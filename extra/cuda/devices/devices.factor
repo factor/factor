@@ -4,7 +4,7 @@ USING: accessors alien.c-types alien.data alien.strings arrays
 assocs byte-arrays classes.struct combinators cuda
 cuda.contexts cuda.ffi cuda.libraries fry io io.encodings.utf8
 kernel locals math math.order math.parser namespaces
-prettyprint sequences ;
+prettyprint sequences splitting ;
 IN: cuda.devices
 
 : #cuda-devices ( -- n )
@@ -51,7 +51,7 @@ IN: cuda.devices
         [ "Memory: " write cuda-device-memory number>string print ]
         [
             "Capability: " write
-            cuda-device-capability [ number>string ] map " " join print
+            cuda-device-capability [ number>string ] map join-words print
         ]
         [ "Properties: " write cuda-device-properties . ]
         [

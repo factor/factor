@@ -71,7 +71,7 @@ M: f cell-dim 2drop 0 0 0 ;
 M: f draw-cell 2drop ;
 
 : single-line ( str -- str' )
-    dup [ "\r\n" member? ] any? [ string-lines " " join ] when ;
+    dup [ "\r\n" member? ] any? [ split-lines join-words ] when ;
 
 M: string cell-dim single-line text-dim first2 ceiling 0 ;
 M: string draw-cell single-line draw-text ;
@@ -216,7 +216,7 @@ M: table draw-gadget*
         ] with-variable
     ] if ;
 
-M: table line-height* ( table -- y )
+M: table line-height*
     [ font>> ] [ renderer>> prototype-row ] bi
     [ cell-dim + nip ] with [ max ] map-reduce ;
 
@@ -326,10 +326,9 @@ M: table model-changed
 PRIVATE>
 
 : row-action ( table -- )
-    dup selected-row
-    [ swap [ dup hook>> call( table -- ) ] [ action>> call( value -- ) ] bi ]
-    [ 2drop ]
-    if ;
+    dup selected-row [
+        over action>> call( value -- )
+    ] [ drop ] if dup hook>> call( table -- ) ;
 
 : row-action? ( table -- ? )
     single-click?>> hand-click# get 2 = or ;

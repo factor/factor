@@ -1,9 +1,9 @@
 ! Copyright (C) 2008, 2009 Doug Coleman, Daniel Ehrenberg.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors combinators kernel kernel.private math sequences
-sequences.private strings sets assocs make lexer namespaces parser
-arrays fry locals regexp.parser splitting sorting regexp.ast
-regexp.negation regexp.compiler compiler.units words math.ranges ;
+USING: accessors arrays compiler.units kernel kernel.private
+lexer make math math.ranges namespaces regexp.ast
+regexp.compiler regexp.negation regexp.parser sequences
+sequences.private splitting strings vocabs.loader words ;
 IN: regexp
 
 TUPLE: regexp
@@ -16,13 +16,15 @@ TUPLE: reverse-regexp < regexp ;
 
 <PRIVATE
 
-M: lookahead question>quot ! Returns ( index string -- ? )
+M: lookahead question>quot
+    ! Returns ( index string -- ? )
     term>> ast>dfa dfa>shortest-word '[ f _ execute ] ;
 
 : <reversed-option> ( ast -- reversed )
     "r" string>options <with-options> ;
 
-M: lookbehind question>quot ! Returns ( index string -- ? )
+M: lookbehind question>quot
+    ! Returns ( index string -- ? )
     term>> <reversed-option>
     ast>dfa dfa>reverse-shortest-word
     '[ [ 1 - ] dip f _ execute ] ;
@@ -156,13 +158,13 @@ GENERIC: compile-regexp ( regex -- regexp )
 : regexp-initial-word ( i string regexp -- i/f )
     [ compile-regexp ] with-compilation-unit match-index-from ;
 
-M: regexp compile-regexp ( regexp -- regexp )
+M: regexp compile-regexp
     dup '[
         dup \ regexp-initial-word =
         [ drop _ get-ast ast>dfa dfa>word ] when
     ] change-dfa ;
 
-M: reverse-regexp compile-regexp ( regexp -- regexp )
+M: reverse-regexp compile-regexp
     t backwards? [ call-next-method ] with-variable ;
 
 DEFER: compile-next-match
@@ -219,6 +221,5 @@ PRIVATE>
 
 SYNTAX: R/ parse-regexp ;
 
-USE: vocabs.loader
 
 { "prettyprint" "regexp" } "regexp.prettyprint" require-when

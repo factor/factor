@@ -5,5 +5,5 @@ USING: arrays io.launcher kernel present system webbrowser ;
 
 IN: webbrowser.freebsd
 
-M: freebsd open-item ( item -- )
+M: freebsd open-item
     present "open" swap 2array run-detached drop ;

@@ -9,7 +9,7 @@ IN: compiler.tree.escape-analysis.branches
 
 M: #branch escape-analysis*
     [ in-d>> add-escaping-values ]
-    [ live-children sift [ (escape-analysis) ] each ]
+    [ live-children [ [ (escape-analysis) ] when* ] each ]
     bi ;
 
 : (merge-allocations) ( values -- allocation )

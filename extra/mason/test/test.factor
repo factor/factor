@@ -21,7 +21,7 @@ IN: mason.test
 : load-failures. ( failures -- ) [ load-error. nl ] each ;
 
 : require-all-no-restarts ( vocabs -- failures )
-    V{ } clone blacklist [
+    V{ } clone errorlist [
         V{ } clone [
             '[
                 [ require ]
@@ -45,12 +45,6 @@ IN: mason.test
     [ keys load-all-vocabs-file to-file ]
     [ load-all-errors-file utf8 [ load-failures. ] with-file-writer ]
     bi ;
-
-GENERIC: word-vocabulary ( word -- vocabulary )
-
-M: word word-vocabulary vocabulary>> ;
-
-M: method word-vocabulary "method-generic" word-prop word-vocabulary ;
 
 :: do-step ( errors summary-file details-file -- )
     errors
@@ -100,7 +94,7 @@ M: method word-vocabulary "method-generic" word-prop word-vocabulary ;
 
 : run-mason-rc ( -- )
     t "user-init" [
-        ".factor-mason-rc" rc-path try-user-init
+        "~/.factor-mason-rc" try-user-init
     ] with-variable ;
 
 : check-user-init-errors ( -- ? )

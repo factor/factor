@@ -116,7 +116,7 @@ C: <cont-frac> cont-frac
 
 : try-all ( -- n )
     2 10000 [a,b]
-    [ perfect-square? not ] filter
+    [ perfect-square? ] reject
     [ find-period ] map
     [ odd? ] filter
     length ;
@@ -147,7 +147,7 @@ C: <cfrac> cfrac
 
 :: split ( fr -- k fr' )
     fr >cfrac< :> ( n a b )
-    n sqrt a + b / >integer
+    n sqrt a + b /i
     dup n swap
     b * a swap -
     b

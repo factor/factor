@@ -1,16 +1,17 @@
 ! Copyright (C) 2005, 2006 Doug Coleman.
 ! Portions copyright (C) 2007, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors alien alien.data alien.strings arrays ascii assocs
-calendar classes classes.struct colors combinators continuations fry
-io io.crlf io.encodings.utf16n kernel libc literals locals make math
-math.bitwise namespaces sequences sets specialized-arrays strings
-threads ui ui.backend ui.clipboards ui.event-loop ui.gadgets
-ui.gadgets.private ui.gadgets.worlds ui.gestures ui.pixel-formats
-ui.private windows.dwmapi windows.errors windows.gdi32
-windows.kernel32 windows.messages windows.offscreen windows.opengl32
-windows.types windows.user32 assocs.extras byte-arrays
-io.encodings.string ;
+USING: accessors alien alien.c-types alien.data alien.strings
+arrays ascii assocs assocs.extras byte-arrays calendar classes
+classes.struct colors combinators continuations io io.crlf
+io.encodings.string io.encodings.utf16n io.encodings.utf8 kernel
+libc literals make math math.bitwise namespaces sequences sets
+specialized-arrays strings threads ui ui.backend ui.clipboards
+ui.event-loop ui.gadgets ui.gadgets.private ui.gadgets.worlds
+ui.gestures ui.pixel-formats ui.private windows.dwmapi
+windows.errors windows.gdi32 windows.kernel32 windows.messages
+windows.offscreen windows.ole32 windows.opengl32 windows.shell32
+windows.types windows.user32 ;
 FROM: unicode => upper-surrogate? under-surrogate? ;
 SPECIALIZED-ARRAY: POINT
 QUALIFIED-WITH: alien.c-types c
@@ -336,7 +337,7 @@ CONSTANT: exclude-keys-wm-char
             lParam -16 shift 0xff bitand :> scan-code
             keyboard-state GetKeyboardState win32-error=0/f
             VK_CONTROL VK_CAPITAL [ 0 swap keyboard-state set-nth ] bi@
-            wParam scan-code keyboard-state chars 2 0 ToUnicode dup win32-error=0/f
+            wParam scan-code keyboard-state chars 2 0 ToUnicode
             1 <=  [
                 1 chars nth 8 shift 0 chars nth bitor
             ] [
@@ -491,7 +492,7 @@ SYMBOL: nc-buttons
     over make-TRACKMOUSEEVENT
         TME_LEAVE >>dwFlags
         0 >>dwHoverTime
-    TrackMouseEvent drop
+    TrackMouseEvent win32-error=0/f
     >lo-hi swap window move-hand fire-motion ;
 
 :: handle-wm-mousewheel ( hWnd uMsg wParam lParam -- )
@@ -511,7 +512,7 @@ SYMBOL: nc-buttons
 : ?make-glass ( world hwnd -- )
     over window-controls>> textured-background swap member-eq? [
         composition-enabled? [
-            full-window-margins DwmExtendFrameIntoClientArea drop
+            full-window-margins DwmExtendFrameIntoClientArea check-hresult
             T{ rgba f 0.0 0.0 0.0 0.0 }
         ] [ drop system-background-color ] if >>background-color
         drop
@@ -700,9 +701,11 @@ M: windows-ui-backend (open-window)
     [ dup handle>> hWnd>> register-window ]
     [ handle>> hWnd>> show-window ] tri ;
 
+! https://github.com/factor/factor/issues/2173
+! ignore timeout (error 258)
 M: win-base select-gl-context
-    [ hDC>> ] [ hRC>> ] bi wglMakeCurrent win32-error=0/f
-    GdiFlush drop ;
+    [ hDC>> ] [ hRC>> ] bi wglMakeCurrent win32-error=0/f-ignore-timeout
+    GdiFlush win32-error=0/f ;
 
 M: win-base flush-gl-context
     hDC>> SwapBuffers win32-error=0/f ;
@@ -798,6 +801,27 @@ CONSTANT: fullscreen-flags flags{ WS_CAPTION WS_BORDER WS_THICKFRAME }
         ]
         [ drop SW_RESTORE ShowWindow win32-error=0/f ]
     } 2cleave ;
+
+: ensure-null-terminated ( str -- str' )
+    dup ?last 0 = [ "\0" append ] unless ; inline
+
+: add-tray-icon ( title -- )
+    NIM_ADD
+    NOTIFYICONDATA <struct>
+        NOTIFYICONDATA heap-size >>cbSize
+        NOTIFYICON_VERSION_4 over timeout-version>> uVersion<<
+        NIF_TIP NIF_ICON bitor >>uFlags
+        world get handle>> hWnd>> >>hWnd
+        f GetModuleHandle "APPICON" native-string>alien LoadIcon >>hIcon
+        rot ensure-null-terminated utf8 encode >>szTip
+        Shell_NotifyIcon win32-error=0/f ;
+
+: remove-tray-icon ( -- )
+    NIM_DELETE
+    NOTIFYICONDATA <struct>
+        NOTIFYICONDATA heap-size >>cbSize
+        world get handle>> hWnd>> >>hWnd
+    Shell_NotifyIcon win32-error=0/f ;
 
 M: windows-ui-backend (set-fullscreen)
     [ enter-fullscreen ] [ exit-fullscreen ] if ;

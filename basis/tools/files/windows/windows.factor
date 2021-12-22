@@ -7,7 +7,7 @@ IN: tools.files.windows
 
 <PRIVATE
 
-M: windows (directory.) ( entries -- lines )
+M: windows (directory.)
     <listing-tool>
         { +file-datetime+ +directory-or-size+ +file-name+ } >>specs
         { { directory-entry>> name>> <=> } } >>sort

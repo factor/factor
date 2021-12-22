@@ -3,8 +3,8 @@
 USING: accessors arrays assocs combinators.short-circuit
 compiler.cfg.comparisons compiler.cfg.instructions
 compiler.cfg.representations.preferred compiler.cfg.rpo
-compiler.cfg.utilities cpu.architecture fry kernel locals math
-namespaces sequences sets ;
+compiler.cfg.utilities cpu.architecture kernel math namespaces
+sequences sets ;
 IN: compiler.cfg.alias-analysis
 
 ! Local copy propagation

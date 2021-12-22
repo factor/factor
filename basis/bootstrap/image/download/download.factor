@@ -8,7 +8,7 @@ CONSTANT: url URL" http://downloads.factorcode.org/images/master/"
 
 : download-checksums ( -- alist )
     url "checksums.txt" >url derive-url http-get nip
-    string-lines [ " " split1 ] { } map>assoc ;
+    split-lines [ " " split1 ] { } map>assoc ;
 
 : file-checksum ( image -- checksum )
     md5 checksum-file bytes>hex-string ;
@@ -17,7 +17,7 @@ CONSTANT: url URL" http://downloads.factorcode.org/images/master/"
     download-checksums at ;
 
 : need-new-image? ( image -- ? )
-    dup exists?
+    dup file-exists?
     [ [ file-checksum ] [ download-checksum ] bi = not ]
     [ drop t ]
     if ;

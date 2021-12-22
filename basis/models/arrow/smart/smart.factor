@@ -8,3 +8,7 @@ IN: models.arrow.smart
 MACRO: <smart-arrow> ( quot -- quot' )
     [ inputs dup ] keep
     '[ _ narray <product> [ _ firstn @ ] <arrow> ] ;
+
+MACRO: <?smart-arrow> ( quot -- quot' )
+    [ inputs dup ] keep
+    '[ _ narray <product> [ _ firstn @ ] <?arrow> ] ;

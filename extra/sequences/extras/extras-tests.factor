@@ -54,13 +54,13 @@ tools.test vectors vocabs ;
 { { 2 4 6 } } [ { 1 2 3 4 5 6 } odd-indices ] unit-test
 
 { "a b c d e" }
-[ "a      b  \t \n \r  c   d \n    e   " [ blank? ] " " compact ] unit-test
+[ "a      b  \t \n \r  c   d \n    e   " [ ascii:blank? ] " " compact ] unit-test
 
 { " a b c d e " }
-[ " a      b  c   d    e   " [ blank? ] " " collapse ] unit-test
+[ " a      b  c   d    e   " [ ascii:blank? ] " " collapse ] unit-test
 
 { { "hello," " " "world!" " " " " } }
-[ "hello, world!  " [ blank? ] slice-when [ >string ] map ] unit-test
+[ "hello, world!  " [ ascii:blank? ] slice-when [ >string ] map ] unit-test
 
 { t }
 [ "abc" sequence>slice slice? ] unit-test
@@ -123,15 +123,15 @@ tools.test vectors vocabs ;
 { "ADEBFC" } [ { "ABC" "D" "EF" } round-robin >string ] unit-test
 
 { { } } [ "ABC" [ ] { } trim-as ] unit-test
-{ "ABC" } [ { 32 65 66 67 32 } [ blank? ] "" trim-as ] unit-test
+{ "ABC" } [ { 32 65 66 67 32 } [ ascii:blank? ] "" trim-as ] unit-test
 
-{ t } [ "ABC" dup [ blank? ] ?trim [ identity-hashcode ] same? ] unit-test
-{ "ABC" } [ " ABC " [ blank? ] ?trim ] unit-test
+{ t } [ "ABC" dup [ ascii:blank? ] ?trim [ identity-hashcode ] same? ] unit-test
+{ "ABC" } [ " ABC " [ ascii:blank? ] ?trim ] unit-test
 
-{ t } [ "ABC" dup [ blank? ] ?trim-head [ identity-hashcode ] same? ] unit-test
-{ t } [ "ABC" dup [ blank? ] ?trim-tail [ identity-hashcode ] same? ] unit-test
-{ "ABC " } [ " ABC " [ blank? ] ?trim-head ] unit-test
-{ " ABC" } [ " ABC " [ blank? ] ?trim-tail ] unit-test
+{ t } [ "ABC" dup [ ascii:blank? ] ?trim-head [ identity-hashcode ] same? ] unit-test
+{ t } [ "ABC" dup [ ascii:blank? ] ?trim-tail [ identity-hashcode ] same? ] unit-test
+{ "ABC " } [ " ABC " [ ascii:blank? ] ?trim-head ] unit-test
+{ " ABC" } [ " ABC " [ ascii:blank? ] ?trim-tail ] unit-test
 
 { "" } [ "" "" "" unsurround ] unit-test
 { "" } [ "  " " " " " unsurround ] unit-test
@@ -211,10 +211,10 @@ tools.test vectors vocabs ;
 { "cdef" } [ 2 f "abcdef" subseq* ] unit-test
 { "cd" } [ -4 -2 "abcdef" subseq* ] unit-test
 
-{ "foo" "" } [ "foo" [ blank? ] cut-when ] unit-test
-{ "foo" " " } [ "foo " [ blank? ] cut-when ] unit-test
-{ "" " foo" } [ " foo" [ blank? ] cut-when ] unit-test
-{ "foo" " bar" } [ "foo bar" [ blank? ] cut-when ] unit-test
+{ "foo" "" } [ "foo" [ ascii:blank? ] cut-when ] unit-test
+{ "foo" " " } [ "foo " [ ascii:blank? ] cut-when ] unit-test
+{ "" " foo" } [ " foo" [ ascii:blank? ] cut-when ] unit-test
+{ "foo" " bar" } [ "foo bar" [ ascii:blank? ] cut-when ] unit-test
 
 { { 4 0 3 1 2 } } [ { 0 4 1 3 2 } 5 <iota> [ nth* ] curry map ] unit-test
 
@@ -234,24 +234,13 @@ tools.test vectors vocabs ;
 
 { 3/10 } [ 10 <iota> [ 3 < ] count* ] unit-test
 
-{ { 0 } } [ "ABA" "ABABA" start-all ] unit-test
-{ { 0 2 } } [ "ABA" "ABABA" start-all* ] unit-test
-{ { 0 3 } } [ "ABA" "ABAABA" start-all ] unit-test
-{ 1 } [ "ABA" "ABABA" count-subseq ] unit-test
-{ 2 } [ "ABA" "ABABA" count-subseq* ] unit-test
+{ { 0 } } [ "ABABA" "ABA" start-all ] unit-test
+{ { 0 2 } } [ "ABABA" "ABA" start-all* ] unit-test
+{ { 0 3 } } [ "ABAABA" "ABA" start-all ] unit-test
+{ 1 } [ "ABABA" "ABA" count-subseq ] unit-test
+{ 2 } [ "ABABA" "ABA" count-subseq* ] unit-test
 
 { 120000 } [ { 10 20 30 40 50 60 } 1 [ * ] 3 reduce-from ] unit-test
-
-{
-    {
-        { 2 4 }
-        { 3 6 }
-        { 4 8 }
-    }
-} [ { 2 3 4 } [ 2 * ] map-zip ] unit-test
-
-{ }
-[ "test:" all-words [ name>> over prepend ] map-zip 2drop ] unit-test
 
 { { 0 1 2 3 } } [ 8 <iota> [ 4 < ] take-while >array ] unit-test
 { { } } [ { 15 16 } [ 4 < ] take-while >array ] unit-test
@@ -279,3 +268,11 @@ tools.test vectors vocabs ;
 { 4 } [ { 1 2 3 4 } [ 5 < ] count-tail ] unit-test
 
 { SBUF" aco" SBUF" ftr"  } [ SBUF" factor" dup [ even? ] extract! ] unit-test
+
+{ 25 5 1 } [ { 4 5 6 } [ sq ] [ 20 > ] find-pred ] unit-test
+{ f f f } [ { 4 5 6 } [ sq ] [ 200 > ] find-pred ] unit-test
+
+{ -1/0. } [ { } max-subarray-sum ] unit-test
+{ -2 } [ { -3 -2 } max-subarray-sum ] unit-test
+{ 7 } [ { 1 2 3 -4 5 } max-subarray-sum ] unit-test
+{ 6 } [ { 1 2 3 -4 1 1 } max-subarray-sum ] unit-test

@@ -5,7 +5,7 @@ strings kernel math io.mmap accessors combinators math.ranges
 unicode byte-arrays io.encodings.string
 io.encodings.utf16 assocs math.parser combinators.short-circuit
 fry namespaces combinators.smart splitting io.encodings.ascii
-arrays io.files.info io.directories.search literals
+arrays io.files.info io.directories literals
 math.functions continuations ;
 FROM: alien.c-types => uchar ;
 IN: id3

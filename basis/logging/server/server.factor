@@ -36,7 +36,7 @@ SYMBOL: log-files
     finally ; inline
 
 : timestamp-header. ( -- )
-    "[" write now (timestamp>rfc3339) "] " write ;
+    "[" write now write-rfc3339 "] " write ;
 
 : multiline-header ( -- str ) 20 CHAR: - <string> ; foldable
 
@@ -68,14 +68,11 @@ SYMBOL: log-files
 
 CONSTANT: keep-logs 10
 
-: ?delete-file ( path -- )
-    dup exists? [ delete-file ] [ drop ] if ;
-
 : delete-oldest ( service -- )
     keep-logs log# ?delete-file ;
 
 : ?move-file ( old new -- )
-    over exists? [ move-file ] [ 2drop ] if ;
+    over file-exists? [ move-file ] [ 2drop ] if ;
 
 : advance-log ( path n -- )
     [ 1 - log# ] 2keep log# ?move-file ;

@@ -165,7 +165,7 @@ M: predicate-class see-class*
     "predicate-definition" word-prop pprint-elements
     pprint-; block> block> ;
 
-M: singleton-class see-class* ( class -- )
+M: singleton-class see-class*
     \ SINGLETON: pprint-word pprint-word ;
 
 GENERIC: pprint-slot-name ( object -- )

@@ -220,7 +220,7 @@ CONSTANT: all-primitives {
     {
         "io.files.private"
         {
-            { "(exists?)" ( path -- ? ) "existsp" { string } { object } f }
+            { "(file-exists?)" ( path -- ? ) "existsp" { string } { object } f }
         }
     }
     {
@@ -407,7 +407,10 @@ CONSTANT: all-primitives {
     {
         "math.private"
         {
-            { "both-fixnums?" ( x y -- ? ) f { object object } { object } f }
+            {
+                "both-fixnums?" ( x y -- ? ) f
+                { object object } { object } make-foldable
+            }
             {
                 "fixnum+fast" ( x y -- z ) f
                 { fixnum fixnum } { fixnum } make-foldable
@@ -778,8 +781,8 @@ CONSTANT: all-primitives {
     {
         "tools.profiler.sampling.private"
         {
-            { "profiling" ( n -- ) "sampling_profiler" { object } { } f }
-            { "(get-samples)" ( -- samples/f ) "get_samples" { } { object } f }
+            { "set-profiling" ( n -- ) "set_profiling" { object } { } f }
+            { "get-samples" ( -- samples/f ) "get_samples" { } { object } f }
         }
     }
     {

@@ -35,7 +35,7 @@ TUPLE: track < pack sizes ;
     } cleave
     '[ [ _ n*v _ set-axis ] when* ] 2map ;
 
-M: track layout* ( track -- ) dup track-layout pack-layout ;
+M: track layout* dup track-layout pack-layout ;
 
 : track-pref-dims-1 ( track -- dim )
     [ children>> pref-dims max-dims ]
@@ -45,10 +45,10 @@ M: track layout* ( track -- ) dup track-layout pack-layout ;
     [
         [ children>> pref-dims ] [ normalized-sizes ] bi
         [ dup { 0 f } member? [ 2drop { 0 0 } ] [ v/n ] if ] 2map
-        max-dims [ >fixnum ] map
+        max-dims
     ] [ gap-dim ] bi v+ ;
 
-M: track pref-dim* ( gadget -- dim )
+M: track pref-dim*
     [ track-pref-dims-1 ]
     [ [ alloted-dim ] [ track-pref-dims-2 ] bi v+ ]
     [ orientation>> ]

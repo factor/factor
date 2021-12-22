@@ -1,20 +1,36 @@
 ! Copyright (C) 2005, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays assocs classes classes.error
-classes.tuple combinators combinators.short-circuit
-continuations debugger effects generic help.crossref help.markup
-help.stylesheet help.topics io io.styles kernel locals make
-namespaces prettyprint sequences sets sorting vocabs words
-words.symbol ;
+USING: accessors arrays assocs classes classes.error combinators
+combinators.short-circuit continuations debugger effects fry
+generic help.crossref help.markup help.stylesheet help.topics io
+io.styles kernel make namespaces prettyprint sequences sets
+sorting vocabs words words.alias words.symbol ;
 IN: help
 
 GENERIC: word-help* ( word -- content )
 
-: word-help ( word -- content )
-    dup "help" word-prop [ ] [ word-help* ] ?if ;
+<PRIVATE
 
-M: word word-help*
-    stack-effect [ in>> ] [ out>> ] bi [
+: inputs-and-outputs ( content word -- content' word )
+   over [ dup array? [ { $values } head? ] [ drop f ] if ] find drop [
+        '[ _ cut unclip rest ] dip [
+            stack-effect [ in>> ] [ out>> ] bi
+            [ [ dup pair? [ first ] when ] map ] bi@
+            [ '[ ?first _ member? ] filter ] bi-curry@
+            \ $inputs \ $outputs
+            [ '[ @ _ prefix ] ] bi-curry@ bi* bi
+            2array glue
+        ] keep
+    ] when* ;
+
+PRIVATE>
+
+: word-help ( word -- content )
+    [ dup "help" word-prop [ ] [ word-help* ] ?if ]
+    [ inputs-and-outputs drop ] bi ;
+
+: effect-help ( effect -- content )
+    [ in>> ] [ out>> ] bi [
         [
             dup pair? [
                 first2 dup effect? [ \ $quotation swap 2array ] when
@@ -22,7 +38,9 @@ M: word word-help*
                 object
             ] if [ effect>string ] dip
         ] { } map>assoc
-    ] bi@ append members \ $values prefix 1array ;
+    ] bi@ \ $inputs \ $outputs [ prefix ] bi-curry@ bi* 2array ;
+
+M: word word-help* stack-effect effect-help ;
 
 : $predicate ( element -- )
     { { "object" object } { "?" boolean } } $values
@@ -35,6 +53,12 @@ M: word word-help*
 M: predicate word-help* \ $predicate swap 2array 1array ;
 
 M: class word-help* drop f ;
+
+M: alias word-help*
+    [
+        \ $description ,
+        "An alias for " , def>> first <$link> , "." ,
+    ] { } make 1array ;
 
 : all-articles ( -- seq )
     articles get keys
@@ -54,7 +78,7 @@ M: class word-help* drop f ;
     } 1|| ;
 
 : sort-articles ( seq -- newseq )
-    [ dup article-title ] { } map>assoc sort-values keys ;
+    [ article-title ] zip-with sort-values keys ;
 
 : all-errors ( -- seq )
     all-words [ error? ] filter sort-articles ;

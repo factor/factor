@@ -109,7 +109,7 @@ SYMBOLS: key-password key-file dh-file ;
         <planet> <login-config> <factor-boilerplate> website-db <alloy> "planet.factorcode.org" add-responder
         <mason-app> <login-config> <factor-boilerplate> website-db <alloy> "builds.factorcode.org" add-responder
         home "docs" append-path <help-webapp> "docs.factorcode.org" add-responder
-        home "cgi" append-path <gitweb> "gitweb.factorcode.org" add-responder
+        home "gitweb" append-path <gitweb> "gitweb.factorcode.org" add-responder
         home "irclogs" append-path <static> t >>allow-listings "irclogs.factorcode.org" add-responder
     main-responder set-global ;
 

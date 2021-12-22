@@ -74,7 +74,7 @@ TUPLE: read-file path encoding block ;
 
 : handle-send-file ( bytes -- )
     "\0" split harvest first2 [ utf8 decode ] bi@
-    over { [ exists? ] [ file-info directory? not ] } 1&& [
+    over { [ file-exists? ] [ file-info directory? not ] } 1&& [
         "netascii" sequence= utf8 binary ? 0 read-file boa
         tftp-client get clients get set-at
         0 handle-send-file-next

@@ -1,8 +1,8 @@
 ! Copyright (C) 2013 Doug Coleman, John Benediktsson.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays assocs combinators combinators.smart fry
-generalizations kernel macros math quotations sequences locals
-math.order sequences.generalizations sequences.private
+generalizations kernel locals macros math math.order namespaces
+quotations sequences sequences.generalizations sequences.private
 stack-checker.transforms system words ;
 IN: combinators.extras
 
@@ -40,7 +40,7 @@ MACRO: cleave-array ( quots -- quot )
 : 4tri ( w x y z p q r -- )
     [ [ 4keep ] dip 4keep ] dip call ; inline
 
-: plox ( ... x/f quot: ( ... x -- ... ) -- ... )
+: plox ( ... x/f quot: ( ... x -- ... y ) -- ... y/f )
     dupd when ; inline
 
 MACRO: smart-plox ( true -- quot )
@@ -103,3 +103,13 @@ DEFER: cond*
     [ dup callable? [ drop t ] [ first call ] if ] map-find
     [ dup callable? [ nip call ] [ second call ] if ]
     [ no-cond ] if* ;
+
+MACRO: chain ( quots -- quot )
+    <reversed> [ ] [ swap '[ [ @ @ ] [ f ] if* ] ] reduce ;
+
+: with-output-variable ( value variable quot -- value )
+    over [ get ] curry compose with-variable ; inline
+
+: loop1 ( ..a quot: ( ..a -- ..a obj ? ) -- ..a obj )
+    [ call ] keep '[ drop _ loop1 ] when ; inline recursive
+

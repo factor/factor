@@ -1,6 +1,6 @@
 ! Copyright (C) 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: assocs fry kernel namespaces memoize init sequences vocabs
+USING: assocs init kernel memoize namespaces sequences vocabs
 vocabs.hierarchy vocabs.loader vocabs.metadata vocabs.refresh
 words ;
 IN: vocabs.cache

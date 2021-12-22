@@ -1,7 +1,7 @@
 ! Copyright (C) 2012 John Benediktsson, Doug Coleman
 ! See http://factorcode.org/license.txt for BSD license
 USING: arrays assocs assocs.private fry generalizations kernel
-math math.statistics sequences sequences.extras ;
+math math.statistics sequences sequences.extras sets ;
 IN: assocs.extras
 
 : deep-at ( assoc seq -- value/f )
@@ -23,6 +23,30 @@ IN: assocs.extras
 
 : sum-values ( assoc -- n ) 0 [ + ] reduce-values ; inline
 
+: map-keys ( assoc quot: ( key -- key' ) -- assoc )
+    '[ _ dip ] assoc-map ; inline
+
+: map-values ( assoc quot: ( value -- value' ) -- assoc )
+    '[ swap _ dip swap ] assoc-map ; inline
+
+: filter-keys ( assoc quot: ( key -- key' ) -- assoc' )
+    '[ drop @ ] assoc-filter ; inline
+
+: filter-values ( assoc quot: ( value -- value' ) -- assoc' )
+    '[ nip @ ] assoc-filter ; inline
+
+: reject-keys ( assoc quot: ( key -- key' ) -- assoc' )
+    '[ drop @ ] assoc-reject ; inline
+
+: reject-values ( assoc quot: ( value -- value' ) -- assoc' )
+    '[ nip @ ] assoc-reject ; inline
+
+: rekey-new-assoc ( assoc keys -- newassoc )
+    [ tuck of ] with H{ } map>assoc ; inline
+
+: rekey-assoc ( assoc keys -- assoc )
+    [ dup keys ] dip diff over [ delete-at ] curry each ; inline
+
 : if-assoc-empty ( ..a assoc quot1: ( ..a -- ..b ) quot2: ( ..a assoc -- ..b ) -- ..b )
     [ dup assoc-empty? ] [ [ drop ] prepose ] [ ] tri* if ; inline
 
@@ -32,12 +56,38 @@ IN: assocs.extras
 : assoc-invert ( assoc -- newassoc )
     dup assoc-invert-as ;
 
-: assoc-merge! ( assoc1 assoc2 -- assoc1 )
+: assoc-collect! ( assoc1 assoc2 -- assoc1 )
     over [ push-at ] with-assoc assoc-each ;
 
-: assoc-merge ( assoc1 assoc2 -- newassoc )
+: assoc-collect ( assoc1 assoc2 -- newassoc )
     [ [ [ assoc-size ] bi@ + ] [ drop ] 2bi new-assoc ] 2keep
-    [ assoc-merge! ] bi@ ;
+    [ assoc-collect! ] bi@ ;
+
+! iterate over assoc2, replace conflicting values
+! Modifies assoc1
+: assoc-merge! ( assoc1 assoc2 quot: ( value1 value2 -- new-value ) -- assoc1' )
+    [| key2 val2 quot | val2 key2 pick
+     at* [ swap quot call ] [ drop ] if
+     key2 pick set-at ] curry assoc-each ; inline
+
+! Same as above, non-destructive
+: assoc-merge ( assoc1 assoc2 quot: ( value1 value2 -- new-value ) -- new-assoc )
+    pick [ [ clone ] 2dip assoc-merge! ]
+    [ drop nip ] if
+    ; inline
+
+! Successively apply assoc-merge operation
+: assoc-collapse ( seq quot: ( value1 value2 -- new-value ) -- assoc )
+    over empty?
+    [ 2drop f ]
+    [ [ unclip-slice H{ } or clone ] [ [ assoc-merge! ] curry ] bi* reduce ] if ; inline
+
+: assoc-collapse! ( assoc seq quot: ( value1 value2 -- new-value ) -- assoc )
+    [ assoc-merge! ] curry each ; inline
+
+: assoc-collapse-as ( seq quot: ( value1 value2 -- new-value ) exemplar -- assoc )
+    pick first assoc-size swap new-assoc
+    -rot assoc-collapse! ; inline
 
 GENERIC: delete-value-at ( value assoc -- )
 
@@ -165,7 +215,7 @@ PRIVATE>
     dup any-multi-value? [ expand-values-set-at flatten-values ] when ;
 
 : intersect-keys ( assoc seq -- elts )
-    [ of ] with map-zip sift-values ; inline
+    [ of ] with zip-with sift-values ; inline
 
 : values-of ( assoc seq -- elts )
     [ of ] with map sift ; inline

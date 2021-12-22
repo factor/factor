@@ -16,11 +16,11 @@ SINGLETON: openssl
 : ssl-error-string ( -- string )
     ERR_get_error (ssl-error-string) ;
 
-: (ssl-error) ( -- * )
+: throw-ssl-error ( -- * )
     ssl-error-string throw ;
 
 : ssl-error ( obj -- )
-    { f 0 } member? [ (ssl-error) ] when ;
+    { f 0 } member? [ throw-ssl-error ] when ;
 
 : init-old-api ( -- )
     SSL_library_init ssl-error

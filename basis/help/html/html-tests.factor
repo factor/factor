@@ -1,26 +1,30 @@
 USING: help.html help.vocabs tools.test help.topics kernel sequences vocabs
 math ;
-IN: help.html.tests
 
-{ } [ "xml" >link help>html drop ] unit-test
+{ } [ [ "xml" >link help>html drop ] with-test-directory ] unit-test
 
-{ } [ "foobar" >link topic>filename drop ] unit-test
+{ "article-foobar.html" }
+[ "foobar" >link topic>filename ] unit-test
 
-{ } [ { "foo" "bar" } >link topic>filename drop ] unit-test
+{ "article-foo,bar.html" }
+[ { "foo" "bar" } >link topic>filename ] unit-test
 
-{ } [ \ + topic>filename drop ] unit-test
+{ "word-+,math.html" } [ \ + topic>filename ] unit-test
 
-{ } [ \ + >link topic>filename drop ] unit-test
+{ "word-+,math.html" } [ \ + >link topic>filename ] unit-test
 
-{ } [ "doesnotexist" >vocab-link topic>filename drop ] unit-test
+{ "vocab-doesnotexist.html" }
+[ "doesnotexist" >vocab-link topic>filename ] unit-test
 
-{ } [ "kernel" lookup-vocab topic>filename drop ] unit-test
+{ "vocab-kernel.html" }
+[ "kernel" lookup-vocab topic>filename ] unit-test
 
-{ } [ "io" <vocab-tag> topic>filename drop ] unit-test
+{ "tag-io.html" } [ "io" <vocab-tag> topic>filename ] unit-test
 
-{ } [ "Steve Jobs" <vocab-author> topic>filename drop ] unit-test
+{ "author-Steve Jobs.html" }
+[ "Steve Jobs" <vocab-author> topic>filename ] unit-test
 
-{ } [ f topic>filename drop ] unit-test
+{ "word-f,syntax.html" } [ f topic>filename ] unit-test
 
 { t } [ all-vocabs-really [ vocab-spec? ] all? ] unit-test
 

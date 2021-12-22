@@ -47,6 +47,11 @@ M: vocab lookup-vocab ;
 
 M: object lookup-vocab vocab-name dictionary get at ;
 
+ERROR: no-vocab-named name ;
+
+: ?lookup-vocab ( vocab-spec -- vocab )
+    dup lookup-vocab [ nip ] [ no-vocab-named ] if* ;
+
 GENERIC: vocab-words-assoc ( vocab-spec -- assoc/f )
 
 M: vocab vocab-words-assoc words>> ;
@@ -125,10 +130,21 @@ M: vocab-spec >vocab-link ;
 
 M: object >vocab-link dup lookup-vocab [ ] [ <vocab-link> ] ?if ;
 
-: forget-vocab ( vocab -- )
+<PRIVATE
+
+: (forget-vocab) ( vocab -- )
     [ vocab-words forget-all ]
     [ vocab-name dictionary get delete-at ]
     [ notify-vocab-observers ] tri ;
+
+PRIVATE>
+
+: forget-vocab ( vocab -- )
+    [ (forget-vocab) ] [
+        vocab-name dup ".private" tail? [ drop ] [
+            ".private" append (forget-vocab)
+        ] if
+    ] bi ;
 
 M: vocab-spec forget* forget-vocab ;
 
@@ -156,3 +172,6 @@ M: string require
 
 : load-vocab ( name -- vocab )
     [ require ] [ lookup-vocab ] bi ;
+
+: ?load-vocab ( name -- vocab )
+    [ require ] [ ?lookup-vocab ] bi ;

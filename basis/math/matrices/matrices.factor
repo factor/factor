@@ -214,6 +214,9 @@ DEFER: matrix-set-nths
 : matrix-map ( matrix quot: ( ... elt -- ... elt' ) -- matrix' )
     '[ _ map ] map ; inline
 
+: matrix-map-index ( matrix quot: ( ... elt i j -- ... elt' ) -- matrix' )
+    '[ [ swap @ ] curry map-index ] map-index ; inline
+
 : column-map ( matrix quot: ( ... col -- ... col' ) -- matrix' )
     [ transpose ] dip map transpose ; inline
 
@@ -308,10 +311,10 @@ M: matrix p-norm-default matrix-p-norm-entrywise ; inline
 M: zero-matrix p-norm 2drop 0 ; inline
 M: matrix p-norm matrix-p-norm ; inline
 
-: matrix-normalize ( m -- m' )
-    dup zero-matrix? [
+: normalize-matrix ( m -- m' )
+    dup zero-matrix? [ ] [
         dup mabs mmax m/n
-    ] unless ; inline foldable
+    ] if ;
 
 ! well-defined for square matrices; but works on nonsquare too
 : main-diagonal ( matrix -- seq )

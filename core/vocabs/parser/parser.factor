@@ -115,7 +115,7 @@ ERROR: unbalanced-private-declaration vocab ;
         vocab-name "Already using ``" "'' vocabulary" surround note.
     ] [
         manifest get
-        [ [ load-vocab ] dip search-vocabs>> push ]
+        [ [ ?load-vocab ] dip search-vocabs>> push ]
         [ [ vocab-name ] dip search-vocab-names>> adjoin ]
         2bi
     ] if ;
@@ -169,11 +169,29 @@ TUPLE: rename word vocab words ;
 : add-renamed-word ( word vocab new-name -- )
     <rename> qualified-vocabs push ;
 
-: use-words ( assoc -- )
+: use-words ( words -- )
     <extra-words> qualified-vocabs push ;
 
-: unuse-words ( assoc -- )
+: unuse-words ( words -- )
     <extra-words> qualified-vocabs remove! drop ;
+
+DEFER: with-words
+
+<PRIVATE
+
+: ?restart-with-words ( words error -- * )
+    dup condition? [
+        [ error>> ]
+        [ restarts>> rethrow-restarts ]
+        [ continuation>> '[ _ _ continue-with ] with-words ] tri
+    ] [ nip rethrow ] if ;
+
+PRIVATE>
+
+: with-words ( words quot -- )
+    [ over '[ _ use-words @ _ unuse-words ] ]
+    [ drop dup '[ _ unuse-words _ swap ?restart-with-words ] ]
+    2bi recover ; inline
 
 TUPLE: ambiguous-use-error name words ;
 
@@ -182,17 +200,24 @@ TUPLE: ambiguous-use-error name words ;
 
 <PRIVATE
 
-: (vocab-search) ( name assocs -- words )
-    [ words>> (lookup) ] with map sift ;
+: (lookup-word) ( words name vocab -- words )
+    words>> (lookup) [ suffix! ] when* ; inline
 
-: (vocab-search-qualified) ( name assocs -- words )
-    [ ":" split1 swap ] dip [ name>> = ] with filter (vocab-search) ;
+: (vocab-search) ( name assocs -- words )
+    [ V{ } clone ] 2dip [ (lookup-word) ] with each ;
+
+: (vocab-search-qualified) ( words name assocs -- words )
+    [ ":" split1 swap ] dip pick [
+        [ name>> = ] with find nip [ (lookup-word) ] with when*
+    ] [
+        3drop
+    ] if ;
 
 : (vocab-search-full) ( name assocs -- words )
-    [ (vocab-search-qualified) ] [ (vocab-search) ] 2bi append ;
+    [ (vocab-search) ] [ (vocab-search-qualified) ] 2bi ;
 
 : vocab-search ( name manifest -- word/f )
-    dupd search-vocabs>> sift (vocab-search-full) dup length {
+    dupd search-vocabs>> (vocab-search-full) dup length {
         { 0 [ 2drop f ] }
         { 1 [ first nip ] }
         [
@@ -259,12 +284,17 @@ M: manifest definitions-changed
 
 PRIVATE>
 
-: with-manifest ( quot -- )
-    <manifest> manifest [
+: (with-manifest) ( quot manifest -- )
+    manifest [
         [ call ] [
             [ manifest get add-definition-observer call ]
             [ manifest get remove-definition-observer ]
-            [ ]
-            cleanup
+            finally
         ] if-bootstrapping
     ] with-variable ; inline
+
+: with-manifest ( quot -- )
+    <manifest> (with-manifest) ; inline
+
+: with-current-manifest ( quot -- )
+    manifest get (with-manifest) ; inline

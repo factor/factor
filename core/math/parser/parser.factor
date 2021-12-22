@@ -88,11 +88,10 @@ TUPLE: float-parse
     [ store-exponent ] [ drop f ] if* ; inline
 
 : pow-until ( base x -- base^x )
-    [ 1 ] 2dip
-    [ dup zero? ] [
+    [ 1 ] 2dip [
         dup odd? [ [ [ * ] keep ] [ 1 - ] bi* ] when
         [ sq ] [ 2/ ] bi*
-    ] until 2drop ; inline
+    ] until-zero drop ; inline
 
 : (pow) ( base x -- base^x )
     integer>fixnum-strict
@@ -169,16 +168,31 @@ CONSTANT: min-magnitude-2 -1074
         [ make-float-bin-exponent ]
     } cond ;
 
+: bignum-?neg ( n -- -n )
+    dup first-bignum bignum= [ drop most-negative-fixnum ] [ neg ] if ;
+
+: fp-?neg ( n -- -n )
+    double>bits 63 2^ bitor bits>double ;
+
 : ?neg ( n/f -- -n/f )
     [
-        dup bignum? [
-            dup first-bignum bignum=
-            [ drop most-negative-fixnum ] [ neg ] if
-        ] [ neg ] if
+        {
+            { [ dup bignum? ] [ bignum-?neg ] }
+            { [ dup fp-nan? ] [ fp-?neg ] }
+            [ neg ]
+        } cond
     ] [ f ] if* ; inline
 
+: ?pos ( n/f -- +n/f )
+    dup fp-nan? [
+        double>bits 63 2^ bitnot bitand bits>double
+    ] when ; inline
+
+: add-ratio? ( n/f -- ? )
+    dup real? [ dup >integer number= not ] [ drop f ] if ;
+
 : ?add-ratio ( m n/f -- m+n/f )
-    dup ratio? [ + ] [ 2drop f ] if ; inline
+    dup add-ratio? [ + ] [ 2drop f ] if ; inline
 
 : @abort ( i number-parse n x -- f )
     4drop f ; inline
@@ -212,8 +226,8 @@ DEFER: @neg-digit
 : @exponent-first-char ( float-parse i number-parse n char -- float-parse n/f )
     {
         { CHAR: - [ [ @exponent-digit ] require-next-digit ?neg ] }
-        { CHAR: + [ [ @exponent-digit ] require-next-digit ] }
-        [ @exponent-digit ]
+        { CHAR: + [ [ @exponent-digit ] require-next-digit ?pos ] }
+        [ @exponent-digit ?pos ]
     } case ; inline
 
 : ->exponent ( float-parse i number-parse n -- float-parse' n/f )
@@ -343,8 +357,8 @@ DEFER: @neg-digit
 : @first-char ( i number-parse n char -- n/f )
     {
         { CHAR: - [ [ @neg-first-digit ] require-next-digit ?neg ] }
-        { CHAR: + [ [ @pos-first-digit ] require-next-digit ] }
-        [ @pos-first-digit ]
+        { CHAR: + [ [ @pos-first-digit ] require-next-digit ?pos ] }
+        [ @pos-first-digit ?pos ]
     } case ; inline
 
 : @neg-first-digit-no-radix ( i number-parse n char -- n/f )
@@ -362,8 +376,8 @@ DEFER: @neg-digit
 : @first-char-no-radix ( i number-parse n char -- n/f )
     {
         { CHAR: - [ [ @neg-first-digit-no-radix ] require-next-digit ?neg ] }
-        { CHAR: + [ [ @pos-first-digit-no-radix ] require-next-digit ] }
-        [ @pos-first-digit-no-radix ]
+        { CHAR: + [ [ @pos-first-digit-no-radix ] require-next-digit ?pos ] }
+        [ @pos-first-digit-no-radix ?pos ]
     } case ; inline
 
 PRIVATE>
@@ -561,7 +575,7 @@ PRIVATE>
 
 M: float >base
     {
-        { [ over fp-nan? ] [ 2drop "0/0." ] }
+        { [ over fp-nan? ] [ drop fp-sign "-0/0." "0/0." ? ] }
         { [ over 1/0. =  ] [ 2drop "1/0." ] }
         { [ over -1/0. = ] [ 2drop "-1/0." ] }
         { [ over  0.0 fp-bitwise= ] [ 2drop  "0.0" ] }

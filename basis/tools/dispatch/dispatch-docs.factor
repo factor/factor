@@ -1,5 +1,4 @@
-IN: tools.dispatch
-USING: help.markup help.syntax vm quotations ;
+USING: help.markup help.syntax vm quotations tools.dispatch ;
 
 HELP: last-dispatch-stats
 { $var-description "A " { $link dispatch-statistics } " instance, set by " { $link collect-dispatch-stats } "." } ;

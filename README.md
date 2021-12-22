@@ -1,5 +1,7 @@
 # Factor
 
+[![](https://api.travis-ci.org/factor/factor.svg)](https://travis-ci.org/factor/factor)
+
 Factor is a [concatenative](https://www.concatenative.org), stack-based
 programming language with [high-level
 features](https://concatenative.org/wiki/view/Factor/Features/The%20language)
@@ -36,15 +38,20 @@ build script:
 
 * Unix: `./build.sh update`
 * Windows: `build.cmd`
+* M1 macOS: `arch -x86_64 ./build.sh update`
 
 or download the correct boot image for your system from
-http://downloads.factorcode.org/images/master/, put it in the factor
+http://downloads.factorcode.org/images/master/, put it in the `factor`
 directory and run:
 
 * Unix: `make` and then `./factor -i=boot.unix-x86.64.image`
 * Windows: `nmake /f Nmakefile x86-64` and then `factor.com -i=boot.windows-x86.64.image`
 
 Now you should have a complete Factor system ready to run.
+
+Factor does not yet work on arm64 cpus. There is an arm64 assembler
+in `cpu.arm.assembler` and we are working on a port and also looking for
+contributors.
 
 More information on [building factor](https://concatenative.org/wiki/view/Factor/Building%20Factor)
 and [system requirements](https://concatenative.org/wiki/view/Factor/Requirements).
@@ -105,6 +112,7 @@ Common arguments:
         -run=listener    run terminal listener
         -run=ui.tools    run Factor development UI
     -e=<code>        evaluate <code>
+    -ea=<code>       evaluate <code> with auto-use
     -no-user-init    suppress loading of .factor-rc
     -roots=<paths>   a list of path-delimited extra vocab roots
 
@@ -148,13 +156,15 @@ Then subsequent fetches will automatically update any replace objects.
 
 ## Community
 
-Factor developers meet in the `#concatenative` channel on
+Factor developers used to meet in the `#concatenative` channel on
 [irc.freenode.net](http://freenode.net). Drop by if you want to discuss
 anything related to Factor or language design in general.
 
 * [Factor homepage](https://factorcode.org)
 * [Concatenative languages wiki](https://concatenative.org)
-* [Mailing list](factor-talk@lists.sourceforge.net)
+* [Join the mailing list](https://concatenative.org/wiki/view/Factor/Mailing%20list)
 * Search for "factorcode" on [Gitter](https://gitter.im/)
+* Search for "Factor" on [Discord](https://discord.com/)
+* [Join the Slack group](https://factorcode.slack.com/)
 
 Have fun!

@@ -22,9 +22,9 @@ SYMBOLS: +effect+ +conditional+ +definition+ ;
 
 : depends-on ( word how -- )
     over primitive? [ 2drop ] [
-        dependencies get dup [
+        dependencies get [
             swap '[ _ strongest-dependency ] change-at
-        ] [ 3drop ] if
+        ] [ 2drop ] if*
     ] if ;
 
 GENERIC: add-depends-on-class ( classoid -- )

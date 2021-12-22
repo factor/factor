@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays calendar calendar.english combinators fry io
 io.directories io.files.info kernel math math.parser prettyprint sequences
-system vocabs sorting.slots calendar.format ;
+system vocabs sorting.slots calendar.format splitting ;
 IN: tools.files
 
 <PRIVATE
@@ -25,7 +25,7 @@ IN: tools.files
         dup year>> dup now year>> =
         [ drop listing-time ] [ nip number>string ] if
         5 CHAR: \s pad-head
-    ] tri 3array " " join ;
+    ] tri 3array join-words ;
 
 : read>string ( ? -- string ) "r" "-" ? ; inline
 
@@ -58,7 +58,7 @@ ERROR: unknown-file-spec symbol ;
 
 HOOK: file-spec>string os ( file-listing spec -- string )
 
-M: object file-spec>string ( file-listing spec -- string )
+M: object file-spec>string
     {
         { +file-name+ [ directory-entry>> name>> ] }
         { +directory-or-size+ [ file-info>> dir-or-size ] }

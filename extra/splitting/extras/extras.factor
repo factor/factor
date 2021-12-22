@@ -1,5 +1,4 @@
-USING: hints kernel math sequences strings ;
-
+USING: hints kernel math sequences sequences.private strings ;
 IN: splitting.extras
 
 <PRIVATE
@@ -32,6 +31,18 @@ PRIVATE>
     [ dup empty? not ] swap [ [ dup ] ] dip
     [ [ [ 1 ] when-zero cut-slice swap ] [ f swap ] if* ] compose
     compose produce nip ; inline
+
+: split-head ( seq quot -- before after )
+    (trim-head) cut ; inline
+
+: split-tail ( seq quot -- before after )
+    (trim-tail) cut ; inline
+
+: split-head-slice ( seq quot -- before after )
+    (trim-head) cut-slice ; inline
+
+: split-tail-slice ( seq quot -- before after )
+    (trim-tail) cut-slice ; inline
 
 <PRIVATE
 

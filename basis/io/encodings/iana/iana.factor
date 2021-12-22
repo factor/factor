@@ -20,7 +20,7 @@ PRIVATE>
 <PRIVATE
 : parse-iana ( file -- synonym-set )
     utf8 file-lines { "" } split [
-        [ " " split ] map
+        [ split-words ] map
         [ first { "Name:" "Alias:" } member? ] filter
         values { "None" } diff
     ] map harvest ;

@@ -189,8 +189,13 @@ PREDICATE: tracked-malloc-ptr < malloc-ptr
 : com-creation-traceback ( disposable -- )
     continuation>> traceback-window ;
 
-[ tracked-disposable? ] \ com-creation-traceback H{ { +primary+ t } } define-operation
-[ tracked-malloc-ptr? ] \ com-creation-traceback H{ { +primary+ t } } define-operation
+[ tracked-disposable? ] \ com-creation-traceback H{
+    { +primary+ t }
+} define-operation
+
+[ tracked-malloc-ptr? ] \ com-creation-traceback H{
+    { +primary+ t }
+} define-operation
 
 ! Operations -> commands
 interactor

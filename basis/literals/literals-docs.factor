@@ -44,7 +44,7 @@ HELP: $[
 HELP: ${
 { $syntax "${ code }" }
 { $description "Outputs an array containing the results of executing " { $snippet "code" } " at parse time." }
-{ $notes { $snippet "code" } "'s definition is looked up and " { $link call } "ed at parse time, so words that reference words in the current compilation unit cannot be used with " { $snippet "$" } "." }
+{ $notes { $snippet "code" } "'s definition is looked up and " { $link call } "ed at parse time, so words that reference words in the current compilation unit cannot be used with " { $snippet "${" } "." }
 { $examples
     { $example
         "USING: kernel literals math prettyprint ;"

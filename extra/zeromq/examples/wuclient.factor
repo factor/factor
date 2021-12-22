@@ -15,7 +15,7 @@ IN: zeromq.examples.wuclient
         2dup >byte-array ZMQ_SUBSCRIBE swap zmq-setopt
         0 100 dup [
             [ pick 0 zmq-recv
-              >string " " split [ string>number ] map second +
+              >string split-words [ string>number ] map second +
             ] times
         ] dip
         / "Average temperature for zipcode '%s' was %dF\n" printf

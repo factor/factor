@@ -1,8 +1,7 @@
 ! Copyright (C) 2009 Joe Groff.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: arrays combinators fry generalizations kernel macros math
-math.order memoize.private quotations sequences
-sequences.private ;
+USING: arrays combinators generalizations kernel math math.order
+memoize.private quotations sequences sequences.private ;
 IN: sequences.generalizations
 
 MACRO: (nsequence) ( n -- quot )
@@ -35,6 +34,9 @@ MACRO: set-firstn ( n -- quot )
         [ set-firstn-unsafe ]
         bi-curry '[ _ _ bi ]
     ] if-zero ;
+
+MACRO: ?firstn ( n -- quot )
+    dup '[ _ f pad-tail _ firstn-unsafe ] ;
 
 : nappend ( n -- seq ) narray concat ; inline
 

@@ -21,16 +21,27 @@ CONSTANT: codes
         { $ XK_KP_Enter "ENTER" }
         { $ XK_Escape "ESC" }
         { $ XK_Delete "DELETE" }
+        { $ XK_KP_Delete "DELETE" }
         { $ XK_Insert "INSERT" }
+        { $ XK_KP_Insert "INSERT" }
         { $ XK_Home "HOME" }
+        { $ XK_KP_Home "HOME" }
         { $ XK_Left "LEFT" }
+        { $ XK_KP_Left "LEFT" }
         { $ XK_Up "UP" }
+        { $ XK_KP_Up "UP" }
         { $ XK_Right "RIGHT" }
+        { $ XK_KP_Right "RIGHT" }
         { $ XK_Down "DOWN" }
+        { $ XK_KP_Down "DOWN" }
         { $ XK_Page_Up "PAGE_UP" }
+        { $ XK_KP_Page_Up "PAGE_UP" }
         { $ XK_Page_Down "PAGE_DOWN" }
+        { $ XK_KP_Page_Down "PAGE_DOWN" }
         { $ XK_End "END" }
+        { $ XK_KP_End "END" }
         { $ XK_Begin "BEGIN" }
+        { $ XK_KP_Begin "BEGIN" }
         { $ XK_F1 "F1" }
         { $ XK_F2 "F2" }
         { $ XK_F3 "F3" }

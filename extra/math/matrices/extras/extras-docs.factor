@@ -117,7 +117,7 @@ HELP: <random-integer-matrix>
     { "The signedness of the numbers in the resulting matrix will be randomized. Use " { $link mabs } " with this word to generate a matrix of random positive integers." }
     { $equiv-word-note "integral" <random-unit-matrix> }
 }
-{ $errors { $link no-method } " if " { $snippet "max"} " is not an " { $link integer } "." }
+{ $errors { $link no-method } " if " { $snippet "max" } " is not an " { $link integer } "." }
 { $examples
     { $unchecked-example
         "USING: math.matrices.extras prettyprint ;"
@@ -368,7 +368,7 @@ HELP: gram-schmidt-normalize
 "{
     { 0.4472135954999579 0.8944271909999159 }
     { 0.894427190999916 -0.447213595499958 }
-    { NAN: 8000000000000 NAN: 8000000000000 }
+    { -0/0. -0/0. }
 }"
     }
 } ;

@@ -1,6 +1,6 @@
+USING: continuations io io.directories io.files.temp logging
+logging.analysis logging.server math tools.test ;
 IN: logging.tests
-USING: tools.test logging logging.analysis logging.server io
-io.files.temp math ;
 
 : input-logging-test ( a b -- c ) + ;
 
@@ -15,6 +15,8 @@ io.files.temp math ;
 \ error-logging-test ERROR add-error-logging
 
 temp-directory [
+    [ "logging-test" temp-file delete-tree ] ignore-errors
+
     "logging-test" [
         [ 4 ] [ 1 3 input-logging-test ] unit-test
 

@@ -7,5 +7,5 @@ IN: backticks
 SYNTAX: `
     "`" parse-multiline-string '[
         _ interpolate>string
-        utf8 [ contents ] with-process-reader
+        utf8 [ read-contents ] with-process-reader
     ] append! ;

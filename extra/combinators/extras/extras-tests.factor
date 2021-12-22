@@ -1,7 +1,7 @@
 ! Copyright (C) 2013 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: combinators.extras io.files kernel math sequences
-tools.test ;
+USING: assocs combinators.extras io.files kernel math sequences
+splitting tools.test splitting ;
 
 { "a b" }
 [ "a" "b" [ " " glue ] once ] unit-test
@@ -34,9 +34,9 @@ tools.test ;
 { "123" "1" } [ "1" "123" [ length ] [ < ] swap-when ] unit-test
 
 
-{ t } [ "resource:" [ exists? ] ?1arg >boolean ] unit-test
-{ f } [ f [ exists? ] ?1arg ] unit-test
-{ f } [ "/homeasdfasdf123123" [ exists? ] ?1arg ] unit-test
+{ t } [ "resource:" [ file-exists? ] ?1arg >boolean ] unit-test
+{ f } [ f [ file-exists? ] ?1arg ] unit-test
+{ f } [ "/homeasdfasdf123123" [ file-exists? ] ?1arg ] unit-test
 
 { "hi " "there" } [
     "hi there" {
@@ -59,4 +59,12 @@ tools.test ;
         { [ "bar" over subseq-start ] [ cut ] }
         [ f ]
     } cond*
+] unit-test
+
+{ f } [ f { } chain ] unit-test
+{ 3 } [ H{ { 1 H{ { 2 3 } } } } { [ 1 of ] [ 2 of ] } chain ] unit-test
+{ f } [ H{ { 1 H{ { 3 4 } } } } { [ 1 of ] [ 2 of ] } chain ] unit-test
+{ f } [ H{ { 2 H{ { 3 4 } } } } { [ 1 of ] [ 2 of ] } chain ] unit-test
+{ 5 } [
+    "hello factor!" { [ split-words ] [ first ] [ length ] } chain
 ] unit-test

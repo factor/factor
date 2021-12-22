@@ -9,7 +9,7 @@ ABOUT: "sodium.secure-memory"
 ARTICLE: "sodium.secure-memory" "Secure memory"
 "The " { $vocab-link "sodium.secure-memory" } " vocab provides a simple wrapper around some of the libsodium's Secure memory functions, see " { $url "https://libsodium.gitbook.io/doc/memory_management" } "." $nl
 "The class for securely allocated alien memory:"
-{ $subsections secure-memory new-secure-memory }
+{ $subsections secure-memory new-secure-memory with-new-secure-memory }
 "Temporary memory access combinators:"
 { $subsections with-read-access with-write-access }
 "Memory access restriction setters:"
@@ -32,6 +32,15 @@ HELP: new-secure-memory
   "In case the memory could not be allocated, " { $link sodium-malloc-error } " is thrown." $nl
   "Initial memory contents are not zero, see documentation at " { $url "https://libsodium.gitbook.io/doc/memory_management" } ". The memory is initially in the read-write mode, but is protected against swapping out by the OS (if supported) and against out of boundary access. Call " { $link allow-no-access } " to restrict access after your own initialization." } ;
 
+HELP: with-new-secure-memory
+{ $values
+  { "size" number }
+  { "quot" { $quotation ( ..a secure-memory -- ..b ) } }
+}
+{ $description "Call " { $snippet "quot" } " with a newly allocated " { $link secure-memory } " instance of the given " { $snippet "size" } ". When the quotation is called, the memory is writable. After the call the access is restricted using " { $link allow-no-access } ". This combinator is especially useful when you need to initialize and lock a new memory region. The " { $snippet "quot" } " should save a reference to the memory for subsequent disposal." } ;
+
+{ new-secure-memory with-new-secure-memory } related-words
+
 HELP: allow-no-access
 { $values
     { "secure-memory" secure-memory }
@@ -53,14 +62,14 @@ HELP: allow-write-access
 HELP: with-read-access
 { $values
   { "secure-memory" secure-memory }
-  { "quot: ( secure-memory -- )" quotation }
+  { "quot" { $quotation ( ..a secure-memory -- ..b ) } }
 }
 { $description "Temporarily allow read-only access to the " { $snippet "secure-memory" } " for the duration of the " { $snippet "quot" } " call. When the quotation terminates, disable the access using " { $link allow-no-access } "." } ;
 
 HELP: with-write-access
 { $values
   { "secure-memory" secure-memory }
-  { "quot: ( secure-memory -- )" quotation }
+  { "quot" { $quotation ( ..a secure-memory -- ..b ) } }
 }
 { $description "Temporarily allow read and write access to the " { $snippet "secure-memory" } " for the duration of the " { $snippet "quot" } " call. When the quotation terminates, disable the access using " { $link allow-no-access } "." } ;
 

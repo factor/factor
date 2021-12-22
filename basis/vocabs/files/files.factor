@@ -1,7 +1,7 @@
 ! Copyright (C) 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: combinators io.directories io.files io.pathnames kernel
-make sequences vocabs.loader ;
+make sequences splitting vocabs vocabs.loader ;
 IN: vocabs.files
 
 : vocab-tests-path ( vocab -- path/f )
@@ -9,15 +9,16 @@ IN: vocabs.files
 
 : vocab-tests-dir ( vocab -- paths )
     dup vocab-dir "tests" append-path vocab-append-path [
-        dup exists? [
+        dup file-exists? [
             dup directory-files [ ".factor" tail? ] filter
             [ append-path ] with map
         ] [ drop f ] if
     ] [ f ] if* ;
 
 : vocab-tests ( vocab -- paths )
+    vocab-name ".private" ?tail drop
     [
-        [ vocab-tests-path [ dup exists? [ , ] [ drop ] if ] when* ]
+        [ vocab-tests-path [ dup file-exists? [ , ] [ drop ] if ] when* ]
         [ vocab-tests-dir % ] bi
     ] { } make ;
 

@@ -1,9 +1,10 @@
 ! Copyright (C) 2007, 2008 Slava Pestov, Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: alien alien.c-types alien.data arrays assocs byte-arrays
-combinators combinators.short-circuit fry kernel kernel.private
-layouts macros math math.bits sequences sequences.private
+combinators combinators.short-circuit kernel kernel.private
+layouts math math.bits sequences sequences.private
 specialized-arrays words ;
+IN: math.bitwise
 SPECIALIZED-ARRAY: uchar
 IN: math.bitwise
 
@@ -58,22 +59,26 @@ ERROR: bit-range-error x high low ;
 
 GENERIC: (bitfield-quot) ( spec -- quot )
 
-M: integer (bitfield-quot) ( spec -- quot )
+M: integer (bitfield-quot)
     '[ _ shift ] ;
 
-M: pair (bitfield-quot) ( spec -- quot )
+M: pair (bitfield-quot)
     first2-unsafe over word? [
         '[ _ execute _ shift ]
     ] [
         '[ _ _ shift ]
     ] if ;
 
-PRIVATE>
-
-MACRO: bitfield ( bitspec -- quot )
+: (bitfield) ( bitspec -- quot )
     [ [ 0 ] ] [
         [ (bitfield-quot) ] [ '[ @ _ dip bitor ] ] map-reduce
     ] if-empty ;
+
+PRIVATE>
+
+MACRO: bitfield ( bitspec -- quot ) (bitfield) ;
+
+MACRO: bitfield* ( bitspec -- quot ) reverse (bitfield) ;
 
 ! bit-count
 <PRIVATE

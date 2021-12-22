@@ -1,6 +1,6 @@
 ! Copyright (C) 2009, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel sequences fry math.order math.ranges splitting ;
+USING: kernel sequences splitting ;
 IN: strings.tables
 
 <PRIVATE
@@ -14,8 +14,8 @@ IN: strings.tables
 PRIVATE>
 
 : format-table ( table -- seq )
-    [ [ string-lines ] map format-row flip ] map concat flip
+    [ [ split-lines ] map format-row flip ] map concat flip
     [ { } ] [
         [ but-last-slice [ format-column ] map! drop ] keep
-        flip [ " " join ] map!
+        flip [ join-words ] map!
     ] if-empty ;

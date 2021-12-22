@@ -96,7 +96,7 @@ HELP: contained-classes
 { $see-also all-contained-classes } ;
 
 HELP: define-predicate
-{ $values { "class" class } { "quot" quotation } }
+{ $values { "class" class } { "quot" { $quotation ( obj -- ? ) } } }
 { $description "Defines a predicate word for a class." }
 $low-level-note ;
 
@@ -105,7 +105,7 @@ HELP: metaclass-changed
 { $description "Notifies the class 'class' that its metaclass 'use' has changed." } ;
 
 HELP: predicate-def
-{ $values { "obj" "a type object" } { "quot" quotation } }
+{ $values { "obj" "a type object" } { "quot" { $quotation ( obj -- ? ) } } }
 { $description "Outputs a quotation that can be used to check if objects are an instance of the given type." }
 { $examples
   { $example

@@ -148,7 +148,7 @@ ERROR: uninferable ;
         [ already-inlined-quot? [ uninferable ] when ]
         [ safe-infer dup +unknown+ = [ uninferable ] when ] tri
     ] [
-        dup class>> {
+        dup { [ slots>> empty? not ] [ class>> ] } 1&& {
             { \ curried [ slots>> third (infer-value) remove-effect-input ] }
             { \ composed [ slots>> last2 [ (infer-value) ] bi@ compose-effects ] }
             [ uninferable ]

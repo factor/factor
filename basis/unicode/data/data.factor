@@ -33,7 +33,7 @@ CONSTANT: name-map H{ }
 : combining-class ( char -- n ) class-map at ; inline
 : non-starter? ( char -- ? ) combining-class { 0 f } member? not ; inline
 : property ( property -- interval-map ) properties at ; foldable
-: property? ( char property -- ? ) property interval-sets:in? ; inline
+: property? ( char property -- ? ) property interval-in? ; inline
 : special-case ( ch -- casing-tuple ) special-casing at ; inline
 
 ! For non-existent characters, use Cn
@@ -100,14 +100,14 @@ PRIVATE>
 
 : (process-decomposed) ( data -- alist )
     5 swap (process-data)
-    [ " " split [ hex> ] map ] assoc-map ;
+    [ split-words [ hex> ] map ] assoc-map ;
 
 : exclusions-file ( -- filename )
     "vocab:unicode/UCD/CompositionExclusions.txt" ;
 
 : exclusions ( -- set )
     exclusions-file utf8 file-lines
-    [ "#" split1 drop [ blank? ] trim-tail hex> ] map
+    [ "#" split1 drop [ ascii:blank? ] trim-tail hex> ] map
     [ 0 = ] reject ;
 
 : unique ( seq -- assoc )
@@ -157,7 +157,7 @@ PRIVATE>
     ] H{ } assoc-map-as ;
 
 : multihex ( hexstring -- string )
-    " " split [ hex> ] map sift ;
+    split-words [ hex> ] map sift ;
 
 PRIVATE>
 

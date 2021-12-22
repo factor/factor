@@ -16,7 +16,7 @@ TUPLE: help-webapp < dispatcher ;
     <page-action>
         { help-webapp "search" } >>template
         [
-            "search" param [ blank? ] trim [
+            "search" param [ unicode:blank? ] trim [
                 help-dir [
                     [ article-apropos links "articles" set-value ]
                     [ word-apropos links "words" set-value ]
@@ -39,8 +39,7 @@ TUPLE: help-webapp < dispatcher ;
     help-webapp new-dispatcher
         <main-action> <secure-only> "" add-responder
         help-dir <search-action> <secure-only> "search" add-responder
-        help-dir <static> <secure-only> "content" add-responder
-        "resource:basis/definitions/icons/" <static> <secure-only> "icons" add-responder ;
+        help-dir <static> <secure-only> "content" add-responder ;
 
 : run-help-webapp ( -- )
     "docs" cache-file <help-webapp>

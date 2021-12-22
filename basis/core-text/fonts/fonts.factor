@@ -77,7 +77,7 @@ FUNCTION: CGFloat CTFontGetXHeight ( CTFontRef font )
 
 CONSTANT: font-names
     H{
-        { "monospace" "Monaco" }
+        { "monospace" "Menlo" }
         { "sans-serif" "LucidaGrande" }
         { "serif" "Times" }
     }

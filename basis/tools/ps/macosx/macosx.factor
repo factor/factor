@@ -139,12 +139,12 @@ STRUCT: kinfo_proc
     [ kinfo_proc memory>struct ] map ;
 
 : ps-arg ( kp_proc -- arg )
-    [ p_pid>> args rest " " join ] [
+    [ p_pid>> args rest join-words ] [
         drop p_comm>> 0 over index [ head ] when* >string
     ] recover ;
 
 PRIVATE>
 
-M: macosx ps ( -- assoc )
+M: macosx ps
     procs [ kp_proc>> p_pid>> 0 > ] filter
     [ kp_proc>> [ p_pid>> ] [ ps-arg ] bi ] { } map>assoc ;

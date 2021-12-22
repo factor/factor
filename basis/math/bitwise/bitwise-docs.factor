@@ -4,14 +4,15 @@ USING: assocs help.markup help.syntax math sequences kernel ;
 IN: math.bitwise
 
 HELP: bitfield
-{ $values { "values..." "a series of objects" } { "bitspec" "an array" } { "n" integer } }
-{ $description "Constructs an integer from a series of values on the stack together with a bit field specifier, which is an array whose elements have one of the following shapes:"
+{ $values { "values..." "a series of objects on the stack" } { "bitspec" "an array" } { "n" integer } }
+    { $description "Constructs an integer (bit field) from a series of values on the stack together with a bit field specifier, which is an array whose elements have one of the following shapes:"
     { $list
-        { { $snippet "{ constant shift }" } " - the resulting bit field is bitwise or'd with " { $snippet "constant" } " shifted to the right by " { $snippet "shift" } " bits" }
-        { { $snippet "{ word shift }" } " - the resulting bit field is bitwise or'd with " { $snippet "word" } " applied to the top of the stack; the result is shifted to the right by " { $snippet "shift" } " bits" }
-        { { $snippet "shift" } " - the resulting bit field is bitwise or'd with the top of the stack; the result is shifted to the right by " { $snippet "shift" } " bits" }
+        { { $snippet "{ word shift }" } " - " { $snippet "word" } " is applied to the top of the stack and the result is shifted to the left by " { $snippet "shift" } " bits and bitor'd with the bit field" }
+        { { $snippet "shift" } " - the top of the stack is shifted to the left by " { $snippet "shift" } " bits and bitor'd with the bit field" }
+        { { $snippet "{ constant shift }" } " - " { $snippet "constant" } " is shifted to the left by " { $snippet "shift" } " bits and bitor'd with the bit field" }
     }
-"The bit field specifier is processed left to right, so stack values should be supplied in reverse order." }
+    "The last entry in the bit field specifier is processed in reverse, so stack values are supplied in reverse order, e.g. the leftmost stack value is the last bit field specifier."
+}
 { $examples
     "Consider the following specification:"
     { $list
@@ -21,7 +22,10 @@ HELP: bitfield
         { "bits 16-20 are set to the value of " { $snippet "fooify" } " applied to " { $snippet "z" } }
     }
     "Such a bit field construction can be specified with a word like the following:"
-    { $code
+    { $example
+        "USING: math math.bitwise prettyprint ;"
+        "IN: math.bitwise.examples"
+        ": fooify ( x -- y ) 0b1111 bitand ;"
         ": baz-bitfield ( x y z -- n )"
         "    {"
         "        { fooify 16 }"
@@ -29,13 +33,85 @@ HELP: bitfield
         "        11"
         "        0"
         "    } bitfield ;"
+        "3 2 1 baz-bitfield ."
+        "102403"
+    }
+    "Square the 3 from the stack and shift 8, place the 1 from the stack at bit 5, and shift a constant 1 to bit 2:"
+    { $example
+        "USING: math math.bitwise prettyprint ;"
+        "1 3"
+        "    {"
+        "        { sq 8 }"
+        "        5"
+        "        { 1 2 }"
+        "    } bitfield .b"
+        "0b100100100100"
     }
 } ;
 
+HELP: bitfield*
+{ $values { "values..." "a series of objects on the stack" } { "bitspec" "an array" } { "n" integer } }
+{ $description "Constructs an integer (bit field) from a series of values on the stack together with a bit field specifier, which is an array whose elements have one of the following shapes:"
+    { $list
+        { { $snippet "{ word shift }" } " - " { $snippet "word" } " is applied to the top of the stack and the result is shifted to the left by " { $snippet "shift" } " bits and bitor'd with the bit field" }
+        { { $snippet "shift" } " - the top of the stack is shifted to the left by " { $snippet "shift" } " bits and bitor'd with the bit field" }
+        { { $snippet "{ constant shift }" } " - " { $snippet "constant" } " is shifted to the left by " { $snippet "shift" } " bits and bitor'd with the bit field" }
+    }
+    "The bit field specifier is processed in order, so stack values are taken from left to right."
+}
+{ $examples
+    "Consider the following specification:"
+    { $list
+        { "bits 0-10 are set to the value of " { $snippet "x" } }
+        { "bits 11-14 are set to the value of " { $snippet "y" } }
+        { "bit 15 is always on" }
+        { "bits 16-20 are set to the value of " { $snippet "fooify" } " applied to " { $snippet "z" } }
+    }
+    "Such a bit field construction can be specified with a word like the following:"
+    { $example
+        "USING: math math.bitwise prettyprint ;"
+        "IN: math.bitwise.examples"
+        ": fooify ( x -- y ) 0b1111 bitand ;"
+        ": baz-bitfield* ( x y z -- n )"
+        "    {"
+        "        0"
+        "        11"
+        "        { 1 15 }"
+        "        { fooify 16 }"
+        "    } bitfield* ;"
+        "1 2 3 baz-bitfield* ."
+        "233473"
+    }
+    "Put a 1 at bit 1, put the 1 from the stack at bit 5, square the 3 and put it at bit 8:"
+    { $example
+        "USING: math math.bitwise prettyprint ;"
+        "1 3"
+        "    {"
+        "        { 1 2 }"
+        "        5"
+        "        { sq 8 }"
+        "    } bitfield* .b"
+        "0b100100100100"
+    }
+} ;
+
+{ bitfield bitfield* } related-words
+
 HELP: bits
 { $values { "m" integer } { "n" integer } { "m'" integer } }
-{ $description "Keep only n bits from the integer m." }
-{ $example "USING: math.bitwise prettyprint ;" "0x123abcdef 16 bits .h" "0xcdef" } ;
+{ $description "Keep only " { $snippet "n" } " bits from the integer " { $snippet "m" } ". For negative numbers, represent the number as two's complement (a positive integer representing a negative integer)." }
+{ $examples
+    { $example
+        "USING: math.bitwise prettyprint ;"
+        "0x123abcdef 16 bits .h"
+        "0xcdef"
+    }
+    { $example
+        "USING: math.bitwise prettyprint ;"
+        "-2 16 bits .h"
+        "0xfffe"
+    }
+} ;
 
 HELP: bit-range
 { $values { "x" integer } { "high" integer } { "low" integer } { "y" integer } }
@@ -45,7 +121,7 @@ HELP: bit-range
 HELP: bitroll
 { $values { "x" integer } { "s" "a shift integer" } { "w" "a wrap integer" } { "y" integer }
 }
-{ $description "Roll n by s bits to the left, wrapping around after w bits." }
+{ $description "Roll " { $snippet "n" } " by " { $snippet "s" } " bits to the left, wrapping around after " { $snippet "w" } " bits." }
 { $examples
     { $example "USING: math.bitwise prettyprint ;" "1 -1 32 bitroll .b" "0b10000000000000000000000000000000" }
     { $example "USING: math.bitwise prettyprint ;" "0xffff0000 8 32 bitroll .h" "0xff0000ff" }
@@ -115,7 +191,7 @@ HELP: clear-bit
      { "x" integer } { "n" integer }
      { "y" integer }
 }
-{ $description "Sets the nth bit of " { $snippet "x" } " to zero." }
+{ $description "Sets the " { $snippet "n" } "th bit of " { $snippet "x" } " to zero." }
 { $examples
     { $example "USING: math.bitwise kernel prettyprint ;"
         "0xff 7 clear-bit .h"
@@ -178,8 +254,14 @@ HELP: >signed
         "0xff 8 >signed ."
         "-1"
     }
+    { $example "USING: math.bitwise prettyprint ;"
+        "0xf0 4 >signed ."
+        "0"
+    }
 }
-{ $description "Interprets a number " { $snippet "x" } " as an " { $snippet "n" } "-bit number and converts it to a negative number " { $snippet "n" } "-bit number if the topmost bit is set." } ;
+{ $description "Interprets a number " { $snippet "x" } " as an " { $snippet "n" } "-bit number and converts it to a negative number if the topmost bit is set." } ;
+
+{ >signed bits } related-words
 
 HELP: mask
 { $values
@@ -199,7 +281,7 @@ HELP: mask-bit
      { "m" integer } { "n" integer }
      { "m'" integer }
 }
-{ $description "Turns off all bits besides the nth bit." }
+{ $description "Turns off all bits besides the " { $snippet "n" } "th bit." }
 { $examples
     { $example "USING: math.bitwise kernel prettyprint ;"
         "0xff 2 mask-bit .b"
@@ -262,7 +344,7 @@ HELP: toggle-bit
      { "n" integer }
      { "m'" integer }
 }
-{ $description "Toggles the nth bit of an integer." }
+{ $description "Toggles the " { $snippet "n" } "th bit of an integer." }
 { $examples
     { $example "USING: math.bitwise kernel prettyprint ;"
         "0 3 toggle-bit .b"
@@ -279,7 +361,7 @@ HELP: set-bit
      { "x" integer } { "n" integer }
      { "y" integer }
 }
-{ $description "Sets the nth bit of " { $snippet "x" } "." }
+{ $description "Sets the " { $snippet "n" } "th bit of " { $snippet "x" } "." }
 { $examples
     { $example "USING: math.bitwise kernel prettyprint ;"
         "0 5 set-bit .h"

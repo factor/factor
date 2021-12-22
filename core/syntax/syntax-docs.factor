@@ -55,7 +55,6 @@ ARTICLE: "syntax-ratios" "Ratio syntax"
 { $code
     "75/33"
     "1/10"
-    "-5/-6"
     "1+1/3"
     "-10-1/7"
 }
@@ -92,14 +91,36 @@ ARTICLE: "syntax-floats" "Float syntax"
     "1/3. ."
     "0.3333333333333333"
 }
+{ $example
+    "1/0.5 ."
+    "2.0"
+}
+{ $example
+    "1/2.5 ."
+    "0.4"
+}
+{ $example
+    "1+1/2. ."
+    "1.5"
+}
+{ $example
+    "1+1/2.5 ."
+    "1.4"
+}
 "The special float values have their own syntax:"
 { $table
 { "Positive infinity" { $snippet "1/0." } }
 { "Negative infinity" { $snippet "-1/0." } }
-{ "Not-a-number" { $snippet "0/0." } }
+{ "Not-a-number (positive)" { $snippet "0/0." } }
+{ "Not-a-number (negative)" { $snippet "-0/0." } }
 }
 "A Not-a-number literal with an arbitrary payload can also be input:"
 { $subsections POSTPONE: NAN: }
+"To see the 64 bit value of " { $snippet "0/0." } " on your platform, execute the following code :"
+{ $code
+     "USING: io math math.parser ;"
+     "\"NAN: \" write 0/0. double>bits >hex print"
+}
 "Hexadecimal, octal and binary float literals are also supported. These consist of a hexadecimal, octal or binary literal with a decimal point and a mandatory base-two exponent expressed as a decimal number after " { $snippet "p" } " or " { $snippet "P" } ":"
 { $example
     "8.0 0x1.0p3 = ."
@@ -167,6 +188,7 @@ ARTICLE: "escape" "Character escape codes"
     { { $snippet "\\\"" } { $snippet "\"" } }
     { { $snippet "\\x" { $emphasis "xx" } } { "The Unicode code point with hexadecimal number " { $snippet { $emphasis "xx" } } } }
     { { $snippet "\\u" { $emphasis "xxxxxx" } } { "The Unicode code point with hexadecimal number " { $snippet { $emphasis "xxxxxx" } } } }
+    { { $snippet "\\u{" { $emphasis "xx" } "}" } { "The Unicode code point with hexadecimal number " { $snippet { $emphasis "xx" } } } }
     { { $snippet "\\u{" { $emphasis "name" } "}" } { "The Unicode code point named " { $snippet { $emphasis "name" } } } }
 } ;
 
@@ -517,26 +539,47 @@ HELP: USE:
 { $syntax "USE: vocabulary" }
 { $values { "vocabulary" "a vocabulary name" } }
 { $description "Adds a new vocabulary to the search path, loading it first if necessary." }
-{ $notes "If adding the vocabulary introduces ambiguity, referencing the ambiguous names will throw a " { $link ambiguous-use-error } "." }
-{ $errors "Throws an error if the vocabulary does not exist or could not be loaded." } ;
+{ $notes "If adding the vocabulary introduces ambiguity, referencing the ambiguous names will throw an " { $link ambiguous-use-error } ". You can disambiguate the names by prefixing them with their vocabulary name and a colon: " { $snippet "vocabulary:word" } "." }
+{ $errors "Throws an error if the vocabulary does not exist or could not be loaded." }
+{ $examples "The following two code snippets are equivalent."
+    { $example
+    "USE: math USE: prettyprint"
+    "1 2 + ."
+    "3" }
+    { $example
+    "USE: math USE: prettyprint"
+    "1 2 math:+ prettyprint:."
+    "3" }
+}
+{ $see-also \ USING: \ QUALIFIED: } ;
 
 HELP: UNUSE:
 { $syntax "UNUSE: vocabulary" }
 { $values { "vocabulary" "a vocabulary name" } }
-{ $description "Removes a vocabulary from the search path." }
-{ $errors "Throws an error if the vocabulary does not exist." } ;
+{ $description "Removes a vocabulary from the search path." } ;
 
 HELP: USING:
 { $syntax "USING: vocabularies... ;" }
 { $values { "vocabularies" "a list of vocabulary names" } }
 { $description "Adds a list of vocabularies to the search path." }
-{ $notes "If adding the vocabularies introduces ambiguity, referencing the ambiguous names will throw a " { $link ambiguous-use-error } "." }
-{ $errors "Throws an error if one of the vocabularies does not exist." } ;
+{ $notes "If adding the vocabulary introduces ambiguity, referencing the ambiguous names will throw an " { $link ambiguous-use-error } ". You can disambiguate the names by prefixing them with their vocabulary name and a colon: " { $snippet "vocabulary:word" } "." }
+{ $errors "Throws an error if one of the vocabularies does not exist." }
+{ $examples "The following two code snippets are equivalent."
+    { $example
+    "USING: math prettyprint ;"
+    "1 2 + ."
+    "3" }
+    { $example
+    "USING: math prettyprint ;"
+    "1 2 math:+ prettyprint:."
+    "3" }
+}
+{ $see-also \ USE: \ QUALIFIED: } ;
 
 HELP: QUALIFIED:
 { $syntax "QUALIFIED: vocab" }
 { $description "Adds the vocabulary's words, prefixed with the vocabulary name, to the search path." }
-{ $notes "If adding the vocabulary introduces ambiguity, the vocabulary will take precedence when resolving any ambiguous names. This is a rare case; for example, suppose a vocabulary " { $snippet "fish" } " defines a word named " { $snippet "go:fishing" } ", and a vocabulary named " { $snippet "go" } " defines a word named " { $snippet "fishing" } ". Then, the following will call the latter word:"
+{ $notes "If adding a vocabulary introduces ambiguity, the vocabulary will take precedence when resolving any ambiguous names. This is a rare case; for example, suppose a vocabulary " { $snippet "fish" } " defines a word named " { $snippet "go:fishing" } ", and a vocabulary named " { $snippet "go" } " defines a word named " { $snippet "fishing" } ". Then, the following will call the latter word:"
   { $code
   "USE: fish"
   "QUALIFIED: go"

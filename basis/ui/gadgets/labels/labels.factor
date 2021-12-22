@@ -12,8 +12,8 @@ TUPLE: label < aligned-gadget text font ;
 
 SLOT: string
 
-M: label string>> ( label -- string )
-    text>> dup string? [ "\n" join ] unless ; inline
+M: label string>>
+    text>> dup string? [ join-lines ] unless ; inline
 
 <PRIVATE
 
@@ -22,9 +22,9 @@ PREDICATE: string-array < array [ string? ] all? ;
 PRIVATE>
 
 : ?string-lines ( string -- string/array )
-    CHAR: \n over member-eq? [ string-lines ] when ;
+    CHAR: \n over member-eq? [ split-lines ] when ;
 
-M: label string<< ( string label -- )
+M: label string<<
     [
         dup string-array? [
             string check-instance ?string-lines
@@ -46,7 +46,7 @@ M: label string<< ( string label -- )
     [ font>> ] [ text>> ] bi ; inline
 
 M: label pref-dim*
-    >label< text-dim ;
+    >label< text-dim first2 ceiling 2array ;
 
 <PRIVATE
 
@@ -56,10 +56,10 @@ M: label pref-dim*
 PRIVATE>
 
 M: label baseline*
-    label-metrics ascent>> round ;
+    label-metrics ascent>> ;
 
 M: label cap-height*
-    label-metrics cap-height>> round ;
+    label-metrics cap-height>> ;
 
 <PRIVATE
 

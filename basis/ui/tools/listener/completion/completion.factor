@@ -4,13 +4,13 @@ USING: accessors arrays assocs calendar colors colors.constants
 combinators combinators.short-circuit definitions.icons
 documents documents.elements fonts fry generic help.vocabs
 kernel math math.vectors models.arrow models.delay parser
-present sequences sets splitting tools.completion ui.commands
-ui.gadgets ui.gadgets.editors ui.gadgets.glass
+present sequences sets splitting strings tools.completion
+ui.commands ui.gadgets ui.gadgets.editors ui.gadgets.glass
 ui.gadgets.labeled ui.gadgets.scrollers ui.gadgets.tables
 ui.gadgets.tracks ui.gadgets.worlds ui.gadgets.wrappers
 ui.gestures ui.images ui.operations ui.pens.solid ui.theme
 ui.theme.images ui.tools.common ui.tools.listener.history
-ui.tools.listener.popups vocabs words ;
+ui.tools.listener.popups unicode.data vocabs words ;
 IN: ui.tools.listener.completion
 
 ! We don't directly depend on the listener tool but we use a few slots
@@ -69,6 +69,9 @@ M: history-completion completion-banner drop "Input history" ;
 
 ! Completion modes also implement the row renderer protocol
 M: listener-completion row-columns drop present 1array ;
+
+M: char-completion row-columns
+    drop [ name-map at 1string ] [ 2array ] bi ;
 
 M: definition-completion prototype-row
     drop \ + definition-icon <image-name> "" 2array ;
@@ -145,8 +148,7 @@ GENERIC#: accept-completion-hook 1 ( item popup -- )
     find-completion-popup
     [ insert-completion ]
     [ accept-completion-hook ]
-    [ nip hide-glass ]
-    2tri ;
+    2bi ;
 
 : <completion-table> ( interactor completion-mode -- table )
     [ completion-element ] [ completion-quot ] [ nip ] 2tri
@@ -157,7 +159,8 @@ GENERIC#: accept-completion-hook 1 ( item popup -- )
         30 >>min-cols
         10 >>min-rows
         10 >>max-rows
-        dup '[ _ accept-completion ] >>action ;
+        dup '[ _ accept-completion ] >>action
+        [ hide-glass ] >>hook ;
 
 : <completion-scroller> ( completion-popup -- scroller )
     table>> <scroller> white-interior ;
@@ -188,15 +191,6 @@ completion-popup H{
 
 : recall-next ( interactor -- )
     history>> history-recall-next ;
-
-: completion-gesture ( gesture completion -- value/f operation/f )
-    table>> selected-row
-    [ [ nip ] [ gesture>operation ] 2bi ] [ drop f ] if ;
-
-M: completion-popup handle-gesture ( gesture completion -- ? )
-    2dup completion-gesture [
-        [ nip hide-glass ] [ invoke-command ] 2bi* f
-    ] [ drop call-next-method ] if* ;
 
 : ?check-popup ( interactor -- interactor )
     dup popup>> [

@@ -44,7 +44,7 @@ TUPLE: linux-monitor < monitor wd inotify watches ;
         "Calling <monitor> outside with-monitors" throw
     ] unless ;
 
-M: linux (monitor) ( path recursive? mailbox -- monitor )
+M: linux (monitor)
     swap [
         <recursive-monitor>
     ] [
@@ -52,7 +52,7 @@ M: linux (monitor) ( path recursive? mailbox -- monitor )
         IN_CHANGE_EVENTS swap add-watch
     ] if ;
 
-M: linux-monitor dispose* ( monitor -- )
+M: linux-monitor dispose*
     [ [ wd>> ] [ watches>> ] bi delete-at ]
     [
         dup inotify>> disposed>> [ drop ] [

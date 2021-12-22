@@ -1,6 +1,6 @@
-USING: kernel math math.constants math.functions math.order
-tools.test prettyprint prettyprint.config namespaces eval
-accessors ;
+USING: accessors eval kernel math math.complex math.constants
+math.functions math.order namespaces prettyprint
+prettyprint.config tools.test ;
 
 [ 1 C{ 0 1 } rect> ] must-fail
 [ C{ 0 1 } 1 rect> ] must-fail

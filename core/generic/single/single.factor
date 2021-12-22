@@ -39,16 +39,17 @@ SYMBOL: combination
 
 HOOK: picker combination ( -- quot )
 
-M: single-combination next-method-quot* ( class generic combination -- quot )
+M: single-combination next-method-quot*
     [
-        2dup next-method dup [
+        2dup next-method [
             [
-                pick predicate-def %
+                [ picker % ] 3dip
+                [ dup predicate-def % ] 2dip
                 1quotation ,
                 [ inconsistent-next-method ] 2curry ,
                 \ if ,
-            ] [ ] make picker prepend
-        ] [ 3drop f ] if
+            ] [ ] make
+        ] [ 2drop f ] if*
     ] with-combination ;
 
 : method-for-object ( obj word -- method )
@@ -59,7 +60,7 @@ M: single-combination next-method-quot* ( class generic combination -- quot )
     bi or ;
 
 M: single-combination make-default-method
-    [ [ picker ] dip [ no-method ] curry append ] with-combination ;
+    [ [ picker ] dip '[ @ _ no-method ] ] with-combination ;
 
 ! ! ! Build an engine ! ! !
 

@@ -57,7 +57,7 @@ CONSTANT: revalidate-url-key "__u"
 : validation-failed ( -- * )
     post-request? revalidate-url and [
         begin-conversation
-        nested-forms-key param " " split harvest nested-forms cset
+        nested-forms-key param split-words harvest nested-forms cset
         form get form cset
         <continue-conversation>
     ] [ <400> ] if*
@@ -100,7 +100,7 @@ CONSTANT: revalidate-url-key "__u"
     begin-form
     handle-rest ;
 
-M: action call-responder* ( path action -- response )
+M: action call-responder*
     [ init-action ] keep
     request get method>> {
         { "GET"   [ handle-get ] }

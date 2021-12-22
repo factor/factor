@@ -27,15 +27,11 @@ PRIVATE>
 
 <PRIVATE
 
+: subseq-range ( seq subseq -- from/f to/f )
+    [ swap subseq-start ] keep [ dupd length + ] curry [ f f ] if* ; inline
+
 : (split1) ( seq subseq snip-quot -- before after )
-    [
-        swap [
-            [ drop length ] [ subseq-start dup ] 2bi
-            [ [ nip ] [ + ] 2bi t ]
-            [ 2drop f f f ]
-            if
-        ] keep swap
-    ] dip [ 2nip f ] if ; inline
+    [ [ subseq-range ] keepd over ] dip [ 2nip f ] if ; inline
 
 PRIVATE>
 
@@ -82,10 +78,10 @@ PRIVATE>
     [ 0 ] 3dip pick [
         swap curry [ keep 1 + swap ] curry [
             [ find-from drop dup ] 2curry [ keep -rot ] curry
-        ] dip produce nip
+        ] dip V{ } produce-as nip
     ] 2keep swap [
         [ length swapd ] keep
-    ] dip 2curry call suffix ; inline
+    ] dip 2curry call suffix! { } like ; inline
 
 PRIVATE>
 
@@ -106,12 +102,14 @@ PRIVATE>
         [ pick subseq ] keep swap
     ] map 2nip ;
 
-! string-lines uses string-nth-fast which is 50% faster over
+! split-lines uses string-nth-fast which is 50% faster over
 ! nth-unsafe. be careful when changing the definition so that
 ! you don't unoptimize it.
-GENERIC: string-lines ( seq -- seq' )
+GENERIC: split-lines ( seq -- seq' )
 
-M: string string-lines
+ALIAS: string-lines split-lines
+
+M: string split-lines
     [ V{ } clone 0 ] dip [ 2dup bounds-check? ] [
         2dup [ "\r\n" member? ] find-from swapd [
             over [ [ nip length ] keep ] unless
@@ -121,4 +119,10 @@ M: string string-lines
         ] when
     ] while 2drop { } like ;
 
-M: sbuf string-lines "" like string-lines ;
+M: sbuf split-lines "" like split-lines ;
+
+: join-lines-as ( seq exemplar -- seq ) "\n" swap join-as ; inline
+: join-lines ( seq -- seq ) "" join-lines-as ; inline
+: split-words ( seq -- seq ) " " split ; inline
+: join-words-as ( seq exemplar -- seq ) " " swap join-as ; inline
+: join-words ( seq -- seq ) " " join-words-as ; inline

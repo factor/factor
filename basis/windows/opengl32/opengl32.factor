@@ -156,7 +156,7 @@ CONSTANT: WGL_TYPE_RGBA_FLOAT_ARB 0x21A0
     "wglGetExtensionsStringARB" wglGetProcAddress >boolean ;
 
 : wgl-extensions ( hdc -- extensions )
-    has-wglGetExtensionsStringARB? [ wglGetExtensionsStringARB " " split ] [ drop { } ] if ;
+    has-wglGetExtensionsStringARB? [ wglGetExtensionsStringARB split-words ] [ drop { } ] if ;
 
 : has-wgl-extensions? ( hdc extensions -- ? )
     swap wgl-extensions [ member? ] curry all? ;

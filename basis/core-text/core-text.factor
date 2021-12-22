@@ -4,9 +4,9 @@ USING: accessors alien.c-types alien.data alien.syntax arrays
 assocs cache classes colors combinators core-foundation
 core-foundation.attributed-strings core-foundation.strings
 core-graphics core-graphics.types core-text.fonts destructors
-fonts init kernel locals make math math.functions math.order
-math.vectors memoize namespaces sequences strings
-io.encodings.utf16n io.encodings.string ;
+fonts init io.encodings.string io.encodings.utf16n kernel make
+math math.functions math.order math.vectors namespaces
+sequences strings ;
 IN: core-text
 
 TYPEDEF: void* CTLineRef
@@ -78,8 +78,7 @@ render-loc render-dim ;
 
 : metrics>dim ( bounds -- dim )
     [ width>> ] [ [ ascent>> ] [ descent>> ] bi + ] bi
-    [ ceiling >integer ]
-    bi@ 2array ;
+    ceiling >integer 2array ;
 
 : fill-background ( context font dim -- )
     [ background>> >rgba-components CGContextSetRGBFillColor ]
@@ -88,7 +87,7 @@ render-loc render-dim ;
 
 : selection-rect ( dim line selection -- rect )
     [let [ start>> ] [ end>> ] [ string>> ] tri :> ( start end string )
-     start end [ 0 swap string subseq utf16n encode length 2 / >integer ] bi@
+     start end [ 0 swap string subseq utf16n encode length 2 /i ] bi@
     ]
     [ f CTLineGetOffsetForStringIndex round ] bi-curry@ bi
     [ drop nip 0 ] [ swap - swap second ] 3bi <CGRect> ;

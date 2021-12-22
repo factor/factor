@@ -53,7 +53,7 @@ PRIVATE>
     dup connect-opposite-edges ;
 
 : parse-vertex ( line -- position )
-    " " split first3 [ string>number >float ] tri@ 0.0 double-4-boa ;
+    split-words first3 [ string>number >float ] tri@ 0.0 double-4-boa ;
 
 : read-vertex ( line vertices -- )
     [ parse-vertex ] dip push ;
@@ -63,7 +63,7 @@ PRIVATE>
     dup 0 >= [ nip 1 - ] [ [ length ] dip + ] if ;
 
 : parse-face ( line vertices -- vertices )
-    [ " " split ] dip '[ _ parse-face-index ] map ;
+    [ split-words ] dip '[ _ parse-face-index ] map ;
 
 : read-face ( line vertices faces -- )
     [ parse-face ] dip push ;

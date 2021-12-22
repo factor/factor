@@ -1,7 +1,7 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! Copyright (C) 2015 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: bootstrap.image checksums checksums.openssl fry io
+USING: bootstrap.image checksums checksums.openssl io
 io.directories io.encodings.ascii io.encodings.utf8 io.files
 io.files.temp io.files.unique io.launcher io.pathnames kernel
 make math.parser namespaces sequences splitting system unicode ;
@@ -24,7 +24,7 @@ SYMBOL: build-images-destination
     image-path parent-directory [
         { "git" "rev-parse" "--abbrev-ref" "HEAD" }
         utf8 <process-reader> stream-contents
-        [ blank? ] trim-tail
+        [ unicode:blank? ] trim-tail
     ] with-directory ;
 
 : git-branch-destination ( -- dest )
@@ -47,14 +47,7 @@ SYMBOL: build-images-destination
         ] each
     ] with-file-writer ;
 
-! Windows scp doesn't like pathnames with colons, it treats them as hostnames.
-! Workaround for uploading checksums.txt created with temp-file.
-! e.g. C:\Users\\Doug\\AppData\\Local\\Temp/factorcode.org\\Factor/checksums.txt
-! ssh: Could not resolve hostname c: no address associated with name
-
-HOOK: scp-name os ( -- path )
-M: object scp-name "scp" ;
-M: windows scp-name "pscp" ;
+: scp-name ( -- path ) "scp" ;
 
 : upload-images ( -- )
     [

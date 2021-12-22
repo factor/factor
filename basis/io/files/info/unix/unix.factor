@@ -1,9 +1,8 @@
 ! Copyright (C) 2008 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors alien.c-types alien.data arrays calendar
-calendar.unix classes.struct combinators
-combinators.short-circuit io.backend io.files.info
-io.files.types kernel libc literals math math.bitwise
+USING: accessors alien.data arrays calendar calendar.unix
+classes.struct combinators combinators.short-circuit io.backend
+io.files.info io.files.types kernel libc math math.bitwise
 sequences specialized-arrays strings system unix unix.ffi
 unix.groups unix.stat unix.time unix.users vocabs ;
 IN: io.files.info.unix
@@ -57,17 +56,17 @@ HOOK: stat>file-info os ( stat -- file-info )
 
 HOOK: stat>type os ( stat -- file-info )
 
-M: unix file-info ( path -- info )
+M: unix file-info
     normalize-path file-status stat>file-info ;
 
-M: unix link-info ( path -- info )
+M: unix link-info
     normalize-path link-status stat>file-info ;
 
-M: unix new-file-info ( -- class ) unix-file-info new ;
+M: unix new-file-info unix-file-info new ;
 
 CONSTANT: standard-unix-block-size 512
 
-M: unix stat>file-info ( stat -- file-info )
+M: unix stat>file-info
     [ new-file-info ] dip
     {
         [ stat>type >>type ]
@@ -99,7 +98,7 @@ M: unix stat>file-info ( stat -- file-info )
         [ drop +unknown+ ]
     } case ;
 
-M: unix stat>type ( stat -- type )
+M: unix stat>type
     st_mode>> n>file-type ;
 
 <PRIVATE
@@ -215,16 +214,16 @@ GENERIC: set-file-user ( path string/id -- )
 
 GENERIC: set-file-group ( path string/id -- )
 
-M: integer set-file-user ( path uid -- )
+M: integer set-file-user
     f set-file-ids ;
 
-M: string set-file-user ( path string -- )
+M: string set-file-user
     user-id f set-file-ids ;
 
-M: integer set-file-group ( path gid -- )
+M: integer set-file-group
     f swap set-file-ids ;
 
-M: string set-file-group ( path string -- )
+M: string set-file-group
     group-id
     f swap set-file-ids ;
 

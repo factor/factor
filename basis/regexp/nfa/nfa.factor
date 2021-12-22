@@ -1,7 +1,7 @@
 ! Copyright (C) 2008, 2009 Doug Coleman, Daniel Ehrenberg.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays assocs combinators.short-circuit fry
-kernel locals math memoize namespaces regexp.ast regexp.classes
+USING: accessors arrays assocs combinators.short-circuit kernel
+math namespaces regexp.ast regexp.classes
 regexp.transition-tables sequences sets unicode vectors ;
 IN: regexp.nfa
 
@@ -63,16 +63,16 @@ M: object modify-epsilon ;
         drop [ unix-lines option? ] 2dip swap ?
     ] [ 2nip ] if ;
 
-M: $ modify-epsilon
+M: $crlf modify-epsilon
     $unix end-of-input line-option ;
 
-M: ^ modify-epsilon
+M: ^crlf modify-epsilon
     ^unix beginning-of-input line-option ;
 
 M: tagged-epsilon nfa-node
     clone [ modify-epsilon ] change-tag add-simple-entry ;
 
-M: concatenation nfa-node ( node -- start end )
+M: concatenation nfa-node
     [ first>> ] [ second>> ] bi
     reversed-regexp option? [ swap ] when
     [ nfa-node ] bi@
@@ -87,7 +87,7 @@ M: concatenation nfa-node ( node -- start end )
     s3 s5 epsilon-transition
     s4 s5 ;
 
-M: alternation nfa-node ( node -- start end )
+M: alternation nfa-node
     [ first>> ] [ second>> ] bi
     [ nfa-node ] bi@
     alternate-nodes ;
@@ -103,7 +103,7 @@ M: integer modify-class
         ] when
     ] when ;
 
-M: integer nfa-node ( node -- start end )
+M: integer nfa-node
     modify-class add-simple-entry ;
 
 M: primitive-class modify-class
@@ -151,7 +151,7 @@ M: range-class modify-class
 M: object nfa-node
     modify-class add-simple-entry ;
 
-M: with-options nfa-node ( node -- start end )
+M: with-options nfa-node
     dup options>> [ tree>> nfa-node ] using-options ;
 
 : construct-nfa ( ast -- nfa-table )

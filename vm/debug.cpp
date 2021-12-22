@@ -267,7 +267,7 @@ void factor_vm::dump_memory(ostream& out, cell from, cell to) {
 
 void dump_memory_range(ostream& out, const char* name, cell name_w,
                        cell start, cell end) {
-  out << setw(name_w) << left << name << ": ";
+  out << setw(static_cast<int>(name_w)) << left << name << ": ";
 
   out << "[" << (void*)start << " -> " << (void*)end << "] ";
   out << setw(10) << right << (end - start) << " bytes" << endl;

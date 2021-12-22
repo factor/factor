@@ -51,7 +51,7 @@ M: irc-message post-process-irc-message drop ;
 
 GENERIC: fill-irc-message-slots ( irc-message -- )
 M: irc-message fill-irc-message-slots
-    gmt >>timestamp
+    now-gmt >>timestamp
     {
         [ process-irc-trailing ]
         [ process-irc-prefix ]
@@ -80,9 +80,9 @@ M: irc-message set-irc-command
     {
         [ prefix>> ]
         [ command>> ]
-        [ parameters>> " " join ]
+        [ parameters>> join-words ]
         [ trailing>> dup [ CHAR: : prefix ] when ]
-    } cleave 4array sift " " join ;
+    } cleave 4array sift join-words ;
 
 <PRIVATE
 : ?define-irc-parameters ( class slot-names -- )

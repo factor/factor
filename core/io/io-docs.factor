@@ -301,7 +301,7 @@ HELP: stream-lines
 { $values { "stream" "an input stream" } { "seq" { $sequence string } } }
 { $description "Reads lines of text until the stream is exhausted, collecting them in a sequence of strings." } ;
 
-HELP: lines
+HELP: read-lines
 { $values { "seq" { $sequence string } } }
 { $description "Reads lines of text until from the " { $link input-stream } " until it is exhausted, collecting them in a sequence of strings." } ;
 
@@ -318,7 +318,7 @@ HELP: stream-contents
 { $description "Reads all elements in the given stream until the stream is exhausted. The type of the sequence depends on the stream's element type. The stream is closed after completion." }
 $io-error ;
 
-HELP: contents
+HELP: read-contents
 { $values { "seq" { $or string byte-array } } }
 { $description "Reads all elements in the " { $link input-stream } " until the stream is exhausted. The type of the sequence depends on the stream's element type." }
 $io-error ;
@@ -476,13 +476,13 @@ $nl
 "Processing lines one by one:"
 { $subsections
     stream-lines
-    lines
+    read-lines
     each-line
 }
 "Processing blocks of data:"
 { $subsections
     stream-contents
-    contents
+    read-contents
     each-block
 }
 "Copying the contents of one stream to another:"

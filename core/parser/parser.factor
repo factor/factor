@@ -21,8 +21,6 @@ M: parsing-word stack-effect drop ( parsed -- parsed ) ;
 
 SYMBOL: auto-use?
 
-: auto-use ( -- ) auto-use? on ;
-
 : no-word-restarted ( restart-value -- word )
     dup word? [
         dup vocabulary>>
@@ -246,6 +244,6 @@ print-use-hook [ [ ] ] initialize
     parse-file call( -- ) ;
 
 : ?run-file ( path -- )
-    dup exists? [ run-file ] [ drop ] if ;
+    dup file-exists? [ run-file ] [ drop ] if ;
 
 ERROR: version-control-merge-conflict ;

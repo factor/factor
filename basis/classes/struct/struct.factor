@@ -5,9 +5,9 @@ USING: accessors alien alien.c-types alien.data alien.parser
 arrays byte-arrays classes classes.parser classes.private
 classes.struct.bit-accessors classes.tuple classes.tuple.parser
 combinators combinators.smart cpu.architecture definitions
-delegate.private fry functors.backend generalizations generic
-generic.parser io kernel kernel.private lexer libc locals macros
-math math.order parser quotations sequences slots slots.private
+delegate.private functors.backend generalizations generic
+generic.parser io kernel kernel.private lexer libc math
+math.order parser quotations sequences slots slots.private
 specialized-arrays stack-checker.dependencies summary vectors
 vocabs.loader vocabs.parser words ;
 IN: classes.struct
@@ -76,17 +76,8 @@ PRIVATE>
 : <struct> ( class -- struct )
     [ >c-ptr clone ] [ heap-size <byte-array> ] init-struct ; inline
 
-MACRO: <struct-boa> ( class -- quot: ( ... -- struct ) )
-    [
-        [ <wrapper> \ (struct) [ ] 2sequence ]
-        [
-            struct-slots
-            [ length \ ndip ]
-            [ [ name>> setter-word 1quotation ] map \ spread ] bi
-        ] bi
-    ] [ ] output>sequence ;
-
 <PRIVATE
+
 : pad-struct-slots ( values class -- values' class )
     [ struct-slots [ initial>> ] map over length tail append ] keep ;
 
@@ -98,7 +89,7 @@ MACRO: <struct-boa> ( class -- quot: ( ... -- struct ) )
 : sign-extender ( signed? bits -- quot )
     '[ _ [ _ sign-extend ] when ] ;
 
-GENERIC: (reader-quot) ( slot -- quot )
+GENERIC: (reader-quot) ( slot -- quot: ( struct -- value ) )
 
 M: struct-slot-spec (reader-quot)
     [ offset>> ] [ type>> ] bi '[ >c-ptr _ _ alien-value ] ;
@@ -109,7 +100,7 @@ M: struct-bit-slot-spec (reader-quot)
     bi compose
     [ >c-ptr ] prepose ;
 
-GENERIC: (writer-quot) ( slot -- quot )
+GENERIC: (writer-quot) ( slot -- quot: ( value struct -- ) )
 
 M: struct-slot-spec (writer-quot)
     [ offset>> ] [ type>> ] bi '[ >c-ptr _ _ set-alien-value ] ;
@@ -123,14 +114,20 @@ M: struct-bit-slot-spec (writer-quot)
 : (unboxer-quot) ( class -- quot )
     drop [ >c-ptr ] ;
 
-MACRO: read-struct-slot ( slot -- quot )
+MACRO: read-struct-slot ( slot -- quot: ( struct -- value ) )
     dup type>> add-depends-on-c-type
     (reader-quot) ;
 
-MACRO: write-struct-slot ( slot -- quot )
+MACRO: write-struct-slot ( slot -- quot: ( value struct -- ) )
     dup type>> add-depends-on-c-type
     (writer-quot) ;
+
 PRIVATE>
+
+MACRO: <struct-boa> ( class -- quot: ( ... -- struct ) )
+    dup struct-slots
+    [ length ] [ [ (writer-quot) '[ over @ ] ] map ] bi
+    '[ [ _ (struct) ] _ ndip _ spread ] ;
 
 M: struct-class boa>object
     swap pad-struct-slots

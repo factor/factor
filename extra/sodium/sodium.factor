@@ -1,7 +1,8 @@
-! Copyright (C) 2017 Alexander Ilin.
+! Copyright (C) 2017-2020 Alexander Ilin.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: byte-arrays init io.encodings.string io.encodings.utf8
-kernel math sequences sodium.ffi ;
+USING: alien.c-types alien.data byte-arrays init io.encodings.ascii
+io.encodings.string io.encodings.utf8 kernel locals math sequences
+sodium.ffi ;
 IN: sodium
 
 ERROR: sodium-init-fail ;
@@ -107,5 +108,21 @@ ERROR: sodium-malloc-error ;
     [
         dup length [ box-message-buf dup rot ] keep
     ] 3dip crypto_box_open_easy check0 ;
+
+:: sodium-base64>bin ( string -- byte-array )
+    string length dup <byte-array> dup :> bin swap
+    string ascii encode dup length f 0 size_t <ref> dup :> bin-length f
+    sodium_base64_VARIANT_URLSAFE_NO_PADDING sodium_base642bin check0
+    bin bin-length size_t deref head ;
+
+: (base64-buffer) ( bin -- len byte-array )
+    length sodium_base64_VARIANT_URLSAFE_NO_PADDING sodium_base64_encoded_len
+    dup <byte-array> ;
+
+:: sodium-bin>base64 ( byte-array -- string )
+    byte-array (base64-buffer) dup :> b64 swap
+    byte-array dup length sodium_base64_VARIANT_URLSAFE_NO_PADDING
+    sodium_bin2base64 0 = [ call-fail ] when b64 ascii decode unclip-last
+    CHAR: \0 = [ call-fail ] unless ;
 
 [ sodium-init ] "sodium" add-startup-hook

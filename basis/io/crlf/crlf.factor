@@ -26,6 +26,7 @@ IN: io.crlf
 : crlf>lf ( str -- str' )
     CHAR: \r swap remove ;
 
+! Note: can't use split-lines here
 : lf>crlf ( str -- str' )
     "\n" split "\r\n" join ;
 

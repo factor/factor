@@ -9,7 +9,7 @@ math.vectors namespaces sequences strings system threads ui ui.backend
 ui.backend.gtk.input-methods ui.backend.gtk.io ui.backend.x11.keys
 ui.clipboards ui.event-loop ui.gadgets ui.gadgets.private
 ui.gadgets.worlds ui.gestures ui.pixel-formats
-ui.pixel-formats.private ui.private vocabs.loader ;
+ui.private vocabs.loader ;
 IN: ui.backend.gtk
 
 SINGLETON: gtk-ui-backend
@@ -41,7 +41,7 @@ M: gtk-clipboard clipboard-contents
     clipboard get-global handle>> gtk_clipboard_store ;
 
 M: gtk-clipboard set-clipboard-contents
-    swap [ handle>> ] [ utf8 string>alien ] bi*
+    swap [ handle>> ] [ [ 0 = ] trim-tail utf8 string>alien ] bi*
     -1 gtk_clipboard_set_text
     save-global-clipboard ;
 
@@ -163,13 +163,13 @@ CONSTANT: events-mask
     ] tri ;
 
 : on-key-press/release ( win event user-data -- ? )
-    drop swap [ key-event>gesture ] [ window ] bi* propagate-key-gesture t ;
+    drop swap [ key-event>gesture ] [ window ] bi* propagate-key-gesture f ;
 
 : on-focus-in ( win event user-data -- ? )
-    2drop window focus-world t ;
+    2drop window focus-world f ;
 
 : on-focus-out ( win event user-data -- ? )
-    2drop window unfocus-world t ;
+    2drop window unfocus-world f ;
 
 CONSTANT: default-icon-path "resource:misc/icons/Factor_128x128.png"
 
@@ -186,7 +186,7 @@ icon-data [ default-icon-data ] initialize
     dup vocab-dir { "icon.png" "icon.ico" } [
         append-path vocab-append-path
     ] 2with map default-icon-path suffix
-    [ exists? ] find nip binary file-contents ;
+    [ file-exists? ] find nip binary file-contents ;
 
 : load-icon ( -- )
     icon-data get [
@@ -391,12 +391,12 @@ M: gtk-ui-backend (make-pixel-format)
 M: gtk-ui-backend (free-pixel-format)
     handle>> g_object_unref ;
 
-M: window-handle select-gl-context ( handle -- )
+M: window-handle select-gl-context
     drawable>>
     [ gtk_widget_get_gl_window ] [ gtk_widget_get_gl_context ] bi
     gdk_gl_drawable_make_current drop ;
 
-M: window-handle flush-gl-context ( handle -- )
+M: window-handle flush-gl-context
     drawable>> gtk_widget_get_gl_window
     gdk_gl_drawable_swap_buffers ;
 
@@ -439,16 +439,16 @@ M:: gtk-ui-backend (open-window) ( world -- )
     win gtk_widget_realize
 
     ! And this must be done after and in this order due to #1307
-    win im configure-im
     win connect-user-input-signals
     win connect-win-state-signals
+    win im configure-im
     world handle>> connect-configure-signal
     drawable connect-expose-sigal
 
     win world window-controls>> configure-window-controls
     win gtk_widget_show_all ;
 
-M: gtk-ui-backend (close-window) ( handle -- )
+M: gtk-ui-backend (close-window)
     window>> [ gtk_widget_destroy ] [ unregister-window ] bi
     event-loop? [ gtk_main_quit ] unless ;
 

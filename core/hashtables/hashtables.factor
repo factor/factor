@@ -165,11 +165,21 @@ M: hashtable keys [ drop ] collect-pairs ;
 
 M: hashtable values [ nip ] collect-pairs ;
 
+M: hashtable unzip
+    [ assoc-size dup [ <vector> ] bi@ ] [ array>> ] bi
+    [ [ suffix! ] bi-curry@ bi* ] each-pair [ { } like ] bi@ ;
+
 M: hashtable clone
     (clone) [ clone ] change-array ; inline
 
 M: hashtable equal?
     over hashtable? [ assoc= ] [ 2drop f ] if ;
+
+M: hashtable hashcode*
+    [
+        dup assoc-size 1 eq?
+        [ assoc-hashcode ] [ nip assoc-size ] if
+    ] recursive-hashcode ;
 
 ! Default method
 M: assoc new-assoc drop <hashtable> ; inline

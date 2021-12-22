@@ -90,9 +90,10 @@ xml>string write-html
 <ul>
 <li><a href="https://concatenative.org/wiki/view/Factor/Mailing list">Join the mailing list</a></li>
 <li><a href="https://concatenative.org/wiki/view/Concatenative IRC channel">Join the IRC channel</a></li>
-<li><a href="https://planet.factorcode.org/">planet.factorcode.org</a> - Factor community blogs</li>
-<li><a href="https://concatenative.org/wiki/view/Concatenative%20language/Publications">Academic publications</a></li>
+<li><a href="https://factorcode.slack.com">Join the Slack group</a></li>
+<li><a href="https://planet.factorcode.org/">Factor community blogs</a></li>
 <li><a href="https://paste.factorcode.org/">Factor community pastebin</a> - if you're in an IRC channel and want to share some code</li>
+<li><a href="https://concatenative.org/wiki/view/Concatenative%20language/Publications">Academic publications</a></li>
 </ul>
 </div>
 </center>

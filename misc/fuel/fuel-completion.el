@@ -1,4 +1,4 @@
-;;; fuel-completion.el -- completion utilities
+;;; fuel-completion.el -- completion utilities -*- lexical-binding: t -*-
 
 ;; Copyright (C) 2008, 2009 Jose Antonio Ortega Ruiz
 ;; See http://factorcode.org/license.txt for BSD license.

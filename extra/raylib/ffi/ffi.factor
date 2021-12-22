@@ -3,10 +3,11 @@
 ! These should be complete bindings to the Raylib library. (v2.5)
 ! Most of the comments are included from the original header
 ! for your convenience.
-USING: alien alien.c-types alien.enums alien.libraries
-alien.libraries.finder alien.syntax classes.struct combinators
-kernel quotations system vocabs ;
+USING: accessors alien alien.c-types alien.destructors alien.libraries
+alien.syntax classes.struct combinators kernel raylib.ffi.util sequences
+sequences.private system vocabs ;
 IN: raylib.ffi
+FROM: alien.c-types => float ;
 <<
 "raylib" {
     { [ os windows? ] [ "raylib.dll" ] }
@@ -20,12 +21,6 @@ IN: raylib.ffi
 LIBRARY: raylib
 
 ! Structs ----------------------------------------------------------------
-STRUCT: Color
-    { r uchar }
-    { g uchar }
-    { b uchar }
-    { a uchar } ;
-
 STRUCT: Vector2
     { x float }
     { y float } ;
@@ -42,6 +37,82 @@ STRUCT: Vector4
     { w float } ;
 TYPEDEF: Vector4 Quaternion ! Same as Vector4
 
+ERROR: invalid-vector-length obj exemplar ;
+
+: <Vector2> ( x y -- obj ) Vector2 <struct-boa> ; inline
+INSTANCE: Vector2 sequence
+M: Vector2 length drop 2 ; inline
+M: Vector2 nth-unsafe
+    swap 0 = [ x>> ] [ y>> ] if ;
+M: Vector2 set-nth-unsafe
+    swap 0 = [ x<< ] [ y<< ] if ;
+M: Vector2 like
+    over length 2 =
+    [ drop dup Vector2?
+      [ first2 <Vector2> ] unless
+    ] [ invalid-vector-length ] if ; inline
+M: Vector2 new-sequence
+    over 2 = [
+        2drop Vector2 (struct)
+    ] [ invalid-vector-length ] if ; inline
+
+: <Vector3> ( x y z -- obj ) Vector3 <struct-boa> ; inline
+INSTANCE: Vector3 sequence
+M: Vector3 length drop 3 ; inline
+M: Vector3 nth-unsafe
+    swap { { 0 [ x>> ] }
+           { 1 [ y>> ] }
+           { 2 [ z>> ] } } case ;
+M: Vector3 set-nth-unsafe
+    swap { { 0 [ x<< ] }
+           { 1 [ y<< ] }
+           { 2 [ z<< ] } } case ;
+M: Vector3 like
+    over length 3 =
+    [ drop dup Vector3?
+      [ first3 <Vector3> ] unless
+    ] [ invalid-vector-length ] if ; inline
+M: Vector3 new-sequence
+    over 3 = [
+        2drop Vector3 (struct)
+    ] [ invalid-vector-length ] if ; inline
+
+: <Vector4> ( x y z w -- obj ) Vector4 <struct-boa> ; inline
+INSTANCE: Vector4 sequence
+M: Vector4 length drop 4 ; inline
+M: Vector4 nth-unsafe
+    swap { { 0 [ x>> ] }
+           { 1 [ y>> ] }
+           { 2 [ z>> ] }
+           { 3 [ w>> ] } } case ;
+M: Vector4 set-nth-unsafe
+    swap { { 0 [ x<< ] }
+           { 1 [ y<< ] }
+           { 2 [ z<< ] }
+           { 3 [ w<< ] } } case ;
+M: Vector4 like
+    over length 4 =
+    [ drop dup Vector4?
+      [ first4 <Vector4> ] unless
+    ] [ invalid-vector-length ] if ; inline
+M: Vector4 new-sequence
+    over 4 = [
+        2drop Vector4 (struct)
+    ] [ invalid-vector-length ] if ; inline
+
+! Matrix type (OpenGL style 4x4 - right handed, column major)
+STRUCT: Matrix
+    { m0 float } { m4 float } { m8 float } { m12 float }
+    { m1 float } { m5 float } { m9 float } { m13 float }
+    { m2 float } { m6 float } { m10 float } { m14 float }
+    { m3 float } { m7 float } { m11 float } { m15 float } ;
+
+STRUCT: Color
+    { r uchar }
+    { g uchar }
+    { b uchar }
+    { a uchar } ;
+
 STRUCT: Rectangle
     { x float }
     { y float }
@@ -54,7 +125,7 @@ STRUCT: Image
     { data void* }                     ! Image raw data
     { width int }                      ! Image base width
     { height int }                     ! Image base height
-    { mipmaps int }                    ! Mipmap levels, 1 by default 
+    { mipmaps int }                    ! Mipmap levels, 1 by default
     { format int } ;                   ! Data format (PixelFormat type)
 
 STRUCT: Texture2D
@@ -69,12 +140,12 @@ TYPEDEF: Texture2D TextureCubemap      ! Actually same as Texture2D
 STRUCT: RenderTexture2D
     { id uint }                        ! OpenGL Framebuffer Object (FBO) id
     { texture Texture2D }              ! Color buffer attachment texture
-    { depth Texture2D }                ! Depth buffer attachment texture
-    { depthTexture bool } ;
+    { depth Texture2D } ;              ! Depth buffer attachment texture
+ 
 TYPEDEF: RenderTexture2D RenderTexture ! Same as RenderTexture2D
 
 STRUCT: NPatchInfo
-    { sourceRec Rectangle }
+    { source Rectangle }
     { left int }
     { top int }
     { right int }
@@ -83,24 +154,31 @@ STRUCT: NPatchInfo
 
 STRUCT: CharInfo
     { value int }                      ! Character value (Unicode)
-    { rec Rectangle }                  ! Character rectangle in sprite font
     { offsetX int }                    ! Character offset X when drawing
     { offsetY int }                    ! Character offset Y when drawing
     { advanceX int }                   ! Character advance position X
-    { data uchar* } ;                  ! Character pixel data (greyscale)
-
+    { image Image } ;                  ! Character image data
+    
 STRUCT: Font
-    { texture Texture2D } ! Font texture
     { baseSize int }      ! Base Size (default chars height)
     { charsCount int }    ! Number of characters
+    { texture Texture2D } ! Characters texture atlas
+    { recs Rectangle* }   ! Characters rectangles in texture
     { chars CharInfo* } ; ! Characters info data
+
+TYPEDEF: Font SpriteFont
+    
+! Camera projection modes
+ENUM: CameraType
+    CAMERA_PERSPECTIVE
+    CAMERA_ORTHOGRAPHIC ;
 
 STRUCT: Camera3D
     { position Vector3 }  ! Camera postion
     { target Vector3 }    ! Camera target it looks-at
     { up Vector3 }        ! Camera up vector (rotation over its axis)
     { fovy float }        ! camera field-of-view apperature in Y (degrees) in perspective, used as near plane width in orthographic
-    { type int } ;        ! Camera type, defines projection type: CAMERA_PERSPECTIVE or CAMERA_ORTHOGRAPHIC
+    { type CameraType } ;        ! Camera type, defines projection type: CAMERA_PERSPECTIVE or CAMERA_ORTHOGRAPHIC
 
 STRUCT: Camera2D
     { offset Vector2 }    ! Camera offset (displacement from target)
@@ -109,42 +187,42 @@ STRUCT: Camera2D
     { zoom float } ;      ! Camera zoom (scaling), should be 1.0f by default
 TYPEDEF: Camera3D Camera  ! Default to 3D Camera
 
-STRUCT: BoundingBox
-    { min Vector3 }       ! Minimum vertex box-corner
-    { max Vector3 } ;     ! Maximum vertex box-corner
-
 STRUCT: Mesh
-    { vertexCount int }   ! Number of verticles stored in arrays
+    { vertexCount int }   ! Number of vertices stored in arrays
     { triangleCount int } ! Number of triangles stored (indexed or not )
-    { verticles float* }  ! Vertex position (XYZ - 3 components per vertex)
-    { texcoords float* }  ! Vertex texture coordinates (UV - 2 components per vertex )
+    { _vertices float* }  ! Vertex position (XYZ - 3 components per vertex)
+    { _texcoords float* }  ! Vertex texture coordinates (UV - 2 components per vertex )
     { texcoords2 float* } ! Vertex second texture coordinates (useful for lightmaps)
-    { normals float* }    ! Vertex normals (XYZ - 3 components per vertex)
+    { _normals float* }    ! Vertex normals (XYZ - 3 components per vertex)
     { tangents float* }   ! Vertex tangents (XYZW - 4 components per vertex )
     { colors uchar* }     ! Vertex colors (RGBA - 4 components per vertex)
     { indices ushort* }   ! Vertex indices (in case vertex data comes indexed)
-    { animVerticles float* }
+    { animVertices float* }
     { animNormals float* }
     { boneIds int* }
     { boneWeights float* }
     { vaoId uint }        ! OpenGL Vertex Array Object id
-    { vboId uint[7] } ;   ! OpenGL Vertex Buffer Objects id (7  types of vertex data)
+    { vboId uint* } ;     ! OpenGL Vertex Buffer Objects id (7  types of vertex data)
 
+ARRAY-SLOT: Mesh Vector3 _vertices [ vertexCount>> ] vertices
+ARRAY-SLOT: Mesh Vector2 _texcoords [ vertexCount>> ] texcoords
+ARRAY-SLOT: Mesh Vector3 _normals [ vertexCount>> ] normals
 
 STRUCT: Shader
     { id uint }              ! Shader program id
-    { locs int[32] } ;       ! Shader locations array
+    { locs int* } ;          ! Shader locations array
                              ! This is dependant on MAX_SHADER_LOCATIONS.  Default is 32
-
 STRUCT: MaterialMap
     { texture Texture2D }    ! Material map Texture
     { color Color }          ! Material map color
     { value float } ;        ! Material map value
 
+CONSTANT: MAX_MATERIAL_MAPS 12 ! NOTE: This seems to be a compile-time constant!
 STRUCT: Material
     { shader Shader }        ! Material shader
-    { maps MaterialMap[12] } ! Material maps.  Uses MAX_MATERIAL_MAPS.
+    { _maps MaterialMap* }    ! Material maps.  Uses MAX_MATERIAL_MAPS.
     { params float* } ;      ! Material generic parameters (if required)
+ARRAY-SLOT: Material MaterialMap _maps [ drop 12 ] maps
 
 STRUCT: Transform
     { translation Vector3 }
@@ -155,29 +233,27 @@ STRUCT: BoneInfo
     { name char[32] }        ! Bone Name
     { parent int } ;         ! Bone parent
 
-! Matrix type (OpenGL style 4x4 - right handed, column major)
-STRUCT: Matrix
-    { m0 float } { m4 float } { m8 float } { m12 float }
-    { m1 float } { m5 float } { m9 float } { m13 float }
-    { m2 float } { m6 float } { m10 float } { m14 float }
-    { m3 float } { m7 float } { m11 float } { m15 float } ;
-
 STRUCT: Model
     { transform Matrix }
     { meshCount int }
-    { meshes Mesh* }
     { materialCount int }
-    { materials Material* }
+    { _meshes Mesh* }
+    { _materials Material* }
     { meshMaterial int* }
     { boneCount int }
-    { bones BoneInfo* }
+    { _bones BoneInfo* }
     { bindPose Transform* } ;
+
+ARRAY-SLOT: Model Material _materials [ materialCount>> ] materials
+ARRAY-SLOT: Model Mesh _meshes [ meshCount>> ] meshes
+ARRAY-SLOT: Model BoneInfo _bones [ boneCount>> ] bones
 
 STRUCT: ModelAnimation
     { boneCount int }
-    { bones BoneInfo* }
     { frameCount int }
+    { _bones BoneInfo* }
     { framePoses Transform** } ;
+ARRAY-SLOT: ModelAnimation BoneInfo _bones [ boneCount>> ] bones
 
 STRUCT: Ray
     { position Vector3 }    ! Ray position (origin)
@@ -189,6 +265,10 @@ STRUCT: RayHitInfo
     { position Vector3 }    ! Position of nearest hit
     { normal Vector3 } ;    ! Surface normal of hit
 
+STRUCT: BoundingBox
+    { min Vector3 }       ! Minimum vertex box-corner
+    { max Vector3 } ;     ! Maximum vertex box-corner
+
 STRUCT: Wave
     { sampleCount uint }    ! Number of samples
     { sampleRate uint }     ! Frequency (samples per second)
@@ -196,24 +276,23 @@ STRUCT: Wave
     { channels uint }       ! Number of channels (1-mono, 2-stereo)
     { data void* } ;        ! Buffer data pointer
 
-STRUCT: Sound
-    { audioBuffer void* }   ! Pointer to internal data used by the audio system
-    { source uint }         ! Audio source id
-    { buffer uint }         ! Audio buffer id
-    { format int } ;        ! Audio format specifier
-
-! typedef struct MusicData *music; What?
-! Audio stream type
-! NOTE: Useful to create custom audio streams not bound to a specific file
 STRUCT: AudioStream
-    { sampleRate uint }               ! Freuqency (samples per second)
-    { sampleSize uint }               ! Bit depth (bits per sample) 8,16,32
-    { channels uint }                 ! Number of channels (1-mono, 2-stereo)
-    { audiobuffer void* }             ! Pointer to internal data used by audio system.
-    { format int }                    ! Audio format specifier
-    { source uint }                   ! Audio source  id
-    { buffers uint[2] } ;             ! Audio buffers (double buffering)
-TYPEDEF: AudioStream Music            ! Cheating for now.  TODO:  Seperate music from audiostream
+    { buffer void* }    ! Pointer to internal data used by the audio system
+    { sampleRate uint } ! Frequency (samples per second)
+    { sampleSize uint } ! Bit depth (bits per sample): 8, 16, 32 (24 not supported)
+    { channels uint } ; ! Number of channels (1-mono, 2-stereo)
+
+STRUCT: Sound
+    { stream AudioStream } ! Audio stream
+    { sampleCount uint } ; ! Total number of samples
+
+STRUCT: Music
+    { stream  AudioStream }     ! Audio stream
+    { sampleCount uint }        ! Total number of samples
+    { looping bool }            ! Music looping enable
+    { ctxType int }             ! Type of music context (audio filetype)
+    { ctxData void* } ;         ! Audio context data, depends on type
+
 
 STRUCT: VrDeviceInfo
     { hResolution int }               ! HMD horizontal resolution in pixels
@@ -239,6 +318,16 @@ ENUM: raylibConfigFlags
     {  FLAG_WINDOW_HIDDEN        128   }
     {  FLAG_MSAA_4X_HINT          32   }   !  Set to try enabling MSAA 4X
     {  FLAG_VSYNC_HINT            64   } ; !  Set to try enabling V-Sync on GPU
+
+ENUM: TraceLogType
+    LOG_ALL
+    LOG_TRACE
+    LOG_DEBUG
+    LOG_INFO
+    LOG_WARNING
+    LOG_ERROR
+    LOG_FATAL
+    LOG_NONE ;
     
 ENUM: KeyboardFunctionKeys
     {  KEY_SPACE            32 } 
@@ -321,33 +410,33 @@ ENUM: KeyboardAlphaNumericKeys
     {  KEY_Y                89 } 
     {  KEY_Z                90 } ;
 
-: LIGHTGRAY  ( -- Color ) 200  200  200  255 Color <struct-boa> ; !  Light Gray
-: GRAY       ( -- Color ) 130  130  130  255 Color <struct-boa> ; !  Gray
-: DARKGRAY   ( -- Color ) 80  80  80  255 Color <struct-boa>    ; !  Dark Gray
-: YELLOW     ( -- Color ) 253  249  0  255 Color <struct-boa>   ; !  Yellow
-: GOLD       ( -- Color ) 255  203  0  255 Color <struct-boa>   ; !  Gold
-: ORANGE     ( -- Color ) 255  161  0  255 Color <struct-boa>   ; !  Orange
-: PINK       ( -- Color ) 255  109  194  255 Color <struct-boa> ; !  Pink
-: RED        ( -- Color ) 230  41  55  255 Color <struct-boa>   ; !  Red
-: MAROON     ( -- Color ) 190  33  55  255 Color <struct-boa>   ; !  Maroon
-: GREEN      ( -- Color ) 0  228  48  255 Color <struct-boa>    ; !  Green
-: LIME       ( -- Color ) 0  158  47  255 Color <struct-boa>    ; !  Lime
-: DARKGREEN  ( -- Color ) 0  117  44  255 Color <struct-boa>    ; !  Dark Green
-: SKYBLUE    ( -- Color ) 102  191  255  255 Color <struct-boa> ; !  Sky Blue
-: BLUE       ( -- Color ) 0  121  241  255 Color <struct-boa>   ; !  Blue
-: DARKBLUE   ( -- Color ) 0  82  172  255 Color <struct-boa>    ; !  Dark Blue
-: PURPLE     ( -- Color ) 200  122  255  255 Color <struct-boa> ; !  Purple
-: VIOLET     ( -- Color ) 135  60  190  255 Color <struct-boa>  ; !  Violet
-: DARKPURPLE ( -- Color ) 112  31  126  255 Color <struct-boa>  ; !  Dark Purple
-: BEIGE      ( -- Color ) 211  176  131  255 Color <struct-boa> ; !  Beige
-: BROWN      ( -- Color ) 127  106  79  255 Color <struct-boa>  ; !  Brown
-: DARKBROWN  ( -- Color ) 76  63  47  255 Color <struct-boa>    ; !  Dark Brown
+CONSTANT: LIGHTGRAY  S{ Color f 200  200  200  255  } !  Light Gray
+CONSTANT: GRAY       S{ Color f 130  130  130  255  } !  Gray
+CONSTANT: DARKGRAY   S{ Color f 80  80  80  255     } !  Dark Gray
+CONSTANT: YELLOW     S{ Color f 253  249  0  255    } !  Yellow
+CONSTANT: GOLD       S{ Color f 255  203  0  255    } !  Gold
+CONSTANT: ORANGE     S{ Color f 255  161  0  255    } !  Orange
+CONSTANT: PINK       S{ Color f 255  109  194  255  } !  Pink
+CONSTANT: RED        S{ Color f 230  41  55  255    } !  Red
+CONSTANT: MAROON     S{ Color f 190  33  55  255    } !  Maroon
+CONSTANT: GREEN      S{ Color f 0  228  48  255     } !  Green
+CONSTANT: LIME       S{ Color f 0  158  47  255     } !  Lime
+CONSTANT: DARKGREEN  S{ Color f 0  117  44  255     } !  Dark Green
+CONSTANT: SKYBLUE    S{ Color f 102  191  255  255  } !  Sky Blue
+CONSTANT: BLUE       S{ Color f 0  121  241  255    } !  Blue
+CONSTANT: DARKBLUE   S{ Color f 0  82  172  255     } !  Dark Blue
+CONSTANT: PURPLE     S{ Color f 200  122  255  255  } !  Purple
+CONSTANT: VIOLET     S{ Color f 135  60  190  255   } !  Violet
+CONSTANT: DARKPURPLE S{ Color f 112  31  126  255   } !  Dark Purple
+CONSTANT: BEIGE      S{ Color f 211  176  131  255  } !  Beige
+CONSTANT: BROWN      S{ Color f 127  106  79  255   } !  Brown
+CONSTANT: DARKBROWN  S{ Color f 76  63  47  255     } !  Dark Brown
 
-: WHITE      ( -- Color ) 255  255  255  255 Color <struct-boa> ; !  White
-: BLACK      ( -- Color ) 0  0  0  255 Color <struct-boa>       ; !  Black
-: BLANK      ( -- Color ) 0  0  0  0 Color <struct-boa>         ; !  Blank (Transparent)
-: MAGENTA    ( -- Color ) 255  0  255  255 Color <struct-boa>   ; !  Magenta
-: RAYWHITE   ( -- Color ) 245  245  245  255 Color <struct-boa> ; !  My own White (raylib logo)
+CONSTANT: WHITE      S{ Color f 255  255  255  255  } !  White
+CONSTANT: BLACK      S{ Color f 0  0  0  255        } !  Black
+CONSTANT: BLANK      S{ Color f 0  0  0  0          } !  Blank (Transparent)
+CONSTANT: MAGENTA    S{ Color f 255  0  255  255    } !  Magenta
+CONSTANT: RAYWHITE   S{ Color f 245  245  245  255  } !  My own White (raylib logo)
 
 ! Leaving Android Enum out because Factor doesn't run on it
 ENUM: MouseButtons
@@ -360,14 +449,6 @@ ENUM: GamepadNumber
     GAMEPAD_PLAYER2
     GAMEPAD_PLAYER3
     GAMEPAD_PLAYER4 ;
-
-! Trace log type
-ENUM: LogType
-    { LOG_INFO 1 }
-    { LOG_WARNING 2 }
-    { LOG_ERROR 4 }
-    { LOG_DEBUG 8 }
-    { LOG_OTHER 16 } ;
 
 ! Shader location point type
 ENUM: ShaderLocationIndex
@@ -397,8 +478,19 @@ ENUM: ShaderLocationIndex
     LOC_MAP_PREFILTER
     LOC_MAP_BRDF ;
 
+ENUM: ShaderUniformDataType
+    UNIFORM_FLOAT
+    UNIFORM_VEC2
+    UNIFORM_VEC3
+    UNIFORM_VEC4
+    UNIFORM_INT
+    UNIFORM_IVEC2
+    UNIFORM_IVEC3
+    UNIFORM_IVEC4
+    UNIFORM_SAMPLER2D ;
+    
 ! Material map type
-ENUM: TexmapIndex
+ENUM: MaterialMapType
     MAP_ALBEDO    
     MAP_METALNESS 
     MAP_NORMAL    
@@ -410,6 +502,9 @@ ENUM: TexmapIndex
     MAP_IRRADIANCE          
     MAP_PREFILTER           
     MAP_BRDF ;
+
+ALIAS: MAP_DIFFUSE MAP_ALBEDO
+ALIAS: MAP_SPECULAR MAP_METALNESS
 
 ! Pixel formats
 ! NOTE: Support depends on OpenGL version and platform
@@ -483,11 +578,6 @@ ENUM: CameraMode
     CAMERA_FIRST_PERSON
     CAMERA_THIRD_PERSON ;
 
-! Camera projection modes
-ENUM: CameraType
-    CAMERA_PERSPECTIVE
-    CAMERA_ORTHOGRAPHIC ;
-
 ENUM: NPatchType
     NPT_9PATCH
     NPT_3PATCH_VERTICAL
@@ -533,12 +623,29 @@ FUNCTION-ALIAS:  get-monitor-name c-string GetMonitorName ( int monitor )       
 FUNCTION-ALIAS:  get-clipboard-text c-string GetClipboardText ( )                         ! Get clipboard text content
 FUNCTION-ALIAS:  set-clipboard-text void SetClipboardText ( c-string text )               ! Set clipboard text content
 
+! 2.5 -> 3.5 Additions
+FUNCTION-ALIAS:  get-window-scale-dpi Vector2 GetWindowScaleDPI ( )                     ! Get window scale DPI factor
+FUNCTION-ALIAS:  is-window-maximized bool IsWindowMaximized ( )                    ! Check if window is currently maximized  ( only PLATFORM_DESKTOP)
+FUNCTION-ALIAS:  is-window-focused bool IsWindowFocused ( )                        ! Check if window is currently focused  ( only PLATFORM_DESKTOP)
+FUNCTION-ALIAS:  is-window-state bool IsWindowState ( uint flag )                       ! Check if one specific window flag is enabled
+FUNCTION-ALIAS:  set-window-state void SetWindowState ( uint flags )                    ! Set window configuration state using flags
+FUNCTION-ALIAS:  clear-window-state void ClearWindowState ( uint flags )                ! Clear window configuration state flags
+FUNCTION-ALIAS:  maximized-window void MaximizeWindow ( )                          ! Set window state: maximized, if resizable  ( only PLATFORM_DESKTOP)
+FUNCTION-ALIAS:  minimize-window void MinimizeWindow (  )                           ! Set window state: minimized, if resizable  ( only PLATFORM_DESKTOP)
+FUNCTION-ALIAS:  restore-window void RestoreWindow ( )                             ! Set window state: not minimized/maximized  ( only PLATFORM_DESKTOP)
+FUNCTION-ALIAS:  get-current-monitor int GetCurrentMonitor ( )                     ! Get current connected monitor
+FUNCTION-ALIAS:  get-monitor-position Vector2 GetMonitorPosition ( int monitor )        ! Get specified monitor position
+FUNCTION-ALIAS:  get-monitor-refresh-rate int GetMonitorRefreshRate ( int monitor )     ! Get specified monitor refresh rate
+FUNCTION-ALIAS:  get-window-position Vector2 GetWindowPosition ( )                 ! Get window position XY on monitor
+
+
 ! Cursor-related functions
 FUNCTION-ALIAS:  show-cursor void ShowCursor ( )                                                  ! Shows cursor
 FUNCTION-ALIAS:  hide-cursor void HideCursor ( )                                                  ! Hides cursor
 FUNCTION-ALIAS:  is-cursor-hidden bool IsCursorHidden ( )                                         ! Check if cursor is not visible
 FUNCTION-ALIAS:  enable-cursor void EnableCursor ( )                                              ! Enables cursor  ( unlock cursor ) 
 FUNCTION-ALIAS:  disable-cursor void DisableCursor ( )                                            ! Disables cursor  ( lock cursor ) 
+FUNCTION-ALIAS:   is-cursor-on-screen  bool IsCursorOnScreen ( )                                   ! Check if cursor is on the current screen.
 
 ! Drawing-related functions
 FUNCTION-ALIAS:  clear-background void ClearBackground ( Color color )                            ! Set background color  ( framebuffer clear color ) 
@@ -550,47 +657,52 @@ FUNCTION-ALIAS:  begin-mode-3d void BeginMode3D ( Camera3D camera )             
 FUNCTION-ALIAS:  end-mode-3d void EndMode3D ( )                                                   ! Ends 3D mode and returns to default 2D orthographic mode
 FUNCTION-ALIAS:  begin-texture-mode void BeginTextureMode ( RenderTexture2D target )              ! Initializes render texture for drawing
 FUNCTION-ALIAS:  end-texture-mode void EndTextureMode ( )                                         ! Ends drawing to render texture
+FUNCTION-ALIAS:  begin-scissor-mode void BeginScissorMode ( int x, int y, int width, int height ) ! Begin scissor mode  ( define screen area for following drawing)
+FUNCTION-ALIAS:  end-scissor-mode void EndScissorMode ( )                                         ! End scissor mode
 
 ! Screen-space-related functions
 FUNCTION-ALIAS:  get-mouse-ray Ray GetMouseRay ( Vector2 mousePosition, Camera camera )           ! Returns a ray trace from mouse position
 FUNCTION-ALIAS:  get-world-to-screen Vector2 GetWorldToScreen ( Vector3 position, Camera camera ) ! Returns the screen space position for a 3d world space position
 FUNCTION-ALIAS:  get-camera-matrix Matrix GetCameraMatrix ( Camera camera )                       ! Returns camera transform matrix  ( view matrix ) 
 
-! Timming-related functions
+! Timing-related functions
 FUNCTION-ALIAS:  set-target-fps void SetTargetFPS ( int fps )                                     ! Set target FPS  ( maximum ) 
 FUNCTION-ALIAS:  get-fps int GetFPS ( )                                                           ! Returns current FPS
 FUNCTION-ALIAS:  get-frame-time float GetFrameTime ( )                                            ! Returns time in seconds for last frame drawn
 FUNCTION-ALIAS:  get-time double GetTime ( )                                                      ! Returns elapsed time in seconds since InitWindow () 
 
-! Color-related functions
-FUNCTION-ALIAS:  color-to-int int ColorToInt ( Color color )                                      ! Returns hexadecimal value for a Color
-FUNCTION-ALIAS:  color-normalize Vector4 ColorNormalize ( Color color )                           ! Returns color normalized as float [0..1]
-FUNCTION-ALIAS:  color-to-hsv Vector3 ColorToHSV ( Color color )                                  ! Returns HSV values for a Color
-FUNCTION-ALIAS:  get-color Color GetColor ( int hexValue )                                        ! Returns a Color struct from hexadecimal value
-FUNCTION-ALIAS:  fade Color Fade ( Color color, float alpha )                                     ! Color fade-in or fade-out, alpha goes from 0.0f to 1.0f
-
 ! Misc. functions
 FUNCTION-ALIAS:  set-config-flags void SetConfigFlags ( uchar flags )                      ! Setup window configuration flags  (view FLAGS) 
-FUNCTION-ALIAS:  set-trace-log-level void SetTraceLogLevel ( int logType )                 ! Set the current threshold  (minimum)  log level
-FUNCTION-ALIAS:  set-trace-log-exit void SetTraceLogExit ( int logType )                   ! Set the exit threshold  (minimum)  log level
+FUNCTION-ALIAS:  set-trace-log-level void SetTraceLogLevel ( TraceLogType logType )                 ! Set the current threshold  (minimum)  log level
+FUNCTION-ALIAS:  set-trace-log-exit void SetTraceLogExit ( TraceLogType logType )                   ! Set the exit threshold  (minimum)  log level
 FUNCTION-ALIAS:  take-screenshot void TakeScreenshot ( c-string fileName )                 ! Takes a screenshot of current screen  ( saved a .png ) 
 FUNCTION-ALIAS:  get-random-value int GetRandomValue ( int min, int max )                  ! Returns a random value between min and max  ( both included ) 
 
 ! Files management functions
-FUNCTION-ALIAS:  file-exists bool FileExists ( c-string fileName )                              ! Check if file exists
-FUNCTION-ALIAS:  is-file-extension bool IsFileExtension ( c-string fileName, c-string ext )     ! Check file extension
-FUNCTION-ALIAS:  get-extension c-string GetExtension ( c-string fileName )                      ! Get pointer to extension for a filename string
-FUNCTION-ALIAS:  get-file-name c-string GetFileName ( c-string filePath )                       ! Get pointer to filename for a path string
-FUNCTION-ALIAS:  get-file-name-without-ext c-string GetFileNameWithoutExt ( c-string filePath ) ! Get filename string without extension  ( memory should be freed ) 
-FUNCTION-ALIAS:  get-directory-path c-string GetDirectoryPath ( c-string fileName )             ! Get full path for a given fileName  ( uses static string ) 
-FUNCTION-ALIAS:  get-working-directory c-string GetWorkingDirectory ( )                         ! Get current working directory  ( uses static string ) 
-FUNCTION-ALIAS:  get-directory-files char** GetDirectoryFiles ( c-string dirPath, int* count )  ! Get filenames in a directory path  ( memory should be freed ) 
-FUNCTION-ALIAS:  clear-directory-files void ClearDirectoryFiles (   )                           ! Clear directory files paths buffers  ( free memory ) 
-FUNCTION-ALIAS:  change-directory bool ChangeDirectory ( c-string dir )                         ! Change working directory, returns true if success
-FUNCTION-ALIAS:  is-file-dropped bool IsFileDropped (   )                                       ! Check if a file has been dropped into window
-FUNCTION-ALIAS:  get-dropped-files char** GetDroppedFiles ( int* count )                        ! Get dropped files names  ( memory should be freed ) 
-FUNCTION-ALIAS:  clear-dropped-files void ClearDroppedFiles (   )                               ! Clear dropped files paths buffer  ( free memory ) 
-FUNCTION-ALIAS:  get-file-mod-time long GetFileModTime ( c-string fileName )                    ! Get file modification time  ( last write time )
+FUNCTION-ALIAS:  load-file-data c-string LoadFileData ( c-string fileName, uint* bytesRead )                    ! Load file data as byte array  ( read)
+FUNCTION-ALIAS:  unload-file-data void UnloadFileData ( c-string data )                                ! Unload file data allocated by LoadFileData ( )
+DESTRUCTOR: unload-file-data
+FUNCTION-ALIAS:  save-file-data bool SaveFileData ( c-string fileName, void *data, uint bytesToWrite )  ! Save data to file from byte array  ( write), returns true on success
+FUNCTION-ALIAS:  load-file-text c-string LoadFileText ( c-string fileName )                                     ! Load text data from file  ( read), returns a '\0' terminated string
+FUNCTION-ALIAS:  unload-file-text void UnloadFileText ( c-string text )                                ! Unload file text data allocated by LoadFileText ( )
+DESTRUCTOR: unload-file-text
+FUNCTION-ALIAS:  save-file-text bool SaveFileText ( c-string fileName, c-string text )                          ! Save text data to file  ( write), string must be '\0' terminated, returns true on success
+FUNCTION-ALIAS:  file-exists bool FileExists ( c-string fileName )                                              ! Check if file exists
+FUNCTION-ALIAS:  directory-exists bool DirectoryExists ( c-string dirPath )                                     ! Check if a directory path exists
+FUNCTION-ALIAS:  is-file-extension bool IsFileExtension ( c-string fileName, c-string ext )                     ! Check file extension  ( including point: .png, .wav)
+FUNCTION-ALIAS:  get-file-extension c-string GetFileExtension ( c-string fileName )                             ! Get pointer to extension for a filename string  ( including point: ".png")
+FUNCTION-ALIAS:  get-file-name c-string GetFileName ( c-string filePath )                                       ! Get pointer to filename for a path string
+FUNCTION-ALIAS:  get-file-name-without-ext c-string GetFileNameWithoutExt ( c-string filePath )                 ! Get filename string without extension  ( uses static string)
+FUNCTION-ALIAS:  get-directory-path c-string GetDirectoryPath ( c-string filePath )                             ! Get full path for a given fileName with path  ( uses static string)
+FUNCTION-ALIAS:  get-prev-directory-path c-string GetPrevDirectoryPath ( c-string dirPath )                     ! Get previous directory path for a given path  ( uses static string)
+FUNCTION-ALIAS:  get-working-directory c-string GetWorkingDirectory ( )                                    ! Get current working directory  ( uses static string)
+FUNCTION-ALIAS:  get-directory-files char** GetDirectoryFiles ( c-string dirPath, int *count )                  ! Get filenames in a directory path  ( memory should be freed)
+FUNCTION-ALIAS:  clear-directory-files void ClearDirectoryFiles ( )                                        ! Clear directory files paths buffers  ( free memory)
+FUNCTION-ALIAS:  change-directory bool ChangeDirectory ( c-string dir )                                         ! Change working directory, return true on success
+FUNCTION-ALIAS:  is-file-dropped bool IsFileDropped ( )                                                    ! Check if a file has been dropped into window
+FUNCTION-ALIAS:  get-dropped-files char** GetDroppedFiles ( int *count )                                        ! Get dropped files names  ( memory should be freed)
+FUNCTION-ALIAS:  clear-dropped-files void ClearDroppedFiles ( )                                            ! Clear dropped files paths buffer  ( free memory)
+FUNCTION-ALIAS:  get-file-mod-time long GetFileModTime ( c-string fileName )                                    ! Get file modification time  ( last write time)
 
 ! Persistent storage management
 FUNCTION-ALIAS:  storage-save-value void StorageSaveValue ( int position, int value )             ! Save integer value to storage file  ( to defined position ) 
@@ -654,7 +766,7 @@ FUNCTION-ALIAS:  get-gesture-pinch-angle float GetGesturePinchAngle ( )         
 ! ------------------------------------------------------------------------------------ 
 ! Camera System Functions  ( Module: camera ) 
 ! ------------------------------------------------------------------------------------
-FUNCTION-ALIAS:  set-camera-mode void SetCameraMode ( Camera camera, int mode )                                                                       ! Set camera mode  ( multiple camera modes available ) 
+FUNCTION-ALIAS:  set-camera-mode void SetCameraMode ( Camera camera, CameraMode mode )                                                                       ! Set camera mode  ( multiple camera modes available ) 
 FUNCTION-ALIAS:  update-camera void UpdateCamera ( Camera* camera )                                                                                   ! Update camera position for selected mode
 FUNCTION-ALIAS:  set-camera-pan-control void SetCameraPanControl ( int panKey )                                                                       ! Set camera pan key to combine with mouse movement  ( free camera ) 
 FUNCTION-ALIAS:  set-camera-alt-control void SetCameraAltControl ( int altKey )                                                                       ! Set camera alt key to combine with mouse movement  ( free camera ) 
@@ -713,8 +825,6 @@ FUNCTION-ALIAS:  check-collision-point-triangle bool CheckCollisionPointTriangle
 
 ! Image/Texture2D data loading/unloading/saving functions
 FUNCTION-ALIAS:  load-image Image LoadImage ( c-string fileName )                                                           ! Load image from file into CPU memory  ( RAM ) 
-FUNCTION-ALIAS:  load-image-ex Image LoadImageEx ( Color* pixels, int width, int height )                                   ! Load image from Color array data  ( RGBA - 32bit ) 
-FUNCTION-ALIAS:  load-image-pro Image LoadImagePro ( void* data, int width, int height, int format )                        ! Load image from raw data with parameters
 FUNCTION-ALIAS:  load-image-raw Image LoadImageRaw ( c-string fileName, int width, int height, int format, int headerSize ) ! Load image from RAW file data
 FUNCTION-ALIAS:  export-image void ExportImage ( c-string fileName, Image image )                                           ! Export image as a PNG file
 FUNCTION-ALIAS:  export-image-as-code void ExportImageAsCode ( Image image, c-string fileName )                             ! Export image as code file defining an array of bytes
@@ -722,8 +832,11 @@ FUNCTION-ALIAS:  load-texture Texture2D LoadTexture ( c-string fileName )       
 FUNCTION-ALIAS:  load-texture-from-image Texture2D LoadTextureFromImage ( Image image )                                     ! Load texture from image data
 FUNCTION-ALIAS:  load-render-texture RenderTexture2D LoadRenderTexture ( int width, int height )                            ! Load texture for rendering  ( framebuffer ) 
 FUNCTION-ALIAS:  unload-image void UnloadImage ( Image image )                                                              ! Unload image from CPU memory  ( RAM ) 
+DESTRUCTOR: unload-image
 FUNCTION-ALIAS:  unload-texture void UnloadTexture ( Texture2D texture )                                                    ! Unload texture from GPU memory  ( VRAM ) 
+DESTRUCTOR: unload-texture
 FUNCTION-ALIAS:  unload-render-texture void UnloadRenderTexture ( RenderTexture2D target )                                  ! Unload render texture from GPU memory  ( VRAM ) 
+DESTRUCTOR: unload-render-texture
 FUNCTION-ALIAS:  get-image-data Color* GetImageData ( Image image )                                                         ! Get pixel data from image as a Color struct array
 FUNCTION-ALIAS:  get-image-data-normalized Vector4* GetImageDataNormalized ( Image image )                                  ! Get pixel data from image as Vector4 array  ( float normalized ) 
 FUNCTION-ALIAS:  get-pixel-datasize int GetPixelDataSize ( int width, int height, int format )                              ! Get pixel data size in bytes  ( image or texture ) 
@@ -748,11 +861,8 @@ FUNCTION-ALIAS:  image-mipmaps void ImageMipmaps ( Image* image )               
 FUNCTION-ALIAS:  image-dither void ImageDither ( Image* image, int rBpp, int gBpp, int bBpp, int aBpp )                                                         ! Dither image data to 16bpp or lower  ( Floyd-Steinberg dithering ) 
 FUNCTION-ALIAS:  image-text Image ImageText ( c-string text, int fontSize, Color color )                                                                        ! Create an image from text  ( default font ) 
 FUNCTION-ALIAS:  image-text-ex Image ImageTextEx ( Font font, c-string text, float fontSize, float spacing, Color tint )                                        ! Create an image from text  ( custom sprite font ) 
-FUNCTION-ALIAS:  image-draw void ImageDraw ( Image* dst, Image src, Rectangle srcRec, Rectangle dstRec )                                                        ! Draw a source image within a destination image
 FUNCTION-ALIAS:  image-draw-rectangle void ImageDrawRectangle ( Image* dst, Vector2 position, Rectangle rec, Color color )                                      ! Draw rectangle within an image
 FUNCTION-ALIAS:  image-draw-rectangle-lines void ImageDrawRectangleLines ( Image *dst, Rectangle rec, int thick, Color color )                                  ! Draw rectangle lines within an image
-FUNCTION-ALIAS:  image-draw-text void ImageDrawText ( Image* dst, Vector2 position, c-string text, int fontSize, Color color )                                  ! Draw text  ( default font )  within an image  ( destination ) 
-FUNCTION-ALIAS:  image-draw-text-ex void ImageDrawTextEx ( Image* dst, Vector2 position, Font font, c-string text, float fontSize, float spacing, Color color ) ! Draw text  ( custom sprite font )  within an image  ( destination ) 
 FUNCTION-ALIAS:  image-flip-vertical void ImageFlipVertical ( Image* image )                                                                                    ! Flip image vertically
 FUNCTION-ALIAS:  image-flip-horizontal void ImageFlipHorizontal ( Image* image )                                                                                ! Flip image horizontally
 FUNCTION-ALIAS:  image-rotate-cw void ImageRotateCW ( Image* image )                                                                                            ! Rotate image clockwise 90deg
@@ -798,6 +908,7 @@ FUNCTION-ALIAS:  load-font-ex Font LoadFontEx ( c-string fileName, int fontSize,
 FUNCTION-ALIAS:  load-font-data CharInfo* LoadFontData ( c-string fileName, int fontSize, int* fontChars, int charsCount, bool sdf )         ! Load font data for further use
 FUNCTION-ALIAS:  gen-image-font-atlas Image GenImageFontAtlas ( CharInfo* chars, int fontSize, int charsCount, int padding, int packMethod ) ! Generate image font atlas using chars info
 FUNCTION-ALIAS:  unload-font void UnloadFont ( Font font )                                                                                   ! Unload Font from GPU memory  ( VRAM ) 
+DESTRUCTOR: unload-font
 
 ! Text drawing functions
 FUNCTION-ALIAS:  draw-fps void DrawFPS ( int posX, int posY )                                                                                         ! Shows current FPS
@@ -856,10 +967,12 @@ FUNCTION-ALIAS:  draw-gizmo void DrawGizmo ( Vector3 position )                 
 FUNCTION-ALIAS:  load-model Model LoadModel ( c-string fileName )           ! Load model from files  ( mesh and material ) 
 FUNCTION-ALIAS:  load-model-from-mesh Model LoadModelFromMesh ( Mesh mesh ) ! Load model from generated mesh
 FUNCTION-ALIAS:  unload-model void UnloadModel ( Model model )              ! Unload model from memory  ( RAM and/or VRAM ) 
+DESTRUCTOR: unload-model
 
 ! Mesh loading/unloading functions
 FUNCTION-ALIAS:  load-mesh Mesh* LoadMeshes ( c-string fileName, int* meshCount  )                ! Load meshes from model file
 FUNCTION-ALIAS:  unload-mesh void UnloadMesh ( Mesh* mesh )                                       ! Unload mesh from memory  ( RAM and/or VRAM ) 
+DESTRUCTOR: unload-mesh
 FUNCTION-ALIAS:  export-mesh void ExportMesh ( c-string fileName, Mesh mesh )                     ! Export mesh as an OBJ file
 
 ! Mesh manipulation functions
@@ -883,6 +996,7 @@ FUNCTION-ALIAS:  gen-mesh-cubicmap Mesh GenMeshCubicmap ( Image cubicmap, Vector
 FUNCTION-ALIAS:  load-material Material LoadMaterial ( c-string fileName )                                           ! Load material from file
 FUNCTION-ALIAS:  load-material-default Material LoadMaterialDefault ( )                                              ! Load default material  ( Supports: DIFFUSE, SPECULAR, NORMAL maps ) 
 FUNCTION-ALIAS:  unload-material void UnloadMaterial ( Material material )                                           ! Unload material from GPU memory  ( VRAM ) 
+DESTRUCTOR: unload-material
 FUNCTION-ALIAS:  set-material-texture void SetMaterialTexture ( Material *material, int mapType, Texture2D texture ) ! Set texture for a material map type  ( MAP_DIFFUSE, MAP_SPECULAR... ) 
 FUNCTION-ALIAS:  set-model-mesh-material void SetModelMeshMaterial ( Model *model, int meshId, int materialId )      ! Set material for a mesh
 
@@ -890,6 +1004,7 @@ FUNCTION-ALIAS:  set-model-mesh-material void SetModelMeshMaterial ( Model *mode
 FUNCTION-ALIAS:  load-model-animations ModelAnimation* LoadModelAnimations ( c-string fileName, int* animsCount ) ! Load model animations from file
 FUNCTION-ALIAS:  update-model-animation void UpdateModelAnimation ( Model model, ModelAnimation anim, int frame ) ! Update model animation pose
 FUNCTION-ALIAS:  unload-model-animation void UnloadModelAnimation ( ModelAnimation anim )                         ! Unload animation data
+DESTRUCTOR: unload-model-animation
 FUNCTION-ALIAS:  is-model-animation-valid bool IsModelAnimationValid ( Model model, ModelAnimation anim )         ! Check model animation skeleton match
 
 ! Model drawing functions
@@ -908,7 +1023,7 @@ FUNCTION-ALIAS:  check-collision-box-sphere bool CheckCollisionBoxSphere ( Bound
 FUNCTION-ALIAS:  check-collision-ray-sphere bool CheckCollisionRaySphere ( Ray ray, Vector3 spherePosition, float sphereRadius )                               ! Detect collision between ray and sphere
 FUNCTION-ALIAS:  check-collision-ray-sphere-ex bool CheckCollisionRaySphereEx ( Ray ray, Vector3 spherePosition, float sphereRadius, Vector3* collisionPoint ) ! Detect collision between ray and sphere, returns collision point
 FUNCTION-ALIAS:  check-collision-ray-box bool CheckCollisionRayBox ( Ray ray, BoundingBox box )                                                                ! Detect collision between ray and box
-FUNCTION-ALIAS:  get-collision-ray-model RayHitInfo GetCollisionRayModel ( Ray ray, Model* model )                                                             ! Get collision info between ray and model
+FUNCTION-ALIAS:  get-collision-ray-model RayHitInfo GetCollisionRayModel ( Ray ray, Model model )                                                             ! Get collision info between ray and model
 FUNCTION-ALIAS:  get-collision-ray-triangle RayHitInfo GetCollisionRayTriangle ( Ray ray, Vector3 p1, Vector3 p2, Vector3 p3 )                                 ! Get collision info between ray and triangle
 FUNCTION-ALIAS:  get-collision-ray-ground RayHitInfo GetCollisionRayGround ( Ray ray, float groundHeight )                                                     ! Get collision info between ray and ground plane  ( Y-normal plane ) 
 
@@ -922,6 +1037,7 @@ FUNCTION-ALIAS:  load-text c-string LoadText ( c-string fileName )              
 FUNCTION-ALIAS:  load-shader Shader LoadShader ( c-string vsFileName, c-string fsFileName ) ! Load shader from files and bind default locations
 FUNCTION-ALIAS:  load-shader-code Shader LoadShaderCode ( c-string vsCode, c-string fsCode )      ! Load shader from code strings and bind default locations
 FUNCTION-ALIAS:  unload-shader void UnloadShader ( Shader shader )                          ! Unload shader from GPU memory  ( VRAM ) 
+DESTRUCTOR: unload-shader
 FUNCTION-ALIAS:  get-shader-default Shader GetShaderDefault ( )                             ! Get default shader
 FUNCTION-ALIAS:  get-texture-default Texture2D GetTextureDefault ( )                        ! Get default texture
 
@@ -947,8 +1063,6 @@ FUNCTION-ALIAS:  begin-shader-mode void BeginShaderMode ( Shader shader )       
 FUNCTION-ALIAS:  end-shader-mode void EndShaderMode ( )                                           ! End custom shader drawing  ( use default shader ) 
 FUNCTION-ALIAS:  begin-blend-mode void BeginBlendMode ( int mode )                                ! Begin blending mode  ( alpha, additive, multiplied ) 
 FUNCTION-ALIAS:  end-blend-mode void EndBlendMode ( )                                             ! End blending mode  ( reset to default: alpha blending ) 
-FUNCTION-ALIAS:  begin-scissor-mode void BeginScissorMode ( int x, int y, int width, int height ) ! Begin scissor mode  ( define screen area for following drawing ) 
-FUNCTION-ALIAS:  end-scissor-mode void EndScissorMode ( )                                         ! End scissor mode
 
 ! VR control functions
 FUNCTION-ALIAS:  init-vr-simulator void InitVrSimulator ( )                                            ! Init VR simulator for selected device parameters
@@ -977,7 +1091,9 @@ FUNCTION-ALIAS:  load-sound Sound LoadSound ( c-string fileName )               
 FUNCTION-ALIAS:  load-sound-from-wave Sound LoadSoundFromWave ( Wave wave )                                                 ! Load sound from wave data
 FUNCTION-ALIAS:  update-sound void UpdateSound ( Sound sound, void* data, int samplesCount )                                ! Update sound buffer with new data
 FUNCTION-ALIAS:  unload-wave void UnloadWave ( Wave wave )                                                                  ! Unload wave data
+DESTRUCTOR: unload-wave
 FUNCTION-ALIAS:  unload-sound void UnloadSound ( Sound sound )                                                              ! Unload sound
+DESTRUCTOR: unload-sound
 FUNCTION-ALIAS:  export-wave void ExportWave ( Wave wave, c-string fileName )                                               ! Export wave data to file
 FUNCTION-ALIAS:  export-wave-as-code void ExportWaveAsCode ( Wave wave, c-string fileName )                                 ! Export wave sample data to code  ( .h ) 
 
@@ -997,6 +1113,7 @@ FUNCTION-ALIAS:  get-wave-data float* GetWaveData ( Wave wave )                 
 ! Music management functions
 FUNCTION-ALIAS:  load-music-stream Music LoadMusicStream ( c-string fileName )          ! Load music stream from file
 FUNCTION-ALIAS:  unload-music-stream void UnloadMusicStream ( Music music )             ! Unload music stream
+DESTRUCTOR: unload-music-stream
 FUNCTION-ALIAS:  play-music-stream void PlayMusicStream ( Music music )                 ! Start music playing
 FUNCTION-ALIAS:  update-music-stream void UpdateMusicStream ( Music music )             ! Updates buffers for music streaming
 FUNCTION-ALIAS:  stop-music-stream void StopMusicStream ( Music music )                 ! Stop music playing
@@ -1022,8 +1139,83 @@ FUNCTION-ALIAS:  stop-audio-stream void StopAudioStream ( AudioStream stream )  
 FUNCTION-ALIAS:  set-audio-stream-volume void SetAudioStreamVolume ( AudioStream stream, float volume )                            ! Set volume for audio stream  ( 1.0 is max level ) 
 FUNCTION-ALIAS:  set-audio-stream-pitch void SetAudioStreamPitch ( AudioStream stream, float pitch )                               ! Set pitch for audio stream  ( 1.0 is base level ) 
 
+
+
+! ------------------------------
+! New or updated from 2.5 -> 3.5
+! ------------------------------
+
+FUNCTION-ALIAS:  get-world-to-screen-ex Vector2 GetWorldToScreenEx ( Vector3 position, Camera camera, int width, int height )                                           ! Returns size position for a 3d world space position
+FUNCTION-ALIAS:  get-world-to-screen-2d Vector2 GetWorldToScreen2D ( Vector2 position, Camera2D camera )                                                                ! Returns the screen space position for a 2d camera world space position
+FUNCTION-ALIAS:  get-screen-to-world2d Vector2 GetScreenToWorld2D ( Vector2 position, Camera2D camera )                                                                 ! Returns the world space position for a 2d camera screen space position
+FUNCTION-ALIAS:  compress-data uchar*  CompressData ( uchar*  data, int dataLength, int* compDataLength )                                                               ! Compress data  ( DEFLATE algorithm)
+FUNCTION-ALIAS:  decompress-data uchar*  DecompressData ( uchar*  compData, int compDataLength, int* dataLength )                                                       ! Decompress data  ( DEFLATE algorithm)
+FUNCTION-ALIAS:  get-char-pressed int GetCharPressed ( )                                                                                                           ! Get char pressed  ( unicode), call it multiple times for chars queued
+FUNCTION-ALIAS:  get-mouse-cursor int GetMouseCursor ( )                                                                                                           ! Returns mouse cursor if  ( MouseCursor enum)
+FUNCTION-ALIAS:  set-mouse-cursor void SetMouseCursor ( int cursor )                                                                                                    ! Set mouse cursor
+FUNCTION-ALIAS:  check-collision-lines bool CheckCollisionLines ( Vector2 startPos1, Vector2 endPos1, Vector2 startPos2, Vector2 endPos2, Vector2 *collisionPoint )     ! Check the collision between two lines defined by two points each, returns collision point by reference
+FUNCTION-ALIAS:  load-image-anim Image LoadImageAnim ( char* fileName, int* frames )                                                                                    ! Load image sequence from file  ( frames appended to image.data)
+FUNCTION-ALIAS:  load-image-from-memory Image LoadImageFromMemory ( char* fileType, uchar*  fileData, int dataSize )                                              ! Load image from memory buffer, fileType refers to extension: i.e. "png"
+FUNCTION-ALIAS:  load-image-colors Color* LoadImageColors ( Image image )                                                                                               ! Load color data from image as a Color array  ( RGBA - 32bit)
+FUNCTION-ALIAS:  load-image-palette Color* LoadImagePalette ( Image image, int maxPaletteSize, int* colorsCount )                                                       ! Load colors palette from image as a Color array  ( RGBA - 32bit)
+FUNCTION-ALIAS:  unload-image-colors void UnloadImageColors ( Color* colors )                                                                                           ! Unload color data loaded with LoadImageColors ( )
+DESTRUCTOR: unload-image-colors
+FUNCTION-ALIAS:  unload-image-palette void UnloadImagePalette ( Color* colors )                                                                                         ! Unload colors palette loaded with LoadImagePalette ( )
+DESTRUCTOR: unload-image-palette
+FUNCTION-ALIAS:  get-image-alpha-border Rectangle GetImageAlphaBorder ( Image image, float threshold )                                                                  ! Get image alpha border rectangle
+
+
+! Image drawing functions
+! NOTE: Image software-rendering functions  (CPU)
+FUNCTION-ALIAS:  image-clear-background void ImageClearBackground ( Image* dst, Color color )                                                                   ! Clear image background with given color
+FUNCTION-ALIAS:  image-draw-pixel void ImageDrawPixel ( Image* dst, int posX, int posY, Color color )                                                           ! Draw pixel within an image
+FUNCTION-ALIAS:  image-draw-pixel-v void ImageDrawPixelV ( Image* dst, Vector2 position, Color color )                                                          ! Draw pixel within an image  ( Vector version)
+FUNCTION-ALIAS:  image-draw-line void ImageDrawLine ( Image* dst, int startPosX, int startPosY, int endPosX, int endPosY, Color color )                         ! Draw line within an image
+FUNCTION-ALIAS:  image-draw-line-v void ImageDrawLineV ( Image* dst, Vector2 start, Vector2 end, Color color )                                                  ! Draw line within an image  ( Vector version)
+FUNCTION-ALIAS:  image-draw-circle void ImageDrawCircle ( Image* dst, int centerX, int centerY, int radius, Color color )                                       ! Draw circle within an image
+FUNCTION-ALIAS:  image-draw-circle-v void ImageDrawCircleV ( Image* dst, Vector2 center, int radius, Color color )                                              ! Draw circle within an image  ( Vector version)
+FUNCTION-ALIAS:  image-draw-rectangle-v void ImageDrawRectangleV ( Image* dst, Vector2 position, Vector2 size, Color color )                                    ! Draw rectangle within an image  ( Vector version)
+FUNCTION-ALIAS:  image-draw-rectangle-rec void ImageDrawRectangleRec ( Image* dst, Rectangle rec, Color color )                                                 ! Draw rectangle within an image
+FUNCTION-ALIAS:  image-draw void ImageDraw ( Image* dst, Image src, Rectangle srcRec, Rectangle dstRec, Color tint )                                            ! Draw a source image within a destination image  ( tint applied to source)
+FUNCTION-ALIAS:  image-draw-text void ImageDrawText ( Image* dst, char* text, int posX, int posY, int fontSize, Color color )                                   ! Draw text  ( using default font) within an image  ( destination)
+FUNCTION-ALIAS:  image-draw-text-ex void ImageDrawTextEx ( Image* dst, Font font, char* text, Vector2 position, float fontSize, float spacing, Color tint )     ! Draw text  ( custom sprite font) within an image  ( destination)
+! ----
+
+FUNCTION-ALIAS:  update-texture-rec void UpdateTextureRec ( Texture2D texture, Rectangle rec, void* pixels )                        ! Update GPU texture rectangle with new data
+
+! Color/pixel related functions
+FUNCTION-ALIAS:  fade Color Fade ( Color color, float alpha )                                   ! Returns color with alpha applied, alpha goes from 0.0f to 1.0f
+FUNCTION-ALIAS:  color-to-int int ColorToInt ( Color color )                                    ! Returns hexadecimal value for a Color
+FUNCTION-ALIAS:  color-normalize Vector4 ColorNormalize ( Color color )                         ! Returns Color normalized as float [0..1]
+FUNCTION-ALIAS:  color-from-normalized Color ColorFromNormalized ( Vector4 normalized )         ! Returns Color from normalized values [0..1]
+FUNCTION-ALIAS:  color-to-hsv Vector3 ColorToHSV ( Color color )                                ! Returns HSV values for a Color
+FUNCTION-ALIAS:  color-from-hsv Color ColorFromHSV ( float hue, float saturation, float value ) ! Returns a Color from HSV values
+FUNCTION-ALIAS:  color-alpha Color ColorAlpha ( Color color, float alpha )                      ! Returns color with alpha applied, alpha goes from 0.0f to 1.0f
+FUNCTION-ALIAS:  color-alpha-blend Color ColorAlphaBlend ( Color dst, Color src, Color tint )   ! Returns src alpha-blended into dst color with tint
+FUNCTION-ALIAS:  get-color Color GetColor ( int hexValue )                                      ! Get Color structure from hexadecimal value
+FUNCTION-ALIAS:  get-pixel-color Color GetPixelColor ( void* srcPtr, int format )               ! Get Color from a source pixel pointer of certain format
+FUNCTION-ALIAS:  set-pixel-color void SetPixelColor ( void* dstPtr, Color color, int format )   ! Set color formatted into destination pixel pointer
+
+! ---------
+
+FUNCTION-ALIAS:  get-codepoints int* GetCodepoints ( char* text, int* count )                           ! Get all codepoints in a string, codepoints count returned by parameters
+FUNCTION-ALIAS:  get-codepoints-count int GetCodepointsCount ( char* text )                             ! Get total number of characters  ( codepoints) in a UTF8 encoded string
+FUNCTION-ALIAS:  get-next-codepoint int GetNextCodepoint ( char* text, int* bytesProcessed )            ! Returns next codepoint in a UTF8 encoded string; 0x3f ( '?') is returned on failure
+FUNCTION-ALIAS:  codepoint-to-utf8 char* CodepointToUtf8 ( int codepoint, int* byteLength )             ! Encode codepoint into utf8 text  ( char array length returned as parameter)
+FUNCTION-ALIAS:  mesh-normals-smooth void MeshNormalsSmooth ( Mesh *mesh )                              ! Smooth  ( average) vertex normals
+FUNCTION-ALIAS:  get-shapes-texture Texture2D GetShapesTexture ( )                                      ! Get texture to draw shapes
+FUNCTION-ALIAS:  get-shapes-texture-rec Rectangle GetShapesTextureRec ( )                               ! Get texture rectangle to draw shapes
+FUNCTION-ALIAS:  get-matrix-projection Matrix GetMatrixProjection ( )                                   ! Get internal projection matrix
+FUNCTION-ALIAS:  load-wave-samples float* LoadWaveSamples ( Wave wave )                                 ! Load samples data from wave as a floats array
+FUNCTION-ALIAS:  unload-wave-samples void UnloadWaveSamples ( float* samples )                          ! Unload samples data loaded with LoadWaveSamples ( )
+DESTRUCTOR: unload-wave-samples
+FUNCTION-ALIAS:  set-audiostream-buffersize-default void SetAudioStreamBufferSizeDefault ( int size )   ! Default size for new audio streams
+
+
+! ------------------------------------------------------------
 ! Load modules depending on what the installed dll/so supports
-"raylib" find-library dlopen dup 
+! -----------------------------------------------------------
+"raylib" lookup-library dll>> dup
 ! Check for ricons symbols
 "DrawIcon" swap dlsym  [ "raylib.modules.ricons" require ] when
 ! Check for gui symbols

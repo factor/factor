@@ -5,22 +5,22 @@ IN: wrap.strings
 
 <PRIVATE
 
-: split-lines ( string -- elements-lines )
-    string-lines [
-        " \t" split harvest
-        [ dup length 1 <element> ] map!
-    ] map! ;
+: wrap-split-line ( string -- elements )
+    dup [ " \t" member? not ] find drop 0 or
+    [ f swap ] [ cut ] if-zero
+    " \t" split harvest [ dup length 1 <element> ] map!
+    swap [ 0 over length <element> prefix ] when* ;
+
+: wrap-split-lines ( string -- elements-lines )
+    split-lines [ wrap-split-line ] map! ;
 
 : join-elements ( wrapped-lines -- lines )
-    [ " " join ] map! ;
-
-: join-lines ( strings -- string )
-    "\n" join ;
+    [ join-words ] map! ;
 
 PRIVATE>
 
 : wrap-lines ( string width -- newlines )
-    [ split-lines ] dip '[ _ wrap join-elements ] map! concat ;
+    [ wrap-split-lines ] dip '[ _ wrap join-elements ] map! concat ;
 
 : wrap-string ( string width -- newstring )
     wrap-lines join-lines ;

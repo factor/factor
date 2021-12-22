@@ -11,7 +11,7 @@ IN: opengl.capabilities
     over string?  [ member? ] [ [ member? ] curry any? ] if ;
 
 : gl-extensions ( -- seq )
-    GL_EXTENSIONS glGetString " " split ;
+    GL_EXTENSIONS glGetString split-words ;
 : has-gl-extensions? ( extensions -- ? )
     gl-extensions [ (has-extension?) ] curry all? ;
 : (make-gl-extensions-error) ( required-extensions -- )

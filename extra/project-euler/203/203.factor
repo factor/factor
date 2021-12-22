@@ -46,7 +46,7 @@ IN: project-euler.203
     [ 0 prefix ] [ 0 suffix ] bi v+ ;
 
 : generate ( n -- seq )
-    1 - { 1 } [ (generate) ] iterate combine ;
+    1 - { 1 } [ (generate) ] iterate union-all ;
 
 : squarefree ( n -- ? )
     factors all-unique? ;

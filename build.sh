@@ -253,9 +253,9 @@ check_gtk_libraries() {
 
 check_libraries() {
     case $OS in
-            linux) check_X11_libraries
-                   check_gtk_libraries;;
-            unix) check_gtk_libraries;;
+        linux) check_X11_libraries
+               check_gtk_libraries;;
+        unix) check_gtk_libraries;;
     esac
 }
 
@@ -284,6 +284,7 @@ find_os() {
         *linux*) OS=linux;;
         *Linux*) OS=linux;;
         FreeBSD) OS=freebsd;;
+        Haiku) OS=haiku;;
     esac
 }
 
@@ -300,65 +301,59 @@ find_architecture() {
        ppc64) ARCH=ppc;;
        *86) ARCH=x86;;
        *86_64) ARCH=x86;;
+       aarch64) ARCH=arm64;;
+       arm64) ARCH=arm64;;
+       iPhone5*[3-9]) ARCH=arm64;;
+       iPhone[6-9]*) ARCH=arm64;;
+       iPhone[1-9][0-9]*) ARCH=arm64;;
+       iPad[4-9]*) ARCH=arm64;;
+       iPad[1-9][0-9]*) ARCH=arm64;;
+       AppleTV[5-9]*) ARCH=arm64;;
+       AppleTV[1-9][0-9]*) ARCH=arm64;;
        "Power Macintosh") ARCH=ppc;;
     esac
 }
 
 find_num_cores() {
-    $ECHO "Finding num cores..."
+    $ECHO "Finding NUM_CORES..."
     NUM_CORES=1
     uname_s=$(uname -s)
     check_ret uname
     case $uname_s in
         CYGWIN_NT-5.2-WOW64 | *CYGWIN_NT* | *CYGWIN* | MINGW32*) NUM_CORES=$NUMBER_OF_PROCESSORS;;
-        *darwin* | *Darwin* | *linux* | *Linux*) NUM_CORES=$(getconf _NPROCESSORS_ONLN);;
-        freebsd) NUM_CORES=$(sysctl -n hw.ncpu);;
+        *linux* | *Linux*) NUM_CORES=$(getconf _NPROCESSORS_ONLN || nproc);;
+        *darwin* | *Darwin* | freebsd) NUM_CORES=$(sysctl -n hw.ncpu);;
     esac
-}
-
-echo_test_program() {
-    #! Must be 'echo'
-    echo -e "int main(){ return (long)(8*sizeof(void*)); }"
-}
-
-c_find_word_size() {
-    $ECHO "Finding WORD..."
-    C_WORD="factor-word-size"
-    echo_test_program | $CC -o $C_WORD -xc -
-    check_ret $CC
-    ./$C_WORD
-    WORD=$?
-    case $WORD in
-        32) ;;
-        64) ;;
-        *)
-            echo "Word size should be 32/64, got $WORD"
-            exit_script 15;;
-    esac
-
-    $DELETE -f $C_WORD
-}
-
-intel_macosx_word_size() {
-    ensure_program_installed sysctl
-    $ECHO -n "Testing if your Intel Mac supports 64bit binaries..."
-    sysctl machdep.cpu.extfeatures | grep EM64T >/dev/null
-    if [[ $? -eq 0 ]] ; then
-        WORD=64
-        $ECHO "yes!"
-    else
-        WORD=32
-        $ECHO "no."
-    fi
 }
 
 find_word_size() {
     if [[ -n $WORD ]] ; then return; fi
-    if [[ $OS == macosx && $ARCH == x86 ]] ; then
-        intel_macosx_word_size
-    else
-        c_find_word_size
-    fi
+    $ECHO "Finding WORD..."
+    WORD=$(getconf LONG_BIT || find_word_size_cpp || find_word_size_c)
+}
+
+find_word_size_cpp() {
+    SIXTY_FOUR='defined(__aarch64__) || defined(__x86_64__) || defined(_M_AMD64) || defined(__PPC64__) || defined(__64BIT__)'
+    THIRTY_TWO='defined(i386) || defined(__i386) || defined(__i386__) || defined(_MIX86)'
+    $CC -E -xc <(echo -e "#if ${SIXTY_FOUR}\n64\n#elif ${THIRTY_TWO}\n32\n#endif") | tail -1
+}
+
+find_word_size_c() {
+    C_WORD="factor-word-size"
+    TEST_PROGRAM="int main(){ return (long)(8*sizeof(void*)); }"
+    echo $TEST_PROGRAM | $CC -o $C_WORD -xc -
+    check_ret $CC
+    ./$C_WORD
+    WORD_OUT=$?
+    case $WORD_OUT in
+        32) ;;
+        64) ;;
+        *)
+            echo "Word size should be 32/64, got '$WORD_OUT'"
+            exit_script 15;;
+    esac
+    $DELETE -f $C_WORD
+    echo "$WORD_OUT"
 }
 
 set_factor_binary() {
@@ -422,6 +417,12 @@ set_build_info() {
     if [[ $OS == linux && $ARCH == ppc ]] ; then
         MAKE_IMAGE_TARGET=linux-ppc.32
         MAKE_TARGET=linux-ppc-32
+    elif [[ $OS == linux && $ARCH == arm64 ]] ; then
+        MAKE_IMAGE_TARGET=unix-arm.64
+        MAKE_TARGET=linux-arm-64
+    elif [[ $OS == macosx && $ARCH == arm64 ]] ; then
+        MAKE_IMAGE_TARGET=unix-arm.64
+        MAKE_TARGET=macosx-arm64
     elif [[ $OS == windows && $ARCH == x86 && $WORD == 64 ]] ; then
         MAKE_IMAGE_TARGET=windows-x86.64
         MAKE_TARGET=windows-x86-64
@@ -490,8 +491,9 @@ update_script_name() {
 update_script() {
     local -r update_script=$(update_script_name)
     local -r bash_path=$(which bash)
+    $ECHO "updating from ${CURRENT_BRANCH}"
     $ECHO "#!$bash_path" >"$update_script"
-    $ECHO "git pull \"$GIT_URL\" master" >>"$update_script"
+    $ECHO "git pull \"$GIT_URL\" ${CURRENT_BRANCH}" >>"$update_script"
     $ECHO "if [[ \$? -eq 0 ]]; then exec \"$0\" $SCRIPT_ARGS; else echo \"git pull failed\"; exit 2; fi" \
         >>"$update_script"
     $ECHO "exit 0" >>"$update_script"
@@ -506,18 +508,18 @@ update_script_changed() {
 
 git_fetch() {
     $ECHO "Fetching the git repository from github.com..."
-    branch=$(current_git_branch)
+    set_current_branch
 
     rm -f "$(update_script_name)"
-    $ECHO git fetch "$GIT_URL" "$branch"
-    invoke_git fetch "$GIT_URL" "$branch"
+    $ECHO git fetch "$GIT_URL" "${CURRENT_BRANCH}"
+    invoke_git fetch "$GIT_URL" "${CURRENT_BRANCH}"
 
     if update_script_changed; then
         $ECHO "Updating and restarting the build.sh script..."
         update_script
     else
         $ECHO "Updating the working tree..."
-        invoke_git pull "$GIT_URL" master
+        invoke_git pull "$GIT_URL" "${CURRENT_BRANCH}"
     fi
 }
 
@@ -612,6 +614,8 @@ set_boot_image_vars() {
         CHECKSUM_URL="$url"
         BOOT_IMAGE_URL="http://downloads.factorcode.org/images/${CURRENT_BRANCH}/${BOOT_IMAGE}"
     else
+        $ECHO "boot image for branch \`${CURRENT_BRANCH}\` is not on server, trying master instead"
+        $ECHO "  tried nonexistent url: ${url}"
         CHECKSUM_URL="http://downloads.factorcode.org/images/master/checksums.txt"
         BOOT_IMAGE_URL="http://downloads.factorcode.org/images/master/${BOOT_IMAGE}"
     fi
@@ -715,7 +719,7 @@ refresh_image() {
 }
 
 make_boot_image() {
-    ./$FACTOR_BINARY -e="\"$MAKE_IMAGE_TARGET\" USING: system bootstrap.image memory ; make-image save 0 exit"
+    ./$FACTOR_BINARY -run="bootstrap.image" "$MAKE_IMAGE_TARGET"
     check_ret factor
 }
 
@@ -769,7 +773,7 @@ usage() {
     $ECHO "  net-bootstrap - recompile, download a boot image, bootstrap"
     $ECHO "  make-target - find and print the os-arch-cpu string"
     $ECHO "  report|info - print the build variables"
-    $ECHO "  update-boot-image - get the boot image for the current branch of for master"
+    $ECHO "  update-boot-image - get the boot image for the current branch"
     $ECHO ""
     $ECHO "If you are behind a firewall, invoke as:"
     $ECHO "env GIT_PROTOCOL=http $0 <command>"
@@ -802,6 +806,7 @@ case "$1" in
     deps-macosx) install_deps_macosx ;;
     deps-dnf) install_deps_dnf ;;
     deps-pkg) install_deps_pkg ;;
+    self-bootstrap) get_config_info; make_boot_image; bootstrap;;
     self-update) update; make_boot_image; bootstrap;;
     quick-update) update; refresh_image ;;
     update|latest) update; download_and_bootstrap ;;

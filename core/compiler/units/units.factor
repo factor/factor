@@ -49,13 +49,13 @@ HOOK: update-call-sites compiler-impl ( class generic -- words )
 : changed-call-sites ( class generic -- )
     update-call-sites [ changed-definition ] each ;
 
-M: generic update-generic ( class generic -- )
+M: generic update-generic
     [ changed-call-sites ]
     [ remake-generic drop ]
     [ changed-conditionally drop ]
     2tri ;
 
-M: sequence update-methods ( class seq -- )
+M: sequence update-methods
     implementors [ update-generic ] with each ;
 
 HOOK: recompile compiler-impl ( words -- alist )
@@ -78,7 +78,7 @@ M: f to-recompile
     changed-definitions get filter-word-defs ;
 
 M: f recompile
-    [ dup def>> ] { } map>assoc ;
+    [ def>> ] zip-with ;
 
 M: f process-forgotten-words drop ;
 
@@ -142,7 +142,7 @@ M: object always-bump-effect-counter? drop f ;
     maybe-changed get members
     changed-definitions get members
     [ always-bump-effect-counter? ] filter
-    3array combine new-words get [ in? not ] curry any? ;
+    3array union-all new-words get [ in? not ] curry any? ;
 
 : bump-effect-counter ( -- )
     bump-effect-counter? [

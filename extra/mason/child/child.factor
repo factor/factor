@@ -67,7 +67,7 @@ M: windows factor-path "./factor.com" ;
 : mason-child-test-cmd ( -- cmd )
     [
         mason-child-vm ,
-        os windows? [ "-codeheap=200" , ] when
+        os windows? cpu x86.64? and [ "-codeheap=200" , ] when
         "-run=mason.test" ,
     ] { } make ;
 

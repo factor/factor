@@ -36,6 +36,11 @@ CONSTANT: DRAGDROP_S_DROP 0x00040100
 CONSTANT: DRAGDROP_S_CANCEL 0x00040101
 CONSTANT: DRAGDROP_S_USEDEFAULTCURSORS 0x00040102
 
+ERROR: hresult-error n ;
+
+: check-hresult ( n -- )
+    dup S_OK = [ drop ] [ hresult-error ] if ;
+
 <<
 : >long ( integer -- long )
     long <ref> long deref ; inline

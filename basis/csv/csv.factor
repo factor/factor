@@ -35,9 +35,9 @@ DEFER: quoted-field,
 
 : ?trim ( string -- string' )
     dup length [ drop "" ] [
-        over first-unsafe blank?
-        [ drop t ] [ 1 - over nth-unsafe blank? ] if
-        [ [ blank? ] trim ] when
+        over first-unsafe unicode:blank?
+        [ drop t ] [ 1 - over nth-unsafe unicode:blank? ] if
+        [ [ unicode:blank? ] trim ] when
     ] if-zero ; inline
 
 : continue-field ( delimiter stream field-seps seq -- sep/f field )

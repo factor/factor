@@ -160,7 +160,7 @@ TUPLE: file-responder root hook special index-names allow-listings ;
 
 : find-index ( filename -- path )
     file-responder get index-names>>
-    [ append-path dup exists? [ drop f ] unless ] with map-find
+    [ append-path dup file-exists? [ drop f ] unless ] with map-find
     drop ;
 
 : serve-directory ( filename -- response )
@@ -173,12 +173,12 @@ TUPLE: file-responder root hook special index-names allow-listings ;
     ] if ;
 
 : serve-object ( filename -- response )
-    serving-path dup exists?
+    serving-path dup file-exists?
     [ dup file-info directory? [ serve-directory ] [ serve-file ] if ]
     [ drop <404> ]
     if ;
 
-M: file-responder call-responder* ( path responder -- response )
+M: file-responder call-responder*
     file-responder set
     ".." over member?
     [ drop <400> ] [ "/" join serve-object ] if ;

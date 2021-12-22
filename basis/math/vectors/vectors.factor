@@ -1,8 +1,7 @@
 ! Copyright (C) 2005, 2010 Slava Pestov, Joe Groff.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: arrays alien.c-types assocs kernel sequences math
-math.functions grouping math.order math.libm math.floats.private
-fry combinators byte-arrays accessors locals ;
+USING: arrays assocs combinators grouping kernel math
+math.functions math.libm math.order sequences ;
 QUALIFIED-WITH: alien.c-types c
 IN: math.vectors
 
@@ -131,7 +130,7 @@ M: object vshuffle2-elements
 GENERIC#: vshuffle-bytes 1 ( v perm -- w )
 
 GENERIC: vshuffle ( v perm -- w )
-M: array vshuffle ( v perm -- w )
+M: array vshuffle
     vshuffle-elements ; inline
 
 GENERIC#: vlshift 1 ( v n -- w )

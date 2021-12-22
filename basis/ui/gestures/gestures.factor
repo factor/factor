@@ -18,7 +18,7 @@ M: object handle-gesture
 
 GENERIC: handles-gesture? ( gesture gadget -- ? )
 
-M: object handles-gesture? ( gesture gadget -- ? )
+M: object handles-gesture?
     get-gesture-handler >boolean ;
 
 : parents-handle-gesture? ( gesture gadget -- ? )
@@ -323,8 +323,8 @@ HOOK: modifiers>string os ( modifiers -- string )
 M: macosx modifiers>string
     [
         {
-            { A+ [ "\u002318" ] }
-            { M+ [ "\u002325" ] }
+            { M+ [ "\u002318" ] }
+            { A+ [ "\u002325" ] }
             { S+ [ "\u0021e7" ] }
             { C+ [ "\u002303" ] }
         } case
@@ -379,7 +379,7 @@ M: zoom-out-action gesture>string drop "Zoom out (pinch)" ;
 HOOK: action-modifier os ( -- mod )
 
 M: object action-modifier C+ ;
-M: macosx action-modifier A+ ;
+M: macosx action-modifier M+ ;
 
 M: action gesture>string
     action-gestures value-at

@@ -1,13 +1,13 @@
 ! Copyright (C) 2005, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors ascii assocs calendar combinators.short-circuit
-destructors fry hashtables http http.client.post-data
-http.parsers io io.crlf io.encodings io.encodings.ascii
-io.encodings.binary io.encodings.iana io.encodings.string
-io.files io.pathnames io.sockets io.sockets.secure io.timeouts
-kernel locals math math.order math.parser mime.types namespaces
-present sequences splitting urls vocabs.loader combinators
-environment ;
+USING: accessors ascii assocs calendar combinators
+combinators.short-circuit destructors environment hashtables
+http http.client.post-data http.parsers io io.crlf io.encodings
+io.encodings.ascii io.encodings.binary io.encodings.iana
+io.encodings.string io.files io.pathnames io.sockets
+io.sockets.secure io.timeouts kernel math math.order math.parser
+mime.types namespaces present sequences splitting urls
+vocabs.loader ;
 IN: http.client
 
 ERROR: too-many-redirects ;
@@ -57,10 +57,10 @@ ERROR: download-failed response ;
     ] if ;
 
 : set-host-header ( request header -- request header )
-    over url>> unparse-host "host" pick set-at ;
+    over url>> unparse-host "Host" pick set-at ;
 
 : set-cookie-header ( header cookies -- header )
-    unparse-cookie "cookie" pick set-at ;
+    unparse-cookie "Cookie" pick set-at ;
 
 : ?set-basic-auth ( header url name -- header )
     swap [
@@ -133,11 +133,10 @@ SYMBOL: redirects
     hex> [ "Bad chunk size" throw ] unless* ;
 
 : read-chunked ( quot: ( chunk -- ) -- )
-    read-chunk-size dup zero?
-    [ 2drop ] [
+    read-chunk-size [ drop ] [
         read [ swap call ] [ drop ] 2bi
         read-crlf B{ } assert= read-chunked
-    ] if ; inline recursive
+    ] if-zero ; inline recursive
 
 : read-response-body ( quot: ( chunk -- ) response -- )
     binary decode-input
@@ -205,8 +204,7 @@ SYMBOL: redirects
     ] if ;
 
 : misparsed-url? ( url -- url' )
-    [ protocol>> not ] [ host>> not ] [ path>> ]
-    tri and and ;
+    [ protocol>> not ] [ host>> not ] [ path>> ] tri and and ;
 
 : request-url ( url -- url' )
     dup >url dup misparsed-url? [
@@ -285,7 +283,7 @@ PRIVATE>
     ] with-file-writer ;
 
 : ?download-to ( url file -- )
-    dup exists? [ 2drop ] [ download-to ] if ;
+    dup file-exists? [ 2drop ] [ download-to ] if ;
 
 : download ( url -- )
     dup download-name download-to ;

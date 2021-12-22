@@ -2,9 +2,10 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors alien alien.c-types alien.data alien.strings
 arrays byte-arrays classes.struct combinators kernel math
-namespaces specialized-arrays system
-vocabs.loader windows windows.advapi32
-windows.errors windows.kernel32 words system-info ;
+namespaces sequences specialized-arrays
+specialized-arrays.instances.alien.c-types.ushort system
+system-info vocabs.loader windows windows.advapi32
+windows.errors windows.kernel32 windows.powrprof words ;
 SPECIALIZED-ARRAY: ushort
 IN: system-info.windows
 
@@ -33,7 +34,7 @@ IN: system-info.windows
 : windows-minor ( -- n )
     os-version-struct dwMinorVersion>> ;
 
-M: windows os-version ( -- obj )
+M: windows os-version
     os-version-struct [ dwMajorVersion>> ] [ dwMinorVersion>> ] bi 2array ;
 
 : windows-build# ( -- n )
@@ -67,41 +68,44 @@ M: windows os-version ( -- obj )
 : system-windows-directory ( -- str )
     \ GetSystemWindowsDirectory get-directory ;
 
-M: windows cpus ( -- n )
+M: windows cpus
     system-info dwNumberOfProcessors>> ;
+
+M: windows cpu-mhz
+    get-processor-power-information first MaxMhz>> 1,000,000 * ;
 
 : memory-status ( -- MEMORYSTATUSEX )
     MEMORYSTATUSEX <struct>
     MEMORYSTATUSEX heap-size >>dwLength
     dup GlobalMemoryStatusEx win32-error=0/f ;
 
-M: windows memory-load ( -- n )
+M: windows memory-load
     memory-status dwMemoryLoad>> ;
 
-M: windows physical-mem ( -- n )
+M: windows physical-mem
     memory-status ullTotalPhys>> ;
 
-M: windows available-mem ( -- n )
+M: windows available-mem
     memory-status ullAvailPhys>> ;
 
-M: windows total-page-file ( -- n )
+M: windows total-page-file
     memory-status ullTotalPageFile>> ;
 
-M: windows available-page-file ( -- n )
+M: windows available-page-file
     memory-status ullAvailPageFile>> ;
 
-M: windows total-virtual-mem ( -- n )
+M: windows total-virtual-mem
     memory-status ullTotalVirtual>> ;
 
-M: windows available-virtual-mem ( -- n )
+M: windows available-virtual-mem
     memory-status ullAvailVirtual>> ;
 
-M: windows computer-name ( -- string )
+M: windows computer-name
     MAX_COMPUTERNAME_LENGTH 1 +
     [ <byte-array> dup ] keep uint <ref>
     GetComputerName win32-error=0/f alien>native-string ;
 
-: username ( -- string )
+M: windows username ( -- string )
     UNLEN 1 +
     [ <byte-array> dup ] keep uint <ref>
     GetUserName win32-error=0/f alien>native-string ;

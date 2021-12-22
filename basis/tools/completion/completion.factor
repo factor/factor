@@ -56,8 +56,9 @@ PRIVATE>
     ] if ;
 
 : rank-completions ( results -- newresults )
-    [ 0 [ first max ] reduce 3 /f ] keep
-    [ first-unsafe < ] with filter
+    [ 0 [ first max ] reduce 4 /f ] keep
+    dup length 25 >
+    [ [ first-unsafe < ] with filter ] [ nip ] if
     sort-keys <reversed> values ;
 
 : complete ( full short -- score )
@@ -75,17 +76,27 @@ PRIVATE>
         rank-completions
     ] bi-curry if-empty ;
 
-: name-completions ( str seq -- seq' )
-    [ dup name>> ] { } map>assoc completions ;
-
-: words-matching ( str -- seq )
-    all-words name-completions ;
+: named ( seq -- seq' )
+    [ dup name>> ] { } map>assoc ;
 
 : vocabs-matching ( str -- seq )
-    all-disk-vocabs-recursive filter-vocabs name-completions ;
+    all-disk-vocabs-recursive filter-vocabs named completions ;
 
 : vocab-words-matching ( str vocab -- seq )
-    vocab-words name-completions ;
+    vocab-words named completions ;
+
+: qualified-named ( str -- seq/f )
+    ":" split1 [
+        drop vocabs-matching keys [
+            [ vocab-words ] [ vocab-name ] bi ":" append
+            [ over name>> append ] curry { } map>assoc
+        ] map! concat
+    ] [ drop f ] if* ;
+
+: words-matching ( str -- seq )
+    [ all-words named ]
+    [ qualified-named [ append ] unless-empty ] bi
+    completions ;
 
 : chars-matching ( str -- seq )
     name-map keys dup zip completions ;
@@ -111,7 +122,7 @@ PRIVATE>
 
 : paths-matching ( str -- seq )
     dup last-path-separator [ 1 + cut ] [ drop "" ] if swap
-    dup { [ exists? ] [ file-info directory? ] } 1&&
+    dup { [ file-exists? ] [ file-info directory? ] } 1&&
     [ directory-paths completions ] [ 2drop { } ] if ;
 
 <PRIVATE

@@ -71,7 +71,7 @@ M: pair effect>string
 
 PRIVATE>
 
-M: effect effect>string ( effect -- string )
+M: effect effect>string
     [
         "( " %
         dup in-var>> var-picture%

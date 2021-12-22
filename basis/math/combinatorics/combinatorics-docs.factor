@@ -1,5 +1,5 @@
-USING: help.markup help.syntax kernel math math.order sequences ;
-IN: math.combinatorics
+USING: help.markup help.syntax kernel math math.combinatorics
+math.combinatorics.private math.order sequences ;
 
 HELP: factorial
 { $values { "n" "a non-negative integer" } { "n!" integer } }
@@ -101,8 +101,6 @@ HELP: each-combination
 { $values { "seq" sequence } { "k" "a non-negative integer" } { "quot" { $quotation ( ... elt -- ... ) } } }
 { $description "Applies the quotation to each combination of " { $snippet "seq" } " choosing " { $snippet "k" } " elements, in order." } ;
 
-
-<PRIVATE
 HELP: factoradic
 { $values { "n" integer } { "factoradic" sequence } }
 { $description "Converts a positive integer " { $snippet "n" } " to factoradic form. The factoradic of an integer is its representation based on a mixed radix numerical system that corresponds to the values of " { $snippet "n" } " factorial." }
@@ -120,6 +118,19 @@ HELP: next-permutation
 { $notes "Performs an in-place modification of " { $snippet "seq" } "." }
 { $examples { $example "USING: math.combinatorics prettyprint ;" "\"ABC\" next-permutation ." "\"ACB\"" } } ;
 
+HELP: all-unique-permutations
+{ $values { "seq" sequence } { "seq'" sequence } }
+{ $description "Outputs a sequence containing all " { $strong "unique" } " permutations of " { $snippet "seq" } " in lexicographical order." }
+{ $examples
+    { $example "USING: math.combinatorics prettyprint ;"
+        "{ 1 1 2 } all-unique-permutations ."
+        "{ { 1 1 2 } { 1 2 1 } { 2 1 1 } }" }
+} ;
+
+HELP: each-unique-permutation
+{ $values { "seq" sequence } { "quot" { $quotation ( ... elt -- ... ) } } }
+{ $description "Applies the quotation to each " { $strong "unique" } " permutation of " { $snippet "seq" } " in order." } ;
+
 HELP: all-subsets
 { $values { "seq" sequence } { "subsets" sequence } }
 { $description
@@ -133,8 +144,8 @@ HELP: all-subsets
     }
 } ;
 
-HELP: selections
-{ $values { "seq" sequence } { "n" integer } { "selections" sequence } }
+HELP: all-selections
+{ $values { "seq" sequence } { "n" integer } { "seq'" sequence } }
 { $description
     "Returns all the ways to take n (possibly the same) items from the "
     "sequence of items."
@@ -142,8 +153,7 @@ HELP: selections
 { $examples
     { $example
         "USING: math.combinatorics prettyprint ;"
-        "{ 1 2 } 2 selections ."
+        "{ 1 2 } 2 all-selections ."
         "{ { 1 1 } { 1 2 } { 2 1 } { 2 2 } }"
     }
 } ;
-PRIVATE>

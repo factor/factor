@@ -116,7 +116,7 @@ M: struct-mirror delete-at
 M: struct-mirror clear-assoc
     object>> reset-struct-slots ;
 
-M: struct-mirror >alist ( mirror -- alist )
+M: struct-mirror >alist
     object>> [
         [ drop "underlying" ] [ >c-ptr ] bi 2array 1array
     ] [

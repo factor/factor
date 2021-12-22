@@ -206,7 +206,7 @@ TUPLE: computer cpu ram ;
 C: <computer> computer
 
 { "TUPLE: computer cpu ram ;" } [
-    [ \ computer see ] with-string-writer string-lines second
+    [ \ computer see ] with-string-writer split-lines second
 ] unit-test
 
 TUPLE: laptop < computer battery ;
@@ -231,7 +231,7 @@ C: <laptop> laptop
 test-laptop-slot-values
 
 { "TUPLE: laptop < computer battery ;" } [
-    [ \ laptop see ] with-string-writer string-lines second
+    [ \ laptop see ] with-string-writer split-lines second
 ] unit-test
 
 { { tuple computer laptop } } [ laptop superclasses-of ] unit-test
@@ -268,7 +268,7 @@ test-server-slot-values
 { f } [ \ + server? ] unit-test
 
 { "TUPLE: server < computer rackmount ;" } [
-    [ \ server see ] with-string-writer string-lines second
+    [ \ server see ] with-string-writer split-lines second
 ] unit-test
 
 [

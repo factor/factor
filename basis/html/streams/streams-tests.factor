@@ -62,11 +62,3 @@ M: funky url-of "http://www.funky-town.com/" swap town>> append ;
 ] unit-test
 
 { } [ [ { 1 2 3 } describe ] with-html-writer drop ] unit-test
-
-{ "<img src=\"/icons/class-word.tiff\"/>" } [
-    [
-        "text"
-        { { image-style "vocab:definitions/icons/class-word.tiff" } }
-        format
-    ] make-html-string
-] unit-test

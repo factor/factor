@@ -2,11 +2,12 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs byte-arrays byte-vectors classes
 classes.algebra.private classes.maybe classes.private
-classes.tuple combinators continuations effects fry generic
-hash-sets hashtables io.pathnames io.styles kernel lists make
-math math.order math.parser namespaces prettyprint.config
-prettyprint.custom prettyprint.sections prettyprint.stylesheet
-quotations sbufs sequences strings vectors words ;
+classes.tuple combinators combinators.short-circuit
+continuations effects generic hash-sets hashtables io.pathnames
+io.styles kernel lists make math math.order math.parser
+namespaces prettyprint.config prettyprint.custom
+prettyprint.sections prettyprint.stylesheet quotations sbufs
+sequences strings vectors words ;
 QUALIFIED: sets
 IN: prettyprint.backend
 
@@ -36,7 +37,7 @@ M: anonymous-union word-name*
 M: anonymous-intersection word-name*
     class-name "intersection{ " " }" surround ;
 
-M: word word-name* ( word -- str )
+M: word word-name*
     [ name>> "( no name )" or ] [ record-vocab ] bi ;
 
 : pprint-word ( word -- )
@@ -82,11 +83,21 @@ M: real pprint*
     } case ;
 
 M: float pprint*
-    dup fp-nan? [
-        \ NAN: [ fp-nan-payload >hex text ] pprint-prefix
-    ] [
-        call-next-method
-    ] if ;
+    {
+        { [ dup 0/0. fp-bitwise= ] [ drop "0/0." text ] }
+        { [ dup -0/0. fp-bitwise= ] [ drop "-0/0." text ] }
+        { [ dup fp-nan? ] [
+            \ NAN: [
+                [ fp-nan-payload ] [ fp-sign ] bi
+                [ 0xfffffffffffff bitxor 1 + neg ] when >hex text
+            ] pprint-prefix
+        ] }
+        { [ dup 1/0. = ] [ drop "1/0." text ] }
+        { [ dup -1/0. = ] [ drop "-1/0." text ] }
+        { [ dup 0.0 fp-bitwise= ] [ drop "0.0" text ] }
+        { [ dup -0.0 fp-bitwise= ] [ drop "-0.0" text ] }
+        [ call-next-method ]
+    } cond ;
 
 M: f pprint* drop \ f pprint-word ;
 
@@ -251,7 +262,7 @@ M: vector pprint-narrow? drop t ;
 M: hashtable pprint-narrow? drop t ;
 M: tuple pprint-narrow? drop t ;
 
-M: object pprint-object ( obj -- )
+M: object pprint-object
     [
         <flow
         dup pprint-delims [

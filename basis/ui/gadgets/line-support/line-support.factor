@@ -19,7 +19,8 @@ TUPLE: line-gadget < gadget
 
 GENERIC: line-leading* ( gadget -- n )
 
-M: line-gadget line-leading* font>> font-metrics leading>> ;
+M: line-gadget line-leading*
+    font>> font-metrics leading>> ;
 
 GENERIC: line-leading ( gadget -- n )
 
@@ -32,7 +33,8 @@ M: line-gadget line-leading
 
 GENERIC: line-height* ( gadget -- n )
 
-M: line-gadget line-height* font>> font-metrics height>> ceiling ;
+M: line-gadget line-height*
+    font>> font-metrics height>> ceiling >integer ;
 
 GENERIC: line-height ( gadget -- n )
 
@@ -85,7 +87,7 @@ GENERIC: draw-line ( line index gadget -- )
 <PRIVATE
 
 : clamp ( dim unit min max -- dim' )
-    [ -1/0. or * ] [ 1/0. or * ] bi-curry* bi
+    [ -1/0. or 1 max * ] [ 1/0. or 1 max * ] bi-curry* bi
     [ max ] [ min ] bi* ;
 
 : em ( font -- x ) "m" text-width ;
@@ -98,11 +100,11 @@ PRIVATE>
 : line-gadget-height ( pref-dim gadget -- h )
     [ second ] [ [ line-height ] [ min-rows>> ] [ max-rows>> ] tri ] bi* clamp ;
 
+: line-gadget-dim ( pref-dim gadget -- dim )
+    [ line-gadget-width ] [ line-gadget-height ] 2bi 2array ;
+
 : pref-viewport-dim* ( gadget -- dim )
-    [ pref-dim ] [ ] bi
-    [ line-gadget-width ]
-    [ line-gadget-height ]
-    2bi 2array ; inline
+    [ pref-dim ] [ line-gadget-dim ] bi ;
 
 M: line-gadget pref-viewport-dim
     dup pref-viewport-dim>>
@@ -110,6 +112,8 @@ M: line-gadget pref-viewport-dim
         [ pref-viewport-dim* ] [ ] [ layout-state>> ] tri
         [ drop ] [ dupd pref-viewport-dim<< ] if
     ] ?if ;
+
+M: line-gadget pref-dim* { 0 0 } swap line-gadget-dim ;
 
 : visible-lines ( gadget -- n )
     [ visible-dim second ] [ line-height ] bi /i ;

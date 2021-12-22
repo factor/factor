@@ -1,4 +1,4 @@
-USING: help.markup help.syntax kernel quotations io ;
+USING: help.markup help.syntax kernel quotations io strings vocabs.refresh ;
 IN: tools.test
 
 ARTICLE: "tools.test" "Unit testing"
@@ -15,7 +15,7 @@ $nl
 $nl
 "If the test harness needs to define words, they should be placed in a vocabulary named " { $snippet { $emphasis "vocab" } ".tests" } " where " { $emphasis "vocab" } " is the vocab being tested."
 { $heading "Writing unit tests" }
-"Several worlds exist for writing different kinds of unit tests. The most general one asserts that a quotation outputs a specific set of values:"
+"Several words exist for writing different kinds of unit tests. The most general one asserts that a quotation outputs a specific set of values:"
 { $subsections POSTPONE: unit-test }
 "Assert that a quotation throws an error:"
 { $subsections
@@ -82,6 +82,15 @@ HELP: test
 
 HELP: test-all
 { $description "Runs unit tests for all loaded vocabularies." } ;
+
+HELP: refresh-and-test
+{ $values { "prefix" string } }
+{ $description "Like " { $link refresh } ", but runs unit tests for all reloaded vocabularies afterwards." } ;
+
+HELP: refresh-and-test-all
+{ $description "Like " { $link refresh-all } ", but runs unit tests for all reloaded vocabularies afterwards." } ;
+
+{ refresh-and-test refresh-and-test-all } related-words
 
 HELP: :test-failures
 { $description "Prints all pending unit test failures." } ;

@@ -2,7 +2,7 @@ USING: accessors arrays assocs classes compiler.units effects
 eval generic grouping io.pathnames io.streams.string kernel
 lexer math multiline namespaces parser sequences sets
 source-files source-files.errors strings tools.crossref
-tools.test vocabs vocabs.parser words words.symbol ;
+tools.test vocabs vocabs.parser words words.symbol splitting ;
 IN: parser.tests
 
 { 1 [ 2 [ 3 ] 4 ] 5 }
@@ -431,7 +431,7 @@ DEFER: foo
         "GENERIC: change-combination ( obj a -- b )"
         "M: integer change-combination 2drop 1 ;"
         "M: array change-combination 2drop 2 ;"
-    } "\n" join <string-reader> "change-combination-test" parse-stream drop
+    } join-lines <string-reader> "change-combination-test" parse-stream drop
 ] unit-test
 
 { } [
@@ -441,7 +441,7 @@ DEFER: foo
         "GENERIC#: change-combination 1 ( obj a -- b )"
         "M: integer change-combination 2drop 1 ;"
         "M: array change-combination 2drop 2 ;"
-    } "\n" join <string-reader> "change-combination-test" parse-stream drop
+    } join-lines <string-reader> "change-combination-test" parse-stream drop
 ] unit-test
 
 { 2 } [

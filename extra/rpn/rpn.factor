@@ -19,7 +19,7 @@ M: div-insn eval-insn drop [ / ] binary-op ;
 M: push-insn eval-insn value>> swons ;
 
 : rpn-tokenize ( string -- string' )
-    " " split harvest sequence>list ;
+    split-words harvest sequence>list ;
 
 : rpn-parse ( string -- tokens )
     rpn-tokenize [

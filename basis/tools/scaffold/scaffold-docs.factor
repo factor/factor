@@ -95,10 +95,14 @@ HELP: scaffold-tests
 }
 { $description "Takes an existing vocabulary and creates an empty tests file help for each word. This word only works if no tests file yet exists." } ;
 
-HELP: scaffold-vocab
+HELP: scaffold-vocab-in
 { $values
     { "vocab-root" "a vocabulary root string" } { "string" string } }
 { $description "Creates a directory in the given root for a new vocabulary and adds a main .factor file and an authors.txt file." } ;
+
+HELP: scaffold-vocab
+{ $values { "string" string } }
+{ $description "Searches parent vocabularies for an appropriate root to create a new vocabulary and adds a main .factor file and an authors.txt file." } ;
 
 HELP: scaffold-emacs
 { $description "Touches the .emacs file in your home directory and provides a clickable link to open it in an editor." } ;

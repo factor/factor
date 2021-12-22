@@ -6,7 +6,7 @@ splitting memoize kernel io.streams.string xml.writer ;
 { } [
     "<style type=\"text/css\" media=\"screen\" >
     *        {margin:0; padding:0; border:0;}"
-    string-lines "html" htmlize-lines drop
+    split-lines "html" htmlize-lines drop
 ] unit-test
 
 { } [

@@ -34,9 +34,9 @@ ERROR: not-found-in-roots path ;
 <PRIVATE
 
 : find-root-for ( path -- path/f )
-    vocab-roots get [ prepend-path exists? ] with find nip ;
+    vocab-roots get [ prepend-path file-exists? ] with find nip ;
 
-M: string vocab-path ( string -- path/f )
+M: string vocab-path
     dup find-root-for [ prepend-path ] [ not-found-in-roots ] if* ;
 
 PRIVATE>
@@ -50,11 +50,12 @@ PRIVATE>
     "/" join ;
 
 : find-vocab-root ( vocab -- path/f )
-    vocab-name root-cache get [
-        dup ".private" tail? [ drop f ] [
-            ".factor" append-vocab-dir find-root-for
-        ] if
-    ] cache ;
+    vocab-name dup ".private" tail? [ drop f ] [
+        root-cache get 2dup at [ 2nip ] [
+            over ".factor" append-vocab-dir find-root-for
+            [ [ -rot set-at ] [ 2drop ] if* ] keep
+        ] if*
+    ] if ;
 
 : vocab-exists? ( name -- ? )
     dup lookup-vocab [ ] [ find-vocab-root ] ?if ;
@@ -63,9 +64,11 @@ PRIVATE>
     swap find-vocab-root [ prepend-path ] [ drop f ] if* ;
 
 : vocab-source-path ( vocab -- path/f )
+    vocab-name ".private" ?tail drop
     dup ".factor" append-vocab-dir vocab-append-path ;
 
 : vocab-docs-path ( vocab -- path/f )
+    vocab-name ".private" ?tail drop
     dup "-docs.factor" append-vocab-dir vocab-append-path ;
 
 SYMBOL: load-help?
@@ -135,15 +138,12 @@ PRIVATE>
         "To define one, refer to \\ MAIN: help" print
     ] ?if ;
 
-SYMBOL: blacklist
-
-: require-all ( vocabs -- )
-    V{ } clone blacklist [ [ require ] each ] with-variable ;
+SYMBOL: errorlist
 
 <PRIVATE
 
-: add-to-blacklist ( error vocab -- )
-    vocab-name blacklist get [ set-at ] [ 2drop ] if* ;
+: add-to-errorlist ( error vocab -- )
+    vocab-name errorlist get [ set-at ] [ 2drop ] if* ;
 
 GENERIC: (require) ( name -- )
 
@@ -154,7 +154,7 @@ M: vocab (require)
             dup docs-loaded?>> [ dup load-docs ] unless
             drop
         ] if
-    ] [ [ swap add-to-blacklist ] keep rethrow ] recover ;
+    ] [ [ swap add-to-errorlist ] keep rethrow ] recover ;
 
 M: vocab-link (require)
     vocab-name (require) ;
@@ -165,8 +165,11 @@ M: string (require)
 
 PRIVATE>
 
+: require-all ( vocabs -- )
+    V{ } clone errorlist [ [ require ] each ] with-variable ;
+
 [
-    dup vocab-name blacklist get at*
+    dup vocab-name errorlist get at*
     [ rethrow ]
     [
         drop dup find-vocab-root

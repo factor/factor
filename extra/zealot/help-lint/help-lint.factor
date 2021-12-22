@@ -1,7 +1,7 @@
 ! Copyright (C) 2019 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: assocs cache command-line help.lint io io.monitors kernel
-namespaces prettyprint sequences system vocabs.hierarchy ;
+USING: assocs command-line help.lint io kernel namespaces
+prettyprint sequences system vocabs.loader ;
 IN: zealot.help-lint
 
 ! FIXME: help-lint sometimes lists monitors and event-streams as leaked.
@@ -18,7 +18,7 @@ CONSTANT: ignored-resources {
 
 ! Allow testing without calling exit
 : zealot-help-lint ( exit? -- )
-    command-line get [ load ] each
+    command-line get require-all
     help-lint-all
     lint-failures get filter-flaky-resources
     [ nip assoc-empty? [ "==== FAILING LINT" print :lint-failures flush ] unless ]

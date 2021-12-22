@@ -11,7 +11,7 @@ emeditor editor-class set-global
         [ "EmEditor.exe" ] unless*
     ] unless* ;
 
-M: emeditor editor-command ( file line -- command )
+M: emeditor editor-command
     [
         emeditor-path , "/l" , number>string , ,
     ] { } make ;

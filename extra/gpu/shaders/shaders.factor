@@ -330,9 +330,9 @@ SYMBOL: padding-no
     ] [ nip ] if ":" join ;
 
 : replace-log-line-numbers ( object log -- log' )
-    "\n" split harvest
+    split-lines harvest
     [ replace-log-line-number ] with map
-    "\n" join ;
+    join-lines ;
 
 : gl-shader-kind ( shader-kind -- shader-kind )
     {

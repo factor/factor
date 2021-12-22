@@ -1,6 +1,7 @@
-USING: arrays assocs kernel math math.functions math.statistics sequences
-math.order tools.test math.vectors ;
+USING: arrays kernel math math.functions math.order math.vectors
+sequences tools.test ;
 FROM: math.ranges => [a,b] ;
+IN: math.statistics
 
 { 3 } [ { 1 2 3 4 5 } 1 power-mean ] unit-test
 { t } [ { 1 2 3 4 5 } [ 2 power-mean ] [ quadratic-mean ] bi 1e-10 ~ ] unit-test
@@ -20,6 +21,21 @@ FROM: math.ranges => [a,b] ;
 { 18 } [ { 4 8 15 16 23 42 } 0 trimmed-mean ] unit-test
 { 15+1/2 } [ { 4 8 15 16 23 42 } 0.2 trimmed-mean ] unit-test
 { 3 } [ { 1 3 3 3 3 5 } 0.2 winsorized-mean ] unit-test
+
+{ 2470 } [ 20 <iota> sum-of-squares ] unit-test
+{ 2470 } [ 20 <iota> >array sum-of-squares ] unit-test
+{ 371 } [ 4 10 [a,b] sum-of-squares ] unit-test
+{ 371 } [ 4 10 [a,b] >array sum-of-squares ] unit-test
+
+{ 36100 } [ 20 <iota> sum-of-cubes ] unit-test
+{ 36100 } [ 20 <iota> >array sum-of-cubes ] unit-test
+{ 2989 } [ 4 10 [a,b] sum-of-cubes ] unit-test
+{ 2989 } [ 4 10 [a,b] >array sum-of-cubes ] unit-test
+
+{ 562666 } [ 20 <iota> sum-of-quads ] unit-test
+{ 562666 } [ 20 <iota> >array sum-of-quads ] unit-test
+{ 25235 } [ 4 10 [a,b] sum-of-quads ] unit-test
+{ 25235 } [ 4 10 [a,b] >array sum-of-quads ] unit-test
 
 { 0 } [ { 1 } range ] unit-test
 { 89 } [ { 1 2 30 90 } range ] unit-test
@@ -217,3 +233,12 @@ FROM: math.ranges => [a,b] ;
 ] unit-test
 
 { 15+1/2 } [ { 4 8 15 16 23 42 } trimean ] unit-test
+
+{ 0 } [ { } dcg ] unit-test
+{ 0.0 } [ { } ndcg ] unit-test
+
+{ 0.0 } [ { 0 } dcg ] unit-test
+{ 0.0 } [ { 0 } ndcg ] unit-test
+
+{ t } [ { 3 2 3 0 1 2 } dcg 6.861126688593501 1e-6 ~ ] unit-test
+{ t } [ { 3 2 3 0 1 2 } ndcg 0.9608081943360615 1e-6 ~ ] unit-test

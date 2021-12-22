@@ -1,7 +1,7 @@
 USING: accessors math kernel namespaces continuations
 io.files io.monitors io.monitors.recursive io.backend
 concurrency.mailboxes tools.test destructors io.files.info
-io.pathnames io.files.temp io.directories.hierarchy fry ;
+io.pathnames io.files.temp io.directories fry ;
 IN: io.monitors.recursive.tests
 
 SINGLETON: mock-io-backend
@@ -18,7 +18,7 @@ M: dummy-monitor dispose*
 
 M: mock-io-backend (monitor)
     nip
-    over exists? [
+    over file-exists? [
         dummy-monitor new-monitor
         dummy-monitor-created get [ 1 + ] change-i drop
     ] [

@@ -1,7 +1,7 @@
 USING: accessors arrays assocs combinators fry generalizations
 grouping growable kernel locals make math math.order math.ranges
-sequences sequences.deep sequences.private sorting splitting
-vectors ;
+sequences sequences.deep sequences.private shuffle sorting
+splitting vectors ;
 IN: sequences.extras
 
 : find-all ( ... seq quot: ( ... elt -- ... ? ) -- ... elts )
@@ -33,12 +33,12 @@ IN: sequences.extras
 : map-like ( seq exemplar -- seq' )
     '[ _ like ] map ; inline
 
-: filter-all-subseqs-range ( ... seq range quot: ( ... subseq -- ... ) -- seq )
+: filter-all-subseqs-range ( ... seq range quot: ( ... subseq -- ... ? ) -- seq )
     [
         '[ <clumps> _ filter ] with map concat
     ] keepdd map-like ; inline
 
-: filter-all-subseqs ( ... seq quot: ( ... subseq -- ... ) -- seq )
+: filter-all-subseqs ( ... seq quot: ( ... subseq -- ... ? ) -- seq )
     [ dup length [1,b] ] dip filter-all-subseqs-range ; inline
 
 :: longest-subseq ( seq1 seq2 -- subseq )
@@ -61,12 +61,11 @@ IN: sequences.extras
 : pad-longest ( seq1 seq2 elt -- seq1 seq2 )
     [ 2dup max-length ] dip [ pad-tail ] 2curry bi@ ;
 
-:: pad-center ( seq n elt -- padded )
-    n seq length [-] :> extra
-    extra 2/ :> left
-    extra left - :> right
-    left elt <repetition> seq right elt <repetition>
-    seq 3append-as ;
+: pad-center ( seq n elt -- padded )
+    swap pick length [-] [ drop ] [
+        [ 2/ ] [ over - ] bi rot '[ _ <repetition> ] bi@
+        pick surround-as
+    ] if-zero ;
 
 : change-nths ( ... indices seq quot: ( ... elt -- ... elt' ) -- ... )
     [ change-nth ] 2curry each ; inline
@@ -131,9 +130,6 @@ PRIVATE>
         [ 2dup = [ 1 + ] when ] [ len ] if*
         [ seq <slice> ] keep len or swap
     ] produce nip ; inline
-
-: cut-slice* ( seq n -- before after )
-    [ head-slice* ] [ tail-slice* ] 2bi ;
 
 : ?<slice> ( from/f to/f sequence -- slice )
     [ [ 0 ] unless* ] 2dip
@@ -444,17 +440,29 @@ PRIVATE>
 : last? ( ... seq quot: ( ... elt -- ... ? ) -- ... ? ) [ last ] dip call ; inline
 : nth? ( ... n seq quot: ( ... elt -- ... ? ) -- ... ? ) [ nth ] dip call ; inline
 
-: loop>sequence ( quot: ( ..a -- ..a obj/f ) exemplar -- seq )
-   [ '[ [ @ [ [ , ] when* ] keep ] loop ] ] dip make ; inline
+: loop>sequence** ( ... quot: ( ... -- ... obj ? ) exemplar -- ... seq )
+    [ ] swap produce-as nip ; inline
 
-: loop>array ( quot: ( ..a -- ..a obj/f ) -- seq )
+: loop>array** ( ... quot: ( ... -- ... obj ? ) -- ... array )
+    { } loop>sequence** ; inline
+
+: loop>sequence* ( ... quot: ( ... -- ... obj ? ) exemplar -- ... seq )
+    [ t ] [ '[ [ _ dip ] [ f f f ] if* ] [ swap ] ] [ produce-as 2nip ] tri* ; inline
+
+: loop>array* ( ... quot: ( ... -- ... obj ? ) -- ... array )
+    { } loop>sequence* ; inline
+
+: loop>sequence ( ... quot: ( ... -- ... obj/f ) exemplar -- ... seq )
+    [ [ dup ] compose [ ] ] dip produce-as nip ; inline
+
+: loop>array ( ... quot: ( ... -- ... obj/f ) -- ... array )
    { } loop>sequence ; inline
 
-: loop>sequence* ( quot: ( ..a -- ..a obj ? ) exemplar -- seq )
-    [ '[ [ @ [ [ , ] when* ] [ ] bi* ] loop ] ] dip make ; inline
+: zero-loop>sequence ( ... quot: ( ... n -- ... obj/f ) exemplar -- ... seq )
+    [ 0 ] [ '[ _ keep 1 + swap ] ] [ loop>sequence ] tri* nip ; inline
 
-: loop>array* ( quot: ( ..a -- ..a obj ? ) -- seq )
-   { } loop>sequence* ; inline
+: zero-loop>array ( quot: ( ..a n -- ..a obj ) -- seq )
+    { } zero-loop>sequence ; inline
 
 <PRIVATE
 
@@ -591,31 +599,25 @@ PRIVATE>
 : map-find-last-index ( ... seq quot: ( ... elt index -- ... result/f ) -- ... result i elt )
     [ find-last-index ] (map-find-index) ; inline
 
-:: (start-all) ( subseq seq increment -- indices )
+:: (start-all) ( seq subseq increment -- indices )
     0
     [ [ subseq seq ] dip subseq-start-from dup ]
     [ [ increment + ] keep ] produce nip ;
 
-: start-all ( subseq seq -- indices )
-    over length (start-all) ; inline
+: start-all ( seq subseq -- indices )
+    dup length (start-all) ; inline
 
-: start-all* ( subseq seq -- indices )
+: start-all* ( seq subseq -- indices )
     1 (start-all) ; inline
 
-: count-subseq ( subseq seq -- n )
+: count-subseq ( seq subseq -- n )
     start-all length ; inline
 
-: count-subseq* ( subseq seq -- n )
+: count-subseq* ( seq subseq -- n )
     start-all* length ; inline
 
-: map-zip ( quot: ( x -- y ) -- alist )
-    '[ _ keep swap ] map>alist ; inline
-
-: map-keys ( assoc quot: ( key -- key' ) -- assoc )
-    '[ _ dip ] assoc-map ; inline
-
-: map-values ( assoc quot: ( value -- value' ) -- assoc )
-    '[ swap _ dip swap ] assoc-map ; inline
+: assoc-zip-with ( quot: ( key value -- calc ) -- alist )
+    '[ _ 2keep 2array swap ] assoc-map ; inline
 
 : take-while ( ... seq quot: ( ... elt -- ... ? ) -- head-slice )
     [ '[ @ not ] find drop ] keepd swap
@@ -626,10 +628,10 @@ PRIVATE>
     [ dup length ] unless* tail-slice ; inline
 
 : count-head ( seq quot -- n )
-    [ not ] compose [ find drop ] 2keep drop length or ; inline
+    [ not ] compose [ find drop ] keepd length or ; inline
 
 : count-tail ( seq quot -- n )
-    [ not ] compose [ find-last drop ] 2keep drop
+    [ not ] compose [ find-last drop ] keepd
     length swap [ - 1 - ] when* ; inline
 
 :: interleaved-as ( seq glue exemplar -- newseq )
@@ -644,3 +646,24 @@ PRIVATE>
 : extract! ( ... seq quot: ( ... elt -- ... ? ) -- ... seq )
     [ dup ] compose over [ length ] keep new-resizable
     [ [ push-if ] 2curry reject! ] keep swap like ; inline
+
+: find-pred-loop ( ... i n seq quot: ( ... elt -- ... calc ? ) -- ... calc/f i/f elt/f )
+    2pick < [
+        [ nipd call ] 4keep
+        7 nrot 7 nrot 7 nrot
+        [ [ 3drop ] 2dip rot ]
+        [ 2drop [ 1 + ] 3dip find-pred-loop ] if
+    ] [
+        4drop f f f
+    ] if ; inline recursive
+
+: find-pred ( ... seq quot: ( ... elt -- ... calc ) pred: ( ... calc -- ... ? ) -- ... calc/f i/f elt/f )
+    [ 0 ] 3dip
+    [ [ length check-length ] keep ] 2dip
+    '[ nth-unsafe _ keep swap _ keep swap ] find-pred-loop swapd ; inline
+
+! https://en.wikipedia.org/wiki/Maximum_subarray_problem
+! Kadane's algorithm O(n) largest sum in subarray
+: max-subarray-sum ( seq -- sum )
+    [ -1/0. 0 ] dip
+    [ [ + ] keep max [ max ] keep ] each drop ;

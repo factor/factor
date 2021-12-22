@@ -1,16 +1,15 @@
 ! Copyright (C) 2005, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors assocs classes combinators destructors
-documents.private fonts fry io io.styles kernel locals math
-math.rectangles math.vectors models namespaces sequences sets
-sorting splitting strings ui.baseline-alignment ui.clipboards
-ui.gadgets ui.gadgets.borders ui.gadgets.grid-lines
-ui.gadgets.grids ui.gadgets.icons ui.gadgets.incremental
-ui.gadgets.labels ui.gadgets.menus ui.gadgets.packs
-ui.gadgets.paragraphs ui.gadgets.presentations
-ui.gadgets.private ui.gadgets.scrollers ui.gadgets.tracks
-ui.gestures ui.images ui.pens.solid ui.render ui.theme
-ui.traverse unicode ;
+documents.private fonts io io.styles kernel math math.rectangles
+math.vectors models namespaces sequences sets sorting splitting
+strings ui.baseline-alignment ui.clipboards ui.gadgets
+ui.gadgets.borders ui.gadgets.grid-lines ui.gadgets.grids
+ui.gadgets.icons ui.gadgets.incremental ui.gadgets.labels
+ui.gadgets.menus ui.gadgets.packs ui.gadgets.paragraphs
+ui.gadgets.presentations ui.gadgets.private ui.gadgets.scrollers
+ui.gadgets.tracks ui.gestures ui.images ui.pens.solid ui.render
+ui.theme ui.traverse unicode ;
 FROM: io.styles => foreground background ;
 FROM: ui.gadgets.wrappers => <wrapper> ;
 IN: ui.gadgets.panes
@@ -130,7 +129,7 @@ M: pane-stream stream-write1
     '[
         dup length 3639 >
         [ 3639 over last-grapheme-from cut-slice ] [ f ] if
-        swap "" like split-lines @ dup
+        swap "" like ?split-lines @ dup
     ] loop drop ; inline
 
 M: pane-stream stream-write
@@ -201,7 +200,7 @@ M: pane-stream write-gadget
 
 TUPLE: pane-control < pane quot ;
 
-M: pane-control model-changed ( model pane-control -- )
+M: pane-control model-changed
     [ value>> ] [ dup quot>> ] bi*
     '[ _ call( value -- ) ] with-pane ;
 
@@ -354,7 +353,7 @@ M: paragraph pane-line
     { presented image-style } pick '[ _ key? ] any? [
         pane-text
     ] [
-        [ " " split ] 2dip
+        [ split-words ] 2dip
         [ pane-bl ] [ pane-text ] bi-curry bi-curry
         interleave
     ] if ;
@@ -364,7 +363,7 @@ M: paragraph pane-line
 
 GENERIC: sloppy-pick-up* ( loc gadget -- n )
 
-M: pack sloppy-pick-up* ( loc gadget -- n )
+M: pack sloppy-pick-up*
     [ orientation>> ] [ children>> ] bi
     [ loc>> ] (fast-children-on) ;
 

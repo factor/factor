@@ -1,6 +1,6 @@
 ! Copyright (C) 2009 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: arrays editors io.directories.search kernel namespaces
+USING: arrays editors io.directories kernel namespaces
 sequences windows.shell32 ;
 
 IN: editors.notepad
@@ -14,5 +14,5 @@ notepad editor-class set-global
         [ "notepad.exe" tail? ] find-file
     ] unless* ;
 
-M: notepad editor-command ( file line -- command )
+M: notepad editor-command
     drop [ notepad-path ] dip 2array ;

@@ -29,15 +29,15 @@ ERROR: vocab-root-required root ;
     [ ensure-vocab-root ] [ check-vocab-name ] bi* ;
 
 : vocab-directory-entries ( root prefix -- vocab-path vocab-name entries )
-    [ ensure-vocab-root ] dip [ append-path ] keep
-    over dup exists? [ directory-entries ] [ drop { } ] if ;
+    ensure-vocab-root/prefix [ vocab-dir append-path ] keep
+    over dup file-exists? [ directory-entries ] [ drop { } ] if ;
 
 : (disk-vocabs) ( root prefix -- seq )
     vocab-directory-entries visible-dirs [
         name>>
         [ dup ".factor" append append-path append-path ]
         [ over empty? [ nip ] [ "." glue ] if ] bi-curry bi*
-        swap exists? [ >vocab-link ] [ <vocab-prefix> ] if
+        swap file-exists? [ >vocab-link ] [ <vocab-prefix> ] if
     ] 2with map ;
 
 DEFER: add-vocab%
