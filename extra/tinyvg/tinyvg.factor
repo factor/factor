@@ -32,33 +32,6 @@ ERROR: invalid-length n ;
 : write-length ( n -- )
     dup 1 < [ invalid-length ] when 1 - write-varuint ;
 
-! Header
-
-CONSTANT: tinyvg-magic B{ 0x72 0x56 }
-
-CONSTANT: tinyvg-version 1
-
-TUPLE: tinyvg-header scale color-encoding coordinate-range width height color-count ;
-
-: read-tinyvg-header ( -- header )
-    2 read tinyvg-magic assert=
-    read1 tinyvg-version assert=
-    read1 [ 4 bits ] [ -4 shift 2 bits ] [ -6 shift ] tri
-    dup { 2 1 4 } nth '[ _ read le> ] 2 call-n
-    read-varuint tinyvg-header boa ;
-
-: write-tinyvg-header ( header -- )
-    tinyvg-magic write
-    tinyvg-version write1 {
-        [ scale>> ]
-        [ color-encoding>> 4 shift bitor ]
-        [ coordinate-range>> 6 shift bitor write1 ]
-        [ width>> ]
-        [ height>> ]
-        [ coordinate-range>> { 2 1 4 } nth '[ _ >le write ] bi@ ]
-        [ color-count>> write-varuint ]
-    } cleave ;
-
 ! Colors
 
 : read-rgba-8888 ( -- rgba )
@@ -526,19 +499,32 @@ C: <segment> segment
 
 ! TinyVG
 
-TUPLE: tinyvg header color-table commands ;
+CONSTANT: tinyvg-magic B{ 0x72 0x56 }
+
+CONSTANT: tinyvg-version 1
+
+TUPLE: tinyvg scale color-encoding coordinate-range width height color-table commands ;
 
 C: <tinyvg> tinyvg
 
 : read-tinyvg ( -- tinyvg )
     [
-        read-tinyvg-header
-        dup scale>> 2^ scale-factor set
-        dup color-encoding>> color-encoding set
-        dup coordinate-range>> coordinate-range set
-        dup color-count>> read-color-table dup color-table set
-        read-commands
-        <tinyvg>
+        tinyvg new
+            2 read tinyvg-magic assert=
+            read1 tinyvg-version assert=
+            read1 {
+                [ 4 bits >>scale ]
+                [ -4 shift 2 bits >>color-encoding ]
+                [ -6 shift [ >>coordinate-range ] keep ]
+            } cleave
+            { 2 1 4 } nth '[ _ read le> ] 2 call-n
+            [ >>width ] [ >>height ] bi*
+            dup scale>> 2^ scale-factor set
+            dup color-encoding>> color-encoding set
+            dup coordinate-range>> coordinate-range set
+            read-varuint read-color-table >>color-table
+            dup color-table>> color-table set
+            read-commands >>commands
     ] with-scope ;
 
 : path>tinyvg ( path -- tinyvg )
@@ -549,13 +535,20 @@ C: <tinyvg> tinyvg
 
 : write-tinyvg ( tinyvg -- )
     [
-        {
-            [ header>> write-tinyvg-header ]
-            [ header>> scale>> 2^ scale-factor set ]
-            [ header>> color-encoding>> color-encoding set ]
-            [ header>> coordinate-range>> coordinate-range set ]
-            [ color-table>> color-table set ]
+        tinyvg-magic write
+        tinyvg-version write1 {
+            [ scale>> ]
+            [ color-encoding>> 4 shift bitor ]
+            [ coordinate-range>> 6 shift bitor write1 ]
+            [ width>> ]
+            [ height>> ]
+            [ coordinate-range>> { 2 1 4 } nth '[ _ >le write ] bi@ ]
+            [ scale>> 2^ scale-factor set ]
+            [ color-encoding>> color-encoding set ]
+            [ coordinate-range>> coordinate-range set ]
+            [ color-table>> length write-varuint ]
             [ color-table>> [ write-color ] each ]
+            [ color-table>> color-table set ]
             [ commands>> write-commands ]
         } cleave
     ] with-scope ;
