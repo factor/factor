@@ -342,95 +342,53 @@ C: <outline-fill-path> outline-fill-path
 
 GENERIC: write-command ( command -- )
 
+:: write-fill ( command n seq -- )
+    command fill-style>> n write-style-kind
+    seq length write-length
+    command fill-style>> write-style ; inline
+
 M: fill-polygon write-command
-    {
-        [ fill-style>> 1 write-style-kind ]
-        [ polygon>> length write-length ]
-        [ fill-style>> write-style ]
-        [ polygon>> [ write-point ] each ]
-    } cleave ;
+    1 over polygon>> [ write-fill ] [ [ write-point ] each ] bi ;
 
 M: fill-rectangles write-command
-    {
-        [ fill-style>> 2 write-style-kind ]
-        [ rectangles>> length write-length ]
-        [ fill-style>> write-style ]
-        [ rectangles>> [ write-rectangle ] each ]
-    } cleave ;
+    2 over rectangles>> [ write-fill ] [ [ write-rectangle ] each ] bi ;
 
 M: fill-path write-command
-    {
-        [ fill-style>> 3 write-style-kind ]
-        [ path>> segments>> length write-length ]
-        [ fill-style>> write-style ]
-        [ path>> write-path ]
-    } cleave ;
+    3 over path>> [ write-fill ] [ write-path ] bi ;
+
+:: write-draw-line ( command n seq -- )
+    command line-style>> n write-style-kind
+    seq length write-length
+    command line-style>> write-style
+    command line-width>> write-unit ; inline
 
 M: draw-lines write-command
-    {
-        [ line-style>> 4 write-style-kind ]
-        [ lines>> length write-length ]
-        [ line-style>> write-style ]
-        [ line-width>> write-unit ]
-        [ lines>> [ write-line ] each ]
-    } cleave ;
+    4 over lines>> [ write-draw-line ] [ [ write-line ] each ] bi ;
 
 M: draw-line-loop write-command
-    {
-        [ line-style>> 5 write-style-kind ]
-        [ points>> length write-length ]
-        [ line-style>> write-style ]
-        [ line-width>> write-unit ]
-        [ points>> [ write-point ] each ]
-    } cleave ;
+    5 over points>> [ write-draw-line ] [ [ write-point ] each ] bi ;
 
 M: draw-line-strip write-command
-    {
-        [ line-style>> 6 write-style-kind ]
-        [ points>> length write-length ]
-        [ line-style>> write-style ]
-        [ line-width>> write-unit ]
-        [ points>> [ write-point ] each ]
-    } cleave ;
+    6 over points>> [ write-draw-line ] [ [ write-point ] each ] bi ;
 
 M: draw-line-path write-command
-    {
-        [ line-style>> 7 write-style-kind ]
-        [ path>> segments>> length write-length ]
-        [ line-style>> write-style ]
-        [ line-width>> write-unit ]
-        [ path>> write-path ]
-    } cleave ;
+    7 over path>> [ write-draw-line ] [ write-path ] bi ;
+
+:: write-outline-fill ( command n seq -- )
+    command fill-style>> n write-style-kind
+    command line-style>> seq length 1 - write-style-kind
+    command fill-style>> write-style
+    command line-style>> write-style
+    command line-width>> write-unit ; inline
 
 M: outline-fill-polygon write-command
-    {
-        [ fill-style>> 8 write-style-kind ]
-        [ [ line-style>> ] [ points>> length 1 - ] bi write-style-kind ]
-        [ fill-style>> write-style ]
-        [ line-style>> write-style ]
-        [ line-width>> write-unit ]
-        [ points>> [ write-point ] each ]
-    } cleave ;
+    8 over points>> [ write-outline-fill ] [ [ write-point ] each ] bi ;
 
 M: outline-fill-rectangles write-command
-    {
-        [ fill-style>> 9 write-style-kind ]
-        [ [ line-style>> ] [ rectangles>> length 1 - ] bi write-style-kind ]
-        [ fill-style>> write-style ]
-        [ line-style>> write-style ]
-        [ line-width>> write-unit ]
-        [ rectangles>> [ write-rectangle ] each ]
-    } cleave ;
+    9 over rectangles>> [ write-outline-fill ] [ [ write-rectangle ] each ] bi ;
 
 M: outline-fill-path write-command
-    {
-        [ fill-style>> 10 write-style-kind ]
-        [ [ line-style>> ] [ path>> segments>> length 1 - ] bi write-style-kind ]
-        [ fill-style>> write-style ]
-        [ line-style>> write-style ]
-        [ line-width>> write-unit ]
-        [ path>> write-path ]
-    } cleave ;
+    10 over path>> [ write-outline-fill ] [ write-path ] bi ;
 
 : write-commands ( commands -- )
     [ write-command ] each 0 write1 ;
@@ -554,27 +512,17 @@ C: <segment> segment
 : read-segment ( n -- segment )
     read-point swap read-instructions segment boa ;
 
-: read-segments ( n -- segments )
-    1 + [ read-varuint ] replicate [ read-segment ] map ;
-
 : write-segment ( segment -- )
     [ start>> write-point ] [ instructions>> [ write-instruction ] each ] bi ;
 
-: write-segments ( segments -- )
-    [ [ instructions>> length write-length ] each ]
-    [ [ write-segment ] each ] bi ;
-
 ! Path
 
-TUPLE: path segments ;
+: read-path ( segment-count -- segments )
+    1 + [ read-varuint ] replicate [ read-segment ] map ;
 
-C: <path> path
-
-: read-path ( segment-count -- path )
-    read-segments path boa ;
-
-: write-path ( path -- )
-    segments>> write-segments ;
+: write-path ( segments -- )
+    [ [ instructions>> length write-length ] each ]
+    [ [ write-segment ] each ] bi ;
 
 ! TinyVG
 
