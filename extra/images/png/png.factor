@@ -97,7 +97,7 @@ ERROR: bad-checksum ;
 
 : <icc-profile> ( byte-array -- icc-profile )
     binary [
-        read-png-string read1 drop contents zlib-inflate
+        read-png-string read1 drop read-contents zlib-inflate
     ] with-byte-reader icc-profile boa ;
 
 : <itext> ( byte-array -- itext )

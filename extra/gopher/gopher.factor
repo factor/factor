@@ -42,7 +42,7 @@ CONSTANT: A_PLUS_SOUND CHAR: <
 : gopher-get ( selector -- item-type byte-array )
     "/" split1 "" or [ first ] dip
     "?" split1 [ "\t" glue ] when*
-    "\r\n" append utf8 encode write flush contents ;
+    "\r\n" append utf8 encode write flush read-contents ;
 
 PRIVATE>
 
