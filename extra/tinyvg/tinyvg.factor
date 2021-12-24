@@ -164,21 +164,22 @@ TUPLE: flat-colored color-index ;
 
 C: <flat-colored> flat-colored
 
-: read-flat-colored ( -- style )
-    read-color-index <flat-colored> ;
-
 TUPLE: gradient point0 point1 color-index0 color-index1 ;
 
 TUPLE: linear-gradient < gradient ;
 
+C: <linear-gradient> linear-gradient
+
 TUPLE: radial-gradient < gradient ;
+
+C: <radial-gradient> radial-gradient
 
 : read-gradient ( class -- style )
     [ [ read-point ] 2 call-n [ read-color-index ] 2 call-n ] dip boa ; inline
 
 : read-style ( style-kind -- style )
     {
-        { 0 [ read-flat-colored ] }
+        { 0 [ read-color-index <flat-colored> ] }
         { 1 [ linear-gradient read-gradient ] }
         { 2 [ radial-gradient read-gradient ] }
     } case ;
@@ -405,7 +406,7 @@ TUPLE: quadratic-bezier < instruction control point1 ;
 C: <quadratic-bezier> quadratic-bezier
 
 : read-tag ( -- line-width/f tag )
-    read1 [ 4 bit? ] [ 3 bits ] bi [ [ read-unit ] [ f ] if ] dip ;
+    read1 [ 4 bit? [ read-unit ] [ f ] if* ] [ 3 bits ] bi ;
 
 : read-arc ( -- large-arc? sweep? )
     read1 [ 0 bit? ] [ 1 bit? ] bi ;
