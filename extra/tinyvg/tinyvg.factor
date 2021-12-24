@@ -406,7 +406,7 @@ TUPLE: quadratic-bezier < instruction control point1 ;
 C: <quadratic-bezier> quadratic-bezier
 
 : read-tag ( -- line-width/f tag )
-    read1 [ 4 bit? [ read-unit ] [ f ] if* ] [ 3 bits ] bi ;
+    read1 [ 4 bit? [ read-unit ] [ f ] if ] [ 3 bits ] bi ;
 
 : read-arc ( -- large-arc? sweep? )
     read1 [ 0 bit? ] [ 1 bit? ] bi ;
