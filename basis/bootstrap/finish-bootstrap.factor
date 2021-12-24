@@ -7,6 +7,6 @@ continuations parser.notes namespaces ;
     
     boot
     [ do-startup-hooks command-line-startup ]
-    [ print-error :c flush 1 exit ]
+    [ print-error nl :c flush 1 exit ]
     recover
 ] set-startup-quot
