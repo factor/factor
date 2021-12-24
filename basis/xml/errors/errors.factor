@@ -100,7 +100,7 @@ XML-ERROR: bad-cdata ;
 
 XML-ERROR: not-enough-characters ;
 
-XML-ERROR: bad-doctype contents ;
+XML-ERROR: bad-doctype read-contents ;
 
 XML-ERROR: bad-encoding encoding ;
 
