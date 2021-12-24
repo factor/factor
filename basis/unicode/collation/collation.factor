@@ -221,14 +221,14 @@ fixup-ducet-for-tibetan
 : base ( char -- base )
     {
         { [ dup 0x03400 0x04DBF between? ] [ drop 0xFB80 ] } ! Extension A
-        { [ dup 0x20000 0x2A6DD between? ] [ drop 0xFB80 ] } ! Extension B
-        { [ dup 0x2A700 0x2B734 between? ] [ drop 0xFB80 ] } ! Extension C
+        { [ dup 0x20000 0x2A6DF between? ] [ drop 0xFB80 ] } ! Extension B
+        { [ dup 0x2A700 0x2B738 between? ] [ drop 0xFB80 ] } ! Extension C
         { [ dup 0x2B740 0x2B81D between? ] [ drop 0xFB80 ] } ! Extension D
         { [ dup 0x2B820 0x2CEA1 between? ] [ drop 0xFB80 ] } ! Extension E
         { [ dup 0x2CEB0 0x2EBE0 between? ] [ drop 0xFB80 ] } ! Extension F
         { [ dup 0x30000 0x3134A between? ] [ drop 0xFB80 ] } ! Extension G
         { [ dup 0x03400 0x04DBF between? ] [ drop 0xFB40 ] } ! CJK
-        { [ dup 0x04E00 0x09FFC between? ] [ drop 0xFB40 ] } ! CJK
+        { [ dup 0x04E00 0x09FFF between? ] [ drop 0xFB40 ] } ! CJK
         [ drop 0xFBC0 ] ! Other
     } cond ;
 
