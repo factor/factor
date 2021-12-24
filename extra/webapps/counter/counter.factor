@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: math kernel accessors http.server http.server.dispatchers
 furnace furnace.actions furnace.sessions furnace.redirection
-html.components html.forms fry urls ;
+html.components html.forms io.servers urls ;
 IN: webapps.counter
 
 SYMBOL: count
@@ -38,6 +38,6 @@ USING: db.sqlite furnace.alloy namespaces ;
     <counter-app>
         counter-db <alloy>
         main-responder set-global
-    8080 httpd drop ;
+    8080 httpd wait-for-server ;
 
 MAIN: run-counter
