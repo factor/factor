@@ -84,11 +84,7 @@ SYMBOL: =>
     first word? ;
 
 : frame-word. ( triple -- )
-    first {
-        { [ dup method? ] [ "Method: " write pprint ] }
-        { [ dup word? ] [ "Word: " write pprint ] }
-        [ drop ]
-    } cond ;
+    first pprint ;
 
 : optimized-frame. ( triple -- )
     [
@@ -100,7 +96,6 @@ SYMBOL: =>
     [
         [ "(U)" write ] with-cell
         [
-            "Quotation: " write
             dup [ second ] [ third ] bi remove-breakpoints
             H{
                 { nesting-limit 3 }
