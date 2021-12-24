@@ -82,7 +82,7 @@ PRIVATE>
 
 : brainfuck-main ( -- )
     command-line get [
-        contents (run-brainfuck)
+        read-contents (run-brainfuck)
     ] [
         [ binary file-contents (run-brainfuck) ] each
     ] if-empty ;
