@@ -214,10 +214,9 @@ DEFER: @pos-digit
 DEFER: @neg-digit
 
 : @exponent-digit-or-punc ( float-parse i number-parse n char -- float-parse n/f )
-    {
-        { CHAR: , [ [ @exponent-digit ] require-next-digit ] }
-        [ @exponent-digit ]
-    } case ; inline
+    dup ",_" member-eq? [
+        drop [ @exponent-digit ] require-next-digit
+    ] [ @exponent-digit ] if ; inline
 
 : @exponent-digit ( float-parse i number-parse n char -- float-parse n/f )
     { float-parse fixnum number-parse integer fixnum } declare
@@ -246,10 +245,9 @@ DEFER: @neg-digit
     [ exponent-char? [ drop ->exponent ] ] dip if ; inline
 
 : @mantissa-digit-or-punc ( float-parse i number-parse n char -- float-parse n/f )
-    {
-        { CHAR: , [ [ @mantissa-digit ] require-next-digit ] }
-        [ @mantissa-digit ]
-    } case ; inline
+    dup ",_" member-eq? [
+        drop [ @mantissa-digit ] require-next-digit
+    ] [ @mantissa-digit ] if ; inline
 
 : @mantissa-digit ( float-parse i number-parse n char -- float-parse n/f )
     { float-parse fixnum number-parse integer fixnum } declare
@@ -266,11 +264,14 @@ DEFER: @neg-digit
     <float-parse> [ @mantissa-digit ] require-next-digit ?make-float ; inline
 
 : @denom-digit-or-punc ( i number-parse n char -- n/f )
-    {
-        { CHAR: , [ [ @denom-digit ] require-next-digit ] }
-        { CHAR: . [ ->mantissa ] }
-        [ [ @denom-digit ] or-exponent ]
-    } case ; inline
+    dup ",_" member-eq? [
+        drop [ @denom-digit ] require-next-digit
+    ] [
+        {
+            { CHAR: . [ ->mantissa ] }
+            [ [ @denom-digit ] or-exponent ]
+        } case
+    ] if ; inline
 
 : @denom-digit ( i number-parse n char -- n/f )
     { fixnum number-parse integer fixnum } declare
@@ -287,11 +288,14 @@ DEFER: @neg-digit
     @split [ @denom-first-digit ] require-next-digit ?make-ratio ;
 
 : @num-digit-or-punc ( i number-parse n char -- n/f )
-    {
-        { CHAR: , [ [ @num-digit ] require-next-digit ] }
-        { CHAR: / [ ->denominator ] }
-        [ @num-digit ]
-    } case ; inline
+    dup ",_" member-eq? [
+        drop [ @num-digit ] require-next-digit
+    ] [
+        {
+            { CHAR: / [ ->denominator ] }
+            [ @num-digit ]
+        } case
+    ] if ; inline
 
 : @num-digit ( i number-parse n char -- n/f )
     { fixnum number-parse integer fixnum } declare
@@ -302,13 +306,16 @@ DEFER: @neg-digit
     @split [ @num-digit ] require-next-digit ?add-ratio ;
 
 : @pos-digit-or-punc ( i number-parse n char -- n/f )
-    {
-        { CHAR: , [ [ @pos-digit ] require-next-digit ] }
-        { CHAR: + [ ->numerator ] }
-        { CHAR: / [ ->denominator ] }
-        { CHAR: . [ ->mantissa ] }
-        [ [ @pos-digit ] or-exponent ]
-    } case ; inline
+    dup ",_" member-eq? [
+        drop [ @pos-digit ] require-next-digit
+    ] [
+        {
+            { CHAR: + [ ->numerator ] }
+            { CHAR: / [ ->denominator ] }
+            { CHAR: . [ ->mantissa ] }
+            [ [ @pos-digit ] or-exponent ]
+        } case
+    ] if ; inline
 
 : @pos-digit ( i number-parse n char -- n/f )
     { fixnum number-parse integer fixnum } declare
@@ -335,13 +342,16 @@ DEFER: @neg-digit
     } case ; inline
 
 : @neg-digit-or-punc ( i number-parse n char -- n/f )
-    {
-        { CHAR: , [ [ @neg-digit ] require-next-digit ] }
-        { CHAR: - [ ->numerator ] }
-        { CHAR: / [ ->denominator ] }
-        { CHAR: . [ ->mantissa ] }
-        [ [ @neg-digit ] or-exponent ]
-    } case ; inline
+    dup ",_" member-eq? [
+        drop [ @neg-digit ] require-next-digit
+    ] [
+        {
+            { CHAR: - [ ->numerator ] }
+            { CHAR: / [ ->denominator ] }
+            { CHAR: . [ ->mantissa ] }
+            [ [ @neg-digit ] or-exponent ]
+        } case
+    ] if ; inline
 
 : @neg-digit ( i number-parse n char -- n/f )
     { fixnum number-parse integer fixnum } declare
