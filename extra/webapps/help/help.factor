@@ -3,7 +3,7 @@
 USING: accessors assocs furnace.actions furnace.redirection
 help.html help.topics html.components html.forms http.server
 http.server.dispatchers http.server.static io.directories
-io.files.temp kernel locals namespaces sequences
+io.files.temp io.servers kernel locals namespaces sequences
 unicode urls ;
 IN: webapps.help
 
@@ -44,6 +44,6 @@ TUPLE: help-webapp < dispatcher ;
 : run-help-webapp ( -- )
     "docs" cache-file <help-webapp>
         main-responder set-global
-    8080 httpd drop ;
+    8080 httpd wait-for-server ;
 
 MAIN: run-help-webapp
