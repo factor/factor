@@ -40,7 +40,7 @@ M: restart-renderer row-columns
             [ "To continue, pick one of the options below:" <label> add-gadget ] dip
             restart-list>> add-gadget
         ] [ drop ] if
-    ] bi ;
+    ] bi <scroller> ;
 
 PRIVATE>
 
@@ -51,7 +51,7 @@ PRIVATE>
         swap >>continuation
         swap >>error
         dup <restart-list> >>restart-list
-        dup <error-display> margins white-interior f track-add
+        dup <error-display> margins white-interior 1 track-add
         add-toolbar ;
 
 M: debugger focusable-child*
