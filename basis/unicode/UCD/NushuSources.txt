@@ -1,16 +1,16 @@
-# NushuSources-13.0.0.txt
-# Date: 2019-09-09, 19:52:00 GMT [KW]
-# © 2019 Unicode®, Inc.
-# For terms of use, see http://www.unicode.org/terms_of_use.html
+# NushuSources-14.0.0.txt
+# Date: 2021-04-30, 23:59:00 GMT [KW]
+# © 2021 Unicode®, Inc.
+# For terms of use, see https://www.unicode.org/terms_of_use.html
 #
 # Unicode Character Database
-# For documentation, see http://www.unicode.org/reports/tr44/
+# For documentation, see https://www.unicode.org/reports/tr44/
 #
 
 # Source references file for Nushu characters
 #
-#	Synchronized with: ISO/IEC 10646:2017 (NushuSrc.txt)
-#	Original Data Date: May 14, 2016
+#	Synchronized with: ISO/IEC 10646:2020/Amd 1.0 (E) (NushuSrc.txt)
+#	Original Data Date: April 28, 2021
 #
 # Format:
 #	Each data line of this file consists of three tab-separated fields.
@@ -313,7 +313,7 @@ U+1B1FC	kReading	lau21
 U+1B1FD	kSrc_NushuDuben	43.13
 U+1B1FD	kReading	lau21
 U+1B1FE	kSrc_NushuDuben	42.05
-U+1B1FE	kReading	nou33
+U+1B1FE	kReading	nw33
 U+1B1FF	kSrc_NushuDuben	43.14
 U+1B1FF	kReading	kou33
 U+1B200	kSrc_NushuDuben	43.15
@@ -400,8 +400,8 @@ U+1B228	kSrc_NushuDuben	45.11
 U+1B228	kReading	si44
 U+1B229	kSrc_NushuDuben	45.12
 U+1B229	kReading	fu33
-U+1B22A	kSrc_NushuDuben	45.14
-U+1B22A	kReading	ngu13
+U+1B22A	kSrc_NushuDuben	46.05
+U+1B22A	kReading	ang21
 U+1B22B	kSrc_NushuDuben	45.16
 U+1B22B	kReading	tchyu21
 U+1B22C	kSrc_NushuDuben	45.15
@@ -434,8 +434,8 @@ U+1B239	kSrc_NushuDuben	45.27
 U+1B239	kReading	huow21
 U+1B23A	kSrc_NushuDuben	46.03
 U+1B23A	kReading	pang44
-U+1B23B	kSrc_NushuDuben	46.05
-U+1B23B	kReading	ang21
+U+1B23B	kSrc_NushuDuben	45.14
+U+1B23B	kReading	ngu13
 U+1B23C	kSrc_NushuDuben	46.08
 U+1B23C	kReading	tsiang44
 U+1B23D	kSrc_NushuDuben	46.07
@@ -466,8 +466,8 @@ U+1B249	kSrc_NushuDuben	49.16
 U+1B249	kReading	tshoe44
 U+1B24A	kSrc_NushuDuben	46.20
 U+1B24A	kReading	kue44
-U+1B24B	kSrc_NushuDuben	46.21
-U+1B24B	kReading	kue35
+U+1B24B	kSrc_NushuDuben	48.14
+U+1B24B	kReading	tsiou33
 U+1B24C	kSrc_NushuDuben	46.22
 U+1B24C	kReading	kue21
 U+1B24D	kSrc_NushuDuben	47.01
@@ -524,8 +524,8 @@ U+1B266	kSrc_NushuDuben	48.13
 U+1B266	kReading	kou5
 U+1B267	kSrc_NushuDuben	51.05
 U+1B267	kReading	ou44
-U+1B268	kSrc_NushuDuben	48.14
-U+1B268	kReading	tsiou33
+U+1B268	kSrc_NushuDuben	46.21
+U+1B268	kReading	kue35
 U+1B269	kSrc_NushuDuben	48.15
 U+1B269	kReading	tshiou44
 U+1B26A	kSrc_NushuDuben	48.16
@@ -787,9 +787,9 @@ U+1B2E9	kReading	tsuow44
 U+1B2EA	kSrc_NushuDuben	55.06
 U+1B2EA	kReading	mang13
 U+1B2EB	kSrc_NushuDuben	55.09
-U+1B2EB	kReading	tciant44
+U+1B2EB	kReading	tciang33
 U+1B2EC	kSrc_NushuDuben	55.07
-U+1B2EC	kReading	tschiang21
+U+1B2EC	kReading	tchiang21
 U+1B2ED	kSrc_NushuDuben	55.08
 U+1B2ED	kReading	tciong44
 U+1B2EE	kSrc_NushuDuben	55.11
