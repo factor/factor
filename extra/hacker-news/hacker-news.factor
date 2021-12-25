@@ -8,6 +8,9 @@ io.styles json.reader kernel make math sequences ui urls ;
 
 IN: hacker-news
 
+CONSTANT: christmas-red HEXCOLOR: bc2c21
+CONSTANT: christmas-green HEXCOLOR: 376627
+
 <PRIVATE
 : hacker-news-ids ( endpoint -- ids )
     "https://hacker-news.firebaseio.com/v0/%s.json?print=pretty" sprintf
@@ -38,6 +41,23 @@ IN: hacker-news
 : hacker-news-job-stories ( n -- seq )
     "jobstories" hacker-news-items ;
 
+: christmas-day? ( -- ? )
+    now dup christmas-day same-day? ;
+
+: number-color ( n -- color )
+    christmas-day? [
+        odd? christmas-red christmas-green ?
+    ] [
+        drop HEXCOLOR: a0a0a0
+    ] if ;
+
+: background-color ( -- color )
+    christmas-day? HEXCOLOR: bc2c21 HEXCOLOR: ff6600 ? ;
+
+: write-number ( n -- )
+    [ "%2d. " sprintf H{ } clone ] keep
+    number-color foreground pick set-at format ;
+
 : write-title ( title url -- )
     '[
         _ presented ,,
@@ -66,7 +86,8 @@ IN: hacker-news
 PRIVATE>
 
 : post. ( post index -- )
-    "%2d. " sprintf write-text {
+    write-number
+    {
         [ [ "title" of ] [ "url" of ] bi write-title ]
         [ post>url host>> " (" ")" surround write-text nl ]
         [ "score" of "    %d points" sprintf write-text ]
@@ -82,10 +103,6 @@ PRIVATE>
             ] if nl nl
         ]
     } cleave ;
-
-: background-color ( -- color )
-    now dup christmas-day same-day?
-    HEXCOLOR: bc2c21 HEXCOLOR: ff6600 ? ;
 
 : banner. ( str -- )
     "http://news.ycombinator.com" >url presented associate
