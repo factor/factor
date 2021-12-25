@@ -21,302 +21,6 @@ FROM: alien.c-types => float ;
 
 LIBRARY: raylib
 
-! Structs ----------------------------------------------------------------
-
-STRUCT: Vector2
-    { x float }
-    { y float } ;
-
-STRUCT: Vector3
-    { x float }
-    { y float }
-    { z float } ;
-
-STRUCT: Vector4
-    { x float }
-    { y float }
-    { z float }
-    { w float } ;
-
-TYPEDEF: Vector4 Quaternion ! Same as Vector4
-
-ERROR: invalid-vector-length obj exemplar ;
-
-: <Vector2> ( x y -- obj ) Vector2 <struct-boa> ; inline
-INSTANCE: Vector2 sequence
-M: Vector2 length drop 2 ; inline
-M: Vector2 nth-unsafe
-    swap 0 = [ x>> ] [ y>> ] if ;
-M: Vector2 set-nth-unsafe
-    swap 0 = [ x<< ] [ y<< ] if ;
-M: Vector2 like
-    over length 2 =
-    [ drop dup Vector2?
-      [ first2 <Vector2> ] unless
-    ] [ invalid-vector-length ] if ; inline
-M: Vector2 new-sequence
-    over 2 = [
-        2drop Vector2 (struct)
-    ] [ invalid-vector-length ] if ; inline
-
-: <Vector3> ( x y z -- obj ) Vector3 <struct-boa> ; inline
-INSTANCE: Vector3 sequence
-M: Vector3 length drop 3 ; inline
-M: Vector3 nth-unsafe
-    swap { { 0 [ x>> ] }
-           { 1 [ y>> ] }
-           { 2 [ z>> ] } } case ;
-M: Vector3 set-nth-unsafe
-    swap { { 0 [ x<< ] }
-           { 1 [ y<< ] }
-           { 2 [ z<< ] } } case ;
-M: Vector3 like
-    over length 3 =
-    [ drop dup Vector3?
-      [ first3 <Vector3> ] unless
-    ] [ invalid-vector-length ] if ; inline
-M: Vector3 new-sequence
-    over 3 = [
-        2drop Vector3 (struct)
-    ] [ invalid-vector-length ] if ; inline
-
-: <Vector4> ( x y z w -- obj ) Vector4 <struct-boa> ; inline
-INSTANCE: Vector4 sequence
-M: Vector4 length drop 4 ; inline
-M: Vector4 nth-unsafe
-    swap { { 0 [ x>> ] }
-           { 1 [ y>> ] }
-           { 2 [ z>> ] }
-           { 3 [ w>> ] } } case ;
-M: Vector4 set-nth-unsafe
-    swap { { 0 [ x<< ] }
-           { 1 [ y<< ] }
-           { 2 [ z<< ] }
-           { 3 [ w<< ] } } case ;
-M: Vector4 like
-    over length 4 =
-    [ drop dup Vector4?
-      [ first4 <Vector4> ] unless
-    ] [ invalid-vector-length ] if ; inline
-M: Vector4 new-sequence
-    over 4 = [
-        2drop Vector4 (struct)
-    ] [ invalid-vector-length ] if ; inline
-
-! Matrix type (OpenGL style 4x4 - right handed, column major)
-STRUCT: Matrix
-    { m0 float } { m4 float } { m8 float } { m12 float }
-    { m1 float } { m5 float } { m9 float } { m13 float }
-    { m2 float } { m6 float } { m10 float } { m14 float }
-    { m3 float } { m7 float } { m11 float } { m15 float } ;
-
-STRUCT: Color
-    { r uchar }
-    { g uchar }
-    { b uchar }
-    { a uchar } ;
-
-STRUCT: Rectangle
-    { x float }
-    { y float }
-    { width float }
-    { height float } ;
-
-! Image type, bpp always RGBA (32bit)
-! NOTE: Data Stored in CPU Memory (RAM)
-STRUCT: Image
-    { data void* }                     ! Image raw data
-    { width int }                      ! Image base width
-    { height int }                     ! Image base height
-    { mipmaps int }                    ! Mipmap levels, 1 by default
-    { format int } ;                   ! Data format (PixelFormat type)
-
-STRUCT: Texture2D
-    { id uint }                        ! OpenGL Texture ID
-    { width int }                      ! Texture Base Width
-    { height int }                     ! Texture Base Height
-    { mipmaps int }                    ! Mipmap Levels, 1 by default
-    { format int } ;                   ! Data Format (PixelFormat type)
-TYPEDEF: Texture2D Texture             ! Texture type same as Texture2D
-TYPEDEF: Texture2D TextureCubemap      ! Actually same as Texture2D
-
-STRUCT: RenderTexture2D
-    { id uint }                        ! OpenGL Framebuffer Object (FBO) id
-    { texture Texture2D }              ! Color buffer attachment texture
-    { depth Texture2D } ;              ! Depth buffer attachment texture
-
-TYPEDEF: RenderTexture2D RenderTexture ! Same as RenderTexture2D
-
-STRUCT: NPatchInfo
-    { source Rectangle }
-    { left int }
-    { top int }
-    { right int }
-    { bottom int }
-    { layout int } ;
-
-STRUCT: GlyphInfo
-    { value int }                      ! Character value (Unicode)
-    { offsetX int }                    ! Character offset X when drawing
-    { offsetY int }                    ! Character offset Y when drawing
-    { advanceX int }                   ! Character advance position X
-    { image Image } ;                  ! Character image data
-
-STRUCT: Font
-    { baseSize int }        ! Base Size (default chars height)
-    { glyphCount int }      ! Number of glyph characters
-    { glyphPadding int }    ! Padding around the glyph characters
-    { texture Texture2D }   ! Texture atlas containing the glyphs
-    { recs Rectangle* }     ! Rectangles in texture for the glyphs
-    { glyphs GlyphInfo* } ; ! Glyphs info data
-
-TYPEDEF: Font SpriteFont
-
-STRUCT: Camera3D
-    { position Vector3 }  ! Camera postion
-    { target Vector3 }    ! Camera target it looks-at
-    { up Vector3 }        ! Camera up vector (rotation over its axis)
-    { fovy float }        ! Camera field-of-view apperature in Y (degrees) in perspective, used as near plane width in orthographic
-    { projection int } ;  ! Camera projection: CAMERA_PERSPECTIVE or CAMERA_ORTHOGRAPHIC
-
-STRUCT: Camera2D
-    { offset Vector2 }    ! Camera offset (displacement from target)
-    { target Vector2 }    ! Camera target (rotation and zoom origin)
-    { rotation float }    ! Camera rotation in degrees
-    { zoom float } ;      ! Camera zoom (scaling), should be 1.0f by default
-TYPEDEF: Camera3D Camera  ! Default to 3D Camera
-
-STRUCT: Mesh
-    { vertexCount int }   ! Number of vertices stored in arrays
-    { triangleCount int } ! Number of triangles stored (indexed or not )
-    { _vertices float* }  ! Vertex position (XYZ - 3 components per vertex)
-    { _texcoords float* }  ! Vertex texture coordinates (UV - 2 components per vertex )
-    { _texcoords2 float* } ! Vertex second texture coordinates (useful for lightmaps)
-    { _normals float* }    ! Vertex normals (XYZ - 3 components per vertex)
-    { tangents float* }   ! Vertex tangents (XYZW - 4 components per vertex )
-    { colors uchar* }     ! Vertex colors (RGBA - 4 components per vertex)
-    { indices ushort* }   ! Vertex indices (in case vertex data comes indexed)
-    { animVertices float* }
-    { animNormals float* }
-    { boneIds int* }
-    { boneWeights float* }
-    { vaoId uint }        ! OpenGL Vertex Array Object id
-    { vboId uint* } ;     ! OpenGL Vertex Buffer Objects id (7  types of vertex data)
-
-ARRAY-SLOT: Mesh Vector3 _vertices [ vertexCount>> ] vertices
-ARRAY-SLOT: Mesh Vector2 _texcoords [ vertexCount>> ] texcoords
-ARRAY-SLOT: Mesh Vector2 _texcoords2 [ vertexCount>> ] texcoords2
-ARRAY-SLOT: Mesh Vector3 _normals [ vertexCount>> ] normals
-
-STRUCT: Shader
-    { id uint }              ! Shader program id
-    { locs int* } ;          ! Shader locations array
-                             ! This is dependant on MAX_SHADER_LOCATIONS.  Default is 32
-STRUCT: MaterialMap
-    { texture Texture2D }    ! Material map Texture
-    { color Color }          ! Material map color
-    { value float } ;        ! Material map value
-
-CONSTANT: MAX_MATERIAL_MAPS 12 ! NOTE: This seems to be a compile-time constant!
-STRUCT: Material
-    { shader Shader }        ! Material shader
-    { _maps MaterialMap* }    ! Material maps.  Uses MAX_MATERIAL_MAPS.
-    { params float[4] } ;      ! Material generic parameters (if required)
-
-ARRAY-SLOT: Material MaterialMap _maps [ drop 12 ] maps
-
-STRUCT: Transform
-    { translation Vector3 }
-    { rotation Quaternion }
-    { scale Vector3 } ;
-
-STRUCT: BoneInfo
-    { name char[32] }        ! Bone Name
-    { parent int } ;         ! Bone parent
-
-STRUCT: Model
-    { transform Matrix }
-    { meshCount int }
-    { materialCount int }
-    { _meshes Mesh* }
-    { _materials Material* }
-    { meshMaterial int* }
-    { boneCount int }
-    { _bones BoneInfo* }
-    { bindPose Transform* } ;
-
-ARRAY-SLOT: Model Material _materials [ materialCount>> ] materials
-ARRAY-SLOT: Model Mesh _meshes [ meshCount>> ] meshes
-ARRAY-SLOT: Model BoneInfo _bones [ boneCount>> ] bones
-
-STRUCT: ModelAnimation
-    { boneCount int }
-    { frameCount int }
-    { _bones BoneInfo* }
-    { framePoses Transform** } ;
-
-ARRAY-SLOT: ModelAnimation BoneInfo _bones [ boneCount>> ] bones
-
-STRUCT: Ray
-    { position Vector3 }    ! Ray position (origin)
-    { direction Vector3 } ; ! Ray direction
-
-STRUCT: RayCollision
-    { hit bool }            ! Did the ray hit something?
-    { distance float }      ! Distance to nearest hit
-    { point Vector3 }       ! Point of nearest hit
-    { normal Vector3 } ;    ! Surface normal of hit
-
-STRUCT: BoundingBox
-    { min Vector3 }       ! Minimum vertex box-corner
-    { max Vector3 } ;     ! Maximum vertex box-corner
-
-STRUCT: Wave
-    { frameCount uint }     ! Total number of frames (considering channels)
-    { sampleRate uint }     ! Frequency (samples per second)
-    { sampleSize uint }     ! Bit depth (bits per sample): 8,16,32
-    { channels uint }       ! Number of channels (1-mono, 2-stereo)
-    { data void* } ;        ! Buffer data pointer
-
-STRUCT: AudioStream
-    { buffer void* }    ! Pointer to internal data used by the audio system
-    { sampleRate uint } ! Frequency (samples per second)
-    { sampleSize uint } ! Bit depth (bits per sample): 8, 16, 32 (24 not supported)
-    { channels uint } ; ! Number of channels (1-mono, 2-stereo)
-
-STRUCT: Sound
-    { stream AudioStream } ! Audio stream
-    { frameCount uint } ;  ! Total number of frames (considering channels)
-
-STRUCT: Music
-    { stream  AudioStream }     ! Audio stream
-    { frameCount uint }         ! Total number of frames (considering channels)
-    { looping bool }            ! Music looping enable
-    { ctxType int }             ! Type of music context (audio filetype)
-    { ctxData void* } ;         ! Audio context data, depends on type
-
-STRUCT: VrDeviceInfo
-    { hResolution int }               ! HMD horizontal resolution in pixels
-    { vResolution int }               ! HMD verticle resolution in pixels
-    { hScreenSize float }             ! HMD horizontal size in meters
-    { vScreenSize float }             ! HMD verticle size in meters
-    { vScreenCenter float }           ! HMD screen center in meters
-    { eyeToScreenDistance float }     ! HMD distance between eye and display in meters
-    { lensSeparationDistance float }  ! HMD lens separation distance in meters
-    { interpupillaryDistance float }  ! HMD IPD in meters
-    { lensDistortionValues float[4] } ! HMD lens distortion constant parameters
-    { chromaAbCorrection float[4] } ; ! HMD chromatic abberation correction parameters
-
-STRUCT: VrStereoConfig
-    { projection Matrix[2] }          ! VR projection matrices (per eye)
-    { viewOffset Matrix[2] }          ! VR view offset matrices (per eye)
-    { leftLensCenter float[2] }       ! VR left lens center
-    { rightLensCenter float[2] }      ! VR right lens center
-    { leftScreenCenter float[2] }     ! VR left screen center
-    { rightScreenCenter float[2] }    ! VR right screen center
-    { scale float[2] }                ! VR distortion scale
-    { scaleIn float[2] } ;            ! VR distortion scale in
-
 ! Enumerations ---------------------------------------------------------
 
 ! Putting some of the #define's as enums.
@@ -461,35 +165,6 @@ ENUM: KeyboardKey
     { KEY_MENU            82 }     ! Key: Android menu button
     { KEY_VOLUME_UP       24 }     ! Key: Android volume up button
     { KEY_VOLUME_DOWN     25 } ;   ! Key: Android volume down button
-
-
-CONSTANT: LIGHTGRAY  S{ Color f 200  200  200  255  } ! Light Gray
-CONSTANT: GRAY       S{ Color f 130  130  130  255  } ! Gray
-CONSTANT: DARKGRAY   S{ Color f 80  80  80  255     } ! Dark Gray
-CONSTANT: YELLOW     S{ Color f 253  249  0  255    } ! Yellow
-CONSTANT: GOLD       S{ Color f 255  203  0  255    } ! Gold
-CONSTANT: ORANGE     S{ Color f 255  161  0  255    } ! Orange
-CONSTANT: PINK       S{ Color f 255  109  194  255  } ! Pink
-CONSTANT: RED        S{ Color f 230  41  55  255    } ! Red
-CONSTANT: MAROON     S{ Color f 190  33  55  255    } ! Maroon
-CONSTANT: GREEN      S{ Color f 0  228  48  255     } ! Green
-CONSTANT: LIME       S{ Color f 0  158  47  255     } ! Lime
-CONSTANT: DARKGREEN  S{ Color f 0  117  44  255     } ! Dark Green
-CONSTANT: SKYBLUE    S{ Color f 102  191  255  255  } ! Sky Blue
-CONSTANT: BLUE       S{ Color f 0  121  241  255    } ! Blue
-CONSTANT: DARKBLUE   S{ Color f 0  82  172  255     } ! Dark Blue
-CONSTANT: PURPLE     S{ Color f 200  122  255  255  } ! Purple
-CONSTANT: VIOLET     S{ Color f 135  60  190  255   } ! Violet
-CONSTANT: DARKPURPLE S{ Color f 112  31  126  255   } ! Dark Purple
-CONSTANT: BEIGE      S{ Color f 211  176  131  255  } ! Beige
-CONSTANT: BROWN      S{ Color f 127  106  79  255   } ! Brown
-CONSTANT: DARKBROWN  S{ Color f 76  63  47  255     } ! Dark Brown
-
-CONSTANT: WHITE      S{ Color f 255  255  255  255  } ! White
-CONSTANT: BLACK      S{ Color f 0  0  0  255        } ! Black
-CONSTANT: BLANK      S{ Color f 0  0  0  0          } ! Blank (Transparent)
-CONSTANT: MAGENTA    S{ Color f 255  0  255  255    } ! Magenta
-CONSTANT: RAYWHITE   S{ Color f 245  245  245  255  } ! My own White (raylib logo)
 
 ENUM: MouseButton
     MOUSE_BUTTON_LEFT        ! Mouse button left
@@ -705,6 +380,332 @@ ENUM: NPatchLayout
     NPATCH_THREE_PATCH_VERTICAL     ! Npatch layout: 1x3 tiles
     NPATCH_THREE_PATCH_HORIZONTAL ; ! Npatch layout: 3x1 tiles
 
+! Structs ----------------------------------------------------------------
+
+STRUCT: Vector2
+    { x float }
+    { y float } ;
+
+STRUCT: Vector3
+    { x float }
+    { y float }
+    { z float } ;
+
+STRUCT: Vector4
+    { x float }
+    { y float }
+    { z float }
+    { w float } ;
+
+TYPEDEF: Vector4 Quaternion ! Same as Vector4
+
+ERROR: invalid-vector-length obj exemplar ;
+
+: <Vector2> ( x y -- obj ) Vector2 <struct-boa> ; inline
+INSTANCE: Vector2 sequence
+M: Vector2 length drop 2 ; inline
+M: Vector2 nth-unsafe
+    swap 0 = [ x>> ] [ y>> ] if ;
+M: Vector2 set-nth-unsafe
+    swap 0 = [ x<< ] [ y<< ] if ;
+M: Vector2 like
+    over length 2 =
+    [ drop dup Vector2?
+      [ first2 <Vector2> ] unless
+    ] [ invalid-vector-length ] if ; inline
+M: Vector2 new-sequence
+    over 2 = [
+        2drop Vector2 (struct)
+    ] [ invalid-vector-length ] if ; inline
+
+: <Vector3> ( x y z -- obj ) Vector3 <struct-boa> ; inline
+INSTANCE: Vector3 sequence
+M: Vector3 length drop 3 ; inline
+M: Vector3 nth-unsafe
+    swap { { 0 [ x>> ] }
+           { 1 [ y>> ] }
+           { 2 [ z>> ] } } case ;
+M: Vector3 set-nth-unsafe
+    swap { { 0 [ x<< ] }
+           { 1 [ y<< ] }
+           { 2 [ z<< ] } } case ;
+M: Vector3 like
+    over length 3 =
+    [ drop dup Vector3?
+      [ first3 <Vector3> ] unless
+    ] [ invalid-vector-length ] if ; inline
+M: Vector3 new-sequence
+    over 3 = [
+        2drop Vector3 (struct)
+    ] [ invalid-vector-length ] if ; inline
+
+: <Vector4> ( x y z w -- obj ) Vector4 <struct-boa> ; inline
+INSTANCE: Vector4 sequence
+M: Vector4 length drop 4 ; inline
+M: Vector4 nth-unsafe
+    swap { { 0 [ x>> ] }
+           { 1 [ y>> ] }
+           { 2 [ z>> ] }
+           { 3 [ w>> ] } } case ;
+M: Vector4 set-nth-unsafe
+    swap { { 0 [ x<< ] }
+           { 1 [ y<< ] }
+           { 2 [ z<< ] }
+           { 3 [ w<< ] } } case ;
+M: Vector4 like
+    over length 4 =
+    [ drop dup Vector4?
+      [ first4 <Vector4> ] unless
+    ] [ invalid-vector-length ] if ; inline
+M: Vector4 new-sequence
+    over 4 = [
+        2drop Vector4 (struct)
+    ] [ invalid-vector-length ] if ; inline
+
+! Matrix type (OpenGL style 4x4 - right handed, column major)
+STRUCT: Matrix
+    { m0 float } { m4 float } { m8 float } { m12 float }
+    { m1 float } { m5 float } { m9 float } { m13 float }
+    { m2 float } { m6 float } { m10 float } { m14 float }
+    { m3 float } { m7 float } { m11 float } { m15 float } ;
+
+STRUCT: Color
+    { r uchar }
+    { g uchar }
+    { b uchar }
+    { a uchar } ;
+
+STRUCT: Rectangle
+    { x float }
+    { y float }
+    { width float }
+    { height float } ;
+
+! Image type, bpp always RGBA (32bit)
+! NOTE: Data Stored in CPU Memory (RAM)
+STRUCT: Image
+    { data void* }                     ! Image raw data
+    { width int }                      ! Image base width
+    { height int }                     ! Image base height
+    { mipmaps int }                    ! Mipmap levels, 1 by default
+    { format PixelFormat } ;           ! Data format (PixelFormat type)
+
+STRUCT: Texture2D
+    { id uint }                        ! OpenGL Texture ID
+    { width int }                      ! Texture Base Width
+    { height int }                     ! Texture Base Height
+    { mipmaps int }                    ! Mipmap Levels, 1 by default
+    { format PixelFormat } ;           ! Data Format (PixelFormat type)
+TYPEDEF: Texture2D Texture             ! Texture type same as Texture2D
+TYPEDEF: Texture2D TextureCubemap      ! Actually same as Texture2D
+
+STRUCT: RenderTexture2D
+    { id uint }                        ! OpenGL Framebuffer Object (FBO) id
+    { texture Texture2D }              ! Color buffer attachment texture
+    { depth Texture2D } ;              ! Depth buffer attachment texture
+
+TYPEDEF: RenderTexture2D RenderTexture ! Same as RenderTexture2D
+
+STRUCT: NPatchInfo
+    { source Rectangle }
+    { left int }
+    { top int }
+    { right int }
+    { bottom int }
+    { layout int } ;
+
+STRUCT: GlyphInfo
+    { value int }                      ! Character value (Unicode)
+    { offsetX int }                    ! Character offset X when drawing
+    { offsetY int }                    ! Character offset Y when drawing
+    { advanceX int }                   ! Character advance position X
+    { image Image } ;                  ! Character image data
+
+STRUCT: Font
+    { baseSize int }        ! Base Size (default chars height)
+    { glyphCount int }      ! Number of glyph characters
+    { glyphPadding int }    ! Padding around the glyph characters
+    { texture Texture2D }   ! Texture atlas containing the glyphs
+    { recs Rectangle* }     ! Rectangles in texture for the glyphs
+    { glyphs GlyphInfo* } ; ! Glyphs info data
+
+TYPEDEF: Font SpriteFont
+
+STRUCT: Camera3D
+    { position Vector3 }  ! Camera postion
+    { target Vector3 }    ! Camera target it looks-at
+    { up Vector3 }        ! Camera up vector (rotation over its axis)
+    { fovy float }        ! Camera field-of-view apperature in Y (degrees) in perspective, used as near plane width in orthographic
+    { projection CameraProjection } ;  ! Camera projection: CAMERA_PERSPECTIVE or CAMERA_ORTHOGRAPHIC
+
+STRUCT: Camera2D
+    { offset Vector2 }    ! Camera offset (displacement from target)
+    { target Vector2 }    ! Camera target (rotation and zoom origin)
+    { rotation float }    ! Camera rotation in degrees
+    { zoom float } ;      ! Camera zoom (scaling), should be 1.0f by default
+TYPEDEF: Camera3D Camera  ! Default to 3D Camera
+
+STRUCT: Mesh
+    { vertexCount int }    ! Number of vertices stored in arrays
+    { triangleCount int }  ! Number of triangles stored (indexed or not )
+    { _vertices float* }   ! Vertex position (XYZ - 3 components per vertex)
+    { _texcoords float* }  ! Vertex texture coordinates (UV - 2 components per vertex )
+    { _texcoords2 float* } ! Vertex second texture coordinates (useful for lightmaps)
+    { _normals float* }    ! Vertex normals (XYZ - 3 components per vertex)
+    { tangents float* }    ! Vertex tangents (XYZW - 4 components per vertex )
+    { colors uchar* }      ! Vertex colors (RGBA - 4 components per vertex)
+    { indices ushort* }    ! Vertex indices (in case vertex data comes indexed)
+    { animVertices float* }
+    { animNormals float* }
+    { boneIds int* }
+    { boneWeights float* }
+    { vaoId uint }         ! OpenGL Vertex Array Object id
+    { vboId uint* } ;      ! OpenGL Vertex Buffer Objects id (7  types of vertex data)
+
+ARRAY-SLOT: Mesh Vector3 _vertices [ vertexCount>> ] vertices
+ARRAY-SLOT: Mesh Vector2 _texcoords [ vertexCount>> ] texcoords
+ARRAY-SLOT: Mesh Vector2 _texcoords2 [ vertexCount>> ] texcoords2
+ARRAY-SLOT: Mesh Vector3 _normals [ vertexCount>> ] normals
+
+STRUCT: Shader
+    { id uint }              ! Shader program id
+    { locs int* } ;          ! Shader locations array
+                             ! This is dependant on MAX_SHADER_LOCATIONS.  Default is 32
+STRUCT: MaterialMap
+    { texture Texture2D }    ! Material map Texture
+    { color Color }          ! Material map color
+    { value float } ;        ! Material map value
+
+CONSTANT: MAX_MATERIAL_MAPS 12 ! NOTE: This seems to be a compile-time constant!
+STRUCT: Material
+    { shader Shader }        ! Material shader
+    { _maps MaterialMap* }   ! Material maps.  Uses MAX_MATERIAL_MAPS.
+    { params float[4] } ;    ! Material generic parameters (if required)
+
+ARRAY-SLOT: Material MaterialMap _maps [ drop 12 ] maps
+
+STRUCT: Transform
+    { translation Vector3 }
+    { rotation Quaternion }
+    { scale Vector3 } ;
+
+STRUCT: BoneInfo
+    { name char[32] }        ! Bone Name
+    { parent int } ;         ! Bone parent
+
+STRUCT: Model
+    { transform Matrix }
+    { meshCount int }
+    { materialCount int }
+    { _meshes Mesh* }
+    { _materials Material* }
+    { meshMaterial int* }
+    { boneCount int }
+    { _bones BoneInfo* }
+    { bindPose Transform* } ;
+
+ARRAY-SLOT: Model Material _materials [ materialCount>> ] materials
+ARRAY-SLOT: Model Mesh _meshes [ meshCount>> ] meshes
+ARRAY-SLOT: Model BoneInfo _bones [ boneCount>> ] bones
+
+STRUCT: ModelAnimation
+    { boneCount int }
+    { frameCount int }
+    { _bones BoneInfo* }
+    { framePoses Transform** } ;
+
+ARRAY-SLOT: ModelAnimation BoneInfo _bones [ boneCount>> ] bones
+
+STRUCT: Ray
+    { position Vector3 }    ! Ray position (origin)
+    { direction Vector3 } ; ! Ray direction
+
+STRUCT: RayCollision
+    { hit bool }            ! Did the ray hit something?
+    { distance float }      ! Distance to nearest hit
+    { point Vector3 }       ! Point of nearest hit
+    { normal Vector3 } ;    ! Surface normal of hit
+
+STRUCT: BoundingBox
+    { min Vector3 }       ! Minimum vertex box-corner
+    { max Vector3 } ;     ! Maximum vertex box-corner
+
+STRUCT: Wave
+    { frameCount uint }     ! Total number of frames (considering channels)
+    { sampleRate uint }     ! Frequency (samples per second)
+    { sampleSize uint }     ! Bit depth (bits per sample): 8,16,32
+    { channels uint }       ! Number of channels (1-mono, 2-stereo)
+    { data void* } ;        ! Buffer data pointer
+
+STRUCT: AudioStream
+    { buffer void* }    ! Pointer to internal data used by the audio system
+    { sampleRate uint } ! Frequency (samples per second)
+    { sampleSize uint } ! Bit depth (bits per sample): 8, 16, 32 (24 not supported)
+    { channels uint } ; ! Number of channels (1-mono, 2-stereo)
+
+STRUCT: Sound
+    { stream AudioStream } ! Audio stream
+    { frameCount uint } ;  ! Total number of frames (considering channels)
+
+STRUCT: Music
+    { stream  AudioStream }     ! Audio stream
+    { frameCount uint }         ! Total number of frames (considering channels)
+    { looping bool }            ! Music looping enable
+    { ctxType int }             ! Type of music context (audio filetype)
+    { ctxData void* } ;         ! Audio context data, depends on type
+
+STRUCT: VrDeviceInfo
+    { hResolution int }               ! HMD horizontal resolution in pixels
+    { vResolution int }               ! HMD verticle resolution in pixels
+    { hScreenSize float }             ! HMD horizontal size in meters
+    { vScreenSize float }             ! HMD verticle size in meters
+    { vScreenCenter float }           ! HMD screen center in meters
+    { eyeToScreenDistance float }     ! HMD distance between eye and display in meters
+    { lensSeparationDistance float }  ! HMD lens separation distance in meters
+    { interpupillaryDistance float }  ! HMD IPD in meters
+    { lensDistortionValues float[4] } ! HMD lens distortion constant parameters
+    { chromaAbCorrection float[4] } ; ! HMD chromatic abberation correction parameters
+
+STRUCT: VrStereoConfig
+    { projection Matrix[2] }          ! VR projection matrices (per eye)
+    { viewOffset Matrix[2] }          ! VR view offset matrices (per eye)
+    { leftLensCenter float[2] }       ! VR left lens center
+    { rightLensCenter float[2] }      ! VR right lens center
+    { leftScreenCenter float[2] }     ! VR left screen center
+    { rightScreenCenter float[2] }    ! VR right screen center
+    { scale float[2] }                ! VR distortion scale
+    { scaleIn float[2] } ;            ! VR distortion scale in
+
+! Constants ----------------------------------------------------------------
+
+CONSTANT: LIGHTGRAY  S{ Color f 200  200  200  255  } ! Light Gray
+CONSTANT: GRAY       S{ Color f 130  130  130  255  } ! Gray
+CONSTANT: DARKGRAY   S{ Color f 80  80  80  255     } ! Dark Gray
+CONSTANT: YELLOW     S{ Color f 253  249  0  255    } ! Yellow
+CONSTANT: GOLD       S{ Color f 255  203  0  255    } ! Gold
+CONSTANT: ORANGE     S{ Color f 255  161  0  255    } ! Orange
+CONSTANT: PINK       S{ Color f 255  109  194  255  } ! Pink
+CONSTANT: RED        S{ Color f 230  41  55  255    } ! Red
+CONSTANT: MAROON     S{ Color f 190  33  55  255    } ! Maroon
+CONSTANT: GREEN      S{ Color f 0  228  48  255     } ! Green
+CONSTANT: LIME       S{ Color f 0  158  47  255     } ! Lime
+CONSTANT: DARKGREEN  S{ Color f 0  117  44  255     } ! Dark Green
+CONSTANT: SKYBLUE    S{ Color f 102  191  255  255  } ! Sky Blue
+CONSTANT: BLUE       S{ Color f 0  121  241  255    } ! Blue
+CONSTANT: DARKBLUE   S{ Color f 0  82  172  255     } ! Dark Blue
+CONSTANT: PURPLE     S{ Color f 200  122  255  255  } ! Purple
+CONSTANT: VIOLET     S{ Color f 135  60  190  255   } ! Violet
+CONSTANT: DARKPURPLE S{ Color f 112  31  126  255   } ! Dark Purple
+CONSTANT: BEIGE      S{ Color f 211  176  131  255  } ! Beige
+CONSTANT: BROWN      S{ Color f 127  106  79  255   } ! Brown
+CONSTANT: DARKBROWN  S{ Color f 76  63  47  255     } ! Dark Brown
+
+CONSTANT: WHITE      S{ Color f 255  255  255  255  } ! White
+CONSTANT: BLACK      S{ Color f 0  0  0  255        } ! Black
+CONSTANT: BLANK      S{ Color f 0  0  0  0          } ! Blank (Transparent)
+CONSTANT: MAGENTA    S{ Color f 255  0  255  255    } ! Magenta
+CONSTANT: RAYWHITE   S{ Color f 245  245  245  255  } ! My own White (raylib logo)
+
 ! Functions ---------------------------------------------------------------
 
 ! Window-related functions
@@ -778,7 +779,7 @@ FUNCTION-ALIAS: begin-texture-mode void BeginTextureMode ( RenderTexture2D targe
 FUNCTION-ALIAS: end-texture-mode void EndTextureMode ( )                                 ! Ends drawing to render texture
 FUNCTION-ALIAS: begin-shader-mode void BeginShaderMode ( Shader shader )                 ! Begin custom shader drawing
 FUNCTION-ALIAS: end-shader-mode void EndShaderMode ( )                                   ! End custom shader drawing (use default shader)
-FUNCTION-ALIAS: begin-blend-mode void BeginBlendMode ( int mode )                        ! Begin blending mode (alpha, additive, multiplied, subtract, custom)
+FUNCTION-ALIAS: begin-blend-mode void BeginBlendMode ( BlendMode mode )                  ! Begin blending mode (alpha, additive, multiplied, subtract, custom)
 FUNCTION-ALIAS: end-blend-mode void EndBlendMode ( )                                     ! End blending mode (reset to default: alpha blending)
 FUNCTION-ALIAS: begin-scissor-mode void BeginScissorMode ( int x, int y, int width, int height ) ! Begin scissor mode (define screen area for following drawing)
 FUNCTION-ALIAS: end-scissor-mode void EndScissorMode ( )                                 ! End scissor mode
@@ -877,40 +878,40 @@ FUNCTION-ALIAS: open-url void OpenURL ( c-string url )                          
 ! ------------------------------------------------------------------------------------
 
 ! Input-related functions: keyboard
-FUNCTION-ALIAS: is-key-pressed bool IsKeyPressed ( int key )                             ! Check if a key has been pressed once
-FUNCTION-ALIAS: is-key-down bool IsKeyDown ( int key )                                   ! Check if a key is being pressed
-FUNCTION-ALIAS: is-key-released bool IsKeyReleased ( int key )                           ! Check if a key has been released once
-FUNCTION-ALIAS: is-key-up bool IsKeyUp ( int key )                                       ! Check if a key is NOT being pressed
-FUNCTION-ALIAS: set-exit-key void SetExitKey ( int key )                                 ! Set a custom key to exit program (default is ESC)
-FUNCTION-ALIAS: get-key-pressed int GetKeyPressed ( )                                    ! Get key pressed (keycode), call it multiple times for keys queued, returns 0 when the queue is empty
+FUNCTION-ALIAS: is-key-pressed bool IsKeyPressed ( KeyboardKey key )                     ! Check if a key has been pressed once
+FUNCTION-ALIAS: is-key-down bool IsKeyDown ( KeyboardKey key )                           ! Check if a key is being pressed
+FUNCTION-ALIAS: is-key-released bool IsKeyReleased ( KeyboardKey key )                   ! Check if a key has been released once
+FUNCTION-ALIAS: is-key-up bool IsKeyUp ( KeyboardKey key )                               ! Check if a key is NOT being pressed
+FUNCTION-ALIAS: set-exit-key void SetExitKey ( KeyboardKey key )                         ! Set a custom key to exit program (default is ESC)
+FUNCTION-ALIAS: get-key-pressed KeyboardKey GetKeyPressed ( )                            ! Get key pressed (keycode), call it multiple times for keys queued, returns 0 when the queue is empty
 FUNCTION-ALIAS: get-char-pressed int GetCharPressed ( )                                  ! Get char pressed (unicode), call it multiple times for chars queued, returns 0 when the queue is empty
 
 ! Input-related functions: gamepads
-FUNCTION-ALIAS: is-gamepad-available bool IsGamepadAvailable ( int gamepad )                        ! Check if a gamepad is available
-FUNCTION-ALIAS: get-gamepad-name c-string GetGamepadName ( int gamepad )                            ! Get gamepad internal name id
-FUNCTION-ALIAS: is-gamepad-button-pressed bool IsGamepadButtonPressed ( int gamepad, int button )   ! Check if a gamepad button has been pressed once
-FUNCTION-ALIAS: is-gamepad-button-down bool IsGamepadButtonDown ( int gamepad, int button )         ! Check if a gamepad button is being pressed
-FUNCTION-ALIAS: is-gamepad-button-released bool IsGamepadButtonReleased ( int gamepad, int button ) ! Check if a gamepad button has been released once
-FUNCTION-ALIAS: is-gamepad-button-up bool IsGamepadButtonUp ( int gamepad, int button )             ! Check if a gamepad button is NOT being pressed
-FUNCTION-ALIAS: get-gamepad-button-pressed int GetGamepadButtonPressed ( )                          ! Get the last gamepad button pressed
-FUNCTION-ALIAS: get-gamepad-axis-count int GetGamepadAxisCount ( int gamepad )                      ! Get gamepad axis count for a gamepad
-FUNCTION-ALIAS: get-gamepad-axis-movement float GetGamepadAxisMovement ( int gamepad, int axis )    ! Get axis movement value for a gamepad axis
-FUNCTION-ALIAS: set-gamepad-mappings int SetGamepadMappings ( c-string mappings )                   ! Set internal gamepad mappings (SDL_GameControllerDB)
+FUNCTION-ALIAS: is-gamepad-available bool IsGamepadAvailable ( int gamepad )                                  ! Check if a gamepad is available
+FUNCTION-ALIAS: get-gamepad-name c-string GetGamepadName ( int gamepad )                                      ! Get gamepad internal name id
+FUNCTION-ALIAS: is-gamepad-button-pressed bool IsGamepadButtonPressed ( int gamepad, GamepadButton button )   ! Check if a gamepad button has been pressed once
+FUNCTION-ALIAS: is-gamepad-button-down bool IsGamepadButtonDown ( int gamepad, GamepadButton button )         ! Check if a gamepad button is being pressed
+FUNCTION-ALIAS: is-gamepad-button-released bool IsGamepadButtonReleased ( int gamepad, GamepadButton button ) ! Check if a gamepad button has been released once
+FUNCTION-ALIAS: is-gamepad-button-up bool IsGamepadButtonUp ( int gamepad, GamepadButton button )             ! Check if a gamepad button is NOT being pressed
+FUNCTION-ALIAS: get-gamepad-button-pressed int GetGamepadButtonPressed ( )                                    ! Get the last gamepad button pressed
+FUNCTION-ALIAS: get-gamepad-axis-count int GetGamepadAxisCount ( int gamepad )                                ! Get gamepad axis count for a gamepad
+FUNCTION-ALIAS: get-gamepad-axis-movement float GetGamepadAxisMovement ( int gamepad, GamepadAxis axis )      ! Get axis movement value for a gamepad axis
+FUNCTION-ALIAS: set-gamepad-mappings int SetGamepadMappings ( c-string mappings )                             ! Set internal gamepad mappings (SDL_GameControllerDB)
 
 ! Input-related functions: mouse
-FUNCTION-ALIAS: is-mouse-button-pressed bool IsMouseButtonPressed ( int button )         ! Check if a mouse button has been pressed once
-FUNCTION-ALIAS: is-mouse-button-down bool IsMouseButtonDown ( int button )               ! Check if a mouse button is being pressed
-FUNCTION-ALIAS: is-mouse-button-released bool IsMouseButtonReleased ( int button )       ! Check if a mouse button has been released once
-FUNCTION-ALIAS: is-mouse-button-up bool IsMouseButtonUp ( int button )                   ! Check if a mouse button is NOT being pressed
-FUNCTION-ALIAS: get-mouse-x int GetMouseX ( )                                            ! Get mouse position X
-FUNCTION-ALIAS: get-mouse-y int GetMouseY ( )                                            ! Get mouse position Y
-FUNCTION-ALIAS: get-mouse-position Vector2 GetMousePosition ( )                          ! Get mouse position XY
-FUNCTION-ALIAS: get-mouse-delta Vector2 GetMouseDelta ( )                                ! Get mouse delta between frames
-FUNCTION-ALIAS: set-mouse-position void SetMousePosition ( int x, int y )                ! Set mouse position XY
-FUNCTION-ALIAS: set-mouse-offset void SetMouseOffset ( int offsetX, int offsetY )        ! Set mouse offset
-FUNCTION-ALIAS: set-mouse-scale void SetMouseScale ( float scaleX, float scaleY )        ! Set mouse scaling
-FUNCTION-ALIAS: get-mouse-wheel-move float GetMouseWheelMove ( )                         ! Get mouse wheel movement Y
-FUNCTION-ALIAS: set-mouse-cursor void SetMouseCursor ( int cursor )                      ! Set mouse cursor
+FUNCTION-ALIAS: is-mouse-button-pressed bool IsMouseButtonPressed ( MouseButton button )   ! Check if a mouse button has been pressed once
+FUNCTION-ALIAS: is-mouse-button-down bool IsMouseButtonDown ( MouseButton button )         ! Check if a mouse button is being pressed
+FUNCTION-ALIAS: is-mouse-button-released bool IsMouseButtonReleased ( MouseButton button ) ! Check if a mouse button has been released once
+FUNCTION-ALIAS: is-mouse-button-up bool IsMouseButtonUp ( MouseButton button )             ! Check if a mouse button is NOT being pressed
+FUNCTION-ALIAS: get-mouse-x int GetMouseX ( )                                              ! Get mouse position X
+FUNCTION-ALIAS: get-mouse-y int GetMouseY ( )                                              ! Get mouse position Y
+FUNCTION-ALIAS: get-mouse-position Vector2 GetMousePosition ( )                            ! Get mouse position XY
+FUNCTION-ALIAS: get-mouse-delta Vector2 GetMouseDelta ( )                                  ! Get mouse delta between frames
+FUNCTION-ALIAS: set-mouse-position void SetMousePosition ( int x, int y )                  ! Set mouse position XY
+FUNCTION-ALIAS: set-mouse-offset void SetMouseOffset ( int offsetX, int offsetY )          ! Set mouse offset
+FUNCTION-ALIAS: set-mouse-scale void SetMouseScale ( float scaleX, float scaleY )          ! Set mouse scaling
+FUNCTION-ALIAS: get-mouse-wheel-move float GetMouseWheelMove ( )                           ! Get mouse wheel movement Y
+FUNCTION-ALIAS: set-mouse-cursor void SetMouseCursor ( MouseCursor cursor )                        ! Set mouse cursor
 
 ! Input-related functions: touch
 FUNCTION-ALIAS: get-touch-x int GetTouchX ( )                                            ! Get touch position X for touch point 0 (relative to screen size)
@@ -923,7 +924,7 @@ FUNCTION-ALIAS: get-touch-point-count int GetTouchPointCount ( )                
 ! Gestures and Touch Handling Functions (Module: rgestures)
 ! ------------------------------------------------------------------------------------
 FUNCTION-ALIAS: set-gestures-enabled void SetGesturesEnabled ( uint flags )              ! Enable a set of gestures using flags
-FUNCTION-ALIAS: is-gesture-detected bool IsGestureDetected ( int gesture )               ! Check if a gesture have been detected
+FUNCTION-ALIAS: is-gesture-detected bool IsGestureDetected ( Gestures gesture )          ! Check if a gesture have been detected
 FUNCTION-ALIAS: get-gesture-detected int GetGestureDetected ( )                          ! Get latest detected gesture
 FUNCTION-ALIAS: get-gesture-hold-duration float GetGestureHoldDuration ( )               ! Get gesture hold time in milliseconds
 FUNCTION-ALIAS: get-gesture-drag-vector Vector2 GetGestureDragVector ( )                 ! Get gesture drag vector
@@ -934,7 +935,7 @@ FUNCTION-ALIAS: get-gesture-pinch-angle float GetGesturePinchAngle ( )          
 ! ------------------------------------------------------------------------------------
 ! Camera System Functions (Module: rcamera)
 ! ------------------------------------------------------------------------------------
-FUNCTION-ALIAS: set-camera-mode void SetCameraMode ( Camera camera, int mode )           ! Set camera mode (multiple camera modes available)
+FUNCTION-ALIAS: set-camera-mode void SetCameraMode ( Camera camera, CameraMode mode )           ! Set camera mode (multiple camera modes available)
 FUNCTION-ALIAS: update-camera void UpdateCamera ( Camera* camera )                       ! Update camera position for selected mode
 
 FUNCTION-ALIAS: set-camera-pan-control void SetCameraPanControl ( int keyPan )           ! Set camera pan key to combine with mouse movement (free camera)
@@ -1112,9 +1113,9 @@ FUNCTION-ALIAS: color-from-hsv Color ColorFromHSV ( float hue, float saturation,
 FUNCTION-ALIAS: color-alpha Color ColorAlpha ( Color color, float alpha )                      ! Get color with alpha applied, alpha goes from 0.0f to 1.0f
 FUNCTION-ALIAS: color-alpha-blend Color ColorAlphaBlend ( Color dst, Color src, Color tint )   ! Get src alpha-blended into dst color with tint
 FUNCTION-ALIAS: get-color Color GetColor ( uint hexValue )                                     ! Get Color structure from hexadecimal value
-FUNCTION-ALIAS: get-pixel-color Color GetPixelColor ( void* srcPtr, int format )               ! Get Color from a source pixel pointer of certain format
-FUNCTION-ALIAS: set-pixel-color void SetPixelColor ( void* dstPtr, Color color, int format )   ! Set color formatted into destination pixel pointer
-FUNCTION-ALIAS: get-pixel-data-size int GetPixelDataSize ( int width, int height, int format ) ! Get pixel data size in bytes for certain format
+FUNCTION-ALIAS: get-pixel-color Color GetPixelColor ( void* srcPtr, PixelFormat format )               ! Get Color from a source pixel pointer of certain format
+FUNCTION-ALIAS: set-pixel-color void SetPixelColor ( void* dstPtr, Color color, PixelFormat format )   ! Set color formatted into destination pixel pointer
+FUNCTION-ALIAS: get-pixel-data-size int GetPixelDataSize ( int width, int height, PixelFormat format ) ! Get pixel data size in bytes for certain format
 
 ! ------------------------------------------------------------------------------------
 ! Font Loading and Text Drawing Functions (Module: text)

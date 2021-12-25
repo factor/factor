@@ -17,7 +17,7 @@ CONSTANT: screen-height 800
     0 10 0 <Vector3> >>target
     0 1.6 0 <Vector3> >>up
     45 >>fovy
-    CAMERA_PERSPECTIVE >>type ;
+    CAMERA_PERSPECTIVE >>projection ;
 
 : resource ( fname -- path )
     "raylib.demo.mesh-picking" "_resources" vocab-file-path swap append-path normalize-path ;
@@ -103,13 +103,13 @@ TUPLE: tower model bbox position ;
 : draw-cursor ( hit-state -- )
     dup nearest-hit>> hit>> [
         [
-            [ nearest-hit>> position>> ] [ color>> ] bi
+            [ nearest-hit>> point>> ] [ color>> ] bi
             '[ 0.3 0.3 0.3 _ draw-cube ]
             [ 0.3 0.3 0.3 RED draw-cube-wires ] bi
         ]
         [
             nearest-hit>>
-            [ position>> dup ] [ normal>> ] bi v+ RED draw-line-3d
+            [ point>> dup ] [ normal>> ] bi v+ RED draw-line-3d
         ] bi
 
     ]
@@ -171,7 +171,7 @@ SYMBOL: mesh-picking-frame
             nearest-hit>> dup hit>> [
                 70 :> ypos
                 [ distance>> "Distance: %3.2f" sprintf 10 ypos 10 BLACK draw-text ]
-                [ position>> first3 "Hit Pos: %3.2f %3.2f %3.2f" sprintf 10 ypos 15 + 10 BLACK draw-text ]
+                [ point>> first3 "Hit Pos: %3.2f %3.2f %3.2f" sprintf 10 ypos 15 + 10 BLACK draw-text ]
                 [ normal>> first3 "Hit Norm: %3.2f %3.2f %3.2f" sprintf 10 ypos 30 + 10 BLACK draw-text ]
                 tri
                 bary [ first3
