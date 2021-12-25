@@ -137,7 +137,7 @@ PRIVATE>
 
 : synchronize ( -- ) dbf gdbm_sync ;
 
-: file-exists? ( key -- ? )
+: gdbm-exists? ( key -- ? )
     [ dbf swap object>datum gdbm_exists c-bool> ]
     with-destructors ;
 
