@@ -29,10 +29,10 @@ SYMBOL: player
 ! Make this cleaner
 : change-player-position ( -- )
     player get {
-        { [ KEY_RIGHT enum>number is-key-down ] [ [  2.0 + ] change-x ] }
-        { [ KEY_LEFT  enum>number is-key-down ] [ [ -2.0 + ] change-x ] }
-        { [ KEY_DOWN  enum>number is-key-down ] [ [  2.0 + ] change-y ] }
-        { [ KEY_UP    enum>number is-key-down ] [ [ -2.0 + ] change-y ] }
+        { [ KEY_RIGHT is-key-down ] [ [  2.0 + ] change-x ] }
+        { [ KEY_LEFT  is-key-down ] [ [ -2.0 + ] change-x ] }
+        { [ KEY_DOWN  is-key-down ] [ [  2.0 + ] change-y ] }
+        { [ KEY_UP    is-key-down ] [ [ -2.0 + ] change-y ] }
         [ ]
     } cond drop ;
 
