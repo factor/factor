@@ -120,7 +120,7 @@ CONSTANT: vertical-thumb-tiles
     tri ;
 
 : elevator-hold ( elevator -- )
-    [ direction>> ] [ find-slider ] bi slide-by-page ;
+    [ direction>> ] [ find-slider ] bi '[ _ slide-by-page ] when* ;
 
 : elevator-click ( elevator -- )
     dup compute-direction >>direction
