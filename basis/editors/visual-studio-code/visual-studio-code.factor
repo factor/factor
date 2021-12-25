@@ -8,7 +8,7 @@ IN: editors.visual-studio-code
 ! Command line arguments
 ! https://code.visualstudio.com/docs/editor/command-line
 
-TUPLE:  visual-studio-code ;
+TUPLE: visual-studio-code ;
 T{ visual-studio-code } editor-class set-global
 
 HOOK: find-visual-studio-code-path editor-class ( -- path )
