@@ -1,7 +1,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors alien.enums arrays classes.struct combinators.short-circuit
 continuations destructors formatting grouping io.backend io.pathnames kernel math
-math.functions.private math.vectors namespaces raylib.ffi sequences threads
+math.functions.private math.vectors namespaces raylib sequences threads
 vocabs.metadata ;
 
 IN: raylib.demo.mesh-picking
@@ -46,7 +46,7 @@ CONSTANT: screen-height 800
 TUPLE: hit-state name color nearest-hit ;
 : <hit-state> ( -- obj )
     "None" WHITE
-    RayHitInfo <struct>
+    RayCollision <struct>
     most-positive-finite-float >>distance
     f >>hit
     hit-state boa ;
@@ -57,21 +57,23 @@ TUPLE: hit-state name color nearest-hit ;
     f >>hit drop ;
 
 : handle-ground-hit ( hit-state ray -- hit-state )
-    0 get-collision-ray-ground
-    over nearest-hit>> swap update-hit?
-    [ >>nearest-hit ] dip
-    [ GREEN >>color "Ground" >>name ] when ;
+    drop ;
+    ! FIXME: raylib 4.0 doesn't have GetCollisionRayGround
+    ! 0 get-collision-ray-ground
+    ! over nearest-hit>> swap update-hit?
+    ! [ >>nearest-hit ] dip
+    ! [ GREEN >>color "Ground" >>name ] when ;
 
 : handle-triangle-hit ( hit-state ray ta tb tc -- hit-state ? )
-    get-collision-ray-triangle
+    get-ray-collision-triangle
     over nearest-hit>> swap update-hit?
     [ [ >>nearest-hit ] dip
     [ PURPLE >>color "Triangle" >>name ] when ] keep ;
 
 : handle-mesh-hit ( hit-state ray model bbox -- hit-state ? )
-    pick swap check-collision-ray-box
+    pick swap get-ray-collision-box
     [
-      get-collision-ray-model
+      get-ray-collision-model
       over nearest-hit>> swap update-hit?
       [ >>nearest-hit ] dip
       [ ORANGE >>color "Mesh" >>name ] when
@@ -83,8 +85,8 @@ TUPLE: tower model bbox position ;
 : <tower> ( -- obj )
     "turret.obj" resource load-model &unload-model
     "turret_diffuse.png" resource load-texture &unload-texture
-    over materials>> first maps>> MAP_DIFFUSE enum>number swap nth texture<<
-    dup meshes>> first mesh-bounding-box
+    over materials>> first maps>> MATERIAL_MAP_DIFFUSE enum>number swap nth texture<<
+    dup meshes>> first get-mesh-bounding-box
     0 0 0 <Vector3> tower boa ;
 
 : init-assets ( -- tower triangle )
