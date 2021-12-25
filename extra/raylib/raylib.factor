@@ -796,8 +796,8 @@ FUNCTION-ALIAS: load-shader Shader LoadShader ( c-string vsFileName, c-string fs
 FUNCTION-ALIAS: load-shader-from-memory Shader LoadShaderFromMemory ( c-string vsCode, c-string fsCode )                         ! Load shader from code strings and bind default locations
 FUNCTION-ALIAS: get-shader-location int GetShaderLocation ( Shader shader, c-string uniformName )                                ! Get shader uniform location
 FUNCTION-ALIAS: get-shader-location-attrib int GetShaderLocationAttrib ( Shader shader, c-string attribName )                    ! Get shader attribute location
-FUNCTION-ALIAS: set-shader-value void SetShaderValue ( Shader shader, int locIndex, void* value, int uniformType )               ! Set shader uniform value
-FUNCTION-ALIAS: set-shader-value-v void SetShaderValueV ( Shader shader, int locIndex, void* value, int uniformType, int count ) ! Set shader uniform value vector
+FUNCTION-ALIAS: set-shader-value void SetShaderValue ( Shader shader, int locIndex, void* value, ShaderUniformType uniformType ) ! Set shader uniform value
+FUNCTION-ALIAS: set-shader-value-v void SetShaderValueV ( Shader shader, int locIndex, void* value, ShaderUniformType uniformType, int count ) ! Set shader uniform value vector
 FUNCTION-ALIAS: set-shader-value-matrix void SetShaderValueMatrix ( Shader shader, int locIndex, Matrix mat )                    ! Set shader uniform value (matrix 4x4)
 FUNCTION-ALIAS: set-shader-value-texture void SetShaderValueTexture ( Shader shader, int locIndex, Texture2D texture )           ! Set shader uniform value for texture (sampler2d)
 FUNCTION-ALIAS: unload-shader void UnloadShader ( Shader shader )                                                                ! Unload shader from GPU memory (VRAM)
@@ -911,7 +911,7 @@ FUNCTION-ALIAS: set-mouse-position void SetMousePosition ( int x, int y )       
 FUNCTION-ALIAS: set-mouse-offset void SetMouseOffset ( int offsetX, int offsetY )          ! Set mouse offset
 FUNCTION-ALIAS: set-mouse-scale void SetMouseScale ( float scaleX, float scaleY )          ! Set mouse scaling
 FUNCTION-ALIAS: get-mouse-wheel-move float GetMouseWheelMove ( )                           ! Get mouse wheel movement Y
-FUNCTION-ALIAS: set-mouse-cursor void SetMouseCursor ( MouseCursor cursor )                        ! Set mouse cursor
+FUNCTION-ALIAS: set-mouse-cursor void SetMouseCursor ( MouseCursor cursor )                ! Set mouse cursor
 
 ! Input-related functions: touch
 FUNCTION-ALIAS: get-touch-x int GetTouchX ( )                                            ! Get touch position X for touch point 0 (relative to screen size)
@@ -935,7 +935,7 @@ FUNCTION-ALIAS: get-gesture-pinch-angle float GetGesturePinchAngle ( )          
 ! ------------------------------------------------------------------------------------
 ! Camera System Functions (Module: rcamera)
 ! ------------------------------------------------------------------------------------
-FUNCTION-ALIAS: set-camera-mode void SetCameraMode ( Camera camera, CameraMode mode )           ! Set camera mode (multiple camera modes available)
+FUNCTION-ALIAS: set-camera-mode void SetCameraMode ( Camera camera, CameraMode mode )    ! Set camera mode (multiple camera modes available)
 FUNCTION-ALIAS: update-camera void UpdateCamera ( Camera* camera )                       ! Update camera position for selected mode
 
 FUNCTION-ALIAS: set-camera-pan-control void SetCameraPanControl ( int keyPan )           ! Set camera pan key to combine with mouse movement (free camera)
@@ -1080,7 +1080,7 @@ FUNCTION-ALIAS: image-draw-text-ex void ImageDrawTextEx ( Image* dst, Font font,
 ! NOTE: These functions require GPU access
 FUNCTION-ALIAS: load-texture Texture2D LoadTexture ( c-string fileName )                                                         ! Load texture from file into GPU memory (VRAM)
 FUNCTION-ALIAS: load-texture-from-image Texture2D LoadTextureFromImage ( Image image )                                           ! Load texture from image data
-FUNCTION-ALIAS: load-texture-cubemap TextureCubemap LoadTextureCubemap ( Image image, int layout )                               ! Load cubemap from image, multiple image cubemap layouts supported
+FUNCTION-ALIAS: load-texture-cubemap TextureCubemap LoadTextureCubemap ( Image image, CubemapLayout layout )                     ! Load cubemap from image, multiple image cubemap layouts supported
 FUNCTION-ALIAS: load-render-texture RenderTexture2D LoadRenderTexture ( int width, int height )                                  ! Load texture for rendering (framebuffer)
 FUNCTION-ALIAS: unload-texture void UnloadTexture ( Texture2D texture )                                                          ! Unload texture from GPU memory (VRAM)
 FUNCTION-ALIAS: unload-render-texture void UnloadRenderTexture ( RenderTexture2D target )                                        ! Unload render texture from GPU memory (VRAM)
@@ -1089,8 +1089,8 @@ FUNCTION-ALIAS: update-texture-rec void UpdateTextureRec ( Texture2D texture, Re
 
 ! Texture configuration functions
 FUNCTION-ALIAS: gen-texture-mipmaps void GenTextureMipmaps ( Texture2D* texture )                                                ! Generate GPU mipmaps for a texture
-FUNCTION-ALIAS: set-texture-filter void SetTextureFilter ( Texture2D texture, int filter )                                       ! Set texture scaling filter mode
-FUNCTION-ALIAS: set-texture-wrap void SetTextureWrap ( Texture2D texture, int wrap )                                             ! Set texture wrapping mode
+FUNCTION-ALIAS: set-texture-filter void SetTextureFilter ( Texture2D texture, TextureFilterMode filter )                         ! Set texture scaling filter mode
+FUNCTION-ALIAS: set-texture-wrap void SetTextureWrap ( Texture2D texture, TextureWrapMode wrap )                                 ! Set texture wrapping mode
 
 ! Texture drawing functions
 FUNCTION-ALIAS: draw-texture void DrawTexture ( Texture2D texture, int posX, int posY, Color tint )                              ! Draw a Texture2D
@@ -1127,7 +1127,7 @@ FUNCTION-ALIAS: load-font Font LoadFont ( c-string fileName )                   
 FUNCTION-ALIAS: load-font-ex Font LoadFontEx ( c-string fileName, int fontSize, int* fontChars, int glyphCount )     ! Load font from file with extended parameters, use NULL for fontChars and 0 for glyphCount to load the default character set
 FUNCTION-ALIAS: load-font-from-image Font LoadFontFromImage ( Image image, Color key, int firstChar )                ! Load font from Image (XNA style)
 FUNCTION-ALIAS: load-font-from-memory Font LoadFontFromMemory ( c-string fileType, c-string fileData, int dataSize, int fontSize, int* fontChars, int glyphCount )  ! Load font from memory buffer, fileType refers to extension: i.e. '.ttf'
-FUNCTION-ALIAS: load-font-data GlyphInfo* LoadFontData ( c-string  fileData, int dataSize, int fontSize, int* fontChars, int glyphCount, int type )  ! Load font data for further use
+FUNCTION-ALIAS: load-font-data GlyphInfo* LoadFontData ( c-string  fileData, int dataSize, int fontSize, int* fontChars, int glyphCount, FontType type )  ! Load font data for further use
 FUNCTION-ALIAS: gen-image-font-atlas Image GenImageFontAtlas ( GlyphInfo* chars, Rectangle** recs, int glyphCount, int fontSize, int padding, int packMethod )  ! Generate image font atlas using chars info
 FUNCTION-ALIAS: unload-font-data void UnloadFontData ( GlyphInfo* chars, int glyphCount )                            ! Unload font chars info data (RAM)
 FUNCTION-ALIAS: unload-font void UnloadFont ( Font font )                                                            ! Unload Font from GPU memory (VRAM)
