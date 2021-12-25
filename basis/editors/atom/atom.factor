@@ -4,8 +4,8 @@ USING: editors io.pathnames io.standard-paths kernel make
 math.parser namespaces sequences system ;
 IN: editors.atom
 
-SINGLETON: atom-editor
-atom-editor editor-class set-global
+SINGLETON: atom
+atom editor-class set-global
 
 SYMBOL: atom-path
 
@@ -21,7 +21,7 @@ M: macosx find-atom
         f
     ] if* ;
 
-M: atom-editor editor-command
+M: atom editor-command
     [
         atom-path get [ find-atom ] unless* ,
         number>string ":" glue ,
