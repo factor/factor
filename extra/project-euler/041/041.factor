@@ -12,7 +12,7 @@ IN: project-euler.041
 ! digits 1 to n exactly once. For example, 2143 is a 4-digit pandigital and is
 ! also prime.
 
-! What is the largest n-digit pandigital prime that file-exists?
+! What is the largest n-digit pandigital prime that exists?
 
 
 ! SOLUTION
