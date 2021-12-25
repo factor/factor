@@ -133,7 +133,7 @@ M: pane-stream stream-write1
     '[
         dup length 3639 >
         [ 3639 over last-grapheme-from cut-slice ] [ f ] if
-        swap "" like split-lines @ dup
+        swap "" like ?split-lines @ dup
     ] loop drop ; inline
 
 M: pane-stream stream-write
