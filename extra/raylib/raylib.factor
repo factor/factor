@@ -796,8 +796,8 @@ FUNCTION-ALIAS: load-shader Shader LoadShader ( c-string vsFileName, c-string fs
 FUNCTION-ALIAS: load-shader-from-memory Shader LoadShaderFromMemory ( c-string vsCode, c-string fsCode )                         ! Load shader from code strings and bind default locations
 FUNCTION-ALIAS: get-shader-location int GetShaderLocation ( Shader shader, c-string uniformName )                                ! Get shader uniform location
 FUNCTION-ALIAS: get-shader-location-attrib int GetShaderLocationAttrib ( Shader shader, c-string attribName )                    ! Get shader attribute location
-FUNCTION-ALIAS: set-shader-value void SetShaderValue ( Shader shader, int locIndex, void* value, ShaderUniformType uniformType ) ! Set shader uniform value
-FUNCTION-ALIAS: set-shader-value-v void SetShaderValueV ( Shader shader, int locIndex, void* value, ShaderUniformType uniformType, int count ) ! Set shader uniform value vector
+FUNCTION-ALIAS: set-shader-value void SetShaderValue ( Shader shader, int locIndex, void* value, ShaderUniformDataType uniformType ) ! Set shader uniform value
+FUNCTION-ALIAS: set-shader-value-v void SetShaderValueV ( Shader shader, int locIndex, void* value, ShaderUniformDataType uniformType, int count ) ! Set shader uniform value vector
 FUNCTION-ALIAS: set-shader-value-matrix void SetShaderValueMatrix ( Shader shader, int locIndex, Matrix mat )                    ! Set shader uniform value (matrix 4x4)
 FUNCTION-ALIAS: set-shader-value-texture void SetShaderValueTexture ( Shader shader, int locIndex, Texture2D texture )           ! Set shader uniform value for texture (sampler2d)
 FUNCTION-ALIAS: unload-shader void UnloadShader ( Shader shader )                                                                ! Unload shader from GPU memory (VRAM)
