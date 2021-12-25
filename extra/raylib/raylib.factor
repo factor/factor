@@ -862,10 +862,10 @@ FUNCTION-ALIAS: clear-dropped-files void ClearDroppedFiles ( )                  
 FUNCTION-ALIAS: get-file-mod-time long GetFileModTime ( c-string fileName )                           ! Get file modification time (last write time)
 
 ! Compression/Encoding functionality
-FUNCTION-ALIAS: compress-data uchar* CompressData ( uchar* data, int dataLength, int* compDataLength )          ! Compress data (DEFLATE algorithm)
-FUNCTION-ALIAS: decompress-data uchar* DecompressData ( uchar* compData, int compDataLength, int* dataLength )  ! Decompress data (DEFLATE algorithm)
-FUNCTION-ALIAS: encode-data-base-6-4 uchar* EncodeDataBase64 ( uchar* data, int dataLength, int* outputLength ) ! Encode data to Base64 string
-FUNCTION-ALIAS: decode-data-base-6-4 uchar* DecodeDataBase64 ( uchar* data, int* outputLength )                 ! Decode Base64 string data
+FUNCTION-ALIAS: compress-data uchar* CompressData ( uchar* data, int dataLength, int* compDataLength )         ! Compress data (DEFLATE algorithm)
+FUNCTION-ALIAS: decompress-data uchar* DecompressData ( uchar* compData, int compDataLength, int* dataLength ) ! Decompress data (DEFLATE algorithm)
+FUNCTION-ALIAS: encode-data-base64 uchar* EncodeDataBase64 ( uchar* data, int dataLength, int* outputLength )  ! Encode data to Base64 string
+FUNCTION-ALIAS: decode-data-base64 uchar* DecodeDataBase64 ( uchar* data, int* outputLength )                  ! Decode Base64 string data
 
 ! Persistent storage management
 FUNCTION-ALIAS: save-storage-value bool SaveStorageValue ( uint position, int value )    ! Save integer value to storage file (to defined position), returns true on success
