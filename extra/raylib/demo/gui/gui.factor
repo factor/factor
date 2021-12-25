@@ -1,9 +1,11 @@
 ! Copyright (C) 2019 Jack Lucas
 ! See http://factorcode.org/license.txt for BSD license.
-USING: raylib raygui kernel math.ranges sequences locals random
+
+USING: raylib kernel math.ranges sequences locals random
 combinators.random  math threads calendar namespaces accessors
 classes.struct combinators alien.enums ;
-IN: raygui.demo
+
+IN: raylib.demo.gui
 
 : make-window ( -- )
     800 600 "Hello, Factor!" init-window
