@@ -86,23 +86,27 @@ M: pane selected-children
 : scroll-pane ( pane -- )
     dup scrolls?>> [ scroll>bottom ] [ drop ] if ;
 
-: smash-line ( current -- gadget )
+GENERIC: pane-label ( pane -- label )
+
+M: pane pane-label drop "" <label> ;
+
+: smash-line ( pane current -- gadget )
     dup children>> {
-        { [ dup empty? ] [ 2drop "" <label> ] }
-        { [ dup length 1 = ] [ nip first ] }
-        [ drop ]
+        { [ dup empty? ] [ 2drop pane-label ] }
+        { [ dup length 1 = ] [ 2nip first ] }
+        [ drop nip ]
     } cond ;
 
 : pane-nl ( pane -- )
     [
-        [ current>> [ unparent ] [ smash-line ] bi ] [ output>> ] bi
+        [ dup current>> [ unparent ] [ smash-line ] bi ] [ output>> ] bi
         add-incremental
     ] [ next-line ] bi ;
 
 GENERIC: smash-pane ( pane -- gadget )
 
 M: pane smash-pane
-    [ pane-nl ] [ output>> smash-line ] bi ;
+    [ pane-nl ] [ dup output>> smash-line ] bi ;
 
 GENERIC: pane-line ( str style gadget -- )
 
@@ -343,6 +347,8 @@ M: pane-stream stream-write-table
     apply-image-style
     apply-presentation-style
     nip ;
+
+M: styled-pane pane-label style>> "" <styled-label> ;
 
 : pane-text ( string style gadget -- )
     [ swap <styled-label> ] [ swap add-gadget drop ] bi* ;
