@@ -2,9 +2,9 @@
 ! See http://factorcode.org/license.txt for BSD license.
 
 USING: accessors assocs calendar calendar.format
-colors.constants colors.hex combinators concurrency.combinators
-formatting fry hashtables http.client io io.styles json.reader
-kernel make math math.parser sequences ui urls vocabs ;
+calendar.holidays.us colors.constants colors.hex combinators
+concurrency.combinators formatting hashtables http.client io
+io.styles json.reader kernel make math sequences ui urls ;
 
 IN: hacker-news
 
@@ -83,14 +83,19 @@ PRIVATE>
         ]
     } cleave ;
 
+: background-color ( -- color )
+    now dup christmas-day same-day?
+    HEXCOLOR: bc2c21 HEXCOLOR: ff6600 ? ;
+
 : banner. ( str -- )
     "http://news.ycombinator.com" >url presented associate
     H{
         { font-size 20 }
         { font-style bold }
-        { background HEXCOLOR: ff6600 }
         { foreground COLOR: black }
-    } assoc-union format nl ;
+    } assoc-union
+    background-color background pick set-at
+    format nl ;
 
 : hacker-news-feed. ( seq -- )
     [ 1 + post. ] each-index ;
