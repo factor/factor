@@ -4,8 +4,8 @@ USING: editors io.pathnames io.standard-paths kernel make
 namespaces system vocabs ;
 IN: editors.brackets
 
-SINGLETON: brackets-editor
-brackets-editor editor-class set-global
+SINGLETON: brackets
+brackets editor-class set-global
 
 HOOK: brackets-path os ( -- path )
 
@@ -16,7 +16,7 @@ M: macosx brackets-path
         f
     ] if* ;
 
-M: brackets-editor editor-command
+M: brackets editor-command
     [ brackets-path "brackets" or , drop , ] { } make ;
 
 os windows? [ "editors.brackets.windows" require ] when
