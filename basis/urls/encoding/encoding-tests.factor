@@ -29,7 +29,7 @@ USING: kernel linked-assocs sequences tools.test urls.encoding ;
 
 { LH{ { "a" { "b" "c" } } } } [ "a=b&a=c" query>assoc ] unit-test
 
-{ LH{ { "a" { "b" "c" } } } } [ "a=b;a=c" query>assoc ] unit-test
+{ LH{ { "a" "b;a=c" } } } [ "a=b;a=c" query>assoc ] unit-test
 
 { LH{ { "c" "d" } { "a" "b" } { "e" "f" } } } [ "c=d&a=b&e=f" query>assoc ] unit-test
 
