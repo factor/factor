@@ -1,9 +1,9 @@
 ! Copyright (C) 2021 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs combinators combinators.smart
-continuations io kernel math math.functions math.parser
-prettyprint quotations random sequences sequences.extras
-splitting strings unicode ;
+continuations formatting io kernel math math.functions
+math.parser prettyprint quotations random sequences
+sequences.extras splitting strings unicode ;
 IN: quiz
 
 GENERIC: generate-question* ( question -- quot )
@@ -103,7 +103,7 @@ M: string-response ask-question generated>> . ;
 M: number-response ask-question generated>> . ;
 
 M: multiple-choice-question ask-question
-    [ generated>> . ] [ choices>> [ ... ] each ] bi ;
+    [ generated>> . ] [ choices>> [ first2 swap "  (" ") " surround write ... ] each ] bi ;
 
 M: question check-response
     [ parsed-response>> ] [ answer>> ] bi = ;
@@ -171,7 +171,7 @@ M: sequence run-multiple-choice-quiz ( seq n -- questions )
 : score-quiz ( seq -- )
     [ [ correct?>> ] count ]
     [ length ] bi
-    [ drop 0.0 ] [ /f ] if-zero . ;
+    [ drop 0.0 ] [ /f ] if-zero 100 * "SCORE: %d%%\n" printf ;
 
 : run-states-quiz-hard ( -- )
     T{ state-capital-question } 5 run-multiple-choice-quiz score-quiz ;
