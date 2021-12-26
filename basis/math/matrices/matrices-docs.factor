@@ -109,7 +109,7 @@ $nl
 "By-element mathematical operations on a matrix:"
 { $subsections matrix-normalize mneg m+n m-n m*n m/n n+m n-m n*m n/m }
 
-"By-element mathematical operations of two matricess:"
+"By-element mathematical operations of two matrices:"
 { $subsections m+ m- m* m/ m~ }
 
 "Dot product (multiplication) of vectors and matrices:"
