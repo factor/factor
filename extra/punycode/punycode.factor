@@ -107,11 +107,11 @@ PRIVATE>
 
 ERROR: invalid-digit char ;
 
-:: decode-digit ( ch -- digit )
+: decode-digit ( ch -- digit )
     {
-        { [ ch CHAR: A CHAR: Z between? ] [ ch CHAR: A - ] }
-        { [ ch CHAR: 0 CHAR: 9 between? ] [ ch CHAR: 0 26 - - ] }
-        [ ch invalid-digit ]
+        { [ dup LETTER? ] [ CHAR: A - ] }
+        { [ dup digit? ] [ CHAR: 0 26 - - ] }
+        [ invalid-digit ]
     } cond ;
 
 :: decode-delta ( extended extpos! bias -- extpos' delta )
