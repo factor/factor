@@ -187,7 +187,7 @@ M: openssl-context dispose*
         tri
     ] with-destructors ;
 
-TUPLE: ssl-handle < disposable file handle connected terminated ;
+TUPLE: ssl-handle < disposable file handle connected ;
 
 SYMBOL: default-secure-context
 
@@ -275,8 +275,7 @@ PRIVATE>
     handle ;
 
 : ssl-error-syscall ( ssl-handle -- event/f )
-    f >>connected
-    t >>terminated drop
+    f >>connected drop
     ERR_get_error {
         { -1 [
             errno { [ ECONNRESET = ] [ EPIPE = ] } 1||
@@ -297,7 +296,7 @@ PRIVATE>
         { SSL_ERROR_SSL [ drop throw-ssl-error ] }
         ! https://stackoverflow.com/questions/50223224/ssl-read-returns-ssl-error-zero-return-but-err-get-error-is-0
         ! we got disconnected
-        { SSL_ERROR_ZERO_RETURN [ t >>terminated f >>connected drop f ] }
+        { SSL_ERROR_ZERO_RETURN [ drop f ] }
         { SSL_ERROR_WANT_ACCEPT [ drop +input+ ] }
     } case ;
 
@@ -311,12 +310,8 @@ PRIVATE>
 
 : maybe-handshake ( ssl-handle -- )
     dup connected>> [ drop ] [
-        dup terminated>> [
-            drop
-        ] [
-            [ [ do-ssl-accept ] with-timeout ]
-            [ t swap connected<< ] bi
-        ] if
+        [ [ do-ssl-accept ] with-timeout ]
+        [ t swap connected<< ] bi
     ] if ;
 
 ! Input ports
