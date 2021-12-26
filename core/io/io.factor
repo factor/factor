@@ -163,9 +163,10 @@ ERROR: invalid-read-buffer buf stream ;
         [ ] collector [ each-stream-line ] dip { } like
     ] with-disposal ; inline
 
-! Note: was `lines` before .99
 : read-lines ( -- seq )
     input-stream get stream-lines ; inline
+
+ALIAS: lines read-lines
 
 CONSTANT: each-block-size 65536
 
