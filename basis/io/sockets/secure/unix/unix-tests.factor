@@ -56,7 +56,7 @@ IN: io.sockets.secure.tests
 ! Actually, this should not be an error since many HTTPS servers
 ! (eg, google.com) do this.
 
-! [ client-test ] [ premature-close? ] must-fail-with
+! [ client-test ] [ premature-close-error? ] must-fail-with
 { "hello" } [ client-test ] unit-test
 
 ! Now, try validating the certificate. This should fail because its
