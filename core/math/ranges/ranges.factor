@@ -61,11 +61,11 @@ PRIVATE>
 : [1..b) ( b -- range ) 1 swap [a..b) ; inline
 
 ! backwards compatibility for new syntax
-ALIAS: [a,b] [a..b]
-ALIAS: (a,b] (a..b]
-ALIAS: [a,b) [a..b)
-ALIAS: (a,b) (a..b)
-ALIAS: [0,b] [0..b]
-ALIAS: [1,b] [1..b]
-ALIAS: [0,b) [0..b)
-ALIAS: [1,b) [1..b)
+ALIAS: [a,b] [a..b] deprecated
+ALIAS: (a,b] (a..b] deprecated
+ALIAS: [a,b) [a..b) deprecated
+ALIAS: (a,b) (a..b) deprecated
+ALIAS: [0,b] [0..b] deprecated
+ALIAS: [1,b] [1..b] deprecated
+ALIAS: [0,b) [0..b) deprecated
+ALIAS: [1,b) [1..b) deprecated
