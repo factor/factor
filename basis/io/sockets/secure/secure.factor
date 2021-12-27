@@ -85,10 +85,10 @@ M: secure-inet (client)
 
 PRIVATE>
 
-ERROR: premature-close ;
+ERROR: premature-close-error ;
 
-M: premature-close summary
-    drop "Connection closed prematurely - potential truncation attack" ;
+M: premature-close-error summary
+    drop "Connection closed prematurely" ;
 
 ERROR: certificate-verify-error result ;
 
