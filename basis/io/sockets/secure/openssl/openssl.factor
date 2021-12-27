@@ -284,7 +284,7 @@ PRIVATE>
         ] }
         ! https://stackoverflow.com/questions/13686398/ssl-read-failing-with-ssl-error-syscall-error
         ! 0 means EOF
-        { 0 [ premature-close-error f ] }
+        { 0 [ f ] }
     } case ;
 
 : check-ssl-error ( ssl-handle ret -- event/f )
@@ -296,8 +296,8 @@ PRIVATE>
         { SSL_ERROR_SYSCALL [ ssl-error-syscall ] }
         { SSL_ERROR_SSL [ drop throw-ssl-error ] }
         ! https://stackoverflow.com/questions/50223224/ssl-read-returns-ssl-error-zero-return-but-err-get-error-is-0
-        ! we got disconnected, not an error
-        { SSL_ERROR_ZERO_RETURN [ f >>connected t >>terminated drop f ] }
+        ! we got disconnected
+        { SSL_ERROR_ZERO_RETURN [ f >>connected t >>terminated premature-close-error ] }
         { SSL_ERROR_WANT_ACCEPT [ drop +input+ ] }
     } case ;
 
@@ -326,7 +326,11 @@ PRIVATE>
         dup 0 > [ swap buffer+ ] [ 2drop ] if f
     ] if* ;
 
+: throw-if-terminated ( ssl-handle -- ssl-handle )
+    dup terminated>> [ premature-close-error ] when ;
+
 M: ssl-handle refill
+    throw-if-terminated
     dup maybe-handshake [ buffer>> ] dip do-ssl-read ;
 
 ! Output ports
@@ -337,6 +341,7 @@ M: ssl-handle refill
     ] if* ;
 
 M: ssl-handle drain
+    throw-if-terminated
     dup maybe-handshake [ buffer>> ] dip do-ssl-write ;
 
 ! Connect
