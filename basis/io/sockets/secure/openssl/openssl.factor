@@ -279,12 +279,12 @@ PRIVATE>
     t >>terminated drop
     ERR_get_error {
         { -1 [
-            errno { [ ECONNRESET = ] [ EPIPE = ] } 1||
-            [ premature-close ] [ throw-errno ] if f
+            errno ECONNRESET =
+            [ premature-close-error ] [ throw-errno ] if f
         ] }
         ! https://stackoverflow.com/questions/13686398/ssl-read-failing-with-ssl-error-syscall-error
         ! 0 means EOF
-        { 0 [ f ] }
+        { 0 [ premature-close-error f ] }
     } case ;
 
 : check-ssl-error ( ssl-handle ret -- event/f )
@@ -297,7 +297,7 @@ PRIVATE>
         { SSL_ERROR_SSL [ drop throw-ssl-error ] }
         ! https://stackoverflow.com/questions/50223224/ssl-read-returns-ssl-error-zero-return-but-err-get-error-is-0
         ! we got disconnected
-        { SSL_ERROR_ZERO_RETURN [ t >>terminated f >>connected drop f ] }
+        { SSL_ERROR_ZERO_RETURN [ f >>connected t >>terminated premature-close-error ] }
         { SSL_ERROR_WANT_ACCEPT [ drop +input+ ] }
     } case ;
 
