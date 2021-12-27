@@ -1,8 +1,9 @@
-USING: accessors calendar classes concurrency.conditions
-concurrency.mailboxes concurrency.promises continuations
-destructors io io.backend.unix io.encodings.ascii io.sockets
+USING: accessors bootstrap.image.download calendar classes
+concurrency.conditions concurrency.mailboxes
+concurrency.promises continuations destructors io
+io.backend.unix io.encodings.ascii io.files.temp io.sockets
 io.sockets.secure io.sockets.secure.debug io.streams.duplex
-io.timeouts kernel locals namespaces threads tools.test ;
+io.timeouts kernel namespaces threads tools.test ;
 QUALIFIED-WITH: concurrency.messaging qm
 IN: io.sockets.secure.tests
 
@@ -171,3 +172,7 @@ IN: io.sockets.secure.tests
         ] with-destructors
     ] [ io-timeout? ] must-fail-with
 ] drop
+
+{ } [
+    [ download-my-image ] with-temp-directory
+] unit-test
