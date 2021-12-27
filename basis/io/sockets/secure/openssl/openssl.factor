@@ -322,7 +322,9 @@ PRIVATE>
 ! Input ports
 : do-ssl-read ( buffer ssl-handle -- event/f )
     2dup handle>> swap [ buffer-end ] [ buffer-capacity ] bi SSL_read
-    [ check-ssl-error ] keep swap [ 2nip ] [ swap buffer+ f ] if* ;
+    [ check-ssl-error ] keep swap [ 2nip ] [
+        dup 0 > [ swap buffer+ ] [ 2drop ] if f
+    ] if* ;
 
 M: ssl-handle refill
     dup maybe-handshake [ buffer>> ] dip do-ssl-read ;
