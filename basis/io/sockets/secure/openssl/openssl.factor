@@ -325,7 +325,9 @@ M: ssl-handle refill
 ! Output ports
 : do-ssl-write ( buffer ssl-handle -- event/f )
     2dup handle>> swap [ buffer@ ] [ buffer-length ] bi SSL_write
-    [ check-ssl-error ] keep swap [ 2nip ] [ swap buffer-consume f ] if* ;
+    [ check-ssl-error ] keep swap [ 2nip ] [
+        dup 0 > [ swap buffer-consume ] [ 2drop ] if f
+    ] if* ;
 
 M: ssl-handle drain
     dup maybe-handshake [ buffer>> ] dip do-ssl-write ;
