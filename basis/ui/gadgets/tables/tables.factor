@@ -30,7 +30,7 @@ M: object column-titles drop f ;
 
 M: trivial-renderer row-columns drop ;
 M: object row-value drop ;
-M: object row-summary drop ;
+M: object row-summary row-value ;
 M: object row-color 2drop f ;
 M: object row-value? drop eq? ;
 
