@@ -51,7 +51,7 @@ MEMO: make-attributes ( open-font color -- hashtable )
     ] with-destructors ;
 
 TUPLE: line < disposable font string line metrics image loc dim
-render-loc render-dim ;
+render-loc render-dim render-ext ;
 
 : typographic-bounds ( line -- width ascent descent leading )
     { CGFloat CGFloat CGFloat }
@@ -89,7 +89,7 @@ render-loc render-dim ;
     [let [ start>> ] [ end>> ] [ string>> ] tri :> ( start end string )
      start end [ 0 swap string subseq utf16n encode length 2 /i ] bi@
     ]
-    [ f CTLineGetOffsetForStringIndex round ] bi-curry@ bi
+    [ f CTLineGetOffsetForStringIndex ] bi-curry@ bi
     [ drop nip 0 ] [ swap - swap second ] 3bi <CGRect> ;
 
 : CGRect-translate-x ( CGRect x -- CGRect' )
@@ -111,7 +111,7 @@ render-loc render-dim ;
 
 :: line-loc ( metrics loc dim -- loc )
     loc first
-    metrics ascent>> ceiling dim second loc second + - 2array ;
+    metrics ascent>> dim second loc second + - 1 - 2array ;
 
 :: <line> ( font string -- line )
     [
@@ -135,12 +135,14 @@ render-loc render-dim ;
         ctline line-rect :> rect
         rect origin>> CGPoint>loc :> (loc)
         rect size>> CGSize>dim :> (dim)
+
         (loc) vfloor :> loc
-        (loc) (dim) v+ vceiling :> ext
-        ext loc [ - >integer 1 max ] 2map :> dim
+        (dim) vceiling :> dim
+        dim [ >integer 1 + ] map :> ext
 
         loc line render-loc<<
         dim line render-dim<<
+        ext line render-ext<<
 
         line metrics>> loc dim line-loc line loc<<
 
@@ -148,8 +150,9 @@ render-loc render-dim ;
 
     line render-loc>> :> loc
     line render-dim>> :> dim
+    line render-ext>> :> ext
 
-    line dim [
+    line ext [
         {
             [ font dim fill-background ]
             [ loc dim ctline string fill-selection-background ]
