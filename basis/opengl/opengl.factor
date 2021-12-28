@@ -3,9 +3,9 @@
 ! Portions copyright (C) 2008 Joe Groff.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: alien alien.c-types alien.data assocs colors
-combinators.smart continuations init io kernel math math.parser
-namespaces opengl.gl sequences sequences.generalizations
-specialized-arrays system words ;
+combinators.smart continuations init io kernel math
+math.functions math.parser namespaces opengl.gl sequences
+sequences.generalizations specialized-arrays system words ;
 FROM: alien.c-types => float ;
 SPECIALIZED-ARRAY: float
 SPECIALIZED-ARRAY: uint
@@ -227,6 +227,15 @@ MACRO: set-draw-buffers ( buffers -- quot )
 
 : gl-unscale ( m -- n )
     gl-scale-factor get-global [ / ] when* ; inline
+
+: gl-floor ( m -- n )
+    gl-scale floor gl-unscale ; inline
+
+: gl-ceiling ( m -- n )
+    gl-scale ceiling gl-unscale ; inline
+
+: gl-round ( m -- n )
+    gl-scale round gl-unscale ; inline
 
 : fix-coordinates ( point1 point2 -- x1 y1 x2 y2 )
     [ first2 [ gl-scale >fixnum ] bi@ ] bi@ ;
