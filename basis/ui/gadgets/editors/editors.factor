@@ -143,10 +143,10 @@ M: editor ungraft*
     [ stop-blinking ] [ f >>focused? relayout-1 ] bi ;
 
 : loc>x ( loc editor -- x )
-    [ first2 swap ] dip [ editor-line ] [ font>> ] bi swap offset>x round ;
+    [ first2 swap ] dip [ editor-line ] [ font>> ] bi swap offset>x gl-round ;
 
 : loc>point ( loc editor -- loc )
-    [ loc>x ] [ [ first ] dip line>y ceiling ] 2bi 2array ;
+    [ loc>x ] [ [ first ] dip line>y gl-ceiling ] 2bi 2array ;
 
 : caret-loc ( editor -- loc )
     [ editor-caret ] keep loc>point ;
@@ -206,10 +206,10 @@ TUPLE: selected-line start end first? last? ;
     ] [ drop f ] if ;
 
 :: draw-selection ( line pair editor -- )
-    pair [ editor font>> line offset>x ] map :> pair
+    pair [ editor font>> line offset>x gl-round ] map :> pair
     editor selection-color>> gl-color
     pair first 0 2array
-    pair second pair first - round 1 max editor line-height 2array
+    pair second pair first - 1 max editor line-height 2array
     gl-fill-rect ;
 
 : draw-unselected-line ( line editor -- )
