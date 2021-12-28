@@ -154,8 +154,8 @@ render-loc render-dim render-ext ;
 
     line ext [
         {
-            [ font dim fill-background ]
-            [ loc dim ctline string fill-selection-background ]
+            [ font ext fill-background ]
+            [ loc first 0 2array dim first ext second 2array ctline string fill-selection-background ]
             [ loc set-text-position ]
             [ [ ctline ] dip CTLineDraw ]
         } cleave
