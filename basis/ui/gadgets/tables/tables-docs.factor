@@ -11,6 +11,7 @@ $nl
     row-color
     row-value
     row-value?
+    row-summary
 }
 "The following optional generic words allow the renderer to provide some information about the display of all rows:"
 { $subsections
