@@ -17,6 +17,7 @@ GENERIC: column-titles ( renderer -- strings )
 
 GENERIC: row-columns ( row renderer -- columns )
 GENERIC: row-value ( row renderer -- object )
+GENERIC: row-summary ( row renderer -- object )
 GENERIC: row-color ( row renderer -- color )
 GENERIC: row-value? ( value row renderer -- ? )
 
@@ -29,6 +30,7 @@ M: object column-titles drop f ;
 
 M: trivial-renderer row-columns drop ;
 M: object row-value drop ;
+M: object row-summary drop ;
 M: object row-color 2drop f ;
 M: object row-value? drop eq? ;
 
@@ -240,7 +242,7 @@ PRIVATE>
 
 : show-row-summary ( table n -- )
     over nth-row
-    [ swap [ renderer>> row-value ] keep show-summary ]
+    [ swap [ renderer>> row-summary ] keep show-summary ]
     [ drop hide-status ]
     if ;
 
