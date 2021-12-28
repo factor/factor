@@ -9,7 +9,7 @@ TYPEDEF: long      __slongword_type
 TYPEDEF: uchar     __u8
 TYPEDEF: ushort    __u16
 TYPEDEF: uint      __u32
-TYPEDEF: longlong  __u64
+TYPEDEF: ulonglong __u64
 TYPEDEF: char      __s8
 TYPEDEF: short     __s16
 TYPEDEF: int       __s32
