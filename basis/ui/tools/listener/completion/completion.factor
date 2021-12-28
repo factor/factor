@@ -68,22 +68,20 @@ M: path-completion completion-banner drop "Paths" ;
 M: history-completion completion-banner drop "Input history" ;
 
 ! Completion modes also implement the row renderer protocol
-M: listener-completion row-columns drop present 1array ;
+M: listener-completion row-columns drop second 1array ;
+M: listener-completion row-summary drop first ;
 
 M: char-completion row-columns
-    drop [ name-map at 1string ] [ 2array ] bi ;
+    drop first [ name-map at 1string ] keep 2array ;
 
 M: definition-completion prototype-row
     drop \ + definition-icon <image-name> "" 2array ;
 
 M: definition-completion row-columns
-    drop
-    [ definition-icon <image-name> ]
-    [ present ] bi
-    2array ;
+    drop first2 [ definition-icon <image-name> ] dip 2array ;
 
 M: word-completion row-color
-    [ vocabulary>> ] [ manifest>> ] bi* {
+    [ first vocabulary>> ] [ manifest>> ] bi* {
         { [ dup not ] [ COLOR: black ] }
         { [ 2dup search-vocab-names>> in? ] [ COLOR: black ] }
         { [ over ".private" tail? ] [ COLOR: dark-red ] }
@@ -98,7 +96,7 @@ M: vocab-completion row-color
     ] [ drop COLOR: dark-gray ] if ;
 
 M: color-completion row-color
-    drop named-color ;
+    drop second named-color ;
 
 : up-to-caret ( caret document -- string )
     [ { 0 0 } ] 2dip doc-range ;
@@ -121,7 +119,7 @@ TUPLE: completion-popup < track interactor table completion-mode ;
 
 : <completion-model> ( editor element quot -- model )
     [ <element-model> 1/3 seconds <delay> ] dip
-    '[ @ keys 1000 short head ] <arrow> ;
+    '[ @ >alist 1000 short head ] <arrow> ;
 
 M: completion-popup focusable-child* table>> ;
 
@@ -130,19 +128,10 @@ M: completion-popup focusable-child* table>> ;
     [ completion-mode>> completion-element ]
     bi ;
 
-GENERIC: completion-string ( object -- string )
-
-M: object completion-string present ;
-
-: method-completion-string ( word -- string )
-    "method-generic" word-prop present ;
-
-M: method completion-string method-completion-string ;
-
 GENERIC#: accept-completion-hook 1 ( item popup -- )
 
 : insert-completion ( item popup -- )
-    [ completion-string ] [ completion-loc/doc/elt ] bi* set-elt-string ;
+    [ second ] [ completion-loc/doc/elt ] bi* set-elt-string ;
 
 : accept-completion ( item table -- )
     find-completion-popup
