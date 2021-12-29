@@ -18,32 +18,25 @@ M: TLSv1.2 ssl-method drop TLSv1_2_method ;
 
 MEMO: make-cipher-list ( -- string )
     {
+        ! https://ciphersuite.info/cs/?security=recommended&software=openssl&singlepage=true
+        ! Recommended 12/28/2021
         "ECDHE-ECDSA-AES256-GCM-SHA384"
-        "ECDHE-ECDSA-AES256-SHA384"
         "ECDHE-ECDSA-AES128-GCM-SHA256"
-        "ECDHE-ECDSA-AES128-SHA256"
-        "ECDHE-RSA-AES256-GCM-SHA384"
-        "ECDHE-RSA-AES256-SHA384"
+        "ECDHE-ECDSA-CHACHA20-POLY1305"
+        "ECDHE-PSK-CHACHA20-POLY1305"
+        "DHE-DSS-AES256-GCM-SHA384"
+        "DHE-DSS-AES128-GCM-SHA256"
+        "DHE-PSK-AES256-GCM-SHA384"
+        "DHE-PSK-AES128-GCM-SHA256"
+        "DHE-PSK-CHACHA20-POLY1305"
+
+        ! Secure 12/28/2021
         "ECDHE-RSA-AES128-GCM-SHA256"
-        "ECDHE-RSA-AES128-SHA256"
         "ECDHE-ECDSA-AES256-CCM8"
         "ECDHE-ECDSA-AES256-CCM"
         "ECDHE-ECDSA-AES128-CCM8"
         "ECDHE-ECDSA-AES128-CCM"
-        "ECDHE-ECDSA-CAMELLIA256-SHA384"
-        "ECDHE-RSA-CAMELLIA256-SHA384"
-        "ECDHE-ECDSA-CAMELLIA128-SHA256"
-        "ECDHE-RSA-CAMELLIA128-SHA256"
         "ECDHE-RSA-CHACHA20-POLY1305"
-        "ECDHE-ECDSA-CHACHA20-POLY1305"
-        "ECDHE-PSK-CHACHA20-POLY1305"
-        "AES256-SHA"
-        "AES128-SHA256"
-        "AES128-SHA"
-        "CAMELLIA256-SHA"
-        "CAMELLIA128-SHA"
-        "IDEA-CBC-SHA"
-        "DES-CBC3-SHA"
     } ":" join ;
 
 TUPLE: openssl-context < secure-context aliens sessions ;
