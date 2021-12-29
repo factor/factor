@@ -1,7 +1,7 @@
 ! Copyright (C) 2021 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel make math math.order math.primes math.ranges
-random sorting ;
+USING: arrays kernel make math math.order math.primes
+math.ranges random sorting ;
 IN: math.primes.pollard-rho-brent
 
 ! https://comeoncodeon.wordpress.com/2010/09/18/pollard-rho-brent-integer-factorization/
@@ -40,29 +40,34 @@ IN: math.primes.pollard-rho-brent
 : brent-factor ( n -- factor )
     dup even? [ drop 2 ] [ (brent-factor) ] if ;
 
-DEFER: brent-factors
+DEFER: pollard-rho-brent-factors
 
+! 0) can hang if given a large prime, so check prime? first
 ! 1) brent-factor can return a composite number
 ! 2) also it can hang if you give it a prime number
 ! 3) factors can be found in random order
 ! therefore we check these conditions
-:: (brent-factors) ( n! -- )
+:: (pollard-rho-brent-factors) ( n! -- )
     n brent-factor :> factor
     ! 1) check for prime
     factor prime? [
         factor ,
     ] [
-        factor brent-factors %
+        factor pollard-rho-brent-factors %
     ] if
     n factor = [
         n factor /i
         ! 2) check for prime
-        dup prime? [ , ] [ (brent-factors) ] if
+        dup prime? [ , ] [ (pollard-rho-brent-factors) ] if
     ] unless ;
 
-: brent-factors ( n! -- factors )
+: pollard-rho-brent-factors ( n! -- factors )
     dup 1 <= [
         drop { }
     ] [
-        [ (brent-factors) ] { } make
+        dup prime? [
+            1array
+        ] [
+            [ (pollard-rho-brent-factors) ] { } make
+        ] if
     ] if natural-sort ;

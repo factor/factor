@@ -35,7 +35,7 @@ PRIVATE>
 
 : unique-factors ( n -- seq ) group-factors keys ; flushable
 
-: factors ( n -- seq ) brent-factors ; flushable
+: factors ( n -- seq ) pollard-rho-brent-factors ; flushable
 
 : totient ( n -- t )
     {
