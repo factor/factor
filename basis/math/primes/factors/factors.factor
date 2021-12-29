@@ -1,8 +1,9 @@
 ! Copyright (C) 2007-2009 Samuel Tardieu.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays assocs combinators command-line io kernel make
-math math.functions math.parser math.primes math.ranges
-namespaces sequences sequences.product sorting splitting ;
+math math.functions math.parser math.primes
+math.primes.pollard-rho-brent math.ranges namespaces sequences
+sequences.product sorting splitting ;
 IN: math.primes.factors
 
 <PRIVATE
@@ -34,8 +35,7 @@ PRIVATE>
 
 : unique-factors ( n -- seq ) group-factors keys ; flushable
 
-: factors ( n -- seq )
-    group-factors [ first2 swap <array> ] map concat ; flushable
+: factors ( n -- seq ) brent-factors ; flushable
 
 : totient ( n -- t )
     {

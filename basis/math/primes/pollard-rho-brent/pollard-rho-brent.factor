@@ -1,7 +1,7 @@
 ! Copyright (C) 2021 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel make math math.order math.primes math.ranges
-random ;
+random sorting ;
 IN: math.primes.pollard-rho-brent
 
 ! https://comeoncodeon.wordpress.com/2010/09/18/pollard-rho-brent-integer-factorization/
@@ -65,4 +65,4 @@ DEFER: brent-factors
         drop { }
     ] [
         [ (brent-factors) ] { } make
-    ] if ;
+    ] if natural-sort ;
