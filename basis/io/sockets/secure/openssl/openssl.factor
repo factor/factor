@@ -16,6 +16,27 @@ M: TLSv1 ssl-method drop TLSv1_method ;
 M: TLSv1.1 ssl-method drop TLSv1_1_method ;
 M: TLSv1.2 ssl-method drop TLSv1_2_method ;
 
+CONSTANT: weak-ciphers-for-compatibility
+    {
+        ! Weak 12/28/2021, included for compatibility for now
+        "ECDHE-ECDSA-AES256-SHA384"
+        "ECDHE-ECDSA-AES128-SHA256"
+        "ECDHE-RSA-AES256-GCM-SHA384"
+        "ECDHE-RSA-AES256-SHA384"
+        "ECDHE-RSA-AES128-SHA256"
+        "ECDHE-RSA-CAMELLIA256-SHA384"
+        "ECDHE-RSA-CAMELLIA128-SHA256"
+        "ECDHE-ECDSA-CAMELLIA256-SHA384"
+        "ECDHE-ECDSA-CAMELLIA128-SHA256"
+        "AES256-SHA"
+        "AES128-SHA256"
+        "AES128-SHA"
+        "CAMELLIA256-SHA"
+        "CAMELLIA128-SHA"
+        "IDEA-CBC-SHA"
+        "DES-CBC3-SHA"
+    }
+
 MEMO: make-cipher-list ( -- string )
     {
         ! https://ciphersuite.info/cs/?security=recommended&software=openssl&singlepage=true
@@ -37,7 +58,10 @@ MEMO: make-cipher-list ( -- string )
         "ECDHE-ECDSA-AES128-CCM8"
         "ECDHE-ECDSA-AES128-CCM"
         "ECDHE-RSA-CHACHA20-POLY1305"
-    } ":" join ;
+    }
+    ! XXX: Weak ciphers
+    weak-ciphers-for-compatibility append
+    ":" join ;
 
 TUPLE: openssl-context < secure-context aliens sessions ;
 
