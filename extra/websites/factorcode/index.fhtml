@@ -85,6 +85,9 @@ xml>string write-html
 
 <p>Stable and development releases are built and uploaded by the <a href="https://concatenative.org/wiki/view/Factor/Build farm">build farm</a>. Follow <a href="https://twitter.com/FactorBuilds">@FactorBuilds</a> on Twitter to receive notifications. If you're curious, take a look at the <a href="https://builds.factorcode.org/dashboard">build farm dashboard</a>. You can also <a href="https://concatenative.org/wiki/view/Factor/Building%20Factor">build Factor</a> on your own platform from source.</p>
 
+<h2>Older releases</h2>
+<a href="https://downloads.factorcode.org/releases/">Download older releases</a> from <a href="https://downloads.factorcode.org/releases/0.29/">Factor 0.29</a> to the current release.
+
 <h1>Community</h1>
 
 <ul>
