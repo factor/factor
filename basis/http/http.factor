@@ -167,6 +167,15 @@ TUPLE: request
 : header ( request/response key -- value )
     swap header>> at ;
 
+! https://github.com/factor/factor/issues/2273
+! https://observatory.mozilla.org/analyze/factorcode.org
+! https://csp-evaluator.withgoogle.com/?csp=https://factorcode.org
+: add-modern-headers ( response -- response )
+    "max-age=63072000; includeSubDomains; preload" "Strict-Transport-Security" set-header
+    "nosniff" "X-Content-Type-Options" set-header
+    "default-src https: 'unsafe-inline'; frame-ancestors 'none'; object-src 'none'" "Content-Security-Policy" set-header
+    "DENY" "X-Frame-Options" set-header
+    "1; mode=block" "X-XSS-Protection" set-header ;
 
 TUPLE: response
     version
@@ -186,6 +195,7 @@ TUPLE: response
         "close" "Connection" set-header
         now timestamp>http-string "Date" set-header
         "Factor http.server" "Server" set-header
+        add-modern-headers
         utf8 >>content-encoding
         V{ } clone >>cookies ;
 
