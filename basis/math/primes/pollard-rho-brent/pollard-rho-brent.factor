@@ -6,9 +6,9 @@ IN: math.primes.pollard-rho-brent
 
 ! https://comeoncodeon.wordpress.com/2010/09/18/pollard-rho-brent-integer-factorization/
 :: (brent-factor) ( n -- factor )
-    n [1,b) random
-    n [1,b) random
-    n [1,b) random :> ( y! c m )
+    n [1..b) random
+    n [1..b) random
+    n [1..b) random :> ( y! c m )
     1 1 1 :> ( g! r! q! )
     0 :> x!
     0 :> ys!
@@ -33,7 +33,7 @@ IN: math.primes.pollard-rho-brent
         [ g 1 > not ] [
             ys sq n mod c + n mod ys!
             x ys - abs n gcd nip g!
-        ] do while
+        ] while
     ] when
     g ;
 
