@@ -4,6 +4,7 @@
 USING: accessors byte-arrays classes combinators endian io
 io.encodings.binary io.files io.streams.byte-array kernel locals
 math math.order math.statistics sequences sequences.extras sets
+;
 
 IN: shapefiles
 
