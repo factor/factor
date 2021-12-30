@@ -1,7 +1,7 @@
 ! Copyright (C) 2006, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays assocs combinators.short-circuit fry
-kernel linked-assocs namespaces sequences ui.commands words ;
+USING: accessors arrays assocs combinators.short-circuit kernel
+linked-assocs namespaces sequences ui.commands words ;
 IN: ui.operations
 
 SYMBOL: +keyboard+

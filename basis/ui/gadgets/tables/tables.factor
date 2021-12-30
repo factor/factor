@@ -1,12 +1,12 @@
 ! Copyright (C) 2008, 2011 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays colors colors.constants combinators
-combinators.short-circuit fonts fry kernel locals math
-math.functions math.order math.rectangles math.vectors models
-namespaces opengl sequences splitting strings ui.commands
-ui.gadgets ui.gadgets.line-support ui.gadgets.menus
-ui.gadgets.scrollers ui.gadgets.status-bar ui.gadgets.worlds
-ui.gestures ui.images ui.pens.solid ui.render ui.text ui.theme ;
+USING: accessors arrays colors combinators
+combinators.short-circuit fonts kernel math math.functions
+math.order math.rectangles math.vectors models namespaces opengl
+sequences splitting strings ui.commands ui.gadgets
+ui.gadgets.line-support ui.gadgets.menus ui.gadgets.scrollers
+ui.gadgets.status-bar ui.gadgets.worlds ui.gestures ui.images
+ui.pens.solid ui.render ui.text ui.theme ;
 IN: ui.gadgets.tables
 
 ! Row renderer protocol

@@ -1,5 +1,4 @@
-USING: ui.gadgets.packs help.markup help.syntax ui.gadgets
-arrays kernel quotations classes.tuple ;
+USING: help.markup help.syntax ui.gadgets ui.gadgets.packs ;
 IN: ui.gadgets.tracks
 
 ARTICLE: "ui-track-layout" "Track layouts"
