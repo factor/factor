@@ -131,12 +131,12 @@ M: completion-popup focusable-child* table>> ;
 GENERIC#: accept-completion-hook 1 ( item popup -- )
 
 : insert-completion ( item popup -- )
-    [ second ] [ completion-loc/doc/elt ] bi* set-elt-string ;
+    completion-loc/doc/elt set-elt-string ;
 
 : accept-completion ( item table -- )
     find-completion-popup
-    [ insert-completion ]
-    [ accept-completion-hook ]
+    [ [ second ] dip insert-completion ]
+    [ [ first ] dip accept-completion-hook ]
     2bi ;
 
 : <completion-table> ( interactor completion-mode -- table )
