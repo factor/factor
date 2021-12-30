@@ -37,10 +37,10 @@ IN: project-euler.023
 <PRIVATE
 
 : source-023 ( -- seq )
-    46 [1,b] 47 20161 2 <range> append ;
+    46 [1..b] 47 20161 2 <range> append ;
 
 : abundants-upto ( n -- seq )
-    [1,b] [ abundant? ] filter ;
+    [1..b] [ abundant? ] filter ;
 
 : possible-sums ( seq -- seq )
     HS{ } clone
