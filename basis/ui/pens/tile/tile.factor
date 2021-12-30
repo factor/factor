@@ -1,7 +1,7 @@
 ! Copyright (C) 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel accessors math.vectors ui.images opengl fry
-combinators ui.pens ;
+USING: accessors combinators kernel math.vectors opengl
+ui.images ui.pens ;
 IN: ui.pens.tile
 
 ! Tile pen
