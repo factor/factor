@@ -251,14 +251,14 @@ IN: calendar
 ] unit-test
 
 { t } [
-    1999 2025 [a,b] [
+    1999 2025 [a..b] [
         <year> timestamp>year-dates-gmt
         [ >date< ymd>ordinal ] map [ < ] monotonic?
     ] map [ ] all?
 ] unit-test
 
 { t } [
-    1999 2025 [a,b] [
+    1999 2025 [a..b] [
         <year-gmt> timestamp>year-dates-gmt
         [ >date< ymd>ordinal ] map [ < ] monotonic?
     ] map [ ] all?

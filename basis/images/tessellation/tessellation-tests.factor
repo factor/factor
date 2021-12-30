@@ -20,7 +20,7 @@ IN: images.tessellation
     }
 } [
     <image>
-        1 16 [a,b] >byte-array >>bitmap
+        1 16 [a..b] >byte-array >>bitmap
         { 4 4 } >>dim
         L >>component-order
         ubyte-components >>component-type
@@ -40,7 +40,7 @@ IN: images.tessellation
     }
 } [
     <image>
-        1 9 [a,b] >byte-array >>bitmap
+        1 9 [a..b] >byte-array >>bitmap
         { 3 3 } >>dim
         L >>component-order
         ubyte-components >>component-type

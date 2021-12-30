@@ -13,7 +13,7 @@ math.ranges sequences tools.test ;
 ! Check sieve array length logic by making sure we get the right
 ! end-point for numbers with all possibilities mod 30. If something
 ! were to go wrong, we'd get a bounds-error.
-{ } [ 2 100 [a,b] [ dup sieve marked-prime? drop ] each ] unit-test
+{ } [ 2 100 [a..b] [ dup sieve marked-prime? drop ] each ] unit-test
 
 { t } [
     { 2 3 5 7 11 13 } 100 sieve '[ _ marked-prime? ] all?

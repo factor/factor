@@ -256,7 +256,7 @@ $nl
     "    random-attrs string>random-generator"
     "    '["
     "        _ _ _"
-    "        [ [a,b] random present write ]"
+    "        [ [a..b] random present write ]"
     "        with-random-generator"
     "    ] [code] ;"
 }

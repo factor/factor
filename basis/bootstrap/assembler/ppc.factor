@@ -40,8 +40,8 @@ IN: bootstrap.ppc
 : restore-vec ( reg offt -- ) save-at 11 swap LI 11 1 LVXL ;
 
 ! Stop using intervals here.
-: nv-fp-regs  ( -- seq ) 14 31 [a,b] ;
-: nv-vec-regs ( -- seq ) 20 31 [a,b] ;
+: nv-fp-regs  ( -- seq ) 14 31 [a..b] ;
+: nv-vec-regs ( -- seq ) 20 31 [a..b] ;
 
 : saved-fp-regs-size  ( -- n ) 144 ;
 : saved-vec-regs-size ( -- n ) 192 ;
