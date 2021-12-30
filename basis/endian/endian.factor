@@ -1,13 +1,8 @@
 ! Copyright (C) 2009 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-
 USING: alien.c-types alien.data byte-arrays combinators
-combinators.smart endian kernel math math.ranges sequences
-sequences.generalizations ;
-
-USING: alien.c-types alien.data grouping kernel
-math.bitwise namespaces sequences ;
-
+combinators.smart grouping hints kernel math math.bitwise
+math.ranges namespaces sequences sequences.generalizations ;
 IN: endian
 
 SINGLETONS: big-endian little-endian ;
@@ -47,18 +42,6 @@ MACRO: reassemble-le ( n -- quot ) le-range reassemble-bytes ;
 
 :: n-le> ( bytes n -- x )
     bytes n check-length drop n firstn-unsafe n reassemble-le ; inline
-
-! HINTS: n-be> { byte-array object } ;
-! HINTS: n-le> { byte-array object } ;
-
-! { >le >be } [
-!     { { fixnum fixnum } { bignum fixnum } }
-!     set-specializer
-! ] each
-
-! { le> be> } [
-!     { byte-array } set-specializer
-! ] each
 
 : if-endian ( endian bytes-quot seq-quot -- )
     [
@@ -235,3 +218,14 @@ M: little-endian signed-endian> signed-le> ;
         ] if concat
     ] if ; inline
 
+HINTS: n-be> { byte-array object } ;
+HINTS: n-le> { byte-array object } ;
+
+{ >le >be } [
+    { { fixnum fixnum } { bignum fixnum } }
+    set-specializer
+] each
+
+{ le> be> } [
+    { byte-array } set-specializer
+] each
