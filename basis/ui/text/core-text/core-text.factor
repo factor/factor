@@ -2,10 +2,8 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors cache core-graphics.types core-text
 core-text.fonts io.encodings.string io.encodings.utf16n kernel
-locals math math.vectors namespaces sequences ui.text
-ui.text.private ;
+math math.vectors namespaces sequences ui.text ui.text.private ;
 IN: ui.text.core-text
-
 SINGLETON: core-text-renderer
 
 <PRIVATE

@@ -1,8 +1,8 @@
 ! Copyright (C) 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors assocs cache combinators images images.loader kernel math
-memoize namespaces opengl opengl.textures sequences splitting system
-ui.gadgets.worlds vocabs ;
+USING: accessors assocs cache combinators images images.loader
+kernel math namespaces opengl opengl.textures sequences
+splitting system ui.gadgets.worlds vocabs ;
 IN: ui.images
 
 TUPLE: image-name path ;
