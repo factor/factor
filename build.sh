@@ -82,6 +82,8 @@ ensure_program_installed() {
 }
 
 check_ret() {
+    # Can't execute any commands before saving $?
+    # $1 is the name of the command we are checking
     RET=$?
     if [[ $RET -ne 0 ]] ; then
        $ECHO $1 failed
@@ -681,6 +683,7 @@ copy_fresh_image() {
 
 bootstrap() {
     ./$FACTOR_BINARY -i=$BOOT_IMAGE
+    check_ret "./$FACTOR_BINARY bootstrap failed"
     copy_fresh_image
 }
 
