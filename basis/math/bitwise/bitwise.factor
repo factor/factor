@@ -150,3 +150,12 @@ M: object bit-count
 : even-parity? ( obj -- ? ) bit-count even? ;
 
 : odd-parity? ( obj -- ? ) bit-count odd? ;
+
+: d>w/w ( d -- w1 w2 )
+    [ 0xffffffff bitand ] [ -32 shift 0xffffffff bitand ] bi ;
+
+: w>h/h ( w -- h1 h2 )
+    [ 0xffff bitand ] [ -16 shift 0xffff bitand ] bi ;
+
+: h>b/b ( h -- b1 b2 )
+    [ 0xff bitand ] [ -8 shift 0xff bitand ] bi ;

@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs byte-arrays byte-vectors classes
 combinators definitions fry generic generic.single
-generic.standard hashtables io.binary kernel kernel.private math
+generic.standard hashtables kernel kernel.private math
 math.parser parser sbufs sequences sequences.private splitting
 strings vectors words ;
 IN: hints
@@ -122,15 +122,6 @@ set-specializer
 \ member-eq? { { array } { string } } set-specializer
 
 \ assoc-stack { vector } set-specializer
-
-{ >le >be } [
-    { { fixnum fixnum } { bignum fixnum } }
-    set-specializer
-] each
-
-{ le> be> } [
-    { byte-array } set-specializer
-] each
 
 \ base> { string fixnum } set-specializer
 

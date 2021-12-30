@@ -1,7 +1,7 @@
 ! Copyright (C) 2007 Gavin Harrison
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel math sequences kernel.private namespaces arrays io
-io.files splitting grouping io.binary math.functions vectors
+io.files splitting grouping math.functions vectors endian
 quotations combinators io.encodings.binary ;
 IN: icfp.2006
 

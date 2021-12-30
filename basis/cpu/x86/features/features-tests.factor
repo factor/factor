@@ -1,5 +1,5 @@
 USING: cpu.x86.features tools.test kernel sequences math math.order
-strings system io.binary ;
+strings system endian ;
 IN: cpu.x86.features.tests
 
 [ t ] [ sse-version 0 42 between? ] unit-test

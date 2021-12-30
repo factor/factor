@@ -1,7 +1,7 @@
 ! Copyright (C) 2013 John Benediktsson
 ! See http://factorcode.org/license.txt for BSD license
 
-USING: checksums grouping io.binary kernel locals math sequences
+USING: checksums endian grouping kernel locals math sequences
 ;
 
 IN: checksums.fletcher

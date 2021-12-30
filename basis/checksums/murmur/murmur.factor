@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 
 USING: accessors alien alien.c-types alien.data byte-arrays
-checksums fry grouping io.binary kernel math math.bitwise
+checksums endian fry grouping kernel math math.bitwise
 math.ranges sequences ;
 
 IN: checksums.murmur

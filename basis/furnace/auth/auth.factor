@@ -1,8 +1,8 @@
 ! Copyright (c) 2008, 2010 Slava Pestov
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors assocs namespaces kernel sequences sets
-destructors combinators fry logging io.encodings.utf8
-io.encodings.string io.binary io.sockets.secure random checksums
+destructors combinators endian fry logging io.encodings.utf8
+io.encodings.string io.sockets.secure random checksums
 checksums.sha urls
 html.forms
 http.server
