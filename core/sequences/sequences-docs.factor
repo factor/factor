@@ -1280,7 +1280,7 @@ HELP: map-sum
 { $examples
     { $example
         "USING: math ranges sequences prettyprint ;"
-        "100 [1,b] [ sq ] map-sum ."
+        "100 [1..b] [ sq ] map-sum ."
         "338350"
     }
 } ;
@@ -1291,7 +1291,7 @@ HELP: count
 { $examples
     { $example
         "USING: math ranges sequences prettyprint ;"
-        "100 [1,b] [ even? ] count ."
+        "100 [1..b] [ even? ] count ."
         "50"
     }
 } ;

@@ -80,7 +80,7 @@ Some other simple things you can try in the listener:
 
 { 4 8 15 16 23 42 } [ 2 * ] map .
 
-1000 [1,b] sum .
+1000 [1..b] sum .
 
 4 <iota> [
     "Happy Birthday " write
