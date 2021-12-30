@@ -222,7 +222,6 @@ ARTICLE: "io" "Input and output"
 }
 { $heading "Utilities" }
 { $subsections
-    "stream-binary"
     "io.styles"
     "checksums"
 }
