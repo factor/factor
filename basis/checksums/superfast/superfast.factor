@@ -19,7 +19,7 @@ C: <superfast> superfast
     [ -11 shift ] [ + ] bi ; inline
 
 : main-loop ( seq hash -- seq hash' )
-    over byte-array? little-endian? and [
+    over byte-array? alien.data:little-endian? and [
         [ 0 over length 4 - 4 <range> ] dip
         [ pick <displaced-alien> int deref (main-loop) ] reduce
     ] [
