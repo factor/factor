@@ -38,7 +38,7 @@ IN: math.functions.tests
 { 0 } [ 0 3.0 ^ ] unit-test
 { 0 } [ 0 3 ^ ] unit-test
 
-: factorial ( n -- n! ) [ 1 ] [ [1,b] 1 [ * ] reduce ] if-zero ;
+: factorial ( n -- n! ) [ 1 ] [ [1..b] 1 [ * ] reduce ] if-zero ;
 
 { 0.0 0 } [ 0 frexp ] unit-test
 { 0.5 1 } [ 1 frexp ] unit-test

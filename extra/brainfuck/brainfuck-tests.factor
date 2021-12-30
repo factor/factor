@@ -67,7 +67,7 @@ math.parser ranges sequences splitting tools.test ;
 
 ! Squares of numbers from 0 to 100
 
-${ 100 [0,b] [ dup * number>string ] map join-lines "\n" append }
+${ 100 [0..b] [ dup * number>string ] map join-lines "\n" append }
 [
     "
     ++++[>+++++<-]>[<+++++>-]+<+[

@@ -39,7 +39,7 @@ IN: picomath
     supremum 1e-3 <
 ] unit-test
 
-: factorial ( n -- n! ) [ 1 ] [ [1,b] 1 [ * ] reduce ] if-zero ;
+: factorial ( n -- n! ) [ 1 ] [ [1..b] 1 [ * ] reduce ] if-zero ;
 
 { t } [
     { 0 1 10 100 1000 10000 } [
