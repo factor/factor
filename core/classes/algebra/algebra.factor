@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs classes classes.private
 combinators kernel make math math.order namespaces sequences
-sets sorting vectors words ;
+sets sorting vectors ;
 IN: classes.algebra
 
 DEFER: sort-classes
