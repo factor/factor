@@ -215,21 +215,21 @@ PRIVATE>
 
 PRIVATE>
 
-: linspace[a,b) ( a b length -- seq )
+: linspace[a..b) ( a b length -- seq )
     steps ..b) <range> ;
 
-: linspace[a,b] ( a b length -- seq )
+: linspace[a..b] ( a b length -- seq )
     {
         { [ dup 1 < ] [ 3drop { } ] }
         { [ dup 1 = ] [ 2drop 1array ] }
         [ 1 - steps <range> ]
     } cond ;
 
-: logspace[a,b) ( a b length base -- seq )
-    [ linspace[a,b) ] dip swap n^v ;
+: logspace[a..b) ( a b length base -- seq )
+    [ linspace[a..b) ] dip swap n^v ;
 
-: logspace[a,b] ( a b length base -- seq )
-    [ linspace[a,b] ] dip swap n^v ;
+: logspace[a..b] ( a b length base -- seq )
+    [ linspace[a..b] ] dip swap n^v ;
 
 : majority ( seq -- elt/f )
     [ f 0 ] dip [

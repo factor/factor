@@ -87,8 +87,8 @@ tools.test ;
     { 0 1 0 0 2 3 }
 } [ { 1 2 1 1 3 4 } unique-indices ] unit-test
 
-{ { 1 8+4/5 16+3/5 24+2/5 32+1/5 } } [ 1 40 5 linspace[a,b) >array ] unit-test
-{ { 1 10+3/4 20+1/2 30+1/4 40 } } [ 1 40 5 linspace[a,b] >array ] unit-test
+{ { 1 8+4/5 16+3/5 24+2/5 32+1/5 } } [ 1 40 5 linspace[a..b) >array ] unit-test
+{ { 1 10+3/4 20+1/2 30+1/4 40 } } [ 1 40 5 linspace[a..b] >array ] unit-test
 
 { f } [ { } majority ] unit-test
 { 1 } [ { 1 } majority ] unit-test
@@ -113,7 +113,7 @@ tools.test ;
         12345.68 12345.679 12345.6789 12345.6789 12345.678901
         12345.6789012 12345.67890123 12345.678901235
     }
-} [ 12345.67890123456 -6 9 [a,b] [ round-to-decimal ] with map ] unit-test
+} [ 12345.67890123456 -6 9 [a..b] [ round-to-decimal ] with map ] unit-test
 
 { 0 } [ 0 5 round-to-step ] unit-test
 { 0 } [ 1 5 round-to-step ] unit-test
