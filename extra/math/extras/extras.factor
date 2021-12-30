@@ -5,7 +5,7 @@ USING: accessors arrays assocs assocs.extras byte-arrays
 combinators combinators.short-circuit compression.zlib fry
 grouping kernel locals math math.bitwise math.combinatorics
 math.constants math.functions math.order math.primes
-math.primes.factors math.ranges math.ranges.private
+math.primes.factors ranges ranges.private
 math.statistics math.vectors memoize parser random sequences
 sequences.extras sequences.private sets sorting sorting.extras ;
 

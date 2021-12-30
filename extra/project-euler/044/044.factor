@@ -1,6 +1,6 @@
 ! Copyright (c) 2008 Aaron Schaefer.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel math math.functions math.ranges math.order
+USING: kernel math math.functions ranges math.order
 project-euler.common sequences layouts ;
 IN: project-euler.044
 

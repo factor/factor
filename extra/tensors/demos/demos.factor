@@ -3,7 +3,7 @@
 ! Code based on https://towardsdatascience.com/linear-regression-from-scratch-with-numpy-implementation-finally-8e617d8e274c
 
 USING: arrays accessors csv io io.encodings.utf8 kernel locals math math.parser
-math.ranges math.statistics prettyprint sequences tensors ;
+ranges math.statistics prettyprint sequences tensors ;
 IN: tensors.demos
 
 <PRIVATE

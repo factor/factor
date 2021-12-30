@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license
 
 USING: assocs combinators.short-circuit kernel make math
-math.order math.parser math.ranges regexp sequences splitting
+math.order math.parser ranges regexp sequences splitting
 strings ;
 
 IN: html.entities

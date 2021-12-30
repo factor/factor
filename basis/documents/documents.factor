@@ -1,6 +1,6 @@
 ! Copyright (C) 2006, 2009 Slava Pestov
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays kernel math math.order math.ranges
+USING: accessors arrays kernel math math.order ranges
 models sequences splitting ;
 IN: documents
 

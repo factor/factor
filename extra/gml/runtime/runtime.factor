@@ -1,6 +1,6 @@
 ! Copyright (C) 2010 Slava Pestov.
 USING: accessors arrays assocs fry generic.parser kernel locals
-locals.parser macros math math.ranges memoize parser sequences
+locals.parser macros math ranges memoize parser sequences
 sequences.private strings strings.parser lexer namespaces
 vectors words generalizations sequences.generalizations
 effects.parser gml.types ;

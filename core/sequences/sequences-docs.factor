@@ -1279,7 +1279,7 @@ HELP: map-sum
 { $description "Like " { $snippet "map sum" } ", but without creating an intermediate sequence." }
 { $examples
     { $example
-        "USING: math math.ranges sequences prettyprint ;"
+        "USING: math ranges sequences prettyprint ;"
         "100 [1,b] [ sq ] map-sum ."
         "338350"
     }
@@ -1290,7 +1290,7 @@ HELP: count
 { $description "Efficiently returns the number of elements that the predicate quotation matches." }
 { $examples
     { $example
-        "USING: math math.ranges sequences prettyprint ;"
+        "USING: math ranges sequences prettyprint ;"
         "100 [1,b] [ even? ] count ."
         "50"
     }
@@ -1759,7 +1759,7 @@ ARTICLE: "sequences-integers" "Counted loops"
 $nl
 "Combinators that produce new sequences, such as " { $link map } ", will output an array if the input is an instance of " { $link <iota> } "."
 $nl
-"More elaborate counted loops can be performed with " { $link "math.ranges" } "." ;
+"More elaborate counted loops can be performed with " { $link "ranges" } "." ;
 
 ARTICLE: "sequences-if" "Control flow with sequences"
 "To reduce the boilerplate of checking if a sequence is empty, several combinators are provided."
@@ -2085,7 +2085,7 @@ $nl
 "Using sequences for looping:"
 { $subsections
     "sequences-integers"
-    "math.ranges"
+    "ranges"
 }
 "Using sequences for control flow:"
 { $subsections "sequences-if" }

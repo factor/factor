@@ -3,7 +3,7 @@
 USING: accessors byte-arrays calendar checksums
 checksums.openssl classes.tuple formatting io.encodings.ascii
 io.encodings.string kernel literals math math.functions
-math.parser math.ranges present random sequences splitting ;
+math.parser ranges present random sequences splitting ;
 IN: hashcash
 
 ! Hashcash implementation

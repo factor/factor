@@ -1,6 +1,6 @@
 ! Copyright (c) 2009 Guillaume Nargeot.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: hash-sets kernel math.ranges project-euler.common
+USING: hash-sets kernel ranges project-euler.common
 sequences sets ;
 IN: project-euler.074
 

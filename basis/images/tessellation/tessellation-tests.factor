@@ -1,4 +1,4 @@
-USING: images accessors kernel tools.test literals math.ranges
+USING: images accessors kernel tools.test literals ranges
 byte-arrays ;
 IN: images.tessellation
 

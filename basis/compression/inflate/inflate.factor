@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs byte-vectors combinators
 combinators.smart compression.huffman endian fry hashtables
-kernel literals locals math math.bitwise math.order math.ranges
+kernel literals locals math math.bitwise math.order ranges
 sequences sorting memoize combinators.short-circuit byte-arrays ;
 QUALIFIED-WITH: bitstreams bs
 IN: compression.inflate

@@ -1,6 +1,6 @@
 USING: accessors arrays calendar colors.constants
 combinators.short-circuit fonts fry kernel literals locals math
-math.order math.ranges math.vectors namespaces opengl random
+math.order ranges math.vectors namespaces opengl random
 sequences timers ui ui.commands ui.gadgets ui.gadgets.worlds
 ui.gestures ui.pens.solid ui.render ui.text ;
 

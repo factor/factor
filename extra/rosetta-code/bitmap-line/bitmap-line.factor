@@ -1,7 +1,7 @@
 ! Copyright (c) 2012 Anonymous
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays kernel locals math math.functions
-math.ranges math.vectors rosetta-code.bitmap sequences
+ranges math.vectors rosetta-code.bitmap sequences
 ui.gadgets ;
 IN: rosetta-code.bitmap-line
 

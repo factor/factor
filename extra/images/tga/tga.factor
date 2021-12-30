@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors endian images images.loader io kernel
 locals math sequences io.encodings.ascii io.encodings.string
-calendar math.ranges math.parser colors arrays hashtables
+calendar ranges math.parser colors arrays hashtables
 ui.pixel-formats combinators continuations io.streams.throwing ;
 IN: images.tga
 

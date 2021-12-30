@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: alien.c-types alien.data byte-arrays combinators
 combinators.smart grouping hints kernel math math.bitwise
-math.ranges namespaces sequences sequences.generalizations ;
+ranges namespaces sequences sequences.generalizations ;
 IN: endian
 
 SINGLETONS: big-endian little-endian ;

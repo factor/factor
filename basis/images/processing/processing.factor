@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays byte-arrays combinators grouping images
 kernel locals math math.order
-math.ranges math.vectors sequences sequences.deep fry ;
+ranges math.vectors sequences sequences.deep fry ;
 IN: images.processing
 
 : coord-matrix ( dim -- m )

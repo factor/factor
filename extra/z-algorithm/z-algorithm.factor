@@ -1,6 +1,6 @@
 ! Copyright (C) 2010 Dmitry Shubin.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: arrays kernel locals math math.ranges sequences
+USING: arrays kernel locals math ranges sequences
 sequences.private ;
 IN: z-algorithm
 

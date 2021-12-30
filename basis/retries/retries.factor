@@ -1,7 +1,7 @@
 ! Copyright (C) 2021 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays calendar combinators combinators.smart
-continuations kernel math math.functions math.parser math.ranges
+continuations kernel math math.functions math.parser ranges
 namespaces prettyprint random sequences system threads ;
 IN: retries
 

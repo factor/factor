@@ -1,5 +1,5 @@
 USING: fry kernel math math.bitwise math.primes.erato
-math.ranges sequences tools.test ;
+ranges sequences tools.test ;
 
 { B{ 255 251 247 126 } } [ 100 sieve ] unit-test
 [ 1 100 sieve marked-prime? ] [ bounds-error? ] must-fail-with

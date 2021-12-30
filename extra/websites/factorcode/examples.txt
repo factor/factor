@@ -87,7 +87,7 @@ ascii file-lines { "%" } split random
 [ print ] each
 ----
 USING: combinators io kernel locals
-math.functions math.parser math.ranges
+math.functions math.parser ranges
 sequences ;
 
 100 [1,b] [| i |

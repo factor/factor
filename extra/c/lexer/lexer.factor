@@ -1,7 +1,7 @@
 ! Copyright (C) 2009 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors combinators combinators.short-circuit
-generalizations kernel locals math.order math.ranges
+generalizations kernel locals math.order ranges
 sequences.parser sequences sequences.generalizations
 sorting.functor sorting.slots unicode ;
 IN: c.lexer

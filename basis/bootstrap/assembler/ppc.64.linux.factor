@@ -1,6 +1,6 @@
 ! Copyright (C) 2011 Erik Charlebois.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: parser system kernel sequences math math.ranges
+USING: parser system kernel sequences math ranges
 cpu.ppc.assembler combinators compiler.constants
 bootstrap.image.private layouts namespaces ;
 IN: bootstrap.ppc

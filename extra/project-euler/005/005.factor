@@ -1,6 +1,6 @@
 ! Copyright (c) 2007, 2009 Aaron Schaefer.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: math math.functions math.ranges project-euler.common sequences ;
+USING: math math.functions ranges project-euler.common sequences ;
 IN: project-euler.005
 
 ! http://projecteuler.net/index.php?section=problems&id=5

@@ -1,4 +1,4 @@
-USING: arrays kernel math math.functions math.order math.ranges
+USING: arrays kernel math math.functions math.order ranges
 math.vectors sequences tools.test ;
 IN: math.statistics
 

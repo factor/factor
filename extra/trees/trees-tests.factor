@@ -1,5 +1,5 @@
 USING: accessors arrays assocs combinators fry kernel locals
-math math.combinatorics math.ranges namespaces random sequences
+math math.combinatorics ranges namespaces random sequences
 sequences.product tools.test trees trees.private ;
 IN: trees.tests
 
