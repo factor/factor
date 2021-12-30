@@ -25,7 +25,7 @@ IN: hashcash
 ! Random salt is formed by ascii characters
 ! between 33 and 126
 CONSTANT: available-chars $[
-    CHAR: : 33 126 [a,b] remove >byte-array
+    CHAR: : 33 126 [a..b] remove >byte-array
 ]
 
 PRIVATE>

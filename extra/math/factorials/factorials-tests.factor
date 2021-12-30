@@ -14,7 +14,7 @@ USING: kernel math.factorials math.functions math.ranges sequences tools.test ;
         1/0. 1/105 1/0. -1/15 1/0. 1/3 1/0. -1 1/0.
         1 1 1 2 3 8 15 48 105 384 945 3840
     }
-} [ -10 10 [a,b] [ double-factorial ] map ] unit-test
+} [ -10 10 [a..b] [ double-factorial ] map ] unit-test
 
 { 1 } [ 10 10 factorial/ ] unit-test
 { 720 } [ 10 7 factorial/ ] unit-test

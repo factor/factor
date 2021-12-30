@@ -481,7 +481,7 @@ simd-classes [
         _ [ [
             _ new
             [ [ length <iota> ] keep like ]
-            [ [ length dup dup + [a,b) ] keep like ] bi [ ] 2sequence
+            [ [ length dup dup + [a..b) ] keep like ] bi [ ] 2sequence
         ] dip '[ _ vshuffle2-elements ] ]
         [ = ] check-optimizer
     ] unit-test
