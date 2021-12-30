@@ -1,6 +1,6 @@
 ! Copyright (C) 2015 Alexander Ilin, Doug Coleman, John Benediktsson.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: assocs fry kernel locals math math.ranges math.statistics
+USING: assocs fry kernel locals math ranges math.statistics
 math.vectors prettyprint random sequences sorting ;
 IN: rosetta-code.dice7
 

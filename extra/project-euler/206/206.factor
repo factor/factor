@@ -1,7 +1,7 @@
 ! Copyright (c) 2010 Aaron Schaefer. All rights reserved.
 ! The contents of this file are licensed under the Simplified BSD License
 ! A copy of the license is available at http://factorcode.org/license.txt
-USING: grouping kernel math math.ranges project-euler.common
+USING: grouping kernel math ranges project-euler.common
 sequences sequences.cords assocs ;
 IN: project-euler.206
 

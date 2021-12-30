@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays combinators command-line io kernel math
 math.functions math.parser math.primes.pollard-rho-brent
-math.ranges math.statistics namespaces sequences
+ranges math.statistics namespaces sequences
 sequences.product sets sorting splitting ;
 IN: math.primes.factors
 

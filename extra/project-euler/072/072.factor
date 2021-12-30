@@ -1,6 +1,6 @@
 ! Copyright (c) 2009 Guillaume Nargeot.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel math math.primes.factors math.ranges
+USING: kernel math math.primes.factors ranges
 project-euler.common sequences ;
 IN: project-euler.072
 

@@ -1,4 +1,4 @@
-USING: help.markup help.syntax math math.ranges ui.gadgets
+USING: help.markup help.syntax math ranges ui.gadgets
 ui.gadgets.sliders.private ;
 IN: ui.gadgets.sliders
 

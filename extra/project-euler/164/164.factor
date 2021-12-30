@@ -1,6 +1,6 @@
 ! Copyright (c) 2008 Eric Mertens.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: arrays assocs kernel math math.ranges sequences project-euler.common ;
+USING: arrays assocs kernel math ranges sequences project-euler.common ;
 IN: project-euler.164
 
 ! http://projecteuler.net/index.php?section=problems&id=164

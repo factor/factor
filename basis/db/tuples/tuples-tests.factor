@@ -2,7 +2,7 @@
 ! Copyright (C) 2018 Alexander Ilin.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors calendar calendar.parser classes continuations
-db.tester db.tuples db.types kernel math math.intervals math.ranges
+db.tester db.tuples db.types kernel math math.intervals ranges
 namespaces random sequences sorting strings tools.test urls ;
 IN: db.tuples.tests
 

@@ -1,7 +1,7 @@
 ! Copyright (C) 2012 John Benediktsson
 ! See http://factorcode.org/license.txt for BSD license
 
-USING: arrays kernel math math.extras math.ranges sequences
+USING: arrays kernel math math.extras ranges sequences
 tools.test ;
 
 { 7 } [ 4 2 stirling ] unit-test

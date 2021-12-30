@@ -1,4 +1,4 @@
-USING: kernel locals math math.ranges sequences ;
+USING: kernel locals math ranges sequences ;
 IN: rosetta-code.josephus-problem
 
 ! http://rosettacode.org/wiki/Josephus_problem

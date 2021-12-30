@@ -3,7 +3,7 @@
 USING: accessors arrays classes.singleton columns combinators
 combinators.short-circuit combinators.smart formatting fry
 grouping kernel locals math math.bits math.functions math.order
-math.private math.ranges math.statistics math.vectors
+math.private ranges math.statistics math.vectors
 math.vectors.private sequences sequences.deep sequences.private
 slots.private summary ;
 IN: math.matrices

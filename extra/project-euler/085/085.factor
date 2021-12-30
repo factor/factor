@@ -1,6 +1,6 @@
 ! Copyright (c) 2009 Guillaume Nargeot.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors kernel math math.ranges project-euler.common
+USING: accessors kernel math ranges project-euler.common
 sequences locals ;
 IN: project-euler.085
 

@@ -1,4 +1,4 @@
-USING: math.ranges kernel random sequences arrays combinators ;
+USING: ranges kernel random sequences arrays combinators ;
 IN: chess960
 
 SYMBOLS: pawn rook knight bishop queen king ;

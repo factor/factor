@@ -18,14 +18,14 @@ CONSTANT: word-renames {
     { "string-lines" { "splitting:split-lines" "0.99" } }
     { "[-inf,a)" { "math.intervals:[-inf,b)" "0.99" } }
     { "[-inf,a]" { "math.intervals:[-inf,b]" "0.99" } }
-    { "(a,b)" { "math.ranges:(a..b)" "0.99" } }
-    { "(a,b]" { "math.ranges:(a..b]" "0.99" } }
-    { "[a,b)" { "math.ranges:[a..b)" "0.99" } }
-    { "[a,b]" { "math.ranges:[a..b]" "0.99" } }
-    { "[0,b)" { "math.ranges:[0..b)" "0.99" } }
-    { "[0,b]" { "math.ranges:[0..b]" "0.99" } }
-    { "[1,b)" { "math.ranges:[1..b)" "0.99" } }
-    { "[1,b]" { "math.ranges:[1..b]" "0.99" } }
+    { "(a,b)" { "ranges:(a..b)" "0.99" } }
+    { "(a,b]" { "ranges:(a..b]" "0.99" } }
+    { "[a,b)" { "ranges:[a..b)" "0.99" } }
+    { "[a,b]" { "ranges:[a..b]" "0.99" } }
+    { "[0,b)" { "ranges:[0..b)" "0.99" } }
+    { "[0,b]" { "ranges:[0..b]" "0.99" } }
+    { "[1,b)" { "ranges:[1..b)" "0.99" } }
+    { "[1,b]" { "ranges:[1..b]" "0.99" } }
     { "assoc-merge" { "assocs.extras:assoc-collect" "0.99" } }
     { "assoc-merge!" { "assocs.extras:assoc-collect!" "0.99" } }
     { "peek-from" { "modern.html:peek1-from" "0.99" } }

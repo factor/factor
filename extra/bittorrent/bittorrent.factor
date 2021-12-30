@@ -5,7 +5,7 @@ calendar checksums checksums.sha combinators destructors endian
 fry grouping http.client io io.encodings.binary io.files
 io.pathnames io.sockets io.streams.byte-array io.streams.duplex
 kernel literals locals make math math.bitwise math.functions
-math.order math.parser math.ranges multiline namespaces
+math.order math.parser ranges multiline namespaces
 prettyprint random sequences splitting strings timers
 tools.annotations ui ui.gadgets.panes ui.tools.listener urls
 urls.encoding ;

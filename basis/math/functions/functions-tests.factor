@@ -1,5 +1,5 @@
 USING: kernel literals math math.constants math.functions math.libm
-math.order math.ranges math.private sequences tools.test math.floats.env ;
+math.order ranges math.private sequences tools.test math.floats.env ;
 
 IN: math.functions.tests
 

@@ -2,7 +2,7 @@
 ! Some parts Copyright (C) 2008 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs byte-arrays crypto.aes.utils
-generalizations kernel literals math math.bitwise math.ranges
+generalizations kernel literals math math.bitwise ranges
 namespaces sequences sequences.private sequences.unrolled ;
 IN: crypto.aes
 

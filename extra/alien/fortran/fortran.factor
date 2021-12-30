@@ -6,7 +6,7 @@ generalizations kernel lexer macros math math.parser namespaces
 parser sequences sequences.generalizations splitting
 stack-checker vectors vocabs.parser words locals
 io.encodings.ascii io.encodings.string shuffle effects
-math.ranges math.order sorting strings system alien.libraries ;
+ranges math.order sorting strings system alien.libraries ;
 QUALIFIED-WITH: alien.c-types c
 IN: alien.fortran
 

@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license
 
 USING: combinators kernel locals math math.extras
-math.extras.private math.functions math.ranges random sequences ;
+math.extras.private math.functions ranges random sequences ;
 
 IN: math.primes.solovay-strassen
 

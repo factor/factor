@@ -1,6 +1,6 @@
 ! Copyright (c) 2012 Anonymous
 ! See http://factorcode.org/license.txt for BSD license.
-USING: bit-arrays formatting fry kernel math math.ranges
+USING: bit-arrays formatting fry kernel math ranges
 sequences ;
 IN: rosetta-code.100-doors
 

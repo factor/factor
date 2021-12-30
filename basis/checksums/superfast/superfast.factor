@@ -3,7 +3,7 @@
 
 USING: accessors alien alien.c-types alien.data byte-arrays
 checksums combinators endian fry grouping kernel math
-math.bitwise math.ranges sequences sequences.private ;
+math.bitwise ranges sequences sequences.private ;
 
 IN: checksums.superfast
 

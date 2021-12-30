@@ -1,6 +1,6 @@
 ! Copyright (C) 2019 Alexander Ilin.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: fry literals math.ranges random sequences ;
+USING: fry literals ranges random sequences ;
 IN: random.passwords
 
 <PRIVATE

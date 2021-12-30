@@ -1,7 +1,7 @@
 ! Copyright (C) 2006, 2010 Slava Pestov
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays assocs classes continuations hashtables kernel
-make math math.functions math.parser math.ranges namespaces
+make math math.functions math.parser ranges namespaces
 quotations regexp sequences sets unicode words xmode.catalog ;
 IN: validators
 

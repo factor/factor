@@ -1,7 +1,7 @@
 ! Copyright (C) 2008 Alex Chapman
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors alien combinators kernel locals math
-math.ranges openal sequences sequences.merged specialized-arrays ;
+ranges openal sequences sequences.merged specialized-arrays ;
 FROM: alien.c-types => short uchar ;
 SPECIALIZED-ARRAY: uchar
 SPECIALIZED-ARRAY: short

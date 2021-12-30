@@ -1,7 +1,7 @@
 ! Copyright (c) 2009 Guillaume Nargeot.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: fry io.encodings.ascii io.files locals kernel math
-math.order math.parser math.ranges sequences splitting
+math.order math.parser ranges sequences splitting
 project-euler.common ;
 IN: project-euler.081
 

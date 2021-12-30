@@ -1,6 +1,6 @@
 ! Copyright (c) 2007 Aaron Schaefer.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: combinators.short-circuit kernel make math math.functions math.ranges
+USING: combinators.short-circuit kernel make math math.functions ranges
     sequences project-euler.common ;
 IN: project-euler.014
 

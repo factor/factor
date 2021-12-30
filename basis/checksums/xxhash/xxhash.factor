@@ -3,7 +3,7 @@
 
 USING: accessors alien alien.c-types alien.data byte-arrays
 checksums combinators endian generalizations grouping kernel
-locals math math.bitwise math.ranges sequences
+locals math math.bitwise ranges sequences
 specialized-arrays ;
 SPECIALIZED-ARRAY: uint64_t
 

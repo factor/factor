@@ -1,7 +1,7 @@
 ! Copyright (C) 2021 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays kernel make math math.order math.primes
-math.ranges random sorting ;
+ranges random sorting ;
 IN: math.primes.pollard-rho-brent
 
 ! https://comeoncodeon.wordpress.com/2010/09/18/pollard-rho-brent-integer-factorization/
