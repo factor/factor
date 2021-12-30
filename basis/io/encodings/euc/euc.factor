@@ -1,8 +1,9 @@
 ! Copyright (C) 2009 Daniel Ehrenberg, Jonghyouk Yun.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel io.encodings accessors assocs sequences biassocs generic
-math.order simple-flat-file io io.binary byte-arrays locals combinators
-words classes.singleton fry classes.parser parser quotations ;
+USING: accessors assocs biassocs byte-arrays classes.parser
+classes.singleton combinators endian generic io io.encodings
+kernel math.bitwise math.order parser sequences simple-flat-file
+words ;
 IN: io.encodings.euc
 
 TUPLE: euc { table biassoc read-only } ;

@@ -1,10 +1,11 @@
 ! Copyright (C) 2013 John Benediktsson.
 ! See http://factorcode.org/license.txt for BSD license.
 
-USING: accessors assocs combinators formatting fry grouping hashtables
-io io.binary io.directories io.encodings.binary io.files
-io.files.types io.pathnames kernel math math.parser memoize pack
-sequences sequences.generalizations splitting strings system ;
+USING: accessors assocs combinators formatting endian fry
+grouping hashtables io io.directories io.encodings.binary
+io.files io.files.types io.pathnames kernel math math.parser
+memoize pack sequences sequences.generalizations splitting
+strings system ;
 
 IN: terminfo
 

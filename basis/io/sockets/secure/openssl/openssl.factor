@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors alien alien.c-types alien.data alien.enums
 alien.strings assocs byte-arrays classes.struct combinators
-combinators.short-circuit destructors io io.backend io.binary
+combinators.short-circuit destructors endian io io.backend
 io.buffers io.encodings.latin1 io.encodings.string
 io.encodings.utf8 io.files io.pathnames io.ports io.sockets
 io.sockets.secure io.timeouts kernel libc math math.functions

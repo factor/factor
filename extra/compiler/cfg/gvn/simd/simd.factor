@@ -2,8 +2,8 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors combinators combinators.short-circuit arrays
 fry kernel layouts math namespaces sequences cpu.architecture
-math.bitwise math.order classes generalizations
-locals make alien.c-types io.binary grouping
+math.bitwise math.order classes endian generalizations
+locals make alien.c-types grouping
 math.vectors.simd.intrinsics
 compiler.cfg
 compiler.cfg.registers

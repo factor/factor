@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 
 USING: arrays asn1.ldap assocs byte-arrays combinators
-continuations io io.binary io.streams.string kernel math
+continuations endian io io.streams.string kernel math
 math.parser namespaces make pack strings sequences accessors ;
 
 IN: asn1

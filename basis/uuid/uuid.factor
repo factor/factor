@@ -1,7 +1,7 @@
 ! Copyright (C) 2008 John Benediktsson
 ! See http://factorcode.org/license.txt for BSD license
 USING: byte-arrays calendar checksums checksums.md5
-checksums.sha io.binary kernel math math.parser math.ranges
+checksums.sha endian kernel math math.parser math.ranges
 random sequences strings system unicode ;
 IN: uuid
 

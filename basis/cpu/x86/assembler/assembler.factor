@@ -1,6 +1,6 @@
 ! Copyright (C) 2005, 2010 Slava Pestov, Joe Groff.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: arrays io.binary kernel combinators
+USING: arrays endian kernel combinators
 combinators.short-circuit math math.bitwise locals namespaces
 make sequences words system layouts math.order accessors
 cpu.x86.assembler.operands cpu.x86.assembler.operands.private ;
