@@ -18,7 +18,7 @@ SINGLETONS: big-endian little-endian ;
 
 ERROR: bad-length bytes n ;
 
-: check-length ( bytes n -- bytes n )
+: check-length ( seq n -- seq n )
     2dup [ length ] dip > [ bad-length ] when ; inline
 
 <<
@@ -37,11 +37,11 @@ MACRO: reassemble-be ( n -- quot ) be-range reassemble-bytes ;
 MACRO: reassemble-le ( n -- quot ) le-range reassemble-bytes ;
 >>
 
-:: n-be> ( bytes n -- x )
-    bytes n check-length drop n firstn-unsafe n reassemble-be ; inline
+:: n-be> ( seq n -- x )
+    seq n check-length drop n firstn-unsafe n reassemble-be ; inline
 
-:: n-le> ( bytes n -- x )
-    bytes n check-length drop n firstn-unsafe n reassemble-le ; inline
+:: n-le> ( seq n -- x )
+    seq n check-length drop n firstn-unsafe n reassemble-le ; inline
 
 : if-endian ( endian bytes-quot seq-quot -- )
     [
@@ -49,33 +49,33 @@ MACRO: reassemble-le ( n -- quot ) le-range reassemble-bytes ;
         [ dup byte-array? ] [ f ] if
     ] 2dip if ; inline
 
-: 1be> ( bytes -- x )
+: 1be> ( seq -- x )
     big-endian [ uint8_t deref ] [ 1 n-be> ] if-endian ;
 
-: 2be> ( bytes -- x )
+: 2be> ( seq -- x )
     big-endian [ uint16_t deref ] [ 2 n-be> ] if-endian ;
 
-: 4be> ( bytes -- x )
+: 4be> ( seq -- x )
     big-endian [ uint32_t deref ] [ 4 n-be> ] if-endian ;
 
-: 8be> ( bytes -- x )
+: 8be> ( seq -- x )
     big-endian [ uint64_t deref ] [ 8 n-be> ] if-endian ;
 
-: 1le> ( bytes -- x )
+: 1le> ( seq -- x )
     little-endian [ uint8_t deref ] [ 1 n-le> ] if-endian ;
 
-: 2le> ( bytes -- x )
+: 2le> ( seq -- x )
     little-endian [ uint16_t deref ] [ 2 n-le> ] if-endian ;
 
-: 4le> ( bytes -- x )
+: 4le> ( seq -- x )
     little-endian [ uint32_t deref ] [ 4 n-le> ] if-endian ;
 
-: 8le> ( bytes -- x )
+: 8le> ( seq -- x )
     little-endian [ uint64_t deref ] [ 8 n-le> ] if-endian ;
 
 PRIVATE>
 
-: be> ( bytes -- x )
+: be> ( seq -- x )
     dup length {
         { 1 [ 1be> ] }
         { 2 [ 2be> ] }
@@ -84,7 +84,7 @@ PRIVATE>
         [ drop slow-be> ]
     } case ;
 
-: le> ( bytes -- x )
+: le> ( seq -- x )
     dup length {
         { 1 [ 1le> ] }
         { 2 [ 2le> ] }
@@ -98,13 +98,13 @@ PRIVATE>
 : signed> ( x seq -- n )
     length 8 * 2dup 1 - bit? [ 2^ - ] [ drop ] if ; inline
 
-: slow-signed-le> ( bytes -- x ) [ le> ] [ signed> ] bi ;
+: slow-signed-le> ( seq -- x ) [ le> ] [ signed> ] bi ;
 
-: slow-signed-be> ( bytes -- x ) [ be> ] [ signed> ] bi ;
+: slow-signed-be> ( seq -- x ) [ be> ] [ signed> ] bi ;
 
 PRIVATE>
 
-: signed-be> ( bytes -- x )
+: signed-be> ( seq -- x )
     big-endian [
         dup length {
             { 1 [ int8_t deref ] }
@@ -115,7 +115,7 @@ PRIVATE>
         } case
     ] [ slow-signed-be> ] if-endian ;
 
-: signed-le> ( bytes -- x )
+: signed-le> ( seq -- x )
     little-endian [
         dup length {
             { 1 [ int8_t deref ] }
@@ -139,7 +139,7 @@ PRIVATE>
 
 PRIVATE>
 
-: >le ( x n -- bytes )
+: >le ( x n -- byte-array )
     compute-native-endianness little-endian = [
         {
             { 2 [ int16_t <ref> ] }
@@ -149,7 +149,7 @@ PRIVATE>
         } case
     ] [ >slow-le ] if ;
 
-: >be ( x n -- bytes )
+: >be ( x n -- byte-array )
     compute-native-endianness big-endian = [
         {
             { 2 [ int16_t <ref> ] }
@@ -162,13 +162,13 @@ PRIVATE>
 SYMBOL: native-endianness
 native-endianness [ compute-native-endianness ] initialize
 
-HOOK: >native-endian native-endianness ( obj n -- bytes )
+HOOK: >native-endian native-endianness ( x n -- byte-array )
 
 M: big-endian >native-endian >be ;
 
 M: little-endian >native-endian >le ;
 
-HOOK: unsigned-native-endian> native-endianness ( obj -- bytes )
+HOOK: unsigned-native-endian> native-endianness ( x -- byte-array )
 
 M: big-endian unsigned-native-endian> be> ;
 
@@ -177,10 +177,10 @@ M: little-endian unsigned-native-endian> le> ;
 SYMBOL: endianness
 endianness [ native-endianness get-global ] initialize
 
-: signed-native-endian> ( obj n -- n' )
+: signed-native-endian> ( x n -- byte-array )
     [ unsigned-native-endian> ] dip >signed ;
 
-HOOK: >endian endianness ( obj n -- bytes )
+HOOK: >endian endianness ( x n -- byte-array )
 
 M: big-endian >endian >be ;
 
@@ -192,13 +192,13 @@ M: big-endian endian> be> ;
 
 M: little-endian endian> le> ;
 
-HOOK: unsigned-endian> endianness ( obj -- bytes )
+HOOK: unsigned-endian> endianness ( seq -- n )
 
 M: big-endian unsigned-endian> be> ;
 
 M: little-endian unsigned-endian> le> ;
 
-HOOK: signed-endian> endianness ( obj -- bytes )
+HOOK: signed-endian> endianness ( seq -- n )
 
 M: big-endian signed-endian> signed-be> ;
 
