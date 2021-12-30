@@ -1,13 +1,13 @@
 ! Copyright (C) 2021 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors assocs continuations formatting kernel
-sequences vocabs vocabs.parser ;
+USING: accessors assocs continuations kernel sequences
+vocabs vocabs.parser ;
 IN: fixups
 
 CONSTANT: vocab-renames {
     { "math.intervals" { "intervals" "0.99" } }
     { "math.ranges" { "ranges" "0.99" } }
-    { "asdfasdf" { "asdfasdf2" "0.99" } }
+    { "unicode.collation" { "unicode" "0.99" } }
 }
 
 CONSTANT: word-renames {
@@ -42,7 +42,8 @@ CONSTANT: word-renames {
         drop { }
     ] [
         swap '[
-            first2 dupd first2 "Fixup: %s renamed to %s in Factor %s" sprintf
+            first2 dupd first2
+            " in Factor " glue " renamed to " glue "Fixup: " prepend
             swap drop no-op-restart
             _ <restart>
         ] map

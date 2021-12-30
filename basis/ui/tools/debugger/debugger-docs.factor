@@ -1,5 +1,4 @@
-USING: ui.gadgets help.markup help.syntax kernel quotations
-continuations debugger ui ;
+USING: continuations help.markup help.syntax ;
 IN: ui.tools.debugger
 
 HELP: <debugger>

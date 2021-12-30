@@ -1,16 +1,12 @@
 ! Copyright (C) 2006, 2011 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays hashtables io kernel math models
-colors.constants namespaces sequences words continuations
-debugger prettyprint help editors fonts ui ui.commands
-ui.debugger ui.gestures ui.gadgets ui.pens.solid
-ui.gadgets.worlds ui.gadgets.packs ui.gadgets.buttons
-ui.gadgets.labels ui.gadgets.presentations ui.gadgets.panes
-ui.gadgets.viewports ui.gadgets.tables ui.theme
-ui.gadgets.tracks ui.gadgets.toolbar ui.gadgets.scrollers
-ui.gadgets.borders ui.gadgets.status-bar ui.theme.images
-ui.tools.traceback ui.tools.inspector ui.tools.browser
-ui.tools.common ;
+USING: accessors arrays continuations debugger editors kernel
+models namespaces sequences ui.commands ui.debugger ui.gadgets
+ui.gadgets.labels ui.gadgets.packs ui.gadgets.panes
+ui.gadgets.scrollers ui.gadgets.status-bar ui.gadgets.tables
+ui.gadgets.toolbar ui.gadgets.tracks ui.gadgets.worlds
+ui.gestures ui.tools.browser ui.tools.common ui.tools.inspector
+ui.tools.traceback ;
 IN: ui.tools.debugger
 
 TUPLE: debugger < track error restarts restart-hook restart-list continuation ;
