@@ -1,16 +1,15 @@
 ! Copyright (C) 2004, 2011 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors alien alien.strings arrays assocs classes
-classes.builtin classes.mixin classes.tuple classes.tuple.parser
-combinators combinators.short-circuit compiler.errors
-compiler.units continuations definitions destructors
-effects.parser fixups fry generic generic.math generic.parser
-generic.single grouping io io.encodings io.styles kernel
-kernel.private lexer libc make math math.order math.parser
-math.ratios namespaces parser prettyprint sequences
-sequences.private slots source-files.errors strings
-strings.parser summary system vocabs vocabs.loader vocabs.parser
-words ;
+classes.builtin classes.tuple classes.tuple.parser combinators
+combinators.short-circuit compiler.errors compiler.units
+continuations definitions destructors effects.parser fixups
+generic generic.math generic.parser generic.single grouping io
+io.encodings io.styles kernel kernel.private lexer libc make
+math math.order math.parser math.ratios namespaces parser
+prettyprint sequences sequences.private slots
+source-files.errors strings strings.parser summary system vocabs
+vocabs.loader vocabs.parser words ;
 IN: debugger
 
 GENERIC: error-help ( error -- topic )
