@@ -41,7 +41,7 @@ TUPLE: timestamp
 <<
 CONSTANT: day-counts { 0 31 28 31 30 31 30 31 31 30 31 30 31 }
 >>
-CONSTANT: days-until $[ day-counts cum-sum0 ]
+CONSTANT: cumulative-day-counts $[ day-counts cum-sum0 ]
 
 PRIVATE>
 
@@ -345,7 +345,7 @@ M: timestamp <=> [ >gmt tuple-slots ] compare ;
     [ slots{ year month } ] same? ;
 
 :: (day-of-year) ( year month day -- n )
-    month days-until nth day + {
+    month cumulative-day-counts nth day + {
         [ year leap-year? ]
         [ month 3 >= ]
     } 0&& [ 1 + ] when ;
@@ -464,6 +464,7 @@ M: duration time-
 
 : hence ( duration -- timestamp ) now swap time+ ;
 : ago ( duration -- timestamp ) now swap time- ;
+: days-until ( time -- n ) now time- duration>days ;
 
 GENERIC: days-in-year ( obj -- n )
 
