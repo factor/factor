@@ -73,7 +73,7 @@ HOOK: (file-appender) io-backend ( path -- stream )
 : file-exists? ( path -- ? )
     normalize-path native-string>alien (file-exists?) ;
 
-ALIAS: exists? file-exists?
+ALIAS: exists? file-exists? deprecated
 
 ! Current directory
 <PRIVATE
