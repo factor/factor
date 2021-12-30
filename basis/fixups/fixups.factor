@@ -12,18 +12,20 @@ CONSTANT: vocab-renames {
 
 CONSTANT: word-renames {
     { "lines" { "io:read-lines" "0.99" } }
-    { "lines" { "splitting:split-lines" "0.99" } }
     { "words" { "splitting:split-words" "0.99" } }
     { "contents" { "io:read-contents" "0.99" } }
     { "exists?" { "io.files:file-exists?" "0.99" } }
     { "string-lines" { "splitting:split-lines" "0.99" } }
-    { "split-lines" { "documents.private:?split-lines" "0.99" } }
     { "[-inf,a)" { "math.intervals:[-inf,b)" "0.99" } }
     { "[-inf,a]" { "math.intervals:[-inf,b]" "0.99" } }
     { "(a,b)" { "math.ranges:(a..b)" "0.99" } }
     { "(a,b]" { "math.ranges:(a..b]" "0.99" } }
     { "[a,b)" { "math.ranges:[a..b)" "0.99" } }
     { "[a,b]" { "math.ranges:[a..b]" "0.99" } }
+    { "[0,b)" { "math.ranges:[0..b)" "0.99" } }
+    { "[0,b]" { "math.ranges:[0..b]" "0.99" } }
+    { "[1,b)" { "math.ranges:[1..b)" "0.99" } }
+    { "[1,b]" { "math.ranges:[1..b]" "0.99" } }
     { "assoc-merge" { "assocs.extras:assoc-collect" "0.99" } }
     { "assoc-merge!" { "assocs.extras:assoc-collect!" "0.99" } }
     { "peek-from" { "modern.html:peek1-from" "0.99" } }
