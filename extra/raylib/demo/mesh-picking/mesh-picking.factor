@@ -149,7 +149,7 @@ SYMBOL: mesh-picking-frame
             ray handle-ground-hit
 
             ray triangle first3 handle-triangle-hit
-            [ dup nearest-hit>> position>> triangle first3 vector3-barycenter bary! ] [ f bary! ] if
+            [ dup nearest-hit>> point>> triangle first3 vector3-barycenter bary! ] [ f bary! ] if
 
             ray tower [ model>> ] [ bbox>> ] bi handle-mesh-hit hit-mesh-bbox!
 
