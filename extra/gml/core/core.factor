@@ -70,7 +70,7 @@ GML: flatten ( array -- flatarray )
     [ dup array? [ 1array ] unless ] map concat ;
 GML: reverse ( array -- reversed ) reverse ;
 GML: slice ( array n k -- slice )
-    [a,b) swap '[ _ wrap nth ] map ;
+    [a..b) swap '[ _ wrap nth ] map ;
 GML:: subarray ( array n k -- slice )
     k n k + array subseq ;
 GML: sort-number-permutation ( array -- permutation )

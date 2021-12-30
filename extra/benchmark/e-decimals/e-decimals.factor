@@ -8,7 +8,7 @@ IN: benchmark.e-decimals
     <iota> DECIMAL: 1 [ 0 <decimal> DECIMAL: 1 D+ D* ] reduce ; inline
 
 :: calculate-e-decimals ( n -- e )
-    n [1,b] DECIMAL: 1
+    n [1..b] DECIMAL: 1
     [ D-factorial DECIMAL: 1 swap n D/ D+ ] reduce ;
 
 : e-decimals-benchmark ( -- )

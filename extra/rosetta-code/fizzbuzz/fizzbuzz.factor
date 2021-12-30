@@ -12,6 +12,6 @@ IN: rosetta-code.fizzbuzz
     dup [ fizz ] [ buzz ] bi append [ number>string ] [ nip ] if-empty ;
 
 : fizzbuzz-main ( -- )
-    100 [1,b] [ fizzbuzz print ] each ;
+    100 [1..b] [ fizzbuzz print ] each ;
 
 MAIN: fizzbuzz-main

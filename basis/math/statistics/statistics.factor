@@ -4,7 +4,6 @@ USING: accessors arrays assocs combinators
 combinators.short-circuit fry generalizations grouping kernel
 locals math math.functions math.order math.ranges math.vectors
 sequences sequences.private sorting ;
-FROM: math.ranges => [a,b] ;
 IN: math.statistics
 
 : power-mean ( seq p -- x )
@@ -411,7 +410,7 @@ PRIVATE>
     [ demean ] [ sample-std ] bi v/n ;
 
 : dcg ( scores -- dcg )
-    dup length 1 + 2 swap [a,b] [ log 2 log /f ] map v/ sum ;
+    dup length 1 + 2 swap [a..b] [ log 2 log /f ] map v/ sum ;
 
 : ndcg ( scores -- ndcg )
     [ 0.0 ] [

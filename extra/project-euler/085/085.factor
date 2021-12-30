@@ -30,8 +30,8 @@ IN: project-euler.085
     2dup [ 1 + ] bi@ * * * 4 /i ; inline
 
 :: each-unique-product ( ... a b quot: ( ... i j -- ... ) -- ... )
-    a b [a,b] [| i |
-        i b [a,b] [| j |
+    a b [a..b] [| i |
+        i b [a..b] [| j |
             i j quot call
         ] each
     ] each ; inline

@@ -76,7 +76,7 @@ M:: sfmt generate ( sfmt -- )
         r state r2<<
     ] each
 
-    ! n m - 1 + n [a,b) [
+    ! n m - 1 + n [a..b) [
     m 1 - <iota> [
         n m - 1 + + >fixnum :> i
         i array nth-unsafe
@@ -111,7 +111,7 @@ M:: sfmt generate ( sfmt -- )
 
 : <sfmt-array> ( sfmt -- uint-array uint-4-array )
     state>>
-    [ n>> 4 * [1,b] uint >c-array ] [ seed>> ] bi
+    [ n>> 4 * [1..b] uint >c-array ] [ seed>> ] bi
     [
         [
             [ -30 shift ] [ ] bi bitxor

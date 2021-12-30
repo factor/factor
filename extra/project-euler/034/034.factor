@@ -39,7 +39,7 @@ IN: project-euler.034
 PRIVATE>
 
 : euler034 ( -- answer )
-    3 2000000 [a,b] [ factorion? ] filter sum ;
+    3 2000000 [a..b] [ factorion? ] filter sum ;
 
 ! [ euler034 ] 10 ave-time
 ! 5506 ms ave run time - 144.0 SD (10 trials)

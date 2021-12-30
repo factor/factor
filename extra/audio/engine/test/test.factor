@@ -13,7 +13,7 @@ M: noise-generator generator-audio-format
     drop 1 16 8000 ;
 M: noise-generator generate-audio
     drop
-    4096 [ -4096 4096 [a,b] random ] short-array{ } replicate-as
+    4096 [ -4096 4096 [a..b] random ] short-array{ } replicate-as
     8192 ;
 M: noise-generator dispose
     drop ;

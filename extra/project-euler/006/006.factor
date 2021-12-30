@@ -35,7 +35,7 @@ IN: project-euler.006
 PRIVATE>
 
 : euler006 ( -- answer )
-    100 [1,b] [ sum-of-squares ] [ square-of-sum ] bi - abs ;
+    100 [1..b] [ sum-of-squares ] [ square-of-sum ] bi - abs ;
 
 ! [ euler006 ] 100 ave-time
 ! 0 ms ave run time - 0.24 SD (100 trials)

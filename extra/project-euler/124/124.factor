@@ -43,7 +43,7 @@ IN: project-euler.124
     unique-factors product ; inline
 
 : rads-upto ( n -- seq )
-    [0,b] [ dup rad 2array ] map ;
+    [0..b] [ dup rad 2array ] map ;
 
 : (euler124) ( -- seq )
     100000 rads-upto sort-values ;

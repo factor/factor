@@ -91,7 +91,7 @@ TUPLE: slides < book ;
 : prev-page ( book -- ) -1 change-page ;
 
 : strip-tease ( data -- seq )
-    first3 2 over length [a,b] [ head 3array ] with with with map ;
+    first3 2 over length [a..b] [ head 3array ] with with with map ;
 
 SYNTAX: STRIP-TEASE:
     parse-definition strip-tease append! ;

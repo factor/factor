@@ -7,7 +7,7 @@ sequences ;
 IN: benchmark.combinatorics
 
 : bench-combinations ( n -- )
-    [1,b] dup clone [
+    [1..b] dup clone [
         {
             [ all-combinations drop ]
             [ [ drop ] each-combination ]

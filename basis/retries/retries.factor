@@ -47,7 +47,7 @@ GENERIC: retry-sleep-time ( retries time-strategy -- nanos/timestamp/0 )
     } cleave ;
 
 M: immediate retry-sleep-time 2drop 0 ;
-M: random-wait retry-sleep-time nip [ lo>> ] [ hi>> ] bi [a,b] random ;
+M: random-wait retry-sleep-time nip [ lo>> ] [ hi>> ] bi [a..b] random ;
 M: exponential-wait retry-sleep-time [ count>> ] [ [ exp>> ^ ] [ nanos>> * ] bi ] bi* ;
 
 : nth* ( n seq -- elt/f ? ) 2dup bounds-check? [ nth t ] [ 2drop f f ] if ;

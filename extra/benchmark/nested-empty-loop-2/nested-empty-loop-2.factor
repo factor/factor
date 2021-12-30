@@ -6,15 +6,15 @@ IN: benchmark.nested-empty-loop-2
 : times ( seq quot -- ) [ drop ] prepose each ; inline
 
 :: nested-empty-loop ( n -- )
-    1 n [a,b] [
-        1 n [a,b] [
-            1 n [a,b] [
-                1 n [a,b] [
-                    1 n [a,b] [
-                        1 n [a,b] [
-                            1 n [a,b] [
-                                1 n [a,b] [
-                                    1 n [a,b] [ ] times
+    n [1..b] [
+        n [1..b] [
+            n [1..b] [
+                n [1..b] [
+                    n [1..b] [
+                        n [1..b] [
+                            n [1..b] [
+                                n [1..b] [
+                                    n [1..b] [ ] times
                                 ] times
                             ] times
                         ] times

@@ -31,7 +31,7 @@ IN: project-euler.046
 <PRIVATE
 
 : perfect-squares ( n -- seq )
-    2 /i sqrt >integer [1,b] [ sq ] map ;
+    2 /i sqrt >integer [1..b] [ sq ] map ;
 
 : fits-conjecture? ( n -- ? )
     dup perfect-squares [ 2 * - ] with map [ prime? ] any? ;

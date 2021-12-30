@@ -121,8 +121,8 @@ M: axion move
   T{ gray f 0.06 0.59 } stroke-color set
   dup pos>> draw
 
-  1 4 [a,b] [ axion-white axion-point- ] each
-  1 4 [a,b] [ axion-black axion-point+ ] each
+  4 [1..b] [ axion-white axion-point- ] each
+  4 [1..b] [ axion-black axion-point+ ] each
 
   dup vel>> move-by
 
@@ -232,7 +232,7 @@ TUPLE: muon < particle ;
 M: muon collide
 
   dup center           >>pos
-  2 32 [a,b] random    >>speed
+  2 32 [a..b] random    >>speed
   0.0001 0.001 2random >>speed-d
 
   dup collision-theta  -0.1 0.1 2random + >>theta

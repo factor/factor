@@ -82,7 +82,7 @@ CONSTANT: keep-logs 10
     [
         log-path
         [ delete-oldest ]
-        [ keep-logs 1 [a,b] [ advance-log ] with each ] bi
+        [ keep-logs 1 [a..b] [ advance-log ] with each ] bi
     ] bi ;
 
 : (rotate-logs) ( -- )

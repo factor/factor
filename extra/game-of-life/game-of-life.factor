@@ -112,10 +112,10 @@ M: grid-gadget pref-dim*
     gadget grid>> grid-dim :> ( rows cols )
     COLOR: gray gl-color
     cols rows [ size * ] bi@ :> ( w h )
-    rows [0,b] [| j |
+    rows [0..b] [| j |
         j size * :> y
         { 0 y } { w y } gl-line
-        cols [0,b] [| i |
+        cols [0..b] [| i |
             i size * :> x
             { x 0 } { x h } gl-line
         ] each

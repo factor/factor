@@ -31,8 +31,8 @@ IN: project-euler.019
 ! the day of the week (Sunday is 0).
 
 : euler019 ( -- answer )
-    1901 2000 [a,b] [
-        12 [1,b] [ 1 (day-of-week) ] with map
+    1901 2000 [a..b] [
+        12 [1..b] [ 1 (day-of-week) ] with map
     ] map concat [ 0 = ] count ;
 
 ! [ euler019 ] 100 ave-time

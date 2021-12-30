@@ -12,7 +12,7 @@ IN: math.primes.miller-rabin
     0 :> a!
     trials <iota> [
         drop
-        2 n 2 - [a,b] random a!
+        2 n 2 - [a..b] random a!
         a s n ^mod 1 = [
             f
         ] [

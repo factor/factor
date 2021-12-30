@@ -76,9 +76,9 @@ M:: object selector-do: ( quot receiver -- nil )
 SELECTOR: to:
 SELECTOR: to:do:
 
-M: object selector-to: swap [a,b] ;
+M: object selector-to: swap [a..b] ;
 M:: object selector-to:do: ( to quot from -- nil )
-    from to [a,b] [ quot call( i -- result ) drop ] each nil ;
+    from to [a..b] [ quot call( i -- result ) drop ] each nil ;
 
 SELECTOR: value
 SELECTOR: value:

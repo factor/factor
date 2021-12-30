@@ -10,7 +10,7 @@ IN: sorting.bubble
 
 :: (bubble-sort!) ( seq quot: ( obj1 obj2 -- <=> ) -- )
     seq length 1 - [
-        f over [0,b) [| i |
+        f over [0..b) [| i |
             i i 1 + [ seq nth-unsafe ] bi@ 2dup quot call +gt+ =
             [ i 1 + i [ seq set-nth-unsafe ] bi-curry@ bi* 2drop i t ]
             [ 2drop ] if

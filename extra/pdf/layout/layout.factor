@@ -422,7 +422,7 @@ TUPLE: pdf info pages fonts ;
         dup length 16 swap 2 range boa zip
         [ pdf-page , , ] assoc-each
     ] { } make
-    dup length [1,b] zip [ first2 pdf-object ] map ;
+    dup length [1..b] zip [ first2 pdf-object ] map ;
 
 : objects>pdf ( objects -- str )
     [ join-lines "\n" append "%PDF-1.4\n" ]

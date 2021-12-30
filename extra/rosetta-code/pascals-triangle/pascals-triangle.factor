@@ -27,7 +27,7 @@ IN: rosetta-code.pascals-triangle
 ! should be noted.
 
 :: pascal-coefficients ( n -- seq )
-    1 n [1,b] [
+    1 n [1..b] [
         dupd [ n swap - * ] [ /i ] bi swap
     ] map nip ;
 

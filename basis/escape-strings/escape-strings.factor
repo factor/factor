@@ -33,7 +33,7 @@ IN: escape-strings
 : lowest-missing-number ( string-set -- min )
     members dup
     [ length ] histogram-by
-    dup keys length [0,b]
+    dup keys length [0..b]
     [ [ of ] keep over [ 10^ < ] [ nip ] if ] with find nip
     [ '[ length _ = ] filter natural-sort ] keep ! remove natural-sort here
     [

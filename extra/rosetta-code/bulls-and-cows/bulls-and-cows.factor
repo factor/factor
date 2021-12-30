@@ -40,7 +40,7 @@ TUPLE: bull ;
 : inc-bulls ( score -- score ) [ 1 + ] change-bulls ;
 : inc-cows ( score -- score ) [ 1 + ] change-cows ;
 
-: random-nums ( -- seq ) 9 [1,b] 4 sample ;
+: random-nums ( -- seq ) 9 [1..b] 4 sample ;
 
 : add-digits ( seq -- n ) 0 [ swap 10 * + ] reduce number>string ;
 

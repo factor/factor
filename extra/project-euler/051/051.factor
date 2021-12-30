@@ -45,7 +45,7 @@ SYMBOL: large-families
 : replace-positions-with-* ( str positions -- str )
     [ *-if-index ] curry map-index ;
 : all-positions-combinations ( seq -- combinations )
-    dup length [1,b] [ all-combinations ] with map concat ;
+    dup length [1..b] [ all-combinations ] with map concat ;
 
 : families ( stra -- seq )
     dup digits-positions values

@@ -20,12 +20,12 @@ IN: sequences.extras
     [ length '[ 0 _ clamp ] bi@ ] keep subseq ;
 
 : all-subseqs ( seq -- seqs )
-    dup length [1,b] [ clump ] with map concat ;
+    dup length [1..b] [ clump ] with map concat ;
 
 :: each-subseq ( ... seq quot: ( ... subseq -- ... ) -- ... )
     seq length :> len
-    len [0,b] [| from |
-        from len (a,b] [| to |
+    len [0..b] [| from |
+        from len (a..b] [| to |
             from to seq subseq quot call
         ] each
     ] each ; inline
@@ -39,7 +39,7 @@ IN: sequences.extras
     ] keepdd map-like ; inline
 
 : filter-all-subseqs ( ... seq quot: ( ... subseq -- ... ? ) -- seq )
-    [ dup length [1,b] ] dip filter-all-subseqs-range ; inline
+    [ dup length [1..b] ] dip filter-all-subseqs-range ; inline
 
 :: longest-subseq ( seq1 seq2 -- subseq )
     seq1 length :> len1
@@ -47,8 +47,8 @@ IN: sequences.extras
     0 :> n!
     0 :> end!
     len1 1 + [ len2 1 + 0 <array> ] replicate :> table
-    len1 [1,b] [| x |
-        len2 [1,b] [| y |
+    len1 [1..b] [| x |
+        len2 [1..b] [| y |
             x 1 - seq1 nth-unsafe
             y 1 - seq2 nth-unsafe = [
                 y 1 - x 1 - table nth-unsafe nth-unsafe 1 + :> len
@@ -479,7 +479,7 @@ PRIVATE>
     [ 1 ] 2dip [ dip * ] curry [ swap ] prepose each ; inline
 
 : insert-nth! ( elt n seq -- )
-    [ length ] keep ensure swap pick (a,b]
+    [ length ] keep ensure swap pick (a..b]
     over '[ [ 1 + ] keep _ move-unsafe ] each
     set-nth-unsafe ;
 
