@@ -26,7 +26,7 @@ INSTANCE: crc32 checksum
     drop [ 0xffffffff dup ] dip ; inline
 
 <PRIVATE
-: 4>be ( n -- byte-array ) ! duplicated from io.binary, but in core
+: 4>be ( n -- byte-array ) ! duplicated from endian but in core
     { -24 -16 -8 0 } [ shift 0xff bitand ] with B{ } map-as ;
 PRIVATE>
 
