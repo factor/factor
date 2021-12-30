@@ -58,19 +58,19 @@ HELP: sinc
 { $description "Returns the " { $link sinc } " function, calculated according to " { $snippet "sin(pi * x) / (pi * x)" } ". The name " { $link sinc } " is short for \"sine cardinal\" or \"sinus cardinalis\"." }
 { $notes { $snippet "0 sinc" } " is the limit value of 1." } ;
 
-HELP: linspace[a,b)
+HELP: linspace[a..b)
 { $values { "a" number } { "b" number } { "length" integer } { "seq" sequence } }
 { $description "Return evenly spaced numbers over an interval " { $snippet "[a,b)" } "." } ;
 
-HELP: linspace[a,b]
+HELP: linspace[a..b]
 { $values { "a" number } { "b" number } { "length" integer } { "seq" sequence } }
 { $description "Return evenly spaced numbers over an interval " { $snippet "[a,b]" } "." } ;
 
-HELP: logspace[a,b)
+HELP: logspace[a..b)
 { $values { "a" number } { "b" number } { "length" integer } { "base" number } { "seq" sequence } }
 { $description "Return evenly spaced numbers on a log scaled interval " { $snippet "[base^a,base^b)" } "." } ;
 
-HELP: logspace[a,b]
+HELP: logspace[a..b]
 { $values { "a" number } { "b" number } { "length" integer } { "base" number } { "seq" sequence } }
 { $description "Return evenly spaced numbers on a log scaled interval " { $snippet "[base^a,base^b]" } "." } ;
 
