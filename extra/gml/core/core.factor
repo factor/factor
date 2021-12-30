@@ -1,5 +1,5 @@
 ! Copyright (C) 2010 Slava Pestov.
-USING: gml.types gml.printer gml.runtime math math.ranges
+USING: gml.types gml.printer gml.runtime math ranges
 continuations combinators arrays kernel vectors accessors
 prettyprint fry sequences assocs locals hashtables grouping
 sorting models ;

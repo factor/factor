@@ -3,7 +3,7 @@
 
 USING: accessors arrays assocs destructors environment
 formatting fry io io.streams.string io.styles kernel locals
-math math.functions math.ranges math.vectors namespaces
+math math.functions ranges math.vectors namespaces
 sequences sequences.extras strings strings.tables ;
 
 IN: io.streams.256color

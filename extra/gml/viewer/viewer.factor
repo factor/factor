@@ -4,7 +4,7 @@ destructors euler.b-rep euler.b-rep.triangulation fry game.input
 game.loop game.models.half-edge game.worlds gml.printer gpu
 gpu.buffers gpu.framebuffers gpu.render gpu.shaders gpu.state
 gpu.util.wasd growable images kernel literals locals math
-math.order math.ranges math.vectors math.vectors.conversion
+math.order ranges math.vectors math.vectors.conversion
 math.vectors.simd math.vectors.simd.cords method-chains models
 namespaces sequences sets specialized-vectors typed ui
 ui.gadgets ui.gadgets.worlds ui.gestures ui.pixel-formats

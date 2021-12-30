@@ -3,7 +3,7 @@
 
 USING: accessors combinators combinators.short-circuit
 continuations formatting fry io kernel math math.functions
-math.order math.parser math.ranges random sequences strings ;
+math.order math.parser ranges random sequences strings ;
 
 IN: hamurabi
 

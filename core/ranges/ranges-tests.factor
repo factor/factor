@@ -1,4 +1,4 @@
-USING: arrays kernel math math.ranges sequences sets tools.test ;
+USING: arrays kernel math ranges sequences sets tools.test ;
 
 { { } } [ 1 1 (a..b) >array ] unit-test
 { { } } [ 1 1 (a..b] >array ] unit-test

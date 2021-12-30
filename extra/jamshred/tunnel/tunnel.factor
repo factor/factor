@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays colors combinators fry jamshred.oint
 kernel literals locals math math.constants math.matrices
-math.order math.quadratic math.ranges math.vectors random
+math.order math.quadratic ranges math.vectors random
 sequences specialized-arrays vectors ;
 FROM: jamshred.oint => distance ;
 FROM: alien.c-types => float ;

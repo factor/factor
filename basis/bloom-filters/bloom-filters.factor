@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays bit-arrays fry kernel kernel.private
 layouts locals math math.functions math.order math.private
-math.ranges multiline sequences sequences.private typed ;
+ranges multiline sequences sequences.private typed ;
 
 IN: bloom-filters
 

@@ -4,7 +4,7 @@ USING: accessors alien.data arrays assocs byte-arrays
 byte-vectors combinators combinators.short-circuit endian fry
 hashtables hashtables.private hash-sets hints io.backend kernel
 locals math math.bitwise math.constants math.functions
-math.order math.ranges namespaces sequences sequences.private
+math.order ranges namespaces sequences sequences.private
 sets summary system typed vocabs ;
 QUALIFIED-WITH: alien.c-types c
 QUALIFIED-WITH: sets sets

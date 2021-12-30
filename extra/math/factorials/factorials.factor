@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license
 
 USING: combinators combinators.short-circuit fry inverse kernel
-math math.functions math.primes math.ranges memoize sequences ;
+math math.functions math.primes ranges memoize sequences ;
 
 IN: math.factorials
 

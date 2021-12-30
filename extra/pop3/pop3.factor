@@ -3,7 +3,7 @@
 USING: accessors annotations arrays assocs calendar combinators
 fry hashtables io io.crlf io.encodings.utf8 io.sockets
 io.streams.duplex io.timeouts kernel make math math.parser
-math.ranges namespaces prettyprint sequences splitting
+ranges namespaces prettyprint sequences splitting
 strings ;
 IN: pop3
 

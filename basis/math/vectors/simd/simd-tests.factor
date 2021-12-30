@@ -1,6 +1,6 @@
 USING: accessors arrays classes compiler.test compiler.tree.debugger
 effects fry io kernel kernel.private math math.functions
-math.private math.vectors math.vectors.simd math.ranges
+math.private math.vectors math.vectors.simd ranges
 math.vectors.simd.private prettyprint random sequences system
 tools.test vocabs assocs compiler.cfg.debugger words
 locals combinators cpu.architecture namespaces byte-arrays alien

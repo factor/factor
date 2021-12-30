@@ -1,7 +1,7 @@
 ! Copyright (C) 2011 John Benediktsson
 ! See http://factorcode.org/license.txt for BSD license
 
-USING: kernel literals math math.functions math.ranges picomath
+USING: kernel literals math math.functions ranges picomath
 sequences tools.test ;
 
 IN: picomath

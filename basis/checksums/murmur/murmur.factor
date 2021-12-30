@@ -3,7 +3,7 @@
 
 USING: accessors alien alien.c-types alien.data byte-arrays
 checksums endian fry grouping kernel math math.bitwise
-math.ranges sequences ;
+ranges sequences ;
 
 IN: checksums.murmur
 

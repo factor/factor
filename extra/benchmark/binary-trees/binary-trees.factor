@@ -1,6 +1,6 @@
 ! Copyright (C) 2008, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors kernel math math.ranges math.order math.parser
+USING: accessors kernel math ranges math.order math.parser
 io locals sequences ;
 IN: benchmark.binary-trees
 

@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license
 USING: arrays ascii assocs combinators combinators.smart fry
 http.client io.encodings.ascii io.files io.files.temp kernel
-locals math math.ranges math.statistics memoize sequences
+locals math ranges math.statistics memoize sequences
 sequences.private sorting splitting urls ;
 IN: spelling
 

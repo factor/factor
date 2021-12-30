@@ -1,6 +1,6 @@
 ! Copyright (c) 2012 Anonymous
 ! See http://factorcode.org/license.txt for BSD license.
-USING: formatting io kernel math math.parser math.ranges
+USING: formatting io kernel math math.parser ranges
 namespaces random sequences strings ;
 IN: rosetta-code.number-reversal
 

@@ -3,7 +3,7 @@
 USING: assocs calendar calendar.format combinators
 concurrency.messaging continuations debugger destructors init io
 io.directories io.encodings.utf8 io.files io.pathnames kernel
-locals math math.parser math.ranges namespaces sequences
+locals math math.parser ranges namespaces sequences
 strings threads ;
 IN: logging.server
 

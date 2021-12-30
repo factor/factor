@@ -3,7 +3,7 @@
 ! A copy of the license is available at http://factorcode.org/license.txt
 USING: accessors arrays byte-arrays fry hints kernel lists make
 math math.functions math.matrices math.order math.parser
-math.primes.factors math.primes.lists math.ranges math.ratios
+math.primes.factors math.primes.lists ranges math.ratios
 math.vectors parser prettyprint sequences sorting strings
 unicode vocabs.parser words ;
 IN: project-euler.common

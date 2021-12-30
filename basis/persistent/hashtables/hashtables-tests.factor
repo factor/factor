@@ -1,6 +1,6 @@
 IN: persistent.hashtables.tests
 USING: persistent.hashtables persistent.assocs hashtables assocs
-tools.test kernel locals namespaces random math.ranges sequences fry ;
+tools.test kernel locals namespaces random ranges sequences fry ;
 
 { t } [ PH{ } assoc-empty? ] unit-test
 

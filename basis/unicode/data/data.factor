@@ -3,7 +3,7 @@
 USING: arrays ascii assocs byte-arrays combinators
 combinators.short-circuit grouping hashtables interval-sets
 io.encodings.utf8 io.files kernel locals make math math.bitwise
-math.order math.parser math.ranges memoize namespaces sequences
+math.order math.parser ranges memoize namespaces sequences
 sets simple-flat-file sorting splitting strings.parser ;
 IN: unicode.data
 

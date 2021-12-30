@@ -1,6 +1,6 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel math.ranges math.parser sets sequences ;
+USING: kernel ranges math.parser sets sequences ;
 IN: benchmark.beust1
 
 : count-numbers ( max -- n )

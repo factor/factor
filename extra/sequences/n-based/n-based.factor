@@ -1,5 +1,5 @@
 ! (c)2008 Joe Groff, see BSD license etc.
-USING: accessors assocs kernel math math.ranges sequences
+USING: accessors assocs kernel math ranges sequences
 sequences.private ;
 IN: sequences.n-based
 

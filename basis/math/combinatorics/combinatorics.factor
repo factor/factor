@@ -3,7 +3,7 @@
 
 USING: accessors arrays assocs classes.tuple combinators hints
 kernel kernel.private make math math.functions math.order
-math.ranges sequences sequences.private sorting strings vectors ;
+ranges sequences sequences.private sorting strings vectors ;
 IN: math.combinatorics
 
 <PRIVATE

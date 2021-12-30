@@ -1,4 +1,4 @@
-USING: accessors grouping kernel math math.order math.ranges
+USING: accessors grouping kernel math math.order ranges
 math.vectors random sequences threads tools.test ;
 IN: calendar
 

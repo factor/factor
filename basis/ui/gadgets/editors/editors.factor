@@ -3,7 +3,7 @@
 USING: accessors arrays assocs calendar colors.constants
 combinators combinators.short-circuit documents
 documents.elements fonts fry grouping kernel literals locals
-make math math.functions math.order math.ranges math.rectangles
+make math math.functions math.order ranges math.rectangles
 math.vectors models models.arrow namespaces opengl opengl.gl
 sequences sorting splitting system timers ui.baseline-alignment
 ui.clipboards ui.commands ui.gadgets ui.gadgets.borders

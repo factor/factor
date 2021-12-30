@@ -1,7 +1,7 @@
 ! Copyright (C) 2007, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays colors fonts fry help.markup help.stylesheet
-io.styles kernel literals math math.ranges models namespaces parser
+io.styles kernel literals math ranges models namespaces parser
 sequences system ui ui.gadgets ui.gadgets.books ui.gadgets.panes
 ui.gestures ui.pens.gradient ui.pens.solid ;
 IN: slides

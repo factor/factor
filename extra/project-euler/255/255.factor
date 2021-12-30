@@ -1,6 +1,6 @@
 ! Copyright (c) 2009 Jon Harper.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: arrays io kernel locals math math.functions math.parser math.ranges
+USING: arrays io kernel locals math math.functions math.parser ranges
     namespaces prettyprint project-euler.common sequences threads ;
 IN: project-euler.255
 
