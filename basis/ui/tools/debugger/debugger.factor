@@ -15,10 +15,6 @@ IN: ui.tools.debugger
 
 TUPLE: debugger < track error restarts restart-hook restart-list continuation ;
 
-! The "Abort" restart is actually an `f` object, so to show a restart
-! with information but do nothing, we define a no-op-action
-SINGLETON: no-op-action
-
 <PRIVATE
 
 SINGLETON: restart-renderer
@@ -30,7 +26,9 @@ M: restart-renderer row-columns
     dup restarts>> f prefix <model> restart-renderer <table>
         [
             [
-                dup obj>> no-op-action =
+                ! The "Abort" restart is actually an `f` object, so to show a restart
+                ! with information but do nothing, we define a no-op-restart
+                dup obj>> no-op-restart =
                 [ drop ] [ \ continue-restart invoke-command ] if
             ] when*
         ] >>action

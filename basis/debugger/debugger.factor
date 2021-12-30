@@ -4,7 +4,7 @@ USING: accessors alien alien.strings arrays assocs classes
 classes.builtin classes.mixin classes.tuple classes.tuple.parser
 combinators combinators.short-circuit compiler.errors
 compiler.units continuations definitions destructors
-effects.parser fry generic generic.math generic.parser
+effects.parser fixups fry generic generic.math generic.parser
 generic.single grouping io io.encodings io.styles kernel
 kernel.private lexer libc make math math.order math.parser
 math.ratios namespaces parser prettyprint sequences
@@ -43,7 +43,9 @@ M: string error. print ;
     error-continuation get name>> assoc-stack ;
 
 : :res ( n -- * )
-    1 - restarts [ nth f ] change-global continue-restart ;
+    1 - restarts [ nth f ] change-global
+    [ dup no-op-restart = [ drop f ] when ] change-obj
+    continue-restart ;
 
 : :1 ( -- * ) 1 :res ;
 : :2 ( -- * ) 2 :res ;
@@ -350,7 +352,7 @@ M: lexer-error summary
     error>> summary ;
 
 M: lexer-error compute-restarts
-    error>> compute-restarts ;
+    [ error-continuation get swap compute-fixups ] [ error>> compute-restarts ] bi append ;
 
 M: lexer-error error-help
     error>> error-help ;
