@@ -1,7 +1,7 @@
 ! Copyright (C) 2021 John Benediktsson
 ! See http://factorcode.org/license.txt for BSD license
 
-USING: accessors colors combinators generalizations io io.binary
+USING: accessors colors combinators endian generalizations io
 io.encodings.binary io.files io.streams.byte-array kernel math
 math.bitwise namespaces sequences ;
 

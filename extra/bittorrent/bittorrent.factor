@@ -1,8 +1,8 @@
 ! Copyright (C) 2020 John Benediktsson
 ! See http://factorcode.org/license.txt for BSD license
 USING: accessors arrays assocs bencode byte-arrays byte-vectors
-calendar checksums checksums.sha combinators destructors fry
-grouping http.client io io.binary io.encodings.binary io.files
+calendar checksums checksums.sha combinators destructors endian
+fry grouping http.client io io.encodings.binary io.files
 io.pathnames io.sockets io.streams.byte-array io.streams.duplex
 kernel literals locals make math math.bitwise math.functions
 math.order math.parser math.ranges multiline namespaces

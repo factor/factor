@@ -2,9 +2,8 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors alien alien.c-types alien.data audio
 audio.chunked-file classes.struct combinators
-combinators.short-circuit endian io io.binary
-io.encodings.binary io.files kernel locals math sequences
-audio.loader ;
+combinators.short-circuit endian io io.encodings.binary
+io.files kernel locals math sequences audio.loader ;
 IN: audio.aiff
 
 CONSTANT: FORM-MAGIC "FORM"

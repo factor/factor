@@ -1,7 +1,9 @@
 USING: accessors assocs bson.reader bson.writer byte-arrays
-byte-vectors combinators formatting fry io io.binary io.encodings.private
-io.encodings.binary io.encodings.string io.encodings.utf8 io.encodings.utf8.private io.files
-kernel locals math mongodb.msg namespaces sequences uuid bson.writer.private ;
+byte-vectors combinators formatting endian fry io
+io.encodings.private io.encodings.binary io.encodings.string
+io.encodings.utf8 io.encodings.utf8.private io.files kernel
+locals math mongodb.msg namespaces sequences uuid
+bson.writer.private ;
 
 FROM: mongodb.connection => connection-buffer ;
 FROM: alien => byte-length ;

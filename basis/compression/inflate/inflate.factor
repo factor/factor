@@ -1,7 +1,7 @@
 ! Copyright (C) 2009, 2020 Marc Fauconneau, Abtin Molavi, Jacob Fischer.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs byte-vectors combinators
-combinators.smart compression.huffman fry hashtables io.binary
+combinators.smart compression.huffman endian fry hashtables
 kernel literals locals math math.bitwise math.order math.ranges
 sequences sorting memoize combinators.short-circuit byte-arrays ;
 QUALIFIED-WITH: bitstreams bs

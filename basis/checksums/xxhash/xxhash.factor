@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 
 USING: accessors alien alien.c-types alien.data byte-arrays
-checksums combinators generalizations grouping io.binary kernel
+checksums combinators endian generalizations grouping kernel
 locals math math.bitwise math.ranges sequences
 specialized-arrays ;
 SPECIALIZED-ARRAY: uint64_t

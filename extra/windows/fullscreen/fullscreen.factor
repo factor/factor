@@ -1,7 +1,7 @@
 ! Copyright (C) 2010 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors alien.c-types alien.data classes.struct
-io.binary kernel literals locals make math math.bitwise
+endian kernel literals locals make math math.bitwise
 sequences slots.syntax ui.backend.windows ui.gadgets.worlds
 windows.errors windows.gdi32 windows.shcore windows.types
 windows.user32 ;

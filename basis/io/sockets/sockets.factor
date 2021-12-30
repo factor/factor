@@ -3,8 +3,8 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors alien.c-types alien.data alien.strings arrays
 byte-arrays classes classes.struct combinators
-combinators.short-circuit continuations destructors fry
-grouping init io.backend io.binary io.encodings.ascii
+combinators.short-circuit continuations destructors endian fry
+grouping init io.backend io.encodings.ascii
 io.encodings.binary io.pathnames io.ports io.streams.duplex
 kernel locals math math.parser memoize namespaces present
 sequences sequences.private splitting strings summary system

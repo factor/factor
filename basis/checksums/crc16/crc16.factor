@@ -1,7 +1,6 @@
 ! Copyright (C) 2016 Alexander Ilin.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: checksums io.binary kernel math sequences
-sequences.private ;
+USING: checksums endian kernel math sequences sequences.private ;
 IN: checksums.crc16
 
 CONSTANT: crc16-polynomial 0xa001
@@ -16,7 +15,7 @@ CONSTANT: crc16-table V{ }
 
 : (crc16) ( crc ch -- crc )
     dupd bitxor
-    mask-byte crc16-table nth-unsafe
+    0xff bitand crc16-table nth-unsafe
     swap -8 shift bitxor ; inline
 
 SINGLETON: crc16
