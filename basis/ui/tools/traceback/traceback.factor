@@ -1,11 +1,10 @@
 ! Copyright (C) 2006, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays colors.constants continuations fonts fry inspector
-kernel models models.arrow prettyprint sequences ui.commands
-ui.gadgets ui.gadgets.borders ui.gadgets.buttons
+USING: accessors arrays continuations fonts inspector kernel
+models models.arrow prettyprint sequences ui.commands ui.gadgets
 ui.gadgets.labeled ui.gadgets.panes ui.gadgets.scrollers
 ui.gadgets.status-bar ui.gadgets.tables ui.gadgets.toolbar
-ui.theme ui.gadgets.tracks ui.gestures ui.theme.images ui.tools.common ;
+ui.gadgets.tracks ui.gestures ui.theme ui.tools.common ;
 QUALIFIED-WITH: ui.tools.inspector i
 IN: ui.tools.traceback
 
