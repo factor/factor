@@ -51,7 +51,7 @@ CONSTANT: P3 0x589965cc75374cc3
 
 :: native-mapper ( from to bytes c-type -- seq )
     from to bytes <slice>
-    bytes byte-array? little-endian? and
+    bytes byte-array? alien.data:little-endian? and
     [ c-type cast-array ]
     [ c-type heap-size <groups> [ le> ] map ] if ; inline
 
