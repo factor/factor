@@ -72,14 +72,14 @@ IN: c.lexer
     CHAR: \ CHAR: \" take-token* ;
 
 : c-identifier-begin? ( ch -- ? )
-    CHAR: a CHAR: z [a,b]
-    CHAR: A CHAR: Z [a,b]
+    CHAR: a CHAR: z [a..b]
+    CHAR: A CHAR: Z [a..b]
     { CHAR: _ } 3append member? ;
 
 : c-identifier-ch? ( ch -- ? )
-    CHAR: a CHAR: z [a,b]
-    CHAR: A CHAR: Z [a,b]
-    CHAR: 0 CHAR: 9 [a,b]
+    CHAR: a CHAR: z [a..b]
+    CHAR: A CHAR: Z [a..b]
+    CHAR: 0 CHAR: 9 [a..b]
     { CHAR: _ } 4 nappend member? ;
 
 : (take-c-identifier) ( sequence-parser -- string/f )

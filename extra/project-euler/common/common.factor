@@ -125,7 +125,7 @@ PRIVATE>
 <PRIVATE
 
 : (sum-divisors) ( n -- sum )
-    dup sqrt >integer [1,b] [
+    dup sqrt >integer [1..b] [
         [ 2dup divisor? [ 2dup / + , ] [ drop ] if ] each
         dup perfect-square? [ sqrt >fixnum neg , ] [ drop ] if
     ] { } make sum ;
@@ -155,7 +155,7 @@ PRIVATE>
 : tau* ( m -- n )
     factor-2s dup [ 1 + ]
     [ perfect-square? -1 0 ? ]
-    [ dup sqrt >fixnum [1,b] ] tri* [
+    [ dup sqrt >fixnum [1..b] ] tri* [
         dupd divisor? [ [ 2 + ] dip ] when
     ] each drop * ;
 

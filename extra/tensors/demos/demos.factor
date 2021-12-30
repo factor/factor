@@ -14,11 +14,11 @@ IN: tensors.demos
     ! combined with X
     X transpose tensor>array :> X-T
     X-T [ mean ] map >tensor :> feat-means
-    X shape>> first [0,b) [ drop feat-means ] map stack :> means
+    X shape>> first [0..b) [ drop feat-means ] map stack :> means
     ! Compute the std for each of the features and repeat it so that it can be
     ! combined with X
     X-T [ std ] map >tensor :> feat-stds
-    X shape>> first [0,b) [ drop feat-stds ] map stack :> stds
+    X shape>> first [0..b) [ drop feat-stds ] map stack :> stds
     X means t- stds t/ ;
 
 :: compute-cost ( X y params -- cost )

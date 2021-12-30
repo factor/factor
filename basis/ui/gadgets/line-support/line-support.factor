@@ -68,7 +68,7 @@ M: line-gadget line-height
     [ [ loc>> ] [ dim>> ] bi v+ ] visible-line 1 + ;
 
 : each-slice-index ( from to seq quot -- )
-    [ [ <slice> ] [ drop [a,b) ] 3bi ] dip 2each ; inline
+    [ [ <slice> ] [ drop [a..b) ] 3bi ] dip 2each ; inline
 
 GENERIC: draw-line ( line index gadget -- )
 

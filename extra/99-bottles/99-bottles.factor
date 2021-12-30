@@ -22,6 +22,6 @@ IN: 99-bottles
     "Go to the store and buy some more, 99 bottles of beer on the wall." print ;
 
 : 99-bottles ( -- )
-    99 1 [a,b] [ verse ] each last-verse ;
+    99 [1..b] [ verse ] each last-verse ;
 
 MAIN: 99-bottles

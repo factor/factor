@@ -346,7 +346,7 @@ M: character-type (<fortran-result>)
         [ (fortran-result>) ]
     } cond ;
 
-: letters ( -- seq ) CHAR: a CHAR: z [a,b] ;
+: letters ( -- seq ) CHAR: a CHAR: z [a..b] ;
 
 : (shuffle-map) ( return parameters -- ret par )
     [

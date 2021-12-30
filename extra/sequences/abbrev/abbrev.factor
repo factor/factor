@@ -6,7 +6,7 @@ IN: sequences.abbrev
 <PRIVATE
 
 : prefixes ( seq -- prefixes )
-    dup length [1,b] [ head ] with map ;
+    dup length [1..b] [ head ] with map ;
 
 PRIVATE>
 

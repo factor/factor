@@ -55,7 +55,7 @@ TUPLE: document < model locs undos redos inside-undo? ;
 
 : each-line ( ... from to quot: ( ... line -- ... ) -- ... )
     2over = [ 3drop ] [
-        [ [ first ] bi@ [a,b] ] dip each
+        [ [ first ] bi@ [a..b] ] dip each
     ] if ; inline
 
 : map-lines ( ... from to quot: ( ... line -- ... result ) -- ... results )

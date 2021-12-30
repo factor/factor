@@ -14,7 +14,7 @@ CONSTANT: ALPHABET "abcdefghijklmnopqrstuvwxyz"
     [ length <iota> ] keep '[ _ remove-nth ] map ;
 
 : transposes ( word -- edits )
-    [ length [1,b) ] keep
+    [ length [1..b) ] keep
     '[ dup 1 - _ clone [ exchange-unsafe ] keep ] map ;
 
 : replace1 ( i word -- words )
@@ -25,7 +25,7 @@ CONSTANT: ALPHABET "abcdefghijklmnopqrstuvwxyz"
     [ length <iota> ] keep '[ _ replace1 ] map concat ;
 
 : inserts ( word -- edits )
-    [ length [0,b] ] keep
+    [ length [0..b] ] keep
     '[ CHAR: ? over _ insert-nth replace1 ] map concat ;
 
 : edits1 ( word -- edits )

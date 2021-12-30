@@ -187,7 +187,7 @@ PRIVATE>
 ! XXX
 : (simd-vdot)              ( a b rep -- n )
     [ 2byte>rep-array [ [ first ] bi@ * ] 2keep ] keep
-    1 swap rep-length [a,b) [ '[ _ swap nth-unsafe ] bi@ * + ] 2with each ;
+    1 swap rep-length [a..b) [ '[ _ swap nth-unsafe ] bi@ * + ] 2with each ;
 : (simd-vsqrt)             ( a   rep -- c ) [ fsqrt ] components-map ;
 : (simd-vsad)              ( a b rep -- c ) 2byte>rep-array [ - abs ] [ + ] 2map-reduce ;
 : (simd-sum)               ( a   rep -- n ) [ + ] components-reduce ;

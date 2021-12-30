@@ -83,12 +83,12 @@ ERROR: bad-tga-unsupported ;
 
 : read-date-timestamp ( -- timestamp )
     timestamp new
-    2 read le> dup 12 [1,b] member? [ bad-tga-timestamp ] unless >>month
-    2 read le> dup 31 [1,b] member? [ bad-tga-timestamp ] unless >>day
+    2 read le> dup 12 [1..b] member? [ bad-tga-timestamp ] unless >>month
+    2 read le> dup 31 [1..b] member? [ bad-tga-timestamp ] unless >>day
     2 read le>                                                   >>year
-    2 read le> dup 23 [0,b] member? [ bad-tga-timestamp ] unless >>hour
-    2 read le> dup 59 [0,b] member? [ bad-tga-timestamp ] unless >>minute
-    2 read le> dup 59 [0,b] member? [ bad-tga-timestamp ] unless >>second ; inline
+    2 read le> dup 23 [0..b] member? [ bad-tga-timestamp ] unless >>hour
+    2 read le> dup 59 [0..b] member? [ bad-tga-timestamp ] unless >>minute
+    2 read le> dup 59 [0..b] member? [ bad-tga-timestamp ] unless >>second ; inline
 
 : read-job-name ( -- string )
     41 read ascii decode [ 0 = ] trim ; inline

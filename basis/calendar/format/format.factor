@@ -77,7 +77,7 @@ M: timestamp day.
 
 : days. ( year month -- )
     [ 1 (day-of-week) dup [ "   " write ] times ]
-    [ (days-in-month) ] 2bi [1,b] [
+    [ (days-in-month) ] 2bi [1..b] [
         [ day. ] [ + 7 mod zero? [ nl ] [ bl ] if ] bi
     ] with each nl ;
 
@@ -90,7 +90,7 @@ PRIVATE>
 GENERIC: year. ( obj -- )
 
 M: integer year.
-    dup number>string 64 center. nl 12 [1,b] [
+    dup number>string 64 center. nl 12 [1..b] [
         [
             [ month-name 20 center. ]
             [ days-header. days. nl nl ] bi

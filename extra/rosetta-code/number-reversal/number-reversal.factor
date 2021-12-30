@@ -17,7 +17,7 @@ IN: rosetta-code.number-reversal
 ! Note: Assume the players input does not need extra validation.
 
 : make-jumbled-array ( -- sorted jumbled )
-    CHAR: 1 CHAR: 9 [a,b] [ 1string ] map dup clone randomize
+    CHAR: 1 CHAR: 9 [a..b] [ 1string ] map dup clone randomize
     [ 2dup = ] [ randomize ] while ;
 
 SYMBOL: trials

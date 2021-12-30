@@ -76,4 +76,4 @@ TUPLE: triplets-count primitives total ;
     "Up to %d: %d triples, %d primitives.\n" printf ;
 
 : pyth ( -- )
-    8 [1,b] [ 10^ dup count-triplets pprint-triplet-count ] each ;
+    8 [1..b] [ 10^ dup count-triplets pprint-triplet-count ] each ;

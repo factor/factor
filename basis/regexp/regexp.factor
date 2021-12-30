@@ -53,7 +53,7 @@ PRIVATE>
 <PRIVATE
 
 : search-range ( i string reverse? -- seq )
-    [ drop -1 ] [ length ] if [a,b] ; inline
+    [ drop -1 ] [ length ] if [a..b] ; inline
 
 :: (next-match) ( i string regexp quot: ( i string regexp -- j ) reverse? -- start end ? )
     i string regexp quot call dup

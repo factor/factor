@@ -44,7 +44,7 @@ CONSTANT: max-speed 30.0
 : moved ( player -- ) nano-count swap last-move<< ;
 
 : speed-range ( -- range )
-    max-speed [0,b] ;
+    max-speed [0..b] ;
 
 : change-player-speed ( inc player -- )
     [ + 0 max-speed clamp ] change-speed drop ;

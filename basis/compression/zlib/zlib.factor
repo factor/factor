@@ -48,7 +48,7 @@ ERROR: zlib-failed n string ;
     ] with-destructors ;
 
 : uncompress ( byte-array -- byte-array' )
-    [ length 5 [0,b) [ 2^ * ] with map ] keep
+    [ length 5 [0..b) [ 2^ * ] with map ] keep
     '[ _ (uncompress) ] attempt-all ;
 
 

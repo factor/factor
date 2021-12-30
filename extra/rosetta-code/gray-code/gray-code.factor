@@ -44,7 +44,7 @@ IN: rosetta-code.gray-code
     p ;
 
 : gray-code-main ( -- )
-    -1 32 [a,b] [
+    -1 32 [a..b] [
         dup [ >bin ] [ gray-encode ] bi
         [ >bin ] [ gray-decode ] bi 4array .
     ] each ;

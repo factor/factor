@@ -43,7 +43,7 @@ CONSTANT: PERCENT_PRIME 0.1
 !    (n-2)² + 4(n-1) = odd squares, no need to calculate
 
 : prime-corners ( n -- m )
-    3 [1,b] swap '[ _ [ 1 - * ] keep 2 - sq + prime? ] count ;
+    3 [1..b] swap '[ _ [ 1 - * ] keep 2 - sq + prime? ] count ;
 
 : total-corners ( n -- m )
     1 - 2 * ; foldable

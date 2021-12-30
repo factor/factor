@@ -83,7 +83,7 @@ MACRO: nspread ( quots n -- quot )
 
 MACRO: spread* ( n -- quot )
     [ [ ] ] [
-        [1,b) [ '[ [ [ _ ndip ] curry ] dip compose ] ] map [ ] concat-as
+        [1..b) [ '[ [ [ _ ndip ] curry ] dip compose ] ] map [ ] concat-as
         [ call ] compose
     ] if-zero ;
 

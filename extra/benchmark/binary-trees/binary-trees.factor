@@ -37,7 +37,7 @@ CONSTANT: min-depth 4
 
     min-depth max-depth 2 <range> [| depth |
         max-depth depth - min-depth + 2^ [
-            [1,b] 0 [
+            [1..b] 0 [
                 dup neg
                 [ depth bottom-up-tree item-check + ] bi@
             ] reduce

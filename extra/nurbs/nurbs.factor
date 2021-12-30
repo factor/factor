@@ -35,7 +35,7 @@ TUPLE: nurbs-curve
     [ order-index-knot-constants ] 2with map ;
 
 : knot-constants ( curve -- knot-constants )
-    2 over order>> [a,b]
+    2 over order>> [a..b]
     [ order-knot-constants ] with map ;
 
 : update-knots ( curve -- curve )

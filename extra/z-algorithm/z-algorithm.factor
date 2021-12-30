@@ -30,7 +30,7 @@ IN: z-algorithm
 :: (z-values) ( seq -- Z )
     seq length dup 0 <array> :> ( len Z )
     len 0 Z set-nth
-    seq Z 0 0 len [1,b) [ z-value ] each 4drop
+    seq Z 0 0 len [1..b) [ z-value ] each 4drop
     Z ; inline
 
 PRIVATE>

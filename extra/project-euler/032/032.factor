@@ -69,7 +69,7 @@ PRIVATE>
 PRIVATE>
 
 : euler032a ( -- answer )
-    50 [1,b] 2000 [1,b]
+    50 [1..b] 2000 [1..b]
     [ mmp ] cartesian-map concat
     [ pandigital? ] filter
     products members sum ;

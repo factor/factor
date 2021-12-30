@@ -42,7 +42,7 @@ IN: project-euler.186
     dup sq 300007 * 200003 - * 100003 + 1000000 rem ;
 
 : <generator> ( -- lag )
-    55 [1,b] [ (generator) ] map <circular> ;
+    55 [1..b] [ (generator) ] map <circular> ;
 
 : next ( lag -- n )
     [ [ first dup ] [ 31 swap nth ] bi + 1000000 rem ] keep circular-push ;

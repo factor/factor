@@ -200,7 +200,7 @@ TUPLE: selected-line start end first? last? ;
 
 : compute-selection ( editor -- assoc )
     dup gadget-selection? [
-        [ selection-start/end [ [ first ] bi@ [a,b] ] [ ] 2bi ]
+        [ selection-start/end [ [ first ] bi@ [a..b] ] [ ] 2bi ]
         [ model>> ] bi
         '[ [ _ _ ] [ _ start/end-on-line ] bi 2array ] H{ } map>assoc
     ] [ drop f ] if ;

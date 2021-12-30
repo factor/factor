@@ -18,7 +18,7 @@ IN: project-euler.005
 ! --------
 
 : euler005 ( -- answer )
-    20 [1,b] 1 [ lcm ] reduce ;
+    20 [1..b] 1 [ lcm ] reduce ;
 
 ! [ euler005 ] 100 ave-time
 ! 0 ms ave run time - 0.14 SD (100 trials)
