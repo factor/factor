@@ -335,9 +335,6 @@ PRIVATE>
 : sum-floats ( seq -- n )
     partial-sums sum-exact ;
 
-! SYNTAX: .. dup pop scan-object [a,b) suffix! ;
-! SYNTAX: ... dup pop scan-object [a,b] suffix! ;
-
 : mobius ( n -- x )
     group-factors values [ 1 ] [
         dup [ 1 > ] any?
