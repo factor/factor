@@ -46,7 +46,7 @@ IN: project-euler.069
 PRIVATE>
 
 : euler069 ( -- answer )
-    2 1000000 [a,b] [ totient-ratio ] map
+    2 1000000 [a..b] [ totient-ratio ] map
     arg-max 2 + ;
 
 ! [ euler069 ] 10 ave-time

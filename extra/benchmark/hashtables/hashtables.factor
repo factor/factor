@@ -5,7 +5,7 @@ math.parser math.ranges memoize sequences ;
 IN: benchmark.hashtables
 
 MEMO: strings ( -- str )
-    0 100 [a,b) 1 [ + ] accumulate* [ number>string ] map ;
+    100 [0..b) 1 [ + ] accumulate* [ number>string ] map ;
 
 :: add-delete-mix ( hash keys -- )
     keys [| k |

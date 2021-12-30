@@ -25,7 +25,7 @@ IN: project-euler.173
 <PRIVATE
 
 : laminae ( upper -- n )
-    4 / dup sqrt [1,b] 0 rot [ over /i - - ] curry reduce ;
+    4 / dup sqrt [1..b] 0 rot [ over /i - - ] curry reduce ;
 
 PRIVATE>
 

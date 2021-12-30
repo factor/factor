@@ -115,7 +115,7 @@ C: <cont-frac> cont-frac
     drop drop drop ;
 
 : try-all ( -- n )
-    2 10000 [a,b]
+    2 10000 [a..b]
     [ perfect-square? ] reject
     [ find-period ] map
     [ odd? ] filter
@@ -171,6 +171,6 @@ C: <cfrac> cfrac
 PRIVATE>
 
 : euler064b ( -- ct )
-    10000 [1,b] [ period odd? ] count ;
+    10000 [1..b] [ period odd? ] count ;
 
 SOLUTION: euler064b

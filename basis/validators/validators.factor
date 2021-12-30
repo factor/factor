@@ -98,7 +98,7 @@ IN: validators
 
 : v-credit-card ( str -- n )
     "- " without
-    dup CHAR: 0 CHAR: 9 [a,b] diff empty? [
+    dup CHAR: 0 CHAR: 9 [a..b] diff empty? [
         13 v-min-length
         16 v-max-length
         dup luhn? [ string>number ] [

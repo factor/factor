@@ -25,7 +25,7 @@ IN: project-euler.164
     [ swap next-keys [ pick at+ ] with each ] assoc-each ;
 
 : init-table ( -- assoc )
-    9 [1,b] [ 1array 1 ] H{ } map>assoc ;
+    9 [1..b] [ 1array 1 ] H{ } map>assoc ;
 
 PRIVATE>
 

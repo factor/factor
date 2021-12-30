@@ -181,7 +181,7 @@ PRIVATE>
 
 : consolidate ( -- seq )
     count zero? [ "No mail for account." ] [
-        1 account count>> [a,b] [
+        1 account count>> [a..b] [
             {
                 [ 0 top drop ]
                 [ <message> swap >># ]

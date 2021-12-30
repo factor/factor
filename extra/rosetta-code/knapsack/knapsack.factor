@@ -63,7 +63,7 @@ CONSTANT: limit 400
     item-no table nth :> prev
     item-no 1 + table nth :> curr
     item-no items nth :> item
-    limit [1,b] [| weight |
+    limit [1..b] [| weight |
         weight prev nth
         weight item weight>> - dup 0 >=
         [ prev nth item value>> + max ]

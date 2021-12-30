@@ -58,7 +58,7 @@ IN: project-euler.074
 PRIVATE>
 
 : euler074 ( -- answer )
-    1000000 [1,b] [ chain-length 60 = ] count ;
+    1,000,000 [1..b] [ chain-length 60 = ] count ;
 
 ! [ euler074 ] 10 ave-time
 ! 25134 ms ave run time - 31.96 SD (10 trials)

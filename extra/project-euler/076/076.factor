@@ -25,7 +25,7 @@ IN: project-euler.076
 <PRIVATE
 
 : init ( n -- table )
-    [1,b] [ 0 2array 0 ] H{ } map>assoc
+    [1..b] [ 0 2array 0 ] H{ } map>assoc
     1 { 0 0 } pick set-at ;
 
 : use ( n i -- n i )
@@ -41,7 +41,7 @@ IN: project-euler.076
     ] if ;
 
 :: each-subproblem ( n quot -- )
-    n [1,b] [ dup [1,b] quot with each ] each ; inline
+    n [1..b] [ dup [1..b] quot with each ] each ; inline
 
 : (euler076) ( n -- m )
     dup init

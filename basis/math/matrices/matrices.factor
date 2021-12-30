@@ -190,7 +190,7 @@ M: matrix <square-cols>
 
 <PRIVATE ! implementation details of <lower-matrix> and <upper-matrix>
 : dimension-range ( matrix -- dim range )
-    dimension [ <coordinate-matrix> ] [ first [1,b] ] bi ;
+    dimension [ <coordinate-matrix> ] [ first [1..b] ] bi ;
 
 : upper-matrix-indices ( matrix -- matrix' )
     dimension-range <reversed> [ tail-slice* >array ] 2map concat ;

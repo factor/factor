@@ -87,7 +87,7 @@ PRIVATE>
         [ CHAR: - = ] satisfy hide ,
         any-char ,
     ] seq* [
-        first2 [a,b] >string
+        first2 [a..b] >string
     ] action replace ;
 
 : range-pattern ( pattern -- parser )

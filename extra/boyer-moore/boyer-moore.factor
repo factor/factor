@@ -11,7 +11,7 @@ IN: boyer-moore
     [ [ i ] unless* ] change-nth-unsafe ; inline
 
 : normal-suffixes ( zs -- ss )
-    [ length [ f <array> ] [ [1,b) ] bi ] keep pick
+    [ length [ f <array> ] [ [1..b) ] bi ] keep pick
     [ (normal-suffixes) ] 2curry each ; inline
 
 :: (partial-suffixes) ( len old elt i -- len old/new old )

@@ -23,7 +23,7 @@ IN: math.primes.factors
         1array
     ] [
         group-factors dup empty? [
-            [ first2 [0,b] [ ^ ] with map ] map
+            [ first2 [0..b] [ ^ ] with map ] map
             [ product ] product-map natural-sort
         ] unless
     ] if ;

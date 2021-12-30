@@ -28,10 +28,10 @@ M: object nths-unsafe (nths-unsafe) ;
 PRIVATE>
 
 : factorial ( n -- n! )
-    dup 1 > [ [1,b] product ] [ drop 1 ] if ;
+    dup 1 > [ [1..b] product ] [ drop 1 ] if ;
 
 : nPk ( n k -- nPk )
-    2dup possible? [ dupd - [a,b) product ] [ 2drop 0 ] if ;
+    2dup possible? [ dupd - [a..b) product ] [ 2drop 0 ] if ;
 
 : nCk ( n k -- nCk )
     twiddle [ nPk ] keep factorial /i ;
@@ -270,7 +270,7 @@ PRIVATE>
     -rotd each-combination ; inline
 
 : all-subsets ( seq -- subsets )
-    dup length [0,b] [ all-combinations ] with map concat ;
+    dup length [0..b] [ all-combinations ] with map concat ;
 
 <PRIVATE
 

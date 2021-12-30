@@ -120,7 +120,7 @@ M: sequence selected-vectors [ selected-vectors ] map concat ;
     [ face-vertex-count>> ]
     [ edge-vertex-count>> + dup ]
     [ point-vertex-count>> + ] tri
-    [a,b) ushort >c-array ;
+    [a..b) ushort >c-array ;
 
 VERTEX-FORMAT: wire-vertex-format
     { "vertex"  float-components 3 f }

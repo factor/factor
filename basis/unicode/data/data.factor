@@ -141,7 +141,7 @@ PRIVATE>
     name-map sort-values keys
     [ { [ "first>" tail? ] [ "last>" tail? ] } 1|| ] filter
     2 group [
-        [ name-map at ] bi@ [ [a,b] ] [ table ?nth ] bi
+        [ name-map at ] bi@ [ [a..b] ] [ table ?nth ] bi
         [ swap table ?set-nth ] curry each
     ] assoc-each table ;
 

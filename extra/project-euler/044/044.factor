@@ -42,8 +42,8 @@ PRIVATE>
 
 : euler044 ( -- answer )
     most-positive-fixnum
-    2500 [1,b] [
-        dup [1,b] [
+    2500 [1..b] [
+        dup [1..b] [
             euler044-step
         ] with each
     ] each ;

@@ -45,7 +45,7 @@ IN: rosetta-code.hailstone-sequence
     "  ends with " write 4 tail* [ unparse ] map ", " join print
 
     ! Maps n => { length n }, and reduces to longest Hailstone sequence.
-    1 100000 [a,b)
+    100000 [1..b)
     [ [ hailstone length ] keep 2array ]
     [ [ [ first ] bi@ > ] most ] map-reduce
     first2

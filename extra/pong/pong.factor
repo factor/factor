@@ -95,13 +95,13 @@ M:: pong-gadget draw-gadget* ( PONG -- )
 
     ! ball on the left
     X BALL-SIZE + COMPUTER - dup 0 < [
-        >integer -10 max 0 [a,b] random
+        >integer -10 max 0 [a..b] random
         GADGET swap move-computer-by
     ] [ drop ] if
 
     ! ball on the right
     X COMPUTER - dup 0 > [
-        >integer 10 min [0,b] random
+        >integer 10 min [0..b] random
         GADGET swap move-computer-by
     ] [ drop ] if ;
 

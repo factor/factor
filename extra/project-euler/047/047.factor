@@ -75,7 +75,7 @@ SYMBOL: sieve
      multiples [ sieve get [ 1 + ] change-nth ] each ;
 
 : prime-tau-upto ( limit -- seq )
-    dup initialize-sieve 2 swap [a,b) [
+    dup initialize-sieve 2 swap [a..b) [
         dup is-prime? [ increment-counts ] [ drop ] if
     ] each sieve get ;
 
