@@ -162,7 +162,7 @@ CONSTANT: test-tree2 TREE{
 { { 120 120 } } [ test-tree2 last-entry ] unit-test
 { 120 } [ test-tree2 last-key ] unit-test
 
-: ?a,b? ( a b ? ? -- range )
+: ?a..b? ( a b ? ? -- range )
     2array {
         { { t t } [ [a..b] ] }
         { { t f } [ [a..b) ] }
@@ -172,7 +172,7 @@ CONSTANT: test-tree2 TREE{
 
 ! subtree>alist
 : test-tree2-subtree>alist ( a b ? ? -- subalist )
-    ?a,b? >array [ even? ] filter [ dup 2array ] map ;
+    ?a..b? >array [ even? ] filter [ dup 2array ] map ;
 
 : subtree>alist ( from-key to-key tree start-inclusive? end-inclusive? -- alist )
     2array {
