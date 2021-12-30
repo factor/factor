@@ -49,6 +49,9 @@ MACRO: reassemble-le ( n -- quot ) le-range reassemble-bytes ;
         [ dup byte-array? ] [ f ] if
     ] 2dip if ; inline
 
+: 1be> ( bytes -- x )
+    big-endian [ uint8_t deref ] [ 1 n-be> ] if-endian ;
+
 : 2be> ( bytes -- x )
     big-endian [ uint16_t deref ] [ 2 n-be> ] if-endian ;
 
@@ -57,6 +60,9 @@ MACRO: reassemble-le ( n -- quot ) le-range reassemble-bytes ;
 
 : 8be> ( bytes -- x )
     big-endian [ uint64_t deref ] [ 8 n-be> ] if-endian ;
+
+: 1le> ( bytes -- x )
+    little-endian [ uint8_t deref ] [ 1 n-le> ] if-endian ;
 
 : 2le> ( bytes -- x )
     little-endian [ uint16_t deref ] [ 2 n-le> ] if-endian ;
@@ -71,6 +77,7 @@ PRIVATE>
 
 : be> ( bytes -- x )
     dup length {
+        { 1 [ 1be> ] }
         { 2 [ 2be> ] }
         { 4 [ 4be> ] }
         { 8 [ 8be> ] }
@@ -79,6 +86,7 @@ PRIVATE>
 
 : le> ( bytes -- x )
     dup length {
+        { 1 [ 1le> ] }
         { 2 [ 2le> ] }
         { 4 [ 4le> ] }
         { 8 [ 8le> ] }
@@ -99,6 +107,7 @@ PRIVATE>
 : signed-be> ( bytes -- x )
     big-endian [
         dup length {
+            { 1 [ int8_t deref ] }
             { 2 [ int16_t deref ] }
             { 4 [ int32_t deref ] }
             { 8 [ int64_t deref ] }
@@ -109,6 +118,7 @@ PRIVATE>
 : signed-le> ( bytes -- x )
     little-endian [
         dup length {
+            { 1 [ int8_t deref ] }
             { 2 [ int16_t deref ] }
             { 4 [ int32_t deref ] }
             { 8 [ int64_t deref ] }
