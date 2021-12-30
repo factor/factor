@@ -46,8 +46,8 @@ CONSTANT: vm-reg         16
 
 M: ppc machine-registers
     {
-        { int-regs $[ 3 12 [a,b] 17 29 [a,b] append ] }
-        { float-regs $[ 0 29 [a,b] ] }
+        { int-regs $[ 3 12 [a..b] 17 29 [a..b] append ] }
+        { float-regs $[ 0 29 [a..b] ] }
     } ;
 
 M: ppc frame-reg 31 ;

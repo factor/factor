@@ -15,9 +15,9 @@ IN: bittorrent
 <<
 CONSTANT: ALPHANUMERIC $[
     [
-        CHAR: a CHAR: z [a,b] %
-        CHAR: A CHAR: Z [a,b] %
-        CHAR: 0 CHAR: 9 [a,b] %
+        CHAR: a CHAR: z [a..b] %
+        CHAR: A CHAR: Z [a..b] %
+        CHAR: 0 CHAR: 9 [a..b] %
         ".-_~" %
     ] { } make
 ]
