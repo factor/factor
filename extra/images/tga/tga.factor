@@ -96,8 +96,8 @@ ERROR: bad-tga-unsupported ;
 : read-job-time ( -- duration )
     duration new
     2 read le>                                                   >>hour
-    2 read le> dup 59 [0,b] member? [ bad-tga-timestamp ] unless >>minute
-    2 read le> dup 59 [0,b] member? [ bad-tga-timestamp ] unless >>second ; inline
+    2 read le> dup 59 [0..b] member? [ bad-tga-timestamp ] unless >>minute
+    2 read le> dup 59 [0..b] member? [ bad-tga-timestamp ] unless >>second ; inline
 
 : read-software-id ( -- string )
     41 read ascii decode [ 0 = ] trim ; inline
