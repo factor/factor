@@ -40,8 +40,8 @@ CONSTANT: word-renames {
         drop { }
     ] [
         swap '[
-            first2 dupd first2 "Fixup: `%s` got renamed to `%s` in %s" sprintf
-            swap drop f
+            first2 dupd first2 "Fixup: %s renamed to %s in Factor %s" sprintf
+            swap drop no-op-action
             _ <restart>
         ] map
     ] if-empty ;

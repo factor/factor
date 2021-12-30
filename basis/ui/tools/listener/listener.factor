@@ -3,7 +3,7 @@
 USING: accessors arrays assocs calendar combinators
 combinators.short-circuit concurrency.flags
 concurrency.mailboxes continuations destructors documents
-documents.elements fonts hashtables help help.markup help.tips
+documents.elements fixups fonts hashtables help help.markup help.tips
 io io.styles kernel lexer listener literals math math.vectors
 models models.arrow models.delay namespaces parser prettyprint
 sequences source-files.errors splitting strings system threads
@@ -352,7 +352,8 @@ M: object accept-completion-hook 2drop ;
 :: <debugger-popup> ( error continuation interactor -- popup )
     error
     continuation
-    error compute-restarts
+    continuation error compute-fixups
+    error compute-restarts append
     error interactor make-restart-hook-quot
     <debugger> frame-debugger ;
 
