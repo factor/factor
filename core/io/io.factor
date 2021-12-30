@@ -166,8 +166,6 @@ ERROR: invalid-read-buffer buf stream ;
 : read-lines ( -- seq )
     input-stream get stream-lines ; inline
 
-ALIAS: lines read-lines deprecated
-
 CONSTANT: each-block-size 65536
 
 : (each-stream-block-slice) ( ... stream quot: ( ... block-slice -- ... ) block-size -- ... )
@@ -213,8 +211,6 @@ CONSTANT: each-block-size 65536
 
 : read-contents ( -- seq )
     input-stream get stream-contents ; inline
-
-ALIAS: contents read-contents deprecated
 
 : stream-copy* ( in out -- )
     [ stream-write ] curry each-stream-block ; inline

@@ -59,13 +59,3 @@ PRIVATE>
 : [0..b) ( b -- range ) 0 swap [a..b) ; inline
 
 : [1..b) ( b -- range ) 1 swap [a..b) ; inline
-
-! backwards compatibility for new syntax
-ALIAS: [a,b] [a..b] deprecated
-ALIAS: (a,b] (a..b] deprecated
-ALIAS: [a,b) [a..b) deprecated
-ALIAS: (a,b) (a..b) deprecated
-ALIAS: [0,b] [0..b] deprecated
-ALIAS: [1,b] [1..b] deprecated
-ALIAS: [0,b) [0..b) deprecated
-ALIAS: [1,b) [1..b) deprecated
