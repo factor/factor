@@ -1,7 +1,7 @@
 ! Copyright (C) 2021 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors assocs continuations formatting kernel
-sequences ui.tools.debugger vocabs vocabs.parser ;
+sequences vocabs vocabs.parser ;
 IN: fixups
 
 CONSTANT: vocab-renames {
@@ -43,7 +43,7 @@ CONSTANT: word-renames {
     ] [
         swap '[
             first2 dupd first2 "Fixup: %s renamed to %s in Factor %s" sprintf
-            swap drop no-op-action
+            swap drop no-op-restart
             _ <restart>
         ] map
     ] if-empty ;
