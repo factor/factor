@@ -210,7 +210,7 @@ M: cocoa-ui-backend system-alert
 : set-theme ( -- )
     NSAppearance -> currentAppearance -> name CF>string
     "NSAppearanceNameDarkAqua" = dark-theme light-theme ?
-    switch-theme ;
+    switch-theme t default-theme? set-global ;
 
 SYMBOL: cocoa-startup-hook
 
