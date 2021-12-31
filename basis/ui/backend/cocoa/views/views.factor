@@ -4,15 +4,14 @@ USING: accessors alien alien.c-types alien.data alien.strings
 arrays assocs classes cocoa cocoa.application cocoa.classes
 cocoa.pasteboard cocoa.runtime cocoa.subclassing cocoa.touchbar
 cocoa.types cocoa.views combinators core-foundation.strings
-core-graphics core-graphics.types core-text io.encodings.utf8
-kernel literals locals math math.order math.parser
-math.rectangles namespaces opengl sequences splitting threads
-ui.commands ui.gadgets ui.gadgets.private ui.gadgets.worlds
-ui.gestures ui.private words sorting math.vectors
-ui.baseline-alignment ui.gadgets.line-support
-ui.gadgets.editors ui.backend.cocoa.input-methods
-ui.backend.cocoa.input-methods.editors io.encodings.utf16n
-io.encodings.string classes.struct ;
+core-graphics core-graphics.types core-text io.encodings.string
+io.encodings.utf16n io.encodings.utf8 kernel literals math
+math.order math.parser math.rectangles math.vectors namespaces
+opengl sequences splitting threads
+ui.backend.cocoa.input-methods ui.commands ui.gadgets
+ui.gadgets.editors ui.gadgets.line-support ui.gadgets.private
+ui.gadgets.worlds ui.gestures ui.private ui.theme
+ui.theme.switching words ;
 IN: ui.backend.cocoa.views
 
 SLOT: window
@@ -328,6 +327,17 @@ PRIVATE>
     METHOD: void drawRect: NSRect rect [
         self window [
             draw-world yield
+        ] when*
+    ] ;
+
+    ! Light/Dark Mode
+
+    METHOD: void viewDidChangeEffectiveAppearance [
+        self -> effectiveAppearance -> name [
+            CF>string {
+                { "NSAppearanceNameAqua" [ light-theme ] }
+                { "NSAppearanceNameDarkAqua" [ dark-theme ] }
+            } case switch-theme
         ] when*
     ] ;
 
