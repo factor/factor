@@ -333,13 +333,10 @@ PRIVATE>
     ! Light/Dark Mode
 
     METHOD: void viewDidChangeEffectiveAppearance [
-        default-theme? get [
-            self -> effectiveAppearance -> name [
-                CF>string "NSAppearanceNameDarkAqua" =
-                dark-theme light-theme ? switch-theme
-                t default-theme? set-global
-            ] when*
-        ] when
+        self -> effectiveAppearance -> name [
+            CF>string "NSAppearanceNameDarkAqua" =
+            dark-theme light-theme ? switch-theme
+        ] when*
     ] ;
 
     ! Events
