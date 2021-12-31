@@ -318,12 +318,12 @@ M: listener-operation invoke-command
     [ [ clear ] \ clear ] dip (call-listener) ;
 
 : use-if-necessary ( word manifest -- )
-    2dup [ vocabulary>> ] dip and [
+    [ [ vocabulary>> ] keep ] dip 2over and [
         manifest [
-            [ vocabulary>> use-vocab ]
-            [ dup name>> associate use-words ] bi
+            [ drop use-vocab ]
+            [ name>> 1array add-words-from ] 2bi
         ] with-variable
-    ] [ 2drop ] if ;
+    ] [ 3drop ] if ;
 
 M: word accept-completion-hook
     interactor>> manifest>> use-if-necessary ;
