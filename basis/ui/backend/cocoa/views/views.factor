@@ -334,10 +334,8 @@ PRIVATE>
 
     METHOD: void viewDidChangeEffectiveAppearance [
         self -> effectiveAppearance -> name [
-            CF>string {
-                { "NSAppearanceNameAqua" [ light-theme ] }
-                { "NSAppearanceNameDarkAqua" [ dark-theme ] }
-            } case switch-theme
+            CF>string "NSAppearanceNameDarkAqua" =
+            dark-theme light-theme ? switch-theme
         ] when*
     ] ;
 
