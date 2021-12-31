@@ -131,7 +131,13 @@ ERROR: unbalanced-private-declaration vocab ;
         manifest get
         [ [ load-vocab ] dip search-vocabs>> remove-eq! drop ]
         [ [ vocab-name ] dip search-vocab-names>> delete ]
-        2bi
+        [
+            [ vocab-name ] dip qualified-vocabs>> [
+                dup extra-words? [ 2drop f ] [
+                    dup vocab? [ vocab>> ] unless vocab-name =
+                ] if
+            ] with reject! drop
+        ] 2tri
     ] [ drop ] if ;
 
 TUPLE: qualified vocab prefix words ;
