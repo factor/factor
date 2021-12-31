@@ -13,7 +13,7 @@ TR: convert-separators "/\\" ".." ;
     trim-tail-separators
     convert-separators ;
 
-: path>vocab-name ( path -- vocab )
+: path>vocab-parent-dir ( path -- path' )
     dup ".factor" tail? [ parent-directory ] when ;
 
 : chop-vocab-root ( path -- path' )
@@ -24,8 +24,8 @@ TR: convert-separators "/\\" ".." ;
     [ head? ] with find nip
     ?head drop ;
 
-: path>vocab ( path -- vocab )
-    chop-vocab-root path>vocab-name vocab-dir>vocab-name ;
+: path>vocab-name ( path -- vocab-name )
+    chop-vocab-root path>vocab-parent-dir vocab-dir>vocab-name ;
 
 : monitor-loop ( monitor -- )
     ! On OS X, monitors give us the full path, so we chop it
@@ -33,7 +33,7 @@ TR: convert-separators "/\\" ".." ;
     [
         next-change path>>
         [
-            path>vocab
+            path>vocab-name
             [ changed-vocab ] [ reset-cache ] bi
         ] [
             [
