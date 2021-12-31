@@ -7,7 +7,6 @@ IN: cocoa
 SYMBOL: sent-messages
 
 sent-messages [ H{ } clone ] initialize
-
 : remember-send ( selector -- )
     dup sent-messages get set-at ;
 
@@ -52,6 +51,7 @@ SYNTAX: IMPORT: scan-token [ ] import-objc-class ;
 [
     {
         "NSAlert"
+        "NSAppearance"
         "NSAppleScript"
         "NSApplication"
         "NSArray"
