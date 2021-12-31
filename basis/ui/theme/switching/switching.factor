@@ -5,9 +5,6 @@ io.styles kernel listener namespaces prettyprint.stylesheet
 sequences ui.theme ui.tools.listener vocabs.prettyprint words ;
 IN: ui.theme.switching
 
-SYMBOL: default-theme?
-t default-theme? set-global
-
 <PRIVATE
 
 : update-style ( style color elt -- )
@@ -62,8 +59,7 @@ t default-theme? set-global
 PRIVATE>
 
 : switch-theme ( theme -- )
-    theme set-global update-stylesheet
-    f default-theme? set-global ;
+    theme set-global update-stylesheet ;
 
 : light-mode ( -- ) light-theme switch-theme ;
 
