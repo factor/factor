@@ -1,8 +1,9 @@
 ! Copyright (C) 2016 Nicolas Pénet.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: assocs fonts hashtables help.stylesheet help.tips
-io.styles kernel listener namespaces prettyprint.stylesheet
-sequences ui.theme ui.tools.listener vocabs.prettyprint words ;
+io.styles kernel listener memoize namespaces
+prettyprint.stylesheet sequences ui.gadgets.panes.private
+ui.theme ui.tools.listener vocabs.prettyprint words ;
 IN: ui.theme.switching
 
 <PRIVATE
@@ -14,6 +15,9 @@ IN: ui.theme.switching
     ! fonts
     text-color default-font-foreground-color set-global
     content-background default-font-background-color set-global
+
+    ! ui.gadgets.panes
+    \ specified-font reset-memoized
 
     ! help.stylesheet
     default-style text-color foreground update-style
