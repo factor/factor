@@ -1,7 +1,10 @@
 ! Copyright (C) 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel assocs math math.parser memoize io.encodings.utf8
-io.files lexer parser colors sequences splitting ascii ;
+
+USING: accessors ascii assocs colors io.encodings.utf8 io.files
+kernel lexer math math.parser sequences splitting vocabs.loader
+;
+
 IN: colors.constants
 
 <PRIVATE
@@ -28,7 +31,13 @@ PRIVATE>
 
 ERROR: no-such-color name ;
 
-: named-color ( name -- color )
+: lookup-color ( name -- color )
     dup colors at [ ] [ no-such-color ] ?if ;
 
-SYNTAX: COLOR: scan-token named-color suffix! ;
+TUPLE: named-color < color name value ;
+
+M: named-color >rgba value>> >rgba ;
+
+SYNTAX: COLOR: scan-token dup lookup-color named-color boa suffix! ;
+
+{ "colors.constants" "prettyprint" } "colors.constants.prettyprint" require-when
