@@ -24,6 +24,7 @@ IN: ui.theme.switching
     link-style link-color foreground update-style
     title-style title-color foreground update-style
     title-style help-header-background page-color update-style
+    help-path-style text-color foreground update-style
     help-path-style help-path-border-color table-border update-style
     heading-style heading-color foreground update-style
     snippet-style snippet-color foreground update-style
