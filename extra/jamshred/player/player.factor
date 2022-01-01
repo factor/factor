@@ -137,4 +137,4 @@ CONSTANT: max-speed 30.0
     [ update-time ] [ distance-to-move ] [ (move-player) 2drop ] tri ;
 
 : update-player ( player -- )
-    [ move-player ] [ nearest-segment>> "white" named-color swap color<< ] bi ;
+    [ move-player ] [ nearest-segment>> COLOR: white swap color<< ] bi ;
