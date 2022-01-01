@@ -46,19 +46,16 @@ PRIVATE>
 
 <PRIVATE
 
-: (split-harvest) ( seq quot: ( ... elt -- ... ? ) slice-quot -- pieces )
-    [ [ [ not ] compose find drop 0 or ] 2keep ] dip [
-        drop
-        dupd [ find-from drop ] 2curry [ 1 + ] prepose
-        [ keep swap ] curry
-        swap [ length 2dup >= [ drop f ] when ] curry
-        [ unless* ] curry compose
-        [ [ dup ] if dup ] curry [ dup ] prepose
+:: (split-harvest) ( seq quot: ( ... elt -- ... ? ) slice-quot -- pieces )
+    seq [ quot call not ] find drop [
+        [
+            [ seq quot find-from drop ] keep swap
+            [ seq length ] unless* dup
+        ] [ f f f ] if*
     ] [
-        pick swap curry [ keep swap ] curry -rot
-        [ not ] compose [ find-from drop ] 2curry
-        [ 1 + ] prepose [ dip ] curry compose
-    ] 3bi produce 2nip ; inline
+        [ seq slice-quot call ] keep swap
+        [ 1 + seq [ quot call not ] find-from drop ] dip
+    ] produce 2nip ; inline
 
 PRIVATE>
 

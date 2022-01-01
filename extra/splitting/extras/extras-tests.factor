@@ -26,6 +26,8 @@ tools.test ;
 ] unit-test
 
 { { } } [ "" " " split-harvest ] unit-test
+{ { } } [ " " " " split-harvest ] unit-test
+{ { } } [ "  " " " split-harvest ] unit-test
 { { "a" } } [ "a" " " split-harvest ] unit-test
 { { "a" } } [ " a" " " split-harvest ] unit-test
 { { "a" } } [ " a " " " split-harvest ] unit-test
