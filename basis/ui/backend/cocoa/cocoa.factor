@@ -207,10 +207,11 @@ M: cocoa-ui-backend system-alert
 : install-app-delegate ( -- )
     NSApp FactorApplicationDelegate install-delegate ;
 
-: set-theme ( -- )
-    NSAppearance -> currentAppearance -> name CF>string
-    "NSAppearanceNameDarkAqua" = dark-theme light-theme ?
-    switch-theme ;
+: current-theme ( -- )
+    NSAppearance -> currentAppearance -> name [
+        CF>string "NSAppearanceNameDarkAqua" =
+        dark-theme light-theme ? switch-theme-if-default
+    ] when* ;
 
 SYMBOL: cocoa-startup-hook
 
@@ -222,7 +223,7 @@ M: cocoa-ui-backend (with-ui)
     "UI" assert.app [
         init-clipboard
         cocoa-startup-hook get call( -- )
-        set-theme
+        current-theme
         start-ui
         stop-io-thread
         init-thread-timer
