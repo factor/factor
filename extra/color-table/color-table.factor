@@ -1,9 +1,9 @@
 ! Copyright (C) 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors colors.constants colors.hex combinators
-combinators.smart formatting kernel literals models
-sorting.human sorting.slots strings ui ui.gadgets.scrollers
-ui.gadgets.search-tables ui.gadgets.tables ;
+USING: accessors colors combinators combinators.smart formatting
+kernel literals math models sorting.human sorting.slots strings ui
+ui.gadgets.scrollers ui.gadgets.search-tables ui.gadgets.tables
+;
 IN: color-table
 
 ! ui.gadgets.tables demo
@@ -12,6 +12,10 @@ SINGLETON: color-renderer
 <PRIVATE
 
 CONSTANT: full-block-string $[ 10 CHAR: full-block <string> ]
+
+: rgba>hex ( rgba -- hex )
+    [ red>> ] [ green>> ] [ blue>> ] tri
+    [ 255 * >integer ] tri@ "%02X%02X%02X" sprintf ;
 
 PRIVATE>
 
@@ -24,7 +28,7 @@ M: color-renderer column-titles
 M: color-renderer row-columns
     drop [
         full-block-string swap
-        dup lookup-color {
+        dup named-color {
             [ red>> "%.5f" sprintf ]
             [ green>> "%.5f" sprintf ]
             [ blue>> "%.5f" sprintf ]
@@ -33,10 +37,10 @@ M: color-renderer row-columns
     ] output>array ;
 
 M: color-renderer row-color
-    drop lookup-color ;
+    drop named-color ;
 
 M: color-renderer row-value
-    drop lookup-color ;
+    drop named-color ;
 
 : <color-table> ( -- table )
     named-colors { human<=> } sort-by <model>

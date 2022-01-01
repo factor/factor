@@ -1,6 +1,6 @@
 ! Copyright (C) 2005, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays assocs colors.constants combinators
+USING: accessors arrays assocs colors combinators
 combinators.short-circuit fry io.directories io.files
 io.files.info io.pathnames kernel locals make math math.order
 sequences sequences.private sorting splitting

@@ -1,7 +1,7 @@
 ! Copyright (C) 2021 John Benediktsson
 ! See http://factorcode.org/license.txt for BSD license
 
-USING: accessors ascii assocs colors.constants combinators
+USING: accessors ascii assocs colors combinators
 combinators.short-circuit continuations images.loader
 images.loader.private images.viewer io io.encodings.ascii
 io.encodings.binary io.encodings.latin1 io.encodings.string

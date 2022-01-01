@@ -2,14 +2,14 @@
 ! See http://factorcode.org/license.txt for BSD license.
 
 USING: accessors assocs calendar calendar.format
-calendar.holidays.us colors.constants colors.hex combinators
-concurrency.combinators formatting hashtables http.client io
-io.styles json.reader kernel make math sequences ui urls ;
+calendar.holidays.us colors combinators concurrency.combinators
+formatting hashtables http.client io io.styles json.reader
+kernel make math sequences ui urls ;
 
 IN: hacker-news
 
-CONSTANT: christmas-red HEXCOLOR: bc2c21
-CONSTANT: christmas-green HEXCOLOR: 376627
+CONSTANT: christmas-red COLOR: #bc2c21
+CONSTANT: christmas-green COLOR: #376627
 
 <PRIVATE
 : hacker-news-ids ( endpoint -- ids )
@@ -48,11 +48,11 @@ CONSTANT: christmas-green HEXCOLOR: 376627
     christmas-day? [
         odd? christmas-red christmas-green ?
     ] [
-        drop HEXCOLOR: a0a0a0
+        drop COLOR: #a0a0a0
     ] if ;
 
 : background-color ( -- color )
-    christmas-day? HEXCOLOR: bc2c21 HEXCOLOR: ff6600 ? ;
+    christmas-day? COLOR: #bc2c21 COLOR: #ff6600 ? ;
 
 : write-number ( n -- )
     [ "%2d. " sprintf H{ } clone ] keep
@@ -67,11 +67,11 @@ CONSTANT: christmas-green HEXCOLOR: 376627
 : write-link ( title url -- )
     '[
         _ presented ,,
-        HEXCOLOR: 888888 foreground ,,
+        COLOR: #888888 foreground ,,
     ] H{ } make format ;
 
 : write-text ( str -- )
-    H{ { foreground HEXCOLOR: 888888 } } format ;
+    H{ { foreground COLOR: #888888 } } format ;
 
 : post>user-url ( post -- user-url )
     "by" of "http://news.ycombinator.com/user?id=" prepend >url ;

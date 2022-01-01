@@ -3,7 +3,7 @@ IN: splitting.extras
 
 <PRIVATE
 
-: (split*) ( seq quot: ( ... elt -- ... ? ) slice-quot -- pieces )
+: (split*) ( ... seq quot: ( ... elt -- ... ? ) slice-quot -- ... pieces )
     [ 0 ] 3dip pick [
         swap curry [ [ 1 + ] when ] prepose [ 2keep ] curry
         [ 2dup = ] prepose [ [ 1 + ] when swap ] compose [
@@ -46,7 +46,7 @@ PRIVATE>
 
 <PRIVATE
 
-:: (split-harvest) ( seq quot: ( ... elt -- ... ? ) slice-quot -- pieces )
+:: (split-harvest) ( ... seq quot: ( ... elt -- ... ? ) slice-quot -- ... pieces )
     seq [ quot call not ] find drop [
         [
             [ seq quot find-from drop ] keep swap

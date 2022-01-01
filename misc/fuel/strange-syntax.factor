@@ -1,6 +1,5 @@
-USING: accessors alien.c-types alien.syntax
-classes.struct colors.constants colors.hex kernel literals logging
-math ;
+USING: accessors alien.c-types alien.syntax classes.struct
+colors kernel literals logging math ;
 IN: strange
 
 ! FUEL Syntax Demo
@@ -96,7 +95,7 @@ FUNCTION: int futimes ( int id,
 FUNCTION: int booyah ( int x )
 FUNCTION-ALIAS: test int bah ( int* ah, int[] eh )
 
-HEXCOLOR: ffffff COLOR: green NAN: 1234 CHAR: m ALIEN: 93
+COLOR: #ffffff COLOR: green NAN: 1234 CHAR: m ALIEN: 93
 2drop 2drop drop
 
 PRIMITIVE: one ( a -- b )

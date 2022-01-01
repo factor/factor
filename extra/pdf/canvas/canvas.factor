@@ -1,8 +1,8 @@
 ! Copyright (C) 2011-2012 John Benediktsson
 ! See http://factorcode.org/license.txt for BSD license
 
-USING: accessors assocs colors.constants combinators fonts fry
-io io.styles kernel math math.order namespaces pdf.text pdf.wrap
+USING: accessors assocs colors combinators fonts fry io
+io.styles kernel math math.order namespaces pdf.text pdf.wrap
 sequences ui.text ;
 
 IN: pdf.canvas
