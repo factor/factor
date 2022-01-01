@@ -1,4 +1,4 @@
-USING: accessors arrays calendar colors.constants
+USING: accessors arrays calendar colors
 combinators.short-circuit fonts fry kernel literals locals math
 math.order ranges math.vectors namespaces opengl random
 sequences timers ui ui.commands ui.gadgets ui.gadgets.worlds

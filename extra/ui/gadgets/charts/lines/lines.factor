@@ -1,6 +1,6 @@
 ! Copyright (C) 2016-2017 Alexander Ilin.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays assocs binary-search colors.constants
+USING: accessors arrays assocs binary-search colors
 combinators combinators.short-circuit fry kernel locals make
 math math.order math.statistics math.vectors opengl opengl.gl
 sequences specialized-arrays splitting.monotonic ui.gadgets

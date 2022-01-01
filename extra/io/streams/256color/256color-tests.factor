@@ -1,7 +1,7 @@
 ! Copyright (C) 2012 John Benediktsson
 ! See http://factorcode.org/license.txt for BSD license
 
-USING: colors.constants io.streams.256color
+USING: colors io.streams.256color
 io.streams.256color.private tools.test ;
 
 { 16 } [ COLOR: black color>256color ] unit-test

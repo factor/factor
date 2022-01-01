@@ -1,8 +1,9 @@
 ! Copyright (C) 2009, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays assocs calendar colors.constants
-combinators combinators.smart compiler.errors debugger editors
-init io.pathnames kernel math.parser models models.arrow
+
+USING: accessors arrays assocs calendar colors combinators
+combinators.smart compiler.errors debugger editors init
+io.pathnames kernel math.parser models models.arrow
 models.arrow.smart models.delay models.mapping models.search
 namespaces prettyprint sequences sorting source-files.errors
 source-files.errors.debugger summary ui ui.commands ui.gadgets
@@ -11,6 +12,7 @@ ui.gadgets.packs ui.gadgets.panes ui.gadgets.scrollers
 ui.gadgets.status-bar ui.gadgets.tables ui.gadgets.toolbar
 ui.gadgets.tracks ui.gestures ui.images ui.operations ui.theme
 ui.tools.browser ui.tools.common ui.tools.inspector ;
+
 IN: ui.tools.error-list
 
 CONSTANT: source-file-icon
