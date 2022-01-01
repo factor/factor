@@ -184,10 +184,10 @@ M: light-theme table-border-color COLOR: FactorTan ;
 
 SINGLETON: dark-theme
 
-M: dark-theme toolbar-background COLOR: solarized-base02 ;
+M: dark-theme toolbar-background HEXCOLOR: 202124 ;
 M: dark-theme toolbar-button-pressed-background COLOR: solarized-base0 ;
 
-M: dark-theme menu-background COLOR: solarized-base02 ;
+M: dark-theme menu-background HEXCOLOR: 202124 ;
 M: dark-theme menu-border-color COLOR: solarized-base01 ;
 
 M: dark-theme status-bar-background COLOR: FactorDarkSlateBlue ;
@@ -233,10 +233,10 @@ M: dark-theme thread-status-running-foreground COLOR: solarized-green ;
 
 M: dark-theme error-summary-background HEXCOLOR: 6E2E32 ;
 
-M: dark-theme content-background COLOR: solarized-base03 ;
-M: dark-theme text-color COLOR: grey75 ;
+M: dark-theme content-background HEXCOLOR: 202124 ;
+M: dark-theme text-color HEXCOLOR: bdc1c6 ;
 
-M: dark-theme link-color COLOR: solarized-blue ;
+M: dark-theme link-color HEXCOLOR: 8ab4f8 ;
 M: dark-theme title-color COLOR: grey75 ;
 M: dark-theme heading-color COLOR: grey75 ;
 M: dark-theme snippet-color COLOR: solarized-orange ;
