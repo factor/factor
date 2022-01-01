@@ -1,7 +1,6 @@
 ! Copyright (C) 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors colors.constants combinators kernel math
-namespaces ;
+USING: accessors colors combinators kernel math namespaces ;
 IN: fonts
 
 CONSTANT: default-serif-font-name "serif"

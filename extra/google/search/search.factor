@@ -2,8 +2,8 @@
 ! See http://factorcode.org/license.txt for BSD license
 
 USING: accessors arrays assocs assocs.extras classes.tuple
-colors.constants combinators formatting fry http.client io
-io.styles json.reader kernel sequences urls wrap.strings ;
+colors combinators formatting fry http.client io io.styles
+json.reader kernel sequences urls wrap.strings ;
 
 IN: google.search
 

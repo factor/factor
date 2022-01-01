@@ -1,6 +1,6 @@
 ! Copyright (C) 2003, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays classes colors.constants combinators
+USING: accessors arrays classes colors combinators
 continuations generic grouping io io.streams.string io.styles
 kernel make math math.parser namespaces prettyprint.config
 prettyprint.custom prettyprint.sections sequences strings

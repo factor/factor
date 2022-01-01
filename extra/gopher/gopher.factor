@@ -1,13 +1,12 @@
 ! Copyright (C) 2014 John Benediktsson
 ! See http://factorcode.org/license.txt for BSD license
 
-USING: accessors byte-arrays calendar colors.constants
-combinators formatting fry images images.loader
-images.loader.private images.viewer io io.encodings.binary
-io.encodings.string io.encodings.utf8 io.sockets io.styles
-io.timeouts kernel make math math.parser namespaces present
-prettyprint sequences splitting summary urls urls.encoding
-vocabs ;
+USING: accessors byte-arrays calendar colors combinators
+formatting fry images images.loader images.loader.private
+images.viewer io io.encodings.binary io.encodings.string
+io.encodings.utf8 io.sockets io.styles io.timeouts kernel make
+math math.parser namespaces present prettyprint sequences
+splitting summary urls urls.encoding vocabs ;
 
 IN: gopher
 

@@ -1,9 +1,9 @@
 ! Copyright (C) 2012 John Benediktsson
 ! See http://factorcode.org/license.txt for BSD license
 
-USING: accessors ascii assocs colors.constants formatting
-html.entities html.parser html.parser.analyzer html.parser.printer
-http.client io io.styles kernel namespaces sequences splitting urls
+USING: accessors ascii assocs colors formatting html.entities
+html.parser html.parser.analyzer html.parser.printer http.client
+io io.styles kernel namespaces sequences splitting urls
 wrap.strings xml xml.data xml.traversal ;
 FROM: xml.data => tag? ;
 

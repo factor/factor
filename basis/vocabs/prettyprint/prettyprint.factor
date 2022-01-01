@@ -1,6 +1,6 @@
 ! Copyright (C) 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors assocs colors.constants fry io io.styles kernel
+USING: accessors assocs colors io io.styles kernel
 make namespaces parser prettyprint.backend prettyprint.sections
 prettyprint.stylesheet sequences sorting vocabs vocabs.parser ;
 FROM: io.styles => inset ;

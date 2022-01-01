@@ -1,10 +1,12 @@
 ! Copyright (C) 2010 Erik Charlebois
 ! See http://factorcode.org/license.txt for BSD license.
+
 USING: accessors alien.c-types alien.data arrays circular colors
-colors.constants columns destructors fonts gpu.buffers
-gpu.render gpu.shaders gpu.state gpu.textures images kernel
-literals locals make math math.constants math.functions
-math.vectors sequences specialized-arrays typed ui.text fry ;
+columns destructors fonts gpu.buffers gpu.render gpu.shaders
+gpu.state gpu.textures images kernel literals locals make math
+math.constants math.functions math.vectors sequences
+specialized-arrays typed ui.text ;
+
 FROM: alien.c-types => float ;
 SPECIALIZED-ARRAYS: float uint ;
 IN: game.debug
