@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license
 
 USING: accessors colors combinators formatting grouping kernel
-lexer math math.parser sequences ;
+lexer math math.parser sequences vocabs.loader ;
 
 IN: colors.hex
 
@@ -21,4 +21,10 @@ ERROR: invalid-hex-color hex ;
     [ red>> ] [ green>> ] [ blue>> ] tri
     [ 255 * >integer ] tri@ "%02X%02X%02X" sprintf ;
 
-SYNTAX: HEXCOLOR: scan-token hex>rgba suffix! ;
+TUPLE: hex-color < color hex value ;
+
+M: hex-color >rgba value>> >rgba ;
+
+SYNTAX: HEXCOLOR: scan-token dup hex>rgba hex-color boa suffix! ;
+
+{ "colors.hex" "prettyprint" } "colors.hex.prettyprint" require-when
