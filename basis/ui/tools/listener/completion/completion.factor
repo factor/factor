@@ -96,7 +96,7 @@ M: vocab-completion row-color
     ] [ drop COLOR: dark-gray ] if ;
 
 M: color-completion row-color
-    drop second named-color ;
+    drop second lookup-color ;
 
 : up-to-caret ( caret document -- string )
     [ { 0 0 } ] 2dip doc-range ;

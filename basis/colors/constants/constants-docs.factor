@@ -1,7 +1,7 @@
 IN: colors.constants
 USING: help.markup help.syntax strings colors ;
 
-HELP: named-color
+HELP: lookup-color
 { $values { "name" string } { "color" color } }
 { $description "Outputs a named color from the color database." }
 { $notes "In most cases, " { $link POSTPONE: COLOR: } " should be used instead." }
@@ -25,7 +25,7 @@ HELP: COLOR:
 ARTICLE: "colors.constants" "Standard color database"
 "The " { $vocab-link "colors.constants" } " vocabulary bundles the X11 " { $snippet "rgb.txt" } " database and Factor's " { $snippet "factor-colors.txt" } " theme database to provide words for looking up color values by name."
 { $subsections
-    named-color
+    lookup-color
     named-colors
     POSTPONE: COLOR:
 } ;

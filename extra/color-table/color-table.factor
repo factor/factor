@@ -24,7 +24,7 @@ M: color-renderer column-titles
 M: color-renderer row-columns
     drop [
         full-block-string swap
-        dup named-color {
+        dup lookup-color {
             [ red>> "%.5f" sprintf ]
             [ green>> "%.5f" sprintf ]
             [ blue>> "%.5f" sprintf ]
@@ -33,10 +33,10 @@ M: color-renderer row-columns
     ] output>array ;
 
 M: color-renderer row-color
-    drop named-color ;
+    drop lookup-color ;
 
 M: color-renderer row-value
-    drop named-color ;
+    drop lookup-color ;
 
 : <color-table> ( -- table )
     named-colors { human<=> } sort-by <model>
