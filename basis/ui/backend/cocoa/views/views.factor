@@ -335,7 +335,7 @@ PRIVATE>
     METHOD: void viewDidChangeEffectiveAppearance [
         self -> effectiveAppearance -> name [
             CF>string "NSAppearanceNameDarkAqua" =
-            dark-theme light-theme ? switch-theme
+            dark-theme light-theme ? switch-theme-if-default
         ] when*
     ] ;
 

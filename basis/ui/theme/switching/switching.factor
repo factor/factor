@@ -6,6 +6,9 @@ prettyprint.stylesheet sequences ui.gadgets.panes.private
 ui.theme ui.tools.listener vocabs.prettyprint words ;
 IN: ui.theme.switching
 
+SYMBOL: default-theme?
+t default-theme? set-global
+
 <PRIVATE
 
 : update-style ( style color elt -- )
@@ -64,7 +67,13 @@ IN: ui.theme.switching
 PRIVATE>
 
 : switch-theme ( theme -- )
-    theme set-global update-stylesheet ;
+    theme set-global update-stylesheet
+    f default-theme? set-global ;
+
+: switch-theme-if-default ( theme -- )
+    default-theme? get [
+        switch-theme t default-theme? set-global
+    ] [ drop ] if ;
 
 : light-mode ( -- ) light-theme switch-theme ;
 
