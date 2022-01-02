@@ -35,3 +35,9 @@ USING: assocs kernel sequences tools.completion tools.test ;
 { f } [ { "CHAR:" } complete-char? ] unit-test
 { t } [ { "CHAR:" "" } complete-char? ] unit-test
 { t } [ { "CHAR:" "a" } complete-char? ] unit-test
+
+{ t } [ { "P\"" } complete-pathname? ] unit-test
+{ t } [ { "P\"" "" } complete-pathname? ] unit-test
+{ t } [ { "P\"" "~/" } complete-pathname? ] unit-test
+{ f } [ { "P\"~/\"" "" } complete-pathname? ] unit-test
+{ f } [ { "P\"~/\"" "asdf" } complete-pathname? ] unit-test
