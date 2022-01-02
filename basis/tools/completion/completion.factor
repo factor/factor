@@ -121,9 +121,11 @@ PRIVATE>
 PRIVATE>
 
 : paths-matching ( str -- seq )
-    dup last-path-separator [ 1 + cut ] [ drop "" ] if swap
-    dup { [ file-exists? ] [ file-info directory? ] } 1&&
-    [ directory-paths completions ] [ 2drop { } ] if ;
+    "P\"" ?head [
+        dup last-path-separator [ 1 + cut ] [ drop "" ] if swap
+        dup { [ file-exists? ] [ file-info directory? ] } 1&&
+        [ directory-paths completions ] [ 2drop { } ] if
+    ] dip [ [ [ "P\"" prepend ] dip ] assoc-map ] when ;
 
 <PRIVATE
 
@@ -175,4 +177,11 @@ PRIVATE>
 
 : complete-color? ( tokens -- ? ) "COLOR:" complete-token? ;
 
-: complete-pathname? ( tokens -- ? ) "P\"" complete-token? ;
+<PRIVATE
+
+: complete-string? ( tokens token -- ? )
+    { [ [ harvest ?last ] [ head? ] bi* ] [ complete-token? ] } 2|| ;
+
+PRIVATE>
+
+: complete-pathname? ( tokens -- ? ) "P\"" complete-string? ;
