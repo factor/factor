@@ -6,16 +6,17 @@ io.encodings.utf8 io.files kernel lexer math math.functions
 math.parser sequences splitting vocabs.loader ;
 IN: colors
 
-! FIXME: replace with MIXIN: color INSTANCE: rgba color
-TUPLE: color ;
+MIXIN: color
 
-TUPLE: rgba < color
+TUPLE: rgba
 { red read-only }
 { green read-only }
 { blue read-only }
 { alpha read-only } ;
 
 C: <rgba> rgba
+
+INSTANCE: rgba color
 
 GENERIC: >rgba ( color -- rgba )
 
@@ -80,7 +81,9 @@ ERROR: no-such-color name ;
 : parse-color ( str -- color )
     "#" ?head [ hex>rgba ] [ named-color ] if ;
 
-TUPLE: parsed-color < color string value ;
+TUPLE: parsed-color string value ;
+
+INSTANCE: parsed-color color
 
 M: parsed-color >rgba value>> >rgba ;
 
