@@ -110,11 +110,13 @@ ARTICLE: "xml" "XML parser"
     { "xml" "events" }
     { "xml" "namespaces" }
 }
-{ $vocab-subsection "Writing XML" "xml.writer" }
-{ $vocab-subsection "XML parsing errors" "xml.errors" }
-{ $vocab-subsection "XML entities" "xml.entities" }
-{ $vocab-subsection "XML data types" "xml.data" }
-{ $vocab-subsection "Utilities for traversing XML" "xml.traversal" }
-{ $vocab-subsection "Syntax extensions for XML" "xml.syntax" } ;
+{ $vocab-subsections
+    { "Writing XML" "xml.writer" }
+    { "XML parsing errors" "xml.errors" }
+    { "XML entities" "xml.entities" }
+    { "XML data types" "xml.data" }
+    { "Utilities for traversing XML" "xml.traversal" }
+    { "Syntax extensions for XML" "xml.syntax" }
+} ;
 
 ABOUT: "xml"
