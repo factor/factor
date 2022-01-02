@@ -332,12 +332,12 @@ PRIVATE>
 
     ! Light/Dark Mode
 
-!    METHOD: void viewDidChangeEffectiveAppearance [
-!        self -> effectiveAppearance -> name [
-!            CF>string "NSAppearanceNameDarkAqua" =
-!            dark-theme light-theme ? switch-theme-if-default
-!        ] when*
-!    ] ;
+    METHOD: void viewDidChangeEffectiveAppearance [
+        self -> effectiveAppearance -> name [
+            CF>string "NSAppearanceNameDarkAqua" =
+            dark-theme light-theme ? switch-theme-if-default
+        ] when*
+    ] ;
 
     ! Events
     METHOD: char acceptsFirstMouse: id event [ 0 ] ;
