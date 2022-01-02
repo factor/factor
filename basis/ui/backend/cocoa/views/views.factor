@@ -1,17 +1,19 @@
 ! Copyright (C) 2006, 2010 Slava Pestov
 ! See http://factorcode.org/license.txt for BSD license.
+
 USING: accessors alien alien.c-types alien.data alien.strings
 arrays assocs classes cocoa cocoa.application cocoa.classes
 cocoa.pasteboard cocoa.runtime cocoa.subclassing cocoa.touchbar
-cocoa.types cocoa.views combinators core-foundation.strings
-core-graphics core-graphics.types core-text io.encodings.string
-io.encodings.utf16n io.encodings.utf8 kernel literals math
-math.order math.parser math.rectangles math.vectors namespaces
-opengl sequences splitting threads
-ui.backend.cocoa.input-methods ui.commands ui.gadgets
-ui.gadgets.editors ui.gadgets.line-support ui.gadgets.private
-ui.gadgets.worlds ui.gestures ui.private ui.theme
-ui.theme.switching words ;
+cocoa.types cocoa.views combinators continuations
+core-foundation.strings core-graphics core-graphics.types
+core-text debugger io.encodings.string io.encodings.utf16n
+io.encodings.utf8 kernel literals math math.order math.parser
+math.rectangles math.vectors namespaces opengl sequences
+splitting threads ui.backend.cocoa.input-methods ui.commands
+ui.gadgets ui.gadgets.editors ui.gadgets.line-support
+ui.gadgets.private ui.gadgets.worlds ui.gestures ui.private
+ui.theme ui.theme.switching words ;
+
 IN: ui.backend.cocoa.views
 
 SLOT: window
@@ -326,7 +328,7 @@ PRIVATE>
     ! Rendering
     METHOD: void drawRect: NSRect rect [
         self window [
-            draw-world yield
+            [ draw-world yield ] [ print-error drop ] recover
         ] when*
     ] ;
 
