@@ -1,4 +1,4 @@
-USING: alien.syntax alien.c-types ;
+USING: alien.syntax alien.c-types classes.struct ;
 IN: unix.types
 
 TYPEDEF: ulonglong __uquad_type
