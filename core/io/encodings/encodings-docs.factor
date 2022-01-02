@@ -92,12 +92,13 @@ ARTICLE: "encodings-descriptors" "Encoding descriptors"
     "io.encodings.binary"
     "io.encodings.utf8"
 }
-{ $vocab-subsection "UTF-16 encoding" "io.encodings.utf16" }
-{ $vocab-subsection "UTF-32 encoding" "io.encodings.utf32" }
-{ $vocab-subsection "Strict encodings" "io.encodings.strict" }
-"Legacy encodings:"
-{ $vocab-subsection "8-bit encodings" "io.encodings.8-bit" }
-{ $vocab-subsection "ASCII encoding" "io.encodings.ascii" }
+{ $vocab-subsections
+    { "UTF-16 encoding" "io.encodings.utf16" }
+    { "UTF-32 encoding" "io.encodings.utf32" }
+    { "Strict encodings" "io.encodings.strict" }
+    { "8-bit encodings" "io.encodings.8-bit" }
+    { "ASCII encoding" "io.encodings.ascii" }
+}
 { $see-also "encodings-introduction" } ;
 
 ARTICLE: "encodings-protocol" "Encoding protocol"
