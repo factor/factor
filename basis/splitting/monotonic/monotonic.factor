@@ -7,19 +7,19 @@ IN: splitting.monotonic
 <PRIVATE
 
 :: monotonic-split-impl ( seq quot slice-quot n -- pieces )
-    V{ 0 } clone :> accum
+    V{ } clone :> accum
 
-    0 seq [ ] [
+    0 0 seq [ ] [
         [ 1 + ] 2dip [
-            quot call [ dup accum push ] unless
+            quot call [
+                [ seq slice-quot call accum push ] keep dup
+            ] unless
         ] keep
     ] map-reduce drop
 
-    n = [ n accum push ] unless
+    n = [ drop ] [ n seq slice-quot call accum push ] if
 
-    accum dup rest-slice [
-        seq slice-quot call
-    ] { } 2map-as ; inline
+    accum { } like ; inline
 
 : (monotonic-split) ( seq quot slice-quot -- pieces )
     pick length [ 3drop { } ] [ monotonic-split-impl ] if-zero ; inline
