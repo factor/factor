@@ -180,7 +180,13 @@ PRIVATE>
 <PRIVATE
 
 : complete-string? ( tokens token -- ? )
-    { [ [ harvest ?last ] [ head? ] bi* ] [ complete-token? ] } 2|| ;
+    {
+        [
+            [ harvest ?last ] dip ?head
+            [ ?last CHAR: \" = not ] [ drop f ] if
+        ]
+        [ complete-token? ]
+    } 2|| ;
 
 PRIVATE>
 
