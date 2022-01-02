@@ -137,7 +137,7 @@ GENERIC#: accept-completion-hook 1 ( item popup -- )
 
 : accept-completion ( item table -- )
     find-completion-popup
-    [ [ first2 over [ word? ] 2dip ? ] dip insert-completion ]
+    [ [ first2 [ [ string? ] keep ] dip ? ] dip insert-completion ]
     [ [ first ] dip accept-completion-hook ]
     2bi ;
 
