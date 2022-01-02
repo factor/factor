@@ -1,4 +1,4 @@
-USING: alien alien.c-types alien.data alien.syntax
+USING: alien.c-types alien.data alien.syntax classes.struct
 environment.unix generalizations io.encodings.utf8 kernel libc
 math sequences simple-tokenizer strings unix unix.types
 unix.utilities ;
@@ -17,10 +17,29 @@ FUNCTION: int execv ( c-string path, c-string* argv )
 FUNCTION: int execvp ( c-string path, c-string* argv )
 FUNCTION: int execve ( c-string path, c-string* argv, c-string* envp )
 
-TYPEDEF: void* posix_spawn_file_actions_t
-TYPEDEF: void* posix_spawnattr_t
+STRUCT: sched_param
+    { sched_priority int } ;
 
-TYPEDEF: uint sigset_t
+TYPEDEF: void* spawn_action
+
+STRUCT: posix_spawn_file_actions_t
+    { __allocated int }
+    { __used int }
+    { __actions spawn_action }
+    { __pad int[16] } ;
+
+! XXX: Linux structs, macOS needs different definitions
+STRUCT: sigset_t
+    { val uchar[128] } ;
+
+STRUCT: posix_spawnattr_t
+  { __flags alien.c-types:short }
+  { __pgrp pid_t }
+  { __sd sigset_t }
+  { __ss sigset_t }
+  { __sp sched_param }
+  { __policy int }
+  { __pad int[16] } ;
 
 FUNCTION: int posix_spawn_file_actions_init ( posix_spawn_file_actions_t* file_actions )
 FUNCTION: int posix_spawn_file_actions_destroy ( posix_spawn_file_actions_t* file_actions )
@@ -88,8 +107,17 @@ CONSTANT: POSIX_SPAWN_PCONTROL_KILL       0x0003
 : check-posix ( n -- )
     dup 0 = [ drop ] [ (throw-errno) ] if ;
 
+: <posix-spawnattr> ( -- attr )
+    posix_spawnattr_t <struct> [ posix_spawnattr_init check-posix ] keep ;
+
+: get-sigdefault ( attr: posix_spawnattr_t out-param: sigset_t -- sigdefault )
+    [ posix_spawnattr_getsigdefault check-posix ] keep ;
+
+: set-sigdefault ( attr: posix_spawnattr_t sigdefault: sigset_t -- )
+    posix_spawnattr_setsigdefault check-posix ;
+
 : posix-spawn-file-actions-init ( -- posix_spawn_file_actions_t )
-    f posix_spawn_file_actions_t <ref>
+    posix_spawn_file_actions_t <struct>
     [ posix_spawn_file_actions_init check-posix ] keep ;
 
 : posix-spawn-file-actions-destroy ( posix_spawn_file_actions_t -- )
