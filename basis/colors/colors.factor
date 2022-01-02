@@ -24,6 +24,7 @@ M: rgba >rgba ; inline
 M: color red>> >rgba red>> ;
 M: color green>> >rgba green>> ;
 M: color blue>> >rgba blue>> ;
+M: color alpha>> >rgba alpha>> ;
 
 : >rgba-components ( object -- r g b a )
     >rgba { [ red>> ] [ green>> ] [ blue>> ] [ alpha>> ] } cleave ; inline
