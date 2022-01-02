@@ -3,9 +3,11 @@
 USING: accessors colors kernel math ;
 IN: colors.gray
 
-TUPLE: gray < color { gray read-only } { alpha read-only } ;
+TUPLE: gray { gray read-only } { alpha read-only } ;
 
 C: <gray> gray
+
+INSTANCE: gray color
 
 M: gray >rgba
     [ gray>> dup dup ] [ alpha>> ] bi <rgba> ; inline

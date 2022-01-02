@@ -6,13 +6,15 @@ math.order ;
 
 IN: colors.yuv
 
-TUPLE: yuva < color
+TUPLE: yuva
 { y read-only }
 { u read-only }
 { v read-only }
 { alpha read-only } ;
 
 C: <yuva> yuva
+
+INSTANCE: yuva color
 
 <PRIVATE
 

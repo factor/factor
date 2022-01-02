@@ -6,13 +6,15 @@ math.order ;
 
 IN: colors.hsl
 
-TUPLE: hsla < color
+TUPLE: hsla
 { hue read-only }
 { saturation read-only }
 { lightness read-only }
 { alpha read-only } ;
 
 C: <hsla> hsla
+
+INSTANCE: hsla color
 
 <PRIVATE
 
