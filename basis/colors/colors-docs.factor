@@ -84,16 +84,18 @@ $nl
     "colors.constants"
 }
 "Color implementations:"
-{ $vocab-subsection "CIE 1931 XYZ colors" "colors.xyz" }
-{ $vocab-subsection "CIE 1931 xyY colors" "colors.xyy" }
-{ $vocab-subsection "CIE 1976 LAB colors" "colors.lab" }
-{ $vocab-subsection "CIE 1976 LUV colors" "colors.luv" }
-{ $vocab-subsection "CMYK colors" "colors.cmyk" }
-{ $vocab-subsection "Grayscale colors" "colors.gray" }
-{ $vocab-subsection "HSL colors" "colors.hsl" }
-{ $vocab-subsection "HSV colors" "colors.hsv" }
-{ $vocab-subsection "RYB colors" "colors.ryb" }
-{ $vocab-subsection "YIQ colors" "colors.yiq" }
-{ $vocab-subsection "YUV colors" "colors.yuv" } ;
+{ $vocab-subsections
+    { "CIE 1931 XYZ colors" "colors.xyz" }
+    { "CIE 1931 xyY colors" "colors.xyy" }
+    { "CIE 1976 LAB colors" "colors.lab" }
+    { "CIE 1976 LUV colors" "colors.luv" }
+    { "CMYK colors" "colors.cmyk" }
+    { "Grayscale colors" "colors.gray" }
+    { "HSL colors" "colors.hsl" }
+    { "HSV colors" "colors.hsv" }
+    { "RYB colors" "colors.ryb" }
+    { "YIQ colors" "colors.yiq" }
+    { "YUV colors" "colors.yuv" }
+} ;
 
 ABOUT: "colors"

@@ -256,6 +256,9 @@ PRIVATE>
         if*
     ] ($subsection) ;
 
+: $vocab-subsections ( element -- )
+    [ $vocab-subsection ] each ($blank-line) ;
+
 : $vocab-link ( element -- )
     check-first [ vocab-name ] keep ($vocab-link) ;
 
