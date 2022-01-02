@@ -41,11 +41,7 @@ SLOT: background-color
     GL_SCISSOR_TEST glEnable
     GL_SRC_ALPHA GL_ONE_MINUS_SRC_ALPHA glBlendFunc
     init-matrices
-    [ init-clip ]
-    [
-        background-color>> >rgba-components glClearColor
-        GL_COLOR_BUFFER_BIT glClear
-    ] bi ;
+    [ init-clip ] [ background-color>> gl-clear ] bi ;
 
 GENERIC: draw-gadget* ( gadget -- )
 
