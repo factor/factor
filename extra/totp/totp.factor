@@ -29,5 +29,5 @@ PRIVATE>
     [ number>string ] dip [ CHAR: 0 pad-head ] keep tail* ;
 
 : totp ( key -- string )
-    dup string? [ >upper base32> ] when
+    dup string? [ [ CHAR: space = ] reject >upper base32> ] when
     now timestamp>count swap totp-hash get totp* totp-digits get digits ;
