@@ -6,13 +6,15 @@ math.order ;
 
 IN: colors.yiq
 
-TUPLE: yiqa < color
+TUPLE: yiqa
 { y read-only }
 { in-phase read-only }
 { quadrature read-only }
 { alpha read-only } ;
 
 C: <yiqa> yiqa
+
+INSTANCE: yiqa color
 
 M: yiqa >rgba
     {
