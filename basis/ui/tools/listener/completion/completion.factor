@@ -135,11 +135,12 @@ GENERIC#: accept-completion-hook 1 ( item popup -- )
 : insert-completion ( item popup -- )
     completion-loc/doc/elt set-elt-string ;
 
+: unpack-completion ( item -- object string )
+    first2 over string? [ drop dup ] when ;
+
 : accept-completion ( item table -- )
-    find-completion-popup
-    [ [ first2 [ [ string? ] keep ] dip ? ] dip insert-completion ]
-    [ [ first ] dip accept-completion-hook ]
-    2bi ;
+    [ unpack-completion ] [ find-completion-popup ] bi*
+    [ insert-completion ] [ accept-completion-hook ] bi ;
 
 : <completion-table> ( interactor completion-mode -- table )
     [ completion-element ] [ completion-quot ] [ nip ] 2tri
