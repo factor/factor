@@ -76,6 +76,7 @@ ID-SYNTAX ID-SYNTAX
 
 ! ! Numbers
 { -55 -0x10 100,00 1,000,000 0x2000,0000 0b01 } drop
+{ -0x100_000 100_00 1_000_000 0x2000_0000 0b0_1 } drop
 
 ! ! Containers
 V{ 1 2 3 } drop
