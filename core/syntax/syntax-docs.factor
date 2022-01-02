@@ -33,11 +33,12 @@ ARTICLE: "syntax-immediate" "Parse time evaluation"
 } ;
 
 ARTICLE: "syntax-integers" "Integer syntax"
-"The printed representation of an integer consists of a sequence of digits, optionally prefixed by a sign and arbitrarily separated by commas."
+"The printed representation of an integer consists of a sequence of digits, optionally prefixed by a sign and arbitrarily separated by commas or underscores."
 { $code
     "123456"
     "-10"
     "2,432,902,008,176,640,000"
+    "1_000_000"
 }
 "Integers are entered in base 10 unless prefixed with a base-changing prefix. " { $snippet "0x" } " begins a hexadecimal literal, " { $snippet "0o" } " an octal literal, and " { $snippet "0b" } " a binary literal. A sign, if any, goes before the base prefix."
 { $example
