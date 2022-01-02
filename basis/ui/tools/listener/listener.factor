@@ -318,7 +318,7 @@ M: listener-operation invoke-command
     [ [ clear ] \ clear ] dip (call-listener) ;
 
 : use-if-necessary ( word manifest -- )
-    [ [ vocabulary>> ] keep ] dip 2over and [
+    [ [ vocabulary>> ] keep ] dip pick over and [
         manifest [
             [ drop use-vocab ]
             [ name>> 1array add-words-from ] 2bi
