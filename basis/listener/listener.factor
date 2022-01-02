@@ -72,7 +72,7 @@ SYMBOL: error-hook
 
 : call-error-hook ( error -- )
     error-continuation get error-hook get
-    call( continuation error -- ) ;
+    call( error continuation -- ) ;
 
 [ drop print-error-and-restarts ] error-hook set-global
 
