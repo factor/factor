@@ -278,20 +278,12 @@ PRIVATE>
 
     METHOD: void prepareOpenGL [
 
-        self SEL: setWantsBestResolutionOpenGLSurface:
-        -> respondsToSelector: c-bool> [
+        self -> backingScaleFactor
+        [ 1.0 > ] keep f ? gl-scale-factor set-global
 
-            self 1 { void { id SEL char } } ?-> setWantsBestResolutionOpenGLSurface:
+        cached-lines get-global clear-assoc
 
-            self { double { id SEL } } ?-> backingScaleFactor
-
-            dup 1.0 > [
-                gl-scale-factor set-global t retina? set-global
-                cached-lines get-global clear-assoc
-            ] [ drop ] if
-
-            self -> update
-        ] when
+        self -> update
     ] ;
 
     METHOD: void reshape [
@@ -706,14 +698,8 @@ PRIVATE>
 
     METHOD: void windowDidChangeBackingProperties: id notification
     [
-
-        notification -> object dup SEL: backingScaleFactor
-        -> respondsToSelector: c-bool> [
-            { double { id SEL } } ?-> backingScaleFactor
-
-            [ [ 1.0 > ] keep f ? gl-scale-factor set-global ]
-            [ 1.0 > retina? set-global ] bi
-        ] [ drop ] if
+        notification -> object -> backingScaleFactor
+        [ 1.0 > ] keep f ? gl-scale-factor set-global
     ] ;
 ;CLASS>
 
