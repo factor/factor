@@ -372,5 +372,6 @@ M: block long-section
     <flow class-of name>> "~pprint error: " "~" surround text block> ;
 
 : with-pprint ( obj quot -- )
-    '[ _ [ drop error-in-pprint ] recover ]
-    f make-pprint drop do-pprint ; inline
+    '[ _ f make-pprint ]
+    [ drop [ error-in-pprint ] f make-pprint ] recover
+    drop do-pprint ; inline
