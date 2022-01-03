@@ -5,7 +5,7 @@ assocs cache classes colors combinators core-foundation
 core-foundation.attributed-strings core-foundation.strings
 core-graphics core-graphics.types core-text.fonts destructors
 fonts init io.encodings.string io.encodings.utf16n kernel make
-math math.functions math.order math.vectors namespaces
+math math.functions math.order math.vectors namespaces opengl
 sequences strings ;
 IN: core-text
 
@@ -31,8 +31,6 @@ FUNCTION: CFIndex CTLineGetStringIndexForPosition ( CTLineRef line, CGPoint posi
 FUNCTION: double CTLineGetTypographicBounds ( CTLineRef line, CGFloat* ascent, CGFloat* descent, CGFloat* leading )
 
 FUNCTION: CGRect CTLineGetImageBounds ( CTLineRef line, CGContextRef context )
-
-SYMBOL: retina?
 
 MEMO: make-attributes ( open-font color -- hashtable )
     [
@@ -113,10 +111,13 @@ render-loc render-dim render-ext ;
     loc first
     metrics ascent>> dim second loc second + - 1 - 2array ;
 
+: load-2x? ( -- ? )
+    gl-scale-factor get-global [ 1.0 > ] [ f ] if* ;
+
 :: <line> ( font string -- line )
     [
         line new-disposable
-        font retina? get-global [ cache-font@2x ] [ cache-font ] if :> open-font
+        font load-2x? [ cache-font@2x ] [ cache-font ] if :> open-font
         string open-font font foreground>> <CTLine> |CFRelease :> line
         open-font line compute-line-metrics
         [ >>metrics ] [ metrics>dim >>dim ] bi
@@ -159,7 +160,7 @@ render-loc render-dim render-ext ;
             [ loc set-text-position ]
             [ [ ctline ] dip CTLineDraw ]
         } cleave
-    ] make-bitmap-image retina? get-global >>2x? ;
+    ] make-bitmap-image load-2x? >>2x? ;
 
 : line>image ( line -- image )
     dup image>> [ render >>image ] unless image>> ;
@@ -171,4 +172,4 @@ SYMBOL: cached-lines
 : cached-line ( font string -- line )
     cached-lines get-global [ <line> ] 2cache ;
 
-[ <cache-assoc> cached-lines set-global f retina? set-global ] "core-text" add-startup-hook
+[ <cache-assoc> cached-lines set-global ] "core-text" add-startup-hook
