@@ -24,7 +24,12 @@ SYMBOL: command-line
 : (command-line) ( -- args )
     OBJ-ARGS special-object sift [ alien>native-string ] map ;
 
+: delete-user-init-errors ( file -- )
+    user-init-errors get delete-at* nip
+    [ notify-error-observers ] when ;
+
 : try-user-init ( file -- )
+    [ delete-user-init-errors ] keep
     "user-init" get swap '[
         _ [ ?run-file ] [
             <user-init-error>
