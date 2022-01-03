@@ -1,5 +1,4 @@
 USING: assocs kernel prettyprint.custom vlists ;
-IN: vlists.prettyprint
 
 M: vlist pprint-delims drop \ VL{ \ } ;
 M: vlist >pprint-sequence ;
