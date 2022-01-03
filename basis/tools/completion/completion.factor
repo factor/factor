@@ -64,7 +64,7 @@ PRIVATE>
         [ <reversed> ] bi@ dupd fuzzy score max
     ] [ 2drop ] if ;
 
-: completion ( short candidate -- score result )
+: completion ( short candidate -- score candidate )
     [ second swap complete ] keep ; inline
 
 : completion, ( short candidate -- )
