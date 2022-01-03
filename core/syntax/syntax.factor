@@ -107,7 +107,7 @@ IN: bootstrap.syntax
     "POSTPONE:" [ scan-word suffix! ] define-core-syntax
     "\\" [ scan-word <wrapper> suffix! ] define-core-syntax
     "M\\" [ scan-word scan-word lookup-method <wrapper> suffix! ] define-core-syntax
-    "auto-use" [ auto-use? on ] define-core-syntax
+    "auto-use" [ t auto-use? set-global ] define-core-syntax
     "delimiter" [ last-word t "delimiter" set-word-prop ] define-core-syntax
     "deprecated" [ last-word make-deprecated ] define-core-syntax
     "flushable" [ last-word make-flushable ] define-core-syntax
