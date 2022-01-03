@@ -34,7 +34,7 @@ SYMBOL: indentation
 : ?filter-children ( children -- no-whitespace )
     xml-pprint? get [
         [ dup string? [ [ blank? ] trim ] when ] map
-        [ "" = ] reject
+        "" swap remove
     ] when ;
 
 PRIVATE>

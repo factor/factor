@@ -108,7 +108,7 @@ PRIVATE>
 : exclusions ( -- set )
     exclusions-file utf8 file-lines
     [ "#" split1 drop [ ascii:blank? ] trim-tail hex> ] map
-    [ 0 = ] reject ;
+    0 swap remove ;
 
 : unique ( seq -- assoc )
     [ dup ] H{ } map>assoc ;
