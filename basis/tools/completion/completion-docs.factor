@@ -42,13 +42,8 @@ HELP: complete
 { $description "Ranks how close " { $snippet "short" } " is to " { $snippet "full" } " by edit distance." } ;
 
 HELP: completion
-{ $values { "short" string } { "candidate" "a pair " { $snippet "{ obj full }" } } { "result" "a pair " { $snippet "{ score obj }" } } }
-{ $description "Outputs a pair of two elements:"
-    { $list
-        { "how close " { $snippet "short" } " is to " { $snippet "full" } " by edit distance" }
-        { "the original value of " { $snippet "obj" } }
-    }
-} ;
+{ $values { "short" string } { "candidate" "a pair " { $snippet "{ obj full }" } } { "score" number } }
+{ $description "Outputs a score for matching two elements indicating how close " { $snippet "short" } " is to " { $snippet "full" } " by edit distance" } ;
 
 HELP: completion,
 { $values { "short" string } { "candidate" "a pair " { $snippet "{ obj full }" } } }
