@@ -33,7 +33,7 @@ tool "common" f {
     { T{ key-down f { C+ M+ } "f" } toggle-fullscreen }
 } {
     { T{ key-down f { C+ } "F4" } close-window }
-    { T{ key-down f { A+ } "F4" } com-exit }
+    { T{ key-down f { A+ } "F4" } close-window }
     { T{ key-down f f "F11" } toggle-fullscreen }
 } ? prepend define-command-map
 
