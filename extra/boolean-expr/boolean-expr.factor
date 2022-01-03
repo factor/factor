@@ -46,7 +46,7 @@ METHOD: ¬ { ⋁ } [ x>> ¬ ] [ y>> ¬ ] bi ⋀ ;
 
 METHOD: ¬ { □ } \ ¬ boa ;
 
-: → ( x y -- expr ) ¬ ⋀ ;
+: → ( x y -- expr ) swap ¬ ⋁ ;
 : ⊕ ( x y -- expr ) [ ⋁ ] [ ⋀ ¬ ] 2bi ⋀ ;
 : ≣ ( x y -- expr ) [ ⋀ ] [ [ ¬ ] bi@ ⋀ ] 2bi ⋁ ;
 
