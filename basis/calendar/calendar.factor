@@ -464,6 +464,7 @@ M: duration time-
 
 : hence ( duration -- timestamp ) now swap time+ ;
 : ago ( duration -- timestamp ) now swap time- ;
+: days-since ( time -- n ) ago duration>days ;
 : days-until ( time -- n ) now time- duration>days ;
 
 GENERIC: days-in-year ( obj -- n )
