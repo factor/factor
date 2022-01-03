@@ -1,10 +1,9 @@
 ! Copyright (C) 2003, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays classes colors combinators
-continuations generic grouping io io.streams.string io.styles
-kernel make math math.parser namespaces prettyprint.config
-prettyprint.custom prettyprint.sections sequences strings
-vocabs.prettyprint words ;
+USING: accessors arrays colors combinators grouping io
+io.streams.string io.styles kernel make math namespaces
+prettyprint.config prettyprint.custom prettyprint.sections
+sequences strings vocabs.prettyprint words ;
 IN: prettyprint
 
 : with-use ( obj quot -- )
@@ -35,19 +34,11 @@ IN: prettyprint
 
 : short. ( obj -- ) pprint-short nl ;
 
-: error-in-pprint ( obj -- str )
-    class-of name>> "~pprint error: " "~" surround ;
-
 : .b ( n -- ) 2 number-base [ . ] with-variable ;
 : .o ( n -- ) 8 number-base [ . ] with-variable ;
 : .h ( n -- ) 16 number-base [ . ] with-variable ;
 
-: stack. ( seq -- )
-    [
-        [ short. ] [
-            drop [ error-in-pprint ] keep write-object nl
-        ] recover
-    ] each ;
+: stack. ( seq -- ) [ short. ] each ;
 
 : .s ( -- ) get-datastack stack. ;
 : .r ( -- ) get-retainstack stack. ;
