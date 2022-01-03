@@ -40,7 +40,7 @@ GENERIC: ¬ ( x -- expr )
 
 METHOD: ¬ { ⊤ } drop ⊥ ;
 METHOD: ¬ { ⊥ } drop ⊤ ;
-
+METHOD: ¬ { ¬ } x>> ;
 METHOD: ¬ { ⋀ } [ x>> ¬ ] [ y>> ¬ ] bi ⋁ ;
 METHOD: ¬ { ⋁ } [ x>> ¬ ] [ y>> ¬ ] bi ⋀ ;
 
