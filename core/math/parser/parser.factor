@@ -591,9 +591,9 @@ M: float >base
     dup length 2/ <byte-array> [
         [
             [ digit> ] 2dip over even? [
-                [ 16 * ] [ 2/ ] [ set-nth ] tri*
+                [ 16 * ] [ 2/ ] [ set-nth-unsafe ] tri*
             ] [
-                [ 2/ ] [ [ + ] change-nth ] bi*
+                [ 2/ ] [ [ + ] change-nth-unsafe ] bi*
             ] if
         ] curry each-index
     ] keep ;
@@ -603,6 +603,6 @@ M: float >base
         [
             [ 16 /mod [ >digit ] bi@ ]
             [ 2 * dup 1 + ]
-            [ [ set-nth ] curry bi-curry@ bi* ] tri*
+            [ [ set-nth-unsafe ] curry bi-curry@ bi* ] tri*
         ] curry each-index
     ] keep ;
