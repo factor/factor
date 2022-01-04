@@ -8,7 +8,9 @@ IN: random.pcg-mwc-vec
 ! https://www.pcg-random.org/
 
 ! The state is an array of four u64 values in this order: x1, x2, x3, c.
-TUPLE: Mwc256XXA64 state ;
+! Since we are only returning 32 bits per step of this 64-bit PRNG, the rest are
+! saved in the rem field.
+TUPLE: Mwc256XXA64 state rem ;
 
 <PRIVATE
 
@@ -31,13 +33,18 @@ CONSTANT: MULTIPLIER 0xfeb3_4465_7c0a_f413
 
 : next-u64 ( obj -- n )
     dup state>> third multiply [ pick state>> first3 permute ] keep
-    swap [ update-state ] dip ;
+    swap [ update-state ] dip ; inline
+
+! If cache is f, use quot to produce a new pair of values from obj: one to be
+! cached, and one to be used. Otherwise return cache as value and cache' = f.
+: cache ( obj cache/f quot: ( obj -- n1 n2 ) -- value cache' )
+    [ nip f ] swap if* ; inline
 
 PRIVATE>
 
 : <Mwc256XXA64> ( key1 key2 -- obj )
-    0xcafef00dd15ea5e5 0x14057B7EF767814F 4array \ Mwc256XXA64 boa
-    6 [ dup next-u64 drop ] times ; inline
+    0xcafef00dd15ea5e5 0x14057B7EF767814F 4array f \ Mwc256XXA64 boa
+    6 [ dup next-u64 drop ] times ;
 
 M: Mwc256XXA64 random-32*
-    next-u64 32 bits ;
+    dup [ [ next-u64 d>w/w ] cache ] change-rem drop ;
