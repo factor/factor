@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays classes kernel sequences sets
 io prettyprint ;
-FROM: multi-methods => GENERIC: METHOD: ;
+FROM: multi-methods => GENERIC: METHOD: method ;
 IN: boolean-expr
 
 TUPLE: ⋀ x y ;
@@ -22,10 +22,15 @@ METHOD: ⋀ { □ ⊤ } drop ;
 METHOD: ⋀ { ⊥ □ } drop ;
 METHOD: ⋀ { □ ⊥ } nip ;
 
+! Implement only distributivity of ∧ over ∨, but not ∨ over ∧ to avoid
+! infinite looping. This makes sure that internally we always use DNF.
 METHOD: ⋀ { ⋁ □ } [ [ x>> ] dip ⋀ ] [ [ y>> ] dip ⋀ ] 2bi ⋁ ;
 METHOD: ⋀ { □ ⋁ } [ x>> ⋀ ] [ y>> ⋀ ] 2bi ⋁ ;
 
-METHOD: ⋀ { □ □ } \ ⋀ boa ;
+METHOD: ⋀ { ¬ ⋁ } { □ ⋁ } \ ⋀ method execute( x y -- expr ) ;
+METHOD: ⋀ { ¬ □ } 2dup swap x>> = [ 2drop ⊥ ] [ \ ⋀ boa ] if ;
+METHOD: ⋀ { □ ¬ } 2dup      x>> = [ 2drop ⊥ ] [ \ ⋀ boa ] if ;
+METHOD: ⋀ { □ □ } 2dup = [ drop ] [ \ ⋀ boa ] if ;
 
 GENERIC: ⋁ ( x y -- expr )
 
@@ -34,7 +39,9 @@ METHOD: ⋁ { □ ⊤ } nip ;
 METHOD: ⋁ { ⊥ □ } nip ;
 METHOD: ⋁ { □ ⊥ } drop ;
 
-METHOD: ⋁ { □ □ } \ ⋁ boa ;
+METHOD: ⋁ { ¬ □ } 2dup swap x>> = [ 2drop ⊤ ] [ \ ⋁ boa ] if ;
+METHOD: ⋁ { □ ¬ } 2dup      x>> = [ 2drop ⊤ ] [ \ ⋁ boa ] if ;
+METHOD: ⋁ { □ □ } 2dup = [ drop ] [ \ ⋁ boa ] if ;
 
 GENERIC: ¬ ( x -- expr )
 
