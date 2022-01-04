@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors alien.c-types classes.struct kernel locals math
 math.bitwise random ;
-IN: random.pcg-mwc
+IN: random.pcg
 
 ! https://github.com/tkaitchuck/Mwc256XXA64/blob/main/impl/src/gen64.rs
 ! https://www.pcg-random.org/
@@ -52,6 +52,6 @@ PRIVATE>
 M: Mwc256XXA64 random-32*
     dup [ [ next-u64 d>w/w ] cache ] change-rem drop ;
 
-! USING: random random.pcg-mwc random.pcg-mwc-vec ;
-! gc 0 0 random.pcg-mwc:<Mwc256XXA64> [ 10,000,000 [ dup random-32* drop ] times ] time drop
-! gc 0 0 random.pcg-mwc-vec:<Mwc256XXA64> [ 10,000,000 [ dup random-32* drop ] times ] time drop
+! USING: random random.pcg random.pcg-vec ;
+! gc 0 0 random.pcg:<Mwc256XXA64> [ 10,000,000 [ dup random-32* drop ] times ] time drop
+! gc 0 0 random.pcg-vec:<Mwc256XXA64> [ 10,000,000 [ dup random-32* drop ] times ] time drop

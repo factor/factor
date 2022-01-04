@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors alien.c-types arrays kernel math math.bitwise
 random sequences ;
-IN: random.pcg-mwc-vec
+IN: random.pcg-vec
 
 ! https://github.com/tkaitchuck/Mwc256XXA64/blob/main/impl/src/gen64.rs
 ! https://www.pcg-random.org/
