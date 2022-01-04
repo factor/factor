@@ -700,6 +700,8 @@ PRIVATE>
     [
         notification -> object -> backingScaleFactor
         [ 1.0 > ] keep f ? gl-scale-factor set-global
+
+        cached-lines get-global clear-assoc
     ] ;
 ;CLASS>
 
