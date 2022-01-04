@@ -98,7 +98,7 @@ CONSTANT: keep-logs 10
 
 : log-server ( -- )
     [
-        init-namespaces
+        init-namestack
         [ log-server-loop ]
         [ error. (close-logs) ]
         recover t

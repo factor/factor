@@ -45,7 +45,7 @@ PRIVATE>
 : namespace ( -- namespace ) (get-namestack) last ; inline
 : get-namestack ( -- namestack ) (get-namestack) clone ;
 : set-namestack ( namestack -- ) >vector (set-namestack) ;
-: init-namespaces ( -- ) global 1array set-namestack ;
+: init-namestack ( -- ) global 1vector (set-namestack) ;
 
 : get-global ( variable -- value ) global box-at value>> ; inline
 : set-global ( value variable -- ) global set-at ; inline
