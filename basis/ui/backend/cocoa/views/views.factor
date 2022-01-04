@@ -271,20 +271,14 @@ IMPORT: NSAttributedString
         gadget remove-preedit-info 
     ] when ;
 
+: set-scale-factor ( n -- )
+    [ 1.0 > ] keep f ? gl-scale-factor set-global
+    cached-lines get-global clear-assoc ;
+
 PRIVATE>
 
 <CLASS: FactorView < NSOpenGLView
     COCOA-PROTOCOL: NSTextInputClient
-
-    METHOD: void prepareOpenGL [
-
-        self -> backingScaleFactor
-        [ 1.0 > ] keep f ? gl-scale-factor set-global
-
-        cached-lines get-global clear-assoc
-
-        self -> update
-    ] ;
 
     METHOD: void reshape [
         self window :> window
@@ -658,7 +652,9 @@ PRIVATE>
     CGLSetParameter drop ;
 
 : <FactorView> ( dim pixel-format -- view )
-    [ FactorView ] 2dip <GLView> [ sync-refresh-to-screen ] keep ;
+    [ FactorView ] 2dip <GLView>
+    [ -> backingScaleFactor set-scale-factor ] keep
+    [ sync-refresh-to-screen ] keep ;
 
 : save-position ( world window -- )
     -> frame CGRect-top-left 2array >>window-loc drop ;
@@ -698,10 +694,7 @@ PRIVATE>
 
     METHOD: void windowDidChangeBackingProperties: id notification
     [
-        notification -> object -> backingScaleFactor
-        [ 1.0 > ] keep f ? gl-scale-factor set-global
-
-        cached-lines get-global clear-assoc
+        notification -> object -> backingScaleFactor set-scale-factor
     ] ;
 ;CLASS>
 
