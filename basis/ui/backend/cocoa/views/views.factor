@@ -280,6 +280,11 @@ PRIVATE>
 <CLASS: FactorView < NSOpenGLView
     COCOA-PROTOCOL: NSTextInputClient
 
+    METHOD: void prepareOpenGL [
+        self -> backingScaleFactor set-scale-factor
+        self -> update
+    ] ;
+
     METHOD: void reshape [
         self window :> window
         window [
