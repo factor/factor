@@ -313,8 +313,8 @@ PRIVATE>
         { SSL_ERROR_SYSCALL [ ssl-error-syscall ] }
         { SSL_ERROR_SSL [ drop throw-ssl-error ] }
         ! https://stackoverflow.com/questions/50223224/ssl-read-returns-ssl-error-zero-return-but-err-get-error-is-0
-        ! we got disconnected
-        { SSL_ERROR_ZERO_RETURN [ f >>connected drop f ] }
+        ! there are no more bytes to read
+        { SSL_ERROR_ZERO_RETURN [ drop f ] }
         { SSL_ERROR_WANT_ACCEPT [ drop +input+ ] }
     } case ;
 
