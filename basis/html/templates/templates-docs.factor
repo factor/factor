@@ -14,6 +14,7 @@ $nl
     { { $link string } " - the simplest type of template; simply written to " { $link output-stream } }
     { { $link callable } " - a custom quotation, called to yield output" }
     { { $link xml } " - written to " { $link output-stream } }
+    { "an input stream - copied to " { $link output-stream } }
 } } ;
 
 HELP: call-template
