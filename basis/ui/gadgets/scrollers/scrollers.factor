@@ -150,13 +150,13 @@ PRIVATE>
     dup find-scroller* [
         [ relative-scroll-rect ] keep
         swap >>follows
-        relayout
+        relayout-1
     ] [ 2drop ] if* ;
 
 : scroll>gadget ( gadget -- )
     dup find-scroller* [
         swap >>follows
-        relayout
+        relayout-1
     ] [
         drop
     ] if* ;
