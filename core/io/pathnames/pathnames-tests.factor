@@ -185,3 +185,7 @@ os windows? [
 
 { "resource:extra/benchmark/sum-file/" }
 [ "benchmark/sum-file/" vocab-path ] unit-test
+
+! Would be a core/ path except the path already exists in basis
+{ "resource:basis/bootstrap/finish-bootstrap.factor" }
+[ "bootstrap/finish-bootstrap.factor" vocab-path ] unit-test
