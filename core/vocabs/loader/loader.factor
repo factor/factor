@@ -1,8 +1,8 @@
 ! Copyright (C) 2007, 2010 Eduardo Cavazos, Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays assocs continuations definitions init
-io io.files io.pathnames kernel make namespaces parser
-sequences sets splitting strings vocabs words ;
+USING: accessors arrays assocs combinators continuations
+definitions init io io.files io.pathnames kernel make namespaces
+parser sequences sets splitting strings vocabs words ;
 IN: vocabs.loader
 
 SYMBOL: vocab-roots
@@ -36,8 +36,23 @@ ERROR: not-found-in-roots path ;
 : find-root-for ( path -- path/f )
     vocab-roots get [ prepend-path file-exists? ] with find nip ;
 
-M: string vocab-path
+: find-root-for-vocab-pathname ( path -- path/f )
     dup find-root-for [ prepend-path ] [ not-found-in-roots ] if* ;
+
+: ensure-parent-directory-is-not-dot ( path -- parent-directory )
+    dup parent-directory dup "." =
+    [ drop not-found-in-roots ]
+    [ nip ] if ;
+
+M: string vocab-path
+    {
+        { [ dup ?last path-separator? ] [ find-root-for-vocab-pathname ] }
+        { [ dup has-file-extension? ] [
+            [ ensure-parent-directory-is-not-dot find-root-for-vocab-pathname ]
+            [ file-name ] bi append-path
+        ] }
+        [ find-root-for-vocab-pathname ]
+    } cond ;
 
 PRIVATE>
 
