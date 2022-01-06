@@ -145,15 +145,22 @@ SYMBOL: errorlist
 : add-to-errorlist ( error vocab -- )
     vocab-name errorlist get [ set-at ] [ 2drop ] if* ;
 
+: remove-from-errorlist ( vocab -- )
+    vocab-name errorlist get [ delete-at ] [ drop ] if* ;
+
 GENERIC: (require) ( name -- )
 
 M: vocab (require)
     [
-        dup source-loaded?>> +parsing+ eq? [ drop ] [
-            dup source-loaded?>> [ dup load-source ] unless
-            dup docs-loaded?>> [ dup load-docs ] unless
-            drop
-        ] if
+        [
+            dup source-loaded?>> +parsing+ eq? [ drop ] [
+                dup source-loaded?>> [ dup load-source ] unless
+                dup docs-loaded?>> [ dup load-docs ] unless
+                drop
+            ] if
+        ] [
+            remove-from-errorlist
+        ] bi
     ] [ [ swap add-to-errorlist ] keep rethrow ] recover ;
 
 M: vocab-link (require)
