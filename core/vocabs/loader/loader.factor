@@ -44,15 +44,20 @@ ERROR: not-found-in-roots path ;
     [ drop not-found-in-roots ]
     [ nip ] if ;
 
+! If path exists use it, otherwise try to find a vocab that exists
 M: string vocab-path
-    {
-        { [ dup ?last path-separator? ] [ find-root-for-vocab-pathname ] }
-        { [ dup has-file-extension? ] [
-            [ ensure-parent-directory-is-not-dot find-root-for-vocab-pathname ]
-            [ file-name ] bi append-path
-        ] }
-        [ find-root-for-vocab-pathname ]
-    } cond ;
+    dup find-root-for [
+        prepend-path
+    ] [
+        {
+            { [ dup ?last path-separator? ] [ find-root-for-vocab-pathname ] }
+            { [ dup has-file-extension? ] [
+                [ ensure-parent-directory-is-not-dot find-root-for-vocab-pathname ]
+                [ file-name ] bi append-path
+            ] }
+            [ find-root-for-vocab-pathname ]
+        } cond
+    ] if* ;
 
 PRIVATE>
 
