@@ -128,6 +128,11 @@ PRIVATE>
 : file-extension ( path -- extension )
     file-name "." split1-last nip ;
 
+: has-file-extension? ( path -- ? )
+    dup ?last path-separator?
+    [ drop f ]
+    [ file-name CHAR: . swap member? ] if ;
+
 : path-components ( path -- seq )
     normalize-path path-separator split harvest ;
 
