@@ -733,13 +733,10 @@ ERROR: windows-error n string ;
 ! Note that win32-error* words throw GetLastError code.
 : win32-error ( -- ) GetLastError n>win32-error-check ;
 : win32-error=0/f ( n -- ) { 0 f } member? [ win32-error ] when ;
-: win32-error>0 ( n -- ) 0 > [ win32-error ] when ;
-: win32-error<0 ( n -- ) 0 < [ win32-error ] when ;
-: win32-error<>0 ( n -- ) zero? [ win32-error ] unless ;
 : win32-error=0/f-ignore-timeout ( n -- )
     { 0 f } member? [ win32-error-ignore-timeout ] when ;
 
-: win32-allow-errors ( n allowed -- n )
+: win32-allow-errors ( n allowed-seq -- n )
     GetLastError 2dup swap member? [
         2drop
     ] [
@@ -765,6 +762,3 @@ CONSTANT: expected-io-errors
 
 : expected-io-error ( error-code -- )
     expected-io-error? [ win32-error ] unless ;
-
-: io-error ( return-value -- )
-    { 0 f } member? [ GetLastError expected-io-error ] when ;
