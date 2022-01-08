@@ -759,6 +759,3 @@ CONSTANT: expected-io-errors
 
 : expected-io-error? ( error-code -- ? )
     expected-io-errors member? ;
-
-: expected-io-error ( error-code -- )
-    expected-io-error? [ win32-error ] unless ;
