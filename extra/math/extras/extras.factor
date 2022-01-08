@@ -358,3 +358,27 @@ PRIVATE>
         ] each
         a a sq m > [ 1 - ] when
     ] if-zero ;
+
+<PRIVATE
+
+: reduce-evens ( value u v -- value' u' v' )
+    [ 2dup [ even? ] both? ] [ [ 2 * ] [ 2/ ] [ 2/ ] tri* ] while ;
+
+: reduce-odds ( value u v -- value' u' v' )
+    [
+        [ [ dup even? ] [ 2/ ] while ] bi@
+        2dup <=> {
+            { +eq+ [ over '[ _ * ] 2dip f ] }
+            { +lt+ [ swap [ - ] keep t ] }
+            { +gt+ [ [ - ] keep t ] }
+        } case
+    ] loop ;
+
+PRIVATE>
+
+: stein ( u v -- w )
+    2dup [ zero? ] both? [ "gcd for zeros is undefined" throw ] when
+    [ dup 0 < [ neg ] when ] bi@
+    [ 1 ] 2dip reduce-evens reduce-odds 2drop ;
+
+

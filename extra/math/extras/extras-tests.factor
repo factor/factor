@@ -151,3 +151,7 @@ tools.test ;
 { 3 } [ 12 integer-sqrt ] unit-test
 { 4 } [ 16 integer-sqrt ] unit-test
 { 44 } [ 2019 integer-sqrt ] unit-test
+
+{ 1 } [ 11 13 stein ] unit-test
+{ 2 } [ 14 52 stein ] unit-test
+{ 7 } [ 14 7 stein ] unit-test
