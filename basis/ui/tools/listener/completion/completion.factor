@@ -93,7 +93,7 @@ M: word-completion row-color
 M: vocab-word-completion row-color 2drop COLOR: black ;
 
 M: vocab-completion row-color
-    drop dup vocab? [
+    drop first dup vocab? [
         name>> ".private" tail? COLOR: dark-red text-color ?
     ] [ drop COLOR: dark-gray ] if ;
 
