@@ -132,7 +132,6 @@ CONSTANT: max-speed 30.0
     ?move-player-freely over 0 > [
         ! bounce
         drag-player
-        (move-player)
     ] when ;
 
 : move-player ( player -- )
