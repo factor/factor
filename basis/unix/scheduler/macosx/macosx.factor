@@ -5,8 +5,8 @@ IN: unix.scheduler
 
 CONSTANT: MOST_IDLE_SCHED_POLICY f
 
-: policy-priority-range ( policy -- * )
+: policy-priority-range ( policy -- high low )
     os bad-platform ;
 
-: priority-allowed? ( policy -- * )
+: priority-allowed? ( policy -- ? )
     os bad-platform ;
