@@ -77,6 +77,7 @@ jamshred-gadget H{
     { T{ key-down f f "DOWN" } [ jamshred>> jamshred-player -1 swap change-player-speed ] }
     { T{ key-down f f "LEFT" } [ jamshred>> 1 jamshred-roll ] }
     { T{ key-down f f "RIGHT" } [ jamshred>> -1 jamshred-roll ] }
+    { T{ key-down f f "ESC" } [ quit ] }
     { T{ key-down f f "q" } [ quit ] }
     { motion [ handle-mouse-motion ] }
     { mouse-scroll [ handle-mouse-scroll ] }
