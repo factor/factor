@@ -36,7 +36,7 @@ IN: http.parsers
     [ token ] map choice ;
 
 : http-method-parser ( -- parser )
-    { "OPTIONS" "GET" "HEAD" "POST" "PUT" "DELETE" "TRACE" "CONNECT" } one-of ;
+    { "OPTIONS" "GET" "HEAD" "POST" "PUT" "DELETE" "TRACE" "CONNECT" "PATCH" } one-of ;
 
 : url-parser ( -- parser )
     [ " \t\r\n" member? ] except repeat1 case-sensitive ;
