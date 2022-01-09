@@ -335,6 +335,15 @@ PRIVATE>
 : http-options* ( url -- response data )
     <options-request> http-request* ;
 
+: <patch-request> ( url -- request )
+    "PATCH" <client-request> ;
+
+: http-patch ( url -- response data )
+    <patch-request> http-request ;
+
+: http-patch* ( url -- response data )
+    <patch-request> http-request* ;
+
 : <trace-request> ( url -- request )
     "TRACE" <client-request> ;
 
