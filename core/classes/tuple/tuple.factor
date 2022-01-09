@@ -300,7 +300,7 @@ GENERIC#: (define-tuple-class) 2 ( class superclass slots -- )
 
 : reset-final ( class -- )
     dup final-class? [
-        [ f "final" set-word-prop ]
+        [ "final" remove-word-prop ]
         [ changed-conditionally ]
         bi
     ] [ drop ] if ;
