@@ -39,6 +39,9 @@ const char* default_image_path(void) {
   if ([path hasSuffix:@".app"] || [path hasSuffix:@".app/"]) {
     NSFileManager* mgr = [NSFileManager defaultManager];
 
+    NSString* root = [path stringByDeletingLastPathComponent];
+    [mgr changeCurrentDirectoryPath: root];
+
     NSString* imageInBundle =
         [[path stringByAppendingPathComponent:@"Contents/Resources"]
             stringByAppendingPathComponent:image];
