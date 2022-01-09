@@ -47,7 +47,7 @@ M: descriptive definition
 
 M: descriptive reset-word
     [ call-next-method ]
-    [ f "descriptive-definition" set-word-prop ] bi ;
+    [ "descriptive-definition" remove-word-prop ] bi ;
 
 SYNTAX: DESCRIPTIVE:: (::) define-descriptive ;
 
@@ -59,4 +59,4 @@ M: descriptive-lambda definition
     "lambda" word-prop body>> ;
 
 M: descriptive-lambda reset-word
-    [ call-next-method ] [ f "lambda" set-word-prop ] bi ;
+    [ call-next-method ] [ "lambda" remove-word-prop ] bi ;

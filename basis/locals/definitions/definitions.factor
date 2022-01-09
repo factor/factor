@@ -12,7 +12,7 @@ M: lambda-word definition
     "lambda" word-prop body>> ;
 
 M: lambda-word reset-word
-    [ call-next-method ] [ f "lambda" set-word-prop ] bi ;
+    [ call-next-method ] [ "lambda" remove-word-prop ] bi ;
 
 PREDICATE: lambda-macro < macro lambda-word? ;
 
@@ -22,7 +22,7 @@ M: lambda-macro definition
     "lambda" word-prop body>> ;
 
 M: lambda-macro reset-word
-    [ call-next-method ] [ f "lambda" set-word-prop ] bi ;
+    [ call-next-method ] [ "lambda" remove-word-prop ] bi ;
 
 PREDICATE: lambda-method < method lambda-word? ;
 
@@ -32,7 +32,7 @@ M: lambda-method definition
     "lambda" word-prop body>> ;
 
 M: lambda-method reset-word
-    [ call-next-method ] [ f "lambda" set-word-prop ] bi ;
+    [ call-next-method ] [ "lambda" remove-word-prop ] bi ;
 
 PREDICATE: lambda-memoized < memoized lambda-word? ;
 
@@ -42,7 +42,7 @@ M: lambda-memoized definition
     "lambda" word-prop body>> ;
 
 M: lambda-memoized reset-word
-    [ call-next-method ] [ f "lambda" set-word-prop ] bi ;
+    [ call-next-method ] [ "lambda" remove-word-prop ] bi ;
 
 : method-stack-effect ( method -- effect )
     dup "lambda" word-prop vars>>
