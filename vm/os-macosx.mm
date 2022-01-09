@@ -40,20 +40,25 @@ const char* default_image_path(void) {
 
   if ([path hasSuffix:@".app"] || [path hasSuffix:@".app/"]) {
     NSFileManager* mgr = [NSFileManager defaultManager];
+    NSString* root = [path stringByDeletingLastPathComponent];
+    NSString* resources = [path stringByAppendingPathComponent:@"Contents/Resources"];
 
     if (!isatty(fileno(stdin))) {
-        NSString* root = [path stringByDeletingLastPathComponent];
         [mgr changeCurrentDirectoryPath: root];
     }
 
-    NSString* imageInBundle =
-        [[path stringByAppendingPathComponent:@"Contents/Resources"]
-            stringByAppendingPathComponent:image];
-    NSString* imageAlongBundle = [[path stringByDeletingLastPathComponent]
-        stringByAppendingPathComponent:image];
+    NSString* imageInBundle = [resources stringByAppendingPathComponent:image];
+    NSString* imageAlongBundle = [root stringByAppendingPathComponent:image];
 
     returnVal = ([mgr fileExistsAtPath:imageInBundle] ? imageInBundle
                                                       : imageAlongBundle);
+  } else if ([executablePath hasSuffix:@".app/Contents/MacOS/factor"]) {
+    returnVal = executablePath;
+    returnVal = [returnVal stringByDeletingLastPathComponent];
+    returnVal = [returnVal stringByDeletingLastPathComponent];
+    returnVal = [returnVal stringByDeletingLastPathComponent];
+    returnVal = [returnVal stringByDeletingLastPathComponent];
+    returnVal = [returnVal stringByAppendingPathComponent:image];
 
   } else {
     returnVal = [path stringByAppendingPathComponent:image];
