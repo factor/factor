@@ -26,7 +26,9 @@ SINGLETON: cache-observer
 PRIVATE>
 
 M: cache-observer vocab-changed
-    drop dup forgot-vocab? [ reset-cache ] [ drop ] if ;
+    drop dup forgot-vocab?
+    [ reset-cache ]
+    [ drop \ all-disk-vocabs-recursive reset-memoized ] if ;
 
 [
     f changed-vocabs set-global
