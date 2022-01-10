@@ -75,6 +75,7 @@ M: pathname url-of
     [XML <meta
             name="viewport"
             content="width=device-width, initial-scale=1"
+            charset="utf-8"
         /> XML] ;
 
 : help-navbar ( -- xml )
@@ -97,7 +98,7 @@ M: pathname url-of
 : css-class ( style classes -- name )
     dup '[ drop _ assoc-size 1 + bijective-base26 ] cache ;
 
-: css-style ( style -- style' )
+: fix-css-style ( style -- style' )
     R/ font-size: \d+pt;/ [
         "font-size: " ?head drop "pt;" ?tail drop
         string>number 2 -
@@ -118,9 +119,21 @@ M: pathname url-of
         " white-space: pre-wrap; line-height: 125%;" append
     ] re-replace-with ;
 
+: fix-help-header ( classes -- classes )
+    dup [
+        first2 [ "#f3f2ea;" swap subseq? ] [ "a" = ] bi* and
+    ] find nip [
+        0 swap [
+            "background-color: #f3f2ea;" "background-color: #f5eed6;" replace
+            "padding: 10px;" "padding: 15px;" replace
+            " border-bottom: 1px solid #ccc; width: calc(100% + 30px); margin: -15px;"
+            append
+        ] change-nth
+    ] when* ;
+
 : css-classes ( classes -- stylesheet )
-    [
-        [ css-style " { " "}" surround ] [ "." prepend ] bi* prepend
+    fix-help-header [
+        [ fix-css-style " { " "}" surround ] [ "." prepend ] bi* prepend
     ] { } assoc>map join-lines ;
 
 :: css-styles-to-classes ( body -- stylesheet body )
