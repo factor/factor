@@ -89,7 +89,9 @@ M: revision feed-entry-url id>> revision-url ;
         [
             "title" value dup latest-revision [
                 from-object
-                { wiki "view" } <chloe-content>
+                t link-no-follow? [
+                    { wiki "view" } <chloe-content>
+                ] with-variable
             ] [
                 edit-url <redirect>
             ] ?if
@@ -102,13 +104,15 @@ M: revision feed-entry-url id>> revision-url ;
 
         "id" >>rest
 
+        [ validate-integer-id ] >>init
+
         [
-            validate-integer-id
             "id" value <revision>
             select-tuple from-object
-        ] >>init
-
-        { wiki "view" } >>template
+            t link-no-follow? [
+                { wiki "view" } <chloe-content>
+            ] with-variable
+        ] >>display
 
     <article-boilerplate> ;
 
