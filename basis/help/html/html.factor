@@ -121,20 +121,19 @@ M: pathname url-of
 
 : fix-help-header ( classes -- classes )
     dup [
-        first2 [ "#f3f2ea;" swap subseq? ] [ "a" = ] bi* and
-    ] find nip [
-        0 swap [
-            "background-color: #f3f2ea;" "background-color: #f5eed6;" replace
-            "padding: 10px;" "padding: 15px;" replace
-            " border-bottom: 1px solid #ccc; width: calc(100% + 30px); margin: -15px;"
-            append
-        ] change-nth
-    ] when* ;
+        [ ".a" head? ] [ "#f3f2ea;" swap subseq? ] bi and
+    ] find [
+        "background-color: #f3f2ea;" "background-color: #f5eed6;" replace
+        "padding: 10px;" "padding: 15px;" replace
+        "}" ?tail drop
+        " border-bottom: 1px solid #ccc; width: calc(100% + 30px); margin: -15px; }"
+        append swap pick set-nth
+    ] [ drop ] if* ;
 
 : css-classes ( classes -- stylesheet )
-    fix-help-header [
+    [
         [ fix-css-style " { " "}" surround ] [ "." prepend ] bi* prepend
-    ] { } assoc>map join-lines ;
+    ] { } assoc>map fix-help-header join-lines ;
 
 :: css-styles-to-classes ( body -- stylesheet body )
     H{ } clone :> classes
