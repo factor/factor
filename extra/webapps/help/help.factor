@@ -26,7 +26,7 @@ TUPLE: help-webapp < dispatcher ;
 
             { help-webapp "search" } <chloe-content>
         ] >>display
-    <boilerplatee>
+    <boilerplate>
         { help-webapp "search" } >>template ;
 
 : help-url ( topic -- url )
