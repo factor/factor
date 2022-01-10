@@ -10,7 +10,7 @@ IN: webapps.help
 TUPLE: help-webapp < dispatcher ;
 
 : links ( seq -- seq' )
-    [ swap <simple-link> ] { } assoc>map ;
+    [ swap "content/" prepend <simple-link> ] { } assoc>map ;
 
 :: <search-action> ( help-dir -- action )
     <page-action>
