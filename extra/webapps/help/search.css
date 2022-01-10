@@ -1,0 +1,12 @@
+h2 {
+    padding: 10px;
+    background-color: #f3f2ea;
+    color: #222;
+}
+
+hr {
+    border: 0;
+    background-color: #ccc;
+    color: #ccc;
+    height: 1px;
+}
