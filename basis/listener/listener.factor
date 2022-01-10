@@ -12,7 +12,7 @@ GENERIC#: prompt. 1 ( stream prompt -- )
 
 : prompt ( -- str )
     manifest get current-vocab>> [ name>> "IN: " prepend ] [ "" ] if*
-    auto-use? get [ " auto-use" append ] when ;
+    auto-use? get [ dup empty? "" " " ? "auto-use" 3append ] when ;
 
 SYMBOL: prompt-style
 H{
@@ -21,7 +21,7 @@ H{
 } prompt-style set-global
 
 M: object prompt.
-    nip prompt-style get-global format bl flush ;
+    nip [ prompt-style get-global format bl ] unless-empty ;
 
 SYMBOL: handle-ctrl-break
 
@@ -126,7 +126,7 @@ t error-summary? set-global
     visible-vars.
     datastack datastack.
     input-stream get prompt prompt.
-
+    flush
     [
         read-quot [
             '[ [ datastack _ with-datastack ] with-ctrl-break ]
