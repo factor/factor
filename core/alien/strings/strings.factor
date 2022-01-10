@@ -21,7 +21,7 @@ M: f alien>string
 
 ERROR: invalid-c-string string ;
 
-: check-string ( string -- )
+: check-c-string ( string -- )
     0 over member-eq? [ invalid-c-string ] [ drop ] if ;
 
 GENERIC#: string>alien 1 ( string encoding -- byte-array )
@@ -53,7 +53,7 @@ M: c-ptr string>alien drop ;
 PRIVATE>
 
 M: string string>alien
-    over check-string
+    over check-c-string
     2dup fast-string?
     [ string>alien-fast ]
     [ string>alien-slow ] if ;
