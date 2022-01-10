@@ -19,7 +19,7 @@ SYMBOL: editor-class
 HOOK: editor-command editor-class ( file line -- command )
 
 M: f editor-command
-    "Select an editor" editor-restarts throw-restarts require
+    "Select an editor" editor-restarts throw-restarts reload
     editor-command ;
 
 HOOK: editor-detached? editor-class ( -- ? )
