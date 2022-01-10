@@ -48,16 +48,13 @@ PRIVATE>
     '[ dup _ >= [ 1 + ] when ] map! drop ; inline
 
 : (>permutation) ( seq n index -- seq )
-    swap [ dupd head-slice ] dip bump-indices ;
+    swap [ dupd (head) <slice-unsafe> ] dip bump-indices ;
 
 : >permutation ( factoradic -- permutation )
     reverse! dup [ (>permutation) ] each-index reverse! ;
 
 : permutation-indices ( n seq -- permutation )
     length [ factoradic ] dip 0 pad-head >permutation ;
-
-: permutation-iota ( seq -- <iota> )
-    length factorial <iota> ; inline
 
 PRIVATE>
 
@@ -99,8 +96,11 @@ DEFER: next-permutation
 
 <PRIVATE
 
+: <permutation-iota> ( seq -- <iota> )
+    length factorial <iota> ; inline
+
 : permutations-quot ( seq quot -- seq quot' )
-    [ [ permutation-iota ] [ length <iota> >array ] [ ] tri ] dip
+    [ [ <permutation-iota> ] [ length <iota> >array ] [ ] tri ] dip
     '[ drop _ [ _ nths-unsafe @ ] keep next-permutation drop ] ; inline
 
 PRIVATE>
@@ -133,18 +133,18 @@ PRIVATE>
 <PRIVATE
 
 : cut-point ( seq -- n )
-    [ last ] keep [ [ > ] keep swap ] find-last drop nip ; inline
+    [ last-unsafe ] keep [ [ > ] keep swap ] find-last drop nip ; inline
 
 : greater-from-last ( n seq -- i )
-    [ nip ] [ nth ] 2bi [ > ] curry find-last drop ; inline
+    [ nip ] [ nth-unsafe ] 2bi [ > ] curry find-last drop ; inline
 
 : reverse-tail! ( n seq -- seq )
-    [ swap 1 + tail-slice reverse! drop ] keep ; inline
+    [ swap 1 + (tail) <slice-unsafe> reverse! drop ] keep ; inline
 
 : (next-permutation) ( seq -- seq )
     dup cut-point [
         swap [ greater-from-last ] 2keep
-        [ exchange ] [ reverse-tail! nip ] 3bi
+        [ exchange-unsafe ] [ reverse-tail! nip ] 3bi
     ] [ reverse! ] if* ;
 
 HINTS: (next-permutation) array ;
@@ -157,7 +157,7 @@ PRIVATE>
 <PRIVATE
 
 : should-swap? ( start curr seq -- ? )
-    [ nipd nth ] [ <slice> member? not ] 3bi ; inline
+    [ nipd nth-unsafe ] [ <slice-unsafe> member? not ] 3bi ; inline
 
 :: unique-permutations ( ... seq i n quot: ( ... elt -- ... ) -- ... )
     i n >= [
@@ -192,15 +192,15 @@ PRIVATE>
     x 1 + x!
     p 0 <array> :> c 0 :> k! 0 :> r!
     p 1 - [| i |
-        i [ 0 ] [ 1 - c nth ] if-zero i c set-nth
+        i [ 0 ] [ 1 - c nth-unsafe ] if-zero i c set-nth-unsafe
         [ k x < ] [
-            i c [ 1 + ] change-nth
-            n i c nth - p i 1 + - nCk r!
+            i c [ 1 + ] change-nth-unsafe
+            n i c nth-unsafe - p i 1 + - nCk r!
             k r + k!
         ] do while k r - k!
     ] each-integer
-    p 2 < [ 0 ] [ p 2 - c nth ] if
-    p 1 < [ drop ] [ x + k - p 1 - c set-nth ] if
+    p 2 < [ 0 ] [ p 2 - c nth-unsafe ] if
+    p 1 < [ drop ] [ x + k - p 1 - c set-nth-unsafe ] if
     c [ 1 - ] map! ;
 
 PRIVATE>
@@ -225,11 +225,11 @@ INSTANCE: combinations immutable-sequence
     over length - '[ _ + >= ] find-index drop ; inline
 
 : increment-rest ( i seq -- )
-    [ nth ] [ swap tail-slice ] 2bi
+    [ nth-unsafe ] [ swap (tail) <slice-unsafe> ] 2bi
     [ drop 1 + dup ] map! 2drop ; inline
 
 : increment-last ( seq -- )
-    [ [ length 1 - ] keep [ 1 + ] change-nth ] unless-empty ; inline
+    [ [ length 1 - ] keep [ 1 + ] change-nth-unsafe ] unless-empty ; inline
 
 :: next-combination ( seq n -- seq )
     seq n find-max-index [
