@@ -142,7 +142,7 @@ assocs    = "[%" types ": %" types " %]" => [[ [ second ] [ fourth ] bi '[ [ _ _
 
 formats   = "%" (types|fmt-%|lists|assocs|unknown) => [[ second ]]
 
-plain-text = (!("%").)+          => [[ >string ]]
+plain-text = [^%]+               => [[ >string ]]
 
 text      = (formats|plain-text)*
 
@@ -243,7 +243,7 @@ formats_  = fmt-%|fmt-a|fmt-A|fmt-b|fmt-B|fmt-c|fmt-d|fmt-H|fmt-I|
 
 formats   = "%" (formats_)       => [[ second ]]
 
-plain-text = (!("%").)+          => [[ >string ]]
+plain-text = [^%]+               => [[ >string ]]
 
 text      = (formats|plain-text)*
 
