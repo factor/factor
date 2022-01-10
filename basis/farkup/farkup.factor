@@ -207,13 +207,13 @@ DEFER: (parse-paragraph)
 
 CONSTANT: invalid-url "javascript:alert('Invalid URL in farkup');"
 
-: check-url ( href -- href' )
+: check-url ( href -- href' absolute? )
     {
-        { [ dup empty? ] [ drop invalid-url ] }
-        { [ dup [ 127 > ] any? ] [ drop invalid-url ] }
-        { [ dup first "/\\" member? ] [ drop invalid-url ] }
-        { [ CHAR: : over member? ] [ dup absolute-url? [ drop invalid-url ] unless ] }
-        [ relative-link-prefix get prepend "" like url-encode ]
+        { [ dup empty? ] [ drop invalid-url f ] }
+        { [ dup [ 127 > ] any? ] [ drop invalid-url f ] }
+        { [ dup first "/\\" member? ] [ drop invalid-url f ] }
+        { [ CHAR: : over member? ] [ dup absolute-url? [ drop invalid-url ] unless t ] }
+        [ relative-link-prefix get prepend "" like url-encode f ]
     } cond ;
 
 : render-code ( string mode -- xml )
@@ -242,7 +242,7 @@ M: paragraph (write-farkup) "p" farkup-inside ;
 M: table (write-farkup) "table" farkup-inside ;
 
 : write-link ( href text -- xml )
-    [ check-url link-no-follow? get "nofollow" and ] dip
+    [ check-url link-no-follow? get "nofollow" and and ] dip
     [XML <a href=<-> rel=<->><-></a> XML] ;
 
 : write-image-link ( href text -- xml )
@@ -250,7 +250,7 @@ M: table (write-farkup) "table" farkup-inside ;
         2drop
         [XML <strong>Images are not allowed</strong> XML]
     ] [
-        [ check-url ] [ f like ] bi*
+        [ check-url drop ] [ f like ] bi*
         [XML <img src=<-> alt=<->/> XML]
     ] if ;
 
