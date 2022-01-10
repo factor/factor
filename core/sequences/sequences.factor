@@ -314,7 +314,7 @@ C: <copy> copy-state
     [ [ length check-length 0 ] keep ] 2dip <copy> (copy) drop ; inline
 
 : subseq-unsafe-as ( from to seq exemplar -- subseq )
-    [ subseq>copy (copy) ] dip like ;
+    [ subseq>copy (copy) ] dip like ; inline
 
 : subseq-unsafe ( from to seq -- subseq )
     dup subseq-unsafe-as ; inline
@@ -325,7 +325,7 @@ PRIVATE>
     [ check-slice ] dip subseq-unsafe-as ;
 
 : subseq ( from to seq -- subseq )
-    dup subseq-as ; inline
+    dup subseq-as ;
 
 : head ( seq n -- headseq ) (head) subseq ;
 
@@ -691,7 +691,7 @@ PRIVATE>
 PRIVATE>
 
 : mismatch ( seq1 seq2 -- i )
-    [ min-length ] 2keep mismatch-unsafe ; inline
+    [ min-length ] 2keep mismatch-unsafe ;
 
 M: sequence <=>
     [ mismatch ] 2keep pick
