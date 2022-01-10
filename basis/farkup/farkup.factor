@@ -212,7 +212,7 @@ CONSTANT: invalid-url "javascript:alert('Invalid URL in farkup');"
         { [ dup empty? ] [ drop invalid-url f ] }
         { [ dup [ 127 > ] any? ] [ drop invalid-url f ] }
         { [ dup first "/\\" member? ] [ drop invalid-url f ] }
-        { [ CHAR: : over member? ] [ dup absolute-url? [ drop invalid-url ] unless t ] }
+        { [ CHAR: : over member? ] [ dup absolute-url? [ drop invalid-url f ] [ t ] if ] }
         [ relative-link-prefix get prepend "" like url-encode f ]
     } cond ;
 
