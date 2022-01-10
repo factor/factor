@@ -1,17 +1,17 @@
 ! Copyright (C) 2016 Alexander Ilin.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: checksums endian kernel math sequences sequences.private ;
+USING: checksums endian kernel literals math sequences sequences.private ;
 IN: checksums.crc16
 
 CONSTANT: crc16-polynomial 0xa001
 
-CONSTANT: crc16-table V{ }
-
-256 <iota> [
-    8 [
-        [ 2/ ] [ even? ] bi [ crc16-polynomial bitxor ] unless
-    ] times
-] map 0 crc16-table copy
+CONSTANT: crc16-table $[
+    256 <iota> [
+        8 [
+            [ 2/ ] [ even? ] bi [ crc16-polynomial bitxor ] unless
+        ] times
+    ] map
+]
 
 : (crc16) ( crc ch -- crc )
     dupd bitxor
