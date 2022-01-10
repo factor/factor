@@ -94,10 +94,14 @@ set-specializer
     set-specializer
 ] each
 
-{ subseq subseq-unsafe } [
-    { { fixnum fixnum string } { fixnum fixnum array } }
+{ suffix prefix } [
+    { { string object } { array object } }
     set-specializer
 ] each
+
+\ subseq
+{ { fixnum fixnum string } { fixnum fixnum array } }
+set-specializer
 
 \ reverse!
 { { string } { array } }
