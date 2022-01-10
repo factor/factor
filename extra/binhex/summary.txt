@@ -1,0 +1,1 @@
+Encoding and decoding of BinHex 4.0 files
