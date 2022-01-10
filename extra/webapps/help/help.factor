@@ -14,6 +14,7 @@ TUPLE: help-webapp < dispatcher ;
 
 :: <search-action> ( help-dir -- action )
     <page-action>
+        { help-webapp "search" } >>template
         [
             "search" param [ unicode:blank? ] trim [
                 help-dir [
@@ -27,7 +28,7 @@ TUPLE: help-webapp < dispatcher ;
             { help-webapp "search" } <chloe-content>
         ] >>display
     <boilerplate>
-        { help-webapp "search" } >>template ;
+        { help-webapp "help" } >>template ;
 
 : help-url ( topic -- url )
     topic>filename "$help-webapp/content/" prepend >url ;

@@ -1,59 +1,46 @@
 <?xml version='1.0' ?>
-<!DOCTYPE html>
+
 <t:chloe xmlns:t="http://factorcode.org/chloe/1.0">
 
-<html xmlns="http://www.w3.org/1999/xhtml">
-    <head>
+    <t:base t:href="$help-webapp/content/" />
+    <t:title>Search - Factor Documentation />
+    <t:style t:include="resource:extra/webapps/help/search.css" />
 
-        <t:base t:href="$help-webapp/content/" />
-        <title>Search - Factor Documentation</title>
-        <meta name="viewport" content="width=device-width, initial-scale=1"/>
-        <t:style t:include="resource:basis/help/html/stylesheet.css" />
-        <t:style t:include="resource:extra/webapps/help/search.css" />
-        <t:write-style />
+    <t:html t:name="navbar"/>
 
-    </head>
+    <div class="page">
+    <t:if t:value="articles">
+        <h2>Articles</h2>
+        <ul>
+            <t:each t:name="articles">
+                <li> <t:link t:name="value" /> </li>
+            </t:each>
+        </ul>
+    </t:if>
 
-    <body>
-    <div id="container">
-        <t:html t:name="navbar"/>
+    <t:if t:value="vocabs">
+        <h2>Vocabularies</h2>
+        <ul>
+            <t:each t:name="vocabs">
+                <li> <t:link t:name="value" /> </li>
+            </t:each>
+        </ul>
+    </t:if>
 
-        <div class="page">
-        <t:if t:value="articles">
-            <h2>Articles</h2>
-            <ul>
-                <t:each t:name="articles">
-                    <li> <t:link t:name="value" /> </li>
-                </t:each>
-            </ul>
-        </t:if>
+    <t:if t:value="words">
+        <h2>Words</h2>
+        <ul>
+            <t:each t:name="words">
+                <li> <t:link t:name="value" /> </li>
+            </t:each>
+        </ul>
+    </t:if>
 
-        <t:if t:value="vocabs">
-            <h2>Vocabularies</h2>
-            <ul>
-                <t:each t:name="vocabs">
-                    <li> <t:link t:name="value" /> </li>
-                </t:each>
-            </ul>
-        </t:if>
-
-        <t:if t:value="words">
-            <h2>Words</h2>
-            <ul>
-                <t:each t:name="words">
-                    <li> <t:link t:name="value" /> </li>
-                </t:each>
-            </ul>
-        </t:if>
-
-        <hr />
-        <p>This is the <a href="http://factorcode.org" target="_top">Factor</a>
-        documentation, generated offline from a
-        <code>load-all</code> image. If you want, you can also browse the
-        documentation from within the <a href="http://factorcode.org" target="_top">Factor</a> UI.</p>
-        </div>
+    <hr />
+    <p>This is the <a href="http://factorcode.org" target="_top">Factor</a>
+    documentation, generated offline from a
+    <code>load-all</code> image. If you want, you can also browse the
+    documentation from within the <a href="http://factorcode.org" target="_top">Factor</a> UI.</p>
     </div>
-    </body>
-</html>
 
 </t:chloe>
