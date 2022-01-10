@@ -22,7 +22,7 @@
                         </t:a>
                     </h2>
 
-                    <t:farkup t:name="content" />
+                    <t:farkup t:name="content" t:no-follow="true" />
                 </t:bind>
             </div>
         </t:if>
@@ -64,7 +64,7 @@
         <t:if t:value="footer">
             <div class="footer">
                 <t:bind t:name="footer">
-                    <t:farkup t:name="content" />
+                    <t:farkup t:name="content" t:no-follow="true" />
                 </t:bind>
             </div>
         </t:if>
