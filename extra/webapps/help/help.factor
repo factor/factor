@@ -1,10 +1,10 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors assocs furnace.actions furnace.redirection
-help.html help.topics html.components html.forms http.server
-http.server.dispatchers http.server.static io.directories
-io.files.temp io.servers kernel locals namespaces sequences
-unicode urls ;
+USING: accessors assocs furnace.actions furnace.boilerplate
+furnace.redirection help.html help.topics html.components
+html.forms http.server http.server.dispatchers
+http.server.static io.directories io.files.temp io.servers
+kernel locals namespaces sequences unicode urls ;
 IN: webapps.help
 
 TUPLE: help-webapp < dispatcher ;
@@ -14,7 +14,6 @@ TUPLE: help-webapp < dispatcher ;
 
 :: <search-action> ( help-dir -- action )
     <page-action>
-        { help-webapp "search" } >>template
         [
             "search" param [ unicode:blank? ] trim [
                 help-dir [
@@ -26,7 +25,9 @@ TUPLE: help-webapp < dispatcher ;
             help-navbar "navbar" set-value
 
             { help-webapp "search" } <chloe-content>
-        ] >>display ;
+        ] >>display
+    <boilerplatee>
+        { help-webapp "search" } >>template ;
 
 : help-url ( topic -- url )
     topic>filename "$help-webapp/content/" prepend >url ;
