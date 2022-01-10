@@ -3,7 +3,9 @@
 USING: checksums endian kernel literals math sequences sequences.private ;
 IN: checksums.crc16
 
+<<
 CONSTANT: crc16-polynomial 0xa001
+>>
 
 CONSTANT: crc16-table $[
     256 <iota> [
