@@ -111,7 +111,7 @@ M: world ungraft*
     dup hand-world get-global eq?
     [ hand-loc get-global swap move-hand ] [ drop ] if ;
 
-: slurp-vector ( .. seq quot: ( ... elt -- .. ) -- )
+: slurp-vector ( ... seq quot: ( ... elt -- ... ) -- ... )
     over '[ _ empty? not ] -rot '[ _ pop @ ] while ; inline
 
 : layout-queued ( -- seq )
