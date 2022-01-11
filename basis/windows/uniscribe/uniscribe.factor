@@ -4,9 +4,10 @@
 USING: accessors alien.c-types alien.data arrays assocs
 byte-arrays cache classes.struct colors combinators destructors
 fonts images init io.encodings.string io.encodings.utf16n kernel
-literals locals math math.bitwise namespaces sequences
-specialized-arrays windows.errors windows.fonts windows.gdi32
-windows.offscreen windows.ole32 windows.types windows.usp10 ;
+literals locals math math.bitwise math.functions namespaces
+sequences specialized-arrays windows.errors windows.fonts
+windows.gdi32 windows.offscreen windows.ole32 windows.types
+windows.usp10 ;
 
 SPECIALIZED-ARRAY: uint32_t
 IN: windows.uniscribe
@@ -106,7 +107,7 @@ PRIVATE>
 ! transparency.
 :: color-to-alpha ( image color -- image' )
     color >rgba-components :> alpha
-    [ 255 * >integer ] tri@ 3byte-array uint32_t deref 24 bits :> rgb
+    [ 255 * round >integer ] tri@ 3byte-array uint32_t deref 24 bits :> rgb
     image bitmap>> uint32_t cast-array
         alpha 1 <
         [ [ 0xff bitand alpha * >integer 24 shift rgb bitor ] map! ]
