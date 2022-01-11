@@ -96,7 +96,7 @@ M: pathname url-of
     version-info "\n" split1 drop
     [XML
         <br />
-        <p style="font-size: smaller;">
+        <p style="color: #666; font-size: smaller;">
         This documentation was generated offline from a
         <code>load-all</code> image.  If you want, you can also
         browse the documentation from within the <a
@@ -104,7 +104,7 @@ M: pathname url-of
         the <a href="https://factorcode.org">Factor website</a>
         for more information.
         </p>
-        <p style="font-size: smaller;"><-></p>
+        <p style="color: #666; font-size: smaller;"><-></p>
     XML] ;
 
 : bijective-base26 ( n -- name )
