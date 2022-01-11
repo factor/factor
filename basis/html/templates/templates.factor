@@ -16,7 +16,7 @@ M: callable call-template* call( -- ) ;
 
 M: xml call-template* write-xml ;
 
-M: object call-template* output-stream get stream-copy* ;
+M: object call-template* output-stream get stream-copy ;
 
 ERROR: template-error template error ;
 
