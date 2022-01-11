@@ -7,7 +7,7 @@ mason.config webapps.mason.version.files ;
 IN: webapps.mason.version.source
 
 : clone-factor ( -- )
-    { "git" "clone" "git://factorcode.org/git/factor.git" } try-process ;
+    { "git" "clone" "https://github.com/factor/factor.git" } try-process ;
 
 : git-reset ( git-id -- )
     { "git" "reset" "--hard" } swap suffix try-process ;

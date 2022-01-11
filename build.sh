@@ -11,7 +11,7 @@ ECHO=echo
 OS=
 ARCH=
 WORD=
-GIT_PROTOCOL=${GIT_PROTOCOL:="git"}
+GIT_PROTOCOL=${GIT_PROTOCOL:="https"}
 GIT_URL=${GIT_URL:=$GIT_PROTOCOL"://github.com/factor/factor.git"}
 SCRIPT_ARGS="$*"
 
