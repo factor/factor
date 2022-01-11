@@ -3,8 +3,8 @@
 
 USING: accessors arrays assocs combinators formatting
 http.client images.http images.loader images.loader.private
-images.viewer kernel math math.order present sequences splitting
-urls ;
+images.viewer kernel math math.functions math.order present
+sequences splitting urls ;
 
 IN: google.charts
 
@@ -72,7 +72,7 @@ PRIVATE>
 
 : rgba>hex ( rgba -- hex )
     [ red>> ] [ green>> ] [ blue>> ] tri
-    [ 255 * >integer ] tri@ "%02X%02X%02X" sprintf ;
+    [ 255 * round >integer ] tri@ "%02X%02X%02X" sprintf ;
 
 : chart>url ( chart -- url )
     [ URL" http://chart.googleapis.com/chart" clone ] dip {

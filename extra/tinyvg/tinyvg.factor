@@ -3,7 +3,7 @@
 
 USING: accessors colors combinators endian generalizations io
 io.encodings.binary io.files io.streams.byte-array kernel math
-math.bitwise namespaces sequences ;
+math.bitwise math.functions namespaces sequences ;
 
 IN: tinyvg
 
@@ -38,7 +38,7 @@ ERROR: invalid-length n ;
     [ read1 255 /f ] 4 call-n <rgba> ;
 
 : write-rgba-8888 ( rgba -- )
-    >rgba-components [ 255 * >integer write1 ] 4 napply ;
+    >rgba-components [ 255 * round >integer write1 ] 4 napply ;
 
 : read-rgb-565 ( -- rgba )
     2 read le>
