@@ -147,7 +147,7 @@ M: light-theme error-summary-background COLOR: #F4D9D9 ;
 M: light-theme content-background COLOR: white ;
 M: light-theme text-color COLOR: black ;
 
-M: light-theme link-color COLOR: DodgerBlue4 ;
+M: light-theme link-color COLOR: #2A5DB0 ;
 M: light-theme title-color COLOR: gray20 ;
 M: light-theme heading-color COLOR: FactorDarkSlateBlue ;
 M: light-theme snippet-color COLOR: DarkOrange4 ;
