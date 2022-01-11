@@ -4,7 +4,7 @@
 <t:chloe xmlns:t="http://factorcode.org/chloe/1.0">
 
 	<t:title>Factor binary package for <t:label t:name="platform" /></t:title>
-    <t:style include="resource:extra/webapps/mason/mason.css" />
+    <t:style t:include="resource:extra/webapps/mason/mason.css" />
 
 	<div><img src="//factorcode.org/logo.png" alt="Logo" height="150" /></div>
 
