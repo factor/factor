@@ -16,20 +16,6 @@ C: <hwba> hwba
 
 INSTANCE: hwba color
 
-<PRIVATE
-
-: value ( p q t -- value )
-    dup 0 < [ 1.0 + ] when
-    dup 1 > [ 1.0 - ] when
-    {
-        { [ dup 1/6 < ] [ [ over - ] dip * 6 * + ] }
-        { [ dup 1/2 < ] [ drop nip ] }
-        { [ dup 2/3 < ] [ [ over - ] dip 2/3 swap - * 6 * + ] }
-        [ 2drop ]
-    } cond ;
-
-PRIVATE>
-
 M: hwba >rgba
     [let
         {
