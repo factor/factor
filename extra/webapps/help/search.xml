@@ -35,11 +35,15 @@
         </ul>
     </t:if>
 
-    <hr />
-    <p>This is the <a href="http://factorcode.org" target="_top">Factor</a>
-    documentation, generated offline from a
-    <code>load-all</code> image. If you want, you can also browse the
-    documentation from within the <a href="http://factorcode.org" target="_top">Factor</a> UI.</p>
+    <br />
+    <p style="font-size: smaller;">
+    This documentation was generated offline from a
+    <code>load-all</code> image.  If you want, you can also
+    browse the documentation from within the <a
+    href="article-ui-tools.html">UI developer tools</a>. See
+    the <a href="https://factorcode.org">Factor website</a>
+    for more information.
+    </p>
     </div>
 
 </t:chloe>
