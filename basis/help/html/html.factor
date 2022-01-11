@@ -5,7 +5,7 @@ debugger formatting fry help help.home help.topics help.vocabs
 html html.streams io.directories io.encodings.binary
 io.encodings.utf8 io.files io.files.temp io.pathnames kernel
 locals make math math.parser memoize namespaces regexp sequences
-sequences.deep serialize sorting splitting tools.completion
+sequences.deep serialize sorting splitting system tools.completion
 vocabs vocabs.hierarchy words xml.data xml.syntax xml.traversal
 xml.writer ;
 FROM: io.encodings.ascii => ascii ;
@@ -87,10 +87,25 @@ M: pathname url-of
         <form method="get" action="/search" style="float: right;">
             <input placeholder="Search" name="search" type="text"/>
             <input type="submit" value="Go"/>
-            <a href="//factorcode.org">factorcode.org</a>
+            <a href="https://factorcode.org">factorcode.org</a>
         </form>
         </div>
      XML] ;
+
+: help-footer ( -- xml )
+    version-info "\n" split1 drop
+    [XML
+        <br />
+        <p style="font-size: smaller;">
+        This documentation was generated offline from a
+        <code>load-all</code> image.  If you want, you can also
+        browse the documentation from within the <a
+        href="article-ui-tools.html">UI developer tools</a>. See
+        the <a href="https://factorcode.org">Factor website</a>
+        for more information.
+        </p>
+        <p style="font-size: smaller;"><-></p>
+    XML] ;
 
 : bijective-base26 ( n -- name )
     [ dup 0 > ] [ 1 - 26 /mod CHAR: a + ] "" produce-as nip reverse! ;
@@ -179,8 +194,8 @@ M: pathname url-of
     [
         [ print-topic ] with-html-writer
         css-styles-to-classes cache-images
-        [ help-stylesheet help-meta prepend help-navbar ] dip
-        [XML <div id="container"><-><div class="page"><-></div></div> XML]
+        [ help-stylesheet help-meta prepend help-navbar ] dip help-footer
+        [XML <div id="container"><-><div class="page"><-><-></div></div> XML]
     ] bi simple-page ;
 
 : generate-help-file ( topic -- )
