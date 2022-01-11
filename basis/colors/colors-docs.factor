@@ -91,7 +91,6 @@ $nl
     { "CIE 1976 LUV colors" "colors.luv" }
     { "CMYK colors" "colors.cmyk" }
     { "Grayscale colors" "colors.gray" }
-    { "HCL colors" "colors.hcl" }
     { "HSL colors" "colors.hsl" }
     { "HSV colors" "colors.hsv" }
     { "HWB colors" "colors.hwb" }
