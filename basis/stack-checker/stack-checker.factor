@@ -15,4 +15,4 @@ IN: stack-checker
     ! Safe to call from inference transforms.
     infer effect>string print ;
 
-M: quotation stack-effect infer ;
+M: callable stack-effect infer ;
