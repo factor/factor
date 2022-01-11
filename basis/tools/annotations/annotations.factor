@@ -17,9 +17,8 @@ M: generic (reset)
 
 M: word (reset)
     dup "unannotated-def" word-prop [
-        dup dup "unannotated-def" word-prop define
-        "unannotated-def" remove-word-prop
-    ] [ drop ] if ;
+        dupd define "unannotated-def" remove-word-prop
+    ] [ drop ] if* ;
 
 PRIVATE>
 
