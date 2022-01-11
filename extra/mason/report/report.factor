@@ -1,9 +1,9 @@
 ! Copyright (C) 2008, 2010 Eduardo Cavazos, Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: assocs combinators.smart debugger io.encodings.utf8
-io.files io.streams.string kernel literals mason.common
-mason.config mason.disk math namespaces sequences splitting
-xml.syntax xml.writer ;
+USING: assocs combinators.smart debugger formatting
+io.encodings.utf8 io.files io.streams.string kernel literals
+mason.common mason.config mason.disk math namespaces sequences
+splitting xml.syntax xml.writer ;
 IN: mason.report
 
 : git-link ( id -- link )
@@ -87,7 +87,7 @@ IN: mason.report
 
 : benchmarks-table ( assoc -- xml )
     [
-        1,000,000,000 /f
+        1,000,000,000 /f "%.3f" sprintf
         [XML <tr><td><-></td><td><-></td></tr> XML]
     ] { } assoc>map
     [XML
