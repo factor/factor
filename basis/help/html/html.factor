@@ -128,6 +128,7 @@ M: pathname url-of
         "}" ?tail drop
         " border-bottom: 1px solid #ccc; width: calc(100% + 30px); margin: -15px; }"
         append swap pick set-nth
+        ".a tr:hover { background-color: #f5eed6; }" prefix
     ] [ drop ] if* ;
 
 : css-classes ( classes -- stylesheet )
