@@ -3,15 +3,14 @@ IN: splitting.extras
 
 <PRIVATE
 
-: (split*) ( ... seq quot: ( ... elt -- ... ? ) slice-quot -- ... pieces )
-    [ 0 ] 3dip pick [
-        swap curry [ [ 1 + ] when ] prepose [ 2keep ] curry
-        [ 2dup = ] prepose [ [ 1 + ] when swap ] compose [
-            [ find-from drop dup ] 2curry [ keep -rot ] curry
-        ] dip produce nip
-    ] 2keep swap [
-        [ length [ swapd dupd < ] keep ] keep
-    ] dip 2curry [ suffix ] compose [ drop ] if ; inline
+:: (split*) ( ... seq quot: ( ... elt -- ... ? ) slice-quot -- ... pieces )
+    0 [
+        [ seq quot find-from drop dup ] keep -rot
+    ] [
+        2dup = [ [ 1 + ] when seq slice-quot call ] 2keep
+        [ 1 + ] when swap
+    ] produce nip swap seq length [ dupd < ] keep
+    '[ _ seq slice-quot call suffix ] [ drop ] if ; inline
 
 PRIVATE>
 
