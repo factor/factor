@@ -123,12 +123,12 @@ M: pathname url-of
     dup [
         [ ".a" head? ] [ "#f3f2ea;" swap subseq? ] bi and
     ] find [
-        "background-color: #f3f2ea;" "background-color: #f5eed6;" replace
+        "background-color: #f3f2ea;" "background-color: #f4efd9;" replace
         "padding: 10px;" "padding: 15px;" replace
         "}" ?tail drop
         " border-bottom: 1px solid #ccc; width: calc(100% + 30px); margin: -15px; }"
         append swap pick set-nth
-        ".a tr:hover { background-color: #f5eed6; }" prefix
+        ".a tr:hover { background-color: #f4efd9; }" prefix
     ] [ drop ] if* ;
 
 : css-classes ( classes -- stylesheet )
