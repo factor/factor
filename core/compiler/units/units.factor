@@ -151,8 +151,8 @@ M: object always-bump-effect-counter? drop f ;
     ] when ;
 
 : notify-observers ( -- )
-    updated-definitions notify-definition-observers
-    notify-error-observers ;
+    updated-definitions dup null?
+    [ drop ] [ notify-definition-observers notify-error-observers ] if ;
 
 : update-existing? ( defs -- ? )
     new-words get [ in? not ] curry any? ;
