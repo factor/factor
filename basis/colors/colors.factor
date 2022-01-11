@@ -49,14 +49,17 @@ CONSTANT: transparent T{ rgba f 0.0 0.0 0.0 0.0 }
 
 : parse-colors ( lines -- assoc )
     [ "!" head? ] reject
-    [ 11 cut [ " \t" split harvest ] dip suffix ] map
-    [ parse-color ] H{ } map>assoc ;
+    [ " \t" split harvest parse-color ] H{ } map>assoc ;
 
 MEMO: colors ( -- assoc )
-    "resource:basis/colors/rgb.txt"
-    "resource:basis/colors/factor-colors.txt"
-    "resource:basis/colors/solarized-colors.txt"
-    [ utf8 file-lines parse-colors ] tri@ assoc-union assoc-union ;
+    {
+        "resource:basis/colors/rgb.txt"
+        "resource:basis/colors/css-colors.txt"
+        "resource:basis/colors/factor-colors.txt"
+        "resource:basis/colors/solarized-colors.txt"
+    } [
+        utf8 file-lines parse-colors
+    ] [ assoc-union ] map-reduce ;
 
 ERROR: invalid-hex-color hex ;
 
