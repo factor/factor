@@ -95,8 +95,8 @@ M: pathname url-of
 : help-footer ( -- xml )
     version-info "\n" split1 drop
     [XML
-        <br />
-        <p style="color: #666; font-size: smaller;">
+        <div class="footer">
+        <p>
         This documentation was generated offline from a
         <code>load-all</code> image.  If you want, you can also
         browse the documentation from within the <a
@@ -104,7 +104,8 @@ M: pathname url-of
         the <a href="https://factorcode.org">Factor website</a>
         for more information.
         </p>
-        <p style="color: #666; font-size: smaller;"><-></p>
+        <p><-></p>
+        </div>
     XML] ;
 
 : bijective-base26 ( n -- name )
@@ -138,11 +139,13 @@ M: pathname url-of
     dup [
         [ ".a" head? ] [ "#f4efd9;" swap subseq? ] bi and
     ] find [
-        "padding: 10px;" "padding: 15px;" replace
+        "padding: 10px;" "padding: 0px;" replace
+        "background-color: #f4efd9;" "background-color: white;" replace
         "}" ?tail drop
-        " border-bottom: 1px solid #ccc; width: calc(100% + 30px); margin: -15px; }"
+        " border-bottom: 1px dashed #ccc; width: 100%; padding-bottom: 10px; }"
         append swap pick set-nth
-        ".a tr:hover { background-color: #f4efd9; }" prefix
+        ".a tr:hover { background-color: white; }" prefix
+        ".a td { border: none; }" prefix
     ] [ drop ] if* ;
 
 : css-classes ( classes -- stylesheet )
