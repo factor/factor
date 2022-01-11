@@ -6,7 +6,7 @@ html {
     box-sizing: inherit;
 }
 
-a, .link { color: #104e8b; }
+a, .link { color: #2A5DB0; }
 a:link, a:visited, a:active, .link { text-decoration: none; }
 a:hover, .link:hover { text-decoration: underline; }
 
