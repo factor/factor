@@ -1,9 +1,9 @@
 ! Copyright (C) 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors colors combinators combinators.smart formatting
-kernel literals math models sorting.human sorting.slots strings ui
-ui.gadgets.scrollers ui.gadgets.search-tables ui.gadgets.tables
-;
+kernel literals math math.functions models sorting.human
+sorting.slots strings ui ui.gadgets.scrollers
+ui.gadgets.search-tables ui.gadgets.tables ;
 IN: color-table
 
 ! ui.gadgets.tables demo
@@ -15,7 +15,7 @@ CONSTANT: full-block-string $[ 10 CHAR: full-block <string> ]
 
 : rgba>hex ( rgba -- hex )
     [ red>> ] [ green>> ] [ blue>> ] tri
-    [ 255 * >integer ] tri@ "%02X%02X%02X" sprintf ;
+    [ 255 * round >integer ] tri@ "%02X%02X%02X" sprintf ;
 
 PRIVATE>
 
