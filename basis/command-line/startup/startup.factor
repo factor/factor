@@ -41,12 +41,10 @@ from within Factor for more information.
 
 : version? ( -- ? ) "version" get ;
 
-: version. ( -- ) "Factor " write vm-version print ;
-
 : command-line-startup ( -- )
     (command-line) parse-command-line {
         { [ help? ] [ help. ] }
-        { [ version? ] [ version. ] }
+        { [ version? ] [ version-info print ] }
         [
             load-vocab-roots
             run-user-init
