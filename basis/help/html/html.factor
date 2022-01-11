@@ -136,9 +136,8 @@ M: pathname url-of
 
 : fix-help-header ( classes -- classes )
     dup [
-        [ ".a" head? ] [ "#f3f2ea;" swap subseq? ] bi and
+        [ ".a" head? ] [ "#f4efd9;" swap subseq? ] bi and
     ] find [
-        "background-color: #f3f2ea;" "background-color: #f4efd9;" replace
         "padding: 10px;" "padding: 15px;" replace
         "}" ?tail drop
         " border-bottom: 1px solid #ccc; width: calc(100% + 30px); margin: -15px; }"
