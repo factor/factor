@@ -43,13 +43,12 @@ CONSTANT: transparent T{ rgba f 0.0 0.0 0.0 0.0 }
 <PRIVATE
 
 : parse-color ( line -- name color )
-    first4
-    [ [ string>number 255 /f ] tri@ 1.0 <rgba> ] dip
-    [ ascii:blank? ] trim-head H{ { CHAR: \s CHAR: - } } substitute swap ;
+    first4 [ [ string>number 255 /f ] tri@ 1.0 <rgba> ] dip swap ;
 
 : parse-colors ( lines -- assoc )
-    [ "!" head? ] reject
-    [ " \t" split harvest parse-color ] H{ } map>assoc ;
+    [ "!" head? ] reject [
+        [ blank? ] split-when harvest 3 cut "-" join suffix parse-color
+    ] H{ } map>assoc ;
 
 MEMO: colors ( -- assoc )
     {
