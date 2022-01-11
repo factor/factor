@@ -93,6 +93,7 @@ $nl
     { "Grayscale colors" "colors.gray" }
     { "HSL colors" "colors.hsl" }
     { "HSV colors" "colors.hsv" }
+    { "HWB colors" "colors.hwb" }
     { "RYB colors" "colors.ryb" }
     { "YIQ colors" "colors.yiq" }
     { "YUV colors" "colors.yuv" }
