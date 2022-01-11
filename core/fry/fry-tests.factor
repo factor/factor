@@ -11,7 +11,6 @@ SYMBOLS: a b c d e f g h ;
 { [ 1 ] } [ 1 '[ _ ] ] unit-test
 { [ 1 ] } [ [ 1 ] '[ @ ] ] unit-test
 { [ 1 2 ] } [ [ 1 ] [ 2 ] '[ @ @ ] ] unit-test
-{ [ 1 2 + ] } [ \ + '[ 1 2 @ ] ] unit-test
 
 { [ 1 2 a ] } [ 1 2 '[ _ _ a ] ] unit-test
 { [ 1 2 ] } [ 1 2 '[ _ _ ] ] unit-test

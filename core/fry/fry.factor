@@ -58,13 +58,10 @@ INSTANCE: fried-sequence fried
 : (make-curry) ( tail quot -- quot' )
     swap [ncurry] curry [ compose ] compose ;
 
-: ?compose ( obj1 obj2 -- compose )
-    [ dup word? [ 1quotation ] when ] bi@ compose ;
-
 : make-compose ( consecutive quot -- consecutive' quot' )
     [ [ [ ] ] [ [ncurry] ] if-zero ]
-    [ [ [ ?compose ] ] [ [ ?compose ?compose ] curry ] if-empty ]
-    bi* ?compose 0 swap ;
+    [ [ [ compose ] ] [ [ compose compose ] curry ] if-empty ]
+    bi* compose 0 swap ;
 
 : make-curry ( consecutive quot -- consecutive' quot' )
     [ 1 + ] dip [ [ ] ] [ (make-curry) 0 swap ] if-empty ;
