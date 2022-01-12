@@ -7,7 +7,7 @@ USING: io math sequences ;
 USING: io kernel sequences
 http.client xml xml.data xml.traversal ;
 
-"http://factorcode.org" http-get nip string>xml
+"https://factorcode.org" http-get nip string>xml
 "a" deep-tags-named
 [ "href" attr ] map
 [ print ] each
