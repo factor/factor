@@ -146,10 +146,10 @@ M: pathname url-of
         "padding: 10px;" "padding: 0px;" replace
         "background-color: #f4efd9;" "background-color: white;" replace
         "}" ?tail drop
-        " border-bottom: 1px dashed #ccc; width: 100%; padding-bottom: 10px; }"
+        " border-bottom: 1px dashed #ccc; width: 100%; padding-top: 15px; padding-bottom: 10px; }"
         append swap pick set-nth {
-            ".a a { color: black; }"
-            ".a * a { color: #2A5DB0; }"
+            ".a a { color: black; font-size: 24pt; }"
+            ".a * a { color: #2A5DB0; font-size: 12pt; }"
             ".a td { border: none; }"
             ".a tr:hover { background-color: white; }"
         } prepend
