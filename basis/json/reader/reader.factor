@@ -1,9 +1,8 @@
 ! Copyright (C) 2008 Peter Burns, 2009 Philipp Winkler
 ! See http://factorcode.org/license.txt for BSD license.
-USING: assocs combinators fry io io.encodings.utf8 io.files
+USING: assocs combinators io io.encodings.utf8 io.files
 io.streams.string json kernel kernel.private math math.order
-math.parser namespaces sbufs sequences sequences.private strings
-vectors ;
+math.parser namespaces sbufs sequences sequences.private strings ;
 IN: json.reader
 
 <PRIVATE
