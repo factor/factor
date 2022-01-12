@@ -33,11 +33,6 @@ M: enum-c-type c-type-setter
 : define-enum-value ( class value -- )
     enum>number "enum-value" set-word-prop ;
 
-PREDICATE: enum-value < word "enum-value" word-prop >boolean ;
-
-M: enum-value reset-word
-    [ call-next-method ] [ "enum-value" remove-word-prop ] bi ;
-
 <PRIVATE
 
 : define-enum-members ( members -- )
@@ -61,11 +56,8 @@ PRIVATE>
 PREDICATE: enum-c-type-word < c-type-word
     "c-type" word-prop enum-c-type? ;
 
-M: enum-c-type-word subwords
-    lookup-c-type members>> keys ;
-
 : enum>values ( enum -- seq )
-    lookup-c-type members>> values ;
+    "c-type" word-prop members>> values ;
 
 : enum>keys ( enum -- seq )
-    lookup-c-type members>> keys [ name>> ] map ;
+    "c-type" word-prop members>> keys [ name>> ] map ;
