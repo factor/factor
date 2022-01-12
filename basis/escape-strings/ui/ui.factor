@@ -25,11 +25,8 @@ M: escape-string-editor model-changed
         [ quot>> call( str -- str' ) ] [ set-editor-string ] bi
     ] [ call-next-method ] if ;
 
-: cake ( string delim -- string' )
-    dup surround ; inline
-
 : containerize ( string tag open-delim close-delim -- string' )
-    overd [ cake ] 2bi@ surround ;
+    overd [ 1string ] 2bi@ surround ;
 
 : checksum-escape-string ( string checksum -- string' )
     [ drop ]

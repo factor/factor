@@ -27,7 +27,7 @@ IN: rosetta-code.sierpinski-triangle
 !        * * * * * * * * * * * * * * * *
 
 : iterate-triangle ( triange spaces -- triangle' )
-    [ [ dup surround ] curry map ]
+    [ [ 1surround ] curry map ]
     [ drop [ dup " " glue ] map ] 2bi append ;
 
 : (sierpinski) ( triangle spaces n -- triangle' )

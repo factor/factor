@@ -180,8 +180,8 @@ GENERIC: write-html ( tag -- )
 
 : >value ( obj -- string )
     {
-        { [ dup squote? ] [ payload>> "'" dup surround ] }
-        { [ dup dquote? ] [ payload>> "\"" dup surround ] }
+        { [ dup squote? ] [ payload>> "'" 1surround ] }
+        { [ dup dquote? ] [ payload>> "\"" 1surround ] }
         [ ]
     } cond ;
 
