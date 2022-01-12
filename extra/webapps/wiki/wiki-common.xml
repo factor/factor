@@ -8,6 +8,8 @@
 
 	<t:style t:include="resource:extra/webapps/wiki/wiki.css" />
 
+    <div id="container">
+
     <div id="left">
 
         <t:if t:value="contents">
@@ -72,5 +74,7 @@
     </div>
 
     <span style="display:none"></span>
+
+	</div>
 
 </t:chloe>
