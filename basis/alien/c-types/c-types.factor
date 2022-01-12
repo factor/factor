@@ -47,6 +47,9 @@ GENERIC: lookup-c-type ( name -- c-type ) foldable
 PREDICATE: c-type-word < word
     "c-type" word-prop >boolean ;
 
+M: c-type-word reset-word
+    [ call-next-method ] [ "c-type" remove-word-prop ] bi ;
+
 TUPLE: pointer { to initial: void read-only } ;
 C: <pointer> pointer
 
