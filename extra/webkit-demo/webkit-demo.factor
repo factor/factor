@@ -31,7 +31,7 @@ CONSTANT: window-style
     <WebWindow>
     [ -> center ]
     [ f -> makeKeyAndOrderFront: ]
-    [ "http://factorcode.org" load-url ] tri ;
+    [ "https://factorcode.org" load-url ] tri ;
 
 : run-webkit-demo ( -- )
     [ webkit-demo ] cocoa-app ;

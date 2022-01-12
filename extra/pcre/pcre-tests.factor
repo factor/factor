@@ -153,7 +153,7 @@ version 8.36 <= [
 
 ! Bigger tests
 { t } [
-    "http://factorcode.org/" http-get nip
+    "https://factorcode.org/" http-get nip
     "href=\"(?P<link>[^\"]+)\"" findall [ "link" of ] map sequence?
 ] unit-test
 
