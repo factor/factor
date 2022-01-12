@@ -68,6 +68,10 @@ a:hover, .link:hover { text-decoration: underline; }
     margin-right: 10px;
 }
 
+.navrow img {
+    vertical-align: middle;
+}
+
 .page {
     max-width: 1000px;
     position: relative;
