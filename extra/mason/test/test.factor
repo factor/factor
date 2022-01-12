@@ -21,14 +21,12 @@ IN: mason.test
 : load-failures. ( failures -- ) [ load-error. nl ] each ;
 
 : require-all-no-restarts ( vocabs -- failures )
-    V{ } clone errorlist [
-        V{ } clone [
-            '[
-                [ require ]
-                [ swap vocab-name _ set-at ] recover
-            ] each
-        ] keep
-    ] with-variable ;
+    V{ } clone [
+        '[
+            [ require ]
+            [ swap vocab-name _ set-at ] recover
+        ] each
+    ] keep ;
 
 : load-from-root-no-restarts ( root prefix -- failures )
     vocabs-to-load require-all-no-restarts ;
