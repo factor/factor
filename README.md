@@ -1,6 +1,6 @@
 # Factor
 
-[![](https://api.travis-ci.org/factor/factor.svg)](https://travis-ci.org/factor/factor)
+![Build](https://github.com/factor/factor/actions/workflows/build.yml/badge.svg)
 
 Factor is a [concatenative](https://www.concatenative.org), stack-based
 programming language with [high-level
