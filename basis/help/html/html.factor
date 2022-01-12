@@ -143,11 +143,12 @@ M: pathname url-of
         "background-color: #f4efd9;" "background-color: white;" replace
         "}" ?tail drop
         " border-bottom: 1px dashed #ccc; width: 100%; padding-bottom: 10px; }"
-        append swap pick set-nth
-        ".a tr:hover { background-color: white; }" prefix
-        ".a td { border: none; }" prefix
-        ".a * a { color: #2A5DB0; }" prefix
-        ".a a { color: black; }" prefix
+        append swap pick set-nth {
+            ".a a { color: black; }"
+            ".a * a { color: #2A5DB0; }"
+            ".a td { border: none; }"
+            ".a tr:hover { background-color: white; }"
+        } prepend
     ] [ drop ] if* ;
 
 : css-classes ( classes -- stylesheet )
