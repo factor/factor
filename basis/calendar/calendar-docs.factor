@@ -51,12 +51,12 @@ HELP: seconds-per-year
 { $description "Returns the number of seconds in a year averaged over 400 years. Used internally for adding an arbitrary real number of seconds to a timestamp." } ;
 
 HELP: julian-day-number
-{ $values { "year" integer } { "month" integer } { "day" integer } { "n" integer } }
+{ $values { "$year" integer } { "$month" integer } { "$day" integer } { "n" integer } }
 { $description "Calculates the Julian day number from a year, month, and day. The difference between two Julian day numbers is the number of days that have elapsed between the two corresponding dates." }
 { $warning "Not valid before year -4800 BCE." } ;
 
 HELP: julian-day-number>date
-{ $values { "n" integer } { "year" integer } { "month" integer } { "day" integer } }
+{ $values { "$n" integer } { "year" integer } { "month" integer } { "day" integer } }
 { $description "Converts from a Julian day number back to a year, month, and day." } ;
 { julian-day-number julian-day-number>date } related-words
 
