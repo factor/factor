@@ -12,6 +12,6 @@ PREDICATE: alias < word "alias" word-prop ;
     [ parsing-word? [ t "parsing" set-word-prop ] [ drop ] if ] 2tri ;
 
 M: alias reset-word
-    [ call-next-method ] [ "alias" remove-word-prop ] bi ;
+    [ call-next-method ] [ f "alias" set-word-prop ] bi ;
 
 M: alias definer drop \ ALIAS: f ;

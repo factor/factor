@@ -10,6 +10,6 @@ PREDICATE: constant < word "constant" word-prop >boolean ;
     [ [ ] curry ( -- value ) define-inline ] 2bi ;
 
 M: constant reset-word
-    [ call-next-method ] [ "constant" remove-word-prop ] bi ;
+    [ call-next-method ] [ f "constant" set-word-prop ] bi ;
 
 M: constant definer drop \ CONSTANT: f ;
