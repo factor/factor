@@ -22,9 +22,7 @@
 
         <body>
 
-            <div id="container">
             <t:call-next-template />
-            </div>
 
         </body>
 
