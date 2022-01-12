@@ -427,3 +427,12 @@ M: bogus-hashcode hashcode* 2drop 0 >bignum ;
 { f } [ { } { 99 88 } [ <= ] 2any? ] unit-test
 { t } [ { 2 4 5 8 } { 2 4 6 8 } [ < ] 2any? ] unit-test
 { f } [ { 2 4 6 8 } { 2 4 6 8 } [ < ] 2any? ] unit-test
+
+{ "ollo" } [ "ll" "o" 1surround ] unit-test
+{ "ollo" } [ { CHAR: l CHAR: l } "o" 1surround ] unit-test
+
+{ { CHAR: o CHAR: l CHAR: l CHAR: o } }
+[ { CHAR: l CHAR: l } "o" { } 1surround-as ] unit-test
+
+{ "ollo" }
+[ { CHAR: l CHAR: l } "o" "" 1surround-as ] unit-test
