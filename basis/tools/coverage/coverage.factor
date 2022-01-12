@@ -71,7 +71,7 @@ M: word add-coverage
     ] deep-annotate ;
 
 M: word remove-coverage
-    [ reset ] [ "coverage" remove-word-prop ] bi ;
+    [ reset ] [ f "coverage" set-word-prop ] bi ;
 
 M: string reset-coverage
     [ reset-coverage ] each-word ;
