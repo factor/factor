@@ -1,7 +1,7 @@
 ! Copyright (C) 2008 Slava Pestov, James Cash.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays assocs classes deques dlists fry
-hashtables kernel parser sequences.private vocabs.loader ;
+USING: accessors arrays assocs classes deques dlists hashtables
+kernel parser sequences.private vocabs.loader ;
 IN: linked-assocs
 
 TUPLE: linked-assoc { assoc read-only } { dlist dlist read-only } ;
