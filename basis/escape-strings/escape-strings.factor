@@ -49,7 +49,7 @@ IN: escape-strings
     [ nip ] [ drop length ] if ;
 
 : surround-by-brackets ( str delim -- str' )
-    [ "[" dup surround ] [ "]" dup surround ] bi surround ;
+    [ "[" 1surround ] [ "]" 1surround ] bi surround ;
 
 : surround-by-equals-brackets ( str n -- str' )
     CHAR: = <repetition> surround-by-brackets ;

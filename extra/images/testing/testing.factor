@@ -27,7 +27,7 @@ PRIVATE>
     [ image. ] with-matching-files ;
 
 : ls ( dirpath extension -- )
-    [ "\"" dup surround print ] with-matching-files ;
+    [ "\"" 1surround print ] with-matching-files ;
 
 : save-as-reference-image ( path -- )
     [ load-image ] [ fig-name ] bi

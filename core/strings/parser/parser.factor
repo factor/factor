@@ -124,7 +124,7 @@ DEFER: (parse-string)
         dup current-char forbid-tab {
             { CHAR: \s [ advance-char ] }
             { f [ drop ] }
-            [ "[space]" swap 1string "'" dup surround unexpected ]
+            [ "[space]" swap 1string "'" 1surround unexpected ]
         } case drop
     ] if ;
 

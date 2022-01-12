@@ -351,6 +351,9 @@ PRIVATE>
 : unsurround ( newseq seq2 seq3 -- seq1 )
    [ ?head drop ] [ ?tail drop ] bi* ;
 
+: >string-list ( seq -- seq' )
+    [ "\"" 1surround ] map "," join ;
+
 : one? ( ... seq quot: ( ... elt -- ... ? ) -- ... ? )
     [ find ] 2keep rot [
         [ 1 + ] 2dip find-from drop not

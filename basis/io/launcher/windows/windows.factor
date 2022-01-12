@@ -82,7 +82,7 @@ TUPLE: CreateProcess-args
 : escape-argument ( str -- newstr )
     escape-double-quote
     CHAR: \s over member? [
-        fix-trailing-backslashes "\"" dup surround
+        fix-trailing-backslashes "\"" 1surround
     ] when ;
 
 : join-arguments ( args -- cmd-line )
