@@ -6,10 +6,13 @@ help.markup help.topics kernel lexer math namespaces parser
 sequences splitting strings strings.parser vocabs.parser words ;
 IN: help.syntax
 
+DEFER: HELP{
+
 <PRIVATE
 
 :: parse-help-token ( end -- str/obj/f )
     ?scan-token dup {
+        [ "{" = [ \ HELP{ ] [ f ] if ]
         [ "syntax" lookup-word ]
         [ "help.markup" lookup-word ]
         [ dup ?last ":{[(/\"" member-eq? [ search ] [ drop f ] if ]
