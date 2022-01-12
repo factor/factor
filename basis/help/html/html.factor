@@ -146,6 +146,8 @@ M: pathname url-of
         append swap pick set-nth
         ".a tr:hover { background-color: white; }" prefix
         ".a td { border: none; }" prefix
+        ".a * a { color: #2A5DB0; }" prefix
+        ".a a { color: black; }" prefix
     ] [ drop ] if* ;
 
 : css-classes ( classes -- stylesheet )
