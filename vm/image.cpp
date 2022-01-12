@@ -25,7 +25,7 @@ vm_parameters::vm_parameters() {
   callstack_size = 128 * sizeof(cell);
 #endif
 
-  code_size = 64;
+  code_size = 96;
   young_size = sizeof(cell) / 4;
   aging_size = sizeof(cell) / 2;
   tenured_size = 24 * sizeof(cell);
