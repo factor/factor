@@ -120,7 +120,7 @@ M: chat-server handle-client-join
 M: chat-server handle-client-disconnect
     [
         line-beginning username " has quit  "
-        client object>> dup [ "\"" dup surround ] when
+        client object>> dup [ "\"" 1surround ] when
     ] "" append-outputs-as send-everyone ;
 
 M: chat-server handle-already-logged-in

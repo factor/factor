@@ -380,6 +380,10 @@ PRIVATE>
 
 : surround ( seq1 seq2 seq3 -- newseq ) over surround-as ; inline
 
+: 1surround-as ( seq1 seq2 exemplar  -- newseq ) dupd surround-as ; inline
+
+: 1surround ( seq1 seq2 -- newseq ) over 1surround-as ; inline
+
 : glue-as ( seq1 seq2 seq3 exemplar -- newseq ) swapd 3append-as ; inline
 
 : glue ( seq1 seq2 seq3 -- newseq ) pick glue-as ; inline

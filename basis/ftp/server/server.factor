@@ -133,7 +133,7 @@ ERROR: type-error type ;
 
 : handle-PWD ( obj -- )
     drop
-    display-directory "\"" dup surround 257 server-response ;
+    display-directory "\"" 1surround 257 server-response ;
 
 : handle-SYST ( obj -- )
     drop

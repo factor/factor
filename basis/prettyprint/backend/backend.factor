@@ -157,7 +157,7 @@ M: pathname pprint*
 : check-recursion ( obj quot: ( obj -- ) -- )
     nesting-limit? [
         drop
-        [ class-of name>> "~" dup surround ] keep present-text
+        [ class-of name>> "~" 1surround ] keep present-text
     ] [
         over recursion-check get member-eq? [
             drop "~circularity~" swap present-text
