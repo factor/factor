@@ -28,7 +28,7 @@ Options:
     -young=<int>        young gc generation 0 size in MiB [" write cell 4 / number>string write "]
     -aging=<int>        aging gc generation 1 size in MiB [" write cell 2 / number>string write "]
     -tenured=<int>      tenured gc generation 2 size in MiB [" write cell 24 * number>string write "]
-    -codeheap=<int>     codeheap size in MiB [64]
+    -codeheap=<int>     codeheap size in MiB [96]
     -pic=<int>          max pic size [3]
     -fep                enter fep mode immediately
     -no-signals         turn off OS signal handling
