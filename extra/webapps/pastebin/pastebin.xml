@@ -6,14 +6,14 @@
 
 	<table width="100%">
 		<tr>
-			<th align="left" width="50%">Summary</th>
-			<th align="left" width="100">Username</th>
+			<th align="left" width="60%">Summary</th>
+			<th align="left" width="150">Username</th>
 			<th align="left" width="200">Date</th>
 		</tr>
 
 		<t:bind-each t:name="pastes">
 			<tr>
-				<td width="100%"><t:a t:href="$pastebin/paste" t:query="id"><t:label t:name="summary" /></t:a></td>
+				<td><t:a t:href="$pastebin/paste" t:query="id"><t:label t:name="summary" /></t:a></td>
 				<td><t:label t:name="author" /></td>
 				<td style="white-space: nowrap"><t:label t:name="date" /></td>
 			</tr>
