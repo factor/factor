@@ -85,6 +85,10 @@ tr:hover {
     input[type=text] {
         width: 100px;
     }
+
+    .navbar img {
+        display: none;
+    }
 }
 
 @media screen and (max-width: 600px) {
