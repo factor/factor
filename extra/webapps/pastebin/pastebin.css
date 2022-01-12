@@ -9,11 +9,13 @@ pre.code {
 table {
     border-collapse: collapse;
     table-layout: fixed;
+    width: 100%;
 }
 
 table td {
     padding: 5px;
     word-wrap: break-word;
+    width: 33%;
 }
 
 table th {
