@@ -40,10 +40,6 @@ a, .link { color: #2A5DB0; }
 a:link, a:visited, a:active, .link { text-decoration: none; }
 a:hover, .link:hover { text-decoration: underline; }
 
-#container {
-    max-width: 1000px;
-}
-
 .error { color: #a00; }
 
 .errors li { color: #a00; }
