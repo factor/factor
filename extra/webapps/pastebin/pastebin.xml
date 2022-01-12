@@ -6,8 +6,8 @@
 
 	<table width="100%">
 		<tr>
-			<th align="left" width="60%">Summary</th>
-			<th align="left" width="150">Username</th>
+			<th align="left" width="70%">Summary</th>
+			<th align="left" width="125">Username</th>
 			<th align="left" width="200">Date</th>
 		</tr>
 
