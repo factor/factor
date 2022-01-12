@@ -22,7 +22,7 @@ GENERIC: see* ( defspec -- )
         { string-limit? f }
         { margin 0 }
         { line-limit 1 }
-    } [
+    } clone [
         [ [ synopsis* ] with-in ] with-string-writer
     ] with-variables ;
 
