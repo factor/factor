@@ -82,13 +82,17 @@ M: pathname url-of
     "conventions" >link topic>filename
     [XML
         <div class="navbar">
-        <a href="/">Handbook</a>
-        <a href=<->>Glossary</a>
-        <form method="get" action="/search" style="float: right;">
-            <input placeholder="Search" name="search" type="text"/>
-            <input type="submit" value="Go"/>
-            <a href="https://factorcode.org">factorcode.org</a>
-        </form>
+            <div class="navrow">
+                <a href="https://factorcode.org">
+                <img src="favicon.ico" width="24" height="24" />
+                </a>
+                <a href="/">Handbook</a>
+                <a href=<->>Glossary</a>
+                <form method="get" action="/search" style="float: right;">
+                    <input placeholder="Search" name="search" type="text"/>
+                    <input type="submit" value="Go"/>
+                </form>
+            </div>
         </div>
      XML] ;
 
@@ -199,8 +203,9 @@ M: pathname url-of
     [
         [ print-topic ] with-html-writer
         css-styles-to-classes cache-images
+        "resource:extra/websites/factorcode/favicon.ico" dup file-name ?copy-file
         [ help-stylesheet help-meta prepend help-navbar ] dip help-footer
-        [XML <div id="container"><-><div class="page"><-><-></div></div> XML]
+        [XML <-><div class="page"><-><-></div> XML]
     ] bi simple-page ;
 
 : generate-help-file ( topic -- )
