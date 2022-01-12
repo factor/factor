@@ -144,10 +144,9 @@ PRIVATE>
     ] if ;
 
 : reload ( name -- )
-    dup lookup-vocab
-    [ [ load-source ] [ load-docs ] bi ]
-    [ require ]
-    ?if ;
+    dup lookup-vocab [
+        f >>source-loaded? f >>docs-loaded? drop
+    ] when* require ;
 
 : run ( vocab -- )
     dup load-vocab vocab-main [
@@ -158,30 +157,15 @@ PRIVATE>
         "To define one, refer to \\ MAIN: help" print
     ] ?if ;
 
-SYMBOL: errorlist
-
 <PRIVATE
-
-: add-to-errorlist ( error vocab -- )
-    vocab-name errorlist get [ set-at ] [ 2drop ] if* ;
-
-: remove-from-errorlist ( vocab -- )
-    vocab-name errorlist get [ delete-at ] [ drop ] if* ;
 
 GENERIC: (require) ( name -- )
 
 M: vocab (require)
-    [
-        [
-            dup source-loaded?>> +parsing+ eq? [ drop ] [
-                dup source-loaded?>> [ dup load-source ] unless
-                dup docs-loaded?>> [ dup load-docs ] unless
-                drop
-            ] if
-        ] [
-            remove-from-errorlist
-        ] bi
-    ] [ [ swap add-to-errorlist ] keep rethrow ] recover ;
+    dup source-loaded?>> +parsing+ eq? [
+        dup source-loaded?>> [ dup load-source ] unless
+        dup docs-loaded?>> [ dup load-docs ] unless
+    ] unless drop ;
 
 M: vocab-link (require)
     vocab-name (require) ;
@@ -192,18 +176,11 @@ M: string (require)
 
 PRIVATE>
 
-: require-all ( vocabs -- )
-    V{ } clone errorlist [ [ require ] each ] with-variable ;
-
 [
-    dup vocab-name errorlist get at*
-    [ rethrow ]
-    [
-        drop dup find-vocab-root
-        [ (require) ]
-        [ dup lookup-vocab [ drop ] [ no-vocab ] if ]
-        if
-    ] if
+    dup find-vocab-root
+    [ (require) ]
+    [ dup lookup-vocab [ drop ] [ no-vocab ] if ]
+    if
 ] require-hook set-global
 
 M: vocab-spec where vocab-source-path dup [ 1 2array ] when ;
