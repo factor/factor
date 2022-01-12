@@ -7,7 +7,7 @@
 	<t:style t:include="resource:extra/webapps/pastebin/pastebin.css" />
 
     <div class="navbar">
-
+	<div class="navrow">
         <t:a t:href="$pastebin">Pastes</t:a>
         <t:a t:href="$pastebin/new-paste">New Paste</t:a>
 
@@ -19,6 +19,7 @@
 
             <t:button t:action="$login-realm/logout" t:aside="begin" class="link-button link">Logout</t:button>
         </t:if>
+    </div>
     </div>
 
     <div class="page">
