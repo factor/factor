@@ -26,7 +26,7 @@ M: escape-string-editor model-changed
     ] [ call-next-method ] if ;
 
 : containerize ( string tag open-delim close-delim -- string' )
-    overd [ 1string ] 2bi@ surround ;
+    overd [ 1surround ] 2bi@ surround ;
 
 : checksum-escape-string ( string checksum -- string' )
     [ drop ]
