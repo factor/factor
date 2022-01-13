@@ -92,6 +92,7 @@ SYMBOL: code-style
 H{
     { font-name $ default-monospace-font-name }
     { font-size $ default-font-size }
+    { foreground $ text-color }
     { page-color $ code-background-color }
     { inset { 5 5 } }
     { wrap-margin f }
