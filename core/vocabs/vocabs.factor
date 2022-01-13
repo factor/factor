@@ -159,10 +159,10 @@ SYMBOL: requiring
 
 : with-requiring ( quot -- )
     requiring get [
-        call
+        swap call
     ] [
-        HS{ } clone requiring [ call ] with-variable
-    ] if ; inline
+        HS{ } clone dup requiring [ swap call ] with-variable
+    ] if* ; inline
 
 PRIVATE>
 
@@ -180,13 +180,13 @@ M: vocab-link require name>> require ;
 M: string require
     [ ".private" ?tail ] keep swap [ lookup-vocab not ] when [
         [
-            dup requiring get ?adjoin
+            dupd ?adjoin
             [ require-hook get call( name -- ) ] [ drop ] if
         ] with-requiring
     ] [ drop ] if ;
 
 : require-all ( vocabs -- )
-    [ [ require ] each ] with-requiring ;
+    [ require ] each ;
 
 : load-vocab ( name -- vocab )
     [ require ] [ lookup-vocab ] bi ;
