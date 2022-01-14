@@ -327,7 +327,9 @@ M: tuple-class (define-tuple-class)
     3dup tuple-class-unchanged?
     [ 2drop ?define-symbol ] [ redefine-tuple-class ] if ;
 
-: boa-effect ( class -- effect )
+GENERIC: boa-effect ( class -- effect )
+
+M: tuple-class boa-effect
     [ all-slots [ name>> ] map ] [ name>> 1array ] bi <effect> ;
 
 : define-boa-word ( word class -- )
