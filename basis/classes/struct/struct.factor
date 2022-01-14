@@ -5,7 +5,7 @@ USING: accessors alien alien.c-types alien.data alien.parser
 arrays byte-arrays classes classes.parser classes.private
 classes.struct.bit-accessors classes.tuple classes.tuple.parser
 combinators combinators.smart cpu.architecture definitions
-delegate.private functors.backend generalizations generic
+delegate.private effects functors.backend generalizations generic
 generic.parser io kernel kernel.private lexer libc math
 math.order parser quotations sequences slots slots.private
 specialized-arrays stack-checker.dependencies summary vectors
@@ -52,7 +52,8 @@ M: struct >c-ptr
 : memory>struct ( ptr class -- struct )
     ! This is sub-optimal if the class is not literal, but gets
     ! optimized down to efficient code if it is.
-    '[ _ boa ] call( ptr -- struct ) ; inline
+    struct-class check-instance
+    M\ tuple-class boa execute( ptr class -- struct ) ;
 
 : read-struct ( class -- struct )
     [ heap-size read ] [ memory>struct ] bi ;
@@ -133,6 +134,13 @@ M: struct-class boa>object
     swap pad-struct-slots
     [ <struct> ] [ struct-slots ] bi
     [ [ (writer-quot) call( value struct -- ) ] with 2each ] keepd ;
+
+M: struct-class new <struct> ;
+
+M: struct-class boa <struct-boa> ;
+
+M: struct-class boa-effect
+    [ struct-slots [ name>> ] map ] [ name>> 1array ] bi <effect> ;
 
 M: struct-class initial-value* <struct> t ; inline
 
