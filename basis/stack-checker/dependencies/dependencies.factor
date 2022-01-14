@@ -128,6 +128,15 @@ TUPLE: depends-on-tuple-layout class layout ;
 M: depends-on-tuple-layout satisfied?
     [ class>> tuple-layout ] [ layout>> ] bi eq? ;
 
+TUPLE: depends-on-struct-slots class slots ;
+
+: add-depends-on-struct-slots ( class slots -- )
+    [ drop +conditional+ depends-on ]
+    [ depends-on-struct-slots add-conditional-dependency ] 2bi ;
+
+M: depends-on-struct-slots satisfied?
+    [ class>> struct-slots ] [ slots>> ] bi eq? ;
+
 TUPLE: depends-on-flushable word ;
 
 : add-depends-on-flushable ( word -- )

@@ -142,7 +142,7 @@ IN: stack-checker.transforms
 \ boa [
     {
         { [ dup struct-class? ] [
-            dup add-depends-on-c-type
+            dup dup struct-slots add-depends-on-struct-slots
             '[ _ <struct-boa> ] ] }
         { [ dup tuple-class? ] [
             dup tuple-layout

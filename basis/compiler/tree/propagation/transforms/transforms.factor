@@ -186,7 +186,7 @@ ERROR: bad-partial-eval quot word ;
 : inline-new ( class -- quot/f )
     {
         { [ dup struct-class? ] [
-            dup add-depends-on-c-type
+            dup dup struct-slots add-depends-on-struct-slots
             '[ _ <struct> ] ] }
         { [ dup tuple-class? ] [
             dup tuple-layout
