@@ -1,6 +1,10 @@
 ! Copyright (C) 2010, 2011 Joe Groff, Daniel Ehrenberg,
 ! John Benediktsson, Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license
+IN: classes.struct
+DEFER: struct-slots ! for stack-checker
+DEFER: struct-class? ! for stack-checker
+DEFER: <struct-boa> ! for stack-checker
 USING: accessors alien alien.c-types alien.data alien.parser
 arrays byte-arrays classes classes.parser classes.private
 classes.struct.bit-accessors classes.tuple classes.tuple.parser
@@ -10,7 +14,6 @@ generic.parser io kernel kernel.private lexer libc math
 math.order parser quotations sequences slots slots.private
 specialized-arrays stack-checker.dependencies summary vectors
 vocabs.loader vocabs.parser words ;
-IN: classes.struct
 
 SPECIALIZED-ARRAY: uchar
 
