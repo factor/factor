@@ -24,6 +24,7 @@ PREDICATE: typed-word < word "typed-word" word-prop >boolean ;
         [ all-slots empty? not ]
         [ immutable-tuple-class? ]
         [ final-class? ]
+        [ struct-class? not ] ! for struct boa change
     } 1&& ;
 
 ! typed inputs
