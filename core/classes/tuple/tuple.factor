@@ -227,7 +227,9 @@ SYMBOL: outdated-tuples
     compute-slot-permutation
     apply-slot-permutation ;
 
-: update-tuple ( tuple -- newtuple )
+GENERIC: update-tuple ( tuple -- newtuple )
+
+M: tuple update-tuple
     [ tuple-slots ] [ layout-of ] bi
     [ permute-slots ] [ first ] bi
     slots>tuple ;
@@ -239,7 +241,7 @@ SYMBOL: outdated-tuples
 
 : update-tuples ( outdated-tuples -- )
     dup assoc-empty? [ drop ] [
-        [ [ tuple? ] instances ] dip [ outdated-tuple? ] curry filter
+        '[ dup tuple? [ _ outdated-tuple? ] [ drop f ] if ] instances
         dup [ update-tuple ] map become
     ] if ;
 
