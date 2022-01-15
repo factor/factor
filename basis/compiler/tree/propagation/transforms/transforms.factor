@@ -202,7 +202,7 @@ ERROR: bad-partial-eval quot word ;
 \ new [ inline-new ] 1 define-partial-eval
 
 \ memory>struct [
-    dup tuple-class? [
+    dup struct-class? [
         dup tuple-layout
         [ add-depends-on-tuple-layout ]
         [ [ "boa-check" word-prop [ ] or ] dip ] 2bi
