@@ -6,12 +6,13 @@ DEFER: struct-slots ! for stack-checker
 DEFER: struct-class? ! for stack-checker
 DEFER: <struct-boa> ! for stack-checker
 USING: accessors alien alien.c-types alien.data alien.parser
-arrays byte-arrays classes classes.parser classes.private
+arrays assocs byte-arrays classes classes.parser classes.private
 classes.struct.bit-accessors classes.tuple classes.tuple.parser
-combinators combinators.smart cpu.architecture definitions
-delegate.private effects functors.backend generalizations generic
-generic.parser io kernel kernel.private lexer libc math
-math.order parser quotations sequences slots slots.private
+classes.tuple.private combinators combinators.smart
+cpu.architecture definitions delegate.private effects
+functors.backend generalizations generic generic.parser io
+kernel kernel.private lexer libc math math.order parser
+quotations sequences sequences.private slots slots.private
 specialized-arrays stack-checker.dependencies summary vectors
 vocabs.loader vocabs.parser words ;
 
@@ -283,7 +284,24 @@ M: struct binary-zero? binary-object uchar <c-direct-array> [ 0 = ] all? ; inlin
     [ type>> lookup-c-type drop ] each ;
 
 : redefine-struct-tuple-class ( class -- )
-    [ struct f define-tuple-class ] [ make-final ] bi ;
+    [ struct f redefine-tuple-class ] [ make-final ] bi ;
+
+: resize-underlying ( struct -- )
+    [ 2 slot ]
+    [ class-of "struct-size" word-prop '[ _ swap resize ] [ f ] if* ]
+    [ 2 set-slot ] tri ;
+
+M: struct update-tuple
+    ! make sure underlying byte-array is correct size, but maybe
+    ! has incorrect contents... is there something better to do?
+    [ resize-underlying ] [ call-next-method ] bi ;
+
+: forget-struct-slot-accessors ( class -- )
+    dup "c-type" word-prop [
+        dup struct-c-type? [
+            fields>> forget-slot-accessors
+        ] [ 2drop ] if
+    ] [ drop ] if* ;
 
 :: (define-struct-class) ( class slot-specs offsets-quot alignment-quot -- )
     slot-specs check-struct-slots
@@ -294,6 +312,8 @@ M: struct binary-zero? binary-object uchar <c-direct-array> [ 0 = ] all? ; inlin
     unaligned-size alignment align :> size
 
     class slot-specs size alignment c-type-for-class :> c-type
+
+    class forget-struct-slot-accessors
 
     c-type class typedef
     class slot-specs define-accessors
@@ -329,11 +349,10 @@ ERROR: invalid-struct-slot token ;
 
 M: struct-class reset-class
     {
-        [ dup "c-type" word-prop fields>> forget-slot-accessors ]
-        [
-            [ forget-struct-slot-values-method ]
-            [ forget-clone-method ] bi
-        ]
+        [ \ <struct-boa> def>> first delete-at ]
+        [ forget-struct-slot-accessors ]
+        [ forget-struct-slot-values-method ]
+        [ forget-clone-method ]
         [ { "c-type" "layout" "struct-size" } remove-word-props ]
         [ call-next-method ]
     } cleave ;
