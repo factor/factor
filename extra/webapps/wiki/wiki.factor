@@ -356,6 +356,7 @@ M: revision feed-entry-url id>> revision-url ;
         <user-edits-feed-action> "user-edits.atom" add-responder
         <list-changes-feed-action> "changes.atom" add-responder
         <delete-action> "delete" add-responder
+        "vocab:webapps/wiki/icons/" <static> "icons" add-responder
     <boilerplate>
         [ init-sidebars init-relative-link-prefix ] >>init
         { wiki "wiki-common" } >>template ;
