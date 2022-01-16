@@ -3,9 +3,9 @@
 USING: accessors calendar db.tuples db.types farkup
 furnace.actions furnace.auth furnace.boilerplate
 furnace.recaptcha furnace.redirection furnace.syndication
-furnace.utilities html.forms http.server.dispatchers kernel lcs
-make namespaces present random sequences sorting splitting urls
-validators ;
+furnace.utilities html.forms http.server.dispatchers
+http.server.static kernel lcs make namespaces present random
+sequences sorting splitting urls validators ;
 IN: webapps.wiki
 
 : wiki-url ( rest path -- url )
