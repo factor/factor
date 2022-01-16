@@ -66,6 +66,14 @@
     padding-left: 20px;
 }
 
+.contents img {
+    max-width: 100%;
+}
+
+.contents hr {
+    height: 1px;
+}
+
 .page {
     padding-left: 15px;
     padding-right: 15px;
