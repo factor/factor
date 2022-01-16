@@ -37,7 +37,7 @@
         <div class="navrow">
 
             <t:if t:value="contents">
-                <img id="menu" onclick="toggleSidebar()" src="icons/hamburger.svg" />
+                <img id="menu" onclick="toggleSidebar()" src="$wiki/icons/hamburger.svg" />
             </t:if>
 
             <t:a t:href="$wiki">Front Page</t:a>
