@@ -43,8 +43,8 @@ SYMBOL: dpi
     <rect> ;
 
 : layout-extents ( layout -- ink-rect logical-rect )
-    PangoRectangle <struct>
-    PangoRectangle <struct>
+    PangoRectangle new
+    PangoRectangle new
     [ pango_layout_get_extents ] 2keep
     [ PangoRectangle>rect ] bi@ ;
 

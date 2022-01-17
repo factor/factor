@@ -40,7 +40,7 @@ super-message-senders [ H{ } clone ] initialize
 
 : <super> ( receiver -- super )
     [ ] [ object_getClass class_getSuperclass ] bi
-    objc-super <struct-boa> ;
+    objc-super boa ;
 
 TUPLE: selector-tuple name object ;
 

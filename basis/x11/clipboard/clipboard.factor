@@ -57,7 +57,7 @@ TUPLE: x-clipboard atom contents ;
     1 XChangeProperty drop ;
 
 : send-notify ( evt prop -- )
-    XSelectionEvent <struct>
+    XSelectionEvent new
     SelectionNotify >>type
     swap >>property
     over display>>   >>display

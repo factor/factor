@@ -7,7 +7,7 @@ IN: time.macosx
 
 M: macosx adjust-time-monotonic
     timestamp>timeval
-    \ timeval <struct>
+    \ timeval new
     [ adjtime io-error ] keep dup binary-zero? [
         drop instant
     ] [

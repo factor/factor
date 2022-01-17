@@ -17,7 +17,7 @@ STRUCT: body
 SPECIALIZED-ARRAY: body
 
 : <body> ( location velocity mass -- body )
-    [ days-per-year v*n ] [ solar-mass * ] bi* body <struct-boa> ; inline
+    [ days-per-year v*n ] [ solar-mass * ] bi* body boa ; inline
 
 : <jupiter> ( -- body )
     double-4{ 4.84143144246472090e00 -1.16032004402742839e00 -1.03622044471123109e-01 0.0 }

@@ -40,7 +40,7 @@ STRUCT: halves
 { 8 } [ halves heap-size ] unit-test
 
 { 3.0 } [
-    halves <struct>
+    halves new
         3.0 >>dick
     dick>>
 ] unit-test

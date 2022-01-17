@@ -310,7 +310,7 @@ ERROR: win32-powrprof-error n ;
     dup 0 = [ drop ] [ win32-powrprof-error ] if ;
 
 : get-power-capabilities ( -- struct )
-    SYSTEM_POWER_CAPABILITIES <struct>
+    SYSTEM_POWER_CAPABILITIES new
     [ GetPwrCapabilities win32-error=0/f ] keep ;
 
 : get-processor-power-information ( -- structs )

@@ -36,7 +36,7 @@ CONSTANT: CP_ALL_LAYERS 0xffffffff
 
 ! cpVect.h
 TYPED: cpv ( x y -- v: cpVect )
-    cpVect <struct-boa> ; inline
+    cpVect boa ; inline
 
 TYPED: cpvzero ( -- v: cpVect )
     0.0 0.0 cpv ; inline
@@ -146,7 +146,7 @@ STRUCT: cpBB
     { t cpFloat } ;
 
 TYPED: cpBBNew ( l b r t -- cpbb: cpBB )
-    cpBB <struct-boa> ; inline
+    cpBB boa ; inline
 
 TYPED: cpBBintersects ( a: cpBB b: cpBB -- ? )
     {

@@ -10,7 +10,7 @@ IN: io.serial.windows
 
 : get-comm-state ( duplex -- dcb )
     in>> handle>>
-    DCB <struct> [ GetCommState win32-error=0/f ] keep ;
+    DCB new [ GetCommState win32-error=0/f ] keep ;
 
 : set-comm-state ( duplex dcb -- )
     [ in>> handle>> ] dip

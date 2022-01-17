@@ -126,7 +126,7 @@ ERROR: core-foundation-error n ;
         kLSUnknownCreator
         swap <CFString> &CFRelease
         f
-        FSRef <struct>
+        FSRef new
         [ f LSFindApplicationForInfo cf-error ] keep
         fsref>string
     ] with-destructors ;

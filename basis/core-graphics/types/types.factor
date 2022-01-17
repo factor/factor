@@ -12,15 +12,13 @@ STRUCT: CGPoint
     { x CGFloat }
     { y CGFloat } ;
 
-: <CGPoint> ( x y -- point )
-    CGPoint <struct-boa> ;
+C: <CGPoint> CGPoint
 
 STRUCT: CGSize
     { w CGFloat }
     { h CGFloat } ;
 
-: <CGSize> ( w h -- size )
-    CGSize <struct-boa> ;
+C: <CGSize> CGSize
 
 STRUCT: CGRect
     { origin CGPoint }
@@ -56,8 +54,7 @@ STRUCT: CGRect
     size>> h<< ; inline
 
 : <CGRect> ( x y w h -- rect )
-    [ CGPoint <struct-boa> ] [ CGSize <struct-boa> ] 2bi*
-    CGRect <struct-boa> ;
+    [ CGPoint boa ] [ CGSize boa ] 2bi* CGRect boa ;
 
 : CGRect-x-y ( alien -- origin-x origin-y )
     [ CGRect-x ] [ CGRect-y ] bi ;

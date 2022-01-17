@@ -18,7 +18,7 @@ WHERE
 STRUCT: T-class { real N-type } { imaginary N-type } ;
 
 : <T> ( z -- alien )
-    >rect T-class <struct-boa> >c-ptr ;
+    >rect T-class boa >c-ptr ;
 
 : *T ( alien -- z )
     T-class memory>struct [ real>> ] [ imaginary>> ] bi rect> ; inline

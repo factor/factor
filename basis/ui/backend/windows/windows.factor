@@ -85,7 +85,7 @@ CONSTANT: pfd-flag-map H{
     [ value>> ] [ 0 ] if* ;
 
 : >pfd ( attributes -- pfd )
-    [ PIXELFORMATDESCRIPTOR <struct> ] dip
+    [ PIXELFORMATDESCRIPTOR new ] dip
     {
         [ drop PIXELFORMATDESCRIPTOR c:heap-size >>nSize ]
         [ drop 1 >>nVersion ]
@@ -483,7 +483,7 @@ SYMBOL: nc-buttons
     ] if ;
 
 : make-TRACKMOUSEEVENT ( hWnd -- alien )
-    TRACKMOUSEEVENT <struct>
+    TRACKMOUSEEVENT new
         swap >>hwndTrack
         TRACKMOUSEEVENT c:heap-size >>cbSize ;
 
@@ -591,7 +591,7 @@ M: windows-ui-backend do-events
     ] if ;
 
 :: register-window-class ( class-name-ptr -- )
-    WNDCLASSEX <struct> f GetModuleHandle
+    WNDCLASSEX new f GetModuleHandle
     class-name-ptr pick GetClassInfoEx 0 = [
         WNDCLASSEX c:heap-size >>cbSize
         flags{ CS_HREDRAW CS_VREDRAW CS_OWNDC } >>style
@@ -675,7 +675,7 @@ M: windows-ui-backend do-events
 
 : set-pixel-format ( pixel-format hdc -- )
     swap handle>>
-    PIXELFORMATDESCRIPTOR <struct> SetPixelFormat win32-error=0/f ;
+    PIXELFORMATDESCRIPTOR new SetPixelFormat win32-error=0/f ;
 
 : setup-gl ( world -- )
     [ get-dc ] keep
@@ -747,18 +747,18 @@ M: windows-ui-backend system-alert
 
 : fullscreen-RECT ( hwnd -- RECT )
     MONITOR_DEFAULTTONEAREST MonitorFromWindow
-    MONITORINFOEX <struct>
+    MONITORINFOEX new
         MONITORINFOEX c:heap-size >>cbSize
     [ GetMonitorInfo win32-error=0/f ] keep rcMonitor>> ;
 
 : client-area>RECT ( hwnd -- RECT )
-    RECT <struct>
+    RECT new
     [ GetClientRect win32-error=0/f ]
     [ >c-ptr POINT cast-array [ ClientToScreen drop ] with each ]
     [ nip ] 2tri ;
 
 : hwnd>RECT ( hwnd -- RECT )
-    RECT <struct> [ GetWindowRect win32-error=0/f ] keep ;
+    RECT new [ GetWindowRect win32-error=0/f ] keep ;
 
 M: windows-ui-backend (grab-input)
     0 ShowCursor drop
@@ -807,7 +807,7 @@ CONSTANT: fullscreen-flags flags{ WS_CAPTION WS_BORDER WS_THICKFRAME }
 
 : add-tray-icon ( title -- )
     NIM_ADD
-    NOTIFYICONDATA <struct>
+    NOTIFYICONDATA new
         NOTIFYICONDATA heap-size >>cbSize
         NOTIFYICON_VERSION_4 over timeout-version>> uVersion<<
         NIF_TIP NIF_ICON bitor >>uFlags
@@ -818,7 +818,7 @@ CONSTANT: fullscreen-flags flags{ WS_CAPTION WS_BORDER WS_THICKFRAME }
 
 : remove-tray-icon ( -- )
     NIM_DELETE
-    NOTIFYICONDATA <struct>
+    NOTIFYICONDATA new
         NOTIFYICONDATA heap-size >>cbSize
         world get handle>> hWnd>> >>hWnd
     Shell_NotifyIcon win32-error=0/f ;

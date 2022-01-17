@@ -12,7 +12,7 @@ IN: raylib.demo.gui
     60 set-target-fps ;
 
 : button-rec ( -- button )
-    50 50 100 100 Rectangle <struct-boa> ;
+    50 50 100 100 Rectangle boa ;
 
 : white-background ( -- )
     RAYWHITE clear-background ;

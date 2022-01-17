@@ -10,7 +10,7 @@ SPECIALIZED-ARRAY: ushort
 IN: system-info.windows
 
 : system-info ( -- SYSTEM_INFO )
-    SYSTEM_INFO <struct> [ GetSystemInfo ] keep ;
+    SYSTEM_INFO new [ GetSystemInfo ] keep ;
 
 : page-size ( -- n )
     system-info dwPageSize>> ;
@@ -24,7 +24,7 @@ IN: system-info.windows
     system-info dwOemId>> 0xffff0000 bitand ;
 
 : os-version-struct ( -- os-version )
-    OSVERSIONINFO <struct>
+    OSVERSIONINFO new
         OSVERSIONINFO heap-size >>dwOSVersionInfoSize
     dup GetVersionEx win32-error=0/f ;
 
@@ -75,7 +75,7 @@ M: windows cpu-mhz
     get-processor-power-information first MaxMhz>> 1,000,000 * ;
 
 : memory-status ( -- MEMORYSTATUSEX )
-    MEMORYSTATUSEX <struct>
+    MEMORYSTATUSEX new
     MEMORYSTATUSEX heap-size >>dwLength
     dup GlobalMemoryStatusEx win32-error=0/f ;
 

@@ -14,7 +14,7 @@ IN: windows.fullscreen
     GetDesktopWindow hwnd>hmonitor ;
 
 :: (monitor-info>devmodes) ( monitor-info n -- )
-    DEVMODE <struct>
+    DEVMODE new
         DEVMODE heap-size >>dmSize
         flags{ DM_BITSPERPEL DM_PELSWIDTH DM_PELSHEIGHT } >>dmFields
     :> devmode
@@ -31,7 +31,7 @@ IN: windows.fullscreen
     [ 0 (monitor-info>devmodes) ] { } make ;
 
 : hmonitor>monitor-info ( HMONITOR -- monitor-info )
-    MONITORINFOEX <struct>
+    MONITORINFOEX new
         MONITORINFOEX heap-size >>cbSize
     [ GetMonitorInfo win32-error=0/f ] keep ;
 
@@ -48,7 +48,7 @@ IN: windows.fullscreen
     desktop-hmonitor hmonitor>monitor-info ;
 
 : desktop-RECT ( -- RECT )
-    GetDesktopWindow RECT <struct> [ GetWindowRect win32-error=0/f ] keep ;
+    GetDesktopWindow RECT new [ GetWindowRect win32-error=0/f ] keep ;
 
 ERROR: display-change-error n ;
 

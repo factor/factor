@@ -322,7 +322,7 @@ STRUCT: PIXELFORMATDESCRIPTOR
     { dwDamageMask DWORD } ;
 
 : <RECT> ( loc dim -- RECT )
-    dupd v+ [ first2 ] bi@ RECT <struct-boa> ;
+    dupd v+ [ first2 ] bi@ RECT boa ;
 
 TYPEDEF: RECT* PRECT
 TYPEDEF: RECT* LPRECT

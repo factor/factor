@@ -53,12 +53,12 @@ ERROR: zlib-failed n string ;
 
 
 : zlib-inflate-init ( -- z_stream_s )
-    z_stream <struct>
+    z_stream new
     dup ZLIB_VERSION over byte-length inflateInit_ zlib-error ;
 
 ! window can be 0, 15, 32, 47 (others?)
 : zlib-inflate-init2 ( window -- z_stream_s )
-    [ z_stream <struct> dup ] dip
+    [ z_stream new dup ] dip
     ZLIB_VERSION pick byte-length inflateInit2_ zlib-error ;
 
 : zlib-inflate-end ( z_stream -- )
@@ -71,4 +71,4 @@ ERROR: zlib-failed n string ;
     inflate zlib-error ;
 
 : zlib-inflate-get-header ( z_stream -- gz_header )
-    gz_header <struct> [ inflateGetHeader zlib-error ] keep ;
+    gz_header new [ inflateGetHeader zlib-error ] keep ;

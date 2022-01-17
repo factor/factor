@@ -160,7 +160,7 @@ CONSTANT: IOC_DIRSHIFT 30  ! SIZESHIFT + SIZEBITS
 : ctype-ioctl-inout ( handle id bytes type -- out )
     [ call-ioctl-out ] dip deref ; inline
 : struct-ioctl ( handle id struct-class -- out )
-    <struct> call-ioctl-out ; inline
+    new call-ioctl-out ; inline
 
 ! EV IOC G/S - evdev ioctl get/set
 ! EVIOCGVERSION EVIOCGID EVIOCGREP EVIOCSREP

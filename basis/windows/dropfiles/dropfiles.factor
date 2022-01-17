@@ -20,7 +20,7 @@ IN: windows.dropfiles
     ] with map ;
 
 ! : point-from-hdrop ( hdrop -- loc )
-!    POINT <struct> [ DragQueryPoint drop ] keep [ x>> ] [ y>> ] bi 2array ;
+!    POINT new [ DragQueryPoint drop ] keep [ x>> ] [ y>> ] bi 2array ;
 
 : handle-wm-dropfiles ( hdrop -- )
     <alien> [ filenames-from-hdrop dropped-files set-global ] [ DragFinish ] bi

@@ -101,10 +101,10 @@ M: ipv4 protocol-family drop PF_INET ;
 
 M: ipv4 sockaddr-size drop sockaddr-in heap-size ;
 
-M: ipv4 empty-sockaddr drop sockaddr-in <struct> ;
+M: ipv4 empty-sockaddr drop sockaddr-in new ;
 
 : make-sockaddr-part ( inet -- sockaddr )
-    sockaddr-in <struct>
+    sockaddr-in new
         AF_INET >>family
         swap
         port>> 0 or htons >>port ; inline
@@ -173,10 +173,10 @@ M: ipv6 protocol-family drop PF_INET6 ;
 
 M: ipv6 sockaddr-size drop sockaddr-in6 heap-size ;
 
-M: ipv6 empty-sockaddr drop sockaddr-in6 <struct> ;
+M: ipv6 empty-sockaddr drop sockaddr-in6 new ;
 
 : make-sockaddr-in6-part ( inet -- sockaddr )
-    sockaddr-in6 <struct>
+    sockaddr-in6 new
         AF_INET6 >>family
         swap
         port>> 0 or htons >>port ; inline
@@ -306,7 +306,7 @@ HOOK: (send) io-backend ( bytes addrspec datagram -- )
 HOOK: addrinfo-error-string io-backend ( n -- string )
 
 : prepare-addrinfo ( -- addrinfo )
-    addrinfo <struct>
+    addrinfo new
         PF_UNSPEC >>family
         IPPROTO_TCP >>protocol ;
 
