@@ -15,14 +15,14 @@ STRUCT: benchmark-data-pair
     { stop benchmark-data } ;
 
 : <benchmark-data> ( -- benchmark-data )
-    \ benchmark-data new
+    benchmark-data <struct>
         nano-count >>time
         data-room >>data-room
         code-room >>code-room
         callback-room >>callback-room ; inline
 
 : <benchmark-data-pair> ( start stop -- benchmark-data-pair )
-    \ benchmark-data-pair new
+    benchmark-data-pair <struct>
         swap >>stop
         swap >>start ; inline
 
