@@ -11,14 +11,13 @@ STRUCT: MARGINS
     { cyTopHeight    int }
     { cyBottomHeight int } ;
 
+C: <MARGINS> MARGINS
+
 STRUCT: DWM_BLURBEHIND
     { dwFlags                DWORD   }
     { fEnable                BOOL    }
     { hRgnBlur               HANDLE  }
     { fTransitionOnMaximized BOOL    } ;
-
-: <MARGINS> ( l r t b -- MARGINS )
-    MARGINS <struct-boa> ; inline
 
 : full-window-margins ( -- MARGINS )
     -1 -1 -1 -1 <MARGINS> ; inline

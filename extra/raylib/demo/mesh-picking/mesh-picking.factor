@@ -12,7 +12,7 @@ CONSTANT: screen-height 800
     screen-width screen-height "raylib [models] example - mesh-picking" init-window ;
 
 : make-camera ( -- camera )
-    Camera3D <struct>
+    Camera3D new
     20 30 20 <Vector3> >>position
     0 10 0 <Vector3> >>target
     0 1.6 0 <Vector3> >>up
@@ -46,7 +46,7 @@ CONSTANT: screen-height 800
 TUPLE: hit-state name color nearest-hit ;
 : <hit-state> ( -- obj )
     "None" WHITE
-    RayCollision <struct>
+    RayCollision new
     most-positive-finite-float >>distance
     f >>hit
     hit-state boa ;
@@ -127,7 +127,7 @@ SYMBOL: mesh-picking-frame
     ! LOG_ALL set-trace-log-level
     [
         make-camera :> camera
-        Ray <struct> :> ray
+        Ray new :> ray
         init-assets :> ( tower triangle )
 
         f :> bary!

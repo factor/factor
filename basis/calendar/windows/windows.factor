@@ -15,7 +15,7 @@ IN: calendar.windows
             [ nip >integer ]
             [ - 1000 * >integer ] 2bi
         ]
-    } cleave \ SYSTEMTIME <struct-boa> ;
+    } cleave \ SYSTEMTIME boa ;
 
 : SYSTEMTIME>timestamp ( SYSTEMTIME -- timestamp )
     {
@@ -28,7 +28,7 @@ IN: calendar.windows
     } cleave instant <timestamp> ;
 
 M: windows gmt-offset
-    TIME_ZONE_INFORMATION <struct>
+    TIME_ZONE_INFORMATION new
     dup GetTimeZoneInformation {
         { TIME_ZONE_ID_INVALID [ win32-error ] }
         { TIME_ZONE_ID_UNKNOWN [ Bias>> ] }
@@ -37,4 +37,4 @@ M: windows gmt-offset
     } case neg 60 /mod 0 ;
 
 M: windows now-gmt
-    SYSTEMTIME <struct> [ GetSystemTime ] keep SYSTEMTIME>timestamp ;
+    SYSTEMTIME new [ GetSystemTime ] keep SYSTEMTIME>timestamp ;

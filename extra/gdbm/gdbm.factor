@@ -70,7 +70,7 @@ DESTRUCTOR: gdbm-close
 
 : object>datum ( obj -- datum )
     object>bytes [ malloc-byte-array &free ] [ length ] bi
-    datum <struct-boa> ;
+    datum boa ;
 
 : datum>object* ( datum -- obj ? )
     [ dptr>> ] [ dsize>> ] bi over

@@ -121,7 +121,7 @@ M:: sfmt generate ( sfmt -- )
     dup uint-4 cast-array ;
 
 : <sfmt-state> ( seed n m mask parity -- sfmt )
-    sfmt-state <struct>
+    sfmt-state new
         swap >>parity
         swap >>mask
         swap >>m

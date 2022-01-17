@@ -28,11 +28,11 @@ TYPEDEF: TOKEN_PRIVILEGES* PTOKEN_PRIVILEGES
     [ CloseHandle drop ] finally ; inline
 
 : lookup-privilege ( string -- luid )
-    [ f ] dip LUID <struct>
+    [ f ] dip LUID new
     [ LookupPrivilegeValue win32-error=0/f ] keep ;
 
 :: make-token-privileges ( name enabled? -- obj )
-    TOKEN_PRIVILEGES <struct>
+    TOKEN_PRIVILEGES new
         1 >>PrivilegeCount
         LUID_AND_ATTRIBUTES malloc-struct &free
             enabled? [ SE_PRIVILEGE_ENABLED >>Attributes ] when

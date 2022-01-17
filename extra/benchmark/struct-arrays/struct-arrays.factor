@@ -37,7 +37,7 @@ SPECIALIZED-ARRAY: point
     [ x>> max ] [ y>> max ] [ z>> max ] change-xyz ; inline
 
 : <zero-point> ( -- point )
-    0 0 0 point <struct-boa> ; inline
+    0 0 0 point boa ; inline
 
 : max-points ( points -- point )
     <zero-point> [ max-point ] reduce ; inline

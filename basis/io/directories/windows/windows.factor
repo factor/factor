@@ -73,7 +73,7 @@ C: <windows-directory-entry> windows-directory-entry
 
 M: windows (directory-entries)
     "\\" ?tail drop "\\*" append
-    WIN32_FIND_DATA <struct>
+    WIN32_FIND_DATA new
     find-first-file over
     [ >windows-directory-entry ] 2dip
     [

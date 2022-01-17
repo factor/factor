@@ -162,6 +162,7 @@ M: struct-class writer-quot
 : offset-of ( field struct -- offset )
     struct-slots slot-named offset>> ; inline
 
+! XXX: make this faster
 M: struct hashcode*
     nip dup >c-ptr [ struct-slot-values hashcode ] [ drop 0 ] if ; inline
 

@@ -36,7 +36,7 @@ CONSTANT: share-mode
     }
 
 : default-security-attributes ( -- obj )
-    SECURITY_ATTRIBUTES <struct>
+    SECURITY_ATTRIBUTES new
     SECURITY_ATTRIBUTES heap-size >>nLength ;
 
 TUPLE: FileArgs
@@ -209,7 +209,7 @@ M: windows (wait-to-read)
     [ dup handle>> refill ] with-destructors drop ;
 
 : make-fd-set ( socket -- fd_set )
-    fd_set <struct> swap 1array void* >c-array >>fd_array 1 >>fd_count ;
+    fd_set new swap 1array void* >c-array >>fd_array 1 >>fd_count ;
 
 : select-sets ( socket event -- read-fds write-fds except-fds )
     [ make-fd-set ] dip +input+ = [ f f ] [ f swap f ] if ;
@@ -367,7 +367,7 @@ M: windows normalize-path
 <PRIVATE
 
 : windows-file-size ( path -- size )
-    normalize-path 0 WIN32_FILE_ATTRIBUTE_DATA <struct>
+    normalize-path 0 WIN32_FILE_ATTRIBUTE_DATA new
     [ GetFileAttributesEx win32-error=0/f ] keep
     [ nFileSizeLow>> ] [ nFileSizeHigh>> ] bi >64bit ;
 
@@ -389,7 +389,7 @@ M: windows home
     [ StreamSize>> ] bi 2array ;
 
 : file-streams-rest ( streams handle -- streams )
-    WIN32_FIND_STREAM_DATA <struct>
+    WIN32_FIND_STREAM_DATA new
     [ FindNextStream ] 2keep
     rot zero? [
         GetLastError ERROR_HANDLE_EOF = [ win32-error ] unless
@@ -401,7 +401,7 @@ M: windows home
 : file-streams ( path -- streams )
     normalize-path
     FindStreamInfoStandard
-    WIN32_FIND_STREAM_DATA <struct>
+    WIN32_FIND_STREAM_DATA new
     0
     [ FindFirstStream ] keepd
     over INVALID_HANDLE_VALUE = [

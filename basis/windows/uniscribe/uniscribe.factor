@@ -131,7 +131,7 @@ PRIVATE>
     [ cx>> ] [ cy>> ] bi 2array ;
 
 : dc-metrics ( dc -- metrics )
-    TEXTMETRICW <struct>
+    TEXTMETRICW new
     [ GetTextMetrics drop ] keep
     TEXTMETRIC>metrics ;
 
