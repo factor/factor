@@ -83,7 +83,7 @@ CONSTANT: POSIX_SPAWN_PCONTROL_KILL       0x0003
     dup 0 = [ drop ] [ (throw-errno) ] if ;
 
 : posix-spawn-file-actions-init ( -- posix_spawn_file_actions_t )
-    posix_spawn_file_actions_t <struct>
+    posix_spawn_file_actions_t new
     [ posix_spawn_file_actions_init check-posix ] keep ;
 
 : posix-spawn-file-actions-destroy ( posix_spawn_file_actions_t -- )

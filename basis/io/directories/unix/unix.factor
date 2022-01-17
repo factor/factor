@@ -73,7 +73,7 @@ M: unix copy-file
 
 M: unix (directory-entries)
     [
-        dirent <struct>
+        dirent new
         '[ _ _ next-dirent ] [ >directory-entry ] produce nip
     ] with-unix-directory ;
 

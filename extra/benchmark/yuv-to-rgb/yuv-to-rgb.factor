@@ -20,7 +20,7 @@ STRUCT: yuv-buffer
 :: fake-data ( -- rgb yuv )
     1600 :> w
     1200 :> h
-    yuv-buffer <struct> :> buffer
+    yuv-buffer new :> buffer
     w h * 3 * <byte-array> :> rgb
     rgb buffer
         w >>y_width

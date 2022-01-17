@@ -959,7 +959,7 @@ TYPED: load-commands ( macho: mach_header_32/64 -- load-commands )
 : sections-array ( segment-commands -- sections-array )
     [
         dup first segment_command_64?
-        [ section_64 ] [ section ] if <struct> ,
+        [ section_64 ] [ section ] if new ,
         segment-commands [ segment-sections [ , ] each ] each
     ] { } make ;
 

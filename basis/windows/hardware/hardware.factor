@@ -9,7 +9,7 @@ IN: windows.hardware
     BOOL { HMONITOR HDC LPRECT LPARAM } stdcall [
         4dup 4array .
         3drop
-        MONITORINFOEX <struct> dup byte-length >>cbSize
+        MONITORINFOEX new dup byte-length >>cbSize
         [ GetMonitorInfo win32-error=0/f ] keep ... flush
         TRUE
     ] alien-callback ;

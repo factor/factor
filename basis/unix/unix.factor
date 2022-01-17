@@ -73,7 +73,7 @@ M: unix open-file [ open ] unix-system-call ;
 : touch ( filename -- ) f [ utime ] unix-system-call drop ;
 
 : change-file-times ( filename access modification -- )
-    utimbuf <struct>
+    utimbuf new
         swap >>modtime
         swap >>actime
         [ utime ] unix-system-call drop ;

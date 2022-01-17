@@ -17,8 +17,7 @@ os windows? [
 
 <PRIVATE
 
-: <GpRect> ( x y w h -- rect )
-    GpRect <struct-boa> ; inline
+C: <GpRect> GpRect
 
 : stream>gdi+-bitmap ( stream -- bitmap )
     stream>IStream &com-release

@@ -14,7 +14,7 @@ IN: io.files.acls.macosx
     {
         { ID_TYPE_UID [ user-name "user:" prepend ] }
         { ID_TYPE_GID [ group-name "group:" prepend ] }
-        ! [ uuid_string_t <struct> [ mbr_uuid_to_string io-error ] keep ]
+        ! [ uuid_string_t new [ mbr_uuid_to_string io-error ] keep ]
     } case ;
 
 : acl-error ( n -- ) -1 = [ throw-errno ] when ; inline

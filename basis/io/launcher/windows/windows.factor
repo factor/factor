@@ -28,10 +28,10 @@ TUPLE: CreateProcess-args
 
 : default-CreateProcess-args ( -- obj )
     CreateProcess-args new
-        STARTUPINFO <struct>
+        STARTUPINFO new
         dup class-of heap-size >>cb
     >>lpStartupInfo
-    PROCESS_INFORMATION <struct> >>lpProcessInformation
+    PROCESS_INFORMATION new >>lpProcessInformation
     TRUE >>bInheritHandles
     0 >>dwCreateFlags ;
 

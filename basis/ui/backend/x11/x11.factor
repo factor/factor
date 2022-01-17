@@ -254,7 +254,7 @@ M: x11-ui-backend set-title
     [ dpy get ] 2dip [ set-title-old ] [ set-title-new ] 3bi ;
 
 : make-fullscreen-msg ( window ? -- msg )
-    XClientMessageEvent <struct>
+    XClientMessageEvent new
         ClientMessage >>type
         dpy get >>display
         XA_NET_WM_STATE >>message_type
@@ -286,7 +286,7 @@ M: x11-ui-backend (open-window)
     tri ;
 
 : make-raise-window-msg ( window -- msg )
-    XClientMessageEvent <struct>
+    XClientMessageEvent new
         ClientMessage >>type
         1 >>send_event
         dpy get >>display
@@ -341,7 +341,7 @@ PRIVATE>
 M: x11-ui-backend system-alert
     "\n\n" glue xmessage ;
 
-: black ( -- xcolor ) 0 0 0 0 0 0 XColor <struct-boa> ; inline
+: black ( -- xcolor ) 0 0 0 0 0 0 XColor boa ; inline
 
 M:: x11-ui-backend (grab-input) ( handle -- )
     handle window>>                                                  :> wnd

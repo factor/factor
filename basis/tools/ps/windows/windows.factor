@@ -10,7 +10,7 @@ IN: tools.ps.windows
     0 CreateToolhelp32Snapshot dup win32-error=0/f ;
 
 : default-process-entry ( -- obj )
-    PROCESSENTRY32 <struct> PROCESSENTRY32 heap-size >>dwSize ;
+    PROCESSENTRY32 new PROCESSENTRY32 heap-size >>dwSize ;
 
 : first-process ( handle -- PROCESSENTRY32 )
     default-process-entry
@@ -28,7 +28,7 @@ IN: tools.ps.windows
 
 : query-information-process ( HANDLE -- PROCESS_BASIC_INFORMATION )
     0
-    PROCESS_BASIC_INFORMATION <struct> [
+    PROCESS_BASIC_INFORMATION new [
         dup byte-length
         f
         NtQueryInformationProcess drop

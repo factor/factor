@@ -20,7 +20,7 @@ IN: cuda.devices
     [ enumerate-cuda-devices ] dip '[ 0 _ with-cuda-context ] each ; inline
 
 : cuda-device-properties ( n -- properties )
-    [ CUdevprop <struct> ] dip
+    [ CUdevprop new ] dip
     [ cuDeviceGetProperties cuda-error ] keepd ;
 
 : cuda-devices ( -- assoc )

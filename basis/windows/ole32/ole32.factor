@@ -173,13 +173,13 @@ CONSTANT: GUID-STRING-LENGTH
     $[ "{01234567-89ab-cdef-0123-456789abcdef}" length ]
 
 : create-guid ( -- GUID )
-    GUID <struct> dup CoCreateGuid check-ole32-error ;
+    GUID new dup CoCreateGuid check-ole32-error ;
 
 : string>guid ( string -- guid )
     "{-}" split harvest
     [ first3 [ hex> ] tri@ ]
     [ 3 tail concat 2 group [ hex> ] B{ } map-as ] bi
-    GUID <struct-boa> ;
+    GUID boa ;
 
 : guid>string ( guid -- string )
     [

@@ -132,7 +132,7 @@ TUPLE: registry-enum-key ;
     0 DWORD <ref> dup :> max-value
     0 DWORD <ref> dup :> max-value-data
     0 DWORD <ref> dup :> security-descriptor
-    FILETIME <struct> dup :> last-write-time
+    FILETIME new dup :> last-write-time
     RegQueryInfoKey :> ret
     ret ERROR_SUCCESS = [
         key

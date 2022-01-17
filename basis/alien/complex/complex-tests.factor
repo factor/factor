@@ -7,8 +7,7 @@ IN: alien.complex.tests
 STRUCT: complex-holder
     { z complex-float } ;
 
-: <complex-holder> ( z -- alien )
-    complex-holder <struct-boa> ;
+C: <complex-holder> complex-holder
 
 { } [
     C{ 1.0 2.0 } <complex-holder> "h" set

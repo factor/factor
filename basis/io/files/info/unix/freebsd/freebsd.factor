@@ -33,10 +33,10 @@ M: freebsd file-systems
 M: freebsd new-file-system-info freebsd-file-system-info new ;
 
 M: freebsd file-system-statfs
-    \ statfs <struct> [ statfs-func io-error ] keep ;
+    \ statfs new [ statfs-func io-error ] keep ;
 
 M: freebsd file-system-statvfs
-    \ statvfs <struct> [ statvfs-func io-error ] keep ;
+    \ statvfs new [ statvfs-func io-error ] keep ;
 
 M: freebsd statfs>file-system-info
     {

@@ -267,7 +267,7 @@ icon-data [ default-icon-data ] initialize
 : gadget-cursor-location ( gadget -- rectangle )
     [ screen-loc ] [ cursor-loc&dim ] bi [ v+ ] dip
     [ first2 [ >fixnum ] bi@ ] bi@
-    cairo_rectangle_int_t <struct-boa> ;
+    cairo_rectangle_int_t boa ;
 
 : update-cursor-location ( im-context gadget -- )
     gadget-cursor-location gtk_im_context_set_cursor_location ;

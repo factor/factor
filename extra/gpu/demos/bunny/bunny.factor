@@ -86,7 +86,7 @@ UNIFORM-TUPLE: loading-uniforms
     [ string>number ] map ; inline
 
 : <bunny-vertex> ( vertex -- struct )
-    bunny-vertex-struct <struct>
+    bunny-vertex-struct new
         swap first3 0.0 float-4-boa >>vertex ; inline
 
 : (read-line-tokens) ( seq stream -- seq )

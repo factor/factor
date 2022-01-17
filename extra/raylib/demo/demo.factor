@@ -24,7 +24,7 @@ SYMBOL: player
 : setup-game-vars ( -- )
     get-screen-width 2 /
     get-screen-height 2 /
-    Vector2 <struct-boa> player set ;
+    Vector2 boa player set ;
 
 ! Make this cleaner
 : change-player-position ( -- )

@@ -129,7 +129,7 @@ FUNCTION: void FSEventStreamShow ( FSEventStreamRef streamRef )
 FUNCTION: CFStringRef FSEventStreamCopyDescription ( FSEventStreamRef streamRef )
 
 : make-FSEventStreamContext ( info -- alien )
-    FSEventStreamContext <struct>
+    FSEventStreamContext new
         swap >>info ;
 
 :: <FSEventStream> ( callback info paths latency flags -- event-stream )

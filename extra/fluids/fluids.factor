@@ -23,7 +23,7 @@ CONSTANT: gravity { 0.0 -0.1 }
     particle [ p>> ] [ v>> ] bi dt v*n v+
     gravity dt dt * particle m>> 2 * / v*n v+ :> p'
     p' particle p>> v- dt v/n :> v'
-    p' v' particle m>> particle_t <struct-boa> ; inline
+    p' v' particle m>> particle_t boa ; inline
 
 CONSTANT: initial-particles
 particle_t-array{
@@ -115,6 +115,6 @@ fluids-world H{
     { T{ button-down } [ [
         hand-loc get float >c-array
         world get dim>> float >c-array v/ 2 v*n 1 v-n { 1 -1 } v*
-        float-array{ 0 0.2 } 2.0 particle_t <struct-boa> suffix
+        float-array{ 0 0.2 } 2.0 particle_t boa suffix
     ] change-particles drop ] }
 } set-gestures
