@@ -8,10 +8,10 @@ DEFER: <struct-boa> ! for stack-checker
 USING: accessors alien alien.c-types alien.data alien.parser
 arrays assocs byte-arrays classes classes.parser classes.private
 classes.struct.bit-accessors classes.tuple classes.tuple.parser
-classes.tuple.private combinators combinators.smart
-cpu.architecture definitions delegate.private effects
-functors.backend generalizations generic generic.parser io
-kernel kernel.private lexer libc math math.order parser
+classes.tuple.private combinators combinators.short-circuit
+combinators.smart cpu.architecture definitions delegate.private
+effects functors.backend generalizations generic generic.parser
+io kernel kernel.private lexer libc math math.order parser
 quotations sequences sequences.private slots slots.private
 specialized-arrays stack-checker.dependencies summary vectors
 vocabs.loader vocabs.parser words ;
@@ -162,11 +162,6 @@ M: struct-class writer-quot
 : offset-of ( field struct -- offset )
     struct-slots slot-named offset>> ; inline
 
-M: struct equal?
-    2dup [ class-of ] same? [
-        [ struct-slot-values ] same?
-    ] [ 2drop f ] if ; inline
-
 M: struct hashcode*
     nip dup >c-ptr [ struct-slot-values hashcode ] [ drop 0 ] if ; inline
 
@@ -196,17 +191,28 @@ M: struct-c-type base-type ;
     \ cleave [ ] 2sequence
     \ output>array [ ] 2sequence ;
 
-: (define-struct-slot-values-method) ( class -- )
+: define-struct-slot-values-method ( class -- )
     [ \ struct-slot-values ] [ struct-slot-values-quot ] bi
     define-inline-method ;
 
 : forget-struct-slot-values-method ( class -- )
     \ struct-slot-values ?lookup-method forget ;
 
+: struct-equals-quot ( class -- quot )
+    dup struct-slots
+    [ name>> reader-word '[ [ _ execute ] same? ] ] map
+    '[ over _ instance? [ _ 2&& ] [ 2drop f ] if ] ;
+
+: define-equal-method ( class -- )
+    [ \ equal? ] [ struct-equals-quot ] bi define-inline-method ;
+
+: forget-equal-method ( class -- )
+    \ equal? ?lookup-method forget ;
+
 : clone-underlying ( struct -- byte-array )
     binary-object memory>byte-array ; inline
 
-: (define-clone-method) ( class -- )
+: define-clone-method ( class -- )
     [ \ clone ]
     [ \ clone-underlying swap literalize \ memory>struct [ ] 3sequence ] bi
     define-inline-method ;
@@ -276,9 +282,10 @@ M: struct binary-zero? binary-object uchar <c-direct-array> [ 0 = ] all? ; inlin
     ] [ drop f ] if ;
 
 : (struct-methods) ( class -- )
-    [ (define-struct-slot-values-method) ]
-    [ (define-clone-method) ]
-    bi ;
+    [ define-struct-slot-values-method ]
+    [ define-clone-method ]
+    [ define-equal-method ]
+    tri ;
 
 : check-struct-slots ( slots -- )
     [ type>> lookup-c-type drop ] each ;
@@ -287,8 +294,8 @@ M: struct binary-zero? binary-object uchar <c-direct-array> [ 0 = ] all? ; inlin
     [ struct f redefine-tuple-class ] [ make-final ] bi ;
 
 : resize-underlying ( struct -- )
-    [ 2 slot ]
-    [ class-of "struct-size" word-prop '[ _ swap resize ] [ f ] if* ]
+    [ 2 slot dup byte-array? ]
+    [ class-of "struct-size" word-prop '[ _ swap resize ] [ drop f ] if ]
     [ 2 set-slot ] tri ;
 
 M: struct update-tuple
@@ -353,6 +360,7 @@ M: struct-class reset-class
         [ forget-struct-slot-accessors ]
         [ forget-struct-slot-values-method ]
         [ forget-clone-method ]
+        [ forget-equal-method ]
         [ { "c-type" "layout" "struct-size" } remove-word-props ]
         [ call-next-method ]
     } cleave ;
