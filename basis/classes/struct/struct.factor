@@ -162,7 +162,11 @@ M: struct-class writer-quot
 : offset-of ( field struct -- offset )
     struct-slots slot-named offset>> ; inline
 
-! XXX: make this faster
+M: struct equal?
+    2dup [ class-of ] same? [
+        [ struct-slot-values ] same?
+    ] [ 2drop f ] if ; inline
+
 M: struct hashcode*
     nip dup >c-ptr [ struct-slot-values hashcode ] [ drop 0 ] if ; inline
 
@@ -283,10 +287,11 @@ M: struct binary-zero? binary-object uchar <c-direct-array> [ 0 = ] all? ; inlin
     ] [ drop f ] if ;
 
 : (struct-methods) ( class -- )
-    [ define-struct-slot-values-method ]
-    [ define-clone-method ]
-    [ define-equal-method ]
-    tri ;
+    {
+        [ define-struct-slot-values-method ]
+        [ define-clone-method ]
+        ! [ define-equal-method ]
+    } cleave ;
 
 : check-struct-slots ( slots -- )
     [ type>> lookup-c-type drop ] each ;
@@ -361,7 +366,7 @@ M: struct-class reset-class
         [ forget-struct-slot-accessors ]
         [ forget-struct-slot-values-method ]
         [ forget-clone-method ]
-        [ forget-equal-method ]
+        ! [ forget-equal-method ]
         [ { "c-type" "layout" "struct-size" } remove-word-props ]
         [ call-next-method ]
     } cleave ;
