@@ -6,7 +6,7 @@ HELP: <CGRect>
 { $description "Allocates a new " { $snippet "CGRect" } " in the Factor heap." } ;
 
 HELP: <CGPoint>
-{ $values { "x" real } { "y" real } { "CGPoint" CGPoint } } }
+{ $values { "x" real } { "y" real } { "CGPoint" CGPoint } }
 { $description "Allocates a new " { $snippet "CGPoint" } " in the Factor heap." } ;
 
 HELP: <CGSize>
