@@ -386,7 +386,7 @@ generic-comparison-ops [
 \ fixnum-max { fixnum fixnum } "input-classes" set-word-prop
 \ fixnum-max [ interval-max ] [ fixnum-valued ] binary-op
 
-\ (local-allot) { alien } "default-output-classes" set-word-prop
+\ local-allot { alien } "default-output-classes" set-word-prop
 
 \ tag [
     drop fixnum 0 num-types get [a,b) <class/interval-info>
