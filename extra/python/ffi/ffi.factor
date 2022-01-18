@@ -3,9 +3,8 @@ alien.libraries.finder alien.syntax assocs classes.struct kernel sequences
 system ;
 IN: python.ffi
 
-! << "python" { "3.0" "3" "2.7" "2.6" } ! Python 3 has a different api, enable someday
 << "python"
-{ "python2.7" "python2.6" "python27" "python26" } find-library-from-list
+{ "python3.10" "python3.9" "python3.8" "python3.7" } find-library-from-list
 cdecl add-library >>
 
 ! Functions that return borrowed references needs to be called like this:
@@ -26,6 +25,8 @@ CONSTANT: METH_STATIC   0x0020
 CONSTANT: METH_COEXIST  0x0040
 
 C-TYPE: PyCFunction
+
+TYPEDEF: long Py_ssize_t
 
 STRUCT: PyMethodDef
     { ml_name c-string }
@@ -115,25 +116,18 @@ FUNCTION: int PyObject_SetAttrString ( PyObject* o,
 FUNCTION: PyObject* PyObject_Str ( PyObject* o )
 FUNCTION: int PyObject_IsTrue ( PyObject* o )
 
-! Strings
-FUNCTION: c-string PyString_AsString ( PyObject* string )
-FUNCTION: PyObject* PyString_FromString ( c-string v )
+! Bytes
+FUNCTION: c-string PyBytes_AsString ( PyObject* string )
+FUNCTION: PyObject* PyBytes_FromStringAndSize ( c-string v, Py_ssize_t size  )
 
-! Unicode
-FUNCTION: PyObject* PyUnicode_DecodeUTF8 ( c-string s,
-                                           int size,
-                                           void* errors )
-FUNCTION: PyObject* PyUnicodeUCS4_FromString ( c-string s )
-FUNCTION: PyObject* PyUnicodeUCS2_FromString ( c-string s )
-FUNCTION: PyObject* PyUnicodeUCS2_AsUTF8String ( PyObject* unicode )
-FUNCTION: PyObject* PyUnicodeUCS4_AsUTF8String ( PyObject* unicode )
+! Strings
+FUNCTION: c-string PyUnicode_AsUTF8 ( PyObject* unicode )
+FUNCTION: PyObject* PyUnicode_FromStringAndSize ( c-string v, Py_ssize_t size  )
 
 ! Ints
-FUNCTION: long PyInt_AsLong ( PyObject* io )
-
-! Longs
+FUNCTION: long PyLong_AsLong ( PyObject* io )
 FUNCTION: PyObject* PyLong_FromLong ( long v )
-FUNCTION: long PyLong_AsLong ( PyObject* o )
+FUNCTION: PyObject* PyLong_FromString ( c-string str, char** pend, int base )
 
 ! Floats
 FUNCTION: PyObject* PyFloat_FromDouble ( double d )
