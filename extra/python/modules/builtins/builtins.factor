@@ -1,7 +1,7 @@
 USING: python.syntax ;
-IN: python.modules.__builtin__
+IN: python.modules.builtins
 
-PY-FROM: __builtin__ =>
+PY-FROM: builtins =>
     callable ( obj -- ? )
     dir ( obj -- seq )
     int ( val -- s )

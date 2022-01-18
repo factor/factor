@@ -1,5 +1,5 @@
-USING: arrays kernel python python.ffi python.modules.__builtin__ python.syntax
-sequences ;
+USING: arrays kernel python python.ffi python.modules.builtins
+python.syntax sequences ;
 IN: python.throwing
 
 PY-FROM: traceback => format_tb ( tb -- seq ) ;
