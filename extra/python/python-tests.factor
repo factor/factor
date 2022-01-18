@@ -8,7 +8,7 @@ IN: python
 
 ! None testing
 { t } [
-    "__builtin__" py-import "None" getattr <none> =
+    "builtins" py-import "None" getattr <none> =
 ] py-test
 
 ! Pretty sure the # of None references should stay constant.
@@ -179,7 +179,7 @@ IN: python
 
 ! Callbacks
 : py-map ( -- alien )
-    "__builtin__" py-import "map" getattr ;
+    "builtins" py-import "map" getattr ;
 
 : py-map-call ( alien-cb -- seq )
     [
