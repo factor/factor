@@ -130,13 +130,6 @@ PY-METHODS: code =>
     ] times
 ] long-py-test
 
-! Working with types
-PY-QUALIFIED-FROM: types => UnicodeType ( -- ) ;
-
-{ "unicode" } [
-    types:$UnicodeType $__name__ py>
-] py-test
-
 ! Make callbacks
 PY-QUALIFIED-FROM: builtins =>
     None ( -- )

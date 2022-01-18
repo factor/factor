@@ -60,7 +60,7 @@ IN: python
 { t } [ Py_IsInitialized ] py-test
 
 ! py-importing
-[ { "ImportError" "No module named kolobi" f } ] [
+[ { "ModuleNotFoundError" "No module named 'kolobi'" f } ] [
     [ "kolobi" py-import ] [
         [ type>> ] [ message>> ] [ traceback>> ] tri 3array
     ] recover
