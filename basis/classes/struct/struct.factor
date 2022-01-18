@@ -193,8 +193,7 @@ M: struct-c-type base-type ;
 : struct-slot-values-quot ( class -- quot )
     struct-slots
     [ name>> reader-word 1quotation ] map
-    \ cleave [ ] 2sequence
-    \ output>array [ ] 2sequence ;
+    '[ [ _ cleave ] output>array ] ;
 
 : define-struct-slot-values-method ( class -- )
     [ \ struct-slot-values ] [ struct-slot-values-quot ] bi
@@ -286,11 +285,11 @@ M: struct binary-zero? binary-object uchar <c-direct-array> [ 0 = ] all? ; inlin
         ] each
     ] [ drop f ] if ;
 
-: (struct-methods) ( class -- )
+: define-struct-methods ( class -- )
     {
         [ define-struct-slot-values-method ]
         [ define-clone-method ]
-        ! [ define-equal-method ]
+        [ define-equal-method ]
     } cleave ;
 
 : check-struct-slots ( slots -- )
@@ -332,7 +331,7 @@ M: struct update-tuple
     class slot-specs define-accessors
     class size "struct-size" set-word-prop
     class dup make-struct-prototype "prototype" set-word-prop
-    class (struct-methods) ; inline
+    class define-struct-methods ; inline
 
 : make-packed-slots ( slots -- slot-specs )
     make-slots [ t >>packed? ] map! ;
@@ -366,7 +365,7 @@ M: struct-class reset-class
         [ forget-struct-slot-accessors ]
         [ forget-struct-slot-values-method ]
         [ forget-clone-method ]
-        ! [ forget-equal-method ]
+        [ forget-equal-method ]
         [ { "c-type" "layout" "struct-size" } remove-word-props ]
         [ call-next-method ]
     } cleave ;
