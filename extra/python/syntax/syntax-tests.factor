@@ -83,12 +83,12 @@ IN: python.syntax.tests
 
 ! Introspection
 PY-METHODS: func =>
-    func_code ( func -- code ) ;
+    __code__ ( func -- code ) ;
 
 PY-METHODS: code =>
     co_argcount ( code -- n ) ;
 
-{ 1 } [ $splitext $func_code $co_argcount py> ] py-test
+{ 1 } [ $splitext $__code__ $co_argcount py> ] py-test
 
 ! Change sys.path
 { t } [
