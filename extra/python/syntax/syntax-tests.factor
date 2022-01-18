@@ -157,6 +157,6 @@ PY-QUALIFIED-FROM: functools =>
 
 { 48 } [
     reduce-func [
-        { 1 2 8 1 2 34 } >py functools:reduce builtins.list py>
+        { 1 2 8 1 2 34 } >py functools:reduce builtins:list py>
     ] with-quot>py-cfunction
 ] py-test

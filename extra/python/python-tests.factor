@@ -181,11 +181,20 @@ IN: python
 : py-map ( -- alien )
     "builtins" py-import "map" getattr ;
 
+: py-list ( -- alien )
+    "builtins" py-import "list" getattr ;
+
+: py-list-call ( alien-cb -- seq )
+    [
+        py-list swap { 1 } >py 2array array>py-tuple f
+        call-object-full
+    ] with-callback py> ;
+
 : py-map-call ( alien-cb -- seq )
     [
         <py-cfunction> py-map swap { 1 2 } >py 2array array>py-tuple f
         call-object-full
-    ] with-callback py> ;
+    ] with-callback py-list-call py> ;
 
 : always-33-fun ( -- alien )
     [ 3drop 33 >py ] PyCallback ;
