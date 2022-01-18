@@ -186,7 +186,7 @@ IN: python
 
 : py-list-call ( alien-cb -- seq )
     [
-        py-list swap { 1 } >py 2array array>py-tuple f
+        py-list swap 1array array>py-tuple f
         call-object-full
     ] with-callback py> ;
 
@@ -194,7 +194,7 @@ IN: python
     [
         <py-cfunction> py-map swap { 1 2 } >py 2array array>py-tuple f
         call-object-full
-    ] with-callback py-list-call py> ;
+    ] with-callback py-list-call ;
 
 : always-33-fun ( -- alien )
     [ 3drop 33 >py ] PyCallback ;
