@@ -31,30 +31,26 @@ STRUCT: CGRect
     [ w>> ] [ h>> ] bi 2array ;
 
 : CGRect>rect ( CGRect -- rect )
-    [ origin>> CGPoint>loc ]
-    [ size>> CGSize>dim ]
-    bi <rect> ; inline
+    [ origin>> CGPoint>loc ] [ size>> CGSize>dim ] bi <rect> ; inline
 
-: CGRect-x ( CGRect -- x )
-    origin>> x>> ; inline
-: CGRect-y ( CGRect -- y )
-    origin>> y>> ; inline
-: CGRect-w ( CGRect -- w )
-    size>> w>> ; inline
-: CGRect-h ( CGRect -- h )
-    size>> h>> ; inline
+: CGRect-x ( CGRect -- x ) origin>> x>> ; inline
 
-: set-CGRect-x ( x CGRect -- )
-    origin>> x<< ; inline
-: set-CGRect-y ( y CGRect -- )
-    origin>> y<< ; inline
-: set-CGRect-w ( w CGRect -- )
-    size>> w<< ; inline
-: set-CGRect-h ( h CGRect -- )
-    size>> h<< ; inline
+: CGRect-y ( CGRect -- y ) origin>> y>> ; inline
+
+: CGRect-w ( CGRect -- w ) size>> w>> ; inline
+
+: CGRect-h ( CGRect -- h ) size>> h>> ; inline
+
+: set-CGRect-x ( x CGRect -- ) origin>> x<< ; inline
+
+: set-CGRect-y ( y CGRect -- ) origin>> y<< ; inline
+
+: set-CGRect-w ( w CGRect -- ) size>> w<< ; inline
+
+: set-CGRect-h ( h CGRect -- ) size>> h<< ; inline
 
 : <CGRect> ( x y w h -- rect )
-    [ CGPoint boa ] [ CGSize boa ] 2bi* CGRect boa ;
+    [ CGPoint <struct-boa> ] [ CGSize <struct-boa> ] 2bi* CGRect <struct-boa> ;
 
 : CGRect-x-y ( alien -- origin-x origin-y )
     [ CGRect-x ] [ CGRect-y ] bi ;
