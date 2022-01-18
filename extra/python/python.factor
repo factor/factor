@@ -1,10 +1,10 @@
-USING: alien alien.c-types alien.data alien.libraries
-arrays assocs command-line fry
-hashtables init io.encodings.utf8 kernel namespaces
-python.errors python.ffi python.objects sequences
+USING: alien alien.c-types alien.data alien.libraries arrays
+assocs byte-arrays command-line hashtables init
+io.encodings.string io.encodings.utf8 kernel math math.parser
+namespaces python.errors python.ffi python.objects sequences
 specialized-arrays strings vectors ;
+
 IN: python
-QUALIFIED: math
 
 ERROR: python-error type message traceback ;
 
@@ -30,21 +30,6 @@ SPECIALIZED-ARRAY: void*
 : py-import ( str -- module )
     PyImport_ImportModule check-new-ref ;
 
-! Unicodes
-: py-ucs-size ( -- n )
-    "maxunicode" PySys_GetObject PyInt_AsLong 0xffff = 2 4 ? ;
-
-: py-unicode>utf8 ( uni -- str )
-    py-ucs-size 4 =
-    [ PyUnicodeUCS4_AsUTF8String ]
-    [ PyUnicodeUCS2_AsUTF8String ] if (check-ref)
-    PyString_AsString (check-ref) ;
-
-: utf8>py-unicode ( str -- uni )
-    py-ucs-size 4 =
-    [ PyUnicodeUCS4_FromString ]
-    [ PyUnicodeUCS2_FromString ] if ;
-
 ! Data marshalling to Python
 : array>py-tuple ( arr -- py-tuple )
     [ length <py-tuple> dup ] keep
@@ -63,20 +48,33 @@ SPECIALIZED-ARRAY: void*
 DEFER: >py
 
 GENERIC: >py ( obj -- py-obj )
+
+M: byte-array >py
+    dup length PyBytes_FromStringAndSize check-new-ref ;
+
 M: string >py
-    utf8>py-unicode check-new-ref ;
+    utf8 encode dup length PyUnicode_FromStringAndSize check-new-ref ;
+
 M: math:fixnum >py
     PyLong_FromLong check-new-ref ;
+
+M: math:bignum >py
+    number>string f 10 PyLong_FromString check-new-ref ;
+
 M: math:float >py
     PyFloat_FromDouble check-new-ref ;
+
 M: array >py
     [ >py ] map array>py-tuple ;
+
 M: hashtable >py
     <py-dict> swap dupd [
         swapd [ >py ] bi@ py-dict-set-item
     ] with assoc-each ;
+
 M: vector >py
     [ >py ] map vector>py-list ;
+
 M: f >py
     drop <none> ;
 
@@ -89,13 +87,12 @@ DEFER: py>
     H{
         { "NoneType" [ drop f ] }
         { "bool" [ PyObject_IsTrue 1 = ] }
+        { "bytes" [ PyBytes_AsString (check-ref) ] }
         { "dict" [ PyDict_Items (check-ref) py> >hashtable ] }
-        { "int" [ PyInt_AsLong ] }
+        { "int" [ PyLong_AsLong ] }
         { "list" [ py-list>vector [ py> ] map ] }
-        { "long" [ PyLong_AsLong ] }
-        { "str" [ PyString_AsString (check-ref) ] }
+        { "str" [ PyUnicode_AsUTF8 (check-ref) utf8 decode ] }
         { "tuple" [ py-tuple>array [ py> ] map ] }
-        { "unicode" [ py-unicode>utf8 ] }
     } clone ;
 
 py-type-dispatch [ init-py-type-dispatch ] initialize
@@ -103,7 +100,7 @@ py-type-dispatch [ init-py-type-dispatch ] initialize
 ERROR: missing-type type ;
 
 : py> ( py-obj -- obj )
-    dup "__class__" getattr "__name__" getattr PyString_AsString
+    dup "__class__" getattr "__name__" getattr PyUnicode_AsUTF8
     py-type-dispatch get ?at [ call( x -- x ) ] [ missing-type ] if ;
 
 ! Callbacks
