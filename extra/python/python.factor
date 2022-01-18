@@ -10,18 +10,9 @@ ERROR: python-error type message traceback ;
 
 SPECIALIZED-ARRAY: void*
 
-! Borrowed from unix.utilities
-: strings>alien ( strings encoding -- array )
-    '[ _ malloc-string ] void*-array{ } map-as f suffix ;
-
 ! Initialization and finalization
 : py-initialize ( -- )
-    Py_IsInitialized [
-        Py_Initialize
-        ! Encoding must be 8bit on Windows I think, so
-        ! native-string-encoding (utf16n) doesn't work.
-        (command-line) [ length ] [ utf8 strings>alien ] bi 0 PySys_SetArgvEx
-    ] unless ;
+    Py_IsInitialized [ Py_Initialize ] unless ;
 
 : py-finalize ( -- )
     Py_IsInitialized [ Py_Finalize ] when ;
