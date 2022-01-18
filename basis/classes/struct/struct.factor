@@ -204,7 +204,7 @@ M: struct-c-type base-type ;
 
 : struct-equals-quot ( class -- quot )
     dup struct-slots
-    [ name>> reader-word '[ [ _ execute ] same? ] ] map
+    [ name>> reader-word 1quotation '[ [ @ ] same? ] ] map
     '[ over _ instance? [ _ 2&& ] [ 2drop f ] if ] ;
 
 : define-equal-method ( class -- )
@@ -217,8 +217,7 @@ M: struct-c-type base-type ;
     binary-object memory>byte-array ; inline
 
 : define-clone-method ( class -- )
-    [ \ clone ]
-    [ \ clone-underlying swap literalize \ memory>struct [ ] 3sequence ] bi
+    [ \ clone ] [ '[ clone-underlying _ memory>struct ] ] bi
     define-inline-method ;
 
 : forget-clone-method ( class -- )
