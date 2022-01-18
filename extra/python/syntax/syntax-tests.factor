@@ -133,11 +133,14 @@ PY-METHODS: code =>
 ! Make callbacks
 PY-QUALIFIED-FROM: builtins =>
     None ( -- )
-    map ( func seq -- seq' )
-    reduce ( func seq -- seq' ) ;
+    map ( func iter -- iter' )
+    list ( iter -- seq ) ;
+
+PY-QUALIFIED-FROM: functools =>
+    reduce ( func iter -- iter' ) ;
 
 { V{ 1 2 3 } } [
-    builtins:$None { 1 2 3 } >py builtins:map py>
+    builtins:$None { 1 2 3 } >py builtins:map builtins:list py>
 ] py-test
 
 : double-fun ( -- alien )
@@ -145,7 +148,7 @@ PY-QUALIFIED-FROM: builtins =>
 
 { V{ 2 4 16 2 4 68 } } [
     double-fun [
-        { 1 2 8 1 2 34 } >py builtins:map py>
+        { 1 2 8 1 2 34 } >py builtins:map builtins:list py>
     ] with-quot>py-cfunction
 ] py-test
 
@@ -154,6 +157,6 @@ PY-QUALIFIED-FROM: builtins =>
 
 { 48 } [
     reduce-func [
-        { 1 2 8 1 2 34 } >py builtins:reduce py>
+        { 1 2 8 1 2 34 } >py functools:reduce builtins.list py>
     ] with-quot>py-cfunction
 ] py-test
