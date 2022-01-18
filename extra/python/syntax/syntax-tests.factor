@@ -97,7 +97,7 @@ PY-METHODS: code =>
 ] py-test
 
 ! Support for kwargs
-[ "datetime.timedelta(4, 10800)" ] [
+[ "datetime.timedelta(days=4, seconds=10800)" ] [
     H{ { "hours" 99 } } >py timedelta repr py>
 ] py-test
 
