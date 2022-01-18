@@ -30,13 +30,23 @@ SPECIALIZED-ARRAY: void*
     [ length <py-list> dup ] keep
     [ rot py-list-set-item ] with each-index ;
 
+DEFER: >py
+DEFER: py>
+
 : py-tuple>array ( py-tuple -- arr )
-    dup py-tuple-size <iota> [ py-tuple-get-item ] with map ;
+    dup py-tuple-size <iota> [ py-tuple-get-item py> ] with map ;
 
 : py-list>vector ( py-list -- vector )
-    dup py-list-size <iota> [ py-list-get-item ] with V{ } map-as ;
+    dup py-list-size <iota> [ py-list-get-item py> ] with V{ } map-as ;
 
-DEFER: >py
+: py-unicode>string ( py-unicode -- str )
+    PyUnicode_AsUTF8 (check-ref) utf8 decode ;
+
+: py-bytes>byte-array ( py-bytes -- byte-array )
+    PyBytes_AsString (check-ref) >byte-array ;
+
+: py-dict>hashtable ( py-dict -- hashtable )
+    PyDict_Items (check-ref) py> >hashtable ;
 
 GENERIC: >py ( obj -- py-obj )
 
@@ -72,18 +82,16 @@ M: f >py
 ! Data marshalling to Factor
 SYMBOL: py-type-dispatch
 
-DEFER: py>
-
 : init-py-type-dispatch ( -- table )
     H{
         { "NoneType" [ drop f ] }
         { "bool" [ PyObject_IsTrue 1 = ] }
-        { "bytes" [ PyBytes_AsString (check-ref) ] }
-        { "dict" [ PyDict_Items (check-ref) py> >hashtable ] }
+        { "bytes" [ py-bytes>byte-array ] }
+        { "dict" [ py-dict>hashtable ] }
         { "int" [ PyLong_AsLong ] }
-        { "list" [ py-list>vector [ py> ] map ] }
-        { "str" [ PyUnicode_AsUTF8 (check-ref) utf8 decode ] }
-        { "tuple" [ py-tuple>array [ py> ] map ] }
+        { "list" [ py-list>vector ] }
+        { "str" [ py-unicode>string ] }
+        { "tuple" [ py-tuple>array ] }
     } clone ;
 
 py-type-dispatch [ init-py-type-dispatch ] initialize
@@ -91,7 +99,7 @@ py-type-dispatch [ init-py-type-dispatch ] initialize
 ERROR: missing-type type ;
 
 : py> ( py-obj -- obj )
-    dup "__class__" getattr "__name__" getattr PyUnicode_AsUTF8
+    dup "__class__" getattr "__name__" getattr py-unicode>string
     py-type-dispatch get ?at [ call( x -- x ) ] [ missing-type ] if ;
 
 ! Callbacks
