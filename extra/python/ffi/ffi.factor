@@ -34,6 +34,19 @@ STRUCT: PyMethodDef
     { ml_flags int }
     { ml_doc c-string } ;
 
+STRUCT: PyPreConfig
+    { _config_init int }
+    { parse_argv int }
+    { isolated int }
+    { use_environment int }
+    { configure_locale int }
+    { coerce_c_locale int }
+    { coerce_c_locale_warn int }
+    ! { legacy_windows_fs_encoding int } ! on Windows
+    { utf8_mode int }
+    { dev_mode int }
+    { allocate int } ;
+
 FUNCTION: PyObject* PyCFunction_NewEx ( PyMethodDef* ml,
                                         PyObject* self,
                                         PyObject* module )

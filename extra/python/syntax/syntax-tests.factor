@@ -1,6 +1,6 @@
 USING: accessors arrays assocs continuations destructors destructors.private
 fry io.files.temp kernel math namespaces python python.ffi
-python.modules.__builtin__ python.modules.argparse python.modules.datetime
+python.modules.builtins python.modules.argparse python.modules.datetime
 python.modules.os python.modules.os.path python.modules.sys
 python.modules.time python.objects python.syntax sets splitting tools.test
 unicode ;
@@ -138,13 +138,13 @@ PY-QUALIFIED-FROM: types => UnicodeType ( -- ) ;
 ] py-test
 
 ! Make callbacks
-PY-QUALIFIED-FROM: __builtin__ =>
+PY-QUALIFIED-FROM: builtins =>
     None ( -- )
     map ( func seq -- seq' )
     reduce ( func seq -- seq' ) ;
 
 { V{ 1 2 3 } } [
-    __builtin__:$None { 1 2 3 } >py __builtin__:map py>
+    builtins:$None { 1 2 3 } >py builtins:map py>
 ] py-test
 
 : double-fun ( -- alien )
@@ -152,7 +152,7 @@ PY-QUALIFIED-FROM: __builtin__ =>
 
 { V{ 2 4 16 2 4 68 } } [
     double-fun [
-        { 1 2 8 1 2 34 } >py __builtin__:map py>
+        { 1 2 8 1 2 34 } >py builtins:map py>
     ] with-quot>py-cfunction
 ] py-test
 
@@ -161,6 +161,6 @@ PY-QUALIFIED-FROM: __builtin__ =>
 
 { 48 } [
     reduce-func [
-        { 1 2 8 1 2 34 } >py __builtin__:reduce py>
+        { 1 2 8 1 2 34 } >py builtins:reduce py>
     ] with-quot>py-cfunction
 ] py-test
