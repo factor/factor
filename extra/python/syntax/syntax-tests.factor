@@ -19,7 +19,7 @@ IN: python.syntax.tests
 [ "hello.doc" ] [ "/some/path/hello.doc" >py basename py> ] py-test
 
 [ { "hello" ".doc" } ] [
-    "hello.doc" >py splitext 2array [ py> ] s:map
+    "hello.doc" >py splitext 2array
 ] py-test
 
 [ ] [ 0 >py sleep ] py-test
@@ -78,7 +78,7 @@ IN: python.syntax.tests
 ] py-test
 
 [ { "hello" "=" "there" } ] [
-    "hello=there" >py "=" >py partition 3array [ py> ] s:map
+    "hello=there" >py "=" >py partition 3array
 ] py-test
 
 ! Introspection
