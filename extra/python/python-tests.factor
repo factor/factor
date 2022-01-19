@@ -184,11 +184,8 @@ IN: python
 : py-list ( -- alien )
     "builtins" "list" py-import-from ;
 
-: py-list-call ( alien-cb -- seq )
-    [
-        py-list swap 1array array>py-tuple f
-        call-object-full
-    ] with-callback py> ;
+: py-list-call ( alien -- seq )
+    py-list swap 1array array>py-tuple f call-object-full py> ;
 
 : py-map-call ( alien-cb -- seq )
     [
