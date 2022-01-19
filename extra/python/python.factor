@@ -1,8 +1,6 @@
-USING: alien alien.c-types alien.data alien.libraries arrays
-assocs byte-arrays command-line hashtables init
-io.encodings.string io.encodings.utf8 kernel math math.parser
-namespaces python.errors python.ffi python.objects sequences
-specialized-arrays strings vectors ;
+USING: alien alien.libraries arrays assocs byte-arrays
+hashtables init kernel math math.parser namespaces python.errors
+python.ffi python.objects sequences strings vectors ;
 
 IN: python
 
@@ -21,9 +19,6 @@ ERROR: python-error type message traceback ;
 
 : py-import-from ( modulename objname -- obj )
     [ py-import ] [ getattr ] bi* ;
-
-DEFER: >py
-DEFER: py>
 
 ! Data marshalling to Python
 : array>py-tuple ( array -- py-tuple )
@@ -87,6 +82,8 @@ M: f >py
 
 ! Data marshalling to Factor
 SYMBOL: py-type-dispatch
+
+DEFER: py>
 
 : init-py-type-dispatch ( -- table )
     H{

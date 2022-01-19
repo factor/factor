@@ -37,27 +37,11 @@ STRUCT: PyMethodDef
     { ml_flags int }
     { ml_doc c-string } ;
 
-STRUCT: PyPreConfig
-    { _config_init int }
-    { parse_argv int }
-    { isolated int }
-    { use_environment int }
-    { configure_locale int }
-    { coerce_c_locale int }
-    { coerce_c_locale_warn int }
-    ! { legacy_windows_fs_encoding int } ! on Windows
-    { utf8_mode int }
-    { dev_mode int }
-    { allocate int } ;
+CALLBACK: PyObject* PyCallback ( PyObject* self, PyObject* args, PyObject* kw )
 
-FUNCTION: PyObject* PyCFunction_NewEx ( PyMethodDef* ml,
-                                        PyObject* self,
-                                        PyObject* module )
+! Functions
+FUNCTION: PyObject* PyCFunction_NewEx ( PyMethodDef* ml, PyObject* self, PyObject* module )
 FUNCTION: int PyCFunction_GetFlags ( PyObject* op )
-
-CALLBACK: PyObject* PyCallback ( PyObject* self,
-                                 PyObject* args,
-                                 PyObject* kw )
 
 ! Top-level
 FUNCTION: c-string Py_GetVersion ( )
@@ -75,39 +59,71 @@ FUNCTION: long PyImport_GetMagicNumber ( )
 FUNCTION: PyObject* PyImport_ImportModule ( c-string name )
 
 ! Sys module
-! Borrowed reference
 FUNCTION: PyObject* PySys_GetObject ( c-string name )
 
 ! Dicts
-! Borrowed reference
-FUNCTION: PyObject* PyDict_GetItemString ( PyObject* d, c-string key )
 FUNCTION: PyObject* PyDict_New ( )
+FUNCTION: PyObject* PyDict_GetItem ( PyObject* d, PyObject* key )
+FUNCTION: PyObject* PyDict_GetItemString ( PyObject* d, c-string key )
+FUNCTION: PyObject* PyDict_GetItemWithError ( PyObject* d, PyObject* key )
+FUNCTION: int PyDict_SetItem ( PyObject* d, PyObject* key, PyObject* value )
+FUNCTION: int PyDict_SetItemString ( PyObject* d, c-string key, PyObject* val )
+FUNCTION: int PyDict_DelItem ( PyObject* d, PyObject* key )
+FUNCTION: int PyDict_DelItemString ( PyObject* d, c-string key )
+FUNCTION: void PyDict_Clear ( PyObject* d )
+FUNCTION: PyObject* PyDict_Keys ( PyObject* d )
+FUNCTION: PyObject* PyDict_Values ( PyObject* d )
+FUNCTION: PyObject* PyDict_Items ( PyObject* d )
 FUNCTION: int PyDict_Size ( PyObject* d )
-FUNCTION: int PyDict_SetItemString ( PyObject* d,
-                                     c-string key,
-                                     PyObject* val )
-FUNCTION: int PyDict_SetItem ( PyObject* d, PyObject* k, PyObject* o )
-FUNCTION: PyObject* PyDict_Items ( PyObject *d )
+FUNCTION: int PyDict_Contains ( PyObject* d, PyObject* key )
 
 ! Tuples
-! Borrowed reference
-FUNCTION: PyObject* PyTuple_GetItem ( PyObject* t, int pos )
 FUNCTION: PyObject* PyTuple_New ( int len )
-! Steals the reference
-FUNCTION: int PyTuple_SetItem ( PyObject* t, int pos, PyObject* o )
 FUNCTION: int PyTuple_Size ( PyObject* t )
+FUNCTION: PyObject* PyTuple_GetItem ( PyObject* t, Py_ssize_t pos )
+FUNCTION: int PyTuple_SetItem ( PyObject* t, Py_ssize_t pos, PyObject* o )
+FUNCTION: PyObject* PyTuple_GetSlice ( PyObject* t, Py_ssize_t i1, Py_ssize_t i2 )
 
 ! Lists
-! Borrowed reference
-FUNCTION: PyObject* PyList_GetItem ( PyObject* l, int pos )
-! New reference
 FUNCTION: PyObject* PyList_New ( int len )
 FUNCTION: int PyList_Size ( PyObject* l )
-! Steals the reference
-FUNCTION: int PyList_SetItem ( PyObject* l, int pos, PyObject* o )
+FUNCTION: PyObject* PyList_GetItem ( PyObject* l, Py_ssize_t pos )
+FUNCTION: int PyList_SetItem ( PyObject* l, Py_ssize_t pos, PyObject* o )
+FUNCTION: int PyList_Insert ( PyObject* l, Py_ssize_t pos, PyObject* o )
+FUNCTION: int PyList_Append ( PyObject* l, PyObject* o )
+FUNCTION: PyObject* PyList_GetSlice ( PyObject* l, Py_ssize_t i1, Py_ssize_t i2 )
+FUNCTION: PyObject* PyList_SetSlice ( PyObject* l, Py_ssize_t i1, Py_ssize_t i2, PyObject* v )
+FUNCTION: int PyList_Sort ( PyObject* l )
+FUNCTION: int PyList_Reverse ( PyObject* l )
 
 ! Sequences
 FUNCTION: int PySequence_Check ( PyObject* o )
+FUNCTION: Py_ssize_t PySequence_Size ( PyObject* o )
+FUNCTION: PyObject* PySequence_Concat ( PyObject* o1, PyObject* o2 )
+FUNCTION: PyObject* PySequence_Repeat ( PyObject* o, Py_ssize_t count )
+FUNCTION: PyObject* PySequence_GetItem ( PyObject* o, Py_ssize_t i )
+FUNCTION: PyObject* PySequence_GetSlice ( PyObject* o, Py_ssize_t i1, Py_ssize_t i2 )
+FUNCTION: PyObject* PySequence_SetItem ( PyObject* o, Py_ssize_t i, PyObject* v )
+FUNCTION: PyObject* PySequence_DelItem ( PyObject* o, Py_ssize_t i )
+FUNCTION: PyObject* PySequence_SetSlice ( PyObject* o, Py_ssize_t i1, Py_ssize_t i2, PyObject* v )
+FUNCTION: PyObject* PySequence_DelSlice ( PyObject* o, Py_ssize_t i1, Py_ssize_t i2 )
+FUNCTION: PyObject* PySequence_Tuple ( PyObject* o )
+FUNCTION: PyObject* PySequence_List ( PyObject* o )
+FUNCTION: Py_ssize_t PySequence_Count ( PyObject* o )
+FUNCTION: int PySequence_Contains ( PyObject* o, PyObject* v )
+FUNCTION: Py_ssize_t PySequence_Index ( PyObject* o, PyObject* v )
+FUNCTION: PyObject* PySequence_InPlaceConcat ( PyObject* o1, PyObject* o2 )
+FUNCTION: PyObject* PySequence_InPlaceRepeat ( PyObject* o, Py_ssize_t count )
+
+! Mapping
+FUNCTION: int PyMapping_Check ( PyObject* o )
+FUNCTION: Py_ssize_t PyMapping_Size ( PyObject* o )
+FUNCTION: int PyMapping_HasKey ( PyObject* o, PyObject* key )
+FUNCTION: PyObject* PyMapping_Keys ( PyObject* o )
+FUNCTION: PyObject* PyMapping_Values ( PyObject* o )
+FUNCTION: PyObject* PyMapping_Items ( PyObject* o )
+FUNCTION: PyObject* PyMapping_GetItemString ( PyObject* o, c-string key )
+FUNCTION: int PyMapping_SetItemString ( PyObject* o, c-string key, PyObject* value )
 
 ! Modules
 FUNCTION: c-string PyModule_GetName ( PyObject* module )
@@ -117,20 +133,68 @@ FUNCTION: PyObject* PyModule_GetDict ( PyObject* module )
 FUNCTION: int PyCallable_Check ( PyObject* obj )
 
 ! Objects
-FUNCTION: PyObject* PyObject_CallObject ( PyObject* callable,
-                                          PyObject* args )
-FUNCTION: PyObject* PyObject_Call ( PyObject* callable,
-                                    PyObject* args,
-                                    PyObject* kw )
-! New reference
-FUNCTION: PyObject* PyObject_GetAttrString ( PyObject* o,
-                                             c-string attr_name )
-FUNCTION: int PyObject_SetAttrString ( PyObject* o,
-                                       c-string attr_name,
-                                       PyObject *v )
-
+FUNCTION: PyObject* PyObject_CallNoArgs ( PyObject* callable )
+FUNCTION: PyObject* PyObject_Call ( PyObject* callable, PyObject* args, PyObject* kw )
+FUNCTION: PyObject* PyObject_CallObject ( PyObject* callable, PyObject* args )
+FUNCTION: int PyObject_HasAttr ( PyObject* o, c-string attr_name )
+FUNCTION: PyObject* PyObject_GetAttr ( PyObject* o, c-string attr_name )
+FUNCTION: PyObject* PyObject_GetAttrString ( PyObject* o, c-string attr_name )
+FUNCTION: int PyObject_SetAttr ( PyObject* o, c-string attr_name, PyObject *v )
+FUNCTION: int PyObject_SetAttrString ( PyObject* o, c-string attr_name, PyObject *v )
+FUNCTION: int PyObject_DelAttr ( PyObject* o, c-string attr_name )
+FUNCTION: int PyObject_DelAttrString ( PyObject* o, c-string attr_name )
+FUNCTION: PyObject* PyObject_Repr ( PyObject* o )
 FUNCTION: PyObject* PyObject_Str ( PyObject* o )
+FUNCTION: PyObject* PyObject_Type ( PyObject* o )
+FUNCTION: PyObject* PyObject_GetItem ( PyObject* o, PyObject* key )
+FUNCTION: int PyObject_SetItem ( PyObject* o, PyObject* key, PyObject* v )
+FUNCTION: int PyObject_DelItem ( PyObject* o, PyObject* key )
+FUNCTION: PyObject* PyObject_Iter ( PyObject* o )
 FUNCTION: int PyObject_IsTrue ( PyObject* o )
+FUNCTION: int PyObject_IsInstance ( PyObject* o, PyObject* typeorclass )
+FUNCTION: int PyObject_IsSubclass ( PyObject* o, PyObject* typeorclass )
+
+! Iter
+FUNCTION: int PyIter_Check ( PyObject* o )
+FUNCTION: PyObject* PyIter_Next ( PyObject* o )
+
+! Number
+FUNCTION: int PyNumber_Check ( PyObject* o )
+FUNCTION: PyObject* PyNumber_Add ( PyObject* o1, PyObject* o2 )
+FUNCTION: PyObject* PyNumber_Subtract ( PyObject* o1, PyObject* o2 )
+FUNCTION: PyObject* PyNumber_Multiply ( PyObject* o1, PyObject* o2 )
+FUNCTION: PyObject* PyNumber_FloorDivide ( PyObject* o1, PyObject* o2 )
+FUNCTION: PyObject* PyNumber_TrueDivide ( PyObject* o1, PyObject* o2 )
+FUNCTION: PyObject* PyNumber_Remainder ( PyObject* o1, PyObject* o2 )
+FUNCTION: PyObject* PyNumber_Divmod ( PyObject* o1, PyObject* o2 )
+FUNCTION: PyObject* PyNumber_Power ( PyObject* o1, PyObject* o2, PyObject* o3 )
+FUNCTION: PyObject* PyNumber_Negative ( PyObject* o )
+FUNCTION: PyObject* PyNumber_Positive ( PyObject* o )
+FUNCTION: PyObject* PyNumber_Absolute ( PyObject* o )
+FUNCTION: PyObject* PyNumber_Invert ( PyObject* o )
+FUNCTION: PyObject* PyNumber_Lshift ( PyObject* o1, PyObject* o2 )
+FUNCTION: PyObject* PyNumber_Rshift ( PyObject* o1, PyObject* o2 )
+FUNCTION: PyObject* PyNumber_And ( PyObject* o1, PyObject* o2 )
+FUNCTION: PyObject* PyNumber_Xor ( PyObject* o1, PyObject* o2 )
+FUNCTION: PyObject* PyNumber_Or ( PyObject* o1, PyObject* o2 )
+FUNCTION: int PyIndex_Check ( PyObject* o )
+FUNCTION: PyObject* PyNumber_Index ( PyObject* o )
+FUNCTION: PyObject* PyNumber_Long ( PyObject* o )
+FUNCTION: PyObject* PyNumber_Float ( PyObject* o )
+FUNCTION: PyObject* PyNumber_InPlaceAdd ( PyObject* o1, PyObject* o2 )
+FUNCTION: PyObject* PyNumber_InPlaceSubtract ( PyObject* o1, PyObject* o2 )
+FUNCTION: PyObject* PyNumber_InPlaceMultiply ( PyObject* o1, PyObject* o2 )
+FUNCTION: PyObject* PyNumber_InPlaceFloorDivide ( PyObject* o1, PyObject* o2 )
+FUNCTION: PyObject* PyNumber_InPlaceTrueDivide ( PyObject* o1, PyObject* o2 )
+FUNCTION: PyObject* PyNumber_InPlaceRemainder ( PyObject* o1, PyObject* o2 )
+FUNCTION: PyObject* PyNumber_InPlaceDivmod ( PyObject* o1, PyObject* o2 )
+FUNCTION: PyObject* PyNumber_InPlacePower ( PyObject* o1, PyObject* o2, PyObject* o3 )
+FUNCTION: PyObject* PyNumber_InPlaceLshift ( PyObject* o1, PyObject* o2 )
+FUNCTION: PyObject* PyNumber_InPlaceRshift ( PyObject* o1, PyObject* o2 )
+FUNCTION: PyObject* PyNumber_InPlaceAnd ( PyObject* o1, PyObject* o2 )
+FUNCTION: PyObject* PyNumber_InPlaceXor ( PyObject* o1, PyObject* o2 )
+FUNCTION: PyObject* PyNumber_InPlaceOr ( PyObject* o1, PyObject* o2 )
+FUNCTION: PyObject* PyNumber_ToBase ( PyObject* o1, int base )
 
 ! Bytes
 FUNCTION: c-string PyBytes_AsString ( PyObject* string )
@@ -163,6 +227,4 @@ FUNCTION: c-string PyEval_GetFuncName ( PyObject* func )
 ! Errors
 FUNCTION: void PyErr_Clear ( )
 FUNCTION: void PyErr_Print ( )
-FUNCTION: void PyErr_Fetch ( PyObject** ptype,
-                             PyObject** pvalue,
-                             PyObject** *ptraceback )
+FUNCTION: void PyErr_Fetch ( PyObject** ptype, PyObject** pvalue, PyObject** *ptraceback )
