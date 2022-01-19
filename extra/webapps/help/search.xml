@@ -13,7 +13,7 @@
 
     <input class="radiotab" name="tabs" tabindex="1" type="radio" id="words" checked="checked" />
     <label class="label" for="words">Words</label>
-    <div class="panel">
+    <div class="panel" tabindex="1">
     <t:if t:value="words">
         <ul>
             <t:each t:name="words">
@@ -25,7 +25,7 @@
 
     <input class="radiotab" name="tabs" tabindex="1" type="radio" id="vocabs" checked="checked" />
     <label class="label" for="vocabs">Vocabs</label>
-    <div class="panel">
+    <div class="panel" tabindex="1">
     <t:if t:value="vocabs">
         <ul>
             <t:each t:name="vocabs">
@@ -37,7 +37,7 @@
 
     <input class="radiotab" name="tabs" tabindex="1" type="radio" id="articles" checked="checked" />
     <label class="label" for="articles">Articles</label>
-    <div class="panel">
+    <div class="panel" tabindex="1">
     <t:if t:value="articles">
         <ul>
             <t:each t:name="articles">

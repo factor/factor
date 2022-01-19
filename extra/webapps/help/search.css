@@ -15,7 +15,7 @@
 }
 
 .label:active {
-  background: #ccc;  
+  background: #ccc;
 }
 
 .panel {
@@ -25,4 +25,14 @@
 
 .input:checked + .label + .panel {
   display: block;
+}
+
+@media (min-width: 600px) {
+  .panel {
+    order: 99;
+  }
+
+  .label {
+    width: 33.33%;
+  }
 }
