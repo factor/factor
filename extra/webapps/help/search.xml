@@ -4,21 +4,16 @@
 
     <t:title>Search - Factor Documentation</t:title>
     <t:style t:include="resource:extra/webapps/help/search.css" />
-    <t:script t:include="resource:extra/webapps/help/search.js" />
 
     <t:html t:name="navbar"/>
 
     <div class="page">
 
-    <h2>Search results for '<t:label name="search" />'</h2>
+    <div class="tabs">
 
-    <div class="tab">
-        <button class="tablinks" onclick="openTab(event, 'words')">Words</button>
-        <button class="tablinks" onclick="openTab(event, 'vocabs')">Vocabs</button>
-        <button class="tablinks" onclick="openTab(event, 'articles')">Articles</button>
-    </div>
-
-    <div id="words" class="tabcontent">
+    <input class="radiotab" name="tabs" tabindex="1" type="radio" id="words" checked="checked" />
+    <label class="label" for="words">Words</label>
+    <div class="panel">
     <t:if t:value="words">
         <ul>
             <t:each t:name="words">
@@ -28,7 +23,9 @@
     </t:if>
     </div>
 
-    <div id="vocabs" class="tabcontent">
+    <input class="radiotab" name="tabs" tabindex="1" type="radio" id="vocabs" checked="checked" />
+    <label class="label" for="vocabs">Vocabs</label>
+    <div class="panel">
     <t:if t:value="vocabs">
         <ul>
             <t:each t:name="vocabs">
@@ -38,7 +35,9 @@
     </t:if>
     </div>
 
-    <div id="articles" class="tabcontent">
+    <input class="radiotab" name="tabs" tabindex="1" type="radio" id="articles" checked="checked" />
+    <label class="label" for="articles">Articles</label>
+    <div class="panel">
     <t:if t:value="articles">
         <ul>
             <t:each t:name="articles">
@@ -46,6 +45,8 @@
             </t:each>
         </ul>
     </t:if>
+    </div>
+
     </div>
 
     <br />
