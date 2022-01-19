@@ -1,7 +1,7 @@
 ! Copyright (C) 2009 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors combinators db2.connections db2.errors
-sqlite.db2.ffi kernel locals namespaces peg.ebnf sequences
+USING: accessors combinators db2.connections db2.errors kernel
+locals multiline namespaces peg.ebnf sequences sqlite.db2.ffi
 strings ;
 IN: sqlite.db2.errors
 
