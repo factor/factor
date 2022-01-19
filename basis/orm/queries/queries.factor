@@ -14,6 +14,7 @@ HOOK: insert-db-assigned-key-sql db-connection ( tuple -- object )
 HOOK: insert-user-assigned-key-sql db-connection ( tuple -- object )
 HOOK: insert-tuple-set-key db-connection ( tuple statement -- )
 HOOK: update-tuple-sql db-connection ( tuple -- object )
+HOOK: upsert-tuple-sql db-connection ( tuple -- object )
 HOOK: delete-tuple-sql db-connection ( tuple -- object )
 HOOK: select-tuple-sql db-connection ( tuple -- object )
 

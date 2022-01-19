@@ -45,15 +45,15 @@ MACRO: slots ( seq -- quot )
 : ?first3 ( sequence -- object1/f object2/f object3/f )
     [ ?first ] [ ?second ] [ ?third ] tri ;
 
-:: 2interleave ( seq1 seq2 between: ( -- ) quot: ( obj1 obj2 -- ) -- )
-    { [ seq1 empty? ] [ seq2 empty? ] } 0|| [
-        seq1 seq2 [ first-unsafe ] bi@ quot call
-        seq1 seq2 [ rest-slice ] bi@
+:: 2interleave ( $seq1 $seq2 $between: ( -- ) quot: ( obj1 obj2 -- ) -- )
+    { [ $seq1 empty? ] [ $seq2 empty? ] } 0|| [
+        $seq1 $seq2 [ first-unsafe ] bi@ quot call
+        $seq1 $seq2 [ rest-slice ] bi@
         2dup { [ nip empty? ] [ drop empty? ] } 2|| [
             2drop
         ] [
-            between call
-            between quot 2interleave
+            $between call
+            $between quot 2interleave
         ] if
     ] unless ; inline recursive
 

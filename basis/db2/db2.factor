@@ -26,18 +26,18 @@ ERROR: retryable-failed statement ;
 : execute-retry-quotation ( statement -- statement )
     dup retry-quotation>> call( statement -- statement ) ;
 
-:: (run-retryable) ( statement quot: ( statement -- statement ) -- obj )
-    statement retries>> 0 > [
-        statement [ 1 - ] change-retries drop
+:: (run-retryable) ( $statement $quot: ( statement -- statement ) -- obj )
+    $statement retries>> 0 > [
+        $statement [ 1 - ] change-retries drop
         [
-            statement quot call
+            $statement $quot call
         ] [
-            statement errors>> push
-            statement execute-retry-quotation reset-statement
-            quot (run-retryable)
+            $statement errors>> push
+            $statement execute-retry-quotation reset-statement
+            $quot (run-retryable)
         ] recover
     ] [
-        statement retryable-failed
+        $statement retryable-failed
     ] if ; inline recursive
 
 : run-retryable ( statement quot -- )
