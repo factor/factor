@@ -448,12 +448,13 @@ M: f ($instance) ($link) ;
     unclip print-element [ \ $link swap ] { } map>assoc $list ;
 
 : $shuffle ( element -- )
-    drop
-    "Shuffle word. Rearranges the top of the datastack as indicated in the stack effect pattern." $description ;
+    "This is a shuffle word, rearranging the top of the datastack as indicated by the word's stack effect" swap
+    ?first [ ": " swap "." 4array ] [ "." append ] if*
+    $description ;
 
 : $complex-shuffle ( element -- )
     $shuffle
-    { "The data flow represented by this shuffle word can be more clearly expressed using " { $link "locals" } "." } $deprecated ;
+    { "The data flow represented by this shuffle word might be more clearly expressed using " { $link "locals" } "." } $deprecated ;
 
 : $low-level-note ( children -- )
     drop
