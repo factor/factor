@@ -4,38 +4,52 @@
 
     <t:title>Search - Factor Documentation</t:title>
     <t:style t:include="resource:extra/webapps/help/search.css" />
+    <t:script t:include="resource:extra/webapps/help/search.js" />
 
     <t:html t:name="navbar"/>
 
     <div class="page">
-    <t:if t:value="articles">
-        <h2>Articles</h2>
-        <ul>
-            <t:each t:name="articles">
-                <li> <t:link t:name="value" /> </li>
-            </t:each>
-        </ul>
-    </t:if>
 
-    <t:if t:value="vocabs">
-        <h2>Vocabularies</h2>
-        <ul>
-            <t:each t:name="vocabs">
-                <li> <t:link t:name="value" /> </li>
-            </t:each>
-        </ul>
-    </t:if>
+    <h2>Search results for '<t:label name="search" />'</h2>
 
+    <div class="tab">
+        <button class="tablinks" onclick="openTab(event, 'words')">Words</button>
+        <button class="tablinks" onclick="openTab(event, 'vocabs')">Vocabs</button>
+        <button class="tablinks" onclick="openTab(event, 'articles')">Articles</button>
+    </div>
+
+    <div id="words" class="tabcontent">
     <t:if t:value="words">
-        <h2>Words</h2>
         <ul>
             <t:each t:name="words">
                 <li> <t:link t:name="value" /> </li>
             </t:each>
         </ul>
     </t:if>
+    </div>
+
+    <div id="vocabs" class="tabcontent">
+    <t:if t:value="vocabs">
+        <ul>
+            <t:each t:name="vocabs">
+                <li> <t:link t:name="value" /> </li>
+            </t:each>
+        </ul>
+    </t:if>
+    </div>
+
+    <div id="articles" class="tabcontent">
+    <t:if t:value="articles">
+        <ul>
+            <t:each t:name="articles">
+                <li> <t:link t:name="value" /> </li>
+            </t:each>
+        </ul>
+    </t:if>
+    </div>
 
     <br />
+    <div class="footer">
     <p style="font-size: smaller;">
     This documentation was generated offline from a
     <code>load-all</code> image.  If you want, you can also
@@ -44,6 +58,8 @@
     the <a href="https://factorcode.org">Factor website</a>
     for more information.
     </p>
+    </div>
+
     </div>
 
 </t:chloe>
