@@ -40,7 +40,7 @@ DEFER: py>
     dup py-list-size <iota> [ py-list-get-item py> ] with V{ } map-as ;
 
 : py-unicode>string ( py-unicode -- str )
-    PyUnicode_AsUTF8 (check-ref) utf8 decode ;
+    PyUnicode_AsUTF8 (check-ref) ;
 
 : py-bytes>byte-array ( py-bytes -- byte-array )
     PyBytes_AsString (check-ref) >byte-array ;
@@ -54,7 +54,7 @@ M: byte-array >py
     dup length PyBytes_FromStringAndSize check-new-ref ;
 
 M: string >py
-    utf8 encode dup length PyUnicode_FromStringAndSize check-new-ref ;
+    PyUnicode_FromString check-new-ref ;
 
 M: math:fixnum >py
     PyLong_FromLong check-new-ref ;
