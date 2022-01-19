@@ -24,7 +24,7 @@
     </div>
 
     <input class="radiotab" name="tabs" tabindex="1" type="radio" id="vocabs" />
-    <label class="label" for="vocabs">Vocabs</label>
+    <label class="label" for="vocabs">Vocabularies</label>
     <div class="panel" tabindex="1">
     <t:if t:value="vocabs">
         <ul>
