@@ -27,7 +27,7 @@ IN: python.syntax.tests
 ! Module variables are bound as zero-arg functions
 { t } [ $path py> s:sequence? ] py-test
 
-{ t } [ $path len int py> 5 > ] py-test
+{ t } [ $path py> empty? not ] py-test
 
 [ 10 ] [ 10 >py range len py> ] py-test
 
