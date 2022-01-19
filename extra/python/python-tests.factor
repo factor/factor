@@ -13,16 +13,10 @@ IN: python
 
 ! Pretty sure the # of None references should stay constant.
 : count-none-refs ( -- n )
-    [
-        "sys" "getrefcount" py-import-from
-        <none> <1py-tuple> call-object py>
-    ] with-destructors ;
+    "sys" "getrefcount" py-import-from
+    <none> <1py-tuple> call-object py> ;
 
-{ t } [
-    ! For some reason, the count increased by one the first time.
-    count-none-refs drop
-    count-none-refs count-none-refs =
-] py-test
+{ t } [ count-none-refs count-none-refs = ] py-test
 
 { } [ { f f f } >py drop ] py-test
 
