@@ -37,12 +37,9 @@ SYMBOL: current-context
     [ [ ":" glue ] [ ":$" glue ] 2bi ] [ nip dup "$" prepend ] if
     [ create-word-in ] bi@ ;
 
-: import-getattr ( module name -- alien )
-    [ py-import ] dip getattr ;
-
 :: add-function ( name effect module prefix? -- )
     module name prefix? make-factor-words :> ( call-word obj-word )
-    obj-word module name '[ _ _ import-getattr ] ( -- o ) define-inline
+    obj-word module name '[ _ _ py-import-from ] ( -- o ) define-inline
     call-word obj-word def>> effect make-function-quot effect define-inline ;
 
 : make-method-quot ( name effect -- quot )

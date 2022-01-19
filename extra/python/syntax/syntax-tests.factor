@@ -19,7 +19,7 @@ IN: python.syntax.tests
 [ "hello.doc" ] [ "/some/path/hello.doc" >py basename py> ] py-test
 
 [ { "hello" ".doc" } ] [
-    "hello.doc" >py splitext 2array
+    "hello.doc" >py splitext [ py> ] bi@ 2array
 ] py-test
 
 [ ] [ 0 >py sleep ] py-test
@@ -78,7 +78,7 @@ IN: python.syntax.tests
 ] py-test
 
 [ { "hello" "=" "there" } ] [
-    "hello=there" >py "=" >py partition 3array
+    "hello=there" >py "=" >py partition [ py> ] tri@ 3array
 ] py-test
 
 ! Introspection
@@ -106,12 +106,12 @@ PY-METHODS: code =>
     [
         ArgumentParser dup
         "--foo" >py H{ { "help" "badger" } } >py add_argument
-        format_help
+        format_help py>
     ] with-destructors [ blank? ] s:trim split-words "badger" swap in?
 ] py-test
 
 { t } [
-    [ 987 >py basename ] [ traceback>> ] recover s:length 0 >
+    [ 987 >py basename ] [ ] recover python-error?
 ] py-test
 
 ! Test if exceptions leak references. If so, the test will leak a few
@@ -152,6 +152,6 @@ PY-QUALIFIED-FROM: functools =>
 
 { 48 } [
     reduce-func [
-        { 1 2 8 1 2 34 } >py functools:reduce builtins:list py>
+        { 1 2 8 1 2 34 } >py functools:reduce py>
     ] with-quot>py-cfunction
 ] py-test
