@@ -1,6 +1,6 @@
-USING: accessors arrays combinators effects effects.parser fry generalizations
-kernel lexer locals math namespaces parser python python.ffi python.objects
-sequences sequences.generalizations vocabs.parser words ;
+USING: accessors combinators effects effects.parser kernel lexer
+namespaces parser python python.objects sequences
+sequences.generalizations words ;
 IN: python.syntax
 
 <PRIVATE
