@@ -23,7 +23,7 @@
     </t:if>
     </div>
 
-    <input class="radiotab" name="tabs" tabindex="1" type="radio" id="vocabs" checked="checked" />
+    <input class="radiotab" name="tabs" tabindex="1" type="radio" id="vocabs" />
     <label class="label" for="vocabs">Vocabs</label>
     <div class="panel" tabindex="1">
     <t:if t:value="vocabs">
@@ -35,7 +35,7 @@
     </t:if>
     </div>
 
-    <input class="radiotab" name="tabs" tabindex="1" type="radio" id="articles" checked="checked" />
+    <input class="radiotab" name="tabs" tabindex="1" type="radio" id="articles" />
     <label class="label" for="articles">Articles</label>
     <div class="panel" tabindex="1">
     <t:if t:value="articles">
