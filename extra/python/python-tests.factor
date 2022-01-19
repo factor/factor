@@ -8,13 +8,13 @@ IN: python
 
 ! None testing
 { t } [
-    "builtins" py-import "None" getattr <none> =
+    "builtins" "None" py-import-from <none> =
 ] py-test
 
 ! Pretty sure the # of None references should stay constant.
 : count-none-refs ( -- n )
     [
-        "sys" py-import "getrefcount" getattr
+        "sys" "getrefcount" py-import-from
         <none> <1py-tuple> call-object py>
     ] with-destructors ;
 
@@ -179,10 +179,10 @@ IN: python
 
 ! Callbacks
 : py-map ( -- alien )
-    "builtins" py-import "map" getattr ;
+    "builtins" "map" py-import-from ;
 
 : py-list ( -- alien )
-    "builtins" py-import "list" getattr ;
+    "builtins" "list" py-import-from ;
 
 : py-list-call ( alien-cb -- seq )
     [

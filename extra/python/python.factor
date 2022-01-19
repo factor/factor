@@ -8,8 +8,6 @@ IN: python
 
 ERROR: python-error type message traceback ;
 
-SPECIALIZED-ARRAY: void*
-
 ! Initialization and finalization
 : py-initialize ( -- )
     Py_IsInitialized [ Py_Initialize ] unless ;
@@ -18,35 +16,45 @@ SPECIALIZED-ARRAY: void*
     Py_IsInitialized [ Py_Finalize ] when ;
 
 ! Importing
-: py-import ( str -- module )
+: py-import ( modulename -- module )
     PyImport_ImportModule check-new-ref ;
 
-! Data marshalling to Python
-: array>py-tuple ( arr -- py-tuple )
-    [ length <py-tuple> dup ] keep
-    [ rot py-tuple-set-item ] with each-index ;
-
-: vector>py-list ( vec -- py-list )
-    [ length <py-list> dup ] keep
-    [ rot py-list-set-item ] with each-index ;
+: py-import-from ( modulename objname -- obj )
+    [ py-import ] [ getattr ] bi* ;
 
 DEFER: >py
 DEFER: py>
 
+! Data marshalling to Python
+: array>py-tuple ( array -- py-tuple )
+    [ length <py-tuple> ] keep
+    [ [ dup ] 2dip py-tuple-set-item ] each-index ;
+
+: vector>py-list ( vector -- py-list )
+    [ length <py-list> ] keep
+    [ [ dup ] 2dip py-list-set-item ] each-index ;
+
+: assoc>py-dict ( assoc -- py-dict )
+    <py-dict> swap [ [ dup ] 2dip py-dict-set-item ] assoc-each ;
+
 : py-tuple>array ( py-tuple -- arr )
-    dup py-tuple-size <iota> [ py-tuple-get-item py> ] with map ;
+    dup py-tuple-size <iota> [ py-tuple-get-item ] with map ;
 
 : py-list>vector ( py-list -- vector )
-    dup py-list-size <iota> [ py-list-get-item py> ] with V{ } map-as ;
+    dup py-list-size <iota> [ py-list-get-item ] with V{ } map-as ;
 
-: py-unicode>string ( py-unicode -- str )
+: py-unicode>string ( py-unicode -- string )
     PyUnicode_AsUTF8 (check-ref) ;
 
 : py-bytes>byte-array ( py-bytes -- byte-array )
     PyBytes_AsString (check-ref) >byte-array ;
 
 : py-dict>hashtable ( py-dict -- hashtable )
-    PyDict_Items (check-ref) py> >hashtable ;
+    PyDict_Items (check-ref) py-list>vector
+    [ py-tuple>array ] map >hashtable ;
+
+: py-class-name ( py-object -- name )
+    "__class__" getattr "__name__" getattr py-unicode>string ;
 
 GENERIC: >py ( obj -- py-obj )
 
@@ -69,9 +77,7 @@ M: array >py
     [ >py ] map array>py-tuple ;
 
 M: hashtable >py
-    <py-dict> swap dupd [
-        swapd [ >py ] bi@ py-dict-set-item
-    ] with assoc-each ;
+    [ [ >py ] bi@ ] assoc-map assoc>py-dict ;
 
 M: vector >py
     [ >py ] map vector>py-list ;
@@ -87,11 +93,11 @@ SYMBOL: py-type-dispatch
         { "NoneType" [ drop f ] }
         { "bool" [ PyObject_IsTrue 1 = ] }
         { "bytes" [ py-bytes>byte-array ] }
-        { "dict" [ py-dict>hashtable ] }
+        { "dict" [ py-dict>hashtable [ [ py> ] bi@ ] assoc-map ] }
         { "int" [ PyLong_AsLong ] }
-        { "list" [ py-list>vector ] }
+        { "list" [ py-list>vector [ py> ] map ] }
         { "str" [ py-unicode>string ] }
-        { "tuple" [ py-tuple>array ] }
+        { "tuple" [ py-tuple>array [ py> ] map ] }
     } clone ;
 
 py-type-dispatch [ init-py-type-dispatch ] initialize
@@ -99,15 +105,12 @@ py-type-dispatch [ init-py-type-dispatch ] initialize
 ERROR: missing-type type ;
 
 : py> ( py-obj -- obj )
-    dup "__class__" getattr "__name__" getattr py-unicode>string
-    py-type-dispatch get ?at [ call( x -- x ) ] [ missing-type ] if ;
+    dup py-class-name py-type-dispatch get ?at
+    [ call( x -- x ) ] [ missing-type ] if ;
 
 ! Callbacks
 : quot>py-callback ( quot: ( args kw -- ret ) -- alien )
-    '[
-        nipd
-        [ [ py> ] [ { } ] if* ] bi@ @ >py
-    ] PyCallback ; inline
+    '[ nipd [ [ py> ] [ { } ] if* ] bi@ @ >py ] PyCallback ; inline
 
 : with-quot>py-cfunction ( alien quot -- )
     '[ <py-cfunction> @ ] with-callback ; inline
