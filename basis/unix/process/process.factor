@@ -1,7 +1,7 @@
-USING: alien.c-types alien.data alien.syntax classes.struct
-environment.unix generalizations io.encodings.utf8 kernel libc
-math sequences simple-tokenizer strings unix unix.types
-unix.utilities ;
+USING: alien.c-types alien.data alien.syntax alien.utilities
+classes.struct environment.unix generalizations
+io.encodings.utf8 kernel libc math sequences simple-tokenizer
+strings unix unix.types ;
 QUALIFIED-WITH: alien.c-types ac
 IN: unix.process
 
