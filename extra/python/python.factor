@@ -28,11 +28,11 @@ DEFER: py>
 ! Data marshalling to Python
 : array>py-tuple ( array -- py-tuple )
     [ length <py-tuple> ] keep
-    [ [ dup ] 2dip py-tuple-set-item ] each-index ;
+    [ [ dup ] 2dip swap py-tuple-set-item ] each-index ;
 
 : vector>py-list ( vector -- py-list )
     [ length <py-list> ] keep
-    [ [ dup ] 2dip py-list-set-item ] each-index ;
+    [ [ dup ] 2dip swap py-list-set-item ] each-index ;
 
 : assoc>py-dict ( assoc -- py-dict )
     <py-dict> swap [ [ dup ] 2dip py-dict-set-item ] assoc-each ;
