@@ -1,43 +1,28 @@
-h2 {
-    padding: 10px;
-    background-color: #f3f2ea;
-    color: #222;
+.tabs {
+  display: flex;
+  flex-wrap: wrap;
 }
 
-hr {
-    border: 0;
-    background-color: #ccc;
-    color: #ccc;
-    height: 1px;
+.radiotab {
+  position: absolute;
+  opacity: 0;
 }
 
-.tab {
-  overflow: hidden;
-  border: 1px solid #ccc;
-  background-color: #f1f1f1;
-}
-
-.tab button {
-  background-color: inherit;
-  float: left;
-  border: none;
-  outline: none;
+.label {
+  width: 100%;
+  background: #e5e5e5;
   cursor: pointer;
-  padding: 14px 16px;
-  transition: 0.3s;
 }
 
-.tab button:hover {
-  background-color: #ddd;
+.label:active {
+  background: #ccc;  
 }
 
-.tab button.active {
-  background-color: #ccc;
-}
-
-.tabcontent {
+.panel {
   display: none;
-  padding: 6px 12px;
-  border: 1px solid #ccc;
-  border-top: none;
+  width: 100%;
+}
+
+.input:checked + .label + .panel {
+  display: block;
 }
