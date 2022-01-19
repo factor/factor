@@ -3,10 +3,10 @@
 USING: accessors alien.c-types alien.data arrays calendar.format
 calendar.parser combinators db2.binders db2.connections
 db2.errors db2.result-sets db2.types db2.utils destructors
-io.encodings.utf8 kernel libc math namespaces orm.binders
-postgresql.db2.connections.private postgresql.db2.ffi
-postgresql.db2.lib present sequences serialize
-specialized-arrays strings urls ;
+io.encodings.utf8 json.reader kernel libc math namespaces
+orm.binders postgresql.db2.connections.private
+postgresql.db2.ffi postgresql.db2.lib present sequences
+serialize specialized-arrays strings urls ;
 IN: postgresql.db2.result-sets
 SPECIALIZED-ARRAY: uint
 SPECIALIZED-ARRAY: void*
@@ -127,6 +127,7 @@ M: postgresql-result-set column
         { BLOB [ pq-get-blob ] }
         { BOOLEAN [ pq-get-boolean ] }
         { URL [ pq-get-string dup [ >url ] when ] }
+        { JSON [ pq-get-string dup [ json> ] when ] }
         { FACTOR-BLOB [
             pq-get-blob
             dup [ bytes>object ] when ] }

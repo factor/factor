@@ -42,10 +42,10 @@ Line = "LINE " [0-9]+:line ": " .+:sql
 
 ]=]
 
-:: set-caret-position ( error caret-line -- error )
-    caret-line length
-    error line>> number>string length "LINE : " length +
-    - [ error ] dip >>column ;
+:: set-caret-position ( $error $caret-line -- error )
+    $caret-line length
+    $error line>> number>string length "LINE : " length +
+    - [ $error ] dip >>column ;
 
 : postgresql-location ( line column -- obj )
     [ parse-postgresql-line-error ] dip

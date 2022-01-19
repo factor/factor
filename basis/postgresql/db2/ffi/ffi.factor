@@ -21,6 +21,9 @@ CONSTANT: CONNECTION_AUTH_OK                5
 CONSTANT: CONNECTION_SETENV                 6
 CONSTANT: CONNECTION_SSL_STARTUP            7
 CONSTANT: CONNECTION_NEEDED                 8
+CONSTANT: CONNECTION_CHECK_WRITABLE         9
+CONSTANT: CONNECTION_CONSUME               10
+CONSTANT: CONNECTION_GSS_STARTUP           11
 
 ! PostgresPollingStatusType
 CONSTANT: PGRES_POLLING_FAILED              0
@@ -38,6 +41,8 @@ CONSTANT: PGRES_COPY_IN                     4
 CONSTANT: PGRES_BAD_RESPONSE                5
 CONSTANT: PGRES_NONFATAL_ERROR              6
 CONSTANT: PGRES_FATAL_ERROR                 7
+CONSTANT: PGRES_COPY_BOTH                   8
+CONSTANT: PGRES_SINGLE_TUPLE                9
 
 ! PGTransactionStatusType;
 CONSTANT: PQTRANS_IDLE                      0
@@ -50,6 +55,18 @@ CONSTANT: PQTRANS_UNKNOWN                   4
 CONSTANT: PQERRORS_TERSE                    0
 CONSTANT: PQERRORS_DEFAULT                  1
 CONSTANT: PQERRORS_VERBOSE                  2
+CONSTANT: PQERRORS_SQLSTATE                 3
+
+! PGContextVisibility
+CONSTANT: PQSHOW_CONTEXT_NEVER              0
+CONSTANT: PQSHOW_CONTEXT_ERRORS             1
+CONSTANT: PQSHOW_CONTEXT_ALWAYS             2
+
+! PGPing
+CONSTANT: PGPING_OK                         0
+CONSTANT: PGPING_REJECT                     1
+CONSTANT: PQPING_NO_RESPONSE                2
+CONSTANT: PQPING_NO_ATTEMPT                 3
 
 CONSTANT: InvalidOid 0
 

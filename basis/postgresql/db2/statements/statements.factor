@@ -1,9 +1,8 @@
 ! Copyright (C) 2009 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors db2.connections
-postgresql.db2.connections.private postgresql.db2.ffi
-postgresql.db2.lib db2.statements destructors kernel namespaces
-sequences math.parser ;
+USING: accessors db2.connections db2.statements kernel
+math.parser namespaces postgresql.db2.connections.private
+postgresql.db2.ffi postgresql.db2.lib sequences ;
 IN: postgresql.db2.statements
 
 M: postgresql-db-connection prepare-statement*

@@ -1,9 +1,8 @@
 ! Copyright (C) 2010 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors assocs fry grouping hashtables kernel make
-math multiline sequences splitting.monotonic ;
+USING: accessors assocs grouping hashtables kernel make math
+multiline sequences splitting.monotonic ;
 IN: reconstructors
-
 
 TUPLE: reconstructor row-spec combiner-spec ;
 
@@ -164,10 +163,6 @@ TUPLE: nested-reconstructor
         big-container >>medium-containers
     }
 }
-
-
-
-
 
 */
 
