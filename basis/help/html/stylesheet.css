@@ -73,7 +73,7 @@ tr:hover {
     margin-top: 15px;
     border-top: 1px dashed #ccc;
     color: #666;
-    font-size: smaller;
+    font-size: 10pt;
 }
 
 @media screen and (max-width: 480px) {
