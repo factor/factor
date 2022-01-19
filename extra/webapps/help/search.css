@@ -1,6 +1,7 @@
 .tabs {
   display: flex;
   flex-wrap: wrap;
+  margin: 0 auto 10px;
 }
 
 .radiotab {
@@ -10,12 +11,25 @@
 
 .label {
   width: 100%;
-  background: #e5e5e5;
+  padding: 5px;
+  background: white;
   cursor: pointer;
+  font-weight: bold;
+  font-size: 14pt;
+  color: #7f7f7f;
+  text-align: center;
+  border: 1px solid #ccc;
 }
 
-.label:active {
-  background: #ccc;
+.label:hover {
+  background: #d8d8d8;
+  border: 1px solid #ccc;
+}
+
+.radiotab:checked + .label {
+  border: 1px solid #ccc;
+  background: #f0f0f0;
+  color: black;
 }
 
 .panel {
@@ -23,16 +37,19 @@
   width: 100%;
 }
 
-.input:checked + .label + .panel {
+.radiotab:checked + .label + .panel {
   display: block;
 }
 
 @media (min-width: 600px) {
+
   .panel {
     order: 99;
   }
 
   .label {
     width: 33.33%;
+    border: 1px solid white;
+    border-bottom: 1px solid #ccc;
   }
 }
