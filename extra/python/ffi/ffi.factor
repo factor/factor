@@ -139,6 +139,7 @@ FUNCTION: PyObject* PyBytes_FromStringAndSize ( c-string v, Py_ssize_t size  )
 ! Strings
 FUNCTION: c-string PyUnicode_AsUTF8 ( PyObject* unicode )
 FUNCTION: PyObject* PyUnicode_FromStringAndSize ( c-string v, Py_ssize_t size  )
+FUNCTION: PyObject* PyUnicode_FromString ( c-string v )
 
 ! Ints
 FUNCTION: long PyLong_AsLong ( PyObject* io )
