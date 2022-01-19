@@ -3,8 +3,8 @@
 
 USING: accessors alien.c-types arrays assocs classes
 classes.algebra classes.algebra.private classes.maybe
-classes.struct classes.tuple combinators.short-circuit fry
-generic kernel math namespaces sequences sets words ;
+classes.tuple combinators.short-circuit fry generic kernel math
+namespaces sequences sets words ;
 
 FROM: classes.tuple.private => tuple-layout ;
 IN: stack-checker.dependencies
@@ -134,8 +134,10 @@ TUPLE: depends-on-struct-slots class slots ;
     [ drop +conditional+ depends-on ]
     [ depends-on-struct-slots add-conditional-dependency ] 2bi ;
 
+SLOT: fields
+
 M: depends-on-struct-slots satisfied?
-    [ class>> struct-slots ] [ slots>> ] bi eq? ;
+    [ class>> "c-type" word-prop fields>> ] [ slots>> ] bi eq? ;
 
 TUPLE: depends-on-flushable word ;
 
