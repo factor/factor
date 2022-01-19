@@ -2,8 +2,8 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs combinators combinators.smart db2
 db2.binders db2.statements db2.types db2.utils kernel make math
-math.intervals math.parser multiline namespaces orm.persistent
-orm.queries postgresql.db2.connections.private ranges sequences ;
+math.parser multiline namespaces orm.persistent orm.queries
+postgresql.db2.connections.private ranges sequences ;
 IN: postgresql.orm.queries
 
 ! TODOOOOOO
@@ -133,7 +133,7 @@ M: postgresql-db-connection insert-user-assigned-key-sql
 
         table-name quote-sql-name "(" columns-minus-key [ column-name>> quote-sql-name ] map ", " join
         ") values("
-        1 columns-minus-key length [a,b]
+        1 columns-minus-key length [a..b]
         [ number>string "$" prepend ] map ", " join
 
         "); select currval(''" table-name-unquoted "_"
