@@ -3,7 +3,8 @@
 
 USING: accessors alien.c-types alien.data byte-arrays
 checksums combinators endian generalizations grouping kernel
-math math.bitwise sequences ;
+math math.bitwise sequences specialized-arrays ;
+SPECIALIZED-ARRAY: uint64_t
 
 IN: checksums.xxhash
 
