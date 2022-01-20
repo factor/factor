@@ -19,15 +19,18 @@
   color: #7f7f7f;
   text-align: center;
   border: 1px solid #ccc;
+  border-bottom: none;
 }
 
 .label:hover {
   background: #d8d8d8;
   border: 1px solid #ccc;
+  border-bottom: none;
 }
 
 .radiotab:checked + .label {
   border: 1px solid #ccc;
+  border-bottom: none;
   background: #f0f0f0;
   color: black;
 }
@@ -35,6 +38,7 @@
 .panel {
   display: none;
   width: 100%;
+  border-top: 1px solid #ccc;
 }
 
 .radiotab:checked + .label + .panel {
@@ -50,6 +54,6 @@
   .label {
     width: 33.33%;
     border: 1px solid white;
-    border-bottom: 1px solid #ccc;
+    border-bottom: none;
   }
 }
