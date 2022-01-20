@@ -109,6 +109,13 @@ PRIVATE>
     [ column>> ] [ line-text>> ] bi
     [ "\"\\" member-eq? ] find-from ;
 
+: check-space ( lexer -- )
+    dup current-char forbid-tab {
+        { CHAR: \s [ advance-char ] }
+        { f [ drop ] }
+        [ "[space]" swap 1string "'" 1surround unexpected ]
+    } case ;
+
 DEFER: (parse-string)
 
 : parse-found-token ( accum lexer i elt -- )
@@ -119,14 +126,7 @@ DEFER: (parse-string)
         [ [ pick push ] bi@ ]
         [ drop 2dup next-line% ] if*
         (parse-string)
-    ] [
-        dup advance-char
-        dup current-char forbid-tab {
-            { CHAR: \s [ advance-char ] }
-            { f [ drop ] }
-            [ "[space]" swap 1string "'" 1surround unexpected ]
-        } case drop
-    ] if ;
+    ] [ dup advance-char check-space drop ] if ;
 
 : (parse-string) ( accum lexer -- )
     { sbuf lexer } declare
