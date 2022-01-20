@@ -141,7 +141,10 @@ M: f smart-usage drop \ f smart-usage ;
 SINGLETON: invalidate-crossref
 
 M: invalidate-crossref definitions-changed
-    drop null? [ f crossref set-global ] unless ;
+    ! reset crossref on non-empty definitions or f which
+    ! indicates a source-file was parsed, cache otherwise
+    drop [ null? not ] [ not ] bi or
+    [ f crossref set-global ] when ;
 
 [ invalidate-crossref add-definition-observer ] "tools.crossref" add-startup-hook
 
