@@ -1,7 +1,8 @@
 ! Copyright (C) 2007 Daniel Ehrenberg
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors combinators kernel lexer locals make math
-namespaces parser quotations sequences words ;
+namespaces parser quotations sequences strings.parser.private
+words ;
 IN: multiline
 
 <PRIVATE
@@ -53,7 +54,7 @@ SYNTAX: STRING:
     [
         lexer
         [ skip-n-chars + end-text lexer (scan-multiline-string) ]
-        change-column drop
+        change-column check-space
     ] "" make ;
 
 : advance-same-line ( lexer text -- )
