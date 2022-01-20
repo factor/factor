@@ -1,8 +1,8 @@
 ! Copyright (C) 2014 John Benediktsson
 ! See http://factorcode.org/license.txt for BSD license
 
-USING: combinators kernel locals math math.extras
-math.extras.private math.functions ranges random sequences ;
+USING: combinators kernel math math.extras math.extras.private
+math.functions ranges random sequences ;
 
 IN: math.primes.solovay-strassen
 

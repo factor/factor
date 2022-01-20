@@ -1,9 +1,9 @@
 ! Copyright (C) 2008 Slava Pestov, Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: concurrency.combinators db db.pools db.sqlite db.tuples
-db.types destructors kernel math random threads tools.test sequences
-io io.pools prettyprint db.postgresql accessors io.files.temp
-namespaces fry system math.parser db.queries assocs ;
+USING: accessors assocs concurrency.combinators db db.pools
+db.postgresql db.queries db.sqlite db.tuples db.types
+destructors io.files.temp kernel math math.parser namespaces
+random sequences system threads tools.test ;
 IN: db.tester
 
 : postgresql-test-db-name ( -- string )

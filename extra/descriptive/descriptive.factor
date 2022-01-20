@@ -1,9 +1,9 @@
 ! Copyright (c) 2008 Daniel Ehrenberg.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: words kernel sequences sequences.generalizations locals
-locals.parser fry locals.definitions accessors parser namespaces
-continuations summary definitions generalizations arrays
-prettyprint debugger io effects tools.annotations effects.parser ;
+USING: accessors arrays continuations debugger definitions
+effects effects.parser generalizations io kernel
+locals.definitions locals.parser prettyprint sequences
+sequences.generalizations tools.annotations words ;
 IN: descriptive
 
 ERROR: descriptive-error args underlying word ;

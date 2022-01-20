@@ -1,6 +1,6 @@
 ! Copyright (c) 2008 Eric Mertens.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: fry kernel math math.primes.factors math.vectors sequences sets
+USING: kernel math math.primes.factors math.vectors sequences sets
 project-euler.common ;
 IN: project-euler.203
 

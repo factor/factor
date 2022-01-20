@@ -1,7 +1,7 @@
 ! Copyright (C) 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors alien alien.c-types classes.struct functors
-kernel math math.functions quotations ;
+kernel math quotations ;
 IN: alien.complex.functor
 
 <FUNCTOR: define-complex-type ( N T -- )

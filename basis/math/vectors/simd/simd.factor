@@ -1,10 +1,9 @@
 USING: accessors alien arrays byte-arrays classes combinators
-cpu.architecture effects fry functors generalizations generic
-generic.parser kernel lexer literals locals macros math math.functions
-math.vectors math.vectors.private math.vectors.simd.intrinsics
-namespaces parser prettyprint.custom quotations sequences
-sequences.generalizations sequences.private vocabs vocabs.loader
-words math.bitwise ;
+cpu.architecture effects functors generalizations kernel lexer
+literals math math.bitwise math.vectors
+math.vectors.simd.intrinsics parser prettyprint.custom
+quotations sequences sequences.generalizations sequences.private
+vocabs.loader words ;
 QUALIFIED-WITH: alien.c-types c
 IN: math.vectors.simd
 

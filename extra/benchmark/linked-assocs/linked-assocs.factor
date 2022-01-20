@@ -1,5 +1,4 @@
-USING: assocs combinators fry kernel linked-assocs math
-sequences ;
+USING: assocs combinators kernel linked-assocs math sequences ;
 
 IN: benchmark.linked-assocs
 

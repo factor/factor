@@ -1,8 +1,8 @@
 ! Copyright (C) 2009, 2010 Joe Groff.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors alien alien.c-types alien.data alien.parser arrays
-byte-arrays combinators effects.parser fry generalizations grouping kernel
-lexer locals macros make math ranges parser sequences
+USING: accessors alien alien.arrays alien.c-types alien.data
+alien.parser arrays byte-arrays combinators effects.parser fry
+generalizations grouping kernel make math sequences
 sequences.generalizations sequences.private ;
 FROM: alien.arrays => array-length ;
 IN: alien.data.map

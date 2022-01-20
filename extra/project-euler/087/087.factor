@@ -1,4 +1,4 @@
-USING: locals math math.functions math.primes
+USING: math math.functions math.primes
 project-euler.common sequences sets ;
 
 IN: project-euler.087

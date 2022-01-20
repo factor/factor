@@ -1,9 +1,8 @@
 ! Copyright (C) 2009 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors alien alien.c-types alien.data alien.syntax
-byte-arrays byte-vectors classes.struct combinators
-compression.zlib.ffi continuations destructors fry kernel libc
-math math.functions ranges sequences system ;
+USING: accessors alien alien.c-types alien.data byte-vectors
+combinators compression.zlib.ffi continuations destructors
+kernel libc math math.functions ranges sequences ;
 IN: compression.zlib
 
 ERROR: zlib-failed n string ;

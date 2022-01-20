@@ -1,8 +1,8 @@
 ! Copyright (C) 2008 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors alien.c-types arrays checksums checksums.common
-combinators combinators.smart endian fry grouping kernel
-kernel.private literals locals math math.bitwise ranges
+USING: accessors alien.c-types checksums checksums.common
+combinators combinators.smart endian grouping kernel
+kernel.private literals math math.bitwise ranges
 sequences sequences.generalizations sequences.private
 specialized-arrays ;
 SPECIALIZED-ARRAY: uint

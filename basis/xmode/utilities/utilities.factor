@@ -1,6 +1,5 @@
-USING: accessors sequences assocs kernel quotations namespaces
-xml.data xml.traversal combinators macros parser lexer words fry
-regexp ;
+USING: combinators kernel namespaces quotations regexp sequences
+xml.data xml.traversal ;
 IN: xmode.utilities
 
 : implies ( x y -- z ) [ not ] dip or ; inline

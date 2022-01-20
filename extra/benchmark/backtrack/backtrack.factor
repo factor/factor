@@ -1,8 +1,7 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: backtrack shuffle math ranges quotations locals fry
-kernel words io memoize macros prettyprint sequences assocs
-combinators namespaces ;
+USING: assocs backtrack kernel math memoize ranges sequences
+words ;
 IN: benchmark.backtrack
 
 ! This was suggested by Dr_Ford. Compute the number of quadruples

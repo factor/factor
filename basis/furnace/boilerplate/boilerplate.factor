@@ -4,7 +4,6 @@ USING: accessors kernel math.order namespaces combinators.short-circuit
 html.forms
 html.templates
 html.templates.chloe
-locals
 http.server
 http.server.filters
 furnace.utilities ;

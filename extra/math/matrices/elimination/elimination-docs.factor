@@ -1,4 +1,4 @@
-USING: help.markup help.syntax math sequences ;
+USING: help.markup help.syntax sequences ;
 
 IN: math.matrices.elimination
 

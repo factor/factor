@@ -1,5 +1,6 @@
-USING: kernel io accessors arrays math.runge-kutta sequences math math.matrices 
-       ui.gadgets ui.gadgets.charts ui.gadgets.panes ui.gadgets.charts.lines ui.theme ;
+USING: accessors arrays kernel math math.matrices
+math.runge-kutta sequences ui.gadgets ui.gadgets.charts
+ui.gadgets.charts.lines ui.gadgets.panes ui.theme ;
 IN: math.runge-kutta.examples
 
 : lorenz-dx/dt ( tx..n -- dx )

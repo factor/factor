@@ -1,6 +1,6 @@
-USING: accessors arrays byte-arrays byte-vectors combinators fry
-http2.hpack.huffman io.encodings.string io.encodings.utf8 locals
-kernel math math.functions math.bitwise multiline sequences ;
+USING: accessors arrays byte-arrays byte-vectors combinators
+http2.hpack.huffman io.encodings.string io.encodings.utf8 kernel
+math math.bitwise multiline sequences ;
 
 IN: http2.hpack
 

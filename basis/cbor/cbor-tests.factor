@@ -1,4 +1,4 @@
-USING: arrays assocs calendar cbor kernel literals locals math
+USING: arrays assocs calendar cbor kernel literals math
 math.parser ranges tools.test urls ;
 
 {

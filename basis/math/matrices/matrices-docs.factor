@@ -1,7 +1,7 @@
 ! Copyright (C) 2005, 2010, 2018, 2020 Slava Pestov, Joe Groff, and Cat Stevens.
-USING: accessors arrays assocs generic.single formatting locals help.markup help.markup.private help.syntax io
-kernel math math.functions math.order math.ratios math.vectors opengl.gl prettyprint
-sequences sequences.generalizations urls ;
+USING: arrays assocs help.markup help.markup.private help.syntax
+kernel math math.functions math.order math.vectors sequences
+sequences.generalizations ;
 IN: math.matrices
 
 <PRIVATE

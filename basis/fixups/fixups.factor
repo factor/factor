@@ -58,7 +58,7 @@ M: object compute-fixups
 M: f compute-fixups 2drop { } ;
 
 M: no-vocab compute-fixups
-    name>> vocab-renames compute-assoc-fixups ;
+    [ name>> vocab-renames compute-assoc-fixups ] [ drop { } ] if* ;
 
 M: no-word-error compute-fixups
-    name>> word-renames compute-assoc-fixups ;
+    [ name>> word-renames compute-assoc-fixups ] [ drop { } ] if* ;

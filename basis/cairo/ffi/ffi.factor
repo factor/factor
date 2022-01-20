@@ -3,7 +3,7 @@
 ! Copyright (C) 2010 Anton Gorenko.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: alien alien.c-types alien.destructors alien.libraries
-alien.syntax assocs classes.struct combinators kernel system ;
+alien.syntax classes.struct combinators system ;
 IN: cairo.ffi
 
 ! Adapted from cairo.h, version 1.8.10

@@ -1,6 +1,6 @@
 ! Copyright (C) 2010 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors alien.c-types classes.struct kernel memory
+USING: accessors alien.c-types classes.struct kernel
 tools.memory system vm ;
 IN: tools.time.struct
 

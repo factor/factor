@@ -1,7 +1,7 @@
 ! Copyright (C) 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: compiler.codegen.relocation compiler.constants cpu.x86.assembler
-cpu.x86.assembler.operands kernel kernel.private layouts locals parser
+cpu.x86.assembler.operands kernel kernel.private layouts parser
 sequences ;
 IN: bootstrap.x86
 

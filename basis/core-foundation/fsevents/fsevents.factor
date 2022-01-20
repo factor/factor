@@ -4,7 +4,7 @@ USING: accessors alien alien.c-types alien.data alien.strings
 alien.syntax arrays assocs classes.struct combinators
 core-foundation core-foundation.arrays core-foundation.run-loop
 core-foundation.strings core-foundation.time destructors init
-io.encodings.utf8 kernel locals namespaces sequences
+io.encodings.utf8 kernel namespaces sequences
 specialized-arrays unix.types ;
 IN: core-foundation.fsevents
 

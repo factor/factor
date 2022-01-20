@@ -4,7 +4,7 @@ USING: accessors alien alien.c-types alien.data alien.strings
 alien.syntax classes classes.struct combinators
 combinators.short-circuit io.encodings.ascii io.encodings.string
 kernel literals make math sequences specialized-arrays typed
-fry io.mmap formatting locals splitting endian arrays ;
+io.mmap formatting splitting endian ;
 FROM: alien.c-types => short ;
 IN: macho
 

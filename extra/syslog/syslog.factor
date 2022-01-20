@@ -2,8 +2,8 @@
 ! See http://factorcode.org/license.txt for BSD license
 
 USING: accessors calendar calendar.format io io.encodings.utf8
-io.sockets io.streams.byte-array io.streams.string literals math
-math.parser namespaces sequences ;
+io.sockets io.streams.byte-array literals math math.parser
+namespaces sequences ;
 
 IN: syslog
 

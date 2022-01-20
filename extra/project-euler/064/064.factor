@@ -1,6 +1,5 @@
-USING: accessors arrays classes.tuple io kernel locals math
-math.functions ranges prettyprint project-euler.common
-sequences ;
+USING: accessors classes.tuple kernel math math.functions
+project-euler.common ranges sequences ;
 IN: project-euler.064
 
 ! http://projecteuler.net/index.php?section=problems&id=64

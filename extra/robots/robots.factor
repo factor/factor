@@ -1,7 +1,7 @@
 ! Copyright (C) 2009 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs calendar.parser combinators
-combinators.short-circuit fry globs http.client kernel math.parser
+combinators.short-circuit globs http.client kernel math.parser
 namespaces present regexp regexp.combinators sequences splitting
 splitting.monotonic unicode urls ;
 IN: robots

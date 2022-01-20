@@ -1,10 +1,9 @@
 ! Copyright (C) 2010 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors alien alien.c-types alien.data alien.strings
-alien.syntax arrays byte-arrays classes.struct combinators
-combinators.smart destructors io.encodings.string
-io.encodings.utf8 io.sockets io.sockets.private kernel libc
-make refs sequences windows.errors windows.kernel32
+USING: accessors alien alien.c-types alien.data alien.syntax
+classes.struct combinators combinators.smart destructors
+io.encodings.string io.encodings.utf8 io.sockets.private kernel
+libc make sequences windows.errors windows.kernel32
 windows.types windows.winsock ;
 IN: windows.iphlpapi
 

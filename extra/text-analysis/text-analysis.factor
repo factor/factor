@@ -1,7 +1,7 @@
 ! Copyright (C) 2014 John Benediktsson
 ! See http://factorcode.org/license.txt for BSD license
 
-USING: accessors combinators formatting fry io.encodings.ascii
+USING: accessors combinators formatting io.encodings.ascii
 io.files kernel literals math math.functions math.order
 multiline regexp sequences sequences.extras sets splitting
 unicode ;

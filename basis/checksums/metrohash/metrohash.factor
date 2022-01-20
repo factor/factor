@@ -1,11 +1,7 @@
 ! Copyright (C) 2018 John Benediktsson.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors alien.c-types alien.data byte-arrays checksums
-combinators endian grouping kernel locals math math.bitwise
-sequences specialized-arrays ;
-SPECIALIZED-ARRAY: uint64_t
-SPECIALIZED-ARRAY: uint32_t
-SPECIALIZED-ARRAY: uint16_t
+combinators endian grouping kernel math math.bitwise sequences ;
 
 IN: checksums.metrohash
 

@@ -3,7 +3,7 @@
 USING: accessors combinators environment
 gobject-introspection.common gobject-introspection.ffi
 gobject-introspection.loader gobject-introspection.types io
-io.files io.pathnames kernel lexer locals make namespaces parser
+io.files io.pathnames kernel lexer make namespaces parser
 sequences splitting summary vocabs vocabs.parser xdg xml ;
 IN: gobject-introspection
 

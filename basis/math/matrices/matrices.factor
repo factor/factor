@@ -1,11 +1,8 @@
 ! Copyright (C) 2005, 2010, 2018, 2020 Slava Pestov, Joe Groff, and Cat Stevens.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays classes.singleton columns combinators
-combinators.short-circuit combinators.smart formatting fry
-grouping kernel locals math math.bits math.functions math.order
-math.private ranges math.statistics math.vectors
-math.vectors.private sequences sequences.deep sequences.private
-slots.private summary ;
+USING: arrays combinators combinators.short-circuit kernel math
+math.functions math.order math.private math.vectors ranges
+sequences sequences.deep sequences.private slots.private ;
 IN: math.matrices
 
 ! defined here because of issue #1943

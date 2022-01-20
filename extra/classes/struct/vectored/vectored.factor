@@ -1,7 +1,7 @@
 ! Copyright (C) 2009 Joe Groff.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors classes.struct classes.tuple combinators fry
-functors kernel locals macros math parser quotations sequences
+USING: accessors classes.struct classes.tuple combinators
+functors kernel math parser quotations sequences
 sequences.private slots specialized-arrays words ;
 IN: classes.struct.vectored
 

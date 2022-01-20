@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license
 
 USING: accessors byte-arrays classes combinators endian io
-io.encodings.binary io.files io.streams.byte-array kernel locals
+io.encodings.binary io.files io.streams.byte-array kernel
 math math.order math.statistics sequences sequences.extras sets
 ;
 

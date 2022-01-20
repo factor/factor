@@ -2,8 +2,8 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs bit-arrays byte-arrays classes
 classes.tuple combinators combinators.short-circuit
-combinators.smart continuations effects fry generalizations
-kernel locals macros make math math.functions namespaces parser
+combinators.smart continuations effects generalizations
+kernel make math math.functions namespaces parser
 quotations sbufs sequences sequences.generalizations slots
 splitting stack-checker strings summary vectors words
 words.symbol ;

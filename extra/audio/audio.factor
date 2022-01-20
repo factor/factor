@@ -1,6 +1,6 @@
 ! Copyright (C) 2010 Joe Groff.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors alien arrays combinators kernel math openal ;
+USING: accessors alien arrays combinators math openal ;
 IN: audio
 
 TUPLE: audio

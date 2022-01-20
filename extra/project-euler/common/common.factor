@@ -1,7 +1,7 @@
 ! Copyright (c) 2007-2010 Aaron Schaefer.
 ! The contents of this file are licensed under the Simplified BSD License
 ! A copy of the license is available at http://factorcode.org/license.txt
-USING: accessors arrays byte-arrays fry hints kernel lists make
+USING: accessors arrays byte-arrays hints kernel lists make
 math math.functions math.matrices math.order math.parser
 math.primes.factors math.primes.lists ranges math.ratios
 math.vectors parser prettyprint sequences sorting strings

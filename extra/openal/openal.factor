@@ -1,9 +1,8 @@
 ! Copyright (C) 2007 Chris Double.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel accessors arrays alien system combinators
-alien.syntax namespaces sequences vocabs.loader
-shuffle alien.libraries generalizations
-specialized-arrays alien.destructors alien.data ;
+USING: alien alien.data alien.destructors alien.libraries
+alien.syntax arrays combinators kernel sequences
+specialized-arrays system ;
 FROM: alien.c-types => char double float int short uchar uint
 ushort void ;
 SPECIALIZED-ARRAY: uint

@@ -1,6 +1,6 @@
 ! Copyright (C) 2017 John Benediktsson, Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: ascii assocs checksums checksums.sha combinators fry
+USING: ascii assocs checksums checksums.sha combinators
 kernel math math.functions math.parser ranges
 math.statistics sequences sets sorting splitting strings uuid ;
 IN: escape-strings

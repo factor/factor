@@ -1,8 +1,8 @@
 ! Copyright (C) 2021 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors alien alien.data arrays classes.struct io
-kernel namespaces prettyprint ui.backend.windows
-ui.gadgets.worlds windows.errors windows.types windows.user32 ;
+USING: accessors alien arrays io kernel namespaces prettyprint
+ui.backend.windows ui.gadgets.worlds windows.errors windows.types
+windows.user32 ;
 IN: windows.hardware
 
 : monitor-enum-proc ( -- callback )

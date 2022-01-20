@@ -1,6 +1,5 @@
 USING: alien alien.c-types alien.destructors alien.libraries
-alien.libraries.finder alien.syntax assocs classes.struct kernel sequences
-system ;
+alien.libraries.finder alien.syntax classes.struct ;
 IN: python.ffi
 
 << "python"

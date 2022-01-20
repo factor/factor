@@ -4,7 +4,7 @@
 ! Space Invaders: http://www.emuparadise.me/M.A.M.E._-_Multiple_Arcade_Machine_Emulator_ROMs/Space_Invaders_--_Space_Invaders_M/13774
 USING: accessors alien.c-types alien.data arrays
 combinators cpu.8080 cpu.8080.emulator io.pathnames kernel
-locals math math.order openal openal.alut opengl.gl sequences
+math math.order openal openal.alut opengl.gl sequences
 specialized-arrays ui ui.gadgets ui.gestures ui.render ;
 QUALIFIED: threads
 QUALIFIED: system

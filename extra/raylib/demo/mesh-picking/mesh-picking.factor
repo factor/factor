@@ -1,8 +1,8 @@
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors alien.enums arrays classes.struct combinators.short-circuit
-continuations destructors formatting grouping io.backend io.pathnames kernel math
-math.functions.private math.vectors namespaces raylib sequences threads
-vocabs.metadata ;
+USING: accessors alien.enums arrays combinators.short-circuit
+continuations destructors formatting grouping io.backend io.pathnames
+kernel math math.functions.private math.vectors namespaces raylib
+sequences vocabs.metadata ;
 
 IN: raylib.demo.mesh-picking
 

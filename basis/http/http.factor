@@ -1,7 +1,7 @@
 ! Copyright (C) 2003, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays ascii assocs base64 calendar calendar.format
-calendar.parser combinators fry hashtables http.parsers io io.crlf
+calendar.parser combinators hashtables http.parsers io io.crlf
 io.encodings.iana io.encodings.utf8 kernel make math math.parser
 mime.types present sequences sets sorting splitting urls ;
 IN: http

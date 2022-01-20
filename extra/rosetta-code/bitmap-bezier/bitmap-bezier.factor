@@ -1,8 +1,7 @@
 ! Copyright (c) 2012 Anonymous
 ! See http://factorcode.org/license.txt for BSD license.
-USING: arrays assocs kernel locals math math.functions
-math.vectors rosetta-code.bitmap rosetta-code.bitmap-line
-sequences ;
+USING: assocs kernel math math.functions math.vectors
+rosetta-code.bitmap-line sequences ;
 IN: rosetta-code.bitmap-bezier
 
 ! http://rosettacode.org/wiki/Bitmap/Bézier_curves/Cubic
