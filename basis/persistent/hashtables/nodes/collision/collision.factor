@@ -1,10 +1,7 @@
 ! Based on Clojure's PersistentHashMap by Rich Hickey.
 
-USING: kernel accessors math arrays fry sequences
-locals persistent.sequences
-persistent.hashtables.config
-persistent.hashtables.nodes
-persistent.hashtables.nodes.leaf ;
+USING: accessors kernel persistent.hashtables.nodes
+persistent.hashtables.nodes.leaf persistent.sequences sequences ;
 IN: persistent.hashtables.nodes.collision
 
 : find-index ( key hashcode collision-node -- n leaf-node )
