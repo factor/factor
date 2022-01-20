@@ -11,15 +11,6 @@ IN: python
     "builtins" "None" py-import-from <none> =
 ] py-test
 
-! Pretty sure the # of None references should stay constant.
-: count-none-refs ( -- n )
-    "sys" "getrefcount" py-import-from
-    <none> <1py-tuple> call-object py> ;
-
-{ t } [ count-none-refs count-none-refs = ] py-test
-
-{ } [ { f f f } >py drop ] py-test
-
 ! Destructors
 { 1 } [ 33 >py drop always-destructors get length ] py-test
 
