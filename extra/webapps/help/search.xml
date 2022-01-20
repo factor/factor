@@ -9,6 +9,8 @@
 
     <div class="page">
 
+    <p><b>Search results for '<t:label t:name="search" />'</b></p>
+
     <div class="tabs">
 
     <t:if t:value="words">
