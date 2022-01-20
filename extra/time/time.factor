@@ -1,6 +1,6 @@
 ! Copyright (C) 2010 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: combinators kernel system vocabs ;
+USING: combinators system vocabs ;
 IN: time
 
 HOOK: set-system-time os ( timestamp -- )

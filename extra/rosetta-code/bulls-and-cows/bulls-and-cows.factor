@@ -1,8 +1,7 @@
 ! Copyright (c) 2012 Anonymous
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors assocs combinators fry grouping hashtables
-kernel locals math math.parser ranges random sequences
-strings io ascii ;
+USING: accessors ascii assocs combinators io kernel math
+math.parser random ranges sequences ;
 IN: rosetta-code.bulls-and-cows
 
 ! http://rosettacode.org/wiki/Bulls_and_cows

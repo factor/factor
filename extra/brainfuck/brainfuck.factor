@@ -1,7 +1,7 @@
 ! Copyright (C) 2009 John Benediktsson
 ! See http://factorcode.org/license.txt for BSD license
 
-USING: accessors assocs command-line fry io io.encodings.binary
+USING: accessors assocs command-line io io.encodings.binary
 io.files io.streams.string kernel macros math namespaces
 peg.ebnf prettyprint sequences multiline ;
 

@@ -1,4 +1,4 @@
-USING: math.private kernel debugger ;
+USING: math.private kernel ;
 IN: benchmark.fib1
 
 : fast-fixnum-fib ( m -- n )

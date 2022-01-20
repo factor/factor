@@ -1,6 +1,6 @@
 ! Copyright (C) 2020 Alexander Ilin.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: arrays fry kernel make sequences ;
+USING: arrays kernel make sequences ;
 
 IN: rosetta-code.multisplit
 

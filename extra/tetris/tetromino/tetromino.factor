@@ -1,8 +1,7 @@
 ! Copyright (C) 2006, 2007, 2008 Alex Chapman
 ! See http://factorcode.org/license.txt for BSD license.
 
-USING: kernel arrays namespaces sequences math math.order
-math.vectors colors random ;
+USING: colors math namespaces random sequences ;
 
 IN: tetris.tetromino
 

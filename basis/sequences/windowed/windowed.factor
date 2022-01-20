@@ -1,7 +1,7 @@
 ! Copyright (C) 2012 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors fry kernel locals math math.order
-math.statistics sequences sequences.private ;
+USING: accessors kernel math math.order math.statistics
+sequences sequences.private ;
 IN: sequences.windowed
 
 TUPLE: windowed-sequence

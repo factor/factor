@@ -1,9 +1,7 @@
 ! Copyright (C) 2019 Jack Lucas
 ! See http://factorcode.org/license.txt for BSD license.
 
-USING: raylib kernel ranges sequences locals random
-combinators.random  math threads calendar namespaces accessors
-classes.struct combinators alien.enums ;
+USING: alien.enums kernel raylib ;
 
 IN: raylib.demo.gui
 

@@ -5,8 +5,7 @@ combinators.short-circuit compiler.cfg.instructions
 compiler.cfg.utilities compiler.cfg.value-numbering.graph
 compiler.cfg.value-numbering.math
 compiler.cfg.value-numbering.rewrite cpu.architecture
-endian generalizations grouping kernel locals make math
-sequences ;
+endian generalizations grouping kernel make math sequences ;
 IN: compiler.cfg.value-numbering.simd
 
 ! Some lame constant folding for SIMD intrinsics. Eventually this

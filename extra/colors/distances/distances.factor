@@ -1,7 +1,7 @@
 ! Copyright (C) 2014 John Benediktsson
 ! See http://factorcode.org/license.txt for BSD license
 
-USING: accessors colors colors.lab colors.lch kernel locals math
+USING: accessors colors colors.lab colors.lch kernel math
 math.functions math.libm math.order math.trig ;
 
 IN: colors.distances

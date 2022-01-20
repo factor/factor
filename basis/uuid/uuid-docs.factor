@@ -1,5 +1,4 @@
-
-USING: help.syntax help.markup kernel prettyprint sequences strings ;
+USING: help.markup help.syntax strings ;
 
 IN: uuid
 

@@ -1,8 +1,7 @@
 ! Copyright (C) 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays assocs combinators kernel math
-math.statistics namespaces sequences sorting xml.syntax
-spider urls html ;
+USING: accessors arrays assocs combinators html kernel math
+math.statistics namespaces sequences sorting urls xml.syntax ;
 IN: spider.report
 
 SYMBOL: network-failures

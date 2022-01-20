@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 
 USING: accessors combinators kernel lists math math.functions
-sequences system tetris.board tetris.piece tetris.tetromino ;
+sequences system tetris.board tetris.piece ;
 
 IN: tetris.game
 

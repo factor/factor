@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: xml io kernel math sequences strings xml.traversal
 tools.test math.parser xml.syntax xml.data xml.syntax.private
-accessors multiline locals inverse xml.writer splitting classes
+accessors multiline inverse xml.writer splitting classes
 xml.private ;
 IN: xml.syntax.tests
 

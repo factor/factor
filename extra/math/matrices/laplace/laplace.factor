@@ -1,7 +1,7 @@
 ! Copyright (C) 2013 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays classes fry kernel locals math
-math.matrices math.vectors sequences sequences.private ;
+USING: accessors classes kernel math math.matrices math.vectors
+sequences sequences.private ;
 IN: math.matrices.laplace
 
 <PRIVATE

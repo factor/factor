@@ -1,7 +1,7 @@
 ! Copyright (C) 2019 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: assocs command-line help.lint io kernel namespaces
-prettyprint sequences system vocabs vocabs.loader ;
+prettyprint sequences system vocabs ;
 IN: zealot.help-lint
 
 ! FIXME: help-lint sometimes lists monitors and event-streams as leaked.

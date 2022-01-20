@@ -1,9 +1,8 @@
 ! Copyright (C) 2010 John Benediktsson
 ! See http://factorcode.org/license.txt for BSD license
 
-USING: assocs calendar combinators environment formatting
-grouping io io.files kernel make math ranges sequences
-splitting xml.entities ;
+USING: assocs calendar environment formatting grouping io.files
+kernel make math ranges sequences splitting xml.entities ;
 
 IN: text-to-pdf
 

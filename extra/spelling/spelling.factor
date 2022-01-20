@@ -1,9 +1,9 @@
 ! Copyright (C) 2010 John Benediktsson
 ! See http://factorcode.org/license.txt for BSD license
-USING: arrays ascii assocs combinators combinators.smart fry
+USING: arrays ascii assocs combinators combinators.smart
 http.client io.encodings.ascii io.files io.files.temp kernel
-locals math ranges math.statistics memoize sequences
-sequences.private sorting splitting urls ;
+math math.statistics ranges sequences sequences.private sorting
+splitting urls ;
 IN: spelling
 
 ! http://norvig.com/spell-correct.html

@@ -1,12 +1,10 @@
 ! Copyright (C) 2010 Erik Charlebois.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays classes.struct destructors game.loop
-game.worlds gpu gpu.buffers gpu.effects.blur gpu.framebuffers
-gpu.render gpu.shaders gpu.state gpu.textures gpu.util images
-images.loader kernel literals locals make math math.rectangles
-math.vectors namespaces opengl.gl sequences specialized-arrays
-ui.gadgets.worlds ui.gestures ui.pixel-formats gpu.effects.step
-images.pgm images.ppm alien.data ;
+USING: accessors alien.data classes.struct destructors game.loop
+game.worlds gpu gpu.effects.blur gpu.effects.step gpu.state
+gpu.textures gpu.util images.loader kernel literals make math
+math.vectors namespaces sequences specialized-arrays
+ui.gadgets.worlds ui.gestures ui.pixel-formats ;
 FROM: alien.c-types => float ;
 SPECIALIZED-ARRAY: float
 IN: fluids

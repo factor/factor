@@ -2,10 +2,8 @@
 ! See http://factorcode.org/license.txt for BSD license
 
 USING: accessors alien.c-types alien.data byte-arrays checksums
-endian grouping kernel literals math math.bitwise math.order
-sequences sequences.generalizations sequences.private
-specialized-arrays ;
-SPECIALIZED-ARRAY: uint64_t
+endian grouping kernel math math.bitwise
+sequences sequences.generalizations sequences.private ;
 IN: checksums.wyhash
 
 <PRIVATE

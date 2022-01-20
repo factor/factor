@@ -1,6 +1,7 @@
 ! Copyright (C) 2007, 2008 Alex Chapman
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays kernel locals math math.constants math.functions math.matrices math.vectors random sequences ;
+USING: accessors arrays kernel math math.functions math.vectors
+random sequences ;
 IN: jamshred.oint
 
 ! An oint is a point with three linearly independent unit vectors

@@ -1,9 +1,9 @@
 ! Copyright (C) 2007, 2008 Alex Chapman
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays calendar jamshred.game jamshred.gl
-jamshred.player jamshred.log kernel math math.constants
-math.rectangles math.vectors namespaces sequences threads ui
-ui.backend ui.gadgets ui.gadgets.worlds ui.gestures ui.render ;
+jamshred.player kernel math math.constants math.vectors
+namespaces sequences threads ui ui.gadgets ui.gadgets.worlds
+ui.gestures ui.render ;
 IN: jamshred
 
 TUPLE: jamshred-gadget < gadget { jamshred jamshred } last-hand-loc ;

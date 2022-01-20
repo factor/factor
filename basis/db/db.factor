@@ -1,6 +1,6 @@
 ! Copyright (C) 2008 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors assocs continuations destructors fry kernel
+USING: accessors assocs continuations destructors kernel
 namespaces sequences strings ;
 IN: db
 

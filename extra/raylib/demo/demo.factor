@@ -1,7 +1,6 @@
 ! Copyright (C) 2019 Jack Lucas
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors alien.enums classes.struct combinators kernel
-math namespaces raylib ;
+USING: accessors combinators kernel math namespaces raylib ;
 IN: raylib.demo
 
 : say-hello ( -- )

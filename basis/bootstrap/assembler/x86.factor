@@ -2,8 +2,8 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: bootstrap.image.private compiler.codegen.relocation
 compiler.constants compiler.units cpu.x86.assembler
-cpu.x86.assembler.operands kernel kernel.private layouts locals
-locals.backend math math.private memory namespaces sequences
+cpu.x86.assembler.operands kernel kernel.private layouts
+locals.backend math math.private namespaces sequences
 slots.private strings.private vocabs ;
 IN: bootstrap.x86
 

@@ -1,7 +1,6 @@
 ! Copyright (C) 2009 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: decimals kernel locals math math.combinatorics ranges
-sequences ;
+USING: decimals kernel math ranges sequences ;
 IN: benchmark.e-decimals
 
 : D-factorial ( n -- D! )

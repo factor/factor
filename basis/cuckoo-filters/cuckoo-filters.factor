@@ -2,8 +2,8 @@
 ! See http://factorcode.org/license.txt for BSD license
 
 USING: accessors alien alien.c-types alien.data arrays checksums
-checksums.sha combinators.short-circuit kernel locals math
-math.bitwise random sequences ;
+checksums.sha combinators.short-circuit kernel math math.bitwise
+random sequences ;
 
 IN: cuckoo-filters
 

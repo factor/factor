@@ -3,8 +3,7 @@
 
 USING: accessors arrays ascii assocs calendar calendar.english
 calendar.private combinators combinators.short-circuit io kernel
-literals locals math math.order math.parser ranges
-sequences splitting ;
+literals math math.order math.parser ranges sequences splitting ;
 
 IN: crontab
 

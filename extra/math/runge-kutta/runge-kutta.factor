@@ -1,5 +1,5 @@
-USING: kernel accessors fry combinators sequences sequences.generalizations
-       arrays math math.vectors math.functions ;
+USING: kernel accessors combinators sequences sequences.generalizations
+arrays math math.vectors ;
 IN: math.runge-kutta
 
 : runge-kutta-2-transform ( rk1 tx..n delta -- tx..n' delta )

@@ -1,12 +1,12 @@
 ! Copyright (C) 2010 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors alien.enums alien.syntax arrays calendar
-combinators combinators.smart constructors destructors endian
+combinators combinators.smart constructors endian
 grouping io io.encodings.binary io.encodings.string
 io.encodings.utf8 io.sockets io.sockets.private
 io.streams.byte-array io.timeouts kernel make math math.bitwise
 math.parser namespaces random sequences slots.syntax splitting
-system vectors vocabs strings ascii ;
+system vectors vocabs ascii ;
 IN: dns
 
 : with-input-seek ( n seek-type quot -- )

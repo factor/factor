@@ -1,8 +1,6 @@
 ! Copyright (C) 2009 Keith Lazuka, Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: assocs colors combinators combinators.short-circuit
-hashtables io.styles kernel literals namespaces sequences words
-words.symbol ;
+USING: assocs colors io.styles kernel namespaces sequences words ;
 IN: prettyprint.stylesheet
 
 <PRIVATE

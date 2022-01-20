@@ -1,11 +1,9 @@
 ! Copyright (C) 2014 John Benediktsson.
 ! See http://factorcode.org/license.txt for BSD license.
 
-USING: accessors alien alien.c-types alien.data byte-arrays
+USING: accessors alien.c-types alien.data byte-arrays
 checksums combinators endian generalizations grouping kernel
-locals math math.bitwise ranges sequences
-specialized-arrays ;
-SPECIALIZED-ARRAY: uint64_t
+math math.bitwise sequences ;
 
 IN: checksums.xxhash
 

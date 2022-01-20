@@ -1,7 +1,7 @@
 ! Copyright (C) 2010 John Benediktsson
 ! See http://factorcode.org/license.txt for BSD license
 
-USING: command-line formatting fry io io.encodings
+USING: command-line formatting io io.encodings
 io.encodings.binary io.files kernel namespaces sequences ;
 
 IN: tools.cat

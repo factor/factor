@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license
 
 USING: accessors colors colors.gray colors.hsl combinators
-kernel locals math math.order ;
+kernel math math.order ;
 
 IN: colors.hwb
 

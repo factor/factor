@@ -1,14 +1,13 @@
 ! Copyright (C) 2013 Björn Lindqvist, John Benediktsson
 ! See http://factorcode.org/license.txt for BSD license
 
-USING: alien.data alien.libraries.finder alien.strings arrays
-byte-arrays combinators.short-circuit environment io.backend
-io.files io.files.info io.pathnames kernel sequences
+USING: alien.c-types alien.data alien.libraries.finder
+alien.strings arrays combinators.short-circuit environment
+io.backend io.files io.files.info io.pathnames kernel sequences
 specialized-arrays splitting system system-info.windows
-windows.kernel32 windows.types ;
+windows.kernel32 ;
 FROM: alien.c-types => ushort ;
 SPECIALIZED-ARRAY: ushort
-
 IN: alien.libraries.finder.windows
 
 <PRIVATE

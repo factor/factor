@@ -1,7 +1,7 @@
 ! Copyright (c) 2012 Anonymous
 ! See http://factorcode.org/license.txt for BSD license.
 USING: grouping http.client io io.encodings.utf8 io.files
-io.files.temp kernel math memoize sequences sequences.extras
+io.files.temp kernel math sequences sequences.extras
 unicode urls ;
 IN: rosetta-code.ordered-words
 

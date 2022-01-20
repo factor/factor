@@ -1,7 +1,7 @@
 ! Copyright (C) 2014 John Benediktsson
 ! See http://factorcode.org/license.txt for BSD license
 
-USING: kernel locals math math.order ranges sequences
+USING: kernel math math.order ranges sequences
 sequences.private ;
 
 IN: sorting.bubble

@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: tools.test core-text core-text.fonts core-foundation
 core-foundation.dictionaries destructors arrays kernel
-generalizations locals math accessors core-foundation.utilities
+generalizations math accessors core-foundation.utilities
 combinators hashtables colors ;
 IN: core-text.tests
 

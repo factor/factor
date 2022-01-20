@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors alien alien.parser alien.strings arrays assocs
 cocoa.messages cocoa.runtime combinators compiler.units fry
-io.encodings.utf8 kernel lexer locals locals.parser locals.types
+io.encodings.utf8 kernel lexer locals.parser locals.types
 make namespaces parser sequences words ;
 IN: cocoa.subclassing
 

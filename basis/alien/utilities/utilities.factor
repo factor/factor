@@ -1,7 +1,7 @@
 ! Copyright (C) 2008 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: alien alien.c-types alien.data alien.strings
-combinators.short-circuit fry kernel layouts sequences accessors
+combinators.short-circuit kernel layouts sequences
 specialized-arrays ;
 IN: alien.utilities
 

@@ -1,6 +1,6 @@
 ! Copyright (C) 2007-2009 Samuel Tardieu.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: combinators combinators.short-circuit fry kernel locals
+USING: combinators combinators.short-circuit kernel
 math math.bitwise math.functions math.order math.primes.erato
 math.primes.erato.private math.primes.miller-rabin ranges
 literals random sequences sets vectors ;

@@ -1,8 +1,7 @@
 ! Copyright (C) 2009 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays combinators grouping kernel locals math
-math.matrices math.order multiline sequences.parser sequences
-tools.continuations ;
+USING: arrays combinators grouping kernel math math.matrices
+math.order sequences sequences.parser ;
 IN: compression.run-length
 
 : run-length-uncompress ( byte-array -- byte-array' )

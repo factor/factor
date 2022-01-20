@@ -1,7 +1,7 @@
 ! Copyright (C) 2009 Slava Pestov, Joe Groff.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors alien alien.data combinators cpu.architecture fry
-grouping kernel libc locals math math.libm math.order ranges
+USING: accessors alien alien.data combinators cpu.architecture
+grouping kernel libc math math.libm math.order ranges
 sequences sequences.cords sequences.generalizations sequences.private
 sequences.unrolled sequences.unrolled.private specialized-arrays
 vocabs ;

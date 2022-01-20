@@ -1,7 +1,7 @@
 ! Copyright (C) 2009 Bruno Deferrari
 ! See http://factorcode.org/license.txt for BSD license.
-USING: help.markup help.syntax quotations kernel
-irc.messages irc.messages.base irc.messages.parser irc.client.chats ;
+USING: help.markup help.syntax irc.client.chats irc.messages
+irc.messages.base ;
 IN: irc.client
 
 HELP: connect-irc "Connecting to an irc server"
