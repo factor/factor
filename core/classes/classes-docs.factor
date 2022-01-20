@@ -1,5 +1,4 @@
-USING: classes.private help.markup help.syntax kernel quotations
-sequences words ;
+USING: classes.private help.markup help.syntax kernel sequences words ;
 IN: classes
 
 ARTICLE: "class-predicates" "Class predicate words"

@@ -1,7 +1,7 @@
 ! Copyright (C) 2010 Joe Groff.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors assocs hashtables hashtables.wrapped kernel
-parser vocabs.loader ;
+vocabs.loader ;
 IN: hashtables.identity
 
 <PRIVATE

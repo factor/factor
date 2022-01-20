@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs classes classes.algebra
 classes.algebra.private classes.maybe classes.private
-combinators definitions kernel make math namespaces sequences
+combinators definitions kernel make namespaces sequences
 sets words ;
 IN: generic
 

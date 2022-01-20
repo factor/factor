@@ -1,8 +1,7 @@
 ! Copyright (C) 2008, 2009 Slava Pestov, Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors assocs combinators continuations kernel
-kernel.private lexer math math.parser namespaces sbufs sequences
-splitting strings ;
+USING: accessors assocs combinators kernel kernel.private lexer
+math math.parser namespaces sbufs sequences splitting strings ;
 IN: strings.parser
 
 ERROR: bad-escape char ;

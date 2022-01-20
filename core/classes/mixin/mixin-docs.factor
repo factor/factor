@@ -1,4 +1,4 @@
-USING: help.markup help.syntax help words compiler.units
+USING: help.markup help.syntax words compiler.units
 classes sequences ;
 IN: classes.mixin
 

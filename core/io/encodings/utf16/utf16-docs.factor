@@ -1,6 +1,6 @@
 ! Copyright (C) 2008 Daniel Ehrenberg
 ! See http://factorcode.org/license.txt for BSD license.
-USING: help.markup help.syntax io.encodings strings ;
+USING: help.markup help.syntax ;
 IN: io.encodings.utf16
 
 ARTICLE: "io.encodings.utf16" "UTF-16 encoding"

@@ -1,4 +1,4 @@
-USING: assocs arrays generic.single help.markup help.syntax kernel
+USING: arrays generic.single help.markup help.syntax kernel
 layouts math math.order quotations sequences.private vectors ;
 IN: sequences
 

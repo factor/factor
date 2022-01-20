@@ -1,4 +1,4 @@
-USING: help.markup help.syntax locals locals.types quotations strings
+USING: help.markup help.syntax locals.types quotations strings
 vocabs.parser ;
 IN: locals.parser
 

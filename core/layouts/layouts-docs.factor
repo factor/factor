@@ -1,6 +1,5 @@
-USING: generic help.markup help.syntax kernel math
-memory namespaces sequences kernel.private classes
-classes.builtin sequences.private ;
+USING: help.markup help.syntax math kernel.private classes
+classes.builtin ;
 IN: layouts
 
 HELP: tag-bits

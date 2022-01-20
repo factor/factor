@@ -1,7 +1,7 @@
 ! Copyright (C) 2003, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays assocs hashtables kernel kernel.private
-math sequences vectors ;
+USING: accessors assocs hashtables kernel kernel.private math
+sequences vectors ;
 IN: namespaces
 
 <PRIVATE

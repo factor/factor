@@ -1,5 +1,4 @@
-USING: generic generic.single generic.standard help.markup help.syntax sequences math
-math.parser effects ;
+USING: generic.standard help.markup help.syntax ;
 IN: generic.hook
 
 HELP: hook-combination

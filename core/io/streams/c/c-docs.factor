@@ -1,5 +1,4 @@
-USING: help.markup help.syntax io io.files threads
-strings byte-arrays io.streams.plain alien math ;
+USING: alien help.markup help.syntax io.files math ;
 IN: io.streams.c
 
 ARTICLE: "io.streams.c" "ANSI C streams"

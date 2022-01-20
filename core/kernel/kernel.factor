@@ -1,7 +1,9 @@
 ! Copyright (C) 2004, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 IN: math DEFER: <= DEFER: - ! for bootstrap
-USING: kernel.private slots.private math.private ;
+USE: slots.private
+USE: kernel.private
+USE: math.private
 IN: kernel
 
 BUILTIN: callstack ;
