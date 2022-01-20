@@ -1,4 +1,4 @@
-USING: help.markup help.syntax math sequences strings ;
+USING: help.markup help.syntax math sequences ;
 IN: poker
 
 HELP: best-holdem-hand

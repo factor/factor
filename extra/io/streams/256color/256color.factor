@@ -2,9 +2,9 @@
 ! See http://factorcode.org/license.txt for BSD license
 
 USING: accessors arrays assocs destructors environment
-formatting fry io io.streams.string io.styles kernel locals
-math math.functions ranges math.vectors namespaces
-sequences sequences.extras strings strings.tables ;
+formatting io io.streams.string io.styles kernel math
+math.functions math.vectors namespaces ranges sequences strings
+strings.tables ;
 
 IN: io.streams.256color
 

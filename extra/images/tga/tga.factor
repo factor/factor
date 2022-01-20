@@ -1,9 +1,9 @@
 ! Copyright (C) 2010 Erik Charlebois
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors endian images images.loader io kernel
-locals math sequences io.encodings.ascii io.encodings.string
-calendar ranges math.parser colors arrays hashtables
-ui.pixel-formats combinators continuations io.streams.throwing ;
+USING: accessors arrays calendar colors combinators
+continuations endian hashtables images images.loader io
+io.encodings.ascii io.encodings.string io.streams.throwing
+kernel math math.parser ranges sequences ;
 IN: images.tga
 
 SINGLETON: tga-image

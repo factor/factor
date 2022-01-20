@@ -1,7 +1,6 @@
 ! Copyright (C) 2019-2020 KUSUMOTO Norio.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: logic lists assocs sequences kernel math
-locals formatting io ;
+USING: assocs formatting io kernel lists logic math sequences ;
 IN: logic.examples.money
 
 LOGIC-PREDS: sumo sum1o digitsumo delo donaldo moneyo ;

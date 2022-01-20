@@ -1,12 +1,9 @@
 ! Copyright (C) 2008, 2010 Slava Pestov, Daniel Ehrenberg
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors kernel namespaces io math.parser assocs classes
-classes.tuple words arrays sequences splitting mirrors
-hashtables combinators continuations math strings inspector
-fry locals calendar calendar.format xml.entities xml.data
-validators urls present xml.writer xml.syntax xml
-xmode.code2html lcs.diff2html farkup io.streams.string
-html html.streams html.forms ;
+USING: accessors arrays combinators farkup html html.forms
+html.streams inspector io kernel lcs.diff2html namespaces
+present sequences splitting strings urls xml.data xml.syntax
+xml.writer xmode.code2html ;
 IN: html.components
 
 GENERIC: render* ( value name renderer -- xml )

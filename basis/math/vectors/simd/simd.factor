@@ -3,7 +3,7 @@ cpu.architecture effects functors generalizations kernel lexer
 literals math math.bitwise math.vectors
 math.vectors.simd.intrinsics parser prettyprint.custom
 quotations sequences sequences.generalizations sequences.private
-vocabs.loader words ;
+words ;
 QUALIFIED-WITH: alien.c-types c
 IN: math.vectors.simd
 
@@ -367,5 +367,3 @@ M: short-8 v*hs+
     short-8-rep [ (simd-v*hs+) ] [ call-next-method ] vv->v-op int-4-cast ; inline
 M: int-4 v*hs+
     int-4-rep [ (simd-v*hs+) ] [ call-next-method ] vv->v-op longlong-2-cast ; inline
-
-{ "math.vectors.simd" "mirrors" } "math.vectors.simd.mirrors" require-when

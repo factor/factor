@@ -1,7 +1,7 @@
 ! Copyright (C) 2012 John Benediktsson, Doug Coleman
 ! See http://factorcode.org/license.txt for BSD license
-USING: arrays assocs assocs.private fry generalizations kernel
-math math.statistics sequences sequences.extras sets ;
+USING: arrays assocs assocs.private kernel math math.statistics
+sequences sets ;
 IN: assocs.extras
 
 : deep-at ( assoc seq -- value/f )

@@ -1,6 +1,6 @@
 ! Copyright (c) 2012 Anonymous
 ! See http://factorcode.org/license.txt for BSD license.
-USING: assocs fry http.client io.encodings.utf8 io.files
+USING: assocs http.client io.encodings.utf8 io.files
 io.files.temp kernel math math.combinatorics sequences sorting
 strings urls ;
 

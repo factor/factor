@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors alien.libraries.finder assocs bootstrap.image
 hashtables io io.directories io.encodings.utf8 io.files
-io.files.temp io.launcher io.pathnames kernel locals make
+io.files.temp io.launcher io.pathnames kernel make
 namespaces prettyprint sequences splitting system
 tools.deploy.config tools.deploy.config.editor
 tools.deploy.embed vocabs.loader vocabs.metadata.resources

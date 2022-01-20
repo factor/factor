@@ -1,6 +1,6 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors assocs combinators fry furnace.utilities
+USING: accessors assocs combinators furnace.utilities
 html.components html.forms html.templates
 html.templates.chloe.compiler html.templates.chloe.syntax kernel
 namespaces present sequences splitting urls xml.data xml.syntax

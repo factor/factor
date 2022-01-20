@@ -1,7 +1,6 @@
 ! Copyright (c) 2012 Anonymous
 ! See http://factorcode.org/license.txt for BSD license.
-USING: arrays kernel locals math math.parser ranges
-prettyprint sequences ;
+USING: arrays kernel math math.parser prettyprint ranges sequences ;
 IN: rosetta-code.gray-code
 
 ! http://rosettacode.org/wiki/Gray_code

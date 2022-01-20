@@ -1,9 +1,8 @@
 ! Copyright (C) 2010 John Benediktsson
 ! See http://factorcode.org/license.txt for BSD license
 
-USING: accessors arrays calendar combinators destructors
-fry formatting kernel io io.sockets math pack random
-sequences ;
+USING: accessors arrays calendar combinators formatting
+io.sockets kernel math pack random sequences ;
 
 IN: ntp
 

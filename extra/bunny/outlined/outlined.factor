@@ -1,8 +1,7 @@
-USING: arrays bunny.model bunny.cel-shaded continuations
-destructors kernel literals math multiline opengl opengl.shaders
-opengl.framebuffers opengl.gl opengl.textures opengl.demo-support fry
-opengl.capabilities sequences ui.gadgets combinators accessors
-macros locals ;
+USING: accessors arrays bunny.cel-shaded bunny.model combinators
+destructors kernel literals multiline opengl opengl.capabilities
+opengl.demo-support opengl.framebuffers opengl.gl opengl.shaders
+opengl.textures sequences ;
 FROM: opengl.demo-support => rect-vertices ;
 IN: bunny.outlined
 

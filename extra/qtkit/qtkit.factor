@@ -1,6 +1,5 @@
 USING: alien.c-types classes.struct cocoa cocoa.application
-cocoa.classes cocoa.enumeration cocoa.plists core-foundation
-core-foundation.strings kernel ;
+cocoa.classes core-foundation core-foundation.strings kernel ;
 IN: qtkit
 
 STRUCT: QTTime

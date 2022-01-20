@@ -1,6 +1,6 @@
 ! Copyright (C) 2018 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors editors fry kernel sequences ui ui.gadgets
+USING: accessors editors kernel sequences ui ui.gadgets
 ui.gadgets.borders ui.gadgets.buttons ui.gadgets.packs
 ui.gadgets.scrollers ui.tools.listener vocabs.loader ;
 IN: editors.ui

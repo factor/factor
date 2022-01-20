@@ -1,8 +1,8 @@
 ! Copyright (C) 2009 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors assocs combinators.short-circuit http.client
+USING: accessors combinators.short-circuit http.client
 images.loader images.loader.private images.viewer io.pathnames
-kernel namespaces present sequences strings urls ;
+kernel present sequences strings urls ;
 IN: images.http
 
 <PRIVATE

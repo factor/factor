@@ -1,6 +1,5 @@
-USING: arrays assocs environment hashtables io.encodings.utf8
-io.files io.pathnames kernel memoize sequences splitting system
-unicode ;
+USING: assocs environment io.encodings.utf8 io.files
+io.pathnames kernel sequences splitting system unicode ;
 
 IN: etc-hosts
 

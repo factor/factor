@@ -1,5 +1,5 @@
 USING: alien alien.c-types alien.destructors alien.libraries
-alien.syntax combinators io.sockets.secure system unix.types ;
+alien.syntax combinators system unix.types ;
 
 IN: libtls.ffi
 

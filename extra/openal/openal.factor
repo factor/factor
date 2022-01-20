@@ -1,11 +1,10 @@
 ! Copyright (C) 2007 Chris Double.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: alien alien.data alien.destructors alien.libraries
-alien.syntax arrays combinators kernel sequences
-specialized-arrays system ;
+USING: alien alien.c-types alien.data alien.destructors
+alien.libraries alien.syntax arrays combinators kernel sequences
+system ;
 FROM: alien.c-types => char double float int short uchar uint
 ushort void ;
-SPECIALIZED-ARRAY: uint
 IN: openal
 
 << "openal" {

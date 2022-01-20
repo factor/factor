@@ -1,9 +1,9 @@
 ! Copyright (C) 2011 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs classes combinators.short-circuit
-continuations fry io kernel math namespaces prettyprint
-quotations sequences sequences.deep splitting strings
-tools.annotations tools.test.private vocabs words words.symbol ;
+continuations io kernel math namespaces prettyprint quotations
+sequences sequences.deep splitting strings tools.annotations
+tools.test.private vocabs words words.symbol ;
 IN: tools.coverage
 
 TUPLE: coverage-state < identity-tuple executed? ;

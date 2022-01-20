@@ -6,9 +6,8 @@
 !  http://cairographics.org/samples/text/
 
 
-USING: cairo.ffi math math.constants byte-arrays kernel ui
-ui.render combinators ui.gadgets opengl.gl accessors
-namespaces opengl sequences ;
+USING: accessors byte-arrays combinators kernel math
+math.constants opengl.gl pango.cairo.ffi ui ui.gadgets ui.render ;
 
 IN: cairo-demo
 

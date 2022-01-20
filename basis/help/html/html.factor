@@ -1,13 +1,13 @@
 ! Copyright (C) 2008, 2011 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays assocs combinators.short-circuit
-debugger formatting fry help help.home help.topics help.vocabs
-html html.streams io.directories io.encodings.binary
-io.encodings.utf8 io.files io.files.temp io.pathnames kernel
-locals make math math.parser memoize namespaces regexp sequences
-sequences.deep serialize sorting splitting system tools.completion
-vocabs vocabs.hierarchy words xml.data xml.syntax xml.traversal
-xml.writer ;
+USING: accessors arrays ascii assocs combinators.short-circuit
+debugger formatting help help.home help.topics help.vocabs html
+html.streams io.directories io.encodings.ascii
+io.encodings.binary io.encodings.utf8 io.files io.files.temp
+io.pathnames kernel make math math.parser namespaces regexp
+sequences sequences.deep serialize sorting splitting system
+tools.completion vocabs vocabs.hierarchy words xml.data
+xml.syntax xml.traversal xml.writer ;
 FROM: io.encodings.ascii => ascii ;
 FROM: ascii => ascii? ;
 IN: help.html

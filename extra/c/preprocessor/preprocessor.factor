@@ -1,10 +1,9 @@
 ! Copyright (C) 2009 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: sequences.parser io io.encodings.utf8 io.files
-io.streams.string kernel combinators accessors io.pathnames
-fry sequences arrays locals namespaces io.directories
-assocs math splitting make unicode combinators.short-circuit
-c.lexer ;
+USING: accessors assocs c.lexer combinators
+combinators.short-circuit io io.directories io.encodings.utf8
+io.files io.pathnames io.streams.string kernel make math
+sequences sequences.parser splitting unicode ;
 IN: c.preprocessor
 
 : initial-library-paths ( -- seq )

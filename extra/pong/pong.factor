@@ -1,8 +1,8 @@
 USING: accessors arrays calendar colors
-combinators.short-circuit fonts fry kernel literals locals math
-math.order ranges math.vectors namespaces opengl random
-sequences timers ui ui.commands ui.gadgets ui.gadgets.worlds
-ui.gestures ui.pens.solid ui.render ui.text ;
+combinators.short-circuit fonts kernel literals math math.order
+math.vectors namespaces opengl random ranges sequences timers ui
+ui.commands ui.gadgets ui.gadgets.worlds ui.gestures
+ui.pens.solid ui.render ui.text ;
 
 IN: pong
 

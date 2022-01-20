@@ -1,4 +1,4 @@
-USING: help.markup help.syntax byte-vectors alien byte-arrays classes.struct ;
+USING: alien byte-arrays classes.struct help.markup help.syntax ;
 IN: specialized-vectors
 
 HELP: SPECIALIZED-VECTOR:

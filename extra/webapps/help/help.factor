@@ -4,7 +4,7 @@ USING: accessors assocs furnace.actions furnace.boilerplate
 furnace.redirection help.html help.topics html.components
 html.forms http.server http.server.dispatchers
 http.server.static io.directories io.files.temp io.servers
-kernel locals namespaces sequences unicode urls ;
+kernel namespaces sequences unicode urls ;
 IN: webapps.help
 
 TUPLE: help-webapp < dispatcher ;

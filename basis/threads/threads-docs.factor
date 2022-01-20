@@ -1,6 +1,6 @@
-USING: help.markup help.syntax kernel kernel.private io
-threads.private init quotations strings assocs heaps boxes
-namespaces deques dlists system ;
+USING: assocs boxes deques dlists heaps help.markup help.syntax
+init kernel kernel.private namespaces quotations strings system
+threads.private ;
 IN: threads
 
 ARTICLE: "threads-start/stop" "Starting and stopping threads"

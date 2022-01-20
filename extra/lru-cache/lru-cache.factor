@@ -1,7 +1,7 @@
 ! Copyright (C) 2017 John Benediktsson
 ! See http://factorcode.org/license.txt for BSD license
 
-USING: accessors assocs deques dlists fry kernel linked-assocs
+USING: accessors assocs deques dlists kernel linked-assocs
 linked-assocs.private math sequences.private ;
 
 IN: lru-cache

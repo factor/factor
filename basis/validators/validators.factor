@@ -1,8 +1,7 @@
 ! Copyright (C) 2006, 2010 Slava Pestov
 ! See http://factorcode.org/license.txt for BSD license.
-USING: arrays assocs classes continuations hashtables kernel
-make math math.functions math.parser ranges namespaces
-quotations regexp sequences sets unicode words xmode.catalog ;
+USING: kernel make math math.functions math.parser ranges regexp
+sequences sets unicode xmode.catalog ;
 IN: validators
 
 : v-checkbox ( str -- ? )

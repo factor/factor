@@ -1,8 +1,8 @@
 ! Copyright (C) 2011-2012 John Benediktsson
 ! See http://factorcode.org/license.txt for BSD license
 
-USING: accessors arrays assocs destructors fry io io.styles
-kernel pdf.layout sequences splitting strings ;
+USING: accessors arrays destructors io io.styles kernel
+pdf.layout sequences splitting strings ;
 
 IN: pdf.streams
 

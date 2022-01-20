@@ -1,5 +1,5 @@
-USING: help.markup help.syntax words alien.c-types assocs
-kernel combinators combinators.private tools.deploy.config ;
+USING: combinators.private help.markup help.syntax kernel
+tools.deploy.config ;
 IN: tools.deploy
 
 ARTICLE: "prepare-deploy" "Preparing to deploy an application"

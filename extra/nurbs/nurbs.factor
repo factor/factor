@@ -1,6 +1,6 @@
 ! Copyright (C) 2009 Joe Groff
 ! See http://factorcode.org/license.txt for BSD license
-USING: accessors alien.c-types grouping kernel locals math
+USING: accessors alien.c-types grouping kernel math
 math.order ranges math.vectors math.vectors.homogeneous
 sequences specialized-arrays ;
 SPECIALIZED-ARRAY: alien.c-types:float

@@ -1,7 +1,7 @@
 ! Copyright (C) 2009 Joe Groff.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors timers audio audio.engine audio.loader calendar
-destructors io kernel locals math math.functions ranges specialized-arrays
+USING: accessors timers audio.engine audio.loader calendar
+destructors io kernel math math.functions ranges specialized-arrays
 sequences random math.vectors ;
 FROM: alien.c-types => short ;
 SPECIALIZED-ARRAY: short

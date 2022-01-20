@@ -1,6 +1,6 @@
 ! Copyright (c) 2012 Anonymous
 ! See http://factorcode.org/license.txt for BSD license.
-USING: arrays locals math ranges sequences sets sorting ;
+USING: arrays math ranges sequences sets sorting ;
 IN: rosetta-code.count-the-coins
 
 ! http://rosettacode.org/wiki/Count_the_coins

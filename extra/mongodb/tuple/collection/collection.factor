@@ -1,8 +1,9 @@
-USING: accessors arrays assocs bson.constants classes classes.tuple
-combinators continuations fry kernel mongodb.driver sequences strings
-vectors words combinators.smart literals memoize slots constructors
-hashtables ;
+USING: accessors arrays assocs bson.constants classes
+classes.tuple combinators constructors hashtables kernel
+literals mongodb.driver mongodb.tuple sequences slots strings
+vectors words ;
 
+! XXX: This is weird, two IN: forms
 IN: mongodb.tuple
 
 SINGLETONS: +transient+ +load+ +user-defined-key+ ;

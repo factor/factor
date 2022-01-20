@@ -1,7 +1,7 @@
 ! Copyright (C) 2009 Joe Groff.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: assocs classes help.markup help.syntax kernel math
-quotations strings ;
+USING: accessors assocs classes.tuple generalizations kernel
+quotations sequences ;
 IN: combinators.tuple
 
 HELP: 1make-tuple
