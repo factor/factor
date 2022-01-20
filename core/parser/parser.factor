@@ -162,10 +162,6 @@ SYMBOL: bootstrap-syntax
         call
     ] with-manifest ; inline
 
-SYMBOL: print-use-hook
-
-print-use-hook [ [ ] ] initialize
-
 : parse-fresh ( lines -- quot )
     [
         parse-lines
