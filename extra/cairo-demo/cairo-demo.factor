@@ -6,7 +6,7 @@
 !  http://cairographics.org/samples/text/
 
 
-USING: accessors byte-arrays combinators kernel math
+USING: accessors byte-arrays cairo.ffi combinators kernel math
 math.constants opengl.gl pango.cairo.ffi ui ui.gadgets ui.render ;
 
 IN: cairo-demo
@@ -19,9 +19,6 @@ IN: cairo-demo
     cairo_image_surface_create_for_data ;
 
 TUPLE: cairo-demo-gadget < gadget image-array cairo-t ;
-
-USE: io
-USE: formatting
 
 M: cairo-demo-gadget draw-gadget* ( gadget -- )
     0 0 glRasterPos2i

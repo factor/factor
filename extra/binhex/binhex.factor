@@ -2,10 +2,10 @@
 ! See http://factorcode.org/license.txt for BSD license
 
 USING: accessors base64.private byte-arrays combinators endian
-generalizations grouping io io.encodings.binary
-io.encodings.string io.encodings.utf8 io.files
-io.streams.byte-array kernel kernel.private literals make math
-math.bitwise sequences splitting.monotonic ;
+grouping io io.encodings.binary io.encodings.string
+io.encodings.utf8 io.files io.streams.byte-array kernel
+kernel.private literals make math math.bitwise sequences
+splitting.monotonic ;
 
 IN: binhex
 

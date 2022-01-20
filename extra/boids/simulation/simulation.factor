@@ -1,8 +1,8 @@
 ! Copyright (C) 2008 Eduardo Cavazos.
 ! Copyright (C) 2011 Anton Gorenko.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays combinators.short-circuit kernel
-locals math math.vectors random sequences ;
+USING: accessors arrays combinators.short-circuit kernel math
+math.vectors random sequences ;
 IN: boids.simulation
 
 CONSTANT: WIDTH 512
