@@ -3,7 +3,9 @@
 
 USING: accessors alien.c-types alien.data byte-arrays checksums
 endian grouping kernel math math.bitwise
-sequences sequences.generalizations sequences.private ;
+sequences sequences.generalizations sequences.private
+specialized-arrays ;
+SPECIALIZED-ARRAY: uint64_t
 IN: checksums.wyhash
 
 <PRIVATE
