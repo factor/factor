@@ -11,41 +11,45 @@
 
     <div class="tabs">
 
+    <t:if t:value="words">
     <input class="radiotab" name="tabs" tabindex="1" type="radio" id="words" checked="checked" />
     <label class="label" for="words">Words</label>
     <div class="panel" tabindex="1">
-    <t:if t:value="words">
         <ul>
             <t:each t:name="words">
                 <li> <t:link t:name="value" /> </li>
             </t:each>
         </ul>
-    </t:if>
     </div>
+    </t:if>
 
+    <t:if t:value="vocabs">
     <input class="radiotab" name="tabs" tabindex="1" type="radio" id="vocabs" />
     <label class="label" for="vocabs">Vocabularies</label>
     <div class="panel" tabindex="1">
-    <t:if t:value="vocabs">
         <ul>
             <t:each t:name="vocabs">
                 <li> <t:link t:name="value" /> </li>
             </t:each>
         </ul>
-    </t:if>
     </div>
+    </t:if>
 
+    <t:if t:value="articles">
     <input class="radiotab" name="tabs" tabindex="1" type="radio" id="articles" />
     <label class="label" for="articles">Articles</label>
     <div class="panel" tabindex="1">
-    <t:if t:value="articles">
         <ul>
             <t:each t:name="articles">
                 <li> <t:link t:name="value" /> </li>
             </t:each>
         </ul>
-    </t:if>
     </div>
+    </t:if>
+
+    <t:if t:value="empty">
+    <p>No results found!</p>
+    </t:if>
 
     </div>
 

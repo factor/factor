@@ -9,19 +9,22 @@ IN: webapps.help
 
 TUPLE: help-webapp < dispatcher ;
 
-: links ( seq -- seq' )
+: links ( apropos -- seq )
     [ swap <simple-link> ] { } assoc>map ;
+
+: ?links ( has-links? apropos -- has-links? seq )
+    links [ empty? not or ] keep ;
 
 :: <search-action> ( help-dir -- action )
     <page-action>
         { help-webapp "search" } >>template
         [
             "search" param [ unicode:blank? ] trim [
-                help-dir [
-                    [ article-apropos links "articles" set-value ]
-                    [ word-apropos links "words" set-value ]
-                    [ vocab-apropos links "vocabs" set-value ] tri
-                ] with-directory
+                f help-dir [
+                    [ article-apropos ?links "articles" set-value ]
+                    [ word-apropos ?links "words" set-value ]
+                    [ vocab-apropos ?links "vocabs" set-value ] tri
+                ] with-directory "empty" set-value
             ] unless-empty
             help-navbar "navbar" set-value
 
