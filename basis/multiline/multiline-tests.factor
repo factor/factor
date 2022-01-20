@@ -1,4 +1,4 @@
-USING: eval multiline sequences tools.test ;
+USING: accessors eval lexer multiline sequences tools.test ;
 IN: multiline.tests
 
 STRING: test-it
@@ -30,3 +30,9 @@ bar
 }" eval
 ] must-fail
 */
+
+{ "abc" } [ "USE: multiline [=[ abc]=]" eval( -- string ) ] unit-test
+[ "USE: multiline [=[" eval( -- string ) ] [ error>> unexpected? ] must-fail-with
+[ "USE: multiline [=[ abc" eval( -- string ) ] [ error>> unexpected? ] must-fail-with
+[ "USE: multiline [=[ abc\n\n" eval( -- string ) ] [ error>> unexpected? ] must-fail-with
+[ "USE: multiline [=[ hello]=]length" eval( -- string ) ] [ error>> unexpected? ] must-fail-with
