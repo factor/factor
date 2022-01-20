@@ -1,4 +1,4 @@
-USING: help.markup help.syntax strings lexer ;
+USING: help.markup help.syntax strings ;
 IN: strings.parser
 
 HELP: bad-escape

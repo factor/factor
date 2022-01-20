@@ -1,4 +1,4 @@
-USING: help.markup help.syntax kernel words math
+USING: help.markup help.syntax kernel math
 sequences math.order ;
 IN: sorting
 

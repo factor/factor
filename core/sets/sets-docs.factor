@@ -1,5 +1,5 @@
-USING: assocs hashtables help.markup help.syntax kernel
-quotations sequences vectors ;
+USING: assocs help.markup help.syntax kernel
+sequences vectors ;
 IN: sets
 
 ARTICLE: "sets" "Sets"

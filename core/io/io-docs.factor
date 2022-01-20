@@ -1,6 +1,5 @@
-USING: help.markup help.syntax quotations hashtables kernel
-classes strings continuations destructors math byte-arrays
-alien specialized-arrays sequences ;
+USING: alien byte-arrays destructors help.markup help.syntax
+kernel math quotations sequences specialized-arrays strings ;
 IN: io
 
 ARTICLE: "stream-types" "Binary and text streams"

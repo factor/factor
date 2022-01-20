@@ -1,5 +1,5 @@
-USING: help.markup help.syntax vocabs.loader io.pathnames strings
-definitions quotations compiler.units ;
+USING: help.markup help.syntax vocabs.loader io.pathnames
+quotations compiler.units ;
 IN: source-files
 
 ARTICLE: "source-files" "Source files"
