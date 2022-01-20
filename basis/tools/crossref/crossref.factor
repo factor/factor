@@ -141,7 +141,7 @@ M: f smart-usage drop \ f smart-usage ;
 SINGLETON: invalidate-crossref
 
 M: invalidate-crossref definitions-changed
-    2drop f crossref set-global ;
+    drop null? [ f crossref set-global ] unless ;
 
 [ invalidate-crossref add-definition-observer ] "tools.crossref" add-startup-hook
 
