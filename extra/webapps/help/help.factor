@@ -19,14 +19,14 @@ TUPLE: help-webapp < dispatcher ;
     <page-action>
         { help-webapp "search" } >>template
         [
-            "search" param [ unicode:blank? ] trim [
-                dup "search" set-value
-                f swap help-dir [
+            f "search" param [ unicode:blank? ] trim
+            dup "search" set-value [
+                help-dir [
                     [ article-apropos ?links "articles" set-value ]
                     [ word-apropos ?links "words" set-value ]
                     [ vocab-apropos ?links "vocabs" set-value ] tri
-                ] with-directory not "empty" set-value
-            ] unless-empty
+                ] with-directory
+            ] unless-empty not "empty" set-value
             help-navbar "navbar" set-value
 
             { help-webapp "search" } <chloe-content>
