@@ -1,4 +1,4 @@
-USING: help.markup help.syntax io ;
+USING: help.markup help.syntax ;
 IN: io.streams.plain
 
 ABOUT: "io.streams.plain"

@@ -1,4 +1,4 @@
-USING: arrays help.markup help.syntax math kernel sequences ;
+USING: help.markup help.syntax sequences ;
 IN: source-files.errors
 
 HELP: error-type-holder

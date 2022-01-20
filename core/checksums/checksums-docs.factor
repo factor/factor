@@ -1,4 +1,4 @@
-USING: byte-arrays help.markup help.syntax sequences strings ;
+USING: byte-arrays help.markup help.syntax ;
 IN: checksums
 
 HELP: checksum
