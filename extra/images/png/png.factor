@@ -1,6 +1,6 @@
 ! Copyright (C) 2009 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays assocs bitstreams checksums
+USING: accessors arrays assocs checksums
 checksums.crc32 combinators compression.inflate endian grouping
 images images.loader io io.encodings.ascii io.encodings.binary
 io.encodings.latin1 io.encodings.string io.streams.byte-array
