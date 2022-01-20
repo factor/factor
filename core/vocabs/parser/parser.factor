@@ -290,6 +290,10 @@ M: manifest definitions-changed
 
 PRIVATE>
 
+SYMBOL: print-use-hook
+
+print-use-hook [ [ ] ] initialize
+
 : (with-manifest) ( quot manifest -- )
     manifest [
         [ call ] [
