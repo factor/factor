@@ -1,8 +1,7 @@
 ! Copyright (C) 2011 John Benediktsson
 ! See http://factorcode.org/license.txt for BSD license
 
-USING: accessors combinators fry hash-sets hashtables kernel
-locals math math.parser sequences sets vectors ;
+USING: accessors hash-sets kernel math sequences sets vectors ;
 
 IN: benchmark.ant
 

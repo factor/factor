@@ -1,7 +1,7 @@
 ! Copyright (C) 2011 John Benediktsson
 ! See http://factorcode.org/license.txt for BSD license
 
-USING: arrays assocs kernel ranges random sequences sets
+USING: arrays assocs kernel random sequences
 sorting trees.splay ;
 
 IN: benchmark.splay

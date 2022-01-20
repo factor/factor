@@ -1,10 +1,10 @@
 USING: accessors arrays ascii calendar colors colors.gray
-combinators.short-circuit fry kernel locals math math.constants
-math.functions math.libm math.order math.points ranges
-math.vectors namespaces opengl processing.shapes quotations
-random sequences splitting timers ui ui.gadgets
-ui.gadgets.borders ui.gadgets.buttons ui.gadgets.frame-buffer
-ui.gadgets.packs ui.gestures ;
+combinators.short-circuit kernel math math.constants
+math.functions math.libm math.order math.points math.vectors
+namespaces opengl processing.shapes quotations random ranges
+sequences splitting timers ui ui.gadgets ui.gadgets.borders
+ui.gadgets.buttons ui.gadgets.frame-buffer ui.gadgets.packs
+ui.gestures ;
 
 IN: bubble-chamber
 

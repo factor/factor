@@ -1,7 +1,7 @@
 ! Copyright (C) 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors alien.data classes.struct combinators.smart
-fry kernel math math.functions math.order math.parser sequences
+kernel math math.functions math.order math.parser sequences
 specialized-arrays io ;
 FROM: alien.c-types => float ;
 IN: benchmark.struct-arrays

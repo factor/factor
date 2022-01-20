@@ -1,6 +1,6 @@
 ! Copyright (C) 2012 John Benediktsson
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel math math.parser sequences splitting wrap wrap.strings ;
+USING: kernel math math.parser sequences splitting wrap.strings ;
 IN: benchmark.wrap
 
 : wrap-benchmark ( -- )
