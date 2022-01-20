@@ -12,8 +12,8 @@ TUPLE: help-webapp < dispatcher ;
 : links ( apropos -- seq )
     [ swap <simple-link> ] { } assoc>map ;
 
-: ?links ( has-links? apropos -- has-links? seq )
-    links [ empty? not or ] keep ;
+: ?links ( has-links? apropos -- has-links? seq/f )
+    links [ f ] [ nip t swap ] if-empty ;
 
 :: <search-action> ( help-dir -- action )
     <page-action>
