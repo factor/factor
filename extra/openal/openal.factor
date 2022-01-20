@@ -2,9 +2,10 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: alien alien.c-types alien.data alien.destructors
 alien.libraries alien.syntax arrays combinators kernel sequences
-system ;
+specialized-arrays system ;
 FROM: alien.c-types => char double float int short uchar uint
 ushort void ;
+SPECIALIZED-ARRAY: uint
 IN: openal
 
 << "openal" {
