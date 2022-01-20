@@ -1,9 +1,9 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: assocs namespaces make kernel sequences accessors
-combinators strings splitting io io.streams.string present
-sets ascii xml.writer xml.data xml.entities html.forms
-html.templates html.templates.chloe.syntax ;
+USING: accessors ascii assocs combinators html.forms
+html.templates html.templates.chloe.syntax io io.streams.string
+kernel make namespaces present sequences splitting strings
+xml.data xml.entities xml.writer ;
 IN: html.templates.chloe.compiler
 
 : chloe-attrs-only ( assoc -- assoc' )

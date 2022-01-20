@@ -1,6 +1,6 @@
 ! Copyright (c) 2012 Anonymous
 ! See http://factorcode.org/license.txt for BSD license.
-USING: arrays combinators io kernel locals math math.functions
+USING: arrays combinators io kernel math math.functions
 ranges prettyprint sequences ;
 IN: rosetta-code.continued-fraction
 

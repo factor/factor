@@ -1,7 +1,6 @@
-USING: accessors arrays assocs combinators fry generalizations
-grouping growable kernel locals make math math.order ranges
-sequences sequences.deep sequences.private shuffle sorting
-splitting vectors ;
+USING: accessors arrays assocs combinators generalizations
+grouping growable kernel math math.order ranges sequences
+sequences.private shuffle sorting splitting vectors ;
 IN: sequences.extras
 
 : find-all ( ... seq quot: ( ... elt -- ... ? ) -- ... elts )

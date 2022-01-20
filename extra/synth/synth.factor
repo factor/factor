@@ -4,6 +4,8 @@ USING: accessors kernel math math.constants math.functions
 sequences sequences.modified sequences.repeating ;
 IN: synth
 
+SLOT: sample-freq
+
 MEMO: single-sine-wave ( samples/wave -- seq )
     [ <iota> ] [ pi 2 * swap / [ * sin ] curry ] bi map ;
 

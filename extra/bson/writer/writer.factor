@@ -2,10 +2,10 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors alien.accessors arrays assocs bson.constants
 byte-arrays byte-vectors calendar combinators
-combinators.short-circuit dlists endian fry hashtables
-io io.encodings io.encodings.utf8 io.streams.byte-array kernel
-linked-assocs literals math math.parser namespaces quotations
-sequences serialize strings typed vectors words ;
+combinators.short-circuit dlists endian hashtables io
+io.encodings io.encodings.utf8 kernel linked-assocs math
+math.parser namespaces quotations sequences serialize strings
+typed vectors words ;
 IN: bson.writer
 
 <PRIVATE

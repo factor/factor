@@ -1,9 +1,8 @@
 ! Copyright (C) 2011 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: alien.c-types alien.data alien.syntax classes.struct
-continuations core-foundation core-foundation.strings
-core-foundation.urls destructors kernel sequences
-specialized-arrays strings unix.ffi ;
+USING: alien.c-types alien.data alien.syntax continuations
+core-foundation core-foundation.strings core-foundation.urls
+destructors kernel sequences specialized-arrays strings unix.ffi ;
 SPECIALIZED-ARRAY: char
 IN: core-foundation.launch-services
 

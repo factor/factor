@@ -1,12 +1,12 @@
 ! Copyright (C) 2008, 2010 Eduardo Cavazos, Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors assocs benchmark bootstrap.stage2 calendar
-command-line compiler.errors continuations debugger fry generic
-help.html help.lint io io.directories io.encodings.utf8 io.files
-io.styles kernel locals mason.common math memory namespaces
-parser.notes sequences sets sorting source-files.errors system
-threads tools.errors tools.test tools.time vocabs
-vocabs.hierarchy.private vocabs.loader vocabs.refresh words ;
+command-line compiler.errors continuations debugger help.html
+help.lint io io.directories io.encodings.utf8 io.files io.styles
+kernel mason.common math memory namespaces parser.notes
+sequences sets sorting source-files.errors system threads
+tools.errors tools.test tools.time vocabs
+vocabs.hierarchy.private vocabs.loader vocabs.refresh ;
 IN: mason.test
 
 : vocab-heading. ( vocab -- )

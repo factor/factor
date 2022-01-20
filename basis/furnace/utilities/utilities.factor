@@ -1,7 +1,7 @@
 ! Copyright (C) 2008, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs classes combinators continuations
-definitions fry http http.server http.server.redirection
+definitions http http.server http.server.redirection
 http.server.remapping io.pathnames kernel make namespaces
 sequences splitting strings urls words xml.syntax ;
 IN: furnace.utilities

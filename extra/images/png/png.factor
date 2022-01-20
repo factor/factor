@@ -1,11 +1,11 @@
 ! Copyright (C) 2009 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays assocs checksums checksums.crc32
-combinators compression.inflate endian fry grouping images
-images.loader io io.encodings.ascii
-io.encodings.binary io.encodings.latin1 io.encodings.string
-io.streams.byte-array io.streams.throwing kernel locals math
-math.bitwise math.functions sequences sorting ;
+USING: accessors arrays assocs bitstreams checksums
+checksums.crc32 combinators compression.inflate endian grouping
+images images.loader io io.encodings.ascii io.encodings.binary
+io.encodings.latin1 io.encodings.string io.streams.byte-array
+io.streams.throwing kernel math math.bitwise math.functions
+sequences sorting ;
 QUALIFIED: bitstreams
 IN: images.png
 

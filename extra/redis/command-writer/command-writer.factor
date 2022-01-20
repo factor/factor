@@ -1,7 +1,7 @@
 ! Copyright (C) 2009 Bruno Deferrari
 ! See http://factorcode.org/license.txt for BSD license.
-USING: arrays assocs formatting io io.crlf kernel math
-math.parser sequences strings locals ;
+USING: arrays assocs formatting kernel math math.parser
+sequences strings ;
 IN: redis.command-writer
 
 <PRIVATE

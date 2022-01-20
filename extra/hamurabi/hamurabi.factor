@@ -2,8 +2,8 @@
 ! See http://factorcode.org/license.txt for BSD license
 
 USING: accessors combinators combinators.short-circuit
-continuations formatting fry io kernel math math.functions
-math.order math.parser ranges random sequences strings ;
+continuations formatting io kernel math math.functions
+math.order math.parser random ranges strings ;
 
 IN: hamurabi
 

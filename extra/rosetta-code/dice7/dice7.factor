@@ -1,7 +1,7 @@
 ! Copyright (C) 2015 Alexander Ilin, Doug Coleman, John Benediktsson.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: assocs fry kernel locals math ranges math.statistics
-math.vectors prettyprint random sequences sorting ;
+USING: assocs kernel math ranges math.statistics math.vectors
+prettyprint random sequences sorting ;
 IN: rosetta-code.dice7
 
 ! http://rosettacode.org/wiki/Seven-sided_dice_from_five-sided_dice

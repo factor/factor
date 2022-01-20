@@ -1,6 +1,6 @@
 ! Copyright (C) 2018 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors alien.c-types classes.struct kernel locals math
+USING: accessors alien.c-types classes.struct kernel math
 math.bitwise random sequences slots.syntax ;
 IN: random.xoshiro
 

@@ -1,12 +1,9 @@
 ! Copyright (C) 2007, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: io io.files io.files.info.unix io.pathnames
-io.directories kernel namespaces make
-sequences system tools.deploy.backend tools.deploy.config
-tools.deploy.config.editor assocs hashtables prettyprint
-io.backend.unix cocoa io.encodings.utf8 io.backend
-cocoa.application cocoa.classes cocoa.plists
-combinators vocabs.metadata vocabs.loader webbrowser ;
+USING: cocoa.application cocoa.plists combinators io.backend
+io.directories io.files io.files.info.unix io.pathnames kernel
+make namespaces sequences system tools.deploy.backend
+tools.deploy.config tools.deploy.config.editor vocabs.loader ;
 QUALIFIED-WITH: tools.deploy.unix unix
 IN: tools.deploy.macosx
 

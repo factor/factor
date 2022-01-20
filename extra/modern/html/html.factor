@@ -1,8 +1,8 @@
 ! Copyright (C) 2021 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays combinators combinators.short-circuit
-generalizations kernel make math modern modern.slices multiline
-sequences sequences.extras splitting strings unicode ;
+generalizations kernel make math modern modern.slices sequences
+sequences.extras splitting strings ;
 IN: modern.html
 
 TUPLE: tag name open-close-delimiter props children ;

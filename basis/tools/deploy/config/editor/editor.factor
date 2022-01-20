@@ -1,8 +1,7 @@
 ! Copyright (C) 2008, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: assocs io.pathnames kernel parser prettyprint
-prettyprint.config sequences splitting tools.deploy.config
-vocabs.loader vocabs.metadata ;
+USING: assocs kernel parser prettyprint prettyprint.config
+sequences splitting tools.deploy.config vocabs.metadata ;
 IN: tools.deploy.config.editor
 
 : deploy-config-path ( vocab -- path/f )

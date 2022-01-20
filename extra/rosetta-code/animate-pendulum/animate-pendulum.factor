@@ -1,7 +1,7 @@
 ! Copyright (c) 2012 Anonymous
 ! See http://factorcode.org/license.txt for BSD license.
 
-USING: accessors arrays calendar colors kernel locals math
+USING: accessors arrays calendar colors kernel math
 math.constants math.functions math.rectangles math.vectors
 opengl sequences system timers ui ui.gadgets ui.render ;
 

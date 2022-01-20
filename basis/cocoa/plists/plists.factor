@@ -4,7 +4,7 @@
 USING: alien.c-types alien.data arrays byte-arrays cocoa
 cocoa.application cocoa.classes cocoa.enumeration combinators
 core-foundation.data core-foundation.strings
-core-foundation.utilities fry io.backend kernel macros math
+core-foundation.utilities io.backend kernel math
 quotations sequences ;
 IN: cocoa.plists
 

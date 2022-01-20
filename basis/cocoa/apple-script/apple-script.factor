@@ -1,8 +1,7 @@
 ! Copyright (C) 2013 John Benediktsson
 ! See http://factorcode.org/license.txt for BSD license
 
-USING: cocoa cocoa.application cocoa.classes kernel parser
-multiline words ;
+USING: cocoa cocoa.application cocoa.classes kernel parser words ;
 
 IN: cocoa.apple-script
 

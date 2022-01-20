@@ -1,9 +1,9 @@
 ! Copyright (C) 2010 John Benediktsson
 ! See http://factorcode.org/license.txt for BSD license
 
-USING: arrays assocs combinators combinators.short-circuit
-formatting hashtables io io.streams.string kernel make math
-namespaces quoting sequences splitting strings strings.parser ;
+USING: arrays assocs combinators.short-circuit formatting
+hashtables io io.streams.string kernel make math namespaces
+quoting sequences splitting strings strings.parser ;
 
 IN: ini-file
 

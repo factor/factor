@@ -1,9 +1,8 @@
 ! Copyright (C) 2019 John Benediktsson
 ! See http://factorcode.org/license.txt for BSD license
 
-USING: accessors arrays assocs hashtables kernel locals make
-math.parser peg peg.parsers regexp sequences splitting
-strings.parser ;
+USING: accessors assocs hashtables kernel make math.parser peg
+peg.parsers regexp sequences splitting strings.parser ;
 
 IN: toml
 

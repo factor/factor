@@ -2,8 +2,8 @@
 ! See http://factorcode.org/license.txt for BSD license
 
 USING: accessors assocs command-line io io.encodings.binary
-io.files io.streams.string kernel macros math namespaces
-peg.ebnf prettyprint sequences multiline ;
+io.files io.streams.string kernel math multiline namespaces
+peg.ebnf prettyprint sequences ;
 
 IN: brainfuck
 

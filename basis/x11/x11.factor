@@ -1,8 +1,7 @@
 ! Copyright (C) 2005, 2009 Eduardo Cavazos, Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: alien.strings continuations io
-io.encodings.ascii kernel namespaces x11.xlib x11.io
-vocabs vocabs.loader ;
+USING: alien.c-types continuations io kernel namespaces
+vocabs.loader x11.io x11.xlib ;
 FROM: alien.c-types => c-bool> ;
 IN: x11
 

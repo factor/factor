@@ -2,13 +2,12 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors alien.c-types arrays classes.struct combinators
 combinators.short-circuit game.loop game.worlds gpu gpu.buffers
-gpu.util.wasd gpu.framebuffers gpu.render gpu.shaders gpu.state
-gpu.textures gpu.util grouping http.client images images.loader
-images.tiff io io.encodings.ascii io.files io.files.temp kernel
-locals math math.matrices math.vectors.simd math.parser math.vectors
-method-chains namespaces sequences splitting threads ui ui.gadgets
-ui.gadgets.worlds ui.pixel-formats specialized-arrays
-specialized-vectors literals ;
+gpu.framebuffers gpu.render gpu.shaders gpu.state gpu.textures
+gpu.util gpu.util.wasd grouping http.client images images.loader
+io io.encodings.ascii io.files io.files.temp kernel literals
+math.parser math.vectors math.vectors.simd method-chains
+namespaces sequences specialized-arrays specialized-vectors
+threads ui.gadgets.worlds ui.pixel-formats ;
 FROM: alien.c-types => float ;
 SPECIALIZED-ARRAY: float
 SPECIALIZED-VECTOR: uint

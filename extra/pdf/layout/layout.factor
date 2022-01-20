@@ -1,10 +1,9 @@
 ! Copyright (C) 2011-2012 John Benediktsson
 ! See http://factorcode.org/license.txt for BSD license
-USING: accessors assocs calendar combinators environment fonts
-formatting fry io io.streams.string kernel literals locals make
-math math.order ranges namespaces pdf.canvas pdf.values
-pdf.wrap sequences sequences.extras sorting splitting ui.text
-xml.entities ;
+USING: accessors assocs calendar combinators fonts formatting io
+io.streams.string kernel literals make math math.order
+namespaces pdf.canvas pdf.values pdf.wrap ranges sequences
+sequences.extras sorting splitting ui.text xml.entities ;
 FROM: pdf.canvas => draw-text ;
 
 IN: pdf.layout

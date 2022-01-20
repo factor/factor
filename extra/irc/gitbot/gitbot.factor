@@ -1,6 +1,6 @@
 ! Copyright (C) 2008, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: calendar debugger fry io io.encodings.utf8 io.launcher
+USING: calendar debugger io io.encodings.utf8 io.launcher
 irc.client irc.client.chats kernel make mason.common mason.git
 math namespaces sequences threads timers ;
 IN: irc.gitbot

@@ -2,8 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors alien.c-types arrays cocoa cocoa.application
 cocoa.classes cocoa.messages cocoa.runtime cocoa.subclassing
-compiler.units kernel locals.backend math.parser multiline
-sequences ui ;
+compiler.units kernel locals.backend math.parser sequences ;
 IN: cocoa.statusbar
 
 << {

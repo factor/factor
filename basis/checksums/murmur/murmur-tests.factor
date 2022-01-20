@@ -1,4 +1,4 @@
-USING: byte-arrays checksums checksums.murmur fry kernel math
+USING: byte-arrays checksums checksums.murmur kernel math
 sequences tools.test ;
 
 { 455139366 } [ "asdf" >byte-array 0 <murmur3-32> checksum-bytes ] unit-test

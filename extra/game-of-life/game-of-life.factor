@@ -2,11 +2,10 @@
 ! See http://factorcode.org/license.txt for BSD license
 
 USING: accessors arrays assocs bit-arrays byte-arrays calendar
-colors combinators fry kernel kernel.private locals math
+colors combinators kernel kernel.private math
 math.order ranges namespaces opengl random sequences
 sequences.private timers ui ui.commands ui.gadgets
-ui.gadgets.toolbar ui.gadgets.tracks ui.gestures ui.render words
-;
+ui.gadgets.toolbar ui.gadgets.tracks ui.gestures ui.render words ;
 
 IN: game-of-life
 

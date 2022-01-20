@@ -3,9 +3,9 @@
 
 USING: accessors arrays assocs calendar circular colors
 combinators combinators.short-circuit combinators.smart
-destructors formatting fry images.loader kernel locals math
-math.order math.parser namespaces opengl opengl.textures random
-sequences timers ui ui.commands ui.gadgets ui.gadgets.toolbar
+destructors formatting images.loader kernel math math.order
+math.parser namespaces opengl opengl.textures random sequences
+timers ui ui.commands ui.gadgets ui.gadgets.toolbar
 ui.gadgets.tracks ui.gadgets.worlds ui.gestures ui.pens.solid
 ui.render ui.tools.browser words ;
 

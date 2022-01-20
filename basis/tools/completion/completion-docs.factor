@@ -1,5 +1,4 @@
-USING: help.markup help.syntax strings generic vectors assocs
-math make ;
+USING: help.markup help.syntax make math strings vectors ;
 IN: tools.completion
 
 ARTICLE: "tools.completion" "Fuzzy completion"

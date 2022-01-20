@@ -1,8 +1,8 @@
 ! Copyright (C) 2006, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors colors formatting kernel math math.functions
-math.vectors models models.arrow models.product models.range sequences
-ui ui.gadgets ui.gadgets.labels ui.gadgets.packs ui.gadgets.sliders
+USING: accessors colors formatting kernel math math.vectors
+models models.arrow models.product models.range sequences ui
+ui.gadgets ui.gadgets.labels ui.gadgets.packs ui.gadgets.sliders
 ui.gadgets.tracks ui.pens.solid ;
 IN: color-picker
 

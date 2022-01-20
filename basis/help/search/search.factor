@@ -1,11 +1,10 @@
 ! Copyright (C) 2012 John Benediktsson
 ! See http://factorcode.org/license.txt for BSD license
 
-USING: arrays assocs combinators combinators.short-circuit fry
-help help.apropos help.markup help.stylesheet help.topics io
-io.streams.string io.styles kernel math memoize namespaces
-sequences sequences.deep sorting splitting strings unicode
-words ;
+USING: arrays combinators combinators.short-circuit help
+help.apropos help.markup help.stylesheet help.topics io
+io.styles kernel math namespaces sequences sorting splitting
+strings unicode words ;
 
 IN: help.search
 
