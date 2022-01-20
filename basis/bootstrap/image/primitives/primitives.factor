@@ -1,5 +1,5 @@
 USING: alien alien.strings arrays assocs byte-arrays
-io.encodings.ascii kernel kernel.private locals math quotations
+io.encodings.ascii kernel kernel.private math quotations
 sequences sequences.generalizations sequences.private strings words ;
 IN: bootstrap.image.primitives
 

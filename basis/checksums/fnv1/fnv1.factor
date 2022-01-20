@@ -1,7 +1,6 @@
 ! Copyright (C) 2009 Alaric Snell-Pym
 ! See http://factorcode.org/license.txt for BSD license.
-USING: checksums classes.singleton kernel math ranges
-math.vectors sequences ;
+USING: checksums kernel math sequences ;
 IN: checksums.fnv1
 
 SINGLETON: fnv1-32

@@ -1,7 +1,7 @@
 ! Copyright (C) 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors assocs combinators grouping kernel locals math
-math.parser ranges memoize sequences ;
+USING: accessors assocs combinators grouping kernel math
+math.parser ranges sequences ;
 IN: benchmark.hashtables
 
 MEMO: strings ( -- str )

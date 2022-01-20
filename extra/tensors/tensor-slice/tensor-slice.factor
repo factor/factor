@@ -1,4 +1,4 @@
-USING: accessors kernel locals math math.order sequences ;
+USING: accessors kernel math math.order sequences ;
 IN: tensors.tensor-slice
 
 TUPLE: step-slice

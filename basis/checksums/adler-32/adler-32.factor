@@ -1,7 +1,6 @@
 ! Copyright (C) 2008 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: checksums classes.singleton kernel math ranges
-math.vectors sequences ;
+USING: checksums kernel math ranges math.vectors sequences ;
 IN: checksums.adler-32
 
 SINGLETON: adler-32

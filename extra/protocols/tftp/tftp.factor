@@ -1,7 +1,7 @@
 ! Copyright (C) 2019 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs combinators
-combinators.short-circuit continuations destructors endian fry
+combinators.short-circuit continuations destructors endian
 io io.directories io.encodings.binary io.encodings.latin1
 io.encodings.string io.encodings.utf8 io.files io.files.info
 io.sockets kernel math math.parser namespaces pack prettyprint

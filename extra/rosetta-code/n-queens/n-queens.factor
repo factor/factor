@@ -1,6 +1,6 @@
 ! Copyright (c) 2012 Anonymous
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel sequences math math.combinatorics formatting io locals ;
+USING: kernel sequences math math.combinatorics formatting io ;
 IN: rosetta-code.n-queens
 
 ! http://rosettacode.org/wiki/N-queens_problem

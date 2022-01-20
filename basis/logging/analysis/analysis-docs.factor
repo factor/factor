@@ -1,4 +1,4 @@
-USING: help.markup help.syntax assocs logging math ;
+USING: help.markup help.syntax assocs logging ;
 IN: logging.analysis
 
 HELP: analyze-entries

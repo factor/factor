@@ -1,4 +1,4 @@
-USING: math kernel debugger namespaces ;
+USING: math kernel namespaces ;
 IN: benchmark.fib5
 
 SYMBOL: n

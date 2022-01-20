@@ -1,12 +1,11 @@
 ! Copyright (C) 2018 John Benediktsson
 ! See http://factorcode.org/license.txt for BSD license
 
-USING: accessors alien.c-types alien.endian alien.strings assocs
-calendar calendar.parser classes.struct combinators endian fry
-io io.encodings.8-bit io.encodings.ascii
-io.encodings.binary io.encodings.string io.files
-io.streams.byte-array kernel math math.parser namespaces
-sequences splitting strings ;
+USING: accessors alien.c-types alien.endian assocs calendar
+calendar.parser classes.struct combinators endian io
+io.encodings.8-bit io.encodings.ascii io.encodings.binary
+io.encodings.string io.files io.streams.byte-array kernel math
+math.parser namespaces sequences ;
 
 IN: dbf
 

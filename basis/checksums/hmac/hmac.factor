@@ -1,8 +1,8 @@
 ! Copyright (C) 2008 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays checksums checksums.common
-io.encodings.binary io.files io.streams.byte-array kernel locals
-math math.vectors sequences ;
+USING: accessors arrays checksums io.encodings.binary
+io.files io.streams.byte-array kernel math math.vectors
+sequences ;
 IN: checksums.hmac
 
 <PRIVATE

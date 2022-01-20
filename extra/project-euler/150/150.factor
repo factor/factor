@@ -1,6 +1,6 @@
 ! Copyright (c) 2008 Eric Mertens.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel locals math math.order ranges math.statistics
+USING: kernel math math.order ranges math.statistics
 project-euler.common sequences sequences.private ;
 IN: project-euler.150
 

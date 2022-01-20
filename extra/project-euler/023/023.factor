@@ -1,6 +1,6 @@
 ! Copyright (c) 2008 Aaron Schaefer.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: fry kernel math ranges project-euler.common
+USING: kernel math ranges project-euler.common
 sequences sets ;
 IN: project-euler.023
 

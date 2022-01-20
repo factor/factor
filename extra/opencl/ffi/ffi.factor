@@ -1,8 +1,7 @@
 ! Copyright (C) 2010 Erik Charlebois.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: alien alien.c-types alien.data alien.libraries alien.syntax
-classes.struct combinators system alien.accessors byte-arrays
-kernel ;
+USING: alien alien.c-types alien.libraries alien.syntax
+classes.struct combinators system ;
 IN: opencl.ffi
 
 << "opencl" {

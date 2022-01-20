@@ -1,5 +1,5 @@
-USING: accessors calendar classes.struct combinators kernel math
-math.functions system windows.errors windows.kernel32 ;
+USING: accessors calendar combinators kernel math math.functions
+system windows.errors windows.kernel32 ;
 IN: calendar.windows
 
 : timestamp>SYSTEMTIME ( timestamp -- SYSTEMTIME )

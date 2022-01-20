@@ -1,6 +1,6 @@
 ! Copyright (C) 2008 Alex Chapman
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays kernel namespaces make openal openal.alut sequences
+USING: accessors arrays kernel make openal openal.alut sequences
 synth synth.buffers ;
 IN: synth.example
 

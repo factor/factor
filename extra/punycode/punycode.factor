@@ -1,14 +1,9 @@
 ! Copyright (C) 2020 John Benediktsson
 ! See http://factorcode.org/license.txt for BSD license
 
-USING: accessors arrays ascii assocs byte-arrays combinators
-io.encodings.string io.encodings.utf8 kernel lexer linked-assocs
-literals locals make math math.order math.parser multiline
-namespaces peg.ebnf present prettyprint.backend
-prettyprint.custom prettyprint.sections regexp sbufs sequences
-sequences.extras sequences.generalizations sets sorting
-splitting strings strings.parser urls urls.encoding
-urls.encoding.private urls.private ;
+USING: accessors ascii byte-arrays combinators kernel literals
+math math.order sbufs sequences sequences.extras sets sorting
+splitting urls ;
 
 IN: punycode
 

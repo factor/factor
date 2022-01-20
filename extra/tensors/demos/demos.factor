@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 ! Code based on https://towardsdatascience.com/linear-regression-from-scratch-with-numpy-implementation-finally-8e617d8e274c
 
-USING: arrays accessors csv io io.encodings.utf8 kernel locals math math.parser
+USING: arrays accessors csv io io.encodings.utf8 kernel math math.parser
 ranges math.statistics prettyprint sequences tensors ;
 IN: tensors.demos
 

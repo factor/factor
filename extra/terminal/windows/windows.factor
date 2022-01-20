@@ -1,8 +1,7 @@
 ! Copyright (C) 2012 John Benediktsson
 ! See http://factorcode.org/license.txt for BSD license
 
-USING: accessors classes.struct kernel math system terminal
-windows.kernel32 ;
+USING: accessors kernel math system terminal windows.kernel32 ;
 
 IN: terminal.windows
 

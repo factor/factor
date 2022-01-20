@@ -1,10 +1,9 @@
-USING: calendar math fry kernel assocs ranges bson.reader io.streams.byte-array
-sequences formatting combinators namespaces io tools.time prettyprint io.encodings.binary
-accessors words mongodb.driver strings math.parser bson.writer
-hashtables ;
+USING: accessors assocs bson.reader bson.writer calendar
+formatting hashtables io io.encodings.binary
+io.streams.byte-array kernel math math.parser
+mongodb.driver namespaces ranges sequences strings tools.time ;
 FROM: mongodb.driver => find ;
 FROM: memory => gc ;
-
 IN: mongodb.benchmark
 
 SYMBOL: collection

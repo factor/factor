@@ -1,5 +1,5 @@
 USING: interpolate io io.encodings.ascii io.files io.files.temp
-io.launcher io.streams.string kernel locals sequences system ;
+io.launcher io.streams.string kernel sequences system ;
 IN: alien.remote-control.tests
 
 : compile-file ( contents -- )

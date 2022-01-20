@@ -1,5 +1,4 @@
-USING: kernel math sequences namespaces math.primes
-math.functions accessors random ;
+USING: accessors kernel math math.functions math.primes random ;
 IN: random.blum-blum-shub
 
 ! Blum Blum Shub, n = pq, x_i+1 = x_i ^ 2 mod n

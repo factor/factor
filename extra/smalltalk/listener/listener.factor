@@ -1,8 +1,7 @@
 ! Copyright (C) 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel prettyprint io io.styles colors compiler.units
-fry debugger sequences locals.rewrite smalltalk.ast
-smalltalk.eval smalltalk.printer smalltalk.listener splitting ;
+USING: colors debugger io io.styles kernel smalltalk.ast
+smalltalk.eval smalltalk.printer ;
 IN: smalltalk.listener
 
 : eval-interactively ( string -- )

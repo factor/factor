@@ -1,6 +1,6 @@
 ! Copyright (c) 2012 Anonymous
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors combinators deques dlists fry io kernel
+USING: accessors combinators deques dlists io kernel
 math.parser ;
 IN: rosetta-code.tree-traversal
 

@@ -1,8 +1,8 @@
 ! Copyright (C) 2010 Anton Gorenko.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors alien.c-types assocs combinators.short-circuit
-gobject-introspection.common gobject-introspection.repository kernel
-locals namespaces parser sequences sets ;
+gobject-introspection.common gobject-introspection.repository
+kernel namespaces parser sequences sets ;
 IN: gobject-introspection.types
 
 SYMBOL: type-infos

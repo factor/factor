@@ -1,6 +1,6 @@
 ! Copyright (C) 2005, 2009 Daniel Ehrenberg
 ! See http://factorcode.org/license.txt for BSD license.
-USING: help.syntax help.markup io strings xml.data multiline ;
+USING: help.markup help.syntax io strings xml.data ;
 IN: xml.writer
 
 ABOUT: "xml.writer"

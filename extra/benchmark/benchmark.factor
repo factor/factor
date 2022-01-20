@@ -2,8 +2,8 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays assocs command-line continuations debugger
 formatting help.markup io io.styles kernel math memory
-namespaces prettyprint sequences tools.profiler.sampling
-tools.test tools.time vocabs.hierarchy vocabs.loader ;
+namespaces sequences tools.profiler.sampling tools.test
+tools.time vocabs.hierarchy vocabs.loader ;
 IN: benchmark
 
 SYMBOL: benchmarks-disabled?

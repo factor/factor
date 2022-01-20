@@ -2,8 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 !
 ! Examples of using channels
-USING: kernel threads channels math namespaces
-locals sequences ;
+USING: kernel threads channels math sequences ;
 IN: channels.examples
 
 : (counter) ( channel n -- )

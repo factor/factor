@@ -1,9 +1,8 @@
 ! Copyright (C) 2007, 2008, 2009 Alex Chapman, 2009 Diego Martinelli
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors ascii assocs biassocs combinators hashtables
-kernel lists literals math namespaces make multiline openal
-openal.alut parser sequences splitting strings synth
-synth.buffers ;
+USING: accessors ascii assocs biassocs combinators kernel
+literals math multiline namespaces openal openal.alut sequences
+splitting strings synth synth.buffers ;
 IN: morse
 
 ERROR: no-morse-ch ch ;

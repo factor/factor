@@ -1,9 +1,8 @@
 ! Copyright (C) 2004, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors assocs combinators destructors fry html io
-io.backend io.pathnames io.styles kernel macros make math
-math.functions math.order math.parser namespaces sequences
-strings words splitting xml xml.syntax ;
+USING: accessors assocs combinators destructors html io
+io.styles kernel make math math.functions math.parser sequences
+strings xml.syntax ;
 IN: html.streams
 
 GENERIC: url-of ( object -- url )

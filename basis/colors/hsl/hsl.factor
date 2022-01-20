@@ -1,8 +1,7 @@
 ! Copyright (C) 2012 John Benediktsson
 ! See http://factorcode.org/license.txt for BSD license
 
-USING: accessors colors combinators kernel locals math
-math.order ;
+USING: accessors colors combinators kernel math math.order ;
 
 IN: colors.hsl
 

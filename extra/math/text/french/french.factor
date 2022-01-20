@@ -1,7 +1,7 @@
 ! Copyright (c) 2009 Samuel Tardieu.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays assocs combinators kernel math math.functions
-math.parser math.text.utils memoize sequences splitting ;
+math.parser math.text.utils sequences splitting ;
 IN: math.text.french
 
 <PRIVATE

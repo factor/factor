@@ -1,7 +1,6 @@
 ! Copyright (C) 2008 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: arrays kernel math strings help.markup help.syntax
-math.order ;
+USING: help.markup help.syntax kernel math math.order ;
 IN: calendar
 
 HELP: duration

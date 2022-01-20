@@ -1,10 +1,9 @@
 ! Copyright (C) 2010 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors alien.c-types alien.data alien.strings arrays
-assocs byte-arrays classes.struct combinators cuda
-cuda.contexts cuda.ffi cuda.libraries fry io io.encodings.utf8
-kernel locals math math.order math.parser namespaces
-prettyprint sequences splitting ;
+assocs byte-arrays combinators cuda cuda.contexts cuda.ffi
+cuda.libraries io io.encodings.utf8 kernel math math.order
+math.parser prettyprint sequences splitting ;
 IN: cuda.devices
 
 : #cuda-devices ( -- n )

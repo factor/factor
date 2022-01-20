@@ -1,8 +1,8 @@
 ! Copyright (c) 2007, 2008, 2018 Aaron Schaefer.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: combinators combinators.short-circuit grouping kernel
-math math.functions math.parser math.order math.text.utils namespaces
-sequences splitting ;
+USING: combinators combinators.short-circuit kernel math
+math.order math.parser math.text.utils namespaces sequences
+splitting ;
 IN: math.text.english
 
 <PRIVATE

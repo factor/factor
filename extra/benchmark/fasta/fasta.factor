@@ -1,7 +1,7 @@
 ! Based on http://shootout.alioth.debian.org/gp4/benchmark.php?test=fasta&lang=java&id=2
 USING: alien.data assocs benchmark.reverse-complement
 byte-arrays io io.encodings.ascii io.files kernel math sequences
-sequences.private specialized-arrays splitting strings typed ;
+sequences.private specialized-arrays strings typed ;
 QUALIFIED-WITH: alien.c-types c
 SPECIALIZED-ARRAY: c:double
 IN: benchmark.fasta

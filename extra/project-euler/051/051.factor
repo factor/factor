@@ -26,7 +26,7 @@
 
 ! for each prime number, count the families it belongs to. When one reaches count of 8, stop, and get the smallest number by replacing * with ones.
 
-USING: assocs fry kernel math math.combinatorics math.functions
+USING: assocs kernel math math.combinatorics math.functions
 math.order math.parser math.primes ranges namespaces
 project-euler.common sequences sets ;
 IN: project-euler.051

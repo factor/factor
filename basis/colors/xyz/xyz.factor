@@ -1,7 +1,7 @@
 ! Copyright (C) 2014 John Benediktsson
 ! See http://factorcode.org/license.txt for BSD license
 
-USING: accessors colors kernel locals math math.functions
+USING: accessors colors kernel math math.functions
 math.order ;
 
 IN: colors.xyz

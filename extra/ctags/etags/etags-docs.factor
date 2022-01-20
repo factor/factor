@@ -1,4 +1,4 @@
-USING: help.syntax help.markup kernel prettyprint sequences strings words math ;
+USING: help.markup help.syntax strings ;
 IN: ctags.etags
 
 ARTICLE: "etags" "Etags file"

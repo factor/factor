@@ -7,10 +7,10 @@
 ! See http://factorcode.org/license.txt for BSD license.
 !
 USING: accessors arrays assocs byte-arrays classes classes.tuple
-combinators endian hashtables hashtables.identity io
-io.encodings.binary io.encodings.string io.encodings.utf8
-io.streams.byte-array kernel locals math namespaces prettyprint
-quotations sequences sequences.private strings vocabs words ;
+combinators endian hashtables io io.encodings.binary
+io.encodings.string io.encodings.utf8 io.streams.byte-array
+kernel math namespaces prettyprint quotations sequences
+sequences.private strings vocabs words ;
 IN: serialize
 
 GENERIC: (serialize) ( obj -- )

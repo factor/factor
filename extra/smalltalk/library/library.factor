@@ -1,8 +1,7 @@
 ! Copyright (C) 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel present io math sequences assocs ranges
-math.order fry tools.time locals smalltalk.selectors
-smalltalk.ast smalltalk.classes ;
+math.order tools.time smalltalk.selectors smalltalk.ast ;
 IN: smalltalk.library
 
 SELECTOR: print

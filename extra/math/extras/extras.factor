@@ -1,13 +1,12 @@
 ! Copyright (C) 2012 John Benediktsson
 ! See http://factorcode.org/license.txt for BSD license
 
-USING: accessors arrays assocs assocs.extras byte-arrays
-combinators combinators.short-circuit compression.zlib fry
-grouping kernel locals math math.bitwise math.combinatorics
-math.constants math.functions math.order math.primes
-math.primes.factors ranges ranges.private
-math.statistics math.vectors memoize parser random sequences
-sequences.extras sequences.private sets sorting sorting.extras ;
+USING: accessors arrays assocs byte-arrays combinators
+combinators.short-circuit compression.zlib grouping kernel math
+math.bitwise math.combinatorics math.constants math.functions
+math.order math.primes math.primes.factors math.statistics
+math.vectors random ranges ranges.private sequences
+sequences.extras sets sorting sorting.extras ;
 
 IN: math.extras
 

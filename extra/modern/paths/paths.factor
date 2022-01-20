@@ -1,8 +1,7 @@
 ! Copyright (C) 2015 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors combinators.smart io.files kernel sequences
-splitting vocabs.files vocabs.hierarchy vocabs.loader
-vocabs.metadata sets ;
+USING: accessors combinators.smart io.files sequences sets
+vocabs.files vocabs.hierarchy vocabs.loader ;
 IN: modern.paths
 
 ERROR: not-a-source-path path ;

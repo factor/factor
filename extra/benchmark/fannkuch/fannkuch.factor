@@ -1,6 +1,6 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel fry math math.combinatorics math.order sequences
+USING: kernel math math.combinatorics math.order sequences
 io prettyprint ;
 IN: benchmark.fannkuch
 

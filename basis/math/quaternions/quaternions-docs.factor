@@ -1,4 +1,4 @@
-USING: help.markup help.syntax math math.vectors vectors ;
+USING: help.markup help.syntax math ;
 IN: math.quaternions
 
 HELP: q+

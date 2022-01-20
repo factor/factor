@@ -1,8 +1,8 @@
 ! Copyright (C) 2013 John Benediktsson
 ! See http://factorcode.org/license.txt for BSD license
 
-USING: combinators combinators.short-circuit fry inverse kernel
-math math.functions math.primes ranges memoize sequences ;
+USING: combinators combinators.short-circuit inverse kernel
+math math.functions math.primes ranges sequences ;
 
 IN: math.factorials
 
