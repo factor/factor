@@ -1,7 +1,7 @@
 ! Copyright (c) 2007 Aaron Schaefer, Daniel Ehrenberg.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: hashtables kernel math math.functions ranges project-euler.common
-    sequences sorting sets ;
+USING: kernel math math.functions project-euler.common ranges
+sequences sets sorting ;
 IN: project-euler.004
 
 ! http://projecteuler.net/index.php?section=problems&id=4

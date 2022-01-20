@@ -1,9 +1,9 @@
 ! Copyright (C) 2016 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays assocs combinators combinators.short-circuit
-continuations fry io.encodings.utf8 io.files kernel locals make
-math math.order modern.paths modern.slices sequences
-sequences.extras sets splitting strings unicode vocabs.loader ;
+continuations io.encodings.utf8 io.files kernel make math
+math.order modern.paths modern.slices sequences sequences.extras
+sets splitting strings unicode vocabs.loader ;
 IN: modern
 
 ERROR: string-expected-got-eof n string ;

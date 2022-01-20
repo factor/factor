@@ -1,4 +1,4 @@
-USING: accessors kernel locals math math.parser multiline peg.ebnf ;
+USING: accessors kernel math math.parser multiline peg.ebnf ;
 IN: rosetta-code.arithmetic-evaluation
 
 ! http://rosettacode.org/wiki/Arithmetic_evaluation

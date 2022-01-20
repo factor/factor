@@ -1,8 +1,7 @@
 ! Copyright (C) 2009 Bruno Deferrari
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel fry splitting ascii calendar accessors combinators
-arrays classes.tuple math.order words assocs strings irc.messages.base
-combinators.short-circuit math sequences ;
+USING: accessors ascii combinators.short-circuit
+irc.messages.base kernel math sequences splitting ;
 IN: irc.messages
 
 ! connection

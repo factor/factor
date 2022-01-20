@@ -1,8 +1,9 @@
 ! Copyright (C) 2008, 2009 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays calendar calendar.english combinators fry io
-io.directories io.files.info kernel math math.parser prettyprint sequences
-system vocabs sorting.slots calendar.format splitting ;
+USING: accessors arrays calendar calendar.english
+calendar.format combinators io.directories io.files.info kernel
+math math.parser prettyprint sequences sorting.slots splitting
+system vocabs ;
 IN: tools.files
 
 <PRIVATE

@@ -1,9 +1,9 @@
 ! Copyright (C) 2006, 2007 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays assocs combinators fry hashtables io
-kernel locals make math math.matrices math.matrices.elimination
-math.order math.parser math.vectors namespaces prettyprint
-sequences sets shuffle sorting splitting ;
+USING: accessors arrays assocs combinators hashtables io kernel
+make math math.matrices math.matrices.elimination math.order
+math.parser math.vectors namespaces prettyprint sequences sets
+shuffle sorting splitting ;
 IN: koszul
 
 ! Utilities

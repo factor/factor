@@ -1,5 +1,5 @@
-USING: help.markup help.syntax io.streams.string strings urls
-calendar xml.data xml.writer present ;
+USING: calendar help.markup help.syntax present strings urls
+xml.data xml.writer ;
 IN: syndication
 
 HELP: entry

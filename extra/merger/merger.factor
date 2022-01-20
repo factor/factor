@@ -1,5 +1,5 @@
-USING: accessors arrays colors file-picker fry io.directories
-kernel math.rectangles models sequences sets ui ui.gadgets
+USING: accessors arrays file-picker io.directories kernel
+math.rectangles models sequences sets ui ui.gadgets
 ui.gadgets.buttons ui.gadgets.glass ui.gadgets.labeled
 ui.gadgets.labels ui.gadgets.tracks ;
 IN: merger

@@ -1,12 +1,9 @@
 USING: accessors arrays classes classes.error combinators
-combinators.short-circuit continuations english eval formatting
-fry generic help help.lint help.lint.checks help.markup io
-io.streams.string io.styles kernel math namespaces parser
-prettyprint sequences sequences.deep sets sorting splitting strings summary
-vocabs vocabs.parser words words.alias ;
-
+continuations english formatting generic help help.lint.checks
+help.markup io io.streams.string io.styles kernel math
+namespaces parser sequences sequences.deep sets sorting
+splitting strings summary vocabs vocabs.parser words words.alias ;
 FROM: namespaces => set ;
-
 IN: help.lint.coverage
 
 TUPLE: word-help-coverage

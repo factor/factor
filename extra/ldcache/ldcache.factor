@@ -1,7 +1,7 @@
 ! Copyright (C) 2017 Björn Lindqvist.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors alien.c-types alien.strings assocs byte-arrays
-classes.struct continuations fry io io.encodings.binary
+classes.struct continuations io io.encodings.binary
 io.encodings.string io.files kernel math math.bitwise sequences
 system ;
 IN: ldcache

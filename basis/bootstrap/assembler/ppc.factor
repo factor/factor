@@ -3,7 +3,7 @@
 USING: bootstrap.image.private kernel kernel.private namespaces
 system cpu.ppc.assembler compiler.units compiler.constants math
 math.private ranges layouts words vocabs slots.private
-locals locals.backend generic.single.private fry sequences
+locals locals.backend generic.single.private sequences
 threads.private strings.private ;
 FROM: cpu.ppc.assembler => B ;
 IN: bootstrap.ppc

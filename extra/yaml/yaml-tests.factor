@@ -1,6 +1,6 @@
 ! Copyright (C) 2014 Jon Harper.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: assocs grouping kernel linked-assocs literals locals
+USING: assocs grouping kernel linked-assocs literals
 namespaces sequences tools.test yaml yaml.config yaml.ffi
 yaml.private calendar yaml.conversion ;
 IN: yaml.tests

@@ -1,8 +1,7 @@
 ! Copyright (C) 2009 Kobi Lurie.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays colors combinators
-combinators.short-circuit fry grouping images images.bitmap
-images.loader images.normalization kernel locals math sequences ;
+USING: accessors combinators grouping images kernel math
+sequences ;
 IN: images.processing.rotation
 
 ERROR: unsupported-rotation degrees ;

@@ -5,7 +5,7 @@ combinators.short-circuit compiler.cfg compiler.cfg.builder
 compiler.cfg.builder.alien compiler.cfg.finalization
 compiler.cfg.optimizer compiler.codegen compiler.crossref
 compiler.errors compiler.tree.builder compiler.tree.optimizer
-compiler.units compiler.utilities continuations definitions fry
+compiler.units compiler.utilities continuations definitions
 generic generic.single io kernel macros make namespaces
 sequences sets stack-checker.dependencies stack-checker.errors
 stack-checker.inlining vocabs.loader words ;

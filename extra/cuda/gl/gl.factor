@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors alien alien.c-types alien.data alien.destructors
 alien.enums continuations cuda cuda.contexts cuda.ffi
-cuda.gl.ffi destructors fry gpu.buffers kernel ;
+cuda.gl.ffi destructors gpu.buffers kernel ;
 IN: cuda.gl
 
 : create-gl-cuda-context ( device flags -- context )

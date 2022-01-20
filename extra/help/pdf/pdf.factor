@@ -1,8 +1,8 @@
 ! Copyright (C) 2010 John Benediktsson
 ! See http://factorcode.org/license.txt for BSD license
 
-USING: accessors arrays assocs help help.markup help.topics
-io.encodings.utf8 io.files io.pathnames kernel namespaces pdf
+USING: accessors arrays help help.markup help.topics
+io.encodings.utf8 io.files io.pathnames kernel namespaces
 pdf.canvas pdf.layout pdf.streams sequences sets strings ;
 
 IN: help.pdf

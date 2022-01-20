@@ -1,7 +1,8 @@
 ! Copyright (C) 2010 Anton Gorenko.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: alien alien.libraries alien.syntax cairo.ffi combinators
-kernel gobject-introspection system vocabs ;
+USING: alien alien.libraries alien.syntax combinators
+gobject-introspection system vocabs ;
+USE: cairo.ffi
 IN: pango.cairo.ffi
 
 << "pango.ffi" require >>

@@ -1,8 +1,8 @@
 ! Copyright (C) 2009 Bruno Deferrari
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays assocs calendar classes.parser classes.tuple
-       combinators fry generic.parser kernel lexer
-       mirrors namespaces parser sequences splitting strings words ;
+USING: accessors arrays assocs calendar classes.parser
+classes.tuple combinators generic.parser kernel lexer mirrors
+namespaces parser sequences splitting words ;
 IN: irc.messages.base
 
 TUPLE: irc-message line prefix command parameters trailing timestamp sender ;

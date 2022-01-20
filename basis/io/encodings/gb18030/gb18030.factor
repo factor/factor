@@ -1,9 +1,10 @@
 ! Copyright (C) 2009 Daniel Ehrenberg
 ! See http://factorcode.org/license.txt for BSD license.
-USING: xml xml.data kernel io io.encodings interval-maps splitting fry
-math.parser sequences combinators assocs locals accessors math arrays
-byte-arrays ascii io.files biassocs math.order namespaces
-combinators.short-circuit endian io.encodings.iana ;
+USING: accessors arrays ascii assocs biassocs byte-arrays
+combinators combinators.short-circuit interval-maps io
+io.encodings io.encodings.iana io.files kernel math
+math.order math.parser namespaces sequences splitting xml
+xml.data ;
 FROM: io.encodings.ascii => ascii ;
 IN: io.encodings.gb18030
 

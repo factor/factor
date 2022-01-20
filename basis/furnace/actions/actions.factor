@@ -1,9 +1,9 @@
 ! Copyright (C) 2008, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors assocs combinators fry furnace.conversations
-furnace.utilities html.forms http http.server
-http.server.responses kernel namespaces sequences splitting urls
-validators ;
+USING: accessors assocs combinators furnace.conversations
+furnace.utilities html.forms html.templates.chloe http
+http.server http.server.responses kernel namespaces sequences
+splitting urls validators ;
 FROM: html.templates.chloe => <chloe> ;
 IN: furnace.actions
 

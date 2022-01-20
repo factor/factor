@@ -1,5 +1,5 @@
-USING: locals math math.combinatorics math.matrices math.matrices.extras
-prettyprint sequences typed ;
+USING: math math.combinatorics math.matrices math.matrices.extras
+prettyprint sequences ;
 IN: benchmark.matrix-exponential-scalar
 
 :: e^m ( m iterations -- e^m )

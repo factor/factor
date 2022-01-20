@@ -1,6 +1,6 @@
 ! Copyright (c) 2012 Anonymous
 ! See http://factorcode.org/license.txt for BSD license.
-USING: combinators locals kernel math ;
+USING: combinators kernel math ;
 IN: rosetta-code.ackermann
 
 ! http://rosettacode.org/wiki/Ackermann_function

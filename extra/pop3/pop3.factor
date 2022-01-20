@@ -1,10 +1,9 @@
 ! Copyright (C) 2009 Elie Chaftari.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors annotations arrays assocs calendar combinators
-fry hashtables io io.crlf io.encodings.utf8 io.sockets
-io.streams.duplex io.timeouts kernel make math math.parser
-ranges namespaces prettyprint sequences splitting
-strings ;
+USING: accessors assocs calendar combinators io io.crlf
+io.encodings.utf8 io.sockets io.streams.duplex io.timeouts
+kernel make math math.parser namespaces ranges sequences
+splitting ;
 IN: pop3
 
 TUPLE: pop3-account

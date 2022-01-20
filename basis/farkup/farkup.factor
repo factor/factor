@@ -1,7 +1,7 @@
 ! Copyright (C) 2008, 2009 Doug Coleman, Daniel Ehrenberg.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays assocs combinators fry io.streams.string
-kernel lists locals math math.order namespaces sequences splitting
+USING: accessors arrays assocs combinators io.streams.string
+kernel lists math math.order namespaces sequences splitting
 strings urls urls.encoding xml.data xml.syntax xml.writer
 xmode.code2html ;
 IN: farkup

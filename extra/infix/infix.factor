@@ -1,10 +1,10 @@
 ! Copyright (C) 2009 Philipp Brüschweiler
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors combinators combinators.short-circuit effects
-effects.parser fry infix.ast infix.parser kernel locals
-locals.parser locals.types math math.functions math.order
-ranges multiline parser quotations sequences summary
-vocabs.parser words words.constant ;
+effects.parser infix.ast infix.parser kernel locals.parser
+locals.types math math.functions math.order multiline parser
+quotations ranges sequences summary vocabs.parser words
+words.constant ;
 IN: infix
 
 <PRIVATE

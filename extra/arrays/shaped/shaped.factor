@@ -1,6 +1,6 @@
 ! Copyright (C) 2012 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays assocs combinators.short-circuit fry
+USING: accessors arrays assocs combinators.short-circuit
 grouping kernel math math.functions math.order math.vectors
 parser prettyprint.custom sequences sequences.deep ;
 IN: arrays.shaped

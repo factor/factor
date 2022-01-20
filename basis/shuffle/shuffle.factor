@@ -1,8 +1,7 @@
 ! Copyright (C) 2007 Chris Double, Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors assocs combinators effects.parser fry
-generalizations kernel macros make sequences
-sequences.generalizations ;
+USING: accessors assocs combinators effects.parser
+generalizations kernel sequences sequences.generalizations ;
 IN: shuffle
 
 MACRO: shuffle-effect ( effect -- quot )

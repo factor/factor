@@ -1,14 +1,13 @@
 USING: accessors alien.c-types alien.data alien.data.map arrays
 assocs byte-arrays colors combinators combinators.short-circuit
-destructors euler.b-rep euler.b-rep.triangulation fry game.input
+destructors euler.b-rep euler.b-rep.triangulation game.input
 game.loop game.models.half-edge game.worlds gml.printer gpu
 gpu.buffers gpu.framebuffers gpu.render gpu.shaders gpu.state
-gpu.util.wasd growable images kernel literals locals math
-math.order ranges math.vectors math.vectors.conversion
-math.vectors.simd math.vectors.simd.cords method-chains models
-namespaces sequences sets specialized-vectors typed ui
-ui.gadgets ui.gadgets.worlds ui.gestures ui.pixel-formats
-vectors ;
+gpu.util.wasd growable images kernel literals math math.order
+math.vectors math.vectors.conversion math.vectors.simd
+math.vectors.simd.cords method-chains models namespaces ranges
+sequences sets specialized-vectors typed ui ui.gadgets
+ui.gadgets.worlds ui.gestures ui.pixel-formats vectors ;
 FROM: models => change-model ;
 SPECIALIZED-VECTORS: ushort float-4 ;
 IN: gml.viewer

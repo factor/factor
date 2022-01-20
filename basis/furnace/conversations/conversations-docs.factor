@@ -1,5 +1,5 @@
-USING: help.markup help.syntax urls http words kernel
-furnace.sessions furnace.db words.symbol ;
+USING: furnace.db furnace.sessions help.markup help.syntax http
+kernel urls words.symbol ;
 IN: furnace.conversations
 
 HELP: <conversations>

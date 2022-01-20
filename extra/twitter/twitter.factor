@@ -1,8 +1,8 @@
 ! Copyright (C) 2009, 2010 Joe Groff, Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors assocs combinators hashtables http
-http.client json.reader kernel macros make namespaces sequences
-io.sockets.secure fry oauth1 urls ;
+USING: accessors assocs combinators http.client
+io.sockets.secure json.reader kernel make namespaces oauth1
+sequences urls ;
 IN: twitter
 
 ! Configuration

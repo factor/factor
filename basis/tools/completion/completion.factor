@@ -2,9 +2,9 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs colors combinators
 combinators.short-circuit io.directories io.files io.files.info
-io.pathnames kernel locals make math math.order sequences
+io.pathnames kernel make math math.order sequences
 sequences.private sorting splitting splitting.monotonic unicode
-unicode.data vectors vocabs vocabs.hierarchy ;
+unicode.data vocabs vocabs.hierarchy ;
 IN: tools.completion
 
 <PRIVATE
