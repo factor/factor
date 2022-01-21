@@ -256,8 +256,8 @@ check_gtk_libraries() {
 check_libraries() {
     case $OS in
         linux) check_X11_libraries
-               check_gtk_libraries;;
-        unix) check_gtk_libraries;;
+               check_gtk_libraries ;;
+        unix) check_gtk_libraries ;;
     esac
 }
 
@@ -275,18 +275,18 @@ find_os() {
     local uname_s=$(uname -s)
     check_ret uname
     case $uname_s in
-        CYGWIN_NT-5.2-WOW64) OS=windows;;
-        *CYGWIN_NT*) OS=windows;;
-        *CYGWIN*) OS=windows;;
-        MINGW32*) OS=windows;;
-        MINGW64*) OS=windows;;
-        MSYS_NT*) OS=windows;;
-        *darwin*) OS=macosx;;
-        *Darwin*) OS=macosx;;
-        *linux*) OS=linux;;
-        *Linux*) OS=linux;;
-        FreeBSD) OS=freebsd;;
-        Haiku) OS=haiku;;
+        CYGWIN_NT-5.2-WOW64) OS=windows ;;
+        *CYGWIN_NT*) OS=windows ;;
+        *CYGWIN*) OS=windows ;;
+        MINGW32*) OS=windows ;;
+        MINGW64*) OS=windows ;;
+        MSYS_NT*) OS=windows ;;
+        *darwin*) OS=macosx ;;
+        *Darwin*) OS=macosx ;;
+        *linux*) OS=linux ;;
+        *Linux*) OS=linux ;;
+        FreeBSD) OS=freebsd ;;
+        Haiku) OS=haiku ;;
     esac
 }
 
@@ -296,23 +296,23 @@ find_architecture() {
     uname_m=$(uname -m)
     check_ret uname
     case $uname_m in
-       i386) ARCH=x86;;
-       i686) ARCH=x86;;
-       i86pc) ARCH=x86;;
-       amd64) ARCH=x86;;
-       ppc64) ARCH=ppc;;
-       *86) ARCH=x86;;
-       *86_64) ARCH=x86;;
-       aarch64) ARCH=arm64;;
-       arm64) ARCH=arm64;;
-       iPhone5*[3-9]) ARCH=arm64;;
-       iPhone[6-9]*) ARCH=arm64;;
-       iPhone[1-9][0-9]*) ARCH=arm64;;
-       iPad[4-9]*) ARCH=arm64;;
-       iPad[1-9][0-9]*) ARCH=arm64;;
-       AppleTV[5-9]*) ARCH=arm64;;
-       AppleTV[1-9][0-9]*) ARCH=arm64;;
-       "Power Macintosh") ARCH=ppc;;
+       i386) ARCH=x86 ;;
+       i686) ARCH=x86 ;;
+       i86pc) ARCH=x86 ;;
+       amd64) ARCH=x86 ;;
+       ppc64) ARCH=ppc ;;
+       *86) ARCH=x86 ;;
+       *86_64) ARCH=x86 ;;
+       aarch64) ARCH=arm64 ;;
+       arm64) ARCH=arm64 ;;
+       iPhone5*[3-9]) ARCH=arm64 ;;
+       iPhone[6-9]*) ARCH=arm64 ;;
+       iPhone[1-9][0-9]*) ARCH=arm64 ;;
+       iPad[4-9]*) ARCH=arm64 ;;
+       iPad[1-9][0-9]*) ARCH=arm64 ;;
+       AppleTV[5-9]*) ARCH=arm64 ;;
+       AppleTV[1-9][0-9]*) ARCH=arm64 ;;
+       "Power Macintosh") ARCH=ppc ;;
     esac
 }
 
@@ -322,9 +322,9 @@ find_num_cores() {
     uname_s=$(uname -s)
     check_ret uname
     case $uname_s in
-        CYGWIN_NT-5.2-WOW64 | *CYGWIN_NT* | *CYGWIN* | MINGW32*) NUM_CORES=$NUMBER_OF_PROCESSORS;;
-        *linux* | *Linux*) NUM_CORES=$(getconf _NPROCESSORS_ONLN || nproc);;
-        *darwin* | *Darwin* | freebsd) NUM_CORES=$(sysctl -n hw.ncpu);;
+        CYGWIN_NT-5.2-WOW64 | *CYGWIN_NT* | *CYGWIN* | MINGW32*) NUM_CORES=$NUMBER_OF_PROCESSORS ;;
+        *linux* | *Linux*) NUM_CORES=$(getconf _NPROCESSORS_ONLN || nproc) ;;
+        *darwin* | *Darwin* | freebsd) NUM_CORES=$(sysctl -n hw.ncpu) ;;
     esac
 }
 
@@ -352,7 +352,7 @@ find_word_size_c() {
         64) ;;
         *)
             echo "Word size should be 32/64, got '$WORD_OUT'"
-            exit_script 15;;
+            exit_script 15 ;;
     esac
     $DELETE -f $C_WORD
     echo "$WORD_OUT"
@@ -360,16 +360,16 @@ find_word_size_c() {
 
 set_factor_binary() {
     case $OS in
-        windows) FACTOR_BINARY=factor.com;;
-        *) FACTOR_BINARY=factor;;
+        windows) FACTOR_BINARY=factor.com ;;
+        *) FACTOR_BINARY=factor ;;
     esac
 }
 
 set_factor_library() {
     case $OS in
-        windows) FACTOR_LIBRARY=factor.dll;;
-        macosx) FACTOR_LIBRARY=libfactor.dylib;;
-        *) FACTOR_LIBRARY=libfactor.a;;
+        windows) FACTOR_LIBRARY=factor.dll ;;
+        macosx) FACTOR_LIBRARY=libfactor.dylib ;;
+        *) FACTOR_LIBRARY=libfactor.a ;;
     esac
 }
 
@@ -532,15 +532,15 @@ cd_factor() {
 
 set_copy() {
     case $OS in
-        windows) COPY=cp;;
-        *) COPY=cp;;
+        windows) COPY=cp ;;
+        *) COPY=cp ;;
     esac
 }
 
 set_delete() {
     case $OS in
-        windows) DELETE=rm;;
-        *) DELETE=rm;;
+        windows) DELETE=rm ;;
+        *) DELETE=rm ;;
     esac
 }
 
@@ -811,8 +811,8 @@ case "$1" in
     deps-macosx) install_deps_macosx ;;
     deps-dnf) install_deps_dnf ;;
     deps-pkg) install_deps_pkg ;;
-    self-bootstrap) get_config_info; make_boot_image; bootstrap;;
-    self-update) update; make_boot_image; bootstrap;;
+    self-bootstrap) get_config_info; make_boot_image; bootstrap  ;;
+    self-update) update; make_boot_image; bootstrap  ;;
     quick-update) update; refresh_image ;;
     update|latest) update; download_and_bootstrap ;;
     compile) find_build_info; make_factor ;;
