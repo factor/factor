@@ -6,7 +6,7 @@ math.private ranges layouts words vocabs slots.private
 locals locals.backend generic.single.private sequences
 threads.private strings.private ;
 FROM: cpu.ppc.assembler => B ;
-IN: bootstrap.ppc
+IN: bootstrap.assembler.ppc
 
 : jit-call ( string -- )
     dup
@@ -815,4 +815,4 @@ IN: bootstrap.ppc
     ] }
 } define-sub-primitives
 
-[ "bootstrap.ppc" forget-vocab ] with-compilation-unit
+[ "bootstrap.assembler.ppc" forget-vocab ] with-compilation-unit

@@ -3,7 +3,7 @@
 USING: compiler.codegen.relocation compiler.constants cpu.x86.assembler
 cpu.x86.assembler.operands kernel kernel.private layouts parser
 sequences ;
-IN: bootstrap.x86
+IN: bootstrap.assembler.x86
 
 : tib-segment ( -- ) FS ;
 : tib-temp ( -- reg ) EAX ;
