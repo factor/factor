@@ -447,6 +447,73 @@ urls [
     1 cut* swap first2 '[ _ _ url-append-path ] unit-test
 ] each
 
+! RFC 3986 1.1.2.  Examples
+
+{
+    T{ url
+        { protocol "ftp" }
+        { host "ftp.is.co.za" }
+        { path "/rfc/rfc1808.txt" }
+    }
+} [ "ftp://ftp.is.co.za/rfc/rfc1808.txt" >url ] unit-test
+
+{
+    T{ url
+        { protocol "http" }
+        { host "www.ietf.org" }
+        { path "/rfc/rfc2396.txt" }
+    }
+} [ "http://www.ietf.org/rfc/rfc2396.txt" >url ] unit-test
+
+
+{
+    T{ url
+        { protocol "ldap" }
+        { host "[2001:db8::7]" }
+        { path "/c=GB" }
+        { query LH{ { "objectClass?one" f } } }
+    }
+} [ "ldap://[2001:db8::7]/c=GB?objectClass?one" >url ] unit-test
+
+{
+    T{ url
+        { protocol "mailto" }
+        { path "John.Doe@example.com" }
+    }
+} [ "mailto:John.Doe@example.com" >url ] unit-test
+
+
+{
+    T{ url
+        { protocol "news" }
+        { path "comp.infosystems.www.servers.unix" }
+    }
+} [ "news:comp.infosystems.www.servers.unix" >url ] unit-test
+
+
+{
+    T{ url
+        { protocol "tel" }
+        { path "+1-816-555-1212" }
+    }
+} [ "tel:+1-816-555-1212" >url ] unit-test
+
+{
+    T{ url
+        { protocol "telnet" }
+        { host "192.0.2.16" }
+        { port 80 }
+        { path "/" }
+    }
+} [ "telnet://192.0.2.16:80/" >url ] unit-test
+
+{
+    T{ url
+        { protocol "urn" }
+        { path "oasis:names:specification:docbook:dtd:xml:4.1.2" }
+    }
+} [ "urn:oasis:names:specification:docbook:dtd:xml:4.1.2" >url ] unit-test
+
 ! RFC 3986 6.2.2.  Syntax Normalization
 { URL" example://a/b/c/%7Bfoo%7D" } [
     URL" eXAMPLE://a/./b/../b/%63/%7bfoo%7d"
