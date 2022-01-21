@@ -117,6 +117,25 @@ ALIAS: °C deg-C
 : zepto ( n -- x ) 1000000000000000000000 / ;
 : yocto ( n -- x ) 1000000000000000000000000 / ;
 
+! Yi Zi Ei Pi Ti Gi Mi Ki
+: yobi ( n -- x ) 1208925819614629174706176 * ;
+: zebi ( n -- x ) 1180591620717411303424 * ;
+: exbi ( n -- x ) 1152921504606846976 * ;
+: pebi ( n -- x ) 1125899906842624 * ;
+: tebi ( n -- x ) 1099511627776 * ;
+: gibi ( n -- x ) 1073741824 * ;
+: mebi ( n -- x ) 1048576 * ;
+: kibi ( n -- x ) 1024 * ;
+
+ALIAS: Yi yobi
+ALIAS: Zi zebi
+ALIAS: Ei exbi
+ALIAS: Pi pebi
+ALIAS: Ti tebi
+ALIAS: Gi gibi
+ALIAS: Mi mebi
+ALIAS: Ki kibi
+
 : km ( n -- dimensioned ) kilo m ;
 : cm ( n -- dimensioned ) centi m ;
 : mm ( n -- dimensioned ) milli m ;
