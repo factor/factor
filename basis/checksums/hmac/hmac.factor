@@ -3,8 +3,9 @@
 USING: accessors arrays checksums io.encodings.binary
 io.files io.streams.byte-array kernel math math.vectors
 sequences ;
-USE: checksums.common
 IN: checksums.hmac
+
+SLOT: block-size
 
 <PRIVATE
 
