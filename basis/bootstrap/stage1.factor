@@ -6,7 +6,7 @@ parser.notes sequences system vocabs vocabs.loader ;
 
 "Bootstrap stage 1..." print flush
 
-"vocab:bootstrap/primitives.factor" run-file
+"resource:basis/bootstrap/primitives.factor" run-file
 
 load-help? off
 { "resource:core" } vocab-roots set
@@ -37,7 +37,7 @@ load-help? off
     "locals.fry" require
     "locals.macros" require
 
-    "vocab:bootstrap/layouts.factor" parse-file %
+    "resource:basis/bootstrap/layouts.factor" parse-file %
 
     [
         f parser-quiet? set-global

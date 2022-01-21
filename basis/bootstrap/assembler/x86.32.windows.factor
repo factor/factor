@@ -8,7 +8,7 @@ IN: bootstrap.assembler.x86
 : tib-segment ( -- ) FS ;
 : tib-temp ( -- reg ) EAX ;
 
-<< "vocab:bootstrap/assembler/x86.windows.factor" parse-file suffix! >> call
+<< "resource:basis/bootstrap/assembler/x86.windows.factor" parse-file suffix! >> call
 
 : jit-install-seh ( -- )
     ! VM pointer must be in vm-reg already
@@ -34,5 +34,5 @@ IN: bootstrap.assembler.x86
     ! Store exception record in TIB.
     tib-exception-list-offset [] tib-temp tib-segment MOV ;
 
-<< "vocab:bootstrap/assembler/x86.32.factor" parse-file suffix! >> call
-<< "vocab:bootstrap/assembler/x86.factor" parse-file suffix! >> call
+<< "resource:basis/bootstrap/assembler/x86.32.factor" parse-file suffix! >> call
+<< "resource:basis/bootstrap/assembler/x86.factor" parse-file suffix! >> call

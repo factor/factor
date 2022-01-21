@@ -16,6 +16,6 @@ IN: bootstrap.assembler.x86
 : arg4 ( -- reg ) RCX ;
 : red-zone-size ( -- n ) 128 ;
 
-<< "vocab:bootstrap/assembler/x86.unix.factor" parse-file suffix! >> call
-<< "vocab:bootstrap/assembler/x86.64.factor" parse-file suffix! >> call
-<< "vocab:bootstrap/assembler/x86.factor" parse-file suffix! >> call
+<< "resource:basis/bootstrap/assembler/x86.unix.factor" parse-file suffix! >> call
+<< "resource:basis/bootstrap/assembler/x86.64.factor" parse-file suffix! >> call
+<< "resource:basis/bootstrap/assembler/x86.factor" parse-file suffix! >> call
