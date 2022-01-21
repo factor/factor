@@ -11,10 +11,10 @@ vocabs.metadata zealot ;
 IN: zealot.factor
 
 : download-boot-checksums ( path branch -- )
-    '[ _ "http://downloads.factorcode.org/images/%s/checksums.txt" sprintf download ] with-directory ;
+    '[ _ "https://downloads.factorcode.org/images/%s/checksums.txt" sprintf download ] with-directory ;
 
 : download-boot-image ( path branch image-name -- )
-    '[ _ _ "http://downloads.factorcode.org/images/%s/%s" sprintf download ] with-directory ;
+    '[ _ _ "https://downloads.factorcode.org/images/%s/%s" sprintf download ] with-directory ;
 
 : download-my-boot-image ( path branch -- )
     my-boot-image-name download-boot-image ;
