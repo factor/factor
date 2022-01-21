@@ -4,7 +4,7 @@
 USING: accessors alien alien.c-types alien.data alien.strings
 arrays ascii assocs assocs.extras byte-arrays calendar classes
 classes.struct colors combinators continuations io io.crlf
-io.encodings.string io.encodings.utf16n io.encodings.utf8 kernel
+io.encodings.string io.encodings.utf16 io.encodings.utf8 kernel
 libc literals make math math.bitwise namespaces sequences sets
 specialized-arrays strings threads ui ui.backend ui.clipboards
 ui.event-loop ui.gadgets ui.gadgets.private ui.gadgets.worlds

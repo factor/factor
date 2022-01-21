@@ -6,7 +6,7 @@ arrays assocs classes cocoa cocoa.application cocoa.classes
 cocoa.pasteboard cocoa.runtime cocoa.subclassing cocoa.touchbar
 cocoa.types cocoa.views combinators continuations
 core-foundation.strings core-graphics core-graphics.types
-core-text debugger io.encodings.string io.encodings.utf16n
+core-text debugger io.encodings.string io.encodings.utf16
 io.encodings.utf8 kernel literals math math.order math.parser
 math.rectangles math.vectors namespaces opengl sequences
 splitting threads ui.backend.cocoa.input-methods ui.commands

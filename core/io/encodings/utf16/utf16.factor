@@ -1,7 +1,8 @@
 ! Copyright (C) 2006, 2009 Daniel Ehrenberg.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors byte-arrays io io.encodings kernel math
-math.private sequences sequences.private strings strings.private ;
+USING: accessors alien.accessors byte-arrays io io.encodings
+kernel math math.private sequences sequences.private strings
+strings.private ;
 IN: io.encodings.utf16
 
 SINGLETON: utf16be
@@ -163,3 +164,12 @@ M: utf16 <encoder>
     drop bom-le over stream-write utf16le <encoder> ;
 
 PRIVATE>
+
+SINGLETON: utf16n
+
+: choose-utf16-endian ( -- descriptor )
+    B{ 1 0 0 0 } 0 alien-unsigned-4 1 = utf16le utf16be ? ; foldable
+
+M: utf16n <decoder> drop choose-utf16-endian <decoder> ;
+
+M: utf16n <encoder> drop choose-utf16-endian <encoder> ;

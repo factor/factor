@@ -1,7 +1,7 @@
 ! Copyright (C) 2009, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors cache core-graphics.types core-text
-core-text.fonts io.encodings.string io.encodings.utf16n kernel
+core-text.fonts io.encodings.string io.encodings.utf16 kernel
 math math.vectors namespaces opengl sequences ui.text
 ui.text.private ;
 IN: ui.text.core-text
