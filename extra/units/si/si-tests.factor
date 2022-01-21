@@ -10,3 +10,6 @@ math.functions units.imperial ;
 { -40 } [ -40 deg-F [ deg-C ] undo ] unit-test
 
 { -40 } [ -40 deg-C [ deg-F ] undo ] unit-test
+
+{ 1024 } [ 1 kibi ] unit-test
+{ 1024 } [ 1 Ki ] unit-test
