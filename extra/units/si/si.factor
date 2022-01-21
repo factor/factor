@@ -57,7 +57,7 @@ IN: units.si
 : T ( n -- tesla ) { kg } { s s A } <dimensioned> ;
 : H ( n -- henry ) { m m kg } { s s A A } <dimensioned> ;
 : deg-C ( n -- Celsius ) 27315/100 + { K } { } <dimensioned> ;
-ALIAS: °C deg-C
+ALIAS: Â°C deg-C
 : lm ( n -- lumen ) { m m cd } { m m } <dimensioned> ;
 : lx ( n -- lux ) { m m cd } { m m m m  } <dimensioned> ;
 : Bq ( n -- becquerel ) { } { s } <dimensioned> ;
