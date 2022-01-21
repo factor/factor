@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: cpu.arm.assembler cpu.arm.assembler.opcodes kernel layouts
 parser sequences ;
-IN: bootstrap.arm
+IN: bootstrap.assembler.arm
 
 ! Stack frame
 ! https://docs.microsoft.com/en-us/cpp/build/arm64-exception-handling?view=vs-2019

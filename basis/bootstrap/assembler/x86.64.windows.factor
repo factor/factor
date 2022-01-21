@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: cpu.x86.assembler cpu.x86.assembler.operands kernel
 layouts parser sequences ;
-IN: bootstrap.x86
+IN: bootstrap.assembler.x86
 
 DEFER: stack-reg
 

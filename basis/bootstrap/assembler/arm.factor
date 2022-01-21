@@ -3,8 +3,8 @@
 USING: bootstrap.image.private cpu.arm.assembler kernel
 kernel.private layouts locals.backend math.private namespaces
 slots.private strings.private ;
-IN: bootstrap.arm
+IN: bootstrap.assembler.arm
 
 big-endian off
 
-! [ "bootstrap.arm" forget-vocab ] with-compilation-unit
+! [ "bootstrap.assembler.arm" forget-vocab ] with-compilation-unit
