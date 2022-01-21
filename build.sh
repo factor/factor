@@ -777,6 +777,7 @@ usage() {
     $ECHO "  net-bootstrap - recompile, download a boot image, bootstrap"
     $ECHO "  make-target - find and print the os-arch-cpu string"
     $ECHO "  report|info - print the build variables"
+    $ECHO "  full-report - print the build variables, check programs and libraries"
     $ECHO "  update-boot-image - get the boot image for the current branch"
     $ECHO ""
     $ECHO "If you are behind a firewall, invoke as:"
@@ -821,7 +822,7 @@ case "$1" in
     make-target) FIND_MAKE_TARGET=true; ECHO=false; find_build_info; exit_script ;;
     report|info) find_build_info ;;
     full-report) find_build_info; check_installed_programs; check_libraries ;;
-    update-boot-image) find_build_info; check_installed_programs; update_boot_image;;
+    update-boot-image) find_build_info; check_installed_programs; update_boot_image ;;
     *) usage ;;
 esac
 
