@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: cpu.x86.assembler.operands kernel layouts parser
 sequences ;
-IN: bootstrap.x86
+IN: bootstrap.assembler.x86
 
 : stack-frame-size ( -- n ) 4 bootstrap-cells ;
 : nv-regs ( -- seq ) { RBX R12 R13 R14 R15 } ;
