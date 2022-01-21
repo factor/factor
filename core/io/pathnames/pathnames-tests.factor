@@ -60,8 +60,8 @@ H{
     { current-directory "." }
     { "resource-path" ".." }
 } [
-    [ "../core/bootstrap/stage2.factor" ]
-    [ "resource:core/bootstrap/stage2.factor" absolute-path ]
+    [ "../basis/bootstrap/stage2.factor" ]
+    [ "resource:basis/bootstrap/stage2.factor" absolute-path ]
     unit-test
 ] with-variables
 
