@@ -1,7 +1,7 @@
 ! Copyright (C) 2005, 2006 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: alien.c-types alien.syntax classes.struct colors
-io.encodings.utf16n io.encodings.utf8 kernel math math.bitwise
+io.encodings.utf16 io.encodings.utf8 kernel math math.bitwise
 math.functions math.vectors sequences ;
 FROM: alien.c-types => float short ;
 IN: windows.types

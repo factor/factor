@@ -3,7 +3,7 @@
 
 USING: accessors alien.c-types alien.data arrays assocs
 byte-arrays cache classes.struct colors combinators destructors
-fonts images init io.encodings.string io.encodings.utf16n kernel
+fonts images init io.encodings.string io.encodings.utf16 kernel
 literals locals math math.bitwise math.functions namespaces
 sequences specialized-arrays windows.errors windows.fonts
 windows.gdi32 windows.offscreen windows.ole32 windows.types

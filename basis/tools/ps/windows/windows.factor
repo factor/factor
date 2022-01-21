@@ -1,7 +1,7 @@
 USING: accessors alien alien.c-types alien.data alien.syntax
 arrays byte-arrays classes.struct combinators.short-circuit
 continuations destructors fry io io.encodings.string
-io.encodings.utf16n kernel literals locals math sequences
+io.encodings.utf16 kernel literals locals math sequences
 strings system tools.ps windows.errors windows.handles
 windows.kernel32 windows.ntdll windows.types ;
 IN: tools.ps.windows
