@@ -41,7 +41,7 @@ build script:
 * M1 macOS: `arch -x86_64 ./build.sh update`
 
 or download the correct boot image for your system from
-http://downloads.factorcode.org/images/master/, put it in the `factor`
+https://downloads.factorcode.org/images/master/, put it in the `factor`
 directory and run:
 
 * Unix: `make` and then `./factor -i=boot.unix-x86.64.image`
