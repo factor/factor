@@ -4,10 +4,10 @@ USING: assocs bootstrap.image checksums checksums.md5
 http.client io.files kernel math.parser splitting urls ;
 IN: bootstrap.image.download
 
-CONSTANT: url URL" http://downloads.factorcode.org/images/master/"
+CONSTANT: download-url URL" https://downloads.factorcode.org/images/master/"
 
 : download-checksums ( -- alist )
-    url "checksums.txt" >url derive-url http-get nip
+    download-url "checksums.txt" >url derive-url http-get nip
     split-lines [ " " split1 ] { } map>assoc ;
 
 : file-checksum ( image -- checksum )
@@ -26,7 +26,7 @@ CONSTANT: url URL" http://downloads.factorcode.org/images/master/"
     need-new-image? [ "Boot image corrupt" throw ] when ;
 
 : download-image ( image -- )
-    [ url swap >url derive-url download ]
+    [ download-url swap >url derive-url download ]
     [ verify-image ]
     bi ;
 
