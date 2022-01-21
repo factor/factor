@@ -56,6 +56,6 @@ IN: bootstrap.assembler.arm
 : arg4 ( -- reg ) X3 ;
 : red-zone-size ( -- n ) 16 ;
 
-<< "vocab:bootstrap/assembler/arm.unix.factor" parse-file suffix! >> call
-<< "vocab:bootstrap/assembler/arm.64.factor" parse-file suffix! >> call
-<< "vocab:bootstrap/assembler/arm.factor" parse-file suffix! >> call
+<< "resource:basis/bootstrap/assembler/arm.unix.factor" parse-file suffix! >> call
+<< "resource:basis/bootstrap/assembler/arm.64.factor" parse-file suffix! >> call
+<< "resource:basis/bootstrap/assembler/arm.factor" parse-file suffix! >> call

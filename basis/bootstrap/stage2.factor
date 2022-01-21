@@ -95,9 +95,9 @@ CONSTANT: default-components
     print-report
 
     "staging" get [
-        "vocab:bootstrap/finish-staging.factor" run-file
+        "resource:basis/bootstrap/finish-staging.factor" run-file
     ] [
-        "vocab:bootstrap/finish-bootstrap.factor" run-file
+        "resource:basis/bootstrap/finish-bootstrap.factor" run-file
     ] if
 
     f error set-global
@@ -108,7 +108,7 @@ CONSTANT: default-components
     drop
     [
         load-help? off
-        [ "vocab:bootstrap/bootstrap-error.factor" parse-file ] save/restore-error
+        [ "resource:basis/bootstrap/bootstrap-error.factor" parse-file ] save/restore-error
         call
     ] with-scope
 ] recover
