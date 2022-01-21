@@ -13,15 +13,15 @@ IN: bootstrap.primitives
 
 H{ } clone sub-primitives set
 
-"vocab:bootstrap/syntax.factor" parse-file
+"resource:basis/bootstrap/syntax.factor" parse-file
 
 : asm-file ( arch -- file )
     "-" split reverse "." join
-    "vocab:bootstrap/assembler/" ".factor" surround ;
+    "resource:basis/bootstrap/assembler/" ".factor" surround ;
 
 architecture get asm-file parse-file
 
-"vocab:bootstrap/layouts.factor" parse-file
+"resource:basis/bootstrap/layouts.factor" parse-file
 
 ! Now we have ( syntax-quot arch-quot layouts-quot ) on the stack
 

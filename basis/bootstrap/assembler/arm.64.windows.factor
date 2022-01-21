@@ -4,6 +4,6 @@ USING: kernel parser sequences ;
 IN: bootstrap.assembler.arm
 
 
-<< "vocab:bootstrap/assembler/arm.windows.factor" parse-file suffix! >> call
-<< "vocab:bootstrap/assembler/arm.64.factor" parse-file suffix! >> call
-<< "vocab:bootstrap/assembler/arm.factor" parse-file suffix! >> call
+<< "resource:basis/bootstrap/assembler/arm.windows.factor" parse-file suffix! >> call
+<< "resource:basis/bootstrap/assembler/arm.64.factor" parse-file suffix! >> call
+<< "resource:basis/bootstrap/assembler/arm.factor" parse-file suffix! >> call

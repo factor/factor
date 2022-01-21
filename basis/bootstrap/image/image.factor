@@ -531,7 +531,7 @@ PRIVATE>
         { auto-use? f }
     } assoc-union! [
         H{ } clone special-objects set
-        "resource:/core/bootstrap/stage1.factor" run-file
+        "resource:basis/bootstrap/stage1.factor" run-file
         build-image
         write-image
     ] with-variables ;
