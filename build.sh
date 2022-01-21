@@ -394,6 +394,8 @@ echo_build_info() {
     $ECHO MAKE_IMAGE_TARGET=$MAKE_IMAGE_TARGET
     $ECHO GIT_PROTOCOL=$GIT_PROTOCOL
     $ECHO GIT_URL=$GIT_URL
+    $ECHO CHECKSUM_URL=$CHECKSUM_URL
+    $ECHO BOOT_IMAGE_URL=$BOOT_IMAGE_URL
     $ECHO DOWNLOADER=$DOWNLOADER
     $ECHO CC=$CC
     $ECHO CXX=$CXX
@@ -472,6 +474,7 @@ find_build_info() {
     set_factor_image
     set_build_info
     set_downloader
+    set_boot_image_vars
     set_make
     echo_build_info
 }
@@ -610,16 +613,16 @@ check_url() {
 # Otherwise, just use `master`
 set_boot_image_vars() {
     set_current_branch
-    local url="http://downloads.factorcode.org/images/${CURRENT_BRANCH}/checksums.txt"
+    local url="https://downloads.factorcode.org/images/${CURRENT_BRANCH}/checksums.txt"
     check_url $url
     if [[ $? -eq 0 ]]; then
         CHECKSUM_URL="$url"
-        BOOT_IMAGE_URL="http://downloads.factorcode.org/images/${CURRENT_BRANCH}/${BOOT_IMAGE}"
+        BOOT_IMAGE_URL="https://downloads.factorcode.org/images/${CURRENT_BRANCH}/${BOOT_IMAGE}"
     else
         $ECHO "boot image for branch \`${CURRENT_BRANCH}\` is not on server, trying master instead"
         $ECHO "  tried nonexistent url: ${url}"
-        CHECKSUM_URL="http://downloads.factorcode.org/images/master/checksums.txt"
-        BOOT_IMAGE_URL="http://downloads.factorcode.org/images/master/${BOOT_IMAGE}"
+        CHECKSUM_URL="https://downloads.factorcode.org/images/master/checksums.txt"
+        BOOT_IMAGE_URL="https://downloads.factorcode.org/images/master/${BOOT_IMAGE}"
     fi
 }
 
