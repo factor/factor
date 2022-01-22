@@ -247,31 +247,44 @@ GENERIC: prev-float ( m -- n )
 : align ( m w -- n )
     1 - [ + ] keep bitnot bitand ; inline
 
-: (each-integer) ( ... i n quot: ( ... i -- ... ) -- ... )
+<PRIVATE
+
+: ((each-integer)) ( ... i n quot: ( ... i -- ... ) -- ... )
     2over < [
         [ nip call ] 3keep
-        [ 1 + ] 2dip (each-integer)
+        [ 1 + ] 2dip ((each-integer))
     ] [
         3drop
     ] if ; inline recursive
 
-: (find-integer) ( ... i n quot: ( ... i -- ... ? ) -- ... i/f )
+: ((find-integer)) ( ... i n quot: ( ... i -- ... ? ) -- ... i/f )
     2over < [
         [ nip call ] 3keep roll
         [ 2drop ]
-        [ [ 1 + ] 2dip (find-integer) ] if
+        [ [ 1 + ] 2dip ((find-integer)) ] if
     ] [
         3drop f
     ] if ; inline recursive
 
-: (all-integers?) ( ... i n quot: ( ... i -- ... ? ) -- ... ? )
+: ((all-integers?)) ( ... i n quot: ( ... i -- ... ? ) -- ... ? )
     2over < [
         [ nip call ] 3keep roll
-        [ [ 1 + ] 2dip (all-integers?) ]
+        [ [ 1 + ] 2dip ((all-integers?)) ]
         [ 3drop f ] if
     ] [
         3drop t
     ] if ; inline recursive
+
+PRIVATE>
+
+: (each-integer) ( ... i n quot: ( ... i -- ... ) -- ... )
+    2over both-fixnums? [ ((each-integer)) ] [ ((each-integer)) ] if ; inline
+
+: (find-integer) ( ... i n quot: ( ... i -- ... ? ) -- ... i/f )
+    2over both-fixnums? [ ((find-integer)) ] [ ((find-integer)) ] if ; inline
+
+: (all-integers?) ( ... i n quot: ( ... i -- ... ? ) -- ... ? )
+    2over both-fixnums? [ ((all-integers?)) ] [ ((all-integers?)) ] if ; inline
 
 : each-integer ( ... n quot: ( ... i -- ... ) -- ... )
     [ 0 ] 2dip (each-integer) ; inline
@@ -285,13 +298,21 @@ GENERIC: prev-float ( m -- n )
 : all-integers? ( ... n quot: ( ... i -- ... ? ) -- ... ? )
     [ 0 ] 2dip (all-integers?) ; inline
 
-: find-last-integer ( ... n quot: ( ... i -- ... ? ) -- ... i/f )
+<PRIVATE
+
+: (find-last-integer) ( ... n quot: ( ... i -- ... ? ) -- ... i/f )
     over 0 < [
         2drop f
     ] [
         [ call ] 2keep rot [
             drop
         ] [
-            [ 1 - ] dip find-last-integer
+            [ 1 - ] dip (find-last-integer)
         ] if
     ] if ; inline recursive
+
+PRIVATE>
+
+
+: find-last-integer ( ... n quot: ( ... i -- ... ? ) -- ... i/f )
+    over fixnum? [ (find-last-integer) ] [ (find-last-integer) ] if ; inline
