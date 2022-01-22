@@ -128,7 +128,7 @@ SYMBOLS: source dot-buffer dash-buffer intra-char-gap-buffer letter-gap-buffer ;
 CONSTANT: beep-freq 880
 
 : <morse-buffer> ( -- buffer )
-    half-sample-freq <8bit-mono-buffer> ;
+    half-sample-freq <8-bit-mono-buffer> ;
 
 : sine-buffer ( seconds -- id )
     beep-freq swap <morse-buffer> >sine-wave-buffer
