@@ -2,8 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors alien alien.c-types alien.data alien.strings
 arrays byte-arrays classes.struct combinators kernel math
-namespaces sequences specialized-arrays
-specialized-arrays.instances.alien.c-types.ushort system
+namespaces sequences specialized-arrays system
 system-info vocabs.loader windows windows.advapi32
 windows.errors windows.kernel32 windows.powrprof words ;
 SPECIALIZED-ARRAY: ushort
