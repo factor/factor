@@ -48,9 +48,9 @@ SYMBOL: header-bits
 
 : cell-bits ( -- n ) 8 cells ; inline
 
-: 32bit? ( -- ? ) cell-bits 32 = ; inline
+: 32-bit? ( -- ? ) cell-bits 32 = ; inline
 
-: 64bit? ( -- ? ) cell-bits 64 = ; inline
+: 64-bit? ( -- ? ) cell-bits 64 = ; inline
 
 : bootstrap-cell ( -- n ) \ cell get cell or ; inline
 

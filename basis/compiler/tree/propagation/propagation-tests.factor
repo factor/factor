@@ -538,7 +538,7 @@ IN: compiler.tree.propagation.tests
     [ { fixnum } declare 1 swap 7 bitand >bignum shift ] final-classes
 ] unit-test
 
-32bit? [
+32-bit? [
     [ V{ integer } ] [
         [ { fixnum } declare 1 swap 31 bitand shift ]
         final-classes
