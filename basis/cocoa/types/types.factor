@@ -4,7 +4,7 @@ USING: alien.c-types alien.syntax classes.struct cocoa.runtime
 core-graphics.types kernel literals layouts ;
 IN: cocoa.types
 
-CONSTANT: NSNotFound $[ 32bit? 0x7fffffff 0x7fffffffffffffff ? ]
+CONSTANT: NSNotFound $[ 32-bit? 0x7fffffff 0x7fffffffffffffff ? ]
 
 TYPEDEF: long NSInteger
 TYPEDEF: ulong NSUInteger
