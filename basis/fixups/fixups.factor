@@ -7,10 +7,11 @@ IN: fixups
 CONSTANT: vocab-renames {
     { "math.intervals" { "intervals" "0.99" } }
     { "math.ranges" { "ranges" "0.99" } }
-    { "unicode.collation" { "unicode" "0.99" } }
 }
 
 CONSTANT: word-renames {
+    { "32bit?" { "layouts:32-bit?" "0.99" } }
+    { "64bit?" { "layouts:64-bit?" "0.99" } }
     { "lines" { "io:read-lines" "0.99" } }
     { "words" { "splitting:split-words" "0.99" } }
     { "contents" { "io:read-contents" "0.99" } }
