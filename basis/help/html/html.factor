@@ -148,7 +148,7 @@ M: pathname url-of
         "}" ?tail drop
         " border-bottom: 1px dashed #ccc; width: 100%; padding-top: 15px; padding-bottom: 10px; }"
         append swap pick set-nth {
-            ".a a { color: black; font-size: 24pt; }"
+            ".a a { color: black; font-size: 24pt; line-height: 100%; }"
             ".a * a { color: #2A5DB0; font-size: 12pt; }"
             ".a td { border: none; }"
             ".a tr:hover { background-color: white; }"
