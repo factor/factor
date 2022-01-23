@@ -1017,11 +1017,7 @@ PRIVATE>
 PRIVATE>
 
 : binary-reduce ( seq start quot: ( elt1 elt2 -- newelt ) -- value )
-    pick dup slice? [
-        [ seq>> ] 3dip [ from>> 0 max ] [ to>> 0 max over - ] bi
-    ] [
-        length 0 max 0 swap
-    ] if (binary-reduce) ; inline
+    pick length 0 max 0 swap (binary-reduce) ; inline
 
 : cut ( seq n -- before after )
     [ head ] [ tail ] 2bi ;
