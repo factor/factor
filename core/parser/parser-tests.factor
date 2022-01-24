@@ -614,11 +614,15 @@ EXCLUDE: qualified.tests.bar => x ;
 ] unit-test
 
 [
+    f auto-use? [
     "dup" <string-reader> "unuse-test" parse-stream
+    ] with-variable
 ] [ error>> error>> error>> no-word-error? ] must-fail-with
 
 [
+    f auto-use? [
     "USE: kernel UNUSE: kernel dup" <string-reader> "unuse-test" parse-stream
+    ] with-variable
 ] [ error>> error>> error>> no-word-error? ] must-fail-with
 
 { } [ [ "vocabs.loader.test.l" forget-vocab ] with-compilation-unit ] unit-test
