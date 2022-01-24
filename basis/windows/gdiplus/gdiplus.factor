@@ -1648,3 +1648,8 @@ CONSTANT: standard-gdi+-startup-input
     GdiplusShutdown ;
 
 DESTRUCTOR: stop-gdi+
+
+SYMBOL: gdi-token
+
+[ start-gdi+ gdi-token set-global ] "windows.gdiplus" add-startup-hook
+[ gdi-token get-global [ stop-gdi+ ] when* ] "windows.gdiplus" add-shutdown-hook
