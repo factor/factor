@@ -155,7 +155,7 @@ PRIVATE>
 : run-test-file ( path -- )
     dup current-test-file [
         test-failures get current-test-file get +test-failure+ delete-file-errors
-        '[ f auto-use? [ _ run-file ] with-variable ] [
+        '[ _ run-file ] [
             restartable-tests? get
             [ dup compute-restarts empty? not ] [ f ] if
             [ rethrow ] [ notify-test-file-failed ] if
