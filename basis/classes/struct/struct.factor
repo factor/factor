@@ -202,17 +202,6 @@ M: struct-c-type base-type ;
 : forget-struct-slot-values-method ( class -- )
     \ struct-slot-values ?lookup-method forget ;
 
-: struct-equals-quot ( class -- quot )
-    dup struct-slots
-    [ name>> reader-word 1quotation '[ [ @ ] same? ] ] map
-    '[ over _ instance? [ _ 2&& ] [ 2drop f ] if ] ;
-
-: define-equal-method ( class -- )
-    [ \ equal? ] [ struct-equals-quot ] bi define-inline-method ;
-
-: forget-equal-method ( class -- )
-    \ equal? ?lookup-method forget ;
-
 : clone-underlying ( struct -- byte-array )
     binary-object memory>byte-array ; inline
 
@@ -285,11 +274,7 @@ M: struct binary-zero? binary-object uchar <c-direct-array> [ 0 = ] all? ; inlin
     ] [ drop f ] if ;
 
 : define-struct-methods ( class -- )
-    {
-        [ define-struct-slot-values-method ]
-        [ define-clone-method ]
-        [ define-equal-method ]
-    } cleave ;
+    [ define-struct-slot-values-method ] [ define-clone-method ] bi ;
 
 : check-struct-slots ( slots -- )
     [ type>> lookup-c-type drop ] each ;
@@ -364,7 +349,6 @@ M: struct-class reset-class
         [ forget-struct-slot-accessors ]
         [ forget-struct-slot-values-method ]
         [ forget-clone-method ]
-        [ forget-equal-method ]
         [ { "c-type" "layout" "struct-size" } remove-word-props ]
         [ call-next-method ]
     } cleave ;
