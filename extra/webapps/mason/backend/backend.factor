@@ -67,15 +67,15 @@ counter "COUNTER" {
 : all-builders ( -- builders )
     builder new select-tuples ; inline
 
-: crashed? ( builder -- ? )
+: offline? ( builder -- ? )
     heartbeat-timestamp>> 30 minutes ago before? ;
 
 : broken? ( builder -- ? )
     [ clean-git-id>> ] [ last-git-id>> ] bi = not ;
 
-: funny-builders ( -- crashed broken )
+: funny-builders ( -- offline broken )
     all-builders
-    [ [ crashed? ] filter ]
+    [ [ offline? ] filter ]
     [ [ broken? ] filter ]
     bi ;
 
