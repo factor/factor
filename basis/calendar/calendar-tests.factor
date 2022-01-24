@@ -231,19 +231,19 @@ IN: calendar
 
 {
     T{ timestamp { year 2019 } { month 11 } { day 4 } }
-} [ 2019 308 year-ordinal>timestamp >gmt midnight ] unit-test
+} [ 2019 308 year-ordinal>timestamp ] unit-test
 
 {
     T{ timestamp { year 2020 } { month 11 } { day 3 } }
-} [ 2020 308 year-ordinal>timestamp >gmt midnight ] unit-test
+} [ 2020 308 year-ordinal>timestamp ] unit-test
 
 {
     T{ timestamp { year 2019 } { month 12 } { day 31 } }
-} [ 2019 365 year-ordinal>timestamp >gmt midnight ] unit-test
+} [ 2019 365 year-ordinal>timestamp ] unit-test
 
 {
     T{ timestamp { year 2020 } { month 12 } { day 31 } }
-} [ 2020 366 year-ordinal>timestamp >gmt midnight ] unit-test
+} [ 2020 366 year-ordinal>timestamp ] unit-test
 
 { t } [
     2020 <year> timestamp>year-dates-gmt

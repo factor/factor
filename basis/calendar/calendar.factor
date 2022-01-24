@@ -816,7 +816,7 @@ CONSTANT: weekday-offsets { 0 0 1 2 3 4 5 }
 
 : year-ordinal>timestamp ( year ordinal -- timestamp )
     [ 1 1 julian-day-number ] dip
-    + 1 - julian-day-number>date <date> ;
+    + 1 - julian-day-number>date <date-gmt> ;
 
 GENERIC: weeks-in-week-year ( obj -- n )
 
