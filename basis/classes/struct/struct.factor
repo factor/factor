@@ -9,12 +9,13 @@ USING: accessors alien alien.c-types alien.data alien.parser
 arrays assocs byte-arrays classes classes.parser classes.private
 classes.struct.bit-accessors classes.tuple classes.tuple.parser
 classes.tuple.private combinators combinators.short-circuit
-combinators.smart cpu.architecture definitions delegate.private
-effects functors.backend generalizations generic generic.parser
-io kernel kernel.private lexer libc math math.order parser
-quotations sequences sequences.private slots slots.private
-specialized-arrays stack-checker.dependencies summary vectors
-vocabs.loader vocabs.parser words ;
+cpu.architecture definitions delegate.private effects
+functors.backend generalizations generic generic.parser io
+kernel kernel.private lexer libc math math.order parser
+quotations sequences sequences.generalizations sequences.private
+slots slots.private specialized-arrays
+stack-checker.dependencies summary vectors vocabs.loader
+vocabs.parser words ;
 
 SPECIALIZED-ARRAY: uchar
 
@@ -192,8 +193,8 @@ M: struct-c-type base-type ;
 <PRIVATE
 : struct-slot-values-quot ( class -- quot )
     struct-slots
-    [ name>> reader-word 1quotation ] map
-    '[ [ _ cleave ] output>array ] ;
+    [ name>> reader-word 1quotation ] map dup length
+    '[ _ cleave _ narray ] ;
 
 : define-struct-slot-values-method ( class -- )
     [ \ struct-slot-values ] [ struct-slot-values-quot ] bi
@@ -201,17 +202,6 @@ M: struct-c-type base-type ;
 
 : forget-struct-slot-values-method ( class -- )
     \ struct-slot-values ?lookup-method forget ;
-
-: struct-equals-quot ( class -- quot )
-    dup struct-slots
-    [ name>> reader-word 1quotation '[ [ @ ] same? ] ] map
-    '[ over _ instance? [ _ 2&& ] [ 2drop f ] if ] ;
-
-: define-equal-method ( class -- )
-    [ \ equal? ] [ struct-equals-quot ] bi define-inline-method ;
-
-: forget-equal-method ( class -- )
-    \ equal? ?lookup-method forget ;
 
 : clone-underlying ( struct -- byte-array )
     binary-object memory>byte-array ; inline
@@ -285,11 +275,7 @@ M: struct binary-zero? binary-object uchar <c-direct-array> [ 0 = ] all? ; inlin
     ] [ drop f ] if ;
 
 : define-struct-methods ( class -- )
-    {
-        [ define-struct-slot-values-method ]
-        [ define-clone-method ]
-        [ define-equal-method ]
-    } cleave ;
+    [ define-struct-slot-values-method ] [ define-clone-method ] bi ;
 
 : check-struct-slots ( slots -- )
     [ type>> lookup-c-type drop ] each ;
@@ -364,7 +350,6 @@ M: struct-class reset-class
         [ forget-struct-slot-accessors ]
         [ forget-struct-slot-values-method ]
         [ forget-clone-method ]
-        [ forget-equal-method ]
         [ { "c-type" "layout" "struct-size" } remove-word-props ]
         [ call-next-method ]
     } cleave ;
