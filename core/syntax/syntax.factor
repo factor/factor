@@ -336,12 +336,14 @@ IN: bootstrap.syntax
     "IDENTITY-MEMO::" [ (::) define-identity-memoized ] define-core-syntax
 
     "STARTUP-HOOK:" [
-        \ ; parse-until >quotation current-vocab name>>
-        add-startup-hook
+        scan-word
+        dup \ [ = [ drop parse-quotation ] [ 1quotation ] if
+        current-vocab name>> [ add-startup-hook ] 2curry append!
     ] define-core-syntax
 
     "SHUTDOWN-HOOK:" [
-        \ ; parse-until >quotation current-vocab name>>
-        add-shutdown-hook
+        scan-word
+        dup \ [ = [ drop parse-quotation ] [ 1quotation ] if
+        current-vocab name>> [ add-shutdown-hook ] 2curry append!
     ] define-core-syntax
 ] with-compilation-unit
