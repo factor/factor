@@ -121,8 +121,8 @@ ALIAS: transpose flip
   first-unsafe length <iota> ; inline
 
 : unshaped-cols-iota ( matrix -- cols-iota )
-  [ first-unsafe length 1 ] keep
-  [ length min ] (each) (each-integer) <iota> ; inline
+  [ first-unsafe length ] keep
+  [ length min ] 1 (each-from) (each-integer) <iota> ; inline
 
 : generic-anti-transpose-unsafe ( cols-iota matrix -- newmatrix )
     [ <reversed> [ nth-end-unsafe ] with { } map-as ] curry { } map-as ; inline
