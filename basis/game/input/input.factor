@@ -36,9 +36,9 @@ M: f (reset-game-input) ;
 : reset-game-input ( -- )
     (reset-game-input) ;
 
-[ reset-game-input ] "game-input" add-startup-hook
-
 PRIVATE>
+
+STARTUP-HOOK: reset-game-input
 
 ERROR: game-input-not-open ;
 
@@ -48,6 +48,7 @@ ERROR: game-input-not-open ;
     ] unless
     game-input-opened [ 1 + ] change-global
     reset-mouse ;
+
 : close-game-input ( -- )
     game-input-opened [
         dup zero? [ game-input-not-open ] when

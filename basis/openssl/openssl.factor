@@ -45,4 +45,4 @@ SINGLETON: openssl
         t ssl-initialized? set-global
     ] unless ;
 
-[ f ssl-initialized? set-global ] "openssl" add-startup-hook
+STARTUP-HOOK: [ f ssl-initialized? set-global ]

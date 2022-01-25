@@ -34,7 +34,7 @@ M: cache-observer vocab-changed
     drop dup forgot-vocab? [ reset-vocab-cache ] [ drop ] if
     reset-disk-cache ;
 
-[
+STARTUP-HOOK: [
     f changed-vocabs set-global
     cache-observer add-vocab-observer
-] "vocabs.cache" add-startup-hook
+]

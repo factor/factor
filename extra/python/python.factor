@@ -115,5 +115,5 @@ ERROR: missing-type type ;
 : python-dll-loaded? ( -- ? )
     "Py_IsInitialized" "python" dlsym? ;
 
-[ python-dll-loaded? [ py-initialize ] when ] "python" add-startup-hook
-[ python-dll-loaded? [ py-finalize ] when ] "python" add-shutdown-hook
+STARTUP-HOOK: [ python-dll-loaded? [ py-initialize ] when ]
+SHUTDOWN-HOOK: [ python-dll-loaded? [ py-finalize ] when ]

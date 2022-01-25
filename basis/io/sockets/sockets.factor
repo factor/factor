@@ -382,8 +382,7 @@ CONSTANT: datagram-size 65536
 MEMO: ipv6-supported? ( -- ? )
     [ "::1" 0 <inet6> binary <server> dispose t ] [ drop f ] recover ;
 
-[ \ ipv6-supported? reset-memoized ]
-"io.sockets:ipv6-supported?" add-startup-hook
+STARTUP-HOOK: [ \ ipv6-supported? reset-memoized ]
 
 GENERIC: resolve-host ( addrspec -- seq )
 

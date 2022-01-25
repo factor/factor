@@ -105,7 +105,7 @@ CONSTANT: keep-logs 10
     "Log server" spawn-server
     "log-server" set-global ;
 
-[
+STARTUP-HOOK: [
     H{ } clone log-files set-global
     log-server
-] "logging" add-startup-hook
+]

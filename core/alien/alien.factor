@@ -105,7 +105,7 @@ ERROR: callsite-not-compiled word ;
 ! cleared on startup.
 SYMBOL: callbacks
 
-[ H{ } clone callbacks set-global ] "alien" add-startup-hook
+STARTUP-HOOK: [ H{ } clone callbacks set-global ]
 
 ! Used by compiler.codegen to wrap callback bodies
 : do-callback ( callback-quot wait-quot: ( callback -- ) -- )

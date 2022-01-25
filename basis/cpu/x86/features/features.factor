@@ -164,8 +164,9 @@ HOOK: (cpuid) cpu ( rax rcx regs -- )
 MEMO: enable-popcnt? ( -- ? )
     popcnt? "disable-popcnt" get not and ;
 
-[ { sse-version enable-popcnt? } [ reset-memoized ] each ]
-"cpu.x86.features" add-startup-hook
+STARTUP-HOOK: [
+    { sse-version enable-popcnt? } [ reset-memoized ] each
+]
 
 : sse-string ( version -- string )
     {

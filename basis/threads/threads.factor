@@ -262,4 +262,4 @@ M: real sleep
 
 PRIVATE>
 
-[ init-threads ] "threads" add-startup-hook
+STARTUP-HOOK: init-threads

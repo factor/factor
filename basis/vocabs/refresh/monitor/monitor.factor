@@ -65,7 +65,7 @@ TR: convert-separators "/\\" ".." ;
     HS{ } clone changed-vocabs set-global
     loaded-vocab-names [ changed-vocab ] each ;
 
-[
+STARTUP-HOOK: [
     "-no-monitors" (command-line) member? [
         [ drop ] add-vocab-root-hook set-global
         f changed-vocabs set-global
@@ -74,4 +74,4 @@ TR: convert-separators "/\\" ".." ;
         vocab-roots get [ start-vocab-monitor ] each
         [ start-vocab-monitor ] add-vocab-root-hook set-global
     ] if
-] "vocabs.refresh.monitor" add-startup-hook
+]

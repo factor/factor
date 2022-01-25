@@ -102,8 +102,8 @@ SYMBOL: run-loop
     ] change-timers drop ;
 
 SYMBOL: thread-timer
-[ f thread-timer set-global ]
-"core-foundation.run-loop" add-startup-hook
+
+STARTUP-HOOK: [ f thread-timer set-global ]
 
 : (reset-thread-timer) ( timer -- )
     sleep-time
