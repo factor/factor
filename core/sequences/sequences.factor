@@ -397,17 +397,6 @@ PRIVATE>
 
 <PRIVATE
 
-! slow-each versions don't unslice
-
-: setup-slow-each ( seq -- n quot )
-    [ length check-length ] keep [ nth-unsafe ] curry ; inline
-
-: (slow-each) ( seq quot -- n quot' )
-    [ setup-slow-each ] dip compose ; inline
-
-: (slow-each-index) ( seq quot -- n quot' )
-    [ setup-slow-each [ keep ] curry ] dip compose ; inline
-
 : setup-each ( seq -- i n quot )
     dup slice? [
         [ from>> ] [ to>> ] [ seq>> ] tri
@@ -433,8 +422,17 @@ PRIVATE>
 : collect ( n quot into -- )
     (collect) each-integer ; inline
 
+: setup-map-each ( seq -- n quot )
+    [ length check-length ] keep [ nth-unsafe ] curry ; inline
+
+: (map-each) ( seq quot -- n quot' )
+    [ setup-map-each ] dip compose ; inline
+
+: (map-each-index) ( seq quot -- n quot' )
+    [ setup-map-each [ keep ] curry ] dip compose ; inline
+
 : map-into ( seq quot into -- )
-    [ (slow-each) ] dip collect ; inline
+    [ (map-each) ] dip collect ; inline
 
 : 2nth-unsafe ( n seq1 seq2 -- elt1 elt2 )
     [ nth-unsafe ] bi-curry@ bi ; inline
@@ -459,7 +457,7 @@ PRIVATE>
     over [ dupd nth-unsafe ] [ drop f ] if ; inline
 
 : (find) ( seq quot quot' -- i elt )
-    pick [ [ (slow-each) ] dip call ] dip finish-find ; inline
+    pick [ [ (map-each) ] dip call ] dip finish-find ; inline
 
 : (find-from) ( n seq quot quot' -- i elt )
     [ 2dup bounds-check? ] 2dip
@@ -468,7 +466,7 @@ PRIVATE>
     if ; inline
 
 : (find-index) ( seq quot quot' -- i elt )
-    pick [ [ (slow-each-index) ] dip call ] dip finish-find ; inline
+    pick [ [ (map-each-index) ] dip call ] dip finish-find ; inline
 
 : (find-index-from) ( n seq quot quot' -- i elt )
     [ 2dup bounds-check? ] 2dip
@@ -497,7 +495,7 @@ PRIVATE>
     overd [ [ collect ] keep ] new-like ; inline
 
 : map-as ( ... seq quot: ( ... elt -- ... newelt ) exemplar -- ... newseq )
-    [ (slow-each) ] dip map-integers ; inline
+    [ (map-each) ] dip map-integers ; inline
 
 : map ( ... seq quot: ( ... elt -- ... newelt ) -- ... newseq )
     over map-as ; inline
