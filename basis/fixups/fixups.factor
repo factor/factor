@@ -27,6 +27,8 @@ CONSTANT: word-renames {
     { "[0,b]" { "ranges:[0..b]" "0.99" } }
     { "[1,b)" { "ranges:[1..b)" "0.99" } }
     { "[1,b]" { "ranges:[1..b]" "0.99" } }
+    { "assoc-combine" { "assocs:assoc-union-all" "0.99" } }
+    { "assoc-refine" { "assocs:assoc-intersect-all" "0.99" } }
     { "assoc-merge" { "assocs.extras:assoc-collect" "0.99" } }
     { "assoc-merge!" { "assocs.extras:assoc-collect!" "0.99" } }
     { "peek-from" { "modern.html:peek1-from" "0.99" } }
