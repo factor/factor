@@ -7,7 +7,7 @@ io.files.info io.files.info.unix io.files.trash io.pathnames
 kernel math math.parser sequences system unix.stat unix.users
 xdg ;
 
-IN: io.files.trash.linux
+IN: io.files.trash.unix
 
 ! Implements the FreeDesktop.org Trash Specification 0.7
 
