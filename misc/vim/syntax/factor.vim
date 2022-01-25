@@ -114,6 +114,8 @@ syn match   factorComment           /\v<!>.*$/ contains=@factorCommentContents
 syn cluster factorCommentContents   contains=factorTodo,@Spell
 syn match   factorTodo              /\v(TODO|FIXME|XXX):=/ contained
 
+syn match   factorInit              /\v<%(STARTUP-HOOK|SHUTDOWN-HOOK):>/     display
+
 syn region  factorDefn  matchgroup=NONE  start=/\v<%(SYNTAX|CONSTRUCTOR|%(M|MACRO|MEMO|TYPED)?:?):>/  skip=/\v<!>.*/  matchgroup=factorDefnDelims  end=/\v<;>/  contains=factorDefnDelims,@factorCluster keepend transparent
 syn region  factorDefnDelims        start=/\v<SYNTAX:>/                            skip=/\v<!>.*/  end=/\v<\S+>/  contains=@factorComment skipempty keepend contained
 syn region  factorDefnDelims        start=/\v<%(MACRO|MEMO|TYPED)?:?:>/            skip=/\v<!>.*/  end=/\v<\S+>/  contains=@factorComment nextgroup=factorEffectSkip skipempty keepend contained
@@ -126,7 +128,8 @@ syn region  factorDeclDelims        start=/\v<HOOK:>/                           
 syn region  factorDeclDelims        start=/\v<C:>/                                 skip=/\v<!>.*/  end=/\v<\S+%(\_\s+%(!>.*)?)+\S+>/   contains=@factorComment skipempty keepend
 
 syn region  factorPDefn  matchgroup=NONE  start=/\v<%(SYNTAX|CONSTRUCTOR|%(M|MACRO|MEMO|TYPED)?:?):>/  skip=/\v<!>.*/  matchgroup=factorPDefnDelims  end=/\v<;>/  contains=factorPDefnDelims,@factorCluster keepend contained
-syn region  factorPDefnDelims       start=/\v<%(SYNTAX|%(MACRO|MEMO|TYPED)?:?):>/  skip=/\v<!>.*/  end=/\v<\S+>/                       contains=@factorComment nextgroup=factorEffectSkip skipempty keepend contained
+syn region  factorPDefnDelims       start=/\v<SYNTAX:>/                            skip=/\v<!>.*/  end=/\v<\S+>/                       contains=@factorComment skipempty keepend contained
+syn region  factorPDefnDelims       start=/\v<%(MACRO|MEMO|TYPED)?:?:>/            skip=/\v<!>.*/  end=/\v<\S+>/                       contains=@factorComment nextgroup=factorEffectSkip skipempty keepend contained
 syn region  factorPDefnDelims       start=/\v<M:>/                                 skip=/\v<!>.*/  end=/\v<\S+%(\_\s+%(!>.*)?)+\S+>/   contains=@factorComment skipempty keepend contained
 syn region  factorPDefnDelims       start=/\v<M::>/                                skip=/\v<!>.*/  end=/\v<\S+%(\_\s+%(!>.*)?)+\S+>/   contains=@factorComment nextgroup=factorEffectSkip skipempty keepend contained
 syn region  factorPDefnDelims       start=/\v<CONSTRUCTOR:>/                       skip=/\v<!>.*/  end=/\v<\S+%(\_\s+%(!>.*)?)+\S+>/   contains=@factorComment nextgroup=factorEffectSkip skipempty keepend contained
@@ -384,6 +387,7 @@ if !exists('g:factor_syn_no_init')
   HiLink   factorLocalsSpecifier        Operator
   HiLink   factorBoolean                Boolean
   HiLink   factorBreakpoint             Debug
+  HiLink   factorInit                   Typedef
   HiLink   factorDefnDelims             Typedef
   HiLink   factorDeclDelims             Typedef
   HiLink   factorPrivate                Special
