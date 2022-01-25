@@ -39,7 +39,10 @@ M: clickable ungraft*
 : <active-buttons-table> ( model -- table )
     [ keys [ ">" swap 2array ] map ] <arrow> trivial-renderer [ second ] <search-table> 
     dup table>>
-        [ second world-buttons at invoke-primary ] >>action
+        [
+            second world-buttons at dup presentation?
+            [ invoke-primary ] [ button-invoke ] if
+        ] >>action
         [ hide-glass ] >>hook
         t >>selection-required?
         10 >>min-rows
