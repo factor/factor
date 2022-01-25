@@ -334,4 +334,14 @@ IN: bootstrap.syntax
     "MACRO::" [ (::) define-macro ] define-core-syntax
     "MEMO::" [ (::) define-memoized ] define-core-syntax
     "IDENTITY-MEMO::" [ (::) define-identity-memoized ] define-core-syntax
+
+    "STARTUP-HOOK:" [
+        \ ; parse-until >quotation current-vocab name>>
+        add-startup-hook
+    ] define-core-syntax
+
+    "SHUTDOWN-HOOK:" [
+        \ ; parse-until >quotation current-vocab name>>
+        add-shutdown-hook
+    ] define-core-syntax
 ] with-compilation-unit
