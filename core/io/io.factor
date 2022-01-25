@@ -163,7 +163,7 @@ ERROR: invalid-read-buffer buf stream ;
         [ ] collector [ each-stream-line ] dip { } like
     ] with-disposal ; inline
 
-: lines ( -- seq )
+: read-lines ( -- seq )
     input-stream get stream-lines ; inline
 
 CONSTANT: each-block-size 65536
@@ -209,7 +209,7 @@ CONSTANT: each-block-size 65536
         [ stream-exemplar produce-as nip ] bi
     ] with-disposal ; inline
 
-: contents ( -- seq )
+: read-contents ( -- seq )
     input-stream get stream-contents ; inline
 
 : stream-copy* ( in out -- )

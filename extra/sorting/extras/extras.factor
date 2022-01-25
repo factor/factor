@@ -1,5 +1,5 @@
-USING: arrays assocs kernel kernel.private locals math
-math.order sequences sequences.extras sequences.private sorting ;
+USING: arrays assocs kernel kernel.private math math.order
+sequences sequences.extras sequences.private sorting ;
 IN: sorting.extras
 
 : argsort ( seq quot: ( obj1 obj2 -- <=> ) -- sortedseq )

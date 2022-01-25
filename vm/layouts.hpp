@@ -9,7 +9,7 @@ inline static cell alignment_for(cell a, cell b) { return align(a, b) - a; }
 
 static const cell data_alignment = 16;
 
-// Must match leaf-stack-frame-size in core/bootstrap/layouts.factor
+// Must match leaf-stack-frame-size in basis/bootstrap/layouts.factor
 #define LEAF_FRAME_SIZE 16
 
 #define WORD_SIZE (signed)(sizeof(cell) * 8)
@@ -21,7 +21,7 @@ static const cell data_alignment = 16;
 #define RETAG(x, tag) (UNTAG(x) | (tag))
 
 // Type tags, should be kept in sync with:
-//   core/bootstrap/layouts.factor
+//   basis/bootstrap/layouts.factor
 #define FIXNUM_TYPE 0
 #define F_TYPE 1
 #define ARRAY_TYPE 2

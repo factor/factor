@@ -2,9 +2,9 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors alien alien.c-types alien.data arrays
 byte-arrays combinators combinators.smart destructors
-io.encodings.ascii io.encodings.string kernel libc literals
-locals make math namespaces opencl.ffi sequences
-specialized-arrays variants ;
+io.encodings.ascii io.encodings.string kernel libc literals make
+math namespaces opencl.ffi sequences specialized-arrays
+variants ;
 IN: opencl
 SPECIALIZED-ARRAYS: void* char size_t ;
 

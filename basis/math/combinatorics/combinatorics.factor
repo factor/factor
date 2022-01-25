@@ -1,10 +1,9 @@
 ! Copyright (c) 2007-2010 Slava Pestov, Doug Coleman, Aaron Schaefer, John Benediktsson.
 ! See http://factorcode.org/license.txt for BSD license.
 
-USING: accessors arrays assocs binary-search classes.tuple
-combinators fry hints kernel kernel.private locals math
-math.functions math.order math.ranges namespaces sequences
-sequences.private sorting strings vectors ;
+USING: accessors arrays assocs classes.tuple combinators hints
+kernel kernel.private make math math.functions math.order
+ranges sequences sequences.private sorting strings vectors ;
 IN: math.combinatorics
 
 <PRIVATE
@@ -29,10 +28,10 @@ M: object nths-unsafe (nths-unsafe) ;
 PRIVATE>
 
 : factorial ( n -- n! )
-    dup 1 > [ [1,b] product ] [ drop 1 ] if ;
+    dup 1 > [ [1..b] product ] [ drop 1 ] if ;
 
 : nPk ( n k -- nPk )
-    2dup possible? [ dupd - [a,b) product ] [ 2drop 0 ] if ;
+    2dup possible? [ dupd - [a..b) product ] [ 2drop 0 ] if ;
 
 : nCk ( n k -- nCk )
     twiddle [ nPk ] keep factorial /i ;
@@ -49,16 +48,13 @@ PRIVATE>
     '[ dup _ >= [ 1 + ] when ] map! drop ; inline
 
 : (>permutation) ( seq n index -- seq )
-    swap [ dupd head-slice ] dip bump-indices ;
+    swap [ dupd (head) <slice-unsafe> ] dip bump-indices ;
 
 : >permutation ( factoradic -- permutation )
     reverse! dup [ (>permutation) ] each-index reverse! ;
 
 : permutation-indices ( n seq -- permutation )
     length [ factoradic ] dip 0 pad-head >permutation ;
-
-: permutation-iota ( seq -- <iota> )
-    length factorial <iota> ; inline
 
 PRIVATE>
 
@@ -100,8 +96,11 @@ DEFER: next-permutation
 
 <PRIVATE
 
+: <permutation-iota> ( seq -- <iota> )
+    length factorial <iota> ; inline
+
 : permutations-quot ( seq quot -- seq quot' )
-    [ [ permutation-iota ] [ length <iota> >array ] [ ] tri ] dip
+    [ [ <permutation-iota> ] [ length <iota> >array ] [ ] tri ] dip
     '[ drop _ [ _ nths-unsafe @ ] keep next-permutation drop ] ; inline
 
 PRIVATE>
@@ -134,18 +133,18 @@ PRIVATE>
 <PRIVATE
 
 : cut-point ( seq -- n )
-    [ last ] keep [ [ > ] keep swap ] find-last drop nip ; inline
+    [ last-unsafe ] keep [ [ > ] keep swap ] find-last drop nip ; inline
 
 : greater-from-last ( n seq -- i )
-    [ nip ] [ nth ] 2bi [ > ] curry find-last drop ; inline
+    [ nip ] [ nth-unsafe ] 2bi [ > ] curry find-last drop ; inline
 
 : reverse-tail! ( n seq -- seq )
-    [ swap 1 + tail-slice reverse! drop ] keep ; inline
+    [ swap 1 + (tail) <slice-unsafe> reverse! drop ] keep ; inline
 
 : (next-permutation) ( seq -- seq )
     dup cut-point [
         swap [ greater-from-last ] 2keep
-        [ exchange ] [ reverse-tail! nip ] 3bi
+        [ exchange-unsafe ] [ reverse-tail! nip ] 3bi
     ] [ reverse! ] if* ;
 
 HINTS: (next-permutation) array ;
@@ -155,6 +154,31 @@ PRIVATE>
 : next-permutation ( seq -- seq )
     dup empty? [ (next-permutation) ] unless ;
 
+<PRIVATE
+
+: should-swap? ( start curr seq -- ? )
+    [ nipd nth-unsafe ] [ <slice-unsafe> member? not ] 3bi ; inline
+
+:: unique-permutations ( ... seq i n quot: ( ... elt -- ... ) -- ... )
+    i n >= [
+        seq clone quot call
+    ] [
+        i n [a..b) [| j |
+            i j seq should-swap? [
+                i j seq exchange-unsafe
+                seq i 1 + n quot unique-permutations
+                i j seq exchange-unsafe
+            ] when
+        ] each
+    ] if ; inline recursive
+
+PRIVATE>
+
+: each-unique-permutation ( ... seq quot: ( ... elt -- ... ) -- ... )
+    [ 0 over length ] dip unique-permutations ; inline
+
+: all-unique-permutations ( seq -- seq' )
+    [ [ , ] each-unique-permutation ] { } make ;
 
 ! Combinadic-based combination methodology
 
@@ -168,15 +192,15 @@ PRIVATE>
     x 1 + x!
     p 0 <array> :> c 0 :> k! 0 :> r!
     p 1 - [| i |
-        i [ 0 ] [ 1 - c nth ] if-zero i c set-nth
+        i [ 0 ] [ 1 - c nth-unsafe ] if-zero i c set-nth-unsafe
         [ k x < ] [
-            i c [ 1 + ] change-nth
-            n i c nth - p i 1 + - nCk r!
+            i c [ 1 + ] change-nth-unsafe
+            n i c nth-unsafe - p i 1 + - nCk r!
             k r + k!
         ] do while k r - k!
     ] each-integer
-    p 2 < [ 0 ] [ p 2 - c nth ] if
-    p 1 < [ drop ] [ x + k - p 1 - c set-nth ] if
+    p 2 < [ 0 ] [ p 2 - c nth-unsafe ] if
+    p 1 < [ drop ] [ x + k - p 1 - c set-nth-unsafe ] if
     c [ 1 - ] map! ;
 
 PRIVATE>
@@ -201,11 +225,11 @@ INSTANCE: combinations immutable-sequence
     over length - '[ _ + >= ] find-index drop ; inline
 
 : increment-rest ( i seq -- )
-    [ nth ] [ swap tail-slice ] 2bi
+    [ nth-unsafe ] [ swap (tail) <slice-unsafe> ] 2bi
     [ drop 1 + dup ] map! 2drop ; inline
 
 : increment-last ( seq -- )
-    [ [ length 1 - ] keep [ 1 + ] change-nth ] unless-empty ; inline
+    [ [ length 1 - ] keep [ 1 + ] change-nth-unsafe ] unless-empty ; inline
 
 :: next-combination ( seq n -- seq )
     seq n find-max-index [
@@ -240,14 +264,13 @@ PRIVATE>
     combinations-quot all? ; inline
 
 : find-combination ( ... seq k quot: ( ... elt -- ... ? ) -- ... elt/f )
-    [ combinations-quot find drop ]
-    [ drop pick [ combination ] [ 3drop f ] if ] 3bi ; inline
+    [ f ] 3dip '[ nip _ keep swap ] combinations-quot find drop swap and ; inline
 
 : reduce-combinations ( ... seq k identity quot: ( ... prev elt -- ... next ) -- ... result )
     -rotd each-combination ; inline
 
 : all-subsets ( seq -- subsets )
-    dup length [0,b] [ all-combinations ] with map concat ;
+    dup length [0..b] [ all-combinations ] with map concat ;
 
 <PRIVATE
 
@@ -258,15 +281,34 @@ PRIVATE>
         [ seq [ + n /mod ] change-nth-unsafe ] keep 1 -
     ] do until 2drop ; inline
 
-:: (selections) ( seq n -- selections )
+:: selections-quot ( seq n quot -- seq quot' )
     seq length :> len
     n 0 <array> :> idx
-    len n ^ [
-        idx seq nths-unsafe
+    n [ 0 ] [ len swap ^ ] if-zero <iota> [
+        drop
+        idx seq nths-unsafe quot call
         idx len next-selection
-    ] replicate ;
+    ] ; inline
 
 PRIVATE>
 
-: selections ( seq n -- selections )
-    dup 0 > [ (selections) ] [ 2drop { } ] if ;
+: each-selection ( ... seq n quot: ( ... elt -- ... ) -- ... )
+    selections-quot each ; inline
+
+: map-selections ( ... seq n quot: ( ... elt -- ... newelt ) -- ... newseq )
+    selections-quot map ; inline
+
+: filter-selections ( ... seq n quot: ( ... elt -- ... newelt ) -- ... newseq )
+    selector [ each-selection ] dip ; inline
+
+: all-selections ( seq n -- seq' )
+    [ ] map-selections ;
+
+: all-selections? ( seq n -- ? )
+    selections-quot all? ; inline
+
+: find-selection ( ... seq n quot: ( ... elt -- ... ? ) -- ... elt/f )
+    [ f ] 3dip '[ nip _ keep swap ] selections-quot find drop swap and ; inline
+
+: reduce-selections ( ... seq n identity quot: ( ... prev elt -- ... next ) -- ... result )
+    -rotd each-selection ; inline

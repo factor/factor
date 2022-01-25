@@ -1,8 +1,7 @@
 ! Copyright (C) 2005, 2008 Slava Pestov, Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
 
-USING: accessors calendar fry kernel math quotations system
-threads ;
+USING: accessors calendar kernel math quotations system threads ;
 
 IN: timers
 

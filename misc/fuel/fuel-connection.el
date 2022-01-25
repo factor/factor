@@ -1,4 +1,4 @@
-;;; fuel-connection.el -- asynchronous comms with the fuel listener
+;;; fuel-connection.el -- asynchronous comms with the fuel listener -*- lexical-binding: t -*-
 
 ;; Copyright (C) 2018 Björn Lindqvist
 ;; Copyright (C) 2008, 2009 Jose Antonio Ortega Ruiz

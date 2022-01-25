@@ -20,7 +20,7 @@
 " All syntax patterns (|:syn-pattern|) are "very magic" (|/\v|).
 " Escape all literal [^[:alnum:]_-!:;] characters in these patterns.
 " (Not escaping [-!:;] characters risks forward-incompatibility,
-"   but fixes if an incompatibile Vim arises would be trivial,
+"   but fixes if an incompatible Vim arises would be trivial,
 "   and Factor likes these characters.)
 "
 " Syntax groups ending in "Error" match errors via |:syn-priority|,
@@ -58,21 +58,19 @@ endif
 syn case match
 
 syn match   factorWord   /\v<\S+>/  contains=@factorWord transparent display
-syn cluster factorClusterNoComment  contains=factorWord,@factorMultilineComment,@factorClusterValue,factorBoolean,factorBreakpoint,factorDeclaration,factorCallQuotation,factorExecute,factorCallNextMethod,@factorWordOps,factorAlien,factorSlot,factorTuple,factorErrorSyn,factorStruct
-syn cluster factorCluster           contains=@factorComment,@factorClusterNoComment
+syn cluster factorCluster           contains=factorWord,factorComment,factorMultilineComment,@factorClusterValue,factorDeclaration,factorCall,factorCallNextMethod,@factorWordOps,factorAlien,factorSlot,factorTuple,factorStruct
+syn cluster factorClusterValue      contains=factorBreakpoint,factorBoolean,factorFrySpecifier,factorLocalsSpecifier,factorChar,factorString,@factorNumber,factorBackslash,factorMBackslash,factorLiteral,@factorEffect,@factorQuotation,@factorArray,factorRegexp
 
 " A crash course on Factor's lexer:
 "
 " The "lexer" vocabulary parses lines (arrays of strings) into tokens.
 " Tokens are non-space strings, effectively words.
-" "[ f skip ] call( i seq -- n )" finds the next space, erroring on tabs.
-"   "t skip" finds the next non-space.
 " The "lexer" class holds lex state.
-" Lexer method "skip-word" advances to the next space (via "f skip"),
+" Lexer method "skip-word" advances to the next space
 "     while also counting leading double quotation marks as their own words.
 "   I.e., this advances to the end of the current token
 "     (if currently at a token, otherwise nothing changes).
-" Method "skip-blank" advances to the next non-space (via "t skip"),
+" Method "skip-blank" advances to the next non-space
 "     while also skipping shebangs at the beginning of the first line.
 "   I.e., this advances to the start of the next token
 "     (if one is present, otherwise it advances to the line's end).
@@ -109,221 +107,207 @@ syn cluster factorCluster           contains=@factorComment,@factorClusterNoComm
 " So! To know when double quotes & exclamation marks aren't special,
 "   grep for "parse-raw". (Mostly. To be certain, grep for "lexer".)
 
+syn match   factorShebang           /\v%^\#!.*$/ display
+
 syn cluster factorComment           contains=factorComment
+syn match   factorComment           /\v<!>.*$/ contains=@factorCommentContents
 syn cluster factorCommentContents   contains=factorTodo,@Spell
 syn match   factorTodo              /\v(TODO|FIXME|XXX):=/ contained
 
-syn cluster factorDefnContents      contains=@factorCluster
+syn match   factorInit              /\v<%(STARTUP-HOOK|SHUTDOWN-HOOK):>/     display
 
-syn region  factorDefn            start=/\v<%(SYNTAX|%(MACRO|MEMO|TYPED)?:?):>/                 matchgroup=factorDefnDelims     end=/\v<;>/ contains=factorDefnDelims,@factorDefnContents
-syn region  factorDefnDelims      start=/\v<%(SYNTAX|%(MACRO|MEMO|TYPED)?:?):>/ end=/\v<\S+>/   contains=@factorComment nextgroup=factorStackEffectSkip skipempty contained
-syn region  factorMethod          start=/\v<M:>/                                                matchgroup=factorMethodDelims     end=/\v<;>/ contains=factorMethodDelims,@factorDefnContents
-syn region  factorMethodDelims    start=/\v<M:>/               skip=/\v<!>.*/   end=/\v<\S+%(\_\s+%(!>.*)?)+\S+>/   contains=@factorComment skipempty keepend contained
-syn region  factorLocalsMethod    start=/\v<M::>/                                               matchgroup=factorLocalsMethodDelims     end=/\v<;>/ contains=factorLocalsMethodDelims,@factorDefnContents
-syn region  factorLocalsMethodDelims    start=/\v<M::>/        skip=/\v<!>.*/   end=/\v<\S+%(\_\s+%(!>.*)?)+\S+>/   contains=@factorComment nextgroup=factorStackEffectSkip skipempty keepend contained
-syn region  factorGeneric         start=/\v<%(GENERIC|MATH|PRIMITIVE):>/                        end=/\v<\S+>/   contains=@factorComment nextgroup=factorStackEffectSkip skipempty
-syn region  factorGenericN matchgroup=factorGenericN  start=/\v<GENERIC\#:>/   skip=/\v<!>.*/   end=/\v<\S+%(\_\s+%(!>.*)?)+\d+>/   contains=@factorComment nextgroup=factorStackEffectSkip skipempty keepend
+syn region  factorDefn  matchgroup=NONE  start=/\v<%(SYNTAX|CONSTRUCTOR|%(M|MACRO|MEMO|TYPED)?:?):>/  skip=/\v<!>.*/  matchgroup=factorDefnDelims  end=/\v<;>/  contains=factorDefnDelims,@factorCluster keepend transparent
+syn region  factorDefnDelims        start=/\v<SYNTAX:>/                            skip=/\v<!>.*/  end=/\v<\S+>/  contains=@factorComment skipempty keepend contained
+syn region  factorDefnDelims        start=/\v<%(MACRO|MEMO|TYPED)?:?:>/            skip=/\v<!>.*/  end=/\v<\S+>/  contains=@factorComment nextgroup=factorEffectSkip skipempty keepend contained
+syn region  factorDefnDelims        start=/\v<M:>/                                 skip=/\v<!>.*/  end=/\v<\S+%(\_\s+%(!>.*)?)+\S+>/   contains=@factorComment skipempty keepend contained
+syn region  factorDefnDelims        start=/\v<M::>/                                skip=/\v<!>.*/  end=/\v<\S+%(\_\s+%(!>.*)?)+\S+>/   contains=@factorComment nextgroup=factorEffectSkip skipempty keepend contained
+syn region  factorDefnDelims        start=/\v<CONSTRUCTOR:>/                       skip=/\v<!>.*/  end=/\v<\S+%(\_\s+%(!>.*)?)+\S+>/   contains=@factorComment nextgroup=factorEffectSkip skipempty keepend contained
+syn region  factorDeclDelims        start=/\v<%(GENERIC|MATH|PRIMITIVE):>/         skip=/\v<!>.*/  end=/\v<\S+>/                       contains=@factorComment nextgroup=factorEffectSkip skipempty keepend
+syn region  factorDeclDelims        start=/\v<GENERIC\#:>/                         skip=/\v<!>.*/  end=/\v<\S+%(\_\s+%(!>.*)?)+\d+>/   contains=@factorComment nextgroup=factorEffectSkip skipempty keepend
+syn region  factorDeclDelims        start=/\v<HOOK:>/                              skip=/\v<!>.*/  end=/\v<\S+%(\_\s+%(!>.*)?)+\S+>/   contains=@factorComment nextgroup=factorEffectSkip skipempty keepend
+syn region  factorDeclDelims        start=/\v<C:>/                                 skip=/\v<!>.*/  end=/\v<\S+%(\_\s+%(!>.*)?)+\S+>/   contains=@factorComment skipempty keepend
 
-syn region  factorPDefn           start=/\v<%(SYNTAX|%(MACRO|MEMO|TYPED)?:?):>/                 matchgroup=factorPDefnDelims    end=/\v<;>/ contains=factorPDefnDelims,@factorDefnContents contained
-syn region  factorPDefnDelims     start=/\v<%(SYNTAX|%(MACRO|MEMO|TYPED)?:?):>/ end=/\v<\S+>/   contains=@factorComment nextgroup=factorStackEffectSkip skipempty contained
-syn region  factorPMethod         start=/\v<M:>/                                                matchgroup=factorPMethodDelims  end=/\v<;>/ contains=factorPMethodDelims,@factorDefnContents contained
-syn region  factorPMethodDelims   start=/\v<M:>/               skip=/\v<!>.*/   end=/\v<\S+%(\_\s+%(!>.*)?)+\S+>/   contains=@factorComment skipempty keepend contained
-syn region  factorPLocalsMethod   start=/\v<M::>/                                               matchgroup=factorPLocalsMethodDelims    end=/\v<;>/ contains=factorPLocalsMethodDelims,@factorDefnContents contained
-syn region  factorPLocalsMethodDelims   start=/\v<M::>/        skip=/\v<!>.*/   end=/\v<\S+%(\_\s+%(!>.*)?)+\S+>/   contains=@factorComment nextgroup=factorStackEffectSkip skipempty keepend contained
-syn region  factorPGeneric        start=/\v<%(GENERIC|MATH|PRIMITIVE):>/                        end=/\v<\S+>/   contains=@factorComment nextgroup=factorStackEffectSkip skipempty contained
-syn region  factorPGenericN matchgroup=factorPGenericN    start=/\v<GENERIC\#:>/   skip=/\v<!>.*/   end=/\v<\S+%(\_\s+%(!>.*)?)+\d+>/ contains=@factorComment nextgroup=factorStackEffectSkip skipempty keepend contained
+syn region  factorPDefn  matchgroup=NONE  start=/\v<%(SYNTAX|CONSTRUCTOR|%(M|MACRO|MEMO|TYPED)?:?):>/  skip=/\v<!>.*/  matchgroup=factorPDefnDelims  end=/\v<;>/  contains=factorPDefnDelims,@factorCluster keepend contained
+syn region  factorPDefnDelims       start=/\v<SYNTAX:>/                            skip=/\v<!>.*/  end=/\v<\S+>/                       contains=@factorComment skipempty keepend contained
+syn region  factorPDefnDelims       start=/\v<%(MACRO|MEMO|TYPED)?:?:>/            skip=/\v<!>.*/  end=/\v<\S+>/                       contains=@factorComment nextgroup=factorEffectSkip skipempty keepend contained
+syn region  factorPDefnDelims       start=/\v<M:>/                                 skip=/\v<!>.*/  end=/\v<\S+%(\_\s+%(!>.*)?)+\S+>/   contains=@factorComment skipempty keepend contained
+syn region  factorPDefnDelims       start=/\v<M::>/                                skip=/\v<!>.*/  end=/\v<\S+%(\_\s+%(!>.*)?)+\S+>/   contains=@factorComment nextgroup=factorEffectSkip skipempty keepend contained
+syn region  factorPDefnDelims       start=/\v<CONSTRUCTOR:>/                       skip=/\v<!>.*/  end=/\v<\S+%(\_\s+%(!>.*)?)+\S+>/   contains=@factorComment nextgroup=factorEffectSkip skipempty keepend contained
+syn region  factorPDeclDelims       start=/\v<%(GENERIC|MATH|PRIMITIVE):>/         skip=/\v<!>.*/  end=/\v<\S+>/                       contains=@factorComment nextgroup=factorEffectSkip skipempty keepend contained
+syn region  factorPDeclDelims       start=/\v<GENERIC\#:>/                         skip=/\v<!>.*/  end=/\v<\S+%(\_\s+%(!>.*)?)+\d+>/   contains=@factorComment nextgroup=factorEffectSkip skipempty keepend contained
+syn region  factorPDeclDelims       start=/\v<HOOK:>/                              skip=/\v<!>.*/  end=/\v<\S+%(\_\s+%(!>.*)?)+\S+>/   contains=@factorComment nextgroup=factorEffectSkip skipempty keepend contained
+syn region  factorPDeclDelims       start=/\v<C:>/                                 skip=/\v<!>.*/  end=/\v<\S+%(\_\s+%(!>.*)?)+\S+>/   contains=@factorComment skipempty keepend contained
 
-syn region  factorPrivate matchgroup=factorPrivate start=/\v<\<PRIVATE>/ end=/\v<PRIVATE\>>/ contains=@factorDefnContents,factorPDefn,factorPMethod,factorPLocalsMethod,factorPGeneric,factorPGenericN skipempty keepend
-
-syn cluster factorClusterValue      contains=factorBreakpoint,factorBoolean,factorFrySpecifier,factorChar,@factorString,@factorNumber,factorBackslash,factorMBackslash,factorLiteral,factorLiteralBlock,@factorStackEffect,@factorQuotation,@factorArray
+syn region  factorPrivate           start=/\v<\<PRIVATE>/ end=/\v<PRIVATE\>>/ contains=@factorCluster,factorPDefn,factorPDeclDelims skipempty keepend
 
 syn keyword factorBoolean           f t
 syn keyword factorBreakpoint        B
 syn keyword factorFrySpecifier      @ _ contained
+syn keyword factorLocalsSpecifier   :> contained
 syn keyword factorDeclaration       delimiter deprecated final flushable foldable inline recursive
-syn match   factorCallQuotation     /\v<call\V(\v/me=e-1    nextgroup=@factorStackEffect
-syn match   factorExecute           /\v<execute\V(\v/me=e-1 nextgroup=@factorStackEffect
+syn region  factorCall  matchgroup=factorCallDelims  start=/\v<%(call|execute)\V(\v>/  end=/\v<\V)\v>/ contains=@factorEffectContents
 syn keyword factorCallNextMethod    call-next-method
 
-syn region  factorChar        start=/\v<CHAR:>/ end=/\v\S+>/
+syn region  factorChar              start=/\v<CHAR:>/  end=/\v\S+>/
+syn region  factorColor             start=/\v<COLOR:>/ end=/\v\S+>/
 
-syn cluster factorString            contains=factorString,factorTriString,factorPrefixedString
 syn match   factorEscape            /\v\\([\\astnrbvf0e\"]|u\x{6}|u\{\S+}|x\x{2})/  contained display
-syn region  factorString            matchgroup=factorStringDelims         start=/\v<"/                 skip=/\v\\"/ end=/\v"/   contains=factorEscape
-" Removed Factor syntax.
-syn region  factorTriString         matchgroup=factorTriStringDelims      start=/\v<"""/               skip=/\v\\"/ end=/\v"""/ contains=factorEscape
-syn region  factorPrefixedString    matchgroup=factorPrefixedStringDelims start=/\v<[^[:blank:]"]+">/  skip=/\v\\"/ end=/\v"/   contains=factorEscape
+syn region  factorString            matchgroup=factorStringDelims   start=/\v<"/                 skip=/\v\\"/ end=/\v"/           contains=factorEscape
+syn region  factorString            matchgroup=factorStringDelims   start=/\v<"""/               skip=/\v\\"/ end=/\v"""/         contains=factorEscape
+syn region  factorString            matchgroup=factorStringDelims   start=/\v<[^[:blank:]"]+"/   skip=/\v\\"/ end=/\v"/           contains=factorEscape
+syn region  factorString            matchgroup=factorStringDelims   start=/\v\[\z(\=*)\[/                     end=/\]\z1\]/       contains=factorEscape
+syn region  factorString            matchgroup=factorStringDelims   start=/\v<[^[\][:blank:]]+\[\z(\=*)\[>/   end=/\v\]\z1\]/
 
-" Vocabulary: multiline
-" This vocabulary reads the ambient lexer without "parse-raw".
-syn cluster factorString            add=factorMultilineString,factorHereDocString,factorPrefixedMultilineString
-syn region  factorMultilineString   matchgroup=factorMultilineStringDelims    start=/\v<\[\z(\={0,6})\[>/   end=/\v\]\z1\]/
-syn region  factorHereDoc           matchgroup=factorHereDocDelims            start=/\v<STRING:\s+\S+>/     end=/\v^;$/
-syn region  factorHereDocString     matchgroup=factorHereDocStringDelims      start=/\v<HEREDOC:\s+\z(.*)>/ end=/\v^\z1$/
-syn region  factorPrefixedMultilineString matchgroup=factorPrefixedMultilineStringDelims  start=/\v<[^[\][:blank:]]+\[\z(\={0,6})\[>/   end=/\v\]\z1\]/
-" These comments are normal syntax words, so no lexer privilege for them.
-" (Hence, no "syn cluster factorComment" membership.)
-syn cluster factorMultilineComment  contains=factorMultilineComment,factorMultilineCComment
-syn region  factorMultilineComment  matchgroup=factorMultilineCommentDelims   start=/\v<!\[\z(\={0,6})\[>/  end=/\v\]\z1\]/ contains=@factorCommentContents keepend
-syn region  factorMultilineCComment matchgroup=factorMultilineCCommentDelims  start=/\v<\/\*>/              end=/\v\*\//    contains=@factorCommentContents keepend
+syn region  factorNamedString       matchgroup=factorNamedStringDelims   start=/\v<STRING:\s+\S+$>/   end=/\v^<;>$/  contains=factorEscape
 
-syn cluster factorReal                  contains=@factorInteger,@factorFloat,@factorRatio,@factorBin,@factorOct,@factorHex,factorNan
-syn cluster factorNumber                contains=@factorReal,factorComplex
-syn cluster factorInteger               contains=factorInteger
+syn region  factorMultilineComment  start=/\v<\/\*>/              end=/\v\*\//       contains=@factorCommentContents keepend
+syn region  factorMultilineComment  start=/\v<!\[\z(\=*)\[/       end=/\v\]\z1\]/    contains=@factorCommentContents keepend
+
+syn region factorRegexp             start=/\v<%(R\/\s)/  skip=/\v%(\\\/)/  end=/\v%(\/\S*)>/
+
+syn cluster factorReal              contains=@factorInteger,@factorFloat,@factorRatio,@factorBin,@factorOct,@factorHex,factorNan
+syn cluster factorNumber            contains=@factorReal,factorComplex
+
+syn cluster factorInteger           contains=factorInteger
 if !exists('g:factor_syn_no_error') " more general
-  syn cluster factorInteger             add=factorIntegerError
-  " + "\d|," with contained "\d"
-  syn match   factorIntegerError        /\v<[+-]=%(\d|,){-}\d%(\d|,)*>/
+  syn cluster factorInteger         add=factorIntegerError
+  syn match   factorIntegerError    /\v<[+-]=%(\d|,|_){-}\d%(\d|,|_)*>/
 endif
-" + "\d|," with leading "\d" and no trailing ","
-syn match   factorInteger               /\v<[+-]=\d%(\d|,)*,@1<!>/
+syn match   factorInteger           /\v<[+-]=\d%(\d|,|_)*,@1<!>/
+
+syn cluster factorFloat             contains=factorFloat
 if !exists('g:factor_syn_no_error') " more general
-  syn cluster factorFloat               add=factorFloatError
-  syn match   factorFloatError          /\v<[+-]=%(\S{-}\d&%(\d|,)*%([eE][+-]=%(\d|,)*|\.%(\d|,)*%([eE][+-]=%(\d|,)*)?)|\.%(\d|,)+%([eE][+-]=%(\d|,)*)?)>/
+  syn cluster factorFloat           add=factorFloatError
+  syn match   factorFloatError      /\v<[+-]=%(\S{-}\d&%(\d|,|_)*%([eE][+-]=%(\d|,|_)*|\.%(\d|,|_)*%([eE][+-]=%(\d|,|_)*)?)|\.%(\d|,|_)+%([eE][+-]=%(\d|,|_)*)?)>/
 endif
-syn cluster factorFloat                 contains=factorFloat
-" exponent is followed by valid integer of radix 10
-" float of
-"   {valid integer,
-"     {"[eE]" exponent}
-"     or {"." mantissa sep, ? "[eE]" exponent}}
-"   or {"." mantissa sep, ? "[eE]" exponent}
-syn match   factorFloat                 /\v<[+-]=%(\d%(\d|,)*,@1<!%([eE][+-]=\d%(\d|,)*,@1<!|\.%(\d%(\d|,)*,@1<!)?%([eE][+-]=\d%(\d|,)*,@1<!)?)|\.\d%(\d|,)*,@1<!%([eE][+-]=\d%(\d|,)*,@1<!)?)>/
-syn cluster factorRatio                 contains=factorRatio
+syn match   factorFloat             /\v<[+-]=%(\d%(\d|,|_)*,@1<!%([eE][+-]=\d%(\d|,|_)*,@1<!|\.%(\d%(\d|,|_)*,@1<!)?%([eE][+-]=\d%(\d|,|_)*,@1<!)?)|\.\d%(\d|,|_)*,@1<!%([eE][+-]=\d%(\d|,|_)*,@1<!)?)>/
+
+syn cluster factorRatio             contains=factorRatio
 if !exists('g:factor_syn_no_error') " more general
-  syn cluster factorRatio               add=factorRatioError
-  syn match   factorRatioError          /\v<[+-]=%(\S{-}\d.{-}\/&%(\d|,)*\.?%(\d|,)*%([+-]%(\d|,)*)?)\/[+-]=%(\S{-}\d&%(\d|,)*\.?%(\d|,)*%([eE][+-]=%(\d|,)*)?)>/
+  syn cluster factorRatio           add=factorRatioError
+  syn match   factorRatioError      /\v<[+-]=%(\S{-}\d.{-}\/&%(\d|,|_)*\.?%(\d|,|_)*%([+-]%(\d|,|_)*)?)\/[+-]=%(\S{-}\d&%(\d|,|_)*\.?%(\d|,|_)*%([eE][+-]=%(\d|,|_)*)?)>/
 endif
-syn match   factorRatio                 /\v<([+-]=)\d%(\d|,)*,@1<!%(\1@=[+-](\d%(\d|,)*,@1<!)\/\2@!\d%(\d|,)*,@1<!|\/%(\d%(\d|,)*,@1<!%(\.%(\d%(\d|,)*,@1<!)?)?|\.\d%(\d|,)*,@1<!)%([eE][+-]=\d%(\d|,)*,@1<!)?)%(\/0)@2<!>/
-syn region  factorComplex         start=/\v<C\{>/   end=/\v<\}>/    contains=@factorReal
-syn cluster factorBin                   contains=factorBin
+syn match   factorRatio             /\v<([+-]=)\d%(\d|,|_)*,@1<!%(\1@=[+-](\d%(\d|,|_)*,@1<!)\/\2@!\d%(\d|,|_)*,@1<!|\/%(\d%(\d|,|_)*,@1<!%(\.%(\d%(\d|,|_)*,@1<!)?)?|\.\d%(\d|,|_)*,@1<!)%([eE][+-]=\d%(\d|,|_)*,@1<!)?)%(\/0)@2<!>/
+
+syn region  factorComplex           start=/\v<C\{>/   skip=/\v<!>.*/ end=/\v<\}>/    contains=@factorComment,@factorReal
+
+syn cluster factorBin               contains=factorBin
 if !exists('g:factor_syn_no_error')
-  syn cluster factorBin                 add=factorBinError
-  syn match   factorBinError            /\v<[+-]=0[bB]%(\S{-}\w&%(\w|,)*\.?%(\w|,)*%([pP][+-]=%(\w|,)*)?)>/
+  syn cluster factorBin             add=factorBinError
+  syn match   factorBinError        /\v<[+-]=0[bB]%(\S{-}\w&%(\w|,|_)*\.?%(\w|,|_)*%([pP][+-]=%(\w|,|_)*)?)>/
 endif
-" basically a float, but with a radix and no integer case to not match
-syn match   factorBin                   /\v<[+-]=0[bB]%([01][01,]*,@1<!%(\.%([01][01,]*,@1<!)?)?|\.[01][01,]*,@1<!)%([pP][+-]=\d%(\d|,)*,@1<!)?>/
-syn cluster factorOct                   contains=factorOct
+syn match   factorBin               /\v<[+-]=0[bB]%([01][01,_]*,@1<!%(\.%([01][01,_]*,@1<!)?)?|\.[01][01,_]*,@1<!)%([pP][+-]=\d%(\d|,|_)*,@1<!)?>/
+
+syn cluster factorOct               contains=factorOct
 if !exists('g:factor_syn_no_error')
-  syn cluster factorOct                 add=factorOctError
-  syn match   factorOctError            /\v<[+-]=0[oO]%(\S{-}\o&%(\w|,)*\.?(\w|,)*%([pP][+-]=%(\w|,)*)?)>/
+  syn cluster factorOct             add=factorOctError
+  syn match   factorOctError        /\v<[+-]=0[oO]%(\S{-}\o&%(\w|,|_)*\.?(\w|,|_)*%([pP][+-]=%(\w|,|_)*)?)>/
 endif
-syn match   factorOct                   /\v<[+-]=0[oO]%(\o%(\o|,)*,@1<!%(\.%(\o%(\o|,)*,@1<!)?)?|\.\o%(\o|,)*,@1<!)%([pP][+-]=\d%(\d|,)*,@1<!)?>/
-syn cluster factorHexNoRadix            contains=factorHexNoRadix
-syn cluster factorHex                   contains=factorHex
+syn match   factorOct               /\v<[+-]=0[oO]%(\o%(\o|,|_)*,@1<!%(\.%(\o%(\o|,|_)*,@1<!)?)?|\.\o%(\o|,|_)*,@1<!)%([pP][+-]=\d%(\d|,|_)*,@1<!)?>/
+
+syn cluster factorHex               contains=factorHex
+syn cluster factorHexNoRadix        contains=factorHexNoRadix
 if !exists('g:factor_syn_no_error')
-  syn cluster factorHexNoRadix          add=factorHexNoRadixError
-  syn cluster factorHex                 add=factorHexError
-  syn match   factorHexNoRadixError     /\v<[+-]=%(\S{-}\x&%(\w|,)*\.?(\w|,)*%([pP][+-]=%(\w|,)*)?)>/   contained
-  syn match   factorHexError            /\v<[+-]=0[xX]%(\S{-}\x&%(\x|,)*\.?(\x|,)*%([pP][+-]=%(\w|,)*)?)>/
+  syn cluster factorHex             add=factorHexError
+  syn match   factorHexError        /\v<[+-]=0[xX]%(\S{-}\x&%(\x|,|_)*\.?(\x|,|_)*%([pP][+-]=%(\w|,|_)*)?)>/
+  syn cluster factorHexNoRadix      add=factorHexNoRadixError
+  syn match   factorHexNoRadixError /\v<[+-]=%(\S{-}\x&%(\w|,|_)*\.?(\w|,|_)*%([pP][+-]=%(\w|,|_)*)?)>/   contained
 endif
-syn match   factorHexNoRadix            /\v<[+-]=%(\x%(\x|,)*,@1<!%(\.%(\x%(\x|,)*,@1<!)?)?|\.\x%(\x|,)*,@1<!)%([pP][+-]=\d%(\d|,)*,@1<!)?>/  contained
-syn match   factorHex                   /\v<[+-]=0[xX]%(\x%(\x|,)*,@1<!%(\.%(\x%(\x|,)*,@1<!)?)?|\.\x%(\x|,)*,@1<!)%([pP][+-]=\d%(\d|,)*,@1<!)?>/
+syn match   factorHex               /\v<[+-]=0[xX]%(\x%(\x|,|_)*,@1<!%(\.%(\x%(\x|,|_)*,@1<!)?)?|\.\x%(\x|,|_)*,@1<!)%([pP][+-]=\d%(\d|,|_)*,@1<!)?>/
+syn match   factorHexNoRadix        /\v<[+-]=%(\x%(\x|,|_)*,@1<!%(\.%(\x%(\x|,|_)*,@1<!)?)?|\.\x%(\x|,|_)*,@1<!)%([pP][+-]=\d%(\d|,|_)*,@1<!)?>/  contained
+
 syn region  factorNan matchgroup=factorNan    start=/\v<NAN:>/ matchgroup=NONE skip=/\v<!>.*/   end=/\v<\S+>/   contains=@factorComment,@factorHexNoRadix keepend
 
-syn region  factorBackslash       start=/\v<\\>/                    end=/\v<\S+>/   contains=@factorComment
-syn region  factorMBackslash      start=/\v<M\\>/  skip=/\v<!>.*/   end=/\v<\S+%(\_\s+%(!>.*)?)+\S+>/   contains=@factorComment keepend
-syn region  factorLiteral         start=/\v<\$>/                    end=/\v<\S+>/   contains=@factorComment
-syn region  factorLiteralBlock    start=/\v<\$\[>/                  end=/\v<\]>/    contains=@factorComment
+syn region  factorBackslash         start=/\v<\\>/     skip=/\v<!>.*/       end=/\v<\S+>/   contains=@factorComment
+syn region  factorMBackslash        start=/\v<M\\>/    skip=/\v<!>.*/       end=/\v<\S+%(\_\s+%(!>.*)?)+\S+>/   contains=@factorComment keepend
+syn region  factorLiteral           start=/\v<\$>/     skip=/\v<!>.*/       end=/\v<\S+>/   contains=@factorComment
 
-syn region  factorIn      start=/\v<IN:>/       end=/\v<\S+>/   contains=@factorComment
-syn region  factorUse     start=/\v<USE:>/      end=/\v<\S+>/   contains=@factorComment
-syn region  factorUnuse   start=/\v<UNUSE:>/    end=/\v<\S+>/   contains=@factorComment
-
-syn region  factorUsing           start=/\v<USING:>/                        end=/\v<;>/     contains=@factorComment
-syn region  factorQualified       start=/\v<QUALIFIED:>/                    end=/\v<\S+>/   contains=@factorComment
-syn region  factorQualifiedWith   start=/\v<QUALIFIED-WITH:>/  skip=/\v<!>.*/   end=/\v<\S+%(\_\s+%(!>.*)?)+\S+>/   contains=@factorComment keepend
-syn region  factorExclude         start=/\v<EXCLUDE:>/                      end=/\v<;>/     contains=@factorComment
-syn region  factorFrom            start=/\v<FROM:>/                         end=/\v<;>/     contains=@factorComment
-syn region  factorRename          start=/\v<RENAME:>/      skip=/\v<!>.*/   end=/\v<\S+%(\_\s+%(!>.*)?)+\S+%(\_\s+%(!>.*)?)+\=\>%(\_\s+%(!>.*)?)+\S+>/  contains=@factorComment keepend
-syn region  factorSingletons      start=/\v<SINGLETONS:>/                   end=/\v<;>/     contains=@factorComment
-syn region  factorSymbol          start=/\v<SYMBOL:>/                       end=/\v<\S+>/   contains=@factorComment
-syn region  factorSymbols         start=/\v<SYMBOLS:>/                      end=/\v<;>/     contains=@factorComment
-syn region  factorConstructor2    start=/\v<CONSTRUCTOR:>/                  end=/\v<;>/     contains=@factorComment,factorStackEffect
-syn region  factorIntersection    start=/\v<INTERSECTION:>/                 end=/\v<;>/     contains=@factorComment
+syn match   factorSlotAttrReadOnly      /\v<read-only>/ contained
+syn match   factorSlotAttrInitial       /\v<initial:>%(\_\s+%(!>.*)?)+/ contains=@factorComment nextgroup=factorWord,@factorClusterValue contained
 syn cluster factorSlotAttr              contains=factorSlotAttrInitial,factorSlotAttrReadOnly
+
 syn cluster factorTupleSlotAttr         contains=@factorSlotAttr
-syn match   factorTupleSlotName         /\v<\S+;@1<!>/ nextgroup=factorTupleSlotClassSkip skipempty contained
+syn match   factorTupleSlotAttrSkip     /\v%(\_\s+%(!>.*)?)*/ contains=@factorComment nextgroup=@factorTupleSlotAttr contained transparent
+syn match   factorTupleSlotName         /\v<\S+>/ nextgroup=factorTupleSlotClassSkip skipempty contained
 syn match   factorTupleSlotNameSkip     /\v%(\_\s+%(!>.*)?)*/ contains=@factorComment nextgroup=factorTupleSlotName transparent contained
 syn match   factorTupleSlotClass        /\v<\S+>/ nextgroup=factorTupleSlotAttrSkip skipempty contained
-" a class is optional, so let an attribute take priority if present
-syn match   factorTupleSlotClassSkip    /\v%(\_\s+%(!>.*)?)*/ contains=@factorComment nextgroup=factorTupleSlotClass,@factorTupleSlotAttr transparent contained
-syn region  factorTupleSlot matchgroup=factorTupleSlotDelims  start=/\v<\{>/                end=/\v<\}>/    contains=@factorComment,factorTupleSlotName,@factorTupleSlotAttr contained
-syn match   factorTupleHeader           /\v%(\_\s+%(!>.*)?)*\S+%(%(\_\s+%(!>.*)?)+\<%(\_\s+%(!>.*)?)+\S+)?>/  contains=@factorComment,@factorWord contained transparent
-syn match   factorTupleDelims           /\v<%(TUPLE|BUILTIN):>/ nextgroup=factorTupleHeader skipempty contained
-syn region  factorTuple           start=/\v<%(TUPLE|BUILTIN):>/ end=/\v<;>/     contains=@factorComment,factorTupleSlotName,factorTupleSlot,factorTupleDelims
-syn region  factorPredicate matchgroup=factorPredicateDelims  start=/\v<%(PREDICATE):>/     end=/\v<;>/     contains=@factorComment,factorTupleSlotName
-" Abnormally named because factor*Error is reserved for syntax errors.
-syn region  factorErrorSyn        start=/\v<ERROR:>/            end=/\v<;>/     contains=@factorComment
-syn region  factorUnion           start=/\v<UNION:>/            end=/\v<;>/     contains=@factorComment
+syn match   factorTupleSlotClassSkip    /\v%(\_\s+%(!>.*)?)*/ contains=@factorComment nextgroup=@factorTupleSlotAttr,factorTupleSlotClass transparent contained
+syn region  factorTupleSlot   matchgroup=factorTupleSlotDelims  start=/\v<\{>/                end=/\v<\}>/    contains=@factorComment,factorTupleSlotName,@factorTupleSlotAttr contained
+"syn match   factorTupleClass            /\v<\S+>/ nextgroup=factorTupleSuperClass,factorTupleSlot contained
+"syn region  factorTupleSuperClass  matchgroup=NONE     start=/\v%(\s+\<\s+)/     matchgroup=Identifier end=/\v<\S+>/   contains=@factorComment contained nextgroup=factorTupleSlot
+syn region  factorTuple   matchgroup=factorTupleDelims          start=/\v<%(TUPLE|BUILTIN|ERROR):>/ end=/\v<;>/     contains=@factorComment,factorTupleSlot
+syn region  factorPredicate   matchgroup=factorPredicateDelims  start=/\v<%(PREDICATE):>/     end=/\v<;>/     contains=@factorComment,factorTupleSlot
+
+syn match   factorStructSlotAttrBits    /\v<bits:>%(\_\s+%(!>.*)?)+/    contains=@factorComment nextgroup=factorWord,@factorReal contained
 syn cluster factorStructSlotAttr        contains=@factorSlotAttr,factorStructSlotAttrBits
 syn match   factorStructSlotName        /\v<\S+>/ nextgroup=factorStructSlotTypeSkip skipempty contained
 syn match   factorStructSlotNameSkip    /\v%(\_\s+%(!>.*)?)*/ contains=@factorComment nextgroup=factorStructSlotName contained transparent
 syn match   factorStructSlotType        /\v<\S+>/ contained
 syn match   factorStructSlotTypeSkip    /\v%(\_\s+%(!>.*)?)*/ contains=@factorComment nextgroup=factorStructSlotType contained transparent
-syn region  factorStructSlot matchgroup=factorStructSlotDelims    start=/\v<\{>/     end=/\v<\}>/ contains=@factorComment,factorStructSlotName,@factorStructSlotAttr contained
-syn region  factorStruct matchgroup=factorStructDelims            start=/\v<%(UNION-STRUCT|STRUCT):>/   end=/\v<;>/ contains=@factorComment,factorStructSlot
+syn region  factorStructSlot      matchgroup=factorStructSlotDelims start=/\v<\{>/                   skip=/\v<!>.*/  end=/\v<\}>/ contains=@factorComment,factorStructSlotName,@factorStructSlotAttr contained
+syn region  factorStruct          matchgroup=factorStructDelims     start=/\v<%(%(UNION-)?STRUCT):>/ skip=/\v<!>.*/  end=/\v<;>/  contains=@factorComment,factorStructSlot
 
-syn match   factorSlotAttrReadOnly      /\v<read-only>/ contained
-syn match   factorSlotAttrInitial       /\v<initial:>%(\_\s+%(!>.*)?)+/ contains=@factorComment nextgroup=factorWord,@factorClusterValue contained
-syn match   factorStructSlotAttrBits    /\v<bits:>%(\_\s+%(!>.*)?)+/    contains=@factorComment nextgroup=factorWord,@factorReal contained
+syn region  factorAlias             start=/\v<ALIAS:>/           skip=/\v<!>.*/     end=/\v<\S+%(\_\s+%(!>.*)?)+\S+>/   contains=@factorComment keepend
+syn region  factorAlien             start=/\v<ALIEN:>/           skip=/\v<!>.*/     end=/\v<\S+>/   contains=@factorComment,@factorHexNoRadix
+syn region  factorConstant          start=/\v<CONSTANT:>/        skip=/\v<!>.*/     end=/\v<\S+>/   contains=@factorComment
+syn region  factorDefer             start=/\v<DEFER:>/           skip=/\v<!>.*/     end=/\v<\S+>/   contains=@factorComment
+syn region  factorExclude           start=/\v<EXCLUDE:>/         skip=/\v<!>.*/     end=/\v<;>/     contains=@factorComment
+syn region  factorForget            start=/\v<FORGET:>/          skip=/\v<!>.*/     end=/\v<\S+>/   contains=@factorComment
+syn region  factorFrom              start=/\v<FROM:>/            skip=/\v<!>.*/     end=/\v<;>/     contains=@factorComment
+syn region  factorIn                start=/\v<IN:>/              skip=/\v<!>.*/     end=/\v<\S+>/   contains=@factorComment
+syn region  factorInstance          start=/\v<INSTANCE:>/        skip=/\v<!>.*/     end=/\v<\S+%(\_\s+%(!>.*)?)+\S+>/   contains=@factorComment keepend
+syn region  factorIntersection      start=/\v<INTERSECTION:>/    skip=/\v<!>.*/     end=/\v<;>/     contains=@factorComment
+syn region  factorMain              start=/\v<MAIN:>/            skip=/\v<!>.*/     end=/\v<\S+>/   contains=@factorComment
+syn region  factorMixin             start=/\v<MIXIN:>/           skip=/\v<!>.*/     end=/\v<\S+>/   contains=@factorComment
+syn region  factorPostpone          start=/\v<POSTPONE:>/        skip=/\v<!>.*/     end=/\v<\S+>/   contains=@factorComment
+syn region  factorQualified         start=/\v<QUALIFIED:>/       skip=/\v<!>.*/     end=/\v<\S+>/   contains=@factorComment
+syn region  factorQualifiedWith     start=/\v<QUALIFIED-WITH:>/  skip=/\v<!>.*/     end=/\v<\S+%(\_\s+%(!>.*)?)+\S+>/   contains=@factorComment keepend
+syn region  factorRename            start=/\v<RENAME:>/          skip=/\v<!>.*/     end=/\v<\S+%(\_\s+%(!>.*)?)+\S+%(\_\s+%(!>.*)?)+\=\>%(\_\s+%(!>.*)?)+\S+>/  contains=@factorComment keepend
+syn region  factorSingleton         start=/\v<SINGLETON:>/       skip=/\v<!>.*/     end=/\v<\S+>/   contains=@factorComment
+syn region  factorSingletons        start=/\v<SINGLETONS:>/      skip=/\v<!>.*/     end=/\v<;>/     contains=@factorComment
+syn region  factorSlot              start=/\v<SLOT:>/            skip=/\v<!>.*/     end=/\v<\S+>/   contains=@factorComment
+syn region  factorSymbol            start=/\v<SYMBOL:>/          skip=/\v<!>.*/     end=/\v<\S+>/   contains=@factorComment
+syn region  factorSymbols           start=/\v<SYMBOLS:>/         skip=/\v<!>.*/     end=/\v<;>/     contains=@factorComment
+syn region  factorUnion             start=/\v<UNION:>/           skip=/\v<!>.*/     end=/\v<;>/     contains=@factorComment
+syn region  factorUnuse             start=/\v<UNUSE:>/           skip=/\v<!>.*/     end=/\v<\S+>/   contains=@factorComment
+syn region  factorUse               start=/\v<USE:>/             skip=/\v<!>.*/     end=/\v<\S+>/   contains=@factorComment
+syn region  factorUsing             start=/\v<USING:>/           skip=/\v<!>.*/     end=/\v<;>/     contains=@factorComment
 
-syn region  factorConstant        start=/\v<CONSTANT:>/                 end=/\v<\S+>/   contains=@factorComment
-syn region  factorAlias           start=/\v<ALIAS:>/     skip=/\v<!>.*/ end=/\v<\S+%(\_\s+%(!>.*)?)+\S+>/   contains=@factorComment keepend
-syn region  factorSingleton       start=/\v<SINGLETON:>/                end=/\v<\S+>/   contains=@factorComment
-syn region  factorPostpone        start=/\v<POSTPONE:>/                 end=/\v<\S+>/   contains=@factorComment
-syn region  factorDefer           start=/\v<DEFER:>/                    end=/\v<\S+>/   contains=@factorComment
-syn region  factorForget          start=/\v<FORGET:>/                   end=/\v<\S+>/   contains=@factorComment
-syn region  factorMixin           start=/\v<MIXIN:>/                    end=/\v<\S+>/   contains=@factorComment
-syn region  factorInstance        start=/\v<INSTANCE:>/    skip=/\v<!>.*/   end=/\v<\S+%(\_\s+%(!>.*)?)+\S+>/   contains=@factorComment keepend
-syn region  factorHook            start=/\v<HOOK:>/    skip=/\v<!>.*/   end=/\v<\S+%(\_\s+%(!>.*)?)+\S+>/   contains=@factorComment nextgroup=factorStackEffectSkip skipempty keepend
-syn region  factorMain            start=/\v<MAIN:>/                     end=/\v<\S+>/   contains=@factorComment
-syn region  factorConstructor     start=/\v<C:>/       skip=/\v<!>.*/   end=/\v<\S+%(\_\s+%(!>.*)?)+\S+>/   contains=@factorComment keepend
-syn region  factorAlien matchgroup=factorAlien start=/\v<ALIEN:>/ matchgroup=NONE   end=/\v<\S+>/  contains=@factorComment,@factorHexNoRadix
-syn region  factorSlot            start=/\v<SLOT:>/                     end=/\v<\S+>/   contains=@factorComment
+syn cluster factorWordOps   contains=factorConstant,factorAlias,factorSingleton,factorSingletons,factorSymbol,factorSymbols,factorPostpone,factorDefer,factorForget,factorMixin,factorInstance,factorHook,factorMain
 
-syn cluster factorWordOps   contains=factorConstant,factorAlias,factorSingleton,factorSingletons,factorSymbol,factorSymbols,factorPostpone,factorDefer,factorForget,factorMixin,factorInstance,factorHook,factorMain,factorConstructor
-
-"TODO:
-"misc:
 " HELP:
 " ARTICLE:
-"literals:
-" PRIMITIVE:
-
-"C interface:
 " C-ENUM:
 " FUNCTION:
 " TYPEDEF:
 " LIBRARY:
-"#\ "
 
 if !exists('g:factor_syn_no_error')
-  syn match   factorStackEffectRequired /\v<\V(\@!\v\S+>/    contained
+  syn match   factorEffectRequired /\v<\V(\@!\v\S+>/    contained
 endif
-syn cluster factorStackEffectContents   contains=@factorComment,factorStackEffectDelims,factorStackEffectVar,factorStackEffectType,factorStackEffectRowVar
-syn cluster factorStackEffect           contains=factorStackEffect
+syn cluster factorEffectContents   contains=@factorComment,factorEffectDelims,factorEffectVar,factorEffectType,factorEffectRowVar
+syn cluster factorEffect           contains=factorEffect
 " Erroring on stack effects without a "--" separator would be nice.
 " Unfortunately, that sort of vacuous detection is above Vim's pay-grade,
 "   especially when stack effects can be nested arbitrarily via types.
-syn match   factorStackEffectSkip       /\v%(\_\s+%(!>.*)?)*/ contains=@factorComment nextgroup=factorStackEffectRequired,@factorStackEffect transparent contained
-syn region  factorStackEffect       matchgroup=factorStackEffectDelims    start=/\v\V(\v>/  end=/\v<\V)\v>/ contains=@factorStackEffectContents
-syn match   factorStackEffectVar        /\v<\S+>/           contained
+syn match   factorEffectSkip       /\v%(\_\s+%(!>.*)?)*/ contains=@factorComment nextgroup=factorEffectRequired,@factorEffect transparent contained
+syn region  factorEffect       matchgroup=factorEffectDelims    start=/\v\V(\v>/  end=/\v<\V)\v>/ contains=@factorEffectContents
+syn match   factorEffectVar        /\v<\S+>/           contained
 " Note that ":!" parses to the "!" word and doesn't lex as a comment.
 " Also, even though we take any value, the leading ":" breaking the word
 "   boundary means a lot of our nicer syntax patterns don't match on
-"   "factorStackEffectType".
-" syn cluster factorStackEffectType contains=factorWord,@factorStackEffect
-syn cluster factorStackEffectType       contains=factorWord,@factorClusterValue
-syn match   factorStackEffectTypeSkip   /\v%(\_\s+%(!>.*)?)*/ contains=@factorComment nextgroup=@factorStackEffectType transparent contained
-syn match   factorStackEffectVar        /\v<\S+:>/          nextgroup=factorStackEffectTypeSkip skipempty contained
-syn match   factorStackEffectType       /\v<:/              nextgroup=@factorStackEffectType contained
-syn match   factorStackEffectRowVar     /\v<\.\.\S+>/       contained
-syn match   factorStackEffectRowVar     /\v<\.\.\S+:>/      nextgroup=factorStackEffectTypeSkip skipempty contained
-syn match   factorStackEffectDelims     /\v<-->/            contained
+"   "factorEffectType".
+" syn cluster factorEffectType contains=factorWord,@factorEffect
+syn cluster factorEffectType       contains=factorWord,@factorClusterValue
+syn match   factorEffectTypeSkip   /\v%(\_\s+%(!>.*)?)*/ contains=@factorComment nextgroup=@factorEffectType transparent contained
+syn match   factorEffectVar        /\v<\S+:>/          nextgroup=factorEffectTypeSkip skipempty contained
+syn match   factorEffectType       /\v<:/              nextgroup=@factorEffectType contained
+syn match   factorEffectRowVar     /\v<\.\.\S+>/       contained
+syn match   factorEffectRowVar     /\v<\.\.\S+:>/      nextgroup=factorEffectTypeSkip skipempty contained
+syn match   factorEffectDelims     /\v<-->/            contained
 if !exists('g:factor_syn_no_error')
-  syn cluster factorStackEffectContents add=factorStackEffectError
-  syn keyword factorStackEffectError    (                   contained
+  syn cluster factorEffectContents add=factorEffectError
+  syn keyword factorEffectError    (                   contained
 endif
 
 " adapted from lisp.vim
@@ -346,44 +330,24 @@ endif
 
 if exists('g:factor_syn_no_rainbow')
   syn cluster factorArray       contains=factorArray
-  syn region  factorArray          matchgroup=factorDelimiter start=/\v<%(\$|[-[:alnum:]]+)?\{>/        end=/\v<\}>/    contains=ALL
+  syn region  factorArray         matchgroup=factorDelimiter start=/\v<[^ \"\[]*\{>/         end=/\v<\}>/    contains=ALL
 else
   syn cluster factorArray       contains=factorArray0
-  syn region  factorArray0               matchgroup=hlLevel0 start=/\v<%(\$|[-[:alnum:]]+)?\{>/         end=/\v<\}>/    contains=@factorCluster,factorArray1,factorQuotation1
-  syn region  factorArray1     contained matchgroup=hlLevel1 start=/\v<%(\$|[-[:alnum:]]+)?\{>/         end=/\v<\}>/    contains=@factorCluster,factorArray2,factorQuotation2
-  syn region  factorArray2     contained matchgroup=hlLevel2 start=/\v<%(\$|[-[:alnum:]]+)?\{>/         end=/\v<\}>/    contains=@factorCluster,factorArray3,factorQuotation3
-  syn region  factorArray3     contained matchgroup=hlLevel3 start=/\v<%(\$|[-[:alnum:]]+)?\{>/         end=/\v<\}>/    contains=@factorCluster,factorArray4,factorQuotation4
-  syn region  factorArray4     contained matchgroup=hlLevel4 start=/\v<%(\$|[-[:alnum:]]+)?\{>/         end=/\v<\}>/    contains=@factorCluster,factorArray5,factorQuotation5
-  syn region  factorArray5     contained matchgroup=hlLevel5 start=/\v<%(\$|[-[:alnum:]]+)?\{>/         end=/\v<\}>/    contains=@factorCluster,factorArray6,factorQuotation6
-  syn region  factorArray6     contained matchgroup=hlLevel6 start=/\v<%(\$|[-[:alnum:]]+)?\{>/         end=/\v<\}>/    contains=@factorCluster,factorArray7,factorQuotation7
-  syn region  factorArray7     contained matchgroup=hlLevel7 start=/\v<%(\$|[-[:alnum:]]+)?\{>/         end=/\v<\}>/    contains=@factorCluster,factorArray8,factorQuotation8
-  syn region  factorArray8     contained matchgroup=hlLevel8 start=/\v<%(\$|[-[:alnum:]]+)?\{>/         end=/\v<\}>/    contains=@factorCluster,factorArray9,factorQuotation9
-  syn region  factorArray9     contained matchgroup=hlLevel9 start=/\v<%(\$|[-[:alnum:]]+)?\{>/         end=/\v<\}>/    contains=@factorCluster,factorArray0,factorQuotation0
+  syn region  factorArray0               matchgroup=hlLevel0 start=/\v<[^ \"\[]*\{>/         end=/\v<\}>/    contains=@factorCluster,factorArray1,factorQuotation1
+  syn region  factorArray1     contained matchgroup=hlLevel1 start=/\v<[^ \"\[]*\{>/         end=/\v<\}>/    contains=@factorCluster,factorArray2,factorQuotation2
+  syn region  factorArray2     contained matchgroup=hlLevel2 start=/\v<[^ \"\[]*\{>/         end=/\v<\}>/    contains=@factorCluster,factorArray3,factorQuotation3
+  syn region  factorArray3     contained matchgroup=hlLevel3 start=/\v<[^ \"\[]*\{>/         end=/\v<\}>/    contains=@factorCluster,factorArray4,factorQuotation4
+  syn region  factorArray4     contained matchgroup=hlLevel4 start=/\v<[^ \"\[]*\{>/         end=/\v<\}>/    contains=@factorCluster,factorArray5,factorQuotation5
+  syn region  factorArray5     contained matchgroup=hlLevel5 start=/\v<[^ \"\[]*\{>/         end=/\v<\}>/    contains=@factorCluster,factorArray6,factorQuotation6
+  syn region  factorArray6     contained matchgroup=hlLevel6 start=/\v<[^ \"\[]*\{>/         end=/\v<\}>/    contains=@factorCluster,factorArray7,factorQuotation7
+  syn region  factorArray7     contained matchgroup=hlLevel7 start=/\v<[^ \"\[]*\{>/         end=/\v<\}>/    contains=@factorCluster,factorArray8,factorQuotation8
+  syn region  factorArray8     contained matchgroup=hlLevel8 start=/\v<[^ \"\[]*\{>/         end=/\v<\}>/    contains=@factorCluster,factorArray9,factorQuotation9
+  syn region  factorArray9     contained matchgroup=hlLevel9 start=/\v<[^ \"\[]*\{>/         end=/\v<\}>/    contains=@factorCluster,factorArray0,factorQuotation0
 endif
 
 if !exists('g:factor_syn_no_error')
   syn match   factorBracketError    /\v<\]>/
   syn match   factorBracketError    /\v<\}>/
-endif
-
-function! FactorSynDefineComment() abort
-  syn match   factorComment         /\v<!>.*$/ contains=@factorCommentContents
-  syn match   factorShebang         /\v%^\#!.*$/ display
-  if !exists('g:factor_syn_no_error')
-    syn match   factorShebangError  /\v%^\#!\S+/
-  endif
-endfunction
-
-if !exists('g:factor_syn_no_comment')
-  call FactorSynDefineComment()
-endif
-
-" Syntax that bypasses comment lexing.
-function! FactorSynDefineAfterComment() abort
-endfunction
-
-if !exists('g:factor_syn_no_after_comment')
-  call FactorSynDefineAfterComment()
 endif
 
 syn sync lines=100
@@ -392,7 +356,6 @@ if !exists('g:factor_syn_no_init')
   command -nargs=+ -bar HiLink hi def link <args>
 
   if !exists('g:factor_syn_no_error')
-    HiLink factorShebangError           Error
     HiLink factorBracketError           Error
     HiLink factorIntegerError           Error
     HiLink factorFloatError             Error
@@ -401,59 +364,40 @@ if !exists('g:factor_syn_no_init')
     HiLink factorHexNoRadixError        Error
     HiLink factorHexError               Error
     HiLink factorOctError               Error
-    HiLink factorStackEffectRequired    Error
-    HiLink factorStackEffectError       Error
+    HiLink factorEffectRequired         Error
+    HiLink factorEffectError            Error
   endif
 
-  HiLink   factorComment                Comment
-  HiLink   factorMultilineComment       factorComment
-  HiLink   factorMultilineCommentDelims factorMultilineComment
-  HiLink   factorMultilineCComment      factorComment
-  HiLink   factorMultilineCCommentDelims factorMultilineCComment
+  HiLink   factorError                  Error
   HiLink   factorShebang                PreProc
-  HiLink   factorStackEffect            Type
-  HiLink   factorStackEffectDelims      Delimiter
-  HiLink   factorStackEffectVar         Identifier
-  HiLink   factorStackEffectRowVar      factorStackEffectVar
-  HiLink   factorStackEffectType        Type
+  HiLink   factorComment                Comment
+  HiLink   factorMultilineComment       Comment
   HiLink   factorTodo                   Todo
+  HiLink   factorEffect                 Type
+  HiLink   factorEffectDelims           Delimiter
+  HiLink   factorEffectVar              Identifier
+  HiLink   factorEffectRowVar           factorEffectVar
+  HiLink   factorEffectType             Type
   HiLink   factorInclude                Include
   HiLink   factorWord                   Keyword
-  HiLink   factorCallQuotation          Keyword
-  HiLink   factorExecute                Keyword
+  HiLink   factorCallDelims             Keyword
   HiLink   factorCallNextMethod         Keyword
   HiLink   factorOperator               Operator
   HiLink   factorFrySpecifier           Operator
+  HiLink   factorLocalsSpecifier        Operator
   HiLink   factorBoolean                Boolean
   HiLink   factorBreakpoint             Debug
+  HiLink   factorInit                   Typedef
   HiLink   factorDefnDelims             Typedef
-  HiLink   factorMethodDelims           Typedef
-  HiLink   factorLocalsMethodDelims     Typedef
-  HiLink   factorGeneric                Typedef
-  HiLink   factorGenericN               Typedef
-  HiLink   factorConstructor            Typedef
-  HiLink   factorConstructor2           Typedef
+  HiLink   factorDeclDelims             Typedef
   HiLink   factorPrivate                Special
   HiLink   factorPDefnDelims            Special
-  HiLink   factorPMethodDelims          Special
-  HiLink   factorPLocalsMethodDelims    Special
-  HiLink   factorPGeneric               Special
-  HiLink   factorPGenericN              Special
+  HiLink   factorPDeclDelims            Special
   HiLink   factorEscape                 SpecialChar
   HiLink   factorString                 String
   HiLink   factorStringDelims           factorString
-  HiLink   factorTriString              factorString
-  HiLink   factorTriStringDelims        factorTriString
-  HiLink   factorPrefixedString         factorString
-  HiLink   factorPrefixedStringDelims   factorPrefixedString
-  HiLink   factorMultilineString        factorString
-  HiLink   factorMultilineStringDelims  Typedef
-  HiLink   factorHereDoc                factorMultilineString
-  HiLink   factorHereDocDelims          factorMultilineStringDelims
-  HiLink   factorHereDocString          factorMultilineString
-  HiLink   factorHereDocStringDelims    factorMultilineStringDelims
-  HiLink   factorPrefixedMultilineString factorString
-  HiLink   factorPrefixedMultilineStringDelims factorMultilineStringDelims
+  HiLink   factorNamedString            String
+  HiLink   factorNamedStringDelims      Typedef
   HiLink   factorComplex                Number
   HiLink   factorRatio                  Number
   HiLink   factorBin                    Number
@@ -473,11 +417,11 @@ if !exists('g:factor_syn_no_init')
   HiLink   factorUnuse                  Include
   HiLink   factorIn                     Define
   HiLink   factorChar                   Character
+  HiLink   factorColor                  Constant
   HiLink   factorDelimiter              Delimiter
   HiLink   factorBackslash              Special
   HiLink   factorMBackslash             Special
   HiLink   factorLiteral                Special
-  HiLink   factorLiteralBlock           Special
   HiLink   factorDeclaration            Typedef
   HiLink   factorSymbol                 Define
   HiLink   factorSymbols                Define
@@ -495,6 +439,7 @@ if !exists('g:factor_syn_no_init')
   HiLink   factorAlien                  Define
   HiLink   factorSlot                   Define
   HiLink   factorIntersection           Typedef
+  HiLink   factorRegexp                 Constant
   HiLink   factorSlot                   Typedef
   HiLink   factorSlotDelims             factorSlot
   HiLink   factorSlotName               Identifier
@@ -510,10 +455,10 @@ if !exists('g:factor_syn_no_init')
   HiLink   factorTuple                  Typedef
   HiLink   factorTupleDelims            factorTuple
   HiLink   factorTupleSlot              factorSlot
+  HiLink   factorTupleClass             Identifier
   HiLink   factorTupleSlotDelims        factorSlotDelims
   HiLink   factorTupleSlotName          factorSlotName
   HiLink   factorTupleSlotClass         factorSlotClass
-  HiLink   factorErrorSyn               Typedef
   HiLink   factorUnion                  Typedef
   HiLink   factorStruct                 Typedef
   HiLink   factorStructDelims           factorStruct

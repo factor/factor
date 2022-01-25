@@ -55,7 +55,7 @@ M: windows send-to-trash ( path -- )
         absolute-path native-string>alien B{ 0 0 } append
         malloc-byte-array &free
 
-        SHFILEOPSTRUCTW <struct>
+        SHFILEOPSTRUCTW new
             f >>hwnd
             FO_DELETE >>wFunc
             swap >>pFrom

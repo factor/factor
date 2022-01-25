@@ -19,7 +19,7 @@ const char* default_image_path() {
   if (!path)
     return strdup("factor.image");
 
-  int len = strlen(path);
+  size_t len = strlen(path);
   char* new_path = (char *)malloc(len + SUFFIX_LEN + 1);
   memcpy(new_path, path, len);
   memcpy(new_path + len, SUFFIX, SUFFIX_LEN + 1);

@@ -1,6 +1,6 @@
 ! Copyright (C) 2018 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors alien.c-types classes.struct kernel locals math
+USING: accessors alien.c-types classes.struct kernel math
 math.bitwise random sequences slots.syntax ;
 IN: random.xoshiro
 
@@ -23,7 +23,7 @@ CONSTANT: LONG-JUMP-256 {
 STRUCT: xoshiro-256-star-star { s0 ulonglong } { s1 ulonglong } { s2 ulonglong } { s3 ulonglong } ;
 
 : <xoshiro-256-star-star> ( s0 s1 s2 s3 -- obj )
-    xoshiro-256-star-star <struct>
+    xoshiro-256-star-star new
         swap >>s3
         swap >>s2
         swap >>s1

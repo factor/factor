@@ -1,7 +1,7 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors calendar calendar.format fonts fry grouping
-kernel math sequences timers ui ui.gadgets ui.gadgets.labels ;
+USING: accessors calendar calendar.format fonts grouping kernel
+math sequences splitting timers ui ui.gadgets ui.gadgets.labels ;
 IN: lcd
 
 : lcd-digit ( digit row -- str )
@@ -16,7 +16,7 @@ IN: lcd
     '[ _ lcd-digit ] { } map-as concat ;
 
 : lcd ( digit-str -- string )
-    4 <iota> [ lcd-row ] with map "\n" join ;
+    4 <iota> [ lcd-row ] with map join-lines ;
 
 TUPLE: time-display < label timer ;
 

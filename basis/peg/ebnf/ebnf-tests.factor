@@ -213,7 +213,7 @@ IN: peg.ebnf.tests
 ] must-fail
 
 { 3 } [
-  { 1 2 "a" 4 } EBNF[=[ num=. ?[ number? ]? list=list:x num:y => [[ x y + ]] | num ]=]
+  { 1 2 "a" 4 } PARTIAL-EBNF[=[ num=. ?[ number? ]? list=list:x num:y => [[ x y + ]] | num ]=]
 ] unit-test
 
 [
@@ -405,7 +405,7 @@ main = Primary
 ] unit-test
 
 { V{ } } [
-  "ab cab c" EBNF[=[ a="a" "b" foo=(a "c")* ]=]
+  "ab cab c" PARTIAL-EBNF[=[ a="a" "b" foo=(a "c")* ]=]
 ] unit-test
 
 { V{ V{ V{ "a" "b" } "c" } V{ V{ "a" "b" } "c" } } } [
@@ -417,11 +417,11 @@ main = Primary
 ] unit-test
 
 { V{ } } [
-  "ab c ab c" EBNF[=[ a="a" "b" foo=(a "c")* ]=]
+  "ab c ab c" PARTIAL-EBNF[=[ a="a" "b" foo=(a "c")* ]=]
 ] unit-test
 
 { V{ } } [
-  "ab c ab c" EBNF[=[ a="a" "b" foo=(a "c")* ]=]
+  "ab c ab c" PARTIAL-EBNF[=[ a="a" "b" foo=(a "c")* ]=]
 ] unit-test
 
 { V{ "a" "a" "a" } } [
@@ -572,7 +572,7 @@ Tok                = Spaces (Number | Special )
 ] unit-test
 
 { "++" } [
-  "++--" EBNF[=[ tokenizer=("++" | "--") main="++" ]=]
+  "++--" PARTIAL-EBNF[=[ tokenizer=("++" | "--") main="++" ]=]
 ] unit-test
 
 { "\\" } [
@@ -607,7 +607,8 @@ Tok                = Spaces (Number | Special )
     EBNF: parse-til-right-bracket [=[
     foo = [^\]]+
     ]=]
-    "abc]" parse-til-right-bracket >string
+    PARTIAL-EBNF: parse-til-right-bracket* parse-til-right-bracket
+    "abc]" parse-til-right-bracket* >string
 ] unit-test
 
 ! Doesn't match anything, don't run it.
@@ -615,4 +616,33 @@ Tok                = Spaces (Number | Special )
     EBNF: parse-empty-range [=[
     foo = []+
     ]=]
+] unit-test
+
+[
+    [==[
+      EBNF: parse-empty-squote [=[
+        foo = ''
+      ]=]
+    ]==] parse-string
+] must-fail
+
+[
+    [==[
+      EBNF: parse-empty-squote [=[
+        foo = ""
+      ]=]
+    ]==] parse-string
+] must-fail
+
+! Bugfix, ensure that ~ rules are ignored with local labels
+{ { "a" "c" } } [
+    "abc" EBNF[=[ rule="a":a "b"~ "c":c => [[ a c 2array ]] ]=]
+] unit-test
+
+{ { "a" "c" } } [
+    "abc" EBNF[=[ rule="a":a "b"*~ "c":c => [[ a c 2array ]] ]=]
+] unit-test
+
+{ { "a" "c" } } [
+    "abc" EBNF[=[ rule="a":a "b"+~ "c":c => [[ a c 2array ]] ]=]
 ] unit-test

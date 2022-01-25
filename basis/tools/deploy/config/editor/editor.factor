@@ -1,8 +1,7 @@
 ! Copyright (C) 2008, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: assocs io.pathnames kernel parser prettyprint
-prettyprint.config sequences splitting tools.deploy.config
-vocabs.loader vocabs.metadata ;
+USING: assocs kernel parser prettyprint prettyprint.config
+sequences splitting tools.deploy.config vocabs.metadata ;
 IN: tools.deploy.config.editor
 
 : deploy-config-path ( vocab -- path/f )
@@ -14,7 +13,7 @@ IN: tools.deploy.config.editor
     parse-fresh [ first assoc-union ] unless-empty ;
 
 : set-deploy-config ( assoc vocab -- )
-    [ [ unparse-use ] without-limits string-lines ] dip
+    [ [ unparse-use ] without-limits split-lines ] dip
     "deploy.factor" set-vocab-file-lines ;
 
 : set-deploy-flag ( value key vocab -- )

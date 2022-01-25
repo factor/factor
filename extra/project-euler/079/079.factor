@@ -52,7 +52,7 @@ PRIVATE>
 
 : topological-sort ( seq -- seq )
     [ [ (topological-sort) ] { } make ] keep
-    combine over diff append ;
+    union-all over diff append ;
 
 : euler079 ( -- answer )
     source-079 >edges topological-sort digits>number ;

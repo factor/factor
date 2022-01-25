@@ -1,6 +1,6 @@
 ! Copyright (C) 2009 Bruno Deferrari
 ! See http://factorcode.org/license.txt for BSD license.
-USING: assocs kernel redis sequences ;
+USING: assocs kernel redis ;
 IN: redis.assoc
 
 INSTANCE: redis assoc

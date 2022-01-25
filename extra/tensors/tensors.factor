@@ -1,8 +1,8 @@
 ! Copyright (C) 2019 HMC Clinic.
 ! See http://factorcode.org/license.txt for BSD license.
 
-USING: accessors alien alien.c-types alien.data arrays byte-arrays combinators
-grouping kernel locals kernel.private math math.functions math.ranges math.vectors
+USING: accessors alien alien.c-types alien.data arrays combinators
+grouping kernel math math.functions ranges math.vectors
 math.vectors.simd multi-methods parser prettyprint.custom sequences sequences.extras
 sequences.private specialized-arrays typed ;
 
@@ -57,7 +57,7 @@ PRIVATE>
 
 ! Construct a tensor with vec { 0 1 2 ... } and reshape to the desired shape
 : naturals ( shape -- tensor )
-    check-shape [ ] [ product [0,b) >float-array ] bi <tensor> ;
+    check-shape [ ] [ product [0..b) >float-array ] bi <tensor> ;
 
 ! Construct a tensor without initializing its values
 : (tensor) ( shape -- tensor )
@@ -349,7 +349,7 @@ syntax:M: tensor sum vec>> 0 <simd-slice>
     seq [ shape>> last ] map :> last-dims
     ! Curr tensor and index in tensor
     0 0
-    last-dims sum [0,b) [
+    last-dims sum [0..b) [
         drop :> old-t-ind :> last-dims-i
         last-dims-i last-dims nth
         old-t-ind -

@@ -2,9 +2,9 @@
 ! See http://factorcode.org/license.txt for BSD license.
 !
 ! Remote Channels
-USING: kernel init namespaces assocs arrays random
-sequences channels match concurrency.messaging
-concurrency.distributed threads accessors ;
+USING: accessors assocs channels concurrency.distributed
+concurrency.messaging init kernel match namespaces random
+threads ;
 IN: channels.remote
 
 <PRIVATE
@@ -66,7 +66,7 @@ M: remote-channel to
 M: remote-channel from
     [ id>> from-message boa ] keep send-message ;
 
-[
+STARTUP-HOOK: [
     H{ } clone \ remote-channels set-global
     start-channel-node
-] "channel-registry" add-startup-hook
+]

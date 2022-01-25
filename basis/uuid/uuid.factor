@@ -1,8 +1,7 @@
 ! Copyright (C) 2008 John Benediktsson
 ! See http://factorcode.org/license.txt for BSD license
-USING: byte-arrays calendar checksums checksums.md5
-checksums.sha io.binary kernel math math.parser math.ranges
-random sequences strings system unicode ;
+USING: calendar checksums checksums.md5 checksums.sha endian
+kernel math math.parser random sequences ;
 IN: uuid
 
 <PRIVATE
@@ -11,7 +10,7 @@ IN: uuid
     ! 0x01b21dd213814000L is the number of 100-ns intervals
     ! between the UUID epoch 1582-10-15 00:00:00 and the
     ! Unix epoch 1970-01-01 00:00:00.
-    gmt timestamp>micros 10 * 0x01b21dd213814000 +
+    now timestamp>micros 10 * 0x01b21dd213814000 +
     [ -48 shift 0x0fff bitand ]
     [ -32 shift 0xffff bitand ]
     [ 0xffffffff bitand ]
@@ -48,7 +47,7 @@ IN: uuid
     [ CHAR: - 8 ] dip insert-nth ;
 
 : string>uuid ( string -- n )
-    [ CHAR: - = ] reject hex> ;
+    CHAR: - swap remove hex> ;
 
 PRIVATE>
 

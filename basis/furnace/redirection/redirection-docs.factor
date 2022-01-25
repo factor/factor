@@ -1,5 +1,4 @@
-USING: help.markup help.syntax io.streams.string quotations urls
-http.server http ;
+USING: help.markup help.syntax http quotations urls ;
 IN: furnace.redirection
 
 HELP: <redirect-responder>

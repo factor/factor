@@ -1,5 +1,10 @@
+#container {
+    max-width: 1000px;
+}
+
 #left {
     width: 0;
+    z-index: 99;
 }
 
 #right {
@@ -72,6 +77,14 @@
     margin-right: -15px;
     margin-bottom: -15px;
     border-top: 1px solid #ccc;
+}
+
+.page img {
+    max-width: 100%;
+}
+
+.page hr {
+    height: 1px;
 }
 
 .description {

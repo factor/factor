@@ -1,5 +1,5 @@
 USING: accessors destructors windows.privileges
-io.files.windows io.mmap io.mmap.private kernel literals locals
+io.files.windows io.mmap io.mmap.private kernel literals
 math math.bitwise system windows.errors windows.handles
 windows.kernel32 ;
 IN: io.mmap.windows

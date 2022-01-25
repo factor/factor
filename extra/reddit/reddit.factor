@@ -1,10 +1,9 @@
 ! Copyright (C) 2011-2012 John Benediktsson
 ! See http://factorcode.org/license.txt for BSD license
 
-USING: accessors assocs calendar calendar.elapsed
-colors.constants colors.hex combinators formatting fry
-http.client io io.styles json json.reader kernel make math
-sequences urls ;
+USING: accessors assocs calendar calendar.format colors
+combinators formatting http.client io io.styles json
+json.reader kernel make math sequences urls ;
 
 IN: reddit
 
@@ -86,11 +85,11 @@ PRIVATE>
 : write-link ( title url -- )
     '[
         _ presented ,,
-        HEXCOLOR: 888888 foreground ,,
+        COLOR: #888888 foreground ,,
     ] H{ } make format ;
 
 : write-text ( str -- )
-    H{ { foreground HEXCOLOR: 888888 } } format ;
+    H{ { foreground COLOR: #888888 } } format ;
 
 PRIVATE>
 

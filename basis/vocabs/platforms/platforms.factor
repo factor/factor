@@ -15,7 +15,7 @@ IN: vocabs.platforms
 
 : parse-platform-section ( string suffix -- )
     [
-        [ [ string-lines parse-lines ] curry with-nested-compilation-unit ]
+        [ [ split-lines parse-lines ] curry with-nested-compilation-unit ]
         curry
     ] dip with-vocabulary drop ; inline
 
@@ -34,3 +34,19 @@ SYNTAX: <LINUX
 SYNTAX: <WINDOWS
     "WINDOWS>" parse-multiline-string
     os windows? [ ".windows" parse-platform-section ] [ drop ] if ;
+
+SYNTAX: <!UNIX
+    "!UNIX>" parse-multiline-string
+    os unix? [ drop ] [ ".unix" parse-platform-section ] if ;
+
+SYNTAX: <!MACOSX
+    "!MACOSX>" parse-multiline-string
+    os macosx? [ drop ] [ ".macosx" parse-platform-section ] if ;
+
+SYNTAX: <!LINUX
+    "!LINUX>" parse-multiline-string
+    os linux? [ drop ] [ ".linux" parse-platform-section ] if ;
+
+SYNTAX: <!WINDOWS
+    "!WINDOWS>" parse-multiline-string
+    os windows? [ drop ] [ ".windows" parse-platform-section ] if ;

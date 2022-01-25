@@ -1,7 +1,7 @@
 ! Copyright (C) 2018 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors assocs calendar combinators environment
-escape-strings fry io io.pathnames io.streams.string kernel math
+escape-strings io io.pathnames io.streams.string kernel math
 math.parser namespaces prettyprint prettyprint.config sequences
 tools.deploy.backend tools.time unix.groups unix.users uuid ;
 IN: ci.run-process
@@ -13,7 +13,7 @@ TUPLE: process-autopsy
 : ci-run-process ( process -- timestamp os-envs cwd uid euid gid egid out elapsed os-envs' process )
     [
         [
-            gmt os-envs current-directory get
+            now-gmt os-envs current-directory get
             real-user-id effective-user-id
             real-group-id effective-group-id
         ] dip [

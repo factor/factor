@@ -1,6 +1,6 @@
 ! Copyright (C) 2004, 2010 Slava Pestov, Joe Groff.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel math math.private math.order ;
+USING: kernel math math.order math.private ;
 IN: math.floats
 
 <PRIVATE

@@ -3,7 +3,7 @@ io.encodings.binary io.encodings.utf8 io.streams.byte-array
 kernel math specialized-arrays strings tools.test ;
 SPECIALIZED-ARRAY: int
 
-{ B{ } } [ B{ } binary [ contents ] with-byte-reader ] unit-test
+{ B{ } } [ B{ } binary [ read-contents ] with-byte-reader ] unit-test
 
 ! Issue #70 github
 { f } [ B{ } binary [ 0 read ] with-byte-reader ] unit-test

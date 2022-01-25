@@ -89,4 +89,4 @@ M: apropos-search >link ;
 INSTANCE: apropos-search topic
 
 : apropos ( str -- )
-    [ blank? ] trim <apropos-search> print-topic ;
+    [ unicode:blank? ] trim <apropos-search> print-topic ;

@@ -9,9 +9,10 @@ PRIMITIVE: disable-ctrl-break ( -- )
 PRIMITIVE: enable-ctrl-break ( -- )
 PRIMITIVE: nano-count ( -- ns )
 
-SINGLETONS: x86.32 x86.64 arm ppc.32 ppc.64 ;
+SINGLETONS: x86.32 x86.64 arm.32 arm.64 ppc.32 ppc.64 ;
 
 UNION: x86 x86.32 x86.64 ;
+UNION: arm arm.32 arm.64 ;
 UNION: ppc ppc.32 ppc.64 ;
 
 : cpu ( -- class ) \ cpu get-global ; foldable
@@ -42,7 +43,8 @@ UNION: unix macosx linux freebsd bsd ;
 CONSTANT: string>cpu-hash H{
     { "x86.32" x86.32 }
     { "x86.64" x86.64 }
-    { "arm" arm }
+    { "arm.32" arm.32 }
+    { "arm.64" arm.64 }
     { "ppc.32" ppc.32 }
     { "ppc.64" ppc.64 }
 }

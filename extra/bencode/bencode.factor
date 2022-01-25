@@ -1,6 +1,6 @@
 USING: arrays assocs byte-arrays combinators io
 io.encodings.binary io.streams.byte-array io.streams.string
-kernel linked-assocs math math.parser sequences strings ;
+kernel linked-assocs math math.parser sequences sequences.extras strings ;
 IN: bencode
 
 GENERIC: >bencode ( obj -- bencode )
@@ -28,12 +28,12 @@ DEFER: read-bencode
     "e" read-until CHAR: e assert= string>number ;
 
 : read-list ( -- obj )
-    [ read-bencode dup ] [ ] produce nip ;
+    [ read-bencode ] loop>array ;
 
 : read-dictionary ( -- obj )
     [
-        read-bencode [ read-bencode 2array ] [ f ] if* dup
-    ] [ ] produce nip >linked-hash ;
+        read-bencode [ read-bencode 2array ] [ f ] if*
+    ] loop>array >linked-hash ;
 
 : read-string ( prefix -- obj )
     ":" read-until CHAR: : assert= swap prefix

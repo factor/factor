@@ -1,9 +1,9 @@
 ! Copyright (C) 2007, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays colors fonts fry help.markup help.stylesheet
-io.styles kernel literals math math.ranges models namespaces parser
-sequences system ui ui.gadgets ui.gadgets.books ui.gadgets.panes
-ui.gestures ui.pens.gradient ui.pens.solid ;
+USING: accessors arrays colors fonts help.markup help.stylesheet
+io.styles kernel literals math models namespaces parser ranges
+sequences ui ui.gadgets ui.gadgets.books ui.gadgets.panes
+ui.gestures ui.pens.gradient ;
 IN: slides
 
 CONSTANT: stylesheet
@@ -91,7 +91,7 @@ TUPLE: slides < book ;
 : prev-page ( book -- ) -1 change-page ;
 
 : strip-tease ( data -- seq )
-    first3 2 over length [a,b] [ head 3array ] with with with map ;
+    first3 2 over length [a..b] [ head 3array ] with with with map ;
 
 SYNTAX: STRIP-TEASE:
     parse-definition strip-tease append! ;

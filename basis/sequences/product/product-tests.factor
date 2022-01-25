@@ -25,6 +25,14 @@ USING: arrays kernel make math sequences sequences.product tools.test ;
 { { } } [ { { } { 1 } } [ ] product-map ] unit-test
 { } [ { { } { 1 } } [ drop ] product-each ] unit-test
 
+{ f } [
+    { } [ sum zero? ] product-find
+] unit-test
+
+{ f } [
+    { f } [ sum zero? ] product-find
+] unit-test
+
 { { 2 4 8 } } [
     { { 1 2 3 } { 4 5 6 } { 7 8 9 } }
     [ [ even? ] all? ] product-find

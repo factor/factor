@@ -24,7 +24,12 @@ SYMBOL: command-line
 : (command-line) ( -- args )
     OBJ-ARGS special-object sift [ alien>native-string ] map ;
 
+: delete-user-init-errors ( file -- )
+    user-init-errors get delete-at* nip
+    [ notify-error-observers ] when ;
+
 : try-user-init ( file -- )
+    [ delete-user-init-errors ] keep
     "user-init" get swap '[
         _ [ ?run-file ] [
             <user-init-error>
@@ -41,7 +46,7 @@ SYMBOL: command-line
 
 : load-vocab-roots ( -- )
     "user-init" get [
-        "~/.factor-roots" dup exists? [
+        "~/.factor-roots" dup file-exists? [
             utf8 file-lines harvest [ add-vocab-root ] each
         ] [ drop ] if
         "roots" get [
@@ -96,9 +101,9 @@ SYMBOL: main-vocab-hook
         main-vocab "run" set
     ] with-global ;
 
-[
+STARTUP-HOOK: [
     H{ } user-init-errors set-global
     default-cli-args
-] "command-line" add-startup-hook
+]
 
 { "debugger" "command-line" } "command-line.debugger" require-when

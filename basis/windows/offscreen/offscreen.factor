@@ -7,7 +7,7 @@ IN: windows.offscreen
 
 : (bitmap-info) ( dim -- BITMAPINFO )
     [
-        BITMAPINFO <struct>
+        BITMAPINFO new
         dup bmiHeader>>
         BITMAPINFOHEADER heap-size >>biSize
     ] dip

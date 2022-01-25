@@ -1,9 +1,9 @@
 ! Copyright (C) 2006, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: assocs classes combinators command-line continuations fry
-help help.lint.checks help.topics io kernel listener locals
-namespaces parser sequences source-files.errors system
-tools.errors vocabs vocabs.hierarchy words ;
+USING: assocs classes combinators command-line continuations
+help help.lint.checks help.topics io kernel listener namespaces
+parser sequences source-files.errors system tools.errors vocabs
+vocabs.hierarchy vocabs.hierarchy.private vocabs.loader words ;
 IN: help.lint
 
 SYMBOL: lint-failures
@@ -22,7 +22,6 @@ T{ error-type-holder
    { quot [ lint-failures get values ] }
    { forget-quot [ lint-failures get delete-at ] }
 } define-error-type
-
 M: help-lint-error error-type drop +help-lint-failure+ ;
 
 <PRIVATE
@@ -70,22 +69,24 @@ PRIVATE>
     <vocab-link> dup
     '[ _ vocab-help [ lookup-article drop ] when* ] check-something ;
 
-: check-vocab ( vocab -- )
-    "Checking " write dup write "..." print flush
+: help-lint-vocab ( vocab -- )
+    "Checking " write dup vocab-name write "..." print flush
     [ check-about ]
     [ vocab-words [ check-word ] each ]
     [ vocab-articles get at [ check-article ] each ]
     tri ;
 
-PRIVATE>
-
-: help-lint ( prefix -- )
+: help-lint-vocabs ( vocabs -- )
     [
         auto-use? off
         group-articles vocab-articles set
-        loaded-child-vocab-names
-        [ check-vocab ] each
+        [ help-lint-vocab ] each
     ] with-scope ;
+
+PRIVATE>
+
+: help-lint ( prefix -- )
+    loaded-child-vocab-names help-lint-vocabs ;
 
 : help-lint-all ( -- ) "" help-lint ;
 
@@ -101,8 +102,13 @@ PRIVATE>
     [ predicate? ] reject ;
 
 : test-lint-main ( -- )
-    command-line get [ load ] each
-    help-lint-all
+    command-line get [
+        dup vocab-roots get member? [
+            "" vocabs-to-load [ require-all ] keep
+        ] [
+            [ load ] [ loaded-child-vocab-names ] bi
+        ] if help-lint-vocabs
+    ] each
     lint-failures get assoc-empty?
     [ [ "==== FAILING LINT" print :lint-failures flush ] unless ]
     [ 0 1 ? exit ] bi ;

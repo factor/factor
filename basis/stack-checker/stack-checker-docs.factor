@@ -1,5 +1,6 @@
 USING: classes continuations effects help.markup help.syntax io
-kernel quotations sequences stack-checker.errors ;
+kernel quotations sequences stack-checker.backend
+stack-checker.errors ;
 IN: stack-checker
 
 ARTICLE: "inference-simple" "Straight-line stack effects"

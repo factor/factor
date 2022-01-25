@@ -1,6 +1,6 @@
 ! Copyright (C) 2011 Erik Charlebois.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel namespaces words math math.order locals math.bitwise io.binary make ;
+USING: endian kernel make math math.bitwise ;
 IN: cpu.ppc.assembler
 
 ! This vocabulary implements the V2.06B Power ISA found at http://www.power.org.

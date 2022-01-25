@@ -2,8 +2,8 @@
 ! See http://factorcode.org/license.txt for BSD license.
 ! Code based on https://towardsdatascience.com/linear-regression-from-scratch-with-numpy-implementation-finally-8e617d8e274c
 
-USING: arrays accessors csv io io.encodings.utf8 kernel locals math math.parser
-math.ranges math.statistics prettyprint sequences tensors ;
+USING: arrays accessors csv io io.encodings.utf8 kernel math math.parser
+ranges math.statistics prettyprint sequences tensors ;
 IN: tensors.demos
 
 <PRIVATE
@@ -14,11 +14,11 @@ IN: tensors.demos
     ! combined with X
     X transpose tensor>array :> X-T
     X-T [ mean ] map >tensor :> feat-means
-    X shape>> first [0,b) [ drop feat-means ] map stack :> means
+    X shape>> first [0..b) [ drop feat-means ] map stack :> means
     ! Compute the std for each of the features and repeat it so that it can be
     ! combined with X
     X-T [ std ] map >tensor :> feat-stds
-    X shape>> first [0,b) [ drop feat-stds ] map stack :> stds
+    X shape>> first [0..b) [ drop feat-stds ] map stack :> stds
     X means t- stds t/ ;
 
 :: compute-cost ( X y params -- cost )

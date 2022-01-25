@@ -1,6 +1,5 @@
 USING: accessors calendar calendar.format io io.encodings.utf8
-io.files kernel multiline parser sequences sorting splitting
-vocabs ;
+io.files kernel multiline sequences sorting splitting vocabs ;
 IN: editors.vim.generate-syntax
 
 <PRIVATE
@@ -66,7 +65,7 @@ CONSTANT: highlighted-vocabs {
 " Language: Factor
 " Maintainer: Alex Chapman <chapman.alex@gmail.com>
 " Last Change: ]=] write
-    now >gmt { YYYY " " MONTH " " DD } formatted [=[
+    now-gmt { YYYY " " MONTH " " DD } formatted [=[
 " Minimum Version: 600
 " To regenerate: USE: editors.vim.generate-syntax generate-vim-syntax
 

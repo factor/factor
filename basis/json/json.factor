@@ -1,4 +1,4 @@
-USING: kernel vocabs summary debugger io ;
+USING: kernel summary vocabs ;
 IN: json
 
 SINGLETON: json-null

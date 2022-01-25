@@ -3,15 +3,15 @@
 USING: accessors arrays assocs calendar combinators
 combinators.short-circuit concurrency.flags
 concurrency.mailboxes continuations destructors documents
-documents.elements fonts fry hashtables help help.markup
-help.tips io io.styles kernel lexer listener literals locals
-math math.vectors models models.arrow models.delay namespaces
-parser prettyprint sequences source-files.errors strings system
-threads ui ui.commands ui.gadgets ui.gadgets.editors
-ui.gadgets.glass ui.gadgets.labeled ui.gadgets.panes
-ui.gadgets.scrollers ui.gadgets.status-bar ui.gadgets.toolbar
-ui.gadgets.tracks ui.gestures ui.operations ui.pens.solid
-ui.theme ui.tools.browser ui.tools.common ui.tools.debugger
+documents.elements fonts hashtables help help.markup help.tips
+io io.styles kernel lexer listener literals math math.vectors
+models models.arrow models.delay namespaces parser prettyprint
+sequences source-files.errors splitting strings system threads
+ui ui.commands ui.gadgets ui.gadgets.editors ui.gadgets.glass
+ui.gadgets.labeled ui.gadgets.panes ui.gadgets.scrollers
+ui.gadgets.status-bar ui.gadgets.toolbar ui.gadgets.tracks
+ui.gestures ui.operations ui.pens.solid ui.theme
+ui.tools.browser ui.tools.common ui.tools.debugger
 ui.tools.error-list ui.tools.listener.completion
 ui.tools.listener.history ui.tools.listener.popups vocabs
 vocabs.loader vocabs.parser vocabs.refresh words ;
@@ -161,7 +161,7 @@ M: interactor stream-readln
 M:: interactor stream-read-unsafe ( n buf interactor -- count )
     n [ 0 ] [
         drop
-        interactor interactor-read dup [ "\n" join ] when
+        interactor interactor-read dup [ join-lines ] when
         n short [ head-slice 0 buf copy ] keep
     ] if-zero ;
 
@@ -176,7 +176,7 @@ M: interactor stream-read1
 M: interactor stream-read-until
     swap '[
         _ interactor-read [
-            "\n" join CHAR: \n suffix
+            join-lines CHAR: \n suffix
             [ _ member? ] dupd find
             [ [ head ] when* ] dip dup not
         ] [ f f f ] if*
@@ -194,7 +194,7 @@ TUPLE: listener-gadget < tool error-summary output scroller input ;
 listener-gadget default-font-size  { 50 58 } n*v set-tool-dim
 
 : listener-streams ( listener -- input output )
-    [ input>> ] [ output>> <pane-stream> ] bi ;
+    [ input>> ] [ output>> <pane-stream> H{ } clone <style-stream> ] bi ;
 
 : init-input/output ( listener -- listener )
     <interactor>
@@ -318,12 +318,12 @@ M: listener-operation invoke-command
     [ [ clear ] \ clear ] dip (call-listener) ;
 
 : use-if-necessary ( word manifest -- )
-    2dup [ vocabulary>> ] dip and [
+    [ [ vocabulary>> ] keep ] dip pick over and [
         manifest [
-            [ vocabulary>> use-vocab ]
-            [ dup name>> associate use-words ] bi
+            [ drop use-vocab ]
+            [ name>> 1array add-words-from ] 2bi
         ] with-variable
-    ] [ 2drop ] if ;
+    ] [ 3drop ] if ;
 
 M: word accept-completion-hook
     interactor>> manifest>> use-if-necessary ;
@@ -384,9 +384,13 @@ M: interactor handle-gesture
         [ call-next-method ]
     } cond ;
 
+: delete-next-character/eof ( interactor -- )
+    dup model>> doc-string empty?
+    [ interactor-eof ] [ delete-next-character ] if ;
+
 interactor "interactor" f {
     { T{ key-down f f "RET" } evaluate-input }
-    { T{ key-down f { C+ } "k" } clear-editor }
+    { T{ key-down f { C+ } "d" } delete-next-character/eof }
 } define-command-map
 
 interactor "completion" f {
@@ -394,6 +398,7 @@ interactor "completion" f {
     { T{ key-down f { C+ } "p" } recall-previous }
     { T{ key-down f { C+ } "n" } recall-next }
     { T{ key-down f { C+ } "r" } history-completion-popup }
+    { T{ key-down f { C+ } "s" } history-completion-popup }
 } define-command-map
 
 : introduction. ( -- )
@@ -406,7 +411,7 @@ interactor "completion" f {
     ] with-default-style nl nl ;
 
 : listener-thread ( listener -- )
-    dup listener-streams [
+    dup input>> dup output>> [
         [ com-browse ] help-hook set
         '[ [ _ input>> ] 2dip debugger-popup ] error-hook set
         error-summary? off
@@ -450,20 +455,19 @@ interactor "completion" f {
 
 listener-gadget "toolbar" f {
     { f restart-listener }
-    { T{ key-down f { A+ } "u" } com-auto-use }
-    { T{ key-down f { A+ } "k" } clear-output }
-    { T{ key-down f { A+ } "K" } clear-stack }
-    { T{ key-down f { C+ } "d" } com-end }
+    { T{ key-down f ${ os macosx? M+ A+ ? } "u" } com-auto-use }
+    { T{ key-down f ${ os macosx? M+ A+ ? } "k" } clear-output }
+    { T{ key-down f ${ os macosx? M+ A+ ? } "K" } clear-stack }
     { T{ key-down f f "F1" } com-help }
 } define-command-map
 
 listener-gadget "scrolling"
 "The listener's scroller can be scrolled from the keyboard."
 {
-    { T{ key-down f { A+ } "UP" } com-scroll-up }
-    { T{ key-down f { A+ } "DOWN" } com-scroll-down }
-    { T{ key-down f { A+ } "PAGE_UP" } com-page-up }
-    { T{ key-down f { A+ } "PAGE_DOWN" } com-page-down }
+    { T{ key-down f ${ os macosx? M+ A+ ? } "UP" } com-scroll-up }
+    { T{ key-down f ${ os macosx? M+ A+ ? } "DOWN" } com-scroll-down }
+    { T{ key-down f ${ os macosx? M+ A+ ? } "PAGE_UP" } com-page-up }
+    { T{ key-down f ${ os macosx? M+ A+ ? } "PAGE_DOWN" } com-page-down }
 } define-command-map
 
 listener-gadget "multi-touch" f {
@@ -487,23 +491,43 @@ M: listener-gadget graft*
 M: listener-gadget ungraft*
     [ com-end ] [ call-next-method ] bi ;
 
-<PRIVATE
-
-:: make-font-style ( family size -- assoc )
-    H{ } clone
-        family font-name pick set-at
-        size font-size pick set-at ;
-
-PRIVATE>
-
 :: set-listener-font ( family size -- )
-    get-listener input>> :> inter
-    family size make-font-style
-    inter output>> make-span-stream :> ostream
-    ostream inter output<<
-    inter [
+    get-listener input>> :> interactor
+    interactor output>> :> output
+    interactor [
         clone
         family >>name
         size >>size
     ] change-font f >>line-height drop
-    ostream output-stream set ;
+    family font-name output style>> set-at
+    size font-size output style>> set-at ;
+
+<PRIVATE
+
+:: adjust-listener-font-size ( listener delta -- )
+    listener input>> :> interactor
+    interactor output>> :> output
+    interactor
+        [ clone [ delta + ] change-size ] change-font
+        f >>line-height
+    font>> size>> font-size output style>> set-at ;
+
+PRIVATE>
+
+: com-font-size-plus ( listener -- )
+    2 adjust-listener-font-size ;
+
+: com-font-size-minus ( listener -- )
+    -2 adjust-listener-font-size ;
+
+: com-font-size-normal ( listener -- )
+    default-font-size over input>> font>> size>> -
+    adjust-listener-font-size ;
+
+listener-gadget "fonts" f {
+    { T{ key-down f ${ os macosx? M+ C+ ? } "+" } com-font-size-plus }
+    { T{ key-down f ${ os macosx? M+ C+ ? } "=" } com-font-size-plus }
+    { T{ key-down f ${ os macosx? M+ C+ ? } "_" } com-font-size-minus }
+    { T{ key-down f ${ os macosx? M+ C+ ? } "-" } com-font-size-minus }
+    { T{ key-down f ${ os macosx? M+ C+ ? } "0" } com-font-size-normal }
+} define-command-map

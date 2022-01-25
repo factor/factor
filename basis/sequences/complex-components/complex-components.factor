@@ -1,5 +1,5 @@
-USING: accessors kernel math math.functions combinators
-sequences sequences.private ;
+USING: accessors kernel math combinators sequences
+sequences.private ;
 IN: sequences.complex-components
 
 TUPLE: complex-components seq ;

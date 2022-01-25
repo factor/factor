@@ -35,6 +35,31 @@ IN: compiler.tree.propagation.tests
     [ dup "foo" <array> drop ] final-info first
 ] unit-test
 
+{ t } [
+    [ resize-array length ] final-info first
+    array-capacity <class-info> =
+] unit-test
+
+{ 42 } [
+    [ 42 swap resize-array length ] final-literals first
+] unit-test
+
+{ f } [
+    [ resize-array ] { resize-array } inlined?
+] unit-test
+
+{ t } [
+    [ 3 { 1 2 3 } resize-array ] { resize-array } inlined?
+] unit-test
+
+{ f } [
+    [ 4 { 1 2 3 } resize-array ] { resize-array } inlined?
+] unit-test
+
+{ f } [
+    [ 4 swap { array } declare resize-array ] { resize-array } inlined?
+] unit-test
+
 ! Byte arrays
 { V{ 3 } } [
     [ 3 <byte-array> length ] final-literals
@@ -46,13 +71,34 @@ IN: compiler.tree.propagation.tests
 ] unit-test
 
 { t } [
-    [ dupd resize-byte-array drop ] final-info first
-    integer-array-capacity <class-info> =
+    [ resize-byte-array length ] final-info first
+    array-capacity <class-info> =
+] unit-test
+
+{ 43 } [
+    [ 43 swap resize-byte-array length ] final-literals first
+] unit-test
+
+{ t } [
+    [ 3 B{ 1 2 3 } resize-byte-array ] { resize-byte-array } inlined?
 ] unit-test
 
 ! Strings
 { V{ 3 } } [
     [ 3 f <string> length ] final-literals
+] unit-test
+
+{ t } [
+    [ resize-string length ] final-info first
+    array-capacity <class-info> =
+] unit-test
+
+{ V{ 44 } } [
+    [ 44 swap resize-string length ] final-literals
+] unit-test
+
+{ t } [
+    [ 3 "123" resize-string ] { resize-string } inlined?
 ] unit-test
 
 { V{ t } } [
@@ -492,7 +538,7 @@ IN: compiler.tree.propagation.tests
     [ { fixnum } declare 1 swap 7 bitand >bignum shift ] final-classes
 ] unit-test
 
-32bit? [
+32-bit? [
     [ V{ integer } ] [
         [ { fixnum } declare 1 swap 31 bitand shift ]
         final-classes
@@ -1024,6 +1070,8 @@ M: tuple-with-read-only-slot clone
 
 ! Could be bignum not integer but who cares
 { V{ integer } } [ [ 10 >bignum bitand ] final-classes ] unit-test
+{ V{ bignum } } [ [ { fixnum } declare 10 >bignum bitand ] final-classes ] unit-test
+{ V{ bignum } } [ [ { integer } declare 10 >bignum bitand ] final-classes ] unit-test
 
 { t } [ [ { fixnum fixnum } declare min ] { min } inlined? ] unit-test
 { f } [ [ { fixnum fixnum } declare min ] { fixnum-min } inlined? ] unit-test

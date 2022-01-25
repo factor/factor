@@ -1,6 +1,6 @@
-USING: accessors arrays combinators effects effects.parser fry generalizations
-kernel lexer locals math namespaces parser python python.ffi python.objects
-sequences sequences.generalizations vocabs.parser words ;
+USING: accessors combinators effects effects.parser kernel lexer
+namespaces parser python python.objects sequences
+sequences.generalizations words ;
 IN: python.syntax
 
 <PRIVATE
@@ -37,12 +37,9 @@ SYMBOL: current-context
     [ [ ":" glue ] [ ":$" glue ] 2bi ] [ nip dup "$" prepend ] if
     [ create-word-in ] bi@ ;
 
-: import-getattr ( module name -- alien )
-    [ py-import ] dip getattr ;
-
 :: add-function ( name effect module prefix? -- )
     module name prefix? make-factor-words :> ( call-word obj-word )
-    obj-word module name '[ _ _ import-getattr ] ( -- o ) define-inline
+    obj-word module name '[ _ _ py-import-from ] ( -- o ) define-inline
     call-word obj-word def>> effect make-function-quot effect define-inline ;
 
 : make-method-quot ( name effect -- quot )

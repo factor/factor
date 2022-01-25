@@ -306,19 +306,19 @@ SYMBOL: delayed
 : compile ( parser -- word )
     [
         H{ } clone delayed [
-            compile-parser-quot ( -- result ) define-temp fixup-delayed
+            compile-parser fixup-delayed
         ] with-variable
     ] with-compilation-unit ;
 
 : compiled-parse ( state word -- result )
     swap [
-        execute( -- result )
+        execute-parser
         [ error-stack get ?first [ throw ]
         [ pos get input get f <parse-error> throw ] if* ] unless*
     ] with-packrat ;
 
 : (parse) ( input parser -- result )
-    dup word? [ compile ] unless compiled-parse ;
+    compile compiled-parse ;
 
 : parse ( input parser -- ast )
     (parse) ast>> ;
@@ -401,7 +401,7 @@ M: choice-parser (compile)
 
 TUPLE: repeat0-parser parser ;
 
-: (repeat) ( quot: ( -- result ) result -- result )
+: (repeat) ( quot: ( -- result/f ) result -- result )
     over call [
         [ remaining>> >>remaining ] [ ast>> ] bi
         over ast>> push (repeat)

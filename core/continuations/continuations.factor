@@ -17,6 +17,8 @@ SYMBOL: error-continuation
 SYMBOL: error-thread
 SYMBOL: restarts
 
+SINGLETON: no-op-restart
+
 <PRIVATE
 
 : (get-catchstack) ( -- catchstack )
@@ -151,15 +153,13 @@ callback-error-hook [ [ die rethrow ] ] initialize
     [ drop ] recover ; inline
 
 : ignore-error ( quot check: ( error -- ? ) -- )
-    [ dup ] prepose [ [ drop ] [ rethrow ] if ] compose
-    recover ; inline
+    '[ dup @ [ drop ] [ rethrow ] if ] recover ; inline
 
 : ignore-error/f ( quot check: ( error -- ? ) -- )
-    [ dup ] prepose [ [ drop f ] [ rethrow ] if ] compose
-    recover ; inline
+    '[ dup @ [ drop f ] [ rethrow ] if ] recover ; inline
 
 : cleanup ( try cleanup-always cleanup-error -- )
-    [ compose [ dip rethrow ] curry recover ] [ drop ] 2bi call ; inline
+    [ '[ [ @ @ ] dip rethrow ] recover ] [ drop ] 2bi call ; inline
 
 : finally ( try cleanup-always -- )
     [ ] cleanup ; inline
@@ -171,7 +171,7 @@ ERROR: attempt-all-error ;
         attempt-all-error
     ] [
         [
-            [ [ , f ] compose [ , drop t ] recover ] curry all?
+            '[ [ @ , f ] [ , drop t ] recover ] all?
         ] { } make last swap [ rethrow ] when
     ] if ; inline
 

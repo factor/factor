@@ -1,6 +1,6 @@
-USING: alien.syntax alien.c-types alien.data core-foundation
-core-foundation.bundles core-foundation.dictionaries system
-combinators kernel sequences io accessors unix.types ;
+USING: alien.c-types alien.data alien.syntax core-foundation
+core-foundation.bundles core-foundation.dictionaries kernel
+sequences system unix.types ;
 IN: iokit
 
 <<

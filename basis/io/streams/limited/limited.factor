@@ -1,9 +1,9 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! Copyright (C) 2009 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors byte-vectors combinators destructors fry io
-io.encodings io.files io.files.info kernel locals math
-namespaces sequences math.order ;
+USING: accessors combinators destructors io io.encodings
+io.files io.files.info kernel math math.order namespaces
+sequences ;
 IN: io.streams.limited
 
 TUPLE: limited-stream stream count limit current start stop ;

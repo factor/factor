@@ -1,8 +1,8 @@
 ! Copyright (C) 2005, 2009 Daniel Ehrenberg
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs combinators
-combinators.short-circuit delegate delegate.protocols fry kernel
-macros sequences slots strings vectors words ;
+combinators.short-circuit delegate delegate.protocols kernel
+sequences slots strings vectors words ;
 IN: xml.data
 
 TUPLE: interpolated var ;

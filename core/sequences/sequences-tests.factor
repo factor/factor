@@ -369,10 +369,12 @@ M: bogus-hashcode hashcode* 2drop 0 >bignum ;
 [ { } [ string>digits sum ] [ + ] map-reduce ] must-infer
 [ { } [ ] [ + ] map-reduce ] must-fail
 { 4 } [ { 1 1 } [ 1 + ] [ + ] map-reduce ] unit-test
+{ 2 18 } [ 2 { 3 3 3 } [ dupd * ] [ + ] map-reduce ] unit-test
 
 [ { } { } [ [ string>digits product ] bi@ + ] [ + ] 2map-reduce ] must-infer
 [ { } { } [ + ] [ + ] 2map-reduce ] must-fail
 { 24 } [ { 1 2 } { 3 4 } [ + ] [ * ] 2map-reduce ] unit-test
+{ 2 96 } [ 2 { 3 3 3 3 } { 4 4 4 4 } [ [ dup ] 2dip * * ] [ + ] 2map-reduce ] unit-test
 
 { 4 } [ 5 <iota> [ ] supremum-by ] unit-test
 { 0 } [ 5 <iota> [ ] infimum-by ] unit-test
@@ -421,3 +423,16 @@ M: bogus-hashcode hashcode* 2drop 0 >bignum ;
 } [ { 11 22 33 } [ + ] BV{ } map-index-as ] unit-test
 
 { t } [ { } { 99 88 } [ <= ] 2all? ] unit-test
+
+{ f } [ { } { 99 88 } [ <= ] 2any? ] unit-test
+{ t } [ { 2 4 5 8 } { 2 4 6 8 } [ < ] 2any? ] unit-test
+{ f } [ { 2 4 6 8 } { 2 4 6 8 } [ < ] 2any? ] unit-test
+
+{ "ollo" } [ "ll" "o" 1surround ] unit-test
+{ "ollo" } [ { CHAR: l CHAR: l } "o" 1surround ] unit-test
+
+{ { CHAR: o CHAR: l CHAR: l CHAR: o } }
+[ { CHAR: l CHAR: l } "o" { } 1surround-as ] unit-test
+
+{ "ollo" }
+[ { CHAR: l CHAR: l } "o" "" 1surround-as ] unit-test

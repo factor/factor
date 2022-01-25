@@ -1,8 +1,8 @@
 ! Copyright (C) 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors colors.constants colors.hex combinators
-combinators.smart formatting kernel literals models
-sorting.human sorting.slots strings ui ui.gadgets.scrollers
+USING: accessors colors combinators combinators.smart formatting
+kernel literals math math.functions models sorting.human
+sorting.slots strings ui ui.gadgets.scrollers
 ui.gadgets.search-tables ui.gadgets.tables ;
 IN: color-table
 
@@ -12,6 +12,10 @@ SINGLETON: color-renderer
 <PRIVATE
 
 CONSTANT: full-block-string $[ 10 CHAR: full-block <string> ]
+
+: rgba>hex ( rgba -- hex )
+    [ red>> ] [ green>> ] [ blue>> ] tri
+    [ 255 * round >integer ] tri@ "%02X%02X%02X" sprintf ;
 
 PRIVATE>
 

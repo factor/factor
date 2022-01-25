@@ -1,6 +1,6 @@
 USING: accessors arrays assocs continuations destructors destructors.private
 fry io.files.temp kernel math namespaces python python.ffi
-python.modules.__builtin__ python.modules.argparse python.modules.datetime
+python.modules.builtins python.modules.argparse python.modules.datetime
 python.modules.os python.modules.os.path python.modules.sys
 python.modules.time python.objects python.syntax sets splitting tools.test
 unicode ;
@@ -19,7 +19,7 @@ IN: python.syntax.tests
 [ "hello.doc" ] [ "/some/path/hello.doc" >py basename py> ] py-test
 
 [ { "hello" ".doc" } ] [
-    "hello.doc" >py splitext 2array [ py> ] s:map
+    "hello.doc" >py splitext [ py> ] bi@ 2array
 ] py-test
 
 [ ] [ 0 >py sleep ] py-test
@@ -27,7 +27,7 @@ IN: python.syntax.tests
 ! Module variables are bound as zero-arg functions
 { t } [ $path py> s:sequence? ] py-test
 
-{ t } [ $path len int py> 5 > ] py-test
+{ t } [ $path py> s:empty? not ] py-test
 
 [ 10 ] [ 10 >py range len py> ] py-test
 
@@ -78,17 +78,17 @@ IN: python.syntax.tests
 ] py-test
 
 [ { "hello" "=" "there" } ] [
-    "hello=there" >py "=" >py partition 3array [ py> ] s:map
+    "hello=there" >py "=" >py partition [ py> ] tri@ 3array
 ] py-test
 
 ! Introspection
 PY-METHODS: func =>
-    func_code ( func -- code ) ;
+    __code__ ( func -- code ) ;
 
 PY-METHODS: code =>
     co_argcount ( code -- n ) ;
 
-{ 1 } [ $splitext $func_code $co_argcount py> ] py-test
+{ 1 } [ $splitext $__code__ $co_argcount py> ] py-test
 
 ! Change sys.path
 { t } [
@@ -97,7 +97,7 @@ PY-METHODS: code =>
 ] py-test
 
 ! Support for kwargs
-[ "datetime.timedelta(4, 10800)" ] [
+[ "datetime.timedelta(days=4, seconds=10800)" ] [
     H{ { "hours" 99 } } >py timedelta repr py>
 ] py-test
 
@@ -107,11 +107,11 @@ PY-METHODS: code =>
         ArgumentParser dup
         "--foo" >py H{ { "help" "badger" } } >py add_argument
         format_help py>
-    ] with-destructors [ blank? ] s:trim " " split "badger" swap in?
+    ] with-destructors [ blank? ] s:trim split-words "badger" swap in?
 ] py-test
 
 { t } [
-    [ 987 >py basename ] [ traceback>> ] recover s:length 0 >
+    [ 987 >py basename ] [ ] recover python-error?
 ] py-test
 
 ! Test if exceptions leak references. If so, the test will leak a few
@@ -130,29 +130,20 @@ PY-METHODS: code =>
     ] times
 ] long-py-test
 
-! Working with types
-PY-QUALIFIED-FROM: types => UnicodeType ( -- ) ;
-
-{ "unicode" } [
-    types:$UnicodeType $__name__ py>
-] py-test
-
 ! Make callbacks
-PY-QUALIFIED-FROM: __builtin__ =>
-    None ( -- )
-    map ( func seq -- seq' )
-    reduce ( func seq -- seq' ) ;
+PY-QUALIFIED-FROM: builtins =>
+    map ( func iter -- iter' )
+    list ( iter -- seq ) ;
 
-{ V{ 1 2 3 } } [
-    __builtin__:$None { 1 2 3 } >py __builtin__:map py>
-] py-test
+PY-QUALIFIED-FROM: functools =>
+    reduce ( func iter -- iter' ) ;
 
 : double-fun ( -- alien )
     [ drop s:first 2 * ] quot>py-callback ;
 
 { V{ 2 4 16 2 4 68 } } [
     double-fun [
-        { 1 2 8 1 2 34 } >py __builtin__:map py>
+        { 1 2 8 1 2 34 } >py builtins:map builtins:list py>
     ] with-quot>py-cfunction
 ] py-test
 
@@ -161,6 +152,6 @@ PY-QUALIFIED-FROM: __builtin__ =>
 
 { 48 } [
     reduce-func [
-        { 1 2 8 1 2 34 } >py __builtin__:reduce py>
+        { 1 2 8 1 2 34 } >py functools:reduce py>
     ] with-quot>py-cfunction
 ] py-test

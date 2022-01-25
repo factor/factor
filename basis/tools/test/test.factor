@@ -1,15 +1,14 @@
 ! Copyright (C) 2003, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs combinators command-line
-compiler.units continuations debugger effects fry
-generalizations io io.files.temp io.files.unique kernel lexer
-locals macros math math.functions math.vectors namespaces parser
-prettyprint quotations sequences sequences.generalizations
-source-files source-files.errors source-files.errors.debugger
-splitting stack-checker summary system tools.errors tools.time
-unicode vocabs vocabs.files vocabs.metadata vocabs.parser words
-;
-FROM: vocabs.hierarchy => load ;
+compiler.units continuations debugger effects generalizations io
+io.files.temp io.files.unique kernel lexer math math.functions
+math.vectors namespaces parser prettyprint quotations sequences
+sequences.generalizations source-files source-files.errors
+source-files.errors.debugger splitting stack-checker summary
+system tools.errors tools.time unicode vocabs vocabs.files
+vocabs.hierarchy vocabs.hierarchy.private vocabs.loader
+vocabs.metadata vocabs.parser vocabs.refresh words ;
 IN: tools.test
 
 TUPLE: test-failure < source-file-error continuation ;
@@ -192,7 +191,8 @@ SYMBOL: forget-tests?
         ] [ drop ] if
     ] when* ;
 
-: test-vocabs ( vocabs -- ) [ test-vocab ] each ;
+: test-vocabs ( vocabs -- )
+    [ don't-test? ] reject [ test-vocab ] each ;
 
 PRIVATE>
 
@@ -222,18 +222,25 @@ M: test-failure error. ( error -- )
 
 : :test-failures ( -- ) test-failures get errors. ;
 
-: test ( prefix -- )
-    loaded-child-vocab-names test-vocabs ;
+: test ( prefix -- ) loaded-child-vocab-names test-vocabs ;
 
-: test-all ( -- )
-    loaded-vocab-names [ don't-test? ] reject test-vocabs ;
+: test-all ( -- ) "" test ;
+
+: refresh-and-test ( prefix --  ) to-refresh [ do-refresh ] keepdd test-vocabs ;
+
+: refresh-and-test-all ( -- ) "" refresh-and-test ;
 
 : test-main ( -- )
-    command-line get dup first "--only" = [
-        rest [ [ require ] [ test-vocab ] bi ] each
-    ] [
-        [ [ load ] [ test ] bi ] each
-    ] if
+    command-line get
+    "--fast" swap [ member? ] [ remove ] 2bi swap
+    [ f long-unit-tests-enabled? set-global ] when
+    [
+        dup vocab-roots get member? [
+            "" vocabs-to-load [ require-all ] keep
+        ] [
+            [ load ] [ loaded-child-vocab-names ] bi
+        ] if test-vocabs
+    ] each
     test-failures get empty?
     [ [ "==== FAILING TESTS" print flush :test-failures ] unless ]
     [ 0 1 ? exit ] bi ;

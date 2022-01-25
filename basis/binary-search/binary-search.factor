@@ -1,7 +1,7 @@
 ! Copyright (C) 2008, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays combinators kernel locals math
-math.order sequences sequences.private vectors ;
+USING: arrays combinators kernel math math.order sequences
+sequences.private vectors ;
 IN: binary-search
 
 <PRIVATE

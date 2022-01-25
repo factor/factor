@@ -1,5 +1,5 @@
-USING: help help.lint.coverage help.lint.coverage.private
-help.markup help.syntax io kernel sequences strings vocabs words ;
+USING: help.markup help.syntax io kernel sequences strings
+vocabs words ;
 IN: help.lint.coverage
 
 <PRIVATE
@@ -200,7 +200,7 @@ HELP: <prefix-help-coverage>
 
 HELP: <word-help-coverage>
 { $values { "word" { $or string word } } { "coverage" word-help-coverage } }
-{ $contract "Looks up a word in the current scope and generates a documentation coverage report for it."}
+{ $contract "Looks up a word in the current scope and generates a documentation coverage report for it." }
 { $examples
     { $example
         "USING: help.lint.coverage prettyprint ;"

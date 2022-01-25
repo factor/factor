@@ -1,8 +1,8 @@
 ! Copyright (C) 2019 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs combinators
-combinators.short-circuit continuations destructors fry io
-io.binary io.directories io.encodings.binary io.encodings.latin1
+combinators.short-circuit continuations destructors endian
+io io.directories io.encodings.binary io.encodings.latin1
 io.encodings.string io.encodings.utf8 io.files io.files.info
 io.sockets kernel math math.parser namespaces pack prettyprint
 random sequences sequences.extras splitting strings ;
@@ -74,7 +74,7 @@ TUPLE: read-file path encoding block ;
 
 : handle-send-file ( bytes -- )
     "\0" split harvest first2 [ utf8 decode ] bi@
-    over { [ exists? ] [ file-info directory? not ] } 1&& [
+    over { [ file-exists? ] [ file-info directory? not ] } 1&& [
         "netascii" sequence= utf8 binary ? 0 read-file boa
         tftp-client get clients get set-at
         0 handle-send-file-next

@@ -1,5 +1,4 @@
-USING: strings arrays byte-arrays help.markup
-help.syntax kernel vectors ;
+USING: help.markup help.syntax ;
 IN: sbufs
 
 ARTICLE: "sbufs" "String buffers"

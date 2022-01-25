@@ -1,6 +1,6 @@
 ! Copyright (c) 2012 Anonymous
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors combinators kernel locals math math.order
+USING: accessors combinators kernel math math.order
 math.vectors sequences sequences.product combinators.short-circuit ;
 IN: rosetta-code.knapsack-unbounded
 

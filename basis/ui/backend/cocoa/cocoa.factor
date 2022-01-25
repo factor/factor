@@ -1,15 +1,13 @@
 ! Copyright (C) 2006, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors alien.c-types alien.data arrays assocs classes
-cocoa cocoa.application cocoa.classes cocoa.messages cocoa.nibs
-cocoa.pasteboard cocoa.runtime cocoa.subclassing cocoa.types
-cocoa.views cocoa.windows combinators command-line
-core-foundation core-foundation.run-loop core-graphics
-core-graphics.types destructors fry generalizations io.thread
-kernel libc literals locals math math.bitwise math.rectangles
-memory namespaces sequences threads ui colors ui.backend
-ui.backend.cocoa.views ui.clipboards ui.gadgets
-ui.gadgets.worlds ui.pixel-formats ui.private words.symbol ;
+USING: accessors alien.c-types alien.data cocoa
+cocoa.application cocoa.classes cocoa.nibs cocoa.pasteboard
+cocoa.runtime cocoa.subclassing cocoa.views cocoa.windows
+combinators core-foundation.run-loop core-foundation.strings
+core-graphics core-graphics.types io.thread kernel literals math
+math.bitwise math.rectangles namespaces sequences threads ui
+ui.backend ui.backend.cocoa.views ui.clipboards
+ui.gadgets.worlds ui.pixel-formats ui.private ;
 IN: ui.backend.cocoa
 
 TUPLE: window-handle view window ;
@@ -208,6 +206,12 @@ M: cocoa-ui-backend system-alert
 : install-app-delegate ( -- )
     NSApp FactorApplicationDelegate install-delegate ;
 
+! : current-theme ( -- )
+!     NSAppearance -> currentAppearance -> name [
+!         CF>string "NSAppearanceNameDarkAqua" =
+!         dark-theme light-theme ? switch-theme-if-default
+!     ] when* ;
+
 SYMBOL: cocoa-startup-hook
 
 cocoa-startup-hook [
@@ -218,6 +222,7 @@ M: cocoa-ui-backend (with-ui)
     "UI" assert.app [
         init-clipboard
         cocoa-startup-hook get call( -- )
+!         current-theme
         start-ui
         stop-io-thread
         init-thread-timer

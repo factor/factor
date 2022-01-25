@@ -1,4 +1,4 @@
-;;; fuel-table.el -- table creation
+;;; fuel-table.el -- table creation -*- lexical-binding: t -*-
 
 ;; Copyright (C) 2009 Jose Antonio Ortega Ruiz
 ;; See http://factorcode.org/license.txt for BSD license.

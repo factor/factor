@@ -132,7 +132,7 @@ ERROR: zone-not-found name ;
         [
             letters>> swap "%" split1 dup [ 1 tail ] when surround
         ] with V{ } map-as
-    ] map-zip ;
+    ] zip-with ;
 
 : number>value ( n -- n' )
     {
@@ -221,14 +221,20 @@ ERROR: unknown-last-day string ;
         [ [ string>year ] bi@ ]
     } cond ;
 
+: parse-hms ( str -- hms-seq )
+    ":" split [ string>number ] map 3 0 pad-tail ;
+
+: parse-offset ( str -- hms-seq )
+    "-" ?head [ parse-hms ] dip [ [ neg ] map ] when ;
+
 ! XXX: Don't just drop the s/u, e.g. 2:00:00s
 : zone-time ( timestamp time -- timestamp' )
     [ Letter? ] split-tail drop
-    time>offset first3 set-time ;
+    parse-offset first3 set-time ;
 
 : hm>duration ( str -- duration )
     ":" split1 "0" or [ string>number ] bi@
-    [ instant ] 2dip 0 set-time! ;
+    [ instant ] 2dip 0 set-time ;
 
 : rule>timestamp-rest ( timestamp zone -- from )
     {

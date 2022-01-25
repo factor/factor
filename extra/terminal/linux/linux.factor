@@ -20,7 +20,7 @@ STRUCT: winsize
 PRIVATE>
 
 M: unix (terminal-size)
-    stdout-handle fileno TIOCGWINSZ winsize <struct>
+    stdout-handle fileno TIOCGWINSZ winsize new
     [ ioctl ] keep swap 0 < [
         drop 0 0
     ] [

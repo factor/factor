@@ -1,9 +1,9 @@
 ! Copyright (C) 2009 Diego Martinelli.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors calendar checksums checksums.openssl classes.tuple
-formatting fry io.encodings.ascii io.encodings.string kernel math
-math.functions math.parser math.ranges present random sequences
-splitting ;
+USING: accessors byte-arrays calendar checksums
+checksums.openssl classes.tuple formatting io.encodings.ascii
+io.encodings.string kernel literals math math.functions
+math.parser ranges present random sequences splitting ;
 IN: hashcash
 
 ! Hashcash implementation
@@ -24,14 +24,15 @@ IN: hashcash
 
 ! Random salt is formed by ascii characters
 ! between 33 and 126
-: available-chars ( -- seq )
-    33 126 [a,b] [ CHAR: : = ] reject ;
+CONSTANT: available-chars $[
+    CHAR: : 33 126 [a..b] remove >byte-array
+]
 
 PRIVATE>
 
 ! Generate a 'length' long random salt
 : salt ( length -- salted )
-    available-chars '[ _ random ] "" replicate-as ;
+    [ available-chars random ] "" replicate-as ;
 
 TUPLE: hashcash version bits date resource ext salt suffix ;
 

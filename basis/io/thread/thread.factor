@@ -27,4 +27,4 @@ M: io-thread error-in-thread die drop rethrow ;
 : stop-io-thread ( -- )
     f io-thread-running? set-global ;
 
-[ start-io-thread ] "io.thread" add-startup-hook
+STARTUP-HOOK: start-io-thread

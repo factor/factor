@@ -1,7 +1,6 @@
-USING: accessors arrays calendar circular colors
-colors.constants fry kernel locals math math.order math.vectors
-namespaces opengl processing.shapes sequences timers ui
-ui.gadgets ui.gestures ui.render ;
+USING: accessors arrays calendar circular colors kernel locals
+math math.order math.vectors namespaces opengl processing.shapes
+sequences timers ui ui.gadgets ui.gestures ui.render ;
 
 IN: trails
 

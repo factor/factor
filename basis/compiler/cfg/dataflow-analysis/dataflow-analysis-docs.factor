@@ -1,5 +1,5 @@
-USING: classes compiler.cfg help.markup help.syntax sequences ;
-IN: compiler.cfg.dataflow-analysis
+USING: classes compiler.cfg compiler.cfg.dataflow-analysis
+compiler.cfg.dataflow-analysis.private help.markup help.syntax sequences ;
 
 HELP: predecessors
 { $values { "bb" basic-block } { "dfa" "a dataflow analysis symbol" } { "seq" sequence } }
@@ -29,8 +29,6 @@ HELP: join-sets
 { $see-also transfer-set } ;
 
 
-<PRIVATE
-
 HELP: run-dataflow-analysis
 { $values
   { "cfg" cfg }
@@ -39,8 +37,6 @@ HELP: run-dataflow-analysis
   { "out-sets" "outputs" }
 }
 { $description "Runs the given dataflow analysis on the cfg." } ;
-
-PRIVATE>
 
 HELP: FORWARD-ANALYSIS:
 { $syntax "FORWARD-ANALYSIS: word" }

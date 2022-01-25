@@ -1,7 +1,7 @@
 ! Copyright (C) 2013 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: assocs fry hash-sets kernel locals sequences
-sequences.extras sets ;
+USING: assocs hash-sets kernel sequences sequences.extras
+sets ;
 IN: sets.extras
 
 : setwise-xor ( seq1 seq2 -- set )

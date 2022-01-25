@@ -164,8 +164,8 @@ patterns: [
     name: "constant.numeric.hex.factor"
   }
   {
-    begin: "\""
-    end: "\""
+    begin: "<[[^"]*\""
+    end: "\">"
     name: "string.quoted.double.factor"
     patterns: [
       {
@@ -216,7 +216,7 @@ repository:
   escaped_characters:
     patterns: [
       {
-        match: "\\\\(\\\\|[abefnrtsv0\"]|x[a-fA-F0-9]{2}|u[a-fA-F0-9]{6})"
+        match: "\\\\(\\\\|[abefnrtsv0\"]|x[a-fA-F0-9]{2}|u[a-fA-F0-9]{6}|u{[^}]+})"
         name: "constant.character.escape.factor"
       }
       {

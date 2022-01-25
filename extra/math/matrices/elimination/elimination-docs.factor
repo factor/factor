@@ -1,4 +1,4 @@
-USING: help.markup help.syntax math sequences ;
+USING: help.markup help.syntax sequences ;
 
 IN: math.matrices.elimination
 
@@ -33,7 +33,7 @@ HELP: nonzero-rows
 HELP: leading
 { $values
   { "seq" sequence }
-  { "n" "the index of the first match, or " { $snippet f } "." }
-  { "elt" "the first non-zero element, or " { $snippet f } "." }
+  { "n" "the index of the first match, or " { $link f } "." }
+  { "elt" "the first non-zero element, or " { $link f } "." }
 }
 { $description "Find the first non-zero element of a sequence." } ;

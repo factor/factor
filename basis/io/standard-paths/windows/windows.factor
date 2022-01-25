@@ -1,7 +1,7 @@
 ! Copyright (C) 2011 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays combinators.smart environment fry
-io.directories.search io.files io.pathnames io.standard-paths
+io.directories io.files io.pathnames io.standard-paths
 kernel sequences sets splitting system unicode windows.shell32 ;
 IN: io.standard-paths.windows
 
@@ -24,4 +24,4 @@ M: windows find-in-applications
 
 M: windows find-in-path*
     [ "PATH" os-env ";" split ] dip
-    '[ _ append-path exists? ] find nip ;
+    '[ _ append-path file-exists? ] find nip ;

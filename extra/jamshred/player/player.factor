@@ -1,9 +1,10 @@
 ! Copyright (C) 2007, 2008 Alex Chapman
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors colors.constants combinators jamshred.log
-jamshred.oint jamshred.sound jamshred.tunnel kernel locals math
-math.constants math.order math.ranges math.vectors math.matrices
-sequences shuffle specialized-arrays strings system ;
+
+USING: accessors colors combinators jamshred.oint
+jamshred.sound jamshred.tunnel kernel math math.order
+math.vectors ranges sequences specialized-arrays
+specialized-arrays.instances.alien.c-types.float strings system ;
 QUALIFIED-WITH: alien.c-types c
 SPECIALIZED-ARRAY: c:float
 IN: jamshred.player
@@ -44,7 +45,7 @@ CONSTANT: max-speed 30.0
 : moved ( player -- ) nano-count swap last-move<< ;
 
 : speed-range ( -- range )
-    max-speed [0,b] ;
+    max-speed [0..b] ;
 
 : change-player-speed ( inc player -- )
     [ + 0 max-speed clamp ] change-speed drop ;
@@ -130,11 +131,10 @@ CONSTANT: max-speed 30.0
     ?move-player-freely over 0 > [
         ! bounce
         drag-player
-        (move-player)
     ] when ;
 
 : move-player ( player -- )
     [ update-time ] [ distance-to-move ] [ (move-player) 2drop ] tri ;
 
 : update-player ( player -- )
-    [ move-player ] [ nearest-segment>> "white" named-color swap color<< ] bi ;
+    [ move-player ] [ nearest-segment>> COLOR: white swap color<< ] bi ;

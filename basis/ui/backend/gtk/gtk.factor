@@ -41,7 +41,7 @@ M: gtk-clipboard clipboard-contents
     clipboard get-global handle>> gtk_clipboard_store ;
 
 M: gtk-clipboard set-clipboard-contents
-    swap [ handle>> ] [ utf8 string>alien ] bi*
+    swap [ handle>> ] [ [ 0 = ] trim-tail utf8 string>alien ] bi*
     -1 gtk_clipboard_set_text
     save-global-clipboard ;
 
@@ -186,7 +186,7 @@ icon-data [ default-icon-data ] initialize
     dup vocab-dir { "icon.png" "icon.ico" } [
         append-path vocab-append-path
     ] 2with map default-icon-path suffix
-    [ exists? ] find nip binary file-contents ;
+    [ file-exists? ] find nip binary file-contents ;
 
 : load-icon ( -- )
     icon-data get [
@@ -267,7 +267,7 @@ icon-data [ default-icon-data ] initialize
 : gadget-cursor-location ( gadget -- rectangle )
     [ screen-loc ] [ cursor-loc&dim ] bi [ v+ ] dip
     [ first2 [ >fixnum ] bi@ ] bi@
-    cairo_rectangle_int_t <struct-boa> ;
+    cairo_rectangle_int_t boa ;
 
 : update-cursor-location ( im-context gadget -- )
     gadget-cursor-location gtk_im_context_set_cursor_location ;

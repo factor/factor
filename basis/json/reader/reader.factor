@@ -1,16 +1,15 @@
 ! Copyright (C) 2008 Peter Burns, 2009 Philipp Winkler
 ! See http://factorcode.org/license.txt for BSD license.
-USING: assocs combinators fry io io.encodings.utf8 io.files
+USING: assocs combinators io io.encodings.utf8 io.files
 io.streams.string json kernel kernel.private math math.order
-math.parser namespaces sbufs sequences sequences.private strings
-vectors ;
+math.parser namespaces sbufs sequences sequences.private strings ;
 IN: json.reader
 
 <PRIVATE
 
 ERROR: not-a-json-number string ;
 
-SYMBOL: counter
+SYMBOL: json-depth
 
 : json-number ( char stream -- num char )
     [ 1string ] [ "\s\t\r\n,:}]" swap stream-read-until ] bi*
@@ -65,7 +64,7 @@ DEFER: (read-json-string)
 
 : read-json-string ( stream -- str )
     "\\\"" over stream-read-until CHAR: \" =
-    [ nip ] [ >sbuf (read-json-escape) { sbuf } declare "" like ] if ;
+    [ nip ] [ >sbuf (read-json-escape) "" like ] if ;
 
 : second-last-unsafe ( seq -- second-last )
     [ length 2 - ] [ nth-unsafe ] bi ; inline
@@ -77,43 +76,33 @@ DEFER: (read-json-string)
     [ dup length ] [ >= ] bi* [ json-error ] unless ; inline
 
 : v-over-push ( accum -- accum )
-    { vector } declare 2 check-length
-    dup [ pop-unsafe ] [ last-unsafe ] bi
-    { vector } declare push ;
+    2 check-length dup [ pop-unsafe ] [ last-unsafe ] bi push ;
 
 : v-pick-push ( accum -- accum )
-    { vector } declare 3 check-length dup
-    [ pop-unsafe ] [ second-last-unsafe ] bi
-    { vector } declare push ;
-
-: v-pop ( accum -- vector )
-    pop { vector } declare ; inline
+    3 check-length dup [ pop-unsafe ] [ second-last-unsafe ] bi push ;
 
 : v-close ( accum -- accum )
-    { vector } declare
-    dup last V{ } = not [ v-over-push ] when
-    { vector } declare ; inline
+    dup last V{ } = not [ v-over-push ] when ;
 
 : json-open-array ( accum -- accum )
-    { vector } declare V{ } clone suffix! ;
+    V{ } clone suffix! ;
 
 : json-open-hash ( accum -- accum )
-    { vector } declare V{ } clone suffix! V{ } clone suffix! ;
+    V{ } clone suffix! V{ } clone suffix! ;
 
 : json-close-array ( accum -- accum )
-    v-close dup v-pop { } like suffix! ;
+    v-close dup pop { } like suffix! ;
 
 : json-close-hash ( accum -- accum )
-    v-close dup dup [ v-pop ] bi@ swap H{ } zip-as suffix! ;
+    v-close dup dup [ pop ] bi@ swap H{ } zip-as suffix! ;
 
 : scan ( stream accum char -- stream accum )
     ! 2dup 1string swap . . ! Great for debug...
-    { object vector object } declare
     {
         { CHAR: \" [ over read-json-string suffix! ] }
-        { CHAR: [  [ 1 counter +@ json-open-array ] }
+        { CHAR: [  [ 1 json-depth +@ json-open-array ] }
         { CHAR: ,  [ v-over-push ] }
-        { CHAR: ]  [ -1 counter +@ json-close-array ] }
+        { CHAR: ]  [ -1 json-depth +@ json-close-array ] }
         { CHAR: {  [ json-open-hash ] }
         { CHAR: :  [ v-pick-push ] }
         { CHAR: }  [ json-close-hash ] }
@@ -128,22 +117,26 @@ DEFER: (read-json-string)
     } case ;
 
 : json-read-input ( stream -- objects )
-    V{ } clone over '[ _ stream-read1 ] [ scan ] while* nip ;
+    0 json-depth [
+        V{ } clone over '[ _ stream-read1 ] [ scan ] while* nip
+        json-depth get zero? [ json-error ] unless
+    ] with-variable ;
 
-
-! A properly formed JSON input should contain exactly one object with balanced brackets.
-: get-json-object ( objects  --  obj  )
-    dup length 1 = counter get 0 = and [ first ] [ json-error ] if ;
+: get-json ( objects  --  obj )
+    dup length 1 = [ first ] [ json-error ] if ;
 
 PRIVATE>
 
-: read-json-objects ( -- objects )
+: read-json ( -- objects )
     input-stream get json-read-input ;
 
 GENERIC: json> ( string -- object )
 
 M: string json>
-    [ 0 counter [ read-json-objects get-json-object ] with-variable ] with-string-reader ;
+    [ read-json get-json ] with-string-reader ;
 
 : path>json ( path -- json )
-    utf8 [ 0 counter [ read-json-objects get-json-object ] with-variable ] with-file-reader ;
+    utf8 [ read-json get-json ] with-file-reader ;
+
+: path>jsons ( path -- jsons )
+    utf8 [ read-json ] with-file-reader ;

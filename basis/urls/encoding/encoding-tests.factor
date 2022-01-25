@@ -1,5 +1,4 @@
-USING: urls.encoding tools.test arrays kernel assocs present
-accessors linked-assocs ;
+USING: kernel linked-assocs sequences tools.test urls.encoding ;
 
 { "~hello world" } [ "%7ehello world" url-decode ] unit-test
 { "" } [ "%XX%XX%XX" url-decode ] unit-test
@@ -30,7 +29,7 @@ accessors linked-assocs ;
 
 { LH{ { "a" { "b" "c" } } } } [ "a=b&a=c" query>assoc ] unit-test
 
-{ LH{ { "a" { "b" "c" } } } } [ "a=b;a=c" query>assoc ] unit-test
+{ LH{ { "a" "b;a=c" } } } [ "a=b;a=c" query>assoc ] unit-test
 
 { LH{ { "c" "d" } { "a" "b" } { "e" "f" } } } [ "c=d&a=b&e=f" query>assoc ] unit-test
 
@@ -43,3 +42,8 @@ accessors linked-assocs ;
 { "a" } [ { { "a" f } } assoc>query ] unit-test
 
 { LH{ { "a" f } } } [ "a" query>assoc ] unit-test
+
+{ t } [ "?x=test" [ encode-uri decode-uri ] keep sequence= ] unit-test
+{ t } [ "шеллы" [ encode-uri decode-uri ] keep sequence= ] unit-test
+{ t } [ "?x=test" [ encode-uri-component decode-uri-component ] keep sequence= ] unit-test
+{ t } [ "шеллы" [ encode-uri-component decode-uri-component ] keep sequence= ] unit-test

@@ -17,8 +17,7 @@ os windows? [
 
 <PRIVATE
 
-: <GpRect> ( x y w h -- rect )
-    GpRect <struct-boa> ; inline
+C: <GpRect> GpRect
 
 : stream>gdi+-bitmap ( stream -- bitmap )
     stream>IStream &com-release
@@ -89,9 +88,6 @@ ERROR: unsupported-pixel-format component-order ;
 : mime-type>clsid ( mime-type -- clsid )
     image-encoders [ MimeType>> alien>native-string = ] with find nip Clsid>> ;
 
-: startup-gdi+ ( -- )
-    start-gdi+ &stop-gdi+ drop ;
-
 : write-image-to-stream ( image stream extension -- )
     [ image>gdi+-bitmap ]
     [ stream>IStream &com-release ]
@@ -101,10 +97,10 @@ ERROR: unsupported-pixel-format component-order ;
 PRIVATE>
 
 M: gdi+-image stream>image*
-    drop startup-gdi+
+    drop
     stream>gdi+-bitmap
     gdi+-bitmap>data
     data>image ;
 
 M: gdi+-image image>stream
-    drop startup-gdi+ output-stream get swap write-image-to-stream ;
+    drop output-stream get swap write-image-to-stream ;

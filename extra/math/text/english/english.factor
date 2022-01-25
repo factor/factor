@@ -1,8 +1,8 @@
 ! Copyright (c) 2007, 2008, 2018 Aaron Schaefer.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: combinators combinators.short-circuit grouping kernel
-math math.functions math.parser math.order math.text.utils namespaces
-sequences splitting ;
+USING: combinators combinators.short-circuit kernel math
+math.order math.parser math.text.utils namespaces sequences
+splitting ;
 IN: math.text.english
 
 <PRIVATE
@@ -104,7 +104,7 @@ M: float number>text
         [ string>number number>text ]
         [ [ "negative " prepend ] when ] bi*
     ] [
-        [ CHAR: 0 - small-numbers ] { } map-as " " join
+        [ CHAR: 0 - small-numbers ] { } map-as join-words
     ] bi* " point " glue ;
 
 M: complex number>text
@@ -122,3 +122,15 @@ M: complex number>text
             [ drop "th" ]
         } case
     ] if ;
+
+: number-ap-style ( n -- str )
+    dup { [ integer? ] [ 0 9 between? ] } 1&&
+    [ number>text ] [ number>string ] if ;
+
+: ordinal-ap-style ( n -- str )
+    dup {
+        f "first" "second" "third" "fourth" "fifth" "sixth"
+        "seventh" "eighth" "ninth"
+    } ?nth [ nip ] [
+        [ number>string ] [ ordinal-suffix ] bi append
+    ] if* ;

@@ -15,17 +15,24 @@ ifdef CONFIG
 
 	XCODE_PATH ?= /Applications/Xcode.app
 	MACOSX_32_SDK ?= MacOSX10.11.sdk
-	MACOSX_SDK ?= MacOSX10.13.sdk
 
 	include $(CONFIG)
 
 	CFLAGS += -Wall \
+		-Wextra \
 		-pedantic \
 		-DFACTOR_VERSION="$(VERSION)" \
 		-DFACTOR_GIT_LABEL="$(GIT_LABEL)" \
 		$(SITE_CFLAGS)
 
 	CXXFLAGS += -std=c++11
+
+	# SANITIZER=address ./build.sh compile
+	# address,thread,undefined,leak
+	ifdef SANITIZER
+		CFLAGS += -fsanitize=$(SANITIZER)
+		CXXFLAGS += -fsanitize=$(SANITIZER)
+	endif
 
 	ifneq ($(DEBUG), 0)
 		CFLAGS += -g -DFACTOR_DEBUG
@@ -155,12 +162,13 @@ help:
 	@echo "linux-x86-64"
 	@echo "linux-ppc-32"
 	@echo "linux-ppc-64"
-	@echo "linux-arm"
+	@echo "linux-arm-64"
 	@echo "freebsd-x86-32"
 	@echo "freebsd-x86-64"
 	@echo "macosx-x86-32"
 	@echo "macosx-x86-64"
 	@echo "macosx-x86-fat"
+	@echo "macosx-arm64"
 	@echo "windows-x86-32"
 	@echo "windows-x86-64"
 	@echo ""
@@ -188,6 +196,15 @@ macosx-x86-64:
 macosx-x86-fat:
 	$(MAKE) $(ALL) macosx.app CONFIG=vm/Config.macosx.x86.fat
 
+macosx-arm64:
+	$(MAKE) $(ALL) macosx.app CONFIG=vm/Config.macosx.arm64
+
+linux-arm-32:
+	$(MAKE) $(ALL) CONFIG=vm/Config.linux.arm.32
+
+linux-arm-64:
+	$(MAKE) $(ALL) CONFIG=vm/Config.linux.arm.64
+
 linux-x86-32:
 	$(MAKE) $(ALL) CONFIG=vm/Config.linux.x86.32
 
@@ -199,9 +216,6 @@ linux-ppc-32:
 
 linux-ppc-64:
 	$(MAKE) $(ALL) CONFIG=vm/Config.linux.ppc.64
-
-linux-arm:
-	$(MAKE) $(ALL) CONFIG=vm/Config.linux.arm
 
 windows-x86-32:
 	$(MAKE) $(ALL) CONFIG=vm/Config.windows.x86.32
@@ -217,7 +231,7 @@ macosx.app: factor
 	mkdir -p $(BUNDLE)/Contents/MacOS
 	mkdir -p $(BUNDLE)/Contents/Frameworks
 	mv $(EXECUTABLE) $(BUNDLE)/Contents/MacOS/factor
-	ln -s Factor.app/Contents/MacOS/factor ./factor
+	ln -s $(BUNDLE)/Contents/MacOS/factor ./factor
 
 $(ENGINE): $(DLL_OBJS)
 	$(TOOLCHAIN_PREFIX)$(LINKER) $(ENGINE) $(DLL_OBJS)
@@ -270,3 +284,4 @@ clean:
 	rm -f Factor.app/Contents/Frameworks/libfactor.dylib
 
 .PHONY: factor factor-lib factor-console factor-ffi-test tags clean macosx.app
+.PHONY: linux-x86-32 linux-x86-64 linux-ppc-32 linux-ppc-64 linux-arm-64 freebsd-x86-32 freebsd-x86-64 macosx-x86-32 macosx-x86-64 macosx-x86-fat macosx-arm64 windows-x86-32 windows-x86-64

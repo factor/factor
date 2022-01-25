@@ -1,7 +1,7 @@
 ! Copyright (C) 2005, 2010 Slava Pestov, Joe Groff.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors combinators fry kernel math math.order
-sequences sequences.private ;
+USING: accessors kernel math math.order sequences
+sequences.private ;
 IN: grouping
 
 ERROR: groups-error seq n ;

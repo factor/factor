@@ -1,7 +1,6 @@
 ! Copyright (C) 2007, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors kernel strings assocs sequences hashtables
-sorting unicode sets ;
+USING: accessors assocs kernel sequences sets sorting unicode ;
 IN: xmode.keyword-map
 
 ! Based on org.gjt.sp.jedit.syntax.KeywordMap
@@ -32,7 +31,7 @@ M: keyword-map >alist
     assoc>> >alist ;
 
 : (keyword-map-no-word-sep) ( assoc -- str )
-    keys combine [ alpha? ] reject natural-sort ;
+    keys union-all [ alpha? ] reject natural-sort ;
 
 : keyword-map-no-word-sep* ( keyword-map -- str )
     dup no-word-sep>> [ ] [

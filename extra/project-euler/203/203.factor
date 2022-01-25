@@ -1,6 +1,6 @@
 ! Copyright (c) 2008 Eric Mertens.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: fry kernel math math.primes.factors math.vectors sequences sets
+USING: kernel math math.primes.factors math.vectors sequences sets
 project-euler.common ;
 IN: project-euler.203
 
@@ -46,7 +46,7 @@ IN: project-euler.203
     [ 0 prefix ] [ 0 suffix ] bi v+ ;
 
 : generate ( n -- seq )
-    1 - { 1 } [ (generate) ] iterate combine ;
+    1 - { 1 } [ (generate) ] iterate union-all ;
 
 : squarefree ( n -- ? )
     factors all-unique? ;

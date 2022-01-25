@@ -1,8 +1,8 @@
 ! Copyright (C) 2009 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors continuations db db.sqlite db.tuples db.types
-io.directories io.files.temp kernel io.streams.string calendar
-debugger combinators.smart sequences arrays ;
+USING: accessors calendar combinators.smart db db.sqlite
+db.tuples db.types debugger io.files.temp io.streams.string
+kernel sequences ;
 IN: site-watcher.db
 
 TUPLE: account account-name email twitter sms ;

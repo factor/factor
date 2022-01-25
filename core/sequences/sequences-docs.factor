@@ -1,4 +1,4 @@
-USING: assocs arrays generic.single help.markup help.syntax kernel
+USING: arrays generic.single help.markup help.syntax kernel
 layouts math math.order quotations sequences.private vectors ;
 IN: sequences
 
@@ -491,11 +491,22 @@ HELP: 3map-as
 
 HELP: 2all?
 { $values { "seq1" sequence } { "seq2" sequence } { "quot" { $quotation ( ... elt1 elt2 -- ... ? ) } } { "?" boolean } }
-{ $description "Tests the predicate pairwise against elements of " { $snippet "seq1" } " and " { $snippet "seq2" } ". If the sequences have different lengths, then only the smallest sequences items are compared with the other." }
+{ $description "Tests if all pairwise elements of " { $snippet "seq1" } " and " { $snippet "seq2" } " fulfill the predicate. If the sequences have different lengths, then only the smallest sequences items are compared with the other." }
 { $examples
   { $example
     "USING: math prettyprint sequences ;"
     "{ 1 2 3 4 } { 2 4 6 8 } [ <= ] 2all? ."
+    "t"
+  }
+} ;
+
+HELP: 2any?
+{ $values { "seq1" sequence } { "seq2" sequence } { "quot" { $quotation ( ... elt1 elt2 -- ... ? ) } } { "?" boolean } }
+{ $description "Tests if any pairwise elements of " { $snippet "seq1" } " and " { $snippet "seq2" } " fulfill the predicate. If the sequences have different lengths, then only the smallest sequences items are compared with the other." }
+{ $examples
+  { $example
+    "USING: math prettyprint sequences ;"
+    "{ 2 4 5 8 } { 2 4 6 8 } [ < ] 2any? ."
     "t"
   }
 } ;
@@ -749,7 +760,7 @@ HELP: join-as
 { $examples
     "Join a list of strings as a string buffer:"
     { $example "USING: sequences prettyprint ;"
-        "{ \"a\" \"b\" \"c\" } \"1\" SBUF\" \"join-as ."
+        "{ \"a\" \"b\" \"c\" } \"1\" SBUF\" \" join-as ."
         "SBUF\" a1b1c\""
     }
 }
@@ -975,6 +986,18 @@ HELP: surround
     }
 } ;
 
+HELP: surround-as
+{ $values { "seq1" sequence } { "seq2" sequence } { "seq3" sequence } { "exemplar" sequence } { "newseq" sequence } }
+{ $description "Outputs a new sequence with " { $snippet "seq1" } " inserted between " { $snippet "seq2" } " and " { $snippet "seq3" } " of the same type as " { $snippet "exemplar" } "." }
+{ $examples
+    { $example "USING: sequences prettyprint ;"
+               "\"sssssh\" \"(\" \")\" SBUF\" \" surround-as ."
+               "SBUF\" (sssssh)\""
+    }
+} ;
+
+{ surround surround-as } related-words
+
 HELP: glue
 { $values { "seq1" sequence } { "seq2" sequence } { "seq3" sequence } { "newseq" sequence } }
 { $description "Outputs a new sequence with " { $snippet "seq3" } " inserted between " { $snippet "seq1" } " and " { $snippet "seq2" } "." }
@@ -984,6 +1007,18 @@ HELP: glue
                "\"a,b\""
     }
 } ;
+
+HELP: glue-as
+{ $values { "seq1" sequence } { "seq2" sequence } { "seq3" sequence } { "exemplar" sequence } { "newseq" sequence } }
+{ $description "Outputs a new sequence with " { $snippet "seq3" } " inserted between " { $snippet "seq1" } " and " { $snippet "seq2" } " of the same type as " { $snippet "exemplar" } "." }
+{ $examples
+    { $example "USING: sequences prettyprint ;"
+               "\"a\" \"b\" \",\" SBUF\" \" glue-as ."
+               "SBUF\" a,b\""
+    }
+} ;
+
+{ glue glue-as } related-words
 
 HELP: subseq
 { $values { "from" "a non-negative integer" } { "to" "a non-negative integer" } { "seq" sequence } { "subseq" "a new sequence" } }
@@ -1111,7 +1146,7 @@ HELP: tail*
 
 { tail tail* tail-slice tail-slice* } related-words
 { head head* head-slice head-slice* } related-words
-{ cut cut* cut-slice } related-words
+{ cut cut* cut-slice cut-slice* } related-words
 { unclip unclip-slice unclip-last unclip-last-slice } related-words
 { first last but-last but-last-slice rest rest-slice } related-words
 
@@ -1137,9 +1172,14 @@ HELP: tail?
 { remove remove-nth remove-eq remove-eq! remove! remove-nth! } related-words
 
 HELP: cut-slice
-{ $values { "seq" sequence } { "n" "a non-negative integer" } { "before-slice" sequence } { "after-slice" "a slice" } }
-{ $description "Outputs a pair of sequences, where " { $snippet "before" } " consists of the first " { $snippet "n" } " elements of " { $snippet "seq" } " and has the same type, while " { $snippet "after" } " is a slice of the remaining elements." }
-{ $notes "Unlike " { $link cut } ", the run time of this word is proportional to the length of " { $snippet "before" } ", not " { $snippet "after" } ", so it is suitable for use in an iterative algorithm which cuts successive pieces off a sequence." } ;
+{ $values { "seq" sequence } { "n" "a non-negative integer" } { "before-slice" "a slice" } { "after-slice" "a slice" } }
+{ $description "Outputs a pair of sequences, where " { $snippet "before-slice" } " is a slice of the first " { $snippet "n" } " elements of " { $snippet "seq" } ", while " { $snippet "after-slice" } " is a slice of the remaining elements." }
+{ $notes "Unlike " { $link cut } ", this is suitable for use in an iterative algorithm which cuts successive pieces off a sequence." } ;
+
+HELP: cut-slice*
+{ $values { "seq" sequence } { "n" "a non-negative integer" } { "before-slice" "a slice" } { "after-slice" "a slice" } }
+{ $description "Outputs a pair of sequences, where " { $snippet "after" } " consists of the last " { $snippet "n" } " elements of " { $snippet "seq" } ", while " { $snippet "before-slice" } " is a slice of the remaining elements." }
+{ $notes "Unlike " { $link cut* } ", this is suitable for use in an iterative algorithm which cuts successive pieces off a sequence." } ;
 
 HELP: cut
 { $values { "seq" sequence } { "n" "a non-negative integer" } { "before" sequence } { "after" sequence } }
@@ -1239,8 +1279,8 @@ HELP: map-sum
 { $description "Like " { $snippet "map sum" } ", but without creating an intermediate sequence." }
 { $examples
     { $example
-        "USING: math math.ranges sequences prettyprint ;"
-        "100 [1,b] [ sq ] map-sum ."
+        "USING: math ranges sequences prettyprint ;"
+        "100 [1..b] [ sq ] map-sum ."
         "338350"
     }
 } ;
@@ -1250,8 +1290,8 @@ HELP: count
 { $description "Efficiently returns the number of elements that the predicate quotation matches." }
 { $examples
     { $example
-        "USING: math math.ranges sequences prettyprint ;"
-        "100 [1,b] [ even? ] count ."
+        "USING: math ranges sequences prettyprint ;"
+        "100 [1..b] [ even? ] count ."
         "50"
     }
 } ;
@@ -1467,7 +1507,7 @@ HELP: virtual@
 
 HELP: 2map-reduce
 { $values
-     { "seq1" sequence } { "seq2" sequence } { "map-quot" { $quotation ( ..a elt1 elt2 -- ..b intermediate ) } } { "reduce-quot" { $quotation ( ..b prev intermediate -- ..a next ) } }
+     { "seq1" sequence } { "seq2" sequence } { "map-quot" { $quotation ( ..a elt1 elt2 -- ..a intermediate ) } } { "reduce-quot" { $quotation ( ..a prev intermediate -- ..a next ) } }
      { "result" object } }
  { $description "Calls " { $snippet "map-quot" } " on each pair of elements from " { $snippet "seq1" } " and " { $snippet "seq2" } " and combines the results using " { $snippet "reduce-quot" } " in the same manner as " { $link reduce } ", except that there is no identity element, and the sequence must have a length of at least 1." }
 { $errors "Throws an error if the sequence is empty." }
@@ -1547,7 +1587,7 @@ HELP: insert-nth
 
 HELP: map-reduce
 { $values
-     { "seq" sequence } { "map-quot" { $quotation ( ..a elt -- ..b intermediate ) } } { "reduce-quot" { $quotation ( ..b prev intermediate -- ..a next ) } }
+     { "seq" sequence } { "map-quot" { $quotation ( ..a elt -- ..a intermediate ) } } { "reduce-quot" { $quotation ( ..a prev intermediate -- ..a next ) } }
      { "result" object } }
 { $description "Calls " { $snippet "map-quot" } " on each element and combines the results using " { $snippet "reduce-quot" } " in the same manner as " { $link reduce } ", except that there is no identity element, and the sequence must have a length of at least 1." }
 { $errors "Throws an error if the sequence is empty." }
@@ -1633,16 +1673,34 @@ HELP: cartesian-map
 { $values { "seq1" sequence } { "seq2" sequence } { "quot" { $quotation ( ... elt1 elt2 -- ... newelt ) } } { "newseq" "a new sequence of sequences" } }
 { $description "Applies the quotation to every possible pairing of elements from the two sequences, collecting results into a new sequence of sequences." } ;
 
+HELP: cartesian-product-as
+{ $values { "seq1" sequence } { "seq2" sequence } { "exemplar" sequence } { "newseq" "a new sequence of sequences of pairs" } }
+{ $description "Outputs a sequence of all possible pairings of elements from the two sequences so that the output sequence is the exemplar's type." }
+{ $examples
+    { $example
+        "USING: bit-arrays prettyprint sequences ;"
+        "\"ab\" ?{ t f } { } cartesian-product-as ."
+        "{ { { 97 t } { 97 f } } { { 98 t } { 98 f } } }"
+    }
+} ;
+
 HELP: cartesian-product
 { $values { "seq1" sequence } { "seq2" sequence } { "newseq" "a new sequence of sequences of pairs" } }
-{ $description "Outputs a sequence of all possible pairings of elements from the two sequences." }
+{ $description "Outputs a sequence of all possible pairings of elements from the two sequences, using the type of " { $snippet "seq2" } "." }
 { $examples
     { $example
         "USING: prettyprint sequences ;"
         "{ 1 2 } { 3 4 } cartesian-product ."
         "{ { { 1 3 } { 1 4 } } { { 2 3 } { 2 4 } } }"
     }
+    { $example
+        "USING: prettyprint sequences ;"
+        "\"abc\" \"def\" cartesian-product ."
+        "{ { \"ad\" \"ae\" \"af\" } { \"bd\" \"be\" \"bf\" } { \"cd\" \"ce\" \"cf\" } }"
+    }
 } ;
+
+{ cartesian-find cartesian-each cartesian-map cartesian-product cartesian-product-as } related-words
 
 ARTICLE: "sequences-unsafe" "Unsafe sequence operations"
 "The " { $link nth-unsafe } " and " { $link set-nth-unsafe } " sequence protocol bypasses bounds checks for increased performance."
@@ -1701,7 +1759,7 @@ ARTICLE: "sequences-integers" "Counted loops"
 $nl
 "Combinators that produce new sequences, such as " { $link map } ", will output an array if the input is an instance of " { $link <iota> } "."
 $nl
-"More elaborate counted loops can be performed with " { $link "math.ranges" } "." ;
+"More elaborate counted loops can be performed with " { $link "ranges" } "." ;
 
 ARTICLE: "sequences-if" "Control flow with sequences"
 "To reduce the boilerplate of checking if a sequence is empty, several combinators are provided."
@@ -1731,7 +1789,7 @@ ARTICLE: "sequences-reshape" "Reshaping sequences"
 { $subsections repetition <repetition> }
 "Reversing a sequence:"
 { $subsections reverse }
-"A " { $emphasis "reversal" } " presents a reversed view of an underlying sequence:"
+"A " { $emphasis "reversed" } " is a virtual sequence presenting a reversed view of an underlying sequence:"
 { $subsections reversed <reversed> }
 "Transposing a matrix:"
 { $subsections flip } ;
@@ -1745,7 +1803,9 @@ ARTICLE: "sequences-appending" "Appending sequences"
     3append
     3append-as
     surround
+    surround-as
     glue
+    glue-as
 }
 "Collapse a sequence unto itself:"
 { $subsections concat join }
@@ -2025,7 +2085,7 @@ $nl
 "Using sequences for looping:"
 { $subsections
     "sequences-integers"
-    "math.ranges"
+    "ranges"
 }
 "Using sequences for control flow:"
 { $subsections "sequences-if" }

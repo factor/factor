@@ -4,12 +4,12 @@
 USING: alien alien.c-types alien.destructors alien.libraries
 alien.parser alien.syntax classes.struct combinators kernel
 literals namespaces openssl.libcrypto system ;
-
+SLOT: alpn-supported-protocols
 IN: openssl.libssl
 
 << "libssl" {
     { [ os windows? ] [ "libssl-38.dll" ] }
-    { [ os macosx? ] [ "libssl.44.dylib" ] }
+    { [ os macosx? ] [ "libssl.35.dylib" ] }
     { [ os unix? ] [ "libssl.so" ] }
 } cond cdecl add-library >>
 
@@ -445,6 +445,7 @@ FUNCTION: int SSL_accept ( SSL* ssl )
 FUNCTION: int SSL_connect ( SSL* ssl )
 FUNCTION: int SSL_read ( SSL* ssl, void* buf, int num )
 FUNCTION: int SSL_write ( SSL* ssl, void* buf, int num )
+FUNCTION: int SSL_write_ex ( SSL* ssl, void* buf, size_t num, size_t* written )
 FUNCTION: long SSL_ctrl ( SSL* ssl, int cmd, long larg, void* parg )
 
 FUNCTION: int SSL_shutdown ( SSL* ssl )
@@ -518,6 +519,33 @@ FUNCTION: ulong SSL_get_options ( SSL* ssl )
 
 FUNCTION: ulong SSL_get_secure_renegotiation_support ( SSL* ssl )
 
+! -----------------------------
+! tls alpn extension
+! -----------------------------
+
+! values from https://github.com/openssl/openssl/blob/master/include/openssl/tls1.h
+CONSTANT: SSL_TLSEXT_ERR_OK 0
+CONSTANT: SSL_TLSEXT_ERR_ALERT_FATAL 2
+CONSTANT: SSL_TLSEXT_ERR_NOACK 3
+! values from https://github.com/openssl/openssl/blob/master/include/openssl/ssl.h.in
+CONSTANT: OPENSSL_NPN_UNSUPPORTED 0
+CONSTANT: OPENSSL_NPN_NEGOTIATED 1
+CONSTANT: OPENSSL_NPN_NO_OVERLAP 2
+
+! callback type
+! CALLBACK: int SSL_CTX_alpn_select_cb_func ( SSL* ssl, const
+! unsigned c-string* out, uchar* outlen, const unsigned c-string
+! in, uint inlen, void* arg )
+CALLBACK: int SSL_CTX_alpn_select_cb_func ( SSL* ssl,
+c-string* out, uchar* outlen, c-string in, uint inlen, void* arg )
+FUNCTION: void SSL_CTX_set_alpn_select_cb ( SSL_CTX* ctx,
+SSL_CTX_alpn_select_cb_func cb, void* arg )
+FUNCTION: int SSL_select_next_proto ( c-string* out, uchar*
+outlen, c-string server, uint server_len, c-string client, uint
+client_len )
+
+FUNCTION: void SSL_get0_alpn_selected ( SSL* s,
+c-string* data, uint* len )
 
 ! ------------------------------------------------------------------------------
 ! Misc

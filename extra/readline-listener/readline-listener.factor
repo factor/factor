@@ -1,8 +1,10 @@
 ! Copyright (C) 2011 Erik Charlebois.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors assocs colors.constants combinators fry io kernel
-listener readline sequences splitting threads tools.completion
+
+USING: accessors assocs colors combinators io kernel listener
+readline sequences splitting threads tools.completion
 unicode.data vocabs vocabs.hierarchy ;
+
 IN: readline-listener
 
 <PRIVATE

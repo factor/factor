@@ -3,8 +3,7 @@
 
 USING: accessors arrays ascii assocs calendar calendar.english
 calendar.private combinators combinators.short-circuit io kernel
-literals locals math math.order math.parser math.ranges
-sequences splitting ;
+literals math math.order math.parser ranges sequences splitting ;
 
 IN: crontab
 
@@ -19,7 +18,7 @@ ERROR: invalid-cronentry value ;
             "/" split1 [ quot seq parse-value 0 over length 1 - ] dip
             string>number <range> swap nths ] }
         { [ CHAR: - over member? ] [
-            "-" split1 quot bi@ [a,b] ] }
+            "-" split1 quot bi@ [a..b] ] }
         [ quot call 1array ]
     } cond ; inline recursive
 
@@ -133,4 +132,4 @@ PRIVATE>
     now next-times-after ;
 
 : read-crontab ( -- entries )
-    lines harvest [ parse-cronentry ] map ;
+    read-lines harvest [ parse-cronentry ] map ;

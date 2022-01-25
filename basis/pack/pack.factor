@@ -1,8 +1,8 @@
 ! Copyright (C) 2009 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: alien.c-types ascii assocs combinators combinators.smart
-endian fry io kernel macros math math.statistics math.vectors
-sequences strings ;
+endian io kernel math math.statistics math.vectors sequences
+strings ;
 IN: pack
 
 GENERIC: >n-byte-array ( obj n -- byte-array )
@@ -58,15 +58,15 @@ CONSTANT: pack-table
 
 CONSTANT: unpack-table
     H{
-        { CHAR: c [ 8 signed-endian> ] }
+        { CHAR: c [ signed-endian> ] }
         { CHAR: C [ unsigned-endian> ] }
-        { CHAR: s [ 16 signed-endian> ] }
+        { CHAR: s [ signed-endian> ] }
         { CHAR: S [ unsigned-endian> ] }
-        { CHAR: t [ 24 signed-endian> ] }
+        { CHAR: t [ signed-endian> ] }
         { CHAR: T [ unsigned-endian> ] }
-        { CHAR: i [ 32 signed-endian> ] }
+        { CHAR: i [ signed-endian> ] }
         { CHAR: I [ unsigned-endian> ] }
-        { CHAR: q [ 64 signed-endian> ] }
+        { CHAR: q [ signed-endian> ] }
         { CHAR: Q [ unsigned-endian> ] }
         { CHAR: f [ unsigned-endian> bits>float ] }
         { CHAR: F [ unsigned-endian> bits>float ] }

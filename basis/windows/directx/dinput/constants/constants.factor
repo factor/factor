@@ -54,7 +54,7 @@ M: array array-base-type first ;
         [ fourth (flags) ]
         [ 4 swap nth (flag) ]
     } cleave
-    DIOBJECTDATAFORMAT <struct-boa> ;
+    DIOBJECTDATAFORMAT boa ;
 
 : make-DIOBJECTDATAFORMAT-arrays ( struct array -- values vars )
     [ [ <DIOBJECTDATAFORMAT> ] [ first ] bi ] with
@@ -73,7 +73,7 @@ M: array array-base-type first ;
 MACRO: <DIDATAFORMAT> ( dwFlags dwDataSize struct rgodf-array -- alien )
     [ DIDATAFORMAT heap-size DIOBJECTDATAFORMAT heap-size ] 4dip
     [ nip length ] [ make-DIOBJECTDATAFORMAT-array-quot ] 2bi
-    '[ _ _ _ _ _ @ DIDATAFORMAT <struct-boa> ] ;
+    '[ _ _ _ _ _ @ DIDATAFORMAT boa ] ;
 
 : (malloc-guid-symbol) ( symbol guid -- )
     '[ _ malloc-byte-array ] initialize ;
@@ -832,7 +832,7 @@ MACRO: <DIDATAFORMAT> ( dwFlags dwDataSize struct rgodf-array -- alien )
     define-guid-constants
     define-format-constants ;
 
-[ define-constants ] "windows.directx.dinput.constants" add-startup-hook
+STARTUP-HOOK: define-constants
 
 : uninitialize ( variable quot -- )
     '[ _ when* f ] change-global ; inline

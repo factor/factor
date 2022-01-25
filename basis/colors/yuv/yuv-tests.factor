@@ -2,15 +2,13 @@
 ! See http://factorcode.org/license.txt for BSD license
 
 USING: arrays colors colors.yuv kernel locals math.functions
-math.ranges sequences tools.test ;
+ranges sequences tools.test ;
 
 { t } [
     0.0 1.0 0.1 <range> [| r |
         0.0 1.0 0.1 <range> [| g |
             0.0 1.0 0.1 <range> [| b |
-                r g b 1.0 <rgba> dup >yuva >rgba
-                [ >rgba-components 4array ] bi@
-                [ 0.00000001 ~ ] 2all?
+                r g b 1.0 <rgba> dup >yuva color=
             ] all?
         ] all?
     ] all?

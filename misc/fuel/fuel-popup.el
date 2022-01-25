@@ -1,4 +1,4 @@
-;;; fuel-popup.el -- popup windows
+;;; fuel-popup.el -- popup windows -*- lexical-binding: t -*-
 
 ;; Copyright (C) 2008 Jose Antonio Ortega Ruiz
 ;; See http://factorcode.org/license.txt for BSD license.

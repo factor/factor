@@ -1,9 +1,8 @@
 ! Copyright (C) 2009 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors combinators combinators.short-circuit
-generalizations kernel locals math.order math.ranges
-sequences.parser sequences sequences.generalizations
-sorting.functor sorting.slots unicode ;
+USING: accessors combinators combinators.short-circuit kernel
+math.order ranges sequences sequences.generalizations
+sequences.parser sorting.functor sorting.slots unicode ;
 IN: c.lexer
 
 : take-c-comment ( sequence-parser -- seq/f )
@@ -72,14 +71,14 @@ IN: c.lexer
     CHAR: \ CHAR: \" take-token* ;
 
 : c-identifier-begin? ( ch -- ? )
-    CHAR: a CHAR: z [a,b]
-    CHAR: A CHAR: Z [a,b]
+    CHAR: a CHAR: z [a..b]
+    CHAR: A CHAR: Z [a..b]
     { CHAR: _ } 3append member? ;
 
 : c-identifier-ch? ( ch -- ? )
-    CHAR: a CHAR: z [a,b]
-    CHAR: A CHAR: Z [a,b]
-    CHAR: 0 CHAR: 9 [a,b]
+    CHAR: a CHAR: z [a..b]
+    CHAR: A CHAR: Z [a..b]
+    CHAR: 0 CHAR: 9 [a..b]
     { CHAR: _ } 4 nappend member? ;
 
 : (take-c-identifier) ( sequence-parser -- string/f )

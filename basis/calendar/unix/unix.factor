@@ -35,10 +35,10 @@ M: unix gmt-offset
     get-time gmtoff>> 3600 /mod 60 /mod ;
 
 : current-timeval ( -- timeval )
-    timeval <struct> [ f gettimeofday io-error ] keep ; inline
+    timeval new [ f gettimeofday io-error ] keep ; inline
 
 : system-micros ( -- n )
     current-timeval timeval>micros ;
 
-M: unix gmt
+M: unix now-gmt
     current-timeval timeval>unix-time ;

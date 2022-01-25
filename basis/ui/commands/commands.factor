@@ -1,6 +1,6 @@
 ! Copyright (C) 2006, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors assocs fry help.markup kernel make quotations
+USING: accessors assocs help.markup kernel make quotations
 sequences splitting tr ui.gestures unicode words ;
 IN: ui.commands
 

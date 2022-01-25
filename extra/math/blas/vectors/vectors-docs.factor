@@ -1,4 +1,4 @@
-USING: alien byte-arrays help.markup help.syntax math sequences ;
+USING: help.markup help.syntax math ;
 IN: math.blas.vectors
 
 ARTICLE: "math.blas.vectors" "BLAS interface vector operations"

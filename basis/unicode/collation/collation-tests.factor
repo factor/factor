@@ -19,24 +19,24 @@ IN: unicode.collation.tests
 
 : collation-test-lines ( -- lines )
     "vocab:unicode/UCA/CollationTest_SHIFTED.txt.zip"
-    binary file-contents uncompress utf8 decode string-lines
+    binary file-contents uncompress utf8 decode split-lines
     [ "#" head? ] reject harvest ;
 
 : parse-collation-test-shifted ( -- lines )
     collation-test-lines
-    [ ";" split first " " split [ hex> ] "" map-as ] map ;
+    [ ";" split first split-words [ hex> ] "" map-as ] map ;
 
 : tail-from-last ( string char -- string' )
     '[ _ = ] dupd find-last drop 1 + tail ; inline
 
 : line>test-weights ( string -- pair )
     ";" split1 [
-        " " split [ hex> ] map
+        split-words [ hex> ] map
     ] [
         "#" split1 nip CHAR: [ tail-from-last
         "]" split1 drop
         "|" split 4 head
-        [ " " split harvest [ hex> ] map ] map
+        [ split-words harvest [ hex> ] map ] map
     ] bi* 2array ;
 
 ! These tests actually would pass if I didn't fix up

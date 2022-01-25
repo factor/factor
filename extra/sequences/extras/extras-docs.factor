@@ -1,5 +1,11 @@
-USING: help.markup help.syntax kernel math sequences ;
+USING: arrays help.markup help.syntax kernel math multiline
+quotations sequences ;
 IN: sequences.extras
+
+HELP: pad-center
+{ $values { "seq" sequence } { "n" "a non-negative integer" } { "elt" object } { "padded" "a new sequence" } }
+{ $description "Outputs a new sequence consisting of " { $snippet "seq" } " padded on the left and right with enough repetitions of " { $snippet "elt" } " to have the result be of length " { $snippet "n" } "." }
+{ $examples { $example "USING: io sequences sequences.extras ;" "{ \"ab\" \"quux\" } [ 5 CHAR: - pad-center print ] each" "-ab--\nquux-" } } ;
 
 HELP: ?supremum
 { $values
@@ -69,7 +75,7 @@ HELP: count*
     { "quot" { $quotation ( ... elt -- ... ? ) } }
     { "%" rational } }
 { $description "Outputs the fraction of elements in the sequence for which the predicate quotation matches." }
-{ $examples { $example "USING: math math.ranges prettyprint sequences.extras ;" "100 [1,b] [ even? ] count* ." "1/2" } } ;
+{ $examples { $example "USING: math ranges prettyprint sequences.extras ;" "100 [1..b] [ even? ] count* ." "1/2" } } ;
 
 HELP: collapse
 { $values
@@ -210,23 +216,26 @@ HELP: unsurround
 
 HELP: start-all
 { $values
-     { "subseq" sequence } { "seq" sequence } { "indices" sequence } }
+     { "seq" sequence } { "subseq" sequence } { "indices" sequence } }
 { $description "Outputs the starting indices of the non-overlapping occurrences of " { $snippet "subseq" } " in " { $snippet "seq" } "." }
 { $examples
-    { $example "USING: prettyprint sequences.extras ; \"ABA\" \"ABABA\" start-all ."
+    { $example "USING: prettyprint sequences.extras ;"
+               "\"ABABA\" \"ABA\" start-all ."
                "{ 0 }"
     }
-    { $example "USING: prettyprint sequences.extras ; \"ABA\" \"ABAABA\" start-all ."
+    { $example "USING: prettyprint sequences.extras ;"
+               "\"ABAABA\" \"ABA\" start-all ."
       "{ 0 3 }"
     }
  } ;
 
 HELP: start-all*
 { $values
-    { "subseq" sequence } { "seq" sequence } { "indices" sequence } }
+    { "seq" sequence } { "subseq" sequence } { "indices" sequence } }
 { $description "Outputs the starting indices of the possibly overlapping occurrences of " { $snippet "subseq" } " in " { $snippet "seq" } "." }
 { $examples
-    { $example "USING: prettyprint sequences.extras ; \"ABA\" \"ABABA\" start-all* ."
+    { $example "USING: prettyprint sequences.extras ;"
+               "\"ABABA\" \"ABA\" start-all* ."
                "{ 0 2 }"
     } } ;
 
@@ -242,21 +251,176 @@ HELP: arg-min
 
 HELP: count-subseq
 { $values
-    { "subseq" sequence } { "seq" sequence } { "n" integer } }
+    { "seq" sequence } { "subseq" sequence } { "n" integer } }
 { $description "Outputs the number of non-overlapping occurrences of " { $snippet "subseq" } " in " { $snippet "seq" } "." }
 { $examples
-    { $example "USING: prettyprint sequences.extras ; \"ABA\" \"ABABA\" count-subseq ."
+    { $example "USING: prettyprint sequences.extras ;"
+               "\"ABABA\" \"ABA\" count-subseq ."
                "1"
     } } ;
 
 
 HELP: count-subseq*
 { $values
-    { "subseq" sequence } { "seq" sequence } { "n" integer } }
+    { "seq" sequence } { "subseq" sequence } { "n" integer } }
 { $description "Outputs the number of possibly overlapping occurrences of " { $snippet "subseq" } " in " { $snippet "seq" } "." }
 { $examples
-    { $example "USING: prettyprint sequences.extras ; \"ABA\" \"ABABA\" count-subseq* ."
+    { $example "USING: prettyprint sequences.extras ;"
+               "\"ABABA\" \"ABA\" count-subseq* ."
                "2"
     } } ;
 
 { start-all start-all* count-subseq count-subseq* } related-words
+
+HELP: loop>array
+{ $values
+    { "quot" quotation }
+    { "array" array }
+}
+{ $description "Call the " { $snippet "quot" } ", which should output an object or " { $snippet "f" } ", and collect the objects in " { $snippet "array" } " until " { $snippet "quot" } " outputs " { $snippet "f" } "." }
+{ $examples
+    { $example "USING: sequences.extras prettyprint io.encodings.binary"
+    "io.streams.byte-array io ;"
+        "B{ 10 20 30 } binary ["
+        "   [ read1 ] loop>array"
+        "] with-byte-reader ."
+        "{ 10 20 30 }"
+    }
+} ;
+
+HELP: loop>array*
+{ $values
+    { "quot" quotation }
+    { "array" array }
+}
+{ $description "Call the " { $snippet "quot" } ", which should output an object and a " { $snippet "bool" } ", and collect the objects in " { $snippet "array" } " until " { $snippet "quot" } " outputs " { $snippet "f" } ". Do collect the last object." }
+{ $examples
+    { $example "USING: sequences.extras prettyprint io.encodings.binary"
+               "random random.mersenne-twister kernel math ;"
+    "123 <mersenne-twister> ["
+    "   ["
+    "      10 random dup 5 >"
+    "   ] loop>array* ."
+    "] with-random"
+    "{ 6 7 2 }"
+    }
+} ;
+
+HELP: loop>array**
+{ $values
+    { "quot" quotation }
+    { "array" array }
+}
+{ $description "Call the " { $snippet "quot" } ", which should output an object and a " { $snippet "bool" } ", and collect the objects in " { $snippet "array" } " until " { $snippet "quot" } " outputs " { $snippet "f" } ". Do not collect the last object." }
+{ $examples
+    { $example "USING: sequences.extras prettyprint io.encodings.binary"
+               "random random.mersenne-twister kernel math ;"
+    "123 <mersenne-twister> ["
+    "   ["
+    "      10 random dup 5 >"
+    "   ] loop>array** ."
+    "] with-random"
+    "{ 6 7 }"
+    }
+} ;
+
+
+HELP: loop>sequence
+{ $values
+    { "quot" quotation } { "exemplar" object }
+    { "seq" sequence }
+}
+{ $description "Call " { $snippet "quot" } ", which should output an object or " { $snippet "f" } ", and collect the objects in " { $snippet "seq" } " of type " { $snippet "exemplar" } " until " { $snippet "quot" } " outputs " { $snippet "f" } "." }
+{ $examples
+    { $example "USING: sequences.extras prettyprint io.encodings.binary"
+    "io.streams.byte-array io ;"
+        "B{ 10 20 30 } binary ["
+        "   [ read1 ] V{ } loop>sequence"
+        "] with-byte-reader ."
+        "V{ 10 20 30 }"
+    }
+} ;
+
+HELP: loop>sequence*
+{ $values
+    { "quot" quotation } { "exemplar" object }
+    { "seq" sequence }
+}
+{ $description "Call " { $snippet "quot" } ", which should output an object and a " { $snippet "bool" } ", and collect the objects in " { $snippet "seq" } " of type " { $snippet "exemplar" } " until " { $snippet "quot" } " outputs " { $snippet "f" } ". Do collect the last object." }
+{ $examples
+    { $example "USING: sequences.extras prettyprint io.encodings.binary"
+               "random random.mersenne-twister kernel math ;"
+    "! Get random numbers until one of them is greater than 5"
+    "! but also output the last number"
+    "123 <mersenne-twister> ["
+    "   ["
+    "      10 random dup 5 >"
+    "   ] V{ } loop>sequence*"
+    "] with-random ."
+    "V{ 6 7 2 }"
+    }
+} ;
+
+HELP: loop>sequence**
+{ $values
+    { "quot" quotation } { "exemplar" object }
+    { "seq" sequence }
+}
+{ $description "Call " { $snippet "quot" } ", which should output an object and a " { $snippet "bool" } ", and collect the objects in " { $snippet "seq" } " of type " { $snippet "exemplar" } " until " { $snippet "quot" } " outputs " { $snippet "f" } ". Do not collect the last object." }
+{ $examples
+    { $example "USING: sequences.extras prettyprint io.encodings.binary"
+               "random random.mersenne-twister kernel math ;"
+    "! Get random numbers until one of them is greater than 5"
+    "! but also output the last number"
+    "123 <mersenne-twister> ["
+    "   ["
+    "      10 random dup 5 >"
+    "   ] V{ } loop>sequence**"
+    "] with-random ."
+    "V{ 6 7 }"
+    }
+} ;
+
+{
+    loop>array loop>array* loop>array**
+    loop>sequence loop>sequence* loop>sequence**
+    zero-loop>array zero-loop>sequence
+} related-words
+
+HELP: zero-loop>array
+{ $values
+    { "quot" quotation }
+    { "seq" sequence }
+}
+{ $description "Call " { $snippet "quot" } ", which takes an integer starting from zero and incrementing on every loop, and should output an object, and collect the objects in " { $snippet "array" } " until " { $snippet "quot" } " outputs " { $snippet "f" } "." }
+{ $examples
+    "Example:"
+    { $example "USING: sequences.extras prettyprint math.text.english math kernel ;"
+        "[ dup 5 < [ number>text ] [ drop f ] if ] zero-loop>array ."
+        [[ { "zero" "one" "two" "three" "four" }]]
+    }
+} ;
+
+HELP: zero-loop>sequence
+{ $values
+    { "quot" quotation } { "exemplar" object }
+    { "seq" sequence }
+}
+{ $description "Call the " { $snippet "quot" } ", which takes an integer starting from zero and incrementing on every loop, and should output an object or " { $snippet "f" } ", and collect the objects in " { $snippet "array" } " until " { $snippet "quot" } " outputs " { $snippet "f" } "." }
+{ $examples
+    "Example:"
+    { $example "USING: sequences.extras prettyprint math.text.english math kernel ;"
+        "[ dup 5 < [ number>text ] [ drop f ] if ] V{ } zero-loop>sequence ."
+        [[ V{ "zero" "one" "two" "three" "four" }]]
+    }
+} ;
+
+HELP: find-pred
+{ $values seq: sequence quot: quotation pred: quotation calc/f: object i/f: object elt/f: object }
+{ $description A version of \ find that saves the calculation done by the first quotation and returns the calulation, element, and index if the calculation matches a predicate quotation. }
+{ $examples
+    [=[ USING: math kernel sequences.extras prettyprint ;
+        { 4 5 6 } [ sq ] [ 20 > ] find-pred [ . ] tri@
+        25\n5\n1
+    ]=]
+} ;

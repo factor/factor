@@ -1,9 +1,9 @@
 ! Copyright (C) 2008 Doug Coleman, John Benediktsson.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: alien.c-types alien.data alien.strings alien.syntax
-arrays assocs byte-arrays core-foundation io.binary
+arrays assocs byte-arrays core-foundation endian
 io.encodings.utf8 kernel libc sequences specialized-arrays
-splitting system system-info ;
+splitting system system-info unix.users ;
 SPECIALIZED-ARRAY: int
 IN: system-info.macosx
 
@@ -22,6 +22,7 @@ FUNCTION: OSErr Gestalt ( OSType selector, SInt32* response )
 : system-version-bugfix ( -- n ) "sys3" be> gestalt ;
 
 CONSTANT: system-code-names H{
+    { { 12 0 } "Monterey" }
     { { 11 0 } "Big Sur" }
     { { 10 16 } "Big Sur" }
     { { 10 15 } "Catalina" }
@@ -104,3 +105,4 @@ M: macosx physical-mem { 6 24 } sysctl-query-ulonglong ;
 : available-cpus ( -- n ) { 6 25 } sysctl-query-uint ;
 
 M: macosx computer-name { 1 10 } sysctl-query-string "." split1 drop ;
+M: macosx username real-user-name ;

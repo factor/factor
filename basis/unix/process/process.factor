@@ -1,7 +1,7 @@
-USING: alien alien.c-types alien.data alien.syntax
-environment.unix generalizations io.encodings.utf8 kernel libc
-math sequences simple-tokenizer strings unix unix.types
-unix.utilities ;
+USING: alien.c-types alien.data alien.syntax alien.utilities
+classes.struct environment.unix generalizations
+io.encodings.utf8 kernel libc math sequences simple-tokenizer
+strings unix unix.types ;
 QUALIFIED-WITH: alien.c-types ac
 IN: unix.process
 
@@ -17,17 +17,11 @@ FUNCTION: int execv ( c-string path, c-string* argv )
 FUNCTION: int execvp ( c-string path, c-string* argv )
 FUNCTION: int execve ( c-string path, c-string* argv, c-string* envp )
 
-TYPEDEF: void* posix_spawn_file_actions_t
-TYPEDEF: void* posix_spawnattr_t
-
-TYPEDEF: uint sigset_t
-
 FUNCTION: int posix_spawn_file_actions_init ( posix_spawn_file_actions_t* file_actions )
 FUNCTION: int posix_spawn_file_actions_destroy ( posix_spawn_file_actions_t* file_actions )
 
 FUNCTION: int posix_spawnattr_init ( posix_spawnattr_t* attr )
 FUNCTION: int posix_spawnattr_destroy ( posix_spawnattr_t* attr )
-
 
 FUNCTION: int posix_spawn_file_actions_addclose (
     posix_spawn_file_actions_t *file_actions, int filedes )
@@ -89,7 +83,7 @@ CONSTANT: POSIX_SPAWN_PCONTROL_KILL       0x0003
     dup 0 = [ drop ] [ (throw-errno) ] if ;
 
 : posix-spawn-file-actions-init ( -- posix_spawn_file_actions_t )
-    f posix_spawn_file_actions_t <ref>
+    posix_spawn_file_actions_t new
     [ posix_spawn_file_actions_init check-posix ] keep ;
 
 : posix-spawn-file-actions-destroy ( posix_spawn_file_actions_t -- )

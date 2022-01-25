@@ -1,7 +1,7 @@
 ! Copyright (C) 2007, 2009 Eduardo Cavazos, Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors assocs definitions kernel namespaces
-sequences sorting splitting strings ;
+USING: accessors assocs definitions kernel namespaces sequences
+sets sorting splitting strings ;
 IN: vocabs
 
 SYMBOL: dictionary
@@ -11,10 +11,8 @@ name words
 main help
 source-loaded? docs-loaded? ;
 
-! sources-loaded? slot is one of these three
-SYMBOL: +parsing+
-SYMBOL: +running+
-SYMBOL: +done+
+! sources-loaded? and docs-loaded? slots could be
+SYMBOLS: +parsing+ +done+ ;
 
 : <vocab> ( name -- vocab )
     vocab new
@@ -32,6 +30,8 @@ TUPLE: vocab-link name ;
 C: <vocab-link> vocab-link
 
 UNION: vocab-spec vocab vocab-link ;
+
+INSTANCE: vocab-spec definition-mixin
 
 GENERIC: vocab-name ( vocab-spec -- name )
 
@@ -75,6 +75,9 @@ M: vocab vocab-main main>> ;
 M: object vocab-main lookup-vocab vocab-main ;
 
 M: f vocab-main ;
+
+PREDICATE: runnable-vocab < vocab
+    vocab-main >boolean ;
 
 SYMBOL: vocab-observers
 
@@ -130,19 +133,38 @@ M: vocab-spec >vocab-link ;
 
 M: object >vocab-link dup lookup-vocab [ ] [ <vocab-link> ] ?if ;
 
-: forget-vocab ( vocab -- )
+<PRIVATE
+
+: (forget-vocab) ( vocab -- )
     [ vocab-words forget-all ]
     [ vocab-name dictionary get delete-at ]
     [ notify-vocab-observers ] tri ;
+
+PRIVATE>
+
+: forget-vocab ( vocab -- )
+    [ (forget-vocab) ] [
+        vocab-name dup ".private" tail? [ drop ] [
+            ".private" append (forget-vocab)
+        ] if
+    ] bi ;
 
 M: vocab-spec forget* forget-vocab ;
 
 SYMBOL: require-hook
 
-PREDICATE: runnable-vocab < vocab
-    vocab-main >boolean ;
+<PRIVATE
 
-INSTANCE: vocab-spec definition-mixin
+SYMBOL: requiring
+
+: with-requiring ( quot -- )
+    requiring get [
+        swap call
+    ] [
+        HS{ } clone dup requiring [ swap call ] with-variable
+    ] if* ; inline
+
+PRIVATE>
 
 GENERIC: require ( object -- )
 
@@ -156,8 +178,15 @@ M: vocab-link require name>> require ;
 ! that contain primitives, and loading the public vocabs would
 ! cause circularity issues.
 M: string require
-    [ ".private" ?tail ] keep swap [ lookup-vocab not ] when
-    [ require-hook get call( name -- ) ] [ drop ] if ;
+    [ ".private" ?tail ] keep swap [ lookup-vocab not ] when [
+        [
+            dupd ?adjoin
+            [ require-hook get call( name -- ) ] [ drop ] if
+        ] with-requiring
+    ] [ drop ] if ;
+
+: require-all ( vocabs -- )
+    [ require ] each ;
 
 : load-vocab ( name -- vocab )
     [ require ] [ lookup-vocab ] bi ;

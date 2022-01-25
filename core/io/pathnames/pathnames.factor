@@ -89,7 +89,7 @@ PRIVATE>
 
 : append-relative-path ( path1 path2 -- path )
     [ trim-tail-separators ]
-    [ trim-head-separators ] bi* path-separator glue ;
+    [ trim-head-separators ] bi* "/" glue ;
 
 : append-path ( path1 path2 -- path )
     {
@@ -128,6 +128,11 @@ PRIVATE>
 : file-extension ( path -- extension )
     file-name "." split1-last nip ;
 
+: has-file-extension? ( path -- ? )
+    dup ?last path-separator?
+    [ drop f ]
+    [ file-name CHAR: . swap member? ] if ;
+
 : path-components ( path -- seq )
     normalize-path path-separator split harvest ;
 
@@ -147,21 +152,12 @@ GENERIC: vocab-path ( path -- newpath )
 GENERIC: absolute-path ( path -- path' )
 
 M: string absolute-path
-    "resource:" ?head [
-        trim-head-separators resource-path
-        absolute-path
-    ] [
-        "vocab:" ?head [
-            trim-head-separators vocab-path
-            absolute-path
-        ] [
-            "~" ?head [
-                trim-head-separators home prepend-path
-                absolute-path
-        ] [
-            current-directory get prepend-path
-        ] if ] if
-    ] if ;
+    {
+        { [ "resource:" ?head ] [ trim-head-separators resource-path absolute-path ] }
+        { [ "vocab:" ?head ] [ trim-head-separators vocab-path absolute-path ] }
+        { [ "~" ?head ] [ trim-head-separators home prepend-path absolute-path ] }
+        [ current-directory get prepend-path ]
+    } cond ;
 
 M: object normalize-path
     absolute-path ;

@@ -5,7 +5,7 @@ IN: peg.javascript
 
 HELP: parse-javascript
 { $values
-  { "string" string }
+  { "input" string }
   { "ast" "a JavaScript abstract syntax tree" }
 }
 { $description

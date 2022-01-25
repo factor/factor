@@ -36,7 +36,7 @@ MEMO: TIOCGWINSZ ( -- x ) CHAR: t 104 winsize heap-size _IOCR ;
 PRIVATE>
 
 M: macosx (terminal-size)
-    stdout-handle fileno TIOCGWINSZ winsize <struct>
+    stdout-handle fileno TIOCGWINSZ winsize new
     [ ioctl ] keep swap 0 < [
         drop 0 0
     ] [

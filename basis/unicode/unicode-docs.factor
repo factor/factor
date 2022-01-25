@@ -9,14 +9,18 @@ $nl
 "The Unicode character set is accompanied by several standard algorithms for common operations like encoding text in files, capitalizing a string, finding the boundaries between words, and so on."
 $nl
 "The Unicode algorithms implemented by the " { $vocab-link "unicode" } " vocabulary are:"
-{ $vocab-subsection "Case mapping" "unicode.case" }
-{ $vocab-subsection "Collation and weak comparison" "unicode.collation" }
-{ $vocab-subsection "Character classes" "unicode.categories" }
-{ $vocab-subsection "Word and grapheme breaks" "unicode.breaks" }
-{ $vocab-subsection "Unicode normalization" "unicode.normalize" }
+{ $vocab-subsections
+    { "Case mapping" "unicode.case" }
+    { "Collation and weak comparison" "unicode.collation" }
+    { "Character classes" "unicode.categories" }
+    { "Word and grapheme breaks" "unicode.breaks" }
+    { "Unicode normalization" "unicode.normalize" }
+}
 "The following are mostly for internal use:"
-{ $vocab-subsection "Unicode category syntax" "unicode.categories" }
-{ $vocab-subsection "Unicode data tables" "unicode.data" }
+{ $vocab-subsections
+    { "Unicode category syntax" "unicode.categories" }
+    { "Unicode data tables" "unicode.data" }
+}
 { $see-also "ascii" "io.encodings" } ;
 
 ABOUT: "unicode"

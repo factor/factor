@@ -1,6 +1,6 @@
 ! Copyright (C) 2010 Daniel Ehrenberg
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors fry hash-sets kernel math prettyprint sequences
+USING: accessors hash-sets kernel math prettyprint sequences
 sets sorting tools.test ;
 
 { { 1 2 3 } } [ HS{ 1 2 3 } members natural-sort ] unit-test

@@ -2,8 +2,11 @@
 
 ! Comments
 
-    ! Normal comments
+    ! Normal comments ( -- x )
     ! More comments
+
+    ! TODO: something
+    ! XXX: blah
 
     /* C
     style 
@@ -14,7 +17,23 @@
       2  comment */
      6 /* something else */ 2 +
 
+    ![[this is a weird new string]]
+    ![=[this is a weird new string]=]
+    ![==[this is a weird new string]==]
+    ![===[this is a weird new string]===]
+    ![====[this is a weird new string]====]
+    ![=====[this is a weird new string]=====]
+    ![======[this is a weird new string]======]
+
 ! Imports
+
+    USING: foo ! asdf
+    bar baz
+    ! something
+    qux ;
+
+    USE: ! fasdf
+    foo
 
     USING: vocabularies ... ;
     USE: vocabulary
@@ -35,8 +54,13 @@
 
     MIXIN: class
     TUPLE: class slots ... ;
+    TUPLE: foo a b c d e f g h i j ;
+    TUPLE: foo < object { x initial: 0 } ;
+    TUPLE: foo < object { x fixnum initial: 0 } ;
+    TUPLE: foo < fixnum { x read-only } ;
     TUPLE: class < superclass slots ... ;
     BUILTIN: class slots ... ;
+    ERROR: class a b c { x fixnum initial: 12 } ;
     INSTANCE: instance mixin
     SINGLETON: class
     SINGLETONS: words ... ;
@@ -51,13 +75,18 @@
 
 ! Definitions
 
-    : word ( x -- ) drop ;
+    : word ( x -- y ) ! foo ;
+    : foo ( x -- y ) 1 + ;
+    1 2 + ;
+
+    : word error drop ;
     : word error drop ;
     :: word ( x -- ) x drop ;
     TYPED: word ( a b: class ... -- x: class y ... ) body ;
+    TYPED: word ( a b: class ... -- x: class y ... ) body ;
     TYPED:: word ( a b: class ... -- x: class y ... ) body ;
-    MACRO: word ( inputs... -- ) definition... ) ;
-    MACRO:: word ( vars... -- outputs... ) definition... ) ;
+    MACRO: word ( inputs... -- ) definition... ;
+    MACRO:: word ( vars... -- outputs... ) definition... ;
     M: object explain drop "an object" print ;
     M: class generic definition... ;
     M:: class generic ( vars... -- outputs... ) body... ;
@@ -71,7 +100,7 @@
         ( stack -- effect )
     GENERIC: word drop ! 3rd token wrong
     GENERIC: word ! next line wrong
-        drop
+        drop ;
     GENERIC: word
 drop ! wrong
     HOOK: word variable ( stack -- effect )
@@ -83,13 +112,14 @@ drop ! wrong
         1 2 ( stack -- effect )
     GENERIC#: word ! 2nd eff. should be independent of GENERIC#,
         1 ! and 2 & 3 shouldn't GENERIC# highlight
-        ( stack -- effect ) ( independent -- effect ) 2 3
+        ( stack -- effect ) ( independent -- effect ) 2 3 ;
     GENERIC#: word 1 ! comment
         drop ! wrong
     MATH: + ( x y -- z ) foldable flushable
     C: <foo> foo
     CONSTRUCTOR: <circle> circle ( radius -- obj ) ;
     CONSTRUCTOR: <circle> circle ( radius -- obj ) definition...  ;
+    PRIMITIVE: word-code ( word -- start end )
 
 ! Private definitions
 
@@ -99,8 +129,8 @@ drop ! wrong
     :: word ( x -- ) x drop ;
     TYPED: word ( a b: class ... -- x: class y ... ) body ;
     TYPED:: word ( a b: class ... -- x: class y ... ) body ;
-    MACRO: word ( inputs... -- ) definition... ) ;
-    MACRO:: word ( vars... -- outputs... ) definition... ) ;
+    MACRO: word ( inputs... -- ) definition... ;
+    MACRO:: word ( vars... -- outputs... ) definition... ;
     M: class generic definition... ;
     M:: class generic ( vars... -- outputs... ) body... ;
     GENERIC: word ( stack -- effect )
@@ -110,11 +140,17 @@ drop ! wrong
     C: <foo> foo
     CONSTRUCTOR: <circle> circle ( radius -- obj ) ;
     CONSTRUCTOR: <circle> circle ( radius -- obj ) definition...  ;
+    PRIMITIVE: word-code ( word -- start end )
 
 PRIVATE>
 
+! Syntax
+
+    SYNTAX: URL" parse-string >url suffix! ;
+
 ! Alien
 
+    ALIEN: foo
     LIBRARY: name
     TYPEDEF: old new
     ENUM: type words... ;
@@ -133,6 +169,9 @@ PRIVATE>
     SYMBOL: word
     SYMBOLS: words ... ;
 
+    COLOR: red
+    COLOR: #336699
+
 ! Math
 
     1 2 +
@@ -148,11 +187,15 @@ PRIVATE>
     >boolean
     <wrapper>
     +@
-    H{ } assoc-empty?
+    [ [ { } ] ?{ } ]
+    H{ ?{ { } } } assoc-empty?
+    ?{ t t f } nth
     5 >bignum
     1 2 pick set-nth
     5 f <array>
     (clone)
+
+    [let [let { } ] ]
 
 ! Strings
 
@@ -169,7 +212,11 @@ PRIVATE>
     URL" http://google.com"
     R" asdf"
 
-    """">json""""
+    """>json"""
+
+    "{ 1 2 3 }"
+
+    [[{ 1 2 3 }]]
 
 ! Triple quote strings (old Factor)
 
@@ -180,8 +227,27 @@ PRIVATE>
 
 ! Multiline strings
 
+    [[this is a weird new string]]
     [=[this is a weird new string]=]
+    [==[this is a weird new string]==]
+    [===[this is a weird new string]===]
+    [====[this is a weird new string]====]
+    [=====[this is a weird new string]=====]
+    [======[this is a weird new string]======]
 
+    HEREDOC: END
+    foo
+END
+
+    HEREDOC: foo bar baz
+    foo
+foo bar baz
+
+    STRING: foo
+asdf\f
+;
+
+    drop
 ! Containers
 
     H{ { 1 2 } }
@@ -189,12 +255,16 @@ PRIVATE>
     { 4 5 6 }
     V{ "asdf" 5 }
     ${ 1 foo 3 }
+    ?{ t t f f t }
 
 ! Quotations
 
     [ 2^ * ]
     '[ _ sqrt ]
+    '[ _ @ ]
     $[ 1 2 + ]
+    [let ]
+    [| | ]
 
 ! Tuples
 
@@ -329,7 +399,7 @@ f,
 
     ( x n -- (x)n )
 
-    ( p:
+    ( p: ! inline comment
 boolean -- q: boolean )
     ( m: integer -- n: float )
     ( :integer -- :float )
@@ -343,7 +413,10 @@ boolean -- q: boolean )
     flushablething
     flushable
     <PRIVATEfoo
+    [[asdf]]foo
     "asdf"foo
+    foo"asdf"foo
+    foo"asdf"
 
 << 5 1 + . >> 1
 
@@ -390,6 +463,9 @@ tail?
   +1+1/2 -0-1/2 /* ! */ +1+2/2 +1+1/2. +0-1/2 -0+1/2
 
 ! Regexp is colored wrong (on Github):
+
+R/ foo/
+R/ foo/s
 
 : using-line ( source -- vocabs )
     R/ USING: [^;]* ;/s all-matching-subseqs ?first

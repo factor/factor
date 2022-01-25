@@ -1,7 +1,7 @@
 ! Copyright (c) 2007 Aaron Schaefer, Daniel Ehrenberg.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: hashtables kernel math math.functions math.ranges project-euler.common
-    sequences sorting sets ;
+USING: kernel math math.functions project-euler.common ranges
+sequences sets sorting ;
 IN: project-euler.004
 
 ! http://projecteuler.net/index.php?section=problems&id=4
@@ -21,7 +21,7 @@ IN: project-euler.004
 <PRIVATE
 
 : source-004 ( -- seq )
-    100 999 [a,b] [ 10 divisor? ] reject ;
+    100 999 [a..b] [ 10 divisor? ] reject ;
 
 : max-palindrome ( seq -- palindrome )
     natural-sort [ palindrome? ] find-last nip ;
@@ -29,7 +29,7 @@ IN: project-euler.004
 PRIVATE>
 
 : euler004 ( -- answer )
-    source-004 dup [ * ] cartesian-map combine max-palindrome ;
+    source-004 dup [ * ] cartesian-map union-all max-palindrome ;
 
 ! [ euler004 ] 100 ave-time
 ! 1164 ms ave run time - 39.35 SD (100 trials)

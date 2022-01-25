@@ -85,14 +85,19 @@ xml>string write-html
 
 <p>Stable and development releases are built and uploaded by the <a href="https://concatenative.org/wiki/view/Factor/Build farm">build farm</a>. Follow <a href="https://twitter.com/FactorBuilds">@FactorBuilds</a> on Twitter to receive notifications. If you're curious, take a look at the <a href="https://builds.factorcode.org/dashboard">build farm dashboard</a>. You can also <a href="https://concatenative.org/wiki/view/Factor/Building%20Factor">build Factor</a> on your own platform from source.</p>
 
+<h2>Older releases</h2>
+<a href="https://downloads.factorcode.org/releases/">Download older releases</a> from <a href="https://downloads.factorcode.org/releases/0.29/">Factor 0.29</a> to the current release.
+
 <h1>Community</h1>
 
 <ul>
 <li><a href="https://concatenative.org/wiki/view/Factor/Mailing list">Join the mailing list</a></li>
+<li><a href="https://discord.gg/QxJYZx3QDf">Join the Discord</a></li>
 <li><a href="https://concatenative.org/wiki/view/Concatenative IRC channel">Join the IRC channel</a></li>
-<li><a href="https://planet.factorcode.org/">planet.factorcode.org</a> - Factor community blogs</li>
-<li><a href="https://concatenative.org/wiki/view/Concatenative%20language/Publications">Academic publications</a></li>
+<li><a href="https://factorcode.slack.com">Join the Slack group</a></li>
+<li><a href="https://planet.factorcode.org/">Factor community blogs</a></li>
 <li><a href="https://paste.factorcode.org/">Factor community pastebin</a> - if you're in an IRC channel and want to share some code</li>
+<li><a href="https://concatenative.org/wiki/view/Concatenative%20language/Publications">Academic publications</a></li>
 </ul>
 </div>
 </center>

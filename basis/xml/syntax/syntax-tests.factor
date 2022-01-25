@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: xml io kernel math sequences strings xml.traversal
 tools.test math.parser xml.syntax xml.data xml.syntax.private
-accessors multiline locals inverse xml.writer splitting classes
+accessors multiline inverse xml.writer splitting classes
 xml.private ;
 IN: xml.syntax.tests
 
@@ -74,7 +74,7 @@ XML-NS: foo http://blah.com
     three
   </item>
 </doc>" } [
-    "one two three" " " split
+    "one two three" split-words
     [ [XML <item><-></item> XML] ] map
     <XML <doc><-></doc> XML> pprint-xml>string
 ] unit-test

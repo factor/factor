@@ -926,10 +926,11 @@ $nl
 "This vocabulary provides the basic tools to construct Factor representations of graphs. For more details, see:"
 { $subsections { "graphviz" "data" } }
 "Other vocabularies let you change a graph's look & feel, write cleaner code to represent it, and (of course) generate its Graphviz output:"
-{ $vocab-subsection "Graphviz attributes" "graphviz.attributes" }
-{ $vocab-subsection "Graphviz notation" "graphviz.notation" }
-{ $vocab-subsection "Rendering Graphviz output" "graphviz.render" }
-$nl
+{ $vocab-subsections
+    { "Graphviz attributes" "graphviz.attributes" }
+    { "Graphviz notation" "graphviz.notation" }
+    { "Rendering Graphviz output" "graphviz.render" }
+}
 "After reading the above, you can see several examples in action:"
 { $subsections { "graphviz" "gallery" } }
 ;

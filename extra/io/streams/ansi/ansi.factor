@@ -1,7 +1,7 @@
 ! Copyright (C) 2014 John Benediktsson
 ! See http://factorcode.org/license.txt for BSD license
 
-USING: accessors arrays assocs destructors formatting fry io
+USING: accessors arrays assocs destructors formatting io
 io.streams.string io.styles kernel math math.functions
 math.vectors namespaces sequences strings strings.tables ;
 

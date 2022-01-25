@@ -1,58 +1,36 @@
-USING: alien alien.c-types alien.data alien.libraries
-arrays assocs command-line fry
-hashtables init io.encodings.utf8 kernel namespaces
-python.errors python.ffi python.objects sequences
-specialized-arrays strings vectors ;
+USING: alien alien.libraries arrays assocs byte-arrays
+hashtables init kernel math math.parser namespaces python.errors
+python.ffi python.objects sequences strings vectors ;
+
 IN: python
-QUALIFIED: math
 
 ERROR: python-error type message traceback ;
 
-SPECIALIZED-ARRAY: void*
-
-! Borrowed from unix.utilities
-: strings>alien ( strings encoding -- array )
-    '[ _ malloc-string ] void*-array{ } map-as f suffix ;
-
 ! Initialization and finalization
 : py-initialize ( -- )
-    Py_IsInitialized [
-        Py_Initialize
-        ! Encoding must be 8bit on Windows I think, so
-        ! native-string-encoding (utf16n) doesn't work.
-        (command-line) [ length ] [ utf8 strings>alien ] bi 0 PySys_SetArgvEx
-    ] unless ;
+    Py_IsInitialized [ Py_Initialize ] unless ;
 
 : py-finalize ( -- )
     Py_IsInitialized [ Py_Finalize ] when ;
 
 ! Importing
-: py-import ( str -- module )
+: py-import ( modulename -- module )
     PyImport_ImportModule check-new-ref ;
 
-! Unicodes
-: py-ucs-size ( -- n )
-    "maxunicode" PySys_GetObject PyInt_AsLong 0xffff = 2 4 ? ;
-
-: py-unicode>utf8 ( uni -- str )
-    py-ucs-size 4 =
-    [ PyUnicodeUCS4_AsUTF8String ]
-    [ PyUnicodeUCS2_AsUTF8String ] if (check-ref)
-    PyString_AsString (check-ref) ;
-
-: utf8>py-unicode ( str -- uni )
-    py-ucs-size 4 =
-    [ PyUnicodeUCS4_FromString ]
-    [ PyUnicodeUCS2_FromString ] if ;
+: py-import-from ( modulename objname -- obj )
+    [ py-import ] [ getattr ] bi* ;
 
 ! Data marshalling to Python
-: array>py-tuple ( arr -- py-tuple )
-    [ length <py-tuple> dup ] keep
-    [ rot py-tuple-set-item ] with each-index ;
+: array>py-tuple ( array -- py-tuple )
+    [ length <py-tuple> ] keep
+    [ [ dup ] 2dip swap py-tuple-set-item ] each-index ;
 
-: vector>py-list ( vec -- py-list )
-    [ length <py-list> dup ] keep
-    [ rot py-list-set-item ] with each-index ;
+: vector>py-list ( vector -- py-list )
+    [ length <py-list> ] keep
+    [ [ dup ] 2dip swap py-list-set-item ] each-index ;
+
+: assoc>py-dict ( assoc -- py-dict )
+    <py-dict> swap [ [ dup ] 2dip py-dict-set-item ] assoc-each ;
 
 : py-tuple>array ( py-tuple -- arr )
     dup py-tuple-size <iota> [ py-tuple-get-item ] with map ;
@@ -60,23 +38,45 @@ SPECIALIZED-ARRAY: void*
 : py-list>vector ( py-list -- vector )
     dup py-list-size <iota> [ py-list-get-item ] with V{ } map-as ;
 
-DEFER: >py
+: py-unicode>string ( py-unicode -- string )
+    PyUnicode_AsUTF8 (check-ref) ;
+
+: py-bytes>byte-array ( py-bytes -- byte-array )
+    PyBytes_AsString (check-ref) >byte-array ;
+
+: py-dict>hashtable ( py-dict -- hashtable )
+    PyDict_Items (check-ref) py-list>vector
+    [ py-tuple>array ] map >hashtable ;
+
+: py-class-name ( py-object -- name )
+    "__class__" getattr "__name__" getattr py-unicode>string ;
 
 GENERIC: >py ( obj -- py-obj )
+
+M: byte-array >py
+    dup length PyBytes_FromStringAndSize check-new-ref ;
+
 M: string >py
-    utf8>py-unicode check-new-ref ;
+    PyUnicode_FromString check-new-ref ;
+
 M: math:fixnum >py
     PyLong_FromLong check-new-ref ;
+
+M: math:bignum >py
+    number>string f 10 PyLong_FromString check-new-ref ;
+
 M: math:float >py
     PyFloat_FromDouble check-new-ref ;
+
 M: array >py
     [ >py ] map array>py-tuple ;
+
 M: hashtable >py
-    <py-dict> swap dupd [
-        swapd [ >py ] bi@ py-dict-set-item
-    ] with assoc-each ;
+    [ [ >py ] bi@ ] assoc-map assoc>py-dict ;
+
 M: vector >py
     [ >py ] map vector>py-list ;
+
 M: f >py
     drop <none> ;
 
@@ -89,13 +89,12 @@ DEFER: py>
     H{
         { "NoneType" [ drop f ] }
         { "bool" [ PyObject_IsTrue 1 = ] }
-        { "dict" [ PyDict_Items (check-ref) py> >hashtable ] }
-        { "int" [ PyInt_AsLong ] }
+        { "bytes" [ py-bytes>byte-array ] }
+        { "dict" [ py-dict>hashtable [ [ py> ] bi@ ] assoc-map ] }
+        { "int" [ PyLong_AsLong ] }
         { "list" [ py-list>vector [ py> ] map ] }
-        { "long" [ PyLong_AsLong ] }
-        { "str" [ PyString_AsString (check-ref) ] }
+        { "str" [ py-unicode>string ] }
         { "tuple" [ py-tuple>array [ py> ] map ] }
-        { "unicode" [ py-unicode>utf8 ] }
     } clone ;
 
 py-type-dispatch [ init-py-type-dispatch ] initialize
@@ -103,15 +102,12 @@ py-type-dispatch [ init-py-type-dispatch ] initialize
 ERROR: missing-type type ;
 
 : py> ( py-obj -- obj )
-    dup "__class__" getattr "__name__" getattr PyString_AsString
-    py-type-dispatch get ?at [ call( x -- x ) ] [ missing-type ] if ;
+    dup py-class-name py-type-dispatch get ?at
+    [ call( x -- x ) ] [ missing-type ] if ;
 
 ! Callbacks
 : quot>py-callback ( quot: ( args kw -- ret ) -- alien )
-    '[
-        nipd
-        [ [ py> ] [ { } ] if* ] bi@ @ >py
-    ] PyCallback ; inline
+    '[ nipd [ [ py> ] [ { } ] if* ] bi@ @ >py ] PyCallback ; inline
 
 : with-quot>py-cfunction ( alien quot -- )
     '[ <py-cfunction> @ ] with-callback ; inline
@@ -119,5 +115,5 @@ ERROR: missing-type type ;
 : python-dll-loaded? ( -- ? )
     "Py_IsInitialized" "python" dlsym? ;
 
-[ python-dll-loaded? [ py-initialize ] when ] "python" add-startup-hook
-[ python-dll-loaded? [ py-finalize ] when ] "python" add-shutdown-hook
+STARTUP-HOOK: [ python-dll-loaded? [ py-initialize ] when ]
+SHUTDOWN-HOOK: [ python-dll-loaded? [ py-finalize ] when ]

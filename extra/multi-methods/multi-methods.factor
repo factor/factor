@@ -1,12 +1,12 @@
 ! Copyright (C) 2008, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel math sequences vectors classes classes.algebra
-combinators arrays words assocs parser namespaces make
-definitions prettyprint prettyprint.backend prettyprint.custom
-quotations generalizations sequences.generalizations debugger io
-compiler.units kernel.private effects accessors hashtables
-sorting shuffle math.order sets see effects.parser ;
+USING: accessors arrays assocs classes classes.algebra
+combinators debugger definitions effects effects.parser io
+kernel make math math.order namespaces parser prettyprint
+prettyprint.backend prettyprint.custom quotations see sequences
+sequences.generalizations sets sorting vectors words ;
 FROM: namespaces => set ;
+QUALIFIED: syntax
 IN: multi-methods
 
 ! PART I: Converting hook specializers
@@ -246,8 +246,6 @@ SYNTAX: M:
     define ;
 
 ! Definition protocol. We qualify core generics here
-QUALIFIED: syntax
-
 syntax:M: generic definer drop \ GENERIC: f ;
 
 syntax:M: generic definition drop f ;

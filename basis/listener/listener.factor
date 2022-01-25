@@ -1,6 +1,6 @@
 ! Copyright (C) 2003, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors colors colors.constants combinators.short-circuit
+USING: accessors colors combinators.short-circuit
 compiler.units continuations debugger fry io io.styles kernel lexer
 locals math math.parser namespaces parser parser.notes prettyprint
 sequences sets source-files.errors system vocabs vocabs.loader
@@ -12,7 +12,7 @@ GENERIC#: prompt. 1 ( stream prompt -- )
 
 : prompt ( -- str )
     manifest get current-vocab>> [ name>> "IN: " prepend ] [ "" ] if*
-    auto-use? get [ " auto-use" append ] when ;
+    auto-use? get [ dup empty? "" " " ? "auto-use" 3append ] when ;
 
 SYMBOL: prompt-style
 H{
@@ -21,7 +21,7 @@ H{
 } prompt-style set-global
 
 M: object prompt.
-    nip prompt-style get-global format bl flush ;
+    nip [ prompt-style get-global format bl ] unless-empty ;
 
 SYMBOL: handle-ctrl-break
 
@@ -72,7 +72,7 @@ SYMBOL: error-hook
 
 : call-error-hook ( error -- )
     error-continuation get error-hook get
-    call( continuation error -- ) ;
+    call( error continuation -- ) ;
 
 [ drop print-error-and-restarts ] error-hook set-global
 
@@ -126,7 +126,7 @@ t error-summary? set-global
     visible-vars.
     datastack datastack.
     input-stream get prompt prompt.
-
+    flush
     [
         read-quot [
             '[ [ datastack _ with-datastack ] with-ctrl-break ]

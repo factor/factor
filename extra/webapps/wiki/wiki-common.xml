@@ -8,6 +8,8 @@
 
 	<t:style t:include="resource:extra/webapps/wiki/wiki.css" />
 
+    <div id="container">
+
     <div id="left">
 
         <t:if t:value="contents">
@@ -22,7 +24,7 @@
                         </t:a>
                     </h2>
 
-                    <t:farkup t:name="content" />
+                    <t:farkup t:name="content" t:no-follow="true" />
                 </t:bind>
             </div>
         </t:if>
@@ -32,9 +34,10 @@
     <div id="right">
 
         <div class="navbar">
+        <div class="navrow">
 
             <t:if t:value="contents">
-                <img id="menu" onclick="toggleSidebar()" src="data:image/svg+xml;base64,PHN2ZyBoZWlnaHQ9IjI0cHgiIHdpZHRoPSIyNHB4IiB2ZXJzaW9uPSIxLjEiIHZpZXdCb3g9IjAgMCAzMiAzMiIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cGF0aCBkPSJNNCwxMGgyNGMxLjEwNCwwLDItMC44OTYsMi0ycy0wLjg5Ni0yLTItMkg0QzIuODk2LDYsMiw2Ljg5NiwyLDhTMi44OTYsMTAsNCwxMHogTTI4LDE0SDRjLTEuMTA0LDAtMiwwLjg5Ni0yLDIgIHMwLjg5NiwyLDIsMmgyNGMxLjEwNCwwLDItMC44OTYsMi0yUzI5LjEwNCwxNCwyOCwxNHogTTI4LDIySDRjLTEuMTA0LDAtMiwwLjg5Ni0yLDJzMC44OTYsMiwyLDJoMjRjMS4xMDQsMCwyLTAuODk2LDItMiAgUzI5LjEwNCwyMiwyOCwyMnoiLz48L3N2Zz4=" />
+                <img id="menu" onclick="toggleSidebar()" src="../icons/hamburger.svg" />
             </t:if>
 
             <t:a t:href="$wiki">Front Page</t:a>
@@ -53,6 +56,7 @@
             </t:if>
 
         </div>
+        </div>
 
         <div class="page">
             <h1 class="title"><t:write-title /></h1>
@@ -64,7 +68,7 @@
         <t:if t:value="footer">
             <div class="footer">
                 <t:bind t:name="footer">
-                    <t:farkup t:name="content" />
+                    <t:farkup t:name="content" t:no-follow="true" />
                 </t:bind>
             </div>
         </t:if>
@@ -72,5 +76,7 @@
     </div>
 
     <span style="display:none"></span>
+
+	</div>
 
 </t:chloe>

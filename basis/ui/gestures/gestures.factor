@@ -1,9 +1,9 @@
 ! Copyright (C) 2005, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays ascii assocs boxes calendar classes columns
-combinators combinators.short-circuit deques fry kernel make math
+combinators combinators.short-circuit deques kernel make math
 math.order math.parser math.vectors namespaces sequences sets system
-timers ui.gadgets ui.gadgets.private words locals ;
+timers ui.gadgets ui.gadgets.private words ;
 IN: ui.gestures
 
 : get-gesture-handler ( gesture gadget -- quot )
@@ -323,8 +323,8 @@ HOOK: modifiers>string os ( modifiers -- string )
 M: macosx modifiers>string
     [
         {
-            { A+ [ "\u002318" ] }
-            { M+ [ "\u002325" ] }
+            { M+ [ "\u002318" ] }
+            { A+ [ "\u002325" ] }
             { S+ [ "\u0021e7" ] }
             { C+ [ "\u002303" ] }
         } case
@@ -379,7 +379,7 @@ M: zoom-out-action gesture>string drop "Zoom out (pinch)" ;
 HOOK: action-modifier os ( -- mod )
 
 M: object action-modifier C+ ;
-M: macosx action-modifier A+ ;
+M: macosx action-modifier M+ ;
 
 M: action gesture>string
     action-gestures value-at

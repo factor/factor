@@ -1,7 +1,7 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: dlists kernel math concurrency.promises
-concurrency.mailboxes accessors fry ;
+USING: accessors concurrency.mailboxes concurrency.promises
+kernel math ;
 IN: concurrency.count-downs
 
 ! http://java.sun.com/j2se/1.5.0/docs/api/java/util/concurrent/CountDownLatch.html

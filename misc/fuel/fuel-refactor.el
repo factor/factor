@@ -1,4 +1,4 @@
-;;; fuel-refactor.el -- code refactoring support
+;;; fuel-refactor.el -- code refactoring support -*- lexical-binding: t -*-
 
 ;; Copyright (C) 2009 Jose Antonio Ortega Ruiz
 ;; See http://factorcode.org/license.txt for BSD license.
@@ -223,8 +223,7 @@ With prefix argument, use word at point instead."
   (interactive "P")
   (let* ((from (if arg (factor-symbol-at-point) (fuel-refactor--def-word)))
          (from (read-string "Rename word: " from))
-         (to (read-string (format "Rename '%s' to: " from)))
-         (buffer (current-buffer)))
+         (to (read-string (format "Rename '%s' to: " from))))
     (fuel-refactor--rename-word from to (buffer-file-name))))
 
 

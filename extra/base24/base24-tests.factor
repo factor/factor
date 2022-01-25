@@ -1,0 +1,60 @@
+USING: base24 endian grouping kernel math.parser sequences
+tools.test ;
+
+IN: base24.tests
+
+{ 49894920630459842177293598641814316632 } [
+    "2FC28KTA66WRST4XAHRRCF237S8Z" base24> be>
+] unit-test
+
+{ 49894920630459842177293598641814316632 } [
+    "2FC2 8KTA6 6WRST 4XAHR RCF23 7S8Z" base24> be>
+] unit-test
+
+{ 49894920630459842177293598641814316632 } [
+    "2fc2 8kta6 6wrst 4xahr rcf23 7s8z" base24> be>
+] unit-test
+
+{
+  "00000000" "ZZZZZZZ"
+  "00000001" "ZZZZZZA"
+  "00000002" "ZZZZZZC"
+  "00000004" "ZZZZZZB"
+  "00000008" "ZZZZZZ4"
+  "00000010" "ZZZZZZP"
+  "00000020" "ZZZZZA4"
+  "00000040" "ZZZZZCP"
+  "00000080" "ZZZZZ34"
+  "00000100" "ZZZZZHP"
+  "00000200" "ZZZZZW4"
+  "00000400" "ZZZZARP"
+  "00000800" "ZZZZ2K4"
+  "00001000" "ZZZZFCP"
+  "00002000" "ZZZZ634"
+  "00004000" "ZZZABHP"
+  "00008000" "ZZZC4W4"
+  "00010000" "ZZZB8RP"
+  "00020000" "ZZZG5K4"
+  "00040000" "ZZZRYCP"
+  "00080000" "ZZAKX34"
+  "00100000" "ZZ229HP"
+  "00200000" "ZZEFPW4"
+  "00400000" "ZZT7GRP"
+  "00800000" "ZAAESK4"
+  "01000000" "ZCCK7CP"
+  "02000000" "ZB32E34"
+  "04000000" "Z4HETHP"
+  "08000000" "ZP9KZW4"
+  "10000000" "AG8CARP"
+  "20000000" "CSHB2K4"
+  "40000000" "3694FCP"
+  "80000000" "53PP634"
+  "CAFEBABE" "8S8ZRYX"
+  "FFFFFFFF" "X5GGBH7"
+} 2 <groups> [
+    [let
+        first2 [ hex-string>bytes ] dip :> ( a b )
+        { a } [ b base24> ] unit-test
+        { b } [ a >base24 "" like ] unit-test
+    ]
+] each

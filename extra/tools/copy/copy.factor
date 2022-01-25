@@ -15,7 +15,7 @@ IN: tools.copy
     [ unclip-last copy-files-into ] [ drop usage ] if ;
 
 : copy-to-file ( args -- )
-    dup last { [ exists? ] [ file-info directory? ] } 1&&
+    dup last { [ file-exists? ] [ file-info directory? ] } 1&&
     [ copy-to-dir ] [ first2 copy-file ] if ;
 
 : run-copy ( -- )

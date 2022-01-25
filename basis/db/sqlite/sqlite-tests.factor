@@ -5,7 +5,7 @@ math.parser namespaces sequences sorting splitting tools.test ;
 IN: db.sqlite.tests
 
 : normalize ( str -- str' )
-    " \n" split harvest " " join ;
+    " \n" split harvest join-words ;
 
 ! delete-trigger-restrict
 ${
@@ -22,7 +22,7 @@ ${
     {
         { "table-name" "TREE" }
         { "table-id" "NODE" }
-        { "foreign-table-name" "NODE"}
+        { "foreign-table-name" "NODE" }
         { "foreign-table-id" "ID" }
     } [ delete-trigger-restrict ] with-variables
     normalize
@@ -43,7 +43,7 @@ ${
     {
         { "table-name" "TREE" }
         { "table-id" "NODE" }
-        { "foreign-table-name" "NODE"}
+        { "foreign-table-name" "NODE" }
         { "foreign-table-id" "ID" }
     } [ insert-trigger ] with-variables normalize
 ] unit-test

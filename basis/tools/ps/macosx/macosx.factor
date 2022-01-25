@@ -139,7 +139,7 @@ STRUCT: kinfo_proc
     [ kinfo_proc memory>struct ] map ;
 
 : ps-arg ( kp_proc -- arg )
-    [ p_pid>> args rest " " join ] [
+    [ p_pid>> args rest join-words ] [
         drop p_comm>> 0 over index [ head ] when* >string
     ] recover ;
 

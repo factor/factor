@@ -3,8 +3,7 @@
 !
 ! Based on pattern matching code from Paul Graham's book 'On Lisp'.
 USING: assocs classes classes.tuple combinators kernel lexer
-macros make namespaces parser quotations sequences summary words
-;
+make namespaces parser quotations sequences summary words ;
 IN: match
 
 SYMBOL: _

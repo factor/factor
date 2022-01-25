@@ -97,7 +97,7 @@ SYMBOLS: out-path err-path ;
         console-vm-path "-run=listener" 2array >>command
         +closed+ >>stdin
         +stdout+ >>stderr
-    utf8 [ lines last ] with-process-reader
+    utf8 [ read-lines last ] with-process-reader
 ] unit-test
 
 : launcher-test-path ( -- str )
@@ -158,7 +158,7 @@ SYMBOLS: out-path err-path ;
     launcher-test-path [
         <process>
             console-vm-path "-script" "env.factor" 3array >>command
-        utf8 [ contents ] with-process-reader
+        utf8 [ read-contents ] with-process-reader
     ] with-directory eval( -- alist )
 
     os-envs =
@@ -170,7 +170,7 @@ SYMBOLS: out-path err-path ;
             console-vm-path "-script" "env.factor" 3array >>command
             +replace-environment+ >>environment-mode
             os-envs >>environment
-        utf8 [ contents ] with-process-reader
+        utf8 [ read-contents ] with-process-reader
     ] with-directory eval( -- alist )
 
     os-envs =
@@ -181,7 +181,7 @@ SYMBOLS: out-path err-path ;
         <process>
             console-vm-path "-script" "env.factor" 3array >>command
             { { "A" "B" } } >>environment
-        utf8 [ contents ] with-process-reader
+        utf8 [ read-contents ] with-process-reader
     ] with-directory eval( -- alist )
 
     "A" of
@@ -193,7 +193,7 @@ SYMBOLS: out-path err-path ;
             console-vm-path "-script" "env.factor" 3array >>command
             { { "USERPROFILE" "XXX" } } >>environment
             +prepend-environment+ >>environment-mode
-        utf8 [ contents ] with-process-reader
+        utf8 [ read-contents ] with-process-reader
     ] with-directory eval( -- alist )
 
     "USERPROFILE" of "XXX" =
@@ -231,7 +231,7 @@ SYMBOLS: out-path err-path ;
 
 [ "IN: scratchpad " ] [
     console-vm-path "-run=listener" 2array
-    ascii [ "USE: system 0 exit" print flush lines last ] with-process-stream
+    ascii [ "USE: system 0 exit" print flush read-lines last ] with-process-stream
 ] unit-test
 
 [ ] [

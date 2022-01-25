@@ -7,6 +7,11 @@ io.encodings.utf8 kernel math namespaces present sequences
 serialize urls ;
 IN: db.sqlite.lib
 
+: sqlite-compile-options ( -- seq )
+    0 [
+        [ 1 + ] [ sqlite3_compileoption_get ] bi dup
+    ] [ ] produce 2nip ;
+
 ERROR: sqlite-error < db-error n string ;
 
 : sqlite-other-error ( n -- * )

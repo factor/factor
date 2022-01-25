@@ -6,7 +6,7 @@ compiler.cfg compiler.cfg.build-stack-frame compiler.cfg.comparisons
 compiler.cfg.instructions compiler.cfg.intrinsics compiler.cfg.registers
 compiler.cfg.stack-frame compiler.codegen compiler.codegen.fixup
 compiler.constants compiler.units cpu.architecture cpu.ppc.assembler fry io
-kernel layouts literals locals make math math.order math.ranges memory
+kernel layouts literals locals make math math.order ranges memory
 namespaces prettyprint sequences system vm words ;
 QUALIFIED-WITH: alien.c-types c
 FROM: cpu.ppc.assembler => B ;
@@ -46,8 +46,8 @@ CONSTANT: vm-reg         16
 
 M: ppc machine-registers
     {
-        { int-regs $[ 3 12 [a,b] 17 29 [a,b] append ] }
-        { float-regs $[ 0 29 [a,b] ] }
+        { int-regs $[ 3 12 [a..b] 17 29 [a..b] append ] }
+        { float-regs $[ 0 29 [a..b] ] }
     } ;
 
 M: ppc frame-reg 31 ;

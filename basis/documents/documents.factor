@@ -1,7 +1,7 @@
 ! Copyright (C) 2006, 2009 Slava Pestov
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays fry kernel locals math math.order
-math.ranges models sequences splitting ;
+USING: accessors arrays kernel math math.order ranges
+models sequences splitting ;
 IN: documents
 
 : +col ( loc n -- newloc ) [ first2 ] dip + 2array ;
@@ -55,7 +55,7 @@ TUPLE: document < model locs undos redos inside-undo? ;
 
 : each-line ( ... from to quot: ( ... line -- ... ) -- ... )
     2over = [ 3drop ] [
-        [ [ first ] bi@ [a,b] ] dip each
+        [ [ first ] bi@ [a..b] ] dip each
     ] if ; inline
 
 : map-lines ( ... from to quot: ( ... line -- ... result ) -- ... results )
@@ -108,8 +108,8 @@ CONSTANT: doc-start { 0 0 }
 : with-undo ( ..a document quot: ( ..a document -- ..b ) -- ..b )
     [ t >>inside-undo? ] dip keep f >>inside-undo? drop ; inline
 
-: split-lines ( str -- seq )
-    [ string-lines ] keep ?last
+: ?split-lines ( str -- seq )
+    [ split-lines ] keep ?last
     [ "\r\n" member? ] [ t ] if*
     [ "" suffix ] when ;
 
@@ -117,7 +117,7 @@ PRIVATE>
 
 :: doc-range ( from to document -- string )
     from to [ [ from to ] dip document (doc-range) ] map-lines
-    "\n" join ;
+    join-lines ;
 
 : add-undo ( edit document -- )
     dup inside-undo?>> [ 2drop ] [
@@ -127,7 +127,7 @@ PRIVATE>
 
 :: set-doc-range ( string from to document -- )
     from to = string empty? and [
-        string split-lines :> new-lines
+        string ?split-lines :> new-lines
         new-lines from text+loc :> new-to
         from to document doc-range :> old-string
         old-string string from to new-to <edit> document add-undo
@@ -137,7 +137,7 @@ PRIVATE>
 
 :: set-doc-range* ( string from to document -- )
     from to = string empty? and [
-        string split-lines :> new-lines
+        string ?split-lines :> new-lines
         new-lines from text+loc :> new-to
         new-lines from to document [ (set-doc-range) ] models:change-model
         new-to document update-locs

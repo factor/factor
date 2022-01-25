@@ -762,11 +762,11 @@ mingw? [
 
 : fastcall-struct-return-ii-callback ( -- ptr )
     test-struct-11 { int int } fastcall
-    [ [ + ] [ - ] 2bi test-struct-11 <struct-boa> ] alien-callback ;
+    [ [ + ] [ - ] 2bi test-struct-11 boa ] alien-callback ;
 
 : fastcall-struct-return-iii-callback ( -- ptr )
     test-struct-11 { int int int } fastcall
-    [ [ drop + ] [ - nip ] 3bi test-struct-11 <struct-boa> ] alien-callback ;
+    [ [ drop + ] [ - nip ] 3bi test-struct-11 boa ] alien-callback ;
 
 { 8 } [
     3 4 fastcall-ii-callback [ fastcall-ii-indirect ] with-callback

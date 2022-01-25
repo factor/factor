@@ -1,10 +1,9 @@
 ! Copyright (C) 2005 Chris Double. All Rights Reserved.
 ! Copyright (C) 2018 Alexander Ilin.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays assocs concurrency.messaging
-continuations destructors fry init io io.encodings.binary
-io.servers io.sockets io.streams.duplex kernel namespaces
-sequences serialize threads ;
+USING: accessors arrays assocs continuations destructors init io
+io.encodings.binary io.servers io.sockets io.streams.duplex
+kernel namespaces sequences serialize threads ;
 FROM: concurrency.messaging => send ;
 IN: concurrency.distributed
 
@@ -78,7 +77,7 @@ M: thread (serialize)
 : stop-node ( -- )
     f local-node get insecure>> send-remote-message ;
 
-[
+STARTUP-HOOK: [
     H{ } clone \ registered-remote-threads set-global
     H{ } clone \ thread-connections set-global
-] "remote-thread-registry" add-startup-hook
+]

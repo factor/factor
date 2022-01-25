@@ -1,6 +1,6 @@
 ! Copyright (C) 2013 Jon Harper.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors calendar circular colors.constants colors.hsv
+USING: accessors calendar circular colors colors.hsv
 command-line continuations io kernel math math.parser namespaces
 openal.example sequences system timers ui ui.gadgets
 ui.pens.solid ;

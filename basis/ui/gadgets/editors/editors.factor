@@ -1,13 +1,14 @@
 ! Copyright (C) 2006, 2011 Slava Pestov
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays assocs calendar colors.constants combinators
+USING: accessors arrays assocs calendar colors combinators
 combinators.short-circuit documents documents.elements fonts fry
-grouping kernel locals make math math.functions math.order math.ranges
-math.rectangles math.vectors models models.arrow namespaces opengl
-sequences sorting splitting timers ui.baseline-alignment ui.clipboards
-ui.commands ui.gadgets ui.gadgets.borders ui.gadgets.line-support
-ui.gadgets.menus ui.gadgets.scrollers ui.gestures ui.pens.solid
-ui.render ui.text ui.theme unicode opengl.gl ;
+grouping kernel literals locals make math math.functions
+math.order ranges math.rectangles math.vectors models
+models.arrow namespaces opengl opengl.gl sequences sorting
+splitting system timers ui.baseline-alignment ui.clipboards
+ui.commands ui.gadgets ui.gadgets.borders
+ui.gadgets.line-support ui.gadgets.menus ui.gadgets.scrollers
+ui.gestures ui.pens.solid ui.render ui.text ui.theme unicode ;
 IN: ui.gadgets.editors
 
 TUPLE: editor < line-gadget
@@ -142,10 +143,10 @@ M: editor ungraft*
     [ stop-blinking ] [ f >>focused? relayout-1 ] bi ;
 
 : loc>x ( loc editor -- x )
-    [ first2 swap ] dip [ editor-line ] [ font>> ] bi swap offset>x round ;
+    [ first2 swap ] dip [ editor-line ] [ font>> ] bi swap offset>x gl-round ;
 
 : loc>point ( loc editor -- loc )
-    [ loc>x ] [ [ first ] dip line>y ceiling ] 2bi 2array ;
+    [ loc>x ] [ [ first ] dip line>y gl-ceiling ] 2bi 2array ;
 
 : caret-loc ( editor -- loc )
     [ editor-caret ] keep loc>point ;
@@ -199,16 +200,16 @@ TUPLE: selected-line start end first? last? ;
 
 : compute-selection ( editor -- assoc )
     dup gadget-selection? [
-        [ selection-start/end [ [ first ] bi@ [a,b] ] [ ] 2bi ]
+        [ selection-start/end [ [ first ] bi@ [a..b] ] [ ] 2bi ]
         [ model>> ] bi
         '[ [ _ _ ] [ _ start/end-on-line ] bi 2array ] H{ } map>assoc
     ] [ drop f ] if ;
 
 :: draw-selection ( line pair editor -- )
-    pair [ editor font>> line offset>x ] map :> pair
+    pair [ editor font>> line offset>x gl-round ] map :> pair
     editor selection-color>> gl-color
     pair first 0 2array
-    pair second pair first - round 1 max editor line-height 2array
+    pair second pair first - 1 max editor line-height 2array
     gl-fill-rect ;
 
 : draw-unselected-line ( line editor -- )
@@ -248,10 +249,11 @@ M: editor draw-gadget*
     ] if ;
 
 M: editor pref-dim*
+    [ call-next-method ] keep ! at least as big as our min-rows/min-cols
     ! Add some space for the caret.
     [ font>> ] keep dup draw-default-text?
     [ default-text>> ] [ control-value ] if
-    text-dim { 1 0 } v+ ;
+    text-dim { 1 0 } v+ vmax ;
 
 M: editor baseline font>> font-metrics ascent>> ;
 
@@ -429,12 +431,16 @@ editor "editing" f {
     { redo-action com-redo }
     { T{ key-down f f "DELETE" } delete-next-character }
     { T{ key-down f f "BACKSPACE" } delete-previous-character }
+    { T{ key-down f { S+ } "DELETE" } delete-next-character }
     { T{ key-down f { S+ } "BACKSPACE" } delete-previous-character }
-    { T{ key-down f { C+ } "DELETE" } delete-next-word }
-    { T{ key-down f { C+ } "BACKSPACE" } delete-previous-word }
-    { T{ key-down f { A+ } "DELETE" } delete-to-end-of-line }
-    { T{ key-down f { A+ } "BACKSPACE" } delete-to-start-of-line }
-} define-command-map
+    { T{ key-down f ${ os macosx? A+ C+ ? } "DELETE" } delete-next-word }
+    { T{ key-down f ${ os macosx? A+ C+ ? } "BACKSPACE" } delete-previous-word }
+    { T{ key-down f ${ os macosx? M+ A+ ? } "DELETE" } delete-to-end-of-line }
+    { T{ key-down f ${ os macosx? M+ A+ ? } "BACKSPACE" } delete-to-start-of-line }
+} os macosx? [ {
+    { T{ key-down f { C+ } "DELETE" } delete-next-character }
+    { T{ key-down f { C+ } "BACKSPACE" } delete-previous-character }
+} append ] when define-command-map
 
 : com-paste ( editor -- ) clipboard get paste-clipboard ;
 
@@ -474,17 +480,30 @@ editor "clipboard" f {
 
 : end-of-line ( editor -- ) one-line-elt editor-next ;
 
+: start-of-paragraph ( editor -- ) paragraph-elt editor-prev ;
+
+: end-of-paragraph ( editor -- ) paragraph-elt editor-next ;
+
 editor "caret-motion" f {
     { T{ button-down } position-caret }
     { T{ key-down f f "LEFT" } previous-character }
     { T{ key-down f f "RIGHT" } next-character }
-    { T{ key-down f { C+ } "LEFT" } previous-word }
-    { T{ key-down f { C+ } "RIGHT" } next-word }
+    { T{ key-down f ${ os macosx? A+ C+ ? } "LEFT" } previous-word }
+    { T{ key-down f ${ os macosx? A+ C+ ? } "RIGHT" } next-word }
     { T{ key-down f f "HOME" } start-of-line }
     { T{ key-down f f "END" } end-of-line }
-    { T{ key-down f { C+ } "HOME" } start-of-document }
-    { T{ key-down f { C+ } "END" } end-of-document }
-} define-command-map
+    { T{ key-down f ${ os macosx? A+ C+ ? } "UP" } start-of-paragraph }
+    { T{ key-down f ${ os macosx? A+ C+ ? } "DOWN" } end-of-paragraph }
+    { T{ key-down f ${ os macosx? A+ C+ ? } "HOME" } start-of-document }
+    { T{ key-down f ${ os macosx? A+ C+ ? } "END" } end-of-document }
+} os macosx? [ {
+    { T{ key-down f { M+ } "LEFT" } start-of-line }
+    { T{ key-down f { M+ } "RIGHT" } end-of-line }
+    { T{ key-down f { M+ } "UP" } start-of-paragraph }
+    { T{ key-down f { M+ } "DOWN" } end-of-paragraph }
+    { T{ key-down f { M+ } "HOME" } start-of-document }
+    { T{ key-down f { M+ } "END" } end-of-document }
+} append ] when define-command-map
 
 : clear-editor ( editor -- )
     model>> clear-doc ;
@@ -518,6 +537,12 @@ editor "caret-motion" f {
 : select-end-of-line ( editor -- )
     one-line-elt editor-select-next ;
 
+: select-start-of-paragraph ( editor -- )
+    paragraph-elt editor-select-prev ;
+
+: select-end-of-paragraph ( editor -- )
+    paragraph-elt editor-select-next ;
+
 : select-start-of-document ( editor -- )
     doc-elt editor-select-prev ;
 
@@ -535,13 +560,22 @@ editor "selection" f {
     { T{ key-down f { C+ } "l" } select-line }
     { T{ key-down f { S+ } "LEFT" } select-previous-character }
     { T{ key-down f { S+ } "RIGHT" } select-next-character }
-    { T{ key-down f { S+ C+ } "LEFT" } select-previous-word }
-    { T{ key-down f { S+ C+ } "RIGHT" } select-next-word }
+    { T{ key-down f ${ S+ os macosx? A+ C+ ? } "LEFT" } select-previous-word }
+    { T{ key-down f ${ S+ os macosx? A+ C+ ? } "RIGHT" } select-next-word }
     { T{ key-down f { S+ } "HOME" } select-start-of-line }
     { T{ key-down f { S+ } "END" } select-end-of-line }
-    { T{ key-down f { S+ C+ } "HOME" } select-start-of-document }
-    { T{ key-down f { S+ C+ } "END" } select-end-of-document }
-} define-command-map
+    { T{ key-down f ${ S+ os macosx? A+ C+ ? } "UP" } select-start-of-paragraph }
+    { T{ key-down f ${ S+ os macosx? A+ C+ ? } "DOWN" } select-end-of-paragraph }
+    { T{ key-down f ${ S+ os macosx? A+ C+ ? } "HOME" } select-start-of-document }
+    { T{ key-down f ${ S+ os macosx? A+ C+ ? } "END" } select-end-of-document }
+} os macosx? [ {
+    { T{ key-down f { S+ M+ } "LEFT" } select-start-of-line }
+    { T{ key-down f { S+ M+ } "RIGHT" } select-end-of-line }
+    { T{ key-down f { S+ M+ } "UP" } select-start-of-paragraph }
+    { T{ key-down f { S+ M+ } "DOWN" } select-end-of-paragraph }
+    { T{ key-down f { S+ M+ } "HOME" } select-start-of-document }
+    { T{ key-down f { S+ M+ } "END" } select-end-of-document }
+} append ] when define-command-map
 
 : editor-menu ( editor -- )
     {
@@ -602,10 +636,10 @@ PRIVATE>
 <PRIVATE
 
 : join-lines ( string -- string' )
-    "\n" split
+    split-lines
     [ rest-slice [ [ blank? ] trim-head-slice ] map! drop ]
     [ but-last-slice [ [ blank? ] trim-tail-slice ] map! drop ]
-    [ " " join ]
+    [ join-words ]
     tri ;
 
 : last-line? ( document line -- ? )
@@ -649,6 +683,7 @@ multiline-editor "multiline" f {
     { T{ key-down f f "RET" } insert-newline }
     { T{ key-down f { S+ } "RET" } insert-newline }
     { T{ key-down f f "ENTER" } insert-newline }
+    { T{ key-down f { S+ } "ENTER" } insert-newline }
     { T{ key-down f { C+ } "j" } com-join-lines }
 } define-command-map
 
@@ -729,3 +764,19 @@ TUPLE: action-field < field quot ;
 action-field H{
     { T{ key-down f f "RET" } [ invoke-action-field ] }
 } set-gestures
+
+: readline-bindings ( editor-class -- )
+    "readline" f {
+        { T{ key-down f { C+ } "p" } previous-line }
+        { T{ key-down f { C+ } "n" } next-line }
+        { T{ key-down f { C+ } "b" } previous-character }
+        { T{ key-down f { C+ } "f" } next-character }
+        { T{ key-down f { C+ } "a" } start-of-line }
+        { T{ key-down f { C+ } "e" } end-of-line }
+        ! { T{ key-down f { C+ } "t" } transpose-character }
+        { T{ key-down f { C+ } "d" } delete-next-character }
+        { T{ key-down f { C+ } "h" } delete-previous-character }
+        { T{ key-down f { C+ } "u" } delete-to-start-of-line }
+        { T{ key-down f { C+ } "k" } delete-to-end-of-line }
+        { T{ key-down f { C+ } "w" } delete-previous-word }
+    } define-command-map ;

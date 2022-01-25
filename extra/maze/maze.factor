@@ -1,5 +1,5 @@
 ! From http://www.ffconsultancy.com/ocaml/maze/index.html
-USING: accessors arrays fry kernel math math.order math.vectors
+USING: accessors arrays kernel math math.order math.vectors
 namespaces opengl.demo-support opengl.gl random sequences ui
 ui.gadgets ui.gadgets.canvas ui.render ;
 IN: maze

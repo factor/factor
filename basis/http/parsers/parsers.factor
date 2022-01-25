@@ -1,8 +1,7 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: combinators.short-circuit math math.order math.parser
-kernel sequences sequences.deep peg peg.parsers assocs arrays
-hashtables strings namespaces make ascii ;
+USING: arrays ascii combinators.short-circuit kernel make
+math.parser peg peg.parsers sequences sequences.deep strings ;
 IN: http.parsers
 
 : except ( quot -- parser )
@@ -11,8 +10,14 @@ IN: http.parsers
 : except-these ( quots -- parser )
     [ 1|| ] curry except ; inline
 
+: cookie-key-disallow? ( ch -- ? )
+    " \t,;=" member? ;
+
 : tspecial? ( ch -- ? )
     "()<>@,;:\\\"/[]?={} \t" member? ;
+
+: cookie-key-parser ( -- parser )
+    { [ control? ] [ cookie-key-disallow? ] } except-these repeat1 ;
 
 : token-parser ( -- parser )
     { [ control? ] [ tspecial? ] } except-these repeat1 ;
@@ -30,7 +35,7 @@ IN: http.parsers
     [ token ] map choice ;
 
 : http-method-parser ( -- parser )
-    { "OPTIONS" "GET" "HEAD" "POST" "PUT" "DELETE" "TRACE" "CONNECT" } one-of ;
+    { "OPTIONS" "GET" "HEAD" "POST" "PUT" "DELETE" "TRACE" "CONNECT" "PATCH" } one-of ;
 
 : url-parser ( -- parser )
     [ " \t\r\n" member? ] except repeat1 case-sensitive ;
@@ -144,7 +149,7 @@ PEG: parse-header-line ( string -- pair )
     2choice case-sensitive ;
 
 : attr-parser ( -- parser )
-    token-parser case-sensitive ;
+    cookie-key-parser case-sensitive ;
 
 : av-pair-parser ( -- parser )
     [

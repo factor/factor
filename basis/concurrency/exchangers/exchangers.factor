@@ -1,6 +1,6 @@
 ! Copyright (C) 2008, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel threads boxes accessors fry ;
+USING: accessors boxes kernel threads ;
 IN: concurrency.exchangers
 
 ! Motivated by

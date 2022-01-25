@@ -2,12 +2,13 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors alien alien.c-types alien.data alien.enums
 alien.strings assocs byte-arrays classes.struct combinators
-combinators.short-circuit destructors fry io io.backend
-io.binary io.buffers io.encodings.latin1 io.encodings.utf8
-io.files io.pathnames io.ports io.sockets io.sockets.secure
-io.timeouts kernel libc locals math math.functions math.order
-math.parser memoize namespaces openssl openssl.libcrypto
+combinators.short-circuit destructors endian io io.backend
+io.buffers io.encodings.latin1 io.encodings.string
+io.encodings.utf8 io.files io.pathnames io.ports io.sockets
+io.sockets.secure io.timeouts kernel libc math math.functions
+math.order math.parser namespaces openssl openssl.libcrypto
 openssl.libssl random sequences sets splitting unicode ;
+SLOT: alpn-supported-protocols
 IN: io.sockets.secure.openssl
 
 GENERIC: ssl-method ( symbol -- method )
@@ -15,27 +16,18 @@ M: TLSv1 ssl-method drop TLSv1_method ;
 M: TLSv1.1 ssl-method drop TLSv1_1_method ;
 M: TLSv1.2 ssl-method drop TLSv1_2_method ;
 
-MEMO: make-cipher-list ( -- string )
+CONSTANT: weak-ciphers-for-compatibility
     {
-        "ECDHE-ECDSA-AES256-GCM-SHA384"
+        ! Weak 12/28/2021, included for compatibility for now
         "ECDHE-ECDSA-AES256-SHA384"
-        "ECDHE-ECDSA-AES128-GCM-SHA256"
         "ECDHE-ECDSA-AES128-SHA256"
         "ECDHE-RSA-AES256-GCM-SHA384"
         "ECDHE-RSA-AES256-SHA384"
-        "ECDHE-RSA-AES128-GCM-SHA256"
         "ECDHE-RSA-AES128-SHA256"
-        "ECDHE-ECDSA-AES256-CCM8"
-        "ECDHE-ECDSA-AES256-CCM"
-        "ECDHE-ECDSA-AES128-CCM8"
-        "ECDHE-ECDSA-AES128-CCM"
-        "ECDHE-ECDSA-CAMELLIA256-SHA384"
         "ECDHE-RSA-CAMELLIA256-SHA384"
-        "ECDHE-ECDSA-CAMELLIA128-SHA256"
         "ECDHE-RSA-CAMELLIA128-SHA256"
-        "ECDHE-RSA-CHACHA20-POLY1305"
-        "ECDHE-ECDSA-CHACHA20-POLY1305"
-        "ECDHE-PSK-CHACHA20-POLY1305"
+        "ECDHE-ECDSA-CAMELLIA256-SHA384"
+        "ECDHE-ECDSA-CAMELLIA128-SHA256"
         "AES256-SHA"
         "AES128-SHA256"
         "AES128-SHA"
@@ -43,7 +35,33 @@ MEMO: make-cipher-list ( -- string )
         "CAMELLIA128-SHA"
         "IDEA-CBC-SHA"
         "DES-CBC3-SHA"
-    } ":" join ;
+    }
+
+MEMO: make-cipher-list ( -- string )
+    {
+        ! https://ciphersuite.info/cs/?security=recommended&software=openssl&singlepage=true
+        ! Recommended 12/28/2021
+        "ECDHE-ECDSA-AES256-GCM-SHA384"
+        "ECDHE-ECDSA-AES128-GCM-SHA256"
+        "ECDHE-ECDSA-CHACHA20-POLY1305"
+        "ECDHE-PSK-CHACHA20-POLY1305"
+        "DHE-DSS-AES256-GCM-SHA384"
+        "DHE-DSS-AES128-GCM-SHA256"
+        "DHE-PSK-AES256-GCM-SHA384"
+        "DHE-PSK-AES128-GCM-SHA256"
+        "DHE-PSK-CHACHA20-POLY1305"
+
+        ! Secure 12/28/2021
+        "ECDHE-RSA-AES128-GCM-SHA256"
+        "ECDHE-ECDSA-AES256-CCM8"
+        "ECDHE-ECDSA-AES256-CCM"
+        "ECDHE-ECDSA-AES128-CCM8"
+        "ECDHE-ECDSA-AES128-CCM"
+        "ECDHE-RSA-CHACHA20-POLY1305"
+    }
+    ! XXX: Weak ciphers
+    weak-ciphers-for-compatibility append
+    ":" join ;
 
 TUPLE: openssl-context < secure-context aliens sessions ;
 
@@ -73,7 +91,7 @@ PRIVATE>
 ERROR: file-expected path ;
 
 : ensure-exists ( path -- path )
-    dup exists? [ file-expected ] unless ; inline
+    dup file-exists? [ file-expected ] unless ; inline
 
 : ssl-file-path ( path -- path' )
     absolute-path ensure-exists ;
@@ -186,7 +204,7 @@ M: openssl-context dispose*
         tri
     ] with-destructors ;
 
-TUPLE: ssl-handle < disposable file handle connected ;
+TUPLE: ssl-handle < disposable file handle connected terminated ;
 
 SYMBOL: default-secure-context
 
@@ -215,10 +233,57 @@ SYMBOL: default-secure-context
         set-secure-cipher-list-only
     ] with-destructors ;
 
+<PRIVATE
+
+: alpn_select_cb_func ( -- alien )
+    [|  ssl out outlen in inlen arg |
+        ! if alpn-protocols is empty return err noack
+
+        ! current-secure-context relies on secure-context
+        ! variable being set. if this is not set in a callback,
+        ! we need some other way of accessing it (probably
+        ! passing it as arg to SSL_CTX_set_alpn_select_cb, but
+        ! need to make sure that stays defined as long as the
+        ! callback can be called)
+        current-secure-context config>> alpn-supported-protocols>>
+        [ SSL_TLSEXT_ERR_NOACK ]
+        [ [ out outlen ] dip
+          ! convert alpn-protocols from list of strings to
+          ! c-string in wire format and length.
+          ! see https://www.openssl.org/docs/manmaster/man3/SSL_set_alpn_protos.html
+          [ utf8 encode dup length prefix ] map
+          concat dup length
+          in inlen SSL_select_next_proto
+          ! the function returns OPENSSL_NPN_NO_OVERLAP when no
+          ! match is found, otherwise OPENSSL_NPN_NEGOTIATED
+          OPENSSL_NPN_NEGOTIATED =
+          [ ! DOUBLECHECK: The value in out is already copied
+            ! from the original, so we can just leave it and
+            ! return... otherwise this detail needs to be ironed
+            ! out, probably by finding the entry in in that out
+            ! is identical to. (out needs to point directly into
+            ! in, or a buffer that will outlive the tls
+            ! handshake.)
+            SSL_TLSEXT_ERR_OK ]
+          [ SSL_TLSEXT_ERR_ALERT_FATAL ] if
+        ] if-empty
+    ] SSL_CTX_alpn_select_cb_func ;
+
+: get_alpn_selected_wrapper ( ssl* -- alpn_string/f )
+    { c-string int } [ SSL_get0_alpn_selected ] with-out-parameters
+    drop ! how do we unbox the c-string?
+    ! also, the string is not null-terminated, is that problematic?
+    ;
+
+PRIVATE>
+
 :: <ssl-socket> ( winsock hostname -- ssl )
     winsock socket-handle BIO_NOCLOSE BIO_new_socket dup ssl-error :> bio
     winsock <ssl-handle> :> handle
     handle handle>> :> native-handle
+    current-secure-context config>> alpn-supported-protocols>>
+    [ drop native-handle ctx>> alpn_select_cb_func f SSL_CTX_set_alpn_select_cb ]
+    unless-empty
     hostname [
         utf8 string>alien
         native-handle swap SSL_set_tlsext_host_name ssl-error
@@ -226,73 +291,82 @@ SYMBOL: default-secure-context
     native-handle bio bio SSL_set_bio
     handle ;
 
-! Error handling
-: syscall-error ( r -- event )
-    ERR_get_error [
-        {
-            { -1 [
-                errno ECONNRESET = [ premature-close ]
-                [ throw-errno ] if
-            ] }
-            ! OpenSSL docs say this it is an error condition for
-            ! a server to not send a close notify, but web
-            ! servers in the wild don't seem to do this, for
-            ! example https://www.google.com.
-            { 0 [ f ] }
-        } case
-    ] [ nip (ssl-error) ] if-zero ;
+: ssl-error-syscall ( ssl-handle -- event/f )
+    f >>connected
+    t >>terminated drop
+    ERR_get_error {
+        { -1 [
+            errno ECONNRESET =
+            [ premature-close-error ] [ throw-errno ] if f
+        ] }
+        ! https://stackoverflow.com/questions/13686398/ssl-read-failing-with-ssl-error-syscall-error
+        ! 0 means EOF
+        { 0 [ f ] }
+    } case ;
 
-: check-ssl-error ( ssl ret exra-cases/f -- event/f )
-    [ tuck SSL_get_error ] dip
+: check-ssl-error ( ssl-handle ret -- event/f )
+    [ drop ] [ [ handle>> ] dip SSL_get_error ] 2bi
     {
         { SSL_ERROR_NONE [ drop f ] }
         { SSL_ERROR_WANT_READ [ drop +input+ ] }
         { SSL_ERROR_WANT_WRITE [ drop +output+ ] }
-        { SSL_ERROR_SYSCALL [ syscall-error ] }
-        { SSL_ERROR_SSL [ drop (ssl-error) ] }
-    } append [ [ execute( -- n ) ] dip ] assoc-map
-    at [ call( x -- y ) ] [ no-cond ] if* ;
+        { SSL_ERROR_SYSCALL [ ssl-error-syscall ] }
+        { SSL_ERROR_SSL [ drop throw-ssl-error ] }
+        ! https://stackoverflow.com/questions/50223224/ssl-read-returns-ssl-error-zero-return-but-err-get-error-is-0
+        ! there are no more bytes to read
+        { SSL_ERROR_ZERO_RETURN [ drop f ] }
+        { SSL_ERROR_WANT_ACCEPT [ drop +input+ ] }
+    } case ;
 
 ! Accept
-: do-ssl-accept-once ( ssl -- event/f )
-    dup SSL_accept {
-        { SSL_ERROR_ZERO_RETURN [ (ssl-error) ] }
-        { SSL_ERROR_WANT_ACCEPT [ drop +input+ ] }
-    } check-ssl-error ;
+: do-ssl-accept-once ( ssl-handle -- event/f )
+    dup handle>> SSL_accept check-ssl-error ;
 
 : do-ssl-accept ( ssl-handle -- )
-    dup handle>> do-ssl-accept-once
+    dup do-ssl-accept-once
     [ [ dup file>> ] dip wait-for-fd do-ssl-accept ] [ drop ] if* ;
 
 : maybe-handshake ( ssl-handle -- )
     dup connected>> [ drop ] [
-        [ [ do-ssl-accept ] with-timeout ]
-        [ t swap connected<< ] bi
+        dup terminated>> [
+            drop
+        ] [
+            [ [ do-ssl-accept ] with-timeout ]
+            [ t swap connected<< ] bi
+        ] if
     ] if ;
 
 ! Input ports
-: do-ssl-read ( buffer ssl -- event/f )
-    2dup swap [ buffer-end ] [ buffer-capacity ] bi SSL_read [
-        { { SSL_ERROR_ZERO_RETURN [ drop f ] } } check-ssl-error
-    ] keep swap [ 2nip ] [ swap buffer+ f ] if* ;
+: do-ssl-read ( buffer ssl-handle -- event/f )
+    2dup handle>> swap [ buffer-end ] [ buffer-capacity ] bi SSL_read
+    [ check-ssl-error ] keep swap [ 2nip ] [
+        dup 0 > [ swap buffer+ ] [ 2drop ] if f
+    ] if* ;
+
+: throw-if-terminated ( ssl-handle -- ssl-handle )
+    dup terminated>> [ premature-close-error ] when ;
 
 M: ssl-handle refill
-    dup maybe-handshake [ buffer>> ] [ handle>> ] bi* do-ssl-read ;
+    throw-if-terminated
+    dup maybe-handshake [ buffer>> ] dip do-ssl-read ;
 
 ! Output ports
-: do-ssl-write ( buffer ssl -- event/f )
-    2dup swap [ buffer@ ] [ buffer-length ] bi SSL_write
-    [ f check-ssl-error ] keep swap [ 2nip ] [ swap buffer-consume f ] if* ;
+: do-ssl-write ( buffer ssl-handle -- event/f )
+    2dup handle>> swap [ buffer@ ] [ buffer-length ] bi SSL_write
+    [ check-ssl-error ] keep swap [ 2nip ] [
+        dup 0 > [ swap buffer-consume ] [ 2drop ] if f
+    ] if* ;
 
 M: ssl-handle drain
-    dup maybe-handshake [ buffer>> ] [ handle>> ] bi* do-ssl-write ;
+    throw-if-terminated
+    dup maybe-handshake [ buffer>> ] dip do-ssl-write ;
 
 ! Connect
-: do-ssl-connect-once ( ssl -- event/f )
-    dup SSL_connect f check-ssl-error ;
+: do-ssl-connect-once ( ssl-handle -- event/f )
+    dup handle>> SSL_connect check-ssl-error ;
 
 : do-ssl-connect ( ssl-handle -- )
-    dup handle>> do-ssl-connect-once
+    dup do-ssl-connect-once
     [ dupd wait-for-fd do-ssl-connect ] [ drop ] if* ;
 
 : resume-session ( ssl-handle ssl-session -- )

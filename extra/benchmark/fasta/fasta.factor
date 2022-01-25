@@ -1,7 +1,7 @@
 ! Based on http://shootout.alioth.debian.org/gp4/benchmark.php?test=fasta&lang=java&id=2
-USING: assocs benchmark.reverse-complement byte-arrays fry io
-io.encodings.ascii io.files locals kernel math sequences
-sequences.private specialized-arrays strings typed alien.data ;
+USING: alien.data assocs benchmark.reverse-complement
+byte-arrays io io.encodings.ascii io.files kernel math sequences
+sequences.private specialized-arrays strings typed ;
 QUALIFIED-WITH: alien.c-types c
 SPECIALIZED-ARRAY: c:double
 IN: benchmark.fasta
@@ -58,14 +58,14 @@ TYPED: make-random-fasta ( seed: float len: fixnum chars: byte-array floats: dou
 : write-description ( desc id -- )
     ">" write write bl print ;
 
-:: split-lines ( n quot -- )
+:: n-split-lines ( n quot -- )
     n line-length /mod
     [ [ line-length quot call ] times ] dip
     quot unless-zero ; inline
 
 TYPED: write-random-fasta ( seed: float n: fixnum chars: byte-array floats: double-array desc id -- seed: float )
     write-description
-    '[ _ _ make-random-fasta ] split-lines ;
+    '[ _ _ make-random-fasta ] n-split-lines ;
 
 TYPED:: make-repeat-fasta ( k: fixnum len: fixnum alu: string -- k': fixnum )
     alu length :> kn
@@ -77,7 +77,7 @@ TYPED:: make-repeat-fasta ( k: fixnum len: fixnum alu: string -- k': fixnum )
     [let
         :> alu
         0 :> k!
-        [| len | k len alu make-repeat-fasta k! ] split-lines
+        [| len | k len alu make-repeat-fasta k! ] n-split-lines
     ] ;
 
 : fasta ( n out -- )

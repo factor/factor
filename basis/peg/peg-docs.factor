@@ -93,7 +93,7 @@ HELP: optional
 }
 { $description
     "Returns a parser that parses 0 or 1 instances of the " { $snippet "parser" } ". The AST produced is "
-    { $link f } " if 0 instances are parsed the AST produced is " { $link f } ", otherwise it is the AST produced by " { $snippet "parser" } "." } ;
+    { $link f } " if 0 instances are parsed, otherwise it is the AST produced by " { $snippet "parser" } "." } ;
 
 HELP: semantic
 { $values

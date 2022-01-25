@@ -193,26 +193,26 @@ HELP: stack
 { $description "Joins the sequences in " { $snippet "seq" } " along a new axis. "
 { $snippet "tensor" } " will have one more dimension than the arrays in " { $snippet "seq" } "." } 
 { $errors "Throws a " { $link shape-mismatch-error } " if the sequences in "
-{ $snippet "seq" } " do not have the same shape."} ;
+{ $snippet "seq" } " do not have the same shape." } ;
 
 
 HELP: hstack 
 { $values { "seq" sequence } { "tensor" tensor } } 
 { $description "Joins the sequences in " { $snippet "seq" } " column-wise." }
 { $errors "Throws a " { $link shape-mismatch-error } " if the sequences in "
-{ $snippet "seq" } " do not have the same shape along all but the second axis."} ;
+{ $snippet "seq" } " do not have the same shape along all but the second axis." } ;
 
 HELP: vstack 
 { $values { "seq" sequence } { "tensor" tensor } } 
 { $description "Joins the sequences in " { $snippet "seq" } " row-wise." }
 { $errors "Throws a " { $link shape-mismatch-error } " if the sequences in "
-{ $snippet "seq" } " do not have the same shape along all but the first axis."} ;
+{ $snippet "seq" } " do not have the same shape along all but the first axis." } ;
 
 HELP: t-concat
 { $values { "seq" sequence } { "tensor" tensor } } 
 { $description "Joins the sequences in " { $snippet "seq" } " along the first axis." }
 { $errors "Throws a " { $link shape-mismatch-error } " if the sequences in "
-{ $snippet "seq" } " do not have the same shape along all but the first axis."} ;
+{ $snippet "seq" } " do not have the same shape along all but the first axis." } ;
 
 
 ABOUT: "tensors"

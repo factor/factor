@@ -1,9 +1,13 @@
 ! Copyright (C) 2016 Nicolas Pénet.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: assocs fonts fry hashtables help.stylesheet help.tips
-io.styles kernel listener namespaces prettyprint.stylesheet
-sequences ui.theme ui.tools.listener vocabs.prettyprint words ;
+USING: assocs fonts hashtables help.stylesheet help.tips
+io.styles kernel listener memoize namespaces
+prettyprint.stylesheet sequences ui.gadgets.panes.private
+ui.theme ui.tools.listener vocabs.prettyprint words ;
 IN: ui.theme.switching
+
+SYMBOL: default-theme?
+t default-theme? set-global
 
 <PRIVATE
 
@@ -15,14 +19,20 @@ IN: ui.theme.switching
     text-color default-font-foreground-color set-global
     content-background default-font-background-color set-global
 
+    ! ui.gadgets.panes
+    \ specified-font reset-memoized
+
     ! help.stylesheet
     default-style text-color foreground update-style
     link-style link-color foreground update-style
     title-style title-color foreground update-style
+    title-style help-header-background page-color update-style
+    help-path-style text-color foreground update-style
     help-path-style help-path-border-color table-border update-style
     heading-style heading-color foreground update-style
     snippet-style snippet-color foreground update-style
     code-style code-background-color page-color update-style
+    code-style text-color foreground update-style
     output-style output-color foreground update-style
     url-style link-color foreground update-style
     warning-style warning-background-color page-color update-style
@@ -58,7 +68,13 @@ IN: ui.theme.switching
 PRIVATE>
 
 : switch-theme ( theme -- )
-    theme set-global update-stylesheet ;
+    theme set-global update-stylesheet
+    f default-theme? set-global ;
+
+: switch-theme-if-default ( theme -- )
+    default-theme? get [
+        switch-theme t default-theme? set-global
+    ] [ drop ] if ;
 
 : light-mode ( -- ) light-theme switch-theme ;
 

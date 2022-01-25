@@ -1,21 +1,19 @@
 ! Copyright (C) 2007, 2008 Chris Double, Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors fry kernel literals make math math.parser
-math.ranges peg peg.private sequences splitting strings unicode
+ranges peg peg.private sequences splitting strings unicode
 vectors ;
 FROM: peg.search => replace ;
 IN: peg.parsers
 
 TUPLE: just-parser p1 ;
 
-CONSTANT: just-pattern [
-    dup [
-        dup remaining>> empty? [ drop f ] unless
-    ] when
-]
-
 M: just-parser (compile)
-    p1>> compile-parser-quot just-pattern compose ;
+    p1>> compile-parser-quot [
+        dup [
+            dup remaining>> empty? [ drop f ] unless
+        ] when
+    ] compose ;
 
 : just ( parser -- parser )
     just-parser boa wrap-peg ;
@@ -89,7 +87,7 @@ PRIVATE>
         [ CHAR: - = ] satisfy hide ,
         any-char ,
     ] seq* [
-        first2 [a,b] >string
+        first2 [a..b] >string
     ] action replace ;
 
 : range-pattern ( pattern -- parser )
@@ -102,7 +100,8 @@ PRIVATE>
     ! range of characters from the first to the second,
     ! inclusive.
     "^" ?head [
-        (range-pattern) '[ _ member? not ] satisfy
+        (range-pattern) dup length 1 =
+        [ first '[ _ = ] ] [ '[ _ member? ] ] if
     ] [
-        (range-pattern) '[ _ member? ] satisfy
-    ] if ;
+        [ [ not ] compose ] when satisfy
+    ] bi* ;

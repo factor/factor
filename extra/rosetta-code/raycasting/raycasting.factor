@@ -1,6 +1,6 @@
 ! Copyright (c) 2012 Anonymous
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel prettyprint sequences arrays math math.vectors ;
+USING: kernel math math.vectors sequences ;
 IN: rosetta-code.raycasting
 
 

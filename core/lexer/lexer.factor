@@ -1,8 +1,8 @@
 ! Copyright (C) 2008, 2010 Slava Pestov, Joe Groff.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays classes combinators continuations io
-kernel kernel.private math math.parser namespaces sequences
-sequences.private source-files.errors strings vectors ;
+kernel math math.parser namespaces sequences source-files.errors
+strings vectors ;
 IN: lexer
 
 TUPLE: lexer
@@ -44,19 +44,12 @@ TUPLE: lexer-parsing-word word line line-text column ;
 
 ERROR: unexpected want got ;
 
-: forbid-tab ( c -- c )
-    [ CHAR: \t eq? [ "[space]" "[tab]" unexpected ] when ] keep ; inline
-
-: skip ( i seq ? -- n )
-    over length [
-        [ swap forbid-tab CHAR: \s eq? xor ] curry find-from drop
-    ] dip or ; inline
-
 : change-lexer-column ( ..a lexer quot: ( ..a col line -- ..b newcol ) -- ..b )
     [ lexer check-instance [ column>> ] [ line-text>> ] bi ] prepose
     keep column<< ; inline
 
-GENERIC: skip-blank ( lexer -- )
+: forbid-tab ( c -- c )
+    [ CHAR: \t eq? [ "[space]" "[tab]" unexpected ] when ] keep ; inline
 
 <PRIVATE
 
@@ -67,21 +60,29 @@ GENERIC: skip-blank ( lexer -- )
         ] [ f ] if
     ] [ f ] if ; inline
 
+: (skip-blank) ( col line -- newcol )
+    [ [ forbid-tab CHAR: \s eq? not ] find-from drop ]
+    [ length or ] bi ;
+
+: (skip-word) ( col line -- newcol )
+    [ [ forbid-tab " \"" member-eq? ] find-from CHAR: \" eq? [ 1 + ] when ]
+    [ length or ] bi ;
+
 PRIVATE>
+
+GENERIC: skip-blank ( lexer -- )
 
 M: lexer skip-blank
     shebang? [
         [ nip length ] change-lexer-column
     ] [
-        [ t skip ] change-lexer-column
+        [ (skip-blank) ] change-lexer-column
     ] if ;
 
 GENERIC: skip-word ( lexer -- )
 
 M: lexer skip-word
-    [
-        2dup nth CHAR: \" eq? [ drop 1 + ] [ f skip ] if
-    ] change-lexer-column ;
+    [ (skip-word) ] change-lexer-column ;
 
 : still-parsing? ( lexer -- ? )
     lexer check-instance [ line>> ] [ text>> length ] bi <= ;

@@ -1,7 +1,7 @@
 ! Copyright (C) 2009 Joe Groff.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: tools.test generalizations kernel math arrays sequences
-sequences.generalizations ascii fry math.parser io io.streams.string ;
+USING: io io.streams.string kernel math sequences
+sequences.generalizations tools.test ;
 IN: sequences.generalizations.tests
 
 { 1 2 3 4 } [ { 1 2 3 4 } 4 firstn ] unit-test

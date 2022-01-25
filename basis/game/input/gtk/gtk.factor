@@ -1,8 +1,10 @@
 ! Copyright (C) 2010 Erik Charlebois, William Schlieper.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors alien.c-types alien.data alien.syntax assocs
-bit-arrays game.input gdk.ffi generalizations kernel math
-namespaces sequences system x11.xlib ;
+USING: accessors alien.c-types alien.data alien.syntax arrays
+assocs bit-arrays destructors game.input gdk.ffi
+io.encodings.binary io.files kernel linux.input-events
+linux.input-events.ffi math namespaces sequences
+system unix.ffi x11.xlib ;
 IN: game.input.gtk
 
 SINGLETON: gtk-game-input-backend
@@ -11,6 +13,20 @@ gtk-game-input-backend game-input-backend set-global
 
 LIBRARY: gdk
 FUNCTION: Display* gdk_x11_display_get_xdisplay ( GdkDisplay* display )
+
+TUPLE: linux-controller < controller path meta state thread fd buttons quit? ;
+: <linux-controller> ( path -- controller )
+    linux-controller new
+        swap >>path
+        dup path>> get-event-device-info >>meta
+        dup meta>> "path" of binary <file-reader> handle>> fd>> >>fd
+        H{ } clone >>state
+        dup meta>> "capabilities" of EV_KEY of keys seq>explode-positions >>buttons ; inline
+        ! swap over state>> '[ _ _ read-events ] in-thread ;
+
+M: linux-controller dispose* fd>> close drop ;
+
+TUPLE: linux-controller-state < controller-state abs ;
 
 : get-dpy ( -- dpy )
     gdk_display_get_default [ gdk_x11_display_get_xdisplay ] [
@@ -27,19 +43,22 @@ M: gtk-game-input-backend (reset-game-input)
     ;
 
 M: gtk-game-input-backend get-controllers
-    { } ;
+    get-input-events-joysticks values [ <linux-controller> ] map ;
 
 M: gtk-game-input-backend product-string
-    drop "" ;
+    meta>> "name" of ;
 
 M: gtk-game-input-backend product-id
-    drop f ;
+    meta>> "id" of ;
 
 M: gtk-game-input-backend instance-id
     drop f ;
 
 M: gtk-game-input-backend read-controller
-    drop controller-state new ;
+    [ linux-controller-state new ] dip
+    [ fd>> ] [ meta>> ] bi
+    [ drop evdev-get-key seq>explode-positions [ <INPUT_KEY> ] zip-with >>buttons ]
+    [ "capabilities" of EV_ABS of [ [ first first evdev-get-abs ] [ first ] bi swap 2array ] with map >>abs ] 2bi ;
 
 M: gtk-game-input-backend calibrate-controller
     drop ;

@@ -1,7 +1,7 @@
 USING: accessors arrays assocs classes classes.algebra classes.mixin
 classes.mixin.private classes.union.private compiler.units definitions
-eval hashtables kernel math parser sequences source-files strings
-tools.test vectors words ;
+eval hashtables kernel math parser sequences source-files splitting
+strings tools.test vectors words ;
 IN: classes.mixin.tests
 
 ! Test mixins
@@ -60,7 +60,7 @@ USE: io.streams.string
             "INSTANCE: sequence mixin-forget-test"
             "GENERIC: mixin-forget-test-g ( x -- y )"
             "M: mixin-forget-test mixin-forget-test-g ;"
-        } "\n" join <string-reader> "mixin-forget-test"
+        } join-lines <string-reader> "mixin-forget-test"
         parse-stream drop
     ] unit-test
 
@@ -75,7 +75,7 @@ USE: io.streams.string
             "INSTANCE: hashtable mixin-forget-test"
             "GENERIC: mixin-forget-test-g ( x -- y )"
             "M: mixin-forget-test mixin-forget-test-g ;"
-        } "\n" join <string-reader> "mixin-forget-test"
+        } join-lines <string-reader> "mixin-forget-test"
         parse-stream drop
     ] unit-test
 

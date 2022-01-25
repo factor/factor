@@ -6,38 +6,38 @@ sorting tools.test ;
 
 IN: redis.tests
 
-: with-redis ( quot -- )
+: with-redis-test ( quot -- )
     [ redis-flushdb ] prepose
-    <redis> swap redis:with-redis ; inline
+    <redis> swap with-redis ; inline
 
-{ -1 } [ [ "foo" redis-decr ] with-redis ] unit-test
+{ -1 } [ [ "foo" redis-decr ] with-redis-test ] unit-test
 
-{ 1 } [ [ "foo" redis-incr ] with-redis ] unit-test
+{ 1 } [ [ "foo" redis-incr ] with-redis-test ] unit-test
 
 { -2 } [
-    [ 2 "foo" redis-decrby ] with-redis
+    [ 2 "foo" redis-decrby ] with-redis-test
 ] unit-test
 
-{ 2 } [ [ 2 "foo" redis-incrby ] with-redis ] unit-test
+{ 2 } [ [ 2 "foo" redis-incrby ] with-redis-test ] unit-test
 
 { "hello" } [
     [
         "hello" "foo" redis-set
         "foo" redis-get
-    ] with-redis
+    ] with-redis-test
 ] unit-test
 
 { { "aa" "ab" "ac" } } [
     [
         { "aa" "ab" "ac" "bd" } [ "hello" swap redis-set ] each
         "a*" redis-keys natural-sort
-    ] with-redis
+    ] with-redis-test
 ] unit-test
 
 { "hello" } [
     [
         "world" "hello" redis-set redis-randomkey
-    ] with-redis
+    ] with-redis-test
 ] unit-test
 
 { { "3" "2" "1" } "1" "5" "3" } [
@@ -48,7 +48,7 @@ IN: redis.tests
         0 -1 "list" redis-lrange
         "5" 1 "list" redis-lset
         3 [ "list" redis-rpop ] times
-    ] with-redis
+    ] with-redis-test
 ] unit-test
 
 { { "world" } "1" 2 } [
@@ -57,12 +57,12 @@ IN: redis.tests
         "hello" redis-hkeys
         "world" "hello" redis-hget
         1 "world" "hello" redis-hincrby
-    ] with-redis
+    ] with-redis-test
 ] unit-test
 
 { t } [
     [
         "world" "hello" redis-set
         [ "hello" redis-incr ] [ drop t ] recover
-    ] with-redis
+    ] with-redis-test
 ] unit-test

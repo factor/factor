@@ -1,22 +1,21 @@
 ! Copyright (C) 2020 John Benediktsson
 ! See http://factorcode.org/license.txt for BSD license
 USING: accessors arrays assocs bencode byte-arrays byte-vectors
-calendar checksums checksums.sha combinators destructors fry
-grouping http.client io io.binary io.encodings.binary io.files
+calendar checksums checksums.sha combinators destructors endian
+grouping http.client io io.encodings.binary io.files
 io.pathnames io.sockets io.streams.byte-array io.streams.duplex
-kernel literals locals make math math.bitwise math.functions
-math.order math.parser math.ranges multiline namespaces
-prettyprint random sequences splitting strings timers
-tools.annotations ui ui.gadgets.panes ui.tools.listener urls ;
+kernel literals make math math.bitwise math.functions math.order
+math.parser namespaces random ranges sequences splitting strings
+timers ui ui.gadgets.panes ui.tools.listener urls ;
 
 IN: bittorrent
 
 <<
 CONSTANT: ALPHANUMERIC $[
     [
-        CHAR: a CHAR: z [a,b] %
-        CHAR: A CHAR: Z [a,b] %
-        CHAR: 0 CHAR: 9 [a,b] %
+        CHAR: a CHAR: z [a..b] %
+        CHAR: A CHAR: Z [a..b] %
+        CHAR: 0 CHAR: 9 [a..b] %
         ".-_~" %
     ] { } make
 ]
@@ -97,6 +96,24 @@ M: string load-metainfo
             { "info" "length" } [ of ] each
             "left" set-query-param
         ]
+    } cleave ;
+
+TUPLE: magnet display-name exact-length exact-topic
+web-seed acceptable-source exact-source keyword-topic
+manifest-topic address-tracker ;
+
+: magnet-link>magnet ( url -- magnet-url )
+    [ magnet new ] dip
+    >url query>> {
+        [ "dn" of >>display-name ]
+        [ "xl" of >>exact-length ]
+        [ "xt" of >>exact-topic ]
+        [ "ws" of >>web-seed ]
+        [ "as" of >>acceptable-source ]
+        [ "xs" of >>exact-source ]
+        [ "kt" of >>keyword-topic ]
+        [ "mt" of >>manifest-topic ]
+        [ "tr" of >>address-tracker ]
     } cleave ;
 
 : parse-peer4 ( peerbin -- inet4 )

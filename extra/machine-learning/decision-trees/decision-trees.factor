@@ -1,7 +1,8 @@
 ! Copyright (C) 2018 Björn Lindqvist
 ! See http://factorcode.org/license.txt for BSD license
-USING: accessors assocs fry grouping.extras kernel locals math
-math.functions math.statistics sequences sequences.extras sorting ;
+USING: accessors assocs grouping.extras kernel math
+math.functions math.statistics sequences sequences.extras
+sorting ;
 IN: machine-learning.decision-trees
 
 ! Why convert the logarithm to base 2? I don't know.

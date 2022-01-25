@@ -1,2 +1,8 @@
 include vm/Config.macosx
 include vm/Config.x86.64
+
+TARGET = -target x86_64-apple-darwin
+
+PLAF_MASTER_HEADERS += vm/os-macosx-x86.64.hpp
+
+SITE_CFLAGS += -mmacosx-version-min=10.9

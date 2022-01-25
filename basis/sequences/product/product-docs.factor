@@ -61,7 +61,7 @@ HELP: product-each
 HELP: product-find
 { $values { "sequences" sequence } { "quot" { $quotation ( ... seq -- ... ? ) } } { "sequence" sequence } }
 { $description "Calls " { $snippet "quot" } " for every element of the cartesian product of " { $snippet "sequences" } ", returning the first sequence where the quotation returns a true value." }
-{ $notes { $snippet "[ ... ] product-each" } " is equivalent to, but more efficient than, " { $snippet "<product-sequence> [ ... ] find" } "." } ;
+{ $notes { $snippet "[ ... ] product-find" } " is equivalent to, but more efficient than, " { $snippet "<product-sequence> [ ... ] find nip" } "." } ;
 
 { product-map product-each product-find } related-words
 

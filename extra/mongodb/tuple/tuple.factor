@@ -1,9 +1,7 @@
 USING: accessors assocs classes.mixin classes.tuple
-classes.tuple.parser compiler.units fry kernel sequences
-hashtables
-mongodb.driver
-mongodb.msg mongodb.tuple.collection
-mongodb.tuple.persistent mongodb.tuple.state strings ;
+classes.tuple.parser compiler.units hashtables kernel
+mongodb.driver mongodb.msg mongodb.tuple.collection
+mongodb.tuple.persistent sequences ;
 FROM: mongodb.driver => update delete find count ;
 FROM: mongodb.tuple.persistent => assoc>tuple ;
 

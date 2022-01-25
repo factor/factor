@@ -131,7 +131,13 @@ ERROR: unbalanced-private-declaration vocab ;
         manifest get
         [ [ load-vocab ] dip search-vocabs>> remove-eq! drop ]
         [ [ vocab-name ] dip search-vocab-names>> delete ]
-        2bi
+        [
+            [ vocab-name ] dip qualified-vocabs>> [
+                dup extra-words? [ 2drop f ] [
+                    dup vocab? [ vocab>> ] unless vocab-name =
+                ] if
+            ] with reject! drop
+        ] 2tri
     ] [ drop ] if ;
 
 TUPLE: qualified vocab prefix words ;
@@ -169,11 +175,29 @@ TUPLE: rename word vocab words ;
 : add-renamed-word ( word vocab new-name -- )
     <rename> qualified-vocabs push ;
 
-: use-words ( assoc -- )
+: use-words ( words -- )
     <extra-words> qualified-vocabs push ;
 
-: unuse-words ( assoc -- )
+: unuse-words ( words -- )
     <extra-words> qualified-vocabs remove! drop ;
+
+DEFER: with-words
+
+<PRIVATE
+
+: ?restart-with-words ( words error -- * )
+    dup condition? [
+        [ error>> ]
+        [ restarts>> rethrow-restarts ]
+        [ continuation>> '[ _ _ continue-with ] with-words ] tri
+    ] [ nip rethrow ] if ;
+
+PRIVATE>
+
+: with-words ( words quot -- )
+    [ over '[ _ use-words @ _ unuse-words ] ]
+    [ drop dup '[ _ unuse-words _ swap ?restart-with-words ] ]
+    2bi recover ; inline
 
 TUPLE: ambiguous-use-error name words ;
 
@@ -266,12 +290,21 @@ M: manifest definitions-changed
 
 PRIVATE>
 
-: with-manifest ( quot -- )
-    <manifest> manifest [
+SYMBOL: print-use-hook
+
+print-use-hook [ [ ] ] initialize
+
+: (with-manifest) ( quot manifest -- )
+    manifest [
         [ call ] [
             [ manifest get add-definition-observer call ]
             [ manifest get remove-definition-observer ]
-            [ ]
-            cleanup
+            finally
         ] if-bootstrapping
     ] with-variable ; inline
+
+: with-manifest ( quot -- )
+    <manifest> (with-manifest) ; inline
+
+: with-current-manifest ( quot -- )
+    manifest get (with-manifest) ; inline

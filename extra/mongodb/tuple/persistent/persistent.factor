@@ -1,6 +1,6 @@
 USING: accessors assocs bson.constants bson.writer combinators
-combinators.short-circuit constructors continuations fry
-hashtables kernel linked-assocs mirrors mongodb.tuple.collection
+combinators.short-circuit constructors continuations hashtables
+kernel linked-assocs mirrors mongodb.tuple.collection
 mongodb.tuple.state namespaces sequences words ;
 IN: mongodb.tuple.persistent
 

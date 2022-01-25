@@ -1,7 +1,7 @@
 ! Copyright (C) 2007, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: assocs calendar help.markup help.syntax io io.files
-io.launcher.private kernel literals quotations sequences ;
+io.launcher.private kernel literals quotations splitting ;
 IN: io.launcher
 
 ARTICLE: "io.launcher.command" "Specifying a command"
@@ -163,7 +163,7 @@ HELP: try-process
             "        }"
             "    }"
             "}"
-        } "\n" join
+        } join-lines
     ]
   }
 } ;
@@ -236,8 +236,8 @@ HELP: with-process-reader
 { $description "Launches a process and redirects its output via a pipe. The quotation is called with " { $link input-stream } " rebound to this pipe." }
 { $examples
   { $unchecked-example
-    "USING: io.launcher prettyprint ;"
-    "\"ls -dl /etc\" utf8 [ contents ] with-process-reader ."
+    "USING: io.launcher prettyprint io.encodings.utf8 ;"
+    "\"ls -dl /etc\" utf8 [ read-contents ] with-process-reader ."
     "\"drwxr-xr-x 213 root root 12288 mar 11 18:52 /etc\\n\""
   }
 } ;
@@ -300,7 +300,7 @@ ARTICLE: "io.launcher.launch" "Launching processes"
 ARTICLE: "io.launcher.examples" "Launcher examples"
 "Starting a command and waiting for it to finish:"
 { $code
-    "\"ls /etc\" run-process"
+    "\"ls /etc\" run-process wait-for-process"
 }
 "Starting a program in the background:"
 { $code

@@ -9,7 +9,7 @@ IN: file-server
 
 : file-server-logging ( quot -- )
     [
-        init-namespaces
+        init-namestack
         receive
 
         dup first "log-message" = [

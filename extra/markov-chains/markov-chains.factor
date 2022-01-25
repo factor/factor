@@ -1,8 +1,8 @@
 ! Copyright (C) 2020 John Benediktsson
 ! See http://factorcode.org/license.txt for BSD license
 
-USING: assocs assocs.extras assocs.private fry grouping kernel
-math.extras random sequences ;
+USING: assocs assocs.private grouping kernel math.extras
+sequences ;
 
 IN: markov-chains
 

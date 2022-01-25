@@ -37,6 +37,10 @@ PRIVATE>
 
 { an-empty-word-with-a-unique-name } [ "an-empty-word-with-a-unique-name" find-word ] unit-test
 
+{ { } } [ \ zero-matrix? missing-sections ] unit-test
+{ t } [ \ word-help-coverage? <word-help-coverage> 100%-coverage?>> ] unit-test
+{ t } [ \ zero-matrix? <word-help-coverage> 100%-coverage?>> ] unit-test
+
 {
   V{ "[" { $[ "math" dup lookup-vocab ] } "] " { "zero?" zero? } ": " }
 } [
@@ -65,8 +69,7 @@ PRIVATE>
 ] unit-test
 
 ! make sure this doesn't throw an error (would signify an issue with ignored-words)
-! the contents of all-words is not important
-{ } [ all-words [ <word-help-coverage> ] map drop ] unit-test
+{ } [ { $io-error $prettyprinting-note $nl } [ <word-help-coverage> ] map drop ] unit-test
 
 
 ! Lint system is written weirdly, there's no way to invoke it and get the output

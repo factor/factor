@@ -1,10 +1,10 @@
 ! Copyright (c) 2009 Aaron Schaefer, Doug Coleman. All rights reserved.
 ! The contents of this file are licensed under the Simplified BSD License
 ! A copy of the license is available at http://factorcode.org/license.txt
-USING: arrays ascii assocs combinators fry kernel lexer locals
-math math.bitwise math.combinatorics math.order math.statistics
-poker.arrays random sequences sequences.extras
-sequences.product splitting strings ;
+USING: arrays ascii assocs combinators kernel lexer math
+math.bitwise math.combinatorics math.order math.statistics
+poker.arrays random sequences sequences.extras sequences.product
+splitting strings ;
 IN: poker
 
 ! The algorithm used is based on Cactus Kev's Poker Hand Evaluator with
@@ -79,7 +79,7 @@ M: string >ckf >upper 1 cut (>ckf) ;
 M: integer >ckf ;
 
 : parse-cards ( string -- seq )
-    " " split [ >ckf ] map ;
+    split-words [ >ckf ] map ;
 
 : flush? ( cards -- ? )
     0xF000 [ bitand ] reduce 0 = not ;

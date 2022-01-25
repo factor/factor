@@ -314,7 +314,7 @@ C: <copy> copy-state
     [ [ length check-length 0 ] keep ] 2dip <copy> (copy) drop ; inline
 
 : subseq-unsafe-as ( from to seq exemplar -- subseq )
-    [ subseq>copy (copy) ] dip like ;
+    [ subseq>copy (copy) ] dip like ; inline
 
 : subseq-unsafe ( from to seq -- subseq )
     dup subseq-unsafe-as ; inline
@@ -325,7 +325,7 @@ PRIVATE>
     [ check-slice ] dip subseq-unsafe-as ;
 
 : subseq ( from to seq -- subseq )
-    dup subseq-as ; inline
+    dup subseq-as ;
 
 : head ( seq n -- headseq ) (head) subseq ;
 
@@ -361,23 +361,32 @@ PRIVATE>
     [ 2dup [ length ] bi@ + ] dip
     [ (append) ] new-like ; inline
 
-: 3append-as ( seq1 seq2 seq3 exemplar -- newseq )
-    [ 3dup [ length ] tri@ + + ] dip [
-        [ [ 2over [ length ] bi@ + ] dip copy-unsafe ]
-        [ (append) ] bi
-    ] new-like ; inline
-
 : append ( seq1 seq2 -- newseq ) over append-as ;
 
 : prepend-as ( seq1 seq2 exemplar -- newseq ) swapd append-as ; inline
 
 : prepend ( seq1 seq2 -- newseq ) over prepend-as ;
 
+: 3append-as ( seq1 seq2 seq3 exemplar -- newseq )
+    [ 3dup [ length ] tri@ + + ] dip [
+        [ [ 2over [ length ] bi@ + ] dip copy-unsafe ]
+        [ (append) ] bi
+    ] new-like ; inline
+
 : 3append ( seq1 seq2 seq3 -- newseq ) pick 3append-as ;
 
-: surround ( seq1 seq2 seq3 -- newseq ) swapd 3append ; inline
+: surround-as ( seq1 seq2 seq3 exemplar -- newseq )
+    [ swap ] 2dip 3append-as ; inline
 
-: glue ( seq1 seq2 seq3 -- newseq ) swap 3append ; inline
+: surround ( seq1 seq2 seq3 -- newseq ) over surround-as ; inline
+
+: 1surround-as ( seq1 seq2 exemplar  -- newseq ) dupd surround-as ; inline
+
+: 1surround ( seq1 seq2 -- newseq ) dup 1surround-as ; inline
+
+: glue-as ( seq1 seq2 seq3 exemplar -- newseq ) swapd 3append-as ; inline
+
+: glue ( seq1 seq2 seq3 -- newseq ) pick glue-as ; inline
 
 : change-nth ( ..a i seq quot: ( ..a elt -- ..b newelt ) -- ..b )
     [ [ nth ] dip call ] 2keepd set-nth-unsafe ; inline
@@ -516,6 +525,9 @@ PRIVATE>
 
 : 2all? ( ... seq1 seq2 quot: ( ... elt1 elt2 -- ... ? ) -- ... ? )
     (2each) all-integers? ; inline
+
+: 2any? ( ... seq1 seq2 quot: ( ... elt1 elt2 -- ... ? ) -- ... ? )
+    [ not ] compose 2all? not ; inline
 
 : 3each ( ... seq1 seq2 seq3 quot: ( ... elt1 elt2 elt3 -- ... ) -- ... )
     (3each) each-integer ; inline
@@ -683,7 +695,7 @@ PRIVATE>
 PRIVATE>
 
 : mismatch ( seq1 seq2 -- i )
-    [ min-length ] 2keep mismatch-unsafe ; inline
+    [ min-length ] 2keep mismatch-unsafe ;
 
 M: sequence <=>
     [ mismatch ] 2keep pick
@@ -908,11 +920,15 @@ PRIVATE>
 : join ( seq glue -- newseq )
     dup join-as ; inline
 
+<PRIVATE
+
 : padding ( ... seq n elt quot: ( ... seq1 seq2 -- ... newseq ) -- ... newseq )
     [
         [ over length [-] dup 0 = [ drop ] ] dip
         [ <repetition> ] curry
     ] dip compose if ; inline
+
+PRIVATE>
 
 : pad-head ( seq n elt -- padded )
     [ swap dup append-as ] padding ;
@@ -943,6 +959,9 @@ PRIVATE>
 
 : cut-slice ( seq n -- before-slice after-slice )
     [ head-slice ] [ tail-slice ] 2bi ; inline
+
+: cut-slice* ( seq n -- before-slice after-slice )
+    [ head-slice* ] [ tail-slice* ] 2bi ;
 
 : insert-nth ( elt n seq -- seq' )
     swap cut-slice [ swap suffix ] dip append ;
@@ -1015,11 +1034,13 @@ PRIVATE>
 : unclip-slice ( seq -- rest-slice first )
     [ rest-slice ] [ first-unsafe ] bi ; inline
 
-: map-reduce ( ..a seq map-quot: ( ..a elt -- ..b intermediate ) reduce-quot: ( ..b prev intermediate -- ..a next ) -- ..a result )
-    [ [ [ first ] keep ] dip [ dip ] keep ] dip compose 1 each-from ; inline
+: map-reduce ( ..a seq map-quot: ( ..a elt -- ..a intermediate ) reduce-quot: ( ..a prev intermediate -- ..a next ) -- ..a result )
+    [ [ [ first ] keep ] dip [ dip ] keep ] dip
+    '[ swap _ dip swap @ ] 1 each-from ; inline
 
-: 2map-reduce ( ..a seq1 seq2 map-quot: ( ..a elt1 elt2 -- ..b intermediate ) reduce-quot: ( ..b prev intermediate -- ..a next ) -- ..a result )
-    [ [ [ [ first ] bi@ ] 2keep ] dip [ 2dip ] keep ] dip compose 1 2each-from ; inline
+: 2map-reduce ( ..a seq1 seq2 map-quot: ( ..a elt1 elt2 -- ..a intermediate ) reduce-quot: ( ..a prev intermediate -- ..a next ) -- ..a result )
+    [ [ [ [ first ] bi@ ] 2keep ] dip [ 2dip ] keep ] dip
+    '[ rot _ dip swap @ ] 1 2each-from ; inline
 
 <PRIVATE
 
@@ -1088,10 +1109,13 @@ M: repetition sum [ elt>> ] [ length>> ] bi * ; inline
     [ with each ] 2curry each ; inline
 
 : cartesian-map ( ... seq1 seq2 quot: ( ... elt1 elt2 -- ... newelt ) -- ... newseq )
-    [ with map ] 2curry map ; inline
+    [ with { } map-as ] 2curry { } map-as ; inline
+
+: cartesian-product-as ( seq1 seq2 exemplar -- newseq )
+    [ 2sequence ] curry cartesian-map ; inline
 
 : cartesian-product ( seq1 seq2 -- newseq )
-    [ { } 2sequence ] cartesian-map ;
+    dup cartesian-product-as ; inline
 
 : cartesian-find ( ... seq1 seq2 quot: ( ... elt1 elt2 -- ... ? ) -- ... elt1 elt2 )
     [ f ] 3dip [ with find swap ] 2curry [ nip ] prepose find nip swap ; inline
@@ -1125,24 +1149,15 @@ PRIVATE>
 <PRIVATE
 
 : generic-flip ( matrix -- newmatrix )
-    [
-        [ first-unsafe length 1 ] keep
-        [ length min ] (each) (each-integer) <iota>
-    ] keep
-    [ [ nth-unsafe ] with { } map-as ] curry { } map-as ; inline
+    [ [ length ] [ min ] map-reduce ] keep
+    '[ _ [ nth-unsafe ] with { } map-as ] { } map-integers ; inline
 
 USE: arrays
 
-: array-length ( array -- len )
-    { array } declare length>> ; inline
-
 : array-flip ( matrix -- newmatrix )
     { array } declare
-    [
-        [ first-unsafe array-length 1 ] keep
-        [ array-length min ] (each) (each-integer) <iota>
-    ] keep
-    [ [ { array } declare array-nth ] with { } map-as ] curry { } map-as ;
+    [ [ { array } declare length>> ] [ min ] map-reduce ] keep
+    '[ _ [ { array } declare array-nth ] with { } map-as ] { } map-integers ;
 
 PRIVATE>
 

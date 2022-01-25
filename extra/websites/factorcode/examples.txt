@@ -7,7 +7,7 @@ USING: io math sequences ;
 USING: io kernel sequences
 http.client xml xml.data xml.traversal ;
 
-"http://factorcode.org" http-get nip string>xml
+"https://factorcode.org" http-get nip string>xml
 "a" deep-tags-named
 [ "href" attr ] map
 [ print ] each
@@ -87,10 +87,10 @@ ascii file-lines { "%" } split random
 [ print ] each
 ----
 USING: combinators io kernel locals
-math.functions math.parser math.ranges
+math.functions math.parser ranges
 sequences ;
 
-100 [1,b] [| i |
+100 [1..b] [| i |
     {
         { [ i 15 divisor? ] [ "FizzBuzz" ] }
         { [ i  3 divisor? ] [ "Fizz" ] }

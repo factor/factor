@@ -2,8 +2,8 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors alien.c-types alien.data alien.syntax arrays
 assocs combinators gdk.pixbuf.ffi glib.ffi gobject.ffi grouping
-images images.loader io kernel locals math sequences
-specialized-arrays system unicode ;
+images images.loader io kernel math sequences specialized-arrays
+system unicode ;
 IN: images.loader.gtk
 SPECIALIZED-ARRAY: uchar
 

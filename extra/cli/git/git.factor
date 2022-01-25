@@ -1,9 +1,9 @@
 ! Copyright (C) 2017 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: arrays concurrency.combinators concurrency.semaphores fry
-io io.directories io.encodings.utf8 io.files.info io.launcher
-io.pathnames kernel math namespaces sequences splitting
-system-info unicode ;
+USING: accessors arrays concurrency.combinators
+concurrency.semaphores io io.directories io.encodings.utf8
+io.files.info io.launcher io.pathnames kernel math namespaces
+sequences splitting system-info unicode ;
 IN: cli.git
 
 SYMBOL: cli-git-num-parallel
@@ -60,3 +60,7 @@ cli-git-num-parallel [ cpus 2 * ] initialize
             _ [ update-repository ] with-semaphore
         ] parallel-each
     ] with-ensure-directory ;
+
+: directory-entries-without-git ( directory -- entries )
+    recursive-directory-entries
+    [ name>> "/.git/" swap subseq? ] reject ;

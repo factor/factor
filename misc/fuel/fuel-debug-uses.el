@@ -1,4 +1,4 @@
-;;; fuel-debug-uses.el -- retrieving USING: stanzas
+;;; fuel-debug-uses.el -- retrieving USING: stanzas -*- lexical-binding: t -*-
 
 ;; Copyright (C) 2008, 2009 Jose Antonio Ortega Ruiz
 ;; See http://factorcode.org/license.txt for BSD license.

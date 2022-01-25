@@ -82,9 +82,9 @@ SPECIALIZED-ARRAY: uchar
             f >>pwcsName
             STGTY_STREAM >>type
             stream stream-size >>cbSize
-            FILETIME <struct> >>mtime
-            FILETIME <struct> >>ctime
-            FILETIME <struct> >>atime
+            FILETIME new >>mtime
+            FILETIME new >>ctime
+            FILETIME new >>atime
             STGM_READWRITE >>grfMode
             0 >>grfLocksSupported
             GUID_NULL >>clsid

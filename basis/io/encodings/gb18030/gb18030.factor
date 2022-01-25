@@ -1,9 +1,10 @@
 ! Copyright (C) 2009 Daniel Ehrenberg
 ! See http://factorcode.org/license.txt for BSD license.
-USING: xml xml.data kernel io io.encodings interval-maps splitting fry
-math.parser sequences combinators assocs locals accessors math arrays
-byte-arrays ascii io.files biassocs math.order namespaces
-combinators.short-circuit io.binary io.encodings.iana ;
+USING: accessors arrays ascii assocs biassocs byte-arrays
+combinators combinators.short-circuit interval-maps io
+io.encodings io.encodings.iana io.files kernel math
+math.order math.parser namespaces sequences splitting xml
+xml.data ;
 FROM: io.encodings.ascii => ascii ;
 IN: io.encodings.gb18030
 
@@ -29,7 +30,7 @@ gb18030 "GB18030" register-encoding
 TUPLE: range ufirst ulast bfirst blast ;
 
 : b>byte-array ( string -- byte-array )
-    " " split [ hex> ] B{ } map-as ;
+    split-words [ hex> ] B{ } map-as ;
 
 : add-range ( contained ranges -- )
     [

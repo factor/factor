@@ -1,8 +1,8 @@
 ! Copyright (C) 2008, 2009 Doug Coleman, Daniel Ehrenberg.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs classes combinators
-combinators.short-circuit combinators.smart fry kernel locals
-math math.order sequences sets unicode unicode.data ;
+combinators.short-circuit combinators.smart kernel math
+math.order sequences sets unicode unicode.data ;
 FROM: ascii => ascii? ;
 IN: regexp.classes
 
@@ -12,7 +12,7 @@ ascii-class punctuation-class java-printable-class blank-class
 control-character-class hex-digit-class java-blank-class c-identifier-class
 unmatchable-class terminator-class word-boundary-class ;
 
-SINGLETONS: beginning-of-input ^ end-of-input $ end-of-file
+SINGLETONS: beginning-of-input ^crlf end-of-input $crlf end-of-file
 ^unix $unix word-break ;
 
 TUPLE: range-class { from read-only } { to read-only } ;
@@ -108,17 +108,14 @@ M: terminator-class class-member?
 
 M: f class-member? 2drop f ; inline
 
-: same? ( obj1 obj2 quot1: ( obj1 -- val1 ) quot2: ( obj2 -- val2 ) -- ? )
-    bi* = ; inline
-
 M: script-class class-member?
-    [ script-of ] [ script>> ] same? ; inline
+    [ script-of ] [ script>> ] bi* = ; inline
 
 M: category-class class-member?
-    [ category ] [ category>> ] same? ; inline
+    [ category ] [ category>> ] bi* = ; inline
 
 M: category-range-class class-member? inline
-    [ category first ] [ category>> ] same? ; inline
+    [ category first ] [ category>> ] bi* = ; inline
 
 TUPLE: not-class { class read-only } ;
 
@@ -141,7 +138,7 @@ TUPLE: and-class { seq read-only } ;
 M: and-class class-member?
     seq>> [ class-member? ] with all? ; inline
 
-DEFER: substitute
+DEFER: (substitute)
 
 : flatten ( seq class -- newseq )
     '[ dup _ instance? [ seq>> ] [ 1array ] if ] map concat ; inline
@@ -188,7 +185,7 @@ TUPLE: class-partition integers not-integers simples not-simples and or other ;
 
 : answer-ors ( partition -- partition' )
     dup [ not-integers>> ] [ not-simples>> ] [ simples>> ] tri 3append
-    '[ [ _ [ t substitute ] each ] map ] change-or ;
+    '[ [ _ [ t (substitute) ] each ] map ] change-or ;
 
 : contradiction? ( partition -- ? )
     {
@@ -219,7 +216,7 @@ TUPLE: class-partition integers not-integers simples not-simples and or other ;
 
 : answer-ands ( partition -- partition' )
     dup [ integers>> ] [ not-simples>> ] [ simples>> ] tri 3append
-    '[ [ _ [ f substitute ] each ] map ] change-and ;
+    '[ [ _ [ f (substitute) ] each ] map ] change-and ;
 
 : tautology? ( partition -- ? )
     {
@@ -291,12 +288,12 @@ M: or-class answer
 M: not-class answer
     [ class>> ] 2dip answer <not-class> ;
 
-GENERIC#: substitute 1 ( class from to -- new-class )
-M: object substitute answer ;
-M: not-class substitute [ <not-class> ] bi@ answer ;
+GENERIC#: (substitute) 1 ( class from to -- new-class )
+M: object (substitute) answer ;
+M: not-class (substitute) [ <not-class> ] bi@ answer ;
 
 : assoc-answer ( table question answer -- new-table )
-    '[ _ _ substitute ] assoc-map sift-values ;
+    '[ _ _ (substitute) ] assoc-map sift-values ;
 
 : assoc-answers ( table questions answer -- new-table )
     '[ _ assoc-answer ] each ;

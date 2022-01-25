@@ -45,7 +45,7 @@ IN: spotlight
 <PRIVATE
 
 : run-process-output ( command -- seq )
-    utf8 [ lines ] with-process-reader ;
+    utf8 [ read-lines ] with-process-reader ;
 
 PRIVATE>
 

@@ -1,7 +1,7 @@
 ! Copyright (C) 2019-2020 KUSUMOTO Norio.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: arrays help.markup help.syntax kernel quotations sequences
-    prettyprint assocs math make lists urls logic.private ;
+USING: arrays assocs help.markup help.syntax kernel logic.private
+make quotations ;
 IN: logic
 
 HELP: !!
@@ -474,7 +474,7 @@ HELP: nlo
 { $see-also writeo writenlo } ;
 
 HELP: nonvaro
-{ $var-description "A logic predicate. "{ $snippet "nonvaro" } " takes a single argument and is true if its argument is not a logic variable or is a concrete logic variable." }
+{ $var-description "A logic predicate. " { $snippet "nonvaro" } " takes a single argument and is true if its argument is not a logic variable or is a concrete logic variable." }
 { $syntax "{ nonvaro X }" }
 { $see-also varo } ;
 
@@ -689,7 +689,7 @@ HELP: writeo
 
 ARTICLE: "logic" "Logic"
 { $vocab-link "logic" }
-" is a vocab for an embedded language that runs on "{ $url "https://github.com/factor/factor" "Factor" } " with the capabilities of a subset of Prolog." $nl
+" is a vocab for an embedded language that runs on " { $url "https://github.com/factor/factor" "Factor" } " with the capabilities of a subset of Prolog." $nl
 "It is an extended port from tiny_prolog and its descendants, " { $url "https://github.com/preston/ruby-prolog" "ruby-prolog" } "." $nl
 { $code
 "USE: logic

@@ -1,34 +1,27 @@
 ! Copyright (C) 2009, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors cache core-graphics.types core-text
-core-text.fonts io.encodings.string io.encodings.utf16n kernel
-locals math math.vectors namespaces sequences ui.text
+core-text.fonts io.encodings.string io.encodings.utf16 kernel
+math math.vectors namespaces opengl sequences ui.text
 ui.text.private ;
 IN: ui.text.core-text
-
 SINGLETON: core-text-renderer
 
 <PRIVATE
 
-: unscale ( m -- n )
-    retina? get-global [ 2.0 / ] when ; inline
-
-: scale ( m -- n )
-    retina? get-global [ 2.0 * ] when ; inline
-
 : scale-dim ( dim -- dim' )
-    retina? get-global [ [ 2.0 / ] map ] when ; inline
+    gl-scale-factor get-global [ [ gl-unscale ] map ] when ; inline
 
 : scale-metrics ( metrics -- metrics' )
-    retina? get-global [
+    gl-scale-factor get-global [
         clone
-            [ 2.0 / ] change-width
-            [ 2.0 / ] change-ascent
-            [ 2.0 / ] change-descent
-            [ 2.0 / ] change-height
-            [ 2.0 / ] change-leading
-            [ 2.0 / ] change-cap-height
-            [ 2.0 / ] change-x-height
+            [ gl-unscale ] change-width
+            [ gl-unscale ] change-ascent
+            [ gl-unscale ] change-descent
+            [ gl-unscale ] change-height
+            [ gl-unscale ] change-leading
+            [ gl-unscale ] change-cap-height
+            [ gl-unscale ] change-x-height
     ] when ; inline
 
 PRIVATE>
@@ -48,7 +41,7 @@ M:: core-text-renderer x>offset ( x font string -- n )
     x font string
     [ 2drop 0 ] [
         cached-line line>>
-        swap scale 0 <CGPoint> CTLineGetStringIndexForPosition
+        swap gl-scale 0 <CGPoint> CTLineGetStringIndexForPosition
         2 * 0 swap string utf16n encode subseq
         utf16n decode length
     ] if-empty ;
@@ -57,7 +50,7 @@ M:: core-text-renderer offset>x ( n font string -- x )
     font string cached-line line>>
     0 n string subseq utf16n encode length 2 /i
     f
-    CTLineGetOffsetForStringIndex unscale ;
+    CTLineGetOffsetForStringIndex gl-unscale ;
 
 M: core-text-renderer font-metrics
     cache-font-metrics ;

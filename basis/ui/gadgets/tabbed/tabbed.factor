@@ -1,9 +1,9 @@
 ! Copyright (C) 2008, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors colors.constants kernel models sequences
-ui.gadgets ui.gadgets.books ui.gadgets.borders
-ui.gadgets.buttons ui.gadgets.buttons.private ui.gadgets.icons
-ui.gadgets.packs ui.gadgets.tracks ui.pens ui.theme.images ;
+USING: accessors colors kernel models sequences ui.gadgets
+ui.gadgets.books ui.gadgets.borders ui.gadgets.buttons
+ui.gadgets.buttons.private ui.gadgets.icons ui.gadgets.packs
+ui.gadgets.tracks ui.pens ui.theme.images ;
 IN: ui.gadgets.tabbed
 
 TUPLE: tabbed-gadget < track tabs book ;

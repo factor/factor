@@ -34,7 +34,7 @@ IN: unicode.normalize.tests
     values [
         [
             "#@" split first [ CHAR: \s = ] trim-tail ";" split harvest
-            [ " " split [ hex> ] "" map-as ] map
+            [ split-words [ hex> ] "" map-as ] map
         ] map
     ] map concat ;
 

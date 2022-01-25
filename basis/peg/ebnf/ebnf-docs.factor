@@ -22,6 +22,14 @@ HELP: EBNF[[
     }
 } ;
 
+HELP: EBNF-PARSER:
+{ $syntax "EBNF-PARSER: word \"...ebnf...\"" }
+{ $description
+    "Defines a word that when called will return a parser for the "
+    "syntax defined with the EBNF DSL. The parser can be used with "
+    "the " { $vocab-link "peg.search" } " vocab."
+} ;
+
 HELP: EBNF:
 { $syntax "EBNF: word [=[ ...ebnf... ]=]" }
 { $values { "word" word } { "...ebnf..." "EBNF DSL text" } }

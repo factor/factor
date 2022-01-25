@@ -2,11 +2,11 @@
 ! See http://factorcode.org/license.txt for BSD license.
 
 USING: accessors ascii assocs combinators
-combinators.short-circuit fry io.pathnames io.sockets
-io.sockets.secure kernel lexer linked-assocs make math
-math.parser multiline namespaces peg.ebnf present sequences
-sequences.generalizations splitting strings strings.parser
-urls.encoding vocabs.loader ;
+combinators.short-circuit fry io.encodings.string
+io.encodings.utf8 io.pathnames io.sockets io.sockets.secure
+kernel lexer linked-assocs make math math.parser multiline
+namespaces peg.ebnf present sequences sequences.generalizations
+splitting strings strings.parser urls.encoding vocabs.loader ;
 
 IN: urls
 
@@ -44,12 +44,26 @@ M: url >url ;
 
 <PRIVATE
 
+: remove-dot-segments ( path -- path' )
+    [ "//" split1 ] [ "/" glue ] while*
+    [ "/./" split1 ] [ "/" glue ] while*
+    [ "/../" split1 ] [ [ "/" split1-last drop ] dip "/" glue ] while*
+    "/.." ?tail [ "/" split1-last drop "/" append ] when
+    "../" ?head [ "/" prepend ] when
+    "./" ?head [ "/" prepend ] when
+    "/." ?tail [ "/" append ] when
+    [ "/" ] when-empty ;
+
+: parse-path ( string -- path )
+    "/" split [ url-decode "/" "%2F" replace ] map "/" join
+    remove-dot-segments ;
+
 EBNF: parse-url [=[
 
 protocol = [a-zA-Z0-9.+-]+ => [[ url-decode ]]
 username = [^/:@#?]*       => [[ url-decode ]]
 password = [^/:@#?]*       => [[ url-decode ]]
-path     = [^#?]+          => [[ url-decode ]]
+path     = [^#?]+          => [[ parse-path ]]
 query    = [^#]+           => [[ query>assoc ]]
 anchor   = .+              => [[ url-decode ]]
 hostname = [^/#?:]+        => [[ url-decode ]]
@@ -62,8 +76,8 @@ host     = (ipv6 | hostname) (":"~ port?)?
 url      = (protocol ":"~)?
            ("//"~ auth? host?)?
            path?
-           ("?"~ query)?
-           ("#"~ anchor)?
+           ("?"~ query?)?
+           ("#"~ anchor?)?
 
 ]=]
 
@@ -97,7 +111,7 @@ M: pathname >url string>> >url ;
 
 : unparse-username-password ( url -- )
     dup username>> dup [
-        % password>> [ ":" % % ] when* "@" %
+        url-encode % password>> [ ":" % url-encode % ] when* "@" %
     ] [ 2drop ] if ;
 
 : url-port ( url -- port/f )
@@ -127,12 +141,17 @@ M: pathname >url string>> >url ;
 : unparse-authority ( url -- )
     dup host>> [ "//" % unparse-host-part ] [ drop ] if ;
 
+: unparse-path ( url -- )
+    path>> "/" split [
+        "%2F" "/" replace url-encode "/" "%2F" replace
+    ] map "/" join % ;
+
 M: url present
     [
         {
             [ unparse-protocol ]
             [ unparse-authority ]
-            [ path>> url-encode % ]
+            [ unparse-path ]
             [ query>> dup assoc-empty? [ drop ] [ "?" % assoc>query % ] if ]
             [ anchor>> [ "#" % present url-encode % ] when* ]
         } cleave
@@ -147,7 +166,7 @@ PRIVATE>
         { [ over "/" tail? ] [ append ] }
         { [ "/" pick subseq-start not ] [ nip ] }
         [ [ "/" split1-last drop "/" ] dip 3append ]
-    } cond ;
+    } cond remove-dot-segments ;
 
 <PRIVATE
 

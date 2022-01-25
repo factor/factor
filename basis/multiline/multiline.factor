@@ -1,10 +1,9 @@
 ! Copyright (C) 2007 Daniel Ehrenberg
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors combinators kernel lexer locals make math
-namespaces parser quotations sequences words ;
+namespaces parser quotations sequences strings.parser
+strings.parser.private words ;
 IN: multiline
-
-ERROR: bad-heredoc identifier ;
 
 <PRIVATE
 
@@ -55,27 +54,11 @@ SYNTAX: STRING:
     [
         lexer
         [ skip-n-chars + end-text lexer (scan-multiline-string) ]
-        change-column drop
+        change-column check-space
     ] "" make ;
 
 : advance-same-line ( lexer text -- )
     length [ + ] curry change-column drop ;
-
-:: (parse-til-line-begins) ( begin-text lexer -- )
-    lexer still-parsing? [
-        lexer line-text>> begin-text sequence= [
-            lexer begin-text advance-same-line
-        ] [
-            lexer line-text>> % CHAR: \n ,
-            lexer next-line
-            begin-text lexer (parse-til-line-begins)
-        ] if
-    ] [
-        begin-text bad-heredoc
-    ] if ;
-
-: parse-til-line-begins ( begin-text lexer -- seq )
-    [ (parse-til-line-begins) ] "" make ;
 
 PRIVATE>
 
@@ -83,14 +66,6 @@ PRIVATE>
     lexer get 1 (parse-multiline-string) ;
 
 SYNTAX: /* "*/" parse-multiline-string drop ;
-
-SYNTAX: HEREDOC:
-    lexer get {
-        [ skip-blank ]
-        [ rest-of-line ]
-        [ next-line ]
-        [ parse-til-line-begins ]
-    } cleave suffix! ;
 
 SYNTAX: [[ "]]" parse-multiline-string suffix! ;
 SYNTAX: [=[ "]=]" parse-multiline-string suffix! ;

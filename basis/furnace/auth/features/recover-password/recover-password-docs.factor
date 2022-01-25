@@ -1,4 +1,4 @@
-USING: help.markup help.syntax kernel strings urls ;
+USING: help.markup help.syntax kernel ;
 IN: furnace.auth.features.recover-password
 
 HELP: allow-password-recovery

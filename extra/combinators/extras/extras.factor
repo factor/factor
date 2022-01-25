@@ -1,8 +1,8 @@
 ! Copyright (C) 2013 Doug Coleman, John Benediktsson.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: arrays assocs combinators combinators.smart fry
-generalizations kernel macros math quotations sequences locals
-math.order sequences.generalizations sequences.private
+USING: arrays assocs combinators combinators.smart
+generalizations kernel math math.order namespaces quotations
+sequences sequences.generalizations sequences.private
 stack-checker.transforms system words ;
 IN: combinators.extras
 
@@ -106,3 +106,10 @@ DEFER: cond*
 
 MACRO: chain ( quots -- quot )
     <reversed> [ ] [ swap '[ [ @ @ ] [ f ] if* ] ] reduce ;
+
+: with-output-variable ( value variable quot -- value )
+    over [ get ] curry compose with-variable ; inline
+
+: loop1 ( ..a quot: ( ..a -- ..a obj ? ) -- ..a obj )
+    [ call ] keep '[ drop _ loop1 ] when ; inline recursive
+

@@ -321,7 +321,7 @@ bignum* factor_vm::bignum_remainder(bignum* numerator, bignum* denominator) {
 // cell_to_bignum, fixnum_to_bignum, long_long_to_bignum, ulong_long_to_bignum
 
 // Allocates memory
-#define FOO_TO_BIGNUM(name, type, stype, utype)                       \
+#define FOO_TO_BIGNUM_SIGNED(name, type, utype)                       \
   bignum* factor_vm::name##_to_bignum(type n) {                       \
     int negative_p;                                                   \
     /* Special cases win when these small constants are cached. */    \
@@ -329,11 +329,11 @@ bignum* factor_vm::bignum_remainder(bignum* numerator, bignum* denominator) {
       return (BIGNUM_ZERO());                                         \
     if (n == 1)                                                       \
       return (BIGNUM_ONE(0));                                         \
-    if (n < (type) 0 && n == (type) - 1)                              \
+    if (n < (type) 0 && n == (type) -1)                               \
       return (BIGNUM_ONE(1));                                         \
     {                                                                 \
       utype accumulator =                                             \
-          ((negative_p = (n < (type) 0)) ? ((type)(-(stype) n)) : n); \
+          ((negative_p = n < (type) 0) ? -n : n);                     \
       if (accumulator < BIGNUM_RADIX)                                 \
       {                                                               \
         bignum* result = allot_bignum(1, negative_p);                 \
@@ -358,10 +358,44 @@ bignum* factor_vm::bignum_remainder(bignum* numerator, bignum* denominator) {
     }                                                                 \
   }
 
-FOO_TO_BIGNUM(cell, cell, fixnum, cell)
-FOO_TO_BIGNUM(fixnum, fixnum, fixnum, cell)
-FOO_TO_BIGNUM(long_long, int64_t, int64_t, uint64_t)
-FOO_TO_BIGNUM(ulong_long, uint64_t, int64_t, uint64_t)
+// Allocates memory
+#define FOO_TO_BIGNUM_UNSIGNED(name, type, utype)                     \
+  bignum* factor_vm::name##_to_bignum(type n) {                       \
+    /* Special cases win when these small constants are cached. */    \
+    if (n == 0)                                                       \
+      return (BIGNUM_ZERO());                                         \
+    if (n == 1)                                                       \
+      return (BIGNUM_ONE(0));                                         \
+    {                                                                 \
+      utype accumulator = n;                                          \
+      if (accumulator < BIGNUM_RADIX)                                 \
+      {                                                               \
+        bignum* result = allot_bignum(1, false);                      \
+        bignum_digit_type* scan = (BIGNUM_START_PTR(result));         \
+        *scan = (accumulator & BIGNUM_DIGIT_MASK);                    \
+        return (result);                                              \
+      } else {                                                        \
+        bignum_digit_type result_digits[BIGNUM_DIGITS_FOR(type)];     \
+        bignum_digit_type* end_digits = result_digits;                \
+        do {                                                          \
+          (*end_digits++) = (accumulator & BIGNUM_DIGIT_MASK);        \
+          accumulator >>= BIGNUM_DIGIT_LENGTH;                        \
+        } while (accumulator != 0);                                   \
+        bignum* result =                                              \
+           (allot_bignum((end_digits - result_digits), false));       \
+        bignum_digit_type* scan_digits = result_digits;               \
+        bignum_digit_type* scan_result = (BIGNUM_START_PTR(result));  \
+        while (scan_digits < end_digits)                              \
+          (*scan_result++) = (*scan_digits++);                        \
+        return (result);                                              \
+      }                                                               \
+    }                                                                 \
+  }
+
+FOO_TO_BIGNUM_SIGNED(fixnum, fixnum, cell)
+FOO_TO_BIGNUM_UNSIGNED(cell, cell, cell)
+FOO_TO_BIGNUM_SIGNED(long_long, int64_t, uint64_t)
+FOO_TO_BIGNUM_UNSIGNED(ulong_long, uint64_t, uint64_t)
 
 // cannot allocate memory
 // bignum_to_cell, fixnum_to_cell, long_long_to_cell, ulong_long_to_cell
@@ -1723,7 +1757,8 @@ bignum* factor_vm::bignum_gcd(bignum* a_, bignum* b_) {
   data_root<bignum> a(a_, this);
   data_root<bignum> b(b_, this);
   bignum_twodigit_type x, y, q, s, t, A, B, C, D;
-  int nbits, k;
+  unsigned long nbits;
+  int k;
   bignum_length_type size_a, size_b, size_c;
   bignum_digit_type* scan_a, *scan_b, *scan_c, *scan_d;
   bignum_digit_type* a_end, *b_end, *c_end;

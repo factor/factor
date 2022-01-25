@@ -1,4 +1,4 @@
-USING: help.syntax help.markup kernel prettyprint sequences strings words math ;
+USING: help.markup help.syntax strings ;
 IN: ctags.etags
 
 ARTICLE: "etags" "Etags file"
@@ -6,7 +6,7 @@ ARTICLE: "etags" "Etags file"
 { $subsections
     etags
     write-etags
-}
+} ;
 
 HELP: write-etags
 { $values { "path" string } }
@@ -19,4 +19,4 @@ HELP: write-etags
   }
 } ;
 
-ABOUT: "etags" ;
+ABOUT: "etags"

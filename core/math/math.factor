@@ -156,6 +156,8 @@ GENERIC: neg? ( x -- ? )
 
 : unless-zero ( ... n quot: ( ... n -- ... ) -- ... ) [ ] swap if-zero ; inline
 
+: until-zero ( ... n quot: ( ... x -- ... y ) -- ... ) [ dup zero? ] swap until drop ; inline
+
 UNION: integer fixnum bignum ;
 
 TUPLE: ratio
