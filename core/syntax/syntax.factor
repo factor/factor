@@ -7,7 +7,7 @@ classes.predicate classes.singleton classes.tuple
 classes.tuple.parser classes.union combinators compiler.units
 definitions effects effects.parser fry generic generic.hook
 generic.math generic.parser generic.standard hash-sets
-hashtables hashtables.identity io.pathnames kernel lexer
+hashtables hashtables.identity init io.pathnames kernel lexer
 locals.errors locals.parser macros math memoize namespaces
 parser quotations sbufs sequences slots source-files splitting
 strings strings.parser vectors vocabs.loader vocabs.parser words
