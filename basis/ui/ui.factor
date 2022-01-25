@@ -208,10 +208,10 @@ HOOK: close-window ui-backend ( gadget -- )
 M: object close-window
     find-world [ ungraft ] when* ;
 
-[
+STARTUP-HOOK: [
     f ui-running set-global
     <flag> ui-notify-flag set-global
-] "ui" add-startup-hook
+]
 
 HOOK: resize-window ui-backend ( world dim -- )
 M: object resize-window 2drop ;

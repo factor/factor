@@ -146,6 +146,6 @@ M: invalidate-crossref definitions-changed
     drop [ null? not ] [ not ] bi or
     [ f crossref set-global ] when ;
 
-[ invalidate-crossref add-definition-observer ] "tools.crossref" add-startup-hook
+STARTUP-HOOK: [ invalidate-crossref add-definition-observer ]
 
 PRIVATE>

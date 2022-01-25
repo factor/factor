@@ -253,4 +253,4 @@ MACRO: set-draw-buffers ( buffers -- quot )
     GL_MODELVIEW glMatrixMode
     glLoadIdentity ;
 
-[ f gl-scale-factor set-global ] "opengl" add-startup-hook
+STARTUP-HOOK: [ f gl-scale-factor set-global ]

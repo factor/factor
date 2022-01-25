@@ -204,7 +204,7 @@ M: error-list-updater errors-changed
 
 \ show-error-list H{ { +nullary+ t } } define-command
 
-[
+STARTUP-HOOK: [
     f <model> 100 milliseconds <delay> error-list-model set-global
     error-list-updater add-error-observer
-] "ui.tools.error-list" add-startup-hook
+]

@@ -16,11 +16,10 @@ CONSTANT: default-vocab-roots {
     "resource:work"
 }
 
-[
+STARTUP-HOOK: [
     default-vocab-roots V{ } like vocab-roots set-global
-
     [ drop ] add-vocab-root-hook set-global
-] "vocabs.loader" add-startup-hook
+]
 
 : add-vocab-root ( root -- )
     trim-tail-separators dup vocab-roots get ?adjoin

@@ -204,9 +204,9 @@ M: pango-renderer line-metrics
     [ cached-layout metrics>> ]
     if-empty ;
 
-[
+STARTUP-HOOK: [
     \ (cache-font-description) reset-memoized
     <cache-assoc> cached-layouts set-global
-] "ui.text.pango" add-startup-hook
+]
 
 pango-renderer font-renderer set-global

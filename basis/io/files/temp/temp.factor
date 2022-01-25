@@ -36,10 +36,10 @@ SYMBOL: current-cache-directory
     { [ os unix? ] [ "io.files.temp.unix" ] }
 } cond require
 
-[
+STARTUP-HOOK: [
     default-temp-directory dup make-directories
     current-temp-directory set-global
 
     default-cache-directory dup make-directories
     current-cache-directory set-global
-] "io.files.temp" add-startup-hook
+]

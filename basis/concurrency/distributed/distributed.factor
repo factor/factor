@@ -77,7 +77,7 @@ M: thread (serialize)
 : stop-node ( -- )
     f local-node get insecure>> send-remote-message ;
 
-[
+STARTUP-HOOK: [
     H{ } clone \ registered-remote-threads set-global
     H{ } clone \ thread-connections set-global
-] "remote-thread-registry" add-startup-hook
+]

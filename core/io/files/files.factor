@@ -90,9 +90,9 @@ PRIVATE>
     ] map-find drop
     [ image-path parent-directory ] unless* "resource-path" set-global ;
 
-[
+STARTUP-HOOK: [
     cwd current-directory set-global
     OBJ-IMAGE special-object alien>native-string \ image-path set-global
     OBJ-EXECUTABLE special-object alien>native-string \ vm-path set-global
     init-resource-path
-] "io.files" add-startup-hook
+]

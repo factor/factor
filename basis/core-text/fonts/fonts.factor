@@ -118,7 +118,7 @@ MEMO: (cache-font-metrics) ( name size traits -- metrics )
 : cache-font-metrics ( font -- metrics )
     [ name>> ] [ size>> ] [ font-traits ] tri (cache-font-metrics) ;
 
-[
+STARTUP-HOOK: [
     \ (cache-font) reset-memoized
     \ (cache-font-metrics) reset-memoized
-] "core-text.fonts" add-startup-hook
+]

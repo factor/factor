@@ -174,10 +174,10 @@ SYMBOL: event-stream-callbacks
 : event-stream-counter ( -- n )
     \ event-stream-counter counter ;
 
-[
+STARTUP-HOOK: [
     event-stream-callbacks
     [ [ drop expired? ] H{ } assoc-reject-as ] change-global
-] "core-foundation" add-startup-hook
+]
 
 : add-event-source-callback ( quot -- id )
     event-stream-counter <alien>

@@ -90,11 +90,11 @@ M: array symbol>string [ utf8 alien>string ] map ", " join ;
 : special-object>string ( n -- str )
     special-object utf8 alien>string ;
 
-[
+STARTUP-HOOK: [
     OBJ-CPU special-object>string string>cpu \ cpu set-global
     OBJ-OS special-object>string string>os \ os set-global
     OBJ-VM-VERSION special-object>string \ vm-version set-global
     OBJ-VM-GIT-LABEL special-object>string \ vm-git-label set-global
     OBJ-VM-COMPILER special-object>string \ vm-compiler set-global
     OBJ-VM-COMPILE-TIME special-object>string \ vm-compile-time set-global
-] "alien.strings" add-startup-hook
+]

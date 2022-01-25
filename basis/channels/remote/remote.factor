@@ -66,7 +66,7 @@ M: remote-channel to
 M: remote-channel from
     [ id>> from-message boa ] keep send-message ;
 
-[
+STARTUP-HOOK: [
     H{ } clone \ remote-channels set-global
     start-channel-node
-] "channel-registry" add-startup-hook
+]

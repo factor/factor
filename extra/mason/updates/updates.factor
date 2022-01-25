@@ -10,10 +10,10 @@ C: <sources> sources
 
 SYMBOLS: latest-sources last-built-sources ;
 
-[
+STARTUP-HOOK: [
     f latest-sources set-global
     f last-built-sources set-global
-] "mason.updates" add-startup-hook
+]
 
 : latest-boot-image ( -- boot-image )
     target-boot-image-name

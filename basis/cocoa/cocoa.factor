@@ -38,7 +38,7 @@ SYMBOL: frameworks
 
 frameworks [ V{ } clone ] initialize
 
-[ frameworks get [ load-framework ] each ] "cocoa" add-startup-hook
+STARTUP-HOOK: [ frameworks get [ load-framework ] each ]
 
 SYNTAX: FRAMEWORK: scan-token [ load-framework ] [ frameworks get push ] bi ;
 

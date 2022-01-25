@@ -125,4 +125,4 @@ ERROR: sodium-malloc-error ;
     sodium_bin2base64 0 = [ call-fail ] when b64 ascii decode unclip-last
     CHAR: \0 = [ call-fail ] unless ;
 
-[ sodium-init ] "sodium" add-startup-hook
+STARTUP-HOOK: sodium-init
