@@ -34,7 +34,7 @@ ARTICLE: "elevate.bugs" "Elevate bugs and caveats"
 ;
 
 HELP: elevated
-{ $values { "command" { $or array string } } { "replace?" boolean } { "win-console?" boolean } { "posix-graphical" boolean } }
+{ $values { "command" { $or array string } } { "replace?" boolean } { "win-console?" boolean } { "posix-graphical?" boolean } { "process" process } }
 { $description
     "Spawn a process from the command " { $slot "command" } " with superuser (administrator) privileges. If the calling process does not already have superuser privileges, it will request them by a number of platform-specific methods."
     $nl
@@ -60,7 +60,7 @@ HELP: elevated
 } ;
 
 HELP: elevate
-{ $values { "win-console?" boolean } { "posix-graphical" boolean } }
+{ $values { "win-console?" boolean } { "posix-graphical?" boolean } }
 { $description "Relaunch the current Factor process with superuser privileges. See " { $link elevated } " for an explanation, as the semantics are identical." } ;
 
 HELP: lowered
@@ -74,6 +74,7 @@ HELP: lowered
 { $errors { $link lowered-failed } " when giving up superuser rights failed." } ;
 
 HELP: already-root? 
+{ $values { "?" boolean } }
 { $description "Determine whether the current Factor process (on " { $link unix } ") or hardware thread {on " { $link windows } ") has administrator or elevated (root) privileges." } ; 
 HELP: lowered-failed 
 { $error-description "Thrown by " { $link lowered } " when giving up elevated privileges resulted in an error or failure by the operating system." } ;
