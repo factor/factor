@@ -16,11 +16,11 @@ CONSTANT: pause-label-image-path "vocab:audio/gadget/pause.png"
 
 SYMBOLS: play-label-image pause-label-image gadget-audio-engine ;
 
-[
+STARTUP-HOOK: [
     f play-label-image set-global
     f pause-label-image set-global
     f gadget-audio-engine set-global
-] "audio.gadget" add-startup-hook
+]
 
 : initialize-audio-gadgets ( -- )
     gadget-audio-engine get-global [

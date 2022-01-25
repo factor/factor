@@ -101,9 +101,9 @@ SYMBOL: main-vocab-hook
         main-vocab "run" set
     ] with-global ;
 
-[
+STARTUP-HOOK: [
     H{ } user-init-errors set-global
     default-cli-args
-] "command-line" add-startup-hook
+]
 
 { "debugger" "command-line" } "command-line.debugger" require-when

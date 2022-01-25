@@ -62,6 +62,4 @@ IN: windows.dropfiles
 : reject-files ( -- )
     world get world-reject-files ;
 
-[
-    f \ init-message-filter set-global
-] "init-dropfiles" add-startup-hook
+STARTUP-HOOK: [ f \ init-message-filter set-global ]

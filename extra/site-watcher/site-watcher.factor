@@ -9,7 +9,7 @@ SYMBOL: site-watcher-frequency
 5 minutes site-watcher-frequency set-global
 
 SYMBOL: running-site-watcher
-[ f running-site-watcher set-global ] "site-watcher" add-startup-hook
+STARTUP-HOOK: [ f running-site-watcher set-global ]
 
 <PRIVATE
 
