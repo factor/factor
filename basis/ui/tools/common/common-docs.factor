@@ -8,6 +8,3 @@ HELP: set-tool-dim
 HELP: with-lines
 { $values { "track" gadget } }
 { $description "Lines are added to the track gadget to visually demarcate its children." } ;
-
-HELP: com-show-active-buttons
-{ $description "Mapped to a keyboard gesture to execute " { $link show-active-buttons-popup } "." } ;

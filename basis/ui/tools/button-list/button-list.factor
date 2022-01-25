@@ -53,4 +53,3 @@ button-list-popup H{
 : show-active-buttons-popup ( tool -- )
     active-buttons get <model> "Active Buttons" <active-buttons-popup>
     [ hand-loc get-global point>rect show-glass ] [ request-focus ] bi ; inline
-
