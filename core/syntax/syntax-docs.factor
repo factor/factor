@@ -1,8 +1,8 @@
 USING: arrays assocs classes.algebra.private classes.maybe
 classes.tuple combinators command-line effects generic
-generic.math generic.single help.markup help.syntax io.pathnames
-kernel math parser sequences vocabs.loader vocabs.parser words
-words.alias words.constant words.symbol ;
+generic.math generic.single help.markup help.syntax init
+io.pathnames kernel math parser sequences vocabs.loader
+vocabs.parser words words.alias words.constant words.symbol ;
 IN: syntax
 
 ARTICLE: "parser-algorithm" "Parser algorithm"
