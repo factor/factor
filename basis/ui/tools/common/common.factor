@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors classes combinators.short-circuit kernel ui
 ui.gadgets ui.gadgets.borders ui.gadgets.scrollers
-ui.gadgets.tracks ui.pens.solid ui.theme ui.tools.button-list words ;
+ui.gadgets.tracks ui.pens.solid ui.theme words ;
 
 IN: ui.tools.common
 
@@ -48,6 +48,3 @@ SLOT: scroller
 
 : white-interior ( track -- track )
     content-background <solid> >>interior ;
-
-: com-show-active-buttons ( tool -- )
-    show-active-buttons-popup ;
