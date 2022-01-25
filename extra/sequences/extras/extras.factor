@@ -359,7 +359,7 @@ PRIVATE>
     ] [ 3drop f ] if ; inline
 
 : map-index! ( ... seq quot: ( ... elt index -- ... newelt ) -- ... seq )
-    over [ [ (each-index) ] dip collect ] keep ; inline
+    over [ [ (map-each-index) ] dip collect ] keep ; inline
 
 <PRIVATE
 
