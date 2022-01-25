@@ -114,6 +114,8 @@ IN: bootstrap.syntax
         "MACRO::"
         "MEMO::"
         "IDENTITY-MEMO::"
+        "STARTUP-HOOK:"
+        "SHUTDOWN-HOOK:"
     } [ "syntax" create-word drop ] each
 
     "t" "syntax" lookup-word define-symbol
