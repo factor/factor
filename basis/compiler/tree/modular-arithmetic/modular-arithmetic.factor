@@ -178,7 +178,8 @@ MEMO: fixnum-coercion ( flags -- nodes )
 
 : like->fixnum? ( #call -- ? )
     word>> {
-        >fixnum bignum>fixnum float>fixnum
+        >fixnum float>fixnum
+        bignum>fixnum bignum>fixnum-strict
         integer>fixnum integer>fixnum-strict
     } member-eq? ;
 
