@@ -410,29 +410,23 @@ PRIVATE>
 : (each-from) ( seq quot i -- i n quot' )
     [ (each) ] dip [ + ] curry 2dip ; inline
 
-: (each-index) ( seq quot -- i n quot' )
-    [ setup-each [ keep ] curry ] dip compose ; inline
-
-: (each-index-from) ( seq quot i -- i n quot' )
-    [ (each-index) ] dip [ + ] curry 2dip ; inline
-
 : (collect) ( quot into -- quot' )
     [ [ keep ] dip set-nth-unsafe ] 2curry ; inline
 
 : collect ( n quot into -- )
     (collect) each-integer ; inline
 
-: setup-map-each ( seq -- n quot )
+: setup-1each ( seq -- n quot )
     [ length check-length ] keep [ nth-unsafe ] curry ; inline
 
-: (map-each) ( seq quot -- n quot' )
-    [ setup-map-each ] dip compose ; inline
+: (1each) ( seq quot -- n quot' )
+    [ setup-1each ] dip compose ; inline
 
-: (map-each-index) ( seq quot -- n quot' )
-    [ setup-map-each [ keep ] curry ] dip compose ; inline
+: (each-index) ( seq quot -- n quot' )
+    [ setup-1each [ keep ] curry ] dip compose ; inline
 
 : map-into ( seq quot into -- )
-    [ (map-each) ] dip collect ; inline
+    [ (1each) ] dip collect ; inline
 
 : 2nth-unsafe ( n seq1 seq2 -- elt1 elt2 )
     [ nth-unsafe ] bi-curry@ bi ; inline
@@ -457,22 +451,18 @@ PRIVATE>
     over [ dupd nth-unsafe ] [ drop f ] if ; inline
 
 : (find) ( seq quot quot' -- i elt )
-    pick [ [ (map-each) ] dip call ] dip finish-find ; inline
+    pick [ [ (1each) ] dip call ] dip finish-find ; inline
 
 : (find-from) ( n seq quot quot' -- i elt )
     [ 2dup bounds-check? ] 2dip
-    [ (find) ] 2curry
-    [ 2drop f f ]
-    if ; inline
+    '[ _ _ (find) ] [ 2drop f f ] if ; inline
 
 : (find-index) ( seq quot quot' -- i elt )
-    pick [ [ (map-each-index) ] dip call ] dip finish-find ; inline
+    pick [ [ (each-index) ] dip call ] dip finish-find ; inline
 
 : (find-index-from) ( n seq quot quot' -- i elt )
     [ 2dup bounds-check? ] 2dip
-    [ (find-index) ] 2curry
-    [ 2drop f f ]
-    if ; inline
+    '[ _ _ (find-index) ] [ 2drop f f ] if ; inline
 
 : (accumulate) ( seq identity quot -- identity seq quot )
     swapd [ keepd ] curry ; inline
@@ -495,7 +485,7 @@ PRIVATE>
     overd [ [ collect ] keep ] new-like ; inline
 
 : map-as ( ... seq quot: ( ... elt -- ... newelt ) exemplar -- ... newseq )
-    [ (map-each) ] dip map-integers ; inline
+    [ (1each) ] dip map-integers ; inline
 
 : map ( ... seq quot: ( ... elt -- ... newelt ) -- ... newseq )
     over map-as ; inline
@@ -637,7 +627,7 @@ PRIVATE>
     [ dup ] swap [ keep ] curry produce nip ; inline
 
 : each-index ( ... seq quot: ( ... elt index -- ... ) -- ... )
-    (each-index) (each-integer) ; inline
+    (each-index) each-integer ; inline
 
 : map-index-as ( ... seq quot: ( ... elt index -- ... newelt ) exemplar -- ... newseq )
     [ dup length <iota> ] 2dip 2map-as ; inline

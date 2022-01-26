@@ -19,7 +19,15 @@ IN: sequences.tests
 
 { "cba" } [ "abcdef" 3 head-slice reverse ] unit-test
 
-{ 5040 } [ [ 1 2 3 4 5 6 7 ] 1 [ * ] reduce ] unit-test
+{ 5040 5040 } [
+    [ 1 2 3 4 5 6 7 ] dup rest-slice
+    [ 1 [ * ] reduce ] bi@
+] unit-test
+
+{ 10079 6459 } [
+    [ 1 2 3 4 5 6 7 ] dup rest-slice
+    [ 1 [ [ * ] [ + ] bi* ] reduce-index ] bi@
+] unit-test
 
 { 5040 { 1 1 2 6 24 120 720 } }
 [ { 1 2 3 4 5 6 7 } 1 [ * ] accumulate ] unit-test
