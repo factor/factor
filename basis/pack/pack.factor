@@ -127,7 +127,7 @@ MACRO: unpack ( str -- quot )
     [ [ ch>packed-length ] { } map-as start/end ]
     [ [ unpack-table at ] { } map-as ] bi
     [ '[ [ _ _ ] dip <slice> @ ] ] 3map
-    '[ [ _ cleave ] output>array ] ;
+    '[ _ cleave>array ] ;
 
 : unpack-native ( seq str -- seq )
     '[ _ _ unpack ] with-native-endian ; inline

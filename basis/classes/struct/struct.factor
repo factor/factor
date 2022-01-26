@@ -193,7 +193,7 @@ M: struct-c-type base-type ;
 : struct-slot-values-quot ( class -- quot )
     struct-slots
     [ name>> reader-word 1quotation ] map
-    '[ [ _ cleave ] output>array ] ;
+    '[ _ cleave>array ] ;
 
 : define-struct-slot-values-method ( class -- )
     [ \ struct-slot-values ] [ struct-slot-values-quot ] bi
