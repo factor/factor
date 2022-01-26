@@ -384,6 +384,10 @@ TUPLE: final-tuple ; final
 
 { "{ ~array~ }\n" } [ [ { { 1 2 } } short. ] with-string-writer ] unit-test
 
+{ "{ { 1 2 } }\n" } [ [ [ { { 1 2 } } short. ] without-limits ] with-string-writer ] unit-test
+
+{ "{ ~array~ }\n" } [ [ [ { { 1 2 } } . ] with-short-limits ] with-string-writer ] unit-test
+
 { "H{ { 1 { 2 3 } } }\n" } [
     f nesting-limit [
         [ H{ { 1 { 2 3 } } } . ] with-string-writer
