@@ -10,7 +10,7 @@ SYNTAX: slots[
 
 SYNTAX: slots{
     "}" [ reader-word 1quotation ] map-tokens
-    '[ [ _ cleave ] output>array ] append! ;
+    '[ _ cleave>array ] append! ;
 
 : >>writer-word ( name -- word )
     ">>" prepend "accessors" lookup-word ;

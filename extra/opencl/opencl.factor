@@ -225,14 +225,14 @@ M: cl-filter-linear  filter-mode-constant drop CL_FILTER_LINEAR ;
     } cleave ;
 
 : cl_device_fp_config>flags ( ulong -- sequence )
-    [ {
+    {
         [ CL_FP_DENORM           bitand 0 = [ f ] [ cl-denorm           ] if ]
         [ CL_FP_INF_NAN          bitand 0 = [ f ] [ cl-inf-and-nan      ] if ]
         [ CL_FP_ROUND_TO_NEAREST bitand 0 = [ f ] [ cl-round-to-nearest ] if ]
         [ CL_FP_ROUND_TO_ZERO    bitand 0 = [ f ] [ cl-round-to-zero    ] if ]
         [ CL_FP_ROUND_TO_INF     bitand 0 = [ f ] [ cl-round-to-inf     ] if ]
         [ CL_FP_FMA              bitand 0 = [ f ] [ cl-fma              ] if ]
-    } cleave ] { } output>sequence sift ;
+    } cleave>array sift ;
 
 : cl_device_mem_cache_type>cache-type ( uint -- cache-type )
     {
