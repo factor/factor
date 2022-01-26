@@ -116,6 +116,10 @@ syn match   factorTodo              /\v(TODO|FIXME|XXX):=/ contained
 
 syn match   factorInit              /\v<%(STARTUP-HOOK|SHUTDOWN-HOOK):>/     display
 
+syn cluster factorHelp              contains=factorHelp
+syn region  factorHelp              start=/\v<HELP:>/            skip=/\v<!>.*/     end=/\v<\S+>/   contains=@factorComment
+syn match   factorHelp              /\v<%(ARTICLE|ABOUT):>/     display
+
 syn region  factorDefn  matchgroup=NONE  start=/\v<%(SYNTAX|CONSTRUCTOR|%(M|MACRO|MEMO|TYPED)?:?):>/  skip=/\v<!>.*/  matchgroup=factorDefnDelims  end=/\v<;>/  contains=factorDefnDelims,@factorCluster keepend transparent
 syn region  factorDefnDelims        start=/\v<SYNTAX:>/                            skip=/\v<!>.*/  end=/\v<\S+>/  contains=@factorComment skipempty keepend contained
 syn region  factorDefnDelims        start=/\v<%(MACRO|MEMO|TYPED)?:?:>/            skip=/\v<!>.*/  end=/\v<\S+>/  contains=@factorComment nextgroup=factorEffectSkip skipempty keepend contained
@@ -275,8 +279,6 @@ syn region  factorUsing             start=/\v<USING:>/           skip=/\v<!>.*/ 
 
 syn cluster factorWordOps   contains=factorConstant,factorAlias,factorSingleton,factorSingletons,factorSymbol,factorSymbols,factorPostpone,factorDefer,factorForget,factorMixin,factorInstance,factorHook,factorMain
 
-" HELP:
-" ARTICLE:
 " C-ENUM:
 " FUNCTION:
 " TYPEDEF:
@@ -434,6 +436,7 @@ if !exists('g:factor_syn_no_init')
   HiLink   factorHook                   Typedef
   HiLink   factorMain                   Define
   HiLink   factorPostpone               Define
+  HiLink   factorHelp                   Define
   HiLink   factorDefer                  Define
   HiLink   factorForget                 Define
   HiLink   factorAlien                  Define
