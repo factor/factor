@@ -20,7 +20,10 @@ IN: did-you-mean
     [ drop \ no-word-error boa ]
     [ did-you-mean-restarts-with-defer ] 2bi ;
 
+: did-you-mean-words ( name -- possibilities )
+    all-words [ [ name>> ] histogram-by corrections ] keep
+    [ name>> swap member? ] with filter ;
+
 : did-you-mean ( name -- word )
-    dup all-words [ [ name>> ] histogram-by corrections ] keep
-    [ name>> swap member? ] with filter
-    <did-you-mean> throw-restarts no-word-restarted ;
+    dup did-you-mean-words <did-you-mean>
+    throw-restarts no-word-restarted ;
