@@ -40,3 +40,6 @@ SYNTAX: C-GLOBAL: scan-c-type scan-new-word define-global ;
 
 SYNTAX: pointer:
     scan-c-type <pointer> suffix! ;
+
+SYNTAX: INITIALIZE-ALIEN:
+    scan-word parse-definition '[ _ _ initialize-alien ] append! ;
