@@ -1,12 +1,26 @@
 ! Copyright (C) 2022 John Benediktsson
 ! See http://factorcode.org/license.txt for BSD license
 
-USING: accessors assocs continuations kernel math
-math.statistics parser sequences spelling vocabs vocabs.parser ;
+USING: accessors arrays assocs continuations formatting kernel
+math math.statistics parser sequences sorting spelling vocabs
+vocabs.parser ;
 
 IN: did-you-mean
 
-: did-you-mean ( name -- words )
+: did-you-mean-restarts ( possibilities -- restarts )
+    natural-sort
+    [ [ [ vocabulary>> ] [ name>> ] bi "Use %s:%s" sprintf ] keep ]
+    { } map>assoc ;
+
+: did-you-mean-restarts-with-defer ( name possibilities -- restarts )
+    did-you-mean-restarts "Defer word in current vocabulary"
+    rot 2array suffix ;
+
+: <did-you-mean> ( name possibilities -- error restarts )
+    [ drop \ no-word-error boa ]
+    [ did-you-mean-restarts-with-defer ] 2bi ;
+
+: did-you-mean ( name -- word )
     dup all-words [ [ name>> ] histogram-by corrections ] keep
     [ name>> swap member? ] with filter
-    <no-word-error> throw-restarts no-word-restarted ;
+    <did-you-mean> throw-restarts no-word-restarted ;
