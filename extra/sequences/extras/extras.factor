@@ -551,8 +551,15 @@ PRIVATE>
 : nth* ( n seq -- elt )
     [ length 1 - swap - ] [ nth ] bi ; inline
 
+<PRIVATE
+
+: (each-index-from) ( seq quot i -- i n quot' )
+    [ (each-index) ] dip [ + ] curry 2dip ; inline
+
+PRIVATE>
+
 : each-index-from ( ... seq quot: ( ... elt index -- ... ) i -- ... )
-    -rot (each-index) (each-integer) ; inline
+    (each-index-from) (each-integer) ; inline
 
 <PRIVATE
 
