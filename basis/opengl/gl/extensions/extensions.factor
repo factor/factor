@@ -7,7 +7,7 @@ ERROR: unknown-gl-platform ;
 << {
     { [ os windows? ] [ "opengl.gl.windows" ] }
     { [ os macosx? ]  [ "opengl.gl.macosx" ] }
-    { [ os unix? ] [ "opengl.gl.gtk" ] }
+    { [ os unix? ] [ "opengl.gl.x11" ] }
     [ unknown-gl-platform ]
 } cond use-vocab >>
 
