@@ -1028,3 +1028,11 @@ HELP: IDENTITY-MEMO::
 { $syntax "IDENTITY-MEMO:: word ( stack -- effect ) definition... ;" }
 { $values { "word" "a new word to define" } { "definition" "a word definition" } }
 { $description "Defines the given word at parse time as one which memoizes its output given a particular input with locals which is identical to another input. The stack effect is mandatory." } ;
+
+HELP: STARTUP-HOOK:
+{ $syntax "STARTUP-HOOK: word/quotation" }
+{ $description "Parses a word or a quotation and sets it as the startup hook for the current vocabulary." } ;
+
+HELP: SHUTDOWN-HOOK:
+{ $syntax "SHUTDOWN-HOOK: word/quotation" }
+{ $description "Parses a word or a quotation and sets it as the shutdown hook for the current vocabulary." } ;
