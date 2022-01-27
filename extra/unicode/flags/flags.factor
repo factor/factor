@@ -1,6 +1,6 @@
 USING: ascii assocs sequences ;
 
-IN: flags
+IN: unicode.flags
 
 CONSTANT: flag-codes H{
     { CHAR: A CHAR: 🇦 }
