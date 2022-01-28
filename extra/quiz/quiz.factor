@@ -3,7 +3,8 @@
 USING: accessors arrays assocs combinators combinators.smart
 continuations formatting io kernel math math.functions
 math.parser prettyprint quotations random sequences
-sequences.extras splitting strings unicode ;
+sequences.extras splitting strings unicode unicode.flags
+unicode.flags.images ;
 IN: quiz
 
 GENERIC: generate-question* ( question -- quot )
@@ -63,6 +64,8 @@ TUPLE: sqrt-question < number-response random-choices ;
 TUPLE: sq-question < number-response random-choices ;
 TUPLE: stack-shuffler < string-response n-shufflers ;
 TUPLE: state-capital-question < string-response ;
+TUPLE: country-from-flag < string-response n ;
+TUPLE: flag-from-countries < string-response n ;
 
 M: multiplication generate-question*
     [ count>> random ] [ n>> ] bi '[ _ random 2 + ] replicate
@@ -90,6 +93,12 @@ CONSTANT: state-capitals H{
 : state-capital ( state -- capital ) state-capitals at ;
 M: state-capital-question generate-question* drop state-capitals keys random '[ _ state-capital ] ;
 M: state-capital-question parse-response drop trim-blanks >title ;
+
+M: country-from-flag generate-question* drop valid-flags random '[ _ flag>unicode ] ;
+M: country-from-flag parse-response drop trim-blanks >title ;
+
+M: flag-from-countries generate-question* drop valid-flag-names random '[ _ unicode>flag ] ;
+M: flag-from-countries parse-response drop trim-blanks >title ;
 
 CONSTANT: stack-shufflers { dup 2dup drop 2drop swap over rot -rot roll -roll 2dup pick dupd }
 
@@ -179,6 +188,16 @@ M: sequence run-multiple-choice-quiz ( seq n -- questions )
 : run-shuffler-quiz ( -- )
     {
         T{ stack-shuffler { n-shufflers 4 } }
+    } 5 run-multiple-choice-quiz score-quiz ;
+
+: run-country-from-flag-quiz ( -- )
+    {
+        T{ country-from-flag { n 4 } }
+    } 5 run-multiple-choice-quiz score-quiz ;
+
+: run-flag-from-countries-quiz ( -- )
+    {
+        T{ flag-from-countries { n 4 } }
     } 5 run-multiple-choice-quiz score-quiz ;
 
 : run-main-quiz ( -- )
