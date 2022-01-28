@@ -5,7 +5,7 @@ ranges sequences sequences.extras strings ui.text unicode.flags ;
 IN: unicode.flags.images
 
 MEMO: valid-flags ( -- flags )
-    CHAR: a CHAR: z [a..b] 2 <k-permutations>
+    CHAR: a CHAR: z [a..b] 2 all-combinations-with-replacement
     [ >string unicode>flag ]
     [ monospace-font swap string>image drop dim>> first2 = ] map-filter ;
 
