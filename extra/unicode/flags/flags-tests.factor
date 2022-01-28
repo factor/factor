@@ -1,3 +1,3 @@
-USING: flags tools.test ;
+USING: unicode.flags tools.test ;
 
 { "🇺🇸" } [ "us" unicode-flag ] unit-test
