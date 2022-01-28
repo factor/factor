@@ -265,6 +265,7 @@ CONSTANT: alpha-2 H{
     { "VU" "Vanuatu" }
     { "WF" "Wallis and Futuna" }
     { "WS" "Samoa" }
+    { "XK" "Kosovo" }
     { "YE" "Yemen" }
     { "YT" "Mayotte" }
     { "YU" "Yugoslavia" }
