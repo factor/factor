@@ -1,4 +1,5 @@
-USING: accessors ascii assocs biassocs lexer sequences ;
+USING: accessors assocs biassocs kernel lexer prettyprint
+sequences unicode ;
 
 IN: unicode.flags
 
@@ -36,5 +37,14 @@ MEMO: flag-codes ( -- biassoc ) H{
 
 : flag>unicode ( flag -- country-code )
     [ flag-codes to>> at ] map ;
+
+! Random flags, England/Scotland/Wales, Refugee Nation Flag
+CONSTANT: extra-flags { "🏁" "🚩" "🎌" "🏴" "🏳" "🏳️‍🌈" "🏴‍☠️" "🏴󠁧󠁢󠁥󠁮󠁧󠁿" "🏴󠁧󠁢󠁳󠁣󠁴󠁿" "🏴󠁧󠁢󠁷󠁬󠁳󠁿" "🏳️‍🟧‍⬛️‍🟧" }
+
+: explain-extra-flags ( -- )
+    extra-flags [
+        dup . [ dup char>name ] { } map>assoc .
+    ] each ;
+
 
 SYNTAX: FLAG: scan-token unicode>flag suffix! ;
