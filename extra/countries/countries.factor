@@ -1,4 +1,4 @@
-IN: country-codes
+IN: countries
 
 ! ISO 3166-1
 
