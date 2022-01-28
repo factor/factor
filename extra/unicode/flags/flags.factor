@@ -1,4 +1,4 @@
-USING: accessors ascii assocs biassocs sequences ;
+USING: accessors ascii assocs biassocs lexer sequences ;
 
 IN: unicode.flags
 
@@ -36,3 +36,5 @@ MEMO: flag-codes ( -- biassoc ) H{
 
 : flag>unicode ( flag -- country-code )
     [ flag-codes to>> at ] map ;
+
+SYNTAX: FLAG: scan-token unicode>flag suffix! ;
