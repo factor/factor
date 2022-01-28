@@ -184,6 +184,45 @@ PRIVATE>
 
 <PRIVATE
 
+:: next-combination-with-replacement ( seq n -- seq )
+    seq n 1 - '[ _ = not ] find-last drop :> i
+    seq i tail-slice i seq nth 1 + '[ drop _ ] map! drop
+    seq ; inline
+
+:: combinations-with-replacement-quot ( seq k quot -- seq quot' )
+    seq length :> n
+    k 1 - n + factorial k factorial / n 1 - factorial / <iota>
+    k 0 <array> seq quot n
+    '[ drop _ [ _ nths-unsafe @ ] keep _ next-combination-with-replacement drop ] ; inline
+
+PRIVATE>
+
+: each-combination-with-replacement ( ... seq k quot: ( ... elt -- ... ) -- ... )
+    combinations-with-replacement-quot each ; inline
+
+: map-combinations-with-replacement ( ... seq k quot: ( ... elt -- ... newelt ) -- ... newseq )
+    combinations-with-replacement-quot map ; inline
+
+: filter-combinations-with-replacement ( ... seq k quot: ( ... elt -- ... ? ) -- ... newseq )
+    selector [ each-combination-with-replacement ] dip ; inline
+
+: map>assoc-combinations-with-replacement ( ... seq k quot: ( ... elt -- ... key value ) exemplar -- ... assoc )
+    [ combinations-with-replacement-quot ] dip map>assoc ; inline
+
+: all-combinations-with-replacement ( seq k -- seq' )
+    [ ] map-combinations-with-replacement ;
+
+: all-combinations-with-replacement? ( ... seq k quot: ( ... elt -- ... ? ) -- ... ? )
+    combinations-with-replacement-quot all? ; inline
+
+: find-combination-with-replacement ( ... seq k quot: ( ... elt -- ... ? ) -- ... elt/f )
+    [ f ] 3dip '[ nip _ keep swap ] combinations-with-replacement-quot find drop swap and ; inline
+
+: reduce-combinations-with-replacement ( ... seq k identity quot: ( ... prev elt -- ... next ) -- ... result )
+    -rotd each-combination-with-replacement ; inline
+
+<PRIVATE
+
 ! "Algorithm 515: Generation of a Vector from the Lexicographical Index"
 ! Buckles, B. P., and Lybanon, M. ACM
 ! Transactions on Mathematical Software, Vol. 3, No. 2, June 1977.
