@@ -3,6 +3,7 @@ IN: countries
 ! ISO 3166-1
 
 CONSTANT: alpha-2 H{
+    { "AC" "Ascension Island" }
     { "AD" "Andorra" }
     { "AE" "United Arab Emirates" }
     { "AF" "Afghanistan" }
@@ -10,6 +11,7 @@ CONSTANT: alpha-2 H{
     { "AI" "Anguilla" }
     { "AL" "Albania" }
     { "AM" "Armenia" }
+    { "AN" "Netherlands Antilles" }
     { "AO" "Angola" }
     { "AQ" "Antarctica" }
     { "AR" "Argentina" }
@@ -36,6 +38,7 @@ CONSTANT: alpha-2 H{
     { "BR" "Brazil" }
     { "BS" "Bahamas" }
     { "BT" "Bhutan" }
+    { "BU" "Burma" }
     { "BV" "Bouvet Island" }
     { "BW" "Botswana" }
     { "BY" "Belarus" }
@@ -52,7 +55,9 @@ CONSTANT: alpha-2 H{
     { "CM" "Cameroon" }
     { "CN" "China" }
     { "CO" "Colombia" }
+    { "CP" "Clipperton Island" }
     { "CR" "Costa Rica" }
+    { "CS" "Czechoslovakia" }
     { "CU" "Cuba" }
     { "CV" "Cabo Verde" }
     { "CW" "Curaçao" }
@@ -60,11 +65,13 @@ CONSTANT: alpha-2 H{
     { "CY" "Cyprus" }
     { "CZ" "Czechia" }
     { "DE" "Germany" }
+    { "DG" "Diego Garcia" }
     { "DJ" "Djibouti" }
     { "DK" "Denmark" }
     { "DM" "Dominica" }
     { "DO" "Dominican Republic" }
     { "DZ" "Algeria" }
+    { "EA" "Ceuta, Melilla" }
     { "EC" "Ecuador" }
     { "EE" "Estonia" }
     { "EG" "Egypt" }
@@ -72,12 +79,15 @@ CONSTANT: alpha-2 H{
     { "ER" "Eritrea" }
     { "ES" "Spain" }
     { "ET" "Ethiopia" }
+    { "EU" "European Union" }
+    { "EZ" "Eurozone" }
     { "FI" "Finland" }
     { "FJ" "Fiji" }
     { "FK" "Falkland Islands (Malvinas)" }
     { "FM" "Micronesia (Federated States of)" }
     { "FO" "Faroe Islands" }
     { "FR" "France" }
+    { "FX" "France, Metropolitan" }
     { "GA" "Gabon" }
     { "GB" "United Kingdom of Great Britain and Northern Ireland" }
     { "GD" "Grenada" }
@@ -103,6 +113,7 @@ CONSTANT: alpha-2 H{
     { "HR" "Croatia" }
     { "HT" "Haiti" }
     { "HU" "Hungary" }
+    { "IC" "Canary Islands" }
     { "ID" "Indonesia" }
     { "IE" "Ireland" }
     { "IL" "Israel" }
@@ -172,6 +183,7 @@ CONSTANT: alpha-2 H{
     { "NO" "Norway" }
     { "NP" "Nepal" }
     { "NR" "Nauru" }
+    { "NT" "Neutral Zone" }
     { "NU" "Niue" }
     { "NZ" "New Zealand" }
     { "OM" "Oman" }
@@ -200,6 +212,7 @@ CONSTANT: alpha-2 H{
     { "SC" "Seychelles" }
     { "SD" "Sudan" }
     { "SE" "Sweden" }
+    { "SF" "Finland" }
     { "SG" "Singapore" }
     { "SH" "Saint Helena, Ascension and Tristan da Cunha" }
     { "SI" "Slovenia" }
@@ -212,10 +225,12 @@ CONSTANT: alpha-2 H{
     { "SR" "Suriname" }
     { "SS" "South Sudan" }
     { "ST" "Sao Tome and Principe" }
+    { "SU" "USSR" }
     { "SV" "El Salvador" }
     { "SX" "Sint Maarten (Dutch part)" }
     { "SY" "Syrian Arab Republic" }
     { "SZ" "Eswatini" }
+    { "TA" "Tristan da Cunha" }
     { "TC" "Turks and Caicos Islands" }
     { "TD" "Chad" }
     { "TF" "French Southern Territories" }
@@ -227,14 +242,17 @@ CONSTANT: alpha-2 H{
     { "TM" "Turkmenistan" }
     { "TN" "Tunisia" }
     { "TO" "Tonga" }
+    { "TP" "East Timor" }
     { "TR" "Turkey" }
     { "TT" "Trinidad and Tobago" }
     { "TV" "Tuvalu" }
     { "TW" "Taiwan, Province of China" }
     { "TZ" "Tanzania, United Republic of" }
     { "UA" "Ukraine" }
+    { "UK" "United Kingdom" }
     { "UG" "Uganda" }
     { "UM" "United States Minor Outlying Islands" }
+    { "UN" "United Nations" }
     { "US" "United States of America" }
     { "UY" "Uruguay" }
     { "UZ" "Uzbekistan" }
@@ -249,8 +267,10 @@ CONSTANT: alpha-2 H{
     { "WS" "Samoa" }
     { "YE" "Yemen" }
     { "YT" "Mayotte" }
+    { "YU" "Yugoslavia" }
     { "ZA" "South Africa" }
     { "ZM" "Zambia" }
+    { "ZR" "Zaire" }
     { "ZW" "Zimbabwe" }
 }
 
