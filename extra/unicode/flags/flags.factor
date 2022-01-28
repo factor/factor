@@ -1,8 +1,8 @@
-USING: ascii assocs sequences ;
+USING: accessors ascii assocs biassocs sequences ;
 
 IN: unicode.flags
 
-CONSTANT: flag-codes H{
+MEMO: flag-codes ( -- biassoc ) H{
     { CHAR: A CHAR: 🇦 }
     { CHAR: B CHAR: 🇧 }
     { CHAR: C CHAR: 🇨 }
@@ -29,7 +29,10 @@ CONSTANT: flag-codes H{
     { CHAR: X CHAR: 🇽 }
     { CHAR: Y CHAR: 🇾 }
     { CHAR: Z CHAR: 🇿 }
-}
+} >biassoc ;
 
-: unicode-flag ( country-code -- flag )
-    >upper [ flag-codes at ] map ;
+: unicode>flag ( country-code -- flag )
+    >upper [ flag-codes from>> at ] map ;
+
+: flag>unicode ( flag -- country-code )
+    [ flag-codes to>> at ] map ;
