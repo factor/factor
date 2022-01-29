@@ -1,12 +1,12 @@
 ! Copyright (C) 2010 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors alien.enums alien.syntax arrays calendar
-combinators combinators.smart constructors endian
+USING: accessors alien.enums alien.syntax arrays ascii calendar
+combinators combinators.smart constructors continuations endian
 grouping io io.encodings.binary io.encodings.string
 io.encodings.utf8 io.sockets io.sockets.private
 io.streams.byte-array io.timeouts kernel make math math.bitwise
 math.parser namespaces random sequences slots.syntax splitting
-system vectors vocabs ascii ;
+system vectors vocabs ;
 IN: dns
 
 : with-input-seek ( n seek-type quot -- )
@@ -340,12 +340,17 @@ M: TXT rdata>byte-array
         [ send ] [ receive drop ] bi
     ] with-any-port-local-datagram ;
 
-: <dns-inet4> ( -- inet4 )
-    dns-servers get random 53 <inet4> ;
+: parse-ip ( str -- ipv4/ipv6 )
+    [ <ipv4> ] [ drop <ipv6> ] recover ;
+
+: <dns-inet> ( -- inet4 )
+    dns-servers get
+    [ parse-ip ] map [ ipv4? ] filter
+    random host>> 53 <inet4> ;
 
 : dns-query ( name type class -- message )
     <query> <message> message>byte-array
-    <dns-inet4> udp-query parse-message ;
+    <dns-inet> udp-query parse-message ;
 
 : dns-A-query ( name -- message ) A IN dns-query ;
 : dns-AAAA-query ( name -- message ) AAAA IN dns-query ;
@@ -392,7 +397,13 @@ M: TXT rdata>byte-array
     [ aaaa? ] filter-message-rdata>names ;
 
 : message>mxs ( message -- assoc )
-    answer-section>> [ rdata>> [ preference>> ] [ exchange>> ] bi 2array ] map ;
+    answer-section>> [
+        rdata>> dup cname? [
+            name>> 1array
+        ] [
+            [ preference>> ] [ exchange>> ] bi 2array
+        ] if
+    ] map ;
 
 : messages>names ( messages -- names )
     [ message>names ] map concat ;

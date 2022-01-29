@@ -22,8 +22,13 @@ IN: tools.dns
     [ a-message. ] [ (aaaa-message.) ] bi ;
 
 : mx-line. ( host pair -- )
-    [ write " mail is handled by " write ]
-    [ first2 [ number>string write bl ] [ print ] bi* ] bi* ;
+    dup length 1 = [
+        [ write " is an alias for " write ]
+        [ first print ] bi*
+    ] [
+        [ write " mail is handled by " write ]
+        [ first2 [ number>string write bl ] [ print ] bi* ] bi*
+    ] if ;
 
 : mx-message. ( message -- )
     [ message>query-name ] [ message>mxs ] bi
