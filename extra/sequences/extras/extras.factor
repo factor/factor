@@ -12,8 +12,7 @@ IN: sequences.extras
 :: subseq* ( from to seq -- subseq )
     seq length :> len
     from [ dup 0 < [ len + ] when ] [ 0 ] if*
-    to [ dup 0 < [ len + ] when ] [ len ] if*
-    [ 0 len clamp ] bi@ dupd max seq subseq ;
+    to [ dup 0 < [ len + ] when ] [ len ] if* [ 0 len clamp ] bi@ dupd max seq subseq ;
 
 : safe-subseq ( from to seq -- subseq )
     [ length '[ 0 _ clamp ] bi@ ] keep subseq ;
@@ -669,3 +668,36 @@ PRIVATE>
 : max-subarray-sum ( seq -- sum )
     [ -1/0. 0 ] dip
     [ [ + ] keep max [ max ] keep ] each drop ;
+
+TUPLE: step-slice
+    { from integer read-only initial: 0 }
+    { to integer read-only initial: 0 }
+    { seq read-only }
+    { step integer read-only } ;
+
+:: <step-slice> ( from to step seq -- step-slice )
+    step zero? [ "can't be zero" throw ] when
+    seq length :> len
+    step 0 > [
+        from [ 0 ] unless*
+        to [ len ] unless*
+    ] [
+        from [ len ] unless*
+        to [ 0 ] unless*
+    ] if
+    [ dup 0 < [ len + ] when 0 len clamp ] bi@
+    ! FIXME: make this work with steps
+    seq dup slice? [ collapse-slice ] when
+    step step-slice boa ;
+
+M: step-slice virtual-exemplar seq>> ; inline
+
+M: step-slice virtual@
+    [ step>> * ] [ from>> + ] [ seq>> ] tri ; inline
+
+M: step-slice length
+    [ to>> ] [ from>> - ] [ step>> ] tri
+    dup 0 < [ [ neg 0 max ] dip neg ] when /mod
+    zero? [ 1 + ] unless ; inline
+
+INSTANCE: step-slice virtual-sequence

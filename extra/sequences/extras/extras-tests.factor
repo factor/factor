@@ -276,3 +276,13 @@ tools.test vectors vocabs ;
 { -2 } [ { -3 -2 } max-subarray-sum ] unit-test
 { 7 } [ { 1 2 3 -4 5 } max-subarray-sum ] unit-test
 { 6 } [ { 1 2 3 -4 1 1 } max-subarray-sum ] unit-test
+
+{ { 9 7 5 } } [ -1 -6 -2 10 <iota> <step-slice> >array ] unit-test
+{ { 9 7 } } [ -1 -5 -2 10 <iota> <step-slice> >array ] unit-test
+{ { 9 7 } } [ -1 -4 -2 10 <iota> <step-slice> >array ] unit-test
+{ { 9 } } [ -1 -3 -2 10 <iota> <step-slice> >array ] unit-test
+{ { } } [ -4 10 -2 10 <iota> <step-slice> >array ] unit-test
+{ { 6 8 } } [ -4 15 2 10 <iota> <step-slice> >array ] unit-test
+{ { 1 3 } } [ 1 4 2 10 <iota> <step-slice> >array ] unit-test
+{ { 1 3 } } [ 1 5 2 10 <iota> <step-slice> >array ] unit-test
+{ { 1 3 5 } } [ 1 6 2 10 <iota> <step-slice> >array ] unit-test
