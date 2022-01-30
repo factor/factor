@@ -3,7 +3,7 @@
 USING: assocs assocs.extras formatting http http.client io
 io.encodings.string io.encodings.utf8 json.reader kernel
 namespaces sequences sequences.generalizations ;
-IN: cloud.hetzner
+IN: hetzner
 
 SYMBOL: hetzner-access-token
 
