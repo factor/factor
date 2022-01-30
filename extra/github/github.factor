@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: assocs cli.git formatting http.client io.pathnames
 json.reader kernel math namespaces sequences ;
-IN: web-services.github
+IN: github
 
 SYMBOL: github-username
 SYMBOL: github-token
