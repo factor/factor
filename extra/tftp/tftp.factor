@@ -6,7 +6,7 @@ io io.directories io.encodings.binary io.encodings.latin1
 io.encodings.string io.encodings.utf8 io.files io.files.info
 io.sockets kernel math math.parser namespaces pack prettyprint
 random sequences sequences.extras splitting strings ;
-IN: protocols.tftp
+IN: tftp
 
 CONSTANT: TFTP-RRQ 1 ! Read request (RRQ)
 CONSTANT: TFTP-WRQ 2 ! Write request (WRQ)
