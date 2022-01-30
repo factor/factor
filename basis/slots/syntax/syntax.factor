@@ -1,6 +1,6 @@
 ! Copyright (C) 2010 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: combinators combinators.smart fry kernel lexer quotations
+USING: combinators combinators.smart kernel lexer quotations
 sequences sequences.generalizations slots words ;
 IN: slots.syntax
 

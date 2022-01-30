@@ -217,8 +217,8 @@ PRIVATE>
 : intersect-keys ( assoc seq -- elts )
     [ of ] with zip-with sift-values ; inline
 
-: values-of ( assoc seq -- elts )
-    [ of ] with map sift ; inline
+: values-of ( assoc seq -- seq' )
+    [ of ] with map ; inline
 
 : counts ( seq elts -- counts )
     [ histogram ] dip intersect-keys ;
