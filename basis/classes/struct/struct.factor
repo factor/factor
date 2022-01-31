@@ -9,12 +9,12 @@ USING: accessors alien alien.c-types alien.data alien.parser
 arrays assocs byte-arrays classes classes.parser classes.private
 classes.struct.bit-accessors classes.tuple classes.tuple.parser
 classes.tuple.private combinators combinators.short-circuit
-cpu.architecture definitions delegate.private effects
-functors.backend generalizations generic generic.parser io
-kernel kernel.private lexer libc math math.order parser
-quotations sequences sequences.generalizations sequences.private
-slots slots.private specialized-arrays stack-checker.dependencies
-summary vectors vocabs.loader vocabs.parser words ;
+combinators.smart cpu.architecture definitions delegate.private
+effects functors.backend generalizations generic generic.parser
+io kernel kernel.private lexer libc math math.order parser
+quotations sequences sequences.private slots slots.private
+specialized-arrays stack-checker.dependencies summary vectors
+vocabs.loader vocabs.parser words ;
 
 SPECIALIZED-ARRAY: uchar
 
@@ -193,8 +193,7 @@ M: struct-c-type base-type ;
 : struct-slot-values-quot ( class -- quot )
     struct-slots
     [ name>> reader-word 1quotation ] map
-    [ name>> reader-word 1quotation ] map dup length
-    '[ _ cleave _ narray ] ;
+    '[ _ cleave>array ] ;
 
 : define-struct-slot-values-method ( class -- )
     [ \ struct-slot-values ] [ struct-slot-values-quot ] bi
