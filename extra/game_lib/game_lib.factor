@@ -1,8 +1,10 @@
-USING: accessors ui.gadgets kernel ui.gadgets.status-bar ui ui.render colors.constants opengl sequences ;
+USING: accessors ui.gadgets kernel ui.gadgets.status-bar ui ui.render colors.constants opengl sequences combinators peg ;
 
 IN: game_lib
 
-TUPLE: window-gadget < gadget dimension bg-color objects ;
+TUPLE: window-gadget < gadget dimension bg-color boxes-params ;
+
+TUPLE: box color loc dim ;
 
 :: display ( gadget -- )
     [ 
@@ -19,15 +21,25 @@ TUPLE: window-gadget < gadget dimension bg-color objects ;
     swap >>dimension 
     COLOR: white set-background-color ;
 
-! Getting error when using call in draw-gadget? 
-:: draw-rect ( gadget origin dim color -- gadget )
-    gadget [ color gl-color origin dim gl-fill-rect ] >>objects ;
+! adds new rectangle parameters to boxes-params as a tuple
+:: draw-rectangle ( gadget color loc dim -- gadget )
+    gadget 
+    gadget boxes-params>> 
+    box new color >>color loc >>loc dim >>dim { } 1sequence append
+    >>boxes-params ;
+
+! extracts parameter tuple and draws the rectangle
+:: draw-single-rect ( box-params -- )
+    box-params color>> gl-color box-params loc>> box-params dim>> gl-fill-rect ;
+
+! draws every rectangle in boxes-params
+: draw-rects ( boxes-params -- )
+    [ draw-single-rect ] each ;
 
 M: window-gadget pref-dim*
    dimension>> ;
 
 M: window-gadget draw-gadget*
-    dup bg-color>> gl-color dimension>>
-    { 0 0 } swap gl-fill-rect ;
-    ! objects>> call ;
-    ! [ COLOR: pink gl-color { 0 0 } { 10 10 } gl-fill-rect ] call ;
+    { 
+        [ boxes-params>> draw-rects ] 
+    } cleave ;
