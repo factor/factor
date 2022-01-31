@@ -1,10 +1,13 @@
-USING: accessors ui.gadgets kernel ui.gadgets.status-bar ui ui.render colors.constants opengl sequences combinators peg ;
+USING: accessors ui.gadgets kernel ui.gadgets.status-bar ui ui.render colors.constants opengl sequences combinators peg
+images.loader opengl.textures ;
 
 IN: game_lib
 
-TUPLE: window-gadget < gadget dimension bg-color boxes-params ;
+TUPLE: window-gadget < gadget dimension bg-color rects-params images-params ;
 
-TUPLE: box color loc dim ;
+TUPLE: rect color loc dim ;
+
+TUPLE: sprite image loc dim ;
 
 :: display ( gadget -- )
     [ 
@@ -21,25 +24,45 @@ TUPLE: box color loc dim ;
     swap >>dimension 
     COLOR: white set-background-color ;
 
-! adds new rectangle parameters to boxes-params as a tuple
-:: draw-rectangle ( gadget color loc dim -- gadget )
+:: draw-background ( gadget -- )
+    gadget bg-color>> gl-color 
+    { 0 0 } gadget dimension>> ! colors the full screen
+    gl-fill-rect ;
+
+! adds new rectangle parameters to rects-params as a tuple
+:: draw-filled-rectangle ( gadget color loc dim -- gadget )
     gadget 
-    gadget boxes-params>> 
-    box new color >>color loc >>loc dim >>dim { } 1sequence append
-    >>boxes-params ;
+    gadget rects-params>> 
+    rect new color >>color loc >>loc dim >>dim { } 1sequence append
+    >>rects-params ;
 
 ! extracts parameter tuple and draws the rectangle
-:: draw-single-rect ( box-params -- )
-    box-params color>> gl-color box-params loc>> box-params dim>> gl-fill-rect ;
+:: draw-single-rect ( rect-params -- )
+    rect-params color>> gl-color rect-params loc>> rect-params dim>> gl-fill-rect ;
 
-! draws every rectangle in boxes-params
-: draw-rects ( boxes-params -- )
+! draws every rectangle in rects-params
+: draw-rects ( rects-params -- )
     [ draw-single-rect ] each ;
+
+:: draw-image ( gadget path loc dim -- gadget )
+    gadget 
+    gadget images-params>> 
+    sprite new path load-image >>image loc >>loc dim >>dim { } 1sequence append
+    >>images-params ;
+
+! TODO: use the cache
+:: draw-single-image ( image-params -- )
+    image-params dim>> image-params image>> image-params loc>> <texture> draw-scaled-texture ;
+
+: draw-images ( images-params -- )
+    [ draw-single-image ] each ;
 
 M: window-gadget pref-dim*
    dimension>> ;
 
 M: window-gadget draw-gadget*
-    { 
-        [ boxes-params>> draw-rects ] 
+    {
+        [ draw-background ]
+        [ rects-params>> draw-rects ] 
+        [ images-params>> draw-images ]
     } cleave ;
