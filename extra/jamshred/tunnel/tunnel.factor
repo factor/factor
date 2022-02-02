@@ -2,8 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors alien.c-types colors combinators jamshred.oint
 kernel literals math math.constants math.order math.quadratic
-math.vectors random sequences specialized-arrays
-specialized-arrays.instances.alien.c-types.float vectors ;
+math.vectors random sequences specialized-arrays vectors ;
 FROM: jamshred.oint => distance ;
 FROM: alien.c-types => float ;
 SPECIALIZED-ARRAY: float

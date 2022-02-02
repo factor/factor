@@ -4,7 +4,7 @@
 USING: accessors colors combinators jamshred.oint
 jamshred.sound jamshred.tunnel kernel math math.order
 math.vectors ranges sequences specialized-arrays
-specialized-arrays.instances.alien.c-types.float strings system ;
+strings system ;
 QUALIFIED-WITH: alien.c-types c
 SPECIALIZED-ARRAY: c:float
 IN: jamshred.player
