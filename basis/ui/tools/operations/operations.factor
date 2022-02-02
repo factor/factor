@@ -119,7 +119,7 @@ IN: ui.tools.operations
     { +listener+ t }
 } define-operation
 
-[ annotated? not ] \ watch H{ } define-operation
+[ [ annotated? not ] [ word? ] bi and ] \ watch H{ } define-operation
 
 [ annotated? ] \ reset H{ } define-operation
 
