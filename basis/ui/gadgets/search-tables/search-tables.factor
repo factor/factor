@@ -1,9 +1,8 @@
 ! Copyright (C) 2008, 2009 Slava Pestov
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors calendar combinators.short-circuit delegate fry
-kernel locals models models.delay models.search
-ui.baseline-alignment ui.gadgets ui.gadgets.borders
-ui.gadgets.buttons ui.gadgets.editors ui.gadgets.labels
+USING: accessors combinators.short-circuit kernel models
+models.search ui.baseline-alignment ui.gadgets
+ui.gadgets.borders ui.gadgets.buttons ui.gadgets.editors
 ui.gadgets.scrollers ui.gadgets.tables ui.gadgets.tracks
 ui.gestures ui.pens ui.pens.image ui.theme.images ;
 IN: ui.gadgets.search-tables
@@ -52,7 +51,7 @@ M: search-field handle-gesture
         values >>model
         search <search-field> >>field
         dup field>> { 2 2 } <filled-border> f track-add
-        values search 500 milliseconds <delay> quot <string-search>
+        values search quot <string-search>
         renderer <table> f >>takes-focus? >>table
         dup table>> <scroller> 1 track-add ; inline
 
