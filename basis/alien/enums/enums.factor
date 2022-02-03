@@ -61,3 +61,6 @@ PREDICATE: enum-c-type-word < c-type-word
 
 : enum>keys ( enum -- seq )
     "c-type" word-prop members>> keys [ name>> ] map ;
+
+: values>enum ( values enum -- seq )
+    '[ _ number>enum ] map ; inline
