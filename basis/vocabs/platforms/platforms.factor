@@ -1,6 +1,6 @@
 ! Copyright (C) 2018 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors compiler.units kernel multiline parser
+USING: accessors compiler.units kernel lexer multiline parser
 sequences splitting system vocabs.parser ;
 IN: vocabs.platforms
 
@@ -50,3 +50,16 @@ SYNTAX: <!LINUX
 SYNTAX: <!WINDOWS
     "!WINDOWS>" parse-multiline-string
     os windows? [ drop ] [ ".windows" parse-platform-section ] if ;
+
+SYNTAX: USE-UNIX: scan-token os unix? [ use-vocab ] [ drop ] if ;
+SYNTAX: USE-FREEBSD: scan-token os freebsd? [ use-vocab ] [ drop ] if ;
+SYNTAX: USE-LINUX: scan-token os linux? [ use-vocab ] [ drop ] if ;
+SYNTAX: USE-MACOSX: scan-token os macosx? [ use-vocab ] [ drop ] if ;
+SYNTAX: USE-WINDOWS: scan-token os windows? [ use-vocab ] [ drop ] if ;
+
+SYNTAX: USE-X86-32: scan-token os x86.32? [ use-vocab ] [ drop ] if ;
+SYNTAX: USE-X86-64: scan-token os x86.64? [ use-vocab ] [ drop ] if ;
+SYNTAX: USE-ARM-32: scan-token os arm.32? [ use-vocab ] [ drop ] if ;
+SYNTAX: USE-ARM-64: scan-token os arm.64? [ use-vocab ] [ drop ] if ;
+
+SYNTAX: USE-IF: scan-token scan-object call( -- ? ) [ use-vocab ] [ drop ] if ;
