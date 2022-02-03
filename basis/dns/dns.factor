@@ -14,18 +14,27 @@ IN: dns
         [ seek-input ] dip call
     ] dip seek-absolute seek-input ; inline
 
+! https://www.iana.org/assignments/dns-parameters/dns-parameters.xhtml
 ENUM: dns-type
 { A 1 } { NS 2 } { MD 3 } { MF 4 }
 { CNAME 5 } { SOA 6 } { MB 7 } { MG 8 }
 { MR 9 } { NULL 10 } { WKS 11 } { PTR 12 }
 { HINFO 13 } { MINFO 14 } { MX 15 } { TXT 16 }
-{ RP 17 } { AFSDB 18 } { SIG 24 } { KEY 25 }
-{ AAAA 28 } { LOC 29 } { SRV 33 } { NAPTR 35 }
-{ KX 36 } { CERT 37 } { DNAME 39 } { OPT 41 }
+{ RP 17 } { AFSDB 18 } { X25 19 } { ISDN 20 } { RT 21 }
+{ NSAP 22 } { NSAP-PTR 23 } { SIG 24 } { KEY 25 } { PX 26 }
+{ GPOS 27 } { AAAA 28 } { LOC 29 } { NXT 30 } { EID 31 }
+{ NIMLOC 32 } { SRV 33 } { ATMA 34 } { NAPTR 35 } { KX 36 }
+{ CERT 37 } { A6 38 } { DNAME 39 } { SINK 40 } { OPT 41 }
 { APL 42 } { DS 43 } { SSHFP 44 } { IPSECKEY 45 }
 { RRSIG 46 } { NSEC 47 } { DNSKEY 48 } { DHCID 49 }
-{ NSEC3 50 } { NSEC3PARAM 51 } { HIP 55 } { SPF 99 }
-{ TKEY 249 } { TSIG 250 } { IXFR 251 }
+{ NSEC3 50 } { NSEC3PARAM 51 } { TLSA 52 } { SMIMEA 53 }
+{ HIP 55 } { NINFO 56 } { RKEY 57 } { TALINK 58 }
+{ CDS 59 } { CDNSKEY 60 } { OPENPGPKEY 61 }
+{ CSYNC 62 } { ZONEMD 63 } { SVCB 64 } { HTTPS 65 }
+{ SPF 99 } { UINFO 100 } { UID 101 } { GID 102 } { UNSPEC 103 }
+{ NID 104 } { L32 105 } { L64 106 } { LP 107 } { EUI48 108 } { EUI64 109 }
+{ TKEY 249 } { TSIG 250 } { IXFR 251 } { AXFR 252 } { MAILB 253 } { MAILA 254 }
+{ DNS* 255 } { URI 256 } { CAA 257 } { AVC 258 } { DOA 259 } { AMTRELAY 260 }
 { TA 32768 } { DLV 32769 } ;
 
 ENUM: dns-class { IN 1 } { CS 2 } { CH 3 } { HS 4 } ;
@@ -46,6 +55,11 @@ SYMBOL: dns-servers
 : clear-dns-servers ( -- )
     V{ } clone dns-servers set-global ;
 
+ERROR: domain-name-contains-empty-label domain ;
+
+: check-domain-name ( domain -- domain )
+    ".." over subseq? [ domain-name-contains-empty-label ] when ;
+
 : >dotted ( domain -- domain' )
     dup "." tail? [ "." append ] unless ;
 
@@ -54,7 +68,7 @@ SYMBOL: dns-servers
 
 TUPLE: query name type class ;
 CONSTRUCTOR: <query> query ( name type class -- obj )
-    [ >dotted ] change-name ;
+    [ check-domain-name >dotted ] change-name ;
 
 TUPLE: rr name type class ttl rdata ;
 
@@ -256,7 +270,9 @@ ERROR: unsupported-domain-name string ;
     [ length 1array ] [ ] bi B{ } append-as ;
 
 : >name ( domain -- byte-array )
-    "." split [ >n/label ] map concat ;
+    dup "." = [ drop B{ 0 } ] [
+        "." split [ >n/label ] map concat
+    ] if ;
 
 : query>byte-array ( query -- byte-array )
     [
@@ -354,6 +370,8 @@ M: TXT rdata>byte-array
 
 : dns-A-query ( name -- message ) A IN dns-query ;
 : dns-AAAA-query ( name -- message ) AAAA IN dns-query ;
+: dns-CNAME-query ( name -- message ) CNAME IN dns-query ;
+: dns-LOC-query ( name -- message ) LOC IN dns-query ;
 : dns-MX-query ( name -- message ) MX IN dns-query ;
 : dns-NS-query ( name -- message ) NS IN dns-query ;
 : dns-TXT-query ( name -- message ) TXT IN dns-query ;
