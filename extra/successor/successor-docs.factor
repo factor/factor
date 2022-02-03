@@ -3,7 +3,7 @@
 
 USING: help.markup help.syntax successor strings ;
 
-IN: succesor
+IN: successor
 
 HELP: successor
 { $values { "str" string } { "str'" string } }
