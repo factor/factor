@@ -40,7 +40,7 @@ SYMBOL: vocab-articles
         '[
             _ rest [
                 but-last join-lines
-                eval-with-stack
+                (eval-with-stack>string)
                 "\n" ?tail drop
             ] keep
             last assert=

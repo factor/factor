@@ -26,16 +26,17 @@ SYNTAX: eval( \ eval parse-call-paren ;
 : eval>string ( str -- output )
     [ (eval>string) ] with-file-vocabs ;
 
-: (eval-with-stack) ( str -- output )
+: (eval-with-stack) ( str -- )
+    parse-string [ output>array datastack. ] call( quot -- ) ;
+
+: eval-with-stack ( str -- )
+    [ (eval-with-stack) ] with-file-vocabs ;
+
+: (eval-with-stack>string) ( str -- output )
     [
-        [
-            parser-quiet? on parse-string [
-                output>array [
-                    nl "--- Data stack:" print stack.
-                ] unless-empty
-            ] call( quot -- )
-        ] [ nip print-error ] recover
+        parser-quiet? on
+        [ eval-with-stack ] [ nip print-error ] recover
     ] with-string-writer ;
 
-: eval-with-stack ( str -- output )
-    [ (eval-with-stack) ] with-file-vocabs ;
+: eval-with-stack>string ( str -- output )
+    [ (eval-with-stack>string) ] with-file-vocabs ;

@@ -44,12 +44,7 @@ from within Factor for more information.
 
 : run-script ( file -- )
     t parser-quiet? [
-        [
-            parse-file [
-                output>array
-                [ nl "--- Data stack:" print stack. ] unless-empty
-            ] call( quot --  )
-        ]
+        [ parse-file [ output>array datastack. ] call( quot --  ) ]
         [ path>source-file main>> [ execute( -- ) ] when* ] bi
     ] with-variable ;
 
@@ -62,7 +57,7 @@ from within Factor for more information.
             run-user-init
             "e" get script get or [
                 t auto-use? [
-                    "e" get [ eval-with-stack print ] when*
+                    "e" get [ eval-with-stack ] when*
                     script get [ run-script ] when*
                 ] with-variable
             ] [
