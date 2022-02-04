@@ -116,15 +116,13 @@ t error-summary? set-global
         ] dip
     ] when stack. ;
 
-: datastack. ( datastack -- )
-    display-stacks? get [
-        [ nl "--- Data stack:" title. trimmed-stack. ] unless-empty
-    ] [ drop ] if ;
+: ?datastack. ( datastack -- )
+    display-stacks? get [ datastack. ] [ drop ] if ;
 
 :: listener-step ( datastack -- datastack' )
     error-summary? get [ error-summary ] when
     visible-vars.
-    datastack datastack.
+    datastack ?datastack.
     input-stream get prompt prompt.
     flush
     [
