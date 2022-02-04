@@ -3,7 +3,7 @@
 USING: accessors combinators concurrency.combinators destructors
 fry grouping io io.backend io.ports io.streams.duplex kernel
 math namespaces quotations sequences simple-tokenizer splitting
-strings system vocabs ;
+strings system vocabs vocabs.platforms ;
 IN: io.pipes
 
 TUPLE: pipe in out ;
@@ -64,8 +64,5 @@ PRIVATE>
         run-pipeline-element
     ] 2parallel-map ;
 
-{
-    { [ os unix? ] [ "io.pipes.unix" require ] }
-    { [ os windows? ] [ "io.pipes.windows" require ] }
-    [ ]
-} cond
+USE-UNIX: io.pipes.unix
+USE-WINDOWS: io.pipes.windows

@@ -1,4 +1,5 @@
-USING: accessors alien.c-types alien.syntax system vocabs ;
+USING: accessors alien.c-types alien.syntax system vocabs
+vocabs.platforms ;
 QUALIFIED: sequences
 IN: unix.types
 
@@ -35,4 +36,4 @@ C-TYPE: rlimit
 C-TYPE: rusage
 C-TYPE: sockaddr
 
-"unix.types." os name>> sequences:append require
+USE-OS-SUFFIX: unix.types

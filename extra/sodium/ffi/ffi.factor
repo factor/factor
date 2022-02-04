@@ -5,11 +5,9 @@ classes.struct combinators literals math.order
 sodium.ffi.const sodium.ffi.const.size_max system ;
 IN: sodium.ffi
 
-<< "sodium" {
-    { [ os windows? ] [ "libsodium.dll" ] }
-    { [ os macosx? ] [ "libsodium.dylib" ] }
-    { [ os unix? ] [ "libsodium.so" ] }
-} cond cdecl add-library >>
+LIBRARY-UNIX: sodium cdecl "libsodium.so"
+LIBRARY-MACOSX: sodium cdecl "libsodium.dylib"
+LIBRARY-WINDOWS: sodium cdecl "libsodium.dll"
 
 LIBRARY: sodium
 

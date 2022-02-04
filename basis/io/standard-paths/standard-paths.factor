@@ -1,7 +1,7 @@
 ! Copyright (C) 2011 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: combinators io.pathnames kernel sequences system
-vocabs ;
+vocabs vocabs.platforms ;
 IN: io.standard-paths
 
 HOOK: find-native-bundle os ( string -- path )
@@ -30,9 +30,6 @@ M: object find-in-standard-login-path*
         [ append-path ] [ 2drop f ] if
     ] if-empty ;
 
-{
-    { [ os windows? ] [ "io.standard-paths.windows" ] }
-    { [ os unix? ] [ "io.standard-paths.unix" ] }
-} cond require
-
-os macosx? [ "io.standard-paths.macosx" require ] when
+USE-MACOSX: io.standard-paths.macosx
+USE-UNIX: io.standard-paths.unix
+USE-WINDOWS: io.standard-paths.windows

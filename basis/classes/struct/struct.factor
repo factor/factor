@@ -441,4 +441,4 @@ FUNCTOR-SYNTAX: STRUCT:
     [ parse-struct-slots* ] [ ] while
     [ >array define-struct-class ] append! ;
 
-{ "classes.struct" "prettyprint" } "classes.struct.prettyprint" require-when
+USE-WHEN-LOADED: classes.struct.prettyprint { "classes.struct" "prettyprint" }

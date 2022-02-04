@@ -7,11 +7,9 @@ literals namespaces openssl.libcrypto system ;
 SLOT: alpn-supported-protocols
 IN: openssl.libssl
 
-<< "libssl" {
-    { [ os windows? ] [ "libssl-38.dll" ] }
-    { [ os macosx? ] [ "libssl.35.dylib" ] }
-    { [ os unix? ] [ "libssl.so" ] }
-} cond cdecl add-library >>
+LIBRARY-UNIX: libssl cdecl "libssl.so"
+LIBRARY-MACOSX: libssl cdecl "libssl.35.dylib"
+LIBRARY-WINDOWS: libssl cdecl "libssl-38.dll"
 
 CONSTANT: X509_FILETYPE_PEM       1
 CONSTANT: X509_FILETYPE_ASN1      2

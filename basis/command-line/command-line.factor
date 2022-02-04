@@ -106,4 +106,4 @@ STARTUP-HOOK: [
     default-cli-args
 ]
 
-{ "debugger" "command-line" } "command-line.debugger" require-when
+USE-WHEN-LOADED: command-line.debugger { "debugger" "command-line" }

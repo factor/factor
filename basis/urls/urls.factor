@@ -218,4 +218,4 @@ PRIVATE>
 ! Literal syntax
 SYNTAX: URL" lexer get skip-blank parse-string >url suffix! ;
 
-{ "urls" "prettyprint" } "urls.prettyprint" require-when
+USE-WHEN-LOADED: urls.prettyprint { "urls" "prettyprint" }

@@ -1,6 +1,7 @@
 USING: accessors arrays assocs combinators command-line
 environment formatting fry io.launcher kernel locals math
-namespaces sequences splitting strings system ui vocabs ;
+namespaces sequences splitting strings system ui vocabs
+vocabs.platforms ;
 IN: elevate
 
 <PRIVATE
@@ -27,10 +28,7 @@ HOOK: lowered  os ( -- )
 
 : elevate ( win-console? posix-graphical? -- ) [ (command-line) t ] 2dip elevated drop ;
 
-os unix? [ "elevate.unix" require ] when
-
-{
-    { [ os windows? ] [ "elevate.windows" require ] }
-    { [ os linux? ] [ "elevate.linux" require ] }
-    { [ os macosx? ] [ "elevate.macosx" require ] }
-} cond
+USE-UNIX: elevate.unix
+USE-WINDOWS: elevate.windows
+USE-LINUX: elevate.linux
+USE-MACOSX: elevate.macosx

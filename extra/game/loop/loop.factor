@@ -97,5 +97,5 @@ PRIVATE>
 M: game-loop dispose
     stop-loop ;
 
-{ "game.loop" "prettyprint" } "game.loop.prettyprint" require-when
-{ "game.loop" "tools.memory" } "game.loop.benchmark" require-when
+USE-WHEN-LOADED: game.loop.prettyprint { "game.loop" "prettyprint" }
+USE-WHEN-LOADED: game.loop.benchmark { "game.loop" "tools.memory" }

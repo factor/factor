@@ -4,7 +4,7 @@ USING: accessors alien.data arrays calendar calendar.unix
 classes.struct combinators combinators.short-circuit io.backend
 io.files.info io.files.types kernel libc math math.bitwise
 sequences specialized-arrays strings system unix unix.ffi
-unix.groups unix.stat unix.time unix.users vocabs ;
+unix.groups unix.stat unix.time unix.users vocabs vocabs.platforms ;
 IN: io.files.info.unix
 SPECIALIZED-ARRAY: timeval
 
@@ -296,4 +296,4 @@ M: unix file-readable? R_OK access? ;
 M: unix file-writable? W_OK access? ;
 M: unix file-executable? X_OK access? ;
 
-"io.files.info.unix." os name>> append require
+USE-OS-SUFFIX: io.files.info.unix

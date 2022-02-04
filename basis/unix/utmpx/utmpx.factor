@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors alien.c-types alien.data alien.syntax
 continuations io.encodings.string io.encodings.utf8 kernel
-sequences system unix.ffi vocabs ;
+sequences system unix.ffi vocabs vocabs.platforms ;
 IN: unix.utmpx
 
 CONSTANT: EMPTY 0
@@ -47,4 +47,4 @@ M: unix new-utmpx-record
         produce nip
     ] with-utmpx ;
 
-"unix.utmpx." os name>> append require
+USE-OS-SUFFIX: unix.utmpx

@@ -5,11 +5,9 @@ alien.syntax classes.struct combinators system ;
 
 IN: openssl.libcrypto
 
-<< "libcrypto" {
-    { [ os windows? ] [ "libcrypto-37.dll" ] }
-    { [ os macosx? ] [ "libcrypto.35.dylib" ] }
-    { [ os unix? ] [ "libcrypto.so" ] }
-} cond cdecl add-library >>
+LIBRARY-UNIX: libcrypto cdecl "libcrypto.so"
+LIBRARY-MACOSX: libcrypto cdecl "libcrypto.35.dylib"
+LIBRARY-WINDOWS: libcrypto cdecl "libcrypto-37.dll"
 
 STRUCT: bio-method
     { type int }

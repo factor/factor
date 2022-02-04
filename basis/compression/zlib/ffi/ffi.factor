@@ -4,11 +4,9 @@ USING: alien alien.c-types alien.libraries alien.syntax
 classes.struct combinators system ;
 IN: compression.zlib.ffi
 
-<< "zlib" {
-    { [ os windows? ] [ "zlib1.dll" ] }
-    { [ os macosx? ] [ "libz.dylib" ] }
-    { [ os unix? ] [ "libz.so" ] }
-} cond cdecl add-library >>
+LIBRARY-UNIX: zlib cdecl "libz.so"
+LIBRARY-MACOSX: zlib cdecl "libz.dylib"
+LIBRARY-WINDOWS: zlib cdecl "zlib1.dll"
 
 LIBRARY: zlib
 

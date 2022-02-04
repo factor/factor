@@ -217,5 +217,4 @@ PRIVATE>
 
 SYNTAX: R/ parse-regexp ;
 
-
-{ "prettyprint" "regexp" } "regexp.prettyprint" require-when
+USE-WHEN-LOADED: regexp.prettyprint { "prettyprint" "regexp" }

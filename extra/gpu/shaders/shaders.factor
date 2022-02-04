@@ -633,4 +633,4 @@ M: program-instance dispose
     [ world>> ] [ program>> instances>> ] [ ] tri ?delete-at
     reset-memos ;
 
-{ "gpu.shaders" "prettyprint" } "gpu.shaders.prettyprint" require-when
+USE-WHEN-LOADED: gpu.shaders.prettyprint { "gpu.shaders" "prettyprint" }

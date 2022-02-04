@@ -16,6 +16,7 @@ IN: bootstrap.compiler
 ] unless
 
 { "boostrap.compiler" "prettyprint" } "alien.prettyprint" require-when
+! USE-WHEN-LOADED: alien.prettyprint { "boostrap.compiler" "prettyprint" }
 
 "cpu." cpu name>> append require
 

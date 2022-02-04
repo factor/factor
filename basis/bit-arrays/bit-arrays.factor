@@ -98,4 +98,4 @@ SYNTAX: ?{ \ } [ >bit-array ] parse-literal ;
 
 INSTANCE: bit-array sequence
 
-{ "bit-arrays" "prettyprint" } "bit-arrays.prettyprint" require-when
+USE-WHEN-LOADED: bit-arrays.prettyprint { "bit-arrays" "prettyprint" }

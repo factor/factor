@@ -2,10 +2,10 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors alien alien.c-types alien.data alien.libraries
 alien.syntax classes.struct sequences system unix.time
-unix.types vocabs ;
+unix.types vocabs vocabs.platforms ;
 IN: unix.ffi
 
-<< "unix.ffi." os name>> append require >>
+USE-OS-SUFFIX: unix.ffi
 
 CONSTANT: PROT_NONE   0
 CONSTANT: PROT_READ   1

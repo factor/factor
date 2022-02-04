@@ -4,7 +4,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors alien alien.c-types alien.destructors
 alien.syntax destructors destructors.private kernel math
-namespaces sequences sets summary system vocabs ;
+namespaces sequences sets summary system vocabs vocabs.platforms ;
 IN: libc
 
 HOOK: strerror os ( errno -- str )
@@ -122,4 +122,4 @@ FUNCTION: int system ( c-string command )
 DESTRUCTOR: free
 
 ! For libc.linux, libc.windows, libc.macosx...
-<< "libc." os name>> append require >>
+USE-OS-SUFFIX: libc

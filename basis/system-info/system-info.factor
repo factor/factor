@@ -1,7 +1,7 @@
 ! Copyright (C) 2008 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors io kernel math math.parser sequences system
-vocabs ;
+vocabs vocabs.platforms ;
 IN: system-info
 
 HOOK: os-version os ( -- version )
@@ -31,4 +31,4 @@ HOOK: username os ( -- string )
     "CPU Speed: " write cpu-mhz ghz nl
     "Physical RAM: " write physical-mem megs nl ;
 
-"system-info." os name>> append require
+USE-OS-SUFFIX: system-info

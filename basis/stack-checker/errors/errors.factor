@@ -35,4 +35,4 @@ ERROR: bad-declaration-error < inference-error declaration ;
 
 ERROR: unbalanced-branches-error < inference-error word quots declareds actuals ;
 
-{ "stack-checker.errors" "debugger" } "stack-checker.errors.prettyprint" require-when
+USE-WHEN-LOADED: stack-checker.errors.prettyprint { "stack-checker.errors" "debugger" }

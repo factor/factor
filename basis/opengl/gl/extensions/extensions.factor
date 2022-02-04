@@ -1,15 +1,16 @@
 USING: alien alien.syntax alien.parser combinators
 kernel parser sequences system words namespaces hashtables init
-math arrays assocs continuations lexer fry locals vocabs.parser ;
+math arrays assocs continuations lexer fry locals vocabs.parser
+vocabs.platforms ;
 IN: opengl.gl.extensions
 
-ERROR: unknown-gl-platform ;
-<< {
-    { [ os windows? ] [ "opengl.gl.windows" ] }
-    { [ os macosx? ]  [ "opengl.gl.macosx" ] }
-    { [ os unix? ] [ "opengl.gl.gtk" ] }
-    [ unknown-gl-platform ]
-} cond use-vocab >>
+USE-WINDOWS: opengl.gl.windows
+USE-MACOSX: opengl.gl.macosx
+! We can't have two gl-function-context in scope here
+! so load either macosx or unix
+<!MACOSX
+    USE-UNIX: opengl.gl.gtk
+!MACOSX>
 
 SYMBOL: +gl-function-counter+
 SYMBOL: +gl-function-pointers+

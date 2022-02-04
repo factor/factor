@@ -199,4 +199,4 @@ ERROR: bad-cuda-abi abi ;
     normalize-path <cuda-library>
     dup name>> cuda-libraries get-global set-at ;
 
-{ "cuda.libraries" "prettyprint" } "cuda.prettyprint" require-when
+USE-WHEN-LOADED: cuda.prettyprint { "cuda.libraries" "prettyprint" }

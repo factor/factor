@@ -3,14 +3,12 @@
 
 USING: accessors arrays combinators io.sockets
 io.sockets.private kernel sequences system
-vocabs.parser ;
+vocabs.parser vocabs.platforms ;
 
 IN: io.sockets.icmp
 
-<< {
-    { [ os windows? ] [ "windows.winsock" ] }
-    { [ os unix? ] [ "unix.ffi" ] }
-} cond use-vocab >>
+USE-WINDOWS: windows.winsock
+USE-UNIX: unix.ffi
 
 <PRIVATE
 

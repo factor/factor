@@ -130,7 +130,5 @@ M: x87-env (get-denormal-mode)
 M: x87-env (set-denormal-mode)
     drop ;
 
-cpu {
-    { x86.32 [ "math.floats.env.x86.32" ] }
-    { x86.64 [ "math.floats.env.x86.64" ] }
-} case require
+USE-X86-32: math.floats.env.x86.32
+USE-X86-64: math.floats.env.x86.64

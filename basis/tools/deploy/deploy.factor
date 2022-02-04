@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: combinators command-line io.directories kernel namespaces
 sequences system tools.deploy.backend tools.deploy.config
-tools.deploy.config.editor vocabs vocabs.loader ;
+tools.deploy.config.editor vocabs vocabs.loader vocabs.platforms ;
 IN: tools.deploy
 
 ERROR: no-vocab-main vocab ;
@@ -23,11 +23,9 @@ ERROR: no-vocab-main vocab ;
     [ vm-path ] 2dip
     swap dup deploy-config make-deploy-image drop ;
 
-{
-    { [ os macosx? ] [ "tools.deploy.macosx" ] }
-    { [ os windows? ] [ "tools.deploy.windows" ] }
-    { [ os unix? ] [ "tools.deploy.unix" ] }
-} cond require
+USE-MACOSX: tools.deploy.macosx
+USE-UNIX: tools.deploy.unix
+USE-WINDOWS: tools.deploy.windows
 
 : deploy-main ( -- )
     command-line get [ [ require ] [ deploy ] bi ] each ;

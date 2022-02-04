@@ -4,11 +4,9 @@ USING: alien alien.c-types alien.libraries alien.syntax
 combinators system tokyo.alien.tcutil tokyo.alien.tctdb ;
 IN: tokyo.alien.tcrdb
 
-<< "tokyotyrant" {
-    { [ os macosx? ] [ "libtokyotyrant.dylib" ] }
-    { [ os unix? ] [ "libtokyotyrant.so" ] }
-    { [ os windows? ] [ "tokyotyrant.dll" ] }
-} cond cdecl add-library >>
+LIBRARY-UNIX: tokyotyrant cdecl "libtokyotyrant.so"
+LIBRARY-MACOSX: tokyotyrant cdecl "libtokyotyrant.dylib"
+LIBRARY-WINDOWS: tokyotyrant cdecl "libtokyotyrant.dll"
 
 LIBRARY: tokyotyrant
 

@@ -153,6 +153,9 @@ PRIVATE>
 : without-fp-traps ( quot -- )
     { } swap with-fp-traps ; inline
 
+! USE-X86: math.floats.env.x86
+! USE-PPC: math.floats.env.ppc
+
 {
     { [ cpu x86? ] [ "math.floats.env.x86" require ] }
     { [ cpu ppc? ] [ "math.floats.env.ppc" require ] }

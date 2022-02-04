@@ -1,8 +1,8 @@
 ! Copyright (C) 2009, 2010 Slava Pestov, Joe Groff.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors alien alien.strings assocs combinators
-compiler.errors destructors kernel namespaces sequences strings
-system vocabs ;
+compiler.errors destructors kernel lexer namespaces
+parser sequences strings system vocabs vocabs.platforms ;
 IN: alien.libraries
 
 PRIMITIVE: dll-valid? ( dll -- ? )
@@ -100,9 +100,13 @@ deploy-libraries [ V{ } clone ] initialize
     [ deploy-libraries get 2dup member? [ 2drop ] [ push ] if ]
     [ "deploy-library failure" no-such-library ] if ;
 
+SYNTAX: DEPLOY-LIBRARY: scan-token deploy-library ;
+
 HOOK: >deployed-library-path os ( path -- path' )
 
-{
-    { [ os windows? ] [ "alien.libraries.windows" ] }
-    { [ os unix? ] [ "alien.libraries.unix" ] }
-} cond require
+SYNTAX: LIBRARY-MACOSX: scan-token scan-object scan-object swap add-library ;
+SYNTAX: LIBRARY-UNIX: scan-token scan-object scan-object swap add-library ;
+SYNTAX: LIBRARY-WINDOWS: scan-token scan-object scan-object swap add-library ;
+
+USE-UNIX: alien.libraries.unix
+USE-WINDOWS: alien.libraries.windows

@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors assocs combinators combinators.short-circuit
 io.files io.files.types io.pathnames kernel math strings system
-vocabs ;
+vocabs vocabs.platforms ;
 IN: io.files.info
 
 ! File info
@@ -66,7 +66,5 @@ M: object mount-points
 : find-mount-point ( path -- object )
     mount-points (find-mount-point) ;
 
-{
-    { [ os unix? ] [ "io.files.info.unix" ] }
-    { [ os windows? ] [ "io.files.info.windows" ] }
-} cond require
+USE-UNIX: io.files.info.unix
+USE-WINDOWS: io.fiels.info.windows

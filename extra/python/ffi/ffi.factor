@@ -1,10 +1,10 @@
 USING: alien alien.c-types alien.destructors alien.libraries
-alien.libraries.finder alien.syntax classes.struct ;
+alien.libraries.finder alien.syntax classes.struct vocabs.platforms ;
 IN: python.ffi
 
-<< "python"
-{ "python3.10" "python3.9" "python3.8" "python3.7" } find-library-from-list
-cdecl add-library >>
+ADD-FIRST-LIBRARY: python cdecl {
+    "python3.12" "python3.11" "python3.10" "python3.9" "python3.8" "python3.7"
+}
 
 ! Functions that return borrowed references needs to be called like this:
 ! Py_Func dup Py_IncRef &Py_DecRef

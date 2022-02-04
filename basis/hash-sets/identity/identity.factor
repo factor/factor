@@ -39,4 +39,4 @@ M: identity-hash-set set-like
 
 SYNTAX: IHS{ \ } [ >identity-hash-set ] parse-literal ;
 
-{ "hash-sets.identity" "prettyprint" } "hash-sets.identity.prettyprint" require-when
+USE-WHEN-LOADED: hash-sets.identity.prettyprint { "hash-sets.identity" "prettyprint" }

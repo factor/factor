@@ -40,4 +40,4 @@ M: number-hashtable new-assoc drop <number-hashtable> ;
 
 SYNTAX: NH{ \ } [ >number-hashtable ] parse-literal ;
 
-{ "hashtables.numbers" "prettyprint" } "hashtables.numbers.prettyprint" require-when
+USE-WHEN-LOADED: hashtables.numbers.prettyprint { "hashtables.numbers" "prettyprint" }

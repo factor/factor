@@ -4,7 +4,7 @@ USING: accessors arrays classes classes.algebra classes.tuple
 classes.struct combinators combinators.short-circuit definitions
 effects effects.parser fry generalizations kernel kernel.private
 locals locals.parser macros quotations sequences slots
-stack-checker.dependencies words ;
+stack-checker.dependencies vocabs.loader words ;
 FROM: classes.tuple.private => tuple-layout ;
 IN: typed
 
@@ -166,7 +166,5 @@ SYNTAX: TYPED:
 SYNTAX: TYPED::
     (::) define-typed ;
 
-USE: vocabs.loader
-
-{ "typed" "prettyprint" } "typed.prettyprint" require-when
-{ "typed" "compiler.cfg.debugger" } "typed.debugger" require-when
+USE-WHEN-LOADED: typed.prettyprint { "typed" "prettyprint" }
+USE-WHEN-LOADED: typed.debugger { "typed" "compiler.cfg.debugger" }

@@ -5,7 +5,7 @@ combinators.short-circuit continuations deques destructors
 dlists fry io io.backend io.encodings.binary io.files
 io.files.info io.files.links io.files.types io.pathnames kernel
 kernel.private make math namespaces sequences sorting strings
-system unicode vocabs ;
+system unicode vocabs vocabs.platforms ;
 IN: io.directories
 
 : set-current-directory ( path -- )
@@ -262,7 +262,5 @@ DEFER: copy-trees-into
 : copy-trees-into ( files to -- )
     '[ _ copy-tree-into ] each ;
 
-{
-    { [ os unix? ] [ "io.directories.unix" require ] }
-    { [ os windows? ] [ "io.directories.windows" require ] }
-} cond
+USE-UNIX: io.directories.unix
+USE-WINDOWS: io.directories.windows

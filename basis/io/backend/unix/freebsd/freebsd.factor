@@ -1,4 +1,6 @@
-USING: io.backend io.backend.unix system namespaces kernel accessors assocs continuations unix init io.backend.unix.multiplexers io.backend.unix.multiplexers.kqueue vocabs io.files.unix ;
+USING: io.backend io.backend.unix system namespaces kernel
+accessors assocs continuations unix init io.backend.unix.multiplexers
+io.backend.unix.multiplexers.kqueue vocabs io.files.unix ;
 
 << "io.files.unix" require >> ! needed for deploy
 

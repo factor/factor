@@ -3,7 +3,7 @@
 USING: accessors arrays calendar calendar.english
 calendar.format combinators io.directories io.files.info kernel
 math math.parser prettyprint sequences sorting.slots splitting
-system vocabs ;
+system vocabs vocabs.platforms ;
 IN: tools.files
 
 <PRIVATE
@@ -125,7 +125,5 @@ CONSTANT: default-file-systems-spec
 : file-systems. ( -- )
     default-file-systems-spec print-file-systems ;
 
-{
-    { [ os unix? ] [ "tools.files.unix" ] }
-    { [ os windows? ] [ "tools.files.windows" ] }
-} cond require
+USE-UNIX: tools.files.unix
+USE-WINDOWS: tools.files.unix

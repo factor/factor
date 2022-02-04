@@ -38,4 +38,5 @@ M: sequence-hash-set clone
 
 SYNTAX: SHS{ \ } [ >sequence-hash-set ] parse-literal ;
 
-{ "hash-sets.sequences" "prettyprint" } "hash-sets.sequences.prettyprint" require-when
+USE-WHEN-LOADED: hash-sets.sequences.prettyprint { "hash-sets.sequences" "prettyprint" }
+

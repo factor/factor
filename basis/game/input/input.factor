@@ -106,9 +106,6 @@ SYMBOLS: pressed released ;
 : buttons-delta ( old-buttons new-buttons -- delta )
     { } buttons-delta-as ; inline
 
-{
-    { [ os windows? ] [ "game.input.dinput" require ] }
-    { [ os macosx? ] [ "game.input.iokit" require ] }
-    { [ os linux? ] [ "game.input.gtk" require ] }
-    [ ]
-} cond
+USE-WINDOWS: game.input.dinput
+USE-MACOSX: game.input.iokit
+USE-LINUX: game.input.gtk

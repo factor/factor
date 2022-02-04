@@ -353,4 +353,4 @@ PRIVATE>
 : http-trace* ( url -- response data )
     <trace-request> http-request* ;
 
-{ "http.client" "debugger" } "http.client.debugger" require-when
+USE-WHEN-LOADED: http.client.debugger { "http.client" "debugger" }

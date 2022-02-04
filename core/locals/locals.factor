@@ -13,3 +13,5 @@ IN: locals
 
 { "locals" "prettyprint" } "locals.definitions" require-when
 { "locals" "prettyprint" } "locals.prettyprint" require-when
+! USE-WHEN-LOADED: locals.definitions { "locals" "prettyprint" }
+! USE-WHEN-LOADED: locals.prettyprint { "locals" "prettyprint" }

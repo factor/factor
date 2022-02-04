@@ -47,4 +47,4 @@ M: wrapped-hash-set equal?
 
 INSTANCE: wrapped-hash-set set
 
-{ "hash-sets.wrapped" "prettyprint" } "hash-sets.wrapped.prettyprint" require-when
+USE-WHEN-LOADED: hash-sets.wrapped.prettyprint { "hash-sets.wrapped" "prettyprint" }

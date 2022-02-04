@@ -2,7 +2,8 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs cache combinators fonts kernel
 math math.order namespaces opengl opengl.gl opengl.textures
-sequences strings system ui.gadgets.worlds vocabs ;
+sequences strings system ui.gadgets.worlds vocabs
+vocabs.platforms ;
 IN: ui.text
 
 <PRIVATE
@@ -79,8 +80,8 @@ M: array draw-text
         ] with each
     ] do-matrix ;
 
-{
-    { [ os macosx? ] [ "core-text" ] }
-    { [ os windows? ] [ "uniscribe" ] }
-    { [ os unix? ] [ "pango" ] }
-} cond "ui.text." prepend require
+USE-MACOSX: ui.text.core-text
+<!MACOSX
+    USE-UNIX: ui.text.pango
+!MACOSX>
+USE-WINDOWS: ui.text.uniscribe

@@ -86,4 +86,4 @@ INSTANCE: valist assoc
 
 SYNTAX: VA{ \ } [ >valist ] parse-literal ;
 
-{ "vlists" "prettyprint" } "vlists.prettyprint" require-when
+USE-WHEN-LOADED: vlists.prettyprint { "vlists" "prettyprint" }

@@ -10,13 +10,7 @@ IN: clutter.cogl.ffi
 
 LIBRARY: clutter.cogl
 
-<<
-"clutter.cogl" {
-    { [ os windows? ] [ drop ] }
-    { [ os macosx? ] [ drop ] }
-    { [ os unix? ] [ "libclutter-glx-1.0.so" cdecl add-library ] }
-} cond
->>
+LIBRARY-UNIX: clutter.cogl cdecl "libclutter-glx-1.0.so"
 
 FOREIGN-ATOMIC-TYPE: GL.uint GLuint
 FOREIGN-ATOMIC-TYPE: GL.enum GLenum

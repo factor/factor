@@ -1,5 +1,5 @@
-USING: accessors alien.libraries kernel sequences system vocabs
-;
+USING: accessors alien.libraries kernel lexer parser sequences
+system vocabs vocabs.platforms ;
 IN: alien.libraries.finder
 
 HOOK: find-library* os ( name -- path/f )
@@ -21,4 +21,8 @@ HOOK: find-library* os ( name -- path/f )
     dup [ find-library* ] map-find drop
     [ ] [ ?first "library_not_found" or ] ?if ;
 
-"alien.libraries.finder." os name>> append require
+SYNTAX: ADD-FIRST-LIBRARY:
+    scan-token scan-word scan-object
+    find-library-from-list swap add-library ;
+
+USE-OS-SUFFIX: alien.libraries.finder

@@ -2,7 +2,7 @@ USING: alien alien.c-types alien.data alien.accessors
 alien.parser effects kernel windows.ole32 parser lexer splitting
 grouping sequences namespaces assocs quotations generalizations
 accessors words macros alien.syntax fry arrays layouts math
-classes.struct windows.kernel32 locals ;
+classes.struct windows.kernel32 locals vocabs.loader ;
 FROM: alien.parser.private => parse-pointers ;
 IN: windows.com.syntax
 
@@ -94,6 +94,4 @@ SYNTAX: COM-INTERFACE:
 
 SYNTAX: GUID: scan-token string>guid suffix! ;
 
-USE: vocabs.loader
-
-{ "windows.com" "prettyprint" } "windows.com.prettyprint" require-when
+USE-WHEN-LOADED: windows.com.prettyprint { "windows.com" "prettyprint" }

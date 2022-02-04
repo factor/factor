@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors concurrency.mailboxes continuations destructors
 fry io.backend io.timeouts kernel namespaces sequences system
-vocabs ;
+vocabs vocabs.platforms ;
 IN: io.monitors
 
 HOOK: init-monitors io-backend ( -- )
@@ -71,4 +71,4 @@ SYMBOL: +rename-file+
 : run-monitor ( path recursive? quot -- )
     '[ [ @ t ] loop ] with-monitor ; inline
 
-"io.monitors." os name>> append require
+USE-OS-SUFFIX: io.monitors

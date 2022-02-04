@@ -13,13 +13,8 @@ IN: gdk.ffi
 
 LIBRARY: gdk
 
-<<
-"gdk" {
-    { [ os windows? ] [ "libgdk-win32-2.0-0.dll" cdecl add-library ] }
-    { [ os macosx? ] [ drop ] }
-    { [ os unix? ] [ "libgdk-x11-2.0.so" cdecl add-library ] }
-} cond
->>
+LIBRARY-UNIX: gdk cdecl "libgdk-x11-2.0.so"
+LIBRARY-WINDOWS: gdk cdecl "libgdk-win32-2.0-0.dll"
 
 ! <workaround these types are from cairo 1.10
 STRUCT: cairo_rectangle_int_t

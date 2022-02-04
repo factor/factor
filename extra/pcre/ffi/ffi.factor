@@ -1,12 +1,10 @@
 USING: alien alien.c-types alien.libraries alien.syntax
-classes.struct combinators system ;
+classes.struct combinators system vocabs.platforms ;
 IN: pcre.ffi
 
-<< "pcre" {
-    { [ os windows? ] [ "pcre.dll" ] }
-    { [ os macosx? ] [ "libpcre.dylib" ] }
-    { [ os unix? ] [ "libpcre.so" ] }
-} cond cdecl add-library >>
+LIBRARY-UNIX: pcre cdecl "pcre.so"
+LIBRARY-MACOSX: pcre cdecl "libpcre.dylib"
+LIBRARY-WINDOWS: pcre cdecl "libpcre.dll"
 
 LIBRARY: pcre
 

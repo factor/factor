@@ -1,6 +1,6 @@
 USING: accessors assocs classes.struct io locals math.bitwise
 namespaces system tools.image-analyzer.utils tools.image-analyzer.vm
-vm vocabs.parser ;
+vm vocabs.parser vocabs.platforms ;
 IN: tools.image-analyzer.data-heap-reader
 FROM: alien.c-types => uchar heap-size ;
 FROM: arrays => 2array ;
@@ -8,13 +8,8 @@ FROM: kernel => ? boa bi dup keep nip swap ;
 FROM: layouts => data-alignment ;
 FROM: math => + - * align neg shift ;
 
-<<
-! For the two annoying structs that differ on 32 and 64 bit.
-cpu x86.32?
-"tools.image-analyzer.vm.32"
-"tools.image-analyzer.vm.64"
-? use-vocab
->>
+USE-X86-64: tools.image-analyzer.vm.64
+USE-X86-32: tools.image-analyzer.vm.32
 
 : tag>class ( tag -- class )
     {

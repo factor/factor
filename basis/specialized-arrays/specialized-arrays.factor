@@ -174,8 +174,8 @@ SYNTAX: SPECIALIZED-ARRAYS:
 SYNTAX: SPECIALIZED-ARRAY:
     scan-c-type define-array-vocab use-vocab ;
 
-{ "specialized-arrays" "prettyprint" } "specialized-arrays.prettyprint" require-when
+USE-WHEN-LOADED: specialized-arrays.prettyprint { "specialized-arrays" "prettyprint" }
 
-{ "specialized-arrays" "mirrors" } "specialized-arrays.mirrors" require-when
+USE-WHEN-LOADED: specialized-arrays.mirrors { "specialized-arrays" "mirrors" }
 
 uchar define-array-vocab drop

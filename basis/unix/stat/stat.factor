@@ -1,5 +1,5 @@
 USING: accessors alien.c-types alien.syntax classes.struct
-kernel sequences system unix vocabs ;
+kernel sequences system unix vocabs vocabs.platforms ;
 IN: unix.stat
 
 ! File Types
@@ -21,7 +21,7 @@ STRUCT: fsid
 TYPEDEF: fsid __fsid_t
 TYPEDEF: fsid fsid_t
 
-<< "unix.stat." os name>> append require >>
+USE-OS-SUFFIX: unix.stat
 
 : file-status ( pathname -- stat )
     \ stat new [ [ stat-func ] unix-system-call drop ] keep ;
