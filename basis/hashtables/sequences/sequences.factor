@@ -40,4 +40,4 @@ M: sequence-hashtable new-assoc drop <sequence-hashtable> ;
 
 SYNTAX: SH{ \ } [ >sequence-hashtable ] parse-literal ;
 
-{ "hashtables.sequences" "prettyprint" } "hashtables.sequences.prettyprint" require-when
+USE-WHEN-LOADED: hashtables.sequences.prettyprint { "hashtables.sequences" "prettyprint" }

@@ -107,4 +107,4 @@ XML-ERROR: bad-encoding encoding ;
 UNION: xml-error
     unclosed multitags notags pre/post-content generated-xml-error ;
 
-{ "xml.errors" "debugger" } "xml.errors.debugger" require-when
+USE-WHEN-LOADED: xml.errors.debugger { "xml.errors" "debugger" }

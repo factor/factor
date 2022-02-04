@@ -11,12 +11,6 @@ IN: clutter.gtk.ffi
 
 LIBRARY: clutter.gtk
 
-<<
-"clutter.gtk" {
-    { [ os windows? ] [ drop ] }
-    { [ os macosx? ] [ drop ] }
-    { [ os unix? ] [ "libclutter-gtk-1.0.so" cdecl add-library ] }
-} cond
->>
+LIBRARY-UNIX: clutter.gtk cdecl "libclutter-gtk-1.0.so"
 
 GIR: GtkClutter-1.0.gir

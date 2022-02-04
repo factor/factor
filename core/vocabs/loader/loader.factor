@@ -1,8 +1,8 @@
 ! Copyright (C) 2007, 2010 Eduardo Cavazos, Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs combinators continuations
-definitions init io io.files io.pathnames kernel make namespaces
-parser sequences sets splitting strings vocabs words ;
+definitions init io io.files io.pathnames kernel lexer make
+namespaces parser sequences sets splitting strings vocabs words ;
 IN: vocabs.loader
 
 SYMBOL: vocab-roots
@@ -184,5 +184,16 @@ PRIVATE>
 
 M: vocab-spec where vocab-source-path dup [ 1 2array ] when ;
 
+SYNTAX: USE-WHEN-LOADED:
+    scan-token
+    scan-object
+    dup [ lookup-vocab ] all? [
+        drop require
+    ] [
+        [ nip require-when-vocabs get adjoin-all ]
+        [ swap 2array require-when-table get push ] 2bi
+    ] if ;
+
 ! put here to avoid circularity between vocabs.loader and source-files.errors
 { "source-files.errors" "debugger" } "source-files.errors.debugger" require-when
+! USE-WHEN-LOADED: source-files.errors.debugger { "source-files.errors" "debugger" }

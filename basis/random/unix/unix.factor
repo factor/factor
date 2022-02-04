@@ -17,10 +17,10 @@ M: unix-random random-bytes*
 
 HINTS: M\ unix-random random-bytes* { fixnum unix-random } ;
 
-STARTUP-HOOK: [
-    "/dev/random" <unix-random> &dispose
-    secure-random-generator set-global
+! STARTUP-HOOK: [
+!     "/dev/random" <unix-random> &dispose
+!     secure-random-generator set-global
 
-    "/dev/urandom" <unix-random> &dispose
-    system-random-generator set-global
-]
+!     "/dev/urandom" <unix-random> &dispose
+!     system-random-generator set-global
+! ]

@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: alien.accessors alien.c-types alien.data alien.strings
 alien.syntax alien.utilities environment io.encodings.utf8
-kernel libc system unix.ffi vocabs ;
+kernel libc system unix.ffi vocabs vocabs.platforms ;
 IN: environment.unix
 
 HOOK: environ os ( -- void* )
@@ -30,4 +30,4 @@ M: unix set-os-envs-pointer environ set-void* ;
 M: unix (set-os-envs)
     utf8 strings>alien malloc-byte-array set-os-envs-pointer ;
 
-os macosx? [ "environment.unix.macosx" require ] when
+USE-MACOSX: environment.unix.macosx

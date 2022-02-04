@@ -10,6 +10,12 @@ IN: curses.ffi
     { [ os unix?  ]  [ "ncursesw" find-library ] }
 } cond cdecl add-library >>
 
+<!MACOSX
+LIBRARY-UNIX: curses cdecl $[ "ncursesw" find-library ]
+!MACOSX>
+LIBRARY-MACOSX: curses cdecl "libcurses.dylib"
+LIBRARY-WINDOWS: curses cdecl "libcurses.dll"
+
 C-TYPE: SCREEN
 TYPEDEF: void* va_list
 

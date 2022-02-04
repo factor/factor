@@ -5,7 +5,7 @@ byte-vectors combinators combinators.short-circuit endian fry
 hashtables hashtables.private hash-sets hints io.backend kernel
 locals math math.bitwise math.constants math.functions
 math.order ranges namespaces sequences sequences.private
-sets summary system typed vocabs ;
+sets summary system typed vocabs vocabs.platforms ;
 QUALIFIED-WITH: alien.c-types c
 QUALIFIED-WITH: sets sets
 IN: random
@@ -345,9 +345,7 @@ PRIVATE>
         [ 1 + ] 2dip [ _ (random-unit) log neg + ] dip
     ] while 2drop ;
 
-{
-    { [ os windows? ] [ "random.windows" require ] }
-    { [ os unix? ] [ "random.unix" require ] }
-} cond
+USE-WINDOWS: random.windows
+USE-UNIX: random.unix
 
 "random.mersenne-twister" require

@@ -6,7 +6,7 @@ grouping io io.encodings.binary io.encodings.string
 io.encodings.utf8 io.sockets io.sockets.private
 io.streams.byte-array io.timeouts kernel make math math.bitwise
 math.parser namespaces random sequences slots.syntax splitting
-system vectors vocabs ;
+system vectors vocabs vocabs.platforms ;
 IN: dns
 
 : with-input-seek ( n seek-type quot -- )
@@ -448,10 +448,8 @@ M: TXT rdata>byte-array
 
 HOOK: initial-dns-servers os ( -- sequence )
 
-{
-    { [ os windows? ] [ "dns.windows" ] }
-    { [ os unix? ] [ "dns.unix" ] }
-} cond require
+USE-UNIX: dns.unix
+USE-WINDOWS: dns.windows
 
 : with-dns-servers ( servers quot -- )
     [ dns-servers ] dip with-variable ; inline

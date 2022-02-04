@@ -519,8 +519,7 @@ os { linux freebsd } member? [
     gtk-ui-backend ui-backend set-global
 ] when
 
-{ "ui.backend.gtk" "ui.gadgets.editors" }
-"ui.backend.gtk.input-methods.editors" require-when
-
 M: gtk-ui-backend ui-backend-available?
     "DISPLAY" os-env >boolean ;
+
+USE-WHEN-LOADED: ui.backend.gtk.input-methods.editors { "ui.backend.gtk" "ui.gadgets.editors" }

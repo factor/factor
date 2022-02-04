@@ -178,5 +178,5 @@ M: optimizing-compiler process-forgotten-words
 : disable-optimizer ( -- )
     f compiler-impl set-global ;
 
-{ "prettyprint" "compiler" } "compiler.prettyprint" require-when
-{ "threads" "compiler" } "compiler.threads" require-when
+USE-WHEN-LOADED: compiler.prettyprint { "prettyprint" "compiler" }
+USE-WHEN-LOADED: compiler.threads { "threads" "compiler" }

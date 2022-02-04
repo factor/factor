@@ -6,15 +6,12 @@ kernel math math.order sequences typed specialized-arrays system ;
 SPECIALIZED-ARRAY: void*
 IN: chipmunk.ffi
 
-<<
-"chipmunk" {
-    { [ os windows? ] [ "chipmunk.dll" ] }
-    { [ os macosx? ] [ "libchipmunk.dylib"  ] }
-    { [ os unix?  ] [ "libchipmunk.so" ] }
-} cond cdecl add-library
+LIBRARY-WINDOWS: chipmunk cdecl "chipmunk.dll"
+LIBRARY-UNIX: chipmunk cdecl "libchipmunk.so"
+LIBRARY-MACOSX: chipmunk cdecl "libchipmunk.dylib"
 
-"chipmunk" deploy-library
->>
+DEPLOY-LIBRARY: chipmunk
+
 LIBRARY: chipmunk
 
 ! chipmunk_types.h

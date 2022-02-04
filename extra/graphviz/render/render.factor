@@ -5,7 +5,7 @@ graphviz.dot images.viewer io.backend io.directories
 io.encodings.latin1 io.encodings.utf8 io.files
 io.files.temp io.files.unique io.launcher io.standard-paths
 kernel locals make namespaces sequences summary system threads
-unicode vocabs webbrowser words ;
+unicode vocabs webbrowser words vocabs.platforms ;
 IN: graphviz.render
 
 <PRIVATE
@@ -202,4 +202,4 @@ PRIVATE>
     standard-formats [ define-graphviz-by-format ] each
 ] with-compilation-unit
 
-os windows? [ "graphviz.render.windows" require ] when
+USE-WINDOWS: graphviz.render.windows

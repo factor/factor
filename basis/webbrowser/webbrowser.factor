@@ -1,12 +1,12 @@
 ! Copyright (C) 2011 John Benediktsson
 ! See http://factorcode.org/license.txt for BSD license
 USING: accessors command-line io.pathnames kernel namespaces
-sequences strings system ui.operations urls vocabs ;
+sequences strings system ui.operations urls vocabs vocabs.platforms ;
 IN: webbrowser
 
 HOOK: open-item os ( item -- )
 
-"webbrowser." os name>> append require
+USE-OS-SUFFIX: webbrowser
 
 : open-url ( url -- )
     >url open-item ;

@@ -1,7 +1,7 @@
 ! Copyright (C) 2008, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel arrays sequences math math.vectors accessors
-parser ;
+parser vocabs.loader ;
 IN: math.rectangles
 
 TUPLE: rect { loc initial: { 0 0 } } { dim initial: { 0 0 } } ;
@@ -62,6 +62,4 @@ M: rect contains-point?
     [ [ dim>> ] dip dim<< ]
     2bi ; inline
 
-USE: vocabs.loader
-
-{ "math.rectangles" "prettyprint" } "math.rectangles.prettyprint" require-when
+USE-WHEN-LOADED: math.rectangles.prettyprint { "math.rectangles" "prettyprint" }

@@ -9,7 +9,7 @@ io.encodings io.styles kernel kernel.private lexer libc make
 math math.order math.parser math.ratios namespaces parser
 prettyprint sequences sequences.private slots
 source-files.errors strings strings.parser summary system vocabs
-vocabs.loader vocabs.parser words ;
+vocabs.loader vocabs.parser vocabs.platforms words ;
 IN: debugger
 
 GENERIC: error-help ( error -- topic )
@@ -380,6 +380,6 @@ M: stack-effect-omits-dashes summary drop "Stack effect must contain “--”" ;
 M: callsite-not-compiled summary
     drop "Caller not compiled with the optimizing compiler" ;
 
-{ "threads" "debugger" } "debugger.threads" require-when
+USE-UNIX: debugger.unix
 
-os unix? [ "debugger.unix" require ] when
+USE-WHEN-LOADED: debugger.threads { "threads" "debugger" }

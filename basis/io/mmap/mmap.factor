@@ -1,7 +1,8 @@
 ! Copyright (C) 2007, 2009 Doug Coleman, Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors alien.c-types alien.data combinators
-destructors io.backend io.files.info kernel math system vocabs ;
+destructors io.backend io.files.info kernel math system vocabs
+vocabs.platforms ;
 IN: io.mmap
 
 TUPLE: mapped-file < disposable address handle length ;
@@ -56,7 +57,5 @@ PRIVATE>
 : with-mapped-array-reader ( path c-type quot -- )
     [ <mapped-file-reader> ] 2dip (with-mapped-array) ; inline
 
-{
-    { [ os unix? ] [ "io.mmap.unix" require ] }
-    { [ os windows? ] [ "io.mmap.windows" require ] }
-} cond
+USE-UNIX: io.mmap.unix
+USE-WINDOWS: io.mmap.windows

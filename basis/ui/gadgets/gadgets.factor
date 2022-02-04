@@ -406,4 +406,4 @@ GENERIC: preedit? ( gadget -- ? )
 
 M: gadget preedit? drop f ;
 
-{ "ui.gadgets" "prettyprint" } "ui.gadgets.prettyprint" require-when
+USE-WHEN-LOADED: ui.gadgets.prettyprint { "ui.gadgets" "prettyprint" }

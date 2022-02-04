@@ -88,4 +88,4 @@ SYNTAX: SPECIALIZED-VECTOR:
     [ define-array-vocab use-vocab ]
     [ define-vector-vocab use-vocab ] bi ;
 
-{ "specialized-vectors" "mirrors" } "specialized-vectors.mirrors" require-when
+USE-WHEN-LOADED: specialized-vectors.mirrors { "specialized-vectors" "mirrors" }

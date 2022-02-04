@@ -9,15 +9,11 @@ raylib.util sequences sequences.private system ;
 IN: raylib
 FROM: alien.c-types => float ;
 
-<<
-"raylib" {
-    { [ os windows? ] [ "raylib.dll" ] }
-    { [ os macosx? ] [ "libraylib.dylib" ] }
-    { [ os unix? ] [ "libraylib.so" ] }
-} cond cdecl add-library
+LIBRARY-UNIX: raylib cdecl "libraylib.so"
+LIBRARY-MACOSX: raylib cdecl "libraylib.dylib"
+LIBRARY-WINDOWS: raylib cdecl "raylib.dll"
 
-"raylib" deploy-library
->>
+DEPLOY-LIBRARY: raylib
 
 LIBRARY: raylib
 

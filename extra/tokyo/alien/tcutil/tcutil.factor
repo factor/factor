@@ -4,11 +4,9 @@ USING: alien alien.c-types alien.libraries alien.syntax
 combinators system ;
 IN: tokyo.alien.tcutil
 
-<< "tokyocabinet" {
-    { [ os macosx? ] [ "libtokyocabinet.dylib" ] }
-    { [ os unix? ] [ "libtokyocabinet.so" ] }
-    { [ os windows? ] [ "tokyocabinet.dll" ] }
-} cond cdecl add-library >>
+LIBRARY-UNIX: tokyocabinet cdecl "tokyocabinet.so"
+LIBRARY-MACOSX: tokyocabinet cdecl "tokyocabinet.dylib"
+LIBRARY-WINDOWS: tokyocabinet cdecl "tokyocabinet.dll"
 
 LIBRARY: tokyocabinet
 

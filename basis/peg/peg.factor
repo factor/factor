@@ -592,4 +592,4 @@ SYNTAX: PEG:
         ] append!
     ] ;
 
-{ "debugger" "peg" } "peg.debugger" require-when
+USE-WHEN-LOADED: peg.debugger { "debugger" "peg" }

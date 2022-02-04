@@ -63,4 +63,4 @@ M: linked-assoc equal?
 
 SYNTAX: LH{ \ } [ check-hashtable >linked-hash ] parse-literal ;
 
-{ "linked-assocs" "prettyprint" } "linked-assocs.prettyprint" require-when
+USE-WHEN-LOADED: linked-assocs.prettyprint { "linked-assocs" "prettyprint" }

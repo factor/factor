@@ -1,6 +1,6 @@
 ! Copyright (C) 2008 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors sequences system vocabs ;
+USING: accessors sequences system vocabs vocabs.platforms ;
 IN: unix.statvfs
 
-"unix.statvfs." os name>> append require
+USE-OS-SUFFIX: unix.statvfs

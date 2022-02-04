@@ -4,11 +4,9 @@ USING: alien alien.c-types alien.libraries alien.syntax
 combinators system ;
 IN: compression.snappy.ffi
 
-<< "snappy" {
-    { [ os windows? ] [ "snappy.dll" ] }
-    { [ os macosx? ] [ "libsnappy.dylib" ] }
-    { [ os unix? ] [ "libsnappy.so" ] }
-} cond cdecl add-library >>
+LIBRARY-UNIX: snappy cdecl "libsnappy.so"
+LIBRARY-MACOSX: snappy cdecl "libsnappy.dylib"
+LIBRARY-WINDOWS: snappy cdecl "snappy.dll"
 
 LIBRARY: snappy
 

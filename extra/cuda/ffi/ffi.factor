@@ -4,13 +4,9 @@ USING: accessors alien alien.c-types alien.libraries alien.syntax
 classes.struct combinators kernel system ;
 IN: cuda.ffi
 
-<<
-"cuda" {
-    { [ os windows? ] [ "nvcuda.dll" stdcall ] }
-    { [ os macosx? ] [ "/usr/local/cuda/lib/libcuda.dylib" cdecl ] }
-    { [ os unix? ] [ "libcuda.so" cdecl ] }
-} cond add-library
->>
+LIBRARY-UNIX: cuda cdecl "libcuda.so"
+LIBRARY-MACOSX: cuda cdecl "/usr/local/cuda/lib/libcuda.dylib"
+LIBRARY-WINDOWS: cuda stdcall "nvcuda.dll"
 
 LIBRARY: cuda
 

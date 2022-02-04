@@ -4,7 +4,8 @@ USING: alien alien.c-types assocs combinators compiler.cfg.intrinsics
 compiler.codegen.gc-maps compiler.codegen.labels
 compiler.codegen.relocation compiler.constants cpu.architecture
 cpu.x86 cpu.x86.assembler cpu.x86.assembler.operands cpu.x86.features
-kernel locals math sequences specialized-arrays system vocabs ;
+kernel locals math sequences specialized-arrays system vocabs
+vocabs.platforms ;
 SPECIALIZED-ARRAY: uint
 IN: cpu.x86.64
 
@@ -134,7 +135,5 @@ M: x86.64 (cpuid)
         RSI 12 [+] EDX MOV
     ] alien-assembly ;
 
-{
-    { [ os unix? ] [ "cpu.x86.64.unix" require ] }
-    { [ os windows? ] [ "cpu.x86.64.windows" require ] }
-} cond
+USE-UNIX: cpu.x86.64.unix
+USE-WINDOWS: cpu.x86.64.windows

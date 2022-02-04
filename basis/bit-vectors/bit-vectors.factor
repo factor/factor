@@ -10,4 +10,4 @@ SYNTAX: ?V{ \ } [ >bit-vector ] parse-literal ;
 
 M: bit-vector contract 2drop ;
 
-{ "bit-vectors" "prettyprint" } "bit-vectors.prettyprint" require-when
+USE-WHEN-LOADED: bit-vectors.prettyprint { "bit-vectors" "prettyprint" }

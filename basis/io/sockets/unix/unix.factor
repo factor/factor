@@ -4,7 +4,7 @@ USING: accessors alien alien.c-types alien.data alien.strings
 byte-arrays classes.struct combinators destructors io.backend.unix
 io.encodings.ascii io.encodings.utf8 io.files io.pathnames io.sockets
 io.sockets.private kernel libc locals math namespaces sequences system
-unix unix.ffi vocabs ;
+unix unix.ffi vocabs vocabs.platforms ;
 IN: io.sockets.unix
 
 : socket-fd ( domain type protocol -- fd )
@@ -180,4 +180,4 @@ M: unix host-name
     256 [ <byte-array> dup ] keep gethostname io-error
     ascii alien>string ;
 
-os linux? [ "io.sockets.unix.linux" require ] when
+USE-LINUX: io.sockets.unix.linux

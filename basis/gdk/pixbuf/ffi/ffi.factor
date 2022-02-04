@@ -10,11 +10,9 @@ IN: gdk.pixbuf.ffi
 
 LIBRARY: gdk.pixbuf
 
-<< "gdk.pixbuf" {
-    { [ os windows? ] [ "libgdk_pixbuf-2.0-0.dll" ] }
-    { [ os macosx? ] [ "libgdk_pixbuf-2.0.dylib" ] }
-    { [ os unix? ] [ "libgdk_pixbuf-2.0.so" ] }
-} cond cdecl add-library >>
+LIBRARY-UNIX: gdk.pixbuf cdecl "libgdk_pixbuf-2.0.so"
+LIBRARY-MACOSX: gdk.pixbuf cdecl "libgdk_pixbuf-2.0.dylib"
+LIBRARY-WINDOWS: gdk.pixbuf cdecl "libgdk_pixbuf-2.0-0.dll"
 
 GIR: vocab:gdk/pixbuf/GdkPixbuf-2.0.gir
 

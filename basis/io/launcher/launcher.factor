@@ -5,7 +5,8 @@ USING: accessors assocs calendar combinators concurrency.flags
 debugger destructors environment fry init io io.backend
 io.encodings io.encodings.utf8 io.pipes io.pipes.private
 io.ports io.streams.duplex io.timeouts kernel math math.order
-namespaces prettyprint sequences strings system threads vocabs ;
+namespaces prettyprint sequences strings system threads vocabs
+vocabs.platforms ;
 
 IN: io.launcher
 
@@ -313,7 +314,5 @@ M: output-process-error error.
     [ [ stream-contents ] [ dup (wait-for-process) ] bi* ] with-timeout
     0 = [ 2drop ] [ output-process-error ] if ;
 
-{
-    { [ os unix? ] [ "io.launcher.unix" require ] }
-    { [ os windows? ] [ "io.launcher.windows" require ] }
-} cond
+USE-UNIX: io.launcher.unix
+USE-WINDOWS: io.launcher.windows

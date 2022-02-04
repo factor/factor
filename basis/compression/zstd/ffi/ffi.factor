@@ -4,11 +4,9 @@ USING: alien alien.c-types alien.libraries alien.syntax
 combinators system ;
 IN: compression.zstd.ffi
 
-<< "zstd" {
-    { [ os windows? ] [ "libzstd.dll" ] }
-    { [ os macosx? ] [ "libzstd.dylib" ] }
-    { [ os unix? ] [ "libzstd.so" ] }
-} cond cdecl add-library >>
+LIBRARY-UNIX: zstd cdecl "libzstd.so"
+LIBRARY-MACOSX: zstd cdecl "libzstd.dylib"
+LIBRARY-WINDOWS: zstd cdecl "libzstd.dll"
 
 LIBRARY: zstd
 

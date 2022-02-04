@@ -38,4 +38,4 @@ M: number-hash-set clone
 
 SYNTAX: NHS{ \ } [ >number-hash-set ] parse-literal ;
 
-{ "hash-sets.numbers" "prettyprint" } "hash-sets.numbers.prettyprint" require-when
+USE-WHEN-LOADED: hash-sets.numbers.prettyprint { "hash-sets.numbers" "prettyprint" }

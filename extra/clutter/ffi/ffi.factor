@@ -14,13 +14,7 @@ IN: clutter.ffi
 
 LIBRARY: clutter
 
-<<
-"clutter" {
-    { [ os windows? ] [ drop ] }
-    { [ os macosx? ] [ drop ] }
-    { [ os unix? ] [ "libclutter-glx-1.0.so" cdecl add-library ] }
-} cond
->>
+LIBRARY-UNIX: clutter cdecl "libclutter-glx-1.0.so"
 
 FOREIGN-RECORD-TYPE: cairo.Path cairo_path_t
 

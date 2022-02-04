@@ -3,6 +3,6 @@ IN: bootstrap.ui.tools
 
 "ui.tools" require
 
-{ "ui.backend.cocoa" } "ui.backend.cocoa.tools" require-when
+USE-WHEN-LOADED: ui.backend.cocoa.tools { "ui.backend.cocoa" }
 
 "ui.tools.walker" require

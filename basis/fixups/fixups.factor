@@ -1,7 +1,7 @@
 ! Copyright (C) 2021 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors assocs continuations kernel sequences
-vocabs vocabs.parser ;
+USING: accessors assocs continuations kernel sequences vocabs
+vocabs.parser words ;
 IN: fixups
 
 CONSTANT: vocab-renames {
@@ -59,6 +59,9 @@ M: object compute-fixups
     [ error>> compute-fixups ] [ 3drop { } ] recover ;
 
 M: f compute-fixups 2drop { } ;
+
+M: undefined-word compute-fixups
+    2drop { } ;
 
 M: no-vocab compute-fixups
     [ name>> vocab-renames compute-assoc-fixups ] [ drop { } ] if* ;

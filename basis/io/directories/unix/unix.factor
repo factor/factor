@@ -4,7 +4,7 @@ USING: accessors alien.c-types alien.data alien.strings assocs
 classes.struct continuations fry io.backend io.backend.unix
 io.directories io.files io.files.info io.files.info.unix
 io.files.types kernel libc literals math sequences system unix
-unix.ffi vocabs ;
+unix.ffi vocabs vocabs.platforms ;
 IN: io.directories.unix
 
 CONSTANT: touch-mode flags{ O_WRONLY O_APPEND O_CREAT O_EXCL }
@@ -77,4 +77,4 @@ M: unix (directory-entries)
         '[ _ _ next-dirent ] [ >directory-entry ] produce nip
     ] with-unix-directory ;
 
-os linux? [ "io.directories.unix.linux" require ] when
+USE-LINUX: io.directories.unix.linux

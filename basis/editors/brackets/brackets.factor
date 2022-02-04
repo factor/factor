@@ -1,7 +1,7 @@
 ! Copyright (C) 2015 Dimage Sapelkin.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: editors io.pathnames io.standard-paths kernel make
-namespaces system vocabs ;
+namespaces system vocabs vocabs.platforms ;
 IN: editors.brackets
 
 SINGLETON: brackets
@@ -19,4 +19,4 @@ M: macosx brackets-path
 M: brackets editor-command
     [ brackets-path "brackets" or , drop , ] { } make ;
 
-os windows? [ "editors.brackets.windows" require ] when
+USE-WINDOWS: editors.brackets.windows

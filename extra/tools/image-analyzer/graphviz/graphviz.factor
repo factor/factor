@@ -3,20 +3,15 @@
 USING: accessors alien.strings assocs classes fry graphviz
 graphviz.attributes graphviz.notation math.bitwise sequences sets
 system tools.image-analyzer.references tools.image-analyzer.utils
-tools.image-analyzer.vm vocabs.parser ;
+tools.image-analyzer.vm vocabs.parser vocabs.platforms ;
 IN: tools.image-analyzer.graphviz
 FROM: arrays => 1array 2array ;
 FROM: byte-arrays => >byte-array ;
 FROM: kernel => ? = 2drop bi bi* dup if keep nip object over swap tri with ;
 FROM: math => <= - shift ;
 
-<<
-! For the two annoying structs that differ on 32 and 64 bit.
-cpu x86.32?
-"tools.image-analyzer.vm.32"
-"tools.image-analyzer.vm.64"
-? use-vocab
->>
+USE-X86-64: tools.image-analyzer.vm.64
+USE-X86-32: tools.image-analyzer.vm.32
 
 : array>string ( array -- str )
     0 suffix >byte-array alien>native-string ;

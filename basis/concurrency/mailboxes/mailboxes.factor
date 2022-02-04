@@ -89,4 +89,4 @@ M: linked-thread error-in-thread
 : spawn-linked-to ( quot name mailbox -- thread )
     <linked-thread> [ (spawn) ] keep ;
 
-{ "concurrency.mailboxes" "debugger" } "concurrency.mailboxes.debugger" require-when
+USE-WHEN-LOADED: concurrency.mailboxes.debugger { "concurrency.mailboxes" "debugger" }

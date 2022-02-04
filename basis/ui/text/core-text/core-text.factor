@@ -60,4 +60,6 @@ M: core-text-renderer line-metrics
     [ cached-line metrics>> scale-metrics ]
     if-empty ;
 
-core-text-renderer font-renderer set-global
+STARTUP-HOOK: [
+    core-text-renderer font-renderer set-global
+]

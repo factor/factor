@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors assocs combinators continuations kernel math
 math.parser namespaces sequences strings system unix unix.ffi
-vocabs ;
+vocabs vocabs.platforms ;
 QUALIFIED: unix.ffi
 IN: unix.users
 
@@ -132,4 +132,4 @@ ERROR: no-such-user obj ;
 : user-home ( name/uid -- path )
     dup user-passwd [ nip dir>> ] [ no-such-user ] if* ;
 
-os macosx? [ "unix.users.macosx" require ] when
+USE-MACOSX: unix.users.macosx

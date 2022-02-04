@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: combinators continuations fry io.backend io.directories
 io.pathnames kernel locals namespaces random.data sequences
-system vocabs ;
+system vocabs vocabs.platforms ;
 IN: io.files.unique
 
 <PRIVATE
@@ -72,7 +72,5 @@ PRIVATE>
     [ path quot with-directory ]
     [ path delete-tree ] finally ; inline
 
-{
-    { [ os unix? ] [ "io.files.unique.unix" ] }
-    { [ os windows? ] [ "io.files.unique.windows" ] }
-} cond require
+USE-UNIX: io.files.unique.unix
+USE-WINDOWS: io.files.unique.windows

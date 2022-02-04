@@ -8,10 +8,8 @@ IN: gio.ffi
 
 LIBRARY: gio
 
-<< "gio" {
-    { [ os windows? ] [ "libgio-2.0-0.dll" ] }
-    { [ os macosx? ] [ "libgio-2.0.dylib" ] }
-    { [ os unix? ] [ "libgio-2.0.so" ] }
-} cond cdecl add-library >>
+LIBRARY-UNIX: gio cdecl "libgio-2.0.so"
+LIBRARY-MACOSX: gio cdecl "libgio-2.0.dylib"
+LIBRARY-WINDOWS: gio cdecl "libgio-2.0-0.dll"
 
 GIR: vocab:gio/Gio-2.0.gir

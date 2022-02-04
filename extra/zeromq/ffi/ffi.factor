@@ -3,15 +3,13 @@
 
 USING: alien alien.accessors alien.c-types alien.data
 alien.libraries alien.syntax assocs byte-arrays classes.struct
-combinators kernel literals math system ;
+combinators kernel literals math system vocabs.platforms ;
 
 IN: zeromq.ffi
 
-<< "zmq" {
-    { [ os windows? ] [ "libzmq.dll" ] }
-    { [ os macosx? ] [ "libzmq.dylib" ] }
-    { [ os unix? ] [ "libzmq.so" ] }
-} cond cdecl add-library >>
+LIBRARY-UNIX: zmq cdecl "libzmq.so"
+LIBRARY-MACOSX: zmq cdecl "libzmq.dylib"
+LIBRARY-WINDOWS: zmq cdecl "libzmq.dll"
 
 LIBRARY: zmq
 

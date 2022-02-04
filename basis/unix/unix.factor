@@ -89,4 +89,4 @@ M: unix open-file [ open ] unix-system-call ;
 
 : unlink-file ( path -- ) [ unlink ] unix-system-call drop ;
 
-{ "unix" "debugger" } "unix.debugger" require-when
+USE-WHEN-LOADED: unix.debugger { "unix" "debugger" }

@@ -1,7 +1,7 @@
 ! Copyright (C) 2008 Slava Pestov, Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors io.backend io.files.info io.files.types
-io.pathnames kernel math namespaces system vocabs ;
+io.pathnames kernel math namespaces system vocabs vocabs.platforms ;
 IN: io.files.links
 
 HOOK: make-link os ( target symlink -- )
@@ -12,8 +12,6 @@ HOOK: read-link os ( symlink -- path )
 
 : copy-link ( target symlink -- )
     [ read-link ] dip make-link ;
-
-os unix? [ "io.files.links.unix" require ] when
 
 : follow-link ( path -- path' )
     [ parent-directory ] [ read-link ] bi append-path ;
@@ -35,3 +33,5 @@ PRIVATE>
 
 : follow-links ( path -- path' )
     [ symlink-depth get ] dip normalize-path (follow-links) ;
+
+USE-UNIX: io.files.links.unix

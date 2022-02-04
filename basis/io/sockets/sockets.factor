@@ -4,17 +4,15 @@
 USING: accessors alien.c-types alien.data alien.strings arrays
 byte-arrays classes classes.struct combinators
 combinators.short-circuit continuations destructors endian fry
-grouping init io.backend io.encodings.ascii
-io.encodings.binary io.pathnames io.ports io.streams.duplex
-kernel locals math math.parser memoize namespaces present
-sequences sequences.private splitting strings summary system
-vocabs vocabs.parser ip-parser ip-parser.private random ;
+grouping init io.backend io.encodings.ascii io.encodings.binary
+io.pathnames io.ports io.streams.duplex ip-parser
+ip-parser.private kernel locals math math.parser
+memoize namespaces present random sequences sequences.private
+splitting strings summary system vocabs vocabs.parser
+vocabs.platforms ;
 IN: io.sockets
 
-<< {
-    { [ os windows? ] [ "windows.winsock" ] }
-    { [ os unix? ] [ "unix.ffi" ] }
-} cond use-vocab >>
+USE-UNIX: unix.ffi
 
 GENERIC#: with-port 1 ( addrspec port -- addrspec )
 
@@ -486,7 +484,6 @@ M: inet6 <any-port-local-inet> drop f 0 <inet6> ;
 : broadcast-once ( bytes addrspec -- )
     [ send ] with-any-port-local-broadcast ;
 
-{
-    { [ os unix? ] [ "io.sockets.unix" require ] }
-    { [ os windows? ] [ "io.sockets.windows" require ] }
-} cond
+USE-UNIX: io.sockets.unix
+USE-WINDOWS: io.sockets.windows
+USE-WINDOWS: windows.winsock

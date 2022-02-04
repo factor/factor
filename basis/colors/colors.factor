@@ -91,4 +91,4 @@ M: parsed-color >rgba value>> >rgba ;
 
 SYNTAX: COLOR: scan-token dup parse-color parsed-color boa suffix! ;
 
-{ "colors" "prettyprint" } "colors.prettyprint" require-when
+USE-WHEN-LOADED: colors.prettyprint { "colors" "prettyprint" }

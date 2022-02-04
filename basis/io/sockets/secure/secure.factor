@@ -1,8 +1,9 @@
 ! Copyright (C) 2008, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors alien.libraries calendar combinators delegate
-destructors io io.sockets io.sockets.private kernel memoize namespaces
-openssl.libssl present sequences summary system vocabs ;
+destructors io io.sockets io.sockets.private kernel namespaces
+present sequences summary system vocabs.platforms ;
+USE: openssl.libssl
 IN: io.sockets.secure
 
 SYMBOL: secure-socket-timeout
@@ -126,7 +127,5 @@ HOOK: send-secure-handshake secure-socket-backend ( -- )
 
 HOOK: accept-secure-handshake secure-socket-backend ( -- )
 
-{
-    { [ os unix? ] [ "io.sockets.secure.unix" require ] }
-    { [ os windows? ] [ "io.sockets.secure.windows" require ] }
-} cond
+USE-UNIX: io.sockets.secure.unix
+USE-WINDOWS: io.sockets.secure.windows

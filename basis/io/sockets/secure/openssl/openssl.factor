@@ -491,4 +491,6 @@ M: openssl accept-secure-handshake
     input/output-ports
     make-input/output-secure ;
 
-openssl secure-socket-backend set-global
+STARTUP-HOOK: [
+    openssl secure-socket-backend set-global
+]

@@ -1,7 +1,7 @@
 ! Copyright (C) 2012 Joe Groff.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: combinators init io.directories io.pathnames kernel
-namespaces system vocabs ;
+namespaces system vocabs vocabs.platforms ;
 IN: io.files.temp
 
 HOOK: default-temp-directory os ( -- path )
@@ -30,11 +30,9 @@ SYMBOL: current-cache-directory
 : with-cache-directory ( quot -- )
     [ cache-directory ] dip with-directory ; inline
 
-{
-    { [ os windows? ] [ "io.files.temp.windows" ] }
-    { [ os macosx? ] [ "io.files.temp.macosx" ] }
-    { [ os unix? ] [ "io.files.temp.unix" ] }
-} cond require
+USE-MACOSX: io.files.temp.macosx
+USE-UNIX: io.files.temp.unix
+USE-WINDOWS: io.files.temp.windows
 
 STARTUP-HOOK: [
     default-temp-directory dup make-directories

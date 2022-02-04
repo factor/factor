@@ -3,7 +3,7 @@
 USING: accessors arrays classes.tuple combinators
 combinators.short-circuit kernel literals math math.functions
 math.intervals math.order math.statistics sequences slots.syntax
-system vocabs vocabs.loader ;
+system vocabs vocabs.loader vocabs.platforms ;
 FROM: ranges => [a..b) ;
 IN: calendar
 
@@ -826,9 +826,7 @@ M: integer weeks-in-week-year
 M: timestamp weeks-in-week-year
     { [ january 1 >>day thursday? ] [ december 31 >>day thursday? ] } 1|| 53 52 ? ;
 
-{
-    { [ os unix? ] [ "calendar.unix" ] }
-    { [ os windows? ] [ "calendar.windows" ] }
-} cond require
+USE-UNIX: calendar.unix
+USE-WINDOWS: calendar.windows
 
-{ "threads" "calendar" } "calendar.threads" require-when
+USE-WHEN-LOADED: calendar.threads { "threads" "calendar" }

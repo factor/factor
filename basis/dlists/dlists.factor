@@ -215,4 +215,4 @@ INSTANCE: dlist deque
 
 SYNTAX: DL{ \ } [ >dlist ] parse-literal ;
 
-{ "dlists" "prettyprint" } "dlists.prettyprint" require-when
+USE-WHEN-LOADED: dlists.prettyprint { "dlists" "prettyprint" }

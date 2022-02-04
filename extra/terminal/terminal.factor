@@ -2,13 +2,13 @@
 ! See http://factorcode.org/license.txt for BSD license
 
 USING: accessors arrays environment kernel math math.parser
-sequences system vocabs ;
+sequences system vocabs vocabs.platforms ;
 
 IN: terminal
 
 HOOK: (terminal-size) os ( -- columns lines )
 
-"terminal." os name>> append require
+USE-OS-SUFFIX: terminal
 
 : terminal-size ( -- dim )
     "COLUMNS" "LINES"
