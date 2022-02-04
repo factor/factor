@@ -40,6 +40,9 @@ IN: prettyprint
 
 : stack. ( seq -- ) [ short. ] each ;
 
+: datastack. ( seq -- )
+    [ nl "--- Data stack:" print stack. ] unless-empty ;
+
 : .s ( -- ) get-datastack stack. ;
 : .r ( -- ) get-retainstack stack. ;
 
