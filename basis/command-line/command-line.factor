@@ -1,9 +1,10 @@
 ! Copyright (C) 2003, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors alien.strings assocs continuations fry init
-io.encodings.utf8 io.files io.pathnames kernel kernel.private
-namespaces parser parser.notes sequences source-files
-source-files.errors splitting system vocabs.loader ;
+USING: accessors alien.strings assocs combinators.smart
+continuations io io.encodings.utf8 io.files kernel
+kernel.private namespaces parser parser.notes prettyprint
+sequences source-files source-files.errors splitting system
+vocabs.loader ;
 IN: command-line
 
 SYMBOL: user-init-errors
@@ -64,7 +65,12 @@ SYMBOL: command-line
 
 : run-script ( file -- )
     t parser-quiet? [
-        [ run-file ]
+        [
+            parse-file [
+                output>array
+                [ nl "--- Data stack:" print stack. ] unless-empty
+            ] call( quot --  )
+        ]
         [ path>source-file main>> [ execute( -- ) ] when* ] bi
     ] with-variable ;
 
