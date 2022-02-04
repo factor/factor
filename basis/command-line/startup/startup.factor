@@ -1,8 +1,9 @@
 ! Copyright (C) 2011 Joe Groff.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: combinators command-line eval io io.pathnames kernel
-layouts math math.parser namespaces parser system vocabs.loader
-;
+USING: accessors combinators combinators.smart command-line eval
+io io.pathnames kernel layouts math math.parser namespaces
+parser parser.notes prettyprint sequences source-files system
+vocabs.loader ;
 IN: command-line.startup
 
 : help? ( -- ? )
@@ -40,6 +41,17 @@ from within Factor for more information.
 " write ;
 
 : version? ( -- ? ) "version" get ;
+
+: run-script ( file -- )
+    t parser-quiet? [
+        [
+            parse-file [
+                output>array
+                [ nl "--- Data stack:" print stack. ] unless-empty
+            ] call( quot --  )
+        ]
+        [ path>source-file main>> [ execute( -- ) ] when* ] bi
+    ] with-variable ;
 
 : command-line-startup ( -- )
     (command-line) parse-command-line {

@@ -134,7 +134,7 @@ $nl
 ARTICLE: "command-line" "Command line arguments"
 "Factor command line usage:"
 { $code "factor [options] [script] [arguments]" }
-"Zero or more options can be passed in, followed by an optional script file name. If the script file is specified, it will be run on startup using " { $link run-script } ". Any arguments after the script file are stored in the following variable, with no further processing by Factor itself:"
+"Zero or more options can be passed in, followed by an optional script file name. If the script file is specified, it will be run on startup. Any arguments after the script file are stored in the following variable, with no further processing by Factor itself:"
 { $subsections command-line }
 "Instead of running a script, it is also possible to run a vocabulary; this invokes the vocabulary's " { $link POSTPONE: MAIN: } " word:"
 { $code "factor [system switches...] -run=<vocab name>" }
@@ -157,10 +157,5 @@ $nl
 { $subsections (command-line) }
 "There is a way to override the default vocabulary to run on startup, if no script name or " { $snippet "-run" } " switch is specified:"
 { $subsections main-vocab-hook } ;
-
-HELP: run-script
-{ $values { "file" "a pathname string" } }
-{ $description "Parses the Factor source code stored in a file and runs it. The initial vocabulary search path is used. If the source file contains a " { $link POSTPONE: MAIN: } " declaration, the main entry point of the file will be also be executed. Loading messages will be suppressed." }
-{ $errors "Throws an error if loading the file fails, there input is malformed, or if a runtime error occurs while calling the parsed quotation or executing the main entry point." } ;
 
 ABOUT: "command-line"
