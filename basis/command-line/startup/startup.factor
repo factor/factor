@@ -1,7 +1,8 @@
 ! Copyright (C) 2011 Joe Groff.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: combinators command-line eval io io.pathnames kernel
-layouts math math.parser namespaces parser system vocabs.loader ;
+USING: combinators command-line continuations debugger eval io
+io.pathnames kernel layouts math math.parser namespaces parser
+sequences system vocabs.loader ;
 IN: command-line.startup
 
 : help? ( -- ? )
@@ -19,7 +20,6 @@ Options:
         -run=listener   run terminal listener
         -run=ui.tools   run Factor development UI
     -e=<code>           evaluate <code>
-    -ea=<code>          evaluate <code> with auto-use
     -no-user-init       suppress loading of .factor-rc
     -datastack=<int>    datastack size in KiB [" write cell 32 * number>string write "]
     -retainstack=<int>  retainstack size in KiB [" write cell 32 * number>string write "]
@@ -41,6 +41,12 @@ from within Factor for more information.
 
 : version? ( -- ? ) "version" get ;
 
+: listener-restarts ( quot -- )
+    [
+        restarts get empty? embedded? or
+        [ rethrow ] [ print-error-and-restarts "q" on "listener" run ] if
+    ] recover ; inline
+
 : command-line-startup ( -- )
     (command-line) parse-command-line {
         { [ help? ] [ help. ] }
@@ -48,10 +54,11 @@ from within Factor for more information.
         [
             load-vocab-roots
             run-user-init
-            "e" get "ea" get script get or or [
-                "e" get [ eval( -- ) ] when*
-                "ea" get [ t auto-use? [ eval( -- ) ] with-variable ] when*
-                script get [ run-script ] when*
+            "e" get script get or [
+                t auto-use? [
+                    "e" get [ '[ _ eval( -- ) ] listener-restarts ] when*
+                    script get [ '[ _ run-script ] listener-restarts ] when*
+                ] with-variable
             ] [
                 "run" get run
             ] if
