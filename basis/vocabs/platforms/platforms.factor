@@ -1,7 +1,7 @@
 ! Copyright (C) 2018 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors compiler.units kernel lexer multiline parser
-sequences splitting system vocabs.parser ;
+sequences splitting system vocabs vocabs.parser ;
 IN: vocabs.platforms
 
 : with-vocabulary ( quot suffix -- )
@@ -56,10 +56,14 @@ SYNTAX: USE-FREEBSD: scan-token os freebsd? [ use-vocab ] [ drop ] if ;
 SYNTAX: USE-LINUX: scan-token os linux? [ use-vocab ] [ drop ] if ;
 SYNTAX: USE-MACOSX: scan-token os macosx? [ use-vocab ] [ drop ] if ;
 SYNTAX: USE-WINDOWS: scan-token os windows? [ use-vocab ] [ drop ] if ;
+SYNTAX: USE-OS-SUFFIX: scan-token os name>> "." glue require ;
 
-SYNTAX: USE-X86-32: scan-token os x86.32? [ use-vocab ] [ drop ] if ;
-SYNTAX: USE-X86-64: scan-token os x86.64? [ use-vocab ] [ drop ] if ;
-SYNTAX: USE-ARM-32: scan-token os arm.32? [ use-vocab ] [ drop ] if ;
-SYNTAX: USE-ARM-64: scan-token os arm.64? [ use-vocab ] [ drop ] if ;
-
-SYNTAX: USE-IF: scan-token scan-object call( -- ? ) [ use-vocab ] [ drop ] if ;
+SYNTAX: USE-X86: scan-token cpu x86? [ use-vocab ] [ drop ] if ;
+SYNTAX: USE-X86-32: scan-token cpu x86.32? [ use-vocab ] [ drop ] if ;
+SYNTAX: USE-X86-64: scan-token cpu x86.64? [ use-vocab ] [ drop ] if ;
+SYNTAX: USE-ARM: scan-token cpu arm? [ use-vocab ] [ drop ] if ;
+SYNTAX: USE-ARM-32: scan-token cpu arm.32? [ use-vocab ] [ drop ] if ;
+SYNTAX: USE-ARM-64: scan-token cpu arm.64? [ use-vocab ] [ drop ] if ;
+SYNTAX: USE-PPC: scan-token cpu ppc? [ use-vocab ] [ drop ] if ;
+SYNTAX: USE-PPC-32: scan-token cpu ppc.32? [ use-vocab ] [ drop ] if ;
+SYNTAX: USE-PPC-64: scan-token cpu ppc.64? [ use-vocab ] [ drop ] if ;
