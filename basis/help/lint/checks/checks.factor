@@ -1,13 +1,12 @@
 ! Copyright (C) 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs classes classes.struct
-classes.tuple combinators combinators.short-circuit
-combinators.smart continuations debugger definitions effects
-eval formatting fry grouping help help.markup help.topics io
-io.streams.string kernel macros math math.statistics namespaces
-parser.notes prettyprint sequences sequences.deep sets splitting
-strings summary tools.destructors unicode vocabs vocabs.loader
-words words.constant words.symbol ;
+classes.tuple combinators combinators.short-circuit debugger
+definitions effects eval formatting grouping help help.markup
+help.topics io io.streams.string kernel macros math
+math.statistics namespaces prettyprint sequences sequences.deep
+sets splitting strings summary tools.destructors unicode vocabs
+vocabs.loader words words.constant words.symbol ;
 IN: help.lint.checks
 
 ERROR: simple-lint-error message ;
@@ -35,17 +34,6 @@ SYMBOL: vocab-articles
             "fd"
         } member?
     ] reject ;
-
-: eval-with-stack ( str -- output )
-    [
-        [
-            parser-quiet? on parse-string [
-                output>array [
-                    nl "--- Data stack:" print stack.
-                ] unless-empty
-            ] call( quot -- )
-        ] [ nip print-error ] recover
-    ] with-string-writer ;
 
 : check-example ( element -- )
     [
