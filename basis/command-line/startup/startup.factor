@@ -1,8 +1,8 @@
 ! Copyright (C) 2011 Joe Groff.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: combinators command-line continuations debugger eval io
-io.pathnames kernel layouts math math.parser namespaces parser
-sequences system vocabs.loader ;
+USING: combinators command-line eval io io.pathnames kernel
+layouts math math.parser namespaces parser system vocabs.loader
+;
 IN: command-line.startup
 
 : help? ( -- ? )
@@ -41,12 +41,6 @@ from within Factor for more information.
 
 : version? ( -- ? ) "version" get ;
 
-: listener-restarts ( quot -- )
-    [
-        restarts get empty? embedded? or
-        [ rethrow ] [ print-error-and-restarts "q" on "listener" run ] if
-    ] recover ; inline
-
 : command-line-startup ( -- )
     (command-line) parse-command-line {
         { [ help? ] [ help. ] }
@@ -56,8 +50,8 @@ from within Factor for more information.
             run-user-init
             "e" get script get or [
                 t auto-use? [
-                    "e" get [ '[ _ eval( -- ) ] listener-restarts ] when*
-                    script get [ '[ _ run-script ] listener-restarts ] when*
+                    "e" get [ eval-with-stack print ] when*
+                    script get [ run-script ] when*
                 ] with-variable
             ] [
                 "run" get run
