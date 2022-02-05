@@ -138,8 +138,8 @@ t error-summary? set-global
         if
     ] recover ;
 
-: (listener) ( datastack -- )
-    listener-step (listener) ;
+: listener-loop ( datastack -- )
+    listener-step listener-loop ;
 
 PRIVATE>
 
@@ -222,7 +222,7 @@ SYMBOL: interactive-vocabs
 : listener ( -- )
     [
         parser-quiet? off
-        [ { } (listener) ] with-return
+        [ { } listener-loop ] with-return
     ] with-interactive-vocabs ;
 
 : listener-main ( -- )
