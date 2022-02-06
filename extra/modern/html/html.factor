@@ -1,11 +1,19 @@
 ! Copyright (C) 2021 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays combinators combinators.short-circuit
-generalizations kernel make math modern modern.slices sequences
-sequences.extras splitting strings ;
+generalizations kernel lexer make math modern modern.slices
+sequences sequences.extras splitting strings ;
 IN: modern.html
 
 TUPLE: tag name open-close-delimiter props children ;
+
+TUPLE: processing-instruction open target props close ;
+: <processing-instruction> ( open target props close -- processing-instruction )
+    processing-instruction new
+        swap >>close
+        swap >>props
+        swap >>target
+        swap >>open ; inline
 
 TUPLE: doctype open close values ;
 : <doctype> ( open close values -- doctype )
@@ -69,11 +77,11 @@ C: <dquote> dquote
         string-expected-got-eof
     ] if ;
 
-:: read-string ( n string char -- n' string payload )
-    n string char CHAR: ' = [ read-squote-string-payload ] [ read-dquote-string-payload ] if drop :> n'
-    n' string
-    n' [ n string string-expected-got-eof ] unless
-    n n' 1 - string <slice> ;
+:: read-string ( $n $string $char -- n' string payload )
+    $n $string $char CHAR: ' = [ read-squote-string-payload ] [ read-dquote-string-payload ] if drop :> $n'
+    $n' $string
+    $n' [ $n $string string-expected-got-eof ] unless
+    $n $n' 1 - $string <slice> ;
 
 : take-tag-name ( n string -- n' string tag )
     [ "\s\r\n/>" member? ] slice-until ;
@@ -88,13 +96,14 @@ C: <dquote> dquote
     } case ;
 
 : read-prop ( n string -- n' string closing/f prop/f )
-    skip-whitespace "\s\n\r\"'<=/>" slice-til-either {
+    skip-whitespace "\s\n\r\"'<=/>?" slice-til-either {
         { CHAR: < [ "< error" throw ] }
         { CHAR: = [ 1 split-slice-back drop >string [ read-value ] dip swap 2array f swap ] }
         { CHAR: / [ ">" expect-and-span 2 split-slice-back swap >string f like ] }
         { CHAR: > [ 1 split-slice-back swap >string f like ] }
         { CHAR: ' [ first read-string >string <squote> f swap ] }
         { CHAR: " [ first read-string >string <dquote> f swap ] }
+        { CHAR: ? [ ">" expect-and-span >string f ] }
         { CHAR: \s [ f swap >string ] }
         { CHAR: \r [ f swap >string ] }
         { CHAR: \n [ f swap >string ] }
@@ -105,6 +114,11 @@ C: <dquote> dquote
     read-prop
     [ 5 npick push ] when*
     [ ] [ read-props ] if* ;
+
+: read-processing-instruction ( n string opening -- n string processing-instruction )
+    "?" expect-and-span >string
+    [ take-tag-name >string ] dip
+    [ V{ } clone -rot read-props ] 2dip spin 6 nrot swap <processing-instruction> ;
 
 : read-doctype ( n string opening -- n string doctype/comment )
     "!" expect-and-span
@@ -164,6 +178,7 @@ ERROR: unmatched-closing-tag-error stack tag ;
                     swap >>close-tag
                     ] }
                 { CHAR: ! [ read-doctype ] }
+                { CHAR: ? [ read-processing-instruction ] }
                 [ drop read-open-tag ]
             } case
         ] }
@@ -188,9 +203,16 @@ M: doctype write-html
     [ values>> [ >value ] map join-words [ " " % % ] unless-empty ]
     [ close>> % ] tri ;
 
-
 : write-props ( seq -- )
     [ dup array? [ first2 >value "=" glue ] [ >value ] if ] map join-words [ " " % % ] unless-empty ;
+
+M: processing-instruction write-html
+    {
+        [ open>> % ]
+        [ target>> % ]
+        [ props>> write-props ]
+        [ close>> % ]
+    } cleave ;
 
 M: open-tag write-html
     {

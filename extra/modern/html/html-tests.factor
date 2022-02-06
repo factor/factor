@@ -36,3 +36,9 @@ IN: modern.html.tests
 
 { "<div><div><a/><b/><c/></div></div>" }
 [ "<div> <div>  <a/> <b/> <c/> </div> </div>" string>html html>string ] unit-test
+
+{ "<?xml version='1.0'?>" }
+[ [[ <?xml version='1.0'?> ]] string>html html>string ] unit-test
+
+{ "<?xml version='1.0'?>" }
+[ [[ <?xml version='1.0' ?> ]] string>html html>string ] unit-test
