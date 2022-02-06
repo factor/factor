@@ -2,10 +2,10 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays combinators combinators.short-circuit
 generalizations kernel lexer make math modern modern.slices
-sequences sequences.extras splitting strings ;
+sequences sequences.extras shuffle splitting strings ;
 IN: modern.html
 
-TUPLE: tag name open-close-delimiter props children ;
+TUPLE: tag open name props close children ;
 
 TUPLE: processing-instruction open target props close ;
 : <processing-instruction> ( open target props close -- processing-instruction )
@@ -16,10 +16,10 @@ TUPLE: processing-instruction open target props close ;
         swap >>open ; inline
 
 TUPLE: doctype open close values ;
-: <doctype> ( open close values -- doctype )
+: <doctype> ( open values close -- doctype )
     doctype new
-        swap >>values
         swap >string >>close
+        swap >>values
         swap >string >>open ;
 
 TUPLE: comment open payload close ;
@@ -35,19 +35,21 @@ TUPLE: close-tag name ;
         swap >string rest rest but-last >>name ;
 
 TUPLE: open-tag < tag close-tag ;
-: <open-tag> ( name delimiter props -- tag )
+: <open-tag> ( open name props close -- tag )
     open-tag new
+        swap >>close
         swap >>props
-        swap >string drop ! >>open-close-delimiter
         swap >string >>name
+        swap >string >>open
         V{ } clone >>children ;
 
 TUPLE: self-close-tag < tag ;
-: <self-close-tag> ( name delimiter props -- tag )
+: <self-close-tag> ( open name props close -- tag )
     self-close-tag new
+        swap >>close
         swap >>props
-        swap >string drop ! >>open-close-delimiter
         swap >string >>name
+        swap >string >>open
         V{ } clone >>children ;
 
 TUPLE: squote payload ;
@@ -78,7 +80,9 @@ C: <dquote> dquote
     ] if ;
 
 :: read-string ( $n $string $char -- n' string payload )
-    $n $string $char CHAR: ' = [ read-squote-string-payload ] [ read-dquote-string-payload ] if drop :> $n'
+    $n $string $char CHAR: ' =
+    [ read-squote-string-payload ]
+    [ read-dquote-string-payload ] if drop :> $n'
     $n' $string
     $n' [ $n $string string-expected-got-eof ] unless
     $n $n' 1 - $string <slice> ;
@@ -95,30 +99,36 @@ C: <dquote> dquote
         [ [ take-tag-name ] dip prefix ]
     } case ;
 
-: read-prop ( n string -- n' string closing/f prop/f )
+: read-prop ( n string -- n' string prop/f closing/f )
     skip-whitespace "\s\n\r\"'<=/>?" slice-til-either {
         { CHAR: < [ "< error" throw ] }
-        { CHAR: = [ 1 split-slice-back drop >string [ read-value ] dip swap 2array f swap ] }
-        { CHAR: / [ ">" expect-and-span 2 split-slice-back swap >string f like ] }
-        { CHAR: > [ 1 split-slice-back swap >string f like ] }
-        { CHAR: ' [ first read-string >string <squote> f swap ] }
-        { CHAR: " [ first read-string >string <dquote> f swap ] }
-        { CHAR: ? [ ">" expect-and-span >string f ] }
-        { CHAR: \s [ f swap >string ] }
-        { CHAR: \r [ f swap >string ] }
-        { CHAR: \n [ f swap >string ] }
+        { CHAR: = [ 1 split-slice-back drop >string [ read-value ] dip swap 2array f ] }
+        { CHAR: / [ ">" expect-and-span 2 split-slice-back [ >string f like ] bi@ ] }
+        { CHAR: > [ 1 split-slice-back [ >string f like ] bi@ ] }
+        { CHAR: ' [ first read-string >string <squote> f ] }
+        { CHAR: " [ first read-string >string <dquote> f ] }
+        { CHAR: ? [ ">" expect-and-span >string f swap ] }
+        { CHAR: \s [ >string f ] }
+        { CHAR: \r [ >string f ] }
+        { CHAR: \n [ >string f ] }
         { f [ "efff" throw ] }
     } case ;
 
-: read-props ( props n string -- props n' string closing )
-    read-prop
-    [ 5 npick push ] when*
-    [ ] [ read-props ] if* ;
+: read-props* ( props n string -- n' string props closing )
+    read-prop [
+        [ [ reach push ] when* rot ] dip
+    ] [
+        [ reach push ] when* read-props*
+    ] if* ; inline recursive
+
+: read-props ( n string -- n' string props closing )
+    V{ } clone -rot read-props* ;
 
 : read-processing-instruction ( n string opening -- n string processing-instruction )
     "?" expect-and-span >string
     [ take-tag-name >string ] dip
-    [ V{ } clone -rot read-props ] 2dip spin 6 nrot swap <processing-instruction> ;
+    [ read-props ] 2dip
+    spin rotd <processing-instruction> ;
 
 : read-doctype ( n string opening -- n string doctype/comment )
     "!" expect-and-span
@@ -127,14 +137,14 @@ C: <dquote> dquote
         [ "-->" slice-til-string [ >string ] bi@ ] dip -rot <comment>
     ] [
         "DOCTYPE" expect-and-span
-        [ V{ } clone -rot read-props ] dip
-        swap 5 nrot <doctype>
+        [ read-props ] dip
+        -rot <doctype>
     ] if ;
 
 : read-open-tag ( n string opening -- n' string tag )
-    [ take-tag-name ] dip drop ! B span-slices
-    [ V{ } clone -rot read-props ] dip
-    swap 5 nrot over ">" sequence= [
+    [ take-tag-name ] dip
+    [ read-props ] 2dip
+    swap 2swap dup ">" sequence= [
         <open-tag>
     ] [
         <self-close-tag>
@@ -216,16 +226,20 @@ M: processing-instruction write-html
 
 M: open-tag write-html
     {
-        [ "<" % name>> % ]
-        [ props>> write-props ">" % ]
+        [ open>> % ]
+        [ name>> % ]
+        [ props>> write-props ]
+        [ close>> % ]
         [ children>> [ write-html ] each ]
         [ close-tag>> name>> "</" ">" surround % ]
     } cleave ;
 
 M: self-close-tag write-html
     {
-        [ "<" % name>> % ]
-        [ props>> write-props "/>" % ]
+        [ open>> % ]
+        [ name>> % ]
+        [ props>> write-props ]
+        [ close>> % ]
     } cleave ;
 
 M: comment write-html
