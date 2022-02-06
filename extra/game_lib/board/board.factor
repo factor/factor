@@ -1,6 +1,6 @@
 USING: sequences kernel accessors sequences.extras ;
 
-IN: gamedev.board
+IN: game_lib.board
 
 TUPLE: board width height cells default-cell ;
 
