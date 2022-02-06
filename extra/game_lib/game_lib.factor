@@ -1,9 +1,9 @@
 USING: accessors ui.gadgets kernel ui.gadgets.status-bar ui ui.render colors.constants opengl sequences combinators peg
-images.loader opengl.textures ;
+images.loader opengl.textures assocs ;
 
 IN: game_lib
 
-TUPLE: window-gadget < gadget dimension bg-color rects-params images-params ;
+TUPLE: window-gadget < gadget dimension bg-color rects-params images-params board;
 
 TUPLE: rect color loc dim ;
 
@@ -57,12 +57,22 @@ TUPLE: sprite image loc dim ;
 : draw-images ( images-params -- )
     [ draw-single-image ] each ;
 
+:: meshgrid ( seq1 seq2 -- seq3 )
+    seq1 seq2 [ seq1 length swap [ ] curry replicate over zip ] map 
+    swap drop ;
+
+
+:: draw-cells ( gadget -- )
+    ;
+
 M: window-gadget pref-dim*
    dimension>> ;
 
 M: window-gadget draw-gadget*
     {
         [ draw-background ]
+        [ draw-cells ]
         [ rects-params>> draw-rects ] 
         [ images-params>> draw-images ]
     } cleave ;
+
