@@ -1,9 +1,7 @@
-! Copyright (C) 2006, 2007, 2008 Alex Chapman
-! See http://factorcode.org/license.txt for BSD license.
 USING: opengl opengl.gl
 ;
 
-IN: gamedev.gl
+IN: game_lib.gl
 
 ! OpenGL rendering 
 
