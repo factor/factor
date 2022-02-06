@@ -136,19 +136,17 @@ C: <dquote> dquote
     vector n tail
     n vector shorten ;
 
-: pop-til-end ( stack quot -- seq/f )
-    [ find-last drop ] keepd swap
-    [ shorten* ] [ drop f ] if* ; inline
+: unclosed-open-tag? ( obj -- ? )
+    { [ open-tag? ] [ close-tag>> not ] } 1&& ; inline
 
 ERROR: unmatched-open-tags-error stack seq ;
 : check-tag-stack ( stack -- stack )
-    dup [
-        { [ open-tag? ] [ close-tag>> not ] } 1&&
-    ] filter [ unmatched-open-tags-error ] unless-empty ;
+    dup [ unclosed-open-tag? ] filter
+    [ unmatched-open-tags-error ] unless-empty ;
 
 ERROR: unmatched-closing-tag-error stack tag ;
 :: find-last-open-tag ( stack name -- seq )
-    stack [ { [ tag? ] [ name>> name = ] } 1&& ] find-last drop [
+    stack [ { [ unclosed-open-tag? ] [ name>> name = ] } 1&& ] find-last drop [
         stack swap shorten*
     ] [
         stack name unmatched-closing-tag-error
