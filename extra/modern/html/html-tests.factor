@@ -33,3 +33,6 @@ IN: modern.html.tests
 
 { [[ <!-- omg omg -->]] }
 [ [[ <!-- omg omg -->]] string>html html>string ] unit-test
+
+{ "<div><div><a/><b/><c/></div></div>" }
+[ "<div> <div>  <a/> <b/> <c/> </div> </div>" string>html html>string ] unit-test
