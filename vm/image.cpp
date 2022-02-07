@@ -273,7 +273,7 @@ void factor_vm::load_image(vm_parameters* p) {
 // so. Instead we signal failure by returning false.
 bool factor_vm::save_image(const vm_char* saving_filename,
                            const vm_char* filename) {
-  image_header h;
+  image_header h = {};
 
   h.magic = image_magic;
   h.version = image_version;
