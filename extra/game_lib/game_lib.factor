@@ -3,7 +3,7 @@ images.loader opengl.textures assocs ;
 
 IN: game_lib
 
-TUPLE: window-gadget < gadget dimension bg-color rects-params images-params board;
+TUPLE: window-gadget < gadget dimension bg-color rects-params images-params board ;
 
 TUPLE: rect color loc dim ;
 
