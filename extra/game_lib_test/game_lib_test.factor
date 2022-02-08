@@ -11,8 +11,9 @@ IN: game_lib_test
 
 
 : display-window ( -- )
-    { 200 200 } init-window ! initialize the window with dimensions
-    draw ! optional function to draw rectangles or sprites
+    { 400 200 } init-window ! initialize the window with dimensions
+    ! draw ! optional function to draw rectangles or sprites
+    3 3 "vocab:game_lib_test/resources/X.png" create-board ! takes up the entire screen as of now
     display ; ! call display to see the window
 
     ! note: using relayout seems to change the window correctly
