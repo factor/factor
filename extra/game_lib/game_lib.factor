@@ -3,19 +3,42 @@ images.loader opengl.textures assocs math math.ranges game_lib.board ;
 
 IN: game_lib
 
-TUPLE: window-gadget < gadget dimension bg-color rects-params images-params board ;
-
-TUPLE: rect color loc dim ;
+! dimension -- { width height } of window
+! draw-quotes is a sequence of quotes, where each quote is an instruction on how to draw something
+! board -- board object created from board library
+TUPLE: window-gadget < gadget dimension bg-color draw-quotes board ;
 
 TUPLE: sprite image loc dim ;
 
-:: <sprite> ( path loc dim -- sprite )
-    path
-    [
-        sprite new path load-image >>image loc >>loc dim >>dim 
-    ] [
-        f
-    ] if ;
+
+! SECTION: These functions are what the user calls
+: set-background-color ( gadget color -- gadget )
+    >>bg-color ;
+
+: init-window ( dim -- gadget )
+    ! makes a window gadget with given dimensions
+    window-gadget new
+    swap >>dimension ;
+
+: create-board ( gadget x y path -- gadget )
+    ! x -- width of the board
+    ! y -- height of the board
+    ! path -- path of the sprite to draw
+    make-board >>board ;
+
+:: draw-filled-rectangle ( gadget color loc dim -- gadget )
+    ! appends instruction to draw a rectangle to current set of instructions in draw-quotes attribute
+    gadget 
+    gadget draw-quotes>> 
+    [ color gl-color loc dim gl-fill-rect ] { } 1sequence append
+    >>draw-quotes ;
+
+:: draw-image ( gadget path loc dim -- gadget )
+    ! appends instructions to draw a sprite to current set of instructions in draw-quotes attributes
+    gadget 
+    gadget draw-quotes>> 
+    [ dim path load-image loc <texture> draw-scaled-texture ] { } 1sequence append
+    >>draw-quotes ;
 
 :: display ( gadget -- )
     [ 
@@ -24,58 +47,27 @@ TUPLE: sprite image loc dim ;
         open-status-window 
     ] with-ui ;
 
-: set-background-color ( gadget color -- gadget )
-    >>bg-color ;
-
-: init-window ( dim -- gadget )
-    window-gadget new
-    swap >>dimension 
-    ! 3 3 "vocab:game_lib_test/resources/X.png" make-board >>board
-    COLOR: white set-background-color ;
-
-: create-board ( gadget x y path -- gadget )
-    make-board >>board ;
-
-:: draw-background ( gadget -- )
-    gadget bg-color>> gl-color 
-    { 0 0 } gadget dimension>> ! colors the full screen
-    gl-fill-rect ;
-
-! adds new rectangle parameters to rects-params as a tuple
-:: draw-filled-rectangle ( gadget color loc dim -- gadget )
-    gadget 
-    gadget rects-params>> 
-    rect new color >>color loc >>loc dim >>dim { } 1sequence append
-    >>rects-params ;
-
-! extracts parameter tuple and draws the rectangle
-:: draw-single-rect ( rect-params -- )
-    rect-params color>> gl-color rect-params loc>> rect-params dim>> gl-fill-rect ;
-
-! draws every rectangle in rects-params
-: draw-rects ( rects-params -- )
-    [ draw-single-rect ] each ;
-
-:: draw-image ( gadget path loc dim -- gadget )
-    gadget 
-    gadget images-params>> 
-    path loc dim <sprite> { } 1sequence append
-    ! sprite new path load-image >>image loc >>loc dim >>dim { } 1sequence append
-    >>images-params ;
-
-! TODO: use the cache and handle cells that are false
-:: draw-single-image ( image-params -- )
-    image-params
+! SECTION: These functions does the logic behind the hood
+:: <sprite> ( path loc dim -- sprite )
+    ! creates a sprite object if given a path, otherwise set sprite as false
+    path
     [
-        image-params dim>> image-params image>> image-params loc>> <texture> draw-scaled-texture 
+        sprite new path load-image >>image loc >>loc dim >>dim 
     ] [
-
+        f
     ] if ;
 
-: draw-images ( images-params -- )
-    [ draw-single-image ] each ;
-
+! TODO: use the cache and handle cells that are false
 :: all-combinations ( seq1 seq2 -- matrix )
+    ! converts two sequences into a matrix of pairs 
+    ! ex: { 0 1 2 } { 4 5 6 7 } -> 
+    ! {
+    !     { { 0 4 } { 1 4 } { 2 4 } }
+    !     { { 0 5 } { 1 5 } { 2 5 } }
+    !     { { 0 6 } { 1 6 } { 2 6 } }
+    !     { { 0 7 } { 1 7 } { 2 7 } }
+    ! }
+
     seq1 seq2 [ seq1 length swap [ ] curry replicate over swap zip ] map 
     swap drop ;
 
@@ -90,32 +82,57 @@ TUPLE: sprite image loc dim ;
    cellwidth cellheight { } 2sequence ;
 
 :: get-dimension-matrix ( gadget -- matrix )
+    ! gets a matrix of all starting locations of cells
     gadget get-cell-dimension :> celldims
+    ! applies appropriate offset to starting locations based on the cell heigh/width
     gadget board>> width>> [0..b) [ celldims first * ] map :> widths
     gadget board>> height>> [0..b) [ celldims second * ] map :> heights
 
     widths heights all-combinations ;
 
+ :: draw-single-image ( image-params -- )
+    ! if the sprite is valid, draw the sprite
+    image-params
+    [
+        image-params dim>> image-params image>> image-params loc>> <texture> draw-scaled-texture 
+    ] [
+
+    ] if ;
+
 :: draw-cells ( gadget -- )
-    gadget get-cell-dimension :> celldims
-    gadget get-dimension-matrix :> dim-matrix
-    gadget board>> cells>> dim-matrix [ [ celldims <sprite> draw-single-image ] 2each ] 2each ;
+    ! if the board is valid, draw the sprite at every starting location
+    gadget board>>
+    [
+        gadget get-cell-dimension :> celldims
+        gadget get-dimension-matrix :> dim-matrix
+        gadget board>> cells>> dim-matrix [ [ celldims <sprite> draw-single-image ] 2each ] 2each
+    ] [
+        
+    ] if ;
 
-    ! gadget board>> ;
 
-: flatten ( -- ) 
-;
+:: draw-background-color ( gadget -- )
+    ! if given a background color, draw the background color
+    gadget bg-color>> 
+    [
+        gadget bg-color>> gl-color { 0 0 } gadget dimension>> gl-fill-rect
+    ] [
+        
+    ] if ;
 
+: draw-background ( gadget -- )
+    ! draws everything in draw-quotes (which we added to using draw-filled-rectangle and draw-image)
+    draw-quotes>> [ call( -- ) ] each ;
 
+! SECTION: gadget methods
 M: window-gadget pref-dim*
    dimension>> ;
 
 M: window-gadget draw-gadget*
     {
         ! Background
+        [ draw-background-color ]
         [ draw-background ]
-        [ rects-params>> draw-rects ] 
-        [ images-params>> draw-images ]
         ! Board
         [ draw-cells ]
     } cleave ;
