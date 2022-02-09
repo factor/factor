@@ -1,5 +1,5 @@
 #include "master.hpp"
 
-namespace zstd {
+namespace lib { namespace zstd {
 #include "zstd.c"
-}
+} }
