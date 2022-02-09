@@ -95,6 +95,7 @@
 namespace factor { struct factor_vm; }
 
 // Factor headers
+#include "zstd.hpp"
 #include "assert.hpp"
 #include "debug.hpp"
 #include "layouts.hpp"

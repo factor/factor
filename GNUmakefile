@@ -89,7 +89,8 @@ ifdef CONFIG
 		vm/tuples.o \
 		vm/utilities.o \
 		vm/vm.o \
-		vm/words.o
+		vm/words.o \
+		vm/zstd.o
 
 	MASTER_HEADERS = $(PLAF_MASTER_HEADERS) \
 		vm/assert.hpp \
@@ -143,7 +144,8 @@ ifdef CONFIG
 		vm/inline_cache.hpp \
 		vm/mvm.hpp \
 		vm/factor.hpp \
-		vm/utilities.hpp
+		vm/utilities.hpp \
+		vm/zstd.h
 
 	EXE_OBJS = $(PLAF_EXE_OBJS)
 
