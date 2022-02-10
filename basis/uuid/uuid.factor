@@ -75,6 +75,9 @@ PRIVATE>
     sha1 checksum-bytes 16 short head be>
     5 (version) uuid>string ;
 
+: uuid-urn ( string -- url )
+    "url:urn:" prepend ;
+
 CONSTANT: NAMESPACE_DNS  "6ba7b810-9dad-11d1-80b4-00c04fd430c8"
 CONSTANT: NAMESPACE_URL  "6ba7b811-9dad-11d1-80b4-00c04fd430c8"
 CONSTANT: NAMESPACE_OID  "6ba7b812-9dad-11d1-80b4-00c04fd430c8"
