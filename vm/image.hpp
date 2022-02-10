@@ -15,14 +15,14 @@ struct image_header {
   cell version;
   // base address of data heap when image was saved
   cell data_relocation_base;
-  // size of heap
-  cell data_size;
+  // size of data heap
+  union { cell data_size; cell version4_escape; };
   // base address of code heap when image was saved
   cell code_relocation_base;
   // size of code heap
   cell code_size;
 
-  cell reserved_1;
+  union { cell reserved_1; cell escaped_data_size; };
   cell reserved_2;
   cell reserved_3;
   cell reserved_4;
