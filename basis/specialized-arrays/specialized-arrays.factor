@@ -91,8 +91,6 @@ M: A underlying-type drop \ T ;
 
 M: A pprint-delims drop \ A{ \ } ;
 
-M: A >pprint-sequence ;
-
 SYNTAX: A{ \ } [ \ T >c-array ] parse-literal ;
 
 INSTANCE: A specialized-array
