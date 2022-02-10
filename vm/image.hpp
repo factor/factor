@@ -21,10 +21,9 @@ struct image_header {
   cell code_relocation_base;
   // size of code heap
   cell code_size;
-
-  union { cell reserved_1; cell escaped_data_size; };
-  cell reserved_2;
-  cell reserved_3;
+  union { cell reserved_1; cell compressed_code_size };
+  union { cell reserved_2; cell esc_data_size };
+  union { cell reserved_3; cell compressed_data_size };
   cell reserved_4;
 
   // Initial user environment
