@@ -20,11 +20,8 @@ TUPLE: sprite image loc dim ;
     window-gadget new
     swap >>dimension ;
 
-: create-board ( gadget x y path -- gadget )
-    ! x -- width of the board
-    ! y -- height of the board
-    ! path -- path of the sprite to draw
-    make-board >>board ;
+: create-board ( gadget board -- gadget )
+    >>board ;
 
 :: draw-filled-rectangle ( gadget color loc dim -- gadget )
     ! appends instruction to draw a rectangle to current set of instructions in draw-quotes attribute
