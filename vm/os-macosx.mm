@@ -43,10 +43,6 @@ const char* default_image_path(void) {
     NSString* root = [path stringByDeletingLastPathComponent];
     NSString* resources = [path stringByAppendingPathComponent:@"Contents/Resources"];
 
-    if (!isatty(fileno(stdin))) {
-        [mgr changeCurrentDirectoryPath: root];
-    }
-
     NSString* imageInBundle = [resources stringByAppendingPathComponent:image];
     NSString* imageAlongBundle = [root stringByAppendingPathComponent:image];
 
