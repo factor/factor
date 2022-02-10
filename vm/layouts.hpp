@@ -22,57 +22,48 @@ static const cell data_alignment = 16;
 
 // Type tags, should be kept in sync with:
 //   basis/bootstrap/layouts.factor
-#define FIXNUM_TYPE 0
-#define F_TYPE 1
-#define ARRAY_TYPE 2
-#define FLOAT_TYPE 3
-#define QUOTATION_TYPE 4
-#define BIGNUM_TYPE 5
-#define ALIEN_TYPE 6
-#define TUPLE_TYPE 7
-#define WRAPPER_TYPE 8
-#define BYTE_ARRAY_TYPE 9
-#define CALLSTACK_TYPE 10
-#define STRING_TYPE 11
-#define WORD_TYPE 12
-#define DLL_TYPE 13
+enum type_tags {
+  FIXNUM_TYPE,
+  F_TYPE,
+  ARRAY_TYPE,
+  FLOAT_TYPE,
+  QUOTATION_TYPE,
+  BIGNUM_TYPE,
+  ALIEN_TYPE,
+  TUPLE_TYPE,
+  WRAPPER_TYPE,
+  BYTE_ARRAY_TYPE,
+  CALLSTACK_TYPE,
+  STRING_TYPE,
+  WORD_TYPE,
+  DLL_TYPE,
 
-#define TYPE_COUNT 14
+  TYPE_COUNT
+};
 
 static inline const char* type_name(cell type) {
-  switch (type) {
-    case FIXNUM_TYPE:
-      return "fixnum";
-    case F_TYPE:
-      return "f";
-    case ARRAY_TYPE:
-      return "array";
-    case FLOAT_TYPE:
-      return "float";
-    case QUOTATION_TYPE:
-      return "quotation";
-    case BIGNUM_TYPE:
-      return "bignum";
-    case ALIEN_TYPE:
-      return "alien";
-    case TUPLE_TYPE:
-      return "tuple";
-    case WRAPPER_TYPE:
-      return "wrapper";
-    case BYTE_ARRAY_TYPE:
-      return "byte-array";
-    case CALLSTACK_TYPE:
-      return "callstack";
-    case STRING_TYPE:
-      return "string";
-    case WORD_TYPE:
-      return "word";
-    case DLL_TYPE:
-      return "dll";
-    default:
+  static const char* const type_names[]={
+    "fixnum",
+    "f",
+    "array",
+    "float",
+    "quotation",
+    "bignum",
+    "alien",
+    "tuple",
+    "wrapper",
+    "byte-array",
+    "callstack",
+    "string",
+    "word",
+    "dll",
+  };
+
+  if (type>=TYPE_COUNT) {
       FACTOR_ASSERT(false);
       return "";
   }
+  return type_names[type];
 }
 
 enum code_block_type {
