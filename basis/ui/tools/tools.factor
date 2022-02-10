@@ -1,9 +1,9 @@
 ! Copyright (C) 2006, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel literals memory namespaces sequences system
-tools.test ui ui.backend ui.commands ui.gestures ui.tools.browser
-ui.tools.button-list ui.tools.common ui.tools.error-list
-ui.tools.listener vocabs.refresh ;
+USING: io.pathnames kernel literals memory namespaces sequences
+system tools.test ui ui.backend ui.commands ui.gestures
+ui.tools.browser ui.tools.button-list ui.tools.common
+ui.tools.error-list ui.tools.listener vocabs.refresh ;
 IN: ui.tools
 
 \ refresh-all H{ { +nullary+ t } { +listener+ t } } define-command
@@ -39,6 +39,7 @@ tool "common" f {
 
 : ui-tools-main ( -- )
     f ui-stop-after-last-window? set-global
+    "resource:" absolute-path current-directory set-global
     listener-window ;
 
 MAIN: ui-tools-main
