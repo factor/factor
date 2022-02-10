@@ -199,7 +199,7 @@ IN: calendar
 
 { t } [
     2009 1 29 <date> 1 months time+
-    2009 3 1 <date> =
+    2009 2 28 <date> =
 ] unit-test
 
 { t } [
