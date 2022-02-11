@@ -102,6 +102,9 @@ M: unescaped write-xml
 M: comment write-xml
     "<!--" write text>> write "-->" write ;
 
+M: cdata write-xml
+    "<![CDATA[" write text>> write "]]>" write ;
+
 : write-decl ( decl name quot: ( decl -- slot ) -- )
     "<!" write swap write bl
     [ name>> write bl ]
