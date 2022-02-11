@@ -182,6 +182,8 @@ M: timestamp easter
 : microseconds ( x -- duration ) 1000000 / seconds ;
 : nanoseconds ( x -- duration ) 1000000000 / seconds ;
 
+DEFER: days-in-month
+
 <PRIVATE
 
 GENERIC: +year ( timestamp x -- timestamp )
@@ -213,7 +215,10 @@ M: real +year
     12 /rem [ 1 - 12 ] when-zero swap ; inline
 
 M: integer +month
-    [ over month>> + months/years [ >>month ] dip +year ] unless-zero ;
+    [
+        over month>> + months/years
+        [ >>month dup days-in-month '[ _ min ] change-day ] dip +year
+    ] unless-zero ;
 
 M: real +month
     float>whole-part swapd average-month * +day swap +month ;
