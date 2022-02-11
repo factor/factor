@@ -4,6 +4,7 @@
 
     <t:title>Search - Factor Documentation</t:title>
     <t:style t:include="resource:extra/webapps/help/search.css" />
+    <t:script t:include="resource:extra/webapps/help/search.js" />
 
     <t:html t:name="navbar"/>
 
