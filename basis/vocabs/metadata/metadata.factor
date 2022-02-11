@@ -104,11 +104,11 @@ M: unsupported-platform summary
 : vocab-metadata-files ( vocab -- paths )
     [
         {
-            [ vocab-summary-path file-exists?, ]
             [ vocab-authors-path file-exists?, ]
-            [ vocab-tags-path file-exists?, ]
             [ vocab-platforms-path file-exists?, ]
             [ vocab-resources-path file-exists?, ]
+            [ vocab-summary-path file-exists?, ]
+            [ vocab-tags-path file-exists?, ]
         } cleave
     ] { } make ;
 
