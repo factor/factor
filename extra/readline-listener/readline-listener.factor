@@ -63,4 +63,7 @@ PRIVATE>
     ] set-completion
     readline-reader new [ listener-main ] with-input-stream* ;
 
+: ?readline-listener ( -- )
+    has-readline? [ readline-listener ] [ listener ] if ;
+
 MAIN: readline-listener
