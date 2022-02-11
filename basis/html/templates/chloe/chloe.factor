@@ -46,8 +46,8 @@ CHLOE: script
 
 CHLOE: write-script
     drop [
-        get-script xml.data:<cdata>
-        [XML <script type="text/javascript"> <-> </script> XML]
+        get-script "*/" "/*" surround xml.data:<cdata>
+        [XML <script type="text/javascript">/* <-> */</script> XML]
     ] [xml-code] ;
 
 CHLOE: meta
