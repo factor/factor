@@ -5,6 +5,7 @@ html.templates html.templates.chloe.compiler
 html.templates.chloe.components html.templates.chloe.syntax
 io.encodings.utf8 io.files io.files.info kernel logging make
 math namespaces sequences splitting words xml xml.syntax ;
+QUALIFIED: xml.data
 IN: html.templates.chloe
 
 TUPLE: chloe path ;
@@ -45,8 +46,8 @@ CHLOE: script
 
 CHLOE: write-script
     drop [
-        get-script
-        [XML <script type="text/javascript"><![CDATA[<->]]></script> XML]
+        get-script xml.data:<cdata>
+        [XML <script type="text/javascript"> <-> </script> XML]
     ] [xml-code] ;
 
 CHLOE: meta
