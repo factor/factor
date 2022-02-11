@@ -186,6 +186,7 @@ FUNCTION: CXString clang_getTypeKindSpelling ( CXTypeKind K )
 
 FUNCTION: CXType clang_getResultType ( CXType T )
 FUNCTION: int clang_Cursor_getNumArguments ( CXCursor C )
+FUNCTION: CXType clang_getArgType ( CXType C, uint i )
 FUNCTION: CXCursor clang_Cursor_getArgument ( CXCursor C, uint i )
 
 FUNCTION: uint clang_visitChildren (
@@ -201,6 +202,7 @@ FUNCTION: uint clang_visitChildren (
             [ clang_getCursorType clang_getTypeSpelling data>> . ]
             [ clang_getCursorSpelling data>> . ]
             [ clang_getCursorKind clang_getCursorKindSpelling data>> . ]
+            [ clang_getCursorType clang_getResultType . ]
             [
                 dup clang_Cursor_getNumArguments dup -1 = [
                     2drop
