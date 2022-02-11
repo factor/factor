@@ -52,7 +52,6 @@ SYMBOL: xml-file
     dup dup "y" attr "z" set-attr
     T{ name { space "blah" } { main "z" } } attr
 ] unit-test
-[ "foo" ] [ "<boo><![CDATA[foo]]></boo>" string>xml children>string ] unit-test
 [ "<!-- B+, B, or B--->" string>xml ] must-fail
 [ ] [ "<?xml version='1.0'?><!-- declarations for <head> & <body> --><foo/>" string>xml drop ] unit-test
 

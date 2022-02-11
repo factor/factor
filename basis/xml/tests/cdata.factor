@@ -6,7 +6,7 @@ IN: xml.tests
 <rss version=\"2.0\">
   <channel>
     <item>
-      <description>Python has a n class property in [&amp;#8230;]</description>
+      <description><![CDATA[Python has a n class property in [&#8230;]]]></description>
     </item>
   </channel>
 </rss>"

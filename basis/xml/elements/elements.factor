@@ -98,9 +98,9 @@ IN: xml.elements
         [ "?>" take-string append <instruction> ]
     } cond ;
 
-: take-cdata ( -- string )
+: take-cdata ( -- cdata )
     depth get zero? [ bad-cdata ] when
-    "[CDATA[" expect "]]>" take-string ;
+    "[CDATA[" expect "]]>" take-string <cdata> ;
 
 DEFER: make-tag ! Is this unavoidable?
 
