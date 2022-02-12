@@ -201,7 +201,7 @@ TUPLE: person first-name last-name ;
     ] with-variable
 ] unit-test
 
-{ "<script type=\"text/javascript\"> function testAlerts() {    window.alert(\"Hello, world!\");} </script>" } [
+{ "<script type=\"text/javascript\">/* <![CDATA[*/function testAlerts() {    window.alert(\"Hello, world!\");}/*]]> */</script>" } [
     SBUF" " clone script [
         [ "test17" test-template call-template ] run-template
     ] with-variable
