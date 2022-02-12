@@ -111,6 +111,8 @@ void factor_vm::load_data_heap(FILE* file, image_header* h, vm_parameters* p) {
     std::cout << h->compressed_data_size << " bytes expected\n";
     fatal_error("load_data_heap failed", 0);
   }
+  if (h->data_size != h->compressed_data_size) {
+  }
 
   data->tenured->initial_free_list(h->data_size);
 }
@@ -128,6 +130,8 @@ void factor_vm::load_code_heap(FILE* file, image_header* h, vm_parameters* p) {
       std::cout << "truncated image: " << bytes_read << " bytes read, ";
       std::cout << h->compressed_code_size << " bytes expected\n";
       fatal_error("load_code_heap failed", 0);
+    }
+    if (h->code_size != h->compressed_code_size) {
     }
   }
 
