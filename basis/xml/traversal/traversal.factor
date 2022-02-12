@@ -4,8 +4,10 @@ USING: accessors combinators kernel make sequences
 sequences.deep strings xml.data ;
 IN: xml.traversal
 
-: children>string ( tag -- string )
-    children>> {
+<PRIVATE
+
+: (children>string) ( children -- string )
+    {
         { [ dup empty? ] [ drop "" ] }
         {
             [ dup [ string? not ] any? ]
@@ -13,6 +15,11 @@ IN: xml.traversal
         }
         [ concat ]
     } cond ;
+
+PRIVATE>
+
+: children>string ( tag -- string )
+    children>> (children>string) ;
 
 : deep-children>string ( tag -- string )
     children>> [
