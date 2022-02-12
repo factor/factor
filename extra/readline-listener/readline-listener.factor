@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 
 USING: accessors assocs colors combinators io kernel listener
-readline sequences splitting threads tools.completion
+readline sequences sets splitting threads tools.completion
 unicode.data vocabs vocabs.hierarchy ;
 
 IN: readline-listener
@@ -29,7 +29,7 @@ M: readline-reader prompt.
     swap '[ _ head? ] filter ;
 
 : prefixed-words ( prefix -- words )
-    all-words [ name>> ] map! prefixed ;
+    all-words [ name>> ] map! members prefixed ;
 
 : prefixed-vocabs ( prefix -- vocabs )
     all-disk-vocabs-recursive filter-vocabs [ name>> ] map! prefixed ;
