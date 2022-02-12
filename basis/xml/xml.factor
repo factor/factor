@@ -4,8 +4,8 @@ USING: accessors arrays ascii assocs combinators
 combinators.short-circuit io io.encodings.binary
 io.encodings.utf8 io.files io.streams.byte-array
 io.streams.string kernel namespaces sequences splitting strings
-xml.autoencoding xml.data xml.elements xml.errors xml.name
-xml.state xml.tokenize ;
+vectors xml.autoencoding xml.data xml.elements xml.errors
+xml.name xml.state xml.tokenize ;
 IN: xml
 
 <PRIVATE
@@ -22,6 +22,8 @@ IN: xml
 GENERIC: process ( object -- )
 
 M: object process add-child ;
+
+M: string process [ add-child ] unless-empty ;
 
 M: prolog process
     xml-stack get
@@ -184,7 +186,7 @@ PRIVATE>
     } case ;
 
 : read-xml-chunk ( stream -- seq )
-    [ check ] 1 read-seq <xml-chunk> ;
+    [ check ] 1 read-seq dup empty? [ "" suffix! ] when <xml-chunk> ;
 
 : string>xml ( string -- xml )
     <string-reader> read-xml ;
