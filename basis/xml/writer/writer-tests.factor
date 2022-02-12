@@ -78,5 +78,5 @@ IN: xml.writer.tests
 ] unit-test
 
 { "<test name=\"bob\"/>" } [
-    "test" { { "name" "bob" } } <contained-tag> xml>string
+    "test" { { "name" "bob" } } { } <tag> xml>string
 ] unit-test
