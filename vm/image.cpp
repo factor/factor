@@ -98,6 +98,8 @@ void vm_parameters::init_from_args(int argc, vm_char** argv) {
 }
 
 void factor_vm::load_data_heap(FILE* file, image_header* h, vm_parameters* p) {
+  auto uncompress = h->data_size != h->compressed_data_size;
+
   p->tenured_size = std::max((h->data_size * 3) / 2, p->tenured_size);
 
   data_heap *d = new data_heap(&nursery,
@@ -111,13 +113,16 @@ void factor_vm::load_data_heap(FILE* file, image_header* h, vm_parameters* p) {
     std::cout << h->compressed_data_size << " bytes expected\n";
     fatal_error("load_data_heap failed", 0);
   }
-  if (h->data_size != h->compressed_data_size) {
+  if (uncompress) {
+    puts ("decompress data");
   }
 
   data->tenured->initial_free_list(h->data_size);
 }
 
 void factor_vm::load_code_heap(FILE* file, image_header* h, vm_parameters* p) {
+  auto uncompress = h->code_size != h->compressed_code_size;
+
   if (h->code_size > p->code_size)
     fatal_error("Code heap too small to fit image", h->code_size);
 
@@ -131,7 +136,8 @@ void factor_vm::load_code_heap(FILE* file, image_header* h, vm_parameters* p) {
       std::cout << h->compressed_code_size << " bytes expected\n";
       fatal_error("load_code_heap failed", 0);
     }
-    if (h->code_size != h->compressed_code_size) {
+    if (uncompress) {
+      puts ("decompress code");
     }
   }
 
