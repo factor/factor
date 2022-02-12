@@ -11,7 +11,7 @@ struct embedded_image_footer {
 };
 
 struct image_header {
-  cell magic;
+  union { cell magic; cell uncompressed_p; };
   cell version;
   // base address of data heap when image was saved
   cell data_relocation_base;
@@ -21,9 +21,9 @@ struct image_header {
   cell code_relocation_base;
   // size of code heap
   cell code_size;
-  union { cell reserved_1; cell compressed_code_size };
-  union { cell reserved_2; cell esc_data_size };
-  union { cell reserved_3; cell compressed_data_size };
+  union { cell reserved_1; cell compressed_code_size; };
+  union { cell reserved_2; cell esc_data_size; };
+  union { cell reserved_3; cell compressed_data_size; };
   cell reserved_4;
 
   // Initial user environment

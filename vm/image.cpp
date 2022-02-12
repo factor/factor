@@ -104,11 +104,11 @@ void factor_vm::load_data_heap(FILE* file, image_header* h, vm_parameters* p) {
                                p->young_size, p->aging_size, p->tenured_size);
   set_data_heap(d);
   fixnum bytes_read =
-      raw_fread((void*)data->tenured->start, 1, h->data_size, file);
+      raw_fread((void*)data->tenured->start, 1, h->compressed_data_size, file);
 
-  if ((cell)bytes_read != h->data_size) {
+  if ((cell)bytes_read != h->compressed_data_size) {
     std::cout << "truncated image: " << bytes_read << " bytes read, ";
-    std::cout << h->data_size << " bytes expected\n";
+    std::cout << h->compressed_data_size << " bytes expected\n";
     fatal_error("load_data_heap failed", 0);
   }
 
@@ -123,10 +123,10 @@ void factor_vm::load_code_heap(FILE* file, image_header* h, vm_parameters* p) {
 
   if (h->code_size != 0) {
     size_t bytes_read =
-        raw_fread((void*)code->allocator->start, 1, h->code_size, file);
-    if (bytes_read != h->code_size) {
+        raw_fread((void*)code->allocator->start, 1, h->compressed_code_size, file);
+    if (bytes_read != h->compressed_code_size) {
       std::cout << "truncated image: " << bytes_read << " bytes read, ";
-      std::cout << h->code_size << " bytes expected\n";
+      std::cout << h->compressed_code_size << " bytes expected\n";
       fatal_error("load_code_heap failed", 0);
     }
   }
@@ -255,7 +255,14 @@ void factor_vm::load_image(vm_parameters* p) {
   if (h.version != image_version)
     fatal_error("Bad image: version number check failed", h.version);
 
-  if (!h.version4_escape) h.data_size=h.escaped_data_size, h.escaped_data_size=0;
+  if (!h.version4_escape) {
+    h.data_size = h.esc_data_size;
+    h.uncompressed_p = 0;
+  } else {
+    h.compressed_data_size = h.data_size;
+    h.compressed_code_size = h.code_size;
+  }
+
 
   load_data_heap(file, &h, p);
   load_code_heap(file, &h, p);
