@@ -29,7 +29,7 @@ M: readline-reader prompt.
     swap '[ _ head? ] filter ;
 
 : prefixed-words ( prefix -- words )
-    all-words [ name>> ] map! members prefixed ;
+    all-words [ name>> ] map! prefixed members ;
 
 : prefixed-vocabs ( prefix -- vocabs )
     all-disk-vocabs-recursive filter-vocabs [ name>> ] map! prefixed ;
