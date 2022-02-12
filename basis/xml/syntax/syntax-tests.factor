@@ -43,8 +43,8 @@ XML-NS: foo http://blah.com
 { "a" "c" { "a" "c" f } } [
     "<?xml version='1.0'?><x><-a-><b val=<-c->/><-></x>"
     string>doc
-    [ second var>> ]
-    [ fourth "val" attr var>> ]
+    [ first var>> ]
+    [ second "val" attr var>> ]
     [ extract-variables ] tri
 ] unit-test
 
