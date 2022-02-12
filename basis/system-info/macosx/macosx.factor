@@ -44,7 +44,8 @@ CONSTANT: system-code-names H{
 }
 
 : system-code-name ( -- str/f )
-    system-version-major system-version-minor 2array
+    system-version-major
+    dup 10 = [ system-version-minor ] [ 0 ] if 2array
     system-code-names at ;
 
 PRIVATE>
