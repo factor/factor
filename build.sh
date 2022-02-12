@@ -745,7 +745,7 @@ install_deps_dnf() {
 }
 
 install_deps_pkg() {
-    sudo pkg install --yes git gmake gcc rlwrap ripgrep curl gmake x11-toolkits/gtk30 x11-toolkits/gtkglext pango cairo vim
+    sudo pkg install --yes bash git gmake gcc rlwrap ripgrep curl gmake x11-toolkits/gtk30 x11-toolkits/gtkglext pango cairo vim
 }
 
 
