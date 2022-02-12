@@ -106,7 +106,7 @@ CHLOE: form
         [ hidden-fields ]
         [ compile-children>xml-string ] tri
         [
-            <unescaped> [XML <form><-><-></form> XML] first
+            <unescaped> [XML <form><-><-></form> XML] second
                 swap >>attrs
             write-xml
         ] [code]
