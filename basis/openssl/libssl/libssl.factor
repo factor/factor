@@ -453,13 +453,13 @@ FUNCTION: int SSL_get_shutdown ( SSL* ssl )
 
 FUNCTION: int SSL_want ( SSL* ssl )
 FUNCTION: long SSL_get_verify_result ( SSL* ssl )
-FUNCTION: X509* SSL_get_peer_certificate ( SSL* s )
-FUNCTION: X509 *SSL_get0_peer_certificate ( SSL *ssl )
-FUNCTION: X509 *SSL_get1_peer_certificate ( SSL *ssl )
+FUNCTION: X509* SSL_get_peer_certificate ( SSL* ssl )
+FUNCTION: X509* SSL_get0_peer_certificate ( SSL* ssl )
+FUNCTION: X509* SSL_get1_peer_certificate ( SSL* ssl )
 
 : get-ssl-peer-certificate ( ssl -- x509 )
-    { "SSL_get1_peer_certificate" "SSL_get_peer_certificate" } "libssl" find-first-function nip
-    "openssl.libssl" lookup-word execute( ssl -- x509 ) ; inline
+    "SSL_get1_peer_certificate" "libssl" library-dll dlsym-raw
+    [ SSL_get1_peer_certificate ] [ SSL_get_peer_certificate ] if ; inline
 
 FUNCTION: int SSL_set_cipher_list ( SSL* ssl, c-string str )
 FUNCTION: int SSL_use_RSAPrivateKey_file ( SSL* ssl, c-string str )
