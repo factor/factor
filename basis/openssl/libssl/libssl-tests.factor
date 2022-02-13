@@ -59,7 +59,7 @@ maybe-init-ssl
         new-tls1-ctx new-ssl {
             SSL_rstate_string_long
             SSL_want
-            SSL_get_peer_certificate
+            get-peer-certificate-function
         } [ execute( x -- x ) ] with map
     ] with-destructors
 ] unit-test
