@@ -17,12 +17,12 @@ HOOK: find-library* os ( name -- path/f )
 
 ERROR: library-missing library ;
 
-: find-first-function ( names library -- function/f )
+: find-first-function ( names library -- alien/f name )
     libraries get ?at [
-        dll>> '[ _ dlsym ] map-find nip
+        dll>> '[ _ dlsym ] map-find
     ] [
         library-missing
-    ] if ;
+    ] if ; inline
 
 ! Try to find the library from a list, but if it's not found,
 ! try to open a library that is the first name in that list anyway
