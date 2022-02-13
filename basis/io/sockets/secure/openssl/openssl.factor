@@ -446,11 +446,8 @@ M: ssl-handle dispose*
         =
     ] if ;
 
-: get-peer-certificate-function ( -- word/f )
-    { "SSL_get1_peer_certificate" "SSL_get_peer_certificate" } "libssl" find-first-function ;
-
 : check-subject-name ( host ssl-handle -- )
-    get-peer-certificate-function execute( ssl -- x509 ) [
+    get-ssl-peer-certificate [
         [ alternative-dns-names ]
         [ subject-name ] bi suffix members
         2dup [ subject-names-match? ] with any?

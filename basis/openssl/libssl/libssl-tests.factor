@@ -53,13 +53,18 @@ maybe-init-ssl
 ] unit-test
 
 {
-    { "read header" 1 f }
+    { "read header" 1 }
 } [
     [
         new-tls1-ctx new-ssl {
             SSL_rstate_string_long
             SSL_want
-            get-peer-certificate-function
         } [ execute( x -- x ) ] with map
+    ] with-destructors
+] unit-test
+
+{ f } [
+    [
+        new-tls1-ctx new-ssl get-ssl-peer-certificate
     ] with-destructors
 ] unit-test
