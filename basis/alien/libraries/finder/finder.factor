@@ -1,5 +1,5 @@
-USING: accessors alien.libraries kernel sequences system vocabs
-;
+USING: accessors alien.libraries assocs kernel namespaces
+sequences system vocabs ;
 IN: alien.libraries.finder
 
 HOOK: find-library* os ( name -- path/f )
@@ -12,6 +12,16 @@ HOOK: find-library* os ( name -- path/f )
         3drop
     ] [
         [ find-library ] [ update-library ] bi*
+    ] if ;
+
+
+ERROR: library-missing library ;
+
+: find-first-function ( names library -- function/f )
+    libraries get ?at [
+        dll>> '[ _ dlsym ] map-find nip
+    ] [
+        library-missing
     ] if ;
 
 ! Try to find the library from a list, but if it's not found,
