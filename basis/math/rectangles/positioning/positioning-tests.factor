@@ -45,7 +45,7 @@ IN: math.rectangles.positioning.tests
     popup-rect
 ] unit-test
 
-{ T{ rect f { 0 50 } { 50 50 } } } [
+{ T{ rect f { 0 0 } { 50 60 } } } [
     T{ rect f { 0 50 } { 0 0 } }
     { 50 60 }
     { 100 100 }
