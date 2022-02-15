@@ -73,11 +73,7 @@ SYMBOL: header-bits
 : most-negative-fixnum ( -- n )
     first-bignum neg >fixnum ; inline
 
-: (max-array-capacity) ( b -- n )
-    2 - 2^ 1 - ; inline
-
-: max-array-capacity ( -- n )
-    fixnum-bits (max-array-capacity) ; inline
+ALIAS: max-array-capacity most-positive-fixnum
 
 : bootstrap-first-bignum ( -- n )
     bootstrap-cell-bits (first-bignum) ;
@@ -88,8 +84,7 @@ SYMBOL: header-bits
 : bootstrap-most-negative-fixnum ( -- n )
     bootstrap-first-bignum neg ;
 
-: bootstrap-max-array-capacity ( -- n )
-    bootstrap-fixnum-bits (max-array-capacity) ;
+ALIAS: bootstrap-max-array-capacity bootstrap-most-positive-fixnum
 
 M: bignum >integer
     dup most-negative-fixnum most-positive-fixnum between?
