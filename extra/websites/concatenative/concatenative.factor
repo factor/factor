@@ -98,6 +98,26 @@ SYMBOLS: key-password key-file dh-file ;
         URL" /gitweb.cgi" <redirect-responder> "" add-responder
         URL" /github-sync.cgi" <redirect-responder> "github-sync" add-responder ;
 
+TUPLE: cgit < file-responder cgi ;
+
+: <cgit> ( root cgi -- responder )
+    cgit new
+        swap >>cgi
+        swap >>root
+        [ (serve-static) ] >>hook
+        H{ } clone >>special ;
+
+M: cgit call-responder*
+    dup file-responder set
+    over [ f ] [ "/" join serving-path file-exists? ] if-empty [
+        call-next-method
+    ] [
+        url get
+            rot "/" join "url" set-query-param
+            "cgit.cgi" >>path drop
+        cgi>> serve-cgi
+    ] if ;
+
 : init-production ( -- )
     common-configuration
     <vhost-dispatcher>
@@ -110,6 +130,7 @@ SYMBOLS: key-password key-file dh-file ;
         <mason-app> <login-config> <factor-boilerplate> website-db <alloy> "builds.factorcode.org" add-responder
         home "docs" append-path <help-webapp> "docs.factorcode.org" add-responder
         home "gitweb" append-path <gitweb> "gitweb.factorcode.org" add-responder
+        "/usr/share/cgit" "/usr/lib/cgit/cgit.cgi" <cgit> "cgit.factorcode.org" add-responder
         home "irclogs" append-path <static> t >>allow-listings "irclogs.factorcode.org" add-responder
     main-responder set-global ;
 
