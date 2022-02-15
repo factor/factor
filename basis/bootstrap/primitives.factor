@@ -177,7 +177,7 @@ define-union-class
 define-predicate-class
 
 "array-capacity" "sequences.private" lookup-word
-[ >fixnum ] bootstrap-max-array-capacity <fake-bignum> [ fixnum-bitand ] curry append
+[ integer>fixnum-strict ] bootstrap-max-array-capacity <fake-bignum> [ fixnum-bitand ] curry append
 "coercer" set-word-prop
 
 "integer-array-capacity" "sequences.private" create-word
