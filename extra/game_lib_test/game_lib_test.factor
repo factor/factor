@@ -1,4 +1,4 @@
-USING: accessors kernel game_lib colors.constants ui.gadgets game_lib.board ;
+USING: accessors kernel game_lib colors.constants ui.gadgets game_lib.board ui.gestures words assocs ;
 
 IN: game_lib_test
 
@@ -6,6 +6,13 @@ IN: game_lib_test
 ! followed by optional draw/board functions, 
 ! and must call display last to see the window with everything drawn
 
+: gestures ( gadget -- )
+    "gestures" [ 
+        { 
+            T{ button-down { # 1 } } 
+            [ dup board>> over gesture-pos "vocab:game_lib_test/resources/X.png" set-cell drop relayout-1 ] 
+        } assoc-union 
+    ] change-word-prop ;
 
 : draw ( gadget -- gadget )
     COLOR: pink set-background-color
@@ -22,6 +29,7 @@ IN: game_lib_test
 
 : display-window ( -- )
     { 400 200 } init-window ! initialize the window with dimensions
+!    dup gestures ! sets gestures -- a hashmap of key presses and associated actions
     draw ! optional function to draw rectangles or sprites
     board ! optional function to create a board
     display ; ! call display to see the window

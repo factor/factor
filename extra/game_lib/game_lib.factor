@@ -1,12 +1,12 @@
 USING: accessors ui.gadgets kernel ui.gadgets.status-bar ui ui.render colors.constants opengl sequences combinators peg
-images.loader opengl.textures assocs math math.ranges game_lib.board ;
+images.loader opengl.textures assocs math math.ranges game_lib.board ui.gestures ;
 
 IN: game_lib
 
 ! dimension -- { width height } of window
 ! draw-quotes is a sequence of quotes, where each quote is an instruction on how to draw something
 ! board -- board object created from board library
-TUPLE: window-gadget < gadget dimension bg-color draw-quotes board ;
+TUPLE: window-gadget < gadget dimension bg-color draw-quotes board gests ;
 
 TUPLE: sprite image loc dim ;
 
@@ -73,8 +73,8 @@ TUPLE: sprite image loc dim ;
     gadget dimension>> first2 :> ( wdt hgt )
     gadget board>> dup width>> swap height>> :> ( cols rows )
 
-    wdt cols / :> cellwidth 
-    hgt rows / :> cellheight
+    wdt cols /i :> cellwidth 
+    hgt rows /i :> cellheight
 
    cellwidth cellheight { } 2sequence ;
 
@@ -121,6 +121,17 @@ TUPLE: sprite image loc dim ;
     ! draws everything in draw-quotes (which we added to using draw-filled-rectangle and draw-image)
     draw-quotes>> [ call( -- ) ] each ;
 
+:: gesture-pos ( gadget -- cell-pos )
+    gadget hand-rel first2 :> ( w h )
+    gadget get-cell-dimension first2 :> ( cw ch )
+    w cw /i :> row
+    h ch /i :> col
+    row col { } 2sequence ;
+
+: new-gestures ( gadget assoc -- gadget )
+    over swap
+    set-gestures ;
+
 ! SECTION: gadget methods
 M: window-gadget pref-dim*
    dimension>> ;
@@ -133,4 +144,20 @@ M: window-gadget draw-gadget*
         ! Board
         [ draw-cells ]
     } cleave ;
+
+! window-gadget 
+!     gests>>
+!     set-gestures 
+
+window-gadget H{
+    ! { T{ button-down f f 1 }     [ request-focus ] }
+    { T{ button-down { # 1 } }      [ dup board>> over gesture-pos "vocab:game_lib_test/resources/X.png" set-cell drop relayout-1 ] }
+    ! { T{ key-down f f "1" }      [ get-cell-from-gest set-to-x] }
+    ! { T{ key-down f f "LEFT" }   [ [ sokoban>> move-left ] unless-paused ] }
+    ! { T{ key-down f f "RIGHT" }  [ [ sokoban>> move-right ] unless-paused ] }
+    ! { T{ key-down f f "DOWN" }   [ [ sokoban>> move-down ] unless-paused ] }
+    ! { T{ key-down f f "p" }      [ sokoban>> toggle-pause ] }
+    ! { T{ key-down f f "n" }      [ new-sokoban drop ] }
+} set-gestures
+
 
