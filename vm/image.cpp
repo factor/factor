@@ -105,8 +105,11 @@ void factor_vm::load_data_heap(FILE* file, image_header* h, vm_parameters* p) {
   data_heap *d = new data_heap(&nursery,
                                p->young_size, p->aging_size, p->tenured_size);
   set_data_heap(d);
+
+  auto buf = uncompress ? malloc (h->compressed_data_size) : (void*)data->tenured->start;
+
   fixnum bytes_read =
-      raw_fread((void*)data->tenured->start, 1, h->compressed_data_size, file);
+        raw_fread(buf, 1, h->compressed_data_size, file);
 
   if ((cell)bytes_read != h->compressed_data_size) {
     std::cout << "truncated image: " << bytes_read << " bytes read, ";
@@ -115,7 +118,13 @@ void factor_vm::load_data_heap(FILE* file, image_header* h, vm_parameters* p) {
   }
   if (uncompress) {
     puts ("decompress data");
+    size_t result = lib::zstd::ZSTD_decompress ( (void*)data->tenured->start, h->data_size, buf, h->compressed_data_size);
+    if (lib::zstd::ZSTD_isError (result)) {
+      puts (lib::zstd::ZSTD_getErrorName (result));
+    }
   }
+
+  if (uncompress && buf) free (buf);
 
   data->tenured->initial_free_list(h->data_size);
 }
@@ -127,10 +136,11 @@ void factor_vm::load_code_heap(FILE* file, image_header* h, vm_parameters* p) {
     fatal_error("Code heap too small to fit image", h->code_size);
 
   code = new code_heap(p->code_size);
+  auto buf = uncompress ? malloc (h->compressed_code_size) : (void*)code->allocator->start;
 
   if (h->code_size != 0) {
     size_t bytes_read =
-        raw_fread((void*)code->allocator->start, 1, h->compressed_code_size, file);
+        raw_fread(buf, 1, h->compressed_code_size, file);
     if (bytes_read != h->compressed_code_size) {
       std::cout << "truncated image: " << bytes_read << " bytes read, ";
       std::cout << h->compressed_code_size << " bytes expected\n";
@@ -138,8 +148,14 @@ void factor_vm::load_code_heap(FILE* file, image_header* h, vm_parameters* p) {
     }
     if (uncompress) {
       puts ("decompress code");
+      size_t result = lib::zstd::ZSTD_decompress ((void*)code->allocator->start, h->code_size, buf, h->compressed_code_size);
+      if (lib::zstd::ZSTD_isError (result)) {
+        puts (lib::zstd::ZSTD_getErrorName (result));
+      }
     }
   }
+
+  if (uncompress && buf) free (buf);
 
   code->allocator->initial_free_list(h->code_size);
   code->initialize_all_blocks_set();
