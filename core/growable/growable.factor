@@ -1,9 +1,10 @@
 ! Copyright (C) 2005, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-IN: growable
-MIXIN: growable ! for bootstrap
-USING: accessors kernel layouts math math.private sequences
+USING: accessors kernel math math.private sequences
 sequences.private ;
+IN: growable
+
+MIXIN: growable
 
 SLOT: length
 SLOT: underlying
@@ -45,9 +46,7 @@ M: growable set-length
     ] if
     length<< ;
 
-: new-size ( old -- new )
-    integer>fixnum-strict 1 fixnum+fast 2 fixnum*fast
-    dup 0 < [ drop most-positive-fixnum ] when ; inline
+: new-size ( old -- new ) 1 + 2 * ; inline
 
 : ensure ( n seq -- n seq )
     bounds-check-head
