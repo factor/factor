@@ -41,7 +41,7 @@ IN: bitcoin.client
 
 : bitcoin-url ( -- url )
     <url>
-      "http" >>protocol
+      "https" >>protocol
       "/" >>path
       bitcoin-server >>host
       bitcoin-port >>port ;
