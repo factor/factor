@@ -18,7 +18,8 @@ TUPLE: sprite image loc dim ;
 : init-window ( dim -- gadget )
     ! makes a window gadget with given dimensions
     window-gadget new
-    swap >>dimension ;
+    swap >>dimension 
+    H{ } >>gests ;
 
 : create-board ( gadget board -- gadget )
     >>board ;
@@ -128,9 +129,11 @@ TUPLE: sprite image loc dim ;
     h ch /i :> col
     row col { } 2sequence ;
 
-: new-gestures ( gadget assoc -- gadget )
-    over swap
-    set-gestures ;
+:: new-gestures ( gadget value key -- gadget )
+    value key gadget gests>> set-at gadget ;
+
+:: make-gestures ( gadget -- gadget )
+    window-gadget gadget gests>> set-gestures gadget ;
 
 ! SECTION: gadget methods
 M: window-gadget pref-dim*
@@ -144,20 +147,5 @@ M: window-gadget draw-gadget*
         ! Board
         [ draw-cells ]
     } cleave ;
-
-! window-gadget 
-!     gests>>
-!     set-gestures 
-
-window-gadget H{
-    ! { T{ button-down f f 1 }     [ request-focus ] }
-    { T{ button-down { # 1 } }      [ dup board>> over gesture-pos "vocab:game_lib_test/resources/X.png" set-cell drop relayout-1 ] }
-    ! { T{ key-down f f "1" }      [ get-cell-from-gest set-to-x] }
-    ! { T{ key-down f f "LEFT" }   [ [ sokoban>> move-left ] unless-paused ] }
-    ! { T{ key-down f f "RIGHT" }  [ [ sokoban>> move-right ] unless-paused ] }
-    ! { T{ key-down f f "DOWN" }   [ [ sokoban>> move-down ] unless-paused ] }
-    ! { T{ key-down f f "p" }      [ sokoban>> toggle-pause ] }
-    ! { T{ key-down f f "n" }      [ new-sokoban drop ] }
-} set-gestures
 
 

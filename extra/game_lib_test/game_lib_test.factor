@@ -6,13 +6,13 @@ IN: game_lib_test
 ! followed by optional draw/board functions, 
 ! and must call display last to see the window with everything drawn
 
-: gestures ( gadget -- )
-    "gestures" [ 
-        { 
-            T{ button-down { # 1 } } 
-            [ dup board>> over gesture-pos "vocab:game_lib_test/resources/X.png" set-cell drop relayout-1 ] 
-        } assoc-union 
-    ] change-word-prop ;
+: gestures ( gadget -- gadget )
+    ! TODO: generalize action quote and make easier to use
+    [ dup board>> over gesture-pos "vocab:game_lib_test/resources/X.png" set-cell drop relayout-1 ]
+    T{ button-down { # 1 } } new-gestures 
+    [ dup board>> over gesture-pos "vocab:game_lib_test/resources/O.png" set-cell drop relayout-1 ]
+    T{ button-down { # 3 } } new-gestures 
+    make-gestures ;
 
 : draw ( gadget -- gadget )
     COLOR: pink set-background-color
@@ -29,7 +29,7 @@ IN: game_lib_test
 
 : display-window ( -- )
     { 400 200 } init-window ! initialize the window with dimensions
-!    dup gestures ! sets gestures -- a hashmap of key presses and associated actions
+    gestures ! sets gestures -- a hashmap of key presses and associated actions
     draw ! optional function to draw rectangles or sprites
     board ! optional function to create a board
     display ; ! call display to see the window
