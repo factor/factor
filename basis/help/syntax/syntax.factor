@@ -1,9 +1,12 @@
 ! Copyright (C) 2005, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
+
 USING: accessors arrays ascii combinators
 combinators.short-circuit compiler.units definitions help
-help.markup help.topics kernel lexer math namespaces parser
-sequences splitting strings strings.parser vocabs.parser words ;
+help.markup help.topics kernel lexer math math.order namespaces
+parser sequences splitting strings strings.parser vocabs.parser
+words ;
+
 IN: help.syntax
 
 DEFER: HELP{
@@ -81,8 +84,21 @@ DEFER: HELP{
         ] if
     ] produce nip ;
 
+: whitespace ( seq -- n )
+    [ [ blank? ] all? ] reject [ 0 ] [
+        [ [ blank? not ] find drop ] [ min ] map-reduce
+    ] if-empty ;
+
+: trim-whitespace ( seq -- seq' )
+    dup rest-slice dup whitespace
+    [ '[ _ short tail ] map! ] unless-zero drop
+    0 over [ [ blank? ] trim-head ] change-nth ;
+
+: code-lines ( str -- seq )
+    split-lines trim-whitespace [ [ blank? ] all? ] trim ;
+
 : make-example ( str -- seq )
-    split-lines dup { [ array? ] [ length 1 > ] } 1&& [
+    code-lines dup { [ array? ] [ length 1 > ] } 1&& [
         dup length 1 - over [ unescape-string ] change-nth
         \ $example prefix
     ] when ;
@@ -93,7 +109,7 @@ DEFER: HELP{
 
 : parse-help-code ( -- seq )
     \ } parse-until dup { [ length 1 = ] [ first string? ] } 1&&
-    [ first split-lines ] [ >array ] if ;
+    [ first code-lines ] [ >array ] if ;
 
 : help-text? ( word -- ? )
     {
