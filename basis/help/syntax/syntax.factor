@@ -81,11 +81,8 @@ DEFER: HELP{
         ] if
     ] produce nip ;
 
-: code-lines ( str -- seq )
-    split-lines [ [ ascii:blank? ] trim ] map harvest ;
-
 : make-example ( str -- seq )
-    code-lines dup { [ array? ] [ length 1 > ] } 1&& [
+    split-lines dup { [ array? ] [ length 1 > ] } 1&& [
         dup length 1 - over [ unescape-string ] change-nth
         \ $example prefix
     ] when ;
@@ -96,7 +93,7 @@ DEFER: HELP{
 
 : parse-help-code ( -- seq )
     \ } parse-until dup { [ length 1 = ] [ first string? ] } 1&&
-    [ first code-lines ] [ >array ] if ;
+    [ first split-lines ] [ >array ] if ;
 
 : help-text? ( word -- ? )
     {
