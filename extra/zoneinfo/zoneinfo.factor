@@ -1,10 +1,11 @@
 ! Copyright (C) 2009 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays ascii assocs assocs.extras calendar
-calendar.english combinators combinators.smart grouping
-interval-maps io.encodings.utf8 io.files kernel math math.parser
-memoize namespaces sequences sequences.extras sorting splitting
-splitting.extras ;
+calendar.english combinators combinators.short-circuit
+combinators.smart csv grouping interval-maps io.encodings.utf8
+io.files kernel math math.parser memoize namespaces sequences
+sequences.extras sorting splitting splitting.extras ;
+QUALIFIED: sets
 IN: zoneinfo
 
 CONSTANT: zoneinfo-paths
@@ -17,11 +18,27 @@ CONSTANT: zoneinfo-paths
     "vocab:zoneinfo/northamerica"
     "vocab:zoneinfo/pacificnew"
     "vocab:zoneinfo/southamerica"
+    "vocab:zoneinfo/backzone"
+}
+
+CONSTANT: zoneinfo-extra-paths
+{
+    "vocab:zoneinfo/backward"
     "vocab:zoneinfo/etcetera"
     "vocab:zoneinfo/factory"
     "vocab:zoneinfo/leapseconds"
     "vocab:zoneinfo/systemv"
 }
+
+: zoneinfo-lines ( path -- seq )
+    utf8 file-lines
+    [
+        { [ length 0 = ] [ "#" head? ] } 1||
+    ] reject
+    [ "\t " split ] map ;
+
+MEMO: zoneinfo-country-zones ( -- seq )
+    "vocab:zoneinfo/zone1970.tab" zoneinfo-lines ;
 
 SYMBOL: last-zone
 
@@ -73,7 +90,7 @@ TUPLE: rule name from to at-time ;
         [ 3 tail harvest ]
     } cleave raw-zone boa ;
 
-: parse-line ( seq -- tuple )
+: parse-zoneinfo-line ( seq -- tuple )
     dup first >lower
     {
         { "rule" [ parse-rule ] }
@@ -84,10 +101,7 @@ TUPLE: rule name from to at-time ;
     } case ;
 
 : parse-zoneinfo-file ( path -- seq )
-    utf8 file-lines
-    [ "#" split1 drop ] map harvest
-    [ "\t " split harvest ] map harvest
-    [ [ parse-line ] map ] with-scope ;
+    zoneinfo-lines [ parse-zoneinfo-line ] map ;
 
 MEMO: zoneinfo-files ( -- seq )
     zoneinfo-paths [ parse-zoneinfo-file ] map ;
@@ -95,8 +109,16 @@ MEMO: zoneinfo-files ( -- seq )
 MEMO: zoneinfo-array ( -- seq )
     zoneinfo-files concat ;
 
+MEMO: zoneinfo-assoc ( -- assoc )
+    zoneinfo-paths [ dup parse-zoneinfo-file ] { } map>assoc ;
+
 : raw-rule-map ( -- assoc )
     zoneinfo-array [ raw-rule? ] filter [ name>> ] collect-by ;
+
+: current-rule-map ( -- assoc )
+    raw-rule-map
+    [ [ to>> "max" = ] filter ] assoc-map
+    harvest-values ;
 
 : raw-zone-map ( -- assoc )
     zoneinfo-array [ raw-zone? ] filter [ name>> ] collect-by ;
@@ -128,10 +150,13 @@ ERROR: zone-not-found name ;
 
 : zone-abbrevs ( -- assoc )
     zoneinfo-zones [
-        find-zone-rules [ format>> ] dip
+        find-zone-rules
+        [ format>> ] dip
         [
-            letters>> swap "%" split1 dup [ 1 tail ] when surround
-        ] with V{ } map-as
+            letters>> dup { "D" "S" } member? [ drop "" ] unless
+            swap "%" split1
+            [ 1 tail surround ] [ nip ] if*
+        ] with V{ } map-as sets:members
     ] zip-with ;
 
 : number>value ( n -- n' )
@@ -281,4 +306,4 @@ ERROR: unknown-last-day string ;
     ] keep zip ;
 
 : chicago-zones ( -- interval-map ) "America/Chicago" name>zones ;
- : us-rules ( -- rules ) "US" name>rules ;
+: us-rules ( -- rules ) "US" name>rules ;
