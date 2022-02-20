@@ -34,11 +34,28 @@ CONSTANT: zoneinfo-extra-paths
     utf8 file-lines
     [
         { [ length 0 = ] [ "#" head? ] } 1||
-    ] reject
-    [ "\t " split ] map ;
+    ] reject ;
 
+TUPLE: zonetab codes lat lng tz comments ;
+C: <zonetab> zonetab
 MEMO: zoneinfo-country-zones ( -- seq )
-    "vocab:zoneinfo/zone1970.tab" zoneinfo-lines ;
+    "vocab:zoneinfo/zone1970.tab" zoneinfo-lines
+    [
+        "\t" split ?first4
+        [ "," split ] 3dip
+        [ "-+" split* first4 [ append ] 2dip append ] 2dip
+        <zonetab>
+    ] { } map-as ;
+
+: parse-zonetabs ( -- seq )
+    zoneinfo-country-zones
+    [ [ codes>> ] [ tz>> ] bi [ 2array ] curry map ] map concat ;
+
+MEMO: tz>country-map ( -- alist )
+    parse-zonetabs [ first ] collect-value-by ;
+
+MEMO: country>tzs-map ( -- alist )
+    parse-zonetabs [ second ] collect-key-by ;
 
 SYMBOL: last-zone
 
@@ -101,7 +118,9 @@ TUPLE: rule name from to at-time ;
     } case ;
 
 : parse-zoneinfo-file ( path -- seq )
-    zoneinfo-lines [ parse-zoneinfo-line ] map ;
+    zoneinfo-lines
+    [ "\t " split ] map
+    [ parse-zoneinfo-line ] map ;
 
 MEMO: zoneinfo-files ( -- seq )
     zoneinfo-paths [ parse-zoneinfo-file ] map ;
