@@ -13,10 +13,6 @@ SINGLETON: color-renderer
 
 CONSTANT: full-block-string $[ 10 CHAR: full-block <string> ]
 
-: rgba>hex ( rgba -- hex )
-    [ red>> ] [ green>> ] [ blue>> ] tri
-    [ 255 * round >integer ] tri@ "%02X%02X%02X" sprintf ;
-
 PRIVATE>
 
 M: color-renderer filled-column
@@ -32,7 +28,7 @@ M: color-renderer row-columns
             [ red>> "%.5f" sprintf ]
             [ green>> "%.5f" sprintf ]
             [ blue>> "%.5f" sprintf ]
-            [ rgba>hex ]
+            [ color>hex ]
         } cleave
     ] output>array ;
 
