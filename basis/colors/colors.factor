@@ -71,7 +71,20 @@ ERROR: invalid-hex-color hex ;
         [ drop invalid-hex-color ]
     } case <rgba> ;
 
+: component>hex ( f -- s )
+    255 * round >integer >hex
+    2 CHAR: 0 pad-head ;
+
+: (color>hex) ( seq -- hex )
+    [ component>hex ] map concat
+    "#" prepend ;
+
 PRIVATE>
+
+: color>hex ( color -- hex )
+    [ >rgba-components 4array ] [ opaque? ] bi
+    [ but-last ] when
+    (color>hex) ;
 
 : named-colors ( -- keys ) colors keys ;
 
