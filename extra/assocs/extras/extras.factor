@@ -222,3 +222,11 @@ PRIVATE>
 
 : counts ( seq elts -- counts )
     [ histogram ] dip intersect-keys ;
+
+: collect-key-by ( ... seq quot: ( ... obj -- ... key ) -- ... assoc )
+    [ keep swap ] curry H{ } clone
+    [ '[ @ [ first ] dip _ push-at ] each ] keep ; inline
+
+: collect-value-by ( ... seq quot: ( ... obj -- ... key ) -- ... assoc )
+    [ keep swap ] curry H{ } clone
+    [ '[ @ [ second ] dip _ push-at ] each ] keep ; inline
