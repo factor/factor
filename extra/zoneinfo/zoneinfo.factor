@@ -2,9 +2,9 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays ascii assocs assocs.extras calendar
 calendar.english combinators combinators.short-circuit
-combinators.smart csv grouping interval-maps io.encodings.utf8
-io.files kernel math math.parser memoize namespaces sequences
-sequences.extras sorting splitting splitting.extras ;
+combinators.smart countries grouping interval-maps
+io.encodings.utf8 io.files kernel math math.parser namespaces
+sequences sequences.extras sorting splitting splitting.extras ;
 QUALIFIED: sets
 IN: zoneinfo
 
@@ -51,11 +51,17 @@ MEMO: zoneinfo-country-zones ( -- seq )
     zoneinfo-country-zones
     [ [ codes>> ] [ tz>> ] bi [ 2array ] curry map ] map concat ;
 
-MEMO: tz>country-map ( -- alist )
+: lookup-country-name ( seq -- seq' ) alpha-2 ?at drop ; inline
+: lookup-country-names ( seq -- seq' ) [ lookup-country-name ] map ;
+
+: timezone>country-map ( -- alist )
+    parse-zonetabs [ second ] collect-key-by ;
+
+: country>timezones-map ( -- alist )
     parse-zonetabs [ first ] collect-value-by ;
 
-MEMO: country>tzs-map ( -- alist )
-    parse-zonetabs [ second ] collect-key-by ;
+: country-timezones-map ( -- alist )
+    country>timezones-map [ dup lookup-country-names zip ] map-values ;
 
 SYMBOL: last-zone
 
@@ -119,7 +125,7 @@ TUPLE: rule name from to at-time ;
 
 : parse-zoneinfo-file ( path -- seq )
     zoneinfo-lines
-    [ "\t " split ] map
+    [ "\t " split harvest ] map harvest
     [ parse-zoneinfo-line ] map ;
 
 MEMO: zoneinfo-files ( -- seq )
@@ -326,3 +332,9 @@ ERROR: unknown-last-day string ;
 
 : chicago-zones ( -- interval-map ) "America/Chicago" name>zones ;
 : us-rules ( -- rules ) "US" name>rules ;
+
+: us-timezones ( -- timezones )
+    country>timezones-map "US" of ;
+
+: puerto-rico-timezone-countries ( -- countries )
+    timezone>country-map "America/Puerto_Rico" of ;
