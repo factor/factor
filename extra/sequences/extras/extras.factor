@@ -491,6 +491,33 @@ PRIVATE>
 : zero-loop>array ( quot: ( ..a n -- ..a obj ) -- seq )
     { } zero-loop>sequence ; inline
 
+: iterate-heap-while ( heap quot1: ( value key -- slurp? ) quot2: ( value key -- obj/f ) -- obj/f loop? )
+    pick heap-empty?
+    [ 3drop f f ]
+    [
+        [ [ heap-peek ] 2dip drop 2keep ]
+        [
+            nip ! ( pop? value key heap quot2 )
+            5roll [
+                swap heap-pop* call( value key -- obj/f ) t
+            ] [
+                4drop f f
+            ] if
+        ] 3bi
+    ] if ; inline
+
+: slurp-heap-while-map ( heap quot1: ( value key -- slurp? ) quot2: ( value key -- obj/f ) -- seq )
+    '[ _ _ _ iterate-heap-while ] loop>array* ; inline
+
+: heap>pairs ( heap -- pairs )
+    [ 2drop t ] [ swap 2array ] slurp-heap-while-map ;
+
+: map-zip-swap ( quot: ( x -- y ) -- alist )
+    '[ _ keep ] map>alist ; inline
+
+: ?heap-pop-value>array ( heap -- array )
+    dup heap-empty? [ drop { } ] [ heap-pop drop 1array ] if ;
+
 <PRIVATE
 
 : (reverse) ( seq -- newseq )
