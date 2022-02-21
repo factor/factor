@@ -32,12 +32,11 @@ CONSTANT: zoneinfo-extra-paths
 
 : zoneinfo-lines ( path -- seq )
     utf8 file-lines
-    [
-        { [ length 0 = ] [ "#" head? ] } 1||
-    ] reject ;
+    [ { [ length 0 = ] [ "#" head? ] } 1|| ] reject ;
 
 TUPLE: zonetab codes lat lng tz comments ;
 C: <zonetab> zonetab
+
 MEMO: zoneinfo-country-zones ( -- seq )
     "vocab:zoneinfo/zone1970.tab" zoneinfo-lines
     [
@@ -63,22 +62,20 @@ MEMO: zoneinfo-country-zones ( -- seq )
 : country-timezones-map ( -- alist )
     country>timezones-map [ dup lookup-country-names zip ] map-values ;
 
-SYMBOL: last-zone
-
 TUPLE: raw-zone name gmt-offset rules/save format until ;
 TUPLE: raw-rule name from to type in on at-time save letters ;
 TUPLE: raw-link from to ;
 TUPLE: raw-leap year month day hms corr r/s ;
 
-TUPLE: zone name ;
-TUPLE: rule name from to at-time ;
+! TUPLE: zone name ;
+! TUPLE: rule name from to at-time ;
 
-: rule-to ( m string -- m n )
-    {
-        { "only" [ dup ] }
-        { "max" [ 1/0. ] }
-        [ string>number ]
-    } case ;
+! : rule-to ( m string -- m n )
+!     {
+!         { "only" [ dup ] }
+!         { "max" [ 1/0. ] }
+!         [ string>number ]
+!     } case ;
 
 : parse-rule ( seq -- rule )
     [
@@ -104,29 +101,28 @@ TUPLE: rule name from to at-time ;
         [ 5 tail harvest ]
     } cleave raw-zone boa ;
 
-: parse-partial-zone ( seq -- zone )
-    [ last-zone get name>> ] dip
-    {
+: parse-rest-of-zone ( prev seq -- zone )
+    [ name>> ] dip {
         [ first ]
         [ second ]
         [ 2 swap nth ]
         [ 3 tail harvest ]
     } cleave raw-zone boa ;
 
-: parse-zoneinfo-line ( seq -- tuple )
+: parse-zoneinfo-line ( prev/f seq -- tuple )
     dup first >lower
     {
-        { "rule" [ parse-rule ] }
-        { "link" [ parse-link ] }
-        { "leap" [ parse-leap ] }
-        { "zone" [ parse-zone dup last-zone set ] }
-        [ drop harvest parse-partial-zone ]
+        { "rule" [ nip parse-rule ] }
+        { "link" [ nip parse-link ] }
+        { "leap" [ nip parse-leap ] }
+        { "zone" [ nip parse-zone ] }
+        [ drop harvest parse-rest-of-zone ]
     } case ;
 
 : parse-zoneinfo-file ( path -- seq )
     zoneinfo-lines
     [ "\t " split harvest ] map harvest
-    [ parse-zoneinfo-line ] map ;
+    [ parse-zoneinfo-line ] map-with-previous ;
 
 MEMO: zoneinfo-files ( -- seq )
     zoneinfo-paths [ parse-zoneinfo-file ] map ;
@@ -160,17 +156,20 @@ M: raw-link zone-matches? from>> = ;
 M: raw-leap zone-matches? 2drop f ;
 M: raw-zone zone-matches? name>> = ;
 
-: find-rules ( string -- rules )
+: find-rules ( country -- rules )
     raw-rule-map
     [ [ to>> "max" = ] filter ] assoc-map at ;
 
 ERROR: zone-not-found name ;
 
-: find-zone ( string -- zone )
+: find-zone ( timezone -- zone )
     raw-zone-map
     [ last ] assoc-map ?at [ zone-not-found ] unless ;
 
-: find-zone-rules ( string -- zone rules )
+: timezone>rules ( timezone -- rules )
+    raw-zone-map at ;
+
+: find-zone-rules ( timezone -- zone rules )
     find-zone dup rules/save>> find-rules ;
 
 : zone-abbrevs ( -- assoc )
@@ -262,7 +261,7 @@ ERROR: unknown-last-day string ;
 : string>year ( str -- year )
     string>number <year-gmt> ;
 
-: rule-year>years ( rule -- from to )
+: rule-year>years ( raw-rule -- from to )
     [ from>> ] [ to>> ] bi
     {
         { [ over "min" = ] [ [ drop -1/0. ] [ string>year ] bi* ] }
@@ -308,19 +307,19 @@ ERROR: unknown-last-day string ;
         } spread timestamp>unix-time
     ] if-empty ;
 
-: zones>interval-map ( zones -- interval-map )
+: raw-zones>interval-map ( raw-zones -- interval-map )
     [
         [ until>> until>timestamp ] map
         -1/0. prefix 2 <clumps> [ >array ] map
     ] keep zip
     [ first2 1 - 2array ] map-keys <interval-map> ;
 
-: name>zones ( name -- interval-map )
-    raw-zone-map at zones>interval-map ;
+: timezone>interval-map ( timezone-name -- interval-map )
+    raw-zone-map at raw-zones>interval-map ;
 
-: gmt-offset ( timestamp name -- gmt-offset )
+: gmt-offset ( timestamp timezone-name -- gmt-offset )
     [ timestamp>unix-time ]
-    [ zones>interval-map ] bi* interval-at ;
+    [ raw-zones>interval-map ] bi* interval-at ;
 
 : name>rules ( name -- rules )
     raw-rule-map at [
@@ -330,11 +329,10 @@ ERROR: unknown-last-day string ;
         ] map
     ] keep zip ;
 
-: chicago-zones ( -- interval-map ) "America/Chicago" name>zones ;
+: chicago-zones ( -- interval-map ) "America/Chicago" timezone>interval-map ;
 : us-rules ( -- rules ) "US" name>rules ;
-
 : us-timezones ( -- timezones )
     country>timezones-map "US" of ;
 
 : puerto-rico-timezone-countries ( -- countries )
-    timezone>country-map "America/Puerto_Rico" of ;
+    timezone>country-map "America/Puerto_Rico" of lookup-country-names ;
