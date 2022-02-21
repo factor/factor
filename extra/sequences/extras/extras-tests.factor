@@ -286,3 +286,11 @@ tools.test vectors vocabs ;
 { { 1 3 } } [ 1 4 2 10 <iota> <step-slice> >array ] unit-test
 { { 1 3 } } [ 1 5 2 10 <iota> <step-slice> >array ] unit-test
 { { 1 3 5 } } [ 1 6 2 10 <iota> <step-slice> >array ] unit-test
+
+{ { 2 3 5 } } [
+    [ swap [ * ] [ 100 + ] if* ] map-with-previous
+] unit-test
+
+{ { } } [
+    [ nip ] map-with-previous
+] unit-test

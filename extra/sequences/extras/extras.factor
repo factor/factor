@@ -1,5 +1,5 @@
 USING: accessors arrays assocs combinators generalizations
-grouping growable kernel math math.order ranges sequences
+grouping growable heaps kernel math math.order ranges sequences
 sequences.private shuffle sorting splitting vectors ;
 IN: sequences.extras
 
@@ -241,6 +241,32 @@ PRIVATE>
 
 : map-harvest ( ... seq quot: ( ... elt -- ... newelt ) -- ... newseq )
     [ empty? not ] map-filter ; inline
+
+: (each-integer-with-previous) ( ... prev i n quot: ( ... i -- ... ) -- ... )
+    2over < [
+        [ nip call ] 4keep nipdd
+        [ 1 + ] 2dip (each-integer-with-previous)
+    ] [
+        4drop
+    ] if ; inline recursive
+
+: each-integer-with-previous ( ... n quot: ( ... i -- ... ) -- ... )
+    [ f 0 ] 2dip (each-integer-with-previous) ; inline
+
+: (collect-with-previous) ( quot into -- quot' )
+    [ [ keep ] dip [ set-nth-unsafe ] keepdd ] 2curry ; inline
+
+: collect-with-previous ( n quot into --  )
+    (collect-with-previous) each-integer-with-previous ; inline
+
+: map-integers-with ( ... len quot: ( ... prev i -- ... elt ) exemplar -- ... newseq )
+    overd [ [ collect-with-previous ] keep ] new-like ; inline
+
+: map-with-previous-as ( ... seq quot: ( ... elt prev/f -- ... newelt ) exemplar -- ... newseq )
+    [ (1each) ] dip map-integers-with ; inline
+
+: map-with-previous ( ... seq quot: ( ... elt prev/f -- ... newelt ) -- ... newseq )
+    over map-with-previous-as ; inline
 
 <PRIVATE
 
