@@ -9,7 +9,7 @@ IN: game_lib_test
 ! trying to have the action be nothing if somethign is already in cell 
 ! :: set-action-x ( gadget -- value )
 !     ! gadget gesture-pos :> curCell
-!     gadget board>> { 1 1 } get-cell
+!     gadget board>> curCell get-cell
 !     ! f
 !     [ 
 !         [ gadget board>> gadget gesture-pos "vocab:game_lib_test/resources/X.png" set-cell drop relayout-1 ]
