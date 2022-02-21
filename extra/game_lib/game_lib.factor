@@ -6,7 +6,7 @@ IN: game_lib
 ! dimension -- { width height } of window
 ! draw-quotes is a sequence of quotes, where each quote is an instruction on how to draw something
 ! board -- board object created from board library
-TUPLE: window-gadget < gadget dimension bg-color draw-quotes board gests ;
+TUPLE: window-gadget < gadget dimension bg-color draw-quotes board gests rules ;
 
 TUPLE: sprite image loc dim ;
 
@@ -23,6 +23,12 @@ TUPLE: sprite image loc dim ;
 
 : create-board ( gadget board -- gadget )
     >>board ;
+
+: set-rules ( gadget rules -- gadget )
+    >>rules ;
+
+: check-rules ( gadget -- ? )
+    rules>> t? ;
 
 :: draw-filled-rectangle ( gadget color loc dim -- gadget )
     ! appends instruction to draw a rectangle to current set of instructions in draw-quotes attribute

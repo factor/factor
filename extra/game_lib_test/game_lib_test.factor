@@ -17,6 +17,7 @@ IN: game_lib_test
 !         [ drop ]
 !     ] if ;
 
+TUPLE: game-state p1 ;
 
 :: set-action-x ( gadget -- value ) 
     [ gadget board>> gadget gesture-pos "vocab:game_lib_test/resources/X.png" set-cell drop relayout-1 ] ;
@@ -24,10 +25,20 @@ IN: game_lib_test
 :: set-action-o ( gadget -- value ) 
     [ gadget board>> gadget gesture-pos "vocab:game_lib_test/resources/O.png" set-cell drop relayout-1 ] ;
 
+:: on-click ( gadget -- value )
+    [ 
+        gadget rules>>
+        [ gadget board>> gadget gesture-pos "vocab:game_lib_test/resources/X.png" set-cell drop relayout-1 gadget f >>rules drop ]
+        [ gadget board>> gadget gesture-pos "vocab:game_lib_test/resources/O.png" set-cell drop relayout-1 gadget t >>rules drop ]
+        if
+    ] ;
+
+
 : gestures ( gadget -- gadget )
     ! TODO: generalize action quote and make easier to use
-    dup set-action-x T{ button-down { # 1 } } new-gestures 
-    dup set-action-o T{ button-down { # 3 } } new-gestures 
+    ! dup set-action-x T{ button-down { # 1 } } new-gestures 
+    ! dup set-action-o T{ button-down { # 3 } } new-gestures 
+    dup on-click T{ button-down { # 1 } } new-gestures
     make-gestures ;
 
 : draw ( gadget -- gadget )
@@ -38,16 +49,25 @@ IN: game_lib_test
 : board ( gadget -- gadget )
     ! sprites takes up the entire screen and can only draw sprites as of now    
     3 3 f make-board 
-    { 2 0 } "vocab:game_lib_test/resources/O.png" set-cell
-    { 1 1 } "vocab:game_lib_test/resources/O.png" set-cell
-    { 2 2 } "vocab:game_lib_test/resources/X.png" set-cell
+    ! { 2 0 } "vocab:game_lib_test/resources/O.png" set-cell
+    ! { 1 1 } "vocab:game_lib_test/resources/O.png" set-cell
+    ! { 2 2 } "vocab:game_lib_test/resources/X.png" set-cell
     create-board ;
+
+: <game-state> ( gadget -- gadget )
+    game-state new
+    f >>p1
+    set-rules ;
 
 : display-window ( -- )
     { 400 200 } init-window ! initialize the window with dimensions
     draw ! optional function to draw rectangles or sprites
     board ! optional function to create a board
+    <game-state> 
     gestures ! sets gestures -- a hashmap of key presses and associated actions
+
+
+
     display ; ! call display to see the window
 
     ! note: using relayout seems to change the window correctly
