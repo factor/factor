@@ -478,6 +478,7 @@ listener-gadget "touchbar" f {
     { f refresh-all }
     { f com-auto-use }
     { f com-help }
+    { f show-error-list }
 } define-command-map
 
 listener-gadget "file-drop" "Files can be drag-and-dropped onto the listener."
