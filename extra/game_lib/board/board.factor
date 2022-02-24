@@ -1,4 +1,4 @@
-USING: sequences kernel accessors sequences.extras ;
+USING: assocs sequences sequences.generalizations kernel accessors sequences.extras math.ranges ;
 
 IN: game_lib.board
 
@@ -20,10 +20,20 @@ TUPLE: board width height cells default-cell ;
     board cells>> :> cells
     x y cells nth nth ;
 
+! Gets all cells in locations array and return as a sequence
+! :: get-multicell ( board locations -- seq )
+    ! ;
+
+! For a board, set the cell at the given location to new-cell
 :: set-cell ( board location new-cell -- board )
     location first2 :> ( x y )
     board cells>> :> cells
     new-cell x y cells nth set-nth
+    board ;
+
+! For a board, set all the given locations to new-cell
+:: set-multicell ( board locations new-cell -- board )
+    locations [ board swap new-cell set-cell drop ] each
     board ;
 
 ! Sets a cell back to the default cell
@@ -87,4 +97,11 @@ TUPLE: board width height cells default-cell ;
 :: find-all-cells ( board quot -- assoc )
     board quot find-all-rows :> row-list ! find-all - returns vector w/ index/elt
     row-list [ quot row-to-cells ] map concat ; inline
-    
+
+! returns all elements of a specified row as a list
+! :: get-row ( board -- assoc )
+    ! board width>> [ index ] replicate 
+    ! board width>> [0..b) zip 
+    ! [ board swap get-cell ] 
+    ! { { 0 0 } { 1 0 } { 2 0 } } [ board swap get-cell ] each
+    ! board width>> { } nsequence ;

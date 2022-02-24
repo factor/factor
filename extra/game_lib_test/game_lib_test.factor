@@ -1,4 +1,4 @@
-USING: accessors kernel game_lib colors.constants ui.gadgets game_lib.board ui.gestures words assocs ;
+USING: accessors kernel game_lib.ui colors.constants ui.gadgets game_lib.board ui.gestures words assocs ;
 
 IN: game_lib_test
 
@@ -17,6 +17,9 @@ IN: game_lib_test
 !         [ drop ]
 !     ] if ;
 
+CONSTANT: X "vocab:game_lib_test/resources/X.png"
+CONSTANT: O "vocab:game_lib_test/resources/O.png"
+
 TUPLE: game-state p1 ;
 
 :: set-action-x ( gadget -- value ) 
@@ -28,10 +31,14 @@ TUPLE: game-state p1 ;
 :: on-click ( gadget -- value )
     [ 
         gadget rules>>
-        [ gadget board>> gadget gesture-pos "vocab:game_lib_test/resources/X.png" set-cell drop relayout-1 gadget f >>rules drop ]
-        [ gadget board>> gadget gesture-pos "vocab:game_lib_test/resources/O.png" set-cell drop relayout-1 gadget t >>rules drop ]
+        [ gadget board>> gadget gesture-pos X set-cell drop relayout-1 gadget f >>rules drop ]
+        [ gadget board>> gadget gesture-pos O set-cell drop relayout-1 gadget t >>rules drop ]
         if
     ] ;
+
+! TODO: incorporate this check for every loop once game loop is ready
+! : check-win ( board -- ? )
+
 
 
 : gestures ( gadget -- gadget )
@@ -63,7 +70,8 @@ TUPLE: game-state p1 ;
     { 400 200 } init-window ! initialize the window with dimensions
     draw ! optional function to draw rectangles or sprites
     board ! optional function to create a board
-    <game-state> 
+
+    ! <game-state> 
     gestures ! sets gestures -- a hashmap of key presses and associated actions
 
 
