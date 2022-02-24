@@ -1,4 +1,4 @@
-USING: accessors kernel game_lib.ui colors.constants ui.gadgets game_lib.board ui.gestures words assocs ;
+USING: accessors sequences kernel grouping game_lib.ui colors.constants ui.gadgets game_lib.board ui.gestures words assocs ;
 
 IN: game_lib_test
 
@@ -37,8 +37,24 @@ TUPLE: game-state p1 ;
     ] ;
 
 ! TODO: incorporate this check for every loop once game loop is ready
-! : check-win ( board -- ? )
+! :: row-win ( board -- ? )
+!     board 0 get-row
+!     board 1 get-row
+!     board 2 get-row { } 3sequence
+!     [ all-equal? ] any? ;
 
+
+:: check-win ( board -- ? )
+    board is-board-empty?
+    [
+        ! Empty board -- no winners yet 
+        f
+    ] [
+        t
+        ! board 0 get-row all-equal?
+    ] if ;
+    ! board 0 get-row 
+    ! [ all-equal ] map ;
 
 
 : gestures ( gadget -- gadget )
