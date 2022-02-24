@@ -50,7 +50,7 @@ SYMBOL: component
       }
     } COLOR: green
   ]
-  [ ! goals on each level (doesn't work yet)
+  [
     {
       {
         { 1 2 } { 5 3 } { 1 4 } { 4 5 } { 3 6 } { 6 6 } { 4 7 } 
