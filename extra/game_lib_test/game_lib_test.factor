@@ -37,12 +37,22 @@ TUPLE: game-state p1 ;
     ] ;
 
 ! TODO: incorporate this check for every loop once game loop is ready
-! :: row-win ( board -- ? )
-!     board 0 get-row
-!     board 1 get-row
-!     board 2 get-row { } 3sequence
-!     [ all-equal? ] any? ;
+:: row-win ( board -- ? )
+    ! second approach in col-win -- which is better, or is there another better approach?
+    board 0 get-row all-equal? 
+    board 1 get-row all-equal? 
+    or 
+    board 2 get-row all-equal? 
+    or ;
 
+:: col-win ( board -- ? )
+    { 0 1 2 } [ board swap get-col ] map 
+    [ all-equal? ] any? ;
+
+:: diag-win ( board -- ? )
+    board { { 0 0 } { 1 1 } { 2 2 } } get-multicell all-equal?
+    board { { 2 0 } { 1 1 } { 0 2 } } get-multicell all-equal?
+    or ;
 
 :: check-win ( board -- ? )
     board is-board-empty?
@@ -50,11 +60,9 @@ TUPLE: game-state p1 ;
         ! Empty board -- no winners yet 
         f
     ] [
-        t
-        ! board 0 get-row all-equal?
+        board row-win board col-win or
+        board diag-win or 
     ] if ;
-    ! board 0 get-row 
-    ! [ all-equal ] map ;
 
 
 : gestures ( gadget -- gadget )
