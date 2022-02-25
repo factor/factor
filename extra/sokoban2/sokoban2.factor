@@ -74,6 +74,8 @@ SYMBOL: level
 
 : main ( -- )
     { 700 800 } init-window
+    ! Don't really like this sequence of quotes thing -- would be nicer if board 
+    ! could be an array of like ascii that gets created here or something
     level get-global board nth call( gadget -- gadget )
     display ;
 
