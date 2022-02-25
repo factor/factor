@@ -112,3 +112,6 @@ TUPLE: board width height cells default-cell ;
 :: find-all-cells ( board quot -- assoc )
     board quot find-all-rows :> row-list ! find-all - returns vector w/ index/elt
     row-list [ quot row-to-cells ] map concat ; inline
+
+:: all-equal-value? ( value seq -- ? )
+    seq [ value = ] all? ;

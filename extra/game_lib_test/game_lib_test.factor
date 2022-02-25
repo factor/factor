@@ -37,33 +37,28 @@ TUPLE: game-state p1 ;
     ] ;
 
 ! TODO: incorporate this check for every loop once game loop is ready
-:: row-win ( board -- ? )
-    ! second approach in col-win -- which is better, or is there another better approach?
-    board 0 get-row all-equal? 
-    board 1 get-row all-equal? 
-    or 
-    board 2 get-row all-equal? 
-    or ;
+:: row-win ( board -- seq )
+    ! Returns true if either X or O has a row win
+    ! For each row, check if every element in specified row equals X, returning true if any row meets the condition
+    { 0 1 2 } [ X swap board swap get-row all-equal-value? ] map [ t = ] any?
+    ! Same check but with O
+    { 0 1 2 } [ O swap board swap get-row all-equal-value? ] map [ t = ] any? or ;
 
 :: col-win ( board -- ? )
-    { 0 1 2 } [ board swap get-col ] map 
-    [ all-equal? ] any? ;
+    ! Same as row win except checks column wins
+    { 0 1 2 } [ X swap board swap get-col all-equal-value? ] map [ t = ] any?
+    { 0 1 2 } [ O swap board swap get-col all-equal-value? ] map [ t = ] any? or ;
 
 :: diag-win ( board -- ? )
-    board { { 0 0 } { 1 1 } { 2 2 } } get-multicell all-equal?
-    board { { 2 0 } { 1 1 } { 0 2 } } get-multicell all-equal?
-    or ;
+    ! Same as row win except checks diagonal wins
+    X board { { 0 0 } { 1 1 } { 2 2 } } get-multicell all-equal-value?
+    X board { { 2 0 } { 1 1 } { 0 2 } } get-multicell all-equal-value? or
+    O board { { 0 0 } { 1 1 } { 2 2 } } get-multicell all-equal-value? or
+    O board { { 2 0 } { 1 1 } { 0 2 } } get-multicell all-equal-value? or ;
 
 :: check-win ( board -- ? )
-    board is-board-empty?
-    [
-        ! Empty board -- no winners yet 
-        f
-    ] [
-        board row-win board col-win or
-        board diag-win or 
-    ] if ;
-
+    ! Returns true if any win condition is met
+    board row-win board col-win or board diag-win or ;
 
 : gestures ( gadget -- gadget )
     ! TODO: generalize action quote and make easier to use
