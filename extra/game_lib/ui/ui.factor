@@ -1,5 +1,5 @@
 USING: accessors ui.gadgets kernel ui.gadgets.status-bar ui ui.render colors.constants opengl sequences combinators peg
-images.loader opengl.textures assocs math math.ranges game_lib.board ui.gestures ;
+images.loader opengl.textures assocs math math.ranges game_lib.board ui.gestures colors ;
 
 IN: game_lib.ui
 
@@ -52,14 +52,21 @@ TUPLE: sprite image loc dim ;
     ] with-ui ;
 
 ! SECTION: These functions does the logic behind the hood
-:: <sprite> ( path loc dim -- sprite )
-    ! creates a sprite object if given a path, otherwise set sprite as false
-    path
-    [
-        sprite new path load-image >>image loc >>loc dim >>dim 
-    ] [
-        f
-    ] if ;
+:: <sprite> ( cell-contents loc dim -- sprite )
+   ! creates a sprite object if cell-contents is valid, otherwise return sprite as false
+   cell-contents color?
+   [
+       ! Sets sprite image as a color if cell-contents is a color
+       sprite new cell-contents >>image loc >>loc dim >>dim
+   ] [
+       cell-contents
+       [
+           ! Sets sprite image as an image if cell-contents is an image path
+           sprite new cell-contents load-image >>image loc >>loc dim >>dim
+       ] [
+           f 
+       ] if
+   ] if ;
 
 ! TODO: use the cache and handle cells that are false
 :: all-combinations ( seq1 seq2 -- matrix )
@@ -94,25 +101,34 @@ TUPLE: sprite image loc dim ;
 
     widths heights all-combinations ;
 
- :: draw-single-image ( image-params -- )
-    ! if the sprite is valid, draw the sprite
-    image-params
-    [
-        image-params dim>> image-params image>> image-params loc>> <texture> draw-scaled-texture 
-    ] [
+ :: draw-single-image ( image-params gadget -- )
+   ! if the sprite is valid, draw the sprite
+   image-params
+   [
+       image-params dim>> :> dimensions
+       image-params image>> :> img
+       image-params loc>> :> location
+       ! if the sprite is a color, draw a filled rectangle
+       img color? [
+           gadget img location dimensions draw-filled-rectangle drop
+       ] [
+           ! otherwise draw an image
+           dimensions img location <texture> draw-scaled-texture
+       ] if
+   ] [
 
-    ] if ;
+   ] if ;
 
 :: draw-cells ( gadget -- )
-    ! if the board is valid, draw the sprite at every starting location
-    gadget board>>
-    [
-        gadget get-cell-dimension :> celldims
-        gadget get-dimension-matrix :> dim-matrix
-        gadget board>> cells>> dim-matrix [ [ celldims <sprite> draw-single-image ] 2each ] 2each
-    ] [
-        
-    ] if ;
+   ! if the board is valid, draw the sprite at every starting location
+   gadget board>>
+   [
+       gadget get-cell-dimension :> celldims
+       gadget get-dimension-matrix :> dim-matrix
+       gadget board>> cells>> dim-matrix [ [ celldims <sprite> gadget draw-single-image ] 2each ] 2each
+   ] [
+      
+   ] if ;
 
 
 :: draw-background-color ( gadget -- )
