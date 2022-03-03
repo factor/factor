@@ -117,7 +117,7 @@ M: word (print-input)
     output>> [ (print-input) ] with-output-stream* ;
 
 : interactor-continue ( obj interactor -- )
-    mailbox>> mailbox-put ;
+    [ mailbox>> mailbox-put ] [ scroll>bottom ] bi ;
 
 : interactor-finish ( interactor -- )
     [ history>> history-add ] keep
