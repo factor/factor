@@ -1,6 +1,6 @@
 ! Copyright (C) 2005, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors assocs classes combinators destructors
+USING: accessors arrays assocs classes combinators destructors
 documents.private fonts io io.styles kernel math math.rectangles
 math.vectors models namespaces sequences sets sorting splitting
 strings ui.baseline-alignment ui.clipboards ui.gadgets
@@ -46,7 +46,6 @@ DEFER: write-gadget
     input>> [ request-focus ] when* ;
 
 : next-line ( pane -- )
-    clear-selection
     [ input>> unparent ]
     [ init-current prepare-last-line ]
     [ focus-input ] tri ;
@@ -120,8 +119,24 @@ GENERIC: pane-line ( str style gadget -- )
 : pane-write1 ( char pane -- )
     [ 1string H{ } ] dip current>> pane-line ;
 
-: do-pane-stream ( pane-stream quot -- )
-    [ pane>> ] dip keep scroll-pane ; inline
+:: do-pane-stream ( pane-stream quot -- )
+    pane-stream pane>> :> pane
+    pane find-scroller :> scroller
+    scroller [
+        model>> {
+            [ range-value second ]
+            [ range-page-value second + ]
+            [ range-max-value second >= ]
+        } cleave
+    ] [ f ] if* :> bottom?
+    pane quot call
+    pane scrolls?>> bottom? and scroller and [
+        scroller {
+            [ model>> range-value first ]
+            [ model>> range-max-value second 2array ]
+            [ set-scroll-position ]
+        } cleave
+    ] when ; inline
 
 M: pane-stream stream-nl
     [ pane-nl ] do-pane-stream ;
@@ -181,7 +196,7 @@ M: filter-writer write-gadget
     stream>> write-gadget ;
 
 M: pane-stream write-gadget
-    pane>> current>> swap add-gadget drop ;
+    [ current>> swap add-gadget drop ] do-pane-stream ;
 
 : print-gadget ( gadget stream -- )
     [ write-gadget ] [ nip stream-nl ] 2bi ;
