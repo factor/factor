@@ -1,10 +1,11 @@
 ! Copyright (C) 2012 John Benediktsson
 ! See http://factorcode.org/license.txt for BSD license
 
-USING: accessors ascii assocs colors formatting html.entities
-html.parser html.parser.analyzer html.parser.printer http.client
-io io.styles kernel namespaces regexp sequences splitting urls
-wrap.strings xml xml.data xml.traversal ;
+USING: accessors ascii assocs calendar colors combinators
+command-line eval formatting html.entities html.parser
+html.parser.analyzer html.parser.printer http.client io
+io.styles kernel namespaces parser regexp sequences splitting
+urls wrap.strings xml xml.data xml.traversal ;
 FROM: xml.data => tag? ;
 
 IN: wikipedia
@@ -85,19 +86,22 @@ PRIVATE>
     historical-get-events sections>sequence ;
 
 : historical-events. ( timestamp -- )
-    historical-get-events "Events" header. sections. ;
+    [ "%B %d - Events" strftime header. ]
+    [ historical-get-events sections. ] bi ;
 
 : historical-births ( timestamp -- births )
     historical-get-births sections>sequence ;
 
 : historical-births. ( timestamp -- )
-    historical-get-births "Births" header. sections. ;
+    [ "%B %d - Births" strftime header. ]
+    [ historical-get-births sections. ] bi ;
 
 : historical-deaths ( timestamp -- births )
     historical-get-deaths sections>sequence ;
 
 : historical-deaths. ( timestamp -- )
-    historical-get-deaths "Deaths" header. sections. ;
+    [ "%B %d - Deaths" strftime header. ]
+    [ historical-get-deaths sections. ] bi ;
 
 : article. ( name -- )
     wikipedia-url http-get nip parse-html
@@ -106,3 +110,25 @@ PRIVATE>
     [ [ ascii:blank? ] trim ] map harvest [
         html-unescape 72 wrap-string print nl
     ] each ;
+
+<PRIVATE
+
+: eval-timestamp ( seq -- timestamp )
+    [ today ] [
+        " " join t auto-use? [ eval( -- timestamp ) ] with-variable
+    ] if-empty ;
+
+PRIVATE>
+
+: wikipedia-main ( -- )
+    command-line get [
+        unclip {
+            { "events" [ eval-timestamp historical-events. ] }
+            { "births" [ eval-timestamp historical-births. ] }
+            { "deaths" [ eval-timestamp historical-deaths. ] }
+            { "article" [ [ article. ] each ] }
+            [ "ERROR: Unknown command: " write print drop ]
+        } case
+    ] unless-empty ;
+
+MAIN: wikipedia-main
