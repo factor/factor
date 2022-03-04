@@ -15,7 +15,7 @@ FROM: ui.gadgets.wrappers => <wrapper> ;
 IN: ui.gadgets.panes
 
 TUPLE: pane < track
-    output current input last-line prototype scrolls?
+    output current input last-line prototype
     selection-color caret mark selecting? ;
 
 TUPLE: pane-stream pane parent ;
@@ -82,9 +82,6 @@ M: pane selected-children
         bi
     ] [ drop f f ] if ;
 
-: scroll-pane ( pane -- )
-    dup scrolls?>> [ scroll>bottom ] [ drop ] if ;
-
 GENERIC: pane-label ( pane -- label )
 
 M: pane pane-label drop "" <label> ;
@@ -130,7 +127,7 @@ GENERIC: pane-line ( str style gadget -- )
         } cleave
     ] [ f ] if* :> bottom?
     pane quot call
-    pane scrolls?>> bottom? and scroller and [
+    scroller bottom? and [
         scroller {
             [ model>> range-value first ]
             [ model>> range-max-value second 2array ]

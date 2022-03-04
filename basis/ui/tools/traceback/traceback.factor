@@ -35,7 +35,7 @@ M: stack-entry-renderer row-value drop object>> ;
 
 : <callstack-display> ( model -- gadget )
     [ [ call>> callstack. ] when* ]
-    <pane-control> t >>scrolls? margins <scroller> white-interior
+    <pane-control> margins <scroller> white-interior
     "Call stack" call-stack-color <colored-labeled-gadget> ;
 
 : <datastack-display> ( model -- gadget )
