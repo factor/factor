@@ -131,7 +131,7 @@ M: word (print-input)
     ] unless drop ;
 
 : evaluate-input ( interactor -- )
-    dup interactor-busy? [ drop ] [
+    dup interactor-busy? [ scroll>bottom ] [
         [ control-value ] keep interactor-continue
     ] if ;
 
