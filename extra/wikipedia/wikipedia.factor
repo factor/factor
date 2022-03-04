@@ -104,7 +104,7 @@ PRIVATE>
     [ historical-get-deaths sections. ] bi ;
 
 : article. ( name -- )
-    wikipedia-url http-get nip parse-html
+    "wiki/" prepend wikipedia-url http-get nip parse-html
     "content" find-by-id-between
     html-text split-lines
     [ [ ascii:blank? ] trim ] map harvest [
