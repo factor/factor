@@ -3,14 +3,14 @@
 
 USING: accessors ascii assocs colors formatting html.entities
 html.parser html.parser.analyzer html.parser.printer http.client
-io io.styles kernel namespaces sequences splitting urls
+io io.styles kernel namespaces regexp sequences splitting urls
 wrap.strings xml xml.data xml.traversal ;
 FROM: xml.data => tag? ;
 
 IN: wikipedia
 
 SYMBOL: language
-"en" language set-global
+language [ "en" ] initialize
 
 : with-language ( str quot -- )
     language swap with-variable ; inline
@@ -22,6 +22,9 @@ SYMBOL: language
 
 : header. ( string -- )
     H{ { font-size 20 } { font-style bold } } format nl ;
+
+: subheader. ( string -- )
+    H{ { font-size 16 } { font-style bold } } format nl ;
 
 : link ( tag -- tag/f )
     "a" assure-name over tag-named? [ "a" deep-tag-named ] unless ;
@@ -36,41 +39,65 @@ SYMBOL: language
 : item. ( tag -- )
     children>> [
         dup tag? [
-            dup link [ link. drop ] [ children>string write ] if*
-        ] [ [ write ] unless-empty ] if
+            dup link [
+                link. drop
+            ] [
+                children>string write
+            ] if*
+        ] [
+            [ R/ \s+/ " " re-replace write ] unless-empty
+        ] if
     ] each nl ;
 
 : items. ( seq -- )
     children-tags [ item. ] each nl ;
 
+: items>sequence ( tag -- seq )
+    children-tags [ deep-children>string ] map ;
+
+: sections. ( alist -- )
+    [ [ subheader. ] [ items. ] bi* ] assoc-each nl ;
+
+: sections>sequence ( alist -- alist )
+    [ items>sequence ] assoc-map ;
+
 : historical-url ( timestamp -- url )
     "%B_%d" strftime wikipedia-url ;
 
-: (historical-events) ( timestamp -- seq )
-    historical-url http-get nip string>xml "ul" deep-tags-named ;
+: historical-get ( timestamp -- xml )
+    historical-url http-get nip string>xml ;
 
-: items>sequence ( tag -- seq )
-    children-tags [ deep-children>string ] map ;
+: historical-get-events ( timestamp -- alist )
+    historical-get "ul" deep-tags-named
+    [ second items>sequence ] [ 4 7 rot subseq ] bi zip ;
+
+: historical-get-births ( timestamp -- alist )
+    historical-get "ul" deep-tags-named
+    [ third items>sequence ] [ 7 10 rot subseq ] bi zip ;
+
+: historical-get-deaths ( timestamp -- alist )
+    historical-get "ul" deep-tags-named
+    [ fourth items>sequence ] [ 10 13 rot subseq ] bi zip ;
 
 PRIVATE>
 
 : historical-events ( timestamp -- events )
-    (historical-events) second items>sequence ;
+    historical-get-events sections>sequence ;
 
 : historical-events. ( timestamp -- )
-    (historical-events) "Events" header. second items. ;
+    historical-get-events "Events" header. sections. ;
 
 : historical-births ( timestamp -- births )
-    (historical-events) third items>sequence ;
+    historical-get-births sections>sequence ;
 
 : historical-births. ( timestamp -- )
-    (historical-events) "Births" header. third items. ;
+    historical-get-births "Births" header. sections. ;
 
 : historical-deaths ( timestamp -- births )
-    (historical-events) fourth items>sequence ;
+    historical-get-deaths sections>sequence ;
 
 : historical-deaths. ( timestamp -- )
-    (historical-events) "Deaths" header. fourth items. ;
+    historical-get-deaths "Deaths" header. sections. ;
 
 : article. ( name -- )
     wikipedia-url http-get nip parse-html
