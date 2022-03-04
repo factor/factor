@@ -19,7 +19,7 @@ language [ "en" ] initialize
 <PRIVATE
 
 : wikipedia-url ( path -- url )
-    language get swap "http://%s.wikipedia.org/wiki/%s" sprintf >url ;
+    language get swap "http://%s.wikipedia.org/%s" sprintf >url ;
 
 : header. ( string -- )
     H{ { font-size 20 } { font-style bold } } format nl ;
@@ -63,7 +63,7 @@ language [ "en" ] initialize
     [ items>sequence ] assoc-map ;
 
 : historical-url ( timestamp -- url )
-    "%B_%d" strftime wikipedia-url ;
+    "wiki/%B_%d" strftime wikipedia-url ;
 
 : historical-get ( timestamp -- xml )
     historical-url http-get nip string>xml ;
