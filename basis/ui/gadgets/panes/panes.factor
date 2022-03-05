@@ -214,7 +214,7 @@ M: pane-stream write-gadget
     over [
         [ [ scroll>top ] [ clear-pane ] [ <pane-stream> ] tri ] dip
         with-output-stream*
-    ] dip scroll>bottom ; inline
+    ] dip scroll-pane ; inline
 
 : make-pane ( quot -- gadget )
     [ <pane> ] dip '[ _ with-pane ] keep smash-pane ; inline
