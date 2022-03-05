@@ -24,7 +24,7 @@ M: gesture-logger user-input*
 
 : run-gesture-logger ( -- )
     [
-        <pane> dup <scroller>
+        <pane> t >>scrolls? dup <scroller>
         { 450 500 } >>pref-dim
         "Gesture log" open-window
         <pane-stream> <gesture-logger>
