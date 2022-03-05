@@ -198,7 +198,7 @@ listener-gadget default-font-size  { 50 58 } n*v set-tool-dim
 
 : init-input/output ( listener -- listener )
     <interactor>
-    [ >>input ] [ pane new-pane >>output ] bi
+    [ >>input ] [ pane new-pane t >>scrolls? >>output ] bi
     dup listener-streams >>output drop ;
 
 : error-summary. ( -- )
