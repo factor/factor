@@ -12,7 +12,7 @@ math.rectangles math.vectors namespaces opengl sequences
 splitting threads ui.backend.cocoa.input-methods ui.commands
 ui.gadgets ui.gadgets.editors ui.gadgets.line-support
 ui.gadgets.private ui.gadgets.worlds ui.gestures ui.private
-words ;
+ui.theme ui.theme.switching words ;
 
 IN: ui.backend.cocoa.views
 
@@ -325,12 +325,12 @@ PRIVATE>
 
     ! Light/Dark Mode
 
-!     METHOD: void viewDidChangeEffectiveAppearance [
-!         self -> effectiveAppearance -> name [
-!             CF>string "NSAppearanceNameDarkAqua" =
-!             dark-theme light-theme ? switch-theme-if-default
-!         ] when*
-!     ] ;
+    METHOD: void viewDidChangeEffectiveAppearance [
+        self -> effectiveAppearance -> name [
+            CF>string "NSAppearanceNameDarkAqua" =
+            dark-theme light-theme ? switch-theme-if-default
+        ] when*
+    ] ;
 
     ! Events
     METHOD: char acceptsFirstMouse: id event [ 0 ] ;
