@@ -1,14 +1,21 @@
-USING: namespaces sequences game_lib.ui game_lib.board ;
+USING: kernel namespaces sequences math.vectors colors.constants game_lib.ui game_lib.board ;
 
 IN: sokoban2
 
 CONSTANT: player "vocab:sokoban2/resources/CharR.png"
-CONSTANT: wall "vocab:sokoban2/resources/Wall_Brown.png"
+CONSTANT: wall COLOR: blue ! "vocab:sokoban2/resources/Wall_Brown.png"
 CONSTANT: goal "vocab:sokoban2/resources/Goal.png"
 CONSTANT: crate "vocab:sokoban2/resources/Crate_Yellow.png"
 
 SYMBOL: level 
 0 level set-global
+
+:: get-pos ( board object -- seq )
+    board [ object = ] find-cell-pos ;
+
+:: get-adjacent-cell ( board object mov -- cell )
+    board object get-pos mov v+ :> location
+    board location get-cell ;
 
 ! TODO: reverse x y values when board is updated
 : board-one ( gadget -- gadget )
@@ -76,7 +83,27 @@ SYMBOL: level
     { 700 800 } init-window
     ! Don't really like this sequence of quotes thing -- would be nicer if board 
     ! could be an array of like ascii that gets created here or something
-    level get-global board nth call( gadget -- gadget )
+    level get-global 
+    board nth call( gadget -- gadget )
     display ;
+
+! :: get-pos ( board object -- seq )
+!     board [ object = ] find-cell-pos ;
+
+! :: get-adjacent-cell ( board object mov -- cell )
+!     board object get-pos mov v+ :> location
+!     board location get-cell ;
+
+! : move-player ( board move -- )
+
+! : move-right ( board -- )
+!     { 1 0 } move-player 
+
+! window-gadget H{
+!     ! { T{ key-down f f "UP" }     [ board>> move-up ]  }
+!     ! { T{ key-down f f "LEFT" }   [ board>> move-left ] }
+!     { T{ key-down f f "RIGHT" }  [ board>> move-right ] }
+!     ! { T{ key-down f f "DOWN" }   [ board>> move-down ] }
+! } set-gestures
 
 MAIN: main

@@ -69,7 +69,7 @@ TUPLE: board width height cells default-cell ;
 :: is-cell-empty? ( board location -- ? )
     board location get-cell board default-cell>> = ;
 
-:: is-board-empty? ( board -- seq )
+:: is-board-empty? ( board -- ? )
     board cells>> [ [ board default-cell>> = ] all? ] all? ;
 
 ! Applies a quotation to a specific cell
@@ -81,17 +81,20 @@ TUPLE: board width height cells default-cell ;
 
 ! Return index and row that contains the first cell that satisfies the quot
 :: find-row ( board quot -- index row )
-    board cells>> [ quot find swap drop not not ] find ; inline
+    board cells>> [ quot find drop ] find ; inline
 
 ! Return first location and cell that satisfies the quot
-:: find-cell ( board quot -- x y cell )
+:: find-cell ( board quot -- seq cell )
     board quot find-row swap :> y
     quot find swap :> x
     { x y } swap ; inline
 
 ! Return first cell that satisfies the quot
-:: find-cell-nopos ( board quot -- index row )
+:: find-cell-nopos ( board quot -- cell )
     board cells>> [ quot find swap drop ] map-find drop ; inline
+
+: find-cell-pos ( board quot -- seq )
+    find-cell drop ; inline
 
 ! Returns a vector containing index row pairs
 :: find-all-rows ( board quot -- index row )

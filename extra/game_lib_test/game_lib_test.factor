@@ -46,8 +46,8 @@ TUPLE: game-state p1 ;
 
 :: col-win ( board -- ? )
     ! Same as row win except checks column wins
-    { 0 1 2 } [ X swap board swap get-col all-equal-value? ] map [ t = ] any?
-    { 0 1 2 } [ O swap board swap get-col all-equal-value? ] map [ t = ] any? or ;
+    { 0 1 2 } [ X swap board swap get-col all-equal-value? ] any?
+    { 0 1 2 } [ O swap board swap get-col all-equal-value? ] any? or ;
 
 :: diag-win ( board -- ? )
     ! Same as row win except checks diagonal wins
