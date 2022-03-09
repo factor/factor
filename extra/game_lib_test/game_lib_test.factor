@@ -22,11 +22,11 @@ CONSTANT: O "vocab:game_lib_test/resources/O.png"
 
 TUPLE: game-state p1 ;
 
-:: set-action-x ( gadget -- value ) 
-    [ gadget board>> gadget gesture-pos "vocab:game_lib_test/resources/X.png" set-cell drop relayout-1 ] ;
+! :: set-action-x ( gadget -- value ) 
+!     [ gadget board>> gadget gesture-pos "vocab:game_lib_test/resources/X.png" set-cell drop relayout-1 ] ;
 
-:: set-action-o ( gadget -- value ) 
-    [ gadget board>> gadget gesture-pos "vocab:game_lib_test/resources/O.png" set-cell drop relayout-1 ] ;
+! :: set-action-o ( gadget -- value ) 
+!     [ gadget board>> gadget gesture-pos "vocab:game_lib_test/resources/O.png" set-cell drop relayout-1 ] ;
 
 :: on-click ( gadget -- value )
     [ 
@@ -40,9 +40,9 @@ TUPLE: game-state p1 ;
 :: row-win ( board -- seq )
     ! Returns true if either X or O has a row win
     ! For each row, check if every element in specified row equals X, returning true if any row meets the condition
-    { 0 1 2 } [ X swap board swap get-row all-equal-value? ] map [ t = ] any?
+    { 0 1 2 } [ X swap board swap get-row all-equal-value? ] any?
     ! Same check but with O
-    { 0 1 2 } [ O swap board swap get-row all-equal-value? ] map [ t = ] any? or ;
+    { 0 1 2 } [ O swap board swap get-row all-equal-value? ] any? or ;
 
 :: col-win ( board -- ? )
     ! Same as row win except checks column wins
@@ -90,9 +90,9 @@ TUPLE: game-state p1 ;
     draw ! optional function to draw rectangles or sprites
     board ! optional function to create a board
 
-    ! <game-state> 
+    <game-state> 
     gestures ! sets gestures -- a hashmap of key presses and associated actions
-
+    COLOR: purple { 2 0 } { 100 100 } draw-filled-rectangle 
 
 
     display ; ! call display to see the window
