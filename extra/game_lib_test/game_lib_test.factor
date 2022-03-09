@@ -43,9 +43,9 @@ SYMBOL: tictactoe-game-loop
 :: row-win ( board -- seq )
     ! Returns true if either X or O has a row win
     ! For each row, check if every element in specified row equals X, returning true if any row meets the condition
-    { 0 1 2 } [ X swap board swap get-row all-equal-value? ] map [ t = ] any?
+    { 0 1 2 } [ X swap board swap get-row all-equal-value? ] any?
     ! Same check but with O
-    { 0 1 2 } [ O swap board swap get-row all-equal-value? ] map [ t = ] any? or ;
+    { 0 1 2 } [ O swap board swap get-row all-equal-value? ] any? or ;
 
 :: col-win ( board -- ? )
     ! Same as row win except checks column wins
@@ -124,9 +124,12 @@ M: game-state draw* drop drop ;
 
     gestures ! sets gestures -- a hashmap of key presses and associated actions
 
+    COLOR: purple { 2 0 } { 100 100 } draw-filled-rectangle 
+    
     <game-state> ! sets the game-state and leaves it on the stack for the creation of the loop
   
     create-loop ! creates and starts the game loop
+
 
     display ; ! call display to see the window
 
