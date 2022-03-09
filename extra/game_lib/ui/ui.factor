@@ -12,17 +12,21 @@ TUPLE: sprite image loc dim ;
 
 
 ! SECTION: These functions are what the user calls
-: set-background-color ( gadget color -- gadget )
-    >>bg-color ;
-
 : init-window ( dim -- gadget )
     ! makes a window gadget with given dimensions
     window-gadget new
     swap >>dimension 
     H{ } >>gests ;
 
-: create-board ( gadget board -- gadget )
-    >>board ;
+:: display ( gadget -- )
+    [ 
+        gadget
+        "Display window"
+        open-status-window 
+    ] with-ui ;
+
+: set-background-color ( gadget color -- gadget )
+    >>bg-color ;
 
 : set-rules ( gadget rules -- gadget )
     >>rules ;
@@ -43,13 +47,6 @@ TUPLE: sprite image loc dim ;
     gadget draw-quotes>> 
     [ dim path load-image loc <texture> draw-scaled-texture ] { } 1sequence append
     >>draw-quotes ;
-
-:: display ( gadget -- )
-    [ 
-        gadget
-        "Display window"
-        open-status-window 
-    ] with-ui ;
 
 ! SECTION: These functions does the logic behind the hood
 :: <sprite> ( cell-contents loc dim -- sprite )
@@ -101,7 +98,7 @@ TUPLE: sprite image loc dim ;
 
     widths heights all-combinations ;
 
- :: draw-single-image ( image-params gadget -- )
+:: draw-single-image ( image-params gadget -- )
    ! if the sprite is valid, draw the sprite
    image-params
    [
@@ -140,7 +137,7 @@ TUPLE: sprite image loc dim ;
         
     ] if ;
 
-: draw-background ( gadget -- )
+: draw-all ( gadget -- )
     ! draws everything in draw-quotes (which we added to using draw-filled-rectangle and draw-image)
     draw-quotes>> [ call( -- ) ] each ;
 
@@ -157,6 +154,12 @@ TUPLE: sprite image loc dim ;
 :: make-gestures ( gadget -- gadget )
     window-gadget gadget gests>> set-gestures gadget ;
 
+:: create-board ( gadget board -- gadget )
+    gadget board >>board
+    gadget draw-quotes>>
+    [ gadget draw-cells ] { } 1sequence append
+    >>draw-quotes ;
+
 ! SECTION: gadget methods
 M: window-gadget pref-dim*
    dimension>> ;
@@ -165,9 +168,7 @@ M: window-gadget draw-gadget*
     {
         ! Background
         [ draw-background-color ]
-        [ draw-background ]
-        ! Board
-        [ draw-cells ]
+        [ draw-all ]
     } cleave ;
 
 
