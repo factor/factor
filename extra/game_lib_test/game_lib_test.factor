@@ -1,4 +1,4 @@
-USING: accessors sequences kernel opengl grouping game_lib.ui colors.constants ui.gadgets game_lib.board ui.gestures words assocs ;
+USING: accessors sequences kernel opengl grouping game_lib.ui colors.constants ui.gadgets game_lib.board ui.gestures words assocs game.loop delegate namespaces ;
 
 IN: game_lib_test
 
@@ -20,7 +20,10 @@ IN: game_lib_test
 CONSTANT: X "vocab:game_lib_test/resources/X.png"
 CONSTANT: O "vocab:game_lib_test/resources/O.png"
 
-TUPLE: game-state p1 ;
+TUPLE: game-state gadget p1 ;
+
+
+SYMBOL: tictactoe-game-loop
 
 ! :: set-action-x ( gadget -- value ) 
 !     [ gadget board>> gadget gesture-pos "vocab:game_lib_test/resources/X.png" set-cell drop relayout-1 ] ;
@@ -31,8 +34,8 @@ TUPLE: game-state p1 ;
 :: on-click ( gadget -- value )
     [ 
         gadget rules>>
-        [ gadget board>> gadget gesture-pos X set-cell drop relayout-1 gadget f >>rules drop ]
-        [ gadget board>> gadget gesture-pos O set-cell drop relayout-1 gadget t >>rules drop ]
+        [ gadget board>> gadget gesture-pos X set-cell drop f >>rules drop ]
+        [ gadget board>> gadget gesture-pos O set-cell drop t >>rules drop ]
         if
     ] ;
 
@@ -78,23 +81,57 @@ TUPLE: game-state p1 ;
     3 3 f make-board 
     create-board ;
 
-: <game-state> ( gadget -- gadget )
-    game-state new
+:: <game-state> ( gadget -- gadget game-state )
+    game-state new 
+    gadget >>gadget
     f >>p1
-    set-rules ;
+    gadget f set-rules swap ;
+
+    
+! --------------------- Game Loop things -----------------------------------------------------
+
+! ----------------------- Goes in the Library---------------------------------------------------------------------
+: new-game-loop ( interval game-state -- game-loop )
+    <game-loop> dup tictactoe-game-loop set ;
+
+: stop-game ( -- )
+    tictactoe-game-loop get stop-loop ;
+
+! ----------------------------------------------------------------------------------------------------------------
+
+: create-loop ( game-state -- )
+    1000000000 swap new-game-loop start-loop ;
+
+
+: tick-update ( game-state -- game-state )
+    dup gadget>> board>> check-win 
+    [ dup gadget>> relayout-1 stop-game ] 
+    [ dup gadget>> relayout-1 ] if ;
+
+
+M: game-state tick* tick-update drop ;
+
+M: game-state draw* drop drop ;
+
+! ----------------------------------------------------------------------------------------------
 
 : display-window ( -- )
     { 400 200 } init-window ! initialize the window with dimensions
     draw ! optional function to draw rectangles or sprites
     board ! optional function to create a board
 
-    <game-state> 
     gestures ! sets gestures -- a hashmap of key presses and associated actions
+
     COLOR: purple { 2 0 } { 100 100 } draw-filled-rectangle 
+    
+    <game-state> ! sets the game-state and leaves it on the stack for the creation of the loop
+  
+    create-loop ! creates and starts the game loop
 
 
     display ; ! call display to see the window
 
     ! note: using relayout seems to change the window correctly
+
 
 MAIN: display-window
