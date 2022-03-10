@@ -1,4 +1,4 @@
-USING: accessors ui.gadgets kernel ui.gadgets.status-bar ui ui.render colors.constants opengl sequences combinators peg
+USING: accessors ui.gadgets kernel ui.gadgets.status-bar ui ui.render colors.constants opengl locals.types strings sequences combinators peg
 images.loader opengl.textures assocs math math.ranges game_lib.board ui.gestures colors ;
 
 IN: game_lib.ui
@@ -7,63 +7,6 @@ IN: game_lib.ui
 ! draw-quotes is a sequence of quotes, where each quote is an instruction on how to draw something
 ! board -- board object created from board library
 TUPLE: window-gadget < gadget dimension bg-color draw-quotes board gests rules ;
-
-TUPLE: sprite image loc dim ;
-
-
-! SECTION: These functions are what the user calls
-: init-window ( dim -- gadget )
-    ! makes a window gadget with given dimensions
-    window-gadget new
-    swap >>dimension 
-    H{ } >>gests ;
-
-:: display ( gadget -- )
-    [ 
-        gadget
-        "Display window"
-        open-status-window 
-    ] with-ui ;
-
-: set-background-color ( gadget color -- gadget )
-    >>bg-color ;
-
-: set-rules ( gadget rules -- gadget )
-    >>rules ;
-
-: check-rules ( gadget -- ? )
-    rules>> t? ;
-
-:: draw-filled-rectangle ( gadget color loc dim -- gadget )
-    ! appends instruction to draw a rectangle to current set of instructions in draw-quotes attribute
-    gadget 
-    gadget draw-quotes>> 
-    [ color gl-color loc dim gl-fill-rect ] { } 1sequence append
-    >>draw-quotes ;
-
-:: draw-image ( gadget path loc dim -- gadget )
-    ! appends instructions to draw a sprite to current set of instructions in draw-quotes attributes
-    gadget 
-    gadget draw-quotes>> 
-    [ dim path load-image loc <texture> draw-scaled-texture ] { } 1sequence append
-    >>draw-quotes ;
-
-! SECTION: These functions does the logic behind the hood
-:: <sprite> ( cell-contents loc dim -- sprite )
-   ! creates a sprite object if cell-contents is valid, otherwise return sprite as false
-   cell-contents color?
-   [
-       ! Sets sprite image as a color if cell-contents is a color
-       sprite new cell-contents >>image loc >>loc dim >>dim
-   ] [
-       cell-contents
-       [
-           ! Sets sprite image as an image if cell-contents is an image path
-           sprite new cell-contents load-image >>image loc >>loc dim >>dim
-       ] [
-           f 
-       ] if
-   ] if ;
 
 ! TODO: use the cache and handle cells that are false
 :: all-combinations ( seq1 seq2 -- matrix )
@@ -98,50 +41,80 @@ TUPLE: sprite image loc dim ;
 
     widths heights all-combinations ;
 
-:: draw-single-image ( image-params gadget -- )
-   ! if the sprite is valid, draw the sprite
-   image-params
-   [
-       image-params dim>> :> dimensions
-       image-params image>> :> img
-       image-params loc>> :> location
-       ! if the sprite is a color, draw a filled rectangle
-       img color? [
-           gadget img location dimensions draw-filled-rectangle drop
-       ] [
-           ! otherwise draw an image
-           dimensions img location <texture> draw-scaled-texture
-       ] if
-   ] [
-
-   ] if ;
-
-:: draw-cells ( gadget -- )
-   ! if the board is valid, draw the sprite at every starting location
-   gadget board>>
-   [
-       gadget get-cell-dimension :> celldims
-       gadget get-dimension-matrix :> dim-matrix
-       gadget board>> cells>> dim-matrix [ [ celldims <sprite> gadget draw-single-image ] 2each ] 2each
-   ] [
-      
-   ] if ;
-
+:: draw-append ( gadget quot -- gadget )
+    gadget
+    gadget draw-quotes>> 
+    quot { } 1sequence append
+    >>draw-quotes ;
 
 :: draw-background-color ( gadget -- )
     ! if given a background color, draw the background color
     gadget bg-color>> 
-    [
-        gadget bg-color>> gl-color { 0 0 } gadget dimension>> gl-fill-rect
-    ] [
-        
-    ] if ;
+    [ gadget bg-color>> gl-color { 0 0 } gadget dimension>> gl-fill-rect ] 
+    [ ] if ;
+
+:: draw-filled-rectangle ( gadget color loc dim -- gadget )
+    ! appends instruction to draw a rectangle to current set of instructions in draw-quotes attribute
+    gadget [ color gl-color loc dim gl-fill-rect ] draw-append ;
+
+:: draw-image ( gadget path loc dim -- gadget )
+    ! appends instructions to draw a sprite to current set of instructions in draw-quotes attributes
+    gadget [ dim path load-image loc <texture> draw-scaled-texture ] draw-append ;
+
+:: draw-quote ( gadget quote -- gadget )
+    gadget quote draw-append ;
+
+:: draw-single ( cell loc dim -- )
+    ! Executes instructions based on content of the cell, does nothing if cell isn't a 
+    ! string, color or quote.
+    { 
+        { [ cell string? ] [ dim cell load-image loc <texture> draw-scaled-texture ] }
+        { [ cell color? ] [ cell gl-color loc dim gl-fill-rect ] }
+        { [ cell quote? ] [ cell call( -- ) ] }
+        [ ]
+    } cond ;
+
+:: draw-cells ( gadget -- )
+    ! board is always valid since this instruction gets added on creation of board
+    gadget board>> cells>> :> cell
+    gadget get-cell-dimension :> celldims
+    gadget get-dimension-matrix :> dim-matrix
+    cell dim-matrix [ [ celldims draw-single ] 2each ] 2each ;
 
 : draw-all ( gadget -- )
     ! draws everything in draw-quotes (which we added to using draw-filled-rectangle and draw-image)
     draw-quotes>> [ call( -- ) ] each ;
 
-:: gesture-pos ( gadget -- cell-pos )
+: init-window ( dim -- gadget )
+    ! makes a window gadget with given dimensions
+    window-gadget new
+    swap >>dimension 
+    H{ } >>gests ;
+
+:: create-board ( gadget board -- gadget )
+    gadget board >>board
+    [ gadget draw-cells ] draw-append ;
+
+:: display ( gadget -- )
+    [ 
+        gadget
+        "Display window"
+        open-status-window 
+    ] with-ui ;
+
+: set-background-color ( gadget color -- gadget )
+    >>bg-color ;
+
+: set-rules ( gadget rules -- gadget )
+    >>rules ;
+
+: check-rules ( gadget -- ? )
+    rules>> t? ;
+
+: get-dim ( gadget -- dim )
+    dim>> ;
+
+:: gesture-pos ( gadget -- cellpos )
     gadget hand-rel first2 :> ( w h )
     gadget get-cell-dimension first2 :> ( cw ch )
     w cw /i :> row
@@ -153,12 +126,6 @@ TUPLE: sprite image loc dim ;
 
 :: make-gestures ( gadget -- gadget )
     window-gadget gadget gests>> set-gestures gadget ;
-
-:: create-board ( gadget board -- gadget )
-    gadget board >>board
-    gadget draw-quotes>>
-    [ gadget draw-cells ] { } 1sequence append
-    >>draw-quotes ;
 
 ! SECTION: gadget methods
 M: window-gadget pref-dim*
