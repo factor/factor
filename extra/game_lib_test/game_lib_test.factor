@@ -74,10 +74,17 @@ SYMBOL: tictactoe-game-loop
     make-gestures ;
 
 : draw ( gadget -- gadget )
-    COLOR: pink set-background-color
-    COLOR: green { 0 0 } { 150 150 } draw-filled-rectangle ! draws this first
-    COLOR: blue { 0 0 } { 100 100 } draw-filled-rectangle 
-    [ { 200 100 } { 50 20 } gl-fill-rect ] draw-quote ;
+    COLOR: pink set-background-color ;
+    ! COLOR: green { 0 0 } { 150 150 } draw-filled-rectangle ! draws this first
+    ! COLOR: blue { 0 0 } { 100 100 } draw-filled-rectangle 
+    ! [ { 200 100 } { 50 20 } gl-fill-rect ] draw-quote ;
+
+
+: foreground ( gadget -- gadget ) 
+    COLOR: black { 123 0 } { 10 400 } draw-filled-rectangle
+    COLOR: black { 256 0 } { 10 400 } draw-filled-rectangle
+    COLOR: black { 0 123 } { 400 10 } draw-filled-rectangle
+    COLOR: black { 0 256 } { 400 10 } draw-filled-rectangle ;
 
 : board ( gadget -- gadget )
     ! sprites takes up the entire screen and can only draw sprites as of now    
@@ -119,10 +126,10 @@ M: game-state draw* drop drop ;
 ! ----------------------------------------------------------------------------------------------
 
 : display-window ( -- )
-    { 400 200 } init-window ! initialize the window with dimensions
+    { 400 400 } init-window ! initialize the window with dimensions
     draw ! optional function to draw rectangles or sprites
     board ! optional function to create a board
-
+    foreground
     gestures ! sets gestures -- a hashmap of key presses and associated actions
 
     ! COLOR: purple { 2 0 } { 100 100 } draw-filled-rectangle 
