@@ -1,4 +1,4 @@
-USING: accessors sequences kernel grouping game_lib.ui colors.constants ui.gadgets game_lib.board ui.gestures words assocs game.loop delegate namespaces ;
+USING: accessors sequences kernel opengl grouping game_lib.ui fonts colors.constants ui.text ui.gadgets game_lib.board ui.gestures words assocs game.loop delegate namespaces ;
 
 IN: game_lib_test
 
@@ -63,6 +63,9 @@ SYMBOL: tictactoe-game-loop
     ! Returns true if any win condition is met
     board row-win board col-win or board diag-win or ;
 
+: game-over ( gadget -- gadget )
+    [ { 75 75 } [ monospace-font t >>bold? 50 >>size COLOR: red >>foreground "GAME OVER" draw-text ] with-translation ] draw-quote ;
+
 : gestures ( gadget -- gadget )
     ! TODO: generalize action quote and make easier to use
     ! dup set-action-x T{ button-down { # 1 } } new-gestures 
@@ -105,7 +108,7 @@ SYMBOL: tictactoe-game-loop
 
 : tick-update ( game-state -- game-state )
     dup gadget>> board>> check-win 
-    [ dup gadget>> relayout-1 stop-game ] 
+    [ dup gadget>> game-over relayout-1 stop-game ] 
     [ dup gadget>> relayout-1 ] if ;
 
 
@@ -122,6 +125,8 @@ M: game-state draw* drop drop ;
 
     gestures ! sets gestures -- a hashmap of key presses and associated actions
 
+    ! COLOR: purple { 2 0 } { 100 100 } draw-filled-rectangle 
+    
     <game-state> ! sets the game-state and leaves it on the stack for the creation of the loop
   
     create-loop ! creates and starts the game loop
