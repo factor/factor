@@ -17,8 +17,6 @@ CONSTANT: O "vocab:tic-tac-toe/resources/O.png"
 : board ( gadget -- gadget )
     ! sprites takes up the entire screen and can only draw sprites as of now    
     3 3 f make-board
-    { 1 0 } O set-cell
-    { 2 0 } X set-cell
     create-board ; 
 
 : main ( -- )

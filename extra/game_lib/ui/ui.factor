@@ -3,9 +3,6 @@ images.loader opengl.textures assocs math math.ranges game_lib.board ui.gestures
 
 IN: game_lib.ui
 
-! dimension -- { width height } of window
-! draw-quotes is a sequence of quotes, where each quote is an instruction on how to draw something
-! board -- board object created from board library
 TUPLE: window-gadget < gadget dimension bg-color draw-quotes board gests rules ;
 
 ! TODO: use the cache and handle cells that are false
