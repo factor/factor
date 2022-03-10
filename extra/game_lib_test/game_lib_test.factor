@@ -31,11 +31,17 @@ SYMBOL: tictactoe-game-loop
 ! :: set-action-o ( gadget -- value ) 
 !     [ gadget board>> gadget gesture-pos "vocab:game_lib_test/resources/O.png" set-cell drop relayout-1 ] ;
 
+:: board-set-XO ( gadget board cell-pos cell-type -- )
+    board cell-pos is-cell-empty?
+    [ gadget dup board cell-pos cell-type set-cell drop rules>> not >>rules drop ]
+    [ ]
+    if ;
+
 :: on-click ( gadget -- value )
     [ 
         gadget rules>>
-        [ gadget board>> gadget gesture-pos X set-cell drop f >>rules drop ]
-        [ gadget board>> gadget gesture-pos O set-cell drop t >>rules drop ]
+        [ gadget board>> gadget gesture-pos X board-set-XO ]
+        [ gadget board>> gadget gesture-pos O board-set-XO ]
         if
     ] ;
 
