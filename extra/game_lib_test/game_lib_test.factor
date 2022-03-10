@@ -1,4 +1,4 @@
-USING: accessors sequences kernel grouping game_lib.ui colors.constants ui.gadgets game_lib.board ui.gestures words assocs ;
+USING: accessors sequences kernel opengl grouping game_lib.ui colors.constants ui.gadgets game_lib.board ui.gestures words assocs ;
 
 IN: game_lib_test
 
@@ -70,14 +70,12 @@ TUPLE: game-state p1 ;
 : draw ( gadget -- gadget )
     COLOR: pink set-background-color
     COLOR: green { 0 0 } { 150 150 } draw-filled-rectangle ! draws this first
-    COLOR: blue { 0 0 } { 100 100 } draw-filled-rectangle ;
+    COLOR: blue { 0 0 } { 100 100 } draw-filled-rectangle 
+    [ { 200 100 } { 50 20 } gl-fill-rect ] draw-quote ;
 
 : board ( gadget -- gadget )
     ! sprites takes up the entire screen and can only draw sprites as of now    
     3 3 f make-board 
-    ! { 2 0 } "vocab:game_lib_test/resources/O.png" set-cell
-    ! { 1 1 } "vocab:game_lib_test/resources/O.png" set-cell
-    ! { 2 2 } "vocab:game_lib_test/resources/X.png" set-cell
     create-board ;
 
 : <game-state> ( gadget -- gadget )
