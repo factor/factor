@@ -488,6 +488,8 @@ GENERIC#: >base 1 ( n radix -- str )
 : >oct ( n -- str ) 8 >base ; inline
 : >hex ( n -- str ) 16 >base ; inline
 
+ALIAS: >dec number>string
+
 M: integer >base
     {
         { [ over 0 = ] [ 2drop "0" ] }
