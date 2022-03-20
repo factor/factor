@@ -1,23 +1,16 @@
-USING: kernel namespaces sequences math.vectors colors.constants game_lib.ui game_lib.board ;
+USING: kernel namespaces accessors sequences combinators math.vectors colors.constants 
+game_lib.ui game_lib.board ui.gestures ui.gadgets ;
 
 IN: sokoban2
 
 CONSTANT: player "vocab:sokoban2/resources/CharR.png"
-CONSTANT: wall COLOR: blue ! "vocab:sokoban2/resources/Wall_Brown.png"
+CONSTANT: wall COLOR: gray ! "vocab:sokoban2/resources/Wall_Brown.png"
 CONSTANT: goal "vocab:sokoban2/resources/Goal.png"
 CONSTANT: crate "vocab:sokoban2/resources/Crate_Yellow.png"
 
 SYMBOL: level 
 0 level set-global
 
-:: get-pos ( board object -- seq )
-    board [ object = ] find-cell-pos ;
-
-:: get-adjacent-cell ( board object mov -- cell )
-    board object get-pos mov v+ :> location
-    board location get-cell ;
-
-! TODO: reverse x y values when board is updated
 : board-one ( gadget -- gadget )
     8 9 f make-board
     
@@ -35,9 +28,9 @@ SYMBOL: level
         { 0 8 } { 1 8 } { 2 8 } { 3 8 } { 4 8 } { 5 8 } { 6 8 } { 7 8 }
     } wall set-multicell
     
-    {
-        { 1 2 } { 5 3 } { 1 4 } { 4 5 } { 3 6 } { 6 6 } { 4 7 } 
-    } goal set-multicell
+    ! {
+        ! { 1 2 } { 5 3 } { 1 4 } { 4 5 } { 3 6 } { 6 6 } { 4 7 } 
+    ! } goal set-multicell
 
     { 
         { 3 2 } { 4 3 } { 4 4 } { 4 6 } { 3 6 } { 5 6 }
@@ -79,31 +72,42 @@ SYMBOL: level
 : board ( -- seq )
     { [ board-one ] [ board-two ] } ;
 
+:: get-pos ( board object -- seq )
+    board [ object = ] find-cell-pos ;
+
+:: move-object ( board move object object-pos -- )
+    board object-pos delete-cell drop
+    board object-pos move v+ object set-cell drop ;
+
+:: move-crate ( board move player-pos -- )
+    player-pos move v+ :> crate-pos
+    board crate-pos move v+ get-cell :> next-cell
+    {
+        { [ next-cell f = ] [ board move crate crate-pos move-object board move player player-pos move-object ] }
+        [ ]
+    } cond ;
+
+:: sokoban-move ( board move -- )
+    board player get-pos :> player-pos
+    board player-pos move v+ get-cell :> adjacent-cell
+    {
+        { [ adjacent-cell f = ] [ board move player player-pos move-object ] }
+        { [ adjacent-cell crate = ] [ board move player-pos move-crate ] }
+        [ ]
+    } cond ;
+
+: game-logic ( gadget -- gadget )
+    T{ key-down f f "UP" } [ dup board>> { 0 -1 } sokoban-move relayout-1 ] new-gesture
+    T{ key-down f f "DOWN" } [ dup board>> { 0 1 } sokoban-move relayout-1 ] new-gesture
+    T{ key-down f f "RIGHT" } [ dup board>> { 1 0 } sokoban-move relayout-1 ] new-gesture
+    T{ key-down f f "LEFT" } [ dup board>> { -1 0 } sokoban-move relayout-1 ] new-gesture ;
+
 : main ( -- )
     { 700 800 } init-window
     ! Don't really like this sequence of quotes thing -- would be nicer if board 
     ! could be an array of like ascii that gets created here or something
-    level get-global 
-    board nth call( gadget -- gadget )
+    level get-global board nth call( gadget -- gadget )
+    game-logic
     display ;
-
-! :: get-pos ( board object -- seq )
-!     board [ object = ] find-cell-pos ;
-
-! :: get-adjacent-cell ( board object mov -- cell )
-!     board object get-pos mov v+ :> location
-!     board location get-cell ;
-
-! : move-player ( board move -- )
-
-! : move-right ( board -- )
-!     { 1 0 } move-player 
-
-! window-gadget H{
-!     ! { T{ key-down f f "UP" }     [ board>> move-up ]  }
-!     ! { T{ key-down f f "LEFT" }   [ board>> move-left ] }
-!     { T{ key-down f f "RIGHT" }  [ board>> move-right ] }
-!     ! { T{ key-down f f "DOWN" }   [ board>> move-down ] }
-! } set-gestures
 
 MAIN: main

@@ -6,17 +6,6 @@ IN: game_lib_test
 ! followed by optional draw/board functions, 
 ! and must call display last to see the window with everything drawn
 
-! trying to have the action be nothing if somethign is already in cell 
-! :: set-action-x ( gadget -- value )
-!     ! gadget gesture-pos :> curCell
-!     gadget board>> curCell get-cell
-!     ! f
-!     [ 
-!         [ gadget board>> gadget gesture-pos "vocab:game_lib_test/resources/X.png" set-cell drop relayout-1 ]
-!     ] [ 
-!         [ drop ]
-!     ] if ;
-
 CONSTANT: X "vocab:game_lib_test/resources/X.png"
 CONSTANT: O "vocab:game_lib_test/resources/O.png"
 
@@ -25,23 +14,16 @@ TUPLE: game-state gadget p1 ;
 
 SYMBOL: tictactoe-game-loop
 
-! :: set-action-x ( gadget -- value ) 
-!     [ gadget board>> gadget gesture-pos "vocab:game_lib_test/resources/X.png" set-cell drop relayout-1 ] ;
-
-! :: set-action-o ( gadget -- value ) 
-!     [ gadget board>> gadget gesture-pos "vocab:game_lib_test/resources/O.png" set-cell drop relayout-1 ] ;
-
 :: board-set-XO ( gadget board cell-pos cell-type -- )
     board cell-pos is-cell-empty?
     [ gadget dup board cell-pos cell-type set-cell drop rules>> not >>rules drop ]
-    [ ]
-    if ;
+    when ;
 
 :: on-click ( gadget -- value )
     [ 
         gadget rules>>
-        [ gadget board>> gadget gesture-pos X board-set-XO ]
-        [ gadget board>> gadget gesture-pos O board-set-XO ]
+        [ gadget board>> gadget hand-rel-cell X board-set-XO ]
+        [ gadget board>> gadget hand-rel-cell O board-set-XO ]
         if
     ] ;
 
@@ -74,10 +56,10 @@ SYMBOL: tictactoe-game-loop
 
 : gestures ( gadget -- gadget )
     ! TODO: generalize action quote and make easier to use
-    ! dup set-action-x T{ button-down { # 1 } } new-gestures 
-    ! dup set-action-o T{ button-down { # 3 } } new-gestures 
-    dup on-click T{ button-down { # 1 } } new-gestures
-    make-gestures ;
+    ! dup set-action-x T{ button-down { # 1 } } new-gesture 
+    ! dup set-action-o T{ button-down { # 3 } } new-gesture 
+    dup on-click T{ button-down { # 1 } } swap new-gesture ;
+    ! make-gestures ;
 
 : draw ( gadget -- gadget )
     COLOR: pink set-background-color ;
@@ -92,8 +74,7 @@ SYMBOL: tictactoe-game-loop
     COLOR: black { 0 123 } { 400 10 } draw-filled-rectangle
     COLOR: black { 0 256 } { 400 10 } draw-filled-rectangle ;
 
-: board ( gadget -- gadget )
-    ! sprites takes up the entire screen and can only draw sprites as of now    
+: board ( gadget -- gadget ) 
     3 3 f make-board 
     create-board ;
 
