@@ -82,21 +82,34 @@ SYMBOL: level
 :: move-crate ( board move player-pos -- )
     player-pos move v+ :> crate-pos
     board crate-pos move v+ get-cell :> next-cell
+    ! Move both the player and crate if possible, otherwise do nothing
     {
-        { [ next-cell f = ] [ board move crate crate-pos move-object board move player player-pos move-object ] }
-        [ ]
+        { 
+            [ next-cell f = ] ! crate can be moved to free space
+            [ board move crate crate-pos move-object 
+            board move player player-pos move-object ] 
+        }
+        [ ] ! Else do nothing
     } cond ;
 
 :: sokoban-move ( board move -- )
     board player get-pos :> player-pos
     board player-pos move v+ get-cell :> adjacent-cell
+    ! Move player to free space or have player push crate if possible, otherwise do nothing
     {
-        { [ adjacent-cell f = ] [ board move player player-pos move-object ] }
-        { [ adjacent-cell crate = ] [ board move player-pos move-crate ] }
-        [ ]
+        { 
+            [ adjacent-cell f = ] ! player can be moved to free space
+            [ board move player player-pos move-object ] 
+        }
+        { 
+            [ adjacent-cell crate = ] ! player is moving into a crate
+            [ board move player-pos move-crate ] 
+        }
+        [ ] ! Else do nothing
     } cond ;
 
 : game-logic ( gadget -- gadget )
+    ! Move pieces according to user input
     T{ key-down f f "UP" } [ dup board>> { 0 -1 } sokoban-move relayout-1 ] new-gesture
     T{ key-down f f "DOWN" } [ dup board>> { 0 1 } sokoban-move relayout-1 ] new-gesture
     T{ key-down f f "RIGHT" } [ dup board>> { 1 0 } sokoban-move relayout-1 ] new-gesture
