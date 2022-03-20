@@ -111,26 +111,28 @@ TUPLE: window-gadget < gadget dimension bg-color draw-quotes board gests rules ;
 : get-dim ( gadget -- dim )
     dim>> ;
 
-:: gesture-pos ( gadget -- cellpos )
+:: hand-rel-cell ( gadget -- cellpos )
     gadget hand-rel first2 :> ( w h )
     gadget get-cell-dimension first2 :> ( cw ch )
     w cw /i :> row
     h ch /i :> col
     row col { } 2sequence ;
 
-:: new-gestures ( gadget value key -- gadget )
+:: new-gesture ( gadget key value -- gadget )
     value key gadget gests>> set-at gadget ;
-
-:: make-gestures ( gadget -- gadget )
-    window-gadget gadget gests>> set-gestures gadget ;
 
 ! SECTION: gadget methods
 M: window-gadget pref-dim*
    dimension>> ;
 
+M: window-gadget handle-gesture
+    swap over gests>> ?at
+    [
+        2dup call( gadget -- )
+    ] when 2drop f ;
+
 M: window-gadget draw-gadget*
     {
-        ! Background
         [ draw-background-color ]
         [ draw-all ]
     } cleave ;
