@@ -1,4 +1,4 @@
-USING: accessors ui.gadgets kernel ui.gadgets.status-bar ui ui.render colors.constants opengl locals.types strings sequences combinators peg
+USING: accessors arrays ui.gadgets kernel ui.gadgets.status-bar ui ui.render colors.constants opengl locals.types strings sequences combinators peg
 images.loader opengl.textures assocs math math.ranges game_lib.board ui.gestures colors ;
 
 IN: game_lib.ui
@@ -68,6 +68,7 @@ TUPLE: window-gadget < gadget dimension bg-color draw-quotes board gests rules ;
         { [ cell string? ] [ dim cell load-image loc <texture> draw-scaled-texture ] }
         { [ cell color? ] [ cell gl-color loc dim gl-fill-rect ] }
         { [ cell quote? ] [ cell call( -- ) ] }
+        { [ cell array? ] [ cell [ loc dim draw-single ] each ] }
         [ ]
     } cond ;
 

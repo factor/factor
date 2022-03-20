@@ -28,13 +28,15 @@ SYMBOL: level
         { 0 8 } { 1 8 } { 2 8 } { 3 8 } { 4 8 } { 5 8 } { 6 8 } { 7 8 }
     } wall set-multicell
     
-    ! {
-        ! { 1 2 } { 5 3 } { 1 4 } { 4 5 } { 3 6 } { 6 6 } { 4 7 } 
-    ! } goal set-multicell
-
     { 
-        { 3 2 } { 4 3 } { 4 4 } { 4 6 } { 3 6 } { 5 6 }
+        { 4 3 } { 4 4 } { 4 6 } { 3 6 } { 5 6 }
     } crate set-multicell
+
+    {
+        { 1 2 } { 5 3 } { 1 4 } { 4 5 } { 3 6 } { 6 6 } { 4 7 } 
+    } goal set-multicell
+
+    ! { 1 2 } { "vocab:sokoban2/resources/Crate_Yellow.png" "vocab:sokoban2/resources/Goal.png" } set-cell
 
     create-board ;
 
@@ -97,13 +99,18 @@ SYMBOL: level
     board player-pos move v+ get-cell :> adjacent-cell
     ! Move player to free space or have player push crate if possible, otherwise do nothing
     {
-        { 
+        {
             [ adjacent-cell f = ] ! player can be moved to free space
             [ board move player player-pos move-object ] 
         }
         { 
             [ adjacent-cell crate = ] ! player is moving into a crate
             [ board move player-pos move-crate ] 
+        }
+        {
+            [ adjacent-cell goal = ] ! player is moving into a goal
+            [ ]
+            ! [ board move { "vocab:sokoban2/resources/CharR.png" "vocab:sokoban2/resources/Goal.png" } player-pos move-object ]
         }
         [ ] ! Else do nothing
     } cond ;
