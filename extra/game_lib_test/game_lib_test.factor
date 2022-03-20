@@ -97,7 +97,7 @@ SYMBOL: tictactoe-game-loop
 ! ----------------------------------------------------------------------------------------------------------------
 
 : create-loop ( game-state -- )
-    1000000000 swap new-game-loop start-loop ;
+    1000 swap new-game-loop start-loop ;
 
 
 : tick-update ( game-state -- game-state )

@@ -48,6 +48,10 @@ TUPLE: board width height cells default-cell ;
     locations [ board swap new-cell set-cell drop ] each
     board ;
 
+! adds new-cell to existing thing at location, resulting in a sequence
+! :: add-cell ( board location new-cell -- board )
+
+
 ! Sets a cell back to the default cell
 :: delete-cell ( board location -- board )
     board location board default-cell>> set-cell ;
@@ -88,6 +92,10 @@ TUPLE: board width height cells default-cell ;
     board quot find-row swap :> y
     quot find swap :> x
     { x y } swap ; inline
+
+! checks quote in arrays as well, output location of first match 
+! :: deep-find-cell ( board quot: ( -- ) -- seq ) 
+
 
 ! Return first cell that satisfies the quot
 :: find-cell-nopos ( board quot -- cell )
