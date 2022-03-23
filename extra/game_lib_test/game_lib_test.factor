@@ -1,4 +1,4 @@
-USING: accessors sequences kernel opengl grouping game_lib.ui fonts colors.constants ui.text ui.gadgets game_lib.board ui.gestures words assocs game.loop delegate namespaces ;
+USING: accessors sequences kernel opengl grouping game_lib.ui fonts colors.constants ui.text ui.gadgets game_lib.board game_lib.loop ui.gestures words assocs game.loop delegate namespaces ;
 
 IN: game_lib_test
 
@@ -10,9 +10,6 @@ CONSTANT: X "vocab:game_lib_test/resources/X.png"
 CONSTANT: O "vocab:game_lib_test/resources/O.png"
 
 TUPLE: game-state gadget p1 ;
-
-
-SYMBOL: tictactoe-game-loop
 
 :: board-set-XO ( gadget board cell-pos cell-type -- )
     board cell-pos is-cell-empty?
@@ -86,15 +83,6 @@ SYMBOL: tictactoe-game-loop
 
     
 ! --------------------- Game Loop things -----------------------------------------------------
-
-! ----------------------- Goes in the Library---------------------------------------------------------------------
-: new-game-loop ( interval game-state -- game-loop )
-    <game-loop> dup tictactoe-game-loop set ;
-
-: stop-game ( -- )
-    tictactoe-game-loop get stop-loop ;
-
-! ----------------------------------------------------------------------------------------------------------------
 
 : create-loop ( game-state -- )
     1000 swap new-game-loop start-loop ;
