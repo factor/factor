@@ -72,7 +72,7 @@ TUPLE: game-state gadget p1 ;
     COLOR: black { 0 256 } { 400 10 } draw-filled-rectangle ;
 
 : board ( gadget -- gadget ) 
-    3 3 f make-board 
+    3 3 make-board 
     create-board ;
 
 :: <game-state> ( gadget -- gadget game-state )

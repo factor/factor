@@ -1,20 +1,20 @@
-USING: assocs sequences sequences.generalizations kernel accessors sequences.extras math.ranges ;
+USING: assocs sequences sequences.generalizations kernel accessors sequences.extras math.ranges generalizations ;
 
 IN: game_lib.board
 
-TUPLE: board width height cells default-cell ;
+TUPLE: board width height cells ;
 
+! Make cells, with an empty sequence as the default cell
+:: make-cells ( width height -- cells )
+    height [ width [ { } clone ] replicate ] replicate ;
 
-:: make-cells ( width height cell -- cells )
-    height [ width [ cell clone ] replicate ] replicate ;
+:: make-board ( width height -- board )
+    width height make-cells :> cells
+    width height cells board boa ;
 
-:: make-board ( width height default-cell -- board )
-    width height default-cell make-cells :> cells
-    width height cells default-cell board boa ;
-
-! Sets all cells to the default cell
+! Sets all cells to an empty sequence
 :: reset-board ( board -- board )
-    board width>> board height>> board default-cell>> make-board ;
+    board width>> board height>> make-board ;
 
 :: get-cell ( board location -- cell )
     location first2 :> ( x y )
@@ -22,7 +22,7 @@ TUPLE: board width height cells default-cell ;
     x y cells nth nth ;
 
 ! Gets all cells in locations array and return as a sequence
-:: get-multicell ( board locations -- seq )
+:: get-cells ( board locations -- seq )
     locations [ board swap get-cell ] map ;
 
 ! returns all elements of a specified row as a seq
@@ -34,9 +34,9 @@ TUPLE: board width height cells default-cell ;
     board 
     board height>> [ index ] replicate 
     board height>> [0..b) zip 
-    get-multicell ;
+    get-cells ;
 
-! For a board, set the cell at the given location to new-cell
+! For a board, set the cell at the given location to new-cell (should be a sequence)
 :: set-cell ( board location new-cell -- board )
     location first2 :> ( x y )
     board cells>> :> cells
@@ -44,17 +44,68 @@ TUPLE: board width height cells default-cell ;
     board ;
 
 ! For a board, set all the given locations to new-cell
-:: set-multicell ( board locations new-cell -- board )
+:: set-cells ( board locations new-cell -- board )
     locations [ board swap new-cell set-cell drop ] each
     board ;
 
-! adds new-cell to existing thing at location, resulting in a sequence
-! :: add-cell ( board location new-cell -- board )
+! Applies a quotation to a specific cell
+:: change-cell ( board location quot -- board )
+    location first2 :> ( x y )
+    board cells>> :> cells
+    y x cells nth quot change-nth
+    board ; inline
 
+! Adds an object to the cell at the specified location in a board
+:: add-to-cell ( board location obj -- board )
+    board cells>> :> cells
+    board location get-cell :> old-cell
+    old-cell { obj } append :> new-cell
+    board location new-cell set-cell ;
+
+! Adds an object to all the given locations to new-cell 
+:: add-to-cells ( board locations obj -- board )
+    locations [ board swap obj add-to-cell drop ] each
+    board ;
 
 ! Sets a cell back to the default cell
 :: delete-cell ( board location -- board )
-    board location board default-cell>> set-cell ;
+    board location { } set-cell ;
+
+! Delete the first instance of obj in the cell at the specified location in the board (if found)
+:: delete-from-cell ( board location obj -- board )
+    board location get-cell :> cell
+    cell [ obj = ] find drop :> obj-index
+    obj-index
+    [
+        obj-index cell remove-nth :> new-cell
+        board location new-cell set-cell
+    ] [
+        board
+    ] if ;
+
+! Delete the first instance of obj from all cells at the specified locations in the board (if found)
+:: delete-from-cells ( board locations obj -- board )
+    locations [ board swap obj delete-from-cell drop ] each
+    board ;
+
+! Like delete-from-cell, but delete all instances of obj (if found)
+:: delete-all-from-cell ( board location obj -- board )
+    board location [ obj swap remove ] change-cell ;
+
+! Like delete-all-from-cell, but deletes from all specified locations in the board (if found)
+:: delete-all-from-cells ( board locations obj -- board )
+    locations [ board swap obj delete-all-from-cell drop ] each
+    board ;
+
+! Helper word that creates a list of all cell locations in the board
+! :: location-matrix ( board -- loclist )
+!     board width>> :> w
+!     board height>> :> h
+
+
+! Deletes the all instances of obj from all cells (if found)
+! :: delete-from-all ( board obj -- board )
+
 
 :: duplicate-cell ( board start dest -- board )
     board dup start get-cell dest set-cell ;
@@ -71,17 +122,10 @@ TUPLE: board width height cells default-cell ;
 
 ! Returns true if cell at location is the default cell
 :: is-cell-empty? ( board location -- ? )
-    board location get-cell board default-cell>> = ;
+    board location get-cell { } = ;
 
 :: is-board-empty? ( board -- ? )
-    board cells>> [ [ board default-cell>> = ] all? ] all? ;
-
-! Applies a quotation to a specific cell
-:: change-cell ( board location quot -- board )
-    location first2 :> ( x y )
-    board cells>> :> cells
-    y x cells nth quot change-nth
-    board ; inline
+    board cells>> [ [ { } = ] all? ] all? ;
 
 ! Return index and row that contains the first cell that satisfies the quot
 :: find-row ( board quot -- index row )
