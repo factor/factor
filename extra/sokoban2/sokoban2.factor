@@ -12,7 +12,7 @@ SYMBOL: level
 0 level set-global
 
 : board-one ( gadget -- gadget )
-    8 9 f make-board
+    8 9 make-board
     
     { 2 2 } player set-cell
 
@@ -26,22 +26,22 @@ SYMBOL: level
         { 0 6 }                                                 { 7 6 }
         { 0 7 }                                                 { 7 7 }
         { 0 8 } { 1 8 } { 2 8 } { 3 8 } { 4 8 } { 5 8 } { 6 8 } { 7 8 }
-    } wall set-multicell
+    } wall set-cells
     
     { 
         { 4 3 } { 4 4 } { 4 6 } { 3 6 } { 5 6 }
-    } crate set-multicell
+    } crate set-cells
 
     {
         { 1 2 } { 5 3 } { 1 4 } { 4 5 } { 3 6 } { 6 6 } { 4 7 } 
-    } goal set-multicell
+    } goal set-cells
 
     ! { 1 2 } { "vocab:sokoban2/resources/Crate_Yellow.png" "vocab:sokoban2/resources/Goal.png" } set-cell
 
     create-board ;
 
 : board-two ( gadget -- gadget )
-    22 11 f make-board
+    22 11 make-board
     
     { 11 8 } player set-cell
 
@@ -57,17 +57,17 @@ SYMBOL: level
         { 0 8 } { 1 8 } { 2 8 } { 3 8 } { 4 8 }         { 6 8 } { 7 8 } { 8 8 }         { 10 8 }          { 12 8 } { 13 8 } { 14 8 } { 15 8 } { 16 8 }                                     { 21 8 }
                                         { 4 9 }                                         { 10 9 } { 11 9 } { 12 9 }                            { 16 9 } { 17 9 } { 18 9 } { 19 9 } { 20 9 } { 21 9 }
                                         { 4 10 } { 5 10 } { 6 10 } { 7 10 } { 8 10 } { 9 10 } { 10 10 }  
-    } wall set-multicell
+    } wall set-cells
     
     {
         { 19 6 } { 20 6 }
         { 19 7 } { 20 7 }
         { 19 8 } { 20 8 }
-    } goal set-multicell
+    } goal set-cells
 
     { 
         { 5 2 } { 7 3 } { 5 4 } { 8 4 } { 5 7 } { 2 7 }
-    } crate set-multicell
+    } crate set-cells
 
     create-board ;
 
