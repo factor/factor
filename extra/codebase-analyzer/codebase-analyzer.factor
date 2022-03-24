@@ -151,7 +151,7 @@ IN: codebase-analyzer
 
 : analyze-codebase-path ( path -- )
     {
-        [ normalize-path "project at path `%s`" sprintf print ]
+        [ normalize-path "project at path `%s`" sprintf print nl ]
         [ uses-git? [ "uses git" print ] when ]
         [ has-package-json? [ "has a package.json file" print ] when ]
     } cleave ;
@@ -166,11 +166,11 @@ IN: codebase-analyzer
         [ uses-cmake? [ "uses cmake" print ] when ]
         [ uses-make? [ "uses make" print ] when ]
         [ rc-files [ length "has %d rc files" sprintf print ] unless-empty ]
-        [ ignore-files [ length "has %d ignore files" sprintf print ] unless-empty ]
-        [ "Top 20 largest files" print file-sizes sort-values 20 sequences:short tail* [ normalize-path ] map-keys assoc. nl ]
-        [ "Top 10 file extention sizes" print sum-sizes-by-extension 10 sequences:short tail* assoc. nl ]
-        [ "Top 10 text file line counts" print sum-line-counts-by-extension 10 sequences:short tail* assoc. nl ]
-        [ "Top 10 file extention counts" print count-by-file-extension 10 sequences:short tail* assoc. nl ]
+        [ ignore-files [ length "has %d ignore files" sprintf print ] unless-empty nl ]
+        [ "Top 20 largest files" print file-sizes sort-values 20 sequences:short tail* [ normalize-path ] map-keys reverse assoc. nl ]
+        [ "Top 10 file extension sizes" print sum-sizes-by-extension 10 sequences:short tail* reverse assoc. nl ]
+        [ "Top 10 text file line counts" print sum-line-counts-by-extension 10 sequences:short tail* reverse assoc. nl ]
+        [ "Top 10 file extension counts" print count-by-file-extension 10 sequences:short tail* reverse assoc. nl ]
     } cleave ;
 
 : analyze-codebase ( path -- )
