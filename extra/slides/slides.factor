@@ -78,7 +78,7 @@ CONSTANT: stylesheet
     ] make-pane page-theme ;
 
 : $slide ( element -- )
-    unclip $title $divider $list ;
+    unclip last-element off $title $divider last-element off $list ;
 
 TUPLE: slides < book ;
 
