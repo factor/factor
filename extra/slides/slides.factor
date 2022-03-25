@@ -32,6 +32,9 @@ CONSTANT: stylesheet
         { table-content-style
             H{ { wrap-margin $[ default-font-size 83 * ] } }
         }
+        { list-content-style
+            H{ { wrap-margin $[ default-font-size 83 * ] } }
+        }
         { list-style
             H{
                 { table-gap ${ default-font-size 5/6 *
