@@ -19,22 +19,22 @@ TUPLE: window-gadget < gadget dimension bg-color draw-quotes board gests rules ;
     seq1 seq2 [ seq1 length swap [ ] curry replicate over swap zip ] map 
     swap drop ;
 
-:: get-cell-dimension ( gadget -- celldims )
+:: get-cell-dimension ( n gadget -- celldims )
     ! Calculates cell height and width based on gadget height and width
     gadget dimension>> first2 :> ( wdt hgt )
-    gadget board>> dup width>> swap height>> :> ( cols rows )
+    n gadget board>> nth dup width>> swap height>> :> ( cols rows )
 
     wdt cols /i :> cellwidth 
     hgt rows /i :> cellheight
 
    cellwidth cellheight { } 2sequence ;
 
-:: get-dimension-matrix ( gadget -- matrix )
+:: get-dimension-matrix ( n gadget -- matrix )
     ! gets a matrix of all starting locations of cells
-    gadget get-cell-dimension :> celldims
+    n gadget get-cell-dimension :> celldims
     ! applies appropriate offset to starting locations based on the cell heigh/width
-    gadget board>> width>> [0..b) [ celldims first * ] map :> widths
-    gadget board>> height>> [0..b) [ celldims second * ] map :> heights
+    n gadget board>> nth width>> [0..b) [ celldims first * ] map :> widths
+    n gadget board>> nth height>> [0..b) [ celldims second * ] map :> heights
 
     widths heights all-combinations ;
 
@@ -73,11 +73,11 @@ TUPLE: window-gadget < gadget dimension bg-color draw-quotes board gests rules ;
         [ ]
     } cond ;
 
-:: draw-cells ( gadget -- )
+:: draw-cells ( n gadget -- )
     ! board is always valid since this instruction gets added on creation of board
-    gadget board>> cells>> :> cell
-    gadget get-cell-dimension :> celldims
-    gadget get-dimension-matrix :> dim-matrix
+    n gadget board>> nth cells>> :> cell
+    n gadget get-cell-dimension :> celldims
+    n gadget get-dimension-matrix :> dim-matrix
     cell dim-matrix [ [ celldims draw-single ] 2each ] 2each ;
 
 : draw-all ( gadget -- )
@@ -91,8 +91,9 @@ TUPLE: window-gadget < gadget dimension bg-color draw-quotes board gests rules ;
     H{ } >>gests ;
 
 :: create-board ( gadget board -- gadget )
+    ! board should be a seq
     gadget board >>board
-    [ gadget draw-cells ] draw-append ;
+    [ board length [0..b) [ gadget draw-cells ] each ] draw-append ;
 
 :: display ( gadget -- )
     [ 
@@ -115,7 +116,7 @@ TUPLE: window-gadget < gadget dimension bg-color draw-quotes board gests rules ;
 
 :: hand-rel-cell ( gadget -- cellpos )
     gadget hand-rel first2 :> ( w h )
-    gadget get-cell-dimension first2 :> ( cw ch )
+    0 gadget get-cell-dimension first2 :> ( cw ch )
     w cw /i :> row
     h ch /i :> col
     row col { } 2sequence ;

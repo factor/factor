@@ -43,9 +43,17 @@ SYMBOL: level
     } $ goal add-to-cells
 
     ! { 1 2 } { "vocab:sokoban2/resources/Crate_Yellow.png" "vocab:sokoban2/resources/Goal.png" } set-cell
-    { 0 0 } [ COLOR: black gl-color { 10 10 } { 20 20 } gl-fill-rect ] set-cell 
+    { 0 0 } [ COLOR: black gl-color { 10 10 } { 20 20 } gl-fill-rect ] set-cell ;
+    
+: board-second ( -- board )
+    8 9 f make-board
 
-    create-board ;
+    {
+        { 1 2 } { 5 3 } { 1 4 } { 4 5 } { 3 6 } { 6 6 } { 4 7 } 
+    } goal set-multicell ;
+
+: board-one ( gadget -- gadget )
+    board-first board-second { } 2sequence create-board ;
 
 : board-two ( gadget -- gadget )
     22 11 make-board
@@ -75,6 +83,8 @@ SYMBOL: level
     { 
         { 5 2 } { 7 3 } { 5 4 } { 8 4 } { 5 7 } { 2 7 }
     } crate add-to-cells
+
+    { } 1sequence 
 
     create-board ;
 
@@ -111,6 +121,11 @@ SYMBOL: level
             [ adjacent-cell is-empty? adjacent-cell goal cell-contains? or ] ! player can be moved to free space
             [ board player-pos move player move-object drop ] 
         }
+        ! {
+        !     [ adjacent-cell goal = ] ! player is moving into a goal
+        !     [ ]
+        !     ! [ board move { "vocab:sokoban2/resources/CharR.png" "vocab:sokoban2/resources/Goal.png" } player-pos move-object ]
+        ! }
         [ ] ! Else do nothing
     } cond ;
 
@@ -126,6 +141,7 @@ SYMBOL: level
     ! Don't really like this sequence of quotes thing -- would be nicer if board 
     ! could be an array of like ascii that gets created here or something
     level get-global board nth call( gadget -- gadget )
+    ! board
     game-logic
     display ;
 
