@@ -16,9 +16,9 @@ M: sokoban-cell draw-cell*
 SYMBOL: level 
 0 level set-global
 
-: board-one ( gadget -- gadget )
-    8 9 f make-board
-    
+: board-first ( -- board )
+    8 9 f make-board 
+
     { 2 2 } player set-cell
 
     {
@@ -34,17 +34,21 @@ SYMBOL: level
     } sokoban-cell wall "wall" sokoban-cell boa set-multicell
     
     { 
-        { 3 2 } { 4 3 } { 4 4 } { 4 6 } { 3 6 } { 5 6 }
+        { 3 2 } { 4 3 } { 4 4 } { 4 6 } { 3 6 } { 5 6 } { 1 6 }
     } crate set-multicell
 
-    {
-        { 5 3 } { 1 4 } { 4 5 } { 3 6 } { 6 6 } { 4 7 } 
-    } goal set-multicell
-
     ! { 1 2 } { "vocab:sokoban2/resources/Crate_Yellow.png" "vocab:sokoban2/resources/Goal.png" } set-cell
-    { 0 0 } [ COLOR: black gl-color { 10 10 } { 20 20 } gl-fill-rect ] set-cell 
+    { 0 0 } [ COLOR: black gl-color { 10 10 } { 20 20 } gl-fill-rect ] set-cell ;
+    
+: board-second ( -- board )
+    8 9 f make-board
 
-    create-board ;
+    {
+        { 1 2 } { 5 3 } { 1 4 } { 4 5 } { 3 6 } { 6 6 } { 4 7 } 
+    } goal set-multicell ;
+
+: board-one ( gadget -- gadget )
+    board-first board-second { } 2sequence create-board ;
 
 : board-two ( gadget -- gadget )
     22 11 f make-board
@@ -75,6 +79,8 @@ SYMBOL: level
         { 5 2 } { 7 3 } { 5 4 } { 8 4 } { 5 7 } { 2 7 }
     } crate set-multicell
 
+    { } 1sequence 
+
     create-board ;
 
 : board ( -- seq )
@@ -101,23 +107,24 @@ SYMBOL: level
     } cond ;
 
 :: sokoban-move ( board move -- )
-    board player get-pos :> player-pos
-    board player-pos move v+ get-cell :> adjacent-cell
+    board first :> board-1
+    board-1 player get-pos :> player-pos
+    board-1 player-pos move v+ get-cell :> adjacent-cell
     ! Move player to free space or have player push crate if possible, otherwise do nothing
     {
         {
             [ adjacent-cell f = ] ! player can be moved to free space
-            [ board move player player-pos move-object ] 
+            [ board-1 move player player-pos move-object ] 
         }
         { 
             [ adjacent-cell crate = ] ! player is moving into a crate
-            [ board move player-pos move-crate ] 
+            [ board-1 move player-pos move-crate ] 
         }
-        {
-            [ adjacent-cell goal = ] ! player is moving into a goal
-            [ ]
-            ! [ board move { "vocab:sokoban2/resources/CharR.png" "vocab:sokoban2/resources/Goal.png" } player-pos move-object ]
-        }
+        ! {
+        !     [ adjacent-cell goal = ] ! player is moving into a goal
+        !     [ ]
+        !     ! [ board move { "vocab:sokoban2/resources/CharR.png" "vocab:sokoban2/resources/Goal.png" } player-pos move-object ]
+        ! }
         [ ] ! Else do nothing
     } cond ;
 
@@ -133,6 +140,7 @@ SYMBOL: level
     ! Don't really like this sequence of quotes thing -- would be nicer if board 
     ! could be an array of like ascii that gets created here or something
     level get-global board nth call( gadget -- gadget )
+    ! board
     game-logic
     display ;
 
