@@ -230,3 +230,7 @@ PRIVATE>
 : collect-value-by ( ... seq quot: ( ... obj -- ... key ) -- ... assoc )
     [ keep swap ] curry H{ } clone
     [ '[ @ [ second ] dip _ push-at ] each ] keep ; inline
+
+: histogram-diff ( hashtable1 hashtable2 -- hashtable3 )
+    [ neg swap pick at+ ] assoc-each
+    [ 0 > ] filter-values ;
