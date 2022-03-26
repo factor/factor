@@ -215,6 +215,8 @@ load-properties properties swap assoc-union! drop
 
 PRIVATE>
 
+ERROR: invalid-unicode-character name ;
+
 [
-    name-map at [ "Invalid character" throw ] unless*
+    name-map ?at [ invalid-unicode-character ] unless
 ] name>char-hook set-global
