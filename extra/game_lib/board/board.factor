@@ -154,14 +154,14 @@ TUPLE: board width height cells ;
 
 
 ! Helper function that formats a position cell pair
-:: label-cell ( y cell x -- seq )
+:: label-cell ( x cell y -- seq )
     { { x y } cell } ;
 
 ! Helper function that finds all cells in an given row that satisfy the quot 
 :: row-to-cells ( seq quot -- cells )
-    seq first2 :> ( x row )
+    seq first2 :> ( y row )
     row quot find-all :> indexed-cells
-    indexed-cells [ first2 x label-cell ] map ; inline
+    indexed-cells [ first2 y label-cell ] map ; inline
 
 ! Return a vector of position cell pairs of all cells in the board that satisfy the quot
 :: find-all-cells ( board quot -- assoc )
