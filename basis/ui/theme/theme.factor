@@ -1,6 +1,6 @@
 ! Copyright (C) 2016 Nicolas Pénet.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: colors colors.constants colors.hex namespaces ;
+USING: colors namespaces ;
 IN: ui.theme
 
 SYMBOL: theme
@@ -132,30 +132,30 @@ M: light-theme popup-color COLOR: yellow2 ;
 M: light-theme object-color COLOR: aquamarine2 ;
 M: light-theme contents-color COLOR: orchid2 ;
 
-M: light-theme help-header-background HEXCOLOR: F4EFD9 ;
+M: light-theme help-header-background COLOR: #F4EFD9 ;
 
-M: light-theme thread-status-stopped-background HEXCOLOR: F4D9D9 ;
-M: light-theme thread-status-suspended-background HEXCOLOR: F4EAD9 ;
-M: light-theme thread-status-running-background HEXCOLOR: EDF4D9 ;
+M: light-theme thread-status-stopped-background COLOR: #F4D9D9 ;
+M: light-theme thread-status-suspended-background COLOR: #F4EAD9 ;
+M: light-theme thread-status-running-background COLOR: #EDF4D9 ;
 
-M: light-theme thread-status-stopped-foreground HEXCOLOR: F42300 ;
-M: light-theme thread-status-suspended-foreground HEXCOLOR: F37B00 ;
-M: light-theme thread-status-running-foreground HEXCOLOR: 3FCA00 ;
+M: light-theme thread-status-stopped-foreground COLOR: #F42300 ;
+M: light-theme thread-status-suspended-foreground COLOR: #F37B00 ;
+M: light-theme thread-status-running-foreground COLOR: #3FCA00 ;
 
-M: light-theme error-summary-background HEXCOLOR: F4D9D9 ;
+M: light-theme error-summary-background COLOR: #F4D9D9 ;
 
 M: light-theme content-background COLOR: white ;
 M: light-theme text-color COLOR: black ;
 
-M: light-theme link-color COLOR: DodgerBlue4 ;
+M: light-theme link-color COLOR: #2A5DB0 ;
 M: light-theme title-color COLOR: gray20 ;
 M: light-theme heading-color COLOR: FactorDarkSlateBlue ;
 M: light-theme snippet-color COLOR: DarkOrange4 ;
 M: light-theme output-color COLOR: DarkOrange4 ;
-M: light-theme deprecated-background-color HEXCOLOR: F4EAD9 ;
-M: light-theme deprecated-border-color HEXCOLOR: F37B00 ;
-M: light-theme warning-background-color HEXCOLOR: F4D9D9 ;
-M: light-theme warning-border-color HEXCOLOR: F42300 ;
+M: light-theme deprecated-background-color COLOR: #F4EAD9 ;
+M: light-theme deprecated-border-color COLOR: #F37B00 ;
+M: light-theme warning-background-color COLOR: #F4D9D9 ;
+M: light-theme warning-border-color COLOR: #F42300 ;
 M: light-theme code-background-color COLOR: FactorLightTan ;
 M: light-theme help-path-border-color COLOR: grey95 ;
 
@@ -184,10 +184,10 @@ M: light-theme table-border-color COLOR: FactorTan ;
 
 SINGLETON: dark-theme
 
-M: dark-theme toolbar-background COLOR: solarized-base02 ;
+M: dark-theme toolbar-background COLOR: #202124 ;
 M: dark-theme toolbar-button-pressed-background COLOR: solarized-base0 ;
 
-M: dark-theme menu-background COLOR: solarized-base02 ;
+M: dark-theme menu-background COLOR: #202124 ;
 M: dark-theme menu-border-color COLOR: solarized-base01 ;
 
 M: dark-theme status-bar-background COLOR: FactorDarkSlateBlue ;
@@ -198,7 +198,7 @@ M: dark-theme button-clicked-text-color COLOR: white ;
 
 M: dark-theme line-color COLOR: solarized-base01 ;
 
-M: dark-theme column-title-background HEXCOLOR: 2F4D5B ;
+M: dark-theme column-title-background COLOR: #2F4D5B ;
 
 M: dark-theme roll-button-rollover-border COLOR: gray50 ;
 M: dark-theme roll-button-selected-background COLOR: dark-gray ;
@@ -221,36 +221,36 @@ M: dark-theme popup-color COLOR: solarized-yellow ;
 M: dark-theme object-color COLOR: solarized-cyan ;
 M: dark-theme contents-color COLOR: solarized-magenta ;
 
-M: dark-theme help-header-background HEXCOLOR: 2F4D5B ;
+M: dark-theme help-header-background COLOR: #2F4D5B ;
 
-M: dark-theme thread-status-stopped-background HEXCOLOR: 492d33 ;
-M: dark-theme thread-status-suspended-background HEXCOLOR: 3c4a24 ;
-M: dark-theme thread-status-running-background HEXCOLOR: 2c4f24 ;
+M: dark-theme thread-status-stopped-background COLOR: #492d33 ;
+M: dark-theme thread-status-suspended-background COLOR: #3c4a24 ;
+M: dark-theme thread-status-running-background COLOR: #2c4f24 ;
 
 M: dark-theme thread-status-stopped-foreground COLOR: solarized-red ;
 M: dark-theme thread-status-suspended-foreground COLOR: solarized-yellow ;
 M: dark-theme thread-status-running-foreground COLOR: solarized-green ;
 
-M: dark-theme error-summary-background HEXCOLOR: 6E2E32 ;
+M: dark-theme error-summary-background COLOR: #6E2E32 ;
 
-M: dark-theme content-background COLOR: solarized-base03 ;
-M: dark-theme text-color COLOR: grey75 ;
+M: dark-theme content-background COLOR: #202124 ;
+M: dark-theme text-color COLOR: #bdc1c6 ;
 
-M: dark-theme link-color COLOR: solarized-blue ;
+M: dark-theme link-color COLOR: #8ab4f8 ;
 M: dark-theme title-color COLOR: grey75 ;
 M: dark-theme heading-color COLOR: grey75 ;
 M: dark-theme snippet-color COLOR: solarized-orange ;
 M: dark-theme output-color COLOR: solarized-orange ;
-M: dark-theme deprecated-background-color HEXCOLOR: 3c4a24 ;
+M: dark-theme deprecated-background-color COLOR: #3c4a24 ;
 M: dark-theme deprecated-border-color COLOR: solarized-yellow ;
-M: dark-theme warning-background-color HEXCOLOR: 492d33 ;
+M: dark-theme warning-background-color COLOR: #492d33 ;
 M: dark-theme warning-border-color COLOR: solarized-red ;
-M: dark-theme code-background-color HEXCOLOR: 2F4D5B ;
+M: dark-theme code-background-color COLOR: #2F4D5B ;
 M: dark-theme help-path-border-color COLOR: solarized-base02 ;
 
-M: dark-theme tip-background-color HEXCOLOR: 2F4D5B ;
+M: dark-theme tip-background-color COLOR: #2F4D5B ;
 
-M: dark-theme prompt-background-color HEXCOLOR: 922f31 ;
+M: dark-theme prompt-background-color COLOR: #922f31 ;
 
 M: dark-theme dim-color COLOR: solarized-cyan ;
 M: dark-theme highlighted-word-color COLOR: solarized-green ;

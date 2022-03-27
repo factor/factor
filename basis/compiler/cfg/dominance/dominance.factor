@@ -1,7 +1,7 @@
 ! Copyright (C) 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors assocs combinators compiler.cfg.predecessors
-compiler.cfg.rpo deques dlists fry kernel locals math math.order
+compiler.cfg.rpo deques dlists kernel math math.order
 namespaces sequences sorting vectors ;
 IN: compiler.cfg.dominance
 

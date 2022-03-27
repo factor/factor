@@ -1,9 +1,9 @@
 ! Copyright (C) 2008, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors assocs combinators fry furnace.conversations
-furnace.utilities html.forms http http.server
-http.server.responses kernel namespaces sequences splitting urls
-validators ;
+USING: accessors assocs combinators furnace.conversations
+furnace.utilities html.forms html.templates.chloe http
+http.server http.server.responses kernel namespaces sequences
+splitting urls validators ;
 FROM: html.templates.chloe => <chloe> ;
 IN: furnace.actions
 
@@ -57,7 +57,7 @@ CONSTANT: revalidate-url-key "__u"
 : validation-failed ( -- * )
     post-request? revalidate-url and [
         begin-conversation
-        nested-forms-key param " " split harvest nested-forms cset
+        nested-forms-key param split-words harvest nested-forms cset
         form get form cset
         <continue-conversation>
     ] [ <400> ] if*

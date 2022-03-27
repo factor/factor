@@ -1,16 +1,16 @@
 ! Copyright (C) 2019 Alexander Ilin.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: fry literals math.ranges random sequences ;
+USING: fry literals ranges random sequences ;
 IN: random.passwords
 
 <PRIVATE
 
-CONSTANT: ascii-printable-charset $[ 33 126 [a,b] ]
+CONSTANT: ascii-printable-charset $[ 33 126 [a..b] ]
 CONSTANT: hex-charset "0123456789ABCDEF"
 CONSTANT: alphanum-charset $[
-    CHAR: 0 CHAR: 9 [a,b]
-    CHAR: a CHAR: z [a,b] append
-    CHAR: A CHAR: Z [a,b] append ]
+    CHAR: 0 CHAR: 9 [a..b]
+    CHAR: a CHAR: z [a..b] append
+    CHAR: A CHAR: Z [a..b] append ]
 
 PRIVATE>
 

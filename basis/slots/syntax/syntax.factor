@@ -1,6 +1,6 @@
 ! Copyright (C) 2010 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: combinators combinators.smart fry kernel lexer quotations
+USING: combinators combinators.smart kernel lexer quotations
 sequences sequences.generalizations slots words ;
 IN: slots.syntax
 
@@ -10,7 +10,7 @@ SYNTAX: slots[
 
 SYNTAX: slots{
     "}" [ reader-word 1quotation ] map-tokens
-    '[ [ _ cleave ] output>array ] append! ;
+    '[ _ cleave>array ] append! ;
 
 : >>writer-word ( name -- word )
     ">>" prepend "accessors" lookup-word ;

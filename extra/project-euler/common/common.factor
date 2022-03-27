@@ -1,9 +1,9 @@
 ! Copyright (c) 2007-2010 Aaron Schaefer.
 ! The contents of this file are licensed under the Simplified BSD License
 ! A copy of the license is available at http://factorcode.org/license.txt
-USING: accessors arrays byte-arrays fry hints kernel lists make
+USING: accessors arrays byte-arrays hints kernel lists make
 math math.functions math.matrices math.order math.parser
-math.primes.factors math.primes.lists math.ranges math.ratios
+math.primes.factors math.primes.lists ranges math.ratios
 math.vectors parser prettyprint sequences sorting strings
 unicode vocabs.parser words ;
 IN: project-euler.common
@@ -125,7 +125,7 @@ PRIVATE>
 <PRIVATE
 
 : (sum-divisors) ( n -- sum )
-    dup sqrt >integer [1,b] [
+    dup sqrt >integer [1..b] [
         [ 2dup divisor? [ 2dup / + , ] [ drop ] if ] each
         dup perfect-square? [ sqrt >fixnum neg , ] [ drop ] if
     ] { } make sum ;
@@ -155,7 +155,7 @@ PRIVATE>
 : tau* ( m -- n )
     factor-2s dup [ 1 + ]
     [ perfect-square? -1 0 ? ]
-    [ dup sqrt >fixnum [1,b] ] tri* [
+    [ dup sqrt >fixnum [1..b] ] tri* [
         dupd divisor? [ [ 2 + ] dip ] when
     ] each drop * ;
 

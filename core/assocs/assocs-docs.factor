@@ -124,7 +124,7 @@ ARTICLE: "assocs-conversions" "Associative mapping conversions"
 "Converting to other assocs:"
 { $subsections assoc-clone-like }
 "Combining a sequence of assocs into a single assoc:"
-{ $subsections assoc-combine }
+{ $subsections assoc-union-all }
 "Creating an assoc from key/value sequences:"
 { $subsections zip zip-as }
 "Creating an assoc from key/value sequences and their indices:"
@@ -332,7 +332,7 @@ HELP: assoc-all?
 { $values { "assoc" assoc } { "quot" { $quotation ( ... key value -- ... ? ) } } { "?" boolean } }
 { $description "Tests if all entries in the assoc satisfy a predicate by applying the quotation to each entry in turn. a predicate quotation to entry in the assoc. Iteration stops if an entry is found for which the quotation outputs " { $link f } ". If the assoc is empty, always outputs " { $link t } "." } ;
 
-HELP: assoc-refine
+HELP: assoc-intersect-all
 { $values { "seq" sequence } { "assoc" assoc } }
 { $description "Outputs the intersection of all the assocs of the assocs sequence " { $snippet "seq" } ", or " { $link f } " if " { $snippet "seq" } " is empty." } ;
 
@@ -513,12 +513,12 @@ HELP: assoc-clone-like
 { $description "Outputs a newly-allocated assoc with the same elements as " { $snippet "assoc" } "." }
 { $examples { $example "USING: prettyprint assocs hashtables ;" "H{ { 1 2 } { 3 4 } } { } assoc-clone-like ." "{ { 1 2 } { 3 4 } }" } } ;
 
-HELP: assoc-combine
+HELP: assoc-union-all
 { $values
      { "seq" "a sequence of assocs" }
      { "union" assoc } }
 { $description "Takes the union of all of the " { $snippet "assocs" } " in " { $snippet "seq" } "." }
-{ $examples { $example "USING: prettyprint assocs ;" "{ H{ { 1 2 } } H{ { 3 4 } } } assoc-combine ." "H{ { 1 2 } { 3 4 } }" } } ;
+{ $examples { $example "USING: prettyprint assocs ;" "{ H{ { 1 2 } } H{ { 3 4 } } } assoc-union-all ." "H{ { 1 2 } { 3 4 } }" } } ;
 
 HELP: assoc-map-as
 { $values

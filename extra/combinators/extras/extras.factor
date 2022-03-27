@@ -1,8 +1,8 @@
 ! Copyright (C) 2013 Doug Coleman, John Benediktsson.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: arrays assocs combinators combinators.smart fry
-generalizations kernel locals macros math math.order namespaces
-quotations sequences sequences.generalizations sequences.private
+USING: arrays assocs combinators combinators.smart
+generalizations kernel math math.order namespaces quotations
+sequences sequences.generalizations sequences.private
 stack-checker.transforms system words ;
 IN: combinators.extras
 

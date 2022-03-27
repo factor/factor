@@ -3,7 +3,7 @@
 USING: accessors arrays assocs combinators fry io
 io.encodings.binary io.files io.pathnames kernel lexer make math
 math.parser namespaces parser peg peg.ebnf peg.parsers
-quotations sequences sequences.deep words multiline ;
+quotations sequences sequences.deep words multiline splitting ;
 IN: cpu.8080.emulator
 
 TUPLE: cpu b c d e f h l a pc sp halted? last-interrupt cycles
@@ -453,7 +453,7 @@ SYMBOL: rom-root
 
 : rom-dir ( -- string )
     rom-root get [
-        home "roms" append-path dup exists? [ drop f ] unless
+        home "roms" append-path dup file-exists? [ drop f ] unless
     ] unless* ;
 
 : load-rom* ( seq cpu -- )
@@ -1375,7 +1375,7 @@ SYMBOL: last-opcode
     ! Process the list of strings, which should make
     ! up an 8080 instruction, and output a quotation
     ! that would implement that instruction.
-    dup " " join instruction-quotations
+    dup join-words instruction-quotations
     [
        "_" join [ "emulate-" % % ] "" make create-word-in
        dup last-instruction set-global

@@ -355,7 +355,7 @@ these lines in your .emacs:
                 "RENAME:"
                 "SINGLETON:" "SLOT:" "SPECIALIZED-ARRAY:"
                 "TYPEDEF:"
-                "USE:")))
+                "REUSE:" "USE:")))
 
 (defconst factor-begin-of-def-regex
   (format "^USING: \\|\\(%s\\)\\|\\(^%s .*\\)"

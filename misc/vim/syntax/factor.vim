@@ -114,6 +114,12 @@ syn match   factorComment           /\v<!>.*$/ contains=@factorCommentContents
 syn cluster factorCommentContents   contains=factorTodo,@Spell
 syn match   factorTodo              /\v(TODO|FIXME|XXX):=/ contained
 
+syn match   factorInit              /\v<%(STARTUP-HOOK|SHUTDOWN-HOOK):>/     display
+
+syn cluster factorHelp              contains=factorHelp
+syn region  factorHelp              start=/\v<HELP:>/            skip=/\v<!>.*/     end=/\v<\S+>/   contains=@factorComment
+syn match   factorHelp              /\v<%(ARTICLE|ABOUT):>/     display
+
 syn region  factorDefn  matchgroup=NONE  start=/\v<%(SYNTAX|CONSTRUCTOR|%(M|MACRO|MEMO|TYPED)?:?):>/  skip=/\v<!>.*/  matchgroup=factorDefnDelims  end=/\v<;>/  contains=factorDefnDelims,@factorCluster keepend transparent
 syn region  factorDefnDelims        start=/\v<SYNTAX:>/                            skip=/\v<!>.*/  end=/\v<\S+>/  contains=@factorComment skipempty keepend contained
 syn region  factorDefnDelims        start=/\v<%(MACRO|MEMO|TYPED)?:?:>/            skip=/\v<!>.*/  end=/\v<\S+>/  contains=@factorComment nextgroup=factorEffectSkip skipempty keepend contained
@@ -126,7 +132,8 @@ syn region  factorDeclDelims        start=/\v<HOOK:>/                           
 syn region  factorDeclDelims        start=/\v<C:>/                                 skip=/\v<!>.*/  end=/\v<\S+%(\_\s+%(!>.*)?)+\S+>/   contains=@factorComment skipempty keepend
 
 syn region  factorPDefn  matchgroup=NONE  start=/\v<%(SYNTAX|CONSTRUCTOR|%(M|MACRO|MEMO|TYPED)?:?):>/  skip=/\v<!>.*/  matchgroup=factorPDefnDelims  end=/\v<;>/  contains=factorPDefnDelims,@factorCluster keepend contained
-syn region  factorPDefnDelims       start=/\v<%(SYNTAX|%(MACRO|MEMO|TYPED)?:?):>/  skip=/\v<!>.*/  end=/\v<\S+>/                       contains=@factorComment nextgroup=factorEffectSkip skipempty keepend contained
+syn region  factorPDefnDelims       start=/\v<SYNTAX:>/                            skip=/\v<!>.*/  end=/\v<\S+>/                       contains=@factorComment skipempty keepend contained
+syn region  factorPDefnDelims       start=/\v<%(MACRO|MEMO|TYPED)?:?:>/            skip=/\v<!>.*/  end=/\v<\S+>/                       contains=@factorComment nextgroup=factorEffectSkip skipempty keepend contained
 syn region  factorPDefnDelims       start=/\v<M:>/                                 skip=/\v<!>.*/  end=/\v<\S+%(\_\s+%(!>.*)?)+\S+>/   contains=@factorComment skipempty keepend contained
 syn region  factorPDefnDelims       start=/\v<M::>/                                skip=/\v<!>.*/  end=/\v<\S+%(\_\s+%(!>.*)?)+\S+>/   contains=@factorComment nextgroup=factorEffectSkip skipempty keepend contained
 syn region  factorPDefnDelims       start=/\v<CONSTRUCTOR:>/                       skip=/\v<!>.*/  end=/\v<\S+%(\_\s+%(!>.*)?)+\S+>/   contains=@factorComment nextgroup=factorEffectSkip skipempty keepend contained
@@ -168,50 +175,50 @@ syn cluster factorNumber            contains=@factorReal,factorComplex
 syn cluster factorInteger           contains=factorInteger
 if !exists('g:factor_syn_no_error') " more general
   syn cluster factorInteger         add=factorIntegerError
-  syn match   factorIntegerError    /\v<[+-]=%(\d|,){-}\d%(\d|,)*>/
+  syn match   factorIntegerError    /\v<[+-]=%(\d|,|_){-}\d%(\d|,|_)*>/
 endif
-syn match   factorInteger           /\v<[+-]=\d%(\d|,)*,@1<!>/
+syn match   factorInteger           /\v<[+-]=\d%(\d|,|_)*,@1<!>/
 
 syn cluster factorFloat             contains=factorFloat
 if !exists('g:factor_syn_no_error') " more general
   syn cluster factorFloat           add=factorFloatError
-  syn match   factorFloatError      /\v<[+-]=%(\S{-}\d&%(\d|,)*%([eE][+-]=%(\d|,)*|\.%(\d|,)*%([eE][+-]=%(\d|,)*)?)|\.%(\d|,)+%([eE][+-]=%(\d|,)*)?)>/
+  syn match   factorFloatError      /\v<[+-]=%(\S{-}\d&%(\d|,|_)*%([eE][+-]=%(\d|,|_)*|\.%(\d|,|_)*%([eE][+-]=%(\d|,|_)*)?)|\.%(\d|,|_)+%([eE][+-]=%(\d|,|_)*)?)>/
 endif
-syn match   factorFloat             /\v<[+-]=%(\d%(\d|,)*,@1<!%([eE][+-]=\d%(\d|,)*,@1<!|\.%(\d%(\d|,)*,@1<!)?%([eE][+-]=\d%(\d|,)*,@1<!)?)|\.\d%(\d|,)*,@1<!%([eE][+-]=\d%(\d|,)*,@1<!)?)>/
+syn match   factorFloat             /\v<[+-]=%(\d%(\d|,|_)*,@1<!%([eE][+-]=\d%(\d|,|_)*,@1<!|\.%(\d%(\d|,|_)*,@1<!)?%([eE][+-]=\d%(\d|,|_)*,@1<!)?)|\.\d%(\d|,|_)*,@1<!%([eE][+-]=\d%(\d|,|_)*,@1<!)?)>/
 
 syn cluster factorRatio             contains=factorRatio
 if !exists('g:factor_syn_no_error') " more general
   syn cluster factorRatio           add=factorRatioError
-  syn match   factorRatioError      /\v<[+-]=%(\S{-}\d.{-}\/&%(\d|,)*\.?%(\d|,)*%([+-]%(\d|,)*)?)\/[+-]=%(\S{-}\d&%(\d|,)*\.?%(\d|,)*%([eE][+-]=%(\d|,)*)?)>/
+  syn match   factorRatioError      /\v<[+-]=%(\S{-}\d.{-}\/&%(\d|,|_)*\.?%(\d|,|_)*%([+-]%(\d|,|_)*)?)\/[+-]=%(\S{-}\d&%(\d|,|_)*\.?%(\d|,|_)*%([eE][+-]=%(\d|,|_)*)?)>/
 endif
-syn match   factorRatio             /\v<([+-]=)\d%(\d|,)*,@1<!%(\1@=[+-](\d%(\d|,)*,@1<!)\/\2@!\d%(\d|,)*,@1<!|\/%(\d%(\d|,)*,@1<!%(\.%(\d%(\d|,)*,@1<!)?)?|\.\d%(\d|,)*,@1<!)%([eE][+-]=\d%(\d|,)*,@1<!)?)%(\/0)@2<!>/
+syn match   factorRatio             /\v<([+-]=)\d%(\d|,|_)*,@1<!%(\1@=[+-](\d%(\d|,|_)*,@1<!)\/\2@!\d%(\d|,|_)*,@1<!|\/%(\d%(\d|,|_)*,@1<!%(\.%(\d%(\d|,|_)*,@1<!)?)?|\.\d%(\d|,|_)*,@1<!)%([eE][+-]=\d%(\d|,|_)*,@1<!)?)%(\/0)@2<!>/
 
 syn region  factorComplex           start=/\v<C\{>/   skip=/\v<!>.*/ end=/\v<\}>/    contains=@factorComment,@factorReal
 
 syn cluster factorBin               contains=factorBin
 if !exists('g:factor_syn_no_error')
   syn cluster factorBin             add=factorBinError
-  syn match   factorBinError        /\v<[+-]=0[bB]%(\S{-}\w&%(\w|,)*\.?%(\w|,)*%([pP][+-]=%(\w|,)*)?)>/
+  syn match   factorBinError        /\v<[+-]=0[bB]%(\S{-}\w&%(\w|,|_)*\.?%(\w|,|_)*%([pP][+-]=%(\w|,|_)*)?)>/
 endif
-syn match   factorBin               /\v<[+-]=0[bB]%([01][01,]*,@1<!%(\.%([01][01,]*,@1<!)?)?|\.[01][01,]*,@1<!)%([pP][+-]=\d%(\d|,)*,@1<!)?>/
+syn match   factorBin               /\v<[+-]=0[bB]%([01][01,_]*,@1<!%(\.%([01][01,_]*,@1<!)?)?|\.[01][01,_]*,@1<!)%([pP][+-]=\d%(\d|,|_)*,@1<!)?>/
 
 syn cluster factorOct               contains=factorOct
 if !exists('g:factor_syn_no_error')
   syn cluster factorOct             add=factorOctError
-  syn match   factorOctError        /\v<[+-]=0[oO]%(\S{-}\o&%(\w|,)*\.?(\w|,)*%([pP][+-]=%(\w|,)*)?)>/
+  syn match   factorOctError        /\v<[+-]=0[oO]%(\S{-}\o&%(\w|,|_)*\.?(\w|,|_)*%([pP][+-]=%(\w|,|_)*)?)>/
 endif
-syn match   factorOct               /\v<[+-]=0[oO]%(\o%(\o|,)*,@1<!%(\.%(\o%(\o|,)*,@1<!)?)?|\.\o%(\o|,)*,@1<!)%([pP][+-]=\d%(\d|,)*,@1<!)?>/
+syn match   factorOct               /\v<[+-]=0[oO]%(\o%(\o|,|_)*,@1<!%(\.%(\o%(\o|,|_)*,@1<!)?)?|\.\o%(\o|,|_)*,@1<!)%([pP][+-]=\d%(\d|,|_)*,@1<!)?>/
 
 syn cluster factorHex               contains=factorHex
 syn cluster factorHexNoRadix        contains=factorHexNoRadix
 if !exists('g:factor_syn_no_error')
   syn cluster factorHex             add=factorHexError
-  syn match   factorHexError        /\v<[+-]=0[xX]%(\S{-}\x&%(\x|,)*\.?(\x|,)*%([pP][+-]=%(\w|,)*)?)>/
+  syn match   factorHexError        /\v<[+-]=0[xX]%(\S{-}\x&%(\x|,|_)*\.?(\x|,|_)*%([pP][+-]=%(\w|,|_)*)?)>/
   syn cluster factorHexNoRadix      add=factorHexNoRadixError
-  syn match   factorHexNoRadixError /\v<[+-]=%(\S{-}\x&%(\w|,)*\.?(\w|,)*%([pP][+-]=%(\w|,)*)?)>/   contained
+  syn match   factorHexNoRadixError /\v<[+-]=%(\S{-}\x&%(\w|,|_)*\.?(\w|,|_)*%([pP][+-]=%(\w|,|_)*)?)>/   contained
 endif
-syn match   factorHex               /\v<[+-]=0[xX]%(\x%(\x|,)*,@1<!%(\.%(\x%(\x|,)*,@1<!)?)?|\.\x%(\x|,)*,@1<!)%([pP][+-]=\d%(\d|,)*,@1<!)?>/
-syn match   factorHexNoRadix        /\v<[+-]=%(\x%(\x|,)*,@1<!%(\.%(\x%(\x|,)*,@1<!)?)?|\.\x%(\x|,)*,@1<!)%([pP][+-]=\d%(\d|,)*,@1<!)?>/  contained
+syn match   factorHex               /\v<[+-]=0[xX]%(\x%(\x|,|_)*,@1<!%(\.%(\x%(\x|,|_)*,@1<!)?)?|\.\x%(\x|,|_)*,@1<!)%([pP][+-]=\d%(\d|,|_)*,@1<!)?>/
+syn match   factorHexNoRadix        /\v<[+-]=%(\x%(\x|,|_)*,@1<!%(\.%(\x%(\x|,|_)*,@1<!)?)?|\.\x%(\x|,|_)*,@1<!)%([pP][+-]=\d%(\d|,|_)*,@1<!)?>/  contained
 
 syn region  factorNan matchgroup=factorNan    start=/\v<NAN:>/ matchgroup=NONE skip=/\v<!>.*/   end=/\v<\S+>/   contains=@factorComment,@factorHexNoRadix keepend
 
@@ -272,8 +279,6 @@ syn region  factorUsing             start=/\v<USING:>/           skip=/\v<!>.*/ 
 
 syn cluster factorWordOps   contains=factorConstant,factorAlias,factorSingleton,factorSingletons,factorSymbol,factorSymbols,factorPostpone,factorDefer,factorForget,factorMixin,factorInstance,factorHook,factorMain
 
-" HELP:
-" ARTICLE:
 " C-ENUM:
 " FUNCTION:
 " TYPEDEF:
@@ -384,6 +389,7 @@ if !exists('g:factor_syn_no_init')
   HiLink   factorLocalsSpecifier        Operator
   HiLink   factorBoolean                Boolean
   HiLink   factorBreakpoint             Debug
+  HiLink   factorInit                   Typedef
   HiLink   factorDefnDelims             Typedef
   HiLink   factorDeclDelims             Typedef
   HiLink   factorPrivate                Special
@@ -430,6 +436,7 @@ if !exists('g:factor_syn_no_init')
   HiLink   factorHook                   Typedef
   HiLink   factorMain                   Define
   HiLink   factorPostpone               Define
+  HiLink   factorHelp                   Define
   HiLink   factorDefer                  Define
   HiLink   factorForget                 Define
   HiLink   factorAlien                  Define

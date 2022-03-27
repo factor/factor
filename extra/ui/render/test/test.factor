@@ -4,7 +4,7 @@ USING: accessors colors arrays kernel sequences math byte-arrays
 namespaces grouping fry cap images.bitmap ui.gadgets ui.gadgets.packs
 ui.gadgets.borders ui.gadgets.grids ui.gadgets.grid-lines
 ui.gadgets.labels ui.gadgets.buttons ui.pens ui.pens.solid ui.render
-ui opengl opengl.gl colors.constants images images.loader ;
+ui opengl opengl.gl images images.loader ;
 IN: ui.render.test
 
 SINGLETON: line-test

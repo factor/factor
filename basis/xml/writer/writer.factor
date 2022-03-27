@@ -1,8 +1,8 @@
 ! Copyright (C) 2005, 2009 Daniel Ehrenberg
 ! See http://factorcode.org/license.txt for BSD license.
-USING: hashtables kernel math namespaces sequences strings
-assocs combinators io io.streams.string accessors
-xml.data wrap.strings xml.entities unicode fry ;
+USING: accessors assocs combinators io io.streams.string kernel
+namespaces sequences strings unicode wrap.strings xml.data
+xml.entities ;
 IN: xml.writer
 
 SYMBOL: sensitive-tags
@@ -34,7 +34,7 @@ SYMBOL: indentation
 : ?filter-children ( children -- no-whitespace )
     xml-pprint? get [
         [ dup string? [ [ blank? ] trim ] when ] map
-        [ "" = ] reject
+        "" swap remove
     ] when ;
 
 PRIVATE>
@@ -101,6 +101,9 @@ M: unescaped write-xml
 
 M: comment write-xml
     "<!--" write text>> write "-->" write ;
+
+M: cdata write-xml
+    "<![CDATA[" write text>> write "]]>" write ;
 
 : write-decl ( decl name quot: ( decl -- slot ) -- )
     "<!" write swap write bl

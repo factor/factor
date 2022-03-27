@@ -1,10 +1,8 @@
 ! Copyright (C) 2008 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: arrays assocs db kernel math math.parser
-sequences continuations sequences.deep prettyprint
-words namespaces slots slots.private classes mirrors
-classes.tuple combinators calendar.format classes.singleton
-accessors quotations random db.private ;
+USING: accessors arrays assocs classes classes.tuple combinators
+db kernel math math.parser mirrors sequences sequences.deep
+splitting words ;
 IN: db.types
 
 HOOK: persistent-table db-connection ( -- hash )
@@ -139,7 +137,7 @@ ERROR: no-sql-type type ;
     ] if ;
 
 : modifiers ( spec -- string )
-    modifiers>> [ lookup-modifier ] map " " join
+    modifiers>> [ lookup-modifier ] map join-words
     [ "" ] [ " " prepend ] if-empty ;
 
 HOOK: bind% db-connection ( spec -- )

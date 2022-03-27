@@ -1,8 +1,9 @@
-USING: accessors arrays assocs calendar colors.constants
-combinators game.input grouping kernel math math.parser
-math.vectors sequences threads timers ui ui.gadgets
-ui.gadgets.borders ui.gadgets.buttons ui.gadgets.labels
-ui.gadgets.packs ui.pens.polygon ui.pens.solid ;
+USING: accessors arrays assocs calendar colors combinators
+game.input grouping kernel math math.parser math.vectors
+sequences threads timers ui ui.gadgets ui.gadgets.borders
+ui.gadgets.buttons ui.gadgets.labels ui.gadgets.packs
+ui.pens.polygon ui.pens.solid ;
+
 IN: game.input.demos.joysticks
 
 CONSTANT: SIZE { 151 151 }

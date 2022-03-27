@@ -1,5 +1,5 @@
-USING: arrays kernel math opengl opengl.gl opengl.glu
-opengl.demo-support ui ui.gadgets ui.render literals accessors ;
+USING: accessors kernel literals math opengl.demo-support
+opengl.gl opengl.glu ui ui.gadgets ui.render ;
 IN: nehe.3
 
 TUPLE: nehe3-gadget < gadget ;

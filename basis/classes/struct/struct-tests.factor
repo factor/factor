@@ -22,6 +22,13 @@ SYMBOL: struct-test-empty
 [ [ struct-test-empty { } define-struct-class ] with-compilation-unit ]
 [ struct-must-have-slots? ] must-fail-with
 
+STRUCT: struct-test-readonly
+    { x uint read-only } ;
+
+{ S{ struct-test-readonly f 10 } } [
+    10 struct-test-readonly <struct-boa>
+] unit-test
+
 STRUCT: struct-test-foo
     { x char }
     { y int initial: 123 }
@@ -33,6 +40,8 @@ STRUCT: struct-test-bar
 
 { 12 } [ struct-test-foo heap-size ] unit-test
 { 12 } [ struct-test-foo <struct> byte-length ] unit-test
+{ t } [ [ struct-test-foo new ] { <struct> } inlined? ] unit-test
+{ t } [ [ struct-test-foo boa ] { <struct-boa> } inlined? ] unit-test
 { 16 } [ struct-test-bar heap-size ] unit-test
 { 123 } [ struct-test-foo <struct> y>> ] unit-test
 { 123 } [ struct-test-bar <struct> foo>> y>> ] unit-test

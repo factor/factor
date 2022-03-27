@@ -4,7 +4,7 @@ USING: accessors arrays classes.tuple combinators
 combinators.short-circuit kernel literals math math.functions
 math.intervals math.order math.statistics sequences slots.syntax
 system vocabs vocabs.loader ;
-FROM: math.ranges => [a..b) ;
+FROM: ranges => [a..b) ;
 IN: calendar
 
 ERROR: not-in-interval value interval ;
@@ -41,7 +41,7 @@ TUPLE: timestamp
 <<
 CONSTANT: day-counts { 0 31 28 31 30 31 30 31 31 30 31 30 31 }
 >>
-CONSTANT: days-until $[ day-counts cum-sum0 ]
+CONSTANT: cumulative-day-counts $[ day-counts cum-sum0 ]
 
 PRIVATE>
 
@@ -56,14 +56,14 @@ M: timestamp leap-year?
 : (days-in-month) ( year month -- n )
     dup 2 = [ drop leap-year? 29 28 ? ] [ nip day-counts nth ] if ;
 
-:: <timestamp> ( year month day hour minute second gmt-offset -- timestamp )
-    year
-    month 1 12 [a,b] check-interval
-    day 1 year month (days-in-month) [a,b] check-interval
-    hour 0 23 [a,b] check-interval
-    minute 0 59 [a,b] check-interval
-    second 0 60 [a,b) check-interval
-    gmt-offset timestamp boa ;
+:: <timestamp> ( $year $month $day $hour $minute $second $gmt-offset -- timestamp )
+    $year
+    $month 1 12 [a,b] check-interval
+    $day 1 $year $month (days-in-month) [a,b] check-interval
+    $hour 0 23 [a,b] check-interval
+    $minute 0 59 [a,b] check-interval
+    $second 0 60 [a,b) check-interval
+    $gmt-offset timestamp boa ;
 
 M: timestamp clone (clone) [ clone ] change-gmt-offset ;
 
@@ -89,44 +89,44 @@ CONSTANT: hours-per-year 876582/100
 CONSTANT: minutes-per-year 5259492/10
 CONSTANT: seconds-per-year 31556952
 
-:: julian-day-number ( year month day -- n )
+:: julian-day-number ( $year $month $day -- n )
     ! Returns a composite date number
     ! Not valid before year -4800
-    14 month - 12 /i :> a
-    year 4800 + a - :> y
-    month 12 a * + 3 - :> m
+    14 $month - 12 /i :> $a
+    $year 4800 + $a - :> $y
+    $month 12 $a * + 3 - :> $m
 
-    day 153 m * 2 + 5 /i + 365 y * +
-    y 4 /i + y 100 /i - y 400 /i + 32045 - ;
+    $day 153 $m * 2 + 5 /i + 365 $y * +
+    $y 4 /i + $y 100 /i - $y 400 /i + 32045 - ;
 
-:: julian-day-number>date ( n -- year month day )
+:: julian-day-number>date ( $n -- year month day )
     ! Inverse of julian-day-number
-    n 32044 + :> a
-    4 a * 3 + 146097 /i :> b
-    a 146097 b * 4 /i - :> c
-    4 c * 3 + 1461 /i :> d
-    c 1461 d * 4 /i - :> e
-    5 e * 2 + 153 /i :> m
+    $n 32044 + :> $a
+    4 $a * 3 + 146097 /i :> $b
+    $a 146097 $b * 4 /i - :> $c
+    4 $c * 3 + 1461 /i :> $d
+    $c 1461 $d * 4 /i - :> $e
+    5 $e * 2 + 153 /i :> $m
 
-    100 b * d + 4800 -
-    m 10 /i + m 3 +
-    12 m 10 /i * -
-    e 153 m * 2 + 5 /i - 1 + ;
+    100 $b * $d + 4800 -
+    $m 10 /i + $m 3 +
+    12 $m 10 /i * -
+    $e 153 $m * 2 + 5 /i - 1 + ;
 
 GENERIC: easter ( obj -- obj' )
 
-:: easter-month-day ( year -- month day )
-    year 19 mod :> a
-    year 100 /mod :> ( b c )
-    b 4 /mod :> ( d e )
-    b 8 + 25 /i :> f
-    b f - 1 + 3 /i :> g
-    19 a * b + d - g - 15 + 30 mod :> h
-    c 4 /mod :> ( i k )
-    32 2 e * + 2 i * + h - k - 7 mod :> l
-    a 11 h * + 22 l * + 451 /i :> m
+:: easter-month-day ( $year -- month day )
+    $year 19 mod :> $a
+    $year 100 /mod :> ( $b $c )
+    $b 4 /mod :> ( $d $e )
+    $b 8 + 25 /i :> $f
+    $b $f - 1 + 3 /i :> $g
+    19 $a * $b + $d - $g - 15 + 30 mod :> $h
+    $c 4 /mod :> ( $i $k )
+    32 2 $e * + 2 $i * + $h - $k - 7 mod :> $l
+    $a 11 $h * + 22 $l * + 451 /i :> $m
 
-    h l + 7 m * - 114 + 31 /mod 1 + ;
+    $h $l + 7 $m * - 114 + 31 /mod 1 + ;
 
 M: integer easter
     dup easter-month-day <date> ;
@@ -182,6 +182,8 @@ M: timestamp easter
 : microseconds ( x -- duration ) 1000000 / seconds ;
 : nanoseconds ( x -- duration ) 1000000000 / seconds ;
 
+DEFER: days-in-month
+
 <PRIVATE
 
 GENERIC: +year ( timestamp x -- timestamp )
@@ -213,7 +215,10 @@ M: real +year
     12 /rem [ 1 - 12 ] when-zero swap ; inline
 
 M: integer +month
-    [ over month>> + months/years [ >>month ] dip +year ] unless-zero ;
+    [
+        over month>> + months/years
+        [ >>month dup days-in-month '[ _ min ] change-day ] dip +year
+    ] unless-zero ;
 
 M: real +month
     float>whole-part swapd average-month * +day swap +month ;
@@ -344,10 +349,10 @@ M: timestamp <=> [ >gmt tuple-slots ] compare ;
 : same-month? ( ts1 ts2 -- ? )
     [ slots{ year month } ] same? ;
 
-:: (day-of-year) ( year month day -- n )
-    month days-until nth day + {
-        [ year leap-year? ]
-        [ month 3 >= ]
+:: (day-of-year) ( $year $month $day -- n )
+    $month cumulative-day-counts nth $day + {
+        [ $year leap-year? ]
+        [ $month 3 >= ]
     } 0&& [ 1 + ] when ;
 
 : day-of-year ( timestamp -- n )
@@ -464,6 +469,8 @@ M: duration time-
 
 : hence ( duration -- timestamp ) now swap time+ ;
 : ago ( duration -- timestamp ) now swap time- ;
+: days-since ( time -- n ) ago duration>days ;
+: days-until ( time -- n ) now time- duration>days ;
 
 GENERIC: days-in-year ( obj -- n )
 
@@ -578,11 +585,11 @@ M: integer last-day-of-year 12 31 <date> ;
     [ dup day-of-week 7 swap - ] [ + 7 mod ] bi*
     { 0 1 2 3 -3 -2 -1 } nth days time+ ;
 
-:: nth-day-this-month ( timestamp n day -- timestamp' )
-    timestamp clone
-    timestamp start-of-month day day-this-week
+:: nth-day-this-month ( $timestamp $n $day -- timestamp' )
+    $timestamp clone
+    $timestamp start-of-month $day day-this-week
     [ [ month>> ] same? ] keep swap
-    [ n ] [ n 1 + ] if weeks time+ ;
+    [ $n ] [ $n 1 + ] if weeks time+ ;
 
 PRIVATE>
 
@@ -814,7 +821,7 @@ CONSTANT: weekday-offsets { 0 0 1 2 3 4 5 }
 
 : year-ordinal>timestamp ( year ordinal -- timestamp )
     [ 1 1 julian-day-number ] dip
-    + 1 - julian-day-number>date <date> ;
+    + 1 - julian-day-number>date <date-gmt> ;
 
 GENERIC: weeks-in-week-year ( obj -- n )
 

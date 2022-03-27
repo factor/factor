@@ -1,10 +1,9 @@
 ! Copyright (C) 2011-2012 John Benediktsson
 ! See http://factorcode.org/license.txt for BSD license
-USING: accessors assocs calendar combinators environment fonts
-formatting fry io io.streams.string kernel literals locals make
-math math.order math.ranges namespaces pdf.canvas pdf.values
-pdf.wrap sequences sequences.extras sorting splitting ui.text
-xml.entities ;
+USING: accessors assocs calendar combinators fonts formatting io
+io.streams.string kernel literals make math math.order
+namespaces pdf.canvas pdf.values pdf.wrap ranges sequences
+sequences.extras sorting splitting ui.text xml.entities ;
 FROM: pdf.canvas => draw-text ;
 
 IN: pdf.layout
@@ -108,7 +107,7 @@ M: p pdf-render
 
 M: p pdf-width
     [ style>> set-style ] keep
-    [ font>> ] [ string>> ] bi* string-lines
+    [ font>> ] [ string>> ] bi* split-lines
     [ dupd text-width ] map nip supremum ;
 
 
@@ -141,7 +140,7 @@ M: text pdf-render
 
 M: text pdf-width
     [ style>> set-style ] keep
-    [ font>> ] [ string>> ] bi* string-lines
+    [ font>> ] [ string>> ] bi* split-lines
     [ dupd text-width ] map nip supremum ;
 
 
@@ -318,7 +317,7 @@ M: table pdf-width
         "/Type /Catalog"
         "/Pages 15 0 R"
         ">>"
-    } "\n" join ;
+    } join-lines ;
 
 : pdf-pages ( n -- str )
     [
@@ -332,7 +331,7 @@ M: table pdf-width
             "/Kids [ " "]" surround ,
         ] bi
         ">>" ,
-    ] { } make "\n" join ;
+    ] { } make join-lines ;
 
 : pdf-page ( n -- page )
     [
@@ -347,7 +346,7 @@ M: table pdf-width
         "/F10 12 0 R /F11 13 0 R /F12 14 0 R" ,
         ">> >>" ,
         ">>" ,
-    ] { } make "\n" join ;
+    ] { } make join-lines ;
 
 : pdf-trailer ( objects -- str )
     [
@@ -366,7 +365,7 @@ M: table pdf-width
         "startxref" ,
         [ length 1 + ] map-sum 9 + "%d" sprintf ,
         "%%EOF" ,
-    ] { } make "\n" join ;
+    ] { } make join-lines ;
 
 SYMBOLS: pdf-producer pdf-author pdf-creator ;
 
@@ -422,10 +421,10 @@ TUPLE: pdf info pages fonts ;
         dup length 16 swap 2 range boa zip
         [ pdf-page , , ] assoc-each
     ] { } make
-    dup length [1,b] zip [ first2 pdf-object ] map ;
+    dup length [1..b] zip [ first2 pdf-object ] map ;
 
 : objects>pdf ( objects -- str )
-    [ "\n" join "\n" append "%PDF-1.4\n" ]
+    [ join-lines "\n" append "%PDF-1.4\n" ]
     [ pdf-trailer ] bi surround ;
 
 ! Rename to pdf>string, have it take a <pdf> object?

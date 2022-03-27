@@ -1,8 +1,8 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: io.files io.encodings.ascii sequences generalizations
-math.parser combinators kernel memoize csv summary
-words accessors math.order binary-search combinators.smart ;
+USING: accessors binary-search combinators combinators.smart csv
+io.encodings.ascii kernel math.order math.parser sequences
+summary ;
 IN: usa-cities
 
 SINGLETONS: AK AL AR AS AZ CA CO CT DC DE FL GA HI IA ID IL IN

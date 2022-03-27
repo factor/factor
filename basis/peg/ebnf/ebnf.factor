@@ -488,7 +488,7 @@ ERROR: bad-effect quot effect ;
     H{
         { "dup" dup } { "nip" nip } { "over" over } ! kernel
         { "nth" nth } ! sequences
-    } [ string-lines parse-lines ] with-words ;
+    } [ split-lines parse-lines ] with-words ;
 
 M: ebnf-action (transform)
     ebnf-transform check-action-effect action ;

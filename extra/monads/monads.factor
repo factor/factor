@@ -1,8 +1,6 @@
 ! Copyright (C) 2008 Slava Pestov
 ! See http://factorcode.org/license.txt for BSD license.
-USING: arrays kernel sequences sequences.deep splitting
-accessors fry locals combinators namespaces lists lists.lazy
-shuffle ;
+USING: accessors arrays kernel lists lists.lazy sequences ;
 IN: monads
 
 ! Functors

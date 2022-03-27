@@ -1,8 +1,8 @@
 ! Copyright (C) 2005, 2009 Daniel Ehrenberg
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs combinators
-combinators.short-circuit delegate delegate.protocols fry kernel
-macros sequences slots strings vectors words ;
+combinators.short-circuit delegate delegate.protocols kernel
+sequences slots strings vectors words ;
 IN: xml.data
 
 TUPLE: interpolated var ;
@@ -84,6 +84,9 @@ C: <contained> contained
 
 TUPLE: comment { text string } ;
 C: <comment> comment
+
+TUPLE: cdata { text string } ;
+C: <cdata> cdata
 
 TUPLE: directive ;
 
@@ -220,7 +223,7 @@ TUPLE: unescaped string ;
 C: <unescaped> unescaped
 
 UNION: xml-data
-    tag comment string directive instruction unescaped ;
+    tag comment cdata string directive instruction unescaped ;
 
 TUPLE: xml-chunk seq ;
 C: <xml-chunk> xml-chunk

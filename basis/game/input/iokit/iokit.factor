@@ -2,7 +2,7 @@ USING: accessors alien alien.c-types arrays assocs bit-arrays
 cocoa.application cocoa.enumeration cocoa.plists combinators
 combinators.short-circuit core-foundation core-foundation.data
 core-foundation.run-loop core-foundation.strings destructors
-game.input hints iokit iokit.hid kernel locals math namespaces
+game.input hints iokit iokit.hid kernel math namespaces
 sequences vectors ;
 IN: game.input.iokit
 

@@ -1,4 +1,4 @@
-USING: math kernel debugger ;
+USING: math kernel ;
 IN: benchmark.fib3
 
 : fib ( m -- n )

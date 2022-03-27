@@ -1,12 +1,12 @@
 ! Copyright (C) 2006, 2011 Slava Pestov
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays assocs calendar colors.constants
-combinators combinators.short-circuit documents
-documents.elements fonts fry grouping kernel literals locals
-make math math.functions math.order math.ranges math.rectangles
-math.vectors models models.arrow namespaces opengl opengl.gl
-sequences sorting splitting system timers ui.baseline-alignment
-ui.clipboards ui.commands ui.gadgets ui.gadgets.borders
+USING: accessors arrays assocs calendar colors combinators
+combinators.short-circuit documents documents.elements fonts fry
+grouping kernel literals locals make math math.functions
+math.order ranges math.rectangles math.vectors models
+models.arrow namespaces opengl opengl.gl sequences sorting
+splitting system timers ui.baseline-alignment ui.clipboards
+ui.commands ui.gadgets ui.gadgets.borders
 ui.gadgets.line-support ui.gadgets.menus ui.gadgets.scrollers
 ui.gestures ui.pens.solid ui.render ui.text ui.theme unicode ;
 IN: ui.gadgets.editors
@@ -143,10 +143,10 @@ M: editor ungraft*
     [ stop-blinking ] [ f >>focused? relayout-1 ] bi ;
 
 : loc>x ( loc editor -- x )
-    [ first2 swap ] dip [ editor-line ] [ font>> ] bi swap offset>x round ;
+    [ first2 swap ] dip [ editor-line ] [ font>> ] bi swap offset>x gl-round ;
 
 : loc>point ( loc editor -- loc )
-    [ loc>x ] [ [ first ] dip line>y ceiling ] 2bi 2array ;
+    [ loc>x ] [ [ first ] dip line>y gl-ceiling ] 2bi 2array ;
 
 : caret-loc ( editor -- loc )
     [ editor-caret ] keep loc>point ;
@@ -200,16 +200,16 @@ TUPLE: selected-line start end first? last? ;
 
 : compute-selection ( editor -- assoc )
     dup gadget-selection? [
-        [ selection-start/end [ [ first ] bi@ [a,b] ] [ ] 2bi ]
+        [ selection-start/end [ [ first ] bi@ [a..b] ] [ ] 2bi ]
         [ model>> ] bi
         '[ [ _ _ ] [ _ start/end-on-line ] bi 2array ] H{ } map>assoc
     ] [ drop f ] if ;
 
 :: draw-selection ( line pair editor -- )
-    pair [ editor font>> line offset>x ] map :> pair
+    pair [ editor font>> line offset>x gl-round ] map :> pair
     editor selection-color>> gl-color
     pair first 0 2array
-    pair second pair first - round 1 max editor line-height 2array
+    pair second pair first - 1 max editor line-height 2array
     gl-fill-rect ;
 
 : draw-unselected-line ( line editor -- )
@@ -636,10 +636,10 @@ PRIVATE>
 <PRIVATE
 
 : join-lines ( string -- string' )
-    "\n" split
+    split-lines
     [ rest-slice [ [ blank? ] trim-head-slice ] map! drop ]
     [ but-last-slice [ [ blank? ] trim-tail-slice ] map! drop ]
-    [ " " join ]
+    [ join-words ]
     tri ;
 
 : last-line? ( document line -- ? )

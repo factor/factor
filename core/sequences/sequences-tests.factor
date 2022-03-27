@@ -19,7 +19,15 @@ IN: sequences.tests
 
 { "cba" } [ "abcdef" 3 head-slice reverse ] unit-test
 
-{ 5040 } [ [ 1 2 3 4 5 6 7 ] 1 [ * ] reduce ] unit-test
+{ 5040 5040 } [
+    [ 1 2 3 4 5 6 7 ] dup rest-slice
+    [ 1 [ * ] reduce ] bi@
+] unit-test
+
+{ 10079 6459 } [
+    [ 1 2 3 4 5 6 7 ] dup rest-slice
+    [ 1 [ [ * ] [ + ] bi* ] reduce-index ] bi@
+] unit-test
 
 { 5040 { 1 1 2 6 24 120 720 } }
 [ { 1 2 3 4 5 6 7 } 1 [ * ] accumulate ] unit-test
@@ -427,3 +435,12 @@ M: bogus-hashcode hashcode* 2drop 0 >bignum ;
 { f } [ { } { 99 88 } [ <= ] 2any? ] unit-test
 { t } [ { 2 4 5 8 } { 2 4 6 8 } [ < ] 2any? ] unit-test
 { f } [ { 2 4 6 8 } { 2 4 6 8 } [ < ] 2any? ] unit-test
+
+{ "ollo" } [ "ll" "o" 1surround ] unit-test
+{ "ollo" } [ { CHAR: l CHAR: l } "o" 1surround ] unit-test
+
+{ { CHAR: o CHAR: l CHAR: l CHAR: o } }
+[ { CHAR: l CHAR: l } "o" { } 1surround-as ] unit-test
+
+{ "ollo" }
+[ { CHAR: l CHAR: l } "o" "" 1surround-as ] unit-test

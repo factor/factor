@@ -163,12 +163,12 @@ M: local protocol-family drop PF_UNIX ;
 
 M: local sockaddr-size drop sockaddr-un heap-size ;
 
-M: local empty-sockaddr drop sockaddr-un <struct> ;
+M: local empty-sockaddr drop sockaddr-un new ;
 
 M: local make-sockaddr
     path>> absolute-path
     dup length 1 + max-un-path > [ "Path too long" throw ] when
-    sockaddr-un <struct>
+    sockaddr-un new
         AF_UNIX >>family
         swap utf8 string>alien >>path ;
 

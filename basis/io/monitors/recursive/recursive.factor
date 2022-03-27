@@ -1,10 +1,9 @@
 ! Copyright (C) 2008, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors sequences assocs arrays continuations
-destructors combinators kernel threads concurrency.messaging
-concurrency.mailboxes concurrency.promises io.files io.files.info
-io.directories io.pathnames io.monitors io.monitors.private
-debugger fry ;
+USING: accessors assocs combinators concurrency.mailboxes
+concurrency.messaging concurrency.promises continuations
+destructors io.directories io.files.info io.monitors
+io.monitors.private io.pathnames kernel sequences threads ;
 IN: io.monitors.recursive
 
 ! Simulate recursive monitors on platforms that don't have them

@@ -1,7 +1,7 @@
 ! Copyright (c) 2009 Samuel Tardieu.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays assocs combinators kernel math math.functions
-math.parser math.text.utils memoize sequences ;
+math.parser math.text.utils sequences splitting ;
 IN: math.text.french
 
 <PRIVATE
@@ -70,7 +70,7 @@ MEMO: units ( -- seq ) ! up to 10^99
 
 : over-1000000 ( n -- str )
     3 digit-groups [ 1 + units nth n-units ] map-index sift
-    reverse " " join ;
+    reverse join-words ;
 
 : decompose ( n -- str ) 1000000 /mod [ over-1000000 ] dip
     dup 0 > [ basic space-append ] [ drop ] if ;

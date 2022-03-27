@@ -3,7 +3,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors continuations db.tuples db.types fry furnace.actions
 furnace.boilerplate furnace.redirection furnace.utilities html.forms
-http.server.dispatchers kernel math math.ranges random random.data
+http.server.dispatchers kernel math ranges random random.data
 sequences urls validators ;
 IN: webapps.wee-url
 

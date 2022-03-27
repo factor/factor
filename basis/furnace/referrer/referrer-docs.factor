@@ -1,5 +1,4 @@
-USING: help.markup help.syntax io.streams.string
-furnace.utilities ;
+USING: furnace.utilities help.markup help.syntax ;
 IN: furnace.referrer
 
 HELP: <check-form-submissions>

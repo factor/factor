@@ -8,14 +8,14 @@ IN: vocabs.refresh
 : source-modified? ( path -- ? )
     dup source-files get at [
         dup path>>
-        dup exists? [
+        dup file-exists? [
             utf8 file-lines crc32 checksum-lines
             swap checksum>> = not
         ] [
             2drop f
         ] if
     ] [
-        exists?
+        file-exists?
     ] ?if ;
 
 SYMBOL: changed-vocabs

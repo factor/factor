@@ -46,7 +46,7 @@ ERROR: bad-log-message-parameters msg word level ;
     check-log-message
     log-service get
     2dup [ log? ] [ ] bi* and [
-        [ [ string-lines ] [ name>> ] [ name>> ] tri* ] dip
+        [ [ split-lines ] [ name>> ] [ name>> ] tri* ] dip
         4array "log-message" send-to-log-server
     ] [
         4drop

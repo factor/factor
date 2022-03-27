@@ -28,7 +28,7 @@ TUPLE: maze < astar ;
   6  X X X X   X   X e X
   7  X g   X           X
   8  X X X X X X X X X X"
-        "\n" split ] nth nth CHAR: X = not ;
+        split-lines ] nth nth CHAR: X = not ;
 
 M: maze neighbours
     drop

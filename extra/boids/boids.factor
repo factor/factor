@@ -1,14 +1,15 @@
 ! Copyright (C) 2008 Eduardo Cavazos.
 ! Copyright (C) 2011 Anton Gorenko.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays boids.simulation calendar classes
-colors.constants kernel literals locals math math.functions
-math.trig models namespaces opengl opengl.demo-support opengl.gl
-sequences threads ui ui.commands ui.gadgets ui.gadgets.borders
+
+USING: accessors arrays boids.simulation calendar classes colors
+kernel literals math math.functions math.trig models
+models.range opengl opengl.demo-support opengl.gl sequences
+threads ui ui.commands ui.gadgets ui.gadgets.borders
 ui.gadgets.buttons ui.gadgets.frames ui.gadgets.grids
 ui.gadgets.labeled ui.gadgets.labels ui.gadgets.packs
-ui.gadgets.sliders ui.gadgets.tracks ui.gadgets.worlds ui.render
-ui.tools.common ;
+ui.gadgets.sliders ui.render ui.tools.common ;
+
 QUALIFIED-WITH: models.range mr
 IN: boids
 

@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors byte-arrays combinators compiler.cfg.builder
 compiler.tree.propagation.info compiler.tree.propagation.nodes
-continuations cpu.architecture fry kernel layouts math
+continuations cpu.architecture kernel layouts math
 math.intervals math.vectors.simd.intrinsics namespaces sequences
 words ;
 IN: compiler.tree.propagation.simd

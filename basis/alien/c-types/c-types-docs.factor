@@ -1,7 +1,5 @@
-USING: alien help.syntax help.markup libc kernel.private
-byte-arrays strings hashtables alien.syntax alien.strings
-sequences io.encodings.string debugger destructors vocabs.loader
-classes.struct math kernel ;
+USING: alien alien.syntax byte-arrays classes.struct help.markup
+help.syntax kernel math sequences ;
 IN: alien.c-types
 
 HELP: heap-size

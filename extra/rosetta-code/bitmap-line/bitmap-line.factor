@@ -1,8 +1,6 @@
 ! Copyright (c) 2012 Anonymous
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays kernel locals math math.functions
-math.ranges math.vectors rosetta-code.bitmap sequences
-ui.gadgets ;
+USING: arrays kernel math ranges rosetta-code.bitmap sequences ;
 IN: rosetta-code.bitmap-line
 
 ! http://rosettacode.org/wiki/Bitmap/Bresenham%27s_line_algorithm

@@ -2,8 +2,8 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs assocs.extras calendar
 calendar.format checksums checksums.sha combinators
-combinators.smart compression.zlib constructors grouping io
-io.binary io.directories io.encodings.binary io.encodings.string
+combinators.smart compression.zlib constructors endian grouping
+io io.directories io.encodings.binary io.encodings.string
 io.encodings.utf8 io.files io.files.info io.pathnames
 io.streams.byte-array io.streams.peek kernel math math.bitwise
 math.parser namespaces random sequences sequences.extras
@@ -60,7 +60,7 @@ ERROR: expected-one-line lines ;
     [ first ] [ expected-one-line ] if ;
 
 : git-unpacked-object-exists? ( hash -- ? )
-    make-object-path exists? ;
+    make-object-path file-exists? ;
 
 TUPLE: index-entry ctime mtime dev ino mode uid gid size sha1 flags name ;
 CONSTRUCTOR: <index-entry> index-entry ( ctime mtime dev ino mode uid gid size sha1 flags name -- obj ) ;
@@ -105,7 +105,7 @@ ERROR: unhandled-git-version n ;
 
 : changed-index-by-sha1 ( -- seq )
     git-index-contents entries>>
-    [ [ sha1>> ] [ name>> path>git-object bytes>hex-string ] bi = not ] filter ;
+    [ [ sha1>> ] [ name>> path>git-object bytes>hex-string ] bi = ] reject ;
 
 : changed-index-by-mtime ( -- seq )
     git-index-contents entries>>
@@ -135,9 +135,9 @@ CONSTRUCTOR: <tree> tree ( -- obj ) ;
 : commit. ( commit -- )
     {
         [ hash>> "commit " prepend print ]
-        [ author>> "Author: " prepend " " split 2 head* " " join print ]
-        [ author>> " " split git-date>string "Date:   " prepend print ]
-        [ message>> "\n" split [ "    " prepend ] map "\n" join nl print nl ]
+        [ author>> "Author: " prepend split-words 2 head* join-words print ]
+        [ author>> split-words git-date>string "Date:   " prepend print ]
+        [ message>> split-lines [ "    " prepend ] map join-lines nl print nl ]
     } cleave ;
 
 ERROR: unknown-field name parameter ;
@@ -155,14 +155,14 @@ ERROR: unknown-field name parameter ;
 
 : git-string>assoc ( string -- assoc )
     "\n\n" split1 [
-        string-lines [ nip first CHAR: \s = ] monotonic-split
+        split-lines [ nip first CHAR: \s = ] monotonic-split
         [
             dup length 1 = [
                 first " " split1 2array
             ] [
                 [ first " " split1 ]
                 [ rest [ rest ] map ] bi
-                swap prefix "\n" join 2array
+                swap prefix join-lines 2array
             ] if
         ] map
     ] [

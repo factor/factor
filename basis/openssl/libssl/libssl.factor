@@ -2,9 +2,9 @@
 ! Portions copyright (C) 2008 Slava Pestov
 ! See http://factorcode.org/license.txt for BSD license.
 USING: alien alien.c-types alien.destructors alien.libraries
-alien.parser alien.syntax classes.struct combinators kernel
-literals namespaces openssl.libcrypto system ;
-SLOT: alpn-supported-protocols
+alien.libraries.finder alien.parser alien.syntax classes.struct
+combinators kernel literals namespaces openssl.libcrypto system
+words ;
 IN: openssl.libssl
 
 << "libssl" {
@@ -445,6 +445,7 @@ FUNCTION: int SSL_accept ( SSL* ssl )
 FUNCTION: int SSL_connect ( SSL* ssl )
 FUNCTION: int SSL_read ( SSL* ssl, void* buf, int num )
 FUNCTION: int SSL_write ( SSL* ssl, void* buf, int num )
+FUNCTION: int SSL_write_ex ( SSL* ssl, void* buf, size_t num, size_t* written )
 FUNCTION: long SSL_ctrl ( SSL* ssl, int cmd, long larg, void* parg )
 
 FUNCTION: int SSL_shutdown ( SSL* ssl )
@@ -452,7 +453,13 @@ FUNCTION: int SSL_get_shutdown ( SSL* ssl )
 
 FUNCTION: int SSL_want ( SSL* ssl )
 FUNCTION: long SSL_get_verify_result ( SSL* ssl )
-FUNCTION: X509* SSL_get_peer_certificate ( SSL* s )
+FUNCTION: X509* SSL_get_peer_certificate ( SSL* ssl )
+FUNCTION: X509* SSL_get0_peer_certificate ( SSL* ssl )
+FUNCTION: X509* SSL_get1_peer_certificate ( SSL* ssl )
+
+: get-ssl-peer-certificate ( ssl -- x509 )
+    "SSL_get1_peer_certificate" "libssl" library-dll dlsym-raw
+    [ SSL_get1_peer_certificate ] [ SSL_get_peer_certificate ] if ; inline
 
 FUNCTION: int SSL_set_cipher_list ( SSL* ssl, c-string str )
 FUNCTION: int SSL_use_RSAPrivateKey_file ( SSL* ssl, c-string str )

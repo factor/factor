@@ -90,13 +90,13 @@ PRIVATE>
         cleanup
     ] with-variables ; inline
 
-[
+STARTUP-HOOK: [
     HS{ } clone disposables set-global
     V{ } clone always-destructors set-global
     V{ } clone error-destructors set-global
-] "destructors" add-startup-hook
+]
 
-[
+SHUTDOWN-HOOK: [
     do-always-destructors
     do-error-destructors
-] "destructors" add-shutdown-hook
+]

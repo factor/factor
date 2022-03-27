@@ -231,7 +231,10 @@ M: test-failure error. ( error -- )
 : refresh-and-test-all ( -- ) "" refresh-and-test ;
 
 : test-main ( -- )
-    command-line get [
+    command-line get
+    "--fast" swap [ member? ] [ remove ] 2bi swap
+    [ f long-unit-tests-enabled? set-global ] when
+    [
         dup vocab-roots get member? [
             "" vocabs-to-load [ require-all ] keep
         ] [

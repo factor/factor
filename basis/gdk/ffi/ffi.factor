@@ -3,7 +3,7 @@
 USING: alien alien.c-types alien.destructors alien.libraries
 alien.syntax cairo.ffi classes.struct combinators
 gobject-introspection gobject-introspection.standard-types
-kernel system vocabs vocabs.loader ;
+kernel system vocabs ;
 IN: gdk.ffi
 
 <<

@@ -1,6 +1,6 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors assocs combinators fry furnace.utilities
+USING: accessors assocs combinators furnace.utilities
 html.components html.forms html.templates
 html.templates.chloe.compiler html.templates.chloe.syntax kernel
 namespaces present sequences splitting urls xml.data xml.syntax
@@ -66,7 +66,7 @@ CHLOE: base
     compile-a-url [ [XML <base href=<->/> XML] ] [xml-code] ;
 
 : hidden-nested-fields ( -- xml )
-    nested-forms get " " join f like nested-forms-key
+    nested-forms get join-words f like nested-forms-key
     hidden-form-field ;
 
 : render-hidden ( for -- xml )

@@ -1,6 +1,6 @@
 ! Copyright (c) 2012 Anonymous
 ! See http://factorcode.org/license.txt for BSD license.
-USING: continuations kernel io io.streams.string locals unicode ;
+USING: continuations kernel io io.streams.string unicode ;
 IN: rosetta-code.odd-word
 
 ! http://rosettacode.org/wiki/Odd_word_problem

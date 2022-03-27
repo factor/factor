@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license
 
 USING: assocs combinators.short-circuit kernel make math
-math.order math.parser math.ranges regexp sequences splitting
+math.order math.parser ranges regexp sequences splitting
 strings ;
 
 IN: html.entities
@@ -2344,7 +2344,7 @@ CONSTANT: html5 H{
 : named-charref ( str -- newstr )
     html5 ?at [
         ! find the longest matching name
-        dup dup length 1 (a,b) [ head html5 at ] with map-find
+        dup dup length 1 (a..b) [ head html5 at ] with map-find
         [ swapd tail append ] [ drop "&" prepend ] if*
     ] unless ;
 

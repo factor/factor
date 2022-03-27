@@ -1,7 +1,7 @@
 ! Copyright (C) 2012 John Benediktsson, Doug Coleman
 ! See http://factorcode.org/license.txt for BSD license
-USING: arrays assocs assocs.private fry generalizations kernel
-math math.statistics sequences sequences.extras sets ;
+USING: arrays assocs assocs.private kernel math math.statistics
+sequences sets ;
 IN: assocs.extras
 
 : deep-at ( assoc seq -- value/f )
@@ -217,8 +217,20 @@ PRIVATE>
 : intersect-keys ( assoc seq -- elts )
     [ of ] with zip-with sift-values ; inline
 
-: values-of ( assoc seq -- elts )
-    [ of ] with map sift ; inline
+: values-of ( assoc seq -- seq' )
+    [ of ] with map ; inline
 
 : counts ( seq elts -- counts )
     [ histogram ] dip intersect-keys ;
+
+: collect-key-by ( ... seq quot: ( ... obj -- ... key ) -- ... assoc )
+    [ keep swap ] curry H{ } clone
+    [ '[ @ [ first ] dip _ push-at ] each ] keep ; inline
+
+: collect-value-by ( ... seq quot: ( ... obj -- ... key ) -- ... assoc )
+    [ keep swap ] curry H{ } clone
+    [ '[ @ [ second ] dip _ push-at ] each ] keep ; inline
+
+: histogram-diff ( hashtable1 hashtable2 -- hashtable3 )
+    [ neg swap pick at+ ] assoc-each
+    [ 0 > ] filter-values ;

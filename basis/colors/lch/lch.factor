@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license
 
 USING: accessors colors colors.lab colors.luv colors.xyz kernel
-locals math math.functions math.libm math.trig ;
+math math.functions math.libm math.trig ;
 
 IN: colors.lch
 

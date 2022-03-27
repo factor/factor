@@ -17,12 +17,12 @@ IN: unicode.breaks
 >>
 
 CONSTANT: emoji-modifier-table $[
-    "resource:basis/unicode/UCD/auxiliary/emoji-data.txt"
+    "resource:basis/unicode/UCD/emoji/emoji-data.txt"
     1 "Emoji_Modifier" load-interval-file-for
 ]
 
 CONSTANT: extended-pictographic-table $[
-    "resource:basis/unicode/UCD/auxiliary/emoji-data.txt"
+    "resource:basis/unicode/UCD/emoji/emoji-data.txt"
     1 "Extended_Pictographic" load-interval-file-for
 ]
 

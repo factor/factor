@@ -7,11 +7,11 @@ classes.predicate classes.singleton classes.tuple
 classes.tuple.parser classes.union combinators compiler.units
 definitions effects effects.parser fry generic generic.hook
 generic.math generic.parser generic.standard hash-sets
-hashtables hashtables.identity io.pathnames kernel lexer
+hashtables hashtables.identity init io.pathnames kernel lexer
 locals.errors locals.parser macros math memoize namespaces
 parser quotations sbufs sequences slots source-files splitting
-strings strings.parser vectors vocabs.parser words words.alias
-words.constant words.symbol ;
+strings strings.parser vectors vocabs.loader vocabs.parser words
+words.alias words.constant words.symbol ;
 IN: bootstrap.syntax
 
 ! These words are defined as a top-level form, instead of with
@@ -46,6 +46,8 @@ IN: bootstrap.syntax
     "<PRIVATE" [ begin-private ] define-core-syntax
 
     "PRIVATE>" [ end-private ] define-core-syntax
+
+    "REUSE:" [ scan-token reload ] define-core-syntax
 
     "USE:" [ scan-token use-vocab ] define-core-syntax
 
@@ -105,12 +107,13 @@ IN: bootstrap.syntax
     "POSTPONE:" [ scan-word suffix! ] define-core-syntax
     "\\" [ scan-word <wrapper> suffix! ] define-core-syntax
     "M\\" [ scan-word scan-word lookup-method <wrapper> suffix! ] define-core-syntax
-    "inline" [ last-word make-inline ] define-core-syntax
-    "recursive" [ last-word make-recursive ] define-core-syntax
-    "foldable" [ last-word make-foldable ] define-core-syntax
-    "flushable" [ last-word make-flushable ] define-core-syntax
+    "auto-use" [ t auto-use? set-global ] define-core-syntax
     "delimiter" [ last-word t "delimiter" set-word-prop ] define-core-syntax
     "deprecated" [ last-word make-deprecated ] define-core-syntax
+    "flushable" [ last-word make-flushable ] define-core-syntax
+    "foldable" [ last-word make-foldable ] define-core-syntax
+    "inline" [ last-word make-inline ] define-core-syntax
+    "recursive" [ last-word make-recursive ] define-core-syntax
 
     "SYNTAX:" [
         scan-new-word parse-definition define-syntax
@@ -129,6 +132,10 @@ IN: bootstrap.syntax
 
     "SYMBOLS:" [
         ";" [ create-word-in [ reset-generic ] [ define-symbol ] bi ] each-token
+    ] define-core-syntax
+
+    "INITIALIZE:" [
+        scan-word parse-definition [ initialize ] 2curry append!
     ] define-core-syntax
 
     "SINGLETONS:" [
@@ -331,4 +338,16 @@ IN: bootstrap.syntax
     "MACRO::" [ (::) define-macro ] define-core-syntax
     "MEMO::" [ (::) define-memoized ] define-core-syntax
     "IDENTITY-MEMO::" [ (::) define-identity-memoized ] define-core-syntax
+
+    "STARTUP-HOOK:" [
+        scan-word
+        dup \ [ = [ drop parse-quotation ] [ 1quotation ] if
+        current-vocab name>> [ add-startup-hook ] 2curry append!
+    ] define-core-syntax
+
+    "SHUTDOWN-HOOK:" [
+        scan-word
+        dup \ [ = [ drop parse-quotation ] [ 1quotation ] if
+        current-vocab name>> [ add-shutdown-hook ] 2curry append!
+    ] define-core-syntax
 ] with-compilation-unit

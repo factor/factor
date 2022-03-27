@@ -1,4 +1,4 @@
-USING: assocs arrays generic.single help.markup help.syntax kernel
+USING: arrays generic.single help.markup help.syntax kernel
 layouts math math.order quotations sequences.private vectors ;
 IN: sequences
 
@@ -1279,8 +1279,8 @@ HELP: map-sum
 { $description "Like " { $snippet "map sum" } ", but without creating an intermediate sequence." }
 { $examples
     { $example
-        "USING: math math.ranges sequences prettyprint ;"
-        "100 [1,b] [ sq ] map-sum ."
+        "USING: math ranges sequences prettyprint ;"
+        "100 [1..b] [ sq ] map-sum ."
         "338350"
     }
 } ;
@@ -1290,8 +1290,8 @@ HELP: count
 { $description "Efficiently returns the number of elements that the predicate quotation matches." }
 { $examples
     { $example
-        "USING: math math.ranges sequences prettyprint ;"
-        "100 [1,b] [ even? ] count ."
+        "USING: math ranges sequences prettyprint ;"
+        "100 [1..b] [ even? ] count ."
         "50"
     }
 } ;
@@ -1507,7 +1507,7 @@ HELP: virtual@
 
 HELP: 2map-reduce
 { $values
-     { "seq1" sequence } { "seq2" sequence } { "map-quot" { $quotation ( ..a elt1 elt2 -- ..b intermediate ) } } { "reduce-quot" { $quotation ( ..b prev intermediate -- ..a next ) } }
+     { "seq1" sequence } { "seq2" sequence } { "map-quot" { $quotation ( ..a elt1 elt2 -- ..a intermediate ) } } { "reduce-quot" { $quotation ( ..a prev intermediate -- ..a next ) } }
      { "result" object } }
  { $description "Calls " { $snippet "map-quot" } " on each pair of elements from " { $snippet "seq1" } " and " { $snippet "seq2" } " and combines the results using " { $snippet "reduce-quot" } " in the same manner as " { $link reduce } ", except that there is no identity element, and the sequence must have a length of at least 1." }
 { $errors "Throws an error if the sequence is empty." }
@@ -1587,7 +1587,7 @@ HELP: insert-nth
 
 HELP: map-reduce
 { $values
-     { "seq" sequence } { "map-quot" { $quotation ( ..a elt -- ..b intermediate ) } } { "reduce-quot" { $quotation ( ..b prev intermediate -- ..a next ) } }
+     { "seq" sequence } { "map-quot" { $quotation ( ..a elt -- ..a intermediate ) } } { "reduce-quot" { $quotation ( ..a prev intermediate -- ..a next ) } }
      { "result" object } }
 { $description "Calls " { $snippet "map-quot" } " on each element and combines the results using " { $snippet "reduce-quot" } " in the same manner as " { $link reduce } ", except that there is no identity element, and the sequence must have a length of at least 1." }
 { $errors "Throws an error if the sequence is empty." }
@@ -1759,7 +1759,7 @@ ARTICLE: "sequences-integers" "Counted loops"
 $nl
 "Combinators that produce new sequences, such as " { $link map } ", will output an array if the input is an instance of " { $link <iota> } "."
 $nl
-"More elaborate counted loops can be performed with " { $link "math.ranges" } "." ;
+"More elaborate counted loops can be performed with " { $link "ranges" } "." ;
 
 ARTICLE: "sequences-if" "Control flow with sequences"
 "To reduce the boilerplate of checking if a sequence is empty, several combinators are provided."
@@ -2085,7 +2085,7 @@ $nl
 "Using sequences for looping:"
 { $subsections
     "sequences-integers"
-    "math.ranges"
+    "ranges"
 }
 "Using sequences for control flow:"
 { $subsections "sequences-if" }

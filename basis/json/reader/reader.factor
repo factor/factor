@@ -1,9 +1,8 @@
 ! Copyright (C) 2008 Peter Burns, 2009 Philipp Winkler
 ! See http://factorcode.org/license.txt for BSD license.
-USING: assocs combinators fry io io.encodings.utf8 io.files
+USING: assocs combinators io io.encodings.utf8 io.files
 io.streams.string json kernel kernel.private math math.order
-math.parser namespaces sbufs sequences sequences.private strings
-vectors ;
+math.parser namespaces sbufs sequences sequences.private strings ;
 IN: json.reader
 
 <PRIVATE
@@ -65,7 +64,7 @@ DEFER: (read-json-string)
 
 : read-json-string ( stream -- str )
     "\\\"" over stream-read-until CHAR: \" =
-    [ nip ] [ >sbuf (read-json-escape) { sbuf } declare "" like ] if ;
+    [ nip ] [ >sbuf (read-json-escape) "" like ] if ;
 
 : second-last-unsafe ( seq -- second-last )
     [ length 2 - ] [ nth-unsafe ] bi ; inline
@@ -77,38 +76,28 @@ DEFER: (read-json-string)
     [ dup length ] [ >= ] bi* [ json-error ] unless ; inline
 
 : v-over-push ( accum -- accum )
-    { vector } declare 2 check-length
-    dup [ pop-unsafe ] [ last-unsafe ] bi
-    { vector } declare push ;
+    2 check-length dup [ pop-unsafe ] [ last-unsafe ] bi push ;
 
 : v-pick-push ( accum -- accum )
-    { vector } declare 3 check-length dup
-    [ pop-unsafe ] [ second-last-unsafe ] bi
-    { vector } declare push ;
-
-: v-pop ( accum -- vector )
-    pop { vector } declare ; inline
+    3 check-length dup [ pop-unsafe ] [ second-last-unsafe ] bi push ;
 
 : v-close ( accum -- accum )
-    { vector } declare
-    dup last V{ } = not [ v-over-push ] when
-    { vector } declare ; inline
+    dup last V{ } = not [ v-over-push ] when ;
 
 : json-open-array ( accum -- accum )
-    { vector } declare V{ } clone suffix! ;
+    V{ } clone suffix! ;
 
 : json-open-hash ( accum -- accum )
-    { vector } declare V{ } clone suffix! V{ } clone suffix! ;
+    V{ } clone suffix! V{ } clone suffix! ;
 
 : json-close-array ( accum -- accum )
-    v-close dup v-pop { } like suffix! ;
+    v-close dup pop { } like suffix! ;
 
 : json-close-hash ( accum -- accum )
-    v-close dup dup [ v-pop ] bi@ swap H{ } zip-as suffix! ;
+    v-close dup dup [ pop ] bi@ swap H{ } zip-as suffix! ;
 
 : scan ( stream accum char -- stream accum )
     ! 2dup 1string swap . . ! Great for debug...
-    { object vector object } declare
     {
         { CHAR: \" [ over read-json-string suffix! ] }
         { CHAR: [  [ 1 json-depth +@ json-open-array ] }

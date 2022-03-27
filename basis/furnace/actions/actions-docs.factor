@@ -1,6 +1,5 @@
-USING: assocs classes help.markup help.syntax io.streams.string
-http http.server.dispatchers http.server.responses
-furnace.redirection strings html.forms ;
+USING: classes furnace.redirection help.markup help.syntax
+html.forms http http.server.dispatchers http.server.responses ;
 IN: furnace.actions
 
 HELP: <action>

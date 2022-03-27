@@ -2,17 +2,15 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs combinators
 combinators.short-circuit compiler.tree compiler.tree.builder
-compiler.tree.checker compiler.tree.cleanup
-compiler.tree.combinators compiler.tree.dead-code
-compiler.tree.def-use compiler.tree.escape-analysis
-compiler.tree.identities compiler.tree.modular-arithmetic
-compiler.tree.normalization compiler.tree.optimizer
-compiler.tree.propagation compiler.tree.propagation.info
-compiler.tree.recursive compiler.tree.tuple-unboxing effects fry
-generic hints io kernel macros make match math namespaces
-prettyprint prettyprint.config prettyprint.custom
-prettyprint.sections quotations sequences sequences.private sets
-sorting words ;
+compiler.tree.cleanup compiler.tree.combinators
+compiler.tree.dead-code compiler.tree.def-use
+compiler.tree.escape-analysis compiler.tree.identities
+compiler.tree.modular-arithmetic compiler.tree.normalization
+compiler.tree.optimizer compiler.tree.propagation
+compiler.tree.recursive compiler.tree.tuple-unboxing effects
+generic hints io kernel make match math namespaces prettyprint
+prettyprint.config prettyprint.custom prettyprint.sections
+quotations sequences sequences.private sets sorting words ;
 FROM: syntax => _ ;
 RENAME: _ match => __
 IN: compiler.tree.debugger

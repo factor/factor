@@ -1,6 +1,5 @@
-USING: accessors arrays classes.tuple io kernel locals math
-math.functions math.ranges prettyprint project-euler.common
-sequences ;
+USING: accessors classes.tuple kernel math math.functions
+project-euler.common ranges sequences ;
 IN: project-euler.064
 
 ! http://projecteuler.net/index.php?section=problems&id=64
@@ -115,8 +114,8 @@ C: <cont-frac> cont-frac
     drop drop drop ;
 
 : try-all ( -- n )
-    2 10000 [a,b]
-    [ perfect-square? not ] filter
+    2 10000 [a..b]
+    [ perfect-square? ] reject
     [ find-period ] map
     [ odd? ] filter
     length ;
@@ -171,6 +170,6 @@ C: <cfrac> cfrac
 PRIVATE>
 
 : euler064b ( -- ct )
-    10000 [1,b] [ period odd? ] count ;
+    10000 [1..b] [ period odd? ] count ;
 
 SOLUTION: euler064b

@@ -23,11 +23,18 @@ GENERIC: word-help* ( word -- content )
         ] keep
     ] when* ;
 
+: fix-shuffle ( content word -- content' word )
+    over [ { $shuffle $complex-shuffle } member? ] find drop [
+        '[ _ cut unclip ] dip [
+            stack-effect 2array 1array glue
+        ] keep
+    ] when* ;
+
 PRIVATE>
 
 : word-help ( word -- content )
-    [ dup "help" word-prop [ ] [ word-help* ] ?if ]
-    [ inputs-and-outputs drop ] bi ;
+    [ dup "help" word-prop [ ] [ word-help* ] ?if ] keep
+    inputs-and-outputs fix-shuffle drop ;
 
 : effect-help ( effect -- content )
     [ in>> ] [ out>> ] bi [
@@ -206,7 +213,7 @@ help-hook [ [ print-topic ] ] initialize
     [ articles get set-at ] keep xref-article ;
 
 : remove-word-help ( word -- )
-    f "help" set-word-prop ;
+    "help" remove-word-prop ;
 
 : set-word-help ( content word -- )
     [ swap "help" set-word-prop ] keep xref-article ;

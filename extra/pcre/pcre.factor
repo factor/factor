@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license
 
 USING: accessors alien alien.accessors alien.c-types alien.data
-alien.enums alien.strings arrays assocs combinators fry
+alien.enums alien.strings arrays assocs combinators
 io.encodings.string io.encodings.utf8 kernel literals math
 math.bitwise math.parser pcre.ffi regexp sequences
 sequences.extras splitting strings ;

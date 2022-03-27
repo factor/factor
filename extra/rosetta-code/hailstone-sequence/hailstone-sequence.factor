@@ -1,6 +1,6 @@
 ! Copyright (c) 2012 Anonymous
 ! See http://factorcode.org/license.txt for BSD license.
-USING: arrays io kernel math math.ranges prettyprint sequences vectors ;
+USING: arrays io kernel math ranges prettyprint sequences vectors ;
 IN: rosetta-code.hailstone-sequence
 
 ! http://rosettacode.org/wiki/Hailstone_sequence
@@ -45,7 +45,7 @@ IN: rosetta-code.hailstone-sequence
     "  ends with " write 4 tail* [ unparse ] map ", " join print
 
     ! Maps n => { length n }, and reduces to longest Hailstone sequence.
-    1 100000 [a,b)
+    100000 [1..b)
     [ [ hailstone length ] keep 2array ]
     [ [ [ first ] bi@ > ] most ] map-reduce
     first2

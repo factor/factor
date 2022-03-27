@@ -13,7 +13,7 @@ CONSTANT: mkdir-mode flags{ USER-ALL GROUP-ALL OTHER-ALL } ! 0o777
 
 M: unix touch-file
     normalize-path
-    dup exists? [ touch ] [
+    dup file-exists? [ touch ] [
         touch-mode file-mode open-file close-file
     ] if ;
 
@@ -73,7 +73,7 @@ M: unix copy-file
 
 M: unix (directory-entries)
     [
-        dirent <struct>
+        dirent new
         '[ _ _ next-dirent ] [ >directory-entry ] produce nip
     ] with-unix-directory ;
 

@@ -75,7 +75,7 @@ HELP: count*
     { "quot" { $quotation ( ... elt -- ... ? ) } }
     { "%" rational } }
 { $description "Outputs the fraction of elements in the sequence for which the predicate quotation matches." }
-{ $examples { $example "USING: math math.ranges prettyprint sequences.extras ;" "100 [1,b] [ even? ] count* ." "1/2" } } ;
+{ $examples { $example "USING: math ranges prettyprint sequences.extras ;" "100 [1..b] [ even? ] count* ." "1/2" } } ;
 
 HELP: collapse
 { $values

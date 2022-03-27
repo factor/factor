@@ -5,7 +5,7 @@
     <t:chloe xmlns:t="http://factorcode.org/chloe/1.0">
 
         <head>
-            <meta name="viewport" content="width=device-width, initial-scale=1" />
+            <meta name="viewport" content="width=device-width, initial-scale=1" charset="utf-8" />
 
             <t:write-title />
 
@@ -22,9 +22,7 @@
 
         <body>
 
-            <div id="container">
             <t:call-next-template />
-            </div>
 
         </body>
 

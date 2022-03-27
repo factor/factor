@@ -1,5 +1,5 @@
-USING: arrays assocs calendar cbor kernel literals locals math
-math.parser math.ranges tools.test urls ;
+USING: arrays assocs calendar cbor kernel literals math
+math.parser ranges tools.test urls ;
 
 {
     { 0 "00" }
@@ -77,7 +77,7 @@ math.parser math.ranges tools.test urls ;
     { { } "80" }
     { { 1 2 3 } "83010203" }
     { { 1 { 2 3 } { 4 5 } } "8301820203820405" }
-    ${ 25 [1,b] >array "98190102030405060708090a0b0c0d0e0f101112131415161718181819" }
+    ${ 25 [1..b] >array "98190102030405060708090a0b0c0d0e0f101112131415161718181819" }
     { { } "a0" }
     { { { 1 2 } { 3 4 } } "a201020304" }
     { { { "a" 1 } { "b" { 2 3 } } } "a26161016162820203" }
@@ -90,7 +90,7 @@ math.parser math.ranges tools.test urls ;
     { { 1 { 2 3 } { 4 5 } } "9f01820203820405ff" }
     { { 1 { 2 3 } { 4 5 } } "83018202039f0405ff" }
     { { 1 { 2 3 } { 4 5 } } "83019f0203ff820405" }
-    ${ 25 [1,b] >array "9f0102030405060708090a0b0c0d0e0f101112131415161718181819ff" }
+    ${ 25 [1..b] >array "9f0102030405060708090a0b0c0d0e0f101112131415161718181819ff" }
     { { { "a" 1 } { "b" { 2 3 } } } "bf61610161629f0203ffff" }
     { { "a" { { "b" "c" } } } "826161bf61626163ff" }
     { { { "Fun" t } { "Amt" -2 } } "bf6346756ef563416d7421ff" }

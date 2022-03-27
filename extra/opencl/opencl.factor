@@ -2,9 +2,9 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors alien alien.c-types alien.data arrays
 byte-arrays combinators combinators.smart destructors
-io.encodings.ascii io.encodings.string kernel libc literals
-locals make math namespaces opencl.ffi sequences
-specialized-arrays variants ;
+io.encodings.ascii io.encodings.string kernel libc literals make
+math namespaces opencl.ffi sequences specialized-arrays
+variants ;
 IN: opencl
 SPECIALIZED-ARRAYS: void* char size_t ;
 
@@ -225,14 +225,14 @@ M: cl-filter-linear  filter-mode-constant drop CL_FILTER_LINEAR ;
     } cleave ;
 
 : cl_device_fp_config>flags ( ulong -- sequence )
-    [ {
+    {
         [ CL_FP_DENORM           bitand 0 = [ f ] [ cl-denorm           ] if ]
         [ CL_FP_INF_NAN          bitand 0 = [ f ] [ cl-inf-and-nan      ] if ]
         [ CL_FP_ROUND_TO_NEAREST bitand 0 = [ f ] [ cl-round-to-nearest ] if ]
         [ CL_FP_ROUND_TO_ZERO    bitand 0 = [ f ] [ cl-round-to-zero    ] if ]
         [ CL_FP_ROUND_TO_INF     bitand 0 = [ f ] [ cl-round-to-inf     ] if ]
         [ CL_FP_FMA              bitand 0 = [ f ] [ cl-fma              ] if ]
-    } cleave ] { } output>sequence sift ;
+    } cleave>array sift ;
 
 : cl_device_mem_cache_type>cache-type ( uint -- cache-type )
     {

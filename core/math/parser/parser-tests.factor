@@ -359,6 +359,11 @@ unit-test
 { f } [ "0b1," string>number ] unit-test
 { f } [ "0o1," string>number ] unit-test
 
+{ f } [ "1_" string>number ] unit-test
+{ 12 } [ "1_2" string>number ] unit-test
+{ f } [ "1_2_" string>number ] unit-test
+{ 123 } [ "1_2_3" string>number ] unit-test
+
 ! #372
 ! hex float requires exponent
 { f } [ "0x1.0" string>number ] unit-test

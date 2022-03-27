@@ -1,10 +1,9 @@
 ! Copyright (C) 2009 Joe Groff.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors alien alien.c-types alien.data audio
-audio.chunked-file classes.struct combinators
-combinators.short-circuit endian io io.binary
-io.encodings.binary io.files kernel locals math sequences
-audio.loader ;
+audio.chunked-file audio.loader classes.struct combinators
+combinators.short-circuit endian io.encodings.binary io.files
+kernel math sequences ;
 IN: audio.aiff
 
 CONSTANT: FORM-MAGIC "FORM"

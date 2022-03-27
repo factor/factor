@@ -17,7 +17,7 @@ IN: graphviz.tests
     ] [
         nip output>>
         "Use one of: " split1 nip "\n" ?tail drop
-        " " split
+        split-words
     ] recover ;
 
 ! http://www.graphviz.org/Download_macos.php#comment-474
@@ -51,7 +51,7 @@ SYMBOLS: supported-layouts supported-formats ;
     ] with-test-directory ;
 
 : preview-smoke-test ( graph -- pass? )
-    [ exists? ] with-preview ;
+    [ file-exists? ] with-preview ;
 
 : K_n ( n -- graph )
     <graph>

@@ -4,7 +4,7 @@ USING: accessors alien.data arrays assocs byte-arrays
 classes.struct combinators combinators.extras
 combinators.short-circuit destructors fry generalizations
 hashtables hashtables.identity io.encodings.string
-io.encodings.utf8 kernel libc linked-assocs locals make math
+io.encodings.utf8 kernel libc linked-assocs make math
 math.parser namespaces sequences sets strings yaml.config
 yaml.conversion yaml.ffi hash-sets.identity ;
 IN: yaml

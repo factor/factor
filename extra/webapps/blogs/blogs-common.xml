@@ -7,6 +7,7 @@
 	<t:style t:include="resource:extra/webapps/blogs/blogs.css" />
 
 	<div class="navbar">
+	<div class="navrow">
 
 		<t:a t:href="$blogs/">All Posts</t:a>
 		<t:a t:href="$blogs/by">My Posts</t:a>
@@ -23,9 +24,12 @@
 		</t:if>
 
 	</div>
+	</div>
 
+	<div class="page">
 	<h1><t:write-title /></h1>
 
 	<t:call-next-template />
+	</div>
 
 </t:chloe>

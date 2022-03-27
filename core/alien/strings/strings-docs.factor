@@ -1,5 +1,5 @@
-USING: help.markup help.syntax strings byte-arrays alien libc
-debugger io.encodings.string sequences ;
+USING: alien byte-arrays help.markup help.syntax sequences
+strings ;
 IN: alien.strings
 
 HELP: string>alien

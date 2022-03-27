@@ -1,7 +1,7 @@
 ! Copyright (c) 2012 Anonymous
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors calendar combinators kernel locals math
-math.constants math.functions prettyprint system threads timers ;
+USING: accessors calendar kernel math math.constants
+math.functions prettyprint system threads timers ;
 IN: rosetta-code.active-object
 
 ! http://rosettacode.org/wiki/Active_object

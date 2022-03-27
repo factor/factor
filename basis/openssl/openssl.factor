@@ -16,11 +16,11 @@ SINGLETON: openssl
 : ssl-error-string ( -- string )
     ERR_get_error (ssl-error-string) ;
 
-: (ssl-error) ( -- * )
+: throw-ssl-error ( -- * )
     ssl-error-string throw ;
 
 : ssl-error ( obj -- )
-    { f 0 } member? [ (ssl-error) ] when ;
+    { f 0 } member? [ throw-ssl-error ] when ;
 
 : init-old-api ( -- )
     SSL_library_init ssl-error
@@ -45,4 +45,4 @@ SINGLETON: openssl
         t ssl-initialized? set-global
     ] unless ;
 
-[ f ssl-initialized? set-global ] "openssl" add-startup-hook
+STARTUP-HOOK: [ f ssl-initialized? set-global ]

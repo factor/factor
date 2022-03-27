@@ -1,6 +1,7 @@
 USING: accessors assocs continuations http http.server
 http.server.requests io.encodings.utf8 io.encodings.binary
-io.streams.string kernel math peg sequences tools.test urls ;
+io.streams.string kernel math peg sequences tools.test urls
+splitting ;
 
 { t } [ [ \ + first ] [ <500> ] recover response? ] unit-test
 
@@ -38,7 +39,7 @@ io.streams.string kernel math peg sequences tools.test urls ;
         "connection: close"
         "host: 127.0.0.1:55532"
         "user-agent: Factor http.client"
-    } [ "\n" join ] [ "\r\n" join ] bi
+    } [ join-lines ] [ "\r\n" join ] bi
     [ [ read-request ] with-string-reader ] same?
 ] unit-test
 

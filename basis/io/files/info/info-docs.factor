@@ -67,7 +67,7 @@ ARTICLE: "io.files.info" "File system metadata"
 { $subsections
     file-info
     link-info
-    exists?
+    file-exists?
     directory?
     regular-file?
     symbolic-link?

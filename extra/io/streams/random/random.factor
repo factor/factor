@@ -1,7 +1,7 @@
 ! Copyright (C) 2010 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: destructors io io.encodings.binary io.files
-io.streams.limited kernel random random.private sequences
+io.streams.limited kernel random random.private
 sequences.private ;
 IN: io.streams.random
 

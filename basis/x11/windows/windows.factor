@@ -28,14 +28,14 @@ CONSTANT: event-mask
     }
 
 : window-attributes ( visinfo -- attributes )
-    XSetWindowAttributes <struct>
+    XSetWindowAttributes new
     0 >>background_pixel
     0 >>border_pixel
     event-mask >>event_mask
     swap create-colormap >>colormap ;
 
 : set-size-hints ( window -- )
-    XSizeHints <struct>
+    XSizeHints new
     USPosition >>flags
     [ dpy get ] 2dip XSetWMNormalHints ;
 

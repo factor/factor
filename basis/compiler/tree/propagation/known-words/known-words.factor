@@ -386,8 +386,21 @@ generic-comparison-ops [
 \ fixnum-max { fixnum fixnum } "input-classes" set-word-prop
 \ fixnum-max [ interval-max ] [ fixnum-valued ] binary-op
 
-\ (local-allot) { alien } "default-output-classes" set-word-prop
+\ local-allot { alien } "default-output-classes" set-word-prop
 
 \ tag [
     drop fixnum 0 num-types get [a,b) <class/interval-info>
 ] "outputs" set-word-prop
+
+! Primitive resize operations
+
+: propagate-resize-fixed-length-sequence ( n-info in-info class -- out-info )
+    nip <sequence-info> ;
+
+{ { resize-array array }
+  { resize-byte-array byte-array }
+  { resize-string string } }
+[
+    [ propagate-resize-fixed-length-sequence ] curry
+    "outputs" set-word-prop
+] assoc-each

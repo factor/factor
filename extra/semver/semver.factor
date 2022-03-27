@@ -1,10 +1,8 @@
 ! Copyright (C) 2020 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays assocs combinators
-combinators.short-circuit combinators.smart kernel math
-math.order math.parser multiline peg.ebnf sequences
-sequences.deep sequences.extras sequences.private sorting.human
-splitting strings ;
+USING: accessors arrays assocs combinators combinators.smart
+kernel math math.order math.parser multiline peg.ebnf sequences
+sequences.deep sequences.extras splitting strings ;
 IN: semver
 
 ! caret - up to next major versions, aka only major version needs to match as long as minor/patch are >=

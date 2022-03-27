@@ -1,6 +1,6 @@
 ! Copyright (C) 2003, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors classes.maybe combinators
+USING: accessors classes classes.maybe combinators
 combinators.short-circuit continuations hashtables io io.styles
 kernel make math namespaces prettyprint.config sequences sets
 splitting strings vocabs vocabs.parser words ;
@@ -368,5 +368,10 @@ M: block long-section
         [ pprinter-manifest ] [ f ] if
     ] with-scope ; inline
 
+: error-in-pprint ( obj -- )
+    <flow class-of name>> "~pprint error: " "~" surround text block> ;
+
 : with-pprint ( obj quot -- )
-    f make-pprint drop do-pprint ; inline
+    '[ _ f make-pprint ]
+    [ drop [ error-in-pprint ] f make-pprint ] recover
+    drop do-pprint ; inline

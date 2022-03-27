@@ -181,9 +181,10 @@ ARTICLE: "db" "Database library"
 "Accessing a database:"
 { $subsections "db-custom-database-combinators" }
 "Higher-level database help:"
-{ $vocab-subsection "Database types" "db.types" }
-{ $vocab-subsection "High-level tuple/database integration" "db.tuples" }
-$nl
+{ $vocab-subsections
+    { "Database types" "db.types" }
+    { "High-level tuple/database integration" "db.tuples" }
+}
 "Low-level database help:"
 { $subsections
     "db-protocol"
@@ -191,8 +192,10 @@ $nl
     "db-lowlevel-tutorial"
 }
 "Supported database backends:"
-{ $vocab-subsection "SQLite" "db.sqlite" }
-{ $vocab-subsection "PostgreSQL" "db.postgresql" } ;
+{ $vocab-subsections
+    { "SQLite" "db.sqlite" }
+    { "PostgreSQL" "db.postgresql" }
+} ;
 
 ARTICLE: "db-random-access-result-set" "Random access result sets"
 "Random-access result sets do not have to be traversed in order. For instance, PostgreSQL's result set object can be accessed as a matrix with i,j coordinates."

@@ -1,9 +1,9 @@
 ! Copyright (C) 2011 Erik Charlebois.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: parser system kernel sequences math math.ranges
+USING: parser system kernel sequences math ranges
 cpu.ppc.assembler combinators compiler.constants
 bootstrap.image.private layouts namespaces ;
-IN: bootstrap.ppc
+IN: bootstrap.assembler.ppc
 
 8 \ cell set
 big-endian on
@@ -16,7 +16,7 @@ CONSTANT: rs-reg    15
 CONSTANT: vm-reg    16
 CONSTANT: ctx-reg   17
 CONSTANT: frame-reg 31
-: nv-int-regs ( -- seq ) 13 31 [a,b] ;
+: nv-int-regs ( -- seq ) 13 31 [a..b] ;
 
 : LOAD64 ( r n -- )
     [ dup ] dip {
@@ -76,5 +76,5 @@ CONSTANT: frame-reg 31
 : param-size ( -- n ) 64 ;
 : saved-int-regs-size ( -- n ) 192 ;
 
-<< "vocab:bootstrap/assembler/ppc.factor" parse-file suffix! >>
+<< "resource:basis/bootstrap/assembler/ppc.factor" parse-file suffix! >>
 call

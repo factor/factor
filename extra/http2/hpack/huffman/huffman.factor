@@ -1,6 +1,5 @@
-USING: accessors arrays assocs bit-arrays http2.hpack
-io.encodings.string io.encodings.utf8 kernel literals locals
-make math sequences ;
+USING: accessors arrays assocs bit-arrays io.encodings.string
+io.encodings.utf8 kernel literals make math sequences ;
 
 IN: http2.hpack.huffman
 

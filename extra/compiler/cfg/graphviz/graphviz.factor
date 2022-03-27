@@ -24,7 +24,7 @@ FROM: compiler.cfg.linearization => number-blocks ;
 IN: compiler.cfg.graphviz
 
 : left-justify ( str -- str' )
-    string-lines "\\l" join ;
+    split-lines "\\l" join ;
 
 : left-justified ( quot -- str )
     with-string-writer left-justify ; inline

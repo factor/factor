@@ -1,6 +1,6 @@
 ! Copyright (C) 2018 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: cocoa cocoa.application cocoa.classes kernel locals ;
+USING: cocoa cocoa.application cocoa.classes kernel ;
 IN: notifications.macos
 
 IMPORT: NSUserNotification

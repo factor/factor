@@ -1,11 +1,10 @@
 ! Copyright (C) 2021 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs calendar combinators
-combinators.extras continuations destructors io
-io.encodings.string io.encodings.utf8 io.files.info io.sockets
-io.streams.string kernel layouts make parser prettyprint
-prettyprint.config sequences splitting system system-info
-threads ;
+continuations destructors io io.encodings.string
+io.encodings.utf8 io.files.info io.sockets io.streams.string
+kernel layouts make parser prettyprint prettyprint.config
+sequences splitting system system-info threads ;
 IN: broadcast-server
 
 TUPLE: broadcast-server < disposable
@@ -64,7 +63,7 @@ SINGLETONS: command data ;
             ] [
                 [
                     receive-socket>> receive
-                    [ utf8 decode "\n" split parse-lines ] dip
+                    [ utf8 decode split-lines parse-lines ] dip
                 ] keep handle-data t
             ] if
         ] loop

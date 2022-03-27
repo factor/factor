@@ -1,6 +1,6 @@
 ! Copyright (C) 2018, 2019 Alexander Ilin.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: ascii binary-search calendar io.binary kernel make math
+USING: ascii binary-search calendar endian kernel make math
 math.bitwise math.order namespaces random sequences splitting
 summary system tr ;
 
@@ -27,9 +27,9 @@ SYMBOL: last-random-bits
 : encode-time ( timestamp -- string )
     timestamp>millis 10 encode-bits ;
 
-: same-msec? ( -- ? )
-    nano-count 1000 /i dup \ same-msec? get =
-    [ drop t ] [ \ same-msec? set f ] if ;
+: same-millisecond? ( -- ? )
+    nano-count 1,000,000 /i dup \ same-millisecond? get =
+    [ drop t ] [ \ same-millisecond? set f ] if ;
 
 : pack-bits ( seq -- seq' )
     5 swap [ first ] [ rest ] bi [
@@ -45,7 +45,7 @@ SYMBOL: last-random-bits
 
 TR: (normalize-ulid) "ILO" "110" ; inline
 
-: (ulid) ( same-msec? -- ulid )
+: (ulid) ( same-millisecond? -- ulid )
     [
         last-time-string get last-random-bits get 1 +
         dup 80-bits > [ ulid-overflow ] when
@@ -57,7 +57,7 @@ TR: (normalize-ulid) "ILO" "110" ; inline
 PRIVATE>
 
 : ulid ( -- ulid )
-    same-msec? (ulid) ;
+    same-millisecond? (ulid) ;
 
 ERROR: ulid>bytes-bad-length n ;
 M: ulid>bytes-bad-length summary drop "Invalid ULID length" ;

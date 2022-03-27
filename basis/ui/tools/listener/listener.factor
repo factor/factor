@@ -6,8 +6,8 @@ concurrency.mailboxes continuations destructors documents
 documents.elements fonts hashtables help help.markup help.tips
 io io.styles kernel lexer listener literals math math.vectors
 models models.arrow models.delay namespaces parser prettyprint
-sequences source-files.errors strings system threads ui
-ui.commands ui.gadgets ui.gadgets.editors ui.gadgets.glass
+sequences source-files.errors splitting strings system threads
+ui ui.commands ui.gadgets ui.gadgets.editors ui.gadgets.glass
 ui.gadgets.labeled ui.gadgets.panes ui.gadgets.scrollers
 ui.gadgets.status-bar ui.gadgets.toolbar ui.gadgets.tracks
 ui.gestures ui.operations ui.pens.solid ui.theme
@@ -117,7 +117,7 @@ M: word (print-input)
     output>> [ (print-input) ] with-output-stream* ;
 
 : interactor-continue ( obj interactor -- )
-    mailbox>> mailbox-put ;
+    [ mailbox>> mailbox-put ] [ scroll>bottom ] bi ;
 
 : interactor-finish ( interactor -- )
     [ history>> history-add ] keep
@@ -131,7 +131,7 @@ M: word (print-input)
     ] unless drop ;
 
 : evaluate-input ( interactor -- )
-    dup interactor-busy? [ drop ] [
+    dup interactor-busy? [ scroll>bottom ] [
         [ control-value ] keep interactor-continue
     ] if ;
 
@@ -161,7 +161,7 @@ M: interactor stream-readln
 M:: interactor stream-read-unsafe ( n buf interactor -- count )
     n [ 0 ] [
         drop
-        interactor interactor-read dup [ "\n" join ] when
+        interactor interactor-read dup [ join-lines ] when
         n short [ head-slice 0 buf copy ] keep
     ] if-zero ;
 
@@ -176,7 +176,7 @@ M: interactor stream-read1
 M: interactor stream-read-until
     swap '[
         _ interactor-read [
-            "\n" join CHAR: \n suffix
+            join-lines CHAR: \n suffix
             [ _ member? ] dupd find
             [ [ head ] when* ] dip dup not
         ] [ f f f ] if*
@@ -318,12 +318,12 @@ M: listener-operation invoke-command
     [ [ clear ] \ clear ] dip (call-listener) ;
 
 : use-if-necessary ( word manifest -- )
-    2dup [ vocabulary>> ] dip and [
+    [ [ vocabulary>> ] keep ] dip pick over and [
         manifest [
-            [ vocabulary>> use-vocab ]
-            [ dup name>> associate use-words ] bi
+            [ drop use-vocab ]
+            [ name>> 1array add-words-from ] 2bi
         ] with-variable
-    ] [ 2drop ] if ;
+    ] [ 3drop ] if ;
 
 M: word accept-completion-hook
     interactor>> manifest>> use-if-necessary ;
@@ -478,6 +478,7 @@ listener-gadget "touchbar" f {
     { f refresh-all }
     { f com-auto-use }
     { f com-help }
+    { f show-error-list }
 } define-command-map
 
 listener-gadget "file-drop" "Files can be drag-and-dropped onto the listener."

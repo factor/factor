@@ -124,7 +124,7 @@ M: insn visit-insn 2drop ;
 : compute-live-out ( basic-block -- live-out )
     [ successors>> [ live-in ] map ]
     [ dup successors>> [ edge-live-in ] with map ] bi
-    append assoc-combine ;
+    append assoc-union-all ;
 
 : update-live-out ( basic-block -- changed? )
     [ compute-live-out ] keep

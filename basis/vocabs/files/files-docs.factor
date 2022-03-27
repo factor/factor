@@ -1,4 +1,5 @@
-USING: help.markup help.syntax literals sequences strings ;
+USING: help.markup help.syntax literals sequences splitting
+strings ;
 IN: vocabs.files
 
 HELP: vocab-tests-path
@@ -23,7 +24,7 @@ HELP: vocab-files
             "    \"resource:basis/alien/libraries/libraries-docs.factor\""
             "    \"resource:basis/alien/libraries/libraries-tests.factor\""
             "}"
-        } "\n" join
+        } join-lines
     ]
   }
 } ;
@@ -48,7 +49,7 @@ HELP: vocab-tests
             "    \"resource:basis/xml/tests/xmltest.factor\""
             "    \"resource:basis/xml/tests/xmode-dtd.factor\""
             "}"
-        } "\n" join
+        } join-lines
     ]
   }
 } ;

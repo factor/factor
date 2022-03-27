@@ -1,13 +1,13 @@
 ! Copyright (C) 2008, 2011 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays assocs combinators.short-circuit
-debugger formatting fry help help.home help.topics help.vocabs
-html html.streams io.directories io.encodings.binary
-io.encodings.utf8 io.files io.files.temp io.pathnames kernel
-locals make math math.parser memoize namespaces regexp sequences
-sequences.deep serialize sorting splitting tools.completion
-vocabs vocabs.hierarchy words xml.data xml.syntax xml.traversal
-xml.writer ;
+USING: accessors arrays ascii assocs combinators.short-circuit
+debugger formatting help help.home help.topics help.vocabs html
+html.streams io.directories io.encodings.ascii
+io.encodings.binary io.encodings.utf8 io.files io.files.temp
+io.pathnames kernel make math math.parser namespaces regexp
+sequences sequences.deep serialize sorting splitting system
+tools.completion vocabs vocabs.hierarchy words xml.data
+xml.syntax xml.traversal xml.writer ;
 FROM: io.encodings.ascii => ascii ;
 FROM: ascii => ascii? ;
 IN: help.html
@@ -75,21 +75,42 @@ M: pathname url-of
     [XML <meta
             name="viewport"
             content="width=device-width, initial-scale=1"
+            charset="utf-8"
         /> XML] ;
 
 : help-navbar ( -- xml )
     "conventions" >link topic>filename
     [XML
         <div class="navbar">
-        <a href="/">Handbook</a>
-        <a href=<->>Glossary</a>
-        <form method="get" action="/search" style="float: right;">
-            <input placeholder="Search" name="search" type="text"/>
-            <input type="submit" value="Go"/>
-            <a href="//factorcode.org">factorcode.org</a>
-        </form>
+            <div class="navrow">
+                <a href="https://factorcode.org">
+                <img src="favicon.ico" width="24" height="24" />
+                </a>
+                <a href="/">Handbook</a>
+                <a href=<->>Glossary</a>
+                <form method="get" action="/search" style="float: right;">
+                    <input placeholder="Search" name="search" type="text"/>
+                    <input type="submit" value="Go"/>
+                </form>
+            </div>
         </div>
      XML] ;
+
+: help-footer ( -- xml )
+    version-info "\n" split1 drop
+    [XML
+        <div class="footer">
+        <p>
+        This documentation was generated offline from a
+        <code>load-all</code> image.  If you want, you can also
+        browse the documentation from within the <a
+        href="article-ui-tools.html">UI developer tools</a>. See
+        the <a href="https://factorcode.org">Factor website</a>
+        for more information.
+        </p>
+        <p><-></p>
+        </div>
+    XML] ;
 
 : bijective-base26 ( n -- name )
     [ dup 0 > ] [ 1 - 26 /mod CHAR: a + ] "" produce-as nip reverse! ;
@@ -97,7 +118,7 @@ M: pathname url-of
 : css-class ( style classes -- name )
     dup '[ drop _ assoc-size 1 + bijective-base26 ] cache ;
 
-: css-style ( style -- style' )
+: fix-css-style ( style -- style' )
     R/ font-size: \d+pt;/ [
         "font-size: " ?head drop "pt;" ?tail drop
         string>number 2 -
@@ -118,10 +139,26 @@ M: pathname url-of
         " white-space: pre-wrap; line-height: 125%;" append
     ] re-replace-with ;
 
+: fix-help-header ( classes -- classes )
+    dup [
+        [ ".a" head? ] [ "#f4efd9;" swap subseq? ] bi and
+    ] find [
+        "padding: 10px;" "padding: 0px;" replace
+        "background-color: #f4efd9;" "background-color: white;" replace
+        "}" ?tail drop
+        " border-bottom: 1px dashed #ccc; width: 100%; padding-top: 15px; padding-bottom: 10px; }"
+        append swap pick set-nth {
+            ".a a { color: black; font-size: 24pt; line-height: 100%; }"
+            ".a * a { color: #2A5DB0; font-size: 12pt; }"
+            ".a td { border: none; }"
+            ".a tr:hover { background-color: white; }"
+        } prepend
+    ] [ drop ] if* ;
+
 : css-classes ( classes -- stylesheet )
     [
-        [ css-style " { " "}" surround ] [ "." prepend ] bi* prepend
-    ] { } assoc>map "\n" join ;
+        [ fix-css-style " { " "}" surround ] [ "." prepend ] bi* prepend
+    ] { } assoc>map fix-help-header join-lines ;
 
 :: css-styles-to-classes ( body -- stylesheet body )
     H{ } clone :> classes
@@ -145,7 +182,7 @@ M: pathname url-of
     "@2x" over subseq? [ "." split1-last "@2x." glue ] unless ;
 
 : ?copy-file ( from to -- )
-    dup exists? [ 2drop ] [ copy-file ] if ;
+    dup file-exists? [ 2drop ] [ copy-file ] if ;
 
 : cache-images ( body -- body' )
     dup [
@@ -166,8 +203,9 @@ M: pathname url-of
     [
         [ print-topic ] with-html-writer
         css-styles-to-classes cache-images
-        [ help-stylesheet help-meta prepend help-navbar ] dip
-        [XML <div id="container"><-><div class="page"><-></div></div> XML]
+        "resource:extra/websites/factorcode/favicon.ico" dup file-name ?copy-file
+        [ help-stylesheet help-meta prepend help-navbar ] dip help-footer
+        [XML <-><div class="page"><-><-></div> XML]
     ] bi simple-page ;
 
 : generate-help-file ( topic -- )
