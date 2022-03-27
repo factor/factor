@@ -14,7 +14,7 @@ SYMBOL: level
 : board-one ( gadget -- gadget )
     8 9 make-board
     
-    { 2 2 } player set-cell
+    { 2 2 } player add-to-cell
 
     {
                         { 2 0 } { 3 0 } { 4 0 } { 5 0 } { 6 0 }
@@ -26,15 +26,15 @@ SYMBOL: level
         { 0 6 }                                                 { 7 6 }
         { 0 7 }                                                 { 7 7 }
         { 0 8 } { 1 8 } { 2 8 } { 3 8 } { 4 8 } { 5 8 } { 6 8 } { 7 8 }
-    } wall set-cells
+    } wall add-to-cells
     
     { 
         { 4 3 } { 4 4 } { 4 6 } { 3 6 } { 5 6 }
-    } crate set-cells
+    } crate add-to-cells
 
     {
         { 1 2 } { 5 3 } { 1 4 } { 4 5 } { 3 6 } { 6 6 } { 4 7 } 
-    } goal set-cells
+    } goal add-to-cells
 
     ! { 1 2 } { "vocab:sokoban2/resources/Crate_Yellow.png" "vocab:sokoban2/resources/Goal.png" } set-cell
 
@@ -43,7 +43,7 @@ SYMBOL: level
 : board-two ( gadget -- gadget )
     22 11 make-board
     
-    { 11 8 } player set-cell
+    { 11 8 } player add-to-cell
 
     {
                                         { 4 0 } { 5 0 } { 6 0 } { 7 0 } { 8 0 }
@@ -57,17 +57,17 @@ SYMBOL: level
         { 0 8 } { 1 8 } { 2 8 } { 3 8 } { 4 8 }         { 6 8 } { 7 8 } { 8 8 }         { 10 8 }          { 12 8 } { 13 8 } { 14 8 } { 15 8 } { 16 8 }                                     { 21 8 }
                                         { 4 9 }                                         { 10 9 } { 11 9 } { 12 9 }                            { 16 9 } { 17 9 } { 18 9 } { 19 9 } { 20 9 } { 21 9 }
                                         { 4 10 } { 5 10 } { 6 10 } { 7 10 } { 8 10 } { 9 10 } { 10 10 }  
-    } wall set-cells
+    } wall add-to-cells
     
     {
         { 19 6 } { 20 6 }
         { 19 7 } { 20 7 }
         { 19 8 } { 20 8 }
-    } goal set-cells
+    } goal add-to-cells
 
     { 
         { 5 2 } { 7 3 } { 5 4 } { 8 4 } { 5 7 } { 2 7 }
-    } crate set-cells
+    } crate add-to-cells
 
     create-board ;
 
@@ -75,11 +75,11 @@ SYMBOL: level
     { [ board-one ] [ board-two ] } ;
 
 :: get-pos ( board object -- seq )
-    board [ object = ] find-cell-pos ;
+    board [ [ object = ] any? ] find-cell-pos ;
 
 :: move-object ( board move object object-pos -- )
-    board object-pos delete-cell drop
-    board object-pos move v+ object set-cell drop ;
+    board object-pos object delete-from-cell
+    object-pos move v+ object add-to-cell drop ;
 
 :: move-crate ( board move player-pos -- )
     player-pos move v+ :> crate-pos
@@ -87,7 +87,7 @@ SYMBOL: level
     ! Move both the player and crate if possible, otherwise do nothing
     {
         { 
-            [ next-cell f = ] ! crate can be moved to free space
+            [ next-cell { } = ] ! crate can be moved to free space FIX THIS BOIIII
             [ board move crate crate-pos move-object 
             board move player player-pos move-object ] 
         }
@@ -108,7 +108,7 @@ SYMBOL: level
             [ board move player-pos move-crate ] 
         }
         {
-            [ adjacent-cell goal = ] ! player is moving into a goal
+            [ adjacent-cell [ goal = ] any? ] ! player is moving into a goal
             [ ]
             ! [ board move { "vocab:sokoban2/resources/CharR.png" "vocab:sokoban2/resources/Goal.png" } player-pos move-object ]
         }
