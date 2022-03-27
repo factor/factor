@@ -108,7 +108,7 @@ $nl
 "{"
 "    { \"action\" \"query\" }"
 "    { \"list\" \"watchlistraw\" }"
-"} api-query"
+"} api-call"
 "\"watchlistraw\" of" }
 { $code " { { \"list\" \"watchlistraw\" } } query" } } ;
 
