@@ -1,9 +1,9 @@
 ! Copyright (C) 2021 Giftpflanze.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: arrays accessors assocs calendar combinators
-continuations formatting http http.client io json.reader kernel
-locals make math math.parser namespaces oauth1 prettyprint
-sequences strings system threads ;
+USING: arrays accessors assocs assocs.extras calendar
+combinators continuations formatting http http.client io
+json.reader kernel locals make math math.parser namespaces
+oauth1 prettyprint sequences strings system threads ;
 IN: mediawiki.api
 
 TUPLE: oauth-login consumer-token consumer-secret access-token
@@ -13,8 +13,14 @@ TUPLE: password-login username password ;
 C: <oauth-login> oauth-login
 C: <password-login> password-login
 
-SYMBOLS: basetimestamp endpoint botflag contact cookies
-curtimestamp oauth-login password-login csrf-token ;
+SYMBOLS: botflag contact cookies csrf-token endpoint oauth-login
+password-login ;
+
+<PRIVATE
+
+SYMBOLS: basetimestamp curtimestamp ;
+
+PRIVATE>
 
 t botflag set-global
 
@@ -135,8 +141,7 @@ PRIVATE>
     { { "action" "query" } } params assoc-union api-call dup
     dup "query" of [ nip ] when*
     "siprop" params key? [
-        params "prop" "list" "meta" [ of ] tri-curry@ tri or or
-        of
+        params { "prop" "list" "meta" } values-of sift first of
     ] unless swap ;
 
 PRIVATE>
