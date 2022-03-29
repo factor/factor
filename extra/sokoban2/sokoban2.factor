@@ -1,4 +1,4 @@
-USING: kernel namespaces accessors sequences combinators math.vectors colors.constants 
+USING: literals kernel namespaces accessors sequences combinators math.vectors colors.constants 
 game_lib.ui game_lib.board ui.gestures ui.gadgets ;
 
 IN: sokoban2
@@ -7,6 +7,7 @@ CONSTANT: player "vocab:sokoban2/resources/CharR.png"
 CONSTANT: wall COLOR: gray ! "vocab:sokoban2/resources/Wall_Brown.png"
 CONSTANT: goal "vocab:sokoban2/resources/Goal.png"
 CONSTANT: crate "vocab:sokoban2/resources/Crate_Yellow.png"
+CONSTANT: dark_crate "vocab:sokoban2/resources/CrateDark_Yellow.png"
 
 SYMBOL: level 
 0 level set-global
@@ -26,15 +27,15 @@ SYMBOL: level
         { 0 6 }                                                 { 7 6 }
         { 0 7 }                                                 { 7 7 }
         { 0 8 } { 1 8 } { 2 8 } { 3 8 } { 4 8 } { 5 8 } { 6 8 } { 7 8 }
-    } wall add-to-cells
+    } $ wall add-to-cells
     
     { 
-        { 4 3 } { 4 4 } { 4 6 } { 3 6 } { 5 6 }
-    } crate add-to-cells
+        { 1 6 } { 3 2 } { 4 3 } { 4 4 } { 4 6 } { 3 6 } { 5 6 }
+    } $ crate add-to-cells
 
     {
         { 1 2 } { 5 3 } { 1 4 } { 4 5 } { 3 6 } { 6 6 } { 4 7 } 
-    } goal add-to-cells
+    } $ goal add-to-cells
 
     ! { 1 2 } { "vocab:sokoban2/resources/Crate_Yellow.png" "vocab:sokoban2/resources/Goal.png" } set-cell
 
@@ -75,7 +76,7 @@ SYMBOL: level
     { [ board-one ] [ board-two ] } ;
 
 :: get-pos ( board object -- seq )
-    board [ [ object = ] any? ] find-cell-pos ;
+    board [ object = ] find-cell-pos ;
 
 :: move-object ( board move object object-pos -- )
     board object-pos object delete-from-cell
@@ -87,7 +88,7 @@ SYMBOL: level
     ! Move both the player and crate if possible, otherwise do nothing
     {
         { 
-            [ next-cell { } = ] ! crate can be moved to free space FIX THIS BOIIII
+            [ next-cell is-empty? next-cell goal cell-contains? or ] ! crate can be moved to free space FIX THIS BOIIII
             [ board move crate crate-pos move-object 
             board move player player-pos move-object ] 
         }
@@ -96,21 +97,21 @@ SYMBOL: level
 
 :: sokoban-move ( board move -- )
     board player get-pos :> player-pos
-    board player-pos move v+ get-cell :> adjacent-cell
+    player-pos move v+ :> new-pos
+    board new-pos get-cell :> adjacent-cell
     ! Move player to free space or have player push crate if possible, otherwise do nothing
     {
         {
-            [ adjacent-cell f = ] ! player can be moved to free space
+            [ adjacent-cell is-empty? ] ! player can be moved to free space
             [ board move player player-pos move-object ] 
         }
         { 
-            [ adjacent-cell crate = ] ! player is moving into a crate
+            [ adjacent-cell crate cell-contains? ] ! player is moving into a crate
             [ board move player-pos move-crate ] 
         }
         {
-            [ adjacent-cell [ goal = ] any? ] ! player is moving into a goal
-            [ ]
-            ! [ board move { "vocab:sokoban2/resources/CharR.png" "vocab:sokoban2/resources/Goal.png" } player-pos move-object ]
+            [ adjacent-cell goal cell-contains? ] ! player can be moved to free space
+            [ board move player player-pos move-object ] 
         }
         [ ] ! Else do nothing
     } cond ;
