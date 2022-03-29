@@ -1,4 +1,4 @@
-USING: assocs sequences sequences.generalizations kernel accessors sequences.extras math.ranges generalizations ;
+USING: assocs sequences sequences.generalizations sets kernel accessors sequences.extras math.ranges generalizations ;
 
 IN: game_lib.board
 
@@ -110,9 +110,14 @@ TUPLE: board width height cells ;
 :: duplicate-cell ( board start dest -- board )
     board dup start get-cell dest set-cell ;
 
-:: move-cell ( board start dest -- board )
+
+! fix this
+:: move-entire-cell ( board start dest -- board )
     board start dest duplicate-cell
     start delete-cell ;
+
+! :: move-object ( board obj start dest -- board ) 
+
 
 :: swap-cells ( board loc1 loc2 -- board )
     board loc1 get-cell :> cell1
@@ -129,12 +134,12 @@ TUPLE: board width height cells ;
 
 ! Return index and row that contains the first cell that satisfies the quot
 :: find-row ( board quot -- index row )
-    board cells>> [ quot find drop ] find ; inline
+    board cells>> [ [ quot find drop ] find drop ] find ; inline
 
 ! Return first location and cell that satisfies the quot
 :: find-cell ( board quot -- seq cell )
     board quot find-row swap :> y
-    quot find swap :> x
+    [ quot find drop ] find swap :> x
     { x y } swap ; inline
 
 ! checks quote in arrays as well, output location of first match 
@@ -152,6 +157,11 @@ TUPLE: board width height cells ;
 :: find-all-rows ( board quot -- index row )
     board cells>> [ quot find swap drop not not ] find-all ; inline
 
+: is-empty? ( cell -- ?  )
+    { } = ;
+
+: cell-contains? ( cell object -- ? )
+    swap in? ;
 
 ! Helper function that formats a position cell pair
 :: label-cell ( x cell y -- seq )
