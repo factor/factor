@@ -206,6 +206,7 @@ PRIVATE>
 
 :: move-page ( from to reason params -- assoc )
     {
+        { "action" "move" }
         { "from" from }
         { "to" to }
         { "reason" reason }
