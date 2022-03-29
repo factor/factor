@@ -1,5 +1,5 @@
-USING: accessors arrays classes quotations ui.gadgets kernel ui.gadgets.status-bar ui ui.render colors.constants opengl locals.types strings sequences combinators peg
-images.loader opengl.textures assocs math math.ranges game_lib.board game_lib.cell ui.gestures colors ;
+USING: accessors arrays classes quotations ui.gadgets kernel ui.gadgets.status-bar ui ui.render opengl locals.types strings sequences combinators peg
+images.loader opengl.textures assocs math ranges game_lib.board game_lib.cell ui.gestures colors ;
 
 IN: game_lib.ui
 
