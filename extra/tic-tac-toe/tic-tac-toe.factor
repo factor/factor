@@ -18,7 +18,7 @@ X player set-global
     COLOR: black { 0 256 } { 400 10 } draw-filled-rectangle ;
 
 : board ( gadget -- gadget )
-    3 3 make-board
+    3 3 make-board { } 1sequence
     create-board ; 
 
 : set-player ( -- )
@@ -35,7 +35,7 @@ X player set-global
     ] when ;
 
 :: on-click ( -- quot )
-    [ dup dup board>> swap hand-rel-cell player get-global set-board relayout-1 ] ;
+    [ dup dup board>> first swap hand-rel-cell player get-global set-board relayout-1 ] ;
 
 :: row-win ( board -- ? )
     ! Returns true if either X or O has a row win
