@@ -78,19 +78,15 @@ SYMBOL: level
 :: get-pos ( board object -- seq )
     board [ object = ] find-cell-pos ;
 
-:: move-object ( board move object object-pos -- )
-    board object-pos object delete-from-cell
-    object-pos move v+ object add-to-cell drop ;
-
-:: move-crate ( board move player-pos -- )
+:: move-crate ( board player-pos move -- )
     player-pos move v+ :> crate-pos
     board crate-pos move v+ get-cell :> next-cell
     ! Move both the player and crate if possible, otherwise do nothing
     {
         { 
-            [ next-cell is-empty? next-cell goal cell-contains? or ] ! crate can be moved to free space FIX THIS BOIIII
-            [ board move crate crate-pos move-object 
-            board move player player-pos move-object ] 
+            [ next-cell is-empty? next-cell goal cell-only-contains? or ] ! crate can be moved to free space FIX THIS BOIIII
+            [ board crate-pos move crate move-object 
+            player-pos move player move-object drop ] 
         }
         [ ] ! Else do nothing
     } cond ;
@@ -101,17 +97,13 @@ SYMBOL: level
     board new-pos get-cell :> adjacent-cell
     ! Move player to free space or have player push crate if possible, otherwise do nothing
     {
-        {
-            [ adjacent-cell is-empty? ] ! player can be moved to free space
-            [ board move player player-pos move-object ] 
-        }
         { 
             [ adjacent-cell crate cell-contains? ] ! player is moving into a crate
-            [ board move player-pos move-crate ] 
+            [ board player-pos move move-crate ] 
         }
         {
-            [ adjacent-cell goal cell-contains? ] ! player can be moved to free space
-            [ board move player player-pos move-object ] 
+            [ adjacent-cell is-empty? adjacent-cell goal cell-contains? or ] ! player can be moved to free space
+            [ board player-pos move player move-object drop ] 
         }
         [ ] ! Else do nothing
     } cond ;

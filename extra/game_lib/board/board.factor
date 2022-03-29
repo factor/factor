@@ -1,4 +1,4 @@
-USING: assocs sequences sequences.generalizations sets kernel accessors sequences.extras math.ranges generalizations ;
+USING: assocs sequences sequences.generalizations sets kernel accessors sequences.extras math.ranges math.vectors generalizations ;
 
 IN: game_lib.board
 
@@ -116,8 +116,9 @@ TUPLE: board width height cells ;
     board start dest duplicate-cell
     start delete-cell ;
 
-! :: move-object ( board obj start dest -- board ) 
-
+:: move-object ( board object-pos move object -- board )
+    board object-pos object delete-from-cell
+    object-pos move v+ object add-to-cell ;
 
 :: swap-cells ( board loc1 loc2 -- board )
     board loc1 get-cell :> cell1
@@ -162,6 +163,10 @@ TUPLE: board width height cells ;
 
 : cell-contains? ( cell object -- ? )
     swap in? ;
+
+:: cell-only-contains? ( cell object -- ? )
+    cell length 1 = 
+    cell object cell-contains? and ;
 
 ! Helper function that formats a position cell pair
 :: label-cell ( x cell y -- seq )
