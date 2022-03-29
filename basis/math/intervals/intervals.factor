@@ -52,9 +52,9 @@ M: full-interval to>> drop { 1/0. t } ;
 : [a,a] ( a -- interval )
     closed-point dup <interval> ; foldable
 
-: [-inf,a] ( a -- interval ) -1/0. swap [a,b] ; inline
+: [-inf,b] ( b -- interval ) -1/0. swap [a,b] ; inline
 
-: [-inf,a) ( a -- interval ) -1/0. swap [a,b) ; inline
+: [-inf,b) ( b -- interval ) -1/0. swap [a,b) ; inline
 
 : [a,inf] ( a -- interval ) 1/0. [a,b] ; inline
 
@@ -255,8 +255,8 @@ M: interval interval-length
         { [ over empty-interval? ] [ drop ] }
         { [ dup empty-interval? ] [ nip ] }
         { [ 2dup [ full-interval? ] both? ] [ drop ] }
-        { [ over full-interval? ] [ nip to>> first [-inf,a] ] }
-        { [ dup full-interval? ] [ drop to>> first [-inf,a] ] }
+        { [ over full-interval? ] [ nip to>> first [-inf,b] ] }
+        { [ dup full-interval? ] [ drop to>> first [-inf,b] ] }
         [ [ interval-closure ] bi@ [ min ] interval-op nan-not-ok ]
     } cond ;
 
@@ -483,12 +483,12 @@ M: interval interval-log2
 
 : assume< ( i1 i2 -- i3 )
     dup special-interval? [ drop ] [
-        to>> first [-inf,a) interval-intersect
+        to>> first [-inf,b) interval-intersect
     ] if ;
 
 : assume<= ( i1 i2 -- i3 )
     dup special-interval? [ drop ] [
-        to>> first [-inf,a] interval-intersect
+        to>> first [-inf,b] interval-intersect
     ] if ;
 
 : assume> ( i1 i2 -- i3 )

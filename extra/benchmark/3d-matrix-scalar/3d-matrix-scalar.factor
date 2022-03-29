@@ -1,4 +1,4 @@
-USING: kernel locals math math.matrices math.matrices.extras
+USING: kernel math math.matrices math.matrices.extras
 math.order math.vectors prettyprint sequences ;
 IN: benchmark.3d-matrix-scalar
 

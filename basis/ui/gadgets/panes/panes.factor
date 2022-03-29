@@ -1,6 +1,6 @@
 ! Copyright (C) 2005, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors assocs classes combinators destructors
+USING: accessors arrays assocs classes combinators destructors
 documents.private fonts io io.styles kernel math math.rectangles
 math.vectors models namespaces sequences sets sorting splitting
 strings ui.baseline-alignment ui.clipboards ui.gadgets
@@ -46,7 +46,6 @@ DEFER: write-gadget
     input>> [ request-focus ] when* ;
 
 : next-line ( pane -- )
-    clear-selection
     [ input>> unparent ]
     [ init-current prepare-last-line ]
     [ focus-input ] tri ;
@@ -86,23 +85,27 @@ M: pane selected-children
 : scroll-pane ( pane -- )
     dup scrolls?>> [ scroll>bottom ] [ drop ] if ;
 
-: smash-line ( current -- gadget )
+GENERIC: pane-label ( pane -- label )
+
+M: pane pane-label drop "" <label> ;
+
+: smash-line ( pane current -- gadget )
     dup children>> {
-        { [ dup empty? ] [ 2drop "" <label> ] }
-        { [ dup length 1 = ] [ nip first ] }
-        [ drop ]
+        { [ dup empty? ] [ 2drop pane-label ] }
+        { [ dup length 1 = ] [ 2nip first ] }
+        [ drop nip ]
     } cond ;
 
 : pane-nl ( pane -- )
     [
-        [ current>> [ unparent ] [ smash-line ] bi ] [ output>> ] bi
+        [ dup current>> [ unparent ] [ smash-line ] bi ] [ output>> ] bi
         add-incremental
     ] [ next-line ] bi ;
 
 GENERIC: smash-pane ( pane -- gadget )
 
 M: pane smash-pane
-    [ pane-nl ] [ output>> smash-line ] bi ;
+    [ pane-nl ] [ dup output>> smash-line ] bi ;
 
 GENERIC: pane-line ( str style gadget -- )
 
@@ -116,8 +119,24 @@ GENERIC: pane-line ( str style gadget -- )
 : pane-write1 ( char pane -- )
     [ 1string H{ } ] dip current>> pane-line ;
 
-: do-pane-stream ( pane-stream quot -- )
-    [ pane>> ] dip keep scroll-pane ; inline
+:: do-pane-stream ( pane-stream quot -- )
+    pane-stream pane>> :> pane
+    pane find-scroller :> scroller
+    scroller [
+        model>> {
+            [ range-value second ]
+            [ range-page-value second + ]
+            [ range-max-value second >= ]
+        } cleave
+    ] [ f ] if* :> bottom?
+    pane quot call
+    pane scrolls?>> bottom? and scroller and [
+        scroller {
+            [ model>> range-value first ]
+            [ model>> range-max-value second 2array ]
+            [ set-scroll-position ]
+        } cleave
+    ] when ; inline
 
 M: pane-stream stream-nl
     [ pane-nl ] do-pane-stream ;
@@ -129,7 +148,7 @@ M: pane-stream stream-write1
     '[
         dup length 3639 >
         [ 3639 over last-grapheme-from cut-slice ] [ f ] if
-        swap "" like split-lines @ dup
+        swap "" like ?split-lines @ dup
     ] loop drop ; inline
 
 M: pane-stream stream-write
@@ -177,7 +196,7 @@ M: filter-writer write-gadget
     stream>> write-gadget ;
 
 M: pane-stream write-gadget
-    pane>> current>> swap add-gadget drop ;
+    [ current>> swap add-gadget drop ] do-pane-stream ;
 
 : print-gadget ( gadget stream -- )
     [ write-gadget ] [ nip stream-nl ] 2bi ;
@@ -192,8 +211,10 @@ M: pane-stream write-gadget
     bi ;
 
 : with-pane ( pane quot -- )
-    [ [ scroll>top ] [ clear-pane ] [ <pane-stream> ] tri ] dip
-    with-output-stream* ; inline
+    over [
+        [ [ scroll>top ] [ clear-pane ] [ <pane-stream> ] tri ] dip
+        with-output-stream*
+    ] dip scroll-pane ; inline
 
 : make-pane ( quot -- gadget )
     [ <pane> ] dip '[ _ with-pane ] keep smash-pane ; inline
@@ -344,6 +365,8 @@ M: pane-stream stream-write-table
     apply-presentation-style
     nip ;
 
+M: styled-pane pane-label style>> "" <styled-label> ;
+
 : pane-text ( string style gadget -- )
     [ swap <styled-label> ] [ swap add-gadget drop ] bi* ;
 
@@ -353,7 +376,7 @@ M: paragraph pane-line
     { presented image-style } pick '[ _ key? ] any? [
         pane-text
     ] [
-        [ " " split ] 2dip
+        [ split-words ] 2dip
         [ pane-bl ] [ pane-text ] bi-curry bi-curry
         interleave
     ] if ;

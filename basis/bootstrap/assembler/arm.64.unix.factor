@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: cpu.arm.assembler cpu.arm.assembler.opcodes kernel layouts
 parser sequences ;
-IN: bootstrap.arm
+IN: bootstrap.assembler.arm
 
 ! Stack frame
 ! https://docs.microsoft.com/en-us/cpp/build/arm64-exception-handling?view=vs-2019
@@ -56,6 +56,6 @@ IN: bootstrap.arm
 : arg4 ( -- reg ) X3 ;
 : red-zone-size ( -- n ) 16 ;
 
-<< "vocab:bootstrap/assembler/arm.unix.factor" parse-file suffix! >> call
-<< "vocab:bootstrap/assembler/arm.64.factor" parse-file suffix! >> call
-<< "vocab:bootstrap/assembler/arm.factor" parse-file suffix! >> call
+<< "resource:basis/bootstrap/assembler/arm.unix.factor" parse-file suffix! >> call
+<< "resource:basis/bootstrap/assembler/arm.64.factor" parse-file suffix! >> call
+<< "resource:basis/bootstrap/assembler/arm.factor" parse-file suffix! >> call

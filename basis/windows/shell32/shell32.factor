@@ -125,7 +125,7 @@ FUNCTION: DWORD_PTR SHGetFileInfoW ( LPCTSTR pszPath,
 : shell32-file-info ( path -- err struct )
     normalize-path
     0
-    SHFILEINFO <struct>
+    SHFILEINFO new
     [ dup byte-length SHGFI_EXETYPE SHGetFileInfoW ] keep ;
 
 SINGLETONS:

@@ -1,10 +1,11 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays assocs fry html.components html.forms
+USING: accessors assocs html.components html.forms
 html.templates html.templates.chloe.compiler
 html.templates.chloe.components html.templates.chloe.syntax
 io.encodings.utf8 io.files io.files.info kernel logging make
 math namespaces sequences splitting words xml xml.syntax ;
+QUALIFIED: xml.data
 IN: html.templates.chloe
 
 TUPLE: chloe path ;
@@ -45,8 +46,8 @@ CHLOE: script
 
 CHLOE: write-script
     drop [
-        get-script
-        [XML <script type="text/javascript"> <-> </script> XML]
+        get-script "*/" "/*" surround xml.data:<cdata>
+        [XML <script type="text/javascript">/* <-> */</script> XML]
     ] [xml-code] ;
 
 CHLOE: meta

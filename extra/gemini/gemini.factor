@@ -1,7 +1,7 @@
 ! Copyright (C) 2021 John Benediktsson
 ! See http://factorcode.org/license.txt for BSD license
 
-USING: accessors ascii assocs colors.constants combinators
+USING: accessors ascii assocs colors combinators
 combinators.short-circuit continuations images.loader
 images.loader.private images.viewer io io.encodings.ascii
 io.encodings.binary io.encodings.latin1 io.encodings.string
@@ -191,4 +191,4 @@ CONSTANT: text-style H{ { font-size 12 } { font-style plain } }
 PRIVATE>
 
 : gemtext. ( base-url body -- )
-    f pre [ string-lines [ gemini-line. ] with each ] with-variable ;
+    f pre [ split-lines [ gemini-line. ] with each ] with-variable ;

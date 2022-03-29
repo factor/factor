@@ -27,3 +27,6 @@ IN: xdg
 : xdg-runtime-dir ( -- path/f )
     "XDG_RUNTIME_DIR" os-env ;
     ! TODO: check runtime secure permissions
+
+: xdg-state-dir ( -- path )
+    "XDG_STATE_HOME" os-env [ "~/.local/state" ] when-empty ;

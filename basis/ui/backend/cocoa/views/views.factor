@@ -1,18 +1,19 @@
 ! Copyright (C) 2006, 2010 Slava Pestov
 ! See http://factorcode.org/license.txt for BSD license.
+
 USING: accessors alien alien.c-types alien.data alien.strings
 arrays assocs classes cocoa cocoa.application cocoa.classes
 cocoa.pasteboard cocoa.runtime cocoa.subclassing cocoa.touchbar
-cocoa.types cocoa.views combinators core-foundation.strings
-core-graphics core-graphics.types core-text io.encodings.utf8
-kernel literals locals math math.order math.parser
-math.rectangles namespaces opengl sequences splitting threads
-ui.commands ui.gadgets ui.gadgets.private ui.gadgets.worlds
-ui.gestures ui.private words sorting math.vectors
-ui.baseline-alignment ui.gadgets.line-support
-ui.gadgets.editors ui.backend.cocoa.input-methods
-ui.backend.cocoa.input-methods.editors io.encodings.utf16n
-io.encodings.string classes.struct ;
+cocoa.types cocoa.views combinators continuations
+core-foundation.strings core-graphics core-graphics.types
+core-text debugger io.encodings.string io.encodings.utf16
+io.encodings.utf8 kernel literals math math.order math.parser
+math.rectangles math.vectors namespaces opengl sequences
+splitting threads ui.backend.cocoa.input-methods ui.commands
+ui.gadgets ui.gadgets.editors ui.gadgets.line-support
+ui.gadgets.private ui.gadgets.worlds ui.gestures ui.private
+ui.theme ui.theme.switching words ;
+
 IN: ui.backend.cocoa.views
 
 SLOT: window
@@ -270,27 +271,18 @@ IMPORT: NSAttributedString
         gadget remove-preedit-info 
     ] when ;
 
+: set-scale-factor ( n -- )
+    [ 1.0 > ] keep f ? gl-scale-factor set-global
+    cached-lines get-global clear-assoc ;
+
 PRIVATE>
 
 <CLASS: FactorView < NSOpenGLView
     COCOA-PROTOCOL: NSTextInputClient
 
     METHOD: void prepareOpenGL [
-
-        self SEL: setWantsBestResolutionOpenGLSurface:
-        -> respondsToSelector: c-bool> [
-
-            self 1 { void { id SEL char } } ?-> setWantsBestResolutionOpenGLSurface:
-
-            self { double { id SEL } } ?-> backingScaleFactor
-
-            dup 1.0 > [
-                gl-scale-factor set-global t retina? set-global
-                cached-lines get-global clear-assoc
-            ] [ drop ] if
-
-            self -> update
-        ] when
+        self -> backingScaleFactor set-scale-factor
+        self -> update
     ] ;
 
     METHOD: void reshape [
@@ -327,7 +319,16 @@ PRIVATE>
     ! Rendering
     METHOD: void drawRect: NSRect rect [
         self window [
-            draw-world yield
+            [ draw-world yield ] [ print-error drop ] recover
+        ] when*
+    ] ;
+
+    ! Light/Dark Mode
+
+    METHOD: void viewDidChangeEffectiveAppearance [
+        self -> effectiveAppearance -> name [
+            CF>string "NSAppearanceNameDarkAqua" =
+            dark-theme light-theme ? switch-theme-if-default
         ] when*
     ] ;
 
@@ -656,7 +657,9 @@ PRIVATE>
     CGLSetParameter drop ;
 
 : <FactorView> ( dim pixel-format -- view )
-    [ FactorView ] 2dip <GLView> [ sync-refresh-to-screen ] keep ;
+    [ FactorView ] 2dip <GLView>
+    [ -> backingScaleFactor set-scale-factor ] keep
+    [ sync-refresh-to-screen ] keep ;
 
 : save-position ( world window -- )
     -> frame CGRect-top-left 2array >>window-loc drop ;
@@ -696,14 +699,7 @@ PRIVATE>
 
     METHOD: void windowDidChangeBackingProperties: id notification
     [
-
-        notification -> object dup SEL: backingScaleFactor
-        -> respondsToSelector: c-bool> [
-            { double { id SEL } } ?-> backingScaleFactor
-
-            [ [ 1.0 > ] keep f ? gl-scale-factor set-global ]
-            [ 1.0 > retina? set-global ] bi
-        ] [ drop ] if
+        notification -> object -> backingScaleFactor set-scale-factor
     ] ;
 ;CLASS>
 

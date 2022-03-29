@@ -2,8 +2,8 @@ USING: combinators.short-circuit editors io.standard-paths
 kernel make math.parser namespaces sequences system ;
 IN: editors.emacs
 
-SINGLETON: emacsclient
-emacsclient editor-class set-global
+SINGLETON: emacs
+emacs editor-class set-global
 
 SYMBOL: emacsclient-path
 SYMBOL: emacsclient-args
@@ -20,7 +20,7 @@ M: windows find-emacsclient
         [ "emacsclient.exe" ]
     } 0|| ;
 
-M: emacsclient editor-command
+M: emacs editor-command
     [
         emacsclient-path get [ find-emacsclient ] unless* ,
         emacsclient-args get [ { "-a=emacs" "--no-wait" } ] unless* %

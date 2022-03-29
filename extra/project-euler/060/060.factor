@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license
 
 USING: backtrack backtrack.private combinators.short-circuit
-kernel locals math math.functions math.primes
+kernel math math.functions math.primes
 project-euler.common sequences ;
 
 IN: project-euler.060

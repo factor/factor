@@ -3,7 +3,7 @@
 USING: accessors byte-arrays calendar checksums
 checksums.openssl classes.tuple formatting io.encodings.ascii
 io.encodings.string kernel literals math math.functions
-math.parser math.ranges present random sequences splitting ;
+math.parser ranges present random sequences splitting ;
 IN: hashcash
 
 ! Hashcash implementation
@@ -25,7 +25,7 @@ IN: hashcash
 ! Random salt is formed by ascii characters
 ! between 33 and 126
 CONSTANT: available-chars $[
-    CHAR: : 33 126 [a,b] remove >byte-array
+    CHAR: : 33 126 [a..b] remove >byte-array
 ]
 
 PRIVATE>

@@ -8,7 +8,7 @@ IN: editors.visual-studio-code
 ! Command line arguments
 ! https://code.visualstudio.com/docs/editor/command-line
 
-TUPLE:  visual-studio-code ;
+TUPLE: visual-studio-code ;
 T{ visual-studio-code } editor-class set-global
 
 HOOK: find-visual-studio-code-path editor-class ( -- path )
@@ -21,7 +21,7 @@ M: visual-studio-code find-visual-studio-code-path
                 [ "Code" which ]
                 [ home "VSCode-linux-x64/Code" append-path ]
                 [ "/usr/share/code/code" ]
-            } [ dup exists? [ drop f ] unless ] map-compose 0|| ] }
+            } [ dup file-exists? [ drop f ] unless ] map-compose 0|| ] }
         { macosx [
             "com.microsoft.VSCode" find-native-bundle
             [ "Contents/MacOS/Electron" append-path ] [ f ] if* ] }

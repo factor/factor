@@ -1,4 +1,4 @@
-USING: cuckoo-filters fry io.binary kernel math sequences ;
+USING: cuckoo-filters endian kernel math sequences ;
 IN: benchmark.cuckoo-filters
 
 : insert-data ( cuckoo-filter -- cuckoo-filter )

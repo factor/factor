@@ -494,6 +494,18 @@ HELP: wrap
     }
 } ;
 
+HELP: d>w/w
+{ $values { "d" "a 64-bit integer" } { "w1" "a 32-bit integer" } { "w2" "a 32-bit integer" } }
+{ $description "Outputs two integers, the least followed by the most significant 32 bits of the input." } ;
+
+HELP: w>h/h
+{ $values { "w" "a 32-bit integer" } { "h1" "a 16-bit integer" } { "h2" "a 16-bit integer" } }
+{ $description "Outputs two integers, the least followed by the most significant 16 bits of the input." } ;
+
+HELP: h>b/b
+{ $values { "h" "a 16-bit integer" } { "b1" "an 8-bit integer" } { "b2" "an 8-bit integer" } }
+{ $description "Outputs two integers, the least followed by the most significant 8 bits of the input." } ;
+
 ARTICLE: "math-bitfields" "Constructing bit fields"
 "Some applications, such as binary communication protocols and assemblers, need to construct integers from elaborate bit field specifications. Hand-coding this using " { $link shift } " and " { $link bitor } " results in repetitive code. A higher-level facility exists to factor out this repetition:"
 { $subsections bitfield } ;
@@ -551,6 +563,12 @@ $nl
     W+
     W-
     W*
+}
+"Words for taking larger integers apart into smaller integers:"
+{ $subsections
+    d>w/w
+    w>h/h
+    h>b/b
 }
 "Converting a number to the nearest even/odd/signed:"
 { $subsections

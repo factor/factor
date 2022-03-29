@@ -33,3 +33,45 @@ IN: modern.html.tests
 
 { [[ <!-- omg omg -->]] }
 [ [[ <!-- omg omg -->]] string>html html>string ] unit-test
+
+{ "<div><div><a/><b/><c/></div></div>" }
+[ "<div> <div>  <a/> <b/> <c/> </div> </div>" string>html html>string ] unit-test
+
+{ "<?xml version='1.0'?>" }
+[ [[ <?xml version='1.0'?> ]] string>html html>string ] unit-test
+
+{ "<?xml version='1.0'?>" }
+[ [[ <?xml version='1.0' ?> ]] string>html html>string ] unit-test
+
+{
+    V{
+        T{ doctype
+            { open "<!DOCTYPE" }
+            { close ">" }
+            { values
+                V{
+                    "plist"
+                    "PUBLIC"
+                    T{ dquote
+                        { payload "-//Apple//DTD PLIST 1.0//EN" }
+                    }
+                    T{ dquote
+                        { payload
+                            "http://www.apple.com/DTDs/PropertyList-1.0.dtd"
+                        }
+                    }
+                }
+            }
+        }
+    }
+} [
+    [[ <!DOCTYPE plist PUBLIC
+    "-//Apple//DTD PLIST 1.0//EN"
+    "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+    ]]
+    string>html
+] unit-test
+
+{
+    V{ T{ comment { open "<!--" } { payload " comment " } { close "-->" } } }
+} [ [[ <!-- comment --> ]] string>html ] unit-test

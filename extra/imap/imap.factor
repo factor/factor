@@ -1,10 +1,9 @@
 USING: accessors arrays assocs calendar calendar.english
-calendar.format calendar.parser formatting fry grouping io
-io.crlf io.encodings.ascii io.encodings.binary
-io.encodings.string io.encodings.utf7 io.encodings.utf8
-io.sockets io.sockets.secure io.streams.duplex io.streams.string
-kernel math math.parser multiline pcre sequences
-sequences.extras strings ;
+calendar.format calendar.parser formatting grouping io io.crlf
+io.encodings.ascii io.encodings.binary io.encodings.string
+io.encodings.utf7 io.encodings.utf8 io.sockets io.sockets.secure
+io.streams.duplex io.streams.string kernel math math.parser
+multiline sequences sequences.extras splitting strings ;
 QUALIFIED: pcre
 IN: imap
 
@@ -79,7 +78,7 @@ CONSTANT: IMAP4_SSL_PORT 993
 
 ! Special parsing
 : parse-items ( seq -- items )
-    first " " split 2 tail ;
+    first split-words 2 tail ;
 
 : parse-list-folders ( str -- folder )
     [[ \* LIST \(([^\)]+)\) "([^"]+)" "?([^"]+)"?]] pcre:findall
@@ -96,11 +95,11 @@ CONSTANT: IMAP4_SSL_PORT 993
 
 : parse-status ( seq -- assoc )
     first [[ \* STATUS "[^"]+" \(([^\)]+)\)]] pcre:findall first last last
-    " " split 2 group [ string>number ] assoc-map ;
+    split-words 2 group [ string>number ] assoc-map ;
 
 : parse-store-mail-line ( str -- pair/f )
     [[ \(FLAGS \(([^\)]+)\) UID (\d+)\)]] pcre:findall [ f ] [
-        first rest values first2 [ " " split ] dip string>number swap 2array
+        first rest values first2 [ split-words ] dip string>number swap 2array
     ] if-empty ;
 
 : parse-store-mail ( seq -- assoc )
@@ -145,7 +144,7 @@ PRIVATE>
     drop ;
 
 : status-folder ( mailbox keys -- assoc )
-    [ >utf7imap4 ] dip " " join "STATUS \"%s\" (%s)" sprintf
+    [ >utf7imap4 ] dip join-words "STATUS \"%s\" (%s)" sprintf
     "" command-response parse-status ;
 
 : close-folder ( -- )

@@ -1,5 +1,4 @@
-USING: alien destructors help.markup help.syntax python python.throwing
-quotations ;
+USING: alien destructors help.markup help.syntax quotations ;
 IN: python
 
 HELP: py-initialize

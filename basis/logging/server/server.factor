@@ -3,8 +3,7 @@
 USING: assocs calendar calendar.format combinators
 concurrency.messaging continuations debugger destructors init io
 io.directories io.encodings.utf8 io.files io.pathnames kernel
-locals math math.parser math.ranges namespaces sequences
-strings threads ;
+math math.parser ranges namespaces sequences strings threads ;
 IN: logging.server
 
 : log-root ( -- string )
@@ -72,7 +71,7 @@ CONSTANT: keep-logs 10
     keep-logs log# ?delete-file ;
 
 : ?move-file ( old new -- )
-    over exists? [ move-file ] [ 2drop ] if ;
+    over file-exists? [ move-file ] [ 2drop ] if ;
 
 : advance-log ( path n -- )
     [ 1 - log# ] 2keep log# ?move-file ;
@@ -82,7 +81,7 @@ CONSTANT: keep-logs 10
     [
         log-path
         [ delete-oldest ]
-        [ keep-logs 1 [a,b] [ advance-log ] with each ] bi
+        [ keep-logs 1 [a..b] [ advance-log ] with each ] bi
     ] bi ;
 
 : (rotate-logs) ( -- )
@@ -98,7 +97,7 @@ CONSTANT: keep-logs 10
 
 : log-server ( -- )
     [
-        init-namespaces
+        init-namestack
         [ log-server-loop ]
         [ error. (close-logs) ]
         recover t
@@ -106,7 +105,7 @@ CONSTANT: keep-logs 10
     "Log server" spawn-server
     "log-server" set-global ;
 
-[
+STARTUP-HOOK: [
     H{ } clone log-files set-global
     log-server
-] "logging" add-startup-hook
+]

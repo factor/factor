@@ -82,18 +82,22 @@ M: real pprint*
         [ unsupported-number-base ]
     } case ;
 
-: pprint-nan? ( f -- ? )
-    { [ fp-nan? ] [ 0/0. fp-bitwise= not ] [ -0/0. fp-bitwise= not ] } 1&& ;
-
 M: float pprint*
-    dup pprint-nan? [
-        \ NAN: [
-            [ fp-nan-payload ] [ fp-sign ] bi
-            [ 0xfffffffffffff bitxor 1 + neg ] when >hex text
-        ] pprint-prefix
-    ] [
-        call-next-method
-    ] if ;
+    {
+        { [ dup 0/0. fp-bitwise= ] [ drop "0/0." text ] }
+        { [ dup -0/0. fp-bitwise= ] [ drop "-0/0." text ] }
+        { [ dup fp-nan? ] [
+            \ NAN: [
+                [ fp-nan-payload ] [ fp-sign ] bi
+                [ 0xfffffffffffff bitxor 1 + neg ] when >hex text
+            ] pprint-prefix
+        ] }
+        { [ dup 1/0. = ] [ drop "1/0." text ] }
+        { [ dup -1/0. = ] [ drop "-1/0." text ] }
+        { [ dup 0.0 fp-bitwise= ] [ drop "0.0" text ] }
+        { [ dup -0.0 fp-bitwise= ] [ drop "-0.0" text ] }
+        [ call-next-method ]
+    } cond ;
 
 M: f pprint* drop \ f pprint-word ;
 
@@ -153,7 +157,7 @@ M: pathname pprint*
 : check-recursion ( obj quot: ( obj -- ) -- )
     nesting-limit? [
         drop
-        [ class-of name>> "~" dup surround ] keep present-text
+        [ class-of name>> "~" 1surround ] keep present-text
     ] [
         over recursion-check get member-eq? [
             drop "~circularity~" swap present-text

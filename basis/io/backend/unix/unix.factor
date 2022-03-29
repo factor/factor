@@ -62,7 +62,7 @@ M: unix can-seek-handle?
     fd>> SEEK_CUR 0 lseek -1 = not ;
 
 M: unix handle-length
-    fd>> \ stat <struct> [ fstat -1 = not ] keep
+    fd>> \ stat new [ fstat -1 = not ] keep
     swap [ st_size>> ] [ drop f ] if ;
 
 ERROR: io-timeout ;

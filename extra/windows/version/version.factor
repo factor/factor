@@ -1,6 +1,6 @@
 USING:
     alien alien.data alien.libraries alien.syntax
-    destructors formatting io.binary kernel libc locals
+    destructors endian formatting kernel libc
     math math.bitwise
     sequences windows.types
 ;

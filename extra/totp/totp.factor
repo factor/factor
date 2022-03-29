@@ -1,6 +1,6 @@
-! Copyright (C) 2018, 2020 Alexander Ilin.
+! Copyright (C) 2018, 2020, 2022 Alexander Ilin.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: base32 calendar checksums.hmac checksums.sha io.binary
+USING: base32 calendar checksums.hmac checksums.sha endian
 kernel math math.bitwise math.parser namespaces sequences
 strings unicode ;
 IN: totp
@@ -29,5 +29,5 @@ PRIVATE>
     [ number>string ] dip [ CHAR: 0 pad-head ] keep tail* ;
 
 : totp ( key -- string )
-    dup string? [ >upper base32> ] when
+    dup string? [ CHAR: space swap remove >upper base32> ] when
     now timestamp>count swap totp-hash get totp* totp-digits get digits ;

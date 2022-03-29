@@ -26,8 +26,8 @@
 
 ! for each prime number, count the families it belongs to. When one reaches count of 8, stop, and get the smallest number by replacing * with ones.
 
-USING: assocs fry kernel math math.combinatorics math.functions
-math.order math.parser math.primes math.ranges namespaces
+USING: assocs kernel math math.combinatorics math.functions
+math.order math.parser math.primes ranges namespaces
 project-euler.common sequences sets ;
 IN: project-euler.051
 <PRIVATE
@@ -45,7 +45,7 @@ SYMBOL: large-families
 : replace-positions-with-* ( str positions -- str )
     [ *-if-index ] curry map-index ;
 : all-positions-combinations ( seq -- combinations )
-    dup length [1,b] [ all-combinations ] with map concat ;
+    dup length [1..b] [ all-combinations ] with map concat ;
 
 : families ( stra -- seq )
     dup digits-positions values

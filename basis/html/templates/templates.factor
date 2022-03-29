@@ -4,10 +4,6 @@ USING: accessors arrays assocs boxes continuations debugger io
 io.encodings.utf8 io.files io.streams.string kernel namespaces
 prettyprint quotations sequences strings xml.data xml.syntax
 xml.writer ;
-! USING: accessors kernel fry io io.encodings.utf8 io.files
-! debugger prettyprint continuations namespaces boxes sequences
-! arrays strings html io.streams.string assocs
-! quotations xml.data xml.writer xml.syntax ;
 IN: html.templates
 
 MIXIN: template

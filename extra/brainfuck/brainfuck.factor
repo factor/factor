@@ -1,9 +1,9 @@
 ! Copyright (C) 2009 John Benediktsson
 ! See http://factorcode.org/license.txt for BSD license
 
-USING: accessors assocs command-line fry io io.encodings.binary
-io.files io.streams.string kernel macros math namespaces
-peg.ebnf prettyprint sequences multiline ;
+USING: accessors assocs command-line io io.encodings.binary
+io.files io.streams.string kernel math multiline namespaces
+peg.ebnf prettyprint sequences ;
 
 IN: brainfuck
 
@@ -82,7 +82,7 @@ PRIVATE>
 
 : brainfuck-main ( -- )
     command-line get [
-        contents (run-brainfuck)
+        read-contents (run-brainfuck)
     ] [
         [ binary file-contents (run-brainfuck) ] each
     ] if-empty ;

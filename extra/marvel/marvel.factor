@@ -1,8 +1,7 @@
 ! Copyright (C) 2014 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: assocs checksums checksums.md5 http.client json.reader
-kernel locals math.parser namespaces sequences strings system
-urls ;
+kernel math.parser namespaces sequences strings system urls ;
 IN: marvel
 
 ! http://developer.marvel.com/docs

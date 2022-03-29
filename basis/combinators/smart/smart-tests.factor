@@ -1,6 +1,6 @@
 ! Copyright (C) 2009 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays assocs combinators.smart kernel locals
+USING: accessors arrays assocs combinators.smart kernel
 math random sequences stack-checker tools.test ;
 IN: combinators.smart.tests
 

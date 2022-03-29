@@ -1,6 +1,6 @@
 ! Copyright (c) 2008 Aaron Schaefer.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: arrays kernel locals math math.order math.primes
+USING: arrays kernel math math.order math.primes
 project-euler.common sequences ;
 IN: project-euler.050
 

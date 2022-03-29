@@ -1,7 +1,8 @@
-USING: arrays assocs classes.algebra.private classes.tuple combinators
-command-line effects generic generic.math generic.single help.markup
-help.syntax io.pathnames kernel math parser sequences vocabs.loader
-vocabs.parser words words.alias words.constant words.symbol ;
+USING: arrays assocs classes.algebra.private classes.maybe
+classes.tuple combinators command-line effects generic
+generic.math generic.single help.markup help.syntax io.pathnames
+kernel math parser sequences vocabs.loader vocabs.parser words
+words.alias words.constant words.symbol ;
 IN: syntax
 
 ARTICLE: "parser-algorithm" "Parser algorithm"
@@ -33,11 +34,12 @@ ARTICLE: "syntax-immediate" "Parse time evaluation"
 } ;
 
 ARTICLE: "syntax-integers" "Integer syntax"
-"The printed representation of an integer consists of a sequence of digits, optionally prefixed by a sign and arbitrarily separated by commas."
+"The printed representation of an integer consists of a sequence of digits, optionally prefixed by a sign and arbitrarily separated by commas or underscores."
 { $code
     "123456"
     "-10"
     "2,432,902,008,176,640,000"
+    "1_000_000"
 }
 "Integers are entered in base 10 unless prefixed with a base-changing prefix. " { $snippet "0x" } " begins a hexadecimal literal, " { $snippet "0o" } " an octal literal, and " { $snippet "0b" } " a binary literal. A sign, if any, goes before the base prefix."
 { $example
@@ -218,11 +220,12 @@ ARTICLE: "syntax-vectors" "Vector syntax"
 
 ARTICLE: "syntax-hashtables" "Hashtable syntax"
 { $subsections POSTPONE: H{ }
-"Hashtables are documented in " { $link "hashtables" } "." ;
+{ $subsections POSTPONE: IH{ }
+"Hashtables are documented in " { $link "hashtables" } " and " { $vocab-link "hashtables.identity" } "." ;
 
 ARTICLE: "syntax-hash-sets" "Hash set syntax"
 { $subsections POSTPONE: HS{ }
-"Hashtables are documented in " { $link "hash-sets" } "." ;
+"Hash sets are documented in " { $link "hash-sets" } " and " { $vocab-link "hash-sets.identity" } "." ;
 
 ARTICLE: "syntax-tuples" "Tuple syntax"
 { $subsections POSTPONE: T{ }
@@ -390,6 +393,23 @@ HELP: intersection{
 { $values { "elements" "a list of classoids" } }
 { $description "Marks the beginning of a literal " { $link anonymous-intersection } " class." } ;
 
+HELP: maybe{
+{ $syntax "maybe{ elements... }" }
+{ $values { "elements" "a list of classoids" } }
+{ $description "Marks the beginning of a literal " { $link maybe } " class." } ;
+
+HELP: not{
+{ $syntax "not{ elements... }" }
+{ $values { "elements" "a list of classoids" } }
+{ $description "Marks the beginning of a literal " { $link anonymous-complement } " class." } ;
+
+HELP: union{
+{ $syntax "union{ elements... }" }
+{ $values { "elements" "a list of classoids" } }
+{ $description "Marks the beginning of a literal " { $link anonymous-union } " class." } ;
+
+{ POSTPONE: intersection{ POSTPONE: union{ POSTPONE: not{ POSTPONE: maybe{ } related-words
+
 HELP: H{
 { $syntax "H{ { key value }... }" }
 { $values { "key" object } { "value" object } }
@@ -401,6 +421,12 @@ HELP: HS{
 { $values { "members" "a list of objects" } }
 { $description "Marks the beginning of a literal hash set, given as a list of its members. Literal hashtables are terminated by " { $link POSTPONE: } } "." }
 { $examples { $code "HS{ 3 \"foo\" }" } } ;
+
+HELP: IH{
+{ $syntax "IH{ { key value }... }" }
+{ $values { "key" object } { "value" object } }
+{ $description "Marks the beginning of a literal identity hashtable, given as a list of two-element arrays holding key/value pairs. Literal identity hashtables are terminated by " { $link POSTPONE: } } "." }
+{ $examples { $code "IH{ { \"tuna\" \"fish\" } { \"jalapeno\" \"vegetable\" } }" } } ;
 
 HELP: C{
 { $syntax "C{ real-part imaginary-part }" }
@@ -476,6 +502,25 @@ HELP: SYMBOLS:
 { $values { "words" { $sequence "new words to define" } } }
 { $description "Creates a new symbol for every token until the " { $snippet ";" } "." }
 { $examples { $example "USING: prettyprint ;" "IN: scratchpad" "SYMBOLS: foo bar baz ;\nfoo . bar . baz ." "foo\nbar\nbaz" } } ;
+
+HELP: INITIALIZE:
+{ $syntax "INITIALIZE: word ... ;"  }
+{ $description "If " { $snippet "word" } " does not have a value in the global namespace, calls the definition and assigns the result to " { $snippet "word" } " in the global namespace." }
+{ $examples
+    { $unchecked-example
+        "USING: math namespaces prettyprint ;"
+        "SYMBOL: foo"
+        "INITIALIZE: foo 15 sq ;"
+        "foo get-global ."
+        "225" }
+    { $unchecked-example
+        "USING: math namespaces prettyprint ;"
+        "SYMBOL: foo"
+        "1234 foo set-global"
+        "INITIALIZE: foo 15 sq ;"
+        "foo get-global ."
+        "1234" }
+} ;
 
 HELP: SINGLETON:
 { $syntax "SINGLETON: class" }
@@ -876,7 +921,7 @@ HELP: C:
 HELP: MAIN:
 { $syntax "MAIN: word" }
 { $values { "word" word } }
-{ $description "Defines the main entry point for the current vocabulary and source file. This word will be executed when this vocabulary is passed to " { $link run } " or the source file is passed to " { $link run-script } "." } ;
+{ $description "Defines the main entry point for the current vocabulary and source file. This word will be executed when this vocabulary is passed to " { $link run } " or the source file is run as a script." } ;
 
 HELP: <PRIVATE
 { $syntax "<PRIVATE ... PRIVATE>" }
@@ -959,3 +1004,35 @@ HELP: execute(
 } ;
 
 { POSTPONE: call( POSTPONE: execute( } related-words
+
+HELP: BUILTIN:
+{ $syntax "BUILTIN: class slots ... ;" }
+{ $values { "class" "a builtin class" } { "definition" "a word definition" } }
+{ $description "A representation of a builtin class from the VM. This word cannot define new builtins but is meant to provide a paper trail to which vocabularies define the builtins. To define new builtins requires adding them to the VM." } ;
+
+HELP: PRIMITIVE:
+{ $syntax "PRIMITIVE: word ( stack -- effect )" }
+{ $description "A reference to a primitive word of from the VM. This word cannot define new primitives but is meant to provide a paper trail to which vocabularies define the primitives. To define new primitves requires adding them to the VM." } ;
+
+HELP: MEMO:
+{ $syntax "MEMO: word ( stack -- effect ) definition... ;" }
+{ $values { "word" "a new word to define" } { "definition" "a word definition" } }
+{ $description "Defines the given word at parse time as one which memoizes its output given a particular input. The stack effect is mandatory." } ;
+
+HELP: IDENTITY-MEMO:
+{ $syntax "IDENTITY-MEMO: word ( stack -- effect ) definition... ;" }
+{ $values { "word" "a new word to define" } { "definition" "a word definition" } }
+{ $description "Defines the given word at parse time as one which memoizes its output given a particular input which is identical to another input. The stack effect is mandatory." } ;
+
+HELP: IDENTITY-MEMO::
+{ $syntax "IDENTITY-MEMO:: word ( stack -- effect ) definition... ;" }
+{ $values { "word" "a new word to define" } { "definition" "a word definition" } }
+{ $description "Defines the given word at parse time as one which memoizes its output given a particular input with locals which is identical to another input. The stack effect is mandatory." } ;
+
+HELP: STARTUP-HOOK:
+{ $syntax "STARTUP-HOOK: word/quotation" }
+{ $description "Parses a word or a quotation and sets it as the startup hook for the current vocabulary." } ;
+
+HELP: SHUTDOWN-HOOK:
+{ $syntax "SHUTDOWN-HOOK: word/quotation" }
+{ $description "Parses a word or a quotation and sets it as the shutdown hook for the current vocabulary." } ;

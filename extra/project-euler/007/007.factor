@@ -1,6 +1,6 @@
 ! Copyright (c) 2007 Aaron Schaefer.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: lists math math.primes.lists project-euler.common ;
+USING: project-euler.common ;
 IN: project-euler.007
 
 ! http://projecteuler.net/index.php?section=problems&id=7

@@ -1,9 +1,9 @@
 ! Copyright (C) 2016 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays assocs combinators combinators.short-circuit
-continuations fry io.encodings.utf8 io.files kernel locals make
-math math.order modern.paths modern.slices sequences
-sequences.extras sets splitting strings unicode vocabs.loader ;
+continuations io.encodings.utf8 io.files kernel make math
+math.order modern.paths modern.slices sequences sequences.extras
+sets splitting strings unicode vocabs.loader ;
 IN: modern
 
 ERROR: string-expected-got-eof n string ;
@@ -99,7 +99,7 @@ MACRO:: read-matched ( ch -- quot: ( n string tag -- n' string slice' ) )
         n string tag
         2over nth-check-eof {
             { [ dup openstreq member? ] [ ch read-double-matched ] } ! (=( or ((
-            { [ dup blank? ] [
+            { [ dup unicode:blank? ] [
                 drop dup '[ _ matching-delimiter-string closestr1 2array members lex-until ] dip
                 swap unclip-last 3array ] } ! ( foo )
             [ drop [ slice-til-whitespace drop ] dip span-slices ]  ! (foo)
@@ -185,7 +185,7 @@ ERROR: unexpected-terminator n string slice ;
         [ "<" head? ]
         [ length 2 >= ]
         [ rest strict-upper? not ]
-        [ [ blank? ] any? not ]
+        [ [ unicode:blank? ] any? not ]
         [ "/>" tail? ]
     } 1&& ;
 
@@ -195,7 +195,7 @@ ERROR: unexpected-terminator n string slice ;
         [ length 2 >= ]
         [ second CHAR: / = not ]
         [ rest strict-upper? not ]
-        [ [ blank? ] any? not ]
+        [ [ unicode:blank? ] any? not ]
         [ ">" tail? ]
     } 1&& ;
 
@@ -205,7 +205,7 @@ ERROR: unexpected-terminator n string slice ;
         [ length 2 >= ]
         [ second CHAR: / = not ]
         [ rest strict-upper? not ]
-        [ [ blank? ] any? not ]
+        [ [ unicode:blank? ] any? not ]
         [ ">" tail? not ]
     } 1&& ;
 
@@ -214,7 +214,7 @@ ERROR: unexpected-terminator n string slice ;
         [ "</" head? ]
         [ length 2 >= ]
         [ rest strict-upper? not ]
-        [ [ blank? ] any? not ]
+        [ [ unicode:blank? ] any? not ]
         [ ">" tail? ]
     } 1&& ;
 
@@ -451,7 +451,7 @@ ERROR: compound-syntax-disallowed n seq obj ;
 
 : check-compound-loop ( n/f string -- n/f string ? )
     [ ] [ peek1-from ] [ previous-from ] 2tri
-    [ blank? ] bi@ or not ! no blanks between tokens
+    [ unicode:blank? ] bi@ or not ! no blanks between tokens
     pick and ; ! and a valid index
 
 : lex-factor ( n/f string/f -- n'/f string literal/f )

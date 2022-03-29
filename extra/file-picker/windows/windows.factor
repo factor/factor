@@ -61,7 +61,7 @@ FUNCTION: BOOL SHGetPathFromIDList (
 
 M: windows open-file-dialog
     [
-        BROWSEINFO <struct>
+        BROWSEINFO new
             GetDesktopWindow >>hwndOwner
             "Select a file or folder" utf8 malloc-string &free >>lpszTitle
             BIF_BROWSEINCLUDEFILES >>ulFlags

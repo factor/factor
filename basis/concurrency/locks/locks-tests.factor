@@ -1,5 +1,5 @@
 USING: tools.test concurrency.locks concurrency.count-downs
-concurrency.messaging concurrency.mailboxes locals kernel
+concurrency.messaging concurrency.mailboxes kernel
 threads sequences calendar accessors ;
 IN: concurrency.locks.tests
 

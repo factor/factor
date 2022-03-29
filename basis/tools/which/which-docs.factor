@@ -1,7 +1,7 @@
 ! Copyright (C) 2013 John Benediktsson.
 ! See http://factorcode.org/license.txt for BSD license.
 
-USING: help.markup help.syntax kernel strings ;
+USING: help.markup help.syntax strings ;
 
 IN: tools.which
 

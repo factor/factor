@@ -1,9 +1,8 @@
 ! Copyright (C) 2009, 2011 Doug Coleman, John Benediktsson.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays assocs combinators effects fry
-generalizations kernel macros math math.order memoize sequences
-sequences.generalizations sequences.private stack-checker
-stack-checker.backend stack-checker.errors stack-checker.values
+USING: accessors arrays assocs combinators effects
+generalizations kernel math sequences sequences.generalizations
+stack-checker stack-checker.backend stack-checker.values
 stack-checker.visitor words ;
 IN: combinators.smart
 

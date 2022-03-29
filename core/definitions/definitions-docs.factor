@@ -1,5 +1,5 @@
-USING: generic hash-sets help.markup help.syntax words math source-files
-parser quotations compiler.units ;
+USING: compiler.units generic hash-sets help.markup help.syntax
+parser ;
 IN: definitions
 
 ARTICLE: "definition-protocol" "Definition protocol"

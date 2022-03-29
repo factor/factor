@@ -1,6 +1,6 @@
 ! Copyright (C) 2021 Your name.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: byte-arrays help.markup help.syntax kernel sequences strings ;
+USING: byte-arrays help.markup help.syntax sequences strings ;
 IN: http2.hpack
 
 HELP: hpack-context

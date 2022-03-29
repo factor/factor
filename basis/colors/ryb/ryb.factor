@@ -1,17 +1,19 @@
 ! Copyright (C) 2013 John Benediktsson
 ! See http://factorcode.org/license.txt for BSD license
 
-USING: accessors colors kernel locals math math.order ;
+USING: accessors colors kernel math math.order ;
 
 IN: colors.ryb
 
-TUPLE: ryba < color
+TUPLE: ryba
     { red read-only }
     { yellow read-only }
     { blue read-only }
     { alpha read-only } ;
 
 C: <ryba> ryba
+
+INSTANCE: ryba color
 
 <PRIVATE
 

@@ -1,20 +1,20 @@
 ! Copyright (C) 2017 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays assocs bootstrap.image
-bootstrap.image.upload calendar cli.git combinators
-concurrency.combinators environment formatting fry http.client
-io io.directories io.launcher io.pathnames kernel math.parser
-memory modern.paths namespaces parser.notes prettyprint
-sequences sequences.extras sets splitting system system-info
-threads tools.test tools.test.private vocabs vocabs.hierarchy
-vocabs.hierarchy.private vocabs.loader vocabs.metadata zealot ;
+USING: accessors arrays assocs bootstrap.image calendar cli.git
+combinators concurrency.combinators environment formatting
+http.client io io.directories io.launcher io.pathnames kernel
+math.parser memory modern.paths namespaces parser.notes
+prettyprint sequences sequences.extras sets splitting system
+system-info threads tools.test tools.test.private vocabs
+vocabs.hierarchy vocabs.hierarchy.private vocabs.loader
+vocabs.metadata zealot ;
 IN: zealot.factor
 
 : download-boot-checksums ( path branch -- )
-    '[ _ "http://downloads.factorcode.org/images/%s/checksums.txt" sprintf download ] with-directory ;
+    '[ _ "https://downloads.factorcode.org/images/%s/checksums.txt" sprintf download ] with-directory ;
 
 : download-boot-image ( path branch image-name -- )
-    '[ _ _ "http://downloads.factorcode.org/images/%s/%s" sprintf download ] with-directory ;
+    '[ _ _ "https://downloads.factorcode.org/images/%s/%s" sprintf download ] with-directory ;
 
 : download-my-boot-image ( path branch -- )
     my-boot-image-name download-boot-image ;

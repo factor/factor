@@ -33,7 +33,7 @@ ERROR: bad-standalone-effect obj ;
 : parse-standalone-type ( obj -- var )
     parse-datum
     dup parsing-word? [
-        ?execute-parsing dup length 1 =
+        V{ } clone swap execute-parsing dup length 1 =
         [ first ] [ bad-standalone-effect ] if
     ] when f swap 2array ;
 PRIVATE>
@@ -51,9 +51,7 @@ PRIVATE>
     } cond ;
 
 : parse-effect-tokens ( end -- var tokens )
-    [
-        [ t f ] dip [ parse-effect-token [ f ] 2dip ] curry [ ] while nip
-    ] { } make ;
+    '[ t f [ _ parse-effect-token [ f ] 2dip ] loop nip ] { } make ;
 
 : parse-effect ( end -- effect )
     [ "--" parse-effect-tokens ] dip parse-effect-tokens

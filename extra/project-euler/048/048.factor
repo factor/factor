@@ -1,6 +1,6 @@
 ! Copyright (c) 2008 Aaron Schaefer.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel math math.functions math.ranges
+USING: kernel math math.functions ranges
 project-euler.common sequences ;
 IN: project-euler.048
 
@@ -18,7 +18,7 @@ IN: project-euler.048
 ! --------
 
 : euler048 ( -- answer )
-    1000 [1,b] [ dup ^ ] map-sum 10 10^ mod ;
+    1000 [1..b] [ dup ^ ] map-sum 10 10^ mod ;
 
 ! [ euler048 ] 100 ave-time
 ! 276 ms run / 1 ms GC ave time - 100 trials

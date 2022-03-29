@@ -1,6 +1,13 @@
 
 USING: arrays assocs fry kernel linked-assocs punycode
-tools.test urls ;
+punycode.private tools.test urls ;
+
+{ 0 } [ CHAR: A decode-digit ] unit-test
+{ 1 } [ CHAR: B decode-digit ] unit-test
+{ 25 } [ CHAR: Z decode-digit ] unit-test
+{ 26 } [ CHAR: 0 decode-digit ] unit-test
+{ 35 } [ CHAR: 9 decode-digit ] unit-test
+[ CHAR: & decode-digit ] [ invalid-digit? ] must-fail-with
 
 {
     ! Wikipedia Examples

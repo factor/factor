@@ -1,8 +1,8 @@
 ! Copyright (C) 2013 John Benediktsson
 ! See http://factorcode.org/license.txt for BSD license
 
-USING: arrays assocs byte-arrays combinators grouping hashtables
-io io.binary io.encodings io.encodings.binary
+USING: arrays assocs byte-arrays combinators endian grouping
+hashtables io io.encodings io.encodings.binary
 io.encodings.string io.encodings.utf8 io.streams.byte-array
 io.streams.string kernel math math.bitwise math.order namespaces
 sequences strings ;

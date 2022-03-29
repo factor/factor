@@ -2,7 +2,8 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors audio.engine combinators concurrency.promises
 destructors game.input game.loop kernel math parser sequences
-threads ui ui.gadgets ui.gadgets.worlds vocabs.parser words.constant ;
+threads ui ui.gadgets ui.gadgets.worlds vocabs.parser
+words.constant ;
 IN: game.worlds
 
 TUPLE: game-world < world

@@ -1,5 +1,5 @@
-USING: alien.fortran combinators kernel math math.order
-namespaces sequences system system-info ;
+USING: alien.fortran combinators kernel math.order namespaces
+system system-info ;
 IN: math.blas.config
 
 SYMBOLS: blas-library blas-fortran-abi deploy-blas? ;

@@ -1,7 +1,7 @@
-USING: alien alien.c-types help.syntax help.markup libc
-kernel.private byte-arrays math strings hashtables alien.syntax
-alien.strings sequences io.encodings.string debugger destructors
-vocabs.loader classes.struct quotations kernel ;
+USING: alien alien.c-types alien.strings alien.syntax
+byte-arrays classes.struct destructors help.markup help.syntax
+io.encodings.string kernel libc math quotations sequences
+strings ;
 IN: alien.data
 
 HELP: >c-array

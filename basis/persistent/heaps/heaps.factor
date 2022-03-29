@@ -1,5 +1,4 @@
-USING: kernel accessors locals combinators math arrays
-assocs namespaces sequences ;
+USING: accessors arrays assocs combinators kernel math sequences ;
 IN: persistent.heaps
 ! These are minheaps
 

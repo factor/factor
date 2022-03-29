@@ -1,11 +1,10 @@
 ! Copyright (C) 2009, 2011 Joe Groff, Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors alien alien.c-types alien.data
-alien.prettyprint arrays assocs classes classes.struct
-combinators combinators.short-circuit continuations fry kernel
-libc make math math.parser mirrors prettyprint.backend
-prettyprint.custom prettyprint.sections see.private sequences
-slots strings summary words ;
+USING: accessors alien alien.prettyprint arrays assocs classes
+classes.struct combinators combinators.short-circuit
+continuations kernel libc make math math.parser mirrors
+prettyprint.backend prettyprint.custom prettyprint.sections
+see.private sequences slots summary ;
 IN: classes.struct.prettyprint
 
 <PRIVATE

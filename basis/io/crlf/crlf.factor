@@ -1,7 +1,7 @@
 ! Copyright (C) 2009 Daniel Ehrenberg, Slava Pestov
 ! See http://factorcode.org/license.txt for BSD license.
-USING: byte-vectors io io.private kernel locals math namespaces
-sbufs sequences splitting ;
+USING: byte-vectors io io.private kernel math namespaces sbufs
+sequences splitting ;
 IN: io.crlf
 
 : crlf ( -- )
@@ -26,6 +26,7 @@ IN: io.crlf
 : crlf>lf ( str -- str' )
     CHAR: \r swap remove ;
 
+! Note: can't use split-lines here
 : lf>crlf ( str -- str' )
     "\n" split "\r\n" join ;
 

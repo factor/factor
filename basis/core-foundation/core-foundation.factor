@@ -33,8 +33,7 @@ STRUCT: CFRange
     { location CFIndex }
     { length CFIndex } ;
 
-: <CFRange> ( location length -- range )
-    CFRange <struct-boa> ;
+C: <CFRange> CFRange
 
 FUNCTION: CFTypeRef CFRetain ( CFTypeRef cf )
 

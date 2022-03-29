@@ -36,10 +36,10 @@ GENERIC: selection-request-event ( event window -- )
 GENERIC: client-event ( event window -- )
 
 : next-event ( -- event )
-    dpy get XEvent <struct> [ XNextEvent drop ] keep ;
+    dpy get XEvent new [ XNextEvent drop ] keep ;
 
 : mask-event ( mask -- event )
-    [ dpy get ] dip XEvent <struct> [ XMaskEvent drop ] keep ;
+    [ dpy get ] dip XEvent new [ XMaskEvent drop ] keep ;
 
 : events-queued ( mode -- n ) [ dpy get ] dip XEventsQueued ;
 

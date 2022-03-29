@@ -1,5 +1,6 @@
-USING: help.markup help.syntax kernel math math.combinatorics
+USING: help.markup help.syntax math math.combinatorics
 math.combinatorics.private math.order sequences ;
+IN: math.combinatorics
 
 HELP: factorial
 { $values { "n" "a non-negative integer" } { "n!" integer } }

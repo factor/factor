@@ -13,17 +13,17 @@ STRUCT: timespec
     { nsec long } ;
 
 : <timeval> ( sec usec -- timeval )
-    timeval <struct>
+    timeval new
         swap >>usec
         swap >>sec ; inline
 
 : make-timeval ( us -- timeval )
-    [ timeval <struct> ] dip [
+    [ timeval new ] dip [
         1000000 /mod [ >>sec ] [ >>usec ] bi*
     ] unless-zero ;
 
 : make-timespec ( nanos -- timespec )
-    [ timespec <struct> ] dip [
+    [ timespec new ] dip [
         1000000000 /mod [ >>sec ] [ >>nsec ] bi*
     ] unless-zero ;
 

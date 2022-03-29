@@ -1,23 +1,21 @@
 ! Copyright (C) 2020 John Benediktsson
 ! See http://factorcode.org/license.txt for BSD license
 USING: accessors arrays assocs bencode byte-arrays byte-vectors
-calendar checksums checksums.sha combinators destructors fry
-grouping http.client io io.binary io.encodings.binary io.files
+calendar checksums checksums.sha combinators destructors endian
+grouping http.client io io.encodings.binary io.files
 io.pathnames io.sockets io.streams.byte-array io.streams.duplex
-kernel literals locals make math math.bitwise math.functions
-math.order math.parser math.ranges multiline namespaces
-prettyprint random sequences splitting strings timers
-tools.annotations ui ui.gadgets.panes ui.tools.listener urls
-urls.encoding ;
+kernel literals make math math.bitwise math.functions math.order
+math.parser namespaces random ranges sequences splitting strings
+timers ui ui.gadgets.panes ui.tools.listener urls ;
 
 IN: bittorrent
 
 <<
 CONSTANT: ALPHANUMERIC $[
     [
-        CHAR: a CHAR: z [a,b] %
-        CHAR: A CHAR: Z [a,b] %
-        CHAR: 0 CHAR: 9 [a,b] %
+        CHAR: a CHAR: z [a..b] %
+        CHAR: A CHAR: Z [a..b] %
+        CHAR: 0 CHAR: 9 [a..b] %
         ".-_~" %
     ] { } make
 ]

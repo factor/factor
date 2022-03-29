@@ -526,5 +526,5 @@ ERROR: winsock-exception n string ;
 
 : shutdown-winsock ( -- ) WSACleanup winsock-return-check ;
 
-[ init-winsock ] "windows.winsock" add-startup-hook
-[ shutdown-winsock ] "windows.winsock" add-shutdown-hook
+STARTUP-HOOK: init-winsock
+SHUTDOWN-HOOK: shutdown-winsock

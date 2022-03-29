@@ -1,5 +1,5 @@
-USING: accessors arrays ui.gadgets kernel ui.gadgets.status-bar ui ui.render colors.constants opengl locals.types strings sequences combinators peg
-images.loader opengl.textures assocs math math.ranges game_lib.board ui.gestures colors ;
+USING: accessors arrays classes quotations ui.gadgets kernel ui.gadgets.status-bar ui ui.render opengl locals.types strings sequences combinators peg
+images.loader opengl.textures assocs math ranges game_lib.board game_lib.cell ui.gestures colors ;
 
 IN: game_lib.ui
 
@@ -61,14 +61,15 @@ TUPLE: window-gadget < gadget dimension bg-color draw-quotes board gests rules ;
 :: draw-quote ( gadget quote -- gadget )
     gadget quote draw-append ;
 
-:: draw-single ( cell loc dim -- )
+:: draw-single ( display-cell loc dim -- )
     ! Executes instructions based on content of the cell, does nothing if cell isn't a 
     ! string, color or quote.
     { 
-        { [ cell string? ] [ dim cell load-image loc <texture> draw-scaled-texture ] }
-        { [ cell color? ] [ cell gl-color loc dim gl-fill-rect ] }
-        { [ cell quote? ] [ cell call( -- ) ] }
-        { [ cell array? ] [ cell [ loc dim draw-single ] each ] }
+        { [ display-cell cell instance? ] [ loc dim display-cell draw-cell* ] }
+        { [ display-cell string? ] [ dim display-cell load-image loc <texture> draw-scaled-texture ] }
+        { [ display-cell color? ] [ display-cell gl-color loc dim gl-fill-rect ] }
+        { [ display-cell quotation? ] [ display-cell call( -- ) ] }
+        { [ display-cell array? ] [ display-cell [ loc dim draw-single ] each ] }
         [ ]
     } cond ;
 
@@ -121,6 +122,7 @@ TUPLE: window-gadget < gadget dimension bg-color draw-quotes board gests rules ;
 
 :: new-gesture ( gadget key value -- gadget )
     value key gadget gests>> set-at gadget ;
+
 
 ! SECTION: gadget methods
 M: window-gadget pref-dim*

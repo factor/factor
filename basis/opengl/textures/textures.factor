@@ -1,8 +1,8 @@
 ! Copyright (C) 2009, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors alien.data arrays assocs colors.constants
-combinators destructors images images.tessellation kernel
-literals math math.statistics math.vectors namespaces opengl
+USING: accessors alien.data arrays assocs colors combinators
+destructors images images.tessellation kernel literals math
+math.statistics math.vectors namespaces opengl
 opengl.capabilities opengl.gl sequences specialized-arrays
 system ;
 FROM: alien.c-types => int float ;

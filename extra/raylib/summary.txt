@@ -1,1 +1,1 @@
-Complete bindings for the Raylib video game library.
+Bindings for Raylib 4.0

@@ -1,5 +1,5 @@
-USING: help.syntax help.markup kernel sequences quotations
-math arrays combinators ;
+USING: combinators help.markup help.syntax kernel math
+quotations ;
 IN: generalizations
 
 HELP: nsum

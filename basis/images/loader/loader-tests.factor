@@ -42,7 +42,7 @@ os { linux windows } member? [
 
     ! Windows 32 can't save .bmp-files for unknown reason. It can load
     ! them though.
-    64bit? [
+    64-bit? [
         { t } [
             open-png-image dup "bmp" convert-to =
         ] unit-test

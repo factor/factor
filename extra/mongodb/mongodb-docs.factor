@@ -1,4 +1,4 @@
-USING: assocs help.markup help.syntax kernel quotations ;
+USING: help.markup help.syntax ;
 IN: mongodb
 
 ARTICLE: "mongodb" "MongoDB factor integration"

@@ -1,12 +1,14 @@
 ! Copyright (C) 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
+
 USING: accessors alien.c-types alien.data arrays assocs
-byte-arrays cache classes.struct colors colors.constants
-combinators destructors fonts images init io.encodings.string
-io.encodings.utf16n kernel literals locals math math.bitwise
-namespaces sequences specialized-arrays windows.errors
-windows.fonts windows.gdi32 windows.offscreen windows.ole32
-windows.types windows.usp10 ;
+byte-arrays cache classes.struct colors combinators destructors
+fonts images init io.encodings.string io.encodings.utf16 kernel
+literals locals math math.bitwise math.functions namespaces
+sequences specialized-arrays windows.errors windows.fonts
+windows.gdi32 windows.offscreen windows.ole32 windows.types
+windows.usp10 ;
+
 SPECIALIZED-ARRAY: uint32_t
 IN: windows.uniscribe
 
@@ -105,7 +107,7 @@ PRIVATE>
 ! transparency.
 :: color-to-alpha ( image color -- image' )
     color >rgba-components :> alpha
-    [ 255 * >integer ] tri@ 3byte-array uint32_t deref 24 bits :> rgb
+    [ 255 * round >integer ] tri@ 3byte-array uint32_t deref 24 bits :> rgb
     image bitmap>> uint32_t cast-array
         alpha 1 <
         [ [ 0xff bitand alpha * >integer 24 shift rgb bitor ] map! ]
@@ -129,7 +131,7 @@ PRIVATE>
     [ cx>> ] [ cy>> ] bi 2array ;
 
 : dc-metrics ( dc -- metrics )
-    TEXTMETRICW <struct>
+    TEXTMETRICW new
     [ GetTextMetrics drop ] keep
     TEXTMETRIC>metrics ;
 
@@ -169,5 +171,4 @@ SYMBOL: cached-script-strings
         ] with-memory-dc
     ] unless image>> ;
 
-[ <cache-assoc> cached-script-strings set-global ]
-"windows.uniscribe" add-startup-hook
+STARTUP-HOOK: [ <cache-assoc> cached-script-strings set-global ]

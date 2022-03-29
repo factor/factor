@@ -1,6 +1,5 @@
-USING: arrays assocs environment hashtables io.encodings.utf8
-io.files io.pathnames kernel memoize sequences splitting system
-unicode ;
+USING: assocs environment io.encodings.utf8 io.files
+io.pathnames kernel sequences splitting system unicode ;
 
 IN: etc-hosts
 
@@ -13,11 +12,11 @@ M: unix hosts-path "/etc/hosts" ;
 
 : parse-hosts ( path -- hosts )
     utf8 file-lines
-    [ [ blank? ] trim ] map harvest
+    [ [ unicode:blank? ] trim ] map harvest
     [ "#" head? ] reject
     [
-        [ blank? ] split1-when
-        [ blank? ] split-when harvest
+        [ unicode:blank? ] split1-when
+        [ unicode:blank? ] split-when harvest
     ] H{ } map>assoc ;
 
 MEMO: system-hosts ( -- hosts ) hosts-path parse-hosts ;

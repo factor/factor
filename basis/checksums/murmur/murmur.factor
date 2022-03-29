@@ -2,8 +2,8 @@
 ! See http://factorcode.org/license.txt for BSD license.
 
 USING: accessors alien alien.c-types alien.data byte-arrays
-checksums fry grouping io.binary kernel math math.bitwise
-math.ranges sequences ;
+checksums endian grouping kernel math math.bitwise
+ranges sequences ;
 
 IN: checksums.murmur
 
@@ -27,7 +27,7 @@ CONSTANT: n 0xe6546b64
     (hash-chunk) bitxor r2 bitroll-32 m w* n w+ ; inline
 
 : main-loop ( seq hash -- seq hash' )
-    over byte-array? little-endian? and [
+    over byte-array? alien.data:little-endian? and [
         [ 0 over length 4 - 4 <range> ] dip
         [ pick <displaced-alien> int deref hash-chunk ] reduce
     ] [

@@ -1,7 +1,6 @@
-USING: accessors arrays assocs combinators fry generalizations
-grouping growable kernel locals make math math.order math.ranges
-sequences sequences.deep sequences.private shuffle sorting
-splitting vectors ;
+USING: accessors arrays assocs combinators generalizations
+grouping growable heaps kernel math math.order ranges sequences
+sequences.private shuffle sorting splitting vectors ;
 IN: sequences.extras
 
 : find-all ( ... seq quot: ( ... elt -- ... ? ) -- ... elts )
@@ -13,19 +12,18 @@ IN: sequences.extras
 :: subseq* ( from to seq -- subseq )
     seq length :> len
     from [ dup 0 < [ len + ] when ] [ 0 ] if*
-    to [ dup 0 < [ len + ] when ] [ len ] if*
-    [ 0 len clamp ] bi@ dupd max seq subseq ;
+    to [ dup 0 < [ len + ] when ] [ len ] if* [ 0 len clamp ] bi@ dupd max seq subseq ;
 
 : safe-subseq ( from to seq -- subseq )
     [ length '[ 0 _ clamp ] bi@ ] keep subseq ;
 
 : all-subseqs ( seq -- seqs )
-    dup length [1,b] [ clump ] with map concat ;
+    dup length [1..b] [ clump ] with map concat ;
 
 :: each-subseq ( ... seq quot: ( ... subseq -- ... ) -- ... )
     seq length :> len
-    len [0,b] [| from |
-        from len (a,b] [| to |
+    len [0..b] [| from |
+        from len (a..b] [| to |
             from to seq subseq quot call
         ] each
     ] each ; inline
@@ -39,7 +37,7 @@ IN: sequences.extras
     ] keepdd map-like ; inline
 
 : filter-all-subseqs ( ... seq quot: ( ... subseq -- ... ? ) -- seq )
-    [ dup length [1,b] ] dip filter-all-subseqs-range ; inline
+    [ dup length [1..b] ] dip filter-all-subseqs-range ; inline
 
 :: longest-subseq ( seq1 seq2 -- subseq )
     seq1 length :> len1
@@ -47,8 +45,8 @@ IN: sequences.extras
     0 :> n!
     0 :> end!
     len1 1 + [ len2 1 + 0 <array> ] replicate :> table
-    len1 [1,b] [| x |
-        len2 [1,b] [| y |
+    len1 [1..b] [| x |
+        len2 [1..b] [| y |
             x 1 - seq1 nth-unsafe
             y 1 - seq2 nth-unsafe = [
                 y 1 - x 1 - table nth-unsafe nth-unsafe 1 + :> len
@@ -244,6 +242,32 @@ PRIVATE>
 : map-harvest ( ... seq quot: ( ... elt -- ... newelt ) -- ... newseq )
     [ empty? not ] map-filter ; inline
 
+: (each-integer-with-previous) ( ... prev i n quot: ( ... i -- ... ) -- ... )
+    2over < [
+        [ nip call ] 4keep nipdd
+        [ 1 + ] 2dip (each-integer-with-previous)
+    ] [
+        4drop
+    ] if ; inline recursive
+
+: each-integer-with-previous ( ... n quot: ( ... i -- ... ) -- ... )
+    [ f 0 ] 2dip (each-integer-with-previous) ; inline
+
+: (collect-with-previous) ( quot into -- quot' )
+    [ [ keep ] dip [ set-nth-unsafe ] keepdd ] 2curry ; inline
+
+: collect-with-previous ( n quot into --  )
+    (collect-with-previous) each-integer-with-previous ; inline
+
+: map-integers-with ( ... len quot: ( ... prev i -- ... elt ) exemplar -- ... newseq )
+    overd [ [ collect-with-previous ] keep ] new-like ; inline
+
+: map-with-previous-as ( ... seq quot: ( ... elt prev/f -- ... newelt ) exemplar -- ... newseq )
+    [ (1each) ] dip map-integers-with ; inline
+
+: map-with-previous ( ... seq quot: ( ... elt prev/f -- ... newelt ) -- ... newseq )
+    over map-with-previous-as ; inline
+
 <PRIVATE
 
 : (setup-each-from) ( i seq -- n quot )
@@ -350,6 +374,9 @@ PRIVATE>
 
 : unsurround ( newseq seq2 seq3 -- seq1 )
    [ ?head drop ] [ ?tail drop ] bi* ;
+
+: >string-list ( seq -- seq' )
+    [ "\"" 1surround ] map "," join ;
 
 : one? ( ... seq quot: ( ... elt -- ... ? ) -- ... ? )
     [ find ] 2keep rot [
@@ -464,6 +491,33 @@ PRIVATE>
 : zero-loop>array ( quot: ( ..a n -- ..a obj ) -- seq )
     { } zero-loop>sequence ; inline
 
+: iterate-heap-while ( heap quot1: ( value key -- slurp? ) quot2: ( value key -- obj/f ) -- obj/f loop? )
+    pick heap-empty?
+    [ 3drop f f ]
+    [
+        [ [ heap-peek ] 2dip drop 2keep ]
+        [
+            nip ! ( pop? value key heap quot2 )
+            5roll [
+                swap heap-pop* call( value key -- obj/f ) t
+            ] [
+                4drop f f
+            ] if
+        ] 3bi
+    ] if ; inline
+
+: slurp-heap-while-map ( heap quot1: ( value key -- slurp? ) quot2: ( value key -- obj/f ) -- seq )
+    '[ _ _ _ iterate-heap-while ] loop>array* ; inline
+
+: heap>pairs ( heap -- pairs )
+    [ 2drop t ] [ swap 2array ] slurp-heap-while-map ;
+
+: map-zip-swap ( quot: ( x -- y ) -- alist )
+    '[ _ keep ] map>alist ; inline
+
+: ?heap-pop-value>array ( heap -- array )
+    dup heap-empty? [ drop { } ] [ heap-pop drop 1array ] if ;
+
 <PRIVATE
 
 : (reverse) ( seq -- newseq )
@@ -479,7 +533,7 @@ PRIVATE>
     [ 1 ] 2dip [ dip * ] curry [ swap ] prepose each ; inline
 
 : insert-nth! ( elt n seq -- )
-    [ length ] keep ensure swap pick (a,b]
+    [ length ] keep ensure swap pick (a..b]
     over '[ [ 1 + ] keep _ move-unsafe ] each
     set-nth-unsafe ;
 
@@ -667,3 +721,36 @@ PRIVATE>
 : max-subarray-sum ( seq -- sum )
     [ -1/0. 0 ] dip
     [ [ + ] keep max [ max ] keep ] each drop ;
+
+TUPLE: step-slice
+    { from integer read-only initial: 0 }
+    { to integer read-only initial: 0 }
+    { seq read-only }
+    { step integer read-only } ;
+
+:: <step-slice> ( from to step seq -- step-slice )
+    step zero? [ "can't be zero" throw ] when
+    seq length :> len
+    step 0 > [
+        from [ 0 ] unless*
+        to [ len ] unless*
+    ] [
+        from [ len ] unless*
+        to [ 0 ] unless*
+    ] if
+    [ dup 0 < [ len + ] when 0 len clamp ] bi@
+    ! FIXME: make this work with steps
+    seq dup slice? [ collapse-slice ] when
+    step step-slice boa ;
+
+M: step-slice virtual-exemplar seq>> ; inline
+
+M: step-slice virtual@
+    [ step>> * ] [ from>> + ] [ seq>> ] tri ; inline
+
+M: step-slice length
+    [ to>> ] [ from>> - ] [ step>> ] tri
+    dup 0 < [ [ neg 0 max ] dip neg ] when /mod
+    zero? [ 1 + ] unless ; inline
+
+INSTANCE: step-slice virtual-sequence

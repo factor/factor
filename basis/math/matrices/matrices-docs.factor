@@ -1,7 +1,7 @@
 ! Copyright (C) 2005, 2010, 2018, 2020 Slava Pestov, Joe Groff, and Cat Stevens.
-USING: accessors arrays assocs generic.single formatting locals help.markup help.markup.private help.syntax io
-kernel math math.functions math.order math.ratios math.vectors opengl.gl prettyprint
-sequences sequences.generalizations urls ;
+USING: arrays assocs help.markup help.markup.private help.syntax
+kernel math math.functions math.order math.vectors sequences
+sequences.generalizations ;
 IN: math.matrices
 
 <PRIVATE
@@ -60,7 +60,7 @@ ARTICLE: "math.matrices" "Matrix operations"
 $nl
 "In this vocabulary's documentation, " { $snippet "m" } " and " { $snippet "matrix" } " are the conventional names used for a given matrix object. " { $snippet "m" } " may also refer to a number."
 $nl
-"The " { $vocab-link "math.matrices.extras" } "vocabulary implements extensions to this one."
+"The " { $vocab-link "math.matrices.extras" } " vocabulary implements extensions to this one."
 $nl
 "Matrices are classified their mathematical properties, and by predicate words:"
 $nl
@@ -80,7 +80,6 @@ $nl
     zero-matrix?
     zero-square-matrix?
     null-matrix?
-
 }
 
 "There are many ways to create 2-dimensional matrices:"
@@ -108,9 +107,9 @@ $nl
 }
 
 "By-element mathematical operations on a matrix:"
-{ $subsections mneg m+n m-n m*n m/n n+m n-m n*m n/m }
+{ $subsections matrix-normalize mneg m+n m-n m*n m/n n+m n-m n*m n/m }
 
-"By-element mathematical operations of two matricess:"
+"By-element mathematical operations of two matrices:"
 { $subsections m+ m- m* m/ m~ }
 
 "Dot product (multiplication) of vectors and matrices:"
@@ -138,13 +137,17 @@ $nl
     anti-diagonal
 }
 
-"The following matrix norms are provided in the 𝑙ₚ vector space; these words are equivalent to ∥･∥ₚ for " { $snippet "p = 1, 2, ∞, n" } ", respectively:"
+"The following matrix norms are provided in the 𝑙ₚ and " { $snippet "L^p,q" } " vector spaces; these words are equivalent to ∥･∥ₚ and ∥･∥^p,q for " { $snippet "p = 1, 2, ∞, ℝ" } ", and " { $snippet "p, q ∈ ℝ" } ", respectively:"
 { $subsections
-    m-1norm
-    m-infinity-norm
-    frobenius-norm
-    matrix-p-norm-entrywise
+    matrix-l1-norm
+    matrix-l2-norm
+    matrix-l-infinity-norm
     matrix-p-norm
+    matrix-p-q-norm
+}
+"For readability, user code should prefer the available generic versions of the above, from " { $vocab-link "math.vectors" } ", which are optimized the same:"
+{ $subsections
+  l1-norm l2-norm l-infinity-norm p-norm
 } ;
 
 ! PREDICATE CLASSES
@@ -266,7 +269,7 @@ HELP: <zero-square-matrix>
 
 HELP: <diagonal-matrix>
 { $values { "diagonal-seq" sequence } { "matrix" matrix } }
-{ $description "Creates a matrix with the specified main diagonal. This word has the opposite effect of " { $link anti-diagonal } "." }
+{ $description "Creates a matrix with the specified main diagonal. This word has the opposite effect of " { $link main-diagonal } "." }
 { $notes "To use a diagonal starting in the lower right, reverse the input sequence before calling this word." }
 { $examples
     { $example
@@ -278,7 +281,7 @@ HELP: <diagonal-matrix>
 
 HELP: <anti-diagonal-matrix>
 { $values { "diagonal-seq" sequence } { "matrix" matrix } }
-{ $description "Creates a matrix with the specified anti-diagonal. This word has the opposite effect of " { $link main-diagonal } "." }
+{ $description "Creates a matrix with the specified anti-diagonal. This word has the opposite effect of " { $link anti-diagonal } "." }
 { $notes "To use a diagonal starting in the lower left, reverse the input sequence before calling this word." }
 { $examples
     { $example
@@ -957,56 +960,72 @@ HELP: mmax
     }
 } ;
 
-HELP: m-1norm
+{ l2-norm frobenius-norm hilbert-schmidt-norm } related-words
+
+HELP: matrix-l1-norm
 { $values { "m" matrix } { "n" number } }
-{ $description "Find the size of a matrix in  𝑙₁ (" { $snippet "L^₁" } ") vector space, usually written ∥･∥₁."
+{ $description "Find the norm (size) of a matrix in  𝑙₁ (" { $snippet "L^₁" } ") vector space, usually written ∥･∥₁."
 $nl "This is the matrix norm when " { $snippet "p=1" } ", and is the overall maximum of the sums of the columns." }
-{ $notelist { $equiv-word-note "transpose" m-infinity-norm } }
-{ $examples
-    { $example
-        "USING: math.matrices prettyprint ;"
-        "{ { 2 -2 1 } { 1 3 -1 } { 2 -4 2 } } m-1norm ."
-        "9"
-    }
-} ;
-
-HELP: m-infinity-norm
-{ $values { "m" matrix } { "n" number } }
-{ $description "Find the size of a matrix, in 𝑙∞ (" { $snippet "L^∞" } ") vector space, usually written ∥･∥∞."
-$nl "This is the matrix norm when " { $snippet "p=∞" } ", and is the overall maximum of the sums of the rows." }
-{ $notelist { $equiv-word-note "transpose" m-1norm } }
-{ $examples
-    { $example
-        "USING: math.matrices prettyprint ;"
-        "{ { 2 -2 1 } { 1 3 -1 } { 2 -4 2 } } m-infinity-norm ."
-        "8"
-    }
-} ;
-
-HELP: frobenius-norm
-{ $values { "m" matrix } { "n" number } }
-{ $description "Find the size of a matrix in 𝑙₂ (" { $snippet "L^2" } ") vector space, usually written ∥･∥₂ₚ."
-$nl "This is the matrix norm when " { $snippet "p=2" } ", and is the square root of the sums of the squares of all the elements of the matrix." }
 { $notelist
-    { "This norm is sometimes called the Hilbert-Schmidt norm." }
-    { "Because " $snippet { "p=2" } ", this word could be named " { $snippet "m-2norm" } "." }
+    { "User code should call the generic " { $link l1-norm } " instead." }
+    { $equiv-word-note "matrix-specific" l1-norm }
+    { $equiv-word-note { $snippet "p = 1" } matrix-p-norm }
+    { $equiv-word-note "transpose" matrix-l-infinity-norm }
+    $2d-only-note
 }
 { $examples
     { $example
         "USING: math.matrices prettyprint ;"
-        "{ { 1 1 } { 1 1 } } frobenius-norm ."
+        "{ { 2 -2 1 } { 1 3 -1 } { 2 -4 2 } } matrix-l1-norm ."
+        "9"
+    }
+} ;
+
+HELP: matrix-l2-norm
+{ $values { "m" matrix } { "n" number } }
+{ $description "Find the norm (size) of a matrix in 𝑙₂ (" { $snippet "L^2" } ") vector space, usually written ∥･∥₂."
+$nl "This is the matrix norm when " { $snippet "p=2" } ", and is the square root of the sums of the squares of all the elements of the matrix." }
+{ $notelist
+    { "This norm is sometimes called the Hilbert-Schmidt norm." }
+    { "User code should call the generic " { $link p-norm } " instead." }
+    { $equiv-word-note "matrix-specific" l2-norm }
+    { $equiv-word-note { $snippet "p = 2" } matrix-p-norm }
+    { $equiv-word-note "transpose" l1-norm }
+    $2d-only-note
+}
+{ $examples
+    { $example
+        "USING: math.matrices prettyprint ;"
+        "{ { 1 1 } { 1 1 } } matrix-l2-norm ."
         "2.0"
     }
 } ;
 
-{ m-1norm m-infinity-norm frobenius-norm } related-words
+HELP: matrix-l-infinity-norm
+{ $values { "m" matrix } { "n" number } }
+{ $description "Find the norm (size) of a matrix, in 𝑙∞ (" { $snippet "L^∞" } ") vector space, usually written ∥･∥∞."
+$nl "This is the matrix norm when " { $snippet "p=∞" } ", and is the overall maximum of the sums of the rows." }
+{ $notelist
+    { "User code should call the generic " { $link l1-norm } " instead." }
+    { $equiv-word-note "matrix-specific" l-infinity-norm }
+    { $equiv-word-note { $snippet "p = ∞" } matrix-p-norm }
+    { $equiv-word-note "transpose" matrix-l1-norm }
+    $2d-only-note
+}
+{ $examples
+    { $example
+        "USING: math.matrices prettyprint ;"
+        "{ { 2 -2 1 } { 1 3 -1 } { 2 -4 2 } } matrix-l-infinity-norm ."
+        "8"
+    }
+} ;
 
 HELP: matrix-p-q-norm
-{ $values { "m" matrix } { "p" "positive real number" } { "q" "positive real number" } { "n" "non-negative real number" } }
-{ $description "Find the size of a matrix in " { $snippet "L^p,q" } " vector space."
-$nl "This is the matrix norm for any " { $snippet "p, q ≥ 1" } ". It is still an entry-wise norm, like " { $link matrix-p-norm-entrywise } "." }
+{ $values { "m" matrix } { "p" "a positive real number" } { "q" "a positive real number" } { "n" "a non-negative real number" } }
+{ $description "Find the norm (size) of a matrix in " { $snippet "L^p,q" } " vector space."
+$nl "This is the matrix norm for any " { $snippet "p, q ∈ ℝ" } ". It is still an entry-wise norm, like " { $link matrix-p-norm-entrywise } ", and is not an induced or Schatten norm." }
 { $examples
-    "Equivalent to " { $link frobenius-norm } " for " { $snippet "p = q = 2 " } ":"
+    "Equivalent to " { $link l2-norm } " for " { $snippet "p = q = 2 " } ":"
     { $example
         "USING: math.matrices prettyprint ;"
         "{ { 1 1 } { 1 1 } } 2 2 matrix-p-q-norm ."
@@ -1015,51 +1034,57 @@ $nl "This is the matrix norm for any " { $snippet "p, q ≥ 1" } ". It is still 
 } ;
 
 HELP: matrix-p-norm-entrywise
-{ $values { "m" matrix } { "p" "positive real number" } { "n" "non-negative real number" } }
+{ $values { "m" matrix } { "p" "a positive real number" } { "n" "a non-negative real number" } }
 { $description "Find the entry-wise norm of a matrix, in 𝑙ₚ (" { $snippet "L^p" } ") vector space."  }
-{ $notes "This word is distinct from a Schatten p-norm, as well as any of " { $links m-1norm frobenius-norm m-infinity-norm } "." }
+{ $notes "This word is not an induced or Schatten norm, and it is distinct from all of " { $links matrix-l1-norm matrix-l2-norm matrix-l-infinity-norm } "." }
 { $examples
-    { $example
-        "USING: math.matrices prettyprint ;"
-        "4 4 1 <matrix> 2 matrix-p-norm-entrywise ."
-        "4.0"
-    }
+   { $example
+       "USING: math.matrices prettyprint ;"
+       "4 4 1 <matrix> 2 matrix-p-norm-entrywise ."
+       "4.0"
+   }
 } ;
 
 HELP: matrix-p-norm
-{ $values { "m" matrix } { "p" "positive real number" } { "n" "non-negative real number" } }
-{ $description "Find the size of a matrix in 𝑙ₚ (" { $snippet "L^p" } ") vector space, usually written ∥･∥ₚ. For " { $snippet "p ≠ 1, 2, ∞" } ", this is an \"entry-wise\" norm." }
+{ $values { "m" matrix } { "p" "a positive real number" } { "n" "a non-negative real number" } }
+{ $description "Find the norm (size) of a matrix in 𝑙ₚ (" { $snippet "L^p" } ") vector space, usually written ∥･∥ₚ. For " { $snippet "p ≠ 1, 2, ∞" } ", this is an \"entry-wise\" norm." }
+{ $notelist
+    { "User code should call the generic " { $link p-norm } " instead." }
+    { $equiv-word-note "matrix-specific" p-norm }
+    { $equiv-word-note { $snippet "p = q" } matrix-p-q-norm }
+    $2d-only-note
+}
 { $examples
-    "Calls " { $link m-1norm } ":"
-    { $example
-        "USING: math.matrices prettyprint ;"
-        "4 4 1 <matrix> 1 matrix-p-norm ."
-        "4"
-    }
-    "Falls back to " { $link matrix-p-norm-entrywise } ":"
-    { $example
-        "USING: math.functions math.matrices prettyprint ;"
-        "2 2 3 <matrix> 1.5 matrix-p-norm 7.559 10e-4 ~ ."
-        "t"
-    }
+   "Calls " { $link l1-norm } ":"
+   { $example
+       "USING: math.matrices prettyprint ;"
+       "4 4 1 <matrix> 1 matrix-p-norm ."
+       "4"
+   }
+   "Falls back to " { $link matrix-p-norm-entrywise } ":"
+   { $example
+       "USING: math.functions math.matrices prettyprint ;"
+       "2 2 3 <matrix> 1.5 matrix-p-norm 7.559 10e-4 ~ ."
+       "t"
+   }
 } ;
 
 { matrix-p-norm matrix-p-norm-entrywise } related-words
-{ matrix-p-norm matrix-p-q-norm } related-words
+{ matrix-l1-norm matrix-l2-norm matrix-l-infinity-norm matrix-p-norm matrix-p-q-norm } related-words
 
-HELP: normalize-matrix
-{ $values { "m" matrix } { "m'" matrix } }
-{ $description "Normalize a matrix. Each element from the input matrix is computed as a fraction of the maximum element. The maximum element becomes " { $snippet "1/1" } "." }
+HELP: matrix-normalize
+{ $values { "m" "a matrix with at least 1 non-zero number" } { "m'" matrix } }
+{ $description "Normalize a matrix containing at least 1 non-zero element. Each element from the input matrix is computed as a fraction of the maximum element. The maximum element becomes " { $snippet "1/1" } "." }
 { $notelist
-    $2d-only-note
-    { $matrix-scalar-note max abs / }
+   $2d-only-note
+   { $matrix-scalar-note max abs / }
 }
 { $examples
-    { $example
-        "USING: math.matrices prettyprint ;"
-        "{ { 5 9 } { 15 17 } } normalize-matrix ."
-        "{ { 5/17 9/17 } { 15/17 1 } }"
-    }
+   { $example
+       "USING: math.matrices prettyprint ;"
+       "{ { 5 9 } { 15 17 } } matrix-normalize ."
+       "{ { 5/17 9/17 } { 15/17 1 } }"
+   }
 } ;
 
 HELP: main-diagonal

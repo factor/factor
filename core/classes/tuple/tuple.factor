@@ -227,7 +227,9 @@ SYMBOL: outdated-tuples
     compute-slot-permutation
     apply-slot-permutation ;
 
-: update-tuple ( tuple -- newtuple )
+GENERIC: update-tuple ( tuple -- newtuple )
+
+M: tuple update-tuple
     [ tuple-slots ] [ layout-of ] bi
     [ permute-slots ] [ first ] bi
     slots>tuple ;
@@ -239,7 +241,7 @@ SYMBOL: outdated-tuples
 
 : update-tuples ( outdated-tuples -- )
     dup assoc-empty? [ drop ] [
-        [ [ tuple? ] instances ] dip [ outdated-tuple? ] curry filter
+        '[ dup tuple? [ _ outdated-tuple? ] [ drop f ] if ] instances
         dup [ update-tuple ] map become
     ] if ;
 
@@ -300,7 +302,7 @@ GENERIC#: (define-tuple-class) 2 ( class superclass slots -- )
 
 : reset-final ( class -- )
     dup final-class? [
-        [ f "final" set-word-prop ]
+        [ "final" remove-word-prop ]
         [ changed-conditionally ]
         bi
     ] [ drop ] if ;
@@ -327,7 +329,9 @@ M: tuple-class (define-tuple-class)
     3dup tuple-class-unchanged?
     [ 2drop ?define-symbol ] [ redefine-tuple-class ] if ;
 
-: boa-effect ( class -- effect )
+GENERIC: boa-effect ( class -- effect )
+
+M: tuple-class boa-effect
     [ all-slots [ name>> ] map ] [ name>> 1array ] bi <effect> ;
 
 : define-boa-word ( word class -- )

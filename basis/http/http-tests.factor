@@ -66,7 +66,7 @@ ${ read-request-test-1' } [
     [ read-request ] with-string-reader
     [ write-request ] with-string-writer
     ! normalize crlf
-    string-lines "\n" join
+    split-lines join-lines
 ] unit-test
 
 STRING: read-request-test-2
@@ -165,7 +165,7 @@ ${ read-response-test-1' } [
     [ read-response ] with-string-reader
     [ write-response ] with-string-writer
     ! normalize crlf
-    string-lines "\n" join
+    split-lines join-lines
 ] unit-test
 
 { t } [

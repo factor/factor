@@ -1,12 +1,11 @@
 ! Copyright (C) 2010 Slava Pestov.
-USING: arrays accessors colors.constants euler.b-rep fry gml
-gml.runtime gml.viewer gml.printer io.directories
-io.encodings.utf8 io.files io.pathnames io.streams.string kernel
-locals models namespaces sequences ui ui.gadgets
-ui.gadgets.buttons ui.gadgets.editors ui.gadgets.frames
-ui.gadgets.grids ui.gadgets.labels ui.gadgets.packs
-ui.gadgets.scrollers ui.gadgets.worlds ui.gadgets.tables
-ui.gadgets.labeled unicode ;
+USING: accessors arrays colors euler.b-rep gml gml.printer
+gml.runtime gml.viewer io.directories io.encodings.utf8 io.files
+io.pathnames io.streams.string kernel models namespaces
+sequences ui ui.gadgets ui.gadgets.buttons ui.gadgets.editors
+ui.gadgets.frames ui.gadgets.grids ui.gadgets.labeled
+ui.gadgets.labels ui.gadgets.packs ui.gadgets.scrollers
+ui.gadgets.tables unicode ;
 FROM: gml => gml ;
 IN: gml.ui
 

@@ -1,7 +1,7 @@
 ! From http://www.ffconsultancy.com/ocaml/maze/index.html
-USING: accessors arrays fry kernel math math.order math.vectors
+USING: accessors arrays kernel math math.order math.vectors
 namespaces opengl.demo-support opengl.gl random sequences ui
-ui.gadgets ui.gadgets.canvas ui.render ;
+ui.gadgets ui.gadgets.canvas ui.gestures ui.render ;
 IN: maze
 
 CONSTANT: line-width 8
@@ -29,13 +29,13 @@ SYMBOL: visited
     GL_LINE_STRIP glBegin
     dup vertex
     dup visit
-    dup random-neighbour dup [
+    dup random-neighbour [
         (draw-maze) (draw-maze)
     ] [
-        2drop
+        drop
         glEnd
         GL_LINE_STRIP glBegin
-    ] if ;
+    ] if* ;
 
 : draw-maze ( n -- )
     line-width 2 - glLineWidth
@@ -58,7 +58,9 @@ M: maze draw-gadget* [ n draw-maze ] draw-canvas ;
 
 M: maze pref-dim* drop { 400 400 } ;
 
+M: maze handle-gesture
+    over T{ button-down { # 1 } } =
+    [ nip relayout f ] [ call-next-method ] if ;
+
 MAIN-WINDOW: maze-window { { title "Maze" } }
     <maze> >>gadgets ;
-
-MAIN: maze-window

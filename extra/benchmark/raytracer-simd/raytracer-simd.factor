@@ -1,10 +1,10 @@
 ! Factor port of the raytracer benchmark from
 ! http://www.ffconsultancy.com/languages/ray_tracer/index.html
 
-USING: arrays accessors generalizations io io.files io.files.temp
+USING: arrays accessors generalizations io.files io.files.temp
 io.encodings.binary kernel math math.constants math.functions
-math.vectors math.vectors.simd math.vectors.simd.cords
-math.parser make sequences words combinators ;
+math.vectors math.vectors.simd.cords math.parser make sequences
+words combinators ;
 IN: benchmark.raytracer-simd
 
 << SYNTAX: no-compile last-word t "no-compile" set-word-prop ; >>

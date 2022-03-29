@@ -1,8 +1,8 @@
 ! Copyright (C) 2009 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors assocs combinators.short-circuit http.client
+USING: accessors combinators.short-circuit http.client
 images.loader images.loader.private images.viewer io.pathnames
-kernel namespaces present sequences strings urls ;
+kernel namespaces opengl present sequences strings urls ;
 IN: images.http
 
 <PRIVATE
@@ -16,7 +16,8 @@ PRIVATE>
 : load-http-image ( path -- image )
     [ http-get swap content-type ]
     [ present file-extension ] bi or
-    (image-class) load-image* ;
+    (image-class) load-image*
+    gl-scale-factor get-global [ 2.0 = >>2x? ] when* ;
 
 M: string set-image
     dup { [ "http://" head? ] [ "https://" head? ] } 1||

@@ -3,9 +3,10 @@
 USING: accessors combinators.short-circuit compiler.errors
 compiler.units continuations definitions destructors editors
 help.topics io.pathnames io.styles kernel libc.private
-macros.expander models parser prettyprint quotations see
-source-files.errors stack-checker threads tools.annotations
-tools.crossref tools.test tools.time tools.walker ui.commands
+macros.expander models namespaces parser prettyprint
+prettyprint.config quotations see source-files.errors
+stack-checker threads tools.annotations tools.crossref
+tools.test tools.time tools.walker ui.clipboards ui.commands
 ui.gestures ui.operations ui.tools.browser ui.tools.deploy
 ui.tools.inspector ui.tools.listener ui.tools.traceback vocabs
 vocabs.loader vocabs.parser words ;
@@ -16,7 +17,7 @@ IN: ui.tools.operations
     { +primary+ t }
 } define-operation
 
-: com-prettyprint ( obj -- ) . ;
+: com-prettyprint ( obj -- ) ... ;
 
 [ drop t ] \ com-prettyprint H{
     { +listener+ t }
@@ -28,9 +29,13 @@ IN: ui.tools.operations
     { +listener+ t }
 } define-operation
 
-: com-unparse ( obj -- ) unparse listener-input ;
+: com-unparse ( obj -- ) [ unparse listener-input ] without-limits ;
 
 [ drop t ] \ com-unparse H{ } define-operation
+
+: com-copy-object ( obj -- ) [ unparse clipboard get set-clipboard-contents ] without-limits ;
+
+[ drop t ] \ com-copy-object H{ } define-operation
 
 ! Models
 [ { [ model? ] [ ref>> ] } 1&& ] \ inspect-model H{
@@ -114,7 +119,7 @@ IN: ui.tools.operations
     { +listener+ t }
 } define-operation
 
-[ annotated? not ] \ watch H{ } define-operation
+[ [ annotated? not ] [ word? ] bi and ] \ watch H{ } define-operation
 
 [ annotated? ] \ reset H{ } define-operation
 

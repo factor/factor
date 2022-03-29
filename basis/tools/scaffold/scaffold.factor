@@ -59,7 +59,7 @@ ERROR: vocab-must-not-exist string ;
 
 : scaffold-directory ( vocab-root vocab -- )
     vocab-root/vocab>path
-    dup exists? [ directory-exists ] [ make-directories ] if ;
+    dup file-exists? [ directory-exists ] [ make-directories ] if ;
 
 : not-scaffolding ( path -- path )
     "Not creating scaffolding for " write dup <pathname> . ;
@@ -68,7 +68,7 @@ ERROR: vocab-must-not-exist string ;
     "Creating scaffolding for " write dup <pathname> . ;
 
 : scaffolding? ( path -- path ? )
-    dup exists? [ not-scaffolding f ] [ scaffolding t ] if ;
+    dup file-exists? [ not-scaffolding f ] [ scaffolding t ] if ;
 
 : scaffold-copyright ( -- )
     "! Copyright (C) " write now year>> number>string write
@@ -341,7 +341,7 @@ PRIVATE>
 SYMBOL: nested-examples
 
 : example-using ( using -- )
-    " " join "example-using" [
+    join-words "example-using" [
         nested-examples get 4 0 ? CHAR: \s <string> "example-indent" [
             "${example-indent}\"Example:\"
 ${example-indent}{ $example \"USING: ${example-using} ;\"

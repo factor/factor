@@ -1,8 +1,8 @@
-USING: accessors arrays calendar colors.constants
-combinators.short-circuit fonts fry kernel literals locals math
-math.order math.ranges math.vectors namespaces opengl random
-sequences timers ui ui.commands ui.gadgets ui.gadgets.worlds
-ui.gestures ui.pens.solid ui.render ui.text ;
+USING: accessors arrays calendar colors
+combinators.short-circuit fonts kernel literals math math.order
+math.vectors namespaces opengl random ranges sequences timers ui
+ui.commands ui.gadgets ui.gadgets.worlds ui.gestures
+ui.pens.solid ui.render ui.text ;
 
 IN: pong
 
@@ -95,13 +95,13 @@ M:: pong-gadget draw-gadget* ( PONG -- )
 
     ! ball on the left
     X BALL-SIZE + COMPUTER - dup 0 < [
-        >integer -10 max 0 [a,b] random
+        >integer -10 max 0 [a..b] random
         GADGET swap move-computer-by
     ] [ drop ] if
 
     ! ball on the right
     X COMPUTER - dup 0 > [
-        >integer 10 min [0,b] random
+        >integer 10 min [0..b] random
         GADGET swap move-computer-by
     ] [ drop ] if ;
 

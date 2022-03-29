@@ -1,8 +1,8 @@
 ! Copyright (C) 2010 Joe Groff.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: combinators combinators.short-circuit
-compiler.tree.propagation.transforms fry generalizations kernel
-locals math sequences sequences.private ;
+compiler.tree.propagation.transforms kernel math
+sequences sequences.private ;
 IN: sequences.unrolled
 
 <PRIVATE

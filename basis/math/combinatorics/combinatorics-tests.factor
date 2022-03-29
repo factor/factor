@@ -52,6 +52,8 @@ math.combinatorics.private tools.test sequences sets ;
 { "ABC" "ACB" "BAC" "BCA" "CAB" "CBA" "ABC" }
 [ "ABC" 6 [ dup dup clone-like next-permutation ] times ] unit-test
 
+{ { "AA" "AB" "AC" "BB" "BC" "CC" } } [ "ABC" 2 all-combinations-with-replacement ] unit-test
+
 { { 0 1 2 } } [ 0 3 5 combination-indices ] unit-test
 { { 2 3 4 } } [ 9 3 5 combination-indices ] unit-test
 

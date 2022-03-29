@@ -21,7 +21,7 @@ CONSTANT: app-icon-resource-id "APPICON"
     vocab-dir "icon.ico" append-path ;
 
 : embed-ico ( vm-path vocab -- )
-    dup vocab-windows-icon-path vocab-append-path dup exists?
+    dup vocab-windows-icon-path vocab-append-path dup file-exists?
     [ binary file-contents app-icon-resource-id embed-icon-resource ]
     [ 2drop ] if ;
 

@@ -1,6 +1,6 @@
-USING: alien.c-types alien.data arrays colors.constants grouping
-kernel locals math math.vectors namespaces opengl opengl.demo-support
-opengl.gl opengl.glu sequences sequences.generalizations shuffle ;
+USING: alien.c-types alien.data arrays colors grouping kernel
+math math.vectors namespaces opengl opengl.demo-support
+opengl.gl opengl.glu sequences sequences.generalizations ;
 IN: processing.shapes
 
 SYMBOL: fill-color

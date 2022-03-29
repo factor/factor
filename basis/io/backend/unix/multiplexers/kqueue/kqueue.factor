@@ -21,7 +21,7 @@ CONSTANT: max-events 256
 M: kqueue-mx dispose* fd>> close-file ;
 
 : make-kevent ( fd filter flags -- event )
-    \ kevent <struct>
+    \ kevent new
         swap >>flags
         swap >>filter
         swap >>ident ;

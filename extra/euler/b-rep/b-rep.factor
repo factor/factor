@@ -1,7 +1,7 @@
 ! Copyright (C) 2010 Slava Pestov.
-USING: accessors fry kernel locals sequences sets namespaces
-combinators combinators.short-circuit game.models.half-edge
-math math.vectors math.matrices assocs arrays hashtables ;
+USING: accessors arrays assocs combinators
+combinators.short-circuit game.models.half-edge kernel math
+math.vectors namespaces sequences sets ;
 FROM: namespaces => set ;
 IN: euler.b-rep
 

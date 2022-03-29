@@ -142,7 +142,7 @@ assocs    = "[%" types ": %" types " %]" => [[ [ second ] [ fourth ] bi '[ [ _ _
 
 formats   = "%" (types|fmt-%|lists|assocs|unknown) => [[ second ]]
 
-plain-text = (!("%").)+          => [[ >string ]]
+plain-text = [^%]+               => [[ >string ]]
 
 text      = (formats|plain-text)*
 
@@ -201,7 +201,7 @@ MACRO: sprintf ( format-string -- quot )
           [ >time ]
           [ year>> number>string ]
        } cleave
-    ] output>array " " join ; inline
+    ] output>array join-words ; inline
 
 : week-of-year ( timestamp day -- n )
     [ dup clone 1 >>month 1 >>day day-of-week dup ] dip > [ 7 swap - ] when
@@ -243,7 +243,7 @@ formats_  = fmt-%|fmt-a|fmt-A|fmt-b|fmt-B|fmt-c|fmt-d|fmt-H|fmt-I|
 
 formats   = "%" (formats_)       => [[ second ]]
 
-plain-text = (!("%").)+          => [[ >string ]]
+plain-text = [^%]+               => [[ >string ]]
 
 text      = (formats|plain-text)*
 

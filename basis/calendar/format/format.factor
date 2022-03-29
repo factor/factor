@@ -1,8 +1,8 @@
 ! Copyright (C) 2008, 2010 Slava Pestov, Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays calendar calendar.english combinators
+USING: accessors calendar calendar.english combinators
 formatting grouping io io.streams.string kernel make math
-math.order math.parser math.parser.private math.ranges present
+math.order math.parser math.parser.private ranges present
 quotations sequences splitting strings words ;
 IN: calendar.format
 
@@ -73,11 +73,11 @@ M: timestamp day.
     [ number>string ] [ month-name ] bi* swap " " glue 20 center. ;
 
 : days-header. ( -- )
-    day-abbreviations2 " " join print ;
+    day-abbreviations2 join-words print ;
 
 : days. ( year month -- )
     [ 1 (day-of-week) dup [ "   " write ] times ]
-    [ (days-in-month) ] 2bi [1,b] [
+    [ (days-in-month) ] 2bi [1..b] [
         [ day. ] [ + 7 mod zero? [ nl ] [ bl ] if ] bi
     ] with each nl ;
 
@@ -90,11 +90,11 @@ PRIVATE>
 GENERIC: year. ( obj -- )
 
 M: integer year.
-    dup number>string 64 center. nl 12 [1,b] [
+    dup number>string 64 center. nl 12 [1..b] [
         [
             [ month-name 20 center. ]
             [ days-header. days. nl nl ] bi
-        ] with-string-writer string-lines
+        ] with-string-writer split-lines
     ] with map 3 <groups>
     [ first3 [ "%-20s  %-20s  %-20s\n" printf ] 3each ] each ;
 
@@ -238,7 +238,7 @@ M: integer elapsed-time
             [ first [ /mod ] [ dup ] if* ] [ second ] bi swap
             dup 0 > [ number>string prepend , ] [ 2drop ] if
         ] each drop
-    ] { } make [ "0s" ] [ reverse " " join ] if-empty ;
+    ] { } make [ "0s" ] [ reverse join-words ] if-empty ;
 
 M: real elapsed-time
     >integer elapsed-time ;

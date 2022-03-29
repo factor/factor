@@ -1,7 +1,7 @@
 ! Copyright (c) 2008 Aaron Schaefer.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays kernel math math.primes math.primes.factors
-    math.ranges namespaces sequences project-euler.common ;
+    ranges namespaces sequences project-euler.common ;
 IN: project-euler.047
 
 ! http://projecteuler.net/index.php?section=problems&id=47
@@ -75,7 +75,7 @@ SYMBOL: sieve
      multiples [ sieve get [ 1 + ] change-nth ] each ;
 
 : prime-tau-upto ( limit -- seq )
-    dup initialize-sieve 2 swap [a,b) [
+    dup initialize-sieve 2 swap [a..b) [
         dup is-prime? [ increment-counts ] [ drop ] if
     ] each sieve get ;
 

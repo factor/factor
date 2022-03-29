@@ -1,6 +1,6 @@
 USING: arrays compiler.units definitions help.markup help.syntax
-kernel lexer math namespaces quotations sequences source-files strings
-vectors vocabs vocabs.parser words words.symbol ;
+kernel lexer math namespaces quotations sequences source-files
+strings vectors vocabs vocabs.parser words words.symbol ;
 IN: parser
 
 ARTICLE: "reading-ahead" "Reading ahead"

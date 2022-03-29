@@ -1,9 +1,10 @@
 ! Copyright (C) 2021 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs combinators combinators.smart
-continuations io kernel math math.functions math.parser
-prettyprint quotations random sequences sequences.extras
-splitting strings unicode ;
+continuations formatting io kernel math math.functions
+math.parser prettyprint quotations random sequences
+sequences.extras splitting strings unicode unicode.flags
+unicode.flags.images ;
 IN: quiz
 
 GENERIC: generate-question* ( question -- quot )
@@ -51,7 +52,7 @@ M: multiple-choice-question generate-question*
     [ n>> ] [ generator>> ] bi
     '[ _ generate-question* ] replicate ;
 
-: trim-blanks ( seq -- seq' ) " " split harvest " " join ;
+: trim-blanks ( seq -- seq' ) split-words harvest join-words ;
 : first-n-letters ( n -- seq ) <iota> [ CHAR: a + 1string ] map ;
 : alphabet-zip ( seq -- zip ) [ length <iota> [ CHAR: a + 1string ] { } map-as ] keep zip ;
 M: question parse-response drop trim-blanks ;
@@ -63,6 +64,8 @@ TUPLE: sqrt-question < number-response random-choices ;
 TUPLE: sq-question < number-response random-choices ;
 TUPLE: stack-shuffler < string-response n-shufflers ;
 TUPLE: state-capital-question < string-response ;
+TUPLE: country-from-flag < string-response n ;
+TUPLE: flag-from-countries < string-response n ;
 
 M: multiplication generate-question*
     [ count>> random ] [ n>> ] bi '[ _ random 2 + ] replicate
@@ -91,19 +94,25 @@ CONSTANT: state-capitals H{
 M: state-capital-question generate-question* drop state-capitals keys random '[ _ state-capital ] ;
 M: state-capital-question parse-response drop trim-blanks >title ;
 
+M: country-from-flag generate-question* drop valid-flags random '[ _ flag>unicode ] ;
+M: country-from-flag parse-response drop trim-blanks >title ;
+
+M: flag-from-countries generate-question* drop valid-flag-names random '[ _ unicode>flag ] ;
+M: flag-from-countries parse-response drop trim-blanks >title ;
+
 CONSTANT: stack-shufflers { dup 2dup drop 2drop swap over rot -rot roll -roll 2dup pick dupd }
 
 M: stack-shuffler generate-question*
     n-shufflers>> [ stack-shufflers random ] [ ] replicate-as
     [ inputs first-n-letters ] keep
-    '[ _ _ with-datastack " " join ] ;
+    '[ _ _ with-datastack join-words ] ;
 
 M: question ask-question generated>> . ;
 M: string-response ask-question generated>> . ;
 M: number-response ask-question generated>> . ;
 
 M: multiple-choice-question ask-question
-    [ generated>> . ] [ choices>> [ ... ] each ] bi ;
+    [ generated>> . ] [ choices>> [ first2 swap "  (" ") " surround write ... ] each ] bi ;
 
 M: question check-response
     [ parsed-response>> ] [ answer>> ] bi = ;
@@ -171,7 +180,7 @@ M: sequence run-multiple-choice-quiz ( seq n -- questions )
 : score-quiz ( seq -- )
     [ [ correct?>> ] count ]
     [ length ] bi
-    [ drop 0.0 ] [ /f ] if-zero . ;
+    [ drop 0.0 ] [ /f ] if-zero 100 * "SCORE: %d%%\n" printf ;
 
 : run-states-quiz-hard ( -- )
     T{ state-capital-question } 5 run-multiple-choice-quiz score-quiz ;
@@ -179,6 +188,16 @@ M: sequence run-multiple-choice-quiz ( seq n -- questions )
 : run-shuffler-quiz ( -- )
     {
         T{ stack-shuffler { n-shufflers 4 } }
+    } 5 run-multiple-choice-quiz score-quiz ;
+
+: run-country-from-flag-quiz ( -- )
+    {
+        T{ country-from-flag { n 4 } }
+    } 5 run-multiple-choice-quiz score-quiz ;
+
+: run-flag-from-countries-quiz ( -- )
+    {
+        T{ flag-from-countries { n 4 } }
     } 5 run-multiple-choice-quiz score-quiz ;
 
 : run-main-quiz ( -- )

@@ -1,8 +1,7 @@
 ! Copyright (C) 2009 Slava Pestov, Eduardo Cavazos, Joe Groff.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays classes combinators generic kernel
-locals.backend math quotations sequences sequences.private sets
-splitting vectors words ;
+USING: accessors combinators kernel locals.backend math
+quotations sequences sets splitting vectors words ;
 IN: fry
 
 ERROR: not-in-a-fry ;

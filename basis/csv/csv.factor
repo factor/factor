@@ -1,8 +1,7 @@
 ! Copyright (C) 2007, 2008 Phil Dawes, 2013 John Benediktsson
 ! See http://factorcode.org/license.txt for BSD license.
-USING: combinators fry io io.files io.streams.string kernel
-make math memoize namespaces sbufs sequences sequences.private
-unicode ;
+USING: combinators io io.files io.streams.string kernel make
+math namespaces sequences sequences.private unicode ;
 IN: csv
 
 SYMBOL: delimiter
@@ -35,9 +34,9 @@ DEFER: quoted-field,
 
 : ?trim ( string -- string' )
     dup length [ drop "" ] [
-        over first-unsafe blank?
-        [ drop t ] [ 1 - over nth-unsafe blank? ] if
-        [ [ blank? ] trim ] when
+        over first-unsafe unicode:blank?
+        [ drop t ] [ 1 - over nth-unsafe unicode:blank? ] if
+        [ [ unicode:blank? ] trim ] when
     ] if-zero ; inline
 
 : continue-field ( delimiter stream field-seps seq -- sep/f field )

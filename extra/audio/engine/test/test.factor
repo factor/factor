@@ -1,7 +1,7 @@
 ! Copyright (C) 2009 Joe Groff.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors timers audio audio.engine audio.loader calendar
-destructors io kernel locals math math.functions math.ranges specialized-arrays
+USING: accessors timers audio.engine audio.loader calendar
+destructors io kernel math math.functions ranges specialized-arrays
 sequences random math.vectors ;
 FROM: alien.c-types => short ;
 SPECIALIZED-ARRAY: short
@@ -13,7 +13,7 @@ M: noise-generator generator-audio-format
     drop 1 16 8000 ;
 M: noise-generator generate-audio
     drop
-    4096 [ -4096 4096 [a,b] random ] short-array{ } replicate-as
+    4096 [ -4096 4096 [a..b] random ] short-array{ } replicate-as
     8192 ;
 M: noise-generator dispose
     drop ;

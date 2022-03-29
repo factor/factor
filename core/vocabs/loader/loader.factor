@@ -1,8 +1,8 @@
 ! Copyright (C) 2007, 2010 Eduardo Cavazos, Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays assocs continuations definitions init
-io io.files io.pathnames kernel make namespaces parser
-sequences sets splitting strings vocabs words ;
+USING: accessors arrays assocs combinators continuations
+definitions init io io.files io.pathnames kernel make namespaces
+parser sequences sets splitting strings vocabs words ;
 IN: vocabs.loader
 
 SYMBOL: vocab-roots
@@ -16,11 +16,10 @@ CONSTANT: default-vocab-roots {
     "resource:work"
 }
 
-[
+STARTUP-HOOK: [
     default-vocab-roots V{ } like vocab-roots set-global
-
     [ drop ] add-vocab-root-hook set-global
-] "vocabs.loader" add-startup-hook
+]
 
 : add-vocab-root ( root -- )
     trim-tail-separators dup vocab-roots get ?adjoin
@@ -34,10 +33,30 @@ ERROR: not-found-in-roots path ;
 <PRIVATE
 
 : find-root-for ( path -- path/f )
-    vocab-roots get [ prepend-path exists? ] with find nip ;
+    vocab-roots get [ prepend-path file-exists? ] with find nip ;
 
-M: string vocab-path
+: find-root-for-vocab-pathname ( path -- path/f )
     dup find-root-for [ prepend-path ] [ not-found-in-roots ] if* ;
+
+: ensure-parent-directory-is-not-dot ( path -- parent-directory )
+    dup parent-directory dup "." =
+    [ drop not-found-in-roots ]
+    [ nip ] if ;
+
+! If path exists use it, otherwise try to find a vocab that exists
+M: string vocab-path
+    dup find-root-for [
+        prepend-path
+    ] [
+        {
+            { [ dup ?last path-separator? ] [ find-root-for-vocab-pathname ] }
+            { [ dup has-file-extension? ] [
+                [ ensure-parent-directory-is-not-dot find-root-for-vocab-pathname ]
+                [ file-name ] bi append-path
+            ] }
+            [ find-root-for-vocab-pathname ]
+        } cond
+    ] if* ;
 
 PRIVATE>
 
@@ -50,11 +69,12 @@ PRIVATE>
     "/" join ;
 
 : find-vocab-root ( vocab -- path/f )
-    vocab-name root-cache get [
-        dup ".private" tail? [ drop f ] [
-            ".factor" append-vocab-dir find-root-for
-        ] if
-    ] cache ;
+    vocab-name dup ".private" tail? [ drop f ] [
+        root-cache get 2dup at [ 2nip ] [
+            over ".factor" append-vocab-dir find-root-for
+            [ [ -rot set-at ] [ 2drop ] if* ] keep
+        ] if*
+    ] if ;
 
 : vocab-exists? ( name -- ? )
     dup lookup-vocab [ ] [ find-vocab-root ] ?if ;
@@ -123,10 +143,9 @@ PRIVATE>
     ] if ;
 
 : reload ( name -- )
-    dup lookup-vocab
-    [ [ load-source ] [ load-docs ] bi ]
-    [ require ]
-    ?if ;
+    dup lookup-vocab [
+        f >>source-loaded? f >>docs-loaded? drop
+    ] when* require ;
 
 : run ( vocab -- )
     dup load-vocab vocab-main [
@@ -137,23 +156,15 @@ PRIVATE>
         "To define one, refer to \\ MAIN: help" print
     ] ?if ;
 
-SYMBOL: errorlist
-
 <PRIVATE
-
-: add-to-errorlist ( error vocab -- )
-    vocab-name errorlist get [ set-at ] [ 2drop ] if* ;
 
 GENERIC: (require) ( name -- )
 
 M: vocab (require)
-    [
-        dup source-loaded?>> +parsing+ eq? [ drop ] [
-            dup source-loaded?>> [ dup load-source ] unless
-            dup docs-loaded?>> [ dup load-docs ] unless
-            drop
-        ] if
-    ] [ [ swap add-to-errorlist ] keep rethrow ] recover ;
+    dup source-loaded?>> +parsing+ eq? [
+        dup source-loaded?>> [ dup load-source ] unless
+        dup docs-loaded?>> [ dup load-docs ] unless
+    ] unless drop ;
 
 M: vocab-link (require)
     vocab-name (require) ;
@@ -164,18 +175,11 @@ M: string (require)
 
 PRIVATE>
 
-: require-all ( vocabs -- )
-    V{ } clone errorlist [ [ require ] each ] with-variable ;
-
 [
-    dup vocab-name errorlist get at*
-    [ rethrow ]
-    [
-        drop dup find-vocab-root
-        [ (require) ]
-        [ dup lookup-vocab [ drop ] [ no-vocab ] if ]
-        if
-    ] if
+    dup find-vocab-root
+    [ (require) ]
+    [ dup lookup-vocab [ drop ] [ no-vocab ] if ]
+    if
 ] require-hook set-global
 
 M: vocab-spec where vocab-source-path dup [ 1 2array ] when ;

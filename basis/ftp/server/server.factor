@@ -66,11 +66,11 @@ C: <ftp-disconnect> ftp-disconnect
     resolve-symlinks server get serving-directory>> head? ;
 
 : can-serve-directory? ( path -- ? )
-    { [ exists? ] [ file-info directory? ] [ serving? ] } 1&& ;
+    { [ file-exists? ] [ file-info directory? ] [ serving? ] } 1&& ;
 
 : can-serve-file? ( path -- ? )
     {
-        [ exists? ]
+        [ file-exists? ]
         [ file-info regular-file? ]
         [ serving? ]
     } 1&& ;
@@ -133,7 +133,7 @@ ERROR: type-error type ;
 
 : handle-PWD ( obj -- )
     drop
-    display-directory "\"" dup surround 257 server-response ;
+    display-directory "\"" 1surround 257 server-response ;
 
 : handle-SYST ( obj -- )
     drop
@@ -180,7 +180,7 @@ M: ftp-list handle-passive-command
     start-directory [
         utf8 encode-output [
             "." directory.
-        ] with-string-writer string-lines
+        ] with-string-writer split-lines
         harvest [ ftp-send ] each
     ] with-output-stream finish-directory ;
 

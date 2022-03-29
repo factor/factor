@@ -1,8 +1,7 @@
 ! Copyright (C) 2008, 2009 Slava Pestov, Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors assocs combinators continuations kernel
-kernel.private lexer math math.parser namespaces sbufs sequences
-splitting strings ;
+USING: accessors assocs combinators kernel kernel.private lexer
+math math.parser namespaces sbufs sequences splitting strings ;
 IN: strings.parser
 
 ERROR: bad-escape char ;
@@ -109,6 +108,13 @@ PRIVATE>
     [ column>> ] [ line-text>> ] bi
     [ "\"\\" member-eq? ] find-from ;
 
+: check-space ( lexer -- )
+    dup current-char forbid-tab {
+        { CHAR: \s [ advance-char ] }
+        { f [ drop ] }
+        [ "[space]" swap 1string "'" 1surround unexpected ]
+    } case ;
+
 DEFER: (parse-string)
 
 : parse-found-token ( accum lexer i elt -- )
@@ -119,14 +125,7 @@ DEFER: (parse-string)
         [ [ pick push ] bi@ ]
         [ drop 2dup next-line% ] if*
         (parse-string)
-    ] [
-        dup advance-char
-        dup current-char forbid-tab {
-            { CHAR: \s [ advance-char ] }
-            { f [ drop ] }
-            [ "[space]" swap 1string "'" dup surround unexpected ]
-        } case drop
-    ] if ;
+    ] [ dup advance-char check-space drop ] if ;
 
 : (parse-string) ( accum lexer -- )
     { sbuf lexer } declare

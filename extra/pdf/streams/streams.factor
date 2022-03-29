@@ -1,8 +1,8 @@
 ! Copyright (C) 2011-2012 John Benediktsson
 ! See http://factorcode.org/license.txt for BSD license
 
-USING: accessors arrays assocs destructors fry io io.styles
-kernel pdf.layout sequences splitting strings ;
+USING: accessors arrays destructors io io.styles kernel
+pdf.layout sequences splitting strings ;
 
 IN: pdf.streams
 
@@ -11,7 +11,7 @@ IN: pdf.streams
 ! FIXME: what about "proper" tab support?
 
 : string>texts ( string style -- seq )
-    [ string-lines ] dip '[ _ <text> 1array ] map
+    [ split-lines ] dip '[ _ <text> 1array ] map
     <br> 1array join ;
 
 PRIVATE>

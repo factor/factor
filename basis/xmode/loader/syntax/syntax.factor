@@ -2,8 +2,8 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs combinators kernel lexer make
 namespaces parser sequences splitting xml.data xml.syntax
-xml.syntax.private xml.traversal xmode.rules xmode.tokens
-xmode.utilities ;
+xml.syntax.private xml.traversal xml.traversal.private
+xmode.rules xmode.tokens xmode.utilities ;
 IN: xmode.loader.syntax
 
 ! Rule tag parsing utilities
@@ -28,6 +28,9 @@ SYNTAX: RULE:
 
 : string>rule-set-name ( string -- name ) "MAIN" or ;
 
+: cdata>string ( tag -- string )
+    children>> [ dup cdata? [ text>> ] when ] map (children>string) ;
+
 ! PROP, PROPS
 : parse-prop-tag ( tag -- key value )
     [ "NAME" attr ] [ "VALUE" attr ] bi ;
@@ -42,12 +45,12 @@ SYNTAX: RULE:
     [ attr string>boolean ] with map first3 ;
 
 : parse-literal-matcher ( tag -- matcher )
-    dup children>string
+    dup cdata>string
     rule-set get ignore-case?>> <string-matcher>
     swap position-attrs <matcher> ;
 
 : parse-regexp-matcher ( tag -- matcher )
-    dup children>string
+    dup cdata>string
     rule-set get ignore-case?>> <?insensitive-regexp>
     swap position-attrs <matcher> ;
 
@@ -102,4 +105,4 @@ TAG: END parse-begin/end-tag
 : init-eol-span-tag ( -- ) [ drop init-eol-span ] , ;
 
 : parse-keyword-tag ( tag keyword-map -- )
-    [ dup main>> string>token swap children>string ] dip set-at ;
+    [ dup main>> string>token swap cdata>string ] dip set-at ;

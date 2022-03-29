@@ -1,9 +1,9 @@
 ! Copyright (C) 2006, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs classes combinators
-combinators.short-circuit compiler.units debugger fonts fry help
+combinators.short-circuit compiler.units debugger fonts help
 help.apropos help.crossref help.home help.markup help.stylesheet
-help.topics io.styles kernel literals locals make math math.vectors
+help.topics io.styles kernel literals make math math.vectors
 models namespaces sequences sets system ui ui.commands
 ui.gadgets ui.gadgets.borders ui.gadgets.editors
 ui.gadgets.glass ui.gadgets.panes ui.gadgets.scrollers

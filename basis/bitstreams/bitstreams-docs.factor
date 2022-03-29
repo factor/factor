@@ -1,4 +1,4 @@
-USING: help.markup help.syntax kernel strings math byte-arrays accessors ;
+USING: help.markup help.syntax kernel math byte-arrays accessors ;
 IN: bitstreams
 
 

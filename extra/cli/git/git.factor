@@ -1,7 +1,7 @@
 ! Copyright (C) 2017 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays concurrency.combinators
-concurrency.semaphores fry io io.directories io.encodings.utf8
+concurrency.semaphores io io.directories io.encodings.utf8
 io.files.info io.launcher io.pathnames kernel math namespaces
 sequences splitting system-info unicode ;
 IN: cli.git

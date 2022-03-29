@@ -15,7 +15,7 @@ IN: vocabs.metadata
 
 MEMO: vocab-file-lines ( vocab name -- lines/f )
     vocab-file-path dup [
-        dup exists? [
+        dup file-exists? [
             utf8 file-lines harvest
         ] [
             drop f
@@ -98,17 +98,17 @@ TUPLE: unsupported-platform vocab requires ;
 M: unsupported-platform summary
     drop "Current operating system not supported by this vocabulary" ;
 
-: exists?, ( path -- )
-    [ dup exists? [ , ] [ drop ] if ] when* ;
+: file-exists?, ( path -- )
+    [ dup file-exists? [ , ] [ drop ] if ] when* ;
 
 : vocab-metadata-files ( vocab -- paths )
     [
         {
-            [ vocab-summary-path exists?, ]
-            [ vocab-authors-path exists?, ]
-            [ vocab-tags-path exists?, ]
-            [ vocab-platforms-path exists?, ]
-            [ vocab-resources-path exists?, ]
+            [ vocab-authors-path file-exists?, ]
+            [ vocab-platforms-path file-exists?, ]
+            [ vocab-resources-path file-exists?, ]
+            [ vocab-summary-path file-exists?, ]
+            [ vocab-tags-path file-exists?, ]
         } cleave
     ] { } make ;
 

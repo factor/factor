@@ -1,9 +1,9 @@
 ! Copyright (C) 2009 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors ascii assocs byte-arrays combinators fry
-hashtables http http.parsers io io.encodings.binary io.files
-io.files.temp io.files.unique io.streams.string kernel math
-quoting sequences splitting ;
+USING: accessors ascii assocs byte-arrays combinators hashtables
+http http.parsers io io.encodings.binary io.files io.files.temp
+io.files.unique io.streams.string kernel math quoting sequences
+splitting ;
 IN: mime.multipart
 
 CONSTANT: buffer-size 65536
@@ -33,7 +33,7 @@ C: <mime-variable> mime-variable
     >byte-array write ;
 
 : parse-headers ( string -- hashtable )
-    string-lines harvest [ parse-header-line ] map >hashtable ;
+    split-lines harvest [ parse-header-line ] map >hashtable ;
 
 : fill-bytes ( multipart -- multipart )
     buffer-size read

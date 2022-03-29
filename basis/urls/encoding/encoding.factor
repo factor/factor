@@ -105,7 +105,7 @@ PRIVATE>
 
 : query>assoc ( query -- assoc )
     dup [
-        "&;" split <linked-hash> [
+        "&" split <linked-hash> [
             [
                 [ "=" split1 [ dup [ query-decode ] when ] bi@ swap ] dip
                 add-query-param

@@ -1,7 +1,8 @@
 ! Copyright (C) 2009 Joe Groff, 2013 John Benediktsson
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors byte-arrays combinators kernel kernel.private layouts
-make math math.private sbufs sequences sequences.private strings ;
+USING: accessors byte-arrays combinators kernel kernel.private
+layouts make math math.private sbufs sequences sequences.private
+strings ;
 IN: math.parser
 
 <PRIVATE
@@ -206,6 +207,9 @@ CONSTANT: min-magnitude-2 -1074
 : <float-parse> ( i number-parse n -- float-parse i number-parse n )
      [ drop nip [ radix>> ] [ magnitude>> ] bi [ 0 f ] dip float-parse boa ] 3keep ; inline
 
+: if-skip ( char true false -- )
+    pick ",_" member-eq? [ drop nip call ] [ nip call ] if ; inline
+
 DEFER: @exponent-digit
 DEFER: @mantissa-digit
 DEFER: @denom-digit
@@ -214,10 +218,7 @@ DEFER: @pos-digit
 DEFER: @neg-digit
 
 : @exponent-digit-or-punc ( float-parse i number-parse n char -- float-parse n/f )
-    {
-        { CHAR: , [ [ @exponent-digit ] require-next-digit ] }
-        [ @exponent-digit ]
-    } case ; inline
+    [ [ @exponent-digit ] require-next-digit ] [ @exponent-digit ] if-skip ; inline
 
 : @exponent-digit ( float-parse i number-parse n char -- float-parse n/f )
     { float-parse fixnum number-parse integer fixnum } declare
@@ -246,10 +247,7 @@ DEFER: @neg-digit
     [ exponent-char? [ drop ->exponent ] ] dip if ; inline
 
 : @mantissa-digit-or-punc ( float-parse i number-parse n char -- float-parse n/f )
-    {
-        { CHAR: , [ [ @mantissa-digit ] require-next-digit ] }
-        [ @mantissa-digit ]
-    } case ; inline
+    [ [ @mantissa-digit ] require-next-digit ] [ @mantissa-digit ] if-skip ; inline
 
 : @mantissa-digit ( float-parse i number-parse n char -- float-parse n/f )
     { float-parse fixnum number-parse integer fixnum } declare
@@ -266,11 +264,12 @@ DEFER: @neg-digit
     <float-parse> [ @mantissa-digit ] require-next-digit ?make-float ; inline
 
 : @denom-digit-or-punc ( i number-parse n char -- n/f )
-    {
-        { CHAR: , [ [ @denom-digit ] require-next-digit ] }
-        { CHAR: . [ ->mantissa ] }
-        [ [ @denom-digit ] or-exponent ]
-    } case ; inline
+    [ [ @denom-digit ] require-next-digit ] [
+        {
+            { CHAR: . [ ->mantissa ] }
+            [ [ @denom-digit ] or-exponent ]
+        } case
+    ] if-skip ; inline
 
 : @denom-digit ( i number-parse n char -- n/f )
     { fixnum number-parse integer fixnum } declare
@@ -287,11 +286,12 @@ DEFER: @neg-digit
     @split [ @denom-first-digit ] require-next-digit ?make-ratio ;
 
 : @num-digit-or-punc ( i number-parse n char -- n/f )
-    {
-        { CHAR: , [ [ @num-digit ] require-next-digit ] }
-        { CHAR: / [ ->denominator ] }
-        [ @num-digit ]
-    } case ; inline
+    [ [ @num-digit ] require-next-digit ] [
+        {
+            { CHAR: / [ ->denominator ] }
+            [ @num-digit ]
+        } case
+    ] if-skip ; inline
 
 : @num-digit ( i number-parse n char -- n/f )
     { fixnum number-parse integer fixnum } declare
@@ -302,13 +302,14 @@ DEFER: @neg-digit
     @split [ @num-digit ] require-next-digit ?add-ratio ;
 
 : @pos-digit-or-punc ( i number-parse n char -- n/f )
-    {
-        { CHAR: , [ [ @pos-digit ] require-next-digit ] }
-        { CHAR: + [ ->numerator ] }
-        { CHAR: / [ ->denominator ] }
-        { CHAR: . [ ->mantissa ] }
-        [ [ @pos-digit ] or-exponent ]
-    } case ; inline
+    [ [ @pos-digit ] require-next-digit ] [
+        {
+            { CHAR: + [ ->numerator ] }
+            { CHAR: / [ ->denominator ] }
+            { CHAR: . [ ->mantissa ] }
+            [ [ @pos-digit ] or-exponent ]
+        } case
+    ] if-skip ; inline
 
 : @pos-digit ( i number-parse n char -- n/f )
     { fixnum number-parse integer fixnum } declare
@@ -335,13 +336,14 @@ DEFER: @neg-digit
     } case ; inline
 
 : @neg-digit-or-punc ( i number-parse n char -- n/f )
-    {
-        { CHAR: , [ [ @neg-digit ] require-next-digit ] }
-        { CHAR: - [ ->numerator ] }
-        { CHAR: / [ ->denominator ] }
-        { CHAR: . [ ->mantissa ] }
-        [ [ @neg-digit ] or-exponent ]
-    } case ; inline
+    [ [ @neg-digit ] require-next-digit ] [
+        {
+            { CHAR: - [ ->numerator ] }
+            { CHAR: / [ ->denominator ] }
+            { CHAR: . [ ->mantissa ] }
+            [ [ @neg-digit ] or-exponent ]
+        } case
+    ] if-skip ; inline
 
 : @neg-digit ( i number-parse n char -- n/f )
     { fixnum number-parse integer fixnum } declare
@@ -486,6 +488,8 @@ GENERIC#: >base 1 ( n radix -- str )
 : >oct ( n -- str ) 8 >base ; inline
 : >hex ( n -- str ) 16 >base ; inline
 
+ALIAS: >dec number>string
+
 M: integer >base
     {
         { [ over 0 = ] [ 2drop "0" ] }
@@ -589,9 +593,9 @@ M: float >base
     dup length 2/ <byte-array> [
         [
             [ digit> ] 2dip over even? [
-                [ 16 * ] [ 2/ ] [ set-nth ] tri*
+                [ 16 * ] [ 2/ ] [ set-nth-unsafe ] tri*
             ] [
-                [ 2/ ] [ [ + ] change-nth ] bi*
+                [ 2/ ] [ [ + ] change-nth-unsafe ] bi*
             ] if
         ] curry each-index
     ] keep ;
@@ -601,6 +605,6 @@ M: float >base
         [
             [ 16 /mod [ >digit ] bi@ ]
             [ 2 * dup 1 + ]
-            [ [ set-nth ] curry bi-curry@ bi* ] tri*
+            [ [ set-nth-unsafe ] curry bi-curry@ bi* ] tri*
         ] curry each-index
     ] keep ;

@@ -5,7 +5,7 @@ io.launcher io.streams.string kernel sequences tools.test ;
 IN: git.tests
 
 : run-process-stdout ( process -- string )
-    >process utf8 [ contents ] with-process-reader ;
+    >process utf8 [ read-contents ] with-process-reader ;
 
 : with-empty-test-git-repo ( quot -- )
     '[

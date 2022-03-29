@@ -1,6 +1,6 @@
 ! Copyright (C) 2018 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: io.files.links io.launcher io.standard-paths json.reader
+USING: io.launcher io.standard-paths json.reader
 kernel literals namespaces sequences strings system ;
 IN: ci.docker
 

@@ -1,10 +1,9 @@
 USING: accessors alien arrays byte-arrays classes combinators
-cpu.architecture effects fry functors generalizations generic
-generic.parser kernel lexer literals locals macros math math.functions
-math.vectors math.vectors.private math.vectors.simd.intrinsics
-namespaces parser prettyprint.custom quotations sequences
-sequences.generalizations sequences.private vocabs vocabs.loader
-words math.bitwise ;
+cpu.architecture effects functors generalizations kernel lexer
+literals math math.bitwise math.vectors
+math.vectors.simd.intrinsics parser prettyprint.custom
+quotations sequences sequences.generalizations sequences.private
+words ;
 QUALIFIED-WITH: alien.c-types c
 IN: math.vectors.simd
 
@@ -94,7 +93,7 @@ DEFER: simd-construct-op
 
 : (vvx->v-op) ( a b obj rep quot: ( (a) (b) obj rep -- (c) ) -- c )
     [ [ simd-unbox ] [ underlying>> ] bi* ] 3dip 2curry 2curry make-underlying ; inline
-    
+
 : vv->v-op ( a b rep quot: ( (a) (b) rep -- (c) ) fallback-quot -- c )
     [ '[ _ (vv->v-op) ] ] [ '[ drop @ ] ] bi* if-both-vectors-match ; inline
 
@@ -368,5 +367,3 @@ M: short-8 v*hs+
     short-8-rep [ (simd-v*hs+) ] [ call-next-method ] vv->v-op int-4-cast ; inline
 M: int-4 v*hs+
     int-4-rep [ (simd-v*hs+) ] [ call-next-method ] vv->v-op longlong-2-cast ; inline
-
-{ "math.vectors.simd" "mirrors" } "math.vectors.simd.mirrors" require-when

@@ -1,4 +1,4 @@
-USING: accessors assocs combinators fry html.parser
+USING: accessors assocs combinators html.parser
 html.parser.utils io io.streams.string kernel math namespaces
 regexp sequences strings unicode ;
 IN: html.parser.printer

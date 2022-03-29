@@ -1,7 +1,7 @@
 ! Copyright (C) 2014 John Benediktsson
 ! See http://factorcode.org/license.txt for BSD license
 
-USING: fry grouping interval-sets kernel math random sequences
+USING: grouping interval-sets kernel math random sequences
 sorting ;
 
 IN: benchmark.interval-sets

@@ -3,10 +3,10 @@
 USING: bootstrap.image.private compiler.codegen.relocation
 compiler.constants compiler.units cpu.arm.assembler
 cpu.arm.assembler.opcodes generic.single.private
-kernel kernel.private layouts locals locals.backend
+kernel kernel.private layouts locals.backend
 math math.private memory namespaces sequences slots.private
 strings.private threads.private vocabs ;
-IN: bootstrap.arm
+IN: bootstrap.assembler.arm
 
 8 \ cell set
 

@@ -34,6 +34,6 @@ CONSTANT: cleanup-list {
 : tidy ( -- )
     "factor" [
         useless-files
-        [ exists? ] filter
+        [ file-exists? ] filter
         [ delete-tree ] each
     ] with-directory ;

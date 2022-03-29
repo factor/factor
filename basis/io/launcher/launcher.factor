@@ -93,10 +93,10 @@ SYMBOL: wait-delay
     5 wait-delay set-global
     [ wait-loop t ] "Process wait" spawn-server drop ;
 
-[
+STARTUP-HOOK: [
     H{ } clone processes set-global
     start-wait-thread
-] "io.launcher" add-startup-hook
+]
 
 : process-started ( process handle -- )
     >>handle

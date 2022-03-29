@@ -1,15 +1,15 @@
 ! Copyright (C) 2021 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors alien alien.data arrays classes.struct io
-kernel namespaces prettyprint ui.backend.windows
-ui.gadgets.worlds windows.errors windows.types windows.user32 ;
+USING: accessors alien arrays io kernel namespaces prettyprint
+ui.backend.windows ui.gadgets.worlds windows.errors windows.types
+windows.user32 ;
 IN: windows.hardware
 
 : monitor-enum-proc ( -- callback )
     BOOL { HMONITOR HDC LPRECT LPARAM } stdcall [
         4dup 4array .
         3drop
-        MONITORINFOEX <struct> dup byte-length >>cbSize
+        MONITORINFOEX new dup byte-length >>cbSize
         [ GetMonitorInfo win32-error=0/f ] keep ... flush
         TRUE
     ] alien-callback ;

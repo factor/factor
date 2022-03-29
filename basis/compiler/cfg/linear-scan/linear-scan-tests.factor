@@ -1,5 +1,5 @@
 USING: tools.test random sorting sequences hashtables assocs
-kernel fry arrays splitting namespaces math accessors vectors locals
+kernel arrays splitting namespaces math accessors vectors
 math.order grouping strings strings.private classes layouts
 cpu.architecture
 compiler.cfg

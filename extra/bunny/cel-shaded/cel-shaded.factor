@@ -1,6 +1,5 @@
-USING: arrays bunny.model continuations destructors kernel
-multiline opengl opengl.shaders opengl.capabilities opengl.gl
-sequences accessors combinators ;
+USING: accessors arrays bunny.model combinators destructors
+kernel multiline opengl.capabilities opengl.gl opengl.shaders ;
 IN: bunny.cel-shaded
 
 STRING: vertex-shader-source

@@ -5,7 +5,7 @@ IN: math.primes.factors
 
 HELP: factors
 { $values { "n" "a positive integer" } { "seq" sequence } }
-{ $description { "Return an ordered list of a number's prime factors, possibly repeated." } }
+{ $description { "Return an ordered list of a number's prime factors, possibly repeated, using the Pollard Rho Brent algorithm in the " { $vocab-link "math.primes.pollard-rho-brent" } " vocabulary." } }
 { $examples { $example "USING: math.primes.factors prettyprint ;" "300 factors ." "{ 2 2 3 5 5 }" } } ;
 
 HELP: group-factors

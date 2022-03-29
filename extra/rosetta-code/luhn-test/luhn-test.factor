@@ -1,6 +1,6 @@
 ! Copyright (c) 2012 Anonymous
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel math math.parser math.order math.ranges sequences ;
+USING: kernel math sequences ;
 IN: rosetta-code.luhn-test
 
 ! http://rosettacode.org/wiki/Luhn_test_of_credit_card_numbers

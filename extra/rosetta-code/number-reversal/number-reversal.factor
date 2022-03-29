@@ -1,6 +1,6 @@
 ! Copyright (c) 2012 Anonymous
 ! See http://factorcode.org/license.txt for BSD license.
-USING: formatting io kernel math math.parser math.ranges
+USING: formatting io kernel math math.parser ranges
 namespaces random sequences strings ;
 IN: rosetta-code.number-reversal
 
@@ -17,7 +17,7 @@ IN: rosetta-code.number-reversal
 ! Note: Assume the players input does not need extra validation.
 
 : make-jumbled-array ( -- sorted jumbled )
-    CHAR: 1 CHAR: 9 [a,b] [ 1string ] map dup clone randomize
+    CHAR: 1 CHAR: 9 [a..b] [ 1string ] map dup clone randomize
     [ 2dup = ] [ randomize ] while ;
 
 SYMBOL: trials

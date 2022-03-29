@@ -1,8 +1,8 @@
 ! Copyright (C) 2014 John Benediktsson
 ! See http://factorcode.org/license.txt for BSD license
 
-USING: arrays combinators kernel locals math math.order
-math.private sequences sequences.private strings vectors ;
+USING: arrays kernel math math.order math.private sequences
+sequences.private strings vectors ;
 
 IN: sorting.quick
 

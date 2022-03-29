@@ -1,8 +1,7 @@
 ! Copyright (C) 2008, 2010 Slava Pestov, Joe Groff.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors assocs sequences sorting binary-search fry math
-math.order arrays classes combinators kernel functors locals
-math.functions math.vectors ;
+USING: accessors classes functors kernel math math.vectors
+sequences ;
 IN: sequences.cords
 
 MIXIN: cord

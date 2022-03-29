@@ -1,10 +1,9 @@
 ! Copyright (C) 2008, 2010 Slava Pestov, Jorge Acereda Macia.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: alien alien.c-types alien.libraries alien.syntax arrays
-combinators destructors fry kernel layouts libc make math
+combinators destructors kernel layouts libc make math
 math.order math.parser namespaces sequences splitting system
-tools.disassembler.private tools.disassembler.utils tools.memory
-;
+tools.disassembler.private tools.disassembler.utils tools.memory ;
 IN: tools.disassembler.udis
 
 << "libudis86" {

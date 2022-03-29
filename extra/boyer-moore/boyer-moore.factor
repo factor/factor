@@ -1,7 +1,7 @@
 ! Copyright (C) 2010 Dmitry Shubin.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays assocs kernel locals math math.order
-math.ranges sequences sequences.private z-algorithm ;
+USING: accessors arrays assocs kernel math math.order ranges
+sequences sequences.private z-algorithm ;
 IN: boyer-moore
 
 <PRIVATE
@@ -11,7 +11,7 @@ IN: boyer-moore
     [ [ i ] unless* ] change-nth-unsafe ; inline
 
 : normal-suffixes ( zs -- ss )
-    [ length [ f <array> ] [ [1,b) ] bi ] keep pick
+    [ length [ f <array> ] [ [1..b) ] bi ] keep pick
     [ (normal-suffixes) ] 2curry each ; inline
 
 :: (partial-suffixes) ( len old elt i -- len old/new old )

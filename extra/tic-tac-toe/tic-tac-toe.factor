@@ -1,4 +1,4 @@
-USING: kernel namespaces accessors math game_lib.ui game_lib.board colors ui.gestures ui.gadgets ;
+USING: kernel namespaces sequences accessors math game_lib.ui game_lib.board colors ui.gestures ui.gadgets ;
 
 IN: tic-tac-toe
 

@@ -1,7 +1,7 @@
 ! Copyright (C) 2021 Kevin Cope.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: arrays assocs colors.constants colors.constants.private
-io.encodings.utf8 io.files kernel namespaces sequences ui.theme ;
+USING: arrays assocs colors colors.private io.encodings.utf8
+io.files kernel namespaces sequences ui.theme ;
 IN: ui.theme.base16
 
 SYMBOL: base16-theme-name

@@ -1,6 +1,6 @@
 ! Copyright (C) 2015 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: help.markup help.syntax kernel quotations strings ;
+USING: help.markup help.syntax quotations strings ;
 IN: changer
 
 HELP: change:

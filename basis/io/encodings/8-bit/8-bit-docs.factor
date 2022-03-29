@@ -1,6 +1,6 @@
 ! Copyright (C) 2008 Daniel Ehrenberg
 ! See http://factorcode.org/license.txt for BSD license.
-USING: help.syntax help.markup strings ;
+USING: help.syntax help.markup ;
 IN: io.encodings.8-bit
 
 HELP: ebcdic

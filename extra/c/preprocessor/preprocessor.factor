@@ -1,10 +1,9 @@
 ! Copyright (C) 2009 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: sequences.parser io io.encodings.utf8 io.files
-io.streams.string kernel combinators accessors io.pathnames
-fry sequences arrays locals namespaces io.directories
-assocs math splitting make unicode combinators.short-circuit
-c.lexer ;
+USING: accessors assocs c.lexer combinators
+combinators.short-circuit io io.directories io.encodings.utf8
+io.files io.pathnames io.streams.string kernel make math
+sequences sequences.parser splitting unicode ;
 IN: c.preprocessor
 
 : initial-library-paths ( -- seq )
@@ -49,7 +48,7 @@ ERROR: header-file-missing path ;
 
 :: read-standard-include ( preprocessor-state path -- )
     preprocessor-state dup library-paths>>
-    [ path append-path exists? ] find nip
+    [ path append-path file-exists? ] find nip
     [
         dup [
             path append-path
@@ -61,7 +60,7 @@ ERROR: header-file-missing path ;
     ] if* ;
 
 : read-local-include ( preprocessor-state path -- )
-    dup exists? [ preprocess-file ] [ 2drop ] if ;
+    dup file-exists? [ preprocess-file ] [ 2drop ] if ;
 
 : skip-whitespace/comments ( sequence-parser -- sequence-parser )
     skip-whitespace
