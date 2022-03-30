@@ -37,6 +37,7 @@ SYMBOL: level
     } $ wall add-to-cells
     
     { 
+
         { 1 6 } { 3 2 } { 4 3 } { 4 4 } { 4 6 } { 3 6 } { 5 6 }
     } $ crate add-to-cells
 
@@ -46,8 +47,11 @@ SYMBOL: level
 
     ! { 1 2 } { "vocab:sokoban2/resources/Crate_Yellow.png" "vocab:sokoban2/resources/Goal.png" } set-cell
     { 0 0 } [ COLOR: black gl-color { 10 10 } { 20 20 } gl-fill-rect ] set-cell 
-
+    
+    { } 1sequence 
+    
     create-board ;
+
 
 : board-two ( gadget -- gadget )
     22 11 make-board
@@ -77,6 +81,8 @@ SYMBOL: level
     { 
         { 5 2 } { 7 3 } { 5 4 } { 8 4 } { 5 7 } { 2 7 }
     } crate add-to-cells
+
+    { } 1sequence 
 
     create-board ;
 
@@ -128,6 +134,7 @@ SYMBOL: level
     ! Don't really like this sequence of quotes thing -- would be nicer if board 
     ! could be an array of like ascii that gets created here or something
     level get-global board nth call( gadget -- gadget )
+    ! board
     game-logic
     display ;
 
