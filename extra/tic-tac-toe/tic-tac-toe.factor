@@ -1,4 +1,4 @@
-USING: kernel namespaces accessors math game_lib.ui game_lib.board colors ui.gestures ui.gadgets ;
+USING: kernel namespaces accessors sequences math game_lib.ui game_lib.board colors ui.gestures ui.gadgets ;
 
 IN: tic-tac-toe
 
@@ -18,7 +18,7 @@ X player set-global
     COLOR: black { 0 256 } { 400 10 } draw-filled-rectangle ;
 
 : board ( gadget -- gadget )
-    3 3 f make-board
+    3 3 make-board
     create-board ; 
 
 : set-player ( -- )
@@ -51,10 +51,10 @@ X player set-global
 
 :: diag-win ( board -- ? )
     ! Same as row win except checks diagonal wins
-    X board { { 0 0 } { 1 1 } { 2 2 } } get-multicell all-equal-value?
-    X board { { 2 0 } { 1 1 } { 0 2 } } get-multicell all-equal-value? or
-    O board { { 0 0 } { 1 1 } { 2 2 } } get-multicell all-equal-value? or
-    O board { { 2 0 } { 1 1 } { 0 2 } } get-multicell all-equal-value? or ;
+    X board { { 0 0 } { 1 1 } { 2 2 } } get-cells all-equal-value?
+    X board { { 2 0 } { 1 1 } { 0 2 } } get-cells all-equal-value? or
+    O board { { 0 0 } { 1 1 } { 2 2 } } get-cells all-equal-value? or
+    O board { { 2 0 } { 1 1 } { 0 2 } } get-cells all-equal-value? or ;
 
 :: check-win ( board -- ? )
     ! Returns true if any win condition is met
