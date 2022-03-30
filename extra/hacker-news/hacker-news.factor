@@ -2,11 +2,14 @@
 ! See http://factorcode.org/license.txt for BSD license.
 
 USING: accessors assocs calendar calendar.format
-colors.constants colors.hex combinators concurrency.combinators
-formatting fry hashtables http.client io io.styles json.reader
-kernel make math math.parser sequences ui urls vocabs ;
+calendar.holidays.us colors combinators concurrency.combinators
+formatting hashtables http.client io io.styles json.reader
+kernel make math sequences ui urls ;
 
 IN: hacker-news
+
+CONSTANT: christmas-red COLOR: #bc2c21
+CONSTANT: christmas-green COLOR: #376627
 
 <PRIVATE
 : hacker-news-ids ( endpoint -- ids )
@@ -38,6 +41,23 @@ IN: hacker-news
 : hacker-news-job-stories ( n -- seq )
     "jobstories" hacker-news-items ;
 
+: christmas-day? ( -- ? )
+    now dup christmas-day same-day? ;
+
+: number-color ( n -- color )
+    christmas-day? [
+        odd? christmas-red christmas-green ?
+    ] [
+        drop COLOR: #a0a0a0
+    ] if ;
+
+: background-color ( -- color )
+    christmas-day? COLOR: #bc2c21 COLOR: #ff6600 ? ;
+
+: write-number ( n -- )
+    [ "%2d. " sprintf H{ } clone ] keep
+    number-color foreground pick set-at format ;
+
 : write-title ( title url -- )
     '[
         _ presented ,,
@@ -47,11 +67,11 @@ IN: hacker-news
 : write-link ( title url -- )
     '[
         _ presented ,,
-        HEXCOLOR: 888888 foreground ,,
+        COLOR: #888888 foreground ,,
     ] H{ } make format ;
 
 : write-text ( str -- )
-    H{ { foreground HEXCOLOR: 888888 } } format ;
+    H{ { foreground COLOR: #888888 } } format ;
 
 : post>user-url ( post -- user-url )
     "by" of "http://news.ycombinator.com/user?id=" prepend >url ;
@@ -66,7 +86,8 @@ IN: hacker-news
 PRIVATE>
 
 : post. ( post index -- )
-    "%2d. " sprintf write-text {
+    write-number
+    {
         [ [ "title" of ] [ "url" of ] bi write-title ]
         [ post>url host>> " (" ")" surround write-text nl ]
         [ "score" of "    %d points" sprintf write-text ]
@@ -88,9 +109,10 @@ PRIVATE>
     H{
         { font-size 20 }
         { font-style bold }
-        { background HEXCOLOR: ff6600 }
         { foreground COLOR: black }
-    } assoc-union format nl ;
+    } assoc-union
+    background-color background pick set-at
+    format nl ;
 
 : hacker-news-feed. ( seq -- )
     [ 1 + post. ] each-index ;

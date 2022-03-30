@@ -1,7 +1,7 @@
 ! Copyright (C) 2012 John Benediktsson
 ! See http://factorcode.org/license.txt for BSD license
 
-USING: arrays kernel math math.extras math.ranges sequences
+USING: arrays kernel math math.extras ranges sequences
 tools.test ;
 
 { 7 } [ 4 2 stirling ] unit-test
@@ -15,14 +15,14 @@ tools.test ;
 { -1 } [ 127 703 jacobi ] unit-test
 { 1 } [ -4 197 jacobi ] unit-test
 
-{ { 2 3 4 5 6 7 8 9 } } [ 10 [1,b] 3 moving-average ] unit-test
+{ { 2 3 4 5 6 7 8 9 } } [ 10 [1..b] 3 moving-average ] unit-test
 { { 1+1/2 2+1/2 3+1/2 4+1/2 5+1/2 6+1/2 7+1/2 8+1/2 9+1/2 } }
-[ 10 [1,b] 2 moving-average ] unit-test
+[ 10 [1..b] 2 moving-average ] unit-test
 
 { { 1 1+1/2 2+1/4 3+1/8 4+1/16 5+1/32 } }
-[ 6 [1,b] 1/2 exponential-moving-average ] unit-test
+[ 6 [1..b] 1/2 exponential-moving-average ] unit-test
 { { 1 3 3 5 5 7 7 9 9 11 } }
-[ 10 [1,b] 2 exponential-moving-average ] unit-test
+[ 10 [1..b] 2 exponential-moving-average ] unit-test
 
 { { 2 5 5 4 3 } } [ { 1 2 5 6 1 4 3 } 3 moving-median ] unit-test
 
@@ -87,8 +87,8 @@ tools.test ;
     { 0 1 0 0 2 3 }
 } [ { 1 2 1 1 3 4 } unique-indices ] unit-test
 
-{ { 1 8+4/5 16+3/5 24+2/5 32+1/5 } } [ 1 40 5 linspace[a,b) >array ] unit-test
-{ { 1 10+3/4 20+1/2 30+1/4 40 } } [ 1 40 5 linspace[a,b] >array ] unit-test
+{ { 1 8+4/5 16+3/5 24+2/5 32+1/5 } } [ 1 40 5 linspace[a..b) >array ] unit-test
+{ { 1 10+3/4 20+1/2 30+1/4 40 } } [ 1 40 5 linspace[a..b] >array ] unit-test
 
 { f } [ { } majority ] unit-test
 { 1 } [ { 1 } majority ] unit-test
@@ -113,7 +113,7 @@ tools.test ;
         12345.68 12345.679 12345.6789 12345.6789 12345.678901
         12345.6789012 12345.67890123 12345.678901235
     }
-} [ 12345.67890123456 -6 9 [a,b] [ round-to-decimal ] with map ] unit-test
+} [ 12345.67890123456 -6 9 [a..b] [ round-to-decimal ] with map ] unit-test
 
 { 0 } [ 0 5 round-to-step ] unit-test
 { 0 } [ 1 5 round-to-step ] unit-test
@@ -139,7 +139,7 @@ tools.test ;
         0 -1 0 -1 0 1 1 -1 0 0 1 0 0 -1 -1
     }
 } [
-    30 [1,b] [ mobius ] map
+    30 [1..b] [ mobius ] map
 ] unit-test
 
 { 1/5 } [ 3/5 1 kelly ] unit-test
@@ -151,3 +151,7 @@ tools.test ;
 { 3 } [ 12 integer-sqrt ] unit-test
 { 4 } [ 16 integer-sqrt ] unit-test
 { 44 } [ 2019 integer-sqrt ] unit-test
+
+{ 1 } [ 11 13 stein ] unit-test
+{ 2 } [ 14 52 stein ] unit-test
+{ 7 } [ 14 7 stein ] unit-test

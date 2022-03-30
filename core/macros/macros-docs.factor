@@ -1,5 +1,5 @@
-USING: help.markup help.syntax quotations kernel
-stack-checker.transforms sequences combinators ;
+USING: help.markup help.syntax kernel
+stack-checker.transforms combinators ;
 IN: macros
 
 HELP: MACRO:

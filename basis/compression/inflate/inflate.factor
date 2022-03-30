@@ -1,9 +1,9 @@
 ! Copyright (C) 2009, 2020 Marc Fauconneau, Abtin Molavi, Jacob Fischer.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays assocs byte-vectors combinators
-combinators.smart compression.huffman fry hashtables io.binary
-kernel literals locals math math.bitwise math.order math.ranges
-sequences sorting memoize combinators.short-circuit byte-arrays ;
+USING: accessors arrays assocs bitstreams byte-arrays
+byte-vectors combinators combinators.short-circuit
+combinators.smart compression.huffman endian kernel math
+math.bitwise ranges sequences sorting ;
 QUALIFIED-WITH: bitstreams bs
 IN: compression.inflate
 
@@ -84,12 +84,12 @@ CONSTANT: clen-shuffle { 16 17 18 0 8 7 9 6 10 5 11 4 12 3 13 2 14 1 15 }
 
 MEMO: static-huffman-tables ( -- obj )
     [
-        0 143 [a,b] length [ 8 ] replicate
-        144 255 [a,b] length [ 9 ] replicate append
-        256 279 [a,b] length [ 7 ] replicate append
-        280 287 [a,b] length [ 8 ] replicate append
+          0 143 [a..b] length [ 8 ] replicate
+        144 255 [a..b] length [ 9 ] replicate append
+        256 279 [a..b] length [ 7 ] replicate append
+        280 287 [a..b] length [ 8 ] replicate append
     ] append-outputs
-    0 31 [a,b] length [ 5 ] replicate 2array
+    0 31 [a..b] length [ 5 ] replicate 2array
     [ [ length>> <iota> ] [ ] bi get-table ] map ;
 
 CONSTANT: length-table

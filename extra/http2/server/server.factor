@@ -1,6 +1,6 @@
-USING: accessors continuations http http.server http.server.requests
-io io.encodings.ascii io.servers io.sockets io.streams.peek
-io.streams.limited kernel namespaces openssl.libssl ; 
+USING: accessors continuations http http.server
+http.server.requests io.encodings.ascii io.servers io.sockets
+io.streams.limited kernel namespaces ;
 
 IN: http2.server
 

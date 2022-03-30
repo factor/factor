@@ -8,13 +8,13 @@ windows.kernel32 windows.ole32 windows.user32 ;
 IN: windows.dragdrop-listener
 
 : handle-data-object ( handler:  ( hdrop -- x ) data-object -- filenames )
-    FORMATETC <struct>
+    FORMATETC new
         CF_HDROP         >>cfFormat
         f                >>ptd
         DVASPECT_CONTENT >>dwAspect
         -1               >>lindex
         TYMED_HGLOBAL    >>tymed
-    STGMEDIUM <struct>
+    STGMEDIUM new
     [ IDataObject::GetData ] keep swap succeeded? [
         dup data>>
         [ rot execute( hdrop -- x ) ] with-global-lock

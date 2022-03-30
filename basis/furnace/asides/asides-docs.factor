@@ -1,5 +1,5 @@
-USING: help.markup help.syntax io.streams.string urls
-furnace.redirection http furnace.sessions furnace.db ;
+USING: furnace.db furnace.redirection furnace.sessions
+help.markup help.syntax http urls ;
 IN: furnace.asides
 
 HELP: <asides>

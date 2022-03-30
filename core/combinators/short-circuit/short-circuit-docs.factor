@@ -1,7 +1,6 @@
 ! Copyright (C) 2008 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: help.markup help.syntax io.streams.string quotations
-math kernel ;
+USING: help.markup help.syntax kernel math quotations ;
 IN: combinators.short-circuit
 
 HELP: 0&&

@@ -1,4 +1,4 @@
-USING: assocs sequences sequences.generalizations sets kernel accessors sequences.extras math.ranges math.vectors generalizations ;
+USING: assocs sequences sequences.generalizations sets kernel accessors sequences.extras ranges math.vectors generalizations ;
 
 IN: game_lib.board
 

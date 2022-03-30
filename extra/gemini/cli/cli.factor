@@ -78,7 +78,7 @@ CONSTANT: URL V{ }
 : gemini-print ( url body meta -- )
     f pre [
         PAGE delete-all
-        gemini-charset decode string-lines [
+        gemini-charset decode split-lines [
             { [ pre get not ] [ "=>" ?head ] } 0&& [
                 swap gemini-link present over 2array PAGE push
                 PAGE length swap "[%s] %s\n" printf
@@ -124,7 +124,7 @@ CONSTANT: URL V{ }
     ] when* ;
 
 : gemini-less ( -- )
-    "gemini.txt" temp-file dup exists? [
+    "gemini.txt" temp-file dup file-exists? [
         "less" swap 2array try-process
     ] [ drop ] if ;
 
@@ -141,7 +141,7 @@ CONSTANT: URL V{ }
     URL ?first [ >url "/" >>path gemini-go ] when* ;
 
 : gemini-shell ( args -- )
-    "|" split "gemini.txt" temp-file dup exists? [
+    "|" split "gemini.txt" temp-file dup file-exists? [
         "cat" swap 2array prefix run-pipeline drop
     ] [ 2drop ] if ;
 

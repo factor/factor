@@ -1,8 +1,8 @@
 ! Copyright (C) 2013 Björn Lindqvist, Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license
 USING: alien.libraries.finder arrays assocs
-combinators.short-circuit environment fry io io.encodings.utf8
-io.launcher kernel locals make sequences sets splitting system
+combinators.short-circuit environment io io.encodings.utf8
+io.launcher kernel make sequences sets splitting system
 unicode ;
 IN: alien.libraries.finder.linux
 
@@ -16,16 +16,16 @@ CONSTANT: mach-map {
 
 : parse-ldconfig-lines ( string -- triple )
     [
-        "=>" split1 [ [ blank? ] trim ] bi@
+        "=>" split1 [ [ unicode:blank? ] trim ] bi@
         [
             " " split1 [ "()" in? ] trim "," split
-            [ [ blank? ] trim ] map
+            [ [ unicode:blank? ] trim ] map
             [ ": Linux" swap subseq? ] reject
         ] dip 3array
     ] map ;
 
 : load-ldconfig-cache ( -- seq )
-    "/sbin/ldconfig -p" utf8 [ lines ] with-process-reader*
+    "/sbin/ldconfig -p" utf8 [ read-lines ] with-process-reader*
     2drop [ f ] [ rest parse-ldconfig-lines ] if-empty ;
 
 : ldconfig-arch ( -- str )
@@ -49,7 +49,7 @@ CONSTANT: mach-map {
         [
             "ld" , "-t" , ":" split [ "-L" , , ] each
             "-o" , "/dev/null" , "-l" name append ,
-        ] { } make utf8 [ lines ] with-process-reader* 2drop
+        ] { } make utf8 [ read-lines ] with-process-reader* 2drop
         "lib" name append '[ _ swap subseq? ] find nip
     ] [ f ] if* ;
 

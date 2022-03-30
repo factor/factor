@@ -8,7 +8,7 @@ IN: hello-unicode
         { { font-size 24 } } [
             "Hello" print
             "Grüß dich" print
-            "здравствуйте" print
+            "Привет" print
             "こんにちは" print
             "안녕하세요" print
             "שָׁלוֹם " print

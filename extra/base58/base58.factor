@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 
 USING: base64.private byte-arrays checksums checksums.sha
-io.binary kernel kernel.private literals math sequences ;
+endian kernel kernel.private literals math sequences ;
 
 IN: base58
 

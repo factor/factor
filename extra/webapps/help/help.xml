@@ -1,0 +1,31 @@
+<?xml version='1.0' ?>
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+    <t:chloe xmlns:t="http://factorcode.org/chloe/1.0">
+
+        <head>
+            <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+            <t:base t:href="$help-webapp/content/" />
+
+            <t:write-title />
+
+            <t:style t:include="resource:basis/help/html/stylesheet.css" />
+
+            <t:write-style />
+
+            <t:write-script />
+
+            <t:write-atom />
+        </head>
+
+        <body>
+
+            <t:call-next-template />
+
+        </body>
+
+    </t:chloe>
+
+</html>

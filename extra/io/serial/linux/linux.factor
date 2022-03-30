@@ -23,7 +23,7 @@ IN: io.serial.linux
     stream>> in>> handle>> fd>> ;
 
 : get-fd-termios ( fd -- serial )
-    termios <struct> [ tcgetattr io-error ] keep ;
+    termios new [ tcgetattr io-error ] keep ;
 
 : set-termios ( serial -- )
     [ serial-fd get-fd-termios ] keep termios<< ;

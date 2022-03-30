@@ -4,7 +4,7 @@ IN: compiler.cfg.instructions.syntax
 <<
 STRING: parse-insn-slot-specs-code
 USING: compiler.cfg.instructions.syntax prettyprint splitting ;
-"use: src/int-rep temp: temp/int-rep" " " split parse-insn-slot-specs .
+"use: src/int-rep temp: temp/int-rep" split-words parse-insn-slot-specs .
 ;
 
 STRING: parse-insn-slot-specs-result

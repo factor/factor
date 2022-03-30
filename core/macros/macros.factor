@@ -36,6 +36,6 @@ M: macro definer drop \ MACRO: \ ; ;
 M: macro definition "macro" word-prop ;
 
 M: macro reset-word
-    [ call-next-method ] [ f "macro" set-word-prop ] bi ;
+    [ call-next-method ] [ "macro" remove-word-prop ] bi ;
 
 M: macro always-bump-effect-counter? drop t ;

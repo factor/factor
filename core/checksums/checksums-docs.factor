@@ -1,4 +1,4 @@
-USING: byte-arrays help.markup help.syntax sequences strings ;
+USING: byte-arrays help.markup help.syntax ;
 IN: checksums
 
 HELP: checksum
@@ -72,12 +72,14 @@ $nl
     get-checksum
 }
 "Checksum implementations:"
-{ $vocab-subsection "CRC32 checksum" "checksums.crc32" }
-{ $vocab-subsection "MD5 checksum" "checksums.md5" }
-{ $vocab-subsection "SHA checksums" "checksums.sha" }
-{ $vocab-subsection "Adler-32 checksum" "checksums.adler-32" }
-{ $vocab-subsection "OpenSSL checksums" "checksums.openssl" }
-{ $vocab-subsection "Internet checksum" "checksums.internet" }
-{ $vocab-subsection "Checksum using an external utility" "checksums.process" } ;
+{ $vocab-subsections
+    { "CRC32 checksum" "checksums.crc32" }
+    { "MD5 checksum" "checksums.md5" }
+    { "SHA checksums" "checksums.sha" }
+    { "Adler-32 checksum" "checksums.adler-32" }
+    { "OpenSSL checksums" "checksums.openssl" }
+    { "Internet checksum" "checksums.internet" }
+    { "Checksum using an external utility" "checksums.process" }
+} ;
 
 ABOUT: "checksums"

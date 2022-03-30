@@ -1,7 +1,7 @@
 ! Copyright (C) 2009 Joe Groff.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors assocs classes.tuple generalizations kernel
-locals quotations sequences ;
+quotations sequences ;
 IN: combinators.tuple
 
 <PRIVATE

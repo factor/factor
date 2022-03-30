@@ -1,9 +1,9 @@
 ! Copyright (C) 2010 John Benediktsson
 ! See http://factorcode.org/license.txt for BSD license
-USING: arrays ascii assocs combinators combinators.smart fry
+USING: arrays ascii assocs combinators combinators.smart
 http.client io.encodings.ascii io.files io.files.temp kernel
-locals math math.ranges math.statistics memoize sequences
-sequences.private sorting splitting urls ;
+math math.statistics ranges sequences sequences.private sorting
+splitting urls ;
 IN: spelling
 
 ! http://norvig.com/spell-correct.html
@@ -14,7 +14,7 @@ CONSTANT: ALPHABET "abcdefghijklmnopqrstuvwxyz"
     [ length <iota> ] keep '[ _ remove-nth ] map ;
 
 : transposes ( word -- edits )
-    [ length [1,b) ] keep
+    [ length [1..b) ] keep
     '[ dup 1 - _ clone [ exchange-unsafe ] keep ] map ;
 
 : replace1 ( i word -- words )
@@ -25,7 +25,7 @@ CONSTANT: ALPHABET "abcdefghijklmnopqrstuvwxyz"
     [ length <iota> ] keep '[ _ replace1 ] map concat ;
 
 : inserts ( word -- edits )
-    [ length [0,b] ] keep
+    [ length [0..b] ] keep
     '[ CHAR: ? over _ insert-nth replace1 ] map concat ;
 
 : edits1 ( word -- edits )

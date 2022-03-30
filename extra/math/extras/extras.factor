@@ -1,13 +1,12 @@
 ! Copyright (C) 2012 John Benediktsson
 ! See http://factorcode.org/license.txt for BSD license
 
-USING: accessors arrays assocs assocs.extras byte-arrays
-combinators combinators.short-circuit compression.zlib fry
-grouping kernel locals math math.bitwise math.combinatorics
-math.constants math.functions math.order math.primes
-math.primes.factors math.ranges math.ranges.private
-math.statistics math.vectors memoize parser random sequences
-sequences.extras sequences.private sets sorting sorting.extras ;
+USING: accessors arrays assocs byte-arrays combinators
+combinators.short-circuit compression.zlib grouping kernel math
+math.bitwise math.combinatorics math.constants math.functions
+math.order math.primes math.primes.factors math.statistics
+math.vectors random ranges ranges.private sequences
+sequences.extras sets sorting sorting.extras ;
 
 IN: math.extras
 
@@ -52,7 +51,7 @@ MEMO: bernoulli ( p -- n )
     even? [ "odd degrees of freedom" throw ] unless ;
 
 : (chi2P) ( chi/2 df/2 -- p )
-    [1,b) dupd n/v cum-product swap neg e^ [ v*n sum ] keep + ;
+    [1..b) dupd n/v cum-product swap neg e^ [ v*n sum ] keep + ;
 
 PRIVATE>
 
@@ -215,21 +214,21 @@ PRIVATE>
 
 PRIVATE>
 
-: linspace[a,b) ( a b length -- seq )
+: linspace[a..b) ( a b length -- seq )
     steps ..b) <range> ;
 
-: linspace[a,b] ( a b length -- seq )
+: linspace[a..b] ( a b length -- seq )
     {
         { [ dup 1 < ] [ 3drop { } ] }
         { [ dup 1 = ] [ 2drop 1array ] }
         [ 1 - steps <range> ]
     } cond ;
 
-: logspace[a,b) ( a b length base -- seq )
-    [ linspace[a,b) ] dip swap n^v ;
+: logspace[a..b) ( a b length base -- seq )
+    [ linspace[a..b) ] dip swap n^v ;
 
-: logspace[a,b] ( a b length base -- seq )
-    [ linspace[a,b] ] dip swap n^v ;
+: logspace[a..b] ( a b length base -- seq )
+    [ linspace[a..b] ] dip swap n^v ;
 
 : majority ( seq -- elt/f )
     [ f 0 ] dip [
@@ -335,9 +334,6 @@ PRIVATE>
 : sum-floats ( seq -- n )
     partial-sums sum-exact ;
 
-! SYNTAX: .. dup pop scan-object [a,b) suffix! ;
-! SYNTAX: ... dup pop scan-object [a,b] suffix! ;
-
 : mobius ( n -- x )
     group-factors values [ 1 ] [
         dup [ 1 > ] any?
@@ -361,3 +357,27 @@ PRIVATE>
         ] each
         a a sq m > [ 1 - ] when
     ] if-zero ;
+
+<PRIVATE
+
+: reduce-evens ( value u v -- value' u' v' )
+    [ 2dup [ even? ] both? ] [ [ 2 * ] [ 2/ ] [ 2/ ] tri* ] while ;
+
+: reduce-odds ( value u v -- value' u' v' )
+    [
+        [ [ dup even? ] [ 2/ ] while ] bi@
+        2dup <=> {
+            { +eq+ [ over '[ _ * ] 2dip f ] }
+            { +lt+ [ swap [ - ] keep t ] }
+            { +gt+ [ [ - ] keep t ] }
+        } case
+    ] loop ;
+
+PRIVATE>
+
+: stein ( u v -- w )
+    2dup [ zero? ] both? [ "gcd for zeros is undefined" throw ] when
+    [ dup 0 < [ neg ] when ] bi@
+    [ 1 ] 2dip reduce-evens reduce-odds 2drop ;
+
+

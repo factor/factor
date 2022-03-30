@@ -4,7 +4,7 @@ USING: accessors alien alien.c-types alien.data alien.strings
 alien.syntax classes classes.struct combinators
 combinators.short-circuit io.encodings.ascii io.encodings.string
 kernel literals make math sequences specialized-arrays typed
-fry io.mmap formatting locals splitting io.binary arrays ;
+io.mmap formatting splitting endian ;
 FROM: alien.c-types => short ;
 IN: macho
 
@@ -944,7 +944,7 @@ TYPED: load-commands ( macho: mach_header_32/64 -- load-commands )
     [ symtab_command? ] filter ; inline
 
 : read-array-string ( uchar-array -- string )
-    ascii decode [ 0 = ] reject ;
+    ascii decode 0 swap remove ;
 
 : segment-sections ( segment-command -- sections )
     {
@@ -959,7 +959,7 @@ TYPED: load-commands ( macho: mach_header_32/64 -- load-commands )
 : sections-array ( segment-commands -- sections-array )
     [
         dup first segment_command_64?
-        [ section_64 ] [ section ] if <struct> ,
+        [ section_64 ] [ section ] if new ,
         segment-commands [ segment-sections [ , ] each ] each
     ] { } make ;
 

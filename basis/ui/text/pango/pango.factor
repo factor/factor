@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors alien.c-types alien.data alien.strings arrays assocs
 cache cairo cairo.ffi classes.struct combinators destructors fonts fry
-gobject.ffi init io.encodings.utf8 kernel locals math math.rectangles
+gobject.ffi init io.encodings.utf8 kernel math math.rectangles
 math.vectors memoize namespaces pango.cairo.ffi pango.ffi sequences
 ui.text ui.text.private ;
 IN: ui.text.pango
@@ -43,8 +43,8 @@ SYMBOL: dpi
     <rect> ;
 
 : layout-extents ( layout -- ink-rect logical-rect )
-    PangoRectangle <struct>
-    PangoRectangle <struct>
+    PangoRectangle new
+    PangoRectangle new
     [ pango_layout_get_extents ] 2keep
     [ PangoRectangle>rect ] bi@ ;
 
@@ -204,9 +204,9 @@ M: pango-renderer line-metrics
     [ cached-layout metrics>> ]
     if-empty ;
 
-[
+STARTUP-HOOK: [
     \ (cache-font-description) reset-memoized
     <cache-assoc> cached-layouts set-global
-] "ui.text.pango" add-startup-hook
+]
 
 pango-renderer font-renderer set-global

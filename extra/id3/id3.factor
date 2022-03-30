@@ -1,12 +1,10 @@
 ! Copyright (C) 2009 Tim Wawrzynczak, Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: sequences io io.encodings.binary io.files io.pathnames
-strings kernel math io.mmap accessors combinators math.ranges
-unicode byte-arrays io.encodings.string
-io.encodings.utf16 assocs math.parser combinators.short-circuit
-fry namespaces combinators.smart splitting io.encodings.ascii
-arrays io.files.info io.directories literals
-math.functions continuations ;
+USING: accessors arrays assocs byte-arrays
+combinators combinators.short-circuit combinators.smart
+continuations io.directories io.encodings.ascii
+io.encodings.string io.encodings.utf16 io.mmap kernel math
+math.functions math.parser sequences splitting unicode ;
 FROM: alien.c-types => uchar ;
 IN: id3
 

@@ -1,9 +1,9 @@
 ! Copyright (C) 2011 John Benediktsson
 ! See http://factorcode.org/license.txt for BSD license
 
-USING: accessors colors.constants formatting http http.client
-images.gif images.http io io.styles kernel namespaces sequences
-splitting ui urls.encoding xml xml.data xml.traversal ;
+USING: accessors colors formatting http http.client images.gif
+images.http io io.styles kernel namespaces sequences splitting
+ui urls.encoding xml xml.data xml.traversal ;
 
 IN: wolfram-alpha
 
@@ -43,7 +43,7 @@ PRIVATE>
         [ "title" attr "%s:\n" printf ]
         [
             "plaintext" deep-tags-named [
-                children>string string-lines
+                children>string split-lines
                 [ "  %s\n" printf ] each
             ] each
         ] bi

@@ -1,7 +1,7 @@
 ! Copyright (C) 2018 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors assocs calendar combinators environment
-escape-strings fry io io.pathnames io.streams.string kernel math
+escape-strings io io.pathnames io.streams.string kernel math
 math.parser namespaces prettyprint prettyprint.config sequences
 tools.deploy.backend tools.time unix.groups unix.users uuid ;
 IN: ci.run-process

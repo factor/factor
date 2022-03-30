@@ -1,9 +1,9 @@
 ! Copyright (C) 2008 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors assocs assocs.extras combinators
-combinators.short-circuit fry html.parser http.client io kernel
-locals math math.statistics sequences sets shuffle splitting
-unicode urls urls.encoding ;
+combinators.short-circuit html.parser http.client io kernel math
+math.statistics sequences sets splitting unicode urls
+urls.encoding ;
 IN: html.parser.analyzer
 
 : scrape-html ( url -- response vector )

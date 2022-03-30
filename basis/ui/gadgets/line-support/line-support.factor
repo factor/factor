@@ -1,7 +1,7 @@
 ! Copyright (C) 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays combinators fry kernel math
-math.functions math.order math.ranges math.vectors namespaces
+math.functions math.order ranges math.vectors namespaces
 opengl sequences ui.gadgets ui.gadgets.scrollers
 ui.gadgets.viewports ui.render ui.text ui.theme ;
 IN: ui.gadgets.line-support
@@ -68,7 +68,7 @@ M: line-gadget line-height
     [ [ loc>> ] [ dim>> ] bi v+ ] visible-line 1 + ;
 
 : each-slice-index ( from to seq quot -- )
-    [ [ <slice> ] [ drop [a,b) ] 3bi ] dip 2each ; inline
+    [ [ <slice> ] [ drop [a..b) ] 3bi ] dip 2each ; inline
 
 GENERIC: draw-line ( line index gadget -- )
 

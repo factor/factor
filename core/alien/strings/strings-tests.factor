@@ -1,6 +1,6 @@
-USING: alien.strings alien.c-types alien.data tools.test
-kernel libc io.encodings.utf8 io.encodings.utf16 io.encodings.utf16n
-io.encodings.ascii alien io.encodings.string io.encodings.latin1 ;
+USING: alien alien.data alien.strings io.encodings.ascii
+io.encodings.latin1 io.encodings.string io.encodings.utf16
+io.encodings.utf8 kernel libc tools.test ;
 
 { "\u0000ff" }
 [ "\u0000ff" latin1 string>alien latin1 alien>string ]

@@ -1,4 +1,4 @@
-USING: effects generic.single help.markup help.syntax math words ;
+USING: effects help.markup help.syntax words ;
 IN: generic.parser
 
 HELP: generic-effect

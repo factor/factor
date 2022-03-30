@@ -230,7 +230,7 @@ ARTICLE: "html.templates.chloe.extend.tags.example" "Examples of custom Chloe ta
 $nl
 "Here is the " { $link POSTPONE: USING: } " form that we need for the below code to work:"
 { $code
-    "USING: combinators kernel math.parser math.ranges random"
+    "USING: combinators kernel math.parser ranges random"
     "html.templates.chloe.compiler html.templates.chloe.syntax ;"
 }
 "We write a word which extracts the relevant attributes from an XML tag:"
@@ -256,7 +256,7 @@ $nl
     "    random-attrs string>random-generator"
     "    '["
     "        _ _ _"
-    "        [ [a,b] random present write ]"
+    "        [ [a..b] random present write ]"
     "        with-random-generator"
     "    ] [code] ;"
 }

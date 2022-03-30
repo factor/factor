@@ -61,7 +61,7 @@ ARTICLE: "concurrency-synchronous-sends" "Synchronous sends"
 { $subsections reply-synchronous handle-synchronous }
 "An example:"
 { $example
-    "USING: concurrency.messaging threads ;"
+    "USING: concurrency.messaging kernel threads ;"
     "IN: scratchpad"
     ": pong-server ( -- )"
     "    [ drop \"pong\" ] handle-synchronous ;"

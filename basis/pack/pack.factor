@@ -58,15 +58,15 @@ CONSTANT: pack-table
 
 CONSTANT: unpack-table
     H{
-        { CHAR: c [ 8 signed-endian> ] }
+        { CHAR: c [ signed-endian> ] }
         { CHAR: C [ unsigned-endian> ] }
-        { CHAR: s [ 16 signed-endian> ] }
+        { CHAR: s [ signed-endian> ] }
         { CHAR: S [ unsigned-endian> ] }
-        { CHAR: t [ 24 signed-endian> ] }
+        { CHAR: t [ signed-endian> ] }
         { CHAR: T [ unsigned-endian> ] }
-        { CHAR: i [ 32 signed-endian> ] }
+        { CHAR: i [ signed-endian> ] }
         { CHAR: I [ unsigned-endian> ] }
-        { CHAR: q [ 64 signed-endian> ] }
+        { CHAR: q [ signed-endian> ] }
         { CHAR: Q [ unsigned-endian> ] }
         { CHAR: f [ unsigned-endian> bits>float ] }
         { CHAR: F [ unsigned-endian> bits>float ] }
@@ -127,7 +127,7 @@ MACRO: unpack ( str -- quot )
     [ [ ch>packed-length ] { } map-as start/end ]
     [ [ unpack-table at ] { } map-as ] bi
     [ '[ [ _ _ ] dip <slice> @ ] ] 3map
-    '[ [ _ cleave ] output>array ] ;
+    '[ _ cleave>array ] ;
 
 : unpack-native ( seq str -- seq )
     '[ _ _ unpack ] with-native-endian ; inline

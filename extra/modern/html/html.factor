@@ -1,17 +1,25 @@
 ! Copyright (C) 2021 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays combinators combinators.short-circuit
-generalizations kernel make math modern modern.slices multiline
-sequences sequences.extras strings unicode ;
+generalizations kernel lexer make math modern modern.slices
+sequences sequences.extras shuffle splitting strings ;
 IN: modern.html
 
-TUPLE: tag name open-close-delimiter props children ;
+TUPLE: tag open name props close children ;
+
+TUPLE: processing-instruction open target props close ;
+: <processing-instruction> ( open target props close -- processing-instruction )
+    processing-instruction new
+        swap >>close
+        swap >>props
+        swap >>target
+        swap >>open ; inline
 
 TUPLE: doctype open close values ;
-: <doctype> ( open close values -- doctype )
+: <doctype> ( open values close -- doctype )
     doctype new
-        swap >>values
         swap >string >>close
+        swap >>values
         swap >string >>open ;
 
 TUPLE: comment open payload close ;
@@ -27,19 +35,21 @@ TUPLE: close-tag name ;
         swap >string rest rest but-last >>name ;
 
 TUPLE: open-tag < tag close-tag ;
-: <open-tag> ( name delimiter props -- tag )
+: <open-tag> ( open name props close -- tag )
     open-tag new
+        swap >>close
         swap >>props
-        swap >string drop ! >>open-close-delimiter
         swap >string >>name
+        swap >string >>open
         V{ } clone >>children ;
 
 TUPLE: self-close-tag < tag ;
-: <self-close-tag> ( name delimiter props -- tag )
+: <self-close-tag> ( open name props close -- tag )
     self-close-tag new
+        swap >>close
         swap >>props
-        swap >string drop ! >>open-close-delimiter
         swap >string >>name
+        swap >string >>open
         V{ } clone >>children ;
 
 TUPLE: squote payload ;
@@ -69,11 +79,13 @@ C: <dquote> dquote
         string-expected-got-eof
     ] if ;
 
-:: read-string ( n string char -- n' string payload )
-    n string char CHAR: ' = [ read-squote-string-payload ] [ read-dquote-string-payload ] if drop :> n'
-    n' string
-    n' [ n string string-expected-got-eof ] unless
-    n n' 1 - string <slice> ;
+:: read-string ( $n $string $char -- n' string payload )
+    $n $string $char CHAR: ' =
+    [ read-squote-string-payload ]
+    [ read-dquote-string-payload ] if drop :> $n'
+    $n' $string
+    $n' [ $n $string string-expected-got-eof ] unless
+    $n $n' 1 - $string <slice> ;
 
 : take-tag-name ( n string -- n' string tag )
     [ "\s\r\n/>" member? ] slice-until ;
@@ -87,24 +99,36 @@ C: <dquote> dquote
         [ [ take-tag-name ] dip prefix ]
     } case ;
 
-: read-prop ( n string -- n' string closing/f prop/f )
-    skip-whitespace "\s\n\r\"'<=/>" slice-til-either {
+: read-prop ( n string -- n' string prop/f closing/f )
+    skip-whitespace "\s\n\r\"'<=/>?" slice-til-either {
         { CHAR: < [ "< error" throw ] }
-        { CHAR: = [ 1 split-slice-back drop >string [ read-value ] dip swap 2array f swap ] }
-        { CHAR: / [ ">" expect-and-span 2 split-slice-back swap >string f like ] }
-        { CHAR: > [ 1 split-slice-back swap >string f like ] }
-        { CHAR: ' [ first read-string >string <squote> f swap ] }
-        { CHAR: " [ first read-string >string <dquote> f swap ] }
-        { CHAR: \s [ f swap >string ] }
-        { CHAR: \r [ f swap >string ] }
-        { CHAR: \n [ f swap >string ] }
+        { CHAR: = [ 1 split-slice-back drop >string [ read-value ] dip swap 2array f ] }
+        { CHAR: / [ ">" expect-and-span 2 split-slice-back [ >string f like ] bi@ ] }
+        { CHAR: > [ 1 split-slice-back [ >string f like ] bi@ ] }
+        { CHAR: ' [ first read-string >string <squote> f ] }
+        { CHAR: " [ first read-string >string <dquote> f ] }
+        { CHAR: ? [ ">" expect-and-span >string f swap ] }
+        { CHAR: \s [ >string f ] }
+        { CHAR: \r [ >string f ] }
+        { CHAR: \n [ >string f ] }
         { f [ "efff" throw ] }
     } case ;
 
-: read-props ( props n string -- props n' string closing )
-    read-prop
-    [ 5 npick push ] when*
-    [ ] [ read-props ] if* ;
+: read-props* ( props n string -- n' string props closing )
+    read-prop [
+        [ [ reach push ] when* rot ] dip
+    ] [
+        [ reach push ] when* read-props*
+    ] if* ; inline recursive
+
+: read-props ( n string -- n' string props closing )
+    V{ } clone -rot read-props* ;
+
+: read-processing-instruction ( n string opening -- n string processing-instruction )
+    "?" expect-and-span >string
+    [ take-tag-name >string ] dip
+    [ read-props ] 2dip
+    spin rotd <processing-instruction> ;
 
 : read-doctype ( n string opening -- n string doctype/comment )
     "!" expect-and-span
@@ -113,14 +137,14 @@ C: <dquote> dquote
         [ "-->" slice-til-string [ >string ] bi@ ] dip -rot <comment>
     ] [
         "DOCTYPE" expect-and-span
-        [ V{ } clone -rot read-props ] dip
-        swap 5 nrot <doctype>
+        [ read-props ] dip
+        -rot <doctype>
     ] if ;
 
 : read-open-tag ( n string opening -- n' string tag )
-    [ take-tag-name ] dip drop ! B span-slices
-    [ V{ } clone -rot read-props ] dip
-    swap 5 nrot over ">" sequence= [
+    [ take-tag-name ] dip
+    [ read-props ] 2dip
+    swap 2swap dup ">" sequence= [
         <open-tag>
     ] [
         <self-close-tag>
@@ -136,19 +160,17 @@ C: <dquote> dquote
     vector n tail
     n vector shorten ;
 
-: pop-til-end ( stack quot -- seq/f )
-    [ find-last drop ] keepd swap
-    [ shorten* ] [ drop f ] if* ; inline
+: unclosed-open-tag? ( obj -- ? )
+    { [ open-tag? ] [ close-tag>> not ] } 1&& ; inline
 
 ERROR: unmatched-open-tags-error stack seq ;
 : check-tag-stack ( stack -- stack )
-    dup [
-        { [ open-tag? ] [ close-tag>> not ] } 1&&
-    ] filter [ unmatched-open-tags-error ] unless-empty ;
+    dup [ unclosed-open-tag? ] filter
+    [ unmatched-open-tags-error ] unless-empty ;
 
 ERROR: unmatched-closing-tag-error stack tag ;
 :: find-last-open-tag ( stack name -- seq )
-    stack [ { [ tag? ] [ name>> name = ] } 1&& ] find-last drop [
+    stack [ { [ unclosed-open-tag? ] [ name>> name = ] } 1&& ] find-last drop [
         stack swap shorten*
     ] [
         stack name unmatched-closing-tag-error
@@ -166,6 +188,7 @@ ERROR: unmatched-closing-tag-error stack tag ;
                     swap >>close-tag
                     ] }
                 { CHAR: ! [ read-doctype ] }
+                { CHAR: ? [ read-processing-instruction ] }
                 [ drop read-open-tag ]
             } case
         ] }
@@ -180,32 +203,43 @@ GENERIC: write-html ( tag -- )
 
 : >value ( obj -- string )
     {
-        { [ dup squote? ] [ payload>> "'" dup surround ] }
-        { [ dup dquote? ] [ payload>> "\"" dup surround ] }
+        { [ dup squote? ] [ payload>> "'" 1surround ] }
+        { [ dup dquote? ] [ payload>> "\"" 1surround ] }
         [ ]
     } cond ;
 
 M: doctype write-html
     [ open>> % ]
-    [ values>> [ >value ] map " " join [ " " % % ] unless-empty ]
+    [ values>> [ >value ] map join-words [ " " % % ] unless-empty ]
     [ close>> % ] tri ;
 
-
 : write-props ( seq -- )
-    [ dup array? [ first2 >value "=" glue ] [ >value ] if ] map " " join [ " " % % ] unless-empty ;
+    [ dup array? [ first2 >value "=" glue ] [ >value ] if ] map join-words [ " " % % ] unless-empty ;
+
+M: processing-instruction write-html
+    {
+        [ open>> % ]
+        [ target>> % ]
+        [ props>> write-props ]
+        [ close>> % ]
+    } cleave ;
 
 M: open-tag write-html
     {
-        [ "<" % name>> % ]
-        [ props>> write-props ">" % ]
+        [ open>> % ]
+        [ name>> % ]
+        [ props>> write-props ]
+        [ close>> % ]
         [ children>> [ write-html ] each ]
         [ close-tag>> name>> "</" ">" surround % ]
     } cleave ;
 
 M: self-close-tag write-html
     {
-        [ "<" % name>> % ]
-        [ props>> write-props "/>" % ]
+        [ open>> % ]
+        [ name>> % ]
+        [ props>> write-props ]
+        [ close>> % ]
     } cleave ;
 
 M: comment write-html

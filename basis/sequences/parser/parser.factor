@@ -1,8 +1,8 @@
 ! Copyright (C) 2005, 2009 Daniel Ehrenberg, Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors circular combinators.short-circuit fry io
-kernel locals math math.order sequences sorting.functor
-sorting.slots unicode sequences.private ;
+USING: accessors circular combinators.short-circuit io kernel
+math math.order sequences sequences.parser sequences.private
+sorting.functor sorting.slots unicode ;
 IN: sequences.parser
 
 TUPLE: sequence-parser sequence n ;

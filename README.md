@@ -1,6 +1,6 @@
 # Factor
 
-[![](https://api.travis-ci.org/factor/factor.svg)](https://travis-ci.org/factor/factor)
+![Build](https://github.com/factor/factor/actions/workflows/build.yml/badge.svg)
 
 Factor is a [concatenative](https://www.concatenative.org), stack-based
 programming language with [high-level
@@ -41,7 +41,7 @@ build script:
 * M1 macOS: `arch -x86_64 ./build.sh update`
 
 or download the correct boot image for your system from
-http://downloads.factorcode.org/images/master/, put it in the `factor`
+https://downloads.factorcode.org/images/master/, put it in the `factor`
 directory and run:
 
 * Unix: `make` and then `./factor -i=boot.unix-x86.64.image`
@@ -80,7 +80,7 @@ Some other simple things you can try in the listener:
 
 { 4 8 15 16 23 42 } [ 2 * ] map .
 
-1000 [1,b] sum .
+1000 [1..b] sum .
 
 4 <iota> [
     "Happy Birthday " write
@@ -112,6 +112,7 @@ Common arguments:
         -run=listener    run terminal listener
         -run=ui.tools    run Factor development UI
     -e=<code>        evaluate <code>
+    -ea=<code>       evaluate <code> with auto-use
     -no-user-init    suppress loading of .factor-rc
     -roots=<paths>   a list of path-delimited extra vocab roots
 
@@ -155,13 +156,14 @@ Then subsequent fetches will automatically update any replace objects.
 
 ## Community
 
-Factor developers meet in the `#concatenative` channel on
-[irc.freenode.net](http://freenode.net). Drop by if you want to discuss
+Factor developers used to meet in the `#concatenative` channel on
+[irc.libera.chat](http://libera.chat). Drop by if you want to discuss
 anything related to Factor or language design in general.
 
 * [Factor homepage](https://factorcode.org)
 * [Concatenative languages wiki](https://concatenative.org)
-* [Mailing list](factor-talk@lists.sourceforge.net)
+* [Join the mailing list](https://concatenative.org/wiki/view/Factor/Mailing%20list)
+* [Join the Factor Discord](http://discord.gg/QxJYZx3QDf)
 * Search for "factorcode" on [Gitter](https://gitter.im/)
 
 Have fun!

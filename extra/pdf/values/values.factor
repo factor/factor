@@ -1,10 +1,9 @@
 ! Copyright (C) 2011-2012 John Benediktsson
 ! See http://factorcode.org/license.txt for BSD license
 
-USING: accessors arrays assocs calendar colors colors.gray
-combinators combinators.short-circuit fonts formatting
-hashtables io kernel make math math.parser sequences splitting
-strings xml.entities ;
+USING: accessors assocs calendar colors combinators fonts
+formatting hashtables io kernel make math math.parser sequences
+splitting strings xml.entities ;
 
 IN: pdf.values
 
@@ -59,7 +58,7 @@ M: font pdf-value
         } cleave
         "/BaseFont " prepend ,
         ">>" ,
-    ] { } make "\n" join ;
+    ] { } make join-lines ;
 
 M: timestamp pdf-value
     "%Y%m%d%H%M%S" strftime "D:" prepend ;

@@ -1,13 +1,12 @@
 ! Copyright (C) 2009 Marc Fauconneau.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays byte-arrays combinators
-compression.huffman fry grouping images images.loader
-images.processing io io.binary io.encodings.binary
-io.streams.byte-array io.streams.limited io.streams.throwing
-kernel locals math math.bitwise math.blas.matrices
-math.blas.vectors math.constants math.functions math.matrices
-math.order math.vectors memoize namespaces sequences
-sequences.deep ;
+compression.huffman endian grouping images images.loader
+images.processing io io.encodings.binary io.streams.byte-array
+io.streams.limited io.streams.throwing kernel math math.bitwise
+math.blas.matrices math.blas.vectors math.constants
+math.functions math.matrices math.order math.vectors namespaces
+sequences sequences.deep ;
 QUALIFIED-WITH: bitstreams bs
 IN: images.jpeg
 
@@ -363,7 +362,7 @@ ERROR: not-a-jpeg-image ;
     [
         parse-marker { SOI } = [ not-a-jpeg-image ] unless
         parse-headers
-        contents <loading-jpeg>
+        read-contents <loading-jpeg>
     ] with-input-stream ;
 
 PRIVATE>

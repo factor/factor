@@ -124,6 +124,17 @@ HELP: http-options*
 
 { http-options http-options* } related-words
 
+HELP: http-patch
+{ $values { "url" { $or url string } } { "response" response } { "data" sequence } }
+{ $description "Submits an HTTP PATCH request." }
+{ $errors "Throws an error if the HTTP request fails." } ;
+
+HELP: http-patch*
+{ $values { "url" { $or url string } } { "response" response } { "data" sequence } }
+{ $description "Submits an HTTP PATCH request, but does not check the HTTP response code for success." } ;
+
+{ http-patch http-patch* } related-words
+
 HELP: http-trace
 { $values { "url" "a " { $link url } " or " { $link string } } { "response" response } { "data" sequence } }
 { $description "Submits an HTTP TRACE request." }

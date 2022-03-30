@@ -36,13 +36,9 @@ pre {
     border: none;
 }
 
-a, .link { color: #104e8b; }
+a, .link { color: #2A5DB0; }
 a:link, a:visited, a:active, .link { text-decoration: none; }
 a:hover, .link:hover { text-decoration: underline; }
-
-#container {
-    max-width: 1000px;
-}
 
 .error { color: #a00; }
 
@@ -55,19 +51,32 @@ a:hover, .link:hover { text-decoration: underline; }
 .inline {
     display: inline;
 }
-
 .navbar {
-    margin: 0;
-    padding: 15px;
-    padding-top: 10px;
-    padding-bottom: 10px;
-    line-height: 150%;
     border-bottom: 1px solid #ccc;
     background-color: #f5f5f5;
 }
 
-.navbar a, .navbar .link {
+.navrow {
+    max-width: 1000px;
+    position: relative;
+    left: calc(max(-500px,-50%) + 50%);
+    margin: 0;
+    padding: 10px 15px 10px 15px;
+}
+
+.navrow a, .navrow .link {
     margin-right: 10px;
+}
+
+.navrow img {
+    vertical-align: middle;
+}
+
+.page {
+    max-width: 1000px;
+    position: relative;
+    left: calc(max(-500px,-50%) + 50%);
+    padding: 15px;
 }
 
 .big-field-label {

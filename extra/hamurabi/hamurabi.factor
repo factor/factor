@@ -2,8 +2,8 @@
 ! See http://factorcode.org/license.txt for BSD license
 
 USING: accessors combinators combinators.short-circuit
-continuations formatting fry io kernel math math.functions
-math.order math.parser math.ranges random sequences strings ;
+continuations formatting io kernel math math.functions
+math.order math.parser random ranges strings ;
 
 IN: hamurabi
 
@@ -77,7 +77,7 @@ total-births total-deaths ;
 : leave-not-too-bad ( game -- game )
     "YOUR PERFORMANCE COULD HAVE BEEN SOMEWHAT BETTER, BUT" print
     "REALLY WASN'T TOO BAD AT ALL." print
-    dup population>> 4/5 * floor [0,b] random
+    dup population>> 4/5 * floor [0..b] random
     "%d PEOPLE WOULD DEARLY LIKE TO SEE YOU ASSASSINATED\n" printf
     "BUT WE ALL HAVE OUR TRIVIAL PROBLEMS" print ;
 
@@ -176,10 +176,10 @@ total-births total-deaths ;
     dup stores>> "YOU NOW HAVE %d BUSHELS IN STORE.\n\n" printf ;
 
 : update-randomness ( game -- game )
-    17 26 [a,b] random >>cost
-    5 [1,b] random >>yield
-    5 [1,b] random >>birth-factor
-    5 [1,b] random >>rat-factor
+    17 26 [a..b] random >>cost
+    5 [1..b] random >>yield
+    5 [1..b] random >>birth-factor
+    5 [1..b] random >>rat-factor
     100 random 15 < >>plague ;
 
 : update-stores ( game -- game )

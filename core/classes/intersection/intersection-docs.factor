@@ -1,6 +1,4 @@
-USING: generic help.markup help.syntax kernel kernel.private
-namespaces sequences words arrays help effects math
-layouts classes.private classes compiler.units ;
+USING: classes compiler.units help.markup help.syntax ;
 IN: classes.intersection
 
 ARTICLE: "intersections" "Intersection classes"

@@ -13,7 +13,7 @@ IN: db.postgresql.lib
     dup zero? [
         drop f
     ] [
-        PQresultErrorMessage [ blank? ] trim
+        PQresultErrorMessage [ ascii:blank? ] trim
     ] if ;
 
 : postgres-result-error ( res -- )
@@ -21,7 +21,7 @@ IN: db.postgresql.lib
 
 : (postgresql-error-message) ( handle -- str )
     PQerrorMessage
-    "\n" split [ [ blank? ] trim ] map "\n" join ;
+    split-lines [ [ ascii:blank? ] trim ] map join-lines ;
 
 : postgresql-error-message ( -- str )
     db-connection get handle>> (postgresql-error-message) ;

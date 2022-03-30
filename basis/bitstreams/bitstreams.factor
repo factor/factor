@@ -1,7 +1,7 @@
 ! Copyright (C) 2009 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors byte-arrays byte-vectors
-combinators.short-circuit io.binary kernel math math.bitwise
+combinators.short-circuit endian kernel math math.bitwise
 sequences sequences.private ;
 IN: bitstreams
 

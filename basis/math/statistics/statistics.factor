@@ -2,9 +2,8 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs combinators
 combinators.short-circuit fry generalizations grouping kernel
-locals math math.functions math.order math.ranges math.vectors
+locals math math.functions math.order ranges math.vectors
 sequences sequences.private sorting ;
-FROM: math.ranges => [a,b] ;
 IN: math.statistics
 
 : power-mean ( seq p -- x )
@@ -25,7 +24,7 @@ GENERIC: sum-of-squares ( seq -- x )
 M: object sum-of-squares [ sq ] map-sum ;
 M: iota sum-of-squares
     n>> 1 - [ ] [ 1 + ] [ 1/2 + ] tri * * 3 / ;
-M: math.ranges:range sum-of-squares
+M: ranges:range sum-of-squares
     dup { [ step>> 1 = ] [ from>> integer? ] } 1&& [
         [ from>> ] [ length>> ] bi dupd +
         [ <iota> sum-of-squares ] bi@ swap -
@@ -34,7 +33,7 @@ M: math.ranges:range sum-of-squares
 GENERIC: sum-of-cubes ( seq -- x )
 M: object sum-of-cubes [ 3 ^ ] map-sum ;
 M: iota sum-of-cubes sum sq ;
-M: math.ranges:range sum-of-cubes
+M: ranges:range sum-of-cubes
     dup { [ step>> 1 = ] [ from>> integer? ] } 1&& [
         [ from>> ] [ length>> ] bi dupd +
         [ <iota> sum-of-cubes ] bi@ swap -
@@ -52,7 +51,7 @@ M: iota sum-of-quads
             * * * 30 /
         ] [ 0 ] if
     ] ;
-M: math.ranges:range sum-of-quads
+M: ranges:range sum-of-quads
     dup { [ step>> 1 = ] [ from>> integer? ] } 1&& [
         [ from>> ] [ length>> ] bi dupd +
         [ <iota> sum-of-quads ] bi@ swap -
@@ -411,7 +410,7 @@ PRIVATE>
     [ demean ] [ sample-std ] bi v/n ;
 
 : dcg ( scores -- dcg )
-    dup length 1 + 2 swap [a,b] [ log 2 log /f ] map v/ sum ;
+    dup length 1 + 2 swap [a..b] [ log 2 log /f ] map v/ sum ;
 
 : ndcg ( scores -- ndcg )
     [ 0.0 ] [

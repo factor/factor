@@ -56,7 +56,7 @@ M: windows-crypto-context random-bytes*
         [ first2 <windows-crypto-context> ] attempt-all
     ] [ 2drop f ] recover ;
 
-[
+STARTUP-HOOK: [
     {
         ${ MS_ENHANCED_PROV PROV_RSA_FULL }
         ${ MS_DEF_PROV PROV_RSA_FULL }
@@ -66,4 +66,4 @@ M: windows-crypto-context random-bytes*
         ${ MS_STRONG_PROV PROV_RSA_FULL }
         ${ MS_ENH_RSA_AES_PROV PROV_RSA_AES }
     } try-crypto-providers secure-random-generator set-global
-] "random.windows" add-startup-hook
+]

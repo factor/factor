@@ -21,11 +21,13 @@ tools.test ;
 
 { { "hello" " " " " " " "world" } } [
     "hello   world"
-    [ [ blank? ] find drop ] split-find
+    [ [ ascii:blank? ] find drop ] split-find
     [ >string ] map
 ] unit-test
 
 { { } } [ "" " " split-harvest ] unit-test
+{ { } } [ " " " " split-harvest ] unit-test
+{ { } } [ "  " " " split-harvest ] unit-test
 { { "a" } } [ "a" " " split-harvest ] unit-test
 { { "a" } } [ " a" " " split-harvest ] unit-test
 { { "a" } } [ " a " " " split-harvest ] unit-test

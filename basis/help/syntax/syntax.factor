@@ -1,15 +1,21 @@
 ! Copyright (C) 2005, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
+
 USING: accessors arrays ascii combinators
 combinators.short-circuit compiler.units definitions help
-help.markup help.topics kernel lexer math namespaces parser
-sequences splitting strings strings.parser vocabs.parser words ;
+help.markup help.topics kernel lexer math math.order namespaces
+parser sequences splitting strings strings.parser vocabs.parser
+words ;
+
 IN: help.syntax
+
+DEFER: HELP{
 
 <PRIVATE
 
 :: parse-help-token ( end -- str/obj/f )
     ?scan-token dup {
+        [ "{" = [ \ HELP{ ] [ f ] if ]
         [ "syntax" lookup-word ]
         [ "help.markup" lookup-word ]
         [ dup ?last ":{[(/\"" member-eq? [ search ] [ drop f ] if ]
@@ -78,8 +84,18 @@ IN: help.syntax
         ] if
     ] produce nip ;
 
+: whitespace ( seq -- n )
+    [ [ blank? ] all? ] reject [ 0 ] [
+        [ [ blank? not ] find drop ] [ min ] map-reduce
+    ] if-empty ;
+
+: trim-whitespace ( seq -- seq' )
+    dup rest-slice dup whitespace
+    [ '[ _ short tail ] map! ] unless-zero drop
+    0 over [ [ blank? ] trim-head ] change-nth ;
+
 : code-lines ( str -- seq )
-    string-lines [ [ blank? ] trim ] map harvest ;
+    split-lines trim-whitespace [ [ blank? ] all? ] trim ;
 
 : make-example ( str -- seq )
     code-lines dup { [ array? ] [ length 1 > ] } 1&& [

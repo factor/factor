@@ -3,6 +3,4 @@
 
 USING: hashtables.sequences kernel prettyprint.custom ;
 
-IN: hashtables.sequences.prettyprint
-
 M: sequence-hashtable pprint-delims drop \ SH{ \ } ;

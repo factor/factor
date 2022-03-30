@@ -1,9 +1,8 @@
 ! Copyright (C) 2009 Alec Berryman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays bit-arrays fry kernel kernel.private
-layouts locals math math.functions math.order math.private
-multiline sequences sequences.private typed ;
-FROM: math.ranges => [1,b] ;
+USING: accessors arrays bit-arrays kernel kernel.private
+layouts math math.functions math.order math.private
+ranges multiline sequences sequences.private typed ;
 
 IN: bloom-filters
 
@@ -61,7 +60,7 @@ ERROR: invalid-capacity capacity ;
 
 ! 100 hashes ought to be enough for anybody.
 : #hashes-range ( -- range )
-    100 [1,b] ;
+    100 [1..b] ;
 
 ! { #hashes #bits }
 : identity-configuration ( -- 2seq )

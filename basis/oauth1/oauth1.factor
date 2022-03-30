@@ -1,9 +1,9 @@
 ! Copyright (C) 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors assocs base64 calendar checksums.hmac
-checksums.sha combinators fry http http.client kernel locals
-make math math.parser namespaces present random sequences
-sorting strings urls urls.encoding urls.private ;
+checksums.sha http http.client kernel make math math.parser
+namespaces present random sequences sorting strings
+urls.encoding urls.private ;
 IN: oauth1
 
 SYMBOL: consumer-token
@@ -60,12 +60,15 @@ nonce ;
         ] bi
     ] H{ } make ; inline
 
-:: sign-params ( url request-method consumer-token request-token params -- signed-params )
+! Checksum all the params but only return the oauth_ params for use in the auth header.
+! See https://github.com/factor/factor/issues/2487
+:: sign-params ( url request-method consumer-token request-token params -- oauth-params )
     params sort-keys :> params
     url request-method params signature-base-string :> sbs
     consumer-token secret>> request-token dup [ secret>> ] when hmac-key :> key
     sbs key sha1 hmac-bytes >base64 >string :> signature
-    params { "oauth_signature" signature } prefix ;
+    params { "oauth_signature" signature } prefix
+    [ drop "oauth_" head? ] assoc-filter ;
 
 : extract-user-data ( assoc -- assoc' )
     [
@@ -144,7 +147,7 @@ TUPLE: oauth-request-params < token-params access-token ;
 
 <PRIVATE
 
-:: signed-oauth-request-params ( request params -- params )
+:: signed-oauth-request-params ( request params -- oauth-params )
     request url>>
     request method>>
     params consumer-token>>
@@ -156,7 +159,7 @@ TUPLE: oauth-request-params < token-params access-token ;
     ] make-token-params
     sign-params ;
 
-: build-auth-string ( params -- string )
+: build-auth-string ( oauth-params -- string )
     [ [ present url-encode-full ] bi@ "\"" "\"" surround "=" glue ] { } assoc>map
     ", " join "OAuth realm=\"\", " prepend ;
 

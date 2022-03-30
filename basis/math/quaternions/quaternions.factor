@@ -1,6 +1,6 @@
 ! Copyright (C) 2005, 2010 Joe Groff, Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: arrays combinators kernel locals math math.functions
+USING: arrays combinators kernel math
 math.libm math.order math.vectors sequences ;
 IN: math.quaternions
 

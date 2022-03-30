@@ -1,0 +1,64 @@
+.tabs {
+  display: flex;
+  flex-wrap: wrap;
+  margin: 0 auto 10px;
+}
+
+.radiotab {
+  position: absolute;
+  opacity: 0;
+}
+
+.label {
+  width: 100%;
+  padding: 5px;
+  background: white;
+  cursor: pointer;
+  font-weight: bold;
+  font-size: 14pt;
+  color: #7f7f7f;
+  text-align: center;
+  border: 1px solid #ccc;
+}
+
+.label:hover {
+  background: #d8d8d8;
+  border: 1px solid #ccc;
+}
+
+.radiotab:checked + .label {
+  border: 1px solid #ccc;
+  background: #f0f0f0;
+  color: black;
+}
+
+.panel {
+  display: none;
+  width: 100%;
+}
+
+.radiotab:checked + .label + .panel {
+  display: block;
+}
+
+@media (min-width: 600px) {
+
+  .panel {
+    order: 99;
+    border-top: 1px solid #ccc;
+  }
+
+  .label {
+    width: 33.33%;
+    border: 1px solid white;
+    border-bottom: none;
+  }
+
+  .label:hover {
+    border-bottom: none;
+  }
+
+  .radiotab:checked + .label {
+    border-bottom: none;
+  }
+}

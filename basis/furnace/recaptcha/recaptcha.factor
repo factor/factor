@@ -1,10 +1,10 @@
 ! Copyright (C) 2009 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors assocs furnace.actions furnace.conversations
-furnace.redirection html.forms html.templates.chloe.compiler
+html.forms html.templates.chloe.compiler
 html.templates.chloe.syntax http.client http.server
-http.server.filters io.sockets json.reader kernel locals
-namespaces sequences splitting urls validators xml.syntax ;
+http.server.filters io.sockets json.reader kernel namespaces
+urls validators xml.syntax ;
 IN: furnace.recaptcha
 
 TUPLE: recaptcha < filter-responder domain secret-key site-key ;

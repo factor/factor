@@ -1,8 +1,7 @@
 ! Copyright (C) 2008 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays assocs kernel math math.intervals
-namespaces sequences money math.order taxes.usa.fica
-taxes.usa.medicare taxes.usa taxes.usa.w4 ;
+USING: accessors kernel math money taxes.usa taxes.usa.fica
+taxes.usa.medicare taxes.usa.w4 ;
 IN: taxes.usa.federal
 
 ! http://www.irs.gov/pub/irs-pdf/p15.pdf

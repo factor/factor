@@ -1,9 +1,8 @@
 ! Copyright (C) 2009, 2020 Marc Fauconneau, Abtin Molavi, and Jacob Fischer.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs bit-arrays bitstreams combinators
-fry hashtables heaps io kernel locals math math.bits math.order
-math.parser math.ranges multiline namespaces sequences sorting
-vectors ;
+hashtables heaps kernel math math.bits math.order namespaces
+sequences sorting vectors ;
 QUALIFIED-WITH: bitstreams bs
 IN: compression.huffman
 

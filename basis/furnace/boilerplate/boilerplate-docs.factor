@@ -1,5 +1,4 @@
-USING: help.markup help.syntax io.streams.string
-http.server.dispatchers ;
+USING: help.markup help.syntax http.server.dispatchers ;
 IN: furnace.boilerplate
 
 HELP: <boilerplate>

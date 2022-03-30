@@ -1,5 +1,5 @@
 ! Copyright (C) 2018 Cat Stevens
-USING: arrays assocs help.markup help.syntax kernel math multiline
+USING: arrays assocs help.markup help.syntax kernel math
 sequences strings ;
 IN: english
 

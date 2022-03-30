@@ -1,9 +1,8 @@
 ! Copyright (C) 2009 Jason W. Merrill.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel math math.functions math.derivatives accessors
-    macros generic compiler.units words effects vocabs
-    sequences arrays assocs generalizations fry make
-    combinators.smart help help.markup ;
+USING: accessors arrays assocs combinators.smart compiler.units
+effects generalizations help help.markup kernel make math
+sequences vocabs words ;
 
 IN: math.dual
 

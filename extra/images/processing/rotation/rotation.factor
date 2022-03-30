@@ -1,8 +1,7 @@
 ! Copyright (C) 2009 Kobi Lurie.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays colors combinators
-combinators.short-circuit fry grouping images images.bitmap
-images.loader images.normalization kernel locals math sequences ;
+USING: accessors combinators grouping images kernel math
+sequences ;
 IN: images.processing.rotation
 
 ERROR: unsupported-rotation degrees ;
@@ -31,11 +30,11 @@ ERROR: unsupported-rotation degrees ;
 : image>byte-rows ( image -- byte-rows )
     [ bitmap>> ] [ row-length ] bi group rows-remove-pad ;
 
-: (seperate-to-pixels) ( byte-rows image -- pixel-rows )
+: (separate-to-pixels) ( byte-rows image -- pixel-rows )
     bytes-per-pixel '[ _ group ] map ;
 
 : image>pixel-rows ( image -- pixel-rows )
-    [ image>byte-rows ] keep (seperate-to-pixels) ;
+    [ image>byte-rows ] keep (separate-to-pixels) ;
  
 : flatten-table ( seq^3 -- seq )
     [ concat ] map concat ;

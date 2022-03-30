@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license
 
 USING: accessors alien.c-types alien.data byte-arrays checksums
-grouping io.binary kernel literals math math.bitwise math.order
+endian grouping kernel math math.bitwise
 sequences sequences.generalizations sequences.private
 specialized-arrays ;
 SPECIALIZED-ARRAY: uint64_t
@@ -51,7 +51,7 @@ CONSTANT: P3 0x589965cc75374cc3
 
 :: native-mapper ( from to bytes c-type -- seq )
     from to bytes <slice>
-    bytes byte-array? little-endian? and
+    bytes byte-array? alien.data:little-endian? and
     [ c-type cast-array ]
     [ c-type heap-size <groups> [ le> ] map ] if ; inline
 

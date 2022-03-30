@@ -1,9 +1,8 @@
 ! Copyright (C) 2013 John Benediktsson
 ! See http://factorcode.org/license.txt for BSD license
 
-USING: accessors assocs combinators hashtables
-hashtables.wrapped kernel math math.hashcodes parser
-vocabs.loader ;
+USING: accessors assocs hashtables hashtables.wrapped kernel
+math math.hashcodes parser vocabs.loader ;
 
 IN: hashtables.numbers
 

@@ -1,9 +1,8 @@
 ! Copyright (C) 2010 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors alien alien.data alien.syntax classes.struct
-continuations fry kernel libc literals locals sequences
-windows.advapi32 windows.errors windows.kernel32 windows.types
-alien.c-types ;
+continuations kernel libc literals sequences windows.advapi32
+windows.errors windows.kernel32 windows.types ;
 IN: windows.privileges
 
 TYPEDEF: TOKEN_PRIVILEGES* PTOKEN_PRIVILEGES
@@ -28,11 +27,11 @@ TYPEDEF: TOKEN_PRIVILEGES* PTOKEN_PRIVILEGES
     [ CloseHandle drop ] finally ; inline
 
 : lookup-privilege ( string -- luid )
-    [ f ] dip LUID <struct>
+    [ f ] dip LUID new
     [ LookupPrivilegeValue win32-error=0/f ] keep ;
 
 :: make-token-privileges ( name enabled? -- obj )
-    TOKEN_PRIVILEGES <struct>
+    TOKEN_PRIVILEGES new
         1 >>PrivilegeCount
         LUID_AND_ATTRIBUTES malloc-struct &free
             enabled? [ SE_PRIVILEGE_ENABLED >>Attributes ] when

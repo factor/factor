@@ -35,7 +35,7 @@ CONSTRUCTOR: <resolv.conf> resolv.conf ( -- resolv.conf )
 : trim-blanks ( string -- string' ) [ blank? ] trim ;
 
 : split-line ( resolv.conf string -- resolv.conf seq resolv.conf )
-    trim-blanks " " split
+    trim-blanks split-words
     [ trim-blanks ] map harvest over ;
 
 : parse-nameserver ( resolv.conf string -- resolv.conf )
@@ -51,7 +51,7 @@ CONSTRUCTOR: <resolv.conf> resolv.conf ( -- resolv.conf )
     split-line search>> push-all ;
 
 : parse-sortlist ( resolv.conf string -- resolv.conf )
-    trim-blanks " " split
+    trim-blanks split-words
     [ trim-blanks "/" split1 <network> ] map >>sortlist ;
 
 ERROR: unsupported-resolv.conf-option string ;
@@ -94,7 +94,7 @@ PRIVATE>
     [ parse-resolv.conf-line ] each ;
 
 : string>resolv.conf ( string -- resolv.conf )
-    string-lines lines>resolv.conf ;
+    split-lines lines>resolv.conf ;
 
 : path>resolv.conf ( path -- resolv.conf )
     utf8 file-lines lines>resolv.conf ;

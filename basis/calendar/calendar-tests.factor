@@ -1,4 +1,4 @@
-USING: accessors grouping kernel math math.order math.ranges
+USING: accessors grouping kernel math math.order ranges
 math.vectors random sequences threads tools.test ;
 IN: calendar
 
@@ -199,7 +199,7 @@ IN: calendar
 
 { t } [
     2009 1 29 <date> 1 months time+
-    2009 3 1 <date> =
+    2009 2 28 <date> =
 ] unit-test
 
 { t } [
@@ -208,7 +208,7 @@ IN: calendar
 ] unit-test
 
 { { 1 1 1 2 2 2 3 3 3 4 4 4 } } [
-    12 [1,b] [ 2020 swap 1 <date> quarter ] map
+    12 [1..b] [ 2020 swap 1 <date> quarter ] map
 ] unit-test
 
 { 0 }
@@ -231,19 +231,19 @@ IN: calendar
 
 {
     T{ timestamp { year 2019 } { month 11 } { day 4 } }
-} [ 2019 308 year-ordinal>timestamp >gmt midnight ] unit-test
+} [ 2019 308 year-ordinal>timestamp ] unit-test
 
 {
     T{ timestamp { year 2020 } { month 11 } { day 3 } }
-} [ 2020 308 year-ordinal>timestamp >gmt midnight ] unit-test
+} [ 2020 308 year-ordinal>timestamp ] unit-test
 
 {
     T{ timestamp { year 2019 } { month 12 } { day 31 } }
-} [ 2019 365 year-ordinal>timestamp >gmt midnight ] unit-test
+} [ 2019 365 year-ordinal>timestamp ] unit-test
 
 {
     T{ timestamp { year 2020 } { month 12 } { day 31 } }
-} [ 2020 366 year-ordinal>timestamp >gmt midnight ] unit-test
+} [ 2020 366 year-ordinal>timestamp ] unit-test
 
 { t } [
     2020 <year> timestamp>year-dates-gmt
@@ -251,14 +251,14 @@ IN: calendar
 ] unit-test
 
 { t } [
-    1999 2025 [a,b] [
+    1999 2025 [a..b] [
         <year> timestamp>year-dates-gmt
         [ >date< ymd>ordinal ] map [ < ] monotonic?
     ] map [ ] all?
 ] unit-test
 
 { t } [
-    1999 2025 [a,b] [
+    1999 2025 [a..b] [
         <year-gmt> timestamp>year-dates-gmt
         [ >date< ymd>ordinal ] map [ < ] monotonic?
     ] map [ ] all?

@@ -1,12 +1,12 @@
 ! Copyright (C) 2009 Maximilian Lupke.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: assocs kernel math.ranges sequences ;
+USING: assocs kernel ranges sequences ;
 IN: sequences.abbrev
 
 <PRIVATE
 
 : prefixes ( seq -- prefixes )
-    dup length [1,b] [ head ] with map ;
+    dup length [1..b] [ head ] with map ;
 
 PRIVATE>
 

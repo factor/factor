@@ -1,13 +1,13 @@
 ! Copyright (C) 2005, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors ascii assocs calendar combinators.short-circuit
-destructors fry hashtables http http.client.post-data
-http.parsers io io.crlf io.encodings io.encodings.ascii
-io.encodings.binary io.encodings.iana io.encodings.string
-io.files io.pathnames io.sockets io.sockets.secure io.timeouts
-kernel locals math math.order math.parser mime.types namespaces
-present sequences splitting urls vocabs.loader combinators
-environment ;
+USING: accessors ascii assocs calendar combinators
+combinators.short-circuit destructors environment hashtables
+http http.client.post-data http.parsers io io.crlf io.encodings
+io.encodings.ascii io.encodings.binary io.encodings.iana
+io.encodings.string io.files io.pathnames io.sockets
+io.sockets.secure io.timeouts kernel math math.order math.parser
+mime.types namespaces present sequences splitting urls
+vocabs.loader ;
 IN: http.client
 
 ERROR: too-many-redirects ;
@@ -283,7 +283,7 @@ PRIVATE>
     ] with-file-writer ;
 
 : ?download-to ( url file -- )
-    dup exists? [ 2drop ] [ download-to ] if ;
+    dup file-exists? [ 2drop ] [ download-to ] if ;
 
 : download ( url -- )
     dup download-name download-to ;
@@ -334,6 +334,15 @@ PRIVATE>
 
 : http-options* ( url -- response data )
     <options-request> http-request* ;
+
+: <patch-request> ( url -- request )
+    "PATCH" <client-request> ;
+
+: http-patch ( url -- response data )
+    <patch-request> http-request ;
+
+: http-patch* ( url -- response data )
+    <patch-request> http-request* ;
 
 : <trace-request> ( url -- request )
     "TRACE" <client-request> ;

@@ -8,7 +8,7 @@ IN: io.launcher.unix.tests
 [
     { } [ { "touch" "launcher-test-1" } try-process ] unit-test
 
-    { t } [ "launcher-test-1" exists? ] unit-test
+    { t } [ "launcher-test-1" file-exists? ] unit-test
 
     { } [
         "launcher-test-1" ?delete-file

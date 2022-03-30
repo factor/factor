@@ -3,10 +3,9 @@
 
 USING: accessors arrays ascii assocs calendar calendar.format
 classes.tuple combinators command-line continuations csv
-formatting fry grouping http.client io io.encodings.ascii
-io.files io.styles kernel math math.extras math.parser memoize
-namespaces regexp sequences sorting.human splitting strings urls
-wrap.strings ;
+formatting grouping http.client io io.encodings.ascii io.files
+io.styles kernel math math.extras math.parser namespaces regexp
+sequences sorting.human splitting strings urls wrap.strings ;
 
 IN: metar
 
@@ -151,7 +150,7 @@ MEMO: glossary ( -- assoc )
             dup number?
             [ number>string ]
             [ glossary ?at drop ] if
-        ] map " " join
+        ] map join-words
     ] map "/" join ;
 
 : parse-timestamp ( str -- str' )
@@ -275,7 +274,7 @@ CONSTANT: compass-directions H{
             [ drop f ]
         } case [
             2 group dup [ weather key? ] all?
-            [ [ weather at ] map " " join ]
+            [ [ weather at ] map join-words ]
             [ concat parse-glossary ] if
         ] dip prepend
     ] if ;
@@ -488,7 +487,7 @@ CONSTANT: high-clouds H{
     [ [ f ] [ low-clouds at "low clouds are %s" sprintf ] if-zero ]
     [ [ f ] [ mid-clouds at "middle clouds are %s" sprintf ] if-zero ]
     [ [ f ] [ high-clouds at "high clouds are %s" sprintf ] if-zero ]
-    tri* 3array " " join ;
+    tri* 3array join-words ;
 
 : parse-inches ( str -- str' )
     dup [ CHAR: / = ] all? [ drop "unknown" ] [
@@ -524,7 +523,7 @@ CONSTANT: high-clouds H{
     "sea-level pressure is %s hPa" sprintf ;
 
 : parse-lightning ( str -- str' )
-    "LTG" ?head drop 2 group [ lightning at ] map " " join ;
+    "LTG" ?head drop 2 group [ lightning at ] map join-words ;
 
 CONSTANT: re-recent-weather R/ ((\w{2})?[BE]\d{2,4}((\w{2})?[BE]\d{2,4})?)+/
 
@@ -547,7 +546,7 @@ CONSTANT: re-recent-weather R/ ((\w{2})?[BE]\d{2,4}((\w{2})?[BE]\d{2,4})?)+/
 
 : parse-recent-weather ( str -- str' )
     split-recent-weather
-    [ (parse-recent-weather) ] map " " join ;
+    [ (parse-recent-weather) ] map join-words ;
 
 : parse-varying ( str -- str' )
     "V" split1 [ string>number ] bi@
@@ -604,7 +603,7 @@ CONSTANT: re-recent-weather R/ ((\w{2})?[BE]\d{2,4}((\w{2})?[BE]\d{2,4})?)+/
     } cond ;
 
 : metar-remarks ( report seq -- report )
-    [ parse-remark ] map " " join >>remarks ;
+    [ parse-remark ] map join-words >>remarks ;
 
 : <metar-report> ( metar -- report )
     [ metar-report new ] dip [ >>raw ] keep
@@ -701,7 +700,7 @@ sky-condition raw ;
     [ re-visibility matches? ] find-one
     [ parse-visibility pick visibility<< ] when*
 
-    [ re-rvr matches? ] find-all " " join
+    [ re-rvr matches? ] find-all join-words
     [ parse-rvr ] map ", " join pick rvr<<
 
     [ re-weather matches? ] find-all
@@ -727,7 +726,7 @@ sky-condition raw ;
     [ re-visibility matches? ] find-one
     [ parse-visibility pick visibility<< ] when*
 
-    [ re-rvr matches? ] find-all " " join
+    [ re-rvr matches? ] find-all join-words
     [ parse-rvr ] map ", " join pick rvr<<
 
     [ re-weather matches? ] find-all
@@ -743,7 +742,7 @@ sky-condition raw ;
 
 : <taf-report> ( taf -- report )
     [ taf-report new ] dip [ >>raw ] keep
-    string-lines [ [ blank? ] trim ] map
+    split-lines [ [ blank? ] trim ] map
     rest dup first "TAF" = [ rest ] when
     harvest unclip swapd taf-body swap taf-partials ;
 

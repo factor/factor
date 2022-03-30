@@ -3,7 +3,7 @@
 namespace factor {
 
 code_heap::code_heap(cell size) {
-  if (size > ((uint64_t)1 << (sizeof(cell) * 8 - 6)))
+  if (size > ((uint64_t)1 << (sizeof(cell) * 8 - 5)))
     fatal_error("Heap too large", size);
   seg = new segment(align_page(size), true);
   if (!seg)

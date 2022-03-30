@@ -2366,7 +2366,7 @@ FUNCTION: BOOL IsValidDpiAwarenessContext (
 )
 
 ! DPI_AWARENESS_CONTEXT experimentally:
-! USE: math.ranges -100 1000 [a,b] [ <alien> IsValidDpiAwarenessContext ] zip-with
+! USE: ranges -100 1000 [a..b] [ <alien> IsValidDpiAwarenessContext ] zip-with
 ! [ nip 0 > ] assoc-filter keys .
 ! { -5 -4 -3 -2 -1 17 18 34 273 529 785 }
 

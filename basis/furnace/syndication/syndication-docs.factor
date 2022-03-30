@@ -1,4 +1,5 @@
-USING: help.markup help.syntax io.streams.string kernel sequences strings urls syndication calendar ;
+USING: calendar help.markup help.syntax kernel strings
+syndication urls ;
 IN: furnace.syndication
 
 HELP: <feed-action>

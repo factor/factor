@@ -1,5 +1,5 @@
 USING: tools.test concurrency.flags concurrency.combinators
-kernel threads locals accessors calendar ;
+kernel threads accessors calendar ;
 IN: concurrency.flags.tests
 
 :: flag-test-1 ( -- val )

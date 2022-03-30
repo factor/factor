@@ -190,7 +190,7 @@ CONSTANT: ALL-EXECUTE   0o0000111
     unix-1970 time- duration>microseconds make-timeval ;
 
 : timestamps>byte-array ( timestamps -- byte-array )
-    [ [ timestamp>timeval ] [ \ timeval <struct> ] if* ] map
+    [ [ timestamp>timeval ] [ \ timeval new ] if* ] map
     timeval >c-array ;
 
 PRIVATE>

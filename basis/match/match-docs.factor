@@ -1,6 +1,6 @@
 ! Copyright (C) 2006 Chris Double.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: help.markup help.syntax namespaces assocs sequences
+USING: help.markup help.syntax namespaces assocs
 kernel combinators ;
 IN: match
 

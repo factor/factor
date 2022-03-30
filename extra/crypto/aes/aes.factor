@@ -2,7 +2,7 @@
 ! Some parts Copyright (C) 2008 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs byte-arrays crypto.aes.utils
-generalizations kernel literals math math.bitwise math.ranges
+generalizations kernel literals math math.bitwise ranges
 namespaces sequences sequences.private sequences.unrolled ;
 IN: crypto.aes
 
@@ -158,7 +158,7 @@ M: aes-256-key key-expand-round ( temp i -- temp' )
     [ dup 4th-from-end ] dip bitxor suffix! ; inline
 
 : (sched-interval) ( K Nr -- seq )
-    [ length ] dip 1 + 4 * [a,b) ;    ! over the interval Nk...Nb(Nr + 1)
+    [ length ] dip 1 + 4 * [a..b) ;    ! over the interval Nk...Nb(Nr + 1)
 
 : (init-round) ( out -- out temp quot )
     [ ]
@@ -260,7 +260,7 @@ SINGLETON: aes-encrypt
 
 M: aes-encrypt (expand-key) (expand-enc-key) ;
 M: aes-encrypt (first-round) add-first-round-key ;
-M: aes-encrypt (counter) 0 swap (a,b) ;
+M: aes-encrypt (counter) [1..b) ;
 M: aes-encrypt (round) aes-round ;
 M: aes-encrypt (final-round) [ final-round ] change-state add-final-round-key ;
 
@@ -274,7 +274,7 @@ M:: aes-decrypt (expand-key) ( K Nr -- sched )
 M: aes-decrypt (first-round) ( aes -- aes' )
     add-final-round-key ;
 
-M: aes-decrypt (counter) ( nrounds -- seq ) 0 swap (a,b) <reversed> ;
+M: aes-decrypt (counter) ( nrounds -- seq ) [1..b) <reversed> ;
 M: aes-decrypt (final-round) ( aes -- aes' )
     [ [ inv-subword ] map unshift-rows  ] change-state
     add-first-round-key ;

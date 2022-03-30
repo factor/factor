@@ -1,6 +1,6 @@
 ! Copyright (C) 2004, 2008 Chris Double, Matthew Willis, James Cash.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays combinators io kernel lists locals math
+USING: accessors arrays combinators io kernel lists math
 promises quotations sequences ;
 IN: lists.lazy
 

@@ -1,5 +1,4 @@
-USING: help.markup help.syntax sequences kernel quotations
-calendar ;
+USING: calendar help.markup help.syntax quotations ;
 IN: concurrency.locks
 
 HELP: lock

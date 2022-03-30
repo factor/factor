@@ -1,9 +1,8 @@
 ! Copyright (C) 2020 Jacob Fischer, Abtin Molavi.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs bit-arrays byte-arrays
-combinators compression.huffman fry kernel literals locals make
-math math.bits math.order math.ranges namespaces sequences
-sequences.deep splitting vectors ;
+combinators compression.huffman kernel math math.bits math.order
+namespaces ranges sequences sequences.deep splitting vectors ;
 IN: compression.gzip
 
 <PRIVATE

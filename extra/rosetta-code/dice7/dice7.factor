@@ -1,7 +1,7 @@
 ! Copyright (C) 2015 Alexander Ilin, Doug Coleman, John Benediktsson.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: assocs fry kernel locals math math.ranges math.statistics
-math.vectors prettyprint random sequences sorting ;
+USING: assocs kernel math ranges math.statistics math.vectors
+prettyprint random sequences sorting ;
 IN: rosetta-code.dice7
 
 ! http://rosettacode.org/wiki/Seven-sided_dice_from_five-sided_dice
@@ -42,7 +42,7 @@ IN: rosetta-code.dice7
 
 ! Output a random integer 1..5.
 : dice5 ( -- x )
-   5 [1,b] random ;
+   5 [1..b] random ;
 
 ! Output a random integer 1..7 using dice5 as randomness source.
 : dice7 ( -- x )
@@ -54,7 +54,7 @@ IN: rosetta-code.dice7
 ! inserting zeros for die rolls that never occur.
 : count-outcomes ( #sides rolls -- counts )
     histogram
-    swap [1,b] [ over [ 0 or ] change-at ] each
+    swap [1..b] [ over [ 0 or ] change-at ] each
     sort-keys values ;
 
 ! Assumes a fair die [1..n] thrown for sum(counts),

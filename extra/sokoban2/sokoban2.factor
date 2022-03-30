@@ -1,13 +1,19 @@
-USING: literals kernel namespaces accessors sequences combinators math.vectors colors.constants 
-game_lib.ui game_lib.board ui.gestures ui.gadgets ;
+
+USING: literals kernel namespaces accessors sequences combinators math.vectors colors
+game_lib.ui game_lib.board game_lib.cell ui.gestures ui.gadgets opengl opengl.textures
+images.loader ;
 
 IN: sokoban2
 
 CONSTANT: player "vocab:sokoban2/resources/CharR.png"
-CONSTANT: wall COLOR: gray ! "vocab:sokoban2/resources/Wall_Brown.png"
+CONSTANT: wall "vocab:sokoban2/resources/Wall_Brown.png"
 CONSTANT: goal "vocab:sokoban2/resources/Goal.png"
 CONSTANT: crate "vocab:sokoban2/resources/Crate_Yellow.png"
 CONSTANT: dark_crate "vocab:sokoban2/resources/CrateDark_Yellow.png"
+
+TUPLE: sokoban-cell < cell image-path cell-name ;
+M: sokoban-cell draw-cell* 
+    rot [ image-path>> load-image ] dip <texture> draw-scaled-texture ;
 
 SYMBOL: level 
 0 level set-global
@@ -27,6 +33,7 @@ SYMBOL: level
         { 0 6 }                                                 { 7 6 }
         { 0 7 }                                                 { 7 7 }
         { 0 8 } { 1 8 } { 2 8 } { 3 8 } { 4 8 } { 5 8 } { 6 8 } { 7 8 }
+
     } $ wall add-to-cells
     
     { 
@@ -38,6 +45,7 @@ SYMBOL: level
     } $ goal add-to-cells
 
     ! { 1 2 } { "vocab:sokoban2/resources/Crate_Yellow.png" "vocab:sokoban2/resources/Goal.png" } set-cell
+    { 0 0 } [ COLOR: black gl-color { 10 10 } { 20 20 } gl-fill-rect ] set-cell 
 
     create-board ;
 

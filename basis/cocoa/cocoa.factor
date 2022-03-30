@@ -7,7 +7,6 @@ IN: cocoa
 SYMBOL: sent-messages
 
 sent-messages [ H{ } clone ] initialize
-
 : remember-send ( selector -- )
     dup sent-messages get set-at ;
 
@@ -39,7 +38,7 @@ SYMBOL: frameworks
 
 frameworks [ V{ } clone ] initialize
 
-[ frameworks get [ load-framework ] each ] "cocoa" add-startup-hook
+STARTUP-HOOK: [ frameworks get [ load-framework ] each ]
 
 SYNTAX: FRAMEWORK: scan-token [ load-framework ] [ frameworks get push ] bi ;
 
@@ -52,6 +51,7 @@ SYNTAX: IMPORT: scan-token [ ] import-objc-class ;
 [
     {
         "NSAlert"
+        "NSAppearance"
         "NSAppleScript"
         "NSApplication"
         "NSArray"

@@ -1,7 +1,7 @@
 ! Copyright (C) 2003, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs combinators
-combinators.short-circuit continuations debugger destructors fry
+combinators.short-circuit continuations debugger destructors
 hashtables html html.streams html.templates http
 http.server.remapping http.server.requests http.server.responses
 io io.crlf io.encodings io.encodings.ascii io.encodings.iana

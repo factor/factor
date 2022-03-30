@@ -1,5 +1,4 @@
-USING: effects generic help.markup help.syntax kernel math
-math.parser sequences ;
+USING: help.markup help.syntax kernel math math.parser ;
 IN: generic.single
 
 HELP: no-method

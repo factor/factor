@@ -1,5 +1,5 @@
-USING: assocs help.markup help.syntax io.streams.string sequences strings present math kernel byte-arrays urls
-calendar ;
+USING: calendar help.markup help.syntax kernel math present
+strings urls ;
 IN: http
 
 HELP: <request>

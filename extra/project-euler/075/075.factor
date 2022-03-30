@@ -1,6 +1,6 @@
 ! Copyright (c) 2008 Aaron Schaefer.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: arrays kernel math math.ranges
+USING: arrays kernel math ranges
     namespaces project-euler.common sequences ;
 IN: project-euler.075
 

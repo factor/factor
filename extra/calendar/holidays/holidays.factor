@@ -1,6 +1,6 @@
 ! Copyright (C) 2009 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors assocs calendar fry hashtables kernel locals
+USING: accessors assocs calendar hashtables kernel
 parser sequences vocabs words ;
 IN: calendar.holidays
 

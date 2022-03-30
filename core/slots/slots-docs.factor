@@ -1,5 +1,5 @@
-USING: help.markup help.syntax generic kernel.private parser
-kernel quotations namespaces sequences arrays effects
+USING: help.markup help.syntax
+kernel quotations sequences
 generic.standard classes.builtin slots.private classes strings math
 assocs byte-arrays alien classes.tuple ;
 IN: slots

@@ -1,7 +1,9 @@
 ! Copyright (C) 2011 Joe Groff.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: combinators command-line eval io io.pathnames kernel
-layouts math math.parser namespaces system vocabs.loader ;
+USING: accessors combinators combinators.smart command-line eval
+io io.pathnames kernel layouts math math.parser namespaces
+parser parser.notes prettyprint sequences source-files system
+vocabs.loader ;
 IN: command-line.startup
 
 : help? ( -- ? )
@@ -27,7 +29,7 @@ Options:
     -young=<int>        young gc generation 0 size in MiB [" write cell 4 / number>string write "]
     -aging=<int>        aging gc generation 1 size in MiB [" write cell 2 / number>string write "]
     -tenured=<int>      tenured gc generation 2 size in MiB [" write cell 24 * number>string write "]
-    -codeheap=<int>     codeheap size in MiB [64]
+    -codeheap=<int>     codeheap size in MiB [96]
     -pic=<int>          max pic size [3]
     -fep                enter fep mode immediately
     -no-signals         turn off OS signal handling
@@ -40,18 +42,24 @@ from within Factor for more information.
 
 : version? ( -- ? ) "version" get ;
 
-: version. ( -- ) "Factor " write vm-version print ;
+: run-script ( file -- )
+    t parser-quiet? [
+        [ parse-file [ output>array datastack. ] call( quot --  ) ]
+        [ path>source-file main>> [ execute( -- ) ] when* ] bi
+    ] with-variable ;
 
 : command-line-startup ( -- )
     (command-line) parse-command-line {
         { [ help? ] [ help. ] }
-        { [ version? ] [ version. ] }
+        { [ version? ] [ version-info print ] }
         [
             load-vocab-roots
             run-user-init
             "e" get script get or [
-                "e" get [ eval( -- ) ] when*
-                script get [ run-script ] when*
+                t auto-use? [
+                    "e" get [ eval-with-stack ] when*
+                    script get [ run-script ] when*
+                ] with-variable
             ] [
                 "run" get run
             ] if

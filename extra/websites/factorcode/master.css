@@ -6,10 +6,9 @@ html {
     box-sizing: inherit;
 }
 
-a:link { text-decoration: none; color: #104e8b; }
-a:visited { text-decoration: none; color: #104e8b; }
-a:active { text-decoration: none; color: #104e8b; }
-a:hover { text-decoration: underline; color: #104e8b; }
+a { color: #2A5DB0; }
+a:link, a:visited, a:active { text-decoration: none; }
+a:hover { text-decoration: underline; }
 
 body {
     font-size: 12pt;

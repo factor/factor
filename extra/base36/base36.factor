@@ -1,9 +1,8 @@
 ! Copyright (C) 2020 John Benediktsson.
 ! See http://factorcode.org/license.txt for BSD license.
 
-USING: base64.private byte-arrays checksums checksums.sha
-io.binary kernel kernel.private literals math math.functions
-sequences ;
+USING: base64.private byte-arrays endian kernel kernel.private
+literals math math.functions sequences ;
 
 IN: base36
 

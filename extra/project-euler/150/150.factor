@@ -1,6 +1,6 @@
 ! Copyright (c) 2008 Eric Mertens.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel locals math math.order math.ranges math.statistics
+USING: kernel math math.order ranges math.statistics
 project-euler.common sequences sequences.private ;
 IN: project-euler.150
 
@@ -48,7 +48,7 @@ IN: project-euler.150
     615949 * 797807 + 20 2^ rem dup 19 2^ - ; inline
 
 : sums-triangle ( -- seq )
-    0 1000 [1,b] [ [ next ] replicate partial-sums ] map nip ; inline
+    0 1000 [1..b] [ [ next ] replicate partial-sums ] map nip ; inline
 
 :: (euler150) ( m -- n )
     sums-triangle :> table

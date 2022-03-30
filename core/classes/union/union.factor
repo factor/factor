@@ -4,7 +4,7 @@ USING: accessors assocs classes classes.algebra
 classes.algebra.private classes.builtin classes.private
 classes.tuple classes.tuple.private combinators definitions
 kernel kernel.private math math.private quotations sequences
-slots.private sorting words ;
+slots.private sorting splitting words ;
 IN: classes.union
 
 PREDICATE: union-class < class
@@ -117,7 +117,7 @@ M: anonymous-union instance?
     members>> [ instance? ] with any? ;
 
 M: anonymous-union class-name
-    members>> [ class-name ] map " " join ;
+    members>> [ class-name ] map join-words ;
 
 M: union-class normalize-class
     class-members <anonymous-union> normalize-class ;

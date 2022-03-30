@@ -1,7 +1,7 @@
 ! Copyright (C) 2017 John Benediktsson, Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: ascii assocs checksums checksums.sha combinators fry
-kernel math math.functions math.parser math.ranges
+USING: ascii assocs checksums checksums.sha combinators
+kernel math math.functions math.parser ranges
 math.statistics sequences sets sorting splitting strings uuid ;
 IN: escape-strings
 
@@ -33,7 +33,7 @@ IN: escape-strings
 : lowest-missing-number ( string-set -- min )
     members dup
     [ length ] histogram-by
-    dup keys length [0,b]
+    dup keys length [0..b]
     [ [ of ] keep over [ 10^ < ] [ nip ] if ] with find nip
     [ '[ length _ = ] filter natural-sort ] keep ! remove natural-sort here
     [
@@ -49,7 +49,7 @@ IN: escape-strings
     [ nip ] [ drop length ] if ;
 
 : surround-by-brackets ( str delim -- str' )
-    [ "[" dup surround ] [ "]" dup surround ] bi surround ;
+    [ "[" 1surround ] [ "]" 1surround ] bi surround ;
 
 : surround-by-equals-brackets ( str n -- str' )
     CHAR: = <repetition> surround-by-brackets ;
@@ -91,4 +91,4 @@ M: sequence sha1-escape-strings ( seq -- strs )
     [ sha1-escape-string ] { } map-as ;
 
 M: string sha1-escape-strings ( str -- strs )
-    string-lines sha1-escape-strings ;
+    split-lines sha1-escape-strings ;

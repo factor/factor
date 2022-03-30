@@ -1,6 +1,6 @@
 ! Copyright (C) 2019 John Benediktsson
 ! See http://factorcode.org/license.txt for BSD license
-USING: base64.private byte-arrays combinators fry io io.binary
+USING: base64.private byte-arrays combinators endian io
 io.encodings.binary io.streams.byte-array kernel kernel.private
 literals math namespaces sequences ;
 IN: base32

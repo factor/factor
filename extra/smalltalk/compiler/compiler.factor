@@ -1,7 +1,7 @@
 ! Copyright (C) 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays assocs combinators continuations fry
-generic kernel locals locals.types math quotations sequences
+USING: accessors arrays assocs combinators continuations
+generic kernel locals.types math quotations sequences
 sequences.generalizations sets smalltalk.ast smalltalk.classes
 smalltalk.compiler.assignment smalltalk.compiler.lexenv
 smalltalk.compiler.return smalltalk.selectors splitting words ;

@@ -1,16 +1,18 @@
 ! Copyright (C) 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays assocs calendar colors colors.constants
-combinators combinators.short-circuit definitions.icons
-documents documents.elements fonts fry generic help.vocabs
-kernel math math.vectors models.arrow models.delay parser
-present sequences sets splitting strings tools.completion
-ui.commands ui.gadgets ui.gadgets.editors ui.gadgets.glass
-ui.gadgets.labeled ui.gadgets.scrollers ui.gadgets.tables
-ui.gadgets.tracks ui.gadgets.worlds ui.gadgets.wrappers
-ui.gestures ui.images ui.operations ui.pens.solid ui.theme
-ui.theme.images ui.tools.common ui.tools.listener.history
+
+USING: accessors arrays assocs calendar colors combinators
+combinators.short-circuit definitions.icons documents
+documents.elements fonts generic help.vocabs kernel math
+math.vectors models.arrow models.delay parser present sequences
+sets splitting strings tools.completion ui.commands ui.gadgets
+ui.gadgets.editors ui.gadgets.glass ui.gadgets.labeled
+ui.gadgets.scrollers ui.gadgets.tables ui.gadgets.tracks
+ui.gadgets.worlds ui.gadgets.wrappers ui.gestures ui.images
+ui.operations ui.pens.solid ui.theme ui.theme.images
+ui.tools.common ui.tools.listener.history
 ui.tools.listener.popups unicode.data vocabs words ;
+
 IN: ui.tools.listener.completion
 
 ! We don't directly depend on the listener tool but we use a few slots
@@ -68,24 +70,22 @@ M: path-completion completion-banner drop "Paths" ;
 M: history-completion completion-banner drop "Input history" ;
 
 ! Completion modes also implement the row renderer protocol
-M: listener-completion row-columns drop present 1array ;
+M: listener-completion row-columns drop second 1array ;
+M: listener-completion row-summary drop first ;
 
 M: char-completion row-columns
-    drop [ name-map at 1string ] [ 2array ] bi ;
+    drop first [ name-map at 1string ] keep 2array ;
 
 M: definition-completion prototype-row
     drop \ + definition-icon <image-name> "" 2array ;
 
 M: definition-completion row-columns
-    drop
-    [ definition-icon <image-name> ]
-    [ present ] bi
-    2array ;
+    drop first2 [ definition-icon <image-name> ] dip 2array ;
 
 M: word-completion row-color
-    [ vocabulary>> ] [ manifest>> ] bi* {
-        { [ dup not ] [ COLOR: black ] }
-        { [ 2dup search-vocab-names>> in? ] [ COLOR: black ] }
+    [ first vocabulary>> ] [ manifest>> ] bi* {
+        { [ dup not ] [ text-color ] }
+        { [ 2dup search-vocab-names>> in? ] [ text-color ] }
         { [ over ".private" tail? ] [ COLOR: dark-red ] }
         [ COLOR: dark-gray ]
     } cond 2nip ;
@@ -93,12 +93,12 @@ M: word-completion row-color
 M: vocab-word-completion row-color 2drop COLOR: black ;
 
 M: vocab-completion row-color
-    drop dup vocab? [
-        name>> ".private" tail? COLOR: dark-red COLOR: black ?
+    drop first dup vocab? [
+        name>> ".private" tail? COLOR: dark-red text-color ?
     ] [ drop COLOR: dark-gray ] if ;
 
 M: color-completion row-color
-    drop named-color ;
+    drop second named-color ;
 
 : up-to-caret ( caret document -- string )
     [ { 0 0 } ] 2dip doc-range ;
@@ -120,8 +120,7 @@ TUPLE: completion-popup < track interactor table completion-mode ;
     [ completion-popup? ] find-parent ;
 
 : <completion-model> ( editor element quot -- model )
-    [ <element-model> 1/3 seconds <delay> ] dip
-    '[ @ keys 1000 short head ] <arrow> ;
+    [ <element-model> ] dip '[ @ >alist 100 short head ] <arrow> ;
 
 M: completion-popup focusable-child* table>> ;
 
@@ -130,25 +129,17 @@ M: completion-popup focusable-child* table>> ;
     [ completion-mode>> completion-element ]
     bi ;
 
-GENERIC: completion-string ( object -- string )
-
-M: object completion-string present ;
-
-: method-completion-string ( word -- string )
-    "method-generic" word-prop present ;
-
-M: method completion-string method-completion-string ;
-
 GENERIC#: accept-completion-hook 1 ( item popup -- )
 
 : insert-completion ( item popup -- )
-    [ completion-string ] [ completion-loc/doc/elt ] bi* set-elt-string ;
+    completion-loc/doc/elt set-elt-string ;
+
+: unpack-completion ( item -- object string )
+    first2 over string? [ drop dup ] when ;
 
 : accept-completion ( item table -- )
-    find-completion-popup
-    [ insert-completion ]
-    [ accept-completion-hook ]
-    2bi ;
+    [ unpack-completion ] [ find-completion-popup ] bi*
+    [ insert-completion ] [ accept-completion-hook ] bi ;
 
 : <completion-table> ( interactor completion-mode -- table )
     [ completion-element ] [ completion-quot ] [ nip ] 2tri

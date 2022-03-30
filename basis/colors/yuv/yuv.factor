@@ -1,18 +1,20 @@
 ! Copyright (C) 2013 John Benediktsson
 ! See http://factorcode.org/license.txt for BSD license
 
-USING: accessors colors combinators kernel locals math
+USING: accessors colors combinators kernel math
 math.order ;
 
 IN: colors.yuv
 
-TUPLE: yuva < color
+TUPLE: yuva
 { y read-only }
 { u read-only }
 { v read-only }
 { alpha read-only } ;
 
 C: <yuva> yuva
+
+INSTANCE: yuva color
 
 <PRIVATE
 
