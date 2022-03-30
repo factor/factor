@@ -17,7 +17,7 @@ M: sokoban-cell draw-cell*
 SYMBOL: level 
 0 level set-global
 
-: board-one ( gadget -- gadget )
+: board-one-bg ( -- board )
     8 9 make-board
     
     { 2 2 } player add-to-cell
@@ -43,17 +43,17 @@ SYMBOL: level
     } $ goal add-to-cells
 
     ! { 1 2 } { "vocab:sokoban2/resources/Crate_Yellow.png" "vocab:sokoban2/resources/Goal.png" } set-cell
-    { 0 0 } [ COLOR: black gl-color { 10 10 } { 20 20 } gl-fill-rect ] set-cell ;
-    
-: board-second ( -- board )
-    8 9 f make-board
+    ! { 0 0 } [ COLOR: black gl-color { 10 10 } { 20 20 } gl-fill-rect ] set-cell 
+    ;
 
-    {
-        { 1 2 } { 5 3 } { 1 4 } { 4 5 } { 3 6 } { 6 6 } { 4 7 } 
-    } goal set-multicell ;
+: board-one-fg ( -- board )
+    ! just to showcase stackable boards
+    8 9 make-board
+
+    { { 4 2 } { 5 1 } } COLOR: blue add-to-cells ;
 
 : board-one ( gadget -- gadget )
-    board-first board-second { } 2sequence create-board ;
+    board-one-bg board-one-fg { } 2sequence create-board ;
 
 : board-two ( gadget -- gadget )
     22 11 make-board
@@ -131,10 +131,10 @@ SYMBOL: level
 
 : game-logic ( gadget -- gadget )
     ! Move pieces according to user input
-    T{ key-down f f "UP" } [ dup board>> { 0 -1 } sokoban-move relayout-1 ] new-gesture
-    T{ key-down f f "DOWN" } [ dup board>> { 0 1 } sokoban-move relayout-1 ] new-gesture
-    T{ key-down f f "RIGHT" } [ dup board>> { 1 0 } sokoban-move relayout-1 ] new-gesture
-    T{ key-down f f "LEFT" } [ dup board>> { -1 0 } sokoban-move relayout-1 ] new-gesture ;
+    T{ key-down f f "UP" } [ dup board>> first { 0 -1 } sokoban-move relayout-1 ] new-gesture
+    T{ key-down f f "DOWN" } [ dup board>> first { 0 1 } sokoban-move relayout-1 ] new-gesture
+    T{ key-down f f "RIGHT" } [ dup board>> first { 1 0 } sokoban-move relayout-1 ] new-gesture
+    T{ key-down f f "LEFT" } [ dup board>> first { -1 0 } sokoban-move relayout-1 ] new-gesture ;
 
 : main ( -- )
     { 700 800 } init-window
