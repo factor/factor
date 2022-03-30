@@ -1,4 +1,4 @@
-USING: kernel namespaces sequences accessors math game_lib.ui game_lib.board colors ui.gestures ui.gadgets ;
+USING: kernel namespaces accessors sequences math game_lib.ui game_lib.board colors ui.gestures ui.gadgets ;
 
 IN: tic-tac-toe
 
@@ -18,7 +18,8 @@ X player set-global
     COLOR: black { 0 256 } { 400 10 } draw-filled-rectangle ;
 
 : board ( gadget -- gadget )
-    3 3 f make-board
+    3 3 make-board { } 1sequence
+    
     create-board ; 
 
 : set-player ( -- )
@@ -35,26 +36,26 @@ X player set-global
     ] when ;
 
 :: on-click ( -- quot )
-    [ dup dup board>> swap hand-rel-cell player get-global set-board relayout-1 ] ;
+    [ dup dup board>> first swap hand-rel-cell player get-global set-board relayout-1 ] ;
 
 :: row-win ( board -- ? )
     ! Returns true if either X or O has a row win
     ! For each row, check if every element in specified row equals X, returning true if any row meets the condition
-    { 0 1 2 } [ X swap board swap get-row all-equal-value? ] any?
+    { 0 1 2 } [ { X } swap board swap get-row all-equal-value? ] any?
     ! Same check but with O
-    { 0 1 2 } [ O swap board swap get-row all-equal-value? ] any? or ;
+    { 0 1 2 } [ { O } swap board swap get-row all-equal-value? ] any? or ;
 
 :: col-win ( board -- ? )
     ! Same as row win except checks column wins
-    { 0 1 2 } [ X swap board swap get-col all-equal-value? ] any?
-    { 0 1 2 } [ O swap board swap get-col all-equal-value? ] any? or ;
+    { 0 1 2 } [ { X } swap board swap get-col all-equal-value? ] any?
+    { 0 1 2 } [ { O } swap board swap get-col all-equal-value? ] any? or ;
 
 :: diag-win ( board -- ? )
     ! Same as row win except checks diagonal wins
-    X board { { 0 0 } { 1 1 } { 2 2 } } get-multicell all-equal-value?
-    X board { { 2 0 } { 1 1 } { 0 2 } } get-multicell all-equal-value? or
-    O board { { 0 0 } { 1 1 } { 2 2 } } get-multicell all-equal-value? or
-    O board { { 2 0 } { 1 1 } { 0 2 } } get-multicell all-equal-value? or ;
+    { X } board { { 0 0 } { 1 1 } { 2 2 } } get-cells all-equal-value?
+    { X } board { { 2 0 } { 1 1 } { 0 2 } } get-cells all-equal-value? or
+    { O } board { { 0 0 } { 1 1 } { 2 2 } } get-cells all-equal-value? or
+    { O } board { { 2 0 } { 1 1 } { 0 2 } } get-cells all-equal-value? or ;
 
 :: check-win ( board -- ? )
     ! Returns true if any win condition is met
