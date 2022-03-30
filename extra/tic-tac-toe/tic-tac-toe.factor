@@ -41,21 +41,21 @@ X player set-global
 :: row-win ( board -- ? )
     ! Returns true if either X or O has a row win
     ! For each row, check if every element in specified row equals X, returning true if any row meets the condition
-    { 0 1 2 } [ X swap board swap get-row all-equal-value? ] any?
+    { 0 1 2 } [ { X } swap board swap get-row all-equal-value? ] any?
     ! Same check but with O
-    { 0 1 2 } [ O swap board swap get-row all-equal-value? ] any? or ;
+    { 0 1 2 } [ { O } swap board swap get-row all-equal-value? ] any? or ;
 
 :: col-win ( board -- ? )
     ! Same as row win except checks column wins
-    { 0 1 2 } [ X swap board swap get-col all-equal-value? ] any?
-    { 0 1 2 } [ O swap board swap get-col all-equal-value? ] any? or ;
+    { 0 1 2 } [ { X } swap board swap get-col all-equal-value? ] any?
+    { 0 1 2 } [ { O } swap board swap get-col all-equal-value? ] any? or ;
 
 :: diag-win ( board -- ? )
     ! Same as row win except checks diagonal wins
-    X board { { 0 0 } { 1 1 } { 2 2 } } get-cells all-equal-value?
-    X board { { 2 0 } { 1 1 } { 0 2 } } get-cells all-equal-value? or
-    O board { { 0 0 } { 1 1 } { 2 2 } } get-cells all-equal-value? or
-    O board { { 2 0 } { 1 1 } { 0 2 } } get-cells all-equal-value? or ;
+    { X } board { { 0 0 } { 1 1 } { 2 2 } } get-cells all-equal-value?
+    { X } board { { 2 0 } { 1 1 } { 0 2 } } get-cells all-equal-value? or
+    { O } board { { 0 0 } { 1 1 } { 2 2 } } get-cells all-equal-value? or
+    { O } board { { 2 0 } { 1 1 } { 0 2 } } get-cells all-equal-value? or ;
 
 :: check-win ( board -- ? )
     ! Returns true if any win condition is met
