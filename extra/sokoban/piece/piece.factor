@@ -1,8 +1,8 @@
 ! Copyright (C) 2006, 2007, 2008 Alex Chapman
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays kernel math math.vectors sequences
-sokoban.tetromino lists.lazy namespaces colors colors.constants 
-math.ranges random ;
+sokoban.tetromino lists.lazy namespaces colors
+ranges random ;
 IN: sokoban.piece
 
 ! The level_num is an index into the tetromino's states array,
@@ -57,7 +57,7 @@ TUPLE: piece
 
 :: <box-seq> ( goal-piece level -- seq )
     ! get list of boxes on corresponding level
-    level get-num-boxes [0,b] [ goal-piece level <box-piece> ] map ;
+    level get-num-boxes [0..b] [ goal-piece level <box-piece> ] map ;
 
 : (rotate-piece) ( level_num inc n-states -- level_num' )
     [ + ] dip rem ;

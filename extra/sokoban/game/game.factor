@@ -3,7 +3,7 @@
 
 USING: accessors combinators kernel lists math math.functions math.vectors
 sequences system sokoban.board sokoban.piece sokoban.tetromino sokoban.sound colors 
-colors.constants namespaces locals ;
+namespaces locals ;
 
 IN: sokoban.game
 

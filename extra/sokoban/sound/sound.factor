@@ -1,7 +1,7 @@
 ! Copyright (C) 2009 Joe Groff.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors timers audio audio.engine audio.loader calendar
-destructors io kernel locals math math.functions math.ranges specialized-arrays
+destructors io kernel locals math math.functions ranges specialized-arrays
 sequences random math.vectors literals ;
 
 

@@ -1,6 +1,6 @@
 ! Copyright (C) 2006, 2007, 2008 Alex Chapman
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays colors colors.constants combinators math.vectors
+USING: accessors arrays colors combinators math.vectors
 kernel math opengl opengl.gl opengl.textures sequences sokoban.game sokoban.piece images.loader
 ;
 

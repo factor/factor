@@ -1,7 +1,7 @@
 ! Copyright (C) 2006, 2007, 2008 Alex Chapman
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel arrays namespaces sequences math math.order
-math.vectors colors colors.constants random ;
+math.vectors colors random ;
 IN: sokoban.tetromino
 
 TUPLE: tetromino states color ;
