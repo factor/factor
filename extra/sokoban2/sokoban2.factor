@@ -1,4 +1,4 @@
-USING: literals kernel namespaces accessors sequences combinators math.vectors colors.constants 
+USING: literals kernel namespaces accessors sequences combinators math.vectors colors
 game_lib.ui game_lib.board game_lib.cell ui.gestures ui.gadgets opengl opengl.textures
 images.loader ;
 
