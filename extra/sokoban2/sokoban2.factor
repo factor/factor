@@ -121,11 +121,6 @@ SYMBOL: level
             [ adjacent-cell is-empty? adjacent-cell goal cell-contains? or ] ! player can be moved to free space
             [ board player-pos move player move-object drop ] 
         }
-        ! {
-        !     [ adjacent-cell goal = ] ! player is moving into a goal
-        !     [ ]
-        !     ! [ board move { "vocab:sokoban2/resources/CharR.png" "vocab:sokoban2/resources/Goal.png" } player-pos move-object ]
-        ! }
         [ ] ! Else do nothing
     } cond ;
 
