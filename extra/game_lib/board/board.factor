@@ -1,4 +1,4 @@
-USING: assocs sequences sequences.generalizations sets kernel accessors sequences.extras ranges math.vectors generalizations ;
+USING: assocs sequences sequences.generalizations sets kernel accessors sequences.extras ranges math.vectors generalizations strings prettyprint ;
 
 IN: game_lib.board
 
@@ -40,10 +40,14 @@ TUPLE: board width height cells ;
 :: set-cell ( board location new-cell -- board )
     location first2 :> ( x y )
     board cells>> :> cells
-    new-cell x y cells nth set-nth
+    new-cell sequence? new-cell string? not and
+    [
+        new-cell x y cells nth set-nth
+    ]
+    [ "New cell is not a sequence! No changes made." . ] if
     board ;
 
-! For a board, set all the given locations to new-cell
+! For a board, set all the given locations to a new cell (should be a sequence)
 :: set-cells ( board locations new-cell -- board )
     locations [ board swap new-cell set-cell drop ] each
     board ;
@@ -52,7 +56,7 @@ TUPLE: board width height cells ;
 :: change-cell ( board location quot -- board )
     location first2 :> ( x y )
     board cells>> :> cells
-    y x cells nth quot change-nth
+    x y cells nth quot change-nth
     board ; inline
 
 ! Adds an object to the cell at the specified location in a board
@@ -97,25 +101,40 @@ TUPLE: board width height cells ;
     locations [ board swap obj delete-all-from-cell drop ] each
     board ;
 
+! Helper word that creates a sequence of n k's
+:: make-n-k ( n k -- seq )
+    n [ k ] replicate ;
+
 ! Helper word that creates a list of all cell locations in the board
-! :: location-matrix ( board -- loclist )
-!     board width>> :> w
-!     board height>> :> h
+:: location-matrix ( board -- loclist )
+    board width>> :> w
+    board height>> :> h
+    w [0..b) :> single-row
+    h [0..b) :> single-col
+    h [ single-row ] replicate concat :> x-vals
+    h [ w ] replicate :> w-list
+    w-list single-col [ make-n-k ] 2map concat :> y-vals
+    x-vals y-vals zip ;
 
+! Sets all cells to a given sequence
+:: set-all ( board seq -- board )
+    board location-matrix :> loclist
+    board loclist seq set-cells ;
 
-! Deletes the all instances of obj from all cells (if found)
-! :: delete-from-all ( board obj -- board )
-
+! Deletes all instances of obj from all cells (if found)
+:: delete-from-all ( board obj -- board )
+    board location-matrix :> loclist
+    board loclist obj delete-all-from-cells ;
 
 :: duplicate-cell ( board start dest -- board )
-    board dup start get-cell dest set-cell ;
+    board dup start get-cell dest swap set-cell ;
 
-
-! fix this
+! Moves an entire cell to a new destination, leaving the original cell empty
 :: move-entire-cell ( board start dest -- board )
     board start dest duplicate-cell
     start delete-cell ;
 
+! Move an object from a cell, relative to its original cell
 :: move-object ( board object-pos move object -- board )
     board object-pos object delete-from-cell
     object-pos move v+ object add-to-cell ;
