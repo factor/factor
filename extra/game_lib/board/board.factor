@@ -204,7 +204,3 @@ TUPLE: board width height cells ;
 
 :: all-equal-value? ( value seq -- ? )
     seq [ value = ] all? ;
-
-:: turn-on-gravity ( location -- ) 
-
-! turn on gravity for cell, move objects by gravity in loop library; user sets how fast gravity is working as a percentage of game loop speed- using counter
