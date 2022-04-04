@@ -39,7 +39,7 @@ M: color-renderer row-value
     drop named-color ;
 
 : <color-table> ( -- table )
-    named-colors { human<=> } sort-by <model>
+    named-colors { humani<=> } sort-by <model>
     color-renderer
     [ ] <search-table> dup table>>
         5 >>gap
