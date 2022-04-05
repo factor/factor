@@ -1,8 +1,10 @@
-USING: assocs sequences sequences.generalizations sets kernel accessors sequences.extras ranges math.vectors generalizations strings prettyprint game_lib.loop;
+USING: assocs sequences sequences.generalizations sets kernel accessors sequences.extras ranges math.vectors generalizations strings prettyprint game_lib.loop ;
 
 IN: game_lib.board
 
 TUPLE: board width height cells ;
+
+CONSTANT: GRAVITY "gravity"
 
 ! Make cells, with an empty sequence as the default cell
 :: make-cells ( width height -- cells )
@@ -205,7 +207,11 @@ TUPLE: board width height cells ;
 :: all-equal-value? ( value seq -- ? )
     seq [ value = ] all? ;
 
+:: gravity? ( board location -- ? )
+    board location get-cell [ GRAVITY = ] any? ;
 
-:: turn-on-gravity ( location -- ) 
+
+:: add-gravity ( board location -- board ) 
+    board location GRAVITY add-to-cell ;
 
 ! turn on gravity for cell, move objects by gravity in loop library; user sets how fast gravity is working as a percentage of game loop speed- using counter
