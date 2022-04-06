@@ -207,11 +207,19 @@ CONSTANT: GRAVITY "gravity"
 :: all-equal-value? ( value seq -- ? )
     seq [ value = ] all? ;
 
+! Checks if the gravity constant is at the specified location on the board
 :: gravity? ( board location -- ? )
     board location get-cell [ GRAVITY = ] any? ;
 
-
+! Add the gravity constant to the specified location on the board if it isn't there yet
 :: add-gravity ( board location -- board ) 
-    board location GRAVITY add-to-cell ;
+    board location gravity? 
+    [ board ]
+    [ GRAVITY add-to-cell ] if
+    ;
+
+! Removes the gravity constant from the specified location on the board
+:: remove-gravity ( board location -- board ) 
+    board location GRAVITY delete-all-from-cell ;
 
 ! turn on gravity for cell, move objects by gravity in loop library; user sets how fast gravity is working as a percentage of game loop speed- using counter
