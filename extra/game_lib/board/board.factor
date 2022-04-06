@@ -172,7 +172,7 @@ CONSTANT: LEFT { -1 0 }
 
 ! Returns a vector containing index row pairs
 :: find-all-rows ( board quot -- index row )
-    board cells>> [ quot find swap drop not not ] find-all ; inline
+    board cells>> [ quot find swap drop ] find-all ; inline
 
 : is-empty? ( cell -- ?  )
     { } = ;
@@ -205,6 +205,9 @@ CONSTANT: LEFT { -1 0 }
 :: find-all-cells ( board quot -- assoc )
     board quot find-all-rows :> row-list ! find-all - returns vector w/ index/elt
     row-list [ quot row-to-cells ] map concat ; inline
+
+:: find-all-cells-nopos ( board quot -- assoc )
+    board quot find-all-cells [ second ] map ; inline
 
 :: all-equal-value? ( value seq -- ? )
     seq [ value = ] all? ;
