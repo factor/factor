@@ -1,10 +1,15 @@
-USING: assocs sequences sequences.generalizations sets kernel accessors sequences.extras ranges math.vectors generalizations strings prettyprint game_lib.loop ;
+USING: assocs classes sequences sequences.generalizations sets kernel accessors sequences.extras ranges math.vectors generalizations strings prettyprint game_lib.loop ;
 
 IN: game_lib.board
 
 TUPLE: board width height cells ;
 
 CONSTANT: GRAVITY "gravity"
+
+CONSTANT: UP { 0 -1 } 
+CONSTANT: DOWN { 0 1 } 
+CONSTANT: RIGHT { 1 0 }
+CONSTANT: LEFT { -1 0 }
 
 ! Make cells, with an empty sequence as the default cell
 :: make-cells ( width height -- cells )
@@ -26,6 +31,12 @@ CONSTANT: GRAVITY "gravity"
 ! Gets all cells in locations array and return as a sequence
 :: get-cells ( board locations -- seq )
     locations [ board swap get-cell ] map ;
+
+! :: get-from-cell ( cell object -- i object )
+    ! [ object = ] find ;
+
+:: get-instance-from-cell ( cell class -- object )
+    cell [ class instance? ] find swap drop ;
 
 ! returns all elements of a specified row as a seq
 :: get-row ( board index -- seq )
@@ -71,6 +82,11 @@ CONSTANT: GRAVITY "gravity"
 ! Adds an object to all the given locations to new-cell 
 :: add-to-cells ( board locations obj -- board )
     locations [ board swap obj add-to-cell drop ] each
+    board ;
+
+! Adds an object to all the given locations to new-cell 
+:: add-copy-to-cells ( board locations obj -- board )
+    locations [ board swap obj clone add-to-cell drop ] each
     board ;
 
 ! Sets a cell back to the default cell
@@ -177,7 +193,7 @@ CONSTANT: GRAVITY "gravity"
 
 ! Returns a vector containing index row pairs
 :: find-all-rows ( board quot -- index row )
-    board cells>> [ quot find swap drop not not ] find-all ; inline
+    board cells>> [ quot find swap drop ] find-all ; inline
 
 : is-empty? ( cell -- ?  )
     { } = ;
@@ -188,6 +204,13 @@ CONSTANT: GRAVITY "gravity"
 :: cell-only-contains? ( cell object -- ? )
     cell length 1 = 
     cell object cell-contains? and ;
+
+:: cell-contains-instance? ( cell class -- ? )
+    cell [ class instance? ] any? ;
+
+:: cell-only-contains-instance? ( cell class -- ? )
+    cell length 1 = 
+    cell class cell-contains-instance? and ;
 
 ! Helper function that formats a position cell pair
 :: label-cell ( x cell y -- seq )
@@ -203,6 +226,9 @@ CONSTANT: GRAVITY "gravity"
 :: find-all-cells ( board quot -- assoc )
     board quot find-all-rows :> row-list ! find-all - returns vector w/ index/elt
     row-list [ quot row-to-cells ] map concat ; inline
+
+:: find-all-cells-nopos ( board quot -- assoc )
+    board quot find-all-cells [ second ] map ; inline
 
 :: all-equal-value? ( value seq -- ? )
     seq [ value = ] all? ;

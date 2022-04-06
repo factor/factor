@@ -1,4 +1,4 @@
-USING: accessors sequences kernel opengl grouping game_lib.ui fonts colors.constants ui.text ui.gadgets game_lib.board game_lib.loop ui.gestures words assocs game.loop delegate namespaces ;
+USING: accessors sequences kernel opengl grouping game_lib.ui fonts colors ui.text ui.gadgets game_lib.board game_lib.loop ui.gestures words assocs game.loop delegate namespaces ;
 
 IN: game_lib_test
 
@@ -19,8 +19,8 @@ TUPLE: game-state gadget p1 ;
 :: on-click ( gadget -- value )
     [ 
         gadget rules>>
-        [ gadget board>> gadget hand-rel-cell X board-set-XO ]
-        [ gadget board>> gadget hand-rel-cell O board-set-XO ]
+        [ gadget board>> first gadget hand-rel-cell X board-set-XO ]
+        [ gadget board>> first gadget hand-rel-cell O board-set-XO ]
         if
     ] ;
 
@@ -39,10 +39,10 @@ TUPLE: game-state gadget p1 ;
 
 :: diag-win ( board -- ? )
     ! Same as row win except checks diagonal wins
-    X board { { 0 0 } { 1 1 } { 2 2 } } get-multicell all-equal-value?
-    X board { { 2 0 } { 1 1 } { 0 2 } } get-multicell all-equal-value? or
-    O board { { 0 0 } { 1 1 } { 2 2 } } get-multicell all-equal-value? or
-    O board { { 2 0 } { 1 1 } { 0 2 } } get-multicell all-equal-value? or ;
+    X board { { 0 0 } { 1 1 } { 2 2 } } get-cells all-equal-value?
+    X board { { 2 0 } { 1 1 } { 0 2 } } get-cells all-equal-value? or
+    O board { { 0 0 } { 1 1 } { 2 2 } } get-cells all-equal-value? or
+    O board { { 2 0 } { 1 1 } { 0 2 } } get-cells all-equal-value? or ;
 
 :: check-win ( board -- ? )
     ! Returns true if any win condition is met
@@ -72,7 +72,7 @@ TUPLE: game-state gadget p1 ;
     COLOR: black { 0 256 } { 400 10 } draw-filled-rectangle ;
 
 : board ( gadget -- gadget ) 
-    3 3 make-board 
+    3 3 make-board { } 1sequence
     create-board ;
 
 :: <game-state> ( gadget -- gadget game-state )
@@ -89,7 +89,7 @@ TUPLE: game-state gadget p1 ;
 
 
 : tick-update ( game-state -- game-state )
-    dup gadget>> board>> check-win 
+    dup gadget>> board>> first check-win 
     [ dup gadget>> game-over relayout-1 stop-game ] 
     [ dup gadget>> relayout-1 ] if ;
 
