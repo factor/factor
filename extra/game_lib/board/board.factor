@@ -215,7 +215,7 @@ CONSTANT: GRAVITY "gravity"
 :: add-gravity ( board location -- board ) 
     board location gravity? 
     [ board ]
-    [ GRAVITY add-to-cell ] if
+    [ board location GRAVITY add-to-cell ] if
     ;
 
 ! Removes the gravity constant from the specified location on the board
