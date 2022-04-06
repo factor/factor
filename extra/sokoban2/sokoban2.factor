@@ -1,5 +1,6 @@
+
 USING: literals kernel namespaces accessors sequences combinators math.vectors colors
-game_lib.ui game_lib.board game_lib.cell ui.gestures ui.gadgets opengl opengl.textures
+game_lib.ui game_lib.board game_lib.cell game_lib.loop game.loop ui.gestures ui.gadgets opengl opengl.textures
 images.loader ;
 
 IN: sokoban2
@@ -7,15 +8,19 @@ IN: sokoban2
 CONSTANT: player "vocab:sokoban2/resources/CharR.png"
 CONSTANT: wall "vocab:sokoban2/resources/Wall_Brown.png"
 CONSTANT: goal "vocab:sokoban2/resources/Goal.png"
-CONSTANT: crate "vocab:sokoban2/resources/Crate_Yellow.png"
-CONSTANT: dark_crate "vocab:sokoban2/resources/CrateDark_Yellow.png"
+CONSTANT: light-crate "vocab:sokoban2/resources/Crate_Yellow.png"
+CONSTANT: dark-crate "vocab:sokoban2/resources/CrateDark_Yellow.png"
 
-TUPLE: sokoban-cell < cell image-path cell-name ;
-M: sokoban-cell draw-cell* 
+TUPLE: crate-cell < cell image-path on-goal? ;
+M: crate-cell draw-cell* 
     rot [ image-path>> load-image ] dip <texture> draw-scaled-texture ;
 
 SYMBOL: level 
 0 level set-global
+
+:: make-crate ( image-path -- crate )
+    crate-cell new
+    image-path f crate-cell boa ;
 
 : board-one-bg ( -- board )
     8 9 make-board
@@ -32,19 +37,18 @@ SYMBOL: level
         { 0 6 }                                                 { 7 6 }
         { 0 7 }                                                 { 7 7 }
         { 0 8 } { 1 8 } { 2 8 } { 3 8 } { 4 8 } { 5 8 } { 6 8 } { 7 8 }
+
     } $ wall add-to-cells
-    
-    { 
-        { 1 6 } { 3 2 } { 4 3 } { 4 4 } { 4 6 } { 3 6 } { 5 6 }
-    } $ crate add-to-cells
+
 
     {
         { 1 2 } { 5 3 } { 1 4 } { 4 5 } { 3 6 } { 6 6 } { 4 7 } 
     } $ goal add-to-cells
+    
+    { 
 
-    ! { 1 2 } { "vocab:sokoban2/resources/Crate_Yellow.png" "vocab:sokoban2/resources/Goal.png" } set-cell
-    ! { 0 0 } [ COLOR: black gl-color { 10 10 } { 20 20 } gl-fill-rect ] set-cell 
-    ;
+        { 1 6 } { 3 2 } { 4 3 } { 4 4 } { 4 6 } { 3 6 } { 5 6 }
+    } light-crate make-crate add-copy-to-cells ;
 
 : board-one-fg ( -- board )
     ! just to showcase stackable boards
@@ -82,7 +86,7 @@ SYMBOL: level
 
     { 
         { 5 2 } { 7 3 } { 5 4 } { 8 4 } { 5 7 } { 2 7 }
-    } crate add-to-cells
+    } light-crate add-to-cells
 
     { } 1sequence 
 
@@ -94,14 +98,21 @@ SYMBOL: level
 :: get-pos ( board object -- seq )
     board [ object = ] find-cell-pos ;
 
-:: move-crate ( board player-pos move -- )
+:: move-crate ( board player-pos move crate -- )
     player-pos move v+ :> crate-pos
     board crate-pos move v+ get-cell :> next-cell
     ! Move both the player and crate if possible, otherwise do nothing
     {
         { 
-            [ next-cell is-empty? next-cell goal cell-only-contains? or ] ! crate can be moved to free space FIX THIS BOIIII
-            [ board crate-pos move crate move-object 
+            [ next-cell is-empty? ] ! crate can be moved to free space
+            [ crate light-crate >>image-path f >>on-goal? drop 
+            board crate-pos move crate move-object 
+            player-pos move player move-object drop ] 
+        }
+        { 
+            [ next-cell goal cell-only-contains? ] ! crate can be moved to goal
+            [ crate dark-crate >>image-path t >>on-goal? drop 
+            board crate-pos move crate move-object 
             player-pos move player move-object drop ] 
         }
         [ ] ! Else do nothing
@@ -114,29 +125,58 @@ SYMBOL: level
     ! Move player to free space or have player push crate if possible, otherwise do nothing
     {
         { 
-            [ adjacent-cell crate cell-contains? ] ! player is moving into a crate
-            [ board player-pos move move-crate ] 
+            [ adjacent-cell crate-cell cell-contains-instance? ] ! player is moving into a crate
+            [ adjacent-cell crate-cell get-instance-from-cell :> crate
+            board player-pos move crate move-crate ]
         }
         {
-            [ adjacent-cell is-empty? adjacent-cell goal cell-contains? or ] ! player can be moved to free space
+            [ adjacent-cell is-empty? adjacent-cell goal cell-contains? or ] ! player can be moved to free space or goal
             [ board player-pos move player move-object drop ] 
         }
         [ ] ! Else do nothing
     } cond ;
 
+! :: check-win ( board -- ? )
+!     board [ { dark-crate make-crate } = ] find-all-cells :> seq
+!     seq length 0 = not seq [ t = ] all? and ;
+
 : game-logic ( gadget -- gadget )
     ! Move pieces according to user input
-    T{ key-down f f "UP" } [ dup board>> first { 0 -1 } sokoban-move relayout-1 ] new-gesture
-    T{ key-down f f "DOWN" } [ dup board>> first { 0 1 } sokoban-move relayout-1 ] new-gesture
-    T{ key-down f f "RIGHT" } [ dup board>> first { 1 0 } sokoban-move relayout-1 ] new-gesture
-    T{ key-down f f "LEFT" } [ dup board>> first { -1 0 } sokoban-move relayout-1 ] new-gesture ;
+    T{ key-down f f "UP" } [ dup board>> first UP sokoban-move relayout-1 ] new-gesture
+    T{ key-down f f "DOWN" } [ dup board>> first DOWN sokoban-move relayout-1 ] new-gesture
+    T{ key-down f f "RIGHT" } [ dup board>> first RIGHT sokoban-move relayout-1 ] new-gesture
+    T{ key-down f f "LEFT" } [ dup board>> first LEFT sokoban-move relayout-1 ] new-gesture ;
+    ! T{ key-down f f "n" } [ dup board>> first reset-board { 700 800 } init-window level get-global board nth call( gadget -- gadget ) ] new-gesture ;
+
+! TUPLE: game-state gadget ;
+
+! :: <game-state> ( gadget -- gadget game-state )
+!     gadget 
+!     game-state new 
+!     gadget >>gadget ;
+
+! : create-loop ( game-state -- )
+!     100000 swap new-game-loop start-loop ;
+
+! ! : tick-update ( game-state -- )
+!     ! gadget>> relayout-1 ;
+
+! :: tick-update ( game-state -- )
+!     game-state gadget>> board>> first check-win
+!     [ { 2200 1100 } init-window board-two game-logic display ] when ;
+
+! M: game-state tick* tick-update ;
+
+! M: game-state draw* drop drop ;
+
 
 : main ( -- )
     { 700 800 } init-window
     ! Don't really like this sequence of quotes thing -- would be nicer if board 
     ! could be an array of like ascii that gets created here or something
-    level get-global board nth call( gadget -- gadget )
-    ! board
+    ! level get-global board nth call( gadget -- gadget )
+    board-one
+    ! <game-state> create-loop
     game-logic
     display ;
 

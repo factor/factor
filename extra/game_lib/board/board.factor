@@ -1,8 +1,13 @@
-USING: assocs sequences sequences.generalizations sets kernel accessors sequences.extras ranges math.vectors generalizations ;
+USING: assocs classes sequences sequences.generalizations sets kernel accessors sequences.extras ranges math.vectors generalizations ;
 
 IN: game_lib.board
 
 TUPLE: board width height cells ;
+
+CONSTANT: UP { 0 -1 } 
+CONSTANT: DOWN { 0 1 } 
+CONSTANT: RIGHT { 1 0 }
+CONSTANT: LEFT { -1 0 }
 
 ! Make cells, with an empty sequence as the default cell
 :: make-cells ( width height -- cells )
@@ -24,6 +29,12 @@ TUPLE: board width height cells ;
 ! Gets all cells in locations array and return as a sequence
 :: get-cells ( board locations -- seq )
     locations [ board swap get-cell ] map ;
+
+! :: get-from-cell ( cell object -- i object )
+    ! [ object = ] find ;
+
+:: get-instance-from-cell ( cell class -- object )
+    cell [ class instance? ] find swap drop ;
 
 ! returns all elements of a specified row as a seq
 :: get-row ( board index -- seq )
@@ -65,6 +76,11 @@ TUPLE: board width height cells ;
 ! Adds an object to all the given locations to new-cell 
 :: add-to-cells ( board locations obj -- board )
     locations [ board swap obj add-to-cell drop ] each
+    board ;
+
+! Adds an object to all the given locations to new-cell 
+:: add-copy-to-cells ( board locations obj -- board )
+    locations [ board swap obj clone add-to-cell drop ] each
     board ;
 
 ! Sets a cell back to the default cell
@@ -167,6 +183,13 @@ TUPLE: board width height cells ;
 :: cell-only-contains? ( cell object -- ? )
     cell length 1 = 
     cell object cell-contains? and ;
+
+:: cell-contains-instance? ( cell class -- ? )
+    cell [ class instance? ] any? ;
+
+:: cell-only-contains-instance? ( cell class -- ? )
+    cell length 1 = 
+    cell class cell-contains-instance? and ;
 
 ! Helper function that formats a position cell pair
 :: label-cell ( x cell y -- seq )
