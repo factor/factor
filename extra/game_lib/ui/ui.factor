@@ -3,7 +3,7 @@ images.loader opengl.textures assocs math ranges game_lib.board game_lib.cell ui
 
 IN: game_lib.ui
 
-TUPLE: window-gadget < gadget dimension bg-color draw-quotes board gests rules ;
+TUPLE: window-gadget < gadget dimension bg-color draw-quotes board gests textures ;
 
 ! TODO: use the cache and handle cells that are false
 :: all-combinations ( seq1 seq2 -- matrix )
@@ -56,20 +56,21 @@ TUPLE: window-gadget < gadget dimension bg-color draw-quotes board gests rules ;
 
 :: draw-image ( gadget path loc dim -- gadget )
     ! appends instructions to draw a sprite to current set of instructions in draw-quotes attributes
-    gadget [ dim path load-image loc <texture> draw-scaled-texture ] draw-append ;
+    gadget [ dim { path loc } gadget textures>> [ first load-image loc <texture> ] cache draw-scaled-texture ] draw-append ;
+    ! gadget [ dim path load-image loc <texture> draw-scaled-texture ] draw-append ;
 
 :: draw-quote ( gadget quote -- gadget )
     gadget quote draw-append ;
 
-:: draw-single ( display-cell loc dim -- )
+:: draw-single ( display-cell loc dim gadget -- )
     ! Executes instructions based on content of the cell, does nothing if cell isn't a 
     ! string, color or quote.
     { 
         { [ display-cell cell instance? ] [ loc dim display-cell draw-cell* ] }
-        { [ display-cell string? ] [ dim display-cell load-image loc <texture> draw-scaled-texture ] }
+        { [ display-cell string? ] [ dim { display-cell loc } gadget textures>> [ first load-image loc <texture> ] cache draw-scaled-texture ] }
         { [ display-cell color? ] [ display-cell gl-color loc dim gl-fill-rect ] }
         { [ display-cell quotation? ] [ display-cell call( -- ) ] }
-        { [ display-cell array? ] [ display-cell [ loc dim draw-single ] each ] }
+        { [ display-cell array? ] [ display-cell [ loc dim gadget draw-single ] each ] }
         [ ]
     } cond ;
 
@@ -78,7 +79,7 @@ TUPLE: window-gadget < gadget dimension bg-color draw-quotes board gests rules ;
     n gadget board>> nth cells>> :> cell
     n gadget get-cell-dimension :> celldims
     n gadget get-dimension-matrix :> dim-matrix
-    cell dim-matrix [ [ celldims draw-single ] 2each ] 2each ;
+    cell dim-matrix [ [ celldims gadget draw-single ] 2each ] 2each ;
 
 : draw-all ( gadget -- )
     ! draws everything in draw-quotes (which we added to using draw-filled-rectangle and draw-image)
@@ -88,7 +89,8 @@ TUPLE: window-gadget < gadget dimension bg-color draw-quotes board gests rules ;
     ! makes a window gadget with given dimensions
     window-gadget new
     swap >>dimension 
-    H{ } >>gests ;
+    H{ } >>gests 
+    H{ } clone >>textures ;
 
 :: create-board ( gadget board -- gadget )
     ! board should be a seq
