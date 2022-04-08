@@ -3,7 +3,7 @@ images.loader opengl.textures assocs math ranges game_lib.board game_lib.cell ui
 
 IN: game_lib.ui
 
-TUPLE: window-gadget < gadget dimension bg-color draw-quotes board gests textures ;
+TUPLE: board-gadget < gadget dimension bg-color draw-quotes board gests textures ;
 
 ! TODO: use the cache and handle cells that are false
 :: all-combinations ( seq1 seq2 -- matrix )
@@ -85,9 +85,10 @@ TUPLE: window-gadget < gadget dimension bg-color draw-quotes board gests texture
     ! draws everything in draw-quotes (which we added to using draw-filled-rectangle and draw-image)
     draw-quotes>> [ call( -- ) ] each ;
 
+! TODO: change to have a board
 : init-window ( dim -- gadget )
     ! makes a window gadget with given dimensions
-    window-gadget new
+    board-gadget new
     swap >>dimension 
     H{ } >>gests 
     H{ } clone >>textures ;
@@ -128,19 +129,20 @@ TUPLE: window-gadget < gadget dimension bg-color draw-quotes board gests texture
 
 
 ! SECTION: gadget methods
-M: window-gadget pref-dim*
+M: board-gadget pref-dim*
    dimension>> ;
 
-M: window-gadget handle-gesture
+M: board-gadget handle-gesture
     swap over gests>> ?at
     [
         2dup call( gadget -- )
     ] when 2drop f ;
 
-M: window-gadget draw-gadget*
+M: board-gadget draw-gadget*
     {
         [ draw-background-color ]
         [ draw-all ]
     } cleave ;
 
 
+! TUPLE: window-gadget < track 

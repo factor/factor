@@ -158,9 +158,6 @@ TUPLE: game-state gadget ;
 : create-loop ( game-state -- )
     10000000 swap new-game-loop start-loop ;
 
-! : tick-update ( game-state -- )
-!     gadget>> relayout ;
-
 :: tick-update ( game-state -- )
     game-state gadget>> relayout
     game-state gadget>> board>> first check-win
