@@ -1,7 +1,7 @@
 
 USING: literals kernel namespaces accessors sequences combinators math.vectors colors
 game_lib.ui game_lib.board game_lib.cell game_lib.loop game.loop ui.gestures ui.gadgets opengl opengl.textures
-images.loader prettyprint ;
+images.loader prettyprint classes game_lib.cell math ;
 
 IN: sokoban2
 
@@ -11,7 +11,7 @@ CONSTANT: goal "vocab:sokoban2/resources/Goal.png"
 CONSTANT: light-crate "vocab:sokoban2/resources/Crate_Yellow.png"
 CONSTANT: dark-crate "vocab:sokoban2/resources/CrateDark_Yellow.png"
 
-TUPLE: crate-cell < cell image-path ;
+TUPLE: crate-cell < flowcell image-path ;
 M: crate-cell draw-cell* 
     rot [ image-path>> load-image ] dip <texture> draw-scaled-texture ;
 
@@ -20,7 +20,8 @@ SYMBOL: level
 
 :: make-crate ( image-path -- crate )
     crate-cell new
-    image-path crate-cell boa ;
+    f f f f flow boa :> flow-obj
+    image-path flow-obj crate-cell boa ;
 
 : board-one-bg ( -- board )
     8 9 make-board
@@ -50,11 +51,13 @@ SYMBOL: level
         { 1 6 } { 3 2 } { 4 3 } { 4 4 } { 4 6 } { 3 6 } { 5 6 }
     } light-crate make-crate add-copy-to-cells ;
 
+
 : board-one-fg ( -- board )
     ! just to showcase stackable boards
     8 9 make-board
 
-    { { 5 2 } { 5 1 } } COLOR: blue add-to-cells ;
+    { { 5 2 } { 5 1 } } COLOR: blue add-to-cells 
+    { { 1 1 } } light-crate make-crate DOWN 100 turn-on-flow add-copy-to-cells ;
 
 : board-one ( gadget -- gadget )
     board-one-bg board-one-fg { } 2sequence create-board ;
@@ -148,6 +151,8 @@ SYMBOL: level
     T{ key-down f f "LEFT" } [ board>> first LEFT sokoban-move ] new-gesture ;
     ! T{ key-down f f "n" } [ dup board>> first reset-board { 700 800 } init-window level get-global board nth call( gadget -- gadget ) ] new-gesture ;
 
+
+    
 TUPLE: game-state gadget ;
 
 :: <game-state> ( gadget -- gadget game-state )
@@ -161,9 +166,52 @@ TUPLE: game-state gadget ;
 ! : tick-update ( game-state -- )
 !     gadget>> relayout ;
 
+:: update-move ( board loc flowcell -- )
+    flowcell flow-on?
+    [
+        flowcell flow>> :> flow-obj
+        flow-obj target>> :> target
+        flow-obj counter>> 1 + :> counter
+        counter target =
+        [
+            flow-obj direction>> :> direction
+            board loc direction flowcell move-object drop
+            flow-obj 0 >>counter drop
+
+        ]
+        [
+            flow-obj counter >>counter drop
+        ]
+        if
+        flowcell flow-obj >>flow drop
+    ]
+    [ ]
+    if ;
+
+! Takes in an object in a cell and calls update-move if it is a flowcell
+:: helper2 ( board loc obj -- )
+    obj flowcell instance?
+    [
+        board loc flowcell update-move
+    ]
+    [ ]
+    if ;
+
+! helper1 (rename this later) takes a board, a location, and the corresponding cell and calls helper2 on all objects in the cell
+:: helper1 ( board pair -- )
+    pair first2 :> ( loc cell )
+    cell length { board } replicate :> boardlist ! a bunch of copies of board to pass down to helper2
+    cell length { loc } replicate :> loclist ! a bunch of copies of loc to pass down to helper2
+    boardlist loclist cell helper2 3map ;
+
 :: tick-update ( game-state -- )
-    game-state gadget>> relayout
-    game-state gadget>> board>> first check-win
+    game-state gadget>> :> g
+    g board>> :> b
+    b [ [ flowcell instance? ] any? ] find-all-cells :> all-cells
+    all-cells length { b } replicate :> boardlist ! a bunch of copies of board to pass down to helper1
+    boardlist all-cells helper1 2map
+    g relayout
+    b first check-win
     [ "pass" . ] when ;
 
 M: game-state tick* tick-update ;

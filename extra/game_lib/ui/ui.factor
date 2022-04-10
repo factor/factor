@@ -66,7 +66,7 @@ TUPLE: window-gadget < gadget dimension bg-color draw-quotes board gests texture
     ! Executes instructions based on content of the cell, does nothing if cell isn't a 
     ! string, color or quote.
     { 
-        { [ display-cell cell instance? ] [ loc dim display-cell draw-cell* ] }
+        { [ display-cell flowcell instance? ] [ loc dim display-cell draw-cell* ] }
         { [ display-cell string? ] [ dim { display-cell loc } gadget textures>> [ first load-image loc <texture> ] cache draw-scaled-texture ] }
         { [ display-cell color? ] [ display-cell gl-color loc dim gl-fill-rect ] }
         { [ display-cell quotation? ] [ display-cell call( -- ) ] }
@@ -79,7 +79,7 @@ TUPLE: window-gadget < gadget dimension bg-color draw-quotes board gests texture
     n gadget board>> nth cells>> :> cell
     n gadget get-cell-dimension :> celldims
     n gadget get-dimension-matrix :> dim-matrix
-    cell dim-matrix [ [ celldims gadget draw-single ] 2each ] 2each ;
+    flowcell dim-matrix [ [ celldims gadget draw-single ] 2each ] 2each ;
 
 : draw-all ( gadget -- )
     ! draws everything in draw-quotes (which we added to using draw-filled-rectangle and draw-image)
