@@ -2,29 +2,39 @@ USING: accessors sequences kernel opengl game_lib.ui colors ui.gadgets.tracks ui
 
 IN: game_lib_test
 
-TUPLE: window < track focusable-child-number ;
+! TUPLE: window < track focusable-child-number ;
 
 : board-init ( -- board )
     10 10 make-board 
-    { 0 0 } COLOR: blue add-to-cell ;
+    { 0 0 } COLOR: blue add-to-cell
+    { } 1sequence ;
 
-: <window> ( -- gadget )
-    horizontal window new-track 
-    { 400 400 } init-window T{ key-down f f "RIGHT" } [ dup board>> first { 0 0 } { 1 0 } move-entire-cell drop relayout ] new-gesture
-    board-init { } 1sequence  create-board ! board gadget with a board inside
-    f track-add
-    { 400 400 } init-window T{ key-down f f "RIGHT" } [ dup board>> first { 0 0 } { 1 0 } move-entire-cell drop relayout ] new-gesture
-    board-init { } 1sequence create-board 
-    f track-add ; 
+! :: <window> ( board-gadgets orientation fsn -- gadget )
+    
 
- : display-window ( -- )
-    ! { 400 400 } init-window
-    ! board 2 seconds gravity-on ! returns gadget and board 
-    ! { } 1sequence create-board ! returns a gadget
-    <window>  
+!     orientation window new-track 
+
+!     fsn >>focusable-child-number
+
+!     board-gadgets  [ f track-add ] each ;
+
+:: first-gadget ( -- gadget )
+    { 400 400 } init-board-gadget
+    T{ key-down f f "RIGHT" } [ dup board>> first { 0 0 } { 1 0 } move-entire-cell drop relayout ] new-gesture
+    board-init add-board ;
+
+:: second-gadget ( -- gadget )
+    { 500 400 } init-board-gadget
+    T{ key-down f f "RIGHT" } [ dup board>> first { 0 0 } { 1 0 } move-entire-cell drop relayout ] new-gesture
+    board-init add-board ;
+
+ :: display-window ( -- )
+    first-gadget :> g1
+    second-gadget :> g2
+    { g1 g2 } horizontal 0 <window> ! initalize two boards   
     display ;
 
-! M: window focusable-child* children>> focusable-child-number nth ;
+!  M: window focusable-child* dup children>> swap focusable-child-number>> swap nth ;
 
 
 

@@ -57,7 +57,7 @@ SYMBOL: level
     { { 5 2 } { 5 1 } } COLOR: blue add-to-cells ;
 
 : board-one ( gadget -- gadget )
-    board-one-bg board-one-fg { } 2sequence create-board ;
+    board-one-bg board-one-fg { } 2sequence add-board ;
 
 : board-two ( gadget -- gadget )
     22 11 make-board
@@ -90,7 +90,7 @@ SYMBOL: level
 
     { } 1sequence 
 
-    create-board ;
+    add-board ;
 
 : board ( -- seq )
     { [ board-one ] [ board-two ] } ;
@@ -146,7 +146,7 @@ SYMBOL: level
     T{ key-down f f "DOWN" } [ board>> first DOWN sokoban-move ] new-gesture
     T{ key-down f f "RIGHT" } [ board>> first RIGHT sokoban-move ] new-gesture
     T{ key-down f f "LEFT" } [ board>> first LEFT sokoban-move ] new-gesture ;
-    ! T{ key-down f f "n" } [ dup board>> first reset-board { 700 800 } init-window level get-global board nth call( gadget -- gadget ) ] new-gesture ;
+    ! T{ key-down f f "n" } [ dup board>> first reset-board { 700 800 } init-board-gadget level get-global board nth call( gadget -- gadget ) ] new-gesture ;
 
 TUPLE: game-state gadget ;
 
@@ -169,7 +169,7 @@ M: game-state draw* drop drop ;
 
 
 : main ( -- )
-    { 700 800 } init-window
+    { 700 800 } init-board-gadget
     ! Don't really like this sequence of quotes thing -- would be nicer if board 
     ! could be an array of like ascii that gets created here or something
     ! level get-global board nth call( gadget -- gadget )

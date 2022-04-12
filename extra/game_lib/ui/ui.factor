@@ -1,5 +1,5 @@
 USING: accessors arrays classes quotations ui.gadgets kernel ui.gadgets.status-bar ui ui.render opengl locals.types strings sequences combinators peg
-images.loader opengl.textures assocs math ranges game_lib.board game_lib.cell ui.gestures colors ;
+images.loader opengl.textures assocs math ranges game_lib.board game_lib.cell ui.gestures ui.gadgets.tracks ui.gadgets.worlds colors destructors game_lib.loop ;
 
 IN: game_lib.ui
 
@@ -86,14 +86,14 @@ TUPLE: board-gadget < gadget dimension bg-color draw-quotes board gests textures
     draw-quotes>> [ call( -- ) ] each ;
 
 ! TODO: change to have a board
-: init-window ( dim -- gadget )
+: init-board-gadget ( dim -- gadget )
     ! makes a window gadget with given dimensions
     board-gadget new
     swap >>dimension 
     H{ } >>gests 
     H{ } clone >>textures ;
 
-:: create-board ( gadget board -- gadget )
+:: add-board ( gadget board -- gadget )
     ! board should be a seq
     gadget board >>board
     [ board length [0..b) [ gadget draw-cells ] each ] draw-append ;
@@ -144,5 +144,17 @@ M: board-gadget draw-gadget*
         [ draw-all ]
     } cleave ;
 
+M: board-gadget ungraft*
+    [
+        dup find-gl-context [ values dispose-each H{ } clone ] change-textures drop
+        ! stop-game
+    ] [ call-next-method ] bi ; 
 
-! TUPLE: window-gadget < track 
+TUPLE: window-gadget < track focusable-child-number ;
+
+:: <window> ( board-gadgets orientation fsn -- gadget )
+    orientation window-gadget new-track 
+    fsn >>focusable-child-number
+    board-gadgets [ f track-add ] each ;
+
+M: window-gadget focusable-child* dup children>> swap focusable-child-number>> swap nth ;
