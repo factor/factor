@@ -79,7 +79,7 @@ TUPLE: board-gadget < gadget dimension bg-color draw-quotes board gests textures
     n gadget board>> nth cells>> :> cell
     n gadget get-cell-dimension :> celldims
     n gadget get-dimension-matrix :> dim-matrix
-    flowcell dim-matrix [ [ celldims gadget draw-single ] 2each ] 2each ;
+    cell dim-matrix [ [ celldims gadget draw-single ] 2each ] 2each ;
 
 : draw-all ( gadget -- )
     ! draws everything in draw-quotes (which we added to using draw-filled-rectangle and draw-image)

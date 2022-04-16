@@ -81,11 +81,6 @@ CONSTANT: LEFT { -1 0 }
 
 ! Adds an object to all the given locations to new-cell 
 :: add-to-cells ( board locations obj -- board )
-    locations [ board swap obj add-to-cell drop ] each
-    board ;
-
-! Adds an object to all the given locations to new-cell 
-:: add-copy-to-cells ( board locations obj -- board )
     locations [ board swap obj clone add-to-cell drop ] each
     board ;
 

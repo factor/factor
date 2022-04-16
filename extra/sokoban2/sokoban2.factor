@@ -1,7 +1,7 @@
 
 USING: literals kernel namespaces accessors sequences combinators math.vectors colors
 game_lib.ui game_lib.board game_lib.cell game_lib.loop game.loop ui.gestures ui.gadgets opengl opengl.textures
-images.loader prettyprint classes game_lib.cell math ;
+images.loader prettyprint classes math ;
 
 IN: sokoban2
 
@@ -19,37 +19,36 @@ SYMBOL: level
 0 level set-global
 
 :: make-crate ( image-path -- crate )
-    crate-cell new
     f f f f flow boa :> flow-obj
-    image-path flow-obj crate-cell boa ;
+    crate-cell new flow-obj image-path crate-cell boa ;
 
 : board-one-bg ( -- board )
-    8 9 make-board
+    8 9 make-board ;
     
-    { 2 2 } player add-to-cell
+    ! { 2 2 } player add-to-cell
 
-    {
-                        { 2 0 } { 3 0 } { 4 0 } { 5 0 } { 6 0 }
-        { 0 1 } { 1 1 } { 2 1 }                         { 6 1 }
-        { 0 2 }                                         { 6 2 }
-        { 0 3 } { 1 3 } { 2 3 }                         { 6 3 }
-        { 0 4 }         { 2 4 } { 3 4 }                 { 6 4 }
-        { 0 5 }         { 2 5 }                         { 6 5 } { 7 5 }
-        { 0 6 }                                                 { 7 6 }
-        { 0 7 }                                                 { 7 7 }
-        { 0 8 } { 1 8 } { 2 8 } { 3 8 } { 4 8 } { 5 8 } { 6 8 } { 7 8 }
+    ! {
+    !                     { 2 0 } { 3 0 } { 4 0 } { 5 0 } { 6 0 }
+    !     { 0 1 } { 1 1 } { 2 1 }                         { 6 1 }
+    !     { 0 2 }                                         { 6 2 }
+    !     { 0 3 } { 1 3 } { 2 3 }                         { 6 3 }
+    !     { 0 4 }         { 2 4 } { 3 4 }                 { 6 4 }
+    !     { 0 5 }         { 2 5 }                         { 6 5 } { 7 5 }
+    !     { 0 6 }                                                 { 7 6 }
+    !     { 0 7 }                                                 { 7 7 }
+    !     { 0 8 } { 1 8 } { 2 8 } { 3 8 } { 4 8 } { 5 8 } { 6 8 } { 7 8 }
 
-    } $ wall add-to-cells
+    ! } $ wall add-to-cells
 
 
-    {
-        { 1 2 } { 5 3 } { 1 4 } { 4 5 } { 3 6 } { 6 6 } { 4 7 } 
-    } $ goal add-to-cells
+    ! {
+    !     { 1 2 } { 5 3 } { 1 4 } { 4 5 } { 3 6 } { 6 6 } { 4 7 } 
+    ! } $ goal add-to-cells
     
-    { 
+    ! { 
 
-        { 1 6 } { 3 2 } { 4 3 } { 4 4 } { 4 6 } { 3 6 } { 5 6 }
-    } light-crate make-crate add-copy-to-cells ;
+    !     { 1 6 } { 3 2 } { 4 3 } { 4 4 } { 4 6 } { 3 6 } { 5 6 }
+    ! } light-crate make-crate add-to-cells ;
 
 
 : board-one-fg ( -- board )
@@ -57,7 +56,7 @@ SYMBOL: level
     8 9 make-board
 
     { { 5 2 } { 5 1 } } COLOR: blue add-to-cells 
-    { { 1 1 } } light-crate make-crate DOWN 100 turn-on-flow add-copy-to-cells ;
+    { { 1 1 } } light-crate make-crate DOWN 1000 turn-on-flow add-to-cells ;
 
 : board-one ( gadget -- gadget )
     board-one-bg board-one-fg { } 2sequence add-board ;
@@ -190,28 +189,27 @@ TUPLE: game-state gadget ;
 
 ! Takes in an object in a cell and calls update-move if it is a flowcell
 :: helper2 ( board loc obj -- )
-    obj flowcell instance?
+    obj crate-cell instance?
     [
-        board loc flowcell update-move
+        board loc obj update-move
     ]
-    [ ]
+    [ loc . obj . ]
     if ;
 
 ! helper1 (rename this later) takes a board, a location, and the corresponding cell and calls helper2 on all objects in the cell
 :: helper1 ( board pair -- )
     pair first2 :> ( loc cell )
-    cell length { board } replicate :> boardlist ! a bunch of copies of board to pass down to helper2
-    cell length { loc } replicate :> loclist ! a bunch of copies of loc to pass down to helper2
-    boardlist loclist cell helper2 3map ;
+    board loc cell [ helper2 ] 2with each
+    ;
 
 :: tick-update ( game-state -- )
     game-state gadget>> :> g
-    g board>> :> b
-    b [ [ flowcell instance? ] any? ] find-all-cells :> all-cells
-    all-cells length { b } replicate :> boardlist ! a bunch of copies of board to pass down to helper1
-    boardlist all-cells helper1 2map
+    g board>> second :> b
+    b [ crate-cell cell-contains-instance? ] find-all-cells :> all-cells
+    all-cells . 
+    b all-cells [ helper1 ] with each
     g relayout
-    b first check-win
+    b check-win
     [ "pass" . ] when ;
 
 M: game-state tick* tick-update ;
