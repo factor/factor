@@ -4,7 +4,6 @@ IN: game_lib.board
 
 TUPLE: board width height cells ;
 
-! CONSTANT: GRAVITY "gravity"
 
 CONSTANT: UP { 0 -1 } 
 CONSTANT: DOWN { 0 1 } 
@@ -240,24 +239,3 @@ CONSTANT: LEFT { -1 0 }
 
 :: all-equal-value? ( value seq -- ? )
     seq [ value = ] all? ;
-
-! ! Checks if the gravity constant is at the specified location on the board
-! :: gravity? ( board location -- ? )
-!     board location get-cell [ GRAVITY = ] any? ;
-
-! ! Add the gravity constant to the specified location on the board if it isn't there yet
-! :: add-gravity ( board location -- board ) 
-!     board location gravity? 
-!     [ board ]
-!     [ board location GRAVITY add-to-cell ] if
-!     ;
-
-! ! Removes the gravity constant from the specified location on the board
-! :: remove-gravity ( board location -- board ) 
-!     board location GRAVITY delete-all-from-cell ;
-
-! ! turn on gravity for cell, move objects by gravity in loop library; user sets how fast gravity is working as a percentage of game loop speed- using counter
-! :: gravity-on ( gadget board interval -- gadget board )
-!     ! finish this -- in quote, check if each cell is empty, if not move the cell down
-!     [ board { 0 0 } { 1 0 } move-entire-cell drop gadget relayout ] interval delayed-every drop 
-!     gadget board ;
