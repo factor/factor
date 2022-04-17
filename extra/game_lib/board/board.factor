@@ -155,6 +155,15 @@ CONSTANT: LEFT { -1 0 }
     board object-pos object delete-from-cell
     object-pos move v+ object add-to-cell ;
 
+:: move-entire-cell-rel ( board start move -- board )
+    board start start move v+ move-entire-cell ;
+
+! move cells of a parent
+:: move-cells ( board start dest -- board )
+    board start first get-cell :> cell
+    board start [ delete-cell ] each
+    dest cell set-cells ;
+
 :: swap-cells ( board loc1 loc2 -- board )
     board loc1 get-cell :> cell1
     board loc2 get-cell :> cell2
