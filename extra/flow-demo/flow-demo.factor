@@ -3,7 +3,7 @@ USING: literals kernel namespaces accessors sequences combinators math.vectors c
 game_lib.ui game_lib.board game_lib.cell game_lib.loop game.loop ui.gestures ui.gadgets opengl opengl.textures
 images.loader prettyprint classes math ;
 
-IN: flow_demo
+IN: flow-demo
 
 CONSTANT: player "vocab:sokoban2/resources/CharR.png"
 CONSTANT: wall "vocab:sokoban2/resources/Wall_Brown.png"
