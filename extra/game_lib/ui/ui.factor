@@ -114,8 +114,11 @@ TUPLE: board-gadget < gadget dimension bg-color draw-quotes board gests textures
 : check-rules ( gadget -- ? )
     rules>> t? ;
 
+: set-dim ( gadget dim -- gadget )
+    >>dimension ;
+
 : get-dim ( gadget -- dim )
-    dim>> ;
+    dimension>> ;
 
 :: hand-rel-cell ( gadget -- cellpos )
     gadget hand-rel first2 :> ( w h )

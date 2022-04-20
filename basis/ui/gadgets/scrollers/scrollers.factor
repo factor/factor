@@ -44,9 +44,9 @@ M: gadget viewport-column-header drop f ;
     [ second swap y>> slide-by-line ]
     2bi ;
 
-scroller H{
-    { mouse-scroll [ do-mouse-scroll ] }
-} set-gestures
+! scroller H{
+!     { mouse-scroll [ do-mouse-scroll ] }
+! } set-gestures
 
 : <scroller-model> ( -- model )
     0 0 0 0 1 <range> 0 0 0 0 1 <range> 2array <product> ;

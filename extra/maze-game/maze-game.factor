@@ -1,6 +1,25 @@
 USING: accessors colors game_lib.board game_lib.ui kernel
-math.vectors sequences ui ui.gadgets ui.gadgets.scrollers ui.gestures ;
-IN: game_lib_test
+prettyprint sequences ui ui.gadgets ui.gadgets.scrollers
+ui.gadgets.sliders ui.gadgets.tracks ui.gestures ;
+
+IN: maze-game
+
+TUPLE: maze-gadget < gadget maze-scroller ;
+
+: <maze-gadget> ( gadget -- myscroller )
+    <scroller>
+    horizontal maze-gadget new-track
+    swap
+    [ >>maze-scroller ]
+    [ f track-add ]
+    bi ;
+
+maze-gadget H{
+    { T{ key-down f f "RIGHT" } [ maze-scroller>> x>> 40 swap slide-by ] } 
+    { T{ key-down f f "LEFT" } [ maze-scroller>> x>> -40 swap slide-by ] } 
+    { T{ key-down f f "UP" } [ maze-scroller>> y>> 40 swap slide-by ] } 
+    { T{ key-down f f "DOWN" } [ maze-scroller>> y>> -40 swap slide-by ] } 
+} set-gestures
 
 : board ( gadget -- gadget )
     17 17 make-board
@@ -24,16 +43,9 @@ IN: game_lib_test
         { 0 16 } { 1 16 } { 2 16 } { 3 16 } { 4 16 } { 5 16 } { 6 16 } { 7 16 } { 8 16 } { 9 16 } { 10 16 } { 11 16 } { 12 16 } { 13 16 } { 14 16 } { 15 16 } { 16 16 }
     } COLOR: black add-to-cells
 
-    { 1 1 } COLOR: blue add-to-cell
+    { 5 1 } COLOR: blue add-to-cell
 
     { } 1sequence add-board ;
-
-:: move ( board move -- ) 
-    board [ COLOR: blue = ] find-cell-pos :> player-pos
-    player-pos move v+ :> new-pos
-    board new-pos get-cell :> adjacent-cell
-    adjacent-cell is-empty?
-    [ board player-pos new-pos move-entire-cell drop ] when ; 
 
 : logic ( gadget -- gadget )
     T{ key-down f f "UP" } [ dup board>> first UP move relayout ] new-gesture
@@ -42,9 +54,10 @@ IN: game_lib_test
     T{ key-down f f "RIGHT" } [ dup board>> first RIGHT move relayout ] new-gesture ;
 
 : main ( -- gadget )
-    { 1600 1600 } init-board-gadget 
-    board 
-    logic 
-    <scroller> ;
+    { 800 800 } init-board-gadget
+    board
+!    logic
+    <maze-gadget>
+    ;
 
-MAIN-WINDOW: maze-game-demo { { title "maze" } { pref-dim { 400 400 } } } main >>gadgets ;
+MAIN-WINDOW: maze-game-demo { { title "maze" } { pref-dim { 300 300 } } } main >>gadgets ;
