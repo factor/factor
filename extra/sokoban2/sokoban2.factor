@@ -53,7 +53,8 @@ SYMBOL: level
     ! just to showcase stackable boards
     8 9 make-board
 
-    { { 5 2 } { 5 1 } } COLOR: blue add-to-cells ;
+    ! { { 5 2 } { 5 1 } } COLOR: blue add-to-cells 
+    ;
 
 : board-one ( gadget -- gadget )
     board-one-bg board-one-fg { } 2sequence add-board ;
