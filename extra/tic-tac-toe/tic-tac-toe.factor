@@ -21,7 +21,7 @@ X player set-global
 
 : board ( gadget -- gadget )
     3 3 make-board { } 1sequence
-    create-board ; 
+    add-board ; 
 
 : set-player ( -- )
     player get-global X =
@@ -94,7 +94,7 @@ M: game-state draw* drop drop ;
 
 
 : main ( -- )
-    { 400 400 } init-window
+    { 400 400 } init-board-gadget
     background board foreground
     game-logic
     <game-state> create-loop 

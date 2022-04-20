@@ -1,8 +1,9 @@
-USING: assocs classes sequences sequences.generalizations sets kernel accessors sequences.extras ranges math.vectors generalizations strings prettyprint game_lib.loop ;
+USING: assocs classes sequences sequences.generalizations math timers sets kernel accessors sequences.extras ranges math.vectors generalizations strings prettyprint game_lib.loop ui.gadgets ;
 
 IN: game_lib.board
 
 TUPLE: board width height cells ;
+
 
 CONSTANT: UP { 0 -1 } 
 CONSTANT: DOWN { 0 1 } 
@@ -79,11 +80,6 @@ CONSTANT: LEFT { -1 0 }
 
 ! Adds an object to all the given locations to new-cell 
 :: add-to-cells ( board locations obj -- board )
-    locations [ board swap obj add-to-cell drop ] each
-    board ;
-
-! Adds an object to all the given locations to new-cell 
-:: add-copy-to-cells ( board locations obj -- board )
     locations [ board swap obj clone add-to-cell drop ] each
     board ;
 
@@ -145,15 +141,28 @@ CONSTANT: LEFT { -1 0 }
 :: duplicate-cell ( board start dest -- board )
     board dup start get-cell dest swap set-cell ;
 
-! Moves an entire cell to a new destination, leaving the original cell empty
+! Moves an entire cell if it can be moved to a new destination, leaving the original cell empty
 :: move-entire-cell ( board start dest -- board )
-    board start dest duplicate-cell
-    start delete-cell ;
+    ! bound checking
+    { start dest } [ first board width>> < ] all? 
+    { start dest } [ second board height>> < ] all? and
+    start [ 0 >= ] all? and 
+    dest [ 0 >= ] all? and 
+    ! move cell
+    [ board start dest duplicate-cell
+    start delete-cell drop ] when 
+    board ;
 
 ! Move an object from a cell, relative to its original cell
 :: move-object ( board object-pos move object -- board )
-    board object-pos object delete-from-cell
-    object-pos move v+ object add-to-cell ;
+    object-pos move v+ :> dest
+    { object-pos dest } [ first board width>> < ] all? 
+    { object-pos dest } [ second board height>> < ] all? and
+    object-pos [ 0 >= ] all? and 
+    dest [ 0 >= ] all? and 
+    [ board object-pos object delete-from-cell
+    dest object add-to-cell drop ] when
+    board ;
 
 :: swap-cells ( board loc1 loc2 -- board )
     board loc1 get-cell :> cell1
