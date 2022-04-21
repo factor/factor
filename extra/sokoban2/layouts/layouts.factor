@@ -36,15 +36,15 @@ M: crate-cell draw-cell*
 
     } $ wall add-to-cells
 
-
-    {
-        { 1 2 } { 5 3 } { 1 4 } { 4 5 } { 3 6 } { 6 6 } { 4 7 } 
-    } $ goal add-to-cells
-    
     { 
 
         { 1 6 } { 3 2 } { 4 3 } { 4 4 } { 4 6 } { 3 6 } { 5 6 }
-    } light-crate make-crate add-copy-to-cells ;
+    } light-crate make-crate add-copy-to-cells
+
+    {
+        { 1 2 } { 5 3 } { 1 4 } { 4 5 } { 3 6 } { 6 6 } { 4 7 } 
+    } $ goal add-to-cells ;
+    
 
 : board-one-fg ( -- board )
     ! just to showcase stackable boards

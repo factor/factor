@@ -147,26 +147,14 @@ CONSTANT: LEFT { -1 0 }
 
 ! Moves an entire cell if it can be moved to a new destination, leaving the original cell empty
 :: move-entire-cell ( board start dest -- board )
-    ! bound checking
-    { start dest } [ first board width>> < ] all? 
-    { start dest } [ second board height>> < ] all? and
-    start [ 0 >= ] all? and 
-    dest [ 0 >= ] all? and 
-    ! move cell
-    [ board start dest duplicate-cell
-    start delete-cell drop ] when 
-    board ;
+    board start dest duplicate-cell
+    start delete-cell ;
 
 ! Move an object from a cell, relative to its original cell
 :: move-object ( board object-pos move object -- board )
     object-pos move v+ :> dest
-    { object-pos dest } [ first board width>> < ] all? 
-    { object-pos dest } [ second board height>> < ] all? and
-    object-pos [ 0 >= ] all? and 
-    dest [ 0 >= ] all? and 
-    [ board object-pos object delete-from-cell
-    dest object add-to-cell drop ] when
-    board ;
+    board object-pos object delete-from-cell
+    dest object add-to-cell ;
 
 :: swap-cells ( board loc1 loc2 -- board )
     board loc1 get-cell :> cell1

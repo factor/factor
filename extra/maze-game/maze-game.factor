@@ -1,25 +1,11 @@
-USING: accessors colors game_lib.board game_lib.ui kernel
-prettyprint sequences ui ui.gadgets ui.gadgets.scrollers
-ui.gadgets.sliders ui.gadgets.tracks ui.gestures ;
+USING: accessors colors combinators game_lib.board game_lib.ui
+kernel math math.vectors prettyprint sequences ui ui.gadgets
+ui.gadgets.scrollers ui.gadgets.sliders ui.gadgets.tracks
+ui.gestures ;
 
 IN: maze-game
 
-TUPLE: maze-gadget < gadget maze-scroller ;
-
-: <maze-gadget> ( gadget -- myscroller )
-    <scroller>
-    horizontal maze-gadget new-track
-    swap
-    [ >>maze-scroller ]
-    [ f track-add ]
-    bi ;
-
-maze-gadget H{
-    { T{ key-down f f "RIGHT" } [ maze-scroller>> x>> 40 swap slide-by ] } 
-    { T{ key-down f f "LEFT" } [ maze-scroller>> x>> -40 swap slide-by ] } 
-    { T{ key-down f f "UP" } [ maze-scroller>> y>> 40 swap slide-by ] } 
-    { T{ key-down f f "DOWN" } [ maze-scroller>> y>> -40 swap slide-by ] } 
-} set-gestures
+TUPLE: maze-gadget < track maze-scroller board-gadget ;
 
 : board ( gadget -- gadget )
     17 17 make-board
@@ -43,21 +29,56 @@ maze-gadget H{
         { 0 16 } { 1 16 } { 2 16 } { 3 16 } { 4 16 } { 5 16 } { 6 16 } { 7 16 } { 8 16 } { 9 16 } { 10 16 } { 11 16 } { 12 16 } { 13 16 } { 14 16 } { 15 16 } { 16 16 }
     } COLOR: black add-to-cells
 
-    { 5 1 } COLOR: blue add-to-cell
-
+    { 1 1 } COLOR: blue add-to-cell
+    
     { } 1sequence add-board ;
 
-: logic ( gadget -- gadget )
-    T{ key-down f f "UP" } [ dup board>> first UP move relayout ] new-gesture
-    T{ key-down f f "DOWN" } [ dup board>> first DOWN move relayout ] new-gesture
-    T{ key-down f f "LEFT" } [ dup board>> first LEFT move relayout ] new-gesture
-    T{ key-down f f "RIGHT" } [ dup board>> first RIGHT move relayout ] new-gesture ;
+:: bound-check ( new-pos -- ? )
+    new-pos [ 0 >= ] all? 
+    new-pos [ 17 < ] all? and ;
+
+: can-move? ( board new-pos -- ? )
+    get-cell is-empty? ;
+
+:: move-window ( scroller move -- )
+    {
+        { [ move LEFT = ] [ scroller x>> -100 swap slide-by ] }
+        { [ move RIGHT = ] [ scroller x>> 100 swap slide-by ] }
+        { [ move DOWN = ] [ scroller y>> 100 swap slide-by ] }
+        { [ move UP = ] [ scroller y>> -100 swap slide-by ] }
+    } cond ;
+
+:: move ( maze-gadget move -- ) 
+    maze-gadget board-gadget>> board>> first :> board
+    maze-gadget maze-scroller>> :> scroller
+    board [ COLOR: blue = ] find-cell-pos :> player-pos
+    player-pos move v+ :> new-pos
+    
+    new-pos bound-check ! check new pos is still inside of board
+    [   
+        board new-pos can-move? ! check if new pos is an empty space
+        [   
+            player-pos { 0 1 } = not player-pos { 16 15 } = not and ! check player isn't at edge of board
+            [ 
+                scroller move move-window
+            ] when
+            board player-pos new-pos move-entire-cell drop
+        ] when
+    ] when  
+    maze-gadget relayout-1 ; 
+
+maze-gadget H{
+    { T{ key-down f f "RIGHT" } [ RIGHT move ] } 
+    { T{ key-down f f "LEFT" } [ LEFT move ] }  
+    { T{ key-down f f "UP" } [ UP move ] } 
+    { T{ key-down f f "DOWN" } [ DOWN move ] } 
+} set-gestures
 
 : main ( -- gadget )
-    { 800 800 } init-board-gadget
-    board
-!    logic
-    <maze-gadget>
-    ;
+    vertical maze-gadget new-track
+    { 1700 1700 } init-board-gadget
+    board [ >>board-gadget ] keep
+    <scroller> [ >>maze-scroller ] keep
+    1 track-add ;
 
-MAIN-WINDOW: maze-game-demo { { title "maze" } { pref-dim { 300 300 } } } main >>gadgets ;
+MAIN-WINDOW: maze-game-demo { { title "maze" } { pref-dim { 400 400 } } } main >>gadgets ;

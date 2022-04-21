@@ -1,5 +1,7 @@
-USING: accessors colors game_lib.board game_lib.ui kernel
-math.vectors sequences ui ui.gadgets ui.gadgets.scrollers ui.gestures ;
+USING: accessors colors game_lib.board game_lib.ui kernel math
+math.vectors sequences ui ui.gadgets ui.gadgets.scrollers
+ui.gadgets.sliders ui.gadgets.status-bar ui.gadgets.tracks
+ui.gestures ;
 IN: game_lib_test
 
 : board ( gadget -- gadget )
@@ -28,23 +30,51 @@ IN: game_lib_test
 
     { } 1sequence add-board ;
 
-:: move ( board move -- ) 
-    board [ COLOR: blue = ] find-cell-pos :> player-pos
-    player-pos move v+ :> new-pos
-    board new-pos get-cell :> adjacent-cell
-    adjacent-cell is-empty?
-    [ board player-pos new-pos move-entire-cell drop ] when ; 
+! :: bound-check ( new-pos -- ? )
+!     new-pos [ 0 >= ] all? 
+!     new-pos [ 17 < ] all? and ;
+
+! :: move ( board move -- ) 
+!     board [ COLOR: blue = ] find-cell-pos :> player-pos
+!     player-pos move v+ :> new-pos
+!     new-pos bound-check
+!     [
+!         board new-pos get-cell :> adjacent-cell
+!         adjacent-cell is-empty?
+!         [ board player-pos new-pos move-entire-cell drop ] when 
+!     ] when ; 
 
 : logic ( gadget -- gadget )
     T{ key-down f f "UP" } [ dup board>> first UP move relayout ] new-gesture
     T{ key-down f f "DOWN" } [ dup board>> first DOWN move relayout ] new-gesture
     T{ key-down f f "LEFT" } [ dup board>> first LEFT move relayout ] new-gesture
-    T{ key-down f f "RIGHT" } [ dup board>> first RIGHT move relayout ] new-gesture ;
+    T{ key-down f f "RIGHT" } [ dup board>> first RIGHT move relayout ] new-gesture 
+    T{ key-down f f "n" } [ { } >>board board relayout ] new-gesture ;
 
-: main ( -- gadget )
-    { 1600 1600 } init-board-gadget 
-    board 
-    logic 
-    <scroller> ;
 
-MAIN-WINDOW: maze-game-demo { { title "maze" } { pref-dim { 400 400 } } } main >>gadgets ;
+! : main ( -- gadget )
+!     { 1600 1600 } init-board-gadget 
+!     board 
+!     logic 
+!     <scroller> { } 1sequence vertical 0 1 <window> ;
+
+TUPLE: maze-gadget < track scroller ;
+
+maze-gadget H{
+    { T{ key-down f f "RIGHT" } [ scroller>> x>> 40 swap slide-by ] } 
+    { T{ key-down f f "LEFT" } [ scroller>> x>> -40 swap slide-by ] } 
+    { T{ key-down f f "UP" } [ scroller>> y>> -40 swap slide-by ] } 
+    { T{ key-down f f "DOWN" } [ scroller>> y>> 40 swap slide-by ] } 
+} set-gestures
+
+: main ( -- )
+    vertical maze-gadget new-track
+    { 2000 2000 } init-board-gadget
+    board
+    ! logic
+    <scroller> [ >>scroller ] keep
+    1 track-add
+    display ;
+
+MAIN: main 
+! MAIN-WINDOW: maze-game-demo { { title "maze" } { pref-dim { 400 400 } } } main >>gadgets ;

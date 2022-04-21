@@ -52,11 +52,11 @@ CONSTANT: dark-crate "vocab:sokoban2/resources/CrateDark_Yellow.png"
     T{ key-down f f "UP" } [ board>> first UP sokoban-move ] new-gesture
     T{ key-down f f "DOWN" } [ board>> first DOWN sokoban-move ] new-gesture
     T{ key-down f f "RIGHT" } [ board>> first RIGHT sokoban-move ] new-gesture
-    T{ key-down f f "LEFT" } [ board>> first LEFT sokoban-move ] new-gesture ;
-    ! T{ key-down f f "n" } [ dup board>> first reset-board { 700 800 } init-board-gadget level get-global board nth call( gadget -- gadget ) ] new-gesture ;
+    T{ key-down f f "LEFT" } [ board>> first LEFT sokoban-move ] new-gesture
+    T{ key-down f f "n" } [ { } >>board board-one drop ] new-gesture ;
 
 : main ( -- )
-    { 800 900 } init-board-gadget
+    { 700 800 } init-board-gadget
     ! level get-global board nth call( gadget -- gadget )
     board-one
     <game-state> create-loop
