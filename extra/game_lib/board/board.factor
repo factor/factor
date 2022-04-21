@@ -1,4 +1,4 @@
-USING: assocs classes sequences sequences.generalizations sets kernel accessors sequences.extras ranges math.vectors generalizations strings prettyprint game_lib.loop ;
+USING: assocs classes sequences sequences.generalizations sets kernel accessors sequences.extras ranges math.vectors generalizations strings prettyprint game_lib.loop classes game_lib.parent ;
 
 IN: game_lib.board
 
@@ -155,10 +155,19 @@ CONSTANT: LEFT { -1 0 }
     board object-pos object delete-from-cell
     object-pos move v+ object add-to-cell ;
 
+! Move a specified object in many cells to different locations
+:: move-objects ( board start dest object -- board )
+    board start object delete-from-cells
+    dest object add-to-cells ;
+
+:: move-many-objects ( board start dest objects -- board )
+    board objects [ start swap dest swap move-objects ] each ;
+
+! move a cell with a move relative to its start
 :: move-entire-cell-rel ( board start move -- board )
     board start start move v+ move-entire-cell ;
 
-! move cells of a parent
+! move cells of a parent (only works when cells are all the same)
 :: move-cells ( board start dest -- board )
     board start first get-cell :> cell
     board start [ delete-cell ] each

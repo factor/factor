@@ -1,4 +1,4 @@
-USING: accessors math kernel ;
+USING: accessors math kernel sequences ;
 
 IN: game_lib.cell 
 
@@ -13,3 +13,20 @@ GENERIC: draw-cell* ( loc dim delegate -- )
 
 : <cell> ( delegate -- cell )
     <cell*> ; inline
+
+
+TUPLE: child-cell < cell parent ;
+
+
+GENERIC: call-parent* ( instruction delegate -- )
+
+TUPLE: parent children function ;
+
+: <parent*> ( children function -- parent )
+    parent boa ;
+
+: <parent> ( children function -- parent )
+    <parent*> ; inline
+
+:: new-child ( child-pos parent -- )
+    parent parent children>> { child-pos } append >>children drop ;
