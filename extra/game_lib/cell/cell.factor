@@ -18,7 +18,7 @@ GENERIC: draw-cell* ( loc dim delegate -- )
 TUPLE: child-cell < cell parent ;
 
 
-GENERIC: call-parent* ( instruction delegate -- )
+GENERIC: call-parent* ( resources instruction delegate -- )
 
 TUPLE: parent children function ;
 
@@ -34,7 +34,7 @@ TUPLE: parent children function ;
 :: fill-board-parent ( board parent -- board )
     board parent children>> { parent } set-cells ;
 
-:: move-children ( board parent move -- board )
+:: move-children ( board move parent -- board )
     parent children>> :> children
     parent children [ move v+ ] map >>children drop
     board children children [ move v+ ] map board children first get-cell move-many-objects ;
