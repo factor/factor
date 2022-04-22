@@ -1,4 +1,4 @@
-USING: accessors math kernel sequences ;
+USING: accessors math kernel sequences math.vectors game_lib.board ;
 
 IN: game_lib.cell 
 
@@ -30,3 +30,11 @@ TUPLE: parent children function ;
 
 :: new-child ( child-pos parent -- )
     parent parent children>> { child-pos } append >>children drop ;
+
+:: fill-board-parent ( board parent -- board )
+    board parent children>> { parent } set-cells ;
+
+:: move-children ( board parent move -- board )
+    parent children>> :> children
+    parent children [ move v+ ] map >>children drop
+    board children children [ move v+ ] map board children first get-cell move-many-objects ;

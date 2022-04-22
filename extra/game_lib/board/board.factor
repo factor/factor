@@ -1,4 +1,4 @@
-USING: assocs classes sequences sequences.generalizations sets kernel accessors sequences.extras ranges math.vectors generalizations strings prettyprint game_lib.loop classes game_lib.parent ;
+USING: assocs classes sequences sequences.generalizations sets kernel accessors sequences.extras ranges math.vectors generalizations strings prettyprint game_lib.loop classes ;
 
 IN: game_lib.board
 

@@ -1,7 +1,7 @@
 
 USING: literals kernel namespaces accessors sequences combinators math.vectors colors
 game_lib.ui game_lib.board game_lib.cell game_lib.loop game.loop ui.gestures ui.gadgets opengl opengl.textures
-images.loader prettyprint game_lib.parent ;
+images.loader prettyprint ;
 
 IN: parent-demo
 
