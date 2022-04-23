@@ -1,7 +1,10 @@
 
-USING: accessors game.loop game_lib.board game_lib.loop game_lib.ui kernel math 
-namespaces prettyprint sequences sokoban2.layouts ui ui.gadgets ;
+USING: accessors colors fonts game.loop game_lib.board
+game_lib.loop game_lib.ui kernel math namespaces opengl
+prettyprint sequences sokoban2.layouts ui ui.gadgets ui.text combinators ;
 IN: sokoban2.loop
+
+SYMBOL: level
 
 TUPLE: game-state gadget ;
 
@@ -17,16 +20,20 @@ TUPLE: game-state gadget ;
 : create-loop ( game-state -- )
     10000000 swap new-game-loop start-loop ;
 
-:: tick-update ( game-state -- )
-    game-state gadget>> relayout-window
-    game-state gadget>> board>> first check-win
-    [
-        game-state dup gadget>> { } >>board { } >>draw-quotes board-two >>gadget
-        gadget>> { 2200 1100 } set-dim
-        relayout-1
+: game-over ( gadget -- gadget )
+    [ { 200 200 } [ monospace-font t >>bold? 50 >>size COLOR: red >>foreground "YOU WIN!" draw-text ] with-translation ] draw-quote ;
 
-    ] when
-    ;
+:: tick-update ( game-state -- )
+    game-state gadget>> :> g
+    g relayout-window
+    g board>> first check-win
+    [ 
+        {
+            { [ level get-global 0 = ] [ level [ 1 + ] change-global game-state g { } >>board { } >>draw-quotes board-two >>gadget drop g { 1500 750 } set-dim relayout ] }
+            { [ level get-global 1 = ] [ level [ 1 + ] change-global game-state g { } >>board { } >>draw-quotes board-three >>gadget drop g { 600 600 } set-dim relayout ] }
+            { [ level get-global 2 = ] [ g game-over relayout-1 stop-game ] }
+        } cond
+    ] when ;
 
 M: game-state tick* tick-update ;
 

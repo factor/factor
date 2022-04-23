@@ -82,13 +82,13 @@ TUPLE: game-state gadget ;
     1000 swap new-game-loop start-loop ;
 
 
-: tick-update ( game-state -- game-state )
+: tick-update ( game-state -- )
     dup gadget>> board>> first check-win 
-    [ dup gadget>> game-over relayout-1 stop-game ] 
-    [ dup gadget>> relayout-1 ] if ;
+    [ gadget>> game-over relayout-1 stop-game ] 
+    [ gadget>> relayout-1 ] if ;
 
 
-M: game-state tick* tick-update drop ;
+M: game-state tick* tick-update ;
 
 M: game-state draw* drop drop ;
 

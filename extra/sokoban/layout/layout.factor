@@ -2,11 +2,11 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel arrays namespaces sequences math math.order
 math.vectors colors random ;
-IN: sokoban.tetromino
+IN: sokoban.layout
 
-TUPLE: tetromino states color ;
+TUPLE: layout states color ;
 
-C: <tetromino> tetromino
+C: <layout> layout
 
 SYMBOL: component
 
@@ -62,7 +62,7 @@ SYMBOL: component
       }
     } COLOR: pink
   ]
-} [ first2 <tetromino> ] map component set-global
+} [ first2 <layout> ] map component set-global
 
 SYMBOL: boxes
 {
@@ -143,7 +143,7 @@ SYMBOL: boxes
   }
 
   ! etc
-} [ first2 <tetromino> ] map boxes set-global
+} [ first2 <layout> ] map boxes set-global
 
 
 SYMBOL: num-boxes
@@ -153,17 +153,17 @@ SYMBOL: num-boxes
   5
 } num-boxes set-global
 
-: get-board ( -- tetromino )
+: get-board ( -- layout )
     component get first ;
 
-: get-player ( -- tetromino )
+: get-player ( -- layout )
     component get second ;
 
-: get-box ( n -- tetromino )
+: get-box ( n -- layout )
     boxes get nth ;
     ! TODO add an n argument and get (n + 1)th
 
-: get-goal ( -- tetromino )
+: get-goal ( -- layout )
     component get third ;
 
 : get-num-boxes ( n -- m )

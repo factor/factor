@@ -7,9 +7,6 @@ CONSTANT: goal "vocab:sokoban2/resources/Goal.png"
 CONSTANT: light-crate "vocab:sokoban2/resources/Crate_Yellow.png"
 CONSTANT: dark-crate "vocab:sokoban2/resources/CrateDark_Yellow.png"
 
-SYMBOL: level 
-0 level set-global
-
 TUPLE: crate-cell < cell image-path ;
 M: crate-cell draw-cell* 
     rot [ image-path>> load-image ] dip <texture> draw-scaled-texture ;
@@ -18,7 +15,7 @@ M: crate-cell draw-cell*
     crate-cell new
     image-path crate-cell boa ;
 
-: board-one-bg ( -- board )
+: board-one ( gadget -- gadget )
     8 9 make-board
     
     { 2 2 } player add-to-cell
@@ -39,22 +36,14 @@ M: crate-cell draw-cell*
     { 
 
         { 1 6 } { 3 2 } { 4 3 } { 4 4 } { 4 6 } { 3 6 } { 5 6 }
-    } light-crate make-crate add-copy-to-cells
+    } $ light-crate make-crate add-copy-to-cells
 
     {
         { 1 2 } { 5 3 } { 1 4 } { 4 5 } { 3 6 } { 6 6 } { 4 7 } 
-    } $ goal add-to-cells ;
+    } $ goal add-to-cells 
     
+    { } 1sequence add-board ;
 
-: board-one-fg ( -- board )
-    ! just to showcase stackable boards
-    8 9 make-board
-
-    { { 5 2 } { 5 1 } } COLOR: blue add-to-cells ;
-
-: board-one ( gadget -- gadget )
-    board-one-bg { } 1sequence add-board ;
-    ! board-one-bg board-one-fg { } 2sequence add-board ;
 
 : board-two ( gadget -- gadget )
     22 11 make-board
@@ -83,11 +72,33 @@ M: crate-cell draw-cell*
 
     { 
         { 5 2 } { 7 3 } { 5 4 } { 8 4 } { 5 7 } { 2 7 }
-    } $ light-crate add-to-cells
+    } $ light-crate make-crate add-copy-to-cells
 
     { } 1sequence 
 
     add-board ;
 
-: select-board ( -- seq )
-    { [ board-one ] [ board-two ] } ;
+
+: board-three ( gadget -- gadget )
+    8 8 make-board
+    
+    { 1 1 } player add-to-cell
+
+    {
+        { 0 0 } { 1 0 } { 2 0 } { 3 0 } { 4 0 } { 5 0 } { 6 0 } { 7 0 }
+        { 0 1 }                                                 { 7 1 }
+        { 0 2 }                                                 { 7 2 }
+        { 0 3 }                                                 { 7 3 }
+        { 0 4 }                                                 { 7 4 }
+        { 0 5 }                                                 { 7 5 }
+        { 0 6 }                                                 { 7 6 }
+        { 0 7 } { 1 7 } { 2 7 } { 3 7 } { 4 7 } { 5 7 } { 6 7 } { 7 7 }
+    } $ wall add-to-cells
+
+    { 2 1 } $ light-crate make-crate add-to-cell
+
+    { 3 1 } $ goal add-to-cell                                         
+
+    { } 1sequence 
+
+    add-board ;

@@ -1,7 +1,7 @@
 ! Copyright (C) 2006, 2007, 2008 Alex Chapman
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays combinators.short-circuit fry kernel
-math sequences sokoban.piece sokoban.tetromino ;
+math sequences sokoban.piece sokoban.layout ;
 IN: sokoban.board
 
 TUPLE: board

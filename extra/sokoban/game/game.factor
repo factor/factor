@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 
 USING: accessors combinators kernel lists math math.functions math.vectors
-sequences system sokoban.board sokoban.piece sokoban.tetromino sokoban.sound colors 
+sequences system sokoban.board sokoban.piece sokoban.layout sokoban.sound colors 
 namespaces locals ;
 
 IN: sokoban.game
@@ -19,7 +19,7 @@ TUPLE: sokoban
     { running? initial: t } ;
 
 : add-wall-block ( sokoban block -- )
-    over [ board>> ] 2dip <board-piece> swap level>> rotate-piece tetromino>> color>> set-block ;
+    over [ board>> ] 2dip <board-piece> swap level>> rotate-piece layout>> color>> set-block ;
 
 : add-walls ( sokoban -- ) 
     dup <board-piece> swap level>> rotate-piece wall-blocks [ add-wall-block ] with each ;
@@ -37,14 +37,12 @@ TUPLE: sokoban
     board >>board
     goals >>goals
     goals lev <box-seq> >>boxes
-    ! create-engine >>engine ! make audio engine
     soko add-walls ; ! draw walls
 
 
 : <default-sokoban> ( -- sokoban )
     ! Level 0 sokoban
     0 8 9 <sokoban> ;
-    ! dup engine>> play-music ;
 
 : toggle-pause ( sokoban -- )
     [ not ] change-paused? drop ;
@@ -72,7 +70,6 @@ TUPLE: sokoban
 
 :: sokoban-move ( soko mov -- ? )
     ! Collision logic -- checks if player can move and moves the player accordingly
-    ! TODO: make function more readable by using cond (?)
     soko mov can-player-move?
     [   ! Player can move
         soko dup player>> mov get-adj-box :> box2move
@@ -86,12 +83,12 @@ TUPLE: sokoban
                     box2move mov move-piece
                     soko engine>> play-beep
                     "vocab:sokoban/resources/CrateDark_Yellow.png" >>path
-                    tetromino>> COLOR: blue >>color drop t ! change color once box is on goal
+                    layout>> COLOR: blue >>color drop t ! change color once box is on goal
                 ]
                 [   ! Next location of box is a free space
                     soko player>> mov move-piece drop
                     box2move mov move-piece
-                    tetromino>> COLOR: orange >>color drop t
+                    layout>> COLOR: orange >>color drop t
                 ] if
             ]
             [   ! Next location of player is a box but box cannot move
@@ -106,7 +103,6 @@ TUPLE: sokoban
         f
     ] if ;
 
-
 : move-left ( sokoban -- ) dup player>> "vocab:sokoban/resources/CharL.png" >>path drop { -1 0 } sokoban-move drop ;
 
 : move-right ( sokoban -- ) dup player>> "vocab:sokoban/resources/CharR.png" >>path drop { 1 0 } sokoban-move drop ;
@@ -117,7 +113,7 @@ TUPLE: sokoban
 
 : update-level? ( sokoban -- ? )
     ! Get color color of each box
-    boxes>> [ tetromino>> ] map [ color>> ] map 
+    boxes>> [ layout>> ] map [ color>> ] map 
     ! All boxes are on correct spots if there are no orange boxes left and level should be updated
     [ COLOR: orange ] first swap member? not ;
 
