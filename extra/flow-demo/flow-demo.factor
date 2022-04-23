@@ -1,16 +1,16 @@
 
 USING: literals kernel namespaces accessors sequences combinators math.vectors colors
-game_lib.ui game_lib.board game_lib.cell game_lib.loop game.loop ui.gestures ui.gadgets opengl opengl.textures
+game_lib.ui game_lib.board game_lib.cell-object game_lib.loop game.loop ui.gestures ui.gadgets opengl opengl.textures
 images.loader prettyprint classes math ;
 
 IN: flow-demo
 
 CONSTANT: light-crate "vocab:sokoban2/resources/Crate_Yellow.png"
 
-TUPLE: crate-cell < flowcell image-path ;
+TUPLE: crate-cell < flowcell-object image-path ;
 
 ! Note -- probably need to cache larger images
-M: crate-cell draw-cell* 
+M: crate-cell draw-cell-object* 
     rot [ image-path>> load-image ] dip <texture> draw-scaled-texture ;
 
 :: make-crate ( image-path -- crate )
@@ -38,16 +38,16 @@ TUPLE: game-state gadget ;
     10000000 swap new-game-loop start-loop ;
 
 ! Updates a crate-cell's location if a target number of frames have passed, otherwise it updates the counter
-:: update-location ( board loc flowcell -- )
-    flowcell flow-on?
+:: update-location ( board loc flowcell-object -- )
+    flowcell-object flow-on?
     [
-        flowcell flow>> :> flow-obj
+        flowcell-object flow>> :> flow-obj
         flow-obj target>> :> target
         flow-obj counter>> 1 + :> counter
         counter target =
         [
             flow-obj direction>> :> direction
-            board loc direction flowcell move-object drop
+            board loc direction flowcell-object move-object drop
             flow-obj 0 >>counter drop
 
         ]
@@ -55,7 +55,7 @@ TUPLE: game-state gadget ;
             flow-obj counter >>counter drop
         ]
         if
-        flowcell flow-obj >>flow drop
+        flowcell-object flow-obj >>flow drop
     ] when ;
 
 ! Takes in a cell object and updates its location based on its flow if the cell object is a crate-cell

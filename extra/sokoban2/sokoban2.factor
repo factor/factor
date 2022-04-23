@@ -1,5 +1,5 @@
 USING: literals kernel namespaces accessors sequences combinators math.vectors colors
-game_lib.ui game_lib.board game_lib.cell game_lib.loop game.loop ui.gestures ui.gadgets opengl opengl.textures
+game_lib.ui game_lib.board game_lib.cell-object game_lib.loop game.loop ui.gestures ui.gadgets opengl opengl.textures
 images.loader prettyprint layouts ;
 
 IN: sokoban2
@@ -10,8 +10,8 @@ CONSTANT: goal "vocab:sokoban2/resources/Goal.png"
 CONSTANT: light-crate "vocab:sokoban2/resources/Crate_Yellow.png"
 CONSTANT: dark-crate "vocab:sokoban2/resources/CrateDark_Yellow.png"
 
-TUPLE: crate-cell < flowcell image-path ;
-M: crate-cell draw-cell* 
+TUPLE: crate-cell < flowcell-object image-path ;
+M: crate-cell draw-cell-object* 
     rot [ image-path>> load-image ] dip <texture> draw-scaled-texture ;
 
 SYMBOL: level 

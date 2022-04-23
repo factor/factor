@@ -1,5 +1,5 @@
 USING: accessors arrays classes quotations ui.gadgets kernel ui.gadgets.status-bar ui ui.render opengl locals.types strings sequences combinators peg
-images.loader opengl.textures assocs math ranges game_lib.board game_lib.cell ui.gestures ui.gadgets.tracks ui.gadgets.worlds colors destructors game_lib.loop ;
+images.loader opengl.textures assocs math ranges game_lib.board game_lib.cell-object ui.gestures ui.gadgets.tracks ui.gadgets.worlds colors destructors game_lib.loop ;
 
 IN: game_lib.ui
 
@@ -66,7 +66,7 @@ TUPLE: board-gadget < gadget dimension bg-color draw-quotes board gests textures
     ! Executes instructions based on content of the cell, does nothing if cell isn't a 
     ! string, color or quote.
     { 
-        { [ display-cell flowcell instance? ] [ loc dim display-cell draw-cell* ] }
+        { [ display-cell cell-object instance? ] [ loc dim display-cell draw-cell-object* ] }
         { [ display-cell string? ] [ dim { display-cell loc } gadget textures>> [ first load-image loc <texture> ] cache draw-scaled-texture ] }
         { [ display-cell color? ] [ display-cell gl-color loc dim gl-fill-rect ] }
         { [ display-cell quotation? ] [ display-cell call( -- ) ] }
