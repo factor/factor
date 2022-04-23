@@ -20,9 +20,9 @@ M: crate-cell draw-cell-object*
 : board-one ( gadget -- gadget )
     8 9 make-board
 
-    { { 2 1 } } light-crate make-crate RIGHT 1000 set-flow add-to-cells 
-    { { 1 1 } } light-crate make-crate DOWN 100 set-flow add-to-cells
-    { { 5 1 } } light-crate make-crate DOWN 10 set-flow add-to-cells 
+    { { 1 1 } } light-crate make-crate RIGHT 220 set-flow add-to-cells 
+    { { 3 1 } } light-crate make-crate DOWN 75 set-flow add-to-cells
+    { { 5 1 } } light-crate make-crate DOWN 20 set-flow add-to-cells 
     { } 1sequence add-board ;
 
 ! -------------------- Game loop --------------------------------------------------
