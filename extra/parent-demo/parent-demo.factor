@@ -16,7 +16,7 @@ M: crate-cell draw-cell*
     rot [ image-path>> load-image ] dip <texture> draw-scaled-texture ;
 
 M: crate-cell call-parent*
-    parent>> dup function>> call drop ; inline
+    parent>> dup function>> call( board move parent -- board ) drop ; inline
 
 SYMBOL: level 
 0 level set-global
