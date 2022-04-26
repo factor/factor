@@ -1,4 +1,4 @@
-USING: accessors colors game_lib.board game_lib.cell game_lib.ui images.loader kernel literals opengl.textures sequences namespaces ;
+USING: accessors colors game_lib.board game_lib.cell-object game_lib.ui images.loader kernel literals opengl.textures sequences namespaces ;
 IN: sokoban2.layouts
 
 CONSTANT: player "vocab:sokoban2/resources/CharR.png"
@@ -7,8 +7,8 @@ CONSTANT: goal "vocab:sokoban2/resources/Goal.png"
 CONSTANT: light-crate "vocab:sokoban2/resources/Crate_Yellow.png"
 CONSTANT: dark-crate "vocab:sokoban2/resources/CrateDark_Yellow.png"
 
-TUPLE: crate-cell < cell image-path ;
-M: crate-cell draw-cell* 
+TUPLE: crate-cell < cell-object image-path ;
+M: crate-cell draw-cell-object* 
     rot [ image-path>> load-image ] dip <texture> draw-scaled-texture ;
 
 :: make-crate ( image-path -- crate )

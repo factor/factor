@@ -108,12 +108,6 @@ TUPLE: board-gadget < gadget dimension bg-color draw-quotes board gests textures
 : set-background-color ( gadget color -- gadget )
     >>bg-color ;
 
-: set-rules ( gadget rules -- gadget )
-    >>rules ;
-
-: check-rules ( gadget -- ? )
-    rules>> t? ;
-
 : set-dim ( gadget dim -- gadget )
     >>dimension ;
 
@@ -148,8 +142,7 @@ M: board-gadget draw-gadget*
     } cleave ;
 
 M: board-gadget ungraft*
-    [
-        dup find-gl-context [ values dispose-each H{ } clone ] change-textures drop
+    [   dup find-gl-context [ values dispose-each H{ } clone ] change-textures drop
         stop-game
     ] [ call-next-method ] bi ; 
 
