@@ -1,7 +1,6 @@
-
 USING: literals kernel namespaces accessors sequences combinators math.vectors colors
-game_lib.ui game_lib.board game_lib.cell game_lib.loop game.loop ui.gestures ui.gadgets opengl opengl.textures
-images.loader prettyprint ;
+game_lib.ui game_lib.board game_lib.cell-object game_lib.loop game.loop ui.gestures ui.gadgets opengl opengl.textures
+images.loader prettyprint layouts ;
 
 IN: sokoban2
 
@@ -11,8 +10,8 @@ CONSTANT: goal "vocab:sokoban2/resources/Goal.png"
 CONSTANT: light-crate "vocab:sokoban2/resources/Crate_Yellow.png"
 CONSTANT: dark-crate "vocab:sokoban2/resources/CrateDark_Yellow.png"
 
-TUPLE: crate-cell < cell image-path ;
-M: crate-cell draw-cell* 
+TUPLE: crate-cell < cell-object image-path ;
+M: crate-cell draw-cell-object* 
     rot [ image-path>> load-image ] dip <texture> draw-scaled-texture ;
 
 SYMBOL: level 
@@ -48,16 +47,17 @@ SYMBOL: level
     { 
 
         { 1 6 } { 3 2 } { 4 3 } { 4 4 } { 4 6 } { 3 6 } { 5 6 }
-    } light-crate make-crate add-copy-to-cells ;
+    } light-crate make-crate add-to-cells ;
 
 : board-one-fg ( -- board )
     ! just to showcase stackable boards
     8 9 make-board
 
-    { { 5 2 } { 5 1 } } COLOR: blue add-to-cells ;
+    ! { { 5 2 } { 5 1 } } COLOR: blue add-to-cells 
+    ;
 
 : board-one ( gadget -- gadget )
-    board-one-bg board-one-fg { } 2sequence create-board ;
+    board-one-bg board-one-fg { } 2sequence add-board ;
 
 : board-two ( gadget -- gadget )
     22 11 make-board
@@ -90,7 +90,7 @@ SYMBOL: level
 
     { } 1sequence 
 
-    create-board ;
+    add-board ;
 
 : board ( -- seq )
     { [ board-one ] [ board-two ] } ;
@@ -146,7 +146,7 @@ SYMBOL: level
     T{ key-down f f "DOWN" } [ board>> first DOWN sokoban-move ] new-gesture
     T{ key-down f f "RIGHT" } [ board>> first RIGHT sokoban-move ] new-gesture
     T{ key-down f f "LEFT" } [ board>> first LEFT sokoban-move ] new-gesture ;
-    ! T{ key-down f f "n" } [ dup board>> first reset-board { 700 800 } init-window level get-global board nth call( gadget -- gadget ) ] new-gesture ;
+    ! T{ key-down f f "n" } [ dup board>> first reset-board { 700 800 } init-board-gadget level get-global board nth call( gadget -- gadget ) ] new-gesture ;
 
 TUPLE: game-state gadget ;
 
@@ -157,9 +157,6 @@ TUPLE: game-state gadget ;
 
 : create-loop ( game-state -- )
     10000000 swap new-game-loop start-loop ;
-
-! : tick-update ( game-state -- )
-!     gadget>> relayout ;
 
 :: tick-update ( game-state -- )
     game-state gadget>> relayout
@@ -172,7 +169,7 @@ M: game-state draw* drop drop ;
 
 
 : main ( -- )
-    { 700 800 } init-window
+    { 700 800 } init-board-gadget
     ! Don't really like this sequence of quotes thing -- would be nicer if board 
     ! could be an array of like ascii that gets created here or something
     ! level get-global board nth call( gadget -- gadget )

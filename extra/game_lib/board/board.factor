@@ -1,8 +1,11 @@
-USING: assocs classes sequences sequences.generalizations sets kernel accessors sequences.extras ranges math.vectors generalizations strings prettyprint game_lib.loop classes ;
+USING: assocs classes sequences sequences.generalizations math timers sets kernel 
+accessors sequences.extras ranges math.vectors generalizations strings prettyprint 
+game_lib.loop ui.gadgets ;
 
 IN: game_lib.board
 
 TUPLE: board width height cells ;
+
 
 CONSTANT: UP { 0 -1 } 
 CONSTANT: DOWN { 0 1 } 
@@ -29,9 +32,6 @@ CONSTANT: LEFT { -1 0 }
 ! Gets all cells in locations array and return as a sequence
 :: get-cells ( board locations -- seq )
     locations [ board swap get-cell ] map ;
-
-! :: get-from-cell ( cell object -- i object )
-    ! [ object = ] find ;
 
 :: get-instance-from-cell ( cell class -- object )
     cell [ class instance? ] find swap drop ;
@@ -79,10 +79,10 @@ CONSTANT: LEFT { -1 0 }
 
 ! Adds an object to all the given locations to new-cell 
 :: add-to-cells ( board locations obj -- board )
-    locations [ board swap obj add-to-cell drop ] each
+    locations [ board swap obj clone add-to-cell drop ] each
     board ;
 
-! Adds an object to all the given locations to new-cell 
+! Adds a copy of an object to all the given locations to new-cell
 :: add-copy-to-cells ( board locations obj -- board )
     locations [ board swap obj clone add-to-cell drop ] each
     board ;
@@ -145,15 +145,28 @@ CONSTANT: LEFT { -1 0 }
 :: duplicate-cell ( board start dest -- board )
     board dup start get-cell dest swap set-cell ;
 
-! Moves an entire cell to a new destination, leaving the original cell empty
+! Moves an entire cell if it can be moved to a new destination, leaving the original cell empty
 :: move-entire-cell ( board start dest -- board )
-    board start dest duplicate-cell
-    start delete-cell ;
+    ! bound checking
+    { start dest } [ first board width>> < ] all? 
+    { start dest } [ second board height>> < ] all? and
+    start [ 0 >= ] all? and 
+    dest [ 0 >= ] all? and 
+    ! move cell
+    [ board start dest duplicate-cell
+    start delete-cell drop ] when 
+    board ;
 
 ! Move an object from a cell, relative to its original cell
 :: move-object ( board object-pos move object -- board )
-    board object-pos object delete-from-cell
-    object-pos move v+ object add-to-cell ;
+    object-pos move v+ :> dest
+    { object-pos dest } [ first board width>> < ] all? 
+    { object-pos dest } [ second board height>> < ] all? and
+    object-pos [ 0 >= ] all? and 
+    dest [ 0 >= ] all? and 
+    [ board object-pos object delete-from-cell
+    dest object add-to-cell drop ] when
+    board ;
 
 ! Move a specified object in many cells to different locations
 :: move-objects ( board start dest object -- board )
@@ -195,10 +208,6 @@ CONSTANT: LEFT { -1 0 }
     board quot find-row swap :> y
     [ quot find drop ] find swap :> x
     { x y } swap ; inline
-
-! checks quote in arrays as well, output location of first match 
-! :: deep-find-cell ( board quot: ( -- ) -- seq ) 
-
 
 ! Return first cell that satisfies the quot
 :: find-cell-nopos ( board quot -- cell )
