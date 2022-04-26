@@ -59,4 +59,3 @@ TUPLE: parent children function ;
     parent children>> :> children
     parent children [ move v+ ] map >>children drop
     board children children [ move v+ ] map board children first get-cell move-many-objects ;
-

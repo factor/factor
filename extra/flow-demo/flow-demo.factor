@@ -20,9 +20,9 @@ M: crate-cell draw-cell-object*
 : board-one ( gadget -- gadget )
     8 9 make-board
 
-    { { 2 1 } } light-crate make-crate RIGHT 1000 set-flow add-to-cells 
-    { { 1 1 } } light-crate make-crate DOWN 100 set-flow add-to-cells
-    { { 5 1 } } light-crate make-crate DOWN 10 set-flow add-to-cells 
+    { { 1 1 } } light-crate make-crate RIGHT 220 set-flow add-to-cells 
+    { { 3 1 } } light-crate make-crate DOWN 75 set-flow add-to-cells
+    { { 5 1 } } light-crate make-crate DOWN 20 set-flow add-to-cells 
     { } 1sequence add-board ;
 
 ! -------------------- Game loop --------------------------------------------------
@@ -38,16 +38,16 @@ TUPLE: game-state gadget ;
     10000000 swap new-game-loop start-loop ;
 
 ! Updates a crate-cell's location if a target number of frames have passed, otherwise it updates the counter
-:: update-location ( board loc flowcell -- )
-    flowcell flow-on?
+:: update-location ( board loc flowcell-object -- )
+    flowcell-object flow-on?
     [
-        flowcell flow>> :> flow-obj
+        flowcell-object flow>> :> flow-obj
         flow-obj target>> :> target
         flow-obj counter>> 1 + :> counter
         counter target =
         [
             flow-obj direction>> :> direction
-            board loc direction flowcell move-object drop
+            board loc direction flowcell-object move-object drop
             flow-obj 0 >>counter drop
 
         ]
@@ -55,7 +55,7 @@ TUPLE: game-state gadget ;
             flow-obj counter >>counter drop
         ]
         if
-        flowcell flow-obj >>flow drop
+        flowcell-object flow-obj >>flow drop
     ] when ;
 
 ! Takes in a cell object and updates its location based on its flow if the cell object is a crate-cell
