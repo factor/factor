@@ -18,7 +18,7 @@ IN: sokoban.gl
     piece piece-blocks [ piece path>> draw-sprite ] each ;
 
 : draw-piece ( piece -- )
-    dup tetromino>> color>> gl-color draw-piece-blocks ;
+    dup layout>> color>> gl-color draw-piece-blocks ;
 
 : draw-goal ( block -- )
     { 0.38 0.38 } v+ { 0.24 0.24 } gl-fill-rect ;
@@ -28,7 +28,7 @@ IN: sokoban.gl
     wall-blocks [ draw-goal ] each ;
 
 : draw-goal-piece ( piece -- )
-    dup tetromino>> color>> gl-color draw-goal-blocks ;
+    dup layout>> color>> gl-color draw-goal-blocks ;
 
 ! TODO: move implementation specific stuff into sokoban-board
 : (draw-row) ( x y row -- )

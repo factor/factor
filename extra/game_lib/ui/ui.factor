@@ -69,7 +69,7 @@ TUPLE: board-gadget < gadget dimension bg-color draw-quotes board gests textures
         { [ display-cell cell-object instance? ] [ loc dim display-cell draw-cell-object* ] }
         { [ display-cell string? ] [ dim { display-cell loc } gadget textures>> [ first load-image loc <texture> ] cache draw-scaled-texture ] }
         { [ display-cell color? ] [ display-cell gl-color loc dim gl-fill-rect ] }
-        { [ display-cell quotation? ] [ display-cell call( -- ) ] }
+        { [ display-cell quotation? ] [ loc dim display-cell 2curry call( -- ) ] }
         { [ display-cell array? ] [ display-cell [ loc dim gadget draw-single ] each ] }
         [ ]
     } cond ;
@@ -114,8 +114,11 @@ TUPLE: board-gadget < gadget dimension bg-color draw-quotes board gests textures
 : check-rules ( gadget -- ? )
     rules>> t? ;
 
+: set-dim ( gadget dim -- gadget )
+    >>dimension ;
+
 : get-dim ( gadget -- dim )
-    dim>> ;
+    dimension>> ;
 
 :: hand-rel-cell ( gadget -- cellpos )
     gadget hand-rel first2 :> ( w h )
@@ -147,14 +150,14 @@ M: board-gadget draw-gadget*
 M: board-gadget ungraft*
     [
         dup find-gl-context [ values dispose-each H{ } clone ] change-textures drop
-        ! stop-game
+        stop-game
     ] [ call-next-method ] bi ; 
 
 TUPLE: window-gadget < track focusable-child-number ;
 
-:: <window> ( board-gadgets orientation fsn -- gadget )
+:: <window> ( board-gadgets orientation fsn constraint -- gadget )
     orientation window-gadget new-track 
     fsn >>focusable-child-number
-    board-gadgets [ f track-add ] each ;
+    board-gadgets [ constraint track-add ] each ;
 
 M: window-gadget focusable-child* dup children>> swap focusable-child-number>> swap nth ;

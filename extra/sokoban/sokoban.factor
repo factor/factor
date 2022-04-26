@@ -1,7 +1,7 @@
 ! Copyright (C) 2006, 2007, 2008 Alex Chapman
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors timers arrays calendar destructors kernel make math math.rectangles
-math.parser namespaces sequences system sokoban.game sokoban.tetromino sokoban.gl sokoban.sound ui.gadgets
+math.parser namespaces sequences system sokoban.game sokoban.layout sokoban.gl sokoban.sound ui.gadgets
 ui.gadgets.labels ui.gadgets.worlds ui.gadgets.status-bar ui.gestures
 ui.render ui ;
 IN: sokoban
@@ -13,7 +13,7 @@ TUPLE: sokoban-gadget < gadget { sokoban sokoban } { timer } { window-dims array
     sokoban-gadget new swap >>sokoban ;
 
 :: get-dim ( sokoban level -- level w h )
-    ! Look for maximum height and width of wall tetromino to determine size of board
+    ! Look for maximum height and width of wall layout to determine size of board
     level component get first states>> nth :> new_board
     level
     new_board [ first ] map supremum 1 +
