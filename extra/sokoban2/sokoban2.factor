@@ -10,7 +10,7 @@ CONSTANT: goal "vocab:sokoban2/resources/Goal.png"
 CONSTANT: light-crate "vocab:sokoban2/resources/Crate_Yellow.png"
 CONSTANT: dark-crate "vocab:sokoban2/resources/CrateDark_Yellow.png"
 
-TUPLE: crate-cell < flowcell-object image-path ;
+TUPLE: crate-cell < cell-object image-path ;
 M: crate-cell draw-cell-object* 
     rot [ image-path>> load-image ] dip <texture> draw-scaled-texture ;
 
@@ -19,7 +19,7 @@ SYMBOL: level
 
 :: make-crate ( image-path -- crate )
     crate-cell new
-    f image-path crate-cell boa ;
+    image-path crate-cell boa ;
 
 : board-one-bg ( -- board )
     8 9 make-board
