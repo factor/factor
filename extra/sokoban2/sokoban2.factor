@@ -1,6 +1,6 @@
-
-USING: accessors combinators game_lib.board game_lib.ui kernel
-math.vectors sequences sokoban2.layouts sokoban2.loop ui.gestures ;
+USING: literals kernel namespaces accessors sequences combinators math.vectors colors
+game_lib.ui game_lib.board game_lib.cell-object game_lib.loop game.loop ui.gestures ui.gadgets opengl opengl.textures
+images.loader prettyprint layouts sokoban2.layouts sokoban2.loop ;
 IN: sokoban2
 
 CONSTANT: player "vocab:sokoban2/resources/CharR.png"
