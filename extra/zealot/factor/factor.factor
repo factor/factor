@@ -1,23 +1,40 @@
 ! Copyright (C) 2017 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs bootstrap.image calendar cli.git
-combinators concurrency.combinators environment formatting
-http.client io io.directories io.launcher io.pathnames kernel
-math.parser memory modern.paths namespaces parser.notes
-prettyprint sequences sequences.extras sets splitting system
-system-info threads tools.test tools.test.private vocabs
-vocabs.hierarchy vocabs.hierarchy.private vocabs.loader
-vocabs.metadata zealot ;
+combinators combinators.short-circuit concurrency.combinators
+environment formatting http.client io io.directories io.launcher
+io.pathnames kernel math.parser memory modern.paths namespaces
+parser.notes prettyprint regexp.classes sequences
+sequences.extras sets splitting system system-info threads
+tools.test tools.test.private vocabs vocabs.hierarchy
+vocabs.hierarchy.private vocabs.loader vocabs.metadata zealot ;
 IN: zealot.factor
 
-: download-boot-checksums ( path branch -- )
+: git-checksum? ( str -- ? )
+    { [ length 40 = ] [ [ hex-digit? ] all? ] } 1&& ;
+
+: download-boot-checksum-branch ( path branch -- )
     '[ _ "https://downloads.factorcode.org/images/%s/checksums.txt" sprintf download ] with-directory ;
 
-: download-boot-image ( path branch image-name -- )
-    '[ _ _ "https://downloads.factorcode.org/images/%s/%s" sprintf download ] with-directory ;
+: download-boot-checksum-git-checksum ( path checksum -- )
+    '[ _ "https://downloads.factorcode.org/images/build/checksums.txt.%s" sprintf download ] with-directory ;
 
-: download-my-boot-image ( path branch -- )
-    my-boot-image-name download-boot-image ;
+: download-boot-checksums ( path branch/checksum -- )
+    dup git-checksum?
+    [ download-boot-checksum-git-checksum ]
+    [ download-boot-checksum-branch ] if ;
+
+: download-boot-image ( path url -- )
+    '[ _  download ] with-directory ;
+
+: arch-git-boot-image-path ( arch git-id -- str )
+    "https://downloads.factorcode.org/images/build/boot.%s.image.%s" sprintf ;
+
+: download-my-boot-image ( path branch/checksum -- )
+    dup git-checksum?
+    [ [ my-arch-name ] dip arch-git-boot-image-path ]
+    [ my-boot-image-name "https://downloads.factorcode.org/images/%s/%s" sprintf ] if
+    download-boot-image ;
 
 HOOK: compile-factor-command os ( -- array )
 M: unix compile-factor-command ( -- array )
@@ -153,7 +170,7 @@ M: windows factor-path "./factor.com" ;
         [ try-process ] parallel-each
     ] with-directory ;
 
-: build-new-factor ( branch -- )
+: build-new-factor ( branch/checksum -- )
     "factor" "factor" zealot-github-ensure drop
 
     [ "factor" "factor" zealot-github-clone-paths nip ] dip
@@ -161,7 +178,7 @@ M: windows factor-path "./factor.com" ;
     {
         [ drop "factor" "factor" zealot-github-add-build-remote drop ]
         [ drop [ git-fetch-all* ] with-directory drop ]
-        [ zealot-build-checkout-branch drop ]
+        [ zealot-build-checkout drop ]
         [ "ZEALOT DOWNLOADING BOOT IMAGE" print flush download-my-boot-image ]
         [ "ZEALOT DOWNLOADING CHECKSUMS" print flush download-boot-checksums ]
         [ "ZEALOT COMPILING" print flush drop compile-factor ]
