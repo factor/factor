@@ -73,5 +73,5 @@ IN: zealot
     [ zealot-github-builds-path ] 2bi
     [ git-clone-as ] keep ;
 
-: zealot-build-checkout-branch ( path branch -- process )
-    '[ _ git-checkout-existing-branch* ] with-directory ;
+: zealot-build-checkout ( path branch/checksum -- process )
+    '[ _ git-checkout-existing* ] with-directory ;
