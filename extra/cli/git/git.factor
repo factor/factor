@@ -22,8 +22,8 @@ cli-git-num-parallel [ cpus 2 * ] initialize
 : git-fetch-tags ( path -- process ) [ git-fetch-tags* ] with-directory ;
 : git-checkout-new-branch* ( branch -- process ) [ { "git" "checkout" "-b" } ] dip suffix run-process ;
 : git-checkout-new-branch ( path branch -- process ) '[ _ git-checkout-new-branch* ] with-directory ;
-: git-checkout-existing-branch* ( branch -- process ) [ { "git" "checkout" } ] dip suffix run-process ;
-: git-checkout-existing-branch ( path branch -- process ) '[ _ git-checkout-existing-branch* ] with-directory ;
+: git-checkout-existing* ( branch/checksum -- process ) [ { "git" "checkout" } ] dip suffix run-process ;
+: git-checkout-existing ( path branch/checksum -- process ) '[ _ git-checkout-existing* ] with-directory ;
 : git-change-remote* ( remote uri -- process ) [ { "git" "remote" "set-url" } ] 2dip 2array append run-process ;
 : git-change-remote ( path remote uri -- process ) '[ _ _ git-change-remote* ] with-directory ;
 : git-remote-add* ( remote uri -- process ) [ { "git" "remote" "add" } ] 2dip 2array append run-process ;
