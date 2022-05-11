@@ -23,7 +23,7 @@
 @media screen and (max-width: 600px) {
     #left {
         position: absolute;
-        margin-top: 35px;
+        margin-top: 32px;
         display: none;
     }
 
