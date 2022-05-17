@@ -82,3 +82,24 @@ a:hover, .link:hover { text-decoration: underline; }
 .big-field-label {
     vertical-align: top;
 }
+
+/* Dark mode */
+@media (prefers-color-scheme: dark) {
+    body {
+        background-color: #202124;
+        color: #bdc1c6;
+    }
+
+    a, .link {
+        color: #8ab4f8;
+    }
+
+    .page .navbar {
+        border-top: 1px solid #666;
+    }
+
+    .navbar {
+        background-color: #373e48;
+        border-bottom: 1px solid #666;
+    }
+}
