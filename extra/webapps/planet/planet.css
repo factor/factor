@@ -46,3 +46,14 @@ pre, code {
         margin-right: 0;
     }
 }
+
+/* Dark mode */
+@media (prefers-color-scheme: dark) {
+    .posting-title {
+        background-color: #373e48;
+    }
+
+    pre, code {
+        color: #bdc1c6;
+    }
+}
