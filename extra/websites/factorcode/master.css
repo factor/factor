@@ -121,3 +121,23 @@ li {
         max-width: 520px;
     }
 }
+
+/* Dark mode */
+@media (prefers-color-scheme: dark) {
+    body {
+        background-color: #202124;
+        color: #bdc1c6;
+    }
+
+    a {
+        color: #8ab4f8;
+    }
+
+    pre {
+        color: black;
+    }
+
+    .downloads a {
+        color: #2A5DB0;
+    }
+}
