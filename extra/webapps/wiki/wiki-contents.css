@@ -35,3 +35,16 @@
         display: inline;
     }
 }
+
+
+/* Dark mode */
+@media (prefers-color-scheme: dark) {
+    .navbar img {
+        filter: invert(80%);
+    }
+
+    #left {
+        background-color: #373e48;
+        border-right: 1px solid #666;
+    }
+}
