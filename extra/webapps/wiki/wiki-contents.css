@@ -47,4 +47,8 @@
         background-color: #373e48;
         border-right: 1px solid #666;
     }
+
+    .description pre {
+        color: black;
+    }
 }
