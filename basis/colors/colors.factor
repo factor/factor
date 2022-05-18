@@ -42,12 +42,12 @@ CONSTANT: transparent T{ rgba f 0.0 0.0 0.0 0.0 }
 
 <PRIVATE
 
-: parse-color ( line -- name color )
+: line-color ( line -- name color )
     first4 [ [ string>number 255 /f ] tri@ 1.0 <rgba> ] dip swap ;
 
-: parse-colors ( lines -- assoc )
+: line-colors ( lines -- assoc )
     [ "!" head? ] reject [
-        [ blank? ] split-when harvest 3 cut "-" join suffix parse-color
+        [ blank? ] split-when harvest 3 cut "-" join suffix line-color
     ] H{ } map>assoc ;
 
 MEMO: colors ( -- assoc )
@@ -57,7 +57,7 @@ MEMO: colors ( -- assoc )
         "resource:basis/colors/factor-colors.txt"
         "resource:basis/colors/solarized-colors.txt"
     } [
-        utf8 file-lines parse-colors
+        utf8 file-lines line-colors
     ] [ assoc-union ] map-reduce ;
 
 ERROR: invalid-hex-color hex ;
