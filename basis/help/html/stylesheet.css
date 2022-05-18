@@ -94,3 +94,33 @@ tr:hover {
 @media screen and (max-width: 600px) {
 
 }
+
+/* Dark mode */
+@media (prefers-color-scheme: dark) {
+    body {
+        background-color: #202124;
+        color: #bdc1c6;
+    }
+
+    a {
+        color: #8ab4f8;
+    }
+
+    .navbar {
+        background-color: #373e48;
+        border-bottom: 1px solid #666;
+    }
+
+    .footer {
+        border-top: 1px dashed #666;
+        color: #999;
+    }
+
+    input {
+        border: 1px solid #666;
+    }
+
+    tr:hover {
+        background-color: #373e48;
+    }
+}
