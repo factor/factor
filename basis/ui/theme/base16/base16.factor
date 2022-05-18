@@ -9,7 +9,7 @@ base16-theme-name [ "greenscreen" ] initialize
 
 MEMO: base16colors ( name -- assoc )
     "vocab:ui/theme/base16/base16-" swap ".txt" 3append
-    utf8 file-lines parse-colors ;
+    utf8 file-lines line-colors ;
 
 : named-base16 ( name -- color )
     dup base16-theme-name get base16colors at [ ] [ no-such-color ] ?if ;
