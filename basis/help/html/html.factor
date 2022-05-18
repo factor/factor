@@ -149,7 +149,7 @@ M: pathname url-of
         " border-bottom: 1px dashed #ccc; width: 100%; padding-top: 15px; padding-bottom: 10px; }"
         append swap pick set-nth {
             ".a a { color: black; font-size: 24pt; line-height: 100%; }"
-            ".a * a { color: #2A5DB0; font-size: 12pt; }"
+            ".a * a { color: #2a5db0; font-size: 12pt; }"
             ".a td { border: none; }"
             ".a tr:hover { background-color: white; }"
         } prepend
@@ -161,13 +161,12 @@ M: pathname url-of
         R/ {[^}]+}/ [
             >string R/ #[0-9a-fA-F]+;/ [
                 >string H{
-                    { "#2A5DB0;" "#8ab4f8;" }
-                    { "#333333;" "#cccccc;" }
                     { "#000000;" "#bdc1c6;" }
                     { "#2a5db0;" "#8ab4f8;" }
+                    { "#333333;" "#cccccc;" }
                     { "#373e48;" "#ffffff;" }
-                    { "#e3e2db;" "#666666;" }
                     { "#8b4500;" "orange;" }
+                    { "#e3e2db;" "#666666;" }
                 } ?at [
                     but-last colors:parse-color inverse-color color>hex ";" append
                 ] unless
