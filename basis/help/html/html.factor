@@ -155,10 +155,35 @@ M: pathname url-of
         } prepend
     ] [ drop ] if* ;
 
+: fix-dark-mode ( classes -- classes )
+    { "/* Dark mode */" "@media (prefers-color-scheme:dark) {" }
+    over [
+        R/ {[^}]+}/ [
+            >string R/ #[0-9a-fA-F]+;/ [
+                >string H{
+                    { "#2A5DB0;" "#8ab4f8;" }
+                    { "#333333;" "#cccccc;" }
+                    { "#000000;" "#bdc1c6;" }
+                    { "#2a5db0;" "#8ab4f8;" }
+                    { "#373e48;" "#ffffff;" }
+                    { "#e3e2db;" "#666666;" }
+                    { "#8b4500;" "orange;" }
+                } ?at [
+                    but-last colors:parse-color inverse-color color>hex ";" append
+                ] unless
+            ] re-replace-with
+
+            H{
+                { "white;" "#202124;" }
+                { "black;" "white;" }
+            } [ splitting:replace ] assoc-each
+        ] re-replace-with "    " prepend
+    ] map 3append "}" suffix ;
+
 : css-classes ( classes -- stylesheet )
     [
         [ fix-css-style " { " "}" surround ] [ "." prepend ] bi* prepend
-    ] { } assoc>map fix-help-header join-lines ;
+    ] { } assoc>map fix-help-header fix-dark-mode join-lines ;
 
 :: css-styles-to-classes ( body -- stylesheet body )
     H{ } clone :> classes
