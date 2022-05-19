@@ -90,6 +90,10 @@ a:hover, .link:hover { text-decoration: underline; }
         color: #bdc1c6;
     }
 
+    title, h1, h2, h3, h4, h5, h6 {
+        color: white;
+    }
+
     a, .link {
         color: #8ab4f8;
     }
