@@ -31,3 +31,9 @@ table tr:hover {
     }
 }
 
+@media (prefers-color-scheme: dark) {
+
+    table tr:hover {
+        background-color: #373e48;
+    }
+}
