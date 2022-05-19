@@ -160,25 +160,28 @@ M: pathname url-of
     { "/* Dark mode */" "@media (prefers-color-scheme:dark) {" }
     over [
         R/ {[^}]+}/ [
-            >string R/ #[0-9a-fA-F]+;/ [
-                >string H{
-                    { "#000000;" "#bdc1c6;" }
-                    { "#2a5db0;" "#8ab4f8;" }
-                    { "#333333;" "#cccccc;" }
-                    { "#373e48;" "#ffffff;" }
-                    { "#8b4500;" "orange;" }
-                    { "#e3e2db;" "#666666;" }
-                } ?at [
-                    but-last parse-color inverse-color color>hex ";" append
-                ] unless
-            ] re-replace-with
-
-            H{
-                { "white;" "#202124;" }
-                { "black;" "white;" }
-            } [ splitting:replace ] assoc-each
+            "{" ?head drop "}" ?tail drop ";" split
+            [ [ blank? ] trim ] map harvest [ ";" append ] map
+            [ R/ (#[0-9a-fA-F]+|white|black);/ re-contains? ] filter
+            [
+                R/ (#[0-9a-fA-F]+|white|black);/ [
+                    >string H{
+                        { "#000000;" "#bdc1c6;" }
+                        { "#2a5db0;" "#8ab4f8;" }
+                        { "#333333;" "#cccccc;" }
+                        { "#373e48;" "#ffffff;" }
+                        { "#8b4500;" "orange;" }
+                        { "#e3e2db;" "#666666;" }
+                        { "white;" "#202124;" }
+                        { "black;" "white;" }
+                    } ?at [
+                        but-last parse-color inverse-color color>hex ";" append
+                    ] unless
+                ] re-replace-with
+            ] map " " join "{ " " }" surround
         ] re-replace-with "    " prepend
-    ] map 3append "}" suffix ;
+        "{  }" over subseq? [ drop f ] when
+    ] map harvest 3append "}" suffix ;
 
 : css-classes ( classes -- stylesheet )
     [
