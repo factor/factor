@@ -4,8 +4,9 @@
 USING: accessors arrays ascii assocs calendar calendar.format
 classes.tuple combinators command-line continuations csv
 formatting grouping http.client io io.encodings.ascii io.files
-io.styles kernel math math.extras math.parser namespaces regexp
-sequences sorting.human splitting strings urls wrap.strings ;
+io.styles kernel math math.extras math.functions math.parser
+namespaces regexp sequences sorting.human splitting strings urls
+wrap.strings ;
 
 IN: metar
 
@@ -210,6 +211,7 @@ CONSTANT: compass-directions H{
         [ parse-direction ] dip {
             { [ "KT" ?tail ] [ "knots" ] }
             { [ "MPS" ?tail ] [ "meters per second" ] }
+            [ "knots" ]
         } cond [ "G" split1 ] dip '[ _ parse-speed ] bi@
         [ "%s at %s with gusts to %s " sprintf ]
         [ "%s at %s" sprintf ] if*
@@ -616,6 +618,13 @@ CONSTANT: re-recent-weather R/ ((\w{2})?[BE]\d{2,4}((\w{2})?[BE]\d{2,4})?)+/
         [ @ [ 65 wrap-string write ] when* ] with-cell
     ] with-row ; inline
 
+: calc-humidity ( report -- humidity/f )
+    [ dew-point>> ] [ temperature>> ] bi 2dup and [
+        [ " " split1 drop string>number ] bi@
+        [ [ 17.625 * ] [ 243.04 + ] bi / e^ ] bi@ / 100 *
+        round "%d%%" sprintf
+    ] [ 2drop f ] if ;
+
 : metar-report. ( report -- )
     standard-table-style [
         {
@@ -629,6 +638,7 @@ CONSTANT: re-recent-weather R/ ((\w{2})?[BE]\d{2,4}((\w{2})?[BE]\d{2,4})?)+/
             [ "Temperature" [ temperature>> ] row. ]
             [ "Dew point" [ dew-point>> ] row. ]
             [ "Altimeter" [ altimeter>> ] row. ]
+            [ "Humidity" [ calc-humidity ] row. ]
             [ "Remarks" [ remarks>> ] row. ]
             [ "Raw Text" [ raw>> ] row. ]
         } cleave
