@@ -2,11 +2,11 @@
 ! See http://factorcode.org/license.txt for BSD license
 
 USING: accessors arrays assocs destructors formatting io
-io.streams.string io.styles kernel math math.functions
-math.vectors namespaces sequences strings strings.tables ;
+io.streams.escape-codes io.streams.string io.styles kernel math
+math.functions math.vectors namespaces sequences strings
+strings.tables ;
 
 IN: io.streams.ansi
-
 <PRIVATE
 
 CONSTANT: colors H{
@@ -46,13 +46,6 @@ CONSTANT: colors H{
 
 : color>background ( color -- string )
     color>ansi [ 40 + ] [ "m" ";1m" ? ] bi* "\e[%d%s" sprintf ;
-
-: font-styles ( font-style -- string )
-    H{
-        { bold "\e[1m" }
-        { italic "\e[3m" }
-        { bold-italic "\e[1m\e[3m" }
-    } at "" or ;
 
 TUPLE: ansi < filter-writer ;
 
