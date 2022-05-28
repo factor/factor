@@ -114,6 +114,9 @@ SYMBOL: plain
 SYMBOL: bold
 SYMBOL: italic
 SYMBOL: bold-italic
+SYMBOL: faint
+SYMBOL: underline
+SYMBOL: blink
 
 ! Character styles
 SYMBOL: foreground
