@@ -89,7 +89,7 @@ C: <dquote> dquote
     } case ;
 
 : read-prop ( n string -- n' string prop/f closing/f )
-    skip-whitespace "\s\n\r\"'<=/>?" slice-til-either {
+    skip-whitespace "\s\n\r\t\"'<=/>?" slice-til-either {
         { CHAR: < [ "< error" throw ] }
         { CHAR: = [ 1 split-slice-back drop >string [ read-value ] dip swap 2array f ] }
         { CHAR: / [ ">" expect-and-span 2 split-slice-back [ >string f like ] bi@ ] }
@@ -100,6 +100,7 @@ C: <dquote> dquote
         { CHAR: \s [ >string f ] }
         { CHAR: \r [ >string f ] }
         { CHAR: \n [ >string f ] }
+        { CHAR: \t [ >string f ] }
         { f [ "efff" throw ] }
     } case ;
 
