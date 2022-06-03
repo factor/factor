@@ -75,3 +75,114 @@ IN: modern.html.tests
 {
     V{ T{ comment { open "<!--" } { payload " comment " } { close "-->" } } }
 } [ [[ <!-- comment --> ]] string>html ] unit-test
+
+! From wikipedia factor article
+! https://en.wikipedia.org/w/index.php?title=Factor_(programming_language)&offset=&limit=500&action=history"
+{
+    V{
+        T{ doctype
+            { open "<!DOCTYPE" }
+            { close ">" }
+            { values V{ "html" } }
+        }
+        T{ open-tag
+            { open "<" }
+            { name "html" }
+            { props
+                V{
+                    {
+                        "class"
+                        T{ dquote { payload "client-nojs" } }
+                    }
+                    { "lang" T{ dquote { payload "en" } } }
+                    { "dir" T{ dquote { payload "ltr" } } }
+                }
+            }
+            { close ">" }
+            { children
+                V{
+                    T{ open-tag
+                        { open "<" }
+                        { name "head" }
+                        { props V{ } }
+                        { close ">" }
+                        { children
+                            V{
+                                T{ open-tag
+                                    { open "<" }
+                                    { name "title" }
+                                    { props V{ } }
+                                    { close ">" }
+                                    { children V{ "omg" } }
+                                    { close-tag
+                                        T{ close-tag
+                                            { name "title" }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                        { close-tag T{ close-tag { name "head" } } }
+                    }
+                    T{ open-tag
+                        { open "<" }
+                        { name "body" }
+                        { props V{ } }
+                        { close ">" }
+                        { children
+                            V{
+                                T{ open-tag
+                                    { open "<" }
+                                    { name "div" }
+                                    { props
+                                        V{
+                                            {
+                                                "id"
+                                                T{ squote
+                                                    { payload
+                                                        "ooui-php-6"
+                                                    }
+                                                }
+                                            }
+                                            {
+                                                "data-ooui"
+                                                T{ squote
+                                                    { payload
+                                                        "{\"_\":\"mw.htmlform.FieldLayout\",\"fieldWidget\":{\"tag\":\"tagfilter\"},\"align\":\"top\",\"helpInline\":true,\"$overlay\":true,\"label\":{\"html\":\"&lt;a href=\\\"\\/wiki\\/Special:Tags\\\" title=\\\"Special:Tags\\\"&gt;Tag&lt;\\/a&gt; filter:\"},\"classes\":[\"mw-htmlform-field-HTMLTagFilter\",\"mw-htmlform-autoinfuse\"]}"
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                    { close ">" }
+                                    { children V{ } }
+                                    { close-tag
+                                        T{ close-tag
+                                            { name "div" }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                        { close-tag T{ close-tag { name "body" } } }
+                    }
+                }
+            }
+            { close-tag T{ close-tag { name "html" } } }
+        }
+    }
+} [
+    [[
+    <!DOCTYPE html>
+    <html class="client-nojs" lang="en" dir="ltr">
+
+    <head> <title>omg</title></head>
+    <body>
+    <div id='ooui-php-6'
+    data-ooui='{"_":"mw.htmlform.FieldLayout","fieldWidget":{"tag":"tagfilter"},"align":"top","helpInline":true,"$overlay":true,"label":{"html":"&lt;a href=\"\/wiki\/Special:Tags\" title=\"Special:Tags\"&gt;Tag&lt;\/a&gt; filter:"},"classes":["mw-htmlform-field-HTMLTagFilter","mw-htmlform-autoinfuse"]}'
+    >
+    </div>
+    </body>
+    </html>
+    ]] string>html
+] unit-test
