@@ -240,3 +240,13 @@ M: string write-html % ;
 
 : html>string ( sequence -- string )
     [ [ write-html ] each ] "" make ;
+
+GENERIC#: walk-html 1 ( seq/tag quot -- )
+
+M: sequence walk-html [ walk-html ] curry each ;
+M: string walk-html call( obj -- ) ;
+M: doctype walk-html call( obj -- ) ;
+M: processing-instruction walk-html call( obj -- ) ;
+M: open-tag walk-html [ call( obj -- ) ] 2keep [ children>> ] dip [ walk-html ] curry each ;
+M: self-close-tag walk-html [ call( obj -- ) ] 2keep [ children>> ] dip [ walk-html ] curry each ;
+M: comment walk-html call( obj -- ) ;
