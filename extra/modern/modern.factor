@@ -109,19 +109,19 @@ MACRO:: read-matched ( ch -- quot: ( n string tag -- n' string slice' ) )
 : read-bracket ( n string slice -- n' string slice' ) CHAR: [ read-matched ;
 : read-brace ( n string slice -- n' string slice' ) CHAR: { read-matched ;
 : read-paren ( n string slice -- n' string slice' ) CHAR: ( read-matched ;
-: read-string-payload ( n string -- n' string )
+: read-dquote-payload ( n string -- n' string )
     over [
         { CHAR: \\ CHAR: \" } slice-til-separator-inclusive {
             { f [ drop ] }
             { CHAR: \" [ drop ] }
-            { CHAR: \\ [ drop next-char-from drop read-string-payload ] }
+            { CHAR: \\ [ drop next-char-from drop read-dquote-payload ] }
         } case
     ] [
         string-expected-got-eof
     ] if ;
 
 :: read-string ( n string tag -- n' string seq )
-    n string read-string-payload drop :> n'
+    n string read-dquote-payload drop :> n'
     n' string
     n' [ n string string-expected-got-eof ] unless
     n n' 1 - string <slice>

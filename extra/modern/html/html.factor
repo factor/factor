@@ -57,23 +57,12 @@ C: <squote> squote
 TUPLE: dquote payload ;
 C: <dquote> dquote
 
-: read-squote-string-payload ( n string -- n' string )
+: read-squote-payload ( n string -- n' string )
     over [
         { CHAR: \\ CHAR: ' } slice-til-separator-inclusive {
             { f [ drop ] }
             { CHAR: ' [ drop ] }
-            { CHAR: \\ [ drop next-char-from drop read-string-payload ] }
-        } case
-    ] [
-        string-expected-got-eof
-    ] if ;
-
-: read-dquote-string-payload ( n string -- n' string )
-    over [
-        { CHAR: \\ CHAR: \" } slice-til-separator-inclusive {
-            { f [ drop ] }
-            { CHAR: \" [ drop ] }
-            { CHAR: \\ [ drop next-char-from drop read-string-payload ] }
+            { CHAR: \\ [ drop next-char-from drop read-squote-payload ] }
         } case
     ] [
         string-expected-got-eof
@@ -81,8 +70,8 @@ C: <dquote> dquote
 
 :: read-string ( $n $string $char -- n' string payload )
     $n $string $char CHAR: ' =
-    [ read-squote-string-payload ]
-    [ read-dquote-string-payload ] if drop :> $n'
+    [ read-squote-payload ]
+    [ read-dquote-payload ] if drop :> $n'
     $n' $string
     $n' [ $n $string string-expected-got-eof ] unless
     $n $n' 1 - $string <slice> ;
