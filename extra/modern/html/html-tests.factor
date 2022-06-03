@@ -186,3 +186,63 @@ IN: modern.html.tests
     </html>
     ]] string>html
 ] unit-test
+
+
+! Handle tabs
+{
+V{
+    T{ open-tag
+        { open "<" }
+        { name "label" }
+        { props
+            V{
+                {
+                    "id"
+                    T{ dquote { payload "p-personal-label" } }
+                }
+                {
+                    "class"
+                    T{ dquote
+                        { payload "vector-menu-heading " }
+                    }
+                }
+            }
+        }
+        { close ">" }
+        { children
+            V{
+                T{ open-tag
+                    { open "<" }
+                    { name "span" }
+                    { props
+                        V{
+                            {
+                                "class"
+                                T{ dquote
+                                    { payload
+                                        "vector-menu-heading-label"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    { close ">" }
+                    { children V{ "Personal tools" } }
+                    { close-tag T{ close-tag { name "span" } } }
+                }
+            }
+        }
+        { close-tag T{ close-tag { name "label" } } }
+    }
+}
+} [
+[[
+	<label
+		id="p-personal-label"
+		
+		class="vector-menu-heading "
+	>
+		<span class="vector-menu-heading-label">Personal tools</span>
+	</label>
+]] string>html
+] unit-test

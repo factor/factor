@@ -117,7 +117,7 @@ ERROR: expected-sequence-error expected actual ;
 
 :: slice-til-not-whitespace ( n string -- n' string slice/f ch/f )
     n [
-        n string [ "\s\r\n" member? not ] find-from :> ( n' ch )
+        n string [ "\s\r\n\t" member? not ] find-from :> ( n' ch )
         n' string
         n n' string ?<slice>
         ch
