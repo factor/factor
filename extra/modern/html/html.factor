@@ -1,8 +1,8 @@
 ! Copyright (C) 2021 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays combinators combinators.short-circuit
-generalizations kernel lexer make math modern modern.slices
-sequences sequences.extras shuffle splitting strings ;
+USING: accessors arrays assocs combinators
+combinators.short-circuit kernel make math modern modern.slices
+sequences sequences.extras shuffle splitting strings unicode ;
 IN: modern.html
 
 TUPLE: tag open name props close children ;
@@ -126,7 +126,7 @@ C: <dquote> dquote
         "--" expect-and-span >string
         [ "-->" slice-til-string [ >string ] bi@ ] dip -rot <comment>
     ] [
-        "DOCTYPE" expect-and-span
+        "DOCTYPE" expect-and-span-insensitive
         [ read-props ] dip
         -rot <doctype>
     ] if ;
@@ -251,3 +251,13 @@ M: processing-instruction walk-html call( obj -- ) ;
 M: open-tag walk-html [ call( obj -- ) ] 2keep [ children>> ] dip [ walk-html ] curry each ;
 M: self-close-tag walk-html [ call( obj -- ) ] 2keep [ children>> ] dip [ walk-html ] curry each ;
 M: comment walk-html call( obj -- ) ;
+
+: find-links ( seq -- links )
+    [
+        [
+            dup tag? [
+                props>> [ drop  >lower "href" = ] assoc-find
+                [ nip , ] [ 2drop ] if
+            ] [ drop ] if
+        ] walk-html
+    ] { } make [ payload>> ] map ;
