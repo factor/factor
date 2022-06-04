@@ -26,6 +26,9 @@ IN: modern.slices
         rest ">" append
     ] if ;
 
+: accept1 ( n string quot: ( ch -- ? ) -- n/n' string ch/f )
+    [ 2dup nth ] dip keep swap [ [ 1 + ] 2dip ] [ drop f ] if ; inline
+
 ERROR: unexpected-end n string ;
 : nth-check-eof ( n string -- nth )
     2dup ?nth [ 2nip ] [ unexpected-end ] if* ;
@@ -86,9 +89,16 @@ ERROR: expected-sequence-error expected actual ;
 : check-sequence ( expected actual -- actual/* )
     2dup sequence= [ nip ] [ expected-sequence-error ] if ;
 
+: check-sequence-insensitive ( expected actual -- actual/* )
+    2dup [ >lower ] bi@ sequence= [ nip ] [ expected-sequence-error ] if ;
+
 : expect-and-span ( n string slice expected-string -- n' string slice' )
     dup length '[ _ take-slice ] 2dip
     rot check-sequence span-slices ;
+
+: expect-and-span-insensitive ( n string slice expected-string -- n' string slice' )
+    dup length '[ _ take-slice ] 2dip
+    rot check-sequence-insensitive span-slices ;
 
 :: split-slice-back ( slice n -- slice1 slice2 )
     slice [ from>> ] [ to>> ] [ seq>> ] tri :> ( from to seq )
