@@ -15,6 +15,13 @@ TUPLE: processing-instruction open target props close ;
         swap >>target
         swap >>open ; inline
 
+TUPLE: embedded-language open payload close ;
+: <embedded-language> ( open payload close -- embedded-language )
+    embedded-language new
+        swap >>close
+        swap >>payload
+        swap >>open ; inline
+
 TUPLE: doctype open close values ;
 : <doctype> ( open values close -- doctype )
     doctype new
@@ -131,6 +138,13 @@ C: <dquote> dquote
         -rot <doctype>
     ] if ;
 
+: read-embedded-language ( n string opening -- n string embedded-language )
+    "%" expect-and-span >string
+    [ take-tag-name >string ] dip swap append
+    [ "%>" slice-til-string [ >string ] bi@ ] dip
+    -rot
+     <embedded-language> ;
+
 : read-open-tag ( n string opening -- n' string tag )
     [ take-tag-name ] dip
     [ read-props ] 2dip
@@ -179,6 +193,7 @@ ERROR: unmatched-closing-tag-error stack tag ;
                     ] }
                 { CHAR: ! [ read-doctype ] }
                 { CHAR: ? [ read-processing-instruction ] }
+                { CHAR: % [ read-embedded-language ] }
                 [ drop read-open-tag ]
             } case
         ] }
@@ -248,6 +263,7 @@ M: sequence walk-html [ walk-html ] curry each ;
 M: string walk-html call( obj -- ) ;
 M: doctype walk-html call( obj -- ) ;
 M: processing-instruction walk-html call( obj -- ) ;
+M: embedded-language walk-html call( obj -- ) ;
 M: open-tag walk-html [ call( obj -- ) ] 2keep [ children>> ] dip [ walk-html ] curry each ;
 M: self-close-tag walk-html [ call( obj -- ) ] 2keep [ children>> ] dip [ walk-html ] curry each ;
 M: comment walk-html call( obj -- ) ;
