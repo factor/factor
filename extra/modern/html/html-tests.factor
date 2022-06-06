@@ -246,3 +246,9 @@ V{
 	</label>
 ]] string>html
 ] unit-test
+
+! Ensure we can parse <%factor "hi" print %> embedded code
+{ t } [
+    "resource:extra/websites/factorcode/index.fhtml" utf8 file-contents
+    string>html [ [ dup embedded-language? [ , ] [ drop ] if ] walk-html ] { } make length 0 >
+] unit-test
