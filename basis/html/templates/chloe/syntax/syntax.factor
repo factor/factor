@@ -4,11 +4,11 @@ USING: accessors assocs kernel lexer namespaces parser sequences
 xml.data xml.syntax ;
 IN: html.templates.chloe.syntax
 
-SYMBOL: tags
+SYMBOL: chloe-tags
 
-tags [ H{ } clone ] initialize
+chloe-tags [ H{ } clone ] initialize
 
-: define-chloe-tag ( name quot -- ) swap tags get set-at ;
+: define-chloe-tag ( name quot -- ) swap chloe-tags get set-at ;
 
 SYNTAX: CHLOE:
     scan-token parse-definition define-chloe-tag ;
