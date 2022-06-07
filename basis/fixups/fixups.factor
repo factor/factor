@@ -41,6 +41,7 @@ CONSTANT: word-renames {
     { "iota" { "sequences:<iota>" ".98" } }
     { "git-checkout-existing-branch" { "git-checkout-existing" "0.99" } }
     { "git-checkout-existing-branch*" { "git-checkout-existing*" "0.99" } }
+    { "tags" { "chloe-tags" "0.99" } }
 }
 
 : compute-assoc-fixups ( continuation name assoc -- seq )
