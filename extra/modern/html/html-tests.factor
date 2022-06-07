@@ -1,6 +1,7 @@
 ! Copyright (C) 2021 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: modern.html multiline tools.test ;
+USING: io.encodings.utf8 io.files kernel make math modern.html
+multiline sequences tools.test ;
 IN: modern.html.tests
 
 [
