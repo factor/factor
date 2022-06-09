@@ -2,7 +2,8 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs combinators
 combinators.short-circuit kernel make math modern modern.slices
-sequences sequences.extras shuffle splitting strings unicode ;
+sequences sequences.extras shuffle shuffle.extras splitting
+strings unicode ;
 IN: modern.html
 
 TUPLE: tag open name props close children ;
@@ -111,44 +112,43 @@ C: <dquote> dquote
         { f [ "efff" throw ] }
     } case ;
 
-: read-props* ( props n string -- n' string props closing )
-    read-prop [
-        [ [ reach push ] when* rot ] dip
+: read-props* ( n string props -- n' string props closing )
+    [ read-prop ] dip-2up [
+        [ [ over push ] when* ] dip
     ] [
-        [ reach push ] when* read-props*
+        [ over push ] when* read-props*
     ] if* ; inline recursive
 
 : read-props ( n string -- n' string props closing )
-    V{ } clone -rot read-props* ;
+    V{ } clone read-props* ;
 
 : read-processing-instruction ( n string opening -- n string processing-instruction )
     "?" expect-and-span >string
-    [ take-tag-name >string ] dip
-    [ read-props ] 2dip
-    spin rotd <processing-instruction> ;
+    [ take-tag-name >string ] dip-1up
+    [ read-props ] 2dip-2up
+    <processing-instruction> ;
 
 : read-doctype ( n string opening -- n string doctype/comment )
     "!" expect-and-span
     2over 2 peek-from "--" sequence= [
         "--" expect-and-span >string
-        [ "-->" slice-til-string [ >string ] bi@ ] dip -rot <comment>
+        [ "-->" slice-til-string [ >string ] bi@ ] dip-2up <comment>
     ] [
         "DOCTYPE" expect-and-span-insensitive
-        [ read-props ] dip
-        -rot <doctype>
+        [ read-props ] dip-2up
+        <doctype>
     ] if ;
 
 : read-embedded-language ( n string opening -- n string embedded-language )
     "%" expect-and-span >string
-    [ take-tag-name >string ] dip swap append
-    [ "%>" slice-til-string [ >string ] bi@ ] dip
-    -rot
+    [ take-tag-name >string ] dip-1up append
+    [ "%>" slice-til-string [ >string ] bi@ ] dip-2up
      <embedded-language> ;
 
 : read-open-tag ( n string opening -- n' string tag )
-    [ take-tag-name ] dip
-    [ read-props ] 2dip
-    swap 2swap dup ">" sequence= [
+    [ take-tag-name ] dip-1up
+    [ read-props ] 2dip-2up
+    dup ">" sequence= [
         <open-tag>
     ] [
         <self-close-tag>
