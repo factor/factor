@@ -1,9 +1,10 @@
 ! Copyright (C) 2016 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: arrays assocs combinators combinators.short-circuit
-continuations io.encodings.utf8 io.files kernel make math
-math.order modern.paths modern.slices sequences sequences.extras
-sets splitting strings unicode vocabs.loader ;
+USING: accessors arrays assocs combinators
+combinators.short-circuit continuations io.encodings.utf8
+io.files kernel make math math.order modern.paths modern.slices
+sequences sequences.extras sets splitting strings unicode
+vocabs.loader ;
 IN: modern
 
 ERROR: string-expected-got-eof n string ;
@@ -109,21 +110,20 @@ MACRO:: read-matched ( ch -- quot: ( n string tag -- n' string slice' ) )
 : read-bracket ( n string slice -- n' string slice' ) CHAR: [ read-matched ;
 : read-brace ( n string slice -- n' string slice' ) CHAR: { read-matched ;
 : read-paren ( n string slice -- n' string slice' ) CHAR: ( read-matched ;
-: read-dquote-payload ( n string -- n' string )
+: advance-dquote-payload ( n string -- n' string )
     over [
         { CHAR: \\ CHAR: \" } slice-til-separator-inclusive {
-            { f [ drop ] }
+            { f [ to>> over string-expected-got-eof ] }
             { CHAR: \" [ drop ] }
-            { CHAR: \\ [ drop next-char-from drop read-dquote-payload ] }
+            { CHAR: \\ [ drop next-char-from drop advance-dquote-payload ] }
         } case
     ] [
         string-expected-got-eof
     ] if ;
 
 :: read-string ( n string tag -- n' string seq )
-    n string read-dquote-payload drop :> n'
+    n string advance-dquote-payload drop :> n'
     n' string
-    n' [ n string string-expected-got-eof ] unless
     n n' 1 - string <slice>
     n' 1 - n' string <slice>
     tag -rot 3array ;
