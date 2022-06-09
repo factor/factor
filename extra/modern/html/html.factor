@@ -65,12 +65,12 @@ C: <squote> squote
 TUPLE: dquote payload ;
 C: <dquote> dquote
 
-: read-squote-payload ( n string -- n' string )
+: advance-squote-payload ( n string -- n' string )
     over [
         { CHAR: \\ CHAR: ' } slice-til-separator-inclusive {
-            { f [ drop ] }
+            { f [ to>> over string-expected-got-eof ] }
             { CHAR: ' [ drop ] }
-            { CHAR: \\ [ drop next-char-from drop read-squote-payload ] }
+            { CHAR: \\ [ drop next-char-from drop advance-squote-payload ] }
         } case
     ] [
         string-expected-got-eof
@@ -78,10 +78,9 @@ C: <dquote> dquote
 
 :: read-string ( $n $string $char -- n' string payload )
     $n $string $char CHAR: ' =
-    [ read-squote-payload ]
-    [ read-dquote-payload ] if drop :> $n'
+    [ advance-squote-payload ]
+    [ advance-dquote-payload ] if drop :> $n'
     $n' $string
-    $n' [ $n $string string-expected-got-eof ] unless
     $n $n' 1 - $string <slice> ;
 
 : take-tag-name ( n string -- n' string tag )
