@@ -68,3 +68,31 @@ splitting tools.test splitting ;
 { 5 } [
     "hello factor!" { [ split-words ] [ first ] [ length ] } chain
 ] unit-test
+
+{
+    { 1 2 3 4 }
+    { 1 2 3 4 }
+    { 1 2 3 4 }
+    { 1 2 3 4 }
+} [
+    1 2 3 4
+    [ 4array ] [ 4array ] [ 4array ] [ 4array ] 4quad
+] unit-test
+
+{
+    { 1 2 3 4 }
+    { 5 6 7 8 }
+    { 9 10 11 12 }
+} [
+    1 2 3 4  5 6 7 8  9 10 11 12
+    [ 4array ] [ 4array ] [ 4array ] 4tri*
+] unit-test
+
+{
+    { 1 2 3 4 }
+    { 5 6 7 8 }
+    { 9 10 11 12 }
+} [
+    1 2 3 4  5 6 7 8  9 10 11 12
+    [ 4array ] 4tri@
+] unit-test

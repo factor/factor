@@ -34,11 +34,22 @@ MACRO: cleave-array ( quots -- quot )
 : 4bi* ( s t u v w x y z p q -- )
     [ 4dip ] dip call ; inline
 
-: 4bi@ ( s t u v w x y z quot -- )
+: 4tri* ( o p q r  s t u v  w x y z  p q r -- )
+    [ 8 ndip ] 2dip
+    [ 4dip ] dip
+    call ; inline
+
+: 4bi@ ( s t u v  w x y z  quot -- )
     dup 4bi* ; inline
 
-: 4tri ( w x y z p q r -- )
+: 4tri@ ( a b c d  e f g h  i j k l  quot -- )
+    dup dup 4tri* ; inline
+
+: 4tri ( w x y z  p q r -- )
     [ [ 4keep ] dip 4keep ] dip call ; inline
+
+: 4quad ( w x y z  p q r s -- )
+    [ [ [ 4keep ] dip 4keep ] dip 4keep ] dip call ; inline
 
 : plox ( ... x/f quot: ( ... x -- ... y ) -- ... y/f )
     dupd when ; inline
