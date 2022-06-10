@@ -688,6 +688,10 @@ PRIVATE>
     [ not ] compose [ find-last drop ] keepd
     length swap [ - 1 - ] when* ; inline
 
+:: shorten* ( vector n -- seq )
+    vector n tail
+    n vector shorten ;
+
 :: interleaved-as ( seq glue exemplar -- newseq )
     seq length dup 1 - + 0 max exemplar new-sequence :> newseq
     seq [ 2 * newseq set-nth-unsafe ] each-index
