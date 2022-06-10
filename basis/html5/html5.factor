@@ -3,7 +3,8 @@
 USING: accessors arrays assocs combinators
 combinators.short-circuit io io.encodings.utf8 io.files
 json.reader kernel math math.order memoize modern.slices
-prettyprint sequences strings suffix-arrays words ;
+prettyprint sequences sequences.extras strings suffix-arrays
+words ;
 IN: html5
 
 : 1sbuf ( ch -- sbuf ) [ SBUF" " clone ] dip over push ; inline
@@ -311,12 +312,13 @@ TUPLE: doctype
 : new-doctype-with-quirks ( document -- )
     <doctype> t >>quirks? >>doctype drop ;
 
-TUPLE: tag self-closing? name attributes ;
+TUPLE: tag self-closing? name attributes children end-tag ;
 
 : <tag> ( -- tag )
     tag new
         SBUF" " clone >>name
-        V{ } clone >>attributes ;
+        V{ } clone >>attributes
+        V{ } clone >>children ;
 
 TUPLE: end-tag self-closing? name attributes ;
 
@@ -367,16 +369,39 @@ TUPLE: end-tag self-closing? name attributes ;
 : push-doctype-system-identifier ( ch document -- )
     doctype>> system-identifier>> push ;
 
+! XXX: not html5 spec, fix
+ERROR: unmatched-closing-tag-error stack tag ;
+
+: unclosed-tag? ( obj -- ? )
+    { [ tag? ] [ end-tag>> not ] } 1&& ; inline
+
+:: find-matching-tag ( name stack -- seq )
+    stack [ { [ unclosed-tag? ] [ name>> name = ] } 1&& ] find-last drop [
+        stack swap shorten*
+    ] [
+        stack name unmatched-closing-tag-error
+    ] if* ;
+
 GENERIC: tree-insert* ( document obj tree-insertion-mode -- document )
+
 M: initial-mode tree-insert*
     drop {
-        { CHAR: \t [ ] }
-        { CHAR: \n [ ] }
-        { CHAR: \f [ ] }
-        { CHAR: \r [ ] }
-        { CHAR: \s [ ] }
+        ! XXX: don't just drop this?
+        { [ dup CHAR: \t = ] [ drop ] }
+        { [ dup CHAR: \n = ] [ drop ] }
+        { [ dup CHAR: \f = ] [ drop ] }
+        { [ dup CHAR: \r = ] [ drop ] }
+        { [ dup CHAR: \s = ] [ drop ] }
+        { [ dup tag? ] [ over tree>> push ] }
+        { [ dup end-tag? ] [
+            dup name>> pick tree>> find-matching-tag
+            unclip
+                swap >>children
+                swap >>end-tag
+            over tree>> push
+        ] }
         [ "initial-mode tree-insert*" unimplemented ]
-    } case ;
+    } cond ;
 
 M: before-html-mode tree-insert* drop unimplemented* ;
 M: before-head-mode tree-insert* drop unimplemented* ;
@@ -464,6 +489,7 @@ ERROR: invalid-return-state obj ;
         [ tag>> [ name>> >string ] [ name<< ] bi ]
         [ push-attribute ]
         [ tag>> . ]
+        [ dup tag>> tree-insert drop ]
         [ f >>tag drop ]
     } cleave ;
 : emit-end-tag ( document -- )
