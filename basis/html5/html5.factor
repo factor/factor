@@ -402,7 +402,7 @@ M: after-after-body-mode tree-insert* drop unimplemented* ;
 M: after-after-frameset-mode tree-insert* drop unimplemented* ;
 
 : tree-insert ( document obj -- document )
-    over tree-insert-mode>> tree-insert* ;
+    over tree-insertion-mode>> tree-insert* ;
 
 MEMO: load-entities ( -- assoc )
     "vocab:html5/entities.json" utf8 file-contents json> ;
@@ -513,11 +513,11 @@ ERROR: invalid-return-state obj ;
 : ascii-hex-digit? ( ch/f -- ? ) { [ ascii-digit? ] [ ascii-hex-alpha? ] } 1|| ;
 
 : (return-state) ( document n/f string ch/f -- document n'/f string )
-    B reach [ f ] change-return-state drop check-return-state
+    reach [ f ] change-return-state drop check-return-state
     execute( document n/f string ch/f -- document n'/f string ) ;
 
 : return-state ( document n/f string -- document n'/f string )
-    B pick [ f ] change-return-state drop check-return-state
+    pick [ f ] change-return-state drop check-return-state
     execute( document n/f string -- document n'/f string ) ;
 
 : (data-state) ( document n/f string ch/f -- document n'/f string )
@@ -1633,13 +1633,15 @@ ERROR: invalid-return-state obj ;
 
 
 : (named-character-reference-state) ( document n/f string ch/f -- document n'/f string )
-    B reach push-temporary-buffer
-    pick named-character-match? [
+    reach push-temporary-buffer
+    pick named-character-match?
+    [
         drop ! exact match, drop prefix match
+        ! XXX: check me
         {
             [ pick temporary-buffer-attribute? ]
             [ pick temporary-buffer>> ?last CHAR: ; = not ]
-            [ 2dup peek-from { [ CHAR: = = ] [ ascii-alphanumeric? ] } 1|| ]
+            [ 3dup peek-from { [ CHAR: = = ] [ ascii-alphanumeric? ] } 1|| ]
         } 0&& [
             unimplemented*
             flush-temporary-buffer
