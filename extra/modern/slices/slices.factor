@@ -255,8 +255,4 @@ ERROR: subseq-expected-but-got-eof n string expected ;
     ] unless ;
 
 : rewind-slice ( n string slice -- n' string )
-    pick [
-        length swap [ - ] dip
-    ] [
-        [ nip ] dip [ [ length ] bi@ - ] keepd
-    ] if ; inline
+    2nip [ from>> ] [ seq>> ] bi ; inline
