@@ -3,8 +3,8 @@
 USING: accessors arrays assocs combinators
 combinators.short-circuit continuations io.encodings.utf8
 io.files kernel make math math.order modern.paths modern.slices
-sequences sequences.extras sets splitting strings unicode
-vocabs.loader ;
+sequences sequences.extras sets shuffle.extras splitting strings
+unicode vocabs.loader ;
 IN: modern
 
 ERROR: string-expected-got-eof n string ;
@@ -124,9 +124,9 @@ MACRO:: read-matched ( ch -- quot: ( n string tag -- n' string slice' ) )
 :: read-string ( n string tag -- n' string seq )
     n string advance-dquote-payload drop :> n'
     n' string
+    tag
     n n' 1 - string <slice>
-    n' 1 - n' string <slice>
-    tag -rot 3array ;
+    n' 1 - n' string <slice> 3array ;
 
 : take-comment ( n string slice -- n' string comment )
     2over ?nth CHAR: [ = [
@@ -285,7 +285,7 @@ ERROR: colon-word-must-be-all-uppercase-or-lowercase n string word ;
         { [ dup section-open? ] [
             [
                 matching-section-delimiter 1array lex-until
-            ] keep swap unclip-last 3array
+            ] keep-1up unclip-last 3array
         ] }
         ! <foo/>
         { [ dup html-self-close? ] [
@@ -320,7 +320,7 @@ ERROR: colon-word-must-be-all-uppercase-or-lowercase n string word ;
     } cond ;
 
 : read-acute ( n string slice -- n' string acute )
-    [ matching-section-delimiter 1array lex-until ] keep swap unclip-last 3array ;
+    [ matching-section-delimiter 1array lex-until ] keep-1up unclip-last 3array ;
 
 ! Words like append! and suffix! are allowed for now.
 : read-exclamation ( n string slice -- n' string obj )
