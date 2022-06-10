@@ -12,6 +12,14 @@ IN: html5
 
 ! https://html.spec.whatwg.org/multipage/parsing.html#tokenization
 
+! https://infra.spec.whatwg.org/#namespaces
+CONSTANT: html-namespace "http://www.w3.org/1999/xhtml"
+CONSTANT: mathml-namespace "http://www.w3.org/1998/Math/MathML"
+CONSTANT: svg-namespace "http://www.w3.org/2000/svg"
+CONSTANT: xlink-namespace "http://www.w3.org/1999/xlink"
+CONSTANT: xml-namespace "http://www.w3.org/XML/1998/namespace"
+CONSTANT: xmlns-namespace "http://www.w3.org/2000/xmlns/"
+
 DEFER: data-state
 DEFER: (data-state)
 DEFER: rcdata-state
@@ -240,9 +248,16 @@ after-after-frameset-mode ;
 
 TUPLE: document
 quirks-mode?
+limited-quirks-mode?
+iframe-srcdoc?
+scripting? ! set in constructor
+frameset-ok? ! frameset-ok? but we want default to f
 fostering-parent?
 tree
-tree-insertion-mode
+tree-doctype
+head-element-pointer ! set during insertion time
+parser-cannot-change-mode-flag
+insertion-mode
 original-insertion-mode
 last
 node
@@ -250,6 +265,7 @@ context
 doctype
 tag
 end-tag
+
 tag-name
 end-tag-name
 attribute-name
@@ -339,14 +355,22 @@ TUPLE: end-tag self-closing? name attributes ;
 : <document> ( -- document )
     document new
         V{ } clone >>tree
-        initial-mode >>tree-insertion-mode
+        initial-mode >>insertion-mode
         <doctype> >>doctype
+        t >>frameset-ok?
+        ! SBUF" " clone >>tag-name
         SBUF" " clone >>attribute-name
         SBUF" " clone >>attribute-value
         SBUF" " clone >>temporary-buffer
         SBUF" " clone >>comment-token
         V{ } clone >>open-elements
     ; inline
+
+TUPLE: comment open payload close ;
+
+: <comment> ( payload -- comment )
+    comment new
+        swap >>payload ; inline
 
 : force-quirks ( document -- )
     doctype>> t >>quirks? drop ;
@@ -382,16 +406,25 @@ ERROR: unmatched-closing-tag-error stack tag ;
         stack name unmatched-closing-tag-error
     ] if* ;
 
-GENERIC: tree-insert* ( document obj tree-insertion-mode -- document )
+DEFER: tree-insert
+GENERIC: tree-insert* ( document obj insertion-mode -- document )
 
+: limited-quirks-mode? ( doctype -- ? )
+    {
+        [ public-identifier>> "-//W3C//DTD XHTML 1.0 Frameset//" head? ]
+        [ public-identifier>> "-//W3C//DTD XHTML 1.0 Transitional//" head? ]
+        [ { [ system-identifier>> ] [ public-identifier>> "-//W3C//DTD HTML 4.01 Frameset//" head? ] } 1&& ]
+        [ { [ system-identifier>> ] [ public-identifier>> "-//W3C//DTD HTML 4.01 Transitional//" head? ] } 1&& ]
+    } 1|| ;
+
+! https://html.spec.whatwg.org/multipage/parsing.html#the-initial-insertion-mode
 M: initial-mode tree-insert*
     drop {
-        ! XXX: don't just drop this?
-        { [ dup CHAR: \t = ] [ drop ] }
-        { [ dup CHAR: \n = ] [ drop ] }
-        { [ dup CHAR: \f = ] [ drop ] }
-        { [ dup CHAR: \r = ] [ drop ] }
-        { [ dup CHAR: \s = ] [ drop ] }
+        { [ dup "\t\n\f\r\s" member? ] [ drop ] }
+        { [ dup doctype? ] [
+            >>tree-doctype before-html-mode >>insertion-mode
+        ] }
+        { [ dup comment? ] [ over tree>> push ] }
         { [ dup tag? ] [ over tree>> push ] }
         { [ dup end-tag? ] [
             dup name>> pick tree>> find-matching-tag
@@ -400,15 +433,246 @@ M: initial-mode tree-insert*
                 swap >>end-tag
             over tree>> push
         ] }
-        [ "initial-mode tree-insert*" unimplemented ]
+        [
+            over iframe-srcdoc?>> [
+                over parser-cannot-change-mode-flag>> [
+                    [ t >>quirks-mode? ] dip
+                ] unless
+            ] [
+                "must be iframe-srcdoc here" throw
+            ] if
+            ! reprocess the token
+            before-html-mode >>insertion-mode tree-insert
+        ]
     } cond ;
 
-M: before-html-mode tree-insert* drop unimplemented* ;
-M: before-head-mode tree-insert* drop unimplemented* ;
-M: in-head-mode tree-insert* drop unimplemented* ;
+! https://html.spec.whatwg.org/multipage/parsing.html#the-before-html-insertion-mode
+M: before-html-mode tree-insert*
+    drop {
+        { [ dup doctype? ] [ drop ] }
+        { [ dup comment? ] [ over tree>> push ] }
+        { [ dup "\t\n\f\r\s" member? ] [ drop ] }
+        { [ dup { [ tag? ] [ name>> "html" = ] } 1&& ] [
+            over tree>> push
+            before-head-mode >>insertion-mode
+        ] }
+        ! these tags are handled in the default case
+        { [ dup { [ end-tag? ] [ name>> { "head" "body" "html" "br" } member? not ] } 1&& ] [
+            ! error end-tag, ignore
+            drop
+        ] }
+        [
+            ! Create missing html tag and reprocess the token
+            <tag> "html" >>name pick tree>> push
+            before-head-mode >>insertion-mode tree-insert
+        ]
+    } cond ;
+
+M: before-head-mode tree-insert*
+    drop {
+        { [ dup "\t\n\f\r\s" member? ] [ drop ] }
+        { [ dup comment? ] [ over tree>> push ] }
+        { [ dup doctype? ] [ drop ] }
+        { [ dup { [ tag? ] [ name>> "html" = ] } 1&& ] [
+            ! XXX: in-body-mode rules here for html tag
+            ! B
+            ! over tree>> push
+            ! before-head-mode >>insertion-mode
+            "handle html in-body-mode here" throw
+        ] }
+        { [ dup { [ tag? ] [ name>> "head" = ] } 1&& ] [
+            [ swap tree>> push ]
+            [ >>head-element-pointer drop ]
+            [ drop in-head-mode >>insertion-mode ] 2tri
+        ] }
+        ! these tags are handled in the default case
+        { [ dup { [ end-tag? ] [ name>> { "head" "body" "html" "br" } member? not ] } 1&& ] [
+            ! error end-tag, ignore
+            drop
+        ] }
+        ! ignore tag
+        { [ dup tag? ] [ drop ] }
+        [
+            ! Create missing html tag and reprocess the token
+            <tag>
+            [ "head" >>name pick tree>> push ]
+            [ >>head-element-pointer ] bi
+            in-head-mode >>insertion-mode tree-insert
+        ]
+    } cond ;
+
+M: in-head-mode tree-insert*
+    drop {
+        { [ dup "\t\n\f\r\s" member? ] [ over tree>> push ] }
+        { [ dup comment? ] [ over tree>> push ] }
+        { [ dup doctype? ] [ drop ] }
+        { [ dup { [ tag? ] [ name>> "html" = ] } 1&& ] [
+            ! XXX: in-body-mode rules here for html tag
+            ! B
+            ! over tree>> push
+            ! before-head-mode >>insertion-mode
+            "handle html in-body-mode here" throw
+            unimplemented*
+        ] }
+        { [ dup { [ tag? ] [ name>> { "base" "basefont" "bgsound" "link" } member? ] } 1&& ] [
+            ! non-void-html-element-start-tag-with-trailing-solidus soft error if not self-closing
+            unimplemented*
+        ] }
+        { [ dup { [ tag? ] [ name>> "meta" = ] } 1&& ] [
+            unimplemented*
+        ] }
+        { [ dup { [ tag? ] [ name>> "title" = ] } 1&& ] [
+            ! https://html.spec.whatwg.org/multipage/parsing.html#generic-rcdata-element-parsing-algorithm
+            "insert title node" throw
+            unimplemented*
+        ] }
+        { [
+            dup {
+                [ { [ tag? ] [ name>> "noscript" = ] [ scripting?>> ] } 1&& ]
+                [ { [ tag? ] [ name>> { "noframes" "style" } member? ] } 1&& ]
+            } 1||
+        ] [
+            ! https://html.spec.whatwg.org/multipage/parsing.html#generic-raw-text-element-parsing-algorithm
+            unimplemented*
+        ] }
+        { [ dup { [ tag? ] [ name>> "noscript" = ] [ scripting?>> not ] } 1&& ] [
+            unimplemented*
+            over tree>> push
+            in-head-noscript-mode >>insertion-mode
+        ] }
+        { [ dup { [ tag? ] [ name>> "script" = ] } 1&& ] [
+            unimplemented*
+            text-mode >>insertion-mode
+        ] }
+        { [ dup { [ end-tag? ] [ name>> "head" = ] } 1&& ] [
+            over tree>> last end-tag<<
+            after-head-mode >>insertion-mode
+        ] }
+        { [ dup { [ end-tag? ] [ name>> { "body" "html" "br" } member? ] } 1&& ] [
+            ! non-void-html-element-start-tag-with-trailing-solidus soft error if not self-closing
+            unimplemented*
+        ] }
+        { [ dup { [ tag? ] [ name>> "template" = ] } 1&& ] [
+            unimplemented*
+            in-template-mode >>insertion-mode
+        ] }
+        { [ dup { [ end-tag? ] [ name>> "template" = ] } 1&& ] [
+            unimplemented*
+        ] }
+        ! XXX: revisit this
+        { [ dup {
+            [ { [ tag? ] [ name>> "head" = ] } 1&& ]
+            [ end-tag? ]
+            } 1|| ] [ drop "ignore here" throw ] }
+        [
+            ! end head tag should be here, pop off, reprocess
+            over tree>> pop swap >>end-tag
+            after-head-mode >>insertion-mode "omg" throw
+        ]
+    } cond ;
+
 M: in-head-noscript-mode tree-insert* drop unimplemented* ;
-M: after-head-mode tree-insert* drop unimplemented* ;
-M: in-body-mode tree-insert* drop unimplemented* ;
+
+M: after-head-mode tree-insert*
+    drop {
+        { [ dup "\t\n\f\r\s" member? ] [ over tree>> push ] }
+        { [ dup comment? ] [ over tree>> push ] }
+        { [ dup doctype? ] [ drop ] }
+        { [ dup { [ tag? ] [ name>> "html" = ] } 1&& ] [
+            ! XXX: in-body-mode rules here for html tag
+            ! B
+            ! over tree>> push
+            ! before-head-mode >>insertion-mode
+            "handle html in-body-mode here" throw
+            unimplemented*
+        ] }
+        { [ dup { [ tag? ] [ name>> "html" = ] } 1&& ] [
+            unimplemented*
+        ] }
+        { [ dup { [ tag? ] [ name>> "body" = ] } 1&& ] [
+            over tree>> push
+            f >>frameset-ok?
+            in-body-mode >>insertion-mode
+        ] }
+        { [ dup { [ tag? ] [ name>> "frameset" = ] } 1&& ] [
+            unimplemented*
+        ] }
+        { [ dup { [ tag? ] [
+            name>> {
+                "base" "basefont" "bgsound" "link" "meta"
+                "noframes" "script" "style" "template" "title"
+            } member? ] } 1&&
+        ] [
+            unimplemented*
+        ] }
+        { [ dup { [ end-tag? ] [ name>> "template" = ] } 1&& ] [
+            unimplemented*
+        ] }
+        ! same as default case
+        ! { [ dup { [ end-tag? ] [ name>> { "body" "html" "br" } member? not ] } 1&& ] [
+        !     unimplemented*
+        ! ] }
+        { [
+            dup {
+                [ { [ tag? ] [ name>> "head" = ] } 1&& ]
+                [ { [ end-tag? ] [ name>> { "body" "html" "br" } member? not ] } 1&& ]
+            } 1||
+        ] [
+            "omg revisit this" throw
+            unimplemented*
+        ] }
+        [
+            B
+            <tag> "body" >>name pick tree>> push
+            in-body-mode >>insertion-mode tree-insert
+        ]
+    } cond ;
+
+M: in-body-mode tree-insert*
+    drop {
+        { [ dup CHAR: \0 = ] [ drop ] }
+        { [ dup "\t\n\f\r\s" member? ] [ over tree>> push ] }
+        { [ dup comment? ] [ over tree>> push ] }
+        { [ dup doctype? ] [ drop ] }
+        { [ dup { [ tag? ] [ name>> "html" = ] } 1&& ] [ drop ] }
+        { [ dup {
+            [
+                {
+                    [ tag? ]
+                    [
+                        name>> {
+                            "base" "basefont" "bgsound" "link" "meta"
+                            "noframes" "script" "style" "template" "title"
+                        } member?
+                    ]
+                } 1&&
+            ] [
+                { [ end-tag? ] [ name>> "template" = ] } 1&&
+            ] } 1||
+        ] [
+            unimplemented*
+        ] }
+        ! XXX: parse error
+        { [ dup { [ tag? ] [ name>> "body" = ] } 1&& ] [ drop unimplemented* ] }
+        { [ dup { [ tag? ] [ name>> "frameset" = ] } 1&& ] [ drop unimplemented* ] }
+        ! XXX: eof
+        ! { [ ] [ ] }
+        { [ dup { [ end-tag? ] [ name>> "body" = ] } 1&& ] [
+            "body" pick tree>> find-matching-tag
+            unclip
+                swap >>children
+                swap >>end-tag
+            over tree>> push
+
+            after-body-mode >>insertion-mode
+         ] }
+        { [ dup { [ end-tag? ] [ name>> "html" = ] } 1&& ] [ drop unimplemented* ] }
+        ! { [ ] [ ] }
+        [
+            unimplemented*
+        ]
+    } cond ;
+
 M: text-mode tree-insert* drop unimplemented* ;
 M: in-table-mode tree-insert* drop unimplemented* ;
 M: in-table-text-mode tree-insert* drop unimplemented* ;
@@ -420,14 +684,49 @@ M: in-cell-mode tree-insert* drop unimplemented* ;
 M: in-select-mode tree-insert* drop unimplemented* ;
 M: in-select-in-table-mode tree-insert* drop unimplemented* ;
 M: in-template-mode tree-insert* drop unimplemented* ;
-M: after-body-mode tree-insert* drop unimplemented* ;
+M: after-body-mode tree-insert*
+    drop {
+        { [ dup "\t\n\f\r\s" member? ] [ over tree>> push ] }
+        { [ dup comment? ] [ over tree>> push ] }
+        { [ dup doctype? ] [ drop ] }
+        { [ dup { [ tag? ] [ name>> "html" = ] } 1&& ] [
+            unimplemented*
+         ] }
+        { [ dup { [ end-tag? ] [ name>> "html" = ] } 1&& ] [
+            ! XXX: make this a function
+            "html" pick tree>> find-matching-tag
+            unclip
+                swap >>children
+                swap >>end-tag
+            over tree>> push
+
+            after-after-body-mode >>insertion-mode
+        ] }
+        [
+            unimplemented*
+        ]
+    } cond ;
 M: in-frameset-mode tree-insert* drop unimplemented* ;
 M: after-frameset-mode tree-insert* drop unimplemented* ;
-M: after-after-body-mode tree-insert* drop unimplemented* ;
+
+M: after-after-body-mode tree-insert*
+    drop {
+        { [ dup comment? ] [ over tree>> push ] }
+        { [ dup doctype? ] [ unimplemented*  ] }
+        { [ dup "\t\n\f\r\s" member? ] [ unimplemented*  ] }
+        { [ dup { [ tag? ] [ name>> "html" = ] } 1&& ] [ unimplemented* ] }
+        ! eof
+        { [ dup f = ] [ drop ] }
+        [
+            ! XXX: parse error
+            [ in-body-mode >>insertion-mode ] dip tree-insert
+        ]
+    } cond ;
+
 M: after-after-frameset-mode tree-insert* drop unimplemented* ;
 
 : tree-insert ( document obj -- document )
-    over tree-insertion-mode>> tree-insert* ;
+    over insertion-mode>> tree-insert* ;
 
 MEMO: load-entities ( -- assoc )
     "vocab:html5/entities.json" utf8 file-contents json> ;
@@ -453,7 +752,12 @@ ERROR: unknown-named-entity entity ;
         unknown-named-entity
     ] if ;
 
-: push-tag-name ( ch document -- ) tag>> name>> push ;
+! XXX: remove the tag>> name>> push part
+: push-tag-name ( ch document -- )
+    [ tag>> name>> push ]
+    [
+        2drop ! tag-name>> push
+    ] 2bi ;
 : push-attribute-name ( ch document -- ) attribute-name>> push ;
 : push-attribute-value ( ch document -- ) attribute-value>> push ;
 : push-comment-token ( ch document -- ) comment-token>> push ;
@@ -480,11 +784,13 @@ ERROR: invalid-return-state obj ;
     [ tag>> attributes>> push-when ]
     [ reset-attribute ] tri ;
 
-: emit-eof ( document -- ) drop "emit-eof" print ;
+: emit-eof ( document -- )
+    "emit-eof" print
+    f tree-insert drop ;
 : emit-char ( char document -- ) drop "emit-char: " write 1string . ;
 : emit-string ( char document -- ) drop "emit-string: " write . ;
 : emit-tag ( document -- )
-    "emit tag: " write
+    "emit-tag: " write
     {
         [ tag>> [ name>> >string ] [ name<< ] bi ]
         [ push-attribute ]
@@ -493,19 +799,34 @@ ERROR: invalid-return-state obj ;
         [ f >>tag drop ]
     } cleave ;
 : emit-end-tag ( document -- )
-    "emit end tag: " write
+    "emit-end-tag: " write
     [ tag>> . ]
     [ f >>tag drop ] bi ;
-: emit-doctype ( document -- )
-    "emit doctype: " write
-    doctype>>
-    [ >string ] change-name
-    . ;
 : emit-comment-token ( document -- )
-    "emit comment token: " write
-    [ comment-token>> >string . ]
-    [ SBUF" " clone comment-token<< ] bi ;
-
+    "emit-comment-token: " write
+    {
+        [ comment-token>> >string . ]
+        [ dup comment-token>> >string <comment> tree-insert drop ]
+        [ SBUF" " clone >>comment-token drop ]
+    } cleave ;
+: emit-doctype ( document -- )
+    "emit-doctype: " write dup doctype>> .
+    {
+        [ doctype>> [ >string ] change-name drop ]
+        [
+            ! XXX: handle iframe srcdoc document
+            dup { [ doctype>> name>> "html" = not ] [ parser-cannot-change-mode-flag>> not ] } 1&& [
+                t >>quirks-mode?
+            ] [
+                dup { [ iframe-srcdoc?>> not ] [ parser-cannot-change-mode-flag>> not ] } 1&& [
+                    dup doctype>> limited-quirks-mode? [ t >>limited-quirks-mode? ] when
+                ] when
+            ] if
+            drop
+        ]
+        [ dup doctype>> tree-insert drop ]
+        [ f >>doctype drop ]
+    } cleave ;
 
 : reset-temporary-buffer ( document -- ) SBUF" " clone temporary-buffer<< ;
 : ch>new-temporary-buffer ( ch document -- ) [ 1sbuf ] dip temporary-buffer<< ;
