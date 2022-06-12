@@ -30,13 +30,13 @@ IN: shuffle.extras.tests
     [ [ CHAR: d = ] accept1 ] 4craft-1up
 ] unit-test
 
-: test-keep-under ( -- a b c d e ) 1 [ [ 5 + ] call 10 20 30 ] keep-under ;
-: test-2keep-under ( -- a b c d e f g ) 1 2 [ [ 5 + ] bi@ 10 20 30 ] 2keep-under ;
-: test-3keep-under ( -- a b c d e f g h i ) 1 2 3 [ [ 5 + ] tri@ 10 20 30 ] 3keep-under ;
+! : test-keep-under ( -- a b c d e ) 1 [ [ 5 + ] call 10 20 30 ] keep-under ;
+! : test-2keep-under ( -- a b c d e f g ) 1 2 [ [ 5 + ] bi@ 10 20 30 ] 2keep-under ;
+! : test-3keep-under ( -- a b c d e f g h i ) 1 2 3 [ [ 5 + ] tri@ 10 20 30 ] 3keep-under ;
 
-{ 1 6 10 20 30 } [ test-keep-under ] unit-test
-{ 1 2 6 7 10 20 30 } [ test-2keep-under ] unit-test
-{ 1 2 3 6 7 8 10 20 30 } [ test-3keep-under ] unit-test
+! { 1 6 10 20 30 } [ test-keep-under ] unit-test
+! { 1 2 6 7 10 20 30 } [ test-2keep-under ] unit-test
+! { 1 2 3 6 7 8 10 20 30 } [ test-3keep-under ] unit-test
 
 { 20 30 2500 } [ 20 30 [ + sq ] 2keep-1up ] unit-test
 
