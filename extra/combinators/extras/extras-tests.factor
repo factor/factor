@@ -1,7 +1,7 @@
 ! Copyright (C) 2013 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: assocs combinators.extras io.files kernel math sequences
-splitting tools.test splitting ;
+USING: arrays assocs combinators.extras io.files kernel math
+sequences splitting tools.test ;
 
 { "a b" }
 [ "a" "b" [ " " glue ] once ] unit-test
