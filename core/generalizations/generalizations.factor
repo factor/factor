@@ -5,8 +5,8 @@ USING: arrays combinators kernel kernel.private math ranges
 memoize.private sequences ;
 IN: generalizations
 
-! These words can be inline combinators the word does no math on
-! the input parameters, e.g. n.
+! These words can be inline combinators when the word does no math
+! on the input parameters, e.g. n.
 ! If math is done, the word needs to be a macro so the math can
 ! be done at compile-time.
 <<
@@ -48,14 +48,20 @@ MACRO: nrot ( n -- quot )
 MACRO: -nrot ( n -- quot )
     1 - [ ] [ '[ swap _ dip ] ] repeat ;
 
+: ndip ( n -- )
+    [ [ dip ] curry ] swap call-n call ; inline
+
+: nrotates ( n depth -- quot )
+    '[ _ [ _ nrot ] times ] call ; inline
+
+: -nrotates ( n depth -- quot )
+    '[ _ [ _ -nrot ] times ] call ; inline
+
 : ndrop ( n -- )
     [ drop ] swap call-n ; inline
 
 : nnip ( n -- )
     '[ _ ndrop ] dip ; inline
-
-: ndip ( n -- )
-    [ [ dip ] curry ] swap call-n call ; inline
 
 : nkeep ( n -- )
     dup '[ [ _ ndup ] dip _ ndip ] call ; inline
