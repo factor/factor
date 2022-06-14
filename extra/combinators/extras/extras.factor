@@ -51,6 +51,10 @@ MACRO: cleave-array ( quots -- quot )
 : 4quad ( w x y z  p q r s -- )
     [ [ [ 4keep ] dip 4keep ] dip 4keep ] dip call ; inline
 
+: quad* ( w x y z p q r s -- ) [ [ [ 3dip ] dip 2dip ] dip dip ] dip call ; inline
+
+: quad@ ( w x y z quot -- ) dup dup dup quad* ; inline
+
 : plox ( ... x/f quot: ( ... x -- ... y ) -- ... y/f )
     dupd when ; inline
 
@@ -124,3 +128,67 @@ MACRO: chain ( quots -- quot )
 : loop1 ( ..a quot: ( ..a -- ..a obj ? ) -- ..a obj )
     [ call ] keep '[ drop _ loop1 ] when ; inline recursive
 
+
+: keep-1up ( quot -- quot ) keep 1 2 nrotates ; inline
+: keep-2up ( quot -- quot ) keep 2 3 nrotates ; inline
+: keep-3up ( quot -- quot ) keep 3 4 nrotates ; inline
+
+: 2keep-1up ( quot -- quot ) 2keep 1 3 nrotates ; inline
+: 2keep-2up ( quot -- quot ) 2keep 2 4 nrotates ; inline
+: 2keep-3up ( quot -- quot ) 2keep 3 5 nrotates ; inline
+
+: 3keep-1up ( quot -- quot ) 3keep 1 4 nrotates ; inline
+: 3keep-2up ( quot -- quot ) 3keep 2 5 nrotates ; inline
+: 3keep-3up ( quot -- quot ) 3keep 3 6 nrotates ; inline
+
+! d is dummy, o is object to save notation space
+: dip-1up  ( ..a d quot: ( ..a -- ..b o d ) -- ..b d o )
+    dip swap ; inline
+: dip-2up  ( ..a d quot: ( ..a -- ..b o1 o2 d ) -- ..b d o1 o2 )
+    dip rot rot ; inline
+
+: 2dip-1up ( ..a d1 d2 quot: ( ..a -- ..b o d1 d2 ) -- ..b d1 d2 o )
+    2dip rot ; inline
+: 2dip-2up ( ..a d1 d2 quot: ( ..a -- ..b o1 o2 d1 d2 ) -- ..b d1 d2 o1 o2 )
+    2dip roll roll ; inline
+
+: 3dip-1up ( ..a d1 d2 d3 quot: ( ..a -- ..b o d1 d2 d3 ) -- ..b d1 d2 d3 o )
+    3dip roll ; inline
+: 3dip-2up ( ..a d1 d2 d3 quot: ( ..a -- ..b o1 o2 d1 d2 d3 ) -- ..b d1 d2 d3 o1 o2 )
+    3dip 2 5 nrotates ; inline
+: 3dip-3up ( ..a d1 d2 d3 quot: ( ..a -- ..b o1 o2 o3 d1 d2 d3 ) -- ..b d1 d2 d3 o1 o2 o3 )
+    3dip 3 6 nrotates ; inline
+
+
+: 2craft-1up ( ..a quot1: ( ..a -- ..b o1 ) quot2: ( ..b -- ..c o2 ) -- ..c o1 o2 )
+    [ call ] dip [ dip-1up ] call ; inline
+
+: 3craft-1up ( ..a quot1: ( ..a -- ..b o1 ) quot2: ( ..b -- ..c o2 ) quot3: ( ..c -- ..d o3 ) -- ..d o1 o2 o3 )
+    [ call ] 2dip [ dip-1up ] dip [ 2dip-1up ] call ; inline
+
+: 4craft-1up ( ..a quot1: ( ..a -- ..b o1 ) quot2: ( ..b -- ..c o2 ) quot3: ( ..c -- ..d o3 ) quot4: ( ..d -- ..e o4 ) -- ..e o1 o2 o3 o4 )
+    [ call ] 3dip [ dip-1up ] 2dip [ 2dip-1up ] dip [ 3dip-1up ] call ; inline
+
+: 3and ( a b c -- ? ) and and ; inline
+: 4and ( a b c d -- ? ) and and and ; inline
+
+: 3or ( a b c -- ? ) or or ; inline
+: 4or ( a b c d -- ? ) or or or ; inline
+
+! The kept values are on the bottom of the stack
+MACRO: keep-under ( quot -- quot' )
+    dup outputs 1 + '[ _ keep 1 _ -nrotates ] ;
+
+MACRO: 2keep-under ( quot -- quot' )
+    dup outputs 2 + '[ _ 2keep 2 _ -nrotates ] ;
+
+MACRO: 3keep-under ( quot -- quot' )
+    dup outputs 3 + '[ _ 3keep 3 _ -nrotates ] ;
+
+MACRO: 4keep-under ( quot -- quot' )
+    dup outputs 4 + '[ _ 4keep 4 _ -nrotates ] ;
+
+! for use with assoc-map etc
+: 1temp1d ( quot: ( a b c -- d e f ) -- quot ) '[ swap @ swap ] ; inline
+: 1temp2d ( quot: ( a b c -- d e f ) -- quot ) '[ rot @ -rot ] ; inline
+: 2temp2d ( quot: ( a b c d -- e f g h ) -- quot ) '[ 2 4 nrotates @ 2 4 -nrotates ] ; inline
