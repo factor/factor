@@ -1,7 +1,7 @@
 ! Copyright (C) 2016 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors assocs kernel math sequences sequences.deep
-sequences.extras strings unicode ;
+sequences.extras combinators.extras strings unicode ;
 IN: modern.slices
 
 : >strings ( seq -- str )
@@ -43,29 +43,14 @@ ERROR: unexpected-end n string ;
     over [ [ 1 - ] dip ?nth ] [ 2drop f ] if ;
 
 ! Allow eof
-: next-char-from ( n/f string -- n'/f string ch/f )
+: take-char ( n/f string -- n'/f string ch/f )
     over [
         2dup ?nth [ [ 1 + ] 2dip ] [ f ] if*
     ] [
-        [ 2drop f ] [ nip ] 2bi f
+        f
     ] if ;
 
-: prev-char-from-slice-end ( slice -- ch/f )
-    [ to>> 2 - ] [ seq>> ] bi ?nth ;
-
-: prev-char-from-slice ( slice -- ch/f )
-    [ from>> 1 - ] [ seq>> ] bi ?nth ;
-
-: next-char-from-slice ( slice -- ch/f )
-    [ to>> ] [ seq>> ] bi ?nth ;
-
-: char-before-slice ( slice -- ch/f )
-    [ from>> 1 - ] [ seq>> ] bi ?nth ;
-
-: char-after-slice ( slice -- ch/f )
-    [ to>> ] [ seq>> ] bi ?nth ;
-
-: find-from* ( ... n seq quot: ( ... elt -- ... ? ) -- ... i elt ? )
+: find-from* ( ... n seq quot: ( ... elt -- ... ? ) -- ... i/f elt ? )
     [ find-from ] keepd
     pick [ drop t ] [ length -rot nip f ] if ; inline
 
@@ -93,12 +78,10 @@ ERROR: expected-sequence-error expected actual ;
     2dup [ >lower ] bi@ sequence= [ nip ] [ expected-sequence-error ] if ;
 
 : expect-and-span ( n string slice expected-string -- n' string slice' )
-    dup length '[ _ take-slice ] 2dip
-    rot check-sequence span-slices ;
+    dup length '[ _ take-slice ] 2dip-1up check-sequence span-slices ;
 
 : expect-and-span-insensitive ( n string slice expected-string -- n' string slice' )
-    dup length '[ _ take-slice ] 2dip
-    rot check-sequence-insensitive span-slices ;
+    dup length '[ _ take-slice ] 2dip-1up check-sequence-insensitive span-slices ;
 
 :: split-slice-back ( slice n -- slice1 slice2 )
     slice [ from>> ] [ to>> ] [ seq>> ] tri :> ( from to seq )
@@ -141,9 +124,6 @@ ERROR: expected-sequence-error expected actual ;
 : empty-slice-end ( seq -- slice )
     [ length dup ] [ ] bi <slice> ; inline
 
-: empty-slice-from ( n seq -- slice )
-    dupd <slice> ; inline
-
 :: slice-til-eol ( n string -- n' string slice/f ch/f )
     n [
         n string '[ "\r\n" member? ] find-from :> ( n' ch )
@@ -154,23 +134,10 @@ ERROR: expected-sequence-error expected actual ;
         n string string empty-slice-end f
     ] if ; inline
 
-:: merge-slice-til-eol-slash'' ( n string -- n' string slice/f ch/f )
-    n [
-        n string '[ "\r\n\\" member? ] find-from :> ( n' ch )
-        n' string
-        n n' string ?<slice>
-        ch
-    ] [
-        n string string empty-slice-end f
-    ] if ; inline
-
-: merge-slice-til-whitespace ( n string slice --  n' string slice' )
+: merge-slice-til-whitespace ( n/f string slice --  n'/f string slice' )
     pick [
         [ slice-til-whitespace drop ] dip merge-slices
     ] when ;
-
-: merge-slice-til-eol ( n string slice --  n' string slice' )
-    [ slice-til-eol drop ] dip merge-slices ;
 
 : slice-between ( slice1 slice2 -- slice )
     ! ensure-same-underlying
@@ -180,25 +147,6 @@ ERROR: expected-sequence-error expected actual ;
 
 : slice-before ( slice -- slice' )
     [ drop 0 ] [ from>> ] [ seq>> ] tri <slice> ;
-
-: (?nth) ( n/f string/f -- obj/f )
-    over [ (?nth) ] [ 2drop f ] if ;
-
-:: merge-slice-til-eol-slash' ( n string slice -- n' string slice/f ch/f )
-    n string merge-slice-til-eol-slash'' :> ( n' string' slice' ch' )
-    ch' CHAR: \\ = [
-        n' 1 + string' (?nth) "\r\n" member? [
-            n' 2 + string' slice slice' span-slices merge-slice-til-eol-slash'
-        ] [
-            "omg" throw
-        ] if
-    ] [
-        n' string' slice slice' span-slices ch'
-    ] if ;
-
-! Supports \ at eol (with no space after it)
-: slice-til-eol-slash ( n string -- n' string slice/f ch/f )
-    2dup empty-slice-from merge-slice-til-eol-slash' ;
 
 :: slice-til-separator-inclusive ( n string tokens -- n' string slice/f ch/f )
     n string '[ tokens member? ] find-from [ dup [ 1 + ] when ] dip  :> ( n' ch )
@@ -243,15 +191,15 @@ ERROR: subseq-expected-but-got-eof n string expected ;
     '[ from>> _ + ] [ to>> ] [ seq>> ] tri <slice> ;
 
 : modify-to ( slice n -- slice' )
-    [ [ from>> ] [ to>> ] [ seq>> ] tri ] dip
-    swap [ + ] dip <slice> ;
+    [ from>> ] swap '[ to>> _ + ] [ seq>> ] tri <slice> ; inline
 
 ! { CHAR: \] [ read-closing ] }
 ! { CHAR: \} [ read-closing ] }
 ! { CHAR: \) [ read-closing ] }
-: read-closing ( n string tok -- n string tok )
+: read-closing ( n string tok -- n' string tok )
     dup length 1 = [
-        -1 modify-to [ 1 - ] 2dip
+        -1 modify-to
+        [ 1 - ] 2dip
     ] unless ;
 
 : rewind-slice ( n string slice -- n' string )

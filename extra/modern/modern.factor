@@ -3,7 +3,7 @@
 USING: accessors arrays assocs combinators
 combinators.short-circuit continuations io.encodings.utf8
 io.files kernel make math math.order modern.paths modern.slices
-sequences sequences.extras sets shuffle.extras splitting strings
+sequences sequences.extras sets combinators.extras splitting strings
 unicode vocabs.loader ;
 IN: modern
 
@@ -115,7 +115,7 @@ MACRO:: read-matched ( ch -- quot: ( n string tag -- n' string slice' ) )
         { CHAR: \\ CHAR: \" } slice-til-separator-inclusive {
             { f [ to>> over string-expected-got-eof ] }
             { CHAR: \" [ drop ] }
-            { CHAR: \\ [ drop next-char-from drop advance-dquote-payload ] }
+            { CHAR: \\ [ drop take-char drop advance-dquote-payload ] }
         } case
     ] [
         string-expected-got-eof
