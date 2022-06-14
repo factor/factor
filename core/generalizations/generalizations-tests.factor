@@ -29,6 +29,12 @@ IN: generalizations.tests
 [ [ 1 ] 5 ndip ] must-infer
 { 1 2 3 4 } [ 2 3 4 [ 1 ] 3 ndip ] unit-test
 
+[ [ 1 2 3 ] 2 3 nrotates ] must-infer
+[ [ 1 2 3 ] 2 3 -nrotates ] must-infer
+{ 1 2 3 4 } [ 1 2 3 4  4 4 nrotates ] unit-test
+{ 1 2 3 4 } [ 1 2 3 4  4 4 -nrotates ] unit-test
+{ 4 1 2 3 } [ 1 2 3 4  1 4 -nrotates ] unit-test
+
 [ 1 2 3 4 5 [ drop drop drop drop drop 2 ] 5 nkeep ] must-infer
 [ 1 2 3 4 5 2 '[ drop drop drop drop drop _ ] 5 nkeep ] must-infer
 { 2 1 2 3 4 5 } [ 1 2 3 4 5 [ drop drop drop drop drop 2 ] 5 nkeep ] unit-test
