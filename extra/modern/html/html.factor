@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs combinators
 combinators.short-circuit kernel make math modern modern.slices
-sequences sequences.extras shuffle shuffle.extras splitting
+sequences sequences.extras shuffle combinators.extras splitting
 strings unicode ;
 IN: modern.html
 
@@ -70,7 +70,7 @@ C: <dquote> dquote
         { CHAR: \\ CHAR: ' } slice-til-separator-inclusive {
             { f [ to>> over string-expected-got-eof ] }
             { CHAR: ' [ drop ] }
-            { CHAR: \\ [ drop next-char-from drop advance-squote-payload ] }
+            { CHAR: \\ [ drop take-char drop advance-squote-payload ] }
         } case
     ] [
         string-expected-got-eof
@@ -87,7 +87,7 @@ C: <dquote> dquote
     [ "\s\r\n/>" member? ] slice-until ;
 
 : read-value ( n string -- n' string value )
-    skip-whitespace next-char-from {
+    skip-whitespace take-char {
         { CHAR: ' [ CHAR: ' read-string >string <squote> ] }
         { CHAR: " [ CHAR: " read-string >string <dquote> ] }
         { CHAR: [ [ "[" throw ] }
