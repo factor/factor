@@ -74,6 +74,13 @@ M: map write-bare
     [ from>> ] [ to>> ] bi [ write-bare ] bi-curry@
     '[ _ _ bi* ] assoc-each ;
 
+! XXX: M: union write-bare
+
+M: user write-bare type>> write-bare ;
+
+M: struct write-bare
+    fields>> [ [ dupd of ] [ write-bare ] bi* ] assoc-each drop ;
+
 GENERIC: read-bare ( schema -- obj )
 
 M: uint read-bare
@@ -129,6 +136,11 @@ M: map read-bare
 
 M: union read-bare
     [ uint read-bare ] dip members>> value-at read-bare ;
+
+M: user read-bare type>> read-bare ;
+
+M: struct read-bare
+    fields>> [ read-bare ] assoc-map ;
 
 : >bare ( obj schema -- encoded )
     binary [ write-bare ] with-byte-writer ;
