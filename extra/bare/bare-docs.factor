@@ -35,6 +35,7 @@ $nl
 "Using schema files:"
 { $subsections
     parse-schema
+    load-schema
     \ SCHEMA:
 } ;
 
