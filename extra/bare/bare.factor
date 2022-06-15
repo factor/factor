@@ -69,6 +69,11 @@ M: list write-bare
     [ length>> [ dup length uint write-bare ] unless ]
     [ type>> '[ _ write-bare ] each ] bi ;
 
+M: map write-bare
+    over assoc-size uint write-bare
+    [ from>> ] [ to>> ] bi [ write-bare ] bi-curry@
+    '[ _ _ bi* ] assoc-each ;
+
 GENERIC: read-bare ( schema -- obj )
 
 M: uint read-bare
@@ -116,6 +121,11 @@ M: optional read-bare
 M: list read-bare
     [ length>> [ uint read-bare ] unless* ]
     [ type>> '[ _ read-bare ] replicate ] bi ;
+
+M: map read-bare
+    [ uint read-bare ] dip
+    [ from>> ] [ to>> ] bi [ read-bare ] bi-curry@
+    '[ @ @ 2array ] replicate ;
 
 M: union read-bare
     [ uint read-bare ] dip members>> value-at read-bare ;
