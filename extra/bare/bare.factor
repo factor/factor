@@ -3,9 +3,9 @@
 
 USING: accessors arrays assocs bare combinators endian
 hashtables io io.encodings.binary io.encodings.string
-io.encodings.utf8 io.streams.byte-array kernel math math.parser
-multiline namespaces parser peg peg.ebnf sequences
-sequences.deep strings vectors words words.constant ;
+io.encodings.utf8 io.files io.streams.byte-array kernel math
+math.parser multiline namespaces parser peg.ebnf sequences
+strings words words.constant ;
 
 IN: bare
 
@@ -52,7 +52,7 @@ M: f64 write-bare drop double>bits u64 write-bare ;
 
 M: bool write-bare drop >boolean 1 0 ? u8 write-bare ;
 
-M: str write-bare drop utf8 encode T{ data f f } write-bare ;
+M: str write-bare drop utf8 encode T{ data } write-bare ;
 
 M: data write-bare
     length>> [ dup length uint write-bare ] unless write ;
@@ -113,7 +113,7 @@ M: bool read-bare
         [ throw ]
     } case ;
 
-M: str read-bare drop T{ data f f } read-bare utf8 decode ;
+M: str read-bare drop T{ data } read-bare utf8 decode ;
 
 M: data read-bare
     length>> [ read ] [ uint read-bare read ] if* ;
@@ -130,9 +130,8 @@ M: list read-bare
     [ type>> '[ _ read-bare ] replicate ] bi ;
 
 M: map read-bare
-    [ uint read-bare ] dip
-    [ from>> ] [ to>> ] bi [ read-bare ] bi-curry@
-    '[ @ @ 2array ] replicate ;
+    [ uint read-bare ] dip [ from>> ] [ to>> ] bi
+    '[ _ _ [ read-bare ] bi@ 2array ] replicate ;
 
 M: union read-bare
     [ uint read-bare ] dip members>> value-at read-bare ;
@@ -240,6 +239,9 @@ PRIVATE>
 
 : parse-schema ( string -- schema )
     H{ } clone user-types [ (parse-schema) ] with-variable ;
+
+: load-schema ( path -- schema )
+    utf8 file-contents parse-schema ;
 
 SYNTAX: SCHEMA:
     scan-object parse-schema types>> [
