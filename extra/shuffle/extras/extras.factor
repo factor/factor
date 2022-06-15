@@ -17,9 +17,9 @@ IN: shuffle.extras
 : 2keep-2up ( quot -- quot ) 2keep roll roll ; inline
 : 2keep-3up ( quot -- quot ) 2keep 5 nrot 5 nrot 5 nrot ; inline
 
-: 3keep-1up ( quot -- quot ) keep roll ; inline
-: 3keep-2up ( quot -- quot ) keep 5 nrot 5 nrot ; inline
-: 3keep-3up ( quot -- quot ) keep 6 nrot 6 nrot 6 nrot ; inline
+: 3keep-1up ( quot -- quot ) 3keep roll ; inline
+: 3keep-2up ( quot -- quot ) 3keep 5 nrot 5 nrot ; inline
+: 3keep-3up ( quot -- quot ) 3keep 6 nrot 6 nrot 6 nrot ; inline
 
 ! d is dummy, o is object to save notation space
 : dip-1up  ( ..a d quot: ( ..a -- ..b o d ) -- ..b d o )
