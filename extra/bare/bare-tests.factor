@@ -1,4 +1,4 @@
-USING: bare tools.test ;
+USING: bare multiline prettyprint prettyprint.config tools.test ;
 
 ! uint
 
