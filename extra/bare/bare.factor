@@ -120,7 +120,7 @@ M: data read-bare
 
 M: void read-bare drop f ; ! XXX: this isn't right
 
-M: enum read-bare [ uint read-bare ] dip value-at ;
+M: enum read-bare [ uint read-bare ] dip values>> value-at ;
 
 M: optional read-bare
     u8 read-bare 1 = [ type>> read-bare ] [ drop f ] if ;
