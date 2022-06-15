@@ -245,5 +245,6 @@ PRIVATE>
 
 SYNTAX: SCHEMA:
     scan-object parse-schema types>> [
-        [ create-word-in dup reset-generic ] dip define-constant
-    ] assoc-each ;
+        [ name>> create-word-in dup reset-generic ]
+        [ type>> define-constant ] bi
+    ] each ;

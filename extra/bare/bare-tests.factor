@@ -1,5 +1,7 @@
 USING: bare multiline prettyprint prettyprint.config sequences tools.test ;
 
+IN: bare.tests
+
 ! uint
 
 { 0 } [ B{ 0x00 } uint bare> ] unit-test
@@ -262,439 +264,8 @@ USING: bare multiline prettyprint prettyprint.config sequences tools.test ;
 
 ! user types / schema
 
-{
-    [=[ T{ schema
-    { types
-        V{
-            T{ user
-                { name "PublicKey" }
-                { type T{ data { length 128 } } }
-            }
-            T{ user { name "Time" } { type str } }
-            T{ user
-                { name "Department" }
-                { type
-                    T{ enum
-                        { values
-                            V{
-                                { "ACCOUNTING" 0 }
-                                { "ADMINISTRATION" 1 }
-                                { "CUSTOMER_SERVICE" 2 }
-                                { "DEVELOPMENT" 3 }
-                                { "JSMITH" 99 }
-                            }
-                        }
-                    }
-                }
-            }
-            T{ user
-                { name "Address" }
-                { type T{ list { type str } { length 4 } } }
-            }
-            T{ user
-                { name "Customer" }
-                { type
-                    T{ struct
-                        { fields
-                            V{
-                                { "name" str }
-                                { "email" str }
-                                {
-                                    "address"
-                                    T{ user
-                                        { name "Address" }
-                                        { type
-                                            T{ list
-                                                { type str }
-                                                { length 4 }
-                                            }
-                                        }
-                                    }
-                                }
-                                {
-                                    "orders"
-                                    T{ list
-                                        { type
-                                            T{ struct
-                                                { fields
-                                                    V{
-                                                        {
-                                                            "orderId"
-                                                            i64
-                                                        }
-                                                        {
-                                                            "quantity"
-                                                            i32
-                                                        }
-                                                    }
-                                                }
-                                            }
-                                        }
-                                    }
-                                }
-                                {
-                                    "metadata"
-                                    T{ map
-                                        { from str }
-                                        { to T{ data } }
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-            T{ user
-                { name "Employee" }
-                { type
-                    T{ struct
-                        { fields
-                            V{
-                                { "name" str }
-                                { "email" str }
-                                {
-                                    "address"
-                                    T{ user
-                                        { name "Address" }
-                                        { type
-                                            T{ list
-                                                { type str }
-                                                { length 4 }
-                                            }
-                                        }
-                                    }
-                                }
-                                {
-                                    "department"
-                                    T{ user
-                                        { name "Department" }
-                                        { type
-                                            T{ enum
-                                                { values
-                                                    V{
-                                                        {
-                                                            "ACCOUNTING"
-                                                            0
-                                                        }
-                                                        {
-                                                            "ADMINISTRATION"
-                                                            1
-                                                        }
-                                                        {
-                                                            "CUSTOMER_SERVICE"
-                                                            2
-                                                        }
-                                                        {
-                                                            "DEVELOPMENT"
-                                                            3
-                                                        }
-                                                        {
-                                                            "JSMITH"
-                                                            99
-                                                        }
-                                                    }
-                                                }
-                                            }
-                                        }
-                                    }
-                                }
-                                {
-                                    "hireDate"
-                                    T{ user
-                                        { name "Time" }
-                                        { type str }
-                                    }
-                                }
-                                {
-                                    "publicKey"
-                                    T{ optional
-                                        { type
-                                            T{ user
-                                                { name
-                                                    "PublicKey"
-                                                }
-                                                { type
-                                                    T{ data
-                                                        { length
-                                                            128
-                                                        }
-                                                    }
-                                                }
-                                            }
-                                        }
-                                    }
-                                }
-                                {
-                                    "metadata"
-                                    T{ map
-                                        { from str }
-                                        { to T{ data } }
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-            T{ user
-                { name "TerminatedEmployee" }
-                { type void }
-            }
-            T{ user
-                { name "Person" }
-                { type
-                    T{ union
-                        { members
-                            V{
-                                {
-                                    T{ user
-                                        { name "Customer" }
-                                        { type
-                                            T{ struct
-                                                { fields
-                                                    V{
-                                                        {
-                                                            "name"
-                                                            str
-                                                        }
-                                                        {
-                                                            "email"
-                                                            str
-                                                        }
-                                                        {
-                                                            "address"
-                                                            T{
-                                                            user
-                                                                {
-                                                                name
-                                                                    "Address"
-                                                                }
-                                                                {
-                                                                type
-                                                                    T{
-                                                                    list
-                                                                        {
-                                                                        type
-                                                                            str
-                                                                        }
-                                                                        {
-                                                                        length
-                                                                            4
-                                                                        }
-                                                                    }
-                                                                }
-                                                            }
-                                                        }
-                                                        {
-                                                            "orders"
-                                                            T{
-                                                            list
-                                                                {
-                                                                type
-                                                                    T{
-                                                                    struct
-                                                                        {
-                                                                        fields
-                                                                            V{
-                                                                                {
-                                                                                    "orderId"
-                                                                                    i64
-                                                                                }
-                                                                                {
-                                                                                    "quantity"
-                                                                                    i32
-                                                                                }
-                                                                            }
-                                                                        }
-                                                                    }
-                                                                }
-                                                            }
-                                                        }
-                                                        {
-                                                            "metadata"
-                                                            T{
-                                                            map
-                                                                {
-                                                                from
-                                                                    str
-                                                                }
-                                                                {
-                                                                to
-                                                                    T{
-                                                                    data
-                                                                    }
-                                                                }
-                                                            }
-                                                        }
-                                                    }
-                                                }
-                                            }
-                                        }
-                                    }
-                                    0
-                                }
-                                {
-                                    T{ user
-                                        { name "Employee" }
-                                        { type
-                                            T{ struct
-                                                { fields
-                                                    V{
-                                                        {
-                                                            "name"
-                                                            str
-                                                        }
-                                                        {
-                                                            "email"
-                                                            str
-                                                        }
-                                                        {
-                                                            "address"
-                                                            T{
-                                                            user
-                                                                {
-                                                                name
-                                                                    "Address"
-                                                                }
-                                                                {
-                                                                type
-                                                                    T{
-                                                                    list
-                                                                        {
-                                                                        type
-                                                                            str
-                                                                        }
-                                                                        {
-                                                                        length
-                                                                            4
-                                                                        }
-                                                                    }
-                                                                }
-                                                            }
-                                                        }
-                                                        {
-                                                            "department"
-                                                            T{
-                                                            user
-                                                                {
-                                                                name
-                                                                    "Department"
-                                                                }
-                                                                {
-                                                                type
-                                                                    T{
-                                                                    enum
-                                                                        {
-                                                                        values
-                                                                            V{
-                                                                                {
-                                                                                    "ACCOUNTING"
-                                                                                    0
-                                                                                }
-                                                                                {
-                                                                                    "ADMINISTRATION"
-                                                                                    1
-                                                                                }
-                                                                                {
-                                                                                    "CUSTOMER_SERVICE"
-                                                                                    2
-                                                                                }
-                                                                                {
-                                                                                    "DEVELOPMENT"
-                                                                                    3
-                                                                                }
-                                                                                {
-                                                                                    "JSMITH"
-                                                                                    99
-                                                                                }
-                                                                            }
-                                                                        }
-                                                                    }
-                                                                }
-                                                            }
-                                                        }
-                                                        {
-                                                            "hireDate"
-                                                            T{
-                                                            user
-                                                                {
-                                                                name
-                                                                    "Time"
-                                                                }
-                                                                {
-                                                                type
-                                                                    str
-                                                                }
-                                                            }
-                                                        }
-                                                        {
-                                                            "publicKey"
-                                                            T{
-                                                            optional
-                                                                {
-                                                                type
-                                                                    T{
-                                                                    user
-                                                                        {
-                                                                        name
-                                                                            "PublicKey"
-                                                                        }
-                                                                        {
-                                                                        type
-                                                                            T{
-                                                                            data
-                                                                                {
-                                                                                length
-                                                                                    128
-                                                                                }
-                                                                            }
-                                                                        }
-                                                                    }
-                                                                }
-                                                            }
-                                                        }
-                                                        {
-                                                            "metadata"
-                                                            T{
-                                                            map
-                                                                {
-                                                                from
-                                                                    str
-                                                                }
-                                                                {
-                                                                to
-                                                                    T{
-                                                                    data
-                                                                    }
-                                                                }
-                                                            }
-                                                        }
-                                                    }
-                                                }
-                                            }
-                                        }
-                                    }
-                                    1
-                                }
-                                {
-                                    T{ user
-                                        { name
-                                            "TerminatedEmployee"
-                                        }
-                                        { type void }
-                                    }
-                                    2
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        }
-    }
-}]=]
-} [
-    [=[ type PublicKey data[128]
+SCHEMA: [=[
+type PublicKey data[128]
 type Time str # ISO 8601
 
 type Department enum {
@@ -733,5 +304,68 @@ type Employee struct {
 type TerminatedEmployee void
 
 type Person union {Customer | Employee | TerminatedEmployee}
-]=] parse-schema [ unparse ] without-limits
+]=]
+
+
+{
+    ! Customer
+    V{
+        { "name" "James Smith" }
+        { "email" "jsmith@example.org" }
+        {
+            "address"
+            { "123 Main St" "Philadelphia" "PA" "United States" }
+        }
+        {
+            "orders"
+            { V{ { "orderId" 4242424242 } { "quantity" 5 } } }
+        }
+        { "metadata" { } }
+    }
+} [
+    B{
+        0x00 0x0b 0x4a 0x61 0x6d 0x65 0x73 0x20 0x53 0x6d 0x69
+        0x74 0x68 0x12 0x6a 0x73 0x6d 0x69 0x74 0x68 0x40 0x65
+        0x78 0x61 0x6d 0x70 0x6c 0x65 0x2e 0x6f 0x72 0x67 0x0b
+        0x31 0x32 0x33 0x20 0x4d 0x61 0x69 0x6e 0x20 0x53 0x74
+        0x0c 0x50 0x68 0x69 0x6c 0x61 0x64 0x65 0x6c 0x70 0x68
+        0x69 0x61 0x02 0x50 0x41 0x0d 0x55 0x6e 0x69 0x74 0x65
+        0x64 0x20 0x53 0x74 0x61 0x74 0x65 0x73 0x01 0xb2 0x41
+        0xde 0xfc 0x00 0x00 0x00 0x00 0x05 0x00 0x00 0x00 0x00
+    } Person bare>
+] unit-test
+
+{
+    ! Employee
+    V{
+        { "name" "Tiffany Doe" }
+        { "email" "tiffanyd@acme.corp" }
+        {
+            "address"
+            { "123 Main St" "Philadelphia" "PA" "United States" }
+        }
+        { "department" "ADMINISTRATION" }
+        { "hireDate" "2020-06-21T21:18:05Z" }
+        { "publicKey" f }
+        { "metadata" { } }
+    }
+} [
+    B{
+        0x01 0x0b 0x54 0x69 0x66 0x66 0x61 0x6e 0x79 0x20 0x44
+        0x6f 0x65 0x12 0x74 0x69 0x66 0x66 0x61 0x6e 0x79 0x64
+        0x40 0x61 0x63 0x6d 0x65 0x2e 0x63 0x6f 0x72 0x70 0x0b
+        0x31 0x32 0x33 0x20 0x4d 0x61 0x69 0x6e 0x20 0x53 0x74
+        0x0c 0x50 0x68 0x69 0x6c 0x61 0x64 0x65 0x6c 0x70 0x68
+        0x69 0x61 0x02 0x50 0x41 0x0d 0x55 0x6e 0x69 0x74 0x65
+        0x64 0x20 0x53 0x74 0x61 0x74 0x65 0x73 0x01 0x14 0x32
+        0x30 0x32 0x30 0x2d 0x30 0x36 0x2d 0x32 0x31 0x54 0x32
+        0x31 0x3a 0x31 0x38 0x3a 0x30 0x35 0x5a 0x00 0x00
+    } Person bare>
+] unit-test
+
+{
+    ! TerminatedEmployee
+    f
+} [
+    B{ 0x02 } Person bare>
 ] unit-test
