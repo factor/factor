@@ -1,11 +1,11 @@
 ! Copyright (C) 2022 John Benediktsson
 ! See http://factorcode.org/license.txt for BSD license
 
-USING: accessors arrays assocs bare combinators endian
-hashtables io io.encodings.binary io.encodings.string
-io.encodings.utf8 io.files io.streams.byte-array kernel math
-math.bitwise math.order math.parser multiline namespaces parser
-peg.ebnf sequences sets strings words words.constant ;
+USING: accessors arrays assocs combinators endian hashtables io
+io.encodings.binary io.encodings.string io.encodings.utf8
+io.files io.streams.byte-array kernel math math.bitwise
+math.order math.parser multiline namespaces parser peg.ebnf
+sequences sets strings words words.constant ;
 
 IN: bare
 
@@ -226,6 +226,12 @@ M: struct read-bare
 
 SYMBOL: user-types
 
+: lookup-user-type ( name -- type )
+    user-types get ?at [ unknown-type ] unless ;
+
+: insert-user-type ( name type -- )
+    swap user-types [ ?set-at ] change ;
+
 EBNF: (parse-schema) [=[
 
 space     = [ \t\n]
@@ -234,35 +240,36 @@ ws        = ((space | comment)*)~
 upper     = [A-Z]
 alpha     = [A-Za-z]
 digit     = [0-9]
-number    = digit+                        => [[ string>number ]]
+number    = digit+                         => [[ string>number ]]
 
-length    =  ws "["~ ws number ws "]"~
+length    = ws "["~ ws number ws "]"~
+value     = ws "="~ ws number
 
-type      =  ws "<"~ ws any-type ws ">"~
+type      = ws "<"~ ws any-type ws ">"~
 
-uint      = "uint"                        => [[ uint ]]
-u8        = "u8"                          => [[ u8 ]]
-u16       = "u16"                         => [[ u16 ]]
-u32       = "u32"                         => [[ u32 ]]
-u64       = "u64"                         => [[ u64 ]]
+uint      = "uint"                         => [[ uint ]]
+u8        = "u8"                           => [[ u8 ]]
+u16       = "u16"                          => [[ u16 ]]
+u32       = "u32"                          => [[ u32 ]]
+u64       = "u64"                          => [[ u64 ]]
 
-int       = "int"                         => [[ int ]]
-i8        = "i8"                          => [[ i8 ]]
-i16       = "i16"                         => [[ i16 ]]
-i32       = "i32"                         => [[ i32 ]]
-i64       = "i64"                         => [[ i64 ]]
+int       = "int"                          => [[ int ]]
+i8        = "i8"                           => [[ i8 ]]
+i16       = "i16"                          => [[ i16 ]]
+i32       = "i32"                          => [[ i32 ]]
+i64       = "i64"                          => [[ i64 ]]
 
-f32       = "f32"                         => [[ f32 ]]
-f64       = "f64"                         => [[ f64 ]]
+f32       = "f32"                          => [[ f32 ]]
+f64       = "f64"                          => [[ f64 ]]
 
-bool      = "bool"                        => [[ bool ]]
-str       = "str"                         => [[ str ]]
-data      = "data"~ length?               => [[ <data> ]]
-void      = "void"                        => [[ void ]]
+bool      = "bool"                         => [[ bool ]]
+str       = "str"                          => [[ str ]]
+data      = "data"~ length?                => [[ <data> ]]
+void      = "void"                         => [[ void ]]
 
-enum-values = (ws enum-value ws)*
-enum-value = enum-value-name (ws "="~ ws number)?
 enum-value-name = upper (upper|digit|[_])* => [[ first2 swap prefix >string ]]
+enum-value = enum-value-name value?        => [[ >array ]]
+enum-values = (ws enum-value ws)*
 enum      = "enum"~ ws "{"~ ws enum-values ws "}"~ => [[ <enum> ]]
 
 uints     = uint|u8|u16|u32|u64
@@ -270,28 +277,28 @@ ints      = int|i8|i16|i32|i64
 floats    = f32|f64
 primitive = uints|ints|floats|bool|str|data|void|enum
 
-optional  = "optional"~ type              => [[ <optional> ]]
-list      = "list"~ type length?          => [[ first2 <list> ]]
-map       = "map"~ type type              => [[ first2 <map> ]]
+optional  = "optional"~ type               => [[ <optional> ]]
+list      = "list"~ type length?           => [[ first2 <list> ]]
+map       = "map"~ type type               => [[ first2 <map> ]]
 
-struct-field-name = alpha+                => [[ >string ]]
+struct-field-name = alpha+                 => [[ >string ]]
 struct-field = struct-field-name ws ":"~ ws any-type => [[ >array ]]
 struct-fields = (ws struct-field ws)*
 struct    = "struct"~ ws "{"~ ws struct-fields ws "}"~ => [[ <struct> ]]
 
+union-member  = any-type value?            => [[ >array ]]
 union-members = union-member (ws "|"~ ws union-member)* => [[ first2 swap prefix ]]
-union-member  = any-type (ws "="~ ws number)? => [[ >array ]]
 union     = "union"~ ws "{"~ ws ("|"?)~ ws union-members? ws ("|"?)~ ws "}"~ => [[ <union> ]]
 
 aggregate = optional|list|map|struct|union
 
-defined   = user-type-name => [[ user-types get ?at [ unknown-type ] unless ]]
+defined   = user-type-name => [[ lookup-user-type ]]
 
 any-type  = aggregate|primitive|defined
 
-user-type-name = (alpha|digit)+     => [[ >string ]]
+user-type-name = (alpha|digit)+            => [[ >string ]]
 user-type = "type"~ ws user-type-name ws any-type
-          => [[ first2 [ 2array ] 2keep swap user-types [ ?set-at ] change ]]
+          => [[ first2 [ insert-user-type ] [ 2array ] 2bi ]]
 
 schema = (ws user-type ws)* => [[ <schema> ]]
 
