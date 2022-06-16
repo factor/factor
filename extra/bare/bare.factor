@@ -9,8 +9,6 @@ strings words words.constant ;
 
 IN: bare
 
-ERROR: invalid-enum value ;
-
 SINGLETONS: uint ;
 SINGLETONS: int ;
 SINGLETONS: u8 u16 u32 u64 ;
@@ -28,6 +26,9 @@ TUPLE: union members ;
 TUPLE: struct fields ;
 TUPLE: user name type ;
 TUPLE: schema types ;
+
+ERROR: invalid-enum value ;
+ERROR: invalid-union value ;
 
 GENERIC: write-bare ( obj schema -- )
 
@@ -139,7 +140,8 @@ M: map read-bare
     '[ _ _ [ read-bare ] bi@ 2array ] replicate ;
 
 M: union read-bare
-    [ uint read-bare ] dip members>> value-at read-bare ;
+    [ uint read-bare ] dip members>> ?value-at
+    [ read-bare ] [ invalid-union ] if ;
 
 M: user read-bare type>> read-bare ;
 
