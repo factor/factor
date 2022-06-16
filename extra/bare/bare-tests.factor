@@ -242,6 +242,10 @@ IN: bare.tests
     ] sequences:map
 ] unit-test
 
+[
+    B{ 0x03 0x03 } T{ bare:union f { { int 0 } { uint 1 } { str 2 } } } bare>
+] [ invalid-union? ] must-fail-with
+
 ! struct
 
 {
