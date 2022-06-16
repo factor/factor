@@ -4,7 +4,7 @@
 USING: accessors arrays assocs bare combinators endian
 hashtables io io.encodings.binary io.encodings.string
 io.encodings.utf8 io.files io.streams.byte-array kernel math
-math.parser multiline namespaces parser peg.ebnf sequences
+math.parser multiline namespaces parser peg.ebnf sequences sets
 strings words words.constant ;
 
 IN: bare
@@ -151,14 +151,22 @@ ERROR: invalid-schema ;
 
 ERROR: unknown-type name ;
 
+ERROR: duplicate-keys keys ;
+
 ERROR: duplicate-values values ;
 
 <PRIVATE
+
+: check-duplicate-keys ( alist -- alist )
+    dup keys duplicates [ duplicate-keys ] unless-empty ;
 
 : check-duplicate-values ( alist -- alist )
     dup H{ } clone [ '[ _ push-at ] assoc-each ] keep
     [ nip length 1 > ] { } assoc-filter-as
     [ duplicate-values ] unless-empty ;
+
+: check-duplicates ( alist -- alist )
+    check-duplicate-keys check-duplicate-values ;
 
 : assign-values ( alist -- alist' )
     0 swap [ rot or dup 1 + -rot ] assoc-map nip ;
@@ -203,7 +211,7 @@ enum-values = enum-value (ws enum-value)* => [[ first2 swap prefix ]]
 enum-value = enum-value-name (ws "="~ ws number)?
 enum-value-name = upper (upper|digit|[_])* => [[ first2 swap prefix >string ]]
 enum      = "enum"~ ws "{"~ ws enum-values ws "}"~
-          => [[ assign-values check-duplicate-values enum boa ]]
+          => [[ assign-values check-duplicates enum boa ]]
 
 uints     = uint|u8|u16|u32|u64
 ints      = int|i8|i16|i32|i64
