@@ -377,15 +377,6 @@ type Person union {Customer | Employee | TerminatedEmployee}
     B{ 0x02 } Person bare>
 ] unit-test
 
-! data checks
-
-[ "type Foo data[0]" parse-schema ] [ invalid-length? ] must-fail-with
-[ "type Foo data[18446744073709551616]" parse-schema ] [ invalid-length? ] must-fail-with
-
-! optional checks
-
-[ "type Foo optional<void>" parse-schema ] [ cannot-be-void? ] must-fail-with
-
 ! enum checks
 
 [
@@ -408,6 +399,27 @@ type Person union {Customer | Employee | TerminatedEmployee}
     }" parse-schema
 ] [ duplicate-values? ] must-fail-with
 
+! data checks
+
+[ "type Foo data[0]" parse-schema ] [ invalid-length? ] must-fail-with
+[ "type Foo data[18446744073709551616]" parse-schema ] [ invalid-length? ] must-fail-with
+
+! optional checks
+
+[ "type Foo optional<void>" parse-schema ] [ cannot-be-void? ] must-fail-with
+
+! list checks
+
+[ "type Foo list<void>" parse-schema ] [ cannot-be-void? ] must-fail-with
+[ "type Foo list<int>[0]" parse-schema ] [ invalid-length? ] must-fail-with
+[ "type Foo list<int>[18446744073709551616]" parse-schema ] [ invalid-length? ] must-fail-with
+
+! map checks
+
+[ "type Foo map<void><int>" parse-schema ] [ cannot-be-void? ] must-fail-with
+[ "type Foo map<void><void>" parse-schema ] [ cannot-be-void? ] must-fail-with
+[ "type Foo map<int><void>" parse-schema ] [ cannot-be-void? ] must-fail-with
+
 ! union checks
 
 [ "type Thing union {int=0|int|str=0}" parse-schema ] [ duplicate-keys? ] must-fail-with
@@ -416,6 +428,7 @@ type Person union {Customer | Employee | TerminatedEmployee}
 ! struct checks
 
 [ "type Thing struct { a: int b: int a: int }" parse-schema ] [ duplicate-keys? ] must-fail-with
+[ "type Thing struct { a: void }" parse-schema ] [ cannot-be-void? ] must-fail-with
 
 ! user checks
 

@@ -81,13 +81,16 @@ PRIVATE>
 : <list> ( type length -- list )
     [ check-void ] [ check-length ] bi* list boa ;
 
-C: <map> map ! XXX: check key types?
+: <map> ( from to -- map )
+    ! XXX: check key types?
+    [ check-void ] bi@ map boa ;
 
 : <union> ( members -- union )
     assign-values check-duplicates check-entries union boa ;
 
 : <struct> ( fields -- struct )
-    check-duplicate-keys check-entries struct boa ;
+    check-duplicate-keys check-entries
+    dup [ check-void 2drop ] assoc-each struct boa ;
 
 C: <user> user
 
