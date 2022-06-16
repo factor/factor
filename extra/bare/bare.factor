@@ -260,7 +260,7 @@ str       = "str"                         => [[ str ]]
 data      = "data"~ length?               => [[ <data> ]]
 void      = "void"                        => [[ void ]]
 
-enum-values = enum-value (ws enum-value)* => [[ first2 swap prefix ]]
+enum-values = (ws enum-value ws)*
 enum-value = enum-value-name (ws "="~ ws number)?
 enum-value-name = upper (upper|digit|[_])* => [[ first2 swap prefix >string ]]
 enum      = "enum"~ ws "{"~ ws enum-values ws "}"~ => [[ <enum> ]]
@@ -276,12 +276,12 @@ map       = "map"~ type type              => [[ first2 <map> ]]
 
 struct-field-name = alpha+                => [[ >string ]]
 struct-field = struct-field-name ws ":"~ ws any-type => [[ >array ]]
-struct-fields = struct-field (ws struct-field)* => [[ first2 swap prefix ]]
-struct    = "struct"~ ws "{"~ ws~ struct-fields ws "}"~ => [[ <struct> ]]
+struct-fields = (ws struct-field ws)*
+struct    = "struct"~ ws "{"~ ws struct-fields ws "}"~ => [[ <struct> ]]
 
 union-members = union-member (ws "|"~ ws union-member)* => [[ first2 swap prefix ]]
 union-member  = any-type (ws "="~ ws number)? => [[ >array ]]
-union     = "union"~ ws "{"~ ws ("|"?)~ ws union-members ws ("|"?)~ ws "}"~ => [[ <union> ]]
+union     = "union"~ ws "{"~ ws ("|"?)~ ws union-members? ws ("|"?)~ ws "}"~ => [[ <union> ]]
 
 aggregate = optional|list|map|struct|union
 
@@ -293,8 +293,7 @@ user-type-name = (alpha|digit)+     => [[ >string ]]
 user-type = "type"~ ws user-type-name ws any-type
           => [[ first2 [ 2array ] 2keep swap user-types [ ?set-at ] change ]]
 
-user-types = user-type (ws user-type)* => [[ first2 swap prefix ]]
-schema = ws user-types ws => [[ <schema> ]]
+schema = (ws user-type ws)* => [[ <schema> ]]
 
 ]=]
 
