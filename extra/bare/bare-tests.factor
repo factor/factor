@@ -148,6 +148,9 @@ IN: bare.tests
 { "BUZZ" } [ B{ 0x80 0x02 } T{ enum f { { "FOO" 0 } { "BAR" 255 } { "BUZZ" 256 } } } bare> ] unit-test
 { B{ 0x80 0x02 } } [ "BUZZ" T{ enum f { { "FOO" 0 } { "BAR" 255 } { "BUZZ" 256 } } } >bare ] unit-test
 
+[ B{ 0x03 } T{ enum f { { "A" 0 } { "B" 1 } { "C" 2 } } } bare> ] [ invalid-enum? ] must-fail-with
+[ "D" T{ enum f { { "A" 0 } { "B" 1 } { "C" 2 } } } >bare ] [ invalid-enum? ] must-fail-with
+
 ! optional<u32>
 
 { f } [ B{ 0x00 } T{ optional f u32 } bare> ] unit-test

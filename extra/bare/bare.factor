@@ -9,6 +9,8 @@ strings words words.constant ;
 
 IN: bare
 
+ERROR: invalid-enum value ;
+
 SINGLETONS: uint ;
 SINGLETONS: int ;
 SINGLETONS: u8 u16 u32 u64 ;
@@ -59,7 +61,8 @@ M: data write-bare
 
 M: void write-bare 2drop ;
 
-M: enum write-bare values>> at uint write-bare ;
+M: enum write-bare
+    values>> ?at [ uint write-bare ] [ invalid-enum ] if ;
 
 M: optional write-bare
     over 1 0 ? u8 write-bare
@@ -120,7 +123,9 @@ M: data read-bare
 
 M: void read-bare drop f ; ! XXX: this isn't right
 
-M: enum read-bare [ uint read-bare ] dip values>> value-at ;
+M: enum read-bare
+    [ uint read-bare ] dip values>> ?value-at
+    [ invalid-enum ] unless ;
 
 M: optional read-bare
     u8 read-bare 1 = [ type>> read-bare ] [ drop f ] if ;
