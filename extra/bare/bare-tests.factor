@@ -379,6 +379,8 @@ type Person union {Customer | Employee | TerminatedEmployee}
 
 ! enum checks
 
+[ "type Thing enum {}" parse-schema ] [ not-enough-entries? ] must-fail-with
+[ "type Thing enum { }" parse-schema ] [ not-enough-entries? ] must-fail-with
 [
     "type Alphabet enum {
       A
@@ -422,11 +424,15 @@ type Person union {Customer | Employee | TerminatedEmployee}
 
 ! union checks
 
+[ "type Thing union {}" parse-schema ] [ not-enough-entries? ] must-fail-with
+[ "type Thing union { }" parse-schema ] [ not-enough-entries? ] must-fail-with
 [ "type Thing union {int=0|int|str=0}" parse-schema ] [ duplicate-keys? ] must-fail-with
 [ "type Thing union {int=0|uint|str=0}" parse-schema ] [ duplicate-values? ] must-fail-with
 
 ! struct checks
 
+[ "type Thing struct {}" parse-schema ] [ not-enough-entries? ] must-fail-with
+[ "type Thing struct { }" parse-schema ] [ not-enough-entries? ] must-fail-with
 [ "type Thing struct { a: int b: int a: int }" parse-schema ] [ duplicate-keys? ] must-fail-with
 [ "type Thing struct { a: void }" parse-schema ] [ cannot-be-void? ] must-fail-with
 
