@@ -26,7 +26,6 @@ TUPLE: list type length ;
 TUPLE: map from to ;
 TUPLE: union members ;
 TUPLE: struct fields ;
-TUPLE: user name type ;
 TUPLE: schema types ;
 
 ! errors
@@ -91,8 +90,6 @@ PRIVATE>
 : <struct> ( fields -- struct )
     check-duplicate-keys check-entries
     dup [ check-void 2drop ] assoc-each struct boa ;
-
-C: <user> user
 
 : <schema> ( types -- schema )
     check-entries schema boa ;
@@ -159,8 +156,6 @@ M: map write-bare
 
 ! XXX: M: union write-bare
 
-M: user write-bare type>> write-bare ;
-
 M: struct write-bare
     fields>> [ [ dupd of ] [ write-bare ] bi* ] assoc-each drop ;
 
@@ -221,8 +216,6 @@ M: map read-bare
 M: union read-bare
     [ uint read-bare ] dip members>> ?value-at
     [ read-bare ] [ invalid-union ] if ;
-
-M: user read-bare type>> read-bare ;
 
 M: struct read-bare
     fields>> [ read-bare ] assoc-map ;
@@ -298,7 +291,7 @@ any-type  = aggregate|primitive|defined
 
 user-type-name = (alpha|digit)+     => [[ >string ]]
 user-type = "type"~ ws user-type-name ws any-type
-          => [[ first2 [ <user> dup ] 2keep drop user-types [ ?set-at ] change ]]
+          => [[ first2 [ 2array ] 2keep swap user-types [ ?set-at ] change ]]
 
 user-types = user-type (ws user-type)* => [[ first2 swap prefix ]]
 schema = ws user-types ws => [[ <schema> ]]
@@ -314,9 +307,10 @@ PRIVATE>
     utf8 file-contents parse-schema ;
 
 : define-schema ( schema -- )
+    ! XXX: define user types as tuples with bare-fields word-prop?
     types>> [
-        [ name>> create-word-in dup reset-generic ]
-        [ type>> define-constant ] bi
-    ] each ;
+        [ create-word-in dup reset-generic ]
+        [ define-constant ] bi*
+    ] assoc-each ;
 
 SYNTAX: SCHEMA: scan-object parse-schema define-schema ;
