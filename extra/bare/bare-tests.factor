@@ -403,3 +403,7 @@ type Person union {Customer | Employee | TerminatedEmployee}
 
 [ "type Thing union {int=0|int|str=0}" parse-schema ] [ duplicate-keys? ] must-fail-with
 [ "type Thing union {int=0|uint|str=0}" parse-schema ] [ duplicate-values? ] must-fail-with
+
+! struct checks
+
+[ "type Thing struct { a: int b: int a: int }" parse-schema ] [ duplicate-keys? ] must-fail-with
