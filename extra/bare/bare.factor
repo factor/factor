@@ -4,10 +4,12 @@
 USING: accessors arrays assocs bare combinators endian
 hashtables io io.encodings.binary io.encodings.string
 io.encodings.utf8 io.files io.streams.byte-array kernel math
-math.parser multiline namespaces parser peg.ebnf sequences sets
-strings words words.constant ;
+math.bitwise math.order math.parser multiline namespaces parser
+peg.ebnf sequences sets strings words words.constant ;
 
 IN: bare
+
+! types
 
 SINGLETONS: uint ;
 SINGLETONS: int ;
@@ -27,10 +29,84 @@ TUPLE: struct fields ;
 TUPLE: user name type ;
 TUPLE: schema types ;
 
+! errors
+
+ERROR: invalid-length length ;
 ERROR: invalid-enum value ;
 ERROR: invalid-union value ;
+ERROR: unknown-type name ;
+ERROR: duplicate-keys keys ;
+ERROR: duplicate-values values ;
+ERROR: not-enough-entries ;
+ERROR: cannot-be-void type ;
+
+<PRIVATE
+
+: check-length ( length/f -- length/f )
+    dup [ 1 64 on-bits between? [ invalid-length ] unless ] when* ;
+
+: check-duplicate-keys ( alist -- alist )
+    dup keys duplicates [ duplicate-keys ] unless-empty ;
+
+: check-duplicate-values ( alist -- alist )
+    dup H{ } clone [ '[ _ push-at ] assoc-each ] keep
+    [ nip length 1 > ] { } assoc-filter-as
+    [ duplicate-values ] unless-empty ;
+
+: check-duplicates ( alist -- alist )
+    check-duplicate-keys check-duplicate-values ;
+
+: assign-values ( alist -- alist' )
+    0 swap [ rot or dup 1 + -rot ] assoc-map nip ;
+
+: check-entries ( alist -- alist )
+    dup assoc-empty? [ not-enough-entries ] when ;
+
+: check-void ( type -- type )
+    dup void? [ cannot-be-void ] when ;
+
+PRIVATE>
+
+! constructors
+
+: <data> ( length -- data )
+    check-length data boa ;
+
+: <enum> ( values -- enum )
+    assign-values check-duplicates check-entries enum boa ;
+
+: <optional> ( type -- optional )
+    check-void optional boa ;
+
+: <list> ( type length -- list )
+    [ check-void ] [ check-length ] bi* list boa ;
+
+C: <map> map ! XXX: check key types?
+
+: <union> ( members -- union )
+    assign-values check-duplicates check-entries union boa ;
+
+: <struct> ( fields -- struct )
+    check-duplicate-keys check-entries struct boa ;
+
+C: <user> user
+
+: <schema> ( types -- schema )
+    check-entries schema boa ;
+
+! main interface
+
+GENERIC: read-bare ( schema -- obj )
 
 GENERIC: write-bare ( obj schema -- )
+
+: bare> ( encoded schema -- obj )
+    swap binary [ read-bare ] with-byte-reader ;
+
+: >bare ( obj schema -- encoded )
+    binary [ write-bare ] with-byte-writer ;
+
+! writing implementation
 
 M: uint write-bare
     drop [ dup 0x80 >= ] [
@@ -85,7 +161,7 @@ M: user write-bare type>> write-bare ;
 M: struct write-bare
     fields>> [ [ dupd of ] [ write-bare ] bi* ] assoc-each drop ;
 
-GENERIC: read-bare ( schema -- obj )
+! reading implementation
 
 M: uint read-bare
     drop 0 0 [
@@ -148,35 +224,9 @@ M: user read-bare type>> read-bare ;
 M: struct read-bare
     fields>> [ read-bare ] assoc-map ;
 
-: >bare ( obj schema -- encoded )
-    binary [ write-bare ] with-byte-writer ;
-
-: bare> ( encoded schema -- obj )
-    swap binary [ read-bare ] with-byte-reader ;
-
-ERROR: invalid-schema ;
-
-ERROR: unknown-type name ;
-
-ERROR: duplicate-keys keys ;
-
-ERROR: duplicate-values values ;
+! schema
 
 <PRIVATE
-
-: check-duplicate-keys ( alist -- alist )
-    dup keys duplicates [ duplicate-keys ] unless-empty ;
-
-: check-duplicate-values ( alist -- alist )
-    dup H{ } clone [ '[ _ push-at ] assoc-each ] keep
-    [ nip length 1 > ] { } assoc-filter-as
-    [ duplicate-values ] unless-empty ;
-
-: check-duplicates ( alist -- alist )
-    check-duplicate-keys check-duplicate-values ;
-
-: assign-values ( alist -- alist' )
-    0 swap [ rot or dup 1 + -rot ] assoc-map nip ;
 
 SYMBOL: user-types
 
@@ -211,34 +261,31 @@ f64       = "f64"                         => [[ f64 ]]
 
 bool      = "bool"                        => [[ bool ]]
 str       = "str"                         => [[ str ]]
-data      = "data"~ length?               => [[ data boa ]]
+data      = "data"~ length?               => [[ <data> ]]
 void      = "void"                        => [[ void ]]
 
 enum-values = enum-value (ws enum-value)* => [[ first2 swap prefix ]]
 enum-value = enum-value-name (ws "="~ ws number)?
 enum-value-name = upper (upper|digit|[_])* => [[ first2 swap prefix >string ]]
-enum      = "enum"~ ws "{"~ ws enum-values ws "}"~
-          => [[ assign-values check-duplicates enum boa ]]
+enum      = "enum"~ ws "{"~ ws enum-values ws "}"~ => [[ <enum> ]]
 
 uints     = uint|u8|u16|u32|u64
 ints      = int|i8|i16|i32|i64
 floats    = f32|f64
 primitive = uints|ints|floats|bool|str|data|void|enum
 
-optional  = "optional"~ type              => [[ optional boa ]]
-list      = "list"~ type length?          => [[ first2 list boa ]]
-map       = "map"~ type type              => [[ first2 bare:map boa ]]
+optional  = "optional"~ type              => [[ <optional> ]]
+list      = "list"~ type length?          => [[ first2 <list> ]]
+map       = "map"~ type type              => [[ first2 <map> ]]
 
 struct-field-name = alpha+                => [[ >string ]]
 struct-field = struct-field-name ws ":"~ ws any-type => [[ >array ]]
 struct-fields = struct-field (ws struct-field)* => [[ first2 swap prefix ]]
-struct    = "struct"~ ws "{"~ ws~ struct-fields ws "}"~
-          => [[ check-duplicate-keys struct boa ]]
+struct    = "struct"~ ws "{"~ ws~ struct-fields ws "}"~ => [[ <struct> ]]
 
 union-members = union-member (ws "|"~ ws union-member)* => [[ first2 swap prefix ]]
 union-member  = any-type (ws "="~ ws number)? => [[ >array ]]
-union     = "union"~ ws "{"~ ws ("|"?)~ ws union-members ws ("|"?)~ ws "}"~
-          => [[ assign-values check-duplicates union boa ]]
+union     = "union"~ ws "{"~ ws ("|"?)~ ws union-members ws ("|"?)~ ws "}"~ => [[ <union> ]]
 
 aggregate = optional|list|map|struct|union
 
@@ -248,10 +295,10 @@ any-type  = aggregate|primitive|defined
 
 user-type-name = (alpha|digit)+     => [[ >string ]]
 user-type = "type"~ ws user-type-name ws any-type
-          => [[ first2 [ user boa dup ] 2keep drop user-types [ ?set-at ] change ]]
+          => [[ first2 [ <user> dup ] 2keep drop user-types [ ?set-at ] change ]]
 
 user-types = user-type (ws user-type)* => [[ first2 swap prefix ]]
-schema = ws user-types ws => [[ schema boa ]]
+schema = ws user-types ws => [[ <schema> ]]
 
 ]=]
 

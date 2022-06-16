@@ -377,6 +377,15 @@ type Person union {Customer | Employee | TerminatedEmployee}
     B{ 0x02 } Person bare>
 ] unit-test
 
+! data checks
+
+[ "type Foo data[0]" parse-schema ] [ invalid-length? ] must-fail-with
+[ "type Foo data[18446744073709551616]" parse-schema ] [ invalid-length? ] must-fail-with
+
+! optional checks
+
+[ "type Foo optional<void>" parse-schema ] [ cannot-be-void? ] must-fail-with
+
 ! enum checks
 
 [
@@ -407,3 +416,7 @@ type Person union {Customer | Employee | TerminatedEmployee}
 ! struct checks
 
 [ "type Thing struct { a: int b: int a: int }" parse-schema ] [ duplicate-keys? ] must-fail-with
+
+! user checks
+
+[ "type Thing Other" parse-schema ] [ unknown-type? ] must-fail-with
