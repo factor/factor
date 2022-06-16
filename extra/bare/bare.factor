@@ -151,12 +151,17 @@ ERROR: invalid-schema ;
 
 ERROR: unknown-type name ;
 
+ERROR: duplicate-values values ;
+
 <PRIVATE
 
+: check-duplicate-values ( alist -- alist )
+    dup H{ } clone [ '[ _ push-at ] assoc-each ] keep
+    [ nip length 1 > ] { } assoc-filter-as
+    [ duplicate-values ] unless-empty ;
+
 : assign-values ( alist -- alist' )
-    0 swap [
-        [ [ drop ] 2dip swap over ] [ over ] if* [ 1 + ] 2dip
-    ] assoc-map nip ;
+    0 swap [ rot or dup 1 + -rot ] assoc-map nip ;
 
 SYMBOL: user-types
 
@@ -198,7 +203,7 @@ enum-values = enum-value (ws enum-value)* => [[ first2 swap prefix ]]
 enum-value = enum-value-name (ws "="~ ws number)?
 enum-value-name = upper (upper|digit|[_])* => [[ first2 swap prefix >string ]]
 enum      = "enum"~ ws "{"~ ws enum-values ws "}"~
-          => [[ assign-values enum boa ]]
+          => [[ assign-values check-duplicate-values enum boa ]]
 
 uints     = uint|u8|u16|u32|u64
 ints      = int|i8|i16|i32|i64
@@ -243,8 +248,10 @@ PRIVATE>
 : load-schema ( path -- schema )
     utf8 file-contents parse-schema ;
 
-SYNTAX: SCHEMA:
-    scan-object parse-schema types>> [
+: define-schema ( schema -- )
+    types>> [
         [ name>> create-word-in dup reset-generic ]
         [ type>> define-constant ] bi
     ] each ;
+
+SYNTAX: SCHEMA: scan-object parse-schema define-schema ;

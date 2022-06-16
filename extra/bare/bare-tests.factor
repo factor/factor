@@ -369,3 +369,13 @@ type Person union {Customer | Employee | TerminatedEmployee}
 } [
     B{ 0x02 } Person bare>
 ] unit-test
+
+[
+    "type Alphabet enum {
+      A
+      B
+      C = 0
+      D
+      E = 99
+    }" parse-schema
+] [ duplicate-values? ] must-fail-with
