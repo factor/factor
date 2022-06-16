@@ -74,6 +74,8 @@ ARTICLE: "assocs-lookup" "Lookup and querying of assocs"
     ?at
     of
     ?of
+    value-at
+    ?value-at
     assoc-empty?
     keys
     values
@@ -401,6 +403,10 @@ HELP: value-at*
 HELP: value-at
 { $values { "value" object } { "assoc" assoc } { "key/f" { $maybe "the key associated to the value" } } }
 { $description "Looks up the key associated with a value. No distinction is made between a missing key and a key set to " { $link f } "." } ;
+
+HELP: ?value-at
+{ $values { "value" object } { "assoc" assoc } { "key/value" "the key associated to the value or the value if the value is not present in the assoc" } { "?" "a " { $link boolean } " indicating if the value was present" } }
+{ $description "Looks up the key associated with a value. If the value was not present, an error can be thrown without extra stack shuffling. This word handles assocs that store " { $link f } "." } ;
 
 HELP: value?
 { $values { "value" object } { "assoc" assoc } { "?" boolean } }

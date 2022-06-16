@@ -221,6 +221,9 @@ M: assoc value-at* swap [ = nip ] curry assoc-find nip ;
 
 : value-at ( value assoc -- key/f ) value-at* drop ;
 
+: ?value-at ( value assoc -- key/value ? )
+    2dup value-at* [ 2nip t ] [ 2drop f ] if ; inline
+
 : value? ( value assoc -- ? ) value-at* nip ;
 
 : push-at ( value key assoc -- )
