@@ -398,3 +398,8 @@ type Person union {Customer | Employee | TerminatedEmployee}
       E = 99
     }" parse-schema
 ] [ duplicate-values? ] must-fail-with
+
+! union checks
+
+[ "type Thing union {int=0|int|str=0}" parse-schema ] [ duplicate-keys? ] must-fail-with
+[ "type Thing union {int=0|uint|str=0}" parse-schema ] [ duplicate-values? ] must-fail-with

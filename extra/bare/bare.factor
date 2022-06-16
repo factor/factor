@@ -238,7 +238,7 @@ struct    = "struct"~ ws "{"~ ws~ struct-fields ws "}"~
 union-members = union-member (ws "|"~ ws union-member)* => [[ first2 swap prefix ]]
 union-member  = any-type (ws "="~ ws number)? => [[ >array ]]
 union     = "union"~ ws "{"~ ws ("|"?)~ ws union-members ws ("|"?)~ ws "}"~
-          => [[ assign-values union boa ]]
+          => [[ assign-values check-duplicates union boa ]]
 
 aggregate = optional|list|map|struct|union
 
