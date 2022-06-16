@@ -233,7 +233,7 @@ struct-field-name = alpha+                => [[ >string ]]
 struct-field = struct-field-name ws ":"~ ws any-type => [[ >array ]]
 struct-fields = struct-field (ws struct-field)* => [[ first2 swap prefix ]]
 struct    = "struct"~ ws "{"~ ws~ struct-fields ws "}"~
-          => [[ struct boa ]]
+          => [[ check-duplicate-keys struct boa ]]
 
 union-members = union-member (ws "|"~ ws union-member)* => [[ first2 swap prefix ]]
 union-member  = any-type (ws "="~ ws number)? => [[ >array ]]
