@@ -4,4 +4,4 @@ USING: io.files.acls.macosx io.pathnames system tools.test ;
 IN: io.files.acls.macosx.tests
 
 { } [ vm-path acls. ] unit-test
-{ } [ home "Pictures" append-path acls. ] unit-test
+{ } [ "~/Pictures" acls. ] unit-test

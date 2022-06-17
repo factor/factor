@@ -373,7 +373,7 @@ ${example-indent}}
     [ "Click to edit: " write <pathname> . ] bi ;
 
 : scaffold-rc ( path -- )
-    [ home ] dip append-path scaffold-file ;
+    home prepend-path scaffold-file ;
 
 : scaffold-factor-boot-rc ( -- )
     ".factor-boot-rc" scaffold-rc ;
