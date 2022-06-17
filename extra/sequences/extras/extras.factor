@@ -704,7 +704,8 @@ PRIVATE>
 : find-pred-loop ( ... i n seq quot: ( ... elt -- ... calc ? ) -- ... calc/f i/f elt/f )
     2pick < [
         [ nipd call ] 4keep
-        3 7 nrotates
+        ! 3 7 nrotates ! stack checker does not like this
+        7 nrot 7 nrot 7 nrot
         [ [ 3drop ] 2dip rot ]
         [ 2drop [ 1 + ] 3dip find-pred-loop ] if
     ] [
