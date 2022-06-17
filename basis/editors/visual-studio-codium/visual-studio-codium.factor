@@ -3,13 +3,13 @@
 USING: combinators editors editors.visual-studio-code
 io.pathnames io.standard-paths kernel namespaces system
 tools.which ;
-IN: editors.codium
+IN: editors.visual-studio-codium
 
-TUPLE: codium < visual-studio-code ;
+TUPLE: visual-studio-codium < visual-studio-code ;
 
-T{ codium } editor-class set-global
+T{ visual-studio-codium } editor-class set-global
 
-M: codium find-visual-studio-code-path
+M: visual-studio-codium find-visual-studio-code-path
     os {
         { linux [ "codium" which ] }
         { macosx [
