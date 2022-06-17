@@ -21,11 +21,11 @@ TUPLE: arm64-assembler ip labels out ;
 : ip ( -- address ) arm64-assembler get ip>> ;
 : >out ( instruction -- ) arm64-assembler get out>> push ;
 
-: ADRP ( imm Rd -- )
-    [
-        ip 12 on-bits unmask - -12 shift
-        [ 2 bits ] [ -2 shift ] bi
-    ] dip ADRP-encode >out ;
+: ADR ( imm21 Rd -- )
+    [ [ 2 bits ] [ 19 bits ] bi ] dip ADR-encode >out ;
+
+: ADRP ( imm21 Rd -- )
+    [ [ 2 bits ] [ 19 bits ] bi ] dip ADRP-encode >out ;
 
 : BL ( offset -- ) ip - 4 / BL-encode >out ;
 : BR ( register -- ) BR-encode >out ;

@@ -6,7 +6,8 @@ multiline parser sequences vocabs.parser words words.symbol ;
 IN: cpu.arm.assembler.opcodes
 
 ! https://developer.arm.com/documentation/ddi0487/latest/
-! https://static.docs.arm.com/ddi0487/fb/DDI0487F_b_armv8_arm.pdf
+! https://static.docs.arm.com/ddi0487/fb/DDI0487F_b_armv8_arm.pdf ! initial work
+! https://static.docs.arm.com/ddi0487/fb/DDI0487G_a_armv8_arm.pdf ! 3/13/21
 
 <<
 SYNTAX: REGISTERS:
