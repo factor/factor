@@ -51,11 +51,11 @@ MACRO: -nrot ( n -- quot )
 : ndip ( n -- )
     [ [ dip ] curry ] swap call-n call ; inline
 
-: nrotates ( n depth -- quot )
-    '[ _ [ _ nrot ] times ] call ; inline
+MACRO: nrotates ( n depth -- quot )
+    '[ [ _ nrot ] ] replicate concat ;
 
-: -nrotates ( n depth -- quot )
-    '[ _ [ _ -nrot ] times ] call ; inline
+MACRO: -nrotates ( n depth -- quot )
+    '[ [ _ -nrot ] ] replicate concat ;
 
 : ndrop ( n -- )
     [ drop ] swap call-n ; inline
