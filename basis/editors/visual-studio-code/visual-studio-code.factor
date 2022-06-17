@@ -19,7 +19,7 @@ M: visual-studio-code find-visual-studio-code-path
             {
                 [ "code" which ]
                 [ "Code" which ]
-                [ home "VSCode-linux-x64/Code" append-path ]
+                [ "~/VSCode-linux-x64/Code" ]
                 [ "/usr/share/code/code" ]
             } [ dup file-exists? [ drop f ] unless ] map-compose 0|| ] }
         { macosx [
