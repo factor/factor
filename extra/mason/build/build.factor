@@ -1,9 +1,10 @@
 ! Copyright (C) 2008, 2011 Eduardo Cavazos, Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: arrays calendar combinators continuations io.directories
-io.pathnames kernel mason.child mason.cleanup mason.common
-mason.config mason.docs mason.git mason.notify mason.platform
-mason.release mason.updates namespaces sequences ;
+USING: arrays calendar combinators continuations io.backend
+io.directories io.pathnames kernel mason.child mason.cleanup
+mason.common mason.config mason.docs mason.git mason.notify
+mason.platform mason.release mason.updates namespaces sequences
+;
 IN: mason.build
 
 : create-build-dir ( -- )
