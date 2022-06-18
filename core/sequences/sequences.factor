@@ -633,7 +633,7 @@ PRIVATE>
     [ dup length <iota> ] 2dip 2map-as ; inline
 
 : map-index ( ... seq quot: ( ... elt index -- ... newelt ) -- ... newseq )
-    { } map-index-as ; inline
+    over map-index-as ; inline
 
 : interleave ( ... seq between quot: ( ... elt -- ... ) -- ... )
     pick empty? [ 3drop ] [
