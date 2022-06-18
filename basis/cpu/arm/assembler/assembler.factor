@@ -1,6 +1,6 @@
 ! Copyright (C) 2020 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors combinators cpu.arm.assembler.opcodes io.binary
+USING: accessors combinators cpu.arm.assembler.opcodes
 kernel make math math.bitwise namespaces sequences ;
 IN: cpu.arm.assembler
 
