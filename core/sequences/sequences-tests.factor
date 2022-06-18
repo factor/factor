@@ -414,6 +414,8 @@ M: bogus-hashcode hashcode* 2drop 0 >bignum ;
 { { 0 } } [ 1 0 <repetition> >array ] unit-test
 { { 0 0 0 } } [ 3 0 <repetition> >array ] unit-test
 
+{ "ABCD" } [ "AAAA" [ + ] map-index ] unit-test
+
 {
     { 11 23 35 }
 } [ { 11 22 33 } [ + ] map-index ] unit-test
