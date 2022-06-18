@@ -1,7 +1,7 @@
 ! Copyright (C) 2020 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors assocs classes.error classes.parser effects
-effects.parser io.binary kernel lexer make math math.bitwise
+effects.parser endian kernel lexer make math math.bitwise
 math.parser multiline parser sequences vocabs.parser words
 words.symbol ;
 IN: cpu.arm.assembler.opcodes
