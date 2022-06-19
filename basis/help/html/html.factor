@@ -303,8 +303,15 @@ MEMO: load-index ( name -- index )
 : article-apropos ( string -- results )
     "articles.idx" offline-apropos ;
 
-: word-apropos ( string -- results )
-    "words.idx" offline-apropos ;
-
 : vocab-apropos ( string -- results )
     "vocabs.idx" offline-apropos ;
+
+: qualified-index ( str index -- str index' )
+    over ":" split1 [
+        drop vocab-apropos values [ "," ".html" surround ] map
+        '[ drop _ [ tail? ] with any? ] dupd assoc-filter
+        [ over ".html" ?tail drop "," split1-last nip swap ":" glue ] assoc-map append
+    ] [ drop ] if* ;
+
+: word-apropos ( string -- results )
+    "words.idx" load-index qualified-index completions ;
