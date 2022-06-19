@@ -159,10 +159,6 @@ C: <dquote> dquote
     ">" expect-and-span
     <close-tag> ;
 
-:: shorten* ( vector n -- seq )
-    vector n tail
-    n vector shorten ;
-
 : unclosed-open-tag? ( obj -- ? )
     { [ open-tag? ] [ close-tag>> not ] } 1&& ; inline
 
