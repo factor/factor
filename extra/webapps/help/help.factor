@@ -9,8 +9,14 @@ IN: webapps.help
 
 TUPLE: help-webapp < dispatcher ;
 
+: fixup-words ( title href -- title' href' )
+    dup "word-" head? [
+        dup ".html" ?tail drop "," split1-last nip
+        '[ " (" _ 3append ")" append ] dip
+    ] when ;
+
 : links ( apropos -- seq )
-    [ swap <simple-link> ] { } assoc>map ;
+    [ swap fixup-words <simple-link> ] { } assoc>map ;
 
 : ?links ( has-links? apropos -- has-links? seq/f )
     links [ f ] [ nip t swap ] if-empty ;
