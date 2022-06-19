@@ -877,7 +877,7 @@ ERROR: invalid-return-state obj ;
     } cond ;
 
 : data-state ( document n/f string -- document n'/f string )
-    next-char-from (data-state) ;
+    take-char (data-state) ;
 
 
 : (rcdata-state) ( document n/f string ch/f -- document n'/f string )
@@ -890,7 +890,7 @@ ERROR: invalid-return-state obj ;
     } cond ;
 
 : rcdata-state ( document n/f string -- document n'/f string )
-    next-char-from (rcdata-state) ;
+    take-char (rcdata-state) ;
 
 
 : (rawtext-state) ( document n/f string ch/f -- document n'/f string )
@@ -902,7 +902,7 @@ ERROR: invalid-return-state obj ;
     } cond ;
 
 : rawtext-state ( document n/f string -- document n'/f string )
-    next-char-from (rawtext-state) ;
+    take-char (rawtext-state) ;
 
 
 : (script-data-state) ( document n/f string ch/f -- document n'/f string )
@@ -914,7 +914,7 @@ ERROR: invalid-return-state obj ;
     } cond ;
 
 : script-data-state ( document n/f string -- document n'/f string )
-    next-char-from (script-data-state) ;
+    take-char (script-data-state) ;
 
 
 : (plaintext-state) ( document n/f string ch/f -- document n'/f string )
@@ -925,7 +925,7 @@ ERROR: invalid-return-state obj ;
     } cond ;
 
 : plaintext-state ( document n/f string -- document n'/f string )
-    next-char-from (plaintext-state) ;
+    take-char (plaintext-state) ;
 
 
 : (tag-open-state) ( document n/f string ch/f -- document n'/f string )
@@ -939,7 +939,7 @@ ERROR: invalid-return-state obj ;
     } cond ;
 
 : tag-open-state ( document n/f string -- document n'/f string )
-    next-char-from (tag-open-state) ;
+    take-char (tag-open-state) ;
 
 
 : (end-tag-open-state) ( document n/f string ch/f -- document n'/f string )
@@ -951,7 +951,7 @@ ERROR: invalid-return-state obj ;
     } cond ;
 
 : end-tag-open-state ( document n/f string -- document n'/f string )
-    next-char-from (end-tag-open-state) ;
+    take-char (end-tag-open-state) ;
 
 
 : (tag-name-state) ( document n/f string ch/f -- document n'/f string )
@@ -966,7 +966,7 @@ ERROR: invalid-return-state obj ;
     } cond ;
 
 : tag-name-state ( document n/f string -- document n'/f string )
-    next-char-from (tag-name-state) ;
+    take-char (tag-name-state) ;
 
 
 : (rcdata-less-than-sign-state) ( document n/f string ch/f -- document n'/f string )
@@ -976,7 +976,7 @@ ERROR: invalid-return-state obj ;
     } cond ;
 
 : rcdata-less-than-sign-state ( document n/f string -- document n'/f string )
-    next-char-from (rcdata-less-than-sign-state) ;
+    take-char (rcdata-less-than-sign-state) ;
 
 
 : (rcdata-end-tag-open-state) ( document n/f string ch/f -- document n'/f string )
@@ -986,7 +986,7 @@ ERROR: invalid-return-state obj ;
     } cond ;
 
 : rcdata-end-tag-open-state ( document n/f string -- document n'/f string )
-    next-char-from (rcdata-end-tag-open-state) ;
+    take-char (rcdata-end-tag-open-state) ;
 
 
 : (rcdata-end-tag-name-state) ( document n/f string ch/f -- document n'/f string )
@@ -1009,7 +1009,7 @@ ERROR: invalid-return-state obj ;
     } cond ;
 
 : rcdata-end-tag-name-state ( document n/f string -- document n'/f string )
-    next-char-from (rcdata-end-tag-name-state) ;
+    take-char (rcdata-end-tag-name-state) ;
 
 
 : (rawtext-less-than-sign-state) ( document n/f string ch/f -- document n'/f string )
@@ -1019,7 +1019,7 @@ ERROR: invalid-return-state obj ;
     } cond ;
 
 : rawtext-less-than-sign-state ( document n/f string -- document n'/f string )
-    next-char-from (rawtext-less-than-sign-state) ;
+    take-char (rawtext-less-than-sign-state) ;
 
 
 : (rawtext-end-tag-open-state) ( document n/f string ch/f -- document n'/f string )
@@ -1029,7 +1029,7 @@ ERROR: invalid-return-state obj ;
     } cond ;
 
 : rawtext-end-tag-open-state ( document n/f string -- document n'/f string )
-    next-char-from (rawtext-end-tag-open-state) ;
+    take-char (rawtext-end-tag-open-state) ;
 
 
 : (rawtext-end-tag-name-state) ( document n/f string ch/f -- document n'/f string )
@@ -1052,7 +1052,7 @@ ERROR: invalid-return-state obj ;
     } cond ;
 
 : rawtext-end-tag-name-state ( document n/f string -- document n'/f string )
-    next-char-from (rawtext-end-tag-name-state) ;
+    take-char (rawtext-end-tag-name-state) ;
 
 
 : (script-data-less-than-sign-state) ( document n/f string ch/f -- document n'/f string )
@@ -1063,7 +1063,7 @@ ERROR: invalid-return-state obj ;
     } cond ;
 
 : script-data-less-than-sign-state ( document n/f string -- document n'/f string )
-    next-char-from (script-data-less-than-sign-state) ;
+    take-char (script-data-less-than-sign-state) ;
 
 
 : (script-data-end-tag-open-state) ( document n/f string ch/f -- document n'/f string )
@@ -1073,7 +1073,7 @@ ERROR: invalid-return-state obj ;
     } cond ;
 
 : script-data-end-tag-open-state ( document n/f string -- document n'/f string )
-    next-char-from (script-data-end-tag-open-state) ;
+    take-char (script-data-end-tag-open-state) ;
 
 
 : (script-data-end-tag-name-state) ( document n/f string ch/f -- document n'/f string )
@@ -1096,7 +1096,7 @@ ERROR: invalid-return-state obj ;
     } cond ;
 
 : script-data-end-tag-name-state ( document n/f string -- document n'/f string )
-    next-char-from (script-data-end-tag-name-state) ;
+    take-char (script-data-end-tag-name-state) ;
 
 
 : (script-data-escape-start-state) ( document n/f string ch/f -- document n'/f string )
@@ -1106,7 +1106,7 @@ ERROR: invalid-return-state obj ;
     } cond ;
 
 : script-data-escape-start-state ( document n/f string -- document n'/f string )
-    next-char-from (script-data-escape-start-state) ;
+    take-char (script-data-escape-start-state) ;
 
 
 : (script-data-escape-start-dash-state) ( document n/f string ch/f -- document n'/f string )
@@ -1116,7 +1116,7 @@ ERROR: invalid-return-state obj ;
     } cond ;
 
 : script-data-escape-start-dash-state ( document n/f string -- document n'/f string )
-    next-char-from (script-data-escape-start-dash-state) ;
+    take-char (script-data-escape-start-dash-state) ;
 
 
 : (script-data-escaped-state) ( document n/f string ch/f -- document n'/f string )
@@ -1129,7 +1129,7 @@ ERROR: invalid-return-state obj ;
     } cond ;
 
 : script-data-escaped-state ( document n/f string -- document n'/f string )
-    next-char-from (script-data-escaped-state) ;
+    take-char (script-data-escaped-state) ;
 
 
 : (script-data-escaped-dash-state) ( document n/f string ch/f -- document n'/f string )
@@ -1142,7 +1142,7 @@ ERROR: invalid-return-state obj ;
     } cond ;
 
 : script-data-escaped-dash-state ( document n/f string -- document n'/f string )
-    next-char-from (script-data-escaped-dash-state) ;
+    take-char (script-data-escaped-dash-state) ;
 
 
 : (script-data-escaped-dash-dash-state) ( document n/f string ch/f -- document n'/f string )
@@ -1156,7 +1156,7 @@ ERROR: invalid-return-state obj ;
     } cond ;
 
 : script-data-escaped-dash-dash-state ( document n/f string -- document n'/f string )
-    next-char-from (script-data-escaped-dash-dash-state) ;
+    take-char (script-data-escaped-dash-dash-state) ;
 
 
 : (script-data-escaped-less-than-sign-state) ( document n/f string ch/f -- document n'/f string )
@@ -1167,7 +1167,7 @@ ERROR: invalid-return-state obj ;
     } cond ;
 
 : script-data-escaped-less-than-sign-state ( document n/f string -- document n'/f string )
-    next-char-from (script-data-escaped-less-than-sign-state) ;
+    take-char (script-data-escaped-less-than-sign-state) ;
 
 
 : (script-data-escaped-end-tag-open-state) ( document n/f string ch/f -- document n'/f string )
@@ -1177,7 +1177,7 @@ ERROR: invalid-return-state obj ;
     } cond ;
 
 : script-data-escaped-end-tag-open-state ( document n/f string -- document n'/f string )
-    next-char-from (script-data-escaped-end-tag-open-state) ;
+    take-char (script-data-escaped-end-tag-open-state) ;
 
 
 : (script-data-escaped-end-tag-name-state) ( document n/f string ch/f -- document n'/f string )
@@ -1200,7 +1200,7 @@ ERROR: invalid-return-state obj ;
     } cond ;
 
 : script-data-escaped-end-tag-name-state ( document n/f string -- document n'/f string )
-    next-char-from (script-data-escaped-end-tag-name-state) ;
+    take-char (script-data-escaped-end-tag-name-state) ;
 
 
 : (script-data-double-escape-start-state) ( document n/f string ch/f -- document n'/f string )
@@ -1216,7 +1216,7 @@ ERROR: invalid-return-state obj ;
     } cond ;
 
 : script-data-double-escape-start-state ( document n/f string -- document n'/f string )
-    next-char-from (script-data-double-escape-start-state) ;
+    take-char (script-data-double-escape-start-state) ;
 
 
 : (script-data-double-escaped-state) ( document n/f string ch/f -- document n'/f string )
@@ -1233,7 +1233,7 @@ ERROR: invalid-return-state obj ;
     } cond ;
 
 : script-data-double-escaped-state ( document n/f string -- document n'/f string )
-    next-char-from (script-data-double-escaped-state) ;
+    take-char (script-data-double-escaped-state) ;
 
 
 : (script-data-double-escaped-dash-state) ( document n/f string ch/f -- document n'/f string )
@@ -1250,7 +1250,7 @@ ERROR: invalid-return-state obj ;
     } cond ;
 
 : script-data-double-escaped-dash-state ( document n/f string -- document n'/f string )
-    next-char-from (script-data-double-escaped-dash-state) ;
+    take-char (script-data-double-escaped-dash-state) ;
 
 
 : (script-data-double-escaped-dash-dash-state) ( document n/f string ch/f -- document n'/f string )
@@ -1268,7 +1268,7 @@ ERROR: invalid-return-state obj ;
     } cond ;
 
 : script-data-double-escaped-dash-dash-state ( document n/f string -- document n'/f string )
-    next-char-from (script-data-double-escaped-dash-dash-state) ;
+    take-char (script-data-double-escaped-dash-dash-state) ;
 
 
 : (script-data-double-escaped-less-than-sign-state) ( document n/f string ch/f -- document n'/f string )
@@ -1278,7 +1278,7 @@ ERROR: invalid-return-state obj ;
     } cond ;
 
 : script-data-double-escaped-less-than-sign-state ( document n/f string -- document n'/f string )
-    next-char-from (script-data-double-escaped-less-than-sign-state) ;
+    take-char (script-data-double-escaped-less-than-sign-state) ;
 
 
 : (script-data-double-escape-end-state) ( document n/f string ch/f -- document n'/f string )
@@ -1294,7 +1294,7 @@ ERROR: invalid-return-state obj ;
     } cond ;
 
 : script-data-double-escape-end-state ( document n/f string -- document n'/f string )
-    next-char-from (script-data-double-escape-end-state) ;
+    take-char (script-data-double-escape-end-state) ;
 
 
 : (before-attribute-name-state) ( document n/f string ch/f -- document n'/f string )
@@ -1307,7 +1307,7 @@ ERROR: invalid-return-state obj ;
     } cond ;
 
 : before-attribute-name-state ( document n/f string -- document n'/f string )
-    next-char-from (before-attribute-name-state) ;
+    take-char (before-attribute-name-state) ;
 
 
 : (attribute-name-state) ( document n/f string ch/f -- document n'/f string )
@@ -1328,7 +1328,7 @@ ERROR: invalid-return-state obj ;
     } cond ;
 
 : attribute-name-state ( document n/f string -- document n'/f string )
-    next-char-from (attribute-name-state) ;
+    take-char (attribute-name-state) ;
 
 
 : (after-attribute-name-state) ( document n/f string ch/f -- document n'/f string )
@@ -1342,7 +1342,7 @@ ERROR: invalid-return-state obj ;
     } cond ;
 
 : after-attribute-name-state ( document n/f string -- document n'/f string )
-    next-char-from (after-attribute-name-state) ;
+    take-char (after-attribute-name-state) ;
 
 
 : (before-attribute-value-state) ( document n/f string ch/f -- document n'/f string )
@@ -1355,7 +1355,7 @@ ERROR: invalid-return-state obj ;
     } cond ;
 
 : before-attribute-value-state ( document n/f string -- document n'/f string )
-    next-char-from (before-attribute-value-state) ;
+    take-char (before-attribute-value-state) ;
 
 
 : (attribute-value-double-quoted-state) ( document n/f string ch/f -- document n'/f string )
@@ -1371,7 +1371,7 @@ ERROR: invalid-return-state obj ;
     } cond ;
 
 : attribute-value-double-quoted-state ( document n/f string -- document n'/f string )
-    next-char-from (attribute-value-double-quoted-state) ;
+    take-char (attribute-value-double-quoted-state) ;
 
 
 : (attribute-value-single-quoted-state) ( document n/f string ch/f -- document n'/f string )
@@ -1390,7 +1390,7 @@ ERROR: invalid-return-state obj ;
     } cond ;
 
 : attribute-value-single-quoted-state ( document n/f string -- document n'/f string )
-    next-char-from (attribute-value-single-quoted-state) ;
+    take-char (attribute-value-single-quoted-state) ;
 
 
 : (attribute-value-unquoted-state) ( document n/f string ch/f -- document n'/f string )
@@ -1412,7 +1412,7 @@ ERROR: invalid-return-state obj ;
     } cond ;
 
 : attribute-value-unquoted-state ( document n/f string -- document n'/f string )
-    next-char-from (attribute-value-unquoted-state) ;
+    take-char (attribute-value-unquoted-state) ;
 
 
 : (after-attribute-value-quoted-state) ( document n/f string ch/f -- document n'/f string )
@@ -1425,7 +1425,7 @@ ERROR: invalid-return-state obj ;
     } cond ;
 
 : after-attribute-value-quoted-state ( document n/f string -- document n'/f string )
-    next-char-from (after-attribute-value-quoted-state) ;
+    take-char (after-attribute-value-quoted-state) ;
 
 
 : (self-closing-start-tag-state) ( document n/f string ch/f -- document n'/f string )
@@ -1436,7 +1436,7 @@ ERROR: invalid-return-state obj ;
     } cond ;
 
 : self-closing-start-tag-state ( document n/f string -- document n'/f string )
-    next-char-from (self-closing-start-tag-state) ;
+    take-char (self-closing-start-tag-state) ;
 
 
 : (bogus-comment-state) ( document n/f string ch/f -- document n'/f string )
@@ -1448,7 +1448,7 @@ ERROR: invalid-return-state obj ;
     } cond ;
 
 : bogus-comment-state ( document n/f string -- document n'/f string )
-    next-char-from (bogus-comment-state) ;
+    take-char (bogus-comment-state) ;
 
 
 : markup-declaration-open-state ( document n/f string -- document n'/f string )
@@ -1469,7 +1469,7 @@ ERROR: invalid-return-state obj ;
     } cond ;
 
 : comment-start-state ( document n/f string -- document n'/f string )
-    next-char-from (comment-start-state) ;
+    take-char (comment-start-state) ;
 
 
 : (comment-start-dash-state) ( document n/f string ch/f -- document n'/f string )
@@ -1481,7 +1481,7 @@ ERROR: invalid-return-state obj ;
     } cond ;
 
 : comment-start-dash-state ( document n/f string -- document n'/f string )
-    next-char-from (comment-start-dash-state) ;
+    take-char (comment-start-dash-state) ;
 
 
 : (comment-state) ( document n/f string ch/f -- document n'/f string )
@@ -1494,7 +1494,7 @@ ERROR: invalid-return-state obj ;
     } cond ;
 
 : comment-state ( document n/f string -- document n'/f string )
-    next-char-from (comment-state) ;
+    take-char (comment-state) ;
 
 
 : (comment-less-than-sign-state) ( document n/f string ch/f -- document n'/f string )
@@ -1505,7 +1505,7 @@ ERROR: invalid-return-state obj ;
     } cond ;
 
 : comment-less-than-sign-state ( document n/f string -- document n'/f string )
-    next-char-from (comment-less-than-sign-state) ;
+    take-char (comment-less-than-sign-state) ;
 
 
 : (comment-less-than-sign-bang-state) ( document n/f string ch/f -- document n'/f string )
@@ -1515,7 +1515,7 @@ ERROR: invalid-return-state obj ;
     } cond ;
 
 : comment-less-than-sign-bang-state ( document n/f string -- document n'/f string )
-    next-char-from (comment-less-than-sign-bang-state) ;
+    take-char (comment-less-than-sign-bang-state) ;
 
 
 : (comment-less-than-sign-bang-dash-state) ( document n/f string ch/f -- document n'/f string )
@@ -1525,7 +1525,7 @@ ERROR: invalid-return-state obj ;
     } cond ;
 
 : comment-less-than-sign-bang-dash-state ( document n/f string -- document n'/f string )
-    next-char-from (comment-less-than-sign-bang-dash-state) ;
+    take-char (comment-less-than-sign-bang-dash-state) ;
 
 
 : (comment-less-than-sign-bang-dash-dash-state) ( document n/f string ch/f -- document n'/f string )
@@ -1536,7 +1536,7 @@ ERROR: invalid-return-state obj ;
     } cond ;
 
 : comment-less-than-sign-bang-dash-dash-state ( document n/f string -- document n'/f string )
-    next-char-from (comment-less-than-sign-bang-dash-dash-state) ;
+    take-char (comment-less-than-sign-bang-dash-dash-state) ;
 
 
 : (comment-end-dash-state) ( document n/f string ch/f -- document n'/f string )
@@ -1547,7 +1547,7 @@ ERROR: invalid-return-state obj ;
     } cond ;
 
 : comment-end-dash-state ( document n/f string -- document n'/f string )
-    next-char-from (comment-end-dash-state) ;
+    take-char (comment-end-dash-state) ;
 
 
 : (comment-end-state) ( document n/f string ch/f -- document n'/f string )
@@ -1560,7 +1560,7 @@ ERROR: invalid-return-state obj ;
     } cond ;
 
 : comment-end-state ( document n/f string -- document n'/f string )
-    next-char-from (comment-end-state) ;
+    take-char (comment-end-state) ;
 
 
 : (comment-end-bang-state) ( document n/f string ch/f -- document n'/f string )
@@ -1572,7 +1572,7 @@ ERROR: invalid-return-state obj ;
     } cond ;
 
 : comment-end-bang-state ( document n/f string -- document n'/f string )
-    next-char-from (comment-end-bang-state) ;
+    take-char (comment-end-bang-state) ;
 
 
 : (doctype-state) ( document n/f string ch/f -- document n'/f string )
@@ -1584,7 +1584,7 @@ ERROR: invalid-return-state obj ;
     } cond ;
 
 : doctype-state ( document n/f string -- document n'/f string )
-    next-char-from (doctype-state) ;
+    take-char (doctype-state) ;
 
 
 : (before-doctype-name-state) ( document n/f string ch/f -- document n'/f string )
@@ -1609,7 +1609,7 @@ ERROR: invalid-return-state obj ;
     } cond ;
 
 : before-doctype-name-state ( document n/f string -- document n'/f string )
-    next-char-from (before-doctype-name-state) ;
+    take-char (before-doctype-name-state) ;
 
 
 : (doctype-name-state) ( document n/f string ch/f -- document n'/f string )
@@ -1627,7 +1627,7 @@ ERROR: invalid-return-state obj ;
     } cond ;
 
 : doctype-name-state ( document n/f string -- document n'/f string )
-    next-char-from (doctype-name-state) ;
+    take-char (doctype-name-state) ;
 
 
 : (after-doctype-name-state) ( document n/f string ch/f -- document n'/f string )
@@ -1641,7 +1641,7 @@ ERROR: invalid-return-state obj ;
     } cond ;
 
 : after-doctype-name-state ( document n/f string -- document n'/f string )
-    next-char-from (after-doctype-name-state) ;
+    take-char (after-doctype-name-state) ;
 
 
 : (after-doctype-public-keyword-state) ( document n/f string ch/f -- document n'/f string )
@@ -1659,7 +1659,7 @@ ERROR: invalid-return-state obj ;
     } cond ;
 
 : after-doctype-public-keyword-state ( document n/f string -- document n'/f string )
-    next-char-from (after-doctype-public-keyword-state) ;
+    take-char (after-doctype-public-keyword-state) ;
 
 
 : (before-doctype-public-identifier-state) ( document n/f string ch/f -- document n'/f string )
@@ -1687,7 +1687,7 @@ ERROR: invalid-return-state obj ;
     } cond ;
 
 : before-doctype-public-identifier-state ( document n/f string -- document n'/f string )
-    next-char-from (before-doctype-public-identifier-state) ;
+    take-char (before-doctype-public-identifier-state) ;
 
 
 : (doctype-public-identifier-double-quoted-state) ( document n/f string ch/f -- document n'/f string )
@@ -1712,7 +1712,7 @@ ERROR: invalid-return-state obj ;
     } cond ;
 
 : doctype-public-identifier-double-quoted-state ( document n/f string -- document n'/f string )
-    next-char-from (doctype-public-identifier-double-quoted-state) ;
+    take-char (doctype-public-identifier-double-quoted-state) ;
 
 
 : (doctype-public-identifier-single-quoted-state) ( document n/f string ch/f -- document n'/f string )
@@ -1737,7 +1737,7 @@ ERROR: invalid-return-state obj ;
     } cond ;
 
 : doctype-public-identifier-single-quoted-state ( document n/f string -- document n'/f string )
-    next-char-from (doctype-public-identifier-single-quoted-state) ;
+    take-char (doctype-public-identifier-single-quoted-state) ;
 
 
 : (after-doctype-public-identifier-state) ( document n/f string ch/f -- document n'/f string )
@@ -1766,7 +1766,7 @@ ERROR: invalid-return-state obj ;
     } cond ;
 
 : after-doctype-public-identifier-state ( document n/f string -- document n'/f string )
-    next-char-from (after-doctype-public-identifier-state) ;
+    take-char (after-doctype-public-identifier-state) ;
 
 
 : (between-doctype-public-and-system-identifiers-state) ( document n/f string ch/f -- document n'/f string )
@@ -1793,7 +1793,7 @@ ERROR: invalid-return-state obj ;
     } cond ;
 
 : between-doctype-public-and-system-identifiers-state ( document n/f string -- document n'/f string )
-    next-char-from (between-doctype-public-and-system-identifiers-state) ;
+    take-char (between-doctype-public-and-system-identifiers-state) ;
 
 
 : (after-doctype-system-keyword-state) ( document n/f string ch/f -- document n'/f string )
@@ -1823,7 +1823,7 @@ ERROR: invalid-return-state obj ;
     } cond ;
 
 : after-doctype-system-keyword-state ( document n/f string -- document n'/f string )
-    next-char-from (after-doctype-system-keyword-state) ;
+    take-char (after-doctype-system-keyword-state) ;
 
 
 : (before-doctype-system-identifier-state) ( document n/f string ch/f -- document n'/f string )
@@ -1851,7 +1851,7 @@ ERROR: invalid-return-state obj ;
     } cond ;
 
 : before-doctype-system-identifier-state ( document n/f string -- document n'/f string )
-    next-char-from (before-doctype-system-identifier-state) ;
+    take-char (before-doctype-system-identifier-state) ;
 
 
 : (doctype-system-identifier-double-quoted-state) ( document n/f string ch/f -- document n'/f string )
@@ -1876,7 +1876,7 @@ ERROR: invalid-return-state obj ;
     } cond ;
 
 : doctype-system-identifier-double-quoted-state ( document n/f string -- document n'/f string )
-    next-char-from (doctype-system-identifier-double-quoted-state) ;
+    take-char (doctype-system-identifier-double-quoted-state) ;
 
 
 : (doctype-system-identifier-single-quoted-state) ( document n/f string ch/f -- document n'/f string )
@@ -1901,7 +1901,7 @@ ERROR: invalid-return-state obj ;
     } cond ;
 
 : doctype-system-identifier-single-quoted-state ( document n/f string -- document n'/f string )
-    next-char-from (doctype-system-identifier-single-quoted-state) ;
+    take-char (doctype-system-identifier-single-quoted-state) ;
 
 
 : (after-doctype-system-identifier-state) ( document n/f string ch/f -- document n'/f string )
@@ -1920,7 +1920,7 @@ ERROR: invalid-return-state obj ;
     } cond ;
 
 : after-doctype-system-identifier-state ( document n/f string -- document n'/f string )
-    next-char-from (after-doctype-system-identifier-state) ;
+    take-char (after-doctype-system-identifier-state) ;
 
 
 : (bogus-doctype-state) ( document n/f string ch/f -- document n'/f string )
@@ -1932,7 +1932,7 @@ ERROR: invalid-return-state obj ;
     } cond ;
 
 : bogus-doctype-state ( document n/f string -- document n'/f string )
-    next-char-from (bogus-doctype-state) ;
+    take-char (bogus-doctype-state) ;
 
 
 : (cdata-section-state) ( document n/f string ch/f -- document n'/f string )
@@ -1943,7 +1943,7 @@ ERROR: invalid-return-state obj ;
     } cond ;
 
 : cdata-section-state ( document n/f string -- document n'/f string )
-    next-char-from (cdata-section-state) ;
+    take-char (cdata-section-state) ;
 
 
 : (cdata-section-bracket-state) ( document n/f string ch/f -- document n'/f string )
@@ -1953,7 +1953,7 @@ ERROR: invalid-return-state obj ;
     } cond ;
 
 : cdata-section-bracket-state ( document n/f string -- document n'/f string )
-    next-char-from (cdata-section-bracket-state) ;
+    take-char (cdata-section-bracket-state) ;
 
 
 : (cdata-section-end-state) ( document n/f string ch/f -- document n'/f string )
@@ -1964,7 +1964,7 @@ ERROR: invalid-return-state obj ;
     } cond ;
 
 : cdata-section-end-state ( document n/f string -- document n'/f string )
-    next-char-from (cdata-section-end-state) ;
+    take-char (cdata-section-end-state) ;
 
 
 : (character-reference-state) ( document n/f string ch/f -- document n'/f string )
@@ -1976,7 +1976,7 @@ ERROR: invalid-return-state obj ;
     } cond ;
 
 : character-reference-state ( document n/f string -- document n'/f string )
-    next-char-from (character-reference-state) ;
+    take-char (character-reference-state) ;
 
 
 : (named-character-reference-state) ( document n/f string ch/f -- document n'/f string )
@@ -2003,7 +2003,7 @@ ERROR: invalid-return-state obj ;
     ] if ;
 
 : named-character-reference-state ( document n/f string -- document n'/f string )
-    next-char-from (named-character-reference-state) ;
+    take-char (named-character-reference-state) ;
 
 
 : (ambiguous-ampersand-state) ( document n/f string ch/f -- document n'/f string )
@@ -2016,7 +2016,7 @@ ERROR: invalid-return-state obj ;
     } cond ;
 
 : ambiguous-ampersand-state ( document n/f string -- document n'/f string )
-    next-char-from (ambiguous-ampersand-state) ;
+    take-char (ambiguous-ampersand-state) ;
 
 
 : (numeric-character-reference-state) ( document n/f string ch/f -- document n'/f string )
@@ -2026,7 +2026,7 @@ ERROR: invalid-return-state obj ;
     } cond ;
 
 : numeric-character-reference-state ( document n/f string -- document n'/f string )
-    next-char-from (numeric-character-reference-state) ;
+    take-char (numeric-character-reference-state) ;
 
 
 : (hexadecimal-character-reference-start-state) ( document n/f string ch/f -- document n'/f string )
@@ -2036,7 +2036,7 @@ ERROR: invalid-return-state obj ;
     } cond ;
 
 : hexadecimal-character-reference-start-state ( document n/f string -- document n'/f string )
-    next-char-from (hexadecimal-character-reference-start-state) ;
+    take-char (hexadecimal-character-reference-start-state) ;
 
 
 : (decimal-character-reference-start-state) ( document n/f string ch/f -- document n'/f string )
@@ -2046,7 +2046,7 @@ ERROR: invalid-return-state obj ;
     } cond ;
 
 : decimal-character-reference-start-state ( document n/f string -- document n'/f string )
-    next-char-from (decimal-character-reference-start-state) ;
+    take-char (decimal-character-reference-start-state) ;
 
 
 : (hexadecimal-character-reference-state) ( document n/f string ch/f -- document n'/f string )
@@ -2059,7 +2059,7 @@ ERROR: invalid-return-state obj ;
     } cond ;
 
 : hexadecimal-character-reference-state ( document n/f string -- document n'/f string )
-    next-char-from (hexadecimal-character-reference-state) ;
+    take-char (hexadecimal-character-reference-state) ;
 
 
 : (decimal-character-reference-state) ( document n/f string ch/f -- document n'/f string )
@@ -2070,7 +2070,7 @@ ERROR: invalid-return-state obj ;
     } cond ;
 
 : decimal-character-reference-state ( document n/f string -- document n'/f string )
-    next-char-from (decimal-character-reference-state) ;
+    take-char (decimal-character-reference-state) ;
 
 
 : (numeric-character-reference-end-state) ( document n/f string ch/f -- document n'/f string )
@@ -2079,7 +2079,7 @@ ERROR: invalid-return-state obj ;
     } cond ;
 
 : numeric-character-reference-end-state ( document n/f string -- document n'/f string )
-    next-char-from (numeric-character-reference-end-state) ;
+    take-char (numeric-character-reference-end-state) ;
 
 
 
