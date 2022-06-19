@@ -1,7 +1,8 @@
 ! Copyright (C) 2016 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors assocs kernel math sequences sequences.deep
-sequences.extras combinators.extras strings unicode ;
+USING: accessors assocs combinators.extras kernel math sequences
+sequences.deep sequences.extras sequences.private strings
+unicode ;
 IN: modern.slices
 
 : >strings ( seq -- str )
@@ -183,7 +184,7 @@ ERROR: subseq-expected-but-got-eof n string expected ;
 :: slice-til-string ( n string search --  n' string payload end-string )
     search string n subseq-start-from :> n'
     n' [ n string search subseq-expected-but-got-eof ] unless
-    n' search length +  string
+    n' search length + string
     n n' string ?<slice>
     n' dup search length + string ?<slice> ;
 
@@ -204,3 +205,34 @@ ERROR: subseq-expected-but-got-eof n string expected ;
 
 : rewind-slice ( n string slice -- n' string )
     2nip [ from>> ] [ seq>> ] bi ; inline
+
+:: take-from? ( n seq subseq -- n'/f seq  ? )
+    subseq seq n pick length (subseq-start-from) 2nip [
+        n subseq length +
+        seq
+        t
+    ] [
+        n seq f
+    ] if ;
+
+: check-slice? ( from to seq -- from to seq ? )
+    pick 0 < [
+        f
+    ] [
+        2dup length > [
+            f
+        ] [
+            t
+        ] if
+    ] if ; inline
+
+:: take-from-insensitive? ( n seq str -- n'/f seq ? )
+    n str length over + seq check-slice? [
+        subseq str [ >lower ] bi@ sequence= [
+            n str length + seq t
+        ] [
+            n seq f
+        ] if
+    ] [
+        3drop n seq f
+    ] if ;
