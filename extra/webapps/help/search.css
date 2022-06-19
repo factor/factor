@@ -17,7 +17,7 @@
   font-size: 14pt;
   color: #7f7f7f;
   text-align: center;
-  border: 1px solid transparent;
+  border: 1px solid #ccc;
   border-bottom: none;
 }
 
@@ -52,6 +52,8 @@
 
   .label {
     color: #bdc1c6;
+    border: 1px solid #666;
+    border-bottom: none;
   }
 
   .label:hover {
@@ -74,5 +76,7 @@
 
   .label {
     width: 33.33%;
+    border: 1px solid transparent;
+    border-bottom: none;
   }
 }
