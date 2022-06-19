@@ -104,7 +104,7 @@ TUPLE: dredge-fry-state
     V{ } clone V{ } clone dredge-fry-state boa ; inline
 
 : input-slices ( n i state -- head tail )
-    input>> [ <slice> ] [ nipd swap 1 + tail-slice ] 3bi ; inline
+    input>> [ <slice> ] [ spin drop 1 + tail-slice ] 3bi ; inline
 
 : push-head-slice ( head state -- )
     quot>> [ push-all ] [ \ _ swap push ] bi ; inline
