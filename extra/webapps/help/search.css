@@ -34,6 +34,7 @@
 .panel {
   display: none;
   width: 100%;
+  border-top: 1px solid #ccc;
 }
 
 .radiotab:checked + .label + .panel {
@@ -42,10 +43,13 @@
 
 @media (prefers-color-scheme: dark) {
 
+  .panel {
+    border-top: 1px solid #666;
+  }
+
   .label {
     color: #bdc1c6;
     border: 1px solid #666;
-    border-bottom: none;
   }
 
   .label:hover {
@@ -60,11 +64,17 @@
   }
 }
 
+@media (max-width: 599px) {
+
+  .panel {
+    border-top: none;
+  }
+}
+
 @media (min-width: 600px) {
 
   .panel {
     order: 99;
-    border-top: 1px solid #ccc;
   }
 
   .label {
@@ -79,12 +89,5 @@
 
   .radiotab:checked + .label {
     border-bottom: none;
-  }
-}
-
-@media (min-width: 600px and prefers-color-scheme: dark) {
-
-  .panel {
-    border-top: 1px solid #666;
   }
 }
