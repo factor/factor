@@ -306,12 +306,21 @@ MEMO: load-index ( name -- index )
 : vocab-apropos ( string -- results )
     "vocabs.idx" offline-apropos ;
 
+: generate-qualified-index ( index -- )
+    H{ } clone [
+        '[
+            over "," split1 nip ".html" ?tail drop
+            [ swap ":" glue 2array ] [ _ push-at ] bi
+        ] assoc-each
+    ] keep [ swap ] { } assoc-map-as
+    "qualified.idx" binary [ serialize ] with-file-writer ;
+
 : qualified-index ( str index -- str index' )
-    over ":" split1 [
-        drop vocab-apropos values [ "," ".html" surround ] map
-        '[ drop _ [ tail? ] with any? ] dupd assoc-filter
-        [ over ".html" ?tail drop "," split1-last nip swap ":" glue ] assoc-map append
-    ] [ drop ] if* ;
+    over ":" split1 drop [ f ] [
+        "qualified.idx"
+        dup file-exists? [ pick generate-qualified-index ] unless
+        load-index completions keys concat
+    ] if-empty [ append ] unless-empty ;
 
 : word-apropos ( string -- results )
     "words.idx" load-index qualified-index completions ;
