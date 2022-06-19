@@ -87,11 +87,11 @@ PRIVATE>
 
 : qualified-named ( str -- seq/f )
     ":" split1 [
-        drop vocabs-matching keys [
+        vocabs-matching keys [
             [ vocab-words ] [ vocab-name ] bi ":" append
             [ over name>> append ] curry { } map>assoc
         ] map concat
-    ] [ drop f ] if* ;
+    ] [ drop f ] if ;
 
 : words-matching ( str -- seq )
     all-words named over qualified-named [ append ] unless-empty completions ;
