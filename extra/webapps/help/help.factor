@@ -4,15 +4,15 @@ USING: accessors assocs furnace.actions furnace.boilerplate
 furnace.redirection help.html help.topics html.components
 html.forms http.server http.server.dispatchers
 http.server.static io.directories io.files.temp io.servers
-kernel namespaces sequences unicode urls ;
+kernel namespaces sequences splitting unicode urls ;
 IN: webapps.help
 
 TUPLE: help-webapp < dispatcher ;
 
 : fixup-words ( title href -- title' href' )
     dup "word-" head? [
-        dup ".html" ?tail drop "," split1-last nip
-        '[ " (" _ 3append ")" append ] dip
+        dup ".html" ?tail drop "," split1-last nip dup ":" append
+        '[ " (" _ 3append ")" append _ ?head drop ] dip
     ] when ;
 
 : links ( apropos -- seq )
