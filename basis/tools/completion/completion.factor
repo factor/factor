@@ -86,12 +86,12 @@ PRIVATE>
     vocab-words named completions ;
 
 : qualified-named ( str -- seq/f )
-    ":" split1 [
-        drop vocabs-matching keys [
+    ":" split1 drop [ f ] [
+        vocabs-matching keys [
             [ vocab-words ] [ vocab-name ] bi ":" append
             [ over name>> append ] curry { } map>assoc
         ] map concat
-    ] [ drop f ] if* ;
+    ] if-empty ;
 
 : words-matching ( str -- seq )
     all-words named over qualified-named [ append ] unless-empty completions ;
