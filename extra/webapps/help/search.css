@@ -17,7 +17,7 @@
   font-size: 14pt;
   color: #7f7f7f;
   text-align: center;
-  border: 1px solid #ccc;
+  border: 1px solid transparent;
 }
 
 .label:hover {
@@ -40,22 +40,14 @@
   display: block;
 }
 
-@media (min-width: 600px) {
+@media (prefers-color-scheme: dark) {
 
   .panel {
-    order: 99;
+    border-top: 1px solid #666;
   }
-
-  .label {
-    width: 33.33%;
-  }
-}
-
-@media (prefers-color-scheme: dark) {
 
   .label {
     color: #bdc1c6;
-    border: 1px solid #666;
   }
 
   .label:hover {
@@ -67,5 +59,25 @@
     border: 1px solid #666;
     background: #373e48;
     color: white;
+  }
+}
+
+@media (min-width: 600px) {
+
+  .panel {
+    order: 99;
+  }
+
+  .label {
+    width: 33.33%;
+    border-bottom: none;
+  }
+
+  .label:hover {
+    border-bottom: none;
+  }
+
+  .radiotab:checked + .label {
+    border-bottom: none;
   }
 }
