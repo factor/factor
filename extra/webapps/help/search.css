@@ -18,18 +18,15 @@
   color: #7f7f7f;
   text-align: center;
   border: 1px solid #ccc;
-  border-bottom: none;
 }
 
 .label:hover {
   background: #d8d8d8;
   border: 1px solid #ccc;
-  border-bottom: none;
 }
 
 .radiotab:checked + .label {
   border: 1px solid #ccc;
-  border-bottom: none;
   background: #f0f0f0;
   color: black;
 }
@@ -37,7 +34,6 @@
 .panel {
   display: none;
   width: 100%;
-  border-top: 1px solid #ccc;
 }
 
 .radiotab:checked + .label + .panel {
@@ -45,10 +41,6 @@
 }
 
 @media (prefers-color-scheme: dark) {
-
-  .panel {
-    border-top: 1px solid #666;
-  }
 
   .label {
     color: #bdc1c6;
@@ -72,11 +64,27 @@
 
   .panel {
     order: 99;
+    border-top: 1px solid #ccc;
   }
 
   .label {
     width: 33.33%;
     border: 1px solid transparent;
     border-bottom: none;
+  }
+
+  .label:hover {
+    border-bottom: none;
+  }
+
+  .radiotab:checked + .label {
+    border-bottom: none;
+  }
+}
+
+@media (min-width: 600px and prefers-color-scheme: dark) {
+
+  .panel {
+    border-top: 1px solid #666;
   }
 }
