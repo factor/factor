@@ -316,11 +316,11 @@ MEMO: load-index ( name -- index )
     "qualified.idx" binary [ serialize ] with-file-writer ;
 
 : qualified-index ( str index -- str index' )
-    over ":" split1 drop [ f ] [
+    over ":" split1 [
         "qualified.idx"
         dup file-exists? [ pick generate-qualified-index ] unless
         load-index completions keys concat
-    ] if-empty [ append ] unless-empty ;
+    ] [ drop f ] if [ append ] unless-empty ;
 
 : word-apropos ( string -- results )
     "words.idx" load-index qualified-index completions ;
