@@ -59,6 +59,6 @@ M: macosx sign-archive ( path -- )
     ${
         "codesign" "--force" "--sign"
         "Developer ID Application"
-        cert-path
+        cert-path normalize-path
     } swap suffix
     short-running-process ;
