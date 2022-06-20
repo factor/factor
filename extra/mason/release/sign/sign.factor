@@ -12,8 +12,8 @@ IN: mason.release.sign
         [ "factor/" prepend-path ] dip prepend-path
     ] [
         ! Not in build, make dir: "resource:factor.com"
-        "resource:" prepend-path normalize-path
-    ] if* ;
+        "resource:" prepend-path
+    ] if* normalize-path ;
 
 HOOK: cert-path os ( -- path/f )
 
@@ -32,7 +32,7 @@ M:: macosx sign-factor-app ( -- )
     ${
         "codesign" "--force" "--sign"
         "Developer ID Application"
-        cert-path
+        cert-path normalize-path
     }
     "Factor.app/" make-factor-path suffix
     short-running-process ;
@@ -43,7 +43,7 @@ M:: windows sign-factor-app ( -- )
             ${
                 "signtool" "sign"
                 "/v"
-                "/f" cert-path
+                "/f" cert-path normalize-path
             }
         ] dip make-factor-path suffix short-running-process
     ] each ;
