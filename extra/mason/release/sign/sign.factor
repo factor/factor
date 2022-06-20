@@ -19,9 +19,9 @@ HOOK: cert-path os ( -- path/f )
 
 M: object cert-path f ;
 
-M: macosx cert-path "~/config/mac_app.cer" ;
+M: macosx cert-path home "config/mac_app.cer" append-path ;
 
-M: windows cert-path "~/config/FactorSPC.pfx" ;
+M: windows cert-path home "config/FactorSPC.pfx" append-path ;
 >>
 
 HOOK: sign-factor-app os ( -- )
@@ -32,7 +32,7 @@ M:: macosx sign-factor-app ( -- )
     ${
         "codesign" "--force" "--sign"
         "Developer ID Application"
-        cert-path normalize-path
+        cert-path
     }
     "Factor.app/" make-factor-path suffix
     short-running-process ;
@@ -43,7 +43,7 @@ M:: windows sign-factor-app ( -- )
             ${
                 "signtool" "sign"
                 "/v"
-                "/f" cert-path normalize-path
+                "/f" cert-path
             }
         ] dip make-factor-path suffix short-running-process
     ] each ;
@@ -59,6 +59,6 @@ M: macosx sign-archive ( path -- )
     ${
         "codesign" "--force" "--sign"
         "Developer ID Application"
-        cert-path normalize-path
+        cert-path
     } swap suffix
     short-running-process ;
