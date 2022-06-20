@@ -160,7 +160,6 @@ cell factor_vm::begin_callback(cell quot_) {
 
 // Allocates memory
 cell begin_callback(factor_vm* parent, cell quot) {
-  cout << "begin_callback called" << endl;
   return parent->begin_callback(quot);
 }
 
