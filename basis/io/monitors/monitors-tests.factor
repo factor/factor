@@ -101,7 +101,7 @@ sequences threads tools.test ;
         ! Non-recursive
         { } [
             "." f <monitor> "m" set
-            100 milliseconds "m" get set-timeout
+            250 milliseconds "m" get set-timeout
             [ [ t ] [ "m" get next-change drop ] while ] must-fail
             "m" get dispose
         ] unit-test
@@ -109,7 +109,7 @@ sequences threads tools.test ;
         ! Recursive
         { } [
             "." t <monitor> "m" set
-            100 milliseconds "m" get set-timeout
+            250 milliseconds "m" get set-timeout
             [ [ t ] [ "m" get next-change drop ] while ] must-fail
             "m" get dispose
         ] unit-test
@@ -130,7 +130,7 @@ sequences threads tools.test ;
                 "p" get fulfill
             ] in-thread
 
-            100 milliseconds sleep
+            250 milliseconds sleep
             "m" get dispose
 
             "p" get 10 seconds ?promise-timeout
