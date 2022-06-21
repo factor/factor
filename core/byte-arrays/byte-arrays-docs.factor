@@ -31,12 +31,16 @@ HELP: byte-array
 { $class-description "The class of byte arrays. See " { $link "syntax-byte-arrays" } " for syntax and " { $link "byte-arrays" } " for general information." } ;
 
 HELP: <byte-array>
-{ $values { "n" "a non-negative integer" } { "byte-array" "a new byte array" } }
-{ $description "Creates a new byte array holding " { $snippet "n" } " bytes." } ;
+{ $values { "n" "a non-negative integer" } { "byte-array" byte-array } }
+{ $examples { $example "USING: byte-arrays prettyprint ;" "3 <byte-array> ." "B{ 0 0 0 }" } }
+{ $description "Creates a new " { $link byte-array } " of length " { $snippet "n" } " bytes, with the elements all initialized to zero." } ;
 
 HELP: (byte-array)
-{ $values { "n" "a non-negative integer" } { "byte-array" "a new byte array" } }
-{ $description "Creates a new byte array with unspecified contents of length " { $snippet "n" } " bytes." } ;
+{ $values { "n" "a non-negative integer" } { "byte-array" byte-array } }
+{ $examples { $unchecked-example "USING: byte-arrays prettyprint ;" "3 (byte-array) ." "B{ 103 189 48 }" } }
+{ $description "Creates a new " { $link byte-array } " of length " { $snippet "n" } " bytes, with the elements containing unspecified values." } ;
+
+{ <byte-array> (byte-array) } related-words
 
 HELP: >byte-array
 { $values { "seq" sequence } { "byte-array" byte-array } }
