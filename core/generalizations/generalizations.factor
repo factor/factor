@@ -32,9 +32,6 @@ MACRO: npick ( n -- quot )
         [ 1 - [ dup ] [ '[ _ dip swap ] ] repeat ]
     } cond ;
 
-MACRO: nover ( n -- quot )
-    dup 1 + '[ _ npick ] n*quot ;
-
 : ndup ( n -- )
     [ '[ _ npick ] ] keep call-n ; inline
 
@@ -51,17 +48,56 @@ MACRO: -nrot ( n -- quot )
 : ndip ( n -- )
     [ [ dip ] curry ] swap call-n call ; inline
 
-MACRO: nrotates ( n depth -- quot )
-    '[ [ _ nrot ] ] replicate concat ;
-
-MACRO: -nrotates ( n depth -- quot )
-    '[ [ _ -nrot ] ] replicate concat ;
-
 : ndrop ( n -- )
     [ drop ] swap call-n ; inline
 
 : nnip ( n -- )
     '[ _ ndrop ] dip ; inline
+
+DEFER: -nrotd
+MACRO: nrotd ( n d -- quot )
+    over 0 < [
+        [ neg ] dip '[ _ _ -nrotd ]
+    ] [
+        [ 1 - [ ] [ '[ _ dip swap ] ] repeat ] dip '[ _ _ ndip ]
+    ] if ;
+
+MACRO: -nrotd ( n d -- quot )
+    over 0 < [
+        [ neg ] dip '[ _ _ nrotd ]
+    ] [
+        [ 1 - [ ] [ '[ swap _ dip ] ] repeat ] dip '[ _ _ ndip ]
+    ] if ;
+
+MACRO: nrotated ( nrots depth dip -- quot )
+    [ '[ [ _ nrot ] ] replicate [ ] concat-as ] dip '[ _ _ ndip ] ;
+
+MACRO: -nrotated ( -nrots depth dip -- quot )
+    [ '[ [ _ -nrot ] ] replicate [ ] concat-as ] dip '[ _ _ ndip ] ;
+
+MACRO: nrotate-heightd ( n height dip -- quot )
+    [ '[ [ _ nrot ] ] replicate concat ] dip '[ _ _ ndip ] ;
+
+MACRO: -nrotate-heightd ( n height dip -- quot )
+    [
+        '[ [ _ -nrot ] ] replicate concat
+    ] dip '[ _ _ ndip ] ;
+
+: ndupd ( n dip -- ) '[ [ _ ndup ] _ ndip ] call ; inline
+
+MACRO: ntuckd ( ntuck ndip -- quot )
+    [ 1 + ] dip '[ [ dup _ -nrot ] _ ndip ] ;
+
+MACRO: nover ( n -- quot )
+    dup 1 + '[ _ npick ] n*quot ;
+
+MACRO: noverd ( n depth dip -- quot' )
+    [ + ] [ 2drop ] [ [ + ] dip ] 3tri
+    '[ _ _ ndupd _ _ _ nrotated ] ;
+
+MACRO: mntuckd ( ndup depth ndip -- quot )
+    { [ nip ] [ 2drop ] [ drop + ] [ 2nip ] } 3cleave
+    '[ _ _ ndupd _ _ _ -nrotated ] ;
 
 : nkeep ( n -- )
     dup '[ [ _ ndup ] dip _ ndip ] call ; inline

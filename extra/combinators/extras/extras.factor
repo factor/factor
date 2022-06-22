@@ -129,17 +129,17 @@ MACRO: chain ( quots -- quot )
     [ call ] keep '[ drop _ loop1 ] when ; inline recursive
 
 
-: keep-1up ( quot -- quot ) keep 1 2 nrotates ; inline
-: keep-2up ( quot -- quot ) keep 2 3 nrotates ; inline
-: keep-3up ( quot -- quot ) keep 3 4 nrotates ; inline
+: keep-1up ( quot -- quot ) keep 1 2 0 nrotated ; inline
+: keep-2up ( quot -- quot ) keep 2 3 0 nrotated ; inline
+: keep-3up ( quot -- quot ) keep 3 4 0 nrotated ; inline
 
-: 2keep-1up ( quot -- quot ) 2keep 1 3 nrotates ; inline
-: 2keep-2up ( quot -- quot ) 2keep 2 4 nrotates ; inline
-: 2keep-3up ( quot -- quot ) 2keep 3 5 nrotates ; inline
+: 2keep-1up ( quot -- quot ) 2keep 1 3 0 nrotated ; inline
+: 2keep-2up ( quot -- quot ) 2keep 2 4 0 nrotated ; inline
+: 2keep-3up ( quot -- quot ) 2keep 3 5 0 nrotated ; inline
 
-: 3keep-1up ( quot -- quot ) 3keep 1 4 nrotates ; inline
-: 3keep-2up ( quot -- quot ) 3keep 2 5 nrotates ; inline
-: 3keep-3up ( quot -- quot ) 3keep 3 6 nrotates ; inline
+: 3keep-1up ( quot -- quot ) 3keep 1 4 0 nrotated ; inline
+: 3keep-2up ( quot -- quot ) 3keep 2 5 0 nrotated ; inline
+: 3keep-3up ( quot -- quot ) 3keep 3 6 0 nrotated ; inline
 
 ! d is dummy, o is object to save notation space
 : dip-1up  ( ..a d quot: ( ..a -- ..b o d ) -- ..b d o )
@@ -155,9 +155,9 @@ MACRO: chain ( quots -- quot )
 : 3dip-1up ( ..a d1 d2 d3 quot: ( ..a -- ..b o d1 d2 d3 ) -- ..b d1 d2 d3 o )
     3dip roll ; inline
 : 3dip-2up ( ..a d1 d2 d3 quot: ( ..a -- ..b o1 o2 d1 d2 d3 ) -- ..b d1 d2 d3 o1 o2 )
-    3dip 2 5 nrotates ; inline
+    3dip 2 5 0 nrotated ; inline
 : 3dip-3up ( ..a d1 d2 d3 quot: ( ..a -- ..b o1 o2 o3 d1 d2 d3 ) -- ..b d1 d2 d3 o1 o2 o3 )
-    3dip 3 6 nrotates ; inline
+    3dip 3 6 0 nrotated ; inline
 
 
 : 2craft-1up ( ..a quot1: ( ..a -- ..b o1 ) quot2: ( ..b -- ..c o2 ) -- ..c o1 o2 )
@@ -177,18 +177,18 @@ MACRO: chain ( quots -- quot )
 
 ! The kept values are on the bottom of the stack
 MACRO: keep-under ( quot -- quot' )
-    dup outputs 1 + '[ _ keep 1 _ -nrotates ] ;
+    dup outputs 1 + '[ _ keep 1 _ 0 -nrotated ] ;
 
 MACRO: 2keep-under ( quot -- quot' )
-    dup outputs 2 + '[ _ 2keep 2 _ -nrotates ] ;
+    dup outputs 2 + '[ _ 2keep 2 _ 0 -nrotated ] ;
 
 MACRO: 3keep-under ( quot -- quot' )
-    dup outputs 3 + '[ _ 3keep 3 _ -nrotates ] ;
+    dup outputs 3 + '[ _ 3keep 3 _ 0 -nrotated ] ;
 
 MACRO: 4keep-under ( quot -- quot' )
-    dup outputs 4 + '[ _ 4keep 4 _ -nrotates ] ;
+    dup outputs 4 + '[ _ 4keep 4 _ 0 -nrotated ] ;
 
 ! for use with assoc-map etc
 : 1temp1d ( quot: ( a b c -- d e f ) -- quot ) '[ swap @ swap ] ; inline
 : 1temp2d ( quot: ( a b c -- d e f ) -- quot ) '[ rot @ -rot ] ; inline
-: 2temp2d ( quot: ( a b c d -- e f g h ) -- quot ) '[ 2 4 nrotates @ 2 4 -nrotates ] ; inline
+: 2temp2d ( quot: ( a b c d -- e f g h ) -- quot ) '[ 2 4 0 nrotated @ 2 4 0 -nrotated ] ; inline
