@@ -8,16 +8,16 @@ MACRO: stack-nth ( n -- quot )
     [ 1 + '[ _ nrot ] ] bi
     '[ @ @ ] ;
 
-: stack-set-nth ( obj n -- quot )
-    [ '[ drop _ ] ] dip ndip ; inline
+MACRO: stack-set-nth ( obj n -- quot )
+    '[ [ drop _ ] _ ndip ] ;
 
-: stack-exchange ( m n -- quot )
+MACRO: stack-exchange ( m n -- quot )
     [ [ stack-nth ] [ '[ _ stack-nth ] dip ] bi* ] 2keep
     swapd
-    [ stack-set-nth ] 2dip stack-set-nth ;
+    '[ _ _ stack-set-nth _ _ stack-set-nth ] ;
 
-: stack-filter ( n quot: ( obj -- ? ) -- quot' )
-    selector [ '[ _ ] replicate spread ] dip ; inline
+! MACRO: stack-filter ( n quot: ( obj -- ? ) -- quot' )
+!     selector [ '[ _ ] replicate spread ] dip ;
 
-: stack-map ( n quot: ( obj -- obj' ) -- quot' )
-    '[ _ ] replicate spread ; inline
+MACRO: stack-map ( n quot: ( obj -- obj' ) -- quot' )
+    '[ _ ] replicate '[ _ spread ] ;
