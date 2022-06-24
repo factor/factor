@@ -88,7 +88,7 @@ M: string make-slot-descriptions
                 "\\u{%x}" sprintf
             ] if
         ] if slot-description boa
-    ] map-index ;
+    ] { } map-index-as ;
 
 M: hashtable make-slot-descriptions
     call-next-method [ key-string>> ] sort-with ;
