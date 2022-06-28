@@ -141,8 +141,14 @@ M: pathname url-of
     ] re-replace-with
 
     R/ font-family: monospace;/ [
-        " border: 1px solid #ccc; border-radius: 5px; white-space: pre-wrap; line-height: 125%; margin: 15px; width: calc(100% - 30px);" append
-    ] re-replace-with ;
+        " white-space: pre-wrap; line-height: 125%;" append
+    ] re-replace-with
+
+    "font-family: monospace;" over subseq? [
+        "background-color:" over subseq?
+    ] [ f ] if [
+        " border: 1px solid #ccc; border-radius: 5px; margin: 15px; width: calc(100% - 30px);" append
+    ] when ;
 
 : fix-help-header ( classes -- classes )
     dup [
@@ -161,7 +167,7 @@ M: pathname url-of
     ] [ drop ] if* ;
 
 : dark-mode-css ( classes -- classes' )
-    { "/* Dark mode */" "@media (prefers-color-scheme:dark) {" }
+    { "" "/* Dark mode */" "@media (prefers-color-scheme:dark) {" }
     swap [
         R/ {[^}]+}/ [
             "{" ?head drop "}" ?tail drop ";" split
@@ -189,7 +195,7 @@ M: pathname url-of
     ] map harvest append "}" suffix ;
 
 : mobile-css ( classes -- classes' )
-    { "/* Mobile */" "@media screen and (max-width: 600px) {" }
+    { "" "/* Mobile */" "@media screen and (max-width: 600px) {" }
     swap [
         R/ {[^}]+}/ [
             "{" ?head drop "}" ?tail drop ";" split
@@ -200,13 +206,13 @@ M: pathname url-of
             " " join "{ " " }" surround
         ] re-replace-with "    " prepend
         "{  }" over subseq? [ drop f ] when
-    ] map B harvest append "}" suffix ;
+    ] map harvest append "}" suffix ;
 
 : css-classes ( classes -- stylesheet )
     [
         [ fix-css-style " { " "}" surround ] [ "." prepend ] bi* prepend
     ] { } assoc>map fix-help-header dup
-    B [ dark-mode-css ] [ mobile-css ] bi 3append join-lines ;
+    [ dark-mode-css ] [ mobile-css ] bi 3append join-lines ;
 
 :: css-styles-to-classes ( body -- stylesheet body )
     H{ } clone :> classes
