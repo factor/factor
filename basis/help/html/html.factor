@@ -5,8 +5,8 @@ combinators.short-circuit debugger formatting help help.home
 help.topics help.vocabs html html.streams io.directories
 io.encodings.ascii io.encodings.binary io.encodings.utf8
 io.files io.files.temp io.pathnames kernel make math math.parser
-namespaces regexp sequences sequences.deep serialize sorting
-splitting strings system tools.completion vocabs
+namespaces regexp sequences sequences.deep serialize sets
+sorting splitting strings system tools.completion vocabs
 vocabs.hierarchy words xml.data xml.syntax xml.traversal
 xml.writer ;
 FROM: io.encodings.ascii => ascii ;
@@ -122,7 +122,7 @@ M: pathname url-of
 : fix-css-style ( style -- style' )
     R/ font-size: \d+pt;/ [
         "font-size: " ?head drop "pt;" ?tail drop
-        string>number 2 -
+        string>number
         "font-size: %dpt;" sprintf
     ] re-replace-with
 
@@ -136,8 +136,12 @@ M: pathname url-of
        drop ""
     ] re-replace-with
 
+    R/ background-color: #f3f2ea;/ [
+        drop "background-color: #f5f5f5;"
+    ] re-replace-with
+
     R/ font-family: monospace;/ [
-        " white-space: pre-wrap; line-height: 125%;" append
+        " border: 1px solid #ccc; border-radius: 5px; white-space: pre-wrap; line-height: 125%; margin: 15px; width: calc(100% - 30px);" append
     ] re-replace-with ;
 
 : fix-help-header ( classes -- classes )
@@ -156,9 +160,9 @@ M: pathname url-of
         } prepend
     ] [ drop ] if* ;
 
-: fix-dark-mode ( classes -- classes )
+: dark-mode-css ( classes -- classes' )
     { "/* Dark mode */" "@media (prefers-color-scheme:dark) {" }
-    over [
+    swap [
         R/ {[^}]+}/ [
             "{" ?head drop "}" ?tail drop ";" split
             [ [ blank? ] trim ] map harvest [ ";" append ] map
@@ -174,6 +178,7 @@ M: pathname url-of
                         { "#e3e2db;" "#666666;" }
                         { "white;" "#202124;" }
                         { "black;" "white;" }
+                        { "#ccc;" "#666;" }
                     } ?at [
                         but-last parse-color inverse-color color>hex ";" append
                     ] unless
@@ -181,12 +186,27 @@ M: pathname url-of
             ] map " " join "{ " " }" surround
         ] re-replace-with "    " prepend
         "{  }" over subseq? [ drop f ] when
-    ] map harvest 3append "}" suffix ;
+    ] map harvest append "}" suffix ;
+
+: mobile-css ( classes -- classes' )
+    { "/* Mobile */" "@media screen and (max-width: 600px) {" }
+    swap [
+        R/ {[^}]+}/ [
+            "{" ?head drop "}" ?tail drop ";" split
+            [ [ blank? ] trim ] map harvest [ ";" append ] map
+            { "margin: 15px;" "width: calc(100% - 30px);" } intersect
+            { "margin: 15px;" } { "margin: 15px 0px;" } replace
+            { "width: calc(100% - 30px);" } { "width: 100%;" } replace
+            " " join "{ " " }" surround
+        ] re-replace-with "    " prepend
+        "{  }" over subseq? [ drop f ] when
+    ] map B harvest append "}" suffix ;
 
 : css-classes ( classes -- stylesheet )
     [
         [ fix-css-style " { " "}" surround ] [ "." prepend ] bi* prepend
-    ] { } assoc>map fix-help-header fix-dark-mode join-lines ;
+    ] { } assoc>map fix-help-header dup
+    B [ dark-mode-css ] [ mobile-css ] bi 3append join-lines ;
 
 :: css-styles-to-classes ( body -- stylesheet body )
     H{ } clone :> classes
