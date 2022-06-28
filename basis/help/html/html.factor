@@ -137,17 +137,15 @@ M: pathname url-of
     ] re-replace-with
 
     R/ background-color: #f3f2ea;/ [
-        drop "background-color: #f5f5f5;"
+        drop "background-color: #f7f7f7;"
     ] re-replace-with
 
     R/ font-family: monospace;/ [
         " white-space: pre-wrap; line-height: 125%;" append
     ] re-replace-with
 
-    "font-family: monospace;" over subseq? [
-        "background-color:" over subseq?
-    ] [ f ] if [
-        " border: 1px solid #ccc; border-radius: 5px; margin: 15px; width: calc(100% - 30px);" append
+    { "font-family: monospace;" "background-color:" } [ over subseq? ] all? [
+        " border: 1px solid #dbdbdb; border-radius: 5px; margin: 15px; width: calc(100% - 30px);" append
     ] when ;
 
 : fix-help-header ( classes -- classes )
@@ -181,10 +179,10 @@ M: pathname url-of
                         { "#333333;" "#cccccc;" }
                         { "#373e48;" "#ffffff;" }
                         { "#8b4500;" "orange;" }
+                        { "#dbdbdb;" "#444444;" }
                         { "#e3e2db;" "#666666;" }
                         { "white;" "#202124;" }
                         { "black;" "white;" }
-                        { "#ccc;" "#666;" }
                     } ?at [
                         but-last parse-color inverse-color color>hex ";" append
                     ] unless
