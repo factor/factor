@@ -494,11 +494,10 @@ M: quotation prepare-object
     emit-words
     "Serializing JIT data..." print flush
     emit-jit-data
-    USE: prettyprint
-special-objects get ...
-nl
-"sub-primitives" print
-sub-primitives get ...
+! special-objects get ...
+! nl
+! "sub-primitives" print
+! sub-primitives get ...
 ! \ c-to-factor of
 ! 43 special-objects get set-at
 
