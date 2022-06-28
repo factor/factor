@@ -11,13 +11,13 @@ a:link, a:visited, a:active { text-decoration: none; }
 a:hover { text-decoration: underline; }
 
 body {
-    font-size: 14pt;
+    font-size: 12pt;
     font-family: sans-serif;
     text-align: center;
 }
 
 .page {
-    max-width: 900px;
+    max-width: 800px;
     text-align: left;
     line-height: 150%;
     padding: 10px;

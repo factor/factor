@@ -122,7 +122,7 @@ M: pathname url-of
 : fix-css-style ( style -- style' )
     R/ font-size: \d+pt;/ [
         "font-size: " ?head drop "pt;" ?tail drop
-        string>number
+        string>number 2 -
         "font-size: %dpt;" sprintf
     ] re-replace-with
 
@@ -136,16 +136,12 @@ M: pathname url-of
        drop ""
     ] re-replace-with
 
-    R/ background-color: #f3f2ea;/ [
-        drop "background-color: #f7f7f7;"
-    ] re-replace-with
-
     R/ font-family: monospace;/ [
         " white-space: pre-wrap; line-height: 125%;" append
     ] re-replace-with
 
     { "font-family: monospace;" "background-color:" } [ over subseq? ] all? [
-        " border: 1px solid #dbdbdb; border-radius: 5px; margin: 15px; width: calc(100% - 30px);" append
+        " border: 1px solid #e3e2db; border-radius: 5px; margin: 10px 0px;" append
     ] when ;
 
 : fix-help-header ( classes -- classes )
@@ -179,8 +175,7 @@ M: pathname url-of
                         { "#333333;" "#cccccc;" }
                         { "#373e48;" "#ffffff;" }
                         { "#8b4500;" "orange;" }
-                        { "#dbdbdb;" "#444444;" }
-                        { "#e3e2db;" "#666666;" }
+                        { "#e3e2db;" "#444444;" }
                         { "white;" "#202124;" }
                         { "black;" "white;" }
                     } ?at [
@@ -192,25 +187,10 @@ M: pathname url-of
         "{  }" over subseq? [ drop f ] when
     ] map harvest append "}" suffix ;
 
-: mobile-css ( classes -- classes' )
-    { "" "/* Mobile */" "@media screen and (max-width: 600px) {" }
-    swap [
-        R/ {[^}]+}/ [
-            "{" ?head drop "}" ?tail drop ";" split
-            [ [ blank? ] trim ] map harvest [ ";" append ] map
-            { "margin: 15px;" "width: calc(100% - 30px);" } intersect
-            { "margin: 15px;" } { "margin: 15px 0px;" } replace
-            { "width: calc(100% - 30px);" } { "width: 100%;" } replace
-            " " join "{ " " }" surround
-        ] re-replace-with "    " prepend
-        "{  }" over subseq? [ drop f ] when
-    ] map harvest append "}" suffix ;
-
 : css-classes ( classes -- stylesheet )
     [
         [ fix-css-style " { " "}" surround ] [ "." prepend ] bi* prepend
-    ] { } assoc>map fix-help-header dup
-    [ dark-mode-css ] [ mobile-css ] bi 3append join-lines ;
+    ] { } assoc>map fix-help-header dup dark-mode-css append join-lines ;
 
 :: css-styles-to-classes ( body -- stylesheet body )
     H{ } clone :> classes
