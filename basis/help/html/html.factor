@@ -141,7 +141,11 @@ M: pathname url-of
     ] re-replace-with
 
     { "font-family: monospace;" "background-color:" } [ over subseq? ] all? [
-        " border: 1px solid #e3e2db; border-radius: 5px; margin: 10px 0px;" append
+        " border: 1px solid #e3e2db; margin: 10px 0px;" append
+    ] when
+
+    { "border:" "background-color:" } [ over subseq? ] all? [
+        " border-radius: 5px;" append
     ] when ;
 
 : fix-help-header ( classes -- classes )
