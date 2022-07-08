@@ -4,7 +4,7 @@
 USING: accessors assocs calendar calendar.format
 calendar.holidays.us colors combinators concurrency.combinators
 formatting hashtables http.client io io.styles json.reader
-kernel make math sequences ui urls ;
+kernel make math sequences ui ui.theme urls ;
 
 IN: hacker-news
 
@@ -61,7 +61,7 @@ CONSTANT: christmas-green COLOR: #376627
 : write-title ( title url -- )
     '[
         _ presented ,,
-        ui-running? COLOR: black COLOR: white ? foreground ,,
+        ui-running? text-color COLOR: white ? foreground ,,
     ] H{ } make format ;
 
 : write-link ( title url -- )
@@ -71,7 +71,7 @@ CONSTANT: christmas-green COLOR: #376627
     ] H{ } make format ;
 
 : write-text ( str -- )
-    H{ { foreground COLOR: #888888 } } format ;
+    text-color foreground associate format ;
 
 : post>user-url ( post -- user-url )
     "by" of "http://news.ycombinator.com/user?id=" prepend >url ;
