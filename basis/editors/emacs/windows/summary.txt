@@ -1,0 +1,1 @@
+implementation of find-emacsclient on Windows
