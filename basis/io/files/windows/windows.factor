@@ -379,6 +379,7 @@ M: windows open-append
 
 M: windows home
     {
+        [ "HOME" os-env ]
         [ "HOMEDRIVE" os-env "HOMEPATH" os-env append-path ]
         [ "USERPROFILE" os-env ]
         [ my-documents ]
