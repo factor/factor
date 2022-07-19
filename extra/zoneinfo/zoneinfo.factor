@@ -19,12 +19,12 @@ CONSTANT: zoneinfo-paths
     "vocab:zoneinfo/pacificnew"
     "vocab:zoneinfo/southamerica"
     "vocab:zoneinfo/backzone"
+    "vocab:zoneinfo/etcetera"
 }
 
 CONSTANT: zoneinfo-extra-paths
 {
     "vocab:zoneinfo/backward"
-    "vocab:zoneinfo/etcetera"
     "vocab:zoneinfo/factory"
     "vocab:zoneinfo/leapseconds"
     "vocab:zoneinfo/systemv"
@@ -32,7 +32,8 @@ CONSTANT: zoneinfo-extra-paths
 
 : zoneinfo-lines ( path -- seq )
     utf8 file-lines
-    [ { [ length 0 = ] [ "#" head? ] } 1|| ] reject ;
+    [ { [ length 0 = ] [ "#" head? ] } 1|| ] reject
+    [ "#" split1-last drop ] map ;
 
 TUPLE: zonetab codes lat lng tz comments ;
 C: <zonetab> zonetab
@@ -285,6 +286,11 @@ ERROR: unknown-last-day string ;
     ":" split1 "0" or [ string>number ] bi@
     [ instant ] 2dip 0 set-time ;
 
+: hms>duration ( str -- duration )
+    ":" split 3 "0" pad-tail
+    [ string>number ] map first3
+    [ instant ] 3dip set-time ;
+
 : rule>timestamp-rest ( timestamp zone -- from )
     {
         [ over fp-infinity? [ drop ] [ in>> month-abbreviation-index >>month ] if ]
@@ -325,7 +331,7 @@ ERROR: unknown-last-day string ;
     raw-rule-map at [
         [
             [ rule>timestamps [ dup fp-infinity? [ timestamp>unix-time ] unless ] bi@ 2array ]
-            [ [ save>> hm>duration ] [ letters>> ] bi 2array ] bi 2array
+            [ [ save>> hms>duration ] [ letters>> ] bi 2array ] bi 2array
         ] map
     ] keep zip ;
 
