@@ -55,7 +55,7 @@ TUPLE: wordlet-game secret-word chances guesses ;
     "guess: " write
     readln >lower dup length 5 =
     [ " needs to have 5 letters" append print read-guess ] unless
-    dup word-hash-set in?
+    dup word-list in?
     [ " not in the word list" append print read-guess ] unless ;
 
 : check-winner? ( game -- ? )
