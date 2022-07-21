@@ -1190,12 +1190,20 @@ HELP: cut*
 { $values { "seq" sequence } { "n" "a non-negative integer" } { "before" sequence } { "after" sequence } }
 { $description "Outputs a pair of sequences, where " { $snippet "after" } " consists of the last " { $snippet "n" } " elements of " { $snippet "seq" } ", while " { $snippet "before" } " holds the remaining elements. Both output sequences have the same type as " { $snippet "seq" } "." } ;
 
-HELP: subseq-start-from
-{ $values { "subseq" sequence } { "seq" sequence } { "n" "a start index" } { "i" "a start index" } }
+HELP: subseq-starts-at?
+{ $values { "i" "a start index" } { "seq" sequence } { "subseq" sequence } { "?" boolean } }
+{ $description "Outputs " { $snippet "t" } " if the subseq starts at the " { $snippet "i" } "th element or outputs " { $link f } " if the sequence is not at that position." } ;
+
+HELP: find-subseq
+{ $values { "seq" sequence } { "subseq" sequence } { "i/f" "a start index or " { $snippet "f" } } }
+{ $description "Outputs the start index of the first contiguous subsequence equal to " { $snippet "subseq" } ", starting the search from the " { $snippet "n" } "th element. If no matching subsequence is found, outputs " { $link f } "." } ;
+
+HELP: find-subseq-from
+{ $values { "n" "a start index" } { "seq" sequence } { "subseq" sequence } { "i/f" "a start index or " { $snippet "f" } } }
 { $description "Outputs the start index of the first contiguous subsequence equal to " { $snippet "subseq" } ", starting the search from the " { $snippet "n" } "th element. If no matching subsequence is found, outputs " { $link f } "." } ;
 
 HELP: subseq-start
-{ $values { "subseq" sequence } { "seq" sequence } { "i" "a start index" } }
+{ $values { "subseq" sequence } { "seq" sequence } { "i/f" "a start index or " { $snippet "f" } } }
 { $description "Outputs the start index of the first contiguous subsequence equal to " { $snippet "subseq" } ", or " { $link f } " if no matching subsequence is found." } ;
 
 HELP: subseq?
@@ -1937,7 +1945,12 @@ ARTICLE: "sequences-search" "Searching sequences"
     last-index-from
 }
 "Finding the start of a subsequence:"
-{ $subsections subseq-start subseq-start-from }
+{ $subsections
+    subseq-start
+    find-subseq
+    find-subseq-from
+    subseq-starts-at?
+}
 "Finding the index of an element satisfying a predicate:"
 { $subsections
     find

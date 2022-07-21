@@ -28,7 +28,7 @@ PRIVATE>
 <PRIVATE
 
 : subseq-range ( seq subseq -- from/f to/f )
-    [ swap subseq-start ] keep '[ dup _ length + ] [ f f ] if* ; inline
+    [ find-subseq ] keep '[ dup _ length + ] [ f f ] if* ; inline
 
 : (split1) ( seq subseq snip-quot -- before after )
     [ [ subseq-range ] keepd over ] dip [ 2nip f ] if ; inline
