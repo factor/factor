@@ -247,43 +247,43 @@ GENERIC: prev-float ( m -- n )
 : align ( m w -- n )
     1 - [ + ] keep bitnot bitand ; inline
 
-: (each-integer) ( ... i n quot: ( ... i -- ... ) -- ... )
+: each-integer-from ( ... i n quot: ( ... i -- ... ) -- ... )
     2over < [
         [ nip call ] 3keep
-        [ 1 + ] 2dip (each-integer)
+        [ 1 + ] 2dip each-integer-from
     ] [
         3drop
     ] if ; inline recursive
 
-: (find-integer) ( ... i n quot: ( ... i -- ... ? ) -- ... i/f )
+: find-integer-from ( ... i n quot: ( ... i -- ... ? ) -- ... i/f )
     2over < [
         [ nip call ] 3keep roll
         [ 2drop ]
-        [ [ 1 + ] 2dip (find-integer) ] if
+        [ [ 1 + ] 2dip find-integer-from ] if
     ] [
         3drop f
     ] if ; inline recursive
 
-: (all-integers?) ( ... i n quot: ( ... i -- ... ? ) -- ... ? )
+: all-integers-from? ( ... i n quot: ( ... i -- ... ? ) -- ... ? )
     2over < [
         [ nip call ] 3keep roll
-        [ [ 1 + ] 2dip (all-integers?) ]
+        [ [ 1 + ] 2dip all-integers-from? ]
         [ 3drop f ] if
     ] [
         3drop t
     ] if ; inline recursive
 
 : each-integer ( ... n quot: ( ... i -- ... ) -- ... )
-    [ 0 ] 2dip (each-integer) ; inline
+    [ 0 ] 2dip each-integer-from ; inline
 
 : times ( ... n quot: ( ... -- ... ) -- ... )
     [ drop ] prepose each-integer ; inline
 
 : find-integer ( ... n quot: ( ... i -- ... ? ) -- ... i/f )
-    [ 0 ] 2dip (find-integer) ; inline
+    [ 0 ] 2dip find-integer-from ; inline
 
 : all-integers? ( ... n quot: ( ... i -- ... ? ) -- ... ? )
-    [ 0 ] 2dip (all-integers?) ; inline
+    [ 0 ] 2dip all-integers-from? ; inline
 
 : find-last-integer ( ... n quot: ( ... i -- ... ? ) -- ... i/f )
     over 0 < [

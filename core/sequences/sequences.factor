@@ -473,10 +473,10 @@ PRIVATE>
 PRIVATE>
 
 : each ( ... seq quot: ( ... x -- ... ) -- ... )
-    (each) (each-integer) ; inline
+    (each) each-integer-from ; inline
 
 : each-from ( ... seq quot: ( ... x -- ... ) i -- ... )
-    (each-from) (each-integer) ; inline
+    (each-from) each-integer-from ; inline
 
 : reduce ( ... seq identity quot: ( ... prev elt -- ... next ) -- ... result )
     swapd each ; inline
@@ -521,7 +521,7 @@ PRIVATE>
     (2each) each-integer ; inline
 
 : 2each-from ( ... seq1 seq2 quot: ( ... elt1 elt2 -- ... ) i -- ... )
-    [ (2each) ] dip -rot (each-integer) ; inline
+    [ (2each) ] dip -rot each-integer-from ; inline
 
 : 2reduce ( ... seq1 seq2 identity quot: ( ... prev elt1 elt2 -- ... next ) -- ... result )
     -rotd 2each ; inline
@@ -548,7 +548,7 @@ PRIVATE>
     pickd swap 3map-as ; inline
 
 : find-from ( ... n seq quot: ( ... elt -- ... ? ) -- ... i elt )
-    [ (find-integer) ] (find-from) ; inline
+    [ find-integer-from ] (find-from) ; inline
 
 : find ( ... seq quot: ( ... elt -- ... ? ) -- ... i elt )
     [ find-integer ] (find) ; inline
@@ -560,13 +560,13 @@ PRIVATE>
     [ [ 1 - ] dip find-last-integer ] (find) ; inline
 
 : find-index-from ( ... n seq quot: ( ... elt i -- ... ? ) -- ... i elt )
-    [ (find-integer) ] (find-index-from) ; inline
+    [ find-integer-from ] (find-index-from) ; inline
 
 : find-index ( ... seq quot: ( ... elt i -- ... ? ) -- ... i elt )
     [ find-integer ] (find-index) ; inline
 
 : all? ( ... seq quot: ( ... elt -- ... ? ) -- ... ? )
-    (each) (all-integers?) ; inline
+    (each) all-integers-from? ; inline
 
 : push-if ( ..a elt quot: ( ..a elt -- ..b ? ) accum -- ..b )
     [ keep ] dip rot [ push ] [ 2drop ] if ; inline
@@ -681,14 +681,26 @@ PRIVATE>
 : member? ( elt seq -- ? )
     [ = ] with any? ;
 
+: member-of? ( seq elt -- ? )
+    [ = ] curry any? ;
+
 : member-eq? ( elt seq -- ? )
     [ eq? ] with any? ;
+
+: member-eq-of? ( seq elt -- ? )
+    [ eq? ] curry any? ;
 
 : remove ( elt seq -- newseq )
     [ = ] with reject ;
 
+: remove-of ( seq elt -- newseq )
+    [ = ] curry reject ;
+
 : remove-eq ( elt seq -- newseq )
     [ eq? ] with reject ;
+
+: remove-eq-of ( seq elt -- newseq )
+    [ eq? ] curry reject ;
 
 : sift ( seq -- newseq )
     [ ] filter ;
@@ -1017,22 +1029,25 @@ PRIVATE>
 : cut* ( seq n -- before after )
     [ head* ] [ tail* ] 2bi ;
 
-<PRIVATE
+: subseq-starts-at? ( i seq subseq -- ? )
+    [ length swap ] keep
+    '[
+        [ + _ nth-unsafe ] keep _ nth-unsafe =
+    ] with all-integers? ; inline
 
-: (subseq-start-from) ( subseq seq n length -- subseq seq ? )
-    [
-        [ 3dup ] dip [ + swap nth-unsafe ] keep rot nth-unsafe =
-    ] all-integers? nip ; inline
+: find-subseq-from ( n seq subseq -- i/f )
+    [ [ length ] bi@ - 1 + ] 2keep
+    '[ _ _ subseq-starts-at? ] find-integer-from ; inline
 
-PRIVATE>
+: subseq-start-from ( subseq seq n -- i/f ) spin find-subseq-from ; inline
 
-: subseq-start-from ( subseq seq n -- i )
-    pick length [ pick length swap - 1 + ] keep
-    [ (subseq-start-from) ] curry (find-integer) 2nip ;
+: find-subseq ( seq subseq -- i/f ) [ 0 ] 2dip find-subseq-from ; inline
 
-: subseq-start ( subseq seq -- i ) 0 subseq-start-from ; inline
+: find-subseq? ( seq subseq -- ? ) find-subseq >boolean ; inline
 
-: subseq? ( subseq seq -- ? ) subseq-start >boolean ;
+: subseq-start ( subseq seq -- i/f ) swap find-subseq ; inline
+
+: subseq? ( subseq seq -- ? ) subseq-start >boolean ; inline
 
 : drop-prefix ( seq1 seq2 -- slice1 slice2 )
     2dup mismatch [ 2dup min-length ] unless*
