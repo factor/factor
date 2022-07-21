@@ -315,7 +315,7 @@ PRIVATE>
 
 : 3each-from
     ( ... seq1 seq2 seq3 quot: ( ... elt1 elt2 elt3 -- ... ) i -- ... )
-    [ (3each) ] dip -rot (each-integer) ; inline
+    [ (3each) ] dip -rot each-integer-from ; inline
 
 : 3map-reduce
     ( ..a seq1 seq2 seq3 map-quot: ( ..a elt1 elt2 elt3 -- ..b intermediate ) reduce-quot: ( ..b prev intermediate -- ..a next ) -- ..a result )
@@ -598,7 +598,7 @@ PRIVATE>
     [ length 1 - swap - ] [ nth ] bi ; inline
 
 : each-index-from ( ... seq quot: ( ... elt index -- ... ) i -- ... )
-    -rot (each-index) (each-integer) ; inline
+    -rot (each-index) each-integer-from ; inline
 
 <PRIVATE
 
@@ -655,7 +655,7 @@ PRIVATE>
 
 :: (start-all) ( seq subseq increment -- indices )
     0
-    [ [ subseq seq ] dip subseq-start-from dup ]
+    [ seq subseq find-subseq-from dup ]
     [ [ increment + ] keep ] produce nip ;
 
 : start-all ( seq subseq -- indices )

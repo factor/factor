@@ -47,7 +47,7 @@ IN: mason.git
 
 : git-pull-failed ( error -- )
     dup output-process-error? [
-        dup output>> "not uptodate. Cannot merge." swap subseq?
+        dup output>> "not uptodate. Cannot merge." find-subseq?
         [ git-repo-corrupted ]
         [ rethrow ]
         if

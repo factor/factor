@@ -42,7 +42,7 @@ DEFER: name/values
 
 : name=value ( string -- remain term )
     [ unicode:blank? ] trim
-    ":`" over subseq? [ (name=value) ] [ f swap ] if ;
+    dup ":`" find-subseq? [ (name=value) ] [ f swap ] if ;
 
 : name/values ( string -- remain terms )
     [ dup { [ empty? not ] [ first CHAR: ` = not ] } 1&& ]

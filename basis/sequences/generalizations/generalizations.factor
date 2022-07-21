@@ -124,7 +124,7 @@ MACRO: (ncollect) ( n -- quot )
 MACRO: nmap-reduce ( map-quot reduce-quot n -- quot )
     -rot dupd compose overd over '[
         [ [ first ] _ napply @ 1 ] _ nkeep
-        _ _ (neach) (each-integer)
+        _ _ (neach) each-integer-from
     ] ;
 
 : nall? ( seqs... quot n -- ? )

@@ -40,9 +40,8 @@ FUNCTION: void NSBeep ( )
 
 : running.app? ( -- ? )
     ! Test if we're running a .app.
-    ".app"
     NSBundle -> mainBundle -> bundlePath CF>string
-    subseq? ;
+    ".app" tail? ;
 
 : assert.app ( message -- )
     running.app? [

@@ -726,7 +726,7 @@ TUPLE: mixed-mutable-immutable { x integer } { y sequence read-only } ;
 { } [ [ [ ] [ ] compose curry call ] final-info drop ] unit-test
 
 { V{ } } [
-    [ [ drop ] [ drop ] compose curry (each-integer) ] final-classes
+    [ [ drop ] [ drop ] compose curry each-integer-from ] final-classes
 ] unit-test
 
 GENERIC: iterate ( obj -- next-obj ? )

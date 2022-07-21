@@ -12,7 +12,7 @@ C: <image-name> image-name
 <PRIVATE
 
 MEMO: cached-image-path ( path -- image )
-    [ load-image ] [ "@2x" swap subseq? >>2x? ] bi ;
+    [ load-image ] [ "@2x" find-subseq? >>2x? ] bi ;
 
 PRIVATE>
 
