@@ -75,7 +75,7 @@ PRIVATE>
             [ first2-unsafe ] dip call
         ] [
             [ [ first-unsafe 1 ] [ setup-each [ + ] 2dip ] bi ] dip
-            '[ @ _ keep swap ] (all-integers?) nip
+            '[ @ _ keep swap ] all-integers-from? nip
         ] if
     ] if ; inline
 

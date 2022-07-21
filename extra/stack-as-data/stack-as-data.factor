@@ -16,8 +16,5 @@ MACRO: stack-exchange ( m n -- quot )
     swapd
     '[ _ _ stack-set-nth _ _ stack-set-nth ] ;
 
-! MACRO: stack-filter ( n quot: ( obj -- ? ) -- quot' )
-!     selector [ '[ _ ] replicate spread ] dip ;
-
 MACRO: stack-map ( n quot: ( obj -- obj' ) -- quot' )
     '[ _ ] replicate '[ _ spread ] ;

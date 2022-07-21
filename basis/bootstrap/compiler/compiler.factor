@@ -89,8 +89,8 @@ gc
     "." write flush
 
     {
-        member-eq? split harvest sift cut cut-slice subseq-start index clone
-        set-at reverse push-all class-of number>string string>number
+        member-eq? split harvest sift cut cut-slice subseq-start find-subseq
+        index clone set-at reverse push-all class-of number>string string>number
         like clone-like
     } compile-unoptimized
 

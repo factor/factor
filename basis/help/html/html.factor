@@ -140,17 +140,17 @@ M: pathname url-of
         " white-space: pre-wrap; line-height: 125%;" append
     ] re-replace-with
 
-   { "font-family: monospace;" "background-color:" } [ over subseq? ] all? [
-       " margin: 10px 0px;" append
-   ] when
+    { "font-family: monospace;" "background-color:" } [ find-subseq? ] with all?[
+        " margin: 10px 0px;" append
+    ] when
 
-    { "border:" "background-color:" } [ over subseq? ] all? [
+    dup { "border:" "background-color:" } [ find-subseq? ] with all? [
         " border-radius: 5px;" append
     ] when ;
 
 : fix-help-header ( classes -- classes )
     dup [
-        [ ".a" head? ] [ "#f4efd9;" swap subseq? ] bi and
+        [ ".a" head? ] [ "#f4efd9;" find-subseq? ] bi and
     ] find [
         "padding: 10px;" "padding: 0px;" replace
         "background-color: #f4efd9;" "background-color: white;" replace
@@ -188,7 +188,7 @@ M: pathname url-of
                 ] re-replace-with
             ] map " " join "{ " " }" surround
         ] re-replace-with "    " prepend
-        "{  }" over subseq? [ drop f ] when
+        dup "{  }" find-subseq? [ drop f ] when
     ] map harvest append "}" suffix ;
 
 : css-classes ( classes -- stylesheet )
@@ -215,7 +215,7 @@ M: pathname url-of
     ] each classes sort-values css-classes body ;
 
 : retina-image ( path -- path' )
-    "@2x" over subseq? [ "." split1-last "@2x." glue ] unless ;
+    dup "@2x" find-subseq? [ "." split1-last "@2x." glue ] unless ;
 
 : ?copy-file ( from to -- )
     dup file-exists? [ 2drop ] [ copy-file ] if ;

@@ -58,7 +58,7 @@ SYMBOL: dns-servers
 ERROR: domain-name-contains-empty-label domain ;
 
 : check-domain-name ( domain -- domain )
-    ".." over subseq? [ domain-name-contains-empty-label ] when ;
+    dup ".." find-subseq? [ domain-name-contains-empty-label ] when ;
 
 : >dotted ( domain -- domain' )
     dup "." tail? [ "." append ] unless ;

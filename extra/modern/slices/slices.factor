@@ -182,7 +182,7 @@ ERROR: expected-sequence-error expected actual ;
 ERROR: subseq-expected-but-got-eof n string expected ;
 
 :: slice-til-string ( n string search --  n' string payload end-string )
-    search string n subseq-start-from :> n'
+    n string search find-subseq-from :> n'
     n' [ n string search subseq-expected-but-got-eof ] unless
     n' search length + string
     n n' string ?<slice>
@@ -206,8 +206,8 @@ ERROR: subseq-expected-but-got-eof n string expected ;
 : rewind-slice ( n string slice -- n' string )
     2nip [ from>> ] [ seq>> ] bi ; inline
 
-:: take-from? ( n seq subseq -- n'/f seq  ? )
-    subseq seq n pick length (subseq-start-from) 2nip [
+:: take-from? ( n seq subseq -- n'/f seq ? )
+    n seq subseq subseq-starts-at? [
         n subseq length +
         seq
         t
