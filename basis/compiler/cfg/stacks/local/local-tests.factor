@@ -178,4 +178,4 @@ IN: compiler.cfg.stacks.local.tests
         my-new-key4
         set-slot
     ]
-    curry (each-integer) ;
+    curry each-integer-from ;

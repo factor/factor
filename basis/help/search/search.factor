@@ -37,7 +37,7 @@ MEMO: article-words ( name -- words )
     search-words [ { } ] [
         [ all-articles ] dip
         dup length 1 > [
-            '[ article-words _ swap subseq? ] filter
+            '[ article-words _ find-subseq? ] filter
         ] [
             first '[ article-words [ _ head? ] any? ] filter
         ] if

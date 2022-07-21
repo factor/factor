@@ -41,7 +41,7 @@ alien.libraries.finder.macosx.private sequences tools.test ;
     } [ dyld-find ] map
 ] unit-test
 
-{ t } [ "libm.dylib" "m" find-library subseq? ] unit-test
-{ t } [ "libc.dylib" "c" find-library subseq? ] unit-test
-{ t } [ "libbz2.dylib" "bz2" find-library subseq? ] unit-test
-{ t } [ "AGL.framework" "AGL" find-library subseq? ] unit-test
+{ t } [ "m" find-library "libm.dylib" find-subseq? ] unit-test
+{ t } [ "c" find-library "libc.dylib" find-subseq? ] unit-test
+{ t } [ "bz2" find-library "libbz2.dylib" find-subseq? ] unit-test
+{ t } [ "AGL" find-library "AGL.framework" find-subseq? ] unit-test

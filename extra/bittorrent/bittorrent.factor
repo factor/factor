@@ -73,7 +73,7 @@ M: string load-metainfo
     dup "announce-list" of [ nip first random ] [ "announce" of ] if* ;
 
 : scrape-url ( metainfo -- url/f )
-    announce-url "announce" over path>> subseq? [
+    announce-url dup path>>  "announce" find-subseq? [
         [ "announce" "scrape" replace ] change-path
     ] [ drop f ] if ;
 
@@ -425,7 +425,7 @@ M: peer dispose
 :: next-block ( peer -- peer )
     peer current-index>> [ 1 + ] [ 0 ] if*
     peer #pieces>>
-    peer bitfield>> '[ _ check-bitfield ] (find-integer)
+    peer bitfield>> '[ _ check-bitfield ] find-integer-from
     peer current-index<<
     0 peer current-piece>> set-length
     peer ;
