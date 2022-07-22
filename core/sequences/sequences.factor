@@ -135,12 +135,6 @@ INSTANCE: iota immutable-sequence
     [ [ nth-unsafe ] curry bi@ ]
     [ [ set-nth-unsafe ] curry bi@ ] 3bi ; inline
 
-: (head) ( seq n -- from to seq ) [ 0 ] 2dip swap ; inline
-
-: (tail) ( seq n -- from to seq ) swap [ length ] keep ; inline
-
-: from-end ( seq n -- seq n' ) [ dup length ] dip - ; inline
-
 : (1sequence) ( obj seq -- seq )
     [ 0 swap set-nth-unsafe ] keep ; inline
 
@@ -154,6 +148,12 @@ INSTANCE: iota immutable-sequence
     [ 3 swap set-nth-unsafe ] keep (3sequence) ; inline
 
 PRIVATE>
+
+: head-to-index ( seq to -- zero to seq ) [ 0 ] 2dip swap ; inline
+
+: index-to-tail ( seq from -- from length seq ) swap [ length ] keep ; inline
+
+: from-tail ( seq n -- seq n' ) [ dup length ] dip - ; inline
 
 : 1sequence ( obj exemplar -- seq )
     1 swap [ (1sequence) ] new-like ; inline
@@ -249,15 +249,17 @@ M: slice length [ to>> ] [ from>> ] bi - ; inline
 
 : short ( seq n -- seq n' ) over length min ; inline
 
-: head-slice ( seq n -- slice ) (head) <slice> ; inline
+: cramp ( seq n -- seq n' ) over length min ; inline
 
-: tail-slice ( seq n -- slice ) (tail) <slice> ; inline
+: head-slice ( seq n -- slice ) head-to-index <slice> ; inline
+
+: tail-slice ( seq n -- slice ) index-to-tail <slice> ; inline
 
 : rest-slice ( seq -- slice ) 1 tail-slice ; inline
 
-: head-slice* ( seq n -- slice ) from-end head-slice ; inline
+: head-slice* ( seq n -- slice ) from-tail head-slice ; inline
 
-: tail-slice* ( seq n -- slice ) from-end tail-slice ; inline
+: tail-slice* ( seq n -- slice ) from-tail tail-slice ; inline
 
 : but-last-slice ( seq -- slice ) 1 head-slice* ; inline
 
@@ -339,15 +341,15 @@ PRIVATE>
 : subseq ( from to seq -- subseq )
     dup subseq-as ;
 
-: head ( seq n -- headseq ) (head) subseq ;
+: head ( seq n -- headseq ) head-to-index subseq ;
 
-: tail ( seq n -- tailseq ) (tail) subseq ;
+: tail ( seq n -- tailseq ) index-to-tail subseq ;
 
 : rest ( seq -- tailseq ) 1 tail ;
 
-: head* ( seq n -- headseq ) from-end head ;
+: head* ( seq n -- headseq ) from-tail head ;
 
-: tail* ( seq n -- tailseq ) from-end tail ;
+: tail* ( seq n -- tailseq ) from-tail tail ;
 
 : but-last ( seq -- headseq ) 1 head* ;
 
