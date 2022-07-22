@@ -538,7 +538,7 @@ PRIVATE>
     (2each) all-integers? ; inline
 
 : 2any? ( ... seq1 seq2 quot: ( ... elt1 elt2 -- ... ? ) -- ... ? )
-    [ not ] compose 2all? not ; inline
+    negate 2all? not ; inline
 
 : 3each ( ... seq1 seq2 seq3 quot: ( ... elt1 elt2 elt3 -- ... ) -- ... )
     (3each) each-integer ; inline
@@ -593,7 +593,7 @@ PRIVATE>
     over filter-as ; inline
 
 : reject-as ( ... seq quot: ( ... elt -- ... ? ) exemplar -- ... subseq )
-    [ [ not ] compose ] [ filter-as ] bi* ; inline
+    [ negate ] [ filter-as ] bi* ; inline
 
 : reject ( ... seq quot: ( ... elt -- ... ? ) -- ... subseq )
     over reject-as ; inline
@@ -785,7 +785,7 @@ PRIVATE>
     swap [ [ 0 0 ] dip (filter!) ] keep ; inline
 
 : reject! ( ... seq quot: ( ... elt -- ... ? ) -- ... seq )
-    [ not ] compose filter! ; inline
+    negate filter! ; inline
 
 : remove! ( elt seq -- seq )
     [ = ] with reject! ;
@@ -1091,11 +1091,11 @@ PRIVATE>
 <PRIVATE
 
 : (trim-head) ( seq quot -- seq n )
-    over [ [ not ] compose find drop ] dip swap
+    over [ negate find drop ] dip swap
     [ dup length ] unless* ; inline
 
 : (trim-tail) ( seq quot -- seq n )
-    over [ [ not ] compose find-last drop ?1+ ] dip
+    over [ negate find-last drop ?1+ ] dip
     swap ; inline
 
 PRIVATE>
