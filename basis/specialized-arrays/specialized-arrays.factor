@@ -121,10 +121,10 @@ PRIVATE>
 : direct-slice ( from to seq -- seq' )
     check-slice direct-slice-unsafe ; inline
 
-: direct-head ( seq n -- seq' ) (head) direct-slice ; inline
-: direct-tail ( seq n -- seq' ) (tail) direct-slice ; inline
-: direct-head* ( seq n -- seq' ) from-end direct-head ; inline
-: direct-tail* ( seq n -- seq' ) from-end direct-tail ; inline
+: direct-head ( seq n -- seq' ) head-to-index direct-slice ; inline
+: direct-tail ( seq n -- seq' ) index-to-tail direct-slice ; inline
+: direct-head* ( seq n -- seq' ) from-tail direct-head ; inline
+: direct-tail* ( seq n -- seq' ) from-tail direct-tail ; inline
 
 : define-array-vocab ( type -- vocab )
     underlying-type

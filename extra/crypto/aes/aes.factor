@@ -155,7 +155,7 @@ M: aes-256-key key-expand-round ( temp i -- temp' )
 
 : (key-sched-round) ( output temp i -- output' )
     key-expand-round
-    [ dup 4th-from-end ] dip bitxor suffix! ; inline
+    [ dup 4th-from-tail ] dip bitxor suffix! ; inline
 
 : (sched-interval) ( K Nr -- seq )
     [ length ] dip 1 + 4 * [a..b) ;    ! over the interval Nk...Nb(Nr + 1)

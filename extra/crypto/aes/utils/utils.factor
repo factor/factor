@@ -57,5 +57,5 @@ IN: crypto.aes.utils
     a2 2 seq set-nth-unsafe
     a3 3 seq set-nth-unsafe ;
 
-: 4th-from-end ( seq -- el )
+: 4th-from-tail ( seq -- el )
     [ length 4 - ] keep nth ;
