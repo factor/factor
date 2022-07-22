@@ -277,6 +277,8 @@ UNION: boolean POSTPONE: t POSTPONE: f ;
 
 : most ( x y quot -- z ) 2keep ? ; inline
 
+: negate ( quot -- quot' ) [ not ] compose ; inline
+
 ! Loops
 : loop ( ... pred: ( ... -- ... ? ) -- ... )
     [ call ] keep [ loop ] curry when ; inline recursive
@@ -291,7 +293,7 @@ UNION: boolean POSTPONE: t POSTPONE: f ;
     [ [ dup ] compose ] dip while drop ; inline
 
 : until ( ..a pred: ( ..a -- ..b ? ) body: ( ..b -- ..a ) -- ..b )
-    [ [ not ] compose ] dip while ; inline
+    [ negate ] dip while ; inline
 
 ! Object protocol
 GENERIC: hashcode* ( depth obj -- code ) flushable
