@@ -65,7 +65,7 @@ PRIVATE>
 
 : syslog ( message level -- )
     utf8 [ write-syslog ] with-byte-writer
-    1024 short head
+    1024 cramp head
     syslog-server get-global
     $[ f 0 <inet4> <datagram> ]
     send ;

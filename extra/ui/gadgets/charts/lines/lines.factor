@@ -38,7 +38,7 @@ ALIAS: y second
 ! right of the index, plus one that's not equal, if requested.
 :: adjusted-head-slice ( n elt plus-one? seq -- slice )
     n seq elt x '[ x _ = not ] find-from drop seq swap
-    [ plus-one? [ 1 + ] when short head-slice ] when* ;
+    [ plus-one? [ 1 + ] when cramp head-slice ] when* ;
 
 ! : data-rect ( data -- rect )
 !    [ [ first x ] [ last x ] bi ] keep

@@ -50,7 +50,7 @@ DEFER: (parse-paragraph)
     parse-paragraph paragraph boa ;
 
 : cut-half-slice ( string i -- before after-slice )
-    [ head ] [ 1 + short tail-slice ] 2bi ;
+    [ head ] [ 1 + cramp tail-slice ] 2bi ;
 
 : find-cut ( string quot -- before after delimiter )
     dupd find
