@@ -291,7 +291,7 @@ ERROR: integer-length-expected obj ;
 : length-sequence ( seq -- n seq )
     [ length check-length ] [ ] bi ; inline
 
-: >range-iterator< ( slice/seq -- i n slice/seq )
+: >underlying< ( slice/seq -- i n slice/seq )
     dup slice? [ >slice< ] [ >sequence< ] if ; inline
 
 TUPLE: copier
@@ -409,18 +409,16 @@ PRIVATE>
 
 <PRIVATE
 
-: sequence-iterator ( seq quot -- i n quot' )
-    [ >range-iterator< [ nth-unsafe ] curry ] dip compose ; inline
+: sequence-operator ( seq quot -- i n quot' )
+    [ >underlying< [ nth-unsafe ] curry ] dip compose ; inline
 
-! setup-1each
 : length-iterator ( seq quot -- n quot' )
     length-sequence [ nth-unsafe ] curry ; inline
 
-! (1each)
 : length-operator ( seq quot -- n quot' )
     [ length-iterator ] dip compose ; inline
 
-: sequence-iterator-from ( seq quot i -- i n quot' )
+: sequence-operator-from ( seq quot i -- i n quot' )
     -rot length-operator ; inline
 
 : collect ( n quot into -- )
@@ -477,10 +475,10 @@ PRIVATE>
 PRIVATE>
 
 : each ( ... seq quot: ( ... x -- ... ) -- ... )
-    sequence-iterator each-integer-from ; inline
+    sequence-operator each-integer-from ; inline
 
 : each-from ( ... seq quot: ( ... x -- ... ) i -- ... )
-    sequence-iterator-from each-integer-from ; inline
+    sequence-operator-from each-integer-from ; inline
 
 : reduce ( ... seq identity quot: ( ... prev elt -- ... next ) -- ... result )
     swapd each ; inline
@@ -570,7 +568,7 @@ PRIVATE>
     [ find-integer ] (find-index) ; inline
 
 : all? ( ... seq quot: ( ... elt -- ... ? ) -- ... ? )
-    sequence-iterator all-integers-from? ; inline
+    sequence-operator all-integers-from? ; inline
 
 : push-if ( ..a elt quot: ( ..a elt -- ..b ? ) accum -- ..b )
     [ keep ] dip rot [ push ] [ 2drop ] if ; inline
