@@ -76,7 +76,7 @@ PRIVATE>
         ] [
             [
                 [ first-unsafe ]
-                [ >range-iterator< [ nth-unsafe ] curry [ 1 + ] 2dip ] bi
+                [ >underlying< [ nth-unsafe ] curry [ 1 + ] 2dip ] bi
             ] dip '[ @ _ keep swap ] all-integers-from? nip
         ] if
     ] if ; inline
