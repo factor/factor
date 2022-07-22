@@ -124,7 +124,7 @@ SYMBOL: error-stream
 
 : (read-into) ( buf stream quot -- buf-slice/f )
     [ dup length over ] 2dip call
-    [ (head) <slice-unsafe> ] [ zero? not ] bi ; inline
+    [ head-to-index <slice-unsafe> ] [ zero? not ] bi ; inline
 
 PRIVATE>
 
