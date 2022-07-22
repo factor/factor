@@ -29,7 +29,7 @@ M: object >entry
         } cleave ;
 
 : process-entries ( seq -- seq' )
-    20 short head-slice [
+    20 cramp head-slice [
         >entry clone
         [ adjust-url ] change-url
     ] map ;

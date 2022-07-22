@@ -162,7 +162,7 @@ M:: interactor stream-read-unsafe ( n buf interactor -- count )
     n [ 0 ] [
         drop
         interactor interactor-read dup [ join-lines ] when
-        n short [ head-slice 0 buf copy ] keep
+        n cramp [ head-slice 0 buf copy ] keep
     ] if-zero ;
 
 M: interactor stream-read1

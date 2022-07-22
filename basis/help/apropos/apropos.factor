@@ -52,7 +52,7 @@ M: more-completions article-content
     completions [
         [
             { $heading search } ,
-            [ max-completions short head keys \ $completions prefix , ]
+            [ max-completions cramp head keys \ $completions prefix , ]
             [
                 length max-completions >
                 [ { $link T{ more-completions f completions search category } } , ] when

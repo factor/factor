@@ -120,7 +120,7 @@ TUPLE: completion-popup < track interactor table completion-mode ;
     [ completion-popup? ] find-parent ;
 
 : <completion-model> ( editor element quot -- model )
-    [ <element-model> ] dip '[ @ >alist 100 short head ] <arrow> ;
+    [ <element-model> ] dip '[ @ >alist 100 cramp head ] <arrow> ;
 
 M: completion-popup focusable-child* table>> ;
 
