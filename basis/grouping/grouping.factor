@@ -74,8 +74,10 @@ PRIVATE>
         2 = [
             [ first2-unsafe ] dip call
         ] [
-            [ [ first-unsafe 1 ] [ setup-each [ + ] 2dip ] bi ] dip
-            '[ @ _ keep swap ] all-integers-from? nip
+            [
+                [ first-unsafe ]
+                [ >range-iterator< [ nth-unsafe ] curry [ 1 + ] 2dip ] bi
+            ] dip '[ @ _ keep swap ] all-integers-from? nip
         ] if
     ] if ; inline
 

@@ -218,6 +218,9 @@ TUPLE: slice
     { to integer read-only }
     { seq read-only } ;
 
+: >slice< ( slice -- from to seq )
+    [ from>> ] [ to>> ] [ seq>> ] tri ; inline
+
 : collapse-slice ( m n slice -- m' n' seq )
     [ from>> ] [ seq>> ] bi [ [ + ] curry bi@ ] dip ; inline
 
@@ -282,13 +285,22 @@ ERROR: integer-length-expected obj ;
 : check-length ( n -- n )
     dup integer? [ integer-length-expected ] unless ; inline
 
-TUPLE: copy-state
+: >sequence< ( seq -- i n seq )
+    [ drop 0 ] [ length check-length ] [ ] tri ; inline
+
+: length-sequence ( seq -- n seq )
+    [ length check-length ] [ ] bi ; inline
+
+: >range-iterator< ( slice/seq -- i n slice/seq )
+    dup slice? [ >slice< ] [ >sequence< ] if ; inline
+
+TUPLE: copier
     { src-i integer read-only }
     { src read-only }
     { dst-i integer read-only }
     { dst read-only } ;
 
-C: <copy> copy-state
+C: <copier> copier
 
 : copy-nth-unsafe ( n copy -- )
     [ [ src-i>> + ] [ src>> ] bi nth-unsafe ]
@@ -301,7 +313,7 @@ C: <copy> copy-state
 
 : subseq>copy ( from to seq -- n copy )
     [ over - check-length swap ] dip
-    3dup nip new-sequence 0 swap <copy> ; inline
+    3dup nip new-sequence 0 swap <copier> ; inline
 
 : bounds-check-head ( n seq -- n seq )
     over 0 < [ bounds-error ] when ; inline
@@ -311,7 +323,7 @@ C: <copy> copy-state
     [ swap length + ] dip lengthen ; inline
 
 : copy-unsafe ( src i dst -- )
-    [ [ length check-length 0 ] keep ] 2dip <copy> (copy) drop ; inline
+    [ [ length check-length 0 ] keep ] 2dip <copier> (copy) drop ; inline
 
 : subseq-unsafe-as ( from to seq exemplar -- subseq )
     [ subseq>copy (copy) ] dip like ; inline
@@ -397,36 +409,28 @@ PRIVATE>
 
 <PRIVATE
 
-: setup-each ( seq -- i n quot )
-    dup slice? [
-        [ from>> ] [ to>> ] [ seq>> ] tri
-    ] [
-        [ length check-length 0 swap ] keep
-    ] if [ nth-unsafe ] curry ; inline
+: sequence-iterator ( seq quot -- i n quot' )
+    [ >range-iterator< [ nth-unsafe ] curry ] dip compose ; inline
 
-: (each) ( seq quot -- i n quot' )
-    [ setup-each ] dip compose ; inline
+! setup-1each
+: length-iterator ( seq quot -- n quot' )
+    length-sequence [ nth-unsafe ] curry ; inline
 
-: (each-from) ( seq quot i -- i n quot' )
-    [ (each) ] dip [ + ] curry 2dip ; inline
+! (1each)
+: length-operator ( seq quot -- n quot' )
+    [ length-iterator ] dip compose ; inline
 
-: (collect) ( quot into -- quot' )
-    [ [ keep ] dip set-nth-unsafe ] 2curry ; inline
+: sequence-iterator-from ( seq quot i -- i n quot' )
+    -rot length-operator ; inline
 
 : collect ( n quot into -- )
-    (collect) each-integer ; inline
+    [ [ keep ] dip set-nth-unsafe ] 2curry each-integer ; inline
 
-: setup-1each ( seq -- n quot )
-    [ length check-length ] keep [ nth-unsafe ] curry ; inline
-
-: (1each) ( seq quot -- n quot' )
-    [ setup-1each ] dip compose ; inline
-
-: (each-index) ( seq quot -- n quot' )
-    [ setup-1each [ keep ] curry ] dip compose ; inline
+: sequence-index-iterator ( seq quot -- n quot' )
+    [ length-iterator [ keep ] curry ] dip compose ; inline
 
 : map-into ( seq quot into -- )
-    [ (1each) ] dip collect ; inline
+    [ length-operator ] dip collect ; inline
 
 : 2nth-unsafe ( n seq1 seq2 -- elt1 elt2 )
     [ nth-unsafe ] bi-curry@ bi ; inline
@@ -451,14 +455,14 @@ PRIVATE>
     over [ dupd nth-unsafe ] [ drop f ] if ; inline
 
 : (find) ( seq quot quot' -- i elt )
-    pick [ [ (1each) ] dip call ] dip finish-find ; inline
+    pick [ [ length-operator ] dip call ] dip finish-find ; inline
 
 : (find-from) ( n seq quot quot' -- i elt )
     [ 2dup bounds-check? ] 2dip
     '[ _ _ (find) ] [ 2drop f f ] if ; inline
 
 : (find-index) ( seq quot quot' -- i elt )
-    pick [ [ (each-index) ] dip call ] dip finish-find ; inline
+    pick [ [ sequence-index-iterator ] dip call ] dip finish-find ; inline
 
 : (find-index-from) ( n seq quot quot' -- i elt )
     [ 2dup bounds-check? ] 2dip
@@ -473,10 +477,10 @@ PRIVATE>
 PRIVATE>
 
 : each ( ... seq quot: ( ... x -- ... ) -- ... )
-    (each) each-integer-from ; inline
+    sequence-iterator each-integer-from ; inline
 
 : each-from ( ... seq quot: ( ... x -- ... ) i -- ... )
-    (each-from) each-integer-from ; inline
+    sequence-iterator-from each-integer-from ; inline
 
 : reduce ( ... seq identity quot: ( ... prev elt -- ... next ) -- ... result )
     swapd each ; inline
@@ -485,7 +489,7 @@ PRIVATE>
     overd [ [ collect ] keep ] new-like ; inline
 
 : map-as ( ... seq quot: ( ... elt -- ... newelt ) exemplar -- ... newseq )
-    [ (1each) ] dip map-integers ; inline
+    [ length-operator ] dip map-integers ; inline
 
 : map ( ... seq quot: ( ... elt -- ... newelt ) -- ... newseq )
     over map-as ; inline
@@ -566,7 +570,7 @@ PRIVATE>
     [ find-integer ] (find-index) ; inline
 
 : all? ( ... seq quot: ( ... elt -- ... ? ) -- ... ? )
-    (each) all-integers-from? ; inline
+    sequence-iterator all-integers-from? ; inline
 
 : push-if ( ..a elt quot: ( ..a elt -- ..b ? ) accum -- ..b )
     [ keep ] dip rot [ push ] [ 2drop ] if ; inline
@@ -627,7 +631,7 @@ PRIVATE>
     [ dup ] swap [ keep ] curry produce nip ; inline
 
 : each-index ( ... seq quot: ( ... elt index -- ... ) -- ... )
-    (each-index) each-integer ; inline
+    sequence-index-iterator each-integer ; inline
 
 : map-index-as ( ... seq quot: ( ... elt index -- ... newelt ) exemplar -- ... newseq )
     [ dup length <iota> ] 2dip 2map-as ; inline
