@@ -48,7 +48,7 @@ PRIVATE>
     '[ dup _ >= [ 1 + ] when ] map! drop ; inline
 
 : (>permutation) ( seq n index -- seq )
-    swap [ dupd (head) <slice-unsafe> ] dip bump-indices ;
+    swap [ dupd head-to-index <slice-unsafe> ] dip bump-indices ;
 
 : >permutation ( factoradic -- permutation )
     reverse! dup [ (>permutation) ] each-index reverse! ;
@@ -139,7 +139,7 @@ PRIVATE>
     [ nip ] [ nth-unsafe ] 2bi [ > ] curry find-last drop ; inline
 
 : reverse-tail! ( n seq -- seq )
-    [ swap 1 + (tail) <slice-unsafe> reverse! drop ] keep ; inline
+    [ swap 1 + index-to-tail <slice-unsafe> reverse! drop ] keep ; inline
 
 : (next-permutation) ( seq -- seq )
     dup cut-point [
@@ -266,7 +266,7 @@ INSTANCE: combinations immutable-sequence
     over length - '[ _ + >= ] find-index drop ; inline
 
 : increment-rest ( i seq -- )
-    [ nth-unsafe ] [ swap (tail) <slice-unsafe> ] 2bi
+    [ nth-unsafe ] [ swap index-to-tail <slice-unsafe> ] 2bi
     [ drop 1 + dup ] map! 2drop ; inline
 
 : increment-last ( seq -- )
