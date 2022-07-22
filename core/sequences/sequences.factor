@@ -412,7 +412,7 @@ PRIVATE>
 : sequence-operator ( seq quot -- i n quot' )
     [ >underlying< [ nth-unsafe ] curry ] dip compose ; inline
 
-: length-iterator ( seq quot -- n quot' )
+: length-iterator ( seq -- n quot' )
     length-sequence [ nth-unsafe ] curry ; inline
 
 : length-operator ( seq quot -- n quot' )
