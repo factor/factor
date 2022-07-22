@@ -36,7 +36,7 @@ SYMBOL: time-std
 
 : process-timings ( -- )
     timings get sort-values
-    [ slowest short tail* reverse slowest-pages set ]
+    [ slowest cramp tail* reverse slowest-pages set ]
     [
         values [
             [ mean 1000000 /f mean-time set ]
