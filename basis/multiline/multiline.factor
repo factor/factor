@@ -44,7 +44,7 @@ SYNTAX: STRING:
         i text end find-subseq-from [| j |
             i j text subseq % j end length +
         ] [
-            text i cramp tail % CHAR: \n ,
+            text i bound tail % CHAR: \n ,
             lexer next-line
             0 end lexer (scan-multiline-string)
         ] if*

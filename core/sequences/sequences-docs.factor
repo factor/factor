@@ -1080,7 +1080,7 @@ HELP: head
     }
     "When a sequence may not have enough elements:"
     { $example "USING: sequences prettyprint ;"
-        "{ 1 2 } 5 cramp head ."
+        "{ 1 2 } 5 bound head ."
         "{ 1 2 }"
     }
 }
@@ -1096,7 +1096,7 @@ HELP: tail
     }
     "When a sequence may not have enough elements:"
     { $example "USING: sequences prettyprint ;"
-        "{ 1 2 } 5 cramp tail ."
+        "{ 1 2 } 5 bound tail ."
         "{ }"
     }
 }
@@ -1122,7 +1122,7 @@ HELP: head*
     }
     "When a sequence may not have enough elements:"
     { $example "USING: sequences prettyprint ;"
-        "{ 1 2 } 5 cramp head* ."
+        "{ 1 2 } 5 bound head* ."
         "{ }"
     }
 }
@@ -1138,7 +1138,7 @@ HELP: tail*
     }
     "When a sequence may not have enough elements:"
     { $example "USING: sequences prettyprint ;"
-        "{ 1 2 } 5 cramp tail* ."
+        "{ 1 2 } 5 bound tail* ."
         "{ 1 2 }"
     }
 }
@@ -1627,12 +1627,12 @@ HELP: sequence-hashcode-step
      { "newhash" integer } }
 { $description "An implementation word that computes a running hashcode of a sequence using some bit-twiddling. The resulting hashcode is always a fixnum." } ;
 
-HELP: cramp
+HELP: bound
 { $values
      { "seq" sequence } { "n" integer } { "n'" integer } }
 { $description "Returns the input sequence and its length or " { $snippet "n" } ", whichever is less." }
 { $examples { $example "USING: sequences kernel prettyprint ;"
-    "\"abcd\" 3 cramp [ . ] bi@"
+    "\"abcd\" 3 bound [ . ] bi@"
     "\"abcd\"\n3"
 } } ;
 

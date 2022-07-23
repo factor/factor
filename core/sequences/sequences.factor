@@ -247,7 +247,7 @@ M: slice virtual@ [ from>> + ] [ seq>> ] bi ; inline
 
 M: slice length [ to>> ] [ from>> ] bi - ; inline
 
-: cramp ( seq n -- seq n' ) over length min ; inline
+: bound ( seq n -- seq n' ) over length min ; inline
 
 : head-slice ( seq n -- slice ) head-to-index <slice> ; inline
 

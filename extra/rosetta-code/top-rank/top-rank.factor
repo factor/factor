@@ -51,7 +51,7 @@ CONSTANT: employees {
     [ [ salary>> ] inv-sort-with ] assoc-map ;
 
 : first-n-each ( seq n quot -- )
-    [ cramp head-slice ] dip each ; inline
+    [ bound head-slice ] dip each ; inline
 
 : top-rank-main ( -- )
     employees prepare-departments [

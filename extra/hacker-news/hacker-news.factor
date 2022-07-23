@@ -20,7 +20,7 @@ CONSTANT: christmas-green COLOR: #376627
     "https://hacker-news.firebaseio.com/v0/item/%d.json?print=pretty" sprintf ;
 
 : hacker-news-items ( n endpoint -- seq )
-    hacker-news-ids swap cramp head
+    hacker-news-ids swap bound head
     [ hacker-news-id>json-url http-get nip json> ] parallel-map ;
 
 : hacker-news-top-stories ( n -- seq )
