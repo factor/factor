@@ -42,9 +42,12 @@ CONSTANT: word-renames {
     { "git-checkout-existing-branch" { "git-checkout-existing" "0.99" } }
     { "git-checkout-existing-branch*" { "git-checkout-existing*" "0.99" } }
     { "tags" { "chloe-tags" "0.99" } }
+    { "(each)" { "sequence-operator" "0.99" } }
     { "(each-integer)" { "each-integer-from" "0.99" } }
     { "(find-integer)" { "find-integer-from" "0.99" } }
     { "(all-integers?)" { "all-integers-from?" "0.99" } }
+    { "short" { "cramp" "0.99" } }
+    { "map-integers" { "map-integers-as" "0.99" } }
 }
 
 : compute-assoc-fixups ( continuation name assoc -- seq )

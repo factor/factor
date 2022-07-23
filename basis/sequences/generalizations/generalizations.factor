@@ -66,7 +66,7 @@ MACRO: nset-nth-unsafe ( n -- quot )
     (neach) each-integer ; inline
 
 : nmap-as ( seq... quot exemplar n -- result )
-    '[ _ (neach) ] dip map-integers ; inline
+    '[ _ (neach) ] dip map-integers-as ; inline
 
 : nmap ( seq... quot n -- result )
     dup '[ [ _ npick ] dip swap ] dip nmap-as ; inline
@@ -91,12 +91,12 @@ MACRO: (ncollect) ( n -- quot )
 : ncollect ( len quot into... n -- )
     (ncollect) each-integer ; inline
 
-: nmap-integers ( len quot exemplar... n -- result... )
+: nmap-integers-as ( len quot exemplar... n -- result... )
     4 dupn
     '[ [ over ] _ ndip [ [ _ ncollect ] _ nkeep ] _ nnew-like ] call ; inline
 
 : mnmap-as ( m*seq quot n*exemplar m n -- result*n )
-    dup '[ [ _ (neach) ] _ ndip _ nmap-integers ] call ; inline
+    dup '[ [ _ (neach) ] _ ndip _ nmap-integers-as ] call ; inline
 
 : mnmap ( m*seq quot m n -- result*n )
     2dup '[ [ _ npick ] dip swap _ dupn ] 2dip mnmap-as ; inline

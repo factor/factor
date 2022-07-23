@@ -186,7 +186,7 @@ ERROR: sqlite-error < db-error n string ;
     } case ;
 
 : sqlite-row ( handle -- seq )
-    dup sqlite-#columns [ sqlite-column ] with { } map-integers ;
+    dup sqlite-#columns [ sqlite-column ] with map-integers ;
 
 : sqlite-step-has-more-rows? ( prepared -- ? )
     {
