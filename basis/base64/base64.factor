@@ -77,7 +77,7 @@ PRIVATE>
 <PRIVATE
 
 : read1-ignoring ( ignoring stream -- ch )
-    dup stream-read1 pick over member-eq-of?
+    dup stream-read1 pick dupd member-eq?
     [ drop read1-ignoring ] [ 2nip ] if ; inline recursive
 
 : read-ignoring ( n ignoring stream -- accum )
