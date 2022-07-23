@@ -12,7 +12,8 @@ IN: sequences.extras
 :: subseq* ( from to seq -- subseq )
     seq length :> len
     from [ dup 0 < [ len + ] when ] [ 0 ] if*
-    to [ dup 0 < [ len + ] when ] [ len ] if* [ 0 len clamp ] bi@ dupd max seq subseq ;
+    to [ dup 0 < [ len + ] when ] [ len ] if*
+    [ 0 len clamp ] bi@ dupd max seq subseq ;
 
 : safe-subseq ( from to seq -- subseq )
     [ length '[ 0 _ clamp ] bi@ ] keep subseq ;
@@ -20,13 +21,10 @@ IN: sequences.extras
 : all-subseqs ( seq -- seqs )
     dup length [1..b] [ clump ] with map concat ;
 
-:: each-subseq ( ... seq quot: ( ... subseq -- ... ) -- ... )
-    seq length :> len
-    len [0..b] [| from |
-        from len (a..b] [| to |
-            from to seq subseq quot call
-        ] each
-    ] each ; inline
+: each-subseq ( ... seq quot: ( ... subseq -- ... ) -- ... )
+    [ dup length [ [0..b] ] [ ] bi ] dip '[
+        dup _ (a..b] [ rot [ subseq _ call ] keep ] with each
+    ] each drop ; inline
 
 : map-like ( seq exemplar -- seq' )
     '[ _ like ] map ; inline
@@ -263,7 +261,7 @@ PRIVATE>
     overd [ [ collect-with-previous ] keep ] new-like ; inline
 
 : map-with-previous-as ( ... seq quot: ( ... elt prev/f -- ... newelt ) exemplar -- ... newseq )
-    [ (1each) ] dip map-integers-with ; inline
+    [ length-operator ] dip map-integers-with ; inline
 
 : map-with-previous ( ... seq quot: ( ... elt prev/f -- ... newelt ) -- ... newseq )
     over map-with-previous-as ; inline
