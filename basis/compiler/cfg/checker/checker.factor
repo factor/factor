@@ -6,7 +6,7 @@ IN: compiler.cfg.checker
 ERROR: bad-successors ;
 
 : check-successors ( bb -- )
-    dup successors>> '[ _ predecessors>> member-eq-of? ] all?
+    dup successors>> [ predecessors>> member-eq? ] with all?
     [ bad-successors ] unless ;
 
 : check-cfg ( cfg -- )
