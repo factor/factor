@@ -466,10 +466,10 @@ PRIVATE>
     [ 2dup bounds-check? ] 2dip
     '[ _ _ (find-index) ] [ 2drop f f ] if ; inline
 
-: (accumulate) ( seq identity quot -- identity seq quot )
+: (accumulate) ( seq identity quot -- identity seq quot' )
     swapd [ keepd ] curry ; inline
 
-: (accumulate*) ( seq identity quot -- identity seq quot )
+: (accumulate*) ( seq identity quot -- identity seq quot' )
     swapd [ dup ] compose ; inline
 
 PRIVATE>
@@ -483,17 +483,23 @@ PRIVATE>
 : reduce ( ... seq identity quot: ( ... prev elt -- ... next ) -- ... result )
     swapd each ; inline
 
-: map-integers ( ... len quot: ( ... i -- ... elt ) exemplar -- ... newseq )
+: map-integers-as ( ... len quot: ( ... i -- ... elt ) exemplar -- ... newseq )
     overd [ [ collect ] keep ] new-like ; inline
 
+: map-integers ( ... len quot: ( ... i -- ... elt ) -- ... newseq )
+    { } map-integers-as ; inline
+
+! : map-integers ( ... len quot: ( ... i -- ... elt ) exemplar -- ... newseq )
+!     overd [ [ collect ] keep ] new-like ; inline
+
 : map-as ( ... seq quot: ( ... elt -- ... newelt ) exemplar -- ... newseq )
-    [ length-operator ] dip map-integers ; inline
+    [ length-operator ] dip map-integers-as ; inline
 
 : map ( ... seq quot: ( ... elt -- ... newelt ) -- ... newseq )
     over map-as ; inline
 
 : replicate-as ( ... len quot: ( ... -- ... newelt ) exemplar -- ... newseq )
-    [ [ drop ] prepose ] dip map-integers ; inline
+    [ [ drop ] prepose ] dip map-integers-as ; inline
 
 : replicate ( ... len quot: ( ... -- ... newelt ) -- ... newseq )
     { } replicate-as ; inline
@@ -529,7 +535,7 @@ PRIVATE>
     -rotd 2each ; inline
 
 : 2map-as ( ... seq1 seq2 quot: ( ... elt1 elt2 -- ... newelt ) exemplar -- ... newseq )
-    [ (2each) ] dip map-integers ; inline
+    [ (2each) ] dip map-integers-as ; inline
 
 : 2map ( ... seq1 seq2 quot: ( ... elt1 elt2 -- ... newelt ) -- ... newseq )
     pick 2map-as ; inline
@@ -544,7 +550,7 @@ PRIVATE>
     (3each) each-integer ; inline
 
 : 3map-as ( ... seq1 seq2 seq3 quot: ( ... elt1 elt2 elt3 -- ... newelt ) exemplar -- ... newseq )
-    [ (3each) ] dip map-integers ; inline
+    [ (3each) ] dip map-integers-as ; inline
 
 : 3map ( ... seq1 seq2 seq3 quot: ( ... elt1 elt2 elt3 -- ... newelt ) -- ... newseq )
     pickd swap 3map-as ; inline
@@ -1180,14 +1186,14 @@ PRIVATE>
 
 : generic-flip ( matrix -- newmatrix )
     [ [ length ] [ min ] map-reduce ] keep
-    '[ _ [ nth-unsafe ] with { } map-as ] { } map-integers ; inline
+    '[ _ [ nth-unsafe ] with { } map-as ] map-integers ; inline
 
 USE: arrays
 
 : array-flip ( matrix -- newmatrix )
     { array } declare
     [ [ { array } declare length>> ] [ min ] map-reduce ] keep
-    '[ _ [ { array } declare array-nth ] with { } map-as ] { } map-integers ;
+    '[ _ [ { array } declare array-nth ] with { } map-as ] map-integers ;
 
 PRIVATE>
 

@@ -14,7 +14,7 @@ cuckoo-filters kernel math.parser sequences tools.test ;
 
 { 250,000 250,000 0 } [
     250,000 <cuckoo-filter>
-    250,000 [ number>string ] { } map-integers
+    250,000 [ number>string ] map-integers
     [
         [
             {

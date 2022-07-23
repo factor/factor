@@ -24,7 +24,7 @@ PRIVATE>
 : unrolled-collect ( n quot: ( n -- value ) into -- )
     (unrolled-collect) unrolled-each-integer ; inline
 
-: unrolled-map-integers ( n quot: ( n -- value ) exemplar -- newseq )
+: unrolled-map-integers-as ( n quot: ( n -- value ) exemplar -- newseq )
     overd [ [ unrolled-collect ] keep ] new-like ; inline
 
 ERROR: unrolled-bounds-error
@@ -61,10 +61,10 @@ ERROR: unrolled-2bounds-error
     (unrolled-each-index) unrolled-each-integer ; inline
 
 : unrolled-map-as-unsafe ( seq len quot: ( x -- newx ) exemplar -- newseq )
-    [ (unrolled-each) ] dip unrolled-map-integers ; inline
+    [ (unrolled-each) ] dip unrolled-map-integers-as ; inline
 
 : unrolled-2map-as-unsafe ( xseq yseq len quot: ( x y -- newx ) exemplar -- newseq )
-    [ (unrolled-2each) ] dip unrolled-map-integers ; inline
+    [ (unrolled-2each) ] dip unrolled-map-integers-as ; inline
 
 : unrolled-map-unsafe ( seq len quot: ( x -- newx ) -- newseq )
     pick unrolled-map-as-unsafe ; inline

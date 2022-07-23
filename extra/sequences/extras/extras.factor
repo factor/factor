@@ -102,12 +102,12 @@ PRIVATE>
 : even-indices ( seq -- seq' )
     [ length 1 + 2/ ] keep [
         [ [ 2 * ] dip nth-unsafe ] curry
-    ] keep map-integers ;
+    ] keep map-integers-as ;
 
 : odd-indices ( seq -- seq' )
     [ length 2/ ] keep [
         [ [ 2 * 1 + ] dip nth-unsafe ] curry
-    ] keep map-integers ;
+    ] keep map-integers-as ;
 
 : compact ( ... seq quot: ( ... elt -- ... ? ) elt -- ... seq' )
     [ split-when harvest ] dip join ; inline
@@ -277,7 +277,7 @@ PRIVATE>
 PRIVATE>
 
 : map-from-as ( ... seq quot: ( ... elt -- ... newelt ) i exemplar -- ... newseq )
-    [ -rot setup-each-from ] dip map-integers ; inline
+    [ -rot setup-each-from ] dip map-integers-as ; inline
 
 : map-from ( ... seq quot: ( ... elt -- ... newelt ) i -- ... newseq )
     pick map-from-as ; inline
@@ -401,7 +401,7 @@ PRIVATE>
     pick [ 2map-into ] keep ; inline
 
 : 2map-index ( ... seq1 seq2 quot: ( ... elt1 elt2 index -- ... newelt ) -- ... newseq )
-    pick [ (2each-index) ] dip map-integers ; inline
+    pick [ (2each-index) ] dip map-integers-as ; inline
 
 TUPLE: evens { seq read-only } ;
 
