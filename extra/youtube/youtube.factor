@@ -61,7 +61,7 @@ CONSTANT: video-info-url URL" http://www.youtube.com/get_video_info"
 : sanitize ( title -- title' )
     [ 0 31 between? ] reject
     [ "\"#$%'*,./:;<>?^|~\\" member? ] reject
-    200 cramp head ;
+    200 bound head ;
 
 : downloadable? ( video-info -- ? )
     "use_cipher_signature" of "False" = ;

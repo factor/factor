@@ -93,7 +93,7 @@ posting "POSTINGS"
     [ date>> ] inv-sort-with ;
 
 : update-cached-postings ( -- )
-    blogroll fetch-blogroll sort-entries 8 cramp head [
+    blogroll fetch-blogroll sort-entries 8 bound head [
         posting new delete-tuples
         [ insert-tuple ] each
     ] with-transaction ;
