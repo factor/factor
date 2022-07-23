@@ -171,7 +171,7 @@ IN: sequences.tests
 { { 1 3 2 4 } } [ { 1 2 3 4 } clone 1 2 pick exchange ] unit-test
 
 { { "" "a" "aa" "aaa" } }
-[ 4 [ CHAR: a <string> ] { } map-integers ]
+[ 4 [ CHAR: a <string> ] map-integers ]
 unit-test
 
 { V{ 1 3 5 7 9 } } [ 10 <iota> >vector [ even? ] reject! ] unit-test

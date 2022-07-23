@@ -11,7 +11,7 @@ IN: base32-crockford
 CONSTANT: ALPHABET $[ "0123456789ABCDEFGHJKMNPQRSTVWXYZ" >byte-array ]
 >>
 
-CONSTANT: INVERSE $[ 256 [ ALPHABET index 0xff or ] B{ } map-integers ]
+CONSTANT: INVERSE $[ 256 [ ALPHABET index 0xff or ] B{ } map-integers-as ]
 
 CONSTANT: CHECKSUM $[ ALPHABET "*~$=U" append ]
 

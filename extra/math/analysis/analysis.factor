@@ -18,7 +18,7 @@ CONSTANT: gamma-p6
     }
 
 : gamma-z ( x n -- seq )
-    [ + recip ] with { } map-integers 1.0 0 pick set-nth ;
+    [ + recip ] with map-integers 1.0 0 pick set-nth ;
 
 : (gamma-lanczos6) ( x -- log[gamma[x+1]] )
     ! log(gamma(x+1)
