@@ -28,7 +28,7 @@ IN: project-euler.117
 <PRIVATE
 
 : next ( seq -- )
-    [ 4 cramp tail* sum ] keep push ;
+    [ 4 bound tail* sum ] keep push ;
 
 : (euler117) ( n -- m )
     [ V{ 1 } clone ] dip over [ next ] curry times last ;

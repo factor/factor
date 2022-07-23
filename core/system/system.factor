@@ -77,7 +77,7 @@ PRIVATE>
         " " % cpu name>> %
         " (" % build # ", " %
         vm-git-ref % "-" %
-        vm-git-id 10 cramp head % ", " %
+        vm-git-id 10 bound head % ", " %
         vm-compile-time % ")\n[" %
         vm-compiler % "] on " % os name>> %
     ] "" make ;
