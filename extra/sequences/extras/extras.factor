@@ -382,7 +382,7 @@ PRIVATE>
     ] [ 3drop f ] if ; inline
 
 : map-index! ( ... seq quot: ( ... elt index -- ... newelt ) -- ... seq )
-    over [ [ sequence-index-iterator ] dip collect ] keep ; inline
+    over [ [ sequence-index-operator ] dip collect ] keep ; inline
 
 <PRIVATE
 
@@ -596,7 +596,7 @@ PRIVATE>
     [ length 1 - swap - ] [ nth ] bi ; inline
 
 : each-index-from ( ... seq quot: ( ... elt index -- ... ) i -- ... )
-    -rot sequence-index-iterator each-integer-from ; inline
+    -rot sequence-index-operator each-integer-from ; inline
 
 <PRIVATE
 
