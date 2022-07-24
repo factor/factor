@@ -83,7 +83,7 @@ gc
     "." write flush
 
     {
-        hashcode* = equal? assoc-stack (assoc-stack) get set
+        hashcode* = equal? assoc-stack search-assoc-stack get set
     } compile-unoptimized
 
     "." write flush

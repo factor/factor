@@ -30,15 +30,15 @@ M: assoc assoc-like drop ; inline
 
 <PRIVATE
 
-: (assoc-each) ( assoc quot -- seq quot' )
+: assoc-operator ( assoc quot -- alist quot' )
     [ >alist ] dip [ first2 ] prepose ; inline
 
-: (assoc-stack) ( key i seq -- value )
+: search-assoc-stack ( key i seq -- value/f )
     over 0 < [
         3drop f
     ] [
         3dup nth-unsafe at*
-        [ 3nip ] [ drop [ 1 - ] dip (assoc-stack) ] if
+        [ 3nip ] [ drop [ 1 - ] dip search-assoc-stack ] if
     ] if ; inline recursive
 
 : search-alist ( key alist -- pair/f i/f )
@@ -53,15 +53,15 @@ M: assoc assoc-like drop ; inline
 PRIVATE>
 
 : assoc-find ( ... assoc quot: ( ... key value -- ... ? ) -- ... key value ? )
-    (assoc-each) find swap [ first2-unsafe t ] [ drop f f f ] if ; inline
+    assoc-operator find swap [ first2-unsafe t ] [ drop f f f ] if ; inline
 
 : key? ( key assoc -- ? ) at* nip ; inline
 
 : assoc-each ( ... assoc quot: ( ... key value -- ... ) -- ... )
-    (assoc-each) each ; inline
+    assoc-operator each ; inline
 
 : assoc>map ( ... assoc quot: ( ... key value -- ... elt ) exemplar -- ... seq )
-    [ (assoc-each) ] dip map-as ; inline
+    [ assoc-operator ] dip map-as ; inline
 
 : assoc-map-as ( ... assoc quot: ( ... key value -- ... newkey newvalue ) exemplar -- ... newassoc )
     [ [ 2array ] compose { } assoc>map ] dip assoc-like ; inline
@@ -70,7 +70,7 @@ PRIVATE>
     over assoc-map-as ; inline
 
 : assoc-filter-as ( ... assoc quot: ( ... key value -- ... ? ) exemplar -- ... subassoc )
-    [ (assoc-each) filter ] dip assoc-like ; inline
+    [ assoc-operator filter ] dip assoc-like ; inline
 
 : assoc-filter ( ... assoc quot: ( ... key value -- ... ? ) -- ... subassoc )
     over assoc-filter-as ; inline
@@ -103,7 +103,7 @@ PRIVATE>
     [ nip empty? ] assoc-reject ; inline
 
 : assoc-partition ( ... assoc quot: ( ... key value -- ... ? ) -- ... true-assoc false-assoc )
-    [ (assoc-each) partition ] [ drop ] 2bi
+    [ assoc-operator partition ] [ drop ] 2bi
     [ assoc-like ] curry bi@ ; inline
 
 : assoc-any? ( ... assoc quot: ( ... key value -- ... ? ) -- ... ? )
@@ -142,7 +142,7 @@ M: assoc values [ nip ] { } assoc>map ;
     assoc-size 0 = ; inline
 
 : assoc-stack ( key seq -- value )
-    [ length 1 - ] keep (assoc-stack) ; flushable
+    [ length 1 - ] keep search-assoc-stack ; flushable
 
 : assoc-subset? ( assoc1 assoc2 -- ? )
     [ at* [ = ] [ 2drop f ] if ] with-assoc assoc-all? ;
