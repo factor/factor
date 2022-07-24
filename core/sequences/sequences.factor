@@ -182,6 +182,9 @@ PRIVATE>
 : ?set-nth ( elt n seq -- )
     2dup bounds-check? [ set-nth-unsafe ] [ 3drop ] if ; inline
 
+: maybe-nth ( i/f seq -- elt/f )
+    over [ nth ] [ 2drop f ] if ; inline
+
 : ?first ( seq -- elt/f ) 0 swap ?nth ; inline
 : ?second ( seq -- elt/f ) 1 swap ?nth ; inline
 : ?last ( seq -- elt/f )
@@ -418,8 +421,14 @@ PRIVATE>
 : length-operator ( seq quot -- n quot' )
     [ length-iterator ] dip compose ; inline
 
+: length-operator-last ( seq quot -- n quot' )
+    length-operator [ 1 - ] dip ; inline
+
 : sequence-operator-from ( seq quot i -- i n quot' )
     -rot length-operator ; inline
+
+: sequence-operator-last-from ( seq quot i -- n quot' )
+    -rot length-operator-last nip ; inline
 
 : collect ( n quot into -- )
     [ [ keep ] dip set-nth-unsafe ] 2curry each-integer ; inline
@@ -449,22 +458,11 @@ PRIVATE>
 : (3each) ( seq1 seq2 seq3 quot -- n quot' )
     [ setup-3each ] dip compose ; inline
 
-: finish-find ( i seq -- i elt )
-    over [ dupd nth-unsafe ] [ drop f ] if ; inline
+: element/index ( i/f seq -- elt/f i/f )
+    [ maybe-nth ] [ drop ] 2bi ; inline
 
-: (find) ( seq quot quot' -- i elt )
-    pick [ [ length-operator ] dip call ] dip finish-find ; inline
-
-: (find-from) ( n seq quot quot' -- i elt )
-    [ 2dup bounds-check? ] 2dip
-    '[ _ _ (find) ] [ 2drop f f ] if ; inline
-
-: (find-index) ( seq quot quot' -- i elt )
-    pick [ [ sequence-index-operator ] dip call ] dip finish-find ; inline
-
-: (find-index-from) ( n seq quot quot' -- i elt )
-    [ 2dup bounds-check? ] 2dip
-    '[ _ _ (find-index) ] [ 2drop f f ] if ; inline
+: index/element ( i/f seq -- elt/f i/f )
+    [ drop ] [ maybe-nth ] 2bi ; inline
 
 : (accumulate) ( seq identity quot -- identity seq quot' )
     swapd [ keepd ] curry ; inline
@@ -552,23 +550,35 @@ PRIVATE>
 : 3map ( ... seq1 seq2 seq3 quot: ( ... elt1 elt2 elt3 -- ... newelt ) -- ... newseq )
     pickd swap 3map-as ; inline
 
+: bounds-check-find ( n seq quot -- elt i )
+    2over bounds-check? [ call ] [ 3drop f f ] if ; inline
+
 : find-from ( ... n seq quot: ( ... elt -- ... ? ) -- ... i elt )
-    [ find-integer-from ] (find-from) ; inline
+    '[
+        _ [ rot sequence-operator-from find-integer-from ] keepd
+        index/element
+    ] bounds-check-find ; inline
 
 : find ( ... seq quot: ( ... elt -- ... ? ) -- ... i elt )
-    [ find-integer ] (find) ; inline
+    [ 0 ] 2dip find-from ; inline
 
 : find-last-from ( ... n seq quot: ( ... elt -- ... ? ) -- ... i elt )
-    [ nip find-last-integer ] (find-from) ; inline
+    '[
+        _ [ rot sequence-operator-last-from find-last-integer ] keepd
+        index/element
+    ] bounds-check-find ; inline
 
 : find-last ( ... seq quot: ( ... elt -- ... ? ) -- ... i elt )
-    [ [ 1 - ] dip find-last-integer ] (find) ; inline
+    [ [ length 1 - ] keep ] dip find-last-from ; inline
 
 : find-index-from ( ... n seq quot: ( ... elt i -- ... ? ) -- ... i elt )
-    [ find-integer-from ] (find-index-from) ; inline
+    '[
+        _ [ sequence-index-operator find-integer-from ] keepd
+        index/element
+    ] bounds-check-find ; inline
 
 : find-index ( ... seq quot: ( ... elt i -- ... ? ) -- ... i elt )
-    [ find-integer ] (find-index) ; inline
+    [ 0 ] 2dip find-index-from ; inline
 
 : all? ( ... seq quot: ( ... elt -- ... ? ) -- ... ? )
     sequence-operator all-integers-from? ; inline
