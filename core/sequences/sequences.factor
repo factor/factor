@@ -424,7 +424,7 @@ PRIVATE>
 : collect ( n quot into -- )
     [ [ keep ] dip set-nth-unsafe ] 2curry each-integer ; inline
 
-: sequence-index-iterator ( seq quot -- n quot' )
+: sequence-index-operator ( seq quot -- n quot' )
     [ length-iterator [ keep ] curry ] dip compose ; inline
 
 : map-into ( seq quot into -- )
@@ -460,7 +460,7 @@ PRIVATE>
     '[ _ _ (find) ] [ 2drop f f ] if ; inline
 
 : (find-index) ( seq quot quot' -- i elt )
-    pick [ [ sequence-index-iterator ] dip call ] dip finish-find ; inline
+    pick [ [ sequence-index-operator ] dip call ] dip finish-find ; inline
 
 : (find-index-from) ( n seq quot quot' -- i elt )
     [ 2dup bounds-check? ] 2dip
@@ -635,7 +635,7 @@ PRIVATE>
     [ dup ] swap [ keep ] curry produce nip ; inline
 
 : each-index ( ... seq quot: ( ... elt index -- ... ) -- ... )
-    sequence-index-iterator each-integer ; inline
+    sequence-index-operator each-integer ; inline
 
 : map-index-as ( ... seq quot: ( ... elt index -- ... newelt ) exemplar -- ... newseq )
     [ dup length <iota> ] 2dip 2map-as ; inline
