@@ -489,9 +489,6 @@ PRIVATE>
 : map-integers ( ... len quot: ( ... i -- ... elt ) -- ... newseq )
     { } map-integers-as ; inline
 
-! : map-integers ( ... len quot: ( ... i -- ... elt ) exemplar -- ... newseq )
-!     overd [ [ collect ] keep ] new-like ; inline
-
 : map-as ( ... seq quot: ( ... elt -- ... newelt ) exemplar -- ... newseq )
     [ length-operator ] dip map-integers-as ; inline
 
