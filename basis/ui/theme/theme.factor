@@ -67,6 +67,7 @@ HOOK: deprecated-border-color theme ( -- color )
 HOOK: warning-background-color theme ( -- color )
 HOOK: warning-border-color theme ( -- color )
 HOOK: code-background-color theme ( -- color )
+HOOK: code-border-color theme ( -- color )
 HOOK: help-path-border-color theme ( -- color )
 
 HOOK: tip-background-color theme ( -- color )
@@ -157,6 +158,7 @@ M: light-theme deprecated-border-color COLOR: #F37B00 ;
 M: light-theme warning-background-color COLOR: #F4D9D9 ;
 M: light-theme warning-border-color COLOR: #F42300 ;
 M: light-theme code-background-color COLOR: FactorLightTan ;
+M: light-theme code-border-color COLOR: FactorTan ;
 M: light-theme help-path-border-color COLOR: grey95 ;
 
 M: light-theme tip-background-color COLOR: lavender ;
@@ -246,6 +248,7 @@ M: dark-theme deprecated-border-color COLOR: solarized-yellow ;
 M: dark-theme warning-background-color COLOR: #492d33 ;
 M: dark-theme warning-border-color COLOR: solarized-red ;
 M: dark-theme code-background-color COLOR: #2F4D5B ;
+M: dark-theme code-border-color COLOR: #666666 ;
 M: dark-theme help-path-border-color COLOR: solarized-base02 ;
 
 M: dark-theme tip-background-color COLOR: #2F4D5B ;
