@@ -140,9 +140,9 @@ M: pathname url-of
         " white-space: pre-wrap; line-height: 125%;" append
     ] re-replace-with
 
-    { "font-family: monospace;" "background-color:" } [ over subseq? ] all? [
-        " border: 1px solid #e3e2db; margin: 10px 0px;" append
-    ] when
+   { "font-family: monospace;" "background-color:" } [ over subseq? ] all? [
+       " margin: 10px 0px;" append
+   ] when
 
     { "border:" "background-color:" } [ over subseq? ] all? [
         " border-radius: 5px;" append
