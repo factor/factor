@@ -19,6 +19,7 @@ IN: ui.theme.switching.tools
     heading-style heading-color foreground update-style
     snippet-style snippet-color foreground update-style
     code-style code-background-color page-color update-style
+    code-style code-border-color border-color update-style
     code-style text-color foreground update-style
     output-style output-color foreground update-style
     url-style link-color foreground update-style
