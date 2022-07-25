@@ -94,6 +94,7 @@ H{
     { font-size $ default-font-size }
     { foreground $ text-color }
     { page-color $ code-background-color }
+    { border-color $ code-border-color }
     { inset { 5 5 } }
     { wrap-margin f }
 } code-style set-global
