@@ -33,12 +33,12 @@ M: assoc assoc-like drop ; inline
 : assoc-operator ( assoc quot -- alist quot' )
     [ >alist ] dip [ first2 ] prepose ; inline
 
-: search-assoc-stack ( key i seq -- value/f )
+: assoc-stack-from ( key i seq -- value/f )
     over 0 < [
         3drop f
     ] [
         3dup nth-unsafe at*
-        [ 3nip ] [ drop [ 1 - ] dip search-assoc-stack ] if
+        [ 3nip ] [ drop [ 1 - ] dip assoc-stack-from ] if
     ] if ; inline recursive
 
 : search-alist ( key alist -- pair/f i/f )
@@ -142,7 +142,7 @@ M: assoc values [ nip ] { } assoc>map ;
     assoc-size 0 = ; inline
 
 : assoc-stack ( key seq -- value )
-    [ length 1 - ] keep search-assoc-stack ; flushable
+    [ length 1 - ] keep assoc-stack-from ; flushable
 
 : assoc-subset? ( assoc1 assoc2 -- ? )
     [ at* [ = ] [ 2drop f ] if ] with-assoc assoc-all? ;
