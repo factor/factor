@@ -553,20 +553,26 @@ PRIVATE>
 : bounds-check-find ( n seq quot -- elt i )
     2over bounds-check? [ call ] [ 3drop f f ] if ; inline
 
+<PRIVATE
+
+: find-from-unsafe ( ... n seq quot: ( ... elt -- ... ? ) -- ... i elt )
+    [ rot sequence-operator-from find-integer-from ] keepd
+    index/element ; inline
+
+: find-last-from-unsafe ( ... n seq quot: ( ... elt -- ... ? ) -- ... i elt )
+    [ rot sequence-operator-last-from find-last-integer ] keepd
+    index/element ; inline
+
+PRIVATE>
+
 : find-from ( ... n seq quot: ( ... elt -- ... ? ) -- ... i elt )
-    '[
-        _ [ rot sequence-operator-from find-integer-from ] keepd
-        index/element
-    ] bounds-check-find ; inline
+    '[ _ find-from-unsafe ] bounds-check-find ; inline
 
 : find ( ... seq quot: ( ... elt -- ... ? ) -- ... i elt )
-    [ 0 ] 2dip find-from ; inline
+    [ 0 ] 2dip find-from-unsafe ; inline
 
 : find-last-from ( ... n seq quot: ( ... elt -- ... ? ) -- ... i elt )
-    '[
-        _ [ rot sequence-operator-last-from find-last-integer ] keepd
-        index/element
-    ] bounds-check-find ; inline
+    '[ _ find-last-from-unsafe ] bounds-check-find ; inline
 
 : find-last ( ... seq quot: ( ... elt -- ... ? ) -- ... i elt )
     [ [ length 1 - ] keep ] dip find-last-from ; inline
@@ -780,22 +786,26 @@ M: slice hashcode* [ sequence-hashcode ] recursive-hashcode ;
 
 <PRIVATE
 
+: move-unsafe* ( to from seq -- from-nth )
+    2over =
+    [ nth-unsafe nip ]
+    [ [ nth-unsafe tuck swap ] [ set-nth-unsafe ] bi ] if ; inline
+
+: filter-from! ( store from seq quot: ( ... elt -- ... ? ) -- seq )
+    2over length < [
+        [ [ move-unsafe* ] dip call ] 4keep
+        [ swap [ 1 + ] when ] 3dip
+        [ 1 + ] 2dip filter-from!
+    ] [ drop [ nip set-length ] keep ] if ; inline recursive
+
 : move-unsafe ( to from seq -- )
     2over =
     [ 3drop ] [ [ nth-unsafe swap ] [ set-nth-unsafe ] bi ] if ; inline
 
-: (filter!) ( ... quot: ( ... elt -- ... ? ) store scan seq -- ... )
-    2dup length < [
-        [ move-unsafe ] 3keep
-        [ nth-unsafe -rot [ [ call ] keep ] dip rot [ 1 + ] when ] 2keep
-        [ 1 + ] dip
-        (filter!)
-    ] [ nip set-length drop ] if ; inline recursive
-
 PRIVATE>
 
 : filter! ( ... seq quot: ( ... elt -- ... ? ) -- ... seq )
-    swap [ [ 0 0 ] dip (filter!) ] keep ; inline
+    [ 0 0 ] 2dip filter-from! ; inline
 
 : reject! ( ... seq quot: ( ... elt -- ... ? ) -- ... seq )
     negate filter! ; inline
