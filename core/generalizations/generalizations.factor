@@ -16,8 +16,6 @@ ALIAS: n*quot (n*quot)
 MACRO: call-n ( n -- quot )
     [ call ] <repetition> '[ _ cleave ] ;
 
-: repeat ( n obj quot -- ) swapd times ; inline
-
 >>
 
 MACRO: nsum ( n -- quot )
@@ -29,7 +27,7 @@ MACRO: npick ( n -- quot )
     {
         { [ dup 0 <= ] [ nonpositive-npick ] }
         { [ dup 1 = ] [ drop [ dup ] ] }
-        [ 1 - [ dup ] [ '[ _ dip swap ] ] repeat ]
+        [ 1 - [ dup ] [ '[ _ dip swap ] ] swapd times ]
     } cond ;
 
 : ndup ( n -- )
@@ -40,10 +38,10 @@ MACRO: dupn ( n -- quot )
     [ 1 - [ dup ] n*quot ] if-zero ;
 
 MACRO: nrot ( n -- quot )
-    1 - [ ] [ '[ _ dip swap ] ] repeat ;
+    1 - [ ] [ '[ _ dip swap ] ] swapd times ;
 
 MACRO: -nrot ( n -- quot )
-    1 - [ ] [ '[ swap _ dip ] ] repeat ;
+    1 - [ ] [ '[ swap _ dip ] ] swapd times ;
 
 : ndip ( n -- )
     [ [ dip ] curry ] swap call-n call ; inline
@@ -59,14 +57,14 @@ MACRO: nrotd ( n d -- quot )
     over 0 < [
         [ neg ] dip '[ _ _ -nrotd ]
     ] [
-        [ 1 - [ ] [ '[ _ dip swap ] ] repeat ] dip '[ _ _ ndip ]
+        [ 1 - [ ] [ '[ _ dip swap ] ] swapd times ] dip '[ _ _ ndip ]
     ] if ;
 
 MACRO: -nrotd ( n d -- quot )
     over 0 < [
         [ neg ] dip '[ _ _ nrotd ]
     ] [
-        [ 1 - [ ] [ '[ swap _ dip ] ] repeat ] dip '[ _ _ ndip ]
+        [ 1 - [ ] [ '[ swap _ dip ] ] swapd times ] dip '[ _ _ ndip ]
     ] if ;
 
 MACRO: nrotated ( nrots depth dip -- quot )
