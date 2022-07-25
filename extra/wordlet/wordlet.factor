@@ -1,10 +1,20 @@
 ! Copyright (C) 2022 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays ascii assocs assocs.extras colors
-combinators hashtables io io.styles kernel math random ranges
-sequences sequences.extras sets sorting strings
-wordlet.word-list ;
+USING: accessors arrays ascii assocs assocs.extras base91 colors
+combinators hashtables io io.encodings.binary
+io.encodings.string io.encodings.utf8 io.files io.styles kernel
+literals math random ranges sequences sequences.extras sets
+sorting splitting strings ;
 IN: wordlet
+
+<PRIVATE
+
+CONSTANT: word-list $[
+    "vocab:wordlet/word-list.txt" binary file-contents
+    base91> utf8 decode "\n" split fast-set
+]
+
+PRIVATE>
 
 TUPLE: wordlet-game secret-word chances guesses ;
 
