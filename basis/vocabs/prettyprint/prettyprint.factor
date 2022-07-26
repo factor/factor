@@ -84,7 +84,7 @@ PRIVATE>
 
 CONSTANT: manifest-style H{
     { page-color COLOR: FactorLightTan }
-    { border-color COLOR: FactorDarkTan }
+    { border-color COLOR: FactorTan }
     { inset { 5 5 } }
 }
 
