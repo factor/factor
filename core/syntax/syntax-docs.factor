@@ -192,6 +192,7 @@ ARTICLE: "escape" "Character escape codes"
     { { $snippet "\\u" { $emphasis "xxxxxx" } } { "The Unicode code point with hexadecimal number " { $snippet { $emphasis "xxxxxx" } } } }
     { { $snippet "\\u{" { $emphasis "xx" } "}" } { "The Unicode code point with hexadecimal number " { $snippet { $emphasis "xx" } } } }
     { { $snippet "\\u{" { $emphasis "name" } "}" } { "The Unicode code point named " { $snippet { $emphasis "name" } } } }
+    { { $snippet "\\xxx" } "an octal escape specified by one, two, or three octal digits" }
 } ;
 
 ARTICLE: "syntax-strings" "Character and string syntax"
