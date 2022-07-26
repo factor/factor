@@ -182,9 +182,6 @@ PRIVATE>
 : ?set-nth ( elt n seq -- )
     2dup bounds-check? [ set-nth-unsafe ] [ 3drop ] if ; inline
 
-: maybe-nth ( i/f seq -- elt/f )
-    over [ nth ] [ 2drop f ] if ; inline
-
 : ?first ( seq -- elt/f ) 0 swap ?nth ; inline
 : ?second ( seq -- elt/f ) 1 swap ?nth ; inline
 : ?last ( seq -- elt/f )
@@ -459,10 +456,10 @@ PRIVATE>
     [ setup-3each ] dip compose ; inline
 
 : element/index ( i/f seq -- elt/f i/f )
-    [ maybe-nth ] [ drop ] 2bi ; inline
+    '[ [ _ nth ] [ f ] if* ] keep ;
 
-: index/element ( i/f seq -- elt/f i/f )
-    [ drop ] [ maybe-nth ] 2bi ; inline
+: index/element ( i/f seq -- i/f elt/f )
+    dupd '[ _ nth ] [ f ] if* ;
 
 : (accumulate) ( seq identity quot -- identity seq quot' )
     swapd [ keepd ] curry ; inline
