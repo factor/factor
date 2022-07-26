@@ -42,8 +42,8 @@ IN: ui.theme.switching.tools
     base-effect-style stack-effect-color foreground update-style
 
     ! vocabs.prettyprint
-    manifest-style vocab-background-color page-color update-style
-    manifest-style vocab-border-color border-color update-style
+    manifest-style code-background-color page-color update-style
+    manifest-style code-border-color border-color update-style
 
     ! ui.gadgets.panes
     \ specified-font reset-memoized
