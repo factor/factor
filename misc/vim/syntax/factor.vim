@@ -155,7 +155,7 @@ syn keyword factorCallNextMethod    call-next-method
 syn region  factorChar              start=/\v<CHAR:>/  end=/\v\S+>/
 syn region  factorColor             start=/\v<COLOR:>/ end=/\v\S+>/
 
-syn match   factorEscape            /\v\\([\\astnrbvf0e\"]|u\x{6}|u\{\S+}|x\x{2})/  contained display
+syn match   factorEscape            /\v\\([\\astnrbvfe\"]|u\x{6}|u\{\S+}|x\x{2}|\o{1,3})/  contained display
 syn region  factorString            matchgroup=factorStringDelims   start=/\v<"/                 skip=/\v\\"/ end=/\v"/           contains=factorEscape
 syn region  factorString            matchgroup=factorStringDelims   start=/\v<"""/               skip=/\v\\"/ end=/\v"""/         contains=factorEscape
 syn region  factorString            matchgroup=factorStringDelims   start=/\v<[^[:blank:]"]+"/   skip=/\v\\"/ end=/\v"/           contains=factorEscape
