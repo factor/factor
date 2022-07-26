@@ -29,6 +29,7 @@ USING: accessors eval kernel lexer strings.parser tools.test ;
 { "foo bar" } [ "\"foo \\\nbar\"" eval( -- obj ) ] unit-test
 
 { "a" } [ "\"\\141\"" eval( -- obj ) ] unit-test
+{ "a1" } [ "\"\\1411\"" eval( -- obj ) ] unit-test
 { "\0" } [ "\"\\0\"" eval( -- obj ) ] unit-test
 { "\x01" } [ "\"\\01\"" eval( -- obj ) ] unit-test
 { "\n" } [ "\"\\012\"" eval( -- obj ) ] unit-test
