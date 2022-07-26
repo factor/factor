@@ -264,6 +264,17 @@ GENERIC: prev-float ( m -- n )
         3drop f
     ] if ; inline recursive
 
+: find-last-integer-from ( ... n quot: ( ... i -- ... ? ) -- ... i/f )
+    over 0 < [
+        2drop f
+    ] [
+        [ call ] 2keep rot [
+            drop
+        ] [
+            [ 1 - ] dip find-last-integer-from
+        ] if
+    ] if ; inline recursive
+
 : all-integers-from? ( ... i n quot: ( ... i -- ... ? ) -- ... ? )
     2over < [
         [ nip call ] 3keep roll
@@ -284,14 +295,3 @@ GENERIC: prev-float ( m -- n )
 
 : all-integers? ( ... n quot: ( ... i -- ... ? ) -- ... ? )
     [ 0 ] 2dip all-integers-from? ; inline
-
-: find-last-integer ( ... n quot: ( ... i -- ... ? ) -- ... i/f )
-    over 0 < [
-        2drop f
-    ] [
-        [ call ] 2keep rot [
-            drop
-        ] [
-            [ 1 - ] dip find-last-integer
-        ] if
-    ] if ; inline recursive

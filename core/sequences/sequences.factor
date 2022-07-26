@@ -557,7 +557,7 @@ PRIVATE>
     index/element ; inline
 
 : find-last-from-unsafe ( ... n seq quot: ( ... elt -- ... ? ) -- ... i elt )
-    [ rot sequence-operator-last-from find-last-integer ] keepd
+    [ rot sequence-operator-last-from find-last-integer-from ] keepd
     index/element ; inline
 
 PRIVATE>

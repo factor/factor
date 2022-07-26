@@ -646,7 +646,7 @@ PRIVATE>
     over [ count ] [ length ] bi* / ; inline
 
 : find-last-index ( ... seq quot: ( ... elt i -- ... ? ) -- ... i elt )
-    [ [ 1 - ] dip find-last-integer ] (find-index) ; inline
+    [ [ 1 - ] dip find-last-integer-from ] (find-index) ; inline
 
 : map-find-last-index ( ... seq quot: ( ... elt index -- ... result/f ) -- ... result i elt )
     [ find-last-index ] (map-find-index) ; inline
