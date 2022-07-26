@@ -89,9 +89,6 @@ M: base16-theme highlighted-word-color "base04" named-base16 ;
 M: base16-theme string-color "base0A" named-base16 ;
 M: base16-theme stack-effect-color "base04" named-base16 ;
 
-M: base16-theme vocab-background-color "base00" named-base16 ;
-M: base16-theme vocab-border-color "base00" named-base16 ;
-
 M: base16-theme field-border-color "base00" named-base16 ;
 
 M: base16-theme editor-caret-color "base06" named-base16 ;

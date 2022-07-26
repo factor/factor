@@ -170,9 +170,6 @@ M: light-theme highlighted-word-color COLOR: DarkSlateGray ;
 M: light-theme string-color COLOR: LightSalmon4 ;
 M: light-theme stack-effect-color COLOR: FactorDarkSlateBlue ;
 
-M: light-theme vocab-background-color COLOR: FactorLightTan ;
-M: light-theme vocab-border-color COLOR: FactorDarkTan ;
-
 M: light-theme field-border-color COLOR: gray ;
 
 M: light-theme editor-caret-color COLOR: red ;
@@ -259,9 +256,6 @@ M: dark-theme dim-color COLOR: solarized-cyan ;
 M: dark-theme highlighted-word-color COLOR: solarized-green ;
 M: dark-theme string-color COLOR: solarized-magenta ;
 M: dark-theme stack-effect-color COLOR: solarized-orange ;
-
-M: dark-theme vocab-background-color COLOR: solarized-base01 ;
-M: dark-theme vocab-border-color COLOR: solarized-base01 ;
 
 M: dark-theme field-border-color COLOR: solarized-base01 ;
 
