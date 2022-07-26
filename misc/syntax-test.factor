@@ -208,6 +208,7 @@ PRIVATE>
     "\"hello\""
     "\a\b\e\f\n\r\t\s\v\s\0\\\""
     "\x01\xaF\uffffff"
+    "\0123\148"
 
     URL" http://google.com"
     R" asdf"
