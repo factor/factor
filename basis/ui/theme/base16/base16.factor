@@ -77,6 +77,7 @@ M: base16-theme deprecated-border-color "base01" named-base16 ;
 M: base16-theme warning-background-color "base01" named-base16 ;
 M: base16-theme warning-border-color "base01" named-base16 ;
 M: base16-theme code-background-color "base01" named-base16 ;
+M: base16-theme code-border-color "base01" named-base16 ;
 M: base16-theme help-path-border-color "base00" named-base16 ;
 
 M: base16-theme tip-background-color "base01" named-base16 ;
