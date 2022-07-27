@@ -1,7 +1,7 @@
 " Vim syntax file
 " Language: Factor
 " Maintainer: Alex Chapman <chapman.alex@gmail.com>
-" Last Change: 2022 Jul 26
+" Last Change: 2022 Jul 27
 " Minimum Version: 600
 " To regenerate: USE: editors.vim.generate-syntax generate-vim-syntax
 
@@ -46,7 +46,7 @@ SynKeywordFactorWord factorWord_sets | syn keyword factorWord_sets contained ?ad
 SynKeywordFactorWord factorWord_sorting | syn keyword factorWord_sorting contained compare-with inv-sort-with natural-sort sort sort-keys sort-pair sort-values sort-with
 SynKeywordFactorWord factorWord_splitting | syn keyword factorWord_splitting contained ?head ?head-slice ?tail ?tail-slice join-lines join-lines-as join-words join-words-as replace split split-indices split-lines split-slice split-subseq split-when split-when-slice split-words split1 split1-last split1-last-slice split1-slice split1-when split1-when-slice string-lines
 SynKeywordFactorWord factorWord_strings | syn keyword factorWord_strings contained 1string <string> >string resize-string string string?
-SynKeywordFactorWord factorWord_strings_parser | syn keyword factorWord_strings_parser contained bad-escape bad-escape? escape hex-escape name>char-hook next-escape oct-escape parse-string unescape-string unicode-escape
+SynKeywordFactorWord factorWord_strings_parser | syn keyword factorWord_strings_parser contained bad-escape bad-escape? escape name>char-hook parse-string unescape-string
 SynKeywordFactorWord factorWord_syntax | syn keyword factorWord_syntax contained " 'HS{ 'H{ '[ '{ ( : :: :> ; << <<<<<< <<<<<<< <PRIVATE ====== ======= >> >>>>>> >>>>>>> @ ALIAS: B B: BUILTIN: BV{ B{ C: CHAR: CONSTANT: CS{ C{ DEFER: ERROR: EXCLUDE: FORGET: FROM: GENERIC#: GENERIC: HOOK: HS{ H{ IDENTITY-MEMO: IDENTITY-MEMO:: IH{ IN: INITIALIZE: INSTANCE: INTERSECTION: M: M:: MACRO: MACRO:: MAIN: MATH: MEMO: MEMO:: MIXIN: M\ NAN: P" POSTPONE: PREDICATE: PRIMITIVE: PRIVATE> QUALIFIED-WITH: QUALIFIED: RENAME: REUSE: SBUF" SHUTDOWN-HOOK: SINGLETON: SINGLETONS: SLOT: STARTUP-HOOK: SYMBOL: SYMBOLS: SYNTAX: TUPLE: T{ UNION: UNUSE: USE: USING: V{ W{ [ [let [\| \ ] _ auto-use call( call-next-method delimiter deprecated execute( f final flushable foldable initial: inline intersection{ maybe{ not{ read-only recursive t t? union{ { }
 SynKeywordFactorWord factorWord_vectors | syn keyword factorWord_vectors contained 1vector <vector> >vector ?push vector vector?
 
