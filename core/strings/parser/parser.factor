@@ -30,6 +30,8 @@ name>char-hook [
     [ "Unicode support not available" throw ]
 ] initialize
 
+<PRIVATE
+
 : hex-escape ( str -- ch str' )
     2 cut-slice [ hex> ] dip ;
 
@@ -61,8 +63,6 @@ name>char-hook [
             [ escape swap ]
         } case
     ] unless ;
-
-<PRIVATE
 
 : (unescape-string) ( accum str i/f -- accum )
     { sbuf object object } declare
