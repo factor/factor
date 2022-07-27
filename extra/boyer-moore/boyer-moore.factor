@@ -46,7 +46,7 @@ TUPLE: boyer-moore pattern bad-char-table good-suffix-table ;
 
 :: mismatch? ( s1 s2 pos len -- i/f )
     len 1 - [ [ pos + s1 ] keep s2 match? not ]
-    find-last-integer-from ; inline
+    find-last-integer ; inline
 
 :: (search-from) ( seq from boyer-moore -- i/f )
     boyer-moore pattern>> :> pat

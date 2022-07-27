@@ -14,7 +14,7 @@ IN: benchmark.mandel
 : c ( i j -- c ) scale center width height scale 2 / - + ; inline
 
 : count-iterations ( z max-iterations step-quot test-quot -- #iters )
-    '[ drop @ dup @ ] find-last-integer-from nip ; inline
+    '[ drop @ dup @ ] find-last-integer nip ; inline
 
 : pixel ( c -- iterations )
     [ C{ 0.0 0.0 } max-iterations ] dip
