@@ -11,7 +11,7 @@ C: <bits> bits
 
 : make-bits ( number -- bits )
     check-negative-bits
-    [ T{ bits f 0 0 } ] [ dup abs log2 1 + <bits> ] if-zero ; inline
+    [ T{ bits f 0 1 } ] [ dup abs log2 1 + <bits> ] if-zero ; inline
 
 M: bits length length>> ; inline
 
