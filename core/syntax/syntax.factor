@@ -10,8 +10,9 @@ generic.math generic.parser generic.standard hash-sets
 hashtables hashtables.identity init io.pathnames kernel lexer
 locals.errors locals.parser macros math memoize namespaces
 parser quotations sbufs sequences slots source-files splitting
-strings strings.parser vectors vocabs.loader vocabs.parser words
-words.alias words.constant words.symbol ;
+strings strings.parser strings.parser.private vectors
+vocabs.loader vocabs.parser words words.alias words.constant
+words.symbol ;
 IN: bootstrap.syntax
 
 ! These words are defined as a top-level form, instead of with
