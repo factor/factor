@@ -23,7 +23,7 @@ M: template-lexer skip-word
 DEFER: <% delimiter
 
 : check-<% ( lexer -- col )
-    [ column>> ] [ line-text>> ] bi "<%" find-subseq-from ;
+    [ column>> ] [ line-text>> ] bi "<%" subsequence-starts-from ;
 
 : found-<% ( accum lexer col -- accum )
     [
