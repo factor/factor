@@ -36,7 +36,7 @@ name>char-hook [
     2 cut-slice [ hex> ] dip ;
 
 : oct-escape ( str -- ch/f str' )
-    dup 3 short head-slice [
+    dup 3 bound head-slice [
         [ CHAR: 0 CHAR: 7 between? not ] find drop
     ] keep '[ _ length ] unless* [ f ] when-zero
     [ cut-slice [ oct> ] dip ] [ f swap ] if* ;
