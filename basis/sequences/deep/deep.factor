@@ -54,8 +54,8 @@ M: object branch? drop f ;
         _ swap dup branch? [ member? ] [ 2drop f ] if
     ] deep-find >boolean ;
 
-: deep-subseq? ( subseq seq -- ? )
-    swap '[
+: deep-subsequence? ( seq subseq -- ? )
+   '[
         _ over branch? [ subsequence? ] [ 2drop f ] if
     ] deep-find >boolean ;
 
