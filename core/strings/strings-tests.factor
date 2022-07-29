@@ -21,6 +21,15 @@ vectors ;
 { f } [ "amigo" "hola" subseq-start ] unit-test
 { f } [ "holaa" "hola" subseq-start ] unit-test
 
+{ 3 } [ "hola" "a" subsequence-starts ] unit-test
+{ f } [ "hola" "x" subsequence-starts ] unit-test
+{ 0 } [ "a" "" subsequence-starts ] unit-test
+{ 0 } [ "" "" subsequence-starts ] unit-test
+{ 0 } [ "hola" "hola" subsequence-starts ] unit-test
+{ 1 } [ "hola" "ol" subsequence-starts ] unit-test
+{ f } [ "hola" "amigo" subsequence-starts ] unit-test
+{ f } [ "hola" "holaa" subsequence-starts ] unit-test
+
 { "Beginning" } [ "Beginning and end" 9 head ] unit-test
 
 { f } [ CHAR: I "team" member? ] unit-test
