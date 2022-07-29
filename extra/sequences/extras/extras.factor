@@ -645,15 +645,24 @@ PRIVATE>
 : count* ( ... seq quot: ( ... elt -- ... ? ) -- ... % )
     over [ count ] [ length ] bi* / ; inline
 
+: sequence-index-operator-last ( n seq quot -- n quot' )
+    [ [ nth-unsafe ] curry [ keep ] curry ] dip compose ; inline
+
+: find-last-index-from ( ... n seq quot: ( ... elt i -- ... ? ) -- ... i elt )
+    '[
+        _ [ sequence-index-operator-last find-last-integer ] keepd
+        index/element
+    ] bounds-check-find ; inline
+
 : find-last-index ( ... seq quot: ( ... elt i -- ... ? ) -- ... i elt )
-    [ [ 1 - ] dip find-last-integer ] (find-index) ; inline
+    [ [ length 1 - ] keep ] dip find-last-index-from ; inline
 
 : map-find-last-index ( ... seq quot: ( ... elt index -- ... result/f ) -- ... result i elt )
     [ find-last-index ] (map-find-index) ; inline
 
 :: (start-all) ( seq subseq increment -- indices )
     0
-    [ seq subseq find-subseq-from dup ]
+    [ seq subseq subsequence-starts-from dup ]
     [ [ increment + ] keep ] produce nip ;
 
 : start-all ( seq subseq -- indices )
