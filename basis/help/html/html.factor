@@ -140,7 +140,7 @@ M: pathname url-of
         " white-space: pre-wrap; line-height: 125%;" append
     ] re-replace-with
 
-    { "font-family: monospace;" "background-color:" } [ subsequence? ] with all?[
+    dup { "font-family: monospace;" "background-color:" } [ subsequence? ] with all? [
         " margin: 10px 0px;" append
     ] when
 
