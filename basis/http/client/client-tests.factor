@@ -48,8 +48,8 @@ IN: http.client.tests
 ! hit the velox.ch website.
 ! { t } [
     ! "https://alice.sni.velox.ch" http-get nip
-    ! [ "Great!" find-subseq? ]
-    ! [ "TLS SNI Test Site: alice.sni.velox.ch" find-subseq? ] bi and
+    ! [ "Great!" subsequence? ]
+    ! [ "TLS SNI Test Site: alice.sni.velox.ch" subsequence? ] bi and
 ! ] unit-test
 
 { t } [

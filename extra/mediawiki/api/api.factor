@@ -104,7 +104,7 @@ t botflag set-global
 : nonce-already-used? ( assoc -- ? )
     "error" of
     [ "code" of "mwoauth-invalid-authorization" = ]
-    [ "info" of "Nonce already used" find-subseq ] bi
+    [ "info" of "Nonce already used" subsequence-starts ] bi
     and ;
 
 : readonly? ( assoc -- ? )

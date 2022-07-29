@@ -1194,11 +1194,11 @@ HELP: subseq-starts-at?
 { $values { "i" "a start index" } { "seq" sequence } { "subseq" sequence } { "?" boolean } }
 { $description "Outputs " { $snippet "t" } " if the subseq starts at the " { $snippet "i" } "th element or outputs " { $link f } " if the sequence is not at that position." } ;
 
-HELP: find-subseq
+HELP: subsequence-starts
 { $values { "seq" sequence } { "subseq" sequence } { "i/f" "a start index or " { $snippet "f" } } }
 { $description "Outputs the start index of the first contiguous subsequence equal to " { $snippet "subseq" } ", starting the search from the " { $snippet "n" } "th element. If no matching subsequence is found, outputs " { $link f } "." } ;
 
-HELP: find-subseq-from
+HELP: subsequence-starts-from
 { $values { "n" "a start index" } { "seq" sequence } { "subseq" sequence } { "i/f" "a start index or " { $snippet "f" } } }
 { $description "Outputs the start index of the first contiguous subsequence equal to " { $snippet "subseq" } ", starting the search from the " { $snippet "n" } "th element. If no matching subsequence is found, outputs " { $link f } "." } ;
 
@@ -1947,8 +1947,8 @@ ARTICLE: "sequences-search" "Searching sequences"
 "Finding the start of a subsequence:"
 { $subsections
     subseq-start
-    find-subseq
-    find-subseq-from
+    subsequence-starts
+    subsequence-starts-from
     subseq-starts-at?
 }
 "Finding the index of an element satisfying a predicate:"

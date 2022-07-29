@@ -249,7 +249,7 @@ GENERIC: lint ( obj -- seq )
 M: object lint ( obj -- seq ) drop f ;
 
 M: callable lint ( quot -- seq )
-    lint-definitions-keys get-global [ find-subseq? ] with filter ;
+    lint-definitions-keys get-global [ subsequence? ] with filter ;
 
 M: word lint ( word -- seq/f )
     def>> [ callable? ] deep-filter [ lint ] map concat ;
