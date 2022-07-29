@@ -1,6 +1,6 @@
 ! Copyright (C) 2022 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel multisets prettyprint tools.test ;
+USING: accessors kernel multisets prettyprint tools.test ;
 IN: multisets.tests
 
 { multiset{ } } [
@@ -30,3 +30,7 @@ IN: multisets.tests
 
 
 { } [ multiset{ 100 100 } [ . ] multiset-each ] unit-test
+
+{ 0 } [ multiset{ } size>> ] unit-test
+{ 0 } [ multiset{ 100 100 } [ multiset-clear ] [ size>> ] bi ] unit-test
+{ 2 } [ multiset{ 100 100 } size>> ] unit-test
