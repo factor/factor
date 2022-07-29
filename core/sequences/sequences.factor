@@ -1057,17 +1057,15 @@ PRIVATE>
         [ + _ nth-unsafe ] keep _ nth-unsafe =
     ] with all-integers? ; inline
 
-: find-subseq-from ( n seq subseq -- i/f )
+: subsequence-starts-from ( n seq subseq -- i/f )
     [ [ length ] bi@ - 1 + ] 2keep
     '[ _ _ subseq-starts-at? ] find-integer-from ; inline
 
-: subseq-start-from ( subseq seq n -- i/f ) spin find-subseq-from ; inline
+: subsequence-starts ( seq subseq -- i/f ) [ 0 ] 2dip subsequence-starts-from ; inline
 
-: find-subseq ( seq subseq -- i/f ) [ 0 ] 2dip find-subseq-from ; inline
+: subsequence? ( seq subseq -- ? ) subsequence-starts >boolean ; inline
 
-: find-subseq? ( seq subseq -- ? ) find-subseq >boolean ; inline
-
-: subseq-start ( subseq seq -- i/f ) swap find-subseq ; inline
+: subseq-start ( subseq seq -- i/f ) swap subsequence-starts ; inline
 
 : subseq? ( subseq seq -- ? ) subseq-start >boolean ; inline
 

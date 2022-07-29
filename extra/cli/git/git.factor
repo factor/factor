@@ -63,4 +63,4 @@ cli-git-num-parallel [ cpus 2 * ] initialize
 
 : directory-entries-without-git ( directory -- entries )
     recursive-directory-entries
-    [ name>> "/.git/" find-subseq? ] reject ;
+    [ name>> "/.git/" subsequence? ] reject ;

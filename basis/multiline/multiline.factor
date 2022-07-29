@@ -41,7 +41,7 @@ SYNTAX: STRING:
 :: (scan-multiline-string) ( i end lexer -- j )
     lexer line-text>> :> text
     lexer still-parsing? [
-        i text end find-subseq-from [| j |
+        i text end subsequence-starts-from [| j |
             i j text subseq % j end length +
         ] [
             text i bound tail % CHAR: \n ,
