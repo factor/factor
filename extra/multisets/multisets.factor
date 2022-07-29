@@ -28,7 +28,8 @@ TUPLE: multiset size avl hash ;
 
 : multiset-clear ( multiset -- )
     [ hash>> clear-assoc ]
-    [ avl>> f >>root 0 >>count drop ] bi ;
+    [ avl>> f >>root 0 >>count drop ]
+    [ 0 >>size drop ] tri ;
 
 : multiset-empty? ( multiset -- ? ) avl>> assoc-size 0 eq? ; inline
 
