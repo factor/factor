@@ -185,11 +185,6 @@ DEFER: parse-mapping
         [ 2drop ] [ 1array yaml-unexpected-event ] if
     ] with-destructors ;
 
-! Same as 'with', but for combinators that
-! put 2 arguments on the stack
-: with2 ( param obj quot -- obj curry )
-    swapd '[ [ _ ] 2dip @ ] ; inline
-
 GENERIC: (deref-aliases) ( anchors obj -- obj' )
 
 M: object (deref-aliases) nip ;
@@ -210,7 +205,7 @@ M: sets:set (deref-aliases)
     [ assoc-map ] [ drop clear-assoc ] [ drop swap assoc-union! ] 2tri ; inline
 
 M: assoc (deref-aliases)
-     [ [ (deref-aliases) ] bi-curry@ bi ] with2 assoc-map! ;
+     [ [ (deref-aliases) ] bi-curry@ bi ] withd assoc-map! ;
 
 : merge-values ( seq -- assoc )
     reverse [ ] [ assoc-union ] map-reduce ;
@@ -241,7 +236,7 @@ M: object apply-merge-keys nip ;
 M: byte-array apply-merge-keys nip ;
 M: string apply-merge-keys nip ;
 M: assoc apply-merge-keys
-    [ [ ?apply-merge-keys ] bi-curry@ bi ] with2 assoc-map!
+    [ [ ?apply-merge-keys ] bi-curry@ bi ] withd assoc-map!
     merge get [ ?apply-merge-key ] when
     value get [ ?apply-default-key ] when ;
 
@@ -431,7 +426,7 @@ M:: yaml-alias emit-value ( emitter event unused obj -- )
     [
         [ emit-mapping-key ]
         [ emit-object ] bi-curry* 2bi
-    ] with2 with2 assoc-each ;
+    ] withd withd assoc-each ;
 
 : emit-linked-assoc-body ( emitter event linked-assoc -- )
     >alist [ first2 swap associate ] map emit-sequence-body ;
