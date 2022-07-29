@@ -42,13 +42,14 @@ C: <mime-variable> mime-variable
 
 ERROR: mime-decoding-ran-out-of-bytes ;
 : dump-until-separator ( multipart -- multipart )
-    [ ] [ current-separator>> ] [ bytes>> ] tri
-    dup [ mime-decoding-ran-out-of-bytes ] unless
-    2dup subseq-start [
-        cut-slice
+    [ ] [ bytes>> ] [ current-separator>> ] tri
+    over [ mime-decoding-ran-out-of-bytes ] unless
+    2dup subsequence-starts [
+        swapd cut-slice
         [ mime-write ]
         [ swap length tail-slice >>bytes ] bi*
     ] [
+        swap
         tuck [ length ] bi@ - 1 - cut-slice
         [ mime-write ]
         [ >>bytes ] bi* fill-bytes

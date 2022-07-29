@@ -79,13 +79,13 @@ SYMBOL: sieve
         dup is-prime? [ increment-counts ] [ drop ] if
     ] each sieve get ;
 
-: consecutive-under ( m limit -- n/f )
-    prime-tau-upto [ dup <repetition> ] dip subseq-start ;
+: consecutive-under ( limit m -- n/f )
+   [ prime-tau-upto ] [ dup <repetition> ] bi* subsequence-starts ;
 
 PRIVATE>
 
 : euler047a ( -- answer )
-    4 200000 consecutive-under ;
+    200000 4 consecutive-under ;
 
 ! [ euler047a ] 100 ave-time
 ! 331 ms ave run time - 19.14 SD (100 trials)
