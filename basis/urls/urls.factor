@@ -164,7 +164,7 @@ PRIVATE>
         { [ dup "/" head? ] [ nip ] }
         { [ dup empty? ] [ drop ] }
         { [ over "/" tail? ] [ append ] }
-        { [ "/" pick subseq-start not ] [ nip ] }
+        { [ over "/" subsequence-starts not ] [ nip ] }
         [ [ "/" split1-last drop "/" ] dip 3append ]
     } cond remove-dot-segments ;
 

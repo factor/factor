@@ -63,6 +63,29 @@ IN: combinators.extras.tests
     } cond*
 ] unit-test
 
+{ "hi " "there" } [
+    "hi there" {
+        { [ dup "there" subsequence-starts ] [ cut ] }
+        [ f ]
+    } cond*
+] unit-test
+
+{ "hi " "there" } [
+    "hi there" {
+        { [ dup "foo" subsequence-starts ] [ head f ] }
+        { [ dup "there" subsequence-starts ] [ cut ] }
+        [ f ]
+    } cond*
+] unit-test
+
+{ "hi there" f } [
+    "hi there" {
+        { [ dup "foo" subsequence-starts ] [ head f ] }
+        { [ dup "bar" subsequence-starts ] [ cut ] }
+        [ f ]
+    } cond*
+] unit-test
+
 { f } [ f { } chain ] unit-test
 { 3 } [ H{ { 1 H{ { 2 3 } } } } { [ 1 of ] [ 2 of ] } chain ] unit-test
 { f } [ H{ { 1 H{ { 3 4 } } } } { [ 1 of ] [ 2 of ] } chain ] unit-test
