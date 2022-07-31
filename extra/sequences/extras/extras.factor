@@ -432,12 +432,6 @@ INSTANCE: odds virtual-sequence
 : until-empty ( seq quot -- )
     [ dup empty? ] swap until drop ; inline
 
-: arg-max ( seq -- n )
-    [ supremum ] keep index ;
-
-: arg-min ( seq -- n )
-    [ infimum ] keep index ;
-
 <PRIVATE
 
 : push-index-if ( ..a elt i quot: ( ..a elt -- ..b ? ) accum -- ..b )
@@ -624,6 +618,12 @@ PRIVATE>
 
 : infimum-by* ( ... seq quot: ( ... elt -- ... x ) -- ... i elt )
     [ before? ] select-by* ; inline
+
+: arg-max ( seq -- n )
+    [ ] supremum-by* drop ;
+
+: arg-min ( seq -- n )
+    [ ] infimum-by* drop ;
 
 : ?supremum ( seq/f -- elt/f )
     [ f ] [
