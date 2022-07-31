@@ -22,7 +22,7 @@ TUPLE: linux-controller < controller path meta state thread fd buttons quit? ;
         dup meta>> "path" of binary <file-reader> handle>> fd>> >>fd
         H{ } clone >>state
         dup meta>> "capabilities" of EV_KEY of keys seq>explode-positions >>buttons ; inline
-        ! swap over state>> '[ _ _ read-events ] in-thread ;
+        ! tuck state>> '[ _ _ read-events ] in-thread ;
 
 M: linux-controller dispose* fd>> close drop ;
 
