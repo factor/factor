@@ -846,6 +846,20 @@ HELP: slice-error
     }
 } ;
 
+HELP: >slice<
+{ $values
+    { "slice" slice }
+    { "from" integer } { "to" integer } { "seq" sequence }
+}
+{ $description "Sets up the stack for iteration with slots from a " { $link slice } ". Used with iteration in words such as " { $link sequence-operator } "." } ;
+
+HELP: >underlying<
+{ $values
+    { "slice/seq" object }
+    { "i" integer } { "n" integer }
+}
+{ $description "Sets up the stack for iteration with slots from a " { $link sequence } ". Used with iteration in words such as " { $link sequence-operator } "." } ;
+
 HELP: slice
 { $class-description "A virtual sequence which presents a subrange of the elements of an underlying sequence. New instances can be created by calling " { $link <slice> } ". Convenience words are also provided for creating slices where one endpoint is the start or end of the sequence; see " { $link "sequences-slices" } " for a list."
 $nl
@@ -1070,6 +1084,13 @@ HELP: tail-slice*
 
 { tail-slice tail-slice* } related-words
 
+HELP: head-to-index
+{ $values
+    { "seq" sequence } { "to" integer }
+    { "zero" object }
+}
+{ $description "Sets up the stack for the " { $link head } " word." } ;
+
 HELP: head
 { $values { "seq" sequence } { "n" "a non-negative integer" } { "headseq" "a new sequence" } }
 { $description "Outputs a new sequence consisting of the first " { $snippet "n" } " elements of the input sequence." }
@@ -1085,6 +1106,13 @@ HELP: head
     }
 }
 { $errors "Throws an error if the index is out of bounds." } ;
+
+HELP: index-to-tail
+{ $values
+    { "seq" sequence } { "from" integer }
+    { "length" object }
+}
+{ $description "Sets up the stack for the " { $link tail } " word." } ;
 
 HELP: tail
 { $values { "seq" sequence } { "n" "a non-negative integer" } { "tailseq" "a new sequence" } }
@@ -1202,6 +1230,13 @@ HELP: subseq-index-from
 { $values { "n" "a start index" } { "seq" sequence } { "subseq" sequence } { "i/f" "a start index or " { $snippet "f" } } }
 { $description "Outputs the start index of the first contiguous subsequence equal to " { $snippet "subseq" } ", starting the search from the " { $snippet "n" } "th element. If no matching subsequence is found, outputs " { $link f } "." } ;
 
+HELP: subseq-start-from
+{ $values
+    { "subseq" object } { "seq" sequence } { "n" integer }
+    { "i/f" { $maybe integer } }
+}
+{ $description "Outputs the start index of the first contiguous subsequence equal to " { $snippet "subseq" } ", or " { $link f } " if no matching subsequence is found starting from " { $snippet "n" } "." } ;
+
 HELP: subseq-start
 { $values { "subseq" sequence } { "seq" sequence } { "i/f" "a start index or " { $snippet "f" } } }
 { $description "Outputs the start index of the first contiguous subsequence equal to " { $snippet "subseq" } ", or " { $link f } " if no matching subsequence is found." } ;
@@ -1252,14 +1287,68 @@ HELP: product
 HELP: infimum
 { $values { "seq" sequence } { "elt" object } }
 { $description "Outputs the least element of " { $snippet "seq" } "." }
+{ $examples
+    "Example:"
+    { $example "USING: sequences prettyprint ;"
+        "{ 1 2 3 4 5 } infimum ."
+        "1"
+    }
+    "Example:"
+    { $example "USING: sequences prettyprint ;"
+        "{ \"c\" \"b\" \"a\" } infimum ."
+        "\"a\""
+    }
+}
+{ $errors "Throws an error if the sequence is empty." } ;
+
+HELP: infimum-by
+{ $values
+    { "seq" sequence } { "quot" quotation }
+    { "elt" object }
+}
+{ $description "Outputs the least element of " { $snippet "seq" } " according to the " { $snippet "quot" } "." }
+{ $examples
+    "Example:"
+    { $example "USING: sequences prettyprint ;"
+        "{ { 1 2 } { 1 2 3 } { 1 2 3 4 } } [ length ] infimum-by ."
+        "{ 1 2 }"
+    }
+}
 { $errors "Throws an error if the sequence is empty." } ;
 
 HELP: supremum
 { $values { "seq" sequence } { "elt" object } }
 { $description "Outputs the greatest element of " { $snippet "seq" } "." }
+{ $examples
+    "Example:"
+    { $example "USING: sequences prettyprint ;"
+        "{ 1 2 3 4 5 } supremum ."
+        "5"
+    }
+    "Example:"
+    { $example "USING: sequences prettyprint ;"
+        "{ \"c\" \"b\" \"a\" } supremum ."
+        "\"c\""
+    }
+}
 { $errors "Throws an error if the sequence is empty." } ;
 
-{ min max supremum infimum } related-words
+HELP: supremum-by
+{ $values
+    { "seq" sequence } { "quot" quotation }
+    { "elt" object }
+}
+{ $description "Outputs the greatest element of " { $snippet "seq" } " according to the " { $snippet "quot" } "." }
+{ $examples
+    "Example:"
+    { $example "USING: sequences prettyprint ;"
+        "{ { 1 2 } { 1 2 3 } { 1 2 3 4 } } [ length ] supremum-by ."
+        "{ 1 2 3 4 }"
+    }
+}
+{ $errors "Throws an error if the sequence is empty." } ;
+
+{ min max infimum infimum-by supremum supremum-by } related-words
 
 HELP: shortest
 { $values { "seqs" sequence } { "elt" object } }
@@ -1951,6 +2040,7 @@ ARTICLE: "sequences-search" "Searching sequences"
 "Finding the start of a subsequence:"
 { $subsections
     subseq-start
+    subseq-start-from
     subseq-index
     subseq-index-from
     subseq-starts-at?
