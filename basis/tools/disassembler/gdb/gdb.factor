@@ -7,6 +7,10 @@ IN: tools.disassembler.gdb
 
 SINGLETON: gdb-disassembler
 
+<PRIVATE
+
+TR: tabs>spaces "\t" "\s" ;
+
 : in-file ( -- path ) "gdb-in.txt" temp-file ;
 
 : out-file ( -- path ) "gdb-out.txt" temp-file ;
@@ -27,7 +31,9 @@ SINGLETON: gdb-disassembler
     try-process
     out-file ascii file-lines ;
 
+PRIVATE>
+
 M: gdb-disassembler disassemble*
-    make-disassemble-cmd run-gdb ;
+    make-disassemble-cmd run-gdb [ tabs>spaces print ] each ;
 
 gdb-disassembler disassembler-backend set-global
