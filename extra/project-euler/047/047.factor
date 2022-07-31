@@ -80,7 +80,7 @@ SYMBOL: sieve
     ] each sieve get ;
 
 : consecutive-under ( limit m -- n/f )
-   [ prime-tau-upto ] [ dup <repetition> ] bi* subsequence-starts ;
+   [ prime-tau-upto ] [ dup <repetition> ] bi* subseq-index ;
 
 PRIVATE>
 

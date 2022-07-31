@@ -65,23 +65,23 @@ IN: combinators.extras.tests
 
 { "hi " "there" } [
     "hi there" {
-        { [ dup "there" subsequence-starts ] [ cut ] }
+        { [ dup "there" subseq-index ] [ cut ] }
         [ f ]
     } cond*
 ] unit-test
 
 { "hi " "there" } [
     "hi there" {
-        { [ dup "foo" subsequence-starts ] [ head f ] }
-        { [ dup "there" subsequence-starts ] [ cut ] }
+        { [ dup "foo" subseq-index ] [ head f ] }
+        { [ dup "there" subseq-index ] [ cut ] }
         [ f ]
     } cond*
 ] unit-test
 
 { "hi there" f } [
     "hi there" {
-        { [ dup "foo" subsequence-starts ] [ head f ] }
-        { [ dup "bar" subsequence-starts ] [ cut ] }
+        { [ dup "foo" subseq-index ] [ head f ] }
+        { [ dup "bar" subseq-index ] [ cut ] }
         [ f ]
     } cond*
 ] unit-test

@@ -16,7 +16,7 @@ SYMBOL: lit-vec
 :: longest-prefix ( ind seq -- start end )
     ind dup ind + seq length min [a..b]
     seq ind head-slice '[
-        [ _ ] dip ind swap seq <slice> subsequence-starts
+        [ _ ] dip ind swap seq <slice> subseq-index
     ] map-find-last ;
 
 :: create-pair ( ind seq -- array )
