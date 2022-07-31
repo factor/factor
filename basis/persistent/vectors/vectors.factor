@@ -63,7 +63,7 @@ M: persistent-vector nth-unsafe
     dup full? [ [ level>> 1node ] keep swap ] [ node-add f ] if ;
 
 : new-last ( val seq -- seq' )
-    [ length 1 - ] keep new-nth ;
+    index-of-last new-nth ;
 
 : node-set-last ( child node -- node' )
     clone [ new-last ] change-children ;

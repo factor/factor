@@ -70,7 +70,7 @@ DEFER: (read-json-string)
     [ length 2 - ] [ nth-unsafe ] bi ; inline
 
 : pop-unsafe ( seq -- elt )
-    [ length 1 - ] keep [ nth-unsafe ] [ shorten ] 2bi ; inline
+    index-of-last [ nth-unsafe ] [ shorten ] 2bi ; inline
 
 : check-length ( seq n -- seq )
     [ dup length ] [ >= ] bi* [ json-error ] unless ; inline
