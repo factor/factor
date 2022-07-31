@@ -28,7 +28,7 @@ PRIVATE>
 <PRIVATE
 
 : subseq-range ( seq subseq -- from/f to/f )
-    [ swap subseq-start ] keep [ dupd length + ] curry [ f f ] if* ; inline
+    [ swap subseq-start ] keep '[ dup _ length + ] [ f f ] if* ; inline
 
 : (split1) ( seq subseq snip-quot -- before after )
     [ [ subseq-range ] keepd over ] dip [ 2nip f ] if ; inline
@@ -45,7 +45,7 @@ PRIVATE>
     [
         1array
     ] [
-        [ dup ] swap [ split1-slice swap ] curry produce nip
+        [ dup ] swap '[ _ split1-slice swap ] produce nip
     ] if-empty ;
 
 : replace ( seq old new -- new-seq )
@@ -54,7 +54,7 @@ PRIVATE>
 <PRIVATE
 
 : (split1-when) ( ... seq quot: ( ... elt -- ... ? ) snip-quot -- ... before-slice after-slice )
-    [ dupd find drop ] dip [ swap [ dup 1 + ] dip ] prepose [ f ] if* ; inline
+    [ dupd find drop ] dip '[ dup 1 + rot @ ] [ f ] if* ; inline
 
 PRIVATE>
 
@@ -74,28 +74,26 @@ PRIVATE>
 
 <PRIVATE
 
-: (split) ( seq quot: ( ... elt -- ... ? ) slice-quot -- pieces )
-    [ 0 ] 3dip pick [
-        swap curry [ keep 1 + swap ] curry [
-            [ find-from drop dup ] 2curry [ keep -rot ] curry
-        ] dip V{ } produce-as nip
-    ] 2keep swap [
-        [ length swapd ] keep
-    ] dip 2curry call suffix! { } like ; inline
+:: (split-when) ( seq quot: ( ... elt -- ... ? ) slice-quot -- pieces )
+    0
+    [ [ seq quot find-from drop dup ] keep -rot ]
+    [ [ seq slice-quot call ] keep 1 + swap ]
+    V{ } produce-as nip swap
+    seq length seq slice-quot call suffix! { } like ; inline
 
 PRIVATE>
 
 : split-when ( ... seq quot: ( ... elt -- ... ? ) -- ... pieces )
-    [ subseq-unsafe ] (split) ; inline
+    [ subseq-unsafe ] (split-when) ; inline
 
 : split-when-slice ( ... seq quot: ( ... elt -- ... ? ) -- ... pieces )
-    [ <slice-unsafe> ] (split) ; inline
+    [ <slice-unsafe> ] (split-when) ; inline
 
 : split ( seq separators -- pieces )
-    [ member? ] curry split-when ; inline
+    '[ _ member? ] split-when ; inline
 
 : split-slice ( seq separators -- pieces )
-    [ member? ] curry split-when-slice ; inline
+    '[ _ member? ] split-when-slice ; inline
 
 : split-indices ( seq indices -- pieces )
     over length suffix 0 swap [
