@@ -3,7 +3,7 @@
 USING: accessors colors formatting kernel math math.vectors
 models models.arrow models.product models.range sequences ui
 ui.gadgets ui.gadgets.labels ui.gadgets.packs ui.gadgets.sliders
-ui.gadgets.tracks ui.pens.solid ;
+ui.gadgets.tracks ui.pens.solid ui.tools.common ;
 IN: color-picker
 
 ! Simple example demonstrating the use of models.
