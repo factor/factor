@@ -4,11 +4,13 @@ USING: ascii kernel math sequences splitting strings tools.test ;
 { "hello" "world-+." } [ "hello-+world-+." "-+" split1 ] unit-test
 { "goodbye" f } [ "goodbye" " " split1 ] unit-test
 { "" "" } [ "great" "great" split1 ] unit-test
+{ { 1 2 3 } f } [ { 1 2 3 } { 5 6 } split1 ] unit-test
 
 { "hello world" "." } [ "hello world ." " " split1-last ] unit-test
 { "hello-+world" "." } [ "hello-+world-+." "-+" split1-last ] unit-test
 { "goodbye" f } [ "goodbye" " " split1-last ] unit-test
 { "" "" } [ "great" "great" split1-last ] unit-test
+{ { 1 2 3 } f } [ { 1 2 3 } { 5 6 } split1-last ] unit-test
 
 { "hello world" "." } [ "hello world ." " " split1-last-slice [ >string ] bi@ ] unit-test
 { "hello-+world" "." } [ "hello-+world-+." "-+" split1-last-slice [ >string ] bi@ ] unit-test
