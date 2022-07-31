@@ -699,26 +699,14 @@ PRIVATE>
 : member? ( elt seq -- ? )
     [ = ] with any? ;
 
-: member-of? ( seq elt -- ? )
-    [ = ] curry any? ;
-
 : member-eq? ( elt seq -- ? )
     [ eq? ] with any? ;
-
-: member-eq-of? ( seq elt -- ? )
-    [ eq? ] curry any? ;
 
 : remove ( elt seq -- newseq )
     [ = ] with reject ;
 
-: remove-of ( seq elt -- newseq )
-    [ = ] curry reject ;
-
 : remove-eq ( elt seq -- newseq )
     [ eq? ] with reject ;
-
-: remove-eq-of ( seq elt -- newseq )
-    [ eq? ] curry reject ;
 
 : sift ( seq -- newseq )
     [ ] filter ;
