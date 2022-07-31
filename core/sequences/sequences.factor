@@ -1057,17 +1057,20 @@ PRIVATE>
         [ + _ nth-unsafe ] keep _ nth-unsafe =
     ] with all-integers? ; inline
 
-: subsequence-starts-from ( n seq subseq -- i/f )
+: subseq-index-from ( n seq subseq -- i/f )
     [ [ length ] bi@ - 1 + ] 2keep
     '[ _ _ subseq-starts-at? ] find-integer-from ; inline
 
-: subsequence-starts ( seq subseq -- i/f ) [ 0 ] 2dip subsequence-starts-from ; inline
+: subseq-index ( seq subseq -- i/f ) [ 0 ] 2dip subseq-index-from ; inline
 
-: subsequence? ( seq subseq -- ? ) subsequence-starts >boolean ; inline
+: subseq-index? ( seq subseq -- ? ) subseq-index >boolean ; inline
 
-: subseq-start ( subseq seq -- i/f ) swap subsequence-starts ; inline
+: subseq-start-from ( subseq seq n -- i/f )
+    spin subseq-index-from ; inline deprecated
 
-: subseq? ( subseq seq -- ? ) subseq-start >boolean ; inline
+: subseq-start ( subseq seq -- i/f ) swap subseq-index ; inline deprecated
+
+: subseq? ( subseq seq -- ? ) subseq-start >boolean ; inline deprecated
 
 : drop-prefix ( seq1 seq2 -- slice1 slice2 )
     2dup mismatch [ 2dup min-length ] unless*

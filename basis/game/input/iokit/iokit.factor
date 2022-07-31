@@ -338,7 +338,7 @@ M: iokit-game-input-backend get-controllers
     +controller-states+ get-global keys [ controller boa ] map ;
 
 : ?glue ( seq subseq sep -- string )
-    2over subsequence-starts [ drop nip ] [ glue ] if ;
+    2over subseq-index [ drop nip ] [ glue ] if ;
 
 M: iokit-game-input-backend product-string
     handle>>

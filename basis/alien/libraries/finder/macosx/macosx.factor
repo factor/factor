@@ -130,7 +130,7 @@ PRIVATE>
 
 : framework-find ( name -- path )
     dup dyld-find [ nip ] [
-        dup ".framework" subsequence-starts [
+        dup ".framework" subseq-index [
             dupd head
         ] [
             [ ".framework" append ] keep

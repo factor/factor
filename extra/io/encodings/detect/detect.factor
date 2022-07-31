@@ -17,7 +17,7 @@ default-encoding [ latin1 ] initialize
 
 : prolog-encoding ( string -- iana-encoding )
     '[
-        _ dup "encoding=" subsequence-starts
+        _ dup "encoding=" subseq-index
         10 + swap [ [ 1 - ] dip nth ] [ index-from ] [ swapd subseq ] 2tri
     ] [ drop "UTF-8" ] recover ;
 

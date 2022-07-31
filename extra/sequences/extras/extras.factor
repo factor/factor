@@ -662,7 +662,7 @@ PRIVATE>
 
 :: (start-all) ( seq subseq increment -- indices )
     0
-    [ seq subseq subsequence-starts-from dup ]
+    [ seq subseq subseq-index-from dup ]
     [ [ increment + ] keep ] produce nip ;
 
 : start-all ( seq subseq -- indices )
