@@ -1627,7 +1627,7 @@ HELP: sequence-hashcode-step
      { "newhash" integer } }
 { $description "An implementation word that computes a running hashcode of a sequence using some bit-twiddling. The resulting hashcode is always a fixnum." } ;
 
-HELP: bound
+HELP: index-or-length
 { $values
      { "seq" sequence } { "n" integer } { "n'" integer } }
 { $description "Returns the input sequence and its length or " { $snippet "n" } ", whichever is less." }
