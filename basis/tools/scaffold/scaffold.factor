@@ -127,6 +127,11 @@ ERROR: vocab-must-not-exist string ;
         { "vocab-root" "a vocabulary root string" }
         { "c-ptr" c-ptr }
         { "sequence" sequence }
+        { "slice" slice }
+        { "from" integer }
+        { "to" integer }
+        { "i" integer }
+        { "n" integer }
         { "seq" sequence }
         { "exemplar" object }
         { "assoc" assoc }
@@ -157,8 +162,8 @@ M: object add-using
                 [ unparse write bl ]
                 [ [ pprint ] [ add-using ] bi ] bi*
             ] [
-                drop unparse write bl null pprint
-                null add-using
+                drop unparse write bl object pprint
+                object add-using
             ] if
             " }" write
         ] interleave
@@ -252,6 +257,7 @@ M: object add-using
     [ HS{ } clone using ] dip with-variable ; inline
 
 : link-vocab ( vocab -- )
+    ".private" ?tail drop
     check-vocab
     "Edit documentation: " write
     "-docs.factor" vocab/suffix>path <pathname> . ;
