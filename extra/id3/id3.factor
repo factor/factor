@@ -116,7 +116,7 @@ CONSTANT: id3v1+-length 227
     [ 10 over size>> 10 + ] dip <slice> filter-text-data ;
 
 : decode-text ( string -- string' )
-    dup 2 bound head
+    dup 2 index-or-length head
     { { 0xff 0xfe } { 0xfe 0xff } } member?
     utf16 ascii ? decode ;
 

@@ -20,7 +20,7 @@ SYMBOL: message-histogram
     drop ;
 
 : recent-histogram ( assoc n -- alist )
-    [ sort-values <reversed> ] dip bound head ;
+    [ sort-values <reversed> ] dip index-or-length head ;
 
 : analyze-entries ( entries word-names -- errors word-histogram message-histogram )
     [
