@@ -88,7 +88,7 @@ CONSTANT: doc-start { 0 0 }
     0 swap [ append ] change-nth ;
 
 : append-last ( str seq -- )
-    [ length 1 - ] keep [ prepend ] change-nth ;
+    index-of-last [ prepend ] change-nth ;
 
 : loc-col/str ( loc document -- str col )
     [ first2 swap ] dip nth swap ;
