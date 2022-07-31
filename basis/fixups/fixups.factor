@@ -46,7 +46,7 @@ CONSTANT: word-renames {
     { "(each-integer)" { "each-integer-from" "0.99" } }
     { "(find-integer)" { "find-integer-from" "0.99" } }
     { "(all-integers?)" { "all-integers-from?" "0.99" } }
-    { "short" { "bound" "0.99" } }
+    { "short" { "index-or-length" "0.99" } }
     { "map-integers" { "map-integers-as" "0.99" } }
     { "deep-subseq?" { "deep-subseq-index?" "0.99" } }
 }
