@@ -8,16 +8,16 @@ IN: tokencase
 <PRIVATE
 
 : case-index ( str -- i/f )
-    dup [ 1string lower? ] find drop [
-        over [ 1string lower? not ] find-from drop
+    dup [ lower? ] find drop [
+        over [ lower? not ] find-from drop
         [ nip ] [ length ] if*
     ] [ length ] if* ;
 
 : split-case ( str -- words )
-    [ dup empty? not ] [
+    >graphemes [ dup empty? not ] [
         dup case-index
         [ cut-slice swap ]
-        [ f 0 rot [ length ] keep <slice> ] if*
+        [ f 0 rot [ length ] keep <slice> ] if* concat
     ] produce nip ;
 
 : split-tokens ( str -- words )
