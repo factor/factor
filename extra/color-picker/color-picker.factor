@@ -39,7 +39,7 @@ M: color-preview model-changed
     [ f track-add ]
     [
         [ <color-model> <color-preview> 1 track-add ]
-        [ [ color>str ] <arrow> <label-control> f track-add ] bi
+        [ [ color>str ] <arrow> <label-control> white-interior f track-add ] bi
     ] bi* ;
 
 MAIN-WINDOW: color-picker-window { { title "Color Picker" } }
