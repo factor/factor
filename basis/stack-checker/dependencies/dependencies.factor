@@ -43,6 +43,9 @@ M: anonymous-union add-depends-on-class
 M: anonymous-intersection add-depends-on-class
     participants>> [ add-depends-on-class ] each ;
 
+! M: covariant-tuple add-depends-on-class
+!    classes>> [ add-depends-on-class ] each ;
+
 GENERIC: add-depends-on-c-type ( c-type -- )
 
 M: void add-depends-on-c-type drop ;

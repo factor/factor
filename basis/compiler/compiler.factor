@@ -9,6 +9,7 @@ compiler.units compiler.utilities continuations definitions
 generic generic.single io kernel macros make namespaces
 sequences sets stack-checker.dependencies stack-checker.errors
 stack-checker.inlining vocabs.loader words ;
+QUALIFIED-WITH: multi-generic mg
 IN: compiler
 
 SYMBOL: compiled
@@ -46,6 +47,16 @@ M: method combinator? "method-generic" word-prop combinator? ;
 M: predicate-engine-word combinator? "owner-generic" word-prop combinator? ;
 
 M: word combinator? inline? ;
+
+M: mg:multi-method no-compile?
+    "multi-generic" word-prop no-compile? ;
+
+M: mg:multi-method combinator?
+    "multi-generic" word-prop combinator? ;
+
+M: mg:predicate-engine-word no-compile? "owner-generic" word-prop no-compile? ;
+
+M: mg:predicate-engine-word combinator? "owner-generic" word-prop combinator? ;
 
 : ignore-error? ( word error -- ? )
     ! Ignore some errors on inline combinators, macros, and special
@@ -101,6 +112,9 @@ M: word combinator? inline? ;
 : optimize? ( word -- ? )
     {
         [ single-generic? ]
+        [ mg:multi-single-generic? ]
+        [ mg:covariant-tuple-multi-generic? ]
+        [ mg:nested-dispatch-engine-word? ]
         [ primitive? ]
     } 1|| not ;
 
@@ -125,12 +139,20 @@ M: word combinator? inline? ;
         ] with-cfg
     ] each ;
 
+! NOTE: this uses a mechanism which is normally only used in the code path of
+! optimized word in the compiler vocab.  The methods will still be compiled.  I
+! suppose this is more of a warning kind of thing.
+: detect-generic-errors ( generic -- )
+     [ mg:check-generic ]
+     [ swap <compiler-error> save-compiler-error ] recover ;
+
 : compile-word ( word -- )
     ! We return early if the word has breakpoints or if it
     ! failed to infer.
     '[
         _ {
             [ start-compilation ]
+            [ detect-generic-errors ]
             [ frontend ]
             [ backend ]
             [ finish-compilation ]

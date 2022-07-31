@@ -3,9 +3,10 @@
 USING: accessors arrays assocs classes.algebra combinators
 combinators.short-circuit compiler.tree compiler.tree.builder
 compiler.tree.normalization compiler.tree.propagation.info
-compiler.tree.propagation.nodes compiler.tree.recursive generic
-generic.math generic.single generic.standard kernel locals math
-math.partial-dispatch namespaces quotations sequences words ;
+compiler.tree.propagation.nodes compiler.tree.recursive effects
+generic generic.math generic.single generic.standard kernel
+kernel.private locals math math.order math.partial-dispatch
+multi-generic namespaces quotations sequences words ;
 IN: compiler.tree.propagation.inlining
 
 : splicing-call ( #call word -- nodes )
@@ -102,12 +103,137 @@ SYMBOL: history
     call( #call -- word/quot/f )
     object swap eliminate-dispatch ;
 
+::  worst-literal-length ( methods -- len )
+    methods first first length :> len
+    methods 0 [
+        first [ object = not ] find drop dup [ len swap - ] [ drop 0 ] if
+        max
+    ] reduce ;
+
+:: inlining-multi-dispatch-method ( #call word -- classes/f method/f )
+    word "hooks" word-prop empty? [
+        word methods :> word-methods
+        #call in-d>> >array [ value-info class>> ] map
+        dup length :> stack-len
+        dup [ object = ] find-last [| classes i |
+            i object <array> 0 i classes replace-slice
+        ] [ drop ] if :> stack-info
+        word-methods empty? [ f f ] [
+            word-methods first first length :> len1
+            word-methods worst-literal-length :> len2
+            stack-info [ object = ] reject length len2 >= [
+                ! method inlining
+                len1 len2 - object <array>
+                stack-info [ length dup len2 - swap ] keep subseq
+                append
+                word-methods spec-boolean-table [
+                    [ drop object ] unless
+                ] 2map
+                dup word ?lookup-multi-method dup [ 2drop f f ] unless
+            ] [
+                ! partical inline
+                word "partial-inline" word-prop [
+                    stack-info [ object = ] all? [ f f ] [
+                        word-methods
+                        word multi-math-generic? [
+                            [
+                                drop first2 [ multi-generic:math-class? ] both?
+                            ] assoc-reject
+                        ] when
+                        multi-generic:sort-methods [
+                            drop stack-info swap t [
+                                [ drop object = ] [ class<= ] 2bi or and
+                            ] 2reduce
+                        ] assoc-filter [
+                            [
+                                stack-info [| c1 c2 |
+                                    c2 object = [ c1 ] [ object ] if
+                                ] 2map
+                            ] dip
+                        ] assoc-map prepare-methods drop
+                        dup empty? [ drop f f ] [
+                            word multi-dispatch-quot
+                            ! declare output classes
+                            word methods dup empty? [ drop ] [
+                                values t [
+                                    "multi-method-effect" word-prop
+                                    out>> [ dup array? [ second ] [ drop object ] if ] map
+                                    over t = [ nip ] [ dup swap = not [ drop f ] when ] if
+                                ] reduce [
+                                    dup [ object = ] all? [ drop ] [
+                                        \ declare 2array >quotation append
+                                    ] if
+                                ] when*
+                            ] if
+                            #call in-d>> >array [ value-info class>> ] map swap
+                        ] if
+                    ] if
+                ] [ f f ] if
+            ] if
+        ] if
+    ] [ f f ] if ;
+
+: multi-math-both-known? ( word left right -- ? )
+    3dup math-op
+    [ 4drop t ]
+    [ drop multi-generic:math-class-max
+      swap single-method-for-class >boolean ] if ;
+
+: multi-math-method* ( word left right -- quot )
+    3dup math-op [ 3nip 1quotation ] [ drop multi-math-method ] if ;
+
+:: inlining-multi-math-method ( #call word -- class/f quot/f )
+    #call word
+    swap in-d>> first2
+    [ value-info class>> normalize-math-class ] bi@
+    3dup multi-math-both-known? [ multi-math-method* ] [ 3drop f ] if
+    number swap [
+        ! Extended mathematical dispatch
+        drop #call word inlining-multi-dispatch-method
+    ] unless* ;
+
+: inlining-multi-standard-method ( #call word -- class/f method/f )
+    dup "dispatch-type" word-prop methods>> assoc-empty?
+    [ 2drop f f ] [
+        2dup [ in-d>> length ] [ single-dispatch# ] bi* <=
+        [ 2drop f f ] [
+            [ in-d>> <reversed> ] [ [ single-dispatch# ] keep ] bi*
+            [ swap nth value-info class>> dup ] dip
+            single-method-for-class
+        ] if
+    ] if ;
+
+: inline-multi-standard-method ( #call word -- ? )
+    dupd inlining-multi-standard-method eliminate-dispatch ;
+
+: inline-multi-math-method ( #call word -- ? )
+    dupd inlining-multi-math-method eliminate-dispatch ;
+
+: inline-multi-dispatch-method ( #call word -- ? )
+    dupd inlining-multi-dispatch-method eliminate-dispatch ;
+
+: inlining-covariant-tuple-dispatch-method ( #call word -- class/f method/f )
+     dup "dispatch-type" word-prop methods>> assoc-empty? [ 2drop f f ] [
+         2dup [ in-d>> length ] [ multi-generic-arity ] bi* < [ 2drop f f ] [
+             [ in-d>> ] [ [ multi-generic-arity ] keep ] bi*
+             [ tail* [ value-info class>> ] map <covariant-tuple> dup ] dip
+             single-method-for-class
+         ] if
+     ] if ;
+
+ : inline-covariant-tuple-dispatch-method ( #call word -- ? )
+     dupd inlining-covariant-tuple-dispatch-method eliminate-dispatch ;
+
 : (do-inlining) ( #call word -- ? )
     {
         { [ dup never-inline-word? ] [ 2drop f ] }
         { [ dup always-inline-word? ] [ inline-word ] }
         { [ dup standard-generic? ] [ inline-standard-method ] }
         { [ dup math-generic? ] [ inline-math-method ] }
+        { [ dup multi-standard-generic? ] [ inline-multi-standard-method ] }
+        { [ dup multi-math-generic? ] [ inline-multi-math-method ] }
+        { [ dup multi-dispatch-generic? ] [ inline-multi-dispatch-method ] }
+        { [ dup covariant-tuple-dispatch-generic? ] [ inline-covariant-tuple-dispatch-method ] }
         { [ dup inline? ] [ inline-word ] }
         [ 2drop f ]
     } cond ;
