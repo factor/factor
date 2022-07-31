@@ -101,7 +101,7 @@ CONSTANT: URL V{ }
 
 : gemini-go ( args -- )
     present [ DEFAULT-URL ] when-empty
-    { [ dup "://" subsequence? ] [ "gemini://" head? ] } 1||
+    { [ dup "://" subseq-index? ] [ "gemini://" head? ] } 1||
     [ "gemini://" prepend ] unless
     dup "gemini://" head? [
         [ add-history ] [ add-stack ] [ gemini-get ] tri

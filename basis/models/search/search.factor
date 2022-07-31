@@ -7,4 +7,4 @@ IN: models.search
     '[ _ curry filter ] <smart-arrow> ; inline
 
 : <string-search> ( values search quot -- model )
-    '[ @ [ >case-fold ] bi@ subsequence? ] <search> ; inline
+    '[ @ [ >case-fold ] bi@ subseq-index? ] <search> ; inline
