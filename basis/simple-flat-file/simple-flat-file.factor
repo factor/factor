@@ -12,7 +12,7 @@ IN: simple-flat-file
     [ drop-comment ] map harvest ;
 
 : split-column ( line -- columns )
-    " \t" split harvest 2 bound head 2 f pad-tail ;
+    " \t" split harvest 2 index-or-length head 2 f pad-tail ;
 
 : parse-hex ( s -- n )
     dup [

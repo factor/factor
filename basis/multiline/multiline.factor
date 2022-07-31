@@ -44,7 +44,7 @@ SYNTAX: STRING:
         i text end subseq-index-from [| j |
             i j text subseq % j end length +
         ] [
-            text i bound tail % CHAR: \n ,
+            text i index-or-length tail % CHAR: \n ,
             lexer next-line
             0 end lexer (scan-multiline-string)
         ] if*

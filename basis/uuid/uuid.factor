@@ -64,7 +64,7 @@ PRIVATE>
 
 : uuid3 ( namespace name -- string )
     [ uuid-parse ] dip append
-    md5 checksum-bytes 16 bound head be>
+    md5 checksum-bytes 16 index-or-length head be>
     3 (version) uuid>string ;
 
 : uuid4 ( -- string )
@@ -73,7 +73,7 @@ PRIVATE>
 
 : uuid5 ( namespace name -- string )
     [ uuid-parse ] dip append
-    sha1 checksum-bytes 16 bound head be>
+    sha1 checksum-bytes 16 index-or-length head be>
     5 (version) uuid>string ;
 
 : uuid6 ( -- string )

@@ -1080,7 +1080,7 @@ HELP: head
     }
     "When a sequence may not have enough elements:"
     { $example "USING: sequences prettyprint ;"
-        "{ 1 2 } 5 bound head ."
+        "{ 1 2 } 5 index-or-length head ."
         "{ 1 2 }"
     }
 }
@@ -1096,7 +1096,7 @@ HELP: tail
     }
     "When a sequence may not have enough elements:"
     { $example "USING: sequences prettyprint ;"
-        "{ 1 2 } 5 bound tail ."
+        "{ 1 2 } 5 index-or-length tail ."
         "{ }"
     }
 }
@@ -1122,7 +1122,7 @@ HELP: head*
     }
     "When a sequence may not have enough elements:"
     { $example "USING: sequences prettyprint ;"
-        "{ 1 2 } 5 bound head* ."
+        "{ 1 2 } 5 index-or-length head* ."
         "{ }"
     }
 }
@@ -1138,7 +1138,7 @@ HELP: tail*
     }
     "When a sequence may not have enough elements:"
     { $example "USING: sequences prettyprint ;"
-        "{ 1 2 } 5 bound tail* ."
+        "{ 1 2 } 5 index-or-length tail* ."
         "{ 1 2 }"
     }
 }
@@ -1632,7 +1632,7 @@ HELP: bound
      { "seq" sequence } { "n" integer } { "n'" integer } }
 { $description "Returns the input sequence and its length or " { $snippet "n" } ", whichever is less." }
 { $examples { $example "USING: sequences kernel prettyprint ;"
-    "\"abcd\" 3 bound [ . ] bi@"
+    "\"abcd\" 3 index-or-length [ . ] bi@"
     "\"abcd\"\n3"
 } } ;
 

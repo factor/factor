@@ -33,7 +33,7 @@ M: trace-step-state summary
     ] "" make ;
 
 : <trace-step> ( continuation word -- trace-step )
-    [ nip ] [ [ data>> ] [ stack-effect in>> length ] bi* bound tail* ] 2bi
+    [ nip ] [ [ data>> ] [ stack-effect in>> length ] bi* index-or-length tail* ] 2bi
     \ trace-step-state boa ;
 
 : print-step ( continuation -- )

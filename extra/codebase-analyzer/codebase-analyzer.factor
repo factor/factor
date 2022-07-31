@@ -167,10 +167,10 @@ IN: codebase-analyzer
         [ uses-make? [ "uses make" print ] when ]
         [ rc-files [ length "has %d rc files" sprintf print ] unless-empty ]
         [ ignore-files [ length "has %d ignore files" sprintf print ] unless-empty nl ]
-        [ "Top 20 largest files" print file-sizes sort-values 20 bound tail* [ normalize-path ] map-keys reverse assoc. nl ]
-        [ "Top 10 file extension sizes" print sum-sizes-by-extension 10 bound tail* reverse assoc. nl ]
-        [ "Top 10 text file line counts" print sum-line-counts-by-extension 10 bound tail* reverse assoc. nl ]
-        [ "Top 10 file extension counts" print count-by-file-extension 10 bound tail* reverse assoc. nl ]
+        [ "Top 20 largest files" print file-sizes sort-values 20 index-or-length tail* [ normalize-path ] map-keys reverse assoc. nl ]
+        [ "Top 10 file extension sizes" print sum-sizes-by-extension 10 index-or-length tail* reverse assoc. nl ]
+        [ "Top 10 text file line counts" print sum-line-counts-by-extension 10 index-or-length tail* reverse assoc. nl ]
+        [ "Top 10 file extension counts" print count-by-file-extension 10 index-or-length tail* reverse assoc. nl ]
     } cleave ;
 
 : analyze-codebase ( path -- )

@@ -106,7 +106,7 @@ pad       = pad-align pad-char pad-width => [[ <reversed> >quotation dup first 0
 sign_     = [+ ]                 => [[ '[ dup first CHAR: - = [ _ prefix ] unless ] ]]
 sign      = (sign_)?             => [[ [ ] or ]]
 
-width_    = "." ([0-9])*         => [[ second >digits '[ _ bound head ] ]]
+width_    = "." ([0-9])*         => [[ second >digits '[ _ index-or-length head ] ]]
 width     = (width_)?            => [[ [ ] or ]]
 
 digits_   = "." ([0-9])*         => [[ second >digits ]]

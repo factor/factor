@@ -146,7 +146,7 @@ PRIVATE>
     { ";" } split1-last [ ] [ ] ?if ;
 
 : complete-vocab-list? ( tokens -- ? )
-    chop-; 1 bound head* "USING:" swap member? ;
+    chop-; 1 index-or-length head* "USING:" swap member? ;
 
 PRIVATE>
 

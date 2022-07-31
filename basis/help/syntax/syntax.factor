@@ -91,7 +91,7 @@ DEFER: HELP{
 
 : trim-whitespace ( seq -- seq' )
     dup rest-slice dup whitespace
-    [ '[ _ bound tail ] map! ] unless-zero drop
+    [ '[ _ index-or-length tail ] map! ] unless-zero drop
     0 over [ [ blank? ] trim-head ] change-nth ;
 
 : code-lines ( str -- seq )
