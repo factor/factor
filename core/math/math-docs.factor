@@ -449,6 +449,11 @@ HELP: all-integers?
 { $description "Applies the quotation to each integer from 0 up to " { $snippet "n" } ", excluding " { $snippet "n" } ". Iteration stops when the quotation outputs " { $link f } " or the end is reached. If the quotation yields a false value for some integer, this word outputs " { $link f } ". Otherwise, this word outputs " { $link t } "." }
 { $notes "This word is used to implement " { $link all? } "." } ;
 
+HELP: find-integer-from
+{ $values { "i" integer } { "n" integer } { "quot" { $quotation ( ... i -- ... ? ) } } { "i/f" { $maybe integer } } }
+{ $description "Applies the quotation to each integer from " { $snippet "i" } " up to " { $snippet "n" } ", excluding " { $snippet "n" } ". Iteration stops when the quotation outputs a true value or the end is reached. If the quotation yields a true value for some integer, this word outputs that integer. Otherwise, this word outputs " { $link f } "." }
+{ $notes "This word is used to implement " { $link find-integer } " and " { $link find } "." } ;
+
 HELP: find-integer
 { $values { "n" integer } { "quot" { $quotation ( ... i -- ... ? ) } } { "i/f" { $maybe integer } } }
 { $description "Applies the quotation to each integer from 0 up to " { $snippet "n" } ", excluding " { $snippet "n" } ". Iteration stops when the quotation outputs a true value or the end is reached. If the quotation yields a true value for some integer, this word outputs that integer. Otherwise, this word outputs " { $link f } "." }
