@@ -1210,6 +1210,10 @@ HELP: subseq?
 { $values { "subseq" sequence } { "seq" sequence } { "?" boolean } }
 { $description "Tests if " { $snippet "seq" } " contains the elements of " { $snippet "subseq" } " as a contiguous subsequence." } ;
 
+HELP: subseq-index?
+{ $values { "seq" sequence } { "subseq" sequence } { "?" boolean } }
+{ $description "Tests if " { $snippet "seq" } " contains the elements of " { $snippet "subseq" } " as a contiguous subsequence." } ;
+
 HELP: drop-prefix
 { $values { "seq1" sequence } { "seq2" sequence } { "slice1" "a slice" } { "slice2" "a slice" } }
 { $description "Outputs a pair of virtual sequences with the common prefix of " { $snippet "seq1" } " and " { $snippet "seq2" } " removed." } ;
@@ -1934,7 +1938,7 @@ ARTICLE: "sequences-tests" "Testing sequences"
 "Testing if a sequence contains an object:"
 { $subsections member? member-eq? }
 "Testing if a sequence contains a subsequence:"
-{ $subsections head? tail? subseq? } ;
+{ $subsections head? tail? subseq? subseq-index? } ;
 
 ARTICLE: "sequences-search" "Searching sequences"
 "Finding the index of an element:"
