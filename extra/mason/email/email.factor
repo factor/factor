@@ -25,7 +25,7 @@ IN: mason.email
 : report-subject ( status -- string )
     [
         subject-prefix %
-        current-git-id get 7 bound head %
+        current-git-id get 7 index-or-length head %
         " -- " %
         {
             { status-clean [ "clean" ] }

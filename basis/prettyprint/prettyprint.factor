@@ -70,7 +70,7 @@ SYMBOL: =>
     ] [ ] make ;
 
 : remove-breakpoints ( quot pos -- quot' )
-    1 + bound cut [ (remove-breakpoints) ] bi@ [ => ] glue ;
+    1 + index-or-length cut [ (remove-breakpoints) ] bi@ [ => ] glue ;
 
 : optimized-frame? ( triple -- ? ) second word? ;
 
