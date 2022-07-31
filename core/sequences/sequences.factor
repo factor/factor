@@ -182,6 +182,10 @@ PRIVATE>
 : ?set-nth ( elt n seq -- )
     2dup bounds-check? [ set-nth-unsafe ] [ 3drop ] if ; inline
 
+: index-or-length ( seq n -- seq n' ) over length min ; inline
+
+: index-of-last ( seq -- n seq ) [ length 1 - ] keep ; inline
+
 : ?first ( seq -- elt/f ) 0 swap ?nth ; inline
 : ?second ( seq -- elt/f ) 1 swap ?nth ; inline
 : ?last ( seq -- elt/f )
@@ -246,10 +250,6 @@ M: slice virtual-exemplar seq>> ; inline
 M: slice virtual@ [ from>> + ] [ seq>> ] bi ; inline
 
 M: slice length [ to>> ] [ from>> ] bi - ; inline
-
-: index-or-length ( seq n -- seq n' ) over length min ; inline
-
-: index-of-last ( seq -- n seq ) [ length 1 - ] keep ; inline
 
 : head-slice ( seq n -- slice ) head-to-index <slice> ; inline
 
