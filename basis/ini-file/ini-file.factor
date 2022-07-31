@@ -68,7 +68,7 @@ IN: ini-file
     [ space? ] trim ;
 
 : unwrap ( str -- str' )
-    1 swap [ length 1 - ] keep subseq ;
+    1 swap index-of-last subseq ;
 
 : uncomment ( str -- str' )
     ";#" [ over index [ head ] when* ] each ;

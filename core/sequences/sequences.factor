@@ -185,7 +185,7 @@ PRIVATE>
 : ?first ( seq -- elt/f ) 0 swap ?nth ; inline
 : ?second ( seq -- elt/f ) 1 swap ?nth ; inline
 : ?last ( seq -- elt/f )
-    [ length 1 - ] keep over 0 <
+    index-of-last over 0 <
     [ 2drop f ] [ nth-unsafe ] if ; inline
 
 MIXIN: virtual-sequence
@@ -248,6 +248,8 @@ M: slice virtual@ [ from>> + ] [ seq>> ] bi ; inline
 M: slice length [ to>> ] [ from>> ] bi - ; inline
 
 : index-or-length ( seq n -- seq n' ) over length min ; inline
+
+: index-of-last ( seq -- n seq ) [ length 1 - ] keep ; inline
 
 : head-slice ( seq n -- slice ) head-to-index <slice> ; inline
 
@@ -572,7 +574,7 @@ PRIVATE>
     '[ _ find-last-from-unsafe ] bounds-check-find ; inline
 
 : find-last ( ... seq quot: ( ... elt -- ... ? ) -- ... i elt )
-    [ [ length 1 - ] keep ] dip find-last-from ; inline
+    [ index-of-last ] dip find-last-from ; inline
 
 : find-index-from ( ... n seq quot: ( ... elt i -- ... ? ) -- ... i elt )
     '[
@@ -817,7 +819,7 @@ PRIVATE>
 : append! ( seq1 seq2 -- seq1 ) over push-all ; inline
 
 : last ( seq -- elt )
-    [ length 1 - ] keep
+    index-of-last
     over 0 < [ bounds-error ] [ nth-unsafe ] if ; inline
 
 <PRIVATE
@@ -828,7 +830,7 @@ PRIVATE>
 PRIVATE>
 
 : set-last ( elt seq -- )
-    [ length 1 - ] keep
+    index-of-last
     over 0 < [ bounds-error ] [ set-nth-unsafe ] if ; inline
 
 : pop* ( seq -- ) [ length 1 - ] [ shorten ] bi ;
@@ -888,7 +890,7 @@ PRIVATE>
     [ [ dup 1 + ] dip snip-slice ] keep append-as ;
 
 : pop ( seq -- elt )
-    [ length 1 - ] keep over 0 >=
+    index-of-last over 0 >=
     [ [ nth-unsafe ] [ shorten ] 2bi ]
     [ bounds-error ] if ;
 

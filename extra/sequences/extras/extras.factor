@@ -655,7 +655,7 @@ PRIVATE>
     ] bounds-check-find ; inline
 
 : find-last-index ( ... seq quot: ( ... elt i -- ... ? ) -- ... i elt )
-    [ [ length 1 - ] keep ] dip find-last-index-from ; inline
+    [ index-of-last ] dip find-last-index-from ; inline
 
 : map-find-last-index ( ... seq quot: ( ... elt index -- ... result/f ) -- ... result i elt )
     [ find-last-index ] (map-find-index) ; inline

@@ -270,7 +270,7 @@ INSTANCE: combinations immutable-sequence
     [ drop 1 + dup ] map! 2drop ; inline
 
 : increment-last ( seq -- )
-    [ [ length 1 - ] keep [ 1 + ] change-nth-unsafe ] unless-empty ; inline
+    [ index-of-last [ 1 + ] change-nth-unsafe ] unless-empty ; inline
 
 :: next-combination ( seq n -- seq )
     seq n find-max-index [

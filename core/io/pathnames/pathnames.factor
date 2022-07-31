@@ -17,7 +17,7 @@ SYMBOL: current-directory
     [ path-separator? ] trim-head ;
 
 : last-path-separator ( path -- n ? )
-    [ length 1 - ] keep [ path-separator? ] find-last-from ;
+    index-of-last [ path-separator? ] find-last-from ;
 
 HOOK: root-directory? io-backend ( path -- ? )
 

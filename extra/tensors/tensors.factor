@@ -465,7 +465,7 @@ PRIVATE>
     ! Compute the starting index
     / truncate dupd *
     ! Compute the ending index
-    swap over +
+    tuck +
     ! Take a slice
     rot <slice> ;
 

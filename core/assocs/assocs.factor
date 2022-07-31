@@ -142,7 +142,7 @@ M: assoc values [ nip ] { } assoc>map ;
     assoc-size 0 = ; inline
 
 : assoc-stack ( key seq -- value )
-    [ length 1 - ] keep assoc-stack-from ; flushable
+    index-of-last assoc-stack-from ; flushable
 
 : assoc-subset? ( assoc1 assoc2 -- ? )
     [ at* [ = ] [ 2drop f ] if ] with-assoc assoc-all? ;
