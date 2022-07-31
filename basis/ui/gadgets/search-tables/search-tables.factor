@@ -4,7 +4,8 @@ USING: accessors combinators.short-circuit kernel models
 models.search ui.baseline-alignment ui.gadgets
 ui.gadgets.borders ui.gadgets.buttons ui.gadgets.editors
 ui.gadgets.scrollers ui.gadgets.tables ui.gadgets.tracks
-ui.gestures ui.pens ui.pens.image ui.theme.images ;
+ui.gestures ui.pens ui.pens.image ui.theme.images
+ui.tools.common ;
 IN: ui.gadgets.search-tables
 
 TUPLE: search-table < track table field ;
