@@ -11,6 +11,7 @@ CONSTANT: light-crate "vocab:gamelib/demos/sokoban/resources/Crate_Yellow.png"
 CONSTANT: dark-crate "vocab:gamelib/demos/sokoban/resources/CrateDark_Yellow.png"
 
 TUPLE: crate-cell < cell-object image-path ;
+
 M: crate-cell draw-cell-object* 
     rot [ image-path>> load-image ] dip <texture> draw-scaled-texture ;
 
@@ -20,7 +21,7 @@ M: crate-cell draw-cell-object*
 
 : board-one ( gadget -- gadget )
     8 9 make-board
-    
+
     { 2 2 } player add-to-cell
 
     {
@@ -100,7 +101,7 @@ M: crate-cell draw-cell-object*
 
     { 2 1 } $ light-crate make-crate add-to-cell
 
-    { 3 1 } $ goal add-to-cell                                         
+    { 3 1 } $ goal add-to-cell
 
     { } 1sequence 
 
