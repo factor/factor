@@ -3,7 +3,8 @@ namespaces prettyprint editors make ;
 IN: editors.subethaedit
 
 SINGLETON: subethaedit
-subethaedit editor-class set-global
+
+editor-class [ subethaedit ] initialize
 
 M: subethaedit editor-command
     drop

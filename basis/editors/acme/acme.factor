@@ -5,7 +5,8 @@ kernel make math.parser namespaces sequences ;
 IN: editors.acme
 
 SINGLETON: acme
-acme editor-class set-global
+
+editor-class [ acme ] initialize
 
 : plan9-path ( -- path )
   \ plan9-path get [

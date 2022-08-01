@@ -9,7 +9,8 @@ IN: editors.visual-studio-code
 ! https://code.visualstudio.com/docs/editor/command-line
 
 TUPLE: visual-studio-code ;
-T{ visual-studio-code } editor-class set-global
+
+editor-class [ T{ visual-studio-code } ] initialize
 
 HOOK: find-visual-studio-code-path editor-class ( -- path )
 

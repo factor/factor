@@ -5,7 +5,8 @@ kernel make math.parser namespaces system ;
 IN: editors.geany
 
 SINGLETON: geany
-geany editor-class set-global
+
+editor-class [ geany ] initialize
 
 SYMBOL: geany-path
 

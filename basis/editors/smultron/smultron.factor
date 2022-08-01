@@ -2,7 +2,8 @@ USING: editors kernel make namespaces ;
 IN: editors.smultron
 
 SINGLETON: smultron
-smultron editor-class set-global
+
+editor-class [ smultron ] initialize
 
 M: smultron editor-command
     drop

@@ -3,7 +3,8 @@ math.parser namespaces ;
 IN: editors.coteditor
 
 SINGLETON: coteditor
-coteditor editor-class set-global
+
+editor-class [ coteditor ] initialize
 
 : find-cot-bundle-path ( -- path/f )
     "com.coteditor.CotEditor" find-native-bundle [
