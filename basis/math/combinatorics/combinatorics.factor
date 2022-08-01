@@ -272,17 +272,17 @@ INSTANCE: combinations immutable-sequence
 : increment-last ( seq -- )
     [ index-of-last [ 1 + ] change-nth-unsafe ] unless-empty ; inline
 
-:: next-combination ( seq n -- seq )
+:: next-combination ( seq n -- )
     seq n find-max-index [
         1 [-] seq increment-rest
     ] [
         seq increment-last
-    ] if* seq ; inline
+    ] if* ; inline
 
 :: combinations-quot ( seq k quot -- seq quot' )
     seq length :> n
     n k nCk <iota> k <iota> >array seq quot n
-    '[ drop _ [ _ nths-unsafe @ ] keep _ next-combination drop ] ; inline
+    '[ drop _ [ _ nths-unsafe @ ] keep _ next-combination ] ; inline
 
 PRIVATE>
 
