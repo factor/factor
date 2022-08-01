@@ -120,11 +120,6 @@ SYMBOL: vocab-articles
         simple-lint-error
     ] unless ;
 
-: check-nulls ( element -- )
-    \ $values swap elements
-    null swap deep-member?
-    [ "$values should not contain null" simple-lint-error ] when ;
-
 : check-see-also ( element -- )
     \ $see-also swap elements [ rest all-unique? ] all?
     [ "$see-also are not unique" simple-lint-error ] unless ;
