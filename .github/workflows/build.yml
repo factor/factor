@@ -32,3 +32,22 @@ jobs:
       run: './factor -run=tools.test resource:core'
     - name: help-lint
       run: './factor -run=help.lint resource:core resource:basis'
+
+  build-windows:
+    runs-on: windows-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: build
+      shell: cmd
+      run: |
+        call "C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Auxiliary\Build\vcvars64.bat"
+        build.cmd net-bootstrap
+    - name: load-all
+      shell: cmd
+      run: 'factor -e="USING: memory namespaces parser.notes vocabs.hierarchy ; parser-quiet? off load-all save"'
+    - name: test
+      shell: cmd
+      run: 'factor -run=tools.test resource:core'
+    - name: help-lint
+      shell: cmd
+      run: 'factor -run=help.lint resource:core resource:basis'
