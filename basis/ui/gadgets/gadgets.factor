@@ -308,16 +308,15 @@ M: gadget remove-gadget 2drop ;
 : unparent ( gadget -- )
     not-in-layout
     [
-        dup parent>> dup
-        [
-            [ remove-gadget ] [
-                over (unparent)
+        dup parent>> [
+            {
+                [ remove-gadget ]
+                [ drop (unparent) ]
                 [ unfocus-gadget ]
                 [ children>> remove! drop ]
                 [ nip relayout ]
-                2tri
-            ] 2bi
-        ] [ 2drop ] if
+            } 2cleave
+        ] [ drop ] if*
     ] when* ;
 
 : clear-gadget ( gadget -- )
