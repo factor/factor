@@ -652,7 +652,7 @@ PRIVATE>
     '[
         _ [ sequence-index-operator-last find-last-integer ] keepd
         index/element
-    ] bounds-check-find ; inline
+    ] bounds-check-call ; inline
 
 : find-last-index ( ... seq quot: ( ... elt i -- ... ? ) -- ... i elt )
     [ index-of-last ] dip find-last-index-from ; inline

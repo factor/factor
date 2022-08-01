@@ -549,10 +549,10 @@ PRIVATE>
 : 3map ( ... seq1 seq2 seq3 quot: ( ... elt1 elt2 elt3 -- ... newelt ) -- ... newseq )
     pickd swap 3map-as ; inline
 
-: bounds-check-find ( n seq quot -- elt i )
-    2over bounds-check? [ call ] [ 3drop f f ] if ; inline
-
 <PRIVATE
+
+: bounds-check-call ( n seq quot -- elt i )
+    2over bounds-check? [ call ] [ 3drop f f ] if ; inline
 
 : find-from-unsafe ( ... n seq quot: ( ... elt -- ... ? ) -- ... i elt )
     [ rot sequence-operator-from find-integer-from ] keepd
@@ -565,13 +565,13 @@ PRIVATE>
 PRIVATE>
 
 : find-from ( ... n seq quot: ( ... elt -- ... ? ) -- ... i elt )
-    '[ _ find-from-unsafe ] bounds-check-find ; inline
+    '[ _ find-from-unsafe ] bounds-check-call ; inline
 
 : find ( ... seq quot: ( ... elt -- ... ? ) -- ... i elt )
     [ 0 ] 2dip find-from-unsafe ; inline
 
 : find-last-from ( ... n seq quot: ( ... elt -- ... ? ) -- ... i elt )
-    '[ _ find-last-from-unsafe ] bounds-check-find ; inline
+    '[ _ find-last-from-unsafe ] bounds-check-call ; inline
 
 : find-last ( ... seq quot: ( ... elt -- ... ? ) -- ... i elt )
     [ index-of-last ] dip find-last-from ; inline
@@ -580,7 +580,7 @@ PRIVATE>
     '[
         _ [ sequence-index-operator find-integer-from ] keepd
         index/element
-    ] bounds-check-find ; inline
+    ] bounds-check-call ; inline
 
 : find-index ( ... seq quot: ( ... elt i -- ... ? ) -- ... i elt )
     [ 0 ] 2dip find-index-from ; inline
