@@ -82,7 +82,6 @@ sokoban-gadget H{
      ;
 
 M: sokoban-gadget graft* ( gadget -- )
-    dup sokoban>> engine>> play-music
     [ [ tick ] curry 100 milliseconds every ] keep timer<< ;
 
 M: sokoban-gadget ungraft* ( gadget -- )

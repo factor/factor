@@ -16,12 +16,3 @@ IN: sokoban.sound
     
     engine T{ audio-source f { 0.0 0.0 0.0 } 1.0 { 0.0 0.0 0.0 } f } once-sound f
         play-static-audio-clip drop ;
-
-:: play-music ( engine -- )
-    $[ "vocab:sokoban/resources/music.wav" read-audio ] :> loop-sound
-    engine start-audio*
-    
-    engine T{ audio-source f { 0.0 0.0 0.0 } 1.0 { 0.0 0.0 0.0 } f } loop-sound t
-        play-static-audio-clip drop ;
-    
-
