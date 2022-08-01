@@ -6,7 +6,7 @@ IN: mason.config
 ! (Optional) Location for build directories
 SYMBOL: builds-dir
 
-builds-dir [ home "builds" append-path ] initialize
+builds-dir [ "~/builds" ] initialize
 
 ! Who sends build report e-mails.
 SYMBOL: builder-from
