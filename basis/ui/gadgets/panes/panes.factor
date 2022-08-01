@@ -357,8 +357,10 @@ M: pane-stream stream-write-table
 : pane-bl ( style gadget -- )
     swap " " <word-break-gadget> apply-character-style add-gadget drop ;
 
+TUPLE: styled-label < label style ;
+
 : <styled-label> ( style text -- gadget )
-    <label>
+    styled-label new-label over >>style
     apply-font-style
     apply-background-style
     apply-image-style
@@ -367,8 +369,17 @@ M: pane-stream stream-write-table
 
 M: styled-pane pane-label style>> "" <styled-label> ;
 
+: find-styled-label ( gadget -- styled-label/f )
+    dup styled-label? [
+        children>> ?last [ find-styled-label ] [ f ] if*
+    ] unless ;
+
 : pane-text ( string style gadget -- )
-    [ swap <styled-label> ] [ swap add-gadget drop ] bi* ;
+    dup find-styled-label [ pick over style>> = ] [ f f ] if* [
+        2nip [ prepend ] change-text drop
+    ] [
+        drop [ swap <styled-label> ] [ swap add-gadget drop ] bi*
+    ] if ;
 
 M: pack pane-line pane-text ;
 
