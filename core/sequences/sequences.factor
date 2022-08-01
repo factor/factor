@@ -825,7 +825,7 @@ PRIVATE>
 <PRIVATE
 
 : last-unsafe ( seq -- elt )
-    [ length 1 - ] [ nth-unsafe ] bi ; inline
+    index-of-last nth-unsafe ; inline
 
 PRIVATE>
 
@@ -833,7 +833,7 @@ PRIVATE>
     index-of-last
     over 0 < [ bounds-error ] [ set-nth-unsafe ] if ; inline
 
-: pop* ( seq -- ) [ length 1 - ] [ shorten ] bi ;
+: pop* ( seq -- ) index-of-last shorten ;
 
 <PRIVATE
 
