@@ -7,7 +7,7 @@ IN: editors.visual-studio-codium
 
 TUPLE: visual-studio-codium < visual-studio-code ;
 
-T{ visual-studio-codium } editor-class set-global
+editor-class [ T{ visual-studio-codium } ] initialize
 
 M: visual-studio-codium find-visual-studio-code-path
     os {

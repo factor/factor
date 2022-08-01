@@ -3,7 +3,8 @@ namespaces sequences ;
 IN: editors.textpad
 
 SINGLETON: textpad
-textpad editor-class set-global
+
+editor-class [ textpad ] initialize
 
 : textpad-path ( -- path )
     \ textpad-path get-global [

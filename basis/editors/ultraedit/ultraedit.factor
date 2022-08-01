@@ -3,7 +3,8 @@ math.parser namespaces system ;
 IN: editors.ultraedit
 
 SINGLETON: ultraedit
-ultraedit editor-class set-global
+
+editor-class [ ultraedit ] initialize
 
 HOOK: find-ultraedit os ( -- path )
 

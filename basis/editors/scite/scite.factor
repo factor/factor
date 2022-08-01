@@ -6,7 +6,8 @@ namespaces sequences system ;
 IN: editors.scite
 
 SINGLETON: scite
-scite editor-class set-global
+
+editor-class [ scite ] initialize
 
 SYMBOL: scite-path
 

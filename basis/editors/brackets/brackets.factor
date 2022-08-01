@@ -5,7 +5,8 @@ namespaces system vocabs ;
 IN: editors.brackets
 
 SINGLETON: brackets
-brackets editor-class set-global
+
+editor-class [ brackets ] initialize
 
 HOOK: brackets-path os ( -- path )
 

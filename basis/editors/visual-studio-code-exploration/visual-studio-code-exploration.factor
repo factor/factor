@@ -7,7 +7,7 @@ IN: editors.visual-studio-code-exploration
 
 TUPLE: visual-studio-code-exploration < visual-studio-code ;
 
-T{ visual-studio-code-exploration } editor-class set-global
+editor-class [ T{ visual-studio-code-exploration } ] initialize
 
 M: visual-studio-code-exploration find-visual-studio-code-path
     os {

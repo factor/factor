@@ -3,7 +3,8 @@ kernel make math.parser namespaces sequences system ;
 IN: editors.emacs
 
 SINGLETON: emacs
-emacs editor-class set-global
+
+editor-class [ emacs ] initialize
 
 SYMBOL: emacsclient-path
 SYMBOL: emacsclient-args

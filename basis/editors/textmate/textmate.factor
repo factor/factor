@@ -3,7 +3,8 @@ namespaces prettyprint editors make ;
 IN: editors.textmate
 
 SINGLETON: textmate
-textmate editor-class set-global
+
+editor-class [ textmate ] initialize
 
 M: textmate editor-command
     [ "mate" , "-a" , "-l" , number>string , , ] { } make ;

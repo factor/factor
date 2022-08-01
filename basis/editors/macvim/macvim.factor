@@ -3,7 +3,8 @@ namespaces ;
 IN: editors.macvim
 
 TUPLE: macvim < vim ;
-T{ macvim } editor-class set-global
+
+editor-class [ T{ macvim } ] initialize
 
 : find-macvim-bundle-path ( -- path/f )
     "org.vim.MacVim" find-native-bundle [

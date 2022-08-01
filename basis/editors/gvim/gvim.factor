@@ -6,7 +6,8 @@ IN: editors.gvim
 ! more information.
 
 TUPLE: gvim < vim ;
-T{ gvim } editor-class set-global
+
+editor-class [ T{ gvim } ] initialize
 
 HOOK: find-gvim-path io-backend ( -- path )
 
