@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel arrays namespaces sequences math math.order
 math.vectors colors random ;
-IN: gamelib.demos.sokoban.layout
+IN: sokoban.layout
 
 TUPLE: layout states color ;
 
