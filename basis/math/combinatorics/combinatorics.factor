@@ -187,15 +187,15 @@ PRIVATE>
 :: nCk-with-replacement ( n k -- nCk )
     k 1 - n + factorial k factorial / n 1 - factorial / ; inline
 
-:: next-combination-with-replacement ( seq n -- seq )
-    seq n 1 - '[ _ = not ] find-last drop :> i
-    seq i tail-slice i seq nth 1 + '[ drop _ ] map! drop
-    seq ; inline
+:: next-combination-with-replacement ( seq n -- )
+    seq n 1 - '[ _ = not ] find-last drop [| i |
+        seq i tail-slice i seq nth 1 + '[ drop _ ] map! drop
+    ] when* ; inline
 
 :: combinations-with-replacement-quot ( seq k quot -- seq quot' )
     seq length :> n
     n k nCk-with-replacement <iota> k 0 <array> seq quot n
-    '[ drop _ [ _ nths-unsafe @ ] keep _ next-combination-with-replacement drop ] ; inline
+    '[ drop _ [ _ nths-unsafe @ ] keep _ next-combination-with-replacement ] ; inline
 
 PRIVATE>
 
