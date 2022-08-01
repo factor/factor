@@ -1,4 +1,4 @@
-USING: arrays sequences system tools.test ;
+USING: arrays kernel sequences system tools.test ;
 
 { { t t t } } [
     version-info
