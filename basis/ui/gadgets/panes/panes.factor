@@ -376,7 +376,7 @@ M: styled-pane pane-label style>> "" <styled-label> ;
 
 : pane-text ( string style gadget -- )
     dup find-styled-label [ pick over style>> = ] [ f f ] if* [
-        2nip [ prepend ] change-text drop
+        2nip [ prepend ] change-text relayout
     ] [
         drop [ swap <styled-label> ] [ swap add-gadget drop ] bi*
     ] if ;
