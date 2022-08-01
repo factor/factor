@@ -2,7 +2,8 @@ USING: arrays editors io.standard-paths kernel namespaces ;
 IN: editors.wordpad
 
 SINGLETON: wordpad
-wordpad editor-class set-global
+
+editor-class [ wordpad ] initialize
 
 : wordpad-path ( -- path )
     \ wordpad-path get [

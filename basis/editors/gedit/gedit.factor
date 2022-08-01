@@ -5,7 +5,8 @@ math.parser namespaces sequences ;
 IN: editors.gedit
 
 SINGLETON: gedit
-gedit editor-class set-global
+
+editor-class [ gedit ] initialize
 
 : gedit-path ( -- path )
     \ gedit-path get [

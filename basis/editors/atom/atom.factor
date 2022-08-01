@@ -5,7 +5,8 @@ math.parser namespaces sequences system ;
 IN: editors.atom
 
 SINGLETON: atom
-atom editor-class set-global
+
+editor-class [ atom ] initialize
 
 SYMBOL: atom-path
 

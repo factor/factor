@@ -6,7 +6,8 @@ sequences windows.shell32 ;
 IN: editors.notepad
 
 SINGLETON: notepad
-notepad editor-class set-global
+
+editor-class [ notepad ] initialize
 
 : notepad-path ( -- path )
     \ notepad-path get [

@@ -2,7 +2,8 @@ USING: editors kernel make namespaces ;
 IN: editors.nova
 
 SINGLETON: nova
-nova editor-class set-global
+
+editor-class [ nova ] initialize
 
 M: nova editor-command
     drop

@@ -3,7 +3,8 @@ namespaces sequences windows.shell32 make io.pathnames ;
 IN: editors.notepad2
 
 SINGLETON: notepad2
-notepad2 editor-class set-global
+
+editor-class [ notepad2 ] initialize
 
 : notepad2-path ( -- path )
     \ notepad2-path get [

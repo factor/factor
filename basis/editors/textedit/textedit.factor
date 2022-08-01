@@ -3,7 +3,8 @@ namespaces prettyprint editors make ;
 IN: editors.textedit
 
 SINGLETON: textedit
-textedit editor-class set-global
+
+editor-class [ textedit ] initialize
 
 M: textedit editor-command
     drop

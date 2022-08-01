@@ -3,7 +3,8 @@ namespaces sequences strings ;
 IN: editors.vim
 
 TUPLE: vim ;
-T{ vim } editor-class set-global
+
+editor-class [ T{ vim } ] initialize
 
 SYMBOL: vim-path
 
