@@ -634,10 +634,10 @@ PRIVATE>
     ] if-empty ;
 
 : change-last ( seq quot -- )
-    [ drop length 1 - ] [ change-nth ] 2bi ; inline
+    [ index-of-last ] [ change-nth ] bi* ; inline
 
 : change-last-unsafe ( seq quot -- )
-    [ drop length 1 - ] [ change-nth-unsafe ] 2bi ; inline
+    [ index-of-last ] [ change-nth-unsafe ] bi* ; inline
 
 : replicate-into ( ... seq quot: ( ... -- ... newelt ) -- ... )
     over [ length ] 2dip '[ _ dip _ set-nth-unsafe ] each-integer ; inline
