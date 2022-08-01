@@ -28,8 +28,11 @@ M: gopher-gadget model-changed
     [ value>> present ]
     [ url-field>> editor>> set-editor-string ] bi* ;
 
+: ?gopher-url ( obj -- url )
+    present dup "://" subseq-index? [ "gopher://" prepend ] unless >url ;
+
 : show-gopher ( url gopher-gadget -- )
-    [ [ >url ] [ f ] if* ] dip
+    [ [ ?gopher-url ] [ f ] if* ] dip
     over [ protocol>> "gopher" = ] [ t ] if* [
         [
             2dup control-value =
@@ -40,7 +43,7 @@ M: gopher-gadget model-changed
     ] [ drop open-url ] if ;
 
 : <url-field> ( gopher-gadget -- field )
-    '[ >url _ show-gopher ] <action-field>
+    '[ _ show-gopher ] <action-field>
         "Gopher URL" >>default-text
         white-interior ;
 
