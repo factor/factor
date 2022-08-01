@@ -120,7 +120,7 @@ M: pathname >url string>> >url ;
 
 : ipv6-host ( host -- host/ipv6 ipv6? )
     dup { [ "[" head? ] [ "]" tail? ] } 1&& [
-        1 swap [ length 1 - ] [ subseq ] bi t
+        1 swap index-of-last subseq t
     ] [ f ] if ;
 
 : unparse-host ( url -- host )
