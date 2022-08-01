@@ -28,8 +28,11 @@ M: gemini-gadget model-changed
     [ value>> present ]
     [ url-field>> editor>> set-editor-string ] bi* ;
 
+: ?gemini-url ( obj -- url )
+    present dup "://" subseq-index? [ "gemini://" prepend ] unless >url ;
+
 : show-gemini ( url gemini-gadget -- )
-    [ [ >url ] [ f ] if* ] dip
+    [ [ ?gemini-url ] [ f ] if* ] dip
     over [ protocol>> "gemini" = ] [ t ] if* [
         [
             2dup control-value =
@@ -40,7 +43,7 @@ M: gemini-gadget model-changed
     ] [ drop open-url ] if ;
 
 : <url-field> ( gemini-gadget -- field )
-    '[ >url _ show-gemini ] <action-field>
+    '[ _ show-gemini ] <action-field>
         "Gemini URL" >>default-text
         white-interior ;
 
