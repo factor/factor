@@ -41,7 +41,7 @@ INSTANCE: anonymous-complement classoid
 M: anonymous-complement rank-class drop 3 ;
 
 M: anonymous-complement predicate-def
-    class>> '[ [ _ instance? not ] [ t ] if* ] curry ;
+    class>> [ over [ instance? not ] [ 2drop t ] if ] curry ;
 
 M: anonymous-complement instance?
     over [ class>> instance? not ] [ 2drop t ] if ;
