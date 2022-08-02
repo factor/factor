@@ -40,6 +40,9 @@ INSTANCE: anonymous-complement classoid
 
 M: anonymous-complement rank-class drop 3 ;
 
+M: anonymous-complement predicate-def
+    class>> '[ [ _ instance? not ] [ t ] if* ] curry ;
+
 M: anonymous-complement instance?
     over [ class>> instance? not ] [ 2drop t ] if ;
 
@@ -154,12 +157,13 @@ PREDICATE: nontrivial-anonymous-intersection < anonymous-intersection
     [ normalize-complement ] dip class<= ;
 
 PREDICATE: nontrivial-anonymous-complement < anonymous-complement
-    class>> {
-        [ anonymous-union? ]
-        [ anonymous-intersection? ]
-        [ class-members ]
-        [ class-participants ]
-    } cleave or or or ;
+    class>> dup anonymous-union? [ drop t ] [
+        dup anonymous-intersection? [ drop t ] [
+            dup class-members [ drop t ] [
+                class-participants
+            ] if
+        ] if
+    ] if ;
 
 PREDICATE: empty-union < anonymous-union members>> empty? ;
 
