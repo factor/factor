@@ -27,7 +27,7 @@ TUPLE: effect
     [ out>> length ] [ in>> length ] bi - ; inline
 
 : variable-effect? ( effect -- ? )
-    [ in-var>> ] [ out-var>> ] bi or ;
+    dup in-var>> [ drop t ] [ out-var>> ] if ;
 
 : bivariable-effect? ( effect -- ? )
     [ in-var>> ] [ out-var>> ] bi = not ;
@@ -44,10 +44,11 @@ TUPLE: effect
     } cond 2nip ; inline
 
 : effect= ( effect1 effect2 -- ? )
-    [ [ in>> length ] same? ]
-    [ [ out>> length ] same? ]
-    [ [ terminated?>> ] same? ]
-    2tri and and ;
+    2dup [ in>> length ] same? [
+        2dup [ out>> length ] same? [
+            [ terminated?>> ] same?
+        ] [ 2drop f ] if
+    ] [ 2drop f ] if ;
 
 GENERIC: effect>string ( obj -- str )
 M: string effect>string ;
@@ -105,13 +106,7 @@ M: word stack-effect
 M: deferred stack-effect call-next-method ( -- * ) or ;
 
 M: effect clone
-    {
-        [ in>> clone ]
-        [ out>> clone ]
-        [ terminated?>> ]
-        [ in-var>> ]
-        [ out-var>> ]
-    } cleave effect boa ;
+    (clone) [ clone ] change-in [ clone ] change-out ;
 
 : stack-height ( word -- n )
     stack-effect effect-height ; inline
