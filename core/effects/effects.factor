@@ -106,7 +106,13 @@ M: word stack-effect
 M: deferred stack-effect call-next-method ( -- * ) or ;
 
 M: effect clone
-    (clone) [ clone ] change-in [ clone ] change-out ;
+    {
+        [ in>> clone ]
+        [ out>> clone ]
+        [ terminated?>> ]
+        [ in-var>> ]
+        [ out-var>> ]
+    } cleave effect boa ;
 
 : stack-height ( word -- n )
     stack-effect effect-height ; inline
