@@ -10,7 +10,7 @@ PREDICATE: intersection-class < class
 
 <PRIVATE
 
-: intersection-predicate-quot ( members -- quot )
+: intersection-predicate-quot ( participants -- quot )
     [
         [ drop t ]
     ] [
@@ -53,6 +53,9 @@ M: anonymous-intersection (flatten-class)
 
 M: anonymous-intersection class-name
     participants>> [ class-name ] map join-words ;
+
+M: anonymous-intersection predicate-def
+    participants>> intersection-predicate-quot ;
 
 PRIVATE>
 
