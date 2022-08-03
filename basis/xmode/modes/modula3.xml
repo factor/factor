@@ -10,25 +10,25 @@
 		<PROPERTY NAME="commentStart" VALUE="(*" />
 		<PROPERTY NAME="commentEnd" VALUE="*)" />
 	</PROPS>
-	<RULES ESCAPE="\" IGNORE_CASE="TRUE" HIGHLIGHT_DIGITS="TRUE">
+	<RULES IGNORE_CASE="TRUE" HIGHLIGHT_DIGITS="TRUE">
 		<!-- Comment -->
 		<!-- Compiler directives. -->
 		<SPAN TYPE="COMMENT2">
 			<BEGIN>&lt;*</BEGIN>
 			<END>*&gt;</END>
 		</SPAN>
-		
+
 		<SPAN TYPE="COMMENT1">
 			<BEGIN>(*</BEGIN>
 			<END>*)</END>
 		</SPAN>
 
 		<!-- Standard literals -->
-		<SPAN TYPE="LITERAL1" NO_LINE_BREAK="TRUE">
+		<SPAN TYPE="LITERAL1" ESCAPE="\" NO_LINE_BREAK="TRUE">
 			<BEGIN>"</BEGIN>
 			<END>"</END>
 		</SPAN>
-		<SPAN TYPE="LITERAL1" NO_LINE_BREAK="TRUE">
+		<SPAN TYPE="LITERAL1" ESCAPE="\" NO_LINE_BREAK="TRUE">
 			<BEGIN>'</BEGIN>
 			<END>'</END>
 		</SPAN>
@@ -152,7 +152,7 @@
 			<LITERAL2>MAX</LITERAL2>
 			<LITERAL2>NULL</LITERAL2>
 			<LITERAL2>SUBARRAY</LITERAL2>
-			
+
 			<!-- Standard interfaces -->
 			<!--  http://www.research.compaq.com/SRC/m3defn/html/intfs.html -->
 			<KEYWORD2>Text</KEYWORD2>
@@ -172,7 +172,7 @@
 			<KEYWORD3>Lex</KEYWORD3>
 			<KEYWORD3>Pickle</KEYWORD3>
 			<KEYWORD3>Table</KEYWORD3>
-			
+
 		</KEYWORDS>
 	</RULES>
 </MODE>

@@ -19,8 +19,7 @@
 			VALUE="^.*(default:\s*|case.*:.*)$" />
 		<PROPERTY NAME="electricKeys" VALUE=":" />
 	</PROPS>
-	<RULES ESCAPE="\"
-		IGNORE_CASE="FALSE"
+	<RULES IGNORE_CASE="FALSE"
 		HIGHLIGHT_DIGITS="TRUE"
 		DIGIT_RE="(0x[\p{XDigit}]+[lL]?|[\p{Digit}]+(e[\p{Digit}]*)?[lLdDfF]?)">
 
@@ -35,17 +34,17 @@
 		<EOL_SPAN TYPE="COMMENT2">//</EOL_SPAN>
 
 		<!-- verbatim strings -->
-		<SPAN TYPE="LITERAL3" NO_LINE_BREAK="FALSE" NO_ESCAPE="TRUE">
+		<SPAN TYPE="LITERAL3" NO_LINE_BREAK="FALSE">
 			<BEGIN>@"</BEGIN>
 			<END>"</END>
 		</SPAN>
 
-		<SPAN TYPE="LITERAL1" NO_LINE_BREAK="TRUE">
+		<SPAN TYPE="LITERAL1" ESCAPE="\" NO_LINE_BREAK="TRUE">
 			<BEGIN>"</BEGIN>
 			<END>"</END>
 		</SPAN>
 
-		<SPAN TYPE="LITERAL1" NO_LINE_BREAK="TRUE">
+		<SPAN TYPE="LITERAL1" ESCAPE="\" NO_LINE_BREAK="TRUE">
 			<BEGIN>'</BEGIN>
 			<END>'</END>
 		</SPAN>
@@ -92,6 +91,7 @@
 
 		<KEYWORDS>
 			<KEYWORD1>abstract</KEYWORD1>
+			<KEYWORD1>alias</KEYWORD1>
 			<KEYWORD1>as</KEYWORD1>
 			<KEYWORD1>base</KEYWORD1>
 			<KEYWORD1>break</KEYWORD1>
@@ -111,6 +111,7 @@
 			<KEYWORD1>fixed</KEYWORD1>
 			<KEYWORD1>for</KEYWORD1>
 			<KEYWORD1>foreach</KEYWORD1>
+			<KEYWORD1>from</KEYWORD1>
 			<KEYWORD1>goto</KEYWORD1>
 			<KEYWORD1>if</KEYWORD1>
 			<KEYWORD1>implicit</KEYWORD1>
@@ -123,6 +124,7 @@
 			<KEYWORD1>out</KEYWORD1>
 			<KEYWORD1>override</KEYWORD1>
 			<KEYWORD1>params</KEYWORD1>
+			<KEYWORD1>partial</KEYWORD1>
 			<KEYWORD1>private</KEYWORD1>
 			<KEYWORD1>protected</KEYWORD1>
 			<KEYWORD1>public</KEYWORD1>
@@ -130,6 +132,7 @@
 			<KEYWORD1>ref</KEYWORD1>
 			<KEYWORD1>return</KEYWORD1>
 			<KEYWORD1>sealed</KEYWORD1>
+			<KEYWORD1>select</KEYWORD1>
 			<KEYWORD1>sizeof</KEYWORD1>
 			<KEYWORD1>stackalloc</KEYWORD1>
 			<KEYWORD1>static</KEYWORD1>
@@ -141,6 +144,8 @@
 			<KEYWORD1>unsafe</KEYWORD1>
 			<KEYWORD1>virtual</KEYWORD1>
 			<KEYWORD1>while</KEYWORD1>
+			<KEYWORD1>where</KEYWORD1>
+			<KEYWORD1>yield</KEYWORD1>
 
 			<KEYWORD2>using</KEYWORD2>
 			<KEYWORD2>namespace</KEYWORD2>
@@ -150,6 +155,7 @@
 			<KEYWORD3>char</KEYWORD3>
 			<KEYWORD3>class</KEYWORD3>
 			<KEYWORD3>double</KEYWORD3>
+			<KEYWORD3>dynamic</KEYWORD3>
 			<KEYWORD3>enum</KEYWORD3>
 			<KEYWORD3>event</KEYWORD3>
 			<KEYWORD3>float</KEYWORD3>
@@ -164,6 +170,7 @@
 			<KEYWORD3>uint</KEYWORD3>
 			<KEYWORD3>ulong</KEYWORD3>
 			<KEYWORD3>ushort</KEYWORD3>
+			<KEYWORD3>var</KEYWORD3>
 			<KEYWORD3>void</KEYWORD3>
 
 			<LITERAL2>false</LITERAL2>

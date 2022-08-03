@@ -1,0 +1,51 @@
+<?xml version="1.0"?>
+<!DOCTYPE MODE SYSTEM "xmode.dtd">
+
+<!-- CPlex LP mode, by Kevin Hunter Kesling for jEdit 4.5+ -->
+<!-- Note that this follows CanJS's implementation of Mustache, as at least -->
+<!-- some of us appreciate some logic in our templates. -->
+<!-- License: GPLv3+ -->
+
+<MODE>
+	<RULES IGNORE_CASE="FALSE" HIGHLIGHT_DIGITS="FALSE">
+
+		<SPAN TYPE="COMMENT1">
+			<BEGIN>{{!</BEGIN>
+			<END>}}</END>
+		</SPAN>
+
+		<SEQ TYPE="KEYWORD3">{{else}}</SEQ>
+		<SEQ TYPE="KEYWORD2">{{.}}</SEQ>
+
+		<SPAN TYPE="COMMENT3" MATCH_TYPE="KEYWORD4">
+			<BEGIN>{{&gt;</BEGIN>
+			<END>}}</END>
+		</SPAN>
+
+		<SPAN_REGEXP HASH_CHAR="{" MATCH_TYPE="KEYWORD3" DELEGATE='MAIN'>
+			<BEGIN><![CDATA[\{\{#(each|if) .*?\}\}]]></BEGIN>
+			<END>{{/$1}}</END>
+		</SPAN_REGEXP>
+
+		<SPAN_REGEXP HASH_CHAR="{" MATCH_TYPE="KEYWORD2" DELEGATE='MAIN'>
+			<BEGIN><![CDATA[\{\{#([\p{Alnum}_\.]+)\}\}]]></BEGIN>
+			<END>{{/$1}}</END>
+		</SPAN_REGEXP>
+
+		<SEQ_REGEXP HASH_CHAR="{" TYPE='LITERAL2'>\{\{[A-z_][A-z_.]*\}\}</SEQ_REGEXP>
+
+		<SPAN TYPE="MARKUP" DELEGATE="javascript::MAIN">
+			<BEGIN>&lt;%</BEGIN>
+			<END>%&gt;</END>
+		</SPAN>
+
+		<SEQ TYPE="KEYWORD4">{{{</SEQ>
+		<MARK_PREVIOUS TYPE="LITERAL4" MATCH_TYPE="KEYWORD4">}}}</MARK_PREVIOUS>
+
+		<SEQ TYPE="KEYWORD4">{{</SEQ>
+		<MARK_PREVIOUS TYPE="LITERAL2" MATCH_TYPE="KEYWORD4">}}</MARK_PREVIOUS>
+
+		<IMPORT DELEGATE="html::MAIN" />
+
+	</RULES>
+</MODE>

@@ -3,80 +3,81 @@
 <!DOCTYPE MODE SYSTEM "xmode.dtd">
 
 <MODE>
-    <PROPS>
-        <PROPERTY NAME="lineComment" VALUE="#" />
-        <PROPERTY NAME="wordBreakChars" VALUE="_,+-=&lt;&gt;/?^&amp;*" />
+	<PROPS>
+		<PROPERTY NAME="lineComment" VALUE="#"/>
+		<PROPERTY NAME="wordBreakChars" VALUE="_,+-=&lt;&gt;/?^&amp;*"/>
 
-        <!-- Auto indent -->
-        <PROPERTY NAME="indentOpenBrackets" VALUE="{" />
-        <PROPERTY NAME="indentCloseBrackets" VALUE="}" />
-        <PROPERTY NAME="indentNextLine"
-            VALUE="\s*(((if|while)\s*\(|else\s*|else\s+if\s*\(|for\s*\(.*\))[^{;]*)" />
-        <!-- set this to 'true' if you want to use GNU coding style -->
-        <PROPERTY NAME="doubleBracketIndent" VALUE="false" />
-    </PROPS>
-    <RULES ESCAPE="\"
-        IGNORE_CASE="FALSE"
-        HIGHLIGHT_DIGITS="TRUE"
-        DIGIT_RE="(0x[\p{XDigit}]+[lL]?|[\p{Digit}]+(e[\p{Digit}]*)?[lLdDfF]?)">
+		<!-- Auto indent -->
+		<PROPERTY NAME="indentOpenBrackets" VALUE="{"/>
+		<PROPERTY NAME="indentCloseBrackets" VALUE="}"/>
+		<PROPERTY NAME="indentNextLine"
+			  VALUE="\s*(((if|while)\s*\(|else\s*|else\s+if\s*\(|for\s*\(.*\))[^{;]*)"/>
+		<!-- set this to 'true' if you want to use GNU coding style -->
+		<PROPERTY NAME="doubleBracketIndent" VALUE="false"/>
+		<PROPERTY NAME="contextInsensitive" VALUE="true"/>
+	</PROPS>
+	<RULES IGNORE_CASE="FALSE"
+	       HIGHLIGHT_DIGITS="TRUE"
+	       DIGIT_RE="(0x[\p{XDigit}]+[lL]?|[\p{Digit}]+(e[\p{Digit}]*)?[lLdDfF]?)">
 
-        <SPAN TYPE="LITERAL1" NO_LINE_BREAK="TRUE">
-            <BEGIN>"</BEGIN>
-            <END>"</END>
-        </SPAN>
-        <SPAN TYPE="LITERAL1" NO_LINE_BREAK="TRUE">
-            <BEGIN>'</BEGIN>
-            <END>'</END>
-        </SPAN>
+		<SPAN TYPE="LITERAL1" ESCAPE="\" NO_LINE_BREAK="TRUE">
+			<BEGIN>"</BEGIN>
+			<END>"</END>
+		</SPAN>
+		<SPAN TYPE="LITERAL1" ESCAPE="\" NO_LINE_BREAK="TRUE">
+			<BEGIN>'</BEGIN>
+			<END>'</END>
+		</SPAN>
 
-        <EOL_SPAN TYPE="COMMENT1">#</EOL_SPAN>
-        <SEQ TYPE="OPERATOR">=</SEQ>
-        <SEQ TYPE="OPERATOR">!</SEQ>
-        <SEQ TYPE="OPERATOR">_</SEQ>
-        <SEQ TYPE="OPERATOR">&gt;=</SEQ>
-        <SEQ TYPE="OPERATOR">&lt;=</SEQ>
-        <SEQ TYPE="OPERATOR">&lt;-</SEQ>
-        <SEQ TYPE="OPERATOR">+</SEQ>
-        <SEQ TYPE="OPERATOR">-</SEQ>
-        <SEQ TYPE="OPERATOR">/</SEQ>
+		<EOL_SPAN TYPE="COMMENT1">#</EOL_SPAN>
+		<SEQ TYPE="OPERATOR">=</SEQ>
+		<SEQ TYPE="OPERATOR">!</SEQ>
+		<SEQ TYPE="OPERATOR">_</SEQ>
+		<SEQ TYPE="OPERATOR">&gt;=</SEQ>
+		<SEQ TYPE="OPERATOR">&lt;=</SEQ>
+		<SEQ TYPE="OPERATOR">&lt;-</SEQ>
+		<SEQ TYPE="OPERATOR">+</SEQ>
+		<SEQ TYPE="OPERATOR">-</SEQ>
+		<SEQ TYPE="OPERATOR">/</SEQ>
 
-        <SEQ TYPE="OPERATOR">*</SEQ>
-        <SEQ TYPE="OPERATOR">&gt;</SEQ>
-        <SEQ TYPE="OPERATOR">&lt;</SEQ>
-        <SEQ TYPE="OPERATOR">%</SEQ>
-        <SEQ TYPE="OPERATOR">&amp;</SEQ>
-        <SEQ TYPE="OPERATOR">|</SEQ>
-        <SEQ TYPE="OPERATOR">^</SEQ>
-        <SEQ TYPE="OPERATOR">~</SEQ>
-        <SEQ TYPE="OPERATOR">}</SEQ>
-        <SEQ TYPE="OPERATOR">{</SEQ>
-        <MARK_PREVIOUS AT_WHITESPACE_END="TRUE"
-            MATCH_TYPE="OPERATOR"
-            TYPE="LABEL">:</MARK_PREVIOUS>
+		<SEQ TYPE="OPERATOR">*</SEQ>
+		<SEQ TYPE="OPERATOR">&gt;</SEQ>
+		<SEQ TYPE="OPERATOR">&lt;</SEQ>
+		<SEQ TYPE="OPERATOR">%</SEQ>
+		<SEQ TYPE="OPERATOR">&amp;</SEQ>
+		<SEQ TYPE="OPERATOR">|</SEQ>
+		<SEQ TYPE="OPERATOR">^</SEQ>
+		<SEQ TYPE="OPERATOR">~</SEQ>
+		<SEQ TYPE="OPERATOR">}</SEQ>
+		<SEQ TYPE="OPERATOR">{</SEQ>
+		<MARK_PREVIOUS AT_WHITESPACE_END="TRUE"
+			       MATCH_TYPE="OPERATOR"
+			       TYPE="LABEL">:
+		</MARK_PREVIOUS>
 
-        <!-- Function calls -->
-        <MARK_PREVIOUS TYPE="FUNCTION" MATCH_TYPE="OPERATOR">(</MARK_PREVIOUS>
+		<!-- Function calls -->
+		<MARK_PREVIOUS TYPE="FUNCTION" MATCH_TYPE="OPERATOR">(</MARK_PREVIOUS>
 		<SEQ TYPE="OPERATOR">)</SEQ>
 
-        <KEYWORDS>
-            <KEYWORD1>break</KEYWORD1>
-            <KEYWORD1>case</KEYWORD1>
-            <KEYWORD1>continue</KEYWORD1>
-            <KEYWORD1>default</KEYWORD1>
-            <KEYWORD1>do</KEYWORD1>
-            <KEYWORD1>else</KEYWORD1>
-            <KEYWORD1>for</KEYWORD1>
-            <KEYWORD1>goto</KEYWORD1>
-            <KEYWORD1>if</KEYWORD1>
-            <KEYWORD1>return</KEYWORD1>
-            <KEYWORD1>sizeof</KEYWORD1>
-            <KEYWORD1>switch</KEYWORD1>
-            <KEYWORD1>while</KEYWORD1>
+		<KEYWORDS>
+			<KEYWORD1>break</KEYWORD1>
+			<KEYWORD1>case</KEYWORD1>
+			<KEYWORD1>continue</KEYWORD1>
+			<KEYWORD1>default</KEYWORD1>
+			<KEYWORD1>do</KEYWORD1>
+			<KEYWORD1>else</KEYWORD1>
+			<KEYWORD1>for</KEYWORD1>
+			<KEYWORD1>goto</KEYWORD1>
+			<KEYWORD1>if</KEYWORD1>
+			<KEYWORD1>return</KEYWORD1>
+			<KEYWORD1>sizeof</KEYWORD1>
+			<KEYWORD1>switch</KEYWORD1>
+			<KEYWORD1>while</KEYWORD1>
 
-            <KEYWORD1>function</KEYWORD1>
+			<KEYWORD1>function</KEYWORD1>
 
-            <LITERAL2>T</LITERAL2>
-            <LITERAL2>F</LITERAL2>
-        </KEYWORDS>
-    </RULES>
+			<LITERAL2>T</LITERAL2>
+			<LITERAL2>F</LITERAL2>
+		</KEYWORDS>
+	</RULES>
 </MODE>

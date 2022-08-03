@@ -11,7 +11,7 @@
 		<PROPERTY NAME="lineComment" VALUE="--" />
 		<PROPERTY NAME="wordBreakChars" VALUE=",+-=&lt;&gt;/?^&amp;*" />
 	</PROPS>
-	<RULES ESCAPE="\" IGNORE_CASE="TRUE" HIGHLIGHT_DIGITS="TRUE">
+	<RULES IGNORE_CASE="TRUE" HIGHLIGHT_DIGITS="TRUE">
 
 		<SPAN TYPE="COMMENT1">
 			<BEGIN>(*</BEGIN>
@@ -19,15 +19,15 @@
 		</SPAN>
 		<EOL_SPAN TYPE="COMMENT1">--</EOL_SPAN>
 
-		<SPAN TYPE="LITERAL1" NO_LINE_BREAK="TRUE">
+		<SPAN TYPE="LITERAL1" ESCAPE="\" NO_LINE_BREAK="TRUE">
 			<BEGIN>"</BEGIN>
 			<END>"</END>
 		</SPAN>
-		<SPAN TYPE="LITERAL1" NO_LINE_BREAK="TRUE">
+		<SPAN TYPE="LITERAL1" ESCAPE="\" NO_LINE_BREAK="TRUE">
 			<BEGIN>'</BEGIN>
 			<END>'</END>
 		</SPAN>
-		
+
 		<SEQ TYPE="OPERATOR">(</SEQ>
 		<SEQ TYPE="OPERATOR">)</SEQ>
 		<SEQ TYPE="OPERATOR">+</SEQ>
@@ -41,7 +41,7 @@
 		<SEQ TYPE="OPERATOR">&gt;</SEQ>
 		<SEQ TYPE="OPERATOR">&gt;=</SEQ>
 		<SEQ TYPE="OPERATOR">=</SEQ>
-		<SEQ TYPE="OPERATOR">­</SEQ>
+		<SEQ TYPE="OPERATOR">Â­</SEQ>
 
 	<!-- Constants -->
 		<SEQ_REGEXP
@@ -59,7 +59,7 @@
 			HASH_CHAR="white"
 			AT_WORD_START="TRUE"
 		>white[\t\s]+space</SEQ_REGEXP>
-		
+
 		<!-- Text Styles -->
 		<SEQ_REGEXP
 			TYPE="LITERAL2"
@@ -75,14 +75,14 @@
 			HASH_CHAR="small"
 			AT_WORD_START="TRUE"
 		>small[\t\s]+caps</SEQ_REGEXP>
-	
+
 	<!-- Predefined Variables -->
 		<SEQ_REGEXP
 			TYPE="KEYWORD3"
 			HASH_CHAR="missing"
 			AT_WORD_START="TRUE"
 		>missing[\t\s]+value</SEQ_REGEXP>
-		
+
 		<KEYWORDS>
 		<!-- Keywords -->
 			<KEYWORD1>script</KEYWORD1>
@@ -124,7 +124,7 @@
 			<KEYWORD1>put</KEYWORD1>
 			<KEYWORD1>into</KEYWORD1>
 			<KEYWORD1>is</KEYWORD1>
-		
+
 		<!-- References -->
 			<KEYWORD2>each</KEYWORD2>
 			<KEYWORD2>some</KEYWORD2>
@@ -158,7 +158,7 @@
 			<KEYWORD2>after</KEYWORD2>
 			<KEYWORD2>beginning</KEYWORD2>
 			<KEYWORD2>the</KEYWORD2>
-		
+
 		<!-- Commands -->
 			<KEYWORD3>close</KEYWORD3>
 			<KEYWORD3>copy</KEYWORD3>
@@ -176,7 +176,7 @@
 			<KEYWORD3>run</KEYWORD3>
 			<KEYWORD3>save</KEYWORD3>
 			<KEYWORD3>saving</KEYWORD3>
-		
+
 		<!-- Predefined Variables -->
 			<LITERAL2>it</LITERAL2>
 			<LITERAL2>me</LITERAL2>
@@ -186,14 +186,14 @@
 			<LITERAL2>space</LITERAL2>
 			<LITERAL2>tab</LITERAL2>
 			<LITERAL2>anything</LITERAL2>
-		
+
 		<!-- Constants -->
 			<LITERAL2>case</LITERAL2>
 			<LITERAL2>diacriticals</LITERAL2>
 			<LITERAL2>expansion</LITERAL2>
 			<LITERAL2>hyphens</LITERAL2>
 			<LITERAL2>punctuation</LITERAL2>
-			
+
 			<!-- Text Styles -->
 			<LITERAL2>bold</LITERAL2>
 			<LITERAL2>condensed</LITERAL2>
@@ -207,16 +207,16 @@
 			<LITERAL2>subscript</LITERAL2>
 			<LITERAL2>superscript</LITERAL2>
 			<LITERAL2>underline</LITERAL2>
-			
+
 			<!-- Save options -->
 			<LITERAL2>ask</LITERAL2>
 			<LITERAL2>no</LITERAL2>
 			<LITERAL2>yes</LITERAL2>
-			
+
 			<!-- Booleans -->
 			<LITERAL2>false</LITERAL2>
 			<LITERAL2>true</LITERAL2>
-			
+
 			<!-- Date & Time -->
 			<LITERAL2>weekday</LITERAL2>
 			<LITERAL2>monday</LITERAL2>
@@ -233,7 +233,7 @@
 			<LITERAL2>sat</LITERAL2>
 			<LITERAL2>sunday</LITERAL2>
 			<LITERAL2>sun</LITERAL2>
-			
+
 			<LITERAL2>month</LITERAL2>
 			<LITERAL2>january</LITERAL2>
 			<LITERAL2>jan</LITERAL2>
@@ -258,12 +258,12 @@
 			<LITERAL2>nov</LITERAL2>
 			<LITERAL2>december</LITERAL2>
 			<LITERAL2>dec</LITERAL2>
-			
+
 			<LITERAL2>minutes</LITERAL2>
 			<LITERAL2>hours</LITERAL2>
 			<LITERAL2>days</LITERAL2>
 			<LITERAL2>weeks</LITERAL2>
-			
+
 		<!-- Operators -->
 			<OPERATOR>div</OPERATOR>
 			<OPERATOR>mod</OPERATOR>

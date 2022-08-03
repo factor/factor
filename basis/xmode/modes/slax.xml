@@ -1,0 +1,150 @@
+<?xml version="1.0"?>
+<!DOCTYPE MODE SYSTEM "xmode.dtd">
+
+<!-- SLAX Script mode written by Curtis Call  
+
+     Types:
+     
+        LITERAL1 = " " Strings 
+        LITERAL2 = ' ' Strings
+        LITERAL3 = /* */ Comments, Operators, Location Paths, Namespace prefix declarations
+        KEYWORD1 = SLAX statements
+        KEYWORD2 = Variables
+        KEYWORD3 = XML Tags
+        KEYWORD4 = Attributes
+        FUNCTION = Templates
+        DIGIT = Numbers
+     
+     Note - LITERAL3 had to highlight different types due to the quirks of the matching
+     possibilities.  The main problem is with trying to match comments that follow a line
+     termination.  I could determine no possible way to correctly match only correct comments
+     and to also use the correct color for the comment as well as the line termination.  The 
+     workaround was to combine multiple types of syntax into the LITERAL3 value. 
+     This is why operators are not matched.  They have to be grouped in along with the rest
+     so it is ok to let them be caught by default.  -->
+     
+<MODE>
+
+    <PROPS>
+        <!-- SLAX has no line comment, only a /* */ comment -->
+        <PROPERTY NAME="commentStart" VALUE="/*"/>
+        <PROPERTY NAME="commentEnd" VALUE="*/"/>
+    
+        <!--  - and _ and : are valid within SLAX words -->
+        <PROPERTY NAME="wordBreakChars" VALUE=",/+=*"/>
+        <PROPERTY NAME="noWordSep" VALUE="-_:."/>
+    
+        <!-- { and } always surround SLAX code blocks, but I cannot get auto-indenting
+             to work correctly so I'll just disable the functionality.
+        <PROPERTY NAME="indentOpenBrackets" VALUE="{"/>
+        <PROPERTY NAME="indentCloseBrackets" VALUE="}"/>
+        <PROPERTY NAME="unalignedOpenBrackets" VALUE="("/>
+        <PROPERTY NAME="unalignedCloseBrackets" VALUE=")"/>
+                                                            -->
+    </PROPS>
+    
+    <RULES IGNORE_CASE="TRUE" HIGHLIGHT_DIGITS="TRUE" NO_WORD_SEP="-_:." 
+        DIGIT_RE="([0-9])*\.?([0-9])+" DEFAULT="LITERAL3">
+
+        <IMPORT DELEGATE="leading-comments"/>
+        <IMPORT DELEGATE="strings"/>
+        <IMPORT DELEGATE="variables"/>
+        <IMPORT DELEGATE="templates"/>
+        <IMPORT DELEGATE="statements"/>
+        <IMPORT DELEGATE="xml-tags"/>
+        <IMPORT DELEGATE="trailing-comments"/>
+    </RULES>
+
+    <!-- These comments start the line so it is obvious that they are not location paths -->
+    <RULES SET="leading-comments">
+        <SPAN TYPE="LITERAL3" AT_WHITESPACE_END="TRUE">
+            <BEGIN>/*</BEGIN> 
+            <END>*/</END>
+        </SPAN>
+    </RULES>
+        
+    <!-- These comments trail at the end of the line - impossible to catch and maintain separate
+         colors with operators -->
+    <RULES SET="trailing-comments">
+        <SPAN_REGEXP TYPE="LITERAL3">
+            <BEGIN>((;)|(\})|(\{)|(\)))(\s)*/\*</BEGIN> 
+            <END>*/</END>
+        </SPAN_REGEXP>
+    </RULES>
+        
+    <!-- Both " " and ' ' strings are correctly caught -->
+    <RULES SET="strings">
+        <SPAN TYPE="LITERAL1" ESCAPE="\">
+            <BEGIN>"</BEGIN>
+            <END>"</END>
+        </SPAN>
+        <SPAN TYPE="LITERAL2" ESCAPE="\">
+            <BEGIN>'</BEGIN>
+            <END>'</END>
+        </SPAN>
+    </RULES>
+    
+    <!-- The XML start tag is embedded in SLAX scripts -->
+    <RULES SET="xml-tags" DEFAULT="KEYWORD3">
+        <SPAN_REGEXP TYPE="KEYWORD3" DELEGATE="inside-the-tag">
+            <BEGIN><![CDATA[<([a-z]|[A-Z])]]></BEGIN>
+            <END><![CDATA[>]]></END>
+        </SPAN_REGEXP>
+    </RULES>
+    
+    <!-- This sets the actual tag < > and tag name to KEYWORD3, the = to LITERAL3
+         and sends the attributes to the attribute RULES and strings to string RULES -->
+    <RULES SET="inside-the-tag" DEFAULT="KEYWORD3">
+        <SPAN_REGEXP TYPE="LITERAL3" DELEGATE="attribute">
+            <BEGIN>(\s)+(?!&gt;)</BEGIN>
+            <END>=</END>
+        </SPAN_REGEXP>
+        <IMPORT DELEGATE="strings"/>
+    </RULES>
+    
+    <!-- XML attributes are KEYWORD4 -->
+    <RULES SET="attribute" DEFAULT="KEYWORD4">
+    </RULES>
+
+    <!-- Applies to both variables and parameters, everything that starts with a $ -->
+    <RULES SET="variables">
+        <MARK_FOLLOWING TYPE="KEYWORD2">$</MARK_FOLLOWING>
+    </RULES>
+
+    <!-- Anything that is immediately prior to a ( will be set to FUNCTION and the ( to
+         LITERAL3 -->
+    <RULES SET="templates">
+        <MARK_PREVIOUS TYPE="FUNCTION" MATCH_TYPE="LITERAL3">(</MARK_PREVIOUS>
+    </RULES>
+
+    <!-- This is the SLAX statement set, they use KEYWORD1 -->
+    <RULES SET="statements">
+        <KEYWORDS>
+            <KEYWORD1>if</KEYWORD1>
+            <KEYWORD1>version</KEYWORD1>
+            <KEYWORD1>ns</KEYWORD1>
+            <KEYWORD1>param</KEYWORD1>
+            <KEYWORD1>var</KEYWORD1>
+            <KEYWORD1>template</KEYWORD1>
+            <KEYWORD1>match</KEYWORD1>
+            <KEYWORD1>else</KEYWORD1>
+            <KEYWORD1>copy-of</KEYWORD1>
+            <KEYWORD1>copy</KEYWORD1>
+            <KEYWORD1>call</KEYWORD1>
+            <KEYWORD1>apply-templates</KEYWORD1>
+            <KEYWORD1>expr</KEYWORD1>
+            <KEYWORD1>import</KEYWORD1>
+            <KEYWORD1>input</KEYWORD1>
+            <KEYWORD1>for-each</KEYWORD1>
+            <KEYWORD1>mode</KEYWORD1>
+            <KEYWORD1>priority</KEYWORD1>
+            <KEYWORD1>extension</KEYWORD1>
+            <KEYWORD1>preserve-space</KEYWORD1>
+            <KEYWORD1>strip-space</KEYWORD1>
+            <KEYWORD1>with</KEYWORD1>
+        </KEYWORDS>
+    </RULES>
+
+</MODE>
+
+ 	  	 

@@ -3,13 +3,13 @@
 <!DOCTYPE MODE SYSTEM "xmode.dtd">
 
 <!-- Extension of c.xml to add C++ specific syntax. -->
+<!-- With some Qt keywords added -->
 <MODE>
     <PROPS>
         <PROPERTY NAME="commentStart" VALUE="/*" />
         <PROPERTY NAME="commentEnd" VALUE="*/" />
         <PROPERTY NAME="lineComment" VALUE="//" />
         <PROPERTY NAME="wordBreakChars" VALUE=",+-=&lt;&gt;/?^&amp;*" />
-
 
         <!-- Auto indent -->
         <PROPERTY NAME="indentOpenBrackets" VALUE="{" />
@@ -19,12 +19,12 @@
         <PROPERTY NAME="indentNextLine"
             VALUE="(?!^\s*(#|//)).*(\b(if|while|for)\s*\(.*\)|\b(else|do)\b)[^{;]*$" />
         <PROPERTY NAME="unindentThisLine"
-            VALUE="^\s*((case\b.*|[\p{Alpha}_][\p{Alnum}_]*)\s*:(?!:)).*$" />
+            VALUE="^\s*((.*case\b.*|[\p{Alpha}_][\p{Alnum}_]*)\s*(slots)?:(?!:)).*$" />
         <PROPERTY NAME="electricKeys" VALUE=":" />
     </PROPS>
 
     <RULES
-        ESCAPE="\" IGNORE_CASE="FALSE"
+        IGNORE_CASE="FALSE"
         HIGHLIGHT_DIGITS="TRUE" DIGIT_RE="[0-9][0-9a-zA-Z]*">
         <EOL_SPAN TYPE="KEYWORD2" AT_WHITESPACE_END="TRUE" DELEGATE="CPP">#</EOL_SPAN>
 
@@ -34,22 +34,39 @@
 
     <!-- Core C++ language -->
     <RULES SET="LEX"
-        ESCAPE="\" IGNORE_CASE="FALSE"
+        IGNORE_CASE="FALSE"
         HIGHLIGHT_DIGITS="TRUE" DIGIT_RE="[0-9][0-9a-zA-Z]*">
 
         <!-- A hack not to mark namespace qualification like "std::"
             as labels. -->
         <SEQ TYPE="OPERATOR">::</SEQ>
 
-        <IMPORT DELEGATE="c::LEX"/>
+        <IMPORT DELEGATE="c::COMMENTS" /> <!-- import from C mode -->
+
+        <IMPORT DELEGATE="LEXER" />
+        <IMPORT DELEGATE="c::C_LEXER" /> <!-- import from C mode -->
+    </RULES>
+
+    <RULES SET="LEXER"
+        IGNORE_CASE="FALSE">
+
+        <!-- String/char literals -->
+        <SPAN_REGEXP TYPE="LITERAL1" NO_LINE_BREAK="TRUE" ESCAPE="\">
+            <BEGIN>(?:u8|u|U)("|')</BEGIN>
+            <END>$1</END>
+        </SPAN_REGEXP>
+        <SPAN_REGEXP TYPE="LITERAL1">
+            <BEGIN>(?:L|u8|u|U)?R"([^()\\\s]*)\(</BEGIN>
+            <END>)$1"</END>
+        </SPAN_REGEXP>
     </RULES>
 
     <!-- Core C++ language -->
     <RULES SET="CORE"
-        ESCAPE="\" IGNORE_CASE="FALSE"
+        IGNORE_CASE="FALSE"
         HIGHLIGHT_DIGITS="TRUE" DIGIT_RE="[0-9][0-9a-zA-Z]*">
 
-        <IMPORT DELEGATE="c::CORE"/>
+        <IMPORT DELEGATE="c::CORE"/> <!-- import from C mode -->
 
         <KEYWORDS>
             <KEYWORD3>catch</KEYWORD3>
@@ -67,6 +84,8 @@
             <KEYWORD1>private</KEYWORD1>
             <KEYWORD1>protected</KEYWORD1>
             <KEYWORD1>public</KEYWORD1>
+            <KEYWORD1>signals</KEYWORD1>
+            <KEYWORD1>slots</KEYWORD1>
             <KEYWORD3>reinterpret_cast</KEYWORD3>
             <KEYWORD3>static_assert</KEYWORD3>
             <KEYWORD3>static_cast</KEYWORD3>
@@ -78,19 +97,55 @@
             <KEYWORD3>typename</KEYWORD3>
             <KEYWORD2>using</KEYWORD2>
             <KEYWORD1>virtual</KEYWORD1>
+            <KEYWORD3>wchar_t</KEYWORD3>             <!-- type, kw3 -->
+
+            <!-- TM -->
+            <KEYWORD1>atomic_cancel</KEYWORD1>       <!-- block, kw1 -->
+            <KEYWORD1>atomic_commit</KEYWORD1>       <!-- block, kw1 -->
+            <KEYWORD1>atomic_noexcept</KEYWORD1>     <!-- block, kw1 -->
+            <KEYWORD1>synchronized</KEYWORD1>        <!-- block, kw1 -->
+            <KEYWORD1>transaction_safe</KEYWORD1>    <!-- block, kw1 -->
+            <KEYWORD1>transaction_safe_dynamic</KEYWORD1> <!-- block, kw1 -->
+
+            <!-- coroutines -->
+            <KEYWORD1>co_await</KEYWORD1>            <!-- statement, kw1 -->
+            <KEYWORD1>co_return</KEYWORD1>           <!-- statement, kw1 -->
+            <KEYWORD1>co_yield</KEYWORD1>            <!-- statement, kw1 -->
+
+            <!-- modules -->
+            <KEYWORD2>import</KEYWORD2>              <!-- declaration, kw2 -->
+            <KEYWORD2>module</KEYWORD2>              <!-- declaration, kw2 -->
+
+            <!-- since C++11 -->
+            <KEYWORD1>alignas</KEYWORD1>             <!-- specifier, kw1 -->
+            <KEYWORD1>alignof</KEYWORD1>             <!-- operator, kw1 -->
+            <KEYWORD3>char16_t</KEYWORD3>            <!-- type, kw 3 -->
+            <KEYWORD3>char32_t</KEYWORD3>            <!-- type, kw 3 -->
+            <KEYWORD1>constexpr</KEYWORD1>           <!-- kw1 -->
+            <KEYWORD3>decltype</KEYWORD3>            <!-- kw3 -->
+            <KEYWORD1>final</KEYWORD1>               <!-- kw1 -->
+            <KEYWORD2>noexcept</KEYWORD2>            <!-- kw2 as decl, ?? as func -->
+            <LITERAL2>nullptr</LITERAL2>             <!-- value, literal 2 -->
+            <KEYWORD1>override</KEYWORD1>            <!-- kw1 -->
+            <KEYWORD2>thread_local</KEYWORD2>        <!-- declaration, kw2 -->
+
+            <!-- since C++20 -->
+            <KEYWORD1>concept</KEYWORD1>             <!-- kw1 -->
+            <KEYWORD1>requires</KEYWORD1>            <!-- kw1 -->
+
         </KEYWORDS>
     </RULES>
 
     <!-- Preprocessor specific rules -->
     <RULES SET="CPP"
-        ESCAPE="\" IGNORE_CASE="FALSE"
+        IGNORE_CASE="FALSE"
         HIGHLIGHT_DIGITS="TRUE" DIGIT_RE="[0-9][0-9a-zA-Z]*">
 
-        <EOL_SPAN_REGEXP HASH_CHAR="include" TYPE="MARKUP" DELEGATE="c::INCLUDE">include\b</EOL_SPAN_REGEXP>
-        <EOL_SPAN_REGEXP HASH_CHAR="define" TYPE="MARKUP" DELEGATE="DEFINE">define\b</EOL_SPAN_REGEXP>
-        <EOL_SPAN_REGEXP HASH_CHAR="endif" TYPE="MARKUP" DELEGATE="c::LEX">endif\b</EOL_SPAN_REGEXP>
-        <EOL_SPAN_REGEXP HASH_CHAR="elif" TYPE="MARKUP" DELEGATE="c::CONDITION">elif\b</EOL_SPAN_REGEXP>
-        <EOL_SPAN_REGEXP HASH_CHAR="if" TYPE="MARKUP" DELEGATE="c::CONDITION">if\b</EOL_SPAN_REGEXP>
+        <EOL_SPAN_REGEXP HASH_CHAR="include" TYPE="MARKUP" DELEGATE="c::INCLUDE">include\b</EOL_SPAN_REGEXP> <!-- import from C mode -->
+        <EOL_SPAN_REGEXP HASH_CHAR="define"  TYPE="MARKUP" DELEGATE="DEFINE">define\b</EOL_SPAN_REGEXP>
+        <EOL_SPAN_REGEXP HASH_CHAR="endif"   TYPE="MARKUP" DELEGATE="c::LEX">endif\b</EOL_SPAN_REGEXP>       <!-- import from C mode -->
+        <EOL_SPAN_REGEXP HASH_CHAR="elif"    TYPE="MARKUP" DELEGATE="c::CONDITION">elif\b</EOL_SPAN_REGEXP>  <!-- import from C mode -->
+        <EOL_SPAN_REGEXP HASH_CHAR="if"      TYPE="MARKUP" DELEGATE="c::CONDITION">if\b</EOL_SPAN_REGEXP>    <!-- import from C mode -->
 
         <IMPORT DELEGATE="LEX"/>
 
@@ -111,7 +166,7 @@
     <!-- Almost same as the normal code,
         except two additional operators # and ##. -->
     <RULES SET="DEFINE"
-        ESCAPE="\" IGNORE_CASE="FALSE"
+        IGNORE_CASE="FALSE"
         HIGHLIGHT_DIGITS="TRUE" DIGIT_RE="[0-9][0-9a-zA-Z]*">
         <SEQ TYPE="OPERATOR">#</SEQ>
         <IMPORT DELEGATE="LEX"/>

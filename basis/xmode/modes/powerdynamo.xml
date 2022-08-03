@@ -189,7 +189,7 @@ for the other tags (data, document, etc). more support planned for future.
 		</SPAN>
 	</RULES>
 
-	<RULES SET="powerdynamo-script" ESCAPE="\" HIGHLIGHT_DIGITS="TRUE">
+	<RULES SET="powerdynamo-script" HIGHLIGHT_DIGITS="TRUE">
 		<!--PROPS>
 			<PROPERTY NAME="commentStart" VALUE="/*" />
 			<PROPERTY NAME="lineComment" VALUE="//" />

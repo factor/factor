@@ -6,12 +6,12 @@
 <!-- 30/MAR/2004: initial contribution                  -->
 
 <MODE>
-  <RULES ESCAPE="\\">
+  <RULES>
     <!-- groups -->
     <SEQ TYPE="OPERATOR">{</SEQ>
     <SEQ TYPE="OPERATOR">}</SEQ>
     <!-- characters as hexadecimal values - eg "\'e9" -->
-    <SEQ_REGEXP HASH_CHAR="\'" TYPE="LITERAL2">\\'\w\d</SEQ_REGEXP>
+    <SEQ_REGEXP HASH_CHAR="\'" ESCAPE="\\" TYPE="LITERAL2">\\'\w\d</SEQ_REGEXP>
     <!-- control words added after the RTF Specification published in March 1987 - eg "\*\panose" -->
     <MARK_FOLLOWING TYPE="KEYWORD2">\*\</MARK_FOLLOWING>
     <!-- control words - eg "\par" -->

@@ -13,7 +13,7 @@
         <PROPERTY NAME="lineComment" VALUE=";" />
         <PROPERTY NAME="noWordSep" VALUE=".-_" />
     </PROPS>
-    <RULES ESCAPE="%" IGNORE_CASE="TRUE" HIGHLIGHT_DIGITS="TRUE">
+    <RULES IGNORE_CASE="TRUE" HIGHLIGHT_DIGITS="TRUE">
         <!-- Comments -->
         <EOL_SPAN TYPE="COMMENT1">#!</EOL_SPAN>
         <EOL_SPAN TYPE="COMMENT1">;</EOL_SPAN>
@@ -22,7 +22,7 @@
             <BEGIN>"((?!$)[^"])*$</BEGIN>
             <END>$</END>
         </SPAN_REGEXP>
-        <SPAN TYPE="LITERAL1" NO_LINE_BREAK="TRUE">
+        <SPAN TYPE="LITERAL1" ESCAPE="%" NO_LINE_BREAK="TRUE">
             <BEGIN>"</BEGIN>
             <END>"</END>
         </SPAN>

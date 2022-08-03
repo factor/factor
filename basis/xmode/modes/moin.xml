@@ -7,7 +7,7 @@
 		<PROPERTY NAME="lineComment" VALUE="##" />
 		<PROPERTY NAME="wrap" VALUE="soft" />
 	</PROPS>
-	<RULES ESCAPE="\" HIGHLIGHT_DIGITS="FALSE" IGNORE_CASE="FALSE">
+	<RULES HIGHLIGHT_DIGITS="FALSE" IGNORE_CASE="FALSE">
 
 		<!-- comment -->
 		<EOL_SPAN TYPE="COMMENT1">##</EOL_SPAN>
@@ -64,7 +64,7 @@
 		</SPAN>
 
 		<!-- code or literal -->
-		<SPAN TYPE="LITERAL2">
+		<SPAN TYPE="LITERAL2" ESCAPE="\">
 			<BEGIN>`</BEGIN>
 			<END>`</END>
 		</SPAN>

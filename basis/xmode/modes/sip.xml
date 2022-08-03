@@ -1,0 +1,105 @@
+<?xml version="1.0"?>
+<!DOCTYPE MODE SYSTEM "xmode.dtd">
+<MODE>
+	<PROPS>
+		<PROPERTY NAME="contextInsensitive" VALUE="true" />
+	</PROPS>
+	<RULES IGNORE_CASE="FALSE" HIGHLIGHT_DIGITS="TRUE" DIGIT_RE="\d+">
+		<MARK_PREVIOUS TYPE="KEYWORD3" MATCH_TYPE="OPERATOR">=</MARK_PREVIOUS>
+		<KEYWORDS>
+			<!--{{{ Requests -->
+			<KEYWORD1>REGISTER</KEYWORD1>
+			<KEYWORD1>INVITE</KEYWORD1>
+			<KEYWORD1>ACK</KEYWORD1>
+			<KEYWORD1>CANCEL</KEYWORD1>
+			<KEYWORD1>OPTIONS</KEYWORD1>
+			<KEYWORD1>BYE</KEYWORD1>
+			<KEYWORD1>REFER</KEYWORD1>
+			<KEYWORD1>NOTIFY</KEYWORD1>
+			<KEYWORD1>MESSAGE</KEYWORD1>
+			<KEYWORD1>SUBSCRIBE</KEYWORD1>
+			<KEYWORD1>INFO</KEYWORD1>
+			<KEYWORD1>PRACK</KEYWORD1>
+			<KEYWORD1>UPDATE</KEYWORD1>
+			<KEYWORD1>PUBLISH</KEYWORD1> <!-- RFC3903 -->
+			<!--}}}-->
+
+			<!--{{{ Header fields -->
+			<KEYWORD2>Accept</KEYWORD2>
+			<KEYWORD2>Accept-Contact</KEYWORD2>			<!-- RFC3841 -->
+			<KEYWORD2>Accept-Language</KEYWORD2>
+			<KEYWORD2>Alert-Info</KEYWORD2>
+			<KEYWORD2>Allow</KEYWORD2>				<!-- RFC3261 -->
+			<KEYWORD2>Allow-Events</KEYWORD2>			<!-- RFC3265 -->
+			<KEYWORD2>Authentication-Info</KEYWORD2>		<!-- RFC3261 -->
+			<KEYWORD2>Authorization</KEYWORD2>			<!-- RFC3261 -->
+			<KEYWORD2>Call-ID</KEYWORD2>				<!-- RFC3261 -->
+			<KEYWORD2>Call-Info</KEYWORD2>				<!-- RFC3261 -->
+			<KEYWORD2>Contact</KEYWORD2>				<!-- RFC3261 -->
+			<KEYWORD2>Content-Disposition</KEYWORD2>		<!-- RFC3261 -->
+			<KEYWORD2>Content-Encoding</KEYWORD2>			<!-- RFC3261 -->
+			<KEYWORD2>Content-Language</KEYWORD2>			<!-- RFC3261 -->
+			<KEYWORD2>Content-Length</KEYWORD2>
+			<KEYWORD2>Content-Type</KEYWORD2>
+			<KEYWORD2>CSeq</KEYWORD2>				<!-- RFC3261 -->
+			<KEYWORD2>Date</KEYWORD2>				<!-- RFC3261 -->
+			<KEYWORD2>Encryption</KEYWORD2>
+			<KEYWORD2>Error-Info</KEYWORD2>				<!-- RFC3261 -->
+			<KEYWORD2>Event</KEYWORD2>				<!-- RFC3265 -->
+			<KEYWORD2>Expires</KEYWORD2>				<!-- RFC2543 -->
+			<KEYWORD2>From</KEYWORD2>				<!-- RFC3261 -->
+			<KEYWORD2>Hide</KEYWORD2>
+			<KEYWORD2>In-Reply-To</KEYWORD2>			<!-- RFC3261 -->
+			<KEYWORD2>Max-Forwards</KEYWORD2>			<!-- RFC3261 -->
+			<KEYWORD2>Min-Expires</KEYWORD2>			<!-- RFC3261 -->
+			<KEYWORD2>Min-SE</KEYWORD2>				<!-- RFC4028 -->
+			<KEYWORD2>MIME-Version</KEYWORD2>
+			<KEYWORD2>Organization</KEYWORD2>			<!-- RFC3261 -->
+			<KEYWORD2>P-Asserted-Identity</KEYWORD2>		<!-- RFC3325 -->
+			<KEYWORD2>P-Preferred-Identity</KEYWORD2>		<!-- RFC3325 -->
+			<KEYWORD2>Path</KEYWORD2>				<!-- RFC3327 -->
+			<KEYWORD2>Priority</KEYWORD2>				<!-- RFC3261 -->
+			<KEYWORD2>Privacy</KEYWORD2>				<!-- RFC3323 -->
+			<KEYWORD2>Proxy-Authenticate</KEYWORD2>
+			<KEYWORD2>Proxy-Authentication-Info</KEYWORD2>		<!-- RFC2617 -->
+			<KEYWORD2>Proxy-Authorization</KEYWORD2>		<!-- RFC3261 -->
+			<KEYWORD2>Proxy-Require</KEYWORD2>			<!-- RFC3261 -->
+			<KEYWORD2>RAck</KEYWORD2>				<!-- RFC3262 -->
+			<KEYWORD2>Reason</KEYWORD2>				<!-- RFC3326 -->
+			<KEYWORD2>Record-Route</KEYWORD2>			<!-- RFC3261 -->
+			<KEYWORD2>Refer-Sub</KEYWORD2>				<!-- RFC4488 -->
+			<KEYWORD2>Refer-To</KEYWORD2>				<!-- RFC3515 -->
+			<KEYWORD2>Referred-By</KEYWORD2>			<!-- RFC3892 -->
+			<KEYWORD2>Reject-Contact</KEYWORD2>			<!-- RFC3841 -->
+			<KEYWORD2>Remote-Party-ID</KEYWORD2>			<!-- draft-ietf-sip-privacy-04.txt -->
+			<KEYWORD2>Replaces</KEYWORD2>				<!-- RFC3891 -->
+			<KEYWORD2>Reply-To</KEYWORD2>				<!-- RFC3261 -->
+			<KEYWORD2>Request-Disposition</KEYWORD2>			<!-- RFC3841 -->
+			<KEYWORD2>Require</KEYWORD2>				<!-- RFC3261 -->
+			<KEYWORD2>Retry-After</KEYWORD2>			<!-- RFC3261 -->
+			<KEYWORD2>Route</KEYWORD2>				<!-- RFC3261 -->
+			<KEYWORD2>RSeq</KEYWORD2>				<!-- RFC3261 -->
+			<KEYWORD2>Security-Client</KEYWORD2>			<!-- RFC3329 -->
+			<KEYWORD2>Security-Server</KEYWORD2>			<!-- RFC3329 -->
+			<KEYWORD2>Security-Verify</KEYWORD2>			<!-- RFC3329 -->
+			<KEYWORD2>Server</KEYWORD2>				<!-- RFC2616 RFC3261 -->
+			<KEYWORD2>Service-Route</KEYWORD2>			<!-- RFC3608 -->
+			<KEYWORD2>Session-Expires</KEYWORD2>			<!-- RFC4028 -->
+			<KEYWORD2>SIP-ETag</KEYWORD2>				<!-- RFC3903 -->
+			<KEYWORD2>SIP-If-Match</KEYWORD2>			<!-- RFC3903 -->
+			<KEYWORD2>Subject</KEYWORD2>				<!-- RFC3261 -->
+			<KEYWORD2>Subscription-State</KEYWORD2>			<!-- RFC3265 -->
+			<KEYWORD2>Supported</KEYWORD2>				<!-- RFC3261 -->
+			<KEYWORD2>Suppress-Body-If-Match</KEYWORD2>		<!-- draft-niemi-sip-subnot-etags-01 -->
+			<KEYWORD2>Suppress-Notify-If-Match</KEYWORD2>		<!-- draft-niemi-sip-subnot-etags-01 -->
+			<KEYWORD2>Timestamp</KEYWORD2>				<!-- RFC3261 -->
+			<KEYWORD2>To</KEYWORD2>					<!-- RFC3261 -->
+			<KEYWORD2>Unsupported</KEYWORD2>			<!-- RFC3261 -->
+			<KEYWORD2>User-Agent</KEYWORD2>
+			<KEYWORD2>Via</KEYWORD2>				<!-- RFC3261 -->
+			<KEYWORD2>Warning</KEYWORD2>				<!-- RFC3261 -->
+			<KEYWORD2>WWW-Authenticate</KEYWORD2>			<!-- RFC3261 -->
+			<!--}}}-->
+		</KEYWORDS>
+	</RULES>
+</MODE>
