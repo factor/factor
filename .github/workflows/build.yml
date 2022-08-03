@@ -47,6 +47,3 @@ jobs:
     - name: test
       shell: cmd
       run: 'factor -run=tools.test resource:core'
-    - name: help-lint
-      shell: cmd
-      run: 'factor -run=help.lint resource:core resource:basis'
