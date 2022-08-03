@@ -1,0 +1,350 @@
+<?xml version="1.0"?>
+<!DOCTYPE MODE SYSTEM "xmode.dtd">
+
+<!--
+
+This is a jedit mode file for Ada programming language.
+Copyright (C) 2012 Peter C. Chapin (pchapin@sf)
+
+This program is free software; you can redistribute it and/or
+modify it under the terms of the GNU General Public License
+as published by the Free Software Foundation; either version 2
+of the License, or (at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program; if not, write to the Free Software
+Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+-->
+
+<!-- TODO: Support based literals as numeric literals: 16#FF#
+           Support numeric literals with an exponent: 1.0e2, 1e2. -->
+
+<MODE>
+	<PROPS>
+		<PROPERTY NAME="lineComment" VALUE="--" />
+        <PROPERTY NAME="indentNextLines"
+            VALUE=".*(begin|declare|do|else|elsif|exception|generic|is|loop|private|record|select|tagged|then|with|=>|:=)\s*(--.*)?$"/>
+        <PROPERTY NAME="unindentThisLine"
+            VALUE="^\s*end\b.*;"/>
+        <PROPERTY NAME="unindentNextLines"
+            VALUE="^\s*end\b.*;"/>
+        <PROPERTY NAME="electricKeys" VALUE=";"/>
+	</PROPS>
+
+	<RULES IGNORE_CASE="TRUE" HIGHLIGHT_DIGITS="TRUE">
+		<!-- SPARK annotation comments. -->
+		<EOL_SPAN TYPE="COMMENT2">--#</EOL_SPAN>
+		<!-- Normal comments. -->
+		<EOL_SPAN TYPE="COMMENT1">--</EOL_SPAN>
+
+		<SPAN TYPE="LITERAL1" NO_LINE_BREAK="TRUE">
+			<BEGIN>"</BEGIN>
+			<END>"</END>
+		</SPAN>
+		
+        <!-- Operators and Related -->
+		<SEQ TYPE="OPERATOR">)</SEQ>
+		<SEQ TYPE="OPERATOR">(</SEQ>
+		<SEQ TYPE="OPERATOR">..</SEQ>
+		<SEQ TYPE="OPERATOR">.all</SEQ>
+		<SEQ TYPE="OPERATOR">:=</SEQ>
+		<SEQ TYPE="OPERATOR">/=</SEQ>
+		<SEQ TYPE="OPERATOR">=&gt;</SEQ>
+		<SEQ TYPE="OPERATOR">=</SEQ>
+		<SEQ TYPE="NULL">&lt;&gt;</SEQ>
+		<SEQ TYPE="LABEL">&lt;&lt;</SEQ>
+		<SEQ TYPE="LABEL">&gt;&gt;</SEQ>
+		<SEQ TYPE="OPERATOR">&gt;=</SEQ>
+		<SEQ TYPE="OPERATOR">&lt;=</SEQ>
+		<SEQ TYPE="OPERATOR">&gt;</SEQ>
+		<SEQ TYPE="OPERATOR">&lt;</SEQ>
+		<SEQ TYPE="OPERATOR">&amp;</SEQ>
+		<SEQ TYPE="OPERATOR">+</SEQ>
+		<SEQ TYPE="OPERATOR">-</SEQ>
+		<SEQ TYPE="OPERATOR">/</SEQ>
+		<SEQ TYPE="OPERATOR">**</SEQ>
+		<SEQ TYPE="OPERATOR">*</SEQ>
+
+		<!-- Predefined Attributes -->
+		<!-- From Section K.2 "Language-Defined Attributes" in the Ada Reference Manual. -->
+		<SEQ TYPE="KEYWORD3">'access</SEQ>
+		<SEQ TYPE="KEYWORD3">'address</SEQ>
+		<SEQ TYPE="KEYWORD3">'adjacent</SEQ>
+		<SEQ TYPE="KEYWORD3">'aft</SEQ>
+		<SEQ TYPE="KEYWORD3">'alignment</SEQ>
+		<SEQ TYPE="KEYWORD3">'base</SEQ>
+		<SEQ TYPE="KEYWORD3">'bit_order</SEQ>
+		<SEQ TYPE="KEYWORD3">'body_version</SEQ>
+		<SEQ TYPE="KEYWORD3">'callable</SEQ>
+		<SEQ TYPE="KEYWORD3">'caller</SEQ>
+		<SEQ TYPE="KEYWORD3">'ceiling</SEQ>
+		<SEQ TYPE="KEYWORD3">'class</SEQ>
+		<SEQ TYPE="KEYWORD3">'component_size</SEQ>
+		<SEQ TYPE="KEYWORD3">'compose</SEQ>
+		<SEQ TYPE="KEYWORD3">'constrained</SEQ>
+		<SEQ TYPE="KEYWORD3">'copy_size</SEQ>
+		<SEQ TYPE="KEYWORD3">'count</SEQ>
+		<SEQ TYPE="KEYWORD3">'definite</SEQ>
+		<SEQ TYPE="KEYWORD3">'delta</SEQ>
+		<SEQ TYPE="KEYWORD3">'denorm</SEQ>
+		<SEQ TYPE="KEYWORD3">'digits</SEQ>
+		<SEQ TYPE="KEYWORD3">'exponent</SEQ>
+		<SEQ TYPE="KEYWORD3">'external_tag</SEQ>
+		<SEQ TYPE="KEYWORD3">'first</SEQ>
+		<SEQ TYPE="KEYWORD3">'first_bit</SEQ>
+		<SEQ TYPE="KEYWORD3">'floor</SEQ>
+		<SEQ TYPE="KEYWORD3">'fore</SEQ>
+		<SEQ TYPE="KEYWORD3">'fraction</SEQ>
+		<SEQ TYPE="KEYWORD3">'has_same_storage</SEQ>
+		<SEQ TYPE="KEYWORD3">'identity</SEQ>
+		<SEQ TYPE="KEYWORD3">'image</SEQ>
+		<SEQ TYPE="KEYWORD3">'class'input</SEQ>
+		<SEQ TYPE="KEYWORD3">'input</SEQ>
+		<SEQ TYPE="KEYWORD3">'last</SEQ>
+		<SEQ TYPE="KEYWORD3">'last_bit</SEQ>
+		<SEQ TYPE="KEYWORD3">'leading_part</SEQ>
+		<SEQ TYPE="KEYWORD3">'length</SEQ>
+		<SEQ TYPE="KEYWORD3">'machine</SEQ>
+		<SEQ TYPE="KEYWORD3">'machine_emax</SEQ>
+		<SEQ TYPE="KEYWORD3">'machine_emin</SEQ>
+		<SEQ TYPE="KEYWORD3">'machine_mantissa</SEQ>
+		<SEQ TYPE="KEYWORD3">'machine_overflows</SEQ>
+		<SEQ TYPE="KEYWORD3">'machine_radix</SEQ>
+        <SEQ TYPE="KEYWORD3">'machine_rounding</SEQ>
+		<SEQ TYPE="KEYWORD3">'machine_rounds</SEQ>
+		<SEQ TYPE="KEYWORD3">'max</SEQ>
+		<SEQ TYPE="KEYWORD3">'max_alignment_for_allocation</SEQ>
+		<SEQ TYPE="KEYWORD3">'max_size_in_storage_elements</SEQ>
+		<SEQ TYPE="KEYWORD3">'min</SEQ>
+		<SEQ TYPE="KEYWORD3">'mod</SEQ>
+		<SEQ TYPE="KEYWORD3">'model</SEQ>
+		<SEQ TYPE="KEYWORD3">'model_emin</SEQ>
+		<SEQ TYPE="KEYWORD3">'model_epsilon</SEQ>
+		<SEQ TYPE="KEYWORD3">'model_mantissa</SEQ>
+		<SEQ TYPE="KEYWORD3">'model_small</SEQ>
+		<SEQ TYPE="KEYWORD3">'modulus</SEQ>
+		<SEQ TYPE="KEYWORD3">'old</SEQ>
+		<SEQ TYPE="KEYWORD3">'class'output</SEQ>
+		<SEQ TYPE="KEYWORD3">'output</SEQ>
+		<SEQ TYPE="KEYWORD3">'overlaps_storage</SEQ>
+		<SEQ TYPE="KEYWORD3">'partition_id</SEQ>
+		<SEQ TYPE="KEYWORD3">'pos</SEQ>
+		<SEQ TYPE="KEYWORD3">'position</SEQ>
+		<SEQ TYPE="KEYWORD3">'pred</SEQ>
+		<SEQ TYPE="KEYWORD3">'priority</SEQ>
+		<SEQ TYPE="KEYWORD3">'range</SEQ>
+		<SEQ TYPE="KEYWORD3">'class'read</SEQ>
+		<SEQ TYPE="KEYWORD3">'read</SEQ>
+		<SEQ TYPE="KEYWORD3">'remainder</SEQ>
+		<SEQ TYPE="KEYWORD3">'result</SEQ>
+		<SEQ TYPE="KEYWORD3">'round</SEQ>
+		<SEQ TYPE="KEYWORD3">'rounding</SEQ>
+		<SEQ TYPE="KEYWORD3">'safe_first</SEQ>
+		<SEQ TYPE="KEYWORD3">'safe_last</SEQ>
+		<SEQ TYPE="KEYWORD3">'scale</SEQ>
+		<SEQ TYPE="KEYWORD3">'scaling</SEQ>
+		<SEQ TYPE="KEYWORD3">'signed_zeros</SEQ>
+		<SEQ TYPE="KEYWORD3">'size</SEQ>
+		<SEQ TYPE="KEYWORD3">'small</SEQ>
+		<SEQ TYPE="KEYWORD3">'storage_pool</SEQ>
+		<SEQ TYPE="KEYWORD3">'storage_size</SEQ>
+        <SEQ TYPE="KEYWORD3">'stream_size</SEQ>
+		<SEQ TYPE="KEYWORD3">'succ</SEQ>
+		<SEQ TYPE="KEYWORD3">'tag</SEQ>
+		<SEQ TYPE="KEYWORD3">'terminated</SEQ>
+		<SEQ TYPE="KEYWORD3">'truncation</SEQ>
+		<SEQ TYPE="KEYWORD3">'unbiased_rounding</SEQ>
+		<SEQ TYPE="KEYWORD3">'unchecked_access</SEQ>
+		<SEQ TYPE="KEYWORD3">'val</SEQ>
+		<SEQ TYPE="KEYWORD3">'valid</SEQ>
+		<SEQ TYPE="KEYWORD3">'value</SEQ>
+		<SEQ TYPE="KEYWORD3">'version</SEQ>
+		<SEQ TYPE="KEYWORD3">'wide_image</SEQ>
+		<SEQ TYPE="KEYWORD3">'wide_value</SEQ>
+		<SEQ TYPE="KEYWORD3">'wide_width</SEQ>
+		<SEQ TYPE="KEYWORD3">'width</SEQ>
+        <SEQ TYPE="KEYWORD3">'wide_wide_image</SEQ>
+        <SEQ TYPE="KEYWORD3">'wide_wide_value</SEQ>
+        <SEQ TYPE="KEYWORD3">'wide_wide_width</SEQ>
+		<SEQ TYPE="KEYWORD3">'class'write</SEQ>
+		<SEQ TYPE="KEYWORD3">'write</SEQ>
+        
+        <!-- Predefined Pragmas -->
+        <!-- From Annex L of the Ada Reference Manual. -->
+        <!-- One problem with this definition is that it requires exactly one
+             space between the pragma keyword and the name of the pragma. -->
+        <SEQ TYPE="KEYWORD3">pragma all_calls_remote</SEQ>
+        <SEQ TYPE="KEYWORD3">pragma assert</SEQ>
+        <SEQ TYPE="KEYWORD3">pragma assertion_policy</SEQ>
+        <SEQ TYPE="KEYWORD3">pragma asynchronous</SEQ>
+        <SEQ TYPE="KEYWORD3">pragma atomic</SEQ>
+        <SEQ TYPE="KEYWORD3">pragma atomic_components</SEQ>
+        <SEQ TYPE="KEYWORD3">pragma attach_handler</SEQ>
+        <SEQ TYPE="KEYWORD3">pragma controlled</SEQ>
+        <SEQ TYPE="KEYWORD3">pragma convention</SEQ>
+        <SEQ TYPE="KEYWORD3">pragma cpu</SEQ>
+        <SEQ TYPE="KEYWORD3">pragma default_storage_pool</SEQ>
+        <SEQ TYPE="KEYWORD3">pragma detect_blocking</SEQ>
+        <SEQ TYPE="KEYWORD3">pragma discard_names</SEQ>
+        <SEQ TYPE="KEYWORD3">pragma dispatching_domain</SEQ>
+        <SEQ TYPE="KEYWORD3">pragma elaborate</SEQ>
+        <SEQ TYPE="KEYWORD3">pragma elaborate_all</SEQ>
+        <SEQ TYPE="KEYWORD3">pragma elaborate_body</SEQ>
+        <SEQ TYPE="KEYWORD3">pragma export</SEQ>
+        <SEQ TYPE="KEYWORD3">pragma import</SEQ>
+        <SEQ TYPE="KEYWORD3">pragma independent</SEQ>
+        <SEQ TYPE="KEYWORD3">pragam independent_components</SEQ>
+        <SEQ TYPE="KEYWORD3">pragma inline</SEQ>
+        <SEQ TYPE="KEYWORD3">pragma inspection_point</SEQ>
+        <SEQ TYPE="KEYWORD3">pragma interrupt_handler</SEQ>
+        <SEQ TYPE="KEYWORD3">pragma interrupt_priority</SEQ>
+        <SEQ TYPE="KEYWORD3">pragma linker_options</SEQ>
+        <SEQ TYPE="KEYWORD3">pragma list</SEQ>
+        <SEQ TYPE="KEYWORD3">pragma locking_policy</SEQ>
+        <SEQ TYPE="KEYWORD3">pragma no_return</SEQ>
+        <SEQ TYPE="KEYWORD3">pragma normalize_scalars</SEQ>
+        <SEQ TYPE="KEYWORD3">pragma optimize</SEQ>
+        <SEQ TYPE="KEYWORD3">pragma pack</SEQ>
+        <SEQ TYPE="KEYWORD3">pragma page</SEQ>
+        <SEQ TYPE="KEYWORD3">pragma partition_elaboration_policy</SEQ>
+        <SEQ TYPE="KEYWORD3">pragma preelaborate_initialization</SEQ>
+        <SEQ TYPE="KEYWORD3">pragma preelaborate</SEQ>
+        <SEQ TYPE="KEYWORD3">pragma priority</SEQ>
+        <SEQ TYPE="KEYWORD3">pragma priority_specific_dispatching</SEQ>
+        <SEQ TYPE="KEYWORD3">pragma profile</SEQ>
+        <SEQ TYPE="KEYWORD3">pragma pure</SEQ>
+        <SEQ TYPE="KEYWORD3">pragma queuing_policy</SEQ>
+        <SEQ TYPE="KEYWORD3">pragma relative_deadline</SEQ>
+        <SEQ TYPE="KEYWORD3">pragma remote_call_interface</SEQ>
+        <SEQ TYPE="KEYWORD3">pragma remote_types</SEQ>
+        <SEQ TYPE="KEYWORD3">pragma restrictions</SEQ>
+        <SEQ TYPE="KEYWORD3">pragma reviewable</SEQ>
+        <SEQ TYPE="KEYWORD3">pragma shared_passive</SEQ>
+        <SEQ TYPE="KEYWORD3">pragma storage_size</SEQ>
+        <SEQ TYPE="KEYWORD3">pragma suppress</SEQ>
+        <SEQ TYPE="KEYWORD3">pragma task_dispatching_policy</SEQ>
+        <SEQ TYPE="KEYWORD3">pragma unchecked_union</SEQ>
+        <SEQ TYPE="KEYWORD3">pragma unsuppress</SEQ>
+        <SEQ TYPE="KEYWORD3">pragma volatile</SEQ>
+        <SEQ TYPE="KEYWORD3">pragma volatile_components</SEQ>
+
+		<SPAN TYPE="LITERAL1" NO_LINE_BREAK="TRUE">
+			<BEGIN>'</BEGIN>
+			<END>'</END>
+		</SPAN>
+
+		<KEYWORDS>
+			<!-- Reserved words -->
+            <!-- The first three are special. Coloring them differently makes it
+                 easier to locate subprograms in the file. -->
+			<KEYWORD1>entry</KEYWORD1>
+			<KEYWORD1>function</KEYWORD1>
+			<KEYWORD1>procedure</KEYWORD1>
+
+			<KEYWORD2>abort</KEYWORD2>
+			<KEYWORD2>abs</KEYWORD2>
+			<KEYWORD2>abstract</KEYWORD2>
+			<KEYWORD2>accept</KEYWORD2>
+			<KEYWORD2>access</KEYWORD2>
+			<KEYWORD2>aliased</KEYWORD2>
+			<KEYWORD2>all</KEYWORD2>
+			<KEYWORD2>and</KEYWORD2>
+			<KEYWORD2>array</KEYWORD2>
+			<KEYWORD2>at</KEYWORD2>
+			<KEYWORD2>begin</KEYWORD2>
+			<KEYWORD2>body</KEYWORD2>
+			<KEYWORD2>case</KEYWORD2>
+			<KEYWORD2>constant</KEYWORD2>
+			<KEYWORD2>declare</KEYWORD2>
+			<KEYWORD2>delay</KEYWORD2>
+			<KEYWORD2>delta</KEYWORD2>
+			<KEYWORD2>digits</KEYWORD2>
+			<KEYWORD2>do</KEYWORD2>
+			<KEYWORD2>else</KEYWORD2>
+			<KEYWORD2>elsif</KEYWORD2>
+			<KEYWORD2>end</KEYWORD2>
+			<KEYWORD2>exception</KEYWORD2>
+			<KEYWORD2>exit</KEYWORD2>
+			<KEYWORD2>for</KEYWORD2>
+            <KEYWORD2>generic</KEYWORD2>
+			<KEYWORD2>goto</KEYWORD2>
+			<KEYWORD2>if</KEYWORD2>
+			<KEYWORD2>in</KEYWORD2>
+            <KEYWORD2>interface</KEYWORD2>
+			<KEYWORD2>is</KEYWORD2>
+			<KEYWORD2>limited</KEYWORD2>
+			<KEYWORD2>loop</KEYWORD2>
+			<KEYWORD2>mod</KEYWORD2>
+			<KEYWORD2>new</KEYWORD2>
+			<KEYWORD2>not</KEYWORD2>
+            <KEYWORD2>null</KEYWORD2>  <!-- This is also used as an access value. -->
+            <KEYWORD2>of</KEYWORD2>
+			<KEYWORD2>or</KEYWORD2>
+			<KEYWORD2>others</KEYWORD2>
+			<KEYWORD2>out</KEYWORD2>
+            <KEYWORD2>overriding</KEYWORD2>
+			<KEYWORD2>package</KEYWORD2>
+			<KEYWORD3>pragma</KEYWORD3>  <!-- Special case -->
+			<KEYWORD2>private</KEYWORD2>
+			<KEYWORD2>protected</KEYWORD2>
+			<KEYWORD2>raise</KEYWORD2>
+			<KEYWORD2>range</KEYWORD2>
+			<KEYWORD2>record</KEYWORD2>
+			<KEYWORD2>rem</KEYWORD2>
+			<KEYWORD2>renames</KEYWORD2>
+			<KEYWORD2>requeue</KEYWORD2>
+			<KEYWORD2>return</KEYWORD2>
+            <KEYWORD2>reverse</KEYWORD2>
+			<KEYWORD2>select</KEYWORD2>
+			<KEYWORD2>separate</KEYWORD2>
+			<KEYWORD2>some</KEYWORD2>
+			<KEYWORD2>subtype</KEYWORD2>
+            <KEYWORD2>synchronized</KEYWORD2>
+			<KEYWORD2>tagged</KEYWORD2>
+			<KEYWORD2>task</KEYWORD2>
+			<KEYWORD2>terminate</KEYWORD2>
+			<KEYWORD2>then</KEYWORD2>
+			<KEYWORD2>type</KEYWORD2>
+			<KEYWORD2>until</KEYWORD2>
+			<KEYWORD2>use</KEYWORD2>
+			<KEYWORD2>when</KEYWORD2>
+			<KEYWORD2>while</KEYWORD2>
+			<KEYWORD2>with</KEYWORD2>
+			<KEYWORD2>xor</KEYWORD2>
+
+			<!-- Literals -->
+			<LITERAL1>false</LITERAL1>
+			<LITERAL1>true</LITERAL1>
+            
+			<!-- Pre-defined types (in package Standard). -->
+			<LITERAL2>address</LITERAL2>
+			<LITERAL2>boolean</LITERAL2>
+			<LITERAL2>character</LITERAL2>
+			<LITERAL2>duration</LITERAL2>
+			<LITERAL2>float</LITERAL2>
+			<LITERAL2>integer</LITERAL2>
+			<LITERAL2>latin_1</LITERAL2>
+			<LITERAL2>natural</LITERAL2>
+			<LITERAL2>positive</LITERAL2>
+			<LITERAL2>string</LITERAL2>
+			<LITERAL2>time</LITERAL2>
+            <LITERAL2>wide_character</LITERAL2>
+            <LITERAL2>wide_wide_character</LITERAL2>
+            <LITERAL2>wide_string</LITERAL2>
+            <LITERAL2>wide_wide_string</LITERAL2>
+
+      <!-- Pre-defined exceptions (in package Standard). -->
+      <LITERAL2>constraint_error</LITERAL2>
+      <LITERAL2>program_error</LITERAL2>
+      <LITERAL2>storage_error</LITERAL2>
+      <LITERAL2>tasking_error</LITERAL2>
+
+		</KEYWORDS>
+	</RULES>
+</MODE>
+

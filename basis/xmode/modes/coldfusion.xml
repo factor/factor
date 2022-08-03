@@ -29,13 +29,19 @@
 			<BEGIN>&lt;!--</BEGIN>
 			<END>--&gt;</END>
 		</SPAN>
-
+		
 		<!-- CFScript -->
-		<SPAN TYPE="KEYWORD3" DELEGATE="CFSCRIPT">
+		<SPAN TYPE="KEYWORD3" DELEGATE="cfscript::MAIN">
 			<BEGIN>&lt;CFSCRIPT</BEGIN>
 			<END>&lt;/CFSCRIPT&gt;</END>
 		</SPAN>
-
+		
+		<!-- query -->
+		<SPAN TYPE="KEYWORD3" DELEGATE="CFQUERY">
+			<BEGIN>&lt;CFQUERY</BEGIN>
+			<END>/CFQUERY&gt;</END>
+		</SPAN>
+		
 		<!-- CFML markup start tags -->
 		<SPAN TYPE="KEYWORD3" DELEGATE="CFTAGS">
 			<BEGIN>&lt;CF</BEGIN>
@@ -59,7 +65,7 @@
 			<BEGIN>&lt;STYLE</BEGIN>
 			<END>&lt;/STYLE&gt;</END>
 		</SPAN>
-
+		
 		<!-- markup tags -->
 		<SPAN TYPE="MARKUP" DELEGATE="TAGS">
 			<BEGIN>&lt;</BEGIN>
@@ -84,7 +90,7 @@
 		</SPAN>
 
 		<SEQ TYPE="OPERATOR">=</SEQ>
-
+		
 		<!-- CFML markup start tags -->
 		<SPAN TYPE="KEYWORD3" DELEGATE="CFTAGS">
 			<BEGIN>&lt;CF</BEGIN>
@@ -96,297 +102,39 @@
 			<BEGIN>&lt;/CF</BEGIN>
 			<END>&gt;</END>
 		</SPAN>
-
-		<!-- CFML markup start tags -->
-		<SPAN TYPE="KEYWORD3" DELEGATE="CFSCRIPT">
-			<BEGIN>&lt;CFSCRIPT</BEGIN>
-			<END>&lt;/CFSCRIPT&gt;</END>
-		</SPAN>
 	</RULES>
-
-	<RULES SET="CFSCRIPT" DEFAULT="KEYWORD1" IGNORE_CASE="TRUE" HIGHLIGHT_DIGITS="TRUE">
-
-		<!-- CFSCRIPT multi-line comment -->
-		<SPAN TYPE="COMMENT1">
-			<BEGIN>/*</BEGIN>
-			<END>*/</END>
-		</SPAN>
-
-		<!-- CFSCRIPT single-line comment -->
-		<EOL_SPAN TYPE="COMMENT2">//</EOL_SPAN>
-
-		<SPAN TYPE="LABEL">
+	
+	<RULES SET="CFQUERY" DEFAULT="KEYWORD3" IGNORE_CASE="TRUE" HIGHLIGHT_DIGITS="TRUE">
+		<!-- attributes inside cfquery tag -->
+		<SPAN TYPE="LITERAL1">
 			<BEGIN>"</BEGIN>
 			<END>"</END>
 		</SPAN>
-		<SPAN TYPE="LABEL">
+		<SPAN TYPE="LITERAL1">
 			<BEGIN>'</BEGIN>
 			<END>'</END>
 		</SPAN>
-
-		<SEQ TYPE="LITERAL2">(</SEQ>
-		<SEQ TYPE="LITERAL2">)</SEQ>
-
 		<SEQ TYPE="OPERATOR">=</SEQ>
-		<SEQ TYPE="OPERATOR">+</SEQ>
-		<SEQ TYPE="OPERATOR">-</SEQ>
-		<SEQ TYPE="OPERATOR">/</SEQ>
-		<SEQ TYPE="OPERATOR">&gt;=</SEQ>
-		<SEQ TYPE="OPERATOR">&lt;=</SEQ>
-		<SEQ TYPE="OPERATOR">&gt;&lt;</SEQ>
-		<SEQ TYPE="OPERATOR">*</SEQ>
-		<SEQ TYPE="OPERATOR">!!</SEQ>
-		<SEQ TYPE="OPERATOR">&amp;&amp;</SEQ>
-
-		<KEYWORDS>
-			<FUNCTION>{</FUNCTION>
-			<FUNCTION>}</FUNCTION>
-			<FUNCTION>for</FUNCTION>
-			<FUNCTION>while</FUNCTION>
-			<FUNCTION>if</FUNCTION>
-			<FUNCTION>}else</FUNCTION>
-			<FUNCTION>}else{</FUNCTION>
-			<FUNCTION>if(</FUNCTION>
-			<FUNCTION>else</FUNCTION>
-			<FUNCTION>break</FUNCTION>
-
-			<FUNCTION>ArrayAppend</FUNCTION>
-			<FUNCTION>ArrayAvg</FUNCTION>
-			<FUNCTION>ArrayClear</FUNCTION>
-			<FUNCTION>ArrayDeleteAt</FUNCTION>
-			<FUNCTION>ArrayInsertAt</FUNCTION>
-			<FUNCTION>ArrayIsEmpty</FUNCTION>
-			<FUNCTION>ArrayLen</FUNCTION>
-			<FUNCTION>ArrayMax</FUNCTION>
-			<FUNCTION>ArrayMin</FUNCTION>
-			<FUNCTION>ArrayNew</FUNCTION>
-			<FUNCTION>ArrayPrepend</FUNCTION>
-			<FUNCTION>ArrayResize</FUNCTION>
-			<FUNCTION>ArraySet</FUNCTION>
-			<FUNCTION>ArraySort</FUNCTION>
-			<FUNCTION>ArraySum</FUNCTION>
-			<FUNCTION>ArraySwap</FUNCTION>
-			<FUNCTION>ArrayToList</FUNCTION>
-			<FUNCTION>IsArray</FUNCTION>
-			<FUNCTION>ListToArray</FUNCTION>
-
-			<FUNCTION>CreateDate</FUNCTION>
-			<FUNCTION>CreateDateTime</FUNCTION>
-			<FUNCTION>CreateODBCTime</FUNCTION>
-			<FUNCTION>CreateODBCDate</FUNCTION>
-			<FUNCTION>CreateODBCDateTime</FUNCTION>
-			<FUNCTION>CreateTime</FUNCTION>
-			<FUNCTION>CreateTimeSpan</FUNCTION>
-			<FUNCTION>DateAdd</FUNCTION>
-			<FUNCTION>DateCompare</FUNCTION>
-			<FUNCTION>DateDiff</FUNCTION>
-			<FUNCTION>DatePart</FUNCTION>
-			<FUNCTION>Day</FUNCTION>
-			<FUNCTION>DayOfWeek</FUNCTION>
-			<FUNCTION>DayOfWeekAsString</FUNCTION>
-			<FUNCTION>DayOfYear</FUNCTION>
-			<FUNCTION>DaysInMonth</FUNCTION>
-			<FUNCTION>DaysInYear</FUNCTION>
-			<FUNCTION>FirstDayOfMonth</FUNCTION>
-			<FUNCTION>Hour</FUNCTION>
-			<FUNCTION>Minute</FUNCTION>
-			<FUNCTION>Month</FUNCTION>
-			<FUNCTION>MonthAsString</FUNCTION>
-			<FUNCTION>Now</FUNCTION>
-			<FUNCTION>ParseDateTime</FUNCTION>
-			<FUNCTION>Quarter</FUNCTION>
-			<FUNCTION>Second</FUNCTION>
-			<FUNCTION>Week</FUNCTION>
-			<FUNCTION>Year</FUNCTION>
-
-			<FUNCTION>IsArray</FUNCTION>
-			<FUNCTION>IsAuthenticated</FUNCTION>
-			<FUNCTION>IsAuthorized</FUNCTION>
-			<FUNCTION>IsBoolean</FUNCTION>
-			<FUNCTION>IsDate</FUNCTION>
-			<FUNCTION>IsDebugMode</FUNCTION>
-			<FUNCTION>IsDefined</FUNCTION>
-			<FUNCTION>IsLeapYear</FUNCTION>
-			<FUNCTION>IsNumeric</FUNCTION>
-			<FUNCTION>IsNumericDate</FUNCTION>
-			<FUNCTION>IsQuery</FUNCTION>
-			<FUNCTION>IsSimpleValue</FUNCTION>
-			<FUNCTION>IsStruct</FUNCTION>
-
-			<FUNCTION>DateFormat</FUNCTION>
-			<FUNCTION>DecimalFormat</FUNCTION>
-			<FUNCTION>DollarFormat</FUNCTION>
-			<FUNCTION>FormatBaseN</FUNCTION>
-			<FUNCTION>HTMLCodeFormat</FUNCTION>
-			<FUNCTION>HTMLEditFormat</FUNCTION>
-			<FUNCTION>NumberFormat</FUNCTION>
-			<FUNCTION>ParagraphFormat</FUNCTION>
-			<FUNCTION>TimeFormat</FUNCTION>
-			<FUNCTION>YesNoFormat</FUNCTION>
-
-			<FUNCTION>DE</FUNCTION>
-			<FUNCTION>Evaluate</FUNCTION>
-			<FUNCTION>IIf</FUNCTION>
-			<FUNCTION>SetVariable</FUNCTION>
-
-			<FUNCTION>ArrayToList</FUNCTION>
-			<FUNCTION>ListAppend</FUNCTION>
-			<FUNCTION>ListChangeDelims</FUNCTION>
-			<FUNCTION>ListContains</FUNCTION>
-			<FUNCTION>ListContainsNoCase</FUNCTION>
-			<FUNCTION>ListDeleteAt</FUNCTION>
-			<FUNCTION>ListFind</FUNCTION>
-			<FUNCTION>ListFindNoCase</FUNCTION>
-			<FUNCTION>ListFirst</FUNCTION>
-			<FUNCTION>ListGetAt</FUNCTION>
-			<FUNCTION>ListInsertAt</FUNCTION>
-			<FUNCTION>ListLast</FUNCTION>
-			<FUNCTION>ListLen</FUNCTION>
-			<FUNCTION>ListPrepend</FUNCTION>
-			<FUNCTION>ListRest</FUNCTION>
-			<FUNCTION>ListSetAt</FUNCTION>
-			<FUNCTION>ListToArray</FUNCTION>
-
-			<FUNCTION>StructClear</FUNCTION>
-			<FUNCTION>StructCopy</FUNCTION>
-			<FUNCTION>StructCount</FUNCTION>
-			<FUNCTION>StructDelete</FUNCTION>
-			<FUNCTION>StructFind</FUNCTION>
-			<FUNCTION>StructInsert</FUNCTION>
-			<FUNCTION>StructIsEmpty</FUNCTION>
-			<FUNCTION>StructKeyExists</FUNCTION>
-			<FUNCTION>StructNew</FUNCTION>
-			<FUNCTION>StructUpdate</FUNCTION>
-
-			<FUNCTION>GetLocale</FUNCTION>
-			<FUNCTION>LSCurrencyFormat</FUNCTION>
-			<FUNCTION>LSDateFormat</FUNCTION>
-			<FUNCTION>LSIsCurrency</FUNCTION>
-			<FUNCTION>LSIsDate</FUNCTION>
-			<FUNCTION>LSIsNumeric</FUNCTION>
-			<FUNCTION>LSNumberFormat</FUNCTION>
-			<FUNCTION>LSParseCurrency</FUNCTION>
-			<FUNCTION>LSParseDateTime</FUNCTION>
-			<FUNCTION>LSParseNumber</FUNCTION>
-			<FUNCTION>LSTimeFormat</FUNCTION>
-			<FUNCTION>SetLocale</FUNCTION>
-
-			<FUNCTION>Abs</FUNCTION>
-			<FUNCTION>Atn</FUNCTION>
-			<FUNCTION>BitAnd</FUNCTION>
-			<FUNCTION>BitMaskClear</FUNCTION>
-			<FUNCTION>BitMaskRead</FUNCTION>
-			<FUNCTION>BitMaskSet</FUNCTION>
-			<FUNCTION>BitNot</FUNCTION>
-			<FUNCTION>BitOr</FUNCTION>
-			<FUNCTION>BitSHLN</FUNCTION>
-			<FUNCTION>BitSHRN</FUNCTION>
-			<FUNCTION>BitXor</FUNCTION>
-			<FUNCTION>Ceiling</FUNCTION>
-			<FUNCTION>Cos</FUNCTION>
-			<FUNCTION>DecrementValue</FUNCTION>
-			<FUNCTION>Exp</FUNCTION>
-			<FUNCTION>Fix</FUNCTION>
-			<FUNCTION>IncrementValue</FUNCTION>
-			<FUNCTION>InputBaseN</FUNCTION>
-			<FUNCTION>Int</FUNCTION>
-			<FUNCTION>Log</FUNCTION>
-			<FUNCTION>Log10</FUNCTION>
-			<FUNCTION>Max</FUNCTION>
-			<FUNCTION>Min</FUNCTION>
-			<FUNCTION>Pi</FUNCTION>
-			<FUNCTION>Rand</FUNCTION>
-			<FUNCTION>Randomize</FUNCTION>
-			<FUNCTION>RandRange</FUNCTION>
-			<FUNCTION>Round</FUNCTION>
-			<FUNCTION>Sgn</FUNCTION>
-			<FUNCTION>Sin</FUNCTION>
-			<FUNCTION>Sqr</FUNCTION>
-			<FUNCTION>Tan</FUNCTION>
-
-			<FUNCTION>Asc</FUNCTION>
-			<FUNCTION>Chr</FUNCTION>
-			<FUNCTION>CJustify</FUNCTION>
-			<FUNCTION>Compare</FUNCTION>
-			<FUNCTION>CompareNoCase</FUNCTION>
-			<FUNCTION>Find</FUNCTION>
-			<FUNCTION>FindNoCase</FUNCTION>
-			<FUNCTION>FindOneOf</FUNCTION>
-			<FUNCTION>GetToken</FUNCTION>
-			<FUNCTION>Insert</FUNCTION>
-			<FUNCTION>LCase</FUNCTION>
-			<FUNCTION>Left</FUNCTION>
-			<FUNCTION>Len</FUNCTION>
-			<FUNCTION>LJustify</FUNCTION>
-			<FUNCTION>LTrim</FUNCTION>
-			<FUNCTION>Mid</FUNCTION>
-			<FUNCTION>REFind</FUNCTION>
-			<FUNCTION>REFindNoCase</FUNCTION>
-			<FUNCTION>RemoveChars</FUNCTION>
-			<FUNCTION>RepeatString</FUNCTION>
-			<FUNCTION>Replace</FUNCTION>
-			<FUNCTION>ReplaceList</FUNCTION>
-			<FUNCTION>ReplaceNoCase</FUNCTION>
-			<FUNCTION>REReplace</FUNCTION>
-			<FUNCTION>REReplaceNoCase</FUNCTION>
-			<FUNCTION>Reverse</FUNCTION>
-			<FUNCTION>Right</FUNCTION>
-			<FUNCTION>RJustify</FUNCTION>
-			<FUNCTION>RTrim</FUNCTION>
-			<FUNCTION>SpanExcluding</FUNCTION>
-			<FUNCTION>SpanIncluding</FUNCTION>
-			<FUNCTION>Trim</FUNCTION>
-			<FUNCTION>UCase</FUNCTION>
-			<FUNCTION>Val</FUNCTION>
-
-			<FUNCTION>DirectoryExists</FUNCTION>
-			<FUNCTION>ExpandPath</FUNCTION>
-			<FUNCTION>FileExists</FUNCTION>
-			<FUNCTION>GetDirectoryFromPath</FUNCTION>
-			<FUNCTION>GetFileFromPath</FUNCTION>
-			<FUNCTION>GetTempDirectory</FUNCTION>
-			<FUNCTION>GetTempFile</FUNCTION>
-			<FUNCTION>GetTemplatePath</FUNCTION>
-
-			<FUNCTION>QueryAddRow</FUNCTION>
-			<FUNCTION>QueryNew</FUNCTION>
-			<FUNCTION>QuerySetCell</FUNCTION>
-
-			<FUNCTION>Decrypt</FUNCTION>
-			<FUNCTION>DeleteClientVariable</FUNCTION>
-			<FUNCTION>Encrypt</FUNCTION>
-			<FUNCTION>GetBaseTagData</FUNCTION>
-			<FUNCTION>GetBaseTagList</FUNCTION>
-			<FUNCTION>GetClientVariablesList</FUNCTION>
-			<FUNCTION>GetTickCount</FUNCTION>
-			<FUNCTION>PreserveSingleQuotes</FUNCTION>
-			<FUNCTION>QuotedValueList</FUNCTION>
-			<FUNCTION>StripCR</FUNCTION>
-			<FUNCTION>URLEncodedFormat</FUNCTION>
-			<FUNCTION>ValueList</FUNCTION>
-			<FUNCTION>WriteOutput</FUNCTION>
-
-			<FUNCTION>ParameterExists</FUNCTION>
-
-			<OPERATOR>IS</OPERATOR>
-			<OPERATOR>EQ</OPERATOR>
-			<OPERATOR>NEQ</OPERATOR>
-			<OPERATOR>GT</OPERATOR>
-			<OPERATOR>GTE</OPERATOR>
-			<OPERATOR>LT</OPERATOR>
-			<OPERATOR>LTE</OPERATOR>
-
-			<OPERATOR>LESS</OPERATOR>
-			<OPERATOR>GREATER</OPERATOR>
-			<OPERATOR>THAN</OPERATOR>
-
-			<OPERATOR>AND</OPERATOR>
-			<OPERATOR>OR</OPERATOR>
-			<OPERATOR>NOT</OPERATOR>
-			<OPERATOR>XOR</OPERATOR>
-		</KEYWORDS>
+		
+		<!-- cf logic inside query (like <cfqueryparam.../> -->
+		<SPAN_REGEXP TYPE="KEYWORD3" DELEGATE="CFTAGS" HASH_CHARS="&lt;CF">
+			<BEGIN>&lt;CF</BEGIN>
+			<END>&gt;</END>
+		</SPAN_REGEXP>
+		
+		<!-- ending cf tag in query (like </cfif> ) -->
+		<SPAN_REGEXP TYPE="KEYWORD3" DELEGATE="CFTAGS" HASH_CHARS="&lt;/CF">
+			<BEGIN>&lt;/CF</BEGIN>
+			<END>&gt;</END>
+		</SPAN_REGEXP>
+		
+		<!-- the actual SQL, delegate -->
+		<SPAN TYPE="MARKUP" DELEGATE="transact-sql::MAIN">
+			<BEGIN>&gt;</BEGIN>
+			<END>&lt;</END>
+		</SPAN>
 	</RULES>
-
+	
 	<RULES SET="CFTAGS" DEFAULT="KEYWORD3">
 		<SPAN TYPE="LITERAL1">
 			<BEGIN>"</BEGIN>
@@ -404,13 +152,33 @@
 			<BEGIN>#</BEGIN>
 			<END>#</END>
 		</SPAN>
-
+		
+		<!-- Allow arbitrary CFScript in CFSET tags (buggy) -->
+		<!--SPAN TYPE="KEYWORD3" DELEGATE="cfscript::MAIN">
+			<BEGIN>SET </BEGIN>
+			<END>&gt;</END>
+		</SPAN-->
+		
 		<KEYWORDS>
+			<KEYWORD2>ACos</KEYWORD2>
+			<KEYWORD2>ASin</KEYWORD2>
+			<KEYWORD2>Abort</KEYWORD2>
+			<KEYWORD2>Abs</KEYWORD2>
+			<KEYWORD2>AddSOAPRequestHeader</KEYWORD2>
+			<KEYWORD2>AddSOAPResponseHeader</KEYWORD2>
+			<KEYWORD2>AjaxLink</KEYWORD2>
+			<KEYWORD2>AjaxOnLoad</KEYWORD2>
+			<KEYWORD2>ApplicationStop</KEYWORD2>
 			<KEYWORD2>ArrayAppend</KEYWORD2>
 			<KEYWORD2>ArrayAvg</KEYWORD2>
 			<KEYWORD2>ArrayClear</KEYWORD2>
+			<KEYWORD2>ArrayContains</KEYWORD2>
+			<KEYWORD2>ArrayDelete</KEYWORD2>
 			<KEYWORD2>ArrayDeleteAt</KEYWORD2>
+			<KEYWORD2>ArrayFind</KEYWORD2>
+			<KEYWORD2>ArrayFindNoCase</KEYWORD2>
 			<KEYWORD2>ArrayInsertAt</KEYWORD2>
+			<KEYWORD2>ArrayIsDefined</KEYWORD2>
 			<KEYWORD2>ArrayIsEmpty</KEYWORD2>
 			<KEYWORD2>ArrayLen</KEYWORD2>
 			<KEYWORD2>ArrayMax</KEYWORD2>
@@ -423,19 +191,50 @@
 			<KEYWORD2>ArraySum</KEYWORD2>
 			<KEYWORD2>ArraySwap</KEYWORD2>
 			<KEYWORD2>ArrayToList</KEYWORD2>
-			<KEYWORD2>IsArray</KEYWORD2>
-			<KEYWORD2>ListToArray</KEYWORD2>
-
+			<KEYWORD2>Asc</KEYWORD2>
+			<KEYWORD2>Atn</KEYWORD2>
+			<KEYWORD2>BinaryDecode</KEYWORD2>
+			<KEYWORD2>BinaryEncode</KEYWORD2>
+			<KEYWORD2>BitAnd</KEYWORD2>
+			<KEYWORD2>BitMaskClear</KEYWORD2>
+			<KEYWORD2>BitMaskRead</KEYWORD2>
+			<KEYWORD2>BitMaskSet</KEYWORD2>
+			<KEYWORD2>BitNot</KEYWORD2>
+			<KEYWORD2>BitOr</KEYWORD2>
+			<KEYWORD2>BitSHLN</KEYWORD2>
+			<KEYWORD2>BitSHRN</KEYWORD2>
+			<KEYWORD2>BitXor</KEYWORD2>
+			<KEYWORD2>CJustify</KEYWORD2>
+			<KEYWORD2>CacheGet</KEYWORD2>
+			<KEYWORD2>CacheGetAllIds</KEYWORD2>
+			<KEYWORD2>CacheGetMetadata</KEYWORD2>
+			<KEYWORD2>CacheGetProperties</KEYWORD2>
+			<KEYWORD2>CacheGetSession</KEYWORD2>
+			<KEYWORD2>CachePut</KEYWORD2>
+			<KEYWORD2>CacheRemove</KEYWORD2>
+			<KEYWORD2>CacheSetProperties</KEYWORD2>
+			<KEYWORD2>Ceiling</KEYWORD2>
+			<KEYWORD2>CharsetDecode</KEYWORD2>
+			<KEYWORD2>CharsetEncode</KEYWORD2>
+			<KEYWORD2>Chr</KEYWORD2>
+			<KEYWORD2>Compare</KEYWORD2>
+			<KEYWORD2>CompareNoCase</KEYWORD2>
+			<KEYWORD2>Cos</KEYWORD2>
 			<KEYWORD2>CreateDate</KEYWORD2>
 			<KEYWORD2>CreateDateTime</KEYWORD2>
-			<KEYWORD2>CreateODBCTime</KEYWORD2>
 			<KEYWORD2>CreateODBCDate</KEYWORD2>
 			<KEYWORD2>CreateODBCDateTime</KEYWORD2>
+			<KEYWORD2>CreateODBCTime</KEYWORD2>
+			<KEYWORD2>CreateObject</KEYWORD2>
 			<KEYWORD2>CreateTime</KEYWORD2>
 			<KEYWORD2>CreateTimeSpan</KEYWORD2>
+			<KEYWORD2>CreateUUID</KEYWORD2>
+			<KEYWORD2>DE</KEYWORD2>
 			<KEYWORD2>DateAdd</KEYWORD2>
 			<KEYWORD2>DateCompare</KEYWORD2>
+			<KEYWORD2>DateConvert</KEYWORD2>
 			<KEYWORD2>DateDiff</KEYWORD2>
+			<KEYWORD2>DateFormat</KEYWORD2>
 			<KEYWORD2>DatePart</KEYWORD2>
 			<KEYWORD2>Day</KEYWORD2>
 			<KEYWORD2>DayOfWeek</KEYWORD2>
@@ -443,49 +242,213 @@
 			<KEYWORD2>DayOfYear</KEYWORD2>
 			<KEYWORD2>DaysInMonth</KEYWORD2>
 			<KEYWORD2>DaysInYear</KEYWORD2>
+			<KEYWORD2>DecimalFormat</KEYWORD2>
+			<KEYWORD2>DecrementValue</KEYWORD2>
+			<KEYWORD2>Decrypt</KEYWORD2>
+			<KEYWORD2>DecryptBinary</KEYWORD2>
+			<KEYWORD2>DeleteClientVariable</KEYWORD2>
+			<KEYWORD2>DeserializeJSON</KEYWORD2>
+			<KEYWORD2>DirectoryCreate</KEYWORD2>
+			<KEYWORD2>DirectoryDelete</KEYWORD2>
+			<KEYWORD2>DirectoryExists</KEYWORD2>
+			<KEYWORD2>DirectoryList</KEYWORD2>
+			<KEYWORD2>DirectoryRename</KEYWORD2>
+			<KEYWORD2>DollarFormat</KEYWORD2>
+			<KEYWORD2>DotNetToCFType</KEYWORD2>
+			<KEYWORD2>Duplicate</KEYWORD2>
+			<KEYWORD2>Encrypt</KEYWORD2>
+			<KEYWORD2>EncryptBinary</KEYWORD2>
+			<KEYWORD2>EntityDelete</KEYWORD2>
+			<KEYWORD2>EntityLoad</KEYWORD2>
+			<KEYWORD2>EntityLoadByExample</KEYWORD2>
+			<KEYWORD2>EntityLoadByPK</KEYWORD2>
+			<KEYWORD2>EntityMerge</KEYWORD2>
+			<KEYWORD2>EntityNew</KEYWORD2>
+			<KEYWORD2>EntityReload</KEYWORD2>
+			<KEYWORD2>EntitySave</KEYWORD2>
+			<KEYWORD2>EntitytoQuery</KEYWORD2>
+			<KEYWORD2>Evaluate</KEYWORD2>
+			<KEYWORD2>Exp</KEYWORD2>
+			<KEYWORD2>ExpandPath</KEYWORD2>
+			<KEYWORD2>FileClose</KEYWORD2>
+			<KEYWORD2>FileCopy</KEYWORD2>
+			<KEYWORD2>FileDelete</KEYWORD2>
+			<KEYWORD2>FileExists</KEYWORD2>
+			<KEYWORD2>FileIsEOF</KEYWORD2>
+			<KEYWORD2>FileMove</KEYWORD2>
+			<KEYWORD2>FileOpen</KEYWORD2>
+			<KEYWORD2>FileRead</KEYWORD2>
+			<KEYWORD2>FileReadBinary</KEYWORD2>
+			<KEYWORD2>FileReadLine</KEYWORD2>
+			<KEYWORD2>FileSeek</KEYWORD2>
+			<KEYWORD2>FileSetAccessMode</KEYWORD2>
+			<KEYWORD2>FileSetAttribute</KEYWORD2>
+			<KEYWORD2>FileSetLastModified</KEYWORD2>
+			<KEYWORD2>FileSkipBytes</KEYWORD2>
+			<KEYWORD2>FileUpload</KEYWORD2>
+			<KEYWORD2>FileUploadAll</KEYWORD2>
+			<KEYWORD2>FileWrite</KEYWORD2>
+			<KEYWORD2>Find</KEYWORD2>
+			<KEYWORD2>FindNoCase</KEYWORD2>
+			<KEYWORD2>FindOneOf</KEYWORD2>
 			<KEYWORD2>FirstDayOfMonth</KEYWORD2>
+			<KEYWORD2>Fix</KEYWORD2>
+			<KEYWORD2>FormatBaseN</KEYWORD2>
+			<KEYWORD2>GenerateSecretKey</KEYWORD2>
+			<KEYWORD2>GetAuthUser</KEYWORD2>
+			<KEYWORD2>GetBaseTagData</KEYWORD2>
+			<KEYWORD2>GetBaseTagList</KEYWORD2>
+			<KEYWORD2>GetBaseTemplatePath</KEYWORD2>
+			<KEYWORD2>GetClientVariablesList</KEYWORD2>
+			<KEYWORD2>GetComponentMetaData</KEYWORD2>
+			<KEYWORD2>GetContextRoot</KEYWORD2>
+			<KEYWORD2>GetCurrentTemplatePath</KEYWORD2>
+			<KEYWORD2>GetDirectoryFromPath</KEYWORD2>
+			<KEYWORD2>GetEncoding</KEYWORD2>
+			<KEYWORD2>GetException</KEYWORD2>
+			<KEYWORD2>GetFileFromPath</KEYWORD2>
+			<KEYWORD2>GetFileInfo</KEYWORD2>
+			<KEYWORD2>GetFunctionCalledName</KEYWORD2>
+			<KEYWORD2>GetFunctionList</KEYWORD2>
+			<KEYWORD2>GetGatewayHelper</KEYWORD2>
+			<KEYWORD2>GetHttpRequestData</KEYWORD2>
+			<KEYWORD2>GetHttpTimeString</KEYWORD2>
+			<KEYWORD2>GetLocalHostIP</KEYWORD2>
+			<KEYWORD2>GetLocale</KEYWORD2>
+			<KEYWORD2>GetLocaleDisplayName</KEYWORD2>
+			<KEYWORD2>GetMetaData</KEYWORD2>
+			<KEYWORD2>GetMetricData</KEYWORD2>
+			<KEYWORD2>GetPageContext</KEYWORD2>
+			<KEYWORD2>GetPrinterInfo</KEYWORD2>
+			<KEYWORD2>GetProfileSections</KEYWORD2>
+			<KEYWORD2>GetProfileString</KEYWORD2>
+			<KEYWORD2>GetReadableImageFormats</KEYWORD2>
+			<KEYWORD2>GetSOAPRequest</KEYWORD2>
+			<KEYWORD2>GetSOAPRequestHeader</KEYWORD2>
+			<KEYWORD2>GetSOAPResponse</KEYWORD2>
+			<KEYWORD2>GetSOAPResponseHeader</KEYWORD2>
+			<KEYWORD2>GetTempDirectory</KEYWORD2>
+			<KEYWORD2>GetTempFile</KEYWORD2>
+			<KEYWORD2>GetTemplatePath</KEYWORD2>
+			<KEYWORD2>GetTickCount</KEYWORD2>
+			<KEYWORD2>GetTimeZoneInfo</KEYWORD2>
+			<KEYWORD2>GetToken</KEYWORD2>
+			<KEYWORD2>GetUserRoles</KEYWORD2>
+			<KEYWORD2>GetWriteableImageFormats</KEYWORD2>
+			<KEYWORD2>HTMLCodeFormat</KEYWORD2>
+			<KEYWORD2>HTMLEditFormat</KEYWORD2>
+			<KEYWORD2>Hash</KEYWORD2>
 			<KEYWORD2>Hour</KEYWORD2>
-			<KEYWORD2>Minute</KEYWORD2>
-			<KEYWORD2>Month</KEYWORD2>
-			<KEYWORD2>MonthAsString</KEYWORD2>
-			<KEYWORD2>Now</KEYWORD2>
-			<KEYWORD2>ParseDateTime</KEYWORD2>
-			<KEYWORD2>Quarter</KEYWORD2>
-			<KEYWORD2>Second</KEYWORD2>
-			<KEYWORD2>Week</KEYWORD2>
-			<KEYWORD2>Year</KEYWORD2>
-
+			<KEYWORD2>IIf</KEYWORD2>
+			<KEYWORD2>ImageAddBorder</KEYWORD2>
+			<KEYWORD2>ImageBlur</KEYWORD2>
+			<KEYWORD2>ImageClearRect</KEYWORD2>
+			<KEYWORD2>ImageCopy</KEYWORD2>
+			<KEYWORD2>ImageCrop</KEYWORD2>
+			<KEYWORD2>ImageDrawArc</KEYWORD2>
+			<KEYWORD2>ImageDrawBeveledRect</KEYWORD2>
+			<KEYWORD2>ImageDrawCubicCurve</KEYWORD2>
+			<KEYWORD2>ImageDrawLine</KEYWORD2>
+			<KEYWORD2>ImageDrawLines</KEYWORD2>
+			<KEYWORD2>ImageDrawOval</KEYWORD2>
+			<KEYWORD2>ImageDrawPoint</KEYWORD2>
+			<KEYWORD2>ImageDrawQuadraticCurve</KEYWORD2>
+			<KEYWORD2>ImageDrawRect</KEYWORD2>
+			<KEYWORD2>ImageDrawRoundRect</KEYWORD2>
+			<KEYWORD2>ImageDrawText</KEYWORD2>
+			<KEYWORD2>ImageFlip</KEYWORD2>
+			<KEYWORD2>ImageGetBlob</KEYWORD2>
+			<KEYWORD2>ImageGetBufferedImage</KEYWORD2>
+			<KEYWORD2>ImageGetEXIFTag</KEYWORD2>
+			<KEYWORD2>ImageGetHeight</KEYWORD2>
+			<KEYWORD2>ImageGetIPTCTag</KEYWORD2>
+			<KEYWORD2>ImageGetWidth</KEYWORD2>
+			<KEYWORD2>ImageGrayscale</KEYWORD2>
+			<KEYWORD2>ImageInfo</KEYWORD2>
+			<KEYWORD2>ImageNegative</KEYWORD2>
+			<KEYWORD2>ImageNew</KEYWORD2>
+			<KEYWORD2>ImageOverlay</KEYWORD2>
+			<KEYWORD2>ImagePaste</KEYWORD2>
+			<KEYWORD2>ImageRead</KEYWORD2>
+			<KEYWORD2>ImageReadBase64</KEYWORD2>
+			<KEYWORD2>ImageResize</KEYWORD2>
+			<KEYWORD2>ImageRotate</KEYWORD2>
+			<KEYWORD2>ImageRotateDrawingAxis</KEYWORD2>
+			<KEYWORD2>ImageScaleToFit</KEYWORD2>
+			<KEYWORD2>ImageSetAntialiasing</KEYWORD2>
+			<KEYWORD2>ImageSetBackgroundColor</KEYWORD2>
+			<KEYWORD2>ImageSetDrawingColor</KEYWORD2>
+			<KEYWORD2>ImageSetDrawingStroke</KEYWORD2>
+			<KEYWORD2>ImageSetDrawingTransparency</KEYWORD2>
+			<KEYWORD2>ImageSharpen</KEYWORD2>
+			<KEYWORD2>ImageShear</KEYWORD2>
+			<KEYWORD2>ImageShearDrawingAxis</KEYWORD2>
+			<KEYWORD2>ImageTranslate</KEYWORD2>
+			<KEYWORD2>ImageTranslateDrawingAxis</KEYWORD2>
+			<KEYWORD2>ImageWrite</KEYWORD2>
+			<KEYWORD2>ImageWriteBase64</KEYWORD2>
+			<KEYWORD2>ImageXORDrawingMode</KEYWORD2>
+			<KEYWORD2>IncrementValue</KEYWORD2>
+			<KEYWORD2>InputBaseN</KEYWORD2>
+			<KEYWORD2>Insert</KEYWORD2>
+			<KEYWORD2>Int</KEYWORD2>
 			<KEYWORD2>IsArray</KEYWORD2>
-			<KEYWORD2>IsAuthenticated</KEYWORD2>
-			<KEYWORD2>IsAuthorized</KEYWORD2>
+			<KEYWORD2>IsBinary</KEYWORD2>
 			<KEYWORD2>IsBoolean</KEYWORD2>
+			<KEYWORD2>IsCustomFunction</KEYWORD2>
+			<KEYWORD2>IsDDX</KEYWORD2>
 			<KEYWORD2>IsDate</KEYWORD2>
 			<KEYWORD2>IsDebugMode</KEYWORD2>
 			<KEYWORD2>IsDefined</KEYWORD2>
+			<KEYWORD2>IsImage</KEYWORD2>
+			<KEYWORD2>IsImageFile</KEYWORD2>
+			<KEYWORD2>IsInstanceOf</KEYWORD2>
+			<KEYWORD2>IsJSON</KEYWORD2>
+			<KEYWORD2>IsK2ServerABroker</KEYWORD2>
+			<KEYWORD2>IsK2ServerDocCountExceeded</KEYWORD2>
+			<KEYWORD2>IsK2ServerOnline</KEYWORD2>
 			<KEYWORD2>IsLeapYear</KEYWORD2>
+			<KEYWORD2>IsLocalHost</KEYWORD2>
+			<KEYWORD2>IsNull</KEYWORD2>
 			<KEYWORD2>IsNumeric</KEYWORD2>
 			<KEYWORD2>IsNumericDate</KEYWORD2>
+			<KEYWORD2>IsObject</KEYWORD2>
+			<KEYWORD2>IsPDFFile</KEYWORD2>
+			<KEYWORD2>IsPDFObject</KEYWORD2>
 			<KEYWORD2>IsQuery</KEYWORD2>
+			<KEYWORD2>IsSOAPRequest</KEYWORD2>
 			<KEYWORD2>IsSimpleValue</KEYWORD2>
 			<KEYWORD2>IsStruct</KEYWORD2>
-
-			<KEYWORD2>DateFormat</KEYWORD2>
-			<KEYWORD2>DecimalFormat</KEYWORD2>
-			<KEYWORD2>DollarFormat</KEYWORD2>
-			<KEYWORD2>FormatBaseN</KEYWORD2>
-			<KEYWORD2>HTMLCodeFormat</KEYWORD2>
-			<KEYWORD2>HTMLEditFormat</KEYWORD2>
-			<KEYWORD2>NumberFormat</KEYWORD2>
-			<KEYWORD2>ParagraphFormat</KEYWORD2>
-			<KEYWORD2>TimeFormat</KEYWORD2>
-			<KEYWORD2>YesNoFormat</KEYWORD2>
-
-			<KEYWORD2>DE</KEYWORD2>
-			<KEYWORD2>Evaluate</KEYWORD2>
-			<KEYWORD2>IIf</KEYWORD2>
-			<KEYWORD2>SetVariable</KEYWORD2>
-
-			<KEYWORD2>ArrayToList</KEYWORD2>
+			<KEYWORD2>IsUserInAnyRole</KEYWORD2>
+			<KEYWORD2>IsUserInRole</KEYWORD2>
+			<KEYWORD2>IsUserLoggedIn</KEYWORD2>
+			<KEYWORD2>IsValid</KEYWORD2>
+			<KEYWORD2>IsWDDX</KEYWORD2>
+			<KEYWORD2>IsXML</KEYWORD2>
+			<KEYWORD2>IsXmlAttribute</KEYWORD2>
+			<KEYWORD2>IsXmlDoc</KEYWORD2>
+			<KEYWORD2>IsXmlElem</KEYWORD2>
+			<KEYWORD2>IsXmlNode</KEYWORD2>
+			<KEYWORD2>IsXmlRoot</KEYWORD2>
+			<KEYWORD2>JSStringFormat</KEYWORD2>
+			<KEYWORD2>JavaCast</KEYWORD2>
+			<KEYWORD2>LCase</KEYWORD2>
+			<KEYWORD2>LJustify</KEYWORD2>
+			<KEYWORD2>LSCurrencyFormat</KEYWORD2>
+			<KEYWORD2>LSDateFormat</KEYWORD2>
+			<KEYWORD2>LSEuroCurrencyFormat</KEYWORD2>
+			<KEYWORD2>LSIsCurrency</KEYWORD2>
+			<KEYWORD2>LSIsDate</KEYWORD2>
+			<KEYWORD2>LSIsNumeric</KEYWORD2>
+			<KEYWORD2>LSNumberFormat</KEYWORD2>
+			<KEYWORD2>LSParseCurrency</KEYWORD2>
+			<KEYWORD2>LSParseDateTime</KEYWORD2>
+			<KEYWORD2>LSParseEuroCurrency</KEYWORD2>
+			<KEYWORD2>LSParseNumber</KEYWORD2>
+			<KEYWORD2>LSTimeFormat</KEYWORD2>
+			<KEYWORD2>LTrim</KEYWORD2>
+			<KEYWORD2>Left</KEYWORD2>
+			<KEYWORD2>Len</KEYWORD2>
 			<KEYWORD2>ListAppend</KEYWORD2>
 			<KEYWORD2>ListChangeDelims</KEYWORD2>
 			<KEYWORD2>ListContains</KEYWORD2>
@@ -499,130 +462,173 @@
 			<KEYWORD2>ListLast</KEYWORD2>
 			<KEYWORD2>ListLen</KEYWORD2>
 			<KEYWORD2>ListPrepend</KEYWORD2>
+			<KEYWORD2>ListQualify</KEYWORD2>
 			<KEYWORD2>ListRest</KEYWORD2>
 			<KEYWORD2>ListSetAt</KEYWORD2>
+			<KEYWORD2>ListSort</KEYWORD2>
 			<KEYWORD2>ListToArray</KEYWORD2>
-
-			<KEYWORD2>StructClear</KEYWORD2>
-			<KEYWORD2>StructCopy</KEYWORD2>
-			<KEYWORD2>StructCount</KEYWORD2>
-			<KEYWORD2>StructDelete</KEYWORD2>
-			<KEYWORD2>StructFind</KEYWORD2>
-			<KEYWORD2>StructInsert</KEYWORD2>
-			<KEYWORD2>StructIsEmpty</KEYWORD2>
-			<KEYWORD2>StructKeyExists</KEYWORD2>
-			<KEYWORD2>StructNew</KEYWORD2>
-			<KEYWORD2>StructUpdate</KEYWORD2>
-
-			<KEYWORD2>GetLocale</KEYWORD2>
-			<KEYWORD2>LSCurrencyFormat</KEYWORD2>
-			<KEYWORD2>LSDateFormat</KEYWORD2>
-			<KEYWORD2>LSIsCurrency</KEYWORD2>
-			<KEYWORD2>LSIsDate</KEYWORD2>
-			<KEYWORD2>LSIsNumeric</KEYWORD2>
-			<KEYWORD2>LSNumberFormat</KEYWORD2>
-			<KEYWORD2>LSParseCurrency</KEYWORD2>
-			<KEYWORD2>LSParseDateTime</KEYWORD2>
-			<KEYWORD2>LSParseNumber</KEYWORD2>
-			<KEYWORD2>LSTimeFormat</KEYWORD2>
-			<KEYWORD2>SetLocale</KEYWORD2>
-
-			<KEYWORD2>Abs</KEYWORD2>
-			<KEYWORD2>Atn</KEYWORD2>
-			<KEYWORD2>BitAnd</KEYWORD2>
-			<KEYWORD2>BitMaskClear</KEYWORD2>
-			<KEYWORD2>BitMaskRead</KEYWORD2>
-			<KEYWORD2>BitMaskSet</KEYWORD2>
-			<KEYWORD2>BitNot</KEYWORD2>
-			<KEYWORD2>BitOr</KEYWORD2>
-			<KEYWORD2>BitSHLN</KEYWORD2>
-			<KEYWORD2>BitSHRN</KEYWORD2>
-			<KEYWORD2>BitXor</KEYWORD2>
-			<KEYWORD2>Ceiling</KEYWORD2>
-			<KEYWORD2>Cos</KEYWORD2>
-			<KEYWORD2>DecrementValue</KEYWORD2>
-			<KEYWORD2>Exp</KEYWORD2>
-			<KEYWORD2>Fix</KEYWORD2>
-			<KEYWORD2>IncrementValue</KEYWORD2>
-			<KEYWORD2>InputBaseN</KEYWORD2>
-			<KEYWORD2>Int</KEYWORD2>
+			<KEYWORD2>ListValueCount</KEYWORD2>
+			<KEYWORD2>ListValueCountNoCase</KEYWORD2>
+			<KEYWORD2>Location</KEYWORD2>
 			<KEYWORD2>Log</KEYWORD2>
 			<KEYWORD2>Log10</KEYWORD2>
 			<KEYWORD2>Max</KEYWORD2>
-			<KEYWORD2>Min</KEYWORD2>
-			<KEYWORD2>Pi</KEYWORD2>
-			<KEYWORD2>Rand</KEYWORD2>
-			<KEYWORD2>Randomize</KEYWORD2>
-			<KEYWORD2>RandRange</KEYWORD2>
-			<KEYWORD2>Round</KEYWORD2>
-			<KEYWORD2>Sgn</KEYWORD2>
-			<KEYWORD2>Sin</KEYWORD2>
-			<KEYWORD2>Sqr</KEYWORD2>
-			<KEYWORD2>Tan</KEYWORD2>
-
-			<KEYWORD2>Asc</KEYWORD2>
-			<KEYWORD2>Chr</KEYWORD2>
-			<KEYWORD2>CJustify</KEYWORD2>
-			<KEYWORD2>Compare</KEYWORD2>
-			<KEYWORD2>CompareNoCase</KEYWORD2>
-			<KEYWORD2>Find</KEYWORD2>
-			<KEYWORD2>FindNoCase</KEYWORD2>
-			<KEYWORD2>FindOneOf</KEYWORD2>
-			<KEYWORD2>GetToken</KEYWORD2>
-			<KEYWORD2>Insert</KEYWORD2>
-			<KEYWORD2>LCase</KEYWORD2>
-			<KEYWORD2>Left</KEYWORD2>
-			<KEYWORD2>Len</KEYWORD2>
-			<KEYWORD2>LJustify</KEYWORD2>
-			<KEYWORD2>LTrim</KEYWORD2>
 			<KEYWORD2>Mid</KEYWORD2>
+			<KEYWORD2>Min</KEYWORD2>
+			<KEYWORD2>Minute</KEYWORD2>
+			<KEYWORD2>Month</KEYWORD2>
+			<KEYWORD2>MonthAsString</KEYWORD2>
+			<KEYWORD2>Now</KEYWORD2>
+			<KEYWORD2>NumberFormat</KEYWORD2>
+			<KEYWORD2>ORMClearSession</KEYWORD2>
+			<KEYWORD2>ORMCloseSession</KEYWORD2>
+			<KEYWORD2>ORMEvictCollection</KEYWORD2>
+			<KEYWORD2>ORMEvictEntity</KEYWORD2>
+			<KEYWORD2>ORMEvictQueries</KEYWORD2>
+			<KEYWORD2>ORMExecuteQuery</KEYWORD2>
+			<KEYWORD2>ORMFlush</KEYWORD2>
+			<KEYWORD2>ORMGetSession</KEYWORD2>
+			<KEYWORD2>ORMGetSessionFactory</KEYWORD2>
+			<KEYWORD2>ORMReload</KEYWORD2>
+			<KEYWORD2>ObjectEquals</KEYWORD2>
+			<KEYWORD2>ObjectLoad</KEYWORD2>
+			<KEYWORD2>ObjectSave</KEYWORD2>
+			<KEYWORD2>ParagraphFormat</KEYWORD2>
+			<KEYWORD2>ParseDateTime</KEYWORD2>
+			<KEYWORD2>Pi</KEYWORD2>
+			<KEYWORD2>PrecisionEvaluate</KEYWORD2>
+			<KEYWORD2>PreserveSingleQuotes</KEYWORD2>
+			<KEYWORD2>Quarter</KEYWORD2>
+			<KEYWORD2>QueryAddColumn</KEYWORD2>
+			<KEYWORD2>QueryAddRow</KEYWORD2>
+			<KEYWORD2>QueryConvertForGrid</KEYWORD2>
+			<KEYWORD2>QueryNew</KEYWORD2>
+			<KEYWORD2>QuerySetCell</KEYWORD2>
+			<KEYWORD2>QuotedValueList</KEYWORD2>
 			<KEYWORD2>REFind</KEYWORD2>
 			<KEYWORD2>REFindNoCase</KEYWORD2>
+			<KEYWORD2>REMatch</KEYWORD2>
+			<KEYWORD2>REMatchNoCase</KEYWORD2>
+			<KEYWORD2>REReplace</KEYWORD2>
+			<KEYWORD2>REReplaceNoCase</KEYWORD2>
+			<KEYWORD2>RJustify</KEYWORD2>
+			<KEYWORD2>RTrim</KEYWORD2>
+			<KEYWORD2>Rand</KEYWORD2>
+			<KEYWORD2>RandRange</KEYWORD2>
+			<KEYWORD2>Randomize</KEYWORD2>
+			<KEYWORD2>ReleaseComObject</KEYWORD2>
 			<KEYWORD2>RemoveChars</KEYWORD2>
 			<KEYWORD2>RepeatString</KEYWORD2>
 			<KEYWORD2>Replace</KEYWORD2>
 			<KEYWORD2>ReplaceList</KEYWORD2>
 			<KEYWORD2>ReplaceNoCase</KEYWORD2>
-			<KEYWORD2>REReplace</KEYWORD2>
-			<KEYWORD2>REReplaceNoCase</KEYWORD2>
 			<KEYWORD2>Reverse</KEYWORD2>
 			<KEYWORD2>Right</KEYWORD2>
-			<KEYWORD2>RJustify</KEYWORD2>
-			<KEYWORD2>RTrim</KEYWORD2>
+			<KEYWORD2>Round</KEYWORD2>
+			<KEYWORD2>Second</KEYWORD2>
+			<KEYWORD2>SendGatewayMessage</KEYWORD2>
+			<KEYWORD2>SerializeJSON</KEYWORD2>
+			<KEYWORD2>SetLocale</KEYWORD2>
+			<KEYWORD2>SetProfileString</KEYWORD2>
+			<KEYWORD2>SetVariable</KEYWORD2>
+			<KEYWORD2>Sgn</KEYWORD2>
+			<KEYWORD2>Sin</KEYWORD2>
+			<KEYWORD2>Sleep</KEYWORD2>
 			<KEYWORD2>SpanExcluding</KEYWORD2>
 			<KEYWORD2>SpanIncluding</KEYWORD2>
+			<KEYWORD2>SpreadsheetAddColumn</KEYWORD2>
+			<KEYWORD2>SpreadsheetAddFreezePane</KEYWORD2>
+			<KEYWORD2>SpreadsheetAddImage</KEYWORD2>
+			<KEYWORD2>SpreadsheetAddInfo</KEYWORD2>
+			<KEYWORD2>SpreadsheetAddRow</KEYWORD2>
+			<KEYWORD2>SpreadsheetAddRows</KEYWORD2>
+			<KEYWORD2>SpreadsheetAddSplitPane</KEYWORD2>
+			<KEYWORD2>SpreadsheetCreateSheet</KEYWORD2>
+			<KEYWORD2>SpreadsheetDeleteColumn</KEYWORD2>
+			<KEYWORD2>SpreadsheetDeleteColumns</KEYWORD2>
+			<KEYWORD2>SpreadsheetDeleteRow</KEYWORD2>
+			<KEYWORD2>SpreadsheetDeleteRows</KEYWORD2>
+			<KEYWORD2>SpreadsheetFormatCell</KEYWORD2>
+			<KEYWORD2>SpreadsheetFormatCellRange</KEYWORD2>
+			<KEYWORD2>SpreadsheetFormatColumn</KEYWORD2>
+			<KEYWORD2>SpreadsheetFormatColumns</KEYWORD2>
+			<KEYWORD2>SpreadsheetFormatRow</KEYWORD2>
+			<KEYWORD2>SpreadsheetFormatRows</KEYWORD2>
+			<KEYWORD2>SpreadsheetGetCellComment</KEYWORD2>
+			<KEYWORD2>SpreadsheetGetCellFormula</KEYWORD2>
+			<KEYWORD2>SpreadsheetGetCellValue</KEYWORD2>
+			<KEYWORD2>SpreadsheetInfo</KEYWORD2>
+			<KEYWORD2>SpreadsheetMergeCells</KEYWORD2>
+			<KEYWORD2>SpreadsheetNew</KEYWORD2>
+			<KEYWORD2>SpreadsheetRead</KEYWORD2>
+			<KEYWORD2>SpreadsheetReadBinary</KEYWORD2>
+			<KEYWORD2>SpreadsheetRemoveSheet</KEYWORD2>
+			<KEYWORD2>SpreadsheetSetActiveSheet</KEYWORD2>
+			<KEYWORD2>SpreadsheetSetActiveSheetNumber</KEYWORD2>
+			<KEYWORD2>SpreadsheetSetCellComment</KEYWORD2>
+			<KEYWORD2>SpreadsheetSetCellFormula</KEYWORD2>
+			<KEYWORD2>SpreadsheetSetCellValue</KEYWORD2>
+			<KEYWORD2>SpreadsheetSetColumnWidth</KEYWORD2>
+			<KEYWORD2>SpreadsheetSetFooter</KEYWORD2>
+			<KEYWORD2>SpreadsheetSetHeader</KEYWORD2>
+			<KEYWORD2>SpreadsheetSetRowHeight</KEYWORD2>
+			<KEYWORD2>SpreadsheetShiftColumns</KEYWORD2>
+			<KEYWORD2>SpreadsheetShiftRows</KEYWORD2>
+			<KEYWORD2>SpreadsheetWrite</KEYWORD2>
+			<KEYWORD2>Sqr</KEYWORD2>
+			<KEYWORD2>StripCR</KEYWORD2>
+			<KEYWORD2>StructAppend</KEYWORD2>
+			<KEYWORD2>StructClear</KEYWORD2>
+			<KEYWORD2>StructCopy</KEYWORD2>
+			<KEYWORD2>StructCount</KEYWORD2>
+			<KEYWORD2>StructDelete</KEYWORD2>
+			<KEYWORD2>StructFind</KEYWORD2>
+			<KEYWORD2>StructFindKey</KEYWORD2>
+			<KEYWORD2>StructFindValue</KEYWORD2>
+			<KEYWORD2>StructGet</KEYWORD2>
+			<KEYWORD2>StructInsert</KEYWORD2>
+			<KEYWORD2>StructIsEmpty</KEYWORD2>
+			<KEYWORD2>StructKeyArray</KEYWORD2>
+			<KEYWORD2>StructKeyExists</KEYWORD2>
+			<KEYWORD2>StructKeyList</KEYWORD2>
+			<KEYWORD2>StructNew</KEYWORD2>
+			<KEYWORD2>StructSort</KEYWORD2>
+			<KEYWORD2>StructUpdate</KEYWORD2>
+			<KEYWORD2>Tan</KEYWORD2>
+			<KEYWORD2>Throw</KEYWORD2>
+			<KEYWORD2>TimeFormat</KEYWORD2>
+			<KEYWORD2>ToBase64</KEYWORD2>
+			<KEYWORD2>ToBinary</KEYWORD2>
+			<KEYWORD2>ToScript</KEYWORD2>
+			<KEYWORD2>ToString</KEYWORD2>
+			<KEYWORD2>Trace</KEYWORD2>
+			<KEYWORD2>TransactionCommit</KEYWORD2>
+			<KEYWORD2>TransactionRollback</KEYWORD2>
+			<KEYWORD2>TransactionSetSavePoint</KEYWORD2>
 			<KEYWORD2>Trim</KEYWORD2>
 			<KEYWORD2>UCase</KEYWORD2>
-			<KEYWORD2>Val</KEYWORD2>
-
-			<KEYWORD2>DirectoryExists</KEYWORD2>
-			<KEYWORD2>ExpandPath</KEYWORD2>
-			<KEYWORD2>FileExists</KEYWORD2>
-			<KEYWORD2>GetDirectoryFromPath</KEYWORD2>
-			<KEYWORD2>GetFileFromPath</KEYWORD2>
-			<KEYWORD2>GetTempDirectory</KEYWORD2>
-			<KEYWORD2>GetTempFile</KEYWORD2>
-			<KEYWORD2>GetTemplatePath</KEYWORD2>
-
-			<KEYWORD2>QueryAddRow</KEYWORD2>
-			<KEYWORD2>QueryNew</KEYWORD2>
-			<KEYWORD2>QuerySetCell</KEYWORD2>
-
-			<KEYWORD2>Decrypt</KEYWORD2>
-			<KEYWORD2>DeleteClientVariable</KEYWORD2>
-			<KEYWORD2>Encrypt</KEYWORD2>
-			<KEYWORD2>GetBaseTagData</KEYWORD2>
-			<KEYWORD2>GetBaseTagList</KEYWORD2>
-			<KEYWORD2>GetClientVariablesList</KEYWORD2>
-			<KEYWORD2>GetTickCount</KEYWORD2>
-			<KEYWORD2>PreserveSingleQuotes</KEYWORD2>
-			<KEYWORD2>QuotedValueList</KEYWORD2>
-			<KEYWORD2>StripCR</KEYWORD2>
+			<KEYWORD2>URLDecode</KEYWORD2>
 			<KEYWORD2>URLEncodedFormat</KEYWORD2>
+			<KEYWORD2>URLSessionFormat</KEYWORD2>
+			<KEYWORD2>Val</KEYWORD2>
 			<KEYWORD2>ValueList</KEYWORD2>
+			<KEYWORD2>VerifyClient</KEYWORD2>
+			<KEYWORD2>Week</KEYWORD2>
+			<KEYWORD2>Wrap</KEYWORD2>
+			<KEYWORD2>WriteDump</KEYWORD2>
+			<KEYWORD2>WriteLog</KEYWORD2>
 			<KEYWORD2>WriteOutput</KEYWORD2>
-
-			<KEYWORD2>ParameterExists</KEYWORD2>
+			<KEYWORD2>XmlChildPos</KEYWORD2>
+			<KEYWORD2>XmlElemNew</KEYWORD2>
+			<KEYWORD2>XmlFormat</KEYWORD2>
+			<KEYWORD2>XmlGetNodeType</KEYWORD2>
+			<KEYWORD2>XmlNew</KEYWORD2>
+			<KEYWORD2>XmlParse</KEYWORD2>
+			<KEYWORD2>XmlSearch</KEYWORD2>
+			<KEYWORD2>XmlTransform</KEYWORD2>
+			<KEYWORD2>XmlValidate</KEYWORD2>
+			<KEYWORD2>Year</KEYWORD2>
+			<KEYWORD2>YesNoFormat</KEYWORD2>
 
 			<OPERATOR>IS</OPERATOR>
 			<OPERATOR>EQ</OPERATOR>

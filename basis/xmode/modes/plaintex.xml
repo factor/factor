@@ -1,0 +1,2886 @@
+<?xml version="1.0"?>
+
+<!DOCTYPE MODE SYSTEM "xmode.dtd">
+
+<!--____________________________________________________________________
+                                 Plain TeX Syntax Highlighting for jEdit
+
+                                                        by James Nicholl
+
+                                                    jnicholl17@yahoo.com
+________________________________________________________________________
+  -  Forward  -
+________________________________________________________________________
+
+	This syntax highlighting package is primarily based on a list of well organized and easily processed control sequence names that can be obtained at:
+
+	http://www.math.upenn.edu/tex_docs/help/csname.txt
+
+	Control sequences contained in the aforementioned document are included here with some exceptions. I removed from this list any control sequence not supported by plain TeX. It is currently my belief that this document details the control sequences in some form of AMS TeX. There were some control sequences that contained the character '@'. It is my understanding that the intention behind using a '@' character in a control sequence is to signify that the control sequence is private. I have therefore removed all control sequences that include '@'.
+
+	Continuing along this line of reason, I chose not to extend this naming restriction to user defined control sequences. They are recognized as being of the form \[a-zA-Z@][a-zA-Z@]* In other words, a user defined control sequence is prefixed by a backslash '\' and contains one or more characters from the set of letter characters union '@'. If you were silly enough to reassign your escape character then this package isn't for you, and I'm sure you've realized by now that there really aren't any syntax highlighting packages available for your exotic dialect of TeX.
+________________________________________________________________________
+  -  Description  -
+________________________________________________________________________
+
+	Take some time and assign a color scheme that makes sense for you. Syntax highlighting can illuminate some simple typing errors and improve your programming by allowing you to quickly and effortlessly identify key structures in your code.
+
+	This is a work in progress. Eventually, with enough experience programming TeX, I should have a better idea of how to categorize everything, and a better idea of what there is to categorize. It's just a matter of working with this xml document always open and making adjustments when the opportunity arises.
+
+	Any unrecognized control sequences of the form "\[a-zA-Z@]" are considered to be user defined.
+
+________________________________________________________________________
+  -  Description  -
+________________________________________________________________________
+
+
+COMMENT1	-	Comments
+
+COMMENT2	-	Allocations
+
+COMMENT3	-	Assignments
+
+COMMENT4	-	Registers
+
+DIGIT		-	Macro (definition) arguments of the form #[1-9]
+
+FUNCTION	-	Definitions
+
+INVALID	-	UNUSED
+
+KEYWORD1	-	Plain TeX control sequences of the form \[a-zA-Z]*
+
+KEYWORD2	-	Character Control Sequences
+
+KEYWORD3	-	Conditional Control Sequences
+
+KEYWORD4	-	Parameters: integer, dimension, glue, muglue and token
+
+LABEL		-	Unrecognized control sequences of the form \[a-zA-Z@]*
+
+LITERAL1	-	Other reserved characters. & ~ ^ _
+
+LITERAL2	-	TeX dimensions of the form [0-9]*.[0-9]*[pt pc bp in cm mm cc dd]
+
+LITERAL3	-	Punctuation , . ; : ' " ` ! ? \ \par
+
+LITERAL4	-	Other Characters ( ) + - lessthan greaterthan = / * |
+
+MARKUP		-	Extends over math mode. It is highly recommended that this type be
+				assigned a background color markedly different than the default
+				background color. You don't want to lose track of your dollar
+				signs!
+
+OPERATOR	-	TeX grouping brackets {...} , square argument brackets [...] , in
+				line math mode dollar signs $...$ and paragraph math mode double
+				dollar signs $$...$$ Assign these symbols bright colors so they
+				stand out!
+
+_______________________________________________________________________________
+	-  References  -
+_______________________________________________________________________________
+
+	In the course of preparing this package I have consulted the famous TeXbook many times. I'm sure I can't say anything positive about this book that hasn't already been said. It's the first book an ambitious student of plain TeX should read, and if it's the only book you read on TeX it's probably enough.
+
+Knuth, Donald. The TeXbook. Twentieth Printing. Addison-Wesley:
+	Reading, MA, USA, 1991.
+
+	After absorbing the material in the TeXbook I found an excellent electronic reference manual through the ubiquitous internet. For someone that appreciates explicit, rigorous and thorough language definition this is an ideal programmer's companion. A printed copy can be purchased and the PDF version can be downloaded free of charge through the author's website.
+
+	http://eijkhout.net/texbytopic/texbytopic.html
+
+Eijkhout, Victor. TeX by Topic. Reprinted 1993. Addison-Wesley:
+	UK, 1991.
+
+	As I am a prolific Googler, many random and forgettable forums, blogs, wikis, and all manner of dubiously monickered digital media were consulted while preparing this package. I think I can safely say that if I had confined myself to the following few websites I would have found everything I needed.
+
+The American Mathematical Society
+	http://www.ams.org/cmlhtml/texcodes.html
+
+CTAN
+
+TUG
+
+
+	It may not be standard to include bibliographical information for such a small computer program, but if you don't recognize any of these sources then I have provided you with a great service. Contained in these references are answeres to all you'll ever want to know about TeX and probably more. I wish I had read comments just like these several months ago!
+________________________________________________________________________
+	-  The Big List -
+________________________________________________________________________
+
+	Starting with the documentation noted, I have extracted and categorized the following control sequences and syntactic entities. There are many more entities in the body of code than are not listed here. These are just the ones that I have taken special care to highlight.
+________________________________________________________________________
+	-  Allocations  -
+
+	Highlight as COMMENT2
+
+	\newlinechar
+	\newmuskip
+	\newinsert
+	\newwrite
+	\newdimen
+	\newcount
+	\newtoks
+	\newskip
+	\newread
+	\newhelp
+	\newfam
+	\newbox
+	\newif
+
+	(\\newlinechar<|\\newmuskip\\newinsert<|\\newwrite<|\\newdimen<|\\newcount<|\\newtoks<|\\newskip<|\\newread<|\\newhelp<|\\newfam<|\\newbox<|\\newif<)
+_______________________________________________________________________________
+	-  Assignments  -
+
+	Highlight as COMMENT3
+
+	\futurelet
+	\let
+
+	(\\futurelet<|\\let<)
+_______________________________________________________________________________
+	-  Registers  -
+
+	Highlight as COMMENT4
+
+	\muskip([0-1][0-9][0-9]|2([0-4][0-9]|5[0-5]))
+	\muskip[0-9][0-9]
+	\muskip[0-9]
+	\muskip
+	\dimen([0-1][0-9][0-9]|2([0-4][0-9]|5[0-5]))
+	\dimen[0-9][0-9]
+	\dimen[0-9]
+	\dimen
+	\count([0-1][0-9][0-9]|2([0-4][0-9]|5[0-5]))
+	\count[0-9][0-9]
+	\count[0-9]
+	\count
+	\toks([0-1][0-9][0-9]|2([0-4][0-9]|5[0-5]))
+	\toks[0-9][0-9]
+	\toks[0-9]
+	\toks
+	\skip([0-1][0-9][0-9]|2([0-4][0-9]|5[0-5]))
+	\skip[0-9][0-9]
+	\skip[0-9]
+	\skip
+	\box([0-1][0-9][0-9]|2([0-4][0-9]|5[0-5]))
+	\box[0-9][0-9]
+	\box[0-9]
+	\box
+_______________________________________________________________________________
+	-  Definitions  -
+
+	Highlight as FUNCTION
+
+	\mathchardef
+	\muskipdef
+	\endcsname
+	\dimendef
+	\countdef
+	\toksdef
+	\skipdef
+	\chardef
+	\csname
+	\global
+	\outer
+	\xdef
+	\gdef
+	\long
+	\edef
+	\def
+
+	(\\mathchardef<|\\muskipdef<|\\endcsname<|\\dimendef<|\\countdef<|\\toksdef<|\\skipdef<|\\chardef<|\\csname<|\\global<|\\outer<|\\xdef<|\\gdef<|\\long<|\\edef<|\\def<)
+_______________________________________________________________________________
+	-  Control Sequences Representing Characters  -
+
+	Highlight as KEYWORD2
+
+	http://www.ams.org/cmlhtml/texcodes.html
+	and Knuth: Chapter 8
+
+	The Escaped Versions of TeX's Reserved Characters
+		\#
+		\$
+		\%
+		\&
+		\{
+		\}
+		\_
+		\backslash
+
+	Characters Described by Number
+		\char<0-255>
+		\char'<octal number 0-377>
+		\char"<hex number 0-FF>
+		^^[ASCII char 0-127]
+		^^[lowercase hex 00-ff]
+
+	The Token for Obtaining an ASCII Character Index
+		`[character or control sequence]
+
+	Control Sequences for Accents
+		\utilde
+		\lfhook
+		\cfudot
+		\candra
+		\acudot
+		\uarc
+		\cfac
+		\`
+		\'
+		\^
+		\"
+		\H
+		\~
+		\c
+		\=
+		\b
+		\.
+		\d
+		\r
+		\k
+		\u
+		\v
+		\t
+
+	Accented Characters and Ligatures
+		\cdprime
+		\cprime
+		\Dbar
+		\dbar
+		\eth
+		\ss
+		\OE
+		\oe
+		\aa
+		\AA
+		\ae
+		\AE
+		\o
+		\O
+		\l
+		\L
+		\j
+		\i
+_______________________________________________________________________________
+	-  Conditional Control Sequences  -
+
+	Highlight as KEYWORD3
+
+	See Eijkhout: pg 140 for details.
+
+	\ifvmode
+	\ifmmode
+	\ifinner
+	\ifhmode
+	\iffalse
+	\ifvoid
+	\ifvbox
+	\iftrue
+	\ifhbox
+	\ifcase
+	\ifodd
+	\ifnum
+	\ifeof
+	\ifdim
+	\ifcat
+	\else
+	\or
+	\ifx
+	\if
+	\fi
+
+	(\\ifvmode<|\\ifmmode<|\\ifinner<|\\ifhmode<|\\iffalse<|\\ifvoid<|\\ifvbox<|\\iftrue<|\\ifhbox<|\\ifcase<|\\ifodd<|\\ifnum<|\\ifeof<|\\ifdim<|\\ifcat<|\\else<|\\or<|\\ifx<|\\if<|\\fi<)
+
+_______________________________________________________________________________
+	-  Parameters  -
+
+	Highlight as KEYWORD4
+
+	See Knuth: pg 272-275 for details.
+
+	Integer Parameters
+		\doublehyphendemerits
+		\finalhyphendemerits
+		\displaywidowpenalty
+		\postdisplaypenalty
+		\tracingparagraphs
+		\errorcontextlines
+		\defaulthyphenchar
+		\tracinglostchars
+		\predisplaypenaty
+		\interlinepenalty
+		\tracingrestores
+		\tracingcommands
+		\floatingpenalty
+		\exhyphenpenalty
+		\delimiterfactor
+		\defaultskewchar
+		\showboxbreadth
+		\righthyphenmin
+		\holdinginserts
+		\tracingoutput
+		\tracingonline
+		\tracingmacros
+		\outputpenalty
+		\maxdeadcycles
+		\lefthyphenmin
+		\hyphenpenalty
+		\brokenpenalty
+		\widowpenalty
+		\tracingstats
+		\tracingpages
+		\showboxdepth
+		\pretolerance
+		\binoppenalty
+		\linepenalty
+		\endlinechar
+		\clubpenalty
+		\adjdemerits
+		\relpenalty
+		\globaldefs
+		\escapechar
+		\tolerance
+		\looseness
+		\hangafter
+		\vbadness
+		\language
+		\hbadness
+		\pausing
+		\uchyph
+		\month
+		\year
+		\time
+		\mag
+		\fam
+		\day
+
+		(\\doublehyphendemerits<|\\finalhyphendemerits<|\\displaywidowpenalty<|\\postdisplaypenalty<|\\tracingparagraphs<|\\errorcontextlines<|\\defaulthyphenchar<|\\tracinglostchars<|\\predisplaypenaty<|\\interlinepenalty<|\\tracingrestores<|\\tracingcommands<|\\floatingpenalty<|\\exhyphenpenalty<|\\delimiterfactor<|\\defaultskewchar<|\\showboxbreadth<|\\righthyphenmin<|\\holdinginserts<|\\tracingoutput<|\\tracingonline<|\\tracingmacros<|\\outputpenalty<|\\maxdeadcycles<|\\lefthyphenmin<|\\hyphenpenalty<|\\brokenpenalty<|\\widowpenalty<|\\tracingstats<|\\tracingpages<|\\showboxdepth<|\\pretolerance<|\\binoppenalty<|\\linepenalty<|\\endlinechar<|\\clubpenalty<|\\adjdemerits<|\\relpenalty<|\\globaldefs<|\\escapechar<|\\tolerance<|\\looseness<|\\hangafter<|\\vbadness<|\\language<|\\hbadness<|\\pausing<|\\uchyph<|\\month<|\\year<|\\time<|\\mag<|\\fam<|\\day<)
+
+	Dimension Parameters
+		\nulldelimiterspace
+		\delimitershortfall
+		\emergencystretch
+		\predisplaysize
+		\splitmaxdepth
+		\lineskiplimit
+		\displayindent
+		\overfullrule
+		\mathsurround
+		\displaywidth
+		\scriptspace
+		\boxmaxdepth
+		\hangindent
+		\parindent
+		\maxdepth
+		\voffset
+		\hoffset
+		\vsize
+		\vfuzz
+		\hsize
+		\hfuzz
+
+		(\\nulldelimiterspace<|\\delimitershortfall<|\\emergencystretch<|\\predisplaysize<|\\splitmaxdepth<|\\lineskiplimit<|\\displayindent<|\\overfullrule<|\\mathsurround<|\\displaywidth<|\\scriptspace<|\\boxmaxdepth<|\\hangindent<|\\parindent<|\\maxdepth<|\\voffset<|\\hoffset<|\\vsize<|\\vfuzz<|\\hsize<|\\hfuzz<)
+
+	Glue Parameters
+		\belowdisplayshortskip
+		\abovedisplayshortskip
+		\belowdisplayskip
+		\abovedisplayskip
+		\splittopskip
+		\baselineskip
+		\parfillskip
+		\xspaceskip
+		\spaceskip
+		\rightskip
+		\lineskip
+		\leftskip
+		\topskip
+		\tabskip
+		\parskip
+
+		(\\belowdisplayshortskip<|\\abovedisplayshortskip<|\\belowdisplayskip<|\\abovedisplayskip<|\\splittopskip<|\\baselineskip<|\\parfillskip<|\\xspaceskip<|\\spaceskip<|\\rightskip<|\\lineskip<|\\leftskip<|\\topskip<|\\tabskip<|\\parskip<)
+
+	Muglue Parameters
+		\thickmuskip
+		\thinmuskip
+		\medmuskip
+
+		(\\thickmuskip<|\\thinmuskip<|\\medmuskip<)
+
+	Token List Parameters
+		\everydisplay
+		\everyvbox
+		\everymath
+		\everyhbox
+		\everypar
+		\everyjob
+		\everycr
+		\errhelp
+		\output
+
+		(\\everydisplay<|\\everyvbox<|\\everymath<|\\everyhbox<|\\everypar<|\\everyjob<|\\everycr<|\\errhelp<|\\output<)
+____________________________________________________________________________-->
+
+<!-- START -->
+
+<MODE>
+	<PROPS>
+		<PROPERTY NAME="lineComment" VALUE="%" />
+	</PROPS>
+	<RULES IGNORE_CASE="FALSE" >
+
+		<!-- Comments -->
+
+		<EOL_SPAN TYPE="COMMENT1">%</EOL_SPAN>
+
+		<!-- Math Modes -->
+
+		<!-- $$ ... $$ -->
+		<SPAN TYPE="OPERATOR" DELEGATE="MATH">
+			<BEGIN>$$</BEGIN>
+			<END>$$</END>
+		</SPAN>
+
+		<!-- $ ... $ -->
+		<SPAN TYPE="OPERATOR" DELEGATE="MATH">
+			<BEGIN>$</BEGIN>
+			<END>$</END>
+		</SPAN>
+
+		<!-- At Least Twenty Five letter control sequences -->
+
+			<!-- Arbitrary control sequence of the specified length -->
+			<SEQ_REGEXP HASH_CHARS="\" TYPE="LABEL"
+					>\\[a-zA-Z@]{25}[a-zA-Z@]*</SEQ_REGEXP>
+
+		<!-- Twenty Four letter control sequences -->
+			<SEQ TYPE="KEYWORD1">\interfootnotelinepenalty</SEQ>
+
+			<!-- Arbitrary control sequence of the specified length -->
+			<SEQ_REGEXP HASH_CHARS="\" TYPE="LABEL">\\[a-zA-Z@]{24}</SEQ_REGEXP>
+
+		<!-- Twenty Three letter control sequences -->
+			<SEQ TYPE="KEYWORD1">\interdisplaylinepenalty</SEQ>
+
+			<!-- Arbitrary control sequence of the specified length -->
+			<SEQ_REGEXP HASH_CHARS="\" TYPE="LABEL">\\[a-zA-Z@]{23}</SEQ_REGEXP>
+
+		<!-- Twenty Two letter control sequences -->
+
+			<!-- Arbitrary control sequence of the specified length -->
+			<SEQ_REGEXP HASH_CHARS="\" TYPE="LABEL">\\[a-zA-Z@]{22}</SEQ_REGEXP>
+
+		<!-- Twenty One letter control sequences -->
+			<SEQ TYPE="KEYWORD4">\belowdisplayshortskip</SEQ>
+			<SEQ TYPE="KEYWORD4">\abovedisplayshortskip</SEQ>
+
+			<!-- Arbitrary control sequence of the specified length -->
+			<SEQ_REGEXP HASH_CHARS="\" TYPE="LABEL">\\[a-zA-Z@]{21}</SEQ_REGEXP>
+
+		<!-- Twenty letter control sequences -->
+
+			<SEQ TYPE="KEYWORD4">\doublehyphendemerits</SEQ>
+			<SEQ TYPE="KEYWORD1">\abovedisplayshortskip</SEQ>
+
+			<!-- Arbitrary control sequence of the specified length -->
+			<SEQ_REGEXP HASH_CHARS="\" TYPE="LABEL">\\[a-zA-Z@]{20}</SEQ_REGEXP>
+
+		<!-- Nineteen letter control sequences -->
+
+			<SEQ TYPE="KEYWORD1">\normallineskiplimit</SEQ>
+			<SEQ TYPE="KEYWORD4">\finalhyphendemerits</SEQ>
+			<SEQ TYPE="KEYWORD4">\displaywidowpenalty</SEQ>
+
+			<!-- Arbitrary control sequence of the specified length -->
+			<SEQ_REGEXP HASH_CHARS="\" TYPE="LABEL">\\[a-zA-Z@]{19}</SEQ_REGEXP>
+
+		<!-- Eighteen letter control sequences -->
+
+			<SEQ TYPE="KEYWORD4">\postdisplaypenalty</SEQ>
+			<SEQ TYPE="KEYWORD4">\nulldelimiterspace</SEQ>
+			<SEQ TYPE="KEYWORD1">\normalbaselineskip</SEQ>
+			<SEQ TYPE="KEYWORD1">\Longleftrightarrow</SEQ>
+			<SEQ TYPE="KEYWORD1">\longleftrightarrow</SEQ>
+			<SEQ TYPE="KEYWORD4">\delimitershortfall</SEQ>
+
+			<!-- Arbitrary control sequence of the specified length -->
+			<SEQ_REGEXP HASH_CHARS="\" TYPE="LABEL">\\[a-zA-Z@]{18}</SEQ_REGEXP>
+
+		<!-- Seventeen letter control sequences -->
+
+			<SEQ TYPE="KEYWORD4">\tracingparagraphs</SEQ>
+			<SEQ TYPE="KEYWORD1">\scriptscriptstyle</SEQ>
+			<SEQ TYPE="KEYWORD1">\rightleftharpoons</SEQ>
+			<SEQ TYPE="KEYWORD1">\predisplaypenalty</SEQ>
+			<SEQ TYPE="KEYWORD4">\errorcontextlines</SEQ>
+			<SEQ TYPE="KEYWORD4">\defaulthyphenchar</SEQ>
+
+			<!-- Arbitrary control sequence of the specified length -->
+			<SEQ_REGEXP HASH_CHARS="\" TYPE="LABEL">\\[a-zA-Z@]{17}</SEQ_REGEXP>
+
+		<!-- Sixteen letter control sequences -->
+
+			<SEQ TYPE="KEYWORD4">\tracinglostchars</SEQ>
+			<SEQ TYPE="KEYWORD1">\scriptscriptfont</SEQ>
+			<SEQ TYPE="KEYWORD1">\rightharpoondown</SEQ>
+			<SEQ TYPE="KEYWORD4">\predisplaypenaty</SEQ>
+			<SEQ TYPE="KEYWORD1">\pagefilllstretch</SEQ>
+			<SEQ TYPE="KEYWORD1">\offinterlineskip</SEQ>
+			<SEQ TYPE="KEYWORD1">\nonfrenchspacing</SEQ>
+			<SEQ TYPE="KEYWORD4">\interlinepenalty</SEQ>
+			<SEQ TYPE="KEYWORD4">\emergencystretch</SEQ>
+			<SEQ TYPE="KEYWORD4">\belowdisplayskip</SEQ>
+			<SEQ TYPE="KEYWORD1">\allocationnumber</SEQ>
+			<SEQ TYPE="KEYWORD4">\abovedisplayskip</SEQ>
+
+			<!-- Arbitrary control sequence of the specified length -->
+			<SEQ_REGEXP HASH_CHARS="\" TYPE="LABEL">\\[a-zA-Z@]{16}</SEQ_REGEXP>
+
+		<!-- Fifteen letter control sequences -->
+
+			<SEQ TYPE="KEYWORD4">\tracingrestores</SEQ>
+			<SEQ TYPE="KEYWORD4">\tracingcommands</SEQ>
+			<SEQ TYPE="KEYWORD1">\smallskipamount</SEQ>
+			<SEQ TYPE="KEYWORD1">\pagefillstretch</SEQ>
+			<SEQ TYPE="KEYWORD1">\normalbaselines</SEQ>
+			<SEQ TYPE="KEYWORD1">\nointerlineskip</SEQ>
+			<SEQ TYPE="KEYWORD1">\leftharpoondown</SEQ>
+			<SEQ TYPE="KEYWORD1">\insertpenalties</SEQ>
+			<SEQ TYPE="KEYWORD4">\floatingpenalty</SEQ>
+			<SEQ TYPE="KEYWORD4">\exhyphenpenalty</SEQ>
+			<SEQ TYPE="KEYWORD4">\delimiterfactor</SEQ>
+			<SEQ TYPE="KEYWORD4">\defaultskewchar</SEQ>
+			<SEQ TYPE="KEYWORD1">\bigtriangledown</SEQ>
+			<SEQ TYPE="KEYWORD1">\afterassignment</SEQ>
+			<SEQ TYPE="KEYWORD1">\abovewithdelims</SEQ>
+
+			<!-- Arbitrary control sequence of the specified length -->
+			<SEQ_REGEXP HASH_CHARS="\" TYPE="LABEL">\\[a-zA-Z@]{15}</SEQ_REGEXP>
+
+		<!-- Fourteen letter control sequences -->
+
+			<SEQ TYPE="KEYWORD1">\splitfirstmark</SEQ>
+			<SEQ TYPE="KEYWORD4">\showboxbreadth</SEQ>
+			<SEQ TYPE="KEYWORD4">\righthyphenmin</SEQ>
+			<SEQ TYPE="KEYWORD1">\rightharpoonup</SEQ>
+			<SEQ TYPE="KEYWORD1">\rightarrowfill</SEQ>
+			<SEQ TYPE="KEYWORD1">\removelastskip</SEQ>
+			<SEQ TYPE="KEYWORD4">\predisplaysize</SEQ>
+			<SEQ TYPE="KEYWORD1">\pagefilstretch</SEQ>
+			<SEQ TYPE="KEYWORD1">\overwithdelims</SEQ>
+			<SEQ TYPE="KEYWORD1">\overrightarrow</SEQ>
+			<SEQ TYPE="KEYWORD1">\normallineskip</SEQ>
+			<SEQ TYPE="KEYWORD1">\longrightarrow</SEQ>
+			<SEQ TYPE="KEYWORD1">\Longrightarrow</SEQ>
+			<SEQ TYPE="KEYWORD1">\Leftrightarrow</SEQ>
+			<SEQ TYPE="KEYWORD1">\leftrightarrow</SEQ>
+			<SEQ TYPE="KEYWORD1">\hookrightarrow</SEQ>
+			<SEQ TYPE="KEYWORD4">\holdinginserts</SEQ>
+			<SEQ TYPE="KEYWORD1">\atopwithdelims</SEQ>
+
+			<!-- Arbitrary control sequence of the specified length -->
+			<SEQ_REGEXP HASH_CHARS="\" TYPE="LABEL">\\[a-zA-Z@]{14}</SEQ_REGEXP>
+
+		<!-- Thirteen letter control sequences -->
+
+			<SEQ TYPE="KEYWORD1">\ttraggedright</SEQ>
+			<SEQ TYPE="KEYWORD1">\triangleright</SEQ>
+			<SEQ TYPE="KEYWORD4">\tracingoutput</SEQ>
+			<SEQ TYPE="KEYWORD4">\tracingonline</SEQ>
+			<SEQ TYPE="KEYWORD4">\tracingmacros</SEQ>
+			<SEQ TYPE="KEYWORD4">\splitmaxdepth</SEQ>
+			<SEQ TYPE="KEYWORD1">\overleftarrow</SEQ>
+			<SEQ TYPE="KEYWORD4">\outputpenalty</SEQ>
+			<SEQ TYPE="KEYWORD1">\nopagenumbers</SEQ>
+			<SEQ TYPE="KEYWORD1">\medskipamount</SEQ>
+			<SEQ TYPE="KEYWORD4">\maxdeadcycles</SEQ>
+			<SEQ TYPE="KEYWORD1">\magnification</SEQ>
+			<SEQ TYPE="KEYWORD1">\Longleftarrow</SEQ>
+			<SEQ TYPE="KEYWORD1">\longleftarrow</SEQ>
+			<SEQ TYPE="KEYWORD4">\lineskiplimit</SEQ>
+			<SEQ TYPE="KEYWORD4">\lefthyphenmin	</SEQ>
+			<SEQ TYPE="KEYWORD1">\leftharpoonup</SEQ>
+			<SEQ TYPE="KEYWORD1">\leftarrowfill</SEQ>
+			<SEQ TYPE="KEYWORD4">\hyphenpenalty</SEQ>
+			<SEQ TYPE="KEYWORD1">\hookleftarrow</SEQ>
+			<SEQ TYPE="KEYWORD1">\frenchspacing</SEQ>
+			<SEQ TYPE="KEYWORD1">\errorstopmode</SEQ>
+			<SEQ TYPE="KEYWORD1">\downbracefill</SEQ>
+			<SEQ TYPE="KEYWORD1">\displaylimits</SEQ>
+			<SEQ TYPE="KEYWORD4">\displayindent</SEQ>
+			<SEQ TYPE="KEYWORD1">\discretionary</SEQ>
+			<SEQ TYPE="KEYWORD4">\brokenpenalty</SEQ>
+			<SEQ TYPE="KEYWORD1">\bigtriangleup</SEQ>
+			<SEQ TYPE="KEYWORD1">\bigskipamount</SEQ>
+			<SEQ TYPE="KEYWORD1">\advancepageno</SEQ>
+
+			<!-- Arbitrary control sequence of the specified length -->
+			<SEQ_REGEXP HASH_CHARS="\" TYPE="LABEL">\\[a-zA-Z@]{13}</SEQ_REGEXP>
+
+		<!-- Twelve letter control sequences -->
+
+			<SEQ TYPE="KEYWORD4">\widowpenalty</SEQ>
+			<SEQ TYPE="KEYWORD1">\triangleleft</SEQ>
+			<SEQ TYPE="KEYWORD4">\tracingstats</SEQ>
+			<SEQ TYPE="KEYWORD4">\tracingpages</SEQ>
+			<SEQ TYPE="KEYWORD4">\splittopskip</SEQ>
+			<SEQ TYPE="KEYWORD1">\splitbotmark</SEQ>
+			<SEQ TYPE="KEYWORD4">\showboxdepth</SEQ>
+			<SEQ TYPE="KEYWORD1">\romannumeral</SEQ>
+			<SEQ TYPE="KEYWORD1">\raggedbottom</SEQ>
+			<SEQ TYPE="KEYWORD4">\pretolerance</SEQ>
+			<SEQ TYPE="KEYWORD1">\pagecontents</SEQ>
+			<SEQ TYPE="KEYWORD4">\overfullrule</SEQ>
+			<SEQ TYPE="KEYWORD1">\normalbottom</SEQ>
+			<SEQ TYPE="KEYWORD1">\negthinspace</SEQ>
+			<SEQ TYPE="KEYWORD4">\mathsurround</SEQ>
+			<SEQ TYPE="KEYWORD1">\makeheadline</SEQ>
+			<SEQ TYPE="KEYWORD1">\makefootline</SEQ>
+			<SEQ TYPE="KEYWORD1">\ignorespaces</SEQ>
+			<SEQ TYPE="KEYWORD1">\footnoterule</SEQ>
+			<SEQ TYPE="KEYWORD4">\everydisplay</SEQ>
+			<SEQ TYPE="KEYWORD1">\dosupereject</SEQ>
+			<SEQ TYPE="KEYWORD4">\displaywidth</SEQ>
+			<SEQ TYPE="KEYWORD1">\displaystyle</SEQ>
+			<SEQ TYPE="KEYWORD1">\displaylines</SEQ>
+			<SEQ TYPE="KEYWORD1">\bordermatrix</SEQ>
+			<SEQ TYPE="KEYWORD4">\binoppenalty</SEQ>
+			<SEQ TYPE="KEYWORD1">\beginsection</SEQ>
+			<SEQ TYPE="KEYWORD1">\baselineskip</SEQ>
+
+			<!-- Arbitrary control sequence of the specified length -->
+			<SEQ_REGEXP HASH_CHARS="\" TYPE="LABEL">\\[a-zA-Z@]{12}</SEQ_REGEXP>
+
+		<!-- Eleven letter control sequences -->
+
+			<SEQ TYPE="KEYWORD1">\Updownarrow</SEQ>
+			<SEQ TYPE="KEYWORD1">\updownarrow</SEQ>
+			<SEQ TYPE="KEYWORD1">\upbracefill</SEQ>
+			<SEQ TYPE="KEYWORD4">\thickmuskip</SEQ>
+			<SEQ TYPE="KEYWORD1">\spacefactor</SEQ>
+			<SEQ TYPE="KEYWORD1">\showhyphens</SEQ>
+			<SEQ TYPE="KEYWORD1">\scriptstyle</SEQ>
+			<SEQ TYPE="KEYWORD4">\scriptspace</SEQ>
+			<SEQ TYPE="KEYWORD1">\raggedright</SEQ>
+			<SEQ TYPE="KEYWORD1">\plainoutput</SEQ>
+			<SEQ TYPE="KEYWORD4">\parfillskip</SEQ>
+			<SEQ TYPE="KEYWORD1">\pagestretch</SEQ>
+			<SEQ TYPE="KEYWORD1">\nonstopmode</SEQ>
+			<SEQ TYPE="COMMENT2">\newlinechar</SEQ>
+			<SEQ TYPE="KEYWORD1">\mathpalette</SEQ>
+			<SEQ TYPE="FUNCTION">\mathchardef</SEQ>
+			<SEQ TYPE="KEYWORD1">\magstephalf</SEQ>
+			<SEQ TYPE="KEYWORD4">\linepenalty</SEQ>
+			<SEQ TYPE="KEYWORD1">\lastpenalty</SEQ>
+			<SEQ TYPE="KEYWORD1">\hyphenation</SEQ>
+			<SEQ TYPE="KEYWORD1">\expandafter</SEQ>
+			<SEQ TYPE="KEYWORD4">\endlinechar</SEQ>
+			<SEQ TYPE="KEYWORD1">\diamondsuit</SEQ>
+			<SEQ TYPE="KEYWORD4">\clubpenalty</SEQ>
+			<SEQ TYPE="KEYWORD4">\boxmaxdepth</SEQ>
+			<SEQ TYPE="KEYWORD4">\adjdemerits</SEQ>
+
+			<!-- Arbitrary control sequence of the specified length -->
+			<SEQ_REGEXP HASH_CHARS="\" TYPE="LABEL">\\[a-zA-Z@]{11}</SEQ_REGEXP>
+
+		<!-- Ten letter control sequences -->
+
+			<SEQ TYPE="KEYWORD4">\xspaceskip</SEQ>
+			<SEQ TYPE="KEYWORD1">\varepsilon</SEQ>
+			<SEQ TYPE="KEYWORD1">\underbrace</SEQ>
+			<SEQ TYPE="KEYWORD1">\tracingall</SEQ>
+			<SEQ TYPE="KEYWORD4">\thinmuskip</SEQ>
+			<SEQ TYPE="KEYWORD1">\textindent</SEQ>
+			<SEQ TYPE="KEYWORD1">\supereject</SEQ>
+			<SEQ TYPE="KEYWORD1">\sqsupseteq</SEQ>
+			<SEQ TYPE="KEYWORD1">\smallbreak</SEQ>
+			<SEQ TYPE="KEYWORD1">\scrollmode</SEQ>
+			<SEQ TYPE="KEYWORD1">\scriptfont</SEQ>
+			<SEQ TYPE="KEYWORD1">\rmoustache</SEQ>
+			<SEQ TYPE="KEYWORD1">\Rightarrow</SEQ>
+			<SEQ TYPE="KEYWORD1">\rightarrow</SEQ>
+			<SEQ TYPE="KEYWORD4">\relpenalty</SEQ>
+			<SEQ TYPE="KEYWORD1">\pageshrink</SEQ>
+			<SEQ TYPE="KEYWORD1">\pageinsert</SEQ>
+			<SEQ TYPE="KEYWORD1">\obeyspaces</SEQ>
+			<SEQ TYPE="KEYWORD1">\mathhexbox</SEQ>
+			<SEQ TYPE="KEYWORD1">\mathchoice</SEQ>
+			<SEQ TYPE="KEYWORD1">\mathaccent</SEQ>
+			<SEQ TYPE="KEYWORD1">\mapstochar</SEQ>
+			<SEQ TYPE="KEYWORD1">\longmapsto</SEQ>
+			<SEQ TYPE="KEYWORD1">\lmoustache</SEQ>
+			<SEQ TYPE="KEYWORD1">\leqalignno</SEQ>
+			<SEQ TYPE="KEYWORD1">\leavevmode</SEQ>
+			<SEQ TYPE="KEYWORD1">\hyphenchar</SEQ>
+			<SEQ TYPE="KEYWORD4">\hangindent</SEQ>
+			<SEQ TYPE="KEYWORD4">\globaldefs</SEQ>
+			<SEQ TYPE="KEYWORD1">\fmtversion</SEQ>
+			<SEQ TYPE="KEYWORD4">\escapechar</SEQ>
+			<SEQ TYPE="KEYWORD1">\errmessage</SEQ>
+			<SEQ TYPE="KEYWORD1">\dospecials</SEQ>
+			<SEQ TYPE="KEYWORD1">\deadcycles</SEQ>
+			<SEQ TYPE="KEYWORD1">\centerline</SEQ>
+			<SEQ TYPE="KEYWORD1">\begingroup</SEQ>
+			<SEQ TYPE="KEYWORD1">\allowbreak</SEQ>
+			<SEQ TYPE="KEYWORD1">\aftergroup</SEQ>
+
+			<!-- Arbitrary control sequence of the specified length -->
+			<SEQ_REGEXP HASH_CHARS="\" TYPE="LABEL">\\[a-zA-Z@]{10}</SEQ_REGEXP>
+
+		<!-- Nine letter control sequences -->
+
+			<SEQ TYPE="KEYWORD1">\widetilde</SEQ>
+			<SEQ TYPE="KEYWORD1">\vfootnote</SEQ>
+			<SEQ TYPE="KEYWORD1">\uppercase</SEQ>
+			<SEQ TYPE="KEYWORD1">\unpenalty</SEQ>
+			<SEQ TYPE="KEYWORD1">\underline</SEQ>
+			<SEQ TYPE="KEYWORD1">\undefined</SEQ>
+			<SEQ TYPE="KEYWORD1">\topinsert</SEQ>
+			<SEQ TYPE="KEYWORD4">\tolerance</SEQ>
+			<SEQ TYPE="KEYWORD1">\thinspace</SEQ>
+			<SEQ TYPE="KEYWORD1">\textstyle</SEQ>
+			<SEQ TYPE="KEYWORD1">\spadesuit</SEQ>
+			<SEQ TYPE="KEYWORD4">\spaceskip</SEQ>
+			<SEQ TYPE="KEYWORD1">\smallskip</SEQ>
+			<SEQ TYPE="KEYWORD1">\showlists</SEQ>
+			<SEQ TYPE="KEYWORD4">\rightskip</SEQ>
+			<SEQ TYPE="KEYWORD1">\rightline</SEQ>
+			<SEQ TYPE="KEYWORD1">\prevdepth</SEQ>
+			<SEQ TYPE="KEYWORD1">\preloaded</SEQ>
+			<SEQ TYPE="KEYWORD4">\parindent</SEQ>
+			<SEQ TYPE="KEYWORD1">\pagetotal</SEQ>
+			<SEQ TYPE="KEYWORD1">\pagedepth</SEQ>
+			<SEQ TYPE="KEYWORD1">\overbrace</SEQ>
+			<SEQ TYPE="KEYWORD1">\obeylines</SEQ>
+			<SEQ TYPE="KEYWORD1">\nonscript</SEQ>
+			<SEQ TYPE="FUNCTION">\newmuskip</SEQ>
+			<SEQ TYPE="FUNCTION">\newinsert</SEQ>
+			<SEQ TYPE="FUNCTION">\muskipdef</SEQ>
+			<SEQ TYPE="KEYWORD1">\multispan</SEQ>
+			<SEQ TYPE="KEYWORD1">\moveright</SEQ>
+			<SEQ TYPE="KEYWORD1">\midinsert</SEQ>
+			<SEQ TYPE="KEYWORD4">\medmuskip</SEQ>
+			<SEQ TYPE="KEYWORD1">\mathstrut</SEQ>
+			<SEQ TYPE="KEYWORD1">\mathpunct</SEQ>
+			<SEQ TYPE="KEYWORD1">\mathinner</SEQ>
+			<SEQ TYPE="KEYWORD1">\mathclose</SEQ>
+			<SEQ TYPE="KEYWORD1">\lowercase</SEQ>
+			<SEQ TYPE="KEYWORD4">\looseness</SEQ>
+			<SEQ TYPE="KEYWORD1">\Leftarrow</SEQ>
+			<SEQ TYPE="KEYWORD1">\leftarrow</SEQ>
+			<SEQ TYPE="KEYWORD1">\immediate</SEQ>
+			<SEQ TYPE="KEYWORD1">\hrulefill</SEQ>
+			<SEQ TYPE="KEYWORD1">\hidewidth</SEQ>
+			<SEQ TYPE="KEYWORD1">\heartsuit</SEQ>
+			<SEQ TYPE="KEYWORD4">\hangafter</SEQ>
+			<SEQ TYPE="KEYWORD1">\goodbreak</SEQ>
+			<SEQ TYPE="COMMENT3">\futurelet</SEQ>
+			<SEQ TYPE="KEYWORD1">\footstrut</SEQ>
+			<SEQ TYPE="KEYWORD1">\fontdimen</SEQ>
+			<SEQ TYPE="KEYWORD1">\firstmark</SEQ>
+			<SEQ TYPE="KEYWORD4">\everyvbox</SEQ>
+			<SEQ TYPE="KEYWORD4">\everymath</SEQ>
+			<SEQ TYPE="KEYWORD4">\everyhbox</SEQ>
+			<SEQ TYPE="KEYWORD1">\eqalignno</SEQ>
+			<SEQ TYPE="KEYWORD1">\endinsert</SEQ>
+			<SEQ TYPE="FUNCTION">\endcsname</SEQ>
+			<SEQ TYPE="KEYWORD1">\Downarrow</SEQ>
+			<SEQ TYPE="KEYWORD1">\downarrow</SEQ>
+			<SEQ TYPE="KEYWORD1">\delimiter</SEQ>
+			<SEQ TYPE="KEYWORD1">\copyright</SEQ>
+			<SEQ TYPE="KEYWORD1">\cleartabs</SEQ>
+			<SEQ TYPE="KEYWORD1">\centering</SEQ>
+			<SEQ TYPE="KEYWORD1">\bracevert</SEQ>
+			<SEQ TYPE="KEYWORD1">\bigotimes</SEQ>
+			<SEQ TYPE="KEYWORD1">\batchmode</SEQ>
+			<SEQ TYPE="KEYWORD2">\backslash</SEQ>
+			<SEQ TYPE="KEYWORD1">\Arrowvert</SEQ>
+			<SEQ TYPE="KEYWORD1">\arrowvert</SEQ>
+
+			<!-- Length Nine Register Reference -->
+			<SEQ_REGEXP HASH_CHARS="\" TYPE="COMMENT4"
+					>\\muskip([0-1][0-9][0-9]|2([0-4][0-9]|5[0-5]))</SEQ_REGEXP>
+
+			<!-- Arbitrary control sequence of the specified length -->
+			<SEQ_REGEXP HASH_CHARS="\" TYPE="LABEL">\\[a-zA-Z@]{9}</SEQ_REGEXP>
+
+		<!-- Eight letter control sequences -->
+
+			<SEQ TYPE="KEYWORD1">\xleaders</SEQ>
+			<SEQ TYPE="KEYWORD1">\vphantom</SEQ>
+			<SEQ TYPE="KEYWORD4">\vbadness</SEQ>
+			<SEQ TYPE="KEYWORD1">\vartheta</SEQ>
+			<SEQ TYPE="KEYWORD1">\varsigma</SEQ>
+			<SEQ TYPE="KEYWORD1">\underbar</SEQ>
+			<SEQ TYPE="KEYWORD1">\triangle</SEQ>
+			<SEQ TYPE="KEYWORD1">\textfont</SEQ>
+			<SEQ TYPE="KEYWORD1">\tabsdone</SEQ>
+			<SEQ TYPE="KEYWORD1">\tabalign</SEQ>
+			<SEQ TYPE="KEYWORD1">\supseteq</SEQ>
+			<SEQ TYPE="KEYWORD1">\subseteq</SEQ>
+			<SEQ TYPE="KEYWORD1">\strutbox</SEQ>
+			<SEQ TYPE="KEYWORD1">\smallint</SEQ>
+			<SEQ TYPE="KEYWORD1">\skewchar</SEQ>
+			<SEQ TYPE="KEYWORD1">\setminus</SEQ>
+			<SEQ TYPE="KEYWORD1">\proclaim</SEQ>
+			<SEQ TYPE="KEYWORD1">\prevgraf</SEQ>
+			<SEQ TYPE="KEYWORD1">\patterns</SEQ>
+			<SEQ TYPE="KEYWORD1">\parshape</SEQ>
+			<SEQ TYPE="KEYWORD1">\parallel</SEQ>
+			<SEQ TYPE="KEYWORD1">\pagegoal</SEQ>
+			<SEQ TYPE="KEYWORD1">\pagebody</SEQ>
+			<SEQ TYPE="KEYWORD1">\overline</SEQ>
+			<SEQ TYPE="KEYWORD1">\oldstyle</SEQ>
+			<SEQ TYPE="KEYWORD1">\nolimits</SEQ>
+			<SEQ TYPE="KEYWORD1">\noindent</SEQ>
+			<SEQ TYPE="KEYWORD1">\noexpand</SEQ>
+			<SEQ TYPE="COMMENT2">\newwrite</SEQ>
+			<SEQ TYPE="COMMENT2">\newdimen</SEQ>
+			<SEQ TYPE="COMMENT2">\newcount</SEQ>
+			<SEQ TYPE="KEYWORD1">\narrower</SEQ>
+			<SEQ TYPE="KEYWORD1">\moveleft</SEQ>
+			<SEQ TYPE="KEYWORD1">\medbreak</SEQ>
+			<SEQ TYPE="KEYWORD1">\maxdimen</SEQ>
+			<SEQ TYPE="KEYWORD4">\maxdepth</SEQ>
+			<SEQ TYPE="KEYWORD1">\mathopen</SEQ>
+			<SEQ TYPE="KEYWORD1">\mathcode</SEQ>
+			<SEQ TYPE="KEYWORD1">\mathchar</SEQ>
+			<SEQ TYPE="KEYWORD1">\lineskip</SEQ>
+			<SEQ TYPE="KEYWORD4">\leftskip</SEQ>
+			<SEQ TYPE="KEYWORD4">\leftline</SEQ>
+			<SEQ TYPE="KEYWORD1">\lastskip</SEQ>
+			<SEQ TYPE="KEYWORD1">\lastkern</SEQ>
+			<SEQ TYPE="KEYWORD4">\language</SEQ>
+			<SEQ TYPE="KEYWORD1">\itemitem</SEQ>
+			<SEQ TYPE="KEYWORD1">\hphantom</SEQ>
+			<SEQ TYPE="KEYWORD1">\hideskip</SEQ>
+			<SEQ TYPE="KEYWORD1">\headline</SEQ>
+			<SEQ TYPE="KEYWORD4">\hbadness</SEQ>
+			<SEQ TYPE="KEYWORD1">\footnote</SEQ>
+			<SEQ TYPE="KEYWORD1">\footline</SEQ>
+			<SEQ TYPE="KEYWORD1">\multiply</SEQ>
+			<SEQ TYPE="KEYWORD1">\fontname</SEQ>
+			<SEQ TYPE="KEYWORD1">\filbreak</SEQ>
+			<SEQ TYPE="KEYWORD4">\everypar</SEQ>
+			<SEQ TYPE="KEYWORD4">\everyjob</SEQ>
+			<SEQ TYPE="KEYWORD1">\endinput</SEQ>
+			<SEQ TYPE="KEYWORD1">\endgroup</SEQ>
+			<SEQ TYPE="KEYWORD1">\emptyset</SEQ>
+			<SEQ TYPE="FUNCTION">\dimendef</SEQ>
+			<SEQ TYPE="FUNCTION">\countdef</SEQ>
+			<SEQ TYPE="KEYWORD1">\clubsuit</SEQ>
+			<SEQ TYPE="KEYWORD1">\closeout</SEQ>
+			<SEQ TYPE="KEYWORD1">\cleaders</SEQ>
+			<SEQ TYPE="KEYWORD1">\buildrel</SEQ>
+			<SEQ TYPE="KEYWORD1">\bigwedge</SEQ>
+			<SEQ TYPE="KEYWORD1">\biguplus</SEQ>
+			<SEQ TYPE="KEYWORD1">\bigsqcup</SEQ>
+			<SEQ TYPE="KEYWORD1">\bigoplus</SEQ>
+			<SEQ TYPE="KEYWORD1">\bigbreak</SEQ>
+
+			<!-- Length Eight Register Reference -->
+			<SEQ_REGEXP HASH_CHARS="\" TYPE="COMMENT4"
+					>\\muskip[0-9][0-9]</SEQ_REGEXP>
+
+			<!-- Length Eight Register Reference -->
+			<SEQ_REGEXP HASH_CHARS="\" TYPE="COMMENT4"
+					>\\dimen([0-1][0-9][0-9]|2([0-4][0-9]|5[0-5]))</SEQ_REGEXP>
+
+			<!-- Length Eight Register Reference -->
+			<SEQ_REGEXP HASH_CHARS="\" TYPE="COMMENT4"
+					>\\count([0-1][0-9][0-9]|2([0-4][0-9]|5[0-5]))</SEQ_REGEXP>
+
+			<!-- Arbitrary control sequence of the specified length -->
+			<SEQ_REGEXP HASH_CHARS="\" TYPE="LABEL">\\[a-zA-Z@]{8}</SEQ_REGEXP>
+
+		<!-- Seven letter control sequences -->
+
+			<SEQ TYPE="KEYWORD1">\widehat</SEQ>
+			<SEQ TYPE="KEYWORD4">\voffset</SEQ>
+			<SEQ TYPE="KEYWORD1">\vfilneg</SEQ>
+			<SEQ TYPE="KEYWORD1">\vcenter</SEQ>
+			<SEQ TYPE="KEYWORD1">\vadjust</SEQ>
+			<SEQ TYPE="KEYWORD1">\Upsilon</SEQ>
+			<SEQ TYPE="KEYWORD1">\upsilon</SEQ>
+			<SEQ TYPE="KEYWORD1">\Uparrow</SEQ>
+			<SEQ TYPE="KEYWORD1">\uparrow</SEQ>
+			<SEQ TYPE="KEYWORD1">\unvcopy</SEQ>
+			<SEQ TYPE="KEYWORD1">\unhcopy</SEQ>
+			<SEQ TYPE="KEYWORD4">\topskip</SEQ>
+			<SEQ TYPE="KEYWORD1">\topmark</SEQ>
+			<SEQ TYPE="FUNCTION">\toksdef</SEQ>
+			<SEQ TYPE="KEYWORD1">\tabsyet</SEQ>
+			<SEQ TYPE="KEYWORD4">\tabskip</SEQ>
+			<SEQ TYPE="KEYWORD1">\swarrow</SEQ>
+			<SEQ TYPE="KEYWORD1">\special</SEQ>
+			<SEQ TYPE="FUNCTION">\skipdef</SEQ>
+			<SEQ TYPE="KEYWORD1">\showthe</SEQ>
+			<SEQ TYPE="KEYWORD1">\showbox</SEQ>
+			<SEQ TYPE="KEYWORD1">\shipout</SEQ>
+			<SEQ TYPE="KEYWORD1">\sevensy</SEQ>
+			<SEQ TYPE="KEYWORD1">\sevenrm</SEQ>
+			<SEQ TYPE="KEYWORD1">\sevenbf</SEQ>
+			<SEQ TYPE="KEYWORD1">\settabs</SEQ>
+			<SEQ TYPE="KEYWORD1">\searrow</SEQ>
+			<SEQ TYPE="KEYWORD1">\rootbox</SEQ>
+			<SEQ TYPE="KEYWORD1">\radical</SEQ>
+			<SEQ TYPE="KEYWORD1">\pmatrix</SEQ>
+			<SEQ TYPE="KEYWORD1">\phantom</SEQ>
+			<SEQ TYPE="KEYWORD1">\penalty</SEQ>
+			<SEQ TYPE="KEYWORD4">\pausing</SEQ>
+			<SEQ TYPE="KEYWORD1">\partial</SEQ>
+			<SEQ TYPE="KEYWORD4">\parskip</SEQ>
+			<SEQ TYPE="KEYWORD1">\openout</SEQ>
+			<SEQ TYPE="KEYWORD1">\ooalign</SEQ>
+			<SEQ TYPE="KEYWORD1">\nwarrow</SEQ>
+			<SEQ TYPE="KEYWORD1">\nobreak</SEQ>
+			<SEQ TYPE="KEYWORD1">\noalign</SEQ>
+			<SEQ TYPE="COMMENT2">\newtoks</SEQ>
+			<SEQ TYPE="COMMENT2">\newskip</SEQ>
+			<SEQ TYPE="COMMENT2">\newread</SEQ>
+			<SEQ TYPE="COMMENT2">\newhelp</SEQ>
+			<SEQ TYPE="KEYWORD1">\nearrow</SEQ>
+			<SEQ TYPE="KEYWORD1">\natural</SEQ>
+			<SEQ TYPE="KEYWORD1">\mscount</SEQ>
+			<SEQ TYPE="KEYWORD1">\message</SEQ>
+			<SEQ TYPE="KEYWORD1">\medskip</SEQ>
+			<SEQ TYPE="KEYWORD1">\meaning</SEQ>
+			<SEQ TYPE="KEYWORD1">\mathrel</SEQ>
+			<SEQ TYPE="KEYWORD1">\mathord</SEQ>
+			<SEQ TYPE="KEYWORD1">\mathbin</SEQ>
+			<SEQ TYPE="KEYWORD1">\magstep</SEQ>
+			<SEQ TYPE="KEYWORD1">\leaders</SEQ>
+			<SEQ TYPE="KEYWORD1">\lastbox</SEQ>
+			<SEQ TYPE="KEYWORD1">\joinrel</SEQ>
+			<SEQ TYPE="KEYWORD1">\jobname</SEQ>
+			<SEQ TYPE="KEYWORD1">\iterate</SEQ>
+			<SEQ TYPE="KEYWORD3">\ifvmode</SEQ>
+			<SEQ TYPE="KEYWORD3">\ifmmode</SEQ>
+			<SEQ TYPE="KEYWORD3">\ifinner</SEQ>
+			<SEQ TYPE="KEYWORD3">\ifhmode</SEQ>
+			<SEQ TYPE="KEYWORD3">\iffalse</SEQ>
+			<SEQ TYPE="KEYWORD4">\hoffset</SEQ>
+			<SEQ TYPE="KEYWORD1">\hfilneg</SEQ>
+			<SEQ TYPE="KEYWORD1">\footins</SEQ>
+			<SEQ TYPE="KEYWORD1">\fmtname</SEQ>
+			<SEQ TYPE="KEYWORD4">\everycr</SEQ>
+			<SEQ TYPE="KEYWORD4">\errhelp</SEQ>
+			<SEQ TYPE="KEYWORD1">\eqalign</SEQ>
+			<SEQ TYPE="KEYWORD1">\epsilon</SEQ>
+			<SEQ TYPE="KEYWORD1">\enspace</SEQ>
+			<SEQ TYPE="KEYWORD1">\endline</SEQ>
+			<SEQ TYPE="KEYWORD1">\endgraf</SEQ>
+			<SEQ TYPE="KEYWORD1">\dotfill</SEQ>
+			<SEQ TYPE="KEYWORD1">\diamond</SEQ>
+			<SEQ TYPE="KEYWORD1">\delcode</SEQ>
+			<SEQ TYPE="KEYWORD1">\ddagger</SEQ>
+			<SEQ TYPE="KEYWORD1">\columns</SEQ>
+			<SEQ TYPE="KEYWORD1">\closein</SEQ>
+			<SEQ TYPE="FUNCTION">\chardef</SEQ>
+			<SEQ TYPE="KEYWORD2">\cdprime</SEQ>
+			<SEQ TYPE="KEYWORD1">\catcode</SEQ>
+			<SEQ TYPE="KEYWORD1">\braceru</SEQ>
+			<SEQ TYPE="KEYWORD1">\bracerd</SEQ>
+			<SEQ TYPE="KEYWORD1">\bracelu</SEQ>
+			<SEQ TYPE="KEYWORD1">\braceld</SEQ>
+			<SEQ TYPE="KEYWORD1">\botmark</SEQ>
+			<SEQ TYPE="KEYWORD1">\bigskip</SEQ>
+			<SEQ TYPE="KEYWORD1">\bigodot</SEQ>
+			<SEQ TYPE="KEYWORD1">\bigcirc</SEQ>
+			<SEQ TYPE="KEYWORD1">\advance</SEQ>
+
+			<!-- Length Seven Register Reference -->
+			<SEQ_REGEXP HASH_CHARS="\" TYPE="COMMENT4">\\muskip[0-9]</SEQ_REGEXP>
+
+			<!-- Length Seven Register Reference -->
+			<SEQ_REGEXP HASH_CHARS="\" TYPE="COMMENT4"
+					>\\dimen[0-9][0-9]</SEQ_REGEXP>
+
+			<!-- Length Seven Register Reference -->
+			<SEQ_REGEXP HASH_CHARS="\" TYPE="COMMENT4"
+					>\\count[0-9][0-9]</SEQ_REGEXP>
+
+			<!-- Length Seven Register Reference -->
+			<SEQ_REGEXP HASH_CHARS="\" TYPE="COMMENT4"
+					>\\toks([0-1][0-9][0-9]|2([0-4][0-9]|5[0-5]))</SEQ_REGEXP>
+
+			<!-- Length Seven Register Reference -->
+			<SEQ_REGEXP HASH_CHARS="\" TYPE="COMMENT4"
+					>\\skip([0-1][0-9][0-9]|2([0-4][0-9]|5[0-5]))</SEQ_REGEXP>
+
+			<!-- Length Seven Decimal Character Reference -->
+			<SEQ_REGEXP HASH_CHARS="\" TYPE="KEYWORD2"
+					>\\char([0-1][0-9][0-9]|2([0-4][0-9]|5[0-5]))</SEQ_REGEXP>
+
+			<!-- Length Seven Octal Character Reference -->
+			<SEQ_REGEXP HASH_CHARS="\" TYPE="KEYWORD2"
+					>\\char'[0-7][0-7]</SEQ_REGEXP>
+
+			<!-- Length Seven Hexadecimal Character Reference -->
+			<SEQ_REGEXP HASH_CHARS="\" TYPE="KEYWORD2"
+					>\\char"[0-9A-Fa-f][0-9A-Fa-f]</SEQ_REGEXP>
+
+			<!-- Arbitrary control sequence of the specified length -->
+			<SEQ_REGEXP HASH_CHARS="\" TYPE="LABEL">\\[a-zA-Z@]{7}</SEQ_REGEXP>
+
+		<!-- Six letter control sequences -->
+
+			<SEQ TYPE="KEYWORD1">\vsplit</SEQ>
+			<SEQ TYPE="KEYWORD1">\varrho</SEQ>
+			<SEQ TYPE="KEYWORD1">\varphi</SEQ>
+			<SEQ TYPE="KEYWORD1">\valign</SEQ>
+			<SEQ TYPE="KEYWORD2">\utilde</SEQ>
+			<SEQ TYPE="KEYWORD1">\unvbox</SEQ>
+			<SEQ TYPE="KEYWORD1">\unskip</SEQ>
+			<SEQ TYPE="KEYWORD1">\unkern</SEQ>
+			<SEQ TYPE="KEYWORD1">\unhbox</SEQ>
+			<SEQ TYPE="KEYWORD4">\uchyph</SEQ>
+			<SEQ TYPE="KEYWORD1">\uccode</SEQ>
+			<SEQ TYPE="KEYWORD1">\topins</SEQ>
+			<SEQ TYPE="KEYWORD1">\supset</SEQ>
+			<SEQ TYPE="KEYWORD1">\succeq</SEQ>
+			<SEQ TYPE="KEYWORD1">\subset</SEQ>
+			<SEQ TYPE="KEYWORD1">\string</SEQ>
+			<SEQ TYPE="KEYWORD1">\sfcode</SEQ>
+			<SEQ TYPE="KEYWORD1">\seveni</SEQ>
+			<SEQ TYPE="KEYWORD1">\setbox</SEQ>
+			<SEQ TYPE="KEYWORD1">\rgroup</SEQ>
+			<SEQ TYPE="KEYWORD1">\rfloor</SEQ>
+			<SEQ TYPE="KEYWORD1">\repeat</SEQ>
+			<SEQ TYPE="KEYWORD1">\Relbar</SEQ>
+			<SEQ TYPE="KEYWORD1">\relbar</SEQ>
+			<SEQ TYPE="KEYWORD1">\rbrack</SEQ>
+			<SEQ TYPE="KEYWORD1">\rbrace</SEQ>
+			<SEQ TYPE="KEYWORD1">\rangle</SEQ>
+			<SEQ TYPE="KEYWORD1">\propto</SEQ>
+			<SEQ TYPE="KEYWORD1">\preceq</SEQ>
+			<SEQ TYPE="KEYWORD1">\pageno</SEQ>
+			<SEQ TYPE="KEYWORD4">\output</SEQ>
+			<SEQ TYPE="KEYWORD1">\otimes</SEQ>
+			<SEQ TYPE="KEYWORD1">\oslash</SEQ>
+			<SEQ TYPE="KEYWORD1">\openup</SEQ>
+			<SEQ TYPE="KEYWORD1">\openin</SEQ>
+			<SEQ TYPE="KEYWORD1">\ominus</SEQ>
+			<SEQ TYPE="KEYWORD1">\ointop</SEQ>
+			<SEQ TYPE="KEYWORD1">\oalign</SEQ>
+			<SEQ TYPE="KEYWORD1">\number</SEQ>
+			<SEQ TYPE="COMMENT2">\newfam</SEQ>
+			<SEQ TYPE="COMMENT2">\newbox</SEQ>
+			<SEQ TYPE="COMMENT4">\muskip</SEQ>
+			<SEQ TYPE="KEYWORD1">\models</SEQ>
+			<SEQ TYPE="KEYWORD1">\matrix</SEQ>
+			<SEQ TYPE="KEYWORD1">\mathop</SEQ>
+			<SEQ TYPE="KEYWORD1">\mapsto</SEQ>
+			<SEQ TYPE="KEYWORD1">\limsup</SEQ>
+			<SEQ TYPE="KEYWORD1">\limits</SEQ>
+			<SEQ TYPE="KEYWORD1">\liminf</SEQ>
+			<SEQ TYPE="KEYWORD1">\lgroup</SEQ>
+			<SEQ TYPE="KEYWORD2">\lfhook</SEQ>
+			<SEQ TYPE="KEYWORD1">\lfloor</SEQ>
+			<SEQ TYPE="KEYWORD1">\lccode</SEQ>
+			<SEQ TYPE="KEYWORD1">\lbrack</SEQ>
+			<SEQ TYPE="KEYWORD1">\lbrace</SEQ>
+			<SEQ TYPE="KEYWORD1">\langle</SEQ>
+			<SEQ TYPE="KEYWORD1">\Lambda</SEQ>
+			<SEQ TYPE="KEYWORD1">\lambda</SEQ>
+			<SEQ TYPE="KEYWORD1">\insert</SEQ>
+			<SEQ TYPE="KEYWORD1">\indent</SEQ>
+			<SEQ TYPE="KEYWORD3">\ifvoid</SEQ>
+			<SEQ TYPE="KEYWORD3">\ifvbox</SEQ>
+			<SEQ TYPE="KEYWORD3">\iftrue</SEQ>
+			<SEQ TYPE="KEYWORD3">\ifhbox</SEQ>
+			<SEQ TYPE="KEYWORD3">\ifcase</SEQ>
+			<SEQ TYPE="KEYWORD1">\ialign</SEQ>
+			<SEQ TYPE="KEYWORD1">\halign</SEQ>
+			<SEQ TYPE="FUNCTION">\global</SEQ>
+			<SEQ TYPE="KEYWORD1">\forall</SEQ>
+			<SEQ TYPE="KEYWORD1">\fivesy</SEQ>
+			<SEQ TYPE="KEYWORD1">\fiverm</SEQ>
+			<SEQ TYPE="KEYWORD1">\fivebf</SEQ>
+			<SEQ TYPE="KEYWORD1">\exists</SEQ>
+			<SEQ TYPE="KEYWORD1">\enskip</SEQ>
+			<SEQ TYPE="KEYWORD1">\egroup</SEQ>
+			<SEQ TYPE="KEYWORD1">\divide</SEQ>
+			<SEQ TYPE="KEYWORD1">\dagger</SEQ>
+			<SEQ TYPE="FUNCTION">\csname</SEQ>
+			<SEQ TYPE="KEYWORD2">\cprime</SEQ>
+			<SEQ TYPE="KEYWORD1">\coprod</SEQ>
+			<SEQ TYPE="KEYWORD1">\choose</SEQ>
+			<SEQ TYPE="KEYWORD2">\cfudot</SEQ>
+			<SEQ TYPE="KEYWORD2">\candra</SEQ>
+			<SEQ TYPE="KEYWORD1">\bullet</SEQ>
+			<SEQ TYPE="KEYWORD1">\bowtie</SEQ>
+			<SEQ TYPE="KEYWORD1">\bigvee</SEQ>
+			<SEQ TYPE="KEYWORD1">\bigcup</SEQ>
+			<SEQ TYPE="KEYWORD1">\bigcap</SEQ>
+			<SEQ TYPE="KEYWORD1">\bgroup</SEQ>
+			<SEQ TYPE="KEYWORD1">\arctan</SEQ>
+			<SEQ TYPE="KEYWORD1">\arcsin</SEQ>
+			<SEQ TYPE="KEYWORD1">\arccos</SEQ>
+			<SEQ TYPE="KEYWORD1">\approx</SEQ>
+			<SEQ TYPE="KEYWORD2">\acudot</SEQ>
+			<SEQ TYPE="KEYWORD1">\active</SEQ>
+			<SEQ TYPE="KEYWORD1">\accent</SEQ>
+
+			<!-- Length Six Register Reference -->
+			<SEQ_REGEXP HASH_CHARS="\" TYPE="COMMENT4"
+					>\\dimen[0-9]</SEQ_REGEXP>
+
+			<!-- Length Six Register Reference -->
+			<SEQ_REGEXP HASH_CHARS="\" TYPE="COMMENT4"
+					>\\count[0-9]</SEQ_REGEXP>
+
+			<!-- Length Six Register Reference -->
+			<SEQ_REGEXP HASH_CHARS="\" TYPE="COMMENT4"
+					>\\toks[0-9][0-9]</SEQ_REGEXP>
+
+			<!-- Length Six Register Reference -->
+			<SEQ_REGEXP HASH_CHARS="\" TYPE="COMMENT4"
+					>\\skip[0-9][0-9]</SEQ_REGEXP>
+
+			<!-- Length Six Register Reference -->
+			<SEQ_REGEXP HASH_CHARS="\" TYPE="COMMENT4"
+					>\\box([0-1][0-9][0-9]|2([0-4][0-9]|5[0-5]))</SEQ_REGEXP>
+
+			<!-- Length Six Decimal Character Reference -->
+			<SEQ_REGEXP HASH_CHARS="\" TYPE="KEYWORD2"
+					>\\char[0-9][0-9]</SEQ_REGEXP>
+
+			<!-- Length Six Octal Character Reference -->
+			<SEQ_REGEXP HASH_CHARS="\" TYPE="KEYWORD2">\\char'[0-7]</SEQ_REGEXP>
+
+			<!-- Length Six Hexadecimal Character Reference -->
+			<SEQ_REGEXP HASH_CHARS="\" TYPE="KEYWORD2"
+					>\\char"[0-9A-Fa-f]</SEQ_REGEXP>
+
+			<!-- Arbitrary control sequence of the specified length -->
+			<SEQ_REGEXP HASH_CHARS="\" TYPE="LABEL">\\[a-zA-Z@]{6}</SEQ_REGEXP>
+
+		<!-- Five letter control sequences -->
+
+			<SEQ TYPE="KEYWORD1">\write</SEQ>
+			<SEQ TYPE="KEYWORD1">\wedge</SEQ>
+			<SEQ TYPE="KEYWORD1">\vskip</SEQ>
+			<SEQ TYPE="KEYWORD4">\vsize</SEQ>
+			<SEQ TYPE="KEYWORD1">\vrule</SEQ>
+			<SEQ TYPE="KEYWORD1">\vglue</SEQ>
+			<SEQ TYPE="KEYWORD4">\vfuzz</SEQ>
+			<SEQ TYPE="KEYWORD1">\vfill</SEQ>
+			<SEQ TYPE="KEYWORD1">\vdots</SEQ>
+			<SEQ TYPE="KEYWORD1">\vdash</SEQ>
+			<SEQ TYPE="KEYWORD1">\varpi</SEQ>
+			<SEQ TYPE="KEYWORD1">\uplus</SEQ>
+			<SEQ TYPE="KEYWORD1">\ttfam</SEQ>
+			<SEQ TYPE="KEYWORD1">\times</SEQ>
+			<SEQ TYPE="KEYWORD1">\tilde</SEQ>
+			<SEQ TYPE="KEYWORD1">\Theta</SEQ>
+			<SEQ TYPE="KEYWORD1">\theta</SEQ>
+			<SEQ TYPE="KEYWORD1">\tentt</SEQ>
+			<SEQ TYPE="KEYWORD1">\tensy</SEQ>
+			<SEQ TYPE="KEYWORD1">\tensl</SEQ>
+			<SEQ TYPE="KEYWORD1">\tenrm</SEQ>
+			<SEQ TYPE="KEYWORD1">\tenit</SEQ>
+			<SEQ TYPE="KEYWORD1">\tenex</SEQ>
+			<SEQ TYPE="KEYWORD1">\tenbf</SEQ>
+			<SEQ TYPE="KEYWORD1">\strut</SEQ>
+			<SEQ TYPE="KEYWORD1">\sqcup</SEQ>
+			<SEQ TYPE="KEYWORD1">\sqcap</SEQ>
+			<SEQ TYPE="KEYWORD1">\space</SEQ>
+			<SEQ TYPE="KEYWORD1">\smile</SEQ>
+			<SEQ TYPE="KEYWORD1">\smash</SEQ>
+			<SEQ TYPE="KEYWORD1">\slfam</SEQ>
+			<SEQ TYPE="KEYWORD1">\slash</SEQ>
+			<SEQ TYPE="KEYWORD1">\simeq</SEQ>
+			<SEQ TYPE="KEYWORD1">\Sigma</SEQ>
+			<SEQ TYPE="KEYWORD1">\sigma</SEQ>
+			<SEQ TYPE="KEYWORD1">\sharp</SEQ>
+			<SEQ TYPE="KEYWORD1">\right</SEQ>
+			<SEQ TYPE="KEYWORD1">\rhook</SEQ>
+			<SEQ TYPE="KEYWORD1">\relax</SEQ>
+			<SEQ TYPE="KEYWORD1">\rceil</SEQ>
+			<SEQ TYPE="KEYWORD1">\raise</SEQ>
+			<SEQ TYPE="KEYWORD1">\qquad</SEQ>
+			<SEQ TYPE="KEYWORD1">\prime</SEQ>
+			<SEQ TYPE="FUNCTION">\outer</SEQ>
+			<SEQ TYPE="KEYWORD1">\oplus</SEQ>
+			<SEQ TYPE="KEYWORD1">\Omega</SEQ>
+			<SEQ TYPE="KEYWORD1">\omega</SEQ>
+			<SEQ TYPE="KEYWORD1">\notin</SEQ>
+			<SEQ TYPE="COMMENT2">\newif</SEQ>
+			<SEQ TYPE="KEYWORD1">\nabla</SEQ>
+			<SEQ TYPE="KEYWORD1">\mskip</SEQ>
+			<SEQ TYPE="KEYWORD4">\month</SEQ>
+			<SEQ TYPE="KEYWORD1">\mkern</SEQ>
+			<SEQ TYPE="KEYWORD1">\lower</SEQ>
+			<SEQ TYPE="KEYWORD1">\lhook</SEQ>
+			<SEQ TYPE="KEYWORD1">\leqno</SEQ>
+			<SEQ TYPE="KEYWORD1">\ldots</SEQ>
+			<SEQ TYPE="KEYWORD1">\ldotp</SEQ>
+			<SEQ TYPE="KEYWORD1">\lceil</SEQ>
+			<SEQ TYPE="KEYWORD1">\kappa</SEQ>
+			<SEQ TYPE="KEYWORD1">\jmath</SEQ>
+			<SEQ TYPE="KEYWORD1">\itfam</SEQ>
+			<SEQ TYPE="KEYWORD1">\intop</SEQ>
+			<SEQ TYPE="KEYWORD1">\input</SEQ>
+			<SEQ TYPE="KEYWORD1">\infty</SEQ>
+			<SEQ TYPE="KEYWORD1">\imath</SEQ>
+			<SEQ TYPE="KEYWORD3">\ifodd</SEQ>
+			<SEQ TYPE="KEYWORD3">\ifnum</SEQ>
+			<SEQ TYPE="KEYWORD3">\ifeof</SEQ>
+			<SEQ TYPE="KEYWORD3">\ifdim</SEQ>
+			<SEQ TYPE="KEYWORD3">\ifcat</SEQ>
+			<SEQ TYPE="KEYWORD1">\hskip</SEQ>
+			<SEQ TYPE="KEYWORD4">\hsize</SEQ>
+			<SEQ TYPE="KEYWORD1">\hrule</SEQ>
+			<SEQ TYPE="KEYWORD1">\hglue</SEQ>
+			<SEQ TYPE="KEYWORD4">\hfuzz</SEQ>
+			<SEQ TYPE="KEYWORD1">\hfill</SEQ>
+			<SEQ TYPE="KEYWORD1">\grave</SEQ>
+			<SEQ TYPE="KEYWORD1">\Gamma</SEQ>
+			<SEQ TYPE="KEYWORD1">\gamma</SEQ>
+			<SEQ TYPE="KEYWORD1">\frown</SEQ>
+			<SEQ TYPE="KEYWORD1">\folio</SEQ>
+			<SEQ TYPE="KEYWORD1">\fivei</SEQ>
+			<SEQ TYPE="KEYWORD1">\equiv</SEQ>
+			<SEQ TYPE="KEYWORD1">\empty</SEQ>
+			<SEQ TYPE="KEYWORD1">\eject</SEQ>
+			<SEQ TYPE="KEYWORD1">\doteq</SEQ>
+			<SEQ TYPE="COMMENT4">\dimen</SEQ>
+			<SEQ TYPE="KEYWORD1">\Delta</SEQ>
+			<SEQ TYPE="KEYWORD1">\delta</SEQ>
+			<SEQ TYPE="KEYWORD1">\ddots</SEQ>
+			<SEQ TYPE="KEYWORD1">\dashv</SEQ>
+			<SEQ TYPE="COMMENT4">\count</SEQ>
+			<SEQ TYPE="KEYWORD1">\colon</SEQ>
+			<SEQ TYPE="KEYWORD1">\check</SEQ>
+			<SEQ TYPE="KEYWORD1">\cdots</SEQ>
+			<SEQ TYPE="KEYWORD1">\cdotp</SEQ>
+			<SEQ TYPE="KEYWORD1">\cases</SEQ>
+			<SEQ TYPE="KEYWORD1">\breve</SEQ>
+			<SEQ TYPE="KEYWORD1">\break</SEQ>
+			<SEQ TYPE="KEYWORD1">\brack</SEQ>
+			<SEQ TYPE="KEYWORD1">\brace</SEQ>
+			<SEQ TYPE="KEYWORD1">\Biggr</SEQ>
+			<SEQ TYPE="KEYWORD1">\biggr</SEQ>
+			<SEQ TYPE="KEYWORD1">\Biggm</SEQ>
+			<SEQ TYPE="KEYWORD1">\biggm</SEQ>
+			<SEQ TYPE="KEYWORD1">\Biggl</SEQ>
+			<SEQ TYPE="KEYWORD1">\biggl</SEQ>
+			<SEQ TYPE="KEYWORD1">\bffam</SEQ>
+			<SEQ TYPE="KEYWORD1">\asymp</SEQ>
+			<SEQ TYPE="KEYWORD1">\angle</SEQ>
+			<SEQ TYPE="KEYWORD1">\amalg</SEQ>
+			<SEQ TYPE="KEYWORD1">\alpha</SEQ>
+			<SEQ TYPE="KEYWORD1">\aleph</SEQ>
+			<SEQ TYPE="KEYWORD1">\acute</SEQ>
+			<SEQ TYPE="KEYWORD1">\above</SEQ>
+
+			<!-- Length Five Register Reference -->
+			<SEQ_REGEXP HASH_CHARS="\" TYPE="COMMENT4">\\toks[0-9]</SEQ_REGEXP>
+
+			<!-- Length Five Register Reference -->
+			<SEQ_REGEXP HASH_CHARS="\" TYPE="COMMENT4">\\skip[0-9]</SEQ_REGEXP>
+
+			<!-- Length Five Register Reference -->
+			<SEQ_REGEXP HASH_CHARS="\" TYPE="COMMENT4"
+					>\\box[0-9][0-9]</SEQ_REGEXP>
+
+			<!-- Length Five Decimal Character Reference -->
+			<SEQ_REGEXP HASH_CHARS="\" TYPE="KEYWORD2">\\char[0-9]</SEQ_REGEXP>
+
+			<!-- Length Five Octal Character Reference -->
+			<SEQ TYPE="KEYWORD2">\char'</SEQ>
+
+			<!-- Length Five Hexadecimal Character Reference -->
+			<SEQ TYPE="KEYWORD2">\char"</SEQ>
+
+			<!-- Arbitrary control sequence of the specified length -->
+			<SEQ_REGEXP HASH_CHARS="\" TYPE="LABEL">\\[a-zA-Z@]{5}</SEQ_REGEXP>
+
+		<!-- Four letter control sequences -->
+			<SEQ TYPE="KEYWORD1">\zeta</SEQ>
+			<SEQ TYPE="KEYWORD4">\year</SEQ>
+			<SEQ TYPE="FUNCTION">\xdef</SEQ>
+			<SEQ TYPE="KEYWORD1">\wlog</SEQ>
+			<SEQ TYPE="KEYWORD1">\vtop</SEQ>
+			<SEQ TYPE="KEYWORD1">\vfil</SEQ>
+			<SEQ TYPE="KEYWORD1">\vert</SEQ>
+			<SEQ TYPE="KEYWORD1">\Vert</SEQ>
+			<SEQ TYPE="KEYWORD1">\vbox</SEQ>
+			<SEQ TYPE="KEYWORD2">\uarc</SEQ>
+			<SEQ TYPE="KEYWORD4">\toks</SEQ>
+			<SEQ TYPE="KEYWORD4">\time</SEQ>
+			<SEQ TYPE="KEYWORD1">\teni</SEQ>
+			<SEQ TYPE="KEYWORD1">\tanh</SEQ>
+			<SEQ TYPE="KEYWORD1">\tabs</SEQ>
+			<SEQ TYPE="KEYWORD1">\surd</SEQ>
+			<SEQ TYPE="KEYWORD1">\succ</SEQ>
+			<SEQ TYPE="KEYWORD1">\star</SEQ>
+			<SEQ TYPE="KEYWORD1">\sqrt</SEQ>
+			<SEQ TYPE="KEYWORD1">\span</SEQ>
+			<SEQ TYPE="KEYWORD4">\skip</SEQ>
+			<SEQ TYPE="KEYWORD1">\skew</SEQ>
+			<SEQ TYPE="KEYWORD1">\sinh</SEQ>
+			<SEQ TYPE="KEYWORD1">\show</SEQ>
+			<SEQ TYPE="KEYWORD1">\root</SEQ>
+			<SEQ TYPE="KEYWORD1">\rlap</SEQ>
+			<SEQ TYPE="KEYWORD1">\read</SEQ>
+			<SEQ TYPE="KEYWORD1">\quad</SEQ>
+			<SEQ TYPE="KEYWORD1">\prod</SEQ>
+			<SEQ TYPE="KEYWORD1">\prec</SEQ>
+			<SEQ TYPE="KEYWORD1">\pmod</SEQ>
+			<SEQ TYPE="KEYWORD1">\perp</SEQ>
+			<SEQ TYPE="KEYWORD1">\owns</SEQ>
+			<SEQ TYPE="KEYWORD1">\over</SEQ>
+			<SEQ TYPE="KEYWORD1">\omit</SEQ>
+			<SEQ TYPE="KEYWORD1">\oint</SEQ>
+			<SEQ TYPE="KEYWORD1">\odot</SEQ>
+			<SEQ TYPE="KEYWORD1">\null</SEQ>
+			<SEQ TYPE="KEYWORD1">\next</SEQ>
+			<SEQ TYPE="KEYWORD1">\mark</SEQ>
+			<SEQ TYPE="KEYWORD1">\loop</SEQ>
+			<SEQ TYPE="FUNCTION">\long</SEQ>
+			<SEQ TYPE="KEYWORD1">\lnot</SEQ>
+			<SEQ TYPE="KEYWORD1">\llap</SEQ>
+			<SEQ TYPE="KEYWORD1">\line</SEQ>
+			<SEQ TYPE="KEYWORD1">\left</SEQ>
+			<SEQ TYPE="KEYWORD1">\land</SEQ>
+			<SEQ TYPE="KEYWORD1">\kern</SEQ>
+			<SEQ TYPE="KEYWORD1">\item</SEQ>
+			<SEQ TYPE="KEYWORD1">\iota</SEQ>
+			<SEQ TYPE="KEYWORD1">\hfil</SEQ>
+			<SEQ TYPE="KEYWORD1">\hbox</SEQ>
+			<SEQ TYPE="KEYWORD1">\hbar</SEQ>
+			<SEQ TYPE="KEYWORD1">\hang</SEQ>
+			<SEQ TYPE="KEYWORD1">\gets</SEQ>
+			<SEQ TYPE="FUNCTION">\gdef</SEQ>
+			<SEQ TYPE="KEYWORD1">\font</SEQ>
+			<SEQ TYPE="KEYWORD1">\flat</SEQ>
+			<SEQ TYPE="KEYWORD1">\eqno</SEQ>
+			<SEQ TYPE="KEYWORD3">\else</SEQ>
+			<SEQ TYPE="FUNCTION">\edef</SEQ>
+			<SEQ TYPE="KEYWORD1">\dump</SEQ>
+			<SEQ TYPE="KEYWORD1">\dots</SEQ>
+			<SEQ TYPE="KEYWORD1">\ddot</SEQ>
+			<SEQ TYPE="KEYWORD1">\ddag</SEQ>
+			<SEQ TYPE="KEYWORD2">\dbar</SEQ>
+			<SEQ TYPE="KEYWORD2">\Dbar</SEQ>
+			<SEQ TYPE="KEYWORD1">\crcr</SEQ>
+			<SEQ TYPE="KEYWORD1">\coth</SEQ>
+			<SEQ TYPE="KEYWORD1">\cosh</SEQ>
+			<SEQ TYPE="KEYWORD1">\copy</SEQ>
+			<SEQ TYPE="KEYWORD1">\cong</SEQ>
+			<SEQ TYPE="KEYWORD1">\circ</SEQ>
+			<SEQ TYPE="KEYWORD2">\char</SEQ>
+			<SEQ TYPE="KEYWORD2">\cfac</SEQ>
+			<SEQ TYPE="KEYWORD1">\cdot</SEQ>
+			<SEQ TYPE="KEYWORD1">\body</SEQ>
+			<SEQ TYPE="KEYWORD1">\bmod</SEQ>
+			<SEQ TYPE="KEYWORD1">\Bigr</SEQ>
+			<SEQ TYPE="KEYWORD1">\bigr</SEQ>
+			<SEQ TYPE="KEYWORD1">\Bigm</SEQ>
+			<SEQ TYPE="KEYWORD1">\bigm</SEQ>
+			<SEQ TYPE="KEYWORD1">\Bigl</SEQ>
+			<SEQ TYPE="KEYWORD1">\bigl</SEQ>
+			<SEQ TYPE="KEYWORD1">\Bigg</SEQ>
+			<SEQ TYPE="KEYWORD1">\bigg</SEQ>
+			<SEQ TYPE="KEYWORD1">\beta</SEQ>
+			<SEQ TYPE="KEYWORD1">\atop</SEQ>
+
+			<!-- Length Four Register Reference -->
+			<SEQ_REGEXP HASH_CHARS="\" TYPE="COMMENT4">\\box[0-9]</SEQ_REGEXP>
+
+			<!-- Length Four Character Reference -->
+			<SEQ TYPE="KEYWORD2">\char</SEQ>
+
+			<!-- Length Four Hexadecimal Invisible Reference -->
+			<SEQ_REGEXP HASH_CHARS="^" TYPE="KEYWORD2"
+					>(\u005E|\x5E)(\u005E|\x5E)([0-9a-f])([0-9a-f])</SEQ_REGEXP>
+
+			<!-- Arbitrary control sequence of the specified length -->
+			<SEQ_REGEXP HASH_CHARS="\" TYPE="LABEL">\\[a-zA-Z@]{4}</SEQ_REGEXP>
+
+		<!-- Three letter control sequences -->
+
+			<SEQ TYPE="KEYWORD1">\vss</SEQ>
+			<SEQ TYPE="KEYWORD1">\vee</SEQ>
+			<SEQ TYPE="KEYWORD1">\vec</SEQ>
+			<SEQ TYPE="KEYWORD1">\top</SEQ>
+			<SEQ TYPE="KEYWORD1">\the</SEQ>
+			<SEQ TYPE="KEYWORD1">\TeX</SEQ>
+			<SEQ TYPE="KEYWORD1">\tau</SEQ>
+			<SEQ TYPE="KEYWORD1">\tan</SEQ>
+			<SEQ TYPE="KEYWORD1">\sup</SEQ>
+			<SEQ TYPE="KEYWORD1">\sum</SEQ>
+			<SEQ TYPE="KEYWORD1">\sin</SEQ>
+			<SEQ TYPE="KEYWORD1">\sim</SEQ>
+			<SEQ TYPE="KEYWORD1">\sec</SEQ>
+			<SEQ TYPE="KEYWORD1">\rho</SEQ>
+			<SEQ TYPE="KEYWORD1">\Psi</SEQ>
+			<SEQ TYPE="KEYWORD1">\psi</SEQ>
+			<SEQ TYPE="KEYWORD1">\Phi</SEQ>
+			<SEQ TYPE="KEYWORD1">\phi</SEQ>
+			<SEQ TYPE="LITERAL3">\par</SEQ>
+			<SEQ TYPE="KEYWORD1">\not</SEQ>
+			<SEQ TYPE="KEYWORD1">\neq</SEQ>
+			<SEQ TYPE="KEYWORD1">\neg</SEQ>
+			<SEQ TYPE="KEYWORD1">\mit</SEQ>
+			<SEQ TYPE="KEYWORD1">\min</SEQ>
+			<SEQ TYPE="KEYWORD1">\mid</SEQ>
+			<SEQ TYPE="KEYWORD1">\max</SEQ>
+			<SEQ TYPE="KEYWORD4">\mag</SEQ>
+			<SEQ TYPE="KEYWORD1">\lor</SEQ>
+			<SEQ TYPE="KEYWORD1">\log</SEQ>
+			<SEQ TYPE="KEYWORD1">\lim</SEQ>
+			<SEQ TYPE="COMMENT3">\let</SEQ>
+			<SEQ TYPE="KEYWORD1">\leq</SEQ>
+			<SEQ TYPE="KEYWORD1">\ker</SEQ>
+			<SEQ TYPE="KEYWORD1">\jot</SEQ>
+			<SEQ TYPE="KEYWORD1">\int</SEQ>
+			<SEQ TYPE="KEYWORD1">\inf</SEQ>
+			<SEQ TYPE="KEYWORD3">\ifx</SEQ>
+			<SEQ TYPE="KEYWORD3">\iff</SEQ>
+			<SEQ TYPE="KEYWORD1">\hss</SEQ>
+			<SEQ TYPE="KEYWORD1">\hom</SEQ>
+			<SEQ TYPE="KEYWORD1">\hat</SEQ>
+			<SEQ TYPE="KEYWORD1">\geq</SEQ>
+			<SEQ TYPE="KEYWORD1">\gcd</SEQ>
+			<SEQ TYPE="KEYWORD4">\fam</SEQ>
+			<SEQ TYPE="KEYWORD1">\exp</SEQ>
+			<SEQ TYPE="KEYWORD2">\eth</SEQ>
+			<SEQ TYPE="KEYWORD1">\eta</SEQ>
+			<SEQ TYPE="KEYWORD1">\end</SEQ>
+			<SEQ TYPE="KEYWORD1">\ell</SEQ>
+			<SEQ TYPE="KEYWORD1">\dot</SEQ>
+			<SEQ TYPE="KEYWORD1">\div</SEQ>
+			<SEQ TYPE="KEYWORD1">\dim</SEQ>
+			<SEQ TYPE="KEYWORD1">\det</SEQ>
+			<SEQ TYPE="KEYWORD1">\deg</SEQ>
+			<SEQ TYPE="FUNCTION">\def</SEQ>
+			<SEQ TYPE="KEYWORD4">\day</SEQ>
+			<SEQ TYPE="KEYWORD1">\dag</SEQ>
+			<SEQ TYPE="KEYWORD1">\cup</SEQ>
+			<SEQ TYPE="KEYWORD1">\csc</SEQ>
+			<SEQ TYPE="KEYWORD1">\cot</SEQ>
+			<SEQ TYPE="KEYWORD1">\cos</SEQ>
+			<SEQ TYPE="KEYWORD1">\chi</SEQ>
+			<SEQ TYPE="KEYWORD1">\cap</SEQ>
+			<SEQ TYPE="KEYWORD1">\cal</SEQ>
+			<SEQ TYPE="KEYWORD1">\bye</SEQ>
+			<SEQ TYPE="COMMENT4">\box</SEQ>
+			<SEQ TYPE="KEYWORD1">\bot</SEQ>
+			<SEQ TYPE="KEYWORD1">\Big</SEQ>
+			<SEQ TYPE="KEYWORD1">\big</SEQ>
+			<SEQ TYPE="KEYWORD1">\bar</SEQ>
+			<SEQ TYPE="KEYWORD1">\ast</SEQ>
+			<SEQ TYPE="KEYWORD1">\arg</SEQ>
+
+			<!-- Length Three Invisible Character Reference -->
+			<SEQ_REGEXP HASH_CHARS="^" TYPE="KEYWORD2"
+				>(\u005E|\x5E)(\u005E|\x5E)(\p{ASCII}|\u0000-\u007F)</SEQ_REGEXP>
+
+			<!-- Arbitrary control sequence of the specified length -->
+			<SEQ_REGEXP HASH_CHARS="\" TYPE="LABEL">\\[a-zA-Z@]{3}</SEQ_REGEXP>
+
+		<!-- Two letter control sequences -->
+
+			<SEQ TYPE="KEYWORD1">\Xi</SEQ>
+			<SEQ TYPE="KEYWORD1">\xi</SEQ>
+			<SEQ TYPE="KEYWORD1">\wr</SEQ>
+			<SEQ TYPE="KEYWORD1">\wp</SEQ>
+			<SEQ TYPE="KEYWORD1">\wd</SEQ>
+			<SEQ TYPE="KEYWORD1">\tt</SEQ>
+			<SEQ TYPE="KEYWORD1">\to</SEQ>
+			<SEQ TYPE="KEYWORD1">\sp</SEQ>
+			<SEQ TYPE="KEYWORD1">\sl</SEQ>
+			<SEQ TYPE="KEYWORD1">\sb</SEQ>
+			<SEQ TYPE="KEYWORD1">\rq</SEQ>
+			<SEQ TYPE="KEYWORD1">\rm</SEQ>
+			<SEQ TYPE="KEYWORD1">\Re</SEQ>
+			<SEQ TYPE="KEYWORD1">\Pr</SEQ>
+			<SEQ TYPE="KEYWORD1">\pm</SEQ>
+			<SEQ TYPE="KEYWORD1">\Pi</SEQ>
+			<SEQ TYPE="KEYWORD1">\pi</SEQ>
+			<SEQ TYPE="KEYWORD3">\or</SEQ>
+			<SEQ TYPE="KEYWORD1">\of</SEQ>
+			<SEQ TYPE="KEYWORD1">\nu</SEQ>
+			<SEQ TYPE="KEYWORD1">\ni</SEQ>
+			<SEQ TYPE="KEYWORD1">\ne</SEQ>
+			<SEQ TYPE="KEYWORD1">\mu</SEQ>
+			<SEQ TYPE="KEYWORD1">\mp</SEQ>
+			<SEQ TYPE="KEYWORD1">\lq</SEQ>
+			<SEQ TYPE="KEYWORD1">\ln</SEQ>
+			<SEQ TYPE="KEYWORD1">\ll</SEQ>
+			<SEQ TYPE="KEYWORD1">\lg</SEQ>
+			<SEQ TYPE="KEYWORD1">\le</SEQ>
+			<SEQ TYPE="KEYWORD1">\it</SEQ>
+			<SEQ TYPE="KEYWORD1">\in</SEQ>
+			<SEQ TYPE="KEYWORD1">\Im</SEQ>
+			<SEQ TYPE="KEYWORD3">\if</SEQ>
+			<SEQ TYPE="KEYWORD1">\ht</SEQ>
+			<SEQ TYPE="KEYWORD1">\gg</SEQ>
+			<SEQ TYPE="KEYWORD1">\ge</SEQ>
+			<SEQ TYPE="KEYWORD3">\fi</SEQ>
+			<SEQ TYPE="KEYWORD1">\dp</SEQ>
+			<SEQ TYPE="KEYWORD1">\do</SEQ>
+			<SEQ TYPE="KEYWORD1">\cr</SEQ>
+			<SEQ TYPE="KEYWORD1">\bf</SEQ>
+
+			<!-- Accents and Special Characters -->
+			<SEQ TYPE="KEYWORD2">\AE</SEQ>
+			<SEQ TYPE="KEYWORD2">\ae</SEQ>
+			<SEQ TYPE="KEYWORD2">\AA</SEQ>
+			<SEQ TYPE="KEYWORD2">\aa</SEQ>
+			<SEQ TYPE="KEYWORD2">\OE</SEQ>
+			<SEQ TYPE="KEYWORD2">\oe</SEQ>
+			<SEQ TYPE="KEYWORD2">\ss</SEQ>
+
+			<!-- Arbitrary control sequence of the specified length -->
+			<SEQ_REGEXP HASH_CHARS="\" TYPE="LABEL">\\[a-zA-Z@]{2}</SEQ_REGEXP>
+
+		<!-- One letter control sequences -->
+
+			<SEQ TYPE="KEYWORD1">\S</SEQ>
+			<SEQ TYPE="KEYWORD1">\P</SEQ>
+
+			<!-- Accents and Special Characters -->
+			<SEQ TYPE="KEYWORD2">\=</SEQ>
+			<SEQ TYPE="KEYWORD2">\'</SEQ>
+			<SEQ TYPE="KEYWORD2">\"</SEQ>
+			<SEQ TYPE="KEYWORD2">\~</SEQ>
+			<SEQ TYPE="KEYWORD2">\`</SEQ>
+			<SEQ TYPE="KEYWORD2">\^</SEQ>
+			<SEQ TYPE="KEYWORD2">\.</SEQ>
+			<SEQ TYPE="KEYWORD2">\H</SEQ>
+			<SEQ TYPE="KEYWORD2">\c</SEQ>
+			<SEQ TYPE="KEYWORD2">\d</SEQ>
+			<SEQ TYPE="KEYWORD2">\b</SEQ>
+			<SEQ TYPE="KEYWORD2">\v</SEQ>
+			<SEQ TYPE="KEYWORD2">\u</SEQ>
+			<SEQ TYPE="KEYWORD2">\t</SEQ>
+			<SEQ TYPE="KEYWORD2">\r</SEQ>
+			<SEQ TYPE="KEYWORD2">\k</SEQ>
+			<SEQ TYPE="KEYWORD2">\O</SEQ>
+			<SEQ TYPE="KEYWORD2">\o</SEQ>
+			<SEQ TYPE="KEYWORD2">\L</SEQ>
+			<SEQ TYPE="KEYWORD2">\l</SEQ>
+			<SEQ TYPE="KEYWORD2">\j</SEQ>
+			<SEQ TYPE="KEYWORD2">\i</SEQ>
+			<SEQ TYPE="KEYWORD1">\?</SEQ>
+			<SEQ TYPE="KEYWORD1">\&gt;</SEQ>
+			<SEQ TYPE="KEYWORD1">\&lt;</SEQ>
+			<SEQ TYPE="KEYWORD1">\;</SEQ>
+			<SEQ TYPE="KEYWORD1">\:</SEQ>
+			<SEQ TYPE="KEYWORD1">\/</SEQ>
+			<SEQ TYPE="KEYWORD1">\-</SEQ>
+			<SEQ TYPE="KEYWORD1">\,</SEQ>
+			<SEQ TYPE="KEYWORD1">\+</SEQ>
+			<SEQ TYPE="KEYWORD1">\*</SEQ>
+			<SEQ TYPE="KEYWORD1">\)</SEQ>
+			<SEQ TYPE="KEYWORD1">\(</SEQ>
+			<SEQ TYPE="KEYWORD1">\!</SEQ>
+			<SEQ TYPE="KEYWORD1">\|</SEQ>
+			<SEQ TYPE="KEYWORD1">\\</SEQ>
+
+			<!-- Reserved Characters -->
+			<SEQ TYPE="KEYWORD2">\#</SEQ>
+			<SEQ TYPE="KEYWORD2">\$</SEQ>
+			<SEQ TYPE="KEYWORD2">\%</SEQ>
+			<SEQ TYPE="KEYWORD2">\&amp;</SEQ>
+			<SEQ TYPE="KEYWORD2">\{</SEQ>
+			<SEQ TYPE="KEYWORD2">\}</SEQ>
+			<SEQ TYPE="KEYWORD2">\_</SEQ>
+
+			<!-- Length One ASCII Index -->
+			<SEQ_REGEXP HASH_CHARS="`" TYPE="KEYWORD2">`\p{ASCII}</SEQ_REGEXP>
+
+			<!-- Definition Arguments -->
+			<SEQ_REGEXP HASH_CHARS="#" TYPE="DIGIT">#[1-9]</SEQ_REGEXP>
+
+			<!-- Arbitrary control sequence of the specified length -->
+			<SEQ_REGEXP HASH_CHARS="\" TYPE="LABEL">\\[a-zA-Z@]{1}</SEQ_REGEXP>
+
+		<!-- Zero letter control sequences -->
+
+			<!-- Punctuation -->
+			<SEQ TYPE="LITERAL3">`</SEQ>
+			<SEQ TYPE="LITERAL3">!</SEQ>
+			<SEQ TYPE="LITERAL3">.</SEQ>
+			<SEQ TYPE="LITERAL3">,</SEQ>
+			<SEQ TYPE="LITERAL3">;</SEQ>
+			<SEQ TYPE="LITERAL3">?</SEQ>
+			<SEQ TYPE="LITERAL3">:</SEQ>
+			<SEQ TYPE="LITERAL3">'</SEQ>
+			<SEQ TYPE="LITERAL3">"</SEQ>
+			<SEQ TYPE="LITERAL3">\</SEQ>
+
+			<!-- Simple Math Characters -->
+			<SEQ TYPE="LITERAL4">(</SEQ>
+			<SEQ TYPE="LITERAL4">)</SEQ>
+			<SEQ TYPE="LITERAL4">=</SEQ>
+			<SEQ TYPE="LITERAL4">+</SEQ>
+			<SEQ TYPE="LITERAL4">-</SEQ>
+			<SEQ TYPE="LITERAL4">&gt;</SEQ>
+			<SEQ TYPE="LITERAL4">&lt;</SEQ>
+
+			<!-- Grouping Brackets -->
+			<SEQ TYPE="OPERATOR">{</SEQ>
+			<SEQ TYPE="OPERATOR">}</SEQ>
+			<SEQ TYPE="OPERATOR">[</SEQ>
+			<SEQ TYPE="OPERATOR">]</SEQ>
+
+			<!-- Reserved Characters -->
+			<SEQ TYPE="LITERAL1">&amp;</SEQ>
+			<SEQ TYPE="LITERAL1">^</SEQ>
+			<SEQ TYPE="LITERAL1">_</SEQ>
+			<SEQ TYPE="LITERAL1">~</SEQ>
+
+			<!-- Dimensions -->
+			<SEQ_REGEXP HASH_CHARS="0123456789." TYPE="LITERAL2"
+					>(\d+?\.\d*pt|\d*\.\d+?pt|\d*pt)</SEQ_REGEXP>
+			<SEQ_REGEXP HASH_CHARS="0123456789." TYPE="LITERAL2"
+					>(\d+?\.\d*pc|\d*\.\d+?pc|\d*pc)</SEQ_REGEXP>
+			<SEQ_REGEXP HASH_CHARS="0123456789." TYPE="LITERAL2"
+					>(\d+?\.\d*in|\d*\.\d+?in|\d*in)</SEQ_REGEXP>
+			<SEQ_REGEXP HASH_CHARS="0123456789." TYPE="LITERAL2"
+					>(\d+?\.\d*bp|\d*\.\d+?bp|\d*bp)</SEQ_REGEXP>
+			<SEQ_REGEXP HASH_CHARS="0123456789." TYPE="LITERAL2"
+					>(\d+?\.\d*cm|\d*\.\d+?cm|\d*cm)</SEQ_REGEXP>
+			<SEQ_REGEXP HASH_CHARS="0123456789." TYPE="LITERAL2"
+					>(\d+?\.\d*mm|\d*\.\d+?mm|\d*mm)</SEQ_REGEXP>
+			<SEQ_REGEXP HASH_CHARS="0123456789." TYPE="LITERAL2"
+					>(\d+?\.\d*dd|\d*\.\d+?dd|\d*dd)</SEQ_REGEXP>
+			<SEQ_REGEXP HASH_CHARS="0123456789." TYPE="LITERAL2"
+					>(\d+?\.\d*cc|\d*\.\d+?cc|\d*cc)</SEQ_REGEXP>
+			<SEQ_REGEXP HASH_CHARS="0123456789." TYPE="LITERAL2"
+					>(\d+?\.\d*sp|\d*\.\d+?sp|\d*sp)</SEQ_REGEXP>
+			<SEQ_REGEXP HASH_CHARS="0123456789." TYPE="LITERAL2"
+					>(\d+?\.\d*ex|\d*\.\d+?ex|\d*ex)</SEQ_REGEXP>
+			<SEQ_REGEXP HASH_CHARS="0123456789." TYPE="LITERAL2"
+					>(\d+?\.\d*em|\d*\.\d+?em|\d*em)</SEQ_REGEXP>
+
+	</RULES>
+
+	<RULES SET="MATH" DEFAULT="MARKUP">
+
+		<!-- Comments -->
+		<EOL_SPAN TYPE="COMMENT1">%</EOL_SPAN>
+
+		<!-- At Least Twenty Five letter control sequences -->
+
+			<!-- Arbitrary control sequence of the specified length -->
+			<SEQ_REGEXP HASH_CHARS="\" TYPE="LABEL"
+					>\\[a-zA-Z@]{25}[a-zA-Z@]*</SEQ_REGEXP>
+
+		<!-- Twenty Four letter control sequences -->
+			<SEQ TYPE="KEYWORD1">\interfootnotelinepenalty</SEQ>
+
+			<!-- Arbitrary control sequence of the specified length -->
+			<SEQ_REGEXP HASH_CHARS="\" TYPE="LABEL">\\[a-zA-Z@]{24}</SEQ_REGEXP>
+
+		<!-- Twenty Three letter control sequences -->
+			<SEQ TYPE="KEYWORD1">\interdisplaylinepenalty</SEQ>
+
+			<!-- Arbitrary control sequence of the specified length -->
+			<SEQ_REGEXP HASH_CHARS="\" TYPE="LABEL">\\[a-zA-Z@]{23}</SEQ_REGEXP>
+
+		<!-- Twenty Two letter control sequences -->
+
+			<!-- Arbitrary control sequence of the specified length -->
+			<SEQ_REGEXP HASH_CHARS="\" TYPE="LABEL">\\[a-zA-Z@]{22}</SEQ_REGEXP>
+
+		<!-- Twenty One letter control sequences -->
+			<SEQ TYPE="KEYWORD4">\belowdisplayshortskip</SEQ>
+			<SEQ TYPE="KEYWORD4">\abovedisplayshortskip</SEQ>
+
+			<!-- Arbitrary control sequence of the specified length -->
+			<SEQ_REGEXP HASH_CHARS="\" TYPE="LABEL">\\[a-zA-Z@]{21}</SEQ_REGEXP>
+
+		<!-- Twenty letter control sequences -->
+
+			<SEQ TYPE="KEYWORD4">\doublehyphendemerits</SEQ>
+			<SEQ TYPE="KEYWORD1">\abovedisplayshortskip</SEQ>
+
+			<!-- Arbitrary control sequence of the specified length -->
+			<SEQ_REGEXP HASH_CHARS="\" TYPE="LABEL">\\[a-zA-Z@]{20}</SEQ_REGEXP>
+
+		<!-- Nineteen letter control sequences -->
+
+			<SEQ TYPE="KEYWORD1">\normallineskiplimit</SEQ>
+			<SEQ TYPE="KEYWORD4">\finalhyphendemerits</SEQ>
+			<SEQ TYPE="KEYWORD4">\displaywidowpenalty</SEQ>
+
+			<!-- Arbitrary control sequence of the specified length -->
+			<SEQ_REGEXP HASH_CHARS="\" TYPE="LABEL">\\[a-zA-Z@]{19}</SEQ_REGEXP>
+
+		<!-- Eighteen letter control sequences -->
+
+			<SEQ TYPE="KEYWORD4">\postdisplaypenalty</SEQ>
+			<SEQ TYPE="KEYWORD4">\nulldelimiterspace</SEQ>
+			<SEQ TYPE="KEYWORD1">\normalbaselineskip</SEQ>
+			<SEQ TYPE="KEYWORD1">\Longleftrightarrow</SEQ>
+			<SEQ TYPE="KEYWORD1">\longleftrightarrow</SEQ>
+			<SEQ TYPE="KEYWORD4">\delimitershortfall</SEQ>
+
+			<!-- Arbitrary control sequence of the specified length -->
+			<SEQ_REGEXP HASH_CHARS="\" TYPE="LABEL">\\[a-zA-Z@]{18}</SEQ_REGEXP>
+
+		<!-- Seventeen letter control sequences -->
+
+			<SEQ TYPE="KEYWORD4">\tracingparagraphs</SEQ>
+			<SEQ TYPE="KEYWORD1">\scriptscriptstyle</SEQ>
+			<SEQ TYPE="KEYWORD1">\rightleftharpoons</SEQ>
+			<SEQ TYPE="KEYWORD1">\predisplaypenalty</SEQ>
+			<SEQ TYPE="KEYWORD4">\errorcontextlines</SEQ>
+			<SEQ TYPE="KEYWORD4">\defaulthyphenchar</SEQ>
+
+			<!-- Arbitrary control sequence of the specified length -->
+			<SEQ_REGEXP HASH_CHARS="\" TYPE="LABEL">\\[a-zA-Z@]{17}</SEQ_REGEXP>
+
+		<!-- Sixteen letter control sequences -->
+
+			<SEQ TYPE="KEYWORD4">\tracinglostchars</SEQ>
+			<SEQ TYPE="KEYWORD1">\scriptscriptfont</SEQ>
+			<SEQ TYPE="KEYWORD1">\rightharpoondown</SEQ>
+			<SEQ TYPE="KEYWORD4">\predisplaypenaty</SEQ>
+			<SEQ TYPE="KEYWORD1">\pagefilllstretch</SEQ>
+			<SEQ TYPE="KEYWORD1">\offinterlineskip</SEQ>
+			<SEQ TYPE="KEYWORD1">\nonfrenchspacing</SEQ>
+			<SEQ TYPE="KEYWORD4">\interlinepenalty</SEQ>
+			<SEQ TYPE="KEYWORD4">\emergencystretch</SEQ>
+			<SEQ TYPE="KEYWORD4">\belowdisplayskip</SEQ>
+			<SEQ TYPE="KEYWORD1">\allocationnumber</SEQ>
+			<SEQ TYPE="KEYWORD4">\abovedisplayskip</SEQ>
+
+			<!-- Arbitrary control sequence of the specified length -->
+			<SEQ_REGEXP HASH_CHARS="\" TYPE="LABEL">\\[a-zA-Z@]{16}</SEQ_REGEXP>
+
+		<!-- Fifteen letter control sequences -->
+
+			<SEQ TYPE="KEYWORD4">\tracingrestores</SEQ>
+			<SEQ TYPE="KEYWORD4">\tracingcommands</SEQ>
+			<SEQ TYPE="KEYWORD1">\smallskipamount</SEQ>
+			<SEQ TYPE="KEYWORD1">\pagefillstretch</SEQ>
+			<SEQ TYPE="KEYWORD1">\normalbaselines</SEQ>
+			<SEQ TYPE="KEYWORD1">\nointerlineskip</SEQ>
+			<SEQ TYPE="KEYWORD1">\leftharpoondown</SEQ>
+			<SEQ TYPE="KEYWORD1">\insertpenalties</SEQ>
+			<SEQ TYPE="KEYWORD4">\floatingpenalty</SEQ>
+			<SEQ TYPE="KEYWORD4">\exhyphenpenalty</SEQ>
+			<SEQ TYPE="KEYWORD4">\delimiterfactor</SEQ>
+			<SEQ TYPE="KEYWORD4">\defaultskewchar</SEQ>
+			<SEQ TYPE="KEYWORD1">\bigtriangledown</SEQ>
+			<SEQ TYPE="KEYWORD1">\afterassignment</SEQ>
+			<SEQ TYPE="KEYWORD1">\abovewithdelims</SEQ>
+
+			<!-- Arbitrary control sequence of the specified length -->
+			<SEQ_REGEXP HASH_CHARS="\" TYPE="LABEL">\\[a-zA-Z@]{15}</SEQ_REGEXP>
+
+		<!-- Fourteen letter control sequences -->
+
+			<SEQ TYPE="KEYWORD1">\splitfirstmark</SEQ>
+			<SEQ TYPE="KEYWORD4">\showboxbreadth</SEQ>
+			<SEQ TYPE="KEYWORD4">\righthyphenmin</SEQ>
+			<SEQ TYPE="KEYWORD1">\rightharpoonup</SEQ>
+			<SEQ TYPE="KEYWORD1">\rightarrowfill</SEQ>
+			<SEQ TYPE="KEYWORD1">\removelastskip</SEQ>
+			<SEQ TYPE="KEYWORD4">\predisplaysize</SEQ>
+			<SEQ TYPE="KEYWORD1">\pagefilstretch</SEQ>
+			<SEQ TYPE="KEYWORD1">\overwithdelims</SEQ>
+			<SEQ TYPE="KEYWORD1">\overrightarrow</SEQ>
+			<SEQ TYPE="KEYWORD1">\normallineskip</SEQ>
+			<SEQ TYPE="KEYWORD1">\longrightarrow</SEQ>
+			<SEQ TYPE="KEYWORD1">\Longrightarrow</SEQ>
+			<SEQ TYPE="KEYWORD1">\Leftrightarrow</SEQ>
+			<SEQ TYPE="KEYWORD1">\leftrightarrow</SEQ>
+			<SEQ TYPE="KEYWORD1">\hookrightarrow</SEQ>
+			<SEQ TYPE="KEYWORD4">\holdinginserts</SEQ>
+			<SEQ TYPE="KEYWORD1">\atopwithdelims</SEQ>
+
+			<!-- Arbitrary control sequence of the specified length -->
+			<SEQ_REGEXP HASH_CHARS="\" TYPE="LABEL">\\[a-zA-Z@]{14}</SEQ_REGEXP>
+
+		<!-- Thirteen letter control sequences -->
+
+			<SEQ TYPE="KEYWORD1">\ttraggedright</SEQ>
+			<SEQ TYPE="KEYWORD1">\triangleright</SEQ>
+			<SEQ TYPE="KEYWORD4">\tracingoutput</SEQ>
+			<SEQ TYPE="KEYWORD4">\tracingonline</SEQ>
+			<SEQ TYPE="KEYWORD4">\tracingmacros</SEQ>
+			<SEQ TYPE="KEYWORD4">\splitmaxdepth</SEQ>
+			<SEQ TYPE="KEYWORD1">\overleftarrow</SEQ>
+			<SEQ TYPE="KEYWORD4">\outputpenalty</SEQ>
+			<SEQ TYPE="KEYWORD1">\nopagenumbers</SEQ>
+			<SEQ TYPE="KEYWORD1">\medskipamount</SEQ>
+			<SEQ TYPE="KEYWORD4">\maxdeadcycles</SEQ>
+			<SEQ TYPE="KEYWORD1">\magnification</SEQ>
+			<SEQ TYPE="KEYWORD1">\Longleftarrow</SEQ>
+			<SEQ TYPE="KEYWORD1">\longleftarrow</SEQ>
+			<SEQ TYPE="KEYWORD4">\lineskiplimit</SEQ>
+			<SEQ TYPE="KEYWORD4">\lefthyphenmin	</SEQ>
+			<SEQ TYPE="KEYWORD1">\leftharpoonup</SEQ>
+			<SEQ TYPE="KEYWORD1">\leftarrowfill</SEQ>
+			<SEQ TYPE="KEYWORD4">\hyphenpenalty</SEQ>
+			<SEQ TYPE="KEYWORD1">\hookleftarrow</SEQ>
+			<SEQ TYPE="KEYWORD1">\frenchspacing</SEQ>
+			<SEQ TYPE="KEYWORD1">\errorstopmode</SEQ>
+			<SEQ TYPE="KEYWORD1">\downbracefill</SEQ>
+			<SEQ TYPE="KEYWORD1">\displaylimits</SEQ>
+			<SEQ TYPE="KEYWORD4">\displayindent</SEQ>
+			<SEQ TYPE="KEYWORD1">\discretionary</SEQ>
+			<SEQ TYPE="KEYWORD4">\brokenpenalty</SEQ>
+			<SEQ TYPE="KEYWORD1">\bigtriangleup</SEQ>
+			<SEQ TYPE="KEYWORD1">\bigskipamount</SEQ>
+			<SEQ TYPE="KEYWORD1">\advancepageno</SEQ>
+
+			<!-- Arbitrary control sequence of the specified length -->
+			<SEQ_REGEXP HASH_CHARS="\" TYPE="LABEL">\\[a-zA-Z@]{13}</SEQ_REGEXP>
+
+		<!-- Twelve letter control sequences -->
+
+			<SEQ TYPE="KEYWORD4">\widowpenalty</SEQ>
+			<SEQ TYPE="KEYWORD1">\triangleleft</SEQ>
+			<SEQ TYPE="KEYWORD4">\tracingstats</SEQ>
+			<SEQ TYPE="KEYWORD4">\tracingpages</SEQ>
+			<SEQ TYPE="KEYWORD4">\splittopskip</SEQ>
+			<SEQ TYPE="KEYWORD1">\splitbotmark</SEQ>
+			<SEQ TYPE="KEYWORD4">\showboxdepth</SEQ>
+			<SEQ TYPE="KEYWORD1">\romannumeral</SEQ>
+			<SEQ TYPE="KEYWORD1">\raggedbottom</SEQ>
+			<SEQ TYPE="KEYWORD4">\pretolerance</SEQ>
+			<SEQ TYPE="KEYWORD1">\pagecontents</SEQ>
+			<SEQ TYPE="KEYWORD4">\overfullrule</SEQ>
+			<SEQ TYPE="KEYWORD1">\normalbottom</SEQ>
+			<SEQ TYPE="KEYWORD1">\negthinspace</SEQ>
+			<SEQ TYPE="KEYWORD4">\mathsurround</SEQ>
+			<SEQ TYPE="KEYWORD1">\makeheadline</SEQ>
+			<SEQ TYPE="KEYWORD1">\makefootline</SEQ>
+			<SEQ TYPE="KEYWORD1">\ignorespaces</SEQ>
+			<SEQ TYPE="KEYWORD1">\footnoterule</SEQ>
+			<SEQ TYPE="KEYWORD4">\everydisplay</SEQ>
+			<SEQ TYPE="KEYWORD1">\dosupereject</SEQ>
+			<SEQ TYPE="KEYWORD4">\displaywidth</SEQ>
+			<SEQ TYPE="KEYWORD1">\displaystyle</SEQ>
+			<SEQ TYPE="KEYWORD1">\displaylines</SEQ>
+			<SEQ TYPE="KEYWORD1">\bordermatrix</SEQ>
+			<SEQ TYPE="KEYWORD4">\binoppenalty</SEQ>
+			<SEQ TYPE="KEYWORD1">\beginsection</SEQ>
+			<SEQ TYPE="KEYWORD1">\baselineskip</SEQ>
+
+			<!-- Arbitrary control sequence of the specified length -->
+			<SEQ_REGEXP HASH_CHARS="\" TYPE="LABEL">\\[a-zA-Z@]{12}</SEQ_REGEXP>
+
+		<!-- Eleven letter control sequences -->
+
+			<SEQ TYPE="KEYWORD1">\Updownarrow</SEQ>
+			<SEQ TYPE="KEYWORD1">\updownarrow</SEQ>
+			<SEQ TYPE="KEYWORD1">\upbracefill</SEQ>
+			<SEQ TYPE="KEYWORD4">\thickmuskip</SEQ>
+			<SEQ TYPE="KEYWORD1">\spacefactor</SEQ>
+			<SEQ TYPE="KEYWORD1">\showhyphens</SEQ>
+			<SEQ TYPE="KEYWORD1">\scriptstyle</SEQ>
+			<SEQ TYPE="KEYWORD4">\scriptspace</SEQ>
+			<SEQ TYPE="KEYWORD1">\raggedright</SEQ>
+			<SEQ TYPE="KEYWORD1">\plainoutput</SEQ>
+			<SEQ TYPE="KEYWORD4">\parfillskip</SEQ>
+			<SEQ TYPE="KEYWORD1">\pagestretch</SEQ>
+			<SEQ TYPE="KEYWORD1">\nonstopmode</SEQ>
+			<SEQ TYPE="COMMENT2">\newlinechar</SEQ>
+			<SEQ TYPE="KEYWORD1">\mathpalette</SEQ>
+			<SEQ TYPE="FUNCTION">\mathchardef</SEQ>
+			<SEQ TYPE="KEYWORD1">\magstephalf</SEQ>
+			<SEQ TYPE="KEYWORD4">\linepenalty</SEQ>
+			<SEQ TYPE="KEYWORD1">\lastpenalty</SEQ>
+			<SEQ TYPE="KEYWORD1">\hyphenation</SEQ>
+			<SEQ TYPE="KEYWORD1">\expandafter</SEQ>
+			<SEQ TYPE="KEYWORD4">\endlinechar</SEQ>
+			<SEQ TYPE="KEYWORD1">\diamondsuit</SEQ>
+			<SEQ TYPE="KEYWORD4">\clubpenalty</SEQ>
+			<SEQ TYPE="KEYWORD4">\boxmaxdepth</SEQ>
+			<SEQ TYPE="KEYWORD4">\adjdemerits</SEQ>
+
+			<!-- Arbitrary control sequence of the specified length -->
+			<SEQ_REGEXP HASH_CHARS="\" TYPE="LABEL">\\[a-zA-Z@]{11}</SEQ_REGEXP>
+
+		<!-- Ten letter control sequences -->
+
+			<SEQ TYPE="KEYWORD4">\xspaceskip</SEQ>
+			<SEQ TYPE="KEYWORD1">\varepsilon</SEQ>
+			<SEQ TYPE="KEYWORD1">\underbrace</SEQ>
+			<SEQ TYPE="KEYWORD1">\tracingall</SEQ>
+			<SEQ TYPE="KEYWORD4">\thinmuskip</SEQ>
+			<SEQ TYPE="KEYWORD1">\textindent</SEQ>
+			<SEQ TYPE="KEYWORD1">\supereject</SEQ>
+			<SEQ TYPE="KEYWORD1">\sqsupseteq</SEQ>
+			<SEQ TYPE="KEYWORD1">\smallbreak</SEQ>
+			<SEQ TYPE="KEYWORD1">\scrollmode</SEQ>
+			<SEQ TYPE="KEYWORD1">\scriptfont</SEQ>
+			<SEQ TYPE="KEYWORD1">\rmoustache</SEQ>
+			<SEQ TYPE="KEYWORD1">\Rightarrow</SEQ>
+			<SEQ TYPE="KEYWORD1">\rightarrow</SEQ>
+			<SEQ TYPE="KEYWORD4">\relpenalty</SEQ>
+			<SEQ TYPE="KEYWORD1">\pageshrink</SEQ>
+			<SEQ TYPE="KEYWORD1">\pageinsert</SEQ>
+			<SEQ TYPE="KEYWORD1">\obeyspaces</SEQ>
+			<SEQ TYPE="KEYWORD1">\mathhexbox</SEQ>
+			<SEQ TYPE="KEYWORD1">\mathchoice</SEQ>
+			<SEQ TYPE="KEYWORD1">\mathaccent</SEQ>
+			<SEQ TYPE="KEYWORD1">\mapstochar</SEQ>
+			<SEQ TYPE="KEYWORD1">\longmapsto</SEQ>
+			<SEQ TYPE="KEYWORD1">\lmoustache</SEQ>
+			<SEQ TYPE="KEYWORD1">\leqalignno</SEQ>
+			<SEQ TYPE="KEYWORD1">\leavevmode</SEQ>
+			<SEQ TYPE="KEYWORD1">\hyphenchar</SEQ>
+			<SEQ TYPE="KEYWORD4">\hangindent</SEQ>
+			<SEQ TYPE="KEYWORD4">\globaldefs</SEQ>
+			<SEQ TYPE="KEYWORD1">\fmtversion</SEQ>
+			<SEQ TYPE="KEYWORD4">\escapechar</SEQ>
+			<SEQ TYPE="KEYWORD1">\errmessage</SEQ>
+			<SEQ TYPE="KEYWORD1">\dospecials</SEQ>
+			<SEQ TYPE="KEYWORD1">\deadcycles</SEQ>
+			<SEQ TYPE="KEYWORD1">\centerline</SEQ>
+			<SEQ TYPE="KEYWORD1">\begingroup</SEQ>
+			<SEQ TYPE="KEYWORD1">\allowbreak</SEQ>
+			<SEQ TYPE="KEYWORD1">\aftergroup</SEQ>
+
+			<!-- Arbitrary control sequence of the specified length -->
+			<SEQ_REGEXP HASH_CHARS="\" TYPE="LABEL">\\[a-zA-Z@]{10}</SEQ_REGEXP>
+
+		<!-- Nine letter control sequences -->
+
+			<SEQ TYPE="KEYWORD1">\widetilde</SEQ>
+			<SEQ TYPE="KEYWORD1">\vfootnote</SEQ>
+			<SEQ TYPE="KEYWORD1">\uppercase</SEQ>
+			<SEQ TYPE="KEYWORD1">\unpenalty</SEQ>
+			<SEQ TYPE="KEYWORD1">\underline</SEQ>
+			<SEQ TYPE="KEYWORD1">\undefined</SEQ>
+			<SEQ TYPE="KEYWORD1">\topinsert</SEQ>
+			<SEQ TYPE="KEYWORD4">\tolerance</SEQ>
+			<SEQ TYPE="KEYWORD1">\thinspace</SEQ>
+			<SEQ TYPE="KEYWORD1">\textstyle</SEQ>
+			<SEQ TYPE="KEYWORD1">\spadesuit</SEQ>
+			<SEQ TYPE="KEYWORD4">\spaceskip</SEQ>
+			<SEQ TYPE="KEYWORD1">\smallskip</SEQ>
+			<SEQ TYPE="KEYWORD1">\showlists</SEQ>
+			<SEQ TYPE="KEYWORD4">\rightskip</SEQ>
+			<SEQ TYPE="KEYWORD1">\rightline</SEQ>
+			<SEQ TYPE="KEYWORD1">\prevdepth</SEQ>
+			<SEQ TYPE="KEYWORD1">\preloaded</SEQ>
+			<SEQ TYPE="KEYWORD4">\parindent</SEQ>
+			<SEQ TYPE="KEYWORD1">\pagetotal</SEQ>
+			<SEQ TYPE="KEYWORD1">\pagedepth</SEQ>
+			<SEQ TYPE="KEYWORD1">\overbrace</SEQ>
+			<SEQ TYPE="KEYWORD1">\obeylines</SEQ>
+			<SEQ TYPE="KEYWORD1">\nonscript</SEQ>
+			<SEQ TYPE="FUNCTION">\newmuskip</SEQ>
+			<SEQ TYPE="FUNCTION">\newinsert</SEQ>
+			<SEQ TYPE="FUNCTION">\muskipdef</SEQ>
+			<SEQ TYPE="KEYWORD1">\multispan</SEQ>
+			<SEQ TYPE="KEYWORD1">\moveright</SEQ>
+			<SEQ TYPE="KEYWORD1">\midinsert</SEQ>
+			<SEQ TYPE="KEYWORD4">\medmuskip</SEQ>
+			<SEQ TYPE="KEYWORD1">\mathstrut</SEQ>
+			<SEQ TYPE="KEYWORD1">\mathpunct</SEQ>
+			<SEQ TYPE="KEYWORD1">\mathinner</SEQ>
+			<SEQ TYPE="KEYWORD1">\mathclose</SEQ>
+			<SEQ TYPE="KEYWORD1">\lowercase</SEQ>
+			<SEQ TYPE="KEYWORD4">\looseness</SEQ>
+			<SEQ TYPE="KEYWORD1">\Leftarrow</SEQ>
+			<SEQ TYPE="KEYWORD1">\leftarrow</SEQ>
+			<SEQ TYPE="KEYWORD1">\immediate</SEQ>
+			<SEQ TYPE="KEYWORD1">\hrulefill</SEQ>
+			<SEQ TYPE="KEYWORD1">\hidewidth</SEQ>
+			<SEQ TYPE="KEYWORD1">\heartsuit</SEQ>
+			<SEQ TYPE="KEYWORD4">\hangafter</SEQ>
+			<SEQ TYPE="KEYWORD1">\goodbreak</SEQ>
+			<SEQ TYPE="COMMENT3">\futurelet</SEQ>
+			<SEQ TYPE="KEYWORD1">\footstrut</SEQ>
+			<SEQ TYPE="KEYWORD1">\fontdimen</SEQ>
+			<SEQ TYPE="KEYWORD1">\firstmark</SEQ>
+			<SEQ TYPE="KEYWORD4">\everyvbox</SEQ>
+			<SEQ TYPE="KEYWORD4">\everymath</SEQ>
+			<SEQ TYPE="KEYWORD4">\everyhbox</SEQ>
+			<SEQ TYPE="KEYWORD1">\eqalignno</SEQ>
+			<SEQ TYPE="KEYWORD1">\endinsert</SEQ>
+			<SEQ TYPE="FUNCTION">\endcsname</SEQ>
+			<SEQ TYPE="KEYWORD1">\Downarrow</SEQ>
+			<SEQ TYPE="KEYWORD1">\downarrow</SEQ>
+			<SEQ TYPE="KEYWORD1">\delimiter</SEQ>
+			<SEQ TYPE="KEYWORD1">\copyright</SEQ>
+			<SEQ TYPE="KEYWORD1">\cleartabs</SEQ>
+			<SEQ TYPE="KEYWORD1">\centering</SEQ>
+			<SEQ TYPE="KEYWORD1">\bracevert</SEQ>
+			<SEQ TYPE="KEYWORD1">\bigotimes</SEQ>
+			<SEQ TYPE="KEYWORD1">\batchmode</SEQ>
+			<SEQ TYPE="KEYWORD2">\backslash</SEQ>
+			<SEQ TYPE="KEYWORD1">\Arrowvert</SEQ>
+			<SEQ TYPE="KEYWORD1">\arrowvert</SEQ>
+
+			<!-- Length Nine Register Reference -->
+			<SEQ_REGEXP HASH_CHARS="\" TYPE="COMMENT4"
+					>\\muskip([0-1][0-9][0-9]|2([0-4][0-9]|5[0-5]))</SEQ_REGEXP>
+
+			<!-- Arbitrary control sequence of the specified length -->
+			<SEQ_REGEXP HASH_CHARS="\" TYPE="LABEL">\\[a-zA-Z@]{9}</SEQ_REGEXP>
+
+		<!-- Eight letter control sequences -->
+
+			<SEQ TYPE="KEYWORD1">\xleaders</SEQ>
+			<SEQ TYPE="KEYWORD1">\vphantom</SEQ>
+			<SEQ TYPE="KEYWORD4">\vbadness</SEQ>
+			<SEQ TYPE="KEYWORD1">\vartheta</SEQ>
+			<SEQ TYPE="KEYWORD1">\varsigma</SEQ>
+			<SEQ TYPE="KEYWORD1">\underbar</SEQ>
+			<SEQ TYPE="KEYWORD1">\triangle</SEQ>
+			<SEQ TYPE="KEYWORD1">\textfont</SEQ>
+			<SEQ TYPE="KEYWORD1">\tabsdone</SEQ>
+			<SEQ TYPE="KEYWORD1">\tabalign</SEQ>
+			<SEQ TYPE="KEYWORD1">\supseteq</SEQ>
+			<SEQ TYPE="KEYWORD1">\subseteq</SEQ>
+			<SEQ TYPE="KEYWORD1">\strutbox</SEQ>
+			<SEQ TYPE="KEYWORD1">\smallint</SEQ>
+			<SEQ TYPE="KEYWORD1">\skewchar</SEQ>
+			<SEQ TYPE="KEYWORD1">\setminus</SEQ>
+			<SEQ TYPE="KEYWORD1">\proclaim</SEQ>
+			<SEQ TYPE="KEYWORD1">\prevgraf</SEQ>
+			<SEQ TYPE="KEYWORD1">\patterns</SEQ>
+			<SEQ TYPE="KEYWORD1">\parshape</SEQ>
+			<SEQ TYPE="KEYWORD1">\parallel</SEQ>
+			<SEQ TYPE="KEYWORD1">\pagegoal</SEQ>
+			<SEQ TYPE="KEYWORD1">\pagebody</SEQ>
+			<SEQ TYPE="KEYWORD1">\overline</SEQ>
+			<SEQ TYPE="KEYWORD1">\oldstyle</SEQ>
+			<SEQ TYPE="KEYWORD1">\nolimits</SEQ>
+			<SEQ TYPE="KEYWORD1">\noindent</SEQ>
+			<SEQ TYPE="KEYWORD1">\noexpand</SEQ>
+			<SEQ TYPE="COMMENT2">\newwrite</SEQ>
+			<SEQ TYPE="COMMENT2">\newdimen</SEQ>
+			<SEQ TYPE="COMMENT2">\newcount</SEQ>
+			<SEQ TYPE="KEYWORD1">\narrower</SEQ>
+			<SEQ TYPE="KEYWORD1">\moveleft</SEQ>
+			<SEQ TYPE="KEYWORD1">\medbreak</SEQ>
+			<SEQ TYPE="KEYWORD1">\maxdimen</SEQ>
+			<SEQ TYPE="KEYWORD4">\maxdepth</SEQ>
+			<SEQ TYPE="KEYWORD1">\mathopen</SEQ>
+			<SEQ TYPE="KEYWORD1">\mathcode</SEQ>
+			<SEQ TYPE="KEYWORD1">\mathchar</SEQ>
+			<SEQ TYPE="KEYWORD1">\lineskip</SEQ>
+			<SEQ TYPE="KEYWORD4">\leftskip</SEQ>
+			<SEQ TYPE="KEYWORD4">\leftline</SEQ>
+			<SEQ TYPE="KEYWORD1">\lastskip</SEQ>
+			<SEQ TYPE="KEYWORD1">\lastkern</SEQ>
+			<SEQ TYPE="KEYWORD4">\language</SEQ>
+			<SEQ TYPE="KEYWORD1">\itemitem</SEQ>
+			<SEQ TYPE="KEYWORD1">\hphantom</SEQ>
+			<SEQ TYPE="KEYWORD1">\hideskip</SEQ>
+			<SEQ TYPE="KEYWORD1">\headline</SEQ>
+			<SEQ TYPE="KEYWORD4">\hbadness</SEQ>
+			<SEQ TYPE="KEYWORD1">\footnote</SEQ>
+			<SEQ TYPE="KEYWORD1">\footline</SEQ>
+			<SEQ TYPE="KEYWORD1">\multiply</SEQ>
+			<SEQ TYPE="KEYWORD1">\fontname</SEQ>
+			<SEQ TYPE="KEYWORD1">\filbreak</SEQ>
+			<SEQ TYPE="KEYWORD4">\everypar</SEQ>
+			<SEQ TYPE="KEYWORD4">\everyjob</SEQ>
+			<SEQ TYPE="KEYWORD1">\endinput</SEQ>
+			<SEQ TYPE="KEYWORD1">\endgroup</SEQ>
+			<SEQ TYPE="KEYWORD1">\emptyset</SEQ>
+			<SEQ TYPE="FUNCTION">\dimendef</SEQ>
+			<SEQ TYPE="FUNCTION">\countdef</SEQ>
+			<SEQ TYPE="KEYWORD1">\clubsuit</SEQ>
+			<SEQ TYPE="KEYWORD1">\closeout</SEQ>
+			<SEQ TYPE="KEYWORD1">\cleaders</SEQ>
+			<SEQ TYPE="KEYWORD1">\buildrel</SEQ>
+			<SEQ TYPE="KEYWORD1">\bigwedge</SEQ>
+			<SEQ TYPE="KEYWORD1">\biguplus</SEQ>
+			<SEQ TYPE="KEYWORD1">\bigsqcup</SEQ>
+			<SEQ TYPE="KEYWORD1">\bigoplus</SEQ>
+			<SEQ TYPE="KEYWORD1">\bigbreak</SEQ>
+
+			<!-- Length Eight Register Reference -->
+			<SEQ_REGEXP HASH_CHARS="\" TYPE="COMMENT4"
+					>\\muskip[0-9][0-9]</SEQ_REGEXP>
+
+			<!-- Length Eight Register Reference -->
+			<SEQ_REGEXP HASH_CHARS="\" TYPE="COMMENT4"
+					>\\dimen([0-1][0-9][0-9]|2([0-4][0-9]|5[0-5]))</SEQ_REGEXP>
+
+			<!-- Length Eight Register Reference -->
+			<SEQ_REGEXP HASH_CHARS="\" TYPE="COMMENT4"
+					>\\count([0-1][0-9][0-9]|2([0-4][0-9]|5[0-5]))</SEQ_REGEXP>
+
+			<!-- Arbitrary control sequence of the specified length -->
+			<SEQ_REGEXP HASH_CHARS="\" TYPE="LABEL">\\[a-zA-Z@]{8}</SEQ_REGEXP>
+
+		<!-- Seven letter control sequences -->
+
+			<SEQ TYPE="KEYWORD1">\widehat</SEQ>
+			<SEQ TYPE="KEYWORD4">\voffset</SEQ>
+			<SEQ TYPE="KEYWORD1">\vfilneg</SEQ>
+			<SEQ TYPE="KEYWORD1">\vcenter</SEQ>
+			<SEQ TYPE="KEYWORD1">\vadjust</SEQ>
+			<SEQ TYPE="KEYWORD1">\Upsilon</SEQ>
+			<SEQ TYPE="KEYWORD1">\upsilon</SEQ>
+			<SEQ TYPE="KEYWORD1">\Uparrow</SEQ>
+			<SEQ TYPE="KEYWORD1">\uparrow</SEQ>
+			<SEQ TYPE="KEYWORD1">\unvcopy</SEQ>
+			<SEQ TYPE="KEYWORD1">\unhcopy</SEQ>
+			<SEQ TYPE="KEYWORD4">\topskip</SEQ>
+			<SEQ TYPE="KEYWORD1">\topmark</SEQ>
+			<SEQ TYPE="FUNCTION">\toksdef</SEQ>
+			<SEQ TYPE="KEYWORD1">\tabsyet</SEQ>
+			<SEQ TYPE="KEYWORD4">\tabskip</SEQ>
+			<SEQ TYPE="KEYWORD1">\swarrow</SEQ>
+			<SEQ TYPE="KEYWORD1">\special</SEQ>
+			<SEQ TYPE="FUNCTION">\skipdef</SEQ>
+			<SEQ TYPE="KEYWORD1">\showthe</SEQ>
+			<SEQ TYPE="KEYWORD1">\showbox</SEQ>
+			<SEQ TYPE="KEYWORD1">\shipout</SEQ>
+			<SEQ TYPE="KEYWORD1">\sevensy</SEQ>
+			<SEQ TYPE="KEYWORD1">\sevenrm</SEQ>
+			<SEQ TYPE="KEYWORD1">\sevenbf</SEQ>
+			<SEQ TYPE="KEYWORD1">\settabs</SEQ>
+			<SEQ TYPE="KEYWORD1">\searrow</SEQ>
+			<SEQ TYPE="KEYWORD1">\rootbox</SEQ>
+			<SEQ TYPE="KEYWORD1">\radical</SEQ>
+			<SEQ TYPE="KEYWORD1">\pmatrix</SEQ>
+			<SEQ TYPE="KEYWORD1">\phantom</SEQ>
+			<SEQ TYPE="KEYWORD1">\penalty</SEQ>
+			<SEQ TYPE="KEYWORD4">\pausing</SEQ>
+			<SEQ TYPE="KEYWORD1">\partial</SEQ>
+			<SEQ TYPE="KEYWORD4">\parskip</SEQ>
+			<SEQ TYPE="KEYWORD1">\openout</SEQ>
+			<SEQ TYPE="KEYWORD1">\ooalign</SEQ>
+			<SEQ TYPE="KEYWORD1">\nwarrow</SEQ>
+			<SEQ TYPE="KEYWORD1">\nobreak</SEQ>
+			<SEQ TYPE="KEYWORD1">\noalign</SEQ>
+			<SEQ TYPE="COMMENT2">\newtoks</SEQ>
+			<SEQ TYPE="COMMENT2">\newskip</SEQ>
+			<SEQ TYPE="COMMENT2">\newread</SEQ>
+			<SEQ TYPE="COMMENT2">\newhelp</SEQ>
+			<SEQ TYPE="KEYWORD1">\nearrow</SEQ>
+			<SEQ TYPE="KEYWORD1">\natural</SEQ>
+			<SEQ TYPE="KEYWORD1">\mscount</SEQ>
+			<SEQ TYPE="KEYWORD1">\message</SEQ>
+			<SEQ TYPE="KEYWORD1">\medskip</SEQ>
+			<SEQ TYPE="KEYWORD1">\meaning</SEQ>
+			<SEQ TYPE="KEYWORD1">\mathrel</SEQ>
+			<SEQ TYPE="KEYWORD1">\mathord</SEQ>
+			<SEQ TYPE="KEYWORD1">\mathbin</SEQ>
+			<SEQ TYPE="KEYWORD1">\magstep</SEQ>
+			<SEQ TYPE="KEYWORD1">\leaders</SEQ>
+			<SEQ TYPE="KEYWORD1">\lastbox</SEQ>
+			<SEQ TYPE="KEYWORD1">\joinrel</SEQ>
+			<SEQ TYPE="KEYWORD1">\jobname</SEQ>
+			<SEQ TYPE="KEYWORD1">\iterate</SEQ>
+			<SEQ TYPE="KEYWORD3">\ifvmode</SEQ>
+			<SEQ TYPE="KEYWORD3">\ifmmode</SEQ>
+			<SEQ TYPE="KEYWORD3">\ifinner</SEQ>
+			<SEQ TYPE="KEYWORD3">\ifhmode</SEQ>
+			<SEQ TYPE="KEYWORD3">\iffalse</SEQ>
+			<SEQ TYPE="KEYWORD4">\hoffset</SEQ>
+			<SEQ TYPE="KEYWORD1">\hfilneg</SEQ>
+			<SEQ TYPE="KEYWORD1">\footins</SEQ>
+			<SEQ TYPE="KEYWORD1">\fmtname</SEQ>
+			<SEQ TYPE="KEYWORD4">\everycr</SEQ>
+			<SEQ TYPE="KEYWORD4">\errhelp</SEQ>
+			<SEQ TYPE="KEYWORD1">\eqalign</SEQ>
+			<SEQ TYPE="KEYWORD1">\epsilon</SEQ>
+			<SEQ TYPE="KEYWORD1">\enspace</SEQ>
+			<SEQ TYPE="KEYWORD1">\endline</SEQ>
+			<SEQ TYPE="KEYWORD1">\endgraf</SEQ>
+			<SEQ TYPE="KEYWORD1">\dotfill</SEQ>
+			<SEQ TYPE="KEYWORD1">\diamond</SEQ>
+			<SEQ TYPE="KEYWORD1">\delcode</SEQ>
+			<SEQ TYPE="KEYWORD1">\ddagger</SEQ>
+			<SEQ TYPE="KEYWORD1">\columns</SEQ>
+			<SEQ TYPE="KEYWORD1">\closein</SEQ>
+			<SEQ TYPE="FUNCTION">\chardef</SEQ>
+			<SEQ TYPE="KEYWORD2">\cdprime</SEQ>
+			<SEQ TYPE="KEYWORD1">\catcode</SEQ>
+			<SEQ TYPE="KEYWORD1">\braceru</SEQ>
+			<SEQ TYPE="KEYWORD1">\bracerd</SEQ>
+			<SEQ TYPE="KEYWORD1">\bracelu</SEQ>
+			<SEQ TYPE="KEYWORD1">\braceld</SEQ>
+			<SEQ TYPE="KEYWORD1">\botmark</SEQ>
+			<SEQ TYPE="KEYWORD1">\bigskip</SEQ>
+			<SEQ TYPE="KEYWORD1">\bigodot</SEQ>
+			<SEQ TYPE="KEYWORD1">\bigcirc</SEQ>
+			<SEQ TYPE="KEYWORD1">\advance</SEQ>
+
+			<!-- Length Seven Register Reference -->
+			<SEQ_REGEXP HASH_CHARS="\" TYPE="COMMENT4">\\muskip[0-9]</SEQ_REGEXP>
+
+			<!-- Length Seven Register Reference -->
+			<SEQ_REGEXP HASH_CHARS="\" TYPE="COMMENT4"
+					>\\dimen[0-9][0-9]</SEQ_REGEXP>
+
+			<!-- Length Seven Register Reference -->
+			<SEQ_REGEXP HASH_CHARS="\" TYPE="COMMENT4"
+					>\\count[0-9][0-9]</SEQ_REGEXP>
+
+			<!-- Length Seven Register Reference -->
+			<SEQ_REGEXP HASH_CHARS="\" TYPE="COMMENT4"
+					>\\toks([0-1][0-9][0-9]|2([0-4][0-9]|5[0-5]))</SEQ_REGEXP>
+
+			<!-- Length Seven Register Reference -->
+			<SEQ_REGEXP HASH_CHARS="\" TYPE="COMMENT4"
+					>\\skip([0-1][0-9][0-9]|2([0-4][0-9]|5[0-5]))</SEQ_REGEXP>
+
+			<!-- Length Seven Decimal Character Reference -->
+			<SEQ_REGEXP HASH_CHARS="\" TYPE="KEYWORD2"
+					>\\char([0-1][0-9][0-9]|2([0-4][0-9]|5[0-5]))</SEQ_REGEXP>
+
+			<!-- Length Seven Octal Character Reference -->
+			<SEQ_REGEXP HASH_CHARS="\" TYPE="KEYWORD2"
+					>\\char'[0-7][0-7]</SEQ_REGEXP>
+
+			<!-- Length Seven Hexadecimal Character Reference -->
+			<SEQ_REGEXP HASH_CHARS="\" TYPE="KEYWORD2"
+					>\\char"[0-9A-Fa-f][0-9A-Fa-f]</SEQ_REGEXP>
+
+			<!-- Arbitrary control sequence of the specified length -->
+			<SEQ_REGEXP HASH_CHARS="\" TYPE="LABEL">\\[a-zA-Z@]{7}</SEQ_REGEXP>
+
+		<!-- Six letter control sequences -->
+
+			<SEQ TYPE="KEYWORD1">\vsplit</SEQ>
+			<SEQ TYPE="KEYWORD1">\varrho</SEQ>
+			<SEQ TYPE="KEYWORD1">\varphi</SEQ>
+			<SEQ TYPE="KEYWORD1">\valign</SEQ>
+			<SEQ TYPE="KEYWORD2">\utilde</SEQ>
+			<SEQ TYPE="KEYWORD1">\unvbox</SEQ>
+			<SEQ TYPE="KEYWORD1">\unskip</SEQ>
+			<SEQ TYPE="KEYWORD1">\unkern</SEQ>
+			<SEQ TYPE="KEYWORD1">\unhbox</SEQ>
+			<SEQ TYPE="KEYWORD4">\uchyph</SEQ>
+			<SEQ TYPE="KEYWORD1">\uccode</SEQ>
+			<SEQ TYPE="KEYWORD1">\topins</SEQ>
+			<SEQ TYPE="KEYWORD1">\supset</SEQ>
+			<SEQ TYPE="KEYWORD1">\succeq</SEQ>
+			<SEQ TYPE="KEYWORD1">\subset</SEQ>
+			<SEQ TYPE="KEYWORD1">\string</SEQ>
+			<SEQ TYPE="KEYWORD1">\sfcode</SEQ>
+			<SEQ TYPE="KEYWORD1">\seveni</SEQ>
+			<SEQ TYPE="KEYWORD1">\setbox</SEQ>
+			<SEQ TYPE="KEYWORD1">\rgroup</SEQ>
+			<SEQ TYPE="KEYWORD1">\rfloor</SEQ>
+			<SEQ TYPE="KEYWORD1">\repeat</SEQ>
+			<SEQ TYPE="KEYWORD1">\Relbar</SEQ>
+			<SEQ TYPE="KEYWORD1">\relbar</SEQ>
+			<SEQ TYPE="KEYWORD1">\rbrack</SEQ>
+			<SEQ TYPE="KEYWORD1">\rbrace</SEQ>
+			<SEQ TYPE="KEYWORD1">\rangle</SEQ>
+			<SEQ TYPE="KEYWORD1">\propto</SEQ>
+			<SEQ TYPE="KEYWORD1">\preceq</SEQ>
+			<SEQ TYPE="KEYWORD1">\pageno</SEQ>
+			<SEQ TYPE="KEYWORD4">\output</SEQ>
+			<SEQ TYPE="KEYWORD1">\otimes</SEQ>
+			<SEQ TYPE="KEYWORD1">\oslash</SEQ>
+			<SEQ TYPE="KEYWORD1">\openup</SEQ>
+			<SEQ TYPE="KEYWORD1">\openin</SEQ>
+			<SEQ TYPE="KEYWORD1">\ominus</SEQ>
+			<SEQ TYPE="KEYWORD1">\ointop</SEQ>
+			<SEQ TYPE="KEYWORD1">\oalign</SEQ>
+			<SEQ TYPE="KEYWORD1">\number</SEQ>
+			<SEQ TYPE="COMMENT2">\newfam</SEQ>
+			<SEQ TYPE="COMMENT2">\newbox</SEQ>
+			<SEQ TYPE="COMMENT4">\muskip</SEQ>
+			<SEQ TYPE="KEYWORD1">\models</SEQ>
+			<SEQ TYPE="KEYWORD1">\matrix</SEQ>
+			<SEQ TYPE="KEYWORD1">\mathop</SEQ>
+			<SEQ TYPE="KEYWORD1">\mapsto</SEQ>
+			<SEQ TYPE="KEYWORD1">\limsup</SEQ>
+			<SEQ TYPE="KEYWORD1">\limits</SEQ>
+			<SEQ TYPE="KEYWORD1">\liminf</SEQ>
+			<SEQ TYPE="KEYWORD1">\lgroup</SEQ>
+			<SEQ TYPE="KEYWORD2">\lfhook</SEQ>
+			<SEQ TYPE="KEYWORD1">\lfloor</SEQ>
+			<SEQ TYPE="KEYWORD1">\lccode</SEQ>
+			<SEQ TYPE="KEYWORD1">\lbrack</SEQ>
+			<SEQ TYPE="KEYWORD1">\lbrace</SEQ>
+			<SEQ TYPE="KEYWORD1">\langle</SEQ>
+			<SEQ TYPE="KEYWORD1">\Lambda</SEQ>
+			<SEQ TYPE="KEYWORD1">\lambda</SEQ>
+			<SEQ TYPE="KEYWORD1">\insert</SEQ>
+			<SEQ TYPE="KEYWORD1">\indent</SEQ>
+			<SEQ TYPE="KEYWORD3">\ifvoid</SEQ>
+			<SEQ TYPE="KEYWORD3">\ifvbox</SEQ>
+			<SEQ TYPE="KEYWORD3">\iftrue</SEQ>
+			<SEQ TYPE="KEYWORD3">\ifhbox</SEQ>
+			<SEQ TYPE="KEYWORD3">\ifcase</SEQ>
+			<SEQ TYPE="KEYWORD1">\ialign</SEQ>
+			<SEQ TYPE="KEYWORD1">\halign</SEQ>
+			<SEQ TYPE="FUNCTION">\global</SEQ>
+			<SEQ TYPE="KEYWORD1">\forall</SEQ>
+			<SEQ TYPE="KEYWORD1">\fivesy</SEQ>
+			<SEQ TYPE="KEYWORD1">\fiverm</SEQ>
+			<SEQ TYPE="KEYWORD1">\fivebf</SEQ>
+			<SEQ TYPE="KEYWORD1">\exists</SEQ>
+			<SEQ TYPE="KEYWORD1">\enskip</SEQ>
+			<SEQ TYPE="KEYWORD1">\egroup</SEQ>
+			<SEQ TYPE="KEYWORD1">\divide</SEQ>
+			<SEQ TYPE="KEYWORD1">\dagger</SEQ>
+			<SEQ TYPE="FUNCTION">\csname</SEQ>
+			<SEQ TYPE="KEYWORD2">\cprime</SEQ>
+			<SEQ TYPE="KEYWORD1">\coprod</SEQ>
+			<SEQ TYPE="KEYWORD1">\choose</SEQ>
+			<SEQ TYPE="KEYWORD2">\cfudot</SEQ>
+			<SEQ TYPE="KEYWORD2">\candra</SEQ>
+			<SEQ TYPE="KEYWORD1">\bullet</SEQ>
+			<SEQ TYPE="KEYWORD1">\bowtie</SEQ>
+			<SEQ TYPE="KEYWORD1">\bigvee</SEQ>
+			<SEQ TYPE="KEYWORD1">\bigcup</SEQ>
+			<SEQ TYPE="KEYWORD1">\bigcap</SEQ>
+			<SEQ TYPE="KEYWORD1">\bgroup</SEQ>
+			<SEQ TYPE="KEYWORD1">\arctan</SEQ>
+			<SEQ TYPE="KEYWORD1">\arcsin</SEQ>
+			<SEQ TYPE="KEYWORD1">\arccos</SEQ>
+			<SEQ TYPE="KEYWORD1">\approx</SEQ>
+			<SEQ TYPE="KEYWORD2">\acudot</SEQ>
+			<SEQ TYPE="KEYWORD1">\active</SEQ>
+			<SEQ TYPE="KEYWORD1">\accent</SEQ>
+
+			<!-- Length Six Register Reference -->
+			<SEQ_REGEXP HASH_CHARS="\" TYPE="COMMENT4"
+					>\\dimen[0-9]</SEQ_REGEXP>
+
+			<!-- Length Six Register Reference -->
+			<SEQ_REGEXP HASH_CHARS="\" TYPE="COMMENT4"
+					>\\count[0-9]</SEQ_REGEXP>
+
+			<!-- Length Six Register Reference -->
+			<SEQ_REGEXP HASH_CHARS="\" TYPE="COMMENT4"
+					>\\toks[0-9][0-9]</SEQ_REGEXP>
+
+			<!-- Length Six Register Reference -->
+			<SEQ_REGEXP HASH_CHARS="\" TYPE="COMMENT4"
+					>\\skip[0-9][0-9]</SEQ_REGEXP>
+
+			<!-- Length Six Register Reference -->
+			<SEQ_REGEXP HASH_CHARS="\" TYPE="COMMENT4"
+					>\\box([0-1][0-9][0-9]|2([0-4][0-9]|5[0-5]))</SEQ_REGEXP>
+
+			<!-- Length Six Decimal Character Reference -->
+			<SEQ_REGEXP HASH_CHARS="\" TYPE="KEYWORD2"
+					>\\char[0-9][0-9]</SEQ_REGEXP>
+
+			<!-- Length Six Octal Character Reference -->
+			<SEQ_REGEXP HASH_CHARS="\" TYPE="KEYWORD2">\\char'[0-7]</SEQ_REGEXP>
+
+			<!-- Length Six Hexadecimal Character Reference -->
+			<SEQ_REGEXP HASH_CHARS="\" TYPE="KEYWORD2"
+					>\\char"[0-9A-Fa-f]</SEQ_REGEXP>
+
+			<!-- Arbitrary control sequence of the specified length -->
+			<SEQ_REGEXP HASH_CHARS="\" TYPE="LABEL">\\[a-zA-Z@]{6}</SEQ_REGEXP>
+
+		<!-- Five letter control sequences -->
+
+			<SEQ TYPE="KEYWORD1">\write</SEQ>
+			<SEQ TYPE="KEYWORD1">\wedge</SEQ>
+			<SEQ TYPE="KEYWORD1">\vskip</SEQ>
+			<SEQ TYPE="KEYWORD4">\vsize</SEQ>
+			<SEQ TYPE="KEYWORD1">\vrule</SEQ>
+			<SEQ TYPE="KEYWORD1">\vglue</SEQ>
+			<SEQ TYPE="KEYWORD4">\vfuzz</SEQ>
+			<SEQ TYPE="KEYWORD1">\vfill</SEQ>
+			<SEQ TYPE="KEYWORD1">\vdots</SEQ>
+			<SEQ TYPE="KEYWORD1">\vdash</SEQ>
+			<SEQ TYPE="KEYWORD1">\varpi</SEQ>
+			<SEQ TYPE="KEYWORD1">\uplus</SEQ>
+			<SEQ TYPE="KEYWORD1">\ttfam</SEQ>
+			<SEQ TYPE="KEYWORD1">\times</SEQ>
+			<SEQ TYPE="KEYWORD1">\tilde</SEQ>
+			<SEQ TYPE="KEYWORD1">\Theta</SEQ>
+			<SEQ TYPE="KEYWORD1">\theta</SEQ>
+			<SEQ TYPE="KEYWORD1">\tentt</SEQ>
+			<SEQ TYPE="KEYWORD1">\tensy</SEQ>
+			<SEQ TYPE="KEYWORD1">\tensl</SEQ>
+			<SEQ TYPE="KEYWORD1">\tenrm</SEQ>
+			<SEQ TYPE="KEYWORD1">\tenit</SEQ>
+			<SEQ TYPE="KEYWORD1">\tenex</SEQ>
+			<SEQ TYPE="KEYWORD1">\tenbf</SEQ>
+			<SEQ TYPE="KEYWORD1">\strut</SEQ>
+			<SEQ TYPE="KEYWORD1">\sqcup</SEQ>
+			<SEQ TYPE="KEYWORD1">\sqcap</SEQ>
+			<SEQ TYPE="KEYWORD1">\space</SEQ>
+			<SEQ TYPE="KEYWORD1">\smile</SEQ>
+			<SEQ TYPE="KEYWORD1">\smash</SEQ>
+			<SEQ TYPE="KEYWORD1">\slfam</SEQ>
+			<SEQ TYPE="KEYWORD1">\slash</SEQ>
+			<SEQ TYPE="KEYWORD1">\simeq</SEQ>
+			<SEQ TYPE="KEYWORD1">\Sigma</SEQ>
+			<SEQ TYPE="KEYWORD1">\sigma</SEQ>
+			<SEQ TYPE="KEYWORD1">\sharp</SEQ>
+			<SEQ TYPE="KEYWORD1">\right</SEQ>
+			<SEQ TYPE="KEYWORD1">\rhook</SEQ>
+			<SEQ TYPE="KEYWORD1">\relax</SEQ>
+			<SEQ TYPE="KEYWORD1">\rceil</SEQ>
+			<SEQ TYPE="KEYWORD1">\raise</SEQ>
+			<SEQ TYPE="KEYWORD1">\qquad</SEQ>
+			<SEQ TYPE="KEYWORD1">\prime</SEQ>
+			<SEQ TYPE="FUNCTION">\outer</SEQ>
+			<SEQ TYPE="KEYWORD1">\oplus</SEQ>
+			<SEQ TYPE="KEYWORD1">\Omega</SEQ>
+			<SEQ TYPE="KEYWORD1">\omega</SEQ>
+			<SEQ TYPE="KEYWORD1">\notin</SEQ>
+			<SEQ TYPE="COMMENT2">\newif</SEQ>
+			<SEQ TYPE="KEYWORD1">\nabla</SEQ>
+			<SEQ TYPE="KEYWORD1">\mskip</SEQ>
+			<SEQ TYPE="KEYWORD4">\month</SEQ>
+			<SEQ TYPE="KEYWORD1">\mkern</SEQ>
+			<SEQ TYPE="KEYWORD1">\lower</SEQ>
+			<SEQ TYPE="KEYWORD1">\lhook</SEQ>
+			<SEQ TYPE="KEYWORD1">\leqno</SEQ>
+			<SEQ TYPE="KEYWORD1">\ldots</SEQ>
+			<SEQ TYPE="KEYWORD1">\ldotp</SEQ>
+			<SEQ TYPE="KEYWORD1">\lceil</SEQ>
+			<SEQ TYPE="KEYWORD1">\kappa</SEQ>
+			<SEQ TYPE="KEYWORD1">\jmath</SEQ>
+			<SEQ TYPE="KEYWORD1">\itfam</SEQ>
+			<SEQ TYPE="KEYWORD1">\intop</SEQ>
+			<SEQ TYPE="KEYWORD1">\input</SEQ>
+			<SEQ TYPE="KEYWORD1">\infty</SEQ>
+			<SEQ TYPE="KEYWORD1">\imath</SEQ>
+			<SEQ TYPE="KEYWORD3">\ifodd</SEQ>
+			<SEQ TYPE="KEYWORD3">\ifnum</SEQ>
+			<SEQ TYPE="KEYWORD3">\ifeof</SEQ>
+			<SEQ TYPE="KEYWORD3">\ifdim</SEQ>
+			<SEQ TYPE="KEYWORD3">\ifcat</SEQ>
+			<SEQ TYPE="KEYWORD1">\hskip</SEQ>
+			<SEQ TYPE="KEYWORD4">\hsize</SEQ>
+			<SEQ TYPE="KEYWORD1">\hrule</SEQ>
+			<SEQ TYPE="KEYWORD1">\hglue</SEQ>
+			<SEQ TYPE="KEYWORD4">\hfuzz</SEQ>
+			<SEQ TYPE="KEYWORD1">\hfill</SEQ>
+			<SEQ TYPE="KEYWORD1">\grave</SEQ>
+			<SEQ TYPE="KEYWORD1">\Gamma</SEQ>
+			<SEQ TYPE="KEYWORD1">\gamma</SEQ>
+			<SEQ TYPE="KEYWORD1">\frown</SEQ>
+			<SEQ TYPE="KEYWORD1">\folio</SEQ>
+			<SEQ TYPE="KEYWORD1">\fivei</SEQ>
+			<SEQ TYPE="KEYWORD1">\equiv</SEQ>
+			<SEQ TYPE="KEYWORD1">\empty</SEQ>
+			<SEQ TYPE="KEYWORD1">\eject</SEQ>
+			<SEQ TYPE="KEYWORD1">\doteq</SEQ>
+			<SEQ TYPE="COMMENT4">\dimen</SEQ>
+			<SEQ TYPE="KEYWORD1">\Delta</SEQ>
+			<SEQ TYPE="KEYWORD1">\delta</SEQ>
+			<SEQ TYPE="KEYWORD1">\ddots</SEQ>
+			<SEQ TYPE="KEYWORD1">\dashv</SEQ>
+			<SEQ TYPE="COMMENT4">\count</SEQ>
+			<SEQ TYPE="KEYWORD1">\colon</SEQ>
+			<SEQ TYPE="KEYWORD1">\check</SEQ>
+			<SEQ TYPE="KEYWORD1">\cdots</SEQ>
+			<SEQ TYPE="KEYWORD1">\cdotp</SEQ>
+			<SEQ TYPE="KEYWORD1">\cases</SEQ>
+			<SEQ TYPE="KEYWORD1">\breve</SEQ>
+			<SEQ TYPE="KEYWORD1">\break</SEQ>
+			<SEQ TYPE="KEYWORD1">\brack</SEQ>
+			<SEQ TYPE="KEYWORD1">\brace</SEQ>
+			<SEQ TYPE="KEYWORD1">\Biggr</SEQ>
+			<SEQ TYPE="KEYWORD1">\biggr</SEQ>
+			<SEQ TYPE="KEYWORD1">\Biggm</SEQ>
+			<SEQ TYPE="KEYWORD1">\biggm</SEQ>
+			<SEQ TYPE="KEYWORD1">\Biggl</SEQ>
+			<SEQ TYPE="KEYWORD1">\biggl</SEQ>
+			<SEQ TYPE="KEYWORD1">\bffam</SEQ>
+			<SEQ TYPE="KEYWORD1">\asymp</SEQ>
+			<SEQ TYPE="KEYWORD1">\angle</SEQ>
+			<SEQ TYPE="KEYWORD1">\amalg</SEQ>
+			<SEQ TYPE="KEYWORD1">\alpha</SEQ>
+			<SEQ TYPE="KEYWORD1">\aleph</SEQ>
+			<SEQ TYPE="KEYWORD1">\acute</SEQ>
+			<SEQ TYPE="KEYWORD1">\above</SEQ>
+
+			<!-- Length Five Register Reference -->
+			<SEQ_REGEXP HASH_CHARS="\" TYPE="COMMENT4">\\toks[0-9]</SEQ_REGEXP>
+
+			<!-- Length Five Register Reference -->
+			<SEQ_REGEXP HASH_CHARS="\" TYPE="COMMENT4">\\skip[0-9]</SEQ_REGEXP>
+
+			<!-- Length Five Register Reference -->
+			<SEQ_REGEXP HASH_CHARS="\" TYPE="COMMENT4"
+					>\\box[0-9][0-9]</SEQ_REGEXP>
+
+			<!-- Length Five Decimal Character Reference -->
+			<SEQ_REGEXP HASH_CHARS="\" TYPE="KEYWORD2">\\char[0-9]</SEQ_REGEXP>
+
+			<!-- Length Five Octal Character Reference -->
+			<SEQ TYPE="KEYWORD2">\char'</SEQ>
+
+			<!-- Length Five Hexadecimal Character Reference -->
+			<SEQ TYPE="KEYWORD2">\char"</SEQ>
+
+			<!-- Arbitrary control sequence of the specified length -->
+			<SEQ_REGEXP HASH_CHARS="\" TYPE="LABEL">\\[a-zA-Z@]{5}</SEQ_REGEXP>
+
+		<!-- Four letter control sequences -->
+			<SEQ TYPE="KEYWORD1">\zeta</SEQ>
+			<SEQ TYPE="KEYWORD4">\year</SEQ>
+			<SEQ TYPE="FUNCTION">\xdef</SEQ>
+			<SEQ TYPE="KEYWORD1">\wlog</SEQ>
+			<SEQ TYPE="KEYWORD1">\vtop</SEQ>
+			<SEQ TYPE="KEYWORD1">\vfil</SEQ>
+			<SEQ TYPE="KEYWORD1">\vert</SEQ>
+			<SEQ TYPE="KEYWORD1">\Vert</SEQ>
+			<SEQ TYPE="KEYWORD1">\vbox</SEQ>
+			<SEQ TYPE="KEYWORD2">\uarc</SEQ>
+			<SEQ TYPE="KEYWORD4">\toks</SEQ>
+			<SEQ TYPE="KEYWORD4">\time</SEQ>
+			<SEQ TYPE="KEYWORD1">\teni</SEQ>
+			<SEQ TYPE="KEYWORD1">\tanh</SEQ>
+			<SEQ TYPE="KEYWORD1">\tabs</SEQ>
+			<SEQ TYPE="KEYWORD1">\surd</SEQ>
+			<SEQ TYPE="KEYWORD1">\succ</SEQ>
+			<SEQ TYPE="KEYWORD1">\star</SEQ>
+			<SEQ TYPE="KEYWORD1">\sqrt</SEQ>
+			<SEQ TYPE="KEYWORD1">\span</SEQ>
+			<SEQ TYPE="KEYWORD4">\skip</SEQ>
+			<SEQ TYPE="KEYWORD1">\skew</SEQ>
+			<SEQ TYPE="KEYWORD1">\sinh</SEQ>
+			<SEQ TYPE="KEYWORD1">\show</SEQ>
+			<SEQ TYPE="KEYWORD1">\root</SEQ>
+			<SEQ TYPE="KEYWORD1">\rlap</SEQ>
+			<SEQ TYPE="KEYWORD1">\read</SEQ>
+			<SEQ TYPE="KEYWORD1">\quad</SEQ>
+			<SEQ TYPE="KEYWORD1">\prod</SEQ>
+			<SEQ TYPE="KEYWORD1">\prec</SEQ>
+			<SEQ TYPE="KEYWORD1">\pmod</SEQ>
+			<SEQ TYPE="KEYWORD1">\perp</SEQ>
+			<SEQ TYPE="KEYWORD1">\owns</SEQ>
+			<SEQ TYPE="KEYWORD1">\over</SEQ>
+			<SEQ TYPE="KEYWORD1">\omit</SEQ>
+			<SEQ TYPE="KEYWORD1">\oint</SEQ>
+			<SEQ TYPE="KEYWORD1">\odot</SEQ>
+			<SEQ TYPE="KEYWORD1">\null</SEQ>
+			<SEQ TYPE="KEYWORD1">\next</SEQ>
+			<SEQ TYPE="KEYWORD1">\mark</SEQ>
+			<SEQ TYPE="KEYWORD1">\loop</SEQ>
+			<SEQ TYPE="FUNCTION">\long</SEQ>
+			<SEQ TYPE="KEYWORD1">\lnot</SEQ>
+			<SEQ TYPE="KEYWORD1">\llap</SEQ>
+			<SEQ TYPE="KEYWORD1">\line</SEQ>
+			<SEQ TYPE="KEYWORD1">\left</SEQ>
+			<SEQ TYPE="KEYWORD1">\land</SEQ>
+			<SEQ TYPE="KEYWORD1">\kern</SEQ>
+			<SEQ TYPE="KEYWORD1">\item</SEQ>
+			<SEQ TYPE="KEYWORD1">\iota</SEQ>
+			<SEQ TYPE="KEYWORD1">\hfil</SEQ>
+			<SEQ TYPE="KEYWORD1">\hbox</SEQ>
+			<SEQ TYPE="KEYWORD1">\hbar</SEQ>
+			<SEQ TYPE="KEYWORD1">\hang</SEQ>
+			<SEQ TYPE="KEYWORD1">\gets</SEQ>
+			<SEQ TYPE="FUNCTION">\gdef</SEQ>
+			<SEQ TYPE="KEYWORD1">\font</SEQ>
+			<SEQ TYPE="KEYWORD1">\flat</SEQ>
+			<SEQ TYPE="KEYWORD1">\eqno</SEQ>
+			<SEQ TYPE="KEYWORD3">\else</SEQ>
+			<SEQ TYPE="FUNCTION">\edef</SEQ>
+			<SEQ TYPE="KEYWORD1">\dump</SEQ>
+			<SEQ TYPE="KEYWORD1">\dots</SEQ>
+			<SEQ TYPE="KEYWORD1">\ddot</SEQ>
+			<SEQ TYPE="KEYWORD1">\ddag</SEQ>
+			<SEQ TYPE="KEYWORD2">\dbar</SEQ>
+			<SEQ TYPE="KEYWORD2">\Dbar</SEQ>
+			<SEQ TYPE="KEYWORD1">\crcr</SEQ>
+			<SEQ TYPE="KEYWORD1">\coth</SEQ>
+			<SEQ TYPE="KEYWORD1">\cosh</SEQ>
+			<SEQ TYPE="KEYWORD1">\copy</SEQ>
+			<SEQ TYPE="KEYWORD1">\cong</SEQ>
+			<SEQ TYPE="KEYWORD1">\circ</SEQ>
+			<SEQ TYPE="KEYWORD2">\char</SEQ>
+			<SEQ TYPE="KEYWORD2">\cfac</SEQ>
+			<SEQ TYPE="KEYWORD1">\cdot</SEQ>
+			<SEQ TYPE="KEYWORD1">\body</SEQ>
+			<SEQ TYPE="KEYWORD1">\bmod</SEQ>
+			<SEQ TYPE="KEYWORD1">\Bigr</SEQ>
+			<SEQ TYPE="KEYWORD1">\bigr</SEQ>
+			<SEQ TYPE="KEYWORD1">\Bigm</SEQ>
+			<SEQ TYPE="KEYWORD1">\bigm</SEQ>
+			<SEQ TYPE="KEYWORD1">\Bigl</SEQ>
+			<SEQ TYPE="KEYWORD1">\bigl</SEQ>
+			<SEQ TYPE="KEYWORD1">\Bigg</SEQ>
+			<SEQ TYPE="KEYWORD1">\bigg</SEQ>
+			<SEQ TYPE="KEYWORD1">\beta</SEQ>
+			<SEQ TYPE="KEYWORD1">\atop</SEQ>
+
+			<!-- Length Four Register Reference -->
+			<SEQ_REGEXP HASH_CHARS="\" TYPE="COMMENT4">\\box[0-9]</SEQ_REGEXP>
+
+			<!-- Length Four Character Reference -->
+			<SEQ TYPE="KEYWORD2">\char</SEQ>
+
+			<!-- Length Four Hexadecimal Invisible Reference -->
+			<SEQ_REGEXP HASH_CHARS="^" TYPE="KEYWORD2"
+					>(\u005E|\x5E)(\u005E|\x5E)([0-9a-f])([0-9a-f])</SEQ_REGEXP>
+
+			<!-- Arbitrary control sequence of the specified length -->
+			<SEQ_REGEXP HASH_CHARS="\" TYPE="LABEL">\\[a-zA-Z@]{4}</SEQ_REGEXP>
+
+		<!-- Three letter control sequences -->
+
+			<SEQ TYPE="KEYWORD1">\vss</SEQ>
+			<SEQ TYPE="KEYWORD1">\vee</SEQ>
+			<SEQ TYPE="KEYWORD1">\vec</SEQ>
+			<SEQ TYPE="KEYWORD1">\top</SEQ>
+			<SEQ TYPE="KEYWORD1">\the</SEQ>
+			<SEQ TYPE="KEYWORD1">\TeX</SEQ>
+			<SEQ TYPE="KEYWORD1">\tau</SEQ>
+			<SEQ TYPE="KEYWORD1">\tan</SEQ>
+			<SEQ TYPE="KEYWORD1">\sup</SEQ>
+			<SEQ TYPE="KEYWORD1">\sum</SEQ>
+			<SEQ TYPE="KEYWORD1">\sin</SEQ>
+			<SEQ TYPE="KEYWORD1">\sim</SEQ>
+			<SEQ TYPE="KEYWORD1">\sec</SEQ>
+			<SEQ TYPE="KEYWORD1">\rho</SEQ>
+			<SEQ TYPE="KEYWORD1">\Psi</SEQ>
+			<SEQ TYPE="KEYWORD1">\psi</SEQ>
+			<SEQ TYPE="KEYWORD1">\Phi</SEQ>
+			<SEQ TYPE="KEYWORD1">\phi</SEQ>
+			<SEQ TYPE="LITERAL3">\par</SEQ>
+			<SEQ TYPE="KEYWORD1">\not</SEQ>
+			<SEQ TYPE="KEYWORD1">\neq</SEQ>
+			<SEQ TYPE="KEYWORD1">\neg</SEQ>
+			<SEQ TYPE="KEYWORD1">\mit</SEQ>
+			<SEQ TYPE="KEYWORD1">\min</SEQ>
+			<SEQ TYPE="KEYWORD1">\mid</SEQ>
+			<SEQ TYPE="KEYWORD1">\max</SEQ>
+			<SEQ TYPE="KEYWORD4">\mag</SEQ>
+			<SEQ TYPE="KEYWORD1">\lor</SEQ>
+			<SEQ TYPE="KEYWORD1">\log</SEQ>
+			<SEQ TYPE="KEYWORD1">\lim</SEQ>
+			<SEQ TYPE="COMMENT3">\let</SEQ>
+			<SEQ TYPE="KEYWORD1">\leq</SEQ>
+			<SEQ TYPE="KEYWORD1">\ker</SEQ>
+			<SEQ TYPE="KEYWORD1">\jot</SEQ>
+			<SEQ TYPE="KEYWORD1">\int</SEQ>
+			<SEQ TYPE="KEYWORD1">\inf</SEQ>
+			<SEQ TYPE="KEYWORD3">\ifx</SEQ>
+			<SEQ TYPE="KEYWORD3">\iff</SEQ>
+			<SEQ TYPE="KEYWORD1">\hss</SEQ>
+			<SEQ TYPE="KEYWORD1">\hom</SEQ>
+			<SEQ TYPE="KEYWORD1">\hat</SEQ>
+			<SEQ TYPE="KEYWORD1">\geq</SEQ>
+			<SEQ TYPE="KEYWORD1">\gcd</SEQ>
+			<SEQ TYPE="KEYWORD4">\fam</SEQ>
+			<SEQ TYPE="KEYWORD1">\exp</SEQ>
+			<SEQ TYPE="KEYWORD2">\eth</SEQ>
+			<SEQ TYPE="KEYWORD1">\eta</SEQ>
+			<SEQ TYPE="KEYWORD1">\end</SEQ>
+			<SEQ TYPE="KEYWORD1">\ell</SEQ>
+			<SEQ TYPE="KEYWORD1">\dot</SEQ>
+			<SEQ TYPE="KEYWORD1">\div</SEQ>
+			<SEQ TYPE="KEYWORD1">\dim</SEQ>
+			<SEQ TYPE="KEYWORD1">\det</SEQ>
+			<SEQ TYPE="KEYWORD1">\deg</SEQ>
+			<SEQ TYPE="FUNCTION">\def</SEQ>
+			<SEQ TYPE="KEYWORD4">\day</SEQ>
+			<SEQ TYPE="KEYWORD1">\dag</SEQ>
+			<SEQ TYPE="KEYWORD1">\cup</SEQ>
+			<SEQ TYPE="KEYWORD1">\csc</SEQ>
+			<SEQ TYPE="KEYWORD1">\cot</SEQ>
+			<SEQ TYPE="KEYWORD1">\cos</SEQ>
+			<SEQ TYPE="KEYWORD1">\chi</SEQ>
+			<SEQ TYPE="KEYWORD1">\cap</SEQ>
+			<SEQ TYPE="KEYWORD1">\cal</SEQ>
+			<SEQ TYPE="KEYWORD1">\bye</SEQ>
+			<SEQ TYPE="COMMENT4">\box</SEQ>
+			<SEQ TYPE="KEYWORD1">\bot</SEQ>
+			<SEQ TYPE="KEYWORD1">\Big</SEQ>
+			<SEQ TYPE="KEYWORD1">\big</SEQ>
+			<SEQ TYPE="KEYWORD1">\bar</SEQ>
+			<SEQ TYPE="KEYWORD1">\ast</SEQ>
+			<SEQ TYPE="KEYWORD1">\arg</SEQ>
+
+			<!-- Length Three Invisible Character Reference -->
+			<SEQ_REGEXP HASH_CHARS="^" TYPE="KEYWORD2"
+				>(\u005E|\x5E)(\u005E|\x5E)(\p{ASCII}|\u0000-\u007F)</SEQ_REGEXP>
+
+			<!-- Arbitrary control sequence of the specified length -->
+			<SEQ_REGEXP HASH_CHARS="\" TYPE="LABEL">\\[a-zA-Z@]{3}</SEQ_REGEXP>
+
+		<!-- Two letter control sequences -->
+
+			<SEQ TYPE="KEYWORD1">\Xi</SEQ>
+			<SEQ TYPE="KEYWORD1">\xi</SEQ>
+			<SEQ TYPE="KEYWORD1">\wr</SEQ>
+			<SEQ TYPE="KEYWORD1">\wp</SEQ>
+			<SEQ TYPE="KEYWORD1">\wd</SEQ>
+			<SEQ TYPE="KEYWORD1">\tt</SEQ>
+			<SEQ TYPE="KEYWORD1">\to</SEQ>
+			<SEQ TYPE="KEYWORD1">\sp</SEQ>
+			<SEQ TYPE="KEYWORD1">\sl</SEQ>
+			<SEQ TYPE="KEYWORD1">\sb</SEQ>
+			<SEQ TYPE="KEYWORD1">\rq</SEQ>
+			<SEQ TYPE="KEYWORD1">\rm</SEQ>
+			<SEQ TYPE="KEYWORD1">\Re</SEQ>
+			<SEQ TYPE="KEYWORD1">\Pr</SEQ>
+			<SEQ TYPE="KEYWORD1">\pm</SEQ>
+			<SEQ TYPE="KEYWORD1">\Pi</SEQ>
+			<SEQ TYPE="KEYWORD1">\pi</SEQ>
+			<SEQ TYPE="KEYWORD3">\or</SEQ>
+			<SEQ TYPE="KEYWORD1">\of</SEQ>
+			<SEQ TYPE="KEYWORD1">\nu</SEQ>
+			<SEQ TYPE="KEYWORD1">\ni</SEQ>
+			<SEQ TYPE="KEYWORD1">\ne</SEQ>
+			<SEQ TYPE="KEYWORD1">\mu</SEQ>
+			<SEQ TYPE="KEYWORD1">\mp</SEQ>
+			<SEQ TYPE="KEYWORD1">\lq</SEQ>
+			<SEQ TYPE="KEYWORD1">\ln</SEQ>
+			<SEQ TYPE="KEYWORD1">\ll</SEQ>
+			<SEQ TYPE="KEYWORD1">\lg</SEQ>
+			<SEQ TYPE="KEYWORD1">\le</SEQ>
+			<SEQ TYPE="KEYWORD1">\it</SEQ>
+			<SEQ TYPE="KEYWORD1">\in</SEQ>
+			<SEQ TYPE="KEYWORD1">\Im</SEQ>
+			<SEQ TYPE="KEYWORD3">\if</SEQ>
+			<SEQ TYPE="KEYWORD1">\ht</SEQ>
+			<SEQ TYPE="KEYWORD1">\gg</SEQ>
+			<SEQ TYPE="KEYWORD1">\ge</SEQ>
+			<SEQ TYPE="KEYWORD3">\fi</SEQ>
+			<SEQ TYPE="KEYWORD1">\dp</SEQ>
+			<SEQ TYPE="KEYWORD1">\do</SEQ>
+			<SEQ TYPE="KEYWORD1">\cr</SEQ>
+			<SEQ TYPE="KEYWORD1">\bf</SEQ>
+
+			<!-- Accents and Special Characters -->
+			<SEQ TYPE="KEYWORD2">\AE</SEQ>
+			<SEQ TYPE="KEYWORD2">\ae</SEQ>
+			<SEQ TYPE="KEYWORD2">\AA</SEQ>
+			<SEQ TYPE="KEYWORD2">\aa</SEQ>
+			<SEQ TYPE="KEYWORD2">\OE</SEQ>
+			<SEQ TYPE="KEYWORD2">\oe</SEQ>
+			<SEQ TYPE="KEYWORD2">\ss</SEQ>
+
+			<!-- Arbitrary control sequence of the specified length -->
+			<SEQ_REGEXP HASH_CHARS="\" TYPE="LABEL">\\[a-zA-Z@]{2}</SEQ_REGEXP>
+
+		<!-- One letter control sequences -->
+
+			<SEQ TYPE="KEYWORD1">\S</SEQ>
+			<SEQ TYPE="KEYWORD1">\P</SEQ>
+
+			<!-- Accents and Special Characters -->
+			<SEQ TYPE="KEYWORD2">\=</SEQ>
+			<SEQ TYPE="KEYWORD2">\'</SEQ>
+			<SEQ TYPE="KEYWORD2">\"</SEQ>
+			<SEQ TYPE="KEYWORD2">\~</SEQ>
+			<SEQ TYPE="KEYWORD2">\`</SEQ>
+			<SEQ TYPE="KEYWORD2">\^</SEQ>
+			<SEQ TYPE="KEYWORD2">\.</SEQ>
+			<SEQ TYPE="KEYWORD2">\H</SEQ>
+			<SEQ TYPE="KEYWORD2">\c</SEQ>
+			<SEQ TYPE="KEYWORD2">\d</SEQ>
+			<SEQ TYPE="KEYWORD2">\b</SEQ>
+			<SEQ TYPE="KEYWORD2">\v</SEQ>
+			<SEQ TYPE="KEYWORD2">\u</SEQ>
+			<SEQ TYPE="KEYWORD2">\t</SEQ>
+			<SEQ TYPE="KEYWORD2">\r</SEQ>
+			<SEQ TYPE="KEYWORD2">\k</SEQ>
+			<SEQ TYPE="KEYWORD2">\O</SEQ>
+			<SEQ TYPE="KEYWORD2">\o</SEQ>
+			<SEQ TYPE="KEYWORD2">\L</SEQ>
+			<SEQ TYPE="KEYWORD2">\l</SEQ>
+			<SEQ TYPE="KEYWORD2">\j</SEQ>
+			<SEQ TYPE="KEYWORD2">\i</SEQ>
+			<SEQ TYPE="KEYWORD1">\?</SEQ>
+			<SEQ TYPE="KEYWORD1">\&gt;</SEQ>
+			<SEQ TYPE="KEYWORD1">\&lt;</SEQ>
+			<SEQ TYPE="KEYWORD1">\;</SEQ>
+			<SEQ TYPE="KEYWORD1">\:</SEQ>
+			<SEQ TYPE="KEYWORD1">\/</SEQ>
+			<SEQ TYPE="KEYWORD1">\-</SEQ>
+			<SEQ TYPE="KEYWORD1">\,</SEQ>
+			<SEQ TYPE="KEYWORD1">\+</SEQ>
+			<SEQ TYPE="KEYWORD1">\*</SEQ>
+			<SEQ TYPE="KEYWORD1">\)</SEQ>
+			<SEQ TYPE="KEYWORD1">\(</SEQ>
+			<SEQ TYPE="KEYWORD1">\!</SEQ>
+			<SEQ TYPE="KEYWORD1">\|</SEQ>
+			<SEQ TYPE="KEYWORD1">\\</SEQ>
+
+			<!-- Reserved Characters -->
+			<SEQ TYPE="KEYWORD2">\#</SEQ>
+			<SEQ TYPE="KEYWORD2">\$</SEQ>
+			<SEQ TYPE="KEYWORD2">\%</SEQ>
+			<SEQ TYPE="KEYWORD2">\&amp;</SEQ>
+			<SEQ TYPE="KEYWORD2">\{</SEQ>
+			<SEQ TYPE="KEYWORD2">\}</SEQ>
+			<SEQ TYPE="KEYWORD2">\_</SEQ>
+
+			<!-- Length One ASCII Index -->
+			<SEQ_REGEXP HASH_CHARS="`" TYPE="KEYWORD2">`\p{ASCII}</SEQ_REGEXP>
+
+			<!-- Definition Arguments -->
+			<SEQ_REGEXP HASH_CHARS="#" TYPE="DIGIT">#[1-9]</SEQ_REGEXP>
+
+			<!-- Arbitrary control sequence of the specified length -->
+			<SEQ_REGEXP HASH_CHARS="\" TYPE="LABEL">\\[a-zA-Z@]{1}</SEQ_REGEXP>
+
+		<!-- Zero letter control sequences -->
+
+			<!-- Punctuation -->
+			<SEQ TYPE="LITERAL3">`</SEQ>
+			<SEQ TYPE="LITERAL3">!</SEQ>
+			<SEQ TYPE="LITERAL3">.</SEQ>
+			<SEQ TYPE="LITERAL3">,</SEQ>
+			<SEQ TYPE="LITERAL3">;</SEQ>
+			<SEQ TYPE="LITERAL3">?</SEQ>
+			<SEQ TYPE="LITERAL3">:</SEQ>
+			<SEQ TYPE="LITERAL3">'</SEQ>
+			<SEQ TYPE="LITERAL3">"</SEQ>
+			<SEQ TYPE="LITERAL3">\</SEQ>
+
+			<!-- Simple Math Characters -->
+			<SEQ TYPE="LITERAL4">(</SEQ>
+			<SEQ TYPE="LITERAL4">)</SEQ>
+			<SEQ TYPE="LITERAL4">=</SEQ>
+			<SEQ TYPE="LITERAL4">+</SEQ>
+			<SEQ TYPE="LITERAL4">-</SEQ>
+			<SEQ TYPE="LITERAL4">&gt;</SEQ>
+			<SEQ TYPE="LITERAL4">&lt;</SEQ>
+
+			<!-- Grouping Brackets -->
+			<SEQ TYPE="OPERATOR">{</SEQ>
+			<SEQ TYPE="OPERATOR">}</SEQ>
+			<SEQ TYPE="OPERATOR">[</SEQ>
+			<SEQ TYPE="OPERATOR">]</SEQ>
+
+			<!-- Reserved Characters -->
+			<SEQ TYPE="LITERAL1">&amp;</SEQ>
+			<SEQ TYPE="LITERAL1">^</SEQ>
+			<SEQ TYPE="LITERAL1">_</SEQ>
+			<SEQ TYPE="LITERAL1">~</SEQ>
+
+			<!-- Dimensions -->
+			<SEQ_REGEXP HASH_CHARS="0123456789." TYPE="LITERAL2"
+					>(\d+?\.\d*pt|\d*\.\d+?pt|\d*pt)</SEQ_REGEXP>
+			<SEQ_REGEXP HASH_CHARS="0123456789." TYPE="LITERAL2"
+					>(\d+?\.\d*pc|\d*\.\d+?pc|\d*pc)</SEQ_REGEXP>
+			<SEQ_REGEXP HASH_CHARS="0123456789." TYPE="LITERAL2"
+					>(\d+?\.\d*in|\d*\.\d+?in|\d*in)</SEQ_REGEXP>
+			<SEQ_REGEXP HASH_CHARS="0123456789." TYPE="LITERAL2"
+					>(\d+?\.\d*bp|\d*\.\d+?bp|\d*bp)</SEQ_REGEXP>
+			<SEQ_REGEXP HASH_CHARS="0123456789." TYPE="LITERAL2"
+					>(\d+?\.\d*cm|\d*\.\d+?cm|\d*cm)</SEQ_REGEXP>
+			<SEQ_REGEXP HASH_CHARS="0123456789." TYPE="LITERAL2"
+					>(\d+?\.\d*mm|\d*\.\d+?mm|\d*mm)</SEQ_REGEXP>
+			<SEQ_REGEXP HASH_CHARS="0123456789." TYPE="LITERAL2"
+					>(\d+?\.\d*dd|\d*\.\d+?dd|\d*dd)</SEQ_REGEXP>
+			<SEQ_REGEXP HASH_CHARS="0123456789." TYPE="LITERAL2"
+					>(\d+?\.\d*cc|\d*\.\d+?cc|\d*cc)</SEQ_REGEXP>
+			<SEQ_REGEXP HASH_CHARS="0123456789." TYPE="LITERAL2"
+					>(\d+?\.\d*sp|\d*\.\d+?sp|\d*sp)</SEQ_REGEXP>
+			<SEQ_REGEXP HASH_CHARS="0123456789." TYPE="LITERAL2"
+					>(\d+?\.\d*ex|\d*\.\d+?ex|\d*ex)</SEQ_REGEXP>
+			<SEQ_REGEXP HASH_CHARS="0123456789." TYPE="LITERAL2"
+					>(\d+?\.\d*em|\d*\.\d+?em|\d*em)</SEQ_REGEXP>
+
+	</RULES>
+
+</MODE>
+
+
+

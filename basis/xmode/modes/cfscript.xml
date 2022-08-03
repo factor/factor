@@ -1,0 +1,693 @@
+<?xml version="1.0"?>
+<!DOCTYPE MODE SYSTEM "xmode.dtd">
+<MODE>
+	<PROPS>
+		<PROPERTY NAME="commentStart" VALUE="/*" />
+		<PROPERTY NAME="commentEnd" VALUE="*/" />
+		<PROPERTY NAME="lineComment" VALUE="//" />
+		<PROPERTY NAME="wordBreakChars" VALUE=",+-=&lt;&gt;/?^&amp;*" />
+		
+		<!-- Auto indent -->
+		<PROPERTY NAME="indentOpenBrackets" VALUE="{[" />
+		<PROPERTY NAME="indentCloseBrackets" VALUE="]}" />
+		<PROPERTY NAME="unalignedOpenBrackets" VALUE="(" />
+		<PROPERTY NAME="unalignedCloseBrackets" VALUE=")" />
+		<PROPERTY NAME="indentNextLine"
+			VALUE="\s*(((if|while)\s*\(|else\s*|else\s+if\s*\(|for\s*\(.*\))[^{;]*)" />
+		<PROPERTY NAME="unindentThisLine"
+			VALUE="^.*(default:\s*|case.*:.*)$" />
+		<PROPERTY NAME="electricKeys" VALUE=":" />
+	</PROPS>
+	<RULES IGNORE_CASE="TRUE" HIGHLIGHT_DIGITS="TRUE" DIGIT_RE="(0x[\p{XDigit}]+[lL]?|[\p{Digit}]+(e[\p{Digit}]*)?[lLdDfF]?)">
+		<SPAN TYPE="COMMENT3" DELEGATE="CFDOC">
+			<BEGIN>/**</BEGIN>
+			<END>*/</END>
+		</SPAN>
+		<SPAN TYPE="COMMENT1">
+			<BEGIN>/*</BEGIN>
+			<END>*/</END>
+		</SPAN>
+		<EOL_SPAN TYPE="COMMENT2">//</EOL_SPAN>
+		
+		
+		<SPAN TYPE="LITERAL1" NO_LINE_BREAK="TRUE" ESCAPE="\">
+			<BEGIN>"</BEGIN>
+			<END>"</END>
+		</SPAN>
+
+		<SPAN TYPE="LITERAL1" NO_LINE_BREAK="TRUE" ESCAPE="\">
+			<BEGIN>'</BEGIN>
+			<END>'</END>
+		</SPAN>
+		
+		<MARK_PREVIOUS TYPE="FUNCTION" MATCH_TYPE="OPERATOR">(</MARK_PREVIOUS>
+		<SEQ TYPE="OPERATOR">)</SEQ>
+		
+		<SEQ TYPE="OPERATOR">=</SEQ>
+		<SEQ TYPE="OPERATOR">!</SEQ>
+		<SEQ TYPE="OPERATOR">&gt;=</SEQ>
+		<SEQ TYPE="OPERATOR">&lt;=</SEQ>
+		<SEQ TYPE="OPERATOR">+</SEQ>
+		<SEQ TYPE="OPERATOR">-</SEQ>
+		<SEQ TYPE="OPERATOR">/</SEQ>
+		<SEQ TYPE="OPERATOR">*</SEQ>
+		<SEQ TYPE="OPERATOR">&gt;</SEQ>
+		<SEQ TYPE="OPERATOR">&lt;</SEQ>
+		<SEQ TYPE="OPERATOR">%</SEQ>
+		<SEQ TYPE="OPERATOR">&amp;</SEQ>
+		<SEQ TYPE="OPERATOR">|</SEQ>
+		<SEQ TYPE="OPERATOR">^</SEQ>
+		<SEQ TYPE="OPERATOR">~</SEQ>
+		<SEQ TYPE="OPERATOR">.</SEQ>
+		<SEQ TYPE="OPERATOR">}</SEQ>
+		<SEQ TYPE="OPERATOR">{</SEQ>
+		<SEQ TYPE="OPERATOR">,</SEQ>
+		<SEQ TYPE="OPERATOR">;</SEQ>
+		<SEQ TYPE="OPERATOR">]</SEQ>
+		<SEQ TYPE="OPERATOR">[</SEQ>
+		<SEQ TYPE="OPERATOR">?</SEQ>
+		<MARK_PREVIOUS AT_WHITESPACE_END="TRUE"
+			MATCH_TYPE="OPERATOR"
+			TYPE="LABEL">:</MARK_PREVIOUS>
+		<SEQ TYPE="OPERATOR">:</SEQ>
+		
+		<KEYWORDS>
+			<!-- common keywords -->
+			<KEYWORD1>break</KEYWORD1>
+			<KEYWORD1>case</KEYWORD1>
+			<KEYWORD1>catch</KEYWORD1>
+			<KEYWORD1>continue</KEYWORD1>
+			<KEYWORD1>delete</KEYWORD1>
+			<KEYWORD1>do</KEYWORD1>
+			<KEYWORD1>else</KEYWORD1>
+			<KEYWORD1>exit</KEYWORD1>
+			<KEYWORD1>finally</KEYWORD1>
+			<KEYWORD1>for</KEYWORD1>
+			<KEYWORD1>function</KEYWORD1>
+			<KEYWORD1>if</KEYWORD1>
+			<KEYWORD1>in</KEYWORD1>
+			<KEYWORD1>new</KEYWORD1>
+			<KEYWORD1>pageencoding</KEYWORD1>
+			<KEYWORD1>rethrow</KEYWORD1>
+			<KEYWORD1>return</KEYWORD1>
+			<KEYWORD1>savecontent</KEYWORD1>
+			<KEYWORD1>switch</KEYWORD1>
+			<KEYWORD1>thread</KEYWORD1>
+			<KEYWORD1>throw</KEYWORD1>
+			<KEYWORD1>transaction</KEYWORD1>
+			<KEYWORD1>try</KEYWORD1>
+			<KEYWORD1>typeof</KEYWORD1>
+			<KEYWORD1>var</KEYWORD1>
+			<KEYWORD1>while</KEYWORD1>
+			<KEYWORD1>with</KEYWORD1>
+			
+			<!-- context literals -->
+			<LITERAL2>this</LITERAL2>
+			<LITERAL2>super</LITERAL2>
+			
+			<!-- value literals -->
+			<LITERAL2>false</LITERAL2>
+			<LITERAL2>true</LITERAL2>
+			<LITERAL2>yes</LITERAL2>
+			<LITERAL2>no</LITERAL2>
+			
+			<!-- CF Types -->
+			<KEYWORD3>boolean</KEYWORD3>
+			<KEYWORD3>struct</KEYWORD3>
+			<KEYWORD3>string</KEYWORD3>
+			<KEYWORD3>numeric</KEYWORD3>
+			<KEYWORD3>array</KEYWORD3>
+			<KEYWORD3>any</KEYWORD3>
+			<KEYWORD3>query</KEYWORD3>
+			<KEYWORD3>mail</KEYWORD3>
+			<KEYWORD3>void</KEYWORD3>
+			
+			<!-- component related -->
+			<KEYWORD3>component</KEYWORD3>
+			<KEYWORD1>implements</KEYWORD1>
+			<KEYWORD1>interface</KEYWORD1>
+			<KEYWORD1>extends</KEYWORD1>
+			<KEYWORD1>include</KEYWORD1>
+			<KEYWORD1>import</KEYWORD1>
+			
+			<!-- access types -->
+			<KEYWORD1>private</KEYWORD1>
+			<KEYWORD1>protected</KEYWORD1>
+			<KEYWORD1>public</KEYWORD1>
+			<KEYWORD1>remote</KEYWORD1>
+			<KEYWORD1>required</KEYWORD1>
+			
+			<KEYWORD1>property</KEYWORD1>
+			
+			<!-- All functions -->
+			<FUNCTION>ACos</FUNCTION>
+			<FUNCTION>ASin</FUNCTION>
+			<FUNCTION>Abort</FUNCTION>
+			<FUNCTION>Abs</FUNCTION>
+			<FUNCTION>AddSOAPRequestHeader</FUNCTION>
+			<FUNCTION>AddSOAPResponseHeader</FUNCTION>
+			<FUNCTION>AjaxLink</FUNCTION>
+			<FUNCTION>AjaxOnLoad</FUNCTION>
+			<FUNCTION>ApplicationStop</FUNCTION>
+			<FUNCTION>ArrayAppend</FUNCTION>
+			<FUNCTION>ArrayAvg</FUNCTION>
+			<FUNCTION>ArrayClear</FUNCTION>
+			<FUNCTION>ArrayContains</FUNCTION>
+			<FUNCTION>ArrayDelete</FUNCTION>
+			<FUNCTION>ArrayDeleteAt</FUNCTION>
+			<FUNCTION>ArrayFind</FUNCTION>
+			<FUNCTION>ArrayFindNoCase</FUNCTION>
+			<FUNCTION>ArrayInsertAt</FUNCTION>
+			<FUNCTION>ArrayIsDefined</FUNCTION>
+			<FUNCTION>ArrayIsEmpty</FUNCTION>
+			<FUNCTION>ArrayLen</FUNCTION>
+			<FUNCTION>ArrayMax</FUNCTION>
+			<FUNCTION>ArrayMin</FUNCTION>
+			<FUNCTION>ArrayNew</FUNCTION>
+			<FUNCTION>ArrayPrepend</FUNCTION>
+			<FUNCTION>ArrayResize</FUNCTION>
+			<FUNCTION>ArraySet</FUNCTION>
+			<FUNCTION>ArraySort</FUNCTION>
+			<FUNCTION>ArraySum</FUNCTION>
+			<FUNCTION>ArraySwap</FUNCTION>
+			<FUNCTION>ArrayToList</FUNCTION>
+			<FUNCTION>Asc</FUNCTION>
+			<FUNCTION>Atn</FUNCTION>
+			<FUNCTION>BinaryDecode</FUNCTION>
+			<FUNCTION>BinaryEncode</FUNCTION>
+			<FUNCTION>BitAnd</FUNCTION>
+			<FUNCTION>BitMaskClear</FUNCTION>
+			<FUNCTION>BitMaskRead</FUNCTION>
+			<FUNCTION>BitMaskSet</FUNCTION>
+			<FUNCTION>BitNot</FUNCTION>
+			<FUNCTION>BitOr</FUNCTION>
+			<FUNCTION>BitSHLN</FUNCTION>
+			<FUNCTION>BitSHRN</FUNCTION>
+			<FUNCTION>BitXor</FUNCTION>
+			<FUNCTION>CJustify</FUNCTION>
+			<FUNCTION>CacheGet</FUNCTION>
+			<FUNCTION>CacheGetAllIds</FUNCTION>
+			<FUNCTION>CacheGetMetadata</FUNCTION>
+			<FUNCTION>CacheGetProperties</FUNCTION>
+			<FUNCTION>CacheGetSession</FUNCTION>
+			<FUNCTION>CachePut</FUNCTION>
+			<FUNCTION>CacheRemove</FUNCTION>
+			<FUNCTION>CacheSetProperties</FUNCTION>
+			<!--FUNCTION>Catch</FUNCTION-->
+			<FUNCTION>Ceiling</FUNCTION>
+			<FUNCTION>CharsetDecode</FUNCTION>
+			<FUNCTION>CharsetEncode</FUNCTION>
+			<FUNCTION>Chr</FUNCTION>
+			<FUNCTION>Compare</FUNCTION>
+			<FUNCTION>CompareNoCase</FUNCTION>
+			<FUNCTION>Cos</FUNCTION>
+			<FUNCTION>CreateDate</FUNCTION>
+			<FUNCTION>CreateDateTime</FUNCTION>
+			<FUNCTION>CreateODBCDate</FUNCTION>
+			<FUNCTION>CreateODBCDateTime</FUNCTION>
+			<FUNCTION>CreateODBCTime</FUNCTION>
+			<FUNCTION>CreateObject</FUNCTION>
+			<FUNCTION>CreateTime</FUNCTION>
+			<FUNCTION>CreateTimeSpan</FUNCTION>
+			<FUNCTION>CreateUUID</FUNCTION>
+			<FUNCTION>DE</FUNCTION>
+			<FUNCTION>DateAdd</FUNCTION>
+			<FUNCTION>DateCompare</FUNCTION>
+			<FUNCTION>DateConvert</FUNCTION>
+			<FUNCTION>DateDiff</FUNCTION>
+			<FUNCTION>DateFormat</FUNCTION>
+			<FUNCTION>DatePart</FUNCTION>
+			<FUNCTION>Day</FUNCTION>
+			<FUNCTION>DayOfWeek</FUNCTION>
+			<FUNCTION>DayOfWeekAsString</FUNCTION>
+			<FUNCTION>DayOfYear</FUNCTION>
+			<FUNCTION>DaysInMonth</FUNCTION>
+			<FUNCTION>DaysInYear</FUNCTION>
+			<FUNCTION>DecimalFormat</FUNCTION>
+			<FUNCTION>DecrementValue</FUNCTION>
+			<FUNCTION>Decrypt</FUNCTION>
+			<FUNCTION>DecryptBinary</FUNCTION>
+			<FUNCTION>DeleteClientVariable</FUNCTION>
+			<FUNCTION>DeserializeJSON</FUNCTION>
+			<FUNCTION>DirectoryCreate</FUNCTION>
+			<FUNCTION>DirectoryDelete</FUNCTION>
+			<FUNCTION>DirectoryExists</FUNCTION>
+			<FUNCTION>DirectoryList</FUNCTION>
+			<FUNCTION>DirectoryRename</FUNCTION>
+			<FUNCTION>DollarFormat</FUNCTION>
+			<FUNCTION>DotNetToCFType</FUNCTION>
+			<FUNCTION>Duplicate</FUNCTION>
+			<FUNCTION>Encrypt</FUNCTION>
+			<FUNCTION>EncryptBinary</FUNCTION>
+			<FUNCTION>EntityDelete</FUNCTION>
+			<FUNCTION>EntityLoad</FUNCTION>
+			<FUNCTION>EntityLoadByExample</FUNCTION>
+			<FUNCTION>EntityLoadByPK</FUNCTION>
+			<FUNCTION>EntityMerge</FUNCTION>
+			<FUNCTION>EntityNew</FUNCTION>
+			<FUNCTION>EntityReload</FUNCTION>
+			<FUNCTION>EntitySave</FUNCTION>
+			<FUNCTION>EntitytoQuery</FUNCTION>
+			<FUNCTION>Evaluate</FUNCTION>
+			<FUNCTION>Exp</FUNCTION>
+			<FUNCTION>ExpandPath</FUNCTION>
+			<FUNCTION>FileClose</FUNCTION>
+			<FUNCTION>FileCopy</FUNCTION>
+			<FUNCTION>FileDelete</FUNCTION>
+			<FUNCTION>FileExists</FUNCTION>
+			<FUNCTION>FileIsEOF</FUNCTION>
+			<FUNCTION>FileMove</FUNCTION>
+			<FUNCTION>FileOpen</FUNCTION>
+			<FUNCTION>FileRead</FUNCTION>
+			<FUNCTION>FileReadBinary</FUNCTION>
+			<FUNCTION>FileReadLine</FUNCTION>
+			<FUNCTION>FileSeek</FUNCTION>
+			<FUNCTION>FileSetAccessMode</FUNCTION>
+			<FUNCTION>FileSetAttribute</FUNCTION>
+			<FUNCTION>FileSetLastModified</FUNCTION>
+			<FUNCTION>FileSkipBytes</FUNCTION>
+			<FUNCTION>FileUpload</FUNCTION>
+			<FUNCTION>FileUploadAll</FUNCTION>
+			<FUNCTION>FileWrite</FUNCTION>
+			<FUNCTION>Find</FUNCTION>
+			<FUNCTION>FindNoCase</FUNCTION>
+			<FUNCTION>FindOneOf</FUNCTION>
+			<FUNCTION>FirstDayOfMonth</FUNCTION>
+			<FUNCTION>Fix</FUNCTION>
+			<FUNCTION>FormatBaseN</FUNCTION>
+			<FUNCTION>GenerateSecretKey</FUNCTION>
+			<FUNCTION>GetAuthUser</FUNCTION>
+			<FUNCTION>GetBaseTagData</FUNCTION>
+			<FUNCTION>GetBaseTagList</FUNCTION>
+			<FUNCTION>GetBaseTemplatePath</FUNCTION>
+			<FUNCTION>GetClientVariablesList</FUNCTION>
+			<FUNCTION>GetComponentMetaData</FUNCTION>
+			<FUNCTION>GetContextRoot</FUNCTION>
+			<FUNCTION>GetCurrentTemplatePath</FUNCTION>
+			<FUNCTION>GetDirectoryFromPath</FUNCTION>
+			<FUNCTION>GetEncoding</FUNCTION>
+			<FUNCTION>GetException</FUNCTION>
+			<FUNCTION>GetFileFromPath</FUNCTION>
+			<FUNCTION>GetFileInfo</FUNCTION>
+			<FUNCTION>GetFunctionCalledName</FUNCTION>
+			<FUNCTION>GetFunctionList</FUNCTION>
+			<FUNCTION>GetGatewayHelper</FUNCTION>
+			<FUNCTION>GetHttpRequestData</FUNCTION>
+			<FUNCTION>GetHttpTimeString</FUNCTION>
+			<FUNCTION>GetLocalHostIP</FUNCTION>
+			<FUNCTION>GetLocale</FUNCTION>
+			<FUNCTION>GetLocaleDisplayName</FUNCTION>
+			<FUNCTION>GetMetaData</FUNCTION>
+			<FUNCTION>GetMetricData</FUNCTION>
+			<FUNCTION>GetPageContext</FUNCTION>
+			<FUNCTION>GetPrinterInfo</FUNCTION>
+			<FUNCTION>GetProfileSections</FUNCTION>
+			<FUNCTION>GetProfileString</FUNCTION>
+			<FUNCTION>GetReadableImageFormats</FUNCTION>
+			<FUNCTION>GetSOAPRequest</FUNCTION>
+			<FUNCTION>GetSOAPRequestHeader</FUNCTION>
+			<FUNCTION>GetSOAPResponse</FUNCTION>
+			<FUNCTION>GetSOAPResponseHeader</FUNCTION>
+			<FUNCTION>GetTempDirectory</FUNCTION>
+			<FUNCTION>GetTempFile</FUNCTION>
+			<FUNCTION>GetTemplatePath</FUNCTION>
+			<FUNCTION>GetTickCount</FUNCTION>
+			<FUNCTION>GetTimeZoneInfo</FUNCTION>
+			<FUNCTION>GetToken</FUNCTION>
+			<FUNCTION>GetUserRoles</FUNCTION>
+			<FUNCTION>GetWriteableImageFormats</FUNCTION>
+			<FUNCTION>HTMLCodeFormat</FUNCTION>
+			<FUNCTION>HTMLEditFormat</FUNCTION>
+			<FUNCTION>Hash</FUNCTION>
+			<FUNCTION>Hour</FUNCTION>
+			<FUNCTION>IIf</FUNCTION>
+			<FUNCTION>ImageAddBorder</FUNCTION>
+			<FUNCTION>ImageBlur</FUNCTION>
+			<FUNCTION>ImageClearRect</FUNCTION>
+			<FUNCTION>ImageCopy</FUNCTION>
+			<FUNCTION>ImageCrop</FUNCTION>
+			<FUNCTION>ImageDrawArc</FUNCTION>
+			<FUNCTION>ImageDrawBeveledRect</FUNCTION>
+			<FUNCTION>ImageDrawCubicCurve</FUNCTION>
+			<FUNCTION>ImageDrawLine</FUNCTION>
+			<FUNCTION>ImageDrawLines</FUNCTION>
+			<FUNCTION>ImageDrawOval</FUNCTION>
+			<FUNCTION>ImageDrawPoint</FUNCTION>
+			<FUNCTION>ImageDrawQuadraticCurve</FUNCTION>
+			<FUNCTION>ImageDrawRect</FUNCTION>
+			<FUNCTION>ImageDrawRoundRect</FUNCTION>
+			<FUNCTION>ImageDrawText</FUNCTION>
+			<FUNCTION>ImageFlip</FUNCTION>
+			<FUNCTION>ImageGetBlob</FUNCTION>
+			<FUNCTION>ImageGetBufferedImage</FUNCTION>
+			<FUNCTION>ImageGetEXIFTag</FUNCTION>
+			<FUNCTION>ImageGetHeight</FUNCTION>
+			<FUNCTION>ImageGetIPTCTag</FUNCTION>
+			<FUNCTION>ImageGetWidth</FUNCTION>
+			<FUNCTION>ImageGrayscale</FUNCTION>
+			<FUNCTION>ImageInfo</FUNCTION>
+			<FUNCTION>ImageNegative</FUNCTION>
+			<FUNCTION>ImageNew</FUNCTION>
+			<FUNCTION>ImageOverlay</FUNCTION>
+			<FUNCTION>ImagePaste</FUNCTION>
+			<FUNCTION>ImageRead</FUNCTION>
+			<FUNCTION>ImageReadBase64</FUNCTION>
+			<FUNCTION>ImageResize</FUNCTION>
+			<FUNCTION>ImageRotate</FUNCTION>
+			<FUNCTION>ImageRotateDrawingAxis</FUNCTION>
+			<FUNCTION>ImageScaleToFit</FUNCTION>
+			<FUNCTION>ImageSetAntialiasing</FUNCTION>
+			<FUNCTION>ImageSetBackgroundColor</FUNCTION>
+			<FUNCTION>ImageSetDrawingColor</FUNCTION>
+			<FUNCTION>ImageSetDrawingStroke</FUNCTION>
+			<FUNCTION>ImageSetDrawingTransparency</FUNCTION>
+			<FUNCTION>ImageSharpen</FUNCTION>
+			<FUNCTION>ImageShear</FUNCTION>
+			<FUNCTION>ImageShearDrawingAxis</FUNCTION>
+			<FUNCTION>ImageTranslate</FUNCTION>
+			<FUNCTION>ImageTranslateDrawingAxis</FUNCTION>
+			<FUNCTION>ImageWrite</FUNCTION>
+			<FUNCTION>ImageWriteBase64</FUNCTION>
+			<FUNCTION>ImageXORDrawingMode</FUNCTION>
+			<FUNCTION>IncrementValue</FUNCTION>
+			<FUNCTION>InputBaseN</FUNCTION>
+			<FUNCTION>Insert</FUNCTION>
+			<FUNCTION>Int</FUNCTION>
+			<FUNCTION>IsArray</FUNCTION>
+			<FUNCTION>IsBinary</FUNCTION>
+			<FUNCTION>IsBoolean</FUNCTION>
+			<FUNCTION>IsCustomFunction</FUNCTION>
+			<FUNCTION>IsDDX</FUNCTION>
+			<FUNCTION>IsDate</FUNCTION>
+			<FUNCTION>IsDebugMode</FUNCTION>
+			<FUNCTION>IsDefined</FUNCTION>
+			<FUNCTION>IsImage</FUNCTION>
+			<FUNCTION>IsImageFile</FUNCTION>
+			<FUNCTION>IsInstanceOf</FUNCTION>
+			<FUNCTION>IsJSON</FUNCTION>
+			<FUNCTION>IsK2ServerABroker</FUNCTION>
+			<FUNCTION>IsK2ServerDocCountExceeded</FUNCTION>
+			<FUNCTION>IsK2ServerOnline</FUNCTION>
+			<FUNCTION>IsLeapYear</FUNCTION>
+			<FUNCTION>IsLocalHost</FUNCTION>
+			<FUNCTION>IsNull</FUNCTION>
+			<FUNCTION>IsNumeric</FUNCTION>
+			<FUNCTION>IsNumericDate</FUNCTION>
+			<FUNCTION>IsObject</FUNCTION>
+			<FUNCTION>IsPDFFile</FUNCTION>
+			<FUNCTION>IsPDFObject</FUNCTION>
+			<FUNCTION>IsQuery</FUNCTION>
+			<FUNCTION>IsSOAPRequest</FUNCTION>
+			<FUNCTION>IsSimpleValue</FUNCTION>
+			<FUNCTION>IsStruct</FUNCTION>
+			<FUNCTION>IsUserInAnyRole</FUNCTION>
+			<FUNCTION>IsUserInRole</FUNCTION>
+			<FUNCTION>IsUserLoggedIn</FUNCTION>
+			<FUNCTION>IsValid</FUNCTION>
+			<FUNCTION>IsWDDX</FUNCTION>
+			<FUNCTION>IsXML</FUNCTION>
+			<FUNCTION>IsXmlAttribute</FUNCTION>
+			<FUNCTION>IsXmlDoc</FUNCTION>
+			<FUNCTION>IsXmlElem</FUNCTION>
+			<FUNCTION>IsXmlNode</FUNCTION>
+			<FUNCTION>IsXmlRoot</FUNCTION>
+			<FUNCTION>JSStringFormat</FUNCTION>
+			<FUNCTION>JavaCast</FUNCTION>
+			<FUNCTION>LCase</FUNCTION>
+			<FUNCTION>LJustify</FUNCTION>
+			<FUNCTION>LSCurrencyFormat</FUNCTION>
+			<FUNCTION>LSDateFormat</FUNCTION>
+			<FUNCTION>LSEuroCurrencyFormat</FUNCTION>
+			<FUNCTION>LSIsCurrency</FUNCTION>
+			<FUNCTION>LSIsDate</FUNCTION>
+			<FUNCTION>LSIsNumeric</FUNCTION>
+			<FUNCTION>LSNumberFormat</FUNCTION>
+			<FUNCTION>LSParseCurrency</FUNCTION>
+			<FUNCTION>LSParseDateTime</FUNCTION>
+			<FUNCTION>LSParseEuroCurrency</FUNCTION>
+			<FUNCTION>LSParseNumber</FUNCTION>
+			<FUNCTION>LSTimeFormat</FUNCTION>
+			<FUNCTION>LTrim</FUNCTION>
+			<FUNCTION>Left</FUNCTION>
+			<FUNCTION>Len</FUNCTION>
+			<FUNCTION>ListAppend</FUNCTION>
+			<FUNCTION>ListChangeDelims</FUNCTION>
+			<FUNCTION>ListContains</FUNCTION>
+			<FUNCTION>ListContainsNoCase</FUNCTION>
+			<FUNCTION>ListDeleteAt</FUNCTION>
+			<FUNCTION>ListFind</FUNCTION>
+			<FUNCTION>ListFindNoCase</FUNCTION>
+			<FUNCTION>ListFirst</FUNCTION>
+			<FUNCTION>ListGetAt</FUNCTION>
+			<FUNCTION>ListInsertAt</FUNCTION>
+			<FUNCTION>ListLast</FUNCTION>
+			<FUNCTION>ListLen</FUNCTION>
+			<FUNCTION>ListPrepend</FUNCTION>
+			<FUNCTION>ListQualify</FUNCTION>
+			<FUNCTION>ListRest</FUNCTION>
+			<FUNCTION>ListSetAt</FUNCTION>
+			<FUNCTION>ListSort</FUNCTION>
+			<FUNCTION>ListToArray</FUNCTION>
+			<FUNCTION>ListValueCount</FUNCTION>
+			<FUNCTION>ListValueCountNoCase</FUNCTION>
+			<FUNCTION>Location</FUNCTION>
+			<FUNCTION>Log</FUNCTION>
+			<FUNCTION>Log10</FUNCTION>
+			<FUNCTION>Max</FUNCTION>
+			<FUNCTION>Mid</FUNCTION>
+			<FUNCTION>Min</FUNCTION>
+			<FUNCTION>Minute</FUNCTION>
+			<FUNCTION>Month</FUNCTION>
+			<FUNCTION>MonthAsString</FUNCTION>
+			<FUNCTION>Now</FUNCTION>
+			<FUNCTION>NumberFormat</FUNCTION>
+			<FUNCTION>ORMClearSession</FUNCTION>
+			<FUNCTION>ORMCloseSession</FUNCTION>
+			<FUNCTION>ORMEvictCollection</FUNCTION>
+			<FUNCTION>ORMEvictEntity</FUNCTION>
+			<FUNCTION>ORMEvictQueries</FUNCTION>
+			<FUNCTION>ORMExecuteQuery</FUNCTION>
+			<FUNCTION>ORMFlush</FUNCTION>
+			<FUNCTION>ORMGetSession</FUNCTION>
+			<FUNCTION>ORMGetSessionFactory</FUNCTION>
+			<FUNCTION>ORMReload</FUNCTION>
+			<FUNCTION>ObjectEquals</FUNCTION>
+			<FUNCTION>ObjectLoad</FUNCTION>
+			<FUNCTION>ObjectSave</FUNCTION>
+			<FUNCTION>ParagraphFormat</FUNCTION>
+			<FUNCTION>ParseDateTime</FUNCTION>
+			<FUNCTION>Pi</FUNCTION>
+			<FUNCTION>PrecisionEvaluate</FUNCTION>
+			<FUNCTION>PreserveSingleQuotes</FUNCTION>
+			<FUNCTION>Quarter</FUNCTION>
+			<FUNCTION>QueryAddColumn</FUNCTION>
+			<FUNCTION>QueryAddRow</FUNCTION>
+			<FUNCTION>QueryConvertForGrid</FUNCTION>
+			<FUNCTION>QueryNew</FUNCTION>
+			<FUNCTION>QuerySetCell</FUNCTION>
+			<FUNCTION>QuotedValueList</FUNCTION>
+			<FUNCTION>REFind</FUNCTION>
+			<FUNCTION>REFindNoCase</FUNCTION>
+			<FUNCTION>REMatch</FUNCTION>
+			<FUNCTION>REMatchNoCase</FUNCTION>
+			<FUNCTION>REReplace</FUNCTION>
+			<FUNCTION>REReplaceNoCase</FUNCTION>
+			<FUNCTION>RJustify</FUNCTION>
+			<FUNCTION>RTrim</FUNCTION>
+			<FUNCTION>Rand</FUNCTION>
+			<FUNCTION>RandRange</FUNCTION>
+			<FUNCTION>Randomize</FUNCTION>
+			<FUNCTION>ReleaseComObject</FUNCTION>
+			<FUNCTION>RemoveChars</FUNCTION>
+			<FUNCTION>RepeatString</FUNCTION>
+			<FUNCTION>Replace</FUNCTION>
+			<FUNCTION>ReplaceList</FUNCTION>
+			<FUNCTION>ReplaceNoCase</FUNCTION>
+			<FUNCTION>Reverse</FUNCTION>
+			<FUNCTION>Right</FUNCTION>
+			<FUNCTION>Round</FUNCTION>
+			<FUNCTION>Second</FUNCTION>
+			<FUNCTION>SendGatewayMessage</FUNCTION>
+			<FUNCTION>SerializeJSON</FUNCTION>
+			<FUNCTION>SetLocale</FUNCTION>
+			<FUNCTION>SetProfileString</FUNCTION>
+			<FUNCTION>SetVariable</FUNCTION>
+			<FUNCTION>Sgn</FUNCTION>
+			<FUNCTION>Sin</FUNCTION>
+			<FUNCTION>Sleep</FUNCTION>
+			<FUNCTION>SpanExcluding</FUNCTION>
+			<FUNCTION>SpanIncluding</FUNCTION>
+			<FUNCTION>SpreadsheetAddColumn</FUNCTION>
+			<FUNCTION>SpreadsheetAddFreezePane</FUNCTION>
+			<FUNCTION>SpreadsheetAddImage</FUNCTION>
+			<FUNCTION>SpreadsheetAddInfo</FUNCTION>
+			<FUNCTION>SpreadsheetAddRow</FUNCTION>
+			<FUNCTION>SpreadsheetAddRows</FUNCTION>
+			<FUNCTION>SpreadsheetAddSplitPane</FUNCTION>
+			<FUNCTION>SpreadsheetCreateSheet</FUNCTION>
+			<FUNCTION>SpreadsheetDeleteColumn</FUNCTION>
+			<FUNCTION>SpreadsheetDeleteColumns</FUNCTION>
+			<FUNCTION>SpreadsheetDeleteRow</FUNCTION>
+			<FUNCTION>SpreadsheetDeleteRows</FUNCTION>
+			<FUNCTION>SpreadsheetFormatCell</FUNCTION>
+			<FUNCTION>SpreadsheetFormatCellRange</FUNCTION>
+			<FUNCTION>SpreadsheetFormatColumn</FUNCTION>
+			<FUNCTION>SpreadsheetFormatColumns</FUNCTION>
+			<FUNCTION>SpreadsheetFormatRow</FUNCTION>
+			<FUNCTION>SpreadsheetFormatRows</FUNCTION>
+			<FUNCTION>SpreadsheetGetCellComment</FUNCTION>
+			<FUNCTION>SpreadsheetGetCellFormula</FUNCTION>
+			<FUNCTION>SpreadsheetGetCellValue</FUNCTION>
+			<FUNCTION>SpreadsheetInfo</FUNCTION>
+			<FUNCTION>SpreadsheetMergeCells</FUNCTION>
+			<FUNCTION>SpreadsheetNew</FUNCTION>
+			<FUNCTION>SpreadsheetRead</FUNCTION>
+			<FUNCTION>SpreadsheetReadBinary</FUNCTION>
+			<FUNCTION>SpreadsheetRemoveSheet</FUNCTION>
+			<FUNCTION>SpreadsheetSetActiveSheet</FUNCTION>
+			<FUNCTION>SpreadsheetSetActiveSheetNumber</FUNCTION>
+			<FUNCTION>SpreadsheetSetCellComment</FUNCTION>
+			<FUNCTION>SpreadsheetSetCellFormula</FUNCTION>
+			<FUNCTION>SpreadsheetSetCellValue</FUNCTION>
+			<FUNCTION>SpreadsheetSetColumnWidth</FUNCTION>
+			<FUNCTION>SpreadsheetSetFooter</FUNCTION>
+			<FUNCTION>SpreadsheetSetHeader</FUNCTION>
+			<FUNCTION>SpreadsheetSetRowHeight</FUNCTION>
+			<FUNCTION>SpreadsheetShiftColumns</FUNCTION>
+			<FUNCTION>SpreadsheetShiftRows</FUNCTION>
+			<FUNCTION>SpreadsheetWrite</FUNCTION>
+			<FUNCTION>Sqr</FUNCTION>
+			<FUNCTION>StripCR</FUNCTION>
+			<FUNCTION>StructAppend</FUNCTION>
+			<FUNCTION>StructClear</FUNCTION>
+			<FUNCTION>StructCopy</FUNCTION>
+			<FUNCTION>StructCount</FUNCTION>
+			<FUNCTION>StructDelete</FUNCTION>
+			<FUNCTION>StructFind</FUNCTION>
+			<FUNCTION>StructFindKey</FUNCTION>
+			<FUNCTION>StructFindValue</FUNCTION>
+			<FUNCTION>StructGet</FUNCTION>
+			<FUNCTION>StructInsert</FUNCTION>
+			<FUNCTION>StructIsEmpty</FUNCTION>
+			<FUNCTION>StructKeyArray</FUNCTION>
+			<FUNCTION>StructKeyExists</FUNCTION>
+			<FUNCTION>StructKeyList</FUNCTION>
+			<FUNCTION>StructNew</FUNCTION>
+			<FUNCTION>StructSort</FUNCTION>
+			<FUNCTION>StructUpdate</FUNCTION>
+			<FUNCTION>Tan</FUNCTION>
+			<!---FUNCTION>Throw</FUNCTION-->
+			<FUNCTION>TimeFormat</FUNCTION>
+			<FUNCTION>ToBase64</FUNCTION>
+			<FUNCTION>ToBinary</FUNCTION>
+			<FUNCTION>ToScript</FUNCTION>
+			<FUNCTION>ToString</FUNCTION>
+			<FUNCTION>Trace</FUNCTION>
+			<!--FUNCTION>Try</FUNCTION-->
+			<FUNCTION>TransactionCommit</FUNCTION>
+			<FUNCTION>TransactionRollback</FUNCTION>
+			<FUNCTION>TransactionSetSavePoint</FUNCTION>
+			<FUNCTION>Trim</FUNCTION>
+			<FUNCTION>UCase</FUNCTION>
+			<FUNCTION>URLDecode</FUNCTION>
+			<FUNCTION>URLEncodedFormat</FUNCTION>
+			<FUNCTION>URLSessionFormat</FUNCTION>
+			<FUNCTION>Val</FUNCTION>
+			<FUNCTION>ValueList</FUNCTION>
+			<FUNCTION>VerifyClient</FUNCTION>
+			<FUNCTION>Week</FUNCTION>
+			<FUNCTION>Wrap</FUNCTION>
+			<FUNCTION>WriteDump</FUNCTION>
+			<FUNCTION>WriteLog</FUNCTION>
+			<FUNCTION>WriteOutput</FUNCTION>
+			<FUNCTION>XmlChildPos</FUNCTION>
+			<FUNCTION>XmlElemNew</FUNCTION>
+			<FUNCTION>XmlFormat</FUNCTION>
+			<FUNCTION>XmlGetNodeType</FUNCTION>
+			<FUNCTION>XmlNew</FUNCTION>
+			<FUNCTION>XmlParse</FUNCTION>
+			<FUNCTION>XmlSearch</FUNCTION>
+			<FUNCTION>XmlTransform</FUNCTION>
+			<FUNCTION>XmlValidate</FUNCTION>
+			<FUNCTION>Year</FUNCTION>
+			<FUNCTION>YesNoFormat</FUNCTION>
+			
+			<!-- Scopes -->
+			<KEYWORD2>Variables</KEYWORD2>
+			<KEYWORD2>Arguments</KEYWORD2>
+			<KEYWORD2>Request</KEYWORD2>
+			<KEYWORD2>Session</KEYWORD2>
+			<KEYWORD2>Local</KEYWORD2>
+			<KEYWORD2>Form</KEYWORD2>
+			<KEYWORD2>CGI</KEYWORD2>
+			<KEYWORD2>URL</KEYWORD2>
+			<KEYWORD2>Attributes</KEYWORD2>
+			<KEYWORD2>Application</KEYWORD2>
+			<KEYWORD2>Cookie</KEYWORD2>
+			
+			
+			<!-- ColdFusion Operators -->
+			<OPERATOR>IS</OPERATOR>
+			<OPERATOR>EQ</OPERATOR><OPERATOR>EQUAL</OPERATOR>
+			<OPERATOR>EQV</OPERATOR>
+			<OPERATOR>NEQ</OPERATOR><OPERATOR>IS NOT</OPERATOR><OPERATOR>NOT EQUAL</OPERATOR>
+			<OPERATOR>GT</OPERATOR><OPERATOR>GREATER THAN</OPERATOR>
+			<OPERATOR>GTE</OPERATOR><OPERATOR>GE</OPERATOR>
+			<OPERATOR>LT</OPERATOR><OPERATOR>LESS THAN</OPERATOR>
+			<OPERATOR>LTE</OPERATOR><OPERATOR>LE</OPERATOR>
+	
+			<OPERATOR>LESS</OPERATOR>
+			<OPERATOR>GREATER</OPERATOR>
+			<OPERATOR>THAN</OPERATOR>
+			
+			<OPERATOR>CONTAINS</OPERATOR>
+			<OPERATOR>DOES NOT CONTAIN</OPERATOR>
+			
+			<OPERATOR>AND</OPERATOR>
+			<OPERATOR>IMP</OPERATOR>
+			<OPERATOR>OR</OPERATOR>
+			<OPERATOR>NOT</OPERATOR>
+			<OPERATOR>XOR</OPERATOR>
+		</KEYWORDS>
+	</RULES>
+	
+	<RULES SET="CFDOC" DEFAULT="COMMENT3" IGNORE_CASE="TRUE">
+		<MARK_FOLLOWING TYPE="LITERAL3">@</MARK_FOLLOWING>
+		
+		<KEYWORDS>
+			<LITERAL1>@hint</LITERAL1>
+			<LITERAL1>@displayname</LITERAL1>
+			<LITERAL1>@output</LITERAL1>
+			<LITERAL1>@access</LITERAL1>
+			<LITERAL1>@accessors</LITERAL1>
+			<LITERAL1>@returntype</LITERAL1>
+			<LITERAL1>@roles</LITERAL1>
+			<LITERAL1>@default</LITERAL1>
+			<LITERAL1>@required</LITERAL1>
+			<LITERAL1>@extends</LITERAL1>
+			<LITERAL1>@implements</LITERAL1>
+			
+			<!-- entity related -->
+			<LITERAL2>@update</LITERAL2>
+			<LITERAL2>@insert</LITERAL2>
+			<LITERAL2>@formula</LITERAL2>
+			<LITERAL2>@dbdefault</LITERAL2>
+			<LITERAL2>@persistent</LITERAL2>
+			<LITERAL2>@optimisticlock</LITERAL2>
+			<LITERAL2>@unique</LITERAL2>
+			<LITERAL2>@uniquekey</LITERAL2>
+			<LITERAL2>@sqltype</LITERAL2>
+			<LITERAL2>@generator</LITERAL2>
+			<LITERAL2>@generated</LITERAL2>
+			<LITERAL2>@notnull</LITERAL2>
+			<LITERAL2>@length</LITERAL2>
+			<LITERAL2>@scale</LITERAL2>
+			<LITERAL2>@precision</LITERAL2>
+			<LITERAL2>@fieldtype</LITERAL2>
+			<LITERAL2>@ormtype</LITERAL2>
+			<LITERAL2>@column</LITERAL2>
+		</KEYWORDS>
+		
+		
+	</RULES>
+</MODE>

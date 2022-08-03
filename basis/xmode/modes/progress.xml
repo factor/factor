@@ -47,7 +47,7 @@
       </SPAN>
   </RULES>
 
-  <RULES ESCAPE="~" IGNORE_CASE="TRUE" HIGHLIGHT_DIGITS="TRUE">
+  <RULES IGNORE_CASE="TRUE" HIGHLIGHT_DIGITS="TRUE">
     <!-- COMMENT1   : Normal Progress comments -->
     <!-- LITERAL1   : text between ' or " -->
     <!-- LITERAL2   :  -->
@@ -64,12 +64,12 @@
      <END>*/</END>
     </SPAN>
     <!-- LITERAL1   : text between ' or " -->
-      <SPAN TYPE="LITERAL1">
+      <SPAN TYPE="LITERAL1" ESCAPE="~">
         <BEGIN>'</BEGIN>
         <END>'</END>
       </SPAN>
 
-      <SPAN TYPE="LITERAL1">
+      <SPAN TYPE="LITERAL1" ESCAPE="~">
         <BEGIN>"</BEGIN>
         <END>"</END>
       </SPAN>

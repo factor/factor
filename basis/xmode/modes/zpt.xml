@@ -50,9 +50,7 @@
 		</SPAN>
 	</RULES>
 
-	<!-- ESCAPE is not exactly right but it is needed to correctly
-	     handle JavaScript in on* parameters -->
-	<RULES SET="TAGS" DEFAULT="MARKUP" ESCAPE="\">
+	<RULES SET="TAGS" DEFAULT="MARKUP">
 		<SPAN TYPE="LITERAL1" DELEGATE="ATTRIBUTE">
 			<BEGIN>"</BEGIN>
 			<END>"</END>
@@ -86,7 +84,7 @@
 		</KEYWORDS>
 	</RULES>
 
-	<RULES SET="ATTRIBUTE" DEFAULT="LITERAL1">
+	<RULES SET="ATTRIBUTE" DEFAULT="LITERAL1" ESCAPE="\">
 		<SEQ TYPE="OPERATOR">:</SEQ>
 		<SEQ TYPE="OPERATOR">;</SEQ>
 		<SEQ TYPE="OPERATOR">?</SEQ>
@@ -124,7 +122,7 @@
 			<KEYWORD4>structure</KEYWORD4>
 
 			<!-- built-in TALES variables -->
-			<!-- NOTE: root, here, container, template, 
+			<!-- NOTE: root, here, container, template,
 			     request, user, and modules are optional -->
 			<LITERAL3>CONTEXTS</LITERAL3>
 			<LITERAL3>attrs</LITERAL3>

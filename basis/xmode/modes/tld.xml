@@ -1,0 +1,257 @@
+<?xml version="1.0"?>
+<!DOCTYPE MODE SYSTEM "xmode.dtd">
+<!-- mode for tag library description (tld) files -->
+<MODE>
+    <PROPS>
+        <PROPERTY NAME="commentStart" VALUE="&lt;!--" />
+        <PROPERTY NAME="commentEnd" VALUE="--&gt;" />
+    </PROPS>
+	<!-- {{{ MAIN -->
+    <RULES>
+		<!-- SGML comment -->
+        <SPAN TYPE="COMMENT1">
+            <BEGIN>&lt;!--</BEGIN>
+            <END>--&gt;</END>
+        </SPAN>
+
+		<!-- DTD Entity declarations -->
+        <SPAN TYPE="KEYWORD2" DELEGATE="ENTITY-TAGS">
+            <BEGIN>&lt;!ENTITY</BEGIN>
+            <END>&gt;</END>
+        </SPAN>
+
+		<!-- CDATA sections -->
+        <SPAN TYPE="KEYWORD2" DELEGATE="CDATA">
+            <BEGIN>&lt;![CDATA[</BEGIN>
+            <END>]]&gt;</END>
+        </SPAN>
+
+		<!-- DTD instructions -->
+        <SPAN TYPE="KEYWORD2" DELEGATE="DTD-TAGS">
+            <BEGIN>&lt;!</BEGIN>
+            <END>&gt;</END>
+        </SPAN>
+
+		<!-- PI directives -->
+        <SPAN TYPE="KEYWORD3">
+            <BEGIN>&lt;?</BEGIN>
+            <END>&gt;</END>
+        </SPAN>
+
+		<!-- markup tags -->
+        <SPAN TYPE="MARKUP" DELEGATE="TAGS">
+            <BEGIN>&lt;</BEGIN>
+            <END>&gt;</END>
+        </SPAN>
+
+		<!-- SGML entities -->
+        <SPAN TYPE="LITERAL2" NO_WORD_BREAK="TRUE">
+            <BEGIN>&amp;</BEGIN>
+            <END>;</END>
+        </SPAN>
+
+        <KEYWORDS>
+            <KEYWORD4>tagdependent</KEYWORD4>
+            <KEYWORD4>empty</KEYWORD4>
+            <KEYWORD4>scriptless</KEYWORD4>
+            <KEYWORD4>true</KEYWORD4>
+            <KEYWORD4>false</KEYWORD4>
+            <KEYWORD4>NESTED</KEYWORD4>
+            <KEYWORD4>AT_BEGIN</KEYWORD4>
+            <KEYWORD4>AT_END</KEYWORD4>
+        </KEYWORDS>
+
+    </RULES>
+	<!-- }}} -->
+	
+	<!-- {{{ TAGS -->
+    <RULES SET="TAGS" DEFAULT="MARKUP" NO_WORD_SEP="-_">
+		<!-- SGML comment -->
+        <SPAN TYPE="COMMENT1">
+            <BEGIN>&lt;!--</BEGIN>
+            <END>--&gt;</END>
+        </SPAN>
+
+        <SPAN TYPE="LITERAL1">
+            <BEGIN>"</BEGIN>
+            <END>"</END>
+        </SPAN>
+
+        <SPAN TYPE="LITERAL1">
+            <BEGIN>'</BEGIN>
+            <END>'</END>
+        </SPAN>
+
+        <SEQ TYPE="MARKUP" DELEGATE="STRING">"</SEQ>
+
+        <SEQ TYPE="MARKUP" DELEGATE="tld::MAIN">/></SEQ>
+        <MARK_PREVIOUS TYPE="LABEL">:</MARK_PREVIOUS>
+        <SEQ TYPE="OPERATOR">:</SEQ>
+        <KEYWORDS>
+            <KEYWORD1>taglib</KEYWORD1>
+            <KEYWORD1>tag</KEYWORD1>
+            <KEYWORD1>tag-file</KEYWORD1>
+            <KEYWORD1>function</KEYWORD1>
+            <KEYWORD1>tag-extension</KEYWORD1>
+            <KEYWORD1>validator</KEYWORD1>
+
+            <KEYWORD2>description</KEYWORD2>
+            <KEYWORD2>display-name</KEYWORD2>
+            <KEYWORD2>icon</KEYWORD2>
+            <KEYWORD2>tlib-version</KEYWORD2>
+            <KEYWORD2>short-name</KEYWORD2>
+            <KEYWORD2>uri</KEYWORD2>
+            <KEYWORD2>listener</KEYWORD2>
+            <KEYWORD2>validator-class</KEYWORD2>
+            <KEYWORD2>init-param</KEYWORD2>
+            <KEYWORD2>name</KEYWORD2>
+            <KEYWORD2>path</KEYWORD2>
+            <KEYWORD2>example</KEYWORD2>
+            <KEYWORD2>tag-extension</KEYWORD2>
+            <KEYWORD2>tag-class</KEYWORD2>
+            <KEYWORD2>tei-class</KEYWORD2>
+            <KEYWORD2>body-content</KEYWORD2>
+            <KEYWORD2>variable</KEYWORD2>
+            <KEYWORD2>attribute</KEYWORD2>
+            <KEYWORD2>dynamic-attributes</KEYWORD2>
+            <KEYWORD2>required</KEYWORD2>
+            <KEYWORD2>rtexprvalue</KEYWORD2>
+            <KEYWORD2>type</KEYWORD2>
+            <KEYWORD2>fragment</KEYWORD2>
+            <KEYWORD2>name-given</KEYWORD2>
+            <KEYWORD2>name-from-attribute</KEYWORD2>
+            <KEYWORD2>variable-class</KEYWORD2>
+            <KEYWORD2>declare</KEYWORD2>
+            <KEYWORD2>scope</KEYWORD2>
+
+
+        </KEYWORDS>
+    </RULES>
+	<!-- }}} -->
+	
+	<!-- {{{ DTD-TAGS -->
+    <RULES SET="DTD-TAGS" DEFAULT="KEYWORD2" IGNORE_CASE="FALSE">
+		<!-- SGML comment -->
+        <SPAN TYPE="COMMENT1">
+            <BEGIN>&lt;!--</BEGIN>
+            <END>--&gt;</END>
+        </SPAN>
+
+		<!-- SGML comment -->
+        <SPAN TYPE="COMMENT1">
+            <BEGIN>--</BEGIN>
+            <END>--</END>
+        </SPAN>
+
+		<!-- Parameter entities -->
+        <SPAN TYPE="LITERAL2" NO_WORD_BREAK="TRUE">
+            <BEGIN>%</BEGIN>
+            <END>;</END>
+        </SPAN>
+
+        <SPAN TYPE="LITERAL1">
+            <BEGIN>"</BEGIN>
+            <END>"</END>
+        </SPAN>
+
+        <SPAN TYPE="LITERAL1">
+            <BEGIN>'</BEGIN>
+            <END>'</END>
+        </SPAN>
+
+		<!-- This appears in some SGML documents -->
+        <SPAN TYPE="KEYWORD2" DELEGATE="MAIN">
+            <BEGIN>[</BEGIN>
+            <END>]</END>
+        </SPAN>
+
+        <SEQ TYPE="OPERATOR">(</SEQ>
+        <SEQ TYPE="OPERATOR">)</SEQ>
+        <SEQ TYPE="OPERATOR">|</SEQ>
+        <SEQ TYPE="OPERATOR">?</SEQ>
+        <SEQ TYPE="OPERATOR">*</SEQ>
+        <SEQ TYPE="OPERATOR">+</SEQ>
+        <SEQ TYPE="OPERATOR">,</SEQ>
+
+        <KEYWORDS>
+            <KEYWORD1>CDATA</KEYWORD1>
+            <KEYWORD1>EMPTY</KEYWORD1>
+            <KEYWORD1>INCLUDE</KEYWORD1>
+            <KEYWORD1>IGNORE</KEYWORD1>
+            <KEYWORD1>NDATA</KEYWORD1>
+            <KEYWORD1>#IMPLIED</KEYWORD1>
+            <KEYWORD1>#PCDATA</KEYWORD1>
+            <KEYWORD1>#REQUIRED</KEYWORD1>
+        </KEYWORDS>
+    </RULES>
+	<!-- }}} -->
+	
+	<!-- {{{ ENTITY-TAGS -->
+    <RULES SET="ENTITY-TAGS" DEFAULT="KEYWORD2">
+		<!-- SGML comment -->
+        <SPAN TYPE="COMMENT1">
+            <BEGIN>&lt;!--</BEGIN>
+            <END>--&gt;</END>
+        </SPAN>
+
+		<!-- SGML comment -->
+        <SPAN TYPE="COMMENT1">
+            <BEGIN>--</BEGIN>
+            <END>--</END>
+        </SPAN>
+
+        <SPAN TYPE="LITERAL1">
+            <BEGIN>"</BEGIN>
+            <END>"</END>
+        </SPAN>
+
+        <SPAN TYPE="LITERAL1">
+            <BEGIN>'</BEGIN>
+            <END>'</END>
+        </SPAN>
+
+        <SEQ TYPE="OPERATOR">=</SEQ>
+
+        <SEQ TYPE="OPERATOR">%</SEQ>
+
+        <KEYWORDS>
+            <KEYWORD1>SYSTEM</KEYWORD1>
+        </KEYWORDS>
+    </RULES>
+	<!-- }}} -->
+	
+	<!-- {{{ CDATA -->
+    <RULES SET="CDATA" DEFAULT="COMMENT2">
+        <KEYWORDS>
+            <LITERAL2>true</LITERAL2>
+            <LITERAL2>yes</LITERAL2>
+            <LITERAL2>false</LITERAL2>
+        </KEYWORDS>
+    </RULES>
+	<!-- }}} -->
+	
+	<!-- {{{ STRING -->
+    <RULES SET="STRING" DEFAULT="LITERAL1">
+		<!-- ant property -->
+        <SPAN TYPE="KEYWORD3">
+            <BEGIN>${</BEGIN>
+            <END>}</END>
+        </SPAN>
+        <SEQ TYPE="NULL">\"</SEQ>
+        <SEQ TYPE="MARKUP" DELEGATE="TAGS">"</SEQ>
+
+        <SPAN TYPE="LITERAL2" NO_WORD_BREAK="TRUE">
+            <BEGIN>&amp;</BEGIN>
+            <END>;</END>
+        </SPAN>
+        <KEYWORDS>
+            <LITERAL2>true</LITERAL2>
+            <LITERAL2>yes</LITERAL2>
+            <LITERAL2>false</LITERAL2>
+        </KEYWORDS>
+    </RULES>
+	<!-- }}} -->
+
+</MODE>
+
+ 	  	 

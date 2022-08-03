@@ -6,7 +6,11 @@
     <PROPS>
         <PROPERTY NAME="lineComment" VALUE="#" />
     </PROPS>
-    <RULES ESCAPE="\" IGNORE_CASE="FALSE" HIGHLIGHT_DIGITS="TRUE">
+    <!-- just in case someone wonders just like me, what this set of rules is for,
+         it's actually for doxygen configuration files, a sample of which can
+         be found here http://www.stack.nl/~dimitri/doxygen/config.html#cfg_extract_static
+      -->
+    <RULES IGNORE_CASE="FALSE" HIGHLIGHT_DIGITS="TRUE">
         <!-- Comment -->
         <EOL_SPAN TYPE="COMMENT1">#</EOL_SPAN>
 
@@ -16,15 +20,15 @@
             AT_LINE_START="TRUE" MATCH_TYPE="OPERATOR">+=</MARK_PREVIOUS>
 
         <!-- Literals -->
-        <SPAN TYPE="LITERAL1" NO_LINE_BREAK="TRUE">
+        <SPAN TYPE="LITERAL1" ESCAPE="\" NO_LINE_BREAK="TRUE">
             <BEGIN>"</BEGIN>
             <END>"</END>
         </SPAN>
-        <SPAN TYPE="LITERAL1" NO_LINE_BREAK="TRUE">
+        <SPAN TYPE="LITERAL1" ESCAPE="\" NO_LINE_BREAK="TRUE">
             <BEGIN>'</BEGIN>
             <END>'</END>
         </SPAN>
-        <SPAN TYPE="LITERAL1" NO_LINE_BREAK="TRUE">
+        <SPAN TYPE="LITERAL1" ESCAPE="\" NO_LINE_BREAK="TRUE">
             <BEGIN>`</BEGIN>
             <END>`</END>
         </SPAN>
@@ -34,9 +38,16 @@
         </KEYWORDS>
     </RULES>
 
+    <!-- this rule set is used as a delegate in c and d modes -->
     <RULES SET="DOXYGEN" DEFAULT="COMMENT3" IGNORE_CASE="TRUE">
         <!-- so that *@param is highlighted -->
         <SEQ TYPE="COMMENT3">*</SEQ>
+
+        <!-- quoted strings -->
+        <SPAN TYPE="LITERAL1" ESCAPE="\" NO_LINE_BREAK="TRUE">
+            <BEGIN>"</BEGIN>
+            <END>"</END>
+        </SPAN>
 
         <!-- HTML comments -->
         <SPAN TYPE="COMMENT1">
@@ -69,14 +80,20 @@
             <LABEL>\bug</LABEL>
             <LABEL>\c</LABEL>
             <LABEL>\callgraph</LABEL>
+            <LABEL>\callergraph</LABEL>
             <LABEL>\category</LABEL>
             <LABEL>\class</LABEL>
             <LABEL>\code</LABEL>
+            <LABEL>\cond</LABEL>
+            <LABEL>\copybrief</LABEL>
+            <LABEL>\copydetails</LABEL>
             <LABEL>\copydoc</LABEL>
             <LABEL>\date</LABEL>
             <LABEL>\def</LABEL>
             <LABEL>\defgroup</LABEL>
             <LABEL>\deprecated</LABEL>
+            <LABEL>\details</LABEL>
+            <LABEL>\dir</LABEL>
             <LABEL>\dontinclude</LABEL>
             <LABEL>\dot</LABEL>
             <LABEL>\dotfile</LABEL>
@@ -85,28 +102,35 @@
             <LABEL>\elseif</LABEL>
             <LABEL>\em</LABEL>
             <LABEL>\endcode</LABEL>
+            <LABEL>\endcond</LABEL>
             <LABEL>\enddot</LABEL>
             <LABEL>\endhtmlonly</LABEL>
             <LABEL>\endif</LABEL>
             <LABEL>\endlatexonly</LABEL>
             <LABEL>\endlink</LABEL>
             <LABEL>\endmanonly</LABEL>
+            <LABEL>\endmsc</LABEL>
             <LABEL>\endverbatim</LABEL>
             <LABEL>\endxmlonly</LABEL>
             <LABEL>\enum</LABEL>
             <LABEL>\example</LABEL>
             <LABEL>\exception</LABEL>
+            <LABEL>\extends</LABEL>
             <LABEL>\f$</LABEL>
             <LABEL>\f[</LABEL>
             <LABEL>\f]</LABEL>
+            <LABEL>\f{</LABEL>
+            <LABEL>\f}</LABEL>
             <LABEL>\file</LABEL>
             <LABEL>\fn</LABEL>
+            <LABEL>\headerfile</LABEL>
             <LABEL>\hideinitializer</LABEL>
             <LABEL>\htmlinclude</LABEL>
             <LABEL>\htmlonly</LABEL>
             <LABEL>\if</LABEL>
             <LABEL>\ifnot</LABEL>
             <LABEL>\image</LABEL>
+            <LABEL>\implements</LABEL>
             <LABEL>\include</LABEL>
             <LABEL>\includelineno</LABEL>
             <LABEL>\ingroup</LABEL>
@@ -119,6 +143,8 @@
             <LABEL>\link</LABEL>
             <LABEL>\mainpage</LABEL>
             <LABEL>\manonly</LABEL>
+            <LABEL>\memberof</LABEL>
+            <LABEL>\msc</LABEL>
             <LABEL>\n</LABEL>
             <LABEL>\name</LABEL>
             <LABEL>\namespace</LABEL>
@@ -152,16 +178,19 @@
             <LABEL>\retval</LABEL>
             <LABEL>\sa</LABEL>
             <LABEL>\section</LABEL>
+            <LABEL>\see</LABEL>
             <LABEL>\showinitializer</LABEL>
             <LABEL>\since</LABEL>
             <LABEL>\skip</LABEL>
             <LABEL>\skipline</LABEL>
             <LABEL>\struct</LABEL>
+            <LABEL>\subpage</LABEL>
             <LABEL>\subsection</LABEL>
             <LABEL>\subsubsection</LABEL>
             <LABEL>\test</LABEL>
             <LABEL>\throw</LABEL>
             <LABEL>\todo</LABEL>
+            <LABEL>\tparam</LABEL>
             <LABEL>\typedef</LABEL>
             <LABEL>\union</LABEL>
             <LABEL>\until</LABEL>
@@ -182,6 +211,7 @@
             <LABEL>\&gt;</LABEL>
             <LABEL>\#</LABEL>
             <LABEL>\%</LABEL>
+            <LABEL>\"</LABEL>
             <LABEL>@a</LABEL>
             <LABEL>@addindex</LABEL>
             <LABEL>@addtogroup</LABEL>
@@ -194,14 +224,20 @@
             <LABEL>@bug</LABEL>
             <LABEL>@c</LABEL>
             <LABEL>@callgraph</LABEL>
+            <LABEL>@callergraph</LABEL>
             <LABEL>@category</LABEL>
             <LABEL>@class</LABEL>
             <LABEL>@code</LABEL>
+            <LABEL>@cond</LABEL>
+            <LABEL>@copybrief</LABEL>
+            <LABEL>@copydetails</LABEL>
             <LABEL>@copydoc</LABEL>
             <LABEL>@date</LABEL>
             <LABEL>@def</LABEL>
             <LABEL>@defgroup</LABEL>
             <LABEL>@deprecated</LABEL>
+            <LABEL>@details</LABEL>
+            <LABEL>@dir</LABEL>
             <LABEL>@dontinclude</LABEL>
             <LABEL>@dot</LABEL>
             <LABEL>@dotfile</LABEL>
@@ -210,28 +246,35 @@
             <LABEL>@elseif</LABEL>
             <LABEL>@em</LABEL>
             <LABEL>@endcode</LABEL>
+            <LABEL>@endcond</LABEL>
             <LABEL>@enddot</LABEL>
             <LABEL>@endhtmlonly</LABEL>
             <LABEL>@endif</LABEL>
             <LABEL>@endlatexonly</LABEL>
             <LABEL>@endlink</LABEL>
             <LABEL>@endmanonly</LABEL>
+            <LABEL>@endmsc</LABEL>
             <LABEL>@endverbatim</LABEL>
             <LABEL>@endxmlonly</LABEL>
             <LABEL>@enum</LABEL>
             <LABEL>@example</LABEL>
             <LABEL>@exception</LABEL>
+            <LABEL>@extends</LABEL>
             <LABEL>@f$</LABEL>
             <LABEL>@f[</LABEL>
             <LABEL>@f]</LABEL>
+            <LABEL>@f{</LABEL>
+            <LABEL>@f}</LABEL>
             <LABEL>@file</LABEL>
             <LABEL>@fn</LABEL>
+            <LABEL>@headerfile</LABEL>
             <LABEL>@hideinitializer</LABEL>
             <LABEL>@htmlinclude</LABEL>
             <LABEL>@htmlonly</LABEL>
             <LABEL>@if</LABEL>
             <LABEL>@ifnot</LABEL>
             <LABEL>@image</LABEL>
+            <LABEL>@implements</LABEL>
             <LABEL>@include</LABEL>
             <LABEL>@includelineno</LABEL>
             <LABEL>@ingroup</LABEL>
@@ -244,6 +287,8 @@
             <LABEL>@link</LABEL>
             <LABEL>@mainpage</LABEL>
             <LABEL>@manonly</LABEL>
+            <LABEL>@memberof</LABEL>
+            <LABEL>@msc</LABEL>
             <LABEL>@n</LABEL>
             <LABEL>@name</LABEL>
             <LABEL>@namespace</LABEL>
@@ -277,16 +322,19 @@
             <LABEL>@retval</LABEL>
             <LABEL>@sa</LABEL>
             <LABEL>@section</LABEL>
+            <LABEL>@see</LABEL>
             <LABEL>@showinitializer</LABEL>
             <LABEL>@since</LABEL>
             <LABEL>@skip</LABEL>
             <LABEL>@skipline</LABEL>
             <LABEL>@struct</LABEL>
+            <LABEL>@subpage</LABEL>
             <LABEL>@subsection</LABEL>
             <LABEL>@subsubsection</LABEL>
             <LABEL>@test</LABEL>
             <LABEL>@throw</LABEL>
             <LABEL>@todo</LABEL>
+            <LABEL>@tparam</LABEL>
             <LABEL>@typedef</LABEL>
             <LABEL>@union</LABEL>
             <LABEL>@until</LABEL>

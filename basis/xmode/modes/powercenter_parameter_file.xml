@@ -1,0 +1,37 @@
+<?xml version="1.0"?>
+<!-- PowerCenter Parameter File format, jEdit mode by Thiemo Kellner 2014 -->
+<!DOCTYPE MODE SYSTEM "xmode.dtd">
+
+<MODE>
+   <RULES IGNORE_CASE="TRUE" HIGHLIGHT_DIGITS="TRUE">
+
+      <!-- single $ after double otherwise double will be treated as single -->
+      <MARK_FOLLOWING TYPE="KEYWORD2">$$</MARK_FOLLOWING>
+      <MARK_FOLLOWING TYPE="KEYWORD1">$</MARK_FOLLOWING>
+
+      <!-- weird stuff -->
+      <SPAN TYPE="KEYWORD3" DELEGATE="EXEC" ESCAPE="\">
+         <BEGIN>[</BEGIN>
+         <END>]</END>
+      </SPAN>
+
+      <!-- Literals -->
+      <SPAN TYPE="LITERAL1" DELEGATE="LITERAL" ESCAPE="\" NO_LINE_BREAK="TRUE">
+         <BEGIN>"</BEGIN>
+         <END>"</END>
+      </SPAN>
+      <SPAN TYPE="LITERAL1" NO_LINE_BREAK="TRUE">
+         <BEGIN>'</BEGIN>
+         <END>'</END>
+      </SPAN>
+
+      <!-- Operators -->
+      <SEQ TYPE="OPERATOR">=</SEQ>
+      <!-- some of these should be marked OPERATOR -->
+      <SEQ TYPE="NULL">=</SEQ>
+
+      <!-- Comments -->
+      <EOL_SPAN_REGEXP TYPE="COMMENT2" AT_LINE_START="TRUE">^[^=]*$</EOL_SPAN_REGEXP>
+   </RULES>
+
+</MODE>

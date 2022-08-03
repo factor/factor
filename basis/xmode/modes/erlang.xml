@@ -7,15 +7,15 @@
 		<PROPERTY NAME="lineComment" VALUE="%"/>
 	</PROPS>
 
-	<RULES IGNORE_CASE="FALSE" HIGHLIGHT_DIGITS="TRUE" ESCAPE="\">
+	<RULES IGNORE_CASE="FALSE" HIGHLIGHT_DIGITS="TRUE">
 		<EOL_SPAN TYPE="COMMENT1">%</EOL_SPAN>
 
-		<SPAN TYPE="LITERAL1" NO_LINE_BREAK="FALSE">
+		<SPAN TYPE="LITERAL1" ESCAPE="\" NO_LINE_BREAK="FALSE">
 			<BEGIN>"</BEGIN>
 			<END>"</END>
 		</SPAN>
 
-		<SPAN TYPE="LITERAL1" NO_LINE_BREAK="TRUE">
+		<SPAN TYPE="LITERAL1" ESCAPE="\" NO_LINE_BREAK="TRUE">
 			<BEGIN>'</BEGIN>
 			<END>'</END>
 		</SPAN>
@@ -28,9 +28,16 @@
 		<SEQ_REGEXP HASH_CHAR="$"
 			TYPE="LITERAL3"
 			AT_WORD_START="TRUE"
-		>\$.\w*</SEQ_REGEXP>
+		>\$(\\.|.)</SEQ_REGEXP>
+
+		<SEQ_REGEXP HASH_CHAR="?"
+			TYPE="LABEL"
+			AT_WORD_START="TRUE"
+		>\?\w*</SEQ_REGEXP>
 
 		<SEQ TYPE="LITERAL3">badarg</SEQ>
+		<SEQ TYPE="LITERAL3">infinity</SEQ>
+		<SEQ TYPE="LITERAL3">undefined</SEQ>
 		<SEQ TYPE="LITERAL3">nocookie</SEQ>
 		<SEQ TYPE="LITERAL3">false</SEQ>
 		<SEQ TYPE="LITERAL3">true</SEQ>
@@ -118,6 +125,16 @@
 			TYPE="OPERATOR"
 			AT_WORD_START="TRUE"
 		>\bbnot\b</SEQ_REGEXP>
+		<!-- andalso -->
+		<SEQ_REGEXP HASH_CHAR="andalso"
+			TYPE="OPERATOR"
+			AT_WORD_START="TRUE"
+		>\bandalso\b</SEQ_REGEXP>
+		<!-- orelse -->
+		<SEQ_REGEXP HASH_CHAR="orelse"
+			TYPE="OPERATOR"
+			AT_WORD_START="TRUE"
+		>\borelse\b</SEQ_REGEXP>
 
 		<KEYWORDS>
 			<!-- keywords -->
@@ -134,6 +151,7 @@
 			<KEYWORD1>query</KEYWORD1>
 			<KEYWORD1>receive</KEYWORD1>
 			<KEYWORD1>when</KEYWORD1>
+			<KEYWORD1>try</KEYWORD1>
 
 			<!-- built-in-functions BIFs -->
 			<KEYWORD2>abs</KEYWORD2>

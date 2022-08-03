@@ -16,14 +16,14 @@
     <PROPERTY NAME="wordBreakChars" VALUE=",+-=&lt;&gt;/?^&amp;*" />
   </PROPS>
 
-  <RULES ESCAPE="\" IGNORE_CASE="TRUE" HIGHLIGHT_DIGITS="TRUE">
+  <RULES IGNORE_CASE="TRUE" HIGHLIGHT_DIGITS="TRUE">
 
-    <SPAN TYPE="LITERAL1">
+    <SPAN TYPE="LITERAL1" ESCAPE="\">
       <BEGIN>'</BEGIN>
       <END>'</END>
      </SPAN>
 
-    <SPAN TYPE="LITERAL1">
+    <SPAN TYPE="LITERAL1" ESCAPE="\">
       <BEGIN>"</BEGIN>
        <END>"</END>
      </SPAN>

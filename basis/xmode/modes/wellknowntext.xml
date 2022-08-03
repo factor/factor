@@ -1,0 +1,34 @@
+<?xml version="1.0"?>
+<!DOCTYPE MODE SYSTEM "xmode.dtd">
+<!--
+jEdit edit mode for Well Known Text (*.wkt) files
+https://en.wikipedia.org/wiki/Well-known_text_representation_of_geometry
+https://www.iso.org/standard/60343.html
+-->
+<MODE>
+    <PROPS>
+        <PROPERTY NAME="contextInsensitive" VALUE="true"/>
+    </PROPS>
+    <RULES IGNORE_CASE="FALSE" HIGHLIGHT_DIGITS="TRUE" DIGIT_RE="([\p{Digit}]+)">
+        <SEQ TYPE="OPERATOR">-</SEQ>
+        <SEQ TYPE="OPERATOR">(</SEQ>
+        <SEQ TYPE="OPERATOR">)</SEQ>
+        <KEYWORDS>
+            <KEYWORD1>POINT</KEYWORD1>
+            <KEYWORD1>LINESTRING</KEYWORD1>
+            <KEYWORD1>POLYGON</KEYWORD1>
+            <KEYWORD1>MULTIPOINT</KEYWORD1>
+            <KEYWORD1>MULTILINESTRING</KEYWORD1>
+            <KEYWORD1>MULTIPOLYGON</KEYWORD1>
+            <KEYWORD1>GEOMETRYCOLLECTION</KEYWORD1>
+            <KEYWORD1>TRIANGLE</KEYWORD1>
+            <KEYWORD1>TIN</KEYWORD1>
+            <KEYWORD1>POLYHEDRALSURFACE</KEYWORD1>
+
+            <KEYWORD2>EMPTY</KEYWORD2>
+            <KEYWORD2>M</KEYWORD2>
+            <KEYWORD2>Z</KEYWORD2>
+            <KEYWORD2>ZM</KEYWORD2>
+        </KEYWORDS>
+    </RULES>
+</MODE>

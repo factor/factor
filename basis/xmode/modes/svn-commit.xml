@@ -7,6 +7,9 @@
 -->
 
 <MODE>
+	<PROPS>
+		<PROPERTY NAME="contextInsensitive" VALUE="true" />
+	</PROPS>
 	<RULES IGNORE_CASE="TRUE" HIGHLIGHT_DIGITS="FALSE">
 		<SEQ TYPE="COMMENT1" 
 			DELEGATE="CHANGED" 

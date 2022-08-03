@@ -1,0 +1,124 @@
+<?xml version="1.0"?>
+
+<!-- @RisingSun//XML//1.0//EN________________________________________________
+
+	JEdit syntax mode for Google Protocol Buffer definitions
+
+	..........................................................................
+
+	File name		:	proto.xml
+	Description		:	JEdit syntax mode for Google Protocol Buffer definitions
+	Related links	:	<https://developers.google.com/protocol-buffers>, <http://www.jedit.org>
+
+	..........................................................................
+	Author			:	Tim Blackler                  <grepppo@users.sf.net>
+	..........................................................................
+
+	Creation date	:	18-Feb-2016
+	Last revision	:	19-April-2020
+	Revision		:	1.0
+    History			:
+						18-Feb-2016 First release
+						19-April-2020 Add a few keywords
+
+	.....................................................................  -->
+
+<!-- ________________________________________________________D O C T Y P E -->
+<!DOCTYPE MODE SYSTEM "xmode.dtd">
+
+<!-- ____________________________________________D O C U M E N T _ R O O T -->
+<MODE>
+
+	<!-- Properties_______________________________________________________ -->
+
+	<PROPS>
+		<PROPERTY NAME="commentStart" VALUE="/*" />
+		<PROPERTY NAME="commentStart" VALUE="*/" />
+		<PROPERTY NAME="lineComment" VALUE="//" />
+		<PROPERTY NAME="indentOpenBrackets" VALUE="{" />
+		<PROPERTY NAME="indentCloseBrackets" VALUE="}" />
+	</PROPS>
+
+	<!-- Rules____________________________________________________________ -->
+
+	<RULES IGNORE_CASE="FALSE" HIGHLIGHT_DIGITS="TRUE">
+
+		<!-- Comments_____________________________________________________ -->
+
+		<!-- C-like comments -->
+		<EOL_SPAN TYPE="COMMENT1">//</EOL_SPAN>
+		<SPAN TYPE="COMMENT1">
+			<BEGIN>/*</BEGIN>
+			<END>*/</END>
+		</SPAN>
+
+		<!-- Strings______________________________________________________ -->
+
+		<!-- Single quotes -->
+		<SPAN TYPE="LITERAL2" ESCAPE="\">
+			<BEGIN>"</BEGIN>
+			<END>"</END>
+		</SPAN>
+
+		<!-- Operatiors___________________________________________________ -->
+
+		<SEQ TYPE="OPERATOR">=</SEQ>
+		<SEQ TYPE="OPERATOR">{</SEQ>
+		<SEQ TYPE="OPERATOR">}</SEQ>
+		<SEQ TYPE="OPERATOR">[</SEQ>
+		<SEQ TYPE="OPERATOR">]</SEQ>
+		<SEQ TYPE="OPERATOR">(</SEQ>
+		<SEQ TYPE="OPERATOR">)</SEQ>
+
+		<!-- Keywords_____________________________________________________ -->
+
+		<KEYWORDS>
+
+			<!-- primitives -->
+			<KEYWORD1>message</KEYWORD1>
+			<KEYWORD1>enum</KEYWORD1>
+			<KEYWORD1>package</KEYWORD1>
+			<KEYWORD1>import</KEYWORD1>
+			<KEYWORD1>option</KEYWORD1>
+			<KEYWORD1>service</KEYWORD1>
+			<KEYWORD1>extend</KEYWORD1>
+			<KEYWORD1>syntax</KEYWORD1>
+			<KEYWORD1>reserved</KEYWORD1>
+			<!-- additional keywords -->
+			<KEYWORD1>public</KEYWORD1>
+			<KEYWORD1>weak</KEYWORD1>
+			<KEYWORD1>to</KEYWORD1>
+			<KEYWORD1>max</KEYWORD1>
+
+			<!--  modifiers -->
+			<KEYWORD2>required</KEYWORD2>
+			<KEYWORD2>optional</KEYWORD2>
+			<KEYWORD2>repeated</KEYWORD2>
+			<KEYWORD2>rpc</KEYWORD2>
+			<KEYWORD2>returns</KEYWORD2>
+			<KEYWORD2>oneof</KEYWORD2>
+
+			<!-- types -->
+			<KEYWORD3>double</KEYWORD3>
+			<KEYWORD3>float</KEYWORD3>
+			<KEYWORD3>int32</KEYWORD3>
+			<KEYWORD3>int64</KEYWORD3>
+			<KEYWORD3>uint32</KEYWORD3>
+			<KEYWORD3>uint64</KEYWORD3>
+			<KEYWORD3>sint32</KEYWORD3>
+			<KEYWORD3>sint64</KEYWORD3>
+			<KEYWORD3>fixed32</KEYWORD3>
+			<KEYWORD3>fixed64</KEYWORD3>
+			<KEYWORD3>sfixed32</KEYWORD3>
+			<KEYWORD3>sfixed64</KEYWORD3>
+			<KEYWORD3>bool</KEYWORD3>
+			<KEYWORD3>string</KEYWORD3>
+			<KEYWORD3>bytes</KEYWORD3>
+			<KEYWORD3>map</KEYWORD3>
+		</KEYWORDS>
+
+	</RULES>
+
+</MODE>
+
+<!-- EOF-UNIX/iso-8895-1__________________________@RisingSun//XML//1.0//EN -->

@@ -19,8 +19,8 @@
 		<PROPERTY NAME="noWordSep" VALUE="_'" />
 		<PROPERTY NAME="wordBreakChars" VALUE=",+-=&lt;&gt;/?^&amp;*" />
 	</PROPS>
-	<RULES ESCAPE="\" IGNORE_CASE="FALSE" HIGHLIGHT_DIGITS="TRUE"
-		DIGIT_RE="([\p{Digit}]|_)+" NO_WORD_SEP="'">
+	<RULES IGNORE_CASE="FALSE" HIGHLIGHT_DIGITS="TRUE"
+        DIGIT_RE="([\p{Digit}]|_|[a-fA-F])+" NO_WORD_SEP="'">
 		<!-- Comments -->
 		<SPAN TYPE="COMMENT1">
 			<BEGIN>/*</BEGIN>
@@ -29,7 +29,7 @@
 		<EOL_SPAN TYPE="COMMENT2">//</EOL_SPAN>
 
 		<!--String Literals -->
-		<SPAN TYPE="LITERAL1" NO_LINE_BREAK="FALSE">
+		<SPAN TYPE="LITERAL1" ESCAPE="\" NO_LINE_BREAK="FALSE">
 			<BEGIN>"</BEGIN>
 			<END>"</END>
 		</SPAN>
@@ -110,6 +110,7 @@
 			<KEYWORD2>`ifdef</KEYWORD2>
 			<KEYWORD2>`ifndef</KEYWORD2>
 			<KEYWORD2>`else</KEYWORD2>
+			<KEYWORD2>`elsif</KEYWORD2>
 			<KEYWORD2>`endif</KEYWORD2>
 			<KEYWORD2>`timescale</KEYWORD2>
 			<KEYWORD2>`resetall</KEYWORD2>
@@ -154,6 +155,7 @@
 			<KEYWORD3>input</KEYWORD3>
 			<KEYWORD3>output</KEYWORD3>
 			<KEYWORD3>inout</KEYWORD3>
+			<KEYWORD3>logic</KEYWORD3>
 
 			<!-- Signal Strengths -->
 			<KEYWORD3>supply0</KEYWORD3>
