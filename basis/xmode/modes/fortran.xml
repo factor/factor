@@ -2,7 +2,9 @@
 
 <!DOCTYPE MODE SYSTEM "xmode.dtd">
 <!--  FORTRAN edit mode
-      Version $Id: fortran.xml 10573 2007-09-14 02:04:59Z ezust $
+      Version 1.3
+      2007-06-21
+      suitable for jEdit 4.2final and jEdit 4.3pre9
 -->
 <!-- This is a mode for FORTRAN source files.  In general, this supports
 common features of the F90 specification.  This may however contain some
@@ -21,7 +23,8 @@ platform or vendor specific keywords (in paticular COMPAQ(Digital) FORTRAN).
          <PROPERTY NAME="lineComment"    VALUE="C" />
          
          <PROPERTY NAME="wordBreakChars" VALUE=",+-=&lt;&gt;/?^&amp;*" />
-         <PROPERTY NAME="indentNextLine" VALUE="\s*((if\s*\(.*\)\s*then|else\s*|do\s*)*)" />
+         <!--<PROPERTY NAME="indentNextLine" VALUE="\s*((if\s*\(.*\)\s*then|else\s*|do\s*)*)" />-->
+         <PROPERTY NAME="indentNextLines" VALUE="\s*((if\s*\(.*\)\s*then|else\s*|do\s*)*)" />
     </PROPS>
 
     <RULES IGNORE_CASE="TRUE" HIGHLIGHT_DIGITS="FALSE">

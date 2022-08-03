@@ -20,7 +20,7 @@ Author: Adam Sawicki
 		<PROPERTY NAME="commentEnd" VALUE="*/" />
 		<PROPERTY NAME="lineComment" VALUE="//" />
 		<PROPERTY NAME="wordBreakChars" VALUE=".,+-*/=&lt;&gt;?^&amp;[]{}" />
-		
+
 		<!-- Auto indent -->
 		<PROPERTY NAME="indentOpenBrackets" VALUE="{" />
 		<PROPERTY NAME="indentCloseBrackets" VALUE="}" />
@@ -28,33 +28,32 @@ Author: Adam Sawicki
 		<PROPERTY NAME="doubleBracketIndent" VALUE="false" />
 		<PROPERTY NAME="lineUpClosingBracket" VALUE="true" />
 	</PROPS>
-	
+
 	<RULES
-		ESCAPE="\"
 		IGNORE_CASE="FALSE"
 		HIGHLIGHT_DIGITS="TRUE"
 		DIGIT_RE="((0[xX][0-9a-fA-F]+|\d+)[uUIL]?|\d+([eE]\d*)?[hHfF]?)">
-		
+
 		<!-- C style comment -->
 		<SPAN TYPE="COMMENT1">
 			<BEGIN>/*</BEGIN>
 			<END>*/</END>
 		</SPAN>
-		
-		<SPAN TYPE="LITERAL1" NO_LINE_BREAK="TRUE">
+
+		<SPAN TYPE="LITERAL1" ESCAPE="\" NO_LINE_BREAK="TRUE">
 			<BEGIN>"</BEGIN>
 			<END>"</END>
 		</SPAN>
-		<SPAN TYPE="LITERAL1" NO_LINE_BREAK="TRUE">
+		<SPAN TYPE="LITERAL1" ESCAPE="\" NO_LINE_BREAK="TRUE">
 			<BEGIN>'</BEGIN>
 			<END>'</END>
 		</SPAN>
-		
+
 		<!-- preprocessor statements -->
 		<SEQ TYPE="KEYWORD2">##</SEQ>
 		<SEQ TYPE="KEYWORD2">#@</SEQ>
 		<EOL_SPAN TYPE="KEYWORD2" DELEGATE="Preprocessor">#</EOL_SPAN>
-		
+
 		<!-- asm -->
 		<SPAN AT_WORD_START="TRUE" EXCLUDE_MATCH="FALSE" TYPE="KEYWORD1" DELEGATE="Asm">
 			<BEGIN>asm</BEGIN>
@@ -72,10 +71,10 @@ Author: Adam Sawicki
 			<BEGIN>asm_fragment</BEGIN>
 			<END>}</END>
 		</SPAN>
-		
+
 		<!-- C style comment -->
 		<EOL_SPAN TYPE="COMMENT2">//</EOL_SPAN>
-		
+
 		<!-- Operators - multi character -->
 		<SEQ TYPE="OPERATOR">++</SEQ>
 		<SEQ TYPE="OPERATOR">--</SEQ>
@@ -113,23 +112,23 @@ Author: Adam Sawicki
 		<SEQ TYPE="OPERATOR">&lt;</SEQ>
 		<SEQ TYPE="OPERATOR">&gt;</SEQ>
 		<SEQ TYPE="OPERATOR">!</SEQ>
-		
+
 		<!-- Function calls -->
 		<MARK_PREVIOUS TYPE="FUNCTION" EXCLUDE_MATCH="TRUE">(</MARK_PREVIOUS>
-		
+
 		<!-- Swizzle operator for vectors/scalars (a.xyzw OR b.rgba), matrices (c._m00_m01 OR d._11_12) indexing -->
 		<SEQ_REGEXP TYPE="OPERATOR" HASH_CHAR=".">.(([xyzw]{1,4})|([rgba]{1,4})|((_m[0123][0123])+)|((_[1234][1234])+))(?!\p{Alnum})</SEQ_REGEXP>
-		
+
 		<!-- Atomic, but complex types -->
 		<SEQ_REGEXP TYPE="KEYWORD2" AT_WORD_START="TRUE" HASH_CHAR="bool">bool[1234](x[1234])?\b</SEQ_REGEXP>
 		<SEQ_REGEXP TYPE="KEYWORD2" AT_WORD_START="TRUE" HASH_CHAR="int">int[1234](x[1234])?\b</SEQ_REGEXP>
 		<SEQ_REGEXP TYPE="KEYWORD2" AT_WORD_START="TRUE" HASH_CHAR="half">half[1234](x[1234])?\b</SEQ_REGEXP>
 		<SEQ_REGEXP TYPE="KEYWORD2" AT_WORD_START="TRUE" HASH_CHAR="float">float[1234](x[1234])?\b</SEQ_REGEXP>
 		<SEQ_REGEXP TYPE="KEYWORD2" AT_WORD_START="TRUE" HASH_CHAR="double">double[1234](x[1234])?\b</SEQ_REGEXP>
-		
+
 		<!-- Semantics -->
 		<SEQ_REGEXP TYPE="KEYWORD1" HASH_CHAR=":">:\s*(register\s*\(\w+(\s*\,\s*\w+\s*)?\)|\w+)</SEQ_REGEXP>
-		
+
 		<KEYWORDS>
 			<!-- Control flow keywords -->
 			<KEYWORD1>discard</KEYWORD1>
@@ -140,7 +139,7 @@ Author: Adam Sawicki
 			<KEYWORD1>return</KEYWORD1>
 			<KEYWORD1>typedef</KEYWORD1>
 			<KEYWORD1>while</KEYWORD1>
-			
+
 			<!-- Other keywords -->
 			<KEYWORD1>compile</KEYWORD1>
 			<KEYWORD1>compile_fragment</KEYWORD1>
@@ -156,7 +155,7 @@ Author: Adam Sawicki
 			<KEYWORD1>decl</KEYWORD1>
 			<KEYWORD1>Decl</KEYWORD1>
 			<KEYWORD1>DECL</KEYWORD1>
-			
+
 			<!-- Atomic type keywords -->
 			<KEYWORD2>void</KEYWORD2>
 			<KEYWORD2>bool</KEYWORD2>
@@ -166,7 +165,7 @@ Author: Adam Sawicki
 			<KEYWORD2>double</KEYWORD2>
 			<KEYWORD2>vector</KEYWORD2>
 			<KEYWORD2>matrix</KEYWORD2>
-			
+
 			<!-- Object type keywords -->
 			<KEYWORD3>string</KEYWORD3>
 			<KEYWORD3>texture</KEYWORD3>
@@ -198,13 +197,13 @@ Author: Adam Sawicki
 			<KEYWORD4>column_major</KEYWORD4>
 			<KEYWORD4>in</KEYWORD4>
 			<KEYWORD4>inout</KEYWORD4>
-			<KEYWORD4>out</KEYWORD4>			
-			
+			<KEYWORD4>out</KEYWORD4>
+
 			<!-- Literals -->
 			<LITERAL1>false</LITERAL1>
 			<LITERAL1>true</LITERAL1>
 			<LITERAL1>NULL</LITERAL1>
-			
+
 			<!-- Intrinsic functions -->
 			<LITERAL2>abs</LITERAL2>
 			<LITERAL2>acos</LITERAL2>
@@ -267,7 +266,7 @@ Author: Adam Sawicki
 			<LITERAL2>tan</LITERAL2>
 			<LITERAL2>tanh</LITERAL2>
 			<LITERAL2>transpose</LITERAL2>
-			
+
 			<!-- Intrinsic functions - sampling -->
 			<LITERAL3>tex1D</LITERAL3>
 			<LITERAL3>tex1Dgrad</LITERAL3>
@@ -350,10 +349,10 @@ Author: Adam Sawicki
 			<BEGIN>/*</BEGIN>
 			<END>*/</END>
 		</SPAN>
-		
+
 		<!-- this is a hack so that #include <net/if.h> does not get the if highlighted -->
 		<EOL_SPAN TYPE="MARKUP" DELEGATE="Include">include</EOL_SPAN>
-		
+
 		<KEYWORDS>
 			<!-- Directives -->
 			<MARKUP>define</MARKUP>
@@ -367,7 +366,7 @@ Author: Adam Sawicki
 			<MARKUP>line</MARKUP>
 			<MARKUP>pragma</MARKUP>
 			<MARKUP>undef</MARKUP>
-			
+
 			<!-- Other -->
 			<LITERAL1>pack_matrix</LITERAL1>
 			<LITERAL1>warning</LITERAL1>
@@ -387,7 +386,7 @@ Author: Adam Sawicki
 		IGNORE_CASE="FALSE"
 		HIGHLIGHT_DIGITS="TRUE"
 		DIGIT_RE="((0x[[:xdigit:]]+|[[:digit:]]+)[uUIL]?|[[:digit:]]+([eE][[:digit:]]*)?[hHfF]?)">
-		
+
 		<!-- Starting... -->
 		<SEQ TYPE="OPERATOR">{</SEQ>
 
@@ -406,7 +405,7 @@ Author: Adam Sawicki
 
 		<!-- Swizzle operator -->
 		<SEQ_REGEXP TYPE="OPERATOR" HASH_CHAR=".">.(([xyzw]{1,4}))</SEQ_REGEXP>
-		
+
 		<!-- Instruction -->
 		<SEQ_REGEXP AT_WORD_START="TRUE" TYPE="FUNCTION" HASH_CHAR="abs">abs(_pp|_sat|_x2|_x4|_x8|_bx2|_d2|_d4|_d8)*\b</SEQ_REGEXP>
 		<SEQ_REGEXP AT_WORD_START="TRUE" TYPE="FUNCTION" HASH_CHAR="add">add(_pp|_sat|_x2|_x4|_x8|_bx2|_d2|_d4|_d8)*\b</SEQ_REGEXP>
@@ -462,10 +461,10 @@ Author: Adam Sawicki
 		<SEQ_REGEXP AT_WORD_START="TRUE" TYPE="FUNCTION" HASH_CHAR="sub">sub(_pp|_sat|_x2|_x4|_x8|_bx2|_d2|_d4|_d8)*\b</SEQ_REGEXP>
 		<!-- (seen in preshader -->
 		<SEQ_REGEXP AT_WORD_START="TRUE" TYPE="FUNCTION" HASH_CHAR="neg">neg(_pp|_sat|_x2|_x4|_x8|_bx2|_d2|_d4|_d8)*\b</SEQ_REGEXP>
-		
+
 		<!-- Texturing instruction -->
 		<SEQ_REGEXP AT_WORD_START="TRUE" TYPE="KEYWORD2" HASH_CHAR="tex">tex\w*</SEQ_REGEXP>
-		
+
 		<!-- Main instruction -->
 		<SEQ_REGEXP AT_WORD_START="TRUE" TYPE="KEYWORD1" HASH_CHAR="ps">ps\w*</SEQ_REGEXP>
 		<SEQ_REGEXP AT_WORD_START="TRUE" TYPE="KEYWORD1" HASH_CHAR="vs">vs\w*</SEQ_REGEXP>

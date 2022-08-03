@@ -12,14 +12,14 @@
 		<PROPERTY NAME="commentStart" VALUE="&lt;!--" />
 		<PROPERTY NAME="commentEnd" VALUE="--&gt;" />
 	</PROPS>
-    <RULES IGNORE_CASE="TRUE" HIGHLIGHT_DIGITS="TRUE">
-		
+
+	<RULES IGNORE_CASE="TRUE" HIGHLIGHT_DIGITS="TRUE">
 		<!-- SGML comment -->
 		<SPAN TYPE="COMMENT3">
 			<BEGIN>&lt;!--</BEGIN>
 			<END>--&gt;</END>
 		</SPAN>
-		
+
 		<!-- JavaScript -->
 		<SPAN TYPE="MARKUP" DELEGATE="html::JAVASCRIPT">
 			<BEGIN>&lt;SCRIPT</BEGIN>
@@ -43,16 +43,21 @@
 			<BEGIN>&amp;</BEGIN>
 			<END>;</END>
 		</SPAN>
-        
-        <!-- TPL markup start tags -->
+
+		<!-- Delegate {php}-Tags to PHP mode -->
+		<SPAN TYPE="KEYWORD3" DELEGATE="php::PHP">
+			<BEGIN>{PHP}</BEGIN>
+			<END>{/PHP}</END>
+		</SPAN>
+
+		<!-- TPL markup start tags -->
 		<SPAN TYPE="KEYWORD3" DELEGATE="TPL">
 			<BEGIN>{</BEGIN>
 			<END>}</END>
 		</SPAN>
 	</RULES>
-    
-    <RULES SET="TPL" DEFAULT="KEYWORD1" IGNORE_CASE="TRUE" HIGHLIGHT_DIGITS="TRUE">
-	
+
+	<RULES SET="TPL" DEFAULT="KEYWORD1" IGNORE_CASE="TRUE" HIGHLIGHT_DIGITS="TRUE">
 		<SPAN TYPE="LABEL">
 			<BEGIN>"</BEGIN>
 			<END>"</END>
@@ -61,19 +66,19 @@
 			<BEGIN>'</BEGIN>
 			<END>'</END>
 		</SPAN>
-		
+
 		<SEQ TYPE="OPERATOR">*</SEQ>
 
-		
+
 		<KEYWORDS>
 			<KEYWORD1>include</KEYWORD1>
-            <OPERATOR>=</OPERATOR>
-            <KEYWORD2>START</KEYWORD2>
-            <KEYWORD2>END</KEYWORD2>
+			<OPERATOR>=</OPERATOR>
+			<KEYWORD2>START</KEYWORD2>
+			<KEYWORD2>END</KEYWORD2>
 		</KEYWORDS>
 	</RULES>
-    
-    <RULES SET="TAGS" DEFAULT="MARKUP" IGNORE_CASE="TRUE" HIGHLIGHT_DIGITS="TRUE">
+
+	<RULES SET="TAGS" DEFAULT="MARKUP" IGNORE_CASE="TRUE" HIGHLIGHT_DIGITS="TRUE">
 		<SPAN TYPE="LITERAL1">
 			<BEGIN>"</BEGIN>
 			<END>"</END>

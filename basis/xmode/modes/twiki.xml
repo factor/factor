@@ -14,7 +14,7 @@
 		<PROPERTY NAME="noTabs" VALUE="true" />
 		<PROPERTY NAME="wrap" VALUE="soft" />
 	</PROPS>
-	<RULES ESCAPE="\" HIGHLIGHT_DIGITS="FALSE" IGNORE_CASE="FALSE">
+	<RULES HIGHLIGHT_DIGITS="FALSE" IGNORE_CASE="FALSE">
 
 		<!-- though not encouraged, HTML is supported -->
 		<IMPORT DELEGATE="html::MAIN"/>
@@ -23,8 +23,8 @@
 		<EOL_SPAN AT_LINE_START="TRUE" TYPE="COMMENT1">-- </EOL_SPAN>
 
 		<!-- header -->
-		<EOL_SPAN_REGEXP HASH_CHAR="---+" 
-			TYPE="KEYWORD1" 
+		<EOL_SPAN_REGEXP HASH_CHAR="---+"
+			TYPE="KEYWORD1"
 			AT_LINE_START="TRUE"
 			>-{3}[+]{1,6}(?:!!)?\s</EOL_SPAN_REGEXP>
 
@@ -95,7 +95,7 @@
 			>\s{3}\w(?:&amp;nbsp;|-|\w)*?\w+:\s</SEQ_REGEXP>
 
 		<!-- twiki variables -->
-		<SEQ_REGEXP HASH_CHAR="%" 
+		<SEQ_REGEXP HASH_CHAR="%"
 			TYPE="FUNCTION"
 			>%[A-Z]+(?:\{[^\}]+\})?%</SEQ_REGEXP>
 

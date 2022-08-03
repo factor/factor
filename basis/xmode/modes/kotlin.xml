@@ -1,0 +1,168 @@
+<?xml version="1.0"?>
+<!DOCTYPE MODE SYSTEM "xmode.dtd">
+
+<!-- Kotlin mode by Sergey Mashkov aka cy6erGn0m -->
+<MODE>
+	<PROPS>
+		<PROPERTY NAME="commentStart" VALUE="/*" />
+		<PROPERTY NAME="commentEnd" VALUE="*/" />
+		<PROPERTY NAME="lineComment" VALUE="//" />
+		<PROPERTY NAME="wordBreakChars" VALUE=",+-=&lt;&gt;/?^&amp;*" />
+
+		<!-- Auto indent -->
+		<PROPERTY NAME="indentOpenBrackets" VALUE="{[" />
+		<PROPERTY NAME="indentCloseBrackets" VALUE="]}" />
+		<PROPERTY NAME="unalignedOpenBrackets" VALUE="(" />
+		<PROPERTY NAME="unalignedCloseBrackets" VALUE=")" />
+		<PROPERTY NAME="indentNextLine"
+			VALUE="\s*(((if|while)\s*\(|else\s*|else\s+if\s*\(|for\s*\(.*\))[^{;]*)" />
+		<PROPERTY NAME="unindentThisLine"
+			VALUE="^.*(else:\s*|when.*:.*)$" />
+	</PROPS>
+
+	<RULES
+		IGNORE_CASE="FALSE"
+		HIGHLIGHT_DIGITS="TRUE"
+		DIGIT_RE="(0x[\p{XDigit}]+[lL]?|[\p{Digit}]+(e[\p{Digit}]*)?[lLdDfF]?)">
+
+		<SPAN TYPE="COMMENT3">
+			<BEGIN>/**</BEGIN>
+			<END>*/</END>
+		</SPAN>
+
+		<SPAN TYPE="COMMENT1">
+			<BEGIN>/*</BEGIN>
+			<END>*/</END>
+		</SPAN>
+
+		<SPAN TYPE="LITERAL1" NO_LINE_BREAK="TRUE" ESCAPE="\">
+			<BEGIN>"</BEGIN>
+			<END>"</END>
+		</SPAN>
+
+		<SPAN TYPE="LITERAL1" NO_LINE_BREAK="TRUE" ESCAPE="\">
+			<BEGIN>'</BEGIN>
+			<END>'</END>
+		</SPAN>
+		
+		<SPAN TYPE="LITERAL1" NO_LINE_BREAK="FALSE" ESCAPE="\">
+			<BEGIN>"""</BEGIN>
+			<END>"""</END>
+		</SPAN>
+
+		<MARK_PREVIOUS TYPE="FUNCTION" MATCH_TYPE="OPERATOR">(</MARK_PREVIOUS>
+		<SEQ TYPE="OPERATOR">)</SEQ>
+
+		<SEQ TYPE="COMMENT2">//--&gt;</SEQ>
+		<EOL_SPAN TYPE="COMMENT2">//</EOL_SPAN>
+		<SEQ_REGEXP TYPE="MARKUP" HASH_CHAR="/" AT_WORD_START="TRUE">/[^\p{Blank}]*?/</SEQ_REGEXP>
+
+		<SEQ TYPE="COMMENT1">&lt;!--</SEQ>
+
+		<SEQ TYPE="OPERATOR">-&gt;</SEQ>
+		<SEQ TYPE="OPERATOR">=</SEQ>
+		<SEQ TYPE="OPERATOR">!</SEQ>
+		<SEQ TYPE="OPERATOR">&gt;=</SEQ>
+		<SEQ TYPE="OPERATOR">&lt;=</SEQ>
+		<SEQ TYPE="OPERATOR">+</SEQ>
+		<SEQ TYPE="OPERATOR">-</SEQ>
+		<SEQ TYPE="OPERATOR">/</SEQ>
+		<SEQ TYPE="OPERATOR">*</SEQ>
+		<SEQ TYPE="OPERATOR">&gt;</SEQ>
+		<SEQ TYPE="OPERATOR">&lt;</SEQ>
+		<SEQ TYPE="OPERATOR">%</SEQ>
+		<SEQ TYPE="OPERATOR">&amp;</SEQ>
+		<SEQ TYPE="OPERATOR">|</SEQ>
+		<SEQ TYPE="OPERATOR">^</SEQ>
+		<SEQ TYPE="OPERATOR">~</SEQ>
+		<SEQ TYPE="OPERATOR">.</SEQ>
+		<SEQ TYPE="OPERATOR">}</SEQ>
+		<SEQ TYPE="OPERATOR">{</SEQ>
+		<SEQ TYPE="OPERATOR">,</SEQ>
+		<SEQ TYPE="OPERATOR">;</SEQ>
+		<SEQ TYPE="OPERATOR">]</SEQ>
+		<SEQ TYPE="OPERATOR">::</SEQ>
+		<SEQ TYPE="OPERATOR">[</SEQ>
+		<SEQ TYPE="OPERATOR">?</SEQ>
+		<MARK_PREVIOUS AT_WHITESPACE_END="TRUE"
+			MATCH_TYPE="OPERATOR"
+			TYPE="LABEL">:</MARK_PREVIOUS>
+		<SEQ TYPE="OPERATOR">:</SEQ>
+
+		<KEYWORDS>
+			<KEYWORD1>break</KEYWORD1>
+			<KEYWORD1>continue</KEYWORD1>
+			<KEYWORD1>else</KEYWORD1>
+			<KEYWORD1>for</KEYWORD1>
+			<KEYWORD1>when</KEYWORD1>
+			<KEYWORD1>fun</KEYWORD1>
+			<KEYWORD1>if</KEYWORD1>
+			<KEYWORD1>return</KEYWORD1>
+			<LITERAL2>this</LITERAL2>
+			<KEYWORD1>vararg</KEYWORD1>
+			<KEYWORD1>var</KEYWORD1>
+			<KEYWORD1>val</KEYWORD1>
+			<KEYWORD1>by</KEYWORD1>
+			<KEYWORD1>while</KEYWORD1>
+			<KEYWORD1>class</KEYWORD1>
+			<KEYWORD1>companion</KEYWORD1>
+			<KEYWORD1>trait</KEYWORD1>
+			<KEYWORD1>object</KEYWORD1>
+			<KEYWORD1>abstract</KEYWORD1>
+			<KEYWORD1>override</KEYWORD1>
+			<KEYWORD2>open</KEYWORD2>
+			<KEYWORD2>attribute</KEYWORD2>
+			<KEYWORD2>inline</KEYWORD2>
+			<KEYWORD2>data</KEYWORD2>
+			<KEYWORD2>get</KEYWORD2>
+			<KEYWORD2>set</KEYWORD2>
+			
+			<KEYWORD3>Any</KEYWORD3>
+			<KEYWORD3>Boolean</KEYWORD3>
+			<KEYWORD3>Byte</KEYWORD3>
+			<KEYWORD3>Unit</KEYWORD3>
+			<KEYWORD3>String</KEYWORD3>
+			<KEYWORD3>Int</KEYWORD3>
+			<KEYWORD3>Short</KEYWORD3>
+			<KEYWORD3>Long</KEYWORD3>
+			<KEYWORD3>Double</KEYWORD3>
+			<KEYWORD3>Float</KEYWORD3>
+			<KEYWORD3>Char</KEYWORD3>
+			<KEYWORD3>Array</KEYWORD3>
+			
+			<KEYWORD1>catch</KEYWORD1>
+			<KEYWORD1>finally</KEYWORD1>
+
+			<KEYWORD1>do</KEYWORD1>
+			<KEYWORD1>enum</KEYWORD1>
+			<KEYWORD1>constructor</KEYWORD1>
+			<KEYWORD3>init</KEYWORD3>
+			<KEYWORD1>typealias</KEYWORD1>
+
+			<KEYWORD2>package</KEYWORD2>
+			<KEYWORD2>import</KEYWORD2>
+			<KEYWORD1>is</KEYWORD1>
+			<KEYWORD2>it</KEYWORD2>
+			<KEYWORD1>as</KEYWORD1>
+			<KEYWORD1>public</KEYWORD1>
+			<KEYWORD1>internal</KEYWORD1>
+			<KEYWORD1>protected</KEYWORD1>
+			<KEYWORD1>private</KEYWORD1>
+			<KEYWORD1>inner</KEYWORD1>
+			<KEYWORD1>super</KEYWORD1>
+
+			<KEYWORD1>throw</KEYWORD1>
+			<KEYWORD1>throws</KEYWORD1>
+			<KEYWORD1>transient</KEYWORD1>
+			<KEYWORD1>try</KEYWORD1>
+			<KEYWORD1>volatile</KEYWORD1>
+
+			<LITERAL2>null</LITERAL2>
+			<LITERAL2>false</LITERAL2>
+			<LITERAL2>true</LITERAL2>
+			
+			<KEYWORD1>in</KEYWORD1>
+			<KEYWORD1>out</KEYWORD1>
+		</KEYWORDS>
+	</RULES>
+</MODE>

@@ -27,9 +27,13 @@
                         <END>*/</END>
                 </SPAN>
                 <EOL_SPAN TYPE="COMMENT1">//</EOL_SPAN>
-                <SPAN TYPE="LITERAL1">
+                <SPAN TYPE="LITERAL1" ESCAPE="\">
                         <BEGIN>"</BEGIN>
                         <END>"</END>
+                </SPAN>
+                <SPAN TYPE="LITERAL1" ESCAPE="\">
+                        <BEGIN>'</BEGIN>
+                        <END>'</END>
                 </SPAN>
                 <SEQ TYPE="OPERATOR">|</SEQ>
                 <SEQ TYPE="OPERATOR">:</SEQ>
