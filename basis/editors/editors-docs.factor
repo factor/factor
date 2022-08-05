@@ -9,7 +9,7 @@ ARTICLE: "editor" "Editor integration"
 { $code "USE: editors.emacs" }
 "If you intend to always use the same editor, it helps to have it load during stage 2 bootstrap. Place the code to load and possibly configure it in the " { $link ".factor-boot-rc" } "."
 $nl
-"Editor integration vocabularies store a class or tuple in a global variable when loaded:"
+"Editor integration vocabularies store an object in a global variable when loaded:"
 { $subsections editor-class }
 "If a syntax error was thrown while loading a source file, you can jump to the location of the error in your editor:"
 { $subsections :edit } ;

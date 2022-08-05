@@ -5,9 +5,12 @@ io.pathnames io.standard-paths kernel namespaces system
 tools.which ;
 IN: editors.visual-studio-codium
 
-TUPLE: visual-studio-codium < visual-studio-code ;
+SINGLETON: visual-studio-codium
 
-editor-class [ T{ visual-studio-codium } ] initialize
+INSTANCE: visual-studio-codium visual-studio-code-base
+
+editor-class get-global dup [ visual-studio-code? not ] when
+[ visual-studio-codium editor-class set-global ] unless
 
 M: visual-studio-codium find-visual-studio-code-path
     os {
