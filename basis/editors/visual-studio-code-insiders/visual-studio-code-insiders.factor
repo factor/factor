@@ -5,9 +5,12 @@ io.pathnames io.standard-paths kernel namespaces system
 tools.which ;
 IN: editors.visual-studio-code-insiders
 
-TUPLE: visual-studio-code-insiders < visual-studio-code ;
+SINGLETON: visual-studio-code-insiders
 
-editor-class [ T{ visual-studio-code-insiders } ] initialize
+INSTANCE: visual-studio-code-insiders visual-studio-code-base
+
+editor-class get-global dup [ visual-studio-code? not ] when
+[ visual-studio-code-insiders editor-class set-global ] unless
 
 M: visual-studio-code-insiders find-visual-studio-code-path
     os {
