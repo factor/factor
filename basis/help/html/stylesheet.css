@@ -41,7 +41,7 @@ tr:hover {
     background-color: #f5f5f5;
 }
 
-.navbar {
+nav {
     border-bottom: 1px solid #ccc;
     background-color: #f5f5f5;
 }
@@ -70,7 +70,7 @@ tr:hover {
     height: 16px;
 }
 
-.footer {
+footer {
     margin-top: 15px;
     border-top: 1px dashed #ccc;
     color: #666;
@@ -87,7 +87,7 @@ tr:hover {
         width: 100px;
     }
 
-    .navbar img {
+    nav img {
         display: none;
     }
 }
@@ -107,12 +107,12 @@ tr:hover {
         color: #8ab4f8;
     }
 
-    .navbar {
+    nav {
         background-color: #373e48;
         border-bottom: 1px solid #666;
     }
 
-    .footer {
+    footer {
         border-top: 1px dashed #666;
         color: #999;
     }
