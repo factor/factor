@@ -2,9 +2,12 @@ USING: editors editors.vim io.pathnames io.standard-paths kernel
 namespaces ;
 IN: editors.macvim
 
-TUPLE: macvim < vim ;
+SINGLETON: macvim
 
-editor-class [ T{ macvim } ] initialize
+INSTANCE: macvim vim-base
+
+editor-class get-global dup [ vim? not ] when
+[ macvim editor-class set-global ] unless
 
 : find-macvim-bundle-path ( -- path/f )
     "org.vim.MacVim" find-native-bundle [
