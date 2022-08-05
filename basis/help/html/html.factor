@@ -73,16 +73,28 @@ M: pathname url-of
     swap "\n" glue [XML <style><-></style> XML] ;
 
 : help-meta ( -- xml )
-    [XML <meta
+    [XML
+        <meta
             name="viewport"
             content="width=device-width, initial-scale=1"
             charset="utf-8"
-        /> XML] ;
+        />
+        <meta
+            name="theme-color"
+            content="#f5f5f5"
+            media="(prefers-color-scheme: light)"
+        />
+        <meta
+            name="theme-color"
+            content="#373e48"
+            media="(prefers-color-scheme: dark)"
+        />
+    XML] ;
 
-: help-navbar ( -- xml )
+: help-nav ( -- xml )
     "conventions" >link topic>filename
     [XML
-        <div class="navbar">
+        <nav>
             <div class="navrow">
                 <a href="https://factorcode.org">
                 <img src="favicon.ico" width="24" height="24" />
@@ -94,13 +106,13 @@ M: pathname url-of
                     <input type="submit" value="Go"/>
                 </form>
             </div>
-        </div>
+        </nav>
      XML] ;
 
 : help-footer ( -- xml )
     version-info "\n" split1 drop
     [XML
-        <div class="footer">
+        <footer>
         <p>
         This documentation was generated offline from a
         <code>load-all</code> image.  If you want, you can also
@@ -110,7 +122,7 @@ M: pathname url-of
         for more information.
         </p>
         <p><-></p>
-        </div>
+        </footer>
     XML] ;
 
 : bijective-base26 ( n -- name )
@@ -240,7 +252,7 @@ M: pathname url-of
         [ print-topic ] with-html-writer
         css-styles-to-classes cache-images
         "resource:extra/websites/factorcode/favicon.ico" dup file-name ?copy-file
-        [ help-stylesheet help-meta prepend help-navbar ] dip help-footer
+        [ help-stylesheet help-meta prepend help-nav ] dip help-footer
         [XML <-><div class="page"><-><-></div> XML]
     ] bi simple-page ;
 
