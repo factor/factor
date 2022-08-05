@@ -1,9 +1,11 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
+
 USING: accessors ascii assocs combinators
-combinators.short-circuit kernel make math namespaces regexp
-sequences strings xmode.marker.state xmode.rules xmode.tokens
-xmode.utilities ;
+combinators.short-circuit formatting kernel make math namespaces
+regexp regexp.parser sequences splitting strings
+xmode.marker.state xmode.rules xmode.tokens xmode.utilities ;
+
 IN: xmode.marker
 
 ! Next two words copied from parser-combinators
@@ -72,22 +74,81 @@ M: rule match-position drop position get ;
 : rest-of-line ( -- str )
     line get position get tail-slice ;
 
+: match-start ( string regexp -- slice/f )
+    first-match dup [ dup from>> 0 = [ drop f ] unless ] when ;
+
 GENERIC: text-matches? ( string text -- match-count/f )
 
 M: f text-matches?
     2drop f ;
 
 M: string-matcher text-matches?
-    [
-        [ string>> ] [ ignore-case?>> ] bi string-head?
-    ] keep string>> length and ;
+    [ string>> ] [ ignore-case?>> ] bi
+    [ string-head? ] keepd length and ;
 
 M: regexp text-matches?
-    [ >string ] dip first-match dup [ to>> ] when ;
+    [ >string ] dip match-start dup [ to>> ] when ;
 
-: rule-start-matches? ( rule -- match-count/f )
-    [ start>> dup ] keep can-match-here? [
-        rest-of-line swap text>> text-matches?
+<PRIVATE
+
+! XXX: Terrible inefficient regexp match group support
+
+: #match-groups ( regexp -- n/f )
+    raw>> [ CHAR: ( = ] count [ f ] when-zero ;
+
+: nth-index ( n obj seq -- i )
+    [ = dup [ drop 1 - dup 0 < ] when ] with find drop nip ;
+
+: match-group-regexp ( regexp n -- skip-regexp match-regexp )
+    [ [ options>> options>string ] [ raw>> ] bi ] dip
+    CHAR: ( pick nth-index cut CHAR: ) over index 1 + head
+    rot '[ _ <optioned-regexp> ] bi@ ;
+
+: skip-first-match ( match regexp -- tailseq )
+    first-match [ seq>> ] [ to>> ] bi tail ;
+
+: nth-match ( match regexp n -- slice/f )
+    match-group-regexp [ skip-first-match ] [ first-match ] bi* ;
+
+: update-match-group ( str match regexp n -- str' )
+    [ nth-match ] [ CHAR: 1 + "$%c" sprintf ] bi swap replace ;
+
+: update-match-groups ( str match regexp -- str' )
+    [ >string ] dip
+    dup #match-groups [ update-match-group ] 2with each-integer ;
+
+GENERIC: fixup-end ( match regexp end -- end' )
+
+M: string-matcher fixup-end
+    [ string>> -rot update-match-groups ]
+    [ ignore-case?>> ] bi <string-matcher> ;
+
+M: regexp fixup-end
+    [ raw>> [ -rot update-match-groups ] keep swap ]
+    [ options>> options>string ] bi <optioned-regexp> {
+        [ parse-tree>> ] [ options>> ] [ dfa>> ] [ next-match>> ]
+    } cleave regexp boa ;
+
+: fixup-end? ( text -- ? )
+    { [ regexp? ] [ #match-groups ] } 1&& ;
+
+: fixup-end/text-matches? ( string regexp rule -- match-count/f )
+    [ >string ] 2dip [ [ match-start dup ] keep ] dip pick [
+        end>> [ [ fixup-end ] change-text drop ] [ 2drop ] if*
+    ] [
+        3drop
+    ] if dup [ to>> ] when ;
+
+PRIVATE>
+
+:: rule-start-matches? ( rule -- match-count/f )
+    rule start>> dup rule can-match-here? [
+        rest-of-line swap text>>
+        dup fixup-end? [
+            rule fixup-end/text-matches?
+        ] [
+            text-matches?
+        ] if
     ] [
         drop f
     ] if ;
@@ -128,17 +189,16 @@ GENERIC: handle-rule-end ( match-count rule -- )
     ] ?if ;
 
 : check-escape-rule ( rule -- ? )
-    no-escape?>> [ f ] [
-        find-escape-rule dup [
-            dup rule-start-matches? [
-                swap handle-rule-start
-                delegate-end-escaped? toggle
-                t
-            ] [
-                drop f
-            ] if*
-        ] when
-    ] if ;
+    escape-rule>> [ find-escape-rule ] unless*
+    dup [
+        dup rule-start-matches? [
+            swap handle-rule-start
+            delegate-end-escaped? toggle
+            t
+        ] [
+            drop f
+        ] if*
+    ] when ;
 
 : check-every-rule ( -- ? )
     current-char current-rule-set get-rules

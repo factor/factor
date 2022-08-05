@@ -37,13 +37,13 @@ xmode.marker tools.test kernel ;
 
 {
     {
-        T{ token f "//" COMMENT2 }
-        T{ token f " " COMMENT2 }
-        T{ token f "hello" COMMENT2 }
-        T{ token f " " COMMENT2 }
-        T{ token f "world" COMMENT2 }
+        T{ token f "#" COMMENT1 }
+        T{ token f " " COMMENT1 }
+        T{ token f "hello" COMMENT1 }
+        T{ token f " " COMMENT1 }
+        T{ token f "world" COMMENT1 }
     }
-} [ f "// hello world" "java" load-mode tokenize-line nip ] unit-test
+} [ f "# hello world" "python" load-mode tokenize-line nip ] unit-test
 
 
 {

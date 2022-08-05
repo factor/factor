@@ -36,8 +36,7 @@ SYNTAX: RULE:
     [ "NAME" attr ] [ "VALUE" attr ] bi ;
 
 : parse-props-tag ( tag -- assoc )
-    children-tags
-    [ parse-prop-tag ] H{ } map>assoc ;
+    children-tags [ parse-prop-tag ] H{ } map>assoc ;
 
 : position-attrs ( tag -- at-line-start? at-whitespace-end? at-word-start? )
     ! XXX Wrong logic!
@@ -63,16 +62,25 @@ SYNTAX: RULE:
 : delegate-attr ( -- )
     { "DELEGATE" f delegate<< } , ;
 
+! XXX: check HASH_CHAR for full prefix, not just first character
+
+: char<< ( value object -- )
+    [ ?first ] dip chars<< ;
+
 : regexp-attr ( -- )
-    { "HASH_CHAR" f chars<< } , ;
+    { "HASH_CHAR" f char<< } ,
+    { "HASH_CHARS" f chars<< } , ;
 
 : match-type-attr ( -- )
     { "MATCH_TYPE" string>match-type match-token<< } , ;
 
+: string>escape ( str -- escape/f )
+    [ f ] [ <escape-rule> ] if-empty ;
+
 : span-attrs ( -- )
     { "NO_LINE_BREAK" string>boolean no-line-break?<< } ,
     { "NO_WORD_BREAK" string>boolean no-word-break?<< } ,
-    { "NO_ESCAPE" string>boolean no-escape?<< } , ;
+    { "ESCAPE" string>escape escape-rule<< } , ;
 
 : literal-start ( -- )
     [ parse-literal-matcher >>start drop ] , ;
@@ -83,22 +91,30 @@ SYNTAX: RULE:
 : literal-end ( -- )
     [ parse-literal-matcher >>end drop ] , ;
 
-! SPAN's children
 TAGS: parse-begin/end-tag ( rule tag -- )
 
 TAG: BEGIN parse-begin/end-tag
-    ! XXX
     parse-literal-matcher >>start drop ;
 
 TAG: END parse-begin/end-tag
-    ! XXX
     parse-literal-matcher >>end drop ;
 
 : parse-begin/end-tags ( -- )
-    [
-        ! XXX: handle position attrs on span tag itself
-        children-tags [ parse-begin/end-tag ] with each
-    ] , ;
+    [ children-tags [ parse-begin/end-tag ] with each ] , ;
+
+TAGS: parse-regexp-begin/end-tag ( rule tag -- )
+
+TAG: BEGIN parse-regexp-begin/end-tag
+    parse-regexp-matcher >>start drop ;
+
+! XXX: END AT_WHITESPACE_END="TRUE"?
+
+TAG: END parse-regexp-begin/end-tag
+    dup "REGEXP" attr string>boolean
+    [ parse-regexp-matcher ] [ parse-literal-matcher ] if >>end drop ;
+
+: parse-regexp-begin/end-tags ( -- )
+    [ children-tags [ parse-regexp-begin/end-tag ] with each ] , ;
 
 : init-span-tag ( -- ) [ drop init-span ] , ;
 
