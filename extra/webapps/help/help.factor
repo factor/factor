@@ -33,7 +33,7 @@ TUPLE: help-webapp < dispatcher ;
                     [ vocab-apropos ?links "vocabs" set-value ] tri
                 ] with-directory
             ] unless-empty not "empty" set-value
-            help-navbar "navbar" set-value
+            help-nav "nav" set-value
 
             { help-webapp "search" } <chloe-content>
         ] >>display

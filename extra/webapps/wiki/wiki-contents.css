@@ -9,7 +9,7 @@
     margin-left: 200px;
 }
 
-.navbar img {
+nav img {
     margin: -15px;
     margin-top: -19px;
     margin-right: 0px;
@@ -31,7 +31,7 @@
         margin-left: 0;
     }
 
-    .navbar img {
+    nav img {
         display: inline;
     }
 }

@@ -51,7 +51,8 @@ a:hover, .link:hover { text-decoration: underline; }
 .inline {
     display: inline;
 }
-.navbar {
+
+nav {
     border-bottom: 1px solid #ccc;
     background-color: #f5f5f5;
 }
@@ -98,11 +99,11 @@ a:hover, .link:hover { text-decoration: underline; }
         color: #8ab4f8;
     }
 
-    .page .navbar {
+    .page nav {
         border-top: 1px solid #666;
     }
 
-    .navbar {
+    nav {
         background-color: #373e48;
         border-bottom: 1px solid #666;
     }
