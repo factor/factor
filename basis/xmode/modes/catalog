@@ -155,6 +155,9 @@
 
 <MODE NAME="django"		FILE="django.xml"/>
 
+<MODE NAME="dockerfile"		FILE="dockerfile.xml"
+        FILE_NAME_GLOB="Dockerfile" />
+
 <MODE NAME="dot"		FILE="dot.xml"
         FILE_NAME_GLOB="*.dot" />
 
