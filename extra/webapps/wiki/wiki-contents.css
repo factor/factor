@@ -1,12 +1,14 @@
 #left {
     float: left;
     width: 200px;
+    z-index: 99;
     border-right: 1px solid #ccc;
     background: #f3f2ea;
 }
 
 #right {
     margin-left: 200px;
+    width: calc(100% - 200px);
 }
 
 nav img {
@@ -18,6 +20,12 @@ nav img {
     padding-bottom: 11px;
     vertical-align: middle;
     display: none;
+}
+
+.page nav {
+    position: relative;
+    width: calc(100vw - 200px);
+    left: 0;
 }
 
 @media screen and (max-width: 600px) {
@@ -33,6 +41,10 @@ nav img {
 
     nav img {
         display: inline;
+    }
+
+    .page nav {
+        width: 100vw;
     }
 }
 
