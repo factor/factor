@@ -22,6 +22,15 @@ nav img {
     display: none;
 }
 
+.navrow {
+    left: 0;
+}
+
+.page {
+    max-width: 800px;
+    left: 0;
+}
+
 .page nav {
     position: relative;
     width: calc(100vw - 200px);
