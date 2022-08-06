@@ -50,11 +50,10 @@ SYMBOL: title
 SYMBOL: style
 
 : add-style ( string -- )
-    "\n" style get push-all
-         style get push-all ;
+    style get push ;
 
 : get-style ( -- string )
-    style get >string ;
+    style get <reversed> "\n" join ;
 
 : write-style ( -- )
     get-style write ;
@@ -62,11 +61,10 @@ SYMBOL: style
 SYMBOL: script
 
 : add-script ( string -- )
-    "\n" script get push-all
-         script get push-all ;
+    script get push ;
 
 : get-script ( -- string )
-    script get >string ;
+    script get <reversed> "\n" join ;
 
 : write-script ( -- )
     get-script write ;
@@ -115,8 +113,8 @@ M: f call-template* drop call-next-template ;
 : with-boilerplate ( child master -- )
     [
         title [ [ <box> ] unless* ] change
-        style [ [ SBUF" " clone ] unless* ] change
-        script [ [ SBUF" " clone ] unless* ] change
+        style [ [ V{ } clone ] unless* ] change
+        script [ [ V{ } clone ] unless* ] change
         meta [ [ V{ } clone ] unless* ] change
         atom-feeds [ V{ } like ] change
 
