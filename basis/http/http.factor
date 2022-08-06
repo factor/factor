@@ -173,7 +173,7 @@ TUPLE: request
 : add-modern-headers ( response -- response )
     "max-age=63072000; includeSubDomains; preload" "Strict-Transport-Security" set-header
     "nosniff" "X-Content-Type-Options" set-header
-    "default-src https: 'unsafe-inline'; frame-ancestors 'none'; object-src 'none'" "Content-Security-Policy" set-header
+    "default-src https: 'unsafe-inline'; frame-ancestors 'none'; object-src 'none'; img-src 'self' data:;" "Content-Security-Policy" set-header
     "DENY" "X-Frame-Options" set-header
     "1; mode=block" "X-XSS-Protection" set-header ;
 
