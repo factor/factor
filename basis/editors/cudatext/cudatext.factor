@@ -1,6 +1,5 @@
 USING: editors io.pathnames io.standard-paths kernel make
 math.parser namespaces sequences system ;
-USING: editors ;
 
 IN: editors.cudatext
 
