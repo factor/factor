@@ -294,3 +294,5 @@ tools.test vectors vocabs ;
 { { } } [
     { } [ nip ] map-with-previous
 ] unit-test
+
+{ { -1 2 -3 4 -5 } } [ { 1 2 3 4 5 } [ odd? ] [ neg ] map-if ] unit-test
