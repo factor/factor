@@ -8,9 +8,11 @@ IN: editors.visual-studio-code
 ! Command line arguments
 ! https://code.visualstudio.com/docs/editor/command-line
 
+MIXIN: visual-studio-code-base
+
 SINGLETON: visual-studio-code
 
-MIXIN: visual-studio-code-base
+INSTANCE: visual-studio-code visual-studio-code-base
 
 editor-class [ visual-studio-code ] initialize
 
