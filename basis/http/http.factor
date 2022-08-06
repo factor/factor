@@ -195,7 +195,7 @@ TUPLE: response
         "close" "Connection" set-header
         now timestamp>http-string "Date" set-header
         "Factor http.server" "Server" set-header
-        add-modern-headers
+        ! XXX: add-modern-headers
         utf8 >>content-encoding
         V{ } clone >>cookies ;
 
