@@ -1,16 +1,3 @@
-#container {
-    max-width: 1000px;
-}
-
-#left {
-    width: 0;
-    z-index: 99;
-}
-
-#right {
-    max-width: 800px;
-}
-
 .comparison th {
     border-width: 1px;
     border-color: #666;
@@ -70,6 +57,7 @@
     padding-left: 15px;
     padding-right: 15px;
     padding-bottom: 15px;
+    max-width: 800px;
 }
 
 .page nav {
@@ -123,7 +111,7 @@
     border-width: 1px 1px 0 0;
 }
 
-.footer {
+footer {
     padding-left: 15px;
     font-size: smaller;
 }
