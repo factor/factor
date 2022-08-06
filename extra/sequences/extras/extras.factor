@@ -725,7 +725,7 @@ PRIVATE>
 
 : extract! ( ... seq quot: ( ... elt -- ... ? ) -- ... seq )
     [ dup ] compose over [ length ] keep new-resizable
-    [ [ push-if ] 2curry reject! ] keep swap like ; inline
+    [ [ push-when ] 2curry reject! ] keep swap like ; inline
 
 : find-pred-loop ( ... i n seq quot: ( ... elt -- ... calc ? ) -- ... calc/f i/f elt/f )
     2pick < [

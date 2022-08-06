@@ -57,7 +57,7 @@ PRIVATE>
 
 : (primes-between) ( low high -- seq )
     [ <primes-range> ] [ <primes-vector> ] 2bi
-    [ '[ [ prime? ] _ push-if ] each ] keep ;
+    [ '[ [ prime? ] _ push-when ] each ] keep ;
 
 PRIVATE>
 

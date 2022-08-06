@@ -38,7 +38,7 @@ IN: io.crlf
     input-stream get stream-read1-ignoring-crlf ;
 
 : push-ignoring-crlf ( elt seq -- )
-    [ "\r\n" member? not ] swap push-if ;
+    [ "\r\n" member? not ] swap push-when ;
 
 : push-all-ignoring-crlf ( src dst -- )
     [ push-ignoring-crlf ] curry each ;

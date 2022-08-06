@@ -35,7 +35,7 @@ ERROR: check-bit-set-failed ;
     dup bit-set? [ check-bit-set-failed ] unless ; inline
 
 : bit-set-map ( seq1 seq2 quot -- seq )
-    [ drop [ length ] bi@ [ assert= ] keep ]
+    [ drop 2length [ assert= ] keep ]
     [ [ [ underlying>> ] bi@ ] dip 2map ] 3bi
     bit-array boa ; inline
 
