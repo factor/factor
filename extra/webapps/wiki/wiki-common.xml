@@ -37,7 +37,7 @@
         <div class="navrow">
 
             <t:if t:value="contents">
-                <img id="menu" onclick="toggleSidebar()" src="data:image/svg+xml;utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink' width='24' height='24' viewBox='0 0 100 100' fill='rgb(0,0,0)'%3E%3Crect x='10' y='20' width='80' height='12' rx='6' /%3E%3Crect x='10' y='44' width='80' height='12' rx='6' /%3E%3Crect x='10' y='68' width='80' height='12' rx='6' /%3E%3C/svg>" />
+                <img id="menu" onclick="toggleSidebar()" src="data:image/svg+xml;utf8,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 xmlns:xlink=%27http://www.w3.org/1999/xlink%27 width=%2724%27 height=%2724%27 viewBox=%270 0 100 100%27 fill=%27rgb(0,0,0)%27%3E%3Crect x=%2710%27 y=%2720%27 width=%2780%27 height=%2712%27 rx=%276%27 /%3E%3Crect x=%2710%27 y=%2744%27 width=%2780%27 height=%2712%27 rx=%276%27 /%3E%3Crect x=%2710%27 y=%2768%27 width=%2780%27 height=%2712%27 rx=%276%27 /%3E%3C/svg>" />
             </t:if>
 
             <t:a t:href="$wiki">Front Page</t:a>
