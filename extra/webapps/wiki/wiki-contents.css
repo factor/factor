@@ -39,7 +39,7 @@ nav img {
 
 /* Dark mode */
 @media (prefers-color-scheme: dark) {
-    .navbar img {
+    nav img {
         filter: invert(80%);
     }
 
