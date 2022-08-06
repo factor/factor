@@ -15,6 +15,12 @@ GENERIC: new-resizable ( len seq -- newseq ) flushable
 GENERIC: like ( seq exemplar -- newseq ) flushable
 GENERIC: clone-like ( seq exemplar -- newseq ) flushable
 
+: new-sequence-like ( len-exemplar type-exemplar -- newseq )
+    [ length ] dip new-sequence ; inline
+
+: new-resizable-like ( len-exemplar type-exemplar -- newseq )
+    [ length ] dip new-resizable ; inline
+
 : new-like ( len exemplar quot -- seq )
     over [ [ new-sequence ] dip call ] dip like ; inline
 
@@ -25,6 +31,9 @@ GENERIC: shorten ( n seq -- )
 
 M: sequence lengthen 2dup length > [ set-length ] [ 2drop ] if ; inline
 M: sequence shorten 2dup length < [ set-length ] [ 2drop ] if ; inline
+
+: 2length ( seq1 seq2 -- n1 n2 ) [ length ] bi@ ; inline
+: 3length ( seq1 seq2 seq3 -- n1 n2 n3 ) [ length ] tri@ ; inline
 
 : empty? ( seq -- ? ) length 0 = ; inline
 
@@ -355,7 +364,7 @@ PRIVATE>
 : copy ( src i dst -- ) check-copy copy-unsafe ; inline
 
 M: sequence clone-like
-    [ dup length ] dip new-sequence [ 0 swap copy-unsafe ] keep ; inline
+    dupd new-sequence-like [ 0 swap copy-unsafe ] keep ; inline
 
 M: immutable-sequence clone-like like ; inline
 
@@ -371,7 +380,7 @@ M: immutable-sequence clone-like like ; inline
 PRIVATE>
 
 : append-as ( seq1 seq2 exemplar -- newseq )
-    [ 2dup [ length ] bi@ + ] dip
+    [ 2dup 2length + ] dip
     [ (append) ] new-like ; inline
 
 : append ( seq1 seq2 -- newseq ) over append-as ;
@@ -381,8 +390,8 @@ PRIVATE>
 : prepend ( seq1 seq2 -- newseq ) over prepend-as ;
 
 : 3append-as ( seq1 seq2 seq3 exemplar -- newseq )
-    [ 3dup [ length ] tri@ + + ] dip [
-        [ [ 2over [ length ] bi@ + ] dip copy-unsafe ]
+    [ 3dup 3length + + ] dip [
+        [ [ 2over 2length + ] dip copy-unsafe ]
         [ (append) ] bi
     ] new-like ; inline
 
@@ -587,13 +596,19 @@ PRIVATE>
 : all? ( ... seq quot: ( ... elt -- ... ? ) -- ... ? )
     sequence-operator all-integers-from? ; inline
 
-: push-if ( ..a elt quot: ( ..a elt -- ..b ? ) accum -- ..b )
+: push-when ( ..a elt quot: ( ..a elt -- ..b ? ) accum -- ..b )
     [ keep ] dip rot [ push ] [ 2drop ] if ; inline
+
+: keep-push-when ( ..a elt quot: ( ..a elt -- ..b ? ) accum -- ..b )
+    [ keep ] dip rot [ push ] [ 2drop ] if ; inline
+
+: call-push-when ( ..a elt quot: ( ..a elt -- ..b elt' ? ) accum -- ..b )
+    [ call ] dip swap [ push ] [ 2drop ] if ; inline
 
 <PRIVATE
 
 : (selector-as) ( quot length exemplar -- selector accum )
-    new-resizable [ [ push-if ] 2curry ] keep ; inline
+    new-resizable [ [ push-when ] 2curry ] keep ; inline
 
 PRIVATE>
 
@@ -625,10 +640,10 @@ PRIVATE>
     over [ 2selector [ each ] 2dip ] dip [ like ] curry bi@ ; inline
 
 : collector-for-as ( seq quot exemplar -- seq quot' vec )
-    [ over length ] dip new-resizable [ [ push ] curry compose ] keep ; inline
+    overd new-resizable-like [ [ push ] curry compose ] keep ; inline
 
 : collector-as ( quot exemplar -- quot' vec )
-    [ length ] keep new-resizable [ [ push ] curry compose ] keep ; inline
+    dup new-resizable-like [ [ push ] curry compose ] keep ; inline
 
 : collector-for ( seq quot -- seq quot' vec )
     V{ } collector-for-as ; inline

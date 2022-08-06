@@ -568,7 +568,7 @@ HELP: all?
 { $values { "seq" sequence } { "quot" { $quotation ( ... elt -- ... ? ) } } { "?" boolean } }
 { $description "Tests if all elements in the sequence satisfy the predicate by checking each element in turn. Given an empty sequence, vacuously outputs " { $link t } "." } ;
 
-HELP: push-if
+HELP: push-when
 { $values { "elt" object } { "quot" { $quotation ( ..a elt -- ..b ? ) } } { "accum" "a resizable mutable sequence" } }
 { $description "Adds the element at the end of the sequence if the quotation yields a true value." }
 { $notes "This word is a factor of " { $link filter } "." } ;
@@ -696,7 +696,7 @@ HELP: replace-slice
 { $description "Replaces a range of elements beginning at index " { $snippet "from" } " and ending before index " { $snippet "to" } " with a new sequence." }
 { $errors "Throws an error if " { $snippet "new" } " contains elements whose types are not permissible in " { $snippet "seq" } "." } ;
 
-{ push push-either push-if pop pop* prefix suffix suffix! } related-words
+{ push push-either push-when pop pop* prefix suffix suffix! } related-words
 
 HELP: suffix
 { $values { "seq" sequence } { "elt" object } { "newseq" sequence } }

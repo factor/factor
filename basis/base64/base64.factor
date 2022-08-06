@@ -82,7 +82,7 @@ PRIVATE>
 
 : read-ignoring ( n ignoring stream -- accum )
     pick <sbuf> [
-        '[ _ _ read1-ignoring [ ] _ push-if ] times
+        '[ _ _ read1-ignoring [ ] _ push-when ] times
     ] keep ;
 
 : decode4 ( a b c d -- x y z )
