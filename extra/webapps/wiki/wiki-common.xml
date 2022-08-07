@@ -10,7 +10,7 @@
 
     <nav>
         <t:if t:value="contents">
-            <img id="menu" onclick="toggleSidebar()" src="data:image/svg+xml;utf8,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 xmlns:xlink=%27http://www.w3.org/1999/xlink%27 width=%2724%27 height=%2724%27 viewBox=%270 0 100 100%27 fill=%27rgb(0,0,0)%27%3E%3Crect x=%2710%27 y=%2720%27 width=%2780%27 height=%2712%27 rx=%276%27 /%3E%3Crect x=%2710%27 y=%2744%27 width=%2780%27 height=%2712%27 rx=%276%27 /%3E%3Crect x=%2710%27 y=%2768%27 width=%2780%27 height=%2712%27 rx=%276%27 /%3E%3C/svg>" />
+            <img id="menu" onclick="toggleSidebar()" src="data:image/svg+xml;utf8,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 xmlns:xlink=%27http://www.w3.org/1999/xlink%27 width=%2724%27 height=%2716%27 viewBox=%270 0 120 100%27 fill=%27rgb(0,0,0)%27%3E%3Crect y=%270%27 width=%27120%27 height=%2720%27 rx=%2710%27 /%3E%3Crect y=%2740%27 width=%27120%27 height=%2720%27 rx=%2710%27 /%3E%3Crect y=%2780%27 width=%27120%27 height=%2720%27 rx=%2710%27 /%3E%3C/svg%3E" />
         </t:if>
 
         <t:a t:href="$wiki">Front Page</t:a>
