@@ -7,7 +7,7 @@
 	<t:form t:action="$wiki/submit" t:for="title">
 
 		<p>
-			<t:textarea t:name="content" t:rows="30" t:cols="80" />
+			<t:textarea t:name="content" t:rows="30" />
 		</p>
 
 		<p>
