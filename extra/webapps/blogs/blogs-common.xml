@@ -7,8 +7,6 @@
     <t:style t:include="resource:extra/webapps/blogs/blogs.css" />
 
     <nav>
-    <div class="navrow">
-
         <t:a t:href="$blogs/">All Posts</t:a>
         <t:a t:href="$blogs/by">My Posts</t:a>
         <t:a t:href="$blogs/new-post">New Post</t:a>
@@ -22,8 +20,6 @@
             <t:button t:action="$login-realm/logout" t:aside="begin" class="link-button link">Logout</t:button>
 
         </t:if>
-
-    </div>
     </nav>
 
     <div class="page">
