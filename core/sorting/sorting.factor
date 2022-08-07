@@ -1,8 +1,8 @@
 ! Copyright (C) 2005, 2009 Slava Pestov.
-! See https://factorcode.org/license.txt for BSD license.
-USING: accessors arrays assocs growable.private hashtables
-kernel kernel.private math math.order sequences
-sequences.private vectors ;
+! See http://factorcode.org/license.txt for BSD license.
+USING: accessors arrays assocs combinators growable.private
+hashtables kernel kernel.private math math.order math.private
+sequences sequences.private vectors ;
 IN: sorting
 
 ! Optimized merge-sort:
@@ -33,12 +33,20 @@ TUPLE: merge-state
 : r-done? ( merge -- ? ) [ from2>> ] [ to2>> ] bi eq? ; inline
 
 : dump-l ( merge -- )
-    [ [ from1>> ] [ to1>> ] [ seq>> ] tri ] [ accum>> ] bi
-    push-all-unsafe ; inline
+    {
+        [ accum>> ]
+        [ [ to1>> ] [ from1>> fixnum-fast ] [ accum>> length integer>fixnum-strict ] tri [ fixnum+fast >>length ] 2keep ]
+        [ seq>> ]
+        [ from1>> roll dupd fixnum+fast ]
+    } cleave seq-copy-loop drop ; inline
 
 : dump-r ( merge -- )
-    [ [ from2>> ] [ to2>> ] [ seq>> ] tri ] [ accum>> ] bi
-    push-all-unsafe ; inline
+    {
+        [ accum>> ]
+        [ [ to2>> ] [ from2>> fixnum-fast ] [ accum>> length integer>fixnum-strict ] tri [ fixnum+fast >>length ] 2keep ]
+        [ seq>> ]
+        [ from2>> roll dupd fixnum+fast ]
+    } cleave seq-copy-loop drop ; inline
 
 : l-next ( merge -- )
     [ l-elt ] [ [ 1 + ] change-from1 accum>> ] bi push-unsafe ; inline
