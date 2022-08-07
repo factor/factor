@@ -104,12 +104,31 @@ IN: math.statistics
 
 {
     H{
-        { 97 2 }
+        { 97 5 }
         { 98 2 }
         { 99 2 }
     }
 } [
     "aabbcc" histogram
+    "aaa" histogram!
+] unit-test
+
+{
+    H{
+        { 97 5 }
+        { 98 2 }
+        { 99 2 }
+    }
+} [
+    "aabbcc" [ ] histogram-by
+    "aaa" [ ] histogram-by!
+] unit-test
+
+{
+    H{ { t 2 } { f 7 } }
+} [
+    "aabbcc" [ even? ] histogram-by
+    "aaa" [ even? ] histogram-by!
 ] unit-test
 
 { H{ { 1 1/2 } { 2 1/6 } { 3 1/3 } } }
