@@ -123,11 +123,14 @@ M: string-matcher fixup-end
     [ string>> -rot update-match-groups ]
     [ ignore-case?>> ] bi <string-matcher> ;
 
-M: regexp fixup-end
-    [ raw>> [ -rot update-match-groups ] keep swap ]
-    [ options>> options>string ] bi <optioned-regexp> {
+MEMO: <fixup-regexp> ( raw matched options -- regexp )
+    <optioned-regexp> {
         [ parse-tree>> ] [ options>> ] [ dfa>> ] [ next-match>> ]
     } cleave regexp boa ;
+
+M: regexp fixup-end
+    [ raw>> [ -rot update-match-groups ] keep swap ]
+    [ options>> options>string ] bi <fixup-regexp> ;
 
 : fixup-end? ( text -- ? )
     { [ regexp? ] [ #match-groups ] } 1&& ;
