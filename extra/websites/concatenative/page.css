@@ -59,11 +59,11 @@ nav {
     padding-top: 10px;
     padding-bottom: 10px;
     padding-left: calc(max(50% - 500px, 15px));
-    padding-right: 15px;
+    padding-right: calc(max(50% - 400px, 10px));
 }
 
 nav a, nav .link {
-    margin-right: 5px;
+    margin-right: 10px;
 }
 
 nav img {

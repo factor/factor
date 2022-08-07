@@ -46,10 +46,11 @@ nav {
     background-color: #f5f5f5;
     padding: 10px;
     padding-left: calc(max(50% - 400px, 10px));
+    padding-right: calc(max(50% - 400px, 10px));
 }
 
 nav a, nav .link {
-    margin-right: 5px;
+    margin-right: 10px;
 }
 
 nav img {
