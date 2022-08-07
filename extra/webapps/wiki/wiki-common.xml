@@ -30,6 +30,7 @@
     </nav>
 
     <div class="page">
+
         <div id="left">
             <t:if t:value="contents">
 
@@ -52,15 +53,16 @@
         <div id="right">
             <h1 class="title"><t:write-title /></h1>
             <t:call-next-template />
+
+            <t:if t:value="footer">
+                <footer>
+                    <t:bind t:name="footer">
+                        <t:farkup t:name="content" t:no-follow="true" />
+                    </t:bind>
+                </footer>
+            </t:if>
         </div>
 
-        <t:if t:value="footer">
-            <footer>
-                <t:bind t:name="footer">
-                    <t:farkup t:name="content" t:no-follow="true" />
-                </t:bind>
-            </footer>
-        </t:if>
     </div>
 
     <span style="display:none"></span>
