@@ -255,10 +255,13 @@ M: assoc unzip
 : zip-with ( ... seq quot: ( ... key -- ... value ) -- ... alist )
     { } zip-with-as ; inline
 
-: collect-by ( ... seq quot: ( ... obj -- ... key ) -- ... assoc )
-    [ keep swap ] curry H{ } clone [
+: collect-by! ( ... assoc seq quot: ( ... obj -- ... key ) -- ... assoc )
+    [ keep swap ] curry rot [
         [ push-at ] curry compose each
     ] keep ; inline
+
+: collect-by ( ... seq quot: ( ... obj -- ... key ) -- ... assoc )
+    [ H{ } clone ] 2dip collect-by! ; inline
 
 M: sequence at*
     search-alist [ second t ] [ f ] if ;
