@@ -1,6 +1,15 @@
+input, textarea, select {
+    font-size: 12pt;
+    border: 1px solid #dbdbdb;
+    border-radius: 5px;
+    padding: 5px;
+}
+
+textarea {
+    width: 100%;
+}
+
 table {
-    border-spacing: 0;
-    border-collapse: collapse;
     table-layout: fixed;
 }
 
