@@ -44,18 +44,16 @@ tr:hover {
 nav {
     border-bottom: 1px solid #ccc;
     background-color: #f5f5f5;
+    padding: 10px;
+    padding-left: calc(max(50% - 500px, 10px));
 }
 
-.navrow {
-    max-width: 800px;
-    position: relative;
-    left: calc(max(-400px,-50%) + 50%);
-    margin: 0;
-    padding: 10px 15px 10px 15px;
+nav a, nav .link {
+    margin-right: 5px;
 }
 
-.navrow a {
-    margin-right: 10px;
+nav img {
+    vertical-align: middle;
 }
 
 .page {

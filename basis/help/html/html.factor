@@ -95,17 +95,15 @@ M: pathname url-of
     "conventions" >link topic>filename
     [XML
         <nav>
-            <div class="navrow">
-                <a href="https://factorcode.org">
-                <img src="favicon.ico" width="24" height="24" />
-                </a>
-                <a href="/">Handbook</a>
-                <a href=<->>Glossary</a>
-                <form method="get" action="/search" style="float: right;">
-                    <input placeholder="Search" name="search" type="text"/>
-                    <input type="submit" value="Go"/>
-                </form>
-            </div>
+            <a href="https://factorcode.org">
+            <img src="favicon.ico" width="24" height="24" />
+            </a>
+            <a href="/">Handbook</a>
+            <a href=<->>Glossary</a>
+            <form method="get" action="/search" style="float: right;">
+                <input placeholder="Search" name="search" type="text"/>
+                <input type="submit" value="Go"/>
+            </form>
         </nav>
      XML] ;
 
