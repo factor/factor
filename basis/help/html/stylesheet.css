@@ -45,7 +45,7 @@ nav {
     border-bottom: 1px solid #ccc;
     background-color: #f5f5f5;
     padding: 10px;
-    padding-left: calc(max(50% - 500px, 10px));
+    padding-left: calc(max(50% - 400px, 10px));
 }
 
 nav a, nav .link {
