@@ -52,20 +52,9 @@
     padding-left: 20px;
 }
 
-.page {
-    padding: 15px;
-    padding-top: 0px;
-    width: calc(100vw - 200px);
-    max-width: 800px;
-}
-
 .page nav {
     margin: -15px;
     margin-top: 0px;
-    border-top: 1px dashed #ccc;
-    border-bottom: 1px dashed #ccc;
-    width: calc(100vw - 200px);
-    max-width: 800px;
     background: none;
 }
 
@@ -129,7 +118,7 @@ footer {
 }
 
 #right {
-    width: 100%;
+    width: calc(100vw - 200px);
     max-width: calc(min(100vw - 230px, 770px));
 }
 
