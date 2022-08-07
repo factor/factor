@@ -8,55 +8,50 @@
 
 	<t:style t:include="resource:extra/webapps/wiki/wiki.css" />
 
-    <div id="left">
-
+    <nav>
         <t:if t:value="contents">
-
-            <t:script t:include="resource:extra/webapps/wiki/wiki.js" />
-
-            <div class="contents">
-                <t:bind t:name="contents">
-                    <h2>
-                        <t:a t:href="$wiki/view" t:rest="title">
-                            <t:label t:name="title" />
-                        </t:a>
-                    </h2>
-
-                    <t:farkup t:name="content" t:no-follow="true" />
-                </t:bind>
-            </div>
+            <img id="menu" onclick="toggleSidebar()" src="data:image/svg+xml;utf8,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 xmlns:xlink=%27http://www.w3.org/1999/xlink%27 width=%2724%27 height=%2724%27 viewBox=%270 0 100 100%27 fill=%27rgb(0,0,0)%27%3E%3Crect x=%2710%27 y=%2720%27 width=%2780%27 height=%2712%27 rx=%276%27 /%3E%3Crect x=%2710%27 y=%2744%27 width=%2780%27 height=%2712%27 rx=%276%27 /%3E%3Crect x=%2710%27 y=%2768%27 width=%2780%27 height=%2712%27 rx=%276%27 /%3E%3C/svg>" />
         </t:if>
 
-    </div>
+        <t:a t:href="$wiki">Front Page</t:a>
+        <t:a t:href="$wiki/articles">All Articles</t:a>
+        <t:a t:href="$wiki/changes">Recent Changes</t:a>
+        <t:a t:href="$wiki/random">Random Article</t:a>
 
-    <div id="right">
+        <t:if t:code="furnace.auth:logged-in?">
 
-        <nav>
+            <t:if t:code="furnace.auth.features.edit-profile:allow-edit-profile?">
+                <t:a t:href="$realm/edit-profile" t:aside="begin">Edit Profile</t:a>
+            </t:if>
+
+            <t:button t:action="$login-realm/logout" t:aside="begin" class="link-button link">Logout</t:button>
+
+        </t:if>
+    </nav>
+
+    <div class="page">
+        <div id="left">
             <t:if t:value="contents">
-                <img id="menu" onclick="toggleSidebar()" src="data:image/svg+xml;utf8,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 xmlns:xlink=%27http://www.w3.org/1999/xlink%27 width=%2724%27 height=%2724%27 viewBox=%270 0 100 100%27 fill=%27rgb(0,0,0)%27%3E%3Crect x=%2710%27 y=%2720%27 width=%2780%27 height=%2712%27 rx=%276%27 /%3E%3Crect x=%2710%27 y=%2744%27 width=%2780%27 height=%2712%27 rx=%276%27 /%3E%3Crect x=%2710%27 y=%2768%27 width=%2780%27 height=%2712%27 rx=%276%27 /%3E%3C/svg>" />
+
+                <t:script t:include="resource:extra/webapps/wiki/wiki.js" />
+
+                <div class="contents">
+                    <t:bind t:name="contents">
+                        <h2>
+                            <t:a t:href="$wiki/view" t:rest="title">
+                                <t:label t:name="title" />
+                            </t:a>
+                        </h2>
+
+                        <t:farkup t:name="content" t:no-follow="true" />
+                    </t:bind>
+                </div>
             </t:if>
+        </div>
 
-            <t:a t:href="$wiki">Front Page</t:a>
-            <t:a t:href="$wiki/articles">All Articles</t:a>
-            <t:a t:href="$wiki/changes">Recent Changes</t:a>
-            <t:a t:href="$wiki/random">Random Article</t:a>
-
-            <t:if t:code="furnace.auth:logged-in?">
-
-                <t:if t:code="furnace.auth.features.edit-profile:allow-edit-profile?">
-                    <t:a t:href="$realm/edit-profile" t:aside="begin">Edit Profile</t:a>
-                </t:if>
-
-                <t:button t:action="$login-realm/logout" t:aside="begin" class="link-button link">Logout</t:button>
-
-            </t:if>
-        </nav>
-
-        <div class="page">
+        <div id="right">
             <h1 class="title"><t:write-title /></h1>
-
             <t:call-next-template />
-
         </div>
 
         <t:if t:value="footer">
@@ -66,7 +61,6 @@
                 </t:bind>
             </footer>
         </t:if>
-
     </div>
 
     <span style="display:none"></span>
