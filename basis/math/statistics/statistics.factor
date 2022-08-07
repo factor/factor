@@ -251,11 +251,14 @@ PRIVATE>
 : trimean ( seq -- x )
     quartile first3 [ 2 * ] dip + + 4 / ;
 
+: histogram-by! ( assoc seq quot: ( x -- bin ) -- hashtable )
+    rot [ '[ @ _ inc-at ] each ] keep ; inline
+
 : histogram! ( hashtable seq -- hashtable )
-    over '[ _ inc-at ] each ;
+    [ ] histogram-by! ; inline
 
 : histogram-by ( seq quot: ( x -- bin ) -- hashtable )
-    H{ } clone [ '[ @ _ inc-at ] each ] keep ; inline
+    [ H{ } clone ] 2dip histogram-by! ; inline
 
 : histogram ( seq -- hashtable )
     [ ] histogram-by ;
