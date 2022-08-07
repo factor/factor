@@ -331,6 +331,17 @@ unit-test
     10 <iota> [ 3 mod ] collect-by
 ] unit-test
 
+{
+    H{
+        { 0 V{ 0 3 6 9 0 3 6 9 } }
+        { 1 V{ 1 4 7 1 4 7 } }
+        { 2 V{ 2 5 8 2 5 8 } }
+    }
+} [
+    10 <iota> [ 3 mod ] collect-by
+    10 <iota> [ 3 mod ] collect-by!
+] unit-test
+
 { H{ { 1 4 } } } [ H{ { 1 2 } } 1 over [ sq ] ?change-at ] unit-test
 { H{ { 1 2 } } } [ H{ { 1 2 } } 2 over [ sq ] ?change-at ] unit-test
 { H{ { 1 3 } } } [ H{ { 1 2 } } 3 1 pick [ drop dup ] ?change-at drop ] unit-test
