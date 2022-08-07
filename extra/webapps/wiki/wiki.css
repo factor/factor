@@ -129,6 +129,10 @@ footer {
     width: calc(100% - 200px);
 }
 
+nav {
+    padding-left: 10px;
+}
+
 nav img {
     margin: -15px;
     margin-top: -19px;
