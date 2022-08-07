@@ -96,12 +96,13 @@ nav img {
         color: #8ab4f8;
     }
 
-    .page nav {
-        border-top: 1px solid #666;
-    }
-
     nav {
         background-color: #373e48;
         border-bottom: 1px solid #666;
+    }
+
+    .page nav {
+        border-top: 1px solid #666;
+        background-color: transparent;
     }
 }
