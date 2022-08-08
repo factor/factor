@@ -1,14 +1,13 @@
 ! Copyright (C) 2008 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-
 USING: accessors alien arrays assocs byte-arrays calendar
 classes classes.error combinators combinators.short-circuit
-continuations hashtables help.markup interpolate io
+continuations eval hashtables help.markup interpolate io
 io.directories io.encodings.utf8 io.files io.pathnames
 io.streams.string kernel math math.parser namespaces prettyprint
-quotations sequences sets sorting splitting strings system
-timers unicode urls vocabs vocabs.loader vocabs.metadata words
-words.symbol ;
+quotations sequences sequences.extras sets sorting splitting
+strings system timers unicode urls vocabs vocabs.loader
+vocabs.metadata words words.symbol ;
 IN: tools.scaffold
 
 SYMBOL: developer-name
@@ -392,6 +391,25 @@ ${example-indent}}
 
 : scaffold-factor-roots ( -- )
     ".factor-roots" scaffold-rc ;
+
+: make-unit-test ( answer code -- str )
+   [
+        prepend-lines-with-spaces
+        "{\n" "\n}" surround
+    ] [
+        prepend-lines-with-spaces
+        "[\n" "\n] unit-test\n" surround
+    ] bi* " " glue ;
+
+: scaffold-unit-test ( -- str/f )
+    read-contents dup "" = [
+        drop f
+    ] [
+        [ eval( -- x ) unparse ] keep make-unit-test
+    ] if ;
+
+: scaffold-unit-tests ( -- str )
+    [ scaffold-unit-test ] loop>array "\n\n" join ;
 
 HOOK: scaffold-emacs os ( -- )
 
