@@ -4,6 +4,9 @@ USING: arrays assocs assocs.private kernel math math.statistics
 sequences sets ;
 IN: assocs.extras
 
+: push-at-each ( value keys assoc -- )
+    '[ _ push-at ] with each ; inline
+
 : deep-at ( assoc seq -- value/f )
     [ of ] each ; inline
 
@@ -148,7 +151,7 @@ PRIVATE>
 : expand-keys-push-at-as ( assoc exemplar -- hashtable' )
     [
         [ swap dup sequence? [ 1array ] unless ]
-        [ '[ _ push-at ] with each ]
+        [ push-at-each ]
     ] dip assoc>object ;
 
 : expand-keys-push-at ( assoc -- hashtable' )
@@ -234,9 +237,6 @@ PRIVATE>
 : histogram-diff ( hashtable1 hashtable2 -- hashtable3 )
     [ neg swap pick at+ ] assoc-each
     [ 0 > ] filter-values ;
-
-: push-at-each ( value keys assoc -- )
-    '[ _ push-at ] with each ; inline
 
 : collect-by-multi! ( ... assoc seq quot: ( ... obj -- ... key ) -- ... assoc )
     [ keep swap ] curry rot [
