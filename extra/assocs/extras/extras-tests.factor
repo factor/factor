@@ -164,3 +164,22 @@ USING: arrays assocs.extras kernel math math.order sequences tools.test ;
     H{ { 3 30 } { 4 40 } } 3array
     [ min ] V{ } assoc-collapse-as
 ] unit-test
+
+{
+    H{ { 1 V{ 10 } } { 2 V{ 10 } } { 3 V{ 10 } } { 4 V{ 10 } } { 5 V{ 10 } } }
+} [
+    H{ } clone 10 { 1 2 3 4 5 } pick push-at-each
+] unit-test
+
+{
+    H{
+        { 1 V{ 10 20 30 40 50 60 } }
+        { 2 V{ 10 20 30 40 50 60 } }
+        { 3 V{ 10 20 30 40 50 60 } }
+        { 4 V{ 10 20 30 40 50 60 } }
+        { 5 V{ 10 20 30 40 50 60 } }
+    }
+} [
+    { 10 20 30 } [ drop { 1 2 3 4 5 } ] collect-by-multi
+    { 40 50 60 } [ drop { 1 2 3 4 5 } ] collect-by-multi!
+] unit-test
