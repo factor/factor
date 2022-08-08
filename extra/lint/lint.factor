@@ -1,10 +1,11 @@
 ! Copyright (C) 2007, 2008, 2011 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays assocs classes classes.tuple.private
-combinators.short-circuit continuations io kernel kernel.private
-locals.backend make math math.private namespaces prettyprint
-quotations sequences sequences.deep shuffle slots.private
-splitting stack-checker vocabs words words.alias ;
+USING: accessors arrays assocs assocs.extras classes
+classes.tuple.private combinators.short-circuit continuations io
+kernel kernel.private locals.backend make math math.private
+namespaces prettyprint quotations sequences sequences.deep
+shuffle slots.private splitting stack-checker vocabs words
+words.alias ;
 IN: lint
 
 <PRIVATE
