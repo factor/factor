@@ -1,5 +1,11 @@
 USING: arrays assocs.extras kernel math math.order sequences tools.test ;
 
+{
+    H{ { 1 V{ 10 } } { 2 V{ 10 } } { 3 V{ 10 } } { 4 V{ 10 } } { 5 V{ 10 } } }
+} [
+    H{ } clone 10 { 1 2 3 4 5 } pick push-at-each
+] unit-test
+
 { f } [ f { } deep-at ] unit-test
 { f } [ f { "foo" } deep-at ] unit-test
 { f } [ H{ } { 1 2 3 } deep-at ] unit-test
@@ -165,11 +171,50 @@ USING: arrays assocs.extras kernel math math.order sequences tools.test ;
     [ min ] V{ } assoc-collapse-as
 ] unit-test
 
+
 {
-    H{ { 1 V{ 10 } } { 2 V{ 10 } } { 3 V{ 10 } } { 4 V{ 10 } } { 5 V{ 10 } } }
+    H{
+        { 41 V{ 401 } }
+        { 10 V{ 100 } }
+        { 20 V{ 200 } }
+        { 30 V{ 300 } }
+    }
 } [
-    H{ } clone 10 { 1 2 3 4 5 } pick push-at-each
+    { { 10 100 } { 20 200 } { 30 300 } { 41 401 } }
+    [ ] collect-assoc-by
 ] unit-test
+
+{
+    H{ { t V{ 100 200 300 } } { f V{ 401 } } }
+} [
+    { { 10 100 } { 20 200 } { 30 300 } { 41 401 } }
+    [ [ even? ] dip ] collect-assoc-by
+] unit-test
+
+{
+    H{
+        { t V{ { 10 100 } { 20 200 } { 30 300 } } }
+        { f V{ { 41 401 } } }
+    }
+} [
+    { { 10 100 } { 20 200 } { 30 300 } { 41 401 } }
+    [ [ drop even? ] [ 2array ] 2bi ] collect-assoc-by
+] unit-test
+
+{
+    H{ { t V{ 10 20 30 } } { f V{ 41 } } }
+} [
+    { { 10 100 } { 20 200 } { 30 300 } { 41 401 } }
+    [ even? ] collect-key-by
+] unit-test
+
+{
+    H{ { t V{ 100 200 300 } } { f V{ 401 } } }
+} [
+    { { 10 100 } { 20 200 } { 30 300 } { 41 401 } }
+    [ even? ] collect-value-by
+] unit-test
+
 
 {
     H{
@@ -182,4 +227,56 @@ USING: arrays assocs.extras kernel math math.order sequences tools.test ;
 } [
     { 10 20 30 } [ drop { 1 2 3 4 5 } ] collect-by-multi
     { 40 50 60 } [ drop { 1 2 3 4 5 } ] collect-by-multi!
+] unit-test
+
+
+
+{
+    H{
+        { 20 V{ 20 } }
+        { 21 V{ 20 } }
+        { 41 V{ 41 } }
+        { 10 V{ 10 } }
+        { 11 V{ 10 } }
+        { 42 V{ 41 } }
+        { 30 V{ 30 } }
+        { 31 V{ 30 } }
+    }
+} [
+    { { 10 100 } { 20 200 } { 30 300 } { 41 401 } }
+    [ dup 1 + 2array ] collect-key-by-multi
+] unit-test
+
+
+{
+    H{
+        { 401 V{ 401 } }
+        { 402 V{ 401 } }
+        { 100 V{ 100 } }
+        { 101 V{ 100 } }
+        { 200 V{ 200 } }
+        { 201 V{ 200 } }
+        { 300 V{ 300 } }
+        { 301 V{ 300 } }
+    }
+} [
+    { { 10 100 } { 20 200 } { 30 300 } { 41 401 } }
+    [ dup 1 + 2array ] collect-value-by-multi
+] unit-test
+
+
+{
+    H{
+        { 20 V{ 200 } }
+        { 21 V{ 200 } }
+        { 41 V{ 401 } }
+        { 10 V{ 100 } }
+        { 11 V{ 100 } }
+        { 42 V{ 401 } }
+        { 30 V{ 300 } }
+        { 31 V{ 300 } }
+    }
+} [
+    { { 10 100 } { 20 200 } { 30 300 } { 41 401 } }
+    [ [ dup 1 + 2array ] dip ] collect-assoc-by-multi
 ] unit-test
