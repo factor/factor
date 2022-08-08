@@ -219,7 +219,7 @@ CONSTANT: trivial-defs
     [ { [ callable? ] [ ignore-def? not ] } 1&& ] deep-filter ;
 
 : (load-definitions) ( word def hash -- )
-    [ all-callables ] dip '[ _ push-at ] with each ;
+    [ all-callables ] dip push-at-each ;
 
 : load-definitions ( words -- hash )
     H{ } clone [ '[ dup def>> _ (load-definitions) ] each ] keep ;
