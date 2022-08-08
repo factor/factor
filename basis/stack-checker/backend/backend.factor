@@ -5,7 +5,6 @@ math.order namespaces quotations sequences
 stack-checker.dependencies stack-checker.errors
 stack-checker.recursive-state stack-checker.state
 stack-checker.values stack-checker.visitor words ;
-FROM: sequences.private => from-end ;
 IN: stack-checker.backend
 
 : push-d ( obj -- ) meta-d push ;
@@ -36,7 +35,7 @@ IN: stack-checker.backend
         [ introduce-values ] [ meta-d push-all ] bi
         meta-d push-all
     ] when
-    swap from-end [ tail ] [ update-inner-d ] bi ;
+    swap from-tail [ tail ] [ update-inner-d ] bi ;
 
 : shorten-by ( n seq -- )
     [ length swap - ] keep shorten ; inline

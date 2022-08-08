@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: alien.c-types alien.data bootstrap.image.private
 destructors io io.directories io.encodings.binary io.files
-kernel locals system ;
+kernel system ;
 IN: tools.deploy.embed
 
 :: embed-image ( image executable -- )

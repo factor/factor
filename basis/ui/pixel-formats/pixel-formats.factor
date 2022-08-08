@@ -1,6 +1,6 @@
 USING: accessors alien.c-types alien.data assocs classes
-combinators destructors fry kernel math sequences
-specialized-arrays ui.backend words ;
+combinators destructors kernel math sequences specialized-arrays
+ui.backend words ;
 SPECIALIZED-ARRAY: int
 IN: ui.pixel-formats
 

@@ -1,9 +1,9 @@
 ! Copyright (C) 2019 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors checksums checksums.sha documents
-escape-strings kernel locals math.parser models sequences ui
-ui.gadgets ui.gadgets.editors ui.gadgets.labeled
-ui.gadgets.scrollers ui.gadgets.tracks ;
+escape-strings kernel math.parser models sequences ui ui.gadgets
+ui.gadgets.editors ui.gadgets.labeled ui.gadgets.scrollers
+ui.gadgets.tracks ;
 IN: escape-strings.ui
 
 TUPLE: escape-string-editor < source-editor source-model quot ;
@@ -25,11 +25,8 @@ M: escape-string-editor model-changed
         [ quot>> call( str -- str' ) ] [ set-editor-string ] bi
     ] [ call-next-method ] if ;
 
-: cake ( string delim -- string' )
-    dup surround ; inline
-
 : containerize ( string tag open-delim close-delim -- string' )
-    overd [ cake ] 2bi@ surround ;
+    overd [ 1surround ] 2bi@ surround ;
 
 : checksum-escape-string ( string checksum -- string' )
     [ drop ]

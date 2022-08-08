@@ -1,6 +1,7 @@
 ! Copyright (C) 2005, 2010, 2018, 2020 Slava Pestov, Joe Groff, and Cat Stevens.
 USING: arrays assocs combinators.short-circuit grouping kernel
-math math.statistics sequences sequences.deep tools.test ;
+math math.statistics math.vectors sequences sequences.deep
+tools.test ;
 IN: math.matrices
 
 <PRIVATE
@@ -318,24 +319,24 @@ PRIVATE>
 ] unit-test
 
 { 9 }
-[ { { 2 -2 1 } { 1 3 -1 } { 2 -4 2 } } m-1norm ] unit-test
+[ { { 2 -2 1 } { 1 3 -1 } { 2 -4 2 } } matrix-l1-norm ] unit-test
 
 { 8 }
-[ { { 2 -2 1 } { 1 3 -1 } { 2 -4 2 } } m-infinity-norm ] unit-test
+[ { { 2 -2 1 } { 1 3 -1 } { 2 -4 2 } } matrix-l-infinity-norm ] unit-test
 
 { 2.0 }
-[ { { 1 1 } { 1 1 } } frobenius-norm ] unit-test
+[ { { 1 1 } { 1 1 } } matrix-l2-norm ] unit-test
 
 { 10e-8 }
 [
   5.4772255
-  { { 1 2 } { 3 4 } } frobenius-norm
+  { { 1 2 } { 3 4 } } matrix-l2-norm
 ] unit-test~
 
 { 10e-6 }
 [
   36.94590
-  { { 1 2 } { 4 8 } { 16 32 } } frobenius-norm
+  { { 1 2 } { 4 8 } { 16 32 } } matrix-l2-norm
 ] unit-test~
 
 ! equivalent to frobenius for p = q = 2
@@ -349,13 +350,13 @@ PRIVATE>
 ] unit-test~
 
 { { { -1 0 } { 0 0 } } }
-[ { { -2 0 } { 0 0 } } normalize-matrix ] unit-test
+[ { { -2 0 } { 0 0 } } matrix-normalize ] unit-test
 
 { { { -1 0 } { 0 1/2 } } }
-[ { { -2 0 } { 0 1 } } normalize-matrix ] unit-test
+[ { { -2 0 } { 0 1 } } matrix-normalize ] unit-test
 
 { t }
-[ 3 3 <zero-matrix> dup normalize-matrix = ] unit-test
+[ 3 3 <zero-matrix> dup matrix-normalize = ] unit-test
 
 ! diagonals
 

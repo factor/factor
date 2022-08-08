@@ -1,6 +1,6 @@
 ! Copyright (C) 2013-2014 Björn Lindqvist
 ! See http://factorcode.org/license.txt for BSD license
-USING: accessors ascii base64 fry io io.encodings
+USING: accessors ascii base64 io io.encodings
 io.encodings.string io.encodings.utf16 kernel make math
 math.functions sequences splitting strings ;
 IN: io.encodings.utf7

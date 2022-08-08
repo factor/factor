@@ -1,10 +1,10 @@
 ! Copyright (C) 2008, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors classes.algebra classes.struct
-compiler.cfg.builder.blocks compiler.cfg.comparisons compiler.cfg.hats
-compiler.cfg.instructions compiler.cfg.stacks compiler.constants
-compiler.tree.propagation.info cpu.architecture kernel layouts math
-namespaces sequences vm ;
+compiler.cfg.builder.blocks compiler.cfg.comparisons
+compiler.cfg.hats compiler.cfg.instructions compiler.cfg.stacks
+compiler.constants compiler.tree.propagation.info
+cpu.architecture kernel layouts math namespaces sequences vm ;
 IN: compiler.cfg.intrinsics.misc
 
 : emit-tag ( -- )

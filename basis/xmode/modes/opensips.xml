@@ -1,0 +1,153 @@
+<?xml version="1.0"?>
+<!DOCTYPE MODE SYSTEM "xmode.dtd">
+<MODE>
+	<PROPS>
+		<PROPERTY NAME="lineComment" VALUE="#" />
+		<PROPERTY NAME="indentOpenBrackets" VALUE="{" />
+		<PROPERTY NAME="indentCloseBrackets" VALUE="}" />
+		<PROPERTY NAME="unalignedOpenBrackets" VALUE="(" />
+		<PROPERTY NAME="unalignedCloseBrackets" VALUE=")" />
+		<PROPERTY NAME="indentNextLine" VALUE="[^#]*\.\s*$" />
+	</PROPS>
+	<RULES HIGHLIGHT_DIGITS="TRUE" IGNORE_CASE="FALSE">
+		<EOL_SPAN TYPE="COMMENT1">#</EOL_SPAN>
+		<SPAN TYPE="LITERAL1" ESCAPE="\" NO_LINE_BREAK="TRUE">
+			<BEGIN>&quot;</BEGIN>
+			<END>&quot;</END>
+		</SPAN>
+		<SPAN TYPE="LITERAL2" ESCAPE="\" NO_LINE_BREAK="TRUE">
+			<BEGIN>'</BEGIN>
+			<END>'</END>
+		</SPAN>
+		<MARK_PREVIOUS TYPE="FUNCTION" MATCH_TYPE="OPERATOR">(</MARK_PREVIOUS>
+		<SEQ_REGEXP HASH_CHAR="$" TYPE="KEYWORD3">[\$]+[a-zA-Z_\x7f-\xff][a-zA-Z0-9_\x7f-\xff]*</SEQ_REGEXP>
+		<SEQ TYPE="OPERATOR">)</SEQ>
+		<SEQ TYPE="OPERATOR">=</SEQ>
+		<SEQ TYPE="OPERATOR">==</SEQ>
+		<SEQ TYPE="OPERATOR">!</SEQ>
+		<SEQ TYPE="OPERATOR">}</SEQ>
+		<SEQ TYPE="OPERATOR">{</SEQ>
+		<SEQ TYPE="OPERATOR">and</SEQ>
+		<KEYWORDS>
+			<KEYWORD1>if</KEYWORD1>
+			<KEYWORD1>else</KEYWORD1>
+			<KEYWORD1>case</KEYWORD1>
+			<KEYWORD1>switch</KEYWORD1>
+			<KEYWORD1>break</KEYWORD1>
+			<KEYWORD1>default</KEYWORD1>
+			<KEYWORD1>exit</KEYWORD1>
+			<KEYWORD1>loadmodule</KEYWORD1>
+			
+			<!-- Core Keywords -->
+			<KEYWORD2>af</KEYWORD2>
+			<KEYWORD2>dst_ip</KEYWORD2>
+			<KEYWORD2>dst_port</KEYWORD2>
+			<KEYWORD2>from_uri</KEYWORD2>
+			<KEYWORD2>method</KEYWORD2>
+			<KEYWORD2>msg:len</KEYWORD2>
+			<KEYWORD2>proto</KEYWORD2>
+			<KEYWORD2>status</KEYWORD2>
+			<KEYWORD2>src_ip</KEYWORD2>
+			<KEYWORD2>src_port</KEYWORD2>
+			<KEYWORD2>to_uri</KEYWORD2>
+			<KEYWORD2>uri</KEYWORD2>
+			
+			<!-- Core Values -->
+			<KEYWORD3>INET</KEYWORD3>
+			<KEYWORD3>INET6</KEYWORD3>
+			<KEYWORD3>TCP</KEYWORD3>
+			<KEYWORD3>UDP</KEYWORD3>
+			<KEYWORD3>max_len</KEYWORD3>
+			<KEYWORD3>myself</KEYWORD3>
+			<KEYWORD3>NULL</KEYWORD3>
+			
+			<!-- Core parameters -->
+			<KEYWORD4>abort_on_assert</KEYWORD4>
+			<KEYWORD4>advertised_address</KEYWORD4>
+			<KEYWORD4>advertised_port</KEYWORD4>
+			<KEYWORD4>alias</KEYWORD4>
+			<KEYWORD4>auto_aliases</KEYWORD4>
+			<KEYWORD4>bin_listen</KEYWORD4>
+			<KEYWORD4>bin_children</KEYWORD4>
+			<KEYWORD4>check_via</KEYWORD4>
+			<KEYWORD4>children</KEYWORD4>
+			<KEYWORD4>chroot</KEYWORD4>
+			<KEYWORD4>db_version_table</KEYWORD4>
+			<KEYWORD4>db_default_url</KEYWORD4>
+			<KEYWORD4>db_max_async_connections</KEYWORD4>
+			<KEYWORD4>debug</KEYWORD4>
+			<KEYWORD4>disable_503_translation</KEYWORD4>
+			<KEYWORD4>disable_core_dump</KEYWORD4>
+			<KEYWORD4>disable_dns_blacklist</KEYWORD4>
+			<KEYWORD4>disable_dns_failover</KEYWORD4>
+			<KEYWORD4>disable_stateless_fwd</KEYWORD4>
+			<KEYWORD4>disable_tcp</KEYWORD4>
+			<KEYWORD4>disable_tls</KEYWORD4>
+			<KEYWORD4>dns</KEYWORD4>
+			<KEYWORD4>dns_retr_time</KEYWORD4>
+			<KEYWORD4>dns_retr_no</KEYWORD4>
+			<KEYWORD4>dns_servers_no</KEYWORD4>
+			<KEYWORD4>dns_try_ipv6</KEYWORD4>
+			<KEYWORD4>dns_try_naptr</KEYWORD4>
+			<KEYWORD4>dns_use_search_list</KEYWORD4>
+			<KEYWORD4>dst_blacklist</KEYWORD4>
+			<KEYWORD4>enable_asserts</KEYWORD4>
+			<KEYWORD4>event_pkg_threshold</KEYWORD4>
+			<KEYWORD4>event_shm_threshold</KEYWORD4>
+			<KEYWORD4>exec_dns_threshold</KEYWORD4>
+			<KEYWORD4>exec_msg_threshold</KEYWORD4>
+			<KEYWORD4>fork</KEYWORD4>
+			<KEYWORD4>group gid</KEYWORD4>
+			<KEYWORD4>include_file</KEYWORD4>
+			<KEYWORD4>import_file</KEYWORD4>
+			<KEYWORD4>listen</KEYWORD4>
+			<KEYWORD4>log_facility</KEYWORD4>
+			<KEYWORD4>log_name</KEYWORD4>
+			<KEYWORD4>log_stderror</KEYWORD4>
+			<KEYWORD4>max_while_loops</KEYWORD4>
+			<KEYWORD4>maxbuffer</KEYWORD4>
+			<KEYWORD4>mem_warming</KEYWORD4>
+			<KEYWORD4>mem_warming_percentage</KEYWORD4>
+			<KEYWORD4>mem_warming_pattern_file</KEYWORD4>
+			<KEYWORD4>memdump</KEYWORD4>
+			<KEYWORD4>mem_dump</KEYWORD4>
+			<KEYWORD4>memlog</KEYWORD4>
+			<KEYWORD4>mem_log</KEYWORD4>
+			<KEYWORD4>mcast_loopback</KEYWORD4>
+			<KEYWORD4>mcast_ttl</KEYWORD4>
+			<KEYWORD4>mhomed</KEYWORD4>
+			<KEYWORD4>mpath</KEYWORD4>
+			<KEYWORD4>open_files_limit</KEYWORD4>
+			<KEYWORD4>poll_method</KEYWORD4>
+			<KEYWORD4>port</KEYWORD4>
+			<KEYWORD4>reply_to_via</KEYWORD4>
+			<KEYWORD4>query_buffer_size</KEYWORD4>
+			<KEYWORD4>query_flush_time</KEYWORD4>
+			<KEYWORD4>rev_dns</KEYWORD4>
+			<KEYWORD4>server_header</KEYWORD4>
+			<KEYWORD4>server_signature</KEYWORD4>
+			<KEYWORD4>shm_hash_split_percentage</KEYWORD4>
+			<KEYWORD4>shm_secondary_hash_size</KEYWORD4>
+			<KEYWORD4>sip_warning</KEYWORD4>
+			<KEYWORD4>tcp_children</KEYWORD4>
+			<KEYWORD4>tcp_accept_aliases</KEYWORD4>
+			<KEYWORD4>tcp_listen_backlog</KEYWORD4>
+			<KEYWORD4>tcp_connect_timeout</KEYWORD4>
+			<KEYWORD4>tcp_connection_lifetime!!!!</KEYWORD4>
+			<KEYWORD4>tcp_max_connections</KEYWORD4>
+			<KEYWORD4>tcp_max_msg_time</KEYWORD4>
+			<KEYWORD4>tcp_no_new_conn_bflag</KEYWORD4>
+			<KEYWORD4>tcp_threshold</KEYWORD4>
+			<KEYWORD4>tcp_keepalive</KEYWORD4>
+			<KEYWORD4>tcp_keepcount</KEYWORD4>
+			<KEYWORD4>tcp_keepidle</KEYWORD4>
+			<KEYWORD4>tcp_keepinterval</KEYWORD4>
+			<KEYWORD4>tls_ca_list</KEYWORD4>
+			<KEYWORD4>user uid</KEYWORD4>
+			<KEYWORD4>user_agent_header</KEYWORD4>
+			<KEYWORD4>wdir</KEYWORD4>
+			<KEYWORD4>xlog_buf_size</KEYWORD4>
+			<KEYWORD4>xlog_force_color</KEYWORD4>
+		</KEYWORDS>
+	</RULES>
+</MODE>

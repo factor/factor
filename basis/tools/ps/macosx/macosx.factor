@@ -4,7 +4,8 @@
 USING: accessors alien.c-types alien.data alien.syntax arrays
 assocs byte-arrays classes.struct continuations fry grouping
 kernel libc literals math sequences splitting strings system
-system-info.macosx tools.ps unix unix.time unix.types ;
+system-info.macosx tools.ps unix unix.sysctl unix.time
+unix.types ;
 
 QUALIFIED-WITH: alien.c-types c
 
@@ -139,7 +140,7 @@ STRUCT: kinfo_proc
     [ kinfo_proc memory>struct ] map ;
 
 : ps-arg ( kp_proc -- arg )
-    [ p_pid>> args rest " " join ] [
+    [ p_pid>> args rest join-words ] [
         drop p_comm>> 0 over index [ head ] when* >string
     ] recover ;
 

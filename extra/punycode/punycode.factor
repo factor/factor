@@ -1,14 +1,9 @@
 ! Copyright (C) 2020 John Benediktsson
 ! See http://factorcode.org/license.txt for BSD license
 
-USING: accessors arrays ascii assocs byte-arrays combinators
-io.encodings.string io.encodings.utf8 kernel lexer linked-assocs
-literals locals make math math.order math.parser multiline
-namespaces peg.ebnf present prettyprint.backend
-prettyprint.custom prettyprint.sections regexp sbufs sequences
-sequences.extras sequences.generalizations sets sorting
-splitting strings strings.parser urls urls.encoding
-urls.encoding.private urls.private ;
+USING: accessors ascii byte-arrays combinators kernel literals
+math math.order sbufs sequences sequences.extras sets sorting
+splitting urls ;
 
 IN: punycode
 
@@ -107,11 +102,11 @@ PRIVATE>
 
 ERROR: invalid-digit char ;
 
-:: decode-digit ( ch -- digit )
+: decode-digit ( ch -- digit )
     {
-        { [ ch CHAR: A CHAR: Z between? ] [ ch CHAR: A - ] }
-        { [ ch CHAR: 0 CHAR: 9 between? ] [ ch CHAR: 0 26 - - ] }
-        [ ch invalid-digit ]
+        { [ dup LETTER? ] [ CHAR: A - ] }
+        { [ dup digit? ] [ CHAR: 0 26 - - ] }
+        [ invalid-digit ]
     } cond ;
 
 :: decode-delta ( extended extpos! bias -- extpos' delta )
@@ -156,141 +151,22 @@ PRIVATE>
         SBUF" " clone swap >upper
     ] if* insertion-sort "" like ;
 
-: idna> ( punycode -- str )
+GENERIC: idna> ( punycode -- obj )
+
+M: object idna>
     "." split [
         "xn--" ?head [ punycode> ] when
     ] map "." join ;
 
-: >idna ( str -- punycode )
+M: url idna> [ idna> ] change-host ;
+
+GENERIC: >idna ( obj -- punycode )
+
+M: object >idna
     "." split [
         dup [ N < ] all? [
             >punycode "xn--" prepend
         ] unless
     ] map "." join ;
 
-TUPLE: irl < url ;
-
-: <irl> ( -- irl ) irl new ;
-
-GENERIC: >irl ( obj -- irl )
-
-M: f >irl drop <irl> ;
-
-<PRIVATE
-
-: irl-decode ( str -- str' )
-    "" like R/ (%[a-fA-F0-9]{2})+/ [ url-decode ] re-replace-with ;
-
-: iquery-decode ( str -- decoded )
-    "+" split "%20" join irl-decode ;
-
-: iquery>assoc ( query -- assoc )
-    dup [
-        "&;" split <linked-hash> [
-            [
-                [ "=" split1 [ dup [ iquery-decode ] when ] bi@ swap ] dip
-                add-query-param
-            ] curry each
-        ] keep
-    ] when ;
-
-: assoc>iquery ( assoc -- str )
-    [
-        [
-            [
-                dup array? [ 1array ] unless
-                [ "=" glue , ] with each
-            ] [ , ] if*
-        ] assoc-each
-    ] { } make "&" join ;
-
-! RFC 3987
-EBNF: parse-irl [=[
-
-protocol = [a-zA-Z0-9.+-]+ => [[ irl-decode ]]
-username = [^/:@#?]+       => [[ irl-decode ]]
-password = [^/:@#?]+       => [[ irl-decode ]]
-path     = [^#?]+          => [[ irl-decode ]]
-query    = [^#]+           => [[ iquery>assoc ]]
-anchor   = .+              => [[ irl-decode ]]
-hostname = [^/#?:]+        => [[ irl-decode ]]
-port     = [^/#?]+         => [[ url-decode parse-port ]]
-
-auth     = username (":"~ password)? "@"~
-host     = hostname (":"~ port)?
-
-url      = (protocol ":"~)?
-           ("//"~ auth? host?)?
-           path?
-           ("?"~ query)?
-           ("#"~ anchor)?
-
-]=]
-
-: unparse-ihost-part ( url -- )
-    {
-        [ unparse-username-password ]
-        [ host>> % ]
-        [ url-port [ ":" % # ] when* ]
-        [ path>> "/" head? [ "/" % ] unless ]
-    } cleave ;
-
-: unparse-iauthority ( url -- )
-    dup host>> [ "//" % unparse-ihost-part ] [ drop ] if ;
-
-M: irl present
-    [
-        {
-            [ unparse-protocol ]
-            [ unparse-iauthority ]
-            [ path>> % ]
-            [ query>> dup assoc-empty? [ drop ] [ "?" % assoc>iquery % ] if ]
-            [ anchor>> [ "#" % present % ] when* ]
-        } cleave
-    ] "" make ;
-
-PRIVATE>
-
-M: string >irl
-    [ <irl> ] dip parse-irl 5 firstn {
-        [ >lower >>protocol ]
-        [
-            [
-                [ first [ first2 [ >>username ] [ >>password ] bi* ] when* ]
-                [ second [ first2 [ >>host ] [ >>port ] bi* ] when* ] bi
-            ] when*
-        ]
-        [ >>path ]
-        [ >>query ]
-        [ >>anchor ]
-    } spread dup host>> [ [ "/" or ] change-path ] when ;
-
-M: irl >url
-    [ <url> ] dip {
-        [ protocol>> >>protocol ]
-        [ username>> >>username ]
-        [ password>> >>password ]
-        [ host>> [ >idna ] [ f ] if* >>host ]
-        [ port>> >>port ]
-        [ path>> >>path ]
-        [ query>> >>query ]
-        [ anchor>> >>anchor ]
-    } cleave ;
-
-M: url >irl
-    [ <irl> ] dip {
-        [ protocol>> >>protocol ]
-        [ username>> >>username ]
-        [ password>> >>password ]
-        [ host>> [ idna> ] [ f ] if* >>host ]
-        [ port>> >>port ]
-        [ path>> >>path ]
-        [ query>> >>query ]
-        [ anchor>> >>anchor ]
-    } cleave ;
-
-SYNTAX: IRL" lexer get skip-blank parse-string >irl suffix! ;
-
-M: irl pprint*
-    \ IRL" record-vocab
-    dup present "IRL\" " "\"" pprint-string ;
+M: url >idna [ >idna ] change-host ;

@@ -1,5 +1,6 @@
-USING: help.markup help.syntax kernel math math.combinatorics
+USING: help.markup help.syntax math math.combinatorics
 math.combinatorics.private math.order sequences ;
+IN: math.combinatorics
 
 HELP: factorial
 { $values { "n" "a non-negative integer" } { "n!" integer } }
@@ -117,6 +118,19 @@ HELP: next-permutation
 { $description "Rearranges the elements in " { $snippet "seq" } " into the lexicographically next greater permutation of elements." }
 { $notes "Performs an in-place modification of " { $snippet "seq" } "." }
 { $examples { $example "USING: math.combinatorics prettyprint ;" "\"ABC\" next-permutation ." "\"ACB\"" } } ;
+
+HELP: all-unique-permutations
+{ $values { "seq" sequence } { "seq'" sequence } }
+{ $description "Outputs a sequence containing all " { $strong "unique" } " permutations of " { $snippet "seq" } " in lexicographical order." }
+{ $examples
+    { $example "USING: math.combinatorics prettyprint ;"
+        "{ 1 1 2 } all-unique-permutations ."
+        "{ { 1 1 2 } { 1 2 1 } { 2 1 1 } }" }
+} ;
+
+HELP: each-unique-permutation
+{ $values { "seq" sequence } { "quot" { $quotation ( ... elt -- ... ) } } }
+{ $description "Applies the quotation to each " { $strong "unique" } " permutation of " { $snippet "seq" } " in order." } ;
 
 HELP: all-subsets
 { $values { "seq" sequence } { "subsets" sequence } }

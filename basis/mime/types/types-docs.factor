@@ -1,6 +1,6 @@
 ! Copyright (C) 2008 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: assocs help.markup help.syntax io.streams.string sequences ;
+USING: assocs help.markup help.syntax sequences ;
 IN: mime.types
 
 HELP: mime-db

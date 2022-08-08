@@ -1,0 +1,64 @@
+<?xml version="1.0"?>
+<!DOCTYPE MODE SYSTEM "xmode.dtd">
+<!-- Edit mode for JEdit for m4 macro language -->
+<!-- Add to ~/.jedit/modes/catalog as follows:  -->
+<!-- <MODE NAME="m4" FILE="m4.xml" FILE_NAME_GLOB="*.m4" /> -->
+<!-- Jack J. Woehr jwoehr@softwoehr.com updated 20151116 -->
+<MODE>
+<PROPS>
+	<PROPERTY NAME="lineComment" VALUE="#" />
+	<PROPERTY NAME="wrap" VALUE="none" />
+	<PROPERTY NAME="noTabs" VALUE="true" />
+</PROPS>
+<RULES IGNORE_CASE="FALSE" HIGHLIGHT_DIGITS="TRUE">
+	<EOL_SPAN_REGEXP AT_WHITESPACE_END="FALSE" HASH_CHAR="d" TYPE="COMMENT1">dnl(?=(\s)|($))</EOL_SPAN_REGEXP>
+	<MARK_FOLLOWING TYPE="KEYWORD2">$</MARK_FOLLOWING>
+	<SEQ TYPE="KEYWORD1">`</SEQ>
+	<SEQ TYPE="KEYWORD1">'</SEQ>
+	<SEQ TYPE="OPERATOR">(</SEQ>
+	<SEQ TYPE="OPERATOR">)</SEQ>
+        <SEQ_REGEXP TYPE="KEYWORD1" HASH_CHAR="b" AT_WORD_START="TRUE">builtin(?=(($)|((\()|(\s))))</SEQ_REGEXP>
+        <SEQ_REGEXP TYPE="KEYWORD1" HASH_CHAR="c" AT_WORD_START="TRUE">changecom(?=(($)|((\()|(\s))))</SEQ_REGEXP>
+        <SEQ_REGEXP TYPE="KEYWORD1" HASH_CHAR="c" AT_WORD_START="TRUE">changequote(?=(($)|((\()|(\s))))</SEQ_REGEXP>
+        <SEQ_REGEXP TYPE="KEYWORD1" HASH_CHAR="c" AT_WORD_START="TRUE">changeword(?=(($)|((\()|(\s))))</SEQ_REGEXP>
+        <SEQ_REGEXP TYPE="KEYWORD1" HASH_CHAR="d" AT_WORD_START="TRUE">debugfile(?=(($)|((\()|(\s))))</SEQ_REGEXP>
+        <SEQ_REGEXP TYPE="KEYWORD1" HASH_CHAR="d" AT_WORD_START="TRUE">debugmode(?=(($)|((\()|(\s))))</SEQ_REGEXP>
+        <SEQ_REGEXP TYPE="KEYWORD1" HASH_CHAR="d" AT_WORD_START="TRUE">decr(?=(($)|((\()|(\s))))</SEQ_REGEXP>
+        <SEQ_REGEXP TYPE="KEYWORD1" HASH_CHAR="d" AT_WORD_START="TRUE">define(?=(($)|((\()|(\s))))</SEQ_REGEXP>
+        <SEQ_REGEXP TYPE="KEYWORD1" HASH_CHAR="d" AT_WORD_START="TRUE">defn(?=(($)|((\()|(\s))))</SEQ_REGEXP>
+        <SEQ_REGEXP TYPE="KEYWORD1" HASH_CHAR="d" AT_WORD_START="TRUE">divert(?=(($)|((\()|(\s))))</SEQ_REGEXP>
+        <SEQ_REGEXP TYPE="KEYWORD1" HASH_CHAR="d" AT_WORD_START="TRUE">divnum(?=(($)|((\()|(\s))))</SEQ_REGEXP>
+        <!-- SEQ_REGEXP TYPE="KEYWORD1" HASH_CHAR="d" AT_WORD_START="TRUE">dnl(?=(($)|((\()|(\s))))</SEQ_REGEXP>  -->
+        <SEQ_REGEXP TYPE="KEYWORD1" HASH_CHAR="d" AT_WORD_START="TRUE">dumpdef(?=(($)|((\()|(\s))))</SEQ_REGEXP>
+        <SEQ_REGEXP TYPE="KEYWORD1" HASH_CHAR="e" AT_WORD_START="TRUE">errprint(?=(($)|((\()|(\s))))</SEQ_REGEXP>
+        <SEQ_REGEXP TYPE="KEYWORD1" HASH_CHAR="e" AT_WORD_START="TRUE">esyscmd(?=(($)|((\()|(\s))))</SEQ_REGEXP>
+        <SEQ_REGEXP TYPE="KEYWORD1" HASH_CHAR="e" AT_WORD_START="TRUE">eval(?=(($)|((\()|(\s))))</SEQ_REGEXP>
+        <SEQ_REGEXP TYPE="KEYWORD1" HASH_CHAR="f" AT_WORD_START="TRUE">file(?=(($)|((\()|(\s))))</SEQ_REGEXP>
+        <SEQ_REGEXP TYPE="KEYWORD1" HASH_CHAR="f" AT_WORD_START="TRUE">format(?=(($)|((\()|(\s))))</SEQ_REGEXP>
+        <SEQ_REGEXP TYPE="KEYWORD1" HASH_CHAR="i" AT_WORD_START="TRUE">ifdef(?=(($)|((\()|(\s))))</SEQ_REGEXP>
+        <SEQ_REGEXP TYPE="KEYWORD1" HASH_CHAR="i" AT_WORD_START="TRUE">ifelse(?=(($)|((\()|(\s))))</SEQ_REGEXP>
+        <SEQ_REGEXP TYPE="KEYWORD1" HASH_CHAR="i" AT_WORD_START="TRUE">include(?=(($)|((\()|(\s))))</SEQ_REGEXP>
+        <SEQ_REGEXP TYPE="KEYWORD1" HASH_CHAR="i" AT_WORD_START="TRUE">incr(?=(($)|((\()|(\s))))</SEQ_REGEXP>
+        <SEQ_REGEXP TYPE="KEYWORD1" HASH_CHAR="i" AT_WORD_START="TRUE">index(?=(($)|((\()|(\s))))</SEQ_REGEXP>
+        <SEQ_REGEXP TYPE="KEYWORD1" HASH_CHAR="i" AT_WORD_START="TRUE">indir(?=(($)|((\()|(\s))))</SEQ_REGEXP>
+        <SEQ_REGEXP TYPE="KEYWORD1" HASH_CHAR="l" AT_WORD_START="TRUE">len(?=(($)|((\()|(\s))))</SEQ_REGEXP>
+        <SEQ_REGEXP TYPE="KEYWORD1" HASH_CHAR="l" AT_WORD_START="TRUE">line(?=(($)|((\()|(\s))))</SEQ_REGEXP>
+        <SEQ_REGEXP TYPE="KEYWORD1" HASH_CHAR="m" AT_WORD_START="TRUE">m4exit(?=(($)|((\()|(\s))))</SEQ_REGEXP>
+        <SEQ_REGEXP TYPE="KEYWORD1" HASH_CHAR="m" AT_WORD_START="TRUE">m4wrap(?=(($)|((\()|(\s))))</SEQ_REGEXP>
+        <SEQ_REGEXP TYPE="KEYWORD1" HASH_CHAR="m" AT_WORD_START="TRUE">maketemp(?=(($)|((\()|(\s))))</SEQ_REGEXP>
+        <SEQ_REGEXP TYPE="KEYWORD1" HASH_CHAR="p" AT_WORD_START="TRUE">patsubst(?=(($)|((\()|(\s))))</SEQ_REGEXP>
+        <SEQ_REGEXP TYPE="KEYWORD1" HASH_CHAR="p" AT_WORD_START="TRUE">popdef(?=(($)|((\()|(\s))))</SEQ_REGEXP>
+        <SEQ_REGEXP TYPE="KEYWORD1" HASH_CHAR="p" AT_WORD_START="TRUE">pushdef(?=(($)|((\()|(\s))))</SEQ_REGEXP>
+        <SEQ_REGEXP TYPE="KEYWORD1" HASH_CHAR="r" AT_WORD_START="TRUE">regexp(?=(($)|((\()|(\s))))</SEQ_REGEXP>
+        <SEQ_REGEXP TYPE="KEYWORD1" HASH_CHAR="s" AT_WORD_START="TRUE">shift(?=(($)|((\()|(\s))))</SEQ_REGEXP>
+        <SEQ_REGEXP TYPE="KEYWORD1" HASH_CHAR="s" AT_WORD_START="TRUE">sinclude(?=(($)|((\()|(\s))))</SEQ_REGEXP>
+        <SEQ_REGEXP TYPE="KEYWORD1" HASH_CHAR="s" AT_WORD_START="TRUE">substr(?=(($)|((\()|(\s))))</SEQ_REGEXP>
+        <SEQ_REGEXP TYPE="KEYWORD1" HASH_CHAR="s" AT_WORD_START="TRUE">syscmd(?=(($)|((\()|(\s))))</SEQ_REGEXP>
+        <SEQ_REGEXP TYPE="KEYWORD1" HASH_CHAR="s" AT_WORD_START="TRUE">sysval(?=(($)|((\()|(\s))))</SEQ_REGEXP>
+        <SEQ_REGEXP TYPE="KEYWORD1" HASH_CHAR="t" AT_WORD_START="TRUE">traceoff(?=(($)|((\()|(\s))))</SEQ_REGEXP>
+        <SEQ_REGEXP TYPE="KEYWORD1" HASH_CHAR="t" AT_WORD_START="TRUE">traceon(?=(($)|((\()|(\s))))</SEQ_REGEXP>
+        <SEQ_REGEXP TYPE="KEYWORD1" HASH_CHAR="t" AT_WORD_START="TRUE">translit(?=(($)|((\()|(\s))))</SEQ_REGEXP>
+        <SEQ_REGEXP TYPE="KEYWORD1" HASH_CHAR="u" AT_WORD_START="TRUE">undefine(?=(($)|((\()|(\s))))</SEQ_REGEXP>
+        <SEQ_REGEXP TYPE="KEYWORD1" HASH_CHAR="u" AT_WORD_START="TRUE">undivert(?=(($)|((\()|(\s))))</SEQ_REGEXP>
+</RULES>
+</MODE>

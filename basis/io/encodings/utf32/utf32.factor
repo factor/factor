@@ -1,7 +1,7 @@
 ! Copyright (C) 2009 Daniel Ehrenberg.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: math kernel io.encodings combinators io io.encodings.utf16
-sequences io.binary io.encodings.iana ;
+USING: combinators endian io io.encodings io.encodings.iana
+io.encodings.utf16 kernel sequences ;
 IN: io.encodings.utf32
 
 SINGLETON: utf32be

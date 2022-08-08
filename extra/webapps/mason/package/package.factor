@@ -44,7 +44,7 @@ IN: webapps.mason.package
     packages-url dup link ;
 
 : clean-image-url ( builder -- url )
-    platform "http://downloads.factorcode.org/images/clean/" prepend ;
+    platform "https://downloads.factorcode.org/images/clean/" prepend ;
 
 : clean-image-link ( builder -- link )
     clean-image-url dup link ;

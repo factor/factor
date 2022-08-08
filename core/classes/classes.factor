@@ -92,10 +92,10 @@ M: object predicate-def
 M: predicate flushable? drop t ;
 
 M: predicate forget*
-    [ call-next-method ] [ f "predicating" set-word-prop ] bi ;
+    [ call-next-method ] [ "predicating" remove-word-prop ] bi ;
 
 M: predicate reset-word
-    [ call-next-method ] [ f "predicating" set-word-prop ] bi ;
+    [ call-next-method ] [ "predicating" remove-word-prop ] bi ;
 
 : define-predicate ( class quot -- )
     [ predicate-word ] dip ( object -- ? ) define-declared ;

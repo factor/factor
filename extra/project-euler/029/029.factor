@@ -1,7 +1,7 @@
 ! Copyright (c) 2008 Aaron Schaefer.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: hashtables kernel math.functions math.ranges project-euler.common
-    sequences sets ;
+USING: kernel math.functions project-euler.common ranges
+sequences sets ;
 IN: project-euler.029
 
 ! http://projecteuler.net/index.php?section=problems&id=29
@@ -29,7 +29,7 @@ IN: project-euler.029
 ! --------
 
 : euler029 ( -- answer )
-    2 100 [a,b] dup [ ^ ] cartesian-map concat members length ;
+    2 100 [a..b] dup [ ^ ] cartesian-map concat members length ;
 
 ! [ euler029 ] 100 ave-time
 ! 704 ms ave run time - 28.07 SD (100 trials)

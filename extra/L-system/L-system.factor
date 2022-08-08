@@ -1,10 +1,10 @@
 
-USING: accessors arrays assocs calendar colors colors.constants
+USING: accessors arrays assocs calendar colors
 combinators.short-circuit help help.markup help.syntax kernel
-locals math math.functions math.matrices
-math.order math.parser math.trig math.vectors opengl
-opengl.demo-support opengl.gl opengl.glu sbufs sequences strings
-threads ui.gadgets ui.gadgets.worlds ui.gestures ui.render ;
+math math.functions math.matrices math.order math.parser
+math.trig math.vectors opengl opengl.demo-support opengl.gl
+opengl.glu sbufs sequences strings threads ui.gadgets
+ui.gadgets.worlds ui.gestures ui.render ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 

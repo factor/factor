@@ -165,6 +165,10 @@ M: hashtable keys [ drop ] collect-pairs ;
 
 M: hashtable values [ nip ] collect-pairs ;
 
+M: hashtable unzip
+    [ assoc-size dup [ <vector> ] bi@ ] [ array>> ] bi
+    [ [ suffix! ] bi-curry@ bi* ] each-pair [ { } like ] bi@ ;
+
 M: hashtable clone
     (clone) [ clone ] change-array ; inline
 

@@ -3,7 +3,7 @@
 USING: accessors assocs base64 calendar calendar.format
 calendar.parser checksums.hmac checksums.sha combinators http
 http.client kernel make math.order namespaces sequences
-sequences.extras sorting sorting.slots strings xml xml.traversal ;
+sorting sorting.slots strings xml xml.traversal ;
 IN: s3
 
 SYMBOL: key-id
@@ -137,4 +137,4 @@ PRIVATE>
 
 : bucket>alist ( bucket -- alist )
     dup keys
-    [ name>> get-object nip ] with map-zip ;
+    [ name>> get-object nip ] with zip-with ;

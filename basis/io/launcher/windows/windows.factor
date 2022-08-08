@@ -28,10 +28,10 @@ TUPLE: CreateProcess-args
 
 : default-CreateProcess-args ( -- obj )
     CreateProcess-args new
-        STARTUPINFO <struct>
+        STARTUPINFO new
         dup class-of heap-size >>cb
     >>lpStartupInfo
-    PROCESS_INFORMATION <struct> >>lpProcessInformation
+    PROCESS_INFORMATION new >>lpProcessInformation
     TRUE >>bInheritHandles
     0 >>dwCreateFlags ;
 
@@ -82,11 +82,11 @@ TUPLE: CreateProcess-args
 : escape-argument ( str -- newstr )
     escape-double-quote
     CHAR: \s over member? [
-        fix-trailing-backslashes "\"" dup surround
+        fix-trailing-backslashes "\"" 1surround
     ] when ;
 
 : join-arguments ( args -- cmd-line )
-    [ escape-argument ] map " " join ;
+    [ escape-argument ] map join-words ;
 
 : lookup-priority ( process -- n )
     priority>> {

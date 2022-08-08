@@ -1,8 +1,8 @@
 ! Copyright (C) 2005, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors assocs calendar continuations debugger
-definitions io io.launcher io.pathnames kernel namespaces
-prettyprint sequences source-files.errors splitting strings
+definitions io io.launcher io.pathnames kernel lexer namespaces
+prettyprint sequences sets source-files.errors splitting strings
 threads tools.crossref vocabs vocabs.files vocabs.hierarchy
 vocabs.loader vocabs.metadata words ;
 IN: editors
@@ -10,16 +10,20 @@ IN: editors
 SYMBOL: editor-class
 
 : available-editors ( -- seq )
-    "editors" disk-child-vocab-names ;
+    "editors" disk-child-vocab-names
+    { "editors.ui" "editors.private" } diff ;
 
 : editor-restarts ( -- alist )
     available-editors
     [ [ "Load " prepend ] keep ] { } map>assoc ;
 
+SYNTAX: EDITOR:
+    f editor-class set-global "editors." scan-token append reload ;
+
 HOOK: editor-command editor-class ( file line -- command )
 
 M: f editor-command
-    "Select an editor" editor-restarts throw-restarts require
+    "Select an editor" editor-restarts throw-restarts reload
     editor-command ;
 
 HOOK: editor-detached? editor-class ( -- ? )

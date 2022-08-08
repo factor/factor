@@ -1,1 +1,1 @@
-Errors which may be reaised by stack effect inference
+Errors which may be raised by stack effect inference

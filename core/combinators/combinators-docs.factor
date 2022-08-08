@@ -1,7 +1,6 @@
-USING: arrays help.markup help.syntax strings sbufs vectors
-kernel quotations generic generic.standard classes
-math assocs sequences sequences.private combinators.private
-effects words ;
+USING: arrays assocs combinators.private effects
+generic.standard help.markup help.syntax kernel quotations
+sequences sequences.private words ;
 IN: combinators
 
 ARTICLE: "cleave-combinators" "Cleave combinators"

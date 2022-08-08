@@ -1,5 +1,4 @@
-USING: help.markup help.syntax debugger sequences kernel
-quotations math ;
+USING: help.markup help.syntax kernel ;
 IN: memory
 
 HELP: instances

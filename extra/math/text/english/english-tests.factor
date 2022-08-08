@@ -11,6 +11,7 @@ sequences tools.test ;
 { "one million, one thousand, one hundred and one" } [ 1001101 number>text ] unit-test
 { "one million, one hundred and eleven thousand, one hundred and eleven" } [ 1111111 number>text ] unit-test
 { "one duotrigintillion" } [ 10 99 ^ number>text ] unit-test
+{ "one noveducentillion" } [ 630 10^ number>text ] unit-test
 
 { "negative one hundred and twenty-three" } [ -123 number>text ] unit-test
 

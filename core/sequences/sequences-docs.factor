@@ -1,4 +1,4 @@
-USING: assocs arrays generic.single help.markup help.syntax kernel
+USING: arrays generic.single help.markup help.syntax kernel
 layouts math math.order quotations sequences.private vectors ;
 IN: sequences
 
@@ -491,11 +491,22 @@ HELP: 3map-as
 
 HELP: 2all?
 { $values { "seq1" sequence } { "seq2" sequence } { "quot" { $quotation ( ... elt1 elt2 -- ... ? ) } } { "?" boolean } }
-{ $description "Tests the predicate pairwise against elements of " { $snippet "seq1" } " and " { $snippet "seq2" } ". If the sequences have different lengths, then only the smallest sequences items are compared with the other." }
+{ $description "Tests if all pairwise elements of " { $snippet "seq1" } " and " { $snippet "seq2" } " fulfill the predicate. If the sequences have different lengths, then only the smallest sequences items are compared with the other." }
 { $examples
   { $example
     "USING: math prettyprint sequences ;"
     "{ 1 2 3 4 } { 2 4 6 8 } [ <= ] 2all? ."
+    "t"
+  }
+} ;
+
+HELP: 2any?
+{ $values { "seq1" sequence } { "seq2" sequence } { "quot" { $quotation ( ... elt1 elt2 -- ... ? ) } } { "?" boolean } }
+{ $description "Tests if any pairwise elements of " { $snippet "seq1" } " and " { $snippet "seq2" } " fulfill the predicate. If the sequences have different lengths, then only the smallest sequences items are compared with the other." }
+{ $examples
+  { $example
+    "USING: math prettyprint sequences ;"
+    "{ 2 4 5 8 } { 2 4 6 8 } [ < ] 2any? ."
     "t"
   }
 } ;
@@ -835,6 +846,20 @@ HELP: slice-error
     }
 } ;
 
+HELP: >slice<
+{ $values
+    { "slice" slice }
+    { "from" integer } { "to" integer } { "seq" sequence }
+}
+{ $description "Sets up the stack for iteration with slots from a " { $link slice } ". Used with iteration in words such as " { $link sequence-operator } "." } ;
+
+HELP: >underlying<
+{ $values
+    { "slice/seq" object }
+    { "i" integer } { "n" integer }
+}
+{ $description "Sets up the stack for iteration with slots from a " { $link sequence } ". Used with iteration in words such as " { $link sequence-operator } "." } ;
+
 HELP: slice
 { $class-description "A virtual sequence which presents a subrange of the elements of an underlying sequence. New instances can be created by calling " { $link <slice> } ". Convenience words are also provided for creating slices where one endpoint is the start or end of the sequence; see " { $link "sequences-slices" } " for a list."
 $nl
@@ -1059,6 +1084,13 @@ HELP: tail-slice*
 
 { tail-slice tail-slice* } related-words
 
+HELP: head-to-index
+{ $values
+    { "seq" sequence } { "to" integer }
+    { "zero" object }
+}
+{ $description "Sets up the stack for the " { $link head } " word." } ;
+
 HELP: head
 { $values { "seq" sequence } { "n" "a non-negative integer" } { "headseq" "a new sequence" } }
 { $description "Outputs a new sequence consisting of the first " { $snippet "n" } " elements of the input sequence." }
@@ -1069,11 +1101,18 @@ HELP: head
     }
     "When a sequence may not have enough elements:"
     { $example "USING: sequences prettyprint ;"
-        "{ 1 2 } 5 short head ."
+        "{ 1 2 } 5 index-or-length head ."
         "{ 1 2 }"
     }
 }
 { $errors "Throws an error if the index is out of bounds." } ;
+
+HELP: index-to-tail
+{ $values
+    { "seq" sequence } { "from" integer }
+    { "length" object }
+}
+{ $description "Sets up the stack for the " { $link tail } " word." } ;
 
 HELP: tail
 { $values { "seq" sequence } { "n" "a non-negative integer" } { "tailseq" "a new sequence" } }
@@ -1085,7 +1124,7 @@ HELP: tail
     }
     "When a sequence may not have enough elements:"
     { $example "USING: sequences prettyprint ;"
-        "{ 1 2 } 5 short tail ."
+        "{ 1 2 } 5 index-or-length tail ."
         "{ }"
     }
 }
@@ -1111,7 +1150,7 @@ HELP: head*
     }
     "When a sequence may not have enough elements:"
     { $example "USING: sequences prettyprint ;"
-        "{ 1 2 } 5 short head* ."
+        "{ 1 2 } 5 index-or-length head* ."
         "{ }"
     }
 }
@@ -1127,7 +1166,7 @@ HELP: tail*
     }
     "When a sequence may not have enough elements:"
     { $example "USING: sequences prettyprint ;"
-        "{ 1 2 } 5 short tail* ."
+        "{ 1 2 } 5 index-or-length tail* ."
         "{ 1 2 }"
     }
 }
@@ -1135,7 +1174,7 @@ HELP: tail*
 
 { tail tail* tail-slice tail-slice* } related-words
 { head head* head-slice head-slice* } related-words
-{ cut cut* cut-slice } related-words
+{ cut cut* cut-slice cut-slice* } related-words
 { unclip unclip-slice unclip-last unclip-last-slice } related-words
 { first last but-last but-last-slice rest rest-slice } related-words
 
@@ -1161,9 +1200,14 @@ HELP: tail?
 { remove remove-nth remove-eq remove-eq! remove! remove-nth! } related-words
 
 HELP: cut-slice
-{ $values { "seq" sequence } { "n" "a non-negative integer" } { "before-slice" sequence } { "after-slice" "a slice" } }
-{ $description "Outputs a pair of sequences, where " { $snippet "before" } " consists of the first " { $snippet "n" } " elements of " { $snippet "seq" } " and has the same type, while " { $snippet "after" } " is a slice of the remaining elements." }
-{ $notes "Unlike " { $link cut } ", the run time of this word is proportional to the length of " { $snippet "before" } ", not " { $snippet "after" } ", so it is suitable for use in an iterative algorithm which cuts successive pieces off a sequence." } ;
+{ $values { "seq" sequence } { "n" "a non-negative integer" } { "before-slice" "a slice" } { "after-slice" "a slice" } }
+{ $description "Outputs a pair of sequences, where " { $snippet "before-slice" } " is a slice of the first " { $snippet "n" } " elements of " { $snippet "seq" } ", while " { $snippet "after-slice" } " is a slice of the remaining elements." }
+{ $notes "Unlike " { $link cut } ", this is suitable for use in an iterative algorithm which cuts successive pieces off a sequence." } ;
+
+HELP: cut-slice*
+{ $values { "seq" sequence } { "n" "a non-negative integer" } { "before-slice" "a slice" } { "after-slice" "a slice" } }
+{ $description "Outputs a pair of sequences, where " { $snippet "after" } " consists of the last " { $snippet "n" } " elements of " { $snippet "seq" } ", while " { $snippet "before-slice" } " is a slice of the remaining elements." }
+{ $notes "Unlike " { $link cut* } ", this is suitable for use in an iterative algorithm which cuts successive pieces off a sequence." } ;
 
 HELP: cut
 { $values { "seq" sequence } { "n" "a non-negative integer" } { "before" sequence } { "after" sequence } }
@@ -1174,16 +1218,35 @@ HELP: cut*
 { $values { "seq" sequence } { "n" "a non-negative integer" } { "before" sequence } { "after" sequence } }
 { $description "Outputs a pair of sequences, where " { $snippet "after" } " consists of the last " { $snippet "n" } " elements of " { $snippet "seq" } ", while " { $snippet "before" } " holds the remaining elements. Both output sequences have the same type as " { $snippet "seq" } "." } ;
 
-HELP: subseq-start-from
-{ $values { "subseq" sequence } { "seq" sequence } { "n" "a start index" } { "i" "a start index" } }
+HELP: subseq-starts-at?
+{ $values { "i" "a start index" } { "seq" sequence } { "subseq" sequence } { "?" boolean } }
+{ $description "Outputs " { $snippet "t" } " if the subseq starts at the " { $snippet "i" } "th element or outputs " { $link f } " if the sequence is not at that position." } ;
+
+HELP: subseq-index
+{ $values { "seq" sequence } { "subseq" sequence } { "i/f" "a start index or " { $snippet "f" } } }
 { $description "Outputs the start index of the first contiguous subsequence equal to " { $snippet "subseq" } ", starting the search from the " { $snippet "n" } "th element. If no matching subsequence is found, outputs " { $link f } "." } ;
 
+HELP: subseq-index-from
+{ $values { "n" "a start index" } { "seq" sequence } { "subseq" sequence } { "i/f" "a start index or " { $snippet "f" } } }
+{ $description "Outputs the start index of the first contiguous subsequence equal to " { $snippet "subseq" } ", starting the search from the " { $snippet "n" } "th element. If no matching subsequence is found, outputs " { $link f } "." } ;
+
+HELP: subseq-start-from
+{ $values
+    { "subseq" object } { "seq" sequence } { "n" integer }
+    { "i/f" { $maybe integer } }
+}
+{ $description "Outputs the start index of the first contiguous subsequence equal to " { $snippet "subseq" } ", or " { $link f } " if no matching subsequence is found starting from " { $snippet "n" } "." } ;
+
 HELP: subseq-start
-{ $values { "subseq" sequence } { "seq" sequence } { "i" "a start index" } }
+{ $values { "subseq" sequence } { "seq" sequence } { "i/f" "a start index or " { $snippet "f" } } }
 { $description "Outputs the start index of the first contiguous subsequence equal to " { $snippet "subseq" } ", or " { $link f } " if no matching subsequence is found." } ;
 
 HELP: subseq?
 { $values { "subseq" sequence } { "seq" sequence } { "?" boolean } }
+{ $description "Tests if " { $snippet "seq" } " contains the elements of " { $snippet "subseq" } " as a contiguous subsequence." } ;
+
+HELP: subseq-index?
+{ $values { "seq" sequence } { "subseq" sequence } { "?" boolean } }
 { $description "Tests if " { $snippet "seq" } " contains the elements of " { $snippet "subseq" } " as a contiguous subsequence." } ;
 
 HELP: drop-prefix
@@ -1224,14 +1287,68 @@ HELP: product
 HELP: infimum
 { $values { "seq" sequence } { "elt" object } }
 { $description "Outputs the least element of " { $snippet "seq" } "." }
+{ $examples
+    "Example:"
+    { $example "USING: sequences prettyprint ;"
+        "{ 1 2 3 4 5 } infimum ."
+        "1"
+    }
+    "Example:"
+    { $example "USING: sequences prettyprint ;"
+        "{ \"c\" \"b\" \"a\" } infimum ."
+        "\"a\""
+    }
+}
+{ $errors "Throws an error if the sequence is empty." } ;
+
+HELP: infimum-by
+{ $values
+    { "seq" sequence } { "quot" quotation }
+    { "elt" object }
+}
+{ $description "Outputs the least element of " { $snippet "seq" } " according to the " { $snippet "quot" } "." }
+{ $examples
+    "Example:"
+    { $example "USING: sequences prettyprint ;"
+        "{ { 1 2 } { 1 2 3 } { 1 2 3 4 } } [ length ] infimum-by ."
+        "{ 1 2 }"
+    }
+}
 { $errors "Throws an error if the sequence is empty." } ;
 
 HELP: supremum
 { $values { "seq" sequence } { "elt" object } }
 { $description "Outputs the greatest element of " { $snippet "seq" } "." }
+{ $examples
+    "Example:"
+    { $example "USING: sequences prettyprint ;"
+        "{ 1 2 3 4 5 } supremum ."
+        "5"
+    }
+    "Example:"
+    { $example "USING: sequences prettyprint ;"
+        "{ \"c\" \"b\" \"a\" } supremum ."
+        "\"c\""
+    }
+}
 { $errors "Throws an error if the sequence is empty." } ;
 
-{ min max supremum infimum } related-words
+HELP: supremum-by
+{ $values
+    { "seq" sequence } { "quot" quotation }
+    { "elt" object }
+}
+{ $description "Outputs the greatest element of " { $snippet "seq" } " according to the " { $snippet "quot" } "." }
+{ $examples
+    "Example:"
+    { $example "USING: sequences prettyprint ;"
+        "{ { 1 2 } { 1 2 3 } { 1 2 3 4 } } [ length ] supremum-by ."
+        "{ 1 2 3 4 }"
+    }
+}
+{ $errors "Throws an error if the sequence is empty." } ;
+
+{ min max infimum infimum-by supremum supremum-by } related-words
 
 HELP: shortest
 { $values { "seqs" sequence } { "elt" object } }
@@ -1263,8 +1380,8 @@ HELP: map-sum
 { $description "Like " { $snippet "map sum" } ", but without creating an intermediate sequence." }
 { $examples
     { $example
-        "USING: math math.ranges sequences prettyprint ;"
-        "100 [1,b] [ sq ] map-sum ."
+        "USING: math ranges sequences prettyprint ;"
+        "100 [1..b] [ sq ] map-sum ."
         "338350"
     }
 } ;
@@ -1274,8 +1391,8 @@ HELP: count
 { $description "Efficiently returns the number of elements that the predicate quotation matches." }
 { $examples
     { $example
-        "USING: math math.ranges sequences prettyprint ;"
-        "100 [1,b] [ even? ] count ."
+        "USING: math ranges sequences prettyprint ;"
+        "100 [1..b] [ even? ] count ."
         "50"
     }
 } ;
@@ -1491,7 +1608,7 @@ HELP: virtual@
 
 HELP: 2map-reduce
 { $values
-     { "seq1" sequence } { "seq2" sequence } { "map-quot" { $quotation ( ..a elt1 elt2 -- ..b intermediate ) } } { "reduce-quot" { $quotation ( ..b prev intermediate -- ..a next ) } }
+     { "seq1" sequence } { "seq2" sequence } { "map-quot" { $quotation ( ..a elt1 elt2 -- ..a intermediate ) } } { "reduce-quot" { $quotation ( ..a prev intermediate -- ..a next ) } }
      { "result" object } }
  { $description "Calls " { $snippet "map-quot" } " on each pair of elements from " { $snippet "seq1" } " and " { $snippet "seq2" } " and combines the results using " { $snippet "reduce-quot" } " in the same manner as " { $link reduce } ", except that there is no identity element, and the sequence must have a length of at least 1." }
 { $errors "Throws an error if the sequence is empty." }
@@ -1571,7 +1688,7 @@ HELP: insert-nth
 
 HELP: map-reduce
 { $values
-     { "seq" sequence } { "map-quot" { $quotation ( ..a elt -- ..b intermediate ) } } { "reduce-quot" { $quotation ( ..b prev intermediate -- ..a next ) } }
+     { "seq" sequence } { "map-quot" { $quotation ( ..a elt -- ..a intermediate ) } } { "reduce-quot" { $quotation ( ..a prev intermediate -- ..a next ) } }
      { "result" object } }
 { $description "Calls " { $snippet "map-quot" } " on each element and combines the results using " { $snippet "reduce-quot" } " in the same manner as " { $link reduce } ", except that there is no identity element, and the sequence must have a length of at least 1." }
 { $errors "Throws an error if the sequence is empty." }
@@ -1603,12 +1720,12 @@ HELP: sequence-hashcode-step
      { "newhash" integer } }
 { $description "An implementation word that computes a running hashcode of a sequence using some bit-twiddling. The resulting hashcode is always a fixnum." } ;
 
-HELP: short
+HELP: index-or-length
 { $values
      { "seq" sequence } { "n" integer } { "n'" integer } }
 { $description "Returns the input sequence and its length or " { $snippet "n" } ", whichever is less." }
 { $examples { $example "USING: sequences kernel prettyprint ;"
-    "\"abcd\" 3 short [ . ] bi@"
+    "\"abcd\" 3 index-or-length [ . ] bi@"
     "\"abcd\"\n3"
 } } ;
 
@@ -1743,7 +1860,7 @@ ARTICLE: "sequences-integers" "Counted loops"
 $nl
 "Combinators that produce new sequences, such as " { $link map } ", will output an array if the input is an instance of " { $link <iota> } "."
 $nl
-"More elaborate counted loops can be performed with " { $link "math.ranges" } "." ;
+"More elaborate counted loops can be performed with " { $link "ranges" } "." ;
 
 ARTICLE: "sequences-if" "Control flow with sequences"
 "To reduce the boilerplate of checking if a sequence is empty, several combinators are provided."
@@ -1910,7 +2027,7 @@ ARTICLE: "sequences-tests" "Testing sequences"
 "Testing if a sequence contains an object:"
 { $subsections member? member-eq? }
 "Testing if a sequence contains a subsequence:"
-{ $subsections head? tail? subseq? } ;
+{ $subsections head? tail? subseq? subseq-index? } ;
 
 ARTICLE: "sequences-search" "Searching sequences"
 "Finding the index of an element:"
@@ -1921,7 +2038,13 @@ ARTICLE: "sequences-search" "Searching sequences"
     last-index-from
 }
 "Finding the start of a subsequence:"
-{ $subsections subseq-start subseq-start-from }
+{ $subsections
+    subseq-start
+    subseq-start-from
+    subseq-index
+    subseq-index-from
+    subseq-starts-at?
+}
 "Finding the index of an element satisfying a predicate:"
 { $subsections
     find
@@ -2069,7 +2192,7 @@ $nl
 "Using sequences for looping:"
 { $subsections
     "sequences-integers"
-    "math.ranges"
+    "ranges"
 }
 "Using sequences for control flow:"
 { $subsections "sequences-if" }

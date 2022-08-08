@@ -5,15 +5,15 @@ sequences sorting xml.syntax webapps.mason.backend
 webapps.mason.utils ;
 IN: webapps.mason.downloads
 
-CONSTANT: CRASHED
-[XML <span style="background-color: yellow;">CRASHED</span> XML]
+CONSTANT: OFFLINE
+[XML <span style="background-color: khaki;">OFFLINE</span> XML]
 
 CONSTANT: BROKEN
 [XML <span style="background-color: red; color: white;">BROKEN</span> XML]
 
 : builder-status ( builder -- status/f )
     {
-        { [ dup crashed? ] [ drop CRASHED ] }
+        { [ dup offline? ] [ drop OFFLINE ] }
         { [ dup broken? ] [ drop BROKEN ] }
         [ drop f ]
     } cond ;

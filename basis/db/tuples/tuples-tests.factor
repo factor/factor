@@ -2,9 +2,8 @@
 ! Copyright (C) 2018 Alexander Ilin.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors calendar calendar.parser classes continuations
-db.tester db.tuples db.types kernel math math.intervals math.ranges
+db.tester db.tuples db.types kernel math math.intervals ranges
 namespaces random sequences sorting strings tools.test urls ;
-FROM: math.ranges => [a,b] ;
 IN: db.tuples.tests
 
 TUPLE: person the-id the-name the-number the-real
@@ -305,7 +304,7 @@ TUPLE: exam id name score ;
 
 : random-exam ( -- exam )
         f
-        6 [ CHAR: a CHAR: z [a,b] random ] replicate >string
+        6 [ CHAR: a CHAR: z [a..b] random ] replicate >string
         100 random
     exam boa ;
 

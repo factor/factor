@@ -21,7 +21,7 @@ SLOT: i
     [ underlying>> length ] [ i>> ] bi - rot min ; inline
 
 : <sequence-copy> ( dst n src-i src dst-i -- n copy )
-    [ ] curry 3curry dip <copy> ; inline
+    [ ] curry 3curry dip <copier> ; inline
 
 : sequence-copy-unsafe ( n buf stream offset -- count )
     [

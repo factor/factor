@@ -1,5 +1,4 @@
-USING: help.markup help.syntax kernel sequences
-sequences.private ;
+USING: help.markup help.syntax sequences sequences.private ;
 IN: growable
 
 ARTICLE: "growable" "Resizable sequence implementation"

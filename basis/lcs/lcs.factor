@@ -1,6 +1,5 @@
 USING: accessors arrays combinators combinators.short-circuit
-kernel locals make math math.order sequences sequences.private
-typed ;
+kernel make math math.order sequences sequences.private typed ;
 IN: lcs
 
 <PRIVATE

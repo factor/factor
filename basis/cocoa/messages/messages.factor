@@ -2,10 +2,10 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors alien alien.c-types alien.data alien.strings
 arrays assocs classes.struct cocoa.runtime cocoa.types
-combinators core-graphics.types fry generalizations
-io.encodings.utf8 kernel layouts libc locals macros make math
-memoize namespaces quotations sequences sets specialized-arrays
-splitting stack-checker strings words ;
+combinators core-graphics.types generalizations
+io.encodings.utf8 kernel layouts libc make math namespaces
+sequences sets specialized-arrays splitting stack-checker
+strings words ;
 QUALIFIED-WITH: alien.c-types c
 IN: cocoa.messages
 
@@ -40,7 +40,7 @@ super-message-senders [ H{ } clone ] initialize
 
 : <super> ( receiver -- super )
     [ ] [ object_getClass class_getSuperclass ] bi
-    objc-super <struct-boa> ;
+    objc-super boa ;
 
 TUPLE: selector-tuple name object ;
 
@@ -67,11 +67,11 @@ objc-methods [ H{ } clone ] initialize
 
 ERROR: no-objc-method name ;
 
-: ?lookup-method ( selector -- signature/f )
+: ?lookup-objc-method ( name -- signature/f )
     objc-methods get at ;
 
-: lookup-method ( selector -- signature )
-    dup ?lookup-method [ ] [ no-objc-method ] ?if ;
+: lookup-objc-method ( name -- signature )
+    dup ?lookup-objc-method [ ] [ no-objc-method ] ?if ;
 
 MEMO: make-prepare-send ( selector signature super? -- quot )
     [

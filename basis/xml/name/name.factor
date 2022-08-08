@@ -1,8 +1,8 @@
 ! Copyright (C) 2005, 2009 Daniel Ehrenberg
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel namespaces accessors xml.tokenize xml.data assocs
-xml.errors xml.char-classes combinators.short-circuit splitting
-fry xml.state sequences combinators ascii math make ;
+USING: accessors ascii assocs combinators
+combinators.short-circuit kernel make math namespaces sequences
+xml.char-classes xml.data xml.errors xml.state xml.tokenize ;
 IN: xml.name
 
 ! XML namespace processing: ns = namespace

@@ -53,10 +53,22 @@ M: object nil? drop f ;
 : (leach) ( list quot -- cdr quot )
     [ [ car ] dip call ] [ [ cdr ] dip ] 2bi ; inline
 
+: (2leach) ( list1 list2 quot -- cdr1 cdr2 quot )
+    [ [ [ car ] bi@ ] dip call ] [ [ [ cdr ] bi@ ] dip ] 3bi ; inline
+
 PRIVATE>
 
 : leach ( ... list quot: ( ... elt -- ... ) -- ... )
     over nil? [ 2drop ] [ (leach) leach ] if ; inline recursive
+
+: 2leach ( ... list1 list2 quot: ( ... elt1 elt2 -- ... ) -- ... )
+    2over [ nil? ] either? [ 3drop ] [ (2leach) 2leach ] if ; inline recursive
+
+: lreduce ( ... list identity quot: ( ... prev elt -- ... next ) -- ... result )
+    swapd leach ; inline
+
+: 2lreduce ( ... list1 list2 identity quot: ( ... prev elt1 elt2 -- ... next ) -- ... result )
+    -rotd 2leach ; inline
 
 : foldl ( ... list identity quot: ( ... prev elt -- ... next ) -- ... result )
     swapd leach ; inline

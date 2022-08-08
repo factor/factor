@@ -1,7 +1,7 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! Copyright (C) 2015 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: bootstrap.image checksums checksums.openssl fry io
+USING: bootstrap.image checksums checksums.openssl io
 io.directories io.encodings.ascii io.encodings.utf8 io.files
 io.files.temp io.files.unique io.launcher io.pathnames kernel
 make math.parser namespaces sequences splitting system unicode ;
@@ -24,7 +24,7 @@ SYMBOL: build-images-destination
     image-path parent-directory [
         { "git" "rev-parse" "--abbrev-ref" "HEAD" }
         utf8 <process-reader> stream-contents
-        [ blank? ] trim-tail
+        [ unicode:blank? ] trim-tail
     ] with-directory ;
 
 : git-branch-destination ( -- dest )

@@ -2,9 +2,9 @@
 ! See http://factorcode.org/license.txt for BSD license
 
 USING: accessors alien.c-types alien.data alien.endian arrays
-assocs calendar classes.struct combinators hashtables io
-io.binary io.encodings.binary io.files kernel locals math
-math.order sequences strings ;
+assocs calendar classes.struct combinators endian hashtables io
+io.encodings.binary io.files kernel locals math math.order
+sequences strings ;
 
 IN: tzinfo
 

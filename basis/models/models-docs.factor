@@ -48,7 +48,7 @@ HELP: deactivate-model
 
 HELP: compute-model
 { $values { "model" model } { "value" object } }
-{ $description "Activate and immediately deactivate the model, forcing recomputation of its value, which is returned. If the model is already activated, no dependencies are recalculated.  Useful when using models outside of gadget context or for testing." } ;
+{ $description "Activate and immediately deactivate the model, forcing recomputation of its value, which is returned. If the model is already activated, no dependencies are recalculated. Useful when using models outside of gadget context or for testing." } ;
 
 HELP: model-changed
 { $values { "model" model } { "observer" object } }

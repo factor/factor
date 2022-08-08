@@ -1,0 +1,55 @@
+<?xml version="1.0"?>
+<!DOCTYPE MODE SYSTEM "xmode.dtd">
+
+<!--
+ Mode for the roff family of text processing systems.
+ By Kostas Michalopoulos.
+ 
+ Known issues:
+   - In escape sequences with arguments, only single and double quotes are
+     recognized while the roff language allows for any character that doesn't
+     appear in the argument.
+   - Double quotes are not really required for textual macros (like .SH in man
+     pages), but the arguments are still text. However they are shown as
+     keywords and non-textual coloring is done. Not really a problem for most
+     roff documents (ie. manpages) though.
+   - Not sure if the last SPAN_REGEXP in ROFF_ESCAPE is a good idea...
+ 
+ Recommended catalog entry:
+ 
+   <MODE NAME="roff"
+         FILE="roff.xml"
+         FILE_NAME_GLOB="*.{1,2,3,4,5,6,7,8,9,me,ms,mm,mom,tmac}" />
+-->
+
+<MODE>
+    <PROPS>
+        <PROPERTY NAME="noTabs" VALUE="true"/>
+        <PROPERTY NAME="lineComment" VALUE="\\#"/>
+        <PROPERTY NAME="wordBreakChars" VALUE=",+-=&lt;&gt;/?^&amp;*"/>
+    </PROPS>
+    
+    <RULES HIGHLIGHT_DIGITS="FALSE">
+        <EOL_SPAN TYPE="COMMENT1">\#</EOL_SPAN>
+        <EOL_SPAN TYPE="COMMENT1">\"</EOL_SPAN>
+        <EOL_SPAN_REGEXP TYPE="KEYWORD1" AT_LINE_START="TRUE" DELEGATE="ROFF_ESCAPE">\.\s*\w+</EOL_SPAN_REGEXP>
+        <SEQ_REGEXP HASH_CHAR="\" TYPE="KEYWORD3">\\((\p{Graph}\[[^\]]*\])|(\p{Graph}((\'.*\')|(\".*\")))|(\p{Graph}{1,2}))</SEQ_REGEXP>
+    </RULES>
+    
+    <RULES SET="ROFF_ESCAPE">
+        <EOL_SPAN TYPE="COMMENT1">\"</EOL_SPAN>
+        <SPAN TYPE="LITERAL1" NO_LINE_BREAK="TRUE">
+            <BEGIN>"</BEGIN>
+            <END>"</END>
+        </SPAN>
+        <SPAN_REGEXP HASH_CHARS="0123456789" TYPE="DIGIT" NO_LINE_BREAK="TRUE">
+            <BEGIN>(\d|\.)+[icpPszfmnvM]?</BEGIN>
+            <END> </END>
+        </SPAN_REGEXP>
+        <SPAN_REGEXP HASH_CHARS="0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstwxyz" TYPE="KEYWORD2" NO_LINE_BREAK="TRUE">
+            <BEGIN>\w+</BEGIN>
+            <END> </END>
+        </SPAN_REGEXP>
+    </RULES>
+</MODE>
+

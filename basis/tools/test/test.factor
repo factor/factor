@@ -8,7 +8,7 @@ sequences.generalizations source-files source-files.errors
 source-files.errors.debugger splitting stack-checker summary
 system tools.errors tools.time unicode vocabs vocabs.files
 vocabs.hierarchy vocabs.hierarchy.private vocabs.loader
-vocabs.metadata vocabs.parser words ;
+vocabs.metadata vocabs.parser vocabs.refresh words ;
 IN: tools.test
 
 TUPLE: test-failure < source-file-error continuation ;
@@ -226,8 +226,15 @@ M: test-failure error. ( error -- )
 
 : test-all ( -- ) "" test ;
 
+: refresh-and-test ( prefix --  ) to-refresh [ do-refresh ] keepdd test-vocabs ;
+
+: refresh-and-test-all ( -- ) "" refresh-and-test ;
+
 : test-main ( -- )
-    command-line get [
+    command-line get
+    "--fast" swap [ member? ] [ remove ] 2bi swap
+    [ f long-unit-tests-enabled? set-global ] when
+    [
         dup vocab-roots get member? [
             "" vocabs-to-load [ require-all ] keep
         ] [

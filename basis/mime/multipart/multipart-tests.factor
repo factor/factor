@@ -3,7 +3,7 @@
 USING: accessors assocs continuations fry http.server io
 io.encodings.ascii io.files io.files.temp io.files.unique
 io.servers io.streams.duplex io.streams.string
-kernel math.ranges mime.multipart multiline namespaces random
+kernel ranges mime.multipart multiline namespaces random
 sequences sorting strings threads tools.test ;
 IN: mime.multipart.tests
 

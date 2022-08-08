@@ -3,7 +3,7 @@
 
 USING: accessors furnace.actions http.server
 http.server.dispatchers http.server.responses http.server.static
-kernel namespaces ;
+io.servers kernel namespaces ;
 
 IN: webapps.benchmark
 
@@ -21,7 +21,7 @@ TUPLE: benchmark-dispatcher < dispatcher ;
 : run-benchmark-webapp ( -- )
     <benchmark-dispatcher>
         main-responder set-global
-    8080 httpd drop ;
+    8080 httpd wait-for-server ;
 
 ! Use this with apachebench:
 !

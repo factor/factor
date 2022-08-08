@@ -4,7 +4,7 @@ USING: accessors alien alien.c-types alien.data alien.strings
 alien.syntax arrays assocs classes.struct combinators
 core-foundation core-foundation.arrays core-foundation.run-loop
 core-foundation.strings core-foundation.time destructors init
-io.encodings.utf8 kernel locals namespaces sequences
+io.encodings.utf8 kernel namespaces sequences
 specialized-arrays unix.types ;
 IN: core-foundation.fsevents
 
@@ -129,7 +129,7 @@ FUNCTION: void FSEventStreamShow ( FSEventStreamRef streamRef )
 FUNCTION: CFStringRef FSEventStreamCopyDescription ( FSEventStreamRef streamRef )
 
 : make-FSEventStreamContext ( info -- alien )
-    FSEventStreamContext <struct>
+    FSEventStreamContext new
         swap >>info ;
 
 :: <FSEventStream> ( callback info paths latency flags -- event-stream )
@@ -174,10 +174,10 @@ SYMBOL: event-stream-callbacks
 : event-stream-counter ( -- n )
     \ event-stream-counter counter ;
 
-[
+STARTUP-HOOK: [
     event-stream-callbacks
     [ [ drop expired? ] H{ } assoc-reject-as ] change-global
-] "core-foundation" add-startup-hook
+]
 
 : add-event-source-callback ( quot -- id )
     event-stream-counter <alien>

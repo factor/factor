@@ -1,7 +1,7 @@
 ! Copyright (C) 2009 Slava Pestov, Joe Groff.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors alien alien.data combinators cpu.architecture fry
-grouping kernel libc locals math math.libm math.order math.ranges
+USING: accessors alien alien.data combinators cpu.architecture
+grouping kernel libc math math.libm math.order ranges
 sequences sequences.cords sequences.generalizations sequences.private
 sequences.unrolled sequences.unrolled.private specialized-arrays
 vocabs ;
@@ -187,7 +187,7 @@ PRIVATE>
 ! XXX
 : (simd-vdot)              ( a b rep -- n )
     [ 2byte>rep-array [ [ first ] bi@ * ] 2keep ] keep
-    1 swap rep-length [a,b) [ '[ _ swap nth-unsafe ] bi@ * + ] 2with each ;
+    1 swap rep-length [a..b) [ '[ _ swap nth-unsafe ] bi@ * + ] 2with each ;
 : (simd-vsqrt)             ( a   rep -- c ) [ fsqrt ] components-map ;
 : (simd-vsad)              ( a b rep -- c ) 2byte>rep-array [ - abs ] [ + ] 2map-reduce ;
 : (simd-sum)               ( a   rep -- n ) [ + ] components-reduce ;

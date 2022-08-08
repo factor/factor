@@ -12,14 +12,12 @@ USING:
     assocs
     base64
     byte-arrays
-    hashtables
     http
     http.client
     io.encodings.binary
     json.reader
     json.writer
     kernel
-    locals
     namespaces
     sequences
     strings
@@ -43,7 +41,7 @@ IN: bitcoin.client
 
 : bitcoin-url ( -- url )
     <url>
-      "http" >>protocol
+      "https" >>protocol
       "/" >>path
       bitcoin-server >>host
       bitcoin-port >>port ;

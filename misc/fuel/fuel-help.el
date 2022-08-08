@@ -1,4 +1,4 @@
-;;; fuel-help.el -- accessing Factor's help system
+;;; fuel-help.el -- accessing Factor's help system -*- lexical-binding: t -*-
 
 ;; Copyright (C) 2008, 2009, 2010 Jose Antonio Ortega Ruiz
 ;; See http://factorcode.org/license.txt for BSD license.

@@ -4,11 +4,13 @@ USING: ascii kernel math sequences splitting strings tools.test ;
 { "hello" "world-+." } [ "hello-+world-+." "-+" split1 ] unit-test
 { "goodbye" f } [ "goodbye" " " split1 ] unit-test
 { "" "" } [ "great" "great" split1 ] unit-test
+{ { 1 2 3 } f } [ { 1 2 3 } { 5 6 } split1 ] unit-test
 
 { "hello world" "." } [ "hello world ." " " split1-last ] unit-test
 { "hello-+world" "." } [ "hello-+world-+." "-+" split1-last ] unit-test
 { "goodbye" f } [ "goodbye" " " split1-last ] unit-test
 { "" "" } [ "great" "great" split1-last ] unit-test
+{ { 1 2 3 } f } [ { 1 2 3 } { 5 6 } split1-last ] unit-test
 
 { "hello world" "." } [ "hello world ." " " split1-last-slice [ >string ] bi@ ] unit-test
 { "hello-+world" "." } [ "hello-+world-+." "-+" split1-last-slice [ >string ] bi@ ] unit-test
@@ -24,52 +26,52 @@ USING: ascii kernel math sequences splitting strings tools.test ;
 { "Beginning and end" f } [ "Beginning and end" "eginning " ?tail ] unit-test
 
 { { "This" "is" "a" "split" "sentence" } }
-[ "This is a split sentence" " " split ]
+[ "This is a split sentence" split-words ]
 unit-test
 
 { { "OneWord" } }
-[ "OneWord" " " split ]
+[ "OneWord" split-words ]
 unit-test
 
 { { "a" "b" "c" "d" "e" "f" } }
 [ "aXbYcXdYeXf" "XY" split ] unit-test
 
 { { "" "" } }
-[ " " " " split ] unit-test
+[ " " split-words ] unit-test
 
 { { "hey" } }
-[ "hey" " " split ] unit-test
+[ "hey" split-words ] unit-test
 
 { "Hello world" t } [ "Hello world\n" "\n" ?tail ] unit-test
 { "Hello world" f } [ "Hello world" "\n" ?tail ] unit-test
 { "" t } [ "\n" "\n" ?tail ] unit-test
 { "" f } [ "" "\n" ?tail ] unit-test
 
-{ { } } [ "" string-lines ] unit-test
-{ { "" } } [ "\n" string-lines ] unit-test
-{ { "" } } [ "\r" string-lines ] unit-test
-{ { "" } } [ "\r\n" string-lines ] unit-test
-{ { "hello" } } [ "hello" string-lines ] unit-test
-{ { "hello" } } [ "hello\n" string-lines ] unit-test
-{ { "hello" } } [ "hello\r" string-lines ] unit-test
-{ { "hello" } } [ "hello\r\n" string-lines ] unit-test
-{ { "hello" "hi" } } [ "hello\nhi" string-lines ] unit-test
-{ { "hello" "hi" } } [ "hello\rhi" string-lines ] unit-test
-{ { "hello" "hi" } } [ "hello\r\nhi" string-lines ] unit-test
-{ { "hello" "" "" } } [ "hello\n\n\n" string-lines ] unit-test
+{ { } } [ "" split-lines ] unit-test
+{ { "" } } [ "\n" split-lines ] unit-test
+{ { "" } } [ "\r" split-lines ] unit-test
+{ { "" } } [ "\r\n" split-lines ] unit-test
+{ { "hello" } } [ "hello" split-lines ] unit-test
+{ { "hello" } } [ "hello\n" split-lines ] unit-test
+{ { "hello" } } [ "hello\r" split-lines ] unit-test
+{ { "hello" } } [ "hello\r\n" split-lines ] unit-test
+{ { "hello" "hi" } } [ "hello\nhi" split-lines ] unit-test
+{ { "hello" "hi" } } [ "hello\rhi" split-lines ] unit-test
+{ { "hello" "hi" } } [ "hello\r\nhi" split-lines ] unit-test
+{ { "hello" "" "" } } [ "hello\n\n\n" split-lines ] unit-test
 
-{ { } } [ SBUF" " string-lines ] unit-test
-{ { "" } } [ SBUF" \n" string-lines ] unit-test
-{ { "" } } [ SBUF" \r" string-lines ] unit-test
-{ { "" } } [ SBUF" \r\n" string-lines ] unit-test
-{ { "hello" } } [ SBUF" hello" string-lines ] unit-test
-{ { "hello" } } [ SBUF" hello\n" string-lines ] unit-test
-{ { "hello" } } [ SBUF" hello\r" string-lines ] unit-test
-{ { "hello" } } [ SBUF" hello\r\n" string-lines ] unit-test
-{ { "hello" "hi" } } [ SBUF" hello\nhi" string-lines ] unit-test
-{ { "hello" "hi" } } [ SBUF" hello\rhi" string-lines ] unit-test
-{ { "hello" "hi" } } [ SBUF" hello\r\nhi" string-lines ] unit-test
-{ { "hello" "" "" } } [ SBUF" hello\n\n\n" string-lines ] unit-test
+{ { } } [ SBUF" " split-lines ] unit-test
+{ { "" } } [ SBUF" \n" split-lines ] unit-test
+{ { "" } } [ SBUF" \r" split-lines ] unit-test
+{ { "" } } [ SBUF" \r\n" split-lines ] unit-test
+{ { "hello" } } [ SBUF" hello" split-lines ] unit-test
+{ { "hello" } } [ SBUF" hello\n" split-lines ] unit-test
+{ { "hello" } } [ SBUF" hello\r" split-lines ] unit-test
+{ { "hello" } } [ SBUF" hello\r\n" split-lines ] unit-test
+{ { "hello" "hi" } } [ SBUF" hello\nhi" split-lines ] unit-test
+{ { "hello" "hi" } } [ SBUF" hello\rhi" split-lines ] unit-test
+{ { "hello" "hi" } } [ SBUF" hello\r\nhi" split-lines ] unit-test
+{ { "hello" "" "" } } [ SBUF" hello\n\n\n" split-lines ] unit-test
 
 { { "hey" "world" "what's" "happening" } }
 [ "heyAworldBwhat'sChappening" [ LETTER? ] split-when ] unit-test

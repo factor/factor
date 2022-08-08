@@ -1,0 +1,1132 @@
+<?xml version="1.0"?>
+
+<!DOCTYPE MODE SYSTEM "xmode.dtd">
+
+<!--
+    This file is partially based on lisp.xml and mostly in
+    the documentation found at: http://clojure.org/
+
+    Why are you looking at this file?
+      Do the symbols handled by this file seem out of date?
+      Want to do something about it?
+      Do you know Clojure?
+      Do you use linux?
+        (or are you knowledgeable enought to translate to your os?)
+
+    Verify file coverage of Clojure namespace symbols using code in:
+      misc/clojure
+    in the standard jEdit source tree. See misc/clojure/README.txt for details.
+
+    author: dsm 2008-10-24 0.1
+    author: mma 2015-03-29 0.2
+-->
+
+<MODE>
+    <PROPS>
+        <PROPERTY NAME="lineComment" VALUE=";" />
+        <PROPERTY NAME="noWordSep" VALUE=".*+!-_?/" />
+        <PROPERTY NAME="unalignedOpenBrackets" VALUE="(" />
+        <PROPERTY NAME="unalignedCloseBrackets" VALUE=")" />
+        <PROPERTY NAME="multipleBracketIndent" VALUE="true" />
+    </PROPS>
+
+    <RULES  IGNORE_CASE="FALSE"
+                HIGHLIGHT_DIGITS="TRUE"
+        NO_WORD_SEP=".*+!-_?/"
+        DIGIT_RE="([0-9]+)|(([0-9]*\.[0-9]+)M?)|([0-9]+/[0-9]+)">
+        <!-- S-exps / lists.
+             Quoted first so as to not break the normal ones.
+             This is highly repetitive, there must be a better way
+        -->
+        <SPAN TYPE="KEYWORD4" DELEGATE="MAIN">
+            <BEGIN>*</BEGIN>
+            <END>*</END>
+        </SPAN>
+        <SPAN TYPE="MARKUP" DELEGATE="MAIN">
+            <BEGIN>#^(</BEGIN>
+            <END>)</END>
+        </SPAN>
+        <SPAN TYPE="LITERAL3" DELEGATE="MAIN">
+            <BEGIN>@(</BEGIN>
+            <END>)</END>
+        </SPAN>
+        <SPAN TYPE="LITERAL3" DELEGATE="MAIN">
+            <BEGIN>^(</BEGIN>
+            <END>)</END>
+        </SPAN>
+        <SPAN TYPE="LITERAL3" DELEGATE="MAIN">
+            <BEGIN>`(</BEGIN>
+            <END>)</END>
+        </SPAN>
+        <SPAN TYPE="LITERAL3" DELEGATE="MAIN">
+            <BEGIN>&apos;(</BEGIN>
+            <END>)</END>
+        </SPAN>
+        <SPAN TYPE="COMMENT3" DELEGATE="MAIN">
+            <BEGIN>#_(</BEGIN>
+            <END>)</END>
+        </SPAN>
+        <SPAN TYPE="KEYWORD1" DELEGATE="MAIN">
+            <BEGIN>#(</BEGIN>
+            <END>)</END>
+        </SPAN>
+        <SPAN TYPE="MARKUP" DELEGATE="MAIN">
+            <BEGIN>(</BEGIN>
+            <END>)</END>
+        </SPAN>
+
+        <!-- Vectors -->
+        <SPAN TYPE="MARKUP" DELEGATE="MAIN">
+            <BEGIN>#^[</BEGIN>
+            <END>]</END>
+        </SPAN>
+        <SPAN TYPE="LITERAL3" DELEGATE="MAIN">
+            <BEGIN>@[</BEGIN>
+            <END>]</END>
+        </SPAN>
+        <SPAN TYPE="LITERAL3" DELEGATE="MAIN">
+            <BEGIN>^[</BEGIN>
+            <END>]</END>
+        </SPAN>
+        <SPAN TYPE="LITERAL3" DELEGATE="MAIN">
+            <BEGIN>&apos;[</BEGIN>
+            <END>]</END>
+        </SPAN>
+        <SPAN TYPE="LABEL" DELEGATE="MAIN">
+            <BEGIN>[</BEGIN>
+            <END>]</END>
+        </SPAN>
+
+        <!-- Maps -->
+        <SPAN TYPE="MARKUP" DELEGATE="MAIN">
+            <BEGIN>#^{</BEGIN>
+            <END>}</END>
+        </SPAN>
+        <SPAN TYPE="LITERAL3" DELEGATE="MAIN">
+            <BEGIN>@{</BEGIN>
+            <END>}</END>
+        </SPAN>
+        <SPAN TYPE="LITERAL3" DELEGATE="MAIN">
+            <BEGIN>^{</BEGIN>
+            <END>}</END>
+        </SPAN>
+        <SPAN TYPE="LITERAL3" DELEGATE="MAIN">
+            <BEGIN>&apos;{</BEGIN>
+            <END>}</END>
+        </SPAN>
+        <SPAN TYPE="LABEL" DELEGATE="MAIN">
+            <BEGIN>{</BEGIN>
+            <END>}</END>
+        </SPAN>
+
+        <!-- Sets -->
+        <SPAN TYPE="MARKUP" DELEGATE="MAIN">
+            <BEGIN>#^#{</BEGIN>
+            <END>}</END>
+        </SPAN>
+        <SPAN TYPE="LITERAL3" DELEGATE="MAIN">
+            <BEGIN>@#{</BEGIN>
+            <END>}</END>
+        </SPAN>
+        <SPAN TYPE="LITERAL3" DELEGATE="MAIN">
+            <BEGIN>^#{</BEGIN>
+            <END>}</END>
+        </SPAN>
+        <SPAN TYPE="LITERAL3" DELEGATE="MAIN">
+            <BEGIN>&apos;#{</BEGIN>
+            <END>}</END>
+        </SPAN>
+        <SPAN TYPE="LABEL" DELEGATE="MAIN">
+            <BEGIN>#{</BEGIN>
+            <END>}</END>
+        </SPAN>
+
+        <!-- Quoted symbols -->
+        <SEQ AT_WORD_START="TRUE" TYPE="KEYWORD2">#&apos;</SEQ>
+        <MARK_FOLLOWING
+            AT_WORD_START="TRUE"
+            TYPE="LITERAL3">&apos;</MARK_FOLLOWING>
+        <!-- Meta symbols -->
+        <MARK_FOLLOWING
+            AT_WORD_START="TRUE"
+            TYPE="LABEL">^</MARK_FOLLOWING>
+        <!-- Deref symbols -->
+        <MARK_FOLLOWING
+            AT_WORD_START="TRUE"
+            TYPE="LABEL">@</MARK_FOLLOWING>
+        <!-- java interop -->
+        <MARK_FOLLOWING
+            AT_WORD_START="TRUE"
+            TYPE="LITERAL3">.</MARK_FOLLOWING>
+        <!-- Metadata -->
+        <MARK_FOLLOWING
+            AT_WORD_START="TRUE"
+            TYPE="MARKUP">#^</MARK_FOLLOWING>
+
+            <!-- Based on convention discussed here:
+                     http://www.gigamonkeys.com/book/syntax-and-semantics.html -->
+            <EOL_SPAN TYPE="COMMENT4">;;;;</EOL_SPAN>
+            <EOL_SPAN TYPE="COMMENT3">;;;</EOL_SPAN>
+            <EOL_SPAN TYPE="COMMENT2">;;</EOL_SPAN>
+            <EOL_SPAN TYPE="COMMENT1">;</EOL_SPAN>
+
+            <SPAN TYPE="LITERAL2" DELEGATE="REGEXPS" ESCAPE="\">
+                <BEGIN>#&quot;</BEGIN>
+                <END>&quot;</END>
+            </SPAN>
+
+            <SPAN TYPE="LITERAL1" DELEGATE="STRINGS" ESCAPE="\">
+                <BEGIN>&quot;</BEGIN>
+                <END>&quot;</END>
+            </SPAN>
+
+        <!-- Character literals -->
+        <SEQ_REGEXP
+            HASH_CHAR="\"
+            AT_WORD_START="TRUE"
+            TYPE="LITERAL2">\\(.|newline|space|tab)</SEQ_REGEXP>
+
+        <!-- The &apos;.&apos; special form -->
+        <SEQ AT_WORD_START="TRUE" TYPE="LITERAL4">.</SEQ>
+
+        <!-- Namespace separators -->
+        <!-- <MARK_PREVIOUS
+                TYPE="LITERAL4"
+                MATCH_TYPE="CONTEXT">/</MARK_PREVIOUS>
+        <MARK_PREVIOUS
+                TYPE="LITERAL4"
+                MATCH_TYPE="CONTEXT">.</MARK_PREVIOUS> -->
+
+        <!-- KEYWORD4: All keywords -->
+        <MARK_FOLLOWING
+            AT_WORD_START="TRUE"
+            TYPE="KEYWORD4">:</MARK_FOLLOWING>
+
+        <KEYWORDS>
+            <!--
+                    KEYWORD1:  Definitions and binding.
+              -->
+
+            <KEYWORD1>assert</KEYWORD1>
+
+            <KEYWORD1>binding</KEYWORD1>
+
+            <KEYWORD1>bound-fn</KEYWORD1>
+            <KEYWORD1>bound-fn*</KEYWORD1>
+
+            <KEYWORD1>comment</KEYWORD1>
+
+            <KEYWORD1>compile</KEYWORD1>
+            <KEYWORD1>gen-class</KEYWORD1>
+            <KEYWORD1>gen-interface</KEYWORD1>
+
+            <KEYWORD1>declare</KEYWORD1>
+
+            <KEYWORD1>def</KEYWORD1>
+            <KEYWORD1>definline</KEYWORD1>
+            <KEYWORD1>definterceptor</KEYWORD1>
+            <KEYWORD1>definterceptorfn</KEYWORD1>
+            <KEYWORD1>definterface</KEYWORD1>
+            <KEYWORD1>defmacro</KEYWORD1>
+            <KEYWORD1>defmethod</KEYWORD1>
+            <KEYWORD1>defmulti</KEYWORD1>
+            <KEYWORD1>defn</KEYWORD1>
+            <KEYWORD1>defn-</KEYWORD1>
+            <KEYWORD1>defon-request</KEYWORD1>
+            <KEYWORD1>defonce</KEYWORD1>
+            <KEYWORD1>defprotocol</KEYWORD1>
+            <KEYWORD1>defrecord</KEYWORD1>
+            <KEYWORD1>defstruct</KEYWORD1>
+            <KEYWORD1>deftest</KEYWORD1>
+            <KEYWORD1>deftest-</KEYWORD1>
+            <KEYWORD1>deftype</KEYWORD1>
+            <KEYWORD1>extend</KEYWORD1>
+            <KEYWORD1>extenders</KEYWORD1>
+            <KEYWORD1>extend-protocol</KEYWORD1>
+            <KEYWORD1>extend-type</KEYWORD1>
+            <KEYWORD1>get-method</KEYWORD1>
+            <KEYWORD1>methods</KEYWORD1>
+            <KEYWORD1>prefers</KEYWORD1>
+            <KEYWORD1>prefer-method</KEYWORD1>
+            <KEYWORD1>remove-all-methods</KEYWORD1>
+            <KEYWORD1>remove-method</KEYWORD1>
+
+            <KEYWORD1>eval</KEYWORD1>
+
+            <KEYWORD1>fn</KEYWORD1>
+            <KEYWORD1>partial</KEYWORD1>
+
+            <KEYWORD1>ns</KEYWORD1>
+            <KEYWORD1>import</KEYWORD1>
+            <KEYWORD1>intern</KEYWORD1>
+            <KEYWORD1>loaded-libs</KEYWORD1>
+            <KEYWORD1>refer</KEYWORD1>
+            <KEYWORD1>refer-clojure</KEYWORD1>
+            <KEYWORD1>reify</KEYWORD1>
+            <KEYWORD1>require</KEYWORD1>
+            <KEYWORD1>the-ns</KEYWORD1>
+            <KEYWORD1>use</KEYWORD1>
+
+            <KEYWORD1>all-ns</KEYWORD1>
+            <KEYWORD1>alias</KEYWORD1>
+            <KEYWORD1>create-ns</KEYWORD1>
+            <KEYWORD1>find-keyword</KEYWORD1>
+            <KEYWORD1>find-ns</KEYWORD1>
+            <KEYWORD1>in-ns</KEYWORD1>
+            <KEYWORD1>ns-name</KEYWORD1>
+            <KEYWORD1>ns-map</KEYWORD1>
+            <KEYWORD1>ns-aliases</KEYWORD1>
+            <KEYWORD1>ns-interns</KEYWORD1>
+            <KEYWORD1>ns-publics</KEYWORD1>
+            <KEYWORD1>ns-imports</KEYWORD1>
+            <KEYWORD1>ns-refers</KEYWORD1>
+            <KEYWORD1>ns-resolve</KEYWORD1>
+            <KEYWORD1>ns-unmap</KEYWORD1>
+            <KEYWORD1>ns-unalias</KEYWORD1>
+            <KEYWORD1>remove-ns</KEYWORD1>
+
+            <!--
+                    KEYWORD2:  Flow control
+              -->
+
+            <KEYWORD2>case</KEYWORD2>
+
+            <KEYWORD2>cond</KEYWORD2>
+            <KEYWORD2>condp</KEYWORD2>
+            <KEYWORD2>cond-&gt;</KEYWORD2>
+            <KEYWORD2>cond-&gt;&gt;</KEYWORD2>
+
+            <KEYWORD2>destructure</KEYWORD2>
+
+            <KEYWORD2>do</KEYWORD2>
+            <KEYWORD2>doall</KEYWORD2>
+            <KEYWORD2>dorun</KEYWORD2>
+            <KEYWORD2>doseq</KEYWORD2>
+            <KEYWORD2>dosync</KEYWORD2>
+            <KEYWORD2>dotimes</KEYWORD2>
+            <KEYWORD2>doto</KEYWORD2>
+
+            <KEYWORD2>for</KEYWORD2>
+
+            <KEYWORD2>if</KEYWORD2>
+            <KEYWORD2>if-let</KEYWORD2>
+            <KEYWORD2>if-not</KEYWORD2>
+            <KEYWORD2>if-some</KEYWORD2>
+
+            <KEYWORD2>let</KEYWORD2>
+            <KEYWORD2>letfn</KEYWORD2>
+
+            <KEYWORD2>loop</KEYWORD2>
+            <KEYWORD2>recur</KEYWORD2>
+
+            <KEYWORD2>sync</KEYWORD2>
+
+            <KEYWORD2>trampoline</KEYWORD2>
+
+            <KEYWORD2>try</KEYWORD2>
+            <KEYWORD2>catch</KEYWORD2>
+            <KEYWORD2>finally</KEYWORD2>
+            <KEYWORD2>throw</KEYWORD2>
+
+            <KEYWORD2>while</KEYWORD2>
+
+            <KEYWORD2>when</KEYWORD2>
+            <KEYWORD2>when-first</KEYWORD2>
+            <KEYWORD2>when-let</KEYWORD2>
+            <KEYWORD2>when-not</KEYWORD2>
+            <KEYWORD2>when-some</KEYWORD2>
+
+            <!--
+                    KEYWORD3:  Core functions and macros
+              -->
+
+            <KEYWORD3>alter</KEYWORD3>
+            <KEYWORD3>alter-meta!</KEYWORD3>
+            <KEYWORD3>alter-var-root</KEYWORD3>
+            <KEYWORD3>commute</KEYWORD3>
+            <KEYWORD3>compare-and-set!</KEYWORD3>
+            <KEYWORD3>ensure</KEYWORD3>
+            <KEYWORD3>ref</KEYWORD3>
+            <KEYWORD3>ref-history-count</KEYWORD3>
+            <KEYWORD3>ref-max-history</KEYWORD3>
+            <KEYWORD3>ref-min-history</KEYWORD3>
+            <KEYWORD3>ref-set</KEYWORD3>
+            <KEYWORD3>reset!</KEYWORD3>
+            <KEYWORD3>reset-meta!</KEYWORD3>
+            <KEYWORD3>set!</KEYWORD3>
+            <KEYWORD3>swap!</KEYWORD3>
+
+            <KEYWORD3>agent</KEYWORD3>
+            <KEYWORD3>agent-error</KEYWORD3>
+            <KEYWORD3>agent-errors</KEYWORD3>
+            <KEYWORD3>add-watch</KEYWORD3>
+            <KEYWORD3>await</KEYWORD3>
+            <KEYWORD3>await-for</KEYWORD3>
+            <KEYWORD3>clear-agent-errors</KEYWORD3>
+            <KEYWORD3>error-handler</KEYWORD3>
+            <KEYWORD3>error-mode</KEYWORD3>
+            <KEYWORD3>get-validator</KEYWORD3>
+            <KEYWORD3>release-pending-sends</KEYWORD3>
+            <KEYWORD3>remove-watch</KEYWORD3>
+            <KEYWORD3>restart-agent</KEYWORD3>
+            <KEYWORD3>send</KEYWORD3>
+            <KEYWORD3>send-off</KEYWORD3>
+            <KEYWORD3>send-via</KEYWORD3>
+            <KEYWORD3>set-agent-send-executor!</KEYWORD3>
+            <KEYWORD3>set-agent-send-off-executor!</KEYWORD3>
+            <KEYWORD3>set-error-handler!</KEYWORD3>
+            <KEYWORD3>set-error-mode!</KEYWORD3>
+            <KEYWORD3>set-validator!</KEYWORD3>
+            <KEYWORD3>shutdown-agents</KEYWORD3>
+
+            <KEYWORD3>future</KEYWORD3>
+            <KEYWORD3>future-call</KEYWORD3>
+            <KEYWORD3>future-cancel</KEYWORD3>
+            <KEYWORD3>deliver</KEYWORD3>
+            <KEYWORD3>deref</KEYWORD3>
+            <KEYWORD3>locking</KEYWORD3>
+            <KEYWORD3>pcalls</KEYWORD3>
+            <KEYWORD3>pmap</KEYWORD3>
+            <KEYWORD3>promise</KEYWORD3>
+
+            <KEYWORD3>delay</KEYWORD3>
+            <KEYWORD3>force</KEYWORD3>
+
+            <KEYWORD3>amap</KEYWORD3>
+            <KEYWORD3>map</KEYWORD3>
+            <KEYWORD3>mapcat</KEYWORD3>
+            <KEYWORD3>mapv</KEYWORD3>
+            <KEYWORD3>map-indexed</KEYWORD3>
+            <KEYWORD3>filter</KEYWORD3>
+            <KEYWORD3>filterv</KEYWORD3>
+            <KEYWORD3>sort</KEYWORD3>
+            <KEYWORD3>sort-by</KEYWORD3>
+
+            <KEYWORD3>get-thread-bindings</KEYWORD3>
+
+            <KEYWORD3>gensym</KEYWORD3>
+
+            <KEYWORD3>memoize</KEYWORD3>
+
+            <KEYWORD3>meta</KEYWORD3>
+            <KEYWORD3>vary-meta</KEYWORD3>
+
+            <KEYWORD3>name</KEYWORD3>
+            <KEYWORD3>namespace</KEYWORD3>
+            <KEYWORD3>resolve</KEYWORD3>
+
+            <KEYWORD3>quote</KEYWORD3>
+            <KEYWORD3>unquote</KEYWORD3>
+            <KEYWORD3>unquote-splicing</KEYWORD3>
+
+            <KEYWORD3>var</KEYWORD3>
+            <KEYWORD3>find-var</KEYWORD3>
+            <KEYWORD3>var-get</KEYWORD3>
+            <KEYWORD3>var-set</KEYWORD3>
+
+            <!-- Types and allocators -->
+            <KEYWORD3>empty</KEYWORD3>
+            <KEYWORD3>new</KEYWORD3>
+            <KEYWORD3>array-map</KEYWORD3>
+            <KEYWORD3>atom</KEYWORD3>
+            <KEYWORD3>bigdec</KEYWORD3>
+            <KEYWORD3>bigint</KEYWORD3>
+            <KEYWORD3>biginteger</KEYWORD3>
+            <KEYWORD3>boolean</KEYWORD3>
+            <KEYWORD3>boolean-array</KEYWORD3>
+            <KEYWORD3>booleans</KEYWORD3>
+            <KEYWORD3>byte</KEYWORD3>
+            <KEYWORD3>byte-array</KEYWORD3>
+            <KEYWORD3>bytes</KEYWORD3>
+            <KEYWORD3>cast</KEYWORD3>
+            <KEYWORD3>char</KEYWORD3>
+            <KEYWORD3>char-array</KEYWORD3>
+            <KEYWORD3>chars</KEYWORD3>
+            <KEYWORD3>construct-proxy</KEYWORD3>
+            <KEYWORD3>create-struct</KEYWORD3>
+            <KEYWORD3>denominator</KEYWORD3>
+            <KEYWORD3>double</KEYWORD3>
+            <KEYWORD3>double-array</KEYWORD3>
+            <KEYWORD3>doubles</KEYWORD3>
+            <KEYWORD3>enumeration-seq</KEYWORD3>
+            <KEYWORD3>float</KEYWORD3>
+            <KEYWORD3>float-array</KEYWORD3>
+            <KEYWORD3>floats</KEYWORD3>
+            <KEYWORD3>get-proxy-class</KEYWORD3>
+            <KEYWORD3>hash</KEYWORD3>
+            <KEYWORD3>hash-combine</KEYWORD3>
+            <KEYWORD3>hash-map</KEYWORD3>
+            <KEYWORD3>hash-ordered-coll</KEYWORD3>
+            <KEYWORD3>hash-set</KEYWORD3>
+            <KEYWORD3>hash-unordered-coll</KEYWORD3>
+            <KEYWORD3>init-proxy</KEYWORD3>
+            <KEYWORD3>int</KEYWORD3>
+            <KEYWORD3>int-array</KEYWORD3>
+            <KEYWORD3>interpose</KEYWORD3>
+            <KEYWORD3>ints</KEYWORD3>
+            <KEYWORD3>list</KEYWORD3>
+            <KEYWORD3>list*</KEYWORD3>
+            <KEYWORD3>long</KEYWORD3>
+            <KEYWORD3>long-array</KEYWORD3>
+            <KEYWORD3>longs</KEYWORD3>
+            <KEYWORD3>make-array</KEYWORD3>
+            <KEYWORD3>num</KEYWORD3>
+            <KEYWORD3>numerator</KEYWORD3>
+            <KEYWORD3>partition</KEYWORD3>
+            <KEYWORD3>partition-all</KEYWORD3>
+            <KEYWORD3>partition-by</KEYWORD3>
+            <KEYWORD3>proxy</KEYWORD3>
+            <KEYWORD3>proxy-call-with-super</KEYWORD3>
+            <KEYWORD3>proxy-mappings</KEYWORD3>
+            <KEYWORD3>proxy-name</KEYWORD3>
+            <KEYWORD3>proxy-super</KEYWORD3>
+            <KEYWORD3>rationalize</KEYWORD3>
+            <KEYWORD3>seq</KEYWORD3>
+            <KEYWORD3>seque</KEYWORD3>
+            <KEYWORD3>sequence</KEYWORD3>
+            <KEYWORD3>set</KEYWORD3>
+            <KEYWORD3>short</KEYWORD3>
+            <KEYWORD3>short-array</KEYWORD3>
+            <KEYWORD3>shorts</KEYWORD3>
+            <KEYWORD3>sorted-map</KEYWORD3>
+            <KEYWORD3>sorted-map-by</KEYWORD3>
+            <KEYWORD3>sorted-set</KEYWORD3>
+            <KEYWORD3>sorted-set-by</KEYWORD3>
+            <KEYWORD3>struct</KEYWORD3>
+            <KEYWORD3>struct-map</KEYWORD3>
+            <KEYWORD3>str</KEYWORD3>
+            <KEYWORD3>symbol</KEYWORD3>
+            <KEYWORD3>tree-seq</KEYWORD3>
+            <KEYWORD3>type</KEYWORD3>
+            <KEYWORD3>update-proxy</KEYWORD3>
+            <KEYWORD3>vec</KEYWORD3>
+            <KEYWORD3>vector</KEYWORD3>
+            <KEYWORD3>vector-of</KEYWORD3>
+            <KEYWORD3>xml-seq</KEYWORD3>
+
+            <!-- Java Interop -->
+            <KEYWORD3>.</KEYWORD3>
+            <KEYWORD3>..</KEYWORD3>
+            <KEYWORD3>aclone</KEYWORD3>
+            <KEYWORD3>ancestors</KEYWORD3>
+            <KEYWORD3>bases</KEYWORD3>
+            <KEYWORD3>bean</KEYWORD3>
+            <KEYWORD3>class</KEYWORD3>
+            <KEYWORD3>derive</KEYWORD3>
+            <KEYWORD3>descendants</KEYWORD3>
+            <KEYWORD3>file-seq</KEYWORD3>
+            <KEYWORD3>iterator-seq</KEYWORD3>
+            <KEYWORD3>make-hierarchy</KEYWORD3>
+            <KEYWORD3>namespace-munge</KEYWORD3>
+            <KEYWORD3>object-array</KEYWORD3>
+            <KEYWORD3>parents</KEYWORD3>
+            <KEYWORD3>primitives-classnames</KEYWORD3>
+            <KEYWORD3>supers</KEYWORD3>
+            <KEYWORD3>underive</KEYWORD3>
+
+            <KEYWORD3>memfn</KEYWORD3>
+
+            <!-- Evaluation -->
+            <KEYWORD3>apply</KEYWORD3>
+            <KEYWORD3>eval</KEYWORD3>
+            <KEYWORD3>load</KEYWORD3>
+            <KEYWORD3>load-file</KEYWORD3>
+            <KEYWORD3>load-reader</KEYWORD3>
+            <KEYWORD3>load-string</KEYWORD3>
+            <KEYWORD3>read</KEYWORD3>
+            <KEYWORD3>read-line</KEYWORD3>
+            <KEYWORD3>read-string</KEYWORD3>
+
+            <!-- with- forms -->
+            <KEYWORD3>with-bindings</KEYWORD3>
+            <KEYWORD3>with-bindings*</KEYWORD3>
+            <KEYWORD3>with-in-str</KEYWORD3>
+            <KEYWORD3>with-loading-context</KEYWORD3>
+            <KEYWORD3>with-local-vars</KEYWORD3>
+            <KEYWORD3>with-meta</KEYWORD3>
+            <KEYWORD3>with-open</KEYWORD3>
+            <KEYWORD3>with-out-str</KEYWORD3>
+            <KEYWORD3>with-precision</KEYWORD3>
+            <KEYWORD3>with-redefs</KEYWORD3>
+            <KEYWORD3>with-redefs-fn</KEYWORD3>
+            <KEYWORD3>with-test</KEYWORD3>
+            <KEYWORD3>with-test-out</KEYWORD3>
+
+            <KEYWORD3>aset-boolean</KEYWORD3>
+            <KEYWORD3>aset-byte</KEYWORD3>
+            <KEYWORD3>aset-char</KEYWORD3>
+            <KEYWORD3>aset-double</KEYWORD3>
+            <KEYWORD3>aset-float</KEYWORD3>
+            <KEYWORD3>aset-int</KEYWORD3>
+            <KEYWORD3>aset-long</KEYWORD3>
+            <KEYWORD3>aset-short</KEYWORD3>
+
+            <KEYWORD3>char-escape-string</KEYWORD3>
+            <KEYWORD3>char-name-string</KEYWORD3>
+
+            <KEYWORD3>clojure-version</KEYWORD3>
+
+            <KEYWORD3>compare</KEYWORD3>
+            <KEYWORD3>complement</KEYWORD3>
+
+            <KEYWORD3>default-data-readers</KEYWORD3>
+
+            <KEYWORD3>every-pred</KEYWORD3>
+            <KEYWORD3>juxt</KEYWORD3>
+
+            <KEYWORD3>ex-data</KEYWORD3>
+            <KEYWORD3>ex-info</KEYWORD3>
+
+            <KEYWORD3>identity</KEYWORD3>
+
+            <KEYWORD3>keyword</KEYWORD3>
+
+            <KEYWORD3>line-seq</KEYWORD3>
+
+            <KEYWORD3>macroexpand-1</KEYWORD3>
+            <KEYWORD3>macroexpand</KEYWORD3>
+
+            <KEYWORD3>parse</KEYWORD3>
+
+            <!-- Printing -->
+            <KEYWORD3>pr</KEYWORD3>
+            <KEYWORD3>prn</KEYWORD3>
+            <KEYWORD3>print</KEYWORD3>
+            <KEYWORD3>printf</KEYWORD3>
+            <KEYWORD3>println</KEYWORD3>
+            <KEYWORD3>pr-str</KEYWORD3>
+            <KEYWORD3>prn-str</KEYWORD3>
+            <KEYWORD3>print-dup</KEYWORD3>
+            <KEYWORD3>print-str</KEYWORD3>
+            <KEYWORD3>println-str</KEYWORD3>
+            <KEYWORD3>flush</KEYWORD3>
+            <KEYWORD3>format</KEYWORD3>
+            <KEYWORD3>io!</KEYWORD3>
+            <KEYWORD3>newline</KEYWORD3>
+
+            <KEYWORD3>rand</KEYWORD3>
+            <KEYWORD3>rand-int</KEYWORD3>
+            <KEYWORD3>rand-nth</KEYWORD3>
+
+            <!-- regular expressions -->
+            <KEYWORD3>re-find</KEYWORD3>
+            <KEYWORD3>re-groups</KEYWORD3>
+            <KEYWORD3>re-matcher</KEYWORD3>
+            <KEYWORD3>re-matches</KEYWORD3>
+            <KEYWORD3>re-pattern</KEYWORD3>
+            <KEYWORD3>re-seq</KEYWORD3>
+
+            <KEYWORD3>slurp</KEYWORD3>
+            <KEYWORD3>spit</KEYWORD3>
+
+            <KEYWORD3>test</KEYWORD3>
+
+            <KEYWORD3>time</KEYWORD3>
+
+            <KEYWORD3>transient</KEYWORD3>
+            <KEYWORD3>assoc!</KEYWORD3>
+            <KEYWORD3>conj!</KEYWORD3>
+            <KEYWORD3>disj!</KEYWORD3>
+            <KEYWORD3>dissoc!</KEYWORD3>
+            <KEYWORD3>persistent!</KEYWORD3>
+            <KEYWORD3>pop!</KEYWORD3>
+
+            <!-- Collections -->
+            <KEYWORD3>accessor</KEYWORD3>
+            <KEYWORD3>aget</KEYWORD3>
+            <KEYWORD3>alength</KEYWORD3>
+            <KEYWORD3>areduce</KEYWORD3>
+            <KEYWORD3>aset</KEYWORD3>
+            <KEYWORD3>assoc</KEYWORD3>
+            <KEYWORD3>assoc-in</KEYWORD3>
+            <KEYWORD3>butlast</KEYWORD3>
+            <KEYWORD3>comp</KEYWORD3>
+            <KEYWORD3>comparator</KEYWORD3>
+            <KEYWORD3>concat</KEYWORD3>
+            <KEYWORD3>conj</KEYWORD3>
+            <KEYWORD3>cons</KEYWORD3>
+            <KEYWORD3>constantly</KEYWORD3>
+            <KEYWORD3>count</KEYWORD3>
+            <KEYWORD3>cycle</KEYWORD3>
+            <KEYWORD3>disj</KEYWORD3>
+            <KEYWORD3>dissoc</KEYWORD3>
+            <KEYWORD3>distinct</KEYWORD3>
+            <KEYWORD3>drop</KEYWORD3>
+            <KEYWORD3>drop-last</KEYWORD3>
+            <KEYWORD3>drop-while</KEYWORD3>
+            <KEYWORD3>ffirst</KEYWORD3>
+            <KEYWORD3>find</KEYWORD3>
+            <KEYWORD3>first</KEYWORD3>
+            <KEYWORD3>flatten</KEYWORD3>
+            <KEYWORD3>fnext</KEYWORD3>
+            <KEYWORD3>fnil</KEYWORD3>
+            <KEYWORD3>frequencies</KEYWORD3>
+            <KEYWORD3>frest</KEYWORD3>
+            <KEYWORD3>get</KEYWORD3>
+            <KEYWORD3>get-in</KEYWORD3>
+            <KEYWORD3>group-by</KEYWORD3>
+            <KEYWORD3>interleave</KEYWORD3>
+            <KEYWORD3>into</KEYWORD3>
+            <KEYWORD3>into-array</KEYWORD3>
+            <KEYWORD3>iterate</KEYWORD3>
+            <KEYWORD3>key</KEYWORD3>
+            <KEYWORD3>keep</KEYWORD3>
+            <KEYWORD3>keep-indexed</KEYWORD3>
+            <KEYWORD3>keys</KEYWORD3>
+            <KEYWORD3>last</KEYWORD3>
+            <KEYWORD3>lazy-cat</KEYWORD3>
+            <KEYWORD3>lazy-cons</KEYWORD3>
+            <KEYWORD3>lazy-seq</KEYWORD3>
+            <KEYWORD3>max</KEYWORD3>
+            <KEYWORD3>max-key</KEYWORD3>
+            <KEYWORD3>merge</KEYWORD3>
+            <KEYWORD3>merge-with</KEYWORD3>
+            <KEYWORD3>min</KEYWORD3>
+            <KEYWORD3>min-key</KEYWORD3>
+            <KEYWORD3>mix-collection-hash</KEYWORD3>
+            <KEYWORD3>munge</KEYWORD3>
+            <KEYWORD3>next</KEYWORD3>
+            <KEYWORD3>nfirst</KEYWORD3>
+            <KEYWORD3>nnext</KEYWORD3>
+            <KEYWORD3>nth</KEYWORD3>
+            <KEYWORD3>nthnext</KEYWORD3>
+            <KEYWORD3>nthrest</KEYWORD3>
+            <KEYWORD3>peek</KEYWORD3>
+            <KEYWORD3>pop</KEYWORD3>
+            <KEYWORD3>put</KEYWORD3>
+            <KEYWORD3>pvalues</KEYWORD3>
+            <KEYWORD3>range</KEYWORD3>
+            <KEYWORD3>reduce</KEYWORD3>
+            <KEYWORD3>reduced</KEYWORD3>
+            <KEYWORD3>reduce-kv</KEYWORD3>
+            <KEYWORD3>reductions</KEYWORD3>
+            <KEYWORD3>remove</KEYWORD3>
+            <KEYWORD3>repeat</KEYWORD3>
+            <KEYWORD3>repeatedly</KEYWORD3>
+            <KEYWORD3>replace</KEYWORD3>
+            <KEYWORD3>replicate</KEYWORD3>
+            <KEYWORD3>rest</KEYWORD3>
+            <KEYWORD3>reverse</KEYWORD3>
+            <KEYWORD3>rfirst</KEYWORD3>
+            <KEYWORD3>rrest</KEYWORD3>
+            <KEYWORD3>rseq</KEYWORD3>
+            <KEYWORD3>rsubseq</KEYWORD3>
+            <KEYWORD3>second</KEYWORD3>
+            <KEYWORD3>select-keys</KEYWORD3>
+            <KEYWORD3>shuffle</KEYWORD3>
+            <KEYWORD3>some</KEYWORD3>
+            <KEYWORD3>some-&gt;</KEYWORD3>
+            <KEYWORD3>some-&gt;&gt;</KEYWORD3>
+            <KEYWORD3>some-fn</KEYWORD3>
+            <KEYWORD3>split-at</KEYWORD3>
+            <KEYWORD3>split-with</KEYWORD3>
+            <KEYWORD3>subs</KEYWORD3>
+            <KEYWORD3>subseq</KEYWORD3>
+            <KEYWORD3>subvec</KEYWORD3>
+            <KEYWORD3>take</KEYWORD3>
+            <KEYWORD3>take-last</KEYWORD3>
+            <KEYWORD3>take-nth</KEYWORD3>
+            <KEYWORD3>take-while</KEYWORD3>
+            <KEYWORD3>to-array</KEYWORD3>
+            <KEYWORD3>to-array-2d</KEYWORD3>
+            <KEYWORD3>update-in</KEYWORD3>
+            <KEYWORD3>val</KEYWORD3>
+            <KEYWORD3>vals</KEYWORD3>
+
+            <!-- SQL functions -->
+            <KEYWORD3>resultset-seq</KEYWORD3>
+
+            <KEYWORD3>zipmap</KEYWORD3>
+
+            <!--
+                    KEYWORD4:  Core variables
+                               (and keywords, per MARK_FOLLOWING above)
+              -->
+
+            <!-- Special symbols -->
+            <KEYWORD4>&amp;</KEYWORD4>
+
+            <KEYWORD4>*1</KEYWORD4>
+            <KEYWORD4>*2</KEYWORD4>
+            <KEYWORD4>*3</KEYWORD4>
+
+            <KEYWORD4>*agent*</KEYWORD4>
+
+            <KEYWORD4>*clojure-version*</KEYWORD4>
+            <KEYWORD4>*command-line-args*</KEYWORD4>
+            <KEYWORD4>*compile-files*</KEYWORD4>
+            <KEYWORD4>*compile-path*</KEYWORD4>
+            <KEYWORD4>*compiler-options*</KEYWORD4>
+
+            <KEYWORD4>*data-readers*</KEYWORD4>
+            <KEYWORD4>*default-data-reader-fn*</KEYWORD4>
+
+            <KEYWORD4>*e</KEYWORD4>
+
+            <KEYWORD4>*file*</KEYWORD4>
+
+            <KEYWORD4>*flush-on-newline*</KEYWORD4>
+
+            <KEYWORD4>*err*</KEYWORD4>
+            <KEYWORD4>*in*</KEYWORD4>
+            <KEYWORD4>*out*</KEYWORD4>
+
+            <KEYWORD4>*ns*</KEYWORD4>
+
+            <KEYWORD4>*open-url-script*</KEYWORD4>
+
+            <KEYWORD4>*print-base*</KEYWORD4>
+            <KEYWORD4>*print-dup*</KEYWORD4>
+            <KEYWORD4>*print-length*</KEYWORD4>
+            <KEYWORD4>*print-level*</KEYWORD4>
+            <KEYWORD4>*print-miser-width*</KEYWORD4>
+            <KEYWORD4>*print-meta*</KEYWORD4>
+            <KEYWORD4>*print-pprint-dispatch*</KEYWORD4>
+            <KEYWORD4>*print-pretty*</KEYWORD4>
+            <KEYWORD4>*print-radix*</KEYWORD4>
+            <KEYWORD4>*print-readably*</KEYWORD4>
+            <KEYWORD4>*print-right-margin*</KEYWORD4>
+            <KEYWORD4>*print-suppress-namespaces*</KEYWORD4>
+
+            <KEYWORD4>*read-eval*</KEYWORD4>
+
+            <KEYWORD4>*unchecked-math*</KEYWORD4>
+
+            <KEYWORD4>*warn-on-reflection*</KEYWORD4>
+
+            <!-- clojure.xml -->
+            <KEYWORD4>*current*</KEYWORD4>
+            <KEYWORD4>*sb*</KEYWORD4>
+            <KEYWORD4>*stack*</KEYWORD4>
+            <KEYWORD4>*state*</KEYWORD4>
+
+            <!--
+                    FUNCTION:  Functions outside of the core.
+              -->
+
+            <!-- clojure.core (seemed overkill for KEYWORD3 or OPERATOR) -->
+            <FUNCTION>unchecked-add</FUNCTION>
+            <FUNCTION>unchecked-add-int</FUNCTION>
+            <FUNCTION>unchecked-byte</FUNCTION>
+            <FUNCTION>unchecked-char</FUNCTION>
+            <FUNCTION>unchecked-dec</FUNCTION>
+            <FUNCTION>unchecked-dec-int</FUNCTION>
+            <FUNCTION>unchecked-divide-int</FUNCTION>
+            <FUNCTION>unchecked-double</FUNCTION>
+            <FUNCTION>unchecked-float</FUNCTION>
+            <FUNCTION>unchecked-inc</FUNCTION>
+            <FUNCTION>unchecked-inc-int</FUNCTION>
+            <FUNCTION>unchecked-int</FUNCTION>
+            <FUNCTION>unchecked-long</FUNCTION>
+            <FUNCTION>unchecked-multiply</FUNCTION>
+            <FUNCTION>unchecked-negate</FUNCTION>
+            <FUNCTION>unchecked-negate-int</FUNCTION>
+            <FUNCTION>unchecked-remainder-int</FUNCTION>
+            <FUNCTION>unchecked-short</FUNCTION>
+            <FUNCTION>unchecked-subtract</FUNCTION>
+            <FUNCTION>unchecked-subtract-int</FUNCTION>
+            <FUNCTION>unsigned-bit-shift-right</FUNCTION>
+
+            <!-- clojure.data.browse -->
+            <FUNCTION>browse-url</FUNCTION>
+
+            <!-- clojure.data -->
+            <FUNCTION>diff</FUNCTION>
+            <FUNCTION>diff-similar</FUNCTION>
+
+            <!-- clojure.instant -->
+            <FUNCTION>parse-timestamp</FUNCTION>
+            <FUNCTION>read-instant-calendar</FUNCTION>
+            <FUNCTION>read-instant-date</FUNCTION>
+            <FUNCTION>read-instant-timestamp</FUNCTION>
+            <FUNCTION>validated</FUNCTION>
+
+            <!-- clojure.java.io -->
+            <FUNCTION>as-file</FUNCTION>
+            <FUNCTION>as-relative-path</FUNCTION>
+            <FUNCTION>as-url</FUNCTION>
+            <FUNCTION>copy</FUNCTION>
+            <FUNCTION>delete-file</FUNCTION>
+            <FUNCTION>file</FUNCTION>
+            <FUNCTION>input-stream</FUNCTION>
+            <FUNCTION>output-stream</FUNCTION>
+            <FUNCTION>make-input-stream</FUNCTION>
+            <FUNCTION>make-output-stream</FUNCTION>
+            <FUNCTION>make-parents</FUNCTION>
+            <FUNCTION>make-reader</FUNCTION>
+            <FUNCTION>make-writer</FUNCTION>
+            <FUNCTION>reader</FUNCTION>
+            <FUNCTION>resource</FUNCTION>
+            <FUNCTION>writer</FUNCTION>
+
+            <!-- clojure.pprint -->
+            <FUNCTION>cl-format</FUNCTION>
+            <FUNCTION>code-dispatch</FUNCTION>
+            <FUNCTION>formatter</FUNCTION>
+            <FUNCTION>formatter-out</FUNCTION>
+            <FUNCTION>fresh-line</FUNCTION>
+            <FUNCTION>get-pretty-writer</FUNCTION>
+            <FUNCTION>pp</FUNCTION>
+            <FUNCTION>pprint</FUNCTION>
+            <FUNCTION>pprint-indent</FUNCTION>
+            <FUNCTION>pprint-logical-block</FUNCTION>
+            <FUNCTION>pprint-newline</FUNCTION>
+            <FUNCTION>pprint-tab</FUNCTION>
+            <FUNCTION>print-length-loop</FUNCTION>
+            <FUNCTION>print-table</FUNCTION>
+            <FUNCTION>set-pprint-dispatch</FUNCTION>
+            <FUNCTION>simple-dispatch</FUNCTION>
+            <FUNCTION>with-pprint-dispatch</FUNCTION>
+            <FUNCTION>write</FUNCTION>
+            <FUNCTION>write-out </FUNCTION>
+
+            <!-- clojure.set -->
+            <FUNCTION>difference</FUNCTION>
+            <FUNCTION>index</FUNCTION>
+            <FUNCTION>intersection</FUNCTION>
+            <FUNCTION>join</FUNCTION>
+            <FUNCTION>map-invert</FUNCTION>
+            <FUNCTION>project</FUNCTION>
+            <FUNCTION>rename</FUNCTION>
+            <FUNCTION>rename-keys</FUNCTION>
+            <FUNCTION>select</FUNCTION>
+            <FUNCTION>union</FUNCTION>
+
+            <!-- clojure.stacktrace -->
+            <FUNCTION>e</FUNCTION>
+            <FUNCTION>print-cause-trace</FUNCTION>
+            <FUNCTION>print-stack-trace</FUNCTION>
+            <FUNCTION>print-throwable</FUNCTION>
+            <FUNCTION>print-trace-element</FUNCTION>
+            <FUNCTION>root-cause</FUNCTION>
+
+            <!-- clojure.string -->
+            <FUNCTION>capitalize</FUNCTION>
+            <FUNCTION>escape</FUNCTION>
+            <FUNCTION>join</FUNCTION>
+            <FUNCTION>lower-case</FUNCTION>
+            <FUNCTION>re-quote-replacement</FUNCTION>
+            <FUNCTION>replace-first</FUNCTION>
+            <FUNCTION>split</FUNCTION>
+            <FUNCTION>split-lines</FUNCTION>
+            <FUNCTION>trim</FUNCTION>
+            <FUNCTION>trim-newline</FUNCTION>
+            <FUNCTION>triml</FUNCTION>
+            <FUNCTION>trimr</FUNCTION>
+            <FUNCTION>upper-case</FUNCTION>
+
+            <!-- clojure.test -->
+            <FUNCTION>are</FUNCTION>
+            <FUNCTION>assert-any</FUNCTION>
+            <FUNCTION>assert-expr</FUNCTION>
+            <FUNCTION>assert-predicate</FUNCTION>
+            <FUNCTION>compose-fixtures</FUNCTION>
+            <FUNCTION>is</FUNCTION>
+            <FUNCTION>join-fixtures</FUNCTION>
+            <FUNCTION>testing</FUNCTION>
+            <FUNCTION>try-expr</FUNCTION>
+            <FUNCTION>use-fixtures</FUNCTION>
+
+            <!-- clojure.walk -->
+            <FUNCTION>keywordize-keys</FUNCTION>
+            <FUNCTION>macroexpand-all</FUNCTION>
+            <FUNCTION>postwalk</FUNCTION>
+            <FUNCTION>postwalk-demo</FUNCTION>
+            <FUNCTION>postwalk-replace</FUNCTION>
+            <FUNCTION>prewalk</FUNCTION>
+            <FUNCTION>prewalk-demo</FUNCTION>
+            <FUNCTION>prewalk-replace</FUNCTION>
+            <FUNCTION>stringify-keys</FUNCTION>
+            <FUNCTION>walk</FUNCTION>
+
+            <!-- clojure.xml -->
+            <FUNCTION>attrs</FUNCTION>
+            <FUNCTION>content</FUNCTION>
+            <FUNCTION>content-handler</FUNCTION>
+            <FUNCTION>element</FUNCTION>
+            <FUNCTION>emit</FUNCTION>
+            <FUNCTION>emit-element</FUNCTION>
+            <FUNCTION>parse</FUNCTION>
+            <FUNCTION>startparse-sax</FUNCTION>
+            <FUNCTION>tag</FUNCTION>
+
+            <!-- clojure.zip -->
+            <FUNCTION>append-child</FUNCTION>
+            <FUNCTION>children</FUNCTION>
+            <FUNCTION>down</FUNCTION>
+            <FUNCTION>edit</FUNCTION>
+            <FUNCTION>insert-child</FUNCTION>
+            <FUNCTION>insert-left</FUNCTION>
+            <FUNCTION>insert-right</FUNCTION>
+            <FUNCTION>left</FUNCTION>
+            <FUNCTION>leftmost</FUNCTION>
+            <FUNCTION>lefts</FUNCTION>
+            <FUNCTION>make-node</FUNCTION>
+            <FUNCTION>next</FUNCTION>
+            <FUNCTION>node</FUNCTION>
+            <FUNCTION>path</FUNCTION>
+            <FUNCTION>prev</FUNCTION>
+            <FUNCTION>remove</FUNCTION>
+            <FUNCTION>replace</FUNCTION>
+            <FUNCTION>right</FUNCTION>
+            <FUNCTION>rightmost</FUNCTION>
+            <FUNCTION>rights</FUNCTION>
+            <FUNCTION>root</FUNCTION>
+            <FUNCTION>seq-zip</FUNCTION>
+            <FUNCTION>up</FUNCTION>
+            <FUNCTION>vector-zip</FUNCTION>
+            <FUNCTION>xml-zip</FUNCTION>
+            <FUNCTION>zipper</FUNCTION>
+
+            <!--
+                    LITERAL3: Predicates
+             -->
+
+            <!-- Predicates -->
+            <LITERAL3>associative?</LITERAL3>
+            <LITERAL3>atom?</LITERAL3>
+            <LITERAL3>blank?</LITERAL3>
+            <LITERAL3>bound?</LITERAL3>
+            <LITERAL3>branch?</LITERAL3>
+            <LITERAL3>char?</LITERAL3>
+            <LITERAL3>class?</LITERAL3>
+            <LITERAL3>contains?</LITERAL3>
+            <LITERAL3>counted?</LITERAL3>
+            <LITERAL3>decimal?</LITERAL3>
+            <LITERAL3>delay?</LITERAL3>
+            <LITERAL3>distinct?</LITERAL3>
+            <LITERAL3>empty?</LITERAL3>
+            <LITERAL3>end?</LITERAL3>
+            <LITERAL3>even?</LITERAL3>
+            <LITERAL3>every?</LITERAL3>
+            <LITERAL3>false?</LITERAL3>
+            <LITERAL3>float?</LITERAL3>
+            <LITERAL3>fn?</LITERAL3>
+            <LITERAL3>function?</LITERAL3>
+            <LITERAL3>future?</LITERAL3>
+            <LITERAL3>future-cancelled?</LITERAL3>
+            <LITERAL3>future-done?</LITERAL3>
+            <LITERAL3>extends?</LITERAL3>
+            <LITERAL3>identical?</LITERAL3>
+            <LITERAL3>ifn?</LITERAL3>
+            <LITERAL3>instance?</LITERAL3>
+            <LITERAL3>integer?</LITERAL3>
+            <LITERAL3>isa?</LITERAL3>
+            <LITERAL3>keyword?</LITERAL3>
+            <LITERAL3>list?</LITERAL3>
+            <LITERAL3>map?</LITERAL3>
+            <LITERAL3>neg?</LITERAL3>
+            <LITERAL3>nil?</LITERAL3>
+            <LITERAL3>not-any?</LITERAL3>
+            <LITERAL3>not-empty</LITERAL3>
+            <LITERAL3>not-every?</LITERAL3>
+            <LITERAL3>number?</LITERAL3>
+            <LITERAL3>odd?</LITERAL3>
+            <LITERAL3>pos?</LITERAL3>
+            <LITERAL3>ratio?</LITERAL3>
+            <LITERAL3>rational?</LITERAL3>
+            <LITERAL3>realized?</LITERAL3>
+            <LITERAL3>record?</LITERAL3>
+            <LITERAL3>reduced?</LITERAL3>
+            <LITERAL3>reversible?</LITERAL3>
+            <LITERAL3>satisfies?</LITERAL3>
+            <LITERAL3>seq?</LITERAL3>
+            <LITERAL3>sequential?</LITERAL3>
+            <LITERAL3>set?</LITERAL3>
+            <LITERAL3>some?</LITERAL3>
+            <LITERAL3>sorted?</LITERAL3>
+            <LITERAL3>string?</LITERAL3>
+            <LITERAL3>subset?</LITERAL3>
+            <LITERAL3>successful?</LITERAL3>
+            <LITERAL3>superset?</LITERAL3>
+            <LITERAL3>symbol?</LITERAL3>
+            <LITERAL3>true?</LITERAL3>
+            <LITERAL3>var?</LITERAL3>
+            <LITERAL3>vector?</LITERAL3>
+            <LITERAL3>zero?</LITERAL3>
+
+            <!-- also quot which matches ' symbol defined above as LITERAL3 -->
+            <LITERAL3>quot</LITERAL3>
+
+            <!--
+                    LITERAL4: Simple literals
+             -->
+
+            <LITERAL4>nil</LITERAL4>
+
+            <LITERAL4>true</LITERAL4>
+            <LITERAL4>false</LITERAL4>
+
+            <!--
+                    OPERATOR: Operators
+             -->
+
+            <OPERATOR>+</OPERATOR>
+            <OPERATOR>+'</OPERATOR>
+            <OPERATOR>-</OPERATOR>
+            <OPERATOR>-'</OPERATOR>
+            <OPERATOR>=</OPERATOR>
+            <OPERATOR>==</OPERATOR>
+            <OPERATOR>as-&gt;</OPERATOR>
+            <OPERATOR>-&gt;</OPERATOR>
+            <OPERATOR>-&gt;&gt;</OPERATOR>
+            <OPERATOR>&gt;=</OPERATOR>
+            <OPERATOR>&gt;</OPERATOR>
+            <OPERATOR>&lt;=</OPERATOR>
+            <OPERATOR>&lt;</OPERATOR>
+            <OPERATOR>/</OPERATOR>
+            <OPERATOR>*</OPERATOR>
+            <OPERATOR>*'</OPERATOR>
+            <OPERATOR>%</OPERATOR>
+            <OPERATOR>and</OPERATOR>
+            <OPERATOR>or</OPERATOR>
+            <OPERATOR>inc</OPERATOR>
+            <OPERATOR>inc'</OPERATOR>
+            <OPERATOR>dec</OPERATOR>
+            <OPERATOR>dec'</OPERATOR>
+            <OPERATOR>mod</OPERATOR>
+            <OPERATOR>not</OPERATOR>
+            <OPERATOR>not=</OPERATOR>
+            <OPERATOR>rem</OPERATOR>
+            <OPERATOR>bit-and</OPERATOR>
+            <OPERATOR>bit-and-not</OPERATOR>
+            <OPERATOR>bit-clear</OPERATOR>
+            <OPERATOR>bit-flip</OPERATOR>
+            <OPERATOR>bit-or</OPERATOR>
+            <OPERATOR>bit-not</OPERATOR>
+            <OPERATOR>bit-set</OPERATOR>
+            <OPERATOR>bit-shift-right</OPERATOR>
+            <OPERATOR>bit-shift-left</OPERATOR>
+            <OPERATOR>bit-test</OPERATOR>
+            <OPERATOR>bit-xor</OPERATOR>
+        </KEYWORDS>
+    </RULES>
+
+    <RULES  SET="STRINGS"
+            HIGHLIGHT_DIGITS="FALSE"
+            DEFAULT="LITERAL1"
+            IGNORE_CASE="TRUE">
+        <SEQ_REGEXP
+            HASH_CHAR="\"
+            AT_WORD_START="FALSE"
+            TYPE="LABEL">\\.</SEQ_REGEXP>
+        <KEYWORDS>
+            <INVALID>&quot;</INVALID>
+        </KEYWORDS>
+    </RULES>
+
+    <RULES  SET="REGEXPS"
+            HIGHLIGHT_DIGITS="FALSE"
+            DEFAULT="LITERAL1"
+            IGNORE_CASE="TRUE">
+        <!-- TODO: Put actual regexp syntax hilighting -->
+        <SEQ_REGEXP
+            HASH_CHAR="\"
+            AT_WORD_START="FALSE"
+            TYPE="LABEL">\\.</SEQ_REGEXP>
+        <KEYWORDS>
+            <INVALID>&quot;</INVALID>
+        </KEYWORDS>
+    </RULES>
+</MODE>
+

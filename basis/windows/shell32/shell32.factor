@@ -125,7 +125,7 @@ FUNCTION: DWORD_PTR SHGetFileInfoW ( LPCTSTR pszPath,
 : shell32-file-info ( path -- err struct )
     normalize-path
     0
-    SHFILEINFO <struct>
+    SHFILEINFO new
     [ dup byte-length SHGFI_EXETYPE SHGetFileInfoW ] keep ;
 
 SINGLETONS:
@@ -369,6 +369,7 @@ CONSTANT: NIN_BALLOONHIDE $[ WM_USER 3 + ]
 CONSTANT: NIN_BALLOONTIMEOUT $[ WM_USER 4 + ]
 CONSTANT: NIN_BALLOONUSERCLICK $[ WM_USER 5 + ]
 
+UNION-STRUCT: timeout-version-union { uTimeout UINT } { uVersion UINT } ;
 STRUCT: NOTIFYICONDATA
     { cbSize DWORD }
     { hWnd HWND }
@@ -380,7 +381,7 @@ STRUCT: NOTIFYICONDATA
     { dwState DWORD }
     { dwStateMask DWORD }
     { szInfo TCHAR[256] }
-    { uTimeout UINT } ! { uVersion UINT } ! c-union here1
+    { timeout-version timeout-version-union } ! { uVersion UINT } ! c-union here1
     { szInfoTitle TCHAR[64] }
     { dwInfoFlags DWORD }
     { guidItem GUID }

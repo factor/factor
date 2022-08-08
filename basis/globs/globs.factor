@@ -123,7 +123,7 @@ DEFER: glob%
 :: glob-literal% ( root globs -- )
     globs unclip :> ( remaining glob )
 
-    root glob append-path dup exists? [
+    root glob append-path dup file-exists? [
         remaining over file-info ?glob%
     ] [
         drop

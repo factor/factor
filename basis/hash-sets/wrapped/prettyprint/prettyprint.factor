@@ -4,8 +4,6 @@
 USING: continuations hash-sets.wrapped namespaces
 prettyprint.config prettyprint.custom sets ;
 
-IN: hash-sets.wrapped.prettyprint
-
 M: wrapped-hash-set >pprint-sequence members ;
 
 M: wrapped-hash-set pprint*

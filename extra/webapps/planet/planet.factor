@@ -4,7 +4,7 @@ USING: accessors calendar concurrency.combinators db db.tuples
 db.types fry furnace.actions furnace.auth furnace.boilerplate
 furnace.redirection furnace.syndication html.components
 html.forms http.server.dispatchers http.server.static kernel
-locals logging sequences sorting syndication timers urls
+logging sequences sorting syndication timers urls
 validators ;
 IN: webapps.planet
 
@@ -93,7 +93,7 @@ posting "POSTINGS"
     [ date>> ] inv-sort-with ;
 
 : update-cached-postings ( -- )
-    blogroll fetch-blogroll sort-entries 8 short head [
+    blogroll fetch-blogroll sort-entries 8 index-or-length head [
         posting new delete-tuples
         [ insert-tuple ] each
     ] with-transaction ;

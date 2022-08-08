@@ -125,10 +125,10 @@ HELP: C+
 { $description "Control key modifier." } ;
 
 HELP: A+
-{ $description "Alt key modifier." } ;
+{ $description "Alt key modifier. This is the Option key on Mac OS X." } ;
 
 HELP: M+
-{ $description "Meta key modifier. This is the Command key on Mac OS X and the Windows key on other Unices and Windows." } ;
+{ $description "Meta key modifier. This is the Command key on Mac OS X and the Windows key on other Unix and Windows platforms." } ;
 
 HELP: S+
 { $description "Shift key modifier." } ;
@@ -248,9 +248,9 @@ ARTICLE: "gesture-differences" "Gesture handling differences between platforms"
 "On Mac OS X, the modifier keys map as follows:"
 { $table
     { { $link S+ } "Shift" }
-    { { $link A+ } "Command (Apple)" }
+    { { $link A+ } "Option" }
     { { $link C+ } "Control" }
-    { { $link M+ } "Option" }
+    { { $link M+ } "Command (Apple)" }
 }
 "On Windows and X11:"
 { $table

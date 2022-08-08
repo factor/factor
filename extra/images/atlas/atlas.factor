@@ -1,8 +1,7 @@
 ! Copyright (C) 2010 Joe Groff.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays assocs byte-arrays fry images kernel
-locals math math.functions math.order math.vectors namespaces
-sequences sorting ;
+USING: accessors arrays assocs byte-arrays images kernel math
+math.functions math.order math.vectors sequences sorting ;
 IN: images.atlas
 
 ! sort rects by height/width/whatever

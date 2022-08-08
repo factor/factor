@@ -1,5 +1,5 @@
 USING: accessors alien alien.accessors alien.c-types
-alien.syntax byte-arrays continuations fry kernel layouts math
+alien.syntax byte-arrays continuations kernel layouts math
 namespaces prettyprint sequences tools.memory tools.test ;
 QUALIFIED: sets
 IN: alien.tests

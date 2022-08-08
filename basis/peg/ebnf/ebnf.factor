@@ -1,9 +1,9 @@
 ! Copyright (C) 2007 Chris Double.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors assocs combinators combinators.short-circuit
-effects fry kernel make math math.parser multiline namespaces
-parser peg peg.parsers quotations sequences sequences.deep
-splitting stack-checker strings strings.parser summary unicode
+effects kernel make math.parser multiline namespaces parser peg
+peg.parsers quotations sequences sequences.deep splitting
+stack-checker strings strings.parser summary unicode
 vocabs.parser words ;
 FROM: vocabs.parser => search ;
 FROM: peg.search => replace ;
@@ -54,8 +54,6 @@ TUPLE: ebnf-sequence elements ;
 TUPLE: ebnf-repeat0 group ;
 TUPLE: ebnf-repeat1 group ;
 TUPLE: ebnf-ignore group ;
-TUPLE: ebnf-ignore-repeat0 group ;
-TUPLE: ebnf-ignore-repeat1 group ;
 TUPLE: ebnf-optional group ;
 TUPLE: ebnf-whitespace group ;
 TUPLE: ebnf-tokenizer elements ;
@@ -77,8 +75,6 @@ C: <ebnf-sequence> ebnf-sequence
 C: <ebnf-repeat0> ebnf-repeat0
 C: <ebnf-repeat1> ebnf-repeat1
 C: <ebnf-ignore> ebnf-ignore
-C: <ebnf-ignore-repeat0> ebnf-ignore-repeat0
-C: <ebnf-ignore-repeat1> ebnf-ignore-repeat1
 C: <ebnf-optional> ebnf-optional
 C: <ebnf-whitespace> ebnf-whitespace
 C: <ebnf-tokenizer> ebnf-tokenizer
@@ -88,16 +84,10 @@ C: <ebnf-var> ebnf-var
 C: <ebnf-semantic> ebnf-semantic
 C: <ebnf> ebnf
 
-MIXIN: ebnf-ignored
-
-INSTANCE: ebnf-ignore ebnf-ignored
-INSTANCE: ebnf-ignore-repeat0 ebnf-ignored
-INSTANCE: ebnf-ignore-repeat1 ebnf-ignored
-
 : filter-hidden ( seq -- seq )
     ! Remove elements that produce no AST from sequence
     [ ebnf-ensure-not? ] reject [ ebnf-ensure? ] reject
-    [ ebnf-ignored? ] reject ;
+    [ ebnf-ignore? ] reject ;
 
 : syntax ( string -- parser )
     ! Parses the string, ignoring white space, and
@@ -194,8 +184,8 @@ INSTANCE: ebnf-ignore-repeat1 ebnf-ignored
                 any-character-parser ,
             ] choice*
             [ dup , "~" token hide , ] seq* [ first <ebnf-ignore> ] action ,
-            [ dup , "*~" token hide , ] seq* [ first <ebnf-ignore-repeat0> ] action ,
-            [ dup , "+~" token hide , ] seq* [ first <ebnf-ignore-repeat1> ] action ,
+            [ dup , "*~" token hide , ] seq* [ first <ebnf-repeat0> <ebnf-ignore> ] action ,
+            [ dup , "+~" token hide , ] seq* [ first <ebnf-repeat1> <ebnf-ignore> ] action ,
             [ dup , "*" token hide , ] seq* [ first <ebnf-repeat0> ] action ,
             [ dup , "+" token hide , ] seq* [ first <ebnf-repeat1> ] action ,
             [ dup , "?[" token ensure-not , "?" token hide , ] seq* [ first <ebnf-optional> ] action ,
@@ -254,10 +244,10 @@ DEFER: choice-parser
     [ <ebnf-ignore> ] "~" syntax grouped ;
 
 : ignore-repeat0-parser ( -- parser )
-    [ <ebnf-ignore-repeat0> ] "*~" syntax grouped ;
+    [ <ebnf-repeat0> <ebnf-ignore> ] "*~" syntax grouped ;
 
 : ignore-repeat1-parser ( -- parser )
-    [ <ebnf-ignore-repeat1> ] "+~" syntax grouped ;
+    [ <ebnf-repeat1> <ebnf-ignore> ] "+~" syntax grouped ;
 
 : optional-parser ( -- parser )
     [ <ebnf-optional> ] "?" syntax grouped ;
@@ -431,12 +421,6 @@ M: ebnf-ensure-not (transform)
 M: ebnf-ignore (transform)
     transform-group [ drop ignore ] action ;
 
-M: ebnf-ignore-repeat0 (transform)
-    transform-group repeat0 hide ;
-
-M: ebnf-ignore-repeat1 (transform)
-    transform-group repeat1 hide ;
-
 M: ebnf-repeat0 (transform)
     transform-group repeat0 ;
 
@@ -504,7 +488,7 @@ ERROR: bad-effect quot effect ;
     H{
         { "dup" dup } { "nip" nip } { "over" over } ! kernel
         { "nth" nth } ! sequences
-    } [ string-lines parse-lines ] with-words ;
+    } [ split-lines parse-lines ] with-words ;
 
 M: ebnf-action (transform)
     ebnf-transform check-action-effect action ;

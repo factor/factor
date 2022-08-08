@@ -66,7 +66,7 @@ ${ read-request-test-1' } [
     [ read-request ] with-string-reader
     [ write-request ] with-string-writer
     ! normalize crlf
-    string-lines "\n" join
+    split-lines join-lines
 ] unit-test
 
 STRING: read-request-test-2
@@ -165,13 +165,24 @@ ${ read-response-test-1' } [
     [ read-response ] with-string-reader
     [ write-response ] with-string-writer
     ! normalize crlf
-    string-lines "\n" join
+    split-lines join-lines
 ] unit-test
 
 { t } [
     "rmid=732423sdfs73242; path=/; domain=.example.net; expires=Fri, 31-Dec-2010 23:59:59 GMT"
     dup parse-set-cookie first unparse-set-cookie =
 ] unit-test
+
+{
+    {
+        T{ cookie
+            { name "lang" }
+            { value "en-US" }
+            { path "/" }
+            { domain "example.com" }
+        }
+    }
+} [ "lang=en-US; Path=/; Domain=example.com" parse-set-cookie ] unit-test
 
 { t } [
     "a="

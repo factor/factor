@@ -2,7 +2,6 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays debugger io kernel prettyprint sequences
 stack-checker.errors summary ;
-IN: stack-checker.errors.prettyprint
 
 M: unknown-macro-input summary
     macro>> name>> "Cannot apply “" "” to an input parameter of a non-inline word" surround ;

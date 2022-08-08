@@ -1,5 +1,5 @@
-USING: continuations io io.directories.hierarchy io.files.temp
-logging logging.analysis logging.server math tools.test ;
+USING: continuations io io.directories io.files.temp logging
+logging.analysis logging.server math tools.test ;
 IN: logging.tests
 
 : input-logging-test ( a b -- c ) + ;

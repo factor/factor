@@ -13,8 +13,8 @@ ARTICLE: "math-intervals-new" "Creating intervals"
 { $subsections [a,a] }
 "Open-ended interval constructors:"
 { $subsections
-    [-inf,a]
-    [-inf,a)
+    [-inf,b]
+    [-inf,b)
     [a,inf]
     (a,inf]
 }
@@ -121,8 +121,8 @@ HELP: <interval>
         { $link (a,b] }
         { $link [a,inf] }
         { $link (a,inf] }
-        { $link [-inf,a) }
-        { $link [-inf,a] }
+        { $link [-inf,b) }
+        { $link [-inf,b] }
     }
 } ;
 
@@ -146,13 +146,22 @@ HELP: [a,a]
 { $values { "a" real } { "interval" interval } }
 { $description "Creates a new interval consisting of a single point." } ;
 
-HELP: [-inf,a]
-{ $values { "a" real } { "interval" interval } }
-{ $description "Creates a new interval containing all real numbers less than or equal to " { $snippet "a" } ", together with negative infinity." } ;
+HELP: [0,b]
+{ $values { "b" real } { "interval" interval } }
+{ $description "Creates a new interval that includes lower endpoint 0 and includes the upper endpoint." } ;
 
-HELP: [-inf,a)
-{ $values { "a" real } { "interval" interval } }
-{ $description "Creates a new interval containing all real numbers less than " { $snippet "a" } ", together with negative infinity." } ;
+HELP: [0,b)
+{ $values { "b" real } { "interval" interval } }
+{ $description "Creates a new interval that includes lower endpoint 0 and excludes the upper endpoint." } ;
+
+
+HELP: [-inf,b]
+{ $values { "b" real } { "interval" interval } }
+{ $description "Creates a new interval containing all real numbers less than or equal to " { $snippet "b" } ", together with negative infinity." } ;
+
+HELP: [-inf,b)
+{ $values { "b" real } { "interval" interval } }
+{ $description "Creates a new interval containing all real numbers less than " { $snippet "b" } ", together with negative infinity." } ;
 
 HELP: [a,inf]
 { $values { "a" real } { "interval" interval } }

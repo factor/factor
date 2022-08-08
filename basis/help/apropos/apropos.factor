@@ -52,7 +52,7 @@ M: more-completions article-content
     completions [
         [
             { $heading search } ,
-            [ max-completions short head keys \ $completions prefix , ]
+            [ max-completions index-or-length head keys \ $completions prefix , ]
             [
                 length max-completions >
                 [ { $link T{ more-completions f completions search category } } , ] when
@@ -89,4 +89,4 @@ M: apropos-search >link ;
 INSTANCE: apropos-search topic
 
 : apropos ( str -- )
-    [ blank? ] trim <apropos-search> print-topic ;
+    [ unicode:blank? ] trim <apropos-search> print-topic ;

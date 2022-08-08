@@ -1,7 +1,7 @@
 ! Copyright (C) 2005, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: assocs colors.constants fonts fry io.styles kernel
-literals math math.order namespaces sequences ui.theme ;
+USING: assocs colors fonts io.styles kernel literals math
+math.order namespaces sequences ui.theme ;
 IN: help.stylesheet
 
 : wrap-margin-full ( -- n )
@@ -53,7 +53,7 @@ H{
     { font-style bold }
     { wrap-margin $ wrap-margin-full }
     { foreground $ title-color }
-    { page-color COLOR: FactorLightTan }
+    { page-color $ help-header-background }
     { inset { 5 5 } }
 } title-style set-global
 
@@ -92,7 +92,9 @@ SYMBOL: code-style
 H{
     { font-name $ default-monospace-font-name }
     { font-size $ default-font-size }
+    { foreground $ text-color }
     { page-color $ code-background-color }
+    { border-color $ code-border-color }
     { inset { 5 5 } }
     { wrap-margin f }
 } code-style set-global

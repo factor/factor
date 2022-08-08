@@ -1,5 +1,5 @@
-USING: accessors colors.constants sequences tools.test
-ui.gadgets ui.gadgets.labeled ;
+USING: accessors sequences tools.test ui.gadgets
+ui.gadgets.labeled ;
 
 { t } [
     <gadget> "Hey" <labeled-gadget> content>> gadget?

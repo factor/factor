@@ -4,7 +4,7 @@ USING: accessors byte-arrays combinators
 combinators.short-circuit compiler.cfg.instructions
 compiler.cfg.registers compiler.cfg.representations.rewrite
 compiler.cfg.representations.selection cpu.architecture kernel
-layouts locals make math namespaces sequences ;
+layouts make math namespaces sequences ;
 IN: compiler.cfg.representations.peephole
 
 GENERIC: optimize-insn ( insn -- )

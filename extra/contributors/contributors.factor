@@ -6,6 +6,7 @@ sequences sorting system ;
 IN: contributors
 
 CONSTANT: aliases {
+    { "Alexander Ilin" "ajsoft@yandex.ru" "alex.ilin@protonmail.com" }
     { "Björn Lindqvist" "bjourne@gmail.com" }
     { "Cat Stevens" "catb0t" }
     { "Daniel Ehrenberg" "Dan Ehrenberg" }
@@ -22,7 +23,7 @@ CONSTANT: aliases {
 : changelog ( -- authors )
     image-path parent-directory [
         "git log --no-merges --pretty=format:%an"
-        utf8 [ lines ] with-process-reader
+        utf8 [ read-lines ] with-process-reader
     ] with-directory ;
 
 : merge-aliases ( authors -- authors' )

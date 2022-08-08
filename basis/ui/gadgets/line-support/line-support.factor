@@ -1,7 +1,7 @@
 ! Copyright (C) 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays combinators fry kernel math
-math.functions math.order math.ranges math.vectors namespaces
+math.functions math.order ranges math.vectors namespaces
 opengl sequences ui.gadgets ui.gadgets.scrollers
 ui.gadgets.viewports ui.render ui.text ui.theme ;
 IN: ui.gadgets.line-support
@@ -68,7 +68,7 @@ M: line-gadget line-height
     [ [ loc>> ] [ dim>> ] bi v+ ] visible-line 1 + ;
 
 : each-slice-index ( from to seq quot -- )
-    [ [ <slice> ] [ drop [a,b) ] 3bi ] dip 2each ; inline
+    [ [ <slice> ] [ drop [a..b) ] 3bi ] dip 2each ; inline
 
 GENERIC: draw-line ( line index gadget -- )
 
@@ -87,7 +87,7 @@ GENERIC: draw-line ( line index gadget -- )
 <PRIVATE
 
 : clamp ( dim unit min max -- dim' )
-    [ -1/0. or * ] [ 1/0. or * ] bi-curry* bi
+    [ -1/0. or 1 max * ] [ 1/0. or 1 max * ] bi-curry* bi
     [ max ] [ min ] bi* ;
 
 : em ( font -- x ) "m" text-width ;
@@ -100,11 +100,11 @@ PRIVATE>
 : line-gadget-height ( pref-dim gadget -- h )
     [ second ] [ [ line-height ] [ min-rows>> ] [ max-rows>> ] tri ] bi* clamp ;
 
+: line-gadget-dim ( pref-dim gadget -- dim )
+    [ line-gadget-width ] [ line-gadget-height ] 2bi 2array ;
+
 : pref-viewport-dim* ( gadget -- dim )
-    [ pref-dim ] [ ] bi
-    [ line-gadget-width ]
-    [ line-gadget-height ]
-    2bi 2array ; inline
+    [ pref-dim ] [ line-gadget-dim ] bi ;
 
 M: line-gadget pref-viewport-dim
     dup pref-viewport-dim>>
@@ -112,6 +112,8 @@ M: line-gadget pref-viewport-dim
         [ pref-viewport-dim* ] [ ] [ layout-state>> ] tri
         [ drop ] [ dupd pref-viewport-dim<< ] if
     ] ?if ;
+
+M: line-gadget pref-dim* { 0 0 } swap line-gadget-dim ;
 
 : visible-lines ( gadget -- n )
     [ visible-dim second ] [ line-height ] bi /i ;

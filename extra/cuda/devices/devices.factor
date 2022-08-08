@@ -1,10 +1,9 @@
 ! Copyright (C) 2010 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors alien.c-types alien.data alien.strings arrays
-assocs byte-arrays classes.struct combinators cuda
-cuda.contexts cuda.ffi cuda.libraries fry io io.encodings.utf8
-kernel locals math math.order math.parser namespaces
-prettyprint sequences ;
+assocs byte-arrays combinators cuda cuda.contexts cuda.ffi
+cuda.libraries io io.encodings.utf8 kernel math math.order
+math.parser prettyprint sequences splitting ;
 IN: cuda.devices
 
 : #cuda-devices ( -- n )
@@ -20,7 +19,7 @@ IN: cuda.devices
     [ enumerate-cuda-devices ] dip '[ 0 _ with-cuda-context ] each ; inline
 
 : cuda-device-properties ( n -- properties )
-    [ CUdevprop <struct> ] dip
+    [ CUdevprop new ] dip
     [ cuDeviceGetProperties cuda-error ] keepd ;
 
 : cuda-devices ( -- assoc )
@@ -51,7 +50,7 @@ IN: cuda.devices
         [ "Memory: " write cuda-device-memory number>string print ]
         [
             "Capability: " write
-            cuda-device-capability [ number>string ] map " " join print
+            cuda-device-capability [ number>string ] map join-words print
         ]
         [ "Properties: " write cuda-device-properties . ]
         [

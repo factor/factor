@@ -136,5 +136,5 @@ ${
        { background $[ content-background ] }
     }
 } [
-    <pane> current>> smash-line [ text>> ] [ font>> ] bi
+    <pane> dup current>> smash-line [ text>> ] [ font>> ] bi
 ] unit-test

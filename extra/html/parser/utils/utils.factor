@@ -6,9 +6,9 @@ IN: html.parser.utils
 : trim1 ( seq ch -- newseq )
     [ [ ?head-slice drop ] [ ?tail-slice drop ] bi ] keepd like ;
 
-: single-quote ( str -- newstr ) "'" dup surround ;
+: single-quote ( str -- newstr ) "'" 1surround ;
 
-: double-quote ( str -- newstr ) "\"" dup surround ;
+: double-quote ( str -- newstr ) "\"" 1surround ;
 
 : quote ( str -- newstr )
     CHAR: ' over member?

@@ -87,7 +87,6 @@
 	</RULES>
 
 	<RULES SET="JAVASCRIPT2"
-		ESCAPE="\"
 		IGNORE_CASE="FALSE"
 		HIGHLIGHT_DIGITS="TRUE"
 		DIGIT_RE="(0x[\p{XDigit}]+[lL]?|[\p{Digit}]+(e[\p{Digit}]*)?[lLdDfF]?)">

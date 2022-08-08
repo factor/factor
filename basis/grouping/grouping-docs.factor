@@ -18,7 +18,7 @@ ARTICLE: "grouping" "Groups and clumps"
 { $list
     { "With groups, the subsequences form the original sequence when concatenated:"
         { $example
-            "USING: grouping ;"
+            "USING: grouping prettyprint ;"
             "{ 1 2 3 4 } 2 group ."
             "{ { 1 2 } { 3 4 } }"
         }

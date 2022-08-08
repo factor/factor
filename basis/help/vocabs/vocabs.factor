@@ -3,11 +3,10 @@
 USING: accessors arrays assocs classes classes.builtin
 classes.intersection classes.mixin classes.predicate
 classes.singleton classes.tuple classes.union combinators
-effects fry generic help help.markup help.stylesheet
-help.topics io io.pathnames io.styles kernel macros make
-namespaces sequences sorting summary vocabs vocabs.files
-vocabs.hierarchy vocabs.loader vocabs.metadata words
-words.symbol ;
+effects generic help help.markup help.stylesheet help.topics io
+io.pathnames io.styles kernel macros make namespaces sequences
+sorting splitting summary vocabs vocabs.files vocabs.hierarchy
+vocabs.loader vocabs.metadata words words.symbol ;
 IN: help.vocabs
 
 : about ( vocab -- )
@@ -82,13 +81,21 @@ C: <vocab-author> vocab-author
         ] ($block)
     ] unless-empty ;
 
+: describe-metadata-files ( vocab -- )
+    vocab-metadata-files [ <pathname> ] map [
+        "Metadata files" $heading
+        [
+            files.
+        ] ($block)
+    ] unless-empty ;
+
 : describe-tuple-classes ( classes -- )
     [
         "Tuple classes" $subheading
         [
             [ <$pretty-link> ]
             [ superclass-of <$pretty-link> ]
-            [ "slots" word-prop [ name>> ] map " " join <$snippet> ]
+            [ "slots" word-prop [ name>> ] map join-words <$snippet> ]
             tri 3array
         ] map
         { { $strong "Class" } { $strong "Superclass" } { $strong "Slots" } } prefix
@@ -246,7 +253,7 @@ C: <vocab-author> vocab-author
         [ vocab-platforms [ "Platforms:" swap \ $links prefix 2array , ] unless-empty ]
         tri
     ] { } make
-    [ "Meta-data" $heading $table ] unless-empty ;
+    [ "Metadata" $heading $table ] unless-empty ;
 
 : $vocab ( element -- )
     first {
@@ -254,6 +261,7 @@ C: <vocab-author> vocab-author
         [ describe-metadata ]
         [ describe-words ]
         [ describe-files ]
+        [ describe-metadata-files ]
         [ describe-children ]
     } cleave ;
 

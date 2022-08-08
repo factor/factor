@@ -1,9 +1,9 @@
 ! Copyright (C) 2006, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors colors formatting kernel math math.functions
-math.vectors models models.arrow models.product models.range sequences
-ui ui.gadgets ui.gadgets.labels ui.gadgets.packs ui.gadgets.sliders
-ui.gadgets.tracks ui.pens.solid ;
+USING: accessors colors formatting kernel math math.vectors
+models models.arrow models.product models.range sequences ui
+ui.gadgets ui.gadgets.labels ui.gadgets.packs ui.gadgets.sliders
+ui.gadgets.tracks ui.pens.solid ui.tools.common ;
 IN: color-picker
 
 ! Simple example demonstrating the use of models.
@@ -39,7 +39,7 @@ M: color-preview model-changed
     [ f track-add ]
     [
         [ <color-model> <color-preview> 1 track-add ]
-        [ [ color>str ] <arrow> <label-control> f track-add ] bi
+        [ [ color>str ] <arrow> <label-control> white-interior f track-add ] bi
     ] bi* ;
 
 MAIN-WINDOW: color-picker-window { { title "Color Picker" } }

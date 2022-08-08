@@ -60,7 +60,7 @@ PREDICATE: consult-method < method
     "consultation" word-prop >boolean ;
 
 M: consult-method reset-word
-    [ call-next-method ] [ f "consultation" set-word-prop ] bi ;
+    [ call-next-method ] [ "consultation" remove-word-prop ] bi ;
 
 GENERIC#: (consult-method-quot) 2 ( consultation quot word -- object )
 

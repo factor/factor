@@ -1,8 +1,8 @@
 ! Copyright (C) 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors assocs cache combinators images images.loader kernel math
-memoize namespaces opengl opengl.textures sequences splitting system
-ui.gadgets.worlds vocabs ;
+USING: accessors assocs cache combinators images images.loader
+kernel math namespaces opengl opengl.textures sequences
+splitting system ui.gadgets.worlds vocabs ;
 IN: ui.images
 
 TUPLE: image-name path ;
@@ -12,7 +12,7 @@ C: <image-name> image-name
 <PRIVATE
 
 MEMO: cached-image-path ( path -- image )
-    [ load-image ] [ "@2x" swap subseq? >>2x? ] bi ;
+    [ load-image ] [ "@2x" subseq-index? >>2x? ] bi ;
 
 PRIVATE>
 

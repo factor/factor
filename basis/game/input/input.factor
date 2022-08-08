@@ -1,5 +1,5 @@
-USING: arrays accessors continuations kernel math system
-sequences namespaces init vocabs combinators ;
+USING: accessors combinators continuations init kernel math
+namespaces sequences system vocabs ;
 IN: game.input
 
 SYMBOLS: game-input-backend game-input-opened ;
@@ -36,9 +36,9 @@ M: f (reset-game-input) ;
 : reset-game-input ( -- )
     (reset-game-input) ;
 
-[ reset-game-input ] "game-input" add-startup-hook
-
 PRIVATE>
+
+STARTUP-HOOK: reset-game-input
 
 ERROR: game-input-not-open ;
 
@@ -48,6 +48,7 @@ ERROR: game-input-not-open ;
     ] unless
     game-input-opened [ 1 + ] change-global
     reset-mouse ;
+
 : close-game-input ( -- )
     game-input-opened [
         dup zero? [ game-input-not-open ] when

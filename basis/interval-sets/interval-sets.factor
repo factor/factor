@@ -1,7 +1,7 @@
 ! Copyright (C) 2009 Daniel Ehrenberg.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors alien.c-types arrays assocs binary-search
-classes combinators fry grouping kernel locals make math
+classes combinators grouping kernel locals make math
 math.order sequences sequences.private sorting
 specialized-arrays ;
 SPECIALIZED-ARRAY: uint
@@ -11,7 +11,7 @@ IN: interval-sets
 ! Intervals are a pair of { start end }
 TUPLE: interval-set { array uint-array read-only } ;
 
-: in? ( key set -- ? )
+: interval-in? ( key set -- ? )
     interval-set check-instance array>>
     dupd [ <=> ] with search swap [
         even? [ >= ] [ 1 - <= ] if

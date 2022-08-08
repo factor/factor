@@ -20,20 +20,26 @@
 <MODE>
 	<PROPS>
 		<PROPERTY NAME="indentNextLines" VALUE="\s*[^#]{3,}:\s*(#.*)?" />
+		<PROPERTY NAME="indentOpenBrackets" VALUE="{[" />
+		<PROPERTY NAME="indentCloseBrackets" VALUE="}]" />
 		<PROPERTY NAME="unalignedOpenBrackets" VALUE="(" />
 		<PROPERTY NAME="unalignedCloseBrackets" VALUE=")" />
-		<PROPERTY NAME="unindentNextLines" VALUE="^\s*(pass|else\s*:|elif\s.*:|except(\s.*)?:|finally\s*:)$" />
-		<PROPERTY NAME="unindentThisLine" VALUE="^\s*(else|elif\s.*|except(\s.*)?|finally)\s*:" />
+		<PROPERTY NAME="unindentNextLines" VALUE="^\s*(pass|else\s*:|elif\s.*:|except(\s.*)?:|finally\s*:)\s*(#.*)?$" />
+		<PROPERTY NAME="unindentThisLine" VALUE="^\s*(else|elif\s.*|except(\s.*)?|finally)\s*:\s*(#.*)?" />
 		<PROPERTY NAME="lineComment" VALUE="#" />
 		<PROPERTY NAME="electricKeys" VALUE=":" />
 		<PROPERTY NAME="ignoreWhitespace" VALUE="false" />
 	</PROPS>
-	<RULES ESCAPE="\" IGNORE_CASE="FALSE" HIGHLIGHT_DIGITS="TRUE">
+	<RULES IGNORE_CASE="FALSE" HIGHLIGHT_DIGITS="TRUE">
 		<!-- Comment -->
 		<EOL_SPAN TYPE="COMMENT1">#</EOL_SPAN>
 
 		<!-- decorator -->
-		<EOL_SPAN_REGEXP HASH_CHAR="@" AT_WORD_START="TRUE" TYPE="KEYWORD4">@\w</EOL_SPAN_REGEXP>
+		<SPAN_REGEXP HASH_CHAR="@" MATCH_TYPE="KEYWORD4" DELEGATE="python::MAIN">
+			<BEGIN>@\w+(?:\.\w+)*\(</BEGIN>
+			<END>\)</END>
+		</SPAN_REGEXP>
+		<MARK_FOLLOWING TYPE="KEYWORD4">@</MARK_FOLLOWING>
 
 		<!-- Triple-quotes -->
 		<SPAN TYPE="LITERAL2" DELEGATE="LITERAL_TWO">

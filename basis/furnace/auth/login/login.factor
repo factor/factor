@@ -1,16 +1,10 @@
 ! Copyright (c) 2008 Slava Pestov
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel accessors namespaces sequences math.parser
-calendar checksums validators urls logging html.forms
-http http.server http.server.dispatchers
-furnace.auth
-furnace.asides
-furnace.actions
-furnace.sessions
-furnace.utilities
-furnace.redirection
-furnace.conversations
-furnace.auth.login.permits ;
+USING: accessors calendar furnace.actions furnace.asides
+furnace.auth furnace.auth.login.permits furnace.conversations
+furnace.redirection furnace.utilities html.forms http
+http.server.dispatchers kernel logging math.parser namespaces
+sequences urls validators ;
 IN: furnace.auth.login
 
 SYMBOL: permit-id

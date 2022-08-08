@@ -1,8 +1,9 @@
 ! Copyright (C) 2005, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays binary-search combinators concurrency.flags
-deques fry kernel locals make math math.order math.rectangles
-math.vectors models namespaces sequences threads vectors ;
+USING: accessors arrays binary-search combinators
+concurrency.flags deques kernel make math math.order
+math.rectangles math.vectors models namespaces sequences threads
+vectors vocabs.loader ;
 IN: ui.gadgets
 
 ! Values for orientation slot
@@ -28,8 +29,6 @@ TUPLE: gadget < rect
 M: gadget equal? 2drop f ;
 
 M: gadget hashcode* nip identity-hashcode ;
-
-M: gadget model-changed 2drop ;
 
 : gadget-child ( gadget -- child ) children>> first ; inline
 
@@ -201,7 +200,7 @@ M: gadget pref-dim* dim>> ;
 
 GENERIC: layout* ( gadget -- )
 
-M: gadget layout* drop ;
+M: object layout* drop ;
 
 : prefer ( gadget -- ) dup pref-dim >>dim drop ;
 
@@ -214,11 +213,11 @@ M: gadget layout* drop ;
 
 GENERIC: graft* ( gadget -- )
 
-M: gadget graft* drop ;
+M: object graft* drop ;
 
 GENERIC: ungraft* ( gadget -- )
 
-M: gadget ungraft* drop ;
+M: object ungraft* drop ;
 
 <PRIVATE
 
@@ -309,16 +308,15 @@ M: gadget remove-gadget 2drop ;
 : unparent ( gadget -- )
     not-in-layout
     [
-        dup parent>> dup
-        [
-            [ remove-gadget ] [
-                over (unparent)
+        dup parent>> [
+            {
+                [ remove-gadget ]
+                [ drop (unparent) ]
                 [ unfocus-gadget ]
                 [ children>> remove! drop ]
                 [ nip relayout ]
-                2tri
-            ] 2bi
-        ] [ 2drop ] if
+            } 2cleave
+        ] [ drop ] if*
     ] when* ;
 
 : clear-gadget ( gadget -- )
@@ -406,7 +404,5 @@ M: f request-focus-on 2drop ;
 GENERIC: preedit? ( gadget -- ? )
 
 M: gadget preedit? drop f ;
-
-USE: vocabs.loader
 
 { "ui.gadgets" "prettyprint" } "ui.gadgets.prettyprint" require-when

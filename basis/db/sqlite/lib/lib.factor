@@ -4,11 +4,13 @@ USING: accessors alien.c-types alien.data arrays calendar.format
 calendar.parser combinators db db.errors db.sqlite.errors
 db.sqlite.ffi db.types io.backend io.encodings.string
 io.encodings.utf8 kernel math namespaces present sequences
-sequences.extras serialize urls ;
+serialize urls ;
 IN: db.sqlite.lib
 
 : sqlite-compile-options ( -- seq )
-    [ sqlite3_compileoption_get ] zero-loop>array ;
+    0 [
+        [ 1 + ] [ sqlite3_compileoption_get ] bi dup
+    ] [ ] produce 2nip ;
 
 ERROR: sqlite-error < db-error n string ;
 
@@ -184,7 +186,7 @@ ERROR: sqlite-error < db-error n string ;
     } case ;
 
 : sqlite-row ( handle -- seq )
-    dup sqlite-#columns [ sqlite-column ] with { } map-integers ;
+    dup sqlite-#columns [ sqlite-column ] with map-integers ;
 
 : sqlite-step-has-more-rows? ( prepared -- ? )
     {

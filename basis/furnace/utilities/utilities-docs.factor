@@ -1,5 +1,5 @@
-USING: assocs help.markup help.syntax kernel
-quotations sequences strings urls xml.data http words ;
+USING: assocs help.markup help.syntax kernel strings urls words
+xml.data ;
 IN: furnace.utilities
 
 HELP: adjust-redirect-url

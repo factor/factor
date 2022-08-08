@@ -18,10 +18,10 @@ $nl
 { $table
     { { $strong "Action" } { $strong "Stack contents" } }
     { "10 is pushed on the stack." { $snippet "10" } }
-    { { "The " { $link sq } " word is executed. It pops one input from the stack - the integer 10 - and squares it, pushing the result." } { $snippet "100" } }
+    { { "The " { $link sq } " word is executed. It pops one input from the stack (the integer 10) and squares it, pushing the result." } { $snippet "100" } }
     { { "5 is pushed on the stack." } { $snippet "100 5" } }
-    { { "The " { $link - } " word is executed. It pops two inputs from the stack - the integers 100 and 5 - and subtracts 5 from 100, pushing the result." } { $snippet "95" } }
-    { { "The " { $link . } " word is executed. It pops one input from the stack - the integer 95 - and prints it in the listener's output area." } { } }
+    { { "The " { $link - } " word is executed. It pops two inputs from the stack (the integers 100 and 5) and subtracts 5 from 100, pushing the result." } { $snippet "95" } }
+    { { "The " { $link . } " word is executed. It pops one input from the stack (the integer 95) and prints it in the listener's output area." } { } }
 }
 "Factor supports many other data types:"
 { $code

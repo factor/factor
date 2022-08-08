@@ -1,6 +1,5 @@
-USING: arrays byte-arrays help.markup help.syntax
-kernel kernel.private strings.private sequences vectors
-sbufs math help.vocabs ;
+USING: help.markup help.syntax strings.private sequences math
+help.vocabs ;
 IN: strings
 
 ARTICLE: "strings" "Strings"

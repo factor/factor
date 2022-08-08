@@ -2,6 +2,8 @@
 
 #include <mach/mach_time.h>
 #include <sys/utsname.h>
+#include <unistd.h>
+#include <stdio.h>
 
 #include "master.hpp"
 
@@ -38,12 +40,11 @@ const char* default_image_path(void) {
 
   if ([path hasSuffix:@".app"] || [path hasSuffix:@".app/"]) {
     NSFileManager* mgr = [NSFileManager defaultManager];
+    NSString* root = [path stringByDeletingLastPathComponent];
+    NSString* resources = [path stringByAppendingPathComponent:@"Contents/Resources"];
 
-    NSString* imageInBundle =
-        [[path stringByAppendingPathComponent:@"Contents/Resources"]
-            stringByAppendingPathComponent:image];
-    NSString* imageAlongBundle = [[path stringByDeletingLastPathComponent]
-        stringByAppendingPathComponent:image];
+    NSString* imageInBundle = [resources stringByAppendingPathComponent:image];
+    NSString* imageAlongBundle = [root stringByAppendingPathComponent:image];
 
     returnVal = ([mgr fileExistsAtPath:imageInBundle] ? imageInBundle
                                                       : imageAlongBundle);
@@ -54,6 +55,7 @@ const char* default_image_path(void) {
     returnVal = [returnVal stringByDeletingLastPathComponent];
     returnVal = [returnVal stringByDeletingLastPathComponent];
     returnVal = [returnVal stringByAppendingPathComponent:image];
+
   } else {
     returnVal = [path stringByAppendingPathComponent:image];
   }

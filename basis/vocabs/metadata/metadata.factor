@@ -1,10 +1,10 @@
 ! Copyright (C) 2009, 2010 Slava Pestov, Joe Groff.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors assocs classes.algebra
+USING: accessors assocs classes.algebra combinators
 combinators.short-circuit continuations io.directories
 io.encodings.utf8 io.files io.pathnames kernel make math.parser
-memoize namespaces sequences summary system vocabs vocabs.loader
-words ;
+memoize namespaces sequences splitting summary system vocabs
+vocabs.loader words ;
 IN: vocabs.metadata
 
 : check-vocab ( vocab -- vocab )
@@ -15,7 +15,7 @@ IN: vocabs.metadata
 
 MEMO: vocab-file-lines ( vocab name -- lines/f )
     vocab-file-path dup [
-        dup exists? [
+        dup file-exists? [
             utf8 file-lines harvest
         ] [
             drop f
@@ -38,21 +38,24 @@ MEMO: vocab-file-lines ( vocab name -- lines/f )
     "summary.txt" vocab-file-path ;
 
 : vocab-summary ( vocab -- summary )
-    dup "summary.txt" vocab-file-lines [
-        vocab-name " vocabulary" append
-    ] [
-        nip first
-    ] if-empty ;
+    "summary.txt" vocab-file-lines [ first ] [ f ] if* ;
+
+: vocab-in-root-summary ( vocab -- string )
+    [ vocab-summary ] [
+        vocab-name dup
+        ".private" ?tail drop find-vocab-root
+        [ "`" "'" surround " in " glue ] when*
+    ] bi over [ ", " glue ] [ nip ] if ;
 
 M: vocab summary
     [
-        dup vocab-summary %
+        dup vocab-in-root-summary %
         " (" %
         words>> assoc-size #
         " words)" %
     ] "" make ;
 
-M: vocab-link summary vocab-summary ;
+M: vocab-link summary vocab-in-root-summary ;
 
 : vocab-tags-path ( vocab -- path/f )
     "tags.txt" vocab-file-path ;
@@ -94,6 +97,20 @@ TUPLE: unsupported-platform vocab requires ;
 
 M: unsupported-platform summary
     drop "Current operating system not supported by this vocabulary" ;
+
+: file-exists?, ( path -- )
+    [ dup file-exists? [ , ] [ drop ] if ] when* ;
+
+: vocab-metadata-files ( vocab -- paths )
+    [
+        {
+            [ vocab-authors-path file-exists?, ]
+            [ vocab-platforms-path file-exists?, ]
+            [ vocab-resources-path file-exists?, ]
+            [ vocab-summary-path file-exists?, ]
+            [ vocab-tags-path file-exists?, ]
+        } cleave
+    ] { } make ;
 
 [
     dup vocab-platforms dup supported-platform?

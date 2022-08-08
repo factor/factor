@@ -1,16 +1,17 @@
 ! Copyright (C) 2005, 2006 Doug Coleman.
 ! Portions copyright (C) 2007, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors alien alien.data alien.strings arrays ascii assocs
-calendar classes classes.struct colors combinators continuations fry
-io io.crlf io.encodings.utf16n kernel libc literals locals make math
-math.bitwise namespaces sequences sets specialized-arrays strings
-threads ui ui.backend ui.clipboards ui.event-loop ui.gadgets
-ui.gadgets.private ui.gadgets.worlds ui.gestures ui.pixel-formats
-ui.private windows.dwmapi windows.errors windows.gdi32
-windows.kernel32 windows.messages windows.offscreen windows.opengl32
-windows.types windows.user32 assocs.extras byte-arrays
-io.encodings.string ;
+USING: accessors alien alien.c-types alien.data alien.strings
+arrays ascii assocs assocs.extras byte-arrays calendar classes
+classes.struct colors combinators continuations io io.crlf
+io.encodings.string io.encodings.utf16 io.encodings.utf8 kernel
+libc literals make math math.bitwise namespaces sequences sets
+specialized-arrays strings threads ui ui.backend ui.clipboards
+ui.event-loop ui.gadgets ui.gadgets.private ui.gadgets.worlds
+ui.gestures ui.pixel-formats ui.private windows.dwmapi
+windows.errors windows.gdi32 windows.kernel32 windows.messages
+windows.offscreen windows.ole32 windows.opengl32 windows.shell32
+windows.types windows.user32 ;
 FROM: unicode => upper-surrogate? under-surrogate? ;
 SPECIALIZED-ARRAY: POINT
 QUALIFIED-WITH: alien.c-types c
@@ -84,7 +85,7 @@ CONSTANT: pfd-flag-map H{
     [ value>> ] [ 0 ] if* ;
 
 : >pfd ( attributes -- pfd )
-    [ PIXELFORMATDESCRIPTOR <struct> ] dip
+    [ PIXELFORMATDESCRIPTOR new ] dip
     {
         [ drop PIXELFORMATDESCRIPTOR c:heap-size >>nSize ]
         [ drop 1 >>nVersion ]
@@ -336,7 +337,7 @@ CONSTANT: exclude-keys-wm-char
             lParam -16 shift 0xff bitand :> scan-code
             keyboard-state GetKeyboardState win32-error=0/f
             VK_CONTROL VK_CAPITAL [ 0 swap keyboard-state set-nth ] bi@
-            wParam scan-code keyboard-state chars 2 0 ToUnicode dup win32-error=0/f
+            wParam scan-code keyboard-state chars 2 0 ToUnicode
             1 <=  [
                 1 chars nth 8 shift 0 chars nth bitor
             ] [
@@ -482,7 +483,7 @@ SYMBOL: nc-buttons
     ] if ;
 
 : make-TRACKMOUSEEVENT ( hWnd -- alien )
-    TRACKMOUSEEVENT <struct>
+    TRACKMOUSEEVENT new
         swap >>hwndTrack
         TRACKMOUSEEVENT c:heap-size >>cbSize ;
 
@@ -491,7 +492,7 @@ SYMBOL: nc-buttons
     over make-TRACKMOUSEEVENT
         TME_LEAVE >>dwFlags
         0 >>dwHoverTime
-    TrackMouseEvent drop
+    TrackMouseEvent win32-error=0/f
     >lo-hi swap window move-hand fire-motion ;
 
 :: handle-wm-mousewheel ( hWnd uMsg wParam lParam -- )
@@ -511,7 +512,7 @@ SYMBOL: nc-buttons
 : ?make-glass ( world hwnd -- )
     over window-controls>> textured-background swap member-eq? [
         composition-enabled? [
-            full-window-margins DwmExtendFrameIntoClientArea drop
+            full-window-margins DwmExtendFrameIntoClientArea check-hresult
             T{ rgba f 0.0 0.0 0.0 0.0 }
         ] [ drop system-background-color ] if >>background-color
         drop
@@ -590,7 +591,7 @@ M: windows-ui-backend do-events
     ] if ;
 
 :: register-window-class ( class-name-ptr -- )
-    WNDCLASSEX <struct> f GetModuleHandle
+    WNDCLASSEX new f GetModuleHandle
     class-name-ptr pick GetClassInfoEx 0 = [
         WNDCLASSEX c:heap-size >>cbSize
         flags{ CS_HREDRAW CS_VREDRAW CS_OWNDC } >>style
@@ -674,7 +675,7 @@ M: windows-ui-backend do-events
 
 : set-pixel-format ( pixel-format hdc -- )
     swap handle>>
-    PIXELFORMATDESCRIPTOR <struct> SetPixelFormat win32-error=0/f ;
+    PIXELFORMATDESCRIPTOR new SetPixelFormat win32-error=0/f ;
 
 : setup-gl ( world -- )
     [ get-dc ] keep
@@ -700,9 +701,11 @@ M: windows-ui-backend (open-window)
     [ dup handle>> hWnd>> register-window ]
     [ handle>> hWnd>> show-window ] tri ;
 
+! https://github.com/factor/factor/issues/2173
+! ignore timeout (error 258)
 M: win-base select-gl-context
-    [ hDC>> ] [ hRC>> ] bi wglMakeCurrent win32-error=0/f
-    GdiFlush drop ;
+    [ hDC>> ] [ hRC>> ] bi wglMakeCurrent win32-error=0/f-ignore-timeout
+    GdiFlush win32-error=0/f ;
 
 M: win-base flush-gl-context
     hDC>> SwapBuffers win32-error=0/f ;
@@ -744,18 +747,18 @@ M: windows-ui-backend system-alert
 
 : fullscreen-RECT ( hwnd -- RECT )
     MONITOR_DEFAULTTONEAREST MonitorFromWindow
-    MONITORINFOEX <struct>
+    MONITORINFOEX new
         MONITORINFOEX c:heap-size >>cbSize
     [ GetMonitorInfo win32-error=0/f ] keep rcMonitor>> ;
 
 : client-area>RECT ( hwnd -- RECT )
-    RECT <struct>
+    RECT new
     [ GetClientRect win32-error=0/f ]
     [ >c-ptr POINT cast-array [ ClientToScreen drop ] with each ]
     [ nip ] 2tri ;
 
 : hwnd>RECT ( hwnd -- RECT )
-    RECT <struct> [ GetWindowRect win32-error=0/f ] keep ;
+    RECT new [ GetWindowRect win32-error=0/f ] keep ;
 
 M: windows-ui-backend (grab-input)
     0 ShowCursor drop
@@ -798,6 +801,27 @@ CONSTANT: fullscreen-flags flags{ WS_CAPTION WS_BORDER WS_THICKFRAME }
         ]
         [ drop SW_RESTORE ShowWindow win32-error=0/f ]
     } 2cleave ;
+
+: ensure-null-terminated ( str -- str' )
+    dup ?last 0 = [ "\0" append ] unless ; inline
+
+: add-tray-icon ( title -- )
+    NIM_ADD
+    NOTIFYICONDATA new
+        NOTIFYICONDATA heap-size >>cbSize
+        NOTIFYICON_VERSION_4 over timeout-version>> uVersion<<
+        NIF_TIP NIF_ICON bitor >>uFlags
+        world get handle>> hWnd>> >>hWnd
+        f GetModuleHandle "APPICON" native-string>alien LoadIcon >>hIcon
+        rot ensure-null-terminated utf8 encode >>szTip
+        Shell_NotifyIcon win32-error=0/f ;
+
+: remove-tray-icon ( -- )
+    NIM_DELETE
+    NOTIFYICONDATA new
+        NOTIFYICONDATA heap-size >>cbSize
+        world get handle>> hWnd>> >>hWnd
+    Shell_NotifyIcon win32-error=0/f ;
 
 M: windows-ui-backend (set-fullscreen)
     [ enter-fullscreen ] [ exit-fullscreen ] if ;

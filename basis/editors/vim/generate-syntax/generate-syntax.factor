@@ -1,6 +1,5 @@
 USING: accessors calendar calendar.format io io.encodings.utf8
-io.files kernel multiline parser sequences sorting splitting
-vocabs ;
+io.files kernel multiline sequences sorting splitting vocabs ;
 IN: editors.vim.generate-syntax
 
 <PRIVATE

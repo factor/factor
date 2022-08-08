@@ -88,12 +88,12 @@ CONSTANT: semver-gt-comparisons {
 
 { t } [
     semver-gt-comparisons
-    [ first2 version<=> ] map-zip
+    [ first2 version<=> ] zip-with
     values [ +gt+ = ] all?
 ] unit-test
 
 { t } [
     semver-gt-comparisons
-    [ first2 swap version<=> ] map-zip
+    [ first2 swap version<=> ] zip-with
     values [ +lt+ = ] all?
 ] unit-test

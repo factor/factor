@@ -5,7 +5,8 @@ namespaces ;
 IN: editors.etexteditor
 
 SINGLETON: etexteditor
-etexteditor editor-class set-global
+
+editor-class [ etexteditor ] initialize
 
 : etexteditor-path ( -- str )
     \ etexteditor-path get [

@@ -1,6 +1,6 @@
 ! Copyright (c) 2009 Guillaume Nargeot.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: arrays kernel math project-euler.common sequences sorting ;
+USING: kernel math project-euler.common sequences sorting ;
 IN: project-euler.112
 
 ! http://projecteuler.net/index.php?section=problems&id=112

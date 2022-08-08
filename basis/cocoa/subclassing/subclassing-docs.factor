@@ -1,4 +1,4 @@
-USING: help.markup help.syntax strings alien hashtables ;
+USING: help.markup help.syntax ;
 IN: cocoa.subclassing
 
 HELP: <CLASS:

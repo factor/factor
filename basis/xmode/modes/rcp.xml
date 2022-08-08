@@ -48,7 +48,7 @@
 	</RULES>
 
 
-	<RULES ESCAPE="\" HIGHLIGHT_DIGITS="TRUE">
+	<RULES HIGHLIGHT_DIGITS="TRUE">
 		<PROPS>
 			<PROPERTY NAME="commentStart" VALUE="/*" />
 			<PROPERTY NAME="lineComment" VALUE="//" />
@@ -63,7 +63,7 @@
 			<BEGIN>"</BEGIN>
 			<END>"</END>
 		</SPAN>
-		<SPAN TYPE="LITERAL1">
+		<SPAN TYPE="LITERAL1" ESCAPE="\">
 			<BEGIN>'</BEGIN>
 			<END>'</END>
 		</SPAN>

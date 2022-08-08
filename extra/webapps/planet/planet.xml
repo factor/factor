@@ -42,11 +42,11 @@
 
         <p>
             <strong>planet-factor</strong> is an Atom/RSS aggregator that collects the
-            contents of <a href="http://factorcode.org/">Factor</a>-related blogs. It is inspired by
-            <a href="http://planet.lisp.org">Planet Lisp</a>.
+            contents of <a href="https://factorcode.org/">Factor</a>-related blogs. It is inspired by
+            <a href="https://planet.lisp.org">Planet Lisp</a>.
         </p>
         <p>
-            <img src="http://planet.factorcode.org/icons/feed-icon-14x14.png" />
+            <img src="icons/feed-icon-14x14.png" />
             <t:a t:href="$planet/feed.xml">Syndicate</t:a>
         </p>
 

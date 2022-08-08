@@ -1,7 +1,7 @@
 ! Copyright (C) 2007, 2010 Slava Pestov, Eduardo Cavazos.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors combinators kernel sequences words
-quotations ;
+USING: accessors arrays combinators kernel sequences
+quotations words ;
 IN: locals.types
 
 TUPLE: lambda vars body ;
@@ -18,18 +18,15 @@ C: <quote> quote
 
 : unquote ( quote -- local ) dup quote? [ local>> ] when ; inline
 
-TUPLE: def local ;
-
-C: <def> def
-
 TUPLE: multi-def locals ;
 
 C: <multi-def> multi-def
 
+: <def> ( local -- def ) 1array <multi-def> ;
+
 PREDICATE: local < word "local?" word-prop ;
 
 : <local> ( name -- word )
-    ! Create a local variable identifier
     f <word>
     dup t "local?" set-word-prop ;
 
@@ -54,4 +51,4 @@ PREDICATE: local-writer < word "local-writer?" word-prop ;
     } 2cleave ;
 
 UNION: lexical local local-reader local-writer ;
-UNION: special lexical quote def ;
+UNION: special lexical quote ;

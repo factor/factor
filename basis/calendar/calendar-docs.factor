@@ -1,7 +1,6 @@
 ! Copyright (C) 2008 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: arrays kernel math strings help.markup help.syntax
-math.order ;
+USING: help.markup help.syntax kernel math math.order ;
 IN: calendar
 
 HELP: duration
@@ -51,12 +50,12 @@ HELP: seconds-per-year
 { $description "Returns the number of seconds in a year averaged over 400 years. Used internally for adding an arbitrary real number of seconds to a timestamp." } ;
 
 HELP: julian-day-number
-{ $values { "year" integer } { "month" integer } { "day" integer } { "n" integer } }
+{ $values { "$year" integer } { "$month" integer } { "$day" integer } { "n" integer } }
 { $description "Calculates the Julian day number from a year, month, and day. The difference between two Julian day numbers is the number of days that have elapsed between the two corresponding dates." }
 { $warning "Not valid before year -4800 BCE." } ;
 
 HELP: julian-day-number>date
-{ $values { "n" integer } { "year" integer } { "month" integer } { "day" integer } }
+{ $values { "$n" integer } { "year" integer } { "month" integer } { "day" integer } }
 { $description "Converts from a Julian day number back to a year, month, and day." } ;
 { julian-day-number julian-day-number>date } related-words
 
@@ -431,41 +430,41 @@ HELP: week-number
 } ;
 
 HELP: sunday
-{ $values { "timestamp" timestamp } }
+{ $values { "timestamp" timestamp } { "timestamp'" timestamp } }
 { $description "Returns the Sunday from the current week, which starts on a Sunday." } ;
 
 HELP: monday
-{ $values { "timestamp" timestamp } }
+{ $values { "timestamp" timestamp } { "timestamp'" timestamp } }
 { $description "Returns the Monday from the current week, which starts on a Sunday." } ;
 
 HELP: tuesday
-{ $values { "timestamp" timestamp } }
+{ $values { "timestamp" timestamp } { "timestamp'" timestamp } }
 { $description "Returns the Tuesday from the current week, which starts on a Sunday." } ;
 
 HELP: wednesday
-{ $values { "timestamp" timestamp } }
+{ $values { "timestamp" timestamp } { "timestamp'" timestamp } }
 { $description "Returns the Wednesday from the current week, which starts on a Sunday." } ;
 
 HELP: thursday
-{ $values { "timestamp" timestamp } }
+{ $values { "timestamp" timestamp } { "timestamp'" timestamp } }
 { $description "Returns the Thursday from the current week, which starts on a Sunday." } ;
 
 HELP: friday
-{ $values { "timestamp" timestamp } }
+{ $values { "timestamp" timestamp } { "timestamp'" timestamp } }
 { $description "Returns the Friday from the current week, which starts on a Sunday." } ;
 
 HELP: saturday
-{ $values { "timestamp" timestamp } }
+{ $values { "timestamp" timestamp } { "timestamp'" timestamp } }
 { $description "Returns the Saturday from the current week, which starts on a Sunday." } ;
 
 { sunday monday tuesday wednesday thursday friday saturday } related-words
 
 HELP: midnight
-{ $values { "timestamp" timestamp } }
+{ $values { "timestamp" timestamp } { "timestamp'" timestamp } }
 { $description "Sets the timestamp to represent the day at midnight, or the beginning of the day." } ;
 
 HELP: noon
-{ $values { "timestamp" timestamp } }
+{ $values { "timestamp" timestamp } { "timestamp'" timestamp } }
 { $description "Sets the timestamp to represent the day at noon, or the middle of the day." } ;
 
 HELP: today
@@ -473,11 +472,11 @@ HELP: today
 { $description "Sets the timestamp to represents today at midnight." } ;
 
 HELP: start-of-month
-{ $values { "timestamp" timestamp } }
+{ $values { "timestamp" timestamp } { "timestamp'" timestamp } }
 { $description "Sets the timestamp with the day set to one." } ;
 
 HELP: start-of-week
-{ $values { "timestamp" timestamp } }
+{ $values { "timestamp" timestamp } { "timestamp'" timestamp } }
 { $description "Sets the timestamp with the day of the week set to Sunday." } ;
 
 HELP: start-of-year
@@ -526,7 +525,7 @@ ARTICLE: "calendar" "Calendar"
 }
 "Both " { $link timestamp } "s and " { $link duration } "s implement the " { $link "math.order" } "."
 $nl
-"Meta-data about the calendar:"
+"Metadata about the calendar:"
 { $subsections "calendar-facts" } ;
 
 ARTICLE: "timestamp-arithmetic" "Timestamp arithmetic"

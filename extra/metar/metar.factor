@@ -2,10 +2,11 @@
 ! See http://factorcode.org/license.txt for BSD license
 
 USING: accessors arrays ascii assocs calendar calendar.format
-combinators command-line continuations csv formatting fry
-grouping http.client io io.encodings.ascii io.files io.styles
-kernel math math.extras math.parser memoize namespaces regexp
-sequences sorting.human splitting strings urls wrap.strings ;
+classes.tuple combinators command-line continuations csv
+formatting grouping http.client io io.encodings.ascii io.files
+io.styles kernel math math.extras math.functions math.parser
+namespaces regexp sequences sorting.human splitting strings urls
+wrap.strings ;
 
 IN: metar
 
@@ -56,6 +57,21 @@ MEMO: all-stations ( -- seq )
             [ 8 swap nth string>longitude ]
         } cleave <station>
     ] map ;
+
+: all-stations. ( -- )
+    all-stations standard-table-style [
+        [
+            [
+                tuple-slots [
+                    [
+                        [
+                            dup string? [ "%.2f" sprintf ] unless write
+                        ] when*
+                    ] with-cell
+                ] each
+            ] with-row
+        ] each
+    ] tabular-output nl ;
 
 : find-by-cccc ( cccc -- station )
     all-stations swap '[ cccc>> _ = ] find nip ;
@@ -135,7 +151,7 @@ MEMO: glossary ( -- assoc )
             dup number?
             [ number>string ]
             [ glossary ?at drop ] if
-        ] map " " join
+        ] map join-words
     ] map "/" join ;
 
 : parse-timestamp ( str -- str' )
@@ -182,15 +198,21 @@ CONSTANT: compass-directions H{
 
 : mph>kt ( mph -- kt ) 1.15077945 / ;
 
-: parse-speed ( str -- str'/f )
-    string>number [
-        dup kt>mph "%s knots (%.1f mph)" sprintf
+: parse-speed ( str units -- str'/f )
+    [ string>number ] dip '[
+        _ dup "knots" =
+        [ drop dup kt>mph "%s knots (%.1f mph)" sprintf ]
+        [ "%s %s" sprintf ] if
     ] [ f ] if* ;
 
 : parse-wind ( str -- str' )
-    dup "00000KT" = [ drop "calm" ] [
-        3 cut "KT" ?tail drop "G" split1
-        [ parse-direction ] [ parse-speed ] [ parse-speed ] tri*
+    dup "00000" head? [ drop "calm" ] [
+        "/" split1 [ 3 cut ] unless*
+        [ parse-direction ] dip {
+            { [ "KT" ?tail ] [ "knots" ] }
+            { [ "MPS" ?tail ] [ "meters per second" ] }
+            [ "knots" ]
+        } cond [ "G" split1 ] dip '[ _ parse-speed ] bi@
         [ "%s at %s with gusts to %s " sprintf ]
         [ "%s at %s" sprintf ] if*
     ] if ;
@@ -199,24 +221,52 @@ CONSTANT: compass-directions H{
     "V" split1 [ parse-compass ] bi@
     ", variable from %s to %s" sprintf ;
 
-! FIXME: "1 1/2SM" visibility doesn't work
 : parse-visibility ( str -- str' )
-    dup first {
-        { CHAR: M [ rest "less than " ] }
-        { CHAR: P [ rest "more than " ] }
-        [ drop "" ]
-    } case swap "SM" ?tail drop
-    CHAR: / over index [ 1 > [ 1 cut "+" glue ] when ] when*
-    string>number "%s%s statute miles" sprintf ;
+    "SM" ?tail [
+        dup first {
+            { CHAR: M [ rest "less than " ] }
+            { CHAR: P [ rest "more than " ] }
+            [ drop "" ]
+        } case swap
+        CHAR: \s over index [ " " "+" replace ] when
+        string>number "%s%s statute miles" sprintf
+    ] [
+        4 cut [
+            string>number {
+                { [ dup 800 < ] [ "%dm" sprintf ] }
+                { [ dup 5000 < ] [ 1000 /f "%.1fkm" sprintf ] }
+                { [ dup 9999 < ] [ 1000 /f "%dkm" sprintf ] }
+                [ drop "more than 10km" ]
+            } cond
+        ] dip [
+            [
+                H{
+                    { CHAR: N "north" }
+                    { CHAR: E "east" }
+                    { CHAR: S "south" }
+                    { CHAR: W "west" }
+                } at
+            ] { } map-as unclip-last
+            [ "-" join ] dip append " " glue
+        ] unless-empty
+    ] if ;
 
 : parse-rvr ( str -- str' )
-    "R" ?head drop "/" split1 "FT" ?tail drop
-    "V" split1 [
-        [ string>number ] bi@
-        "varying between %s and %s" sprintf
-    ] [
-        string>number "of %s" sprintf
-    ] if* "runway %s visibility %s ft" sprintf ;
+    {
+        { [ "U" ?tail ] [ " with improvement" ] }
+        { [ "D" ?tail ] [ " with aggravation" ] }
+        { [ "N" ?tail ] [ " with no change" ] }
+        [ "" ]
+    } cond [
+        "R" ?head drop "/" split1 "FT" ?tail [
+            "V" split1 [
+                [ string>number ] bi@
+                "varying between %s and %s" sprintf
+            ] [
+                string>number "of %s" sprintf
+            ] if* "runway %s visibility %s" sprintf
+         ] dip " ft" " meters" ? append
+    ] dip append ;
 
 : (parse-weather) ( str -- str' )
     dup "+FC" = [ drop "tornadoes or waterspouts" ] [
@@ -226,13 +276,13 @@ CONSTANT: compass-directions H{
             [ drop f ]
         } case [
             2 group dup [ weather key? ] all?
-            [ [ weather at ] map " " join ]
+            [ [ weather at ] map join-words ]
             [ concat parse-glossary ] if
         ] dip prepend
     ] if ;
 
 : parse-weather ( str -- str' )
-    "VC" over subseq? [ "VC" "" replace t ] [ f ] if
+    dup "VC" subseq-index? [ "VC" "" replace t ] [ f ] if
     [ (parse-weather) ]
     [ [ " in the vicinity" append ] when ] bi* ;
 
@@ -285,24 +335,33 @@ CONSTANT: sky H{
 CONSTANT: re-timestamp R/ \d{6}Z/
 CONSTANT: re-station R/ \w{4}/
 CONSTANT: re-temperature R/ [M]?\d{2}\/([M]?\d{2})?/
-CONSTANT: re-wind R/ (VRB|\d{3})\d{2,3}(G\d{2,3})?KT/
+CONSTANT: re-wind R/ (VRB|\d{3})(\/\d+|\d{2,3})(G\d{2,3})?(KT|MPS)/
 CONSTANT: re-wind-variable R/ \d{3}V\d{3}/
-CONSTANT: re-visibility R/ [MP]?\d+(\/\d+)?SM/
-CONSTANT: re-rvr R/ R\d{2}[RLC]?\/\d{4}(V\d{4})?FT/
+CONSTANT: re-visibility R/ ((\d+|[MP])?\d+(\/\d+)?SM|\d{4}[NSEW]{0,2})/
+CONSTANT: re-rvr R/ R\d{2}[RLC]?\/[MP]?\d{4}(V\d{4})?(FT)?[UDN]?/
 CONSTANT: re-weather R/ [+-]?(VC)?(\w{2}|\w{4})/
 CONSTANT: re-sky-condition R/ (\w{2,3}\d{3}(\w+)?|\w{3}|CAVOK)/
 CONSTANT: re-altimeter R/ [AQ]\d{4}/
 
-: find-one ( seq quot: ( elt -- ? ) -- seq elt/f )
-    dupd find drop [ tail unclip ] [ f ] if* ; inline
+: find-one ( seq quot: ( elt -- ? ) -- seq' elt/f )
+    dupd find [ [ swap remove-nth ] when* ] dip ; inline
 
 : find-all ( seq quot: ( elt -- ? ) -- seq elts )
-    [ find-one swap ] keep '[
-        dup [ f ] [ first @ ] if-empty
-    ] [ unclip ] produce rot [ prefix ] when* ; inline
+    [ dupd find drop ] keep '[
+        cut
+        [ dup ?first _ [ f ] if* ] [ unclip ] produce
+        [ append ] dip
+    ] [ f ] if* ; inline
+
+: fix-visibility ( seq -- seq' )
+    dup [ R/ \d+(\/\d+)?SM/ matches? ] find drop [
+        dup 1 - pick ?nth [ R/ \d+/ matches? ] [ f ] if* [
+            cut [ unclip-last ] [ unclip swap ] bi*
+            [ " " glue 1array ] [ 3append ] bi*
+        ] [ drop ] if
+    ] when* ;
 
 : metar-body ( report seq -- report )
-
     [ { "METAR" "SPECI" } member? ] find-one
     [ pick type<< ] when*
 
@@ -321,10 +380,11 @@ CONSTANT: re-altimeter R/ [AQ]\d{4}/
     [ re-wind-variable matches? ] find-one
     [ parse-wind-variable pick wind>> prepend pick wind<< ] when*
 
-    [ re-visibility matches? ] find-one
-    [ parse-visibility pick visibility<< ] when*
+    fix-visibility
+    [ re-visibility matches? ] find-all
+    [ parse-visibility ] map ", " join pick visibility<<
 
-    [ re-rvr matches? ] find-all " " join
+    [ re-rvr matches? ] find-all
     [ parse-rvr ] map ", " join pick rvr<<
 
     [ re-weather matches? ] find-all
@@ -429,7 +489,7 @@ CONSTANT: high-clouds H{
     [ [ f ] [ low-clouds at "low clouds are %s" sprintf ] if-zero ]
     [ [ f ] [ mid-clouds at "middle clouds are %s" sprintf ] if-zero ]
     [ [ f ] [ high-clouds at "high clouds are %s" sprintf ] if-zero ]
-    tri* 3array " " join ;
+    tri* 3array join-words ;
 
 : parse-inches ( str -- str' )
     dup [ CHAR: / = ] all? [ drop "unknown" ] [
@@ -465,7 +525,7 @@ CONSTANT: high-clouds H{
     "sea-level pressure is %s hPa" sprintf ;
 
 : parse-lightning ( str -- str' )
-    "LTG" ?head drop 2 group [ lightning at ] map " " join ;
+    "LTG" ?head drop 2 group [ lightning at ] map join-words ;
 
 CONSTANT: re-recent-weather R/ ((\w{2})?[BE]\d{2,4}((\w{2})?[BE]\d{2,4})?)+/
 
@@ -488,7 +548,7 @@ CONSTANT: re-recent-weather R/ ((\w{2})?[BE]\d{2,4}((\w{2})?[BE]\d{2,4})?)+/
 
 : parse-recent-weather ( str -- str' )
     split-recent-weather
-    [ (parse-recent-weather) ] map " " join ;
+    [ (parse-recent-weather) ] map join-words ;
 
 : parse-varying ( str -- str' )
     "V" split1 [ string>number ] bi@
@@ -545,7 +605,7 @@ CONSTANT: re-recent-weather R/ ((\w{2})?[BE]\d{2,4}((\w{2})?[BE]\d{2,4})?)+/
     } cond ;
 
 : metar-remarks ( report seq -- report )
-    [ parse-remark ] map " " join >>remarks ;
+    [ parse-remark ] map join-words >>remarks ;
 
 : <metar-report> ( metar -- report )
     [ metar-report new ] dip [ >>raw ] keep
@@ -557,6 +617,13 @@ CONSTANT: re-recent-weather R/ ((\w{2})?[BE]\d{2,4}((\w{2})?[BE]\d{2,4})?)+/
         [ _ write ] with-cell
         [ @ [ 65 wrap-string write ] when* ] with-cell
     ] with-row ; inline
+
+: calc-humidity ( report -- humidity/f )
+    [ dew-point>> ] [ temperature>> ] bi 2dup and [
+        [ " " split1 drop string>number ] bi@
+        [ [ 17.625 * ] [ 243.04 + ] bi / e^ ] bi@ / 100 *
+        round "%d%%" sprintf
+    ] [ 2drop f ] if ;
 
 : metar-report. ( report -- )
     standard-table-style [
@@ -571,6 +638,7 @@ CONSTANT: re-recent-weather R/ ((\w{2})?[BE]\d{2,4}((\w{2})?[BE]\d{2,4})?)+/
             [ "Temperature" [ temperature>> ] row. ]
             [ "Dew point" [ dew-point>> ] row. ]
             [ "Altimeter" [ altimeter>> ] row. ]
+            [ "Humidity" [ calc-humidity ] row. ]
             [ "Remarks" [ remarks>> ] row. ]
             [ "Raw Text" [ raw>> ] row. ]
         } cleave
@@ -642,7 +710,7 @@ sky-condition raw ;
     [ re-visibility matches? ] find-one
     [ parse-visibility pick visibility<< ] when*
 
-    [ re-rvr matches? ] find-all " " join
+    [ re-rvr matches? ] find-all join-words
     [ parse-rvr ] map ", " join pick rvr<<
 
     [ re-weather matches? ] find-all
@@ -668,7 +736,7 @@ sky-condition raw ;
     [ re-visibility matches? ] find-one
     [ parse-visibility pick visibility<< ] when*
 
-    [ re-rvr matches? ] find-all " " join
+    [ re-rvr matches? ] find-all join-words
     [ parse-rvr ] map ", " join pick rvr<<
 
     [ re-weather matches? ] find-all
@@ -684,7 +752,7 @@ sky-condition raw ;
 
 : <taf-report> ( taf -- report )
     [ taf-report new ] dip [ >>raw ] keep
-    string-lines [ [ blank? ] trim ] map
+    split-lines [ [ blank? ] trim ] map
     rest dup first "TAF" = [ rest ] when
     harvest unclip swapd taf-body swap taf-partials ;
 

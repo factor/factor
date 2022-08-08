@@ -16,7 +16,7 @@ FUNCTION: CFIndex CFArrayGetCount ( CFArrayRef array )
 
 : CF>array ( alien -- array )
     dup CFArrayGetCount
-    [ CFArrayGetValueAtIndex ] with { } map-integers ;
+    [ CFArrayGetValueAtIndex ] with map-integers ;
 
 : <CFArray> ( seq -- alien )
     f over length &: kCFTypeArrayCallBacks CFArrayCreateMutable

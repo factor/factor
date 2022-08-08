@@ -1,5 +1,8 @@
 <?xml version="1.0"?>
-
+<!-- 
+ * :tabSize=8:indentSize=8:noTabs=false:
+ * :folding=explicit:collapseFolds=1:
+-->
 <!DOCTYPE MODE SYSTEM "xmode.dtd">
 
 <MODE>
@@ -19,9 +22,9 @@
 		<PROPERTY NAME="unindentThisLine"
 			VALUE="^.*(default:\s*|case.*:.*)$" />
 		<PROPERTY NAME="electricKeys" VALUE=":" />
+		<PROPERTY NAME="doubleBracketIndent" VALUE="true" />
 	</PROPS>
-	<RULES ESCAPE="\"
-		IGNORE_CASE="FALSE"
+	<RULES IGNORE_CASE="FALSE"
 		HIGHLIGHT_DIGITS="TRUE"
 		DIGIT_RE="(0[lL]?|[1-9]\d{0,9}(\d{0,9}[lL])?|0[xX]\p{XDigit}{1,8}(\p{XDigit}{0,8}[lL])?|0[0-7]{1,11}([0-7]{0,11}[lL])?|([0-9]+\.[0-9]*|\.[0-9]+)([eE][+-]?[0-9]+)?[fFdD]?|[0-9]+([eE][+-]?[0-9]+[fFdD]?|([eE][+-]?[0-9]+)?[fFdD]))">
 
@@ -40,16 +43,19 @@
 			<END>*/</END>
 		</SPAN>
 
-		<SPAN TYPE="LITERAL1" NO_LINE_BREAK="TRUE">
+		<SPAN TYPE="LITERAL1" DELEGATE="DOUBLEQUOTE_LITERAL" NO_LINE_BREAK="TRUE">
 			<BEGIN>"</BEGIN>
 			<END>"</END>
 		</SPAN>
-		<SPAN TYPE="LITERAL1" NO_LINE_BREAK="TRUE">
+		<SPAN TYPE="LITERAL3" DELEGATE="SIMPLEQUOTE_LITERAL" NO_LINE_BREAK="TRUE">
 			<BEGIN>'</BEGIN>
 			<END>'</END>
 		</SPAN>
 
-		<EOL_SPAN TYPE="COMMENT2">//</EOL_SPAN>
+		<!-- end of line comment is defined this way rather than using an
+		EOL_SPAN because using an EOL_SPAN causes such comments in jsp
+		files to highlight incorrectly -->
+		<SEQ_REGEXP TYPE="COMMENT2">[/][/](.*?)$</SEQ_REGEXP>
 
 		<SEQ TYPE="OPERATOR">=</SEQ>
 		<SEQ TYPE="OPERATOR">!</SEQ>
@@ -57,7 +63,11 @@
 		<SEQ TYPE="OPERATOR">&lt;=</SEQ>
 		<SEQ TYPE="OPERATOR">+</SEQ>
 		<SEQ TYPE="OPERATOR">-</SEQ>
-		<SEQ TYPE="OPERATOR">/</SEQ>
+		
+		<!-- division operator is defined this way so that the '//' at the
+		start of single line comments within java scriptlets in jsp files 
+		are not parsed as operators. -->
+		<SEQ_REGEXP TYPE="OPERATOR">/(?![/])</SEQ_REGEXP>
 
 		<!-- workaround to stop "*" from being colorized
 		     in import statements. -->
@@ -84,7 +94,8 @@
 		<MARK_FOLLOWING TYPE="KEYWORD4">@</MARK_FOLLOWING>
 
 		<KEYWORDS>
-			<KEYWORD1>abstract</KEYWORD1>
+			<!--{{{ modifiers -->
+			<KEYWORD1>assert</KEYWORD1>
 			<KEYWORD1>break</KEYWORD1>
 			<KEYWORD1>case</KEYWORD1>
 			<KEYWORD1>catch</KEYWORD1>
@@ -92,32 +103,61 @@
 			<KEYWORD1>default</KEYWORD1>
 			<KEYWORD1>do</KEYWORD1>
 			<KEYWORD1>else</KEYWORD1>
-			<KEYWORD1>extends</KEYWORD1>
-			<KEYWORD1>final</KEYWORD1>
 			<KEYWORD1>finally</KEYWORD1>
 			<KEYWORD1>for</KEYWORD1>
 			<KEYWORD1>if</KEYWORD1>
-			<KEYWORD1>implements</KEYWORD1>
 			<KEYWORD1>instanceof</KEYWORD1>
-			<KEYWORD1>native</KEYWORD1>
 			<KEYWORD1>new</KEYWORD1>
-			<KEYWORD1>private</KEYWORD1>
-			<KEYWORD1>protected</KEYWORD1>
-			<KEYWORD1>public</KEYWORD1>
+			<KEYWORD1>record</KEYWORD1>
 			<KEYWORD1>return</KEYWORD1>
-			<KEYWORD1>static</KEYWORD1>
+			<KEYWORD1>strictfp</KEYWORD1>
 			<KEYWORD1>switch</KEYWORD1>
-			<KEYWORD1>synchronized</KEYWORD1>
 			<KEYWORD1>throw</KEYWORD1>
-			<KEYWORD1>throws</KEYWORD1>
-			<KEYWORD1>transient</KEYWORD1>
 			<KEYWORD1>try</KEYWORD1>
-			<KEYWORD1>volatile</KEYWORD1>
 			<KEYWORD1>while</KEYWORD1>
+			<KEYWORD1>yield</KEYWORD1>
+			<!--}}}-->
 
+			<!--{{{ structure keywords -->
+			<KEYWORD2>abstract</KEYWORD2>
+			<KEYWORD2>enum</KEYWORD2>
+			<KEYWORD2>extends</KEYWORD2>
+			<KEYWORD2>final</KEYWORD2>
+			<KEYWORD2>implements</KEYWORD2>
+			<KEYWORD2>import</KEYWORD2> 
+			<KEYWORD2>native</KEYWORD2>
 			<KEYWORD2>package</KEYWORD2>
-			<KEYWORD2>import</KEYWORD2>
+			<KEYWORD2>private</KEYWORD2>
+			<KEYWORD2>protected</KEYWORD2>
+			<KEYWORD2>public</KEYWORD2>
+			<KEYWORD2>static</KEYWORD2>
+			<KEYWORD2>synchronized</KEYWORD2>
+			<KEYWORD2>throws</KEYWORD2>
+			<KEYWORD2>transient</KEYWORD2>
+			<KEYWORD2>volatile</KEYWORD2>
+			<KEYWORD3>void</KEYWORD3>
+			<!--}}}-->
 
+			<!--{{{ Module related keywords -->
+			<KEYWORD2>module</KEYWORD2>
+			<KEYWORD2>open</KEYWORD2>
+			<KEYWORD2>requires</KEYWORD2>
+			<KEYWORD2>exports</KEYWORD2>
+			<KEYWORD2>opens</KEYWORD2>
+			<KEYWORD2>to</KEYWORD2>
+			<KEYWORD2>uses</KEYWORD2>
+			<KEYWORD2>provides</KEYWORD2>
+			<KEYWORD2>with</KEYWORD2>
+			<KEYWORD2>transitive</KEYWORD2>
+			<!--}}}-->
+			
+			<!--{{{ sealed class keywords -->
+			<KEYWORD2>sealed</KEYWORD2>
+			<KEYWORD2>permits</KEYWORD2>
+			<KEYWORD2>non-sealed</KEYWORD2>
+			<!--}}}-->
+			
+			<!--{{{ types -->
 			<KEYWORD3>boolean</KEYWORD3>
 			<KEYWORD3>byte</KEYWORD3>
 			<KEYWORD3>char</KEYWORD3>
@@ -128,26 +168,44 @@
 			<KEYWORD3>interface</KEYWORD3>
 			<KEYWORD3>long</KEYWORD3>
 			<KEYWORD3>short</KEYWORD3>
-			<KEYWORD3>void</KEYWORD3>
+			<!-- added for Java 10. While 'var' is not technically a keyword, it is a type. -->
+			<KEYWORD3>var</KEYWORD3>
+			<!--}}}-->
 
-			<FUNCTION>assert</FUNCTION>
-			<KEYWORD1>strictfp</KEYWORD1>
-
-
+			<!--{{{ literals -->
 			<LITERAL2>false</LITERAL2>
 			<LITERAL2>null</LITERAL2>
 			<LITERAL2>super</LITERAL2>
 			<LITERAL2>this</LITERAL2>
 			<LITERAL2>true</LITERAL2>
+			<!--}}}-->
 
 			<INVALID>goto</INVALID>
 			<INVALID>const</INVALID>
-
-			<!-- Java 1.5 -->
-			<KEYWORD3>enum</KEYWORD3>
 		</KEYWORDS>
 	</RULES>
 
+	<!--{{{ DOUBLEQUOTE_LITERAL rule -->
+	<RULES SET="DOUBLEQUOTE_LITERAL" DEFAULT="LITERAL1" IGNORE_CASE="TRUE">
+		<SEQ TYPE="LITERAL4">\\</SEQ>
+		<SEQ TYPE="LITERAL4">\"</SEQ>
+		<SEQ TYPE="LITERAL4">\n</SEQ>
+		<SEQ TYPE="LITERAL4">\r</SEQ>
+		<SEQ TYPE="LITERAL4">\t</SEQ>
+		<SEQ_REGEXP HASH_CHAR="\u" TYPE="LITERAL4">\\u[a-f\d]{4}</SEQ_REGEXP>
+	</RULES> <!--}}}-->
+	
+	<!--{{{ SIMPLEUOTE_LITERAL rule -->
+	<RULES SET="SIMPLEQUOTE_LITERAL" DEFAULT="LITERAL3" IGNORE_CASE="TRUE">
+		<SEQ TYPE="LITERAL4">\\</SEQ>
+		<SEQ TYPE="LITERAL4">\'</SEQ>
+		<SEQ TYPE="LITERAL4">\n</SEQ>
+		<SEQ TYPE="LITERAL4">\r</SEQ>
+		<SEQ TYPE="LITERAL4">\t</SEQ>
+		<SEQ_REGEXP HASH_CHAR="\u" TYPE="LITERAL4">\\u[a-f\d]{4}</SEQ_REGEXP>
+	</RULES> <!--}}}-->
+
+	<!--{{{ JAVADOC rules -->
 	<RULES SET="JAVADOC" DEFAULT="COMMENT3" IGNORE_CASE="TRUE">
 
 		<!-- so that *@param is highlighted -->
@@ -171,6 +229,12 @@
 		<SEQ TYPE="COMMENT3">&lt;=</SEQ>
 		<SEQ TYPE="COMMENT3">&lt; </SEQ>
 
+		<!-- strings in quotes -->
+		<SPAN TYPE="LITERAL1" ESCAPE="\" NO_LINE_BREAK="TRUE">
+		<BEGIN>&quot;</BEGIN>
+		<END>&quot;</END>
+		</SPAN>
+
 		<!-- HTML tags -->
 		<SPAN TYPE="MARKUP" DELEGATE="xml::TAGS"
 			NO_LINE_BREAK="TRUE">
@@ -187,7 +251,7 @@
 			<END>}</END>
 		</SPAN_REGEXP>
 
-		<!-- for the common usage of the cvs keyword $Id: java.xml 9228 2007-03-27 22:01:25Z ezust $ -->
+		<!-- for the common usage of the cvs keyword $Id: java.xml 25558 2022-06-02 20:36:50Z daleanson $ -->
 		<SPAN_REGEXP TYPE="LABEL" HASH_CHAR="@version" NO_WORD_BREAK="FALSE" DELEGATE="JAVADOC_PARAM">
 			<BEGIN>@version\s+\$</BEGIN>
 			<END>$</END>
@@ -205,7 +269,7 @@
 		<!-- Note: the labels in comments are handled by SPANs above -->
 
 		<!-- Official javadoc tags:
-			 http://java.sun.com/j2se/1.5/docs/tooldocs/windows/javadoc.html#javadoctags -->
+			 http://download.oracle.com/javase/6/docs/technotes/tools/windows/javadoc.html#javadoctags -->
 			<LABEL>@author</LABEL>
 			<LABEL>@deprecated</LABEL>
 		<!--<LABEL>@docRoot</LABEL>-->
@@ -220,7 +284,7 @@
 			<LABEL>@serialData</LABEL>
 		<!--<LABEL>@serialField</LABEL>-->
 			<LABEL>@since</LABEL>
-		<!--<LABEL>@throws</LABEL>-->
+			<LABEL>@throws</LABEL>
 			<LABEL>{@value}</LABEL>
 			<LABEL>@version</LABEL>
 
@@ -266,7 +330,8 @@
 			<KEYWORD4>@uses</KEYWORD4>
 			<KEYWORD4>@values</KEYWORD4>
 		</KEYWORDS>
-	</RULES>
+	</RULES> <!--}}}-->
+
 
 	<!-- just a dummy which makes use of the default token type COMMENT4 for highlighting the word after @param in javadoc -->
 	<RULES SET="JAVADOC_PARAM" DEFAULT="COMMENT4" IGNORE_CASE="TRUE" />

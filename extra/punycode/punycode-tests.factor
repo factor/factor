@@ -1,6 +1,13 @@
 
 USING: arrays assocs fry kernel linked-assocs punycode
-tools.test urls ;
+punycode.private tools.test urls ;
+
+{ 0 } [ CHAR: A decode-digit ] unit-test
+{ 1 } [ CHAR: B decode-digit ] unit-test
+{ 25 } [ CHAR: Z decode-digit ] unit-test
+{ 26 } [ CHAR: 0 decode-digit ] unit-test
+{ 35 } [ CHAR: 9 decode-digit ] unit-test
+[ CHAR: & decode-digit ] [ invalid-digit? ] must-fail-with
 
 {
     ! Wikipedia Examples
@@ -149,18 +156,5 @@ tools.test urls ;
     [ 1array swap '[ _ >idna ] unit-test ] 2bi
 ] assoc-each
 
-{ IRL" http://例子.卷筒纸" } [ URL" http://xn--fsqu00a.xn--3lr804guic/" >irl ] unit-test
-{ URL" http://xn--fsqu00a.xn--3lr804guic/" } [ IRL" http://例子.卷筒纸" >url ] unit-test
-
-{
-    T{ irl
-        { protocol "http" }
-        { username f }
-        { password f }
-        { host "März.com" }
-        { port f }
-        { path "/päth" }
-        { query LH{ { "query" "Dürst" } } }
-        { anchor "☃" }
-    }
-} [ "http://März.com/päth?query=Dürst#☃" >irl ] unit-test
+{ URL" http://例子.卷筒纸" } [ URL" http://xn--fsqu00a.xn--3lr804guic/" idna> ] unit-test
+{ URL" http://xn--fsqu00a.xn--3lr804guic/" } [ URL" http://例子.卷筒纸" >idna ] unit-test

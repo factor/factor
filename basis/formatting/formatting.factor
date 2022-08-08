@@ -1,11 +1,11 @@
 ! Copyright (C) 2008 John Benediktsson
 ! See http://factorcode.org/license.txt for BSD license
-USING: accessors arrays assocs calendar calendar.english combinators
-combinators.smart fry generalizations io io.streams.string
-kernel macros math math.functions math.parser namespaces
+USING: accessors arrays assocs calendar calendar.english
+combinators combinators.smart generalizations io
+io.streams.string kernel math math.functions
+math.functions.integer-logs math.parser multiline namespaces
 peg.ebnf present prettyprint quotations sequences
-sequences.generalizations strings unicode vectors
-math.functions.integer-logs splitting multiline ;
+sequences.generalizations splitting strings unicode ;
 FROM: math.parser.private => format-float ;
 IN: formatting
 
@@ -106,7 +106,7 @@ pad       = pad-align pad-char pad-width => [[ <reversed> >quotation dup first 0
 sign_     = [+ ]                 => [[ '[ dup first CHAR: - = [ _ prefix ] unless ] ]]
 sign      = (sign_)?             => [[ [ ] or ]]
 
-width_    = "." ([0-9])*         => [[ second >digits '[ _ short head ] ]]
+width_    = "." ([0-9])*         => [[ second >digits '[ _ index-or-length head ] ]]
 width     = (width_)?            => [[ [ ] or ]]
 
 digits_   = "." ([0-9])*         => [[ second >digits ]]
@@ -142,7 +142,7 @@ assocs    = "[%" types ": %" types " %]" => [[ [ second ] [ fourth ] bi '[ [ _ _
 
 formats   = "%" (types|fmt-%|lists|assocs|unknown) => [[ second ]]
 
-plain-text = (!("%").)+          => [[ >string ]]
+plain-text = [^%]+               => [[ >string ]]
 
 text      = (formats|plain-text)*
 
@@ -201,7 +201,7 @@ MACRO: sprintf ( format-string -- quot )
           [ >time ]
           [ year>> number>string ]
        } cleave
-    ] output>array " " join ; inline
+    ] output>array join-words ; inline
 
 : week-of-year ( timestamp day -- n )
     [ dup clone 1 >>month 1 >>day day-of-week dup ] dip > [ 7 swap - ] when
@@ -243,7 +243,7 @@ formats_  = fmt-%|fmt-a|fmt-A|fmt-b|fmt-B|fmt-c|fmt-d|fmt-H|fmt-I|
 
 formats   = "%" (formats_)       => [[ second ]]
 
-plain-text = (!("%").)+          => [[ >string ]]
+plain-text = [^%]+               => [[ >string ]]
 
 text      = (formats|plain-text)*
 
@@ -254,10 +254,8 @@ PRIVATE>
 MACRO: strftime ( format-string -- quot )
     parse-strftime [
         dup string? [
-            '[ _ swap push-all ]
+            '[ _ append! ]
         ] [
-            '[ over @ swap push-all ]
+            '[ over @ append! ]
         ] if
-    ] map '[
-        SBUF" " clone [ _ cleave drop ] keep "" like
-    ] ;
+    ] map concat '[ SBUF" " clone @ nip "" like ] ;

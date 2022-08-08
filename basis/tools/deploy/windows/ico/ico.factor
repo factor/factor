@@ -36,7 +36,7 @@ STRUCT: group-directory-entry
     [ {
         [ Width>> ] [ Height>> ] [ Colors>> ] [ Reserved>> ]
         [ Planes>> ] [ BitsPerPixel>> ] [ ImageSize>> ]
-    } cleave ] [ 1 + ] bi* group-directory-entry <struct-boa> >c-ptr ; inline
+    } cleave ] [ 1 + ] bi* group-directory-entry boa >c-ptr ; inline
 
 : ico-icon ( directory-entry bytes -- subbytes )
     [ [ ImageOffset>> dup ] [ ImageSize>> + ] bi ] dip subseq ; inline

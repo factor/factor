@@ -1,6 +1,6 @@
 ! Copyright (c) 2012 Anonymous
 ! See http://factorcode.org/license.txt for BSD license.
-USING: combinators kernel locals math sequences ;
+USING: combinators kernel math sequences ;
 IN: rosetta-code.balanced-brackets
 
 ! http://rosettacode.org/wiki/Balanced_brackets

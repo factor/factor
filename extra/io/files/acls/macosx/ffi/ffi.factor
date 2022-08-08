@@ -131,10 +131,10 @@ FUNCTION: acl_t acl_init ( int count )
 
 FUNCTION: acl_t acl_get_fd ( int fd )
 FUNCTION: acl_t acl_get_fd_np ( int fd, acl_type_t type )
-FUNCTION: acl_t acl_get_file ( char* path_p, acl_type_t type )
-FUNCTION: acl_t acl_get_link_np ( char* path_p, acl_type_t type )
+FUNCTION: acl_t acl_get_file ( c-string path_p, acl_type_t type )
+FUNCTION: acl_t acl_get_link_np ( c-string path_p, acl_type_t type )
 
-FUNCTION: int acl_set_file ( char* path_p, acl_type_t type, acl_t acl )
+FUNCTION: int acl_set_file ( c-string path_p, acl_type_t type, acl_t acl )
 
 FUNCTION: int acl_get_entry ( acl_t acl, int entry_id, acl_entry_t* entry_p )
 
@@ -145,9 +145,9 @@ FUNCTION: ssize_t acl_copy_ext ( void* buf_p, acl_t acl, ssize_t size )
 FUNCTION: ssize_t acl_copy_ext_native ( void* buf_p, acl_t acl, ssize_t size )
 FUNCTION: acl_t acl_copy_int ( void* buf_p )
 FUNCTION: acl_t acl_copy_int_native ( void* buf_p )
-FUNCTION: acl_t acl_from_text ( char* buf_p )
+FUNCTION: acl_t acl_from_text ( c-string buf_p )
 FUNCTION: ssize_t acl_size ( acl_t acl )
-FUNCTION: char* acl_to_text ( acl_t acl, ssize_t* len_p )
+FUNCTION: c-string acl_to_text ( acl_t acl, ssize_t* len_p )
 FUNCTION: int acl_valid ( acl_t acl )
 FUNCTION: int acl_add_perm ( acl_permset_t permset_d, acl_perm_t perm )
 FUNCTION: int acl_delete_perm ( acl_permset_t permset_d, acl_perm_t perm )
@@ -184,4 +184,4 @@ FUNCTION: int mbr_uuid_to_sid ( uuid_t uu, nt_sid_t *sid )
 
 TYPEDEF: char[37] uuid_string_t
 
-FUNCTION: int mbr_uuid_to_string (  uuid_t uu, char* string )
+FUNCTION: int mbr_uuid_to_string (  uuid_t uu, c-string string )

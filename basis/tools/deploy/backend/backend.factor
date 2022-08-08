@@ -1,10 +1,11 @@
 ! Copyright (C) 2007, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors assocs bootstrap.image hashtables io io.directories
-io.encodings.utf8 io.files io.files.temp io.launcher io.pathnames
-kernel locals make namespaces prettyprint sequences splitting system
-tools.deploy.config tools.deploy.config.editor tools.deploy.embed
-tools.deploy.libraries vocabs.loader vocabs.metadata.resources
+USING: accessors alien.libraries.finder assocs bootstrap.image
+hashtables io io.directories io.encodings.utf8 io.files
+io.files.temp io.launcher io.pathnames kernel make
+namespaces prettyprint sequences splitting system
+tools.deploy.config tools.deploy.config.editor
+tools.deploy.embed vocabs.loader vocabs.metadata.resources
 webbrowser ;
 IN: tools.deploy.backend
 
@@ -19,7 +20,7 @@ TUPLE: vocab-manifest vocabs libraries ;
 ERROR: can't-deploy-library-file library ;
 
 : copy-library ( dir library -- )
-    dup find-library-file
+    dup find-library*
     [ tuck file-name append-path copy-file ]
     [ can't-deploy-library-file ] ?if ;
 
@@ -42,7 +43,7 @@ ERROR: can't-deploy-library-file library ;
 
 : make-boot-image ( -- )
     ! If stage1 image doesn't exist, create one.
-    my-boot-image-name resource-path exists?
+    my-boot-image-name resource-path file-exists?
     [ make-my-image ] unless ;
 
 : staging-image-name ( profile -- name )
@@ -67,7 +68,7 @@ ERROR: can't-deploy-library-file library ;
         [
             "-staging" , "-no-user-init" , "-pic=0" ,
             [ staging-image-name "-output-image=" prepend , ]
-            [ " " join "-include=" prepend , ] bi
+            [ join-words "-include=" prepend , ] bi
         ] [
             input-image-name "-i=" prepend ,
             "-resource-path=" "" resource-path append ,
@@ -76,7 +77,7 @@ ERROR: can't-deploy-library-file library ;
     ] { } make ;
 
 : make-staging-image ( profile -- )
-    { } [ suffix ] accumulate* [ staging-image-name exists? ] reject
+    { } [ suffix ] accumulate* [ staging-image-name file-exists? ] reject
     [ staging-command-line ] map
     [ vm-path swap run-factor ] each ;
 

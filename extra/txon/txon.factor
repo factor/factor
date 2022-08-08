@@ -27,26 +27,26 @@ IN: txon
 DEFER: name/values
 
 : (parse-value) ( string -- values )
-    decode-value string-lines
+    decode-value split-lines
     [ "" ] [ dup length 1 = [ first ] when ] if-empty ;
 
 : parse-value ( string -- remain value )
     dup find-` [
         dup 1 - pick ?nth CHAR: : =
         [ drop name/values ] [ cut swap (parse-value) ] if
-        [ rest [ blank? ] trim-head ] dip
+        [ rest [ unicode:blank? ] trim-head ] dip
     ] [ f swap ] if* ;
 
 : (name=value) ( string -- remain term )
     parse-name [ parse-value ] dip associate ;
 
 : name=value ( string -- remain term )
-    [ blank? ] trim
-    ":`" over subseq? [ (name=value) ] [ f swap ] if ;
+    [ unicode:blank? ] trim
+    dup ":`" subseq-index? [ (name=value) ] [ f swap ] if ;
 
 : name/values ( string -- remain terms )
     [ dup { [ empty? not ] [ first CHAR: ` = not ] } 1&& ]
-    [ name=value ] produce assoc-combine ;
+    [ name=value ] produce assoc-union-all ;
 
 : parse-txon ( string -- objects )
     [ dup empty? not ] [ name=value ] produce nip ;
@@ -66,12 +66,12 @@ PRIVATE>
 GENERIC: >txon ( object -- string )
 
 M: sequence >txon
-    [ >txon ] map "\n" join ;
+    [ >txon ] map join-lines ;
 
 M: assoc >txon
     >alist [
         first2 [ encode-value ] [ >txon ] bi* "%s:`%s`" sprintf
-    ] map "\n" join ;
+    ] map join-lines ;
 
 M: string >txon
     encode-value ;

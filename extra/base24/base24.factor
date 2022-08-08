@@ -1,8 +1,8 @@
 ! Copyright (C) 2020 John Benediktsson
 ! See http://factorcode.org/license.txt for BSD license
 
-USING: ascii assocs base64.private byte-arrays grouping
-io.binary kernel kernel.private literals math sequences ;
+USING: ascii base64.private byte-arrays endian grouping
+kernel kernel.private literals math sequences ;
 
 IN: base24
 

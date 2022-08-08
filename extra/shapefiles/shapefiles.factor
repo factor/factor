@@ -1,10 +1,10 @@
 ! Copyright (C) 2018 John Benediktsson
 ! See http://factorcode.org/license.txt for BSD license
 
-USING: accessors byte-arrays classes combinators io
-io.binary.fast io.encodings.binary io.files
-io.streams.byte-array kernel locals math math.order
-math.statistics sequences sequences.extras sets ;
+USING: accessors byte-arrays classes combinators endian io
+io.encodings.binary io.files io.streams.byte-array kernel
+math math.order math.statistics sequences sequences.extras sets
+;
 
 IN: shapefiles
 

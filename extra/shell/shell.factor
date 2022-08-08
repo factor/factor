@@ -30,7 +30,7 @@ DEFER: expansion
 
 M: back-quoted-expr expand
   expr>> expr command>> expansion
-  utf8 [ contents ] with-process-reader
+  utf8 [ read-contents ] with-process-reader
   " \n" split harvest ;
 
 : expansion ( command -- command ) [ expand ] map flatten ;

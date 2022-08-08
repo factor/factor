@@ -2,7 +2,8 @@ USING: editors kernel make namespaces ;
 IN: editors.bbedit
 
 SINGLETON: bbedit
-bbedit editor-class set-global
+
+editor-class [ bbedit ] initialize
 
 M: bbedit editor-command
     drop

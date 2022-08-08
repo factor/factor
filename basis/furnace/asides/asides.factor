@@ -1,13 +1,9 @@
 ! Copyright (C) 2008, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: namespaces assocs kernel sequences accessors hashtables
-urls db.types db.tuples math.parser fry logging combinators
-html.templates.chloe.syntax
-http http.server http.server.filters http.server.redirection
-furnace.cache
-furnace.sessions
-furnace.utilities
-furnace.redirection ;
+USING: accessors assocs combinators db.tuples db.types
+furnace.cache furnace.redirection furnace.sessions
+furnace.utilities hashtables html.templates.chloe.syntax http
+http.server kernel logging math.parser namespaces urls ;
 IN: furnace.asides
 
 TUPLE: aside < server-state

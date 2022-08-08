@@ -1,0 +1,350 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE MODE SYSTEM "xmode.dtd">
+<!--
+ METAPOST syntax highlight v0.1.0
+ Made by Kondr <kondr@lesnimoudrost.cz>
+ Last revision: 2007-05-04
+ Cooperates with LaTeX syntax higlight (tested with the jEdit default latex.xml)
+ 
+ Kyword types
+ ************
+ 1 Basic keywords (for, begingig, ... )
+ 2 Statements
+ 3 Variables
+ 4 Constants
+ 
+ Macros are considred as functions, including the z,x,y prefixes.
+ 
+ Recommended catalog entry:
+ 
+   <MODE NAME="Metapost"
+         FILE="mpost.xml"
+         FILE_NAME_GLOB="*.mp"/>
+-->
+<MODE>
+	<PROPS>
+		<PROPERTY NAME="lineComment" VALUE="%"/>
+	</PROPS>
+	<RULES HIGHLIGHT_DIGITS="TRUE" DIGIT_RE="(0x[[:xdigit:]]+[lL]?|[[:digit:]]+(e[[:digit:]]*)?[lLdDfF]?(cm|in|pt|px)?)">
+	   		<!-- btex...etex -->
+		<SPAN TYPE="MARKUP" DELEGATE="tex::MAIN">
+			<BEGIN>btex</BEGIN>
+			<END>etex</END>
+		</SPAN>
+			
+		<!-- types -->
+		<SEQ TYPE="OPERATOR">path</SEQ>
+		<SEQ TYPE="OPERATOR">pair</SEQ>
+		<EOL_SPAN TYPE="COMMENT1">%</EOL_SPAN>
+		
+		<!-- xyz suffixes -->
+		<SEQ_REGEXP HASH_CHAR="z" AT_WORD_START="TRUE" TYPE="FUNCTION">z[0-9]?</SEQ_REGEXP>
+		<SEQ_REGEXP HASH_CHAR="x" AT_WORD_START="TRUE" TYPE="FUNCTION">x[0-9]?</SEQ_REGEXP>
+		<SEQ_REGEXP HASH_CHAR="y" AT_WORD_START="TRUE" TYPE="FUNCTION">y[0-9]?</SEQ_REGEXP>
+		<MARK_PREVIOUS TYPE="FUNCTION" MATCH_TYPE="CONTEXT">(</MARK_PREVIOUS>
+		
+		<SEQ TYPE="OPERATOR">&amp;</SEQ>
+		<SEQ TYPE="OPERATOR">*</SEQ>
+		<SEQ TYPE="OPERATOR">*</SEQ>
+		<SEQ TYPE="OPERATOR">**</SEQ>
+		<SEQ TYPE="OPERATOR">+</SEQ>
+		<SEQ TYPE="OPERATOR">++</SEQ>
+		<SEQ TYPE="OPERATOR">+-+</SEQ>
+		<SEQ TYPE="OPERATOR">-</SEQ>
+		<SEQ TYPE="OPERATOR">.</SEQ>
+		<SEQ TYPE="OPERATOR">/</SEQ>
+		<SEQ TYPE="OPERATOR">&lt;</SEQ>
+		<SEQ TYPE="OPERATOR">&lt;=</SEQ>
+		<SEQ TYPE="OPERATOR">&lt;&gt;</SEQ>
+		
+		<KEYWORDS>
+		    <!-- basic keywords -->
+			<KEYWORD1>beginfig</KEYWORD1>
+			<KEYWORD1>endfig</KEYWORD1>
+			<KEYWORD1>for</KEYWORD1>
+			<KEYWORD1>upto</KEYWORD1>
+			<KEYWORD1>downto</KEYWORD1>
+			<KEYWORD1>def</KEYWORD1>
+			<KEYWORD1>enddef</KEYWORD1>
+			<KEYWORD1>vardef</KEYWORD1>
+			<KEYWORD1>step</KEYWORD1>
+			<KEYWORD1>until</KEYWORD1>
+			<KEYWORD1>endfor</KEYWORD1>
+			<KEYWORD1>bye</KEYWORD1>
+			<KEYWORD1>if</KEYWORD1>
+			<KEYWORD1>elseif</KEYWORD1>
+			<KEYWORD1>else:</KEYWORD1>
+			<KEYWORD1>fi</KEYWORD1>
+			<KEYWORD1>exitif</KEYWORD1>
+			<KEYWORD1>exitunless</KEYWORD1>
+			<KEYWORD1>forever:</KEYWORD1>
+			<KEYWORD1>forsuffixes</KEYWORD1>
+			<KEYWORD1>end</KEYWORD1>
+			<KEYWORD1>begingroup</KEYWORD1>
+			<KEYWORD1>endgroup</KEYWORD1>
+			<KEYWORD1>save</KEYWORD1>
+			<KEYWORD1>unknown</KEYWORD1>
+			<KEYWORD1>input</KEYWORD1>
+			<KEYWORD1>newinternal</KEYWORD1>
+		
+			<!-- statements -->
+			<KEYWORD2>addto</KEYWORD2>
+			<KEYWORD2>clip</KEYWORD2>
+			<KEYWORD2>cutdraw</KEYWORD2>
+			<KEYWORD2>draw</KEYWORD2>
+			<KEYWORD2>drawarrow</KEYWORD2>
+			<KEYWORD2>drawdblarrow</KEYWORD2>
+			<KEYWORD2>fill</KEYWORD2>
+			<KEYWORD2>filldraw</KEYWORD2>
+			<KEYWORD2>interim</KEYWORD2>
+			<KEYWORD2>let</KEYWORD2>
+			<KEYWORD2>loggingall</KEYWORD2>
+			<KEYWORD2>newinternal</KEYWORD2>
+			<KEYWORD2>pickup</KEYWORD2>
+			<KEYWORD2>save</KEYWORD2>
+			<KEYWORD2>setbounds</KEYWORD2>
+			<KEYWORD2>shipout</KEYWORD2>
+			<KEYWORD2>show</KEYWORD2>
+			<KEYWORD2>showdependencies</KEYWORD2>
+			<KEYWORD2>showtoken</KEYWORD2>
+			<KEYWORD2>showvariable</KEYWORD2>
+			<KEYWORD2>special</KEYWORD2>
+			<KEYWORD2>tracingall</KEYWORD2>
+			<KEYWORD2>tracingnone</KEYWORD2>
+			<KEYWORD2>undraw</KEYWORD2>
+			<KEYWORD2>unfill</KEYWORD2>
+			<KEYWORD2>unfilldraw</KEYWORD2>
+			
+			<!-- variables -->
+			<KEYWORD3>ahangle</KEYWORD3>
+			<KEYWORD3>ahlength</KEYWORD3>
+			<KEYWORD3>bboxmargin</KEYWORD3>
+			<KEYWORD3>charcode</KEYWORD3>
+			<KEYWORD3>circmargin</KEYWORD3>
+			<KEYWORD3>day</KEYWORD3>
+			<KEYWORD3>defaultcolormodel</KEYWORD3>
+			<KEYWORD3>defaultdx</KEYWORD3>
+			<KEYWORD3>defaultdy</KEYWORD3>
+			<KEYWORD3>defaultpen</KEYWORD3>
+			<KEYWORD3>defaultscale</KEYWORD3>
+			<KEYWORD3>labeloffset</KEYWORD3>
+			<KEYWORD3>linecap</KEYWORD3>
+			<KEYWORD3>linejoin</KEYWORD3>
+			<KEYWORD3>miterlimit</KEYWORD3>
+			<KEYWORD3>month</KEYWORD3>
+			<KEYWORD3>mpprocset</KEYWORD3>
+			<KEYWORD3>pausing</KEYWORD3>
+			<KEYWORD3>prologues</KEYWORD3>
+			<KEYWORD3>restoreclipcolor</KEYWORD3>
+			<KEYWORD3>showstopping</KEYWORD3>
+			<KEYWORD3>time</KEYWORD3>
+			<KEYWORD3>tracingcapsules</KEYWORD3>
+			<KEYWORD3>tracingchoices</KEYWORD3>
+			<KEYWORD3>tracingcommands</KEYWORD3>
+			<KEYWORD3>tracingequations</KEYWORD3>
+			<KEYWORD3>tracinglostchars</KEYWORD3>
+			<KEYWORD3>tracingmacros</KEYWORD3>
+			<KEYWORD3>tracingonline</KEYWORD3>
+			<KEYWORD3>tracingoutput</KEYWORD3>
+			<KEYWORD3>tracingrestores</KEYWORD3>
+			<KEYWORD3>tracingspecs</KEYWORD3>
+			<KEYWORD3>tracingstats</KEYWORD3>
+			<KEYWORD3>tracingtitles</KEYWORD3>
+			<KEYWORD3>troffmode</KEYWORD3>
+			<KEYWORD3>truecorners</KEYWORD3>
+			<KEYWORD3>warningcheck</KEYWORD3>
+			<KEYWORD3>year </KEYWORD3>
+			<KEYWORD3>background</KEYWORD3>
+			<KEYWORD3>currentpen</KEYWORD3>
+			<KEYWORD3>currentpicture</KEYWORD3>
+			<KEYWORD3>cuttings</KEYWORD3>
+			<KEYWORD3>defaultfont</KEYWORD3>
+			<KEYWORD3>extra_beginfig</KEYWORD3>
+			<KEYWORD3>extra_endfig</KEYWORD3> 
+
+			<!-- constants -->
+			<KEYWORD4>beveled</KEYWORD4>
+			<KEYWORD4>black</KEYWORD4>
+			<KEYWORD4>blue</KEYWORD4>
+			<KEYWORD4>bp</KEYWORD4>
+			<KEYWORD4>butt</KEYWORD4>
+			<KEYWORD4>cc</KEYWORD4>
+			<KEYWORD4>cm</KEYWORD4>
+			<KEYWORD4>dd</KEYWORD4>
+			<KEYWORD4>ditto</KEYWORD4>
+			<KEYWORD4>down</KEYWORD4>
+			<KEYWORD4>epsilon</KEYWORD4>
+			<KEYWORD4>evenly</KEYWORD4>
+			<KEYWORD4>false</KEYWORD4>
+			<KEYWORD4>fullcircle</KEYWORD4>
+			<KEYWORD4>green</KEYWORD4>
+			<KEYWORD4>halfcircle</KEYWORD4>
+			<KEYWORD4>identity</KEYWORD4>
+			<KEYWORD4>in</KEYWORD4>
+			<KEYWORD4>infinity</KEYWORD4>
+			<KEYWORD4>left</KEYWORD4>
+			<KEYWORD4>mitered</KEYWORD4>
+			<KEYWORD4>mm</KEYWORD4>
+			<KEYWORD4>mpversion</KEYWORD4>
+			<KEYWORD4>nullpicture</KEYWORD4>
+			<KEYWORD4>origin</KEYWORD4>
+			<KEYWORD4>pc</KEYWORD4>
+			<KEYWORD4>pencircle</KEYWORD4>
+			<KEYWORD4>pensquare</KEYWORD4>
+			<KEYWORD4>pt</KEYWORD4>
+			<KEYWORD4>quartercircle</KEYWORD4>
+			<KEYWORD4>red</KEYWORD4>
+			<KEYWORD4>right</KEYWORD4>
+			<KEYWORD4>rounded</KEYWORD4>
+			<KEYWORD4>and</KEYWORD4>
+			<KEYWORD4>squared</KEYWORD4>
+			<KEYWORD4>true</KEYWORD4>
+			<KEYWORD4>unitsquare</KEYWORD4>
+			<KEYWORD4>up</KEYWORD4>
+			<KEYWORD4>white</KEYWORD4>
+			<KEYWORD4>withdots</KEYWORD4>
+						
+			<!-- functions -->
+			<FUNCTION>boxit</FUNCTION>
+			<FUNCTION>boxjoin</FUNCTION>
+			<FUNCTION>bpath</FUNCTION>
+			<FUNCTION>buildcycle</FUNCTION>
+			<FUNCTION>circleit</FUNCTION>
+			<FUNCTION>circleit</FUNCTION>
+			<FUNCTION>circleit</FUNCTION>
+			<FUNCTION>dashpattern</FUNCTION>
+			<FUNCTION>decr</FUNCTION>
+			<FUNCTION>dotlabel</FUNCTION>
+			<FUNCTION>dotlabel</FUNCTION>
+			<FUNCTION>dotlabels</FUNCTION>
+			<FUNCTION>drawboxed</FUNCTION>
+			<FUNCTION>contents</FUNCTION>
+			<FUNCTION>drawdot</FUNCTION>
+			<FUNCTION>drawoptions</FUNCTION>
+			<FUNCTION>drawunboxed</FUNCTION>
+			<FUNCTION>fixpos</FUNCTION>
+			<FUNCTION>named</FUNCTION>
+			<FUNCTION>fixsize</FUNCTION>
+			<FUNCTION>image</FUNCTION>
+			<FUNCTION>incr</FUNCTION>
+			<FUNCTION>label</FUNCTION>
+			<FUNCTION>label</FUNCTION>
+			<FUNCTION>labels</FUNCTION>
+			<FUNCTION>max</FUNCTION>
+			<FUNCTION>max</FUNCTION>
+			<FUNCTION>min</FUNCTION>
+			<FUNCTION>min</FUNCTION>
+			<FUNCTION>pic</FUNCTION>
+			<FUNCTION>thelabel</FUNCTION>
+			<FUNCTION>thelabel</FUNCTION>
+			<OPERATOR>rotatedaround</OPERATOR>
+			<!-- operators -->
+			<OPERATOR>abs</OPERATOR>
+			<OPERATOR>angle</OPERATOR>
+			<OPERATOR>arclength</OPERATOR>
+			<OPERATOR>arctime</OPERATOR>
+			<OPERATOR>ASCII</OPERATOR>
+			<OPERATOR>bbox</OPERATOR>
+			<OPERATOR>bluepart</OPERATOR>
+			<OPERATOR>boolean</OPERATOR>
+			<OPERATOR>bot</OPERATOR>
+			<OPERATOR>ceiling</OPERATOR>
+			<OPERATOR>center</OPERATOR>
+			<OPERATOR>char</OPERATOR>
+			<OPERATOR>cmykcolor</OPERATOR>
+			<OPERATOR>colormodel</OPERATOR>
+			<OPERATOR>color</OPERATOR>
+			<OPERATOR>cosd</OPERATOR>
+			<OPERATOR>cutafter</OPERATOR>
+			<OPERATOR>intersection</OPERATOR>
+			<OPERATOR>cutbefore</OPERATOR>
+			<OPERATOR>intersection</OPERATOR>
+			<OPERATOR>cyanpart</OPERATOR>
+			<OPERATOR>cycle</OPERATOR>
+			<OPERATOR>decimal</OPERATOR>
+			<OPERATOR>dir</OPERATOR>
+			<OPERATOR>direction</OPERATOR>
+			<OPERATOR>directionpoint</OPERATOR>
+			<OPERATOR>directiontime</OPERATOR>
+			<OPERATOR>div</OPERATOR>
+			<OPERATOR>dotprod</OPERATOR>
+			<OPERATOR>floor</OPERATOR>
+			<OPERATOR>fontsize</OPERATOR>
+			<OPERATOR>greenpart</OPERATOR>
+			<OPERATOR>greypart</OPERATOR>
+			<OPERATOR>hex</OPERATOR>
+			<OPERATOR>infont</OPERATOR>
+			<OPERATOR>intersectionpoint</OPERATOR>
+			<OPERATOR>intesctiontimes</OPERATOR>
+			<OPERATOR>inverse</OPERATOR>
+			<OPERATOR>known</OPERATOR>
+			<OPERATOR>length</OPERATOR>
+			<OPERATOR>ulft</OPERATOR>
+			<OPERATOR>llft</OPERATOR>
+			<OPERATOR>lft</OPERATOR>
+			<OPERATOR>llcorner</OPERATOR>
+			<OPERATOR>lrcorner</OPERATOR>
+			<OPERATOR>magentapart</OPERATOR>
+			<OPERATOR>makemakeconvex</OPERATOR>
+			<OPERATOR>mexp</OPERATOR>
+			<OPERATOR>mlog</OPERATOR>
+			<OPERATOR>mod</OPERATOR>
+			<OPERATOR>normaldeviate</OPERATOR>
+			<OPERATOR>not</OPERATOR>
+			<OPERATOR>numeric</OPERATOR>
+			<OPERATOR>oct</OPERATOR>
+			<OPERATOR>odd</OPERATOR>
+			<OPERATOR>or</OPERATOR>
+			<OPERATOR>of</OPERATOR>
+			<OPERATOR>penoffset</OPERATOR>
+			<OPERATOR>picture</OPERATOR>
+			<OPERATOR>point</OPERATOR>
+			<OPERATOR>postcontrol</OPERATOR>
+			<OPERATOR>precontrol</OPERATOR>
+			<OPERATOR>redpart</OPERATOR>
+			<OPERATOR>reverse</OPERATOR>
+			<OPERATOR>swapped</OPERATOR>
+			<OPERATOR>rgbcolor</OPERATOR>
+			<OPERATOR>rotated</OPERATOR>
+			<OPERATOR>reflectedabout</OPERATOR>
+			<OPERATOR>round</OPERATOR>
+			<OPERATOR>lrt</OPERATOR>
+			<OPERATOR>urt</OPERATOR>
+			<OPERATOR>rt</OPERATOR>
+			<OPERATOR>scaled</OPERATOR>
+			<OPERATOR>scantokens</OPERATOR>
+			<OPERATOR>token</OPERATOR>
+			<OPERATOR>top</OPERATOR>
+			<OPERATOR>to</OPERATOR>
+			<OPERATOR>shifted</OPERATOR>
+			<OPERATOR>sind</OPERATOR>
+			<OPERATOR>slanted</OPERATOR>
+			<OPERATOR>sqrt</OPERATOR>
+			<OPERATOR>string</OPERATOR>
+			<OPERATOR>str</OPERATOR>
+			<OPERATOR>subof</OPERATOR>
+			<OPERATOR>substring</OPERATOR>
+			<OPERATOR>transformed</OPERATOR>
+			<OPERATOR>transform</OPERATOR>
+			<OPERATOR>ulcorner</OPERATOR>
+			<OPERATOR>uniformdeviate</OPERATOR>
+			<OPERATOR>unitvector</OPERATOR>
+			<OPERATOR>unknown</OPERATOR>
+			<OPERATOR>urcorner</OPERATOR>
+			<OPERATOR>whatever</OPERATOR>
+			<OPERATOR>xpart</OPERATOR>
+			<OPERATOR>xxpart</OPERATOR>
+			<OPERATOR>xypart</OPERATOR>
+			<OPERATOR>yellowpart</OPERATOR>
+			<OPERATOR>ypart</OPERATOR>
+			<OPERATOR>yxpart</OPERATOR>
+			<OPERATOR>yypart</OPERATOR>
+			<OPERATOR>zscaled</OPERATOR>
+			<OPERATOR>dashed</OPERATOR>
+			<OPERATOR>pen</OPERATOR>
+			<OPERATOR>suffix</OPERATOR>
+			<OPERATOR>expr</OPERATOR>
+		</KEYWORDS>
+	
+	</RULES>
+</MODE>

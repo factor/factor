@@ -6,10 +6,9 @@ html {
     box-sizing: inherit;
 }
 
-a:link { text-decoration: none; color: #104e8b; }
-a:visited { text-decoration: none; color: #104e8b; }
-a:active { text-decoration: none; color: #104e8b; }
-a:hover { text-decoration: underline; color: #104e8b; }
+a { color: #2A5DB0; }
+a:link, a:visited, a:active { text-decoration: none; }
+a:hover { text-decoration: underline; }
 
 body {
     font-size: 12pt;
@@ -30,8 +29,9 @@ img {
 }
 
 pre {
-    background-color: #f5f5f5;
-    border: 1px dashed #ccc;
+    background-color: #f7f7f7;
+    border: 1px solid #dbdbdb;
+    border-radius: 5px;
     margin-top: 10px;
     padding: 10px;
     font-size: smaller;
@@ -120,5 +120,33 @@ li {
     .downloads {
         width: 100%;
         max-width: 520px;
+    }
+}
+
+/* Dark mode */
+@media (prefers-color-scheme: dark) {
+    body {
+        background-color: #202124;
+        color: #bdc1c6;
+    }
+
+    title, h1, h2, h3, h4, h5, h6 {
+        color: white;
+    }
+
+    a {
+        color: #8ab4f8;
+    }
+
+    pre {
+        color: black;
+    }
+
+    .downloads a {
+        color: #2A5DB0;
+    }
+
+    img#logo {
+        content:url(logo-dark.png);
     }
 }

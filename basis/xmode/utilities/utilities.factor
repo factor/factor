@@ -1,6 +1,5 @@
-USING: accessors sequences assocs kernel quotations namespaces
-xml.data xml.traversal combinators macros parser lexer words fry
-regexp ;
+USING: combinators kernel namespaces quotations regexp sequences
+splitting xml.data xml.traversal ;
 IN: xmode.utilities
 
 : implies ( x y -- z ) [ not ] dip or ; inline
@@ -33,4 +32,6 @@ MACRO: (init-from-tag) ( specs -- quot )
     over [ (init-from-tag) ] dip ; inline
 
 : <?insensitive-regexp> ( string ? -- regexp )
+    ! handle Java style case-insensitive flags
+    "(?i)" pick subseq-start [ drop "(?i)" "" replace t ] when
     "i" "" ? <optioned-regexp> ;

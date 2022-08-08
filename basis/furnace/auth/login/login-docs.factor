@@ -1,4 +1,4 @@
-USING: help.markup help.syntax kernel strings ;
+USING: help.markup help.syntax strings ;
 IN: furnace.auth.login
 
 HELP: <login-realm>

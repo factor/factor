@@ -1,6 +1,6 @@
 ! Copyright (C) 2006, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays fry kernel make math math.order
+USING: accessors arrays kernel make math math.order
 math.rectangles math.vectors sequences strings.tables
 ui.baseline-alignment ui.gadgets ;
 IN: ui.gadgets.grids

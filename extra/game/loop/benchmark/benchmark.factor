@@ -13,7 +13,7 @@ STRUCT: game-loop-benchmark
 SPECIALIZED-VECTOR: game-loop-benchmark
 
 : <game-loop-benchmark> ( benchmark-data-pair tick frame -- obj )
-    \ game-loop-benchmark <struct>
+    \ game-loop-benchmark new
         swap >>frame#
         swap >>tick#
         swap >>benchmark-data-pair ; inline

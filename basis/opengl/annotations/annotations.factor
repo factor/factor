@@ -1,8 +1,8 @@
 ! Copyright (C) 2009 Joe Groff.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel namespaces combinators.short-circuit vocabs sequences
-compiler.units tools.annotations tools.annotations.private fry words
-opengl calendar accessors ascii ;
+USING: accessors ascii calendar combinators.short-circuit
+compiler.units kernel namespaces opengl sequences
+tools.annotations.private vocabs words ;
 IN: opengl.annotations
 
 TUPLE: gl-error-log

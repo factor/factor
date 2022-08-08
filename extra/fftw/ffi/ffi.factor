@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 
 USING: alien alien.c-types alien.destructors alien.libraries
-alien.libraries.finder alien.syntax combinators kernel system ;
+alien.syntax combinators system ;
 
 IN: fftw.ffi
 

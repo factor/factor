@@ -1,6 +1,6 @@
 ! Copyright (c) 2012 Anonymous
 ! See http://factorcode.org/license.txt for BSD license.
-USING: grouping kernel locals math math.ranges sequences ;
+USING: grouping kernel math ranges sequences ;
 IN: rosetta-code.pascals-triangle
 
 ! http://rosettacode.org/wiki/Pascal%27s_triangle
@@ -27,7 +27,7 @@ IN: rosetta-code.pascals-triangle
 ! should be noted.
 
 :: pascal-coefficients ( n -- seq )
-    1 n [1,b] [
+    1 n [1..b] [
         dupd [ n swap - * ] [ /i ] bi swap
     ] map nip ;
 

@@ -1,13 +1,15 @@
 ! Copyright (C) 2004, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs combinators compiler.cfg
-compiler.cfg.builder.blocks compiler.cfg.comparisons compiler.cfg.hats
-compiler.cfg.instructions compiler.cfg.intrinsics compiler.cfg.registers
-compiler.cfg.stacks compiler.cfg.stacks.local compiler.tree
-compiler.cfg.utilities cpu.architecture fry kernel locals make math
-namespaces sequences words ;
+compiler.cfg.builder.blocks compiler.cfg.comparisons
+compiler.cfg.hats compiler.cfg.instructions
+compiler.cfg.registers compiler.cfg.stacks
+compiler.cfg.stacks.local compiler.cfg.utilities compiler.tree
+cpu.architecture kernel make math namespaces sequences words ;
 IN: compiler.cfg.builder
 
+SLOT: id
+SLOT: return
 SYMBOL: procedures
 SYMBOL: loops
 

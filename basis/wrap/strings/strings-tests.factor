@@ -26,6 +26,30 @@ word wrap."
     "  " wrap-indented-string
 ] unit-test
 
+{
+    "   This is
+a long
+piece of
+text that
+we wish to
+word wrap."
+} [
+    "  This is a long piece of text that we wish to word wrap." 10
+    wrap-string
+] unit-test
+
+{
+    "     This is
+  a long
+  piece of
+  text that
+  we wish to
+  word wrap."
+} [
+    "  This is a long piece of text that we wish to word wrap." 12
+    "  " wrap-indented-string
+] unit-test
+
 { t } [
     "This is a long piece of text that we wish to word wrap." 12
     [ "  " wrap-indented-string ] [ 2 wrap-indented-string ] 2bi =

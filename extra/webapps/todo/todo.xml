@@ -10,7 +10,7 @@
 
     <body>
 
-	<div class="navbar">
+    <nav>
 		<t:a t:href="$todo-list/list">List Items</t:a>
 		<t:a t:href="$todo-list/new">Add Item</t:a>
 
@@ -19,12 +19,14 @@
 		</t:if>
 
 		<t:button t:action="$login-realm/logout" t:aside="begin" class="link-button link">Logout</t:button>
-	</div>
+	</nav>
 
+	<div class="page">
 	<h1><t:write-title /></h1>
 
 	<t:call-next-template />
 
+	</div>
     </body>
 
 </html>

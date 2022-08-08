@@ -1,8 +1,8 @@
 ! Copyright (C) 2008, 2010 Slava Pestov, Joe Groff.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays classes combinators continuations io
-kernel kernel.private math math.parser namespaces sequences
-sequences.private source-files.errors strings vectors ;
+kernel math math.parser namespaces sequences source-files.errors
+strings vectors ;
 IN: lexer
 
 TUPLE: lexer

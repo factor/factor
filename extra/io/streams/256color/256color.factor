@@ -2,9 +2,9 @@
 ! See http://factorcode.org/license.txt for BSD license
 
 USING: accessors arrays assocs destructors environment
-formatting fry io io.streams.string io.styles kernel locals
-math math.functions math.ranges math.vectors namespaces
-sequences sequences.extras strings strings.tables ;
+formatting io io.streams.escape-codes io.streams.string
+io.styles kernel math math.functions math.vectors namespaces
+ranges sequences strings strings.tables ;
 
 IN: io.streams.256color
 
@@ -65,13 +65,6 @@ intensities [| r i |
 
 : color>background ( color -- string )
     color>256color "\e[48;5;%sm" sprintf ;
-
-: font-styles ( font-style -- string )
-    H{
-        { bold "\e[1m" }
-        { italic "\e[3m" }
-        { bold-italic "\e[1m\e[3m" }
-    } at "" or ;
 
 TUPLE: 256color < filter-writer ;
 

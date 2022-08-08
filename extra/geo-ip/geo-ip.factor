@@ -3,7 +3,7 @@
 USING: accessors arrays assocs combinators combinators.smart csv
 grouping http.client interval-maps io.encodings.ascii io.files
 io.files.temp io.launcher io.pathnames ip-parser kernel math
-math.parser memoize sequences strings ;
+math.parser sequences splitting strings ;
 IN: geo-ip
 
 : db-path ( -- path ) "IpToCountry.csv" cache-file ;
@@ -11,7 +11,7 @@ IN: geo-ip
 CONSTANT: db-url "http://software77.net/geo-ip/?DL=1"
 
 : download-db ( -- path )
-    db-path dup exists? [
+    db-path dup file-exists? [
         db-url over ".gz" append download-to
         { "gunzip" } over ".gz" append absolute-path suffix try-process
     ] unless ;
@@ -33,7 +33,7 @@ TUPLE: ip-entry from to registry assigned city cntry country ;
 
 MEMO: ip-db ( -- seq )
     download-db ascii file-lines
-    [ "#" head? ] reject "\n" join string>csv
+    [ "#" head? ] reject join-lines string>csv
     [ parse-ip-entry ] map ;
 
 : filter-overlaps ( alist -- alist' )

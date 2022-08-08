@@ -1,0 +1,531 @@
+<?xml version="1.0" ?>
+<!--
+/**
+* @version		2.0.1 (2010-02-08)
+* @author		Mads Lie Jensen
+* @author		Rowan Collins
+* Improved Smarty highlighting mode, based on http://www.palustris.dk/jedit/smarty.xml
+*	and the built-in PHP mode from jEdit 4.3
+* @link http://rwec.co.uk/jedit for documentation and updates
+*/
+
+To install, add this to the "catalog" file:
+<MODE NAME="smarty" FILE="smarty.xml" FILE_NAME_GLOB="*.tpl"></MODE>
+
+You might want to execute these lines of BeanShell code (e.g. with the Utilities->BeanShell menu):
+
+jEdit.setProperty("mode.smarty.sidekick.parser","html");
+jEdit.setProperty("mode.smarty.xml.completion-info",
+"jeditresource:/XML.jar!/xml/completion/html-complete.xml");
+
+to get tag-completion/matching on html in the templates-files if you have the XML-plugin installed
+
+-->
+<!DOCTYPE MODE SYSTEM "xmode.dtd">
+<MODE>
+	<PROPS>
+		<PROPERTY NAME="commentStart" VALUE="{*" />
+		<PROPERTY NAME="commentEnd" VALUE="*}" />
+	</PROPS>
+
+	<RULES IGNORE_CASE="TRUE" HIGHLIGHT_DIGITS="FALSE">
+		<SPAN TYPE="COMMENT1">
+			<BEGIN>{*</BEGIN>
+			<END>*}</END>
+		</SPAN>
+		
+		<!-- Highlight markup other than Smarty inside a {literal} block -->
+		<SPAN TYPE="LITERAL3" DELEGATE="NON_SMARTY">
+			<BEGIN>{LITERAL}</BEGIN>
+			<END>{/LITERAL}</END>
+		</SPAN>
+		
+		<SPAN TYPE="MARKUP" DELEGATE="php::PHP" MATCH_TYPE="FUNCTION">
+			<BEGIN>{PHP}</BEGIN>
+			<END>{/PHP}</END>
+		</SPAN>
+
+		<SPAN TYPE="MARKUP" DELEGATE="SMARTY">
+			<BEGIN>{</BEGIN>
+			<END>}</END>
+		</SPAN>
+		
+		<!-- SGML comment -->
+		<SPAN TYPE="COMMENT1" DELEGATE="COMMENT1+SMARTY">
+			<BEGIN>&lt;!--</BEGIN>
+			<END>--&gt;</END>
+		</SPAN>
+		
+		<!-- JavaScript -->
+		<SPAN TYPE="MARKUP" DELEGATE="JAVASCRIPT_OPENTAG">
+			<BEGIN>&lt;SCRIPT</BEGIN>
+			<END>&lt;/SCRIPT&gt;</END>
+		</SPAN>
+
+		<!-- CSS -->
+		<SPAN TYPE="MARKUP" DELEGATE="CSS_OPENTAG">
+			<BEGIN>&lt;STYLE</BEGIN>
+			<END>&lt;/STYLE&gt;</END>
+		</SPAN>
+		
+		<!-- HTML tags -->
+		<SEQ_REGEXP HASH_CHAR="&lt;" TYPE="MARKUP" DELEGATE="TAGS">&lt;/?\w+</SEQ_REGEXP>
+		
+		<IMPORT DELEGATE="NON_SMARTY" />
+	</RULES>
+	
+	<RULES SET="NON_SMARTY" IGNORE_CASE="TRUE" HIGHLIGHT_DIGITS="FALSE">
+
+		<!-- SGML comment -->
+		<SPAN TYPE="COMMENT1">
+			<BEGIN>&lt;!--</BEGIN>
+			<END>--&gt;</END>
+		</SPAN>
+
+		<!-- DTD instructions -->
+		<SPAN TYPE="KEYWORD2" DELEGATE="xml::DTD-TAGS">
+			<BEGIN>&lt;!</BEGIN>
+			<END>&gt;</END>
+		</SPAN>
+		
+		<!-- JavaScript -->
+		<SPAN_REGEXP HASH_CHAR="&lt;SCRIPT" TYPE="MARKUP" DELEGATE="javascript::MAIN">
+			<BEGIN>&lt;SCRIPT.*?&gt;</BEGIN>
+			<END>&lt;/SCRIPT&gt;</END>
+		</SPAN_REGEXP>
+
+		<!-- CSS -->
+		<SPAN_REGEXP HASH_CHAR="&lt;STYLE" TYPE="MARKUP" DELEGATE="css::MAIN">
+			<BEGIN>&lt;STYLE.*?&gt;</BEGIN>
+			<END>&lt;/STYLE&gt;</END>
+		</SPAN_REGEXP>
+
+		<!-- HTML tags -->
+		<SEQ_REGEXP HASH_CHAR="&lt;" TYPE="MARKUP" DELEGATE="html::TAGS">&lt;/?\w+</SEQ_REGEXP>
+
+		<!-- SGML entities -->
+		<SPAN TYPE="LITERAL2" NO_WORD_BREAK="TRUE">
+			<BEGIN>&amp;</BEGIN>
+			<END>;</END>
+		</SPAN>
+
+	</RULES>
+	
+	<!-- HTML tags (from MAIN rule) -->
+	<RULES SET="TAGS" DEFAULT="MARKUP" ESCAPE="\">
+		<SEQ TYPE="MARKUP" DELEGATE="MAIN">&gt;</SEQ><!-- from SEQ_REGEXP delegate -->
+
+		<SPAN_REGEXP AT_WORD_START="TRUE" TYPE="MARKUP" DELEGATE="CSS_PROPERTIES+SMARTY" HASH_CHAR="style">
+			<BEGIN>style\s*=\s*(["'])</BEGIN>
+			<END>$1</END>
+		</SPAN_REGEXP>
+		
+		<IMPORT DELEGATE="TO_LITERAL+SMARTY" />
+		<IMPORT DELEGATE="TO_SMARTY" />
+		<IMPORT DELEGATE="INVALID_LT" />
+		<IMPORT DELEGATE="html::TAGS" />
+	</RULES>
+	
+	<!-- Handle literals, but allow switching to SMARTY therein, e.g. from html TAGS -->
+	<RULES SET="TO_LITERAL+SMARTY">
+		<SPAN TYPE="LITERAL1" DELEGATE="LITERAL1+SMARTY">
+			<BEGIN>'</BEGIN>
+			<END>'</END>
+		</SPAN>
+		<SPAN TYPE="LITERAL2" DELEGATE="LITERAL2+SMARTY">
+			<BEGIN>"</BEGIN>
+			<END>"</END>
+		</SPAN>
+		<IMPORT DELEGATE="TO_SMARTY"/>
+	</RULES>
+	
+	<!-- Handle SMARTY tags in LITERAL1, e.g. in the "type" attribute of a <SCRIPT> tag -->
+	<RULES SET="LITERAL1+SMARTY" DEFAULT="LITERAL1" ESCAPE="\">
+		<IMPORT DELEGATE="TO_SMARTY"/>
+	</RULES>
+
+	<!-- Handle SMARTY tags in LITERAL2, e.g. in the "type" attribute of a <SCRIPT> tag -->
+	<RULES SET="LITERAL2+SMARTY" DEFAULT="LITERAL2" ESCAPE="\">
+		<IMPORT DELEGATE="TO_SMARTY"/>
+	</RULES>
+	
+	<!-- Handle Smarty tags in HTML comments -->
+	<RULES SET="COMMENT1+SMARTY" DEFAULT="COMMENT1">
+		<IMPORT DELEGATE="TO_SMARTY"/>
+	</RULES>
+	
+	<!-- Go to SMARTY mode again -->
+	<RULES SET="TO_SMARTY" DEFAULT="MARKUP">
+		<SPAN TYPE="MARKUP" DELEGATE="SMARTY">
+			<BEGIN>{</BEGIN>
+			<END>}</END>
+		</SPAN>
+	</RULES>
+	
+	<RULES SET="INVALID_LT" DEFAULT="INVALID">
+		<SEQ TYPE="INVALID">&lt;</SEQ>
+	</RULES>
+	
+	
+	
+	<!-- CSS where SMARTY code may be injected -->
+	<RULES SET="CSS_OPENTAG" DEFAULT="MARKUP">
+		<SEQ TYPE="MARKUP" DELEGATE="CSS+SMARTY">&gt;</SEQ>
+
+		<IMPORT DELEGATE="TO_LITERAL+SMARTY"/>
+	</RULES>
+
+	<RULES SET="CSS+SMARTY" DEFAULT="MARKUP">
+		<!-- Hacky support for highlighting of CSS not inside a {literal} block -->
+		<SPAN TYPE="FUNCTION" DELEGATE="CSS_PROPERTIES+SMARTY">
+			<BEGIN>{ldelim}</BEGIN>
+			<END>{rdelim}</END>
+		</SPAN>
+		<SPAN TYPE="KEYWORD3" DELEGATE="CSS_PROPERTIES+SMARTY">
+			<BEGIN>{$smarty.ldelim}</BEGIN>
+			<END>{$smarty.rdelim}</END>
+		</SPAN>
+		
+		<SEQ TYPE="OPERATOR" DELEGATE="CSS_PSEUDO">:</SEQ>
+		
+		<IMPORT DELEGATE="TO_SMARTY"/>
+		<IMPORT DELEGATE="css::MAIN"/>
+	</RULES>
+	<RULES SET="CSS_PROPERTIES+SMARTY" ESCAPE="\">
+		<SEQ TYPE="OPERATOR" DELEGATE="CSS_PROP_VALUE+SMARTY">:</SEQ>
+		
+		<IMPORT DELEGATE="TO_SMARTY"/>
+		<IMPORT DELEGATE="css::PROPERTIES"/>
+	</RULES>
+	<RULES SET="CSS_PROP_VALUE+SMARTY"
+		HIGHLIGHT_DIGITS="TRUE"
+		DIGIT_RE="-?\d+(\.\d+)?(pt|pc|in|mm|cm|em|ex|px|ms|s|%|)"
+		NO_WORD_SEP="-_%">
+		
+		<SEQ TYPE="OPERATOR" DELEGATE="CSS_PROPERTIES+SMARTY">;</SEQ>
+		<SEQ TYPE="INVALID" DELEGATE="CSS+SMARTY">}</SEQ> <!-- end properties block, but it's invalid -->
+		
+		<IMPORT DELEGATE="TO_SMARTY"/>
+		<IMPORT DELEGATE="css::PROP_VALUE"/>
+	</RULES>
+	<!-- Pseudo-classes like ":active" are handled specially in the CSS mode -->
+	<RULES SET="CSS_PSEUDO">
+		<SEQ TYPE="NULL" DELEGATE="CSS+SMARTY"> </SEQ>
+		<SEQ TYPE="OPERATOR" DELEGATE="CSS+SMARTY">,</SEQ>
+		
+		<SPAN TYPE="FUNCTION" DELEGATE="CSS_PROPERTIES+SMARTY">
+			<BEGIN>{ldelim}</BEGIN>
+			<END>{rdelim}</END>
+		</SPAN>
+		<SPAN TYPE="KEYWORD3" DELEGATE="CSS_PROPERTIES+SMARTY">
+			<BEGIN>{$smarty.ldelim}</BEGIN>
+			<END>{$smarty.rdelim}</END>
+		</SPAN>
+	
+		<IMPORT DELEGATE="TO_SMARTY"/>
+		<IMPORT DELEGATE="css::PSEUDO"/>
+	</RULES>
+	
+	<!-- Javascript -->
+	<RULES SET="JAVASCRIPT_OPENTAG" DEFAULT="MARKUP">
+		<SEQ TYPE="MARKUP" DELEGATE="JAVASCRIPT">&gt;</SEQ>
+		<IMPORT DELEGATE="TO_LITERAL+SMARTY"/> <!-- handle SMARTY in <script> tag -->
+		<IMPORT DELEGATE="html::TAGS" /> <!-- handle e.g. 'style="width:1px"' -->
+	</RULES>
+	
+	<RULES SET="JAVASCRIPT" DEFAULT="MARKUP" ESCAPE="\">
+		<IMPORT DELEGATE="TO_LITERAL+SMARTY"/>
+		<IMPORT DELEGATE="TO_SMARTY"/>
+		<IMPORT DELEGATE="javascript::MAIN"/>
+	</RULES>
+	
+	
+	
+	<RULES DEFAULT="LITERAL2" SET="DOUBLE_QUOTED" IGNORE_CASE="TRUE">
+		<SPAN TYPE="LITERAL2" DELEGATE="BACK_TICKED">
+			<BEGIN>`</BEGIN>
+			<END>`</END>
+		</SPAN>
+		
+		<IMPORT DELEGATE="VARIABLES" />
+	</RULES>
+	
+	<RULES DEFAULT="LITERAL2" SET="BACK_TICKED" IGNORE_CASE="TRUE">
+		<IMPORT DELEGATE="VARIABLES" />
+		<IMPORT DELEGATE="MATH_OPERATORS" />
+	</RULES>
+	
+	
+	<RULES SET="VARIABLES">
+		<MARK_FOLLOWING TYPE="KEYWORD3">$</MARK_FOLLOWING>
+	</RULES>
+		
+	<RULES SET="MATH_OPERATORS" IGNORE_CASE="TRUE">
+		<SEQ TYPE="OPERATOR">.</SEQ>
+		<SEQ TYPE="OPERATOR">-&gt;</SEQ>
+		<SEQ TYPE="OPERATOR">*</SEQ>
+		<SEQ TYPE="OPERATOR">/</SEQ>
+		<SEQ TYPE="OPERATOR">+</SEQ>
+		<SEQ TYPE="OPERATOR">-</SEQ>
+		<SEQ TYPE="OPERATOR">%</SEQ>
+	</RULES>
+
+	<RULES SET="LOGIC_OPERATORS" IGNORE_CASE="TRUE">
+		<SEQ TYPE="OPERATOR">|</SEQ>
+		<SEQ TYPE="OPERATOR">:</SEQ>
+		<SEQ TYPE="OPERATOR">=</SEQ>
+	
+		<KEYWORDS>
+			<OPERATOR>!=</OPERATOR>
+			<OPERATOR>&gt;</OPERATOR>
+			<OPERATOR>&gt;=</OPERATOR>
+			<OPERATOR>&lt;</OPERATOR>
+			<OPERATOR>&lt;=</OPERATOR>
+			
+			<OPERATOR>==</OPERATOR>
+			
+			<OPERATOR>div by </OPERATOR>
+			<OPERATOR>even by </OPERATOR>
+			<OPERATOR>is even </OPERATOR>
+			<OPERATOR>is not even </OPERATOR>
+			<OPERATOR>is not odd </OPERATOR>
+			<OPERATOR>is odd </OPERATOR>
+			<OPERATOR>odd by </OPERATOR>
+			
+			<OPERATOR>eq</OPERATOR>
+			<OPERATOR>ge</OPERATOR>
+			<OPERATOR>gt</OPERATOR>
+			<OPERATOR>gte</OPERATOR>
+			<OPERATOR>le</OPERATOR>
+			<OPERATOR>lt</OPERATOR>
+			<OPERATOR>lte</OPERATOR>
+			<OPERATOR>mod</OPERATOR>
+			<OPERATOR>ne</OPERATOR>
+			<OPERATOR>neq</OPERATOR>
+			<OPERATOR>not</OPERATOR>
+		</KEYWORDS>
+	</RULES>
+	
+
+	<RULES SET="SMARTY" IGNORE_CASE="TRUE" HIGHLIGHT_DIGITS="TRUE" DEFAULT="LITERAL1">
+		<SPAN TYPE="LITERAL1">
+			<BEGIN>'</BEGIN>
+			<END>'</END>
+		</SPAN>
+		
+		<SPAN TYPE="LITERAL2" DELEGATE="DOUBLE_QUOTED">
+			<BEGIN>"</BEGIN>
+			<END>"</END>
+		</SPAN>
+		
+		<!-- Variables from config-files -->
+		<SPAN TYPE="KEYWORD3">
+			<BEGIN>#</BEGIN>
+			<END>#</END>
+		</SPAN>
+		
+		<IMPORT DELEGATE="VARIABLES" />
+		<IMPORT DELEGATE="MATH_OPERATORS" />
+		<IMPORT DELEGATE="LOGIC_OPERATORS" />
+		
+		<KEYWORDS>
+		
+			<!-- Built-in functions (in order of documentation) -->
+			<FUNCTION>capture</FUNCTION>
+			<FUNCTION>/capture</FUNCTION>
+			<FUNCTION>config_load</FUNCTION>
+			<FUNCTION>foreach</FUNCTION>
+			<FUNCTION>foreachelse</FUNCTION>
+			<FUNCTION>/foreach</FUNCTION>
+			<FUNCTION>if</FUNCTION>
+			<FUNCTION>else</FUNCTION>
+			<FUNCTION>elseif</FUNCTION>
+			<FUNCTION>/if</FUNCTION>
+			<FUNCTION>include</FUNCTION>
+			<FUNCTION>include_php</FUNCTION>
+			<FUNCTION>insert</FUNCTION>
+			<FUNCTION>ldelim</FUNCTION>
+			<FUNCTION>rdelim</FUNCTION>
+			<!-- {literal} is handled specially -->
+			<!-- {php} is handled specially -->
+			<FUNCTION>section</FUNCTION>
+			<FUNCTION>sectionelse</FUNCTION>
+			<FUNCTION>/section</FUNCTION>
+			<FUNCTION>strip</FUNCTION>
+			<FUNCTION>/strip</FUNCTION>
+			
+			<!-- Default custom functions -->
+			<FUNCTION>assign</FUNCTION>
+			<FUNCTION>counter</FUNCTION>
+			<FUNCTION>cycle</FUNCTION>
+			<FUNCTION>debug</FUNCTION>
+			<FUNCTION>eval</FUNCTION>
+			<FUNCTION>fetch</FUNCTION>
+			<FUNCTION>html_checkboxes</FUNCTION>
+			<FUNCTION>html_image</FUNCTION>
+			<FUNCTION>html_options</FUNCTION>
+			<FUNCTION>html_radios</FUNCTION>
+			<FUNCTION>html_select_date</FUNCTION>
+			<FUNCTION>html_select_time</FUNCTION>
+			<FUNCTION>html_table</FUNCTION>
+			<FUNCTION>mailto</FUNCTION>
+			<FUNCTION>math</FUNCTION>
+			<FUNCTION>popup</FUNCTION>
+			<FUNCTION>popup_init</FUNCTION>
+			<FUNCTION>textformat</FUNCTION>
+			<FUNCTION>/textformat</FUNCTION>
+			
+			<!-- 
+			Variable modifiers
+			'strip' is used in Smarty as both a variable modifier and a function.
+			I have them listed as both, but it will only be recognised as one of these possibilities.
+			At time of writing this is the last entry, ie. a KEYWORD1
+			-->
+			<KEYWORD1>capitalize</KEYWORD1>
+			<KEYWORD1>cat</KEYWORD1>
+			<KEYWORD1>count_characters</KEYWORD1>
+			<KEYWORD1>count_paragraphs</KEYWORD1>
+			<KEYWORD1>count_sentences</KEYWORD1>
+			<KEYWORD1>count_words</KEYWORD1>
+			<KEYWORD1>date_format</KEYWORD1>
+			<KEYWORD1>default</KEYWORD1>
+			<KEYWORD1>escape</KEYWORD1>
+			<KEYWORD1>indent</KEYWORD1>
+			<KEYWORD1>lower</KEYWORD1>
+			<KEYWORD1>nl2br</KEYWORD1>
+			<KEYWORD1>regex_replace</KEYWORD1>
+			<KEYWORD1>replace</KEYWORD1>
+			<KEYWORD1>spacify</KEYWORD1>
+			<KEYWORD1>string_format</KEYWORD1>
+			<KEYWORD1>strip</KEYWORD1>
+			<KEYWORD1>strip_tags</KEYWORD1>
+			<KEYWORD1>truncate</KEYWORD1>
+			<KEYWORD1>upper</KEYWORD1>
+			<KEYWORD1>wordwrap</KEYWORD1>
+			
+			<!-- attributes for Smarty built-in and custom functions -->
+			<KEYWORD3>above</KEYWORD3>
+			<KEYWORD3>advance</KEYWORD3>
+			<KEYWORD3>all_extra</KEYWORD3>
+			<KEYWORD3>assign</KEYWORD3>
+			<KEYWORD3>autostatus</KEYWORD3>
+			<KEYWORD3>autostatuscap</KEYWORD3>
+			<KEYWORD3>background</KEYWORD3>
+			<KEYWORD3>below</KEYWORD3>
+			<KEYWORD3>bgbackground</KEYWORD3>
+			<KEYWORD3>bgcolor</KEYWORD3>
+			<KEYWORD3>border</KEYWORD3>
+			<KEYWORD3>caparray</KEYWORD3>
+			<KEYWORD3>capcolor</KEYWORD3>
+			<KEYWORD3>capicon</KEYWORD3>
+			<KEYWORD3>caption</KEYWORD3>
+			<KEYWORD3>captionfont</KEYWORD3>
+			<KEYWORD3>captionsize</KEYWORD3>
+			<KEYWORD3>center</KEYWORD3>
+			<KEYWORD3>closecolor</KEYWORD3>
+			<KEYWORD3>closefont</KEYWORD3>
+			<KEYWORD3>closesize</KEYWORD3>
+			<KEYWORD3>closetext</KEYWORD3>
+			<KEYWORD3>day_extra</KEYWORD3>
+			<KEYWORD3>day_format</KEYWORD3>
+			<KEYWORD3>day_size</KEYWORD3>
+			<KEYWORD3>delay</KEYWORD3>
+			<KEYWORD3>delimiter</KEYWORD3>
+			<KEYWORD3>direction</KEYWORD3>
+			<KEYWORD3>display_days</KEYWORD3>
+			<KEYWORD3>display_hours</KEYWORD3>
+			<KEYWORD3>display_meridian</KEYWORD3>
+			<KEYWORD3>display_minutes</KEYWORD3>
+			<KEYWORD3>display_months</KEYWORD3>
+			<KEYWORD3>display_seconds</KEYWORD3>
+			<KEYWORD3>display_years</KEYWORD3>
+			<KEYWORD3>end_year</KEYWORD3>
+			<KEYWORD3>equation</KEYWORD3>
+			<KEYWORD3>fgbackground</KEYWORD3>
+			<KEYWORD3>fgcolor</KEYWORD3>
+			<KEYWORD3>field_array</KEYWORD3>
+			<KEYWORD3>field_order</KEYWORD3>
+			<KEYWORD3>field_separator</KEYWORD3>
+			<KEYWORD3>file</KEYWORD3>
+			<KEYWORD3>fixx</KEYWORD3>
+			<KEYWORD3>fixy</KEYWORD3>
+			<KEYWORD3>format</KEYWORD3>
+			<KEYWORD3>frame</KEYWORD3>
+			<KEYWORD3>from</KEYWORD3>
+			<KEYWORD3>fullhtml</KEYWORD3>
+			<KEYWORD3>hauto</KEYWORD3>
+			<KEYWORD3>height</KEYWORD3>
+			<KEYWORD3>hour_extra</KEYWORD3>
+			<KEYWORD3>inarray</KEYWORD3>
+			<KEYWORD3>indent</KEYWORD3>
+			<KEYWORD3>indent_char</KEYWORD3>
+			<KEYWORD3>indent_first</KEYWORD3>
+			<KEYWORD3>item</KEYWORD3>
+			<KEYWORD3>key</KEYWORD3>
+			<KEYWORD3>left</KEYWORD3>
+			<KEYWORD3>loop</KEYWORD3>
+			<KEYWORD3>max</KEYWORD3>
+			<KEYWORD3>meridian_extra</KEYWORD3>
+			<KEYWORD3>minute_extra</KEYWORD3>
+			<KEYWORD3>minute_interval</KEYWORD3>
+			<KEYWORD3>month_extra</KEYWORD3>
+			<KEYWORD3>month_format</KEYWORD3>
+			<KEYWORD3>month_size</KEYWORD3>
+			<KEYWORD3>month_value_format</KEYWORD3>
+			<KEYWORD3>name</KEYWORD3>
+			<KEYWORD3>noclose</KEYWORD3>
+			<KEYWORD3>offsetx</KEYWORD3>
+			<KEYWORD3>offsety</KEYWORD3>
+			<KEYWORD3>once</KEYWORD3>
+			<KEYWORD3>options</KEYWORD3>
+			<KEYWORD3>output</KEYWORD3>
+			<KEYWORD3>padx</KEYWORD3>
+			<KEYWORD3>pady</KEYWORD3>
+			<KEYWORD3>prefix</KEYWORD3>
+			<KEYWORD3>print</KEYWORD3>
+			<KEYWORD3>reverse_years</KEYWORD3>
+			<KEYWORD3>right</KEYWORD3>
+			<KEYWORD3>scope</KEYWORD3>
+			<KEYWORD3>script</KEYWORD3>
+			<KEYWORD3>second_extra</KEYWORD3>
+			<KEYWORD3>second_interval</KEYWORD3>
+			<KEYWORD3>section</KEYWORD3>
+			<KEYWORD3>selected</KEYWORD3>
+			<KEYWORD3>show</KEYWORD3>
+			<KEYWORD3>skip</KEYWORD3>
+			<KEYWORD3>snapx</KEYWORD3>
+			<KEYWORD3>snapy</KEYWORD3>
+			<KEYWORD3>start</KEYWORD3>
+			<KEYWORD3>start_year</KEYWORD3>
+			<KEYWORD3>status</KEYWORD3>
+			<KEYWORD3>step</KEYWORD3>
+			<KEYWORD3>sticky</KEYWORD3>
+			<KEYWORD3>stop</KEYWORD3>
+			<KEYWORD3>style</KEYWORD3>
+			<KEYWORD3>text</KEYWORD3>
+			<KEYWORD3>textcolor</KEYWORD3>
+			<KEYWORD3>textfont</KEYWORD3>
+			<KEYWORD3>textsize</KEYWORD3>
+			<KEYWORD3>time</KEYWORD3>
+			<KEYWORD3>timeout</KEYWORD3>
+			<KEYWORD3>trigger</KEYWORD3>
+			<KEYWORD3>use_24_hours</KEYWORD3>
+			<KEYWORD3>value</KEYWORD3>
+			<KEYWORD3>values</KEYWORD3>
+			<KEYWORD3>var</KEYWORD3>
+			<KEYWORD3>vauto</KEYWORD3>
+			<KEYWORD3>width</KEYWORD3>
+			<KEYWORD3>wrap</KEYWORD3>
+			<KEYWORD3>wrap_char</KEYWORD3>
+			<KEYWORD3>wrap_cut</KEYWORD3>
+			<KEYWORD3>year_as_text</KEYWORD3>
+			<KEYWORD3>year_extra</KEYWORD3>
+			<KEYWORD3>year_size</KEYWORD3>
+			
+		</KEYWORDS>
+		
+	</RULES>
+
+</MODE>
+
+ 	  	 

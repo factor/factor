@@ -1,8 +1,7 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: combinators.short-circuit math math.order math.parser
-kernel sequences sequences.deep peg peg.parsers assocs arrays
-hashtables strings namespaces make ascii ;
+USING: arrays ascii combinators.short-circuit kernel make
+math.parser peg peg.parsers sequences sequences.deep strings ;
 IN: http.parsers
 
 : except ( quot -- parser )
@@ -36,7 +35,7 @@ IN: http.parsers
     [ token ] map choice ;
 
 : http-method-parser ( -- parser )
-    { "OPTIONS" "GET" "HEAD" "POST" "PUT" "DELETE" "TRACE" "CONNECT" } one-of ;
+    { "OPTIONS" "GET" "HEAD" "POST" "PUT" "DELETE" "TRACE" "CONNECT" "PATCH" } one-of ;
 
 : url-parser ( -- parser )
     [ " \t\r\n" member? ] except repeat1 case-sensitive ;

@@ -266,7 +266,7 @@ GENERIC: (compile) ( peg -- quot )
     pos get apply-rule process-parser-result ;
 
 : preset-parser-word ( parser -- word parser )
-    gensym swap over >>compiled ;
+    gensym tuck >>compiled ;
 
 : define-parser-word ( word parser -- )
     ! Return the body of the word that is the compiled version

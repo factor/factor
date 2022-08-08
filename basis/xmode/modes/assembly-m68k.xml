@@ -12,6 +12,7 @@
 
 	<PROPS>
 		<PROPERTY NAME="lineComment" VALUE=";" />
+		<PROPERTY NAME="contextInsensitive" VALUE="true"/>
 	</PROPS>
 
 	<RULES IGNORE_CASE="TRUE" HIGHLIGHT_DIGITS="TRUE" DIGIT_RE="(0x\p{XDigit}+|\d+)">

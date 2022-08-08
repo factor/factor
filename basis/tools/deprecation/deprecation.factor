@@ -1,6 +1,6 @@
 ! Copyright (C) 2009 Joe Groff.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays assocs combinators.short-circuit
+USING: accessors assocs combinators.short-circuit
 compiler.units debugger init io io.streams.null kernel
 namespaces prettyprint sequences sets source-files.errors
 summary tools.crossref tools.crossref.private tools.errors
@@ -75,7 +75,6 @@ M: deprecation-observer definitions-changed
     [ [ check-deprecations ] each ]
     [ drop initialize-deprecation-notes ] if ;
 
-[ deprecation-observer add-definition-observer ]
-"tools.deprecation" add-startup-hook
+STARTUP-HOOK: [ deprecation-observer add-definition-observer ]
 
 initialize-deprecation-notes

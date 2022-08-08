@@ -1,15 +1,16 @@
 ! Copyright (C) 2006, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs classes combinators
-combinators.short-circuit compiler.units debugger fonts fry help
+combinators.short-circuit compiler.units debugger fonts help
 help.apropos help.crossref help.home help.markup help.stylesheet
-help.topics io.styles kernel locals make math.vectors models
-namespaces sequences sets ui ui.commands ui.gadgets ui.gadgets.borders
-ui.gadgets.editors ui.gadgets.glass ui.gadgets.panes
-ui.gadgets.scrollers ui.gadgets.status-bar ui.gadgets.toolbar
-ui.gadgets.tracks ui.gadgets.viewports ui.gadgets.worlds ui.gestures
-ui.pens.solid ui.theme ui.tools.browser.history
-ui.tools.browser.popups ui.tools.common unicode vocabs ;
+help.topics io.styles kernel literals make math math.vectors
+models namespaces sequences sets system ui ui.commands
+ui.gadgets ui.gadgets.borders ui.gadgets.editors
+ui.gadgets.glass ui.gadgets.panes ui.gadgets.scrollers
+ui.gadgets.status-bar ui.gadgets.toolbar ui.gadgets.tracks
+ui.gadgets.viewports ui.gadgets.worlds ui.gestures ui.pens.solid
+ui.theme ui.tools.browser.history ui.tools.browser.popups
+ui.tools.common unicode vocabs ;
 IN: ui.tools.browser
 
 TUPLE: browser-gadget < tool history scroller search-field popup ;
@@ -178,6 +179,8 @@ M: browser-gadget focusable-child* search-field>> ;
 
 : com-forward ( browser -- ) history>> go-forward ;
 
+: browser-focus-search ( browser -- ) search-field>> request-focus ;
+
 : com-home ( browser -- ) "help.home" swap show-help ;
 
 : browser-help ( -- ) "ui-browser" com-browse ;
@@ -188,11 +191,11 @@ M: browser-gadget focusable-child* search-field>> ;
 \ glossary H{ { +nullary+ t } } define-command
 
 browser-gadget "toolbar" f {
-    { T{ key-down f { A+ } "LEFT" } com-back }
-    { T{ key-down f { A+ } "RIGHT" } com-forward }
-    { T{ key-down f { A+ } "H" } com-home }
+    { T{ key-down f ${ os macosx? M+ A+ ? } "LEFT" } com-back }
+    { T{ key-down f ${ os macosx? M+ A+ ? } "RIGHT" } com-forward }
+    { T{ key-down f ${ os macosx? M+ A+ ? } "HOME" } com-home }
     { T{ key-down f f "F1" } browser-help }
-    { T{ key-down f { A+ } "F1" } glossary }
+    { T{ key-down f ${ os macosx? M+ A+ ? } "F1" } glossary }
 } define-command-map
 
 : ?show-help ( link browser -- )
@@ -208,12 +211,16 @@ browser-gadget "toolbar" f {
 : com-next ( browser -- ) [ next-article ] navigate ;
 
 browser-gadget "navigation" "Commands for navigating in the article hierarchy" {
-    { T{ key-down f { A+ } "u" } com-up }
-    { T{ key-down f { A+ } "p" } com-prev }
-    { T{ key-down f { A+ } "n" } com-next }
-    { T{ key-down f { A+ } "k" } com-show-outgoing-links }
-    { T{ key-down f { A+ } "K" } com-show-incoming-links }
-} define-command-map
+    { T{ key-down f ${ os macosx? M+ A+ ? } "UP" } com-up }
+    { T{ key-down f ${ os macosx? M+ A+ ? } "p" } com-prev }
+    { T{ key-down f ${ os macosx? M+ A+ ? } "n" } com-next }
+    { T{ key-down f ${ os macosx? M+ A+ ? } "k" } com-show-outgoing-links }
+    { T{ key-down f ${ os macosx? M+ A+ ? } "K" } com-show-incoming-links }
+    { T{ key-down f ${ os macosx? M+ A+ ? } "f" } browser-focus-search }
+} os macosx? [ {
+    { T{ key-down f { M+ } "[" } com-back }
+    { T{ key-down f { M+ } "]" } com-forward }
+} append ] when define-command-map
 
 browser-gadget "multi-touch" f {
     { left-action com-back }
@@ -243,11 +250,16 @@ browser-gadget "scrolling"
 : com-font-size-minus ( browser -- )
     -2 adjust-help-font-size model>> notify-connections ;
 
+: com-font-size-normal ( browser -- )
+    font-size-span default-style get font-size of -
+    adjust-help-font-size model>> notify-connections ;
+
 browser-gadget "fonts" f {
-    { T{ key-down f { A+ } "+" } com-font-size-plus }
-    { T{ key-down f { A+ } "=" } com-font-size-plus }
-    { T{ key-down f { A+ } "_" } com-font-size-minus }
-    { T{ key-down f { A+ } "-" } com-font-size-minus }
+    { T{ key-down f ${ os macosx? M+ C+ ? } "+" } com-font-size-plus }
+    { T{ key-down f ${ os macosx? M+ C+ ? } "=" } com-font-size-plus }
+    { T{ key-down f ${ os macosx? M+ C+ ? } "_" } com-font-size-minus }
+    { T{ key-down f ${ os macosx? M+ C+ ? } "-" } com-font-size-minus }
+    { T{ key-down f ${ os macosx? M+ C+ ? } "0" } com-font-size-normal }
 } define-command-map
 
 MAIN: browser-window

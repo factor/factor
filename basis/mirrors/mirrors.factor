@@ -1,8 +1,8 @@
 ! Copyright (C) 2007, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors assocs classes classes.tuple classes.tuple.private
-combinators fry hash-sets hashtables kernel math sequences sets slots
-slots.private summary ;
+USING: accessors assocs classes classes.tuple
+classes.tuple.private combinators hash-sets hashtables kernel
+math sequences sets slots slots.private summary ;
 IN: mirrors
 
 TUPLE: mirror { object read-only } ;

@@ -1,8 +1,8 @@
 ! Copyright (C) 2010 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors timers bit-arrays calendar game.input io
-io.binary io.encodings.binary io.files kernel literals math
-namespaces system threads ;
+USING: accessors bit-arrays calendar endian game.input io
+io.encodings.binary io.files kernel literals math namespaces
+threads timers ;
 IN: key-logger
 
 CONSTANT: frequency $[ 1/30 seconds ]

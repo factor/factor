@@ -3,7 +3,8 @@ math.parser namespaces sequences make ;
 IN: editors.ted-notepad
 
 SINGLETON: ted-notepad
-ted-notepad editor-class set-global
+
+editor-class [ ted-notepad ] initialize
 
 : ted-notepad-path ( -- path )
     \ ted-notepad-path get [

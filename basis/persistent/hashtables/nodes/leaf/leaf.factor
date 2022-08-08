@@ -1,8 +1,6 @@
 ! Based on Clojure's PersistentHashMap by Rich Hickey.
 
-USING: kernel accessors locals math arrays namespaces make
-persistent.hashtables.config
-persistent.hashtables.nodes ;
+USING: accessors arrays kernel make persistent.hashtables.nodes ;
 IN: persistent.hashtables.nodes.leaf
 
 : matching-key? ( key hashcode leaf-node -- ? )

@@ -4,12 +4,12 @@ USING: accessors arrays assocs byte-arrays classes
 classes.builtin classes.private classes.tuple
 classes.tuple.private combinators combinators.short-circuit
 combinators.smart command-line compiler.codegen.relocation
-compiler.units fry generic generic.single.private grouping
-hashtables hashtables.private io io.binary io.encodings.binary
-io.files io.pathnames kernel kernel.private layouts locals make
-math math.order namespaces namespaces.private parser
+compiler.units endian generic generic.single.private grouping
+hashtables hashtables.private io io.encodings.binary io.files
+io.pathnames kernel kernel.private layouts make math
+math.bitwise math.order namespaces namespaces.private parser
 parser.notes prettyprint quotations sequences sequences.private
-source-files strings system vectors vocabs words ;
+source-files splitting strings system vectors vocabs words ;
 IN: bootstrap.image
 
 : arch-name ( os cpu -- arch )
@@ -494,6 +494,13 @@ M: quotation prepare-object
     emit-words
     "Serializing JIT data..." print flush
     emit-jit-data
+! special-objects get ...
+! nl
+! "sub-primitives" print
+! sub-primitives get ...
+! \ c-to-factor of
+! 43 special-objects get set-at
+
     "Serializing global namespace..." print flush
     emit-global
     "Serializing singletons..." print flush
@@ -531,7 +538,7 @@ PRIVATE>
         { auto-use? f }
     } assoc-union! [
         H{ } clone special-objects set
-        "resource:/core/bootstrap/stage1.factor" run-file
+        "resource:basis/bootstrap/stage1.factor" run-file
         build-image
         write-image
     ] with-variables ;
@@ -543,6 +550,10 @@ PRIVATE>
     my-arch-name make-image ;
 
 : make-image-main ( -- )
-    command-line get [ make-my-image ] [ [ make-image ] each ] if-empty ;
+    command-line get [
+        make-my-image
+    ] [
+        [ "boot." ?head drop ".image" ?tail drop make-image ] each
+    ] if-empty ;
 
 MAIN: make-image-main

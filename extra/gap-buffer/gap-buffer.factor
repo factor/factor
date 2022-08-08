@@ -262,7 +262,7 @@ M: sequence insert*
 
 : pop-start ( gb -- elem ) 0 swap pop-elem ;
 
-: pop-end ( gb -- elem ) [ length 1 - ] keep pop-elem ;
+: pop-end ( gb -- elem ) index-of-last pop-elem ;
 
 : rotate-right ( gb -- )
     dup [ pop-end ] keep push-start drop ;

@@ -1,10 +1,9 @@
 ! Copyright (C) 2010 Daniel Ehrenberg
 ! Copyright (C) 2005, 2011 John Benediktsson, Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays combinators growable.private hash-sets
-hashtables.private kernel kernel.private math math.private
-sequences sequences.private sets sets.private slots.private
-vectors ;
+USING: accessors arrays growable.private hashtables.private
+kernel kernel.private math math.private sequences
+sequences.private sets sets.private slots.private vectors ;
 IN: hash-sets
 
 TUPLE: hash-set
@@ -41,7 +40,7 @@ TUPLE: hash-set
 : reset-hash ( n hash -- )
     swap <hash-array> >>array init-hash ; inline
 
-: (new-key@) ( key array i probe# j -- array i j empty? )
+: (new-key@) ( array key i probe# j -- array i j empty? )
     [ 2dup swap array-nth ] 2dip pick tombstone?
     [
         rot +empty+ eq?

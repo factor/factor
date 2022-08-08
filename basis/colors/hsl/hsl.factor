@@ -1,18 +1,19 @@
 ! Copyright (C) 2012 John Benediktsson
 ! See http://factorcode.org/license.txt for BSD license
 
-USING: accessors colors combinators kernel locals math
-math.order ;
+USING: accessors colors combinators kernel math math.order ;
 
 IN: colors.hsl
 
-TUPLE: hsla < color
+TUPLE: hsla
 { hue read-only }
 { saturation read-only }
 { lightness read-only }
 { alpha read-only } ;
 
 C: <hsla> hsla
+
+INSTANCE: hsla color
 
 <PRIVATE
 

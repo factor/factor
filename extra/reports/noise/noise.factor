@@ -3,8 +3,7 @@
 USING: accessors assocs math kernel shuffle generalizations
 words quotations arrays combinators sequences math.vectors
 io.styles prettyprint vocabs sorting io generic
-math.statistics math.order locals.types
-locals.definitions ;
+math.order locals.types locals.definitions ;
 IN: reports.noise
 
 : badness ( word -- n )
@@ -120,7 +119,7 @@ M: lambda-word word-noise-factor
 
 : noisy-words ( -- alist )
     all-words flatten-generics
-    [ dup word-noise-factor ] { } map>assoc
+    [ word-noise-factor ] zip-with
     sort-values reverse ;
 
 : noise. ( alist -- )
@@ -140,7 +139,7 @@ M: lambda-word word-noise-factor
     ] if-empty ;
 
 : noisy-vocabs ( -- alist )
-    loaded-vocab-names [ dup vocab-noise-factor ] { } map>assoc
+    loaded-vocab-names [ vocab-noise-factor ] zip-with
     sort-values reverse ;
 
 : noise-report ( -- )

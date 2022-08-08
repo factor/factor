@@ -1,7 +1,9 @@
 ! Copyright (C) 2004, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 IN: math DEFER: <= DEFER: - ! for bootstrap
-USING: kernel.private slots.private math.private ;
+USE: slots.private
+USE: kernel.private
+USE: math.private
 IN: kernel
 
 BUILTIN: callstack ;
@@ -234,6 +236,9 @@ DEFER: if
 : 2with ( param1 param2 obj quot -- obj curried )
     with with ; inline
 
+: withd ( param obj quot -- obj curried )
+    swapd [ -rotd call ] 2curry ; inline
+
 : prepose ( quot1 quot2 -- composed )
     swap compose ; inline
 
@@ -275,6 +280,8 @@ UNION: boolean POSTPONE: t POSTPONE: f ;
 
 : most ( x y quot -- z ) 2keep ? ; inline
 
+: negate ( quot -- quot' ) [ not ] compose ; inline
+
 ! Loops
 : loop ( ... pred: ( ... -- ... ? ) -- ... )
     [ call ] keep [ loop ] curry when ; inline recursive
@@ -289,10 +296,10 @@ UNION: boolean POSTPONE: t POSTPONE: f ;
     [ [ dup ] compose ] dip while drop ; inline
 
 : until ( ..a pred: ( ..a -- ..b ? ) body: ( ..b -- ..a ) -- ..b )
-    [ [ not ] compose ] dip while ; inline
+    [ negate ] dip while ; inline
 
 ! Object protocol
-GENERIC: hashcode* ( depth obj -- code )
+GENERIC: hashcode* ( depth obj -- code ) flushable
 
 M: object hashcode* 2drop 0 ; inline
 
