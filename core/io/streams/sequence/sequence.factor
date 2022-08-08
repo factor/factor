@@ -20,14 +20,11 @@ SLOT: i
 : (sequence-read-length) ( n buf stream -- buf count )
     [ underlying>> length ] [ i>> ] bi - rot min ; inline
 
-: <sequence-copy> ( dst n src-i src dst-i -- n copy )
-    [ ] curry 3curry dip <copier> ; inline
-
 : sequence-copy-unsafe ( n buf stream offset -- count )
     [
         [ (sequence-read-length) ]
         [ [ dup pick + ] change-i underlying>> ] bi
-    ] dip [ <sequence-copy> (copy) drop ] 3curry keep ; inline
+    ] dip [ -roll swap rot dupd + seq-copy-loop drop ] 3curry keep ; inline
 
 : (sequence-read-unsafe) ( n buf stream -- count )
     [ integer>fixnum ]
