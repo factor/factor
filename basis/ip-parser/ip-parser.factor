@@ -71,7 +71,7 @@ ERROR: more-than-8-components ;
     [ [ parse-ipv4 append ] unless-empty ] bi* ;
 
 : pad-ipv6 ( string1 string2 -- seq )
-    2dup [ length ] bi@ + 8 swap -
+    2dup 2length + 8 swap -
     dup 0 < [ more-than-8-components ] when
     <byte-array> glue ;
 

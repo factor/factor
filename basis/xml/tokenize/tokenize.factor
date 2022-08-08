@@ -103,7 +103,7 @@ HINTS: next* { spot } ;
 
 : take-string ( match -- string )
     [ spot get (take-string) [ missing-close ] unless ]
-    [ dupd [ length ] bi@ - over shorten "" like ] bi ;
+    [ dupd 2length - over shorten "" like ] bi ;
 
 : expect ( string -- )
     dup length spot get '[ _ [ char>> ] keep next* ] "" replicate-as

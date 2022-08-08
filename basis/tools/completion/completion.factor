@@ -44,7 +44,7 @@ PRIVATE>
 
 : score ( full fuzzy -- n )
     [
-        [ [ length ] bi@ - 15 swap [-] 3 /f ] 2keep
+        [ 2length - 15 swap [-] 3 /f ] 2keep
         runs [
             [ 0 [ pick score-1 max ] reduce nip ] keep
             length * +

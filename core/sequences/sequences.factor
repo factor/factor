@@ -476,9 +476,9 @@ PRIVATE>
 : change-nth ( ..a i seq quot: ( ..a elt -- ..b newelt ) -- ..b )
     [ [ nth ] dip call ] 2keepd set-nth-unsafe ; inline
 
-: min-length ( seq1 seq2 -- n ) [ length ] bi@ min ; inline
+: min-length ( seq1 seq2 -- n ) 2length min ; inline
 
-: max-length ( seq1 seq2 -- n ) [ length ] bi@ max ; inline
+: max-length ( seq1 seq2 -- n ) 2length max ; inline
 
 <PRIVATE
 
@@ -519,7 +519,7 @@ PRIVATE>
     [ nth-unsafe ] tri-curry@ tri ; inline
 
 : setup-3each ( seq1 seq2 seq3 -- n quot )
-    [ [ length ] tri@ min min check-length ]
+    [ 3length min min check-length ]
     [ [ 3nth-unsafe ] 3curry ] 3bi ; inline
 
 : (3each) ( seq1 seq2 seq3 quot -- n quot' )
@@ -802,7 +802,7 @@ M: sequence <=>
     [ 2nth-unsafe <=> ] [ [ length ] compare nip ] if ;
 
 : sequence= ( seq1 seq2 -- ? )
-    2dup [ length ] bi@ dupd =
+    2dup 2length dupd =
     [ -rot mismatch-unsafe not ] [ 3drop f ] if ; inline
 
 ERROR: assert-sequence got expected ;
@@ -1040,10 +1040,10 @@ PRIVATE>
 : pad-tail ( seq n elt -- padded )
     [ append ] padding ;
 
-: shorter? ( seq1 seq2 -- ? ) [ length ] bi@ < ; inline
-: longer? ( seq1 seq2 -- ? ) [ length ] bi@ > ; inline
-: shorter ( seq1 seq2 -- seq ) [ [ length ] bi@ <= ] 2keep ? ; inline
-: longer ( seq1 seq2 -- seq ) [ [ length ] bi@ >= ] 2keep ? ; inline
+: shorter? ( seq1 seq2 -- ? ) 2length < ; inline
+: longer? ( seq1 seq2 -- ? ) 2length > ; inline
+: shorter ( seq1 seq2 -- seq ) [ 2length <= ] 2keep ? ; inline
+: longer ( seq1 seq2 -- seq ) [ 2length >= ] 2keep ? ; inline
 
 : head? ( seq begin -- ? )
     2dup shorter? [
@@ -1119,7 +1119,7 @@ PRIVATE>
     ] with all-integers? ; inline
 
 : subseq-index-from ( n seq subseq -- i/f )
-    [ [ length ] bi@ - 1 + ] 2keep
+    [ 2length - 1 + ] 2keep
     '[ _ _ subseq-starts-at? ] find-integer-from ; inline
 
 : subseq-index ( seq subseq -- i/f ) [ 0 ] 2dip subseq-index-from ; inline

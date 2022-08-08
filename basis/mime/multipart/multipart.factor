@@ -49,7 +49,7 @@ ERROR: mime-decoding-ran-out-of-bytes ;
         [ mime-write ]
         [ swap length tail-slice >>bytes ] bi*
     ] [
-        tuck [ length ] bi@ - 1 - cut-slice
+        tuck 2length - 1 - cut-slice
         [ mime-write ]
         [ >>bytes ] bi* fill-bytes
         dup end-of-stream?>> [ dump-until-separator ] unless

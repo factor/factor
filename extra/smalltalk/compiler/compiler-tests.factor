@@ -10,7 +10,7 @@ IN: smalltalk.compiler.tests
     ] with-compilation-unit ;
 
 : test-inference ( ast -- in# out# )
-    test-compilation infer [ in>> ] [ out>> ] bi [ length ] bi@ ;
+    test-compilation infer [ in>> ] [ out>> ] bi 2length ;
 
 { 2 1 } [
     T{ ast-block f
