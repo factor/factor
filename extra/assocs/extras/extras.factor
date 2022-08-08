@@ -226,22 +226,52 @@ PRIVATE>
 : counts ( seq elts -- counts )
     [ histogram ] dip intersect-keys ;
 
-: collect-key-by ( ... seq quot: ( ... obj -- ... key ) -- ... assoc )
-    [ keep swap ] curry H{ } clone
-    [ '[ @ [ first ] dip _ push-at ] each ] keep ; inline
-
-: collect-value-by ( ... seq quot: ( ... obj -- ... key ) -- ... assoc )
-    [ keep swap ] curry H{ } clone
-    [ '[ @ [ second ] dip _ push-at ] each ] keep ; inline
-
 : histogram-diff ( hashtable1 hashtable2 -- hashtable3 )
     [ neg swap pick at+ ] assoc-each
     [ 0 > ] filter-values ;
 
-: collect-by-multi! ( ... assoc seq quot: ( ... obj -- ... key ) -- ... assoc )
+: collect-by-multi! ( ... assoc seq quot: ( ... obj -- ... new-keys ) -- ... assoc )
     [ keep swap ] curry rot [
         [ push-at-each ] curry compose each
     ] keep ; inline
 
-: collect-by-multi ( ... seq quot: ( ... obj -- ... keys ) -- ... assoc )
+: collect-by-multi ( ... seq quot: ( ... obj -- ... new-keys ) -- ... assoc )
     [ H{ } clone ] 2dip collect-by-multi! ; inline
+
+
+: collect-assoc-by! ( ... assoc input-assoc quot: ( ... key value -- ... key' value' ) -- ... assoc )
+    rot [ '[ @ swap _ push-at ] assoc-each ] keep ; inline
+
+: collect-assoc-by ( ... input-assoc quot: ( ... key value -- ... key value ) -- ... assoc )
+    [ H{ } clone ] 2dip collect-assoc-by! ; inline
+
+: collect-key-by! ( ... assoc input-assoc quot: ( ... key -- ... new-key ) -- ... assoc )
+    rot [ '[ drop _ keep swap _ push-at ] assoc-each ] keep ; inline
+
+: collect-key-by ( ... input-assoc quot: ( ... key -- ... new-key ) -- ... assoc )
+    [ H{ } clone ] 2dip collect-key-by! ; inline
+
+: collect-value-by! ( ... assoc input-assoc quot: ( ... value -- ... new-key ) -- ... assoc )
+    rot [ '[ nip _ keep swap _ push-at ] assoc-each ] keep ; inline
+
+: collect-value-by ( ... input-assoc quot: ( ... value -- ... new-key ) -- ... assoc )
+    [ H{ } clone ] 2dip collect-value-by! ; inline
+
+
+: collect-assoc-by-multi! ( ... assoc input-assoc quot: ( ... key value -- ... new-keys value' ) -- ... assoc )
+    rot [ '[ @ swap _ B push-at-each ] assoc-each ] keep ; inline
+
+: collect-assoc-by-multi ( ... assoc quot: ( ... key value -- ... new-keys value' ) -- ... assoc )
+    [ H{ } clone ] 2dip collect-assoc-by-multi! ; inline
+
+: collect-key-by-multi! ( ... assoc input-assoc quot: ( ... key -- ... new-keys ) -- ... assoc )
+    rot [ '[ drop _ keep swap _ push-at-each ] assoc-each ] keep ; inline
+
+: collect-key-by-multi ( ... assoc quot: ( ... key -- ... new-keys ) -- ... assoc )
+    [ H{ } clone ] 2dip collect-key-by-multi! ; inline
+
+: collect-value-by-multi! ( ... assoc input-assoc quot: ( ... value -- ... new-keys ) -- ... assoc )
+    rot [ '[ nip _ keep swap _ push-at-each ] assoc-each ] keep ; inline
+
+: collect-value-by-multi ( ... assoc quot: ( ... value -- ... new-keys ) -- ... assoc )
+    [ H{ } clone ] 2dip collect-value-by-multi! ; inline
