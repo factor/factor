@@ -47,7 +47,7 @@ M: #declare propagate-before
 ERROR: invalid-outputs #call infos ;
 
 : check-outputs ( #call infos -- infos )
-    over out-d>> over [ length ] bi@ =
+    over out-d>> over 2length =
     [ nip ] [ invalid-outputs ] if ;
 
 : call-outputs-quot ( #call word -- infos )

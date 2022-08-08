@@ -84,7 +84,7 @@ M: tuple class-of layout-of 2 slot { word } declare ; inline
     ] if-bootstrapping ; inline
 
 : pad-slots ( seq class -- seq' class )
-    [ all-slots ] keep 2over [ length ] bi@ 2dup > [
+    [ all-slots ] keep 2over 2length 2dup > [
         [ nip swap ] 2dip too-many-slots
     ] [
         drop [

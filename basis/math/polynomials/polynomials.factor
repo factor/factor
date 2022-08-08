@@ -29,7 +29,7 @@ PRIVATE>
 ALIAS: n*p n*v
 
 : pextend-conv ( p q -- p' q' )
-    2dup [ length ] bi@ + 1 - 2pad-tail ;
+    2dup 2length + 1 - 2pad-tail ;
 
 : p* ( p q -- r )
     2unempty pextend-conv
@@ -52,7 +52,7 @@ ERROR: negative-power-polynomial p n ;
 
 : p/mod-setup ( p p -- p p n )
     2ptrim
-    2dup [ length ] bi@ -
+    2dup 2length -
     dup 1 < [ drop 1 ] when
     [ over length + 0 pad-head pextend ] keep 1 + ;
 

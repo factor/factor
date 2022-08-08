@@ -289,7 +289,7 @@ tools.test ;
 
             ! preserve file traversal order, but sort
             ! alphabetically for cross-platform testing
-            [ [ length ] bi@ = ] monotonic-split
+            [ 2length = ] monotonic-split
             [ sort ] map concat
         ] with-variable
     ] with-test-directory

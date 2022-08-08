@@ -13,5 +13,5 @@ MAIN: dummy-benchmark
 
 { 0 1 } [
     { "benchmark.tests" } [ drop "hello" throw ] run-benchmarks
-    [ length ] bi@
+    2length
 ] unit-test

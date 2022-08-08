@@ -344,7 +344,7 @@ cell 4 = [
         [ 2drop 0 < ]
         [ [ drop ] 2dip length > ]
         [ drop > ]
-    } 3|| [ 3drop f ] [ slice boa ] if swap [ [ length ] bi@ ] 2keep ;
+    } 3|| [ 3drop f ] [ slice boa ] if swap [ 2length ] 2keep ;
 
 { 0 3 f { 1 2 3 } } [ { 1 2 3 } -10 3 "hello" coalescing-bug-1 ] unit-test
 { 0 3 f { 1 2 3 } } [ { 1 2 3 } 0 7 "hello" coalescing-bug-1 ] unit-test

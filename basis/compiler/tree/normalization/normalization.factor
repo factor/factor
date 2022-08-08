@@ -40,7 +40,7 @@ M: #branch normalize*
     [
         [ nip ] [
             dup [ +top+ eq? ] trim-head
-            [ [ length ] bi@ - tail* ] keep append
+            [ 2length - tail* ] keep append
         ] if
     ] 3map ;
 
