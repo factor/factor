@@ -259,7 +259,7 @@ PRIVATE>
 
 
 : collect-assoc-by-multi! ( ... assoc input-assoc quot: ( ... key value -- ... new-keys value' ) -- ... assoc )
-    rot [ '[ @ swap _ B push-at-each ] assoc-each ] keep ; inline
+    rot [ '[ @ swap _ push-at-each ] assoc-each ] keep ; inline
 
 : collect-assoc-by-multi ( ... assoc quot: ( ... key value -- ... new-keys value' ) -- ... assoc )
     [ H{ } clone ] 2dip collect-assoc-by-multi! ; inline
