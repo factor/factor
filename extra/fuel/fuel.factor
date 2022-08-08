@@ -146,7 +146,7 @@ PRIVATE>
     [ developer-name set ] when* ;
 
 : fuel-scaffold-vocab ( root name devname -- result )
-    [ scaffold-name dup [ scaffold-vocab ] dip ] with-scope
+    [ scaffold-name dup [ scaffold-vocab-in ] dip ] with-scope
     dup require vocab-source-path absolute-path ;
 
 : fuel-scaffold-help ( name devname -- result )

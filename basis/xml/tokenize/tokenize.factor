@@ -1,9 +1,9 @@
 ! Copyright (C) 2005, 2009 Daniel Ehrenberg
 ! See http://factorcode.org/license.txt for BSD license.
-USING: namespaces xml.state kernel sequences accessors
-xml.char-classes xml.errors math io sbufs fry strings ascii
-xml.entities assocs splitting math.parser
-locals combinators combinators.short-circuit arrays hints ;
+USING: accessors ascii assocs combinators
+combinators.short-circuit hints io kernel math math.parser
+namespaces sbufs sequences splitting strings xml.char-classes
+xml.entities xml.errors xml.state ;
 IN: xml.tokenize
 
 ! * Basic utility words

@@ -1,6 +1,4 @@
-USING: accessors parser words words.symbol
-sequences namespaces kernel assocs
-compiler.units ;
+USING: assocs kernel namespaces parser words.symbol ;
 IN: xmode.tokens
 
 ! Based on org.gjt.sp.jedit.syntax.Token

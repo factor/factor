@@ -1,4 +1,4 @@
-USING: kernel locals math math.parser sequences ;
+USING: kernel math math.parser sequences ;
 IN: benchmark.fib7
 
 :: matrix-fib ( m -- n )

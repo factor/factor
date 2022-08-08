@@ -1,8 +1,8 @@
 ! Copyright (C) 2009, 2011 Joe Groff.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors classes.struct fry generalizations kernel
-locals math math.combinatorics math.functions math.matrices.simd
-math.vectors math.vectors.simd math.quaternions sequences
+USING: accessors classes.struct generalizations kernel
+math math.functions math.matrices.simd math.vectors
+math.vectors.simd math.quaternions sequences
 sequences.generalizations sequences.private specialized-arrays
 typed ;
 FROM: sequences.private => nth-unsafe ;

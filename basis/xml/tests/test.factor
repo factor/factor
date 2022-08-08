@@ -52,12 +52,11 @@ SYMBOL: xml-file
     dup dup "y" attr "z" set-attr
     T{ name { space "blah" } { main "z" } } attr
 ] unit-test
-[ "foo" ] [ "<boo><![CDATA[foo]]></boo>" string>xml children>string ] unit-test
 [ "<!-- B+, B, or B--->" string>xml ] must-fail
 [ ] [ "<?xml version='1.0'?><!-- declarations for <head> & <body> --><foo/>" string>xml drop ] unit-test
 
 : first-thing ( seq -- elt )
-    [ "" = ] reject first ;
+    "" swap remove first ;
 
 [ T{ element-decl f "br" "EMPTY" } ] [ "<!ELEMENT br EMPTY>" string>dtd directives>> first-thing ] unit-test
 [ T{ element-decl f "p" "(#PCDATA|emph)*" } ] [ "<!ELEMENT p (#PCDATA|emph)*>" string>dtd directives>> first-thing ] unit-test

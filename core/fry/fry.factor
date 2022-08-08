@@ -1,8 +1,7 @@
 ! Copyright (C) 2009 Slava Pestov, Eduardo Cavazos, Joe Groff.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays classes combinators generic kernel
-locals.backend math quotations sequences sequences.private sets
-splitting vectors words ;
+USING: accessors combinators kernel locals.backend math
+quotations sequences sets splitting vectors words ;
 IN: fry
 
 ERROR: not-in-a-fry ;
@@ -105,7 +104,7 @@ TUPLE: dredge-fry-state
     V{ } clone V{ } clone dredge-fry-state boa ; inline
 
 : input-slices ( n i state -- head tail )
-    input>> [ <slice> ] [ nipd swap 1 + tail-slice ] 3bi ; inline
+    input>> [ <slice> ] [ spin drop 1 + tail-slice ] 3bi ; inline
 
 : push-head-slice ( head state -- )
     quot>> [ push-all ] [ \ _ swap push ] bi ; inline

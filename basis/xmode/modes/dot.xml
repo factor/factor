@@ -1,0 +1,624 @@
+<?xml version="1.0"?>
+<!DOCTYPE MODE SYSTEM "xmode.dtd">
+
+<!-- DOT mode, by Kevin Hunter of caktusgroup.com (kevin@) for jEdit 4.3 -->
+<!-- This is based on the grammar defined at
+     http://graphviz.org/doc/info/lang.html -->
+
+<MODE>
+	<PROPS>
+		<PROPERTY NAME='commentStart'   VALUE='/*' />
+		<PROPERTY NAME='commentEnd'     VALUE='*/' />
+		<PROPERTY NAME='wordBreakChars' VALUE=',+-=&lt;&gt;/?^&amp;*' />
+
+		<!-- Auto indent -->
+		<PROPERTY NAME='indentOpenBrackets'     VALUE='[{' />
+		<PROPERTY NAME='indentCloseBrackets'    VALUE=']}' />
+		<PROPERTY NAME='unalignedOpenBrackets'  VALUE='(' />
+		<PROPERTY NAME='unalignedCloseBrackets' VALUE=')' />
+		<PROPERTY NAME='indentNextLine'
+		    VALUE='(?!^\s*(#|//|/\*)).*((sub|di|)graph|node|edge)\s+([\[{&lt;]).*'
+			/>
+	</PROPS>
+
+	<RULES
+		IGNORE_CASE="FALSE"
+		HIGHLIGHT_DIGITS="TRUE" DIGIT_RE="[0-9][0-9a-zA-Z]*">
+
+		<IMPORT DELEGATE='DOT_LEXER' />
+		<IMPORT DELEGATE='KEYWORDS' />
+	</RULES>
+
+	<RULES SET='DOT_LEXER'
+		IGNORE_CASE='FALSE'
+		HIGHLIGHT_DIGITS='TRUE' DIGIT_RE='[0-9][0-9a-zA-Z]*'>
+
+		<EOL_SPAN TYPE='COMMENT1'>#</EOL_SPAN>
+		<EOL_SPAN TYPE='COMMENT2'>//</EOL_SPAN>
+		<SPAN_REGEXP TYPE='COMMENT3' MATCH_TYPE='COMMENT3' NO_LINE_BREAK='FALSE'>
+			<BEGIN>/\*</BEGIN>
+			<END>*/</END>
+		</SPAN_REGEXP>
+
+		<SEQ TYPE='OPERATOR'>-&gt;</SEQ>
+		<SEQ TYPE='OPERATOR'>[</SEQ>
+		<SEQ TYPE='OPERATOR'>]</SEQ>
+		<SEQ TYPE='OPERATOR'>)</SEQ>
+		<SEQ TYPE='OPERATOR'>}</SEQ>
+		<SEQ TYPE='OPERATOR'>{</SEQ>
+		<SEQ TYPE='OPERATOR'>;</SEQ>
+		<SEQ TYPE='OPERATOR'>=</SEQ>
+
+		<SPAN TYPE='KEYWORD3' ESCAPE='\' DELEGATE='url::MAIN'>
+			<BEGIN>URL="</BEGIN>
+			<END>"</END>
+		</SPAN>
+		<!-- Dot does not use single quotes as delimiters. -->
+		<SPAN TYPE='LITERAL1' ESCAPE='\'>
+			<BEGIN>"</BEGIN>
+			<END>"</END>
+		</SPAN>
+		<SPAN DELEGATE='html::MAIN'>
+			<BEGIN>&lt;</BEGIN>
+			<END>&gt;</END>
+		</SPAN>
+	</RULES>
+
+	<RULES SET='KEYWORDS' IGNORE_CASE='TRUE'>
+		<KEYWORDS>
+			<KEYWORD1>graph</KEYWORD1>
+			<KEYWORD1>subgraph</KEYWORD1>
+			<KEYWORD1>digraph</KEYWORD1>
+			<KEYWORD1>node</KEYWORD1>
+			<KEYWORD1>edge</KEYWORD1>
+
+			<KEYWORD2>strict</KEYWORD2>
+
+			<!-- Node attributes -->
+			<KEYWORD3>URL</KEYWORD3>
+			<KEYWORD3>label</KEYWORD3>
+			<KEYWORD3>shape</KEYWORD3>
+			<KEYWORD3>style</KEYWORD3>
+			<KEYWORD3>type</KEYWORD3>
+			<KEYWORD3>rank</KEYWORD3>
+			<KEYWORD3>tailport</KEYWORD3>
+			<KEYWORD3>headport</KEYWORD3>
+
+			<!-- Node ranks -->
+			<KEYWORD4>same</KEYWORD4>
+
+			<!-- Node shapes -->
+			<KEYWORD4>box</KEYWORD4>
+			<KEYWORD4>polygon</KEYWORD4>
+			<KEYWORD4>ellipse</KEYWORD4>
+			<KEYWORD4>point</KEYWORD4>
+			<KEYWORD4>egg</KEYWORD4>
+			<KEYWORD4>triangle</KEYWORD4>
+			<KEYWORD4>diamond</KEYWORD4>
+			<KEYWORD4>trapezium</KEYWORD4>
+			<KEYWORD4>parallelogram</KEYWORD4>
+			<KEYWORD4>hexagon</KEYWORD4>
+			<KEYWORD4>octagon</KEYWORD4>
+			<KEYWORD4>doublecircle</KEYWORD4>
+			<KEYWORD4>tripleoctagon</KEYWORD4>
+			<KEYWORD4>invtriangle</KEYWORD4>
+			<KEYWORD4>invtrapezium</KEYWORD4>
+
+			<!-- Edge pointer shapes (arrow heads) -->
+			<KEYWORD4>normal</KEYWORD4>
+			<KEYWORD4>dot</KEYWORD4>
+			<KEYWORD4>odot</KEYWORD4>
+			<KEYWORD4>inv</KEYWORD4>
+			<KEYWORD4>invdot</KEYWORD4>
+			<KEYWORD4>invodot</KEYWORD4>
+			<KEYWORD4>none</KEYWORD4>
+
+			<!-- Colors -->
+
+			<!-- Whites -->
+			<KEYWORD4>antiquewhite1</KEYWORD4>
+			<KEYWORD4>antiquewhite2</KEYWORD4>
+			<KEYWORD4>antiquewhite3</KEYWORD4>
+			<KEYWORD4>antiquewhite4</KEYWORD4>
+			<KEYWORD4>azure1</KEYWORD4>
+			<KEYWORD4>azure2</KEYWORD4>
+			<KEYWORD4>azure3</KEYWORD4>
+			<KEYWORD4>azure4</KEYWORD4>
+			<KEYWORD4>bisque1</KEYWORD4>
+			<KEYWORD4>bisque2</KEYWORD4>
+			<KEYWORD4>bisque3</KEYWORD4>
+			<KEYWORD4>bisque4</KEYWORD4>
+			<KEYWORD4>blanchedalmond</KEYWORD4>
+			<KEYWORD4>cornsilk1</KEYWORD4>
+			<KEYWORD4>cornsilk2</KEYWORD4>
+			<KEYWORD4>cornsilk3</KEYWORD4>
+			<KEYWORD4>cornsilk4</KEYWORD4>
+			<KEYWORD4>floralwhite</KEYWORD4>
+			<KEYWORD4>gainsboro</KEYWORD4>
+			<KEYWORD4>ghostwhite</KEYWORD4>
+			<KEYWORD4>honeydew1</KEYWORD4>
+			<KEYWORD4>honeydew2</KEYWORD4>
+			<KEYWORD4>honeydew3</KEYWORD4>
+			<KEYWORD4>honeydew4</KEYWORD4>
+			<KEYWORD4>ivory1</KEYWORD4>
+			<KEYWORD4>ivory2</KEYWORD4>
+			<KEYWORD4>ivory3</KEYWORD4>
+			<KEYWORD4>ivory4</KEYWORD4>
+			<KEYWORD4>lavender</KEYWORD4>
+			<KEYWORD4>lavenderblush1</KEYWORD4>
+			<KEYWORD4>lavenderblush2</KEYWORD4>
+			<KEYWORD4>lavenderblush3</KEYWORD4>
+			<KEYWORD4>lavenderblush4</KEYWORD4>
+			<KEYWORD4>lemonchiffon1</KEYWORD4>
+			<KEYWORD4>lemonchiffon2</KEYWORD4>
+			<KEYWORD4>lemonchiffon3</KEYWORD4>
+			<KEYWORD4>lemonchiffon4</KEYWORD4>
+			<KEYWORD4>linen</KEYWORD4>
+			<KEYWORD4>mintcream</KEYWORD4>
+			<KEYWORD4>mistyrose1</KEYWORD4>
+			<KEYWORD4>mistyrose2</KEYWORD4>
+			<KEYWORD4>mistyrose3</KEYWORD4>
+			<KEYWORD4>mistyrose4</KEYWORD4>
+			<KEYWORD4>moccasin</KEYWORD4>
+			<KEYWORD4>navajowhite1</KEYWORD4>
+			<KEYWORD4>navajowhite2</KEYWORD4>
+			<KEYWORD4>navajowhite3</KEYWORD4>
+			<KEYWORD4>navajowhite4</KEYWORD4>
+			<KEYWORD4>oldlace</KEYWORD4>
+			<KEYWORD4>papayawhip</KEYWORD4>
+			<KEYWORD4>peachpuff1</KEYWORD4>
+			<KEYWORD4>peachpuff2</KEYWORD4>
+			<KEYWORD4>peachpuff3</KEYWORD4>
+			<KEYWORD4>peachpuff4</KEYWORD4>
+			<KEYWORD4>seashell1</KEYWORD4>
+			<KEYWORD4>seashell2</KEYWORD4>
+			<KEYWORD4>seashell3</KEYWORD4>
+			<KEYWORD4>seashell4</KEYWORD4>
+			<KEYWORD4>snow1</KEYWORD4>
+			<KEYWORD4>snow2</KEYWORD4>
+			<KEYWORD4>snow3</KEYWORD4>
+			<KEYWORD4>snow4</KEYWORD4>
+			<KEYWORD4>thistle1</KEYWORD4>
+			<KEYWORD4>thistle2</KEYWORD4>
+			<KEYWORD4>thistle3</KEYWORD4>
+			<KEYWORD4>thistle4</KEYWORD4>
+			<KEYWORD4>wheat1</KEYWORD4>
+			<KEYWORD4>wheat2</KEYWORD4>
+			<KEYWORD4>wheat3</KEYWORD4>
+			<KEYWORD4>wheat4</KEYWORD4>
+			<KEYWORD4>white</KEYWORD4>
+			<KEYWORD4>whitesmoke</KEYWORD4>
+
+			<!-- Reds -->
+			<KEYWORD4>coral1</KEYWORD4>
+			<KEYWORD4>coral2</KEYWORD4>
+			<KEYWORD4>coral3</KEYWORD4>
+			<KEYWORD4>coral4</KEYWORD4>
+			<KEYWORD4>crimson</KEYWORD4>
+			<KEYWORD4>darksalmon</KEYWORD4>
+			<KEYWORD4>deeppink1</KEYWORD4>
+			<KEYWORD4>deeppink2</KEYWORD4>
+			<KEYWORD4>deeppink3</KEYWORD4>
+			<KEYWORD4>deeppink4</KEYWORD4>
+			<KEYWORD4>firebrick1</KEYWORD4>
+			<KEYWORD4>firebrick2</KEYWORD4>
+			<KEYWORD4>firebrick3</KEYWORD4>
+			<KEYWORD4>firebrick4</KEYWORD4>
+			<KEYWORD4>hotpink1</KEYWORD4>
+			<KEYWORD4>hotpink2</KEYWORD4>
+			<KEYWORD4>hotpink3</KEYWORD4>
+			<KEYWORD4>hotpink4</KEYWORD4>
+			<KEYWORD4>indianred1</KEYWORD4>
+			<KEYWORD4>indianred2</KEYWORD4>
+			<KEYWORD4>indianred3</KEYWORD4>
+			<KEYWORD4>indianred4</KEYWORD4>
+			<KEYWORD4>lightpink1</KEYWORD4>
+			<KEYWORD4>lightpink2</KEYWORD4>
+			<KEYWORD4>lightpink3</KEYWORD4>
+			<KEYWORD4>lightpink4</KEYWORD4>
+			<KEYWORD4>lightsalmon1</KEYWORD4>
+			<KEYWORD4>lightsalmon2</KEYWORD4>
+			<KEYWORD4>lightsalmon3</KEYWORD4>
+			<KEYWORD4>lightsalmon4</KEYWORD4>
+			<KEYWORD4>maroon1</KEYWORD4>
+			<KEYWORD4>maroon2</KEYWORD4>
+			<KEYWORD4>maroon3</KEYWORD4>
+			<KEYWORD4>maroon4</KEYWORD4>
+			<KEYWORD4>mediumvioletred</KEYWORD4>
+			<KEYWORD4>orangered1</KEYWORD4>
+			<KEYWORD4>orangered2</KEYWORD4>
+			<KEYWORD4>orangered3</KEYWORD4>
+			<KEYWORD4>orangered4</KEYWORD4>
+			<KEYWORD4>palevioletred1</KEYWORD4>
+			<KEYWORD4>palevioletred2</KEYWORD4>
+			<KEYWORD4>palevioletred3</KEYWORD4>
+			<KEYWORD4>palevioletred4</KEYWORD4>
+			<KEYWORD4>pink1</KEYWORD4>
+			<KEYWORD4>pink2</KEYWORD4>
+			<KEYWORD4>pink3</KEYWORD4>
+			<KEYWORD4>pink4</KEYWORD4>
+			<KEYWORD4>red1</KEYWORD4>
+			<KEYWORD4>red2</KEYWORD4>
+			<KEYWORD4>red3</KEYWORD4>
+			<KEYWORD4>red4</KEYWORD4>
+			<KEYWORD4>salmon1</KEYWORD4>
+			<KEYWORD4>salmon2</KEYWORD4>
+			<KEYWORD4>salmon3</KEYWORD4>
+			<KEYWORD4>salmon4</KEYWORD4>
+			<KEYWORD4>tomato1</KEYWORD4>
+			<KEYWORD4>tomato2</KEYWORD4>
+			<KEYWORD4>tomato3</KEYWORD4>
+			<KEYWORD4>tomato4</KEYWORD4>
+			<KEYWORD4>violetred1</KEYWORD4>
+			<KEYWORD4>violetred2</KEYWORD4>
+			<KEYWORD4>violetred3</KEYWORD4>
+			<KEYWORD4>violetred4</KEYWORD4>
+
+			<!-- Yellows -->
+			<KEYWORD4>darkgoldenrod1</KEYWORD4>
+			<KEYWORD4>darkgoldenrod2</KEYWORD4>
+			<KEYWORD4>darkgoldenrod3</KEYWORD4>
+			<KEYWORD4>darkgoldenrod4</KEYWORD4>
+			<KEYWORD4>gold1</KEYWORD4>
+			<KEYWORD4>gold2</KEYWORD4>
+			<KEYWORD4>gold3</KEYWORD4>
+			<KEYWORD4>gold4</KEYWORD4>
+			<KEYWORD4>goldenrod1</KEYWORD4>
+			<KEYWORD4>goldenrod2</KEYWORD4>
+			<KEYWORD4>goldenrod3</KEYWORD4>
+			<KEYWORD4>goldenrod4</KEYWORD4>
+			<KEYWORD4>greenyellow</KEYWORD4>
+			<KEYWORD4>lightgoldenrod1</KEYWORD4>
+			<KEYWORD4>lightgoldenrod2</KEYWORD4>
+			<KEYWORD4>lightgoldenrod3</KEYWORD4>
+			<KEYWORD4>lightgoldenrod4</KEYWORD4>
+			<KEYWORD4>lightgoldenrodyellow</KEYWORD4>
+			<KEYWORD4>lightyellow1</KEYWORD4>
+			<KEYWORD4>lightyellow2</KEYWORD4>
+			<KEYWORD4>lightyellow3</KEYWORD4>
+			<KEYWORD4>lightyellow4</KEYWORD4>
+			<KEYWORD4>palegoldenrod</KEYWORD4>
+			<KEYWORD4>yellow1</KEYWORD4>
+			<KEYWORD4>yellow2</KEYWORD4>
+			<KEYWORD4>yellow3</KEYWORD4>
+			<KEYWORD4>yellow4</KEYWORD4>
+			<KEYWORD4>yellowgreen</KEYWORD4>
+
+			<!-- Magentas -->
+			<KEYWORD4>blueviolet</KEYWORD4>
+			<KEYWORD4>darkorchid1</KEYWORD4>
+			<KEYWORD4>darkorchid2</KEYWORD4>
+			<KEYWORD4>darkorchid3</KEYWORD4>
+			<KEYWORD4>darkorchid4</KEYWORD4>
+			<KEYWORD4>darkviolet</KEYWORD4>
+			<KEYWORD4>magenta1</KEYWORD4>
+			<KEYWORD4>magenta2</KEYWORD4>
+			<KEYWORD4>magenta3</KEYWORD4>
+			<KEYWORD4>magenta4</KEYWORD4>
+			<KEYWORD4>mediumorchid1</KEYWORD4>
+			<KEYWORD4>mediumorchid2</KEYWORD4>
+			<KEYWORD4>mediumorchid3</KEYWORD4>
+			<KEYWORD4>mediumorchid4</KEYWORD4>
+			<KEYWORD4>mediumpurple1</KEYWORD4>
+			<KEYWORD4>mediumpurple2</KEYWORD4>
+			<KEYWORD4>mediumpurple3</KEYWORD4>
+			<KEYWORD4>mediumpurple4</KEYWORD4>
+			<KEYWORD4>mediumvioletred</KEYWORD4>
+			<KEYWORD4>orchid1</KEYWORD4>
+			<KEYWORD4>orchid2</KEYWORD4>
+			<KEYWORD4>orchid3</KEYWORD4>
+			<KEYWORD4>orchid4</KEYWORD4>
+			<KEYWORD4>palevioletred1</KEYWORD4>
+			<KEYWORD4>palevioletred2</KEYWORD4>
+			<KEYWORD4>palevioletred3</KEYWORD4>
+			<KEYWORD4>palevioletred4</KEYWORD4>
+			<KEYWORD4>plum1</KEYWORD4>
+			<KEYWORD4>plum2</KEYWORD4>
+			<KEYWORD4>plum3</KEYWORD4>
+			<KEYWORD4>plum4</KEYWORD4>
+			<KEYWORD4>purple1</KEYWORD4>
+			<KEYWORD4>purple2</KEYWORD4>
+			<KEYWORD4>purple3</KEYWORD4>
+			<KEYWORD4>purple4</KEYWORD4>
+			<KEYWORD4>violet</KEYWORD4>
+			<KEYWORD4>violetred1</KEYWORD4>
+			<KEYWORD4>violetred2</KEYWORD4>
+			<KEYWORD4>violetred3</KEYWORD4>
+			<KEYWORD4>violetred4</KEYWORD4>
+
+			<!-- Blues -->
+			<KEYWORD4>aliceblue</KEYWORD4>
+			<KEYWORD4>blue1</KEYWORD4>
+			<KEYWORD4>blue2</KEYWORD4>
+			<KEYWORD4>blue3</KEYWORD4>
+			<KEYWORD4>blue4</KEYWORD4>
+			<KEYWORD4>blueviolet</KEYWORD4>
+			<KEYWORD4>cadetblue1</KEYWORD4>
+			<KEYWORD4>cadetblue2</KEYWORD4>
+			<KEYWORD4>cadetblue3</KEYWORD4>
+			<KEYWORD4>cadetblue4</KEYWORD4>
+			<KEYWORD4>cornflowerblue</KEYWORD4>
+			<KEYWORD4>darkslateblue</KEYWORD4>
+			<KEYWORD4>deepskyblue1</KEYWORD4>
+			<KEYWORD4>deepskyblue2</KEYWORD4>
+			<KEYWORD4>deepskyblue3</KEYWORD4>
+			<KEYWORD4>deepskyblue4</KEYWORD4>
+			<KEYWORD4>dodgerblue1</KEYWORD4>
+			<KEYWORD4>dodgerblue2</KEYWORD4>
+			<KEYWORD4>dodgerblue3</KEYWORD4>
+			<KEYWORD4>dodgerblue4</KEYWORD4>
+			<KEYWORD4>indigo</KEYWORD4>
+			<KEYWORD4>lightblue1</KEYWORD4>
+			<KEYWORD4>lightblue2</KEYWORD4>
+			<KEYWORD4>lightblue3</KEYWORD4>
+			<KEYWORD4>lightblue4</KEYWORD4>
+			<KEYWORD4>lightskyblue1</KEYWORD4>
+			<KEYWORD4>lightskyblue2</KEYWORD4>
+			<KEYWORD4>lightskyblue3</KEYWORD4>
+			<KEYWORD4>lightskyblue4</KEYWORD4>
+			<KEYWORD4>lightslateblue1</KEYWORD4>
+			<KEYWORD4>lightslateblue2</KEYWORD4>
+			<KEYWORD4>lightslateblue3</KEYWORD4>
+			<KEYWORD4>lightslateblue4</KEYWORD4>
+			<KEYWORD4>mediumblue</KEYWORD4>
+			<KEYWORD4>mediumslateblue</KEYWORD4>
+			<KEYWORD4>midnightblue</KEYWORD4>
+			<KEYWORD4>navy</KEYWORD4>
+			<KEYWORD4>navyblue</KEYWORD4>
+			<KEYWORD4>powderblue</KEYWORD4>
+			<KEYWORD4>royalblue1</KEYWORD4>
+			<KEYWORD4>royalblue2</KEYWORD4>
+			<KEYWORD4>royalblue3</KEYWORD4>
+			<KEYWORD4>royalblue4</KEYWORD4>
+			<KEYWORD4>skyblue1</KEYWORD4>
+			<KEYWORD4>skyblue2</KEYWORD4>
+			<KEYWORD4>skyblue3</KEYWORD4>
+			<KEYWORD4>skyblue4</KEYWORD4>
+			<KEYWORD4>slateblue1</KEYWORD4>
+			<KEYWORD4>slateblue2</KEYWORD4>
+			<KEYWORD4>slateblue3</KEYWORD4>
+			<KEYWORD4>slateblue4</KEYWORD4>
+			<KEYWORD4>steelblue1</KEYWORD4>
+			<KEYWORD4>steelblue2</KEYWORD4>
+			<KEYWORD4>steelblue3</KEYWORD4>
+			<KEYWORD4>steelblue4</KEYWORD4>
+
+			<!-- Greens -->
+			<KEYWORD4>chartreuse1</KEYWORD4>
+			<KEYWORD4>chartreuse2</KEYWORD4>
+			<KEYWORD4>chartreuse3</KEYWORD4>
+			<KEYWORD4>chartreuse4</KEYWORD4>
+			<KEYWORD4>darkgreen</KEYWORD4>
+			<KEYWORD4>darkolivegreen1</KEYWORD4>
+			<KEYWORD4>darkolivegreen2</KEYWORD4>
+			<KEYWORD4>darkolivegreen3</KEYWORD4>
+			<KEYWORD4>darkolivegreen4</KEYWORD4>
+			<KEYWORD4>darkseagreen1</KEYWORD4>
+			<KEYWORD4>darkseagreen2</KEYWORD4>
+			<KEYWORD4>darkseagreen3</KEYWORD4>
+			<KEYWORD4>darkseagreen4</KEYWORD4>
+			<KEYWORD4>forestgreen</KEYWORD4>
+			<KEYWORD4>green1</KEYWORD4>
+			<KEYWORD4>green2</KEYWORD4>
+			<KEYWORD4>green3</KEYWORD4>
+			<KEYWORD4>green4</KEYWORD4>
+			<KEYWORD4>greenyellow</KEYWORD4>
+			<KEYWORD4>lawngreen</KEYWORD4>
+			<KEYWORD4>lightseagreen</KEYWORD4>
+			<KEYWORD4>limegreen</KEYWORD4>
+			<KEYWORD4>mediumseagreen</KEYWORD4>
+			<KEYWORD4>mediumspringgreen</KEYWORD4>
+			<KEYWORD4>mintcream</KEYWORD4>
+			<KEYWORD4>olivedrab1</KEYWORD4>
+			<KEYWORD4>olivedrab2</KEYWORD4>
+			<KEYWORD4>olivedrab3</KEYWORD4>
+			<KEYWORD4>olivedrab4</KEYWORD4>
+			<KEYWORD4>palegreen1</KEYWORD4>
+			<KEYWORD4>palegreen2</KEYWORD4>
+			<KEYWORD4>palegreen3</KEYWORD4>
+			<KEYWORD4>palegreen4</KEYWORD4>
+			<KEYWORD4>seagreen1</KEYWORD4>
+			<KEYWORD4>seagreen2</KEYWORD4>
+			<KEYWORD4>seagreen3</KEYWORD4>
+			<KEYWORD4>seagreen4</KEYWORD4>
+			<KEYWORD4>springgreen1</KEYWORD4>
+			<KEYWORD4>springgreen2</KEYWORD4>
+			<KEYWORD4>springgreen3</KEYWORD4>
+			<KEYWORD4>springgreen4</KEYWORD4>
+			<KEYWORD4>yellowgreen</KEYWORD4>
+
+			<!-- Browns -->
+			<KEYWORD4>beige</KEYWORD4>
+			<KEYWORD4>brown1</KEYWORD4>
+			<KEYWORD4>brown2</KEYWORD4>
+			<KEYWORD4>brown3</KEYWORD4>
+			<KEYWORD4>brown4</KEYWORD4>
+			<KEYWORD4>burlywood1</KEYWORD4>
+			<KEYWORD4>burlywood2</KEYWORD4>
+			<KEYWORD4>burlywood3</KEYWORD4>
+			<KEYWORD4>burlywood4</KEYWORD4>
+			<KEYWORD4>chocolate1</KEYWORD4>
+			<KEYWORD4>chocolate2</KEYWORD4>
+			<KEYWORD4>chocolate3</KEYWORD4>
+			<KEYWORD4>chocolate4</KEYWORD4>
+			<KEYWORD4>darkkhaki</KEYWORD4>
+			<KEYWORD4>khaki1</KEYWORD4>
+			<KEYWORD4>khaki2</KEYWORD4>
+			<KEYWORD4>khaki3</KEYWORD4>
+			<KEYWORD4>khaki4</KEYWORD4>
+			<KEYWORD4>peru</KEYWORD4>
+			<KEYWORD4>rosybrown1</KEYWORD4>
+			<KEYWORD4>rosybrown2</KEYWORD4>
+			<KEYWORD4>rosybrown3</KEYWORD4>
+			<KEYWORD4>rosybrown4</KEYWORD4>
+			<KEYWORD4>saddlebrown</KEYWORD4>
+			<KEYWORD4>sandybrown</KEYWORD4>
+			<KEYWORD4>sienna1</KEYWORD4>
+			<KEYWORD4>sienna2</KEYWORD4>
+			<KEYWORD4>sienna3</KEYWORD4>
+			<KEYWORD4>sienna4</KEYWORD4>
+			<KEYWORD4>tan1</KEYWORD4>
+			<KEYWORD4>tan2</KEYWORD4>
+			<KEYWORD4>tan3</KEYWORD4>
+			<KEYWORD4>tan4</KEYWORD4>
+
+			<!-- Greys -->
+			<KEYWORD4>darkslategray1</KEYWORD4>
+			<KEYWORD4>darkslategray2</KEYWORD4>
+			<KEYWORD4>darkslategray3</KEYWORD4>
+			<KEYWORD4>darkslategray4</KEYWORD4>
+			<KEYWORD4>dimgray</KEYWORD4>
+			<KEYWORD4>gray</KEYWORD4>
+			<KEYWORD4>gray0</KEYWORD4>
+			<KEYWORD4>gray1</KEYWORD4>
+			<KEYWORD4>gray2</KEYWORD4>
+			<KEYWORD4>gray3</KEYWORD4>
+			<KEYWORD4>gray4</KEYWORD4>
+			<KEYWORD4>gray5</KEYWORD4>
+			<KEYWORD4>gray6</KEYWORD4>
+			<KEYWORD4>gray7</KEYWORD4>
+			<KEYWORD4>gray8</KEYWORD4>
+			<KEYWORD4>gray9</KEYWORD4>
+			<KEYWORD4>gray10</KEYWORD4>
+			<KEYWORD4>gray11</KEYWORD4>
+			<KEYWORD4>gray12</KEYWORD4>
+			<KEYWORD4>gray13</KEYWORD4>
+			<KEYWORD4>gray14</KEYWORD4>
+			<KEYWORD4>gray15</KEYWORD4>
+			<KEYWORD4>gray16</KEYWORD4>
+			<KEYWORD4>gray17</KEYWORD4>
+			<KEYWORD4>gray18</KEYWORD4>
+			<KEYWORD4>gray19</KEYWORD4>
+			<KEYWORD4>gray20</KEYWORD4>
+			<KEYWORD4>gray21</KEYWORD4>
+			<KEYWORD4>gray22</KEYWORD4>
+			<KEYWORD4>gray23</KEYWORD4>
+			<KEYWORD4>gray24</KEYWORD4>
+			<KEYWORD4>gray25</KEYWORD4>
+			<KEYWORD4>gray26</KEYWORD4>
+			<KEYWORD4>gray27</KEYWORD4>
+			<KEYWORD4>gray28</KEYWORD4>
+			<KEYWORD4>gray29</KEYWORD4>
+			<KEYWORD4>gray30</KEYWORD4>
+			<KEYWORD4>gray31</KEYWORD4>
+			<KEYWORD4>gray32</KEYWORD4>
+			<KEYWORD4>gray33</KEYWORD4>
+			<KEYWORD4>gray34</KEYWORD4>
+			<KEYWORD4>gray35</KEYWORD4>
+			<KEYWORD4>gray36</KEYWORD4>
+			<KEYWORD4>gray37</KEYWORD4>
+			<KEYWORD4>gray38</KEYWORD4>
+			<KEYWORD4>gray39</KEYWORD4>
+			<KEYWORD4>gray40</KEYWORD4>
+			<KEYWORD4>gray41</KEYWORD4>
+			<KEYWORD4>gray42</KEYWORD4>
+			<KEYWORD4>gray43</KEYWORD4>
+			<KEYWORD4>gray44</KEYWORD4>
+			<KEYWORD4>gray45</KEYWORD4>
+			<KEYWORD4>gray46</KEYWORD4>
+			<KEYWORD4>gray47</KEYWORD4>
+			<KEYWORD4>gray48</KEYWORD4>
+			<KEYWORD4>gray49</KEYWORD4>
+			<KEYWORD4>gray50</KEYWORD4>
+			<KEYWORD4>gray51</KEYWORD4>
+			<KEYWORD4>gray52</KEYWORD4>
+			<KEYWORD4>gray53</KEYWORD4>
+			<KEYWORD4>gray54</KEYWORD4>
+			<KEYWORD4>gray55</KEYWORD4>
+			<KEYWORD4>gray56</KEYWORD4>
+			<KEYWORD4>gray57</KEYWORD4>
+			<KEYWORD4>gray58</KEYWORD4>
+			<KEYWORD4>gray59</KEYWORD4>
+			<KEYWORD4>gray60</KEYWORD4>
+			<KEYWORD4>gray61</KEYWORD4>
+			<KEYWORD4>gray62</KEYWORD4>
+			<KEYWORD4>gray63</KEYWORD4>
+			<KEYWORD4>gray64</KEYWORD4>
+			<KEYWORD4>gray65</KEYWORD4>
+			<KEYWORD4>gray66</KEYWORD4>
+			<KEYWORD4>gray67</KEYWORD4>
+			<KEYWORD4>gray68</KEYWORD4>
+			<KEYWORD4>gray69</KEYWORD4>
+			<KEYWORD4>gray70</KEYWORD4>
+			<KEYWORD4>gray71</KEYWORD4>
+			<KEYWORD4>gray72</KEYWORD4>
+			<KEYWORD4>gray73</KEYWORD4>
+			<KEYWORD4>gray74</KEYWORD4>
+			<KEYWORD4>gray75</KEYWORD4>
+			<KEYWORD4>gray76</KEYWORD4>
+			<KEYWORD4>gray77</KEYWORD4>
+			<KEYWORD4>gray78</KEYWORD4>
+			<KEYWORD4>gray79</KEYWORD4>
+			<KEYWORD4>gray80</KEYWORD4>
+			<KEYWORD4>gray81</KEYWORD4>
+			<KEYWORD4>gray82</KEYWORD4>
+			<KEYWORD4>gray83</KEYWORD4>
+			<KEYWORD4>gray84</KEYWORD4>
+			<KEYWORD4>gray85</KEYWORD4>
+			<KEYWORD4>gray86</KEYWORD4>
+			<KEYWORD4>gray87</KEYWORD4>
+			<KEYWORD4>gray88</KEYWORD4>
+			<KEYWORD4>gray89</KEYWORD4>
+			<KEYWORD4>gray90</KEYWORD4>
+			<KEYWORD4>gray91</KEYWORD4>
+			<KEYWORD4>gray92</KEYWORD4>
+			<KEYWORD4>gray93</KEYWORD4>
+			<KEYWORD4>gray94</KEYWORD4>
+			<KEYWORD4>gray95</KEYWORD4>
+			<KEYWORD4>gray96</KEYWORD4>
+			<KEYWORD4>gray97</KEYWORD4>
+			<KEYWORD4>gray98</KEYWORD4>
+			<KEYWORD4>gray99</KEYWORD4>
+			<KEYWORD4>gray100</KEYWORD4>
+			<KEYWORD4>lightgray</KEYWORD4>
+			<KEYWORD4>lightslategray</KEYWORD4>
+			<KEYWORD4>slategray1</KEYWORD4>
+			<KEYWORD4>slategray2</KEYWORD4>
+			<KEYWORD4>slategray3</KEYWORD4>
+			<KEYWORD4>slategray4</KEYWORD4>
+
+			<!-- Cyans -->
+			<KEYWORD4>aquamarine1</KEYWORD4>
+			<KEYWORD4>aquamarine2</KEYWORD4>
+			<KEYWORD4>aquamarine3</KEYWORD4>
+			<KEYWORD4>aquamarine4</KEYWORD4>
+			<KEYWORD4>cyan1</KEYWORD4>
+			<KEYWORD4>cyan2</KEYWORD4>
+			<KEYWORD4>cyan3</KEYWORD4>
+			<KEYWORD4>cyan4</KEYWORD4>
+			<KEYWORD4>darkturquoise</KEYWORD4>
+			<KEYWORD4>lightcyan1</KEYWORD4>
+			<KEYWORD4>lightcyan2</KEYWORD4>
+			<KEYWORD4>lightcyan3</KEYWORD4>
+			<KEYWORD4>lightcyan4</KEYWORD4>
+			<KEYWORD4>mediumaquamarine</KEYWORD4>
+			<KEYWORD4>mediumturquoise</KEYWORD4>
+			<KEYWORD4>paleturquoise1</KEYWORD4>
+			<KEYWORD4>paleturquoise2</KEYWORD4>
+			<KEYWORD4>paleturquoise3</KEYWORD4>
+			<KEYWORD4>paleturquoise4</KEYWORD4>
+			<KEYWORD4>turquoise1</KEYWORD4>
+			<KEYWORD4>turquoise2</KEYWORD4>
+			<KEYWORD4>turquoise3</KEYWORD4>
+			<KEYWORD4>turquoise4</KEYWORD4>
+
+			<!-- Oranges -->
+			<KEYWORD4>darkorange1</KEYWORD4>
+			<KEYWORD4>darkorange2</KEYWORD4>
+			<KEYWORD4>darkorange3</KEYWORD4>
+			<KEYWORD4>darkorange4</KEYWORD4>
+			<KEYWORD4>orange1</KEYWORD4>
+			<KEYWORD4>orange2</KEYWORD4>
+			<KEYWORD4>orange3</KEYWORD4>
+			<KEYWORD4>orange4</KEYWORD4>
+			<KEYWORD4>orangered1</KEYWORD4>
+			<KEYWORD4>orangered2</KEYWORD4>
+			<KEYWORD4>orangered3</KEYWORD4>
+			<KEYWORD4>orangered4</KEYWORD4>
+
+			<!-- Blacks -->
+			<KEYWORD4>black</KEYWORD4>
+		</KEYWORDS>
+	</RULES>
+</MODE>
+ 	  	 

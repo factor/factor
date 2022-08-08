@@ -20,7 +20,7 @@ M: imagebin call-responder*
     [ imagebin set ] [ call-next-method ] bi ;
 
 : move-image ( mime-file -- )
-    [ next-image-path dup exists? ] [ drop ] while
+    [ next-image-path dup file-exists? ] [ drop ] while
     [ [ temporary-path>> ] dip move-file ]
     [ [ filename>> ] dip ".txt" append utf8 set-file-contents ] 2bi ;
 

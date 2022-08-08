@@ -1,7 +1,6 @@
 ! Copyright (c) 2012 Anonymous
 ! See http://factorcode.org/license.txt for BSD license.
-USING: fry io kernel math math.functions math.order sequences
-splitting strings ;
+USING: io kernel math math.functions sequences splitting strings ;
 IN: rosetta.align-columns
 
 ! http://rosettacode.org/wiki/Align_columns
@@ -44,7 +43,7 @@ Further,$allow$for$each$word$in$a$column$to$be$either$left$
 justified,$right$justified,$or$center$justified$within$its$column."
 
 : split-and-pad ( text -- lines )
-    "\n" split [ "$" split harvest ] map
+    split-lines [ "$" split harvest ] map
     dup longest length
     '[ _ "" pad-tail ] map ;
 

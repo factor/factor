@@ -112,7 +112,7 @@ ERROR: unbalanced-private-declaration vocab ;
 
 : use-vocab ( vocab -- )
     dup using-vocab? [
-        vocab-name "Already using ``" "'' vocabulary" surround note.
+        vocab-name "Already using “" "” vocabulary" surround note.
     ] [
         manifest get
         [ [ ?load-vocab ] dip search-vocabs>> push ]
@@ -131,7 +131,13 @@ ERROR: unbalanced-private-declaration vocab ;
         manifest get
         [ [ load-vocab ] dip search-vocabs>> remove-eq! drop ]
         [ [ vocab-name ] dip search-vocab-names>> delete ]
-        2bi
+        [
+            [ vocab-name ] dip qualified-vocabs>> [
+                dup extra-words? [ 2drop f ] [
+                    dup vocab? [ vocab>> ] unless vocab-name =
+                ] if
+            ] with reject! drop
+        ] 2tri
     ] [ drop ] if ;
 
 TUPLE: qualified vocab prefix words ;
@@ -284,11 +290,21 @@ M: manifest definitions-changed
 
 PRIVATE>
 
-: with-manifest ( quot -- )
-    <manifest> manifest [
+SYMBOL: print-use-hook
+
+print-use-hook [ [ ] ] initialize
+
+: (with-manifest) ( quot manifest -- )
+    manifest [
         [ call ] [
             [ manifest get add-definition-observer call ]
             [ manifest get remove-definition-observer ]
             finally
         ] if-bootstrapping
     ] with-variable ; inline
+
+: with-manifest ( quot -- )
+    <manifest> (with-manifest) ; inline
+
+: with-current-manifest ( quot -- )
+    manifest get (with-manifest) ; inline

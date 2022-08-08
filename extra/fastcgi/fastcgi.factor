@@ -14,8 +14,8 @@
 !     * REMOTE_ADDR
 
 USING: accessors alien.enums alien.syntax assocs combinators
-combinators.smart formatting http http.server
-http.server.responses io io.binary io.directories
+combinators.smart endian formatting http http.server
+http.server.responses io io.directories
 io.encodings.binary io.files io.servers io.sockets
 io.streams.byte-array kernel locals math namespaces pack
 prettyprint sequences sequences.deep strings threads
@@ -86,7 +86,7 @@ ENUM: fcgi-protocol-status
     ] loop ;
 
 : delete-if-exists ( file -- )
-    dup exists? [ delete-file ] [ drop ] if ;
+    dup file-exists? [ delete-file ] [ drop ] if ;
 
 : make-local-socket ( socket-path -- socket )
     [ delete-if-exists ] keep

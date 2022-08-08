@@ -51,7 +51,7 @@ IN: compiler.tree.recursive.tests
 
 { t } [
     [ [ loop-test-1 ] each ] build-tree analyze-recursive
-    \ (each-integer) label-is-loop?
+    \ each-integer-from label-is-loop?
 ] unit-test
 
 : loop-test-2 ( a b -- a' )
@@ -175,7 +175,7 @@ DEFER: a''
 { t } [
     [ 10 [ [ drop ] each-integer ] loop-in-non-loop ]
     build-tree analyze-recursive
-    \ (each-integer) label-is-loop?
+    \ each-integer-from label-is-loop?
 ] unit-test
 
 DEFER: a'''

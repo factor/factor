@@ -1,7 +1,7 @@
 ! Copyright (C) 2008 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors kernel quotations help.syntax help.markup
-io.sockets strings calendar io.encodings.utf8 ;
+USING: help.markup help.syntax io.encodings.utf8 io.sockets
+quotations strings ;
 IN: smtp
 
 HELP: smtp-config

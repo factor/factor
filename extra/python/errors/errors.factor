@@ -1,6 +1,6 @@
-USING: accessors alien alien.c-types alien.data combinators.short-circuit
-destructors.private kernel namespaces python.ffi sequences vocabs.loader
-words ;
+USING: accessors alien alien.c-types alien.data
+combinators.short-circuit destructors.private kernel namespaces
+python.ffi sequences words ;
 IN: python.errors
 
 <PRIVATE

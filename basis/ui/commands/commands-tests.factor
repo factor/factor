@@ -23,19 +23,19 @@ testing "testing" "hey" {
 } define-command-map
 
 os macosx? [
-    [ "⌘A" ] [ T{ key-down f { A+ } "a" } gesture>string ] unit-test
-    [ "B" ] [ T{ key-down f f "b" } gesture>string ] unit-test
+    { "⌘A" } [ T{ key-down f { M+ } "a" } gesture>string ] unit-test
+    { "B" } [ T{ key-down f f "b" } gesture>string ] unit-test
 
-    [ "⌃X" ] [
+    { "⌃X" } [
         [
             { $command testing "testing" com-test-1 } print-element
         ] with-string-writer
     ] unit-test
 ] [
-    [ "A+a" ] [ T{ key-down f { A+ } "a" } gesture>string ] unit-test
-    [ "b" ] [ T{ key-down f f "b" } gesture>string ] unit-test
+    { "A+a" } [ T{ key-down f { A+ } "a" } gesture>string ] unit-test
+    { "b" } [ T{ key-down f f "b" } gesture>string ] unit-test
 
-    [ "C+x" ] [
+    { "C+x" } [
         [
             { $command testing "testing" com-test-1 } print-element
         ] with-string-writer

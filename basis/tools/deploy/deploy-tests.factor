@@ -27,7 +27,7 @@ delete-staging-images
     } [
         "hello-world" deploy
         "hello-world" deploy-path 1array
-        ascii [ lines ] with-process-reader
+        ascii [ read-lines ] with-process-reader
     ] with-variables
 ] long-unit-test
 
@@ -143,7 +143,7 @@ os macosx? [
 { { "a" "b" "c" } } [
     "tools.deploy.test.15" shake-and-bake deploy-test-command
     { "a" "b" "c" } append
-    ascii [ lines ] with-process-reader
+    ascii [ read-lines ] with-process-reader
     rest
 ] long-unit-test
 

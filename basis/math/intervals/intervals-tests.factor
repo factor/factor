@@ -23,6 +23,10 @@ IN: math.intervals.tests
 
 { T{ interval f { 1 t } { 1 t } } } [ 1 [a,a] ] unit-test
 
+{ T{ interval f { 0 t } { 42 t } } } [ 42 [0,b] ] unit-test
+
+{ T{ interval f { 0 t } { 42 f } } } [ 42 [0,b) ] unit-test
+
 ! Not sure how to handle NaNs yet...
 ! [ 1 0/0. [a,b] ] must-fail
 ! [ 0/0. 1 [a,b] ] must-fail
@@ -394,9 +398,9 @@ commutative-ops [
 
 { f } [ empty-interval interval-zero? ] unit-test
 
-{ f } [ -1/0. 1/0. [ empty-interval interval-contains? ] bi@ or ] unit-test
+{ f f } [ -1/0. 1/0. [ empty-interval interval-contains? ] bi@ ] unit-test
 
-{ t } [ -1/0. 1/0. [ full-interval interval-contains? ] bi@ and ] unit-test
+{ t t } [ -1/0. 1/0. [ full-interval interval-contains? ] bi@ ] unit-test
 
 ! Interval bitand
 ${ 0 0xaf [a,b] } [ 0 0xff [a,b] 0 0xaf [a,b] interval-bitand ] unit-test
@@ -413,15 +417,15 @@ ${ 0 0xff [a,b] } [ -0xff -1 [a,b] 0 0xff [a,b] interval-bitand ] unit-test
     [ 0 15 [a,b] interval-contains? ] all?
 ] unit-test
 
-${ 0 256 [a,b] } [ 0 255 [a,b] dup interval-bitor ] unit-test
-${ 0 512 [a,b] } [ 0 256 [a,b] dup interval-bitor ] unit-test
+${ 0 255 [a,b] } [ 0 255 [a,b] dup interval-bitor ] unit-test
+${ 0 511 [a,b] } [ 0 256 [a,b] dup interval-bitor ] unit-test
 
 ${ -128 127 [a,b] } [ -128 127 [a,b] dup interval-bitor ] unit-test
 ${ -256 255 [a,b] } [ -128 128 [a,b] dup interval-bitor ] unit-test
 
 { full-interval } [ full-interval -128 127 [a,b] interval-bitor ] unit-test
 ${ 0 [a,inf] } [ 0 [a,inf] dup interval-bitor ] unit-test
-{ full-interval } [ 0 [-inf,a] dup interval-bitor ] unit-test
+{ full-interval } [ 0 [-inf,b] dup interval-bitor ] unit-test
 ${ 4 [a,inf] } [ 4 [a,inf] 3 [a,inf] interval-bitor ] unit-test
 
 ! Interval bitxor
@@ -434,6 +438,6 @@ ${ 0 127 [a,b] } [ -128 -1 [a,b] dup interval-bitxor ] unit-test
 
 { full-interval } [ full-interval -128 127 [a,b] interval-bitxor ] unit-test
 ${ 0 [a,inf] } [ 0 [a,inf] dup interval-bitxor ] unit-test
-${ 0 [a,inf] } [ -1 [-inf,a] dup interval-bitxor ] unit-test
+${ 0 [a,inf] } [ -1 [-inf,b] dup interval-bitxor ] unit-test
 ${ 0 [a,inf] } [ 4 [a,inf] 3 [a,inf] interval-bitxor ] unit-test
 { full-interval } [ 4 [a,inf] -3 [a,inf] interval-bitxor ] unit-test

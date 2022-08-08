@@ -8,7 +8,6 @@ USING:
     alien.syntax
     classes.struct
     combinators
-    kernel
     ogg
     system
 ;

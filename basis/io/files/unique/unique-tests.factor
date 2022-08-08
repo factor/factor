@@ -1,7 +1,6 @@
-USING: accessors continuations io.directories
-io.directories.hierarchy io.encodings.ascii io.files
-io.files.info io.files.temp io.files.unique io.pathnames kernel
-namespaces sequences strings tools.test ;
+USING: accessors continuations io.directories io.encodings.ascii
+io.files io.files.info io.files.temp io.files.unique
+io.pathnames kernel namespaces sequences strings tools.test ;
 
 { 123 } [
     [
@@ -33,7 +32,7 @@ namespaces sequences strings tools.test ;
 { t } [
     [
         [ ] with-unique-directory
-        [ exists? ] [ delete-tree ] bi
+        [ file-exists? ] [ delete-tree ] bi
     ] with-temp-directory
 ] unit-test
 

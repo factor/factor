@@ -1,11 +1,8 @@
 ! Copyright (C) 2005, 2010, 2018, 2020 Slava Pestov, Joe Groff, and Cat Stevens.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays classes.singleton columns combinators
-combinators.short-circuit combinators.smart formatting fry
-grouping kernel locals math math.bits math.functions math.order
-math.private math.ranges math.statistics math.vectors
-math.vectors.private sequences sequences.deep sequences.private
-slots.private summary ;
+USING: arrays combinators combinators.short-circuit kernel math
+math.functions math.order math.private math.vectors ranges
+sequences sequences.deep sequences.private slots.private ;
 IN: math.matrices
 
 ! defined here because of issue #1943
@@ -62,23 +59,23 @@ PREDICATE: zero-square-matrix < square-matrix
     dup <zero-matrix> ; inline
 
 <PRIVATE
-: (nth-from-end) ( n seq -- n )
+: (nth-from-tail) ( n seq -- n )
     length 1 - swap - ; inline flushable
 
 : nth-end ( n seq -- elt )
-    [ (nth-from-end) ] keep nth ; inline flushable
+    [ (nth-from-tail) ] keep nth ; inline flushable
 
 : nth-end-unsafe ( n seq -- elt )
-    [ (nth-from-end) ] keep nth-unsafe ; inline flushable
+    [ (nth-from-tail) ] keep nth-unsafe ; inline flushable
 
 : array-nth-end-unsafe ( n seq -- elt )
-    [ (nth-from-end) ] keep swap 2 fixnum+fast slot ; inline flushable
+    [ (nth-from-tail) ] keep swap 2 fixnum+fast slot ; inline flushable
 
 : set-nth-end ( elt n seq -- )
-    [ (nth-from-end) ] keep set-nth ; inline
+    [ (nth-from-tail) ] keep set-nth ; inline
 
 : set-nth-end-unsafe ( elt n seq -- )
-    [ (nth-from-end) ] keep set-nth-unsafe ; inline
+    [ (nth-from-tail) ] keep set-nth-unsafe ; inline
 PRIVATE>
 
 ! main-diagonal matrix
@@ -124,8 +121,8 @@ ALIAS: transpose flip
   first-unsafe length <iota> ; inline
 
 : unshaped-cols-iota ( matrix -- cols-iota )
-  [ first-unsafe length 1 ] keep
-  [ length min ] (each) (each-integer) <iota> ; inline
+  [ first-unsafe length ] keep
+  [ length min ] 1 each-from <iota> ; inline
 
 : generic-anti-transpose-unsafe ( cols-iota matrix -- newmatrix )
     [ <reversed> [ nth-end-unsafe ] with { } map-as ] curry { } map-as ; inline
@@ -190,7 +187,7 @@ M: matrix <square-cols>
 
 <PRIVATE ! implementation details of <lower-matrix> and <upper-matrix>
 : dimension-range ( matrix -- dim range )
-    dimension [ <coordinate-matrix> ] [ first [1,b] ] bi ;
+    dimension [ <coordinate-matrix> ] [ first [1..b] ] bi ;
 
 : upper-matrix-indices ( matrix -- matrix' )
     dimension-range <reversed> [ tail-slice* >array ] 2map concat ;
@@ -260,47 +257,61 @@ DEFER: matrix-set-nths
 : mmin ( m -- n ) [ 1/0. ] dip [ [ min ] each ] each ;
 : mmax ( m -- n ) [ -1/0. ] dip [ [ max ] each ] each ;
 
-: m-infinity-norm ( m -- n )
-    dup zero-matrix? [ drop 0. ] [
+: matrix-l-infinity-norm ( m -- n )
+    dup zero-matrix? [ drop 0 ] [
         [ [ abs ] map-sum ] map supremum
-    ] if ;
+    ] if ; inline foldable
 
-: m-1norm ( m -- n )
-    dup zero-matrix? [ drop 0. ] [
-        flip m-infinity-norm
-    ] if ;
+: matrix-l1-norm ( m -- n )
+    dup zero-matrix? [ drop 0 ] [
+        flip matrix-l-infinity-norm
+    ] if ; inline foldable
 
-: frobenius-norm ( m -- n )
-    dup zero-matrix? [ drop 0. ] [
+: matrix-l2-norm ( m -- n )
+    dup zero-matrix? [ drop 0 ] [
         [ [ sq ] map-sum ] map-sum sqrt
-    ] if ;
+    ] if ; inline foldable
 
-ALIAS: hilbert-schmidt-norm frobenius-norm
+! XXX: M: zero-matrix l1-norm drop 0 ; inline
+! XXX: M: matrix l1-norm matrix-l1-norm ; inline
+
+! XXX: M: zero-matrix l2-norm drop 0 ; inline
+! XXX: M: matrix l2-norm matrix-l2-norm ; inline
+
+! XXX: M: zero-matrix l-infinity-norm drop 0 ; inline
+! XXX: M: matrix l-infinity-norm matrix-l-infinity-norm ; inline
+
+ALIAS: frobenius-norm matrix-l2-norm
+ALIAS: hilbert-schmidt-norm matrix-l2-norm
 
 :: matrix-p-q-norm ( m p q -- n )
-    m dup zero-matrix? [ drop 0. ] [
+    m dup zero-matrix? [ drop 0 ] [
         [ [ sq ] map-sum q p / ^ ] map-sum q recip ^
-    ] if ;
+    ] if ; inline foldable
 
 : matrix-p-norm-entrywise ( m p -- n )
-    dup zero-matrix? [ 2drop 0. ] [
-        [ flatten1 V{ } like ] dip p-norm-default
-    ] if ;
+    [ flatten1 V{ } like ] dip p-norm-default ; inline
+
+! XXX: M: zero-matrix p-norm-default 2drop 0 ; inline
+! XXX: M: matrix p-norm-default matrix-p-norm-entrywise ; inline
 
 : matrix-p-norm ( m p -- n )
-    dup zero-matrix? [ 2drop 0. ] [
+    over zero-matrix? [ 2drop 0 ] [
         {
-            { [ dup 1 = ] [ drop m-1norm ] }
-            { [ dup 2 = ] [ drop frobenius-norm ] }
-            { [ dup fp-infinity? ] [ drop m-infinity-norm ] }
+            { [ dup 1 number= ] [ drop matrix-l1-norm ] }
+            { [ dup 2 number= ] [ drop matrix-l2-norm ] }
+            { [ dup fp-infinity? ] [ drop matrix-l-infinity-norm ] }
             [ matrix-p-norm-entrywise ]
         } cond
-    ] if ;
+    ] if ; inline foldable
 
-: normalize-matrix ( m -- m' )
-    dup zero-matrix? [ ] [
+! XXX: M: zero-matrix p-norm 2drop 0 ; inline
+! XXX: M: matrix p-norm matrix-p-norm ; inline
+
+: matrix-normalize ( m -- m' )
+    dup zero-matrix? [
         dup mabs mmax m/n
-    ] if ;
+    ] unless ; inline foldable
 
 ! well-defined for square matrices; but works on nonsquare too
 : main-diagonal ( matrix -- seq )

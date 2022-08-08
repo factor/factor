@@ -1,12 +1,13 @@
 ! Copyright (C) 2008, 2011 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays assocs combinators.short-circuit
-debugger formatting fry help help.home help.topics help.vocabs
-html html.streams io.directories io.encodings.binary
-io.encodings.utf8 io.files io.files.temp io.pathnames kernel
-locals make math math.parser memoize namespaces regexp sequences
-sequences.deep serialize sorting splitting tools.completion
-vocabs vocabs.hierarchy words xml.data xml.syntax xml.traversal
+USING: accessors arrays ascii assocs colors
+combinators.short-circuit debugger formatting help help.home
+help.topics help.vocabs html html.streams io.directories
+io.encodings.ascii io.encodings.binary io.encodings.utf8
+io.files io.files.temp io.pathnames kernel make math math.parser
+namespaces regexp sequences sequences.deep serialize sets
+sorting splitting strings system tools.completion vocabs
+vocabs.hierarchy words xml.data xml.syntax xml.traversal
 xml.writer ;
 FROM: io.encodings.ascii => ascii ;
 FROM: ascii => ascii? ;
@@ -72,24 +73,55 @@ M: pathname url-of
     swap "\n" glue [XML <style><-></style> XML] ;
 
 : help-meta ( -- xml )
-    [XML <meta
+    [XML
+        <meta
             name="viewport"
             content="width=device-width, initial-scale=1"
-        /> XML] ;
+            charset="utf-8"
+        />
+        <meta
+            name="theme-color"
+            content="#f5f5f5"
+            media="(prefers-color-scheme: light)"
+        />
+        <meta
+            name="theme-color"
+            content="#373e48"
+            media="(prefers-color-scheme: dark)"
+        />
+    XML] ;
 
-: help-navbar ( -- xml )
+: help-nav ( -- xml )
     "conventions" >link topic>filename
     [XML
-        <div class="navbar">
-        <a href="/">Handbook</a>
-        <a href=<->>Glossary</a>
-        <form method="get" action="/search" style="float: right;">
-            <input placeholder="Search" name="search" type="text"/>
-            <input type="submit" value="Go"/>
-            <a href="//factorcode.org">factorcode.org</a>
-        </form>
-        </div>
+        <nav>
+            <a href="https://factorcode.org">
+            <img src="favicon.ico" width="24" height="24" />
+            </a>
+            <a href="/">Handbook</a>
+            <a href=<->>Glossary</a>
+            <form method="get" action="/search" style="float: right;">
+                <input placeholder="Search" name="search" type="text"/>
+                <input type="submit" value="Go"/>
+            </form>
+        </nav>
      XML] ;
+
+: help-footer ( -- xml )
+    version-info "\n" split1 drop
+    [XML
+        <footer>
+        <p>
+        This documentation was generated offline from a
+        <code>load-all</code> image.  If you want, you can also
+        browse the documentation from within the <a
+        href="article-ui-tools.html">UI developer tools</a>. See
+        the <a href="https://factorcode.org">Factor website</a>
+        for more information.
+        </p>
+        <p><-></p>
+        </footer>
+    XML] ;
 
 : bijective-base26 ( n -- name )
     [ dup 0 > ] [ 1 - 26 /mod CHAR: a + ] "" produce-as nip reverse! ;
@@ -97,7 +129,7 @@ M: pathname url-of
 : css-class ( style classes -- name )
     dup '[ drop _ assoc-size 1 + bijective-base26 ] cache ;
 
-: css-style ( style -- style' )
+: fix-css-style ( style -- style' )
     R/ font-size: \d+pt;/ [
         "font-size: " ?head drop "pt;" ?tail drop
         string>number 2 -
@@ -116,12 +148,63 @@ M: pathname url-of
 
     R/ font-family: monospace;/ [
         " white-space: pre-wrap; line-height: 125%;" append
-    ] re-replace-with ;
+    ] re-replace-with
+
+    dup { "font-family: monospace;" "background-color:" } [ subseq-index? ] with all? [
+        " margin: 10px 0px;" append
+    ] when
+
+    dup { "border:" "background-color:" } [ subseq-index? ] with all? [
+        " border-radius: 5px;" append
+    ] when ;
+
+: fix-help-header ( classes -- classes )
+    dup [
+        [ ".a" head? ] [ "#f4efd9;" subseq-index? ] bi and
+    ] find [
+        "padding: 10px;" "padding: 0px;" replace
+        "background-color: #f4efd9;" "background-color: white;" replace
+        "}" ?tail drop
+        " border-bottom: 1px dashed #ccc; width: 100%; padding-top: 15px; padding-bottom: 10px; }"
+        append swap pick set-nth {
+            ".a a { color: black; font-size: 24pt; line-height: 100%; }"
+            ".a * a { color: #2a5db0; font-size: 12pt; }"
+            ".a td { border: none; }"
+            ".a tr:hover { background-color: white; }"
+        } prepend
+    ] [ drop ] if* ;
+
+: dark-mode-css ( classes -- classes' )
+    { "" "/* Dark mode */" "@media (prefers-color-scheme:dark) {" }
+    swap [
+        R/ {[^}]+}/ [
+            "{" ?head drop "}" ?tail drop ";" split
+            [ [ blank? ] trim ] map harvest [ ";" append ] map
+            [ R/ (#[0-9a-fA-F]+|white|black);/ re-contains? ] filter
+            [
+                R/ (#[0-9a-fA-F]+|white|black);/ [
+                    >string H{
+                        { "#000000;" "#bdc1c6;" }
+                        { "#2a5db0;" "#8ab4f8;" }
+                        { "#333333;" "#cccccc;" }
+                        { "#373e48;" "#ffffff;" }
+                        { "#8b4500;" "orange;" }
+                        { "#e3e2db;" "#444444;" }
+                        { "white;" "#202124;" }
+                        { "black;" "white;" }
+                    } ?at [
+                        but-last parse-color inverse-color color>hex ";" append
+                    ] unless
+                ] re-replace-with
+            ] map " " join "{ " " }" surround
+        ] re-replace-with "    " prepend
+        dup "{  }" subseq-index? [ drop f ] when
+    ] map harvest append "}" suffix ;
 
 : css-classes ( classes -- stylesheet )
     [
-        [ css-style " { " "}" surround ] [ "." prepend ] bi* prepend
-    ] { } assoc>map "\n" join ;
+        [ fix-css-style " { " "}" surround ] [ "." prepend ] bi* prepend
+    ] { } assoc>map fix-help-header dup dark-mode-css append join-lines ;
 
 :: css-styles-to-classes ( body -- stylesheet body )
     H{ } clone :> classes
@@ -142,10 +225,10 @@ M: pathname url-of
     ] each classes sort-values css-classes body ;
 
 : retina-image ( path -- path' )
-    "@2x" over subseq? [ "." split1-last "@2x." glue ] unless ;
+    dup "@2x" subseq-index? [ "." split1-last "@2x." glue ] unless ;
 
 : ?copy-file ( from to -- )
-    dup exists? [ 2drop ] [ copy-file ] if ;
+    dup file-exists? [ 2drop ] [ copy-file ] if ;
 
 : cache-images ( body -- body' )
     dup [
@@ -166,8 +249,9 @@ M: pathname url-of
     [
         [ print-topic ] with-html-writer
         css-styles-to-classes cache-images
-        [ help-stylesheet help-meta prepend help-navbar ] dip
-        [XML <div id="container"><-><div class="page"><-></div></div> XML]
+        "resource:extra/websites/factorcode/favicon.ico" dup file-name ?copy-file
+        [ help-stylesheet help-meta prepend help-nav ] dip help-footer
+        [XML <-><div class="page"><-><-></div> XML]
     ] bi simple-page ;
 
 : generate-help-file ( topic -- )
@@ -237,8 +321,24 @@ MEMO: load-index ( name -- index )
 : article-apropos ( string -- results )
     "articles.idx" offline-apropos ;
 
-: word-apropos ( string -- results )
-    "words.idx" offline-apropos ;
-
 : vocab-apropos ( string -- results )
     "vocabs.idx" offline-apropos ;
+
+: generate-qualified-index ( index -- )
+    H{ } clone [
+        '[
+            over "," split1 nip ".html" ?tail drop
+            [ swap ":" glue 2array ] [ _ push-at ] bi
+        ] assoc-each
+    ] keep [ swap ] { } assoc-map-as
+    "qualified.idx" binary [ serialize ] with-file-writer ;
+
+: qualified-index ( str index -- str index' )
+    over ":" split1 [
+        "qualified.idx"
+        dup file-exists? [ pick generate-qualified-index ] unless
+        load-index completions keys concat
+    ] [ drop f ] if [ append ] unless-empty ;
+
+: word-apropos ( string -- results )
+    "words.idx" load-index qualified-index completions ;

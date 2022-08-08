@@ -1,0 +1,276 @@
+<?xml version="1.0"?>
+<!DOCTYPE MODE SYSTEM "xmode.dtd">
+
+<!-- Dart mode by Chris Sullins
+This is a jedit mode file for Dart programming language.
+Copyright (C) 2012 Chris Sullins, based on javascript mode by Andre Kaplan
+
+This program is free software; you can redistribute it and/or
+modify it under the terms of the GNU General Public License
+as published by the Free Software Foundation; either version 2
+of the License, or (at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program; if not, write to the Free Software
+Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+-->
+
+<MODE>
+	<PROPS>
+		<PROPERTY NAME="commentStart" VALUE="/*" />
+		<PROPERTY NAME="commentEnd" VALUE="*/" />
+		<PROPERTY NAME="lineComment" VALUE="//" />
+		<PROPERTY NAME="wordBreakChars" VALUE=",+-=&lt;&gt;/?^&amp;*" />
+		
+		<!-- Auto indent -->
+		<PROPERTY NAME="indentOpenBrackets" VALUE="{[" />
+		<PROPERTY NAME="indentCloseBrackets" VALUE="]}" />
+		<PROPERTY NAME="unalignedOpenBrackets" VALUE="(" />
+		<PROPERTY NAME="unalignedCloseBrackets" VALUE=")" />
+		<PROPERTY NAME="indentNextLine"
+			VALUE="\s*(((if|while)\s*\(|else\s*|else\s+if\s*\(|for\s*\(.*\))[^{;]*)" />
+		<PROPERTY NAME="unindentThisLine"
+			VALUE="^.*(default:\s*|case.*:.*)$" />
+		<PROPERTY NAME="electricKeys" VALUE=":" />
+	</PROPS>
+	
+	<!-- DART string literal where variables get parsed -->
+	<RULES SET="DART_LITERAL1" DEFAULT="LITERAL1" ESCAPE="\">
+		<!-- expressions in curly braces ("${foo}") -->
+		<SPAN_REGEXP HASH_CHAR="$" TYPE="LITERAL4" DELEGATE="DART_EXPRESSION">
+			<BEGIN>\$\{</BEGIN>
+			<END>}</END>
+		</SPAN_REGEXP>
+		
+		<SEQ_REGEXP HASH_CHAR="$" TYPE="LITERAL4">\$[_a-zA-Z][_a-zA-Z0-9]*</SEQ_REGEXP>
+	</RULES>
+	
+	<RULES SET="DART_EXPRESSION"
+		HIGHLIGHT_DIGITS="TRUE"
+		DIGIT_RE="(0x[\p{XDigit}]+[lL]?|[\p{Digit}]+(e[\p{Digit}]*)?[lLdDfF]?)">
+		
+		<SPAN TYPE="COMMENT3">
+			<BEGIN>/**</BEGIN>
+			<END>*/</END>
+		</SPAN>
+		
+		<SPAN TYPE="COMMENT1">
+			<BEGIN>/*</BEGIN>
+			<END>*/</END>
+		</SPAN>
+		
+		<SPAN TYPE="LITERAL1">
+			<BEGIN>@"""</BEGIN>
+			<END>"""</END>
+		</SPAN>
+		
+		<SPAN TYPE="LITERAL1">
+			<BEGIN>@'''</BEGIN>
+			<END>'''</END>
+		</SPAN>
+		
+		<SPAN TYPE="LITERAL1" NO_LINE_BREAK="TRUE" ESCAPE="\">
+			<BEGIN>@"</BEGIN>
+			<END>"</END>
+		</SPAN>
+		
+		<SPAN TYPE="LITERAL1" NO_LINE_BREAK="TRUE" ESCAPE="\">
+			<BEGIN>@'</BEGIN>
+			<END>'</END>
+		</SPAN>
+		
+		<SPAN TYPE="LITERAL1" DELEGATE="DART_LITERAL1">
+			<BEGIN>"""</BEGIN>
+			<END>"""</END>
+		</SPAN>
+		
+		<SPAN TYPE="LITERAL1" DELEGATE="DART_LITERAL1">
+			<BEGIN>'''</BEGIN>
+			<END>'''</END>
+		</SPAN>
+		
+		<SPAN TYPE="LITERAL1" NO_LINE_BREAK="TRUE" ESCAPE="\" DELEGATE="DART_LITERAL1">
+			<BEGIN>"</BEGIN>
+			<END>"</END>
+		</SPAN>
+		
+		<SPAN TYPE="LITERAL1" NO_LINE_BREAK="TRUE" ESCAPE="\" DELEGATE="DART_LITERAL1">
+			<BEGIN>'</BEGIN>
+			<END>'</END>
+		</SPAN>
+		
+		<SEQ TYPE="OPERATOR">=</SEQ>
+		<SEQ TYPE="OPERATOR">!</SEQ>
+		<SEQ TYPE="OPERATOR">&gt;=</SEQ>
+		<SEQ TYPE="OPERATOR">&lt;=</SEQ>
+		<SEQ TYPE="OPERATOR">+</SEQ>
+		<SEQ TYPE="OPERATOR">-</SEQ>
+		<SEQ TYPE="OPERATOR">/</SEQ>
+		<SEQ TYPE="OPERATOR">*</SEQ>
+		<SEQ TYPE="OPERATOR">&gt;</SEQ>
+		<SEQ TYPE="OPERATOR">&lt;</SEQ>
+		<SEQ TYPE="OPERATOR">%</SEQ>
+		<SEQ TYPE="OPERATOR">&amp;</SEQ>
+		<SEQ TYPE="OPERATOR">|</SEQ>
+		<SEQ TYPE="OPERATOR">^</SEQ>
+		<SEQ TYPE="OPERATOR">&lt;&lt;</SEQ>
+		<SEQ TYPE="OPERATOR">&gt;&gt;&gt;</SEQ>
+		<SEQ TYPE="OPERATOR">&gt;&gt;</SEQ>
+		<SEQ TYPE="OPERATOR">~/</SEQ>
+		
+		<SEQ TYPE="OPERATOR">.</SEQ>
+		<SEQ TYPE="OPERATOR">;</SEQ>
+		<SEQ TYPE="OPERATOR">]</SEQ>
+		<SEQ TYPE="OPERATOR">[</SEQ>
+		<SEQ TYPE="OPERATOR">}</SEQ>
+		<SEQ TYPE="OPERATOR">{</SEQ>
+		
+		<MARK_PREVIOUS TYPE="FUNCTION" MATCH_TYPE="OPERATOR">(</MARK_PREVIOUS>
+		<SEQ TYPE="OPERATOR">)</SEQ>
+		
+		<KEYWORDS>
+			<!-- literals -->
+			<LITERAL2>null</LITERAL2>
+			<LITERAL2>true</LITERAL2>
+			<LITERAL2>false</LITERAL2>
+			
+			<!-- types -->
+			<KEYWORD3>bool</KEYWORD3>
+			<KEYWORD3>int</KEYWORD3>
+			<KEYWORD3>double</KEYWORD3>
+			<KEYWORD3>num</KEYWORD3>
+			<KEYWORD3>void</KEYWORD3>
+			
+			<!-- stdlib types -->
+			<!-- comment out for consistency with user-defined types -->
+			<KEYWORD4>AssertionError</KEYWORD4>
+			<KEYWORD4>Clock</KEYWORD4>
+			<KEYWORD4>Collection</KEYWORD4>
+			<KEYWORD4>Comparable</KEYWORD4>
+			<KEYWORD4>Date</KEYWORD4>
+			<KEYWORD4>Dispatcher</KEYWORD4>
+			<KEYWORD4>Duration</KEYWORD4>
+			<KEYWORD4>Expect</KEYWORD4>
+			<KEYWORD4>FallThroughError</KEYWORD4>
+			<KEYWORD4>Function</KEYWORD4>
+			<KEYWORD4>HashMap</KEYWORD4>
+			<KEYWORD4>HashSet</KEYWORD4>
+			<KEYWORD4>Hashable</KEYWORD4>
+			<KEYWORD4>Isolate</KEYWORD4>
+			<KEYWORD4>Iterable</KEYWORD4>
+			<KEYWORD4>Iterator</KEYWORD4>
+			<KEYWORD4>LinkedHashMap</KEYWORD4>
+			<KEYWORD4>List</KEYWORD4>
+			<KEYWORD4>Map</KEYWORD4>
+			<KEYWORD4>Match</KEYWORD4>
+			<KEYWORD4>Math</KEYWORD4>
+			<KEYWORD4>Object</KEYWORD4>
+			<KEYWORD4>Pattern</KEYWORD4>
+			<KEYWORD4>Promise</KEYWORD4>
+			<KEYWORD4>Proxy</KEYWORD4>
+			<KEYWORD4>Queue</KEYWORD4>
+			<KEYWORD4>ReceivePort</KEYWORD4>
+			<KEYWORD4>RegExp</KEYWORD4>
+			<KEYWORD4>SendPort</KEYWORD4>
+			<KEYWORD4>Set</KEYWORD4>
+			<KEYWORD4>StopWatch</KEYWORD4>
+			<KEYWORD4>String</KEYWORD4>
+			<KEYWORD4>StringBuffer</KEYWORD4>
+			<KEYWORD4>Strings</KEYWORD4>
+			<KEYWORD4>TimeZone</KEYWORD4>
+			<KEYWORD4>TypeError</KEYWORD4>
+			
+			<!-- stdlib exceptions -->
+			<KEYWORD4>BadNumberFormatException</KEYWORD4>
+			<KEYWORD4>ClosureArgumentMismatchException</KEYWORD4>
+			<KEYWORD4>EmptyQueueException</KEYWORD4>
+			<KEYWORD4>Exception</KEYWORD4>
+			<KEYWORD4>ExpectException</KEYWORD4>
+			<KEYWORD4>IllegalAccessException</KEYWORD4>
+			<KEYWORD4>IllegalArgumentException</KEYWORD4>
+			<KEYWORD4>IllegalJSRegExpException</KEYWORD4>
+			<KEYWORD4>IndexOutOfRangeException</KEYWORD4>
+			<KEYWORD4>IntegerDivisionByZeroException</KEYWORD4>
+			<KEYWORD4>NoMoreElementsException</KEYWORD4>
+			<KEYWORD4>NoSuchMethodException</KEYWORD4>
+			<KEYWORD4>NotImplementedException</KEYWORD4>
+			<KEYWORD4>NullPointerException</KEYWORD4>
+			<KEYWORD4>ObjectNotClosureException</KEYWORD4>
+			<KEYWORD4>OutOfMemoryException</KEYWORD4>
+			<KEYWORD4>StackOverflowException</KEYWORD4>
+			<KEYWORD4>UnsupportedOperationException</KEYWORD4>
+			<KEYWORD4>WrongArgumentCountException</KEYWORD4>
+			
+			<KEYWORD1>is</KEYWORD1>
+			<KEYWORD1>implements</KEYWORD1>
+			
+			<KEYWORD1>const</KEYWORD1>
+			<KEYWORD1>new</KEYWORD1>
+			<LITERAL2>this</LITERAL2>
+			<LITERAL2>super</LITERAL2>
+		</KEYWORDS>
+	</RULES>
+	
+	<RULES
+		HIGHLIGHT_DIGITS="TRUE"
+		DIGIT_RE="(0x[\p{XDigit}]+[lL]?|[\p{Digit}]+(e[\p{Digit}]*)?[lLdDfF]?)"
+		IGNORE_CASE="FALSE">
+		
+		<SEQ TYPE="COMMENT2">//--&gt;</SEQ>
+		<EOL_SPAN TYPE="COMMENT2">//</EOL_SPAN>
+		
+		<EOL_SPAN TYPE="KEYWORD2">#!</EOL_SPAN>
+		<SEQ TYPE="KEYWORD2">#library</SEQ>
+		<SEQ TYPE="KEYWORD2">#import</SEQ>
+		<SEQ TYPE="KEYWORD2">#source</SEQ>
+		<SEQ TYPE="KEYWORD2">#resource</SEQ>
+		
+		<KEYWORDS>
+			<!-- general keywords -->
+			<KEYWORD1>abstract</KEYWORD1>
+			<KEYWORD1>assert</KEYWORD1>
+			<KEYWORD1>class</KEYWORD1>
+			<KEYWORD1>extends</KEYWORD1>
+			<KEYWORD1>factory</KEYWORD1>
+			<KEYWORD1>get</KEYWORD1>
+			<KEYWORD1>import</KEYWORD1>
+			<KEYWORD1>interface</KEYWORD1>
+			<KEYWORD1>library</KEYWORD1>
+			<KEYWORD1>negate</KEYWORD1>
+			<KEYWORD1>operator</KEYWORD1>
+			<KEYWORD1>set</KEYWORD1>
+			<KEYWORD1>source</KEYWORD1>
+			<KEYWORD1>static</KEYWORD1>
+			<KEYWORD1>typedef</KEYWORD1>
+			
+			<!-- control keywords -->
+			<KEYWORD1>var</KEYWORD1>
+			<KEYWORD1>final</KEYWORD1>
+			<KEYWORD1>if</KEYWORD1>
+			<KEYWORD1>else</KEYWORD1>
+			<KEYWORD1>for</KEYWORD1>
+			<KEYWORD1>in</KEYWORD1>
+			<KEYWORD1>while</KEYWORD1>
+			<KEYWORD1>do</KEYWORD1>
+			<KEYWORD1>switch</KEYWORD1>
+			<KEYWORD1>case</KEYWORD1>
+			<KEYWORD1>default</KEYWORD1>
+			<KEYWORD1>in</KEYWORD1>
+			<KEYWORD1>try</KEYWORD1>
+			<KEYWORD1>catch</KEYWORD1>
+			<KEYWORD1>finally</KEYWORD1>
+			<KEYWORD1>return</KEYWORD1>
+			<KEYWORD1>break</KEYWORD1>
+			<KEYWORD1>continue</KEYWORD1>
+			<KEYWORD1>throw</KEYWORD1>
+			<KEYWORD1>assert</KEYWORD1>
+		</KEYWORDS>
+		
+		<IMPORT DELEGATE="DART_EXPRESSION" />
+	</RULES>
+</MODE>

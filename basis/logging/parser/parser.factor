@@ -2,8 +2,8 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors assocs calendar calendar.format calendar.parser
 combinators io io.encodings.utf8 io.files kernel logging
-logging.server make namespaces peg peg.parsers prettyprint sequences
-strings vectors words ;
+logging.server make namespaces peg peg.parsers prettyprint
+sequences splitting strings vectors words ;
 IN: logging.parser
 
 TUPLE: log-entry date level word-name message ;
@@ -81,7 +81,7 @@ PEG: parse-log-line ( string -- entry ) log-line-parser ;
     ] { } make ;
 
 : parse-log-file ( service -- entries )
-    log-path 1 log# dup exists?
+    log-path 1 log# dup file-exists?
     [ utf8 file-lines parse-log ] [ drop f ] if ;
 
 GENERIC: log-timestamp. ( date -- )
@@ -95,7 +95,7 @@ M: word log-timestamp. drop "multiline" write ;
         [ date>> log-timestamp. bl ]
         [ level>> pprint bl ]
         [ word-name>> write nl ]
-        [ message>> "\n" join print ]
+        [ message>> join-lines print ]
     } cleave ;
 
 : log-entries. ( errors -- )

@@ -21,7 +21,7 @@ CONSTANT: max-events 256
 M: epoll-mx dispose* fd>> close-file ;
 
 : make-event ( fd events -- event )
-    epoll-event <struct>
+    epoll-event new
         swap >>events
         tuck data>> fd<< ;
 

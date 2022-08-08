@@ -11,27 +11,24 @@ GENERIC: disassemble ( obj -- )
 
 SYMBOL: disassembler-backend
 
-HOOK: disassemble* disassembler-backend ( from to -- lines )
+HOOK: disassemble* disassembler-backend ( from to -- )
 
-TR: tabs>spaces "\t" "\s" ;
+GENERIC: convert-address ( object -- n )
 
-GENERIC: (>address) ( object -- n )
+M: integer convert-address ;
 
-M: integer (>address) ;
-M: alien (>address) alien-address ;
+M: alien convert-address alien-address ;
 
 PRIVATE>
 
 M: byte-array disassemble
     [
         [ malloc-byte-array &free alien-address dup ]
-        [ length + ] bi
-        2array disassemble
+        [ length + ] bi 2array disassemble
     ] with-destructors ;
 
 M: pair disassemble
-    first2-unsafe [ (>address) ] bi@ disassemble*
-    [ tabs>spaces print ] each ;
+    first2-unsafe [ convert-address ] bi@ disassemble* ;
 
 M: word disassemble word-code 2array disassemble ;
 

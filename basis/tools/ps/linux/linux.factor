@@ -11,7 +11,7 @@ IN: tools.ps.linux
         [ "()" member? ] trim
         "[" "]" surround
     ] [
-        nip "\0" split harvest " " join
+        nip "\0" split harvest join-words
     ] if-empty ;
 
 : safe-ps-cmdline ( path -- string/f )

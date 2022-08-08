@@ -1,6 +1,5 @@
-USING: alien alien.c-types continuations destructors
-help.markup help.syntax kernel math quotations
-specialized-arrays ;
+USING: alien alien.c-types destructors help.markup help.syntax
+quotations specialized-arrays ;
 IN: io.mmap
 
 HELP: mapped-file

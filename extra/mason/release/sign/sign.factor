@@ -1,7 +1,7 @@
 ! Copyright (C) 2016 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: io.backend io.pathnames kernel literals locals
-mason.common namespaces sequences system ;
+USING: io.backend io.pathnames kernel literals mason.common
+sequences system ;
 IN: mason.release.sign
 
 <<
@@ -12,18 +12,16 @@ IN: mason.release.sign
         [ "factor/" prepend-path ] dip prepend-path
     ] [
         ! Not in build, make dir: "resource:factor.com"
-        "resource:" prepend-path normalize-path
-    ] if* ;
+        "resource:" prepend-path
+    ] if* normalize-path ;
 
 HOOK: cert-path os ( -- path/f )
 
 M: object cert-path f ;
 
-M: macosx cert-path
-    home "config/mac_app.cer" append-path ;
+M: macosx cert-path home "config/mac_app.cer" append-path ;
 
-M: windows cert-path
-    home "config/FactorSPC.pfx" append-path ;
+M: windows cert-path home "config/FactorSPC.pfx" append-path ;
 >>
 
 HOOK: sign-factor-app os ( -- )

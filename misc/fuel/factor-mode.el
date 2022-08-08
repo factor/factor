@@ -1,4 +1,4 @@
-;;; factor-mode.el --- Major mode for editing Factor programs.
+;;; factor-mode.el --- Major mode for editing Factor programs. -*- lexical-binding: t -*-
 
 ;; Copyright (C) 2013 Erik Charlebois
 ;; Copyright (C) 2008, 2009, 2010 Jose Antonio Ortega Ruiz
@@ -355,7 +355,7 @@ these lines in your .emacs:
                 "RENAME:"
                 "SINGLETON:" "SLOT:" "SPECIALIZED-ARRAY:"
                 "TYPEDEF:"
-                "USE:")))
+                "REUSE:" "USE:")))
 
 (defconst factor-begin-of-def-regex
   (format "^USING: \\|\\(%s\\)\\|\\(^%s .*\\)"

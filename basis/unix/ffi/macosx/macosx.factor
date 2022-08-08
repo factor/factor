@@ -139,3 +139,24 @@ STRUCT: sf_hdtr
     { trl_cnt int } ;
 
 FUNCTION: int sendfile ( int fd, int s, off_t offset, off_t* len, sf_hdtr* hdtr, int flags )
+
+CONSTANT: XATTR_NOFOLLOW        0x0001
+CONSTANT: XATTR_CREATE          0x0002
+CONSTANT: XATTR_REPLACE         0x0004
+CONSTANT: XATTR_NOSECURITY      0x0008
+CONSTANT: XATTR_NODEFAULT       0x0010
+CONSTANT: XATTR_SHOWCOMPRESSION 0x0020
+
+CONSTANT: XATTR_MAXNAMELEN 127
+CONSTANT: XATTR_FINDERINFO_NAME   "com.apple.FinderInfo"
+CONSTANT: XATTR_RESOURCEFORK_NAME "com.apple.ResourceFork"
+CONSTANT: XATTR_MAXSIZE 67108864 ! 64 * 1024 * 1024
+
+FUNCTION: ssize_t getxattr ( c-string path, c-string name, void *value, size_t size, u_int32_t position, int options )
+FUNCTION: ssize_t fgetxattr ( int fd, c-string name, void *value, size_t size, u_int32_t position, int options )
+FUNCTION: int setxattr ( c-string path, c-string name, void *value, size_t size, u_int32_t position, int options )
+FUNCTION: int fsetxattr ( int fd, c-string name, void *value, size_t size, u_int32_t position, int options )
+FUNCTION: int removexattr ( c-string path, c-string name, int options )
+FUNCTION: int fremovexattr ( int fd, c-string name, int options )
+FUNCTION: ssize_t listxattr ( c-string path, c-string namebuf, size_t size, int options )
+FUNCTION: ssize_t flistxattr ( int fd, c-string namebuf, size_t size, int options )

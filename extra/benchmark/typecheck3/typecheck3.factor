@@ -1,4 +1,4 @@
-USING: math kernel kernel.private slots.private ;
+USING: math kernel slots.private ;
 IN: benchmark.typecheck3
 
 TUPLE: hello n ;

@@ -1,9 +1,7 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel accessors math.intervals
-system calendar fry
-random db db.tuples db.types
-http.server.filters ;
+USING: accessors calendar db.tuples db.types http.server.filters
+kernel math.intervals random ;
 IN: furnace.cache
 
 TUPLE: server-state id expires ;

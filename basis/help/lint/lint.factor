@@ -50,7 +50,6 @@ PRIVATE>
                 [ check-values ]
                 [ check-value-effects ]
                 [ check-class-description ]
-                [ nip check-nulls ]
                 [ nip check-see-also ]
                 [ nip check-markup ]
             } 2cleave

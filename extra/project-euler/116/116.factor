@@ -1,6 +1,6 @@
 ! Copyright (c) 2008 Eric Mertens.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel math math.ranges sequences project-euler.common ;
+USING: kernel math ranges sequences project-euler.common ;
 IN: project-euler.116
 
 ! http://projecteuler.net/index.php?section=problems&id=116
@@ -47,7 +47,7 @@ IN: project-euler.116
     V{ 1 } clone [ [ next ] 2curry times ] keep last 1 - ;
 
 : (euler116) ( length -- permutations )
-    3 [1,b] [ ways ] with map-sum ;
+    3 [1..b] [ ways ] with map-sum ;
 
 PRIVATE>
 

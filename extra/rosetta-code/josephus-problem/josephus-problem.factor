@@ -1,4 +1,4 @@
-USING: kernel locals math math.ranges sequences ;
+USING: kernel math ranges sequences ;
 IN: rosetta-code.josephus-problem
 
 ! http://rosettacode.org/wiki/Josephus_problem
@@ -41,7 +41,7 @@ IN: rosetta-code.josephus-problem
 !    mathematically.
 
 :: josephus-k ( n k -- m )
-    n [1,b] 0 [ [ k + ] dip mod ] reduce ;
+    n [1..b] 0 [ [ k + ] dip mod ] reduce ;
 
 :: josephus-2 ( n -- m )  ! faster for k=2
     n n log2 2^ - 2 * ;

@@ -1,7 +1,7 @@
 ! Copyright (c) 2012 Anonymous
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors http.client io io.encodings.ascii io.files
-io.files.temp kernel math math.parser memoize sequences
+io.files.temp kernel math math.parser sequences
 splitting urls ;
 IN: rosetta-code.text-processing.max-licenses
 
@@ -32,9 +32,9 @@ TUPLE: maxlicense max-count current-count times ;
 
 : <maxlicense> ( -- max ) -1 0 V{ } clone \ maxlicense boa ; inline
 
-: out? ( line -- ? ) [ "OUT" ] dip subseq? ; inline
+: out? ( line -- ? ) "OUT" subseq-index? ; inline
 
-: line-time ( line -- time ) " " split harvest fourth ; inline
+: line-time ( line -- time ) split-words harvest fourth ; inline
 
 : update-max-count ( max -- max' )
     dup [ current-count>> ] [ max-count>> ] bi >
@@ -62,7 +62,7 @@ TUPLE: maxlicense max-count current-count times ;
 : process ( max line -- max ) split-line inc-current-count update-time ;
 
 MEMO: mlijobs ( -- lines )
-    "mlijobs.txt" temp-file dup exists? [
+    "mlijobs.txt" temp-file dup file-exists? [
         URL" http://rosettacode.org/resources/mlijobs.txt"
         over download-to
     ] unless ascii file-lines ;

@@ -23,7 +23,13 @@ PRIVATE>
          [ dip ] keep [ (closure) ] 2curry each
      ] [ 3drop ] if ; inline recursive
 
+ : new-empty-set-like ( exemplar -- set )
+     f swap set-like clone ; inline
+
 PRIVATE>
 
+: closure-as ( vertex quot: ( vertex -- edges ) exemplar -- set )
+    new-empty-set-like [ swap (closure) ] keep ; inline
+
 : closure ( vertex quot: ( vertex -- edges ) -- set )
-    HS{ } clone [ swap (closure) ] keep ; inline
+    HS{ } closure-as ; inline

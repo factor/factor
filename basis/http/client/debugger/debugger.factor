@@ -10,4 +10,4 @@ M: too-many-redirects summary
 
 M: download-failed error.
     "HTTP request failed:" print nl
-    response>> . ;
+    response>> ... ;

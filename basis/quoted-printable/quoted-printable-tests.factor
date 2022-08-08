@@ -23,8 +23,8 @@ and we didn't know hów tö do thât" latin2 encode >quoted ] unit-test
 : message ( -- str )
     55 [ "hello" ] replicate concat ;
 
-{ f } [ message >quoted "=\r\n" swap subseq? ] unit-test
-{ 1 } [ message >quoted string-lines length ] unit-test
-{ t } [ message >quoted-lines "=\r\n" swap subseq? ] unit-test
-{ 4 } [ message >quoted-lines string-lines length ] unit-test
-{ "===o" } [ message >quoted-lines string-lines [ last ] "" map-as ] unit-test
+{ f } [ message >quoted "=\r\n" subseq-index? ] unit-test
+{ 1 } [ message >quoted split-lines length ] unit-test
+{ t } [ message >quoted-lines "=\r\n" subseq-index? ] unit-test
+{ 4 } [ message >quoted-lines split-lines length ] unit-test
+{ "===o" } [ message >quoted-lines split-lines [ last ] "" map-as ] unit-test

@@ -1,4 +1,4 @@
-USING: help.markup help.syntax ;
+USING: help.syntax ;
 IN: llvm.examples.kaleidoscope
 
 ARTICLE: "llvm.kaleidoscope" "The Kaleidoscope language"

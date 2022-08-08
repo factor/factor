@@ -58,6 +58,7 @@ IN: xml.writer.tests
 { "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<foo>\n  bar\n</foo>" }
 [ "<foo>         bar            </foo>" string>xml pprint-xml>string ] unit-test
 { "<foo'>" } [ "<foo'>" <unescaped> xml>string ] unit-test
+{ "<![CDATA[<&'\"]]>" } [ "<&'\"" <cdata> xml>string ] unit-test
 
 : test-file ( -- path )
     "test.xml" temp-file ;

@@ -1,5 +1,4 @@
-USING: help.markup help.syntax words parser quotations strings
-system sequences ;
+USING: help.markup help.syntax words ;
 IN: tools.annotations
 
 ARTICLE: "tools.annotations" "Word annotations"

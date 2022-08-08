@@ -1,8 +1,9 @@
-USING: ui ui.gadgets sequences kernel arrays math colors
-colors.constants ui.render ui.pens.polygon ui.pens.solid math.vectors
-accessors fry ui.gadgets.packs game.input ui.gadgets.labels
-ui.gadgets.borders timers calendar locals strings ui.gadgets.buttons
-combinators math.parser assocs threads ;
+USING: accessors arrays assocs calendar colors combinators
+game.input grouping kernel math math.parser math.vectors
+sequences threads timers ui ui.gadgets ui.gadgets.borders
+ui.gadgets.buttons ui.gadgets.labels ui.gadgets.packs
+ui.pens.polygon ui.pens.solid ;
+
 IN: game.input.demos.joysticks
 
 CONSTANT: SIZE { 151 151 }
@@ -87,13 +88,23 @@ TUPLE: joystick-demo-gadget < pack axis raxis controller buttons timer ;
 : add-raxis-gadget ( gadget shelf -- gadget shelf )
     <axis-gadget> [ >>raxis ] [ add-gadget-with-border ] bi-curry bi* ;
 
-:: (add-button-gadgets) ( gadget shelf -- )
-    gadget controller>> read-controller buttons>> length <iota> [
-        number>string [ drop ] <border-button>
-        shelf over add-gadget drop
-    ] map gadget buttons<< ;
+: button-pref-dim ( n -- dim )
+    number>string [ drop ] <border-button> pref-dim ;
 
-: add-button-gadgets ( gadget shelf -- gadget shelf )
+:: (add-button-gadgets) ( gadget pile -- )
+    gadget controller>> read-controller buttons>>
+    dup length button-pref-dim :> pref-dim
+    length <iota> [
+        number>string [ drop ] <border-button>
+        pref-dim >>pref-dim
+    ] map :> buttons
+    buttons gadget buttons<<
+    buttons 32 group [
+        [ <shelf> ] dip [ add-gadget ] each
+        pile swap add-gadget drop
+    ] each ;
+
+: add-button-gadgets ( gadget pile -- gadget pile )
     [ (add-button-gadgets) ] 2keep ;
 
 : <joystick-demo-gadget> ( controller -- gadget )
@@ -101,7 +112,7 @@ TUPLE: joystick-demo-gadget < pack axis raxis controller buttons timer ;
     { 0 1 } >>orientation
     swap add-controller-label
     <shelf> add-axis-gadget add-raxis-gadget add-gadget
-    <shelf> add-button-gadgets add-gadget ;
+    <pile> add-button-gadgets add-gadget ;
 
 : update-buttons ( buttons button-states -- )
     [ >>selected? drop ] 2each ;

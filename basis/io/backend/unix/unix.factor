@@ -62,7 +62,7 @@ M: unix can-seek-handle?
     fd>> SEEK_CUR 0 lseek -1 = not ;
 
 M: unix handle-length
-    fd>> \ stat <struct> [ fstat -1 = not ] keep
+    fd>> \ stat new [ fstat -1 = not ] keep
     swap [ st_size>> ] [ drop f ] if ;
 
 ERROR: io-timeout ;
@@ -186,7 +186,7 @@ M: stdin cancel-operation
 : signal-pipe-loop ( port -- )
     '[
         int heap-size _ io:stream-read
-        dup [ int deref dispatch-signal-hook get call( x -- ) ] when*
+        dup [ int deref dispatch-signal-hook get-global call( x -- ) ] when*
     ] loop ;
 
 : start-signal-pipe-thread ( -- )

@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays audio.engine audio.loader game.loop
 game.worlds gpu gpu.render gpu.shaders gpu.util gpu.util.wasd
-kernel literals locals math math.libm math.matrices
+kernel literals math math.libm math.matrices
 math.matrices.extras math.order math.vectors method-chains
 sequences ui.gadgets.worlds ui.pixel-formats ;
 IN: gpu.demos.raytrace

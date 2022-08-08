@@ -6,7 +6,8 @@ system ;
 IN: editors.jedit
 
 SINGLETON: jedit
-jedit editor-class set-global
+
+editor-class [ jedit ] initialize
 
 HOOK: find-jedit-path os ( -- path )
 

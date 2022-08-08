@@ -1,6 +1,6 @@
 ! Copyright (C) 2008 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: help.markup help.syntax kernel math multiline strings ;
+USING: help.markup help.syntax math multiline strings ;
 IN: roman
 
 HELP: >roman

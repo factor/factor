@@ -1,10 +1,10 @@
 ! Copyright (C) 2005, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs combinators compiler.units
-definitions.icons effects fry hashtables help.stylesheet
-help.topics io io.styles kernel locals make math namespaces
-present prettyprint prettyprint.stylesheet quotations see
-sequences sequences.private sets sorting strings urls vocabs
+definitions.icons effects hashtables help.stylesheet help.topics
+io io.styles kernel make math namespaces present prettyprint
+prettyprint.stylesheet quotations see sequences
+sequences.private sets sorting splitting strings urls vocabs
 words words.symbol ;
 FROM: prettyprint.sections => with-pprint ;
 IN: help.markup
@@ -99,7 +99,7 @@ M: f print-element drop ;
     ] ($block) ; inline
 
 : $code ( element -- )
-    "\n" join dup <input> [ write ] ($code) ;
+    join-lines dup <input> [ write ] ($code) ;
 
 : $syntax ( element -- ) "Syntax" $heading $code ;
 
@@ -122,7 +122,7 @@ M: f print-element drop ;
     "Examples" $heading print-element ;
 
 : $example ( element -- )
-    unclip-last [ "\n" join ] dip over <input> [
+    unclip-last [ join-lines ] dip over <input> [
         [ print ] [ output-style get format ] bi*
     ] ($code) ;
 
@@ -255,6 +255,9 @@ PRIVATE>
         [ [ >vocab-link link-icon bl ] [ ($vocab-link) ] bi ]
         if*
     ] ($subsection) ;
+
+: $vocab-subsections ( element -- )
+    [ $vocab-subsection ] each ($blank-line) ;
 
 : $vocab-link ( element -- )
     check-first [ vocab-name ] keep ($vocab-link) ;
@@ -445,12 +448,13 @@ M: f ($instance) ($link) ;
     unclip print-element [ \ $link swap ] { } map>assoc $list ;
 
 : $shuffle ( element -- )
-    drop
-    "Shuffle word. Rearranges the top of the datastack as indicated in the stack effect pattern." $description ;
+    "This is a shuffle word, rearranging the top of the datastack as indicated by the word's stack effect" swap
+    ?first [ ": " swap "." 4array ] [ "." append ] if*
+    $description ;
 
 : $complex-shuffle ( element -- )
     $shuffle
-    { "The data flow represented by this shuffle word can be more clearly expressed using " { $link "locals" } "." } $deprecated ;
+    { "The data flow represented by this shuffle word might be more clearly expressed using " { $link "locals" } "." } $deprecated ;
 
 : $low-level-note ( children -- )
     drop

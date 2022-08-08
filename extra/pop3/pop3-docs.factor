@@ -1,7 +1,7 @@
 ! Copyright (C) 2009 Elie Chaftari.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: arrays assocs help.markup help.syntax kernel math
-sequences strings ;
+USING: arrays assocs help.markup help.syntax math sequences
+strings ;
 IN: pop3
 
 HELP: <pop3-account>

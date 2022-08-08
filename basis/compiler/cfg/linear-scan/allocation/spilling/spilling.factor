@@ -4,8 +4,8 @@ USING: accessors assocs combinators
 compiler.cfg.linear-scan.allocation.splitting
 compiler.cfg.linear-scan.allocation.state
 compiler.cfg.linear-scan.live-intervals
-compiler.cfg.linear-scan.ranges compiler.utilities fry kernel
-linked-assocs locals math namespaces sequences ;
+compiler.cfg.linear-scan.ranges compiler.utilities kernel
+linked-assocs math namespaces sequences ;
 IN: compiler.cfg.linear-scan.allocation.spilling
 
 : trim-before-ranges ( live-interval -- )

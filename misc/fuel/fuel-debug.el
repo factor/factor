@@ -1,4 +1,4 @@
-;;; fuel-debug.el -- debugging factor code
+;;; fuel-debug.el -- debugging factor code -*- lexical-binding: t -*-
 
 ;; Copyright (C) 2008, 2009, 2010 Jose Antonio Ortega Ruiz
 ;; See http://factorcode.org/license.txt for BSD license.

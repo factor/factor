@@ -90,7 +90,7 @@ IN: compiler.cfg.builder.tests
     [ { array } declare dup 1 slot [ 1 slot ] when ]
     [ [ dup more? ] [ dup ] produce ]
     [ vector new over test-case-1 [ test-case-2 ] [ ] if ]
-    [ [ [ nth-unsafe ".." = 0 ] dip set-nth-unsafe ] 2curry (each-integer) ]
+    [ [ [ nth-unsafe ".." = 0 ] dip set-nth-unsafe ] 2curry each-integer-from ]
     [
         { fixnum sbuf } declare 2dup 3 slot fixnum> [
             over 3 fixnum* over dup [ 2 slot resize-string ] dip 2 set-slot

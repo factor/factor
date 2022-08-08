@@ -31,7 +31,7 @@
 		<!-- Multi-line assignments (using the (blah blah) syntax) -->
 		<SPAN TYPE="OPERATOR" AT_LINE_START="FALSE" NO_LINE_BREAK="FALSE" DELEGATE="typoscript::assignment">
 			<BEGIN>(</BEGIN>
-			<END>)</END>
+			<END AT_WHITESPACE_END="TRUE">)</END>
 		</SPAN>
 
 		<!-- Object copies (using the < operator)

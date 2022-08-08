@@ -167,7 +167,7 @@ IN: compiler.tree.dead-code.tests
 
 { } [ [ call-recursive-dce-5 swap ] optimize-quot drop ] unit-test
 
-{ } [ [ [ 0 -rot set-nth-unsafe ] curry (each-integer) ] optimize-quot drop ] unit-test
+{ } [ [ [ 0 -rot set-nth-unsafe ] curry each-integer-from ] optimize-quot drop ] unit-test
 
 : call-recursive-dce-6 ( i quot: ( ..a -- ..b ) -- i )
     dup call [ drop ] [ call-recursive-dce-6 ] if ; inline recursive

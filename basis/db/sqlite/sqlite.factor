@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors classes.tuple combinators db db.private db.queries
 db.sqlite.errors db.sqlite.ffi db.sqlite.lib db.tuples
-db.tuples.private db.types destructors interpolate kernel locals math
+db.tuples.private db.types destructors interpolate kernel math
 math.parser namespaces nmake random sequences sequences.deep ;
 IN: db.sqlite
 
@@ -260,7 +260,7 @@ M: sqlite-db-connection persistent-table
     "sql-spec" get modifiers>> [ +not-null+ = ] none? ;
 
 : delete-cascade? ( -- ? )
-    "sql-spec" get modifiers>> { +on-delete+ +cascade+ } swap subseq? ;
+    "sql-spec" get modifiers>> { +on-delete+ +cascade+ } subseq-index? ;
 
 : sqlite-trigger, ( string -- )
     { } { } <simple-statement> 3, ;

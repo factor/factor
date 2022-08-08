@@ -2,7 +2,7 @@
 ! Copyright (C) 2005 Mackenzie Straight.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors alien.private arrays assocs boxes combinators
-continuations continuations.private deques dlists fry hashtables
+continuations continuations.private deques dlists hashtables
 heaps init kernel kernel.private math math.order namespaces
 quotations sequences strings system ;
 IN: threads
@@ -262,4 +262,4 @@ M: real sleep
 
 PRIVATE>
 
-[ init-threads ] "threads" add-startup-hook
+STARTUP-HOOK: init-threads

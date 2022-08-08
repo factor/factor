@@ -1,0 +1,586 @@
+<?xml version="1.0"?>
+<!DOCTYPE MODE SYSTEM "xmode.dtd">
+
+<!--
+
+    ANS Forth 94 Syntax Highlighting Mode File for jEdit.
+    
+    Copyright (C) 2014, Mark Corbin (mark@dibsco.co.uk)
+
+
+    This library is free software; you can redistribute it and/or modify it
+    under the terms of the GNU Lesser General Public License as published by
+    the Free Software Foundation; either version 2.1 of the License, or
+    (at your option) any later version.
+
+    This library is distributed in the hope that it will be useful, but
+    WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser
+    General Public License for more details.
+
+    You should have received a copy of the GNU Lesser General Public License
+    along with this library; if not, write to the Free Software
+    Foundation, Inc., 51 Franklin Street, Fifth Floor,
+    Boston, MA  02110-1301  USA
+
+-->
+
+<!--
+
+Token Usage:
+
+COMMENT1        Range and line comments.
+COMMENT2        Tasks (FIXME TODO NOTE and XXX).
+DIGIT           All numbers (single, double and floating point).
+FUNCTION        Word definitions and references.
+INVALID         Obsolete Forth keywords (all ANS wordsets).
+KEYWORD1        Forth Keywords (all ANS wordsets).
+KEYWORD2        Variables.
+LITERAL1        Strings.
+LITERAL2        Character literals.
+LITERAL3        Constants.
+
+-->
+
+<!--
+
+Recommended catalog file entry:
+
+<MODE NAME="ans-forth94"        FILE="ans-forth94.xml"
+                                FILE_NAME_GLOB="*.4th" />
+
+-->
+
+<MODE>
+  <PROPS>
+    <PROPERTY NAME="commentStart" VALUE="(" />
+    <PROPERTY NAME="commentEnd" VALUE=")" />
+    <PROPERTY NAME="lineComment" VALUE="\" />
+
+    <PROPERTY NAME="indentNextLines" VALUE="((^|\s+)(:|begin|case|else)($|\s+.*))|((^|.*\s+)(do|\?do|of|if)($|\s+.*))" />
+    <PROPERTY NAME="unindentThisLine" VALUE="(^|\s+)(;|again|repeat|until|endcase|else|loop|\+loop|endof|then)($|\s+.*)" />
+    <PROPERTY NAME="unindentNextLines" VALUE="(^|\s+)(;|again|repeat|until|endcase|else|loop|\+loop|endof|then)($|\s+.*)" />
+    <PROPERTY NAME="electricKeys" VALUE=";eflnopt" />
+  </PROPS>
+
+  <RULES IGNORE_CASE="TRUE"
+         NO_WORD_SEP="!£$%^&amp;#&apos;~|\(){}*+,-./_=@:;&lt;&gt;&quot;?[]"
+         HIGHLIGHT_DIGITS="TRUE"
+         DIGIT_RE="((^|\s+)([-]?[0-9]+)($|\s+))|((^|\s+)([-]?[0-9]+[.][0-9]*)($|\s+))|((^|\s+)(([+]|[-])?([0-9]+[.]?[0-9]*)(E|e)([+]|[-])?([0-9]*))($|\s+))">
+
+    <!-- Line Comments. -->
+    <EOL_SPAN_REGEXP TYPE="KEYWORD1"
+                     AT_WORD_START="TRUE"
+                     DELEGATE="LINE-COMMENT">\\($|\s+)</EOL_SPAN_REGEXP>
+
+    <!-- Range Comments. -->
+    <SPAN_REGEXP TYPE="KEYWORD1"
+                 AT_WORD_START="TRUE"
+                 DELEGATE="RANGE-COMMENT">
+      <BEGIN>\(($|\s+)</BEGIN>
+      <END REGEXP="TRUE">(?=\))</END>
+    </SPAN_REGEXP>
+
+    <!-- Quoted Strings. -->
+    <SPAN_REGEXP TYPE="KEYWORD1"
+                 AT_WORD_START="TRUE"
+                 DELEGATE="STRING">
+      <BEGIN>([.]&quot;|ABORT&quot;|S&quot;|C&quot;)($|\s+)</BEGIN>
+      <END REGEXP="TRUE">(?=&quot;)</END>
+    </SPAN_REGEXP>
+
+    <!-- Parsed Strings. -->
+    <SPAN_REGEXP TYPE="KEYWORD1" 
+                 AT_WORD_START="TRUE"
+                 NO_LINE_BREAK="TRUE"
+                 DELEGATE="STRING">
+      <BEGIN>(WORD|PARSE)($|\s+)</BEGIN>
+      <END REGEXP="TRUE">\s+</END>
+    </SPAN_REGEXP>
+
+    <!-- Display Strings. -->
+    <SPAN_REGEXP TYPE="KEYWORD1"
+                 AT_WORD_START="TRUE"
+                 DELEGATE="STRING">
+      <BEGIN>[.]\(($|\s+)</BEGIN>
+      <END REGEXP="TRUE">(?=\))</END>
+    </SPAN_REGEXP>
+
+    <!-- Character Literals. -->
+    <SPAN_REGEXP TYPE="KEYWORD1"
+                    AT_WORD_START="TRUE"
+                    NO_LINE_BREAK="TRUE"
+                    DELEGATE="LITERAL">
+      <BEGIN>(CHAR|\[CHAR\])($|\s+)</BEGIN>
+      <END REGEXP="TRUE">\s+</END>
+    </SPAN_REGEXP>
+
+    <!-- Word Definitions and References. -->
+    <SPAN_REGEXP TYPE="KEYWORD1"
+                    AT_WORD_START="TRUE"
+                    NO_LINE_BREAK="TRUE"
+                    DELEGATE="WORD">
+      <BEGIN>(:|'|CREATE|POSTPONE|MARKER|\[COMPILE\]|CODE|SEE)($|\s+)</BEGIN>
+      <END REGEXP="TRUE">\s+</END>
+    </SPAN_REGEXP>
+
+    <!-- Obsolete Keywords. -->
+    <SPAN_REGEXP TYPE="INVALID"
+                    AT_WORD_START="TRUE"
+                    NO_LINE_BREAK="TRUE"
+                    DELEGATE="WORD">
+      <BEGIN>FORGET($|\s+)</BEGIN>
+      <END REGEXP="TRUE">\s+</END>
+    </SPAN_REGEXP>
+
+    <!-- Variables. -->
+    <SPAN_REGEXP TYPE="KEYWORD1"
+                    AT_WORD_START="TRUE"
+                    NO_LINE_BREAK="TRUE"
+                    DELEGATE="VARIABLE">
+      <BEGIN>(VARIABLE|TO|VALUE|2VARIABLE|FVARIABLE)($|\s+)</BEGIN>
+      <END REGEXP="TRUE">\s+</END>
+    </SPAN_REGEXP>
+
+    <!-- Local Variables. -->
+    <SPAN_REGEXP TYPE="KEYWORD1"
+                    AT_WORD_START="TRUE"
+                    NO_LINE_BREAK="TRUE"
+                    DELEGATE="VARIABLE">
+      <BEGIN>(LOCALS\|)($|\s+)</BEGIN>
+      <END REGEXP="TRUE">(?=\|)</END>
+    </SPAN_REGEXP>
+
+    <!-- Constants. -->
+    <SPAN_REGEXP TYPE="KEYWORD1"
+                    AT_WORD_START="TRUE"
+                    NO_LINE_BREAK="TRUE"
+                    DELEGATE="CONSTANT">
+      <BEGIN>(CONSTANT|2CONSTANT|FCONSTANT)($|\s+)</BEGIN>
+      <END REGEXP="TRUE">\s+</END>
+    </SPAN_REGEXP>
+
+    <KEYWORDS>
+      <!-- Core Keywords -->
+      <KEYWORD1>!</KEYWORD1>
+      <KEYWORD1>#</KEYWORD1>
+      <KEYWORD1>#&gt;</KEYWORD1> <!-- #> -->
+      <KEYWORD1>#S</KEYWORD1>
+      <KEYWORD1>&apos;</KEYWORD1> <!-- ' -->
+      <KEYWORD1>(</KEYWORD1>
+      <KEYWORD1>)</KEYWORD1> <!-- Added to delimit range comments. -->
+      <KEYWORD1>*</KEYWORD1>
+      <KEYWORD1>*/</KEYWORD1>
+      <KEYWORD1>*/MOD</KEYWORD1>
+      <KEYWORD1>+</KEYWORD1>
+      <KEYWORD1>+!</KEYWORD1>
+      <KEYWORD1>+LOOP</KEYWORD1>
+      <KEYWORD1>,</KEYWORD1>
+      <KEYWORD1>-</KEYWORD1>
+      <KEYWORD1>.</KEYWORD1>
+      <KEYWORD1>.&quot;</KEYWORD1> <!-- ." -->
+      <KEYWORD1>&quot;</KEYWORD1> <!-- Added to delimit strings. -->
+      <KEYWORD1>/</KEYWORD1>
+      <KEYWORD1>/MOD</KEYWORD1>
+      <KEYWORD1>0&lt;</KEYWORD1> <!-- 0< -->
+      <KEYWORD1>0=</KEYWORD1>
+      <KEYWORD1>1+</KEYWORD1>
+      <KEYWORD1>1-</KEYWORD1>
+      <KEYWORD1>2!</KEYWORD1>
+      <KEYWORD1>2*</KEYWORD1>
+      <KEYWORD1>2/</KEYWORD1>
+      <KEYWORD1>2@</KEYWORD1>
+      <KEYWORD1>2DROP</KEYWORD1>
+      <KEYWORD1>2DUP</KEYWORD1>
+      <KEYWORD1>2OVER</KEYWORD1>
+      <KEYWORD1>2SWAP</KEYWORD1>
+      <KEYWORD1>:</KEYWORD1>
+      <KEYWORD1>;</KEYWORD1>
+      <KEYWORD1>&lt;</KEYWORD1> <!-- < -->
+      <KEYWORD1>&lt;#</KEYWORD1> <!-- <# -->
+      <KEYWORD1>=</KEYWORD1>
+      <KEYWORD1>&gt;</KEYWORD1> <!-- > -->
+      <KEYWORD1>&gt;BODY</KEYWORD1> <!-- >BODY -->
+      <KEYWORD1>&gt;IN</KEYWORD1> <!-- >IN -->
+      <KEYWORD1>&gt;NUMBER</KEYWORD1> <!-- >NUMBER -->
+      <KEYWORD1>&gt;R</KEYWORD1> <!-- >R -->
+      <KEYWORD1>?DUP</KEYWORD1>
+      <KEYWORD1>@</KEYWORD1>
+      <KEYWORD1>ABORT</KEYWORD1>
+      <KEYWORD1>ABORT&quot;</KEYWORD1> <!-- ABORT" -->
+      <KEYWORD1>ABS</KEYWORD1>
+      <KEYWORD1>ACCEPT</KEYWORD1>
+      <KEYWORD1>ALIGN</KEYWORD1>
+      <KEYWORD1>ALIGNED</KEYWORD1>
+      <KEYWORD1>ALLOT</KEYWORD1>
+      <KEYWORD1>AND</KEYWORD1>
+      <KEYWORD1>BASE</KEYWORD1>
+      <KEYWORD1>BEGIN</KEYWORD1>
+      <KEYWORD1>BL</KEYWORD1>
+      <KEYWORD1>C!</KEYWORD1>
+      <KEYWORD1>C,</KEYWORD1>
+      <KEYWORD1>C@</KEYWORD1>
+      <KEYWORD1>CELL+</KEYWORD1>
+      <KEYWORD1>CELLS</KEYWORD1>
+      <KEYWORD1>CHAR</KEYWORD1>
+      <KEYWORD1>CHAR+</KEYWORD1>
+      <KEYWORD1>CHARS</KEYWORD1>
+      <KEYWORD1>CONSTANT</KEYWORD1>
+      <KEYWORD1>COUNT</KEYWORD1>
+      <KEYWORD1>CR</KEYWORD1>
+      <KEYWORD1>CREATE</KEYWORD1>
+      <KEYWORD1>DECIMAL</KEYWORD1>
+      <KEYWORD1>DEPTH</KEYWORD1>
+      <KEYWORD1>DO</KEYWORD1>
+      <KEYWORD1>DOES&gt;</KEYWORD1> <!-- DOES> -->
+      <KEYWORD1>DROP</KEYWORD1>
+      <KEYWORD1>DUP</KEYWORD1>
+      <KEYWORD1>ELSE</KEYWORD1>
+      <KEYWORD1>EMIT</KEYWORD1>
+      <KEYWORD1>ENVIRONMENT?</KEYWORD1>
+      <KEYWORD1>EVALUATE</KEYWORD1>
+      <KEYWORD1>EXECUTE</KEYWORD1>
+      <KEYWORD1>EXIT</KEYWORD1>
+      <KEYWORD1>FILL</KEYWORD1>
+      <KEYWORD1>FIND</KEYWORD1>
+      <KEYWORD1>FM/MOD</KEYWORD1>
+      <KEYWORD1>HERE</KEYWORD1>
+      <KEYWORD1>HOLD</KEYWORD1>
+      <KEYWORD1>I</KEYWORD1>
+      <KEYWORD1>IF</KEYWORD1>
+      <KEYWORD1>IMMEDIATE</KEYWORD1>
+      <KEYWORD1>INVERT</KEYWORD1>
+      <KEYWORD1>J</KEYWORD1>
+      <KEYWORD1>KEY</KEYWORD1>
+      <KEYWORD1>LEAVE</KEYWORD1>
+      <KEYWORD1>LITERAL</KEYWORD1>
+      <KEYWORD1>LOOP</KEYWORD1>
+      <KEYWORD1>LSHIFT</KEYWORD1>
+      <KEYWORD1>M*</KEYWORD1>
+      <KEYWORD1>MAX</KEYWORD1>
+      <KEYWORD1>MIN</KEYWORD1>
+      <KEYWORD1>MOD</KEYWORD1>
+      <KEYWORD1>MOVE</KEYWORD1>
+      <KEYWORD1>NEGATE</KEYWORD1>
+      <KEYWORD1>OR</KEYWORD1>
+      <KEYWORD1>OVER</KEYWORD1>
+      <KEYWORD1>POSTPONE</KEYWORD1>
+      <KEYWORD1>QUIT</KEYWORD1>
+      <KEYWORD1>R&gt;</KEYWORD1> <!-- R> -->
+      <KEYWORD1>R@</KEYWORD1>
+      <KEYWORD1>RECURSE</KEYWORD1>
+      <KEYWORD1>REPEAT</KEYWORD1>
+      <KEYWORD1>ROT</KEYWORD1>
+      <KEYWORD1>RSHIFT</KEYWORD1>
+      <KEYWORD1>S&quot;</KEYWORD1> <!-- S" -->
+      <KEYWORD1>S&gt;D</KEYWORD1> <!-- S>D -->
+      <KEYWORD1>SIGN</KEYWORD1>
+      <KEYWORD1>SM/REM</KEYWORD1>
+      <KEYWORD1>SOURCE</KEYWORD1>
+      <KEYWORD1>SPACE</KEYWORD1>
+      <KEYWORD1>SPACES</KEYWORD1>
+      <KEYWORD1>STATE</KEYWORD1>
+      <KEYWORD1>SWAP</KEYWORD1>
+      <KEYWORD1>THEN</KEYWORD1>
+      <KEYWORD1>TYPE</KEYWORD1>
+      <KEYWORD1>U.</KEYWORD1>
+      <KEYWORD1>U&lt;</KEYWORD1> <!-- U< -->
+      <KEYWORD1>UM*</KEYWORD1>
+      <KEYWORD1>UM/MOD</KEYWORD1>
+      <KEYWORD1>UNLOOP</KEYWORD1>
+      <KEYWORD1>UNTIL</KEYWORD1>
+      <KEYWORD1>VARIABLE</KEYWORD1>
+      <KEYWORD1>WHILE</KEYWORD1>
+      <KEYWORD1>WORD</KEYWORD1>
+      <KEYWORD1>XOR</KEYWORD1>
+      <KEYWORD1>[</KEYWORD1>
+      <KEYWORD1>[&apos;]</KEYWORD1> <!-- ['] -->
+      <KEYWORD1>[CHAR]</KEYWORD1>
+      <KEYWORD1>]</KEYWORD1>
+      <!-- Core Extension Keywords -->
+      <KEYWORD1>.(</KEYWORD1>
+      <KEYWORD1>.R</KEYWORD1>
+      <KEYWORD1>0&lt;&gt;</KEYWORD1> <!-- 0<> -->
+      <KEYWORD1>0&gt;</KEYWORD1> <!-- 0> -->
+      <KEYWORD1>2&gt;R</KEYWORD1> <!-- 2>R -->
+      <KEYWORD1>2R&gt;</KEYWORD1> <!-- 2R> -->
+      <KEYWORD1>2R@</KEYWORD1>
+      <KEYWORD1>:NONAME</KEYWORD1>
+      <KEYWORD1>&lt;&gt;</KEYWORD1> <!-- <> -->
+      <KEYWORD1>?DO</KEYWORD1>
+      <KEYWORD1>AGAIN</KEYWORD1>
+      <KEYWORD1>C&quot;</KEYWORD1> <!-- C" -->
+      <KEYWORD1>CASE</KEYWORD1>
+      <KEYWORD1>COMPILE,</KEYWORD1>
+      <KEYWORD1>ENDCASE</KEYWORD1>
+      <KEYWORD1>ENDOF</KEYWORD1>
+      <KEYWORD1>ERASE</KEYWORD1>
+      <KEYWORD1>FALSE</KEYWORD1>
+      <KEYWORD1>HEX</KEYWORD1>
+      <KEYWORD1>MARKER</KEYWORD1>
+      <KEYWORD1>NIP</KEYWORD1>
+      <KEYWORD1>OF</KEYWORD1>
+      <KEYWORD1>PAD</KEYWORD1>
+      <KEYWORD1>PARSE</KEYWORD1>
+      <KEYWORD1>PICK</KEYWORD1>
+      <KEYWORD1>REFILL</KEYWORD1>
+      <KEYWORD1>RESTORE-INPUT</KEYWORD1>
+      <KEYWORD1>ROLL</KEYWORD1>
+      <KEYWORD1>SAVE-INPUT</KEYWORD1>
+      <KEYWORD1>SOURCE-ID</KEYWORD1>
+      <KEYWORD1>TO</KEYWORD1>
+      <KEYWORD1>TRUE</KEYWORD1>
+      <KEYWORD1>TUCK</KEYWORD1>
+      <KEYWORD1>U.R</KEYWORD1>
+      <KEYWORD1>U&gt;</KEYWORD1> <!-- U> -->
+      <KEYWORD1>UNUSED</KEYWORD1>
+      <KEYWORD1>VALUE</KEYWORD1>
+      <KEYWORD1>WITHIN</KEYWORD1>
+      <KEYWORD1>[COMPILE]</KEYWORD1>
+      <KEYWORD1>\</KEYWORD1>
+      <!-- Obsolete Core Extension Keywords -->
+      <INVALID>#TIB</INVALID>
+      <INVALID>CONVERT</INVALID>
+      <INVALID>EXPECT</INVALID>
+      <INVALID>QUERY</INVALID>
+      <INVALID>SPAN</INVALID>
+      <INVALID>TIB</INVALID>
+      <!-- Block Keywords -->
+      <KEYWORD1>BLK</KEYWORD1>
+      <KEYWORD1>BLOCK</KEYWORD1>
+      <KEYWORD1>BUFFER</KEYWORD1>
+      <KEYWORD1>EVALUATE</KEYWORD1>
+      <KEYWORD1>FLUSH</KEYWORD1>
+      <KEYWORD1>LOAD</KEYWORD1>
+      <KEYWORD1>SAVE-BUFFERS</KEYWORD1>
+      <KEYWORD1>UPDATE</KEYWORD1>
+      <!-- Block Extension Keywords -->
+      <KEYWORD1>EMPTY-BUFFERS</KEYWORD1>
+      <KEYWORD1>LIST</KEYWORD1>
+      <KEYWORD1>REFILL</KEYWORD1>
+      <KEYWORD1>SCR</KEYWORD1>
+      <KEYWORD1>THRU</KEYWORD1>
+      <KEYWORD1>\</KEYWORD1>
+      <!-- Double Keywords -->
+      <KEYWORD1>2CONSTANT</KEYWORD1>
+      <KEYWORD1>2LITERAL</KEYWORD1>
+      <KEYWORD1>2VARIABLE</KEYWORD1>
+      <KEYWORD1>D+</KEYWORD1>
+      <KEYWORD1>D-</KEYWORD1>
+      <KEYWORD1>D.</KEYWORD1>
+      <KEYWORD1>D.R</KEYWORD1>
+      <KEYWORD1>D0&lt;</KEYWORD1> <!-- D0< -->
+      <KEYWORD1>D0=</KEYWORD1>
+      <KEYWORD1>D2*</KEYWORD1>
+      <KEYWORD1>D2/</KEYWORD1>
+      <KEYWORD1>D&lt;</KEYWORD1> <!-- D< -->
+      <KEYWORD1>D=</KEYWORD1>
+      <KEYWORD1>D&gt;S</KEYWORD1> <!-- D>S -->
+      <KEYWORD1>DABS</KEYWORD1>
+      <KEYWORD1>DMAX</KEYWORD1>
+      <KEYWORD1>DMIN</KEYWORD1>
+      <KEYWORD1>DNEGATE</KEYWORD1>
+      <KEYWORD1>M*/</KEYWORD1>
+      <KEYWORD1>M+</KEYWORD1>
+      <!-- Double Extension Keywords -->
+      <KEYWORD1>2ROT</KEYWORD1>
+      <KEYWORD1>DU&lt;</KEYWORD1> <!-- DU< -->
+      <!-- Exception Keywords -->
+      <KEYWORD1>CATCH</KEYWORD1>
+      <KEYWORD1>THROW</KEYWORD1>
+      <!-- Exception Extension Keywords -->
+      <KEYWORD1>ABORT</KEYWORD1>
+      <KEYWORD1>ABORT&quot;</KEYWORD1> <!-- ABORT" -->
+      <!-- Facility Keywords -->
+      <KEYWORD1>AT-XY</KEYWORD1>
+      <KEYWORD1>KEY?</KEYWORD1>
+      <KEYWORD1>PAGE</KEYWORD1>
+      <!-- Facility Extension Keywords -->
+      <KEYWORD1>EKEY</KEYWORD1>
+      <KEYWORD1>EKEY&gt;CHAR</KEYWORD1> <!-- EKEY>CHAR -->
+      <KEYWORD1>EKEY?</KEYWORD1>
+      <KEYWORD1>EMIT?</KEYWORD1>
+      <KEYWORD1>MS</KEYWORD1>
+      <KEYWORD1>TIME&amp;DATE</KEYWORD1> <!-- TIME&DATE -->
+      <!-- File Keywords -->
+      <KEYWORD1>(</KEYWORD1>
+      <KEYWORD1>BIN</KEYWORD1>
+      <KEYWORD1>CLOSE-FILE</KEYWORD1>
+      <KEYWORD1>CREATE-FILE</KEYWORD1>
+      <KEYWORD1>DELETE-FILE</KEYWORD1>
+      <KEYWORD1>FILE-POSITION</KEYWORD1>
+      <KEYWORD1>FILE-SIZE</KEYWORD1>
+      <KEYWORD1>INCLUDE-FILE</KEYWORD1>
+      <KEYWORD1>INCLUDED</KEYWORD1>
+      <KEYWORD1>OPEN-FILE</KEYWORD1>
+      <KEYWORD1>R/O</KEYWORD1>
+      <KEYWORD1>R/W</KEYWORD1>
+      <KEYWORD1>READ-FILE</KEYWORD1>
+      <KEYWORD1>READ-LINE</KEYWORD1>
+      <KEYWORD1>REPOSITION-FILE</KEYWORD1>
+      <KEYWORD1>RESIZE-FILE</KEYWORD1>
+      <KEYWORD1>S&quot;</KEYWORD1> <!-- S" -->
+      <KEYWORD1>SOURCE-ID</KEYWORD1>
+      <KEYWORD1>W/O</KEYWORD1>
+      <KEYWORD1>WRITE-FILE</KEYWORD1>
+      <KEYWORD1>WRITE-LINE</KEYWORD1>
+      <!-- File Extension Keywords -->
+      <KEYWORD1>FILE-STATUS</KEYWORD1>
+      <KEYWORD1>FLUSH-FILE</KEYWORD1>
+      <KEYWORD1>REFILL</KEYWORD1>
+      <KEYWORD1>RENAME-FILE</KEYWORD1>
+      <!-- Floating Keywords -->
+      <KEYWORD1>&gt;FLOAT</KEYWORD1> <!-- >FLOAT -->
+      <KEYWORD1>D&gt;F</KEYWORD1> <!-- D>F -->
+      <KEYWORD1>F!</KEYWORD1>
+      <KEYWORD1>F*</KEYWORD1>
+      <KEYWORD1>F+</KEYWORD1>
+      <KEYWORD1>F-</KEYWORD1>
+      <KEYWORD1>F/</KEYWORD1>
+      <KEYWORD1>F0&lt;</KEYWORD1> <!-- F0< -->
+      <KEYWORD1>F0=</KEYWORD1>
+      <KEYWORD1>F&lt;</KEYWORD1> <!-- F< -->
+      <KEYWORD1>F&gt;D</KEYWORD1> <!-- F>D -->
+      <KEYWORD1>F@</KEYWORD1>
+      <KEYWORD1>FALIGN</KEYWORD1>
+      <KEYWORD1>FALIGNED</KEYWORD1>
+      <KEYWORD1>FCONSTANT</KEYWORD1>
+      <KEYWORD1>FDEPTH</KEYWORD1>
+      <KEYWORD1>FDROP</KEYWORD1>
+      <KEYWORD1>FDUP</KEYWORD1>
+      <KEYWORD1>FLITERAL</KEYWORD1>
+      <KEYWORD1>FLOAT+</KEYWORD1>
+      <KEYWORD1>FLOATS</KEYWORD1>
+      <KEYWORD1>FLOOR</KEYWORD1>
+      <KEYWORD1>FMAX</KEYWORD1>
+      <KEYWORD1>FMIN</KEYWORD1>
+      <KEYWORD1>FNEGATE</KEYWORD1>
+      <KEYWORD1>FOVER</KEYWORD1>
+      <KEYWORD1>FROT</KEYWORD1>
+      <KEYWORD1>FROUND</KEYWORD1>
+      <KEYWORD1>FSWAP</KEYWORD1>
+      <KEYWORD1>FVARIABLE</KEYWORD1>
+      <KEYWORD1>REPRESENT</KEYWORD1>
+      <!-- Floating Extension Keywords -->
+      <KEYWORD1>DF!</KEYWORD1>
+      <KEYWORD1>DF@</KEYWORD1>
+      <KEYWORD1>DFALIGN</KEYWORD1>
+      <KEYWORD1>DFALIGNED</KEYWORD1>
+      <KEYWORD1>DFLOAT+</KEYWORD1>
+      <KEYWORD1>DFLOATS</KEYWORD1>
+      <KEYWORD1>F**</KEYWORD1>
+      <KEYWORD1>F.</KEYWORD1>
+      <KEYWORD1>FABS</KEYWORD1>
+      <KEYWORD1>FACOS</KEYWORD1>
+      <KEYWORD1>FACOSH</KEYWORD1>
+      <KEYWORD1>FALOG</KEYWORD1>
+      <KEYWORD1>FASIN</KEYWORD1>
+      <KEYWORD1>FASINH</KEYWORD1>
+      <KEYWORD1>FATAN</KEYWORD1>
+      <KEYWORD1>FATAN2</KEYWORD1>
+      <KEYWORD1>FATANH</KEYWORD1>
+      <KEYWORD1>FCOS</KEYWORD1>
+      <KEYWORD1>FCOSH</KEYWORD1>
+      <KEYWORD1>FE.</KEYWORD1>
+      <KEYWORD1>FEXP</KEYWORD1>
+      <KEYWORD1>FEXPM1</KEYWORD1>
+      <KEYWORD1>FLN</KEYWORD1>
+      <KEYWORD1>FLNP1</KEYWORD1>
+      <KEYWORD1>FLOG</KEYWORD1>
+      <KEYWORD1>FS.</KEYWORD1>
+      <KEYWORD1>FSIN</KEYWORD1>
+      <KEYWORD1>FSINCOS</KEYWORD1>
+      <KEYWORD1>FSINH</KEYWORD1>
+      <KEYWORD1>FSQRT</KEYWORD1>
+      <KEYWORD1>FTAN</KEYWORD1>
+      <KEYWORD1>FTANH</KEYWORD1>
+      <KEYWORD1>F~</KEYWORD1>
+      <KEYWORD1>PRECISION</KEYWORD1>
+      <KEYWORD1>SET-PRECISION</KEYWORD1>
+      <KEYWORD1>SF!</KEYWORD1>
+      <KEYWORD1>SF@</KEYWORD1>
+      <KEYWORD1>SFALIGN</KEYWORD1>
+      <KEYWORD1>SFALIGNED</KEYWORD1>
+      <KEYWORD1>SFLOAT+</KEYWORD1>
+      <KEYWORD1>SFLOATS</KEYWORD1>
+      <!-- Local Keywords -->
+      <KEYWORD1>(LOCAL)</KEYWORD1>
+      <KEYWORD1>TO</KEYWORD1>
+      <!-- Local Extension Keywords -->
+      <KEYWORD1>LOCALS|</KEYWORD1>
+      <KEYWORD1>|</KEYWORD1> <!-- Added to delimit local variables. -->
+      <!-- Memory Keywords -->
+      <KEYWORD1>ALLOCATE</KEYWORD1>
+      <KEYWORD1>FREE</KEYWORD1>
+      <KEYWORD1>RESIZE</KEYWORD1>
+      <!-- Tools Keywords -->
+      <KEYWORD1>.S</KEYWORD1>
+      <KEYWORD1>?</KEYWORD1>
+      <KEYWORD1>DUMP</KEYWORD1>
+      <KEYWORD1>SEE</KEYWORD1>
+      <KEYWORD1>WORDS</KEYWORD1>
+      <!-- Tools Extension Keywords -->
+      <KEYWORD1>;CODE</KEYWORD1>
+      <KEYWORD1>AHEAD</KEYWORD1>
+      <KEYWORD1>ASSEMBLER</KEYWORD1>
+      <KEYWORD1>BYE</KEYWORD1>
+      <KEYWORD1>CODE</KEYWORD1>
+      <KEYWORD1>CS-PICK</KEYWORD1>
+      <KEYWORD1>CS-ROLL</KEYWORD1>
+      <KEYWORD1>EDITOR</KEYWORD1>
+      <KEYWORD1>STATE</KEYWORD1>
+      <KEYWORD1>[ELSE]</KEYWORD1>
+      <KEYWORD1>[IF]</KEYWORD1>
+      <KEYWORD1>[THEN]</KEYWORD1>
+      <!-- Obsolete Tools Extension Keywords -->
+      <INVALID>FORGET</INVALID>
+      <!-- Search Keywords -->
+      <KEYWORD1>DEFINITIONS</KEYWORD1>
+      <KEYWORD1>FIND</KEYWORD1>
+      <KEYWORD1>FORTH-WORDLIST</KEYWORD1>
+      <KEYWORD1>GET-CURRENT</KEYWORD1>
+      <KEYWORD1>GET-ORDER</KEYWORD1>
+      <KEYWORD1>SEARCH-WORDLIST</KEYWORD1>
+      <KEYWORD1>SET-CURRENT</KEYWORD1>
+      <KEYWORD1>SET-ORDER</KEYWORD1>
+      <KEYWORD1>WORDLIST</KEYWORD1>
+      <!-- Search Extension Keywords -->
+      <KEYWORD1>ALSO</KEYWORD1>
+      <KEYWORD1>FORTH</KEYWORD1>
+      <KEYWORD1>ONLY</KEYWORD1>
+      <KEYWORD1>ORDER</KEYWORD1>
+      <KEYWORD1>PREVIOUS</KEYWORD1>
+      <!-- String Keywords -->
+      <KEYWORD1>-TRAILING</KEYWORD1>
+      <KEYWORD1>/STRING</KEYWORD1>
+      <KEYWORD1>BLANK</KEYWORD1>
+      <KEYWORD1>CMOVE</KEYWORD1>
+      <KEYWORD1>CMOVE&gt;</KEYWORD1> <!-- CMOVE> -->
+      <KEYWORD1>COMPARE</KEYWORD1>
+      <KEYWORD1>SEARCH</KEYWORD1>
+      <KEYWORD1>SLITERAL</KEYWORD1>
+    </KEYWORDS>
+  </RULES>
+
+  <RULES SET="RANGE-COMMENT" IGNORE_CASE="TRUE" DEFAULT="COMMENT1" HIGHLIGHT_DIGITS="FALSE">
+    <IMPORT DELEGATE="IN-COMMENT" />
+  </RULES>
+
+  <RULES SET="LINE-COMMENT" IGNORE_CASE="TRUE" DEFAULT="COMMENT1" HIGHLIGHT_DIGITS="FALSE">
+    <IMPORT DELEGATE="IN-COMMENT" />
+  </RULES>
+
+  <RULES SET="IN-COMMENT" IGNORE_CASE="TRUE" HIGHLIGHT_DIGITS="FALSE">
+    <SEQ_REGEXP TYPE="COMMENT2">(FIXME|TODO|NOTE|XXX)(:|$|\s+)</SEQ_REGEXP>
+  </RULES>
+
+  <RULES SET="STRING" IGNORE_CASE="TRUE" DEFAULT="LITERAL1" HIGHLIGHT_DIGITS="FALSE" />
+
+  <RULES SET="LITERAL" IGNORE_CASE="TRUE" DEFAULT="LITERAL2" HIGHLIGHT_DIGITS="FALSE" />
+
+  <RULES SET="WORD" IGNORE_CASE="TRUE" DEFAULT="FUNCTION" HIGHLIGHT_DIGITS="FALSE" />
+
+  <RULES SET="VARIABLE" IGNORE_CASE="TRUE" DEFAULT="KEYWORD2" HIGHLIGHT_DIGITS="FALSE" />
+
+  <RULES SET="CONSTANT" IGNORE_CASE="TRUE" DEFAULT="LITERAL3" HIGHLIGHT_DIGITS="FALSE" />
+</MODE>

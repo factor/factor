@@ -1,6 +1,6 @@
 ! Copyright (C) 2012 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays fry kernel machine-learning.transformer
+USING: accessors arrays kernel machine-learning.transformer
 sequences sets sorting sorting.extras ;
 IN: machine-learning.label-binarizer
 

@@ -1,3 +1,3 @@
 ! Copyright (C) 2020 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-IN: bootstrap.arm
+IN: bootstrap.assembler.arm

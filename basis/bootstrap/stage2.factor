@@ -13,10 +13,8 @@ SYMBOL: bootstrap-time
 : strip-encodings ( -- )
     os unix? [
         [
-            P" resource:core/io/encodings/utf16/utf16.factor"
-            P" resource:core/io/encodings/utf16n/utf16n.factor" [ forget ] bi@
-            "io.encodings.utf16"
-            "io.encodings.utf16n" [ loaded-child-vocab-names [ forget-vocab ] each ] bi@
+            P" resource:core/io/encodings/utf16/utf16.factor" forget
+            "io.encodings.utf16" loaded-child-vocab-names [ forget-vocab ] each
         ] with-compilation-unit
     ] when ;
 
@@ -29,7 +27,7 @@ SYMBOL: bootstrap-time
     "bootstrap." prepend require ;
 
 : load-components ( -- )
-    "include" "exclude" [ get-global " " split harvest ] bi@ diff
+    "include" "exclude" [ get-global split-words harvest ] bi@ diff
     [ load-component ] each ;
 
 : print-time ( us -- )
@@ -95,9 +93,9 @@ CONSTANT: default-components
     print-report
 
     "staging" get [
-        "vocab:bootstrap/finish-staging.factor" run-file
+        "resource:basis/bootstrap/finish-staging.factor" run-file
     ] [
-        "vocab:bootstrap/finish-bootstrap.factor" run-file
+        "resource:basis/bootstrap/finish-bootstrap.factor" run-file
     ] if
 
     f error set-global
@@ -108,7 +106,7 @@ CONSTANT: default-components
     drop
     [
         load-help? off
-        [ "vocab:bootstrap/bootstrap-error.factor" parse-file ] save/restore-error
+        [ "resource:basis/bootstrap/bootstrap-error.factor" parse-file ] save/restore-error
         call
     ] with-scope
 ] recover

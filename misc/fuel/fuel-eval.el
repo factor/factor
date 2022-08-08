@@ -1,4 +1,4 @@
-;;; fuel-eval.el --- evaluating Factor expressions
+;;; fuel-eval.el --- evaluating Factor expressions -*- lexical-binding: t -*-
 
 ;; Copyright (C) 2008, 2009  Jose Antonio Ortega Ruiz
 ;; See http://factorcode.org/license.txt for BSD license.

@@ -1,6 +1,6 @@
 ! Copyright (c) 2012 Anonymous
 ! See http://factorcode.org/license.txt for BSD license.
-USING: combinators kernel make math sequences ;
+USING: combinators kernel make math ;
 IN: rosetta-code.happy-numbers
 
 ! http://rosettacode.org/wiki/Happy_numbers#Factor

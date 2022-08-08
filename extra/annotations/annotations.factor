@@ -1,7 +1,6 @@
 ! (c)2009 Joe Groff, Doug Coleman. see BSD license
-USING: accessors combinators.short-circuit definitions functors
-kernel lexer namespaces parser prettyprint tools.crossref
-sequences words ;
+USING: accessors combinators.short-circuit functors kernel lexer
+namespaces sequences tools.crossref words ;
 IN: annotations
 
 <<

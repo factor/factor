@@ -2,7 +2,7 @@
 ! Slava Pestov, Doug Coleman, Daniel Ehrenberg.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs base64 calendar calendar.format
-classes combinators debugger fry io io.crlf io.encodings
+classes combinators debugger io io.crlf io.encodings
 io.encodings.ascii io.encodings.binary io.encodings.iana
 io.encodings.string io.encodings.utf8 io.sockets
 io.sockets.secure io.timeouts kernel logging make math.order

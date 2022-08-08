@@ -1,6 +1,6 @@
 ! Copyright (c) 2012 Anonymous
 ! See http://factorcode.org/license.txt for BSD license.
-USING: arrays locals math math.ranges sequences sets sorting ;
+USING: arrays math ranges sequences sets sorting ;
 IN: rosetta-code.count-the-coins
 
 ! http://rosettacode.org/wiki/Count_the_coins
@@ -32,7 +32,7 @@ IN: rosetta-code.count-the-coins
     cents 1 + 0 <array> :> ways
     1 ways set-first
     coins [| coin |
-        coin cents [a,b] [| j |
+        coin cents [a..b] [| j |
             j coin - ways nth j ways [ + ] change-nth
         ] each
     ] each ways last ;

@@ -33,10 +33,10 @@ M: macosx file-systems
 M: macosx new-file-system-info macosx-file-system-info new ;
 
 M: macosx file-system-statfs
-    \ statfs64 <struct> [ statfs64-func io-error ] keep ;
+    \ statfs64 new [ statfs64-func io-error ] keep ;
 
 M: macosx file-system-statvfs
-    \ statvfs <struct> [ statvfs-func io-error ] keep ;
+    \ statvfs new [ statvfs-func io-error ] keep ;
 
 M: macosx statfs>file-system-info
     {

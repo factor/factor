@@ -1,4 +1,4 @@
-USING: help.markup help.syntax locals locals.types quotations strings
+USING: help.markup help.syntax locals.types quotations strings
 vocabs.parser ;
 IN: locals.parser
 
@@ -8,7 +8,7 @@ HELP: in-lambda?
 HELP: parse-def
 { $values
   { "name/paren" string }
-  { "def" "a " { $link def } " or a " { $link multi-def } }
+  { "def" multi-def }
 }
 { $description "Parses the lexical variable bindings following a " { $link POSTPONE: :> } " token." } ;
 

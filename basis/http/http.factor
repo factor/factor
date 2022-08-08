@@ -1,7 +1,7 @@
 ! Copyright (C) 2003, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays assocs base64 calendar calendar.format
-calendar.parser combinators fry hashtables http.parsers io io.crlf
+USING: accessors arrays ascii assocs base64 calendar calendar.format
+calendar.parser combinators hashtables http.parsers io io.crlf
 io.encodings.iana io.encodings.utf8 kernel make math math.parser
 mime.types present sequences sets sorting splitting urls ;
 IN: http
@@ -52,7 +52,7 @@ TUPLE: cookie name value version comment path domain expires max-age http-only s
         f swap
         (parse-set-cookie)
         [
-            swap {
+            swapd pick >lower {
                 { "version" [ >>version ] }
                 { "comment" [ >>comment ] }
                 { "expires" [ [ cookie-string>timestamp >>expires ] unless-empty ] }
@@ -61,8 +61,8 @@ TUPLE: cookie name value version comment path domain expires max-age http-only s
                 { "path" [ >>path ] }
                 { "httponly" [ drop t >>http-only ] }
                 { "secure" [ drop t >>secure ] }
-                [ <cookie> dup , nip ]
-            } case
+                [ drop rot <cookie> dup , ]
+            } case nip
         ] assoc-each
         drop
     ] { } make ;
@@ -160,13 +160,22 @@ TUPLE: request
         <url> >>proxy-url
         H{ } clone >>header
         V{ } clone >>cookies
-        "close" "connection" set-header
-        "Factor http.client" "user-agent" set-header
+        "close" "Connection" set-header
+        "Factor http.client" "User-Agent" set-header
         max-redirects >>redirects ;
 
 : header ( request/response key -- value )
     swap header>> at ;
 
+! https://github.com/factor/factor/issues/2273
+! https://observatory.mozilla.org/analyze/factorcode.org
+! https://csp-evaluator.withgoogle.com/?csp=https://factorcode.org
+: add-modern-headers ( response -- response )
+    "max-age=63072000; includeSubDomains; preload" "Strict-Transport-Security" set-header
+    "nosniff" "X-Content-Type-Options" set-header
+    "default-src https: 'unsafe-inline'; frame-ancestors 'none'; object-src 'none'; img-src 'self' data:;" "Content-Security-Policy" set-header
+    "DENY" "X-Frame-Options" set-header
+    "1; mode=block" "X-XSS-Protection" set-header ;
 
 TUPLE: response
     version
@@ -183,9 +192,10 @@ TUPLE: response
     response new
         "1.1" >>version
         H{ } clone >>header
-        "close" "connection" set-header
-        now timestamp>http-string "date" set-header
-        "Factor http.server" "server" set-header
+        "close" "Connection" set-header
+        now timestamp>http-string "Date" set-header
+        "Factor http.server" "Server" set-header
+        ! XXX: add-modern-headers
         utf8 >>content-encoding
         V{ } clone >>cookies ;
 
@@ -221,7 +231,7 @@ TUPLE: post-data data params content-type content-encoding ;
         swap >>content-type ;
 
 : parse-content-type-attributes ( string -- attributes )
-    " " split harvest [
+    split-words harvest [
         "=" split1
         "\"" ?head drop "\"" ?tail drop
     ] { } map>assoc ;

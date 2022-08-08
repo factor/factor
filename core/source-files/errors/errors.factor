@@ -68,9 +68,7 @@ GENERIC: errors-changed ( observer -- )
 
 SYMBOL: error-observers
 
-[
-    V{ } clone error-observers set-global
-] "source-files.errors" add-startup-hook
+STARTUP-HOOK: [ V{ } clone error-observers set-global ]
 
 : add-error-observer ( observer -- )
     error-observers get push ;

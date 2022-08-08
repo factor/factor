@@ -1,6 +1,7 @@
 USING: accessors assocs combinators.short-circuit
-compiler.cfg.instructions compiler.cfg.registers compiler.cfg.rpo
-compiler.cfg.stacks compiler.cfg.stacks.padding kernel sequences ;
+compiler.cfg.instructions compiler.cfg.registers
+compiler.cfg.rpo compiler.cfg.stacks compiler.cfg.stacks.padding
+kernel sequences ;
 IN: compiler.cfg.stacks.clearing
 
 : state>clears ( state -- clears )

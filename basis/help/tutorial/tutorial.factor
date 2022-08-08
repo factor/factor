@@ -28,7 +28,7 @@ ARTICLE: "first-program-logic" "Writing some logic in your first program"
 $nl
 "Your " { $snippet "palindrome.factor" } " file should look like the following after the previous section:"
 { $code
-    "! Copyright (C) 2012 Your name."
+    "! Copyright (C) 2022 Your name."
     "! See http://factorcode.org/license.txt for BSD license."
     "USING: ;"
     "IN: palindrome"

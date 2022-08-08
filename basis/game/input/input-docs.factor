@@ -1,5 +1,5 @@
-USING: help.markup help.syntax kernel ui.gestures quotations
-sequences strings math ;
+USING: help.markup help.syntax kernel math quotations sequences
+strings ;
 IN: game.input
 
 ARTICLE: "game-input" "Game controller input"

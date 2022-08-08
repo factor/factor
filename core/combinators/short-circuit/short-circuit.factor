@@ -1,5 +1,4 @@
-USING: arrays combinators fry generalizations kernel macros
-math sequences ;
+USING: arrays combinators generalizations kernel math sequences ;
 IN: combinators.short-circuit
 
 <PRIVATE

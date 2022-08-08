@@ -5,6 +5,9 @@
 <!DOCTYPE MODE SYSTEM "xmode.dtd">
 
 <MODE>
+	<PROPS>
+		<PROPERTY NAME="contextInsensitive" VALUE="true" />
+	</PROPS>
 	<RULES>
 		<TERMINATE AT_CHAR="0" />
 	</RULES>

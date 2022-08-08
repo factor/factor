@@ -1,10 +1,9 @@
 ! Copyright (C) 2008, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors assocs sequences kernel parser fry quotations
-classes.tuple classes.singleton namespaces
-html.components
-html.templates.chloe.compiler
-html.templates.chloe.syntax ;
+USING: accessors assocs classes.singleton classes.tuple
+html.components html.templates.chloe.compiler
+html.templates.chloe.syntax kernel namespaces parser quotations
+sequences ;
 IN: html.templates.chloe.components
 
 : render-quot ( -- quot )

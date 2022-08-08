@@ -1,7 +1,8 @@
 ! Copyright © 2008 Reginald Keith Ford II
 ! 24, the Factor game!
-USING: accessors backtrack combinators continuations formatting fry io
-kernel math prettyprint quotations random sequences ;
+USING: accessors backtrack combinators combinators.smart
+continuations formatting io kernel math prettyprint
+quotations random sequences ;
 IN: 24-game
 
 : nop ( -- ) ;
@@ -29,7 +30,7 @@ IN: 24-game
     4 [ 10 random ] replicate ;
 
 : make-24 ( -- array )
-    f [ dup first4 makes-24? ] [ drop random-4 ] do until ;
+    [ random-4 dup first4 makes-24? not ] smart-loop ;
 
 : q ( -- obj ) "quit" ;
 

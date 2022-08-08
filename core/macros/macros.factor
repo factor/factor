@@ -1,7 +1,7 @@
 ! Copyright (C) 2007, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors combinators compiler.units definitions effects
-effects.parser fry kernel memoize words ;
+kernel memoize words ;
 IN: macros
 
 <PRIVATE
@@ -36,6 +36,6 @@ M: macro definer drop \ MACRO: \ ; ;
 M: macro definition "macro" word-prop ;
 
 M: macro reset-word
-    [ call-next-method ] [ f "macro" set-word-prop ] bi ;
+    [ call-next-method ] [ "macro" remove-word-prop ] bi ;
 
 M: macro always-bump-effect-counter? drop t ;

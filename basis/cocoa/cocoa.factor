@@ -7,13 +7,12 @@ IN: cocoa
 SYMBOL: sent-messages
 
 sent-messages [ H{ } clone ] initialize
-
 : remember-send ( selector -- )
     dup sent-messages get set-at ;
 
 SYNTAX: ->
     scan-token dup remember-send
-    [ lookup-method suffix! ] [ suffix! ] bi \ send suffix! ;
+    [ lookup-objc-method suffix! ] [ suffix! ] bi \ send suffix! ;
 
 SYNTAX: ?->
     dup last cache-stubs
@@ -33,13 +32,13 @@ super-sent-messages [ H{ } clone ] initialize
 
 SYNTAX: SUPER->
     scan-token dup remember-super-send
-    [ lookup-method suffix! ] [ suffix! ] bi \ super-send suffix! ;
+    [ lookup-objc-method suffix! ] [ suffix! ] bi \ super-send suffix! ;
 
 SYMBOL: frameworks
 
 frameworks [ V{ } clone ] initialize
 
-[ frameworks get [ load-framework ] each ] "cocoa" add-startup-hook
+STARTUP-HOOK: [ frameworks get [ load-framework ] each ]
 
 SYNTAX: FRAMEWORK: scan-token [ load-framework ] [ frameworks get push ] bi ;
 
@@ -52,6 +51,7 @@ SYNTAX: IMPORT: scan-token [ ] import-objc-class ;
 [
     {
         "NSAlert"
+        "NSAppearance"
         "NSAppleScript"
         "NSApplication"
         "NSArray"
@@ -66,6 +66,7 @@ SYNTAX: IMPORT: scan-token [ ] import-objc-class ;
         "NSError"
         "NSEvent"
         "NSException"
+        "NSImage"
         "NSMenu"
         "NSMenuItem"
         "NSMutableDictionary"
@@ -80,6 +81,7 @@ SYNTAX: IMPORT: scan-token [ ] import-objc-class ;
         "NSOpenPanel"
         "NSPanel"
         "NSPasteboard"
+        "NSPopover"
         "NSPropertyListSerialization"
         "NSResponder"
         "NSSavePanel"

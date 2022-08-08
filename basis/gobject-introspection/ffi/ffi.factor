@@ -1,10 +1,10 @@
 ! Copyright (C) 2010 Anton Gorenko.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors alien.c-types alien.parser arrays ascii
-classes.parser classes.struct combinators combinators.short-circuit
-gobject-introspection.repository gobject-introspection.types kernel
-locals make math.parser namespaces parser sequences
-splitting.monotonic vocabs.parser words words.constant ;
+classes.parser classes.struct combinators
+combinators.short-circuit gobject-introspection.repository
+gobject-introspection.types kernel make math.parser namespaces
+sequences splitting.monotonic vocabs.parser words words.constant ;
 IN: gobject-introspection.ffi
 
 : def-c-type ( c-type-name base-c-type -- )
@@ -26,7 +26,7 @@ IN: gobject-introspection.ffi
     (CREATE-C-TYPE) [ typedef ] keep ;
 
 : alias-c-type-name ( alias -- c-type-name )
-    ! <workaround for alises w/o c:type (Atk)
+    ! <workaround for aliases w/o c:type (Atk)
     [ c-type>> ] [ name>> ] bi or ;
     ! workaround>
     ! c-type>> ;

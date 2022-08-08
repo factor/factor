@@ -1,6 +1,6 @@
 ! Copyright (c) 2008 Aaron Schaefer.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel math.combinatorics math.parser math.primes sequences project-euler.common ;
+USING: kernel math.combinatorics math.primes sequences project-euler.common ;
 IN: project-euler.041
 
 ! http://projecteuler.net/index.php?section=problems&id=41

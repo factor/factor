@@ -1,6 +1,6 @@
 ! Copyright (C) 2015 Sankaranarayanan Viswanathan.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays assocs combinators fry kernel make math
+USING: accessors arrays assocs combinators kernel make math
 math.vectors random sequences sets sorting ;
 
 IN: snake-game.game

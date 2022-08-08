@@ -1,9 +1,11 @@
 ! Copyright (C) 2008 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors alien.c-types alien.data assocs byte-arrays
-classes.struct combinators continuations fry grouping
+
+USING: accessors alien.c-types alien.data alien.utilities assocs
+byte-arrays classes.struct combinators continuations grouping
 io.encodings.utf8 kernel math math.parser namespaces sequences
-strings unix unix.ffi unix.users unix.utilities ;
+strings unix unix.ffi unix.users ;
+
 IN: unix.groups
 
 TUPLE: group id name passwd members ;
@@ -18,7 +20,7 @@ GENERIC: group-struct ( obj -- group/f )
     gr_mem>> utf8 alien>strings ;
 
 : (group-struct) ( id -- group-struct id group-struct byte-array length void* )
-    [ unix.ffi:group <struct> ] dip over 4096
+    [ unix.ffi:group new ] dip over 4096
     [ <byte-array> ] keep f void* <ref> ;
 
 : check-group-struct ( group-struct ptr -- group-struct/f )

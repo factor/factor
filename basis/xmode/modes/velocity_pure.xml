@@ -1,0 +1,116 @@
+<?xml version="1.0"?>
+
+<!DOCTYPE MODE SYSTEM "xmode.dtd">
+
+<!--
+ Mode definition for pure Velocity Template Language (VTL) highlighting
+  - In contrast to velocity.xml, there is no sgml highlighting!
+  - valid for jEdit 4.2, 4.3, 4.4 and 4.5.
+ 
+ Extensions for jEdit's Templates Plugin 4.0.0 are also highlighted:
+  - Special directives and variables added.
+  - Embedded Beanshell scripts are highlighted as java.
+ 
+ catalog entry recommended for Velocity Template files:
+ 
+   <MODE NAME="velocity"
+         FILE="velocity_pure.xml"
+         FILE_NAME_GLOB="*.vm" />
+ 
+ 16.01.2012 Robert Schwenn
+-->
+
+<MODE>
+
+	<PROPS>
+		<PROPERTY NAME="commentStart" VALUE="#*" />
+		<PROPERTY NAME="commentEnd" VALUE="*#" />
+		<PROPERTY NAME="lineComment" VALUE="##" />
+		<!-- Auto indent -->
+		<PROPERTY NAME="indentNextLines" VALUE="^\s*(#(foreach|if|elseif|else|beanshell|macro))\s*\(.*\)\s*"/>
+		<PROPERTY NAME="unindentThisLine" VALUE="^\s*#(end|elseif|else)\b.*"/>
+	</PROPS>
+	
+  <RULES IGNORE_CASE="FALSE">
+
+		<!-- VTL comment -->
+		<SPAN TYPE="COMMENT3">
+			<BEGIN>#**</BEGIN>
+			<END>*#</END>
+		</SPAN>
+
+		<!-- multi-line comment -->
+		<SPAN TYPE="COMMENT1">
+			<BEGIN>#*</BEGIN>
+			<END>*#</END>
+		</SPAN>
+
+		<!--single-line comment -->
+    <EOL_SPAN TYPE="COMMENT2">##</EOL_SPAN>
+    
+		
+		<!-- String -->
+    <SPAN TYPE="LITERAL1" NO_LINE_BREAK="TRUE">
+			<BEGIN>"</BEGIN>
+			<END>"</END>
+		</SPAN>
+
+		<!-- Variable name -->
+    <SPAN TYPE="FUNCTION" NO_LINE_BREAK="TRUE">
+			<BEGIN>${</BEGIN>
+			<END>}</END>
+		</SPAN>
+    <SEQ_REGEXP HASH_CHAR="$" TYPE="FUNCTION">\$!?[A-z][A-z0-9._-]*</SEQ_REGEXP>
+
+		<!-- Embedded Beanshell script -->
+    <SPAN TYPE="KEYWORD4" NO_LINE_BREAK="FALSE" DELEGATE="java::MAIN">
+			<BEGIN>#beanshell</BEGIN>
+			<END>#end</END>
+		</SPAN>
+    <!-- More correct, but the whole line after "#beanshell" is highlighted in one color:
+    <SPAN_REGEXP HASH_CHAR="#" TYPE="KEYWORD4" NO_LINE_BREAK="FALSE" DELEGATE="java::MAIN">
+			<BEGIN>#beanshell\s*\((true|false)?\)\s*</BEGIN>
+			<END>#end</END>
+		</SPAN_REGEXP>
+    -->
+
+
+		<KEYWORDS>
+      
+      <KEYWORD4>#macro</KEYWORD4>        <!-- Velocimacro block -->
+			<KEYWORD4>#beanshell</KEYWORD4>    <!-- beanshell block (jEdit-specific) -->
+      
+			<!-- Velocity directives, General -->
+      <KEYWORD1>#set</KEYWORD1>
+			<KEYWORD1>#parse</KEYWORD1>
+			<KEYWORD1>#include</KEYWORD1>
+			<KEYWORD1>#stop</KEYWORD1>
+      
+			<!-- Velocity directives, Flow control -->
+			<KEYWORD3>#if</KEYWORD3>
+			<KEYWORD3>#else</KEYWORD3>
+			<KEYWORD3>#elseif</KEYWORD3>
+			<KEYWORD3>#foreach</KEYWORD3>
+			<KEYWORD3>in</KEYWORD3>
+			<KEYWORD3>#end</KEYWORD3>
+      
+			<!-- Velocity directives, jEdit-specific -->
+			<LITERAL2>#prompt</LITERAL2>
+			<LITERAL2>#yes_no</LITERAL2>
+			<LITERAL2>#today</LITERAL2>
+			<LITERAL2>#caret</LITERAL2>
+			<LITERAL2>#buffermode</LITERAL2>
+      
+			<!-- jEdit-specific variables -->
+      <KEYWORD2>_jeditIndentation</KEYWORD2>
+			<KEYWORD2>_jeditSelection</KEYWORD2>
+			<KEYWORD2>_jeditTab</KEYWORD2>
+			<KEYWORD2>buffer</KEYWORD2>
+			<KEYWORD2>textarea</KEYWORD2>
+			<KEYWORD2>view</KEYWORD2>
+      
+		</KEYWORDS>
+    
+	</RULES>
+
+</MODE>

@@ -1,4 +1,4 @@
-;;; fuel-base.el --- Basic FUEL support code
+;;; fuel-base.el --- Basic FUEL support code -*- lexical-binding: t -*-
 
 ;; Copyright (C) 2008 Jose Antonio Ortega Ruiz
 ;; See http://factorcode.org/license.txt for BSD license.

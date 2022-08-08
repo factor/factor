@@ -17,6 +17,8 @@ SYMBOL: error-continuation
 SYMBOL: error-thread
 SYMBOL: restarts
 
+SINGLETON: no-op-restart
+
 <PRIVATE
 
 : (get-catchstack) ( -- catchstack )

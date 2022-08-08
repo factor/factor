@@ -6,7 +6,8 @@ system ;
 IN: editors.sublime
 
 SINGLETON: sublime
-sublime editor-class set-global
+
+editor-class [ sublime ] initialize
 
 HOOK: find-sublime-path os ( -- path )
 

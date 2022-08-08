@@ -1,5 +1,5 @@
-USING: alien fry generalizations io io.ports kernel locals math
-sequences sequences.private tools.annotations ;
+USING: alien generalizations io io.ports kernel math sequences
+sequences.private tools.annotations ;
 IN: tools.annotations.assertions
 
 ERROR: invalid-nth-unsafe n seq word ;

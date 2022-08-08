@@ -4,24 +4,54 @@
 
 <MODE>
 	<PROPS>
-		<PROPERTY NAME="lineComment" VALUE="#" />
+		<PROPERTY NAME="contextInsensitive" VALUE="FALSE" />
 	</PROPS>
-	<RULES DEFAULT="KEYWORD1">
-		<EOL_SPAN TYPE="COMMENT1" AT_LINE_START="TRUE">#</EOL_SPAN>
-		<EOL_SPAN TYPE="NULL" DELEGATE="PROP_VALUE">=</EOL_SPAN>
-		<EOL_SPAN TYPE="NULL" DELEGATE="PROP_VALUE">:</EOL_SPAN>
-		<EOL_SPAN TYPE="NULL" DELEGATE="PROP_VALUE"> </EOL_SPAN>
-		<EOL_SPAN TYPE="NULL" DELEGATE="PROP_VALUE">	</EOL_SPAN>
-	</RULES>
-	<RULES SET="PROP_VALUE" HIGHLIGHT_DIGITS="TRUE"
-		DIGIT_RE="([\p{Digit}]+|#[\p{XDigit}]+)"
-		NO_WORD_SEP="#">
-		<!-- MessageFormat { ... } stuff -->
-		<SPAN TYPE="KEYWORD3" NO_LINE_BREAK="TRUE">
-			<BEGIN>{</BEGIN>
-			<END>}</END>
-		</SPAN>
-		<!-- Sillyness -->
-		<MARK_FOLLOWING TYPE="DIGIT">#</MARK_FOLLOWING>
-	</RULES>
+	<RULES>
+        <!-- 
+        Comments: indicated by either ASCII # or ! as the first non-whitespace
+        character on a line. Comments extend to the end of the line. Comments
+        placed after a key/value are considered part of the value, not as a
+        comment.
+        -->
+        <EOL_SPAN_REGEXP TYPE="COMMENT1" AT_LINE_START="TRUE">\s*[#!]</EOL_SPAN_REGEXP>
+        
+        <!-- 
+        A "natural" line, that is, a blank line. This isn't necessary, it's here
+        just to show it was considered and handled.
+        -->
+        <EOL_SPAN_REGEXP TYPE="NULL">\s*$</EOL_SPAN_REGEXP>
+	
+	    <!--
+	    Key: The key contains all of the characters in the line starting with the 
+	    first non-white space character and up to, but not including, the first 
+	    unescaped '=', ':', or white space character other than a line terminator. 
+	    All of these key termination characters may be included in the key by 
+	    escaping them with a preceding backslash character.
+	    -->
+	    <SPAN_REGEXP TYPE="KEYWORD1" NO_LINE_BREAK="TRUE" NO_WORD_BREAK="TRUE" AT_LINE_START="TRUE" ESCAPE="\">
+	        <BEGIN>\s*([\u0022-\uFFFF&amp;&amp;[^:=]]|[\\][:=&#09;])+?</BEGIN>
+	        <END REGEXP="TRUE">(?=(([:=])|(\s+)))</END>
+	    </SPAN_REGEXP>
+	
+	    <!-- 
+	    Visible key termination characters.
+	    -->
+	    <SEQ_REGEXP	TYPE="OPERATOR">((\s*[:=]\s*)|(\s+))</SEQ_REGEXP>
+	    
+	    <!-- 
+	    Not a comment, not a key, not a key terminator, must be a value.
+	    Value contains all characters until the end of the line. The line may
+	    be continued to the next line by a trailing \.
+	    
+	    The seq_regexp handles the odd case where the value is only 1 character
+	    long. The tokenizer consumes that character, which means the ending
+	    regex for the span_regexp doesn't work.
+	    -->
+	    <SEQ_REGEXP	TYPE="LITERAL1">[^\\]{1}$</SEQ_REGEXP>
+        <SPAN_REGEXP TYPE="LITERAL1">
+            <BEGIN>.</BEGIN>
+            <END REGEXP="TRUE">[^\\]$</END>
+        </SPAN_REGEXP>
+    </RULES>
+	
 </MODE>

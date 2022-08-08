@@ -1,9 +1,10 @@
 ! Copyright (C) 2007, 2008 Slava Pestov, Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: alien alien.c-types alien.data arrays assocs byte-arrays
-combinators combinators.short-circuit fry kernel kernel.private
-layouts macros math math.bits sequences sequences.private
+combinators combinators.short-circuit kernel kernel.private
+layouts math math.bits sequences sequences.private
 specialized-arrays words ;
+IN: math.bitwise
 SPECIALIZED-ARRAY: uchar
 IN: math.bitwise
 
@@ -149,3 +150,12 @@ M: object bit-count
 : even-parity? ( obj -- ? ) bit-count even? ;
 
 : odd-parity? ( obj -- ? ) bit-count odd? ;
+
+: d>w/w ( d -- w1 w2 )
+    [ 0xffffffff bitand ] [ -32 shift 0xffffffff bitand ] bi ;
+
+: w>h/h ( w -- h1 h2 )
+    [ 0xffff bitand ] [ -16 shift 0xffff bitand ] bi ;
+
+: h>b/b ( h -- b1 b2 )
+    [ 0xff bitand ] [ -8 shift 0xff bitand ] bi ;

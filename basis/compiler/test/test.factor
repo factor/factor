@@ -7,7 +7,7 @@ compiler.cfg.stacks compiler.cfg.stacks.local compiler.cfg.utilities
 compiler.tree.builder compiler.tree.checker compiler.tree.def-use
 compiler.tree.normalization compiler.tree.propagation
 compiler.tree.propagation.info compiler.tree.recursive compiler.units
-fry hashtables kernel math namespaces sequences stack-checker
+hashtables kernel math namespaces sequences stack-checker
 tools.test vectors vocabs words ;
 IN: compiler.test
 

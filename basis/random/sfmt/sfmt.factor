@@ -1,7 +1,7 @@
 ! Copyright (C) 2009 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors alien.c-types alien.data kernel locals math
-math.ranges math.bitwise math.vectors math.vectors.simd random
+ranges math.bitwise math.vectors math.vectors.simd random
 sequences specialized-arrays sequences.private classes.struct
 combinators.short-circuit fry ;
 SPECIALIZED-ARRAY: uint
@@ -76,7 +76,7 @@ M:: sfmt generate ( sfmt -- )
         r state r2<<
     ] each
 
-    ! n m - 1 + n [a,b) [
+    ! n m - 1 + n [a..b) [
     m 1 - <iota> [
         n m - 1 + + >fixnum :> i
         i array nth-unsafe
@@ -111,7 +111,7 @@ M:: sfmt generate ( sfmt -- )
 
 : <sfmt-array> ( sfmt -- uint-array uint-4-array )
     state>>
-    [ n>> 4 * [1,b] uint >c-array ] [ seed>> ] bi
+    [ n>> 4 * [1..b] uint >c-array ] [ seed>> ] bi
     [
         [
             [ -30 shift ] [ ] bi bitxor
@@ -121,7 +121,7 @@ M:: sfmt generate ( sfmt -- )
     dup uint-4 cast-array ;
 
 : <sfmt-state> ( seed n m mask parity -- sfmt )
-    sfmt-state <struct>
+    sfmt-state new
         swap >>parity
         swap >>mask
         swap >>m

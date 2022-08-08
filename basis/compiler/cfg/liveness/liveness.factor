@@ -5,7 +5,7 @@ compiler.cfg.def-use compiler.cfg.instructions
 compiler.cfg.predecessors compiler.cfg.registers
 compiler.cfg.rpo compiler.cfg.ssa.destruction.leaders
 compiler.cfg.utilities compiler.utilities cpu.architecture
-deques dlists fry kernel locals namespaces sequences sets ;
+deques dlists kernel namespaces sequences sets ;
 IN: compiler.cfg.liveness
 
 SYMBOL: live-ins
@@ -124,7 +124,7 @@ M: insn visit-insn 2drop ;
 : compute-live-out ( basic-block -- live-out )
     [ successors>> [ live-in ] map ]
     [ dup successors>> [ edge-live-in ] with map ] bi
-    append assoc-combine ;
+    append assoc-union-all ;
 
 : update-live-out ( basic-block -- changed? )
     [ compute-live-out ] keep

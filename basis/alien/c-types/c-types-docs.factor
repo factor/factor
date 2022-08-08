@@ -1,7 +1,5 @@
-USING: alien help.syntax help.markup libc kernel.private
-byte-arrays strings hashtables alien.syntax alien.strings
-sequences io.encodings.string debugger destructors vocabs.loader
-classes.struct math kernel ;
+USING: alien alien.syntax byte-arrays classes.struct help.markup
+help.syntax kernel math sequences ;
 IN: alien.c-types
 
 HELP: heap-size
@@ -133,7 +131,6 @@ $nl
 ARTICLE: "c-types.ambiguity" "Word name clashes with C types"
 "Note that some of the C type word names clash with commonly-used Factor words:"
 { $list
-  { { $link short } " clashes with the " { $link sequences:short } " word in the " { $vocab-link "sequences" } " vocabulary" }
   { { $link float } " clashes with the " { $link math:float } " word in the " { $vocab-link "math" } " vocabulary" }
 }
 "If you use the wrong vocabulary, you will see a " { $link no-c-type } " error. For example, the following is " { $strong "not" } " valid, and will raise an error because the " { $link math:float } " word from the " { $vocab-link "math" } " vocabulary is not a C type:"

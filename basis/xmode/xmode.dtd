@@ -14,7 +14,7 @@
 <!ENTITY % att-delegate 'DELEGATE CDATA #IMPLIED' >
 <!ENTITY % att-span-mix 'NO_LINE_BREAK %att-bool;
 	NO_WORD_BREAK %att-bool;
-	NO_ESCAPE %att-bool; '>
+    ESCAPE CDATA #IMPLIED '>
 <!ENTITY % att-hash-char 'HASH_CHAR CDATA #IMPLIED
 	HASH_CHARS CDATA #IMPLIED' >
 
@@ -98,9 +98,10 @@
 
 <!-- SPAN and SPAN_REGEXP children -->
 <!ELEMENT BEGIN ( #PCDATA ) >
-<!ATTLIST BEGIN %att-position-mix; >
 <!ELEMENT END ( #PCDATA ) >
-<!ATTLIST END %att-position-mix; >
+<!ATTLIST END
+	%att-position-mix;
+	REGEXP %att-bool; >
 
 <!-- EOL_SPAN element -->
 <!ELEMENT EOL_SPAN ( #PCDATA ) >

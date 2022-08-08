@@ -19,7 +19,7 @@ HELP: primitive-quot
 { $description "Creates the defining quotation for the primitive. If 'vm-func' is a string, then it is prefixed with 'primitive_' and a quotation calling that C++ function is generated." } ;
 
 ARTICLE: "bootstrap.image.primitives" "Bootstrap primitives"
-"This vocab contains utilities for declaring primitives to be added to the bootstrap image. It is used by the file " { $snippet "resource:core/bootstrap/primitives.factor" }
+"This vocab contains utilities for declaring primitives to be added to the bootstrap image. It is used by the file " { $snippet "resource:basis/bootstrap/primitives.factor" }
 $nl
 { $link all-primitives } " is an assoc where all primitives are declared. See that constant for a description of the format." ;
 

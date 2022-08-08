@@ -1,10 +1,9 @@
 ! Copyright (C) 2008, 2009 Doug Coleman, Daniel Ehrenberg.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs combinators
-combinators.short-circuit interval-maps kernel locals
-math.parser memoize multiline peg.ebnf regexp.ast regexp.classes
-sequences sets splitting strings unicode unicode.data
-unicode.script ;
+combinators.short-circuit interval-maps kernel math.parser
+multiline peg.ebnf regexp.ast regexp.classes sequences sets
+splitting strings unicode unicode.data unicode.script ;
 IN: regexp.parser
 
 : allowed-char? ( ch -- ? )

@@ -1,7 +1,7 @@
 ! Copyright (C) 2007, 2009 Slava Pestov, Eduardo Cavazos.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays assocs effects.parser fry generic.parser
-kernel lexer locals.errors locals.rewrite.closures locals.types
+USING: accessors arrays assocs effects.parser generic.parser
+kernel lexer locals.errors locals.rewrite locals.types
 make namespaces parser quotations sequences splitting
 vocabs.parser words ;
 IN: locals.parser

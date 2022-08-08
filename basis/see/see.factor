@@ -18,12 +18,13 @@ GENERIC: see* ( defspec -- )
 : see ( defspec -- ) see* nl ;
 
 : synopsis ( defspec -- str )
-    [
-        string-limit? off
-        0 margin namespaces:set
-        1 line-limit namespaces:set
-        [ synopsis* ] with-in
-    ] with-string-writer ;
+    H{
+        { string-limit? f }
+        { margin 0 }
+        { line-limit 1 }
+    } clone [
+        [ [ synopsis* ] with-in ] with-string-writer
+    ] with-variables ;
 
 : definer. ( defspec -- )
     definer drop pprint-word ;

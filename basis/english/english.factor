@@ -1,8 +1,8 @@
 ! Copyright (C) 2015, 2018 John Benediktsson
 ! See http://factorcode.org/license.txt for BSD license
 USING: accessors arrays assocs combinators help.markup kernel
-literals locals math math.order math.parser sequences splitting
-unicode words ;
+literals math math.order math.parser sequences splitting unicode
+words ;
 IN: english
 
 <PRIVATE

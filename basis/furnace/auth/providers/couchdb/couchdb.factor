@@ -1,6 +1,7 @@
-USING: accessors assocs base64 byte-arrays combinators.short-circuit
-continuations couchdb fry furnace.auth.providers json.writer kernel
-locals make mirrors namespaces sequences strings urls urls.encoding ;
+USING: accessors assocs base64 byte-arrays
+combinators.short-circuit continuations couchdb
+furnace.auth.providers json.writer kernel make mirrors
+namespaces sequences strings urls urls.encoding ;
 IN: furnace.auth.providers.couchdb
 
 ! !!! Implement the authentication protocol for CouchDB.

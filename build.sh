@@ -11,7 +11,7 @@ ECHO=echo
 OS=
 ARCH=
 WORD=
-GIT_PROTOCOL=${GIT_PROTOCOL:="git"}
+GIT_PROTOCOL=${GIT_PROTOCOL:="https"}
 GIT_URL=${GIT_URL:=$GIT_PROTOCOL"://github.com/factor/factor.git"}
 SCRIPT_ARGS="$*"
 
@@ -82,6 +82,8 @@ ensure_program_installed() {
 }
 
 check_ret() {
+    # Can't execute any commands before saving $?
+    # $1 is the name of the command we are checking
     RET=$?
     if [[ $RET -ne 0 ]] ; then
        $ECHO $1 failed
@@ -254,8 +256,8 @@ check_gtk_libraries() {
 check_libraries() {
     case $OS in
         linux) check_X11_libraries
-               check_gtk_libraries;;
-        unix) check_gtk_libraries;;
+               check_gtk_libraries ;;
+        unix) check_gtk_libraries ;;
     esac
 }
 
@@ -273,18 +275,18 @@ find_os() {
     local uname_s=$(uname -s)
     check_ret uname
     case $uname_s in
-        CYGWIN_NT-5.2-WOW64) OS=windows;;
-        *CYGWIN_NT*) OS=windows;;
-        *CYGWIN*) OS=windows;;
-        MINGW32*) OS=windows;;
-        MINGW64*) OS=windows;;
-        MSYS_NT*) OS=windows;;
-        *darwin*) OS=macosx;;
-        *Darwin*) OS=macosx;;
-        *linux*) OS=linux;;
-        *Linux*) OS=linux;;
-        FreeBSD) OS=freebsd;;
-        Haiku) OS=haiku;;
+        CYGWIN_NT-5.2-WOW64) OS=windows ;;
+        *CYGWIN_NT*) OS=windows ;;
+        *CYGWIN*) OS=windows ;;
+        MINGW32*) OS=windows ;;
+        MINGW64*) OS=windows ;;
+        MSYS_NT*) OS=windows ;;
+        *darwin*) OS=macosx ;;
+        *Darwin*) OS=macosx ;;
+        *linux*) OS=linux ;;
+        *Linux*) OS=linux ;;
+        FreeBSD) OS=freebsd ;;
+        Haiku) OS=haiku ;;
     esac
 }
 
@@ -294,23 +296,23 @@ find_architecture() {
     uname_m=$(uname -m)
     check_ret uname
     case $uname_m in
-       i386) ARCH=x86;;
-       i686) ARCH=x86;;
-       i86pc) ARCH=x86;;
-       amd64) ARCH=x86;;
-       ppc64) ARCH=ppc;;
-       *86) ARCH=x86;;
-       *86_64) ARCH=x86;;
-       aarch64) ARCH=arm64;;
-       arm64) ARCH=arm64;;
-       iPhone5*[3-9]) ARCH=arm64;;
-       iPhone[6-9]*) ARCH=arm64;;
-       iPhone[1-9][0-9]*) ARCH=arm64;;
-       iPad[4-9]*) ARCH=arm64;;
-       iPad[1-9][0-9]*) ARCH=arm64;;
-       AppleTV[5-9]*) ARCH=arm64;;
-       AppleTV[1-9][0-9]*) ARCH=arm64;;
-       "Power Macintosh") ARCH=ppc;;
+       i386) ARCH=x86 ;;
+       i686) ARCH=x86 ;;
+       i86pc) ARCH=x86 ;;
+       amd64) ARCH=x86 ;;
+       ppc64) ARCH=ppc ;;
+       *86) ARCH=x86 ;;
+       *86_64) ARCH=x86 ;;
+       aarch64) ARCH=arm64 ;;
+       arm64) ARCH=arm64 ;;
+       iPhone5*[3-9]) ARCH=arm64 ;;
+       iPhone[6-9]*) ARCH=arm64 ;;
+       iPhone[1-9][0-9]*) ARCH=arm64 ;;
+       iPad[4-9]*) ARCH=arm64 ;;
+       iPad[1-9][0-9]*) ARCH=arm64 ;;
+       AppleTV[5-9]*) ARCH=arm64 ;;
+       AppleTV[1-9][0-9]*) ARCH=arm64 ;;
+       "Power Macintosh") ARCH=ppc ;;
     esac
 }
 
@@ -320,16 +322,16 @@ find_num_cores() {
     uname_s=$(uname -s)
     check_ret uname
     case $uname_s in
-        CYGWIN_NT-5.2-WOW64 | *CYGWIN_NT* | *CYGWIN* | MINGW32*) NUM_CORES=$NUMBER_OF_PROCESSORS;;
-        *linux* | *Linux*) NUM_CORES=$(getconf _NPROCESSORS_ONLN || nproc);;
-        *darwin* | *Darwin* | freebsd) NUM_CORES=$(sysctl -n hw.ncpu);;
+        CYGWIN_NT-5.2-WOW64 | *CYGWIN_NT* | *CYGWIN* | MINGW32*) NUM_CORES=$NUMBER_OF_PROCESSORS ;;
+        *linux* | *Linux*) NUM_CORES=$(getconf _NPROCESSORS_ONLN || nproc) ;;
+        *darwin* | *Darwin* | freebsd) NUM_CORES=$(sysctl -n hw.ncpu) ;;
     esac
 }
 
 find_word_size() {
     if [[ -n $WORD ]] ; then return; fi
     $ECHO "Finding WORD..."
-    WORD=$(find_word_size_cpp || find_word_size_c)
+    WORD=$(getconf LONG_BIT || find_word_size_cpp || find_word_size_c)
 }
 
 find_word_size_cpp() {
@@ -350,7 +352,7 @@ find_word_size_c() {
         64) ;;
         *)
             echo "Word size should be 32/64, got '$WORD_OUT'"
-            exit_script 15;;
+            exit_script 15 ;;
     esac
     $DELETE -f $C_WORD
     echo "$WORD_OUT"
@@ -358,16 +360,16 @@ find_word_size_c() {
 
 set_factor_binary() {
     case $OS in
-        windows) FACTOR_BINARY=factor.com;;
-        *) FACTOR_BINARY=factor;;
+        windows) FACTOR_BINARY=factor.com ;;
+        *) FACTOR_BINARY=factor ;;
     esac
 }
 
 set_factor_library() {
     case $OS in
-        windows) FACTOR_LIBRARY=factor.dll;;
-        macosx) FACTOR_LIBRARY=libfactor.dylib;;
-        *) FACTOR_LIBRARY=libfactor.a;;
+        windows) FACTOR_LIBRARY=factor.dll ;;
+        macosx) FACTOR_LIBRARY=libfactor.dylib ;;
+        *) FACTOR_LIBRARY=libfactor.a ;;
     esac
 }
 
@@ -392,6 +394,8 @@ echo_build_info() {
     $ECHO MAKE_IMAGE_TARGET=$MAKE_IMAGE_TARGET
     $ECHO GIT_PROTOCOL=$GIT_PROTOCOL
     $ECHO GIT_URL=$GIT_URL
+    $ECHO CHECKSUM_URL=$CHECKSUM_URL
+    $ECHO BOOT_IMAGE_URL=$BOOT_IMAGE_URL
     $ECHO DOWNLOADER=$DOWNLOADER
     $ECHO CC=$CC
     $ECHO CXX=$CXX
@@ -470,6 +474,7 @@ find_build_info() {
     set_factor_image
     set_build_info
     set_downloader
+    set_boot_image_vars
     set_make
     echo_build_info
 }
@@ -530,15 +535,15 @@ cd_factor() {
 
 set_copy() {
     case $OS in
-        windows) COPY=cp;;
-        *) COPY=cp;;
+        windows) COPY=cp ;;
+        *) COPY=cp ;;
     esac
 }
 
 set_delete() {
     case $OS in
-        windows) DELETE=rm;;
-        *) DELETE=rm;;
+        windows) DELETE=rm ;;
+        *) DELETE=rm ;;
     esac
 }
 
@@ -608,16 +613,16 @@ check_url() {
 # Otherwise, just use `master`
 set_boot_image_vars() {
     set_current_branch
-    local url="http://downloads.factorcode.org/images/${CURRENT_BRANCH}/checksums.txt"
+    local url="https://downloads.factorcode.org/images/${CURRENT_BRANCH}/checksums.txt"
     check_url $url
     if [[ $? -eq 0 ]]; then
         CHECKSUM_URL="$url"
-        BOOT_IMAGE_URL="http://downloads.factorcode.org/images/${CURRENT_BRANCH}/${BOOT_IMAGE}"
+        BOOT_IMAGE_URL="https://downloads.factorcode.org/images/${CURRENT_BRANCH}/${BOOT_IMAGE}"
     else
         $ECHO "boot image for branch \`${CURRENT_BRANCH}\` is not on server, trying master instead"
         $ECHO "  tried nonexistent url: ${url}"
-        CHECKSUM_URL="http://downloads.factorcode.org/images/master/checksums.txt"
-        BOOT_IMAGE_URL="http://downloads.factorcode.org/images/master/${BOOT_IMAGE}"
+        CHECKSUM_URL="https://downloads.factorcode.org/images/master/checksums.txt"
+        BOOT_IMAGE_URL="https://downloads.factorcode.org/images/master/${BOOT_IMAGE}"
     fi
 }
 
@@ -681,6 +686,7 @@ copy_fresh_image() {
 
 bootstrap() {
     ./$FACTOR_BINARY -i=$BOOT_IMAGE
+    check_ret "./$FACTOR_BINARY bootstrap failed"
     copy_fresh_image
 }
 
@@ -739,7 +745,7 @@ install_deps_dnf() {
 }
 
 install_deps_pkg() {
-    sudo pkg install --yes git gmake gcc rlwrap ripgrep curl gmake x11-toolkits/gtk30 x11-toolkits/gtkglext pango cairo vim
+    sudo pkg install --yes bash git gmake gcc rlwrap ripgrep curl gmake x11-toolkits/gtk30 x11-toolkits/gtkglext pango cairo vim
 }
 
 
@@ -764,6 +770,7 @@ usage() {
     $ECHO "  deps-dnf - install required packages for Factor on Linux using dnf"
     $ECHO "  deps-pkg - install required packages for Factor on FreeBSD using pkg"
     $ECHO "  deps-macosx - install git on MacOSX using port"
+    $ECHO "  self-bootstrap - make local boot image, bootstrap"
     $ECHO "  self-update - git pull, recompile, make local boot image, bootstrap"
     $ECHO "  quick-update - git pull, refresh-all, save"
     $ECHO "  update|latest - git pull, recompile, download a boot image, bootstrap"
@@ -773,6 +780,7 @@ usage() {
     $ECHO "  net-bootstrap - recompile, download a boot image, bootstrap"
     $ECHO "  make-target - find and print the os-arch-cpu string"
     $ECHO "  report|info - print the build variables"
+    $ECHO "  full-report - print the build variables, check programs and libraries"
     $ECHO "  update-boot-image - get the boot image for the current branch"
     $ECHO ""
     $ECHO "If you are behind a firewall, invoke as:"
@@ -806,8 +814,8 @@ case "$1" in
     deps-macosx) install_deps_macosx ;;
     deps-dnf) install_deps_dnf ;;
     deps-pkg) install_deps_pkg ;;
-    self-bootstrap) get_config_info; make_boot_image; bootstrap;;
-    self-update) update; make_boot_image; bootstrap;;
+    self-bootstrap) get_config_info; make_boot_image; bootstrap  ;;
+    self-update) update; make_boot_image; bootstrap  ;;
     quick-update) update; refresh_image ;;
     update|latest) update; download_and_bootstrap ;;
     compile) find_build_info; make_factor ;;
@@ -817,7 +825,7 @@ case "$1" in
     make-target) FIND_MAKE_TARGET=true; ECHO=false; find_build_info; exit_script ;;
     report|info) find_build_info ;;
     full-report) find_build_info; check_installed_programs; check_libraries ;;
-    update-boot-image) find_build_info; check_installed_programs; update_boot_image;;
+    update-boot-image) find_build_info; check_installed_programs; update_boot_image ;;
     *) usage ;;
 esac
 

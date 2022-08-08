@@ -1,9 +1,9 @@
 ! Copyright (C) 2008, 2009 Doug Coleman, Daniel Ehrenberg.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors combinators kernel kernel.private math sequences
-sequences.private strings sets assocs make lexer namespaces parser
-arrays fry locals regexp.parser splitting sorting regexp.ast
-regexp.negation regexp.compiler compiler.units words math.ranges ;
+USING: accessors arrays classes compiler.units kernel
+kernel.private lexer make math ranges namespaces regexp.ast
+regexp.compiler regexp.negation regexp.parser sequences
+sequences.private splitting strings vocabs.loader words ;
 IN: regexp
 
 TUPLE: regexp
@@ -29,10 +29,6 @@ M: lookbehind question>quot
     ast>dfa dfa>reverse-shortest-word
     '[ [ 1 - ] dip f _ execute ] ;
 
-: check-string ( string -- string )
-    ! Make this configurable
-    dup string? [ "String required" throw ] unless ;
-
 : match-index-from ( i string regexp -- index/f )
     ! This word is unsafe. It assumes that i is a fixnum
     ! and that string is a string.
@@ -45,7 +41,7 @@ M: reverse-regexp end/start drop length 1 - -1 swap ;
 PRIVATE>
 
 : matches? ( string regexp -- ? )
-    [ check-string ] dip
+    [ string check-instance ] dip
     [ end/start ] 2keep
     match-index-from
     [ = ] [ drop f ] if* ;
@@ -53,7 +49,7 @@ PRIVATE>
 <PRIVATE
 
 : search-range ( i string reverse? -- seq )
-    [ drop -1 ] [ length ] if [a,b] ; inline
+    [ drop -1 ] [ length ] if [a..b] ; inline
 
 :: (next-match) ( i string regexp quot: ( i string regexp -- j ) reverse? -- start end ? )
     i string regexp quot call dup
@@ -94,7 +90,7 @@ M: regexp match-iterator-start 2drop 0 ;
 M: reverse-regexp match-iterator-start drop length ;
 
 : prepare-match-iterator ( string regexp -- i string regexp )
-    [ check-string ] dip [ match-iterator-start ] 2keep ; inline
+    [ string check-instance ] dip [ match-iterator-start ] 2keep ; inline
 
 PRIVATE>
 
@@ -221,6 +217,5 @@ PRIVATE>
 
 SYNTAX: R/ parse-regexp ;
 
-USE: vocabs.loader
 
 { "prettyprint" "regexp" } "regexp.prettyprint" require-when

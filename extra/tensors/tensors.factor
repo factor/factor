@@ -1,8 +1,8 @@
 ! Copyright (C) 2019 HMC Clinic.
 ! See http://factorcode.org/license.txt for BSD license.
 
-USING: accessors alien alien.c-types alien.data arrays byte-arrays combinators
-grouping kernel locals kernel.private math math.functions math.ranges math.vectors
+USING: accessors alien alien.c-types alien.data arrays combinators
+grouping kernel math math.functions ranges math.vectors
 math.vectors.simd multi-methods parser prettyprint.custom sequences sequences.extras
 sequences.private specialized-arrays typed ;
 
@@ -57,7 +57,7 @@ PRIVATE>
 
 ! Construct a tensor with vec { 0 1 2 ... } and reshape to the desired shape
 : naturals ( shape -- tensor )
-    check-shape [ ] [ product [0,b) >float-array ] bi <tensor> ;
+    check-shape dup product [0..b) >float-array <tensor> ;
 
 ! Construct a tensor without initializing its values
 : (tensor) ( shape -- tensor )
@@ -76,8 +76,7 @@ PRIVATE>
 
 ! Flatten the tensor so that it is only one-dimensional
 : flatten ( tensor -- tensor )
-    dup shape>>
-    product { } 1sequence >>shape ;
+    dup shape>> product { } 1sequence >>shape ;
 
 ! outputs the number of dimensions of a tensor
 : dims ( tensor -- n )
@@ -294,7 +293,7 @@ METHOD: t% { number tensor } [ >float ] dip [ mod ] with t-uop ;
 
 ! Sum together all elements in the tensor
 syntax:M: tensor sum vec>> 0 <simd-slice>
-    [ simd-slice>> 0 [ sum + ] reduce ]
+    [ simd-slice>> [ sum ] map-sum ]
     [ end-slice>> sum ] bi + ;
 
 <PRIVATE
@@ -349,7 +348,7 @@ syntax:M: tensor sum vec>> 0 <simd-slice>
     seq [ shape>> last ] map :> last-dims
     ! Curr tensor and index in tensor
     0 0
-    last-dims sum [0,b) [
+    last-dims sum [0..b) [
         drop :> old-t-ind :> last-dims-i
         last-dims-i last-dims nth
         old-t-ind -
@@ -398,7 +397,7 @@ syntax:M: tensor sum vec>> 0 <simd-slice>
 :: final-vstack-shape ( seq -- shape )
     ! Compute the new second-to-last dimension
     seq first dims 2 - :> vdim
-    seq 0 [ shape>> vdim swap nth + ] reduce
+    seq [ shape>> vdim swap nth ] map-sum
     ! Combine it to create the new shape
     seq first shape>> clone :> new-shape
     vdim new-shape set-nth
@@ -421,7 +420,7 @@ PRIVATE>
     ! Compute the final shape
     [
         ! Compute the first dimension
-        [ 0 [ shape>> first + ] reduce 1array ]
+        [ [ shape>> first ] map-sum 1array ]
         ! Compute the other dimensions
         [ first shape>> rest ] bi  append
     ]
@@ -466,7 +465,7 @@ PRIVATE>
     ! Compute the starting index
     / truncate dupd *
     ! Compute the ending index
-    swap over +
+    tuck +
     ! Take a slice
     rot <slice> ;
 

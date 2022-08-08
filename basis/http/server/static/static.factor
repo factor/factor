@@ -3,13 +3,12 @@
 IN: http.server.static
 DEFER: file-responder ! necessary for cgi-docs
 DEFER: <static> ! necessary for cgi-docs
-USING: calendar kernel math math.order math.parser namespaces
-parser sequences strings assocs hashtables debugger mime.types
-sorting logging calendar.parser accessors splitting io io.files
-io.files.info io.directories io.pathnames io.encodings.binary
-fry xml.entities destructors urls html xml.syntax
-html.templates.fhtml http http.server http.server.responses
-http.server.redirection xml.writer locals combinators ;
+USING: accessors assocs calendar.parser combinators destructors
+html html.templates.fhtml http http.server
+http.server.redirection http.server.responses io.directories
+io.encodings.binary io.files io.files.info io.pathnames kernel
+logging math.order math.parser mime.types namespaces sequences
+sorting splitting urls xml.syntax ;
 QUALIFIED: sets
 
 TUPLE: file-responder root hook special index-names allow-listings ;
@@ -160,7 +159,7 @@ TUPLE: file-responder root hook special index-names allow-listings ;
 
 : find-index ( filename -- path )
     file-responder get index-names>>
-    [ append-path dup exists? [ drop f ] unless ] with map-find
+    [ append-path dup file-exists? [ drop f ] unless ] with map-find
     drop ;
 
 : serve-directory ( filename -- response )
@@ -173,7 +172,7 @@ TUPLE: file-responder root hook special index-names allow-listings ;
     ] if ;
 
 : serve-object ( filename -- response )
-    serving-path dup exists?
+    serving-path dup file-exists?
     [ dup file-info directory? [ serve-directory ] [ serve-file ] if ]
     [ drop <404> ]
     if ;

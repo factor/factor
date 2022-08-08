@@ -28,27 +28,27 @@
   <RULES IGNORE_CASE="FALSE" NO_WORD_SEP="_:." HIGHLIGHT_DIGITS="TRUE"
          DIGIT_RE="[\p{Digit}]*(\.[\p{Digit}]*)?([eE][+-]?[\p{Digit}]*)?">
     <!-- Multiline comments -->
-    <SPAN TYPE="COMMENT1">
-      <BEGIN>--[[</BEGIN>
-      <END>]]</END>
-    </SPAN>
+    <SPAN_REGEXP TYPE="COMMENT1" HASH_CHARS="--[">
+      <BEGIN>--\[(=*)\[</BEGIN>
+      <END>]$1]</END>
+    </SPAN_REGEXP>
     <!-- Single line comments -->
     <EOL_SPAN TYPE="COMMENT1">--</EOL_SPAN>
     <EOL_SPAN AT_LINE_START="TRUE" TYPE="COMMENT2">#!</EOL_SPAN>
     <!-- Simple string literals -->
-    <SPAN TYPE="LITERAL1">
+    <SPAN TYPE="LITERAL1" ESCAPE="\">
       <BEGIN>"</BEGIN>
       <END>"</END>
     </SPAN>
-    <SPAN TYPE="LITERAL1">
+    <SPAN TYPE="LITERAL1" ESCAPE="\">
       <BEGIN>'</BEGIN>
       <END>'</END>
     </SPAN>
     <!-- Multiline string literals -->
-    <SPAN TYPE="LITERAL1">
-      <BEGIN>[[</BEGIN>
-      <END>]]</END>
-    </SPAN>
+    <SPAN_REGEXP TYPE="LITERAL1" HASH_CHAR="[">
+      <BEGIN>\[(=*)\[</BEGIN>
+      <END>]$1]</END>
+    </SPAN_REGEXP>
     <!-- Operators -->
     <SEQ TYPE="OPERATOR">+</SEQ>
     <SEQ TYPE="OPERATOR">-</SEQ>

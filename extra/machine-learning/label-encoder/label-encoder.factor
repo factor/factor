@@ -1,7 +1,7 @@
 ! Copyright (C) 2012 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors fry kernel locals machine-learning.transformer
-sequences sets sorting sorting.extras ;
+USING: accessors kernel machine-learning.transformer sequences
+sets sorting sorting.extras ;
 IN: machine-learning.label-encoder
 
 TUPLE: label-encoder classes_ ;

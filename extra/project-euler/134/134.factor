@@ -1,7 +1,7 @@
 ! Copyright (c) 2007 Samuel Tardieu.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: arrays kernel lists lists.lazy math.algebra math math.functions
-    math.order math.primes.lists math.ranges project-euler.common sequences ;
+USING: arrays kernel lists lists.lazy math math.algebra
+math.functions math.primes.lists project-euler.common ;
 IN: project-euler.134
 
 ! http://projecteuler.net/index.php?section=problems&id=134

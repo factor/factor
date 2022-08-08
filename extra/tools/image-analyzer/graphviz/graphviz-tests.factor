@@ -8,7 +8,7 @@ IN: tools.image-analyzer.graphviz.tests
     boot-image-name resource-path ;
 
 : ?make-image ( arch -- )
-    dup boot-image-path exists? [ drop ] [ make-image ] if ;
+    dup boot-image-path file-exists? [ drop ] [ make-image ] if ;
 
 : loadable-images ( -- images )
     image-names cpu name>> '[ _ tail? ] filter ;

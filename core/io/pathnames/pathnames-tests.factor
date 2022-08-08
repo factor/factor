@@ -1,6 +1,5 @@
-USING: io.backend io.directories io.files.private io.files.temp
-io.files.unique io.pathnames kernel locals math multiline
-namespaces sequences system tools.test ;
+USING: io.backend io.directories io.files.private io.pathnames
+kernel math namespaces sequences system tools.test vocabs.loader ;
 
 { "passwd" } [ "/etc/passwd" file-name ] unit-test
 { "awk" } [ "/usr/libexec/awk/" file-name ] unit-test
@@ -10,95 +9,45 @@ namespaces sequences system tools.test ;
 { "freetype6.dll" } [ "resource:freetype6.dll" file-name ] unit-test
 { "freetype6.dll" } [ "resource:/freetype6.dll" file-name ] unit-test
 
-os windows?
-    [
-        { "C:\\usr\\lib" } [ "C:\\usr" "lib" append-path ] unit-test
-        { "C:\\usr\\lib" } [ "C:\\usr\\" "lib" append-path ] unit-test
-        { "C:\\usr\\lib" } [ "C:\\usr" ".\\lib" append-path ] unit-test
-        { "C:\\usr\\lib\\" } [ "C:\\usr" ".\\lib\\" append-path ] unit-test
-        { "C:\\lib" } [ "C:\\usr" "..\\lib" append-path ] unit-test
-        { "C:\\lib\\" } [ "C:\\usr" "..\\lib\\" append-path ] unit-test
-    ]
-    [
-        { "/usr/lib" } [ "/usr" "lib" append-path ] unit-test
-        { "/usr/lib" } [ "/usr/" "lib" append-path ] unit-test
-        { "/usr/lib" } [ "/usr" "./lib" append-path ] unit-test
-        { "/usr/lib/" } [ "/usr" "./lib/" append-path ] unit-test
-        { "/lib" } [ "/usr" "../lib" append-path ] unit-test
-        { "/lib/" } [ "/usr" "../lib/" append-path ] unit-test
-    ]
-    if
+{ "/usr/lib" } [ "/usr" "lib" append-path ] unit-test
+{ "/usr/lib" } [ "/usr/" "lib" append-path ] unit-test
+{ "/usr/lib" } [ "/usr" "./lib" append-path ] unit-test
+{ "/usr/lib/" } [ "/usr" "./lib/" append-path ] unit-test
+{ "/lib" } [ "/usr" "../lib" append-path ] unit-test
+{ "/lib/" } [ "/usr" "../lib/" append-path ] unit-test
 
 { "" } [ "" "." append-path ] unit-test
 [ "" ".." append-path ] must-fail
 
-os windows?
-    [
-        { "C:\\" } [ "C:\\" ".\\." append-path ] unit-test
-        { "C:\\" } [ "C:\\" ".\\.\\" append-path ] unit-test
-        { "C:\\a\\b\\lib" } [ "C:\\a\\b\\c\\d\\e\\f\\" "..\\..\\..\\..\\lib" append-path ] unit-test
-        { "C:\\a\\b\\lib\\" } [ "C:\\a\\b\\c\\d\\e\\f\\" "..\\..\\..\\..\\lib\\" append-path ] unit-test
-    ]
-    [
-        { "/" } [ "/" "./." append-path ] unit-test
-        { "/" } [ "/" "././" append-path ] unit-test
-        { "/a/b/lib" } [ "/a/b/c/d/e/f/" "../../../../lib" append-path ] unit-test
-        { "/a/b/lib/" } [ "/a/b/c/d/e/f/" "../../../../lib/" append-path ] unit-test
-    ]
-    if
+{ "/" } [ "/" "./." append-path ] unit-test
+{ "/" } [ "/" "././" append-path ] unit-test
+{ "/a/b/lib" } [ "/a/b/c/d/e/f/" "../../../../lib" append-path ] unit-test
+{ "/a/b/lib/" } [ "/a/b/c/d/e/f/" "../../../../lib/" append-path ] unit-test
 
 [ "" "../lib/" append-path ] must-fail
 { "lib" } [ "" "lib" append-path ] unit-test
 { "lib" } [ "" "./lib" append-path ] unit-test
 
-os windows?
-    [
-        [ "    \\bar\\." parent-directory ] must-fail
-        [ "    \\bar\\.\\" parent-directory ] must-fail
-        [ "    \\bar\\baz\\.." parent-directory ] must-fail
-        [ "    \\bar\\baz\\..\\" parent-directory ] must-fail
-        [ "." parent-directory ] must-fail
-        [ ".\\" parent-directory ] must-fail
-        [ ".." parent-directory ] must-fail
-        [ "..\\" parent-directory ] must-fail
-        [ "..\\..\\" parent-directory ] must-fail
-        [ "    \\.." parent-directory ] must-fail
-        [ "    \\..\\" parent-directory ] must-fail
-        [ "" parent-directory ] must-fail
-    ]
-    [
-        [ "    /bar/." parent-directory ] must-fail
-        [ "    /bar/./" parent-directory ] must-fail
-        [ "    /bar/baz/.." parent-directory ] must-fail
-        [ "    /bar/baz/../" parent-directory ] must-fail
-        [ "." parent-directory ] must-fail
-        [ "./" parent-directory ] must-fail
-        [ ".." parent-directory ] must-fail
-        [ "../" parent-directory ] must-fail
-        [ "../../" parent-directory ] must-fail
-        [ "    /.." parent-directory ] must-fail
-        [ "    /../" parent-directory ] must-fail
-        [ "" parent-directory ] must-fail
-    ]
-    if
+[ "foo/bar/." parent-directory ] must-fail
+[ "foo/bar/./" parent-directory ] must-fail
+[ "foo/bar/baz/.." parent-directory ] must-fail
+[ "foo/bar/baz/../" parent-directory ] must-fail
 
+[ "." parent-directory ] must-fail
+[ "./" parent-directory ] must-fail
+[ ".." parent-directory ] must-fail
+[ "../" parent-directory ] must-fail
+[ "../../" parent-directory ] must-fail
+[ "foo/.." parent-directory ] must-fail
+[ "foo/../" parent-directory ] must-fail
+[ "" parent-directory ] must-fail
 { "." } [ "boot.x86.64.image" parent-directory ] unit-test
 
-os windows?
-    [
-        { "bar\\    " } [ "bar\\baz" "..\\\\\\    " append-path ] unit-test
-        { "bar\\baz\\    " } [ "bar\\baz" ".\\\\\\    " append-path ] unit-test
-        { "bar\\    " } [ "bar\\baz" ".\\..\\\\    " append-path ] unit-test
-        { "bar\\    " } [ "bar\\baz" ".\\..\\.\\.\\.\\.\\.\\.\\\\\\\\    " append-path ] unit-test
-    ]
-    [
-        { "bar/    " } [ "bar/baz" "..///    " append-path ] unit-test
-        { "bar/baz/    " } [ "bar/baz" ".///    " append-path ] unit-test
-        { "bar/    " } [ "bar/baz" "./..//    " append-path ] unit-test
-        { "bar/    " } [ "bar/baz" "./../././././././///    " append-path ] unit-test
-    ]
-    if
-    
+{ "bar/foo" } [ "bar/baz" "..///foo" append-path ] unit-test
+{ "bar/baz/foo" } [ "bar/baz" ".///foo" append-path ] unit-test
+{ "bar/foo" } [ "bar/baz" "./..//foo" append-path ] unit-test
+{ "bar/foo" } [ "bar/baz" "./../././././././///foo" append-path ] unit-test
+
 { t } [ "resource:core" absolute-path? ] unit-test
 { f } [ "" absolute-path? ] unit-test
 
@@ -107,28 +56,14 @@ os windows?
 ] with-test-file
 
 ! aum's bug
-os windows?
-    [
-        H{
-            { current-directory "." }
-            { "resource-path" ".." }
-        } [
-            [ "..\\core\\bootstrap\\stage2.factor" ]
-            [ "resource:core\\bootstrap\\stage2.factor" absolute-path ]
-            unit-test
-        ] with-variables
-    ]
-    [
-        H{
-            { current-directory "." }
-            { "resource-path" ".." }
-        } [
-            [ "../core/bootstrap/stage2.factor" ]
-            [ "resource:core/bootstrap/stage2.factor" absolute-path ]
-            unit-test
-        ] with-variables
-    ]
-if
+H{
+    { current-directory "." }
+    { "resource-path" ".." }
+} [
+    [ "../basis/bootstrap/stage2.factor" ]
+    [ "resource:basis/bootstrap/stage2.factor" absolute-path ]
+    unit-test
+] with-variables
 
 { t } [ cwd "misc" resource-path [ ] with-directory cwd = ] unit-test
 
@@ -222,3 +157,35 @@ os windows? [
     { "/" } [ "/Users/foo/bar////.//../../../../../../////./." root-path ] unit-test
     { "/" } [ "/Users/////" root-path ] unit-test
 ] if
+
+{ t } [ "." has-file-extension? ] unit-test
+{ t } [ ".." has-file-extension? ] unit-test
+{ t } [ "a.b" has-file-extension? ] unit-test
+{ f } [ "a/" has-file-extension? ] unit-test
+{ f } [ "a.b/" has-file-extension? ] unit-test
+{ t } [ "math.factor" has-file-extension? ] unit-test
+{ t } [ "math." has-file-extension? ] unit-test
+{ f } [ "math" has-file-extension? ] unit-test
+
+{ "resource:core/math" } [ "math" vocab-path ] unit-test
+{ "resource:core/math/" } [ "math/" vocab-path ] unit-test
+
+[ "math.omg" vocab-path ] [ not-found-in-roots? ] must-fail-with
+[ "math.omg/" vocab-path ] [ not-found-in-roots? ] must-fail-with
+[ "accessors" vocab-path ] [ not-found-in-roots? ] must-fail-with
+[ "asdfasdfasdfasfd1231231" vocab-path ] [ not-found-in-roots? ] must-fail-with
+[ "resource:extra/benchmark/sum-file/sum-file.txt/" vocab-path ]
+[ not-found-in-roots? ] must-fail-with
+
+{ "resource:extra/benchmark/sum-file/sum-file.txt" }
+[ "benchmark/sum-file/sum-file.txt" vocab-path ] unit-test
+
+{ "resource:extra/benchmark/sum-file" }
+[ "benchmark/sum-file" vocab-path ] unit-test
+
+{ "resource:extra/benchmark/sum-file/" }
+[ "benchmark/sum-file/" vocab-path ] unit-test
+
+! Would be a core/ path except the path already exists in basis
+{ "resource:basis/bootstrap/finish-bootstrap.factor" }
+[ "bootstrap/finish-bootstrap.factor" vocab-path ] unit-test

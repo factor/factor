@@ -1,4 +1,4 @@
-;;; fuel-menu.el -- menu utilities
+;;; fuel-menu.el -- menu utilities -*- lexical-binding: t -*-
 
 ;; Copyright (c) 2010 Jose Antonio Ortega Ruiz
 ;; See http://factorcode.org/license.txt for BSD license.

@@ -36,6 +36,11 @@ CONSTANT: DRAGDROP_S_DROP 0x00040100
 CONSTANT: DRAGDROP_S_CANCEL 0x00040101
 CONSTANT: DRAGDROP_S_USEDEFAULTCURSORS 0x00040102
 
+ERROR: hresult-error n ;
+
+: check-hresult ( n -- )
+    dup S_OK = [ drop ] [ hresult-error ] if ;
+
 <<
 : >long ( integer -- long )
     long <ref> long deref ; inline
@@ -168,13 +173,13 @@ CONSTANT: GUID-STRING-LENGTH
     $[ "{01234567-89ab-cdef-0123-456789abcdef}" length ]
 
 : create-guid ( -- GUID )
-    GUID <struct> dup CoCreateGuid check-ole32-error ;
+    GUID new dup CoCreateGuid check-ole32-error ;
 
 : string>guid ( string -- guid )
     "{-}" split harvest
     [ first3 [ hex> ] tri@ ]
     [ 3 tail concat 2 group [ hex> ] B{ } map-as ] bi
-    GUID <struct-boa> ;
+    GUID boa ;
 
 : guid>string ( guid -- string )
     [

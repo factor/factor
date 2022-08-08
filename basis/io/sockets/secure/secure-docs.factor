@@ -115,7 +115,7 @@ $nl
 "Upgrading a connection to a secure socket by waiting for an SSL/TLS handshake from the client:"
 { $subsections accept-secure-handshake } ;
 
-HELP: premature-close
+HELP: premature-close-error
 { $error-description "Thrown if an SSL connection is closed without the proper " { $snippet "close_notify" } " sequence." } ;
 
 HELP: certificate-verify-error
@@ -137,7 +137,7 @@ HELP: no-tls-supported
 ARTICLE: "ssl-errors" "Secure socket errors"
 "Secure sockets can throw one of several errors in addition to the usual I/O errors:"
 { $subsections
-    premature-close
+    premature-close-error
     certificate-verify-error
     subject-name-verify-error
 }

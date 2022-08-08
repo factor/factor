@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors assocs classes classes.algebra
 classes.algebra.private classes.builtin classes.private
-combinators kernel make sequences words ;
+combinators kernel make sequences splitting words ;
 IN: classes.intersection
 
 PREDICATE: intersection-class < class
@@ -10,7 +10,7 @@ PREDICATE: intersection-class < class
 
 <PRIVATE
 
-: intersection-predicate-quot ( members -- quot )
+: intersection-predicate-quot ( participants -- quot )
     [
         [ drop t ]
     ] [
@@ -52,7 +52,10 @@ M: anonymous-intersection (flatten-class)
     ] if-empty ;
 
 M: anonymous-intersection class-name
-    participants>> [ class-name ] map " " join ;
+    participants>> [ class-name ] map join-words ;
+
+M: anonymous-intersection predicate-def
+    participants>> intersection-predicate-quot ;
 
 PRIVATE>
 

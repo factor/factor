@@ -78,7 +78,7 @@ M: f to-recompile
     changed-definitions get filter-word-defs ;
 
 M: f recompile
-    [ dup def>> ] { } map>assoc ;
+    [ def>> ] zip-with ;
 
 M: f process-forgotten-words drop ;
 
@@ -91,12 +91,12 @@ SYMBOL: definition-observers
 
 GENERIC: definitions-changed ( set obj -- )
 
-[ V{ } clone definition-observers set-global ]
-"compiler.units" add-startup-hook
+STARTUP-HOOK: [
+    V{ } clone definition-observers set-global
 
-! This goes here because vocabs cannot depend on init
-[ V{ } clone vocab-observers set-global ]
-"vocabs" add-startup-hook
+    ! This goes here because vocabs cannot depend on init
+    V{ } clone vocab-observers set-global
+]
 
 : add-definition-observer ( obj -- )
     definition-observers get push ;
@@ -151,8 +151,8 @@ M: object always-bump-effect-counter? drop f ;
     ] when ;
 
 : notify-observers ( -- )
-    updated-definitions dup null?
-    [ drop ] [ notify-definition-observers notify-error-observers ] if ;
+    updated-definitions notify-definition-observers
+    notify-error-observers ;
 
 : update-existing? ( defs -- ? )
     new-words get [ in? not ] curry any? ;

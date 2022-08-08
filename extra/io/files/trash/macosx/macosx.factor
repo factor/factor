@@ -54,7 +54,7 @@ FUNCTION: OSStatus FSPathMakeRefWithOptions (
 : <fs-ref> ( path -- fs-ref )
     utf8 string>alien
     kFSPathMakeRefDoNotFollowLeafSymlink
-    FSRef <struct>
+    FSRef new
     [ f FSPathMakeRefWithOptions check-err ] keep ;
 
 PRIVATE>

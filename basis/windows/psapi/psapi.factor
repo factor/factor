@@ -10,3 +10,15 @@ FUNCTION: BOOL EnumDeviceDrivers ( LPVOID* lpImageBase, DWORD cb, LPDWORD lpcbNe
 FUNCTION: DWORD GetDeviceDriverBaseNameW ( LPVOID ImageBase, LPTSTR lpBaseName, DWORD nSize )
 
 ALIAS: GetDeviceDriverBaseName GetDeviceDriverBaseNameW
+
+FUNCTION: DWORD GetModuleFileNameExW ( HANDLE hProcess,
+  HMODULE hModule,
+  LPWSTR  lpFilename,
+  DWORD   nSize
+)
+
+FUNCTION: DWORD GetProcessImageFileNameA (
+  HANDLE hProcess,
+  LPSTR  lpImageFileName,
+  DWORD  nSize
+)

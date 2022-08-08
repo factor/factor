@@ -1,7 +1,7 @@
 ! Copyright (c) 2009 Aaron Schaefer.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: arrays byte-arrays fry kernel math math.combinatorics math.functions
-    math.parser math.primes project-euler.common sequences sets ;
+USING: arrays kernel math math.primes project-euler.common
+sequences sets ;
 FROM: project-euler.common => permutations? ;
 IN: project-euler.049
 

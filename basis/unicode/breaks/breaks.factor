@@ -8,6 +8,32 @@ IN: unicode.breaks
 
 <PRIVATE
 
+<<
+
+:: load-interval-file-for ( filename n key -- table )
+    filename load-data-file [ n swap nth key = ] filter
+    intern-values expand-ranges ;
+
+>>
+
+CONSTANT: emoji-modifier-table $[
+    "resource:basis/unicode/UCD/emoji/emoji-data.txt"
+    1 "Emoji_Modifier" load-interval-file-for
+]
+
+CONSTANT: extended-pictographic-table $[
+    "resource:basis/unicode/UCD/emoji/emoji-data.txt"
+    1 "Extended_Pictographic" load-interval-file-for
+]
+
+CONSTANT: spacing-mark-exceptions-table $[
+    {
+        0x102B 0x102C 0x1038 { 0x1062 0x1064 } { 0x1067 0x106D }
+        0x1083 { 0x1087 0x108C } 0x108F { 0x109A 0x109C } 0x1A61
+        0x1A63 0x1A64 0xAA7B 0xAA7D 0x11720 0x11721
+    } <interval-set>
+]
+
 ! Grapheme breaks
 <<
 CONSTANT: Any 0
@@ -28,28 +54,6 @@ CONSTANT: (Extended_Pictographic-Extend*-)ZWJ 14
 CONSTANT: Regional_Indicator(even) 15
 CONSTANT: Regional_Indicator(odd) 16
 CONSTANT: graphemes 17
-
-:: load-interval-file-for ( filename n key -- table )
-    filename load-data-file [ n swap nth key = ] filter
-    intern-values expand-ranges ;
-
-"emoji-modifier-table" create-word-in
-"resource:basis/unicode/UCD/auxiliary/emoji-data.txt"
-1 "Emoji_Modifier" load-interval-file-for
-define-constant
-
-"extended-pictographic-table" create-word-in
-"resource:basis/unicode/UCD/auxiliary/emoji-data.txt"
-1 "Extended_Pictographic" load-interval-file-for
-define-constant
-
-"spacing-mark-exceptions-table" create-word-in
-{
-    0x102B 0x102C 0x1038 { 0x1062 0x1064 } { 0x1067 0x106D }
-    0x1083 { 0x1087 0x108C } 0x108F { 0x109A 0x109C } 0x1A61
-    0x1A63 0x1A64 0xAA7B 0xAA7D 0x11720 0x11721
-}
-<interval-set> define-constant
 
 : jamo-class ( ch -- class )
     dup initial? [ drop L ]
@@ -80,10 +84,11 @@ CATEGORY: grapheme-control Zl Zp Cc Cf ;
 CATEGORY: spacing Mc ;
 
 : regional? ( ch -- ? )
-    "Regional_Indicator" property? ; 
+    "Regional_Indicator" property? ;
 >>
 
-: modifier? ( ch -- ? ) emoji-modifier-table interval-key? ; inline
+: modifier? ( ch -- ? )
+    emoji-modifier-table interval-key? ; inline
 
 :: grapheme-class ( str -- class )
     str last
@@ -99,18 +104,19 @@ CATEGORY: spacing Mc ;
                       [ modifier? ]
                       tri or or not
                   ] find-last drop [ swap ?nth ] [ last ] if*
-                  extended-pictographic-table interval-key? [                      
+                  extended-pictographic-table interval-key? [
                       (Extended_Pictographic-Extend*-)ZWJ
                   ] [ ZWJ ] if
-              ] when               
+              ] when
           ] }
         { [ dup extend? ] [ drop Extend ] }
         { [ dup modifier? ] [ drop Extend ] }
-        { [ dup spacing? ] [ spacing-mark-exceptions-table
-                             interval-key? [ Any ] [ SpacingMark ] if ] }
+        { [ dup spacing? ] [
+               spacing-mark-exceptions-table
+               interval-key? [ Any ] [ SpacingMark ] if ] }
         { [ dup loe? ] [ drop Prepend ] }
         { [ dup regional? ] [
-              drop  
+              drop
               f :> ri-even?!
               str unclip-last-slice drop [
                   regional? [ ri-even? not ri-even?! f ] [ t ] if
@@ -161,12 +167,12 @@ SYMBOL: table
     { Prepend } graphemes <iota> connect                                        ! GB9b
     { (Extended_Pictographic-Extend*-)ZWJ } { Extended_Pictographic } connect   ! GB11
     { Regional_Indicator(odd) } { Regional_Indicator(even) } connect ;          ! GB12,13
-
-"grapheme-table" create-word-in
-graphemes init-table table
-[ make-grapheme-table finish-table ] with-variable
-define-constant
 >>
+
+CONSTANT: grapheme-table $[
+    graphemes init-table table
+    [ make-grapheme-table finish-table ] with-variable
+]
 
 : grapheme-break? ( class1 class2 -- ? )
     grapheme-table nth nth not ;
@@ -193,22 +199,37 @@ CONSTANT: wNumeric 16
 CONSTANT: wExtendNumLet 17
 CONSTANT: wWSegSpace 18
 CONSTANT: unicode-words 19
+>>
 
-! Is there a way to avoid this?
-CONSTANT: word-break-classes H{
-    { "Other" 0 } { "CR" 1 } { "LF" 2 } { "Newline" 3 }
-    { "Extend" 4 } { "ZWJ" 5 } { "Regional_Indicator" 6 }
-    { "Format" 7 } { "Katakana" 8 } { "Hebrew_Letter" 9 }
-    { "ALetter" 10 } { "Single_Quote" 11 } { "Double_Quote" 12 }
-    { "MidNumLet" 13 } { "MidLetter" 14 } { "MidNum" 15 }
-    { "Numeric" 16 } { "ExtendNumLet" 17 } { "WSegSpace" 18 }
-}
-
-"word-break-table" create-word-in
-"resource:basis/unicode/UCD/auxiliary/WordBreakProperty.txt"
-load-interval-file dup array>>
-[ 2 swap [ word-break-classes at ] change-nth ] each
-define-constant
+<<
+CONSTANT: word-break-table $[
+    "resource:basis/unicode/UCD/auxiliary/WordBreakProperty.txt"
+    load-interval-file dup array>> [
+        2 swap [
+            {
+                { "Other" [ wOther ] }
+                { "CR" [ wCR ] }
+                { "LF" [ wLF ] }
+                { "Newline" [ wNewline ] }
+                { "Extend" [ wExtend ] }
+                { "ZWJ" [ wZWJ ]  }
+                { "Regional_Indicator" [ wRegional_Indicator ] }
+                { "Format" [ wFormat ] }
+                { "Katakana" [ wKatakana ] }
+                { "Hebrew_Letter" [ wHebrew_Letter ] }
+                { "ALetter" [ wALetter ] }
+                { "Single_Quote" [ wSingle_Quote ] }
+                { "Double_Quote" [ wDouble_Quote ] }
+                { "MidNumLet" [ wMidNumLet ] }
+                { "MidLetter" [ wMidLetter ] }
+                { "MidNum" [ wMidNum ] }
+                { "Numeric" [ wNumeric ] }
+                { "ExtendNumLet" [ wExtendNumLet ] }
+                { "WSegSpace" [ wWSegSpace ] }
+            } case
+        ] change-nth
+    ] each
+]
 >>
 
 : word-break-prop ( char -- word-break-prop )
@@ -276,11 +297,13 @@ SYMBOL: check-RI-pair
     table get [
         [ { { 0 [ f ] } { 1 [ t ] } [ ] } case ] map
     ] map ;
+>>
 
-"word-table" create-word-in
-unicode-words init-table table
-[ make-word-table finish-word-table ] with-variable
-define-constant
+<<
+CONSTANT: word-table $[
+    unicode-words init-table table
+    [ make-word-table finish-word-table ] with-variable
+]
 >>
 
 : word-table-nth ( class1 class2 -- ? )

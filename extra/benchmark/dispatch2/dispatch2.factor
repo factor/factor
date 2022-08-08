@@ -1,4 +1,4 @@
-USING: alien.c-types make math sequences splitting grouping
+USING: alien.c-types make math sequences grouping
 kernel columns specialized-arrays bit-arrays ;
 SPECIALIZED-ARRAY: double
 IN: benchmark.dispatch2

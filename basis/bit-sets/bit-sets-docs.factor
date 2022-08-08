@@ -1,4 +1,4 @@
-USING: help.markup help.syntax sequences math ;
+USING: help.markup help.syntax math sequences ;
 IN: bit-sets
 
 ARTICLE: "bit-sets" "Bit sets"

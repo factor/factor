@@ -1,8 +1,8 @@
 ! Copyright (C) 2010 John Benediktsson
 ! See http://factorcode.org/license.txt for BSD license
 
-USING: ascii assocs fry io.encodings.ascii io.files kernel math
-memoize sequences sequences.extras sorting sets ;
+USING: ascii assocs io.encodings.ascii io.files kernel math
+sequences sequences.extras sorting sets ;
 IN: anagrams
 
 : make-anagram-hash ( strings -- assoc )

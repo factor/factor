@@ -1,5 +1,4 @@
-USING: assocs hashtables.private help.markup help.syntax kernel
-sequences ;
+USING: assocs help.markup help.syntax kernel hashtables.private ;
 IN: hashtables
 
 ARTICLE: "hashtables.private" "Hashtable implementation details"

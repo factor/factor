@@ -3,9 +3,8 @@
 USING: accessors arrays classes combinators
 compiler.cfg.instructions compiler.cfg.registers
 compiler.cfg.stacks compiler.cfg.stacks.local
-compiler.tree.propagation.info cpu.architecture fry
-generalizations kernel locals macros make math quotations
-sequences sequences.generalizations ;
+compiler.tree.propagation.info cpu.architecture generalizations
+kernel make math quotations sequences sequences.generalizations ;
 IN: compiler.cfg.intrinsics.simd.backend
 
 ! Selection of implementation based on available CPU instructions

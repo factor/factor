@@ -1,0 +1,52 @@
+<?xml version="1.0" ?>
+<!DOCTYPE MODE SYSTEM "xmode.dtd">
+<MODE>
+  <PROPS>
+  	<PROPERTY NAME="lineComment" VALUE="#" />
+    <PROPERTY NAME="noTabs" VALUE="true"/>
+    <PROPERTY NAME="wrap" VALUE="none"/>
+    <PROPERTY NAME="tabSize" VALUE="2"/>
+    <PROPERTY NAME="indentSize" VALUE="2"/>
+    <PROPERTY NAME="folding" VALUE="indent"/>
+    <PROPERTY NAME="noWordSep" VALUE="_-"/>
+    <PROPERTY NAME="indentNextLines" VALUE="^\s*([Ff]eature|[Ss]cenario)\s*:.*$" />
+  </PROPS>
+  <RULES ESCAPE="\" IGNORE_CASE="TRUE" HIGHLIGHT_DIGITS="TRUE" NO_WORD_SEP="-_%">
+  	<EOL_SPAN TYPE="COMMENT4">#</EOL_SPAN>
+    <SEQ_REGEXP TYPE="KEYWORD2">in\s+order\s+to</SEQ_REGEXP>
+    <SEQ_REGEXP TYPE="KEYWORD2" AT_LINE_START="TRUE">\s*(given|when|then|but|and|As\s+a|I\s+want\s+to)</SEQ_REGEXP>
+    <SEQ TYPE="OPERATOR">[</SEQ>
+    <SEQ TYPE="OPERATOR">]</SEQ>
+    <SEQ TYPE="OPERATOR">(</SEQ>
+    <SEQ TYPE="OPERATOR">)</SEQ>
+    <SEQ TYPE="OPERATOR">|</SEQ>
+    <SPAN TYPE="LITERAL1" NO_LINE_BREAK="TRUE" DELEGATE="STR">
+      <BEGIN>"</BEGIN>
+      <END>"</END>
+    </SPAN>
+    <SPAN TYPE="LITERAL1" NO_LINE_BREAK="TRUE">
+      <BEGIN>'</BEGIN>
+      <END>'</END>
+    </SPAN>
+    <SPAN TYPE="MARKUP">
+		<BEGIN>&lt;</BEGIN>
+		<END>&gt;</END>
+	</SPAN>
+	
+	<SEQ TYPE="KEYWORD3">Scenario Outline:</SEQ>
+	
+	<MARK_FOLLOWING TYPE="KEYWORD4">@</MARK_FOLLOWING>
+    <KEYWORDS>
+      <KEYWORD3>Feature:</KEYWORD3>
+      <KEYWORD3>Scenario:</KEYWORD3>
+      <KEYWORD3>Background:</KEYWORD3>
+      <KEYWORD3>Examples:</KEYWORD3>
+    </KEYWORDS>
+  </RULES>
+  <RULES SET="STR" DEFAULT="LITERAL2">
+  	<SPAN TYPE="MARKUP">
+		<BEGIN>&lt;</BEGIN>
+		<END>&gt;</END>
+	</SPAN>
+  </RULES>
+</MODE>
