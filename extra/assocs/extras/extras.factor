@@ -234,3 +234,14 @@ PRIVATE>
 : histogram-diff ( hashtable1 hashtable2 -- hashtable3 )
     [ neg swap pick at+ ] assoc-each
     [ 0 > ] filter-values ;
+
+: push-at-each ( value keys assoc -- )
+    '[ _ push-at ] with each ; inline
+
+: collect-by-multi! ( ... assoc seq quot: ( ... obj -- ... key ) -- ... assoc )
+    [ keep swap ] curry rot [
+        [ push-at-each ] curry compose each
+    ] keep ; inline
+
+: collect-by-multi ( ... seq quot: ( ... obj -- ... keys ) -- ... assoc )
+    [ H{ } clone ] 2dip collect-by-multi! ; inline
