@@ -774,3 +774,29 @@ M: step-slice length
     zero? [ 1 + ] unless ; inline
 
 INSTANCE: step-slice virtual-sequence
+
+: 2nested-each ( seq1 seq2 quot -- )
+    swapd '[
+        swap _ with each
+    ] with each ; inline
+
+: 3nested-each ( seq1 seq2 seq3 quot -- )
+    [ spin ] dip '[
+        -rot [
+            swap _ with with each
+        ] with with each
+    ] with with each ; inline
+
+: 2nested-map ( seq1 seq2 quot -- seq )
+    2over [ length ] bi@ * reach
+    [
+        new-resizable
+        [ [ push ] curry compose 2nested-each ] keep
+    ] keep like ; inline
+
+: 3nested-map ( seq1 seq2 seq3 quot -- seq )
+    3 nover [ length ] tri@ * * 5 npick
+    [
+        new-resizable
+        [ [ push ] curry compose 3nested-each ] keep
+    ] keep like ; inline
