@@ -23,7 +23,7 @@ webapps.mason.utils webapps.mason.version.data xml.writer xmode.highlight ;
 
 <body>
 <center>
-<img src="logo.png" width="583" height="150" alt="Factor programming language" />
+<img id="logo" src="logo.png" width="583" height="150" alt="Factor programming language" />
 
 <div class="page">
 
