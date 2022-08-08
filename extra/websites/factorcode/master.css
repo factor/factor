@@ -145,4 +145,8 @@ li {
     .downloads a {
         color: #2A5DB0;
     }
+
+    img#logo {
+        content:url(logo-dark.png);
+    }
 }
