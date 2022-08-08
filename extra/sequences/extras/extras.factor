@@ -379,6 +379,12 @@ PRIVATE>
 : >string-list ( seq -- seq' )
     [ "\"" 1surround ] map "," join ;
 
+: with-string-lines ( str quot -- str' )
+    [ string-lines ] dip map "\n" join ; inline
+
+: prepend-lines-with-spaces ( str -- str' )
+    [ "    " prepend ] with-string-lines ;
+
 : one? ( ... seq quot: ( ... elt -- ... ? ) -- ... ? )
     [ find ] 2keep rot [
         [ 1 + ] 2dip find-from drop not
