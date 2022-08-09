@@ -41,23 +41,23 @@ CONSTANT: colors H{
     colors [ keys swap infimum-by ] [ at ] bi
     dup 8 >= [ 8 - t ] [ f ] if ;
 
-: color>foreground ( color -- string )
+MEMO: color>foreground ( color -- string )
     color>ansi [ 30 + ] [ "m" ";1m" ? ] bi* "\e[%d%s" sprintf ;
 
-: color>background ( color -- string )
+MEMO: color>background ( color -- string )
     color>ansi [ 40 + ] [ "m" ";1m" ? ] bi* "\e[%d%s" sprintf ;
 
 TUPLE: ansi < filter-writer ;
 
 C: <ansi> ansi
 
-M: ansi stream-format
-    [
-        [ foreground of [ color>foreground ] [ "" ] if* ]
-        [ background of [ color>background ] [ "" ] if* ]
-        [ font-style of [ font-styles ] [ "" ] if* ]
-        tri 3append [ "\e[0m" surround ] unless-empty
-    ] dip stream>> stream-write ;
+M:: ansi stream-format ( str style stream -- )
+    stream stream>> :> out
+    style foreground of [ color>foreground out stream-write t ] [ f ] if*
+    style background of [ color>background out stream-write t ] [ f ] if*
+    style font-style of [ font-styles out stream-write t ] [ f ] if*
+    or or [ "\e[0m" out stream-write ] unless
+    str out stream-write ;
 
 M: ansi make-span-stream
     swap <style-stream> <ignore-close-stream> ;
