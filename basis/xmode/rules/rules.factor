@@ -41,14 +41,8 @@ MEMO: standard-rule-set ( id -- ruleset )
     [ [ { f } ] when-empty ] 2dip
     [ swapd push-at ] 2curry each ;
 
-: ?push-all ( seq1 seq2 -- seq1+seq2 )
-    [
-        over [ [ V{ } like ] dip append! ] [ nip ] if
-    ] when* ;
-
 : rule-set-no-word-sep* ( ruleset -- str )
-    [ no-word-sep>> ]
-    [ keywords>> ] bi
+    [ no-word-sep>> ] [ keywords>> ] bi
     dup [ keyword-map-no-word-sep* ] when
     "_" 3append ;
 
