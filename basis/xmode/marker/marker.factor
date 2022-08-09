@@ -102,7 +102,7 @@ M: regexp text-matches?
 : match-group-regexp ( regexp n -- skip-regexp match-regexp )
     [ [ options>> options>string ] [ raw>> ] bi ] dip
     CHAR: ( pick nth-index cut CHAR: ) over index 1 + head
-    rot '[ H{ } [ _ <optioned-regexp> ] cache ] bi@ ;
+    rot '[ _ H{ } [ <optioned-regexp> ] 2cache ] bi@ ;
 
 : skip-first-match ( match regexp -- tailseq )
     first-match [ seq>> ] [ to>> ] bi tail ;
@@ -171,14 +171,14 @@ PRIVATE>
 
 DEFER: get-rules
 
-: get-always-rules ( vector/f ruleset -- vector/f )
-    f swap rules>> at ?push-all ;
+: get-always-rules ( ruleset -- vector/f )
+    f swap rules>> at ;
 
-: get-char-rules ( vector/f char ruleset -- vector/f )
-    [ ch>upper ] dip rules>> at ?push-all ;
+: get-char-rules ( char ruleset -- vector/f )
+    [ ch>upper ] dip rules>> at ;
 
 : get-rules ( char ruleset -- seq )
-    [ f ] 2dip [ get-char-rules ] keep get-always-rules ;
+    [ get-char-rules ] [ get-always-rules ] bi [ append ] when* ;
 
 GENERIC: handle-rule-start ( match-count rule -- )
 
