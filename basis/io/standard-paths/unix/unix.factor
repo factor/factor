@@ -6,8 +6,10 @@ io.pathnames io.standard-paths kernel math sequences splitting
 system unix.users ;
 IN: io.standard-paths.unix
 
+M: unix application-directories "PATH" os-env ":" split ;
+
 M: unix find-in-path*
-    [ "PATH" os-env ":" split ] dip
+    [ application-directories ] dip
     '[ _ append-path file-exists? ] find nip ;
 
 ! iterm2 spews some terminal info on every bash command.

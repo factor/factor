@@ -12,6 +12,8 @@ HOOK: find-in-applications os ( directories filename -- path )
 
 HOOK: find-in-standard-login-path* os ( string -- path/f )
 
+HOOK: application-directories os ( -- paths )
+
 M: object find-in-standard-login-path*
     find-in-path* ;
 
