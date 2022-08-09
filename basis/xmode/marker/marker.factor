@@ -102,7 +102,7 @@ M: regexp text-matches?
 : match-group-regexp ( regexp n -- skip-regexp match-regexp )
     [ [ options>> options>string ] [ raw>> ] bi ] dip
     CHAR: ( pick nth-index cut CHAR: ) over index 1 + head
-    rot '[ _ <optioned-regexp> ] bi@ ;
+    rot '[ H{ } [ _ <optioned-regexp> ] cache ] bi@ ;
 
 : skip-first-match ( match regexp -- tailseq )
     first-match [ seq>> ] [ to>> ] bi tail ;
