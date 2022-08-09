@@ -60,23 +60,23 @@ intensities [| r i |
     color>rgb '[ _ distance ]
     256colors [ keys swap infimum-by ] [ at ] bi ;
 
-: color>foreground ( color -- string )
+MEMO: color>foreground ( color -- string )
     color>256color "\e[38;5;%sm" sprintf ;
 
-: color>background ( color -- string )
+MEMO: color>background ( color -- string )
     color>256color "\e[48;5;%sm" sprintf ;
 
 TUPLE: 256color < filter-writer ;
 
 C: <256color> 256color
 
-M: 256color stream-format
-    [
-        [ foreground of [ color>foreground ] [ "" ] if* ]
-        [ background of [ color>background ] [ "" ] if* ]
-        [ font-style of [ font-styles ] [ "" ] if* ]
-        tri 3append [ "\e[0m" surround ] unless-empty
-    ] dip stream>> stream-write ;
+M:: 256color stream-format ( str style stream -- )
+    stream stream>> :> out
+    style foreground of [ color>foreground out stream-write t ] [ f ] if*
+    style background of [ color>background out stream-write t ] [ f ] if*
+    style font-style of [ font-styles out stream-write t ] [ f ] if*
+    or or [ "\e[0m" out stream-write ] unless
+    str out stream-write ;
 
 M: 256color make-span-stream
     swap <style-stream> <ignore-close-stream> ;
