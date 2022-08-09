@@ -393,15 +393,19 @@ ${example-indent}}
     ".factor-roots" scaffold-rc ;
 
 : make-unit-test ( answer code -- str )
-    [ split-lines [ "    " prepend ] map "\n" join ] bi@
-    [ "{\n" "\n}" surround ] [ "[\n" "\n] unit-test\n" surround ] bi*
+    split-lines [ "    " prepend ] map "\n" join
+    "[\n" "\n] unit-test\n" surround
     " " glue ;
+
+: run-string ( string -- datastack )
+    parse-string V{ } clone swap with-datastack ; inline
 
 : scaffold-unit-test ( -- str/f )
     read-contents dup "" = [
         drop f
     ] [
-        [ eval( -- x ) unparse ] keep make-unit-test
+        [ run-string unparse ] keep
+        make-unit-test
     ] if ;
 
 : scaffold-unit-tests ( -- str )
