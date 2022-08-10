@@ -2,11 +2,11 @@
 
 <t:chloe xmlns:t="http://factorcode.org/chloe/1.0">
 
-	<t:atom t:href="$wiki/changes.atom">
-		Recent Changes
-	</t:atom>
+    <t:atom t:href="$wiki/changes.atom">
+        Recent Changes
+    </t:atom>
 
-	<t:style t:include="resource:extra/webapps/wiki/wiki.css" />
+    <t:style t:include="resource:extra/webapps/wiki/wiki.css" />
 
     <nav>
         <t:if t:value="contents">
@@ -27,6 +27,11 @@
             <t:button t:action="$login-realm/logout" t:aside="begin" class="link-button link">Logout</t:button>
 
         </t:if>
+
+        <t:form t:method="get" t:action="$wiki/search" style="display: inline;">
+            <input placeholder="Search" name="search" type="text"/>
+            <input type="submit" value="Go"/>
+        </t:form>
     </nav>
 
     <div class="page">
