@@ -9,7 +9,9 @@ stack-checker.visitor.dummy ;
 IN: stack-checker
 
 : infer ( quot -- effect )
-    [ infer-quot-here ] with-infer drop ;
+    dup callable?
+    [ [ infer-quot-here ] with-infer drop ]
+    [ drop ( -- x ) ] if ;
 
 : infer. ( quot -- )
     ! Safe to call from inference transforms.
