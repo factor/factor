@@ -1,7 +1,8 @@
 USING: assocs fonts help.stylesheet help.tips io.styles kernel
-listener memoize namespaces prettyprint.stylesheet sequences
-ui.gadgets.panes.private ui.theme ui.theme.switching
-ui.tools.listener vectors vocabs.prettyprint words ;
+listener memoize namespaces prettyprint.private
+prettyprint.stylesheet sequences ui.gadgets.panes.private
+ui.theme ui.theme.switching ui.tools.listener vectors
+vocabs.prettyprint words ;
 IN: ui.theme.switching.tools
 
 : update-tools-style ( -- )
@@ -40,6 +41,11 @@ IN: ui.theme.switching.tools
     base-string-style string-color foreground update-style
     base-vocab-style dim-color foreground update-style
     base-effect-style stack-effect-color foreground update-style
+
+    ! prettyprint.private
+    \ => "word-style" word-prop
+    [ content-background foreground rot set-at ]
+    [ text-color background rot set-at ] bi
 
     ! vocabs.prettyprint
     manifest-style code-background-color page-color update-style
