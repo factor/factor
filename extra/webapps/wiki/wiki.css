@@ -130,6 +130,11 @@ nav img {
     display: none;
 }
 
+nav input {
+    border-radius: 3px;
+    padding: 3px;
+}
+
 .page nav {
     width: calc(100vw - 200px);
     max-width: 800px;
@@ -182,6 +187,10 @@ nav img {
 @media (prefers-color-scheme: dark) {
     nav img {
         filter: invert(80%);
+    }
+
+    nav input {
+        font-size: smaller;
     }
 
     #left {

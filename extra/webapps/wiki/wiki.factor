@@ -3,9 +3,10 @@
 USING: accessors calendar db.tuples db.types farkup
 furnace.actions furnace.auth furnace.boilerplate
 furnace.recaptcha furnace.redirection furnace.syndication
-furnace.utilities html.forms http.server.dispatchers
+furnace.utilities html.forms http.server http.server.dispatchers
 http.server.static kernel lcs make namespaces present random
-sequences sorting splitting urls validators ;
+regexp sequences simple-tokenizer sorting splitting unicode urls
+validators ;
 IN: webapps.wiki
 
 : wiki-url ( rest path -- url )
@@ -305,6 +306,33 @@ M: revision feed-entry-url id>> revision-url ;
 
         { wiki "articles" } >>template ;
 
+: <search-articles-action> ( -- action )
+    <page-action>
+
+        [
+            "search" param [ unicode:blank? ] trim
+            dup "search" set-value
+
+            [ f ] [
+                tokenize [
+                    " " "\s+" replace "\\b" dup surround
+                    "i" <optioned-regexp>
+                ] map
+            ] if-empty
+
+            [ f ] [
+                f <article> select-tuples
+                [ title>> ] sort-with
+                [ revision>> <revision> select-tuple ] map
+                swap '[ content>> _ [ first-match ] with all? ] filter
+            ] if-empty
+
+            [ "results" set-value ]
+            [ not "empty" set-value ] bi
+        ] >>init
+
+        { wiki "search" } >>template ;
+
 : list-user-edits ( -- seq )
     f <revision> "author" value >>author select-tuples
     reverse-chronological-order ;
@@ -352,6 +380,7 @@ M: revision feed-entry-url id>> revision-url ;
         <rollback-action> "rollback" add-responder
         <user-edits-action> "user-edits" add-responder
         <list-articles-action> "articles" add-responder
+        <search-articles-action> "search" add-responder
         <list-changes-action> "changes" add-responder
         <user-edits-feed-action> "user-edits.atom" add-responder
         <list-changes-feed-action> "changes.atom" add-responder
