@@ -133,6 +133,7 @@ nav img {
 nav input {
     border-radius: 3px;
     padding: 3px;
+    margin: 0px;
 }
 
 .page nav {
