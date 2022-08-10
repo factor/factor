@@ -245,16 +245,16 @@ PRIVATE>
 : collect-assoc-by ( ... input-assoc quot: ( ... key value -- ... key value ) -- ... assoc )
     [ H{ } clone ] 2dip collect-assoc-by! ; inline
 
-: collect-key-by! ( ... assoc input-assoc quot: ( ... key -- ... new-key ) -- ... assoc )
-    rot [ '[ drop _ keep swap _ push-at ] assoc-each ] keep ; inline
+: collect-key-by! ( ... assoc input-assoc quot: ( ... key value -- ... new-key ) -- ... assoc )
+    '[ _ keepd ] collect-assoc-by! ; inline
 
-: collect-key-by ( ... input-assoc quot: ( ... key -- ... new-key ) -- ... assoc )
+: collect-key-by ( ... input-assoc quot: ( ... key value -- ... new-key ) -- ... assoc )
     [ H{ } clone ] 2dip collect-key-by! ; inline
 
-: collect-value-by! ( ... assoc input-assoc quot: ( ... value -- ... new-key ) -- ... assoc )
-    rot [ '[ nip _ keep swap _ push-at ] assoc-each ] keep ; inline
+: collect-value-by! ( ... assoc input-assoc quot: ( ... key value -- ... new-key ) -- ... assoc )
+    '[ _ keep ] collect-assoc-by! ; inline
 
-: collect-value-by ( ... input-assoc quot: ( ... value -- ... new-key ) -- ... assoc )
+: collect-value-by ( ... input-assoc quot: ( ... key value -- ... new-key ) -- ... assoc )
     [ H{ } clone ] 2dip collect-value-by! ; inline
 
 
@@ -264,14 +264,16 @@ PRIVATE>
 : collect-assoc-by-multi ( ... assoc quot: ( ... key value -- ... new-keys value' ) -- ... assoc )
     [ H{ } clone ] 2dip collect-assoc-by-multi! ; inline
 
-: collect-key-by-multi! ( ... assoc input-assoc quot: ( ... key -- ... new-keys ) -- ... assoc )
-    rot [ '[ drop _ keep swap _ push-at-each ] assoc-each ] keep ; inline
+
+: collect-key-by-multi! ( ... assoc input-assoc quot: ( ... key value -- ... new-keys ) -- ... assoc )
+    '[ _ keepd ] collect-assoc-by-multi! ; inline
 
 : collect-key-by-multi ( ... assoc quot: ( ... key -- ... new-keys ) -- ... assoc )
     [ H{ } clone ] 2dip collect-key-by-multi! ; inline
 
-: collect-value-by-multi! ( ... assoc input-assoc quot: ( ... value -- ... new-keys ) -- ... assoc )
-    rot [ '[ nip _ keep swap _ push-at-each ] assoc-each ] keep ; inline
+
+: collect-value-by-multi! ( ... assoc input-assoc quot: ( ... key value -- ... new-keys ) -- ... assoc )
+    '[ _ keep ] collect-assoc-by-multi! ; inline
 
 : collect-value-by-multi ( ... assoc quot: ( ... value -- ... new-keys ) -- ... assoc )
     [ H{ } clone ] 2dip collect-value-by-multi! ; inline
