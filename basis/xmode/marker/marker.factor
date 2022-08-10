@@ -110,8 +110,12 @@ M: regexp text-matches?
 : nth-match ( match regexp n -- slice/f )
     match-group-regexp [ skip-first-match ] [ first-match ] bi* ;
 
-: update-match-group ( str match regexp n -- str' )
-    [ nth-match ] [ CHAR: 1 + "$%c" sprintf ] bi swap replace ;
+:: update-match-group ( str match regexp n -- str' )
+    n H{ } [ CHAR: 1 + CHAR: $ swap "" 2sequence ] cache :> x
+    x str subseq-range :> ( from to )
+    from [
+        to str snip-slice match regexp n nth-match glue
+    ] [ str ] if* ;
 
 : update-match-groups ( str match regexp -- str' )
     [ >string ] dip
