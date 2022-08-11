@@ -49,7 +49,7 @@ TUPLE: wordlet-game secret-word chances guesses ;
        guess>chars
     ] with map concat members
     [ background of ] assoc-map
-    [ first ] collect-value-by
+    [ drop ] collect-value-by
     [ [ color>n ] zip-with sort-values reverse first first ] assoc-map
     CHAR: a CHAR: z [a..b] [ 1string COLOR: white ] { } map>assoc [ or ] assoc-merge ;
 
