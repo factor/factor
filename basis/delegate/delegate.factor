@@ -79,8 +79,9 @@ M: consultation (consult-method-quot)
 M: broadcast (consult-method-quot)
     '[ _ call [ _ execute ] each ] nip ;
 
-M:: hook-consultation (consult-method-quot) ( consultation quot word -- object )
-    [ quot call consultation hook-var>> [ word execute ] with-variable ] ;
+M: hook-consultation (consult-method-quot) ( consultation quot word -- object )
+    [ hook-var>> ] 2dip
+    '[ _ _ call swap [ _ execute ] with-variable ] ;
 
 : consult-method-quot ( consultation word -- object )
     [ dup quot>> ] dip
