@@ -55,10 +55,10 @@ MEMO: zoneinfo-country-zones ( -- seq )
 : lookup-country-names ( seq -- seq' ) [ lookup-country-name ] map ;
 
 : timezone>country-map ( -- alist )
-    parse-zonetabs [ second ] collect-key-by ;
+    parse-zonetabs [ nip ] collect-key-by ;
 
 : country>timezones-map ( -- alist )
-    parse-zonetabs [ first ] collect-value-by ;
+    parse-zonetabs [ drop ] collect-value-by ;
 
 : country-timezones-map ( -- alist )
     country>timezones-map [ dup lookup-country-names zip ] map-values ;

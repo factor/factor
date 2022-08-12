@@ -93,29 +93,42 @@ M: regexp text-matches?
 
 ! XXX: Terrible inefficient regexp match group support
 
-: #match-groups ( regexp -- n/f )
-    raw>> [ CHAR: ( = ] count [ f ] when-zero ;
+! XXX: support named-capturing groups?
 
-: nth-index ( n obj seq -- i )
-    [ = dup [ drop 1 - dup 0 < ] when ] with find drop nip ;
+: group-start ( i raw -- n/f )
+    [ CHAR: ( -rot index-from ] keep 2dup
+    { [ drop ] [ [ 1 + ] dip ?nth CHAR: ? = ] } 2&&
+    [ [ 1 + ] dip group-start ] [ drop ] if ;
+
+: nth-group-start ( n raw -- n )
+    [ -1 ] 2dip '[ dup [ 1 + _ group-start ] when ] times ;
+
+: matching-paren ( str -- to )
+    0 swap [
+        {
+            { CHAR: ( [ 1 + ] }
+            { CHAR: ) [ 1 - ] }
+            [ drop ]
+        } case dup zero?
+    ] find drop nip ;
+
+: nth-group ( n raw -- before nth )
+    [ nth-group-start ] keep swap cut dup matching-paren 1 + head ;
 
 : match-group-regexp ( regexp n -- skip-regexp match-regexp )
-    [ [ options>> options>string ] [ raw>> ] bi ] dip
-    CHAR: ( pick nth-index cut CHAR: ) over index 1 + head
-    rot '[ _ <optioned-regexp> ] bi@ ;
+    [ [ options>> options>string ] [ raw>> ] bi ] dip swap
+    nth-group rot '[ _ H{ } [ <optioned-regexp> ] 2cache ] bi@ ;
 
 : skip-first-match ( match regexp -- tailseq )
-    first-match [ seq>> ] [ to>> ] bi tail ;
+    [ >string ] dip first-match [ seq>> ] [ to>> ] bi tail ;
 
 : nth-match ( match regexp n -- slice/f )
-    match-group-regexp [ skip-first-match ] [ first-match ] bi* ;
-
-: update-match-group ( str match regexp n -- str' )
-    [ nth-match ] [ CHAR: 1 + "$%c" sprintf ] bi swap replace ;
+    match-group-regexp [ skip-first-match ] [ match-start ] bi* ;
 
 : update-match-groups ( str match regexp -- str' )
-    [ >string ] dip
-    dup #match-groups [ update-match-group ] 2with each-integer ;
+    pick CHAR: $ swap index [
+        R/ [$]\d/ [ second CHAR: 0 - nth-match ] 2with re-replace-with
+    ] [ 2drop ] if ;
 
 GENERIC: fixup-end ( match regexp end -- end' )
 
@@ -133,7 +146,7 @@ M: regexp fixup-end
     [ options>> options>string ] bi <fixup-regexp> ;
 
 : fixup-end? ( text -- ? )
-    { [ regexp? ] [ #match-groups ] } 1&& ;
+    { [ regexp? ] [ 0 swap raw>> group-start ] } 1&& ;
 
 : fixup-end/text-matches? ( string regexp rule -- match-count/f )
     [ >string ] 2dip [ [ match-start dup ] keep ] dip pick [
@@ -171,14 +184,14 @@ PRIVATE>
 
 DEFER: get-rules
 
-: get-always-rules ( vector/f ruleset -- vector/f )
-    f swap rules>> at ?push-all ;
+: get-always-rules ( ruleset -- vector/f )
+    f swap rules>> at ;
 
-: get-char-rules ( vector/f char ruleset -- vector/f )
-    [ ch>upper ] dip rules>> at ?push-all ;
+: get-char-rules ( char ruleset -- vector/f )
+    [ ch>upper ] dip rules>> at ;
 
 : get-rules ( char ruleset -- seq )
-    [ f ] 2dip [ get-char-rules ] keep get-always-rules ;
+    [ get-char-rules ] [ get-always-rules ] bi [ append ] when* ;
 
 GENERIC: handle-rule-start ( match-count rule -- )
 

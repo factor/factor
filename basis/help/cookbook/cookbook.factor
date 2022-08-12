@@ -190,6 +190,8 @@ ARTICLE: "cookbook-scripts" "Scripting cookbook"
 $nl
 "To run a script, simply pass it as an argument to the Factor executable:"
 { $code "./factor cleanup.factor" }
+"To test a script in the listener, you can use " { $link run-file } "." 
+$nl
 "The script may access command line arguments by inspecting the value of the " { $link command-line } " variable. It can also get its own path from the " { $link script } " variable."
 { $heading "Example: ls" }
 "Here is an example implementing a simplified version of the Unix " { $snippet "ls" } " command in Factor:"

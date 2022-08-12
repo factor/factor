@@ -513,6 +513,9 @@ unit-test
 
 { 3 } [ "caba" "(?<=b)a" <regexp> first-match from>> ] unit-test
 
+{ "<" } [ "<style>" R/ <(?=STYLE\b)/i first-match >string ] unit-test
+{ "bar" } [ "foobar" R/ (?<=FOO)BAR/i first-match >string ] unit-test
+
 { t } [ "\ra" R/ .^a/ms matches? ] unit-test
 { f } [ "\ra" R/ .^a/mds matches? ] unit-test
 { t } [ "\na" R/ .^a/ms matches? ] unit-test

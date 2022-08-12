@@ -45,6 +45,10 @@ IN: ui.backend.cocoa.tools
 
     METHOD: id switchDarkTheme: id app [ dark-mode f ] ;
 
+    METHOD: id switchWombatTheme: id app [ wombat-mode f ] ;
+
+    METHOD: id switchBase16Theme: id app [ base16-mode f ] ;
+
     METHOD: id refreshAll: id app [ [ refresh-all ] \ refresh-all call-listener f ] ;
 ;CLASS>
 
