@@ -8,11 +8,12 @@ models.arrow namespaces opengl opengl.gl sequences sorting
 splitting system timers ui.baseline-alignment ui.clipboards
 ui.commands ui.gadgets ui.gadgets.borders
 ui.gadgets.line-support ui.gadgets.menus ui.gadgets.scrollers
+prettyprint ui.gadgets.editors.private math.parser
 ui.gestures ui.pens.solid ui.render ui.text ui.theme unicode ;
 IN: ui.gadgets.editors
 
 TUPLE: editor < line-gadget
-    caret mark
+    caret caret-shape mark
     focused? blink blink-timer
     default-text
     preedit-start
@@ -24,12 +25,14 @@ TUPLE: editor < line-gadget
 
 M: editor preedit? preedit-start>> ;
 
+: <shape> ( -- shape )  2 <model> ;
+
 <PRIVATE
 
 : <loc> ( -- loc ) { 0 0 } <model> ;
-
 : init-editor-locs ( editor -- editor )
     <loc> >>caret
+    <shape> >>caret-shape
     <loc> >>mark ; inline
 
 : editor-theme ( editor -- editor )
@@ -167,11 +170,43 @@ M: editor ungraft*
     { [ focused?>> ] [ blink>> ]
       [ [ preedit? not ] [ preedit-selection-mode?>> not ] bi or ] } 1&& ;
 
+: logcaret ( n n -- )
+    [ unparse "loc: " prepend ] dip
+    unparse " dim: " prepend append drop
+    ;
+
+: draw-caret-line ( editor -- )
+    [ caret-loc ] [ caret-dim ] bi
+    ! 2dup logcaret
+    over v+ gl-line
+    ;
+
+: draw-caret-rect ( editor -- )
+    [ caret-loc ] [ caret-dim ] bi
+    second  [ 2 / ] keep  { } 2sequence 
+    ! 2dup logcaret
+    gl-rect
+    ;
+
+: draw-caret-rect-filled ( editor -- )
+    [ caret-loc ] [ caret-dim ] bi
+    second  [ 2 / ] keep { } 2sequence
+    ! 2dup logcaret
+    gl-fill-rect
+    ;
+
+: draw-caret-shape ( editor -- )
+    dup caret-shape>> value>>
+    {
+        { 1 [ draw-caret-rect ] }
+        { 2 [ draw-caret-rect-filled ] }
+        [ drop  draw-caret-line ]
+    } case ;
+
 : draw-caret ( editor -- )
     dup draw-caret? [
         [ editor-caret-color gl-color ] dip
-        [ caret-loc ] [ caret-dim ] bi
-        over v+ gl-line
+        draw-caret-shape
     ] [ drop ] if ;
 
 :: draw-preedit-underlines ( editor -- )
