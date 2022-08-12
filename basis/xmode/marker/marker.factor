@@ -103,8 +103,17 @@ M: regexp text-matches?
 : nth-group-start ( n raw -- n )
     [ -1 ] 2dip '[ dup [ 1 + _ group-start ] when ] times ;
 
+: matching-paren ( str -- to )
+    0 swap [
+        {
+            { CHAR: ( [ 1 + ] }
+            { CHAR: ) [ 1 - ] }
+            [ drop ]
+        } case dup zero?
+    ] find drop nip ;
+
 : nth-group ( n raw -- before nth )
-    [ nth-group-start ] keep swap cut CHAR: ) over index 1 + head ;
+    [ nth-group-start ] keep swap cut dup matching-paren 1 + head ;
 
 : match-group-regexp ( regexp n -- skip-regexp match-regexp )
     [ [ options>> options>string ] [ raw>> ] bi ] dip swap
