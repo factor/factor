@@ -1,7 +1,7 @@
 ! Copyright (C) 2016 Nicolas Pénet.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: hashtables kernel namespaces sequences ui.theme
-vocabs.loader ;
+USING: hashtables kernel namespaces sequences ui.theme ui.theme.base16
+ui.theme.wombat vocabs.loader ;
 IN: ui.theme.switching
 
 SYMBOL: default-theme?
@@ -25,5 +25,9 @@ t default-theme? set-global
 : light-mode ( -- ) light-theme switch-theme ;
 
 : dark-mode ( -- ) dark-theme switch-theme ;
+
+: wombat-mode ( -- ) wombat-theme switch-theme ;
+
+: base16-mode ( -- ) base16-theme switch-theme ;
 
 { "ui.theme.switching" "ui.tools" } "ui.theme.switching.tools" require-when
