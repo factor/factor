@@ -113,6 +113,7 @@
     ($contract . fuel-markup--contract)
     ($curious . fuel-markup--curious)
     ($definition . fuel-markup--definition)
+    ($describe-vocab . fuel-markup--describe-vocab)
     ($description . fuel-markup--description)
     ($doc-path . fuel-markup--doc-path)
     ($emphasis . fuel-markup--emphasis)
@@ -170,6 +171,7 @@
     ($vocab-link . fuel-markup--vocab-link)
     ($vocab-links . fuel-markup--vocab-links)
     ($vocab-subsection . fuel-markup--vocab-subsection)
+    ($vocabulary . fuel-markup--vocabulary)
     ($warning . fuel-markup--warning)
     (article . fuel-markup--article)
     (describe-words . fuel-markup--describe-words)
@@ -323,6 +325,13 @@
   (fuel-markup--print (cons '$code (cdr e)))
   (newline))
 
+(defun fuel-markup--example (e)
+  (fuel-markup--insert-newline)
+  (dolist (s (cdr e))
+    (fuel-markup--snippet (list '$snippet s))
+    (newline))
+  (newline))
+
 (defun fuel-markup--markup-example (e)
   (fuel-markup--insert-newline)
   (fuel-markup--snippet (cons '$snippet (cdr e))))
@@ -392,6 +401,11 @@ or lists."
   (let* ((cmd `(:fuel* ((,(cadr e) fuel-vocab-help)) "fuel" t))
          (res (fuel-eval--retort-result (fuel-eval--send/wait cmd))))
     (when res (fuel-markup--print res))))
+
+(defun fuel-markup--vocabulary (e)
+  (fuel-markup--insert-heading "Vocabulary: " t)
+  (fuel-markup--vocab-link (cons '$vocab-link (cdr e)))
+  (newline))
 
 (defun fuel-markup--parse-classes ()
   (let ((elems))
