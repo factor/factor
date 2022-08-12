@@ -74,12 +74,29 @@ ERROR: vocab-must-not-exist string ;
     developer-name get [ "Your name" ] unless* bl write "." print
     "! See http://factorcode.org/license.txt for BSD license." print ;
 
-: main-file-string ( vocab -- string )
-    [
-        scaffold-copyright
-        "USING: ;" print
-        "IN: " write print
-    ] with-string-writer ;
+: scaffold-filename ( path -- )
+    "! File: " write
+    file-name print ;
+
+: scaffold-version ( -- )
+    "! Version: 0.1" print ;
+
+: scaffold-dri ( -- )
+    "! DRI: "
+    developer-name get [ "Your name" ] unless*  append print ;
+
+: scaffold-description ( -- )
+    "! Description: Another fine Factor file!" print ;
+
+: scaffold-headers ( path -- )
+    scaffold-filename
+    scaffold-version
+    scaffold-dri
+    scaffold-description
+    scaffold-copyright ;
+    
+: main-file-string ( path -- string )
+    [ scaffold-headers ] with-string-writer ;
 
 : set-scaffold-main-file ( vocab path -- )
     [ main-file-string 1array ] dip utf8 set-file-lines ;
@@ -151,9 +168,12 @@ M: string add-using drop ;
 M: object add-using
     vocabulary>> using get [ adjoin ] [ drop ] if* ;
 
+: 4bl ( -- )
+    "    " write ; inline
+
 : ($values.) ( array -- )
     [
-        "    " write
+        4bl
         [ bl ] [
             "{ " write
             dup array? [ first ] when
