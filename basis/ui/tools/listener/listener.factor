@@ -391,12 +391,16 @@ M: interactor handle-gesture
 interactor "interactor" f {
     { T{ key-down f f "RET" } evaluate-input }
     { T{ key-down f { C+ } "d" } delete-next-character/eof }
+    { T{ key-down f { C+ } "k" } clear-editor }
 } define-command-map
 
 interactor "completion" f {
     { T{ key-down f f "TAB" } code-completion-popup }
+    { T{ key-down f { C+ } "y" } history-completion-popup }
     { T{ key-down f { C+ } "p" } recall-previous }
     { T{ key-down f { C+ } "n" } recall-next }
+    { T{ key-down f f "UP" } recall-previous }
+    { T{ key-down f f "DOWN" } recall-next }
     { T{ key-down f { C+ } "r" } history-completion-popup }
     { T{ key-down f { C+ } "s" } history-completion-popup }
 } define-command-map
@@ -471,6 +475,8 @@ listener-gadget "scrolling"
 } define-command-map
 
 listener-gadget "multi-touch" f {
+    { left-action recall-previous }
+    { right-action recall-next }
     { up-action refresh-all }
 } define-command-map
 
@@ -491,6 +497,15 @@ M: listener-gadget graft*
 
 M: listener-gadget ungraft*
     [ com-end ] [ call-next-method ] bi ;
+
+<PRIVATE
+
+:: make-font-style ( family size -- assoc )
+    H{ } clone
+        family font-name pick set-at
+        size font-size pick set-at ;
+
+PRIVATE>
 
 :: set-listener-font ( family size -- )
     get-listener input>> :> interactor
