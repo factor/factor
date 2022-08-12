@@ -65,11 +65,11 @@ SYNTAX: RULE:
 ! XXX: check HASH_CHAR for full prefix, not just first character
 
 : char<< ( value object -- )
-    [ ?first ] dip chars<< ;
+    '[ 1 head _ chars<< ] unless-empty ;
 
 : regexp-attr ( -- )
-    { "HASH_CHAR" f char<< } ,
-    { "HASH_CHARS" f chars<< } , ;
+    { "HASH_CHARS" f chars<< } ,
+    { "HASH_CHAR" f char<< } , ;
 
 : match-type-attr ( -- )
     { "MATCH_TYPE" string>match-type match-token<< } , ;

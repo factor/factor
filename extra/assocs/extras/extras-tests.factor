@@ -201,20 +201,35 @@ USING: arrays assocs.extras kernel math math.order sequences tools.test ;
     [ [ drop even? ] [ 2array ] 2bi ] collect-assoc-by
 ] unit-test
 
-{
-    H{ { t V{ 10 20 30 } } { f V{ 41 } } }
-} [
-    { { 10 100 } { 20 200 } { 30 300 } { 41 401 } }
-    [ even? ] collect-key-by
-] unit-test
 
 {
-    H{ { t V{ 100 200 300 } } { f V{ 401 } } }
+    H{ { t V{ 10 21 } } { f V{ 30 41 } } }
 } [
-    { { 10 100 } { 20 200 } { 30 300 } { 41 401 } }
-    [ even? ] collect-value-by
-] unit-test
+    { { 10 100 } { 21 200 } { 30 301 } { 41 401 } }
+    [ nip even? ] collect-key-by
+ ] unit-test
 
+{
+    H{ { t V{ 10 30 } } { f V{ 21 41 } } }
+} [
+    { { 10 100 } { 21 200 } { 30 301 } { 41 401 } }
+    [ drop even? ] collect-key-by
+ ] unit-test
+
+
+{
+    H{ { t V{ 100 200 } } { f V{ 301 401 } } }
+} [
+    { { 10 100 } { 21 200 } { 30 301 } { 41 401 } }
+    [ nip even? ] collect-value-by
+ ] unit-test
+
+{
+    H{ { t V{ 100 301 } } { f V{ 200 401 } } }
+} [
+    { { 10 100 } { 21 200 } { 30 301 } { 41 401 } }
+    [ drop even? ] collect-value-by
+ ] unit-test
 
 {
     H{
@@ -244,7 +259,7 @@ USING: arrays assocs.extras kernel math math.order sequences tools.test ;
     }
 } [
     { { 10 100 } { 20 200 } { 30 300 } { 41 401 } }
-    [ dup 1 + 2array ] collect-key-by-multi
+    [ drop dup 1 + 2array ] collect-key-by-multi
 ] unit-test
 
 
@@ -261,7 +276,7 @@ USING: arrays assocs.extras kernel math math.order sequences tools.test ;
     }
 } [
     { { 10 100 } { 20 200 } { 30 300 } { 41 401 } }
-    [ dup 1 + 2array ] collect-value-by-multi
+    [ nip dup 1 + 2array ] collect-value-by-multi
 ] unit-test
 
 
