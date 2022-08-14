@@ -55,3 +55,6 @@ USING: arrays kernel math ranges sequences sets tools.test ;
 { t } [ -10 10 2 <range> [ sum ] [ >array sum ] bi = ] unit-test
 { t } [ 10 -10 -1 <range> [ sum ] [ >array sum ] bi = ] unit-test
 { t } [ 10 -10 -2 <range> [ sum ] [ >array sum ] bi = ] unit-test
+
+! Empty range
+{ 0 } [ 1 0 1 <range> sum ] unit-test
