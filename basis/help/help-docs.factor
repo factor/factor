@@ -279,7 +279,11 @@ HELP: $nl
 
 HELP: $snippet
 { $values { "children" "markup elements" } }
-{ $description "Prints a key word or otherwise notable snippet of text, such as a type or a word input parameter. To document slot names, use " { $link $slot } "." } ;
+{ $description "Prints a key word or otherwise notable snippet of text, such as a type or a word input parameter. To document slot names, use " { $link $slot } "." } 
+{ $examples
+  { $markup-example { $snippet "vocab" } }
+  { $markup-example { $snippet "{ string... }" } }
+} ;
 
 HELP: $slot
 { $values { "children" "markup elements" } }
@@ -384,7 +388,11 @@ HELP: $table
 HELP: $values
 { $values { "element" "an array of pairs of markup elements" } }
 { $description "Prints the description of arguments and values found on every word help page. The first element of a pair is the argument name and is output with " { $link $snippet } ". The remainder is either a single class word, or an element. If it is a class word " { $snippet "class" } ", it is inserted as if it were shorthand for " { $snippet "{ $instance class }" } "." }
-{ $see-also $maybe $instance $quotation } ;
+{ $see-also $maybe $instance $quotation }
+{ $examples
+  { $markup-example { $values { "arg1" "description of arg1" } { "arg2" integer } } }
+}
+$nl ;
 
 HELP: $instance
 { $values { "element" "an array with shape " { $snippet "{ class }" } } }
