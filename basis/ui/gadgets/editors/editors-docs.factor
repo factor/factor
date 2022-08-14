@@ -33,6 +33,29 @@ HELP: <editor>
 
 { editor-caret editor-mark } related-words
 
+HELP: caret-is-shape
+{ $description
+  "Shape is defined as line, box, or filled box"
+}
+$nl
+{ $code
+"  IN: ui.gadgets.editors"
+"  2 caret-is-shape set"
+""
+} print-element
+$nl
+{ $table
+  { "Value" "Shape" }
+  { "f" "default (line)" }
+  { "0" "line" }
+  { "1" "box" }
+  { "2" "filled box" }
+} print-element
+
+{ $references   "Set desired shape in your .factor-rc file" 
+ "rc-files" }
+    ;
+
 HELP: editor-caret
 { $values { "editor" editor } { "loc" "a pair of integers" } }
 { $description "Outputs the current caret location as a line/column number pair." } ;
