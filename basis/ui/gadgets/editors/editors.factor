@@ -9,7 +9,7 @@ splitting system timers ui.baseline-alignment ui.clipboards
 ui.commands ui.gadgets ui.gadgets.borders
 ui.gadgets.line-support ui.gadgets.menus ui.gadgets.scrollers
 prettyprint ui.gadgets.editors.private math.parser
-ui.gestures ui.pens.solid ui.render ui.text ui.theme unicode ;
+ui.gestures ui.pens.solid ui.render ui.text ui.theme unicode variables ;
 IN: ui.gadgets.editors
 
 TUPLE: editor < line-gadget
@@ -25,14 +25,15 @@ TUPLE: editor < line-gadget
 
 M: editor preedit? preedit-start>> ;
 
-: <shape> ( -- shape )  2 <model> ;
+SYMBOL: caret-is-shape 
+: <caret-shape> ( -- shape )  caret-is-shape get <model> ;
 
 <PRIVATE
 
 : <loc> ( -- loc ) { 0 0 } <model> ;
 : init-editor-locs ( editor -- editor )
     <loc> >>caret
-    <shape> >>caret-shape
+    <caret-shape> >>caret-shape
     <loc> >>mark ; inline
 
 : editor-theme ( editor -- editor )
@@ -170,38 +171,29 @@ M: editor ungraft*
     { [ focused?>> ] [ blink>> ]
       [ [ preedit? not ] [ preedit-selection-mode?>> not ] bi or ] } 1&& ;
 
-: logcaret ( n n -- )
-    [ unparse "loc: " prepend ] dip
-    unparse " dim: " prepend append drop
-    ;
+: (caret-location) ( editor -- loc dim )
+    [ caret-loc ] [ caret-dim ] bi ;
+
+: (caret-rect) ( dim -- newdim )
+    second [ 2 / ] keep 2array ;
 
 : draw-caret-line ( editor -- )
-    [ caret-loc ] [ caret-dim ] bi
-    ! 2dup logcaret
-    over v+ gl-line
-    ;
+    (caret-location) over v+ gl-line ;
 
 : draw-caret-rect ( editor -- )
-    [ caret-loc ] [ caret-dim ] bi
-    second  [ 2 / ] keep  { } 2sequence 
-    ! 2dup logcaret
-    gl-rect
-    ;
+    (caret-location) (caret-rect) gl-rect ;
 
 : draw-caret-rect-filled ( editor -- )
-    [ caret-loc ] [ caret-dim ] bi
-    second  [ 2 / ] keep { } 2sequence
-    ! 2dup logcaret
-    gl-fill-rect
-    ;
+    (caret-location) (caret-rect) gl-fill-rect ;
 
 : draw-caret-shape ( editor -- )
-    dup caret-shape>> value>>
+    dup caret-shape>> value>> 
     {
         { 1 [ draw-caret-rect ] }
         { 2 [ draw-caret-rect-filled ] }
         [ drop  draw-caret-line ]
     } case ;
+    
 
 : draw-caret ( editor -- )
     dup draw-caret? [
