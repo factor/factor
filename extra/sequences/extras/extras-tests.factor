@@ -296,3 +296,7 @@ tools.test vectors vocabs ;
 ] unit-test
 
 { { -1 2 -3 4 -5 } } [ { 1 2 3 4 5 } [ odd? ] [ neg ] map-if ] unit-test
+
+{ { { 100 0 } { 200 1 } { 300 2 } { 400 3 } } } [
+    { 100 200 300 400 } <zip-index> >array
+] unit-test

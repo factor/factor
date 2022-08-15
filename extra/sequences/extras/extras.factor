@@ -800,3 +800,14 @@ INSTANCE: step-slice virtual-sequence
         new-resizable
         [ [ push ] curry compose 3nested-each ] keep
     ] keep like ; inline
+
+TUPLE: virtual-zip-index seq ;
+
+C: <zip-index> virtual-zip-index
+
+M: virtual-zip-index length seq>> length ; inline
+
+M: virtual-zip-index nth-unsafe
+    over [ seq>> nth-unsafe ] [ 2array ] bi* ; inline
+
+INSTANCE: virtual-zip-index immutable-sequence
