@@ -345,3 +345,11 @@ unit-test
 { H{ { 1 4 } } } [ H{ { 1 2 } } 1 over [ sq ] ?change-at ] unit-test
 { H{ { 1 2 } } } [ H{ { 1 2 } } 2 over [ sq ] ?change-at ] unit-test
 { H{ { 1 3 } } } [ H{ { 1 2 } } 3 1 pick [ drop dup ] ?change-at drop ] unit-test
+
+{ H{ { 1 100 } } } [
+    H{ } clone 1 100 set-of
+] unit-test
+
+{ H{ { 1 V{ 100 200 } } } } [
+    H{ } clone 1 100 push-of 1 200 push-of
+] unit-test
