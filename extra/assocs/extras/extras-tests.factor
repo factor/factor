@@ -295,3 +295,4 @@ USING: arrays assocs.extras kernel math math.order sequences tools.test ;
     { { 10 100 } { 20 200 } { 30 300 } { 41 401 } }
     [ [ dup 1 + 2array ] dip ] collect-assoc-by-multi
 ] unit-test
+

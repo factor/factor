@@ -46,3 +46,4 @@ USING: math math.primes.factors sequences tools.test ;
 !     107 2^ 1 -
 !     127 2^ 1 - * * factors
 ! ] unit-test
+
