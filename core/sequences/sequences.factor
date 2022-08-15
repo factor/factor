@@ -38,8 +38,8 @@ GENERIC#: seq-lengthen 1 ( seq n -- seq )
 GENERIC#: seq-shorten 1 ( seq n -- seq )
 
 : seq-set-length ( seq n -- seq ) [ swap set-length ] keepd ; inline
-: seq-nth ( seq n -- elt ) swap nth ; inline
-: seq-set-nth ( seq n elt -- seq ) swap rot [ set-nth ] keep ; inline
+: nth-of ( seq n -- elt ) swap nth ; inline
+: set-nth-of ( seq n elt -- seq ) swap rot [ set-nth ] keep ; inline
 
 M: sequence seq-lengthen 2dup lengthd < [ seq-set-length ] [ drop ] if ; inline
 M: sequence seq-shorten 2dup lengthd > [ seq-set-length ] [ drop ] if ; inline
@@ -69,7 +69,7 @@ M: sequence seq-shorten 2dup lengthd > [ seq-set-length ] [ drop ] if ; inline
 
 : push ( elt seq -- ) [ length ] [ set-nth ] bi ;
 
-: seq-push ( seq elt -- seq ) [ dup length ] dip seq-set-nth ;
+: seq-push ( seq elt -- seq ) [ dup length ] dip set-nth-of ;
 
 ERROR: bounds-error index seq ;
 
@@ -119,15 +119,15 @@ M: sequence set-nth bounds-check set-nth-unsafe ; inline
 M: sequence nth-unsafe nth ; inline
 M: sequence set-nth-unsafe set-nth ; inline
 
-: seq-nth-unsafe ( seq n -- elt ) swap nth-unsafe ; inline
+: nth-of-unsafe ( seq n -- elt ) swap nth-unsafe ; inline
 
-: seq-set-nth-unsafe ( seq n elt -- seq ) swap pick set-nth-unsafe ; inline
+: set-nth-of-unsafe ( seq n elt -- seq ) swap pick set-nth-unsafe ; inline
 
 : change-nth-unsafe ( i seq quot -- )
     [ [ nth-unsafe ] dip call ] 2keepd set-nth-unsafe ; inline
 
-: change-seq-nth-unsafe ( seq i quot -- seq )
-    [ [ seq-nth-unsafe ] dip call ] 2keepd rot seq-set-nth-unsafe ; inline
+: change-nth-of-unsafe ( seq i quot -- seq )
+    [ [ nth-of-unsafe ] dip call ] 2keepd rot set-nth-of-unsafe ; inline
 
 PRIVATE>
 
@@ -345,8 +345,8 @@ C: <copier> copier
     [ [ src-i>> + ] [ src>> ] bi nth-unsafe ]
     [ [ dst-i>> + ] [ dst>> ] bi set-nth-unsafe ] 2bi ; inline
 
-: copy-seq-nth-unsafe ( dst dst-i src src-i -- )
-    seq-nth-unsafe seq-set-nth-unsafe drop ; inline
+: copy-nth-of-unsafe ( dst dst-i src src-i -- )
+    nth-of-unsafe set-nth-of-unsafe drop ; inline
 
 : (copy) ( n copy -- dst )
     over 0 <= [ nip dst>> ] [
@@ -358,7 +358,7 @@ C: <copier> copier
         4drop
     ] [
         [
-            [ copy-seq-nth-unsafe ] 4keep
+            [ copy-nth-of-unsafe ] 4keep
             [ 1 + ] 2dip 1 +
         ] dip seq-copy-loop
     ] if ; inline recursive
