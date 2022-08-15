@@ -28,6 +28,9 @@ M: assoc assoc-like drop ; inline
 : maybe-set-at ( value key assoc -- changed? )
     3dup at* [ = [ 3drop f ] [ set-at t ] if ] [ 2drop set-at t ] if ;
 
+: set-of ( assoc key value -- assoc )
+    swap pick set-at ; inline
+
 <PRIVATE
 
 : assoc-operator ( assoc quot -- alist quot' )
@@ -228,6 +231,9 @@ M: assoc value-at* swap [ = nip ] curry assoc-find nip ;
 
 : push-at ( value key assoc -- )
     [ ?push ] change-at ;
+
+: push-of ( assoc key value -- assoc )
+    swap pick push-at ; inline
 
 : zip-as ( keys values exemplar -- assoc )
     dup sequence? [
