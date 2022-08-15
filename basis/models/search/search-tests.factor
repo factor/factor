@@ -8,3 +8,4 @@ IN: models.search.tests
     world-buttons <model> "Active Buttons"
         <active-buttons-popup> gadget.
 ] unit-test
+

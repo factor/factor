@@ -10,3 +10,4 @@ IN: editors.acme.tests
 
 { "/usr/local/plan9" } [ f \ plan9-path [
  f "PLAN9" [ plan9-path ] with-os-env ] with-variable ] unit-test
+

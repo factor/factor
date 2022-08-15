@@ -460,3 +460,4 @@ FUNCTION: sqlite3* sqlite3_db_handle ( sqlite3_stmt* pStmt )
 
 FUNCTION: c-string sqlite3_db_filename ( sqlite3* db, c-string zDbName )
 FUNCTION: int sqlite3_db_readonly ( sqlite3* db, c-string zDbName )
+

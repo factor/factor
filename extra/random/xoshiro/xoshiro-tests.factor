@@ -36,3 +36,4 @@ IN: random.xoshiro.tests
   9857397594961175947
   8327361040835137714
 } [ 0 1 2 3 long-jump-256 ] unit-test
+

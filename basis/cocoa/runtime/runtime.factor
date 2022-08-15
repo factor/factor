@@ -87,3 +87,4 @@ FUNCTION: void* method_getImplementation ( Method method )
 FUNCTION: Class object_getClass ( id object )
 
 FUNCTION: void* object_getIvar ( Class class, Ivar ivar )
+
