@@ -149,7 +149,7 @@ text      = (formats|plain-text)*
 ]=]
 
 : printf-quot ( format-string -- format-quot n )
-    parse-printf [ [ callable? ] count ] keep [
+    parse-printf [ [ callable? ] count-by ] keep [
         dup string? [ 1quotation ] [ [ 1 - ] dip ] if
         over [ ndip ] 2curry
     ] map nip [ compose-all ] [ length ] bi ; inline

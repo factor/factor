@@ -78,7 +78,7 @@ sequences.private tools.test ;
     t t t t t t t t   t t t t t t t t   t t t t t t t t  t t t t t t t t
 } bit-array>integer ] unit-test
 
-{ 49 } [ 49 <bit-array> dup set-bits [ ] count ] unit-test
+{ 49 } [ 49 <bit-array> dup set-bits [ ] count-by ] unit-test
 
 { 1 } [ ?{ f t f t } byte-length ] unit-test
 
