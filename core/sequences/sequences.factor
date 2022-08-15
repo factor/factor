@@ -1217,6 +1217,9 @@ M: repetition sum [ elt>> ] [ length>> ] bi * ; inline
 : count ( ... seq quot: ( ... elt -- ... ? ) -- ... n )
     [ 1 0 ? ] compose map-sum ; inline
 
+: count-by ( ... seq quot: ( ... elt -- ... ? ) -- ... n )
+    [ 1 0 ? ] compose map-sum ; inline
+
 : cartesian-each ( ... seq1 seq2 quot: ( ... elt1 elt2 -- ... ) -- ... )
     [ with each ] 2curry each ; inline
 

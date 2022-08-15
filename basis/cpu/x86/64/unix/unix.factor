@@ -55,5 +55,5 @@ M: x86.64 dummy-int-params? f ;
 M: x86.64 dummy-fp-params? f ;
 
 M: x86.64 %prepare-var-args
-    [ second reg-class-of float-regs? ] count 8 min
+    [ second reg-class-of float-regs? ] count-by 8 min
     [ EAX EAX XOR ] [ <byte> AL swap MOV ] if-zero ;

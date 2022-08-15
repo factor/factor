@@ -440,7 +440,7 @@ M: ssl-handle dispose*
     "*." ?head [
         {
             [ tail? ]
-            [ [ [ CHAR: . = ] count ] bi@ - 1 <= ]
+            [ [ [ CHAR: . = ] count-by ] bi@ - 1 <= ]
         } 2&&
     ] [
         =
