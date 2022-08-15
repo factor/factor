@@ -2085,3 +2085,4 @@ ERROR: invalid-return-state obj ;
 
 : parse-html5 ( string -- document )
     [ <document> 0 ] dip data-state 2drop ;
+

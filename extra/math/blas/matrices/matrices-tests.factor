@@ -715,3 +715,4 @@ sequences tools.test ;
         svector{ 3.0 2.0 3.0 4.0 }
     } equal?
 ] unit-test
+

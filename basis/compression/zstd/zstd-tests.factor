@@ -15,3 +15,4 @@ IN: compression.zstd.tests
 [
     B{ 1 2 3 4 } zstd-uncompress-size
 ] [ zstd-error? ] must-fail-with
+

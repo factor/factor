@@ -31,3 +31,4 @@ TUPLE: reservoir-sampler iteration k sampled ;
             3drop
         ] if
     ] if ;
+
