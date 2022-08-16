@@ -1,6 +1,5 @@
 USING: accessors arrays ascii io io.streams.string kernel make
-math math.vectors random sequences sequences.extras strings
-tools.test vectors vocabs ;
+math prettyprint sequences sequences.extras strings tools.test ;
 
 { V{ { 0 104 } { 2 108 } { 3 108 } } } [ "hello" [ even? ] find-all ] unit-test
 
@@ -299,4 +298,28 @@ tools.test vectors vocabs ;
 
 { { { 100 0 } { 200 1 } { 300 2 } { 400 3 } } } [
     { 100 200 300 400 } <zip-index> >array
+] unit-test
+
+{ } [
+    { } [ - . ] each-prior
+] unit-test
+
+{ } [
+    { 5 16 42 103 } [ - . ] each-prior
+] unit-test
+
+{ { } } [
+    { } [ - ] map-prior
+] unit-test
+
+{ V{ 5 11 26 61 } } [
+    V{ 5 16 42 103 } [ - ] map-prior
+] unit-test
+
+{ V{ } } [
+    { } [ - ] V{ } map-prior-as
+] unit-test
+
+{ { 5 11 26 61 } } [
+    V{ 5 16 42 103 } [ - ] { } map-prior-as
 ] unit-test
