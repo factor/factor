@@ -29,7 +29,7 @@ M: gopher-gadget model-changed
     [ url-field>> editor>> set-editor-string ] bi* ;
 
 : ?gopher-url ( obj -- url )
-    present dup "://" subseq-index? [ "gopher://" prepend ] unless >url ;
+    present dup "://" subseq-of? [ "gopher://" prepend ] unless >url ;
 
 : show-gopher ( url gopher-gadget -- )
     [ [ ?gopher-url ] [ f ] if* ] dip

@@ -1053,7 +1053,7 @@ PRIVATE>
 
 : subseq-index ( seq subseq -- i/f ) [ 0 ] 2dip subseq-index-from ; inline
 
-: subseq-index? ( seq subseq -- ? ) subseq-index >boolean ; inline
+: subseq-of? ( seq subseq -- ? ) subseq-index >boolean ; inline
 
 : subseq-start-from ( subseq seq n -- i/f )
     spin subseq-index-from ; inline deprecated

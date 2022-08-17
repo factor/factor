@@ -73,7 +73,7 @@ M: string load-metainfo
     dup "announce-list" of [ nip first random ] [ "announce" of ] if* ;
 
 : scrape-url ( metainfo -- url/f )
-    announce-url dup path>>  "announce" subseq-index? [
+    announce-url dup path>>  "announce" subseq-of? [
         [ "announce" "scrape" replace ] change-path
     ] [ drop f ] if ;
 
