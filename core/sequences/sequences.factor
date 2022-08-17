@@ -423,14 +423,14 @@ PRIVATE>
 : length-operator-last ( seq quot -- n quot' )
     length-operator [ 1 - ] dip ; inline
 
-: sequence-operator-from ( seq quot i -- i n quot' )
-    -rot length-operator ; inline
+: collect-into ( quot into -- quot' )
+    [ [ keep ] dip set-nth-unsafe ] 2curry ; inline
 
-: sequence-operator-last-from ( seq quot i -- n quot' )
-    -rot length-operator-last nip ; inline
+: collect-from ( i n quot into -- )
+    collect-into each-integer-from ; inline
 
 : collect ( n quot into -- )
-    [ [ keep ] dip set-nth-unsafe ] 2curry each-integer ; inline
+    collect-into each-integer ; inline
 
 : sequence-index-operator ( seq quot -- n quot' )
     [ length-iterator [ keep ] curry ] dip compose ; inline
@@ -475,10 +475,13 @@ PRIVATE>
     sequence-operator each-integer-from ; inline
 
 : each-from ( ... seq quot: ( ... x -- ... ) i -- ... )
-    sequence-operator-from each-integer-from ; inline
+    -rot length-operator each-integer-from ; inline
 
 : reduce ( ... seq identity quot: ( ... prev elt -- ... next ) -- ... result )
     swapd each ; inline
+
+: map-integers-from-as ( ... from len quot: ( ... i -- ... elt ) exemplar -- ... newseq )
+    overd [ [ collect-from ] keep ] new-like ; inline
 
 : map-integers-as ( ... len quot: ( ... i -- ... elt ) exemplar -- ... newseq )
     overd [ [ collect ] keep ] new-like ; inline
@@ -555,11 +558,11 @@ PRIVATE>
     2over bounds-check? [ call ] [ 3drop f f ] if ; inline
 
 : find-from-unsafe ( ... n seq quot: ( ... elt -- ... ? ) -- ... i elt )
-    [ rot sequence-operator-from find-integer-from ] keepd
+    [ length-operator find-integer-from ] keepd
     index/element ; inline
 
 : find-last-from-unsafe ( ... n seq quot: ( ... elt -- ... ? ) -- ... i elt )
-    [ rot sequence-operator-last-from find-last-integer ] keepd
+    [ length-operator-last nip find-last-integer ] keepd
     index/element ; inline
 
 PRIVATE>
