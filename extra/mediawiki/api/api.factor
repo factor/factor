@@ -1,9 +1,10 @@
-! Copyright (C) 2021 Giftpflanze.
+! Copyright (C) 2021, 2022 Giftpflanze.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays accessors assocs assocs.extras calendar
-combinators continuations formatting http http.client io
-json.reader kernel locals make math math.parser namespaces
-oauth1 prettyprint sequences strings system threads ;
+combinators combinators.short-circuit continuations formatting
+http http.client io json.reader kernel locals make math
+math.parser namespaces oauth1 prettyprint sequences strings
+system threads ;
 IN: mediawiki.api
 
 TUPLE: oauth-login consumer-token consumer-secret access-token
@@ -72,7 +73,7 @@ t botflag set-global
         { "meta" "tokens" }
         { "type" "login" }
     } cookie-post*
-    "query" "tokens" "logintoken" [ of ] tri@ ;
+    { "query" "tokens" "logintoken" } deep-of ;
 
 : login ( -- cookies )
     [
@@ -104,18 +105,26 @@ t botflag set-global
 : nonce-already-used? ( assoc -- ? )
     "error" of
     [ "code" of "mwoauth-invalid-authorization" = ]
-    [ "info" of "Nonce already used" subseq-index ] bi
+    [ "info" of "Nonce already used" subseq-of? ] bi
     and ;
 
 : readonly? ( assoc -- ? )
-    "error" "code" [ of ] bi@ "readonly" = dup
+    { "error" "code" } deep-of "readonly" = dup
     [ 5 minutes sleep ] when ;
 
+DEFER: get-csrf-token
+: badtoken? ( assoc -- ? )
+    { "error" "code" } deep-of "badtoken" = dup
+    [ get-csrf-token drop ] when ;
+
 : failed? ( response assoc -- response assoc ? )
-    2dup 2dup code-200? not
-    rot retry-after? or
-    over nonce-already-used? or
-    swap readonly? or ;
+    2dup {
+        [ code-200? not ]
+        [ drop retry-after? ]
+        [ nip nonce-already-used? ]
+        [ nip readonly? ]
+        [ nip badtoken? ]
+    } 2|| ;
 
 : dispatch-call ( params -- response data )
     {
@@ -172,7 +181,7 @@ quot2: ( ... -- ... ) -- seq )
     [
         "query" of "pages" "revisions" [ of first ] bi@
         [ "timestamp" of basetimestamp set-global ]
-        [ "slots" "main" "content" [ of ] tri@ ] bi
+        [ { "slots" "main" "content" } deep-of ] bi
     ] bi ;
 
 <PRIVATE
