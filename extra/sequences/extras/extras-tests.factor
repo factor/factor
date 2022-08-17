@@ -328,6 +328,14 @@ math prettyprint sequences sequences.extras strings tools.test ;
     V{ 5 16 42 103 } [ - ] map-prior
 ] unit-test
 
+{ V{ f f 26 61 } } [
+    2 V{ 5 16 42 103 } [ - ] map-prior-from
+] unit-test
+
+{ V{ f f 26 61 } } [
+    2 { 5 16 42 103 } [ - ] V{ } map-prior-from-as
+] unit-test
+
 { V{ } } [
     { } [ - ] V{ } map-prior-as
 ] unit-test
