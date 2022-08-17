@@ -20,7 +20,7 @@ CONSTANT: mach-map {
         [
             " " split1 [ "()" in? ] trim "," split
             [ [ unicode:blank? ] trim ] map
-            [ ": Linux" subseq-index? ] reject
+            [ ": Linux" subseq-of? ] reject
         ] dip 3array
     ] map ;
 
@@ -50,7 +50,7 @@ CONSTANT: mach-map {
             "ld" , "-t" , ":" split [ "-L" , , ] each
             "-o" , "/dev/null" , "-l" name append ,
         ] { } make utf8 [ read-lines ] with-process-reader* 2drop
-        "lib" name append '[ _ subseq-index? ] find nip
+        "lib" name append '[ _ subseq-of? ] find nip
     ] [ f ] if* ;
 
 PRIVATE>

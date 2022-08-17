@@ -147,7 +147,7 @@ MEMO: zoneinfo-assoc ( -- assoc )
 
 : zoneinfo-zones ( -- seq )
     raw-zone-map keys
-    [ "/" subseq-index? ] partition
+    [ "/" subseq-of? ] partition
     [ natural-sort ] bi@ append ;
 
 GENERIC: zone-matches? ( string rule -- ? )
@@ -232,8 +232,8 @@ ERROR: unknown-day-abbrev day ;
 
 : comparison-day-string ( timestamp string -- timestamp )
     {
-        { [ dup ">=" subseq-index? ] [ ">=" split1 swap [ string>number >>day ] dip day-abbrev>= ] }
-        { [ dup "<=" subseq-index? ] [ "<=" split1 swap [ string>number >>day ] dip day-abbrev<= ] }
+        { [ dup ">=" subseq-of? ] [ ">=" split1 swap [ string>number >>day ] dip day-abbrev>= ] }
+        { [ dup "<=" subseq-of? ] [ "<=" split1 swap [ string>number >>day ] dip day-abbrev<= ] }
         [ string>number >>day ]
     } cond ;
         
