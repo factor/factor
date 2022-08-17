@@ -841,8 +841,8 @@ INSTANCE: step-slice virtual-sequence
 : map-prior-as ( ... seq quot: ( ... prior elt -- elt' ) exemplar -- seq' )
     0 -roll map-prior-from-as ; inline
 
-: map-prior-from ( ... seq quot: ( ... prior elt -- elt' ) i -- seq' )
-    pick map-prior-from-as ; inline
+: map-prior-from ( ... i seq quot: ( ... prior elt -- elt' ) -- seq' )
+    over map-prior-from-as ; inline
 
 : map-prior ( ... seq quot: ( ... prior elt -- elt' ) -- seq' )
     over map-prior-as ; inline
