@@ -308,8 +308,17 @@ math prettyprint sequences sequences.extras strings tools.test ;
 ] unit-test
 
 { } [
+    1000 { } [ - . ] each-prior-from
+] unit-test
+
+{ } [
     { 5 16 42 103 } [ - . ] each-prior
 ] unit-test
+
+{ } [
+    1 { 5 16 42 103 } [ - . ] each-prior-from
+] unit-test
+
 
 { { } } [
     { } [ - ] map-prior
@@ -331,3 +340,7 @@ math prettyprint sequences sequences.extras strings tools.test ;
 { 0 } [ 0 CHAR: a "abba" nth-index ] unit-test
 { 3 } [ 1 CHAR: a "abba" nth-index ] unit-test
 { f } [ 2 CHAR: a "abba" nth-index ] unit-test
+
+{ { -995 11 26 61 } } [
+    1000 V{ 5 16 42 103 } [ - ] { } map-prior-identity-as
+] unit-test
