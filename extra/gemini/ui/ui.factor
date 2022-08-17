@@ -29,7 +29,7 @@ M: gemini-gadget model-changed
     [ url-field>> editor>> set-editor-string ] bi* ;
 
 : ?gemini-url ( obj -- url )
-    present dup "://" subseq-index? [ "gemini://" prepend ] unless >url ;
+    present dup "://" subseq-of? [ "gemini://" prepend ] unless >url ;
 
 : show-gemini ( url gemini-gadget -- )
     [ [ ?gemini-url ] [ f ] if* ] dip

@@ -147,7 +147,7 @@ SYMBOL: vocab-articles
             simple-lint-error
         ] when
     ] [
-        "  " subseq-index? [
+        "  " subseq-of? [
             "Paragraph text should not contain double spaces"
             simple-lint-error
         ] when

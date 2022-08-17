@@ -1245,7 +1245,7 @@ HELP: subseq?
 { $values { "subseq" sequence } { "seq" sequence } { "?" boolean } }
 { $description "Tests if " { $snippet "seq" } " contains the elements of " { $snippet "subseq" } " as a contiguous subsequence." } ;
 
-HELP: subseq-index?
+HELP: subseq-of?
 { $values { "seq" sequence } { "subseq" sequence } { "?" boolean } }
 { $description "Tests if " { $snippet "seq" } " contains the elements of " { $snippet "subseq" } " as a contiguous subsequence." } ;
 
@@ -2027,7 +2027,7 @@ ARTICLE: "sequences-tests" "Testing sequences"
 "Testing if a sequence contains an object:"
 { $subsections member? member-eq? }
 "Testing if a sequence contains a subsequence:"
-{ $subsections head? tail? subseq? subseq-index? } ;
+{ $subsections head? tail? subseq? subseq-of? } ;
 
 ARTICLE: "sequences-search" "Searching sequences"
 "Finding the index of an element:"
