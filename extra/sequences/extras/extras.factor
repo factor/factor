@@ -807,14 +807,42 @@ INSTANCE: step-slice virtual-sequence
         [ [ push ] curry compose 3nested-each ] keep
     ] keep like ; inline
 
-: each-prior ( ... seq quot: ( ... prior elt -- ... ) -- ... )
+: prev ( n seq -- obj ) [ 1 - ] dip nth ; inline
+: ?prev ( n seq -- obj/f ) [ 1 - ] dip ?nth ; inline
+: ??prev ( n seq -- obj/f ? ) [ 1 - ] dip ??nth ; inline
+: prev-of ( seq n -- obj ) 1 - nth-of ; inline
+: ?prev-of ( seq n -- obj/f ) 1 - ?nth-of ; inline
+: ??prev-of ( seq n -- obj/f ) 1 - ??nth-of ; inline
+
+: prev-identity ( i seq -- identity i seq )
+    2dup ??prev [ drop 0 ] unless -rot ; inline
+
+: each-prior-identity-from ( ... identity i seq quot: ( ... prior elt -- ... ) -- ... )
     '[ [ swap @ ] keep ]
-    sequence-operator 0 -rot each-integer-from drop ; inline
+    length-operator each-integer-from drop ; inline
+
+: each-prior-from ( ... i seq quot: ( ... prior elt -- ... ) -- ... )
+    [ prev-identity ] dip each-prior-identity-from ; inline
+
+: each-prior ( ... seq quot: ( ... prior elt -- ... ) -- ... )
+    0 -rot each-prior-from ; inline
+
+: map-prior-identity-from-as ( ... identity i seq quot: ( ... prior elt -- elt' ) exemplar -- seq' )
+    [
+        '[ [ swap @ ] keep swap ] length-operator
+    ] dip map-integers-from-as nip ; inline
+
+: map-prior-identity-as ( ... identity seq quot: ( ... prior elt -- elt' ) exemplar -- seq' )
+    [ 0 ] 3dip map-prior-identity-from-as ; inline
+
+: map-prior-from-as ( ... i seq quot: ( ... prior elt -- elt' ) exemplar -- seq' )
+    [ prev-identity ] 2dip map-prior-identity-from-as ; inline
 
 : map-prior-as ( ... seq quot: ( ... prior elt -- elt' ) exemplar -- seq' )
-    [
-        '[ [ swap @ ] keep swap ] length-operator 0 -rot
-    ] dip map-integers-as nip ; inline
+    0 -roll map-prior-from-as ; inline
+
+: map-prior-from ( ... seq quot: ( ... prior elt -- elt' ) i -- seq' )
+    pick map-prior-from-as ; inline
 
 : map-prior ( ... seq quot: ( ... prior elt -- elt' ) -- seq' )
     over map-prior-as ; inline
