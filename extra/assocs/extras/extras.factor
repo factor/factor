@@ -7,7 +7,7 @@ IN: assocs.extras
 : push-at-each ( value keys assoc -- )
     '[ _ push-at ] with each ; inline
 
-: deep-at ( assoc seq -- value/f )
+: deep-of ( assoc seq -- value/f )
     [ of ] each ; inline
 
 : substitute! ( seq assoc -- seq )

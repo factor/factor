@@ -23,7 +23,7 @@ PRIVATE>
 
 : google-search ( query -- results )
     search-url http-get nip json>
-    { "responseData" "results" } deep-at
+    { "responseData" "results" } deep-of
     [ \ search-result from-slots ] map ;
 
 <PRIVATE
