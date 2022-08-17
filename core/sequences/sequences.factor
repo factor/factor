@@ -420,9 +420,6 @@ PRIVATE>
 : length-operator ( seq quot -- n quot' )
     [ length-iterator ] dip compose ; inline
 
-: length-operator-last ( seq quot -- n quot' )
-    length-operator [ 1 - ] dip ; inline
-
 : collect-into ( quot into -- quot' )
     [ [ keep ] dip set-nth-unsafe ] 2curry ; inline
 
@@ -562,7 +559,7 @@ PRIVATE>
     index/element ; inline
 
 : find-last-from-unsafe ( ... n seq quot: ( ... elt -- ... ? ) -- ... i elt )
-    [ length-operator-last nip find-last-integer ] keepd
+    [ length-operator nip find-last-integer ] keepd
     index/element ; inline
 
 PRIVATE>
