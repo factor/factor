@@ -49,7 +49,7 @@ ERROR: unrolled-2bounds-error
     swapd '[ dup _ nth-unsafe swap @ ] ; inline
 
 : (unrolled-2each) ( xseq yseq len quot -- len quot )
-    [ '[ _ ] 2dip ] dip (2each) nip ; inline
+    [ '[ _ ] 2dip ] dip 2length-operator nip ; inline
 
 : unrolled-each-unsafe ( seq len quot: ( x -- ) -- )
     (unrolled-each) unrolled-each-integer ; inline

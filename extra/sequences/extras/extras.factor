@@ -316,7 +316,7 @@ PRIVATE>
 
 : 3each-from
     ( ... seq1 seq2 seq3 quot: ( ... elt1 elt2 elt3 -- ... ) i -- ... )
-    [ (3each) ] dip -rot each-integer-from ; inline
+    [ 3length-operator ] dip -rot each-integer-from ; inline
 
 : 3map-reduce
     ( ..a seq1 seq2 seq3 map-quot: ( ..a elt1 elt2 elt3 -- ..b intermediate ) reduce-quot: ( ..b prev intermediate -- ..a next ) -- ..a result )
@@ -404,7 +404,7 @@ PRIVATE>
     (2each-index) each-integer ; inline
 
 : 2map-into ( seq1 seq2 quot into -- )
-    [ (2each) ] dip collect ; inline
+    [ 2length-operator ] dip collect ; inline
 
 : 2map! ( ... seq1 seq2 quot: ( ... elt1 elt2 -- ... newelt ) -- ... seq1 )
     pick [ 2map-into ] keep ; inline
