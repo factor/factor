@@ -516,21 +516,21 @@ PRIVATE>
 : 2nth-unsafe ( n seq1 seq2 -- elt1 elt2 )
     [ nth-unsafe ] bi-curry@ bi ; inline
 
-: setup-2each ( seq1 seq2 -- n quot )
+: 2length-iterator ( seq1 seq2 -- n quot )
     [ min-length check-length ] 2keep [ 2nth-unsafe ] 2curry ; inline
 
-: (2each) ( seq1 seq2 quot -- n quot' )
-    [ setup-2each ] dip compose ; inline
+: 2length-operator ( seq1 seq2 quot -- n quot' )
+    [ 2length-iterator ] dip compose ; inline
 
 : 3nth-unsafe ( n seq1 seq2 seq3 -- elt1 elt2 elt3 )
     [ nth-unsafe ] tri-curry@ tri ; inline
 
-: setup-3each ( seq1 seq2 seq3 -- n quot )
+: 3length-iterator ( seq1 seq2 seq3 -- n quot )
     [ 3length min min check-length ]
     [ [ 3nth-unsafe ] 3curry ] 3bi ; inline
 
-: (3each) ( seq1 seq2 seq3 quot -- n quot' )
-    [ setup-3each ] dip compose ; inline
+: 3length-operator ( seq1 seq2 seq3 quot -- n quot' )
+    [ 3length-iterator ] dip compose ; inline
 
 : element/index ( i/f seq -- elt/f i/f )
     '[ [ _ nth ] [ f ] if* ] keep ; inline
@@ -598,31 +598,31 @@ PRIVATE>
     (accumulate*) map! nip ; inline
 
 : 2each ( ... seq1 seq2 quot: ( ... elt1 elt2 -- ... ) -- ... )
-    (2each) each-integer ; inline
+    2length-operator each-integer ; inline
 
 : 2each-from ( ... seq1 seq2 quot: ( ... elt1 elt2 -- ... ) i -- ... )
-    [ (2each) ] dip -rot each-integer-from ; inline
+    [ 2length-operator ] dip -rot each-integer-from ; inline
 
 : 2reduce ( ... seq1 seq2 identity quot: ( ... prev elt1 elt2 -- ... next ) -- ... result )
     -rotd 2each ; inline
 
 : 2map-as ( ... seq1 seq2 quot: ( ... elt1 elt2 -- ... newelt ) exemplar -- ... newseq )
-    [ (2each) ] dip map-integers-as ; inline
+    [ 2length-operator ] dip map-integers-as ; inline
 
 : 2map ( ... seq1 seq2 quot: ( ... elt1 elt2 -- ... newelt ) -- ... newseq )
     pick 2map-as ; inline
 
 : 2all? ( ... seq1 seq2 quot: ( ... elt1 elt2 -- ... ? ) -- ... ? )
-    (2each) all-integers? ; inline
+    2length-operator all-integers? ; inline
 
 : 2any? ( ... seq1 seq2 quot: ( ... elt1 elt2 -- ... ? ) -- ... ? )
     negate 2all? not ; inline
 
 : 3each ( ... seq1 seq2 seq3 quot: ( ... elt1 elt2 elt3 -- ... ) -- ... )
-    (3each) each-integer ; inline
+    3length-operator each-integer ; inline
 
 : 3map-as ( ... seq1 seq2 seq3 quot: ( ... elt1 elt2 elt3 -- ... newelt ) exemplar -- ... newseq )
-    [ (3each) ] dip map-integers-as ; inline
+    [ 3length-operator ] dip map-integers-as ; inline
 
 : 3map ( ... seq1 seq2 seq3 quot: ( ... elt1 elt2 elt3 -- ... newelt ) -- ... newseq )
     pickd swap 3map-as ; inline
