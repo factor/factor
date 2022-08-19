@@ -57,9 +57,6 @@ M: assoc assoc-like drop ; inline
 : substituter ( assoc -- quot )
     [ ?at drop ] curry ; inline
 
-: with-assoc ( assoc quot: ( ..a value key assoc -- ..b ) -- quot: ( ..a key value -- ..b ) )
-    curry [ swap ] prepose ; inline
-
 PRIVATE>
 
 : assoc-find ( ... assoc quot: ( ... key value -- ... ? ) -- ... key value ? )

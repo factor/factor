@@ -755,8 +755,11 @@ PRIVATE>
 : last-index-from ( obj i seq -- n )
     rot [ = ] curry find-last-from drop ;
 
+: with-assoc ( assoc quot: ( ..a value key assoc -- ..b ) -- quot: ( ..a key value -- ..b ) )
+    curry [ swap ] prepose ; inline
+
 : indices ( obj seq -- indices )
-    swap [ = ] curry [ swap ] prepose V{ } clone [
+    swap [ = ] with-assoc V{ } clone [
         [ push ] curry [ [ drop ] if ] curry compose each-index
     ] keep ;
 
@@ -1049,8 +1052,8 @@ PRIVATE>
 
 : shorter? ( seq1 seq2 -- ? ) 2length < ; inline
 : longer? ( seq1 seq2 -- ? ) 2length > ; inline
-: shorter ( seq1 seq2 -- seq ) [ 2length <= ] 2keep ? ; inline
-: longer ( seq1 seq2 -- seq ) [ 2length >= ] 2keep ? ; inline
+: shorter ( seq1 seq2 -- seq ) [ 2length <= ] most ; inline
+: longer ( seq1 seq2 -- seq ) [ 2length >= ] most ; inline
 
 : head? ( seq begin -- ? )
     2dup shorter? [
@@ -1219,7 +1222,7 @@ M: repetition sum [ elt>> ] [ length>> ] bi * ; inline
 : supremum ( seq -- elt ) [ ] [ max ] map-reduce ;
 
 : map-sum ( ... seq quot: ( ... elt -- ... n ) -- ... n )
-    [ 0 ] 2dip [ dip + ] curry [ swap ] prepose each ; inline
+    [ 0 ] 2dip [ dip + ] with-assoc each ; inline
 
 : count ( ... seq quot: ( ... elt -- ... ? ) -- ... n )
     [ 1 0 ? ] compose map-sum ; inline
