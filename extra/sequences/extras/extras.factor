@@ -395,13 +395,13 @@ PRIVATE>
 
 <PRIVATE
 
-: (2each-index) ( seq1 seq2 quot -- n quot' )
-    [ setup-2each [ keep ] curry ] dip compose ; inline
+: 2sequence-index-iterator ( seq1 seq2 quot -- n quot' )
+    [ 2length-iterator [ keep ] curry ] dip compose ; inline
 
 PRIVATE>
 
 : 2each-index ( ... seq1 seq2 quot: ( ... elt1 elt2 index -- ... ) -- ... )
-    (2each-index) each-integer ; inline
+    2sequence-index-iterator each-integer ; inline
 
 : 2map-into ( seq1 seq2 quot into -- )
     [ 2length-operator ] dip collect ; inline
@@ -410,7 +410,7 @@ PRIVATE>
     pick [ 2map-into ] keep ; inline
 
 : 2map-index ( ... seq1 seq2 quot: ( ... elt1 elt2 index -- ... newelt ) -- ... newseq )
-    pick [ (2each-index) ] dip map-integers-as ; inline
+    pick [ 2sequence-index-iterator ] dip map-integers-as ; inline
 
 TUPLE: evens { seq read-only } ;
 
