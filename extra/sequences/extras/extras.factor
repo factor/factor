@@ -531,7 +531,7 @@ PRIVATE>
     [ (reverse) ] [ like ] bi* ;
 
 : map-product ( ... seq quot: ( ... elt -- ... n ) -- ... n )
-    [ 1 ] 2dip [ dip * ] curry [ swap ] prepose each ; inline
+    [ 1 ] 2dip [ dip * ] with-assoc each ; inline
 
 : insert-nth! ( elt n seq -- )
     [ length ] keep ensure swap pick (a..b]
