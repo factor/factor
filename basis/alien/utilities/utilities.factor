@@ -7,14 +7,14 @@ IN: alien.utilities
 
 SPECIALIZED-ARRAY: void*
 
-: more? ( alien -- ? )
+: deref? ( alien -- ? )
     { [ ] [ void* deref ] } 1&& ;
 
 : advance ( void* -- void* )
     cell swap <displaced-alien> ;
 
 : alien>strings ( alien encoding -- strings )
-    [ [ dup more? ] ] dip
+    [ [ dup deref? ] ] dip
     '[ [ advance ] [ void* deref _ alien>string ] bi ]
     produce nip ;
 
