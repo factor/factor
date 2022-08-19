@@ -29,6 +29,18 @@ IN: sequences.tests
     [ 1 [ [ * ] [ + ] bi* ] reduce-index ] bi@
 ] unit-test
 
+{ 21 } [
+    { 1 2 3 } { 4 5 6 } 0 [ + + ] 0 2reduce-from
+] unit-test
+
+{ 16 } [
+    { 1 2 3 } { 4 5 6 } 0 [ + + ] 1 2reduce-from
+] unit-test
+
+{ -541365 } [
+    { 10 21 32 } { 500 600 700 } [ - sq ] [ - ] 2map-reduce
+] unit-test
+
 { 5040 { 1 1 2 6 24 120 720 } }
 [ { 1 2 3 4 5 6 7 } 1 [ * ] accumulate ] unit-test
 
