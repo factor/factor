@@ -6,9 +6,12 @@ quotations sequences sequences.generalizations sequences.private
 sets shuffle stack-checker.transforms system words ;
 IN: combinators.extras
 
+: callk ( ..a quot: ( ..a -- ..b ) -- ..b quot )
+    dup [ call ] dip ; inline
+
 : once ( quot -- ) call ; inline
-: twice ( quot -- ) dup [ call ] dip call ; inline
-: thrice ( quot -- ) dup dup [ call ] 2dip [ call ] dip call ; inline
+: twice ( quot -- ) callk call ; inline
+: thrice ( quot -- ) callk callk call ; inline
 : forever ( quot -- ) [ t ] compose loop ; inline
 
 MACRO: cond-case ( assoc -- quot )
