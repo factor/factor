@@ -134,7 +134,7 @@ PRIVATE>
 GENERIC: bit-count ( obj -- n )
 
 M: integer bit-count
-    dup 0 < [ non-negative-integer-expected ] when (bit-count) ; inline
+    ensure-non-negative (bit-count) ; inline
 
 M: byte-array bit-count
     byte-array-bit-count ;

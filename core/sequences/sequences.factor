@@ -143,9 +143,11 @@ TUPLE: iota { n integer read-only } ;
 
 ERROR: non-negative-integer-expected n ;
 
+: ensure-non-negative ( n -- n )
+    dup 0 < [ non-negative-integer-expected ] when ; inline
+
 : <iota> ( n -- iota )
-    dup 0 < [ non-negative-integer-expected ] when
-    iota boa ; inline
+    ensure-non-negative iota boa ; inline
 
 M: iota length n>> ; inline
 M: iota nth-unsafe drop ; inline
