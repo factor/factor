@@ -296,3 +296,12 @@ USING: arrays assocs.extras kernel math math.order sequences tools.test ;
     [ [ dup 1 + 2array ] dip ] collect-assoc-by-multi
 ] unit-test
 
+{ H{ { 1 2 } { 3 4 } } } [
+    H{ { 1 2 } { 3 4 } { 5 6 } }
+    { 1 3 } intersect-keys
+] unit-test
+
+{ { { 1 2 } { 3 4 } } } [
+    H{ { 1 2 } { 3 4 } { 5 6 } }
+    { 1 3 } { } intersect-keys-as
+] unit-test
