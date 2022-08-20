@@ -32,7 +32,7 @@ C: <repeats> repeats
 
 M: repeats length [ seq>> length ] [ times>> ] bi * ;
 
-M: repeats virtual@ [ times>> /i ] [ seq>> ] bi ;
+M: repeats virtual@ [ seq>> length mod ] [ seq>> ] bi ;
 
 M: repeats virtual-exemplar seq>> ;
 
