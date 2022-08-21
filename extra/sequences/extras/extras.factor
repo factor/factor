@@ -823,3 +823,6 @@ M: virtual-zip-index nth-unsafe
     over [ seq>> nth-unsafe ] [ 2array ] bi* ; inline
 
 INSTANCE: virtual-zip-index immutable-sequence
+
+: nth-index ( n obj seq -- i )
+    [ = dup [ drop 1 - dup 0 < ] when ] with find drop nip ;
