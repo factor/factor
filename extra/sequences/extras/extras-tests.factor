@@ -323,3 +323,8 @@ math prettyprint sequences sequences.extras strings tools.test ;
 { { 5 11 26 61 } } [
     V{ 5 16 42 103 } [ - ] { } map-prior-as
 ] unit-test
+
+{ f } [ 0 CHAR: a "foo" nth-index ] unit-test
+{ 0 } [ 0 CHAR: a "abba" nth-index ] unit-test
+{ 3 } [ 1 CHAR: a "abba" nth-index ] unit-test
+{ f } [ 2 CHAR: a "abba" nth-index ] unit-test
