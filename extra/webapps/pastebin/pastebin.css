@@ -14,7 +14,7 @@ pre.code {
     border-radius: 5px;
     background-color: #f7f7f7;
     padding: 5px;
-    color: #000000;
+    color: black;
 }
 
 table {
@@ -46,5 +46,13 @@ table tr:hover {
 
     table tr:hover {
         background-color: #373e48;
+    }
+
+    pre.code {
+        filter: invert(80%);
+    }
+
+    input, textarea, select {
+        filter: invert(80%);
     }
 }
