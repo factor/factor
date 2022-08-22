@@ -24,9 +24,9 @@ command! -bar -bang -range=1 -nargs=1 -complete=customlist,factor#complete_vocab
             \ execute factor#go_to_vocab_command(<count>,"edit<bang>",<q-args>)
 command! -bar -bang -range=1 -nargs=1 -complete=customlist,factor#complete_vocab_glob NewFactorVocab
             \ execute factor#make_vocab_command(<count>,"edit<bang>",<q-args>)
-command! FactorVocabImpl -bar :call GoToFactorVocabImpl()
-command! FactorVocabDocs -bar :call GoToFactorVocabDocs()
-command! FactorVocabTests -bar :call GoToFactorVocabTests()
+command! -bar FactorVocabImpl :call GoToFactorVocabImpl()
+command! -bar FactorVocabDocs :call GoToFactorVocabDocs()
+command! -bar FactorVocabTests :call GoToFactorVocabTests()
 
 function! FactorFileBase()
     let filename = expand('%:r')
