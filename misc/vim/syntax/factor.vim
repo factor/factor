@@ -61,6 +61,9 @@ syn match   factorWord   /\v<\S+>/  contains=@factorWord transparent display
 syn cluster factorCluster           contains=factorWord,factorComment,factorMultilineComment,@factorClusterValue,factorDeclaration,factorCall,factorCallNextMethod,@factorWordOps,factorAlien,factorSlot,factorTuple,factorStruct
 syn cluster factorClusterValue      contains=factorBreakpoint,factorBoolean,factorFrySpecifier,factorLocalsSpecifier,factorChar,factorString,@factorNumber,factorBackslash,factorMBackslash,factorLiteral,@factorEffect,@factorQuotation,@factorArray,factorRegexp
 
+" Almost any byte in Factor can be a part of a word
+syn iskeyword 33-126,128-255
+
 " A crash course on Factor's lexer:
 "
 " The "lexer" vocabulary parses lines (arrays of strings) into tokens.
