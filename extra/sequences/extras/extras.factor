@@ -815,7 +815,7 @@ INSTANCE: step-slice virtual-sequence
 : ??prev ( n seq -- obj/f ? ) [ 1 - ] dip ??nth ; inline
 : prev-of ( seq n -- obj ) 1 - nth-of ; inline
 : ?prev-of ( seq n -- obj/f ) 1 - ?nth-of ; inline
-: ??prev-of ( seq n -- obj/f ) 1 - ??nth-of ; inline
+: ??prev-of ( seq n -- obj/f ? ) 1 - ??nth-of ; inline
 
 : prev-identity ( i seq -- identity i seq )
     2dup ??prev [ drop 0 ] unless -rot ; inline
