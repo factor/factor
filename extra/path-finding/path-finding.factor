@@ -67,12 +67,12 @@ TUPLE: (astar) astar goal origin in-open-set open-set ;
 TUPLE: astar-simple < astar cost heuristic neighbors ;
 M: astar-simple cost cost>> call( n1 n2 -- c ) ;
 M: astar-simple heuristic heuristic>> call( n1 n2 -- c ) ;
-M: astar-simple neighbors neighbours>> call( n -- neighbours ) ;
+M: astar-simple neighbors neighbors>> call( n -- neighbors ) ;
 
 TUPLE: bfs < astar neighbors ;
 M: bfs cost 3drop 1 ;
 M: bfs heuristic 3drop 0 ;
-M: bfs neighbors neighbours>> at ;
+M: bfs neighbors neighbors>> at ;
 
 TUPLE: dijkstra < astar costs ;
 M: dijkstra cost costs>> swapd at at ;

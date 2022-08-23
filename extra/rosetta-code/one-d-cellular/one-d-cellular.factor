@@ -32,7 +32,7 @@ IN: rosetta-code.one-d-cellular
 :: neighbors ( index world -- # )
     index [ 1 - ] [ 1 + ] bi [ world ?nth ] bi@ bool-sum ;
 
-: count-neighbors ( world -- neighbours )
+: count-neighbors ( world -- neighbors )
     [ length <iota> ] keep [ neighbors ] curry map ;
 
 : life-law ( alive? neighbors -- alive? )
