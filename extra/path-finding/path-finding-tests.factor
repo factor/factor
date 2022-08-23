@@ -30,7 +30,7 @@ TUPLE: maze < astar ;
   8  X X X X X X X X X X"
         split-lines ] nth nth CHAR: X = not ;
 
-M: maze neighbours
+M: maze neighbors
     drop
     first2
     { [ 1 + 2array ] [ 1 - 2array ] [ [ 1 + ] dip 2array ] [ [ 1 - ] dip 2array ] } 2cleave
@@ -99,7 +99,7 @@ M: maze cost
 
 MEMO: routes ( -- hash ) $[ { "ABD" "BC" "C" "DCE" "ECF" } [ unclip swap 2array ] map >hashtable ] ;
 
-: n ( pos -- neighbours )
+: n ( pos -- neighbors )
     routes at ;
 
 : c ( from to -- cost )

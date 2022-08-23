@@ -24,7 +24,7 @@ IN: rosetta-code.knapsack
 
 ! Which items does the tourist carry in his knapsack so that
 ! their total weight does not exceed 400 dag [4 kg], and their
-! total value is maximised?
+! total value is maximized?
 
 TUPLE: item
     name weight value ;
