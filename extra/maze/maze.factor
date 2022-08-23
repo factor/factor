@@ -17,7 +17,7 @@ SYMBOL: visited
     [ v+ ] with map
     [ unvisited? ] filter ;
 
-: random-neighbour ( cell -- newcell ) choices random ;
+: random-neighbor ( cell -- newcell ) choices random ;
 
 : vertex ( pair -- )
     first2 [ 0.5 + line-width * ] bi@ glVertex2d ;
@@ -29,7 +29,7 @@ SYMBOL: visited
     GL_LINE_STRIP glBegin
     dup vertex
     dup visit
-    dup random-neighbour [
+    dup random-neighbor [
         (draw-maze) (draw-maze)
     ] [
         drop

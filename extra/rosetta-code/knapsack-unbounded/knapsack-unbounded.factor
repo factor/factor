@@ -20,12 +20,12 @@ IN: rosetta-code.knapsack-unbounded
 ! He can only take whole units of any item, but there is much
 ! more of any item than he could ever carry
 
-! How many of each item does he take to maximise the value of
+! How many of each item does he take to maximize the value of
 ! items he is carrying away with him?
 
 ! Note:
 
-! There are four solutions that maximise the value taken. Only
+! There are four solutions that maximize the value taken. Only
 ! one need be given.
 
 CONSTANT: values { 3000 1800 2500 }
