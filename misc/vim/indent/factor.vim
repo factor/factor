@@ -21,16 +21,16 @@ function! GetFactorIndent(lnum)
 	let pline = getline(a:lnum-1)
 	let pind = indent(a:lnum-1)
 	if pline =~ '^:'
-		return pind + shiftwidth()
+		let pind += shiftwidth()
 	endif
 	if pline =~ ';$'
-		return pind - shiftwidth()
+		let pind -= shiftwidth()
 	endif
 	if pline =~ '[{[]$'
-		return pind + shiftwidth()
+		let pind += shiftwidth()
 	endif
 	if cline =~ '^\s*[\]}]'
-		return pind - shiftwidth()
+		let pind -= shiftwidth()
 	endif
 	return pind
 endfunction
