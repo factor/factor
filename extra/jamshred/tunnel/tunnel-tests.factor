@@ -9,14 +9,14 @@ IN: jamshred.tunnel.tests
 : test-segment-oint ( -- oint )
     { 0 0 0 } { 0 0 -1 } { 0 1 0 } { -1 0 0 } <oint> ;
 
-{ { -1 0 0 } } [ test-segment-oint { 1 0 0 } vector-to-centre ] unit-test
-{ { 1 0 0 } } [ test-segment-oint { -1 0 0 } vector-to-centre ] unit-test
-{ { 0 -1 0 } } [ test-segment-oint { 0 1 0 } vector-to-centre ] unit-test
-{ { 0 1 0 } } [ test-segment-oint { 0 -1 0 } vector-to-centre ] unit-test
-{ { -1 0 0 } } [ test-segment-oint { 1 0 -1 } vector-to-centre ] unit-test
-{ { 1 0 0 } } [ test-segment-oint { -1 0 -1 } vector-to-centre ] unit-test
-{ { 0 -1 0 } } [ test-segment-oint { 0 1 -1 } vector-to-centre ] unit-test
-{ { 0 1 0 } } [ test-segment-oint { 0 -1 -1 } vector-to-centre ] unit-test
+{ { -1 0 0 } } [ test-segment-oint { 1 0 0 } vector-to-center ] unit-test
+{ { 1 0 0 } } [ test-segment-oint { -1 0 0 } vector-to-center ] unit-test
+{ { 0 -1 0 } } [ test-segment-oint { 0 1 0 } vector-to-center ] unit-test
+{ { 0 1 0 } } [ test-segment-oint { 0 -1 0 } vector-to-center ] unit-test
+{ { -1 0 0 } } [ test-segment-oint { 1 0 -1 } vector-to-center ] unit-test
+{ { 1 0 0 } } [ test-segment-oint { -1 0 -1 } vector-to-center ] unit-test
+{ { 0 -1 0 } } [ test-segment-oint { 0 1 -1 } vector-to-center ] unit-test
+{ { 0 1 0 } } [ test-segment-oint { 0 -1 -1 } vector-to-center ] unit-test
 
 : simplest-straight-ahead ( -- oint segment )
     { 0 0 0 } { 0 0 -1 } { 0 1 0 } { -1 0 0 } <oint>

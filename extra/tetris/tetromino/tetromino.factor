@@ -5,7 +5,7 @@ USING: colors math namespaces random sequences ;
 
 IN: tetris.tetromino
 
-TUPLE: tetromino states colour ;
+TUPLE: tetromino states color ;
 
 C: <tetromino> tetromino
 
