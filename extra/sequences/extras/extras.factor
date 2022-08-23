@@ -75,6 +75,9 @@ IN: sequences.extras
 : push-if* ( ..a elt quot: ( ..a elt -- ..b obj/f ) accum -- ..b )
     [ call ] dip [ push ] [ drop ] if* ; inline
 
+: push? ( elt/f accum -- )
+    over [ push ] [ 2drop ] if ; inline
+
 <PRIVATE
 
 : (index-selector-as) ( quot length exampler -- selector accum )
@@ -784,10 +787,56 @@ M: step-slice length
 
 INSTANCE: step-slice virtual-sequence
 
+: 2nested-each* ( seq1 seq-quot: ( n -- seq ) quot: ( a b -- ) -- )
+    '[
+        _ keep swap _ with each
+    ] each ; inline
+
+: 2nested-filter-as* ( seq1 seq-quot quot exemplar -- seq )
+    [ 2over [ length ] bi@ * ] dip
+    [
+        new-resizable
+        [ [ push? ] curry compose 2nested-each* ] keep
+    ] keep like ; inline
+
+: 2nested-filter* ( seq1 seq-quot quot -- seq )
+    pick 2nested-filter-as* ; inline
+
+: 2nested-map-as* ( seq1 seq-quot quot exemplar -- seq )
+    [ 2over [ length ] bi@ * ] dip
+    [
+        new-resizable
+        [ [ push ] curry compose 2nested-each* ] keep
+    ] keep like ; inline
+
+: 2nested-map* ( seq1 seq-quot quot -- seq )
+    pick 2nested-map-as* ; inline
+
+
 : 2nested-each ( seq1 seq2 quot -- )
     swapd '[
         swap _ with each
     ] with each ; inline
+
+: 2nested-filter-as ( seq1 seq2 quot exemplar -- seq )
+    [ 2over [ length ] bi@ * ] dip
+    [
+        new-resizable
+        [ [ push? ] curry compose 2nested-each ] keep
+    ] keep like ; inline
+
+: 2nested-filter ( seq1 seq2 quot -- seq )
+    pick 2nested-filter-as ; inline
+
+: 2nested-map-as ( seq1 seq2 quot exemplar -- seq )
+    [ 2over [ length ] bi@ * ] dip
+    [
+        new-resizable
+        [ [ push ] curry compose 2nested-each ] keep
+    ] keep like ; inline
+
+: 2nested-map ( seq1 seq2 quot -- seq )
+    pick 2nested-map-as ; inline
 
 : 3nested-each ( seq1 seq2 seq3 quot -- )
     [ spin ] dip '[
@@ -796,19 +845,25 @@ INSTANCE: step-slice virtual-sequence
         ] with with each
     ] with with each ; inline
 
-: 2nested-map ( seq1 seq2 quot -- seq )
-    2over [ length ] bi@ * reach
+: 3nested-filter-as ( seq1 seq2 seq3 quot exemplar -- seq )
+    [ 3 nover [ length ] tri@ * * ] dip
     [
         new-resizable
-        [ [ push ] curry compose 2nested-each ] keep
+        [ [ push? ] curry compose 3nested-each ] keep
     ] keep like ; inline
 
-: 3nested-map ( seq1 seq2 seq3 quot -- seq )
-    3 nover [ length ] tri@ * * 5 npick
+: 3nested-filter ( seq1 seq2 seq3 quot -- seq )
+    reach 3nested-filter-as ; inline
+
+: 3nested-map-as ( seq1 seq2 seq3 quot exemplar -- seq )
+    [ 3 nover [ length ] tri@ * * ] dip
     [
         new-resizable
         [ [ push ] curry compose 3nested-each ] keep
     ] keep like ; inline
+
+: 3nested-map ( seq1 seq2 seq3 quot -- seq )
+    reach 3nested-map-as ; inline
 
 : prev ( n seq -- obj ) [ 1 - ] dip nth ; inline
 : ?prev ( n seq -- obj/f ) [ 1 - ] dip ?nth ; inline
