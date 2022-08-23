@@ -29,7 +29,7 @@ CONSTANT: initial-dt 5
         t >>clipped?
         ${ WIDTH HEIGHT } >>pref-dim
         initial-population random-boids >>boids
-        initial-behaviors >>behaviours
+        initial-behaviors >>behaviors
         initial-dt >>dt ;
 
 M: boids-gadget ungraft*

@@ -48,7 +48,7 @@ HELP: <astar>
   { "astar" astar }
 }
 { $description "Build an astar object from the given quotations. The "
-  { $snippet "neighbors" } " one builds the list of neighbours. The "
+  { $snippet "neighbors" } " one builds the list of neighbors. The "
   { $snippet "cost" } " and " { $snippet "heuristic" } " ones represent "
   "respectively the cost for transitioning from a node to one of its neighbor, "
   "and the underestimated cost for going from a node to the target. This solution "
