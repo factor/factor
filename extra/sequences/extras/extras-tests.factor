@@ -1,5 +1,6 @@
-USING: accessors arrays ascii io io.streams.string kernel make
-math prettyprint sequences sequences.extras strings tools.test ;
+USING: accessors arrays ascii grouping io io.streams.string
+kernel make math prettyprint ranges sequences sequences.extras
+strings tools.test ;
 
 { V{ { 0 104 } { 2 108 } { 3 108 } } } [ "hello" [ even? ] find-all ] unit-test
 
@@ -351,4 +352,23 @@ math prettyprint sequences sequences.extras strings tools.test ;
 
 { { -995 11 26 61 } } [
     1000 V{ 5 16 42 103 } [ - ] { } map-prior-identity-as
+] unit-test
+
+{ V{ 1 4 9 } } [
+    { 1 2 3 } { 1 2 3 }
+    [ 2dup 2array all-eq? [ * ] [ 2drop f ] if ]
+    V{ } 2nested-filter-as
+] unit-test
+
+{ V{ 1 8 27 } } [
+    { 1 2 3 } { 1 2 3 } { 1 2 3 }
+    [ 3dup 3array all-eq? [ * * ] [ 3drop f ] if ]
+    V{ } 3nested-filter-as
+] unit-test
+
+{ V{ 0 2 0 3 6 4 12 0 5 10 15 20 } } [
+    6 [1..b)
+    [ [0..b) ]
+    [ 2dup [ odd? ] bi@ or [ * ] [ 2drop f ] if  ]
+    2nested-filter*
 ] unit-test
