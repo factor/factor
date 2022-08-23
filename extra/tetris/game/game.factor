@@ -42,7 +42,7 @@ CONSTANT: default-height 20
     level 1 - 60 * 1,000,000,000 swap - ;
 
 : add-block ( tetris block -- )
-    over [ board>> ] 2dip current-piece tetromino>> colour>> set-block ;
+    over [ board>> ] 2dip current-piece tetromino>> color>> set-block ;
 
 : game-over? ( tetris -- ? )
     [ board>> ] [ next-piece ] bi piece-valid? not ;

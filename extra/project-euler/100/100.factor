@@ -7,7 +7,7 @@ IN: project-euler.100
 
 ! DESCRIPTION ! -----------
 
-! If a box contains twenty-one coloured discs, composed of fifteen blue discs
+! If a box contains twenty-one colored discs, composed of fifteen blue discs
 !  and six red discs, and two discs were taken at random, it can be seen that
 !  the probability of taking two blue discs, P(BB) = (15/21)*(14/20) = 1/2.
 
