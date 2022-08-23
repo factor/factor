@@ -20,7 +20,7 @@ IN: project-euler.116
 ! replacing the black tiles in a row measuring five units in length.
 
 ! How many different ways can the black tiles in a row measuring fifty units in
-! length be replaced if colors cannot be mixed and at least one coloured tile
+! length be replaced if colors cannot be mixed and at least one colored tile
 ! must be used?
 
 
