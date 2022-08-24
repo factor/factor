@@ -214,7 +214,7 @@ M: inet6 parse-sockaddr
     [ call-next-method ] [ drop port>> ntohs ] 2bi with-port ;
 
 M: inet6 present
-    [ call-next-method ] [ port>> number>string ] bi ":" glue ;
+    [ call-next-method "[" "]" surround ] [ port>> number>string ] bi ":" glue ;
 
 M: inet6 protocol drop 0 ;
 
