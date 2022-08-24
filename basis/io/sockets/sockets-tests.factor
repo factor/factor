@@ -37,8 +37,8 @@ os unix? [
 
 ! Test present on addrspecs
 { "4.4.4.4:12" } [ "4.4.4.4" 12 <inet4> present ] unit-test
-{ "::1:12" } [ "::1" 12 <inet6> present ] unit-test
-{ "fe80::1%1:12" } [ "fe80::1" 1 12 inet6 boa present ] unit-test
+{ "[::1]:12" } [ "::1" 12 <inet6> present ] unit-test
+{ "[fe80::1%1]:12" } [ "fe80::1" 1 12 inet6 boa present ] unit-test
 
 { B{ 1 2 3 4 } }
 [ "1.2.3.4" T{ inet4 } inet-pton ] unit-test
