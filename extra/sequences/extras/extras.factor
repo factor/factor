@@ -293,7 +293,7 @@ PRIVATE>
     over 0accumulate-as ; inline
 
 : occurrence-count-by ( seq quot: ( elt -- elt' ) -- hash seq' )
-    '[ nip @ over inc-at* ] H{ } clone -rot 0accumulate ; inline
+    '[ nip @ over inc-at* ] [ H{ } clone ] 2dip 0accumulate ; inline
 
 : occurrence-count ( seq -- hash seq' )
     [ ] occurrence-count-by ; inline
