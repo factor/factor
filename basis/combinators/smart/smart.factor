@@ -158,7 +158,7 @@ MACRO: smart-2map-reduce ( 2map-reduce-quots -- quot )
     [ keys ] [ [ [ ] concat-as ] [ ] map-as ] bi dup length dup '[
         [ [ first ] bi@ _ 2cleave ] 2keep
         [ @ _ [ cleave-curry ] [ cleave-curry ] bi _ spread* ]
-        1 2each-from
+        1 -roll 2each-from
     ] ;
 
 : smart-loop ( ..a quot: ( ..a -- ..b ? ) -- ..b )

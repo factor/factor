@@ -211,11 +211,15 @@ M: assoc values [ nip ] { } assoc>map ;
 
 : at+ ( n key assoc -- ) [ 0 or + ] change-at ; inline
 
+: at+* ( n key assoc -- old ) [ 0 or [ + ] keep swap ] change-at ; inline
+
 : inc-at ( key assoc -- ) [ 1 ] 2dip at+ ; inline
 
 : of+ ( assoc key n -- assoc ) '[ 0 or _ + ] change-of ; inline
 
 : inc-of ( assoc key -- assoc ) 1 of+ ; inline
+
+: inc-at* ( key assoc -- old ) [ 1 ] 2dip at+* ; inline
 
 : map>assoc ( ... seq quot: ( ... elt -- ... key value ) exemplar -- ... assoc )
     dup sequence? [
