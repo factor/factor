@@ -602,8 +602,8 @@ PRIVATE>
 : 2each ( ... seq1 seq2 quot: ( ... elt1 elt2 -- ... ) -- ... )
     2length-operator each-integer ; inline
 
-: 2each-from ( ... seq1 seq2 quot: ( ... elt1 elt2 -- ... ) i -- ... )
-    [ 2length-operator ] dip -rot each-integer-from ; inline
+: 2each-from ( ... from seq1 seq2 quot: ( ... elt1 elt2 -- ... ) -- ... )
+    2length-operator each-integer-from ; inline
 
 : 2reduce ( ... seq1 seq2 identity quot: ( ... prev elt1 elt2 -- ... next ) -- ... result )
     -rotd 2each ; inline
