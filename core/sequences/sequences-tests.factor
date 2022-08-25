@@ -29,14 +29,6 @@ IN: sequences.tests
     [ 1 [ [ * ] [ + ] bi* ] reduce-index ] bi@
 ] unit-test
 
-{ 21 } [
-    { 1 2 3 } { 4 5 6 } 0 [ + + ] [ 0 ] 4dip 2reduce-from
-] unit-test
-
-{ 16 } [
-    { 1 2 3 } { 4 5 6 } 0 [ + + ] [ 1 ] 4dip 2reduce-from
-] unit-test
-
 { -541365 } [
     { 10 21 32 } { 500 600 700 } [ - sq ] [ - ] 2map-reduce
 ] unit-test
@@ -443,12 +435,6 @@ M: bogus-hashcode hashcode* 2drop 0 >bignum ;
 {
     BV{ 11 23 35 }
 } [ { 11 22 33 } [ + ] BV{ } map-index-as ] unit-test
-
-{ { 0 400 900 } }
-[ { 10 20 30 } [ sq ] 1 map-from ] unit-test
-
-{ V{ 0 400 900 } }
-[ { 10 20 30 } [ sq ] 1 V{ } map-from-as ] unit-test
 
 { t } [ { } { 99 88 } [ <= ] 2all? ] unit-test
 

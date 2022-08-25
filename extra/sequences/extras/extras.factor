@@ -281,6 +281,9 @@ PRIVATE>
 : reduce-from ( ... seq identity quot: ( ... prev elt -- ... next ) from -- ... result )
     [ swap ] 2dip each-from ; inline
 
+: 2reduce-from ( ... seq1 seq2 identity quot: ( ... prev elt1 elt2 -- ... next ) i -- ... result )
+    [ -rot ] 2dip 2each-from ; inline
+
 : 0accumulate-as ( ... seq quot: ( ... prev elt -- ... next ) exemplar -- ... newseq )
     pick empty? [
         2nip clone
