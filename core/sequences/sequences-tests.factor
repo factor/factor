@@ -30,11 +30,11 @@ IN: sequences.tests
 ] unit-test
 
 { 21 } [
-    { 1 2 3 } { 4 5 6 } 0 [ + + ] 0 2reduce-from
+    { 1 2 3 } { 4 5 6 } 0 [ + + ] [ 0 ] 4dip 2reduce-from
 ] unit-test
 
 { 16 } [
-    { 1 2 3 } { 4 5 6 } 0 [ + + ] 1 2reduce-from
+    { 1 2 3 } { 4 5 6 } 0 [ + + ] [ 1 ] 4dip 2reduce-from
 ] unit-test
 
 { -541365 } [
