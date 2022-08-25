@@ -6,12 +6,6 @@ IN: sequences.extras
 : find-all ( ... seq quot: ( ... elt -- ... ? ) -- ... elts )
     [ <enumerated> ] dip '[ nip @ ] assoc-filter ; inline
 
-: reduce-from ( ... seq identity quot: ( ... prev elt -- ... next ) i -- ... result )
-    [ swap ] 2dip each-from ; inline
-
-: 2reduce-from ( ... seq1 seq2 identity quot: ( ... prev elt1 elt2 -- ... next ) i -- ... result )
-    [ -rot ] 2dip 2each-from ; inline
-
 :: subseq* ( from to seq -- subseq )
     seq length :> len
     from [ dup 0 < [ len + ] when ] [ 0 ] if*
@@ -272,24 +266,34 @@ PRIVATE>
 : map-with-previous ( ... seq quot: ( ... elt prev/f -- ... newelt ) -- ... newseq )
     over map-with-previous-as ; inline
 
-<PRIVATE
+: setup-each-from ( seq quot -- n quot )
+    [ [ length ] keep [ nth-unsafe ] curry ] dip compose ; inline
 
-: (setup-each-from) ( i seq -- n quot )
-    [ length over [-] swap ] keep '[ _ + _ nth-unsafe ] ; inline
+: map-from-as ( ... from seq quot: ( ... elt -- ... newelt ) exemplar -- ... newseq )
+    [ sequence-operator ] dip map-integers-as ; inline
 
-: setup-each-from ( i seq quot -- n quot' )
-    [ (setup-each-from) ] dip compose ; inline
-
-PRIVATE>
-
-: map-from-as ( ... seq quot: ( ... elt -- ... newelt ) i exemplar -- ... newseq )
-    [ -rot setup-each-from ] dip map-integers-as ; inline
-
-: map-from ( ... seq quot: ( ... elt -- ... newelt ) i -- ... newseq )
+: map-from ( ... from seq quot: ( ... elt -- ... newelt ) -- ... newseq )
     pick map-from-as ; inline
 
 : map-if ( ... seq if-quot: ( ... elt -- ... ? ) map-quot: ( ... elt -- ... newelt ) -- ... newseq )
     '[ dup @ _ when ] map ; inline
+
+: reduce-from ( ... seq identity quot: ( ... prev elt -- ... next ) from -- ... result )
+    [ swap ] 2dip each-from ; inline
+
+: 0accumulate-as ( ... seq quot: ( ... prev elt -- ... next ) exemplar -- ... newseq )
+    pick empty? [
+        2nip clone
+    ] [
+        [ 0 ] 2dip
+        [ swapd [ dup ] compose ] dip map-as nip
+    ] if ; inline
+
+: 0accumulate ( ... seq quot: ( ... prev elt -- ... next ) -- ... final newseq )
+    over 0accumulate-as ; inline
+
+: 0reduce ( seq quot: ( prev elt -- next ) -- result )
+    [ 0 ] dip reduce ; inline
 
 <PRIVATE
 
