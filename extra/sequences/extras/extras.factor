@@ -292,6 +292,12 @@ PRIVATE>
 : 0accumulate ( ... seq quot: ( ... prev elt -- ... next ) -- ... final newseq )
     over 0accumulate-as ; inline
 
+: occurrence-count-by ( seq quot: ( elt -- elt' ) -- hash seq )
+    '[ nip @ over inc-at* ] H{ } clone -rot 0accumulate ; inline
+
+: occurrence-count ( seq -- hash seq )
+    [ ] occurrence-count-by ; inline
+
 : 0reduce ( seq quot: ( prev elt -- next ) -- result )
     [ 0 ] dip reduce ; inline
 
