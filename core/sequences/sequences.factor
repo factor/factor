@@ -602,8 +602,8 @@ PRIVATE>
 : 2each ( ... seq1 seq2 quot: ( ... elt1 elt2 -- ... ) -- ... )
     2length-operator each-integer ; inline
 
-: 2each-from ( ... from seq1 seq2 quot: ( ... elt1 elt2 -- ... ) -- ... )
-    2length-operator each-integer-from ; inline
+: 2each-from ( ... seq1 seq2 quot: ( ... elt1 elt2 -- ... ) from -- ... )
+    -roll 2length-operator each-integer-from ; inline
 
 : 2reduce ( ... seq1 seq2 identity quot: ( ... prev elt1 elt2 -- ... next ) -- ... result )
     -rotd 2each ; inline
@@ -1161,7 +1161,7 @@ PRIVATE>
 
 : 2map-reduce ( ..a seq1 seq2 map-quot: ( ..a elt1 elt2 -- ..a intermediate ) reduce-quot: ( ..a prev intermediate -- ..a next ) -- ..a result )
     [ [ [ [ first ] bi@ ] 2keep ] dip [ 2dip ] keep ] dip
-    '[ rot _ dip swap @ ] 1 -roll 2each-from ; inline
+    '[ rot _ dip swap @ ] 1 2each-from ; inline
 
 <PRIVATE
 
