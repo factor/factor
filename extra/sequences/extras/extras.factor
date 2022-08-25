@@ -343,6 +343,21 @@ PRIVATE>
 : filter-map ( ... seq filter-quot: ( ... elt -- ... ? ) map-quot: ( ... elt -- ... newelt ) -- ... newseq )
     pick filter-map-as ; inline
 
+: 2filter-as ( ... seq1 seq2 quot: ( ... elt1 elt2 -- ... newelt ) exemplar -- ... newseq )
+    [
+        pick [ length ] keep
+        [ (2selector-as) [ 2each ] dip ] 2curry call
+    ] dip like ; inline
+
+: 2filter ( ... seq1 seq2 quot: ( ... elt1 elt2 -- ... newelt ) -- ... newseq )
+    pick 2filter-as ; inline
+
+: 2reject-as ( ... seq1 seq2 quot: ( ... elt1 elt2 -- ... newelt ) exemplar -- ... newseq )
+    [ [ not ] compose ] dip 2filter-as ; inline
+
+: 2reject ( ... seq1 seq2 quot: ( ... elt1 elt2 -- ... newelt ) -- ... newseq )
+    pick 2reject-as ; inline
+
 : 2map-sum ( ... seq1 seq2 quot: ( ... elt1 elt2 -- ... n ) -- ... n )
     [ 0 ] 3dip [ dip + ] curry [ rot ] prepose 2each ; inline
 
