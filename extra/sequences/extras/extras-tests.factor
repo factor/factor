@@ -113,6 +113,16 @@ strings tools.test ;
 { "bcde" } [ "abcd" [ 1 + ] [ drop t ] map-filter ] unit-test
 { { 0 4 16 36 64 } } [ 10 <iota> [ sq ] [ even? ] { } map-filter-as ] unit-test
 
+{ 120000 } [ { 10 20 30 40 50 60 } 1 [ * ] 3 reduce-from ] unit-test
+
+{ 21 } [
+    { 1 2 3 } { 4 5 6 } 0 [ + + ] 0 2reduce-from
+] unit-test
+
+{ 16 } [
+    { 1 2 3 } { 4 5 6 } 0 [ + + ] 1 2reduce-from
+] unit-test
+
 { V{ 0 4 16 36 64 } } [ 10 <iota> [ even? ] [ sq ] filter-map ] unit-test
 { { 2 6 10 14 18 } } [ 10 <iota> [ odd? ] [ 2 * ] { } filter-map-as ] unit-test
 
@@ -208,6 +218,12 @@ strings tools.test ;
 { t 3 3 } [ 10 <iota> [ [ odd? ] [ 1 > ] bi* and ] map-find-index ] unit-test
 { f f f } [ 10 <iota> [ [ odd? ] [ 9 > ] bi* and ] map-find-index ] unit-test
 
+{ { 0 400 900 } }
+[ { 10 20 30 } [ sq ] 1 map-from ] unit-test
+
+{ V{ f 400 900 } }
+[ { 10 20 30 } [ sq ] 1 V{ } map-from-as ] unit-test
+
 { "abcdef" } [ f f "abcdef" subseq* ] unit-test
 { "abcdef" } [ 0 f "abcdef" subseq* ] unit-test
 { "ab" } [ f 2 "abcdef" subseq* ] unit-test
@@ -242,8 +258,6 @@ strings tools.test ;
 { { 0 3 } } [ "ABAABA" "ABA" start-all ] unit-test
 { 1 } [ "ABABA" "ABA" count-subseq ] unit-test
 { 2 } [ "ABABA" "ABA" count-subseq* ] unit-test
-
-{ 120000 } [ { 10 20 30 40 50 60 } 1 [ * ] 3 reduce-from ] unit-test
 
 { 0 } [ { } [ + ] 0reduce ] unit-test
 { 107 } [ { 100 1 2 4 } [ + ] 0reduce ] unit-test
