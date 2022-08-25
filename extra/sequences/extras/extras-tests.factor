@@ -272,6 +272,18 @@ strings tools.test ;
     { 2 7 1 8 1 7 1 8 2 8 4 } [ ] occurrence-count-by
 ] unit-test
 
+{ { 1 2 0 3 3 3 3 3 3 3 3 3 3 3 3 3 } } [
+    "cab" "abcdefghijklmnop" progressive-index nip
+] unit-test
+
+{ { 0 1 2 3 3 } } [
+    "aaa" "aaaaa" progressive-index nip
+] unit-test
+
+{ { 0 3 1 4 2 5 5 5 5 5 } } [
+    "aaabb" "ababababab" progressive-index nip
+] unit-test
+
 { { 0 1 2 3 } } [ 8 <iota> [ 4 < ] take-while >array ] unit-test
 { { } } [ { 15 16 } [ 4 < ] take-while >array ] unit-test
 { { 0 1 2 } } [ 3 <iota> [ 4 < ] take-while >array ] unit-test

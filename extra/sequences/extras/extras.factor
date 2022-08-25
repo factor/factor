@@ -292,11 +292,27 @@ PRIVATE>
 : 0accumulate ( ... seq quot: ( ... prev elt -- ... next ) -- ... final newseq )
     over 0accumulate-as ; inline
 
-: occurrence-count-by ( seq quot: ( elt -- elt' ) -- hash seq )
+: occurrence-count-by ( seq quot: ( elt -- elt' ) -- hash seq' )
     '[ nip @ over inc-at* ] H{ } clone -rot 0accumulate ; inline
 
-: occurrence-count ( seq -- hash seq )
+: occurrence-count ( seq -- hash seq' )
     [ ] occurrence-count-by ; inline
+
+: nth-index ( n obj seq -- i )
+    [ = dup [ drop 1 - dup 0 < ] when ] with find drop nip ;
+
+: progressive-index-by-as ( seq1 seq2 quot exemplar -- hash seq' )
+    [
+        pick length '[
+            tuck [ @ over inc-at* ] 2dip swap nth-index _ or
+        ] [ H{ } clone ] 3dip with
+    ] dip map-as ; inline
+
+: progressive-index-by ( seq1 seq2 quot -- hash seq' )
+    { } progressive-index-by-as ; inline
+
+: progressive-index ( seq1 seq2 -- hash seq' )
+    [ ] progressive-index-by ; inline
 
 : 0reduce ( seq quot: ( prev elt -- next ) -- result )
     [ 0 ] dip reduce ; inline
@@ -925,6 +941,3 @@ M: virtual-zip-index nth-unsafe
     over [ seq>> nth-unsafe ] [ 2array ] bi* ; inline
 
 INSTANCE: virtual-zip-index immutable-sequence
-
-: nth-index ( n obj seq -- i )
-    [ = dup [ drop 1 - dup 0 < ] when ] with find drop nip ;
