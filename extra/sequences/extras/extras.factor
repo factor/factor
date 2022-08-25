@@ -269,10 +269,10 @@ PRIVATE>
 : setup-each-from ( seq quot -- n quot )
     [ [ length ] keep [ nth-unsafe ] curry ] dip compose ; inline
 
-: map-from-as ( ... from seq quot: ( ... elt -- ... newelt ) exemplar -- ... newseq )
-    [ sequence-operator ] dip map-integers-as ; inline
+: map-from-as ( ... seq quot: ( ... elt -- ... newelt ) from exemplar -- ... newseq )
+    -rotd [ sequence-operator nipd ] dip map-integers-from-as ; inline
 
-: map-from ( ... from seq quot: ( ... elt -- ... newelt ) -- ... newseq )
+: map-from ( ... seq quot: ( ... elt -- ... newelt ) from -- ... newseq )
     pick map-from-as ; inline
 
 : map-if ( ... seq if-quot: ( ... elt -- ... ? ) map-quot: ( ... elt -- ... newelt ) -- ... newseq )
