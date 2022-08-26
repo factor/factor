@@ -931,27 +931,12 @@ PRIVATE>
         move-backward
     ] if ;
 
-: move-forward ( shift from to seq -- )
-    2over = [
-        4drop
-    ] [
-        [ [ [ ] [ nip + ] [ 2nip ] 3tri ] dip move-unsafe 1 - ] keep
-        move-forward
-    ] if ;
-
-: (open-slice) ( shift from to seq ? -- )
-    [
-        [ [ 1 - ] bi@ ] dip move-forward
-    ] [
-        [ over - ] 2dip move-backward
-    ] if ;
-
 : open-slice ( shift from seq -- )
     pick 0 = [
         3drop
     ] [
         [ ] [ nip length + ] [ 2nip ] 3tri
-        [ pick 0 > [ [ length ] keep ] dip (open-slice) ] 2dip
+        [ [ length ] keep [ over - ] 2dip move-backward ] 2dip
         set-length
     ] if ;
 
