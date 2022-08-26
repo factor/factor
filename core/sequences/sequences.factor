@@ -39,7 +39,7 @@ GENERIC#: seq-shorten 1 ( seq n -- seq )
 
 : seq-set-length ( seq n -- seq ) [ swap set-length ] keepd ; inline
 : nth-of ( seq n -- elt ) swap nth ; inline
-: set-nth-of ( seq n elt -- seq ) swap rot [ set-nth ] keep ; inline
+: set-nth-of ( seq n elt -- seq ) spin [ set-nth ] keep ; inline
 
 M: sequence seq-lengthen 2dup lengthd < [ seq-set-length ] [ drop ] if ; inline
 M: sequence seq-shorten 2dup lengthd > [ seq-set-length ] [ drop ] if ; inline

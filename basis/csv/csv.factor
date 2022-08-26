@@ -40,7 +40,7 @@ DEFER: quoted-field,
     ] if-zero ; inline
 
 : continue-field ( delimiter stream field-seps seq -- sep/f field )
-    swap rot stream-read-until [ "\"" glue ] dip
+    spin stream-read-until [ "\"" glue ] dip
     swap ?trim nipd ; inline
 
 : field ( delimiter stream field-seps quote-seps -- sep/f field )

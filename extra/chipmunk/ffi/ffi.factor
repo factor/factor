@@ -441,7 +441,7 @@ FUNCTION: int cpPolyShapeGetNumVerts ( cpShape* shape )
 FUNCTION: cpVect cpPolyShapeGetVert ( cpShape* shape, int idx )
 
 TYPED: cpPolyShapeValueOnAxis ( poly: cpPolyShape n: cpVect d -- min-dist )
-    swap rot [ numVerts>> ] [ tVerts>> swap cpVect <c-direct-array> ] bi swap
+    spin [ numVerts>> ] [ tVerts>> swap cpVect <c-direct-array> ] bi swap
     [ cpvdot ] curry [ min ] reduce swap - ; inline
 
 TYPED: cpPolyShapeContainsVert ( poly: cpPolyShape v: cpVect -- ? )
