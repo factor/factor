@@ -664,8 +664,66 @@ PRIVATE>
 
 : all-longest ( seqs -- seqs' ) dup longest length filter-length ;
 
+<PRIVATE
+
+: nth-unsafe-of ( seq n -- elt ) swap nth-unsafe ; inline
+: set-nth-unsafe-of ( seq n elt -- seq ) spin [ set-nth-unsafe ] keep ; inline
+: set-length-of ( seq n -- seq ) over set-length ; inline
+
+: move-unsafe-of ( seq to from -- seq )
+    2dup = [
+        3drop
+    ] [
+        overd nth-unsafe-of set-nth-unsafe-of
+    ] if ; inline
+
+: move-backward-of ( seq shift from to -- seq )
+    2dup = [
+        3drop
+    ] [
+        [ [ [ + ] keep move-unsafe-of ] 2keep 1 + ] dip move-backward-of
+    ] if ;
+
+: open-slice-of ( seq shift from -- seq )
+    over 0 = [
+        3drop
+    ] [
+        [ ] [ drop [ length ] dip + ] 3bi
+        [ pick length [ over - ] dip move-backward-of ] dip
+        set-length-of
+    ] if ;
+
+PRIVATE>
+
+: index-of ( seq obj -- n ) '[ _ = ] find drop ;
+
+ERROR: slice-error-of from to seq ;
+
+: check-slice-of ( seq from to -- seq from to )
+    over 0 < [ slice-error-of ] when
+    dup reach length > [ slice-error-of ] when
+    2dup > [ slice-error-of ] when ; inline
+
+: delete-slice-of ( seq from to -- seq )
+    check-slice-of over [ - ] dip open-slice-of ;
+
+: remove-nth-of ( seq n -- seq' )
+    [ dup 1 + rot snip-slice ] keepd append-as ;
+
+: remove-nth-of! ( seq n -- seq )
+    dup 1 + delete-slice-of ;
+
+: snip-of ( seq from to -- head tail )
+    [ head ] [ tail ] bi-curry* bi ; inline
+
+: snip-slice-of ( seq from to -- head tail )
+    [ head-slice ] [ tail-slice ] bi-curry* bi ; inline
+
 : remove-first ( obj seq -- seq' )
     [ index ] keep over [ remove-nth ] [ nip ] if ;
+
+: remove-first-of ( seq obj -- seq' )
+    dupd index-of [ remove-nth-of ] when* ;
 
 : remove-first! ( obj seq -- seq )
     [ index ] keep over [ remove-nth! ] [ nip ] if ;
@@ -675,6 +733,18 @@ PRIVATE>
 
 : remove-last! ( obj seq -- seq )
     [ last-index ] keep over [ remove-nth! ] [ nip ] if ;
+
+: member-of? ( seq elt -- ? )
+    [ = ] curry any? ;
+
+: member-eq-of? ( seq elt -- ? )
+    [ eq? ] curry any? ;
+
+: remove-of ( seq elt -- newseq )
+    [ = ] curry reject ;
+
+: remove-eq-of ( seq elt -- newseq )
+    [ eq? ] curry reject ;
 
 : ?first2 ( seq -- first/f second/f )
     dup length {

@@ -221,6 +221,20 @@ strings tools.test ;
 { V{ 1 } } [ 1 0 V{ } [ insert-nth! ] keep ] unit-test
 { V{ 1 2 3 4 } } [ 2 1 V{ 1 3 4 } [ insert-nth! ] keep ] unit-test
 
+{ V{ 1 3 } } [ V{ 1 2 3 } 1 2 delete-slice-of ] unit-test
+{ V{ 1 2 } } [ V{ 1 2 3 } 2 remove-nth-of! ] unit-test
+
+{
+    T{ slice { to 1 } { seq V{ 1 2 3 4 5 } } }
+    T{ slice { from 2 } { to 5 } { seq V{ 1 2 3 4 5 } } }
+} [
+    V{ 1 2 3 4 5 } 1 2 snip-slice-of
+] unit-test
+
+{ V{ 1 } V{ 3 4 5 } } [
+    V{ 1 2 3 4 5 } 1 2 snip-of
+] unit-test
+
 { "abc" } [ B{ 97 98 99 100 101 102 103 } 3 "" head-as ] unit-test
 { "abcd" } [ B{ 97 98 99 100 101 102 103 } 3 "" head*-as ] unit-test
 { "defg" } [ B{ 97 98 99 100 101 102 103 } 3 "" tail-as ] unit-test
