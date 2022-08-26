@@ -672,7 +672,7 @@ PRIVATE>
 
 : move-unsafe-of ( seq to from -- seq )
     2dup = [
-        3drop
+        2drop
     ] [
         overd nth-unsafe-of set-nth-unsafe-of
     ] if ; inline
@@ -686,7 +686,7 @@ PRIVATE>
 
 : open-slice-of ( seq shift from -- seq )
     over 0 = [
-        3drop
+        2drop
     ] [
         [ ] [ drop [ length ] dip + ] 3bi
         [ pick length [ over - ] dip move-backward-of ] dip
