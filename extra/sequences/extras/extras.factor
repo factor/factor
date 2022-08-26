@@ -322,26 +322,79 @@ PRIVATE>
 
 <PRIVATE
 
-: push-map-if ( ..a elt filter-quot: ( ..a elt -- ..b ? ) map-quot: ( ..a elt -- ..b newelt ) accum -- ..b )
+: push-map-when* ( ..a elt quot: ( ..a elt -- ..b obj ? ) accum -- ..b )
+    [ call ] dip swap [ push ] [ 2drop ] if ; inline
+
+: filter-mapper-for* ( quot length exemplar -- filter-mapper accum )
+    new-resizable [ [ push-map-when* ] 2curry ] keep ; inline
+
+: 1push-map-when ( ..a filter-quot: ( ..a -- ..b ? ) map-quot: ( ..a -- ..b obj ) accum -- ..b )
     [ keep over ] 2dip [ when ] dip rot [ push ] [ 2drop ] if ; inline
 
-: (filter-mapper-for) ( filter-quot map-quot length exempler -- filter-mapper accum )
-    new-resizable [ [ push-map-if ] 3curry ] keep ; inline
+: 1filter-mapper-for ( filter-quot map-quot length exemplar -- filter-mapper accum )
+    new-resizable [ [ 1push-map-when ] 3curry ] keep ; inline
 
-: filter-mapper-for ( filter-quot map-quot exemplar -- filter-mapper accum )
-    [ length ] keep (filter-mapper-for) ; inline
+: 2push-map-when ( ..a filter-quot: ( ..a -- ..b ? ) map-quot: ( ..a -- ..b obj ) accum -- ..b )
+    [ 2keep rot ] 2dip '[ [ @ _ push ] [ 2drop ] if ] call ; inline
 
-: filter-mapper ( filter-quot map-quot -- filter-mapper accum )
-    V{ } filter-mapper-for ; inline
+: 2filter-mapper-for ( filter-quot map-quot length exemplar -- filter-mapper accum )
+    new-resizable [ [ 2push-map-when ] 3curry ] keep ; inline
 
 PRIVATE>
 
-: filter-map-as ( ... seq filter-quot: ( ... elt -- ... ? ) map-quot: ( ... elt -- ... newelt ) exemplar -- ... newseq )
-    reach length over
-    [ (filter-mapper-for) [ each ] dip ] 2curry dip like ; inline
+: filter-map-as* ( ... seq quot: ( ..a elt -- ..b obj ? ) exemplar -- ... newseq )
+    pick length over
+    [ filter-mapper-for* [ each ] dip ] 2curry dip like ; inline
 
-: filter-map ( ... seq filter-quot: ( ... elt -- ... ? ) map-quot: ( ... elt -- ... newelt ) -- ... newseq )
+: filter-map* ( ... seq quot: ( ... elt -- ... newelt ? ) -- ... newseq )
+    over filter-map-as* ; inline
+
+: reject-map-as* ( ... seq quot: ( ... elt -- ... newelt ? ) exemplar -- ... newseq )
+    [ [ not ] compose ] dip filter-map-as* ; inline
+
+: reject-map* ( ... seq quot: ( ... elt -- ... newelt ? ) -- ... newseq )
+    over reject-map-as* ; inline
+
+: 2filter-map-as* ( ... seq1 seq2 quot: ( ... elt1 elt2 -- ... obj ? ) exemplar -- ... newseq )
+    reach length over
+    [ filter-mapper-for* [ 2each ] dip ] 2curry dip like ; inline
+
+: 2filter-map* ( ... seq1 seq2 quot: ( ... elt1 elt2 -- ... ? ) -- ... newseq )
+    pick 2filter-map-as* ; inline
+
+: 2reject-map-as* ( ... seq1 seq2 quot: ( ... elt1 elt2 -- ... obj ? ) exemplar -- ... newseq )
+    [ [ not ] compose ] dip 2filter-map-as* ; inline
+
+: 2reject-map* ( ... seq1 seq2 quot: ( ... elt1 elt2 -- ... obj ? ) -- ... newseq )
+    pick 2reject-map-as* ; inline
+
+
+: filter-map-as ( ... seq filter-quot: ( ..a elt -- ..b ? ) map-quot: ( obj -- obj' ) exemplar -- ... newseq )
+    reach length over
+    [ 1filter-mapper-for [ each ] dip ] 2curry dip like ; inline
+
+: filter-map ( ... seq filter-quot: ( ... elt -- ... ? ) map-quot: ( obj -- obj' ) -- ... newseq )
     pick filter-map-as ; inline
+
+: reject-map-as ( ... seq filter-quot: ( ... elt -- ... ? ) map-quot: ( obj -- obj' ) exemplar -- ... newseq )
+    [ [ not ] compose ] 2dip filter-map-as ; inline
+
+: reject-map ( ... seq filter-quot: ( ... elt -- ... ? ) map-quot: ( obj -- obj' ) -- ... newseq )
+    pick reject-map-as ; inline
+
+: 2filter-map-as ( ... seq1 seq2 filter-quot: ( ... elt1 elt2 -- ... ? ) map-quot: ( elt1 elt2 -- obj ) exemplar -- ... newseq )
+    5 npick length over
+    [ 2filter-mapper-for [ 2each ] dip ] 2curry dip like ; inline
+
+: 2filter-map ( ... seq1 seq2 filter-quot: ( ... elt1 elt2 -- ... ? ) map-quot: ( elt1 elt2 -- obj ) -- ... newseq )
+    reach 2filter-map-as ; inline
+
+: 2reject-map-as ( ... seq1 seq2 quot: ( ... elt1 elt2 -- ... ? ) map-quot: ( elt1 elt2 -- obj ) exemplar -- ... newseq )
+    [ [ not ] compose ] 2dip 2filter-map-as ; inline
+
+: 2reject-map ( ... seq1 seq2 quot: ( ... elt1 elt2 -- ... ? ) map-quot: ( elt1 elt2 -- obj ) -- ... newseq )
+    pick 2reject-map-as ; inline
+
 
 : 2filter-as ( ... seq1 seq2 quot: ( ... elt1 elt2 -- ... newelt ) exemplar -- ... newseq )
     [

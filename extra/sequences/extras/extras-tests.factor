@@ -124,7 +124,24 @@ strings tools.test ;
 ] unit-test
 
 { V{ 0 4 16 36 64 } } [ 10 <iota> [ even? ] [ sq ] filter-map ] unit-test
+{ V{ 0 4 16 36 64 } } [ 10 <iota> [ even? ] [ sq ] filter-map ] unit-test
+{ V{ 2 6 10 14 18 } } [ 10 <iota> [ odd? ] [ 2 * ] V{ } filter-map-as ] unit-test
 { { 2 6 10 14 18 } } [ 10 <iota> [ odd? ] [ 2 * ] { } filter-map-as ] unit-test
+
+{ V{ 1 9 25 49 81 } } [ 10 <iota> [ even? ] [ sq ] reject-map ] unit-test
+{ V{ 1 9 25 49 81 } } [ 10 <iota> [ even? ] [ sq ] reject-map ] unit-test
+{ V{ 0 4 8 12 16 }  } [ 10 <iota> [ odd? ] [ 2 * ] V{ } reject-map-as ] unit-test
+{ { 0 4 8 12 16 }   } [ 10 <iota> [ odd? ] [ 2 * ] { } reject-map-as ] unit-test
+
+{ V{ 0 4 16 36 64 } } [ 10 <iota> [ dup even? [ sq t ] [ f ] if ] filter-map* ] unit-test
+{ V{ 0 4 16 36 64 } } [ 10 <iota> [ sq dup even? ] filter-map* ] unit-test
+{ V{ 2 6 10 14 18 } } [ 10 <iota> [ dup odd? [ 2 * t ] [ f ] if ] V{ } filter-map-as* ] unit-test
+{ { 2 6 10 14 18 } } [ 10 <iota> [ dup odd? [ 2 * t ] [ f ] if ] { } filter-map-as* ] unit-test
+
+{ V{ 1 9 25 49 81 } } [ 10 <iota> [ dup even? [ t ] [ sq f ] if ] reject-map* ] unit-test
+{ V{ 1 9 25 49 81 } } [ 10 <iota> [ sq dup even? ] reject-map* ] unit-test
+{ V{ 0 4 8 12 16 }  } [ 10 <iota> [ dup odd? [ t ] [ 2 * f ] if ] V{ } reject-map-as* ] unit-test
+{ { 0 4 8 12 16 }   } [ 10 <iota> [ dup odd? [ t ] [ 2 * f ] if ] { } reject-map-as* ] unit-test
 
 { 8 } [ 3 <iota> dup [ 1 + * ] 2map-sum ] unit-test
 { 4 } [ "hello" "jello" [ = ] 2count ] unit-test
