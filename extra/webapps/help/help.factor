@@ -1,8 +1,8 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors assocs furnace.actions furnace.boilerplate
-furnace.redirection help.html help.topics html.components
-html.forms http.server http.server.dispatchers
+USING: accessors arrays assocs continuations furnace.actions
+furnace.boilerplate furnace.redirection help.html help.topics
+html.components html.forms http.server http.server.dispatchers
 http.server.static io.directories io.files.temp io.servers
 kernel namespaces sequences simple-tokenizer splitting unicode
 urls ;
