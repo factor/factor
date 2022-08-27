@@ -1,8 +1,8 @@
 ! Copyright (C) 2008 John Benediktsson
 ! See http://factorcode.org/license.txt for BSD license
 USING: accessors arrays assocs calendar calendar.english
-combinators combinators.smart generalizations io
-io.streams.string kernel math math.functions
+calendar.private combinators combinators.smart generalizations
+io io.streams.string kernel math math.functions
 math.functions.integer-logs math.parser multiline namespaces
 peg.ebnf present prettyprint quotations sequences
 sequences.generalizations splitting strings unicode ;
@@ -204,8 +204,9 @@ MACRO: sprintf ( format-string -- quot )
     ] output>array join-words ; inline
 
 : week-of-year ( timestamp day -- n )
-    [ dup clone 1 >>month 1 >>day day-of-week dup ] dip > [ 7 swap - ] when
-    [ day-of-year ] dip 2dup < [ 0 2nip ] [ - 7 / 1 + >fixnum ] if ;
+    [ dup clone first-day-of-year dup clone ]
+    [ day-this-week ] bi* swap '[ _ time- duration>days ] bi@
+    dup 0 < [ 7 + - ] [ drop ] if 7 + 7 /i ;
 
 : week-of-year-sunday ( timestamp -- n ) 0 week-of-year ; inline
 
