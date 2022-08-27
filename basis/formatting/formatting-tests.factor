@@ -178,3 +178,19 @@ ${ os windows? "1.000000e+00" "1e+00" ? } [ 1.0 "%.0e" sprintf ] unit-test
 
 { "44" } [ 2020 11 6 <date> "%U" strftime ] unit-test
 { "44" } [ 2020 11 6 <date> "%W" strftime ] unit-test
+
+{ "00" } [ 2022 1 1 <date> "%U" strftime ] unit-test
+{ "01" } [ 2022 1 2 <date> "%U" strftime ] unit-test
+{ "01" } [ 2022 1 3 <date> "%U" strftime ] unit-test
+
+{ "00" } [ 2022 1 1 <date> "%W" strftime ] unit-test
+{ "00" } [ 2022 1 2 <date> "%W" strftime ] unit-test
+{ "01" } [ 2022 1 3 <date> "%W" strftime ] unit-test
+
+{ "34" } [ 2022 8 27 <date> "%U" strftime ] unit-test
+{ "35" } [ 2022 8 28 <date> "%U" strftime ] unit-test
+{ "35" } [ 2022 8 29 <date> "%U" strftime ] unit-test
+
+{ "34" } [ 2022 8 27 <date> "%W" strftime ] unit-test
+{ "34" } [ 2022 8 28 <date> "%W" strftime ] unit-test
+{ "35" } [ 2022 8 29 <date> "%W" strftime ] unit-test
