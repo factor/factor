@@ -6,12 +6,12 @@ USING: arrays assocs.extras kernel math math.order sequences tools.test ;
     H{ } clone 10 { 1 2 3 4 5 } pick push-at-each
 ] unit-test
 
-{ f } [ f { } deep-at ] unit-test
-{ f } [ f { "foo" } deep-at ] unit-test
-{ f } [ H{ } { 1 2 3 } deep-at ] unit-test
-{ f } [ H{ { "a" H{ { "b" 1 } } } } { "a" "c" } deep-at ] unit-test
-{ 1 } [ H{ { "a" H{ { "b" 1 } } } } { "a" "b" } deep-at ] unit-test
-{ 4 } [ H{ { 1 H{ { 2 H{ { 3 4 } } } } } } { 1 2 3 } deep-at ] unit-test
+{ f } [ f { } deep-of ] unit-test
+{ f } [ f { "foo" } deep-of ] unit-test
+{ f } [ H{ } { 1 2 3 } deep-of ] unit-test
+{ f } [ H{ { "a" H{ { "b" 1 } } } } { "a" "c" } deep-of ] unit-test
+{ 1 } [ H{ { "a" H{ { "b" 1 } } } } { "a" "b" } deep-of ] unit-test
+{ 4 } [ H{ { 1 H{ { 2 H{ { 3 4 } } } } } } { 1 2 3 } deep-of ] unit-test
 
 { H{ { 2 1 } { 4 3 } } } [ H{ { 1 2 } { 3 4 } } assoc-invert ] unit-test
 
@@ -294,4 +294,14 @@ USING: arrays assocs.extras kernel math math.order sequences tools.test ;
 } [
     { { 10 100 } { 20 200 } { 30 300 } { 41 401 } }
     [ [ dup 1 + 2array ] dip ] collect-assoc-by-multi
+] unit-test
+
+{ H{ { 1 2 } { 3 4 } } } [
+    H{ { 1 2 } { 3 4 } { 5 6 } }
+    { 1 3 } intersect-keys
+] unit-test
+
+{ { { 1 2 } { 3 4 } } } [
+    H{ { 1 2 } { 3 4 } { 5 6 } }
+    { 1 3 } { } intersect-keys-as
 ] unit-test

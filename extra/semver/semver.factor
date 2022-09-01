@@ -1,6 +1,6 @@
 ! Copyright (C) 2020 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays assocs combinators combinators.smart
+USING: accessors arrays assocs combinators combinators.smart io
 kernel math math.order math.parser multiline peg.ebnf sequences
 sequences.deep sequences.extras splitting strings ;
 IN: semver
@@ -31,6 +31,8 @@ TUPLE: semver
     [ "-" split1 ] dip
     [ "." split [ string>number ] map first3 ] 2dip
     semver boa ;
+
+: <semver> ( str -- semver ) parse-semver ; inline
 
 : first-semver-slot ( semver -- class )
     {
@@ -63,6 +65,9 @@ TUPLE: semver
         } cleave
     ] "" append-outputs-as ;
 
+: semver. ( semver -- )
+    semver>string print ;
+
 : semver-inc-major ( semver -- semver )
     dup prerelease>> [
         [ 1 + ] change-major
@@ -91,7 +96,6 @@ TUPLE: semver
 : semver-inc-patch ( semver -- semver )
     dup prerelease>> [
         [ 1 + ] change-patch
-        0 >>patch
         "" >>prerelease
         "" >>build
     ] [

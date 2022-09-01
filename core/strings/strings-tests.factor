@@ -35,8 +35,8 @@ vectors ;
 { f } [ CHAR: I "team" member? ] unit-test
 { t } [ "ea" "team" subseq? ] unit-test
 { f } [ "actore" "Factor" subseq? ] unit-test
-{ t } [ "team" "ea" subseq-index? ] unit-test
-{ f } [ "Factor" "actore" subseq-index? ] unit-test
+{ t } [ "team" "ea" subseq-of? ] unit-test
+{ f } [ "Factor" "actore" subseq-of? ] unit-test
 
 { "end" } [ "Beginning and end" 14 tail ] unit-test
 

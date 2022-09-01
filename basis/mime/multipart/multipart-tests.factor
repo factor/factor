@@ -84,3 +84,4 @@ SYMBOL: mime-test-server
         "\r\n\r\n" parse-multipart
     ] with-input-stream
 ] [ mime-decoding-ran-out-of-bytes? ] must-fail-with
+

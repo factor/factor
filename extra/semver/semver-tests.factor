@@ -140,3 +140,15 @@ CONSTANT: semver-gt-comparisons {
     [ first2 swap [ parse-semver ] bi@ <=> ] zip-with
     values [ +lt+ = ] all?
 ] unit-test
+
+{ "1.2.4-dev.0" } [ "1.2.3" <semver> semver-inc-prepatch semver>string ] unit-test
+{ "1.2.4" } [ "1.2.3" <semver> semver-inc-patch semver>string ] unit-test
+
+{ "1.3.0-dev.0" } [ "1.2.3" <semver> semver-inc-preminor semver>string ] unit-test
+{ "1.3.0" } [ "1.2.3" <semver> semver-inc-minor semver>string ] unit-test
+
+{ "2.0.0-dev.0" } [ "1.2.3" <semver> semver-inc-premajor semver>string ] unit-test
+{ "2.0.0-dev.1" } [ "1.2.3" <semver> semver-inc-premajor semver-inc-prerelease semver>string ] unit-test
+{ "2.0.0" } [ "1.2.3" <semver> semver-inc-major semver>string ] unit-test
+
+{ "1.2.3-erg.0" } [ "1.2.3" <semver> "erg" semver-inc-prerelease-id semver>string ] unit-test

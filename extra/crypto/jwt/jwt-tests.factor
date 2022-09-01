@@ -22,3 +22,4 @@ IN: crypto.jwt.tests
     }
     "" sha-256 sign-jwt
 ] unit-test
+

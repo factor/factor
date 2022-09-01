@@ -26,3 +26,4 @@ FUNCTION: uint ZSTD_isError ( size_t code )
 FUNCTION: c-string ZSTD_getErrorName ( size_t code )
 
 ! There are many more api calls but this is enough for basic payloads
+

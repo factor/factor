@@ -53,3 +53,4 @@ kernel sequences splitting strings tools.test ;
 
 { "{\"a\":\"bcd\"}" }
 [ "{\"a\":\"bcd\"}" >urlsafe-base64-jwt urlsafe-base64> >string ] unit-test
+

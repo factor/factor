@@ -7,7 +7,7 @@ IN: assocs.extras
 : push-at-each ( value keys assoc -- )
     '[ _ push-at ] with each ; inline
 
-: deep-at ( assoc seq -- value/f )
+: deep-of ( assoc seq -- value/f )
     [ of ] each ; inline
 
 : substitute! ( seq assoc -- seq )
@@ -217,8 +217,11 @@ PRIVATE>
 : flatten-values ( assoc -- assoc' )
     dup any-multi-value? [ expand-values-set-at flatten-values ] when ;
 
+: intersect-keys-as ( assoc seq exemplar -- elts )
+  [ [ of ] with ] dip zip-with-as sift-values ; inline
+
 : intersect-keys ( assoc seq -- elts )
-    [ of ] with zip-with sift-values ; inline
+    over intersect-keys-as ; inline
 
 : values-of ( assoc seq -- seq' )
     [ of ] with map ; inline

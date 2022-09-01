@@ -23,10 +23,10 @@ IN: codebase-analyzer
     [ has-file-extension? ] filter ;
 
 : without-git-paths ( paths -- paths' )
-    [ "/.git/" subseq-index? ] reject ;
+    [ "/.git/" subseq-of? ] reject ;
 
 : without-node-modules-paths ( paths -- paths' )
-    [ "/node_modules/" subseq-index? ] reject ;
+    [ "/node_modules/" subseq-of? ] reject ;
 
 : regular-directory-files ( path -- seq )
     recursive-directory-files

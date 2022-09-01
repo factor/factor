@@ -86,14 +86,14 @@ CONSTANT: default-segment-radius 1
     next current half-way-between-oints :> h
     cf h vdot cf location vdot - cf heading vdot / ;
 
-: vector-to-centre ( seg loc -- v )
+: vector-to-center ( seg loc -- v )
     over location>> swap v- swap forward>> proj-perp ;
 
-: distance-from-centre ( seg loc -- distance )
-    vector-to-centre norm ;
+: distance-from-center ( seg loc -- distance )
+    vector-to-center norm ;
 
 : wall-normal ( seg oint -- n )
-    location>> vector-to-centre normalize ;
+    location>> vector-to-center normalize ;
 
 CONSTANT: distant 1000
 

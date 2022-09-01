@@ -9,7 +9,7 @@ IN: project-euler.151
 ! -----------
 
 ! A printing shop runs 16 batches (jobs) every week and each batch requires a
-! sheet of special colour-proofing paper of size A5.
+! sheet of special color-proofing paper of size A5.
 
 ! Every Monday morning, the foreman opens a new envelope, containing a large
 ! sheet of the special paper with size A1.

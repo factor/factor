@@ -5,7 +5,7 @@ IN: promises
 
 HELP: <promise>
 { $values { "quot" { $quotation ( -- x ) } } { "promise" "a promise object" } }
-{ $description "Creates a promise to return a value. When forced this quotation is called and the value returned. The value is memorised so that calling " { $link force } " again does not call the quotation again, instead the previous value is returned directly." } ;
+{ $description "Creates a promise to return a value. When forced this quotation is called and the value returned. The value is memorized so that calling " { $link force } " again does not call the quotation again, instead the previous value is returned directly." } ;
 
 HELP: force
 { $values { "promise" "a promise object" } { "value" "a factor object" } }

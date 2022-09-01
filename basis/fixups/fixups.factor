@@ -48,7 +48,7 @@ CONSTANT: word-renames {
     { "(all-integers?)" { "all-integers-from?" "0.99" } }
     { "short" { "index-or-length" "0.99" } }
     { "map-integers" { "map-integers-as" "0.99" } }
-    { "deep-subseq?" { "deep-subseq-index?" "0.99" } }
+    { "deep-subseq?" { "deep-subseq-of?" "0.99" } }
 }
 
 : compute-assoc-fixups ( continuation name assoc -- seq )

@@ -54,9 +54,9 @@ M: object branch? drop f ;
         _ swap dup branch? [ member? ] [ 2drop f ] if
     ] deep-find >boolean ;
 
-: deep-subseq-index? ( seq subseq -- ? )
+: deep-subseq-of? ( seq subseq -- ? )
    '[
-        _ over branch? [ subseq-index? ] [ 2drop f ] if
+        _ over branch? [ subseq-of? ] [ 2drop f ] if
     ] deep-find >boolean ;
 
 : deep-map! ( ... obj quot: ( ... elt -- ... elt' ) -- ... obj )

@@ -800,3 +800,29 @@ INSTANCE: step-slice virtual-sequence
         new-resizable
         [ [ push ] curry compose 3nested-each ] keep
     ] keep like ; inline
+
+: each-prior ( ... seq quot: ( ... prior elt -- ... ) -- ... )
+    '[ [ swap @ ] keep ]
+    sequence-operator 0 -rot each-integer-from drop ; inline
+
+: map-prior-as ( ... seq quot: ( ... prior elt -- elt' ) exemplar -- seq' )
+    [
+        '[ [ swap @ ] keep swap ] length-operator 0 -rot
+    ] dip map-integers-as nip ; inline
+
+: map-prior ( ... seq quot: ( ... prior elt -- elt' ) -- seq' )
+    over map-prior-as ; inline
+
+TUPLE: virtual-zip-index seq ;
+
+C: <zip-index> virtual-zip-index
+
+M: virtual-zip-index length seq>> length ; inline
+
+M: virtual-zip-index nth-unsafe
+    over [ seq>> nth-unsafe ] [ 2array ] bi* ; inline
+
+INSTANCE: virtual-zip-index immutable-sequence
+
+: nth-index ( n obj seq -- i )
+    [ = dup [ drop 1 - dup 0 < ] when ] with find drop nip ;

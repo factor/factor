@@ -19,3 +19,4 @@ IN: stack-as-data.tests
     5 6 7 8
     4 [ sq ] stack-map
 ] unit-test
+
