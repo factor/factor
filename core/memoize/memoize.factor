@@ -71,7 +71,8 @@ PRIVATE>
 PREDICATE: memoized < word "memoize" word-prop >boolean ;
 
 M: memoized definer
-    def>> ?first hashtable? \ MEMO: \ IDENTITY-MEMO: ? \ ; ;
+    def>> 3 from-tail swap ?nth hashtable?
+    \ MEMO: \ IDENTITY-MEMO: ? \ ; ;
 
 M: memoized definition "memo-quot" word-prop ;
 

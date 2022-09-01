@@ -32,7 +32,10 @@ M: range hashcode* tuple-hashcode ;
 
 INSTANCE: range immutable-sequence
 
-M: range sum [ length ] [ first ] [ last ] tri + * 2 / ;
+M: range sum
+    dup length
+    [ drop 0 ]
+    [ swap [ first-unsafe ] [ last-unsafe ] bi + * 2 / ] if-zero ;
 
 <PRIVATE
 

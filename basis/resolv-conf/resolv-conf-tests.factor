@@ -16,3 +16,4 @@ IN: resolv-conf.tests
     options edns0
     search localdomain" string>resolv.conf
 ] unit-test
+

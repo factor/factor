@@ -51,3 +51,4 @@ M:: counting-stream stream-contents* ( stream -- seq )
 
 : with-counting-stream ( stream quot -- in-count out-count )
     [ <counting-stream> ] dip [ with-input-stream ] keepd [ in-count>> ] [ out-count>> ] bi ; inline
+

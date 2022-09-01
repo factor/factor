@@ -754,7 +754,7 @@ FUNCTION-ALIAS: get-clipboard-text c-string GetClipboardText ( )                
 ! Custom frame control functions
 ! NOTE: Those functions are intended for advance users that want full control over the frame processing
 ! By default EndDrawing() does this job: draws everything + SwapScreenBuffer() + manage frame timming + PollInputEvents()
-! To avoid that behaviour and control frame processes manually, enable in config.h: SUPPORT_CUSTOM_FRAME_CONTROL
+! To avoid that behavior and control frame processes manually, enable in config.h: SUPPORT_CUSTOM_FRAME_CONTROL
 FUNCTION-ALIAS: swap-screen-buffer void SwapScreenBuffer ( )                             ! Swap back buffer with front buffer (screen drawing)
 FUNCTION-ALIAS: poll-input-events void PollInputEvents ( )                               ! Register all input events
 FUNCTION-ALIAS: wait-time void WaitTime ( float ms )                                     ! Wait for some milliseconds (halt program execution)

@@ -64,3 +64,4 @@ PREDICATE: enum-c-type-word < c-type-word
 
 : values>enum ( values enum -- seq )
     '[ _ number>enum ] map ; inline
+

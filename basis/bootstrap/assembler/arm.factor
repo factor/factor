@@ -8,3 +8,4 @@ IN: bootstrap.assembler.arm
 big-endian off
 
 ! [ "bootstrap.assembler.arm" forget-vocab ] with-compilation-unit
+

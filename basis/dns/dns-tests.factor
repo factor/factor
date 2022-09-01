@@ -10,3 +10,4 @@ IN: dns.tests
 
 ! "1.1.1.1" reverse-ipv4-lookup
 ! "one.one.one.one" A IN dns-query
+
