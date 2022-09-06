@@ -35,7 +35,7 @@ SYMBOL: old-dictionary
     "USING: [^;]+ ;|USE: \\S+" <regexp> all-matching-subseqs ;
 
 : clean-up-source ( string -- string )
-    "\"(\\\"|[^\"]*)\"|(R/ (\\\\/|[^/])*/)|\\\\\\s+\\S+|POSTPONE: \\S+|! ([^\n])*" <regexp> "" re-replace ;
+    "\"(\\\"|[^\"]*|\n)\"|(R/ (\\\\/|[^/])*/)|\\\\\\s+(USE:|USING:)|POSTPONE:\\s+(USE:|USING:)|! ([^\n])*" <regexp> "" re-replace ;
 
 : strip-syntax ( seq -- seq )
     [ "USING: | ;|USE: " <regexp> " " re-replace ] map ;
