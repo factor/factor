@@ -3,7 +3,7 @@ hints interval-maps kernel math math.order sequences sorting
 strings unicode.breaks.private unicode.case.private
 unicode.categories unicode.collation unicode.collation.private
 unicode.data unicode.data.private unicode.normalize.private
-unicode.script locals ranges ;
+unicode.script ranges ;
 IN: unicode
 
 CATEGORY: blank Zs Zl Zp | "\r\n\t" member? ;
