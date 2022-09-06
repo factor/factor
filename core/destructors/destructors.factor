@@ -1,6 +1,6 @@
 ! Copyright (C) 2007, 2010 Doug Coleman, Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors assocs continuations init kernel namespaces
+USING: accessors assocs continuations kernel namespaces
 sequences sets ;
 IN: destructors
 
