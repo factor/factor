@@ -2,8 +2,8 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays ascii assocs byte-arrays combinators
 combinators.short-circuit grouping hashtables interval-sets
-io.encodings.utf8 io.files kernel locals make math math.bitwise
-math.order math.parser ranges memoize namespaces sequences
+io.encodings.utf8 io.files kernel make math math.bitwise
+math.order math.parser ranges namespaces sequences
 sets simple-flat-file sorting splitting strings.parser ;
 IN: unicode.data
 
