@@ -30,17 +30,18 @@ USE: math.complex
 
 USE: math.primes
 "
-CONSTANT: ignore-postpone-using  "POSTPONE: USING: : nop ( -- ) ;"
-CONSTANT: ingore-\-using         "\\ USING: : nop ( -- ) ;"
-CONSTANT: ignore-postpone-use    "POSTPONE: USE: ignore : nop ( -- ) ;"
-CONSTANT: ignore-\-use           "\\ USE: ignore : nop ( -- ) ;"
-CONSTANT: ignore-in-string-one   "\"USE:\" \"USING:\" : nop ( -- ) ;"
-CONSTANT: ignore-in-string-two   "\"asdfasdf USE:\" \"asdfasdf USING:\" : nop ( -- ) ;"
-CONSTANT: ignore-in-string-three "\"asdfasdf USE: asdfasdf\" : nop ( -- ) ;"
-CONSTANT: ignore-in-string-four  "\"asdfasdf USE: asdfasdf\" \"asdfasff USING: asdfasdf\" : nop ( -- ) ;"
-CONSTANT: ignore-use-regex       "R/ USE: ignore/ : nop ( -- ) ;"
-CONSTANT: ignore-using-regex     "R/ USING: ignore ;/ : nop ( -- ) ;"
-CONSTANT: empty-using-statement  "USING: ; nop ( -- ) ;"
+CONSTANT: ignore-postpone-using     "POSTPONE: USING: : nop ( -- ) ;"
+CONSTANT: ingore-\-using            "\\ USING: : nop ( -- ) ;"
+CONSTANT: ignore-postpone-use       "POSTPONE: USE: ignore : nop ( -- ) ;"
+CONSTANT: ignore-\-use              "\\ USE: ignore : nop ( -- ) ;"
+CONSTANT: ignore-in-string-one      "\"USE:\" \"USING:\" : nop ( -- ) ;"
+CONSTANT: ignore-in-string-two      "\"asdfasdf USE:\" \"asdfasdf USING:\" : nop ( -- ) ;"
+CONSTANT: ignore-in-string-three    "\"asdfasdf USE: asdfasdf\" : nop ( -- ) ;"
+CONSTANT: ignore-in-string-four     "\"asdfasdf USE: asdfasdf\" \"asdfasff USING: asdfasdf\" : nop ( -- ) ;"
+CONSTANT: ignore-string-with-quote  "\"\\\"USE:\" : nop ( -- ) ;"
+CONSTANT: ignore-use-regex          "R/ USE: ignore/ : nop ( -- ) ;"
+CONSTANT: ignore-using-regex        "R/ USING: ignore ;/ : nop ( -- ) ;"
+CONSTANT: empty-using-statement     "USING: ; nop ( -- ) ;"
 : ---- ( -- ) "-------------------------------------------------------------------------" print ;
 PRIVATE>
 
@@ -59,20 +60,21 @@ PRIVATE>
 ----
 
 "It should ignore USE: and USING: that are in strings: " print
-{ { } } [ ignore-in-string-one find-unused-in-string ] unit-test
-{ { } } [ ignore-in-string-two find-unused-in-string ] unit-test
-{ { } } [ ignore-in-string-three find-unused-in-string ] unit-test
-{ { } } [ ignore-in-string-four find-unused-in-string ] unit-test
+{ { } } [ ignore-in-string-one     find-unused-in-string ] unit-test
+{ { } } [ ignore-in-string-two     find-unused-in-string ] unit-test
+{ { } } [ ignore-in-string-three   find-unused-in-string ] unit-test
+{ { } } [ ignore-in-string-four    find-unused-in-string ] unit-test
+{ { } } [ ignore-string-with-quote find-unused-in-string ] unit-test
 
 ----
 
 "It should ignore USE: and USING: that are in RegEx: " print
-{ { } } [ ignore-use-regex find-unused-in-string ] unit-test
+{ { } } [ ignore-use-regex   find-unused-in-string ] unit-test
 { { } } [ ignore-using-regex find-unused-in-string ] unit-test
 
 ----
 
-"IT should return empty when no imports have been found: " print
+"It should return empty when no imports have been found: " print
 { { } } [ empty-using-statement find-unused-in-string ] unit-test
 
 ----
