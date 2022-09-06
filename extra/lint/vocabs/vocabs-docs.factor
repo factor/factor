@@ -29,7 +29,7 @@ HELP: find-unused-in-file
 } 
 { $examples
     { $example "USING: lint.vocabs prettyprint ;"
-        "\"resource:work/lint/vocabs/vocabs.factor\" find-unused-in-file ."
+        "\"vocab:lint/vocabs/vocabs.factor\" find-unused-in-file ."
         "{ }"
     }
 } ;
