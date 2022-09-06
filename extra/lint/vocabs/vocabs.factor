@@ -34,8 +34,8 @@ SYMBOL: old-dictionary
 : find-import-statements ( string -- seq )
     "USING: [^;]+ ;|USE: \\S+" <regexp> all-matching-subseqs ;
 
-: clean-up-source ( string -- string )
-    "\"(\\\"|[^\"]*|\n)\"|(R/ (\\\\/|[^/])*/)|\\\\\\s+(USE:|USING:)|POSTPONE:\\s+(USE:|USING:)|! ([^\n])*" <regexp> "" re-replace ;
+: clean-up-source ( string -- string ) 
+    "\"(\\\\\"|[^\"])*\"|(R/ (\\\\/|[^/])*/)|\\\\\\s+(USE:|USING:)|POSTPONE:\\s+(USE:|USING:)|! [^\n]*" <regexp> "" re-replace ;
 
 : strip-syntax ( seq -- seq )
     [ "USING: | ;|USE: " <regexp> " " re-replace ] map ;
