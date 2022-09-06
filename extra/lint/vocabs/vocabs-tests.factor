@@ -41,6 +41,7 @@ CONSTANT: ignore-in-string-four     "\"asdfasdf USE: asdfasdf\" \"asdfasff USING
 CONSTANT: ignore-string-with-quote  "\"\\\"USE:\" : nop ( -- ) ;"
 CONSTANT: ignore-use-regex          "R/ USE: ignore/ : nop ( -- ) ;"
 CONSTANT: ignore-using-regex        "R/ USING: ignore ;/ : nop ( -- ) ;"
+CONSTANT: ignore-char-backslash     "CHAR: \\ USING: math.functions ;"
 CONSTANT: empty-using-statement     "USING: ; nop ( -- ) ;"
 : ---- ( -- ) "-------------------------------------------------------------------------" print ;
 PRIVATE>
@@ -65,6 +66,11 @@ PRIVATE>
 { { } } [ ignore-in-string-three   find-unused-in-string ] unit-test
 { { } } [ ignore-in-string-four    find-unused-in-string ] unit-test
 { { } } [ ignore-string-with-quote find-unused-in-string ] unit-test
+
+----
+
+"It should ignore CHAR: \\: " print
+{ { "math.functions" } } [ ignore-char-backslash find-unused-in-string ] unit-test
 
 ----
 
