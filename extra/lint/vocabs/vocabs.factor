@@ -1,7 +1,7 @@
 ! Copyright (C) 2022 CapitalEx
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays assocs compiler.units continuations
-formatting hash-sets hashtables io io.encodings.utf8 io.files
+USING: accessors arrays assocs compiler.units formatting 
+hash-sets hashtables io io.encodings.utf8 io.files
 kernel namespaces regexp sequences sequences.deep sets sorting
 splitting unicode vocabs vocabs.loader ;
 FROM: namespaces => set ;
@@ -35,7 +35,7 @@ SYMBOL: old-dictionary
     "USING: [^;]+ ;|USE: \\S+" <regexp> all-matching-subseqs ;
 
 : clean-up-source ( string -- string ) 
-    "\"(\\\\\"|[^\"])*\"|(R/ (\\\\/|[^/])*/)|\\\\\\s+(USE:|USING:)|POSTPONE:\\s+(USE:|USING:)|! [^\n]*" <regexp> "" re-replace ;
+    "\"(\\\\\"|[^\"])*\"|R/ (\\\\/|[^/])*/|\\\\\\s+(USE:|USING:)|POSTPONE:\\s+(USE:|USING:)|! [^\n]*|CHAR:\\s+\\S+\\s+" <regexp> "" re-replace ;
 
 : strip-syntax ( seq -- seq )
     [ "USING: | ;|USE: " <regexp> " " re-replace ] map ;
