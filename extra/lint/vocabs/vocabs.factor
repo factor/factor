@@ -9,6 +9,11 @@ IN: lint.vocabs
 
 <PRIVATE
 SYMBOL: old-dictionary
+SYMBOL: LINT-VOCABS-REGEX
+
+! Cache regular expression to avoid compile time slowdowns
+"CHAR:\\s+\\S+\\s+|\"(\\\\\\\\|\\\\[\\\\stnrbvf0e\"]|\\\\x[a-fA-F0-9]{2}|\\\\u[a-fA-F0-9]{6}|[^\\\\\"])*\"|R/ (\\\\/|[^/])*/|\\\\\\s+(USE:|USING:)|POSTPONE:\\s+(USE:|USING:)|(?<!\\S+)! [^\n]*" <regexp>
+LINT-VOCABS-REGEX set-global
 
 : save-dictionary ( -- )
     dictionary     get clone 
@@ -35,7 +40,7 @@ SYMBOL: old-dictionary
     "USING: [^;]+ ;|USE: \\S+" <regexp> all-matching-subseqs ;
 
 : clean-up-source ( string -- string ) 
-    "\"(\\\\\"|[^\"])*\"|R/ (\\\\/|[^/])*/|\\\\\\s+(USE:|USING:)|POSTPONE:\\s+(USE:|USING:)|! [^\n]*|CHAR:\\s+\\S+\\s+" <regexp> "" re-replace ;
+    LINT-VOCABS-REGEX get-global "" re-replace ;
 
 : strip-syntax ( seq -- seq )
     [ "USING: | ;|USE: " <regexp> " " re-replace ] map ;
