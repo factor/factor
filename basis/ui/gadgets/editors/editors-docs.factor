@@ -33,27 +33,16 @@ HELP: <editor>
 
 { editor-caret editor-mark } related-words
 
-HELP: caret-is-shape
-{ $description
-  "Shape is defined as line, box, or filled box"
-}
-$nl
-{ $code
-"  IN: ui.gadgets.editors"
-"  +box+ caret-shape set-global"
-""
-} print-element
-$nl
+HELP: caret-style
+{ $description "Caret styles available:"
 { $table
   { "Value" "Shape" }
-  { "+line+" "line (default)" }
-  { "+box+" "box" }
-  { "+filled+" "filled box" }
-} print-element
-
-{ $references   "Set desired shape in your .factor-rc file" 
- "rc-files" }
-    ;
+  { { $link +line+ } "line (default)" }
+  { { $link +box+ } "box" }
+  { { $link +filled+ } "filled box" }
+}
+}
+{ $references "Set desired caret style in your .factor-rc file" "rc-files" } ;
 
 HELP: editor-caret
 { $values { "editor" editor } { "loc" "a pair of integers" } }
