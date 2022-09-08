@@ -27,10 +27,8 @@ TUPLE: editor < line-gadget
 M: editor preedit? preedit-start>> ;
 
 SYMBOLS: +line+ +box+ +filled+ ;
-GLOBAL: caret-is-shape 
-+line+ caret-is-shape set-global
-
-: <caret-shape> ( -- shape )  caret-is-shape get-global <model> ;
+SYMBOL: caret-style
++line+ caret-style set-global
 
 <PRIVATE
 
@@ -38,7 +36,6 @@ GLOBAL: caret-is-shape
 
 : init-editor-locs ( editor -- editor )
     <loc> >>caret
-    <caret-shape> >>caret-shape
     <loc> >>mark ; inline
 
 : editor-theme ( editor -- editor )
@@ -176,29 +173,27 @@ M: editor ungraft*
     { [ focused?>> ] [ blink>> ]
       [ [ preedit? not ] [ preedit-selection-mode?>> not ] bi or ] } 1&& ;
 
-: (caret-location) ( editor -- loc dim )
+: caret-line ( editor -- loc dim )
     [ caret-loc ] [ caret-dim ] bi ;
 
-: (caret-rect) ( dim -- newdim )
-    second [ 2 / ] keep 2array ;
+: caret-rect ( editor -- loc dim )
+    caret-line second [ 2 / ] keep 2array ;
 
 : draw-caret-line ( editor -- )
-    (caret-location) over v+ gl-line ;
+    caret-line over v+ gl-line ;
 
 : draw-caret-rect ( editor -- )
-    (caret-location) (caret-rect) gl-rect ;
+    caret-rect gl-rect ;
 
 : draw-caret-rect-filled ( editor -- )
-    (caret-location) (caret-rect) gl-fill-rect ;
+    caret-rect gl-fill-rect ;
 
 : draw-caret-shape ( editor -- )
-    dup caret-shape>> value>>
-    {
+    caret-style get {
         { +box+ [ draw-caret-rect ] }
         { +filled+ [ draw-caret-rect-filled ] }
         [ drop  draw-caret-line ]
     } case ;
-    
 
 : draw-caret ( editor -- )
     dup draw-caret? [
