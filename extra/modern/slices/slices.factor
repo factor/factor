@@ -1,8 +1,7 @@
 ! Copyright (C) 2016 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors assocs combinators.extras kernel math sequences
-sequences.deep sequences.extras sequences.private strings
-unicode ;
+sequences.deep sequences.extras strings unicode ;
 IN: modern.slices
 
 : >strings ( seq -- str )

@@ -1,10 +1,10 @@
 ! Copyright (C) 2016 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays assocs combinators
+USING: accessors arrays assocs combinators combinators.extras
 combinators.short-circuit continuations io.encodings.utf8
 io.files kernel make math math.order modern.paths modern.slices
-sequences sequences.extras sets combinators.extras splitting strings
-unicode vocabs.loader ;
+sequences sequences.extras sets splitting strings unicode
+vocabs.loader ;
 IN: modern
 
 ERROR: string-expected-got-eof n string ;

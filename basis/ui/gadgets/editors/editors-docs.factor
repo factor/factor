@@ -40,16 +40,15 @@ HELP: caret-is-shape
 $nl
 { $code
 "  IN: ui.gadgets.editors"
-"  2 caret-is-shape set"
+"  +box+ caret-shape set-global"
 ""
 } print-element
 $nl
 { $table
   { "Value" "Shape" }
-  { "f" "default (line)" }
-  { "0" "line" }
-  { "1" "box" }
-  { "2" "filled box" }
+  { "+line+" "line (default)" }
+  { "+box+" "box" }
+  { "+filled+" "filled box" }
 } print-element
 
 { $references   "Set desired shape in your .factor-rc file" 

@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs classes classes.private
 classes.tuple.private continuations definitions generic
-hash-sets init kernel kernel.private math namespaces sequences
+hash-sets kernel kernel.private math namespaces sequences
 sets source-files.errors vocabs words ;
 IN: compiler.units
 
