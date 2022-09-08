@@ -8,12 +8,13 @@ models.arrow namespaces opengl opengl.gl sequences sorting
 splitting system timers ui.baseline-alignment ui.clipboards
 ui.commands ui.gadgets ui.gadgets.borders
 ui.gadgets.line-support ui.gadgets.menus ui.gadgets.scrollers
-prettyprint ui.gadgets.editors.private math.parser
+prettyprint math.parser
 ui.gestures ui.pens.solid ui.render ui.text ui.theme unicode variables ;
 IN: ui.gadgets.editors
 
 TUPLE: editor < line-gadget
     caret mark
+    caret-shape
     focused? blink blink-timer
     default-text
     preedit-start
@@ -25,8 +26,11 @@ TUPLE: editor < line-gadget
 
 M: editor preedit? preedit-start>> ;
 
-SYMBOL: caret-is-shape 
-: <caret-shape> ( -- shape )  caret-is-shape get <model> ;
+SYMBOLS: +line+ +box+ +filled+ ;
+GLOBAL: caret-is-shape 
++line+ caret-is-shape set-global
+
+: <caret-shape> ( -- shape )  caret-is-shape get-global <model> ;
 
 <PRIVATE
 
@@ -188,10 +192,10 @@ M: editor ungraft*
     (caret-location) (caret-rect) gl-fill-rect ;
 
 : draw-caret-shape ( editor -- )
-    dup caret-shape>> value>> 
+    dup caret-shape>> value>>
     {
-        { 1 [ draw-caret-rect ] }
-        { 2 [ draw-caret-rect-filled ] }
+        { +box+ [ draw-caret-rect ] }
+        { +filled+ [ draw-caret-rect-filled ] }
         [ drop  draw-caret-line ]
     } case ;
     
@@ -199,8 +203,7 @@ M: editor ungraft*
 : draw-caret ( editor -- )
     dup draw-caret? [
         [ editor-caret-color gl-color ] dip
-        [ caret-loc ] [ caret-dim ] bi
-        over v+ gl-line
+        draw-caret-shape
     ] [ drop ] if ;
 
 :: draw-preedit-underlines ( editor -- )
