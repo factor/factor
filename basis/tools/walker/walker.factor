@@ -169,6 +169,10 @@ IN: syntax
 
 SYNTAX: B \ break suffix! ;
 
+SYNTAX: HIT \ hit-count suffix! ;
+
+SYNTAX: B= \ break= suffix! ;
+
 SYNTAX: B: scan-word definition
     [ break "now press O I to land inside the parsing word" drop ]
     prepose call( accum -- accum ) ;

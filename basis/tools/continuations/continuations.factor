@@ -26,30 +26,46 @@ SYMBOL: break-hook
 
 \ break t "break?" set-word-prop
 
+SYMBOL: hit-counter
+
+: (hit-count-inc) ( -- )
+    hit-counter get dup
+    [  1 + ]
+    [ drop 1 ] if
+    hit-counter set ;
+
+: hit-count-reset ( -- )
+    0 hit-counter set ;
+
+: hit-count@ ( -- n )
+    hit-counter get ;
+
+: hit-count ( -- )
+    (hit-count-inc) ;
+
+\ hit-count t "hit?" set-word-prop
 
 SYMBOL: break-counter
 
-: break-counter-get ( -- n )
-    break-counter get ;
+: break-count-reset ( -- )
+    0 break-counter set
+    hit-count-reset ;
 
-: break-count-zero ( -- )
-    0 break-counter set ;
-
-: break-count ( -- )
+: (break-count-inc) ( -- )
     break-counter get dup
     [  1 + ]
     [ drop 1 ] if
     break-counter set ;
 
-: break-count= ( n -- )
-    break-count
+: break= ( n -- )
+    (hit-count-inc)
+    (break-count-inc)
     break-counter get swap >=
-    [     continuation callstack >>call
+    [ current-continuation get-callstack >>call
     break-hook get call( continuation -- continuation' )
-    after-break  ]
-    [ ] if ;
+    after-break  ] when ;
 
-! \ break-count= t "break?" set-word-prop
+\ break= t "break?" set-word-prop
 
 GENERIC: add-breakpoint ( quot -- quot' )
 
