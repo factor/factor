@@ -3,6 +3,8 @@
 USING: colors namespaces ;
 IN: ui.theme
 
+CONSTANT: help-header-background HEXCOLOR: EDF4D9
+
 SYMBOL: theme
 
 HOOK: toolbar-background theme ( -- color )

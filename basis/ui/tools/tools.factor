@@ -47,4 +47,8 @@ tool "common" f {
     f ui-stop-after-last-window? set-global
     environment-window ;
 
+: ui-tools-main ( -- )
+    f ui-stop-after-last-window? set-global
+    environment-window ;
+
 MAIN: ui-tools-main
