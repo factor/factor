@@ -42,4 +42,8 @@ tool "common" f {
     "resource:" absolute-path current-directory set-global
     listener-window ;
 
+: ui-tools-main ( -- )
+    f ui-stop-after-last-window? set-global
+    environment-window ;
+
 MAIN: ui-tools-main

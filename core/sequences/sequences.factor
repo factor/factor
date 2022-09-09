@@ -1209,3 +1209,6 @@ PRIVATE>
             [ array-flip ] [ generic-flip ] if
         ] [ generic-flip ] if
     ] unless ;
+
+: special-produce ( initial pred: ( a -- ? ) body: ( b -- a ) -- seq )
+    [ [ preserving ] curry ] dip [ dup ] compose produce nip ; inline

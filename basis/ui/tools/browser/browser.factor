@@ -262,4 +262,18 @@ browser-gadget "fonts" f {
     { T{ key-down f ${ os macosx? M+ C+ ? } "0" } com-font-size-normal }
 } define-command-map
 
+: <help-header> ( browser-gadget -- gadget )
+    horizontal <track> swap model>> 
+    [ [ '[ _ $title ] try ] <pane-control> 1 track-add ]
+    [ <active/inactive> { 5 0 } <border> f track-add ] bi ;
+
+: (browser-window) ( topic -- )
+    <browser-gadget>
+    <world-attributes>
+        "Browser" >>title
+        { windowed double-buffered multisampled
+          T{ samples f 4 } T{ sample-buffers f 1 } }
+        >>pixel-format-attributes
+    open-status-window ;
+
 MAIN: browser-window

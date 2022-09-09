@@ -74,3 +74,9 @@ TUPLE: metrics width ascent descent height leading cap-height x-height ;
 TUPLE: selection string start end color ;
 
 C: <selection> selection
+
+
+CONSTANT: default-font-size 15 inline
+
+CONSTANT: default-sans-serif-font-name "Linux Biolinum O" inline
+CONSTANT: default-monospace-font-name "Linux Biolinum O" inline
