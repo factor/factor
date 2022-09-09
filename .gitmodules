@@ -1,0 +1,3 @@
+[submodule "skovsrc"]
+	path = skovsrc
+	url = git@github.com:tgunr/skov.git
