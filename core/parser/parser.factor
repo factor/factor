@@ -3,8 +3,9 @@
 USING: accessors arrays classes combinators compiler.units
 continuations definitions effects io io.encodings.utf8 io.files
 kernel lexer math math.parser namespaces parser.notes quotations
-sequences sets slots source-files vectors vocabs vocabs.parser
-words words.symbol ;
+sequences sets slots source-files strings vectors vocabs
+vocabs.parser words words.symbol ;
+
 FROM: namespaces => set ;
 IN: parser
 
@@ -173,17 +174,15 @@ SYMBOL: parsing-file-level
 parsing-file-level [ 0 ] initialize
 
 : (parsing-file-level) ( -- string )
-    parsing-file-level get dup
-    [ "" swap <iota> [ drop "." append ] each ]
-    [ drop "" ] if
-    ;
+    parsing-file-level get
+    [ "" ] [ CHAR: . <string> ] if-zero ;
 
 FROM: namespaces => set ; 
 : parsing-file-level++ ( -- )
-    parsing-file-level get  1 +  parsing-file-level set ;
+    parsing-file-level [ 1 + ] change ;
  
 : parsing-file-level-- ( -- )
-      parsing-file-level get  1 -  parsing-file-level set ;
+    parsing-file-level [ 1 - ] change ;
       
 : parsing-file ( file -- )
     parser-quiet? get [ drop ]
