@@ -42,7 +42,14 @@ HELP: caret-style
   { { $link +filled+ } "filled box" }
 }
 }
-{ $references "Set desired caret style in your .factor-rc file" "rc-files" } ;
+{ $references "Set desired caret style in your .factor-rc file" "rc-files" }
+{ $examples
+  { $example "USING: ui.gadgets.editors ;"
+    "+filled+ caret-style set-global"
+    ""
+  }
+}
+    ;
 
 HELP: editor-caret
 { $values { "editor" editor } { "loc" "a pair of integers" } }
