@@ -1,6 +1,6 @@
 ! Copyright (C) 2016-2017 Nicolas Pénet.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: code code.factor-abstraction kernel models
+USING: code.factor-abstraction kernel models
 ui.gadgets.borders ui.tools.environment.theme
 ui.tools.environment.tree ui.gadgets.labels continuations ;
 IN: ui.tools.environment.tree.help-tree

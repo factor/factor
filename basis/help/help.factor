@@ -103,6 +103,10 @@ M: word article-title
         append
     ] if ;
 
+! skov
+! M: word article-title
+!     dup [ parsing-word? ] [ symbol? ] bi or [ name>> ] [ unparse ] if ;
+
 <PRIVATE
 
 : (word-help) ( word -- element )
@@ -218,36 +222,34 @@ help-hook [ [ print-topic ] ] initialize
 : set-word-help ( content word -- )
     [ swap "help" set-word-prop ] keep xref-article ;
 
-M: word article-title
-    dup [ parsing-word? ] [ symbol? ] bi or [ name>> ] [ unparse ] if ;
+! skov
+! <PRIVATE
 
-<PRIVATE
+! : (word-help) ( word -- element )
+!     [
+!         {
+!             [ \ $vocabulary swap 2array , ]
+!             [ \ $graph swap 2array , ]
+!             [ word-help % ]
+!             [ dup global at [ get-global \ $value swap 2array , ] [ drop ] if ]
+!             [ \ $definition swap 2array , ]
+!             [ \ $related swap 2array , ]
+!         } cleave
+!     ] { } make ;
 
-: (word-help) ( word -- element )
-    [
-        {
-            [ \ $vocabulary swap 2array , ]
-            [ \ $graph swap 2array , ]
-            [ word-help % ]
-            [ dup global at [ get-global \ $value swap 2array , ] [ drop ] if ]
-            [ \ $definition swap 2array , ]
-            [ \ $related swap 2array , ]
-        } cleave
-    ] { } make ;
+! PRIVATE>
 
-PRIVATE>
+! M: generic article-content (word-help) ;
 
-M: generic article-content (word-help) ;
+! M: class article-content (word-help) ;
 
-M: class article-content (word-help) ;
-
-M: word word-help*
-    stack-effect [ in>> ] [ out>> ] bi [
-        [
-            dup pair? [
-                first2 dup effect? [ \ $quotation swap 2array ] when
-            ] [
-                object
-            ] if [ effect>string ] dip
-        ] { } map>assoc
-    ] bi@ [ \ $inputs prefix ] dip \ $outputs prefix 2array ;
+! M: word word-help*
+!     stack-effect [ in>> ] [ out>> ] bi [
+!         [
+!             dup pair? [
+!                 first2 dup effect? [ \ $quotation swap 2array ] when
+!             ] [
+!                 object
+!             ] if [ effect>string ] dip
+!         ] { } map>assoc
+!     ] bi@ [ \ $inputs prefix ] dip \ $outputs prefix 2array ;

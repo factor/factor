@@ -5,7 +5,7 @@ definitions.icons effects hashtables help.stylesheet help.topics
 io io.styles kernel make math namespaces present prettyprint
 prettyprint.stylesheet quotations see sequences
 sequences.private sets sorting splitting strings urls vocabs
-words words.symbol ;
+words words.symbol  ;
 FROM: prettyprint.sections => with-pprint ;
 IN: help.markup
 
@@ -423,6 +423,8 @@ M: f ($instance) ($link) ;
     [ code-style get swap with-nesting ] ($block) ; inline
 
 : $see ( element -- ) check-first [ see* ] ($see) ;
+! : $see ( element -- )
+!     check-first <definition-tree> nl output-stream get write-gadget ;
 
 : $synopsis ( element -- ) check-first [ synopsis write ] ($see) ;
 
@@ -510,18 +512,16 @@ M: array elements*
     { f { $strong "Definition class" } } prefix
     $table ;
 
-: $graph ( element -- )
-    check-first <help-tree> nl nl output-stream get write-gadget ;
+! skov
+! : $graph ( element -- )
+!     check-first <help-tree> nl nl output-stream get write-gadget ;
 
-: $see ( element -- )
-    check-first <definition-tree> nl output-stream get write-gadget ;
+! : $inputs ( element -- )
+!     "Inputs" $heading
+!     [ [ "none" print ] ($block) ]
+!     [ [ values-row ] map $table ] if-empty ;
 
-: $inputs ( element -- )
-    "Inputs" $heading
-    [ [ "none" print ] ($block) ]
-    [ [ values-row ] map $table ] if-empty ;
-
-: $outputs ( element -- )
-    "Outputs" $heading
-    [ [ "none" print ] ($block) ]
-    [ [ values-row ] map $table ] if-empty ;
+! : $outputs ( element -- )
+!     "Outputs" $heading
+!     [ [ "none" print ] ($block) ]
+!     [ [ values-row ] map $table ] if-empty ;

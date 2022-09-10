@@ -4,10 +4,10 @@ USING: accessors colors combinators kernel math namespaces ;
 IN: fonts
 
 CONSTANT: default-serif-font-name "serif"
-CONSTANT: default-sans-serif-font-name "sans-serif"
-CONSTANT: default-monospace-font-name "monospace"
+CONSTANT: default-sans-serif-font-name "Linux Biolinum O" inline
+CONSTANT: default-monospace-font-name "Linux Biolinum O" inline
 
-CONSTANT: default-font-size 12
+CONSTANT: default-font-size 15
 
 SYMBOL: default-font-foreground-color
 COLOR: black default-font-foreground-color set-global
@@ -75,8 +75,3 @@ TUPLE: selection string start end color ;
 
 C: <selection> selection
 
-
-CONSTANT: default-font-size 15 inline
-
-CONSTANT: default-sans-serif-font-name "Linux Biolinum O" inline
-CONSTANT: default-monospace-font-name "Linux Biolinum O" inline

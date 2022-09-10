@@ -1,24 +1,23 @@
 ! Copyright (C) 2015 Nicolas Pénet.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors colors colors.constants colors.hex io.pathnames
-kernel sequences system ui.images ui.pens.image ui.pens.solid ;
+USING: accessors colors kernel ui.pens.solid ;
 IN: ui.tools.environment.theme
 
-CONSTANT: content-background-colour HEXCOLOR: 002b36
+CONSTANT: content-background-colour COLOR: #002b36
 
-CONSTANT: dark-background { HEXCOLOR: 5C8284 HEXCOLOR: 26515A }
-CONSTANT: green-background { HEXCOLOR: ACDC3F HEXCOLOR: 79B900 }
-CONSTANT: white-background { HEXCOLOR: D4DFDF HEXCOLOR: A3BEBD }
-CONSTANT: blue-background { HEXCOLOR: 56C5FF HEXCOLOR: 1B94FF }
-CONSTANT: red-background { HEXCOLOR: FF7C65 HEXCOLOR: FE2F26 }
-CONSTANT: yellow-background { HEXCOLOR: DCC23F HEXCOLOR: B9A013 }
-CONSTANT: inactive-background { HEXCOLOR: 004457 HEXCOLOR: 002B36 }
-CONSTANT: active-background { HEXCOLOR: 006581 HEXCOLOR: 004153 }
+CONSTANT: dark-background { COLOR: #5C8284 COLOR: #26515A }
+CONSTANT: green-background { COLOR: #ACDC3F COLOR: #79B900 }
+CONSTANT: white-background { COLOR: #D4DFDF COLOR: #A3BEBD }
+CONSTANT: blue-background { COLOR: #56C5FF COLOR: #1B94FF }
+CONSTANT: red-background { COLOR: #FF7C65 COLOR: #FE2F26 }
+CONSTANT: yellow-background { COLOR: #DCC23F COLOR: #B9A013 }
+CONSTANT: inactive-background { COLOR: #004457 COLOR: #002B36 }
+CONSTANT: active-background { COLOR: #006581 COLOR: #004153 }
 
-CONSTANT: content-text-colour HEXCOLOR: E5E5E5
+CONSTANT: content-text-colour COLOR: #E5E5E5
 CONSTANT: dark-text-colour COLOR: black
-CONSTANT: light-text-colour HEXCOLOR: C4DCDE
-CONSTANT: faded-text-colour HEXCOLOR: 93A1A1
+CONSTANT: light-text-colour COLOR: #C4DCDE
+CONSTANT: faded-text-colour COLOR: #93A1A1
 
 : set-small-font ( label -- label )
     [ 13 >>size t >>bold? ] change-font ;
