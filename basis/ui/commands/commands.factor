@@ -115,6 +115,3 @@ M: word command-word ;
 
 M: f invoke-command 2drop ;
 
-M: word command-name
-    name>> "com " ?head drop "." ?tail drop dup first Letter?
-    [ rest ] unless (command-name) ;
