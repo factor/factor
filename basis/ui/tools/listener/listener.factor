@@ -547,3 +547,46 @@ listener-gadget "fonts" f {
     { T{ key-down f ${ os macosx? M+ C+ ? } "-" } com-font-size-minus }
     { T{ key-down f ${ os macosx? M+ C+ ? } "0" } com-font-size-normal }
 } define-command-map
+
+: show-listener ( -- ) [ border? ] find-window [ raise-window ] [ environment-window ] if* ;
+: listener-window ( -- ) environment-window ;
+
+USE: lists.lazy
+USE: math.trig
+
+interactive-vocabs [ { 
+  "io.encodings.utf8"
+  "io.encodings.binary"
+  "io.encodings.ascii"
+  "io.binary"
+  "io.directories"
+  "io.directories.hierarchy"
+  "lists.lazy"
+  "splitting"
+  "math.functions"
+  "math.trig"
+  "math.vectors"
+  "math.intervals"
+  "math.statistics"
+  "math.parser"
+  "sequences.deep"
+  "sequences.extras"
+  "sequences.generalizations"
+  "binary-search"
+  "vectors"
+  "quotations"
+  "byte-arrays"
+  "deques"
+  "regexp"
+  "calendar"
+  "classes"
+  "unicode.case"
+  "unicode.categories"
+  "io.files.info"
+  "colors"
+  "colors.hex"
+  "timers"
+  "sets"
+  "globs"
+  "scratchpad"
+} append ] change-global
