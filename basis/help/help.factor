@@ -222,34 +222,36 @@ help-hook [ [ print-topic ] ] initialize
 : set-word-help ( content word -- )
     [ swap "help" set-word-prop ] keep xref-article ;
 
-! skov
-! <PRIVATE
+M: word article-title
+    dup [ parsing-word? ] [ symbol? ] bi or [ name>> ] [ unparse ] if ;
 
-! : (word-help) ( word -- element )
-!     [
-!         {
-!             [ \ $vocabulary swap 2array , ]
-!             [ \ $graph swap 2array , ]
-!             [ word-help % ]
-!             [ dup global at [ get-global \ $value swap 2array , ] [ drop ] if ]
-!             [ \ $definition swap 2array , ]
-!             [ \ $related swap 2array , ]
-!         } cleave
-!     ] { } make ;
+<PRIVATE
 
-! PRIVATE>
+: (word-help) ( word -- element )
+    [
+        {
+            [ \ $vocabulary swap 2array , ]
+            [ \ $graph swap 2array , ]
+            [ word-help % ]
+            [ dup global at [ get-global \ $value swap 2array , ] [ drop ] if ]
+            [ \ $definition swap 2array , ]
+            [ \ $related swap 2array , ]
+        } cleave
+    ] { } make ;
 
-! M: generic article-content (word-help) ;
+PRIVATE>
 
-! M: class article-content (word-help) ;
+M: generic article-content (word-help) ;
 
-! M: word word-help*
-!     stack-effect [ in>> ] [ out>> ] bi [
-!         [
-!             dup pair? [
-!                 first2 dup effect? [ \ $quotation swap 2array ] when
-!             ] [
-!                 object
-!             ] if [ effect>string ] dip
-!         ] { } map>assoc
-!     ] bi@ [ \ $inputs prefix ] dip \ $outputs prefix 2array ;
+M: class article-content (word-help) ;
+
+M: word word-help*
+    stack-effect [ in>> ] [ out>> ] bi [
+        [
+            dup pair? [
+                first2 dup effect? [ \ $quotation swap 2array ] when
+            ] [
+                object
+            ] if [ effect>string ] dip
+        ] { } map>assoc
+    ] bi@ [ \ $inputs prefix ] dip \ $outputs prefix 2array ;

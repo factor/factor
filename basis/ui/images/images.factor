@@ -49,6 +49,9 @@ PRIVATE>
 : image-dim ( image-name -- dim )
     cached-image dim>> 1/2 v*n ;
 
+: image-dim ( image-name -- dim )
+    cached-image dim>> 1/2 v*n ;
+
 {
     { [ os macosx? ] [ "images.loader.cocoa" require ] }
     { [ os windows?  ] [ "images.loader.gdiplus" require ] }

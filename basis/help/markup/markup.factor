@@ -512,16 +512,18 @@ M: array elements*
     { f { $strong "Definition class" } } prefix
     $table ;
 
-! skov
-! : $graph ( element -- )
-!     check-first <help-tree> nl nl output-stream get write-gadget ;
+: $graph ( element -- )
+    check-first <help-tree> nl nl output-stream get write-gadget ;
 
-! : $inputs ( element -- )
-!     "Inputs" $heading
-!     [ [ "none" print ] ($block) ]
-!     [ [ values-row ] map $table ] if-empty ;
+: $see ( element -- )
+    check-first <definition-tree> nl output-stream get write-gadget ;
 
-! : $outputs ( element -- )
-!     "Outputs" $heading
-!     [ [ "none" print ] ($block) ]
-!     [ [ values-row ] map $table ] if-empty ;
+: $inputs ( element -- )
+    "Inputs" $heading
+    [ [ "none" print ] ($block) ]
+    [ [ values-row ] map $table ] if-empty ;
+
+: $outputs ( element -- )
+    "Outputs" $heading
+    [ [ "none" print ] ($block) ]
+    [ [ values-row ] map $table ] if-empty ;

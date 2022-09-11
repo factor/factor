@@ -1,8 +1,8 @@
 ! Copyright (C) 2015-2017 Nicolas Pénet.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays code code.execution colors 
+USING: accessors arrays code code.execution colors colors.hex
 combinators combinators.short-circuit combinators.smart fry
-kernel listener locals locals math math.order math.statistics
+kernel listener locals math math.order math.statistics
 math.vectors models namespaces sequences splitting system
 ui.commands ui.gadgets ui.gadgets.borders
 ui.gadgets.buttons.round ui.gadgets.editors
