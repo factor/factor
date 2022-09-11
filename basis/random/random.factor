@@ -1,11 +1,10 @@
 ! Copyright (C) 2008 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors alien.data arrays assocs byte-arrays
-byte-vectors combinators combinators.short-circuit endian fry
-hashtables hashtables.private hash-sets hints io.backend kernel
-locals math math.bitwise math.constants math.functions
-math.order ranges namespaces sequences sequences.private
-sets summary system typed vocabs ;
+combinators combinators.short-circuit hash-sets hashtables
+hashtables.private kernel math math.bitwise math.constants
+math.functions math.order namespaces sequences sequences.private
+sets summary system vocabs ;
 QUALIFIED-WITH: alien.c-types c
 QUALIFIED-WITH: sets sets
 IN: random

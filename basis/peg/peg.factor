@@ -3,9 +3,8 @@
 
 USING: accessors arrays assocs classes combinators
 combinators.short-circuit compiler.units effects.parser fry
-generalizations kernel locals make math math.order namespaces
-quotations sequences sets splitting unicode vectors
-vocabs.loader words ;
+kernel make math math.order namespaces quotations sequences
+sets splitting unicode vectors vocabs.loader words ;
 
 IN: peg
 

@@ -1,9 +1,9 @@
 ! Copyright (C) 2005, 2010 Slava Pestov.
 ! Copyright (C) 2008 Eduardo Cavazos.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors alien.c-types alien.syntax byte-arrays classes.struct
+USING: accessors alien.c-types alien.syntax byte-arrays
 combinators.short-circuit combinators.smart generalizations kernel
-libc locals math sequences sequences.generalizations strings system
+libc math sequences sequences.generalizations strings system
 unix.ffi vocabs.loader ;
 IN: unix
 

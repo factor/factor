@@ -1,9 +1,8 @@
 ! Copyright (C) 2008, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: combinators combinators.smart compiler.units
-continuations debugger effects.parser io io.streams.string
-kernel namespaces parser parser.notes prettyprint sequences
-splitting ;
+continuations debugger effects.parser io.streams.string
+kernel namespaces parser parser.notes prettyprint splitting ;
 IN: eval
 
 : parse-string ( str -- quot )

@@ -3,7 +3,7 @@
 USING: accessors arrays assocs boxes classes.tuple
 classes.tuple.parser combinators combinators.short-circuit
 concurrency.flags concurrency.promises continuations deques
-destructors dlists init kernel lexer make math math.functions
+destructors dlists kernel lexer make math math.functions
 namespaces parser sequences sets strings threads ui.backend
 ui.gadgets ui.gadgets.private ui.gadgets.worlds ui.gestures
 ui.render vectors vocabs.parser words ;
