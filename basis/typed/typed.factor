@@ -3,8 +3,8 @@
 USING: accessors arrays classes classes.algebra classes.tuple
 classes.struct combinators combinators.short-circuit definitions
 effects effects.parser fry generalizations kernel kernel.private
-locals locals.parser macros quotations sequences slots
-stack-checker.dependencies words ;
+locals.parser quotations sequences slots stack-checker.dependencies
+words ;
 FROM: classes.tuple.private => tuple-layout ;
 IN: typed
 

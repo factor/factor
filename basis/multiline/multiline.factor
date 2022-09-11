@@ -1,8 +1,7 @@
 ! Copyright (C) 2007 Daniel Ehrenberg
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors combinators kernel lexer locals make math
-namespaces parser quotations sequences strings.parser
-strings.parser.private words ;
+USING: accessors kernel lexer make math namespaces parser
+quotations sequences strings.parser.private words ;
 IN: multiline
 
 <PRIVATE

@@ -1,6 +1,6 @@
 ! Copyright (C) 2007, 2008, Slava Pestov, Elie CHAFTARI.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: alien.libraries init kernel math namespaces openssl.libcrypto
+USING: alien.libraries kernel math namespaces openssl.libcrypto
 openssl.libssl sequences ;
 IN: openssl
 
