@@ -1,8 +1,8 @@
 ! Copyright (C) 2008, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors fry generalizations io io.streams.string kernel
-locals macros make math math.order math.parser multiline
-namespaces present sequences splitting strings vocabs.parser ;
+make math math.order math.parser multiline namespaces present
+sequences splitting strings vocabs.parser ;
 IN: interpolate
 
 <PRIVATE

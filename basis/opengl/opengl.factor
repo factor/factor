@@ -3,7 +3,7 @@
 ! Portions copyright (C) 2008 Joe Groff.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: alien alien.c-types alien.data assocs colors
-combinators.smart continuations init io kernel math
+combinators.smart continuations io kernel math
 math.functions math.parser namespaces opengl.gl sequences
 sequences.generalizations specialized-arrays system words ;
 FROM: alien.c-types => float ;

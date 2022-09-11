@@ -1,7 +1,7 @@
 ! Copyright (C) 2008 James Cash, Daniel Ehrenberg, Chris Double.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors combinators combinators.short-circuit kernel
-lexer locals make math namespaces parser sequences words ;
+lexer make math namespaces parser sequences words ;
 IN: lists
 
 ! List Protocol

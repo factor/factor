@@ -2,11 +2,11 @@
 ! See http://factorcode.org/license.txt for BSD license.
 
 USING: accessors ascii assocs combinators
-combinators.short-circuit fry io.encodings.string
-io.encodings.utf8 io.pathnames io.sockets io.sockets.secure
-kernel lexer linked-assocs make math math.parser multiline
-namespaces peg.ebnf present sequences sequences.generalizations
-splitting strings strings.parser urls.encoding vocabs.loader ;
+combinators.short-circuit io.pathnames io.sockets
+io.sockets.secure kernel lexer linked-assocs make math.parser
+multiline namespaces peg.ebnf present sequences
+sequences.generalizations splitting strings strings.parser
+urls.encoding vocabs.loader ;
 
 IN: urls
 

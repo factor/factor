@@ -3,8 +3,8 @@
 USING: accessors arrays assocs byte-arrays byte-vectors classes
 combinators definitions fry generic generic.single
 generic.standard hashtables kernel kernel.private math
-math.parser parser sbufs sequences sequences.private splitting
-strings vectors words ;
+math.parser parser sbufs sequences splitting strings vectors
+words ;
 IN: hints
 
 GENERIC: specializer-predicate ( spec -- quot )
