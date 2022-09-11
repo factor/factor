@@ -1,6 +1,6 @@
 ! Copyright (C) 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors kernel math opengl sequences ui.images ui.pens ;
+USING: accessors kernel math opengl sequences ui.images ui.pens colors ;
 IN: ui.pens.image
 
 ! Image pen

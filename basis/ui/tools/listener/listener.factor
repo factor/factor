@@ -14,7 +14,8 @@ ui.gestures ui.operations ui.pens.solid ui.theme
 ui.tools.browser ui.tools.common ui.tools.debugger
 ui.tools.error-list ui.tools.listener.completion
 ui.tools.listener.history ui.tools.listener.popups vocabs
-vocabs.loader vocabs.parser vocabs.refresh words ;
+vocabs.loader vocabs.parser vocabs.refresh words ui.gadgets.borders
+ui.gadgets.tools.environment ui.tools.environment.theme ;
 IN: ui.tools.listener
 
 TUPLE: interactor < source-editor
@@ -243,8 +244,11 @@ M: listener-gadget focusable-child*
     <listener-gadget>
     dup "Listener" open-status-window ;
 
-: listener-window ( -- )
-    [ listener-window* drop ] with-ui ;
+! : listener-window ( -- )
+!     [ listener-window* drop ] with-ui ;
+
+! skov
+: listener-window ( -- ) environment-window ;
 
 \ listener-window H{ { +nullary+ t } } define-command
 
@@ -262,8 +266,11 @@ M: listener-gadget focusable-child*
 : get-listener ( -- listener )
     [ listener-gadget? ] (get-listener) ;
 
-: show-listener ( -- )
-    get-listener drop ;
+! : show-listener ( -- )
+!     get-listener drop ;
+
+! skov
+: show-listener ( -- ) [ border? ] find-window [ raise-window ] [ environment-window ] if* ;
 
 \ show-listener H{ { +nullary+ t } } define-command
 
@@ -547,9 +554,6 @@ listener-gadget "fonts" f {
     { T{ key-down f ${ os macosx? M+ C+ ? } "-" } com-font-size-minus }
     { T{ key-down f ${ os macosx? M+ C+ ? } "0" } com-font-size-normal }
 } define-command-map
-
-: show-listener ( -- ) [ border? ] find-window [ raise-window ] [ environment-window ] if* ;
-: listener-window ( -- ) environment-window ;
 
 USE: lists.lazy
 USE: math.trig

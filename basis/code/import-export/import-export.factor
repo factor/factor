@@ -13,7 +13,7 @@ SYMBOL: skov-version
     image-path parent-directory "work" append-path ;
 
 : make-directory? ( path -- path )
-    [ exists? not ] [ dup make-directory ] smart-when ;
+    [ file-exists? not ] [ dup make-directory ] smart-when ;
 
 : vocab-directory-path ( elt -- str )
     parents reverse rest [ factor-name ] map path-separator join work-directory swap append-path ;

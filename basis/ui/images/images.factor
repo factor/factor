@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors assocs cache combinators images images.loader
 kernel math namespaces opengl opengl.textures sequences
-splitting system ui.gadgets.worlds vocabs ;
+splitting system ui.gadgets.worlds vocabs math.vectors colors ;
 IN: ui.images
 
 TUPLE: image-name path ;
@@ -42,9 +42,10 @@ PRIVATE>
 : draw-scaled-image ( dim image -- )
     rendered-image draw-scaled-texture ;
 
-: image-dim ( image -- dim )
-    cached-image [ dim>> ] [ 2x?>> [ [ 2 / ] map ] when ] bi ;
+! : image-dim ( image -- dim )
+!     cached-image [ dim>> ] [ 2x?>> [ [ 2 / ] map ] when ] bi ;
 
+! skov
 : image-dim ( image-name -- dim )
     cached-image dim>> 1/2 v*n ;
 

@@ -37,11 +37,12 @@ tool "common" f {
     { T{ key-down f f "F11" } toggle-fullscreen }
 } ? prepend define-command-map
 
-: ui-tools-main ( -- )
-    f ui-stop-after-last-window? set-global
-    "resource:" absolute-path current-directory set-global
-    listener-window ;
+! : ui-tools-main ( -- )
+!     f ui-stop-after-last-window? set-global
+!     "resource:" absolute-path current-directory set-global
+!     listener-window ;
 
+! skov
 : ui-tools-main ( -- )
     f ui-stop-after-last-window? set-global
     environment-window ;

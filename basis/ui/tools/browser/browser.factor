@@ -10,7 +10,7 @@ ui.gadgets.glass ui.gadgets.panes ui.gadgets.scrollers
 ui.gadgets.status-bar ui.gadgets.toolbar ui.gadgets.tracks
 ui.gadgets.viewports ui.gadgets.worlds ui.gestures ui.pens.solid
 ui.theme ui.tools.browser.history ui.tools.browser.popups
-ui.tools.common unicode vocabs ;
+ui.tools.common unicode vocabs ui.gadgets.buttons.activate ;
 IN: ui.tools.browser
 
 TUPLE: browser-gadget < tool history scroller search-field popup ;
@@ -59,8 +59,14 @@ CONSTANT: next 1
         [ ($navigation-path) ] bi
     ] with-nesting ;
 
+! : <help-header> ( browser-gadget -- gadget )
+!     model>> [ '[ _ $title ] try ] <pane-control> ;
+
+! skov
 : <help-header> ( browser-gadget -- gadget )
-    model>> [ '[ _ $title ] try ] <pane-control> ;
+    horizontal <track> swap model>> 
+    [ [ '[ _ $title ] try ] <pane-control> 1 track-add ]
+    [ <active/inactive> { 5 0 } <border> f track-add ] bi ;
 
 : add-help-header ( track -- track )
     dup <help-header> { 3 3 } <border>
@@ -152,6 +158,16 @@ M: browser-gadget focusable-child* search-field>> ;
     <world-attributes>
         "Browser" >>title
     open-status-window ;
+
+! skov
+! : (browser-window) ( topic -- )
+!     <browser-gadget>
+!     <world-attributes>
+!         "Browser" >>title
+!         { windowed double-buffered multisampled
+!           T{ samples f 4 } T{ sample-buffers f 1 } }
+!         >>pixel-format-attributes
+!     open-status-window ;
 
 : browser-window ( -- )
     "help.home" (browser-window) ;
@@ -261,19 +277,5 @@ browser-gadget "fonts" f {
     { T{ key-down f ${ os macosx? M+ C+ ? } "-" } com-font-size-minus }
     { T{ key-down f ${ os macosx? M+ C+ ? } "0" } com-font-size-normal }
 } define-command-map
-
-: <help-header> ( browser-gadget -- gadget )
-    horizontal <track> swap model>> 
-    [ [ '[ _ $title ] try ] <pane-control> 1 track-add ]
-    [ <active/inactive> { 5 0 } <border> f track-add ] bi ;
-
-: (browser-window) ( topic -- )
-    <browser-gadget>
-    <world-attributes>
-        "Browser" >>title
-        { windowed double-buffered multisampled
-          T{ samples f 4 } T{ sample-buffers f 1 } }
-        >>pixel-format-attributes
-    open-status-window ;
 
 MAIN: browser-window
