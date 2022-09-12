@@ -255,7 +255,6 @@ PRIVATE>
 !             [ drop dup add-thumb-to-elevator 1 track-add ]
 !         } cleave ;
 
-! skov
 ! M: slider pref-dim*
 !     [ slider-enabled? [ { 16 16 } ] [ { 0 0 } ] if ]
 !     [ drop { 0 0 } ]

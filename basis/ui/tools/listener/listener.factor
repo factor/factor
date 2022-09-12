@@ -555,6 +555,9 @@ listener-gadget "fonts" f {
     { T{ key-down f ${ os macosx? M+ C+ ? } "0" } com-font-size-normal }
 } define-command-map
 
+: show-listener ( -- ) [ border? ] find-window [ raise-window ] [ environment-window ] if* ;
+: listener-window ( -- ) environment-window ;
+
 USE: lists.lazy
 USE: math.trig
 

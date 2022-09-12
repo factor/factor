@@ -6,8 +6,8 @@ ui.gadgets ui.gadgets.borders ui.gadgets.buttons
 ui.gadgets.buttons.round ui.gadgets.icons ui.gadgets.labels
 ui.gadgets.packs ui.gestures ui.pens.gradient-rounded
 ui.pens.tile ui.tools.environment.cell
-ui.gadgets.tools.environment.navigation.dot-pattern
-ui.tools.environment.theme ui.tools.environment ui.tools.environment.tree ;
+ui.tools.environment.navigation.dot-pattern
+ui.tools.environment.theme ui.tools.environment.tree ;
 FROM: models => change-model ;
 IN: ui.tools.environment.navigation
 
