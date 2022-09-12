@@ -5,7 +5,7 @@ definitions.icons effects hashtables help.stylesheet help.topics
 io io.styles kernel make math namespaces present prettyprint
 prettyprint.stylesheet quotations see sequences
 sequences.private sets sorting splitting strings urls vocabs
-words words.symbol  ;
+words words.symbol ui.tools.environment.tree.help-tree ; 
 FROM: prettyprint.sections => with-pprint ;
 IN: help.markup
 

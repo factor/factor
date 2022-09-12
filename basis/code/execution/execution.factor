@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs classes.parser classes.tuple code
 combinators combinators.smart compiler.units debugger effects io
-io.streams.string kernel listener locals locals.rewrite.closures
+io.streams.string kernel listener locals locals.rewrite
 locals.types math math.statistics namespaces quotations
 sequences sequences.deep sets splitting ui.gadgets.panes
 vocabs.parser ;

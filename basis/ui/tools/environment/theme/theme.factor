@@ -35,17 +35,4 @@ CONSTANT: faded-text-colour COLOR: gray2
 : with-background ( gadget -- gadget )
     content-background-colour <solid> >>interior ;
 
-: nearest-color ( hex -- color value )
-    unclip drop hex>
-    named-colors
-    [ dup named-color color>hex ] map>alist
-    [ second unclip drop hex> number>string
-      [ second unclip drop hex> number>string ] dip
-      human<=>
-    ] sort
-    [ second unclip drop hex> over > ] map-find
-    2nip  [ first ] keep second 
-;
-    
-: nc ( hex -- ) nearest-color . com-copy-object ; 
     
