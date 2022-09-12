@@ -5,7 +5,7 @@ combinators kernel listener locals memory models namespaces
 sequences ui ui.commands ui.gadgets ui.gadgets.scrollers
 ui.gadgets.status-bar ui.gadgets.tracks ui.gadgets.worlds
 ui.gestures ui.pixel-formats ui.tools.browser ui.tools.common
-ui.gadgets.tools.environment.cell ui.gadgets.tools.environment.navigation
+ui.tools.environment.cell ui.tools.environment.navigation
 ui.tools.environment.theme ;
 FROM: models => change-model ;
 IN: ui.tools.environment

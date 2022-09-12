@@ -1,6 +1,6 @@
 ! Copyright (C) 2005, 2011 Slava Pestov, Daniel Ehrenberg.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors kernel kernel.private math math.order combinators.smart
+USING: accessors kernel kernel.private math math.order
 math.private slots.private ;
 IN: sequences
 
@@ -1210,5 +1210,3 @@ PRIVATE>
         ] [ generic-flip ] if
     ] unless ;
 
-: special-produce ( initial pred: ( a -- ? ) body: ( b -- a ) -- seq )
-    [ [ preserving ] curry ] dip [ dup ] compose produce nip ; inline
