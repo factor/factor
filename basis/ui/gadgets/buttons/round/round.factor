@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays colors colors.gray kernel locals math
 math.order sequences ui.gadgets ui.gadgets.buttons combinators.smart
-ui.pens.gradient-rounded ;
+ui.pens.gradient-rounded ui.tools.environment.theme ;
 IN: ui.gadgets.buttons.round
 
 TUPLE: round-button < button ;

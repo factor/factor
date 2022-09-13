@@ -3,7 +3,7 @@
 USING: io.pathnames kernel literals memory namespaces sequences
 system tools.test ui ui.backend ui.commands ui.gestures
 ui.tools.browser ui.tools.button-list ui.tools.common
-ui.tools.error-list ui.tools.listener vocabs.refresh ;
+ui.tools.error-list ui.tools.listener vocabs.refresh ui.tools.environment ;
 IN: ui.tools
 
 \ refresh-all H{ { +nullary+ t } { +listener+ t } } define-command
@@ -43,10 +43,6 @@ tool "common" f {
 !     listener-window ;
 
 ! skov
-: ui-tools-main ( -- )
-    f ui-stop-after-last-window? set-global
-    environment-window ;
-
 : ui-tools-main ( -- )
     f ui-stop-after-last-window? set-global
     environment-window ;
