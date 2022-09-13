@@ -106,18 +106,18 @@ M: word valid-article? drop t ;
 
 M: word article-name name>> ;
 
-M: word article-title
-    dup [ parsing-word? ] [ symbol? ] bi or [
-        name>>
-    ] [
-        [ unparse ]
-        [ stack-effect [ effect>string " " prepend ] [ "" ] if* ] bi
-        append
-    ] if ;
+! M: word article-title
+!     dup [ parsing-word? ] [ symbol? ] bi or [
+!         name>>
+!     ] [
+!         [ unparse ]
+!         [ stack-effect [ effect>string " " prepend ] [ "" ] if* ] bi
+!         append
+!     ] if ;
 
 ! skov
-! M: word article-title
-!     dup [ parsing-word? ] [ symbol? ] bi or [ name>> ] [ unparse ] if ;
+M: word article-title
+    dup [ parsing-word? ] [ symbol? ] bi or [ name>> ] [ unparse ] if ;
 
 <PRIVATE
 
