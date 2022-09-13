@@ -76,7 +76,7 @@ ensure_program_installed() {
     if [[ $OS == macosx ]] ; then
         $ECHO "If you have Xcode 4.3 or higher installed, you must install the"
         $ECHO "Command Line Tools from Xcode Preferences > Downloads in order"
-        $ECHO "to build Factor."
+        $ECHO "to build Skov."
     fi
     exit_script 1;
 }
@@ -183,7 +183,7 @@ set_cc() {
         return
     fi
 
-    # gcc and g++ will fail to correctly build Factor on Cygwin
+    # gcc and g++ will fail to correctly build Skov on Cygwin
     test_programs_installed gcc g++
     if [[ $? -ne 0 ]] ; then
         [ -z "$CC" ] && CC=gcc
@@ -261,9 +261,9 @@ check_libraries() {
     esac
 }
 
-check_factor_exists() {
-    if [[ -d "factor" ]] ; then
-        $ECHO "A directory called 'factor' already exists."
+check_skov_exists() {
+    if [[ -d "skov" ]] ; then
+        $ECHO "A directory called 'skov' already exists."
         $ECHO "Rename or delete it and try again."
         exit_script 4
     fi
@@ -358,24 +358,24 @@ find_word_size_c() {
     echo "$WORD_OUT"
 }
 
-set_factor_binary() {
+set_skov_binary() {
     case $OS in
-        windows) FACTOR_BINARY=factor.com ;;
-        *) FACTOR_BINARY=factor ;;
+        windows) SKOV_BINARY=skov.com ;;
+        *) SKOV_BINARY=skov ;;
     esac
 }
 
-set_factor_library() {
+set_skov_library() {
     case $OS in
-        windows) FACTOR_LIBRARY=factor.dll ;;
-        macosx) FACTOR_LIBRARY=libfactor.dylib ;;
-        *) FACTOR_LIBRARY=libfactor.a ;;
+        windows) SKOV_LIBRARY=factor.dll ;;
+        macosx) SKOV_LIBRARY=libfactor.dylib ;;
+        *) SKOV_LIBRARY=libfactor.a ;;
     esac
 }
 
-set_factor_image() {
-    FACTOR_IMAGE=factor.image
-    FACTOR_IMAGE_FRESH=factor.image.fresh
+set_skov_image() {
+    SKOV_IMAGE=skov.image
+    SKOV_IMAGE_FRESH=skov.image.fresh
 }
 
 echo_build_info() {
@@ -386,9 +386,9 @@ echo_build_info() {
     $ECHO DEBUG=$DEBUG
     $ECHO REPRODUCIBLE=$REPRODUCIBLE
     $ECHO CURRENT_BRANCH=$CURRENT_BRANCH
-    $ECHO FACTOR_BINARY=$FACTOR_BINARY
-    $ECHO FACTOR_LIBRARY=$FACTOR_LIBRARY
-    $ECHO FACTOR_IMAGE=$FACTOR_IMAGE
+    $ECHO SKOV_BINARY=$SKOV_BINARY
+    $ECHO SKOV_LIBRARY=$SKOV_LIBRARY
+    $ECHO SKOV_IMAGE=$SKOV_IMAGE
     $ECHO MAKE_TARGET=$MAKE_TARGET
     $ECHO BOOT_IMAGE=$BOOT_IMAGE
     $ECHO MAKE_IMAGE_TARGET=$MAKE_IMAGE_TARGET
@@ -469,9 +469,9 @@ find_build_info() {
     set_cc
     find_word_size
     set_current_branch
-    set_factor_binary
-    set_factor_library
-    set_factor_image
+    set_skov_binary
+    set_skov_library
+    set_skov_image
     set_build_info
     set_downloader
     set_boot_image_vars
@@ -528,8 +528,8 @@ git_fetch() {
     fi
 }
 
-cd_factor() {
-    cd "factor"
+cd_skov() {
+    cd "skov"
     check_ret cd
 }
 
@@ -547,12 +547,12 @@ set_delete() {
     esac
 }
 
-backup_factor() {
-    $ECHO "Backing up factor..."
-    $COPY $FACTOR_BINARY $FACTOR_BINARY.bak
-    $COPY $FACTOR_LIBRARY $FACTOR_LIBRARY.bak
+backup_skov() {
+    $ECHO "Backing up skov..."
+    $COPY $SKOV_BINARY $SKOV_BINARY.bak
+    $COPY $SKOV_LIBRARY $SKOV_LIBRARY.bak
     $COPY $BOOT_IMAGE $BOOT_IMAGE.bak
-    $COPY $FACTOR_IMAGE $FACTOR_IMAGE.bak
+    $COPY $SKOV_IMAGE $SKOV_IMAGE.bak
     $ECHO "Done with backup."
 }
 
@@ -561,7 +561,7 @@ check_makefile_exists() {
         $ECHO ""
         $ECHO "***GNUmakefile not found***"
         $ECHO "You are likely in the wrong directory."
-        $ECHO "Run this script from your factor directory:"
+        $ECHO "Run this script from your skov directory:"
         $ECHO "     ./build.sh"
         exit_script 6
     fi
@@ -577,14 +577,14 @@ make_clean() {
     invoke_make clean
 }
 
-make_factor() {
-    $ECHO "Building factor with $NUM_CORES cores"
+make_skov() {
+    $ECHO "Building skov with $NUM_CORES cores"
     invoke_make CC=$CC CXX=$CXX $MAKE_TARGET -j$NUM_CORES
 }
 
-make_clean_factor() {
+make_clean_skov() {
     make_clean
-    make_factor
+    make_skov
 }
 
 current_git_branch() {
@@ -680,22 +680,22 @@ get_config_info() {
 }
 
 copy_fresh_image() {
-    $ECHO "Copying $FACTOR_IMAGE to $FACTOR_IMAGE_FRESH..."
-    $COPY $FACTOR_IMAGE $FACTOR_IMAGE_FRESH
+    $ECHO "Copying $SKOV_IMAGE to $SKOV_IMAGE_FRESH..."
+    $COPY $SKOV_IMAGE $SKOV_IMAGE_FRESH
 }
 
 bootstrap() {
-    ./$FACTOR_BINARY -i=$BOOT_IMAGE
-    check_ret "./$FACTOR_BINARY bootstrap failed"
+    ./$SKOV_BINARY -i=$BOOT_IMAGE
+    check_ret "./$SKOV_BINARY bootstrap failed"
     copy_fresh_image
 }
 
 install() {
-    check_factor_exists
+    check_skov_exists
     get_config_info
     git_clone
-    cd_factor
-    make_factor
+    cd_skov
+    make_skov
     set_boot_image_vars
     get_boot_image
     bootstrap
@@ -704,8 +704,8 @@ install() {
 update() {
     get_config_info
     git_fetch
-    backup_factor
-    make_clean_factor
+    backup_skov
+    make_clean_skov
 }
 
 download_and_bootstrap() {
@@ -715,18 +715,18 @@ download_and_bootstrap() {
 
 net_bootstrap_no_pull() {
     get_config_info
-    make_clean_factor
+    make_clean_skov
     download_and_bootstrap
 }
 
 refresh_image() {
-    ./$FACTOR_BINARY -e="USING: vocabs.loader vocabs.refresh system memory ; refresh-all save 0 exit"
-    check_ret factor
+    ./$SKOV_BINARY -e="USING: vocabs.loader vocabs.refresh system memory ; refresh-all save 0 exit"
+    check_ret skov
 }
 
 make_boot_image() {
-    ./$FACTOR_BINARY -run="bootstrap.image" "$MAKE_IMAGE_TARGET"
-    check_ret factor
+    ./$SKOV_BINARY -run="bootstrap.image" "$MAKE_IMAGE_TARGET"
+    check_ret skov
 }
 
 install_deps_apt() {
@@ -765,10 +765,10 @@ install_deps_macosx() {
 usage() {
     $ECHO "usage: $0 command [optional-target]"
     $ECHO "  install - git clone, compile, bootstrap"
-    $ECHO "  deps-apt - install required packages for Factor on Linux using apt"
-    $ECHO "  deps-pacman - install required packages for Factor on Linux using pacman"
-    $ECHO "  deps-dnf - install required packages for Factor on Linux using dnf"
-    $ECHO "  deps-pkg - install required packages for Factor on FreeBSD using pkg"
+    $ECHO "  deps-apt - install required packages for Skov on Linux using apt"
+    $ECHO "  deps-pacman - install required packages for Skov on Linux using pacman"
+    $ECHO "  deps-dnf - install required packages for Skov on Linux using dnf"
+    $ECHO "  deps-pkg - install required packages for Skov on FreeBSD using pkg"
     $ECHO "  deps-macosx - install git on MacOSX using port"
     $ECHO "  self-bootstrap - make local boot image, bootstrap"
     $ECHO "  self-update - git pull, recompile, make local boot image, bootstrap"
@@ -818,8 +818,8 @@ case "$1" in
     self-update) update; make_boot_image; bootstrap  ;;
     quick-update) update; refresh_image ;;
     update|latest) update; download_and_bootstrap ;;
-    compile) find_build_info; make_factor ;;
-    recompile) find_build_info; make_clean; make_factor ;;
+    compile) find_build_info; make_skov ;;
+    recompile) find_build_info; make_clean; make_skov ;;
     bootstrap) get_config_info; bootstrap ;;
     net-bootstrap) net_bootstrap_no_pull ;;
     make-target) FIND_MAKE_TARGET=true; ECHO=false; find_build_info; exit_script ;;

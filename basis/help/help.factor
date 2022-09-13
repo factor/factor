@@ -47,7 +47,19 @@ PRIVATE>
         ] { } map>assoc
     ] bi@ \ $inputs \ $outputs [ prefix ] bi-curry@ bi* 2array ;
 
-M: word word-help* stack-effect effect-help ;
+! M: word word-help* stack-effect effect-help ;
+
+! skov
+M: word word-help*
+    stack-effect [ in>> ] [ out>> ] bi [
+        [
+            dup pair? [
+                first2 dup effect? [ \ $quotation swap 2array ] when
+            ] [
+                object
+            ] if [ effect>string ] dip
+        ] { } map>assoc
+    ] bi@ [ \ $inputs prefix ] dip \ $outputs prefix 2array ;
 
 : $predicate ( element -- )
     { { "object" object } { "?" boolean } } $values
@@ -94,25 +106,42 @@ M: word valid-article? drop t ;
 
 M: word article-name name>> ;
 
+! M: word article-title
+!     dup [ parsing-word? ] [ symbol? ] bi or [
+!         name>>
+!     ] [
+!         [ unparse ]
+!         [ stack-effect [ effect>string " " prepend ] [ "" ] if* ] bi
+!         append
+!     ] if ;
+
+! skov
 M: word article-title
-    dup [ parsing-word? ] [ symbol? ] bi or [
-        name>>
-    ] [
-        [ unparse ]
-        [ stack-effect [ effect>string " " prepend ] [ "" ] if* ] bi
-        append
-    ] if ;
+    dup [ parsing-word? ] [ symbol? ] bi or [ name>> ] [ unparse ] if ;
 
 <PRIVATE
 
+! : (word-help) ( word -- element )
+!     [
+!         {
+!             [ \ $vocabulary swap 2array , ]
+!             [ word-help % ]
+!             [ \ $related swap 2array , ]
+!             [ dup global at [ get-global \ $value swap 2array , ] [ drop ] if ]
+!             [ \ $definition swap 2array , ]
+!         } cleave
+!     ] { } make ;
+
+! skov
 : (word-help) ( word -- element )
     [
         {
             [ \ $vocabulary swap 2array , ]
+            [ \ $graph swap 2array , ]
             [ word-help % ]
-            [ \ $related swap 2array , ]
             [ dup global at [ get-global \ $value swap 2array , ] [ drop ] if ]
             [ \ $definition swap 2array , ]
+            [ \ $related swap 2array , ]
         } cleave
     ] { } make ;
 
@@ -129,7 +158,10 @@ PRIVATE>
 
 M: generic article-content word-with-methods ;
 
-M: class article-content word-with-methods ;
+! M: class article-content word-with-methods ;
+
+! skov
+M: class article-content (word-help) ;
 
 M: word article-parent "help-parent" word-prop ;
 

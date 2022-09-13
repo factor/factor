@@ -5,7 +5,7 @@ definitions.icons effects hashtables help.stylesheet help.topics
 io io.styles kernel make math namespaces present prettyprint
 prettyprint.stylesheet quotations see sequences
 sequences.private sets sorting splitting strings urls vocabs
-words words.symbol ;
+words words.symbol ; 
 FROM: prettyprint.sections => with-pprint ;
 IN: help.markup
 
@@ -400,11 +400,23 @@ M: f ($instance) ($link) ;
     [ [ "None" write ] ($block) ]
     [ [ values-row ] map $table ] if-empty ;
 
-: $inputs ( element -- )
-    "Inputs" $heading ($values) ;
+! : $inputs ( element -- )
+!     "Inputs" $heading ($values) ;
 
+! skov
+: $inputs ( element -- )
+    "Inputs" $heading
+    [ [ "none" print ] ($block) ]
+    [ [ values-row ] map $table ] if-empty ;
+
+! : $outputs ( element -- )
+!     "Outputs" $heading ($values) ;
+
+! skov
 : $outputs ( element -- )
-    "Outputs" $heading ($values) ;
+    "Outputs" $heading
+    [ [ "none" print ] ($block) ]
+    [ [ values-row ] map $table ] if-empty ;
 
 : $values ( element -- )
     "Inputs and outputs" $heading ($values) ;
@@ -423,6 +435,10 @@ M: f ($instance) ($link) ;
     [ code-style get swap with-nesting ] ($block) ; inline
 
 : $see ( element -- ) check-first [ see* ] ($see) ;
+
+! skov
+! : $see ( element -- )
+!     check-first <definition-tree> nl output-stream get write-gadget ;
 
 : $synopsis ( element -- ) check-first [ synopsis write ] ($see) ;
 
@@ -509,3 +525,10 @@ M: array elements*
     [ [ <$link> ] [ definition-icon-path <$image> ] bi* swap ] assoc-map
     { f { $strong "Definition class" } } prefix
     $table ;
+
+! skov
+DEFER: <help-tree>
+DEFER: write-gadget
+: $graph ( element -- )
+    check-first <help-tree> nl nl output-stream get write-gadget ;
+

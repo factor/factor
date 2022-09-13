@@ -30,6 +30,9 @@ IN: bootstrap.syntax
     [ dup "syntax" lookup-word [ ] [ no-word-error ] ?if ] dip
     define-syntax ;
 
+: false ( -- false )  f ;
+: true ( -- true )  t ;
+
 [
     { "]" "}" ";" ">>" } [ define-delimiter ] each
 

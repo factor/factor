@@ -527,3 +527,4 @@ PRIVATE>
 
 : get-retainstack ( -- array )
     context retainstack-for ; inline
+

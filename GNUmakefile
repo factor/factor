@@ -1,7 +1,7 @@
 ifdef CONFIG
 	VERSION = 0.99
 	GIT_LABEL = $(shell echo `git describe --all`-`git rev-parse HEAD`)
-	BUNDLE = Factor.app
+	BUNDLE = Skov.app
 	DEBUG ?= 0
 	REPRODUCIBLE ?= 0
 
@@ -44,9 +44,9 @@ ifdef CONFIG
 		CFLAGS += -DFACTOR_REPRODUCIBLE
 	endif
 
-	ENGINE = $(DLL_PREFIX)factor$(DLL_SUFFIX)$(DLL_EXTENSION)
-	EXECUTABLE = factor$(EXE_SUFFIX)$(EXE_EXTENSION)
-	CONSOLE_EXECUTABLE = factor$(EXE_SUFFIX)$(CONSOLE_EXTENSION)
+	ENGINE = $(DLL_PREFIX)skov$(DLL_SUFFIX)$(DLL_EXTENSION)
+	EXECUTABLE = skov$(EXE_SUFFIX)$(EXE_EXTENSION)
+	CONSOLE_EXECUTABLE = skov$(EXE_SUFFIX)$(CONSOLE_EXTENSION)
 
 	DLL_OBJS = $(PLAF_DLL_OBJS) \
 		vm/aging_collector.o \
@@ -179,7 +179,7 @@ help:
 	@echo "SITE_CFLAGS=...  additional optimization flags"
 	@echo "X11=1  force link with X11 libraries instead of Cocoa (only on Mac OS X)"
 
-ALL = factor factor-ffi-test factor-lib
+ALL = skov factor-ffi-test factor-lib
 
 freebsd-x86-32:
 	$(MAKE) $(ALL) CONFIG=vm/Config.freebsd.x86.32
@@ -227,18 +227,18 @@ windows-x86-64:
 
 ifdef CONFIG
 
-macosx.app: factor
+macosx.app: skov
 	mkdir -p $(BUNDLE)/Contents/MacOS
 	mkdir -p $(BUNDLE)/Contents/Frameworks
-	mv $(EXECUTABLE) $(BUNDLE)/Contents/MacOS/factor
-	ln -s $(BUNDLE)/Contents/MacOS/factor ./factor
+	mv $(EXECUTABLE) $(BUNDLE)/Contents/MacOS/skov
+	ln -s $(BUNDLE)/Contents/MacOS/skov ./skov
 
 $(ENGINE): $(DLL_OBJS)
 	$(TOOLCHAIN_PREFIX)$(LINKER) $(ENGINE) $(DLL_OBJS)
 
 factor-lib: $(ENGINE)
 
-factor: $(EXE_OBJS) $(DLL_OBJS)
+skov: $(EXE_OBJS) $(DLL_OBJS)
 	$(TOOLCHAIN_PREFIX)$(CXX) -L. $(DLL_OBJS) \
 		$(CFLAGS) $(CXXFLAGS) -o $(EXECUTABLE) $(LIBS) $(EXE_OBJS)
 
@@ -281,7 +281,7 @@ clean:
 	rm -f factor.dll.lib
 	rm -f libfactor.*
 	rm -f libfactor-ffi-test.*
-	rm -f Factor.app/Contents/Frameworks/libfactor.dylib
+	rm -f Skov.app/Contents/Frameworks/libfactor.dylib
 
-.PHONY: factor factor-lib factor-console factor-ffi-test tags clean macosx.app
+.PHONY: skov factor-lib factor-console factor-ffi-test tags clean macosx.app
 .PHONY: linux-x86-32 linux-x86-64 linux-ppc-32 linux-ppc-64 linux-arm-64 freebsd-x86-32 freebsd-x86-64 macosx-x86-32 macosx-x86-64 macosx-x86-fat macosx-arm64 windows-x86-32 windows-x86-64
