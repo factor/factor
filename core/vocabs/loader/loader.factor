@@ -22,7 +22,7 @@ STARTUP-HOOK: [
 ]
 
 : add-vocab-root ( root -- )
-    trim-tail-separators dup vocab-roots get ?adjoin
+    absolute-path trim-tail-separators dup vocab-roots get ?adjoin
     [ add-vocab-root-hook get-global call( root -- ) ] [ drop ] if ;
 
 SYMBOL: root-cache
