@@ -53,7 +53,7 @@ CONSTANT: categories {
 MEMO: categories-map ( -- hashtable )
     categories H{ } zip-index-as ;
 
-CONSTANT: NUM-CHARS 0x2FA1E
+CONSTANT: NUM-CHARS 0x2FA25
 
 PRIVATE>
 

@@ -4,7 +4,7 @@
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
 <meta http-equiv="Content-Language" content="en-us">
-<link rel="stylesheet" href="http://www.unicode.org/reports/reports.css" type="text/css">
+<link rel="stylesheet" href="https://www.unicode.org/reports/reports-v2.css" type="text/css">
 <title>UCA Conformance Tests</title>
 </head>
 
@@ -12,9 +12,9 @@
 
 <table class="header">
   <tbody><tr>
-    <td class="icon"><a href="http://www.unicode.org">
-    <img alt="[Unicode]" src="http://www.unicode.org/webscripts/logo60s2.gif" align="middle" border="0" height="33" width="34"></a>&nbsp;&nbsp;<a class="bar" href="http://www.unicode.org/reports/tr10/">Unicode
-    Collation Algorithm</a></td>
+    <td class="icon"><a href="https://www.unicode.org">
+    <img alt="[Unicode]" src="https://www.unicode.org/webscripts/logo60s2.gif" align="middle" border="0" height="33" width="34"></a>&nbsp;&nbsp;
+    <a class="bar" href="https://www.unicode.org/reports/tr10/">Unicode Collation Algorithm</a></td>
   </tr>
   <tr>
     <td class="gray">&nbsp;</td>
@@ -22,9 +22,9 @@
 </tbody></table>
 <div class="body">
   <h1>Unicode® Collation Algorithm<br>Conformance Tests</h1>
-  <h2 align="center">Version 13.0.0<br>2020-02-12</h2>
+  <h2 align="center">Version 15.0.0<br>2022-08-12</h2>
 <p>The following files provide conformance tests for the Unicode Collation Algorithm
-  (<a href="http://www.unicode.org/reports/tr10/tr10-43.html">UTS #10: Unicode Collation Algorithm</a>).</p>
+  (<a href="https://www.unicode.org/reports/tr10/tr10-47.html">UTS #10: Unicode Collation Algorithm</a>).</p>
   <ul>
     <li>CollationTest_SHIFTED.txt</li>
     <li>CollationTest_NON_IGNORABLE.txt</li>
@@ -33,11 +33,27 @@
   </ul>
   <p>These files are large, and thus packaged in zip format to save download time.</p>
 
+  <blockquote>
+    <p><b>Note:</b> These files test the sort order of an untailored DUCET table.
+    If you are using an implementation of the
+    <a href="https://www.unicode.org/reports/tr35/tr35-collation.html#CLDR_Collation_Algorithm">CLDR Collation Algorithm</a>
+    with its <a href="https://www.unicode.org/reports/tr35/tr35-collation.html#Root_Collation">tailored root collation data</a>,
+    for example ICU or a library that uses ICU for collation,
+    then you need to test with files that reflect that sort order.
+    The CLDR collation conformance test files have
+    the same names (except for an added _CLDR infix)
+    and structures as the ones here for the DUCET.
+    You can find them in the <a href="https://github.com/unicode-org/cldr/tree/main/common/uca">CLDR GitHub repo in the folder “common/uca”</a>,
+    or in the <a href="https://www.unicode.org/Public/cldr/">CLDR data file download area</a>,
+    in the “cldr-common-*.zip” file, again in the folder “common/uca”.
+    Select the files for the version of CLDR that is used in the implementation.</p>
+  </blockquote>
+
 <h2>Format</h2>
   <p>There are four different files:</p>
   <ul>
     <li>The shifted vs non-ignorable files correspond to the two alternate
-      <a href="http://www.unicode.org/reports/tr10/tr10-43.html#Variable_Weighting">Variable Weighting</a> values.</li>
+      <a href="https://www.unicode.org/reports/tr10/tr10-47.html#Variable_Weighting">Variable Weighting</a> values.</li>
     <li>The SHORT versions omit the comments, for more compact storage.</li>
   </ul>
 <p>The format is illustrated by the following example:</p>
@@ -46,25 +62,20 @@
   After the hash mark is a comment. This comment is purely informational, and may change in the 
   future. Currently it consists of the characters of the sequence in parentheses,
   the name of the first code point, and a representation of 
-  the&nbsp; sort key for the sequence.</p>
+  the sort key for the sequence.</p>
   <p>The sort key representation is in square brackets. It uses a vertical bar for the ZERO 
   separator. Between the bars are the primary, secondary, tertiary, and quaternary weights (if any), 
   in hex.</p>
   <blockquote>
-    <table class="noborder" border="0" cellpadding="2" cellspacing="0">
-      <tbody><tr>
-        <th class="noborder" align="left" valign="top" width="1%"><b>Note:</b></th>
-        <td class="noborder" valign="top">The sort key is purely informational. UCA does <i>not</i> 
-        require the production of any particular sort key, as long as the results of comparisons 
-        match.</td>
-      </tr>
-    </tbody></table>
+    <p><b>Note:</b> The sort key is purely informational. UCA does <i>not</i>
+    require the production of any particular sort key, as long as the results of comparisons
+    match.</p>
   </blockquote>
 
   <h2>Testing</h2>
   <p>The files are designed so each line in the file will order as being greater than or equal to 
   the previous one, when using the UCA and the
-  <a href="http://www.unicode.org/reports/tr10/tr10-43.html#Default_Unicode_Collation_Element_Table">Default
+  <a href="https://www.unicode.org/reports/tr10/tr10-47.html#Default_Unicode_Collation_Element_Table">Default
   Unicode Collation Element Table</a>.
   A test program can read in each line, compare it to 
   the last line, and signal an error if order is not correct. The exact comparison that should be 
@@ -81,9 +92,6 @@
   <p>These files contain test cases that include ill-formed strings, with surrogate code points.
   Implementations that do not weight surrogate code points the same way as reserved code points
   may filter out such lines lines in the test cases, before testing for conformance.</p>
-  <blockquote>
-    <p><b>Note:</b> This test is only valid for an untailored DUCET table.</p>
-  </blockquote>
 
   <h2>Migration</h2>
   <h3>Tie-breaker</h3>
@@ -115,23 +123,23 @@
     <li>S2.1.1 loops over each of the following three characters C,
     but there is no table entry for any of those three S+C.
     In particular, there is no DUCET mapping for 0FB2+0F71
-    (see <i><a href="http://www.unicode.org/reports/tr10/tr10-43.html#Well_Formed_DUCET">Tibetan and
+    (see <i><a href="https://www.unicode.org/reports/tr10/tr10-47.html#Well_Formed_DUCET">Tibetan and
     Well-Formedness of DUCET</a></i>).</li>
     <li>The loop exits without finding any match beyond S=0FB2.</li>
   </ul>
 
   <p>See “Also note that the Algorithm employs two distinct contraction matching methods:”
   at the end of <i>Section 7.2,
-  <a href="http://www.unicode.org/reports/tr10/tr10-43.html#Step_2">Produce Collation Element Arrays</a></i>.</p>
+  <a href="https://www.unicode.org/reports/tr10/tr10-47.html#Step_2">Produce Collation Element Arrays</a></i>.</p>
 
   <hr width="50%">
-  <p class="copyright">© 2020 Unicode, Inc. All Rights Reserved.
+  <p class="copyright">© 2022 Unicode, Inc. All Rights Reserved.
   The Unicode Consortium makes no expressed or implied warranty 
   of any kind, and assumes no liability for errors or omissions. No liability 
   is assumed for incidental and consequential damages in connection with or arising 
   out of the use of the information or programs contained or accompanying this 
   technical report. The Unicode
-  <a href="http://www.unicode.org/copyright.html">Terms of Use</a> apply.
+  <a href="https://www.unicode.org/copyright.html">Terms of Use</a> apply.
   </p>
   <p class="copyright">Unicode and the Unicode logo are trademarks 
   of Unicode, Inc., and are registered in some jurisdictions.</p>

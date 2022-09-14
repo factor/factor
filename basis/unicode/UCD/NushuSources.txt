@@ -1,6 +1,6 @@
-# NushuSources-14.0.0.txt
-# Date: 2021-04-30, 23:59:00 GMT [KW]
-# © 2021 Unicode®, Inc.
+# NushuSources-15.0.0.txt
+# Date: 2022-05-03, 18:54:00 GMT [KW]
+# © 2022 Unicode®, Inc.
 # For terms of use, see https://www.unicode.org/terms_of_use.html
 #
 # Unicode Character Database

@@ -1,13 +1,13 @@
-# emoji-variation-sequences-14.0.0.txt
-# Date: 2021-06-08, 05:19:16 GMT
-# © 2021 Unicode®, Inc.
+# emoji-variation-sequences.txt
+# Date: 2022-05-13, 21:54:24 GMT
+# © 2022 Unicode®, Inc.
 # Unicode and the Unicode Logo are registered trademarks of Unicode, Inc. in the U.S. and other countries.
-# For terms of use, see http://www.unicode.org/terms_of_use.html
+# For terms of use, see https://www.unicode.org/terms_of_use.html
 #
 # Emoji Variation Sequences for UTS #51
-# Used with Emoji Version 14.0 and subsequent minor revisions (if any)
+# Used with Emoji Version 15.0 and subsequent minor revisions (if any)
 #
-# For documentation and usage, see http://www.unicode.org/reports/tr51
+# For documentation and usage, see https://www.unicode.org/reports/tr51
 #
 0023 FE0E  ; text style;  # (1.1) NUMBER SIGN
 0023 FE0F  ; emoji style; # (1.1) NUMBER SIGN
