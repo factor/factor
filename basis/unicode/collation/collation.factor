@@ -203,18 +203,16 @@ TUPLE: weight-levels primary secondary tertiary ignorable? ;
 fixup-ducet-for-tibetan
 
 : tangut-block? ( char -- ? )
-    ! Tangut Block, Tangut Components Block
     {
-        [ 0x17000 0x187FF between? ]
-        [ 0x18800 0x18AFF between? ]
-        [ 0x18D00 0x18D08 between? ]
+        [ 0x17000 0x18AFF between? ] ! Tangut and Tangut Components
+        [ 0x18D00 0x18D8F between? ] ! Tangut Supplement
     } 1|| ; inline
 
 : nushu-block? ( char -- ? )
-    0x1b170 0x1B2FB between? ; inline
+    0x1b170 0x1B2FF between? ; inline
 
 : khitan-block? ( char -- ? )
-    0x18b00 0x18cd5 between? ; inline
+    0x18b00 0x18cff between? ; inline
 
 ! https://wiki.computercraft.cc/Module:Unicode_data
 ! Unicode TR10 - Computing Implicit Weights
@@ -222,13 +220,15 @@ fixup-ducet-for-tibetan
     {
         { [ dup 0x03400 0x04DBF between? ] [ drop 0xFB80 ] } ! Extension A
         { [ dup 0x20000 0x2A6DF between? ] [ drop 0xFB80 ] } ! Extension B
-        { [ dup 0x2A700 0x2B738 between? ] [ drop 0xFB80 ] } ! Extension C
+        { [ dup 0x2A700 0x2B739 between? ] [ drop 0xFB80 ] } ! Extension C
         { [ dup 0x2B740 0x2B81D between? ] [ drop 0xFB80 ] } ! Extension D
         { [ dup 0x2B820 0x2CEA1 between? ] [ drop 0xFB80 ] } ! Extension E
         { [ dup 0x2CEB0 0x2EBE0 between? ] [ drop 0xFB80 ] } ! Extension F
         { [ dup 0x30000 0x3134A between? ] [ drop 0xFB80 ] } ! Extension G
-        { [ dup 0x03400 0x04DBF between? ] [ drop 0xFB40 ] } ! CJK
+        { [ dup 0x31350 0x323AF between? ] [ drop 0xFB80 ] } ! Extension H
+        { [ dup 0x2F800 0x2FA1D between? ] [ drop 0xFB80 ] } ! CJK Compatibility
         { [ dup 0x04E00 0x09FFF between? ] [ drop 0xFB40 ] } ! CJK
+        { [ dup 0x0F900 0x0FAD9 between? ] [ drop 0xFB40 ] } ! CJK
         [ drop 0xFBC0 ] ! Other
     } cond ;
 
