@@ -124,6 +124,7 @@ require-when-table [ V{ } clone ] initialize
 
 : (load-source-finish) ( vocab quote -- )
     [ +parsing+ >>source-loaded? ] dip
+    [ parse-file ] [ [ ] ] if*
     [ % ] [ call( -- ) ] if-bootstrapping
     +done+ >>source-loaded?
     load-conditional-requires ;
@@ -131,19 +132,15 @@ require-when-table [ V{ } clone ] initialize
 : load-source ( vocab -- )
     dup check-vocab-hook get call( vocab -- )
     [
-        +parsing+ >>source-loaded?
         dup vocab-source-path
-        [ parse-file ] [ [ ] ] if*
         (load-source-finish)
     ] [ ] [ f >>source-loaded? ] cleanup ;
 
 : load-overlay ( vocab -- )
     dup check-vocab-hook get call( vocab -- )
-    [ +parsing+ >>overlay-loaded?
-      dup vocab-overlay-path dup [
+    [ dup vocab-overlay-path dup [
           dup file-exists? [ 
-              dup "Overlay: " prepend print 
-              [ parse-file ] [ [ ] ] if*
+              "Overlay: " print 
               (load-source-finish)
           ] [ drop f >>overlay-loaded? drop ] if
       ] [  drop f >>overlay-loaded? drop ] if
