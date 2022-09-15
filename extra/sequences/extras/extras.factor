@@ -320,6 +320,18 @@ PRIVATE>
 : 0reduce ( seq quot: ( prev elt -- next ) -- result )
     [ 0 ] dip reduce ; inline
 
+: ?unclip ( seq -- rest/f first/f )
+    [ f f ] [ unclip ] if-empty ;
+
+: 1reduce ( seq quot: ( prev elt -- next ) -- result )
+    [ ?unclip ] dip reduce ; inline
+
+: reduce-of ( seq quot: ( prev elt -- next ) identity -- result )
+    swap reduce ; inline
+
+: accumulate-of ( seq quot: ( prev elt -- next ) identity -- result )
+    swap accumulate ; inline
+
 <PRIVATE
 
 : push-map-when* ( ..a elt quot: ( ..a elt -- ..b obj ? ) accum -- ..b )

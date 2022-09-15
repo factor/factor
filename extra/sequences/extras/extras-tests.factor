@@ -292,6 +292,14 @@ strings tools.test ;
 
 { 0 } [ { } [ + ] 0reduce ] unit-test
 { 107 } [ { 100 1 2 4 } [ + ] 0reduce ] unit-test
+{ 0 } [ { 100 1 2 4 } [ * ] 0reduce ] unit-test
+
+{ f } [ { } [ + ] 1reduce ] unit-test
+{ 107 } [ { 100 1 2 4 } [ + ] 1reduce ] unit-test
+{ 800 } [ { 100 1 2 4 } [ * ] 1reduce ] unit-test
+
+{ 800 } [ { 100 1 2 4 } [ * ] 1 reduce-of ] unit-test
+{ 800 { 1 100 100 200 } } [ { 100 1 2 4 } [ * ] 1 accumulate-of ] unit-test
 
 { { } } [ { } [ + ] 0accumulate ] unit-test
 { { 100 101 103 107 } } [ { 100 1 2 4 } [ + ] 0accumulate ] unit-test
