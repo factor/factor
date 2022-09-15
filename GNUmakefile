@@ -232,6 +232,8 @@ macosx.app: skov
 	mkdir -p $(BUNDLE)/Contents/Frameworks
 	mv $(EXECUTABLE) $(BUNDLE)/Contents/MacOS/skov
 	ln -s $(BUNDLE)/Contents/MacOS/skov ./skov
+	rm -f ./factor
+	ln -s ./skov ./factor
 
 $(ENGINE): $(DLL_OBJS)
 	$(TOOLCHAIN_PREFIX)$(LINKER) $(ENGINE) $(DLL_OBJS)
