@@ -38,6 +38,7 @@ build script:
 
 * Unix: `./build.sh update`
 * Windows: `build.cmd`
+* macOS: `./build.sh update`
 * M1 macOS: `arch -x86_64 ./build.sh update`
 
 or download the correct boot image for your system from
@@ -52,6 +53,9 @@ Now you should have a complete Factor system ready to run.
 Factor does not yet work on arm64 cpus. There is an arm64 assembler
 in `cpu.arm.assembler` and we are working on a port and also looking for
 contributors.
+
+### Xcode
+Checkout the `xcode` branch and open the **Xcode/Factor.xcodeproj** project to build and run the engine from Xcode debugger.
 
 More information on [building factor](https://concatenative.org/wiki/view/Factor/Building%20Factor)
 and [system requirements](https://concatenative.org/wiki/view/Factor/Requirements).

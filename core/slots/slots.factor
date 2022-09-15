@@ -40,8 +40,14 @@ M: object reader-quot
     dup object bootstrap-word eq?
     [ drop ] [ 1array [ declare ] curry compose ] if ;
 
+! : reader-word ( name -- word )
+!     ">>" append "accessors" create-word
+!     dup t "reader" set-word-prop ;
+
+! skov
 : reader-word ( name -- word )
-    ">>" append "accessors" create-word
+    [ ">>" append "accessors" create-word ]
+    [ " (accessor)" append >>name ] bi
     dup t "reader" set-word-prop ;
 
 : reader-props ( slot-spec -- assoc )
@@ -61,8 +67,14 @@ M: object reader-quot
         } 2cleave define-typecheck
     ] 2bi ;
 
+! : writer-word ( name -- word )
+!     "<<" append "accessors" create-word
+!     dup t "writer" set-word-prop ;
+
+! skov
 : writer-word ( name -- word )
-    "<<" append "accessors" create-word
+    [ "<<" append "accessors" create-word ]
+    [ " (writer)" append >>name ] bi
     dup t "writer" set-word-prop ;
 
 ERROR: bad-slot-value value class ;
@@ -104,8 +116,13 @@ M: object writer-quot
         } 2cleave define-typecheck
     ] 2bi ;
 
+! : setter-word ( name -- word )
+!     ">>" prepend "accessors" create-word ;
+
+! skov
 : setter-word ( name -- word )
-    ">>" prepend "accessors" create-word ;
+    [ ">>" prepend "accessors" create-word ]
+    [ " (mutator)" append >>name ] bi ;
 
 : define-setter ( name -- )
     dup setter-word dup deferred? [
@@ -113,8 +130,13 @@ M: object writer-quot
         ( object value -- object ) define-inline
     ] [ 2drop ] if ;
 
+! : changer-word ( name -- word )
+!     "change-" prepend "accessors" create-word ;
+
+! skov
 : changer-word ( name -- word )
-    "change-" prepend "accessors" create-word ;
+    [ "change-" prepend "accessors" create-word ]
+    [ "change " prepend >>name ] bi ;
 
 : define-changer ( name -- )
     dup changer-word dup deferred? [
@@ -269,3 +291,4 @@ M: slot-spec make-slot
 
 : slot-named ( name specs -- spec/f )
     slot-named* nip ;
+

@@ -14,7 +14,8 @@ ui.gestures ui.operations ui.pens.solid ui.theme
 ui.tools.browser ui.tools.common ui.tools.debugger
 ui.tools.error-list ui.tools.listener.completion
 ui.tools.listener.history ui.tools.listener.popups vocabs
-vocabs.loader vocabs.parser vocabs.refresh words ;
+vocabs.loader vocabs.parser vocabs.refresh words ui.gadgets.borders
+ui.tools.environment ui.tools.environment.theme ;
 IN: ui.tools.listener
 
 TUPLE: interactor < source-editor
@@ -243,8 +244,11 @@ M: listener-gadget focusable-child*
     <listener-gadget>
     dup "Listener" open-status-window ;
 
-: listener-window ( -- )
-    [ listener-window* drop ] with-ui ;
+! : listener-window ( -- )
+!     [ listener-window* drop ] with-ui ;
+
+! skov
+: listener-window ( -- ) environment-window ;
 
 \ listener-window H{ { +nullary+ t } } define-command
 
@@ -262,8 +266,11 @@ M: listener-gadget focusable-child*
 : get-listener ( -- listener )
     [ listener-gadget? ] (get-listener) ;
 
-: show-listener ( -- )
-    get-listener drop ;
+! : show-listener ( -- )
+!     get-listener drop ;
+
+! skov
+: show-listener ( -- ) [ border? ] find-window [ raise-window ] [ environment-window ] if* ;
 
 \ show-listener H{ { +nullary+ t } } define-command
 
@@ -391,6 +398,7 @@ M: interactor handle-gesture
 interactor "interactor" f {
     { T{ key-down f f "RET" } evaluate-input }
     { T{ key-down f { C+ } "d" } delete-next-character/eof }
+    { T{ key-down f { C+ } "k" } clear-editor }
 } define-command-map
 
 interactor "completion" f {
@@ -471,6 +479,8 @@ listener-gadget "scrolling"
 } define-command-map
 
 listener-gadget "multi-touch" f {
+    { left-action recall-previous }
+    { right-action recall-next }
     { up-action refresh-all }
 } define-command-map
 
@@ -491,6 +501,15 @@ M: listener-gadget graft*
 
 M: listener-gadget ungraft*
     [ com-end ] [ call-next-method ] bi ;
+
+<PRIVATE
+
+:: make-font-style ( family size -- assoc )
+    H{ } clone
+        family font-name pick set-at
+        size font-size pick set-at ;
+
+PRIVATE>
 
 :: set-listener-font ( family size -- )
     get-listener input>> :> interactor
@@ -532,3 +551,43 @@ listener-gadget "fonts" f {
     { T{ key-down f ${ os macosx? M+ C+ ? } "-" } com-font-size-minus }
     { T{ key-down f ${ os macosx? M+ C+ ? } "0" } com-font-size-normal }
 } define-command-map
+
+USE: lists.lazy
+USE: math.trig
+
+interactive-vocabs [ { 
+  "io.encodings.utf8"
+  "io.encodings.binary"
+  "io.encodings.ascii"
+  "io.binary"
+  "io.directories"
+  "io.directories.hierarchy"
+  "lists.lazy"
+  "splitting"
+  "math.functions"
+  "math.trig"
+  "math.vectors"
+  "math.intervals"
+  "math.statistics"
+  "math.parser"
+  "sequences.deep"
+  "sequences.extras"
+  "sequences.generalizations"
+  "binary-search"
+  "vectors"
+  "quotations"
+  "byte-arrays"
+  "deques"
+  "regexp"
+  "calendar"
+  "classes"
+  "unicode.case"
+  "unicode.categories"
+  "io.files.info"
+  "colors"
+  "colors.hex"
+  "timers"
+  "sets"
+  "globs"
+  "scratchpad"
+} append ] change-global

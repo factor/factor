@@ -12,3 +12,4 @@ IN: math.constants
 : single-epsilon ( -- epsilon ) 0x34000000 bits>float ; foldable
 : smallest-float ( -- x ) 0x1 bits>double ; foldable
 : largest-float ( -- x ) 0x7fefffffffffffff bits>double ; foldable
+: tau ( -- tau )  2 pi * ; inline

@@ -295,3 +295,7 @@ GENERIC: prev-float ( m -- n )
 
 : all-integers? ( ... n quot: ( ... i -- ... ? ) -- ... ? )
     [ 0 ] 2dip all-integers-from? ; inline
+
+: half ( x -- x/2 )  2 / ;
+
+: special-times ( initial n quot -- final )  times ; inline
