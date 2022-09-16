@@ -139,8 +139,8 @@ require-when-table [ V{ } clone ] initialize
 : load-overlay ( vocab -- )
     dup check-vocab-hook get call( vocab -- )
     [ dup vocab-overlay-path dup [
-          dup file-exists? [ 
-              "Overlay: " print 
+          dup file-exists? [
+              dup [ "Overlay: " over append print ] when
               (load-source-finish)
           ] [ drop f >>overlay-loaded? drop ] if
       ] [  drop f >>overlay-loaded? drop ] if
