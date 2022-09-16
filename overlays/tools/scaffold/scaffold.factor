@@ -1,4 +1,4 @@
-USING: arrays io io.encodings.utf8 io.files io.pathnames
+USING: arrays io io.encodings.utf8 io.files io.pathnames io.backend
 io.streams.string kernel namespaces sequences tools.scaffold.private ;
 
 IN: tools.scaffold
@@ -37,3 +37,9 @@ IN: tools.scaffold
         2drop
     ] if ;
 PRIVATE>
+
+: scaffold-overlays ( string -- )
+    "resource:overlays" swap scaffold-vocab-in ;
+
+: scaffold-my-work ( string -- )
+    "~/factorwork" normalize-path swap scaffold-vocab-in ;
