@@ -300,6 +300,9 @@ big-endian off
 ! # All arm.64 subprimitives
 {
     { c-to-factor [
+            ! Set up the datastack and retainstack registers
+            ! and jump into the quotation
+
 
             ! write()
             ! 68 X8 MOVwi64
@@ -444,6 +447,8 @@ big-endian off
 
 ! C to Factor entry point
 [
+
+    9999 BRK
     ! ! Optimizing compiler's side of callback accesses
     ! ! arguments that are on the stack via the frame pointer.
     ! ! On x86-32 fastcall, and x86-64, some arguments are passed
