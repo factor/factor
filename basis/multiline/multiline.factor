@@ -66,6 +66,8 @@ PRIVATE>
 
 SYNTAX: /* "*/" parse-multiline-string drop ;
 
+SYNTAX: (( "))" parse-multiline-string drop ;
+
 SYNTAX: [[ "]]" parse-multiline-string suffix! ;
 SYNTAX: [=[ "]=]" parse-multiline-string suffix! ;
 SYNTAX: [==[ "]==]" parse-multiline-string suffix! ;
