@@ -1,6 +1,5 @@
 ! Copyright (C) 2004, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-IN: math DEFER: <= DEFER: - ! for bootstrap
 USE: slots.private
 USE: kernel.private
 USE: math.private
@@ -306,9 +305,6 @@ M: object hashcode* 2drop 0 ; inline
 M: f hashcode* 2drop 31337 ; inline
 
 : hashcode ( obj -- code ) 3 swap hashcode* ; inline
-
-: recursive-hashcode ( n obj quot -- code )
-    pick 0 <= [ 3drop 0 ] [ [ 1 - ] 2dip call ] if ; inline
 
 GENERIC: equal? ( obj1 obj2 -- ? )
 
