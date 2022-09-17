@@ -1,9 +1,9 @@
 ! Copyright (C) 2016 Nicolas Pénet.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors code.execution combinators.smart help.topics
-kernel locals models ui.gadgets ui.gadgets.buttons.round
-ui.gadgets.packs ui.tools.environment.theme vocabs words ;
-IN: ui.gadgets.buttons.activate
+USING: accessors skov.basis.code.execution combinators.smart help.topics
+kernel locals models ui.gadgets skov.basis.ui.gadgets.buttons.round
+ui.gadgets.packs skov.basis.ui.tools.environment.theme vocabs words ;
+IN: skov.basis.ui.gadgets.buttons.activate
 
 : vocab/word? ( obj -- ? )
     [ vocab? ] [ [ link? ] [ name>> word? ] [ drop f ] smart-if ] bi or ;

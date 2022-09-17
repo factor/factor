@@ -4,7 +4,7 @@ USING: accessors code combinators combinators.smart effects
 kernel locals math math.parser quotations sequences splitting
 stack-checker strings vectors words ;
 FROM: code => call word ;
-IN: code.factor-abstraction
+IN: skov.basis.code.factor-abstraction
 
 :: call-from-factor ( factor-word -- call )
     call new factor-word name>> >>name factor-word >>target ;

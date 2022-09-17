@@ -4,7 +4,7 @@ USING: accessors assocs combinators fry kernel math math.order
 math.vectors models models.range ui.gadgets ui.gadgets.buttons
 ui.gadgets.icons ui.gadgets.tracks ui.gestures ui.pens
 ui.pens.image ui.pens.tile ui.theme.images ;
-IN: ui.gadgets.sliders
+IN: skov.basis.ui.gadgets.sliders
 
 TUPLE: slider < track elevator thumb saved line ;
 

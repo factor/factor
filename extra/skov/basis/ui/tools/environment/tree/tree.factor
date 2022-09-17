@@ -1,14 +1,17 @@
 ! Copyright (C) 2015-2017 Nicolas Pénet.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays code combinators.short-circuit kernel
-locals math math.order math.vectors models sequences splitting
-ui.gadgets ui.gadgets.borders ui.gadgets.buttons.round
-ui.gadgets.labels ui.gadgets.packs ui.gadgets.packs.private
-ui.gestures ui.pens.gradient-rounded ui.pens.solid
-ui.tools.environment.cell ui.tools.environment.tree ui.tools.environment.theme ;
-FROM: code => call ;
+USING: accessors arrays skov.basis.code combinators.short-circuit kernel
+locals math math.order math.vectors models sequences
+skov.basis.ui.tools.environment.cell
+skov.basis.ui.tools.environment.theme
+skov.basis.ui.tools.environment.tree splitting ui.gadgets
+ui.gadgets.borders skov.basis.ui.gadgets.buttons.round ui.gadgets.labels
+ui.gadgets.packs ui.gadgets.packs.private ui.gestures
+skov.basis.ui.pens.gradient-rounded ui.pens.solid
+skov.basis.ui.tools.environment.theme ;
+FROM: skov.basis.code => call ;
 FROM: models => change-model ;
-IN: ui.tools.environment.tree
+IN: skov.basis.ui.tools.environment.tree
 
 TUPLE: tree < pack ;
 TUPLE: tree-control < pack ;

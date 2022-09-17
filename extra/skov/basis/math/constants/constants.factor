@@ -1,7 +1,7 @@
 ! Copyright (C) 2004, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USE: math
-IN: math.constants
+IN: skov.basis.math.constants
 
 : e ( -- e ) 2.7182818284590452354 ; inline
 : euler ( -- gamma ) 0.57721566490153286060 ; inline

@@ -8,7 +8,7 @@ sequences.deep sequences.extras sets splitting strings
 ui.gadgets vectors vocabs.parser definitions ;
 QUALIFIED: vocabs
 QUALIFIED: words
-IN: code
+IN: skov.basis.code
 
 TUPLE: element < identity-tuple  name parent contents default-name target ;
 

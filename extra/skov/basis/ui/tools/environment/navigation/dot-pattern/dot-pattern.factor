@@ -1,9 +1,9 @@
 ! Copyright (C) 2015-2017 Nicolas Pénet.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: arrays accessors colors kernel locals math math.constants
-math.functions opengl.gl sequences ui.gadgets system
-ui.render ui.tools.environment.theme ;
-IN: ui.tools.environment.navigation.dot-pattern
+USING: accessors arrays colors kernel math math.functions opengl.gl
+sequences skov.basis.ui.pens.gradient-rounded.private
+skov.basis.ui.tools.environment.theme system ui.gadgets ui.render ;
+IN: skov.basis.ui.tools.environment.navigation.dot-pattern
 
 TUPLE: dot-pattern < gadget ;
 
