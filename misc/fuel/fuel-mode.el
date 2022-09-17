@@ -193,10 +193,12 @@ interacting with a factor listener is at your disposal.
   ("Eval region" ("\C-c\C-e\C-r" "\C-c\C-er")
    fuel-eval-region :enable mark-active)
   --
-  ("Edit word at point" ("\M-." "\C-c\C-e\C-d" "\C-c\C-ed")
-   fuel-edit-word-at-point :enable (symbol-at-point))
-  ("Edit word help" "\C-c\C-e\C-h"  fuel-add-help-word-template :enable (symbol-at-point))
-  ("Edit word..." ("\C-c\C-e\C-w" "\C-c\C-ew") fuel-edit-word)
+  ("Edit word or vocab at point..." ("\M-." "\C-c\C-e\C-d" "\C-c\C-ed")
+   fuel-edit-word-at-point)
+  ("Document word at point..." ("\C-c\C-e\C-c" "\C-c\C-ec" "\C-c\C-c\C-c")
+   fuel-edit-word-doc-at-point)
+  ("Add help template..." ("\C-c\C-e\C-t" "\C-c\C-et")
+   fuel-add-help-word-template)
   ("Edit vocab..." ("\C-c\C-e\C-v" "\C-c\C-ev") fuel-edit-vocabulary)
   ("Jump back" "\M-," fuel-edit-pop-edit-word-stack)
   --
