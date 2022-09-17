@@ -6,7 +6,6 @@ alien.strings arrays combinators.short-circuit environment
 io.backend io.files io.files.info io.pathnames kernel sequences
 specialized-arrays splitting system system-info.windows
 windows.kernel32 ;
-FROM: alien.c-types => ushort ;
 SPECIALIZED-ARRAY: ushort
 IN: alien.libraries.finder.windows
 
