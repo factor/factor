@@ -4,7 +4,6 @@ USING: accessors alien alien.c-types alien.data alien.libraries
 alien.syntax classes.struct combinators endian
 kernel locals math sequences specialized-arrays
 system unix.time unix.types ;
-FROM: alien.c-types => short ;
 IN: libusb
 
 << "libusb" {

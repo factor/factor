@@ -4,7 +4,6 @@ USING: accessors alien alien.c-types alien.data alien.syntax
 byte-arrays classes.struct grouping init kernel literals math
 math.parser sequences system vocabs.parser windows.com.syntax
 windows.errors windows.kernel32 windows.types ;
-FROM: alien.c-types => short ;
 IN: windows.winsock
 
 <<

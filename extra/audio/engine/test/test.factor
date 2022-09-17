@@ -3,7 +3,6 @@
 USING: accessors timers audio.engine audio.loader calendar
 destructors io kernel math math.functions ranges specialized-arrays
 sequences random math.vectors ;
-FROM: alien.c-types => short ;
 SPECIALIZED-ARRAY: short
 IN: audio.engine.test
 

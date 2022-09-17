@@ -4,7 +4,6 @@
 ! This file is based on the gl.h that comes with xorg-x11 6.8.2
 USING: alien alien.c-types alien.libraries alien.syntax
 io.encodings.ascii kernel opengl.gl.extensions system ;
-FROM: alien.c-types => short ;
 IN: opengl.gl
 
 TYPEDEF: uint    GLenum

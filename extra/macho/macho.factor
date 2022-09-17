@@ -5,7 +5,6 @@ alien.syntax classes classes.struct combinators
 combinators.short-circuit io.encodings.ascii io.encodings.string
 kernel literals make math sequences specialized-arrays typed
 io.mmap formatting splitting endian ;
-FROM: alien.c-types => short ;
 IN: macho
 
 ! FFI data
