@@ -1,7 +1,8 @@
 USING: accessors alien alien.accessors arrays assocs byte-arrays
 continuations debugger grouping io.streams.string kernel
 kernel.private literals locals.backend math memory namespaces
-prettyprint sequences sequences.private tools.test words ;
+prettyprint sequences sequences.private tools.test vocabs.loader
+words ;
 IN: kernel.tests
 
 { 0 } [ f size ] unit-test
@@ -207,3 +208,5 @@ IN: kernel.tests
 
 { 2 3 4 1 } [ 1 2 3 4 roll ] unit-test
 { 1 2 3 4 } [ 2 3 4 1 -roll ] unit-test
+
+{ } [ "kernel" reload ] long-unit-test

@@ -131,6 +131,9 @@ GENERIC: (log2) ( x -- n ) foldable
 
 PRIVATE>
 
+: recursive-hashcode ( n obj quot -- code )
+    pick 0 <= [ 3drop 0 ] [ [ 1 - ] 2dip call ] if ; inline
+
 ERROR: log2-expects-positive x ;
 
 : log2 ( x -- n )
