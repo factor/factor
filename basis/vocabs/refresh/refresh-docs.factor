@@ -1,4 +1,4 @@
-USING: help.markup help.syntax kernel strings ;
+USING: bootstrap.image help.markup help.syntax kernel strings ;
 IN: vocabs.refresh
 
 HELP: source-modified?
@@ -10,7 +10,9 @@ HELP: refresh
 { $description "Reloads source files and documentation belonging to loaded vocabularies whose names are prefixed by " { $snippet "prefix" } " which have been modified on disk." } ;
 
 HELP: refresh-all
-{ $description "Reloads source files and documentation for all loaded vocabularies which have been modified on disk." } ;
+{ $description "Reloads source files and documentation for all loaded vocabularies which have been modified on disk." }
+{ $notes
+"After a fresh bootstrap if " { $link refresh-all } " reloads any vocabularies, then the boot image was outdated. You can generate a new boot image with " { $link make-my-image } " and bootstrap again." } ;
 
 { refresh refresh-all } related-words
 
