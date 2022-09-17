@@ -14,7 +14,7 @@ HELP: DESTRUCTOR:
 { $examples
   "Suppose you are writing a binding to the GLib library, which as a " { $snippet "g_object_unref" } " function. Then you can define the function and destructor like so,"
   { $code
-    "FUNCTION: void g_object_unref ( gpointer object ) ;"
+    "FUNCTION: void g_object_unref ( gpointer object )"
     "DESTRUCTOR: g_object_unref"
   }
   "Now, memory management becomes easier:"
