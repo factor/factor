@@ -90,6 +90,14 @@ IN: redis
 : redis-info ( -- response ) info flush read-response ;
 : redis-monitor ( -- response ) monitor flush read-response ;
 
+! Lua
+: redis-script-load ( script -- script ) script-load flush read-response ;
+: redis-script-exists ( sequence -- sequence ) script-exists flush read-response ;
+: redis-script-flush ( -- ) script-flush flush check-response ;
+: redis-script-kill ( -- ) script-kill flush check-response ;
+: redis-script-eval ( script keys args -- result ) script-eval flush read-response ;
+: redis-script-evalsha ( sha keys args -- result ) script-evalsha flush read-response ;
+
 ! Redis object
 TUPLE: redis host port encoding password ;
 
