@@ -1,5 +1,5 @@
-USING: accessors colors kernel locals math opengl opengl.gl
-sequences ui.pens skov.basis.ui.tools.environment.theme system ;
+USING: accessors colors kernel math opengl opengl.gl sequences
+skov.basis.ui.tools.environment.theme ui.pens ;
 IN: skov.basis.ui.pens.title-gradient
 
 TUPLE: title-gradient  colors foreground selected? ;

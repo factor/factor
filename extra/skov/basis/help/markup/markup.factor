@@ -7,7 +7,7 @@ prettyprint.stylesheet quotations see sequences
 sequences.private sets sorting splitting strings urls vocabs
 words words.symbol ; 
 FROM: prettyprint.sections => with-pprint ;
-IN: help.markup
+IN: skov.basis.help.markup
 
 PREDICATE: simple-element < array
     [ t ] [ first word? not ] if-empty ;

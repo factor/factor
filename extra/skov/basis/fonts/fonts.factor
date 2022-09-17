@@ -1,7 +1,7 @@
 ! Copyright (C) 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors colors combinators kernel math namespaces ;
-IN: fonts
+IN: skov.basis.fonts
 
 CONSTANT: default-serif-font-name "serif"
 CONSTANT: default-sans-serif-font-name "Linux Biolinum O" inline

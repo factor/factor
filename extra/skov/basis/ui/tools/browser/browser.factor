@@ -10,8 +10,8 @@ ui.gadgets.glass ui.gadgets.panes ui.gadgets.scrollers
 ui.gadgets.status-bar ui.gadgets.toolbar ui.gadgets.tracks
 ui.gadgets.viewports ui.gadgets.worlds ui.gestures ui.pens.solid
 ui.theme ui.tools.browser.history ui.tools.browser.popups
-ui.tools.common unicode vocabs ui.gadgets.buttons.activate ;
-IN: ui.tools.browser
+ui.tools.common unicode vocabs skov.basis.ui.gadgets.buttons.activate ;
+IN: skov.basis.ui.tools.browser
 
 TUPLE: browser-gadget < tool history scroller search-field popup ;
 

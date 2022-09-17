@@ -1,19 +1,16 @@
 ! Copyright (C) 2015-2017 Nicolas Pénet.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays code code.execution colors 
-combinators combinators.short-circuit combinators.smart fry
-kernel listener locals locals math math.order math.statistics
-math.vectors models namespaces sequences splitting system
-ui.commands ui.gadgets ui.gadgets.borders
-ui.gadgets.buttons.round ui.gadgets.editors
-ui.gadgets.editors.private ui.gadgets.frames ui.gadgets.grids
-ui.gadgets.labels ui.gadgets.packs ui.gadgets.worlds ui.gestures
-ui.pens.gradient-rounded ui.pens.solid ui.pens.tile
-ui.pens.title-gradient ui.render ui.text ui.tools.browser
-ui.tools.environment.theme ;
-FROM: code => call ;
+USING: accessors arrays colors combinators combinators.short-circuit
+combinators.smart kernel listener math models sequences
+skov.basis.code skov.basis.code.execution
+skov.basis.ui.gadgets.buttons.round
+skov.basis.ui.pens.gradient-rounded skov.basis.ui.pens.title-gradient
+skov.basis.ui.tools.browser skov.basis.ui.tools.environment.theme
+ui.commands ui.gadgets ui.gadgets.borders ui.gadgets.editors
+ui.gadgets.labels ui.gadgets.packs ui.gestures ;
+FROM: skov.basis.code => call ;
 FROM: models => change-model ;
-IN: ui.tools.environment.cell
+IN: skov.basis.ui.tools.environment.cell
 
 CONSTANT: cell-height 24
 CONSTANT: min-cell-width 30

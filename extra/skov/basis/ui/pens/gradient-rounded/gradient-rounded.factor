@@ -3,7 +3,7 @@ combinators.short-circuit combinators.smart kernel locals math
 math.functions math.order ranges math.vectors opengl.gl
 sequences ui.gadgets ui.gadgets.packs ui.pens ui.pens.caching
 ui.pens.gradient system ;
-IN: ui.pens.gradient-rounded
+IN: skov.basis.ui.pens.gradient-rounded
 
 TUPLE: gradient-shape < caching-pen  colors foreground shape last-vertices last-colors ;
 TUPLE: gradient-squircle < gradient-shape ;

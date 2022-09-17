@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors assocs colors kernel math math.parser sequences
 sorting sorting.human ui.pens.solid ;
-IN: ui.tools.environment.theme
+IN: skov.basis.ui.tools.environment.theme
 
 CONSTANT: content-background-colour COLOR: #002b36
 

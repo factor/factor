@@ -1,7 +1,7 @@
 ! Copyright (C) 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors kernel math opengl sequences ui.images ui.pens colors ;
-IN: ui.pens.image
+IN: skov.basis.ui.pens.image
 
 ! Image pen
 TUPLE: image-pen image fill? ;

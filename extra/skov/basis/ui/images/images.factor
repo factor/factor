@@ -3,7 +3,7 @@
 USING: accessors assocs cache combinators images images.loader
 kernel math namespaces opengl opengl.textures sequences
 splitting system ui.gadgets.worlds vocabs math.vectors colors ;
-IN: ui.images
+IN: skov.basis.ui.images
 
 TUPLE: image-name path ;
 

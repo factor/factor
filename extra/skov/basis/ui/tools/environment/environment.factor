@@ -1,11 +1,14 @@
 ! Copyright (C) 2015-2017 Nicolas Pénet.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors kernel memory models namespaces ui ui.gadgets
+USING: accessors kernel memory models namespaces skov.basis.code
+skov.basis.code.import-export skov.basis.ui.tools.browser
+skov.basis.ui.tools.environment.navigation
+skov.basis.ui.tools.environment.theme ui ui.gadgets
 ui.gadgets.scrollers ui.gadgets.status-bar ui.gadgets.tracks
-ui.gadgets.worlds ui.gestures ui.pixel-formats ui.tools.browser
-ui.tools.common ;
+ui.gadgets.worlds ui.gestures ui.pixel-formats ui.tools.common ;
+
 FROM: models => change-model ;
-IN: ui.tools.environment
+IN: skov.basis.ui.tools.environment
 
 TUPLE: environment < tool ;
 

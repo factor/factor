@@ -1,15 +1,15 @@
 ! Copyright (C) 2015-2017 Nicolas Pénet.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors code code.execution colors combinators
-combinators.smart kernel locals models sequences system
-ui.gadgets ui.gadgets.borders ui.gadgets.buttons
-ui.gadgets.buttons.round ui.gadgets.icons ui.gadgets.labels
-ui.gadgets.packs ui.gestures ui.pens.gradient-rounded
-ui.pens.tile ui.tools.environment.cell ui.tools.environment.tree 
-ui.tools.environment.navigation.dot-pattern
-ui.tools.environment.theme ui.tools.environment ;
+USING: accessors combinators combinators.smart kernel models sequences
+skov.basis.code skov.basis.code.execution
+skov.basis.ui.pens.gradient-rounded
+skov.basis.ui.tools.environment.cell
+skov.basis.ui.tools.environment.navigation.dot-pattern
+skov.basis.ui.tools.environment.theme
+skov.basis.ui.tools.environment.tree ui.gadgets ui.gadgets.borders
+ui.gadgets.labels ui.gadgets.packs ui.gestures ;
 FROM: models => change-model ;
-IN: ui.tools.environment.navigation
+IN: skov.basis.ui.tools.environment.navigation
 
 TUPLE: navigation < pack ;
 
