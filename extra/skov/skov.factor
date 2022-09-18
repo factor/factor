@@ -14,3 +14,8 @@ skov.basis.ui.tools.environment.theme ui.gadgets ui.gadgets.buttons
 ui.gadgets.packs ui.pens ui.pens.caching vocabs words ;
 IN: skov
 
+: ui-tools-main ( -- )
+    f ui-stop-after-last-window? set-global
+    environment-window ;
+
+MAIN: ui-tools-main
