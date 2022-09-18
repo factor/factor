@@ -7,8 +7,7 @@ skov.basis.ui.tools.environment.theme
 skov.basis.ui.tools.environment.tree splitting ui.gadgets
 ui.gadgets.borders skov.basis.ui.gadgets.buttons.round ui.gadgets.labels
 ui.gadgets.packs ui.gadgets.packs.private ui.gestures
-skov.basis.ui.pens.gradient-rounded ui.pens.solid
-skov.basis.ui.tools.environment.theme ;
+skov.basis.ui.pens.gradient-rounded ui.pens.solid ;
 FROM: skov.basis.code => call ;
 FROM: models => change-model ;
 IN: skov.basis.ui.tools.environment.tree

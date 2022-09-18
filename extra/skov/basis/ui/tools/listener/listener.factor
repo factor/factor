@@ -1,22 +1,21 @@
 ! Copyright (C) 2005, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs calendar combinators
-combinators.short-circuit concurrency.flags
-concurrency.mailboxes continuations destructors documents
-documents.elements fonts hashtables help help.markup help.tips
-io io.styles kernel lexer listener literals math math.vectors
-models models.arrow models.delay namespaces parser prettyprint
-sequences source-files.errors splitting strings system threads
-ui ui.commands ui.gadgets ui.gadgets.editors ui.gadgets.glass
-ui.gadgets.labeled ui.gadgets.panes ui.gadgets.scrollers
-ui.gadgets.status-bar ui.gadgets.toolbar ui.gadgets.tracks
-ui.gestures ui.operations ui.pens.solid ui.theme
-ui.tools.browser ui.tools.common ui.tools.debugger
-ui.tools.error-list ui.tools.listener.completion
+combinators.short-circuit concurrency.flags concurrency.mailboxes
+continuations destructors documents documents.elements fonts
+hashtables help help.markup help.tips io io.styles kernel lexer
+listener literals math math.vectors models models.arrow models.delay
+namespaces parser prettyprint sequences source-files.errors splitting
+strings system threads ui ui.commands ui.gadgets ui.gadgets.borders
+ui.gadgets.editors ui.gadgets.glass ui.gadgets.labeled
+ui.gadgets.panes ui.gadgets.scrollers ui.gadgets.status-bar
+ui.gadgets.toolbar ui.gadgets.tracks ui.gestures ui.operations
+ui.pens.solid ui.theme ui.tools.browser ui.tools.common
+ui.tools.debugger ui.tools.error-list ui.tools.listener.completion
 ui.tools.listener.history ui.tools.listener.popups vocabs
-vocabs.loader vocabs.parser vocabs.refresh words ui.gadgets.borders
-ui.tools.environment ui.tools.environment.theme ;
-IN: ui.tools.listener
+vocabs.loader vocabs.parser vocabs.refresh words
+skov.basis.ui.tools.environment ;
+IN: skov.basis.ui.tools.listener
 
 TUPLE: interactor < source-editor
     output history flag mailbox thread waiting token-model word-model popup ;
@@ -240,7 +239,7 @@ M: listener-gadget focusable-child*
 : listener-busy? ( listener -- ? )
     input>> interactor-busy? ;
 
-: listener-window* ( -- listener )
+: skov-window* ( -- listener )
     <listener-gadget>
     dup "Listener" open-status-window ;
 
@@ -248,9 +247,9 @@ M: listener-gadget focusable-child*
 !     [ listener-window* drop ] with-ui ;
 
 ! skov
-: listener-window ( -- ) environment-window ;
+: skov-window ( -- ) environment-window ;
 
-\ listener-window H{ { +nullary+ t } } define-command
+\ skov-window H{ { +nullary+ t } } define-command
 
 : (get-listener) ( quot -- listener )
     find-window [
@@ -261,7 +260,7 @@ M: listener-gadget focusable-child*
             [ input>> scroll>caret ]
             [ input>> request-focus ] tri
         ] bi
-    ] [ listener-window* ] if* ; inline
+    ] [ skov-window* ] if* ; inline
 
 : get-listener ( -- listener )
     [ listener-gadget? ] (get-listener) ;
@@ -270,9 +269,9 @@ M: listener-gadget focusable-child*
 !     get-listener drop ;
 
 ! skov
-: show-listener ( -- ) [ border? ] find-window [ raise-window ] [ environment-window ] if* ;
+: show-skov ( -- ) [ border? ] find-window [ raise-window ] [ environment-window ] if* ;
 
-\ show-listener H{ { +nullary+ t } } define-command
+\ show-skov H{ { +nullary+ t } } define-command
 
 : get-ready-listener ( -- listener )
     [

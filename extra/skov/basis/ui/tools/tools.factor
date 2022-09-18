@@ -4,7 +4,7 @@ USING: io.pathnames kernel literals memory namespaces sequences
 system tools.test ui ui.backend ui.commands ui.gestures
 ui.tools.browser ui.tools.button-list ui.tools.common
 ui.tools.error-list ui.tools.listener vocabs.refresh ui.tools.environment ;
-IN: ui.tools
+IN: skov.basis.ui.tools
 
 \ refresh-all H{ { +nullary+ t } { +listener+ t } } define-command
 \ refresh-and-test-all H{ { +nullary+ t } { +listener+ t } } define-command
