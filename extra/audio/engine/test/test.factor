@@ -1,9 +1,9 @@
 ! Copyright (C) 2009 Joe Groff.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors timers audio.engine audio.loader calendar
-destructors io kernel math math.functions ranges specialized-arrays
-sequences random math.vectors ;
-SPECIALIZED-ARRAY: alien.c-types:short
+USING: accessors alien.c-types audio.engine audio.loader
+calendar destructors io kernel math math.functions math.vectors
+random ranges sequences specialized-arrays timers ;
+SPECIALIZED-ARRAY: short
 IN: audio.engine.test
 
 TUPLE: noise-generator ;
