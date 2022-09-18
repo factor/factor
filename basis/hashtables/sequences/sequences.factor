@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license
 
 USING: accessors assocs hashtables hashtables.wrapped kernel
-parser sequences vocabs.loader ;
+math parser sequences vocabs.loader ;
 
 IN: hashtables.sequences
 
