@@ -1,7 +1,7 @@
 ! Copyright (C) 2007, 2010 Eduardo Cavazos, Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs combinators continuations
-definitions io io.files io.pathnames kernel make namespaces
+definitions io io.directories io.files io.pathnames kernel make namespaces
 parser sequences sets splitting strings vocabs words ;
 IN: vocabs.loader
 
@@ -158,6 +158,11 @@ require-when-table [ V{ } clone ] initialize
     ] when drop ;
 
 PRIVATE>
+
+: load-overlays ( -- )
+    "resource:overlays" recursive-directory-files
+    [ "." split last "factor" = ] filter
+    [ run-file ] each ;
 
 : require-when ( if then -- )
     over [ lookup-vocab ] all? [

@@ -316,8 +316,8 @@ PRIVATE>
     "resource:work" swap scaffold-vocab-in  ;
 
 : scaffold-overlay ( string -- )
-    "resource:overlay" swap scaffold-vocab-in  ;
-
+    "resource:overlays" swap scaffold-vocab-in  ;
+ 
 : scaffold-vocab ( string -- )
     "Choose a vocabulary root:" vocab-roots get
     '[ [ "Use " prepend ] keep ] { } map>assoc throw-restarts
