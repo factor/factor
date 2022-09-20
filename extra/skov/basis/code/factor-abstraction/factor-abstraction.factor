@@ -1,9 +1,9 @@
 ! Copyright (C) 2016-2017 Nicolas Pénet.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors code combinators combinators.smart effects
+USING: accessors skov.basis.code combinators combinators.smart effects
 kernel locals math math.parser quotations sequences splitting
 stack-checker strings vectors words ;
-FROM: code => call word ;
+FROM: skov.basis.code => call word ;
 IN: skov.basis.code.factor-abstraction
 
 :: call-from-factor ( factor-word -- call )

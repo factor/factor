@@ -1,8 +1,8 @@
 USING: accessors arrays assocs colors combinators
 combinators.short-circuit combinators.smart kernel locals math
-math.functions math.order math.ranges math.vectors opengl.gl
+math.functions math.order ranges math.vectors opengl.gl
 sequences ui.gadgets ui.gadgets.packs ui.pens ui.pens.caching
-skov.basis.ui.pens.gradient system ;
+ui.pens.gradient system ;
 IN: skov.basis.ui.pens.gradient-rounded
 
 TUPLE: gradient-shape < caching-pen  colors foreground shape last-vertices last-colors ;

@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs classes classes.error combinators
 combinators.short-circuit continuations debugger effects fry
-generic help.crossref help.markup help.stylesheet help.topics io
+generic help.crossref skov.basis.help.markup help.stylesheet help.topics io
 io.styles kernel make namespaces prettyprint sequences sets
 sorting vocabs words words.alias words.symbol ;
 IN: skov.basis.help
