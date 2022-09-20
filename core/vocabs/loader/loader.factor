@@ -137,6 +137,7 @@ require-when-table [ V{ } clone ] initialize
     ] [ ] [ f >>source-loaded? ] cleanup ;
 
 : load-overlay ( vocab -- )
+    "overlays" get-global [
     dup check-vocab-hook get call( vocab -- )
     [ dup vocab-overlay-path dup [
           dup file-exists? [
@@ -144,7 +145,8 @@ require-when-table [ V{ } clone ] initialize
               (load-source-finish)
           ] [ drop f >>overlay-loaded? drop ] if
       ] [  drop f >>overlay-loaded? drop ] if
-    ] [ ] [ f >>overlay-loaded? ] cleanup ;
+    ] [ ] [ f >>overlay-loaded? ] cleanup ]
+    [ drop ] if ; 
 
 : load-docs ( vocab -- )
     load-help? get [
