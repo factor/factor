@@ -6,7 +6,7 @@ sequences sorting system ;
 IN: contributors
 
 CONSTANT: aliases {
-    { "Alexander Ilin" "ajsoft@yandex.ru" "alex.ilin@protonmail.com" }
+    { "Alexander Ilin" "Alexander Iljin" }
     { "Björn Lindqvist" "bjourne@gmail.com" }
     { "Cat Stevens" "catb0t" }
     { "Daniel Ehrenberg" "Dan Ehrenberg" }
