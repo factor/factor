@@ -12,7 +12,7 @@ document.addEventListener('keydown', function (event) {
             if (input !== document.activeElement) {
                 event.preventDefault();
                 setTimeout(function() {
-                    input.focus().select()
+                    input.focus();
                 }, 0);
             }
         }
