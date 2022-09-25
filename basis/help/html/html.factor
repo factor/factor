@@ -101,7 +101,7 @@ M: pathname url-of
                     if (input !== document.activeElement) {
                         event.preventDefault();
                         setTimeout(function() {
-                            input.focus().select()
+                            input.focus();
                         }, 0);
                     }
                 }
