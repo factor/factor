@@ -9,6 +9,7 @@ document.addEventListener('keydown', function (event) {
     if (event.code == 'Slash') {
         let input = document.getElementById('search');
         if (input !== document.activeElement) {
+            event.preventDefault();
             setTimeout(function() {
                 input.focus().select()
             }, 0);
