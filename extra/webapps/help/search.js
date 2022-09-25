@@ -4,3 +4,14 @@ window.onload = function() {
         radios[0].checked = true;
     }
 }
+
+document.addEventListener('keydown', function (event) {
+    if (event.code == 'Slash') {
+        let input = document.getElementById('search');
+        if (input !== document.activeElement) {
+            setTimeout(function() {
+                input.focus().select()
+            }, 0);
+        }
+    }
+});

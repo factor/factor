@@ -91,12 +91,31 @@ M: pathname url-of
         />
     XML] ;
 
+: help-script ( -- xml )
+    [XML
+        <script type="text/javascript">
+        document.addEventListener('keydown', function (event) {
+            if (event.code == 'Slash') {
+                let input = document.getElementById('search');
+                if (input !== document.activeElement) {
+                    setTimeout(function() {
+                        input.focus().select()
+                    }, 0);
+                }
+            }
+        });
+        </script>
+     XML] ;
+
+: help-header ( stylesheet -- xml )
+    help-stylesheet help-meta swap help-script 3append ;
+
 : help-nav ( -- xml )
     "conventions" >link topic>filename
     [XML
         <nav>
             <form method="get" action="/search" style="float: right;">
-                <input placeholder="Search" name="search" type="text" tabindex="1" />
+                <input placeholder="Search" id="search" name="search" type="text" tabindex="1" />
                 <input type="submit" value="Go" tabindex="1" />
             </form>
             <a href="https://factorcode.org">
@@ -250,7 +269,7 @@ M: pathname url-of
         [ print-topic ] with-html-writer
         css-styles-to-classes cache-images
         "resource:extra/websites/factorcode/favicon.ico" dup file-name ?copy-file
-        [ help-stylesheet help-meta prepend help-nav ] dip help-footer
+        [ help-header help-nav ] dip help-footer
         [XML <-><div class="page"><-><-></div> XML]
     ] bi simple-page ;
 
