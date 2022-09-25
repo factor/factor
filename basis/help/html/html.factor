@@ -98,7 +98,7 @@ M: pathname url-of
             if (event.code == 'Slash') {
                 let input = document.getElementById('search');
                 if (input != null) {
-                    if input !== document.activeElement) {
+                    if (input !== document.activeElement) {
                         event.preventDefault();
                         setTimeout(function() {
                             input.focus().select()
