@@ -1,5 +1,5 @@
-USING: accessors assocs classes classes.algebra compiler.units
-eval generic.single kernel math strings tools.test words ;
+USING: accessors assocs classes classes.algebra classes.predicate compiler.units
+eval generic.single hash-sets kernel math sequences strings tools.test words ;
 IN: classes.predicate.tests
 
 PREDICATE: negative < integer 0 < ;
@@ -86,3 +86,17 @@ M: change-meta-test-predicate change-meta-test length>> ;
 { f } [ change-meta-test-predicate class? ] unit-test
 
 { t } [ \ change-meta-test "methods" word-prop assoc-empty? ] unit-test
+
+! Testing DISJOINT specification
+PREDICATE: num42 < fixnum 42 = ;
+PREDICATE: num47 < fixnum 47 = ;
+PREDICATE: numx < fixnum 0 > ;
+
+DISJOINT: num42 num47 ;
+{ f } [ num42 numx check-disjoint-classes ] unit-test
+{ t } [ num42 num47 check-disjoint-classes ] unit-test
+
+{ t } [ num42 number classes-intersect? ] unit-test
+{ f } [ num42 string classes-intersect? ] unit-test
+{ t } [ num42 numx classes-intersect? ] unit-test
+{ f } [ num42 num47 classes-intersect? ] unit-test
