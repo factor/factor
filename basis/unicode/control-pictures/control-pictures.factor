@@ -12,7 +12,14 @@ IN: unicode.control-pictures
         [ ]
     } cond ;
 
+: char>control-picture* ( char -- char' )
+    char>control-picture
+    dup 0x20 = [ drop 0x2420 ] when ;
+
 PRIVATE>
 
 : control-pictures ( string -- string )
     [ char>control-picture ] map ;
+
+: control-pictures* ( string -- string )
+    [ char>control-picture* ] map ;
