@@ -1,4 +1,4 @@
-! Copyright (C) 2017 Pi.
+! Copyright (C) 2022 Alex Maestas.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: combinators kernel math sequences ;
 IN: unicode.control-pictures
