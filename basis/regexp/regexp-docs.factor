@@ -90,7 +90,7 @@ ARTICLE: "regexp-syntax" "Regular expression syntax"
     { { $snippet "\\z" } "End of text" }
     { { $snippet "\\Z" } "Almost end of text: only thing after is newline" }
     { { $snippet "\\b" } "Word boundary (by Unicode word boundaries)" }
-    { { $snippet "\\b" } "Not word boundary (by Unicode word boundaries)" } }
+    { { $snippet "\\B" } "Not word boundary (by Unicode word boundaries)" } }
 { $heading "Greedy quantifiers" }
 "It is possible to have a regular expression which matches a variable number of occurrences of another regular expression."
 { $table
