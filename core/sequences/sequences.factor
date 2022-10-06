@@ -33,7 +33,7 @@ M: sequence shorten 2dup length < [ set-length ] [ 2drop ] if ; inline
 
 : when-empty ( seq quot: ( ..a -- ..b ) -- ) [ drop ] if-empty ; inline
 
-: unless-empty ( seq quot -- ) [ ] swap if-empty ; inline
+: unless-empty ( seq quot: ( ..a seq -- ..b ) -- ) [ ] swap if-empty ; inline
 
 : delete-all ( seq -- ) 0 swap set-length ;
 
