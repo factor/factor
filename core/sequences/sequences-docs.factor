@@ -92,7 +92,9 @@ HELP: if-empty
 
 HELP: when-empty
 { $values
-     { "seq" sequence } { "quot" "the first quotation of an " { $link if-empty } } }
+    { "seq" sequence } { "quot" "the first quotation of an " { $link if-empty } }
+    { "seq/obj" object }
+}
 { $description "Makes an implicit check if the sequence is empty. An empty sequence is dropped and the " { $snippet "quot" } " is called." }
 { $examples "This word is equivalent to " { $link if-empty } " with an empty second quotation:"
     { $example
