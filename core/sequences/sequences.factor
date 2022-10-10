@@ -31,7 +31,7 @@ M: sequence shorten 2dup length < [ set-length ] [ 2drop ] if ; inline
 : if-empty ( ..a seq quot1: ( ..a -- ..b ) quot2: ( ..a seq -- ..b ) -- ..b )
     [ dup empty? ] [ [ drop ] prepose ] [ ] tri* if ; inline
 
-: when-empty ( ... seq quot: ( ... -- obj ) -- ... seq/obj ) [ ] if-empty ; inline
+: when-empty ( ... seq quot: ( ... -- ... obj ) -- ... seq/obj ) [ ] if-empty ; inline
 : unless-empty ( ... seq quot: ( ... seq -- ... ) -- ... ) [ ] swap if-empty ; inline
 
 : delete-all ( seq -- ) 0 swap set-length ;
