@@ -454,10 +454,10 @@ PRIVATE>
     [ setup-3each ] dip compose ; inline
 
 : element/index ( i/f seq -- elt/f i/f )
-    '[ [ _ nth ] [ f ] if* ] keep ;
+    '[ [ _ nth ] [ f ] if* ] keep ; inline
 
 : index/element ( i/f seq -- i/f elt/f )
-    dupd '[ _ nth ] [ f ] if* ;
+    dupd '[ _ nth ] [ f ] if* ; inline
 
 : (accumulate) ( seq identity quot -- identity seq quot' )
     swapd [ keepd ] curry ; inline
