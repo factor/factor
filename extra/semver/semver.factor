@@ -26,10 +26,14 @@ TUPLE: semver
     { prerelease initial: "" }
     { build initial: "" } ;
 
+ERROR: malformed-semver parts ;
+: check-semver-parts ( seq -- seq )
+    dup length 3 <= [ malformed-semver ] unless ;
+
 : parse-semver ( str -- semver )
     "+" split1
     [ "-" split1 ] dip
-    [ "." split [ string>number ] map first3 ] 2dip
+    [ "." split [ string>number ] map check-semver-parts first3 ] 2dip
     semver boa ;
 
 : <semver> ( str -- semver ) parse-semver ; inline

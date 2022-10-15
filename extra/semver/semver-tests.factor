@@ -152,3 +152,11 @@ CONSTANT: semver-gt-comparisons {
 { "2.0.0" } [ "1.2.3" <semver> semver-inc-major semver>string ] unit-test
 
 { "1.2.3-erg.0" } [ "1.2.3" <semver> "erg" semver-inc-prerelease-id semver>string ] unit-test
+
+{ T{ semver f 2 7 2 "pre" "build" } } [ "2.7.2-pre+build" parse-semver ] unit-test
+{ T{ semver f 2 7 2 "pre" f } } [ "2.7.2-pre" parse-semver ] unit-test
+{ T{ semver f 2 7 2 f "build" } } [ "2.7.2+build" parse-semver ] unit-test
+
+[ "2.7.2.1+build" parse-semver ] [ malformed-semver? ] must-fail-with
+[ "2.7.2.+build" parse-semver ] [ malformed-semver? ] must-fail-with
+[ "2.7.2." parse-semver ] [ malformed-semver? ] must-fail-with
