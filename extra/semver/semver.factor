@@ -26,11 +26,14 @@ TUPLE: semver
     { prerelease initial: "" }
     { build initial: "" } ;
 
-: parse-semver ( str -- semver )
-    "+" split1
-    [ "-" split1 ] dip
-    [ "." split [ string>number ] map first3 ] 2dip
-    semver boa ;
+EBNF: parse-semver [=[
+    nr      = [0-9]+ => [[ string>number ]]
+    part    = nr | [-0-9A-Za-z]+ => [[ >string ]]
+    pre     = '-'~ part
+    bld     = '+'~ part
+    version = nr '.'~ nr '.'~ nr pre? bld?
+              => [[ [ first4 ] [ 4 swap nth ] bi semver boa ]]
+]=]
 
 : <semver> ( str -- semver ) parse-semver ; inline
 
