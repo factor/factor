@@ -1,4 +1,4 @@
-USING: alien alien.libraries alien.c-types alien.data alien.syntax
+USING: alien alien.libraries alien.c-types alien.data alien.syntax endian
        kernel io.encodings.string byte-arrays sequences combinators syntax
        compression.bzip3.ffi locals math math.order summary pair-rocket ;
 IN: compression.bzip3
@@ -7,6 +7,7 @@ ERROR: invalid-block-size size ;
 M: invalid-block-size summary drop "Block size must be between 65 KiB and 511 MiB" ;
 ERROR: internal-error msg ;
 M: internal-error summary drop "bzip3: Internal Error" ;
+
 <PRIVATE
 CONSTANT: dsize 1048576 ! placeholder block size
 
@@ -35,13 +36,14 @@ ALIAS: version bz3_version
   out-size <byte-array> :> out
   block-size/f [ dsize ] unless* validate-block-size
   byte-array out in-size out-size size_t <ref> bz3_compress
-  dup 0 = [ drop out ] [ throw-internal-error ] if
+  dup 0 = [ drop in-size 8 >be out append ] [ throw-internal-error ] if
 ;
 
 :: decompress ( byte-array -- byte-array' )
-  byte-array length :> in-size
-  in-size bz3_bound :> out-size
+  byte-array 8 cut-slice :> ( head in )
+  in length :> in-size
+  head be> :> out-size
   out-size <byte-array> :> out
-  byte-array out in-size out-size size_t <ref> bz3_decompress
+  in out in-size out-size size_t <ref> bz3_decompress
   dup 0 = [ drop out ] [ throw-internal-error ] if
 ;
