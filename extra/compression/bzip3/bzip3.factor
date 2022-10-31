@@ -1,5 +1,5 @@
 USING: alien alien.libraries alien.c-types alien.data alien.syntax endian
-       kernel io.encodings.string byte-arrays sequences combinators syntax
+       kernel io.encodings.string byte-arrays sequences combinators
        compression.bzip3.ffi locals math math.order summary pair-rocket ;
 IN: compression.bzip3
 
