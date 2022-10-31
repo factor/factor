@@ -4,7 +4,7 @@ USING: byte-arrays help.markup help.syntax kernel strings ;
 IN: compression.bzip3
 
 HELP: compress
-{ $values byte-array: byte-array block-size/f: POSTPONE: integer/f byte-array: byte-array }
+{ $values byte-array: byte-array block-size/f: { $maybe "integer" } byte-array: byte-array }
 { $description Takes a { $link "byte-array" } and block size, and pushes a compressed byte array from bzip3. } ;
 
 HELP: decompress

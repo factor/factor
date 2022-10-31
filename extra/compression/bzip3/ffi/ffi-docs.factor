@@ -1,6 +1,6 @@
 ! Copyright (C) 2022 Your name.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: help.markup help.syntax kernel math ;
+USING: classes.struct help.markup help.syntax kernel math ;
 IN: compression.bzip3.ffi
 
 HELP: bz3_bound
