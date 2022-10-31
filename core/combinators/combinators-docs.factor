@@ -346,7 +346,9 @@ HELP: case
 { $description
     "Compares " { $snippet "obj" } " against the first element of every " { $link pair } ", evaluating the first element if it is a " { $link callable } ". If a pair matches, " { $snippet "obj" } " is removed from the stack and the second element of that pair (which must be a " { $link quotation } ") is " { $link call } "ed."
     $nl
-    "If there is no case matching " { $snippet "obj" } ", the default case is taken. If the last element of " { $snippet "assoc" } " is a quotation, the quotation is called with " { $snippet "obj" } " on the stack. Otherwise, a " { $link no-case } " error is raised."
+    "If the last element of the " { $snippet assoc } " is a quotation, that quotation is the default case. The default case is called with the " { $snippet "obj" } " on the stack, if there is no other case matching " { $snippet obj } "."
+    $nl
+    "If all the cases have failed and there is no default case to execute, a " { $link no-case } " error is raised."
     $nl
     "The following two phrases are equivalent:"
     { $code "{ { X [ Y ] } { Z [ T ] } } case" }
