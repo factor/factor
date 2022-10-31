@@ -113,7 +113,7 @@ DEFER: HELP{
 
 : help-text? ( word -- ? )
     {
-        $description $snippet $emphasis $strong $url $heading
+        $description $snippet $emphasis $strong $heading
         $subheading $syntax $class-description
         $error-description $var-description $contract $notes
         $curious $deprecated $errors $side-effects $content
@@ -121,7 +121,7 @@ DEFER: HELP{
     } member-eq? ;
 
 : help-code? ( word -- ? )
-    { $example $unchecked-example $code } member-eq? ;
+    { $example $unchecked-example $code $url } member-eq? ;
 
 : help-values? ( word -- ? )
     { $values $inputs $outputs } member-eq? ;
