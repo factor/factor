@@ -121,7 +121,7 @@ DEFER: HELP{
     } member-eq? ;
 
 : help-code? ( word -- ? )
-    { $example $unchecked-example $code $url } member-eq? ;
+    { $example $unchecked-example $code } member-eq? ;
 
 : help-values? ( word -- ? )
     { $values $inputs $outputs } member-eq? ;
