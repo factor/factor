@@ -1,5 +1,5 @@
 USING: arrays help.markup help.syntax kernel math multiline
-quotations sequences ;
+quotations sequences vectors assocs strings ;
 IN: sequences.extras
 
 HELP: pad-center
