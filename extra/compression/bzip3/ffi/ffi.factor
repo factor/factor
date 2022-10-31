@@ -14,15 +14,6 @@ IN: compression.bzip3.ffi
 
 LIBRARY: bzip3
 
-TYPEDEF: uint8_t u8
-TYPEDEF: uint16_t u16
-TYPEDEF: uint32_t u32
-TYPEDEF: uint64_t u64
-TYPEDEF: int8_t s8
-TYPEDEF: int16_t s16
-TYPEDEF: int32_t s32
-
-
 ! typedef struct {
 !     /* Input/output. */
 !     u8 *in_queue, *out_queue;
