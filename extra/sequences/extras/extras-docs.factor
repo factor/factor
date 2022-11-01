@@ -565,21 +565,21 @@ HELP: ?trim
     { "seq" sequence } { "quot" quotation }
     { "seq/newseq" object }
 }
-{ $description "Similar to " { $link "trim" } ", but sequences that do not require trimming are left as is." } ;
+{ $description "Similar to " { $link trim } ", but sequences that do not require trimming are left as is." } ;
 
 HELP: ?trim-head
 { $values
     { "seq" sequence } { "quot" quotation }
     { "seq/newseq" object }
 }
-{ $description "Similar to " { $link "trim-head" } ", but sequences that do not require trimming are left as is." } ;
+{ $description "Similar to " { $link trim-head } ", but sequences that do not require trimming are left as is." } ;
 
 HELP: ?trim-tail
 { $values
     { "seq" sequence } { "quot" quotation }
     { "seq/newseq" object }
 }
-{ $description "Similar to " { $link "trim-tail" } ", but sequences that do not require trimming are left as is." } ;
+{ $description "Similar to " { $link trim-tail } ", but sequences that do not require trimming are left as is." } ;
 
 HELP: all-longest
 { $values
@@ -759,14 +759,14 @@ HELP: filter-index
     { "seq" sequence } { "quot" quotation }
     { "seq'" sequence }
 }
-{ $description "Perform a " { $link "filter" } " on the given sequence, with the index provided as an additional argument to " { $snippet "quot" } "." } ;
+{ $description "Perform a " { $link filter } " on the given sequence, with the index provided as an additional argument to " { $snippet "quot" } "." } ;
 
 HELP: filter-index-as
 { $values
     { "seq" sequence } { "quot" quotation } { "exemplar" object }
     { "seq'" sequence }
 }
-{ $description "Perform a " { $link "filter-as" } " on the given sequence, with the index provided as an additional argument to " { $snippet "quot" } ". Outputs a sequence of the same class as " { $snippet "exemplar" } "." } ;
+{ $description "Perform a " { $link filter-as } " on the given sequence, with the index provided as an additional argument to " { $snippet "quot" } ". Outputs a sequence of the same class as " { $snippet "exemplar" } "." } ;
 
 HELP: filter-length
 { $values
@@ -794,7 +794,7 @@ HELP: find-last-index
     { "seq" sequence } { "quot" quotation }
     { "i" integer } { "elt" object }
 }
-{ $description "A simpler variant of " { $link "find-last-index-from" } ", with starting index set to 0." } ;
+{ $description "A simpler variant of " { $link find-last-index-from } ", with starting index set to 0." } ;
 
 HELP: find-last-index-from
 { $values
@@ -829,14 +829,14 @@ HELP: head*-as
     { "seq" sequence } { "n" integer } { "exemplar" object }
     { "seq'" sequence }
 }
-{ $description "A version of " { $link "head*" } " where " { $snippet "seq'" } " is the same class as " { $snippet "exemplar" } "." } ;
+{ $description "A version of " { $link head* } " where " { $snippet "seq'" } " is the same class as " { $snippet "exemplar" } "." } ;
 
 HELP: head-as
 { $values
     { "seq" sequence } { "n" integer } { "exemplar" object }
     { "seq'" sequence }
 }
-{ $description "A version of " { $link "head" } " where " { $snippet "seq'" } " is the same class as " { $snippet "exemplar" } "." } ;
+{ $description "A version of " { $link head } " where " { $snippet "seq'" } " is the same class as " { $snippet "exemplar" } "." } ;
 
 HELP: heap>pairs
 { $values
@@ -864,27 +864,27 @@ HELP: infimum-by*
     { "seq" sequence } { "quot" quotation }
     { "i" integer } { "elt" object }
 }
-{ $description "A variant of " { $link "infimum-by" } " that pushes the index of the least element along with the least element." } ;
+{ $description "A variant of " { $link infimum-by } " that pushes the index of the least element along with the least element." } ;
 
 HELP: insert-nth!
 { $values
     { "elt" object } { "n" integer } { "seq" sequence }
 }
-{ $description "A variant of " { $link "insert-nth" } " that modifies " { $snippet "seq" } " in place." } ;
+{ $description "A variant of " { $link insert-nth } " that modifies " { $snippet "seq" } " in place." } ;
 
 HELP: interleaved
 { $values
     { "seq" sequence } { "glue" object }
     { "newseq" sequence }
 }
-{ $description "Insert " { $link "glue" } " between every pair of elements in " { $snippet "seq" } "." } ;
+{ $description "Insert " { $link glue } " between every pair of elements in " { $snippet "seq" } "." } ;
 
 HELP: interleaved-as
 { $values
     { "seq" sequence } { "glue" object } { "exemplar" object }
     { "newseq" sequence }
 }
-{ $description "Insert " { $link "glue" } " between every pair of elements in " { $snippet "seq" } ". Resulting sequence will be the same class as " { $snippet "exemplar" } "." } ;
+{ $description "Insert " { $link glue } " between every pair of elements in " { $snippet "seq" } ". Resulting sequence will be the same class as " { $snippet "exemplar" } "." } ;
 
 HELP: iterate-heap-while
 { $values
@@ -919,76 +919,76 @@ HELP: map-concat
     { "seq" sequence } { "quot" quotation }
     { "newseq" sequence }
 }
-{ $description "Perform a " { $link "map" } " on the given sequence with " { $snippet "quot" } ", then perform a " { $link "concat" } " on the result." } ;
+{ $description "Perform a " { $link map } " on the given sequence with " { $snippet "quot" } ", then perform a " { $link concat } " on the result." } ;
 
 HELP: map-concat-as
 { $values
     { "seq" sequence } { "quot" quotation } { "exemplar" object }
     { "newseq" sequence }
 }
-{ $description "A version of " { $link "map-concat" } " where the resultant sequence has the same class as " { $snippet "exemplar" } } ;
+{ $description "A version of " { $link map-concat } " where the resultant sequence has the same class as " { $snippet "exemplar" } } ;
 
 HELP: map-filter
 { $values
     { "seq" sequence } { "map-quot" object } { "filter-quot" object }
     { "subseq" object }
 }
-{ $description "Perform a " { $link "map" } " on the given sequence with " { $snippet "map-quot" } ", then perform a " { $link "filter" } " on the result with " { $snippet "filter-quot" } "." } ;
+{ $description "Perform a " { $link map } " on the given sequence with " { $snippet "map-quot" } ", then perform a " { $link filter } " on the result with " { $snippet "filter-quot" } "." } ;
 
 HELP: map-filter-as
 { $values
     { "seq" sequence } { "map-quot" object } { "filter-quot" object } { "exemplar" object }
     { "subseq" object }
 }
-{ $description "A version of " { $link "map-filter" } " where the resultant sequence has the same class as " { $snippet "exemplar" } } ;
+{ $description "A version of " { $link map-filter } " where the resultant sequence has the same class as " { $snippet "exemplar" } } ;
 
 HELP: map-find-index
 { $values
     { "seq" sequence } { "quot" quotation }
     { "result" object } { "i" integer } { "elt" object }
 }
-{ $description "A version of " { $link "map-find" } " where the index of the found element, if any, is returned." } ;
+{ $description "A version of " { $link map-find } " where the index of the found element, if any, is returned." } ;
 
 HELP: map-find-last-index
 { $values
     { "seq" sequence } { "quot" quotation }
     { "result" object } { "i" integer } { "elt" object }
 }
-{ $description "A version of " { $link "map-find-index" } " where the index of the found element, if any, is returned." } ;
+{ $description "A version of " { $link map-find-index } " where the index of the found element, if any, is returned." } ;
 
 HELP: map-from
 { $values
     { "seq" sequence } { "quot" quotation } { "i" integer }
     { "newseq" sequence }
 }
-{ $description "A version of " { $link "map" } " that maps the slice of " { $snippet "seq" } " beginning at index " { $snippet "i" } "." } ;
+{ $description "A version of " { $link map } " that maps the slice of " { $snippet "seq" } " beginning at index " { $snippet "i" } "." } ;
 
 HELP: map-from-as
 { $values
     { "seq" sequence } { "quot" quotation } { "i" integer } { "exemplar" object }
     { "newseq" sequence }
 }
-{ $description "A version of " { $link "map-from" } " where the resultant sequence has the same class as " { $snippet "exemplar" } } ;
+{ $description "A version of " { $link map-from } " where the resultant sequence has the same class as " { $snippet "exemplar" } } ;
 
 HELP: map-harvest
 { $values
     { "seq" sequence } { "quot" quotation }
     { "newseq" sequence }
 }
-{ $description "A version of " { $link "map" } " with all empty sequences removed from the result." } ;
+{ $description "A version of " { $link map } " with all empty sequences removed from the result." } ;
 
 HELP: map-if
 { $values
     { "seq" sequence } { "if-quot" object } { "map-quot" object }
     { "newseq" sequence }
 }
-{ $description "A version of " { $link "map" } " where " { $snippet "map-quot" } " is applied only if " { $snippet "if-quot" } " returns true for a given element." } ;
+{ $description "A version of " { $link map } " where " { $snippet "map-quot" } " is applied only if " { $snippet "if-quot" } " returns true for a given element." } ;
 
 HELP: map-index!
 { $values
     { "seq" sequence } { "quot" quotation }
 }
-{ $description "A version of " { $link "map-index" } " which modifies " { $snippet "seq" } " in place." } ;
+{ $description "A version of " { $link map-index } " which modifies " { $snippet "seq" } " in place." } ;
 
 HELP: map-integers-with
 { $values
@@ -1023,14 +1023,14 @@ HELP: map-product
     { "seq" sequence } { "quot" quotation }
     { "n" integer }
 }
-{ $description "Like " { $link "map product" } ", but without creating an intermediate sequence." } ;
+{ $description "Like " { $link map-product } ", but without creating an intermediate sequence." } ;
 
 HELP: map-sift
 { $values
     { "seq" sequence } { "quot" quotation }
     { "newseq" sequence }
 }
-{ $description "A version of " { $link "map" } " with all instances of " { $link "f" } " removed from the result." } ;
+{ $description "A version of " { $link map } " with all instances of " { $link f } " removed from the result." } ;
 
 HELP: map-with-previous
 { $values
@@ -1130,7 +1130,7 @@ HELP: pad-longest
 { $values
     { "seq1" sequence } { "seq2" sequence } { "elt" object }
 }
-{ $description "Perform " { $link "pad-tail" } " on both sequences, padding with " { $snippet "elt" } " to the longest length between the two." } ;
+{ $description "Perform " { $link pad-tail } " on both sequences, padding with " { $snippet "elt" } " to the longest length between the two." } ;
 
 HELP: prepend-lines-with-spaces
 { $values
@@ -1169,7 +1169,7 @@ HELP: remove-first!
 { $values
     { "obj" object } { "seq" sequence }
 }
-{ $description "A version of " { $link "remove-first" } " that modifies " { $snippet "seq" } " in place." } ;
+{ $description "A version of " { $link remove-first } " that modifies " { $snippet "seq" } " in place." } ;
 
 HELP: remove-last
 { $values
@@ -1182,7 +1182,7 @@ HELP: remove-last!
 { $values
     { "obj" object } { "seq" sequence }
 }
-{ $description "A version of " { $link "remove-last" } " that modifies " { $snippet "seq" } " in place." } ;
+{ $description "A version of " { $link remove-last } " that modifies " { $snippet "seq" } " in place." } ;
 
 HELP: replicate-into
 { $values
@@ -1195,7 +1195,7 @@ HELP: reverse-as
     { "seq" sequence } { "exemplar" object }
     { "newseq" sequence }
 }
-{ $description "A version of " { $link "reverse" } " where " { $snippet "seq'" } " is the same class as " { $snippet "exemplar" } "." } ;
+{ $description "A version of " { $link reverse } " where " { $snippet "seq'" } " is the same class as " { $snippet "exemplar" } "." } ;
 
 HELP: rotate
 { $values
@@ -1208,7 +1208,7 @@ HELP: rotate!
 { $values
     { "seq" sequence } { "n" integer }
 }
-{ $description "A version of " { $link "rotate!" } " that modifies " { $snippet "seq" } " in place." } ;
+{ $description "A version of " { $link rotate! } " that modifies " { $snippet "seq" } " in place." } ;
 
 HELP: round-robin
 { $values
@@ -1222,7 +1222,7 @@ HELP: safe-subseq
     { "from" integer } { "to" integer } { "seq" sequence }
     { "subseq" object }
 }
-{ $description "A safe version of " { $link "subseq" } "." } ;
+{ $description "A safe version of " { $link subseq } "." } ;
 
 HELP: selector*
 { $values
@@ -1262,7 +1262,7 @@ HELP: set-nths-unsafe
 { $values
     { "value" object } { "indices" object } { "seq" sequence }
 }
-{ $description "Unsafe version of " { $link "set-nths" } } ;
+{ $description "Unsafe version of " { $link set-nths } } ;
 
 HELP: shorten*
 { $values
