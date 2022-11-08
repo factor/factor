@@ -178,7 +178,7 @@ these lines in your .emacs:
 ;;; Regexps galore:
 
 ;; Utility regexp used by other regexps to match a Factor symbol name
-(setq-local symbol-nc "\\(?:\\sw\\|\\s_\\|\"\\|\\s(\\|\\s)\\|\\s\\\\)+")
+(setq-local symbol-nc "\\(?:\\sw\\|\\s_\\|`\\|\"\\|\\s(\\|\\s)\\|\\s\\\\)+")
 (setq-local symbol (format "\\(%s\\)" symbol-nc))
 (setq-local c-symbol-nc "\\(?:\\sw\\|\\s_\\|\\[\\|\\]\\)+")
 (setq-local c-symbol (format "\\(%s\\)" c-symbol-nc))
