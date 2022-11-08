@@ -101,3 +101,6 @@ COLOR: #ffffff COLOR: green NAN: 1234 CHAR: m ALIEN: 93
 
 PRIMITIVE: one ( a -- b )
 PRIMITIVE: two ( c -- d )
+
+: `word ( -- ) ;
+: word ( -- ) ; ! this isn't strange, just for contrast with the above
