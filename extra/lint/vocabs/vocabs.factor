@@ -1,15 +1,98 @@
 ! Copyright (C) 2022 CapitalEx
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays assocs compiler.units formatting 
-hash-sets hashtables io io.encodings.utf8 io.files
-kernel namespaces regexp sequences sequences.deep sets sorting
-splitting unicode vocabs vocabs.loader ;
+USING: accessors arrays assocs combinators compiler.units
+formatting grouping.extras hash-sets hashtables io
+io.encodings.utf8 io.files kernel multiline namespaces peg.ebnf
+regexp sequences sequences.deep sequences.parser sets sorting
+splitting strings unicode vocabs vocabs.loader ;
 FROM: namespaces => set ;
 IN: lint.vocabs
 
 <PRIVATE
 SYMBOL: old-dictionary
 SYMBOL: LINT-VOCABS-REGEX
+
+
+
+: tokenize ( string -- sequence-parser )
+    <sequence-parser> ;
+
+: next-token ( sequence-parser -- string )
+    [ current blank? ] take-until >string ;
+
+: skip-after ( sequence-parser seq -- sequence-parser )
+   [ take-until-sequence* drop ] curry keep ;
+
+: next-line ( sequence-parser -- sequence-parser )
+    "\n" skip-after ;
+
+: next-word ( sequence-parser -- sequence-parser string/f )
+    dup next-token {
+        ! prune syntax stuff
+        { "FROM:"     [ ";" skip-after f ] }
+        { "IN:"       [ next-line f ] }
+        { "SYMBOL:"   [ next-line f ] }
+        { "SYMBOLS:"  [ ";" skip-after f ] }
+        { "("         [ ")" skip-after f ] }
+
+        ! comments
+        { "!"           [ next-line f ] }
+        { "(("          [ "))"      skip-after f ] }
+        { "/*"          [ "*/"      skip-after f ] }
+        { "![["         [ "]]"      skip-after f ] }
+        { "![=["        [ "]=]"     skip-after f ] }
+        { "![==["       [ "]==]"    skip-after f ] }
+        { "![===["      [ "]===]"   skip-after f ] }
+        { "![====["     [ "]====]"  skip-after f ] }
+        { "![=====["    [ "]=====]" skip-after f ] }
+        { "![======["   [ "]=====]" skip-after f ] }
+
+        ! strings (special case needed for `"`)
+        { "STRING:"    [ ";"       skip-after f ] }
+        { "[["         [ "]]"      skip-after f ] }
+        { "[=["        [ "]=]"     skip-after f ] }
+        { "[==["       [ "]==]"    skip-after f ] }
+        { "[===["      [ "]===]"   skip-after f ] }
+        { "[====["     [ "]====]"  skip-after f ] }
+        { "[=====["    [ "]=====]" skip-after f ] }
+        { "[======["   [ "]=====]" skip-after f ] }
+
+        ! EBNF
+        { "EBNF[["         [ "]]"      skip-after f ] }
+        { "EBNF[=["        [ "]=]"     skip-after f ] }
+        { "EBNF[==["       [ "]==]"    skip-after f ] }
+        { "EBNF[===["      [ "]===]"   skip-after f ] }
+        { "EBNF[====["     [ "]====]"  skip-after f ] }
+        { "EBNF[=====["    [ "]=====]" skip-after f ] }
+        { "EBNF[======["   [ "]=====]" skip-after f ] }
+
+        ! miscellaneous 
+        { "POSTPONE: " [ advance f ] }
+        { "\\"         [ advance f ] }
+        { "!AUTHOR"    [ next-line f ] }
+        { "!BROKEN"    [ next-line f ] }
+        { "!BUG"       [ next-line f ] }
+        { "!FIXME"     [ next-line f ] }
+        { "!LICENSE"   [ next-line f ] }
+        { "!LOL"       [ next-line f ] }
+        { "!NOTE"      [ next-line f ] }
+        { "!REVIEW"    [ next-line f ] }
+        { "!TODO"      [ next-line f ] }
+        { "!XXX"       [ next-line f ] }
+        
+        ! special cause for handling `"`
+        [ ]
+    } case ;
+
+: all-blank? ( string -- ? )
+    [ blank? ] all? ;
+
+: ?store-word ( vector sequence-parser string/? -- vector sequence-parser )
+    [ [ swap [ push ] keep ] curry dip ] when* ;
+
+: collect ( vector sequence-praser -- vector )
+    skip-whitespace next-word ?store-word
+    [ sequence-parse-end? ] [ drop ] [ collect ] smart-if ;
 
 ! Cache regular expression to avoid compile time slowdowns
 "CHAR:\\s+\\S+\\s+|\"(\\\\\\\\|\\\\[\\\\stnrbvf0e\"]|\\\\x[a-fA-F0-9]{2}|\\\\u[a-fA-F0-9]{6}|[^\\\\\"])*\"|R/ (\\\\/|[^/])*/|\\\\\\s+(USE:|USING:)|POSTPONE:\\s+(USE:|USING:)|(?<!\\S+)! [^\n]*" <regexp>
