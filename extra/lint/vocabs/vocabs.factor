@@ -12,13 +12,8 @@ IN: lint.vocabs
 SYMBOL: old-dictionary
 SYMBOL: LINT-VOCABS-REGEX
 
-
-
 : tokenize ( string -- sequence-parser )
     <sequence-parser> ;
-
-: next-token ( sequence-parser -- string )
-    [ current blank? ] take-until >string ;
 
 : skip-after ( sequence-parser seq -- sequence-parser )
    [ take-until-sequence* drop ] curry keep ;
@@ -26,14 +21,54 @@ SYMBOL: LINT-VOCABS-REGEX
 : next-line ( sequence-parser -- sequence-parser )
     "\n" skip-after ;
 
+DEFER: next-token
+
+: reject-token ( sequence-parser token -- string )
+    drop next-line next-token ;
+
+: accept-token ( sequence-parser token -- string )
+    nip >string ;
+
+: comment? ( token -- ? )
+    "!" = ;
+
+: get-token ( sequence-parser -- token )
+    skip-whitespace [ current blank? ] take-until ;
+
+: next-token ( sequence-parser -- string )
+    dup get-token dup comment?
+        [ reject-token ] 
+        [ accept-token ] if ;
+
+: skip-token ( sequence-parser -- sequence-parser )
+    dup next-token drop  ;
+
+: quotation-mark? ( token -- ? )
+    first CHAR: " = ;
+
+: ends-with-quote? ( token -- ? )
+    2 tail* [ first CHAR: \ = not ] 
+            [ second CHAR: " =    ] bi and ;
+
+: end-string? ( token -- ? )
+    dup length 1 = [ quotation-mark? ] [ ends-with-quote? ] if ;
+
+: skip-string ( sequence-parser -- sequence-parser )
+    dup next-token end-string? not [ skip-string ] when ;
+
+: is-string? ( token -- ? )
+    first CHAR: " = ;
+
 : next-word ( sequence-parser -- sequence-parser string/f )
-    dup next-token {
+    dup next-token break {
         ! prune syntax stuff
+        { ""          [ f ] }
         { "FROM:"     [ ";" skip-after f ] }
-        { "IN:"       [ next-line f ] }
-        { "SYMBOL:"   [ next-line f ] }
+        { "IN:"       [ skip-token f ] }
+        { "SYMBOL:"   [ skip-token f ] }
         { "SYMBOLS:"  [ ";" skip-after f ] }
         { "("         [ ")" skip-after f ] }
+        { ":"         [ skip-token f ] }
 
         ! comments
         { "!"           [ next-line f ] }
@@ -45,7 +80,7 @@ SYMBOL: LINT-VOCABS-REGEX
         { "![===["      [ "]===]"   skip-after f ] }
         { "![====["     [ "]====]"  skip-after f ] }
         { "![=====["    [ "]=====]" skip-after f ] }
-        { "![======["   [ "]=====]" skip-after f ] }
+        { "![======["   [ "]======]" skip-after f ] }
 
         ! strings (special case needed for `"`)
         { "STRING:"    [ ";"       skip-after f ] }
@@ -55,7 +90,7 @@ SYMBOL: LINT-VOCABS-REGEX
         { "[===["      [ "]===]"   skip-after f ] }
         { "[====["     [ "]====]"  skip-after f ] }
         { "[=====["    [ "]=====]" skip-after f ] }
-        { "[======["   [ "]=====]" skip-after f ] }
+        { "[======["   [ "]======]" skip-after f ] }
 
         ! EBNF
         { "EBNF[["         [ "]]"      skip-after f ] }
@@ -64,11 +99,11 @@ SYMBOL: LINT-VOCABS-REGEX
         { "EBNF[===["      [ "]===]"   skip-after f ] }
         { "EBNF[====["     [ "]====]"  skip-after f ] }
         { "EBNF[=====["    [ "]=====]" skip-after f ] }
-        { "EBNF[======["   [ "]=====]" skip-after f ] }
+        { "EBNF[======["   [ "]======]" skip-after f ] }
 
         ! miscellaneous 
-        { "POSTPONE: " [ advance f ] }
-        { "\\"         [ advance f ] }
+        { "POSTPONE: " [ skip-token f ] }
+        { "\\"         [ skip-token f ] }
         { "!AUTHOR"    [ next-line f ] }
         { "!BROKEN"    [ next-line f ] }
         { "!BUG"       [ next-line f ] }
@@ -81,7 +116,7 @@ SYMBOL: LINT-VOCABS-REGEX
         { "!XXX"       [ next-line f ] }
         
         ! special cause for handling `"`
-        [ ]
+        [ dup is-string? [ drop skip-string f ] when ]
     } case ;
 
 : all-blank? ( string -- ? )
@@ -90,9 +125,15 @@ SYMBOL: LINT-VOCABS-REGEX
 : ?store-word ( vector sequence-parser string/? -- vector sequence-parser )
     [ [ swap [ push ] keep ] curry dip ] when* ;
 
+DEFER: collect
+
+: ?keep-parsing ( vector sequence-parser -- vector )
+    dup sequence-parse-end? [ drop ] [ collect ] if ;
+
 : collect ( vector sequence-praser -- vector )
-    skip-whitespace next-word ?store-word
-    [ sequence-parse-end? ] [ drop ] [ collect ] smart-if ;
+    skip-whitespace next-word 
+        ?store-word ?keep-parsing 
+    harvest ;
 
 ! Cache regular expression to avoid compile time slowdowns
 "CHAR:\\s+\\S+\\s+|\"(\\\\\\\\|\\\\[\\\\stnrbvf0e\"]|\\\\x[a-fA-F0-9]{2}|\\\\u[a-fA-F0-9]{6}|[^\\\\\"])*\"|R/ (\\\\/|[^/])*/|\\\\\\s+(USE:|USING:)|POSTPONE:\\s+(USE:|USING:)|(?<!\\S+)! [^\n]*" <regexp>
