@@ -12,6 +12,7 @@ IN: lint.vocabs
 SYMBOL: old-dictionary
 SYMBOL: LINT-VOCABS-REGEX
 
+! Helper words
 : tokenize ( string -- sequence-parser )
     <sequence-parser> ;
 
@@ -21,6 +22,16 @@ SYMBOL: LINT-VOCABS-REGEX
 : next-line ( sequence-parser -- sequence-parser )
     "\n" skip-after ;
 
+: quotation-mark? ( token -- ? )
+    first CHAR: " = ;
+
+: comment? ( token -- ? )
+    "!" = ;
+
+: string-literal? ( token -- ? )
+    first CHAR: " = ;
+
+! Words for parsing tokens
 DEFER: next-token
 
 : reject-token ( sequence-parser token -- string )
@@ -28,9 +39,6 @@ DEFER: next-token
 
 : accept-token ( sequence-parser token -- string )
     nip >string ;
-
-: comment? ( token -- ? )
-    "!" = ;
 
 : get-token ( sequence-parser -- token )
     skip-whitespace [ current blank? ] take-until ;
@@ -43,9 +51,7 @@ DEFER: next-token
 : skip-token ( sequence-parser -- sequence-parser )
     dup next-token drop  ;
 
-: quotation-mark? ( token -- ? )
-    first CHAR: " = ;
-
+! Words for parsing a string literal
 : ends-with-quote? ( token -- ? )
     2 tail* [ first CHAR: \ = not ] 
             [ second CHAR: " =    ] bi and ;
@@ -56,54 +62,53 @@ DEFER: next-token
 : skip-string ( sequence-parser -- sequence-parser )
     dup next-token end-string? not [ skip-string ] when ;
 
-: is-string? ( token -- ? )
-    first CHAR: " = ;
-
 : next-word ( sequence-parser -- sequence-parser string/f )
-    dup next-token break {
+    dup next-token {
+        ! skip over empty tokens
+        { "" [ f ] }
+
         ! prune syntax stuff
-        { ""          [ f ] }
         { "FROM:"     [ ";" skip-after f ] }
-        { "IN:"       [ skip-token f ] }
-        { "SYMBOL:"   [ skip-token f ] }
+        { "IN:"       [     skip-token f ] }
+        { "SYMBOL:"   [     skip-token f ] }
         { "SYMBOLS:"  [ ";" skip-after f ] }
         { "("         [ ")" skip-after f ] }
-        { ":"         [ skip-token f ] }
+        { ":"         [     skip-token f ] }
+        { "POSTPONE:" [     skip-token f ] }
+        { "\\"        [     skip-token f ] }
 
         ! comments
-        { "!"           [ next-line f ] }
-        { "(("          [ "))"      skip-after f ] }
-        { "/*"          [ "*/"      skip-after f ] }
-        { "![["         [ "]]"      skip-after f ] }
-        { "![=["        [ "]=]"     skip-after f ] }
-        { "![==["       [ "]==]"    skip-after f ] }
-        { "![===["      [ "]===]"   skip-after f ] }
-        { "![====["     [ "]====]"  skip-after f ] }
-        { "![=====["    [ "]=====]" skip-after f ] }
+        { "!"           [             next-line f ] }
+        { "(("          [ "))"       skip-after f ] }
+        { "/*"          [ "*/"       skip-after f ] }
+        { "![["         [ "]]"       skip-after f ] }
+        { "![=["        [ "]=]"      skip-after f ] }
+        { "![==["       [ "]==]"     skip-after f ] }
+        { "![===["      [ "]===]"    skip-after f ] }
+        { "![====["     [ "]====]"   skip-after f ] }
+        { "![=====["    [ "]=====]"  skip-after f ] }
         { "![======["   [ "]======]" skip-after f ] }
 
         ! strings (special case needed for `"`)
-        { "STRING:"    [ ";"       skip-after f ] }
-        { "[["         [ "]]"      skip-after f ] }
-        { "[=["        [ "]=]"     skip-after f ] }
-        { "[==["       [ "]==]"    skip-after f ] }
-        { "[===["      [ "]===]"   skip-after f ] }
-        { "[====["     [ "]====]"  skip-after f ] }
-        { "[=====["    [ "]=====]" skip-after f ] }
+        { "STRING:"    [ ";"        skip-after f ] }
+        { "[["         [ "]]"       skip-after f ] }
+        { "[=["        [ "]=]"      skip-after f ] }
+        { "[==["       [ "]==]"     skip-after f ] }
+        { "[===["      [ "]===]"    skip-after f ] }
+        { "[====["     [ "]====]"   skip-after f ] }
+        { "[=====["    [ "]=====]"  skip-after f ] }
         { "[======["   [ "]======]" skip-after f ] }
 
         ! EBNF
-        { "EBNF[["         [ "]]"      skip-after f ] }
-        { "EBNF[=["        [ "]=]"     skip-after f ] }
-        { "EBNF[==["       [ "]==]"    skip-after f ] }
-        { "EBNF[===["      [ "]===]"   skip-after f ] }
-        { "EBNF[====["     [ "]====]"  skip-after f ] }
-        { "EBNF[=====["    [ "]=====]" skip-after f ] }
+        { "EBNF[["         [ "]]"       skip-after f ] }
+        { "EBNF[=["        [ "]=]"      skip-after f ] }
+        { "EBNF[==["       [ "]==]"     skip-after f ] }
+        { "EBNF[===["      [ "]===]"    skip-after f ] }
+        { "EBNF[====["     [ "]====]"   skip-after f ] }
+        { "EBNF[=====["    [ "]=====]"  skip-after f ] }
         { "EBNF[======["   [ "]======]" skip-after f ] }
-
-        ! miscellaneous 
-        { "POSTPONE: " [ skip-token f ] }
-        { "\\"         [ skip-token f ] }
+        
+        ! Annotations
         { "!AUTHOR"    [ next-line f ] }
         { "!BROKEN"    [ next-line f ] }
         { "!BUG"       [ next-line f ] }
@@ -116,11 +121,8 @@ DEFER: next-token
         { "!XXX"       [ next-line f ] }
         
         ! special cause for handling `"`
-        [ dup is-string? [ drop skip-string f ] when ]
+        [ dup string-literal? [ drop skip-string f ] when ]
     } case ;
-
-: all-blank? ( string -- ? )
-    [ blank? ] all? ;
 
 : ?store-word ( vector sequence-parser string/? -- vector sequence-parser )
     [ [ swap [ push ] keep ] curry dip ] when* ;
