@@ -81,6 +81,12 @@ MACRO: output>array-n ( quot n -- array )
 
 : input<sequence ( seq quot -- )
     [ inputs firstn ] [ call ] bi ; inline
+    
+: sequence>sequence ( seq quot exemplar -- new-seq )
+    '[ _ _ output>sequence ] input<sequence ; inline
+    
+: sequence>array ( seq quot -- array )
+    { } sequence>sequence ; inline
 
 : input<sequence-unsafe ( seq quot -- )
     [ inputs firstn-unsafe ] [ call ] bi ; inline
