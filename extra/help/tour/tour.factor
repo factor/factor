@@ -1,11 +1,12 @@
 ! Copyright (C) 2022 Raghu Ranganathan and Andrea Ferreti.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: arrays command-line help help.markup help.syntax
-help.vocabs io kernel math math.factorials math.functions
-namespaces parser prettyprint ranges see sequences stack-checker
-vocabs.loader ;
+USING: arrays assocs command-line help help.markup help.syntax
+help.vocabs inspector io kernel math math.factorials
+math.functions math.primes memory namespaces parser prettyprint
+ranges see sequences stack-checker strings tools.crossref
+tools.test tools.time ui.gadgets.panes vocabs.loader
+vocabs.refresh words editors ;
 IN: help.tour
-
 
 ARTICLE: "tour-concatenative" "Concatenative Languages" 
 Factor is a { $emphasis concatenative } programming language in the spirit of Forth. What does this mean?
@@ -38,8 +39,6 @@ Notice that if every function takes the state of the whole world and returns the
 anymore. So, even though it is convenient to think of pure functions as receiving a stack as input and outputting a stack,
 the semantics of the language can be implemented more efficiently by mutating a single stack.
 
-{ $heading "Up Next" }
-{ $link "tour-stack" }
 ;
 
 ARTICLE: "tour-stack" "Playing with the stack"
@@ -92,8 +91,6 @@ and in familiar infix notation
 $nl
 Also notice that we have been able to split our computation onto many lines or combine it onto fewer lines rather arbitrarily, and that each line made sense in itself.
 
-{ $heading "Up Next" }
-{ $link "tour-first-word" }
 ;
 
 ARTICLE: "tour-first-word" "Defining our first word" 
@@ -187,8 +184,6 @@ Of course, Factor already has a word for the factorial (actually there is a whol
 vocabulary, including many variants of the usual factorial) and a word for the product "(" { $link product }  in the 
 { $vocab-link "sequences" }  vocabulary), but as it often happens introductory examples overlap with the standard library.
 
-{ $heading "Up Next" }
-{ $link "tour-parsing-words" }
 ;
 
 ARTICLE: "tour-parsing-words" "Parsing Words"
@@ -214,8 +209,6 @@ Other uses of parsing word include the module system, the object-oriented featur
 , privacy modifiers and more. In theory, even { $snippet "SYNTAX:" } can be defined in terms of itself, although of course the 
 system has to be bootstrapped somehow.
 
-{ $heading "Up Next" }
-{ $link "tour-stack-shuffling" }
 ;
 
 ARTICLE: "tour-stack-shuffling" "Stack Shuffling"
@@ -241,8 +234,6 @@ get a feel for how they manipulate the stack using the listener.
   2dup
 }
 
-{ $heading "Up Next" }
-{ $link "tour-combinators" }
 ;
 
 ARTICLE: "tour-combinators" "Combinators"
@@ -315,6 +306,396 @@ calculus, which use one level of nesting for each function, higher-order or not.
 
 Many more combinators exists other than { $link bi }  (and its relative { $link tri } ), and you should become acquainted at least with 
 { $link bi } , { $link tri } , and { $link bi@ } by reading about them in the online help and trying them out in the listener.
+
+;
+
+ARTICLE: "tour-vocabularies" "Vocabularies"
+
+It is now time to start writing your functions in files and learn how to import them in the listener. Factor organizes 
+words into nested namespaces called **vocabularies**. You can import all names from a vocabulary with the word { $snippet "USE:" } . 
+In fact, you may have seen something like
+
+{ $code "USE: ranges" }
+
+when you asked the listener to import the word { $link [1..b] } for you. You can also use more than one vocabulary at a time 
+with the word { $snippet "USING:" } , which is followed by a list of vocabularies and terminated by { $snippet ";" } , like
+
+{ $code "USING: math.ranges sequences.deep ;" }
+
+Finally, you define the vocabulary where your definitions are stored with the word { $snippet "IN:" } . If you search the online 
+help for a word you have defined so far, like { $link prime? } , you will see that your definitions have been grouped under the 
+default { $snippet "scratchpad" } vocabulary. By the way, this shows that the online help automatically collects information about your 
+own words, which is a very useful feature.
+
+There are a few more words, like { $snippet "QUALIFIED:" } , { $snippet "FROM:" } , { $snippet "EXCLUDE:" } and { $snippet "RENAME:" } , that allow more fine-grained control 
+over the imports, but { $snippet "USING:" } is the most common.
+
+On disk, vocabularies are stored under a few root directories, much like with the classpath in JVM languages. By 
+default, the system starts looking up into the directories { $snippet "basis" } , { $snippet "core" } , { $snippet "extra" } , { $snippet "work" } under the Factor home. You can 
+add more, both at runtime with the word { $link add-vocab-root } , and by creating a configuration file { $snippet ".factor-rc" } , but for now 
+we will store our vocabularies under the { $snippet "work" } directory, which is reserved for the user.
+
+Generate a template for a vocabulary writing
+
+{ $code "USE: tools.scaffold
+\"github.tutorial\" scaffold-work" }
+
+You will find a file { $snippet "work/github/tutorial/tutorial.factor" } containing an empty vocabulary. Factor integrates with 
+many editors, so you can try { $snippet "\"github.tutorial\" edit" } ":" this will prompt you to choose your favourite editor, and use that 
+editor to open the newly created vocabulary.
+
+You can add the definitions of the previous paragraph, so that it looks like
+
+{ $code "
+! Copyright (C) 2014 Andrea Ferretti.
+! See http://factorcode.org/license.txt for BSD license.
+USING: ;
+IN: github.tutorial
+
+: [2..b] ( n -- {2,...,n} ) 2 swap [a,b] ; inline
+
+: multiple? ( a b -- ? ) swap divisor? ; inline
+
+: prime? ( n -- ? ) [ sqrt [2..b] ] [ [ multiple? ] curry ] bi any? not ;
+" }
+Since the vocabulary was already loaded when you scaffolded it, we need a way to refresh it from disk. You can do this 
+with { $snippet "\"github.tutorial\" refresh" } . There is also a { $link refresh-all } word, with a shortcut { $snippet "F2" } .
+
+You will be prompted a few times to use vocabularies, since your { $snippet "USING:" } statement is empty. After having accepted 
+all of them, Factor suggests you a new header with all the needed imports:
+{ $code "
+USING: kernel math.functions math.ranges sequences ;
+IN: github.tutorial
+" }
+Now that you have some words in your vocabulary, you can edit, say, the { $snippet "multiple?" } word with { $snippet "\ multiple? edit" } . You 
+will find your editor open on the relevant line of the right file. This also works for words in the Factor distribution, 
+although it may be a bad idea to modify them.
+
+This { $snippet "\\" } word requires a little explanation. It works like a sort of escape, allowing us to put a reference to the 
+next word on the stack, without executing it. This is exactly what we need, because { $snippet "edit" } is a word that takes words 
+themselves as arguments. This mechanism is similar to quotations, but while a quotation creates a new anonymous function, 
+here we are directly refering to the word { $snippet "multiple?" } .
+
+Back to our task, you may notice that the words { $snippet "[2..b]" } and { $snippet "multiple?" } are just helper functions that you may not 
+want to expose directly. To hide them from view, you can wrap them in a private block like this
+
+{ $code "
+<PRIVATE
+
+: [2..b] ( n -- {2,...,n} ) 2 swap [a,b] ; inline
+
+: multiple? ( a b -- ? ) swap divisor? ; inline
+
+PRIVATE>
+" }
+
+After making this change and refreshed the vocabulary, you will see that the listener is not able to refer to words 
+like { $snippet "[2..b]" } anymore. The { $snippet "<PRIVATE" } word works by putting all definitions in the private block under a different 
+vocabulary, in our case { $snippet "github.tutorial.private" } .
+
+It is still possible to refer to words in private vocabularies, as you can confirm by searching for { $snippet "[2..b]" } in the 
+online help, but of course this is discouraged, since people do not guarantee any API stability for private words. Words 
+under { $snippet "github.tutorial" } can refer to words in { $snippet "github.tutorial.private" } directly, like { $link prime? } does.
+
+;
+
+ARTICLE: "tour-tests-docs" "Tests and Documentation"
+
+This is a good time to start writing some unit tests. You can create a skeleton with
+{ $code "
+\"github.tutorial\" scaffold-tests
+" }
+You will find a generated file under { $snippet "work/github/tutorial/tutorial-tests.factor" } , that you can open with 
+{ $snippet "\"github.tutorial\" edit-tests" } . Notice the line
+
+{ $code "
+USING: tools.test github.tutorial ;
+" }
+that imports the unit testing module as well as your own. We will only test the public { $snippet "prime?" }  function.
+
+Tests are written using the { $link POSTPONE: unit-test }  word, which expects two quotations: the first one containing the expected 
+outputs and the second one containing the words to run in order to get that output. Add these lines to 
+{ $snippet "github.tutorial-tests" } ":"
+
+{ $code "
+[ t ] [ 2 prime? ] unit-test
+[ t ] [ 13 prime? ] unit-test
+[ t ] [ 29 prime? ] unit-test
+[ f ] [ 15 prime? ] unit-test
+[ f ] [ 377 prime? ] unit-test
+[ f ] [ 1 prime? ] unit-test
+[ t ] [ 20750750228539 prime? ] unit-test
+" }
+You can now run the tests with { $snippet "\"github.tutorial\" test" } . You will see that we have actually made a mistake, and 
+pressing { $snippet "F3" }  will show more details. It seems that our assertions fails for { $snippet "2" } .
+
+In fact, if you manually try to run our functions for { $snippet "2" } , you will see that our defition of { $snippet "[2..b]" }  returns { $snippet "{ 2 }" }  
+for { $snippet "2 sqrt" } , due to the fact that the square root of two is less than two, so we get a descending interval. Try making a 
+fix so that the tests now pass.
+
+There are a few more words to test errors and inference of stack effects. { $link POSTPONE: unit-test }  suffices for now, but later on 
+you may want to check { $link POSTPONE: must-fail }  and { $link POSTPONE: must-infer } .
+
+We can also add some documentation to our vocabulary. Autogenerated documentation is always available for user-defined 
+words (even in the listener), but we can write some useful comments manually, or even add custom articles that will 
+appear in the online help. Predictably, we start with { $snippet "\"github.tutorial\" scaffold-docs" }  and then 
+{ $snippet "\"github.tutorial\" edit-docs" } .
+
+The generated file { $snippet "work/github/tutorial-docs.factor" }  imports { $vocab-link "help.markup" } and { $vocab-link "help.syntax" } . These two vocabularies 
+define words to generate documentation. The actual help page is generated by the { $snippet "HELP:" }  parsing word.
+
+The arguments to { $snippet "HELP:" }  are nested array of the form { $snippet "{ $directive content... }" } . In particular, you see here the 
+directives { $link $values } and { $link $description } , but a few more exist, such as { $link $errors } , { $link $examples }  and { $link $see-also } .
+
+Notice that the type of the output { $snippet "?" }  has been inferred to be boolean. Change the first lines to look like
+
+{ $code "
+USING: help.markup help.syntax kernel math ;
+IN: github.tutorial
+
+HELP: prime?
+{ $values
+    { \"n\" fixnum }
+    { \"?\" boolean }
+}
+{ $description \"Tests if n is prime. n is assumed to be a positive integer.\" } ;
+" }
+and refresh the { $snippet "github.tutorial" }  vocabulary. If you now look at the help for { $snippet "prime?" } , for instance with 
+{ $snippet "\\ prime? help" } , you will see the updated documentation.
+
+You can also render the directives in the listener for quicker feedback. For instance, try writing
+
+{ $code "
+{ $values
+    { \"n\" integer }
+    { \"?\" boolean }
+} print-content
+" }
+The help markup contains a lot of possible directives, and you can use them to write stand-alone articles in the help 
+system. Have a look at some more with { $snippet "\"element-types\" help" } .
+;
+
+ARTICLE: "tour-objects" "The Object System"
+
+Although it is not apparent from what we have said so far, Factor has object-oriented features, and many core words 
+are actually method invocations. To better understand how objects behave in Factor, a quote is in order:
+$nl
+{ $emphasis "I invented the term Object-Oriented and I can tell you I did not have C++ in mind.
+  -Alan Kay" }
+$nl
+The term object-oriented has as many different meanings as people using it. One point of view - which was actually 
+central to the work of Alan Kay - is that it is about late binding of function names. In Smalltalk, the language where this 
+concept was born, people do not talk about calling a method, but rather sending a message to an object. It is up to the 
+object to decide how to respond to this message, and the caller should not know about the implementation. For instance, 
+one can send the message { $link map } both to an array and a linked list, but internally the iteration will be handled 
+differently.
+
+The binding of the message name to the method implementation is dynamic, and this is regarded as the core strenght of 
+objects. As a result, fairly complex systems can evolve from the cooperation of independent objects who do not mess with 
+each other internals.
+
+To be fair, Factor is very different from Smalltalk, but still there is the concept of classes, and generic words can 
+defined having different implementations on different classes.
+
+Some classes are builtin in Factor, such as { $link string } , { $link boolean } , { $link fixnum } or { $link word } . Next, the most common way to 
+define a class is as a **tuple**. Tuples are defined with the { $link POSTPONE: TUPLE: } parsing word, followed by the tuple name and the 
+fields of the class that we want to define, which are called **slots** in Factor parlance.
+
+Let us define a class for movies:
+
+{ $code "
+TUPLE: movie title director actors ;
+" }
+This also generates setters { $snippet ">>title" } , { $snippet ">>director" } and { $snippet ">>actors" } and getters { $snippet "title>>" } , { $snippet "director>>" } and { $snippet "actors>>" } . 
+For instance, we can create a new movie with
+
+{ $code "
+movie new \"The prestige\" >>title
+  \"Christopher Nolan\" >>director
+  { \"Hugh Jackman\" \"Christian Bale\" \"Scarlett Johansson\" } >>actors
+" }
+We can also shorten this to
+
+{ $code "
+\"The prestige\" \"Christopher Nolan\"
+{ \"Hugh Jackman\" \"Christian Bale\" \"Scarlett Johansson\" }
+movie boa
+" }
+The word { $link boa } stands for 'by-order-of-arguments' and is a constructor that fills the slots of the tuple with the 
+items on the stack in order. { $snippet "movie boa" } is called a **boa constructor**, a pun on the Boa Constrictor. It is customary to 
+define a most common constructor called { $snippet "<movie>" } , which in our case could be simply
+
+{ $code "
+: <movie> ( title director actors -- movie ) movie boa ;
+" }
+In fact, boa constructor are so common, that the above line can be shortened to
+
+{ $code "
+C: <movie> movie
+" }
+In other cases, you may want to use some defaults, or compute some fields.
+
+The functional minded will be worried about the mutability of tuples. Actually, slots can be declared to be "read-only" 
+with { $snippet "{ slot-name read-only } " } . In this case, the field setter will not be generated, and the value must be set a the 
+beginning with a boa constructor. Other valid slot modifiers are { $link POSTPONE: initial: } - to declare a default value - and a class word
+, such as { $snippet "integer" } , to restrict the values that can be inserted.
+
+As an example, we define another tuple class for rock bands
+
+{ $code "
+TUPLE: band
+  { keyboards string read-only }
+  { guitar string read-only }
+  { bass string read-only }
+  { drums string read-only } ;
+: <band> ( keyboards guitar bass drums -- band ) band boa ;
+" }
+together with one instance
+
+{ $code "
+	\"Richard Wright\" \"David Gilmour\" \"Roger Waters\" \"Nick Mason\" <band>
+" }
+Now, of course everyone knows that the star in a movie is the first actor, while in a rock band it is the bass player. 
+To encode this, we first define a **generic word**
+
+{ $code "
+GENERIC: star ( item -- star )
+" }
+As you can see, it is declared with the parsing word { $link POSTPONE: GENERIC: } and declares its stack effects but it has no 
+implementation right now, hence no need for the closing { $link POSTPONE: ; } . Generic words are used to perform dynamic dispatch. We can define 
+implementations for various classes using the word { $link POSTPONE: M: }
+
+{ $code "
+M: movie star actors>> first ;
+M: band star bass>> ;
+" }
+If you write { $snippet "star ." } two times, you can see the different effect of calling a generic word on instances of different 
+classes.
+
+Builtin and tuple classes are not all that there is to the object system: more classes can be defined with set 
+operations like { $link POSTPONE: UNION: } and { $link POSTPONE: INTERSECTION: } . Another way to define a class is as a **mixin**.
+
+Mixins are defined with the { $snippet "MIXIN:" } word, and existing classes can be added to the mixin writing
+
+{ $code "
+INSTANCE: class mixin
+" }
+Methods defined on the mixin will then be available on all classes that belong to the mixin. If you are familiar with 
+Haskell typeclasses, you will recognize a resemblance, although Haskell enforces at compile time that instance of 
+typeclasses implent certain functions, while in Factor this is informally specified in documentation.
+
+Two important examples of mixins are { $link sequence } and { $link assoc } . The former defines a protocol that is available to all 
+concrete sequences, such as strings, linked lists or arrays, while the latter defines a protocol for associative arrays, 
+such as hashtables or association lists.
+
+This enables all sequences in Factor to be acted upon with a common set of words, while differing in implementation 
+and minimizing code repetition (because only few primitives are needed, and other operations are defined for the { $link sequence }
+ class). The most common operations you will use on sequences are { $link map } , { $link filter } and { $link reduce } , but there are many more 
+- as you can see with { $snippet "\"sequences\" help" } .
+;
+
+ARTICLE: "tour-tools" "Learning the Tools"
+
+A big part of the productivity of Factor comes from the deep integration of the language and libraries with the tools around 
+them, which are embodied in the listener. Many functions of the listener can be used programmatically, and vice versa.
+You have seen some examples of this:
+
+{ $list
+  {  " The help is navigable online, but you can also invoke it with "  { $link help }  " and print help items with "  { $link print-content }  " ; "  }
+  {  " The "  { $snippet  "F2"  }  " shortcut or the words "  { $link refresh }  " and "  { $link refresh-all }  " can be used to refresh vocabularies from disk while continuing working in the listener; "  }
+  {  " The "  { $link edit  }  " word gives you editor integration, but you can also click on file names in the help pages for vocabularies to open them. "  }
+}
+
+The refresh is actually quite smart. Whenever a word is redefined, words that depend on it are recompiled against the new 
+defition. You can check by yourself doing
+
+{ $code "
+: inc ( x -- y ) 1 + ;
+: inc-print ( x -- ) inc . ;
+5 inc-print
+" }
+and then
+
+{ $code "
+: inc ( x -- y ) 2 + ;
+5 inc-print
+" }
+This allows you to always keep a listener open, improving your definitions, periodically saving your definitions to file 
+and refreshing, without ever having to reload Factor.
+
+You can also save the whole state of Factor with the word { $link save-image } and later restore it by starting Factor with
+
+{ $code "
+./factor -i=path-to-image
+" }
+In fact, Factor is image-based and only uses files when loading and refreshing vocabularies.
+
+The power of the listener does not end here. Elements of the stack can be inspected by clicking on them, or by calling the 
+word { $link inspector } . For instance try writing
+
+{ $code "
+TUPLE: trilogy first second third ;
+: <trilogy> ( first second third -- trilogy ) trilogy boa ;
+\"A new hope\" \"The Empire strikes back\" \"Return of the Jedi\" <trilogy>
+\"George Lucas\" 2array
+" }
+You will get an item that looks like
+
+{ $code "
+{ ~trilogy~ \"George Lucas\" }
+" }
+on the stack. Try clicking on it: you will be able to see the slots of the array and focus on the trilogy or on the string 
+by double-clicking on them. This is extremely useful for interactive prototyping. Special objects can customize the inspector 
+by implementing the { $link content-gadget } method.
+
+There is another inspector for errors. Whenever an error arises, it can be inspected with { $snippet "F3" } . This allows you to investigate 
+exceptions, bad stack effects declarations and so on. The debugger allows you to step into code, both forwards and 
+backwards, and you should take a moment to get some familiarity with it. You can also trigger the debugger manually, by 
+entering some code in the listener and pressing { $snippet "Ctrl+w" } .
+
+Another feature of the listener allows you to benchmark code. As an example, we write an intentionally inefficient Fibonacci:
+
+{ $code "
+DEFER: fib-rec
+: fib ( n -- f(n) ) dup 2 < [ ] [ fib-rec ] if ;
+: fib-rec ( n -- f(n) ) [ 1 - fib ] [ 2 - fib ] bi + ;
+" }
+(notice the use of { $snippet "DEFER:" } to define two mutually "recursive" words). You can benchmark the running time writing { $snippet "40 fib" }  
+and then pressing Ctrl+t instead of Enter. You will get timing information, as well as other statistics. Programmatically
+, you can use the { $link time } word on a quotation to do the same.
+
+You can also add watches on words, to print inputs and outputs on entry and exit. Try writing
+
+{ $code "
+\ fib watch
+" }
+and then run { $snippet "10 fib" }  to see what happens. You can then remove the watch with { $snippet "\\ fib reset" } .
+
+Another very useful tool is the { $vocab-link "lint" }  vocabulary. This scans word definitions to find duplicated code that can be factored 
+out. As an example, let us define a word to check if a string starts with another one. Create a test vocabulary
+
+{ $code "
+\"lintme\" scaffold-work
+" }
+and add the following definition
+
+{ $code "
+USING: kernel sequences ;
+IN: lintme
+
+: startswith? ( str sub -- ? ) dup length swapd head = ;
+" }
+Load the lint tool with { $snippet "USE: lint" }  and write { $snippet "\"lintme\" lint-vocab" } . You will get a report mentioning that the word sequence 
+{ $snippet "length swapd" }  is already used in the word { $snippet "(split)" } of { $snippet "splitting.private" } , hence it could be factored out.
+
+Now, you would not certainly want to modify the source of a word in the standard library - let alone a private one - but 
+in more complex cases the lint tool is able to find actual repetitions. It is a good idea to lint your vocabularies from 
+time to time, to avoid code duplication and as a good way to discover library words that you may have accidentally redefined
+.
+
+Finally, there are a few utilities to inspect words. You can see the definition of a word in the help tool, but a quicker 
+way can be { $link see } . Or, vice versa, you may use { $link usage. } to inspect the callers of a given word. Try { $snippet "\\ reverse see" }  and 
+{ $snippet "\\ reverse usage." } .
 ;
 
 ARTICLE: "tour" "A guided tour of Factor"
@@ -352,6 +733,11 @@ to skip it if you want to get your feet wet and return to it after some hands on
   "tour-first-word"
   "tour-parsing-words"
   "tour-stack-shuffling"
+  "tour-combinators"
+  "tour-vocabularies"
+  "tour-tests-docs"
+  "tour-objects"
+  "tour-tools"
 }
 ;
 
