@@ -1,7 +1,7 @@
 ! Copyright (C) 2005, 2010, 2018, 2020 Slava Pestov, Joe Groff, and Cat Stevens.
 USING: arrays assocs help.markup help.markup.private help.syntax
 kernel math math.functions math.order math.vectors sequences
-sequences.generalizations ;
+sequences.generalizations urls ;
 IN: math.matrices
 
 <PRIVATE
@@ -633,7 +633,7 @@ HELP: matrix-set-nths
     "Throws an error if the sequence cannot hold elements of the given type."
 } }
 { $examples
-    "Change both entries on row 0."
+    "Change both entries on row 1."
     { $example
         "USING: math.matrices kernel prettyprint ;"
         "{ { 0 1 } { 2 3 } } \"a\" { { 1 0 } { 1 1 } } pick matrix-set-nths ."

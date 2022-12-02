@@ -1,4 +1,4 @@
-! Copyright (C) 2017 Pi.
+! Copyright (C) 2022 Alex Maestas.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: combinators kernel math sequences ;
 IN: unicode.control-pictures
@@ -12,7 +12,14 @@ IN: unicode.control-pictures
         [ ]
     } cond ;
 
+: char>control-picture* ( char -- char' )
+    char>control-picture
+    dup 0x20 = [ drop 0x2420 ] when ;
+
 PRIVATE>
 
 : control-pictures ( string -- string )
     [ char>control-picture ] map ;
+
+: control-pictures* ( string -- string )
+    [ char>control-picture* ] map ;

@@ -17,7 +17,7 @@ DEFER: HELP{
     ?scan-token dup {
         [ "{" = [ \ HELP{ ] [ f ] if ]
         [ "syntax" lookup-word ]
-        [ "help.markup" lookup-word ]
+        [ { [ "$" head? ] [ "help.markup" lookup-word ] } 1&& ]
         [ dup ?last ":{[(/\"" member-eq? [ search ] [ drop f ] if ]
     } 1|| {
         { [ dup not ] [ drop ] }
@@ -113,7 +113,7 @@ DEFER: HELP{
 
 : help-text? ( word -- ? )
     {
-        $description $snippet $emphasis $strong $url $heading
+        $description $snippet $emphasis $strong $heading
         $subheading $syntax $class-description
         $error-description $var-description $contract $notes
         $curious $deprecated $errors $side-effects $content

@@ -41,8 +41,8 @@ $nl
 
 HELP: nths
 { $values
-     { "indices" sequence } { "seq" sequence }
-     { "seq'" sequence } }
+    { "indices" sequence } { "seq" sequence }
+    { "seq'" sequence } }
 { $description "Outputs a sequence of elements from the input sequence indexed by the indices." }
 { $examples
     { $example "USING: prettyprint sequences ;"
@@ -92,7 +92,9 @@ HELP: if-empty
 
 HELP: when-empty
 { $values
-     { "seq" sequence } { "quot" "the first quotation of an " { $link if-empty } } }
+    { "seq" sequence } { "quot" "the first quotation of an " { $link if-empty } }
+    { "seq/obj" object }
+}
 { $description "Makes an implicit check if the sequence is empty. An empty sequence is dropped and the " { $snippet "quot" } " is called." }
 { $examples "This word is equivalent to " { $link if-empty } " with an empty second quotation:"
     { $example
@@ -109,7 +111,7 @@ HELP: when-empty
 
 HELP: unless-empty
 { $values
-     { "seq" sequence } { "quot" "the second quotation of an " { $link if-empty } } }
+    { "seq" sequence } { "quot" "the second quotation of an " { $link if-empty } } }
 { $description "Makes an implicit check if the sequence is empty. An empty sequence is dropped. Otherwise, the " { $snippet "quot" } " is called on the sequence." }
 { $examples "This word is equivalent to " { $link if-empty } " with an empty first quotation:"
     { $example
@@ -312,7 +314,7 @@ HELP: reduce
 
 HELP: reduce-index
 { $values
-     { "seq" sequence } { "identity" object } { "quot" { $quotation ( ... prev elt index -- ... next ) } } { "result" object } }
+    { "seq" sequence } { "identity" object } { "quot" { $quotation ( ... prev elt index -- ... next ) } } { "result" object } }
 { $description "Combines successive elements of the sequence and their indices binary operations, and outputs the final result. On the first iteration, the three inputs to the quotation are " { $snippet "identity" } ", the first element of the sequence, and its index, 0. On successive iterations, the first input is the result of the previous iteration, the second input is the corresponding element of the sequence, and the third is its index." }
 { $examples { $example "USING: sequences prettyprint math ;"
     "{ 10 50 90 } 0 [ + + ] reduce-index ."
@@ -406,7 +408,7 @@ HELP: map-as
 
 HELP: each-index
 { $values
-     { "seq" sequence } { "quot" { $quotation ( ... elt index -- ... ) } } }
+    { "seq" sequence } { "quot" { $quotation ( ... elt index -- ... ) } } }
 { $description "Calls the quotation with the element of the sequence and its index on the stack, with the index on the top of the stack." }
 { $examples { $example "USING: arrays sequences prettyprint ;"
 "{ 10 20 30 } [ 2array . ] each-index"
@@ -653,8 +655,8 @@ HELP: remove-eq
 
 HELP: remove-nth
 { $values
-     { "n" integer } { "seq" sequence }
-     { "seq'" sequence } }
+    { "n" integer } { "seq" sequence }
+    { "seq'" sequence } }
 { $description "Creates a new sequence without the element at index " { $snippet "n" } "." }
 { $examples "Notice that the original sequence is left intact:" { $example "USING: sequences prettyprint kernel ;"
     "{ 1 2 3 } 1 over remove-nth . ."
@@ -1399,8 +1401,8 @@ HELP: count
 
 HELP: selector
 { $values
-     { "quot" { $quotation ( ... elt -- ... ? ) } }
-     { "selector" { $quotation ( ... elt -- ... ) } } { "accum" vector } }
+    { "quot" { $quotation ( ... elt -- ... ? ) } }
+    { "selector" { $quotation ( ... elt -- ... ) } } { "accum" vector } }
 { $description "Creates a new vector to accumulate the values which return true for a predicate. Returns a new quotation which accepts an object to be tested and stored in the collector if the test yields true. The collector is left on the stack for convenience." }
 { $examples
     { $example "! Find all the even numbers:" "USING: prettyprint sequences math kernel ;"
@@ -1412,8 +1414,8 @@ HELP: selector
 
 HELP: trim-head
 { $values
-     { "seq" sequence } { "quot" quotation }
-     { "newseq" sequence } }
+    { "seq" sequence } { "quot" quotation }
+    { "newseq" sequence } }
 { $description "Removes elements starting from the left side of a sequence if they match a predicate. Once an element does not match, the test stops and the rest of the sequence is left on the stack as a new sequence." }
 { $examples
     { $example "USING: prettyprint math sequences ;"
@@ -1424,8 +1426,8 @@ HELP: trim-head
 
 HELP: trim-head-slice
 { $values
-     { "seq" sequence } { "quot" quotation }
-     { "slice" slice } }
+    { "seq" sequence } { "quot" quotation }
+    { "slice" slice } }
 { $description "Removes elements starting from the left side of a sequence if they match a predicate. Once an element does not match, the test stops and the rest of the sequence is left on the stack as a slice." }
 { $examples
     { $example "USING: prettyprint math sequences ;"
@@ -1436,8 +1438,8 @@ HELP: trim-head-slice
 
 HELP: trim-tail
 { $values
-     { "seq" sequence } { "quot" quotation }
-     { "newseq" sequence } }
+    { "seq" sequence } { "quot" quotation }
+    { "newseq" sequence } }
 { $description "Removes elements starting from the right side of a sequence if they match a predicate. Once an element does not match, the test stops and the rest of the sequence is left on the stack as a new sequence." }
 { $examples
     { $example "USING: prettyprint math sequences ;"
@@ -1448,8 +1450,8 @@ HELP: trim-tail
 
 HELP: trim-tail-slice
 { $values
-     { "seq" sequence } { "quot" quotation }
-     { "slice" slice } }
+    { "seq" sequence } { "quot" quotation }
+    { "slice" slice } }
 { $description "Removes elements starting from the right side of a sequence if they match a predicate. Once an element does not match, the test stops and the rest of the sequence is left on the stack as a slice." }
 { $examples
     { $example "USING: prettyprint math sequences ;"
@@ -1460,8 +1462,8 @@ HELP: trim-tail-slice
 
 HELP: trim
 { $values
-     { "seq" sequence } { "quot" quotation }
-     { "newseq" sequence } }
+    { "seq" sequence } { "quot" quotation }
+    { "newseq" sequence } }
 { $description "Removes elements starting from the left and right sides of a sequence if they match a predicate. Once an element does not match, the test stops and the rest of the sequence is left on the stack as a new sequence." }
 { $examples
     { $example "USING: prettyprint math sequences ;"
@@ -1472,8 +1474,8 @@ HELP: trim
 
 HELP: trim-slice
 { $values
-     { "seq" sequence } { "quot" quotation }
-     { "slice" slice } }
+    { "seq" sequence } { "quot" quotation }
+    { "slice" slice } }
 { $description "Removes elements starting from the left and right sides of a sequence if they match a predicate. Once an element does not match, the test stops and the rest of the sequence is left on the stack as a slice." }
 { $examples
     { $example "USING: prettyprint math sequences ;"
@@ -1486,8 +1488,8 @@ HELP: trim-slice
 
 HELP: sift
 { $values
-     { "seq" sequence }
-     { "newseq" sequence } }
+    { "seq" sequence }
+    { "newseq" sequence } }
  { $description "Outputs a new sequence with all instances of " { $link f } " removed." }
  { $examples
     { $example "USING: prettyprint sequences ;"
@@ -1498,8 +1500,8 @@ HELP: sift
 
 HELP: harvest
 { $values
-     { "seq" sequence }
-     { "newseq" sequence } }
+    { "seq" sequence }
+    { "newseq" sequence } }
 { $description "Outputs a new sequence with all empty sequences removed." }
 { $examples
     { $example "USING: prettyprint sequences ;"
@@ -1512,7 +1514,7 @@ HELP: harvest
 
 HELP: set-first
 { $values
-     { "first" object } { "seq" sequence } }
+    { "first" object } { "seq" sequence } }
 { $description "Sets the first element of a sequence." }
 { $examples
     { $example "USING: prettyprint kernel sequences ;"
@@ -1523,7 +1525,7 @@ HELP: set-first
 
 HELP: set-second
 { $values
-     { "second" object } { "seq" sequence } }
+    { "second" object } { "seq" sequence } }
 { $description "Sets the second element of a sequence." }
 { $examples
     { $example "USING: prettyprint kernel sequences ;"
@@ -1534,7 +1536,7 @@ HELP: set-second
 
 HELP: set-third
 { $values
-     { "third" object } { "seq" sequence } }
+    { "third" object } { "seq" sequence } }
 { $description "Sets the third element of a sequence." }
 { $examples
     { $example "USING: prettyprint kernel sequences ;"
@@ -1545,7 +1547,7 @@ HELP: set-third
 
 HELP: set-fourth
 { $values
-     { "fourth" object } { "seq" sequence } }
+    { "fourth" object } { "seq" sequence } }
 { $description "Sets the fourth element of a sequence." }
 { $examples
     { $example "USING: prettyprint kernel sequences ;"
@@ -1558,9 +1560,9 @@ HELP: set-fourth
 
 HELP: replicate
 { $values
-     { "len" integer } { "quot" { $quotation ( ... -- ... newelt ) } }
-     { "newseq" sequence } }
-     { $description "Calls the quotation " { $snippet "len" } " times, collecting results into a new array." }
+    { "len" integer } { "quot" { $quotation ( ... -- ... newelt ) } }
+    { "newseq" sequence } }
+    { $description "Calls the quotation " { $snippet "len" } " times, collecting results into a new array." }
 { $examples
     { $unchecked-example "USING: kernel prettyprint random sequences ;"
         "5 [ 100 random ] replicate ."
@@ -1570,8 +1572,8 @@ HELP: replicate
 
 HELP: replicate-as
 { $values
-     { "len" integer } { "quot" { $quotation ( ... -- ... newelt ) } } { "exemplar" sequence }
-     { "newseq" sequence } }
+    { "len" integer } { "quot" { $quotation ( ... -- ... newelt ) } } { "exemplar" sequence }
+    { "newseq" sequence } }
  { $description "Calls the quotation " { $snippet "len" } " times, collecting results into a new sequence of the same type as the exemplar sequence." }
 { $examples
     { $unchecked-example "USING: prettyprint kernel sequences ;"
@@ -1584,9 +1586,9 @@ HELP: replicate-as
 
 HELP: partition
 { $values
-     { "seq" sequence } { "quot" quotation }
-     { "trueseq" sequence } { "falseseq" sequence } }
-     { $description "Calls a predicate quotation on each element of the input sequence. If the test yields true, the element is added to " { $snippet "trueseq" } "; if false, it's added to " { $snippet "falseseq" } "." }
+    { "seq" sequence } { "quot" quotation }
+    { "trueseq" sequence } { "falseseq" sequence } }
+    { $description "Calls a predicate quotation on each element of the input sequence. If the test yields true, the element is added to " { $snippet "trueseq" } "; if false, it's added to " { $snippet "falseseq" } "." }
 { $examples
     { $example "USING: prettyprint kernel math sequences ;"
         "{ 1 2 3 4 5 } [ even? ] partition [ . ] bi@"
@@ -1596,20 +1598,20 @@ HELP: partition
 
 HELP: virtual-exemplar
 { $values
-     { "seq" sequence }
-     { "seq'" sequence } }
+    { "seq" sequence }
+    { "seq'" sequence } }
 { $description "Part of the virtual sequence protocol, this word is used to return an exemplar of the underlying storage. This is used in words like " { $link new-sequence } "." } ;
 
 HELP: virtual@
 { $values
-     { "n" integer } { "seq" sequence }
-     { "n'" integer } { "seq'" sequence } }
+    { "n" integer } { "seq" sequence }
+    { "n'" integer } { "seq'" sequence } }
 { $description "Part of the sequence protocol, this word translates the input index " { $snippet "n" } " into an index and the underlying storage this index points into." } ;
 
 HELP: 2map-reduce
 { $values
-     { "seq1" sequence } { "seq2" sequence } { "map-quot" { $quotation ( ..a elt1 elt2 -- ..a intermediate ) } } { "reduce-quot" { $quotation ( ..a prev intermediate -- ..a next ) } }
-     { "result" object } }
+    { "seq1" sequence } { "seq2" sequence } { "map-quot" { $quotation ( ..a elt1 elt2 -- ..a intermediate ) } } { "reduce-quot" { $quotation ( ..a prev intermediate -- ..a next ) } }
+    { "result" object } }
  { $description "Calls " { $snippet "map-quot" } " on each pair of elements from " { $snippet "seq1" } " and " { $snippet "seq2" } " and combines the results using " { $snippet "reduce-quot" } " in the same manner as " { $link reduce } ", except that there is no identity element, and the sequence must have a length of at least 1." }
 { $errors "Throws an error if the sequence is empty." }
 { $examples { $example "USING: sequences prettyprint math ;"
@@ -1619,14 +1621,14 @@ HELP: 2map-reduce
 
 HELP: 2selector
 { $values
-     { "quot" quotation }
-     { "selector" quotation } { "accum1" vector } { "accum2" vector } }
+    { "quot" quotation }
+    { "selector" quotation } { "accum1" vector } { "accum2" vector } }
 { $description "Creates two new vectors to accumulate values based on a predicate. The first vector accumulates values for which the predicate yields true; the second for false." } ;
 
 HELP: collector
 { $values
-     { "quot" quotation }
-     { "quot'" quotation } { "vec" vector } }
+    { "quot" quotation }
+    { "quot'" quotation } { "vec" vector } }
 { $description "Creates a new quotation that pushes its result to a vector and outputs that vector on the stack." }
 { $examples { $example "USING: sequences prettyprint kernel math ;"
     "{ 1 2 } [ 30 + ] collector [ each ] dip ."
@@ -1635,8 +1637,8 @@ HELP: collector
 
 HELP: binary-reduce
 { $values
-     { "seq" sequence } { "start" integer } { "quot" { $quotation ( elt1 elt2 -- newelt ) } }
-     { "value" object } }
+    { "seq" sequence } { "start" integer } { "quot" { $quotation ( elt1 elt2 -- newelt ) } }
+    { "value" object } }
 { $description "Like " { $link reduce } ", but splits the sequence in half recursively until each sequence is small enough, and calls the quotation on these smaller sequences. If the quotation computes values that depend on the size of their input, such as bignum arithmetic, then this algorithm can be more efficient than using " { $link reduce } "." }
 { $examples "Computing factorial:"
     { $example "USING: prettyprint sequences math ;"
@@ -1646,8 +1648,8 @@ HELP: binary-reduce
 
 HELP: follow
 { $values
-     { "obj" object } { "quot" { $quotation ( ... prev -- ... result/f ) } }
-     { "seq" sequence } }
+    { "obj" object } { "quot" { $quotation ( ... prev -- ... result/f ) } }
+    { "seq" sequence } }
 { $description "Outputs a sequence containing the input object and all of the objects generated by successively feeding the result of the quotation called on the input object to the quotation recursively. Objects yielded by the quotation are added to the output sequence until the quotation yields " { $link f } ", at which point the recursion terminates." }
 { $examples "Get random numbers until zero is reached:"
     { $unchecked-example
@@ -1658,8 +1660,8 @@ HELP: follow
 
 HELP: halves
 { $values
-     { "seq" sequence }
-     { "first-slice" slice } { "second-slice" slice } }
+    { "seq" sequence }
+    { "first-slice" slice } { "second-slice" slice } }
 { $description "Splits a sequence into two slices at the midpoint. If the sequence has an odd number of elements, the extra element is returned in the second slice." }
 { $examples { $example "USING: arrays sequences prettyprint kernel ;"
     "{ 1 2 3 4 5 } halves [ >array . ] bi@"
@@ -1668,8 +1670,8 @@ HELP: halves
 
 HELP: indices
 { $values
-     { "obj" object } { "seq" sequence }
-     { "indices" sequence } }
+    { "obj" object } { "seq" sequence }
+    { "indices" sequence } }
 { $description "Compares the input object to every element in the sequence and returns a vector containing the index of every position where the element was found." }
 { $examples { $example "USING: sequences prettyprint ;"
     "2 { 2 4 2 6 2 8 2 10 } indices ."
@@ -1678,8 +1680,8 @@ HELP: indices
 
 HELP: insert-nth
 { $values
-     { "elt" object } { "n" integer } { "seq" sequence }
-     { "seq'" sequence } }
+    { "elt" object } { "n" integer } { "seq" sequence }
+    { "seq'" sequence } }
 { $description "Creates a new sequence where the " { $snippet "n" } "th index is set to the input object." }
 { $examples { $example "USING: prettyprint sequences ;"
     "40 3 { 10 20 30 50 } insert-nth ."
@@ -1688,8 +1690,8 @@ HELP: insert-nth
 
 HELP: map-reduce
 { $values
-     { "seq" sequence } { "map-quot" { $quotation ( ..a elt -- ..a intermediate ) } } { "reduce-quot" { $quotation ( ..a prev intermediate -- ..a next ) } }
-     { "result" object } }
+    { "seq" sequence } { "map-quot" { $quotation ( ..a elt -- ..a intermediate ) } } { "reduce-quot" { $quotation ( ..a prev intermediate -- ..a next ) } }
+    { "result" object } }
 { $description "Calls " { $snippet "map-quot" } " on each element and combines the results using " { $snippet "reduce-quot" } " in the same manner as " { $link reduce } ", except that there is no identity element, and the sequence must have a length of at least 1." }
 { $errors "Throws an error if the sequence is empty." }
 { $examples { $example "USING: sequences prettyprint math ;"
@@ -1699,30 +1701,30 @@ HELP: map-reduce
 
 HELP: new-like
 { $values
-     { "len" integer } { "exemplar" "an exemplar sequence" } { "quot" quotation }
-     { "seq" sequence } }
+    { "len" integer } { "exemplar" "an exemplar sequence" } { "quot" quotation }
+    { "seq" sequence } }
 { $description "Creates a new sequence of length " { $snippet "len" } " and calls the quotation with this sequence on the stack. The output of the quotation and the original exemplar are then passed to " { $link like } " so that the output sequence is the exemplar's type." } ;
 
 HELP: push-either
 { $values
-     { "elt" object } { "quot" quotation } { "accum1" vector } { "accum2" vector } }
+    { "elt" object } { "quot" quotation } { "accum1" vector } { "accum2" vector } }
 { $description "Pushes the input object onto one of the accumulators; the first if the quotation yields true, the second if false." } ;
 
 HELP: sequence-hashcode
 { $values
-     { "n" integer } { "seq" sequence }
-     { "x" integer } }
+    { "n" integer } { "seq" sequence }
+    { "x" integer } }
 { $description "Iterates over a sequence, computes a hashcode with " { $link hashcode* } " for each element, and combines them using " { $link sequence-hashcode-step } "." } ;
 
 HELP: sequence-hashcode-step
 { $values
-     { "oldhash" integer } { "newpart" integer }
-     { "newhash" integer } }
+    { "oldhash" integer } { "newpart" integer }
+    { "newhash" integer } }
 { $description "An implementation word that computes a running hashcode of a sequence using some bit-twiddling. The resulting hashcode is always a fixnum." } ;
 
 HELP: index-or-length
 { $values
-     { "seq" sequence } { "n" integer } { "n'" integer } }
+    { "seq" sequence } { "n" integer } { "n'" integer } }
 { $description "Returns the input sequence and its length or " { $snippet "n" } ", whichever is less." }
 { $examples { $example "USING: sequences kernel prettyprint ;"
     "\"abcd\" 3 index-or-length [ . ] bi@"
@@ -1731,7 +1733,7 @@ HELP: index-or-length
 
 HELP: shorten
 { $values
-     { "n" integer } { "seq" sequence } }
+    { "n" integer } { "seq" sequence } }
 { $description "Shortens a " { $link "growable" } " sequence to be " { $snippet "n" } " elements long." }
 { $examples { $example "USING: sequences prettyprint kernel ;"
     "V{ 1 2 3 4 5 } 3 over shorten ."

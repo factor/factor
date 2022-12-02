@@ -4,3 +4,17 @@ window.onload = function() {
         radios[0].checked = true;
     }
 }
+
+document.addEventListener('keydown', function (event) {
+    if (event.code == 'Slash') {
+        let input = document.getElementById('search');
+        if (input != null) {
+            if (input !== document.activeElement) {
+                event.preventDefault();
+                setTimeout(function() {
+                    input.focus();
+                }, 0);
+            }
+        }
+    }
+});
