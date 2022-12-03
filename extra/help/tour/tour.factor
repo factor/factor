@@ -1,11 +1,14 @@
 ! Copyright (C) 2022 Raghu Ranganathan and Andrea Ferreti.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: arrays assocs command-line help help.markup help.syntax
-help.vocabs inspector io kernel math math.factorials
-math.functions math.primes memory namespaces parser prettyprint
-ranges see sequences stack-checker strings tools.crossref
-tools.test tools.time ui.gadgets.panes vocabs.loader
-vocabs.refresh words editors ;
+USING: alien.c-types arrays assocs command-line continuations
+editors help help.markup help.syntax help.vocabs inspector io
+io.directories io.files io.files.types kernel lexer math
+math.factorials math.functions math.primes memory namespaces
+parser prettyprint ranges see sequences stack-checker strings
+threads tools.crossref tools.test tools.time ui.gadgets.panes
+ui.tools.deploy vocabs vocabs.loader vocabs.refresh words
+io.servers http io.sockets io.launcher channels 
+concurrency.distributed channels.remote ;
 IN: help.tour
 
 ARTICLE: "tour-concatenative" "Concatenative Languages" 
@@ -96,8 +99,8 @@ Also notice that we have been able to split our computation onto many lines or c
 ARTICLE: "tour-first-word" "Defining our first word" 
 
 We will now define our first function. Factor has slightly odd naming of functions: since functions are read from left 
-to right, they are simply called **words**, and this is what we'll call them from now on. Modules in Factor define 
-words in terms of previous words and these sets of words are then called **vocabularies**.
+to right, they are simply called { $strong "words" } , and this is what we'll call them from now on. Modules in Factor define 
+words in terms of previous words and these sets of words are then called { $strong "vocabularies" } .
 
 Suppose we want to compute the factorial. To start with a concrete example, we'll compute the factorial of { $snippet "10" }
 , so we start by writing { $snippet "10" }  on the stack. Now, the factorial is the product of the numbers from { 
@@ -138,7 +141,7 @@ Now, { $link reduce }  usually takes three arguments: a sequence (and we had one
 
 If we had written just { $link * } , Factor would have tried to apply multiplication to the topmost two elements 
 on the stack, which is not what we wanted. What we need is a way to get a word onto the stack without applying it. 
-Keeping to our textual metaphor, this mechanism is called **quotation**. To quote one or more words, you just surround them 
+Keeping to our textual metaphor, this mechanism is called { $strong "quotation" } . To quote one or more words, you just surround them 
 by { $snippet "[" }  and { $snippet "]" }  (leaving spaces!). What you get is akin to an anonymous function in other 
 languages.
 
@@ -149,7 +152,7 @@ expected.
 We now want to define a word for factorial that can be used whenever we want a factorial. We will call our word { $snippet "fact" }
 "(" although { $snippet "!" }  is customarily used as the symbol for factorial, in Factor { $snippet "!" }  
 is the word used for comments ")" . To define it, we first need to use the word { $snippet ":" } . Then we put the name of 
-the word being defined, then the **stack effects** and finally the body, ending with the { $snippet ";" }  word:
+the word being defined, then the { $strong "stack effects" }  and finally the body, ending with the { $snippet ";" }  word:
 
 { $code ": fact ( n -- n! ) [1..b] 1 [ * ] reduce ;" }
 
@@ -190,7 +193,7 @@ ARTICLE: "tour-parsing-words" "Parsing Words"
 If you've been paying close attention so far, you realize I've lied to you. I said each word acts on the stack in order
 , but there a few words like { $snippet "[" } , { $snippet "]" } , { $snippet ":" } and { $snippet ";" } that don't seem to follow this rule.
 
-These are **parsing words** and they behave differently from simpler words like { $snippet "5" } , { $link [1..b] } or { $link drop } . We will cover 
+These are { $strong "parsing words" }  and they behave differently from simpler words like { $snippet "5" } , { $link [1..b] } or { $link drop } . We will cover 
 these in more detail when we talk about metaprogramming, but for now it is enough to know that parsing words are special.
 
 They are not defined using the { $snippet ":" } word, but with the word { $snippet "SYNTAX:" } instead. When a parsing words is encountered, it 
@@ -312,7 +315,7 @@ Many more combinators exists other than { $link bi }  (and its relative { $link 
 ARTICLE: "tour-vocabularies" "Vocabularies"
 
 It is now time to start writing your functions in files and learn how to import them in the listener. Factor organizes 
-words into nested namespaces called **vocabularies**. You can import all names from a vocabulary with the word { $snippet "USE:" } . 
+words into nested namespaces called { $strong "vocabularies" } . You can import all names from a vocabulary with the word { $snippet "USE:" } . 
 In fact, you may have seen something like
 
 { $code "USE: ranges" }
@@ -352,7 +355,7 @@ You can add the definitions of the previous paragraph, so that it looks like
 USING: ;
 IN: github.tutorial
 
-: [2..b] ( n -- {2,...,n} ) 2 swap [a,b] ; inline
+: [2..b] ( n -- {2,...,n} ) 2 swap [a..b] ; inline
 
 : multiple? ( a b -- ? ) swap divisor? ; inline
 
@@ -382,7 +385,7 @@ want to expose directly. To hide them from view, you can wrap them in a private 
 { $code "
 <PRIVATE
 
-: [2..b] ( n -- {2,...,n} ) 2 swap [a,b] ; inline
+: [2..b] ( n -- {2,...,n} ) 2 swap [a..b] ; inline
 
 : multiple? ( a b -- ? ) swap divisor? ; inline
 
@@ -498,8 +501,8 @@ To be fair, Factor is very different from Smalltalk, but still there is the conc
 defined having different implementations on different classes.
 
 Some classes are builtin in Factor, such as { $link string } , { $link boolean } , { $link fixnum } or { $link word } . Next, the most common way to 
-define a class is as a **tuple**. Tuples are defined with the { $link POSTPONE: TUPLE: } parsing word, followed by the tuple name and the 
-fields of the class that we want to define, which are called **slots** in Factor parlance.
+define a class is as a { $strong "tuple" } . Tuples are defined with the { $link POSTPONE: TUPLE: } parsing word, followed by the tuple name and the 
+fields of the class that we want to define, which are called { $strong "slots" }  in Factor parlance.
 
 Let us define a class for movies:
 
@@ -522,7 +525,7 @@ We can also shorten this to
 movie boa
 " }
 The word { $link boa } stands for 'by-order-of-arguments' and is a constructor that fills the slots of the tuple with the 
-items on the stack in order. { $snippet "movie boa" } is called a **boa constructor**, a pun on the Boa Constrictor. It is customary to 
+items on the stack in order. { $snippet "movie boa" } is called a { $strong "boa constructor" } , a pun on the Boa Constrictor. It is customary to 
 define a most common constructor called { $snippet "<movie>" } , which in our case could be simply
 
 { $code "
@@ -556,7 +559,7 @@ together with one instance
 	\"Richard Wright\" \"David Gilmour\" \"Roger Waters\" \"Nick Mason\" <band>
 " }
 Now, of course everyone knows that the star in a movie is the first actor, while in a rock band it is the bass player. 
-To encode this, we first define a **generic word**
+To encode this, we first define a { $strong "generic word" } 
 
 { $code "
 GENERIC: star ( item -- star )
@@ -573,7 +576,7 @@ If you write { $snippet "star ." } two times, you can see the different effect o
 classes.
 
 Builtin and tuple classes are not all that there is to the object system: more classes can be defined with set 
-operations like { $link POSTPONE: UNION: } and { $link POSTPONE: INTERSECTION: } . Another way to define a class is as a **mixin**.
+operations like { $link POSTPONE: UNION: } and { $link POSTPONE: INTERSECTION: } . Another way to define a class is as a { $strong "mixin" } .
 
 Mixins are defined with the { $snippet "MIXIN:" } word, and existing classes can be added to the mixin writing
 
@@ -698,6 +701,771 @@ way can be { $link see } . Or, vice versa, you may use { $link usage. } to inspe
 { $snippet "\\ reverse usage." } .
 ;
 
+ARTICLE: "tour-metaprogramming" "Metaprogramming"
+
+We now venture into the metaprogramming world, and write our first parsing word. By now, you have seen a lot of 
+parsing words, such as { $link POSTPONE: [ } . { $link POSTPONE: { } , { $link POSTPONE: H{ } , { $link POSTPONE: USE: } , { $link POSTPONE: IN: } , { $link POSTPONE: <PRIVATE } , { $link POSTPONE: GENERIC: } and so on. Each of those is defined with the 
+parsing word { $link POSTPONE: SYNTAX: } and interacts with Factor's parser.
+
+The parser accumulates tokens onto an accumulator vector, unless it finds a parsing word, which is executed immediately.
+ Since parsing words execute at compile time, they cannot interact with the stack, but they have access to the 
+accumulator vector. Their stack effect must be { $snippet "( accum -- accum )" } . Usually what they do is ask the parser for some more tokens,
+ do something with them, and finally push a result on the accumulator vector with the word { $snippet "suffix!" } .
+
+As an example, we will define a literal for DNA sequences. A DNA sequence is a sequence of one of the bases cytosine, 
+guanine, adenine and thymine, which we will denote by the letters c, g, a, t. Since there are four possible bases, we 
+can encode each with two bits. Let use define a word
+
+{ $code "
+: dna>bits ( token -- bits ) {
+  { \"a\" [ { f f } ] }
+  { \"c\" [ { t t } ] }
+  { \"g\" [ { f t } ] }
+  { \"t\" [ { t f } ] }
+} case ;
+" }
+where the first bit represents whether the basis is a purine or a pyrimidine, and the second one identifies bases that 
+pair together.
+
+Our aim is to read a sequence of letters a, c, g, "t" - possibly with spaces - and convert them to a bit array. Factor 
+supports bit arrays, and literal bit arrays look like { $snippet "?{ f f t }" } .
+
+Our syntax for DNA will start with { $snippet "DNA{" } and get all tokens until the closing token { $snippet "}" } is found. The intermediate 
+tokens will be put into a string, and using our function { $snippet "dna>bits" } we will map this string into a bit array. To read 
+tokens, we will use the word { $link parse-tokens } . There are a few higher-level words to interact with the parser, such as { $link parse-until }
+and { $link parse-literal } , but we cannot apply them in our case, since the tokens we will find are just sequences of a 
+c g t, instead of valid Factor words. Let us start with a simple approximation that just reads tokens between our 
+delimiters and outputs the string obtained by concatenation
+
+{ $code "
+SYNTAX: DNA{ \"}\" parse-tokens concat suffix!
+" }
+You can test the effect by doing { $snippet "DNA{ a ccg t a g }" } , which should output { $snippet "\"accgtag\"" } . As a second approximation, we 
+transform each letter into a boolean pair:
+
+{ $code "
+SYNTAX: DNA{ \"}\" parse-tokens concat
+  [ 1string dna>bits ] { } map-as suffix! ;
+" }
+Notice the use of { $link map-as } instead of { $link map } . Since the target collection is not a string, we did not use { $link map } , which 
+preserves the type, but { $link map-as } , which take as an additional argument an examplar of the target collection - here { $snippet "{ }" } .
+Our "final" version flattens the array of pairs with { $link concat } and finally makes into a bit array:
+
+{ $code "
+SYNTAX: DNA{ \"}\" parse-tokens concat
+  [ 1string dna>bits ] { } map-as
+  concat >bit-array suffix! ;
+" }
+If you try it with { $snippet "DNA{ a ccg t a g }" } you should get
+
+{ $code "
+{ $snippet \"?{ f f t t t t f t t f f f f t }\" }
+" }
+Let us make another very simple example, stolen from [John Benediktsson](http://re-factor.blogspot.it/2014/06/swift-ranges.html), 
+which is about infix syntax for ranges. Until now, we have used { $link [a..b] } to create a range. We can make a 
+syntax that is friendlier to people coming from other languages using { $snippet "..." } as an infix word.
+
+We can use { $link scan-object } to ask the parser for the next parsed object, and { $snippet "unclip-last" } to get the top element from 
+the accumulator vector. This way, we can define { $snippet "..." } simply with
+
+{ $code "
+SYNTAX: ... unclip-last scan-object [a..b] suffix! ;
+" }
+You can try it with { $snippet "12 ... 18 >array" } .
+
+We only scratched the surface of parsing words; in general, they allow you to perform arbitrary computations at 
+compile time, enabling powerful forms of metaprogramming.
+
+In a sense, Factor syntax is completely flat, and parsing words allow you to introduce syntaxes more complex than a 
+stream of tokens to be used locally. This permits to increase the Factor language by adding many new features as libraries
+. In principle, it would even be possible to have an external language compile to Factor - say JavaScript - and embed it 
+as a Factor DSL inside the boundaries of a { $snippet "<JS ... JS>" } parsing word. Some taste is needed not to abuse too much of 
+this to introduce styles that are much too alien in the concatenative world.
+;
+
+ARTICLE: "tour-stack-ne" "When the stack is not enough"
+
+Until now I have cheated a bit, and tried to avoid writing examples that would have been too complex to write in 
+concatenative style. Truth is, you *will* find occasions where this is too restrictive. Fortunately, parsing words allow you 
+to break these restrictions, and Factor comes with a few to handle the most common annoyances.
+
+One thing you may want to do is to actually name local variables. The { $link POSTPONE: :: } word works like { $link POSTPONE: : } , but allows you to 
+actually bind the name of stack parameters to variables, so that you can use them multiple times, in the order you want. For 
+instance, let us define a word to solve quadratic equations. I will spare you the purely stack-based version, and 
+present you a version with locals (this will require the { $vocab-link "locals" } vocabulary):
+
+{ $code "
+    :: solveq ( a b c -- x )
+      b neg
+      b b * 4 a c * * - sqrt
+      +
+      2 a * / ;
+" }
+In this case we have chosen the + sign, but we can do better and output both solutions:
+
+{ $code "
+    :: solveq ( a b c -- x1 x2 )
+      b neg
+      b b * 4 a c * * - sqrt
+      [ + ] [ - ] 2bi
+      [ 2 a * / ] bi@ ;
+" }
+You can check that this definition works with something like { $snippet "2 -16 30 solveq" } , which should output both { $snippet "3.0" } and { $snippet "5.0" } . 
+Apart from being written in RPN style, our first version of { $snippet "solveq" } looks exactly the same it would in a language 
+with local variables. For the second definition, we apply both the { $link + }  and { $link - }  operations to -b and delta, using the 
+combinator { $link 2bi } , and then divide both results by 2a using { $link bi@ } .
+
+There is also support for locals in quotations - using { $link POSTPONE: [| } - and methods - using { $link POSTPONE: M:: } - and one can also create a 
+scope where to bind local variables outside definitions using { $link POSTPONE: [let } . Of course, all of these are actually compiled to 
+concatenative code with some stack shuffling. I encourage you to browse examples for these words, but bear in mind that 
+their usage in practice is actually much less prominent than one would expect - about 1% of Factor's own codebase.
+
+Another more common case happens when you need to specialize a quotation to some values, but these do not appear in 
+the right place. Remember that you can partially apply a quotation using { $link curry } . But this assumes that the value you are 
+applying should appear leftmost in the quotation; in the other cases you need some stack shuffling. The word { $link with }  is a 
+sort of partial application with a hole. It also curries a quotation, but uses the third element on the stack instead 
+of the second. Also, the resulting curried quotation will be applied to an element inserting it in the second position.
+
+The example from the documentation probably tells more than the above sentence: try writing { $snippet "1 { 1 2 3 } [ / ] with map" } .
+
+Let me take again { $snippet "prime?" } , but this time write it without using helper words:
+
+{ $code "
+    : prime? ( n -- ? ) [ sqrt 2 swap [a,b] ] [ [ swap divisor? ] curry ] bi any? not ;
+" }
+Using { $link with }  instead of { $link curry } , this simplifies to
+
+{ $code "
+    : prime? ( n -- ? ) 2 over sqrt [a,b] [ divisor? ] with any? not ;
+" }
+If you do not visualize what is happening, you may want to consider the { $vocab-link "fry" } vocabulary. It defines { $strong "fried quotations" } ";" 
+these are quotations that have holes in them - marked by { $snippet "_" } - that are filled with values from the stack.
+
+The first quotation is rewritten more simply as
+
+{ $code "
+    [ '[ 2 _ sqrt [a,b] ] call ]
+" }
+Here we use a fried quotation - starting with { $link POSTPONE: '[ } - to inject the element on the top of the stack in the second 
+position, and then use { $snippet "call" } to evaluate the resulting quotation. The second quotation becomes simply
+
+{ $code "
+    [ '[ _ swap divisor? ] ]
+" }
+so an alternative defition of { $snippet "prime?" } is
+
+{ $code "
+    : prime? ( n -- ? ) [ '[ 2 _ sqrt [a,b] ] call ] [ '[ _ swap divisor? ] ] bi any? not ;
+" }
+Depending on your taste, you may find this version more readable. In this case, the added clarity is probably lost due 
+to the fact that the fried quotations are themselves inside quotations, but occasionally their use can do a lot to 
+simplify the flow.
+
+Finally, there are times where one just wants to give names to variables that are available inside some scope, and use 
+them where necessary. These variables can hold values that are global, or at least not local to a single word. A 
+typical example could be the input and output streams, or database connections.
+
+Factor allows you to create { $strong "dynamic variables" }  and bind them in scopes. The first thing is to create a { $strong "symbol" }  
+for a variable, say
+
+{ $code "
+    SYMBOL: favorite-language
+" }
+Then one can use the word { $link set }  to bind the variable and { $link get }  to retrieve its values, like
+
+{ $code "
+    \"Factor\" favorite-language set
+    favorite-language get
+" }
+Scopes are nested, and new scopes can be created with the word { $link with-scope } . Try for instance
+
+{ $code "
+    : on-the-jvm ( -- ) [
+      \"Scala\" favorite-language set
+      favorite-language get .
+    ] with-scope ;
+" }
+If you run { $snippet "on-the-jvm" } you will get { $snippet "\"Scala\"" } printed, but still after execution { $snippet "favorite-language get" } return { $snippet "\"Factor\"" } .
+
+All the tools that we have seen in this section should be used when necessary, as they break concatenativity and make 
+words less easy to factor, but they can greatly increase clarity when needed. Factor has a very practical approach and 
+does not shy from offering features that are less pure but nevertheless often useful.
+;
+
+ARTICLE: "tour-io" "Input/Output"
+
+We now leave the tour of the language, and start investigating how to tour the outside world with Factor. I will begin in 
+this section with some examples of input/output, but inevitably this will lead into a discussion of asynchrony. The 
+rest of the tutorial will then go in more detail about parallel and distributed computing.
+
+Factor implements efficient asynchronous input/output facilities, similar to NIO on the JVM or the Node.js I/O system. 
+This means that input and output operations are performed in the background, leaving the foreground task free to 
+perform work while the disk is spinning or the network is buffering packets. Factor is currently single threaded, but 
+asynchrony allows it to be rather performant for applications that are I/O-bound.
+
+All of Factor input/output words are centered on { $strong "streams" } . Streams are lazy sequences which can be read or written 
+to, typical examples being files, network ports or the standard input and output. Factor holds a couple of dynamic 
+variables called { $link input-stream } and { $link output-stream } , which are used by most I/O words. These variables can be rebound locally 
+using { $link with-input-stream } , { $link with-output-stream } and { $link with-streams } . When you are in the listener, the default streams 
+write and read in the listener, but once you deploy your application as an executable, they are usually bound to the 
+standard input and output of your console.
+
+The words { $link <file-reader> } and { $link <file-writer> } (or { $link <file-appender> } ) can be used to create a read or write stream to a 
+file, given its path and encoding. Putting everything together, we make a simple example of a word that reads each line 
+of a file encoded in UTF8, and writes the first letter of the line to the listener.
+
+First, we want a { $snippet "safe-head" } word, that works like { $link head } , but returns its input if the sequence is too short. To do so
+, we will use the word { $link recover } , which allows us to declare a try-catch block. It requires two quotations: the first 
+one is executed, and on failure, the second one is executed with the error as input. Hence we can define
+
+{ $code "
+    : safe-head ( seq n -- seq' ) [ head ] [ 2drop ] recover ;
+" }
+This is mostly an occasion to show an example of exceptions, as Factor defines the { $link short } word, which takes a 
+sequence and a number, and returns the minimum between the length of the sequence and the number. This allows us to write simply
+
+{ $code "
+    : safe-head ( seq n -- seq' ) short head ;
+" }
+With this definition, we can make a word to read the first character of the first line:
+
+{ $code "
+    : read-first-letters ( path -- )
+      utf8 <file-reader> [
+        readln 1 safe-head write nl
+      ] with-input-stream ;
+" }
+Using the helper word { $link with-file-reader } , we can also shorten this to
+
+{ $code "
+    : read-first-letters ( path -- )
+      utf8 [
+        readln 1 safe-head write nl
+      ] with-file-reader ;
+" }
+Unfortunately, we are limited to one line. To read more lines, we should chain calls to { $link readln } until one returns { $link f } .
+Factor helps us with { $link file-lines } , which lazily iterates "over" lines. Our "final" definition becomes
+
+{ $code "
+    : read-first-letters ( path -- )
+      utf8 file-lines [ 1 safe-head write nl ] each ;
+" }
+When the file is small, one can also use { $link file-contents } to read the whole contents of a file in a single string. 
+Factor defines many more words for input/output, which cover many more cases, such as binary files or sockets.
+
+We end this section investigating some words to walk the filesystem. Our aim is a very minimal implementation of the { $snippet "ls" } command.
+
+The word { $link directory-entries } lists the contents of a directory, giving a list of tuple elements, each one having the 
+slots { $snippet "name" } and { $snippet "type" } . You can see this by trying { $snippet "\"/home\" directory-entries [ name>> ] map" } . If you inspect the 
+directory entries, you will see that the type is either { $link +directory+ } or { $link +regular-file+ } (well, there are symlinks as well, 
+but we will ignore them for simplicity). Hence we can define a word that lists files and directories with
+
+{ $code "
+    : list-files-and-dirs ( path -- files dirs )
+        directory-entries [ type>> +regular-file+ = ] partition ;
+" }
+With this, we can define a word { $snippet "ls" } that will print directory contents as follows:
+
+{ $code "
+    : ls ( path -- )
+      list-files-and-dirs
+      \"DIRECTORIES:\" write nl
+      \"------------\" write nl
+      [ name>> write nl ] each
+      \"FILES:\" write nl
+      \"------\" write nl
+      [ name>> write nl ] each ;
+" }
+Try the word on your home directory to see the effects. In the next section, we shall look at how to create an 
+executable for our simple program.
+;
+
+ARTICLE: "tour-deploy" "Deploying programs"
+
+
+There are two ways to run Factor programs outside the listener: as scripts, which are interpreted by Factor, or as 
+standalone executable compiled for your platform. Both require you to define a vocabulary with an entry point (altough 
+there is an even simpler way for scripts), so let's do that first.
+
+Start by creating our { $snippet "ls" } vocabulary with { $snippet "\"ls\" scaffold-work" } and make it look like this:
+
+
+{ $code "
+    ! Copyright (C) 2014 Andrea Ferretti.
+    ! See http://factorcode.org/license.txt for BSD license.
+    USING: accessors command-line io io.directories io.files.types
+      kernel namespaces sequences ;
+    IN: ls
+
+    <PRIVATE
+
+    : list-files-and-dirs ( path -- files dirs )
+        directory-entries [ type>> +regular-file+ = ] partition ;
+
+    PRIVATE>
+
+    : ls ( path -- )
+      list-files-and-dirs
+      \"DIRECTORIES:\" write nl
+      \"------------\" write nl
+      [ name>> write nl ] each
+      \"FILES:\" write nl
+      \"------\" write nl
+      [ name>> write nl ] each ;
+" }
+
+When we run our vocabulary, we will need to read arguments from the command line. Command-line arguments are stored 
+under the { $link command-line } dynamic variable, which holds an array of strings. Hence - forgetting any error checking - we can 
+define a word which runs { $snippet "ls" } on the first command-line argument with
+
+{ $code "
+    : ls-run ( -- ) command-line get first ls ;
+" }
+Finally, we use the word { $snippet "MAIN:" } to declare the main word of our vocabulary:
+
+{ $code "
+    MAIN: ls-run
+" }
+Having added those two lines to your vocabulary, you are now ready to run it. The simplest way is to run the 
+vocabulary as a script with the { $snippet "-run" } flag passed to Factor. For instance to list the contents of my home I can do
+
+{ $code "
+    ./factor -run=ls /home/andrea
+" }
+In order to produce an executable, we must set some options and call the { $snippet "deploy" } word. The simplest way to do this 
+graphically is to invoke the { $link deploy-tool } word. If you write { $snippet "\"ls\" deploy-tool" } , you will be presented with a window to 
+choose deployment options. For our simple case, we will leave the default options and choose Deploy.
+
+After a little while, you should be presented with an executable that you can run like
+
+{ $code "
+    cd ls
+    ./ls /home/andrea
+" }
+Try making the { $snippet "ls" } program more robust by handling missing command-line arguments and non-existent or non-directory 
+arguments.
+;
+
+ARTICLE: "tour-multithreading" "Multithreading"
+
+As we have said, the Factor runtime is single-threaded, like Node. Still, one can emulate concurrency in a single-
+threaded setting by making use of { $strong "coroutines" } . These are essentially cooperative threads, which periodically release 
+control with the { $link yield } word, so that the scheduler can decide which coroutine to run next.
+
+Although cooperative threads do not allow to make use of multiple cores, they still have some benefits:
+{ $list 
+  "input/output operations can avoid blocking the entire runtime, so that one can implement quite performant applications if I/O is the bottleneck;"
+  "user interfaces are naturally a multithreaded construct, and they can be implemented in this model, as the listener itself shows;"
+  "finally, some problems may just naturally be easier to write making use of the multithreaded constructs."
+}
+
+For the cases where one wants to make use of multiple cores, Factor offers the possibility of spawning other processes 
+and communicating between them with the use of { $strong "channels" } , as we will see in a later section.
+
+Threads in Factors are created out of a quotation and a name, with the { $link spawn } word. Let us use this to print the 
+first few lines of Star Wars, one per second, each line being printed inside its own thread. First, let us write those lines 
+inside a dynamic variable:
+
+{ $code "
+SYMBOL: star-wars
+
+\"A long time ago, in a galaxy far, far away....
+
+It is a period of civil war. Rebel
+spaceships, striking from a hidden
+base, have won their first victory
+against the evil Galactic Empire.
+
+During the battle, rebel spies managed
+to steal secret plans to the Empire's
+ultimate weapon, the DEATH STAR, an
+armored space station with enough
+power to destroy an entire planet.
+
+Pursued by the Empire's sinister agents,
+Princess Leia races home aboard her
+starship, custodian of the stolen plans
+that can save her people and restore
+freedom to the galaxy....\"
+\"\n\" split star-wars set
+" }
+
+We will spawn 18 threads, each one printing a line. The operation that a thread must run amounts to
+
+{ $code "
+star-wars get ?nth print
+" }
+
+Note that dynamic variables are shared between threads, so each one has access to star-wars. This is fine, since it is 
+read-only, but the usual caveats about shared memory in a multithreaded settings apply.
+
+Let us define a word for the thread workload
+
+{ $code "
+: print-a-line ( i -- ) star-wars get ?nth print ;
+" }
+
+If we give the i-th thread the name "\"i\"" , our example amounts to
+
+{ $code "
+18 [0..b) [
+  [ [ print-a-line ] curry ]
+  [ number>string ]
+  bi spawn
+] each
+" }
+
+Note the use of { $link curry } to send i to the quotation that prints the i-th line. This is almost what we want, but it runs 
+too fast. We need to put the thread to sleep for a while. So we { $link clear } the stack that now contains a lot of thread 
+objects and look for the { $link sleep } word in the help.
+
+It turns out that { $link sleep } does exactly what we need, but it takes a { $strong "duration" }  object as input. We can create a 
+duration of i seconds with... well { $snippet "i seconds" } . So we define
+
+{ $code "
+: wait-and-print ( i -- ) dup seconds sleep print-a-line ;
+" }
+
+Let us try
+
+{ $code "
+18 [0..b) [
+  [ [ wait-and-print ] curry ]
+  [ number>string ]
+  bi spawn
+] each
+" }
+
+Instead of { $link spawn } , we can also use { $link in-thread } which uses a dummy thread name and discards the returned thread, 
+simplifying the above to
+
+{ $code "
+18 [0..b) [
+  [ wait-and-print ] curry in-thread
+] each
+" }
+
+This is good enough for our simple purpose. In serious applications theads will be long-running. In order to make them 
+cooperate, one can use the { $link yield } word to signal that the thread has done a unit of work, and other threads can gain 
+control. You also may want to have a look at other words to { $link stop } , { $link suspend } or { $link resume } threads.
+;
+
+ARTICLE: "tour-servers" "Servers and Furnace"
+
+A very common case for using more than one thread is when writing server applications. When writing network 
+applications, it is common to start a thread for each incoming connection (remember that these are green threads, so they are much 
+more lightweight than OS threads).
+
+To simplify this, Factor has the word { $link spawn-server } , which works like { $link spawn } , but in addition repeatedly spawns the 
+quotation until it returns { $link f } . This is still a very low-level word: in reality one has to do much more: listen for TCP 
+connections on a given port, handle connection limits and so on.
+
+The vocabulary { $vocab-link "io.servers" } allows to write and configure TCP servers. A server is created with the word `<threaded-
+server>`, which requires an encoding as a parameter. Its slots can then be set to configure logging, connection limits, 
+ports and so on. The most important slot to fill is { $snippet "handler" } , which contains a quotation that is executed for each 
+incoming connection. You can see a very simple example of server with
+{ $code "
+
+    \"resource:extra/time-server/time-server.factor\" edit-file
+
+" }
+
+We will raise the level of abstraction even more and show how to run a simple HTTP server. First, { $snippet "USE: http.server" } .
+
+An HTTP application is built out of a { $strong "responder" } . A responder is essentially a function from a path and an HTTP 
+request to an HTTP response, but more concretely it is anything that implements the method { $snippet "call-responder*" } . Responses are 
+instances of the tuple { $link response } , so are usually generated calling { $link <response> } and customizing a few slots. Let us 
+write a simple echo responder:
+{ $code "
+
+    TUPLE: echo-responder ;
+
+    : <echo-responder> ( -- responder ) echo-responder new ;
+
+    M: echo-responder call-responder*
+      drop
+      <response>
+        200 >>code
+        \"Document follows\" >>message
+        \"text/plain\" >>content-type
+        swap concat >>body ;
+
+" }
+
+Responders are usually combined to form more complex responders in order to implement routing and other features. In 
+our simplistic example, we will use just this one responder, and set it globally with
+{ $code "
+
+    <echo-responder> main-responder set-global
+
+" }
+
+Once you have done this, you can start the server with { $snippet "8080 httpd" } . You can then visit { $url "http://localhost:8080/hello/%20/from/%20/factor" }
+ in your browser to see your first responder in action. You can then stop the server with { $link stop-server } .
+
+Now, if this was all that Factor offers to write web applications, it would still be rather low level. In reality, web 
+applications are usually written using a web framework called { $strong "Furnace" } .
+
+Furnace allows us - among other things - to write more complex actions using a template language. Actually, there are 
+two template languages shipped by default, and we will use { $strong "Chloe" } . Furnace allows us to use create { $strong "page actions" }  
+from Chloe templates, and in order to create a responder we will need to add routing.
+
+Let use first investigate a simple example of routing. To do this, we create a special type of responder called a **
+dispatcher**, that dispatches requests based on path parameters. Let us create a simple dispatcher that will choose 
+between our echo responder and a default responder used to serve static files.
+{ $code "
+
+    dispatcher new-dispatcher
+      <echo-responder> \"echo\" add-responder
+      \"/home/andrea\" <static> \"home\" add-responder
+      main-responder set-global
+
+" }
+
+Of course, substitute the path { $snippet "/home/andrea" } with any folder you like. If you start again the server with { $snippet "8080 httpd" }
+, you should be able to see both our simple echo responder (under { $snippet "/echo" } ) and the contents of your files (under { $snippet "/home" } ).
+ Notice that directory listing is disabled by default, you can only access the content of files.
+
+Now that you know how to do routing, we can write page actions in Chloe. Things are starting to become complicated, so 
+we scaffold a vocabulary with { $snippet "\"hello-furnace\" scaffold-work" } . Make it look like this:
+{ $code "
+
+    ! Copyright (C) 2014 Andrea Ferretti.
+    ! See http://factorcode.org/license.txt for BSD license.
+    USING: accessors furnace.actions http http.server
+      http.server.dispatchers http.server.static kernel sequences ;
+    IN: hello-furnace
+
+
+    TUPLE: echo-responder ;
+
+    : <echo-responder> ( -- responder ) echo-responder new ;
+
+    M: echo-responder call-responder*
+      drop
+      <response>
+        200 >>code
+        \"Document follows\" >>message
+        \"text/plain\" >>content-type
+        swap concat >>body ;
+
+    TUPLE: hello-dispatcher < dispatcher ;
+
+    : <example-responder> ( -- responder )
+      hello-dispatcher new-dispatcher
+        <echo-responder> \"echo\" add-responder
+        \"/home/andrea\" <static> \"home\" add-responder
+        <page-action>
+          { hello-dispatcher \"greetings\" } >>template
+        \"chloe\" add-responder ;
+
+" }
+
+Most things are the same as we have done in the listener. The only difference is that we have added a third responder 
+in our dispatcher, under { $snippet "chloe" } . This responder is created with a page action. The page action has many slots - say, to 
+declare the behaviour of receiving the result of a form - but we only set its template. This is the pair with the 
+dispatcher class and the relative path of the template file.
+
+In order for all this to work, create a file { $snippet "work/hello-furnace/greetings.xml" } with a content like
+{ $code "
+
+    <?xml version='1.0' ?>
+
+    <t:chloe xmlns:t=\"http://factorcode.org/chloe/1.0\">
+      <p>Hello from Chloe</p>
+    </t:chloe>
+
+" }
+
+Reload the { $snippet "hello-furnace" } vocabulary and { $snippet "<example-responder> main-responder set-global" } . You should be able to see 
+the results of your efforts under { $url "http://localhost:8080/chloe" } . Notice that there was no need to restart the server, we 
+can change the main responder dynamically.
+
+This ends our very brief tour of Furnace. It actually does much more than this: form validation and handling, 
+authentication, logging and more. But this section is already getting too long, and you will have to find out more in the 
+documentation.
+;
+
+ARTICLE: "tour-processes" "Processes and Channels"
+
+
+As I said, Factor is single-threaded from the point of view of the OS. If we want to make use of multiple cores, we 
+need a way to spawn Factor processes and communicate between them. Factor implements two different models of message-
+passing concurrency: the actor model, which is based on the idea of sending messages asynchronously between threads, and the 
+CSP model, based on the use of { $strong "channels" } .
+
+As a warm-up, we will make a simple example of communication between threads in the same process.
+{ $code "
+
+    FROM: concurrency.messaging => send receive ;
+
+" }
+We can start a thread that will receive a message and print it repeatedly:
+{ $code "
+
+    : print-repeatedly ( -- ) receive . print-repeatedly ;
+    [ print-repeatedly ] \"printer\" spawn
+
+" }
+A thread whose quotation starts with { $link receive } and calls itself recursively behaves like an actor in Erlang or Akka. 
+We can then use { $link send } to send messages to it. Try { $snippet "\"hello\" over send" } and then { $snippet "\"threading\" over send" } .
+
+Channels are slightly different abstractions, used for instance in Go and in Clojure core.async. They decouple the 
+sender and the receiver, and are usually used synchronously. For instance, one side can receive from a channel before some 
+other party sends something to it. This just means that the receiving end yields control to the scheduler, which waits 
+for a message to be sent before giving control to the receiver again. This feature sometimes makes it easier to 
+synchronize multithreaded applications.
+
+Again, we first use a channel to communicate between threads in the same process. As expected, { $snippet "USE: channels" } . You 
+can create a channel with { $link <channel> } , write to it with { $link to } and read from it with { $link from } . Note that both operations are 
+blocking: { $link to } will block until the value is read in a different thread, and { $link from } will block until a value is available.
+
+We create a channel and give it a name with
+{ $code "
+
+    SYMBOL: ch
+    <channel> ch set
+
+" }
+Then we write to it in a separate thread, in order not to block the UI
+{ $code "
+
+    [ \"hello\" ch get to ] in-thread
+
+" }
+We can then read the value in the UI with
+{ $code "
+
+    ch get from
+
+" }
+We can also invert the order:
+{ $code "
+
+    [ ch get from . ] in-thread
+    \"hello\" ch get to
+
+" }
+This works fine, since we had set the reader first.
+
+Now, for the interesting part: we will start a second Factor instance and communicate via message sending. Factor 
+transparently supports sending messages over the network, serializing values with the { $snippet "serialize" } vocabulary.
+
+Start another instance of Factor, and run a node server on it. We will use the word { $link <inet4> } , that creates an IPv4 
+address from a host and a port, and the { $link <node-server> } constructor
+{ $code "
+
+    USE: concurrency.distributed
+    f 9000 <inet4> <node-server> start-server
+
+" }
+Here we have used { $link f } as host, which just stands for localhost. We will also start a thread that keeps a running count 
+of the numbers it has received.
+{ $code "
+
+    FROM: concurrency.messaging => send receive ;
+    : add ( x -- y ) receive + dup . add ;
+    [ 0 add ] \"adder\" spawn
+
+" }
+Once we have started the server, we can make a thread available with { $link register-remote-thread } ":"
+{ $code "
+
+    dup name>> register-remote-thread
+
+" }
+Now we switch to the other instance of Factor. Here we will receive a reference to the remote thread and start sending 
+numbers to it. The address of a thread is just the address of its server and the name we have registered the thread with
+, so we obtain a reference to our adder thread with
+{ $code "
+
+    f 9000 <inet4> \"adder\" <remote-thread>
+
+" }
+Now, we reimport { $link send } just to be sure (there is an overlap with a word having the same name in { $vocab-link "io.sockets" } , that we 
+have imported)
+{ $code "
+
+    FROM: concurrency.messaging => send receive ;
+
+" }
+and we can start sending numbers to it. Try { $snippet "3 over send" } , and then { $snippet "8 over send" } - you should see the running total 
+printed in the other Factor instance.
+
+What about channels? We go back to our server, and start a channel there, just as above. This time, though, we { $link publish } it to make it available remotely:
+{ $code "
+
+    USING: channels channels.remote ;
+    <channel> dup publish
+
+" }
+What you get in return is an id you can use remotely to communicate. For instance, I just got 
+{ $snippet "72581372615274718877979307388951222312843084896785643440879198703359628058956" } (yes, they really want to be sure it is unique!).
+
+We will wait on this channel, thereby blocking the UI:
+{ $code "
+
+    swap from .
+
+" }
+In the other Factor instance we use the id to get a reference to the remote channel and write to it
+{ $code "
+
+    f 9000 <inet4> 72581372615274718877979307388951222312843084896785643440879198703359628058956 <remote-channel>
+    \"Hello, channels\" over to
+
+" }
+In the server instance, the message should be printed.
+
+Remote channels and threads are both useful to implement distributed applications and make good use of multicore 
+servers. Of course, it remains the question how to start worker nodes in the first place. Here we have done it manually - if 
+the set of nodes is fixed, this is actually an option.
+
+Otherwise, one could use the { $vocab-link "io.launcher" } vocabulary to start other Factor instances programmatically.
+;
+
+ARTICLE: "tour-where" "Where to go from here?"
+
+We have covered a lot of ground, and I hope that by now you have a feeling whether Factor clicks for you. You can now 
+work your way through the documentation, and hopefully contribute to Factor yourself.
+
+Let me end with a few tips:
+
+{ $list
+{ "when starting to write Factor, it is " { $emphasis "very" } " easy to deal a lot with stack shuffling. Learn the " 
+{ $vocab-link "combinators" } " well, and do not fear to throw away your first examples;" }
+"no definition is too short: aim for one line;"
+"the help system and the inspector are your best friends."
+}
+To be fair, we also have to mention some drawbacks of Factor:
+
+{ $list
+"first, the community is really small. What they have done is impressive, but do not hope to find a lot of information 
+on the internet;"
+"the concatenative model is very powerful, but also very hard to get right;"
+"Factor lacks threads: although the distributed processes make up for it, they incur some cost in serialization;"
+"finally, Factor does not currently have a package manager, and this probably hinders contribution."
+}
+We have to balance the last observation with the convenience of having the whole source tree of Factor available in 
+the image, which certainly makes it easier to learn about libraries. Let me suggest a few vocabularies that you may want 
+to have a look at:
+
+{ $list 
+  { "first, I have not talked a lot about errors and exceptions. Learn more with " { $snippet "\"errors\" help" } ";" } 
+  { "the " { $vocab-link "macros" } " vocabulary implements a form of compile time metaprogramming less general than parsing words, but still quite convenient;" }
+  { "the " { $vocab-link "models" } " vocabulary lets you implement a form of dataflow programming using objects with observable slots;" }
+  { "the " { $vocab-link "match" } " vocabulary implements a form of pattern matching;" }
+  { "the " { $vocab-link "monads" } " vocabulary implements Haskell-style monads." }
+}
+
+I think these vocabularies are a testament to the power and expressivity of Factor. Happy hacking!
+
+{ $code "
+USE: images.http
+\"http://factorcode.org/logo.png\" http-image.
+" }
+;
+
 ARTICLE: "tour" "A guided tour of Factor"
 Factor is a mature, dynamically typed language based on the concatenative paradigm. Getting started with Factor can be daunting 
 since the concatenative paradigm is different from most mainstream languages. This tutorial will guide you through the basics of
@@ -738,6 +1506,14 @@ to skip it if you want to get your feet wet and return to it after some hands on
   "tour-tests-docs"
   "tour-objects"
   "tour-tools"
+  "tour-metaprogramming"
+  "tour-stack-ne"
+  "tour-io"
+  "tour-deploy"
+  "tour-multithreading"
+  "tour-servers"
+  "tour-processes"
+  "tour-where"
 }
 ;
 
