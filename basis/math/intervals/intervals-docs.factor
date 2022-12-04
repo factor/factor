@@ -173,15 +173,33 @@ HELP: (a,inf]
 
 HELP: interval+
 { $values { "i1" interval } { "i2" interval } { "i3" interval } }
-{ $description "Adds two intervals." } ;
+{ $description "Adds two intervals." }
+{ $examples
+    { $example "USING: math.intervals prettyprint ;"
+        "10 11 [a,b] 5 7 [a,b] interval+ ."
+        "T{ interval { from { 15 t } } { to { 18 t } } }"
+    }
+} ;
 
 HELP: interval-
 { $values { "i1" interval } { "i2" interval } { "i3" interval } }
-{ $description "Subtracts " { $snippet "i2" } " from " { $snippet "i1" } "." } ;
+{ $description "Subtracts " { $snippet "i2" } " from " { $snippet "i1" } "." }
+{ $examples
+    { $example "USING: math.intervals prettyprint ;"
+        "10 11 [a,b] 5 7 [a,b] interval- ."
+        "T{ interval { from { 3 t } } { to { 6 t } } }"
+    }
+} ;
 
 HELP: interval*
 { $values { "i1" interval } { "i2" interval } { "i3" interval } }
-{ $description "Multiplies two intervals." } ;
+{ $description "Multiplies two intervals." }
+{ $examples
+    { $example "USING: math.intervals prettyprint ;"
+        "10 11 [a,b] 5 7 [a,b] interval* ."
+        "T{ interval { from { 50 t } } { to { 77 t } } }"
+    }
+} ;
 
 HELP: interval-shift
 { $values { "i1" interval } { "i2" interval } { "i3" interval } }
@@ -217,23 +235,53 @@ HELP: interval-min
 
 HELP: interval-1+
 { $values { "i1" interval } { "i2" interval } }
-{ $description "Adds 1 to an interval." } ;
+{ $description "Adds 1 to an interval." }
+{ $examples
+    { $example "USING: math.intervals prettyprint ;"
+        "10 11 [a,b] interval-1+ ."
+        "T{ interval { from { 11 t } } { to { 12 t } } }"
+    }
+} ;
 
 HELP: interval-1-
 { $values { "i1" interval } { "i2" interval } }
-{ $description "Subtracts 1 from an interval." } ;
+{ $description "Subtracts 1 from an interval." }
+{ $examples
+    { $example "USING: math.intervals prettyprint ;"
+        "10 11 [a,b] interval-1- ."
+        "T{ interval { from { 9 t } } { to { 10 t } } }"
+    }
+} ;
 
 HELP: interval-neg
 { $values { "i1" interval } { "i2" interval } }
-{ $description "Negates an interval." } ;
+{ $description "Negates an interval." }
+{ $examples
+    { $example "USING: math.intervals prettyprint ;"
+        "10 11 [a,b] interval-neg ."
+        "T{ interval { from { -11 t } } { to { -10 t } } }"
+    }
+} ;
 
 HELP: interval-abs
 { $values { "i1" interval } { "i2" interval } }
-{ $description "Absolute value of an interval." } ;
+{ $description "Absolute value of an interval." }
+{ $examples
+    { $example "USING: math.intervals prettyprint ;"
+        "-11 -10 [a,b] interval-abs ."
+        "T{ interval { from { 10 t } } { to { 11 t } } }"
+    }
+} ;
 
 HELP: interval-log2
 { $values { "i1" interval } { "i2" interval } }
-{ $description "Integer-valued Base-2 logarithm of an interval." } ;
+{ $description "Integer-valued Base-2 logarithm of an interval." }
+{ $examples
+    { $example "USING: math.intervals prettyprint ;"
+        "20 32 [a,b] interval-log2 ."
+        "T{ interval { from { 0 t } } { to { 5 t } } }"
+    }
+} ;
 
 HELP: interval-intersect
 { $values { "i1" interval } { "i2" interval } { "i3" { $maybe interval } } }
@@ -241,27 +289,85 @@ HELP: interval-intersect
 
 HELP: interval-union
 { $values { "i1" interval } { "i2" interval } { "i3" interval } }
-{ $description "Outputs the smallest interval containing the set-theoretic union of " { $snippet "i1" } " and " { $snippet "i2" } " (the union itself may not be an interval)." } ;
+{ $description "Outputs the smallest interval containing the set-theoretic union of " { $snippet "i1" } " and " { $snippet "i2" } " (the union itself may not be an interval)." }
+{ $examples
+    { $example "USING: math.intervals prettyprint ;"
+        "1 5 [a,b] 10 15 [a,b] interval-union ."
+        "T{ interval { from { 1 t } } { to { 15 t } } }"
+    }
+    { $example "USING: math.intervals prettyprint ;"
+        "empty-interval empty-interval interval-union ."
+        "empty-interval"
+    }
+} ;
+
+{ interval-intersect interval-union } related-words
 
 HELP: interval-subset?
 { $values { "i1" interval } { "i2" interval } { "?" boolean } }
-{ $description "Tests if every point of " { $snippet "i1" } " is contained in " { $snippet "i2" } "." } ;
+{ $description "Tests if every point of " { $snippet "i1" } " is contained in " { $snippet "i2" } "." }
+{ $examples
+    { $example "USING: math.intervals prettyprint ;"
+        "2 4 [a,b] 1 9 [a,b] interval-subset? ."
+        "t"
+    }
+} ;
 
 HELP: interval-contains?
-{ $values { "x" real } { "int" interval } { "?" boolean } }
-{ $description "Tests if " { $snippet "x" } " is contained in " { $snippet "int" } "." } ;
+{ $values { "x" real } { "interval" interval } { "?" boolean } }
+{ $description "Tests if " { $snippet "x" } " is contained in " { $snippet "interval" } "." }
+{ $examples
+    { $example "USING: math.intervals prettyprint ;"
+        "1.5 1 2 [a,b] interval-contains? ."
+        "t"
+    }
+    "Half-open endpoints are not contained:"
+    { $example "USING: math.intervals prettyprint ;"
+        "1 1 2 (a,b] interval-contains? ."
+        "f"
+    }
+    "The empty interval obviously does not contain an interval:"
+    { $example "USING: math.intervals prettyprint ;"
+        "1 2 (a,b] empty-interval interval-contains? ."
+        "f"
+    }
+} ;
+
+{ interval-contains? interval-subset? } related-words
 
 HELP: interval-closure
 { $values { "i1" interval } { "i2" interval } }
-{ $description "Outputs the smallest closed interval containing the endpoints of " { $snippet "i1" } "." } ;
+{ $description "Outputs the smallest closed interval containing the endpoints of " { $snippet "i1" } "." }
+{ $examples
+    { $example "USING: math.intervals prettyprint ;"
+        "1 3 [a,b) interval-closure ."
+        "T{ interval { from { 1 t } } { to { 3 t } } }"
+    }
+} ;
 
 HELP: interval/
 { $values { "i1" interval } { "i2" interval } { "i3" interval } }
-{ $description "Divides " { $snippet "i1" } " by " { $snippet "i2" } ", using " { $link / } " to perform the division." } ;
+{ $description "Divides " { $snippet "i1" } " by " { $snippet "i2" } ", using " { $link / } " to perform the division." }
+{ $examples
+    { $example "USING: math.intervals prettyprint ;"
+        "7 9 [a,b] 10 11 [a,b] interval/ ."
+        "T{ interval { from { 7/11 t } } { to { 9/10 t } } }"
+    }
+} ;
 
 HELP: interval/i
 { $values { "i1" interval } { "i2" interval } { "i3" interval } }
-{ $description "Divides " { $snippet "i1" } " by " { $snippet "i2" } ", using " { $link /i } " to perform the division." } ;
+{ $description "Divides " { $snippet "i1" } " by " { $snippet "i2" } ", using " { $link /i } " to perform the division." }
+{ $examples
+    { $example "USING: math.intervals prettyprint ;"
+        "7 9 [a,b] 10 11 [a,b] interval/i ."
+        "T{ interval { from { 0 t } } { to { 0 t } } }"
+    }
+    { $example "USING: math.intervals prettyprint ;"
+        "10 11 [a,b] 5 7 [a,b] interval/i ."
+        "T{ interval { from { 1 t } } { to { 2 t } } }"
+    }
+} ;
 
 HELP: interval/f
 { $values { "i1" interval } { "i2" interval } { "i3" interval } }
@@ -332,7 +438,7 @@ HELP: interval>
 } ;
 
 HELP: interval>points
-{ $values { "int" interval } { "from" "a " { $snippet "{ point included? }" } " pair" } { "to" "a " { $snippet "{ point included? }" } " pair" } }
+{ $values { "interval" interval } { "from" "a " { $snippet "{ point included? }" } " pair" } { "to" "a " { $snippet "{ point included? }" } " pair" } }
 { $description "Outputs both endpoints of the interval." } ;
 
 HELP: assume<
