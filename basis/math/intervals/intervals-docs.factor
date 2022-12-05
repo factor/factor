@@ -26,6 +26,8 @@ ARTICLE: "math-intervals-new" "Creating intervals"
 { $subsections points>interval } ;
 
 ARTICLE: "math-intervals-arithmetic" "Interval arithmetic"
+"In general, a binary operation " { $snippet "X Y op" } " where " { $snippet "X" } " and " { $snippet "Y" } " are intervals is the set " { $snippet "{x op y forall x in X, y in Y}" } "."
+$nl
 "Binary operations on intervals:"
 { $subsections
     interval+
@@ -86,7 +88,7 @@ $nl
 $nl
 "In other words, the resulting interval might be an overestimate, but it is never an underestimate." ;
 
-ARTICLE: "math-intervals" "Intervals"
+ARTICLE: "math.intervals" "Intervals"
 "Interval arithmetic is performed on ranges of real numbers, rather than exact values. It is used by the Factor compiler to convert arbitrary-precision arithmetic to machine arithmetic, by inferring bounds for integer calculations."
 { $subsections "math-interval-properties" }
 "The class of intervals:"
@@ -102,7 +104,7 @@ ARTICLE: "math-intervals" "Intervals"
     "math-intervals-compare"
 } ;
 
-ABOUT: "math-intervals"
+ABOUT: "math.intervals"
 
 HELP: interval
 { $class-description "An interval represents a set of real numbers between two endpoints; the endpoints can either be included or excluded from the interval."
@@ -173,7 +175,9 @@ HELP: (a,inf]
 
 HELP: interval+
 { $values { "i1" interval } { "i2" interval } { "i3" interval } }
-{ $description "Adds two intervals." }
+{ $description "Adds two intervals."
+$nl
+"The output interval contains all possible values from adding any number in " { $snippet "i1" } " to any number in " { $snippet "i2" } "." }
 { $examples
     { $example "USING: math.intervals prettyprint ;"
         "10 11 [a,b] 5 7 [a,b] interval+ ."
@@ -183,7 +187,9 @@ HELP: interval+
 
 HELP: interval-
 { $values { "i1" interval } { "i2" interval } { "i3" interval } }
-{ $description "Subtracts " { $snippet "i2" } " from " { $snippet "i1" } "." }
+{ $description "Subtracts " { $snippet "i2" } " from " { $snippet "i1" } "."
+$nl
+"The output interval contains all possible values from subtracting any number in " { $snippet "i2" } " from any number in " { $snippet "i1" } "." }
 { $examples
     { $example "USING: math.intervals prettyprint ;"
         "10 11 [a,b] 5 7 [a,b] interval- ."
@@ -193,21 +199,23 @@ HELP: interval-
 
 HELP: interval*
 { $values { "i1" interval } { "i2" interval } { "i3" interval } }
-{ $description "Multiplies two intervals." }
+{ $description "Multiplies two intervals."
+$nl
+"The output interval contains all possible values from multiplying any number in " { $snippet "i1" } " with any number in " { $snippet "i2" } "." }
 { $examples
     { $example "USING: math.intervals prettyprint ;"
         "10 11 [a,b] 5 7 [a,b] interval* ."
         "T{ interval { from { 50 t } } { to { 77 t } } }"
+    }
+    { $example "USING: math.intervals prettyprint ;"
+        "-10 11 [a,b] 5 7 [a,b] interval* ."
+        "T{ interval { from { -70 t } } { to { 77 t } } }"
     }
 } ;
 
 HELP: interval-shift
 { $values { "i1" interval } { "i2" interval } { "i3" interval } }
 { $description "Shifts " { $snippet "i1" } " to the left by " { $snippet "i2" } " bits. Outputs " { $link full-interval } " if the endpoints of either " { $snippet "i1" } " or " { $snippet "i2" } " are not integers." } ;
-
-HELP: interval-max
-{ $values { "i1" interval } { "i2" interval } { "i3" interval } }
-{ $description "Outputs the interval values obtained by lifting the " { $link max } " word to " { $snippet "i1" } " and " { $snippet "i2" } "." } ;
 
 HELP: interval-mod
 { $values { "i1" interval } { "i2" interval } { "i3" interval } }
@@ -228,6 +236,10 @@ HELP: interval-bitor
 HELP: interval-bitxor
 { $values { "i1" interval } { "i2" interval } { "i3" interval } }
 { $description "Outputs an interval containing all possible values obtained by applying " { $link bitxor } " to elements of " { $snippet "i1" } " and " { $snippet "i2" } "." } ;
+
+HELP: interval-max
+{ $values { "i1" interval } { "i2" interval } { "i3" interval } }
+{ $description "Outputs the interval values obtained by lifting the " { $link max } " word to " { $snippet "i1" } " and " { $snippet "i2" } "." } ;
 
 HELP: interval-min
 { $values { "i1" interval } { "i2" interval } { "i3" interval } }
@@ -347,7 +359,7 @@ HELP: interval-closure
 
 HELP: interval/
 { $values { "i1" interval } { "i2" interval } { "i3" interval } }
-{ $description "Divides " { $snippet "i1" } " by " { $snippet "i2" } ", using " { $link / } " to perform the division." }
+{ $description "Ouputs an interval " { $snippet "i3" } " containing all possible values from dividing any element in " { $snippet "i1" } " by any element from " { $snippet "i2" } ", using " { $link / } " to perform the division." }
 { $examples
     { $example "USING: math.intervals prettyprint ;"
         "7 9 [a,b] 10 11 [a,b] interval/ ."
@@ -357,11 +369,11 @@ HELP: interval/
 
 HELP: interval/i
 { $values { "i1" interval } { "i2" interval } { "i3" interval } }
-{ $description "Divides " { $snippet "i1" } " by " { $snippet "i2" } ", using " { $link /i } " to perform the division." }
+{ $description "Ouputs an interval " { $snippet "i3" } " containing all possible values from dividing any element in " { $snippet "i1" } " by any element from " { $snippet "i2" } ", using " { $link /i } " to perform the division." }
 { $examples
     { $example "USING: math.intervals prettyprint ;"
-        "7 9 [a,b] 10 11 [a,b] interval/i ."
-        "T{ interval { from { 0 t } } { to { 0 t } } }"
+        "9 25 [a,b] 10 11 [a,b] interval/i ."
+        "T{ interval { from { 0 t } } { to { 2 t } } }"
     }
     { $example "USING: math.intervals prettyprint ;"
         "10 11 [a,b] 5 7 [a,b] interval/i ."
@@ -369,9 +381,17 @@ HELP: interval/i
     }
 } ;
 
+{ interval/ interval/i interval/f } related-words
+
 HELP: interval/f
 { $values { "i1" interval } { "i2" interval } { "i3" interval } }
-{ $description "Divides " { $snippet "i1" } " by " { $snippet "i2" } ", using " { $link /f } " to perform the division." } ;
+{ $description "Ouputs an interval " { $snippet "i3" } " containing all possible values from dividing any element in " { $snippet "i1" } " by any element from " { $snippet "i2" } ", using " { $link /f } " to perform the division." }
+{ $examples
+    { $example "USING: math.intervals prettyprint ;"
+        "10 12 [a,b] 2 4 [a,b] interval/f ."
+        "T{ interval { from { 2.5 t } } { to { 6.0 t } } }"
+    }
+} ;
 
 HELP: interval-recip
 { $values { "i1" interval } { "i2" interval } }
