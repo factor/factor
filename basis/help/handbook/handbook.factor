@@ -117,7 +117,7 @@ ARTICLE: "numbers" "Numbers"
 "Advanced features:"
 { $subsections
     "math-vectors"
-    "math-intervals"
+    "math.intervals"
 } ;
 
 USE: io.buffers
