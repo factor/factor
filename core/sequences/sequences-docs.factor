@@ -1432,7 +1432,7 @@ HELP: count-by
 { $examples
     { $example
         "USING: math ranges sequences prettyprint ;"
-        "100 [1..b] [ even? ] count ."
+        "100 [1..b] [ even? ] count-by ."
         "50"
     }
 } ;
