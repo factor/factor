@@ -897,7 +897,9 @@ HELP: ERROR:
     "The following two snippets are equivalent:"
     { $code
         "ERROR: invalid-values x y ;"
-        ""
+    }
+    $nl
+    { $code
         "TUPLE: invalid-values x y ;"
         ": invalid-values ( x y -- * )"
         "    \\ invalid-values boa throw ;"
