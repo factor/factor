@@ -23,7 +23,7 @@ ARTICLE: "grouping" "Groups and clumps"
             "{ { 1 2 } { 3 4 } }"
         }
         { $example
-            "USING: grouping ;"
+            "USING: grouping prettyprint sequences ;"
             "{ 1 2 3 4 } dup"
             "2 <groups> concat sequence= ."
             "t"
@@ -31,12 +31,12 @@ ARTICLE: "grouping" "Groups and clumps"
     }
     { "With clumps, collecting the first element of each subsequence but the last one, together with the last subsequence, yields the original sequence:"
         { $example
-            "USING: grouping ;"
+            "USING: grouping prettyprint ;"
             "{ 1 2 3 4 } 2 clump ."
             "{ { 1 2 } { 2 3 } { 3 4 } }"
         }
         { $example
-            "USING: grouping assocs sequences ;"
+            "USING: grouping assocs sequences prettyprint ;"
             "{ 1 2 3 4 } dup"
             "2 <clumps> unclip-last [ keys ] dip append sequence= ."
             "t"
@@ -44,18 +44,18 @@ ARTICLE: "grouping" "Groups and clumps"
     }
     { "With circular clumps, collecting the first element of each subsequence yields the original sequence. Collecting the " { $snippet "n" } "th element of each subsequence would rotate the original sequence " { $snippet "n" } " elements rightward:"
         { $example
-            "USING: grouping ;"
+            "USING: grouping prettyprint ;"
             "{ 1 2 3 4 } 2 circular-clump ."
             "{ { 1 2 } { 2 3 } { 3 4 } { 4 1 } }"
         }
         { $example
-            "USING: grouping assocs sequences ;"
+            "USING: grouping assocs sequences prettyprint ;"
             "{ 1 2 3 4 } dup"
             "2 <circular-clumps> keys sequence= ."
             "t"
         }
         { $example
-            "USING: grouping ;"
+            "USING: grouping prettyprint ;"
             "{ 1 2 3 4 }"
             "2 <circular-clumps> [ second ] { } map-as ."
             "{ 2 3 4 1 }"

@@ -209,7 +209,7 @@ PRIVATE>
 
 : ?nth-of ( seq n -- elt/f ) swap ?nth ; inline
 
-: ??nth-of ( seq n -- elt ? ) swap ??nth ; inline
+: ??nth-of ( seq n -- elt/f ? ) swap ??nth ; inline
 
 : index-or-length ( seq n -- seq n' ) over length min ; inline
 
