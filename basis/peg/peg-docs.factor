@@ -178,3 +178,13 @@ HELP: box
     "should return the constructed parser and is called when the parser is compiled. "
     "The compiled result is memoized for future runs. See " { $link delay } " for a word "
     "that calls the quotation at runtime." } ;
+
+HELP: PEG:
+{ $syntax "PEG: word ( stack -- effect ) definition... ;" }
+{ $description "Defines a word that when called will parse a string using the syntax"
+    "defined by the parser created by the definition. The definition should have stack"
+    "effect " { $snippet "( -- parser )" } " and the created word "
+    { $snippet "( string -- ast )" } ". In contrast to calling the parser resulting from"
+    "the definition with " { $link parse } ", the parser is pre-compiled and not compiled"
+    "for each invocation of " { $link parse } ". If the parsing fails, the word throws an"
+    "exception." } ;
