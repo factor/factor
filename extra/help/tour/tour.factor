@@ -1490,6 +1490,7 @@ other languages, most arising from the fact that it has essentially no syntax:
   "It has powerful metaprogramming capabilities, exceeding even those of LISPs"
   "It is ideal for creating DSLs"
   "It integrates easily with powerful tools"
+}
 
 A few file paths in the examples may need to be adjusted based on your system.
 
