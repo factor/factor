@@ -529,3 +529,23 @@ HELP: vocab-help
 HELP: orphan-articles
 { $values { "seq" "vocab names" } }
 { $description "Retrieves all vocabs without parents, except for 'help.home' and 'handbook' which are special." } ;
+
+HELP: HELP{
+{ $syntax "HELP{ help-markup }" }
+{ $description "Generates help markup using syntax that does not require literal strings.
+Has some known problems with syntax words, which need to be quoted inside the " { $snippet "HELP{ }" } 
+ " definition." }
+{ $examples
+  { $code
+      "HELP{ I am a doc string.
+
+      This is a second paragraph. { $snippet \"code snippet\" }
+}"
+  }
+  "generates"
+  { $code
+      "{ \"I am a doc string.\" $nl \"This is a second paragraph.\" { $snippet \"code snippet\" } }"
+  }
+} 
+;
+
