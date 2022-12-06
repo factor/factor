@@ -241,11 +241,11 @@ HELP: start-all*
 
 HELP: arg-max
 { $values { "seq" sequence } { "n" integer } }
-{ $description "Outputs the sequence with the largest item." } ;
+{ $description "Outputs the index of the element with the largest value in " { $snippet "seq" } "." } ;
 
 HELP: arg-min
 { $values { "seq" sequence } { "n" integer } }
-{ $description "Outputs the sequence with the smallest item." } ;
+{ $description "Outputs the index of the element with the smallest value in " { $snippet "seq" } "." } ;
 
 { arg-max arg-min } related-words
 
