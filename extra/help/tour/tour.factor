@@ -1490,12 +1490,10 @@ other languages, most arising from the fact that it has essentially no syntax:
   "It has powerful metaprogramming capabilities, exceeding even those of LISPs"
   "It is ideal for creating DSLs"
   "It integrates easily with powerful tools"
-}
 
-This tutorial is Windows-centric, but everything should work the same on other systems, provided you adjust the file paths in 
-the examples.
+A few file paths in the examples may need to be adjusted based on your system.
 
-The first section gives some motivation for the rather peculiar model of computation of concatenative languages, but feel free 
+The first section gives some motivation for the peculiar model of computation of concatenative languages, but feel free 
 to skip it if you want to get your feet wet and return to it after some hands on practice with Factor.
 
 { $heading "The Tour" }
