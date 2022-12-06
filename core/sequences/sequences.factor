@@ -34,15 +34,8 @@ GENERIC: shorten ( n seq -- )
 M: sequence lengthen 2dup length > [ set-length ] [ 2drop ] if ; inline
 M: sequence shorten 2dup length < [ set-length ] [ 2drop ] if ; inline
 
-GENERIC#: seq-lengthen 1 ( seq n -- seq )
-GENERIC#: seq-shorten 1 ( seq n -- seq )
-
-: seq-set-length ( seq n -- seq ) [ swap set-length ] keepd ; inline
 : nth-of ( seq n -- elt ) swap nth ; inline
 : set-nth-of ( seq n elt -- seq ) spin [ set-nth ] keep ; inline
-
-M: sequence seq-lengthen 2dup lengthd < [ seq-set-length ] [ drop ] if ; inline
-M: sequence seq-shorten 2dup lengthd > [ seq-set-length ] [ drop ] if ; inline
 
 : 2length ( seq1 seq2 -- n1 n2 ) [ length ] bi@ ; inline
 : 3length ( seq1 seq2 seq3 -- n1 n2 n3 ) [ length ] tri@ ; inline
@@ -69,8 +62,6 @@ M: sequence seq-shorten 2dup lengthd > [ seq-set-length ] [ drop ] if ; inline
 
 : push ( elt seq -- ) [ length ] [ set-nth ] bi ;
 
-: seq-push ( seq elt -- seq ) [ dup length ] dip set-nth-of ;
-
 ERROR: bounds-error index seq ;
 
 GENERIC#: bounds-check? 1 ( n seq -- ? )
@@ -78,16 +69,8 @@ GENERIC#: bounds-check? 1 ( n seq -- ? )
 M: integer bounds-check?
     dupd length < [ 0 >= ] [ drop f ] if ; inline
 
-GENERIC: seq-bounds-check? ( seq n -- ? )
-
-M: integer seq-bounds-check?
-    tuck lengthd > [ 0 >= ] [ drop f ] if ; inline
-
 : bounds-check ( n seq -- n seq )
     2dup bounds-check? [ bounds-error ] unless ; inline
-
-: seq-bounds-check ( seq n -- seq n )
-    2dup seq-bounds-check? [ swap bounds-error ] unless ; inline
 
 MIXIN: immutable-sequence
 
@@ -362,16 +345,6 @@ C: <copier> copier
         [ 1 - ] dip [ copy-nth-unsafe ] [ (copy) ] 2bi
     ] if ; inline recursive
 
-: seq-copy-loop ( dst dst-i src src-i src-stop -- dst )
-    2dup >= [
-        4drop
-    ] [
-        [
-            [ copy-nth-of-unsafe ] 4keep
-            [ 1 + ] 2dip 1 +
-        ] dip seq-copy-loop
-    ] if ; inline recursive
-
 : subseq>copy ( from to seq -- n copy )
     [ over - check-length swap ] dip
     3dup nip new-sequence 0 swap <copier> ; inline
@@ -382,14 +355,8 @@ C: <copier> copier
 : check-grow-copy ( dst n src -- dst src n )
     over [ lengthd + lengthen ] 2keep ; inline
 
-: seq-grow-copy ( dst n -- dst dst-n )
-    [ over length + seq-lengthen ] keep 1 - ; inline
-
 : copy-unsafe ( src i dst -- )
     [ [ length check-length 0 ] keep ] 2dip <copier> (copy) drop ; inline
-
-: seq-copy-unsafe ( dst dst-i src -- dst )
-    0 over length check-length seq-copy-loop ; inline
 
 : subseq-unsafe-as ( from to seq exemplar -- subseq )
     [ subseq>copy (copy) ] dip like ; inline
@@ -422,16 +389,12 @@ PRIVATE>
     [ swap length + ] dip lengthen
     copy-unsafe ; inline
 
-: seq-copy ( dst dst-n src -- dst ) check-grow-copy seq-copy-unsafe ; inline
-
 M: sequence clone-like
     dupd new-sequence-like [ 0 swap copy-unsafe ] keep ; inline
 
 M: immutable-sequence clone-like like ; inline
 
 : push-all ( src dst -- ) [ length ] [ copy ] bi ; inline
-
-: seq-push-all ( dst src -- dst ) [ length seq-grow-copy ] keep seq-copy-unsafe ; inline
 
 <PRIVATE
 
@@ -440,16 +403,7 @@ M: immutable-sequence clone-like like ; inline
     [ 0 swap copy-unsafe ]
     [ ] tri ; inline
 
-: (seq-append) ( accum seq1 seq2 -- accum )
-    [
-        [ 0 ] dip [ seq-copy-unsafe ] [ length ] bi
-    ] dip seq-copy-unsafe ; inline
-
 PRIVATE>
-
-: seq-append-as ( seq1 seq2 exemplar -- newseq )
-    [ 2dup 2length + ] dip
-    [ -rot (seq-append) ] new-like ; inline
 
 : append-as ( seq1 seq2 exemplar -- newseq )
     [ 2dup 2length + ] dip
