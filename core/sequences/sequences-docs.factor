@@ -31,6 +31,11 @@ HELP: nth
 { $contract "Outputs the " { $snippet "n" } "th element of the sequence. Elements are numbered from zero, so the last element has an index one less than the length of the sequence. All sequences support this operation." }
 { $errors "Throws a " { $link bounds-error } " if the index is negative, or greater than or equal to the length of the sequence." } ;
 
+HELP: nth-of
+{ $values { "seq" sequence } { "n" "a non-negative integer" } { "elt" "the element at the " { $snippet "n" } "th index" } }
+{ $contract "Outputs the " { $snippet "n" } "th element of the sequence. Elements are numbered from zero, so the last element has an index one less than the length of the sequence. All sequences support this operation." }
+{ $errors "Throws a " { $link bounds-error } " if the index is negative, or greater than or equal to the length of the sequence." } ;
+
 HELP: set-nth
 { $values { "elt" object } { "n" "a non-negative integer" } { "seq" "a mutable sequence" } }
 { $contract "Sets the " { $snippet "n" } "th element of the sequence. Storing beyond the end of a resizable sequence such as a vector or string buffer grows the sequence." }
@@ -179,6 +184,20 @@ HELP: bounds-check
 HELP: ?nth
 { $values { "n" integer } { "seq" sequence } { "elt/f" { $maybe object } } }
 { $description "A forgiving version of " { $link nth } ". If the index is out of bounds, or if the sequence is " { $link f } ", simply outputs " { $link f } "." } ;
+
+HELP: ??nth
+{ $values { "n" integer } { "seq" sequence } { "elt/f" { $maybe object } } { "?" boolean } }
+{ $description "A forgiving version of " { $link nth } ". If the index is out of bounds, or if the sequence is " { $link f } ", simply outputs " { $link f } ". Also outputs a boolean to distinguish between the sequence containing an " { $link f } " or an out of bounds index." } ;
+
+HELP: ?nth-of
+{ $values { "seq" sequence } { "n" integer } { "elt/f" { $maybe object } } }
+{ $description "A forgiving version of " { $link nth-of } ". If the index is out of bounds, or if the sequence is " { $link f } ", simply outputs " { $link f } "." } ;
+
+HELP: ??nth-of
+{ $values { "seq" sequence } { "n" integer } { "elt/f" { $maybe object } } { "?" boolean } }
+{ $description "A forgiving version of " { $link nth-of } ". If the index is out of bounds, or if the sequence is " { $link f } ", simply outputs " { $link f } ". Also outputs a boolean to distinguish between the sequence containing an " { $link f } " or an out of bounds index." } ;
+
+{ nth ?nth ??nth nth-of ?nth-of ??nth-of } related-words
 
 HELP: ?set-nth
 { $values { "elt" object } { "n" integer } { "seq" sequence } }
@@ -555,6 +574,12 @@ HELP: find-index-from
 HELP: map-find
 { $values { "seq" sequence } { "quot" { $quotation ( ... elt -- ... result/f ) } } { "result" "the first non-false result of the quotation" } { "elt" { $maybe "the first matching element" } } }
 { $description "Applies the quotation to each element of the sequence, until the quotation outputs a true value. If the quotation ever yields a result which is not " { $link f } ", then the value is output, along with the element of the sequence which yielded this." } ;
+
+HELP: map-find-last
+{ $values { "seq" sequence } { "quot" { $quotation ( ... elt -- ... result/f ) } } { "result" "the last non-false result of the quotation" } { "elt" { $maybe "the last matching element" } } }
+{ $description "Applies the quotation to each element of the sequence from the tail, until the quotation outputs a true value. If the quotation ever yields a result which is not " { $link f } ", then the value is output, along with the element of the sequence which yielded this." } ;
+
+{ map-find map-find-last } related-words
 
 HELP: any?
 { $values { "seq" sequence } { "quot" { $quotation ( ... elt -- ... ? ) } } { "?" boolean } }
@@ -1390,6 +1415,18 @@ HELP: map-sum
 } ;
 
 HELP: count
+{ $values { "seq" sequence } { "n" integer } }
+{ $description "Efficiently returns the number of elements that are true." }
+{ $notes "This word used to take a quotation; that word is now " { $link count-by } "." }
+{ $examples
+    { $example
+        "USING: sequences prettyprint ;"
+        "{ 1 2 f f f } count ."
+        "2"
+    }
+} ;
+
+HELP: count-by
 { $values { "seq" sequence } { "quot" quotation } { "n" integer } }
 { $description "Efficiently returns the number of elements that the predicate quotation matches." }
 { $examples
@@ -1399,6 +1436,8 @@ HELP: count
         "50"
     }
 } ;
+
+{ count count-by } related-words
 
 HELP: selector
 { $values
@@ -1823,11 +1862,11 @@ ARTICLE: "sequence-protocol" "Sequence protocol"
 "All sequences must know their length:"
 { $subsections length }
 "At least one of the following two generic words must have a method for accessing elements; the " { $link sequence } " mixin has default definitions which are mutually recursive:"
-{ $subsections nth nth-unsafe }
+{ $subsections nth nth-unsafe ?nth ??nth nth-of ?nth-of ??nth-of }
 "Note that sequences are always indexed starting from zero."
 $nl
 "At least one of the following two generic words must have a method for storing elements; the " { $link sequence } " mixin has default definitions which are mutually recursive:"
-{ $subsections set-nth set-nth-unsafe }
+{ $subsections set-nth set-nth-unsafe ?set-nth }
 "If your sequence is immutable, then you must implement either " { $link set-nth } " or " { $link set-nth-unsafe } " to simply call " { $link immutable } " to signal an error."
 $nl
 "The following two generic words are optional, as not all sequences are resizable:"
@@ -1873,7 +1912,7 @@ $nl
 
 ARTICLE: "sequences-access" "Accessing sequence elements"
 "Element access by index, without raising exceptions:"
-{ $subsections ?nth }
+{ $subsections ?nth ??nth ?nth-of ??nth-of }
 "Concise way of extracting one of the first four elements:"
 { $subsections first second third fourth ?first ?second }
 "Extracting the last element:"
@@ -1912,7 +1951,7 @@ ARTICLE: "sequences-appending" "Appending sequences"
     glue-as
 }
 "Collapse a sequence unto itself:"
-{ $subsections concat join }
+{ $subsections concat concat-as join join-as }
 "A pair of words useful for aligning strings:"
 { $subsections pad-head pad-tail } ;
 
@@ -1989,12 +2028,35 @@ ARTICLE: "sequences-combinators" "Sequence combinators"
     filter-as
     partition
 }
+"Counting:"
+{ $subsections
+    count
+    count-by
+}
+"Superlatives with " { $link min } " and " { $link max } ":"
+{ $subsections
+    infimum
+    infimum-by
+    supremum
+    supremum-by
+    shorter
+    longer
+    shorter?
+    longer?
+    shortest
+    longest
+}
 "Generating:"
 { $subsections
     replicate
     replicate-as
     produce
     produce-as
+}
+"Math:"
+{ $subsections
+    sum
+    product
 }
 "Testing if a sequence contains elements satisfying a predicate:"
 { $subsections
@@ -2055,6 +2117,7 @@ ARTICLE: "sequences-search" "Searching sequences"
     find-last
     find-last-from
     map-find
+    map-find-last
 } ;
 
 ARTICLE: "sequences-trimming" "Trimming sequences"
@@ -2159,6 +2222,7 @@ $nl
 "Computing the cartesian product of two sequences:"
 { $subsections
     cartesian-product
+    cartesian-product-as
 } ;
 
 ARTICLE: "sequences" "Sequence operations"
