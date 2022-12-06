@@ -302,8 +302,10 @@ unit-test
 
 { 328350 } [ 100 <iota> [ sq ] map-sum ] unit-test
 
-{ 50 } [ 100 <iota> [ even? ] count ] unit-test
-{ 50 } [ 100 <iota> [ odd?  ] count ] unit-test
+{ 5 } [ { 1 f 3 f 5 f 7 f 9 f } count ] unit-test
+
+{ 50 } [ 100 <iota> [ even? ] count-by ] unit-test
+{ 50 } [ 100 <iota> [ odd?  ] count-by ] unit-test
 
 { { "b" "d" } } [ { 1 3 } { "a" "b" "c" "d" } nths ] unit-test
 { { "a" "b" "c" "d" } } [ { 0 1 2 3 } { "a" "b" "c" "d" } nths ] unit-test

@@ -364,6 +364,16 @@ C: <copier> copier
 : subseq-unsafe ( from to seq -- subseq )
     dup subseq-unsafe-as ; inline
 
+: seq-copy-loop ( dst dst-i src src-i src-stop -- dst )
+    2dup >= [
+        4drop
+    ] [
+        [
+            [ copy-nth-of-unsafe ] 4keep
+            [ 1 + ] 2dip 1 +
+        ] dip seq-copy-loop
+    ] if ; inline recursive
+
 PRIVATE>
 
 : subseq-as ( from to seq exemplar -- subseq )
@@ -731,6 +741,9 @@ PRIVATE>
 
 : nths ( indices seq -- seq' )
     [ [ nth ] curry ] keep map-as ;
+
+: nths-of ( seq indices -- seq' )
+    swap nths ; inline
 
 : any? ( ... seq quot: ( ... elt -- ... ? ) -- ... ? )
     find drop >boolean ; inline
@@ -1168,11 +1181,11 @@ M: repetition sum [ elt>> ] [ length>> ] bi * ; inline
 : map-sum ( ... seq quot: ( ... elt -- ... n ) -- ... n )
     [ 0 ] 2dip [ dip + ] with-assoc each ; inline
 
-: count ( ... seq quot: ( ... elt -- ... ? ) -- ... n )
-    [ 1 0 ? ] compose map-sum ; inline
-
 : count-by ( ... seq quot: ( ... elt -- ... ? ) -- ... n )
     [ 1 0 ? ] compose map-sum ; inline
+
+: count ( ... seq -- ... n )
+    [ ] count-by ; inline
 
 : cartesian-each ( ... seq1 seq2 quot: ( ... elt1 elt2 -- ... ) -- ... )
     [ with each ] 2curry each ; inline
