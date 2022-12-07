@@ -296,7 +296,7 @@ PRIVATE>
     over 0accumulate-as ; inline
 
 : occurrence-count-by ( seq quot: ( elt -- elt' ) -- hash seq' )
-    '[ nip @ over inc-at* ] [ H{ } clone ] 2dip 0accumulate ; inline
+    '[ nip @ over inc-at* drop ] [ H{ } clone ] 2dip 0accumulate ; inline
 
 : occurrence-count ( seq -- hash seq' )
     [ ] occurrence-count-by ; inline
@@ -307,7 +307,7 @@ PRIVATE>
 : progressive-index-by-as ( seq1 seq2 quot exemplar -- hash seq' )
     [
         pick length '[
-            tuck [ @ over inc-at* ] 2dip swap nth-index _ or
+            tuck [ @ over inc-at* drop ] 2dip swap nth-index _ or
         ] [ H{ } clone ] 3dip with
     ] dip map-as ; inline
 
@@ -842,8 +842,8 @@ PRIVATE>
 : replicate-into ( ... seq quot: ( ... -- ... newelt ) -- ... )
     over [ length ] 2dip '[ _ dip _ set-nth-unsafe ] each-integer ; inline
 
-: count* ( ... seq quot: ( ... elt -- ... ? ) -- ... % )
-    over [ count ] [ length ] bi* / ; inline
+: count-by* ( ... seq quot: ( ... elt -- ... ? ) -- ... % )
+    over [ count-by ] [ length ] bi* / ; inline
 
 : sequence-index-operator-last ( n seq quot -- n quot' )
     [ [ nth-unsafe ] curry [ keep ] curry ] dip compose ; inline
