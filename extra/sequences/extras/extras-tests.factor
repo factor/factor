@@ -282,7 +282,7 @@ strings tools.test ;
 { 1 } [ { 1 f 3 2 } ?infimum ] unit-test
 { 1 } [ { 1 3 2 } ?infimum ] unit-test
 
-{ 3/10 } [ 10 <iota> [ 3 < ] count* ] unit-test
+{ 3/10 } [ 10 <iota> [ 3 < ] count-by* ] unit-test
 
 { { 0 } } [ "ABABA" "ABA" start-all ] unit-test
 { { 0 2 } } [ "ABABA" "ABA" start-all* ] unit-test
