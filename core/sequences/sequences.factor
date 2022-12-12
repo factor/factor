@@ -292,7 +292,7 @@ ERROR: integer-length-expected obj ;
 : length-sequence ( seq -- n seq )
     [ length check-length ] [ ] bi ; inline
 
-: >underlying< ( slice/seq -- i n slice/seq )
+: >underlying< ( slice/seq -- from to slice/seq )
     dup slice? [ >slice< ] [ >sequence< ] if ; inline
 
 TUPLE: copier
