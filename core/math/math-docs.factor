@@ -510,7 +510,8 @@ HELP: simple-gcd
     { "x" object } { "y" object }
     { "d" object }
 }
-{ $description "" } ;
+{ $description "Computes the GCD of two numbers." }
+{ $see-also gcd } ;
 
 ARTICLE: "division-by-zero" "Division by zero"
 "Behavior of division operations when a denominator of zero is used depends on the data types in question, as well as the platform being used."
