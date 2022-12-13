@@ -475,7 +475,7 @@ HELP: each-integer-from
 { $values
     { "from" integer } { "to" integer } { "quot" quotation }
 }
-{ $description "Applies the quotation to each integer in " { $snippet "[from..to)" } ", returning a list of all the results." } ;
+{ $description "Applies the quotation to each integer in " { $snippet "[from..to)" } " in order." } ;
 
 HELP: integer>fixnum
 { $values
