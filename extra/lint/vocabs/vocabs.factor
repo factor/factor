@@ -1,16 +1,32 @@
 ! Copyright (C) 2022 CapitalEx
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays assocs combinators compiler.units
-formatting grouping.extras hash-sets hashtables io
-io.encodings.utf8 io.files kernel multiline namespaces peg.ebnf
-regexp sequences sequences.deep sequences.parser sets sorting
-splitting strings unicode vocabs vocabs.loader ;
+USING: accessors arrays assocs combinators combinators.extras
+combinators.short-circuit compiler.units formatting
+grouping.extras hash-sets hashtables io io.encodings.utf8
+io.files kernel literals multiline namespaces peg.ebnf regexp
+sequences sequences.deep sequences.parser sets sorting splitting
+strings unicode vocabs vocabs.loader  ;
 FROM: namespaces => set ;
 IN: lint.vocabs
 
+
 <PRIVATE
 SYMBOL: old-dictionary
-SYMBOL: LINT-VOCABS-REGEX
+
+: save-dictionary ( -- )
+    dictionary     get clone 
+    old-dictionary set       ;
+
+: restore-dictionary ( -- )
+    dictionary     get keys >hash-set
+    old-dictionary get keys >hash-set
+    diff members [ [ forget-vocab ] each ] with-compilation-unit ;
+
+: vocab-loaded? ( name -- ? )
+    dictionary get key? ;
+
+USE: literals
+CONSTANT: USING-PATTERN $[ "USING: [^;]+ ;|USE: \\S+" <regexp> ]
 
 ! Helper words
 : tokenize ( string -- sequence-parser )
@@ -18,6 +34,9 @@ SYMBOL: LINT-VOCABS-REGEX
 
 : skip-after ( sequence-parser seq -- sequence-parser )
    [ take-until-sequence* drop ] curry keep ;
+
+: skip-after* ( sequence-parser object -- sequence-parser )
+    [ take-until-object drop ] curry keep ;
 
 : next-line ( sequence-parser -- sequence-parser )
     "\n" skip-after ;
@@ -51,7 +70,7 @@ DEFER: next-token
 : skip-token ( sequence-parser -- sequence-parser )
     dup next-token drop  ;
 
-! Words for parsing a string literal
+! Words for removing syntax that should be ignored
 : ends-with-quote? ( token -- ? )
     2 tail* [ first CHAR: \ = not ] 
             [ second CHAR: " =    ] bi and ;
@@ -59,10 +78,13 @@ DEFER: next-token
 : end-string? ( token -- ? )
     dup length 1 = [ quotation-mark? ] [ ends-with-quote? ] if ;
 
-: skip-string ( sequence-parser -- sequence-parser )
-    dup next-token end-string? not [ skip-string ] when ;
+: skip-string ( sequence-parser string -- sequence-parser )
+    end-string? not [ dup next-token skip-string ] when ;
 
-: next-word ( sequence-parser -- sequence-parser string/f )
+: ?handle-string ( sequence-parser string -- sequence-parser string/f )
+    dup { [ empty? not ] [ string-literal? ] } 1&& [ skip-string f ] when ;
+
+: next-word/f ( sequence-parser -- sequence-parser string/f )
     dup next-token {
         ! skip over empty tokens
         { "" [ f ] }
@@ -76,6 +98,7 @@ DEFER: next-token
         { ":"         [     skip-token f ] }
         { "POSTPONE:" [     skip-token f ] }
         { "\\"        [     skip-token f ] }
+        { "CHAR:"     [     skip-token f ] }
 
         ! comments
         { "!"           [             next-line f ] }
@@ -120,38 +143,56 @@ DEFER: next-token
         { "!TODO"      [ next-line f ] }
         { "!XXX"       [ next-line f ] }
         
-        ! special cause for handling `"`
-        [ dup string-literal? [ drop skip-string f ] when ]
-    } case ;
 
-: ?store-word ( vector sequence-parser string/? -- vector sequence-parser )
+        [ ]
+    } case ?handle-string ;
+
+: ?push ( vector sequence-parser string/? -- vector sequence-parser )
     [ [ swap [ push ] keep ] curry dip ] when* ;
 
-DEFER: collect
+: ?keep-parsing-with ( vector sequence-parser quot -- vector )
+    [ dup sequence-parse-end? not ] dip
+        [ call( x x -- x ) ] curry [ drop ] if ;
 
-: ?keep-parsing ( vector sequence-parser -- vector )
-    dup sequence-parse-end? [ drop ] [ collect ] if ;
+: (strip-code) ( vector sequence-praser -- vector )
+    skip-whitespace next-word/f ?push 
+        [ (strip-code) ] ?keep-parsing-with harvest ;
 
-: collect ( vector sequence-praser -- vector )
-    skip-whitespace next-word 
-        ?store-word ?keep-parsing 
-    harvest ;
+: strip-code ( string -- string )
+    tokenize V{ } clone swap (strip-code) ;
 
-! Cache regular expression to avoid compile time slowdowns
-"CHAR:\\s+\\S+\\s+|\"(\\\\\\\\|\\\\[\\\\stnrbvf0e\"]|\\\\x[a-fA-F0-9]{2}|\\\\u[a-fA-F0-9]{6}|[^\\\\\"])*\"|R/ (\\\\/|[^/])*/|\\\\\\s+(USE:|USING:)|POSTPONE:\\s+(USE:|USING:)|(?<!\\S+)! [^\n]*" <regexp>
-LINT-VOCABS-REGEX set-global
+: extract-imports ( string -- seq )
+    USING-PATTERN all-matching-subseqs ;
 
-: save-dictionary ( -- )
-    dictionary     get clone 
-    old-dictionary set       ;
+: remove-imports ( string -- seq )
+    USING-PATTERN "" re-replace ;
 
-: restore-dictionary ( -- )
-    dictionary     get keys >hash-set
-    old-dictionary get keys >hash-set
-    diff members [ [ forget-vocab ] each ] with-compilation-unit ;
+! Words for finding the words used ina program, stripping out import statements
+: skip-imports ( sequence-parser -- sequence-parser string/? )
+    dup next { 
+        { "USING:"  [ ";" skip-after* f ] }
+        { "USE:"    [        advance  f ] }
+        [ ]
+    } case ;
 
-: vocab-loaded? ( name -- ? )
-    dictionary get key? ;
+: take-imports ( sequence-parser -- vector )
+    dup next {
+        { "USING:" [ ";" take-until-object ] }
+        { "USE:"   [  1  take-n ] }
+        [ 2drop f ]
+    } case ;
+
+: (find-used-words) ( vector sequence-parser -- vector )
+    skip-imports ?push [ (find-used-words) ] ?keep-parsing-with ;
+
+: find-used-words ( vector -- set )
+    <sequence-parser> V{ } clone swap (find-used-words) fast-set ;
+
+: (find-imports) ( vector sequence-parser -- vector )
+    dup take-imports rot prepend swap [ (find-imports) ] ?keep-parsing-with ;
+
+: find-imports ( vector -- set )
+    <sequence-parser> V{ } clone swap (find-imports) fast-set ;
 
 : (get-words) ( name -- vocab )
     dup load-vocab words>> keys 2array ;
@@ -161,15 +202,6 @@ LINT-VOCABS-REGEX set-global
 
 : nl>space ( string -- string )
     "\n" " " replace ;
-
-: find-import-statements ( string -- seq )
-    "USING: [^;]+ ;|USE: \\S+" <regexp> all-matching-subseqs ;
-
-: clean-up-source ( string -- string ) 
-    LINT-VOCABS-REGEX get-global "" re-replace ;
-
-: strip-syntax ( seq -- seq )
-    [ "USING: | ;|USE: " <regexp> " " re-replace ] map ;
 
 : split-when-blank ( string -- seq )
     [ blank? ] split-when ;
@@ -194,33 +226,3 @@ LINT-VOCABS-REGEX set-global
     drop "No unused vocabs found in %s.\n" printf ;
 
 PRIVATE>
-
-: get-words ( name -- assoc )
-    dup vocab-exists? 
-        [ (get-words) ]
-        [ no-vocab-found ] if ;
-
-: get-vocabs ( string -- seq )
-    nl>space find-import-statements strip-syntax split-words harvest ;
-
-: get-imported-words ( string -- hashtable )
-    save-dictionary 
-        get-vocabs [ get-words ] map >hashtable 
-    restore-dictionary 
-    ;
-
-: find-unused-in-string ( string -- seq )
-    clean-up-source
-    [ get-imported-words ] [ "\n" split get-unique-words ] bi
-    reject-unused-vocabs natural-sort ; inline
-
-: find-unused-in-file ( path -- seq )
-    utf8 file-contents find-unused-in-string ;
-
-: find-unused ( name -- seq )
-    vocab-source-path dup [ find-unused-in-file ] when ;
-
-: find-unused. ( name -- )
-    dup find-unused dup empty?
-        [ print-no-unused-vocabs ]
-           [ print-unused-vocabs ] if ;
