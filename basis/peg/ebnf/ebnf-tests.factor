@@ -647,3 +647,11 @@ Tok                = Spaces (Number | Special )
     "abc" EBNF[=[ rule="a":a "b"+~ "c":c => [[ a c 2array ]] ]=]
 ] unit-test
 
+! Bugfix, ensure that named vars work in groups
+{ { "a" "b" } } [
+    "ab" EBNF[=[ rule = ( "a":a "b":b ) => [[ { a b } ]] ]=]
+] unit-test
+
+{ { "a" "b" } } [
+    "a b" EBNF[=[ rule = { "a":a "b":b } => [[ { a b } ]] ]=]
+] unit-test

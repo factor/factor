@@ -469,6 +469,9 @@ M: ebnf-var build-locals
         " nip ]" %
     ] "" make ;
 
+M: ebnf-whitespace build-locals
+    group>> build-locals ;
+
 M: object build-locals
     drop ;
 
