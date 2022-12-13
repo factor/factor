@@ -13,6 +13,14 @@ USING: arrays assocs.extras kernel math math.order sequences tools.test ;
 { 1 } [ H{ { "a" H{ { "b" 1 } } } } { "a" "b" } deep-of ] unit-test
 { 4 } [ H{ { 1 H{ { 2 H{ { 3 4 } } } } } } { 1 2 3 } deep-of ] unit-test
 
+{ H{ { 1 H{ { 2 H{ { 3 44 } } } } } } } [
+    H{ { 1 H{ { 2 H{ { 3 4 } } } } } } dup { 1 2 3 } [ 40 + ] deep-change-of
+] unit-test
+
+{ H{ { 1 H{ { 2 H{ { 3 40 } } } } } } } [
+    H{ { 1 H{ { 2 H{ { 3 4 } } } } } } dup { 1 2 3 } 40 deep-set-of
+] unit-test
+
 { H{ { 2 1 } { 4 3 } } } [ H{ { 1 2 } { 3 4 } } assoc-invert ] unit-test
 
 { H{ { "a" V{ 2 5 } } { "b" V{ 3 } } { "c" V{ 10 } } } }

@@ -10,6 +10,15 @@ IN: assocs.extras
 : deep-of ( assoc seq -- value/f )
     [ of ] each ; inline
 
+: deep-of-but-last ( assoc seq -- obj key )
+    unclip-last [ [ of ] each ] dip ; inline
+
+: deep-change-of ( assoc seq quot -- )
+    [ deep-of-but-last swap ] dip change-at ; inline
+
+: deep-set-of ( assoc seq elt -- )
+    [ deep-of-but-last ] dip spin set-at ; inline
+
 : substitute! ( seq assoc -- seq )
     substituter map! ;
 
