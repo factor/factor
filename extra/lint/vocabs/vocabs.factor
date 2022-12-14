@@ -7,12 +7,13 @@ namespaces prettyprint.backend prettyprint.sections sequences
 sequences.deep sequences.parser sets sorting splitting strings
 unicode vectors vocabs vocabs.loader vocabs.prettyprint ;
 FROM: namespaces => set ;
+FROM: sequences.parser => next advance ;
 IN: lint.vocabs
 
 <PRIVATE
 SYMBOL: old-dictionary
 SYMBOL: cache
-
+ 
 ! Words for working with the dictionary.
 : save-dictionary ( -- )
     dictionary     get clone 
