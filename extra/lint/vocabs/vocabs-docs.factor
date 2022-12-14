@@ -57,49 +57,6 @@ HELP: find-unused.
     }
 } ;
 
-HELP: get-imported-words
-{ $values
-    { "string" string }
-    { "hashtable" hashtable }
-}
-{ $description 
-    "Gets all words that have been imported with " { $link \ USE: } " and " { $link \ USING: } " in the given string."
-} ;
-
-HELP: get-vocabs
-{ $values
-    { "string" string }
-    { "seq" sequence }
-}
-{ $description 
-    "Gets all the vocabularies imported in the given string." 
-} ;
-
-HELP: get-words
-{ $values
-    { "name" "a vocab name string" }
-    { "assoc" assoc }
-}
-{ $description 
-    "Gets all the words used in a given vocabulary." 
-} 
-{ $examples
-    { $example "USING: lint.vocabs prettyprint ;"
-        "\"lint.vocabs\" get-words ."
-"{
-    \"lint.vocabs\"
-    {
-        \"get-vocabs\"
-        \"get-words\"
-        \"find-unused-in-file\"
-        \"get-imported-words\"
-        \"find-unused-in-string\"
-        \"find-unused.\"
-        \"find-unused\"
-    }
-}"
-    }
-} ;
 
 ARTICLE: "lint.vocabs" "The Unused Vocabulary Linter"
 "The " { $vocab-link "lint.vocabs" } " vocabulary implements a set of words designed to find unused imports."
