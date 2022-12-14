@@ -4,8 +4,8 @@ USING: accessors arrays assocs combinators
 combinators.short-circuit compiler.units formatting hash-sets
 hashtables io io.encodings.utf8 io.files io.styles kernel
 namespaces prettyprint.backend prettyprint.sections sequences
-sequences.deep sequences.parser sets sorting splitting strings
-unicode vectors vocabs vocabs.loader vocabs.prettyprint ;
+sequences.parser sets sorting strings unicode vectors vocabs
+vocabs.loader vocabs.prettyprint ;
 FROM: namespaces => set ;
 FROM: sequences.parser => next advance ;
 IN: lint.vocabs
