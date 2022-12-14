@@ -1,17 +1,19 @@
 ! Copyright (C) 2022 CapitalEx
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays assocs combinators 
+USING: accessors arrays assocs combinators
 combinators.short-circuit compiler.units formatting hash-sets
-hashtables io io.encodings.utf8 io.files kernel namespaces
-sequences sequences.deep sequences.parser sets sorting splitting
-strings unicode vocabs vocabs.loader  ;
+hashtables io io.encodings.utf8 io.files io.styles kernel
+namespaces prettyprint.backend prettyprint.sections sequences
+sequences.deep sequences.parser sets sorting splitting strings
+unicode vectors vocabs vocabs.loader vocabs.prettyprint ;
 FROM: namespaces => set ;
 IN: lint.vocabs
 
-
 <PRIVATE
 SYMBOL: old-dictionary
+SYMBOL: cache
 
+! Words for working with the dictionary.
 : save-dictionary ( -- )
     dictionary     get clone 
     old-dictionary set       ;
@@ -23,6 +25,7 @@ SYMBOL: old-dictionary
 
 : vocab-loaded? ( name -- ? )
     dictionary get key? ;
+
 
 ! Helper words
 : tokenize ( string -- sequence-parser )
@@ -46,6 +49,7 @@ SYMBOL: old-dictionary
 : string-literal? ( token -- ? )
     first CHAR: " = ;
 
+
 ! Words for parsing tokens
 DEFER: next-token
 
@@ -65,6 +69,7 @@ DEFER: next-token
 
 : skip-token ( sequence-parser -- sequence-parser )
     dup next-token drop  ;
+
 
 ! Words for removing syntax that should be ignored
 : ends-with-quote? ( token -- ? )
@@ -158,7 +163,9 @@ DEFER: next-token
 : strip-code ( string -- string )
     tokenize V{ } clone swap (strip-code) ;
 
-! Words for finding the words used ina program, stripping out import statements
+
+! Words for finding the words used in a program
+! and stripping out import statements
 : skip-imports ( sequence-parser -- sequence-parser string/? )
     dup next { 
         { "USING:"  [ ";" skip-after* f ] }
@@ -183,7 +190,7 @@ DEFER: next-token
     dup take-imports rot prepend swap [ (find-imports) ] ?keep-parsing-with ;
 
 : find-imports ( vector -- seq )
-    <sequence-parser> V{ } clone swap (find-imports) ;
+    <sequence-parser> V{ } clone swap (find-imports) dup cache set ;
 
 : (get-words) ( name -- vocab )
     dup load-vocab words>> keys 2array ;
@@ -191,31 +198,38 @@ DEFER: next-token
 : no-vocab-found ( name -- empty )
     { } 2array ;
 
-: nl>space ( string -- string )
-    "\n" " " replace ;
-
-: split-when-blank ( string -- seq )
-    [ blank? ] split-when ;
-
-: split-words ( line -- words )
-    [ split-when-blank ] map flatten harvest ;
-
-: get-unique-words ( seq -- hash-set )
-    harvest split-words >hash-set ;
-
 : [is-used?] ( hash-set  -- quot )
     '[ nip [ _ in? ] any? ] ; inline
 
 : reject-unused-vocabs ( assoc hash-set -- seq )
     [is-used?] assoc-reject keys ;
 
-: print-unused-vocabs ( name seq -- )
-    swap "The following vocabs are unused in %s: \n" printf
-        [ "    - " prepend print ] each ;
+! Take this from vocabs.prettyprint.private so I'm not
+! depending on internal details of vocabs.prettyprint.
+: pprint-using ( seq -- )
+    "syntax" lookup-vocab '[ _ = ] reject
+    [ vocab-name ] sort-with [
+        \ USING: pprint-word
+        [ pprint-vocab ] each
+        \ ; pprint-word
+    ] with-pprint ;
+
+:: print-new-header ( seq -- )
+    "Use the following header to remove unused imports: " print
+    manifest-style [ cache get seq diff pprint-using ] with-nesting ;
+
+:: print-unused-vocabs ( name seq -- )
+    name "The following vocabs are unused in %s: \n" printf
+    seq [ "    - " prepend print ] each 
+    seq print-new-header
+    nl
+    nl ;
 
 : print-no-unused-vocabs ( name _ -- )
     drop "No unused vocabs found in %s.\n" printf ;
 
+
+! Private details for fetching words and imports
 : get-words ( name -- assoc )
     dup vocab-exists? [ (get-words) ] [ no-vocab-found ] if ;
 
