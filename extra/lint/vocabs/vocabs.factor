@@ -3,11 +3,10 @@
 USING: accessors arrays assocs combinators
 combinators.short-circuit compiler.units formatting hash-sets
 hashtables io io.encodings.utf8 io.files io.styles kernel
-namespaces prettyprint.backend prettyprint.sections sequences
-sequences.parser sets sorting strings unicode vectors vocabs
-vocabs.loader vocabs.prettyprint ;
+namespaces sequences sequences.parser sets sorting strings 
+unicode vectors vocabs vocabs.loader vocabs.prettyprint 
+vocabs.prettyprint.private ;
 FROM: namespaces => set ;
-FROM: sequences.parser => next advance ;
 IN: lint.vocabs
 
 <PRIVATE
@@ -204,16 +203,6 @@ DEFER: next-token
 
 : reject-unused-vocabs ( assoc hash-set -- seq )
     [is-used?] assoc-reject keys ;
-
-! Take this from vocabs.prettyprint.private so I'm not
-! depending on internal details of vocabs.prettyprint.
-: pprint-using ( seq -- )
-    "syntax" lookup-vocab '[ _ = ] reject
-    [ vocab-name ] sort-with [
-        \ USING: pprint-word
-        [ pprint-vocab ] each
-        \ ; pprint-word
-    ] with-pprint ;
 
 :: print-new-header ( seq -- )
     "Use the following header to remove unused imports: " print
