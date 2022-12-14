@@ -1,9 +1,8 @@
 ! Copyright (C) 2022 CapitalEx
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays assocs combinators combinators.extras
-combinators.short-circuit compiler.units formatting
-grouping.extras hash-sets hashtables io io.encodings.utf8
-io.files kernel literals multiline namespaces peg.ebnf regexp
+USING: accessors arrays assocs combinators 
+combinators.short-circuit compiler.units formatting hash-sets
+hashtables io io.encodings.utf8 io.files kernel namespaces
 sequences sequences.deep sequences.parser sets sorting splitting
 strings unicode vocabs vocabs.loader  ;
 FROM: namespaces => set ;
@@ -24,9 +23,6 @@ SYMBOL: old-dictionary
 
 : vocab-loaded? ( name -- ? )
     dictionary get key? ;
-
-USE: literals
-CONSTANT: USING-PATTERN $[ "USING: [^;]+ ;|USE: \\S+" <regexp> ]
 
 ! Helper words
 : tokenize ( string -- sequence-parser )
@@ -91,10 +87,11 @@ DEFER: next-token
 
         ! prune syntax stuff
         { "FROM:"     [ ";" skip-after f ] }
+        { "SYMBOLS:"  [ ";" skip-after f ] }
+        { "R/"        [ "/" skip-after f ] }
+        { "("         [ ")" skip-after f ] }
         { "IN:"       [     skip-token f ] }
         { "SYMBOL:"   [     skip-token f ] }
-        { "SYMBOLS:"  [ ";" skip-after f ] }
-        { "("         [ ")" skip-after f ] }
         { ":"         [     skip-token f ] }
         { "POSTPONE:" [     skip-token f ] }
         { "\\"        [     skip-token f ] }
@@ -161,12 +158,6 @@ DEFER: next-token
 : strip-code ( string -- string )
     tokenize V{ } clone swap (strip-code) ;
 
-: extract-imports ( string -- seq )
-    USING-PATTERN all-matching-subseqs ;
-
-: remove-imports ( string -- seq )
-    USING-PATTERN "" re-replace ;
-
 ! Words for finding the words used ina program, stripping out import statements
 : skip-imports ( sequence-parser -- sequence-parser string/? )
     dup next { 
@@ -191,8 +182,8 @@ DEFER: next-token
 : (find-imports) ( vector sequence-parser -- vector )
     dup take-imports rot prepend swap [ (find-imports) ] ?keep-parsing-with ;
 
-: find-imports ( vector -- set )
-    <sequence-parser> V{ } clone swap (find-imports) fast-set ;
+: find-imports ( vector -- seq )
+    <sequence-parser> V{ } clone swap (find-imports) ;
 
 : (get-words) ( name -- vocab )
     dup load-vocab words>> keys 2array ;
@@ -225,4 +216,27 @@ DEFER: next-token
 : print-no-unused-vocabs ( name _ -- )
     drop "No unused vocabs found in %s.\n" printf ;
 
+: get-words ( name -- assoc )
+    dup vocab-exists? [ (get-words) ] [ no-vocab-found ] if ;
+
+: get-imported-words ( string -- hashtable )
+    save-dictionary
+        find-imports [ get-words ] map >hashtable
+    restore-dictionary ;
+
 PRIVATE>
+
+: find-unused-in-string ( string -- seq )
+    strip-code [ get-imported-words ] [ find-used-words ] bi
+        reject-unused-vocabs natural-sort ;
+
+: find-unused-in-file ( path -- seq )
+    utf8 file-contents find-unused-in-string ;
+
+: find-unused ( name -- seq )
+    vocab-source-path dup [ find-unused-in-file ] when ;
+
+: find-unused. ( name -- )
+    dup find-unused dup empty?
+        [ print-no-unused-vocabs ]
+           [ print-unused-vocabs ] if ;
