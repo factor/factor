@@ -94,7 +94,7 @@ check_ret() {
 set_downloader() {
     test_program_installed wget
     if [[ $? -ne 0 ]] ; then
-        DOWNLOADER="wget -nd"
+        DOWNLOADER="wget -nd --prefer-family=IPv4"
         DOWNLOADER_NAME=wget
         return
     fi
