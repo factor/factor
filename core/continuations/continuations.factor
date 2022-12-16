@@ -149,13 +149,13 @@ callback-error-hook [ [ die rethrow ] ] initialize
         ] curry
     ] dip ifcc ; inline
 
-: ignore-errors ( quot -- )
+: ignore-errors ( ... quot: ( ... -- ... ) -- ... )
     [ drop ] recover ; inline
 
-: ignore-error ( quot check: ( error -- ? ) -- )
+: ignore-error ( ... quot: ( ... -- ... ) check: ( error -- ? ) -- ... )
     '[ dup @ [ drop ] [ rethrow ] if ] recover ; inline
 
-: ignore-error/f ( quot check: ( error -- ? ) -- )
+: ignore-error/f ( ... quot: ( ... -- ... x ) check: ( error -- ? ) -- ... x/f )
     '[ dup @ [ drop f ] [ rethrow ] if ] recover ; inline
 
 : cleanup ( try cleanup-always cleanup-error -- )
