@@ -107,7 +107,7 @@ C: <ebnf> ebnf
     ] choice* replace ;
 
 : identifier-parser ( -- parser )
-    ! Return a parser that parses an identifer delimited by
+    ! Return a parser that parses an identifier delimited by
     ! a quotation character. The quotation can be single
     ! or double quotes. The AST produced is the identifier
     ! between the quotes.
