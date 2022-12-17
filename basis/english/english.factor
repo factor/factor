@@ -106,6 +106,11 @@ CONSTANT: plural-to-singular $[ singular-to-plural [ swap ] assoc-map ]
 
 PRIVATE>
 
+CONSTANT: vowels "aeiou"
+
+: vowel? ( ch -- ? )
+    vowels member? ; inline
+
 : singularize ( word -- singular )
     dup >lower {
         { [ dup empty? ] [ ] }
@@ -114,9 +119,7 @@ PRIVATE>
         { [ dup "s" tail? not ] [ ] }
         {
             [
-                dup "ies" ?tail [
-                    last "aeiou" member? not
-                ] [ drop f ] if
+                dup "ies" ?tail [ last vowel? not ] [ drop f ] if
             ] [ 3 head* "y" append ]
         }
         { [ dup "es" tail? ] [ 2 head* ] }
@@ -130,9 +133,7 @@ PRIVATE>
         { [ singular-to-plural ?at ] [ ] }
         {
             [
-                dup "y" ?tail [
-                    last "aeiou" member? not
-                ] [ drop f ] if
+                dup "y" ?tail [ last vowel? not ] [ drop f ] if
             ] [ but-last "ies" append ]
         }
         {
@@ -161,7 +162,7 @@ PRIVATE>
     ] when ;
 
 : a/an ( word -- article )
-    [ first ] [ length ] bi 1 = "afhilmnorsx" "aeiou" ?
+    [ first ] [ length ] bi 1 = "afhilmnorsx" vowels ?
     member? "an" "a" ? ;
 
 : ?plural-article ( word -- article )
