@@ -1,8 +1,9 @@
-USING: combinators kernel math parser sequences splitting ;
+USING: combinators english kernel math parser sequences
+splitting ;
 IN: porter-stemmer
 
 : consonant? ( i str -- ? )
-    2dup nth dup "aeiou" member? [
+    2dup nth dup vowel? [
         3drop f
     ] [
         CHAR: y = [
