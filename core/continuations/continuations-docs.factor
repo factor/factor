@@ -188,7 +188,7 @@ HELP: ignore-error
 { $description "Calls the quotation. If an exception is thrown which is matched by the 'check' quotation it is ignored. Otherwise the error is rethrown." } ;
 
 HELP: ignore-error/f
-{ $values { "quot" quotation } { "check" quotation } }
+{ $values { "quot" quotation } { "check" quotation } { "x/f" { $maybe object } } }
 { $description "Like " { $link ignore-error } ", but if a matched exception is thrown " { $link f } " is put on the stack." } ;
 
 HELP: ignore-errors
