@@ -327,7 +327,7 @@ In fact, you may have seen something like
 when you asked the listener to import the word { $link [1..b] } for you. You can also use more than one vocabulary at a time 
 with the word { $link  POSTPONE: USING: } , which is followed by a list of vocabularies and terminated by { $link POSTPONE: ; } , like
 
-{ $code "USING: math.ranges sequences.deep ;" }
+{ $code "USING: ranges sequences.deep ;" }
 $nl
 Finally, you define the vocabulary where your definitions are stored with the word { $link POSTPONE: IN: } . If you search the online 
 help for a word you have defined so far, like { $link prime? } , you will see that your definitions have been grouped under the 
@@ -371,7 +371,7 @@ with { $snippet "\"github.tutorial\" refresh" } . There is also a { $link refres
 You will be prompted a few times to use vocabularies, since your { $link POSTPONE: USING: } statement is empty. After having accepted 
 all of them, Factor suggests you a new header with all the needed imports:
 { $code "
-USING: kernel math.functions math.ranges sequences ;
+USING: kernel math.functions ranges sequences ;
 IN: github.tutorial
 " }
 Now that you have some words in your vocabulary, you can edit, say, the { $snippet "multiple?" } word with { $snippet "\ multiple? edit" } . You 
