@@ -155,9 +155,9 @@ ERROR: missing-literal ;
     dup { [ word? ] [ symbol? not ] } 1&&
     [ missing-literal ] when ;
 
-\ + [ - ] [ - ] define-math-inverse
+\ + [ - ] [ swap - ] define-math-inverse
 \ - [ + ] [ - ] define-math-inverse
-\ * [ / ] [ / ] define-math-inverse
+\ * [ / ] [ swap / ] define-math-inverse
 \ / [ * ] [ / ] define-math-inverse
 \ ^ [ recip ^ ] [ swap [ log ] bi@ / ] define-math-inverse
 
