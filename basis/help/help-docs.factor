@@ -371,7 +371,7 @@ HELP: $deprecated
 ;
 
 HELP: $emphasis
-{ $values { "element" "a markup element" } }
+{ $values { "children" "a markup element" } }
 { $description "Prints " { $emphasis "emphasized" } "text. This is also known as italicized text." }
 ;
 
@@ -382,7 +382,7 @@ HELP: $inputs
 ;
 
 HELP: $io-error
-{ $values { "element" "a markup element" } }
+{ $values { "children" "a markup element" } }
 { $description "Indicates an error class for input/output." }
 ;
 
