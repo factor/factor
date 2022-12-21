@@ -73,6 +73,9 @@ C: <nil> nil
 { 0.0 } [ 0.0 pi + [ pi + ] undo ] unit-test
 { } [ 3 [ __ ] undo ] unit-test
 
+{ 2 } [ 4 [ 2 swap + ] undo ] unit-test
+{ 2 } [ 4 [ 2 swap * ] undo ] unit-test
+
 { 2.0 } [ 2 3 ^ [ 3 ^ ] undo ] unit-test
 { 3.0 } [ 2 3 ^ [ 2 swap ^ ] undo ] unit-test
 
