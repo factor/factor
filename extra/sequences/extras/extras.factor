@@ -748,15 +748,15 @@ TUPLE: step-slice
     { seq read-only }
     { step integer read-only } ;
 
-:: <step-slice> ( from to step seq -- step-slice )
+:: <step-slice> ( from/f to/f step seq -- step-slice )
     step zero? [ "can't be zero" throw ] when
     seq length :> len
     step 0 > [
-        from [ 0 ] unless*
-        to [ len ] unless*
+        from/f [ 0 ] unless*
+        to/f [ len ] unless*
     ] [
-        from [ len ] unless*
-        to [ 0 ] unless*
+        from/f [ len ] unless*
+        to/f [ 0 ] unless*
     ] if
     [ dup 0 < [ len + ] when 0 len clamp ] bi@
     ! FIXME: make this work with steps
