@@ -205,14 +205,14 @@ PRIVATE>
 : assoc-any-key? ( ... assoc quot: ( ... key -- ... ? ) -- ... ? )
     [ drop ] prepose assoc-find 2nip ; inline
 
-: assoc-any-value? ( ... assoc quot: ( ... key -- ... ? ) -- ... ? )
+: assoc-any-value? ( ... assoc quot: ( ... value -- ... ? ) -- ... ? )
     [ nip ] prepose assoc-find 2nip ; inline
 
 : assoc-all-key? ( ... assoc quot: ( ... key -- ... ? ) -- ... ? )
-    [ not ] compose assoc-any-key? not  ; inline
+    [ not ] compose assoc-any-key? not ; inline
 
-: assoc-all-value? ( ... assoc quot: ( ... key -- ... ? ) -- ... ? )
-    [ not ] compose assoc-any-value? not  ; inline
+: assoc-all-value? ( ... assoc quot: ( ... value -- ... ? ) -- ... ? )
+    [ not ] compose assoc-any-value? not ; inline
 
 : any-multi-key? ( assoc -- ? )
     [ sequence? ] assoc-any-key? ;
