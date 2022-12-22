@@ -1,8 +1,7 @@
 ! Copyright (C) 2015, 2018 John Benediktsson
 ! See http://factorcode.org/license.txt for BSD license
-USING: accessors arrays assocs combinators help.markup kernel
-literals math math.order math.parser sequences splitting unicode
-words ;
+USING: arrays assocs combinators kernel literals math math.order
+math.parser sequences splitting unicode ;
 IN: english
 
 <PRIVATE
@@ -175,15 +174,3 @@ CONSTANT: vowels "aeiou"
     ] dip over length dup 3 >= [
         [ 3 > ", " " " ? " " surround ] [ 2 - pick set-nth ] bi
     ] [ 2drop ] if ;
-
-: or-markup-example ( classes -- markup )
-    [
-        dup word? [
-            [ name>> ] keep \ $link
-        ] [
-            dup \ $snippet
-        ] if swap 2array [ a/an " " append ] dip 2array
-    ] map "or" comma-list ;
-
-: $or-markup-example ( classes -- )
-    or-markup-example print-element ;

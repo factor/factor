@@ -72,14 +72,12 @@ HELP: vocab-help-coverage.
     { $example
         "USING: help.lint.coverage ;"
         "\"english\" vocab-help-coverage."
-"[english] $or-markup-example: full help coverage
-[english] ?plural-article: full help coverage
+"[english] ?plural-article: full help coverage
 [english] ?pluralize: full help coverage
 [english] a/an: full help coverage
 [english] a10n: full help coverage
 [english] comma-list: full help coverage
 [english] count-of-things: full help coverage
-[english] or-markup-example: full help coverage
 [english] plural?: full help coverage
 [english] pluralize: full help coverage
 [english] singular?: full help coverage
@@ -96,14 +94,12 @@ HELP: prefix-help-coverage.
     { $example
         "USING: help.lint.coverage ;"
         "\"english\" t prefix-help-coverage."
-"[english] $or-markup-example: full help coverage
-[english] ?plural-article: full help coverage
+"[english] ?plural-article: full help coverage
 [english] ?pluralize: full help coverage
 [english] a/an: full help coverage
 [english] a10n: full help coverage
 [english] comma-list: full help coverage
 [english] count-of-things: full help coverage
-[english] or-markup-example: full help coverage
 [english] plural?: full help coverage
 [english] pluralize: full help coverage
 [english] singular?: full help coverage
@@ -127,10 +123,6 @@ HELP: <prefix-help-coverage>
         "\"english\" t <prefix-help-coverage> ..."
 "{
     T{ word-help-coverage
-        { word-name $or-markup-example }
-        { 100%-coverage? t }
-    }
-    T{ word-help-coverage
         { word-name ?plural-article }
         { 100%-coverage? t }
     }
@@ -152,10 +144,6 @@ HELP: <prefix-help-coverage>
     }
     T{ word-help-coverage
         { word-name count-of-things }
-        { 100%-coverage? t }
-    }
-    T{ word-help-coverage
-        { word-name or-markup-example }
         { 100%-coverage? t }
     }
     T{ word-help-coverage
@@ -221,10 +209,6 @@ HELP: <vocab-help-coverage>
         "\"english\" <vocab-help-coverage> ..."
 "{
     T{ word-help-coverage
-        { word-name $or-markup-example }
-        { 100%-coverage? t }
-    }
-    T{ word-help-coverage
         { word-name ?plural-article }
         { 100%-coverage? t }
     }
@@ -246,10 +230,6 @@ HELP: <vocab-help-coverage>
     }
     T{ word-help-coverage
         { word-name count-of-things }
-        { 100%-coverage? t }
-    }
-    T{ word-help-coverage
-        { word-name or-markup-example }
         { 100%-coverage? t }
     }
     T{ word-help-coverage
