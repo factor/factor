@@ -1213,7 +1213,7 @@ HELP: rotate!
 { $values
     { "seq" sequence } { "n" integer }
 }
-{ $description "A version of " { $link rotate! } " that modifies " { $snippet "seq" } " in place." } ;
+{ $description "A version of " { $link rotate } " that modifies " { $snippet "seq" } " in place." } ;
 
 HELP: round-robin
 { $values
