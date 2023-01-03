@@ -94,7 +94,7 @@ check_ret() {
 set_downloader() {
     test_program_installed wget
     if [[ $? -ne 0 ]] ; then
-        DOWNLOADER="wget -nd"
+        DOWNLOADER="wget -nd --prefer-family=IPv4"
         DOWNLOADER_NAME=wget
         return
     fi
@@ -595,7 +595,7 @@ current_git_branch() {
 
 check_url() {
     if [[ $DOWNLOADER_NAME == 'wget' ]]; then
-        if [[ $(wget -S --spider $1 2>&1 | grep 'HTTP/1.1 200 OK') ]]; then
+        if [[ $(wget -S --spider --prefer-family=IPv4 $1 2>&1 | grep 'HTTP/1.1 200 OK') ]]; then
             return 0
         else
             return 1
@@ -614,7 +614,9 @@ check_url() {
 set_boot_image_vars() {
     set_current_branch
     local url="https://downloads.factorcode.org/images/${CURRENT_BRANCH}/checksums.txt"
+    $ECHO "Getting checksum from ${url}"
     check_url $url
+    $ECHO "got checksum!"
     if [[ $? -eq 0 ]]; then
         CHECKSUM_URL="$url"
         BOOT_IMAGE_URL="https://downloads.factorcode.org/images/${CURRENT_BRANCH}/${BOOT_IMAGE}"

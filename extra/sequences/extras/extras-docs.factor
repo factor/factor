@@ -241,11 +241,11 @@ HELP: start-all*
 
 HELP: arg-max
 { $values { "seq" sequence } { "n" integer } }
-{ $description "Outputs the sequence with the largest item." } ;
+{ $description "Outputs the index of the element with the largest value in " { $snippet "seq" } "." } ;
 
 HELP: arg-min
 { $values { "seq" sequence } { "n" integer } }
-{ $description "Outputs the sequence with the smallest item." } ;
+{ $description "Outputs the index of the element with the smallest value in " { $snippet "seq" } "." } ;
 
 { arg-max arg-min } related-words
 
@@ -499,10 +499,15 @@ HELP: 3nested-map
 
 HELP: <step-slice>
 { $values
-    { "from" integer } { "to" integer } { "step" object } { "seq" sequence }
+    { "from/f" { $maybe integer } } { "to/f" { $maybe integer } } { "step" object } { "seq" sequence }
     { "step-slice" slice }
 }
-{ $description "Outputs a new virtual sequence sharing storage with the subrange of elements in " { $snippet "seq" } " with indices starting from and including " { $snippet "from" } ", and up to but not including " { $snippet "to" } ", with step " { $snippet "step" } "." } ;
+{ $description "Outputs a new virtual sequence sharing storage with the subrange of elements in " { $snippet "seq" } " with indices starting from and including " { $snippet "from/f" } ", and up to but not including " { $snippet "to/f" } ", with step " { $snippet "step" } "."
+  $nl
+  "If " { $link f } "is given in place of " { $snippet "from/f" } ", it is taken as 0."
+  $nl
+  "If " { $link f } "is given in place of " { $snippet "to/f" } ", it is taken as the length of " { $snippet "seq" } "." }
+;
 
 HELP: <zip-index>
 { $values
@@ -1208,7 +1213,7 @@ HELP: rotate!
 { $values
     { "seq" sequence } { "n" integer }
 }
-{ $description "A version of " { $link rotate! } " that modifies " { $snippet "seq" } " in place." } ;
+{ $description "A version of " { $link rotate } " that modifies " { $snippet "seq" } " in place." } ;
 
 HELP: round-robin
 { $values

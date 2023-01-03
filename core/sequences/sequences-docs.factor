@@ -857,8 +857,8 @@ HELP: >slice<
 
 HELP: >underlying<
 { $values
-    { "slice/seq" object }
-    { "i" integer } { "n" integer }
+    { "slice/seq" { $or slice sequence } }
+    { "from" integer } { "to" integer }
 }
 { $description "Sets up the stack for iteration with slots from a " { $link sequence } ". Used with iteration in words such as " { $link sequence-operator } "." } ;
 

@@ -43,12 +43,16 @@ M: readline-reader prompt.
 : prefixed-chars ( prefix -- chars )
     name-map keys prefixed ;
 
+: prefixed-paths ( prefix -- paths )
+    dup paths-matching keys prefixed ;
+
 : get-completions ( prefix -- completions )
     completions tget [ nip ] [
         completion-line " \r\n" split {
             { [ dup complete-vocab? ] [ drop prefixed-vocabs ] }
             { [ dup complete-char? ] [ drop prefixed-chars ] }
             { [ dup complete-color? ] [ drop prefixed-colors ] }
+            { [ dup complete-pathname? ] [ drop prefixed-paths ] }
             { [ dup complete-vocab-words? ] [ harvest second prefixed-vocab-words ] }
             [ drop prefixed-words ]
         } cond dup completions tset

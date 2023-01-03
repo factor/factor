@@ -10,6 +10,15 @@ IN: assocs.extras
 : deep-of ( assoc seq -- value/f )
     [ of ] each ; inline
 
+: deep-of-but-last ( assoc seq -- obj key )
+    unclip-last [ [ of ] each ] dip ; inline
+
+: deep-change-of ( assoc seq quot -- )
+    [ deep-of-but-last swap ] dip change-at ; inline
+
+: deep-set-of ( assoc seq elt -- )
+    [ deep-of-but-last ] dip spin set-at ; inline
+
 : substitute! ( seq assoc -- seq )
     substituter map! ;
 
@@ -196,14 +205,14 @@ PRIVATE>
 : assoc-any-key? ( ... assoc quot: ( ... key -- ... ? ) -- ... ? )
     [ drop ] prepose assoc-find 2nip ; inline
 
-: assoc-any-value? ( ... assoc quot: ( ... key -- ... ? ) -- ... ? )
+: assoc-any-value? ( ... assoc quot: ( ... value -- ... ? ) -- ... ? )
     [ nip ] prepose assoc-find 2nip ; inline
 
 : assoc-all-key? ( ... assoc quot: ( ... key -- ... ? ) -- ... ? )
-    [ not ] compose assoc-any-key? not  ; inline
+    [ not ] compose assoc-any-key? not ; inline
 
-: assoc-all-value? ( ... assoc quot: ( ... key -- ... ? ) -- ... ? )
-    [ not ] compose assoc-any-value? not  ; inline
+: assoc-all-value? ( ... assoc quot: ( ... value -- ... ? ) -- ... ? )
+    [ not ] compose assoc-any-value? not ; inline
 
 : any-multi-key? ( assoc -- ? )
     [ sequence? ] assoc-any-key? ;

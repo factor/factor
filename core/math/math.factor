@@ -250,7 +250,7 @@ GENERIC: prev-float ( m -- n )
 : align ( m w -- n )
     1 - [ + ] keep bitnot bitand ; inline
 
-: each-integer-from ( ... i n quot: ( ... i -- ... ) -- ... )
+: each-integer-from ( ... from to quot: ( ... i -- ... ) -- ... )
     2over < [
         [ nip call ] 3keep
         [ 1 + ] 2dip each-integer-from
@@ -287,7 +287,7 @@ GENERIC: prev-float ( m -- n )
         ] if
     ] if ; inline recursive
 
-: all-integers-from? ( ... i n quot: ( ... i -- ... ? ) -- ... ? )
+: all-integers-from? ( ... from to quot: ( ... i -- ... ? ) -- ... ? )
     2over < [
         [ nip call ] 3keep roll
         [ [ 1 + ] 2dip all-integers-from? ]

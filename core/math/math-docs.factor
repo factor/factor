@@ -464,6 +464,55 @@ HELP: find-last-integer
 { $description "Applies the quotation to each integer from " { $snippet "n" } " down to 0, inclusive. Iteration stops when the quotation outputs a true value or 0 is reached. If the quotation yields a true value for some integer, the word outputs that integer. Otherwise, the word outputs " { $link f } "." }
 { $notes "This word is used to implement " { $link find-last } "." } ;
 
+HELP: all-integers-from?
+{ $values
+    { "from" integer } { "to" integer } { "quot" quotation }
+    { "?" boolean }
+}
+{ $description "Applies the quotation to each integer in " { $snippet "[from..to)" } ", returning " { $link t } " if all results are true, " and { $link f } " otherwise." } ;
+
+HELP: each-integer-from
+{ $values
+    { "from" integer } { "to" integer } { "quot" quotation }
+}
+{ $description "Applies the quotation to each integer in " { $snippet "[from..to)" } " in order." } ;
+
+HELP: integer>fixnum
+{ $values
+    { "x" object }
+    { "y" object }
+}
+{ $description "Converts a general integer to a fixed-width integer." } ;
+
+HELP: integer>fixnum-strict
+{ $values
+    { "x" object }
+    { "y" object }
+}
+{ $description "Converts a general integer to a fixed-width integer." } ;
+
+HELP: log2-expects-positive
+{ $values
+    { "x" object }
+}
+{ $description "Throws a " { $link log2-expects-positive } " error." }
+{ $see-also log2 } ;
+
+HELP: neg?
+{ $values
+    { "x" object }
+    { "?" boolean }
+}
+{ $description "Pushes " { $link t } " if " { $snippet "x" } " is negative, else " { $link f } } ;
+
+HELP: simple-gcd
+{ $values
+    { "x" object } { "y" object }
+    { "d" object }
+}
+{ $description "Computes the GCD of two numbers." }
+{ $see-also gcd } ;
+
 ARTICLE: "division-by-zero" "Division by zero"
 "Behavior of division operations when a denominator of zero is used depends on the data types in question, as well as the platform being used."
 $nl

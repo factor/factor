@@ -154,7 +154,7 @@ PRIVATE>
     LIBRARY: name
     TYPEDEF: old new
     ENUM: type words... ;
-    ENUM: type < base-type words...
+    ENUM: type < base-type words... ;
     FUNCTION: return name ( parameters ) ;
     FUNCTION-ALIAS: factor-name return name ( parameters ) ;
 
@@ -195,6 +195,7 @@ PRIVATE>
     5 f <array>
     (clone)
 
+    [| a b | ]
     [let [let { } ] ]
 
 ! Strings

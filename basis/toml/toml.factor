@@ -291,7 +291,9 @@ M: table update-toml
     [ entries>> [ H{ } clone ] dip [ update-toml ] each swap rot ]
     [ array?>> [ push-at ] [ check-no-key set-at ] if ] tri ;
 
+PEG: parse-toml ( string -- ast ) toml-parser ;
+
 PRIVATE>
 
 : toml> ( string -- assoc )
-    [ H{ } clone ] dip toml-parser parse [ update-toml ] each ;
+    [ H{ } clone ] dip parse-toml [ update-toml ] each ;
