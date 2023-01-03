@@ -42,7 +42,7 @@
   (buffer-disable-undo)
   (setq-local comint-redirect-subvert-readonly t)
   (add-hook 'after-change-functions
-            '(lambda (b e len)
+            #'(lambda (b e len)
                (let ((inhibit-read-only t))
                  (when (> b fuel-log--max-buffer-size)
                    (delete-region (point-min) b))))
