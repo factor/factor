@@ -1450,7 +1450,7 @@ However, you can help with this by posting questions on Stack Overflow under the
 }
 The Factor source tree is massive, so here's a few vocabularies to get you started off:
 { $list 
-  { "We have not talked a lot about errors and exceptions. Learn more in the " { $vocab-link "errors" } " vocabulary." } 
+  { "We have not talked a lot about errors and exceptions. Learn more in the " { $vocab-link "debugger" } " vocabulary." } 
   { "The " { $vocab-link "macros" } " vocabulary implements a form of compile time metaprogramming less general than parsing words." }
   { "The " { $vocab-link "models" } " vocabulary lets you implement a form of dataflow programming using objects with observable slots." }
   { "The " { $vocab-link "match" } " vocabulary implements ML-style pattern matching." }
