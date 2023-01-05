@@ -127,10 +127,10 @@ SYMBOL: vocab-articles
 : check-modules ( element -- )
     \ $vocab-link swap elements [
         second
-        vocab-exists? [
-            "$vocab-link to non-existent vocabulary"
+        dup vocab-exists? [ drop ] [
+            "$vocab-link to non-existent vocabulary ``" "''" surround
             simple-lint-error
-        ] unless
+        ] if
     ] each ;
 
 : check-slots-tables ( element -- )
