@@ -82,6 +82,8 @@ HELP: vocab-help-coverage.
 [english] pluralize: full help coverage
 [english] singular?: full help coverage
 [english] singularize: full help coverage
+[english] vowel?: needs help sections: $values, $description, and $examples
+[english] vowels: needs help sections: $values, $description, and $examples
 
 100.0% of words have complete documentation"
     }
