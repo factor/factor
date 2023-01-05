@@ -1,7 +1,7 @@
 ! Copyright (C) 2022 Raghu Ranganathan.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: tools.test byte-arrays random locals sequences ;
-IN: compression.bzip3.tests
+USING: byte-arrays compression.bzip3 math random sequences
+tools.test ;
 
 ! Simple compression and decompression
 { B{
