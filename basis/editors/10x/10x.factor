@@ -15,9 +15,7 @@ HOOK: find-10x-editor-path os ( -- path )
 M: unix find-10x-editor-path "10x" ?find-in-path ;
 
 M: windows find-10x-editor-path
-    {
-        "PureDevSoftware/10x"
-    } "10x.exe" find-in-applications
+    { "PureDevSoftware/10x" } "10x.exe" find-in-applications
     [ "10x.exe" ] unless* ;
 
 M: 10x-editor editor-command
