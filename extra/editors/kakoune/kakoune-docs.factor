@@ -15,9 +15,6 @@ HELP: find-kak-path
 }
 { $description "A word which finds kakoune in your unix system's PATH variable." } ;
 
-HELP: kak-base
-{ $class-description "" } ;
-
 HELP: kak-path
 { $var-description "Set this variable to a sequence of strings that indicate the command to be run when factor wants to invoke kakoune. For example, on the author's system, this is " { $snippet "{ \"alacritty\" \"-e\" \"kak\" }" } } ;
 
