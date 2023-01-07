@@ -85,7 +85,7 @@ HELP: vocab-help-coverage.
 [english] vowel?: needs help sections: $values, $description, and $examples
 [english] vowels: needs help sections: $values, $description, and $examples
 
-100.0% of words have complete documentation"
+83.3% of words have complete documentation"
     }
 } ;
 
@@ -106,13 +106,15 @@ HELP: prefix-help-coverage.
 [english] pluralize: full help coverage
 [english] singular?: full help coverage
 [english] singularize: full help coverage
+[english] vowel?: needs help sections: $values, $description, and $examples
+[english] vowels: needs help sections: $values, $description, and $examples
 [english.private] $0-plurality: needs help sections: $values, $description, and $examples
 [english.private] $keep-case: needs help sections: $values, $description, and $examples
 [english.private] match-case: needs help sections: $values, $description, and $examples
 [english.private] plural-to-singular: needs help sections: $values, $description, and $examples
 [english.private] singular-to-plural: needs help sections: $values, $description, and $examples
 
-70.6% of words have complete documentation"
+58.8% of words have complete documentation"
     }
 } ;
 
@@ -163,6 +165,14 @@ HELP: <prefix-help-coverage>
     T{ word-help-coverage
         { word-name singularize }
         { 100%-coverage? t }
+    }
+    T{ word-help-coverage
+        { word-name vowel? }
+        { omitted-sections { $values $description $examples } }
+    }
+    T{ word-help-coverage
+        { word-name vowels }
+        { omitted-sections { $values $description $examples } }
     }
     T{ word-help-coverage
         { word-name $0-plurality }
@@ -249,6 +259,14 @@ HELP: <vocab-help-coverage>
     T{ word-help-coverage
         { word-name singularize }
         { 100%-coverage? t }
+    }
+    T{ word-help-coverage
+        { word-name vowel? }
+        { omitted-sections { $values $description $examples } }
+    }
+    T{ word-help-coverage
+        { word-name vowels }
+        { omitted-sections { $values $description $examples } }
     }
 }"
     }
