@@ -110,7 +110,7 @@ TUPLE: file-responder root hook special index-names allow-listings ;
 
 : sort-orders ( -- CO-N CO-M CO-S )
     "N" "M" "S" sort-column [
-        [ drop "?C=" ";O=" surround ]
+        [ drop "?C=" "&O=" surround ]
         [ ?toggle-sort-order ] 2bi append
     ] curry tri@ ;
 
