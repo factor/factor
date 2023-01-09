@@ -45,6 +45,12 @@ HELP: catch-stop-generator
 }
 { $description "Attempts to run the " { $snippet try } " quotation. If a " { $link stop-generator } " error is thrown, then the " { $snippet except } "quotation will be run instead." } ;
 
+HELP: exhausted?
+{ $values
+    { "gen" generator } { "?" boolean }
+}
+{ $description "Check whether a generator has already been exhausted." } ;
+
 HELP: gen-coroutine
 { $values
     { "quot" quotation } { "gen" generator }
@@ -121,6 +127,12 @@ HELP: yield*
     { "result" object }
 }
 { $description "Pause computation and yield a value to the caller, with the expectation for a value to be returned before computation is resumed." } ;
+
+HELP: yield-from
+{ $values
+    { "gen" generator }
+}
+{ $description "Delegate computation to the specified generator until it is exhausted, before resuming computation in the current generator." } ;
 
 ARTICLE: "generators" "generators"
 { $vocab-link "generators" }
