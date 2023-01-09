@@ -44,3 +44,9 @@ GEN: next*-gen ( -- g ) 1 yield* yield* yield* ;
 
 { { 1 2 3 } } [ no-inp-gen take-all ] unit-test
 { { } } [ [ ] <generator> take-all ] unit-test
+
+GEN: yf-test ( -- g ) no-inp-gen yield-from no-inp-gen yield-from ;
+{ { 1 2 3 1 2 3 } } [ yf-test take-all ] unit-test
+
+{ t } [ no-inp-gen [ take-all drop ] [ exhausted? ] bi ] unit-test
+{ f } [ no-inp-gen exhausted? ] unit-test
