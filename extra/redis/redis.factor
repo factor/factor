@@ -1,8 +1,9 @@
 ! Copyright (C) 2009 Bruno Deferrari
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors calendar io io.sockets io.streams.duplex
-io.timeouts kernel redis.command-writer redis.response-parser
-io.encodings.utf8 ;
+USING: accessors calendar io io.encodings.utf8 io.sockets
+io.streams.duplex io.timeouts kernel redis.command-writer
+redis.response-parser ;
+QUALIFIED: namespaces
 IN: redis
 
 ! Connection
@@ -101,12 +102,16 @@ IN: redis
 ! Redis object
 TUPLE: redis host port encoding password ;
 
-CONSTANT: default-redis-port 6379
+SYMBOL: redis-host
+"127.0.0.1" redis-host namespaces:set-global
+
+SYMBOL: redis-port
+6379 redis-port namespaces:set-global
 
 : <redis> ( -- redis )
     redis new
-        "127.0.0.1" >>host
-        default-redis-port >>port
+        redis-host namespaces:get >>host
+        redis-port namespaces:get >>port
         utf8 >>encoding ;
 
 : redis-do-connect ( redis -- stream )
