@@ -1,5 +1,5 @@
 USING: help.markup help.syntax parser source-files
-source-files.errors vocabs.loader kernel editors.gedit ;
+source-files.errors vocabs.loader kernel ;
 IN: editors
 
 ARTICLE: "editor" "Editor integration"
@@ -46,7 +46,7 @@ $nl
     [
             gedit-path , number>string \"+\" prepend , ,
     ] { } make ;" }
-"Here, " { $link gedit-path } " is a word that either pushes the location of " { $snippet "gedit" }
+"Here, " { $snippet gedit-path } " is a word that either pushes the location of " { $snippet "gedit" }
 " from PATH, or uses a user-defined path, set in a global."
 $nl
 "Finally, if your editor does not use a GUI, the " { $link editor-detached? } " method must be "
