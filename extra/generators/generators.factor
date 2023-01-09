@@ -32,4 +32,8 @@ SYNTAX: GEN:: (::) [ make-gen-quot ] keep define-declared ;
 : ?next ( gen -- val/f end? ) [ next f ] [ drop f t ] catch-stop-generator ;
 : ?next* ( v gen -- val/f end? ) [ next* f ] [ 2drop f t ] catch-stop-generator ;
 : take ( gen n -- seq ) [ swap '[ drop _ ?next [ , t ] unless ] all-integers? drop ] { } make ;
-: take-all ( gen -- seq ) [ '[ _ ?next [ , t ] unless ] loop ] { } make ;
+: take-all ( gen -- seq ) '[ _ ?next not ] [ ] produce nip ;
+
+: yield-from ( gen -- ) '[ _ ?next [ drop f ] [ yield t ] if ] loop ;
+
+: exhausted? ( gen -- ? ) state>> not ;
