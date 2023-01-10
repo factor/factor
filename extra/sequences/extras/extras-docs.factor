@@ -679,7 +679,7 @@ HELP: count-tail
     { "seq" sequence } { "quot" quotation }
     { "n" integer }
 }
-{ $description "Count the number of values at the beginning of " { $snippet "seq" } " that return a truthy value when passed into " { $snippet "quot" } "." } ;
+{ $description "Count the number of values from the end of " { $snippet "seq" } " that return a truthy value when passed into " { $snippet "quot" } "." } ;
 
 HELP: cut-when
 { $values
