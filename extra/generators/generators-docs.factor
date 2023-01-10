@@ -134,7 +134,7 @@ HELP: yield-from
 }
 { $description "Delegate computation to the specified generator until it is exhausted, before resuming computation in the current generator." } ;
 
-ARTICLE: "generators" "generators"
+ARTICLE: "generators" "Generators"
 { $vocab-link "generators" }
 ;
 
