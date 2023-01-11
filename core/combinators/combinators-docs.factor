@@ -1,5 +1,6 @@
 USING: arrays assocs combinators.private effects
 generic.standard help.markup help.syntax kernel quotations
+generalizations
 sequences sequences.private words ;
 IN: combinators
 
@@ -209,6 +210,22 @@ $nl
 { $subsections "call-unsafe" }
 { $see-also "effects" "inference" } ;
 
+ARTICLE: "combinators-connection" "Combinator Connections" 
+"Factor provides several convenient implementations of combinators, specifically for simpler " 
+"cases with few stack arguments. This page will document combinators that are "
+"similar in application, but may be different in effect."
+{ $list
+  { { $link map } " generalizes " { $link call } " over " { $link sequence } "s of objects." }
+  { { $link napply } " generalizes " { $link bi@ } " and " { $link tri@ }
+    " for a number of objects on the stack." }
+  { { $link cleave } " generalizes " { $link bi } " and " { $link tri }
+    " for equal numbers of quotations and objects on the stack." }
+  { { $link spread } " generalizes " { $link  bi* } " and "  { $link tri* } " "
+    "for performing a set of operations that ignore the top n values of the stack, keeping "
+    "them as is." }  
+}
+;
+
 ARTICLE: "combinators" "Combinators"
 "A central concept in Factor is that of a " { $emphasis "combinator" } ", which is a word taking code as input."
 { $subsections
@@ -221,6 +238,7 @@ ARTICLE: "combinators" "Combinators"
     "combinators.smart"
     "combinators-quot"
     "generalizations"
+    "combinators-connection"
 }
 "More combinators are defined for working on data structures, such as " { $link "sequences-combinators" } " and " { $link "assocs-combinators" } "."
 { $see-also "quotations" } ;
