@@ -102,11 +102,11 @@ IN: ui.tools.listener.tests
 ] with-interactive-vocabs
 
 ! Hang
-{ } [ <interactor> <pane> <pane-stream> >>output "interactor" set ] unit-test
+[ <interactor> <pane> <pane-stream> >>output "interactor" set ] must-not-fail
 
-{ } [ [ "interactor" get stream-read-quot drop ] "A" spawn drop ] unit-test
+[ [ "interactor" get stream-read-quot drop ] "A" spawn ] must-not-fail
 
-{ } [ [ "interactor" get stream-read-quot drop ] "B" spawn drop ] unit-test
+[ [ "interactor" get stream-read-quot drop ] "B" spawn ] must-not-fail
 
 { } [ 1 seconds sleep ] unit-test
 

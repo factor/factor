@@ -51,4 +51,4 @@ USING: accessors arrays.shaped kernel math sequences tools.test ;
 ] unit-test
 
 
-{ } [ 15 <iota> { 3 5 1 } reshape drop ] unit-test
+[ 15 <iota> { 3 5 1 } reshape ] must-not-fail

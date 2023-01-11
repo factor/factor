@@ -118,8 +118,8 @@ IN: compiler.tree.propagation.call-effect.tests
 { f } [ [ dup drop ] final-info first infer-value ] unit-test
 
 ! This should not hang
-{ } [ [ [ dup call( quot -- ) ] dup call( quot -- ) ] final-info drop ] unit-test
-{ } [ [ [ dup curry call( quot -- ) ] dup curry call( quot -- ) ] final-info drop ] unit-test
+[ [ [ dup call( quot -- ) ] dup call( quot -- ) ] final-info ] must-not-fail
+[ [ [ dup curry call( quot -- ) ] dup curry call( quot -- ) ] final-info ] must-not-fail
 
 ! This should get inlined, because the parameter to the curry is literal even though
 ! [ boa ] by itself doesn't infer

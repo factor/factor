@@ -16,7 +16,7 @@ unit-test
     ] all-integers?
 ] unit-test
 
-{ } [ { 1 2 } [ 2drop 1 ] sort drop ] unit-test
+[ { 1 2 } [ 2drop 1 ] sort ] must-not-fail
 
 ! Is it a stable sort?
 { t } [ { { 1 "a" } { 1 "b" } { 1 "c" } } dup sort-keys = ] unit-test
@@ -24,7 +24,7 @@ unit-test
 { { { 1 "a" } { 1 "b" } { 1 "c" } { 1 "e" } { 2 "d" } } }
 [ { { 1 "a" } { 1 "b" } { 1 "c" } { 2 "d" } { 1 "e" } } sort-keys ] unit-test
 
-{ } [ all-words natural-sort drop ] unit-test
+[ all-words natural-sort ] must-not-fail
 
 { +gt+ } [ "lady" "bug" { [ length ] [ first ] } compare-with ] unit-test
 { +lt+ } [ "bug" "lady" { [ length ] [ first ] } compare-with ] unit-test

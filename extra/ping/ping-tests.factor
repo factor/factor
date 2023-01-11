@@ -8,7 +8,7 @@ IN: ping.tests
     os-version { 5 1 } after? and not ;
 
 test-ping? [
-    [ ] [ "localhost" ping drop ] unit-test
+    [ "localhost" ping ] must-not-fail
     [ t ] [ "localhost" alive? ] unit-test
     [ t ] [ "127.0.0.1" alive? ] unit-test
     [ f ] [ "0.0.0.0" alive? ] unit-test

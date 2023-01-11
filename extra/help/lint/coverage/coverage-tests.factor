@@ -69,7 +69,7 @@ PRIVATE>
 ] unit-test
 
 ! make sure this doesn't throw an error (would signify an issue with ignored-words)
-{ } [ { $io-error $prettyprinting-note $nl } [ <word-help-coverage> ] map drop ] unit-test
+[ { $io-error $prettyprinting-note $nl } [ <word-help-coverage> ] map ] must-not-fail
 
 
 ! Lint system is written weirdly, there's no way to invoke it and get the output

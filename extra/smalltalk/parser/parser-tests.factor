@@ -294,8 +294,8 @@ test         = <foreign parse-smalltalk LocalVariableDeclarationList>
 }
 [ "class Test1 [|a|]. class Test2 extends Test1 [|b|]" parse-smalltalk ] unit-test
 
-{ } [ "class Foo []. Tests blah " parse-smalltalk drop ] unit-test
+[ "class Foo []. Tests blah " parse-smalltalk ] must-not-fail
 
-{ } [ "vocab:smalltalk/parser/test.st" ascii file-contents parse-smalltalk drop ] unit-test
+[ "vocab:smalltalk/parser/test.st" ascii file-contents parse-smalltalk ] must-not-fail
 
-{ } [ "_abc_" parse-smalltalk drop ] unit-test
+[ "_abc_" parse-smalltalk ] must-not-fail

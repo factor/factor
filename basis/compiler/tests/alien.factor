@@ -580,7 +580,7 @@ FUNCTION: test_struct_14 ffi_test_44 ( ) inline
 
 : stack-frame-bustage ( -- a b ) ffi_test_44 gc 3 ;
 
-[ ] [ stack-frame-bustage 2drop ] unit-test
+[ stack-frame-bustage ] must-not-fail
 
 ! C99 tests
 os windows? [
