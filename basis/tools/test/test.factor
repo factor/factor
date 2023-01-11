@@ -103,6 +103,9 @@ M: did-not-fail summary drop "Did not fail" ;
 :: (must-fail) ( quot -- error/f failed? tested? )
     [ { } quot with-datastack drop did-not-fail t ] [ drop f f ] recover t ;
 
+:: (must-not-fail) ( quot -- error/f failed? tested? )
+    [ { } quot with-datastack drop f f ] [ t ] recover t ;
+
 : experiment-title ( word -- string )
     "(" ?head drop ")" ?tail drop
     H{ { CHAR: - CHAR: \s } } substitute >title ;
@@ -211,6 +214,7 @@ TEST: must-infer-as
 TEST: must-infer
 TEST: must-fail-with
 TEST: must-fail
+TEST: must-not-fail
 
 M: test-failure error. ( error -- )
     {
