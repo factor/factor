@@ -314,7 +314,7 @@ C: <ro-box> ro-box
 
 TUPLE: empty-tuple ;
 
-{ } [ [ empty-tuple boa layout-of ] count-unboxed-allocations drop ] unit-test
+[ [ empty-tuple boa layout-of ] count-unboxed-allocations ] must-not-fail
 
 ! New feature!
 

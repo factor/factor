@@ -65,7 +65,7 @@ IN: concurrency.locks.tests
     ] with-lock
 ] unit-test
 
-{ } [ <rw-lock> drop ] unit-test
+[ <rw-lock> ] must-not-fail
 
 { } [ <rw-lock> [ ] with-read-lock ] unit-test
 

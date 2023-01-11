@@ -92,7 +92,7 @@ TUPLE: test-tuple { x read-only } ;
     null-info value-info-union >literal<
 ] unit-test
 
-{ } [ { } value-infos-union drop ] unit-test
+[ { } value-infos-union ] must-not-fail
 
 ! interval>literal
 { 10 t } [

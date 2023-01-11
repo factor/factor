@@ -1,11 +1,11 @@
 USING: accessors combinators gml tools.test kernel sequences
 euler.b-rep ;
 
-{ } [ [ "vocab:gml/test-core.gml" run-gml-file ] make-gml 2drop ] unit-test
+[ [ "vocab:gml/test-core.gml" run-gml-file ] make-gml ] must-not-fail
 
-{ } [ [ "vocab:gml/test-coremath.gml" run-gml-file ] make-gml 2drop ] unit-test
+[ [ "vocab:gml/test-coremath.gml" run-gml-file ] make-gml ] must-not-fail
 
-{ } [ [ "vocab:gml/test-geometry.gml" run-gml-file ] make-gml 2drop ] unit-test
+[ [ "vocab:gml/test-geometry.gml" run-gml-file ] make-gml ] must-not-fail
 
 { } [
     [ "vocab:gml/examples/cube.gml" run-gml-file ] make-gml nip

@@ -3,4 +3,4 @@
 USING: kernel tools.test unix.utmpx ;
 IN: unix.utmpx.tests
 
-{ } [ all-utmpx drop ] unit-test
+[ all-utmpx ] must-not-fail

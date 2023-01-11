@@ -4,7 +4,7 @@ USING: assocs countries kernel sets system tools.test
 unicode.flags unicode.flags.images ;
 IN: unicode.flags.images.tests
 
-{ } [ valid-flag-biassoc drop ] unit-test
+[ valid-flag-biassoc ] must-not-fail
 
 ! Windows doesn't seem to have these flags yet (!)
 { { } } [
