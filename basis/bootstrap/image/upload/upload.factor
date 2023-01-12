@@ -52,6 +52,7 @@ SYMBOL: build-images-destination
 : upload-images ( -- )
     [
         \ scp-name get-global scp-name or ,
+        "-4" , ! force ipv4
         boot-image-names %
         checksums-path ,
         git-branch-destination [ print flush ] [ , ] bi
@@ -86,6 +87,7 @@ SYMBOL: build-images-destination
     [
         [
             \ scp-name get-global scp-name or ,
+            "-4" , ! force ipv4
             "." directory-files %
             build-destination ,
         ] { } make try-process
@@ -94,6 +96,7 @@ SYMBOL: build-images-destination
 : create-remote-upload-directory ( -- )
     '[
         "ssh" ,
+        "-4" , ! force ipv4
         "sheeple@downloads.factorcode.org" ,
         "mkdir -p downloads.factorcode.org/images/" factor-git-branch append ,
     ] { } make try-process ;
