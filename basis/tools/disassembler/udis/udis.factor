@@ -1,9 +1,8 @@
 ! Copyright (C) 2008, 2010 Slava Pestov, Jorge Acereda Macia.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors alien alien.c-types alien.libraries
-alien.syntax arrays combinators destructors io kernel
-layouts libc make math math.order math.parser namespaces
-prettyprint sequences splitting system
+USING: alien alien.c-types alien.libraries alien.syntax arrays
+combinators destructors io kernel layouts libc make math
+math.order math.parser namespaces sequences system
 tools.disassembler.private tools.memory ;
 IN: tools.disassembler.udis
 
@@ -59,20 +58,6 @@ SINGLETON: udis-disassembler
 <PRIVATE
 
 : buf/len ( from to -- buf len ) [ drop <alien> ] [ swap - ] 2bi ;
-
-: complete-address ( n seq -- )
-    " (" % building get [ "" like write ] [ delete-all ] bi
-    [ nip owner>> pprint-short ] [ entry-point>> - ] 2bi
-    [ " + 0x" % >hex % ] unless-zero ")" % ;
-
-: search-xt ( addr -- )
-    dup lookup-return-address [ complete-address ] [ drop ] if* ;
-
-: resolve-xt ( str -- )
-    string>number [ search-xt ] when* ;
-
-: resolve-call ( str -- )
-    "0x" over subseq-start [ tail-slice resolve-xt ] [ drop ] if* ;
 
 : write-disassembly ( lines -- )
     dup [ second length ] [ max ] map-reduce [
