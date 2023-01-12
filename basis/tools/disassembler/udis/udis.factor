@@ -59,16 +59,6 @@ SINGLETON: udis-disassembler
 
 : buf/len ( from to -- buf len ) [ drop <alien> ] [ swap - ] 2bi ;
 
-: write-disassembly ( lines -- )
-    dup [ second length ] [ max ] map-reduce [
-        '[
-            [ first >hex cell 2 * CHAR: 0 pad-head % ": " % ]
-            [ second _ CHAR: \s pad-tail % "  " % ]
-            [ third [ % ] [ resolve-call ] bi ]
-            tri CHAR: \n ,
-        ] each
-    ] "" make write ;
-
 : make-disassembly ( ud -- lines )
     [
         [ dup ud_disassemble 0 = ] [
