@@ -128,10 +128,13 @@ SPECIALIZED-ARRAY: cs_insn
 
 <PRIVATE
 
+: buf/len/start ( from to -- buf len from )
+    [ drop <alien> ] [ swap - ] [ drop ] 2tri ;
+
 : make-insn ( cs_insn -- seq )
     {
         [ address>> ]
-        [ [ bytes>> ] [ size>> ] bi head bytes>hex-string ]
+        [ [ bytes>> ] [ size>> ] bi head-slice bytes>hex-string ]
         [ mnemonic>> alien>native-string ]
         [ op_str>> alien>native-string " " glue ]
     } cleave 3array ;
@@ -149,7 +152,6 @@ PRIVATE>
 SINGLETON: capstone-disassembler
 
 M: capstone-disassembler disassemble*
-    [ [ <alien> ] keep ] dip over [ - ] dip
-    [ make-disassembly write-disassembly ] with-code-blocks ;
+    [ buf/len/start make-disassembly write-disassembly ] with-code-blocks ;
 
 capstone-disassembler disassembler-backend set-global
