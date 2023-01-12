@@ -16,7 +16,7 @@ PRIVATE>
     [ MDB_TUPLE_INFO ] dip at ; inline
 
 : set-tuple-info ( tuple assoc -- )
-   [ <tuple-info> MDB_TUPLE_INFO ] dip set-at ; inline
+    [ <tuple-info> MDB_TUPLE_INFO ] dip set-at ; inline
 
 : tuple-info? ( assoc -- ? )
-   [ MDB_TUPLE_INFO ] dip key? ;
+    [ MDB_TUPLE_INFO ] dip key? ;

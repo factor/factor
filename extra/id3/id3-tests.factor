@@ -15,12 +15,12 @@ IN: id3.tests
     } cleave ;
 
 {
-   "BLAH"
-   "ARTIST"
-   "ALBUM"
-   "2009"
-   "COMMENT"
-   "Bluegrass"
+    "BLAH"
+    "ARTIST"
+    "ALBUM"
+    "2009"
+    "COMMENT"
+    "Bluegrass"
 } [ "vocab:id3/tests/blah.mp3" mp3>id3 id3-params ] unit-test
 
 {
@@ -33,12 +33,12 @@ IN: id3.tests
 } [ "vocab:id3/tests/blah2.mp3" mp3>id3 id3-params ] unit-test
 
 {
-   "Stormy Weather"
-   "Frank Sinatra"
-   "Night and Day Frank Sinatra"
-    f
-   "eng, AG# 08E1C12E"
-   "Big Band"
+    "Stormy Weather"
+    "Frank Sinatra"
+    "Night and Day Frank Sinatra"
+     f
+    "eng, AG# 08E1C12E"
+    "Big Band"
 } [ "vocab:id3/tests/blah3.mp3" mp3>id3 id3-params ] unit-test
 
 

@@ -15,12 +15,12 @@ TUPLE: help-lint-error < source-file-error ;
 SYMBOL: +help-lint-failure+
 
 T{ error-type-holder
-   { type +help-lint-failure+ }
-   { word ":lint-failures" }
-   { plural "help lint failures" }
-   { icon "vocab:ui/tools/error-list/icons/help-lint-error.png" }
-   { quot [ lint-failures get values ] }
-   { forget-quot [ lint-failures get delete-at ] }
+    { type +help-lint-failure+ }
+    { word ":lint-failures" }
+    { plural "help lint failures" }
+    { icon "vocab:ui/tools/error-list/icons/help-lint-error.png" }
+    { quot [ lint-failures get values ] }
+    { forget-quot [ lint-failures get delete-at ] }
 } define-error-type
 M: help-lint-error error-type drop +help-lint-failure+ ;
 

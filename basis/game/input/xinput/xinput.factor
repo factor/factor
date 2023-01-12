@@ -34,7 +34,7 @@ MACRO: map-index-compose ( seq quot -- quot' )
       map-index-compose 2cleave ;
 
  : >pov ( byte -- symbol )
-     {
+    {
          pov-neutral
          pov-up
          pov-down
@@ -51,7 +51,7 @@ MACRO: map-index-compose ( seq quot -- quot' )
          pov-neutral
          pov-neutral
          pov-neutral
-     } nth ;
+    } nth ;
 
 : fill-controller-state ( XINPUT_STATE -- controller-state )
     Gamepad>> controller-state new dup rot

@@ -12,7 +12,7 @@ IN: cocoa.dialogs
     dup 1 -> setAllowsMultipleSelection: ;
 
 : <NSDirPanel> ( -- panel ) <NSOpenPanel>
-   dup 1 -> setCanChooseDirectories: ;
+    dup 1 -> setCanChooseDirectories: ;
 
 : <NSSavePanel> ( -- panel )
     NSSavePanel -> savePanel

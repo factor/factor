@@ -59,7 +59,7 @@ M: participant-mode >log-line
             [ " has set mode " % mode>> % ]
             [ " to " % parameter>> % ]
         } cleave
-     ] "" make ;
+    ] "" make ;
 
 M: nick >log-line
     [ "* " % dup sender>> % " is now known as " % nickname>> % ] "" make ;

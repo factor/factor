@@ -65,8 +65,8 @@ HELP: set-firstn
 
 HELP: nappend
 { $values
-     { "n" integer }
-     { "seq" sequence }
+    { "n" integer }
+    { "seq" sequence }
 }
 { $description "Outputs a new sequence consisting of the elements of the top " { $snippet "n" } " sequences from the datastack in turn." }
 { $errors "Throws an error if any of the sequences contain elements that are not permitted in the sequence type of the first sequence." }
@@ -79,8 +79,8 @@ HELP: nappend
 
 HELP: nappend-as
 { $values
-     { "n" integer } { "exemplar" sequence }
-     { "seq" sequence }
+    { "n" integer } { "exemplar" sequence }
+    { "seq" sequence }
 }
 { $description "Outputs a new sequence of type " { $snippet "exemplar" } " consisting of the elements of the top " { $snippet "n" } " sequences from the datastack in turn." }
 { $errors "Throws an error if any of the sequences contain elements that are not permitted in the sequence type of the first sequence." }

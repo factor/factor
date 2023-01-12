@@ -44,13 +44,13 @@ SYNTAX: XML-NS:
     [ values [ interpolated? ] filter ] dip each ; inline
 
 : (each-interpolated) ( ... item quot: ( ... interpolated -- ... ) -- ... )
-     {
+    {
         { [ over interpolated? ] [ call ] }
         { [ over tag? ] [ [ attrs>> ] dip each-attrs ] }
         { [ over attrs? ] [ each-attrs ] }
         { [ over xml? ] [ [ body>> ] dip (each-interpolated) ] }
         [ 2drop ]
-     } cond ; inline recursive
+    } cond ; inline recursive
 
 : each-interpolated ( xml quot -- )
     '[ _ (each-interpolated) ] deep-each ; inline

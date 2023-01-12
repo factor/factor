@@ -11,7 +11,7 @@ ERROR: not-a-source-path path ;
     no-prefixes [ name>> ] map ;
 
 CONSTANT: core-broken-vocabs
-   {
+    {
         "vocabs.loader.test.a"
         "vocabs.loader.test.b"
         "vocabs.loader.test.c"

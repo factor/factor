@@ -15,14 +15,14 @@ HELP: benchmark?
 
 HELP: call-responder
 { $values
-     { "path" "a sequence of strings" } { "responder" "a responder" }
-     { "response" response } }
+    { "path" "a sequence of strings" } { "responder" "a responder" }
+    { "response" response } }
 { $description "Calls a responder." } ;
 
 HELP: call-responder*
 { $values
-     { "path" "a sequence of strings" } { "responder" "a responder" }
-     { "response" response } }
+    { "path" "a sequence of strings" } { "responder" "a responder" }
+    { "response" response } }
 { $contract "Processes an HTTP request and returns a response." }
 { $notes "When this word is called, various dynamic variables are set; see " { $link "http.server.requests" } "." } ;
 
@@ -64,8 +64,8 @@ HELP: request-params
 
 HELP: param
 { $values
-     { "name" string }
-     { "value" string }
+    { "name" string }
+    { "value" string }
 }
 { $description "Outputs the value of a query parameter (if the current request is a GET or HEAD request) or a POST parameter (if the current request is a POST request)." }
 { $notes "Instead of using this word, it is better to use " { $vocab-link "furnace.actions" } " and the associated validation machinery, which allows you to access values using " { $link "html.forms.values" } " words." } ;

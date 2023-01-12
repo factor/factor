@@ -75,9 +75,9 @@ HINTS: next* { spot } ;
     ! Take the substring of a string starting at spot
     ! from code until the quotation given is true and
     ! advance spot to after the substring.
-   10 <sbuf> [
-       '[ _ keep over [ drop ] [ _ push ] if ] skip-until
-   ] keep "" like ; inline
+    10 <sbuf> [
+        '[ _ keep over [ drop ] [ _ push ] if ] skip-until
+    ] keep "" like ; inline
 
 : take-to ( seq -- string )
     '[ _ member? ] take-until ; inline
@@ -186,4 +186,4 @@ HINTS: next* { spot } ;
     [ next (parse-quote) ] [ quoteless-attr ] if ; inline
 
 : parse-quote ( -- seq )
-   f parse-quote* ;
+    f parse-quote* ;

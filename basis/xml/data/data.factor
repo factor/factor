@@ -205,7 +205,7 @@ CONSULT: name xml body>> ;
 PRIVATE>
 
 M: xml clone
-   xml clone-slots ;
+    xml clone-slots ;
 
 M: xml like
     swap dup xml? [ nip ] [

@@ -83,18 +83,18 @@ debug-text-fragment-shader debug-text-vertex-format ;
 
 CONSTANT: debug-text-font
     T{ font
-       { name       "monospace"  }
-       { size       16           }
-       { bold?      f            }
-       { italic?    f            }
-       { foreground COLOR: white }
-       { background COLOR: black } }
+        { name       "monospace"  }
+        { size       16           }
+        { bold?      f            }
+        { italic?    f            }
+        { foreground COLOR: white }
+        { background COLOR: black } }
 
 CONSTANT: debug-text-texture-parameters
     T{ texture-parameters
-       { wrap              repeat-texcoord }
-       { min-filter        filter-linear   }
-       { min-mipmap-filter f               } }
+        { wrap              repeat-texcoord }
+        { min-filter        filter-linear   }
+        { min-mipmap-filter f               } }
 
 : text>image ( string color -- image )
     debug-text-font clone swap >>foreground swap string>image drop ;

@@ -190,8 +190,8 @@ M: tree >alist
             to-key node right>> node-right?
             [ end-comparator (node>subalist-right) ]
             [
-                 [ from-key ] 2dip start-comparator
-                 end-comparator (node>subalist)
+                [ from-key ] 2dip start-comparator
+                end-comparator (node>subalist)
             ] if
         ] when
     ] when ; inline recursive

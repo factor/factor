@@ -419,16 +419,16 @@ CONSTANT: construct-merge-obj {
     H{ { "x" 0 } { "y" 2 } } :> LEFT
     H{ { "r" 10 } } :> BIG
     H{ { "r" 1 } } :> SMALL
- {
-    CENTER
-    LEFT
-    BIG
-    SMALL
-    H{ { "x" 1 } { "y" 2 } { "r" 10 } { "label" "center/big" } }
-    H{ { T{ yaml-merge } CENTER }  { "r" 10 } { "label" "center/big" } }
-    H{ { T{ yaml-merge } { CENTER BIG } } { "label" "center/big" } }
-    H{ { T{ yaml-merge } { BIG LEFT SMALL } } { "x" 1 } { "label" "center/big" } }
-} ;
+    {
+        CENTER
+        LEFT
+        BIG
+        SMALL
+        H{ { "x" 1 } { "y" 2 } { "r" 10 } { "label" "center/big" } }
+        H{ { T{ yaml-merge } CENTER }  { "r" 10 } { "label" "center/big" } }
+        H{ { T{ yaml-merge } { CENTER BIG } } { "label" "center/big" } }
+        H{ { T{ yaml-merge } { BIG LEFT SMALL } } { "x" 1 } { "label" "center/big" } }
+    } ;
 
 CONSTANT: construct-merge-str "---
 - &CENTER { x: 1, 'y': 2 }
@@ -722,7 +722,7 @@ f value [
   ${ construct-value-unsafe-obj } [ $ construct-value-unsafe-obj >yaml-docs yaml-docs> ] unit-test
   ${ construct-value-safe-obj } [
     $ construct-value-str yaml-docs> [
-     dup "link with" swap [ [ scalar-value ] map ] change-at
+      dup "link with" swap [ [ scalar-value ] map ] change-at
     ] map
   ] unit-test
 ] with-variable

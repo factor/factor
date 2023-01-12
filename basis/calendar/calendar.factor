@@ -261,7 +261,7 @@ M: number +second
         [ day>>    +day    ]
         [ month>>  +month  ]
         [ year>>   +year   ]
-     } cleave ; inline
+    } cleave ; inline
 
 PRIVATE>
 

@@ -5,7 +5,7 @@ IN: tools.files
 
 HELP: directory.
 { $values
-     { "path" "a pathname string" }
+    { "path" "a pathname string" }
 }
 { $description "Prints information about all files in a directory to the output stream in a cross-platform way similar to the Unix " { $snippet "ls" } " command." } ;
 

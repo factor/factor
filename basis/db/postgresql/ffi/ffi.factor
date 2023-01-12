@@ -242,12 +242,12 @@ FUNCTION: int    PQflush ( PGconn* conn )
 ! * use
 !
 FUNCTION: PGresult* PQfn ( PGconn* conn,
-     int fnid,
-     int* result_buf,
-     int* result_len,
-     int result_is_int,
-     PQArgBlock* args,
-     int nargs )
+    int fnid,
+    int* result_buf,
+    int* result_len,
+    int result_is_int,
+    PQArgBlock* args,
+    int nargs )
 
 ! Accessor functions for PGresult objects
 FUNCTION: ExecStatusType PQresultStatus ( PGresult* res )

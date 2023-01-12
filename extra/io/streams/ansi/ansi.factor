@@ -75,7 +75,7 @@ M: ansi stream-write-table
     ] with-output-stream* ;
 
 M: ansi make-cell-stream
-     2drop <string-writer> <ansi> ;
+    2drop <string-writer> <ansi> ;
 
 M: ansi dispose drop ;
 

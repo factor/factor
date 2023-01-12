@@ -48,8 +48,8 @@ punycode.private tools.test urls ;
 
     ! (D) Czech:
     {
-       "\u{0050}\u{0072}\u{006F}\u{010D}\u{0070}\u{0072}\u{006F}\u{0073}\u{0074}\u{011B}\u{006E}\u{0065}\u{006D}\u{006C}\u{0075}\u{0076}\u{00ED}\u{010D}\u{0065}\u{0073}\u{006B}\u{0079}"
-       "Proprostnemluvesky-uyb24dma41a"
+        "\u{0050}\u{0072}\u{006F}\u{010D}\u{0070}\u{0072}\u{006F}\u{0073}\u{0074}\u{011B}\u{006E}\u{0065}\u{006D}\u{006C}\u{0075}\u{0076}\u{00ED}\u{010D}\u{0065}\u{0073}\u{006B}\u{0079}"
+        "Proprostnemluvesky-uyb24dma41a"
     }
 
     ! (E) Hebrew:
@@ -110,7 +110,7 @@ punycode.private tools.test urls ;
     ! (N) Hello-Another-Way-<sorezore><no><basho>
     {
         "\u{0048}\u{0065}\u{006C}\u{006C}\u{006F}\u{002D}\u{0041}\u{006E}\u{006F}\u{0074}\u{0068}\u{0065}\u{0072}\u{002D}\u{0057}\u{0061}\u{0079}\u{002D}\u{305D}\u{308C}\u{305E}\u{308C}\u{306E}\u{5834}\u{6240}"
-       "Hello-Another-Way--fc4qua05auwb3674vfr0b"
+        "Hello-Another-Way--fc4qua05auwb3674vfr0b"
     }
 
     ! (O) <hitotsu><yane><no><shita>2
@@ -121,14 +121,14 @@ punycode.private tools.test urls ;
 
     ! (P) Maji<de>Koi<suru>5<byou><mae>
     {
-       "\u{004D}\u{0061}\u{006A}\u{0069}\u{3067}\u{004B}\u{006F}\u{0069}\u{3059}\u{308B}\u{0035}\u{79D2}\u{524D}"
-       "MajiKoi5-783gue6qz075azm5e"
+        "\u{004D}\u{0061}\u{006A}\u{0069}\u{3067}\u{004B}\u{006F}\u{0069}\u{3059}\u{308B}\u{0035}\u{79D2}\u{524D}"
+        "MajiKoi5-783gue6qz075azm5e"
     }
 
     ! (Q) <pafii>de<runba>
     {
-       "\u{30D1}\u{30D5}\u{30A3}\u{30FC}\u{0064}\u{0065}\u{30EB}\u{30F3}\u{30D0}"
-       "de-jg4avhby1noc0d"
+        "\u{30D1}\u{30D5}\u{30A3}\u{30FC}\u{0064}\u{0065}\u{30EB}\u{30F3}\u{30D0}"
+        "de-jg4avhby1noc0d"
     }
 
     ! (R) <sono><supiido><de>
@@ -139,7 +139,7 @@ punycode.private tools.test urls ;
 
     ! (S) -> $1.00 <-
     {
-       "\u{002D}\u{003E}\u{0020}\u{0024}\u{0031}\u{002E}\u{0030}\u{0030}\u{0020}\u{003C}\u{002D}"
+        "\u{002D}\u{003E}\u{0020}\u{0024}\u{0031}\u{002E}\u{0030}\u{0030}\u{0020}\u{003C}\u{002D}"
         "-> $1.00 <--"
     }
 } [

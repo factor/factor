@@ -85,7 +85,7 @@ ${ { 0xabcd } >string } [ " \"\\uaBCd\" " json> ] unit-test
 [ not-a-json-number? ] must-fail-with
 
 ! unclosed objects and mismatched brackets are not allowed
- [ "[\"a\",
+[ "[\"a\",
 4
 ,1," json> ] must-fail
 

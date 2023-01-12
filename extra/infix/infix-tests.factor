@@ -10,9 +10,10 @@ IN: infix.tests
 { 3 } [ [infix 2*7%3+1 infix] ] unit-test
 { 1419857 } [ [infix 17**5 infix] ] unit-test
 { 1 } [ [infix 2-
-     1
-     -5*
-     0 infix] ] unit-test
+    1
+    -5*
+    0 infix]
+] unit-test
 
 { 0.0 } [ [infix sin(0) infix] ] unit-test
 { 10 } [ [infix lcm(2,5) infix] ] unit-test

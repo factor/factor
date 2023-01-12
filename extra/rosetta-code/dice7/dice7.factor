@@ -42,7 +42,7 @@ IN: rosetta-code.dice7
 
 ! Output a random integer 1..5.
 : dice5 ( -- x )
-   5 [1..b] random ;
+    5 [1..b] random ;
 
 ! Output a random integer 1..7 using dice5 as randomness source.
 : dice7 ( -- x )

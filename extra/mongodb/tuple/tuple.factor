@@ -21,18 +21,19 @@ SYNTAX: MDBTUPLE:
 : ensure-table ( class -- )
     tuple-collection
     [ create-collection ]
-    [ [ mdb-index-map values ] keep
-      '[ _ name>> >>ns ensure-index ] each
+    [
+        [ mdb-index-map values ] keep
+        '[ _ name>> >>ns ensure-index ] each
     ] bi ;
 
 : ensure-tables ( classes -- )
     [ ensure-table ] each ;
 
 : drop-table ( class -- )
-      tuple-collection
-      [ [ mdb-index-map values ] keep
-        '[ _ name>> swap name>> drop-index ] each ]
-      [ name>> drop-collection ] bi ;
+    tuple-collection
+    [ [ mdb-index-map values ] keep
+    '[ _ name>> swap name>> drop-index ] each ]
+    [ name>> drop-collection ] bi ;
 
 : recreate-table ( class -- )
     [ drop-table ]
@@ -45,15 +46,17 @@ DEFER: tuple>query
 GENERIC: id-selector ( object -- selector )
 
 M: toid id-selector
-   [ value>> ] [ key>> ] bi associate ; inline
+    [ value>> ] [ key>> ] bi associate ; inline
 
 M: mdb-persistent id-selector
-   >toid id-selector ;
+    >toid id-selector ;
 
 : (save-tuples) ( collection assoc -- )
-   swap '[ [ _ ] 2dip
-           [ id-selector ] dip
-           <update> >upsert update ] assoc-each ; inline
+    swap '[
+        [ _ ] 2dip
+        [ id-selector ] dip
+        <update> >upsert update
+    ] assoc-each ; inline
 
 : prepare-tuple-query ( tuple/query -- query )
     dup mdb-query-msg? [ tuple>query ] unless ;
@@ -73,32 +76,32 @@ PRIVATE>
     update-tuple ;
 
 : insert-tuple ( tuple -- )
-   [ tuple-collection name>> ]
-   [ tuple>assoc ] bi
-   save ;
+    [ tuple-collection name>> ]
+    [ tuple>assoc ] bi
+    save ;
 
 : delete-tuple ( tuple -- )
-   [ tuple-collection name>> ] keep
-   id-selector <delete> delete ;
+    [ tuple-collection name>> ] keep
+    id-selector <delete> delete ;
 
 : delete-tuples ( seq -- )
     [ delete-tuple ] each ;
 
 : tuple>query ( tuple -- query )
-   [ tuple-collection name>> ] keep
-   tuple>selector <query> ;
+    [ tuple-collection name>> ] keep
+    tuple>selector <query> ;
 
 : select-tuple ( tuple/query -- tuple/f )
-   prepare-tuple-query
-   find-one [ assoc>tuple ] [ f ] if* ;
+    prepare-tuple-query
+    find-one [ assoc>tuple ] [ f ] if* ;
 
 : select-tuples ( tuple/query -- cursor tuples/f )
-   prepare-tuple-query
-   find [ assoc>tuple ] map ;
+    prepare-tuple-query
+    find [ assoc>tuple ] map ;
 
 : select-all-tuples ( tuple/query -- tuples )
-   prepare-tuple-query
-   find-all [ assoc>tuple ] map ;
+    prepare-tuple-query
+    find-all [ assoc>tuple ] map ;
 
 : count-tuples ( tuple/query -- n )
-   dup mdb-query-msg? [ tuple>query ] unless count ;
+    dup mdb-query-msg? [ tuple>query ] unless count ;

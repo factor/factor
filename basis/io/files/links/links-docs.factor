@@ -19,15 +19,15 @@ HELP: copy-link
 
 HELP: follow-link
 { $values
-     { "path" "a pathname string" }
-     { "path'" "a pathname string" }
+    { "path" "a pathname string" }
+    { "path'" "a pathname string" }
 }
 { $description "Returns an absolute path from " { $link read-link } "." } ;
 
 HELP: follow-links
 { $values
-     { "path" "a pathname string" }
-     { "path'" "a pathname string" }
+    { "path" "a pathname string" }
+    { "path'" "a pathname string" }
 }
 { $description "Follows a chain of symlinks up to " { $link symlink-depth } "." } ;
 
@@ -35,13 +35,13 @@ HELP: follow-links
 
 HELP: symlink-depth
 { $values
-     { "value" integer }
+    { "value" integer }
 }
 { $description "The number of redirections " { $link follow-links } " will follow." } ;
 
 HELP: too-many-symlinks
 { $values
-     { "path" "a pathname string" } { "n" integer }
+    { "path" "a pathname string" } { "n" integer }
 }
 { $description "An error thrown when the number of redirections in a chain of symlinks surpasses the value in the " { $link symlink-depth } " variable." } ;
 

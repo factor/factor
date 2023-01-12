@@ -25,7 +25,7 @@ IN: readline
 
 : set-completion ( quot -- )
     [
-       '[
+        '[
             [ @ [ utf8 malloc-string ] [ f ] if* ]
             readline.ffi:rl_compentry_func_t
         ] ( -- alien ) define-temp

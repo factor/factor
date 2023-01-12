@@ -33,7 +33,7 @@ os macosx? [
         { "png" "tif" "tiff" "gif" "jpg" "jpeg" "bmp" "ico" "webp" }
     ] [
         supported-ns-image-extensions
-     ] if [ ns-image register-image-class ] each
+    ] if [ ns-image register-image-class ] each
 ] when
 
 : <CGImage> ( byte-array -- image-rep )

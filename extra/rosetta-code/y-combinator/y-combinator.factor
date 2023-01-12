@@ -36,8 +36,8 @@ IN: rosetta-code.y-combinator
 :: almost-ack ( quot -- quot )
     [
         {
-          { [ over zero? ] [ nip 1 + ] }
-          { [ dup zero? ] [ [ 1 - ] [ drop 1 ] bi* quot call ] }
-          [ [ drop 1 - ] [ 1 - quot call ] 2bi quot call ]
+            { [ over zero? ] [ nip 1 + ] }
+            { [ dup zero? ] [ [ 1 - ] [ drop 1 ] bi* quot call ] }
+            [ [ drop 1 - ] [ 1 - quot call ] 2bi quot call ]
         } cond
     ] ;

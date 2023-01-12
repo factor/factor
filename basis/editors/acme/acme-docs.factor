@@ -20,10 +20,9 @@ HELP: plan9-path
 "The " { $link plan9-path } " word will try to locate your Plan9"
 " installation. In order of preference this word checks:"
 $nl
-{
- $list
- { "The " { $link plan9-path } " global" }
- "The PLAN9 environment variable"
+{ $list
+  { "The " { $link plan9-path } " global" }
+  "The PLAN9 environment variable"
 }
 $nl
 "Finally, if neither is available, falls back to "

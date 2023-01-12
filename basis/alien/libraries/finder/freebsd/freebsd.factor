@@ -6,10 +6,11 @@ IN: alien.libraries.finder.freebsd
 <PRIVATE
 
 : parse-ldconfig-lines ( string -- triple )
-    [ ":-" split1 [ drop ] dip
-    "=>" split1 [ [ unicode:blank? ] trim ] bi@
-      2array
-   ] map ;
+    [
+        ":-" split1 [ drop ] dip
+        "=>" split1 [ [ unicode:blank? ] trim ] bi@
+        2array
+    ] map ;
 
 : load-ldconfig-cache ( -- seq )
     "/sbin/ldconfig -r" utf8 [ read-lines ] with-process-reader

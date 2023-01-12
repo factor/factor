@@ -5,22 +5,22 @@ IN: sorting.human
 
 HELP: find-numbers
 { $values
-     { "sequence" sequence }
-     { "sequence'" sequence }
+    { "sequence" sequence }
+    { "sequence'" sequence }
 }
 { $description "Splits a string on numbers and returns a sequence of sequences and integers." } ;
 
 HELP: human<=>
 { $values
-     { "obj1" object } { "obj2" object }
-     { "<=>" "an ordering specifier" }
+    { "obj1" object } { "obj2" object }
+    { "<=>" "an ordering specifier" }
 }
 { $description "Compares two objects after converting numbers in the string into integers." } ;
 
 HELP: human>=<
 { $values
-     { "obj1" object } { "obj2" object }
-     { ">=<" "an ordering specifier" }
+    { "obj1" object } { "obj2" object }
+    { ">=<" "an ordering specifier" }
 }
 { $description "Compares two objects using the " { $link human<=> } " word and inverts the result." } ;
 

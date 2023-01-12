@@ -109,7 +109,7 @@ USING: compression.gzip compression.inflate tools.test ;
     255 255 255 0 255 255 255 0 255 255 255 0 255 255 255 0 255
     255 255 0
     }
-   compress-dynamic gzip-inflate 
+    compress-dynamic gzip-inflate 
 ] unit-test 
 
 { B{
@@ -221,5 +221,5 @@ USING: compression.gzip compression.inflate tools.test ;
     255 255 255 0 255 255 255 0 255 255 255 0 255 255 255 0 255
     255 255 0
     }
-   compress-fixed gzip-inflate 
+    compress-fixed gzip-inflate 
 ] unit-test 

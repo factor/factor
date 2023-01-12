@@ -136,9 +136,9 @@ TUPLE: couchdb-auth-provider
     bi ;
 
 : user>user-hash ( user -- hash )
-     hash-mirror
-     [ [ "password" ] dip [ >base64 >string ] change-at ] keep
-     couchdb-auth-provider get field-map>> map-fields-forward ;
+    hash-mirror
+    [ [ "password" ] dip [ >base64 >string ] change-at ] keep
+    couchdb-auth-provider get field-map>> map-fields-forward ;
 
 ! Used when the user is guaranteed to exist if the logic of the Factor
 ! code is correct (e.g. when update-user is called).

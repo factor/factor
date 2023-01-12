@@ -572,7 +572,7 @@ FUNCTION: int crypto_secretstream_xchacha20poly1305_pull (
     uchar* c, ulonglong clen,
     uchar* ad, ulonglong adlen )
 FUNCTION: void crypto_secretstream_xchacha20poly1305_rekey (
-     crypto_secretstream_xchacha20poly1305_state* state )
+    crypto_secretstream_xchacha20poly1305_state* state )
 
 ! sodium_runtime_H
 FUNCTION: int sodium_runtime_has_neon ( )

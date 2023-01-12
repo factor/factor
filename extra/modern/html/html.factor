@@ -142,7 +142,7 @@ C: <dquote> dquote
     "%" expect-and-span >string
     [ take-tag-name >string ] dip-1up append
     [ "%>" slice-til-string [ >string ] bi@ ] dip-2up
-     <embedded-language> ;
+    <embedded-language> ;
 
 : read-open-tag ( n string opening -- n' string tag )
     [ take-tag-name ] dip-1up

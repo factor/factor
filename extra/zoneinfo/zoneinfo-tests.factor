@@ -7,11 +7,11 @@ tools.test zoneinfo ;
 
 {
     T{ raw-zone
-       { name "EST" }
-       { gmt-offset "-5:00" }
-       { rules/save "-" }
-       { format "EST" }
-       { until { } }
+        { name "EST" }
+        { gmt-offset "-5:00" }
+        { rules/save "-" }
+        { format "EST" }
+        { until { } }
     }
 } [
     "EST" find-zone

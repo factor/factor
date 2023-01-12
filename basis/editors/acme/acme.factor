@@ -25,10 +25,10 @@ editor-class [ acme ] initialize
 
 : (massage-pathname) ( file line -- str )
  over file-info regular-file?
- [ number>string 2array ":" join ]
- [ drop ] if ;
+  [ number>string 2array ":" join ]
+  [ drop ] if ;
 
 PRIVATE>
 
 M: acme editor-command ( file line -- command )
- [ (plumb-path) , "-d" , "edit" , (massage-pathname) , ] { } make ;
+  [ (plumb-path) , "-d" , "edit" , (massage-pathname) , ] { } make ;

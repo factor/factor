@@ -54,8 +54,8 @@ HELP: dlsym?
 
 HELP: make-library
 { $values
-     { "path" "a pathname string" } { "abi" "the ABI used by the library, either " { $link cdecl } " or " { $link stdcall } }
-     { "library" library } }
+    { "path" "a pathname string" } { "abi" "the ABI used by the library, either " { $link cdecl } " or " { $link stdcall } }
+    { "library" library } }
 { $description "Opens a C library using the path and ABI parameters and outputs a library tuple." }
 { $notes "User code should use " { $link add-library } " so that the opened library is added to a global hashtable, " { $link libraries } "." } ;
 

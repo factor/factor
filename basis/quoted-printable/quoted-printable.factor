@@ -47,9 +47,9 @@ PRIVATE>
 
 : read-char ( byte -- ch )
     dup CHAR: = = [
-       drop read1 dup CHAR: \n =
-       [ drop read1 read-char ]
-       [ read1 2array hex> ] if
+        drop read1 dup CHAR: \n =
+        [ drop read1 read-char ]
+        [ read1 2array hex> ] if
     ] when ;
 
 : read-quoted ( -- bytes )

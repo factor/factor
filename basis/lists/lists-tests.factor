@@ -31,7 +31,7 @@ USING: tools.test lists math kernel ;
 ] unit-test
 
 { 15 } [
- { 1 2 3 4 5 } sequence>list 0 [ + ] foldr
+    { 1 2 3 4 5 } sequence>list 0 [ + ] foldr
 ] unit-test
 
 { { 5 4 3 2 1 } } [

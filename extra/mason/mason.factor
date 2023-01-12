@@ -19,8 +19,8 @@ IN: mason
 
 : build-loop-error ( error callstack -- )
     fatal-error-body
-     "build loop error"
-     email-fatal ;
+    "build loop error"
+    email-fatal ;
 
 : build-loop ( -- )
     [

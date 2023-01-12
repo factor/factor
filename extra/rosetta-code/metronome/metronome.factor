@@ -65,6 +65,6 @@ M: metronome-gadget pref-dim* drop { 200 200 } ;
     "Example: metronome " write print-defaults flush ;
 
 : metronome-main ( -- )
-     [ [ metronome-cmdline metronome-ui ] [ drop metronome-usage 1 exit ] recover ] with-ui ;
+    [ [ metronome-cmdline metronome-ui ] [ drop metronome-usage 1 exit ] recover ] with-ui ;
 
 MAIN: metronome-main

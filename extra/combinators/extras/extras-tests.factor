@@ -17,9 +17,9 @@ IN: combinators.extras.tests
 { { "negative" 0 "positive" } } [
     { -1 0 1 } [
         {
-           { [ 0 > ] [ "positive" ] }
-           { [ 0 < ] [ "negative" ] }
-           [ ]
+            { [ 0 > ] [ "positive" ] }
+            { [ 0 < ] [ "negative" ] }
+            [ ]
         } cond-case
     ] map
 ] unit-test

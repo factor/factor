@@ -374,13 +374,13 @@ PRIVATE>
 { { 4 3 2 1 } } [ { 1 2 3 4 } <anti-diagonal-matrix> transpose anti-diagonal ] unit-test
 
 { {
- { 1 4 7 }
- { 2 5 8 }
- { 3 6 9 }
+  { 1 4 7 }
+  { 2 5 8 }
+  { 3 6 9 }
 } } [ {
- { 1 2 3 }
- { 4 5 6 }
- { 7 8 9 }
+  { 1 2 3 }
+  { 4 5 6 }
+  { 7 8 9 }
 } transpose ] unit-test
 
 ! anti transposition
@@ -389,13 +389,13 @@ PRIVATE>
 { { 4 3 2 1 } } [ { 1 2 3 4 } <diagonal-matrix> anti-transpose main-diagonal ] unit-test
 
 { {
- { 9 6 3 }
- { 8 5 2 }
- { 7 4 1 }
+  { 9 6 3 }
+  { 8 5 2 }
+  { 7 4 1 }
 } } [ {
- { 1 2 3 }
- { 4 5 6 }
- { 7 8 9 }
+  { 1 2 3 }
+  { 4 5 6 }
+  { 7 8 9 }
 } anti-transpose ] unit-test
 
 <PRIVATE

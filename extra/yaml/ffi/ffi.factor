@@ -609,9 +609,9 @@ STRUCT: yaml_node_pair_t
             { style yaml_mapping_style_t }
         ;
   UNION-STRUCT: node_data
-     { scalar scalar_node_data }
-     { sequence sequence_node_data }
-     { mapping mapping_node_data }
+    { scalar scalar_node_data }
+    { sequence sequence_node_data }
+    { mapping mapping_node_data }
   ;
 
 STRUCT: yaml_node_t

@@ -176,7 +176,7 @@ M: lazy-append cdr
     [ list1>> cdr ] [ list2>> ] bi lappend-lazy ;
 
 M: lazy-append nil?
-     drop f ;
+    drop f ;
 
 TUPLE: lazy-from-by n quot ;
 

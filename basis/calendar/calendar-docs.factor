@@ -351,9 +351,9 @@ HELP: hence
 { $description "Computes a time in the future that is the " { $snippet "duration" } " added to the result of " { $link now } "." }
 { $examples
     { $unchecked-example
-       "USING: calendar prettyprint ;"
-       "10 hours hence ."
-       "T{ timestamp f 2008 9 2 2 47 45+943/1000 T{ duration f 0 0 0 -5 0 0 } }"
+        "USING: calendar prettyprint ;"
+        "10 hours hence ."
+        "T{ timestamp f 2008 9 2 2 47 45+943/1000 T{ duration f 0 0 0 -5 0 0 } }"
     }
 } ;
 
@@ -362,9 +362,9 @@ HELP: ago
 { $description "Computes a time in the past that is the " { $snippet "duration" } " subtracted from the result of " { $link now } "." }
 { $examples
     { $unchecked-example
-       "USING: calendar prettyprint ;"
-       "3 weeks ago ."
-       "T{ timestamp f 2008 8 11 16 49 52+99/500 T{ duration f 0 0 0 -5 0 0 } }"
+        "USING: calendar prettyprint ;"
+        "3 weeks ago ."
+        "T{ timestamp f 2008 8 11 16 49 52+99/500 T{ duration f 0 0 0 -5 0 0 } }"
     }
 } ;
 
@@ -489,8 +489,8 @@ HELP: time-since-midnight
 
 HELP: since-1970
 { $values
-     { "duration" duration }
-     { "timestamp" timestamp } }
+    { "duration" duration }
+    { "timestamp" timestamp } }
 { $description "Adds the duration to the beginning of Unix time and returns the result as a timestamp." } ;
 
 ARTICLE: "calendar" "Calendar"

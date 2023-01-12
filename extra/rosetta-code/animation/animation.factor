@@ -37,7 +37,7 @@ TUPLE: animated-label < label-control reversed alarm ;
 animated-label
     H{
         { T{ button-down } [ [ not ] change-reversed drop ] }
-     } set-gestures
+    } set-gestures
 
 M: animated-label graft*
   [ [ [ model>> ] [ reversed>> ] bi update-model ] curry 400 milliseconds every ] keep

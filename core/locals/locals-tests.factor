@@ -492,7 +492,7 @@ M: string ed's-bug reverse ;
 M: integer ed's-bug neg ;
 
 :: ed's-test-case ( a -- b )
-   { [ a ed's-bug ] } && ;
+    { [ a ed's-bug ] } && ;
 
 { t } [ \ ed's-test-case word-optimized? ] unit-test
 

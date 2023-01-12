@@ -60,11 +60,11 @@ TYPED: write-byte-array ( binary: byte-array -- )
     [ T_Binary_Default write1 write ] bi ; inline
 
 TYPED: write-mdbregexp ( regexp: mdbregexp -- )
-   [ regexp>> write-cstring ]
-   [ options>> write-cstring ] bi ; inline
+    [ regexp>> write-cstring ]
+    [ options>> write-cstring ] bi ; inline
 
 TYPED: write-sequence ( array: sequence -- )
-   '[
+    '[
         _ [ number>string swap write-pair ] each-index
         write-eoo
     ] with-length-prefix ; inline recursive
@@ -85,7 +85,7 @@ UNION: hashtables hashtable linked-assoc ;
 TYPED: write-assoc ( assoc: hashtables -- )
     '[ _ [ write-oid-field ] [
             [ skip-field? [ 2drop ] [ write-pair ] if ] assoc-each
-         ] bi write-eoo
+        ] bi write-eoo
     ] with-length-prefix ; inline recursive
 
 UNION: code word quotation ;

@@ -113,9 +113,9 @@ HELP: set-generate
 }
 { $description
     "If 'gen' is true, the server starts generating bitcoins. If 'gen' is "
-     "'false' then the server stops generating bitcoins. 'n' is the number "
-     "of CPU's to use while generating. A value of '-1' means use all the "
-     "CPU's available."
+    "'false' then the server stops generating bitcoins. 'n' is the number "
+    "of CPU's to use while generating. A value of '-1' means use all the "
+    "CPU's available."
 } ;
 
 HELP: get-info

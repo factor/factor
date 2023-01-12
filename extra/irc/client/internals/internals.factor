@@ -46,10 +46,10 @@ IN: irc.client.internals
     ] [ (terminate-irc) ] if* ;
 
 : (do-login) ( -- )
-     irc>
-     [ profile>> password>> [ /PASS ] when* ]
-     [ nick>> /LOGIN ]
-     bi ;
+    irc>
+    [ profile>> password>> [ /PASS ] when* ]
+    [ nick>> /LOGIN ]
+    bi ;
 
 GENERIC: initialize-chat ( chat -- )
 M: irc-chat         initialize-chat drop ;

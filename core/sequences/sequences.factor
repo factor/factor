@@ -909,7 +909,7 @@ PRIVATE>
     ] keep ;
 
 : reverse ( seq -- newseq )
-     [
+    [
         dup [ length ] keep new-sequence
         [ 0 swap copy-unsafe ] keep reverse!
     ] keep like ;

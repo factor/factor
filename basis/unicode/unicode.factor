@@ -67,7 +67,7 @@ CATEGORY: math Sm | "Other_Math" property? ;
     ] if ;
 
 : last-grapheme-from ( end str -- i )
-     swap head-slice last-grapheme ;
+    swap head-slice last-grapheme ;
 
 <PRIVATE
 

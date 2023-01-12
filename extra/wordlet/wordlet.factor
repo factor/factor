@@ -46,7 +46,7 @@ TUPLE: wordlet-game secret-word chances guesses ;
 
 : reamining-chars ( game -- chars )
     [ secret-word>> ] [ guesses>> ] bi [
-       guess>chars
+        guess>chars
     ] with map concat members
     [ background of ] assoc-map
     [ drop ] collect-value-by

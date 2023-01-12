@@ -48,19 +48,19 @@ IN: db.tester
 TUPLE: test-1 id a b c ;
 
 test-1 "TEST1" {
-   { "id" "ID" INTEGER +db-assigned-id+ }
-   { "a" "A" { VARCHAR 256 } +not-null+ }
-   { "b" "B" { VARCHAR 256 } +not-null+ }
-   { "c" "C" { VARCHAR 256 } +not-null+ }
+    { "id" "ID" INTEGER +db-assigned-id+ }
+    { "a" "A" { VARCHAR 256 } +not-null+ }
+    { "b" "B" { VARCHAR 256 } +not-null+ }
+    { "c" "C" { VARCHAR 256 } +not-null+ }
 } define-persistent
 
 TUPLE: test-2 id x y z ;
 
 test-2 "TEST2" {
-   { "id" "ID" INTEGER +db-assigned-id+ }
-   { "x" "X" { VARCHAR 256 } +not-null+ }
-   { "y" "Y" { VARCHAR 256 } +not-null+ }
-   { "z" "Z" { VARCHAR 256 } +not-null+ }
+    { "id" "ID" INTEGER +db-assigned-id+ }
+    { "x" "X" { VARCHAR 256 } +not-null+ }
+    { "y" "Y" { VARCHAR 256 } +not-null+ }
+    { "z" "Z" { VARCHAR 256 } +not-null+ }
 } define-persistent
 
 : test-1-tuple ( -- tuple )

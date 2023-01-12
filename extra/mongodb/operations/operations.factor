@@ -112,9 +112,9 @@ PRIVATE>
 
 : write-insert-message ( message -- )
     [
-       [ flags>> write-int32 ]
-       [ collection>> write-cstring ]
-       [ objects>> [ assoc>stream ] each ] tri
+        [ flags>> write-int32 ]
+        [ collection>> write-cstring ]
+        [ objects>> [ assoc>stream ] each ] tri
     ] (write-message) ; inline
 
 : write-update-message ( message -- )
@@ -150,9 +150,9 @@ PRIVATE>
 
 : write-killcursors-message ( message -- )
     [
-       [ flags>> write-int32 ]
-       [ cursors#>> write-int32 ]
-       [ cursors>> [ write-longlong ] each ] tri
+        [ flags>> write-int32 ]
+        [ cursors#>> write-int32 ]
+        [ cursors>> [ write-longlong ] each ] tri
     ] (write-message) ; inline
 
 PRIVATE>

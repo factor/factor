@@ -225,7 +225,7 @@ SINGLETON: aes-encrypt
     c0 gb0   c1 gb1   c2 gb2   c3 gb3   >ui32 ; ! c3'
 
 : (add-round-key) ( key state -- state' )
-   4 [ bitxor ] unrolled-2map ;
+    4 [ bitxor ] unrolled-2map ;
 
 : add-round-key ( aes n -- aes' )
     over (key-at-nth-round) swap

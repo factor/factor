@@ -95,17 +95,17 @@ CATEGORY: spacing Mc ;
         { [ dup jamo? ] [ jamo-class ] }
         { [ dup hangul? ] [ hangul-class ] }
         { [ dup grapheme-control? ] [
-              control-class dup ZWJ = [
-                  drop
-                  str unclip-last-slice drop dup [
-                      [ extend? ]
-                      [ control-class Extend = ]
-                      [ modifier? ]
-                      tri or or not
-                  ] find-last drop [ swap ?nth ] [ last ] if*
-                  extended-pictographic-table interval-key? [
-                      (Extended_Pictographic-Extend*-)ZWJ
-                  ] [ ZWJ ] if
+            control-class dup ZWJ = [
+                drop
+                str unclip-last-slice drop dup [
+                    [ extend? ]
+                    [ control-class Extend = ]
+                    [ modifier? ]
+                    tri or or not
+                ] find-last drop [ swap ?nth ] [ last ] if*
+                extended-pictographic-table interval-key? [
+                    (Extended_Pictographic-Extend*-)ZWJ
+                ] [ ZWJ ] if
               ] when
           ] }
         { [ dup extend? ] [ drop Extend ] }

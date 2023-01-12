@@ -54,7 +54,7 @@ SYMBOL: large-families
 : save-family ( family -- )
     dup family-count get at 8 = [ large-families get adjoin ] [ drop ] if ;
 : increment-family ( family -- )
-   family-count get inc-at ;
+    family-count get inc-at ;
 : handle-family ( family -- )
     [ increment-family ] [ save-family ] bi ;
 

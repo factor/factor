@@ -375,14 +375,14 @@ cell 4 = [
 
 ! Reduction
 : coalescing-bug-4 ( a b c -- a b c )
-     [ [ min ] keep ] dip vector? [ 1 ] [ 2 ] if ;
+    [ [ min ] keep ] dip vector? [ 1 ] [ 2 ] if ;
 
- [ 2 3 2 ] [ 2 3 "" coalescing-bug-4 ] unit-test
- [ 3 3 2 ] [ 4 3 "" coalescing-bug-4 ] unit-test
- [ 3 3 2 ] [ 4 3 "" coalescing-bug-4 ] unit-test
- [ 2 3 1 ] [ 2 3 V{ } coalescing-bug-4 ] unit-test
- [ 3 3 1 ] [ 4 3 V{ } coalescing-bug-4 ] unit-test
- [ 3 3 1 ] [ 4 3 V{ } coalescing-bug-4 ] unit-test
+[ 2 3 2 ] [ 2 3 "" coalescing-bug-4 ] unit-test
+[ 3 3 2 ] [ 4 3 "" coalescing-bug-4 ] unit-test
+[ 3 3 2 ] [ 4 3 "" coalescing-bug-4 ] unit-test
+[ 2 3 1 ] [ 2 3 V{ } coalescing-bug-4 ] unit-test
+[ 3 3 1 ] [ 4 3 V{ } coalescing-bug-4 ] unit-test
+[ 3 3 1 ] [ 4 3 V{ } coalescing-bug-4 ] unit-test
 
 ! Global stack analysis dataflow equations are wrong
 : some-word ( a -- b ) 2 + ;

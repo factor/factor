@@ -277,7 +277,7 @@ HELP: if-zero
 
 HELP: when-zero
 { $values
-     { "n" number } { "quot" "the first quotation of an " { $link if-zero } } { "x" object } }
+    { "n" number } { "quot" "the first quotation of an " { $link if-zero } } { "x" object } }
 { $description "Makes an implicit check if the number is zero. A zero is dropped and the " { $snippet "quot" } " is called." }
 { $examples "This word is equivalent to " { $link if-zero } " with an empty second quotation:"
     { $example
@@ -294,7 +294,7 @@ HELP: when-zero
 
 HELP: unless-zero
 { $values
-     { "n" number } { "quot" "the second quotation of an " { $link if-zero } } }
+    { "n" number } { "quot" "the second quotation of an " { $link if-zero } } }
 { $description "Makes an implicit check if the number is zero. A zero is dropped. Otherwise, the " { $snippet "quot" } " is called on the number." }
 { $examples "This word is equivalent to " { $link if-zero } " with an empty first quotation:"
     { $example
@@ -311,7 +311,7 @@ HELP: unless-zero
 
 HELP: until-zero
 { $values
-     { "n" number } { "quot" { $quotation ( ... x -- ... y ) } } }
+    { "n" number } { "quot" { $quotation ( ... x -- ... y ) } } }
 { $description "Makes a check if the number is zero, and repeatedly calls " { $snippet "quot" } " until the value on the stack is zero." }
 { $examples
     { $example

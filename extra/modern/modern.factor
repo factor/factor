@@ -37,7 +37,7 @@ MACRO:: read-double-matched ( open-ch -- quot: ( n string tag ch -- n' string se
             ] }
             [ [ tag openstr2 n string ] dip long-opening-mismatch ]
         } case
-     ] ;
+    ] ;
 
 : read-double-matched-paren ( n string tag ch -- n' string seq ) CHAR: ( read-double-matched ;
 : read-double-matched-bracket ( n string tag ch -- n' string seq ) CHAR: [ read-double-matched ;

@@ -51,8 +51,8 @@ DEFER: read-elements
     read-int32 [ f ] [ drop read-elements t ] if-zero ; inline recursive
 
 : bson-binary-read ( -- binary )
-   read-int32 read-byte
-   {
+    read-int32 read-byte
+    {
         { T_Binary_Default [ read ] }
         { T_Binary_Bytes_Deprecated [ drop read-int32 read ] }
         { T_Binary_Custom [ read bytes>object ] }
@@ -60,11 +60,11 @@ DEFER: read-elements
         { T_Binary_MD5 [ read >string ] }
         { T_Binary_UUID [ read >string ] }
         [ "unknown binary sub-type" unknown-bson-type ]
-   } case ; inline
+    } case ; inline
 
 TYPED: bson-regexp-read ( -- mdbregexp: mdbregexp )
-   mdbregexp new
-   read-cstring >>regexp read-cstring >>options ; inline
+    mdbregexp new
+    read-cstring >>regexp read-cstring >>options ; inline
 
 TYPED: bson-oid-read ( -- oid: oid )
     read-longlong read-int32 oid boa ; inline

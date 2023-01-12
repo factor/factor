@@ -114,11 +114,11 @@ CONSTANT: BLOCK-TERMINATOR 0x00
         read-sub-blocks >>comment-data ;
 
 : read-application-extension ( -- read-application-extension )
-   \ application-extension new
-       1 read le> >>block-size
-       8 read utf8 decode >>identifier
-       3 read >>authentication-code
-       read-sub-blocks >>application-data ;
+    \ application-extension new
+        1 read le> >>block-size
+        8 read utf8 decode >>identifier
+        3 read >>authentication-code
+        read-sub-blocks >>application-data ;
 
 : read-gif-header ( loading-gif -- loading-gif )
     6 read utf8 decode >>magic ;
