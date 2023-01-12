@@ -7,7 +7,7 @@ IN: github
 SYMBOL: github-username
 SYMBOL: github-token
 
-! type is orgs, users
+! type is one of { "orgs" "users" }
 :: get-repositories-with-credentials ( type name username token -- seq )
     0 [ dup ] [
         1 + dup

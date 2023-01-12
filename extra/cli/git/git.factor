@@ -50,14 +50,14 @@ cli-git-num-parallel [ cpus 2 * ] initialize
 : repository-url>name ( string -- string' )
     file-name ".git" ?tail drop ;
 
-: update-repository ( url -- process )
+: sync-repository ( url -- process )
     dup repository-url>name git-repository?
     [ repository-url>name git-pull ] [ git-clone ] if ;
 
 : sync-repositories ( directory urls -- )
     '[
         _ cli-git-num-parallel get <semaphore> '[
-            _ [ update-repository ] with-semaphore
+            _ [ sync-repository ] with-semaphore
         ] parallel-each
     ] with-ensure-directory ;
 
