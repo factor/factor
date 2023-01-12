@@ -33,10 +33,10 @@ IN: cgi
 
 : parse-post ( -- assoc )
     "CONTENT_TYPE" os-env "" or content-type {
-       { "multipart/form-data"               [ multipart ] }
-       { "application/x-www-form-urlencoded" [ urlencoded ] }
-       [ drop parse-get ]
-   } case nip ;
+        { "multipart/form-data"               [ multipart ] }
+        { "application/x-www-form-urlencoded" [ urlencoded ] }
+        [ drop parse-get ]
+    } case nip ;
 
 PRIVATE>
 

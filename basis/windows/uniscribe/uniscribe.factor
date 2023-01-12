@@ -89,10 +89,10 @@ PRIVATE>
     [ [ { 0 0 } ] dip <RECT> ]
     [
         [let :> str str selection-start/end
-         [
-             str string>> dup selection? [ string>> ] when
-             swap >utf16-index
-         ] bi@
+            [
+                str string>> dup selection? [ string>> ] when
+                swap >utf16-index
+            ] bi@
         ]
     ] tri*
     ! iMinSel

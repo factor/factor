@@ -224,8 +224,8 @@ SYMBOLS: big small a-big-cat a-small-cat ;
 { { H{ { X Tom } } } } [ { cato X } query ] unit-test
 {
     {
-       H{ { X big } { Y a-big-cat } }
-       H{ { X small } { Y a-small-cat } }
+        H{ { X big } { Y a-big-cat } }
+        H{ { X small } { Y a-small-cat } }
     }
 } [ { cato X Y } query ] unit-test
 {

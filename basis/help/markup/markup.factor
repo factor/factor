@@ -376,7 +376,7 @@ M: f ($instance) ($link) ;
     print-element $snippet ;
 
 : ($instances) ( element -- )
-     dup word? [ ($link) "s" print-element ] [ print-element ] if ;
+    dup word? [ ($link) "s" print-element ] [ print-element ] if ;
 
 : $sequence ( element -- )
     { "a " { $link sequence } " of " } print-element

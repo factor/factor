@@ -45,7 +45,7 @@ M: boids-gadget ungraft*
             -6.0  4.0 glVertex2f
             -6.0 -4.0 glVertex2f
             8.0 0.0 glVertex2f
-         ] do-state
+        ] do-state
     ] with-translation ;
 
 : draw-boids ( boids -- )

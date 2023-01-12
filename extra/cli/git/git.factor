@@ -42,7 +42,7 @@ cli-git-num-parallel [ cpus 2 * ] initialize
     ?file-info dup [ directory? ] when ;
 
 : git-current-branch* ( -- name )
-     { "git" "rev-parse" "--abbrev-ref" "HEAD" } git-command>string ;
+    { "git" "rev-parse" "--abbrev-ref" "HEAD" } git-command>string ;
 
 : git-current-branch ( directory -- name )
     [ git-current-branch* ] with-directory ;

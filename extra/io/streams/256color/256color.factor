@@ -94,7 +94,7 @@ M: 256color stream-write-table
     ] with-output-stream* ;
 
 M: 256color make-cell-stream
-     2drop <string-writer> <256color> ;
+    2drop <string-writer> <256color> ;
 
 M: 256color dispose drop ;
 

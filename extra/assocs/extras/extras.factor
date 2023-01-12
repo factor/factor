@@ -79,8 +79,8 @@ IN: assocs.extras
 ! Modifies assoc1
 : assoc-merge! ( assoc1 assoc2 quot: ( value1 value2 -- new-value ) -- assoc1' )
     [| key2 val2 quot | val2 key2 pick
-     at* [ swap quot call ] [ drop ] if
-     key2 pick set-at ] curry assoc-each ; inline
+    at* [ swap quot call ] [ drop ] if
+    key2 pick set-at ] curry assoc-each ; inline
 
 ! Same as above, non-destructive
 : assoc-merge ( assoc1 assoc2 quot: ( value1 value2 -- new-value ) -- new-assoc )

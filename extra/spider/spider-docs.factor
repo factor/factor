@@ -5,13 +5,13 @@ IN: spider
 
 HELP: <spider>
 { $values
-     { "base" "a string or url" }
-     { "spider" spider } }
+    { "base" "a string or url" }
+    { "spider" spider } }
 { $description "Creates a new web spider with a given base url." } ;
 
 HELP: run-spider
 { $values
-     { "spider" spider } }
+    { "spider" spider } }
 { $description "Runs a spider until completion. See the " { $subsection "spider-tutorial" } " for a complete description of the tuple slots that affect how thet spider works." } ;
 
 ARTICLE: "spider-tutorial" "Spider tutorial"

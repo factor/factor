@@ -45,15 +45,15 @@ LOGIC-VARS: S E N D M O R Y A L G B T
 
 :: S-and-M-can't-be-zero ( seq -- seq' )
     seq [| hash |
-         1 hash N1 of lnth 0 = not
-         1 hash N2 of lnth 0 = not and
+        1 hash N1 of lnth 0 = not
+        1 hash N2 of lnth 0 = not and
     ] filter ;
 
 :: print-puzzle ( hash-array -- )
     hash-array
     [| hash |
-     "   " printf hash N1 of [ "%d " printf ] leach nl
-     "+  " printf hash N2 of [ "%d " printf ] leach nl
-     "----------------" printf nl
-     "   " printf hash N  of [ "%d " printf ] leach nl nl
+        "   " printf hash N1 of [ "%d " printf ] leach nl
+        "+  " printf hash N2 of [ "%d " printf ] leach nl
+        "----------------" printf nl
+        "   " printf hash N  of [ "%d " printf ] leach nl nl
     ] each ;

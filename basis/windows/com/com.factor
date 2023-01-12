@@ -130,7 +130,7 @@ FUNCTION: void ReleaseStgMedium ( LPSTGMEDIUM pmedium )
     with-out-parameters ;
 
 : com-add-ref ( interface -- interface )
-     [ IUnknown::AddRef drop ] keep ; inline
+    [ IUnknown::AddRef drop ] keep ; inline
 
 ERROR: null-com-release ;
 : com-release ( interface -- )

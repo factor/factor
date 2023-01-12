@@ -88,4 +88,4 @@ PRIVATE>
     } apply-passes ;
 
 : merge-set ( bbs -- bbs' )
-     (merge-set) [ members ] dip nths ;
+    (merge-set) [ members ] dip nths ;

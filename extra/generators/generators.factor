@@ -1,7 +1,7 @@
 ! Copyright (C) 2023 Keldan Chapman.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel coroutines effects.parser words sequences accessors generalizations
-       locals.parser summary combinators.smart math continuations make ;
+locals.parser summary combinators.smart math continuations make ;
 IN: generators
 
 TUPLE: generator state ;

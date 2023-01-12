@@ -118,9 +118,9 @@ CONSTANT: window-vertexes
 :: <2d-render-texture> ( dim order type -- renderbuffer texture )
     order type
     T{ texture-parameters
-       { wrap clamp-texcoord-to-edge }
-       { min-filter filter-linear }
-       { min-mipmap-filter f } }
+        { wrap clamp-texcoord-to-edge }
+        { min-filter filter-linear }
+        { min-mipmap-filter f } }
     <texture-2d> [
         0 <texture-2d-attachment> 1array f f dim <framebuffer>
         dup { { default-attachment { 0 0 0 } } } clear-framebuffer

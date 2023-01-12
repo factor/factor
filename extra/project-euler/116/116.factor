@@ -41,7 +41,7 @@ IN: project-euler.116
     [ length swap - 1 - ] keep ?nth 0 or ;
 
 : next ( colortile seq -- )
-     [ nth* ] [ last + ] [ push ] tri ;
+    [ nth* ] [ last + ] [ push ] tri ;
 
 : ways ( length colortile -- permutations )
     V{ 1 } clone [ [ next ] 2curry times ] keep last 1 - ;

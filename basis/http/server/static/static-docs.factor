@@ -9,9 +9,9 @@ HELP: <file-responder>
 
 HELP: <static>
 { $values
-     { "root" "a pathname string" }
-     { "responder" file-responder } }
- { $description "Creates a file responder which serves content from " { $snippet "path" } "." } ;
+    { "root" "a pathname string" }
+    { "responder" file-responder } }
+{ $description "Creates a file responder which serves content from " { $snippet "path" } "." } ;
 
 HELP: enable-fhtml
 { $values { "responder" file-responder } }

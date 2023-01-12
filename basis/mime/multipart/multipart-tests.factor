@@ -12,9 +12,9 @@ CONSTANT: separator1 "----WebKitFormBoundary6odjpVPXIighAE2L"
 CONSTANT: upload1 "------WebKitFormBoundary6odjpVPXIighAE2L\r\nContent-Disposition: form-data; name=\"file1\"; filename=\"up.txt\"\r\nContent-Type: text/plain\r\n\r\nuploaded!\n\r\n------WebKitFormBoundary6odjpVPXIighAE2L\r\nContent-Disposition: form-data; name=\"file2\"; filename=\"\"\r\n\r\n\r\n------WebKitFormBoundary6odjpVPXIighAE2L\r\nContent-Disposition: form-data; name=\"file3\"; filename=\"\"\r\n\r\n\r\n------WebKitFormBoundary6odjpVPXIighAE2L\r\nContent-Disposition: form-data; name=\"text1\"\r\n\r\nlol\r\n------WebKitFormBoundary6odjpVPXIighAE2L--\r\n"
 
 : mime-test-stream ( -- stream )
-   upload1
-   [ "mime" "test" unique-file ] with-temp-directory
-   ascii [ set-file-contents ] [ <file-reader> ] 2bi ;
+    upload1
+    [ "mime" "test" unique-file ] with-temp-directory
+    ascii [ set-file-contents ] [ <file-reader> ] 2bi ;
 
 { } [ mime-test-stream [ ] with-input-stream ] unit-test
 

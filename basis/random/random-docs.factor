@@ -102,8 +102,8 @@ HELP: with-system-random
 
 HELP: randomize
 { $values
-     { "seq" sequence }
-     { "randomized" sequence }
+    { "seq" sequence }
+    { "randomized" sequence }
 }
 { $description "Randomizes a sequence in-place with the Fisher-Yates algorithm and returns the sequence." } ;
 
@@ -122,8 +122,8 @@ HELP: sample
 
 HELP: delete-random
 { $values
-     { "seq" sequence }
-     { "elt" object } }
+    { "seq" sequence }
+    { "elt" object } }
 { $description "Deletes a random number from a sequence using " { $link remove-nth! } " and returns the deleted object." } ;
 
 ARTICLE: "random-protocol" "Random protocol"

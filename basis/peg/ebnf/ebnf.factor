@@ -300,10 +300,10 @@ DEFER: choice-parser
     ] choice* ;
 
 : action-parser ( -- parser )
-     "[[" factor-code-parser "]]" syntax-pack ;
+    "[[" factor-code-parser "]]" syntax-pack ;
 
 : semantic-parser ( -- parser )
-     "?[" factor-code-parser "]?" syntax-pack ;
+    "?[" factor-code-parser "]?" syntax-pack ;
 
 : sequence-parser ( -- parser )
     ! A sequence of terminals and non-terminals, including
@@ -457,7 +457,7 @@ M: ebnf-sequence build-locals
                 " " %
                 %
                 " nip ]" %
-             ] "" make
+            ] "" make
         ] if
     ] if ;
 

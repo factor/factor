@@ -177,8 +177,8 @@ SYMBOL: redirects
 
 : no-proxy? ( request -- ? )
     get-no-proxy-list [
-       [ url>> host>> "." split ] dip "," split
-       [ "." split no-proxy-match? ] with any?
+        [ url>> host>> "." split ] dip "," split
+        [ "." split no-proxy-match? ] with any?
     ] [ drop f ] if* ;
 
 : (check-proxy) ( proxy -- ? )

@@ -51,7 +51,7 @@ CONSTRUCTOR: <dbref> dbref ( ref id -- dbref ) ;
 TUPLE: mdbregexp { regexp string } { options string } ;
 
 : <mdbregexp> ( string -- mdbregexp )
-   [ mdbregexp new ] dip >>regexp ;
+    [ mdbregexp new ] dip >>regexp ;
 
 
 CONSTANT: MDB_OID_FIELD "_id"

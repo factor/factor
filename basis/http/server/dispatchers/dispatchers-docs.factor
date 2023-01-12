@@ -23,7 +23,7 @@ HELP: <vhost-dispatcher>
 
 HELP: add-responder
 { $values
-     { "dispatcher" dispatcher } { "responder" "a responder" } { "path" "a pathname string or hostname" } }
+    { "dispatcher" dispatcher } { "responder" "a responder" } { "path" "a pathname string or hostname" } }
 { $description "Adds a responder to a dispatcher." }
 { $notes "The " { $snippet "path" } " parameter is interpreted differently depending on the dispatcher type." }
 { $side-effects "dispatcher" } ;

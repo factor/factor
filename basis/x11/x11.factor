@@ -10,8 +10,8 @@ SYMBOL: scr
 SYMBOL: root
 
 : init-locale ( -- )
-   LC_ALL "" setlocale [ "setlocale() failed" print flush ] unless
-   XSupportsLocale c-bool> [ "XSupportsLocale() failed" print flush ] unless ;
+    LC_ALL "" setlocale [ "setlocale() failed" print flush ] unless
+    XSupportsLocale c-bool> [ "XSupportsLocale() failed" print flush ] unless ;
 
 : flush-dpy ( -- ) dpy get XFlush drop ;
 

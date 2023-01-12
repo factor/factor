@@ -108,7 +108,7 @@ M: pathname url-of
             }
         });
         </script>
-     XML] ;
+    XML] ;
 
 : help-header ( stylesheet -- xml )
     help-stylesheet help-meta swap help-script 3append ;
@@ -127,7 +127,7 @@ M: pathname url-of
             <a href="/">Handbook</a>
             <a href=<->>Glossary</a>
         </nav>
-     XML] ;
+    XML] ;
 
 : help-footer ( -- xml )
     version-info "\n" split1 drop

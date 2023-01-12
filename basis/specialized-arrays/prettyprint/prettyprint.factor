@@ -7,9 +7,9 @@ IN: specialized-arrays.prettyprint
 
 : pprint-direct-array ( direct-array -- )
     \ c-array@ [
-         [ underlying-type ] [ underlying>> ] [ length>> ] tri
-         [ pprint* ] tri@
-     ] pprint-prefix ;
+        [ underlying-type ] [ underlying>> ] [ length>> ] tri
+        [ pprint* ] tri@
+    ] pprint-prefix ;
 
 M: specialized-array pprint*
     [ pprint-object ] [ pprint-direct-array ] pprint-c-object ;

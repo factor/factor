@@ -24,9 +24,9 @@ FUNCTION-ALIAS: (xuname)
 PRIVATE>
 
 : uname ( -- seq )
-     SYS_NMLN [ (uname) ] [ group ] bi
-     dup length utsname-items assert=
-     [ >string [ zero? ] trim-tail ] map ;
+    SYS_NMLN [ (uname) ] [ group ] bi
+    dup length utsname-items assert=
+    [ >string [ zero? ] trim-tail ] map ;
 
 : sysname ( -- string ) 0 uname nth ;
 : nodename ( -- string ) 1 uname nth ;

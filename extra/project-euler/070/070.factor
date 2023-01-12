@@ -60,8 +60,8 @@ IN: project-euler.070
 PRIVATE>
 
 : euler070 ( -- answer )
-   likely-prime-factors 2 all-combinations [ n-and-phi ] map
-   [ fit-requirements? ] filter minimum-ratio ;
+    likely-prime-factors 2 all-combinations [ n-and-phi ] map
+    [ fit-requirements? ] filter minimum-ratio ;
 
 ! [ euler070 ] 100 ave-time
 ! 379 ms ave run time - 1.15 SD (100 trials)

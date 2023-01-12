@@ -99,7 +99,7 @@ PRIVATE>
     [ 0 0 ] dip <hash-array> hash-set boa ; inline
 
 M: hash-set in?
-     key@ 2nip ;
+    key@ 2nip ;
 
 M: hash-set clear-set
     [ init-hash ] [ array>> [ drop +empty+ ] map! drop ] bi ;

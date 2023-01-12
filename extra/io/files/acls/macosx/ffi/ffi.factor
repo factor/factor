@@ -104,25 +104,25 @@ CONSTANT: acl-flag-names {
 }
 
 STRUCT: guid_t
-   { g_guid { uchar KAUTH_GUID_SIZE } } ;
+    { g_guid { uchar KAUTH_GUID_SIZE } } ;
 
 TYPEDEF: uint kauth_ace_rights_t
 STRUCT: kauth_ace
-   { ace_applicable guid_t }
-   { ace_flags uint }
-   { ace_rights kauth_ace_rights_t } ;
+    { ace_applicable guid_t }
+    { ace_flags uint }
+    { ace_rights kauth_ace_rights_t } ;
 TYPEDEF: kauth_ace* kauth_ace_t
 
 STRUCT: kauth_acl
-   { acl_entrycount uint }
-   { acl_flags uint }
-   { acl_ace { kauth_ace 1 } } ;
+    { acl_entrycount uint }
+    { acl_flags uint }
+    { acl_ace { kauth_ace 1 } } ;
 TYPEDEF: kauth_acl* kauth_acl_t
 
 STRUCT: kauth_filesec
-   { fsec_magic uint }
-   { fsec_owner guid_t }
-   { fsec_group guid_t } ;
+    { fsec_magic uint }
+    { fsec_owner guid_t }
+    { fsec_group guid_t } ;
 TYPEDEF: kauth_filesec* kauth_filesec_t
 
 FUNCTION: int acl_dup ( acl_t acl )

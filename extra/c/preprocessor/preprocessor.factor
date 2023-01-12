@@ -158,7 +158,7 @@ ERROR: header-file-missing path ;
             drop f >>processing-disabled?
             [ 1 - ] change-ifdef-nesting
             drop
-         ] [ 2drop ] if
+        ] [ 2drop ] if
     ] [
         parse-directive
     ] if ;

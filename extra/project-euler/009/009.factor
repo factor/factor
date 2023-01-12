@@ -40,7 +40,7 @@ IN: project-euler.009
     sum pickd = [ next-pq 2dup abc (ptriplet) ] unless ;
 
 : ptriplet ( target -- triplet )
-   3 1 { 3 4 5 } (ptriplet) abc nip ;
+    3 1 { 3 4 5 } (ptriplet) abc nip ;
 
 PRIVATE>
 

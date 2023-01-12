@@ -514,7 +514,7 @@ ERROR: bug-in-fixnum* x y a b ;
 ] unit-test
 
 [ B{ 0 1 2 3 4 } ] [
-   2  B{ 0 1 2 3 4 } <displaced-alien>
+    2 B{ 0 1 2 3 4 } <displaced-alien>
     [ 1 swap <displaced-alien> ] compile-call
     underlying>>
 ] unit-test

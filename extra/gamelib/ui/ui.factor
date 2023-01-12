@@ -17,7 +17,7 @@ TUPLE: board-gadget < gadget dimension bg-color draw-quotes board gests textures
     wdt cols /i :> cellwidth 
     hgt rows /i :> cellheight
 
-   cellwidth cellheight { } 2sequence ;
+    cellwidth cellheight { } 2sequence ;
 
 :: get-dimension-matrix ( n gadget -- matrix )
     ! gets a matrix of all starting locations of cells
@@ -117,7 +117,7 @@ TUPLE: board-gadget < gadget dimension bg-color draw-quotes board gests textures
 
 ! SECTION: gadget methods
 M: board-gadget pref-dim*
-   dimension>> ;
+    dimension>> ;
 
 M: board-gadget handle-gesture
     swap over gests>> ?at

@@ -310,12 +310,12 @@ M: object >uniform-vec-array '[ _ head ] map float-array{ } concat-as ; inline
 M: binary-data >uniform-vec-array drop ; inline
 
 M:: object >uniform-matrix ( sequence cols rows -- c-array )
-     sequence flip cols head-slice
-     [ rows head-slice c:float >c-array ] { } map-as concat ; inline
+    sequence flip cols head-slice
+    [ rows head-slice c:float >c-array ] { } map-as concat ; inline
 M: binary-data >uniform-matrix 2drop ; inline
 
 M: object >uniform-matrix-array
-     '[ _ _ >uniform-matrix ] map concat ; inline
+    '[ _ _ >uniform-matrix ] map concat ; inline
 M: binary-data >uniform-matrix-array 2drop ; inline
 
 M: object bind-uniform-bvec2 ( index sequence -- )

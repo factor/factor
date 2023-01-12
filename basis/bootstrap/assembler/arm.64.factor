@@ -324,7 +324,7 @@ big-endian off
             jit-call-quot
 
             vm-reg "end_callback" jit-call-1arg
-     ] }
+    ] }
 } define-sub-primitives
 
 

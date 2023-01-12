@@ -72,7 +72,7 @@ SYMBOL: sieve
     sieve get length 1 - over <range> ;
 
 : increment-counts ( n -- )
-     multiples [ sieve get [ 1 + ] change-nth ] each ;
+    multiples [ sieve get [ 1 + ] change-nth ] each ;
 
 : prime-tau-upto ( limit -- seq )
     dup initialize-sieve 2 swap [a..b) [
@@ -80,7 +80,7 @@ SYMBOL: sieve
     ] each sieve get ;
 
 : consecutive-under ( limit m -- n/f )
-   [ prime-tau-upto ] [ dup <repetition> ] bi* subseq-index ;
+    [ prime-tau-upto ] [ dup <repetition> ] bi* subseq-index ;
 
 PRIVATE>
 

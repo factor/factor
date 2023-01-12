@@ -5,8 +5,8 @@ IN: splitting.monotonic
 
 HELP: monotonic-split-slice
 { $values
-     { "seq" sequence } { "quot" { $quotation ( obj1 obj2 -- ? ) } }
-     { "pieces" "a sequence of slices" }
+    { "seq" sequence } { "quot" { $quotation ( obj1 obj2 -- ? ) } }
+    { "pieces" "a sequence of slices" }
 }
 { $description "Monotonically splits a sequence into slices." }
 { $examples
@@ -22,8 +22,8 @@ HELP: monotonic-split-slice
 
 HELP: monotonic-split
 { $values
-     { "seq" sequence } { "quot" quotation }
-     { "pieces" "a sequence of sequences" }
+    { "seq" sequence } { "quot" quotation }
+    { "pieces" "a sequence of sequences" }
 }
 { $description "Splits a sequence into subsequences, in which for all consecutive pairs of elements the quotation returns true." }
 { $examples
@@ -43,8 +43,8 @@ HELP: monotonic-split
 
 HELP: downward-slices
 { $values
-     { "seq" sequence }
-     { "slices" "a sequence of downward-slices" }
+    { "seq" sequence }
+    { "slices" "a sequence of downward-slices" }
 }
 { $description "Returns an array of monotonically decreasing slices of type " { $link downward-slice } ". Slices of one element are discarded." } ;
 

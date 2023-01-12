@@ -135,7 +135,7 @@ link-no-follow? off
 { "<p>asdf</p><ul><li>lol</li><li>haha</li></ul>" } [ "asdf\n-lol\n-haha" convert-farkup ] unit-test
 
 { "<p>asdf</p><ul><li>lol</li><li>haha</li></ul>" }
- [ "asdf\n\n-lol\n-haha" convert-farkup ] unit-test
+[ "asdf\n\n-lol\n-haha" convert-farkup ] unit-test
 
 { "<hr/>" } [ "___" convert-farkup ] unit-test
 { "<hr/>" } [ "___\n" convert-farkup ] unit-test

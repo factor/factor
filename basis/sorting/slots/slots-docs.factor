@@ -15,8 +15,8 @@ HELP: compare-slots
 
 HELP: sort-by
 { $values
-     { "seq" sequence } { "sort-specs" "a sequence of accessors ending with a comparator" }
-     { "seq'" sequence }
+    { "seq" sequence } { "sort-specs" "a sequence of accessors ending with a comparator" }
+    { "seq'" sequence }
 }
 { $description "Sorts a sequence of tuples by the sort-specs in " { $snippet "sort-spec" } ". A sort-spec is a sequence of slot accessors ending in a comparator." }
 { $examples

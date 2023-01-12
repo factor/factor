@@ -4,62 +4,62 @@ IN: ui.backend.gtk.tests
 
 : gdk-key-release-event ( -- event )
     S{ GdkEventKey
-       { type 9 }
-       { window ALIEN: 1672900 }
-       { send_event 0 }
-       { time 1332590199 }
-       { state 17 }
-       { keyval 72 }
-       { length 1 }
-       { string ALIEN: 1b25c80 }
-       { hardware_keycode 43 }
-       { group 0 }
-       { is_modifier 0 }
+        { type 9 }
+        { window ALIEN: 1672900 }
+        { send_event 0 }
+        { time 1332590199 }
+        { state 17 }
+        { keyval 72 }
+        { length 1 }
+        { string ALIEN: 1b25c80 }
+        { hardware_keycode 43 }
+        { group 0 }
+        { is_modifier 0 }
     } ;
 
 : gdk-key-press-event ( -- event )
     S{ GdkEventKey
-       { type 8 }
-       { window ALIEN: 16727e0 }
-       { send_event 0 }
-       { time 1332864912 }
-       { state 16 }
-       { keyval 65471 }
-       { length 0 }
-       { string ALIEN: 19c9700 }
-       { hardware_keycode 68 }
-       { group 0 }
-       { is_modifier 0 }
+        { type 8 }
+        { window ALIEN: 16727e0 }
+        { send_event 0 }
+        { time 1332864912 }
+        { state 16 }
+        { keyval 65471 }
+        { length 0 }
+        { string ALIEN: 19c9700 }
+        { hardware_keycode 68 }
+        { group 0 }
+        { is_modifier 0 }
     } ;
 
 : gdk-space-key-press-event ( -- event )
     S{ GdkEventKey
-       { type 8 }
-       { window ALIEN: 1b66360 }
-       { send_event 0 }
-       { time 28246628 }
-       { state 0 }
-       { keyval 32 }
-       { length 0 }
-       { string ALIEN: 20233b0 }
-       { hardware_keycode 64 }
-       { group 0 }
-       { is_modifier 1 }
+        { type 8 }
+        { window ALIEN: 1b66360 }
+        { send_event 0 }
+        { time 28246628 }
+        { state 0 }
+        { keyval 32 }
+        { length 0 }
+        { string ALIEN: 20233b0 }
+        { hardware_keycode 64 }
+        { group 0 }
+        { is_modifier 1 }
     } ;
 
 : gdk-windows-key-release-event ( -- event )
     S{ GdkEventKey
-       { type 9 }
-       { window ALIEN: 1a71d80 }
-       { send_event 0 }
-       { time 47998769 }
-       { state 67108928 }
-       { keyval 119 }
-       { length 1 }
-       { string ALIEN: 2017640 }
-       { hardware_keycode 25 }
-       { group 0 }
-       { is_modifier 0 }
+        { type 9 }
+        { window ALIEN: 1a71d80 }
+        { send_event 0 }
+        { time 47998769 }
+        { state 67108928 }
+        { keyval 119 }
+        { length 1 }
+        { string ALIEN: 2017640 }
+        { hardware_keycode 25 }
+        { group 0 }
+        { is_modifier 0 }
     } ;
 
 

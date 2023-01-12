@@ -12,7 +12,7 @@ ABOUT: "elevate"
 ARTICLE: "elevate" "Elevated permissions API"
     "The " { $vocab-link "elevate" } " vocabulary provides abstractions for running programs with elevated (administrator) privileges (permissions). It allows code to relaunch itself or other programs with administrator privileges after requiring a password."
     $nl
-     "This vocabulary is inspired by and ported from " { $url "https://github.com/barneygale/elevate" "Barney Gale's elevate.py" } "."
+    "This vocabulary is inspired by and ported from " { $url "https://github.com/barneygale/elevate" "Barney Gale's elevate.py" } "."
     $nl
     { $subsections already-root? elevate elevated lowered }
     "However, there are many caveats: " { $link "elevate.bugs" } "." ;

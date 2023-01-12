@@ -67,7 +67,7 @@ M: multi-texture texture-size
         ] [ f ] if*
     ] [ f ] if* ;
 : same-internal-format? ( image-gadget -- ? )
-   [ texture-format ] [ image>> image-format 2drop ] bi = ;
+    [ texture-format ] [ image>> image-format 2drop ] bi = ;
 
 ! TODO: also keep multitextures if possible ?
 : keep-same-texture? ( image-gadget -- ? )

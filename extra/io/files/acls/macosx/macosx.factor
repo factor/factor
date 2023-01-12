@@ -90,7 +90,7 @@ ERROR: add-permission-failed permission-set permission ;
     f acl_permset_t <ref> [ acl_get_permset acl-error ] keep ;
 
 : filter-strings ( obj strings -- string )
-   [ [ 1 = ] dip f ? ] 2map sift "," join ;
+    [ [ 1 = ] dip f ? ] 2map sift "," join ;
 
 : permset>strings ( acl_permset -- strings )
     acl-perms [ acl_get_perm_np dup acl-error ] with map
@@ -100,7 +100,7 @@ ERROR: add-permission-failed permission-set permission ;
     acl-entry>permset permset>strings ;
 
 : with-new-acl ( quot -- )
-   [ [ new-acl &free-acl ] dip call ] with-destructors ; inline
+    [ [ new-acl &free-acl ] dip call ] with-destructors ; inline
 
 : acls. ( path -- )
     [ acl>text io:write ] acl-each ;

@@ -195,11 +195,11 @@ MACRO: sprintf ( format-string -- quot )
 : >datetime ( timestamp -- string )
     [
        {
-          [ day-of-week day-abbreviation3 ]
-          [ month>> month-abbreviation ]
-          [ day>> pad-00 ]
-          [ >time ]
-          [ year>> number>string ]
+            [ day-of-week day-abbreviation3 ]
+            [ month>> month-abbreviation ]
+            [ day>> pad-00 ]
+            [ >time ]
+            [ year>> number>string ]
        } cleave
     ] output>array join-words ; inline
 

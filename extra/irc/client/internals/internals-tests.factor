@@ -190,9 +190,10 @@ M: mb-writer dispose drop ;
   ] unit-test
 ] spawning-irc
 
-[ { H{ { "factorbot" T{ participant { nick "factorbot" } { operator t } } }
-       { "ircuser" T{ participant { nick "ircuser" } } }
-       { "voiced" T{ participant { nick "voiced" } { voice t } } } } } [
+[ { H{
+      { "factorbot" T{ participant { nick "factorbot" } { operator t } } }
+      { "ircuser" T{ participant { nick "ircuser" } } }
+      { "voiced" T{ participant { nick "voiced" } { voice t } } } } } [
       "#factortest" <irc-channel-chat>
       "ircuser" over join-participant
       [ %add-named-chat ] keep

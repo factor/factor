@@ -13,9 +13,9 @@ IN: ui.backend.gtk.io
     revents>> 0 = not ;
 
 : dispatch ( source callback user-data -- ? )
-     3drop
-     0 mx get-global wait-for-events
-     yield t ;
+    3drop
+    0 mx get-global wait-for-events
+    yield t ;
 
 : <funcs> ( -- funcs )
     GSourceFuncs malloc-struct

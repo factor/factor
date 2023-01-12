@@ -19,7 +19,7 @@ IN: html.parser.analyzer
     swap attributes>> key? ;
 
 : find-all ( seq quot -- alist )
-   [ <enumerated> >alist ] [ '[ second @ ] ] bi* filter ; inline
+    [ <enumerated> >alist ] [ '[ second @ ] ] bi* filter ; inline
 
 : loopn-index ( n quot -- )
     [ <iota> ] [ '[ @ not ] ] bi* find 2drop ; inline

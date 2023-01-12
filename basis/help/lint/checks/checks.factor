@@ -47,8 +47,8 @@ SYMBOL: vocab-articles
         ] vocabs-quot get call( quot -- )
     ] leaks members no-ui-disposables
     dup length 0 > [
-       dup [ class-of ] histogram-by
-       [ "Leaked resources: " write ... ] with-string-writer simple-lint-error
+        dup [ class-of ] histogram-by
+        [ "Leaked resources: " write ... ] with-string-writer simple-lint-error
     ] [
         drop
     ] if ;

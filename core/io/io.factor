@@ -223,12 +223,12 @@ CONSTANT: each-block-size 65536
 <PRIVATE
 
 : read-loop ( buf stream n i -- count )
-     2dup = [ 3nip ] [
+    2dup = [ 3nip ] [
         pick stream-read1 [
             over [ pick set-nth-unsafe ] 2curry 3dip
             1 + read-loop
         ] [ 3nip ] if*
-     ] if ; inline recursive
+    ] if ; inline recursive
 
 : finalize-read-until ( seq sep/f -- seq/f sep/f )
     2dup [ empty? ] [ not ] bi* and [ 2drop f f ] when ; inline

@@ -107,7 +107,7 @@ CONSTANT: c53h { { ":status" "200" }
 
 ! RFC7541 Appendix C.2.1
 { T{ hpack-context f 4096 { { "custom-key" "custom-header" } } } 
-   26 { "custom-key" "custom-header" } }
+    26 { "custom-key" "custom-header" } }
 [ hpack-context new c21 0 decode-field nipd ] unit-test
 
 ! RFC7541 Appendix C.2.2

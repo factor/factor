@@ -58,7 +58,7 @@ TUPLE: bull ;
     } cond ;
 
 : add-to-score ( arr -- score )
-   <score> [ bull? [ inc-bulls ] [ inc-cows ] if ] reduce ;
+    <score> [ bull? [ inc-bulls ] [ inc-cows ] if ] reduce ;
 
 : check-win ( score -- ? ) bulls>> 4 = ;
 

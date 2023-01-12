@@ -176,7 +176,7 @@ SYMBOL: mesh-picking-frame
                 tri
                 bary [ first3
                        "Barycenter: %3.2f %3.2f %3.2f" sprintf 10 ypos 45 + 10 BLACK draw-text
-                     ] when*
+                    ] when*
             ] [ drop ] if
 
             "Use Mouse to Move Camera" 10 screen-height 20 - 10 GRAY draw-text

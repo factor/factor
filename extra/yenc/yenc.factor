@@ -71,7 +71,7 @@ PRIVATE>
     >string " " split [ "=" split1 ] H{ } map>assoc ;
 
 : find-metadata ( lines type -- metadata i )
-   [ '[ _ head? ] find ] keep ?head drop parse-metadata swap ;
+    [ '[ _ head? ] find ] keep ?head drop parse-metadata swap ;
 
 PRIVATE>
 

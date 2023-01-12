@@ -5,9 +5,9 @@ IN: mason.report.tests
 { 0 0 } [ [ ] with-report ] must-infer-as
 
 : verify-report ( -- )
-     [ t ] [ "report" file-exists? ] unit-test
-     [ ] [ "report" file>xml drop ] unit-test
-     [ ] [ "report" delete-file ] unit-test ;
+    [ t ] [ "report" file-exists? ] unit-test
+    [ ] [ "report" file>xml drop ] unit-test
+    [ ] [ "report" delete-file ] unit-test ;
 
 "builds" temp-file builds-dir [
     [

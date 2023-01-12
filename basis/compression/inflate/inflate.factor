@@ -26,14 +26,14 @@ ERROR: bad-zlib-header ;
 
 
 : read-until-terminated ( data -- data ) 
-   [ dup 8 swap bs:read 0 =  ] [  ]  until ;
+    [ dup 8 swap bs:read 0 =  ] [  ]  until ;
 
 :: interpret-flag ( flg data  -- )
-   27 data bs:seek 
-   flg first 1 = [ 8 data bs:read data bs:seek  ] when
-   flg second 1 = [ data read-until-terminated drop ] when
-   flg fourth 1 = [ data read-until-terminated drop ] when
-   flg second 1 = [ 1 data bs:read drop  ] when ;
+    27 data bs:seek 
+    flg first 1 = [ 8 data bs:read data bs:seek  ] when
+    flg second 1 = [ data read-until-terminated drop ] when
+    flg fourth 1 = [ data read-until-terminated drop ] when
+    flg second 1 = [ 1 data bs:read drop  ] when ;
 
 :: check-gzip-header ( data -- )
     8 data bs:read 31 assert=   ! ID 1

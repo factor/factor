@@ -266,7 +266,7 @@ M: revision feed-entry-url id>> revision-url ;
             URL" $wiki" <redirect>
         ] >>submit
 
-     <protected>
+    <protected>
         "delete wiki articles" >>description
         { can-delete-wiki-articles? } >>capabilities ;
 

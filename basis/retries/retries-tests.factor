@@ -67,6 +67,6 @@ IN: retries.tests
 
 { } [
     [ 2 = [ "not 2!" throw ] unless ]
-     1.1 100 <exponential-wait> 3 retries
+    1.1 100 <exponential-wait> 3 retries
 ] unit-test
 

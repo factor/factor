@@ -130,10 +130,10 @@ ARTICLE: "test-article-2" "This is a test article"
 ${
     ""
     T{ font
-       { name $[ default-sans-serif-font-name ] }
-       { size $[ default-font-size ] }
-       { foreground $[ text-color ] }
-       { background $[ content-background ] }
+        { name $[ default-sans-serif-font-name ] }
+        { size $[ default-font-size ] }
+        { foreground $[ text-color ] }
+        { background $[ content-background ] }
     }
 } [
     <pane> dup current>> smash-line [ text>> ] [ font>> ] bi

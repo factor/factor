@@ -14,11 +14,11 @@ HELP: json-print
 $nl
 "Some options can control the formatting of the result:"
 { $table
-     { { $link json-allow-fp-special? } "Allow special floating-points: NaN, Infinity, -Infinity" }
-     { { $link json-friendly-keys? }    "Convert - to _ in tuple slots and hashtable keys" }
-     { { $link json-coerce-keys? }      "Coerce hashtable keys into strings" }
-     { { $link json-escape-slashes? }   "Escape forward slashes inside strings" }
-     { { $link json-escape-unicode? }   "Escape unicode values inside strings" }
+    { { $link json-allow-fp-special? } "Allow special floating-points: NaN, Infinity, -Infinity" }
+    { { $link json-friendly-keys? }    "Convert - to _ in tuple slots and hashtable keys" }
+    { { $link json-coerce-keys? }      "Coerce hashtable keys into strings" }
+    { { $link json-escape-slashes? }   "Escape forward slashes inside strings" }
+    { { $link json-escape-unicode? }   "Escape unicode values inside strings" }
 }
 }
 { $see-also >json } ;

@@ -25,7 +25,7 @@ IN: rosetta-code.inverted-index
     '[ _ [ _ add-to-file-list ] change-at ] each ;
 
 : (index-files) ( files index -- )
-   [ [ [ file-words ] keep ] dip swap add-to-index ] curry each ;
+    [ [ [ file-words ] keep ] dip swap add-to-index ] curry each ;
 
 : index-files ( files -- index )
     H{ } clone [ (index-files) ] keep ;

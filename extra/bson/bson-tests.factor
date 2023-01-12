@@ -36,12 +36,18 @@ IN: bson.tests
                    { gmt-offset T{ duration { hour 2 } } } } } } turnaround
 ] unit-test
 
-{ H{ { "nested" H{ { "a" "a string" } { "b" H{ { "a" "a string" } } } } }
-     { "ref" T{ dbref f "a" "b" "c" } }
-     { "array" H{ { "a list" { 1 2.234 "hello world" } } } }
-     { "quot" [ 1 2 + ] } }
-}
-[ H{ { "nested" H{ { "a" "a string" } { "b" H{ { "a" "a string" } } } } }
-     { "ref" T{ dbref f "a" "b" "c" } }
-     { "array" H{ { "a list" { 1 2.234 "hello world" } } } }
-     { "quot" [ 1 2 + ] } } turnaround ] unit-test
+{
+     H{
+          { "nested" H{ { "a" "a string" } { "b" H{ { "a" "a string" } } } } }
+          { "ref" T{ dbref f "a" "b" "c" } }
+          { "array" H{ { "a list" { 1 2.234 "hello world" } } } }
+          { "quot" [ 1 2 + ] }
+     }
+} [
+     H{
+          { "nested" H{ { "a" "a string" } { "b" H{ { "a" "a string" } } } } }
+          { "ref" T{ dbref f "a" "b" "c" } }
+          { "array" H{ { "a list" { 1 2.234 "hello world" } } } }
+          { "quot" [ 1 2 + ] }
+     } turnaround
+] unit-test

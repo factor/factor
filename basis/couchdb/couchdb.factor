@@ -86,7 +86,7 @@ CONSTANT: default-uuids-to-cache 100
     [ dup server-url % "_uuids?count=" % uuids-to-cache>> number>string % ] "" make ;
 
 : uuids-get ( server -- uuids )
-     uuids-url couch-get "uuids" of >vector ;
+    uuids-url couch-get "uuids" of >vector ;
 
 : get-uuids ( server -- server )
     dup uuids-get [ nip ] curry change-uuids ;

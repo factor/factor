@@ -24,7 +24,7 @@ DEFER: quoted-field,
             { CHAR: \r   [ ] } ! Error: lf inside string?
             [ [ , drop f maybe-escaped-quote ] when* ]
         } case
-     ] if ; inline recursive
+    ] if ; inline recursive
 
 : quoted-field, ( delimiter stream -- delimiter stream sep/f )
     "\"" over stream-read-until drop % t maybe-escaped-quote ;

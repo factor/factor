@@ -1036,7 +1036,7 @@ FUNCTION: ulong ffi_test_70 ( test_struct_68 a test_struct_68 b, test_struct_66 
 ] unit-test
 
 { 55 } [
-   1 2 3 S{ test_struct_66 f 4 5 } S{ test_struct_69 f 6.0 7 8 } S{ test_struct_66 f 9 10 } ffi_test_69
+    1 2 3 S{ test_struct_66 f 4 5 } S{ test_struct_69 f 6.0 7 8 } S{ test_struct_66 f 9 10 } ffi_test_69
 ] unit-test
 
 : callback-17 ( -- callback )

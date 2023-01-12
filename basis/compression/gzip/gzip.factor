@@ -94,7 +94,7 @@ SYMBOL: lit-vec
     dup array? [ [ first 5 <bits> >bit-array reverse ] [ second ] bi 2array ] [ 5 <bits> >bit-array reverse ] if  ;
 
 : lit-to-bits ( lit -- bits )
-     dup array? [ [ first (lit-to-bits) ] [ second ] bi 2array ] [ (lit-to-bits) ] if  ;
+    dup array? [ [ first (lit-to-bits) ] [ second ] bi 2array ] [ (lit-to-bits) ] if  ;
  
 : pair-to-bits ( l,d -- bits )
     [ first lit-to-bits ] [ second dist-to-bits ] bi 2array ;
@@ -124,7 +124,7 @@ SYMBOL: lit-vec
 
 ! Use the given dictionary to replace the element with its code
 :: replace-one ( ele code-dict  --  new-ele )
-   ele array? [ ele first code-dict at ele second 2array ] [ ele code-dict at ] if ;
+    ele array? [ ele first code-dict at ele second 2array ] [ ele code-dict at ] if ;
 
 ! replace both elements of a length distance pair with their codes
 : replace-pair (  pair  -- new-pair  )
@@ -136,10 +136,10 @@ SYMBOL: lit-vec
 
 ! Dictionary encoding
 : lit-code-lens ( -- len-seq )
-     285 [0..b] [ lit-dict get at length ] map [ zero? ] trim-tail ;
+    285 [0..b] [ lit-dict get at length ] map [ zero? ] trim-tail ;
 
 : dist-code-lens ( -- len-seq )
-     31 [0..b] [ dist-dict get at length ] map [ zero? ] trim-tail ;
+    31 [0..b] [ dist-dict get at length ] map [ zero? ] trim-tail ;
 
 :: replace-0-single ( m len-seq  -- new-len-seq )
     m 11 < [ len-seq m 0 <array> 17 m 3 - 3 <bits> >bit-array 2array 1array replace ]
@@ -162,7 +162,7 @@ SYMBOL: lit-vec
     range empty? [ len-seq ] [ range first range 1 tail len-seq replace-all-runs replace-runs ] if ;
 
 : run-free-lit ( -- len-seq )
-     0 285 [a..b] lit-code-lens replace-0 replace-all-runs ;
+    0 285 [a..b] lit-code-lens replace-0 replace-all-runs ;
 
 : run-free-dist ( -- len-seq )
     0 31 [a..b] dist-code-lens replace-0 replace-all-runs ;
@@ -204,7 +204,7 @@ TUPLE: deflate-block
 
 ! Compresses a block with dynamic huffman compression, outputting a nested array structure
 : (compress-dynamic) ( lit-seq -- bit-arr-seq  )
-   [    dup compress-lz77 vec-to-lits { 256 } append lit-vec set 
+    [   dup compress-lz77 vec-to-lits { 256 } append lit-vec set 
         lit-vec get build-dicts  
         dist-dict set 
         lit-dict set

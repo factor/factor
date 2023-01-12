@@ -10,7 +10,7 @@ IN: concurrency.distributed
 <PRIVATE
 
 : registered-remote-threads ( -- hash )
-   \ registered-remote-threads get-global ;
+    \ registered-remote-threads get-global ;
 
 : thread-connections ( -- hash )
     \ thread-connections get-global ;

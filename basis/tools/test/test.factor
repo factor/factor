@@ -22,11 +22,11 @@ SYMBOL: test-failures
 test-failures [ V{ } clone ] initialize
 
 T{ error-type-holder
-   { type +test-failure+ }
-   { word ":test-failures" }
-   { plural "unit test failures" }
-   { icon "vocab:ui/tools/error-list/icons/unit-test-error.png" }
-   { quot [ test-failures get ] }
+    { type +test-failure+ }
+    { word ":test-failures" }
+    { plural "unit test failures" }
+    { icon "vocab:ui/tools/error-list/icons/unit-test-error.png" }
+    { quot [ test-failures get ] }
 } define-error-type
 
 SYMBOL: silent-tests?

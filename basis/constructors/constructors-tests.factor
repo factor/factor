@@ -7,7 +7,7 @@ IN: constructors.tests
 TUPLE: stock-spread stock spread timestamp ;
 
 CONSTRUCTOR: <stock-spread> stock-spread ( stock spread -- stock-spread )
-   now >>timestamp ;
+    now >>timestamp ;
 
 SYMBOL: AAPL
 

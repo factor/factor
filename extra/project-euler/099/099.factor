@@ -45,7 +45,7 @@ IN: project-euler.099
 PRIVATE>
 
 : euler099 ( -- answer )
-     source-099 solve ;
+    source-099 solve ;
 
 ! [ euler099 ] 100 ave-time
 ! 16 ms ave run timen - 1.67 SD (100 trials)

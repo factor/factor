@@ -32,7 +32,7 @@ SYMBOL: cache
     <sequence-parser> ;
 
 : skip-after ( sequence-parser seq -- sequence-parser )
-   [ take-until-sequence* drop ] curry keep ;
+    [ take-until-sequence* drop ] curry keep ;
 
 : skip-after* ( sequence-parser object -- sequence-parser )
     [ take-until-object drop ] curry keep ;

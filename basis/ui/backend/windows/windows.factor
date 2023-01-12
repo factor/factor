@@ -357,15 +357,15 @@ SYMBOL: upper-surrogate-wm-char
         ctrl? alt? xor [ ! enable AltGr combination inputs
             wParam {
                 { [ dup upper-surrogate? ] [
-                      upper-surrogate-wm-char set-global ]
-                }
+                      upper-surrogate-wm-char set-global
+                ] }
                 { [ dup under-surrogate? ] [
-                      drop
-                      upper-surrogate-wm-char get-global [
-                          wParam "" 2sequence
-                          utf16n encode utf16n decode hWnd window user-input
-                      ] when* ]
-                }
+                    drop
+                    upper-surrogate-wm-char get-global [
+                        wParam "" 2sequence
+                        utf16n encode utf16n decode hWnd window user-input
+                    ] when*
+                ] }
                 [ 1string hWnd window user-input
                   f upper-surrogate-wm-char set-global ]
             } cond

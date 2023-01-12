@@ -10,13 +10,13 @@ IN: rosetta-code.n-queens
 
 :: safe?  ( board q -- ? )
     [let q board nth :> x
-      q <iota> [
-         x swap
-         [ board nth ] keep
-         q swap -
-           [ + = not ]
-           [ - = not ] 3bi and
-      ] all?
+        q <iota> [
+            x swap
+            [ board nth ] keep
+            q swap -
+            [ + = not ]
+            [ - = not ] 3bi and
+        ] all?
     ] ;
 
 : solution? ( board -- ? )

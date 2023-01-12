@@ -265,7 +265,7 @@ CONSTANT: compass-directions H{
             ] [
                 string>number "of %s" sprintf
             ] if* "runway %s visibility %s" sprintf
-         ] dip " ft" " meters" ? append
+        ] dip " ft" " meters" ? append
     ] dip append ;
 
 : (parse-weather) ( str -- str' )

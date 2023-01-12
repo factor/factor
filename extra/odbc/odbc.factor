@@ -115,14 +115,14 @@ FUNCTION: SQLRETURN SQLNumResultCols ( SQLHSTMT statementHandle, SQLSMALLINT* co
 FUNCTION: SQLRETURN SQLDescribeCol ( SQLHSTMT statementHandle, SQLSMALLINT columnNumber, SQLCHAR* columnName, SQLSMALLINT bufferLength, SQLSMALLINT* nameLengthPtr, SQLSMALLINT* dataTypePtr, SQLUINTEGER* columnSizePtr, SQLSMALLINT* decimalDigitsPtr, SQLSMALLINT* nullablePtr )
 FUNCTION: SQLRETURN SQLGetData ( SQLHSTMT statementHandle, SQLUSMALLINT columnNumber, SQLSMALLINT targetType, SQLPOINTER targetValuePtr, SQLINTEGER bufferLength, SQLINTEGER* strlen_or_indPtr )
 FUNCTION: SQLRETURN SQLGetDiagRec (
-     SQLSMALLINT     HandleType,
-     SQLHANDLE       Handle,
-     SQLSMALLINT     RecNumber,
-     SQLCHAR*       SQLState,
-     SQLINTEGER*    NativeErrorPtr,
-     SQLCHAR*       MessageText,
-     SQLSMALLINT     BufferLength,
-     SQLSMALLINT*   TextLengthPtr )
+    SQLSMALLINT     HandleType,
+    SQLHANDLE       Handle,
+    SQLSMALLINT     RecNumber,
+    SQLCHAR*       SQLState,
+    SQLINTEGER*    NativeErrorPtr,
+    SQLCHAR*       MessageText,
+    SQLSMALLINT     BufferLength,
+    SQLSMALLINT*   TextLengthPtr )
 
 : alloc-handle ( type parent -- handle )
     f void* <ref> [ SQLAllocHandle ] keep swap succeeded? [

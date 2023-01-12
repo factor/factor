@@ -96,9 +96,10 @@ CONSTRUCTOR: <mdb-connection> mdb-connection ( instance -- mdb-connection ) ;
     check-ok [ drop ] [ throw ] if ; inline
 
 : authenticate-connection ( mdb-connection -- )
-   [ mdb-connection get instance>> auth?
-     [ perform-authentication ] when
-   ] with-connection ; inline
+    [
+        mdb-connection get instance>> auth?
+        [ perform-authentication ] when
+    ] with-connection ; inline
 
 : open-connection ( mdb-connection node -- mdb-connection )
     [ >>node ] [ address>> ] bi
@@ -109,24 +110,24 @@ CONSTRUCTOR: <mdb-connection> mdb-connection ( instance -- mdb-connection ) ;
     "admin.$cmd" H{ { "ismaster" 1 } } send-query-1result ;
 
 : split-host-str ( hoststr -- host port )
-   ":" split [ first ] [ second string>number ] bi ; inline
+    ":" split [ first ] [ second string>number ] bi ; inline
 
 : eval-ismaster-result ( node result -- )
-   [
+    [
         [ "ismaster" ] dip at dup string?
         [ >integer 1 = ] when >>master? drop
-   ] [
+    ] [
         [ "remote" ] dip at
         [ split-host-str <inet> f <mdb-node> >>remote ] when* drop
     ] 2bi ;
 
 : check-node ( mdb node --  )
-   [ <mdb-connection> &dispose ] dip
-   [ [ open-connection ] [ 3drop f ] recover ] keep swap
-   [ [ get-ismaster eval-ismaster-result ] with-connection ] [ drop ] if* ;
+    [ <mdb-connection> &dispose ] dip
+    [ [ open-connection ] [ 3drop f ] recover ] keep swap
+    [ [ get-ismaster eval-ismaster-result ] with-connection ] [ drop ] if* ;
 
 : nodelist>table ( seq -- assoc )
-   [ [ master?>> ] keep 2array ] map >hashtable ;
+    [ [ master?>> ] keep 2array ] map >hashtable ;
 
 PRIVATE>
 
@@ -154,7 +155,7 @@ ERROR: mongod-connection-error address message ;
     ] recover ;
 
 : mdb-close ( mdb-connection -- )
-     [ [ dispose ] when* f ] change-handle drop ;
+    [ [ dispose ] when* f ] change-handle drop ;
 
 M: mdb-connection dispose
-     mdb-close ;
+    mdb-close ;
