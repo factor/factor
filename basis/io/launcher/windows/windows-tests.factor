@@ -7,59 +7,59 @@ io.pathnames kernel math namespaces parser sequences
 splitting system tools.test ;
 IN: io.launcher.windows.tests
 
-[ "hello world" ] [ { "hello" "world" } join-arguments ] unit-test
+{ "hello world" } [ { "hello" "world" } join-arguments ] unit-test
 
-[ "bob \"mac arthur\"" ] [ { "bob" "mac arthur" } join-arguments ] unit-test
+{ "bob \"mac arthur\"" } [ { "bob" "mac arthur" } join-arguments ] unit-test
 
-[ "bob mac\\\\arthur" ] [ { "bob" "mac\\\\arthur" } join-arguments ] unit-test
+{ "bob mac\\\\arthur" } [ { "bob" "mac\\\\arthur" } join-arguments ] unit-test
 
-[ "bob \"mac arthur\\\\\"" ] [ { "bob" "mac arthur\\" } join-arguments ] unit-test
+{ "bob \"mac arthur\\\\\"" } [ { "bob" "mac arthur\\" } join-arguments ] unit-test
 
 ! Bug #245
-[ "\\\"hi\\\"" ] [ { "\"hi\"" } join-arguments ] unit-test
+{ "\\\"hi\\\"" } [ { "\"hi\"" } join-arguments ] unit-test
 
-[ "\"\\\"hi you\\\"\"" ] [ { "\"hi you\"" } join-arguments ] unit-test
+{ "\"\\\"hi you\\\"\"" } [ { "\"hi you\"" } join-arguments ] unit-test
 
 ! Commented line -- what should appear on the command line
 ! \foo\\bar\\\bas\ -> \foo\\bar\\\bas\
-[ "\\foo\\\\bar\\\\\\bas\\" ]
+{ "\\foo\\\\bar\\\\\\bas\\" }
 [ { "\\foo\\\\bar\\\\\\bas\\" } join-arguments ] unit-test
 
 ! \"foo"\\bar\\\bas\ -> \\\"foo\"\\bar\\\bas\
-[ "\\\\\\\"foo\\\"\\\\bar\\\\\\bas\\" ]
+{ "\\\\\\\"foo\\\"\\\\bar\\\\\\bas\\" }
 [ { "\\\"foo\"\\\\bar\\\\\\bas\\" } join-arguments ] unit-test
 
 ! \foo\\"bar"\\\bas\ -> \foo\\\\\"bar\"\\\bas\
-[ "\\foo\\\\\\\\\\\"bar\\\"\\\\\\bas\\" ]
+{ "\\foo\\\\\\\\\\\"bar\\\"\\\\\\bas\\" }
 [ { "\\foo\\\\\"bar\"\\\\\\bas\\" } join-arguments ] unit-test
 
 ! \foo\\bar\\\"bas"\ -> \foo\\bar\\\\\\\"bas\"\
-[ "\\foo\\\\bar\\\\\\\\\\\\\\\"bas\\\"\\" ]
+{ "\\foo\\\\bar\\\\\\\\\\\\\\\"bas\\\"\\" }
 [ { "\\foo\\\\bar\\\\\\\"bas\"\\" } join-arguments ] unit-test
 
 ! \foo\\bar bar\\\bas\ -> "\foo\\bar bar\\\bas\\"
-[ "\"\\foo\\\\bar bar\\\\\\bas\\\\\"" ]
+{ "\"\\foo\\\\bar bar\\\\\\bas\\\\\"" }
 [ { "\\foo\\\\bar bar\\\\\\bas\\" } join-arguments ] unit-test
 
 
-[ ] [
+{ } [
     <process>
         "notepad" >>command
         1/2 seconds >>timeout
     "notepad" set
 ] unit-test
 
-[ f ] [ "notepad" get process-running? ] unit-test
+{ f } [ "notepad" get process-running? ] unit-test
 
-[ f ] [ "notepad" get process-started? ] unit-test
+{ f } [ "notepad" get process-started? ] unit-test
 
-[ ] [ "notepad" [ run-detached ] change ] unit-test
+{ } [ "notepad" [ run-detached ] change ] unit-test
 
 [ "notepad" get wait-for-process ] must-fail
 
-[ t ] [ "notepad" get killed>> ] unit-test
+{ t } [ "notepad" get killed>> ] unit-test
 
-[ f ] [ "notepad" get process-running? ] unit-test
+{ f } [ "notepad" get process-running? ] unit-test
 
 [
     <process>
@@ -80,7 +80,7 @@ IN: io.launcher.windows.tests
 
 SYMBOLS: out-path err-path ;
 
-[ ] [
+{ } [
     <process>
         console-vm-path "-run=hello-world" 2array >>command
         [ "out" ".txt" unique-file ] with-temp-directory
@@ -88,11 +88,11 @@ SYMBOLS: out-path err-path ;
     try-process
 ] unit-test
 
-[ "Hello world" ] [
+{ "Hello world" } [
     out-path get-global ascii file-lines first
 ] unit-test
 
-[ "IN: scratchpad " ] [
+{ "IN: scratchpad " } [
     <process>
         console-vm-path "-run=listener" 2array >>command
         +closed+ >>stdin
@@ -103,7 +103,7 @@ SYMBOLS: out-path err-path ;
 : launcher-test-path ( -- str )
     "resource:basis/io/launcher/windows/test" ;
 
-[ ] [
+{ } [
     launcher-test-path [
         <process>
             console-vm-path "-script" "stderr.factor" 3array >>command
@@ -115,15 +115,15 @@ SYMBOLS: out-path err-path ;
     ] with-directory
 ] unit-test
 
-[ "output" ] [
+{ "output" } [
     out-path get-global ascii file-lines first
 ] unit-test
 
-[ "error" ] [
+{ "error" } [
     err-path get-global ascii file-lines first
 ] unit-test
 
-[ ] [
+{ } [
     launcher-test-path [
         <process>
             console-vm-path "-script" "stderr.factor" 3array >>command
@@ -134,11 +134,11 @@ SYMBOLS: out-path err-path ;
     ] with-directory
 ] unit-test
 
-[ "outputerror" ] [
+{ "outputerror" } [
     out-path get-global ascii file-lines first
 ] unit-test
 
-[ "output" ] [
+{ "output" } [
     launcher-test-path [
         <process>
             console-vm-path "-script" "stderr.factor" 3array >>command
@@ -148,13 +148,11 @@ SYMBOLS: out-path err-path ;
     ] with-directory
 ] unit-test
 
-[ "error" ] [
+{ "error" } [
     err-path get-global ascii file-lines first
 ] unit-test
 
-
-
-[ t ] [
+{ t } [
     launcher-test-path [
         <process>
             console-vm-path "-script" "env.factor" 3array >>command
@@ -164,7 +162,7 @@ SYMBOLS: out-path err-path ;
     os-envs =
 ] unit-test
 
-[ t ] [
+{ t } [
     launcher-test-path [
         <process>
             console-vm-path "-script" "env.factor" 3array >>command
@@ -176,7 +174,7 @@ SYMBOLS: out-path err-path ;
     os-envs =
 ] unit-test
 
-[ "B" ] [
+{ "B" } [
     launcher-test-path [
         <process>
             console-vm-path "-script" "env.factor" 3array >>command
@@ -187,7 +185,7 @@ SYMBOLS: out-path err-path ;
     "A" of
 ] unit-test
 
-[ f ] [
+{ f } [
     launcher-test-path [
         <process>
             console-vm-path "-script" "env.factor" 3array >>command
@@ -200,7 +198,7 @@ SYMBOLS: out-path err-path ;
 ] unit-test
 
 2 [
-    [ ] [
+    { } [
         <process>
             "cmd.exe /c dir" >>command
             [ "dir" ".txt" unique-file ] with-temp-directory
@@ -208,7 +206,7 @@ SYMBOLS: out-path err-path ;
         try-process
     ] unit-test
 
-    [ ] [ out-path get-global delete-file ] unit-test
+    { } [ out-path get-global delete-file ] unit-test
 ] times
 
 { "Hello appender\r\nÖrjan ågren är åter\r\nHello appender\r\nÖrjan ågren är åter\r\n" } [
@@ -229,17 +227,17 @@ SYMBOLS: out-path err-path ;
     "cmd /c echo.This is a hidden process." utf8 (process-stream) hidden>> swap stream-contents
 ] unit-test
 
-[ "IN: scratchpad " ] [
+{ "IN: scratchpad " } [
     console-vm-path "-run=listener" 2array
     ascii [ "USE: system 0 exit" print flush read-lines last ] with-process-stream
 ] unit-test
 
-[ ] [
+{ } [
     console-vm-path "-run=listener" 2array
     ascii [ "USE: system 0 exit" print ] with-process-writer
 ] unit-test
 
-[ ] [
+{ } [
     <process>
     console-vm-path "-run=listener" 2array >>command
     "vocab:io/launcher/windows/test/input.txt" >>stdin

@@ -4,9 +4,9 @@ IN: compiler.tests.redefine9
 
 ! Mixin redefinition did not recompile all necessary words.
 
-[ ] [ [ "compiler.tests.redefine9" forget-vocab ] with-compilation-unit ] unit-test
+{ } [ [ "compiler.tests.redefine9" forget-vocab ] with-compilation-unit ] unit-test
 
-[ ] [
+{ } [
     "USING: kernel math math.order sorting ;
     IN: compiler.tests.redefine9
     MIXIN: my-mixin
@@ -18,7 +18,7 @@ IN: compiler.tests.redefine9
     eval( -- )
 ] unit-test
 
-[ ] [
+{ } [
     "USE: math
     IN: compiler.tests.redefine9
     TUPLE: my-tuple ;

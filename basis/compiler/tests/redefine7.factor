@@ -4,9 +4,9 @@ IN: compiler.tests.redefine7
 
 ! Mixin redefinition did not recompile all necessary words.
 
-[ ] [ [ "compiler.tests.redefine7" forget-vocab ] with-compilation-unit ] unit-test
+{ } [ [ "compiler.tests.redefine7" forget-vocab ] with-compilation-unit ] unit-test
 
-[ ] [
+{ } [
     "USING: kernel math ;
     IN: compiler.tests.redefine7
     MIXIN: my-mixin
@@ -15,13 +15,13 @@ IN: compiler.tests.redefine7
     eval( -- )
 ] unit-test
 
-[ ] [
+{ } [
     "USE: math
     IN: compiler.tests.redefine7
     INSTANCE: float my-mixin"
     eval( -- )
 ] unit-test
 
-[ 2.0 ] [
+{ 2.0 } [
     1.0 "my-inline" "compiler.tests.redefine7" lookup-word execute
 ] unit-test

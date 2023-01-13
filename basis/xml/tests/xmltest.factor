@@ -46,4 +46,4 @@ CONSTANT: base "vocab:xml/tests/xmltest/"
 : failing-valids ( -- tests )
     partition-xml-tests nip [ second first ] map [ type>> "valid" = ] filter ;
 
-[ ] [ partition-xml-tests 2drop ] unit-test
+{ } [ partition-xml-tests 2drop ] unit-test
