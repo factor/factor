@@ -37,7 +37,7 @@ cli-git-num-parallel [ cpus 2 * ] initialize
 : git-diff-name-only ( path from to -- lines )
     '[ _ _ git-diff-name-only* ] with-directory ;
 
-: git-repository? ( directory -- ? )
+: git-directory? ( directory -- ? )
     ".git" append-path current-directory get prepend-path
     ?file-info dup [ directory? ] when ;
 
@@ -47,12 +47,16 @@ cli-git-num-parallel [ cpus 2 * ] initialize
 : git-current-branch ( directory -- name )
     [ git-current-branch* ] with-directory ;
 
-: repository-url>name ( string -- string' )
+: git-directory-name ( string -- string' )
     file-name ".git" ?tail drop ;
 
 : sync-repository ( url -- process )
-    dup repository-url>name git-repository?
-    [ repository-url>name git-pull ] [ git-clone ] if ;
+    dup git-directory-name git-directory?
+    [ git-directory-name git-pull ] [ git-clone ] if ;
+
+: sync-repository-as ( url path -- process )
+    dup git-directory?
+    [ nip git-pull ] [ git-clone-as ] if ;
 
 : sync-repositories ( directory urls -- )
     '[
