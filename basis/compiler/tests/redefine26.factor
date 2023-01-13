@@ -20,7 +20,7 @@ TUPLE: redefine-test-26 { a maybe{ foo } } ;
 [ store-26. a>> ] [ bad-slot-value? ] must-fail-with
 [ store-hoo a>> ] [ bad-slot-value? ] must-fail-with
 
-{ ] [
+{ } [
     [
         \ foo { integer hoo } define-union-class
     ] with-compilation-unit
