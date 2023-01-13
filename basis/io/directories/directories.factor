@@ -245,6 +245,9 @@ M: object copy-file
         bi
     ] [ delete-file ] if ;
 
+: ?delete-tree ( path -- )
+    dup file-exists? [ delete-tree ] [ drop ] if ;
+
 DEFER: copy-trees-into
 
 : copy-tree ( from to -- )
