@@ -22,62 +22,62 @@ M: object fake-float? drop f ;
 
 : my-baked-inline-3 ( a -- b ) { my-mixin } declare fake-float? ;
 
-[ f ] [ 5 my-inline-3 ] unit-test
+{ f } [ 5 my-inline-3 ] unit-test
 
-[ f ] [ 5 my-fake-inline-3 ] unit-test
+{ f } [ 5 my-fake-inline-3 ] unit-test
 
-[ f ] [ 5 my-baked-inline-3 ] unit-test
+{ f } [ 5 my-baked-inline-3 ] unit-test
 
-[ f ] [ 5 my-inline-4 ] unit-test
+{ f } [ 5 my-inline-4 ] unit-test
 
-[ t ] [ 5 my-inline-5 ] unit-test
+{ t } [ 5 my-inline-5 ] unit-test
 
-[ t ] [ 5 my-inline-6 ] unit-test
+{ t } [ 5 my-inline-6 ] unit-test
 
-[ ] [ [ float my-mixin add-mixin-instance ] with-compilation-unit ] unit-test
+{ } [ [ float my-mixin add-mixin-instance ] with-compilation-unit ] unit-test
 
-[ 2.0 ] [ 1.0 my-inline-1 ] unit-test
+{ 2.0 } [ 1.0 my-inline-1 ] unit-test
 
-[ 2.0 ] [ 1.0 my-inline-2 ] unit-test
+{ 2.0 } [ 1.0 my-inline-2 ] unit-test
 
-[ t ] [ 1.0 my-inline-3 ] unit-test
+{ t } [ 1.0 my-inline-3 ] unit-test
 
-[ t ] [ 1.0 my-fake-inline-3 ] unit-test
+{ t } [ 1.0 my-fake-inline-3 ] unit-test
 
-[ t ] [ 1.0 my-baked-inline-3 ] unit-test
+{ t } [ 1.0 my-baked-inline-3 ] unit-test
 
-[ t ] [ 1.0 my-inline-4 ] unit-test
+{ t } [ 1.0 my-inline-4 ] unit-test
 
-[ f ] [ 1.0 my-inline-5 ] unit-test
+{ f } [ 1.0 my-inline-5 ] unit-test
 
-[ f ] [ 1.0 my-inline-6 ] unit-test
+{ f } [ 1.0 my-inline-6 ] unit-test
 
-[ ] [ [ fixnum my-mixin remove-mixin-instance ] with-compilation-unit ] unit-test
+{ } [ [ fixnum my-mixin remove-mixin-instance ] with-compilation-unit ] unit-test
 
-[ f ] [ 5 my-inline-3 ] unit-test
+{ f } [ 5 my-inline-3 ] unit-test
 
-[ f ] [ 5 my-fake-inline-3 ] unit-test
+{ f } [ 5 my-fake-inline-3 ] unit-test
 
-[ f ] [ 5 my-baked-inline-3 ] unit-test
+{ f } [ 5 my-baked-inline-3 ] unit-test
 
-[ f ] [ 5 my-inline-4 ] unit-test
+{ f } [ 5 my-inline-4 ] unit-test
 
-[ f ] [ 5 my-inline-5 ] unit-test
+{ f } [ 5 my-inline-5 ] unit-test
 
-[ f ] [ 5 my-inline-6 ] unit-test
+{ f } [ 5 my-inline-6 ] unit-test
 
-[ ] [ [ float my-mixin remove-mixin-instance ] with-compilation-unit ] unit-test
+{ } [ [ float my-mixin remove-mixin-instance ] with-compilation-unit ] unit-test
 
-[ 1.0 ] [ 1.0 my-inline-1 ] unit-test
+{ 1.0 } [ 1.0 my-inline-1 ] unit-test
 
-[ 1.0 ] [ 1.0 my-inline-2 ] unit-test
+{ 1.0 } [ 1.0 my-inline-2 ] unit-test
 
-[ f ] [ 1.0 my-inline-3 ] unit-test
+{ f } [ 1.0 my-inline-3 ] unit-test
 
-[ f ] [ 1.0 my-fake-inline-3 ] unit-test
+{ f } [ 1.0 my-fake-inline-3 ] unit-test
 
-[ f ] [ 1.0 my-inline-4 ] unit-test
+{ f } [ 1.0 my-inline-4 ] unit-test
 
-[ f ] [ 1.0 my-inline-5 ] unit-test
+{ f } [ 1.0 my-inline-5 ] unit-test
 
-[ f ] [ 1.0 my-inline-6 ] unit-test
+{ f } [ 1.0 my-inline-6 ] unit-test

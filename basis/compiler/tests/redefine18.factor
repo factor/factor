@@ -18,8 +18,8 @@ INSTANCE: d c
 
 M: d g2 drop d ;
 
-[ ] [ "IN: compiler.tests.redefine18 SINGLETON: b INSTANCE: b d" eval( -- ) ] unit-test
+{ } [ "IN: compiler.tests.redefine18 SINGLETON: b INSTANCE: b d" eval( -- ) ] unit-test
 
-[ d ] [ "b" "compiler.tests.redefine18" lookup-word g1 ] unit-test
+{ d } [ "b" "compiler.tests.redefine18" lookup-word g1 ] unit-test
 
-[ ] [ "IN: compiler.tests.redefine18 FORGET: b" eval( -- ) ] unit-test
+{ } [ "IN: compiler.tests.redefine18 FORGET: b" eval( -- ) ] unit-test

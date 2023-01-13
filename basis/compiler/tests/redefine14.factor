@@ -5,4 +5,4 @@ TUPLE: bad ;
 
 M: bad length 1 2 3 ;
 
-[ ] [ [ M\ bad length forget ] with-compilation-unit ] unit-test
+{ } [ [ M\ bad length forget ] with-compilation-unit ] unit-test
