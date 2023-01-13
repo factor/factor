@@ -18,9 +18,9 @@ IN: memcached.tests
 : not-found? ( quot -- )
     [ key-not-found? ] must-fail-with ;
 
-: x ( -- str ) cpu present "-x" append ;
-: y ( -- str ) cpu present "-y" append ;
-: z ( -- str ) cpu present "-z" append ;
+: x ( -- str ) os cpu [ present ] bi@ "-" glue "-x" append ;
+: y ( -- str ) os cpu [ present ] bi@ "-" glue "-y" append ;
+: z ( -- str ) os cpu [ present ] bi@ "-" glue "-z" append ;
 
 PRIVATE>
 
