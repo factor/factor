@@ -3,4 +3,4 @@
 USING: io.standard-paths io.standard-paths.windows sequences
 tools.test ;
 
-[ t ] [ "cmd.exe" find-in-path "cmd.exe" tail? ] unit-test
+{ t } [ "cmd.exe" find-in-path "cmd.exe" tail? ] unit-test

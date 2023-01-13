@@ -24,7 +24,7 @@ C: <B> B
 
 { 1 0 } [ define-box ] must-infer-as
 
-[ T{ float-box f 5.0 } ] [ 5.0 <float-box> ] unit-test
+{ T{ float-box f 5.0 } } [ 5.0 <float-box> ] unit-test
 
 : twice ( word -- )
     [ execute ] [ execute ] bi ; inline
@@ -44,7 +44,7 @@ WHERE
 
 >>
 
-[ 16 ] [ 2 sqsq ] unit-test
+{ 16 } [ 2 sqsq ] unit-test
 
 <<
 
@@ -62,7 +62,7 @@ WHERE
 
 >>
 
-[ 4 ] [ 1 3 blah ] unit-test
+{ 4 } [ 1 3 blah ] unit-test
 
 <<
 
@@ -80,7 +80,7 @@ SYMBOL: W
 
 >>
 
-[ blorgh ] [ blorgh ] unit-test
+{ blorgh } [ blorgh ] unit-test
 
 <<
 
@@ -100,11 +100,11 @@ M: integer W 1 + ;
 
 >>
 
-[ 2   ] [ 1   snurv ] unit-test
-[ 3.0 ] [ 3.0 snurv ] unit-test
+{ 2   } [ 1   snurv ] unit-test
+{ 3.0 } [ 3.0 snurv ] unit-test
 
 ! Does replacing an ordinary word with a functor-generated one work?
-[ [ ] ] [
+{ [ ] } [
     "IN: functors.tests
 
     TUPLE: some-tuple ;
@@ -115,14 +115,14 @@ M: integer W 1 + ;
 ] unit-test
 
 : test-redefinition ( -- )
-    [ t ] [ "some-word" "functors.tests" lookup-word >boolean ] unit-test
-    [ t ] [ "some-tuple" "functors.tests" lookup-word >boolean ] unit-test
-    [ t ] [ "some-generic" "functors.tests" lookup-word >boolean ] unit-test
-    [ t ] [
+    { t } [ "some-word" "functors.tests" lookup-word >boolean ] unit-test
+    { t } [ "some-tuple" "functors.tests" lookup-word >boolean ] unit-test
+    { t } [ "some-generic" "functors.tests" lookup-word >boolean ] unit-test
+    { t } [
         "some-tuple" "functors.tests" lookup-word
         "some-generic" "functors.tests" lookup-word lookup-method >boolean
     ] unit-test ;
-    [ t ] [ "some-symbol" "functors.tests" lookup-word >boolean ] unit-test
+    { t } [ "some-symbol" "functors.tests" lookup-word >boolean ] unit-test
 
 test-redefinition
 
@@ -229,8 +229,8 @@ WHERE
 
 >>
 
-[ t ] [ \ an-inline-word inline? ] unit-test
-[ f ] [ \ an-inline-word-an-inline-word inline? ] unit-test
+{ t } [ \ an-inline-word inline? ] unit-test
+{ f } [ \ an-inline-word-an-inline-word inline? ] unit-test
 
 <<
 
@@ -251,4 +251,4 @@ TUPLE: T ; final
 
 >>
 
-[ t ] [ a-final-tuple final-class? ] unit-test
+{ t } [ a-final-tuple final-class? ] unit-test

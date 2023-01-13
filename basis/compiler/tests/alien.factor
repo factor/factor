@@ -39,28 +39,28 @@ IN: compiler.tests.alien
 LIBRARY: f-cdecl
 
 FUNCTION: void ffi_test_0 ( )
-[ ] [ ffi_test_0 ] unit-test
+{ } [ ffi_test_0 ] unit-test
 
 FUNCTION: int ffi_test_1 ( )
-[ 3 ] [ ffi_test_1 ] unit-test
+{ 3 } [ ffi_test_1 ] unit-test
 
-[ ] [ \ ffi_test_1 def>> [ drop ] append compile-call ] unit-test
+{ } [ \ ffi_test_1 def>> [ drop ] append compile-call ] unit-test
 
 FUNCTION: int ffi_test_2 ( int x, int y )
-[ 5 ] [ 2 3 ffi_test_2 ] unit-test
+{ 5 } [ 2 3 ffi_test_2 ] unit-test
 [ "hi" 3 ffi_test_2 ] must-fail
 
 FUNCTION: int ffi_test_3 ( int x, int y, int z, int t )
-[ 25 ] [ 2 3 4 5 ffi_test_3 ] unit-test
+{ 25 } [ 2 3 4 5 ffi_test_3 ] unit-test
 
 FUNCTION: float ffi_test_4 ( )
-[ 1.5 ] [ ffi_test_4 ] unit-test
+{ 1.5 } [ ffi_test_4 ] unit-test
 
 FUNCTION: double ffi_test_5 ( )
-[ 1.5 ] [ ffi_test_5 ] unit-test
+{ 1.5 } [ ffi_test_5 ] unit-test
 
 FUNCTION: int ffi_test_9 ( int a, int b, int c, int d, int e, int f, int g )
-[ 28 ] [ 1 2 3 4 5 6 7 ffi_test_9 ] unit-test
+{ 28 } [ 1 2 3 4 5 6 7 ffi_test_9 ] unit-test
 [ "a" 2 3 4 5 6 7 ffi_test_9 ] must-fail
 [ 1 2 3 4 5 6 "a" ffi_test_9 ] must-fail
 
@@ -71,27 +71,27 @@ STRUCT: FOO { x int } { y int } ;
 
 FUNCTION: int ffi_test_11 ( int a, FOO b, int c )
 
-[ 14 ] [ 1 2 3 make-FOO 4 ffi_test_11 ] unit-test
+{ 14 } [ 1 2 3 make-FOO 4 ffi_test_11 ] unit-test
 
 FUNCTION: int ffi_test_13 ( int a, int b, int c, int d, int e, int f, int g, int h, int i, int j, int k )
 
-[ 66 ] [ 1 2 3 4 5 6 7 8 9 10 11 ffi_test_13 ] unit-test
+{ 66 } [ 1 2 3 4 5 6 7 8 9 10 11 ffi_test_13 ] unit-test
 
 FUNCTION: FOO ffi_test_14 ( int x, int y )
 
-[ 11 6 ] [ 11 6 ffi_test_14 [ x>> ] [ y>> ] bi ] unit-test
+{ 11 6 } [ 11 6 ffi_test_14 [ x>> ] [ y>> ] bi ] unit-test
 
 FUNCTION: c-string ffi_test_15 ( c-string x, c-string y )
 
-[ "foo" ] [ "xy" "zt" ffi_test_15 ] unit-test
-[ "bar" ] [ "xy" "xy" ffi_test_15 ] unit-test
+{ "foo" } [ "xy" "zt" ffi_test_15 ] unit-test
+{ "bar" } [ "xy" "xy" ffi_test_15 ] unit-test
 [ 1 2 ffi_test_15 ] must-fail
 
 STRUCT: BAR { x long } { y long } { z long } ;
 
 FUNCTION: BAR ffi_test_16 ( long x, long y, long z )
 
-[ 11 6 -7 ] [
+{ 11 6 -7 } [
     11 6 -7 ffi_test_16 [ x>> ] [ y>> ] [ z>> ] tri
 ] unit-test
 
@@ -99,7 +99,7 @@ STRUCT: TINY { x int } ;
 
 FUNCTION: TINY ffi_test_17 ( int x )
 
-[ 11 ] [ 11 ffi_test_17 x>> ] unit-test
+{ 11 } [ 11 ffi_test_17 x>> ] unit-test
 
 [ [ alien-indirect ] infer ] [ inference-error? ] must-fail-with
 
@@ -108,14 +108,14 @@ FUNCTION: TINY ffi_test_17 ( int x )
 
 { 1 1 } [ indirect-test-1 ] must-infer-as
 
-[ 3 ] [ &: ffi_test_1 indirect-test-1 ] unit-test
+{ 3 } [ &: ffi_test_1 indirect-test-1 ] unit-test
 
 : indirect-test-1' ( ptr -- )
     int { } cdecl alien-indirect drop ;
 
 { 1 0 } [ indirect-test-1' ] must-infer-as
 
-[ ] [ &: ffi_test_1 indirect-test-1' ] unit-test
+{ } [ &: ffi_test_1 indirect-test-1' ] unit-test
 
 [ -1 indirect-test-1 ] must-fail
 
@@ -124,28 +124,26 @@ FUNCTION: TINY ffi_test_17 ( int x )
 
 { 3 1 } [ indirect-test-2 ] must-infer-as
 
-[ 5 ]
-[ 2 3 &: ffi_test_2 indirect-test-2 ]
-unit-test
+{ 5 } [ 2 3 &: ffi_test_2 indirect-test-2 ] unit-test
 
 : indirect-test-3 ( a b c d ptr -- result )
     int { int int int int } stdcall alien-indirect
     gc ;
 
-[ f ] [ "f-stdcall" library-dll f = ] unit-test
-[ stdcall ] [ "f-stdcall" lookup-library abi>> ] unit-test
+{ f } [ "f-stdcall" library-dll f = ] unit-test
+{ stdcall } [ "f-stdcall" lookup-library abi>> ] unit-test
 
 : ffi_test_18 ( w x y z -- int )
     int "f-stdcall" "ffi_test_18" { int int int int } f
     alien-invoke gc ;
 
-[ 25 ] [ 2 3 4 5 ffi_test_18 ] unit-test
+{ 25 } [ 2 3 4 5 ffi_test_18 ] unit-test
 
 : ffi_test_19 ( x y z -- BAR )
     BAR "f-stdcall" "ffi_test_19" { long long long } f
     alien-invoke gc ;
 
-[ 11 6 -7 ] [
+{ 11 6 -7 } [
     11 6 -7 ffi_test_19 [ x>> ] [ y>> ] [ z>> ] tri
 ] unit-test
 
@@ -155,26 +153,26 @@ unit-test
     int "f-stdcall" "ffi_test_18" { int int int int } f alien-invoke
     gc ;
 
-[ 25 85 ] [ 2 3 4 5 6 7 8 9 multi_ffi_test_18 ] unit-test
+{ 25 85 } [ 2 3 4 5 6 7 8 9 multi_ffi_test_18 ] unit-test
 
 FUNCTION: double ffi_test_6 ( float x, float y )
-[ 6.0 ] [ 3.0 2.0 ffi_test_6 ] unit-test
+{ 6.0 } [ 3.0 2.0 ffi_test_6 ] unit-test
 [ "a" "b" ffi_test_6 ] must-fail
 
 FUNCTION: double ffi_test_7 ( double x, double y )
-[ 6.0 ] [ 3.0 2.0 ffi_test_7 ] unit-test
+{ 6.0 } [ 3.0 2.0 ffi_test_7 ] unit-test
 
 FUNCTION: double ffi_test_8 ( double x, float y, double z, float t, int w )
-[ 19.0 ] [ 3.0 2.0 1.0 6.0 7 ffi_test_8 ] unit-test
+{ 19.0 } [ 3.0 2.0 1.0 6.0 7 ffi_test_8 ] unit-test
 
 FUNCTION: int ffi_test_10 ( int a, int b, double c, int d, float e, int f, int g, int h )
-[ -34 ] [ 1 2 3.0 4 5.0 6 7 8 ffi_test_10 ] unit-test
+{ -34 } [ 1 2 3.0 4 5.0 6 7 8 ffi_test_10 ] unit-test
 
 FUNCTION: void ffi_test_20 ( double x1, double x2, double x3,
     double y1, double y2, double y3,
     double z1, double z2, double z3 )
 
-[ ] [ 1.0 2.0 3.0 4.0 5.0 6.0 7.0 8.0 9.0 ffi_test_20 ] unit-test
+{ } [ 1.0 2.0 3.0 4.0 5.0 6.0 7.0 8.0 9.0 ffi_test_20 ] unit-test
 
 ! Make sure XT doesn't get clobbered in stack frame
 
@@ -184,7 +182,7 @@ FUNCTION: void ffi_test_20 ( double x1, double x2, double x3,
     { int int int int int int int int int int int int int int int int int int int int int int int int int int int int int int int int int int int int int int int int int int } f
     alien-invoke gc 3 ;
 
-[ 861 3 ] [ 42 [ ] each-integer ffi_test_31 ] unit-test
+{ 861 3 } [ 42 [ ] each-integer ffi_test_31 ] unit-test
 
 : ffi_test_31_point_5 ( a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a -- result )
     float
@@ -192,17 +190,15 @@ FUNCTION: void ffi_test_20 ( double x1, double x2, double x3,
     { float float float float float float float float float float float float float float float float float float float float float float float float float float float float float float float float float float float float float float float float float float } f
     alien-invoke ;
 
-[ 861.0 ] [ 42 [ >float ] each-integer ffi_test_31_point_5 ] unit-test
+{ 861.0 } [ 42 [ >float ] each-integer ffi_test_31_point_5 ] unit-test
 
 FUNCTION: longlong ffi_test_21 ( long x, long y )
 
-[ 121932631112635269 ]
-[ 123456789 987654321 ffi_test_21 ] unit-test
+{ 121932631112635269 } [ 123456789 987654321 ffi_test_21 ] unit-test
 
 FUNCTION: long ffi_test_22 ( long x, longlong y, longlong z )
 
-[ 987655432 ]
-[ 1111 121932631112635269 123456789 ffi_test_22 ] unit-test
+{ 987655432 } [ 1111 121932631112635269 123456789 ffi_test_22 ] unit-test
 
 [ 1111 f 123456789 ffi_test_22 ] must-fail
 
@@ -219,13 +215,13 @@ STRUCT: RECT
 
 FUNCTION: int ffi_test_12 ( int a, int b, RECT c, int d, int e, int f )
 
-[ 45 ] [ 1 2 3.0 4.0 5.0 6.0 <RECT> 7 8 9 ffi_test_12 ] unit-test
+{ 45 } [ 1 2 3.0 4.0 5.0 6.0 <RECT> 7 8 9 ffi_test_12 ] unit-test
 
 [ 1 2 { 1 2 3 } 7 8 9 ffi_test_12 ] must-fail
 
 FUNCTION: float ffi_test_23 ( float[3] x, float[3] y )
 
-[ 32.0 ] [
+{ 32.0 } [
     { 1.0 2.0 3.0 } float >c-array
     { 4.0 5.0 6.0 } float >c-array
     ffi_test_23
@@ -236,7 +232,7 @@ STRUCT: test-struct-1 { x char[1] } ;
 
 FUNCTION: test-struct-1 ffi_test_24 ( )
 
-[ S{ test-struct-1 { x char-array{ 1 } } } ] [ ffi_test_24 ] unit-test
+{ S{ test-struct-1 { x char-array{ 1 } } } } [ ffi_test_24 ] unit-test
 
 STRUCT: test-struct-2 { x char[2] } ;
 

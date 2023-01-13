@@ -43,7 +43,7 @@ METHOD: hook-test { hashtable { some-var number } } assoc-size ;
 
 { 1 2 3 } some-var set
 { { f t t } } [ { t t f } hook-test ] unit-test
-[ fixnum ] [ 3 hook-test ] unit-test
+{ fixnum } [ 3 hook-test ] unit-test
 5.0 some-var set
 { 0 } [ H{ } hook-test ] unit-test
 
