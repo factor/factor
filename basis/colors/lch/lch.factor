@@ -10,7 +10,7 @@ TUPLE: LCHuv l c h alpha ;
 
 C: <LCHuv> LCHuv
 
-INSTANCE: LCHuv collor
+INSTANCE: LCHuv color
 
 M: LCHuv >rgba >luva >rgba ;
 
