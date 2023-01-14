@@ -1,7 +1,7 @@
 ! Copyright (C) 2023 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: build-from-source io.directories io.encodings.utf8
-io.files io.launcher multiline ;
+io.files io.launcher kernel multiline ;
 IN: build-from-source.windows
 
 ! From `choco install -y nasm`
@@ -25,7 +25,6 @@ IN: build-from-source.windows
         check-nmake
         { "perl" "Configure" "VC-WIN64A" } try-process  ! "VC-WIN32"
         { "nmake" } try-process
-
         { "openssl/apps/libssl-3-x64.dll" "openssl/apps/libcrypto-3-x64.dll" } copy-output-files
     ] with-updated-git-repo ;
 
@@ -52,6 +51,18 @@ IN: build-from-source.windows
         "Release/libpq/libpq.dll" copy-output-file
     ] with-updated-git-repo ;
 
+! choco install -y glfw3
+: build-raylib-dll ( -- )
+    "https://github.com/raysan5/raylib.git" [
+        [
+            check-cmake
+            check-msbuild
+            { "cmake" "-DCMAKE_BUILD_TYPE=Release" "-DBUILD_SHARED_LIBS=ON" "-DBUILD_EXAMPLES=OFF" "-DUSE_EXTERNAL_GLFW=OFF" ".." } try-process
+            { "msbuild" "raylib.sln" "/m" } try-process
+            "Debug/raylib.dll" copy-output-file
+        ] with-build-directory
+    ] with-updated-git-repo ;
+
 : build-sqlite3-dll ( -- )
     "https://github.com/sqlite/sqlite.git" [
         check-nmake
@@ -63,7 +74,6 @@ IN: build-from-source.windows
 : build-yaml-dll ( -- )
     "https://github.com/yaml/libyaml.git" [
         [
-            current-directory get ...
             { "cmake" "-DBUILD_SHARED_LIBS=ON" ".." } try-process
             { "msbuild" "yaml.sln" } try-process
             "Debug/yaml.dll" copy-output-file
@@ -83,4 +93,5 @@ IN: build-from-source.windows
     build-openssl-64-dlls
     build-postgres-dll
     build-sqlite3-dll
+    build-yaml-dll
     build-zlib-dll ;
