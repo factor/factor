@@ -1,12 +1,11 @@
 ! Copyright (C) 2021 John Benediktsson
 ! See http://factorcode.org/license.txt for BSD license
 
-USING: accessors arrays assocs combinators
-combinators.short-circuit command-loop formatting gemini
-gemini.private io io.directories io.encodings.string
-io.encodings.utf8 io.files io.files.temp io.launcher io.pipes
-kernel math math.parser namespaces present sequences splitting
-system urls webbrowser ;
+USING: accessors arrays combinators.short-circuit command-loop
+environment formatting gemini gemini.private io io.directories
+io.encodings.string io.encodings.utf8 io.files io.files.temp
+io.launcher io.pipes kernel math math.parser namespaces present
+sequences splitting system urls webbrowser ;
 
 IN: gemini.cli
 
@@ -125,7 +124,8 @@ CONSTANT: URL V{ }
 
 : gemini-less ( -- )
     "gemini.txt" temp-file dup file-exists? [
-        "less" swap 2array try-process
+        [ "PAGER" os-env [ "less" ] unless* ]
+        [ "\"" dup surround " " glue try-process ] bi*
     ] [ drop ] if ;
 
  : gemini-ls ( args -- )
