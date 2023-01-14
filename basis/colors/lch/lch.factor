@@ -10,6 +10,8 @@ TUPLE: LCHuv l c h alpha ;
 
 C: <LCHuv> LCHuv
 
+INSTANCE: LCHuv collor
+
 M: LCHuv >rgba >luva >rgba ;
 
 M: LCHuv >xyza >luva >xyza ;
@@ -49,6 +51,8 @@ M: luva >LCHuv
 TUPLE: LCHab l c h alpha ;
 
 C: <LCHab> LCHab
+
+INSTANCE: LCHab color
 
 M: LCHab >rgba >laba >rgba ;
 

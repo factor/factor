@@ -10,6 +10,8 @@ TUPLE: xyza x y z alpha ;
 
 C: <xyza> xyza
 
+INSTANCE: xyza color
+
 <PRIVATE
 
 CONSTANT: xyz_epsilon 216/24389

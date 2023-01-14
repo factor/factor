@@ -9,6 +9,8 @@ TUPLE: xyYa x y Y alpha ;
 
 C: <xyYa> xyYa
 
+INSTANCE: xyYa color
+
 M: xyYa >rgba
     >xyza >rgba ;
 
