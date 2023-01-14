@@ -60,6 +60,16 @@ IN: build-from-source.windows
         "sqlite3.dll" copy-output-file
     ] with-updated-git-repo ;
 
+: build-yaml-dll ( -- )
+    "https://github.com/yaml/libyaml.git" [
+        [
+            current-directory get ...
+            { "cmake" "-DBUILD_SHARED_LIBS=ON" ".." } try-process
+            { "msbuild" "yaml.sln" } try-process
+            "Debug/yaml.dll" copy-output-file
+        ] with-build-directory
+    ] with-updated-git-repo ;
+
 : build-zlib-dll ( -- )
     "https://github.com/madler/zlib" [
         check-nmake

@@ -15,6 +15,10 @@ IN: build-from-source
 : prepend-current-path ( path -- path' )
     current-directory get prepend-path ;
 
+: copy-output-file-as ( name new-name -- )
+    [ prepend-current-path ]
+    [ dll-out-directory prepend-path ] bi* copy-file ;
+
 : copy-output-file ( name -- )
     prepend-current-path dll-out-directory copy-file-into ;
 
