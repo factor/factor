@@ -10,6 +10,8 @@ TUPLE: luva l u v alpha ;
 
 C: <luva> luva
 
+INSTANCE: luva color
+
 <PRIVATE
 
 :: xyz-to-uv ( x y z -- u v )

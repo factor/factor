@@ -10,6 +10,8 @@ TUPLE: laba l a b alpha ;
 
 C: <laba> laba
 
+INSTANCE: laba color
+
 M: laba >rgba >xyza >rgba ;
 
 M: laba >xyza
