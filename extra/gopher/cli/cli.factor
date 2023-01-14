@@ -1,11 +1,10 @@
 ! Copyright (C) 2021 John Benediktsson
 ! See http://factorcode.org/license.txt for BSD license
 
-USING: accessors arrays assocs combinators
-combinators.short-circuit command-loop formatting gopher
-gopher.private io io.directories io.encodings.string
+USING: accessors arrays combinators.short-circuit command-loop
+environment formatting gopher gopher.private io io.directories
 io.encodings.utf8 io.files io.files.temp io.launcher io.pipes
-kernel math math.parser namespaces present sequences splitting
+kernel literals math math.parser present sequences splitting
 system urls webbrowser ;
 
 IN: gopher.cli
@@ -75,9 +74,6 @@ CONSTANT: URL V{ }
 : gopher-history ( -- )
     HISTORY t print-links ;
 
-USE: literals
-USE: prettyprint
-
 : gopher-print ( item-type body -- )
     PAGE delete-all
     gopher-text swap ${ A_MENU A_INDEX } member?
@@ -126,7 +122,8 @@ USE: prettyprint
 
 : gopher-less ( -- )
     "gopher.txt" temp-file dup file-exists? [
-        "less" swap 2array try-process
+        [ "PAGER" os-env [ "less" ] unless* ]
+        [ "\"" dup surround " " glue try-process ] bi*
     ] [ drop ] if ;
 
  : gopher-ls ( args -- )
