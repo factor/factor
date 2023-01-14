@@ -63,6 +63,15 @@ IN: build-from-source.windows
         ] with-build-directory
     ] with-updated-git-repo ;
 
+: build-snappy-dll ( -- )
+    "https://github.com/google/snappy.git" [
+        [
+            { "cmake" "-DCMAKE_BUILD_TYPE=Release" "-DBUILD_SHARED_LIBS=ON" "-DSNAPPY_BUILD_TESTS=OFF" "-DSNAPPY_BUILD_BENCHMARKS=OFF" ".." } try-process
+            { "msbuild" "Snappy.sln" "/m" } try-process
+            "Debug/snappy.dll" copy-output-file
+        ] with-build-directory
+    ] with-updated-git-repo ;
+
 : build-sqlite3-dll ( -- )
     "https://github.com/sqlite/sqlite.git" [
         check-nmake
