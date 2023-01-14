@@ -1,6 +1,7 @@
 ! Copyright (C) 2023 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: build-from-source io.directories io.launcher multiline ;
+USING: build-from-source io.directories io.encodings.utf8
+io.files io.launcher multiline ;
 IN: build-from-source.windows
 
 ! From `choco install -y nasm`
@@ -39,6 +40,18 @@ IN: build-from-source.windows
         ] with-build-directory
     ] with-updated-git-repo ;
 
+! choco install -y meson winflexbison3
+! win_flex.exe and win_bison.exe are copied in and renamed for postgres
+: build-postgres-dll ( -- )
+    "https://github.com/postgres/postgres" [
+        "src/tools/msvc/clean.bat" prepend-current-path try-process
+        [[ c:\ProgramData\chocolatey\bin\win_flex.exe]] "src/tools/msvc/flex.exe" prepend-current-path copy-file
+        [[ c:\ProgramData\chocolatey\bin\win_bison.exe]] "src/tools/msvc/bison.exe" prepend-current-path copy-file
+        [[ $ENV{MSBFLAGS}="/m";]] "src/tools/msvc/buildenv.pl" prepend-current-path utf8 set-file-contents
+        "src/tools/msvc/build.bat" prepend-current-path try-process
+        "Release/libpq/libpq.dll" copy-output-file
+    ] with-updated-git-repo ;
+
 : build-sqlite3-dll ( -- )
     "https://github.com/sqlite/sqlite.git" [
         check-nmake
@@ -58,5 +71,6 @@ IN: build-from-source.windows
 : build-windows-dlls ( -- )
     dll-out-directory remake-directory
     build-openssl-64-dlls
+    build-postgres-dll
     build-sqlite3-dll
     build-zlib-dll ;
