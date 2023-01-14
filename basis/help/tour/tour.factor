@@ -501,9 +501,9 @@ object to decide how to respond to this message, and the caller should not know 
 one can send the message { $link map } both to an array and a linked list, but internally the iteration will be handled 
 differently.
 
-The binding of the message name to the method implementation is dynamic, and this is regarded as the core strenght of 
-objects. As a result, fairly complex systems can evolve from the cooperation of independent objects who do not mess with 
-each other internals.
+The binding of the message name to the method implementation is dynamic, and this is regarded as the core strength of 
+objects. As a result, fairly complex systems can evolve from the cooperation of independent objects that do not mess with 
+each other's internals.
 
 To be fair, Factor is very different from Smalltalk, but still there is the concept of classes, and generic words can 
 defined having different implementations on different classes.
