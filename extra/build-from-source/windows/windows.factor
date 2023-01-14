@@ -7,7 +7,7 @@ IN: build-from-source.windows
 
 ! From `choco install -y nasm`
 ! Add nasm to path (windows+r sysdm.cpl -> Advanced tab -> Environment Variables -> New -> "c:\Program Files\NASM")
-: check-nasm ( -- ) { [[ C:\Program Files\NASM\nasm.exe]] } try-process ;
+: check-nasm ( -- ) { "nasm.exe" "-h" } try-process ;
 
 ! From `choco install -y StrawberryPerl`
 ! make sure it is above the git /usr/bin/perl (if that is installed)
@@ -22,9 +22,10 @@ IN: build-from-source.windows
 : build-openssl-64-dlls ( -- )
     "https://github.com/openssl/openssl.git" [
         check-perl
+        program-files "NASM/nasm.exe" append-path "nasm.exe" prepend-current-path copy-file
         check-nasm
         check-nmake
-        { "perl" "Configure" "VC-WIN64A" } try-process  ! "VC-WIN32"
+        { "perl" "Configure" "VC-WIN64A" } try-process ! "VC-WIN32"
         { "nmake" } try-process
         { "openssl/apps/libssl-3-x64.dll" "openssl/apps/libcrypto-3-x64.dll" } copy-output-files
     ] with-updated-git-repo ;
@@ -109,6 +110,8 @@ IN: build-from-source.windows
     dll-out-directory remake-directory
     build-openssl-64-dlls
     build-postgres-dll
+    build-raylib-dll
+    build-snappy-dll
     build-sqlite3-dll
     build-yaml-dll
     build-zlib-dll ;
