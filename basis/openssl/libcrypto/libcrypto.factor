@@ -6,7 +6,7 @@ alien.syntax classes.struct combinators system ;
 IN: openssl.libcrypto
 
 << "libcrypto" {
-    { [ os windows? ] [ "libcrypto-3-x64.dll" ] }
+    { [ os windows? ] [ "libcrypto-37.dll" ] }
     { [ os macosx? ] [ "libcrypto.35.dylib" ] }
     { [ os unix? ] [ "libcrypto.so" ] }
 } cond cdecl add-library >>
