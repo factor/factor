@@ -59,7 +59,7 @@ IN: build-from-source.windows
             check-msbuild
             { "cmake" "-DCMAKE_BUILD_TYPE=Release" "-DBUILD_SHARED_LIBS=ON" "-DBUILD_EXAMPLES=OFF" "-DUSE_EXTERNAL_GLFW=OFF" ".." } try-process
             { "msbuild" "raylib.sln" "/m" } try-process
-            "Debug/raylib.dll" copy-output-file
+            "raylib/Debug/raylib.dll" copy-output-file
         ] with-build-directory
     ] with-updated-git-repo ;
 
