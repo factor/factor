@@ -1,7 +1,8 @@
 ! Copyright (C) 2023 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: build-from-source io.directories io.encodings.utf8
-io.files io.launcher kernel multiline ;
+USING: build-from-source http.client io.directories
+io.encodings.utf8 io.files io.files.temp io.launcher kernel
+multiline ;
 IN: build-from-source.windows
 
 ! From `choco install -y nasm`
@@ -96,6 +97,13 @@ IN: build-from-source.windows
         { "nmake" "/f" "win32/Makefile.msc" } try-process
         "zlib1.dll" copy-output-file
     ] with-updated-git-repo ;
+
+! Probably not needed on Windows 10+
+: install-windows-redistributable ( -- )
+    [
+        "https://aka.ms/vs/17/release/vc_redist.x64.exe" download
+        { "vc_redist.x64.exe" "/install" "/passive" "/norestart" } try-process
+    ] with-temp-directory ;
 
 : build-windows-dlls ( -- )
     dll-out-directory remake-directory
