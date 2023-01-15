@@ -1,9 +1,9 @@
 ! Copyright (C) 2023 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors build-from-source environment html.parser
-html.parser.analyzer http.client io.directories
+html.parser.analyzer http.client io.backend io.directories
 io.encodings.utf8 io.files io.files.temp io.launcher
-io.pathnames kernel multiline sequences sorting.human
+io.pathnames kernel multiline qw sequences sorting.human
 sorting.slots windows.shell32 ;
 IN: build-from-source.windows
 
@@ -94,7 +94,7 @@ IN: build-from-source.windows
 : build-postgres-dll ( -- )
     "https://github.com/postgres/postgres" [
         "src/tools/msvc/clean.bat" prepend-current-path try-process
-        { "meson" "setup" "build2" } try-process
+        qw{ meson setup build2 } try-process
         "build2" prepend-current-path
         [ { "ninja" } try-process ] with-directory
         "build2/src/interfaces/libpq/libpq.dll" copy-output-file
@@ -129,8 +129,9 @@ IN: build-from-source.windows
 : build-yaml-dll ( -- )
     "https://github.com/yaml/libyaml.git" [
         [
-            { "cmake" "-DBUILD_SHARED_LIBS=ON" ".." } try-process
-            { "msbuild" "yaml.sln" "/property:Configuration=Release" } try-process
+            qw{ cmake -DBUILD_SHARED_LIBS=ON .. } try-process
+            qw{ msbuild yaml.sln /property:Configuration=Release } try-process
+
             "Release/yaml.dll" copy-output-file
         ] with-build-directory
     ] with-updated-git-repo ;
@@ -138,8 +139,8 @@ IN: build-from-source.windows
 : build-zeromq ( -- )
     "https://github.com/zeromq/libzmq.git" [
         [
-            { "cmake" "-DBUILD_SHARED_LIBS=ON" ".." } try-process
-            { "msbuild" "ZeroMQ.sln" "/property:Configuration=Release" } try-process
+            qw{ cmake -DBUILD_SHARED_LIBS=ON .. } try-process
+            qw{ msbuild ZeroMQ.sln /property:Configuration=Release } try-process
             "bin/Release" find-dlls first "libzmq.dll" copy-output-file-as
         ] with-build-directory
     ] with-updated-git-repo ;
@@ -151,11 +152,43 @@ IN: build-from-source.windows
         "zlib1.dll" copy-output-file
     ] with-updated-git-repo ;
 
+: build-lz4 ( -- )
+    "https://github.com/lz4/lz4.git" [
+        "build/cmake" [
+            [
+                qw{ cmake -DBUILD_SHARED_LIBS=ON .. } try-process
+                qw{ msbuild LZ4.sln /property:Configuration=Release } try-process
+                "Release/lz4.dll" copy-output-file
+            ] with-build-directory
+        ] with-directory
+    ] with-updated-git-repo ;
+
+: build-zstd-dll ( -- )
+    "https://github.com/facebook/zstd.git" [
+        qw{
+            meson setup
+            --buildtype=debugoptimized
+            -Db_lundef=false
+            -Dauto_features=enabled
+            -Dbin_programs=true
+            -Dbin_tests=true
+            -Dbin_contrib=true
+            -Ddefault_library=both
+            -Dlz4=disabled
+            build/meson builddir
+        } try-process
+        "builddir" prepend-current-path
+        [
+            { "ninja" } try-process
+            "lib/zstd-1.dll" "libzstd.dll" copy-output-file-as
+        ] with-directory
+    ] with-updated-git-repo ;
+
 ! Probably not needed on Windows 10+
 : install-windows-redistributable ( -- )
     [
         "https://aka.ms/vs/17/release/vc_redist.x64.exe" download
-        { "vc_redist.x64.exe" "/install" "/passive" "/norestart" } try-process
+        qw{ vc_redist.x64.exe /install /passive /norestart } try-process
     ] with-temp-directory ;
 
 : build-windows-dlls ( -- )
