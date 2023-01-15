@@ -4,8 +4,8 @@
 USING: accessors arrays combinators.short-circuit command-loop
 environment formatting gopher gopher.private io io.directories
 io.encodings.utf8 io.files io.files.temp io.launcher io.pipes
-kernel literals math math.parser present sequences splitting
-system urls webbrowser ;
+kernel literals math math.parser namespaces present sequences
+splitting system urls webbrowser ;
 
 IN: gopher.cli
 
@@ -122,8 +122,12 @@ CONSTANT: URL V{ }
 
 : gopher-less ( -- )
     "gopher.txt" temp-file dup file-exists? [
-        [ "PAGER" os-env [ "less" ] unless* ]
-        [ "\"" dup surround " " glue try-process ] bi*
+        utf8 [
+            <process>
+                "PAGER" os-env [ "less" ] unless* >>command
+                input-stream get >>stdin
+            try-process
+        ] with-file-reader
     ] [ drop ] if ;
 
  : gopher-ls ( args -- )
