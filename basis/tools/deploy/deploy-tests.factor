@@ -7,6 +7,8 @@ io.directories splitting tools.deploy tools.deploy.test vocabs ;
 
 IN: tools.deploy.tests
 
+os windows? [
+
 ! Delete all cached staging images in case syntax or
 ! other core vocabularies have changed and staging
 ! images are stale.
@@ -180,3 +182,5 @@ os macosx? [
 { } [ "benchmark.ui-panes" shake-and-bake run-temp-image ] long-unit-test
 
 { } [ "tools.deploy.test.23" shake-and-bake ] long-unit-test
+
+] unless
