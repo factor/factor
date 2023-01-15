@@ -28,7 +28,7 @@ IN: build-from-source.windows
         check-nmake
         { "perl" "Configure" "VC-WIN64A" } try-process ! "VC-WIN32"
         { "nmake" } try-process
-        { "openssl/apps/libssl-3-x64.dll" "openssl/apps/libcrypto-3-x64.dll" } copy-output-files
+        { "apps/libssl-3-x64.dll" "apps/libcrypto-3-x64.dll" } copy-output-files
     ] with-updated-git-repo ;
 
 : latest-pcre-tar-gz ( -- path )
