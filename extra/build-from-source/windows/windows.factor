@@ -1,6 +1,6 @@
 ! Copyright (C) 2023 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors build-from-source html.parser
+USING: accessors build-from-source environment html.parser
 html.parser.analyzer http.client io.directories
 io.encodings.utf8 io.files io.files.temp io.launcher
 io.pathnames kernel multiline sequences windows.shell32 ;
@@ -19,6 +19,16 @@ IN: build-from-source.windows
 : check-nmake ( -- ) { "nmake" "/?" } try-process ;
 : check-cmake ( -- ) { "cmake" "-h" } try-process ;
 : check-msbuild ( -- ) { "msbuild" "-h" } try-process ;
+
+: build-winflexbison ( -- )
+    "https://github.com/lexxmark/winflexbison.git" [
+        [
+            { "cmake" ".." } try-process
+            { "cmake" "--build" "." "--config" "Release" "--target" "package" } try-process
+        ] with-build-directory
+        "bin/Release/win_bison.exe" "bison.exe" copy-vm-file-as
+        "bin/Release/win_flex.exe" "flex.exe" copy-vm-file-as
+    ] with-updated-git-repo ;
 
 : build-openssl-64-dlls ( -- )
     "https://github.com/openssl/openssl.git" [
@@ -40,48 +50,40 @@ IN: build-from-source.windows
     ] keep prepend ;
 
 : build-pcre-dll ( -- )
-    check-cmake
-    check-msbuild
     latest-pcre-tar-gz [
         [
             { "cmake" "-DCMAKE_BUILD_TYPE=Release" "-DBUILD_SHARED_LIBS=ON" "-DPCRE_SUPPORT_UTF=ON" "-DPCRE_SUPPORT_UNICODE_PROPERTIES=ON" ".." } try-process
-            { "msbuild" "PCRE.sln" "/m" } try-process
-            "Debug/pcred.dll" copy-output-file
+            { "msbuild" "PCRE.sln" "/m" "/property:Configuration=Release" } try-process
+            "Release/pcre.dll" copy-output-file
         ] with-build-directory
     ] with-tar-gz ;
 
 : build-pcre2-dll ( -- )
     "https://github.com/PCRE2Project/pcre2.git" [
         [
-            check-cmake
-            check-msbuild
             { "cmake" "-DCMAKE_BUILD_TYPE=Release" "-DBUILD_SHARED_LIBS=ON" "-DPCRE_SUPPORT_UTF=ON" "-DPCRE_SUPPORT_UNICODE_PROPERTIES=ON" ".." } try-process
-            { "msbuild" "PCRE2.sln" "/m" } try-process
-            { "Debug/pcre2-8d.dll" "Debug/pcre2-posixd.dll" } copy-output-files
+            { "msbuild" "PCRE2.sln" "/m" "/property:Configuration=Release" } try-process
+            { "Release/pcre2-8.dll" "Release/pcre2-posix.dll" } copy-output-files
         ] with-build-directory
     ] with-updated-git-repo ;
 
-! choco install -y winflexbison3
-! win_flex.exe and win_bison.exe are copied in and renamed for postgres
+! choco install -y meson winflexbison3
 : build-postgres-dll ( -- )
     "https://github.com/postgres/postgres" [
         "src/tools/msvc/clean.bat" prepend-current-path try-process
-        [[ c:\ProgramData\chocolatey\bin\win_flex.exe]] "src/tools/msvc/flex.exe" prepend-current-path copy-file
-        [[ c:\ProgramData\chocolatey\bin\win_bison.exe]] "src/tools/msvc/bison.exe" prepend-current-path copy-file
-        [[ $ENV{MSBFLAGS}="/m";]] "src/tools/msvc/buildenv.bat" prepend-current-path utf8 set-file-contents
-        "src/tools/msvc/build.bat" prepend-current-path try-process
-        "Release/libpq/libpq.dll" copy-output-file
+        { "meson" "setup" "build2" } try-process
+        "build2" prepend-current-path
+        [ { "ninja" } try-process ] with-directory
+        "build2/src/interfaces/libpq/libpq.dll" copy-output-file
     ] with-updated-git-repo ;
 
 ! choco install -y glfw3
 : build-raylib-dll ( -- )
     "https://github.com/raysan5/raylib.git" [
         [
-            check-cmake
-            check-msbuild
             { "cmake" "-DCMAKE_BUILD_TYPE=Release" "-DBUILD_SHARED_LIBS=ON" "-DBUILD_EXAMPLES=OFF" "-DUSE_EXTERNAL_GLFW=OFF" ".." } try-process
-            { "msbuild" "raylib.sln" "/m" } try-process
-            "raylib/Debug/raylib.dll" copy-output-file
+            { "msbuild" "raylib.sln" "/m" "/property:Configuration=Release" } try-process
+            "raylib/Release/raylib.dll" copy-output-file
         ] with-build-directory
     ] with-updated-git-repo ;
 
@@ -89,14 +91,13 @@ IN: build-from-source.windows
     "https://github.com/google/snappy.git" [
         [
             { "cmake" "-DCMAKE_BUILD_TYPE=Release" "-DBUILD_SHARED_LIBS=ON" "-DSNAPPY_BUILD_TESTS=OFF" "-DSNAPPY_BUILD_BENCHMARKS=OFF" ".." } try-process
-            { "msbuild" "Snappy.sln" "/m" } try-process
-            "Debug/snappy.dll" copy-output-file
+            { "msbuild" "Snappy.sln" "/m" "/property:Configuration=Release" } try-process
+            "Release/snappy.dll" copy-output-file
         ] with-build-directory
     ] with-updated-git-repo ;
 
 : build-sqlite3-dll ( -- )
     "https://github.com/sqlite/sqlite.git" [
-        check-nmake
         { "nmake" "/f" "Makefile.msc" "clean" } try-process
         { "nmake" "/f" "Makefile.msc" } try-process
         "sqlite3.dll" copy-output-file
@@ -106,14 +107,13 @@ IN: build-from-source.windows
     "https://github.com/yaml/libyaml.git" [
         [
             { "cmake" "-DBUILD_SHARED_LIBS=ON" ".." } try-process
-            { "msbuild" "yaml.sln" } try-process
-            "Debug/yaml.dll" copy-output-file
+            { "msbuild" "yaml.sln" "/property:Configuration=Release" } try-process
+            "Release/yaml.dll" copy-output-file
         ] with-build-directory
     ] with-updated-git-repo ;
 
 : build-zlib-dll ( -- )
     "https://github.com/madler/zlib" [
-        check-nmake
         { "nmake" "/f" "win32/Makefile.msc" "clean" } try-process
         { "nmake" "/f" "win32/Makefile.msc" } try-process
         "zlib1.dll" copy-output-file
@@ -130,6 +130,7 @@ IN: build-from-source.windows
     dll-out-directory make-directories
     build-openssl-64-dlls
     build-pcre-dll
+    build-pcre2-dll
     build-postgres-dll
     build-raylib-dll
     build-snappy-dll
