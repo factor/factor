@@ -127,8 +127,9 @@ IN: build-from-source.windows
     ] with-temp-directory ;
 
 : build-windows-dlls ( -- )
-    dll-out-directory remake-directory
+    dll-out-directory make-directories
     build-openssl-64-dlls
+    build-pcre-dll
     build-postgres-dll
     build-raylib-dll
     build-snappy-dll
