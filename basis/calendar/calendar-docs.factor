@@ -415,7 +415,7 @@ HELP: day-of-year
 
 HELP: week-number
 { $values { "timestamp" timestamp } { "[1,53]" integer } }
-{ $description "Calculates the ISO 8601 week number from 1 to 53 (leap years). See " { $snippet "https://en.wikipedia.org/wiki/ISO_week_date" } }
+{ $description "Calculates the ISO 8601 week number from 1 to 53 (leap years). Weeks start on Monday and end on Sunday. The end of December can sometimes be the first week of the next year and January can be the last week number of the previous year. See " { $snippet "https://en.wikipedia.org/wiki/ISO_week_date" } }
 { $examples
     "Last day of 2018 is already in the first week of 2019."
     { $example "USING: calendar prettyprint ;"
