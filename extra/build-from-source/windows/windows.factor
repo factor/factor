@@ -1,8 +1,9 @@
 ! Copyright (C) 2023 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: build-from-source http.client io.directories
-io.encodings.utf8 io.files io.files.temp io.launcher kernel
-multiline ;
+USING: accessors build-from-source html.parser
+html.parser.analyzer http.client io.directories
+io.encodings.utf8 io.files io.files.temp io.launcher
+io.pathnames kernel multiline sequences windows.shell32 ;
 IN: build-from-source.windows
 
 ! From `choco install -y nasm`
@@ -30,13 +31,32 @@ IN: build-from-source.windows
         { "openssl/apps/libssl-3-x64.dll" "openssl/apps/libcrypto-3-x64.dll" } copy-output-files
     ] with-updated-git-repo ;
 
+: latest-pcre-tar-gz ( -- path )
+    "https://ftp.exim.org/pub/pcre/" [
+        http-get nip parse-html find-links concat
+        [ name>> text = ] filter [ text>> ] map
+        [ "pcre-" head? ] filter
+        [ ".tar.gz" tail? ] filter last
+    ] keep prepend ;
+
+: build-pcre-dll ( -- )
+    check-cmake
+    check-msbuild
+    latest-pcre-tar-gz [
+        [
+            { "cmake" "-DCMAKE_BUILD_TYPE=Release" "-DBUILD_SHARED_LIBS=ON" "-DPCRE_SUPPORT_UTF=ON" "-DPCRE_SUPPORT_UNICODE_PROPERTIES=ON" ".." } try-process
+            { "msbuild" "PCRE.sln" "/m" } try-process
+            "Debug/pcred.dll" copy-output-file
+        ] with-build-directory
+    ] with-tar-gz ;
+
 : build-pcre2-dll ( -- )
     "https://github.com/PCRE2Project/pcre2.git" [
         [
             check-cmake
             check-msbuild
-            { "cmake" "-DCMAKE_BUILD_TYPE=Release" "-DBUILD_SHARED_LIBS=ON" ".." } try-process
-            { "msbuild" "PCRE2.sln" } try-process
+            { "cmake" "-DCMAKE_BUILD_TYPE=Release" "-DBUILD_SHARED_LIBS=ON" "-DPCRE_SUPPORT_UTF=ON" "-DPCRE_SUPPORT_UNICODE_PROPERTIES=ON" ".." } try-process
+            { "msbuild" "PCRE2.sln" "/m" } try-process
             { "Debug/pcre2-8d.dll" "Debug/pcre2-posixd.dll" } copy-output-files
         ] with-build-directory
     ] with-updated-git-repo ;
