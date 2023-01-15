@@ -42,6 +42,10 @@ PRIVATE>
 MEMO: bernoulli ( p -- n )
     [ 1 ] [ (bernoulli) ] if-zero ;
 
+! From page 4 https://arxiv.org/ftp/arxiv/papers/2201/2201.12601.pdf
+: bernoulli-estimate-factorial ( n -- n! )
+    [ 2pi swap ^ ] [ bernoulli ] bi * 2 / ;
+
 : chi2 ( actual expected -- n )
     0 [ dup 0 > [ [ - sq ] keep / + ] [ 2drop ] if ] 2reduce ;
 
