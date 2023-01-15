@@ -1,9 +1,9 @@
 ! Copyright (C) 2023 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: cli.git combinators.short-circuit formatting http.client
-io.directories io.files io.files.info io.files.temp io.launcher
-io.pathnames kernel layouts namespaces sequences splitting
-system ;
+USING: ascii cli.git combinators.short-circuit formatting
+http.client io.directories io.files io.files.info io.files.temp
+io.launcher io.pathnames kernel layouts namespaces sequences
+splitting system ;
 IN: build-from-source
 
 : dll-out-directory ( -- path )
@@ -16,9 +16,17 @@ IN: build-from-source
 : prepend-current-path ( path -- path' )
     current-directory get prepend-path ;
 
+: find-dlls ( path -- paths )
+    recursive-directory-files
+    [ file-name >lower ".dll" tail? ] filter ;
+
 : copy-output-file-as ( name new-name -- )
     [ prepend-current-path ]
     [ dll-out-directory prepend-path ] bi* copy-file ;
+
+: copy-vm-file-as ( name new-name -- )
+    [ prepend-current-path ]
+    [ vm-path parent-directory prepend-path ] bi* copy-file ;
 
 : copy-output-file ( name -- )
     prepend-current-path dll-out-directory copy-file-into ;
@@ -38,7 +46,7 @@ IN: build-from-source
 ! C:\Users\sheeple\AppData\Local\Temp\factorcode.org\Factor>
 : ?sync-repository-as ( url path -- )
     dup { [ git-directory? ] [ ".git" append-path empty-directory? not ] } 1&&
-    [ dup delete-tree ] unless
+    [ dup ?delete-tree ] unless
     sync-repository-as wait-for-success ;
 
 : with-updated-git-repo-as ( git-uri path quot -- )
