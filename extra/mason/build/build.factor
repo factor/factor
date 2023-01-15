@@ -17,8 +17,7 @@ IN: mason.build
 
 : clone-source ( -- )
     "Cloning GIT repository" print-timestamp
-    { "git" "clone" "--depth" "1" }
-    builds-dir get "factor" append-path absolute-path suffix
+    "git" "clone" builds-dir get "factor" append-path absolute-path 3array
     short-running-process ;
 
 : copy-image ( -- )
