@@ -1,8 +1,8 @@
 ! Copyright (C) 2023 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: cli.git formatting io.directories io.files.temp
-io.launcher io.pathnames kernel layouts namespaces sequences
-system ;
+USING: cli.git formatting http.client io.directories io.files
+io.files.temp io.launcher io.pathnames kernel layouts namespaces
+sequences splitting system ;
 IN: build-from-source
 
 : dll-out-directory ( -- path )
@@ -40,3 +40,15 @@ IN: build-from-source
 
 : with-updated-git-repo ( git-uri quot -- )
     [ dup git-directory-name ] dip with-updated-git-repo-as ; inline
+
+: ?download ( path -- )
+    dup file-name file-exists? [ drop ] [ download ] if ; inline
+
+: with-tar-gz ( path quot -- )
+    '[
+        _
+        [ ?download ]
+        [ file-name { "tar" "xvfz" } swap suffix try-process ]
+        [ file-name ".tar.gz" ?tail drop ] tri
+        prepend-current-path _ with-directory
+    ] with-temp-directory ; inline
