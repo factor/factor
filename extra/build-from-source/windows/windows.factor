@@ -112,6 +112,15 @@ IN: build-from-source.windows
         ] with-build-directory
     ] with-updated-git-repo ;
 
+: build-zeromq ( -- )
+    "https://github.com/zeromq/libzmq.git" [
+        [
+            { "cmake" "-DBUILD_SHARED_LIBS=ON" ".." } try-process
+            { "msbuild" "ZeroMQ.sln" "/property:Configuration=Release" } try-process
+            "bin/Release" find-dlls first "libzmq.dll" copy-output-file-as
+        ] with-build-directory
+    ] with-updated-git-repo ;
+
 : build-zlib-dll ( -- )
     "https://github.com/madler/zlib" [
         { "nmake" "/f" "win32/Makefile.msc" "clean" } try-process
