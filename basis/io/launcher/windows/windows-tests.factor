@@ -80,15 +80,29 @@ IN: io.launcher.windows.tests
 
 SYMBOLS: out-path err-path ;
 
-{ } [
+! +same-group+
+{ "Hello world" } [
     <process>
         console-vm-path "-run=hello-world" 2array >>command
         [ "out" ".txt" unique-file ] with-temp-directory
         [ out-path set-global ] keep >>stdout
+        +stdout+ >>stderr
+        10 seconds >>timeout
+        +same-group+ >>group
     try-process
+    out-path get-global ascii file-lines first
 ] unit-test
 
+! +new-group+
 { "Hello world" } [
+    <process>
+        console-vm-path "-run=hello-world" 2array >>command
+        [ "out" ".txt" unique-file ] with-temp-directory
+        [ out-path set-global ] keep >>stdout
+        +stdout+ >>stderr
+        10 seconds >>timeout
+        +new-group+ >>group
+    try-process
     out-path get-global ascii file-lines first
 ] unit-test
 
