@@ -1,3 +1,4 @@
 *.factor text eol=lf
 *.html text eol=lf
+LICENSE.txt text eol=lf
 misc/vim/*/*/generated.vim linguist-generated
