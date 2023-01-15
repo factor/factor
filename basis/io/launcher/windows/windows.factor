@@ -111,8 +111,8 @@ TUPLE: CreateProcess-args
     pick group>> [
         {
             { +same-group+ [ ] }
-            { +new-session+ [ DETACHED_PROCESS bitor CREATE_NEW_PROCESS_GROUP bitor ] }
-            { +new-group+ [ DETACHED_PROCESS bitor CREATE_NEW_PROCESS_GROUP bitor ] }
+            { +new-session+ [ CREATE_NEW_PROCESS_GROUP bitor ] }
+            { +new-group+ [ CREATE_NEW_PROCESS_GROUP bitor ] }
             [ drop ]
         } case
     ] when*
