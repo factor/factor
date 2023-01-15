@@ -165,13 +165,11 @@ IN: formatting.tests
 { t } [ "Thu Oct 09 12:03:15 2008" testtime "%c" strftime = ] unit-test
 { t } [ "PM" testtime "%p" strftime = ] unit-test
 
-! Differences on Windows due to rounding mode (#1792).
-${ os windows? "1.3" "1.2" ? } [ 125/100 "%.1f" sprintf ] unit-test
-${ os windows? "3" "2" ? } [ 5/2 "%.0f" sprintf ] unit-test
-! Differences on Windows due to setprecision(0)
-${ os windows? "2.500000e+00" "2e+00" ? } [ 5/2 "%.0e" sprintf ] unit-test
-${ os windows? "3.500000e+00" "4e+00" ? } [ 7/2 "%.0e" sprintf ] unit-test
-${ os windows? "1.000000e+00" "1e+00" ? } [ 1.0 "%.0e" sprintf ] unit-test
+{ "1.2" } [ 125/100 "%.1f" sprintf ] unit-test
+{ "2" } [ 5/2 "%.0f" sprintf ] unit-test
+{ "2e+00" } [ 5/2 "%.0e" sprintf ] unit-test
+{ "4e+00" } [ 7/2 "%.0e" sprintf ] unit-test
+{ "1e+00" } [ 1.0 "%.0e" sprintf ] unit-test
 
 { "00" } [ 2020 1 1 <date> "%U" strftime ] unit-test
 { "00" } [ 2020 1 1 <date> "%W" strftime ] unit-test
