@@ -8,7 +8,7 @@ words ;
 IN: openssl.libssl
 
 << "libssl" {
-    { [ os windows? ] [ { "libssl-3-x64.dll" "libssl-38.dll" } find-library-from-list ] }
+    { [ os windows? ] [ "libssl-38.dll" ] }
     { [ os macosx? ] [ "libssl.35.dylib" ] }
     { [ os unix? ] [ "libssl.so" ] }
 } cond cdecl add-library >>
