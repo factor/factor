@@ -124,8 +124,12 @@ CONSTANT: URL V{ }
 
 : gemini-less ( -- )
     "gemini.txt" temp-file dup file-exists? [
-        [ "PAGER" os-env [ "less" ] unless* ]
-        [ "\"" dup surround " " glue try-process ] bi*
+        utf8 [
+            <process>
+                "PAGER" os-env [ "less" ] unless* >>command
+                input-stream get >>stdin
+            try-process
+        ] with-file-reader
     ] [ drop ] if ;
 
  : gemini-ls ( args -- )
