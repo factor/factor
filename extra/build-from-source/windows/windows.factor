@@ -7,6 +7,8 @@ io.pathnames kernel multiline sequences sorting.human
 sorting.slots windows.shell32 ;
 IN: build-from-source.windows
 
+! choco install -y meson StrawberryPerl nasm winflexbison3 glfw3
+
 ! From `choco install -y nasm`
 ! Add nasm to path (windows+r sysdm.cpl -> Advanced tab -> Environment Variables -> New -> "c:\Program Files\NASM")
 : check-nasm ( -- ) { "nasm.exe" "-h" } try-process ;
