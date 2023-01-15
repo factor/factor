@@ -3,7 +3,8 @@
 USING: accessors build-from-source environment html.parser
 html.parser.analyzer http.client io.directories
 io.encodings.utf8 io.files io.files.temp io.launcher
-io.pathnames kernel multiline sequences windows.shell32 ;
+io.pathnames kernel multiline sequences sorting.human
+sorting.slots windows.shell32 ;
 IN: build-from-source.windows
 
 ! From `choco install -y nasm`
@@ -19,6 +20,26 @@ IN: build-from-source.windows
 : check-nmake ( -- ) { "nmake" "/?" } try-process ;
 : check-cmake ( -- ) { "cmake" "-h" } try-process ;
 : check-msbuild ( -- ) { "msbuild" "-h" } try-process ;
+
+: latest-fftw ( -- path )
+    "http://ftp.fftw.org/pub/fftw/" [
+        http-get nip
+        parse-html find-links concat
+        [ name>> text = ] filter
+        [ text>> ] map
+        [ "fftw-" head? ] filter
+        [ ".tar.gz" tail? ] filter
+        { human<=> } sort-by last
+    ] keep prepend-path ;
+
+: build-fftw ( -- )
+    latest-fftw [
+        [
+            { "cmake" "-DBUILD_SHARED_LIBS=ON" ".." } try-process
+            { "msbuild" "fftw.sln" "/m" "/property:Configuration=Release" } try-process
+            "Release/fftw3.dll" copy-output-file
+        ] with-build-directory
+    ] with-tar-gz ;
 
 : build-winflexbison ( -- )
     "https://github.com/lexxmark/winflexbison.git" [

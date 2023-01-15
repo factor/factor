@@ -20,8 +20,9 @@ IN: build-from-source
     recursive-directory-files
     [ file-name >lower ".dll" tail? ] filter ;
 
+ERROR: no-output-file path ;
 : copy-output-file-as ( name new-name -- )
-    [ prepend-current-path ]
+    [ prepend-current-path dup file-exists? [ no-output-file ] unless ]
     [ dll-out-directory prepend-path ] bi* copy-file ;
 
 : copy-vm-file-as ( name new-name -- )
