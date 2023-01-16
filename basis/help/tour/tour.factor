@@ -627,12 +627,14 @@ defition. You can check by yourself doing
 { $code "
 : inc ( x -- y ) 1 + ;
 : inc-print ( x -- ) inc . ;
+
 5 inc-print
 " }
 and then
 
 { $code "
 : inc ( x -- y ) 2 + ;
+
 5 inc-print
 " }
 This allows you to keep a listener open, improve your definitions, periodically save your definitions to a file 
@@ -808,14 +810,16 @@ actually bind the name of stack parameters to variables, so that you can use the
 instance, let us define a word to solve quadratic equations. I will spare you the purely stack-based version, and 
 present you a version with locals (this will require the { $vocab-link "locals" } vocabulary):
 
-{ $code ":: solveq ( a b c -- x )
+{ $code "
+:: solveq ( a b c -- x )
     b neg
     b b * 4 a c * * - sqrt
     +
     2 a * / ;" }
 In this case we have chosen the + sign, but we can do better and output both solutions:
 
-{ $code ":: solveq ( a b c -- x1 x2 )
+{ $code "
+:: solveq ( a b c -- x1 x2 )
     b neg
     b b * 4 a c * * - sqrt
     [ + ] [ - ] 2bi
@@ -843,13 +847,13 @@ above sentence -- try writing:
 Let me take again { $snippet "prime?" } , but this time write it without using helper words:
 
 { $code "
-    : prime? ( n -- ? ) [ sqrt 2 swap [a,b] ] [ [ swap divisor? ] curry ] bi any? not ;
-" }
+: prime? ( n -- ? )
+    [ sqrt 2 swap [a,b] ] [ [ swap divisor? ] curry ] bi any? not ;" }
 Using { $link with }  instead of { $link curry } , this simplifies to
 
 { $code "
-    : prime? ( n -- ? ) 2 over sqrt [a,b] [ divisor? ] with any? not ;
-" }
+: prime? ( n -- ? )
+    2 over sqrt [a,b] [ divisor? ] with any? not ;" }
 If you are not able to visualize what is happening, you may want to consider the { $vocab-link "fry" } vocabulary. It defines { $strong "fried quotations" } ";" 
 these are quotations that have holes in them - marked by { $snippet "_" } - that are filled with values from the stack.
 
@@ -887,7 +891,8 @@ Then one can use the word { $link set }  to bind the variable and { $link get } 
 favorite-language get" }
 Scopes are nested, and new scopes can be created with the word { $link with-scope } . Try for instance
 
-{ $code ": on-the-jvm ( -- )
+{ $code "
+: on-the-jvm ( -- )
     [
         \"Scala\" favorite-language set
         favorite-language get .
@@ -925,30 +930,31 @@ First, we want a { $snippet "safe-head" } word, that works like { $link head } ,
 one is executed, and on failure, the second one is executed with the error as input. Hence we can define
 
 { $code "
-    : safe-head ( seq n -- seq' ) [ head ] [ 2drop ] recover ;
-" }
+: safe-head ( seq n -- seq' ) [ head ] [ 2drop ] recover ;" }
 This is an impractical example of exceptions, as Factor defines the { $link short } word, which takes a 
 sequence and a number, and returns the minimum between the length of the sequence and the number. This allows us to write simply
 
 { $code "
-    : safe-head ( seq n -- seq' ) short head ;
-" }
+: safe-head ( seq n -- seq' ) short head ;" }
 With this definition, we can make a word to read the first character of the first line:
 
-{ $code ": read-first-letters ( path -- )
+{ $code "
+: read-first-letters ( path -- )
     utf8 <file-reader> [
         readln 1 safe-head write nl
     ] with-input-stream ;" }
 Using the helper word { $link with-file-reader } , we can also shorten this to
 
-{ $code ": read-first-letters ( path -- )
+{ $code "
+: read-first-letters ( path -- )
     utf8 [
         readln 1 safe-head write nl
     ] with-file-reader ;" }
 Unfortunately, we are limited to one line. To read more lines, we should chain calls to { $link readln } until one returns { $link f } .
 Factor helps us with { $link file-lines } , which lazily iterates "over" lines. Our "final" definition becomes
 
-{ $code ": read-first-letters ( path -- )
+{ $code "
+: read-first-letters ( path -- )
     utf8 file-lines [ 1 safe-head write nl ] each ;" }
 When the file is small, one can also use { $link file-contents } to read the whole contents of a file in a single string. 
 Factor defines many more words for input/output, which cover many more cases, such as binary files or sockets.
@@ -960,11 +966,13 @@ slots { $snippet "name" } and { $snippet "type" } . You can see this by trying {
 directory entries, you will see that the type is either { $link +directory+ } or { $link +regular-file+ } (well, there are symlinks as well, 
 but we will ignore them for simplicity). Hence we can define a word that lists files and directories with
 
-{ $code ": list-files-and-dirs ( path -- files dirs )
+{ $code "
+: list-files-and-dirs ( path -- files dirs )
     directory-entries [ type>> +regular-file+ = ] partition ;" }
 With this, we can define a word { $snippet "ls" } that will print directory contents as follows:
 
-{ $code ": ls ( path -- )
+{ $code "
+: ls ( path -- )
     list-files-and-dirs
     \"DIRECTORIES:\" write nl
     \"------------\" write nl
@@ -1091,7 +1099,8 @@ Let us define a word for the thread workload
 
 If we give the i-th thread the name "\"i\"" , our example amounts to
 
-{ $code "18 [0..b) [
+{ $code "
+18 [0..b) [
     [ [ print-a-line ] curry ]
     [ number>string ]
     bi spawn
@@ -1108,7 +1117,8 @@ duration of i seconds with... well { $snippet "i seconds" } . So we define
 
 Let us try
 
-{ $code "18 [0..b) [
+{ $code "
+18 [0..b) [
     [ [ wait-and-print ] curry ]
     [ number>string ]
     bi spawn
@@ -1117,7 +1127,8 @@ Let us try
 Instead of { $link spawn } , we can also use { $link in-thread } which uses a dummy thread name and discards the returned thread, 
 simplifying the above to
 
-{ $code "18 [0..b) [
+{ $code "
+18 [0..b) [
     [ wait-and-print ] curry in-thread
 ] each" }
 $nl
@@ -1179,7 +1190,8 @@ from Chloe templates, and in order to create a responder we will need to add rou
 
 Let use first investigate a simple example of routing. To do this, we create a special type of responder called a { $strong "dispatcher" } , that dispatches requests based on path parameters. Let us create a simple dispatcher that will choose 
 between our echo responder and a default responder used to serve static files.
-{ $code "dispatcher new-dispatcher
+{ $code "
+dispatcher new-dispatcher
     <echo-responder> \"echo\" add-responder
     \"/home/andrea\" <static> \"home\" add-responder
     main-responder set-global" }
