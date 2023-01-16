@@ -100,3 +100,8 @@ gopher-gadget "scrolling" f {
 } define-command-map
 
 [ gopher-link? ] \ com-gopher H{ { +primary+ t } } define-operation
+
+: gopher-main ( -- )
+    [ "gopher.quux.org" open-gopher-window ] with-ui ;
+
+MAIN: gopher-main
