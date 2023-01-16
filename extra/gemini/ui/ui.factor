@@ -110,3 +110,8 @@ gemini-gadget "scrolling" f {
 } define-command-map
 
 [ dup url? [ protocol>> "gemini" = ] [ drop f ] if ] \ com-gemini H{ { +primary+ t } } define-operation
+
+: gemini-main ( -- )
+    [ "gemini.circumlunar.space" open-gemini-window ] with-ui ;
+
+MAIN: gemini-main
