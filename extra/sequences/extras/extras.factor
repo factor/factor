@@ -643,10 +643,10 @@ PRIVATE>
     ] if-empty ;
 
 : map-infimum ( seq quot: ( ... elt -- ... elt' ) -- elt' )
-    [ min ] map-reduce ;
+    [ min ] map-reduce ; inline
 
 : map-supremum ( seq quot: ( ... elt -- ... elt' ) -- elt' )
-    [ max ] map-reduce ;
+    [ max ] map-reduce ; inline
 
 : change-last ( seq quot -- )
     [ index-of-last ] [ change-nth ] bi* ; inline

@@ -162,6 +162,9 @@ math prettyprint sequences sequences.extras strings tools.test ;
 { V{ 0 4 } } [ { 5 3 2 10 5 } [ 5 = ] arg-where ] unit-test
 { { 2 1 0 4 3 } } [ { 5 3 2 10 5 } arg-sort ] unit-test
 
+{ 10 } [ { 4 3 2 1 } [ 10 * ] map-infimum ] unit-test
+{ 40 } [ { 4 3 2 1 } [ 10 * ] map-supremum ] unit-test
+
 { t } [ { 1 2 3 4 5 } 1 first= ] unit-test
 { t } [ { 1 2 3 4 5 } 2 second= ] unit-test
 { t } [ { 1 2 3 4 5 } 3 third= ] unit-test
