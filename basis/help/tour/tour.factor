@@ -935,7 +935,7 @@ This is an impractical example of exceptions, as Factor defines the { $link shor
 sequence and a number, and returns the minimum between the length of the sequence and the number. This allows us to write simply
 
 { $code "
-: safe-head ( seq n -- seq' ) short head ;" }
+: safe-head ( seq n -- seq' ) index-or-length head ;" }
 With this definition, we can make a word to read the first character of the first line:
 
 { $code "
