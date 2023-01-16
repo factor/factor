@@ -1095,7 +1095,9 @@ read-only, but the usual caveats about shared memory in a multithreaded settings
 
 Let us define a word for the thread workload
 
-{ $code ": print-a-line ( i -- ) star-wars get ?nth print ;" }
+{ $code "
+: print-a-line ( i -- )
+    star-wars get ?nth print ;" }
 
 If we give the i-th thread the name "\"i\"" , our example amounts to
 
@@ -1113,7 +1115,9 @@ objects and look for the { $link sleep } word in the help.
 It turns out that { $link sleep } does exactly what we need, but it takes a { $strong "duration" }  object as input. We can create a 
 duration of i seconds with... well { $snippet "i seconds" } . So we define
 
-{ $code ": wait-and-print ( i -- ) dup seconds sleep print-a-line ;" }
+{ $code "
+: wait-and-print ( i -- )
+    dup seconds sleep print-a-line ;" }
 
 Let us try
 
