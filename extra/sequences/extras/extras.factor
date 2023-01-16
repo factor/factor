@@ -642,6 +642,12 @@ PRIVATE>
         [ ] [ 2dup and [ min ] [ dupd ? ] if ] map-reduce
     ] if-empty ;
 
+: map-infimum ( seq quot: ( ... elt -- ... elt' ) -- elt' )
+    [ min ] map-reduce ;
+
+: map-supremum ( seq quot: ( ... elt -- ... elt' ) -- elt' )
+    [ max ] map-reduce ;
+
 : change-last ( seq quot -- )
     [ index-of-last ] [ change-nth ] bi* ; inline
 
