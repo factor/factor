@@ -42,6 +42,7 @@ M:: windows sign-factor-app ( -- )
         [
             ${
                 "signtool" "sign"
+                "/fd" "sha1" ! maybe upgrade to sha256?
                 "/v"
                 "/f" cert-path
             }
