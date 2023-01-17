@@ -1,9 +1,10 @@
 ! Copyright (C) 2008, 2010 Eduardo Cavazos, Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors calendar continuations debugger io
-io.directories io.sockets io.streams.string kernel mason.build
-mason.config mason.disk mason.email mason.notify mason.updates
-namespaces prettyprint threads ;
+io.directories io.pathnames io.sockets io.streams.string kernel
+make mason.build mason.common mason.config mason.disk
+mason.email mason.notify mason.updates namespaces prettyprint
+sequences threads ;
 IN: mason
 
 : heartbeat-loop ( -- )
@@ -37,7 +38,21 @@ IN: mason
 
     build-loop ;
 
+: check-host ( user host -- )
+    "@" glue [
+        scp-command get ,
+        "resource:LICENSE.txt" absolute-path ,
+        ":" append ,
+    ] { } make short-running-process ;
+
+: check-hosts ( -- )
+    docs-username get docs-host get check-host
+    branch-username get branch-host get check-host
+    package-username get package-host get check-host
+    image-username get image-host get check-host ;
+
 : run-mason ( -- )
+    check-hosts
     [ heartbeat-loop ] "Heartbeat loop" spawn
     [ build-loop ] "Build loop" spawn
     stop ;
