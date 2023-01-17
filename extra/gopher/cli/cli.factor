@@ -199,6 +199,11 @@ CONSTANT: COMMANDS {
         { help "'cat' the most recent gopher URL through a shell." }
         { abbrevs { "!" } } }
     T{ command
+        { name "home" }
+        { quot [ drop DEFAULT-URL gopher-go ] }
+        { help "Go to the default gopher URL" }
+        { abbrevs f } }
+    T{ command
         { name "quit" }
         { quot [ drop gopher-quit ] }
         { help "Quit the program." }
