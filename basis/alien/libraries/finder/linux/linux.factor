@@ -45,17 +45,16 @@ CONSTANT: mach-map {
     [ ldconfig-matches? ] with find nip ?last ;
 
 :: find-ld ( name -- path/f )
-    "LD_LIBRARY_PATH" os-env [
-        <process>
-            swap [
-                "ld" , "-t" , ":" split [ "-L" , , ] each
-                cpu x86.64? "-melf_x86_64" "-melf_i386" ? ,
-                "-o" , "/dev/null" , "-l" name append ,
-            ] { } make >>command
-            +closed+ >>stderr
-        utf8 [ read-lines ] with-process-reader* 2drop
-        "lib" name append '[ _ subseq-of? ] find nip
-    ] [ f ] if* ;
+    "lib" name append <process>
+        [
+            "ld" , "-t" ,
+            "LD_LIBRARY_PATH" os-env ":" split [ "-L" , , ] each
+            cpu x86.64? "-melf_x86_64" "-melf_i386" ? ,
+            "-o" , "/dev/null" , "-l" name append ,
+        ] { } make >>command
+        +closed+ >>stderr
+    utf8 [ read-lines ] with-process-reader* 2drop
+    [ subseq? ] with find nip ;
 
 PRIVATE>
 
