@@ -28,7 +28,7 @@ HOOK: sign-factor-app os ( -- )
 
 M: object sign-factor-app ;
 
-M:: macosx sign-factor-app ( -- )
+M: macosx sign-factor-app
     ${
         "codesign" "--force" "--sign"
         "Developer ID Application"
@@ -42,7 +42,7 @@ M:: windows sign-factor-app ( -- )
         [
             ${
                 "signtool" "sign"
-                "/fd" "sha1" ! maybe upgrade to sha256?
+                "/fd" "sha256"
                 "/v"
                 "/f" cert-path
             }
@@ -56,7 +56,7 @@ M: object sign-archive drop ;
 ! Sign the .dmg on macOS as well to avoid Gatekeeper marking
 ! the xattrs as quarantined.
 ! https://github.com/factor/factor/issues/1896
-M: macosx sign-archive ( path -- )
+M: macosx sign-archive
     ${
         "codesign" "--force" "--sign"
         "Developer ID Application"
