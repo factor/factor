@@ -107,7 +107,7 @@ $snippet "1" }  to { $snippet "10" } , so we should produce such a list of numbe
 
 The word to produce a range is called { $link [a..b] }  (tokenization is trivial in Factor because words are 
 always separated by spaces, so this allows you to use any combination of non-whitespace characters as the name of a word; 
-there are no semantics to the { $snippet "[" } , the { $snippet "," }  and the { $snippet "]" }  in { $link [a..b] }  
+there are no semantics to the { $snippet "[" } , the { $snippet ".." }  and the { $snippet "]" }  in { $link [a..b] }  
 since it is just a token like { $snippet "foo" }  or { $snippet "bar" } ).
 
 The range we want starts with { $snippet "1" } , so we can use the simpler word { $link [1..b] }  that assumes the 
