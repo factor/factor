@@ -48,6 +48,7 @@ CONSTANT: mach-map {
     "LD_LIBRARY_PATH" os-env [
         [
             "ld" , "-t" , ":" split [ "-L" , , ] each
+            cpu x86.64? "-melf_x86_64" "-melf_i386" ? ,
             "-o" , "/dev/null" , "-l" name append ,
         ] { } make utf8 [ read-lines ] with-process-reader* 2drop
         "lib" name append '[ _ subseq-of? ] find nip
