@@ -211,6 +211,11 @@ CONSTANT: COMMANDS {
         { help "'cat' the most recent Gemini URL through a shell." }
         { abbrevs { "!" } } }
     T{ command
+        { name "home" }
+        { quot [ drop DEFAULT-URL gemini-go ] }
+        { help "Go to the default Gemini URL" }
+        { abbrevs f } }
+    T{ command
         { name "quit" }
         { quot [ drop gemini-quit ] }
         { help "Quit the program." }
