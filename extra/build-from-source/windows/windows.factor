@@ -34,7 +34,7 @@ IN: build-from-source.windows
         { human<=> } sort-by last
     ] keep prepend-path ;
 
-: build-fftw ( -- )
+: build-fftw-dll ( -- )
     latest-fftw [
         [
             { "cmake" "-DBUILD_SHARED_LIBS=ON" ".." } try-process
@@ -59,10 +59,32 @@ IN: build-from-source.windows
         program-files "NASM/nasm.exe" append-path "nasm.exe" prepend-current-path copy-file
         check-nasm
         check-nmake
-        { "perl" "Configure" "VC-WIN64A" } try-process ! "VC-WIN32"
+        { "perl" "Configure" "-DOPENSSL_PIC" "VC-WIN64A" } try-process ! "VC-WIN32"
         { "nmake" } try-process
         { "apps/libssl-3-x64.dll" "apps/libcrypto-3-x64.dll" } copy-output-files
     ] with-updated-git-repo ;
+
+: latest-libressl ( -- path )
+    "https://ftp.openbsd.org/pub/OpenBSD/LibreSSL/" [
+        http-get nip parse-html find-links concat
+        [ name>> text = ] filter
+        [ text>> ] map
+        [ "libressl-" head? ] filter
+        [ ".tar.gz" tail? ] filter last
+    ] keep prepend ;
+
+: build-libressl-dlls ( -- )
+    latest-libressl [
+        [
+            qw{ cmake -DCMAKE_BUILD_TYPE=Release -DBUILD_SHARED_LIBS=ON .. } try-process
+            qw{ msbuild LibreSSL.sln /m /property:Configuration=Release } try-process
+            {
+                "crypto/Release/crypto-50.dll"
+                "ssl/Release/ssl-53.dll"
+                "tls/Release/tls-26.dll"
+            } copy-output-files
+        ] with-build-directory
+    ] with-tar-gz ;
 
 : latest-pcre-tar-gz ( -- path )
     "https://ftp.exim.org/pub/pcre/" [
@@ -75,8 +97,8 @@ IN: build-from-source.windows
 : build-pcre-dll ( -- )
     latest-pcre-tar-gz [
         [
-            { "cmake" "-DCMAKE_BUILD_TYPE=Release" "-DBUILD_SHARED_LIBS=ON" "-DPCRE_SUPPORT_UTF=ON" "-DPCRE_SUPPORT_UNICODE_PROPERTIES=ON" ".." } try-process
-            { "msbuild" "PCRE.sln" "/m" "/property:Configuration=Release" } try-process
+            qw{ cmake -DCMAKE_BUILD_TYPE=Release -DBUILD_SHARED_LIBS=ON -DPCRE_SUPPORT_UTF=ON -DPCRE_SUPPORT_UNICODE_PROPERTIES=ON .. } try-process
+            qw{ msbuild PCRE.sln /m /property:Configuration=Release } try-process
             "Release/pcre.dll" copy-output-file
         ] with-build-directory
     ] with-tar-gz ;
@@ -84,8 +106,8 @@ IN: build-from-source.windows
 : build-pcre2-dll ( -- )
     "https://github.com/PCRE2Project/pcre2.git" [
         [
-            { "cmake" "-DCMAKE_BUILD_TYPE=Release" "-DBUILD_SHARED_LIBS=ON" "-DPCRE_SUPPORT_UTF=ON" "-DPCRE_SUPPORT_UNICODE_PROPERTIES=ON" ".." } try-process
-            { "msbuild" "PCRE2.sln" "/m" "/property:Configuration=Release" } try-process
+            qw{ cmake -DCMAKE_BUILD_TYPE=Release -DBUILD_SHARED_LIBS=ON -DPCRE_SUPPORT_UTF=ON -DPCRE_SUPPORT_UNICODE_PROPERTIES=ON .. } try-process
+            qw{ msbuild PCRE2.sln /m /property:Configuration=Release } try-process
             { "Release/pcre2-8.dll" "Release/pcre2-posix.dll" } copy-output-files
         ] with-build-directory
     ] with-updated-git-repo ;
@@ -136,7 +158,7 @@ IN: build-from-source.windows
         ] with-build-directory
     ] with-updated-git-repo ;
 
-: build-zeromq ( -- )
+: build-zeromq-dll ( -- )
     "https://github.com/zeromq/libzmq.git" [
         [
             qw{ cmake -DBUILD_SHARED_LIBS=ON .. } try-process
@@ -194,6 +216,8 @@ IN: build-from-source.windows
 : build-windows-dlls ( -- )
     dll-out-directory make-directories
     build-openssl-64-dlls
+    build-libressl-dlls
+    build-fftw-dll
     build-pcre-dll
     build-pcre2-dll
     build-postgres-dll
@@ -201,4 +225,6 @@ IN: build-from-source.windows
     build-snappy-dll
     build-sqlite3-dll
     build-yaml-dll
-    build-zlib-dll ;
+    build-zeromq-dll
+    build-zlib-dll
+    build-zstd-dll ;
