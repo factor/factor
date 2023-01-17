@@ -1,6 +1,6 @@
 ! Copyright (C) 2013 Björn Lindqvist, Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license
-USING: alien.libraries.finder arrays assocs
+USING: accessors alien.libraries.finder arrays assocs
 combinators.short-circuit environment io io.encodings.utf8
 io.launcher kernel make sequences sets splitting system
 unicode ;
@@ -46,11 +46,14 @@ CONSTANT: mach-map {
 
 :: find-ld ( name -- path/f )
     "LD_LIBRARY_PATH" os-env [
-        [
-            "ld" , "-t" , ":" split [ "-L" , , ] each
-            cpu x86.64? "-melf_x86_64" "-melf_i386" ? ,
-            "-o" , "/dev/null" , "-l" name append ,
-        ] { } make utf8 [ read-lines ] with-process-reader* 2drop
+        <process>
+            swap [
+                "ld" , "-t" , ":" split [ "-L" , , ] each
+                cpu x86.64? "-melf_x86_64" "-melf_i386" ? ,
+                "-o" , "/dev/null" , "-l" name append ,
+            ] { } make >>command
+            +closed+ >>stderr
+        utf8 [ read-lines ] with-process-reader* 2drop
         "lib" name append '[ _ subseq-of? ] find nip
     ] [ f ] if* ;
 
