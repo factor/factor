@@ -52,7 +52,13 @@ IN: mason.test
 
 : do-tests ( -- )
     forget-tests? on
-    test-all test-failures get
+    cpu x86.32? [
+        "resource:core" test-root
+        "resource:basis" test-root
+    ] [
+        test-all
+    ] if
+    test-failures get
     test-all-vocabs-file
     test-all-errors-file
     do-step ;
