@@ -7,7 +7,7 @@ random sequences system threads tools.test ;
 IN: db.tester
 
 : postgresql-test-db-name ( -- string )
-    cpu name>> "-" "factor-test" 3append
+    os name>> cpu name>> "-" glue "-factor-test" append
     H{ { CHAR: - CHAR: _ } { CHAR: . CHAR: _ } } substitute ;
 
 : postgresql-test-db ( -- postgresql-db )
@@ -34,14 +34,11 @@ IN: db.tester
     ] call ; inline
 
 : test-postgresql ( quot -- )
-
     '[
-        os windows? cpu x86.64? and [
-            postgresql-template1-db [
-                postgresql-test-db-name ensure-database
-            ] with-db
-            [ ] [ postgresql-test-db _ with-db ] unit-test
-        ] unless
+        postgresql-template1-db [
+            postgresql-test-db-name ensure-database
+        ] with-db
+        [ ] [ postgresql-test-db _ with-db ] unit-test
     ] call ; inline
 
 
