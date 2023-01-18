@@ -35,10 +35,13 @@ IN: db.tester
 
 : test-postgresql ( quot -- )
     '[
-        postgresql-template1-db [
-            postgresql-test-db-name ensure-database
-        ] with-db
-        [ ] [ postgresql-test-db _ with-db ] unit-test
+        ! disable on windows-x86-32
+        os windows? cpu x86.32? and [
+            postgresql-template1-db [
+                postgresql-test-db-name ensure-database
+            ] with-db
+            [ ] [ postgresql-test-db _ with-db ] unit-test
+        ] unless
     ] call ; inline
 
 
