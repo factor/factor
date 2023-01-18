@@ -1,5 +1,8 @@
 USING: kernel math.blas.matrices math.blas.vectors
-sequences tools.test ;
+sequences system tools.test ;
+
+! disable on linux-x86-32
+os linux? cpu x86.32? and [
 
 ! clone
 
@@ -716,3 +719,4 @@ sequences tools.test ;
     } equal?
 ] unit-test
 
+] unless
