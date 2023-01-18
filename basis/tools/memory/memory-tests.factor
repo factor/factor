@@ -12,7 +12,7 @@ tools.memory tools.memory.private tools.test tools.time vm ;
 ! Each gc-event must reclaim something. #659
 { f } [
     [ "resource:basis/tools/memory/memory.factor" run-file ] time
-    gc-events get [ space-reclaimed 0 <= ] any?
+    gc-events get [ space-reclaimed 0 < ] any?
 ] unit-test
 
 { t t t } [
