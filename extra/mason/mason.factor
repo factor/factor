@@ -46,10 +46,12 @@ IN: mason
     ] { } make short-running-process ;
 
 : check-hosts ( -- )
-    docs-username get docs-host get check-host
     branch-username get branch-host get check-host
     package-username get package-host get check-host
-    image-username get image-host get check-host ;
+    image-username get image-host get check-host
+    upload-docs? get [
+        docs-username get docs-host get check-host
+    ] when ;
 
 : run-mason ( -- )
     check-hosts
