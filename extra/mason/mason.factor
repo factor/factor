@@ -41,7 +41,7 @@ IN: mason
 : check-host ( user host -- )
     "@" glue [
         scp-command get ,
-        "resource:LICENSE.txt" absolute-path ,
+        "resource:LICENSE.txt" absolute-path canonicalize-path ,
         ":" append ,
     ] { } make short-running-process ;
 
