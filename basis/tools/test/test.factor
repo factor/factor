@@ -230,6 +230,8 @@ M: test-failure error. ( error -- )
 
 : test-all ( -- ) "" test ;
 
+: test-root ( root -- ) "" vocabs-to-load test-vocabs ;
+
 : refresh-and-test ( prefix --  ) to-refresh [ do-refresh ] keepdd test-vocabs ;
 
 : refresh-and-test-all ( -- ) "" refresh-and-test ;
