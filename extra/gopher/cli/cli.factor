@@ -94,7 +94,7 @@ CONSTANT: URL V{ }
     LINKS delete-all PAGE LINKS push-all ;
 
 : gopher-get ( args -- )
-    dup URL set-first
+    dup array? [ first ] when dup URL set-first
     >url gopher over ${ A_TEXT A_MENU A_INDEX } member? [
         "gopher.txt" temp-file
         [ utf8 [ gopher-print ] with-file-writer ]
@@ -104,7 +104,7 @@ CONSTANT: URL V{ }
     ] if ;
 
 : gopher-go ( args -- )
-    present [ DEFAULT-URL ] when-empty
+    dup array? [ first ] when present [ DEFAULT-URL ] when-empty
     { [ "://" over subseq? ] [ "gopher://" head? ] } 1||
     [ "gopher://" prepend ] unless
     dup "gopher://" head? [
@@ -214,9 +214,7 @@ TUPLE: gopher-command-loop < command-loop ;
 
 M: gopher-command-loop missing-command
     over string>number [ 1 - LINKS ?nth ] [ f ] if* [
-        [ add-history ]
-        [ add-stack ]
-        [ dup array? [ first ] when gopher-get 3drop ] tri
+        gopher-go 3drop
     ] [
         call-next-method
     ] if* ;
