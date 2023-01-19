@@ -89,7 +89,7 @@ CONSTANT: URL V{ }
     ] with-variable ;
 
 : gemini-get ( args -- )
-    dup URL set-first
+    dup array? [ first ] when dup URL set-first
     >url dup gemini [ drop ] 2dip swap "text/" ?head [
         "gemini.txt" temp-file
         [ utf8 [ gemini-print ] with-file-writer ]
@@ -99,7 +99,7 @@ CONSTANT: URL V{ }
     ] if ;
 
 : gemini-go ( args -- )
-    present [ DEFAULT-URL ] when-empty
+    dup array? [ first ] when present [ DEFAULT-URL ] when-empty
     { [ dup "://" subseq-of? ] [ "gemini://" head? ] } 1||
     [ "gemini://" prepend ] unless
     dup "gemini://" head? [
@@ -226,9 +226,7 @@ TUPLE: gemini-command-loop < command-loop ;
 
 M: gemini-command-loop missing-command
     over string>number [ 1 - LINKS ?nth ] [ f ] if* [
-        [ add-history ]
-        [ add-stack ]
-        [ dup array? [ first ] when gemini-get 3drop ] tri
+        gemini-go 3drop
     ] [
         call-next-method
     ] if* ;
