@@ -4,5 +4,5 @@ USING: literals simple-flat-file ;
 IN: unicode.script
 
 CONSTANT: script-table $[
-    "vocab:unicode/UCD/Scripts.txt" load-interval-file
+    "vocab:unicode/Scripts.txt" load-interval-file
 ]

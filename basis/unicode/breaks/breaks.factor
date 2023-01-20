@@ -16,12 +16,12 @@ IN: unicode.breaks
 >>
 
 CONSTANT: emoji-modifier-table $[
-    "resource:basis/unicode/UCD/emoji/emoji-data.txt"
+    "vocab:unicode/emoji-data.txt"
     1 "Emoji_Modifier" load-interval-file-for
 ]
 
 CONSTANT: extended-pictographic-table $[
-    "resource:basis/unicode/UCD/emoji/emoji-data.txt"
+    "vocab:unicode/emoji-data.txt"
     1 "Extended_Pictographic" load-interval-file-for
 ]
 
@@ -202,7 +202,7 @@ CONSTANT: unicode-words 19
 
 <<
 CONSTANT: word-break-table $[
-    "resource:basis/unicode/UCD/auxiliary/WordBreakProperty.txt"
+    "vocab:unicode/WordBreakProperty.txt"
     load-interval-file dup array>> [
         2 swap [
             {
