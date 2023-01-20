@@ -1,6 +1,6 @@
 ! Copyright (C) 2016 Doug Coleman.
 ! See https://factorcode.org/license.txt for BSD license.
-USING: io.backend io.pathnames kernel literals mason.common
+USING: io.backend io.pathnames kernel literals make mason.common
 sequences system ;
 IN: mason.release.sign
 
@@ -34,11 +34,16 @@ M: macosx sign-factor-app
         "libfactor.dylib"
         "libfactor-ffi-test.dylib"
     } [
-        ${
-            "codesign" "--force" "--sign"
-            "Developer ID Application"
-            cert-path
-        } swap make-factor-path suffix short-running-process
+        [
+            "codesign" ,
+            "--entitlements" ,
+            "factor.entitlements" make-factor-path ,
+            "--option" , "runtime" , ! Hardened Runtime
+            "--force" , "--sign" ,
+            "Developer ID Application" ,
+            cert-path ,
+            make-factor-path ,
+        ] { } make short-running-process
     ] each ;
 
 M:: windows sign-factor-app ( -- )
