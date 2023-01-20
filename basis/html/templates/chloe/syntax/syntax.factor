@@ -13,12 +13,12 @@ chloe-tags [ H{ } clone ] initialize
 SYNTAX: CHLOE:
     scan-token parse-definition define-chloe-tag ;
 
-CONSTANT: chloe-ns "https://factorcode.org/chloe/1.0"
+CONSTANT: chloe-ns "http://factorcode.org/chloe/1.0"
 
 : chloe-name? ( name -- ? )
     url>> chloe-ns = ;
 
-XML-NS: chloe-name https://factorcode.org/chloe/1.0
+XML-NS: chloe-name http://factorcode.org/chloe/1.0
 
 : required-attr ( tag name -- value )
     [ nip ] [ chloe-name attr ] 2bi
