@@ -30,7 +30,7 @@ TUPLE: weight-levels primary secondary tertiary ignorable? ;
 : parse-ducet ( file -- ducet )
     load-data-file [ [ parse-keys ] [ parse-weight ] bi* ] H{ } assoc-map-as ;
 
-"vocab:unicode/UCA/allkeys.txt" parse-ducet ducet set-global
+"vocab:unicode/allkeys.txt" parse-ducet ducet set-global
 
 ! https://www.unicode.org/reports/tr10/tr10-41.html#Well_Formed_DUCET
 ! WF5 - Well-formedness 5 condition:
