@@ -63,7 +63,7 @@ PRIVATE>
 
 : <Mwc128XXA32> ( key1 key2 -- obj )
     0xcafef00d 0xd15ea5e5 Mwc128XXA32 boa
-    6 [ dup next-u64 drop ] times ;
+    6 [ dup next-u32 drop ] times ;
 
 : <Mwc256XXA64> ( key1 key2 -- obj )
     0xcafef00dd15ea5e5 0x14057B7EF767814F f Mwc256XXA64 boa
