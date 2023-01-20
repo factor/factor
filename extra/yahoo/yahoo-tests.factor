@@ -9,7 +9,7 @@ USING: tools.test yahoo kernel io.files xml sequences accessors urls ;
 } } [ "resource:extra/yahoo/test-results.xml" file>xml parse-yahoo first ] unit-test
 
 {
-    URL" http://search.yahooapis.com/WebSearchService/V1/webSearch?appid=Factor-search&query=hi&results=2&similar_ok=1"
+    URL" https://search.yahooapis.com/WebSearchService/V1/webSearch?appid=Factor-search&query=hi&results=2&similar_ok=1"
 } [
     "hi" <search> "Factor-search" >>appid 2 >>results t >>similar-ok query
 ] unit-test
