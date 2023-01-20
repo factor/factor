@@ -4,7 +4,7 @@ USING: calendar io.encodings.utf8 io.files robots tools.test
 urls ;
 
 {
-    { "https://www.chiplist.com/sitemap.txt" }
+    { "http://www.chiplist.com/sitemap.txt" }
     {
         T{ rules
             { user-agents V{ "*" } }
