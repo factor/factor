@@ -597,12 +597,12 @@ STRUCT: Model
     { transform Matrix }
     { meshCount int }
     { materialCount int }
-    { _meshes Mesh* }
-    { _materials Material* }
+    { _meshes void* }
+    { _materials void* }
     { meshMaterial int* }
     { boneCount int }
-    { _bones BoneInfo* }
-    { bindPose Transform* } ;
+    { _bones void* }
+    { bindPose void* } ;
 
 ARRAY-SLOT: Model Material _materials [ materialCount>> ] materials
 ARRAY-SLOT: Model Mesh _meshes [ meshCount>> ] meshes
@@ -1275,10 +1275,8 @@ FUNCTION-ALIAS: get-ray-collision-quad RayCollision GetRayCollisionQuad ( Ray ra
 
 : get-ray-collision-model ( ray model -- ray-collision )
     [ RayCollision <struct> ] 2dip dup meshCount>> [
-        over
-        [ _meshes>> ]
-        [ <displaced-alien> Mesh memory>struct ]
-        [ transform>> ] tri*
+        swap dup
+        [ _meshes>> <displaced-alien> ] [ transform>> ] bi*
         get-ray-collision-mesh dup hit>> [
             over hit>> [ 2dup [ distance>> ] bi@ < ] [ t ] if
             [ nip ] [ drop ] if
