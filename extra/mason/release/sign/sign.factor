@@ -1,7 +1,7 @@
 ! Copyright (C) 2016 Doug Coleman.
 ! See https://factorcode.org/license.txt for BSD license.
-USING: io.backend io.pathnames kernel literals make mason.common
-sequences system ;
+USING: combinators io.backend io.pathnames kernel literals
+make mason.common sequences system ;
 IN: mason.release.sign
 
 <<
@@ -64,9 +64,28 @@ M: object sign-archive drop ;
 ! the xattrs as quarantined.
 ! https://github.com/factor/factor/issues/1896
 M: macosx sign-archive
-    ${
-        "codesign" "--force" "--sign"
-        "Developer ID Application"
-        cert-path
-    } swap suffix
-    short-running-process ;
+    [
+        ${
+            "codesign" "--force" "--sign"
+            "Developer ID Application"
+            cert-path
+        } swap suffix
+        short-running-process
+    ] [
+        [
+            "xcrun" ,
+            "notarytool" ,
+            "submit" ,
+            ,
+            "--keychain-profile" ,
+            "AC_PASSWORD" ,
+            "--wait" ,
+        ] { } make short-running-process
+    ] [
+        [
+            "xcrun" ,
+            "stapler" ,
+            "staple" ,
+            ,
+        ] { } make short-running-process
+    ] tri ;
