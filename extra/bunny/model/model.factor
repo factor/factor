@@ -42,7 +42,8 @@ IN: bunny.model
 
 : model-path ( -- path ) "bun_zipper.ply" cache-file ;
 
-CONSTANT: model-url "http://duriansoftware.com/joe/media/bun_zipper.ply"
+CONSTANT: model-url
+"https://downloads.factorcode.org/misc/bun_zipper.ply"
 
 : download-bunny ( -- path )
     model-url model-path [ ?download-to ] keep ;
