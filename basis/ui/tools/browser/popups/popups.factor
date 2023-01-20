@@ -1,5 +1,5 @@
 ! Copyright (C) 2009 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs definitions.icons help
 help.topics kernel math.rectangles models.arrow namespaces
 sequences tools.crossref ui.gadgets ui.gadgets.glass

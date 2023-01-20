@@ -1,5 +1,5 @@
 ! Copyright (C) 2011-2012 John Benediktsson
-! See http://factorcode.org/license.txt for BSD license
+! See https://factorcode.org/license.txt for BSD license
 
 USING: accessors assocs calendar colors combinators fonts
 formatting hashtables io kernel make math math.parser sequences

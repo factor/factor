@@ -1,5 +1,5 @@
 ! Copyright (C) 2010 Doug Coleman.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors alien.enums alien.syntax arrays ascii calendar
 combinators combinators.smart constructors continuations endian
 grouping io io.encodings.binary io.encodings.string

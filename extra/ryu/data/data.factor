@@ -1,5 +1,5 @@
 ! Copyright (C) 2018 Alexander Ilin.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 IN: ryu.data
 
 CONSTANT: DOUBLE_POW5_INV_SPLIT {

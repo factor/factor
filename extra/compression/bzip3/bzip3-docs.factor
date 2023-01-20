@@ -1,5 +1,5 @@
 ! Copyright (C) 2022 Raghu Ranganathan.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: byte-arrays help.markup help.syntax kernel multiline strings ;
 IN: compression.bzip3
 

@@ -1,5 +1,5 @@
 ! Copyright (C) 2020 Fred Alger
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: arrays editors environment io.files.info io.pathnames
 kernel make math.parser namespaces sequences ;
 IN: editors.acme

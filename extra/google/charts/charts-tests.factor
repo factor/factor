@@ -1,5 +1,5 @@
 ! Copyright (C) 2016 Alexander Ilin.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors colors google.charts google.charts.private
 kernel math present sequences tools.test ;
 

@@ -1,5 +1,5 @@
 ! Copyright (C) 2009 Joe Groff.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 ! This vocab only exports forward-compatible OpenGL 3.x symbols.
 ! For legacy OpenGL and extensions, use opengl.gl
 

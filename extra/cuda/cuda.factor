@@ -1,5 +1,5 @@
 ! Copyright (C) 2010 Doug Coleman.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: alien.c-types alien.data cuda.ffi kernel ;
 QUALIFIED-WITH: alien.c-types c
 IN: cuda

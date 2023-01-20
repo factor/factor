@@ -1,5 +1,5 @@
 ! Copyright (C) 2009 John Benediktsson
-! See http://factorcode.org/license.txt for BSD license
+! See https://factorcode.org/license.txt for BSD license
 
 USING: accessors assocs command-line io io.encodings.binary
 io.files io.streams.string kernel math multiline namespaces

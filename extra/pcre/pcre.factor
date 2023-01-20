@@ -1,5 +1,5 @@
 ! Copyright (C) 2013, 2016 Björn Lindqvist
-! See http://factorcode.org/license.txt for BSD license
+! See https://factorcode.org/license.txt for BSD license
 
 USING: accessors alien alien.accessors alien.c-types alien.data
 alien.enums alien.strings arrays assocs combinators

@@ -1,5 +1,5 @@
 ! Copyright (C) 2010 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors calendar db db.tuples db.types kernel
 webapps.mason.version.files sequences ;
 IN: webapps.mason.version.data

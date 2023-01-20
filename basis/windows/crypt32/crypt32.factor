@@ -1,5 +1,5 @@
 ! Copyright (C) 2016 Doug Coleman.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: alien.syntax classes.struct windows.kernel32
 windows.types ;
 IN: windows.crypt32

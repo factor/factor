@@ -1,5 +1,5 @@
 ! Copyright (C) 2010 Erik Charlebois
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: io io.encodings.ascii math.parser sequences splitting
 kernel assocs io.files combinators math.order math namespaces
 arrays sequences.deep accessors alien.c-types alien.data

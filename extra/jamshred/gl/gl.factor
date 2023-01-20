@@ -1,5 +1,5 @@
 ! Copyright (C) 2007, 2008 Alex Chapman
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors alien.c-types jamshred.game jamshred.tunnel
 kernel literals math math.constants math.functions
 math.vectors opengl opengl.demo-support opengl.gl opengl.glu

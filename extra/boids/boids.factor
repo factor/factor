@@ -1,6 +1,6 @@
 ! Copyright (C) 2008 Eduardo Cavazos.
 ! Copyright (C) 2011 Anton Gorenko.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 
 USING: accessors arrays boids.simulation calendar classes colors
 kernel literals math math.functions math.trig models

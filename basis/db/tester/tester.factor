@@ -1,5 +1,5 @@
 ! Copyright (C) 2008 Slava Pestov, Doug Coleman.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors assocs concurrency.combinators db db.pools
 db.postgresql db.queries db.sqlite db.tuples db.types
 destructors io.files.temp kernel math math.parser namespaces

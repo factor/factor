@@ -1,5 +1,5 @@
 ! Copyright (C) 2018, 2020, 2022 Alexander Ilin.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: base32 calendar checksums.hmac checksums.sha endian
 kernel math math.bitwise math.parser namespaces sequences
 strings unicode ;

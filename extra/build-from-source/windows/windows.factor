@@ -1,5 +1,5 @@
 ! Copyright (C) 2023 Doug Coleman.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors build-from-source environment html.parser
 html.parser.analyzer http.client io.backend io.directories
 io.encodings.utf8 io.files io.files.temp io.launcher
@@ -24,7 +24,7 @@ IN: build-from-source.windows
 : check-msbuild ( -- ) { "msbuild" "-h" } try-process ;
 
 : latest-fftw ( -- path )
-    "http://ftp.fftw.org/pub/fftw/" [
+    "https://ftp.fftw.org/pub/fftw/" [
         http-get nip
         parse-html find-links concat
         [ name>> text = ] filter

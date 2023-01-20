@@ -1,5 +1,5 @@
 ! Copyright (C) 2009 John Benediktsson
-! See http://factorcode.org/license.txt for BSD license
+! See https://factorcode.org/license.txt for BSD license
 
 USING: brainfuck io.streams.string kernel literals math
 math.parser ranges sequences splitting tools.test ;

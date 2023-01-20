@@ -1,5 +1,5 @@
 ! Copyright (C) 2010 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: alien.c-types compiler.cfg.hats compiler.cfg.instructions
 compiler.cfg.stacks compiler.constants cpu.architecture kernel ;
 IN: compiler.cfg.intrinsics.strings

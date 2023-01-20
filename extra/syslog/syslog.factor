@@ -1,5 +1,5 @@
 ! Copyright (C) 2021 John Benediktsson
-! See http://factorcode.org/license.txt for BSD license
+! See https://factorcode.org/license.txt for BSD license
 
 USING: accessors calendar calendar.format io io.encodings.utf8
 io.sockets io.streams.byte-array literals math math.parser
@@ -7,7 +7,7 @@ namespaces sequences ;
 
 IN: syslog
 
-! RFC 3164 (http://www.faqs.org/rfcs/rfc3164.html)
+! RFC 3164 (https://www.faqs.org/rfcs/rfc3164.html)
 
 ! The first part is called the PRI, the second part is the
 ! HEADER, and the third part is the MSG.  The total length of

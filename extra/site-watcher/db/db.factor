@@ -1,5 +1,5 @@
 ! Copyright (C) 2009 Doug Coleman.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors calendar combinators.smart db db.sqlite
 db.tuples db.types debugger io.files.temp io.streams.string
 kernel sequences ;

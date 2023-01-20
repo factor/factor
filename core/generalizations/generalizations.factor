@@ -1,6 +1,6 @@
 ! Copyright (C) 2007, 2009 Chris Double, Doug Coleman, Eduardo
 ! Cavazos, Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: arrays combinators kernel kernel.private math ranges
 memoize.private sequences ;
 IN: generalizations

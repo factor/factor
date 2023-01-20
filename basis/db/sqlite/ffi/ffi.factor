@@ -1,5 +1,5 @@
 ! Copyright (C) 2005 Chris Double, Doug Coleman.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 ! An interface to the sqlite database. Tested against sqlite v3.1.3.
 ! Not all functions have been wrapped.
 USING: alien alien.c-types alien.libraries alien.syntax

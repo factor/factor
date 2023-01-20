@@ -1,5 +1,5 @@
 ! Copyright (C) 2011-2012 John Benediktsson
-! See http://factorcode.org/license.txt for BSD license
+! See https://factorcode.org/license.txt for BSD license
 USING: accessors assocs calendar combinators fonts formatting io
 io.streams.string kernel literals make math math.order
 namespaces pdf.canvas pdf.values pdf.wrap ranges sequences

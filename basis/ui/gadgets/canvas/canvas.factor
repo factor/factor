@@ -1,5 +1,5 @@
 ! Copyright (C) 2007, 2009 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 
 USING: ui.backend ui.gadgets ui.gadgets.worlds ui.pens.solid
 opengl opengl.gl kernel namespaces classes.tuple colors

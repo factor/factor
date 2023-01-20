@@ -1,5 +1,5 @@
 ! Copyright (C) 2009 Samuel Tardieu.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: kernel kernel.private math math.bitwise
 math.functions math.order math.private ranges sequences
 sequences.private ;

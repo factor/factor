@@ -1,5 +1,5 @@
 ! Copyright (C) 2010 Erik Charlebois
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors alien.c-types arrays combinators game.loop
 game.models.loader game.worlds gpu gpu.buffers gpu.render
 gpu.shaders gpu.state gpu.textures gpu.util.wasd images

@@ -1,5 +1,5 @@
 ! Copyright (C) 2006, 2010 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: alien.syntax cocoa cocoa.application cocoa.classes
 cocoa.dialogs cocoa.nibs cocoa.pasteboard cocoa.runtime
 cocoa.subclassing core-foundation.strings eval kernel listener

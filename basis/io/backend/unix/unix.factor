@@ -1,5 +1,5 @@
 ! Copyright (C) 2004, 2008 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors alien.c-types alien.data alien.syntax classes
 classes.struct combinators destructors destructors.private fry
 io.backend io.backend.unix.multiplexers io.buffers io.files

@@ -1,5 +1,5 @@
 ! Copyright (C) 2009 Sascha Matzke.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: assocs help.markup help.syntax kernel quotations ;
 IN: mongodb.driver
 
@@ -44,7 +44,7 @@ HELP: <update>
 }
 { $description "Creates an update message for the object(s) identified by the given selector."
   "MongoDB supports full object updates as well as partial update modifiers such as $set, $inc or $push"
-  "For more information see: " { $url "http://www.mongodb.org/display/DOCS/Updates" } } ;
+  "For more information see: " { $url "https://www.mongodb.org/display/DOCS/Updates" } } ;
 
 HELP: >upsert
 { $values
@@ -122,7 +122,7 @@ HELP: ensure-index
   { "index-spec" "an index specification" }
 }
 { $description "Ensures the existence of the given index. "
-  "For more information on MongoDB indexes see: " { $url "http://www.mongodb.org/display/DOCS/Indexes" } }
+  "For more information on MongoDB indexes see: " { $url "https://www.mongodb.org/display/DOCS/Indexes" } }
 { $examples
   { $unchecked-example "USING: mongodb.driver ;"
     "\"db\" \"127.0.0.1\" 27017 <mdb>"
@@ -161,7 +161,7 @@ HELP: hint
   { "index-hint" "a hint to an index" }
 }
 { $description "Annotates the query with a hint to an index. "
-  "For detailed information see: " { $url "http://www.mongodb.org/display/DOCS/Optimizing+Mongo+Performance#OptimizingMongoPerformance-Hint" } }
+  "For detailed information see: " { $url "https://www.mongodb.org/display/DOCS/Optimizing+Mongo+Performance#OptimizingMongoPerformance-Hint" } }
 { $examples
   { $unchecked-example "USING: mongodb.driver ;"
     "\"db\" \"127.0.0.1\" 27017 <mdb>"
@@ -173,7 +173,7 @@ HELP: lasterror
   { "error" "error message or f" }
 }
 { $description "Checks if the last operation resulted in an error on the MongoDB side"
-  "For more information see: " { $url "http://www.mongodb.org/display/DOCS/Mongo+Commands#MongoCommands-LastErrorCommands" } } ;
+  "For more information see: " { $url "https://www.mongodb.org/display/DOCS/Mongo+Commands#MongoCommands-LastErrorCommands" } } ;
 
 HELP: limit
 { $values

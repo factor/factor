@@ -1,5 +1,5 @@
 ! Copyright (C) 2008 Doug Coleman.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors arrays byte-arrays classes classes.tuple
 combinators continuations db db.errors db.tuples
 db.tuples.private db.types destructors kernel make math

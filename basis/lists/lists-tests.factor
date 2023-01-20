@@ -1,5 +1,5 @@
 ! Copyright (C) 2008 James Cash
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: tools.test lists math kernel ;
 
 { { 3 4 5 6 7 } } [

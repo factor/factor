@@ -1,5 +1,5 @@
 ! Copyright (C) 2010 Joe Groff.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors alien alien.c-types alien.handles alien.syntax
 destructors kernel math tools.test ;
 IN: alien.handles.tests

@@ -1,5 +1,5 @@
 ! Copyright (C) 2009 Daniel Ehrenberg
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors byte-arrays classes combinators destructors
 growable io io.private io.streams.plain kernel math math.order
 sequences sequences.private strings ;

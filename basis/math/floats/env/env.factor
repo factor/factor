@@ -1,5 +1,5 @@
 ! Copyright (C) 2009 Joe Groff.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: arrays assocs combinators continuations generalizations
 kernel math math.bitwise sequences sets system vocabs ;
 IN: math.floats.env

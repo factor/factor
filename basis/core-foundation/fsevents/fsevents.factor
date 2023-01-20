@@ -1,5 +1,5 @@
 ! Copyright (C) 2008 Slava Pestov
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors alien alien.c-types alien.data alien.strings
 alien.syntax arrays assocs classes.struct combinators
 core-foundation core-foundation.arrays core-foundation.run-loop

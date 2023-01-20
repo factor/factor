@@ -1,5 +1,5 @@
 ! Copyright (C) 2009 Chris Double. All Rights Reserved.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors assocs base64 calendar calendar.format
 calendar.parser checksums.hmac checksums.sha combinators http
 http.client kernel make math.order namespaces sequences
@@ -40,7 +40,7 @@ TUPLE: s3-request path mime-type date method headers bucket data ;
 
 : s3-url ( s3-request -- string )
     [
-        "http://" %
+        "https://" %
         dup bucket>> [ % "." % ] when*
         "s3.amazonaws.com" %
         path>> %
@@ -88,7 +88,7 @@ PRIVATE>
 
 <PRIVATE
 : bucket-url ( bucket -- string )
-    [ "http://" % % ".s3.amazonaws.com/" % ] "" make ;
+    [ "https://" % % ".s3.amazonaws.com/" % ] "" make ;
 PRIVATE>
 
 TUPLE: key name last-modified size ;

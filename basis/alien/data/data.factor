@@ -1,5 +1,5 @@
 ! Copyright (C) 2009, 2010 Slava Pestov, Joe Groff.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors alien alien.arrays alien.c-types alien.strings
 arrays byte-arrays combinators combinators.short-circuit
 cpu.architecture generalizations io io.streams.memory kernel

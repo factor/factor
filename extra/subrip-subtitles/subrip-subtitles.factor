@@ -1,11 +1,11 @@
 ! Copyright (C) 2014 Doug Coleman.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors arrays calendar calendar.parser
 io.encodings.utf8 io.files io.streams.string kernel math
 math.parser sequences splitting ascii ;
 IN: subrip-subtitles
 
-! http://en.wikipedia.org/wiki/SubRip
+! https://en.wikipedia.org/wiki/SubRip
 ! .srt
 
 TUPLE: srt-chunk id begin-time end-time rect text ;

@@ -1,9 +1,9 @@
 ! Copyright (c) 2012 Anonymous
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: backtrack kernel prettyprint sequences splitting ;
 IN: rosetta-code.amb
 
-! http://rosettacode.org/wiki/Amb
+! https://rosettacode.org/wiki/Amb
 
 ! Define and give an example of the Amb operator.
 

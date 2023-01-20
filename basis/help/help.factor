@@ -1,5 +1,5 @@
 ! Copyright (C) 2005, 2010 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs classes classes.error combinators
 combinators.short-circuit continuations debugger effects fry
 generic help.crossref help.markup help.stylesheet help.topics io

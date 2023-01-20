@@ -1,5 +1,5 @@
 ! Copyright (C) 2006 Daniel Ehrenberg, Walton Chan
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: http.client xml xml.traversal kernel sequences
 math.parser urls accessors ;
 IN: yahoo
@@ -18,7 +18,7 @@ format similar-ok language country site subscription license ;
         first3 <result>
     ] map ;
 
-CONSTANT: yahoo-url URL" http://search.yahooapis.com/WebSearchService/V1/webSearch"
+CONSTANT: yahoo-url URL" https://search.yahooapis.com/WebSearchService/V1/webSearch"
 
 :: param ( search url name quot -- search url )
     search url search quot call

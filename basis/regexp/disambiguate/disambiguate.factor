@@ -1,5 +1,5 @@
 ! Copyright (C) 2009 Daniel Ehrenberg.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs kernel math math.bits regexp.ast
 regexp.classes regexp.transition-tables sequences sets ;
 IN: regexp.disambiguate

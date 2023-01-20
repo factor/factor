@@ -1,5 +1,5 @@
 ! Copyright (C) 2007, 2008 Slava Pestov, 2020 Alexander Ilin.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: assocs fry io io.directories io.encodings.utf8
 io.launcher io.pathnames kernel math.statistics prettyprint
 sequences sorting system ;

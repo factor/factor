@@ -1,10 +1,10 @@
 ! Copyright (c) 2012 Anonymous
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: assocs kernel math math.functions math.vectors
 rosetta-code.bitmap-line sequences ;
 IN: rosetta-code.bitmap-bezier
 
-! http://rosettacode.org/wiki/Bitmap/Bézier_curves/Cubic
+! https://rosettacode.org/wiki/Bitmap/Bézier_curves/Cubic
 
 ! Using the data storage type defined on this page for raster
 ! images, and the draw_line function defined in this other one,

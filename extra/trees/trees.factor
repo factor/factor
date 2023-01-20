@@ -1,5 +1,5 @@
 ! Copyright (C) 2007 Alex Chapman
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs combinators
 combinators.short-circuit deques dlists kernel make math
 math.order namespaces parser prettyprint.custom random sequences

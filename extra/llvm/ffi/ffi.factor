@@ -1,5 +1,5 @@
 ! Copyright (C) 2009 Matthew Willis, 2017 Björn Lindqvist
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: alien alien.c-types alien.libraries alien.syntax combinators
 kernel ldcache system ;
 IN: llvm.ffi

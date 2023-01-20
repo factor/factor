@@ -1,5 +1,5 @@
 ! Copyright (C) 2022 John Benediktsson
-! See http://factorcode.org/license.txt for BSD license
+! See https://factorcode.org/license.txt for BSD license
 
 USING: accessors base64.private byte-arrays combinators endian
 grouping io io.encodings.binary io.encodings.string

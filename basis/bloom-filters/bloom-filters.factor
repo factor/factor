@@ -1,5 +1,5 @@
 ! Copyright (C) 2009 Alec Berryman.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors arrays bit-arrays kernel kernel.private
 layouts math math.functions math.order math.private
 ranges multiline sequences sequences.private typed ;
@@ -18,8 +18,8 @@ TODO:
   - Try something smarter than the bitwise complement for a
     second hash code.
 
-  - http://spyced.blogspot.com/2009/01/all-you-ever-wanted-to-know-about.html
-    makes a case for http://murmurhash.googlepages.com/ instead
+  - https://spyced.blogspot.com/2009/01/all-you-ever-wanted-to-know-about.html
+    makes a case for https://murmurhash.googlepages.com/ instead
     of enhanced double-hashing.
 
   - Be sure to adjust the test that asserts the number of false
@@ -108,8 +108,8 @@ PRIVATE>
 ! See "Bloom Filters in Probabilistic Verification" by Peter C.
 ! Dillinger and Panagiotis Manolios, section 5.2, "Enhanced
 ! Double Hashing":
-! http://www.ccs.neu.edu/home/pete/research/bloom-filters-verification.html
-! http://www.cc.gatech.edu/~manolios/research/bloom-filters-verification.html
+! https://www.ccs.neu.edu/home/pete/research/bloom-filters-verification.html
+! https://www.cc.gatech.edu/~manolios/research/bloom-filters-verification.html
 : combine-hashcodes ( index hash0 hash1 -- hash )
     { fixnum fixnum fixnum } declare
     [ [ [ 3 ^ ] [ - ] bi 6 /i ] keep ]

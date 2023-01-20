@@ -1,5 +1,5 @@
 ! Copyright (C) 2017 Doug Coleman.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: kernel math math.functions math.order math.vectors
 sequences ;
 IN: machine-learning.functions

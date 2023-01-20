@@ -1,9 +1,9 @@
 ! Copyright (c) 2012 Anonymous
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: bit-arrays io kernel math sequences ;
 IN: rosetta-code.one-d-cellular
 
-! http://rosettacode.org/wiki/One-dimensional_cellular_automata
+! https://rosettacode.org/wiki/One-dimensional_cellular_automata
 
 ! Assume an array of cells with an initial distribution of live
 ! and dead cells, and imaginary cells off the end of the array

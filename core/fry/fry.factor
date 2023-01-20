@@ -1,5 +1,5 @@
 ! Copyright (C) 2009 Slava Pestov, Eduardo Cavazos, Joe Groff.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors combinators kernel locals.backend math
 quotations sequences sets splitting vectors words ;
 IN: fry

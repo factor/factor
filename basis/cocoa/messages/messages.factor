@@ -1,5 +1,5 @@
 ! Copyright (C) 2006, 2010 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors alien alien.c-types alien.data alien.strings
 arrays assocs classes.struct cocoa.runtime cocoa.types
 combinators core-graphics.types generalizations

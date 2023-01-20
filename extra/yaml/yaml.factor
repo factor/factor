@@ -1,5 +1,5 @@
 ! Copyright (C) 2013 Jon Harper.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors alien.data arrays assocs byte-arrays
 classes.struct combinators combinators.extras
 combinators.short-circuit destructors fry generalizations

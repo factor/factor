@@ -1,5 +1,5 @@
 ! Copyright (C) 2014 Jon Harper.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: arrays kernel sequences sorting tools.coverage
 tools.coverage.private tools.coverage.testvocab
 tools.coverage.testvocab.child tools.coverage.testvocab.private

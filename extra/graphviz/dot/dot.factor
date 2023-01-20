@@ -1,5 +1,5 @@
 ! Copyright (C) 2012 Alex Vondrak.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors classes classes.tuple combinators formatting graphviz
 graphviz.attributes io io.files kernel namespaces sequences splitting
 strings words ;

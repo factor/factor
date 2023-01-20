@@ -1,5 +1,5 @@
 ! Copyright (C) 2009 Joe Groff.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors alien.data.map destructors grouping kernel math
 math.vectors.simd opengl opengl.gl ranges sequences
 specialized-arrays ;

@@ -1,5 +1,5 @@
 ! Copyright (C) 2008 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors alien alien.data arrays byte-arrays
 compiler.units destructors io kernel layouts libc make math
 math.order math.parser namespaces prettyprint quotations

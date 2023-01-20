@@ -1,5 +1,5 @@
 ! Copyright (C) 2020 John Benediktsson
-! See http://factorcode.org/license.txt for BSD license
+! See https://factorcode.org/license.txt for BSD license
 
 USING: accessors ascii byte-arrays combinators kernel literals
 math math.order sbufs sequences sequences.extras sets sorting

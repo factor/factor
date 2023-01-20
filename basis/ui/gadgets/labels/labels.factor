@@ -1,5 +1,5 @@
 ! Copyright (C) 2005, 2009 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors arrays classes colors combinators
 fonts fry kernel make math.functions models namespaces sequences
 splitting strings ui.baseline-alignment ui.gadgets

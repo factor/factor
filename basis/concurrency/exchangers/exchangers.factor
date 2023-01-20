@@ -1,10 +1,10 @@
 ! Copyright (C) 2008, 2010 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors boxes kernel threads ;
 IN: concurrency.exchangers
 
 ! Motivated by
-! http://java.sun.com/j2se/1.5.0/docs/api/java/util/concurrent/Exchanger.html
+! https://java.sun.com/j2se/1.5.0/docs/api/java/util/concurrent/Exchanger.html
 
 TUPLE: exchanger thread object ;
 

@@ -1,5 +1,5 @@
 ! Copyright (C) 2005, 2009 Eduardo Cavazos, Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: alien.c-types continuations io kernel namespaces
 vocabs.loader x11.io x11.xlib ;
 FROM: alien.c-types => c-bool> ;

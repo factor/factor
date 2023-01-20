@@ -1,5 +1,5 @@
 ! Copyright (C) 2006, 2008 Doug Coleman.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: alien alien.c-types alien.data alien.strings alien.syntax
 classes.struct io.backend kernel literals math windows
 windows.com windows.com.syntax windows.kernel32 windows.messages

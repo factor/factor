@@ -1,5 +1,5 @@
 ! Copyright (C) 2009, 2011 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs compiler.cfg.def-use
 compiler.cfg.instructions compiler.cfg.instructions.syntax fry
 functors generic.parser kernel lexer namespaces parser sequences

@@ -1,5 +1,5 @@
 ! Copyright (C) 2008 Doug Coleman.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors alien.data arrays assocs byte-arrays
 combinators combinators.short-circuit hash-sets hashtables
 hashtables.private kernel math math.bitwise math.constants

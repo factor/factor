@@ -1,5 +1,5 @@
 ! Copyright (C) 2005, 2010, 2018 Slava Pestov, Joe Groff, and Cat Stevens.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors arrays combinators formatting kernel math
 math.bits math.functions math.matrices math.order
 math.statistics math.text.english math.vectors random sequences

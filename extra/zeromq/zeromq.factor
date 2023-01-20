@@ -1,5 +1,5 @@
 ! Copyright (C) 2011-2013 Eungju PARK, John Benediktsson.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors alien.c-types alien.data arrays byte-arrays
 classes.struct combinators destructors fry kernel libc math math.order
 memoize sequences zeromq.ffi ;

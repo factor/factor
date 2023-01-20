@@ -1,5 +1,5 @@
 ! Copyright (C) 2007, 2009 Doug Coleman.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors alien.c-types alien.data arrays
 byte-arrays combinators compression.run-length endian grouping
 images images.loader images.normalization io io.encodings.latin1
@@ -9,8 +9,8 @@ QUALIFIED-WITH: bitstreams b
 SPECIALIZED-ARRAYS: uint ushort ;
 IN: images.bitmap
 
-! http://www.fileformat.info/format/bmp/egff.htm
-! http://www.digicamsoft.com/bmp/bmp.html
+! https://www.fileformat.info/format/bmp/egff.htm
+! https://www.digicamsoft.com/bmp/bmp.html
 
 SINGLETON: bmp-image
 "bmp" bmp-image ?register-image-class

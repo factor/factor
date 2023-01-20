@@ -1,5 +1,5 @@
 ! Copyright (C) 2023 Doug Coleman.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: editors io.standard-paths kernel make math math.parser
 namespaces sequences system ;
 IN: editors.10x

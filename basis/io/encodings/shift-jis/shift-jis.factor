@@ -1,5 +1,5 @@
 ! Copyright (C) 2009 Daniel Ehrenberg
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs byte-arrays
 combinators.short-circuit endian io io.encodings
 io.encodings.iana kernel math.bitwise math.order namespaces

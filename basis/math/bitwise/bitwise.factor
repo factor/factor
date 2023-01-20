@@ -1,5 +1,5 @@
 ! Copyright (C) 2007, 2008 Slava Pestov, Doug Coleman.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: alien alien.c-types alien.data arrays assocs byte-arrays
 combinators combinators.short-circuit kernel kernel.private
 layouts math math.bits sequences sequences.private

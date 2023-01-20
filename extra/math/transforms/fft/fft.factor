@@ -1,5 +1,5 @@
 ! Copyright (c) 2012 John Benediktsson
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: kernel math math.constants math.functions
 math.vectors sequences sequences.extras ;
 IN: math.transforms.fft

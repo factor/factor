@@ -1,5 +1,5 @@
 ! Copyright (C) 2008 John Benediktsson
-! See http://factorcode.org/license.txt for BSD license
+! See https://factorcode.org/license.txt for BSD license
 USING: calendar checksums checksums.md5 checksums.sha
 combinators endian kernel literals math math.bitwise math.parser
 random sequences ;

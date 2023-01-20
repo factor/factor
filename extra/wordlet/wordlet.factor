@@ -1,5 +1,5 @@
 ! Copyright (C) 2022 Doug Coleman.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors arrays ascii assocs assocs.extras base91 colors
 combinators hashtables io io.encodings.binary
 io.encodings.string io.encodings.utf8 io.files io.styles kernel

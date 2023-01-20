@@ -1,5 +1,5 @@
 ! Copyright (C) 2009 Bruno Deferrari
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors assocs concurrency.mailboxes io irc.client.chats
 irc.messages kernel namespaces sequences strings words.symbol ;
 IN: irc.client.base

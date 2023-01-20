@@ -1,5 +1,5 @@
 ! Copyright (C) 2011 Joe Groff.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors assocs combinators combinators.short-circuit
 continuations formatting generalizations io io.streams.string
 kernel kernel.private layouts math math.parser math.vectors

@@ -1,5 +1,5 @@
 ! Copyright (C) 2009 Doug Coleman.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors assocs continuations fry http.server io
 io.encodings.ascii io.files io.files.temp io.files.unique
 io.servers io.streams.duplex io.streams.string

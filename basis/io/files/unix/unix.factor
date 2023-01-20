@@ -1,5 +1,5 @@
 ! Copyright (C) 2005, 2008 Slava Pestov, Doug Coleman.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors byte-arrays continuations destructors environment
 io.backend.unix io.files io.files.private io.pathnames io.ports kernel
 libc literals math system unix unix.ffi ;

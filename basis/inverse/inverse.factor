@@ -1,5 +1,5 @@
 ! Copyright (C) 2007, 2009 Daniel Ehrenberg.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs bit-arrays byte-arrays classes
 classes.tuple combinators combinators.short-circuit
 combinators.smart continuations effects generalizations

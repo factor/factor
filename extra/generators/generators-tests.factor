@@ -1,5 +1,5 @@
 ! Copyright (C) 2023 Keldan Chapman.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: tools.test generators kernel coroutines ;
 IN: generators.tests
 

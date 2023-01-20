@@ -1,5 +1,5 @@
 ! Copyright (C) 2007 Chris Double, 2016 Alexander Ilin.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors alien alien.c-types alien.data alien.libraries
 alien.strings alien.syntax combinators continuations
 io.encodings.ascii kernel locals make math sequences strings

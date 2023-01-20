@@ -1,5 +1,5 @@
 ! Copyright (C) 2019 HMC Clinic.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 
 USING: accessors alien alien.c-types alien.data arrays combinators
 grouping kernel math math.functions ranges math.vectors

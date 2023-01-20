@@ -1,5 +1,5 @@
 ! Copyright (C) 2013 Doug Coleman.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: combinators.short-circuit editors io.standard-paths
 kernel make math.parser namespaces system ;
 IN: editors.geany

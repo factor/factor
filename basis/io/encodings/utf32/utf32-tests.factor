@@ -1,5 +1,5 @@
 ! Copyright (C) 2009 Daniel Ehrenberg.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: kernel tools.test io.encodings.utf32 arrays sbufs
 io.streams.byte-array sequences io.encodings io strings
 io.encodings.string alien.c-types alien.strings accessors classes ;

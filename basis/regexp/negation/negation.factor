@@ -1,5 +1,5 @@
 ! Copyright (C) 2009 Daniel Ehrenberg.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors assocs hashtables kernel namespaces regexp.ast
 regexp.classes regexp.dfa regexp.disambiguate regexp.minimize
 regexp.nfa regexp.transition-tables sequences sets vectors ;

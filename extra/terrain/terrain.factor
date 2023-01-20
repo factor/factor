@@ -1,5 +1,5 @@
 ! Copyright (C) 2009 Joe Groff, Doug Coleman.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors arrays combinators combinators.short-circuit
 destructors game.input game.input.scancodes game.loop
 game.worlds grid-meshes grouping kernel literals math

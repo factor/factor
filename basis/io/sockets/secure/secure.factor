@@ -1,5 +1,5 @@
 ! Copyright (C) 2008, 2010 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors alien.libraries calendar combinators delegate
 destructors io io.sockets io.sockets.private kernel memoize namespaces
 openssl.libssl present sequences summary system vocabs ;

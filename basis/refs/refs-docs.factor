@@ -1,5 +1,5 @@
 ! Copyright (C) 2007 Slava Pestov, 2009 Alex Chapman
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: boxes help.markup help.syntax kernel math namespaces assocs ;
 IN: refs
 

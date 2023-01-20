@@ -1,5 +1,5 @@
 ! Copyright (C) 2008, 2009 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors furnace.actions furnace.alloy
 furnace.redirection html.forms http.server
 http.server.dispatchers kernel math namespaces urls validators

@@ -1,5 +1,5 @@
 ! Copyright (C) 2010 John Benediktsson
-! See http://factorcode.org/license.txt for BSD license
+! See https://factorcode.org/license.txt for BSD license
 
 USING: ascii assocs io.encodings.ascii io.files kernel math
 sequences sequences.extras sorting sets ;

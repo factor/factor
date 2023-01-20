@@ -1,5 +1,5 @@
 ! Copyright (C) 2007, 2009 Slava Pestov, Doug Coleman.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 ! Based on Slate's src/unfinished/interval.slate by Brian Rice.
 USING: accessors kernel sequences arrays math math.order
 combinators combinators.short-circuit generic layouts memoize ;

@@ -1,5 +1,5 @@
 ! Copyright (C) 2022 Alexander Ilin.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: arrays circular help.markup help.syntax lists lists.lazy ;
 IN: lists.circular
 

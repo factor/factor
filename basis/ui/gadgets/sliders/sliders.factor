@@ -1,5 +1,5 @@
 ! Copyright (C) 2005, 2010 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors assocs combinators fry kernel math math.order
 math.vectors models models.range ui.gadgets ui.gadgets.buttons
 ui.gadgets.icons ui.gadgets.tracks ui.gestures ui.pens

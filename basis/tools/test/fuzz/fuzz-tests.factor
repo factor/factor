@@ -1,5 +1,5 @@
 ! Copyright (C) 2011 Joe Groff.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors fry kernel macros math namespaces sequences
 source-files.errors tools.test tools.test.fuzz
 tools.test.fuzz.private tools.test.private ;

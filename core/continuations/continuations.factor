@@ -1,5 +1,5 @@
 ! Copyright (C) 2003, 2011 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors assocs classes combinators combinators.private
 kernel kernel.private make namespaces sequences vectors ;
 IN: continuations

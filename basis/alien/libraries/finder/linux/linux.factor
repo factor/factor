@@ -1,5 +1,5 @@
 ! Copyright (C) 2013 Björn Lindqvist, Doug Coleman.
-! See http://factorcode.org/license.txt for BSD license
+! See https://factorcode.org/license.txt for BSD license
 USING: accessors alien.libraries.finder arrays assocs
 combinators.short-circuit environment io io.encodings.utf8
 io.launcher kernel make sequences sets splitting system

@@ -1,6 +1,6 @@
 ! Copyright (c) 2009 Aaron Schaefer. All rights reserved.
 ! The contents of this file are licensed under the Simplified BSD License
-! A copy of the license is available at http://factorcode.org/license.txt
+! A copy of the license is available at https://factorcode.org/license.txt
 USING: arrays formatting io kernel math math.matrices
 math.parser sequences ;
 IN: benchmark.pidigits

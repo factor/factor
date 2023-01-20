@@ -1,5 +1,5 @@
 ! Copyright (C) 2009, 2020 Marc Fauconneau, Abtin Molavi, Jacob Fischer.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs bitstreams byte-arrays
 byte-vectors combinators combinators.short-circuit
 combinators.smart compression.huffman endian kernel math

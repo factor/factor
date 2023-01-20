@@ -1,5 +1,5 @@
 ! Copyright (c) 2012 Anonymous
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: io kernel math.functions math.parser ranges sequences ;
 IN: rosetta-code.fizzbuzz
 

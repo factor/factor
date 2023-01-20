@@ -1,5 +1,5 @@
 ! Copyright (C) 2005, 2009 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors combinators grouping kernel math math.vectors
 namespaces sequences threads ui.gadgets ui.gadgets.packs
 ui.gadgets.private ;

@@ -1,5 +1,5 @@
 ! Copyright (c) 2007, 2008 Aaron Schaefer.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: kernel math math.functions sequences ;
 IN: math.text.utils
 

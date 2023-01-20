@@ -1,5 +1,5 @@
 ! Copyright (C) 2016 John Benediktsson
-! See http://factorcode.org/license.txt for BSD license
+! See https://factorcode.org/license.txt for BSD license
 
 USING: alien.data command-line io io.encodings
 io.encodings.binary io.files kernel math math.bitwise

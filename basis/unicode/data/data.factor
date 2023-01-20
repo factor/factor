@@ -1,5 +1,5 @@
 ! Copyright (C) 2008, 2009 Daniel Ehrenberg.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: arrays ascii assocs byte-arrays combinators
 combinators.short-circuit grouping hashtables interval-sets
 io.encodings.utf8 io.files kernel make math math.bitwise

@@ -1,5 +1,5 @@
 ! Copyright (C) 2008 Peter Burns, 2009 Philipp Winkler
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: assocs combinators io io.encodings.utf8 io.files
 io.streams.string json kernel kernel.private math math.order
 math.parser namespaces sbufs sequences sequences.private strings ;

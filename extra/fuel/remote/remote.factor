@@ -1,5 +1,5 @@
 ! Copyright (C) 2009, 2010 Jose Antonio Ortega Ruiz.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: io io.servers kernel math tty-server ;
 
 IN: fuel.remote

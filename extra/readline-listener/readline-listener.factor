@@ -1,5 +1,5 @@
 ! Copyright (C) 2011 Erik Charlebois.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 
 USING: accessors assocs colors combinators io kernel listener
 readline sequences sets splitting threads tools.completion

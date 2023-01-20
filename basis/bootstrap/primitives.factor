@@ -1,5 +1,5 @@
 ! Copyright (C) 2004, 2010 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: arrays assocs bootstrap.image.primitives
 bootstrap.image.private classes classes.builtin classes.intersection
 classes.predicate classes.private classes.singleton classes.tuple

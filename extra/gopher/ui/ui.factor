@@ -1,5 +1,5 @@
 ! Copyright (C) 2014 John Benediktsson
-! See http://factorcode.org/license.txt for BSD license
+! See https://factorcode.org/license.txt for BSD license
 
 USING: accessors arrays debugger fonts gopher gopher.private
 kernel math.vectors models present sequences ui ui.commands

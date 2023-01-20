@@ -1,7 +1,7 @@
 ! Copyright (C) 2004, 2005 Mackenzie Straight
 ! Copyright (C) 2007, 2010 Slava Pestov
 ! Copyright (C) 2007, 2008 Doug Coleman
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors alien alien.c-types alien.destructors
 alien.syntax destructors destructors.private kernel math
 namespaces sequences sets summary system vocabs ;

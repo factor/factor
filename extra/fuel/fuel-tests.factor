@@ -1,5 +1,5 @@
 ! Copyright (C) 2009 Nicholas Seckar.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: continuations eval fuel fuel.private namespaces tools.test words ;
 IN: fuel.tests
 

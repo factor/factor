@@ -1,5 +1,5 @@
 ! Copyright (C) 2009 Bruno Deferrari
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs combinators concurrency.mailboxes
 continuations destructors io irc.client.base irc.client.chats
 irc.client.participants irc.messages irc.messages.base

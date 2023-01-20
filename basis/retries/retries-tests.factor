@@ -1,5 +1,5 @@
 ! Copyright (C) 2021 Doug Coleman.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors kernel namespaces retries tools.test ;
 IN: retries.tests
 

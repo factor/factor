@@ -1,5 +1,5 @@
 ! Copyright (C) 2011 John Benediktsson
-! See http://factorcode.org/license.txt for BSD license
+! See https://factorcode.org/license.txt for BSD license
 
 USING: command-line io io.encodings.utf8 io.files kernel
 namespaces sets sequences ;

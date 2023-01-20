@@ -1,5 +1,5 @@
 ! Copyright (C) 2006 Chris Double. All Rights Reserved.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors kernel peg strings sequences math math.parser
 make words quotations arrays hashtables io
 io.streams.string assocs ascii peg.parsers words.symbol

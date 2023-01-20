@@ -1,5 +1,5 @@
 ! Copyright (C) 2008, 2010 Slava Pestov, Jorge Acereda Macia.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors io io.encodings.ascii io.files io.files.temp
 io.launcher locals make math math.parser namespaces
 tools.disassembler.private ;

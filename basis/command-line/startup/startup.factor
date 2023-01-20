@@ -1,5 +1,5 @@
 ! Copyright (C) 2011 Joe Groff.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors combinators combinators.smart command-line eval
 io io.pathnames kernel layouts math math.parser namespaces
 parser parser.notes prettyprint sequences source-files system

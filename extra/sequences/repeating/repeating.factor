@@ -1,6 +1,6 @@
 ! Copyright (C) 2008 Alex Chapman
 ! Copyright (C) 2012 John Benediktsson
-! See http://factorcode.org/license.txt for BSD license
+! See https://factorcode.org/license.txt for BSD license
 USING: accessors circular kernel math sequences ;
 IN: sequences.repeating
 

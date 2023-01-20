@@ -1,5 +1,5 @@
 ! Copyright (C) 2009, 2020 Marc Fauconneau, Abtin Molavi, and Jacob Fischer.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs bit-arrays bitstreams combinators
 hashtables heaps kernel math math.bits math.order namespaces
 sequences sorting vectors ;

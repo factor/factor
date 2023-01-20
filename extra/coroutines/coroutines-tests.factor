@@ -1,5 +1,5 @@
 ! Copyright (C) 2005 Chris Double, 2007 Clemens Hofreither, 2008 James Cash.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 IN: coroutines.tests
 USING: coroutines kernel sequences prettyprint tools.test math ;
 

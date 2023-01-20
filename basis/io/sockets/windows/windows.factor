@@ -1,5 +1,5 @@
 ! Copyright (C) 2007, 2009 Slava Pestov, Doug Coleman.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 
 USING: accessors alien alien.c-types alien.data alien.strings
 byte-arrays classes.struct combinators destructors io.backend
@@ -77,7 +77,7 @@ M: object remote>handle
     [ open-socket ] [ drop ] 2bi
     [ make-sockaddr/size bind-socket ] [ drop ] 2bi ;
 
-! http://support.microsoft.com/kb/127144
+! https://support.microsoft.com/kb/127144
 ! NOTE: Possibly tweak this because of SYN flood attacks
 : listen-backlog ( -- n ) 0x7fffffff ; inline
 

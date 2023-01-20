@@ -1,5 +1,5 @@
 ! Copyright (C) 2010 Samuel Tardieu.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: arrays assocs combinators hashtables kernel literals math math.functions
 math.vectors memoize path-finding sequences sorting splitting strings tools.test ;
 IN: path-finding.tests

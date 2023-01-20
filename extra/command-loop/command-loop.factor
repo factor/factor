@@ -1,5 +1,5 @@
 ! Copyright (C) 2021 John Benediktsson
-! See http://factorcode.org/license.txt for BSD license
+! See https://factorcode.org/license.txt for BSD license
 
 USING: accessors ascii assocs combinators continuations debugger
 formatting grouping io kernel math sequences sorting splitting ;

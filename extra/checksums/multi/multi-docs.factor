@@ -1,5 +1,5 @@
 ! Copyright (C) 2018 Alexander Ilin.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: checksums checksums.common checksums.md5 checksums.sha
 destructors help.markup help.syntax sequences ;
 IN: checksums.multi

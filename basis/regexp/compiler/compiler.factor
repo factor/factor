@@ -1,5 +1,5 @@
 ! Copyright (C) 2009 Daniel Ehrenberg.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors assocs combinators combinators.short-circuit
 kernel kernel.private math namespaces quotations regexp.classes
 regexp.transition-tables sequences sequences.private sets

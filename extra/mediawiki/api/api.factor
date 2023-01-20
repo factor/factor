@@ -1,5 +1,5 @@
 ! Copyright (C) 2021, 2022 Giftpflanze.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: arrays accessors assocs assocs.extras calendar
 combinators combinators.short-circuit continuations formatting
 http http.client io json.reader kernel locals make math

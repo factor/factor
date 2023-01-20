@@ -1,5 +1,5 @@
 ! Copyright (C) 2019-2020 KUSUMOTO Norio.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: logic kernel lists assocs math ;
 IN: logic.examples.fib
 

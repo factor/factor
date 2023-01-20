@@ -1,5 +1,5 @@
 ! Copyright (C) 2018 John Benediktsson
-! See http://factorcode.org/license.txt for BSD license
+! See https://factorcode.org/license.txt for BSD license
 
 USING: accessors arrays ascii assocs calendar calendar.english
 calendar.private combinators combinators.short-circuit io kernel

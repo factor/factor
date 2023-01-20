@@ -1,5 +1,5 @@
 ! Copyright (C) 2021 Doug Coleman.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: alien alien.c-types byte-arrays compression.zstd.ffi
 generalizations kernel math math.bitwise sequences ;
 IN: compression.zstd

@@ -1,5 +1,5 @@
 ! Copyright (C) 2007, 2008 Chris Double, Doug Coleman.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors fry kernel literals make math math.parser
 ranges peg peg.private sequences splitting strings unicode
 vectors ;

@@ -1,5 +1,5 @@
 ! Copyright (C) 2023 Doug Coleman.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: ascii cli.git combinators.short-circuit formatting
 http.client io.directories io.files io.files.info io.files.temp
 io.launcher io.pathnames kernel layouts namespaces sequences

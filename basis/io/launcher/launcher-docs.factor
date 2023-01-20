@@ -1,5 +1,5 @@
 ! Copyright (C) 2007, 2008 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: assocs calendar help.markup help.syntax io io.files
 io.launcher.private kernel literals quotations splitting ;
 IN: io.launcher

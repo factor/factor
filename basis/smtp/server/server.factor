@@ -1,5 +1,5 @@
 ! Copyright (C) 2007 Elie CHAFTARI
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: combinators kernel prettyprint io io.timeouts sequences
 namespaces io.sockets io.sockets.secure continuations calendar
 io.encodings.ascii io.streams.duplex destructors locals

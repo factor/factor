@@ -1,10 +1,10 @@
 ! Copyright (c) 2012 Anonymous
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: arrays combinators io kernel math math.functions
 ranges prettyprint sequences ;
 IN: rosetta-code.continued-fraction
 
-! http://rosettacode.org/wiki/Continued_fraction
+! https://rosettacode.org/wiki/Continued_fraction
 
 ! A number may be represented as a continued fraction (see
 ! Mathworld for more information) as follows:

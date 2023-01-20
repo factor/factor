@@ -1,5 +1,5 @@
 ! Copyright (C) 2009 Tim Wawrzynczak, Doug Coleman.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs byte-arrays
 combinators combinators.short-circuit combinators.smart
 continuations io.directories io.encodings.ascii

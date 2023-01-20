@@ -1,5 +1,5 @@
 ! Copyright (C) 2008 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors assocs math kernel shuffle generalizations
 words quotations arrays combinators sequences math.vectors
 io.styles prettyprint vocabs sorting io generic

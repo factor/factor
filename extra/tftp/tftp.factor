@@ -1,5 +1,5 @@
 ! Copyright (C) 2019 Doug Coleman.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs combinators
 combinators.short-circuit continuations destructors endian
 io io.directories io.encodings.binary io.encodings.latin1

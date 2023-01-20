@@ -1,5 +1,5 @@
 ! Copyright (C) 2009 Marc Fauconneau.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors arrays byte-arrays combinators
 compression.huffman endian grouping images images.loader
 images.processing io io.encodings.binary io.streams.byte-array

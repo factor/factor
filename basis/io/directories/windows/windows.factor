@@ -1,5 +1,5 @@
 ! Copyright (C) 2008 Doug Coleman.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: system io.directories alien.strings
 io.pathnames io.backend io.files.windows destructors
 kernel accessors calendar windows windows.errors

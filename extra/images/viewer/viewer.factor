@@ -1,5 +1,5 @@
 ! Copyright (C) 2007, 2009 Doug Coleman.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors arrays combinators.short-circuit continuations
 destructors images images.loader io.pathnames kernel math
 models opengl.gl opengl.textures opengl.textures.private

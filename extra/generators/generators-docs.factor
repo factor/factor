@@ -1,5 +1,5 @@
 ! Copyright (C) 2023 Keldan Chapman.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: help.markup help.syntax kernel math quotations sequences generators coroutines effects ;
 IN: generators
 

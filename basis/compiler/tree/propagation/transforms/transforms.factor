@@ -1,5 +1,5 @@
 ! Copyright (C) 2008, 2011 Slava Pestov, Daniel Ehrenberg.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 
 USING: accessors alien.c-types arrays assocs byte-arrays classes
 classes.algebra classes.struct classes.tuple

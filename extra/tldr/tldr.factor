@@ -1,5 +1,5 @@
 ! Copyright (C) 2021 John Benediktsson
-! See http://factorcode.org/license.txt for BSD license
+! See https://factorcode.org/license.txt for BSD license
 
 USING: assocs combinators command-line http.client io
 io.directories io.encodings.utf8 io.files io.files.temp

@@ -1,5 +1,5 @@
 ! Copyright (C) 2009 Doug Coleman, Daniel Ehrenberg.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: ascii assocs byte-arrays destructors fry
 io.encodings.binary io.files io.pathnames io.streams.byte-array
 kernel namespaces strings ;

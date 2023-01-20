@@ -1,5 +1,5 @@
 ! Copyright (C) 2005, 2010 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors alien arrays assocs byte-arrays classes.algebra
 classes.struct combinators compiler compiler.cfg
 compiler.cfg.comparisons compiler.cfg.instructions

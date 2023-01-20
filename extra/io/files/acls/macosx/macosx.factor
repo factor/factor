@@ -1,5 +1,5 @@
 ! Copyright (C) 2009 Doug Coleman.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: alien.c-types alien.data alien.destructors combinators
 destructors io io.backend io.files io.files.acls.macosx.ffi
 kernel libc sequences unix.groups unix.types unix.users ;
@@ -131,4 +131,4 @@ ERROR: add-permission-failed permission-set permission ;
 ! acl_get_qualifier, acl_get_tag_type, acl_get_flagset_np,
 ! acl_get_permset
 
-! http://www.google.com/codesearch/p?hl=en#pFm0LxzAWvs/darwinsource/tarballs/apsl/file_cmds-116.10.tar.gz%7CFam4LGNxuqg/file_cmds-116.10/ls/print.c&q=acl_get_permset&d=6
+! https://www.google.com/codesearch/p?hl=en#pFm0LxzAWvs/darwinsource/tarballs/apsl/file_cmds-116.10.tar.gz%7CFam4LGNxuqg/file_cmds-116.10/ls/print.c&q=acl_get_permset&d=6

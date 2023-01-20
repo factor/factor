@@ -1,5 +1,5 @@
 ! Copyright (C) 2020 Alexander Ilin.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: alien help.markup help.syntax kernel sodium.ffi ;
 IN: sodium
 

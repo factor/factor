@@ -1,6 +1,6 @@
 ! Copyright (C) 2004, 2011 Slava Pestov.
 ! Copyright (C) 2005 Mackenzie Straight.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors alien.private arrays assocs boxes combinators
 continuations continuations.private deques dlists hashtables
 heaps kernel kernel.private math math.order namespaces

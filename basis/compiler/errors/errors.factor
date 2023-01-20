@@ -1,5 +1,5 @@
 ! Copyright (C) 2007, 2009 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors assocs command-line fry kernel namespaces
 source-files.errors summary ;
 IN: compiler.errors

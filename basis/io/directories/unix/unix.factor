@@ -1,5 +1,5 @@
 ! Copyright (C) 2008 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors alien.c-types alien.data alien.strings assocs
 classes.struct continuations fry io.backend io.backend.unix
 io.directories io.files io.files.info io.files.info.unix

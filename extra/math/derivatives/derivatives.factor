@@ -1,5 +1,5 @@
 ! Copyright (C) 2009 Jason W. Merrill.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: kernel math math.functions math.derivatives.syntax
     math.order math.parser summary accessors make combinators ;
 IN: math.derivatives

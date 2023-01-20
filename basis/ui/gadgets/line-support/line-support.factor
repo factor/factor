@@ -1,5 +1,5 @@
 ! Copyright (C) 2009 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors arrays combinators fry kernel math
 math.functions math.order ranges math.vectors namespaces
 opengl sequences ui.gadgets ui.gadgets.scrollers

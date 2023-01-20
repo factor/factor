@@ -1,5 +1,5 @@
 ! Copyright (C) 2008, 2009 Slava Pestov, Daniel Ehrenberg.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors alien.accessors assocs combinators
 combinators.short-circuit compiler.tree
 compiler.tree.combinators compiler.tree.def-use.simplified

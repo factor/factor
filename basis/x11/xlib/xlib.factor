@@ -1,5 +1,5 @@
 ! Copyright (C) 2005, 2006 Eduardo Cavazos
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 !
 ! The most popular guides to programming the X Window System are
 ! the series from Oreilly. For programming with Xlib, there is

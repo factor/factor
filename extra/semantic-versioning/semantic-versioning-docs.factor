@@ -1,5 +1,5 @@
 ! Copyright (C) 2010 Maximilian Lupke.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: help.markup help.syntax kernel strings ;
 IN: semantic-versioning
 
@@ -42,7 +42,7 @@ HELP: version>=
 ARTICLE: "semantic-versioning" "Semantic Versioning"
 { $vocab-link "semantic-versioning" }
 $nl
-{ "See " { $url "http://semver.org/" } " for a detailed description of semantic versioning." }
+{ "See " { $url "https://semver.org/" } " for a detailed description of semantic versioning." }
 ;
 
 ABOUT: "semantic-versioning"

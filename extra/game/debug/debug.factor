@@ -1,5 +1,5 @@
 ! Copyright (C) 2010 Erik Charlebois
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 
 USING: accessors alien.c-types alien.data arrays circular colors
 columns destructors fonts gpu.buffers gpu.render gpu.shaders

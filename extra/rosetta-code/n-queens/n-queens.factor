@@ -1,9 +1,9 @@
 ! Copyright (c) 2012 Anonymous
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: kernel sequences math math.combinatorics formatting io ;
 IN: rosetta-code.n-queens
 
-! http://rosettacode.org/wiki/N-queens_problem
+! https://rosettacode.org/wiki/N-queens_problem
 
 ! Solve the eight queens puzzle. You can extend the problem to
 ! solve the puzzle with a board of side NxN.

@@ -1,5 +1,5 @@
 ! Copyright (C) 2020 Doug Coleman.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: bootstrap.image.private compiler.codegen.relocation
 compiler.constants compiler.units cpu.arm.assembler
 cpu.arm.assembler.opcodes generic.single.private

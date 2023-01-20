@@ -1,5 +1,5 @@
 ! Copyright (C) 2009 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: kernel present io math sequences assocs ranges
 math.order tools.time smalltalk.selectors smalltalk.ast ;
 IN: smalltalk.library

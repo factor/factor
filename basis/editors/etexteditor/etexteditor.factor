@@ -1,5 +1,5 @@
 ! Copyright (C) 2008 Kibleur Christophe.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: editors io.standard-paths kernel make math.parser
 namespaces ;
 IN: editors.etexteditor

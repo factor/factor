@@ -1,5 +1,5 @@
 ! Copyright (C) 2011 Erik Charlebois
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors alien alien.accessors alien.c-types alien.complex alien.data
 alien.libraries assocs byte-arrays classes.algebra classes.struct combinators
 compiler.cfg compiler.cfg.build-stack-frame compiler.cfg.comparisons

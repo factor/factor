@@ -1,5 +1,5 @@
 ! Copyright (C) 2021 Doug Coleman.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: assocs base64 checksums.hmac checksums.sha json.reader
 json.writer kernel sequences splitting strings ;
 IN: crypto.jwt

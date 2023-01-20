@@ -1,7 +1,7 @@
 ! Copyright (C) 2009 Jon Harper.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 
-! http://projecteuler.net/index.php?section=problems&id=1
+! https://projecteuler.net/index.php?section=problems&id=1
 
 ! DESCRIPTION
 ! -----------

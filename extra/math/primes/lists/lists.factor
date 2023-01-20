@@ -1,5 +1,5 @@
 ! Copyright (C) 2007-2009 Samuel Tardieu.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: kernel lists.lazy math math.primes ;
 IN: math.primes.lists
 

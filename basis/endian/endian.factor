@@ -1,5 +1,5 @@
 ! Copyright (C) 2009 Doug Coleman.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: alien.c-types alien.data byte-arrays combinators
 combinators.smart grouping hints kernel math math.bitwise
 ranges namespaces sequences sequences.generalizations ;

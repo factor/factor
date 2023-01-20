@@ -1,5 +1,5 @@
 ! Copyright (C) 2005, 2010 Eduardo Cavazos, Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors alien.data classes.struct fry kernel literals math
 math.vectors namespaces sequences x11 x11.X x11.events x11.glx
 x11.xlib ;

@@ -1,5 +1,5 @@
 ! Copyright (C) 2009 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors arrays combinators.short-circuit continuations
 generalizations kernel locals.rewrite locals.types sequences
 smalltalk.ast ;

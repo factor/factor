@@ -1,5 +1,5 @@
 ! Copyright (C) 2020 Alexander Ilin.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: io.directories io.files.trash kernel tools.test ;
 IN: io.files.trash.tests
 

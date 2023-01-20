@@ -1,5 +1,5 @@
 ! Copyright (C) 2008 Marc Fauconneau.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors binary-search kernel math math.order parser
 sequences sets sorting ;
 IN: suffix-arrays

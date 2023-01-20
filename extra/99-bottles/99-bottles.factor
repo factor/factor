@@ -1,5 +1,5 @@
 ! Copyright (C) 2011 Doug Coleman.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: ascii combinators combinators.smart io kernel math
 math.parser ranges sequences splitting ;
 IN: 99-bottles

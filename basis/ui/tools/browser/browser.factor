@@ -1,5 +1,5 @@
 ! Copyright (C) 2006, 2009 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs classes combinators
 combinators.short-circuit compiler.units debugger fonts help
 help.apropos help.crossref help.home help.markup help.stylesheet

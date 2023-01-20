@@ -1,5 +1,5 @@
 ! Copyright (C) 2010 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs db.tuples furnace.actions
 furnace.utilities html.forms kernel mason.config namespaces
 sequences urls validators webapps.mason.backend

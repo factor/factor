@@ -1,5 +1,5 @@
 ! Copyright (C) 2009 Keith Lazuka.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors compression.lzw images.gif images.testing io
 io.encodings.binary io.files kernel math math.bitwise
 namespaces sequences tools.test ;

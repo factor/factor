@@ -1,5 +1,5 @@
 ! Copyright (C) 2006, 2008 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: ascii grouping hints io io.encodings.ascii io.files
 io.files.temp kernel sequences strings tr vectors ;
 IN: benchmark.reverse-complement

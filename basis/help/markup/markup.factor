@@ -1,5 +1,5 @@
 ! Copyright (C) 2005, 2009 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs combinators compiler.units
 definitions.icons effects english hashtables help.stylesheet
 help.topics io io.styles kernel make math namespaces present

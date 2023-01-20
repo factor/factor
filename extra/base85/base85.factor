@@ -1,5 +1,5 @@
 ! Copyright (C) 2013 John Benediktsson.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: base64.private byte-arrays combinators endian io
 io.encodings.binary io.streams.byte-array kernel kernel.private
 literals math namespaces sequences ;

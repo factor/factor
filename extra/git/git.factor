@@ -1,5 +1,5 @@
 ! Copyright (C) 2015 Doug Coleman.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs assocs.extras calendar
 calendar.format checksums checksums.sha combinators
 combinators.smart compression.zlib constructors endian grouping
@@ -332,7 +332,7 @@ SYMBOL: initial-offset
         _ seek-absolute seek-input read-packed
     ] with-file-reader ;
 
-! http://stackoverflow.com/questions/18010820/git-the-meaning-of-object-size-returned-by-git-verify-pack
+! https://stackoverflow.com/questions/18010820/git-the-meaning-of-object-size-returned-by-git-verify-pack
 TUPLE: pack magic version count objects sha1 ;
 : parse-pack ( path -- pack )
     binary [

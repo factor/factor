@@ -1,5 +1,5 @@
 ! Copyright (C) 2022 Raghu Ranganathan and Andrea Ferreti.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: alien.c-types arrays assocs command-line continuations
 editors help help.markup help.syntax help.vocabs inspector io
 io.directories io.files io.files.types kernel lexer math
@@ -356,7 +356,7 @@ You can add the definitions of the previous paragraph, so that it looks like
 
 { $code "
 ! Copyright (C) 2014 Andrea Ferretti.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: ;
 IN: github.tutorial
 
@@ -778,7 +778,7 @@ If you try it with { $snippet "DNA{ a ccg t a g }" } you should get
 " }
 
 Let us try an example from the { $url
-"http://re-factor.blogspot.com/2014/06/swift-ranges.html" "Re: Factor" } blog,
+"https://re-factor.blogspot.com/2014/06/swift-ranges.html" "Re: Factor" } blog,
 which adds infix syntax for ranges. Until now, we have used { $link [a..b] } to create a range. We can make a 
 syntax that is friendlier to people coming from other languages using { $snippet "..." } as an infix word.
 
@@ -996,7 +996,7 @@ Start by creating our { $snippet "ls" } vocabulary with { $snippet "\"ls\" scaff
 
 { $code "\
 ! Copyright (C) 2014 Andrea Ferretti.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors command-line io io.directories io.files.types
   kernel namespaces sequences ;
 IN: ls
@@ -1182,7 +1182,7 @@ Responders are usually combined to form more complex responders in order to impl
 our simplistic example, we will use just this one responder, and set it globally with
 { $code "<echo-responder> main-responder set-global" }
 
-Once you have done this, you can start the server with { $snippet "8080 httpd" } . You can then visit { $url "http://localhost:8080/hello/%20/from/%20/factor" }
+Once you have done this, you can start the server with { $snippet "8080 httpd" } . You can then visit { $url "https://localhost:8080/hello/%20/from/%20/factor" }
  in your browser to see your first responder in action. You can then stop the server with { $link stop-server } .
 
 Now, if this was all that Factor offers to write web applications, it would still be rather low level. In reality, web 
@@ -1208,7 +1208,7 @@ Now that you know how to do routing, we can write page actions in Chloe. Things 
 we scaffold a vocabulary with { $snippet "\"hello-furnace\" scaffold-work" } . Make it look like this:
 { $code "\
 ! Copyright (C) 2014 Andrea Ferretti.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors furnace.actions http http.server
   http.server.dispatchers http.server.static kernel sequences ;
 IN: hello-furnace
@@ -1244,12 +1244,12 @@ dispatcher class and the relative path of the template file.
 In order for all this to work, create a file { $snippet "work/hello-furnace/greetings.xml" } with a content like
 { $code "<?xml version='1.0' ?>
 
-<t:chloe xmlns:t=\"http://factorcode.org/chloe/1.0\">
+<t:chloe xmlns:t=\"https://factorcode.org/chloe/1.0\">
     <p>Hello from Chloe</p>
 </t:chloe>" }
 
 Reload the { $snippet "hello-furnace" } vocabulary and { $snippet "<example-responder> main-responder set-global" } . You should be able to see 
-the results of your efforts under { $url "http://localhost:8080/chloe" } . Notice that there was no need to restart the server, we 
+the results of your efforts under { $url "https://localhost:8080/chloe" } . Notice that there was no need to restart the server, we 
 can change the main responder dynamically.
 
 This ends our very brief tour of Furnace. Furnace is much more expansive than the examples shown here,  as it allows for many general web
@@ -1383,7 +1383,7 @@ $nl
 { $code "\
 USE: images.http
 
-\"http://factorcode.org/logo.png\" http-image." }
+\"https://factorcode.org/logo.png\" http-image." }
 ;
 
 ARTICLE: "tour" "Guided tour of Factor"

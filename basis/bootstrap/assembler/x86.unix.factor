@@ -1,5 +1,5 @@
 ! Copyright (C) 2010 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: cpu.x86.assembler cpu.x86.assembler.operands kernel
 layouts ;
 IN: bootstrap.assembler.x86

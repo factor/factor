@@ -29,7 +29,7 @@ $nl
 "Your " { $snippet "palindrome.factor" } " file should look like the following after the previous section:"
 { $code
     "! Copyright (C) 2022 Your name."
-    "! See http://factorcode.org/license.txt for BSD license."
+    "! See https://factorcode.org/license.txt for BSD license."
     "USING: ;"
     "IN: palindrome"
 }
@@ -70,7 +70,7 @@ ARTICLE: "first-program-test" "Testing your first program"
 "Your " { $snippet "palindrome.factor" } " file should look like the following after the previous section:"
 { $code
     "! Copyright (C) 2012 Your name."
-    "! See http://factorcode.org/license.txt for BSD license."
+    "! See https://factorcode.org/license.txt for BSD license."
     "USING: kernel sequences ;"
     "IN: palindrome"
     ""

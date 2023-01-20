@@ -1,5 +1,5 @@
 ! Copyright (C) 2006 Chris Double.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs combinators fry io
 io.encodings.binary io.files io.pathnames kernel lexer make math
 math.parser namespaces parser peg peg.ebnf peg.parsers

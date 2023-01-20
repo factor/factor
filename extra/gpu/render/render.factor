@@ -1,5 +1,5 @@
 ! Copyright (C) 2009 Joe Groff.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors alien alien.c-types alien.data arrays assocs
 classes classes.parser classes.struct classes.tuple
 classes.tuple.private combinators combinators.tuple generic

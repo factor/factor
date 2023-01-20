@@ -1,5 +1,5 @@
 ! Copyright (C) 2013 Doug Coleman.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: arrays assocs combinators.extras io.files kernel math
 modern.slices sequences splitting tools.test ;
 IN: combinators.extras.tests

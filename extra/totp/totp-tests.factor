@@ -1,5 +1,5 @@
 ! Copyright (C) 2018 Alexander Ilin.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: calendar checksums.sha tools.test totp ;
 IN: totp.tests
 

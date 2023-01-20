@@ -1,5 +1,5 @@
 /* Copyright (C) 2007 Chris Double. All Rights Reserved.
-   See http://factorcode.org/license.txt for BSD license. */
+   See https://factorcode.org/license.txt for BSD license. */
 
 var fjsc_repl = false;
 

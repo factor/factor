@@ -1,5 +1,5 @@
 ! Copyright (C) 2009 Slava Pestov, Joe Groff.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors alien.c-types arrays assocs byte-arrays
 combinators combinators.short-circuit compiler.cfg.comparisons
 compiler.cfg.hats compiler.cfg.instructions

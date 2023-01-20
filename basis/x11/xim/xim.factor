@@ -1,5 +1,5 @@
 ! Copyright (C) 2007, 2008 Slava Pestov
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: alien.c-types alien.data byte-arrays continuations
 io.encodings.string io.encodings.utf8 kernel literals math namespaces
 sequences x11 x11.X x11.xlib ;

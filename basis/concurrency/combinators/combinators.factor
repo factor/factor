@@ -1,5 +1,5 @@
 ! Copyright (C) 2008 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: arrays assocs combinators concurrency.count-downs
 concurrency.futures generalizations kernel sequences
 sequences.private sequences.product ;

@@ -1,5 +1,5 @@
 ! Copyright (C) 2006 Chris Double.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: combinators continuations io io.streams.string kernel
 literals math namespaces peg sequences strings ;
 IN: peg.search

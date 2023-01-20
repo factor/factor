@@ -1,10 +1,10 @@
 ! Copyright (C) 2008 Doug Coleman.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors kernel math money taxes.usa taxes.usa.fica
 taxes.usa.medicare taxes.usa.w4 ;
 IN: taxes.usa.federal
 
-! http://www.irs.gov/pub/irs-pdf/p15.pdf
+! https://www.irs.gov/pub/irs-pdf/p15.pdf
 ! Table 7 ANNUAL Payroll Period
 
 : federal-single ( -- triples )

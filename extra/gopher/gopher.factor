@@ -1,5 +1,5 @@
 ! Copyright (C) 2014 John Benediktsson
-! See http://factorcode.org/license.txt for BSD license
+! See https://factorcode.org/license.txt for BSD license
 
 USING: accessors calendar colors combinators formatting
 images.loader images.loader.private images.viewer io

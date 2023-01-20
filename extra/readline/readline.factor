@@ -1,5 +1,5 @@
 ! Copyright (C) 2011 Erik Charlebois.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: alien.data alien.libraries alien.strings compiler.units
 destructors io.encodings.utf8 kernel libc sequences words ;
 QUALIFIED: readline.ffi

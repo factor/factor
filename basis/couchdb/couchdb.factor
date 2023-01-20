@@ -1,5 +1,5 @@
 ! Copyright (C) 2008, 2009 Alex Chapman
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors assocs continuations debugger hashtables http
 http.client io io.encodings.string io.encodings.utf8 json.reader
 json.writer kernel make math math.parser namespaces sequences
@@ -74,7 +74,7 @@ CONSTANT: default-uuids-to-cache 100
     default-couch-host default-couch-port <server> ;
 
 : (server-url) ( server -- )
-    "http://" % [ host>> % ] [ CHAR: : , port>> number>string % ] bi CHAR: / , ; inline
+    "https://" % [ host>> % ] [ CHAR: : , port>> number>string % ] bi CHAR: / , ; inline
 
 : server-url ( server -- url )
     [ (server-url) ] "" make ;
