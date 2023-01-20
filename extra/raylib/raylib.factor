@@ -1304,7 +1304,7 @@ PRIVATE>
             dup normal>> 1.0 >>y drop
             ray position>>
             ray direction>> distance Vector3Scale
-            Vector3Add ground-height >>y >>position
+            Vector3Add ground-height >>y >>point
         ] when
     ] when ;
 
