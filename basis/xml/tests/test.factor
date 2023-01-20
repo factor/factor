@@ -21,9 +21,9 @@ SYMBOL: xml-file
 { "1.0" } [ xml-file get prolog>> version>> ] unit-test
 { f } [ xml-file get prolog>> standalone>> ] unit-test
 { "a" } [ xml-file get space>> ] unit-test
-{ "https://www.hello.com" } [ xml-file get url>> ] unit-test
+{ "http://www.hello.com" } [ xml-file get url>> ] unit-test
 { "that" } [
-    xml-file get T{ name f "" "this" "https://d.de" } attr
+    xml-file get T{ name f "" "this" "http://d.de" } attr
 ] unit-test
 { t } [ xml-file get children>> second contained-tag? ] unit-test
 [ "<a></b>" string>xml ] [ xml-error? ] must-fail-with
