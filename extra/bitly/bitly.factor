@@ -1,5 +1,5 @@
 ! Copyright (C) 2010-2012 Slava Pestov, John Benediktsson.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: assocs http.client json.reader kernel namespaces
 sequences urls ;
 IN: bitly
@@ -9,7 +9,7 @@ SYMBOLS: bitly-api-user bitly-api-key ;
 <PRIVATE
 
 : <bitly-url> ( path -- url )
-    "http://api.bitly.com/v3/" prepend >url
+    "https://api.bitly.com/v3/" prepend >url
         bitly-api-user get "login" set-query-param
         bitly-api-key get "apiKey" set-query-param
         "json" "format" set-query-param ;

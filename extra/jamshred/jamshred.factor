@@ -1,5 +1,5 @@
 ! Copyright (C) 2007, 2008 Alex Chapman
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors arrays calendar jamshred.game jamshred.gl
 jamshred.player kernel math math.constants math.vectors
 namespaces sequences threads ui ui.gadgets ui.gadgets.worlds

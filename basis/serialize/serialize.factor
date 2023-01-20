@@ -4,7 +4,7 @@
 ! Chris Double modified it to fix bugs and get it working
 ! correctly under the latest versions of Factor.
 !
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 !
 USING: accessors arrays assocs byte-arrays classes classes.tuple
 combinators endian hashtables io io.encodings.binary

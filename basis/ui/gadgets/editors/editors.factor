@@ -1,5 +1,5 @@
 ! Copyright (C) 2006, 2011 Slava Pestov
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs calendar colors combinators
 combinators.short-circuit documents documents.elements fonts fry
 grouping kernel literals locals make math math.functions

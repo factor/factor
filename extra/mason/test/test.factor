@@ -1,5 +1,5 @@
 ! Copyright (C) 2008, 2010 Eduardo Cavazos, Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors assocs benchmark bootstrap.stage2 calendar
 command-line compiler.errors continuations debugger help.html
 help.lint io io.directories io.encodings.utf8 io.files io.styles

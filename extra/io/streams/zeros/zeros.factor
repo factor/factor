@@ -1,5 +1,5 @@
 ! Copyright (C) 2010 Doug Coleman.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: combinators destructors io io.directories
 io.encodings.binary io.files kernel math sequences ;
 IN: io.streams.zeros

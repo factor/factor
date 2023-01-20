@@ -1,6 +1,6 @@
 ! Copyright (C) 2007, 2009 Elie CHAFTARI, Dirk Vleugels,
 ! Slava Pestov, Doug Coleman, Daniel Ehrenberg.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs base64 calendar calendar.format
 classes combinators debugger io io.crlf io.encodings
 io.encodings.ascii io.encodings.binary io.encodings.iana

@@ -1,5 +1,5 @@
 ! Copyright (C) 2008 Doug Coleman.
-! See http://factorcode.org/license.txt for BSD license.xo
+! See https://factorcode.org/license.txt for BSD license.xo
 USING: arrays calendar help.markup help.syntax kernel math strings ;
 IN: calendar.english
 

@@ -1,5 +1,5 @@
 ! Copyright (C) 2007-2009 Samuel Tardieu.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: arrays combinators command-line io kernel math
 math.functions math.parser math.primes.pollard-rho-brent
 ranges math.statistics namespaces sequences

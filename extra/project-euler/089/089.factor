@@ -1,10 +1,10 @@
 ! Copyright (c) 2009 Doug Coleman.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: io.encodings.ascii io.files kernel math
 project-euler.common roman sequences ;
 IN: project-euler.089
 
-! http://projecteuler.net/index.php?section=problems&id=089
+! https://projecteuler.net/index.php?section=problems&id=089
 
 ! DESCRIPTION
 ! -----------

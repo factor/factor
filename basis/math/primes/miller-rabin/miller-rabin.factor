@@ -1,5 +1,5 @@
 ! Copyright (c) 2008-2009 Doug Coleman.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: combinators kernel math math.functions ranges
 random sequences ;
 IN: math.primes.miller-rabin

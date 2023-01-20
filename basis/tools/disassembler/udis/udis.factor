@@ -1,5 +1,5 @@
 ! Copyright (C) 2008, 2010 Slava Pestov, Jorge Acereda Macia.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: alien alien.c-types alien.libraries alien.syntax arrays
 combinators destructors io kernel layouts libc make math
 math.order math.parser namespaces sequences system

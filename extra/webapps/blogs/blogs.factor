@@ -1,5 +1,5 @@
 ! Copyright (C) 2008 Slava Pestov
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: kernel accessors sequences sorting math.order math.parser
 urls validators db db.types db.tuples calendar present namespaces
 html.forms

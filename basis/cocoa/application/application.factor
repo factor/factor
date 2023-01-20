@@ -1,5 +1,5 @@
 ! Copyright (C) 2006, 2010 Slava Pestov
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: alien.c-types alien.syntax cocoa cocoa.classes
 cocoa.runtime core-foundation.strings kernel sequences ;
 IN: cocoa.application

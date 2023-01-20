@@ -1,5 +1,5 @@
 ! Copyright (C) 2009 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors assocs checksums checksums.crc32
 combinators.short-circuit io.encodings.utf8 io.files kernel
 namespaces sequences sets source-files vocabs vocabs.loader ;

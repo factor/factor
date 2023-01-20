@@ -1,5 +1,5 @@
 ! Copyright (C) 2010 Doug Coleman.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors alien.c-types alien.data classes.struct
 endian kernel literals make math math.bitwise
 sequences slots.syntax ui.backend.windows ui.gadgets.worlds

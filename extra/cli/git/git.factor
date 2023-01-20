@@ -1,5 +1,5 @@
 ! Copyright (C) 2017 Doug Coleman.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors arrays concurrency.combinators
 concurrency.semaphores io io.directories io.encodings.utf8
 io.files.info io.launcher io.pathnames kernel math namespaces

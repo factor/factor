@@ -1,5 +1,5 @@
 ! Copyright (C) 2008, 2011 Eduardo Cavazos, Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: arrays calendar combinators continuations io.backend
 io.directories io.pathnames kernel mason.child mason.cleanup
 mason.common mason.config mason.docs mason.git mason.notify

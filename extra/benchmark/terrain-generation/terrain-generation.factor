@@ -1,5 +1,5 @@
 ! Copyright (C) 2009, 2012 Joe Groff.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors kernel math.vectors.simd terrain.generation ;
 FROM: alien.c-types => float ;
 IN: benchmark.terrain-generation

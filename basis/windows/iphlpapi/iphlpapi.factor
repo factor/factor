@@ -1,5 +1,5 @@
 ! Copyright (C) 2010 Doug Coleman.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors alien alien.c-types alien.data alien.syntax
 classes.struct combinators combinators.smart destructors
 io.encodings.string io.encodings.utf8 io.sockets.private kernel

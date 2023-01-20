@@ -1,5 +1,5 @@
 ! Copyright (C) 2005, 2009 Daniel Ehrenberg
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors ascii assocs combinators
 combinators.short-circuit kernel make math namespaces sequences
 xml.char-classes xml.data xml.errors xml.state xml.tokenize ;
@@ -35,8 +35,8 @@ SYMBOL: ns-stack
 
 : init-ns-stack ( -- )
     V{ H{
-        { "xml" "http://www.w3.org/XML/1998/namespace" }
-        { "xmlns" "http://www.w3.org/2000/xmlns" }
+        { "xml" "https://www.w3.org/XML/1998/namespace" }
+        { "xmlns" "https://www.w3.org/2000/xmlns" }
         { "" "" }
     } } clone
     ns-stack set ;

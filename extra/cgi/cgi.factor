@@ -1,5 +1,5 @@
 ! Copyright (C) 2009-2012 John Benediktsson
-! See http://factorcode.org/license.txt for BSD license
+! See https://factorcode.org/license.txt for BSD license
 
 USING: arrays assocs combinators environment io kernel
 linked-assocs math.parser regexp sequences splitting strings

@@ -1,5 +1,5 @@
 ! Copyright (C) 2012-2014 John Benediktsson
-! See http://factorcode.org/license.txt for BSD license
+! See https://factorcode.org/license.txt for BSD license
 USING: byte-arrays combinators combinators.short-circuit kernel
 math math.bitwise math.parser sequences splitting ;
 

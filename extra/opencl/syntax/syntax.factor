@@ -1,5 +1,5 @@
 ! Copyright (C) 2010 Erik Charlebois.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: classes.parser classes.singleton classes.union kernel lexer
 sequences ;
 IN: opencl.syntax

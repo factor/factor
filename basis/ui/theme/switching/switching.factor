@@ -1,5 +1,5 @@
 ! Copyright (C) 2016 Nicolas Pénet.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: hashtables kernel namespaces sequences ui.theme ui.theme.base16
 ui.theme.wombat vocabs.loader ;
 IN: ui.theme.switching

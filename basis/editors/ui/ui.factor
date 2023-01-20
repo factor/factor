@@ -1,5 +1,5 @@
 ! Copyright (C) 2018 Doug Coleman.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors editors kernel namespaces sequences ui
 ui.gadgets ui.gadgets.borders ui.gadgets.buttons
 ui.gadgets.packs ui.gadgets.scrollers ui.tools.listener

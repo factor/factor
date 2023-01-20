@@ -1,5 +1,5 @@
 ! Copyright (C) 2011-2013 Eungju PARK, John Benediktsson.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: destructors sequences tools.test zeromq ;
 
 { t } [

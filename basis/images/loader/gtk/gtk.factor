@@ -1,5 +1,5 @@
 ! Copyright (C) 2010 Philipp Brüschweiler.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors alien.c-types alien.data alien.syntax arrays
 assocs combinators gdk.pixbuf.ffi glib.ffi gobject.ffi grouping
 images images.loader io kernel math sequences specialized-arrays

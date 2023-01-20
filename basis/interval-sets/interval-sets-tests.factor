@@ -1,5 +1,5 @@
 ! Copyright (C) 2009 Daniel Ehrenberg.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: tools.test interval-sets math grouping sequences accessors
 combinators.short-circuit literals ;
 IN: interval-sets.tests

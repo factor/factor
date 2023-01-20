@@ -1,5 +1,5 @@
 ! Copyright (C) 2018, 2020 Alexander Ilin.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: byte-arrays calendar checksums checksums.sha help.markup
 help.syntax kernel math strings ;
 IN: totp

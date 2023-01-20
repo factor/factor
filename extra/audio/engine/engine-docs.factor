@@ -1,5 +1,5 @@
 ! Copyright (C) 2010 Joe Groff.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: alien audio byte-arrays destructors help.markup
 help.syntax kernel math strings ;
 IN: audio.engine

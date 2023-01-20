@@ -1,5 +1,5 @@
 ! Copyright (C) 2014 Jon Harper.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: assocs grouping kernel linked-assocs literals
 namespaces sequences tools.test yaml yaml.config yaml.ffi
 yaml.private calendar yaml.conversion ;
@@ -162,7 +162,7 @@ ${ transitive-recursive-objects-anchored } [ transitive-recursive-objects replac
 
 
 ! Lifted from pyyaml
-! http://pyyaml.org/browser/pyyaml/trunk/tests/data
+! https://pyyaml.org/browser/pyyaml/trunk/tests/data
 
 ! !!!!!!!!!!!!!!!
 ! construct-bool
@@ -463,7 +463,7 @@ ${ construct-merge-obj } [ $ construct-merge-str yaml> ] unit-test
 ${ construct-merge-obj } [ $ construct-merge-obj2 >yaml yaml> ] unit-test
 
 ! More merge tests
-! see http://sourceforge.net/p/yaml/mailman/message/12308050
+! see https://sourceforge.net/p/yaml/mailman/message/12308050
 CONSTANT: nested-merge-str "foo: 1
 <<:
   bar: 2

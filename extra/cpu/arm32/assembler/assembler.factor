@@ -1,5 +1,5 @@
 ! Copyright (C) 2007, 2009 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors arrays combinators kernel make math math.bitwise
 namespaces sequences words words.symbol parser ;
 IN: cpu.arm32.assembler

@@ -1,5 +1,5 @@
 ! Copyright (C) 2007 Chris Double.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 
 USING: kernel tools.test peg peg.ebnf peg.ebnf.private peg.pl0
 sequences accessors ;

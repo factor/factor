@@ -1,6 +1,6 @@
 ! Copyright (C) 2004, 2009 Chris Double, Daniel Ehrenberg,
 ! Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors kernel xml.data xml.writer xml.syntax 
 urls.encoding ;
 IN: html
@@ -12,7 +12,7 @@ M: empty-prolog write-xml drop ;
 : simple-page ( title head body -- xml )
     <XML
         <!DOCTYPE html>
-        <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+        <html xmlns="https://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
             <head>
                 <title><-></title>
                 <->

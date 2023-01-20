@@ -1,5 +1,5 @@
 ! Copyright (C) 2016 Alexander Ilin.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: ascii checksums checksums.common destructors help.markup
 help.syntax ;
 IN: checksums.process

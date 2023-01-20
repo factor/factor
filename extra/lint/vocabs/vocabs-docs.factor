@@ -1,5 +1,5 @@
 ! Copyright (C) 2022 CapitalEx
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: assocs hashtables help.markup help.syntax io kernel
 sequences strings ;
 IN: lint.vocabs

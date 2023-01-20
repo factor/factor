@@ -1,5 +1,5 @@
 ! Copyright (C) 2006, 2008 Slava Pestov
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: cocoa cocoa.application cocoa.classes
 core-foundation.strings kernel splitting ;
 IN: cocoa.dialogs

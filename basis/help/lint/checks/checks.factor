@@ -1,5 +1,5 @@
 ! Copyright (C) 2009 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs classes classes.struct
 classes.tuple combinators combinators.short-circuit debugger
 definitions effects eval formatting grouping help help.markup

@@ -1,5 +1,5 @@
 ! Copyright (C) 2008 Doug Coleman.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: kernel math sequences prettyprint math.parser io
 math.functions math.bitwise combinators.short-circuit ;
 IN: math.floating-point

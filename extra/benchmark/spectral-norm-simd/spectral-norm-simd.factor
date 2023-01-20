@@ -1,5 +1,5 @@
 ! Copyright (C) 2010 Marc Fauconneau.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: alien.c-types alien.data specialized-arrays kernel math
 math.functions math.vectors sequences sequences.private
 prettyprint words typed locals math.vectors.simd

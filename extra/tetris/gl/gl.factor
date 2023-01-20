@@ -1,5 +1,5 @@
 ! Copyright (C) 2006, 2007, 2008 Alex Chapman
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 
 USING: accessors arrays colors combinators kernel math opengl
 opengl.gl sequences tetris.game tetris.piece ;

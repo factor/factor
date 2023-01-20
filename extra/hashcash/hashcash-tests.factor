@@ -1,5 +1,5 @@
 ! Copyright (C) 2022 Zoltán Kéri.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors calendar hashcash hashcash.private kernel
 literals namespaces sequences splitting tools.test ;
 IN: hashcash.tests

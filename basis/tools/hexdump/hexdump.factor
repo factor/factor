@@ -1,5 +1,5 @@
 ! Copyright (C) 2008 Doug Coleman.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 
 USING: accessors ascii byte-arrays byte-vectors combinators
 command-line destructors fry io io.encodings io.encodings.binary

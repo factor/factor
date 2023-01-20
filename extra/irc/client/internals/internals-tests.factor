@@ -1,5 +1,5 @@
 ! Copyright (C) 2009 Bruno Deferrari
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors assocs calendar classes combinators
 concurrency.mailboxes destructors io io.streams.duplex irc.client.base
 irc.client.chats irc.client.internals irc.client.participants

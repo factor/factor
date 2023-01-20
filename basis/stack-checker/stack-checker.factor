@@ -1,5 +1,5 @@
 ! Copyright (C) 2004, 2010 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors classes effects generic io kernel namespaces
 quotations sequences stack-checker.backend stack-checker.errors
 stack-checker.inlining stack-checker.known-words

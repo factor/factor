@@ -1,5 +1,5 @@
 ! Copyright (C) 2005, 2006 Eduardo Cavazos and Alex Chapman, 2016 Björn Lindqvist
-! http://factorcode.org/license.txt for BSD license.
+! https://factorcode.org/license.txt for BSD license.
 
 ! Selected parts of /usr/include/X11/X.h
 USING: alien.c-types alien.syntax math ;

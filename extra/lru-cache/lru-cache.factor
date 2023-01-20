@@ -1,5 +1,5 @@
 ! Copyright (C) 2017 John Benediktsson
-! See http://factorcode.org/license.txt for BSD license
+! See https://factorcode.org/license.txt for BSD license
 
 USING: accessors assocs deques dlists kernel linked-assocs
 linked-assocs.private math sequences.private ;

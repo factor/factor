@@ -1,5 +1,5 @@
 ! Copyright (C) 2007, 2011 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors alien alien.accessors byte-arrays endian
 kernel kernel.private math math.bitwise parser sequences
 sequences.private vocabs.loader ;

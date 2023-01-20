@@ -1,5 +1,5 @@
 ! Copyright (C) 2022 Doug Coleman.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors alien.c-types assocs assocs.extras combinators
 combinators.short-circuit formatting io io.backend
 io.directories io.encodings.binary io.files io.files.info

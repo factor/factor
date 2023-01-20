@@ -1,5 +1,5 @@
 ! Copyright (C) 2008, 2010 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: ascii assocs formatting grouping io io.encodings.ascii
 io.files kernel math math.statistics sequences ;
 IN: benchmark.knucleotide

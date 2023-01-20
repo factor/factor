@@ -1,5 +1,5 @@
 ! Copyright (C) 2008, 2010 Eduardo Cavazos, Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors calendar combinators continuations debugger io
 kernel make mason.common mason.config mason.platform math.order
 namespaces sequences smtp ;

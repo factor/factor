@@ -1,5 +1,5 @@
 ! Copyright (C) 2015 Dimage Sapelkin.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: editors io.pathnames io.standard-paths kernel make
 namespaces system vocabs ;
 IN: editors.brackets

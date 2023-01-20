@@ -1,5 +1,5 @@
 ! Copyright (C) 2008 Daniel Ehrenberg.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors arrays combinators interval-maps kernel
 literals math namespaces sequences simple-flat-file
 unicode.categories unicode.data unicode.normalize.private words ;

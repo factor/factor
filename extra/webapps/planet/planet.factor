@@ -1,5 +1,5 @@
 ! Copyright (C) 2008, 2010 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors calendar concurrency.combinators db db.tuples
 db.types fry furnace.actions furnace.auth furnace.boilerplate
 furnace.redirection furnace.syndication html.components

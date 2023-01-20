@@ -1,5 +1,5 @@
 ! Copyright (C) 2008, 2010 Slava Pestov, Doug Coleman.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors calendar calendar.english combinators
 formatting grouping io io.streams.string kernel make math
 math.order math.parser math.parser.private ranges present

@@ -1,5 +1,5 @@
 ! Copyright (C) 2016 Doug Coleman.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: io.directories kernel sequences system ;
 IN: mason.release.dlls
 
@@ -10,7 +10,7 @@ M: object dll-list { } ;
 ! These files should be in the directory that mason is run from.
 ! e.g. c:\factor32 or c:\factor64 on the build machine.
 
-! Sqlite win64: http://synopse.info/files/SQLite3-64.7z
+! Sqlite win64: https://synopse.info/files/SQLite3-64.7z
 M: windows dll-list
     {
         "resource:libcrypto-37.dll"

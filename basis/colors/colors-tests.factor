@@ -1,5 +1,5 @@
 ! Copyright (C) 2009 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors colors colors.private literals tools.test ;
 
 { t } [ COLOR: light-green value>> rgba? ] unit-test

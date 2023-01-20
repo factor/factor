@@ -1,5 +1,5 @@
 ! Copyright (C) 2020 John Benediktsson
-! See http://factorcode.org/license.txt for BSD license
+! See https://factorcode.org/license.txt for BSD license
 USING: accessors arrays assocs bencode byte-arrays byte-vectors
 calendar checksums checksums.sha combinators destructors endian
 grouping http.client io io.encodings.binary io.files

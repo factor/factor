@@ -1,5 +1,5 @@
 ! Copyright (C) 2005 Alex Chapman.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 
 ! This file is based on the gl.h that comes with xorg-x11 6.8.2
 USING: alien alien.c-types alien.libraries alien.syntax

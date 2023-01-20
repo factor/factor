@@ -1,6 +1,6 @@
 ! Copyright (C) 2008 Doug Coleman.
 ! Copyright (C) 2018 Alexander Ilin.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: classes db db.tuples.private db.types help.markup
 help.syntax kernel math quotations sequences strings ;
 IN: db.tuples

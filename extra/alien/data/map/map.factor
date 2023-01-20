@@ -1,5 +1,5 @@
 ! Copyright (C) 2009, 2010 Joe Groff.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors alien alien.arrays alien.c-types alien.data
 alien.parser arrays byte-arrays combinators effects.parser fry
 generalizations grouping kernel make math sequences

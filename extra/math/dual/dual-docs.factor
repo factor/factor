@@ -1,5 +1,5 @@
 ! Copyright (C) 2009 Jason W. Merrill.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: help.markup help.syntax kernel math
 math.derivatives.syntax words ;
 IN: math.dual

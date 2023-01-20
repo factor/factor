@@ -1,5 +1,5 @@
 ! Copyright (C) 2012 Doug Coleman.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 
 USING: accessors assocs calendar calendar.format
 calendar.holidays.us colors combinators concurrency.combinators
@@ -74,10 +74,10 @@ CONSTANT: christmas-green COLOR: #376627
     text-color foreground associate format ;
 
 : post>user-url ( post -- user-url )
-    "by" of "http://news.ycombinator.com/user?id=" prepend >url ;
+    "by" of "https://news.ycombinator.com/user?id=" prepend >url ;
 
 : post>comments-url ( post -- user-url )
-    "id" of "http://news.ycombinator.com/item?id=%d" sprintf >url ;
+    "id" of "https://news.ycombinator.com/item?id=%d" sprintf >url ;
 
 ! Api is funky, gives id=0 and /comment/2342342 for self-post ads
 : post>url ( post -- url )
@@ -105,7 +105,7 @@ PRIVATE>
     } cleave ;
 
 : banner. ( str -- )
-    "http://news.ycombinator.com" >url presented associate
+    "https://news.ycombinator.com" >url presented associate
     H{
         { font-size 20 }
         { font-style bold }

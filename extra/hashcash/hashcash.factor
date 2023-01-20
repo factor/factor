@@ -1,6 +1,6 @@
 ! Copyright (C) 2009 Diego Martinelli.
 ! Copyright (C) 2022 Zoltán Kéri.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors byte-arrays calendar calendar.format
 calendar.parser checksums checksums.openssl classes.tuple
 combinators combinators.short-circuit.smart formatting grouping

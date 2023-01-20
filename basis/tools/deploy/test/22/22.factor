@@ -1,5 +1,5 @@
 ! Copyright (C) 2011 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors continuations concurrency.mailboxes
 concurrency.messaging kernel system threads ;
 IN: tools.deploy.test.22

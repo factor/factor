@@ -1,7 +1,7 @@
 ! Copyright (C) 2013 Jon Harper.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 ! adapted from "yaml.h" libYAML 0.1.4
-! http://pyyaml.org/wiki/LibYAML
+! https://pyyaml.org/wiki/LibYAML
 USING: alien alien.c-types alien.destructors alien.libraries
 alien.syntax classes.struct combinators literals system
 alien.libraries.finder ;

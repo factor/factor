@@ -1,5 +1,5 @@
 ! Copyright (c) 2007, 2010 slava pestov.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors assocs continuations init io kernel
 kernel.private make math.parser namespaces sequences splitting ;
 IN: system

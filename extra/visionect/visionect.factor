@@ -1,5 +1,5 @@
 ! Copyright (C) 2020 John Benediktsson
-! See http://factorcode.org/license.txt for BSD license
+! See https://factorcode.org/license.txt for BSD license
 
 USING: accessors assocs base64 calendar calendar.format
 checksums.hmac checksums.sha combinators.smart formatting http
@@ -9,7 +9,7 @@ namespaces random sequences splitting ;
 IN: visionect
 
 SYMBOL: visionect-base-url
-visionect-base-url [ "http://localhost:8081" ] initialize
+visionect-base-url [ "https://localhost:8081" ] initialize
 
 SYMBOL: visionect-api-key
 

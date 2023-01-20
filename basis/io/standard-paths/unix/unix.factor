@@ -1,5 +1,5 @@
 ! Copyright (C) 2011 Doug Coleman.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors ascii environment io io.encodings.binary
 io.encodings.string io.encodings.utf8 io.files io.launcher
 io.pathnames io.standard-paths kernel math sequences splitting

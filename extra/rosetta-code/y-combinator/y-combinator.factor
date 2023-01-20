@@ -1,9 +1,9 @@
 ! Copyright (c) 2012 Anonymous
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: combinators kernel math ;
 IN: rosetta-code.y-combinator
 
-! http://rosettacode.org/wiki/Y_combinator
+! https://rosettacode.org/wiki/Y_combinator
 
 ! In strict functional programming and the lambda calculus,
 ! functions (lambda expressions) don't have state and are only

@@ -1,10 +1,10 @@
 ! Copyright (c) 2009 Guillaume Nargeot.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: arrays kernel math.primes.factors
 ranges project-euler.common sequences sorting ;
 IN: project-euler.124
 
-! http://projecteuler.net/index.php?section=problems&id=124
+! https://projecteuler.net/index.php?section=problems&id=124
 
 ! DESCRIPTION
 ! -----------

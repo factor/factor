@@ -1,5 +1,5 @@
 ! Copyright (C) 2008 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: arrays ascii combinators.short-circuit kernel make
 math.parser peg peg.parsers sequences sequences.deep strings ;
 IN: http.parsers

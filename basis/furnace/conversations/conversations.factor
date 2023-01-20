@@ -1,5 +1,5 @@
 ! Copyright (C) 2008 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors assocs db.tuples db.types furnace.cache
 furnace.redirection furnace.scopes furnace.sessions
 furnace.utilities http http.server kernel math.parser namespaces

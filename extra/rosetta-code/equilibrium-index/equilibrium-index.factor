@@ -1,9 +1,9 @@
 ! Copyright (c) 2012 Anonymous
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: kernel math.statistics math.vectors sequences ;
 IN: rosetta-code.equilibrium-index
 
-! http://rosettacode.org/wiki/Equilibrium_index
+! https://rosettacode.org/wiki/Equilibrium_index
 
 ! An equilibrium index of a sequence is an index into the
 ! sequence such that the sum of elements at lower indices is

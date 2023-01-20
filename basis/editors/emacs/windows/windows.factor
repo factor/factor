@@ -1,5 +1,5 @@
 ! Copyright (C) 2022 nomennescio
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: combinators.short-circuit continuations editors editors.emacs
 io.pathnames io.standard-paths kernel make math.parser
 namespaces sequences system windows.advapi32 windows.registry ;

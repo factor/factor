@@ -1,5 +1,5 @@
 ! Copyright (C) 2007, 2008 Alex Chapman
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors arrays jamshred.oint jamshred.tunnel kernel
 math.vectors sequences specialized-arrays tools.test
 alien.c-types ;

@@ -1,5 +1,5 @@
 ! Copyright (C) 2004, 2008 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors arrays growable kernel math sequences
 sequences.private ;
 IN: vectors

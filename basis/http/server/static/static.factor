@@ -1,5 +1,5 @@
 ! Copyright (C) 2004, 2010 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 IN: http.server.static
 DEFER: file-responder ! necessary for cgi-docs
 DEFER: <static> ! necessary for cgi-docs

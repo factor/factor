@@ -1,5 +1,5 @@
 ! Copyright (C) 2012 John Benediktsson, Doug Coleman
-! See http://factorcode.org/license.txt for BSD license
+! See https://factorcode.org/license.txt for BSD license
 USING: arrays assocs assocs.private kernel math math.statistics
 sequences sets ;
 IN: assocs.extras

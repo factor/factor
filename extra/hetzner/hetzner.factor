@@ -1,5 +1,5 @@
 ! Copyright (C) 2022 Doug Coleman.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: assocs assocs.extras formatting http http.client io
 io.encodings.string io.encodings.utf8 json.reader kernel
 namespaces sequences sequences.generalizations ;

@@ -1,5 +1,5 @@
 ! Copyright (C) 2005, 2010 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors ascii assocs calendar combinators
 combinators.short-circuit destructors environment hashtables
 http http.client.post-data http.parsers io io.crlf io.encodings
@@ -209,7 +209,7 @@ SYMBOL: redirects
 : request-url ( url -- url' )
     dup >url dup misparsed-url? [
         drop dup url? [ present ] when
-        "http://" prepend >url
+        "https://" prepend >url
     ] [ nip ] if ensure-port ;
 
 : ?default-proxy ( request -- request' )

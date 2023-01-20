@@ -1,5 +1,5 @@
 ! Copyright (C) 2009 Joe Groff.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors calendar continuations destructors kernel
 math math.order system timers ui ui.gadgets.worlds vocabs.loader ;
 IN: game.loop

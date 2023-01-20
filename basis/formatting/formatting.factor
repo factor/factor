@@ -1,5 +1,5 @@
 ! Copyright (C) 2008 John Benediktsson
-! See http://factorcode.org/license.txt for BSD license
+! See https://factorcode.org/license.txt for BSD license
 USING: accessors arrays assocs calendar calendar.english
 calendar.private combinators combinators.smart generalizations
 io io.streams.string kernel math math.functions

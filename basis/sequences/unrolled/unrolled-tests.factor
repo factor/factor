@@ -1,5 +1,5 @@
 ! Copyright (C) 2010 Joe Groff.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: compiler.test compiler.tree.debugger kernel make math.parser sequences
 sequences.unrolled tools.test ;
 IN: sequences.unrolled.tests

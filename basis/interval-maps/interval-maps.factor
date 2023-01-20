@@ -1,5 +1,5 @@
 ! Copyright (C) 2008 Daniel Ehrenberg.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs binary-search classes grouping
 kernel make math math.order sequences sequences.private
 sorting ;

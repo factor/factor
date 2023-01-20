@@ -1,9 +1,9 @@
 ! Copyright (C) 2009 Doug Coleman, Keith Lazuka
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors images.png images.testing io.directories
 io.encodings.binary io.files kernel sequences tools.test ;
 
-! Test files from PngSuite (http://www.libpng.org/pub/png/pngsuite.html)
+! Test files from PngSuite (https://www.libpng.org/pub/png/pngsuite.html)
 
 ! The subset of the suite that should work given the current implementation.
 "vocab:images/testing/png" [
@@ -83,7 +83,7 @@ io.encodings.binary io.files kernel sequences tools.test ;
 
     {
         "XML:com.adobe.xmp"
-        "<x:xmpmeta xmlns:x=\"adobe:ns:meta/\" x:xmptk=\"XMP Core 5.4.0\">\n   <rdf:RDF xmlns:rdf=\"http://www.w3.org/1999/02/22-rdf-syntax-ns#\">\n      <rdf:Description rdf:about=\"\"\n            xmlns:exif=\"http://ns.adobe.com/exif/1.0/\">\n         <exif:PixelXDimension>77</exif:PixelXDimension>\n         <exif:PixelYDimension>71</exif:PixelYDimension>\n      </rdf:Description>\n   </rdf:RDF>\n</x:xmpmeta>\n"
+        "<x:xmpmeta xmlns:x=\"adobe:ns:meta/\" x:xmptk=\"XMP Core 5.4.0\">\n   <rdf:RDF xmlns:rdf=\"https://www.w3.org/1999/02/22-rdf-syntax-ns#\">\n      <rdf:Description rdf:about=\"\"\n            xmlns:exif=\"https://ns.adobe.com/exif/1.0/\">\n         <exif:PixelXDimension>77</exif:PixelXDimension>\n         <exif:PixelYDimension>71</exif:PixelYDimension>\n      </rdf:Description>\n   </rdf:RDF>\n</x:xmpmeta>\n"
     } [
         "1529.png" binary <file-reader> load-png
         itexts>> first [ keyword>> ] [ text>> ] bi

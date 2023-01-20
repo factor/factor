@@ -1,7 +1,7 @@
 ;;; fuel-stack.el -- stack inference help -*- lexical-binding: t -*-
 
 ;; Copyright (C) 2008 Jose Antonio Ortega Ruiz
-;; See http://factorcode.org/license.txt for BSD license.
+;; See https://factorcode.org/license.txt for BSD license.
 
 ;; Author: Jose Antonio Ortega Ruiz <jao@gnu.org>
 ;; Keywords: languages, fuel, factor

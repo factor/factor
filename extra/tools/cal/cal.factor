@@ -1,5 +1,5 @@
 ! Copyright (C) 2016 John Benediktsson
-! See http://factorcode.org/license.txt for BSD license
+! See https://factorcode.org/license.txt for BSD license
 USING: accessors calendar calendar.format combinators
 command-line kernel math.parser namespaces sequences
 sequences.extras ;

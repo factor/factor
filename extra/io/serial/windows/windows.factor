@@ -1,5 +1,5 @@
 ! Copyright (C) 2009 Doug Coleman.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: io.files.windows io.streams.duplex kernel math
 math.bitwise windows windows.kernel32 windows.errors accessors
 alien.c-types fry locals continuations classes.struct ;

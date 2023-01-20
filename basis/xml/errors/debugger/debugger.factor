@@ -1,5 +1,5 @@
 ! Copyright (C) 2005, 2006 Daniel Ehrenberg
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors debugger io kernel prettyprint sequences
 xml.errors xml.writer ;
 IN: xml.errors.debugger

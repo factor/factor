@@ -1,9 +1,9 @@
 ! Copyright (c) 2012 Anonymous
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: combinators kernel ;
 IN: rosetta-code.ternary-logic
 
-! http://rosettacode.org/wiki/Ternary_logic
+! https://rosettacode.org/wiki/Ternary_logic
 
 ! In logic, a three-valued logic (also trivalent, ternary, or
 ! trinary logic, sometimes abbreviated 3VL) is any of several

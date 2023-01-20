@@ -1,5 +1,5 @@
 ! Copyright (C) 2009 Matthew Willis, 2017 Björn Lindqvist.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors alien.c-types alien.data alien.strings destructors
 io.encodings.utf8 kernel llvm.ffi ;
 IN: llvm.wrappers

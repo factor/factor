@@ -1,5 +1,5 @@
 ! Copyright (C) 2014 Benjamin Pollack
-! See http://factorcode.org/license.txt for BSD license
+! See https://factorcode.org/license.txt for BSD license
 
 USING: continuations kernel redis math math.parser sequences
 sorting tools.test ;

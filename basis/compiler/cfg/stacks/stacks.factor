@@ -1,5 +1,5 @@
 ! Copyright (C) 2008, 2010 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors biassocs compiler.cfg.registers
 compiler.cfg.stacks.finalize compiler.cfg.stacks.global
 compiler.cfg.stacks.local compiler.cfg.utilities kernel math

@@ -1,5 +1,5 @@
 ! Copyright (C) 2021 Your name.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: tools.test http2.hpack http2.hpack.private accessors
 kernel sequences ;
 IN: http2.hpack.tests

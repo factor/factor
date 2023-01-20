@@ -1,9 +1,9 @@
 ! Copyright (c) 2008 Eric Mertens.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: assocs combinators kernel math math.order namespaces sequences project-euler.common ;
 IN: project-euler.151
 
-! http://projecteuler.net/index.php?section=problems&id=151
+! https://projecteuler.net/index.php?section=problems&id=151
 
 ! DESCRIPTION
 ! -----------

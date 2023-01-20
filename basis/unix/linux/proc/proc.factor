@@ -1,5 +1,5 @@
 ! Copyright (C) 2013 Doug Coleman.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors arrays combinators combinators.smart
 io.encodings.utf8 io.files kernel math math.order math.parser
 memoize sequences sorting.slots splitting splitting.monotonic

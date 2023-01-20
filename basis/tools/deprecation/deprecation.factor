@@ -1,5 +1,5 @@
 ! Copyright (C) 2009 Joe Groff.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors assocs combinators.short-circuit
 compiler.units debugger init io io.streams.null kernel
 namespaces prettyprint sequences sets source-files.errors

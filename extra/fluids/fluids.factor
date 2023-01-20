@@ -1,5 +1,5 @@
 ! Copyright (C) 2010 Erik Charlebois.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors alien.data classes.struct destructors game.loop
 game.worlds gpu gpu.effects.blur gpu.effects.step gpu.state
 gpu.textures gpu.util images.loader kernel literals make math

@@ -1,5 +1,5 @@
 ! Copyright (C) 2011 John Benediktsson
-! See http://factorcode.org/license.txt for BSD license
+! See https://factorcode.org/license.txt for BSD license
 
 USING: accessors ascii assocs checksums checksums.md5
 classes.tuple formatting http.client images.http json.reader
@@ -15,7 +15,7 @@ profileBackground profileUrl requestHash thumbnailUrl urls ;
     [ blank? ] trim >lower md5 checksum-bytes bytes>hex-string ;
 
 : gravatar-info ( gravatar-id -- info )
-    "http://gravatar.com/%s.json" sprintf http-get nip
+    "https://gravatar.com/%s.json" sprintf http-get nip
     >string json> "entry" of first info from-slots ;
 
 : gravatar. ( gravatar-id -- )

@@ -1,4 +1,4 @@
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors alien.enums arrays combinators.short-circuit
 continuations destructors formatting grouping io.backend io.pathnames
 kernel math math.functions.private math.vectors namespaces raylib

@@ -1,5 +1,5 @@
 ! Copyright (C) 2005 Chris Double. All Rights Reserved.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: kernel threads vectors arrays sequences namespaces make
 tools.test continuations deques strings math words match
 quotations concurrency.messaging concurrency.mailboxes

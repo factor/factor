@@ -1,5 +1,5 @@
 ! Copyright (C) 2005, 2009 Daniel Ehrenberg
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors ascii assocs combinators
 combinators.short-circuit hints io kernel math math.parser
 namespaces sbufs sequences splitting strings xml.char-classes

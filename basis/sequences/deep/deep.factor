@@ -1,5 +1,5 @@
 ! Copyright (C) 2007, 2008 Daniel Ehrenberg, Doug Coleman.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: fry kernel make math sequences strings ;
 IN: sequences.deep
 

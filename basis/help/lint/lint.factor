@@ -1,5 +1,5 @@
 ! Copyright (C) 2006, 2009 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: assocs classes combinators command-line continuations
 help help.lint.checks help.topics io kernel listener namespaces
 parser sequences source-files.errors system tools.errors vocabs

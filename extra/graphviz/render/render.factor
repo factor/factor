@@ -1,5 +1,5 @@
 ! Copyright (C) 2012 Alex Vondrak.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: calendar combinators compiler.units continuations
 graphviz.dot images.viewer io.backend io.directories
 io.encodings.latin1 io.encodings.utf8 io.files
@@ -10,7 +10,7 @@ IN: graphviz.render
 
 <PRIVATE
 
-! "Layout Commands" from http://graphviz.org/Documentation.php
+! "Layout Commands" from https://graphviz.org/Documentation.php
 CONSTANT: standard-layouts {
     "circo"
     "dot"
@@ -139,7 +139,7 @@ PRIVATE>
 
 <PRIVATE
 
-! http://graphviz.org/content/output-formats
+! https://graphviz.org/content/output-formats
 CONSTANT: standard-formats {
     "bmp"
     "canon"

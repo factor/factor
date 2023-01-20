@@ -1,5 +1,5 @@
 ! Copyright (C) 2007 Berlin Brown, 2008 Doug Coleman, 2021 Giftpflanze.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 ! Adapted from mysql.h and mysql.c
 ! Tested with MariaDB version 10.1.39
 USING: alien alien.c-types alien.libraries alien.syntax

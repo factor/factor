@@ -1,5 +1,5 @@
 ! Copyright (C) 2005, 2010 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs combinators.smart compiler.units
 generic generic.single hash-sets.identity hashtables help
 help.crossref help.markup help.topics init io io.pathnames

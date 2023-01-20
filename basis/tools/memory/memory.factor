@@ -1,5 +1,5 @@
 ! Copyright (C) 2005, 2011 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs binary-search classes classes.struct
 combinators combinators.smart continuations fry grouping hashtables
 hints io io.styles kernel layouts literals math math.order math.parser

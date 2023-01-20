@@ -1,5 +1,5 @@
 ! Copyright (C) 2005, 2010 Eduardo Cavazos, Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors alien.c-types alien.data alien.syntax arrays ascii
 assocs classes.struct combinators combinators.short-circuit
 environment io.encodings.ascii io.encodings.string io.encodings.utf8

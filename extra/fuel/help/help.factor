@@ -1,5 +1,5 @@
 ! Copyright (C) 2009 Jose Antonio Ortega Ruiz.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs combinators
 combinators.short-circuit help help.crossref help.markup
 help.markup.private help.topics help.vocabs io io.streams.string

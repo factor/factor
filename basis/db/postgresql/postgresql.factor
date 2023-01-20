@@ -1,5 +1,5 @@
 ! Copyright (C) 2007, 2008 Doug Coleman.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors classes.tuple combinators db
 db.postgresql.errors db.postgresql.ffi db.postgresql.lib
 db.private db.queries db.tuples db.tuples.private db.types

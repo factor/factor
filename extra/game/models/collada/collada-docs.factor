@@ -1,5 +1,5 @@
 ! Copyright (C) 2010 Erik Charlebois
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: help.markup help.crossref help.stylesheet help.topics help.syntax
 definitions io prettyprint summary arrays math sequences vocabs strings
 see xml.data hashtables assocs game.models.collada.private game.models
@@ -9,7 +9,7 @@ IN: game.models.collada
 ABOUT: "game.models.collada"
 
 ARTICLE: "game.models.collada" "Conversion of COLLADA assets"
-"The " { $vocab-link "game.models.collada" } " vocabulary implements words for converting COLLADA assets to data suitable for use with OpenGL. See the COLLADA documentation at " { $url "http://collada.org" } "." ;
+"The " { $vocab-link "game.models.collada" } " vocabulary implements words for converting COLLADA assets to data suitable for use with OpenGL. See the COLLADA documentation at " { $url "https://collada.org" } "." ;
 
 HELP: source
 { $class-description "Tuple of a vertex attribute semantic, offset in triangle index buffer and float data for a single vertex attribute." } ;

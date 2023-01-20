@@ -1,9 +1,9 @@
 ! Copyright (c) 2012 Anonymous
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: kernel math sequences ;
 IN: rosetta-code.catalan-numbers
 
-! http://rosettacode.org/wiki/Catalan_numbers
+! https://rosettacode.org/wiki/Catalan_numbers
 
 ! Catalan numbers are a sequence of numbers which can be defined
 ! directly:

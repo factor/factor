@@ -1,10 +1,10 @@
 ! Copyright (c) 2012 Anonymous
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors arrays io kernel make math math.order
 math.parser ranges sequences sorting ;
 IN: rosetta-code.knapsack
 
-! http://rosettacode.org/wiki/Knapsack_problem/0-1
+! https://rosettacode.org/wiki/Knapsack_problem/0-1
 
 ! A tourist wants to make a good trip at the weekend with his
 ! friends. They will go to the mountains to see the wonders of

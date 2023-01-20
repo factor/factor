@@ -1,5 +1,5 @@
 ! Copyright (C) 2016 Björn Lindqvist
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors assocs kernel literals ui.gestures x11.X
 x11.keysymdef ;
 IN: ui.backend.x11.keys

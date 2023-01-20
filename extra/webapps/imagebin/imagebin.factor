@@ -1,5 +1,5 @@
 ! Copyright (C) 2008 Doug Coleman.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors furnace.actions furnace.redirection http.server
 http.server.dispatchers io.directories io.encodings.utf8 io.files
 io.pathnames kernel math math.parser namespaces sequences

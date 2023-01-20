@@ -1,5 +1,5 @@
 ! Copyright (C) 2009 Joe Groff, 2013 John Benediktsson
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors byte-arrays combinators kernel kernel.private
 layouts make math math.private sbufs sequences sequences.private
 strings ;

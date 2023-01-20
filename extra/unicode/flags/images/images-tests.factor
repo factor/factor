@@ -1,5 +1,5 @@
 ! Copyright (C) 2022 Doug Coleman.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: assocs countries kernel sets system tools.test
 unicode.flags unicode.flags.images ;
 IN: unicode.flags.images.tests

@@ -1,5 +1,5 @@
 ! Copyright (C) 2005, 2010 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.x
+! See https://factorcode.org/license.txt for BSD license.x
 USING: accessors assocs definitions kernel make namespaces
 prettyprint summary vocabs words ;
 IN: help.topics

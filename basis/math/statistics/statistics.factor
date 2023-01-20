@@ -1,5 +1,5 @@
 ! Copyright (C) 2008 Doug Coleman, Michael Judge, Loryn Jenkins.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs combinators
 combinators.short-circuit fry generalizations grouping kernel
 locals math math.functions math.order ranges math.vectors
@@ -187,7 +187,7 @@ PRIVATE>
 
 ! quantile can be any n-tile. quartile is n = 4, percentile is n = 100
 ! a,b,c,d parameters, N - number of samples, q is quantile (1/2 for median, 1/4 for 1st quartile)
-! http://mathworld.wolfram.com/Quantile.html
+! https://mathworld.wolfram.com/Quantile.html
 ! a + (N + b) q - 1
 ! could subtract 1 from a
 

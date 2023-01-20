@@ -1,5 +1,5 @@
 ! Copyright (C) 2017 Doug Coleman.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: assocs cli.git formatting http.client io.pathnames
 json.reader kernel math namespaces sequences ;
 IN: github

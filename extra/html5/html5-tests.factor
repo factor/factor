@@ -1,5 +1,5 @@
 ! Copyright (C) 2020 Doug Coleman.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: html5 kernel multiline tools.test ;
 IN: html5.tests
 

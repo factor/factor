@@ -1,5 +1,5 @@
 ! Copyright (C) 2009, 2010 Slava Pestov, Daniel Ehrenberg.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors combinators combinators.private
 combinators.short-circuit compiler.tree.propagation.info
 compiler.tree.propagation.inlining compiler.units continuations

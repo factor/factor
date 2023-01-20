@@ -1,8 +1,8 @@
 ! Copyright (C) 2010 Chris Double.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 !
 ! bitcoin API documentation at:
-!  http://www.bitcoin.org/wiki/doku.php?id=api
+!  https://www.bitcoin.org/wiki/doku.php?id=api
 !
 ! Donations can be sent to the following bitcoin address:
 ! 1HVMkUcaPhCeCK3rrBm31EY2bf5r33VHsj

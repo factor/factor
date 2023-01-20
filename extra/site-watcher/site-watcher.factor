@@ -1,5 +1,5 @@
 ! Copyright (C) 2009 Doug Coleman.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors calendar continuations db http.client init
 kernel math math.parser namespaces sequences site-watcher.db
 site-watcher.email timers ;

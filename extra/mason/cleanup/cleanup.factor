@@ -1,5 +1,5 @@
 ! Copyright (C) 2008 Eduardo Cavazos, Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: arrays io.directories io.files kernel mason.common
 mason.config mason.platform namespaces ;
 IN: mason.cleanup

@@ -1,5 +1,5 @@
 ! Copyright (C) 2005, 2010 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors arrays classes combinators compiler.units
 continuations definitions effects io io.encodings.utf8 io.files
 kernel lexer math.parser namespaces parser.notes quotations

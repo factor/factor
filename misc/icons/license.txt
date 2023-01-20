@@ -1,4 +1,4 @@
 The icons/images/jackets contained in this archive are
 Copyright (C) 2012-2015 John Benediktsson. All Rights Reserved.
 
-See http://factorcode.org/license.txt for BSD license.
+See https://factorcode.org/license.txt for BSD license.

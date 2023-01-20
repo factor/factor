@@ -1,5 +1,5 @@
 ! Copyright (C) 2009 Daniel Ehrenberg
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors arrays ascii assocs biassocs byte-arrays
 combinators combinators.short-circuit interval-maps io
 io.encodings io.encodings.iana io.files kernel math
@@ -17,10 +17,10 @@ gb18030 "GB18030" register-encoding
 ! GB to mean GB18030 is a terrible abuse of notation
 
 ! Resource file from:
-! http://source.icu-project.org/repos/icu/data/trunk/charset/data/xml/gb-18030-2000.xml
+! https://source.icu-project.org/repos/icu/data/trunk/charset/data/xml/gb-18030-2000.xml
 
 ! Algorithms from:
-! http://www-128.ibm.com/developerworks/library/u-china.html
+! https://www-128.ibm.com/developerworks/library/u-china.html
 
 : linear ( bytes -- num )
     ! This hard-codes bMin and bMax

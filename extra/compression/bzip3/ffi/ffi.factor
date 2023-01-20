@@ -1,5 +1,5 @@
 ! Copyright (C) 2022 Raghu Ranganathan.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 
 ! Makes use of Kamila Szewczyk's bzip3 library.
 ! See https://github.com/kspalaiologos/bzip3/blob/master/include/libbz3.h for the API specifics.

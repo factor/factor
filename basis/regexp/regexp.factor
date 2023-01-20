@@ -1,5 +1,5 @@
 ! Copyright (C) 2008, 2009 Doug Coleman, Daniel Ehrenberg.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors arrays classes compiler.units kernel
 kernel.private lexer make math ranges namespaces quotations
 regexp.ast regexp.compiler regexp.negation regexp.parser

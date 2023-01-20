@@ -1,5 +1,5 @@
 ! Copyright (C) 2008 Doug Coleman, Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors alien alien.data arrays classes.struct
 combinators continuations destructors fry io.backend
 io.encodings.string io.encodings.utf16 io.files.windows

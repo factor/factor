@@ -1,5 +1,5 @@
 ! Copyright (C) 2009 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: kernel io math math.functions math.parser math.vectors
 math.vectors.simd sequences specialized-arrays ;
 QUALIFIED-WITH: alien.c-types c

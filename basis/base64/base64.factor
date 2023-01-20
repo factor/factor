@@ -1,5 +1,5 @@
 ! Copyright (C) 2008 Doug Coleman, Daniel Ehrenberg.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: arrays assocs byte-arrays combinators growable io
 io.encodings.binary io.streams.byte-array kernel kernel.private
 literals math math.bitwise namespaces sbufs sequences

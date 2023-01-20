@@ -1,5 +1,5 @@
 ! Copyright (C) 2010 Sascha Matzke.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors assocs bson.constants calendar combinators
 endian io io.encodings io.encodings.binary io.encodings.utf8
 io.files io.streams.byte-array kernel math namespaces sequences

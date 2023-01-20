@@ -1,5 +1,5 @@
 ! Copyright (C) 2009 Doug Coleman.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors assocs furnace.actions furnace.conversations
 html.forms html.templates.chloe.compiler
 html.templates.chloe.syntax http.client http.server

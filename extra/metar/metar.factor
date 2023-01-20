@@ -1,5 +1,5 @@
 ! Copyright (C) 2013 John Benediktsson
-! See http://factorcode.org/license.txt for BSD license
+! See https://factorcode.org/license.txt for BSD license
 
 USING: accessors arrays ascii assocs calendar calendar.format
 classes.tuple combinators command-line continuations csv
@@ -41,7 +41,7 @@ ERROR: bad-location str ;
     ] [ drop f ] if ;
 
 : stations-data ( -- seq )
-    URL" http://tgftp.nws.noaa.gov/data/nsd_cccc.txt"
+    URL" https://tgftp.nws.noaa.gov/data/nsd_cccc.txt"
     http-get nip CHAR: ; [ string>csv ] with-delimiter ;
 
 PRIVATE>
@@ -651,7 +651,7 @@ GENERIC: metar ( station -- metar )
 M: station metar cccc>> metar ;
 
 M: string metar
-    "http://tgftp.nws.noaa.gov/data/observations/metar/stations/%s.TXT"
+    "https://tgftp.nws.noaa.gov/data/observations/metar/stations/%s.TXT"
     sprintf http-get nip ;
 
 GENERIC: metar. ( station -- )
@@ -793,7 +793,7 @@ GENERIC: taf ( station -- taf )
 M: station taf cccc>> taf ;
 
 M: string taf
-    "http://tgftp.nws.noaa.gov/data/forecasts/taf/stations/%s.TXT"
+    "https://tgftp.nws.noaa.gov/data/forecasts/taf/stations/%s.TXT"
     sprintf http-get nip ;
 
 GENERIC: taf. ( station -- )

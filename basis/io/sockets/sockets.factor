@@ -1,6 +1,6 @@
 ! Copyright (C) 2007, 2011 Slava Pestov, Doug Coleman,
 ! Daniel Ehrenberg.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors alien.c-types alien.data alien.strings arrays
 byte-arrays classes classes.struct combinators
 combinators.short-circuit continuations destructors endian fry

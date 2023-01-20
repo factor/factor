@@ -1,5 +1,5 @@
 ! Copyright (C) 2009 Doug Coleman.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors assocs calendar calendar.format
 combinators.smart io io.crlf io.encodings.utf8 kernel
 managed-server namespaces sequences sorting splitting unicode ;

@@ -1,5 +1,5 @@
 ! Copyright (C) 2018 Björn Lindqvist
-! See http://factorcode.org/license.txt for BSD license
+! See https://factorcode.org/license.txt for BSD license
 USING: accessors assocs grouping.extras kernel math
 math.functions math.statistics sequences sequences.extras
 sorting ;

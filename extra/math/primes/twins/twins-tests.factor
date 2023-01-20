@@ -1,5 +1,5 @@
 ! Copyright (C) 2012 John Benediktsson
-! See http://factorcode.org/license.txt for BSD license
+! See https://factorcode.org/license.txt for BSD license
 USING: math.primes.twins tools.test ;
 
 { { } } [ 3 twin-primes-upto ] unit-test

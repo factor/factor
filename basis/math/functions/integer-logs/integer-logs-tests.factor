@@ -1,5 +1,5 @@
 ! Copyright (C) 2016 Jon Harper.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: tools.test math math.functions math.functions.integer-logs ;
 IN: math.functions.integer-logs.tests
 

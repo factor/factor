@@ -1,5 +1,5 @@
 ! Copyright (C) 2019 HMC Clinic.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors alien.c-types arrays kernel math math.order math.vectors
 sequences specialized-arrays tensors tools.test ;
 QUALIFIED-WITH: alien.c-types c

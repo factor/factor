@@ -1,5 +1,5 @@
 ! Copyright (C) 2008, 2010 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: alien arrays byte-arrays kernel layouts literals math
 quotations sequences strings words ;
 IN: compiler.constants

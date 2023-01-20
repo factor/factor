@@ -1,5 +1,5 @@
 ! Copyright (C) 2005, 2009 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors assocs calendar continuations debugger
 definitions io io.launcher io.pathnames kernel lexer namespaces
 prettyprint sequences sets source-files.errors splitting strings

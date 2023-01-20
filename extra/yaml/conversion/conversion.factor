@@ -1,18 +1,18 @@
 ! Copyright (C) 2014 Jon Harper.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors assocs base64 byte-arrays combinators
 combinators.extras hash-sets kernel linked-assocs math
 math.parser regexp sequences strings yaml.ffi
 calendar calendar.format calendar.parser ;
 IN: yaml.conversion
 
-! http://yaml.org/type/
+! https://yaml.org/type/
 CONSTANT: YAML_MERGE_TAG "tag:yaml.org,2002:merge"
 CONSTANT: YAML_VALUE_TAG "tag:yaml.org,2002:value"
 
 ! !!!!!!!!!!!!!!
 ! tag resolution
-! http://www.yaml.org/spec/1.2/spec.html
+! https://www.yaml.org/spec/1.2/spec.html
 ! 10.3. Core Schema
 
 CONSTANT: re-null R/ null|Null|NULL|~/

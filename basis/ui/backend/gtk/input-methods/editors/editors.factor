@@ -1,5 +1,5 @@
 ! Copyright (C) 2011 Anton Gorenko.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: kernel sequences ui.backend.gtk.input-methods
 ui.gadgets.editors ;
 IN: ui.backend.gtk.input-methods.editors

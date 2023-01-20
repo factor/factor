@@ -1,5 +1,5 @@
 ! Copyright (C) 2008, 2011 Eduardo Cavazos, Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors arrays calendar combinators.short-circuit
 continuations io.directories io.launcher io.pathnames kernel
 layouts make mason.config mason.notify mason.platform

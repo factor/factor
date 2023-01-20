@@ -1,5 +1,5 @@
 ! Copyright (C) 2010 Daniel Ehrenberg, Doug Coleman.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: bit-arrays bit-sets kernel math sequences sets sorting
 tools.test ;
 IN: sets.tests

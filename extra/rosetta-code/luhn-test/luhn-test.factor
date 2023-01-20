@@ -1,9 +1,9 @@
 ! Copyright (c) 2012 Anonymous
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: kernel math sequences ;
 IN: rosetta-code.luhn-test
 
-! http://rosettacode.org/wiki/Luhn_test_of_credit_card_numbers
+! https://rosettacode.org/wiki/Luhn_test_of_credit_card_numbers
 
 ! The Luhn test is used by some credit card companies to
 ! distinguish valid credit card numbers from what could be a

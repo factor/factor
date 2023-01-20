@@ -46,7 +46,7 @@ BT
 /F1 10 Tf
 12 TL
 (! Copyright \(C\) 2010 John Benediktsson)'
-(! See http://factorcode.org/license.txt for BSD license)'
+(! See https://factorcode.org/license.txt for BSD license)'
 ( )'
 (USING: assocs calendar combinators environment formatting)'
 (grouping io io.files kernel make math ranges sequences)'

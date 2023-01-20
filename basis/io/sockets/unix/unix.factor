@@ -1,5 +1,5 @@
 ! Copyright (C) 2004, 2008 Slava Pestov, Ivan Tikhonov.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors alien alien.c-types alien.data alien.strings
 byte-arrays classes.struct combinators destructors io.backend.unix
 io.encodings.ascii io.encodings.utf8 io.files io.pathnames io.sockets

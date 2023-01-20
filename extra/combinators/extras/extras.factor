@@ -1,5 +1,5 @@
 ! Copyright (C) 2013 Doug Coleman, John Benediktsson.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: arrays assocs combinators combinators.smart
 generalizations kernel math math.order namespaces quotations
 sequences sequences.generalizations sequences.private

@@ -1,5 +1,5 @@
 ! Copyright (C) 2010 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors fry kernel make mason.config mason.platform
 mason.release.archive namespaces sequences ;
 IN: webapps.mason.version.files

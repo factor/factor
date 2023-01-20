@@ -1,5 +1,5 @@
 ! Copyright (C) 2008 Doug Coleman.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors assocs assocs.extras combinators
 combinators.short-circuit html.parser http.client io kernel math
 math.statistics sequences sets splitting unicode urls

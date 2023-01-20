@@ -1,5 +1,5 @@
 ! Copyright (C) 2008, 2010 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: hashtables http.client io.files.temp io.pathnames kernel
 mason.common mason.config namespaces sequences ;
 IN: mason.docs

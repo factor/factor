@@ -1,5 +1,5 @@
 ! Copyright (C) 2020 Doug Coleman.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs combinators combinators.smart io
 kernel math math.order math.parser multiline peg.ebnf sequences
 sequences.deep sequences.extras splitting strings ;

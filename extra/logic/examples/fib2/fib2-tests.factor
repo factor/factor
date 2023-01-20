@@ -1,5 +1,5 @@
 ! Copyright (C) 2019 KUSUMOTO Norio.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: tools.test logic logic.examples.fib2 ;
 
 { { H{ { F 6765 } } } } [

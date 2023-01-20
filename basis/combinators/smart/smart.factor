@@ -1,5 +1,5 @@
 ! Copyright (C) 2009, 2011 Doug Coleman, John Benediktsson.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs combinators effects
 generalizations kernel math sequences sequences.generalizations
 stack-checker stack-checker.backend stack-checker.values

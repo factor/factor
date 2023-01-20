@@ -1,10 +1,10 @@
 ! Copyright (c) 2012 Anonymous
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors combinators deques dlists io kernel
 math.parser ;
 IN: rosetta-code.tree-traversal
 
-! http://rosettacode.org/wiki/Tree_traversal
+! https://rosettacode.org/wiki/Tree_traversal
 
 ! Implement a binary tree where each node carries an integer,
 ! and implement preoder, inorder, postorder and level-order

@@ -1,5 +1,5 @@
 ! Copyright (c) 2012 Anonymous
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 
 USING: accessors arrays calendar colors kernel math
 math.constants math.functions math.rectangles math.vectors
@@ -7,7 +7,7 @@ opengl sequences system timers ui ui.gadgets ui.render ;
 
 IN: rosetta-code.animate-pendulum
 
-! http://rosettacode.org/wiki/Animate_a_pendulum
+! https://rosettacode.org/wiki/Animate_a_pendulum
 
 ! One good way of making an animation is by simulating a
 ! physical system and illustrating the variables in that system

@@ -1,5 +1,5 @@
 ! Copyright (C) 2016 Doug Coleman.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs combinators combinators.extras
 combinators.short-circuit continuations io.encodings.utf8
 io.files kernel make math math.order modern.paths modern.slices

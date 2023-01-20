@@ -1,5 +1,5 @@
 ! Copyright (C) 2004, 2009 Slava Pestov, Daniel Ehrenberg.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: alien.strings io io.backend io.encodings
 io.pathnames kernel kernel.private namespaces sequences
 splitting system ;

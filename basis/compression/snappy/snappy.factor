@@ -1,5 +1,5 @@
 ! Copyright (C) 2014 Doug Coleman.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: alien.c-types alien.data byte-arrays compression.snappy.ffi
 kernel sequences ;
 IN: compression.snappy

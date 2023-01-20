@@ -1,5 +1,5 @@
 ! Copyright (C) 2003, 2009 Slava Pestov, Daniel Ehrenberg.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors destructors io io.encodings io.streams.sequence
 kernel math sbufs sequences sequences.private strings ;
 IN: io.streams.string

@@ -1,5 +1,5 @@
 ! Copyright (C) 2010 Doug Coleman.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors bit-arrays calendar endian game.input io
 io.encodings.binary io.files kernel literals math namespaces
 threads timers ;

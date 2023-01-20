@@ -1,11 +1,11 @@
 ! Copyright (c) 2012 Anonymous
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors timers calendar fonts kernel models sequences ui
 ui.gadgets ui.gadgets.labels ui.gestures ;
 FROM: models => change-model ;
 IN: rosetta-code.animation
 
-! http://rosettacode.org/wiki/Animation
+! https://rosettacode.org/wiki/Animation
 
 ! Animation is the foundation of a great many parts of graphical
 ! user interfaces, including both the fancy effects when things

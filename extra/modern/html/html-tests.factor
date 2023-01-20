@@ -1,5 +1,5 @@
 ! Copyright (C) 2021 Doug Coleman.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: io.encodings.utf8 io.files kernel make math modern.html
 multiline sequences tools.test ;
 IN: modern.html.tests
@@ -58,7 +58,7 @@ IN: modern.html.tests
                     }
                     T{ dquote
                         { payload
-                            "http://www.apple.com/DTDs/PropertyList-1.0.dtd"
+                            "https://www.apple.com/DTDs/PropertyList-1.0.dtd"
                         }
                     }
                 }
@@ -68,7 +68,7 @@ IN: modern.html.tests
 } [
     [[ <!DOCTYPE plist PUBLIC
     "-//Apple//DTD PLIST 1.0//EN"
-    "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+    "https://www.apple.com/DTDs/PropertyList-1.0.dtd">
     ]]
     string>html
 ] unit-test

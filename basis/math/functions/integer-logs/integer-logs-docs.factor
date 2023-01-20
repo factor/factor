@@ -1,5 +1,5 @@
 ! Copyright (C) 2017 Jon Harper.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: help.markup help.syntax kernel math quotations ;
 IN: math.functions.integer-logs
 

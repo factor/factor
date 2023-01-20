@@ -1,5 +1,5 @@
 ! Copyright (C) 2008, 2010 Eduardo Cavazos, Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors calendar continuations debugger io
 io.directories io.pathnames io.sockets io.streams.string kernel
 make mason.build mason.common mason.config mason.disk

@@ -1,5 +1,5 @@
 ! Copyright (C) 2008, 2010 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: ascii assocs byte-arrays fry hints kernel lexer math
 parser sequences sequences.private strings summary words ;
 IN: tr

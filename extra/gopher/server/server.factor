@@ -1,5 +1,5 @@
 ! Copyright (C) 2016 John Benediktsson
-! See http://factorcode.org/license.txt for BSD license
+! See https://factorcode.org/license.txt for BSD license
 
 USING: accessors calendar combinators combinators.short-circuit
 command-line formatting io io.directories io.encodings.binary

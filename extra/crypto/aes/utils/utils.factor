@@ -1,5 +1,5 @@
 ! Copyright (C) 2013 Fred Alger
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: combinators grouping kernel math math.bitwise
 prettyprint sequences
 sequences.private ;

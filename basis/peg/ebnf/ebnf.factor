@@ -1,5 +1,5 @@
 ! Copyright (C) 2007 Chris Double.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors assocs combinators combinators.short-circuit
 effects kernel make math.parser multiline namespaces parser peg
 peg.parsers quotations sequences sequences.deep splitting

@@ -1,5 +1,5 @@
 ! Copyright (C) 2008, 2010 Slava Pestov, Daniel Ehrenberg
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors arrays combinators farkup html html.forms
 html.streams inspector io kernel lcs.diff2html namespaces
 present sequences splitting strings urls xml.data xml.syntax

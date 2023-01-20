@@ -1,12 +1,12 @@
 ! Copyright (c) 2012 Anonymous
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: assocs http.client io.encodings.utf8 io.files
 io.files.temp kernel math math.combinatorics sequences sorting
 strings urls ;
 
 IN: rosettacode.anagrams-deranged
 
-! http://rosettacode.org/wiki/Anagrams/Deranged_anagrams
+! https://rosettacode.org/wiki/Anagrams/Deranged_anagrams
 
 ! Two or more words are said to be anagrams if they have the
 ! same characters, but in a different order. By analogy with
@@ -15,7 +15,7 @@ IN: rosettacode.anagrams-deranged
 ! in the same position in both words.
 
 ! The task is to use the word list at
-! http://www.puzzlers.org/pub/wordlists/unixdict.txt to find and
+! https://www.puzzlers.org/pub/wordlists/unixdict.txt to find and
 ! show the longest deranged anagram.
 
 : derangement? ( str1 str2 -- ? ) [ = not ] 2all? ;
@@ -42,7 +42,7 @@ IN: rosettacode.anagrams-deranged
     deranged-anagrams [ first length ] sort-with last ;
 
 : default-word-list ( -- path )
-    URL" http://puzzlers.org/pub/wordlists/unixdict.txt"
+    URL" https://puzzlers.org/pub/wordlists/unixdict.txt"
     "unixdict.txt" temp-file [ ?download-to ] keep ;
 
 : longest-deranged-anagrams ( -- anagrams )

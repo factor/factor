@@ -1,5 +1,5 @@
 ! Copyright (C) 2009 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors assocs destructors http io io.encodings.ascii
 io.encodings.binary io.encodings.string io.encodings.utf8
 io.files io.files.info io.pathnames kernel math.parser sequences

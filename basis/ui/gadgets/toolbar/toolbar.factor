@@ -1,5 +1,5 @@
 ! Copyright (C) 2005, 2009 Slava Pestov, 2015 Nicolas Pénet.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors assocs classes kernel ui.baseline-alignment
 ui.commands ui.gadgets ui.gadgets.borders ui.gadgets.buttons
 ui.gadgets.buttons.private ui.gadgets.tracks ui.pens

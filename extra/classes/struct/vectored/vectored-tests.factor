@@ -1,5 +1,5 @@
 ! Copyright (C) 2009 Joe Groff.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors alien.c-types classes.struct classes.struct.vectored
 kernel sequences specialized-arrays tools.test vocabs compiler.units ;
 FROM: specialized-arrays.private => specialized-array-vocab ;

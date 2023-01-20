@@ -1,10 +1,10 @@
 ! Copyright (c) 2012 Anonymous
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: arrays assocs combinators.random formatting kernel
 math quotations sequences ;
 IN: rosettacode.probabilistic-choice
 
-! http://rosettacode.org/wiki/Probabilistic_choice
+! https://rosettacode.org/wiki/Probabilistic_choice
 
 ! Given a mapping between items and their required probability
 ! of occurrence, generate a million items randomly subject to the

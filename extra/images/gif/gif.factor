@@ -1,5 +1,5 @@
 ! Copyrigt (C) 2009 Doug Coleman, Keith Lazuka
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors arrays combinators compression.lzw constructors
 endian grouping images images.loader io io.encodings.string
 io.encodings.utf8 kernel make math math.bitwise sequences ;
