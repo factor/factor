@@ -209,7 +209,7 @@ SYMBOL: redirects
 : request-url ( url -- url' )
     dup >url dup misparsed-url? [
         drop dup url? [ present ] when
-        "https://" prepend >url
+        "http://" prepend >url
     ] [ nip ] if ensure-port ;
 
 : ?default-proxy ( request -- request' )
