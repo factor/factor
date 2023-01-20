@@ -5,7 +5,7 @@
 ! for your convenience.
 USING: accessors alien alien.c-types alien.destructors
 alien.libraries alien.syntax classes.struct combinators kernel
-raylib.util sequences sequences.private system ;
+math raylib.util sequences sequences.private system ;
 IN: raylib
 FROM: alien.c-types => float ;
 
@@ -639,6 +639,7 @@ STRUCT: Wave
 
 STRUCT: AudioStream
     { buffer void* }    ! Pointer to internal data used by the audio system
+    { processor void* } ! Pointer to internal data processor, useful for audio effects
     { sampleRate uint } ! Frequency (samples per second)
     { sampleSize uint } ! Bit depth (bits per sample): 8, 16, 32 (24 not supported)
     { channels uint } ; ! Number of channels (1-mono, 2-stereo)
@@ -732,6 +733,7 @@ FUNCTION-ALIAS: set-window-position void SetWindowPosition ( int x, int y )     
 FUNCTION-ALIAS: set-window-monitor void SetWindowMonitor ( int monitor )                 ! Set monitor for the current window (fullscreen mode)
 FUNCTION-ALIAS: set-window-min-size void SetWindowMinSize ( int width, int height )      ! Set window minimum dimensions (for FLAG_WINDOW_RESIZABLE)
 FUNCTION-ALIAS: set-window-size void SetWindowSize ( int width, int height )             ! Set window dimensions
+FUNCTION-ALIAS: set-window-opacity void SetWindowOpacity ( float opacity )               ! Set window opacity [0.0f..1.0f] (only PLATFORM_DESKTOP)
 FUNCTION-ALIAS: get-window-handle void* GetWindowHandle ( )                              ! Get native window handle
 FUNCTION-ALIAS: get-screen-width int GetScreenWidth ( )                                  ! Get current screen width
 FUNCTION-ALIAS: get-screen-height int GetScreenHeight ( )                                ! Get current screen height
@@ -750,6 +752,8 @@ FUNCTION-ALIAS: get-window-scale-dpi Vector2 GetWindowScaleDPI ( )              
 FUNCTION-ALIAS: get-monitor-name c-string GetMonitorName ( int monitor )                 ! Get the human-readable, UTF-8 encoded name of the primary monitor
 FUNCTION-ALIAS: set-clipboard-text void SetClipboardText ( c-string text )               ! Set clipboard text content
 FUNCTION-ALIAS: get-clipboard-text c-string GetClipboardText ( )                         ! Get clipboard text content
+FUNCTION-ALIAS: enable-event-waiting void EnableEventWaiting ( )                         ! Enable waiting for events on EndDrawing(), no automatic event polling
+FUNCTION-ALIAS: disable-event-waiting void DisableEventWaiting ( )                       ! Disable waiting for events on EndDrawing(), automatic events polling
 
 ! Custom frame control functions
 ! NOTE: Those functions are intended for advance users that want full control over the frame processing
@@ -757,7 +761,7 @@ FUNCTION-ALIAS: get-clipboard-text c-string GetClipboardText ( )                
 ! To avoid that behavior and control frame processes manually, enable in config.h: SUPPORT_CUSTOM_FRAME_CONTROL
 FUNCTION-ALIAS: swap-screen-buffer void SwapScreenBuffer ( )                             ! Swap back buffer with front buffer (screen drawing)
 FUNCTION-ALIAS: poll-input-events void PollInputEvents ( )                               ! Register all input events
-FUNCTION-ALIAS: wait-time void WaitTime ( float ms )                                     ! Wait for some milliseconds (halt program execution)
+FUNCTION-ALIAS: wait-time void WaitTime ( double seconds )                               ! Wait for some milliseconds (halt program execution)
 
 ! Cursor-related functions
 FUNCTION-ALIAS: show-cursor void ShowCursor ( )                                          ! Shows cursor
@@ -829,6 +833,8 @@ FUNCTION-ALIAS: mem-alloc void* MemAlloc ( int size )                           
 FUNCTION-ALIAS: mem-realloc void* MemRealloc ( void* ptr, int size )                     ! Internal memory reallocator
 FUNCTION-ALIAS: mem-free void MemFree ( void* ptr )                                      ! Internal memory free
 
+FUNCTION-ALIAS: open-url void OpenURL ( c-string url )                                   ! Open URL with default system browser (if available)
+
 ! Set custom callbacks
 ! WARNING: Callbacks setup is intended for advance users
 ! FUNCTION: void SetTraceLogCallback ( TraceLogCallback callback )          ! Set custom trace log
@@ -841,24 +847,27 @@ FUNCTION-ALIAS: mem-free void MemFree ( void* ptr )                             
 FUNCTION-ALIAS: load-file-data c-string LoadFileData ( c-string fileName, uint* bytesRead )           ! Load file data as byte array (read)
 FUNCTION-ALIAS: unload-file-data void UnloadFileData ( c-string data )                                ! Unload file data allocated by LoadFileData()
 FUNCTION-ALIAS: save-file-data bool SaveFileData ( c-string fileName, void* data, uint bytesToWrite ) ! Save data to file from byte array (write), returns true on success
+FUNCTION-ALIAS: export-data-as-code bool ExportDataAsCode ( char* data, uint size, c-string fileName ) ! Export data to code (.h), returns true on success
 FUNCTION-ALIAS: load-file-text c-string LoadFileText ( c-string fileName )                            ! Load text data from file (read), returns a ' ' terminated string
 FUNCTION-ALIAS: unload-file-text void UnloadFileText ( c-string text )                                ! Unload file text data allocated by LoadFileText()
 FUNCTION-ALIAS: save-file-text bool SaveFileText ( c-string fileName, c-string text )                 ! Save text data to file (write), string must be ' ' terminated, returns true on success
 FUNCTION-ALIAS: file-exists bool FileExists ( c-string fileName )                                     ! Check if file exists
 FUNCTION-ALIAS: directory-exists bool DirectoryExists ( c-string dirPath )                            ! Check if a directory path exists
 FUNCTION-ALIAS: is-file-extension bool IsFileExtension ( c-string fileName, c-string ext )            ! Check file extension (including point: .png, .wav)
+FUNCTION-ALIAS: get-file-length int GetFileLength ( c-string fileName )                               ! Get file length in bytes (NOTE: GetFileSize() conflicts with windows.h)
 FUNCTION-ALIAS: get-file-extension c-string GetFileExtension ( c-string fileName )                    ! Get pointer to extension for a filename string (includes dot: '.png')
 FUNCTION-ALIAS: get-file-name c-string GetFileName ( c-string filePath )                              ! Get pointer to filename for a path string
 FUNCTION-ALIAS: get-file-name-without-ext c-string GetFileNameWithoutExt ( c-string filePath )        ! Get filename string without extension (uses static string)
 FUNCTION-ALIAS: get-directory-path c-string GetDirectoryPath ( c-string filePath )                    ! Get full path for a given fileName with path (uses static string)
 FUNCTION-ALIAS: get-prev-directory-path c-string GetPrevDirectoryPath ( c-string dirPath )            ! Get previous directory path for a given path (uses static string)
 FUNCTION-ALIAS: get-working-directory c-string GetWorkingDirectory ( )                                ! Get current working directory (uses static string)
-FUNCTION-ALIAS: get-directory-files char** GetDirectoryFiles ( c-string dirPath, int* count )         ! Get filenames in a directory path (memory should be freed)
-FUNCTION-ALIAS: clear-directory-files void ClearDirectoryFiles ( )                                    ! Clear directory files paths buffers (free memory)
+FUNCTION-ALIAS: get-application-directory c-string GetApplicationDirectory ( )                        ! Get the directory if the running application (uses static string)
+FUNCTION-ALIAS: load-directory-files char** LoadDirectoryFiles ( c-string dirPath, int* count )         ! Get filenames in a directory path (memory should be freed)
+FUNCTION-ALIAS: unload-directory-files void UnloadDirectoryFiles ( )                                    ! Clear directory files paths buffers (free memory)
 FUNCTION-ALIAS: change-directory bool ChangeDirectory ( c-string dir )                                ! Change working directory, return true on success
 FUNCTION-ALIAS: is-file-dropped bool IsFileDropped ( )                                                ! Check if a file has been dropped into window
-FUNCTION-ALIAS: get-dropped-files c-string* GetDroppedFiles ( int* count )                            ! Get dropped files names (memory should be freed)
-FUNCTION-ALIAS: clear-dropped-files void ClearDroppedFiles ( )                                        ! Clear dropped files paths buffer (free memory)
+FUNCTION-ALIAS: load-dropped-files c-string* LoadDroppedFiles ( int* count )                            ! Get dropped files names (memory should be freed)
+FUNCTION-ALIAS: unload-dropped-files void UnloadDroppedFiles ( )                                        ! Clear dropped files paths buffer (free memory)
 FUNCTION-ALIAS: get-file-mod-time long GetFileModTime ( c-string fileName )                           ! Get file modification time (last write time)
 
 ! Compression/Encoding functionality
@@ -866,12 +875,6 @@ FUNCTION-ALIAS: compress-data uchar* CompressData ( uchar* data, int dataLength,
 FUNCTION-ALIAS: decompress-data uchar* DecompressData ( uchar* compData, int compDataLength, int* dataLength ) ! Decompress data (DEFLATE algorithm)
 FUNCTION-ALIAS: encode-data-base64 uchar* EncodeDataBase64 ( uchar* data, int dataLength, int* outputLength )  ! Encode data to Base64 string
 FUNCTION-ALIAS: decode-data-base64 uchar* DecodeDataBase64 ( uchar* data, int* outputLength )                  ! Decode Base64 string data
-
-! Persistent storage management
-FUNCTION-ALIAS: save-storage-value bool SaveStorageValue ( uint position, int value )    ! Save integer value to storage file (to defined position), returns true on success
-FUNCTION-ALIAS: load-storage-value int LoadStorageValue ( uint position )                ! Load integer value from storage file (from defined position)
-
-FUNCTION-ALIAS: open-url void OpenURL ( c-string url )                                   ! Open URL with default system browser (if available)
 
 ! ------------------------------------------------------------------------------------
 ! Input Handling Functions (Module: core)
@@ -911,6 +914,7 @@ FUNCTION-ALIAS: set-mouse-position void SetMousePosition ( int x, int y )       
 FUNCTION-ALIAS: set-mouse-offset void SetMouseOffset ( int offsetX, int offsetY )          ! Set mouse offset
 FUNCTION-ALIAS: set-mouse-scale void SetMouseScale ( float scaleX, float scaleY )          ! Set mouse scaling
 FUNCTION-ALIAS: get-mouse-wheel-move float GetMouseWheelMove ( )                           ! Get mouse wheel movement Y
+FUNCTION-ALIAS: get-mouse-wheel-move-v Vector2 GetMouseWheelMoveV ( )                      ! Get mouse wheel movement for both X and Y
 FUNCTION-ALIAS: set-mouse-cursor void SetMouseCursor ( MouseCursor cursor )                ! Set mouse cursor
 
 ! Input-related functions: touch
@@ -1131,6 +1135,7 @@ FUNCTION-ALIAS: load-font-data GlyphInfo* LoadFontData ( c-string  fileData, int
 FUNCTION-ALIAS: gen-image-font-atlas Image GenImageFontAtlas ( GlyphInfo* chars, Rectangle** recs, int glyphCount, int fontSize, int padding, int packMethod )  ! Generate image font atlas using chars info
 FUNCTION-ALIAS: unload-font-data void UnloadFontData ( GlyphInfo* chars, int glyphCount )                            ! Unload font chars info data (RAM)
 FUNCTION-ALIAS: unload-font void UnloadFont ( Font font )                                                            ! Unload Font from GPU memory (VRAM)
+FUNCTION-ALIAS: export-font-as-code bool ExportFontAsCode ( Font font, c-string fileName )                           ! Export font as code file, returns true on success
 
 ! Text drawing functions
 FUNCTION-ALIAS: draw-fps void DrawFPS ( int posX, int posY )                                                         ! Draw current FPS
@@ -1138,6 +1143,7 @@ FUNCTION-ALIAS: draw-text void DrawText ( c-string text, int posX, int posY, int
 FUNCTION-ALIAS: draw-text-ex void DrawTextEx ( Font font, c-string text, Vector2 position, float fontSize, float spacing, Color tint )  ! Draw text using font and additional parameters
 FUNCTION-ALIAS: draw-text-pro void DrawTextPro ( Font font, c-string text, Vector2 position, Vector2 origin, float rotation, float fontSize, float spacing, Color tint )  ! Draw text using Font and pro parameters (rotation)
 FUNCTION-ALIAS: draw-text-codepoint void DrawTextCodepoint ( Font font, int codepoint, Vector2 position, float fontSize, Color tint )  ! Draw one character (codepoint)
+FUNCTION-ALIAS: draw-text-codepoints void DrawTextCodepoints ( Font font, int* codepoint, int count, Vector2 position, float fontSize, float spacing,  Color tint )  ! Draw multiple character (codepoint)
 
 ! Text font info functions
 FUNCTION-ALIAS: measure-text int MeasureText ( c-string text, int fontSize )                                         ! Measure string width for default font
@@ -1229,7 +1235,6 @@ FUNCTION-ALIAS: draw-mesh-instanced void DrawMeshInstanced ( Mesh mesh, Material
 FUNCTION-ALIAS: export-mesh bool ExportMesh ( Mesh mesh, c-string fileName )                          ! Export mesh data to file, returns true on success
 FUNCTION-ALIAS: get-mesh-bounding-box BoundingBox GetMeshBoundingBox ( Mesh mesh )                    ! Compute mesh bounding box limits
 FUNCTION-ALIAS: gen-mesh-tangents void GenMeshTangents ( Mesh* mesh )                                 ! Compute mesh tangents
-FUNCTION-ALIAS: gen-mesh-binormals void GenMeshBinormals ( Mesh* mesh )                               ! Compute mesh binormals
 
 ! Mesh generation functions
 FUNCTION-ALIAS: gen-mesh-poly Mesh GenMeshPoly ( int sides, float radius )                            ! Generate polygonal mesh
@@ -1264,14 +1269,51 @@ FUNCTION-ALIAS: check-collision-boxes bool CheckCollisionBoxes ( BoundingBox box
 FUNCTION-ALIAS: check-collision-box-sphere bool CheckCollisionBoxSphere ( BoundingBox box, Vector3 center, float radius )             ! Check collision between box and sphere
 FUNCTION-ALIAS: get-ray-collision-sphere RayCollision GetRayCollisionSphere ( Ray ray, Vector3 center, float radius )                 ! Get collision info between ray and sphere
 FUNCTION-ALIAS: get-ray-collision-box RayCollision GetRayCollisionBox ( Ray ray, BoundingBox box )                                    ! Get collision info between ray and box
-FUNCTION-ALIAS: get-ray-collision-model RayCollision GetRayCollisionModel ( Ray ray, Model model )                                    ! Get collision info between ray and model
 FUNCTION-ALIAS: get-ray-collision-mesh RayCollision GetRayCollisionMesh ( Ray ray, Mesh mesh, Matrix transform )                      ! Get collision info between ray and mesh
 FUNCTION-ALIAS: get-ray-collision-triangle RayCollision GetRayCollisionTriangle ( Ray ray, Vector3 p1, Vector3 p2, Vector3 p3 )       ! Get collision info between ray and triangle
 FUNCTION-ALIAS: get-ray-collision-quad RayCollision GetRayCollisionQuad ( Ray ray, Vector3 p1, Vector3 p2, Vector3 p3, Vector3 p4 )   ! Get collision info between ray and quad
 
+: get-ray-collision-model ( ray model -- ray-collision )
+    [ RayCollision <struct> ] 2dip dup meshCount>> [
+        over
+        [ _meshes>> ]
+        [ <displaced-alien> Mesh memory>struct ]
+        [ transform>> ] tri*
+        get-ray-collision-mesh dup hit>> [
+            over hit>> [ 2dup [ distance>> ] bi@ < ] [ t ] if
+            [ nip ] [ drop ] if
+        ] [ drop ] if
+    ] 2with each-integer ;
+
+<PRIVATE
+: Vector3Add ( v1 v2 -- v3 )
+    [ [ x>> ] bi@ + ] [ [ y>> ] bi@ + ] [ [ z>> ] bi@ + ] 2tri
+    Vector3 boa ;
+: Vector3Scale ( v scalar -- r )
+    [ [ x>> ] [ y>> ] [ z>> ] tri ] dip '[ _ * ] tri@ Vector3 boa ;
+PRIVATE>
+
+:: get-ray-collision-ground ( ray ground-height -- ray-collision )
+    RayCollision <struct>
+    ray direction>> y>> abs 0.000001 > [
+        ray position>> y>> ground-height -
+        ray direction>> y>> neg / :> distance
+        distance 0.0 >= [
+            t >>hit
+            distance >>distance
+            dup normal>> 1.0 >>y drop
+            ray position>>
+            ray direction>> distance Vector3Scale
+            Vector3Add ground-height >>y >>position
+        ] when
+    ] when ;
+
+
 ! ------------------------------------------------------------------------------------
 ! Audio Loading and Playing Functions (Module: audio)
 ! ------------------------------------------------------------------------------------
+
+CALLBACK: void AudioCallback ( void* bufferData, int frames )
 
 ! Audio device management functions
 FUNCTION-ALIAS: init-audio-device void InitAudioDevice ( )                                      ! Initialize audio device and context
@@ -1301,6 +1343,7 @@ FUNCTION-ALIAS: get-sounds-playing int GetSoundsPlaying ( )                     
 FUNCTION-ALIAS: is-sound-playing bool IsSoundPlaying ( Sound sound )                            ! Check if a sound is currently playing
 FUNCTION-ALIAS: set-sound-volume void SetSoundVolume ( Sound sound, float volume )              ! Set volume for a sound (1.0 is max level)
 FUNCTION-ALIAS: set-sound-pitch void SetSoundPitch ( Sound sound, float pitch )                 ! Set pitch for a sound (1.0 is base level)
+FUNCTION-ALIAS: set-sound-pan void SetSoundPan ( Sound sound, float pan )                       ! Set pan for a sound (0.5 is center)
 FUNCTION-ALIAS: wave-format void WaveFormat ( Wave* wave, int sampleRate, int sampleSize, int channels ) ! Convert wave data to desired format
 FUNCTION-ALIAS: wave-copy Wave WaveCopy ( Wave wave )                                           ! Copy a wave to a new wave
 FUNCTION-ALIAS: wave-crop void WaveCrop ( Wave* wave, int initSample, int finalSample )         ! Crop a wave to defined samples range
@@ -1320,6 +1363,7 @@ FUNCTION-ALIAS: resume-music-stream void ResumeMusicStream ( Music music )      
 FUNCTION-ALIAS: seek-music-stream void SeekMusicStream ( Music music, float position )          ! Seek music to a position (in seconds)
 FUNCTION-ALIAS: set-music-volume void SetMusicVolume ( Music music, float volume )              ! Set volume for music (1.0 is max level)
 FUNCTION-ALIAS: set-music-pitch void SetMusicPitch ( Music music, float pitch )                 ! Set pitch for a music (1.0 is base level)
+FUNCTION-ALIAS: set-music-pan void SetMusicPan ( Music sound, float pan )                       ! Set pan for a music (0.5 is center)
 FUNCTION-ALIAS: get-music-time-length float GetMusicTimeLength ( Music music )                  ! Get music time length (in seconds)
 FUNCTION-ALIAS: get-music-time-played float GetMusicTimePlayed ( Music music )                  ! Get current music time played (in seconds)
 
@@ -1335,6 +1379,7 @@ FUNCTION-ALIAS: is-audio-stream-playing bool IsAudioStreamPlaying ( AudioStream 
 FUNCTION-ALIAS: stop-audio-stream void StopAudioStream ( AudioStream stream )                                     ! Stop audio stream
 FUNCTION-ALIAS: set-audio-stream-volume void SetAudioStreamVolume ( AudioStream stream, float volume )            ! Set volume for audio stream (1.0 is max level)
 FUNCTION-ALIAS: set-audio-stream-pitch void SetAudioStreamPitch ( AudioStream stream, float pitch )               ! Set pitch for audio stream (1.0 is base level)
+FUNCTION-ALIAS: set-audio-stream-pan void SetAudioStreamPan ( AudioStream stream, float pan )                     ! Set pan for audio stream (0.5 is center)
 FUNCTION-ALIAS: set-audio-stream-buffer-size-default void SetAudioStreamBufferSizeDefault ( int size )            ! Default size for new audio streams
 
 ! Destructors

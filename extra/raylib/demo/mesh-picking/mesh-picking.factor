@@ -57,12 +57,10 @@ TUPLE: hit-state name color nearest-hit ;
     f >>hit drop ;
 
 : handle-ground-hit ( hit-state ray -- hit-state )
-    drop ;
-    ! FIXME: raylib 4.0 doesn't have GetCollisionRayGround
-    ! 0 get-collision-ray-ground
-    ! over nearest-hit>> swap update-hit?
-    ! [ >>nearest-hit ] dip
-    ! [ GREEN >>color "Ground" >>name ] when ;
+    0 get-ray-collision-ground
+    over nearest-hit>> swap update-hit?
+    [ >>nearest-hit ] dip
+    [ GREEN >>color "Ground" >>name ] when ;
 
 : handle-triangle-hit ( hit-state ray ta tb tc -- hit-state ? )
     get-ray-collision-triangle
