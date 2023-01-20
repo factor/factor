@@ -50,7 +50,7 @@ ERROR: not-a-gopher-url url ;
     >url dup protocol>> "gopher" = [ not-a-gopher-url ] unless {
         [ host>> ]
         [ port>> 70 or <inet> binary ]
-        [ path>> rest url-encode [ "1/" ] when-empty ]
+        [ path>> rest [ "1/" ] when-empty ]
         [ query>> [ assoc>query url-decode "?" glue ] when* ]
     } cleave '[
         1 minutes input-stream get set-timeout
