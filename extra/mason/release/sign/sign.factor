@@ -29,24 +29,26 @@ HOOK: sign-factor-app os ( -- )
 M: object sign-factor-app ;
 
 M: macosx sign-factor-app
-    ${
-        "codesign" "--force" "--sign"
-        "Developer ID Application"
-        cert-path
-    }
-    "Factor.app/" make-factor-path suffix
-    short-running-process ;
+    {
+        "Factor.app/"
+        "libfactor.dylib"
+        "libfactor-ffi-test.dylib"
+    } [
+        ${
+            "codesign" "--force" "--sign"
+            "Developer ID Application"
+            cert-path
+        } swap make-factor-path suffix short-running-process
+    ] each ;
 
 M:: windows sign-factor-app ( -- )
     { "factor.com" "factor.exe" } [
-        [
-            ${
-                "signtool" "sign"
-                "/fd" "sha256"
-                "/v"
-                "/f" cert-path
-            }
-        ] dip make-factor-path suffix short-running-process
+        ${
+            "signtool" "sign"
+            "/fd" "sha256"
+            "/v"
+            "/f" cert-path
+        } swap make-factor-path suffix short-running-process
     ] each ;
 
 HOOK: sign-archive os ( path -- )
