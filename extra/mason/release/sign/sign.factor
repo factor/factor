@@ -63,8 +63,7 @@ M: macosx sign-factor-app
         "notarytool" ,
         "submit" ,
         "factor.zip" temp-file ,
-        "--keychain-profile" ,
-        "AC_PASSWORD" ,
+        notary-args get %
         "--wait" ,
     ] { } make short-running-process ;
 

@@ -109,3 +109,6 @@ scp-command [ "scp" ] initialize
 
 SYMBOL: ssh-command
 ssh-command [ "ssh" ] initialize
+
+! Notary command-line arguments
+SYMBOL: notary-args
