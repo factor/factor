@@ -81,7 +81,7 @@ M: macosx sign-archive
         dup ,
         notary-args get %
         "--wait" ,
-    ] { } make short-running-process ;
+    ] { } make short-running-process
 
     ! staple the notarized ticket
     [
