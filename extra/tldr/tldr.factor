@@ -3,8 +3,8 @@
 
 USING: assocs combinators command-line http.client io
 io.directories io.encodings.utf8 io.files io.files.temp
-io.launcher io.pathnames json.reader kernel namespaces sequences
-splitting system urls wrap.strings ;
+io.launcher io.pathnames json.reader kernel namespaces regexp
+sequences splitting system urls wrap.strings ;
 
 IN: tldr
 
@@ -58,7 +58,9 @@ PRIVATE>
 : tldr. ( name -- )
     tldr [
         { "`" "    " } [ ?head ] any? [
-            "`" ?tail drop 76 "  " wrap-indented-string
+            "`" ?tail drop
+            R/ \{\{[^}]+\}\}/ [ 2 tail 2 head* ] re-replace-with
+            76 "  " wrap-indented-string
         ] [
             { "# " "= " "> " "- " } [ ?head ] any? drop
             76 wrap-string
