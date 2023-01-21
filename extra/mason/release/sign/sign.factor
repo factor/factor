@@ -54,7 +54,7 @@ M: macosx sign-factor-app
         "zip" ,
         "-r" ,
         "factor.zip" temp-file ,
-        %
+        [ make-factor-path , ] each
     ] { } make short-running-process
 
     ! notarize the binaries
