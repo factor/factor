@@ -78,7 +78,6 @@ M: Mwc128XXA32 random-32*
 M: Mwc256XXA64 random-32*
     dup [ [ next-u64 d>w/w ] cache ] change-rem drop ;
 
-! USING: random random.pcg random.pcg-vec ;
+! USING: random random.pcg ;
 ! gc 0 0 random.pcg:<Mwc256XXA64> [ 10,000,000 [ dup random-32* drop ] times ] time drop
 ! gc 0 0 random.pcg:<Mwc128XXA32> [ 10,000,000 [ dup random-32* drop ] times ] time drop
-! gc 0 0 random.pcg-vec:<Mwc256XXA64> [ 10,000,000 [ dup random-32* drop ] times ] time drop
