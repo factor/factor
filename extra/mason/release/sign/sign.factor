@@ -34,10 +34,7 @@ M: macosx sign-factor-app
         "Factor.app/"
         "libfactor.dylib"
         "libfactor-ffi-test.dylib"
-    }
-
-    ! sign the binaries
-    dup [
+    } [
         [
             "codesign" ,
             "--entitlements" ,
@@ -48,25 +45,7 @@ M: macosx sign-factor-app
             cert-path ,
             make-factor-path ,
         ] { } make short-running-process
-    ] each
-
-    ! zip the binaries
-    [
-        "zip" ,
-        "-r" ,
-        "factor.zip" temp-file ,
-        [ make-factor-path , ] each
-    ] { } make short-running-process
-
-    ! notarize the binaries
-    [
-        "xcrun" ,
-        "notarytool" ,
-        "submit" ,
-        "factor.zip" temp-file ,
-        notary-args get %
-        "--wait" ,
-    ] { } make short-running-process ;
+    ] each ;
 
 M:: windows sign-factor-app ( -- )
     { "factor.com" "factor.exe" } [
@@ -93,6 +72,16 @@ M: macosx sign-archive
         "Developer ID Application"
         cert-path
     } over suffix short-running-process
+
+    ! notarize the binaries
+    [
+        "xcrun" ,
+        "notarytool" ,
+        "submit" ,
+        dup ,
+        notary-args get %
+        "--wait" ,
+    ] { } make short-running-process ;
 
     ! staple the notarized ticket
     [
