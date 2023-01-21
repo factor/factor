@@ -1,7 +1,8 @@
 ! Copyright (C) 2016 Doug Coleman.
 ! See https://factorcode.org/license.txt for BSD license.
 USING: combinators io.backend io.files.temp io.pathnames kernel
-literals make mason.common sequences system ;
+literals make mason.common mason.config namespaces sequences
+system ;
 IN: mason.release.sign
 
 <<
