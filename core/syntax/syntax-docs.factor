@@ -625,6 +625,8 @@ HELP: USING:
 HELP: QUALIFIED:
 { $syntax "QUALIFIED: vocab" }
 { $description "Adds the vocabulary's words, prefixed with the vocabulary name, to the search path." }
+{ $deprecated "This word is deprecated since Factor words can now be used as qualified by default. "
+{ $link POSTPONE: QUALIFIED-WITH: } " can be used for changing the qualification prefix." }
 { $notes "If adding a vocabulary introduces ambiguity, the vocabulary will take precedence when resolving any ambiguous names. This is a rare case; for example, suppose a vocabulary " { $snippet "fish" } " defines a word named " { $snippet "go:fishing" } ", and a vocabulary named " { $snippet "go" } " defines a word named " { $snippet "fishing" } ". Then, the following will call the latter word:"
   { $code
   "USE: fish"
