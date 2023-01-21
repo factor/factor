@@ -498,7 +498,7 @@ The term object-oriented has as many different meanings as people using it. One 
 central to the work of Alan Kay - is that it is about late binding of function names. In Smalltalk, the language where this 
 concept was born, people do not talk about calling a method, but rather sending a message to an object. It is up to the 
 object to decide how to respond to this message, and the caller should not know about the implementation. For instance, 
-one can send the message { $link map } both to an array and a linked list, but internally the iteration will be handled 
+one can send the message { $link map } both to an array and a vector, but internally the operation will be handled 
 differently.
 
 The binding of the message name to the method implementation is dynamic, and this is regarded as the core strength of 
