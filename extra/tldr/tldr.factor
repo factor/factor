@@ -34,7 +34,7 @@ CONSTANT: tldr-zip URL" https://tldr-pages.github.io/assets/tldr.zip"
     "tldr/tldr.zip" cache-file file-exists? [ download-tldr ] unless ;
 
 MEMO: tldr-index ( -- index )
-    "tldr/index.json" cache-file path>json ;
+    ?download-tldr "tldr/index.json" cache-file path>json ;
 
 : find-command ( name -- command )
     tldr-index "commands" of [ "name" of = ] with find nip ;
