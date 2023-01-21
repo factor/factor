@@ -1,7 +1,7 @@
 ! Copyright (C) 2016 Doug Coleman.
 ! See https://factorcode.org/license.txt for BSD license.
-USING: combinators io.backend io.pathnames kernel literals
-make mason.common sequences system ;
+USING: combinators io.backend io.files.temp io.pathnames kernel
+literals make mason.common sequences system ;
 IN: mason.release.sign
 
 <<
@@ -33,7 +33,10 @@ M: macosx sign-factor-app
         "Factor.app/"
         "libfactor.dylib"
         "libfactor-ffi-test.dylib"
-    } [
+    }
+
+    ! sign the binaries
+    dup [
         [
             "codesign" ,
             "--entitlements" ,
@@ -44,15 +47,36 @@ M: macosx sign-factor-app
             cert-path ,
             make-factor-path ,
         ] { } make short-running-process
-    ] each ;
+    ] each
+
+    ! zip the binaries
+    [
+        "zip" ,
+        "-r" ,
+        "factor.zip" temp-file ,
+        %
+    ] { } make short-running-process
+
+    ! notarize the binaries
+    [
+        "xcrun" ,
+        "notarytool" ,
+        "submit" ,
+        "factor.zip" temp-file ,
+        "--keychain-profile" ,
+        "AC_PASSWORD" ,
+        "--wait" ,
+    ] { } make short-running-process ;
 
 M:: windows sign-factor-app ( -- )
     { "factor.com" "factor.exe" } [
         ${
             "signtool" "sign"
-            "/fd" "sha256"
+            "/fd" "SHA256"
             "/v"
             "/f" cert-path
+            "/tr" "http://time.certum.pl"
+            "/td" "SHA256"
         } swap make-factor-path suffix short-running-process
     ] each ;
 
@@ -60,32 +84,20 @@ HOOK: sign-archive os ( path -- )
 
 M: object sign-archive drop ;
 
-! Sign the .dmg on macOS as well to avoid Gatekeeper marking
-! the xattrs as quarantined.
-! https://github.com/factor/factor/issues/1896
 M: macosx sign-archive
+    ! sign the .dmg on macOS as well to avoid Gatekeeper marking
+    ! the xattrs as quarantined.
+    ! https://github.com/factor/factor/issues/1896
+    ${
+        "codesign" "--force" "--sign"
+        "Developer ID Application"
+        cert-path
+    } over suffix short-running-process
+
+    ! staple the notarized ticket
     [
-        ${
-            "codesign" "--force" "--sign"
-            "Developer ID Application"
-            cert-path
-        } swap suffix
-        short-running-process
-    ] [
-        [
-            "xcrun" ,
-            "notarytool" ,
-            "submit" ,
-            ,
-            "--keychain-profile" ,
-            "AC_PASSWORD" ,
-            "--wait" ,
-        ] { } make short-running-process
-    ] [
-        [
-            "xcrun" ,
-            "stapler" ,
-            "staple" ,
-            ,
-        ] { } make short-running-process
-    ] tri ;
+        "xcrun" ,
+        "stapler" ,
+        "staple" ,
+        ,
+    ] { } make short-running-process ;
