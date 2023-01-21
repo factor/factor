@@ -87,6 +87,9 @@ PRIVATE>
 : help-lint ( prefix -- )
     loaded-child-vocab-names help-lint-vocabs ;
 
+: help-lint-root ( root -- )
+    "" vocabs-to-load help-lint-vocabs ;
+
 : help-lint-all ( -- ) "" help-lint ;
 
 : :lint-failures ( -- ) lint-failures get values errors. ;
@@ -103,10 +106,10 @@ PRIVATE>
 : test-lint-main ( -- )
     command-line get [
         dup vocab-roots get member? [
-            "" vocabs-to-load [ require-all ] keep
+            [ load-root ] [ help-lint-root ] bi
         ] [
-            [ load ] [ loaded-child-vocab-names ] bi
-        ] if help-lint-vocabs
+            [ load ] [ help-lint ] bi
+        ] if
     ] each
     lint-failures get assoc-empty?
     [ [ "==== FAILING LINT" print :lint-failures flush ] unless ]
