@@ -242,10 +242,10 @@ M: test-failure error. ( error -- )
     [ f long-unit-tests-enabled? set-global ] when
     [
         dup vocab-roots get member? [
-            "" vocabs-to-load [ require-all ] keep
+            [ load-root ] [ test-root ] bi
         ] [
-            [ load ] [ loaded-child-vocab-names ] bi
-        ] if test-vocabs
+            [ load ] [ test ] bi
+        ] if
     ] each
     test-failures get empty?
     [ [ "==== FAILING TESTS" print flush :test-failures ] unless ]
