@@ -113,7 +113,7 @@ HELP: short-groups
     $nl
     "Returns a virtual sequence." } ;
     
-HELP: prefixes
+HELP: all-prefixes
 { $values
     { "seq" sequence }
     { "array" array }
@@ -121,10 +121,10 @@ HELP: prefixes
 { $description "A strict version of " { $link <prefixes> } " that returns a list of sequences"
     " instead of slices." } ;
 
-HELP: prefixes-seq
+HELP: prefixes
 { $class-description "Class that represents the prefixes of a sequence." } ;
 
-HELP: suffixes
+HELP: all-suffixes
 { $values
     { "seq" sequence }
     { "array" array }
@@ -132,5 +132,5 @@ HELP: suffixes
 { $description "A strict version of " { $link <suffixes> } " that returns a list of sequences"
     " instead of slices." } ;
 
-HELP: suffixes-seq
+HELP: suffixes
 { $class-description "Class that represents the suffixes of a sequence." } ;
