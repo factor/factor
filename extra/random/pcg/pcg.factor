@@ -54,11 +54,6 @@ CONSTANT: MULTIPLIER-32 3487286589
     dup x3>> multiply [ pick [ x1>> ] [ x2>> ] [ x3>> ] tri permute ] keep
     swap [ update-state ] dip ; inline
 
-! If cache is f, use quot to produce a new pair of values from obj: one to be
-! cached, and one to be used. Otherwise return cache as value and cache' = f.
-: cache ( obj cache/f quot: ( obj -- n1 n2 ) -- value cache' )
-    [ nip f ] swap if* ; inline
-
 PRIVATE>
 
 : <Mwc128XXA32> ( key1 key2 -- obj )
@@ -76,7 +71,7 @@ M: Mwc128XXA32 random-32*
     next-u32 ;
 
 M: Mwc256XXA64 random-32*
-    dup [ [ next-u64 d>w/w ] cache ] change-rem drop ;
+    dup '[ [ f ] [ _ next-u64 d>w/w ] if* ] change-rem drop ;
 
 ! USING: random random.pcg ;
 ! gc 0 0 random.pcg:<Mwc256XXA64> [ 10,000,000 [ dup random-32* drop ] times ] time drop
