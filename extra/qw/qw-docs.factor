@@ -7,9 +7,9 @@ HELP: qw{
 { $syntax "qw{ lorem ipsum }" }
 { $description "Marks the beginning of a literal array of strings. Component strings are delimited by whitespace." }
 { $examples
-{ $unchecked-example "USING: prettyprint qw ;
-qw{ pop quiz my hive of big wild ex tranny jocks } ."
-"{ \"pop\" \"quiz\" \"my\" \"hive\" \"of\" \"big\" \"wild\" \"ex\" \"tranny\" \"jocks\" }" }
+{ $example "USING: prettyprint qw ;
+qw{ a man a plan a canal panama } ."
+"{ \"a\" \"man\" \"a\" \"plan\" \"a\" \"canal\" \"panama\" }" }
 } ;
 
 ARTICLE: "qw" "Quoted words"
