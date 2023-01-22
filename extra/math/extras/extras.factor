@@ -199,7 +199,7 @@ PRIVATE>
     dup sum '[ _ / dup ^ ] map-product ;
 
 : weighted-random ( histogram -- obj )
-    unzip cum-sum [ last random ] [ bisect-left ] bi swap nth ;
+    unzip cum-sum [ last >float random ] [ bisect-left ] bi swap nth ;
 
 : unique-indices ( seq -- unique indices )
     [ members ] keep over dup length <iota>
