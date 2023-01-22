@@ -21,6 +21,14 @@ USING: arrays assocs.extras kernel math math.order sequences tools.test ;
     H{ { 1 H{ { 2 H{ { 3 4 } } } } } } dup { 1 2 3 } 40 deep-set-of
 ] unit-test
 
+{ { { 1 1 } { 2 2 } { 0 3 } { 0 4 } { 0 5 } } } [
+    { 1 2 } { 1 2 3 4 5 } 0 zip-longest-with
+] unit-test
+
+{ { { 1 1 } { 2 2 } { f 3 } { f 4 } { f 5 } } } [
+    { 1 2 } { 1 2 3 4 5 } zip-longest
+] unit-test
+
 { H{ { 2 1 } { 4 3 } } } [ H{ { 1 2 } { 3 4 } } assoc-invert ] unit-test
 
 { H{ { "a" V{ 2 5 } } { "b" V{ 3 } } { "c" V{ 10 } } } }
