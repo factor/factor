@@ -13,7 +13,7 @@ qw{ a man a plan a canal panama } ."
 } ;
 
 ARTICLE: "qw" "Quoted words"
-"The " { $vocab-link "qw" } " vocabulary offers a shorthand syntax for arrays-of-strings literals." $nl
+"The " { $vocab-link "qw" } " vocabulary offers a shorthand syntax for arrays of single-word string literals." $nl
 "Construct an array of strings:"
 { $subsections POSTPONE: qw{ } ;
 
