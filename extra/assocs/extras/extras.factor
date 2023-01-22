@@ -19,6 +19,12 @@ IN: assocs.extras
 : deep-set-of ( assoc seq elt -- )
     [ deep-of-but-last ] dip spin set-at ; inline
 
+: zip-longest-with ( seq1 seq2 fill -- assoc )
+    [ 2dup max-length ] dip '[ _ _ pad-tail ] bi@ zip ;
+
+: zip-longest ( seq1 seq2 -- assoc )
+    f zip-longest-with ;
+
 : substitute! ( seq assoc -- seq )
     substituter map! ;
 
