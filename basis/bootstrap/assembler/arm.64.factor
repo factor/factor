@@ -93,6 +93,8 @@ big-endian off
 : temp2 ( -- reg ) X11 ;
 : temp3 ( -- reg ) X12 ;
 
+: nv-reg ( -- reg ) temp0 ; ! X19
+: link-reg ( -- reg ) temp1 ;
 
 ! : pic-tail-reg ( -- reg ) RBX ;
 : return-reg ( -- reg ) X0 ;
@@ -457,53 +459,98 @@ big-endian off
     ! frame-reg PUSH
     ! frame-reg stack-reg MOV
 
+    ! -- ! fp is non-volatile
+
     ! ! Save all non-volatile registers
     ! nv-regs [ PUSH ] each
 
-    ! jit-save-tib
+    -16 SP X18 X19 STP-pre
+    -16 SP X20 X21 STP-pre
+    -16 SP X22 X23 STP-pre
+    -16 SP X24 X25 STP-pre
+    -16 SP X26 X27 STP-pre
+    -16 SP X28 X29 STP-pre
+    -16 SP X30 STR-pre
+
+    jit-save-tib ! nop
 
     ! ! Load VM into vm-reg
     ! vm-reg 0 MOV 0 rc-absolute-cell rel-vm
+    vm-reg 0 MOVwi64 0 rc-absolute-cell rel-vm
 
     ! ! Save old context
     ! nv-reg vm-reg vm-context-offset [+] MOV
     ! nv-reg PUSH
 
+    vm-context-offset vm-reg nv-reg LDR-uoff
+    -16 SP nv-reg STR-pre
+
     ! ! Switch over to the spare context
     ! nv-reg vm-reg vm-spare-context-offset [+] MOV
     ! vm-reg vm-context-offset [+] nv-reg MOV
 
+    vm-spare-context-offset vm-reg nv-reg LDR-uoff
+    vm-context-offset vm-reg nv-reg STRuoff64
+
     ! ! Save C callstack pointer
     ! nv-reg context-callstack-save-offset [+] stack-reg MOV
+
+    context-callstack-save-offset nv-reg stack-reg STRuoff64
 
     ! ! Load Factor stack pointers
     ! stack-reg nv-reg context-callstack-bottom-offset [+] MOV
     ! nv-reg jit-update-tib
     ! jit-install-seh
 
+    context-callstack-bottom-offset nv-reg stack-reg LDR-uoff
+    nv-reg jit-update-tib ! nop
+    jit-install-seh ! uh
+
     ! rs-reg nv-reg context-retainstack-offset [+] MOV
     ! ds-reg nv-reg context-datastack-offset [+] MOV
+
+    context-retainstack-offset nv-reg rs-reg-uoff
+    context-datastack-offset nv-reg ds-reg LDR-uoff
 
     ! ! Call into Factor code
     ! link-reg 0 MOV f rc-absolute-cell rel-word
     ! link-reg CALL
 
+    link-reg* 0 MOVwi64 f rc-absolute-cell rel-word
+    link-reg* BLR
+
     ! ! Load VM into vm-reg; only needed on x86-32, but doesn't
     ! ! hurt on x86-64
     ! vm-reg 0 MOV 0 rc-absolute-cell rel-vm
+
+    ! --?
 
     ! ! Load C callstack pointer
     ! nv-reg vm-reg vm-context-offset [+] MOV
     ! stack-reg nv-reg context-callstack-save-offset [+] MOV
 
+    vm-context-offset vm-reg nv-reg LDR-uoff
+    context-callstack-save-offset nv-reg stack-reg LDR-uoff
+
     ! ! Load old context
     ! nv-reg POP
     ! vm-reg vm-context-offset [+] nv-reg MOV
 
+    16 SP nv-reg LDR-post
+    vm-context-offset vm-reg nv-reg LDR-uoff
+
     ! ! Restore non-volatile registers
-    ! jit-restore-tib
+    jit-restore-tib ! nop
 
     ! nv-regs <reversed> [ POP ] each
+
+    -16 SP X30 LDR-post
+    -16 SP X28 X29 LDP-post
+    -16 SP X26 X27 LDP-post
+    -16 SP X24 X25 LDP-post
+    -16 SP X22 X23 LDP-post
+    -16 SP X20 X21 LDP-post
+    -16 SP X18 X19 LDP-post
 
     ! frame-reg POP
 
@@ -512,6 +559,10 @@ big-endian off
 
     ! ! See the comment for M\ x86.32 stack-cleanup in cpu.x86.32
     ! 0xffff RET f rc-absolute-2 rel-untagged
+
+    f RET
+    ! f rc-absolute-2 rel-untagged ! ?
+
 ] CALLBACK-STUB jit-define
 
 [
@@ -615,12 +666,14 @@ big-endian off
     ! ! make room for LR plus magic number of callback, 16byte align
     stack-frame-size bootstrap-cell 2 * + stack-reg stack-reg SUBi64
     ! link-reg X29 stack-reg STP
-    -16 SP link-reg X29 STP-pre
+    ! -16 SP link-reg X29 STP-pre
+    -16 SP link-reg stack-frame-reg STP-pre
 ] JIT-PROLOG jit-define
 
 [
     ! x64 ! stack-reg stack-frame-size bootstrap-cell - ADD
-    -16 SP link-reg X29 LDP-pre
+    ! -16 SP link-reg X29 LDP-pre
+    16 SP link-reg stack-frame-reg LDP-post
     stack-frame-size bootstrap-cell 2 * + stack-reg stack-reg ADDi64
 ] JIT-EPILOG jit-define
 
