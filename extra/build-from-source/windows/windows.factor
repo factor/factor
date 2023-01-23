@@ -132,6 +132,13 @@ IN: build-from-source.windows
         ] with-build-directory
     ] with-updated-git-repo ;
 
+: build-raygui-dll ( -- )
+    "https://github.com/raysan5/raygui.git" [
+        "src/raygui.h" "src/raygui.c" copy-file
+        qw{ cl /O2 /I ../raylib/src/ /D_USRDLL /D_WINDLL /DRAYGUI_IMPLEMENTATION /DBUILD_LIBTYPE_SHARED src/raygui.c /LD /Feraygui.dll /link /LIBPATH ../raylib/build/raylib/Release/raylib.lib /subsystem:windows /machine:x64 } try-process
+        "raygui.dll" copy-output-file
+    ] with-updated-git-repo ;
+
 : build-snappy-dll ( -- )
     "https://github.com/google/snappy.git" [
         [
