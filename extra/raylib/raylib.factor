@@ -21,6 +21,12 @@ FROM: alien.c-types => float ;
 
 LIBRARY: raylib
 
+! Last updated 1/23/2023
+CONSTANT: RAYLIB_VERSION_MAJOR 4
+CONSTANT: RAYLIB_VERSION_MINOR 5
+CONSTANT: RAYLIB_VERSION_PATCH 0
+CONSTANT: RAYLIB_VERSION  "4.5-dev"
+
 ! Enumerations ---------------------------------------------------------
 
 ! Putting some of the #define's as enums.
@@ -862,12 +868,14 @@ FUNCTION-ALIAS: get-directory-path c-string GetDirectoryPath ( c-string filePath
 FUNCTION-ALIAS: get-prev-directory-path c-string GetPrevDirectoryPath ( c-string dirPath )            ! Get previous directory path for a given path (uses static string)
 FUNCTION-ALIAS: get-working-directory c-string GetWorkingDirectory ( )                                ! Get current working directory (uses static string)
 FUNCTION-ALIAS: get-application-directory c-string GetApplicationDirectory ( )                        ! Get the directory if the running application (uses static string)
-FUNCTION-ALIAS: load-directory-files char** LoadDirectoryFiles ( c-string dirPath, int* count )         ! Get filenames in a directory path (memory should be freed)
-FUNCTION-ALIAS: unload-directory-files void UnloadDirectoryFiles ( )                                    ! Clear directory files paths buffers (free memory)
 FUNCTION-ALIAS: change-directory bool ChangeDirectory ( c-string dir )                                ! Change working directory, return true on success
+FUNCTION-ALIAS: is-path-file bool IsPathFile ( c-string path )                                        ! Check if a given path is a file or a directory
+FUNCTION-ALIAS: load-directory-files char** LoadDirectoryFiles ( c-string dirPath, int* count )       ! Get filenames in a directory path (memory should be freed)
+FUNCTION-ALIAS: load-directory-files-ex char** LoadDirectoryFilesEx ( c-string dirPath, c-string filter, bool scanSubDirs )       ! Get filenames in a directory path (memory should be freed)
+FUNCTION-ALIAS: unload-directory-files void UnloadDirectoryFiles ( )                                  ! Clear directory files paths buffers (free memory)
 FUNCTION-ALIAS: is-file-dropped bool IsFileDropped ( )                                                ! Check if a file has been dropped into window
-FUNCTION-ALIAS: load-dropped-files c-string* LoadDroppedFiles ( int* count )                            ! Get dropped files names (memory should be freed)
-FUNCTION-ALIAS: unload-dropped-files void UnloadDroppedFiles ( )                                        ! Clear dropped files paths buffer (free memory)
+FUNCTION-ALIAS: load-dropped-files c-string* LoadDroppedFiles ( int* count )                          ! Get dropped files names (memory should be freed)
+FUNCTION-ALIAS: unload-dropped-files void UnloadDroppedFiles ( )                                      ! Clear dropped files paths buffer (free memory)
 FUNCTION-ALIAS: get-file-mod-time long GetFileModTime ( c-string fileName )                           ! Get file modification time (last write time)
 
 ! Compression/Encoding functionality
@@ -998,8 +1006,10 @@ FUNCTION-ALIAS: draw-poly-lines-ex void DrawPolyLinesEx ( Vector2 center, int si
 FUNCTION-ALIAS: check-collision-recs bool CheckCollisionRecs ( Rectangle rec1, Rectangle rec2 )                                  ! Check collision between two rectangles
 FUNCTION-ALIAS: check-collision-circles bool CheckCollisionCircles ( Vector2 center1, float radius1, Vector2 center2, float radius2 ) ! Check collision between two circles
 FUNCTION-ALIAS: check-collision-circle-rec bool CheckCollisionCircleRec ( Vector2 center, float radius, Rectangle rec )          ! Check collision between circle and rectangle
-FUNCTION-ALIAS: check-collision-point-rec bool CheckCollisionPointRec ( Vector2 point, Rectangle rec )                           ! Check if point is inside rectangle FUNCTION-ALIAS: check-collision-point-circle bool CheckCollisionPointCircle ( Vector2 point, Vector2 center, float radius )                        ! Check if point is inside circle
+FUNCTION-ALIAS: check-collision-point-rec bool CheckCollisionPointRec ( Vector2 point, Rectangle rec )                           ! Check if point is inside rectangle
+FUNCTION-ALIAS: check-collision-point-circle bool CheckCollisionPointCircle ( Vector2 point, Vector2 center, float radius )      ! Check if point is inside circle
 FUNCTION-ALIAS: check-collision-point-triangle bool CheckCollisionPointTriangle ( Vector2 point, Vector2 p1, Vector2 p2, Vector2 p3 ) ! Check if point is inside a triangle
+FUNCTION-ALIAS: check-collision-point-poly bool CheckCollisionPointPoly ( Vector2 point, Vector2 *points, int pointCount ) ! Check if point is inside a polygon
 FUNCTION-ALIAS: check-collision-lines bool CheckCollisionLines ( Vector2 startPos1, Vector2 endPos1, Vector2 startPos2, Vector2 endPos2, Vector2* collisionPoint )  ! Check the collision between two lines defined by two points each, returns collision point by reference
 FUNCTION-ALIAS: check-collision-point-line bool CheckCollisionPointLine ( Vector2 point, Vector2 p1, Vector2 p2, int threshold ) ! Check if point belongs to line created between two points [p1] and [p2] with defined margin in pixels [threshold]
 FUNCTION-ALIAS: get-collision-rec Rectangle GetCollisionRec ( Rectangle rec1, Rectangle rec2 )                                   ! Get collision rectangle for two rectangles collision
@@ -1027,7 +1037,9 @@ FUNCTION-ALIAS: gen-image-gradient-h Image GenImageGradientH ( int width, int he
 FUNCTION-ALIAS: gen-image-gradient-radial Image GenImageGradientRadial ( int width, int height, float density, Color inner, Color outer ) ! Generate image: radial gradient
 FUNCTION-ALIAS: gen-image-checked Image GenImageChecked ( int width, int height, int checksX, int checksY, Color col1, Color col2 ) ! Generate image: checked
 FUNCTION-ALIAS: gen-image-white-noise Image GenImageWhiteNoise ( int width, int height, float factor )                           ! Generate image: white noise
+FUNCTION-ALIAS: gen-image-perlin-noise Image GenImagePerlinNoise ( int width, int height, int offsetX, int offsetY, float scale ) ! Generate image: perlin noise
 FUNCTION-ALIAS: gen-image-cellular Image GenImageCellular ( int width, int height, int tileSize )                                ! Generate image: cellular algorithm, bigger tileSize means bigger cells
+FUNCTION-ALIAS: gen-image-text Image GenImageText ( int width, int height, c-string text )                                       ! Generate image: text
 
 ! Image manipulation functions
 FUNCTION-ALIAS: image-copy Image ImageCopy ( Image image )                                                                       ! Create an image duplicate (useful for transformations)
@@ -1041,6 +1053,7 @@ FUNCTION-ALIAS: image-alpha-crop void ImageAlphaCrop ( Image* image, float thres
 FUNCTION-ALIAS: image-alpha-clear void ImageAlphaClear ( Image* image, Color color, float threshold )                            ! Clear alpha channel to desired color
 FUNCTION-ALIAS: image-alpha-mask void ImageAlphaMask ( Image* image, Image alphaMask )                                           ! Apply alpha mask to image
 FUNCTION-ALIAS: image-alpha-premultiply void ImageAlphaPremultiply ( Image* image )                                              ! Premultiply alpha channel
+FUNCTION-ALIAS: image-blur-gaussian void ImageBlurGaussian ( Image* image, int blurSize )                                        ! Blur image with gaussian
 FUNCTION-ALIAS: image-resize void ImageResize ( Image* image, int newWidth, int newHeight )                                      ! Resize image (Bicubic scaling algorithm)
 FUNCTION-ALIAS: image-resize-nn void ImageResizeNN ( Image* image, int newWidth, int newHeight )                                 ! Resize image (Nearest-Neighbor scaling algorithm)
 FUNCTION-ALIAS: image-resize-canvas void ImageResizeCanvas ( Image* image, int newWidth, int newHeight, int offsetX, int offsetY, Color fill )  ! Resize canvas and fill with color
@@ -1072,6 +1085,8 @@ FUNCTION-ALIAS: image-draw-line void ImageDrawLine ( Image* dst, int startPosX, 
 FUNCTION-ALIAS: image-draw-line-v void ImageDrawLineV ( Image* dst, Vector2 start, Vector2 end, Color color )                    ! Draw line within an image (Vector version)
 FUNCTION-ALIAS: image-draw-circle void ImageDrawCircle ( Image* dst, int centerX, int centerY, int radius, Color color )         ! Draw circle within an image
 FUNCTION-ALIAS: image-draw-circle-v void ImageDrawCircleV ( Image* dst, Vector2 center, int radius, Color color )                ! Draw circle within an image (Vector version)
+FUNCTION-ALIAS: image-draw-circle-lines void ImageDrawCircleLines ( Image* dst, int centerX, int centerY, int radius, Color color )         ! Draw circle within an image
+FUNCTION-ALIAS: image-draw-circle-lines-v void ImageDrawCircleLinesV ( Image* dst, Vector2 center, int radius, Color color )                ! Draw circle within an image (Vector version)
 FUNCTION-ALIAS: image-draw-rectangle void ImageDrawRectangle ( Image* dst, int posX, int posY, int width, int height, Color color ) ! Draw rectangle within an image
 FUNCTION-ALIAS: image-draw-rectangle-v void ImageDrawRectangleV ( Image* dst, Vector2 position, Vector2 size, Color color )      ! Draw rectangle within an image (Vector version)
 FUNCTION-ALIAS: image-draw-rectangle-rec void ImageDrawRectangleRec ( Image* dst, Rectangle rec, Color color )                   ! Draw rectangle within an image
@@ -1101,11 +1116,11 @@ FUNCTION-ALIAS: draw-texture void DrawTexture ( Texture2D texture, int posX, int
 FUNCTION-ALIAS: draw-texture-v void DrawTextureV ( Texture2D texture, Vector2 position, Color tint )                             ! Draw a Texture2D with position defined as Vector2
 FUNCTION-ALIAS: draw-texture-ex void DrawTextureEx ( Texture2D texture, Vector2 position, float rotation, float scale, Color tint ) ! Draw a Texture2D with extended parameters
 FUNCTION-ALIAS: draw-texture-rec void DrawTextureRec ( Texture2D texture, Rectangle source, Vector2 position, Color tint )       ! Draw a part of a texture defined by a rectangle
-FUNCTION-ALIAS: draw-texture-quad void DrawTextureQuad ( Texture2D texture, Vector2 tiling, Vector2 offset, Rectangle quad, Color tint ) ! Draw texture quad with tiling and offset parameters
-FUNCTION-ALIAS: draw-texture-tiled void DrawTextureTiled ( Texture2D texture, Rectangle source, Rectangle dest, Vector2 origin, float rotation, float scale, Color tint ) ! Draw part of a texture (defined by a rectangle) with rotation and scale tiled into dest.
+! FUNCTION-ALIAS: draw-texture-quad void DrawTextureQuad ( Texture2D texture, Vector2 tiling, Vector2 offset, Rectangle quad, Color tint ) ! Draw texture quad with tiling and offset parameters
+! FUNCTION-ALIAS: draw-texture-tiled void DrawTextureTiled ( Texture2D texture, Rectangle source, Rectangle dest, Vector2 origin, float rotation, float scale, Color tint ) ! Draw part of a texture (defined by a rectangle) with rotation and scale tiled into dest.
 FUNCTION-ALIAS: draw-texture-pro void DrawTexturePro ( Texture2D texture, Rectangle source, Rectangle dest, Vector2 origin, float rotation, Color tint ) ! Draw a part of a texture defined by a rectangle with 'pro' parameters
 FUNCTION-ALIAS: draw-texture-npatch void DrawTextureNPatch ( Texture2D texture, NPatchInfo nPatchInfo, Rectangle dest, Vector2 origin, float rotation, Color tint ) ! Draws a texture (or part of it) that stretches or shrinks nicely
-FUNCTION-ALIAS: draw-texture-poly void DrawTexturePoly ( Texture2D texture, Vector2 center, Vector2* points, Vector2* texcoords, int pointCount, Color tint ) ! Draw a textured polygon
+! FUNCTION-ALIAS: draw-texture-poly void DrawTexturePoly ( Texture2D texture, Vector2 center, Vector2* points, Vector2* texcoords, int pointCount, Color tint ) ! Draw a textured polygon
 
 ! Color/pixel related functions
 FUNCTION-ALIAS: fade Color Fade ( Color color, float alpha )                                   ! Get color with alpha applied, alpha goes from 0.0f to 1.0f
@@ -1114,6 +1129,9 @@ FUNCTION-ALIAS: color-normalize Vector4 ColorNormalize ( Color color )          
 FUNCTION-ALIAS: color-from-normalized Color ColorFromNormalized ( Vector4 normalized )         ! Get Color from normalized values [0..1]
 FUNCTION-ALIAS: color-to-hsv Vector3 ColorToHSV ( Color color )                                ! Get HSV values for a Color, hue [0..360], saturation/value [0..1]
 FUNCTION-ALIAS: color-from-hsv Color ColorFromHSV ( float hue, float saturation, float value ) ! Get a Color from HSV values, hue [0..360], saturation/value [0..1]
+FUNCTION-ALIAS: color-tint Color ColorTint ( Color color, Color tint )                         ! Get color with tint
+FUNCTION-ALIAS: color-brightness Color ColorBrightness ( Color color, float factor )           ! Get color with brightness
+FUNCTION-ALIAS: color-contrast Color ColorContrast ( Color color, float contrast )             ! Get color with contrast
 FUNCTION-ALIAS: color-alpha Color ColorAlpha ( Color color, float alpha )                      ! Get color with alpha applied, alpha goes from 0.0f to 1.0f
 FUNCTION-ALIAS: color-alpha-blend Color ColorAlphaBlend ( Color dst, Color src, Color tint )   ! Get src alpha-blended into dst color with tint
 FUNCTION-ALIAS: get-color Color GetColor ( uint hexValue )                                     ! Get Color structure from hexadecimal value
@@ -1153,12 +1171,15 @@ FUNCTION-ALIAS: get-glyph-info GlyphInfo GetGlyphInfo ( Font font, int codepoint
 FUNCTION-ALIAS: get-glyph-atlas-rec Rectangle GetGlyphAtlasRec ( Font font, int codepoint )                          ! Get glyph rectangle in font atlas for a codepoint (unicode character), fallback to '?' if not found
 
 ! Text codepoints management functions (unicode characters)
+FUNCTION-ALIAS: load-utf8 c-string LoadUTF8 ( int *codepoints, int length )                     ! Load UTF-8 text encoded from codepoints array
+FUNCTION-ALIAS: unload-utf8 void UnloadUTF8 ( c-string text )                                   ! Unload UTF-8 text encoded from codepoints array
 FUNCTION-ALIAS: load-codepoints int* LoadCodepoints ( c-string text, int* count )                     ! Load all codepoints from a UTF-8 text string, codepoints count returned by parameter
 FUNCTION-ALIAS: unload-codepoints void UnloadCodepoints ( int* codepoints )                           ! Unload codepoints data from memory
 FUNCTION-ALIAS: get-codepoint-count int GetCodepointCount ( c-string text )                           ! Get total number of codepoints in a UTF-8 encoded string
 FUNCTION-ALIAS: get-codepoint int GetCodepoint ( c-string text, int* bytesProcessed )                 ! Get next codepoint in a UTF-8 encoded string, 0x3f('?') is returned on failure
+FUNCTION-ALIAS: get-codepoint-next int GetCodepointNext ( c-string text, int* codepointSize )         ! Get next codepoint in a UTF-8 encoded string, 0x3f('?') is returned on failure
+FUNCTION-ALIAS: get-codepoint-previous int GetCodepointPrevious ( c-string text, int* codepointSize ) ! Get previous codepoint in a UTF-8 encoded string, 0x3f('?') is returned on failure
 FUNCTION-ALIAS: codepoint-to-utf8 c-string CodepointToUTF8 ( int codepoint, int* byteSize )           ! Encode one codepoint into UTF-8 byte array (array length returned as parameter)
-FUNCTION-ALIAS: text-codepoints-to-utf8 c-string TextCodepointsToUTF8 ( int* codepoints, int length ) ! Encode text as codepoints array into UTF-8 text string (WARNING: memory must be freed!)
 
 ! Text strings management functions (no UTF-8 strings, only byte chars)
 ! NOTE: Some strings allocate memory internally for returned strings, just be careful!
@@ -1192,8 +1213,8 @@ FUNCTION-ALIAS: draw-cube void DrawCube ( Vector3 position, float width, float h
 FUNCTION-ALIAS: draw-cube-v void DrawCubeV ( Vector3 position, Vector3 size, Color color )            ! Draw cube (Vector version)
 FUNCTION-ALIAS: draw-cube-wires void DrawCubeWires ( Vector3 position, float width, float height, float length, Color color ) ! Draw cube wires
 FUNCTION-ALIAS: draw-cube-wires-v void DrawCubeWiresV ( Vector3 position, Vector3 size, Color color ) ! Draw cube wires (Vector version)
-FUNCTION-ALIAS: draw-cube-texture void DrawCubeTexture ( Texture2D texture, Vector3 position, float width, float height, float length, Color color )  ! Draw cube textured
-FUNCTION-ALIAS: draw-cube-texture-rec void DrawCubeTextureRec ( Texture2D texture, Rectangle source, Vector3 position, float width, float height, float length, Color color )  ! Draw cube with a region of a texture
+! FUNCTION-ALIAS: draw-cube-texture void DrawCubeTexture ( Texture2D texture, Vector3 position, float width, float height, float length, Color color )  ! Draw cube textured
+! FUNCTION-ALIAS: draw-cube-texture-rec void DrawCubeTextureRec ( Texture2D texture, Rectangle source, Vector3 position, float width, float height, float length, Color color )  ! Draw cube with a region of a texture
 FUNCTION-ALIAS: draw-sphere void DrawSphere ( Vector3 centerPos, float radius, Color color )          ! Draw sphere
 FUNCTION-ALIAS: draw-sphere-ex void DrawSphereEx ( Vector3 centerPos, float radius, int rings, int slices, Color color ) ! Draw sphere with extended parameters
 FUNCTION-ALIAS: draw-sphere-wires void DrawSphereWires ( Vector3 centerPos, float radius, int rings, int slices, Color color ) ! Draw sphere wires
@@ -1201,6 +1222,8 @@ FUNCTION-ALIAS: draw-cylinder void DrawCylinder ( Vector3 position, float radius
 FUNCTION-ALIAS: draw-cylinder-ex void DrawCylinderEx ( Vector3 startPos, Vector3 endPos, float startRadius, float endRadius, int sides, Color color )  ! Draw a cylinder with base at startPos and top at endPos
 FUNCTION-ALIAS: draw-cylinder-wires void DrawCylinderWires ( Vector3 position, float radiusTop, float radiusBottom, float height, int slices, Color color )  ! Draw a cylinder/cone wires
 FUNCTION-ALIAS: draw-cylinder-wires-ex void DrawCylinderWiresEx ( Vector3 startPos, Vector3 endPos, float startRadius, float endRadius, int sides, Color color )  ! Draw a cylinder wires with base at startPos and top at endPos
+FUNCTION-ALIAS: draw-capsule void DrawCapsule ( Vector3 startPos, Vector3 endPos, float radius, int slices, int rings, Color color )  ! Draw a capsule with the center of its sphere caps at startPos and endPos
+FUNCTION-ALIAS: draw-capsule-wires void DrawCapsuleWires ( Vector3 startPos, Vector3 endPos, float radius, int slices, int rings, Color color )  ! Draw capsule wireframe with the center of its sphere caps at startPos and endPos
 FUNCTION-ALIAS: draw-plane void DrawPlane ( Vector3 centerPos, Vector2 size, Color color )            ! Draw a plane XZ
 FUNCTION-ALIAS: draw-ray void DrawRay ( Ray ray, Color color )                                        ! Draw a ray line
 FUNCTION-ALIAS: draw-grid void DrawGrid ( int slices, float spacing )                                 ! Draw a grid (centered at (0, 0, 0))
@@ -1379,6 +1402,9 @@ FUNCTION-ALIAS: set-audio-stream-volume void SetAudioStreamVolume ( AudioStream 
 FUNCTION-ALIAS: set-audio-stream-pitch void SetAudioStreamPitch ( AudioStream stream, float pitch )               ! Set pitch for audio stream (1.0 is base level)
 FUNCTION-ALIAS: set-audio-stream-pan void SetAudioStreamPan ( AudioStream stream, float pan )                     ! Set pan for audio stream (0.5 is center)
 FUNCTION-ALIAS: set-audio-stream-buffer-size-default void SetAudioStreamBufferSizeDefault ( int size )            ! Default size for new audio streams
+FUNCTION-ALIAS: set-audio-stream-callback void SetAudioStreamCallback ( AudioStream stream, AudioCallback callback ) ! Audio thread callback to request new data
+FUNCTION-ALIAS: attach-audio-stream-processor void AttachAudioStreamProcessor ( AudioStream stream, AudioCallback processor ) ! Attach audio stream processor to stream
+FUNCTION-ALIAS: detach-audio-stream-processor void DetachAudioStreamProcessor ( AudioStream stream, AudioCallback processor ) ! Detach audio stream processor from stream
 
 ! Destructors
 DESTRUCTOR: unload-audio-stream
