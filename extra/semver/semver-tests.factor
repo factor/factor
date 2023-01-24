@@ -1,6 +1,6 @@
 ! Copyright (C) 2020 Doug Coleman.
 ! See https://factorcode.org/license.txt for BSD license.
-USING: assocs kernel math.order random semver sequences
+USING: assocs kernel math math.order random semver sequences
 sequences.extras sorting tools.test ;
 IN: semver.tests
 
@@ -164,7 +164,7 @@ CONSTANT: semver-gt-comparisons {
 } [
     "0.1.4" >semver [ semver>string ] keep
     bump-prepatch [ semver>string ] keep
-    2 [ bump-prerelease [ semver>string ] keep ] times
+    2 [ bump-dev [ semver>string ] keep ] times
     2 [ bump-alpha [ semver>string ] keep ] times
     2 [ bump-beta [ semver>string ] keep ] times
     bump-rc [ semver>string ] keep
@@ -174,11 +174,11 @@ CONSTANT: semver-gt-comparisons {
 { "1.2.4-0" } [ "1.2.3" >semver bump-prepatch semver>string ] unit-test
 { "1.3.0-0" } [ "1.2.3" >semver bump-preminor semver>string ] unit-test
 { "2.0.0-0" } [ "1.2.3" >semver bump-premajor semver>string ] unit-test
-{ "2.0.0-1" } [ "1.2.3" >semver bump-premajor bump-prerelease semver>string ] unit-test
+{ "2.0.0-1" } [ "1.2.3" >semver bump-premajor bump-dev semver>string ] unit-test
 
-{ "1.2.3-erg.0" } [ "1.2.3-0" >semver "erg" bump-prerelease-id semver>string ] unit-test
-{ "1.2.3-erg.1" } [ "1.2.3-erg.0" >semver "erg" bump-prerelease-id semver>string ] unit-test
-{ "1.2.4-erg.0" } [ "1.2.3" >semver "erg" bump-prerelease-id semver>string ] unit-test
+{ "1.2.3-erg.0" } [ "1.2.3-0" >semver "erg" bump-prerelease semver>string ] unit-test
+{ "1.2.3-erg.1" } [ "1.2.3-erg.0" >semver "erg" bump-prerelease semver>string ] unit-test
+{ "1.2.4-erg.0" } [ "1.2.3" >semver "erg" bump-prerelease semver>string ] unit-test
 
 { T{ semver f 2 7 2 "pre" "build" } } [ "2.7.2-pre+build" >semver ] unit-test
 { T{ semver f 2 7 2 "pre" f } } [ "2.7.2-pre" >semver ] unit-test

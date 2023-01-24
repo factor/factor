@@ -65,7 +65,7 @@ M: string >semver
         [ 1 + ] change-patch
     ] when f >>prerelease ;
 
-: bump-prerelease-id ( semver id -- semver )
+: bump-prerelease ( semver id -- semver )
     over prerelease>> [
         [ bump-patch ] dip [ "0" ] [ ".0" append ] if-empty
     ] [
@@ -82,13 +82,13 @@ M: string >semver
         ] if
     ] if-empty >>prerelease f >>build ;
 
-: bump-prerelease ( semver -- semver ) f bump-prerelease-id ;
+: bump-dev ( semver -- semver ) f bump-prerelease ;
 
-: bump-alpha ( semver -- semver ) "alpha" bump-prerelease-id ;
+: bump-alpha ( semver -- semver ) "alpha" bump-prerelease ;
 
-: bump-beta ( semver -- semver ) "beta" bump-prerelease-id ;
+: bump-beta ( semver -- semver ) "beta" bump-prerelease ;
 
-: bump-rc ( semver -- semver ) "rc" bump-prerelease-id ;
+: bump-rc ( semver -- semver ) "rc" bump-prerelease ;
 
 : bump-premajor ( semver -- semver )
     [ 1 + ] change-major 0 >>minor 0 >>patch "0" >>prerelease f >>build ;
