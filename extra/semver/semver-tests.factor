@@ -154,20 +154,19 @@ CONSTANT: semver-gt-comparisons {
     "0.1.4"
     "0.1.5-0"
     "0.1.5-1"
-    "0.1.5-2"
     "0.1.5-alpha.0"
     "0.1.5-alpha.1"
     "0.1.5-beta.0"
     "0.1.5-beta.1"
     "0.1.5-rc.0"
+    "0.1.5-rc.1"
     "0.1.5"
 } [
     "0.1.4" >semver [ semver>string ] keep
-    bump-prepatch [ semver>string ] keep
     2 [ bump-dev [ semver>string ] keep ] times
     2 [ bump-alpha [ semver>string ] keep ] times
     2 [ bump-beta [ semver>string ] keep ] times
-    bump-rc [ semver>string ] keep
+    2 [ bump-rc [ semver>string ] keep ] times
     bump-patch semver>string
 ] unit-test
 
