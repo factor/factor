@@ -69,7 +69,6 @@ inline cell object::slot_count(Fixup fixup) const {
   } else {
     switch (t) {
       // these objects do not refer to other objects at all
-      case FIXNUM_TYPE:
       case F_TYPE:
       case FLOAT_TYPE:
       case BYTE_ARRAY_TYPE:
