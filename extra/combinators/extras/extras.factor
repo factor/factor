@@ -195,3 +195,20 @@ MACRO: 4keep-under ( quot -- quot' )
 : 1temp1d ( quot: ( a b c -- d e f ) -- quot ) '[ swap @ swap ] ; inline
 : 1temp2d ( quot: ( a b c -- d e f ) -- quot ) '[ rot @ -rot ] ; inline
 : 2temp2d ( quot: ( a b c d -- e f g h ) -- quot ) '[ 2 4 0 nrotated @ 2 4 0 -nrotated ] ; inline
+
+ : (closure-limit) ( vertex set quot: ( vertex -- edges ) i n -- )
+    2dup < [
+        [ 1 + ] dip
+        2reach ?adjoin [
+            [ [ dip ] keep ] 2dip [ (closure-limit) ] 2curry 2curry each
+        ] [ 5drop ] if
+    ] [
+        5drop
+    ] if ; inline recursive
+
+: closure-limit-as ( vertex quot: ( vertex -- edges ) n exemplar -- set )
+    [ 0 ] 2dip
+    new-empty-set-like [ -roll (closure-limit) ] keep ; inline
+
+: closure-limit ( vertex quot: ( vertex -- edges ) n -- set )
+    HS{ } closure-limit-as ; inline
