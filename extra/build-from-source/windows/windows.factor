@@ -31,7 +31,7 @@ IN: build-from-source.windows
         [ text>> ] map
         [ "fftw-" head? ] filter
         [ ".tar.gz" tail? ] filter
-        { human<=> } sort-by last
+        human-sort last
     ] keep prepend-path ;
 
 : build-fftw-dll ( -- )
