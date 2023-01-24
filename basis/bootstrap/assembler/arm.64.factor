@@ -1,4 +1,5 @@
 ! Copyright (C) 2020 Doug Coleman.
+! Copyright (C) 2023 Giftpflanze.
 ! See https://factorcode.org/license.txt for BSD license.
 USING: bootstrap.image.private compiler.codegen.relocation
 compiler.constants compiler.units cpu.arm.assembler
@@ -23,7 +24,7 @@ big-endian off
 !   in user mode, points to TEB
 ! x19-x28	Non-volatile	Scratch registers
 ! x29/fp	Non-volatile	Frame pointer
-! x30/lr	Non-volatile	Link registers
+! x30/lr	Non-volatile	Link register
 
 ! varargs https://developer.arm.com/documentation/ihi0055/d/?lang=en
 : stack-frame-size ( -- n ) 8 bootstrap-cells ;
@@ -54,7 +55,7 @@ big-endian off
 ! X8         Indirect result location register (volatile)
 ! X9 -  X15  Temporary registers (volatile)
 ! X16 - X17  Intra-procedure call temporary (volatile)
-! x16 - syscall reg with SVC instructioin
+! X16 - syscall reg with SVC instruction
 ! X18        Platform register, otherwise temporary, DONT USE (volatile)
 
 ! X19 - X29    Callee-saved register    Must preserve (non-volatile)
@@ -94,7 +95,7 @@ big-endian off
 : temp3 ( -- reg ) X12 ;
 
 : nv-reg ( -- reg ) temp0 ; ! X19
-: link-reg ( -- reg ) temp1 ;
+: link-reg* ( -- reg ) temp1 ;
 
 ! : pic-tail-reg ( -- reg ) RBX ;
 : return-reg ( -- reg ) X0 ;
@@ -450,7 +451,6 @@ big-endian off
 ! C to Factor entry point
 [
 
-    9999 BRK
     ! ! Optimizing compiler's side of callback accesses
     ! ! arguments that are on the stack via the frame pointer.
     ! ! On x86-32 fastcall, and x86-64, some arguments are passed
@@ -476,7 +476,8 @@ big-endian off
 
     ! ! Load VM into vm-reg
     ! vm-reg 0 MOV 0 rc-absolute-cell rel-vm
-    vm-reg 0 MOVwi64 0 rc-absolute-cell rel-vm
+    0 vm-reg MOVwi64
+    0 rc-absolute-cell rel-vm
 
     ! ! Save old context
     ! nv-reg vm-reg vm-context-offset [+] MOV
@@ -509,14 +510,15 @@ big-endian off
     ! rs-reg nv-reg context-retainstack-offset [+] MOV
     ! ds-reg nv-reg context-datastack-offset [+] MOV
 
-    context-retainstack-offset nv-reg rs-reg-uoff
+    context-retainstack-offset nv-reg rs-reg LDR-uoff
     context-datastack-offset nv-reg ds-reg LDR-uoff
 
     ! ! Call into Factor code
     ! link-reg 0 MOV f rc-absolute-cell rel-word
     ! link-reg CALL
 
-    link-reg* 0 MOVwi64 f rc-absolute-cell rel-word
+    0 link-reg* MOVwi64
+    f rc-absolute-cell rel-word
     link-reg* BLR
 
     ! ! Load VM into vm-reg; only needed on x86-32, but doesn't
