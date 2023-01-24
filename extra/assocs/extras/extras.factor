@@ -1,7 +1,7 @@
 ! Copyright (C) 2012 John Benediktsson, Doug Coleman
 ! See https://factorcode.org/license.txt for BSD license
 USING: arrays assocs assocs.private kernel math math.statistics
-sequences sets ;
+sequences sequences.extras sets ;
 IN: assocs.extras
 
 : push-at-each ( value keys assoc -- )
@@ -20,7 +20,7 @@ IN: assocs.extras
     [ deep-of-but-last ] dip spin set-at ; inline
 
 : zip-longest-with ( seq1 seq2 fill -- assoc )
-    [ 2dup max-length ] dip '[ _ _ pad-tail ] bi@ zip ;
+    pad-longest zip ;
 
 : zip-longest ( seq1 seq2 -- assoc )
     f zip-longest-with ;
