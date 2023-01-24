@@ -150,18 +150,33 @@ CONSTANT: semver-gt-comparisons {
 { "1.3.3" } [ "1.3.2" >semver bump-patch semver>string ] unit-test
 { "0.1.5" } [ "0.1.5-rc.2" >semver bump-patch semver>string ] unit-test
 
-{ "0.1.5-dev.0" } [ "0.1.4" >semver bump-prerelease semver>string ] unit-test
-{ "0.1.5-dev.1" } [ "0.1.5-dev.0" >semver bump-prerelease semver>string ] unit-test
+{
+    "0.1.4"
+    "0.1.5-0"
+    "0.1.5-1"
+    "0.1.5-2"
+    "0.1.5-alpha.0"
+    "0.1.5-alpha.1"
+    "0.1.5-beta.0"
+    "0.1.5-beta.1"
+    "0.1.5-rc.0"
+    "0.1.5"
+} [
+    "0.1.4" >semver [ semver>string ] keep
+    bump-prepatch [ semver>string ] keep
+    2 [ bump-prerelease [ semver>string ] keep ] times
+    2 [ bump-alpha [ semver>string ] keep ] times
+    2 [ bump-beta [ semver>string ] keep ] times
+    bump-rc [ semver>string ] keep
+    bump-patch semver>string
+] unit-test
 
-{ "1.2.4-dev.0" } [ "1.2.3" >semver bump-prepatch semver>string ] unit-test
+{ "1.2.4-0" } [ "1.2.3" >semver bump-prepatch semver>string ] unit-test
+{ "1.3.0-0" } [ "1.2.3" >semver bump-preminor semver>string ] unit-test
+{ "2.0.0-0" } [ "1.2.3" >semver bump-premajor semver>string ] unit-test
+{ "2.0.0-1" } [ "1.2.3" >semver bump-premajor bump-prerelease semver>string ] unit-test
 
-{ "1.3.0-dev.0" } [ "1.2.3" >semver bump-preminor semver>string ] unit-test
-{ "1.3.0" } [ "1.2.3" >semver bump-minor semver>string ] unit-test
-
-{ "2.0.0-dev.0" } [ "1.2.3" >semver bump-premajor semver>string ] unit-test
-{ "2.0.0-dev.1" } [ "1.2.3" >semver bump-premajor bump-prerelease semver>string ] unit-test
-
-{ "1.2.3-erg.0" } [ "1.2.3-dev.0" >semver "erg" bump-prerelease-id semver>string ] unit-test
+{ "1.2.3-erg.0" } [ "1.2.3-0" >semver "erg" bump-prerelease-id semver>string ] unit-test
 { "1.2.3-erg.1" } [ "1.2.3-erg.0" >semver "erg" bump-prerelease-id semver>string ] unit-test
 { "1.2.4-erg.0" } [ "1.2.3" >semver "erg" bump-prerelease-id semver>string ] unit-test
 
@@ -191,6 +206,8 @@ CONSTANT: semver-gt-comparisons {
 
 { t } [
     {
+        "1.0.0-0"
+        "1.0.0-12"
         "1.0.0-alpha"
         "1.0.0-alpha.1"
         "1.0.0-alpha.beta"

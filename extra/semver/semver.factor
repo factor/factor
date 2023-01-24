@@ -4,8 +4,7 @@
 USING: accessors arrays assocs.extras combinators
 combinators.short-circuit combinators.smart io kernel math
 math.order math.parser multiline peg.ebnf sequences
-sequences.deep sequences.extras sorting.human splitting strings
-;
+sequences.deep splitting strings ;
 
 IN: semver
 
@@ -68,7 +67,7 @@ M: string >semver
 
 : bump-prerelease-id ( semver id -- semver )
     over prerelease>> [
-        [ bump-patch ] dip ".0" append
+        [ bump-patch ] dip [ "0" ] [ ".0" append ] if-empty
     ] [
         2dup swap head? [
             "." split
@@ -76,34 +75,29 @@ M: string >semver
                 over [ string>number 1 + number>string ] change-nth
                 "." join nip
             ] [
-                2drop ".0" append
+                2drop [ "0" ] [ ".0" append ] if-empty
             ] if
         ] [
-            drop ".0" append
+            drop [ "0" ] [ ".0" append ] if-empty
         ] if
-    ] if-empty >>prerelease
-    f >>build ;
+    ] if-empty >>prerelease f >>build ;
 
-: bump-prerelease ( semver -- semver )
-    "dev" bump-prerelease-id ;
+: bump-prerelease ( semver -- semver ) f bump-prerelease-id ;
 
-: bump-prepatch ( semver -- semver )
-    [ 1 + ] change-patch
-    "dev.0" >>prerelease
-    f >>build ;
+: bump-alpha ( semver -- semver ) "alpha" bump-prerelease-id ;
 
-: bump-preminor ( semver -- semver )
-    [ 1 + ] change-minor
-    0 >>patch
-    "dev.0" >>prerelease
-    f >>build ;
+: bump-beta ( semver -- semver ) "beta" bump-prerelease-id ;
+
+: bump-rc ( semver -- semver ) "rc" bump-prerelease-id ;
 
 : bump-premajor ( semver -- semver )
-    [ 1 + ] change-major
-    0 >>minor
-    0 >>patch
-    "dev.0" >>prerelease
-    f >>build ;
+    [ 1 + ] change-major 0 >>minor 0 >>patch "0" >>prerelease f >>build ;
+
+: bump-preminor ( semver -- semver )
+    [ 1 + ] change-minor 0 >>patch "0" >>prerelease f >>build ;
+
+: bump-prepatch ( semver -- semver )
+    [ 1 + ] change-patch "0" >>prerelease f >>build ;
 
 : lower-range ( semver -- str )
     semver>string ">=" prepend ;
