@@ -51,12 +51,8 @@ HELP: sort-pair
 { $values { "a" object } { "b" object } { "c" object } { "d" object } }
 { $description "If " { $snippet "a" } " is greater than " { $snippet "b" } ", exchanges " { $snippet "a" } " with " { $snippet "b" } "." } ;
 
-HELP: compare-with
-{ $values { "quots" { $sequence { $quotation ( obj1 obj2 -- <=> ) } } } }
-{ $description "Generate a chained comparator using the specified " { $snippet "quots" } " sequence of comparators." } ;
-
 HELP: midpoint@
 { $values { "seq" sequence } { "n" integer } }
 { $description "Outputs the index of the midpoint of " { $snippet "seq" } "." } ;
 
-{ <=> compare compare-with natural-sort sort-with inv-sort-with sort-keys sort-values } related-words
+{ <=> compare natural-sort sort-with inv-sort-with sort-keys sort-values } related-words
