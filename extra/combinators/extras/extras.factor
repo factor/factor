@@ -1,9 +1,9 @@
 ! Copyright (C) 2013 Doug Coleman, John Benediktsson.
 ! See https://factorcode.org/license.txt for BSD license.
 USING: arrays assocs combinators combinators.smart
-generalizations kernel math math.order namespaces quotations
-sequences sequences.generalizations sequences.private
-stack-checker.transforms system words ;
+generalizations graphs.private kernel math math.order namespaces
+quotations sequences sequences.generalizations sequences.private
+sets shuffle stack-checker.transforms system words ;
 IN: combinators.extras
 
 : once ( quot -- ) call ; inline
