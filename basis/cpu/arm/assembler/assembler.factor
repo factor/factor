@@ -101,6 +101,10 @@ ERROR: imm-out-of-range imm n ;
 : STRr64 ( Rm Rn Rt -- )
     [ 0 0 ] 2dip STRr64-encode ;
 
+: STR-pre ( imm9 Rn Rt -- ) STRpre64-encode ;
+
+: STR-post ( imm9 Rn Rt -- ) STRpost64-encode ;
+
 : ASRi32 ( imm6 Rn Rd -- ) [ 6 ?bits ] 2dip ASRi32-encode ;
 : ASRi64 ( imm6 Rn Rd -- ) [ 6 ?bits ] 2dip ASRi64-encode ;
 : LSLi32 ( imm6 Rn Rd -- ) [ 6 ?bits ] 2dip LSLi32-encode ;
