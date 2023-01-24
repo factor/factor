@@ -25,9 +25,3 @@ unit-test
 [ { { 1 "a" } { 1 "b" } { 1 "c" } { 2 "d" } { 1 "e" } } sort-keys ] unit-test
 
 [ all-words natural-sort ] must-not-fail
-
-{ +gt+ } [ "lady" "bug" { [ length ] [ first ] } compare-with ] unit-test
-{ +lt+ } [ "bug" "lady" { [ length ] [ first ] } compare-with ] unit-test
-{ +eq+ } [ "bat" "bat" { [ length ] [ first ] } compare-with ] unit-test
-{ +lt+ } [ "bat" "cat" { [ length ] [ first ] } compare-with ] unit-test
-{ +gt+ } [ "fat" "cat" { [ length ] [ first ] } compare-with ] unit-test

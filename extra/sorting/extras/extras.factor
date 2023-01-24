@@ -35,3 +35,8 @@ IN: sorting.extras
 
 : insort-right! ( obj seq -- seq )
     [ bisect-right ] 2keep swapd [ insert-nth! ] keep ;
+
+MACRO: compare-with ( quots -- <=> )
+    [ '[ _ bi@ <=> ] ]
+    [ '[ _ 2keep rot dup +eq+ eq? [ drop @ ] [ 2nip ] if ] ]
+    map-reduce ;
