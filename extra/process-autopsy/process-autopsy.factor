@@ -4,7 +4,7 @@ USING: accessors assocs calendar combinators environment
 escape-strings io io.pathnames io.streams.string kernel math
 math.parser namespaces prettyprint prettyprint.config sequences
 tools.deploy.backend tools.time unix.groups unix.users uuid ;
-IN: ci.run-process
+IN: process-autopsy
 
 TUPLE: process-autopsy
     timestamp os-envs
