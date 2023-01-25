@@ -9,8 +9,7 @@ SINGLETON: visual-studio-codium
 
 INSTANCE: visual-studio-codium visual-studio-code-base
 
-editor-class get-global dup [ visual-studio-code? not ] when
-[ visual-studio-codium editor-class set-global ] unless
+editor-class [ visual-studio-codium ] initialize
 
 M: visual-studio-codium find-visual-studio-code-path
     os {

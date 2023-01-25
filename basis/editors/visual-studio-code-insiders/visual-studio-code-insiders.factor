@@ -9,8 +9,7 @@ SINGLETON: visual-studio-code-insiders
 
 INSTANCE: visual-studio-code-insiders visual-studio-code-base
 
-editor-class get-global dup [ visual-studio-code? not ] when
-[ visual-studio-code-insiders editor-class set-global ] unless
+editor-class [ visual-studio-code-insiders ] initialize
 
 M: visual-studio-code-insiders find-visual-studio-code-path
     os {
