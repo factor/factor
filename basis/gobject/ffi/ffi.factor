@@ -12,7 +12,7 @@ USE: glib.ffi
 LIBRARY: gobject
 
 << "gobject" {
-    { [ os windows? ] [ "libgobject-2.0-0.dll" ] }
+    { [ os windows? ] [ "gobject-2.0-0.dll" ] }
     { [ os macosx? ] [ "libgobject-2.0.dylib" ] }
     { [ os unix? ] [ "libgobject-2.0.so" ] }
 } cond cdecl add-library >>

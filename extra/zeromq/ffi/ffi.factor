@@ -8,7 +8,7 @@ combinators kernel literals math system ;
 IN: zeromq.ffi
 
 << "zmq" {
-    { [ os windows? ] [ "libzmq.dll" ] }
+    { [ os windows? ] [ "zmq.dll" ] }
     { [ os macosx? ] [ "libzmq.dylib" ] }
     { [ os unix? ] [ "libzmq.so" ] }
 } cond cdecl add-library >>
