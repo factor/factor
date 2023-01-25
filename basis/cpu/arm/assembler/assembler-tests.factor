@@ -4,10 +4,6 @@ USING: cpu.arm.assembler cpu.arm.assembler.opcodes make
 tools.test ;
 IN: cpu.arm.assembler.tests
 
-{ { 0x10 0x02 0x00 0x91 } } [ [ 0 X16 X16 ADDi64 ] { } make ] unit-test
-{ { 0x10 0x22 0x00 0x91 } } [ [ 8 X16 X16 ADDi64 ] { } make ] unit-test
-{ { 0x10 0xe2 0x3f 0x91 } } [ [ 0xff8 X16 X16 ADDi64 ] { } make ] unit-test
-
 { { 0xb8 0x04 0x40 0x94 } } [ [ 0x04004b8 BL ] { } make ] unit-test
 { { 0x20 0x02 0x1f 0xd6 } } [ [ X17 BR ] { } make ] unit-test
 

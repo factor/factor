@@ -27,6 +27,7 @@ IN: cpu.arm.assembler.64
 : LDR-pre ( imm9 Rn Rt -- ) LDRpre64-encode ;
 : LDR-post ( imm9 Rn Rt -- ) LDRpost64-encode ;
 : LDR-uoff ( imm12 Rn Rt -- ) [ 8 / ] 2dip LDRuoff64-encode ;
+: LDR-literal ( imm19 Rt -- ) [ 4 / 19 bits ] dip LDRl64-encode ;
 
 : LDP-pre ( offset register-offset register-mid register -- )
     [ 8 / 7 bits ] 3dip swapd LDPpre64-encode ;
@@ -56,6 +57,12 @@ IN: cpu.arm.assembler.64
 
 : STP-signed-offset ( offset register-offset register-mid register -- )
     [ 8 / 7 bits ] 3dip swapd STPsoff64-encode ;
+
+: STR-pre ( imm9 Rn Rt -- )
+    [ 9 bits ] 2dip STRpre64-encode ;
+
+: STR-post ( imm9 Rn Rt -- )
+    [ 9 bits ] 2dip STRpost64-encode ;
 
 : STRr ( Rm Rn Rt -- )
     [ 0 0 ] 2dip STRr64-encode ;
