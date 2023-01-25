@@ -3,10 +3,8 @@
 ! See https://factorcode.org/license.txt for BSD license.
 USING: bootstrap.image.private compiler.codegen.relocation
 compiler.constants compiler.units cpu.arm.assembler
-cpu.arm.assembler.opcodes generic.single.private
-kernel kernel.private layouts locals.backend
-math math.private memory namespaces sequences slots.private
-strings.private threads.private vocabs ;
+cpu.arm.assembler.64 cpu.arm.assembler.opcodes kernel
+kernel.private layouts math namespaces vocabs ;
 IN: bootstrap.assembler.arm
 
 8 \ cell set
@@ -110,21 +108,21 @@ big-endian off
 
 ! rc-absolute-cell is just CONSTANT: 0
 : jit-call ( name -- )
-    0 X0 MOVwi64
+    0 X0 MOVwi
     f rc-absolute-cell rel-dlsym
     X0 BLR ;
     ! RAX 0 MOV f rc-absolute-cell rel-dlsym
     ! RAX CALL ;
 
 :: jit-call-1arg ( arg1s name -- )
-    arg1s arg1 MOVr64
+    arg1s arg1 MOVr
     name jit-call ;
-    ! arg1 arg1s MOVr64
+    ! arg1 arg1s MOVr
     ! name jit-call ;
 
 :: jit-call-2arg ( arg1s arg2s name -- )
-    arg1s arg1 MOVr64
-    arg2s arg2 MOVr64
+    arg1s arg1 MOVr
+    arg2s arg2 MOVr
     name jit-call ;
     ! arg1 arg1s MOV
     ! arg2 arg2s MOV
@@ -194,39 +192,39 @@ big-endian off
 
 
 : jit->r ( -- )
-    1 bootstrap-cells rs-reg rs-reg ADDi64
+    1 bootstrap-cells rs-reg rs-reg ADDi
     -1 bootstrap-cells ds-reg rs-reg LDR-post ;
 
 : jit-r> ( -- )
-    1 bootstrap-cells ds-reg ds-reg ADDi64
+    1 bootstrap-cells ds-reg ds-reg ADDi
     -1 bootstrap-cells rs-reg ds-reg LDR-post ;
 
 : jit-2>r ( -- )
-    1 bootstrap-cells rs-reg rs-reg ADDi64
+    1 bootstrap-cells rs-reg rs-reg ADDi
     -1 bootstrap-cells ds-reg rs-reg LDR-post
-    1 bootstrap-cells rs-reg rs-reg ADDi64
+    1 bootstrap-cells rs-reg rs-reg ADDi
     -1 bootstrap-cells ds-reg rs-reg LDR-post ;
 
 : jit-2r> ( -- )
-    1 bootstrap-cells ds-reg ds-reg ADDi64
+    1 bootstrap-cells ds-reg ds-reg ADDi
     -1 bootstrap-cells rs-reg ds-reg LDR-post
-    1 bootstrap-cells ds-reg ds-reg ADDi64
+    1 bootstrap-cells ds-reg ds-reg ADDi
     -1 bootstrap-cells rs-reg ds-reg LDR-post ;
 
 : jit-3>r ( -- )
-    1 bootstrap-cells rs-reg rs-reg ADDi64
+    1 bootstrap-cells rs-reg rs-reg ADDi
     -1 bootstrap-cells ds-reg rs-reg LDR-post
-    1 bootstrap-cells rs-reg rs-reg ADDi64
+    1 bootstrap-cells rs-reg rs-reg ADDi
     -1 bootstrap-cells ds-reg rs-reg LDR-post
-    1 bootstrap-cells rs-reg rs-reg ADDi64
+    1 bootstrap-cells rs-reg rs-reg ADDi
     -1 bootstrap-cells ds-reg rs-reg LDR-post ;
 
 : jit-3r> ( -- )
-    1 bootstrap-cells ds-reg ds-reg ADDi64
+    1 bootstrap-cells ds-reg ds-reg ADDi
     -1 bootstrap-cells rs-reg ds-reg LDR-post
-    1 bootstrap-cells ds-reg ds-reg ADDi64
+    1 bootstrap-cells ds-reg ds-reg ADDi
     -1 bootstrap-cells rs-reg ds-reg LDR-post
-    1 bootstrap-cells ds-reg ds-reg ADDi64
+    1 bootstrap-cells ds-reg ds-reg ADDi
     -1 bootstrap-cells rs-reg ds-reg LDR-post ;
 
 ! Contexts
@@ -306,22 +304,22 @@ big-endian off
 
 
             ! write()
-            ! 68 X8 MOVwi64
-            ! X2 MOVwi64
+            ! 68 X8 MOVwi
+            ! X2 MOVwi
             ! 0 SVC
 
             ! exit(42)
 
             ! 9999 BRK
-            ! 42 X0 MOVwi64
-            ! 93 X8 MOVwi64
+            ! 42 X0 MOVwi
+            ! 93 X8 MOVwi
             ! 0 SVC
 
-            ! Rn Rd MOVr64 ! comment
-            arg1 arg2 MOVr64
+            ! Rn Rd MOVr ! comment
+            arg1 arg2 MOVr
             vm-reg "begin_callback" jit-call-1arg
 
-            return-reg arg1 MOVr64 ! arg1 is return
+            return-reg arg1 MOVr ! arg1 is return
             jit-call-quot
 
             vm-reg "end_callback" jit-call-1arg
@@ -354,23 +352,23 @@ big-endian off
     !     [
 
     !         ! write()
-    !         ! 68 X8 MOVwi64
-    !         ! X2 MOVwi64
+    !         ! 68 X8 MOVwi
+    !         ! X2 MOVwi
     !         ! 0 SVC
 
     !         ! exit(42)
     !         9999 BRK
-    !         42 X0 MOVwi64
-    !         93 X8 MOVwi64
+    !         42 X0 MOVwi
+    !         93 X8 MOVwi
     !         0 SVC
 
             
 
-    !         ! Rn Rd MOVr64
-    !         ! arg1 arg2 MOVr64
+    !         ! Rn Rd MOVr
+    !         ! arg1 arg2 MOVr
     !         ! vm-reg "begin_callback" jit-call-1arg
 
-    !         ! return-reg arg1 MOVr64 ! arg1 is return
+    !         ! return-reg arg1 MOVr ! arg1 is return
     !         ! jit-call-quot
 
     !         ! vm-reg "end_callback" jit-call-1arg
@@ -656,7 +654,7 @@ big-endian off
     ! : stack-frame-reg ( -- reg ) X29 ; ! FP
 
     ! ! make room for LR plus magic number of callback, 16byte align
-    stack-frame-size bootstrap-cell 2 * + stack-reg stack-reg SUBi64
+    stack-frame-size bootstrap-cell 2 * + stack-reg stack-reg SUBi
     ! link-reg X29 stack-reg STP
     ! -16 SP link-reg X29 STP-pre
     -16 SP link-reg stack-frame-reg STP-pre
@@ -666,7 +664,7 @@ big-endian off
     ! x64 ! stack-reg stack-frame-size bootstrap-cell - ADD
     ! -16 SP link-reg X29 LDP-pre
     16 SP link-reg stack-frame-reg LDP-post
-    stack-frame-size bootstrap-cell 2 * + stack-reg stack-reg ADDi64
+    stack-frame-size bootstrap-cell 2 * + stack-reg stack-reg ADDi
 ] JIT-EPILOG jit-define
 
 [
