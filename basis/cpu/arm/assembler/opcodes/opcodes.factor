@@ -819,12 +819,9 @@ ARM-INSTRUCTION: LDPsoff32-encode ( 00 101 0 010 1 imm7 Rt2 Rn Rt -- )
 ARM-INSTRUCTION: LDPsoff64-encode ( 10 101 0 010 1 imm7 Rt2 Rn Rt -- )
 
 ! LDPSW: Load Pair of Registers Signed Word.
-ARM-INSTRUCTION: LDPSWpost32-encode ( 01 101 0 001 1 imm7 Rt2 Rn Rt -- )
-ARM-INSTRUCTION: LDPSWpost64-encode ( 01 101 0 001 1 imm7 Rt2 Rn Rt -- )
-ARM-INSTRUCTION: LDPSWpre32-encode  ( 01 101 0 011 1 imm7 Rt2 Rn Rt -- )
-ARM-INSTRUCTION: LDPSWpre64-encode  ( 01 101 0 011 1 imm7 Rt2 Rn Rt -- )
-ARM-INSTRUCTION: LDPSWsoff32-encode ( 01 101 0 010 1 imm7 Rt2 Rn Rt -- )
-ARM-INSTRUCTION: LDPSWsoff64-encode ( 01 101 0 010 1 imm7 Rt2 Rn Rt -- )
+ARM-INSTRUCTION: LDPSWpost-encode ( 01 101 0 001 1 imm7 Rt2 Rn Rt -- )
+ARM-INSTRUCTION: LDPSWpre-encode  ( 01 101 0 011 1 imm7 Rt2 Rn Rt -- )
+ARM-INSTRUCTION: LDPSWsoff-encode ( 01 101 0 010 1 imm7 Rt2 Rn Rt -- )
 
 ! LDR (immediate): Load Register (immediate).
 ARM-INSTRUCTION: LDRpost32-encode ( 10 111 0 00 01 0 imm9 01 Rn Rt -- )
