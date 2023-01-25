@@ -62,6 +62,8 @@ IN: build-from-source.windows
         { "perl" "Configure" "-DOPENSSL_PIC" "VC-WIN64A" } try-process ! "VC-WIN32"
         { "nmake" } try-process
         { "apps/libssl-3-x64.dll" "apps/libcrypto-3-x64.dll" } copy-output-files
+        "apps/libssl-3-x64.dll" "libssl-38.dll" copy-output-file-as
+        "apps/libcrypto-3-x64.dll" "libcrypto-37.dll" copy-output-file-as
     ] with-updated-git-repo ;
 
 : build-cairo-dll ( -- )
@@ -217,7 +219,7 @@ IN: build-from-source.windows
         "builddir" prepend-current-path
         [
             { "ninja" } try-process
-            "lib/zstd-1.dll" "libzstd.dll" copy-output-file-as
+            "lib/zstd-1.dll" copy-output-file
         ] with-directory
     ] with-updated-git-repo ;
 
