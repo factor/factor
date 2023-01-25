@@ -479,26 +479,26 @@ big-endian off
     ! nv-reg PUSH
 
     vm-context-offset vm-reg ctx-reg LDR-uoff
-    8 SP ctx-reg STRuoff64
+    8 SP ctx-reg STRuoff
 
     ! ! Switch over to the spare context
     ! nv-reg vm-reg vm-spare-context-offset [+] MOV
     ! vm-reg vm-context-offset [+] nv-reg MOV
 
     vm-spare-context-offset vm-reg ctx-reg LDR-uoff
-    vm-context-offset vm-reg ctx-reg STRuoff64
+    vm-context-offset vm-reg ctx-reg STRuoff
 
     ! ! Save C callstack pointer
     ! nv-reg context-callstack-save-offset [+] stack-reg MOV
 
-    0 stack-reg temp0 ADDi64 ! MOV temp0, stack-reg
-    context-callstack-save-offset ctx-reg temp0 STRuoff64
+    0 stack-reg temp0 ADDi ! MOV temp0, stack-reg
+    context-callstack-save-offset ctx-reg temp0 STRuoff
 
     ! ! Load Factor stack pointers
     ! stack-reg nv-reg context-callstack-bottom-offset [+] MOV
 
     context-callstack-bottom-offset ctx-reg temp0 LDR-uoff
-    0 temp0 stack-reg ADDi64 ! MOV stack-reg, temp0
+    0 temp0 stack-reg ADDi ! MOV stack-reg, temp0
 
     ! rs-reg nv-reg context-retainstack-offset [+] MOV
     ! ds-reg nv-reg context-datastack-offset [+] MOV
@@ -519,14 +519,14 @@ big-endian off
 
     vm-context-offset vm-reg ctx-reg LDR-uoff
     context-callstack-save-offset ctx-reg temp0 LDR-uoff
-    0 temp0 stack-reg ADDi64 ! MOV stack-reg, temp0
+    0 temp0 stack-reg ADDi ! MOV stack-reg, temp0
 
     ! ! Load old context
     ! nv-reg POP
     ! vm-reg vm-context-offset [+] nv-reg MOV
 
     8 SP ctx-reg LDR-uoff
-    vm-context-offset vm-reg ctx-reg STRuoff64
+    vm-context-offset vm-reg ctx-reg STRuoff
 
     ! ! Restore non-volatile registers
     ! nv-regs <reversed> [ POP ] each
