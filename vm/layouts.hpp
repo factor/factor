@@ -242,6 +242,7 @@ struct word : public object {
 // Assembly code makes assumptions about the layout of this struct
 struct wrapper : public object {
   static const cell type_number = WRAPPER_TYPE;
+  // TAGGED
   cell object;
 };
 
