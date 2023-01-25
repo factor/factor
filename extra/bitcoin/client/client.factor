@@ -6,23 +6,11 @@
 !
 ! Donations can be sent to the following bitcoin address:
 ! 1HVMkUcaPhCeCK3rrBm31EY2bf5r33VHsj
-!
-USING:
-    accessors
-    assocs
-    base64
-    byte-arrays
-    http
-    http.client
-    io.encodings.binary
-    json.reader
-    json.writer
-    kernel
-    namespaces
-    sequences
-    strings
-    urls
-;
+
+USING: accessors assocs base64 byte-arrays http http.client
+io.encodings.binary json kernel namespaces sequences strings
+urls ;
+
 IN: bitcoin.client
 
 : bitcoin-server ( -- string )

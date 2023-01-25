@@ -3,8 +3,8 @@
 
 USING: assocs combinators command-line http.client io
 io.directories io.encodings.utf8 io.files io.files.temp
-io.launcher io.pathnames json.reader kernel namespaces regexp
-sequences splitting system urls wrap.strings ;
+io.launcher io.pathnames json kernel namespaces regexp sequences
+splitting system urls wrap.strings ;
 
 IN: tldr
 

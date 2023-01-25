@@ -1,7 +1,9 @@
 ! Copyright (C) 2010-2012 Slava Pestov, John Benediktsson.
 ! See https://factorcode.org/license.txt for BSD license.
-USING: assocs http.client json.reader kernel namespaces
-sequences urls ;
+
+USING: assocs http.client json kernel namespaces sequences urls
+;
+
 IN: bitly
 
 SYMBOLS: bitly-api-user bitly-api-key ;

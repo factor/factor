@@ -1,7 +1,6 @@
 ! Copyright (C) 2012 John Benediktsson
 ! See https://factorcode.org/license.txt for BSD license.
-USING: assocs json.reader json.writer kernel math math.parser
-sequences ;
+USING: assocs json kernel math math.parser sequences ;
 IN: benchmark.json
 
 : json-benchmark ( -- )

@@ -1,10 +1,13 @@
-! (c)2010 Joe Groff bsd license
+! Copyright (C) 2010 Joe Groff
+! See https://factorcode.org/license.txt for BSD license
+
 USING: accessors alien assocs classes.struct combinators
 combinators.short-circuit fry gpu.shaders images images.atlas
 images.loader io.directories io.encodings.utf8 io.files
-io.pathnames json json.reader kernel locals math math.matrices.simd
-math.vectors.simd sequences sets specialized-arrays
-strings typed ;
+io.pathnames json kernel locals math math.matrices.simd
+math.vectors.simd sequences sets specialized-arrays strings
+typed ;
+
 FROM: alien.c-types => float ;
 SPECIALIZED-ARRAYS: float float-4 ;
 IN: papier.map

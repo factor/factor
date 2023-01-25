@@ -2,8 +2,8 @@
 ! See https://factorcode.org/license.txt for BSD license
 
 USING: accessors assocs calendar calendar.format colors
-combinators formatting http.client io io.styles json
-json.reader kernel make math sequences urls ;
+combinators formatting http.client io io.styles json kernel make
+math sequences urls ;
 
 IN: reddit
 

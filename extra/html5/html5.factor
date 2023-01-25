@@ -1,10 +1,11 @@
 ! Copyright (C) 2020 Doug Coleman.
 ! See https://factorcode.org/license.txt for BSD license.
+
 USING: accessors arrays assocs combinators
-combinators.short-circuit io io.encodings.utf8 io.files
-json.reader kernel math math.order memoize modern.slices
-prettyprint sequences sequences.extras strings suffix-arrays
-words ;
+combinators.short-circuit io io.encodings.utf8 io.files json
+kernel math math.order memoize modern.slices prettyprint
+sequences sequences.extras strings suffix-arrays words ;
+
 IN: html5
 
 : 1sbuf ( ch -- sbuf ) [ SBUF" " clone ] dip over push ; inline

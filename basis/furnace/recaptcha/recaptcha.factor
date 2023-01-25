@@ -3,8 +3,8 @@
 USING: accessors assocs furnace.actions furnace.conversations
 html.forms html.templates.chloe.compiler
 html.templates.chloe.syntax http.client http.server
-http.server.filters io.sockets json.reader kernel namespaces
-urls validators xml.syntax ;
+http.server.filters io.sockets json kernel namespaces urls
+validators xml.syntax ;
 IN: furnace.recaptcha
 
 TUPLE: recaptcha < filter-responder domain secret-key site-key ;
