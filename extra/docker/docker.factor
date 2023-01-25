@@ -4,7 +4,7 @@
 USING: io.launcher io.standard-paths json kernel literals
 namespaces sequences strings system ;
 
-IN: ci.docker
+IN: docker
 
 SYMBOL: docker-username
 SYMBOL: docker-password
