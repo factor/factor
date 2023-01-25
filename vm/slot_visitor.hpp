@@ -71,15 +71,15 @@ inline cell object::slot_count(Fixup fixup) const {
       // How many slots do we visit?
       // It looks like all the slots that have TAGGED pointers
       case FLOAT_TYPE: return 0;
-      case BYTE_ARRAY_TYPE: return 1;
-      case BIGNUM_TYPE: return 1;
-      case CALLSTACK_TYPE: return 1;
-      case WORD_TYPE: return 8;
-      case ALIEN_TYPE: return 2;
-      case DLL_TYPE: return 1;
       case QUOTATION_TYPE: return 3;
-      case STRING_TYPE: return 3;
+      case BIGNUM_TYPE: return 1;
+      case ALIEN_TYPE: return 2;
       case WRAPPER_TYPE: return 1;
+      case CALLSTACK_TYPE: return 1;
+      case BYTE_ARRAY_TYPE: return 1;
+      case STRING_TYPE: return 3;
+      case WORD_TYPE: return 8;
+      case DLL_TYPE: return 1;
       default:
         critical_error("Invalid header in slot_count", (cell)this);
         return 0; // can't happen
