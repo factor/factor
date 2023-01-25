@@ -447,7 +447,7 @@ big-endian off
 ! C to Factor entry point
 [
 
-    9999 BRK
+    0xabcd BRK
     ! ! Optimizing compiler's side of callback accesses
     ! ! arguments that are on the stack via the frame pointer.
     ! ! On x86-32 fastcall, and x86-64, some arguments are passed
