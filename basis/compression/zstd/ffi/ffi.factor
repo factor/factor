@@ -5,7 +5,7 @@ combinators system ;
 IN: compression.zstd.ffi
 
 << "zstd" {
-    { [ os windows? ] [ "libzstd.dll" ] }
+    { [ os windows? ] [ "zstd-1.dll" ] }
     { [ os macosx? ] [ "libzstd.dylib" ] }
     { [ os unix? ] [ "libzstd.so" ] }
 } cond cdecl add-library >>

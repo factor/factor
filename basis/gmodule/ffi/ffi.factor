@@ -9,7 +9,7 @@ IN: gmodule.ffi
 LIBRARY: gmodule
 
 << "gmodule" {
-    { [ os windows? ] [ "libgmodule-2.0-0.dll" ] }
+    { [ os windows? ] [ "gmodule-2.0-0.dll" ] }
     { [ os macosx? ] [ "libgmodule-2.0.dylib" ] }
     { [ os unix? ] [ "libgmodule-2.0.so" ] }
 } cond cdecl add-library >>
