@@ -97,7 +97,6 @@ CONSTANT: manifest-style H{
             "at the top of the source file:" print nl
         ] with-style
         manifest-style [ manifest get pprint-manifest ] with-nesting
-        nl nl
+        nl nl flush
     ] with-output>error
-    error-stream get stream-flush
 ] print-use-hook set-global
