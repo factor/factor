@@ -1,4 +1,4 @@
-USING: bson.reader bson.writer bson.constants byte-arrays io.encodings.binary
+USING: bson bson.constants byte-arrays io.encodings.binary
 io.streams.byte-array tools.test literals calendar kernel math ;
 
 IN: bson.tests
