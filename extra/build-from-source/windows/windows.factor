@@ -64,6 +64,14 @@ IN: build-from-source.windows
         { "apps/libssl-3-x64.dll" "apps/libcrypto-3-x64.dll" } copy-output-files
     ] with-updated-git-repo ;
 
+: build-cairo-dll ( -- )
+    "https://github.com/freedesktop/cairo.git" [
+        qw{ meson setup build2 } try-process
+        "build2" prepend-current-path
+        [ { "ninja" } try-process ] with-directory
+        "." find-dlls copy-output-files
+    ] with-updated-git-repo ;
+
 : latest-libressl ( -- path )
     "https://ftp.openbsd.org/pub/OpenBSD/LibreSSL/" [
         http-get nip parse-html find-links concat
