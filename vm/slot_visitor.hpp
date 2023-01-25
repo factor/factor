@@ -68,11 +68,12 @@ inline cell object::slot_count(Fixup fixup) const {
     return 1 + tuple_capacity(layout);
   } else {
     switch (t) {
-      // these objects do not refer to other objects at all
-      case FLOAT_TYPE:
-      case BYTE_ARRAY_TYPE:
-      case BIGNUM_TYPE:
-      case CALLSTACK_TYPE: return 0;
+      // How many slots do we visit?
+      // It looks like all the slots that have TAGGED pointers
+      case FLOAT_TYPE: return 0;
+      case BYTE_ARRAY_TYPE: return 1;
+      case BIGNUM_TYPE: return 1;
+      case CALLSTACK_TYPE: return 1;
       case WORD_TYPE: return 8;
       case ALIEN_TYPE: return 2;
       case DLL_TYPE: return 1;
