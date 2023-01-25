@@ -94,9 +94,6 @@ big-endian off
 : temp2 ( -- reg ) X11 ;
 : temp3 ( -- reg ) X12 ;
 
-: nv-reg ( -- reg ) temp0 ; ! X19
-: link-reg* ( -- reg ) temp1 ;
-
 ! : pic-tail-reg ( -- reg ) RBX ;
 : return-reg ( -- reg ) X0 ;
 : stack-reg ( -- reg ) SP ;
@@ -106,7 +103,8 @@ big-endian off
 : vm-reg ( -- reg ) X28 ;
 : ds-reg ( -- reg ) X27 ;
 : rs-reg ( -- reg ) X26 ;
-! : ctx-reg ( -- reg ) R12 ;
+: ctx-reg ( -- reg ) X13 ;
+: word-reg ( -- reg ) X14 ;
 ! : fixnum>slot@ ( -- ) temp0 1 SAR ;
 ! : rex-length ( -- n ) 1 ;
 
@@ -451,6 +449,7 @@ big-endian off
 ! C to Factor entry point
 [
 
+    9999 BRK
     ! ! Optimizing compiler's side of callback accesses
     ! ! arguments that are on the stack via the frame pointer.
     ! ! On x86-32 fastcall, and x86-64, some arguments are passed
@@ -472,87 +471,75 @@ big-endian off
     -16 SP X28 X29 STP-pre
     -16 SP X30 STR-pre
 
-    jit-save-tib ! nop
-
     ! ! Load VM into vm-reg
     ! vm-reg 0 MOV 0 rc-absolute-cell rel-vm
-    0 vm-reg MOVwi64
-    0 rc-absolute-cell rel-vm
+
+    104 vm-reg LDR-literal
 
     ! ! Save old context
     ! nv-reg vm-reg vm-context-offset [+] MOV
     ! nv-reg PUSH
 
-    vm-context-offset vm-reg nv-reg LDR-uoff
-    -16 SP nv-reg STR-pre
+    vm-context-offset vm-reg ctx-reg LDR-uoff
+    8 SP ctx-reg STRuoff64
 
     ! ! Switch over to the spare context
     ! nv-reg vm-reg vm-spare-context-offset [+] MOV
     ! vm-reg vm-context-offset [+] nv-reg MOV
 
-    vm-spare-context-offset vm-reg nv-reg LDR-uoff
-    vm-context-offset vm-reg nv-reg STRuoff64
+    vm-spare-context-offset vm-reg ctx-reg LDR-uoff
+    vm-context-offset vm-reg ctx-reg STRuoff64
 
     ! ! Save C callstack pointer
     ! nv-reg context-callstack-save-offset [+] stack-reg MOV
 
-    context-callstack-save-offset nv-reg stack-reg STRuoff64
+    0 stack-reg temp0 ADDi64 ! MOV temp0, stack-reg
+    context-callstack-save-offset ctx-reg temp0 STRuoff64
 
     ! ! Load Factor stack pointers
     ! stack-reg nv-reg context-callstack-bottom-offset [+] MOV
-    ! nv-reg jit-update-tib
-    ! jit-install-seh
 
-    context-callstack-bottom-offset nv-reg stack-reg LDR-uoff
-    nv-reg jit-update-tib ! nop
-    jit-install-seh ! uh
+    context-callstack-bottom-offset ctx-reg temp0 LDR-uoff
+    0 temp0 stack-reg ADDi64 ! MOV stack-reg, temp0
 
     ! rs-reg nv-reg context-retainstack-offset [+] MOV
     ! ds-reg nv-reg context-datastack-offset [+] MOV
 
-    context-retainstack-offset nv-reg rs-reg LDR-uoff
-    context-datastack-offset nv-reg ds-reg LDR-uoff
+    context-retainstack-offset ctx-reg rs-reg LDR-uoff
+    context-datastack-offset ctx-reg ds-reg LDR-uoff
 
     ! ! Call into Factor code
     ! link-reg 0 MOV f rc-absolute-cell rel-word
     ! link-reg CALL
 
-    0 link-reg* MOVwi64
-    f rc-absolute-cell rel-word
-    link-reg* BLR
-
-    ! ! Load VM into vm-reg; only needed on x86-32, but doesn't
-    ! ! hurt on x86-64
-    ! vm-reg 0 MOV 0 rc-absolute-cell rel-vm
-
-    ! --?
+    68 word-reg LDR-literal
+    word-reg BLR
 
     ! ! Load C callstack pointer
     ! nv-reg vm-reg vm-context-offset [+] MOV
     ! stack-reg nv-reg context-callstack-save-offset [+] MOV
 
-    vm-context-offset vm-reg nv-reg LDR-uoff
-    context-callstack-save-offset nv-reg stack-reg LDR-uoff
+    vm-context-offset vm-reg ctx-reg LDR-uoff
+    context-callstack-save-offset ctx-reg temp0 LDR-uoff
+    0 temp0 stack-reg ADDi64 ! MOV stack-reg, temp0
 
     ! ! Load old context
     ! nv-reg POP
     ! vm-reg vm-context-offset [+] nv-reg MOV
 
-    16 SP nv-reg LDR-post
-    vm-context-offset vm-reg nv-reg LDR-uoff
+    8 SP ctx-reg LDR-uoff
+    vm-context-offset vm-reg ctx-reg STRuoff64
 
     ! ! Restore non-volatile registers
-    jit-restore-tib ! nop
-
     ! nv-regs <reversed> [ POP ] each
 
-    -16 SP X30 LDR-post
-    -16 SP X28 X29 LDP-post
-    -16 SP X26 X27 LDP-post
-    -16 SP X24 X25 LDP-post
-    -16 SP X22 X23 LDP-post
-    -16 SP X20 X21 LDP-post
-    -16 SP X18 X19 LDP-post
+    16 SP X30 LDR-post
+    16 SP X28 X29 LDP-post
+    16 SP X26 X27 LDP-post
+    16 SP X24 X25 LDP-post
+    16 SP X22 X23 LDP-post
+    16 SP X20 X21 LDP-post
+    16 SP X18 X19 LDP-post
 
     ! frame-reg POP
 
@@ -564,6 +551,9 @@ big-endian off
 
     f RET
     ! f rc-absolute-2 rel-untagged ! ?
+
+    NOP NOP 0 rc-absolute-cell rel-vm
+    NOP NOP f rc-absolute-cell rel-word
 
 ] CALLBACK-STUB jit-define
 

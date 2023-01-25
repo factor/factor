@@ -24,6 +24,7 @@ ERROR: arm64-encoding-imm original n-bits-requested truncated ;
 : LDR-pre ( imm9 Rn Rt -- ) LDRpre64-encode ;
 : LDR-post ( imm9 Rn Rt -- ) LDRpost64-encode ;
 : LDR-uoff ( imm12 Rn Rt -- ) [ 8 / ] 2dip LDRuoff64-encode ;
+: LDR-literal ( imm19 Rt -- ) [ 4 / 19 bits ] dip LDRl64-encode ;
 
 : MOVwi64 ( imm Rt -- ) [ 0 ] 2dip MOVwi64-encode ;
 : MOVr64 ( Rn Rd -- ) MOVr64-encode ;
@@ -101,9 +102,11 @@ ERROR: imm-out-of-range imm n ;
 : STRr64 ( Rm Rn Rt -- )
     [ 0 0 ] 2dip STRr64-encode ;
 
-: STR-pre ( imm9 Rn Rt -- ) STRpre64-encode ;
+: STR-pre ( imm9 Rn Rt -- )
+    [ 9 bits ] 2dip STRpre64-encode ;
 
-: STR-post ( imm9 Rn Rt -- ) STRpost64-encode ;
+: STR-post ( imm9 Rn Rt -- )
+    [ 9 bits ] 2dip STRpost64-encode ;
 
 : ASRi32 ( imm6 Rn Rd -- ) [ 6 ?bits ] 2dip ASRi32-encode ;
 : ASRi64 ( imm6 Rn Rd -- ) [ 6 ?bits ] 2dip ASRi64-encode ;
