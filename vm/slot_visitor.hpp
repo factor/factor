@@ -76,7 +76,6 @@ inline cell object::slot_count(Fixup fixup) const {
       case QUOTATION_TYPE: return 3;
       case ALIEN_TYPE: return 2;
       case WRAPPER_TYPE: return 1;
-      case CALLSTACK_TYPE: return 1;
       case STRING_TYPE: return 3;
       case WORD_TYPE: return 8;
       case DLL_TYPE: return 1;
