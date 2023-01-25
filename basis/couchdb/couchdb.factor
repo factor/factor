@@ -1,14 +1,14 @@
 ! Copyright (C) 2008, 2009 Alex Chapman
 ! See https://factorcode.org/license.txt for BSD license.
 USING: accessors assocs continuations debugger hashtables http
-http.client io io.encodings.string io.encodings.utf8 json.reader
-json.writer kernel make math math.parser namespaces sequences
-strings urls.encoding vectors ;
+http.client io io.encodings.string io.encodings.utf8 json kernel
+make math math.parser namespaces sequences strings urls.encoding
+vectors ;
 IN: couchdb
 
-! NOTE: This code only works with the latest couchdb (0.9.*), because old
-! versions didn't provide the /_uuids feature which this code relies on when
-! creating new documents.
+! NOTE: This code only works with the latest couchdb (0.9.*),
+! because old versions didn't provide the /_uuids feature which
+! this code relies on when creating new documents.
 
 SYMBOL: couch
 : with-couch ( db quot -- )

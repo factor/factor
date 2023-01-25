@@ -1,7 +1,9 @@
 ! Copyright (C) 2016 Björn Lindqvist.
 ! See https://factorcode.org/license.txt for BSD license.
-USING: accessors arrays json.reader kernel namespaces oauth2
-sequences urls ;
+
+USING: accessors arrays json kernel namespaces oauth2 sequences
+urls ;
+
 IN: google.gmail
 
 CONSTANT: api-base "https://www.googleapis.com/gmail/v1/users"

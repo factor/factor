@@ -3,8 +3,8 @@
 
 USING: accessors assocs calendar calendar.format
 calendar.holidays.us colors combinators concurrency.combinators
-formatting hashtables http.client io io.styles json.reader
-kernel make math sequences ui ui.theme urls ;
+formatting hashtables http.client io io.styles json kernel make
+math sequences ui ui.theme urls ;
 
 IN: hacker-news
 

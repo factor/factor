@@ -3,8 +3,8 @@
 
 USING: accessors assocs base64 calendar calendar.format
 checksums.hmac checksums.sha combinators.smart formatting http
-http.client json.reader json.writer kernel make math.parser
-namespaces random sequences splitting ;
+http.client json kernel make math.parser namespaces random
+sequences splitting ;
 
 IN: visionect
 

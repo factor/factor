@@ -2,8 +2,8 @@
 ! See https://factorcode.org/license.txt for BSD license
 
 USING: accessors ascii assocs checksums checksums.md5
-classes.tuple formatting http.client images.http json.reader
-kernel math.parser sequences strings ;
+classes.tuple formatting http.client images.http json kernel
+math.parser sequences strings ;
 
 IN: gravatar
 

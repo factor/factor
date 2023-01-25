@@ -2,9 +2,8 @@
 ! See https://factorcode.org/license.txt for BSD license.
 USING: arrays accessors assocs assocs.extras calendar
 combinators combinators.short-circuit continuations formatting
-http http.client io json.reader kernel locals make math
-math.parser namespaces oauth1 prettyprint sequences strings
-system threads ;
+http http.client io json kernel locals make math math.parser
+namespaces oauth1 prettyprint sequences strings system threads ;
 IN: mediawiki.api
 
 TUPLE: oauth-login consumer-token consumer-secret access-token

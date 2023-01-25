@@ -1,7 +1,9 @@
 ! Copyright (C) 2018 Doug Coleman.
 ! See https://factorcode.org/license.txt for BSD license.
-USING: io.launcher io.standard-paths json.reader
-kernel literals namespaces sequences strings system ;
+
+USING: io.launcher io.standard-paths json kernel literals
+namespaces sequences strings system ;
+
 IN: ci.docker
 
 SYMBOL: docker-username

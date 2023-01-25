@@ -1,6 +1,6 @@
 ! Copyright (C) 2016 Doug Coleman.
 ! See https://factorcode.org/license.txt for BSD license.
-USING: io.streams.string json.prettyprint json.reader tools.test ;
+USING: io.streams.string json json.prettyprint tools.test ;
 
 {
 "{

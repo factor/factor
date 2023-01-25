@@ -1,7 +1,9 @@
 ! Copyright (C) 2010 Doug Coleman.
 ! See https://factorcode.org/license.txt for BSD license.
+
 USING: assocs combinators grouping http.client io io.files.temp
-io.files.unique json.reader kernel make sequences urls ;
+io.files.unique json kernel make sequences urls ;
+
 IN: google.translate
 
 CONSTANT: google-translate-url "https://ajax.googleapis.com/ajax/services/language/translate"

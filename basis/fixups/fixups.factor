@@ -36,7 +36,7 @@ CONSTANT: word-renames {
     { "substitute" { "regexp.classes:(substitute)" "0.99" } }
     { "combine" { "sets:union-all" "0.99" } }
     { "refine" { "sets:intersect-all" "0.99" } }
-    { "read-json-objects" { "json.reader:read-json" "0.99" } }
+    { "read-json-objects" { "json:read-json" "0.99" } }
     { "init-namespaces" { "namespaces:init-namestack" "0.99" } }
     { "iota" { "sequences:<iota>" ".98" } }
     { "git-checkout-existing-branch" { "git-checkout-existing" "0.99" } }
