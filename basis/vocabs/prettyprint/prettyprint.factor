@@ -89,12 +89,15 @@ CONSTANT: manifest-style H{
 }
 
 [
-    nl
-    { { font-style bold } { font-name "sans-serif" } } [
-        "Restarts were invoked adding vocabularies to the search path." print
-        "To avoid doing this in the future, add the following forms" print
-        "at the top of the source file:" print nl
-    ] with-style
-    manifest-style [ manifest get pprint-manifest ] with-nesting
-    nl nl
+    [
+        nl
+        { { font-style bold } { font-name "sans-serif" } } [
+            "Restarts were invoked adding vocabularies to the search path." print
+            "To avoid doing this in the future, add the following forms" print
+            "at the top of the source file:" print nl
+        ] with-style
+        manifest-style [ manifest get pprint-manifest ] with-nesting
+        nl nl
+    ] with-output>error
+    error-stream get stream-flush
 ] print-use-hook set-global
