@@ -836,7 +836,7 @@ ARM-INSTRUCTION: LDRuoff64-encode ( 11 111 0 01 01 imm12 Rn Rt -- )
 
 ! LDR (literal): Load Register (literal).
 ARM-INSTRUCTION: LDRl32-encode ( 00 011 0 00 imm19 Rt -- )
-ARM-INSTRUCTION: LDRl64-encode ( 00 011 0 00 imm19 Rt -- )
+ARM-INSTRUCTION: LDRl64-encode ( 01 011 0 00 imm19 Rt -- )
 
 ! LDR (register): Load Register (register).
 ARM-INSTRUCTION: LDRr32-encode ( 10 111 0 00 01 1 Rm option3 S 1 0 Rn Rt -- )
@@ -1490,9 +1490,9 @@ ARM-INSTRUCTION: STRr32-encode ( 10 111 0 00 00 1 Rm option3 S 10 Rn Rt -- )
 ARM-INSTRUCTION: STRr64-encode ( 11 111 0 00 00 1 Rm option3 S 10 Rn Rt -- )
 
 ! STRB (immediate): Store Register Byte (immediate).
-ARM-INSTRUCTION: STRpost-encode ( 00 111 0 00 00 0 imm9 01 Rn Rt -- )
-ARM-INSTRUCTION: STRpre-encode  ( 00 111 0 00 00 0 imm9 11 Rn Rt -- )
-ARM-INSTRUCTION: STRuoff-encode ( 00 111 0 01 00 imm12 Rn Rt -- )
+ARM-INSTRUCTION: STRBpost-encode ( 00 111 0 00 00 0 imm9 01 Rn Rt -- )
+ARM-INSTRUCTION: STRBpre-encode  ( 00 111 0 00 00 0 imm9 11 Rn Rt -- )
+ARM-INSTRUCTION: STRBuoff-encode ( 00 111 0 01 00 imm12 Rn Rt -- )
 
 ! STRB (register): Store Register Byte (register).
 ARM-INSTRUCTION: STRBext-encode   ( 00 111 0 00 00 1 Rm option3 S 10 Rn Rt -- )
