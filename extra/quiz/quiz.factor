@@ -72,8 +72,8 @@ TUPLE: stack-shuffler < string-response n-shufflers ;
 TUPLE: state-capital < string-response ;
 TUPLE: country-code-from-flag < string-response n ;
 TUPLE: flag-from-country-code < string-response n ;
-TUPLE: country-from-flag < string-response n ;
-TUPLE: flag-from-country < string-response n ;
+TUPLE: country-name-from-flag < string-response n ;
+TUPLE: flag-from-country-name < string-response n ;
 
 M: math-multiplication generate-question*
     [ count>> random ] [ n>> ] bi '[ _ random 2 + ] replicate '[ _ product ] ;
@@ -146,11 +146,11 @@ M: country-code-from-flag parse-response drop trim-blanks >title ;
 M: flag-from-country-code generate-question* drop valid-flag-names random '[ _ unicode>flag ] ;
 M: flag-from-country-code parse-response drop trim-blanks >title ;
 
-M: country-from-flag generate-question* drop valid-flags random '[ _ flag>country ] ;
-M: country-from-flag parse-response drop trim-blanks >title ;
+M: country-name-from-flag generate-question* drop valid-flags random '[ _ flag>country ] ;
+M: country-name-from-flag parse-response drop trim-blanks >title ;
 
-M: flag-from-country generate-question* drop valid-flag-names random alpha-2 ?at drop '[ _ country>flag ] ;
-M: flag-from-country parse-response drop trim-blanks >title ;
+M: flag-from-country-name generate-question* drop valid-flag-names random alpha-2 ?at drop '[ _ country>flag ] ;
+M: flag-from-country-name parse-response drop trim-blanks >title ;
 
 CONSTANT: stack-shufflers {
     dup 2dup drop 2drop swap over rot -rot roll -roll 2dup pick dupd
@@ -253,14 +253,14 @@ M: sequence run-multiple-choice-quiz ( seq n -- questions )
         T{ flag-from-country-code { n 4 } }
     } 5 run-multiple-choice-quiz score-quiz ;
 
-: run-country-from-flag-quiz ( -- )
+: run-country-name-from-flag-quiz ( -- )
     {
-        T{ country-from-flag { n 4 } }
+        T{ country-name-from-flag { n 4 } }
     } 5 run-multiple-choice-quiz score-quiz ;
 
-: run-flag-from-country-quiz ( -- )
+: run-flag-from-country-name-quiz ( -- )
     {
-        T{ flag-from-country { n 4 } }
+        T{ flag-from-country-name { n 4 } }
     } 5 run-multiple-choice-quiz score-quiz ;
 
 : run-math-quiz ( -- )
