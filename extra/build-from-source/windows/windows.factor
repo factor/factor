@@ -232,6 +232,7 @@ IN: build-from-source.windows
 
 : build-windows-dlls ( -- )
     dll-out-directory make-directories
+    build-cairo-dll
     build-openssl-64-dlls
     build-libressl-dlls
     build-fftw-dll
