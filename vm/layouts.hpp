@@ -106,10 +106,10 @@ struct object {
   // bit 0      : free?
   // bit 1      : forwarding pointer?
   // if not forwarding:
-  //   bit 2-5    : tag
-  //   bit 7-end  : hashcode
+  //   bit 2..5    : tag
+  //   bit 6..end  : hashcode
   // if forwarding:
-  //   bit 2-end  : forwarding pointer
+  //   bit 2..end  : forwarding pointer
   cell header;
 
   template <typename Fixup> cell base_size(Fixup fixup) const;
