@@ -90,11 +90,13 @@ TUPLE: escape-rule < rule ;
     f <string-matcher> f f f <matcher>
     escape-rule new swap >>start ;
 
+ERROR: text-required ;
+
 GENERIC: text-hash-char ( text -- ch )
 
 M: f text-hash-char ;
 
-M: string-matcher text-hash-char string>> first ;
+M: string-matcher text-hash-char string>> [ text-required ] [ first ] if-empty ;
 
 M: regexp text-hash-char drop f ;
 
