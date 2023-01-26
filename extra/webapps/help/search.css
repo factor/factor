@@ -47,12 +47,16 @@
 
 @media (max-width: 599px) {
 
-  .label {
+  .label[for="words"] {
     width: 30%;
   }
 
-  .label:nth-of-type(2) {
+  .label[for="vocabs"] {
     width: 40%;
+  }
+
+  .label[for="articles"] {
+    width: 30%;
   }
 }
 
