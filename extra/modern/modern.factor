@@ -487,6 +487,9 @@ ERROR: compound-syntax-disallowed n seq obj ;
 
 : failed-lexing ( assoc -- assoc' ) [ nip array? ] assoc-reject ;
 
+: rewrite-file ( path encoding quot: ( str -- str' ) -- )
+    '[ file-contents @ ] 2keep set-file-contents ; inline
+
 : lex-core ( -- assoc ) core-vocabs lex-vocabs ;
 : lex-basis ( -- assoc ) basis-vocabs lex-vocabs ;
 : lex-extra ( -- assoc ) extra-vocabs lex-vocabs ;
