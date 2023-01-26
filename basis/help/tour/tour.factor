@@ -1328,13 +1328,13 @@ What about channels? We go back to our server, and start a channel there, just a
 
 <channel> dup publish" }
 What you get in return is an id you can use remotely to communicate. For instance, I just got 
-{ $snippet "72581372615274718877979307388951222312843084896785643440879198703359628058956" } (yes, they really want to be sure it is unique!).
+{ $snippet "326546621698456955263335657082068225943" } (yes, they really want to be sure it is unique!).
 
 We will wait on this channel, thereby blocking the UI:
 { $code "swap from ." }
 In the other Factor instance we use the id to get a reference to the remote channel and write to it
 { $code "\
-f 9000 <inet4> 72581372615274718877979307388951222312843084896785643440879198703359628058956 <remote-channel>
+f 9000 <inet4> 326546621698456955263335657082068225943 <remote-channel>
 \"Hello, channels\" over to" }
 In the server instance, the message should be printed.
 
