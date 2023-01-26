@@ -51,7 +51,6 @@ SYNTAX: REGISTER-FIELD:
     scan-new-word scan-object
     [ "width" set-word-prop ] 2keep
     make-register-checker-word ;
-
 >>
 
 <<
@@ -273,7 +272,6 @@ SINGLETONS: SPSR_EL1 SPSR_EL2 SPSR_EL3 ;
 : imm12>parts-32 ( imm12 -- imms immr N-is-0 )
     [ -4 shift 4 bits ] [ 4 bits ] [ drop 0 ] tri ;
 
-
 ERROR: no-field-word vocab name ;
 
 TUPLE: integer-literal value width ;
@@ -304,6 +302,7 @@ M: object value ;
 
 ERROR: bad-instruction values ;
 >>
+
 <<
 SYNTAX: ARM-INSTRUCTION:
     scan-new-word
@@ -316,8 +315,6 @@ SYNTAX: ARM-INSTRUCTION:
       '[ _ bitfield* 4 >le % ]
     ] [ in>> [ string>number ] reject { } <effect> ] bi define-declared ;
 >>
-
-
 
 ! ADC: Add with Carry.
 ! ADCS: Add with Carry, setting flags.
@@ -338,8 +335,6 @@ ARM-INSTRUCTION: ADDi64-encode ( 1 0 0 10001 shift2 imm12 Rn Rd -- )
 ARM-INSTRUCTION: ADDsr32-encode ( 0 0 0 01011 shift2 0 Rm imm6 Rn Rd -- )
 ARM-INSTRUCTION: ADDsr64-encode ( 1 0 0 01011 shift2 0 Rm imm6 Rn Rd -- )
 
-ARM-INSTRUCTION: ADDs-encode ( 01 0 11110 size2 1 Rm 10000 1 Rn Rd -- )
-
 ! ADDG: Add with Tag.
 ARM-INSTRUCTION: ADDG-encode ( 1 0 0 100011 0 uimm6 00 uimm4 Xn Xd -- )
 
@@ -359,7 +354,6 @@ ARM-INSTRUCTION: ADDSsr64-encode ( 1 0 1 01011 shift2 0 Rm imm6 Rn Rd -- )
 ! ADRP: Form PC-relative address to 4KB page.
 ARM-INSTRUCTION: ADR-encode  ( 0 immlo2 10000 immhi19 Rd -- )
 ARM-INSTRUCTION: ADRP-encode ( 1 immlo2 10000 immhi19 Rd -- )
-
 
 ! AND (immediate): Bitwise AND (immediate).
 ARM-INSTRUCTION: ANDi32-encode ( 0 00 100100 0 immrimms Rn Rd -- )
@@ -514,7 +508,6 @@ ARM-INSTRUCTION: CBNZ64-encode ( 1 011010 1 imm19 Rt -- )
 ! CBZ: Compare and Branch on Zero.
 ARM-INSTRUCTION: CBZ32-encode ( 0 011010 0 imm19 Rt -- )
 ARM-INSTRUCTION: CBZ64-encode ( 1 011010 0 imm19 Rt -- )
-
 
 ! CCMN (immediate): Conditional Compare Negative (immediate).
 ARM-INSTRUCTION: CCMNi32-encode ( 0 0 1 11010010 imm5 cond4 1 0 Rn 0 nzcv4 -- )
@@ -1214,7 +1207,6 @@ ARM-INSTRUCTION: PACIZA-encode ( 1 1 0 11010110 00001 0 0 1 000 Rn Rd -- )
 ARM-INSTRUCTION: PACIA1716-encode ( 1101010100 0 00 011 0010 0001 000 11111 -- )
 ARM-INSTRUCTION: PACIASP-encode   ( 1101010100 0 00 011 0010 0011 001 11111 -- )
 ARM-INSTRUCTION: PACIAZ-encode    ( 1101010100 0 00 011 0010 0011 000 11111 -- )
-
 
 ! PACIB, PACIB1716, PACIBSP, PACIBZ, PACIZB: Pointer Authentication Code for Instruction address, using key B.
 ! ARMv8.3

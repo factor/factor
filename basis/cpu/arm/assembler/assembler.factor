@@ -46,9 +46,8 @@ ERROR: imm-out-of-range imm n ;
 : HLT ( imm16 -- ) 16 ?bits HLT-encode ;
 
 ! B but that is breakpoint
-: Br ( imm26 -- ) 26 ?bits B-encode ;
-: B.cond ( imm19 cond4 -- ) [ 19 ?bits ] dip B.cond-encode ;
-! : BL ( offset -- ) ip - 4 / BL-encode ;
-: BL ( offset -- ) BL-encode ;
+: Br ( imm26 -- ) 4 / 26 bits B-encode ;
+: B.cond ( imm19 cond4 -- ) [ 4 / 19 bits ] dip B.cond-encode ;
+: BL ( imm26 -- ) 4 / 26 bits BL-encode ;
 : BR ( Rn -- ) BR-encode ;
 : BLR ( Rn -- ) BLR-encode ;

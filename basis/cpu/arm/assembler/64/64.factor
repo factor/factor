@@ -7,6 +7,8 @@ IN: cpu.arm.assembler.64
 : ADC ( Rm Rn Rd -- ) ADC64-encode ;
 : ADCS ( Rm Rn Rd -- ) ADCS64-encode ;
 
+: ADDr ( Rm Rn Rd -- ) [ 0 0 ] 2dip ADDer64-encode ;
+
 : ADDi ( imm12 Rn Rd -- )
     [ 12 prepare-split-imm 1 0 ? swap ] 2dip
     ADDi64-encode ;
@@ -24,48 +26,42 @@ IN: cpu.arm.assembler.64
 : CSET ( Rd cond4 -- ) swap CSET64-encode ;
 : CSETM ( Rd cond4 -- ) swap CSETM64-encode ;
 
-: LDR-pre ( imm9 Rn Rt -- ) LDRpre64-encode ;
-: LDR-post ( imm9 Rn Rt -- ) LDRpost64-encode ;
-: LDR-uoff ( imm12 Rn Rt -- ) [ 8 / ] 2dip LDRuoff64-encode ;
-: LDR-literal ( imm19 Rt -- ) [ 4 / 19 bits ] dip LDRl64-encode ;
+: LDRpre ( imm9 Rn Rt -- ) [ 9 bits ] 2dip LDRpre64-encode ;
+: LDRpost ( imm9 Rn Rt -- ) [ 9 bits ] 2dip LDRpost64-encode ;
+: LDRuoff ( imm12 Rn Rt -- ) [ 8 / ] 2dip LDRuoff64-encode ;
+: LDRl ( imm19 Rt -- ) [ 4 / 19 bits ] dip LDRl64-encode ;
+: LDRl32 ( imm19 Rt -- ) [ 4 / 19 bits ] dip LDRl32-encode ;
 
-: LDP-pre ( offset register-offset register-mid register -- )
+: LDPpre ( imm7 Rn Rt2 Rt -- )
     [ 8 / 7 bits ] 3dip swapd LDPpre64-encode ;
 
-: LDP-post ( offset register-offset register-mid register -- )
+: LDPpost ( imm7 Rn Rt2 Rt -- )
     [ 8 / 7 bits ] 3dip swapd LDPpost64-encode ;
 
-: LDP-signed-offset ( offset register-offset register-mid register -- )
+: LDPsoff ( imm7 Rn Rt2 Rt -- )
     [ 8 / 7 bits ] 3dip swapd LDPsoff64-encode ;
 
 : LSLi ( imm6 Rn Rd -- ) [ 6 ?bits ] 2dip LSLi64-encode ;
 : LSRi ( imm6 Rn Rd -- ) [ 6 ?bits ] 2dip LSRi64-encode ;
 
-
 : MOVwi ( imm Rt -- ) [ 0 ] 2dip MOVwi64-encode ;
 : MOVr ( Rn Rd -- ) MOVr64-encode ;
+: MOVsp ( Rn Rd -- ) [ 0 ] 2dip MOVsp64-encode ;
 
-
-
-! stp     x29, x30, [sp,#-16]!
-! -16 SP X30 X29 STP-pre
-: STP-pre ( offset register-offset register-mid register -- )
+: STPpre ( imm7 Rn Rt2 Rt -- )
     [ 8 / 7 bits ] 3dip swapd STPpre64-encode ;
 
-: STP-post ( offset register-offset register-mid register -- )
+: STPpost ( imm7 Rn Rt2 Rt -- )
     [ 8 / 7 bits ] 3dip swapd STPpost64-encode ;
 
-: STP-signed-offset ( offset register-offset register-mid register -- )
+: STPsoff ( imm7 Rn Rt2 Rt -- )
     [ 8 / 7 bits ] 3dip swapd STPsoff64-encode ;
 
-: STR-pre ( imm9 Rn Rt -- )
-    [ 9 bits ] 2dip STRpre64-encode ;
+: STRpre ( imm9 Rn Rt -- ) [ 9 bits ] 2dip STRpre64-encode ;
 
-: STR-post ( imm9 Rn Rt -- )
-    [ 9 bits ] 2dip STRpost64-encode ;
+: STRpost ( imm9 Rn Rt -- ) [ 9 bits ] 2dip STRpost64-encode ;
 
-: STRr ( Rm Rn Rt -- )
-    [ 0 0 ] 2dip STRr64-encode ;
+: STRr ( Rm Rn Rt -- ) [ 0 0 ] 2dip STRr64-encode ;
 
 : STRuoff ( imm12 Rn Rt -- )
     [ -3 shift ] 2dip STRuoff64-encode ;
