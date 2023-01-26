@@ -71,9 +71,6 @@ M: cannot-find-graphviz-installation summary
     dup [ utf8? ] [ latin1? ] bi or
     [ unsupported-encoding ] unless ;
 
-: ?delete-file ( path -- )
-    dup file-exists? [ delete-file ] [ drop ] if ;
-
 PRIVATE>
 
 :: graphviz ( graph path format layout -- )
