@@ -95,7 +95,7 @@ PRIVATE>
 
 :: (decode-base64) ( input output -- )
     3 <byte-array> :> data
-    [ B{ CHAR: \n CHAR: \r } input read1-ignoring dup ] [
+    [ B{ CHAR: \n CHAR: \r } input read1-ignoring ] [
         B{ CHAR: \n CHAR: \r } input read1-ignoring CHAR: = or
         B{ CHAR: \n CHAR: \r } input read1-ignoring CHAR: = or
         B{ CHAR: \n CHAR: \r } input read1-ignoring CHAR: = or
@@ -103,7 +103,7 @@ PRIVATE>
         [ CHAR: = eq? 1 0 ? ] tri@ + +
         [ head-slice* ] unless-zero
         output stream-write
-    ] while drop ;
+    ] while* ;
 
 PRIVATE>
 
