@@ -68,17 +68,18 @@
 
   .label {
     color: #bdc1c6;
-    border: 1px solid #666;
   }
 
   .label:hover {
     background: #373e48;
     border: 1px solid #666;
+    border-bottom: none;
   }
 
   .radiotab:checked + .label {
-    border: 1px solid #666;
     background: #373e48;
     color: white;
+    border: 1px solid #666;
+    border-bottom: none;
   }
 }
