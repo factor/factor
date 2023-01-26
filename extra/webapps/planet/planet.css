@@ -45,6 +45,10 @@ pre, code {
     .posts {
         margin-right: 0;
     }
+
+    blockquote {
+        margin: 0.5rem;
+    }
 }
 
 /* Dark mode */
