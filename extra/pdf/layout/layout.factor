@@ -52,11 +52,11 @@ GENERIC: pdf-width ( canvas obj -- n )
 <PRIVATE
 
 : (pdf-layout) ( page obj -- page )
-    [ dup ] [
+    [ ] [
         dupd [ pdf-render ] with-string-writer
         '[ _ append ] [ change-stream ] curry dip
         [ [ , <canvas> ] when ] keep
-    ] while drop ;
+    ] while* ;
 
 PRIVATE>
 
