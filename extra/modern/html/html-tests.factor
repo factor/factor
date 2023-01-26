@@ -24,7 +24,7 @@ IN: modern.html.tests
     [[ <html></html123>]] string>html
 ] [ unmatched-closing-tag-error? ] must-fail-with
 
-{ [[ <html><head>omg</head><body><asdf a b c="d"><a/></asdf></body></html>]] } [
+{ [[ <html><head>omg</head><body><asdf a b c="d"> <a/></asdf></body></html>]] } [
     [[ <html><head>omg</head><body><asdf a b c="d" > <a/></asdf></body></html>]] string>html html>string
 ] unit-test
 
@@ -35,7 +35,7 @@ IN: modern.html.tests
 { [[ <!-- omg omg -->]] }
 [ [[ <!-- omg omg -->]] string>html html>string ] unit-test
 
-{ "<div><div><a/><b/><c/></div></div>" }
+{ "<div> <div>  <a/> <b/> <c/> </div> </div>" }
 [ "<div> <div>  <a/> <b/> <c/> </div> </div>" string>html html>string ] unit-test
 
 { "<?xml version='1.0'?>" }
@@ -81,11 +81,13 @@ IN: modern.html.tests
 ! https://en.wikipedia.org/w/index.php?title=Factor_(programming_language)&offset=&limit=500&action=history"
 {
     V{
+        "\n    "
         T{ doctype
             { open "<!DOCTYPE" }
             { close ">" }
             { values V{ "html" } }
         }
+        "\n    "
         T{ open-tag
             { open "<" }
             { name "html" }
@@ -102,6 +104,7 @@ IN: modern.html.tests
             { close ">" }
             { children
                 V{
+                    "\n\n    "
                     T{ open-tag
                         { open "<" }
                         { name "head" }
@@ -109,6 +112,7 @@ IN: modern.html.tests
                         { close ">" }
                         { children
                             V{
+                                " "
                                 T{ open-tag
                                     { open "<" }
                                     { name "title" }
@@ -125,6 +129,7 @@ IN: modern.html.tests
                         }
                         { close-tag T{ close-tag { name "head" } } }
                     }
+                    "\n    "
                     T{ open-tag
                         { open "<" }
                         { name "body" }
@@ -132,6 +137,7 @@ IN: modern.html.tests
                         { close ">" }
                         { children
                             V{
+                                "\n    "
                                 T{ open-tag
                                     { open "<" }
                                     { name "div" }
@@ -156,17 +162,19 @@ IN: modern.html.tests
                                         }
                                     }
                                     { close ">" }
-                                    { children V{ } }
+                                    { children V{ "\n    " } }
                                     { close-tag
                                         T{ close-tag
                                             { name "div" }
                                         }
                                     }
                                 }
+                                "\n    "
                             }
                         }
                         { close-tag T{ close-tag { name "body" } } }
                     }
+                    "\n    "
                 }
             }
             { close-tag T{ close-tag { name "html" } } }
@@ -191,7 +199,8 @@ IN: modern.html.tests
 
 ! Handle tabs
 {
-V{
+    V{
+    "\n\t"
     T{ open-tag
         { open "<" }
         { name "label" }
@@ -212,6 +221,7 @@ V{
         { close ">" }
         { children
             V{
+                "\n\t\t"
                 T{ open-tag
                     { open "<" }
                     { name "span" }
@@ -231,6 +241,7 @@ V{
                     { children V{ "Personal tools" } }
                     { close-tag T{ close-tag { name "span" } } }
                 }
+                "\n\t"
             }
         }
         { close-tag T{ close-tag { name "label" } } }
