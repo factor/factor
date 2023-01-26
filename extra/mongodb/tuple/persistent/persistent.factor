@@ -1,4 +1,4 @@
-USING: accessors assocs bson.constants bson.writer combinators
+USING: accessors assocs bson bson.constants combinators
 combinators.short-circuit constructors continuations hashtables
 kernel linked-assocs mirrors mongodb.tuple.collection
 mongodb.tuple.state namespaces sequences words ;

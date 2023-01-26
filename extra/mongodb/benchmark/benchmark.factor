@@ -1,7 +1,7 @@
-USING: accessors assocs bson.reader bson.writer calendar
-formatting hashtables io io.encodings.binary
-io.streams.byte-array kernel math math.parser
-mongodb.driver namespaces ranges sequences strings tools.time ;
+USING: accessors assocs bson calendar formatting hashtables io
+io.encodings.binary io.streams.byte-array kernel math
+math.parser mongodb.driver namespaces ranges sequences strings
+tools.time ;
 FROM: mongodb.driver => find ;
 FROM: memory => gc ;
 IN: mongodb.benchmark
