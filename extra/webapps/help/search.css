@@ -10,35 +10,50 @@
 }
 
 .label {
-  width: 100%;
   padding: 5px;
   cursor: pointer;
   font-weight: bold;
   font-size: 14pt;
   color: #7f7f7f;
   text-align: center;
-  border: 1px solid #ccc;
+  width: 33.33%;
+  border: 1px solid transparent;
+  border-bottom: none;
 }
 
 .label:hover {
   background: #d8d8d8;
   border: 1px solid #ccc;
+  border-bottom: none;
 }
 
 .radiotab:checked + .label {
-  border: 1px solid #ccc;
   background: #f0f0f0;
   color: black;
+  border: 1px solid #ccc;
+  border-bottom: none;
 }
 
 .panel {
   display: none;
   width: 100%;
   border-top: 1px solid #ccc;
+  order: 99;
 }
 
 .radiotab:checked + .label + .panel {
   display: block;
+}
+
+@media (max-width: 599px) {
+
+  .label {
+    width: 30%;
+  }
+
+  .label:nth-of-type(2) {
+    width: 40%;
+  }
 }
 
 @media (prefers-color-scheme: dark) {
@@ -61,33 +76,5 @@
     border: 1px solid #666;
     background: #373e48;
     color: white;
-  }
-}
-
-@media (max-width: 599px) {
-
-  .panel {
-    border-top: none;
-  }
-}
-
-@media (min-width: 600px) {
-
-  .panel {
-    order: 99;
-  }
-
-  .label {
-    width: 33.33%;
-    border: 1px solid transparent;
-    border-bottom: none;
-  }
-
-  .label:hover {
-    border-bottom: none;
-  }
-
-  .radiotab:checked + .label {
-    border-bottom: none;
   }
 }
