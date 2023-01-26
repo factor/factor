@@ -72,6 +72,15 @@ IN: build-from-source.windows
         "build2" prepend-current-path
         [ { "ninja" } try-process ] with-directory
         "." find-dlls copy-output-files
+        {
+            "gdbus-example-objectmanager.dll"
+            "moduletestplugin_a_library.dll"
+            "moduletestplugin_a_plugin.dll"
+            "moduletestplugin_b_library.dll"
+            "moduletestplugin_b_plugin.dll"
+            "testmodulea.dll"
+            "testmoduleb.dll"
+        } delete-output-files
     ] with-updated-git-repo ;
 
 : latest-libressl ( -- path )

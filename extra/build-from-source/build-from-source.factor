@@ -35,6 +35,12 @@ ERROR: no-output-file path ;
 : copy-output-files ( seq -- )
     [ copy-output-file ] each ;
 
+: delete-output-file ( name -- )
+    dll-out-directory prepend-path ?delete-file ;
+
+: delete-output-files ( seq -- )
+    [ delete-output-file ] each ;
+
 : with-build-directory-as ( name quot -- )
     [ prepend-current-path dup remake-directory ] dip with-directory ; inline
 
