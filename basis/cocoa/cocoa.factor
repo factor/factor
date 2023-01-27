@@ -66,6 +66,7 @@ SYNTAX: IMPORT: scan-token [ ] import-objc-class ;
         "NSError"
         "NSEvent"
         "NSException"
+        "NSFontManager"
         "NSImage"
         "NSMenu"
         "NSMenuItem"
