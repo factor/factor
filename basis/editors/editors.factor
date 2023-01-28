@@ -1,11 +1,12 @@
 ! Copyright (C) 2005, 2009 Slava Pestov.
 ! See https://factorcode.org/license.txt for BSD license.
 USING: accessors assocs calendar classes.parser
-classes.singleton continuations debugger definitions io
-io.launcher io.pathnames kernel lexer namespaces prettyprint
-sequences sets source-files.errors splitting strings threads
-tools.crossref vocabs vocabs.files vocabs.hierarchy
-vocabs.loader vocabs.metadata vocabs.parser words ;
+classes.singleton combinators.smart continuations debugger
+definitions io io.launcher io.pathnames kernel lexer namespaces
+parser.notes prettyprint sequences sets source-files.errors
+splitting strings threads tools.crossref tools.scaffold vocabs
+vocabs.files vocabs.hierarchy vocabs.loader vocabs.metadata
+vocabs.parser words ;
 IN: editors
 
 SYMBOL: editor-class
@@ -20,16 +21,43 @@ INITIALIZED-SYMBOL: editors [ HS{ } clone ]
     available-editors
     [ [ "Load " prepend ] keep ] { } map>assoc ;
 
-SYNTAX: EDITOR:
-    scan-new-class [ define-singleton-class ] [ editors get-global adjoin ] bi ;
+: define-editor ( word -- )
+    [ define-singleton-class ] [ editors get-global adjoin ] bi ;
 
-SYNTAX: SET-EDITOR:
-    scan-token [ "editors." prepend use-vocab ] [ search ] bi editor-class set-global ;
+SYNTAX: EDITOR: scan-new-class define-editor ;
+
+: set-editor ( string -- )
+    "editors." ?head drop
+    [ "editors." prepend t parser-quiet? [ use-vocab ] with-variable ] [ search ] bi
+    editor-class set-global ;
+
+SYNTAX: SET-EDITOR: scan-token set-editor ;
 
 HOOK: editor-command editor-class ( file line -- command )
 
+: write-pprint ( obj -- ) dup string? [ write ] [ pprint ] if ;
+: print-pprint ( obj -- ) dup string? [ print ] [ pprint nl ] if ;
+
+: pprint-line ( seq -- )
+    [
+        dup string?
+        [ print ]
+        [ unclip-last [ [ write-pprint ] each ] [ print-pprint ] bi* ] if
+    ] unless-empty ; inline
+
 M: f editor-command
-    "Select an editor" editor-restarts throw-restarts reload
+    "Select an editor" editor-restarts throw-restarts
+    [ set-editor ]
+    [
+        '[
+            "To make this editor permanent, in your "
+            ".factor-boot-rc" home-path
+            " or "
+            ".factor-rc" home-path
+            " add:\n"
+            "USE: editors SET-EDITOR: " _ append
+        ] output>array "Note:" print pprint-line
+    ] bi
     editor-command ;
 
 HOOK: editor-detached? editor-class ( -- ? )
