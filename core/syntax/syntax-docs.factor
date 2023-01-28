@@ -504,23 +504,16 @@ HELP: SYMBOLS:
 { $description "Creates a new symbol for every token until the " { $snippet ";" } "." }
 { $examples { $example "USING: prettyprint ;" "IN: scratchpad" "SYMBOLS: foo bar baz ;\nfoo . bar . baz ." "foo\nbar\nbaz" } } ;
 
-HELP: INITIALIZE:
-{ $syntax "INITIALIZE: word ... ;"  }
-{ $description "If " { $snippet "word" } " does not have a value in the global namespace, calls the definition and assigns the result to " { $snippet "word" } " in the global namespace." }
+HELP: INITIALIZED-SYMBOL:
+{ $syntax "INITIALIZE-SYMBOL: word [ ... ]"  }
+{ $description "Defines a new symbol " { $snippet "word" } " and sets the value in the global namespace." }
 { $examples
     { $unchecked-example
         "USING: math namespaces prettyprint ;"
-        "SYMBOL: foo"
-        "INITIALIZE: foo 15 sq ;"
+        "INITIALIZED-SYMBOL: foo [ 15 sq ]"
         "foo get-global ."
-        "225" }
-    { $unchecked-example
-        "USING: math namespaces prettyprint ;"
-        "SYMBOL: foo"
-        "1234 foo set-global"
-        "INITIALIZE: foo 15 sq ;"
-        "foo get-global ."
-        "1234" }
+        "225"
+    }
 } ;
 
 HELP: SINGLETON:
