@@ -1,7 +1,7 @@
 USING: editors kernel make namespaces ;
 IN: editors.xcode
 
-EDITOR: xcode
+SINGLETON: xcode
 
 M: xcode editor-command
     drop

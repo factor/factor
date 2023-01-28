@@ -3,7 +3,7 @@ math.parser namespaces sequences system ;
 
 IN: editors.cudatext
 
-EDITOR: cudatext
+SINGLETON: cudatext
 
 HOOK: find-cudatext-path os ( -- path )
 

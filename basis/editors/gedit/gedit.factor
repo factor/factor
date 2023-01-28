@@ -4,7 +4,7 @@ USING: editors io.launcher io.standard-paths kernel make
 math.parser namespaces sequences ;
 IN: editors.gedit
 
-EDITOR: gedit
+SINGLETON: gedit
 
 : gedit-path ( -- path )
     \ gedit-path get [

@@ -4,7 +4,7 @@ USING: editors io.standard-paths kernel make math math.parser
 namespaces sequences system ;
 IN: editors.10x
 
-EDITOR: 10x-editor
+SINGLETON: 10x-editor
 
 SYMBOL: 10x-editor-path
 

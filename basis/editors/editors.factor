@@ -11,8 +11,6 @@ IN: editors
 
 SYMBOL: editor-class
 
-INITIALIZED-SYMBOL: editors [ HS{ } clone ]
-
 : available-editors ( -- seq )
     "editors" disk-child-vocab-names
     { "editors.ui" "editors.private" } diff ;
@@ -21,17 +19,13 @@ INITIALIZED-SYMBOL: editors [ HS{ } clone ]
     available-editors
     [ [ "Load " prepend ] keep ] { } map>assoc ;
 
-: define-editor ( word -- )
-    [ define-singleton-class ] [ editors get-global adjoin ] bi ;
-
-SYNTAX: EDITOR: scan-new-class define-editor ;
-
 : set-editor ( string -- )
     "editors." ?head drop
-    [ "editors." prepend t parser-quiet? [ use-vocab ] with-variable ] [ search ] bi
+    [ "editors." prepend t parser-quiet? [ use-vocab ] with-variable ]
+    [ search ] bi
     editor-class set-global ;
 
-SYNTAX: SET-EDITOR: scan-token set-editor ;
+SYNTAX: EDITOR: scan-token set-editor ;
 
 HOOK: editor-command editor-class ( file line -- command )
 
@@ -55,7 +49,7 @@ M: f editor-command
             " or "
             ".factor-rc" home-path
             " add:\n"
-            "USE: editors SET-EDITOR: " _ append
+            "USE: editors EDITOR: " _ append
         ] output>array "Note:" print pprint-line
     ] bi
     editor-command ;

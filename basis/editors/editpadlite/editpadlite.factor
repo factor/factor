@@ -2,7 +2,7 @@ USING: combinators.short-circuit editors io.standard-paths
 kernel make namespaces ;
 IN: editors.editpadlite
 
-EDITOR: editpadlite
+SINGLETON: editpadlite
 
 : editpadlite-path ( -- path )
     \ editpadlite-path get [

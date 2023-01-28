@@ -8,7 +8,7 @@ USING: editors io.pathnames io.standard-paths kernel make
 math.parser namespaces sequences system ;
 IN: editors.aquamacs
 
-EDITOR: aquamacs
+SINGLETON: aquamacs
 
 HOOK: find-aquamacs-path os ( -- path )
 

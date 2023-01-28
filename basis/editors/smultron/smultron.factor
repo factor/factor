@@ -1,7 +1,7 @@
 USING: editors kernel make namespaces ;
 IN: editors.smultron
 
-EDITOR: smultron
+SINGLETON: smultron
 
 M: smultron editor-command
     drop

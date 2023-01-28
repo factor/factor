@@ -5,7 +5,7 @@ IN: editors.gvim
 ! This code builds on the code in editors.vim; see there for
 ! more information.
 
-EDITOR: gvim
+SINGLETON: gvim
 
 INSTANCE: gvim vim-base
 

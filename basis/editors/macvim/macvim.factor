@@ -2,7 +2,7 @@ USING: editors editors.vim io.pathnames io.standard-paths kernel
 namespaces ;
 IN: editors.macvim
 
-EDITOR: macvim
+SINGLETON: macvim
 
 INSTANCE: macvim vim-base
 
