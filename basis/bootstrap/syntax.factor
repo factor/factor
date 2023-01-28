@@ -44,7 +44,7 @@ IN: bootstrap.syntax
         "BUILTIN:"
         "SYMBOL:"
         "SYMBOLS:"
-        "INITIALIZE:"
+        "INITIALIZED-SYMBOL:"
         "CONSTANT:"
         "TUPLE:"
         "final"

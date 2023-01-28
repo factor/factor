@@ -50,6 +50,7 @@ CONSTANT: word-renames {
     { "map-integers" { "map-integers-as" "0.99" } }
     { "deep-subseq?" { "deep-subseq-of?" "0.99" } }
     { "overtomorrow" { "overmorrow" "0.99" } }
+    { "INITIALIZE:" { "INITIALIZED-SYMBOL:" "0.99" } }
 }
 
 : compute-assoc-fixups ( continuation name assoc -- seq )

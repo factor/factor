@@ -135,8 +135,8 @@ IN: bootstrap.syntax
         ";" [ create-word-in [ reset-generic ] [ define-symbol ] bi ] each-token
     ] define-core-syntax
 
-    "INITIALIZE:" [
-        scan-word parse-definition [ initialize ] 2curry append!
+    "INITIALIZED-SYMBOL:" [
+        scan-new-word [ define-symbol ] [ scan-object [ initialize ] 2curry ] bi append!
     ] define-core-syntax
 
     "SINGLETONS:" [
