@@ -14,7 +14,7 @@ io.pathnames io.standard-paths kernel make math math.parser
 namespaces sequences system vocabs ;
 IN: editors.textadept
 
-EDITOR: textadept
+SINGLETON: textadept
 
 HOOK: find-textadept-path os ( -- path )
 

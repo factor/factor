@@ -10,7 +10,7 @@ IN: editors.visual-studio-code
 
 MIXIN: visual-studio-code-base
 
-EDITOR: visual-studio-code
+SINGLETON: visual-studio-code
 
 INSTANCE: visual-studio-code visual-studio-code-base
 

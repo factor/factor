@@ -1,7 +1,7 @@
 USING: editors kernel make namespaces ;
 IN: editors.bluefish
 
-EDITOR: bluefish
+SINGLETON: bluefish
 
 M: bluefish editor-command
     drop

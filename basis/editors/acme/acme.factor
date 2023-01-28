@@ -4,7 +4,7 @@ USING: arrays editors environment io.files.info io.pathnames
 kernel make math.parser namespaces sequences ;
 IN: editors.acme
 
-EDITOR: acme
+SINGLETON: acme
 
 : plan9-path ( -- path )
   \ plan9-path get [

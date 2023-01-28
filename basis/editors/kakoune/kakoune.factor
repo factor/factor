@@ -2,7 +2,7 @@ USING: editors io.standard-paths kernel make math.parser
 namespaces sequences strings ;
 IN: editors.kakoune
 
-EDITOR: kakoune
+SINGLETON: kakoune
 
 SYMBOL: kak-path
 

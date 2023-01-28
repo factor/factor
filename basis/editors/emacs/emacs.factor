@@ -2,7 +2,7 @@ USING: combinators.short-circuit editors io.standard-paths
 kernel make math.parser namespaces sequences system vocabs ;
 IN: editors.emacs
 
-EDITOR: emacs
+SINGLETON: emacs
 
 SYMBOL: emacsclient-path
 SYMBOL: emacsclient-args

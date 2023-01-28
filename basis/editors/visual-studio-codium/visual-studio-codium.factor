@@ -5,7 +5,7 @@ io.pathnames io.standard-paths kernel namespaces system
 tools.which ;
 IN: editors.visual-studio-codium
 
-EDITOR: visual-studio-codium
+SINGLETON: visual-studio-codium
 
 INSTANCE: visual-studio-codium visual-studio-code-base
 

@@ -2,7 +2,7 @@ USING: editors kernel make namespaces ;
 
 IN: editors.espresso
 
-EDITOR: espresso
+SINGLETON: espresso
 
 M: espresso editor-command
     drop
