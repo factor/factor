@@ -5,9 +5,7 @@ io.standard-paths kernel make math.parser namespaces sequences
 system ;
 IN: editors.sublime
 
-SINGLETON: sublime
-
-editor-class [ sublime ] initialize
+EDITOR: sublime
 
 HOOK: find-sublime-path os ( -- path )
 

@@ -3,9 +3,7 @@ math.parser namespaces sequences system ;
 
 IN: editors.lapce
 
-SINGLETON: lapce
-
-editor-class [ lapce ] initialize
+EDITOR: lapce
 
 HOOK: find-lapce-path os ( -- path )
 

@@ -3,9 +3,7 @@ math.parser namespaces sequences system ;
 
 IN: editors.kate
 
-SINGLETON: kate
-
-editor-class [ kate ] initialize
+EDITOR: kate
 
 HOOK: find-kate-path os ( -- path )
 

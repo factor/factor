@@ -1,15 +1,15 @@
 ! Copyright (C) 2018 Doug Coleman.
 ! See https://factorcode.org/license.txt for BSD license.
-USING: accessors editors kernel namespaces sequences ui
-ui.gadgets ui.gadgets.borders ui.gadgets.buttons
+USING: accessors editors kernel namespaces sequences splitting
+ui ui.gadgets ui.gadgets.borders ui.gadgets.buttons
 ui.gadgets.packs ui.gadgets.scrollers ui.tools.listener
-vocabs.loader ;
+vocabs.loader vocabs.parser ;
 IN: editors.ui
 
 : <reload-editor-button> ( editor -- button )
     dup '[
-        drop
-        [ f editor-class set-global _ reload ]
+        drop 
+        [ _ [ reload ] [ use-vocab ] [ "editors." ?head drop search editor-class set-global ] tri ]
         \ run call-listener
     ] <border-button> ;
 

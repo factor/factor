@@ -11,9 +11,7 @@ IN: editors.textwrangler
 
 ! Note that launching with ``open -a`` does not support line numbers.
 
-SINGLETON: textwrangler
-
-editor-class [ textwrangler ] initialize
+EDITOR: textwrangler
 
 M: textwrangler editor-command
     "edit" find-in-path [

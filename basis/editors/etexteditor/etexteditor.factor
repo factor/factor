@@ -4,9 +4,7 @@ USING: editors io.standard-paths kernel make math.parser
 namespaces ;
 IN: editors.etexteditor
 
-SINGLETON: etexteditor
-
-editor-class [ etexteditor ] initialize
+EDITOR: etexteditor
 
 : etexteditor-path ( -- str )
     \ etexteditor-path get [
