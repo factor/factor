@@ -2,9 +2,7 @@ USING: editors io.standard-paths kernel make math.parser
 namespaces ;
 IN: editors.editplus
 
-SINGLETON: editplus
-
-editor-class [ editplus ] initialize
+EDITOR: editplus
 
 : editplus-path ( -- path )
     \ editplus-path get [

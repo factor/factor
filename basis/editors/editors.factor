@@ -24,7 +24,7 @@ SYNTAX: EDITOR:
     scan-new-class [ define-singleton-class ] [ editors get-global adjoin ] bi ;
 
 SYNTAX: SET-EDITOR:
-    scan-token [ "editors." prepend require ] [ search ] bi editor-class set-global ;
+    scan-token [ "editors." prepend use-vocab ] [ search ] bi editor-class set-global ;
 
 HOOK: editor-command editor-class ( file line -- command )
 

@@ -2,9 +2,7 @@ USING: combinators.short-circuit editors io.pathnames
 io.standard-paths kernel make namespaces strings system ;
 IN: editors.lite-xl
 
-SINGLETON: lite-xl
-
-editor-class [ lite-xl ] initialize
+EDITOR: lite-xl
 
 SYMBOL: lite-xl-editor-path
 

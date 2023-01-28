@@ -2,9 +2,7 @@ USING: editors io.files io.launcher io.standard-paths kernel
 math.parser namespaces sequences make ;
 IN: editors.ted-notepad
 
-SINGLETON: ted-notepad
-
-editor-class [ ted-notepad ] initialize
+EDITOR: ted-notepad
 
 : ted-notepad-path ( -- path )
     \ ted-notepad-path get [

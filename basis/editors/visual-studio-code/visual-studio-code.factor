@@ -10,11 +10,9 @@ IN: editors.visual-studio-code
 
 MIXIN: visual-studio-code-base
 
-SINGLETON: visual-studio-code
+EDITOR: visual-studio-code
 
 INSTANCE: visual-studio-code visual-studio-code-base
-
-editor-class [ visual-studio-code ] initialize
 
 HOOK: find-visual-studio-code-path editor-class ( -- path )
 

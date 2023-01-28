@@ -5,11 +5,9 @@ io.pathnames io.standard-paths kernel namespaces system
 tools.which ;
 IN: editors.visual-studio-codium
 
-SINGLETON: visual-studio-codium
+EDITOR: visual-studio-codium
 
 INSTANCE: visual-studio-codium visual-studio-code-base
-
-editor-class [ visual-studio-codium ] initialize
 
 M: visual-studio-codium find-visual-studio-code-path
     os {

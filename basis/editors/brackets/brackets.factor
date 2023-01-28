@@ -4,9 +4,7 @@ USING: editors io.pathnames io.standard-paths kernel make
 namespaces system vocabs ;
 IN: editors.brackets
 
-SINGLETON: brackets
-
-editor-class [ brackets ] initialize
+EDITOR: brackets
 
 HOOK: brackets-path os ( -- path )
 

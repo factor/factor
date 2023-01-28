@@ -2,9 +2,7 @@ USING: combinators.short-circuit editors io.standard-paths
 kernel make math.parser namespaces sequences ;
 IN: editors.editpadpro
 
-SINGLETON: editpadpro
-
-editor-class [ editpadpro ] initialize
+EDITOR: editpadpro
 
 : editpadpro-path ( -- path )
     \ editpadpro-path get [

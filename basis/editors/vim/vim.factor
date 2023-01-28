@@ -2,13 +2,11 @@ USING: editors io.standard-paths kernel make math.parser
 namespaces sequences strings ;
 IN: editors.vim
 
-SINGLETON: vim
+EDITOR: vim
 
 MIXIN: vim-base
 
 INSTANCE: vim vim-base
-
-editor-class [ vim ] initialize
 
 SYMBOL: vim-path
 
