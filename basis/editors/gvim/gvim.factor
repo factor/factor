@@ -5,12 +5,9 @@ IN: editors.gvim
 ! This code builds on the code in editors.vim; see there for
 ! more information.
 
-SINGLETON: gvim
+EDITOR: gvim
 
 INSTANCE: gvim vim-base
-
-editor-class get-global dup [ vim? not ] when
-[ gvim editor-class set-global ] unless
 
 HOOK: find-gvim-path io-backend ( -- path )
 

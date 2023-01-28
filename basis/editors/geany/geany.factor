@@ -4,9 +4,7 @@ USING: combinators.short-circuit editors io.standard-paths
 kernel make math.parser namespaces system ;
 IN: editors.geany
 
-SINGLETON: geany
-
-editor-class [ geany ] initialize
+EDITOR: geany
 
 SYMBOL: geany-path
 

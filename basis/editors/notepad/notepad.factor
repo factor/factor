@@ -5,9 +5,7 @@ kernel namespaces sequences windows.shell32 ;
 
 IN: editors.notepad
 
-SINGLETON: notepad
-
-editor-class [ notepad ] initialize
+EDITOR: notepad
 
 : notepad-path ( -- path )
     \ notepad-path get [

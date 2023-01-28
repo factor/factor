@@ -2,9 +2,7 @@ USING: editors io.files io.launcher kernel math.parser
 namespaces sequences windows.shell32 make io.pathnames ;
 IN: editors.notepad2
 
-SINGLETON: notepad2
-
-editor-class [ notepad2 ] initialize
+EDITOR: notepad2
 
 : notepad2-path ( -- path )
     \ notepad2-path get [

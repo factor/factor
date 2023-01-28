@@ -2,9 +2,7 @@ USING: editors io.standard-paths kernel make math.parser
 namespaces sequences ;
 IN: editors.textpad
 
-SINGLETON: textpad
-
-editor-class [ textpad ] initialize
+EDITOR: textpad
 
 : textpad-path ( -- path )
     \ textpad-path get-global [

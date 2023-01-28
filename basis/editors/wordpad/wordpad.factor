@@ -1,9 +1,7 @@
 USING: arrays editors io.standard-paths kernel namespaces ;
 IN: editors.wordpad
 
-SINGLETON: wordpad
-
-editor-class [ wordpad ] initialize
+EDITOR: wordpad
 
 : wordpad-path ( -- path )
     \ wordpad-path get [

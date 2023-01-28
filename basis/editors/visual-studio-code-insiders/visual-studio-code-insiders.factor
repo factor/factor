@@ -5,11 +5,9 @@ io.pathnames io.standard-paths kernel namespaces system
 tools.which ;
 IN: editors.visual-studio-code-insiders
 
-SINGLETON: visual-studio-code-insiders
+EDITOR: visual-studio-code-insiders
 
 INSTANCE: visual-studio-code-insiders visual-studio-code-base
-
-editor-class [ visual-studio-code-insiders ] initialize
 
 M: visual-studio-code-insiders find-visual-studio-code-path
     os {

@@ -5,9 +5,7 @@ USING: editors io.standard-paths kernel make math.parser
 namespaces sequences system ;
 IN: editors.scite
 
-SINGLETON: scite
-
-editor-class [ scite ] initialize
+EDITOR: scite
 
 SYMBOL: scite-path
 

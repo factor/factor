@@ -2,9 +2,7 @@ USING: editors io.standard-paths kernel make math.parser
 namespaces sequences ;
 IN: editors.notepad++
 
-SINGLETON: notepad++
-
-editor-class [ notepad++ ] initialize
+EDITOR: notepad++
 
 : notepad++-path ( -- path )
     \ notepad++-path get [

@@ -1,9 +1,7 @@
 USING: editors kernel make namespaces ;
 IN: editors.nova
 
-SINGLETON: nova
-
-editor-class [ nova ] initialize
+EDITOR: nova
 
 M: nova editor-command
     drop

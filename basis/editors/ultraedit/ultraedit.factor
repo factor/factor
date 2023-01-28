@@ -2,9 +2,7 @@ USING: editors io.pathnames io.standard-paths kernel make
 math.parser namespaces system ;
 IN: editors.ultraedit
 
-SINGLETON: ultraedit
-
-editor-class [ ultraedit ] initialize
+EDITOR: ultraedit
 
 HOOK: find-ultraedit os ( -- path )
 
