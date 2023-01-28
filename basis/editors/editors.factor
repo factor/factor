@@ -43,6 +43,7 @@ M: f editor-command
     "Select an editor" editor-restarts throw-restarts
     [ set-editor ]
     [
+        "Note:" print
         '[
             "To make this editor permanent, in your "
             ".factor-boot-rc" home-path
@@ -50,7 +51,7 @@ M: f editor-command
             ".factor-rc" home-path
             " add:\n"
             "USE: editors EDITOR: " _ append
-        ] output>array "Note:" print pprint-line
+        ] output>array pprint-line
     ] bi
     editor-command ;
 
