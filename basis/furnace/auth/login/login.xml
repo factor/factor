@@ -2,7 +2,6 @@
 
 <t:chloe xmlns:t="http://factorcode.org/chloe/1.0">
 
-    <div style="padding: 10px;">
 	<t:title>Login</t:title>
 
 	<t:if t:value="description">
@@ -52,5 +51,5 @@
 			<t:a t:href="recover-password">Recover Password</t:a>
 		</t:if>
 	</p>
-    </div>
+
 </t:chloe>
