@@ -1,13 +1,16 @@
 ! Copyright (C) 2005, 2009 Slava Pestov.
 ! See https://factorcode.org/license.txt for BSD license.
-USING: accessors assocs calendar continuations debugger
-definitions io io.launcher io.pathnames kernel lexer namespaces
-prettyprint sequences sets source-files.errors splitting strings
-threads tools.crossref vocabs vocabs.files vocabs.hierarchy
-vocabs.loader vocabs.metadata words ;
+USING: accessors assocs calendar classes.parser
+classes.singleton continuations debugger definitions io
+io.launcher io.pathnames kernel lexer namespaces prettyprint
+sequences sets source-files.errors splitting strings threads
+tools.crossref vocabs vocabs.files vocabs.hierarchy
+vocabs.loader vocabs.metadata vocabs.parser words ;
 IN: editors
 
 SYMBOL: editor-class
+
+INITIALIZED-SYMBOL: editors [ HS{ } clone ]
 
 : available-editors ( -- seq )
     "editors" disk-child-vocab-names
@@ -18,7 +21,10 @@ SYMBOL: editor-class
     [ [ "Load " prepend ] keep ] { } map>assoc ;
 
 SYNTAX: EDITOR:
-    f editor-class set-global "editors." scan-token append reload ;
+    scan-new-class [ define-singleton-class ] [ editors get-global adjoin ] bi ;
+
+SYNTAX: SET-EDITOR:
+    scan-token [ "editors." prepend require ] [ search ] bi editor-class set-global ;
 
 HOOK: editor-command editor-class ( file line -- command )
 
