@@ -5,9 +5,9 @@ sequences.private ;
 IN: ranges
 
 TUPLE: range
-{ from read-only }
-{ length read-only }
-{ step read-only } ;
+{ from number read-only }
+{ length integer read-only }
+{ step number read-only } ;
 
 <PRIVATE
 
