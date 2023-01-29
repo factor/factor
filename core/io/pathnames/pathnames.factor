@@ -147,6 +147,8 @@ HOOK: home io-backend ( -- dir )
 
 M: object home "" resource-path ;
 
+: home-path ( path -- newpath ) home prepend-path ;
+
 GENERIC: vocab-path ( path -- newpath )
 
 GENERIC: absolute-path ( path -- path' )
@@ -226,3 +228,6 @@ C: <pathname> pathname
 M: pathname absolute-path string>> absolute-path ;
 
 M: pathname <=> [ string>> ] compare ;
+
+: >pathname ( obj -- pathname )
+    dup pathname? [ <pathname> ] unless ;
