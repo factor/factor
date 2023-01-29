@@ -190,10 +190,6 @@ nav input {
         filter: invert(80%);
     }
 
-    nav input {
-        font-size: smaller;
-    }
-
     #left {
         border: none;
         border-left: 1px solid #666;
