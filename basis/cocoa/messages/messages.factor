@@ -220,9 +220,11 @@ ERROR: no-objc-type name ;
 : method-return-type ( method -- ctype )
     method_copyReturnType
     [
-        utf8 alien>string dup string>number
-        [ "unknown obcj return type: " prepend print f ]
-        [ parse-objc-type ] if
+        utf8 alien>string dup string>number [
+            "unknown objc return type: " prepend
+            [ print ] with-output>error
+            f
+        ] [ parse-objc-type ] if
     ] keep (free) ;
 
 : method-signature ( method -- signature )
