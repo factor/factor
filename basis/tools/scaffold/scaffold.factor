@@ -373,17 +373,12 @@ ${example-indent}}
 : scaffold-examples ( word -- )
     2 swap scaffold-n-examples ;
 
-: ?<pathname> ( obj -- pathname )
-    dup pathname? [ <pathname> ] unless ;
-
 : scaffold-file ( path -- )
     [ touch-file ]
-    [ "Click to edit: " write ?<pathname> . ] bi ;
-
-: home-path ( path -- pathname ) home prepend-path ?<pathname> ;
+    [ "Click to edit: " write >pathname . ] bi ;
 
 : scaffold-rc ( path -- )
-    home-path scaffold-file ;
+    home-path >pathname scaffold-file ;
 
 : scaffold-factor-boot-rc ( -- )
     ".factor-boot-rc" scaffold-rc ;
