@@ -52,7 +52,7 @@ UNION: irrelevant ##peek ##replace ##inc ;
 : split-instructions? ( insns -- ? ) [ irrelevant? not ] count 5 <= ;
 
 : short-tail-block? ( bb -- ? )
-    [ successors>> empty? ] [ instructions>> length 2 = ] bi and ;
+    { [ successors>> empty? ] [ instructions>> length 2 = ] } 1&& ;
 
 : short-block? ( bb -- ? )
     ! If block is empty, always split

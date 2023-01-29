@@ -132,7 +132,7 @@ SYMBOL: changed?
 GENERIC: optimize-modular-arithmetic* ( node -- nodes )
 
 M: #push optimize-modular-arithmetic*
-    dup [ out-d>> first modular-value? ] [ literal>> real? ] bi and
+    dup { [ out-d>> first modular-value? ] [ literal>> real? ] } 1&&
     [ [ >fixnum ] change-literal ] when ;
 
 : redundant->fixnum? ( #call -- ? )
