@@ -16,12 +16,6 @@ M: #push propagate-before
     [ literal>> <literal-info> ] [ out-d>> first ] bi
     set-value-info ;
 
-: refine-value-infos ( classes/f values -- )
-    [ refine-value-info ] 2each ;
-
-: set-value-infos ( infos values -- )
-    [ set-value-info ] 2each ;
-
 M: #declare propagate-before
     ! We need to force the caller word to recompile when the
     ! classes mentioned in the declaration are redefined, since

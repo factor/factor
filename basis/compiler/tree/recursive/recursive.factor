@@ -87,7 +87,7 @@ SYMBOL: changed?
     label>> dup not-a-loop? [ drop ] [
         recursive-nesting get <reversed> [
             2dup label>> eq? [ 2drop f ] [
-                [ label>> not-a-loop? ] [ tail?>> not ] bi or
+                { [ label>> not-a-loop? ] [ tail?>> not ] } 1||
                 [ not-a-loop changed? on ] [ drop ] if t
             ] if
         ] with all? drop
