@@ -13,7 +13,8 @@ SYMBOL: editor-class
 
 : available-editors ( -- seq )
     "editors" disk-child-vocab-names
-    { "editors.ui" "editors.private" } diff ;
+    { "editors.ui" "editors.private" } diff
+    [ vocab-platforms supported-platform? ] filter ;
 
 : editor-restarts ( -- alist )
     available-editors
