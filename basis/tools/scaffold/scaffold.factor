@@ -378,7 +378,7 @@ ${example-indent}}
     [ "Click to edit: " write >pathname . ] bi ;
 
 : scaffold-rc ( path -- )
-    home-path >pathname scaffold-file ;
+    home-path scaffold-file ;
 
 : scaffold-factor-boot-rc ( -- )
     ".factor-boot-rc" scaffold-rc ;
