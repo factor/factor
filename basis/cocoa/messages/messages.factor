@@ -250,7 +250,7 @@ ERROR: no-objc-type name ;
 : each-method-in-class ( class quot: ( classname method -- ) -- )
     [
         [ class_getName ] keep
-        { uint } [ class_copyMethodList ] with-out-parameters
+        0 uint <ref> [ class_copyMethodList ] keep uint deref
     ] dip over 0 = [ 4drop ] [
         [ void* <c-direct-array> ] dip
         [ with each ] [ drop (free) ] 2bi
