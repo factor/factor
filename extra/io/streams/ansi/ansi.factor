@@ -54,10 +54,10 @@ C: <ansi> ansi
 M:: ansi stream-format ( str style stream -- )
     stream stream>> :> out
     style foreground of [ color>foreground out stream-write t ] [ f ] if*
-    style background of [ color>background out stream-write t ] [ f ] if*
-    style font-style of [ font-styles out stream-write t ] [ f ] if*
+    style background of [ color>background out stream-write drop t ] when*
+    style font-style of [ font-styles out stream-write drop t ] when*
     str out stream-write
-    or or [ "\e[0m" out stream-write ] when ;
+    [ "\e[0m" out stream-write ] when ;
 
 M: ansi make-span-stream
     swap <style-stream> <ignore-close-stream> ;
