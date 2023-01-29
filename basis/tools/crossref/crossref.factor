@@ -1,10 +1,11 @@
 ! Copyright (C) 2005, 2010 Slava Pestov.
 ! See https://factorcode.org/license.txt for BSD license.
-USING: accessors arrays assocs combinators.smart compiler.units
-generic generic.single hash-sets.identity hashtables help
-help.crossref help.markup help.topics init io io.pathnames
-io.styles kernel namespaces quotations see sequences sets
-sorting source-files threads vocabs words ;
+USING: accessors arrays assocs combinators.short-circuit
+combinators.smart compiler.units generic generic.single
+hash-sets.identity hashtables help help.crossref help.markup
+help.topics init io io.pathnames io.styles kernel namespaces
+quotations see sequences sets sorting source-files threads
+vocabs words ;
 IN: tools.crossref
 
 SYMBOL: crossref
@@ -118,7 +119,7 @@ M: f smart-usage drop \ f smart-usage ;
 : vocab-xref ( vocab quot: ( defspec -- seq ) -- vocabs )
     [ [ vocab-name ] [ vocab-words [ generic? ] reject ] bi ] dip map
     [
-        [ [ word? ] [ generic? not ] bi and ] filter [
+        [ { [ word? ] [ generic? not ] } 1&& ] filter [
             dup method?
             [ "method-generic" word-prop ] when
             vocabulary>>
