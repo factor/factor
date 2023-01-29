@@ -2,10 +2,10 @@
 ! See https://factorcode.org/license.txt for BSD license.
 USING: accessors alien alien.c-types alien.data alien.strings
 arrays assocs classes.struct cocoa.runtime cocoa.types
-combinators core-graphics.types generalizations
-io.encodings.utf8 kernel layouts libc make math namespaces
-sequences sets specialized-arrays splitting stack-checker
-strings words ;
+combinators core-graphics.types generalizations io
+io.encodings.utf8 kernel layouts libc make math math.parser
+namespaces sequences sets specialized-arrays
+splitting stack-checker strings words ;
 QUALIFIED-WITH: alien.c-types c
 IN: cocoa.messages
 
@@ -219,8 +219,11 @@ ERROR: no-objc-type name ;
 
 : method-return-type ( method -- ctype )
     method_copyReturnType
-    [ utf8 alien>string parse-objc-type ] keep
-    (free) ;
+    [
+        utf8 alien>string dup string>number
+        [ "unknown obcj return type: " prepend print f ]
+        [ parse-objc-type ] if
+    ] keep (free) ;
 
 : method-signature ( method -- signature )
     [ method-return-type ] [ method-arg-types ] bi 2array ;
@@ -232,9 +235,11 @@ ERROR: no-objc-type name ;
     method method-signature :> signature
     method method-name :> name
     classname "." name 3append :> fullname
-    signature cache-stubs
-    signature name objc-methods get set-at
-    signature fullname objc-methods get set-at ;
+    signature first [
+        signature cache-stubs
+        signature name objc-methods get set-at
+        signature fullname objc-methods get set-at
+    ] when ;
 
 : method-collisions ( -- collisions )
     objc-methods get >alist
