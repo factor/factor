@@ -2,9 +2,9 @@
 ! See https://factorcode.org/license.txt for BSD license.
 USING: accessors alien alien.c-types alien.data alien.strings
 arrays assocs classes.struct cocoa.runtime cocoa.types
-combinators continuations core-graphics.types generalizations io
-io.encodings.utf8 kernel layouts libc make math math.parser
-namespaces sequences sets specialized-arrays
+combinators continuations core-graphics.types destructors
+generalizations io io.encodings.utf8 kernel layouts libc make math
+math.parser namespaces sequences sets specialized-arrays
 splitting stack-checker strings words ;
 QUALIFIED-WITH: alien.c-types c
 IN: cocoa.messages
@@ -290,3 +290,11 @@ ERROR: no-objc-type name ;
 
 : root-class ( class -- root )
     dup class_getSuperclass [ root-class ] [ ] ?if ;
+
+: objc-class-names ( -- seq )
+    [
+        f 0 objc_getClassList
+        [ Class heap-size * malloc &free ] keep
+        dupd objc_getClassList void* <c-direct-array>
+        [ class_getName ] { } map-as
+    ] with-destructors ;
