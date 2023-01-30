@@ -7,6 +7,7 @@ cpu.arm.assembler.64 cpu.arm.assembler.opcodes
 generic.single.private kernel kernel.private layouts
 locals.backend math math.private namespaces slots.private
 strings.private threads.private vocabs ;
+RENAME: STRuoff cpu.arm.assembler.32 => STRuoff32
 IN: bootstrap.assembler.arm
 
 8 \ cell set
@@ -46,6 +47,8 @@ big-endian off
 : pop-link-reg ( -- ) 16 stack-reg link-reg LDRpost ;
 
 : load0 ( -- ) 0 ds-reg temp0 LDRuoff ;
+: load1 ( -- ) -8 ds-reg temp1 LDUR ;
+: load2 ( -- ) -16 ds-reg temp2 LDUR ;
 : load1/0 ( -- ) -8 ds-reg temp0 temp1 LDPsoff ;
 : load2/1 ( -- ) -16 ds-reg temp1 temp2 LDPsoff ;
 : load2/1* ( -- ) -8 ds-reg temp1 temp2 LDPsoff ;
@@ -78,20 +81,41 @@ big-endian off
 
 :: tag ( reg -- ) tag-bits get reg reg LSLi ;
 :: untag ( reg -- ) tag-bits get reg reg ASRi ;
-: tagged>offset ( -- ) 1 temp0 temp0 ASRi ;
+: tagged>offset0 ( -- ) 1 temp0 temp0 ASRi ;
 
 : >r ( -- ) pop0 pushr ;
 : r> ( -- ) popr push0 ;
 
+: absolute-jump ( -- word class )
+    2 words temp0 LDRl
+    temp0 BR
+    NOP NOP f rc-absolute-cell ;
+
+: absolute-call ( -- word class )
+    5 words temp0 LDRl
+    push-link-reg
+    temp0 BLR
+    pop-link-reg
+    3 words Br
+    NOP NOP f rc-absolute-cell ;
+
+[
+    ! pic-tail-reg 5 [RIP+] LEA
+    ! why do we store the address after JMP in EBX, where is it
+    ! picked up?
+    ! 0 JMP f rc-relative rel-word-pic-tail
+    absolute-jump rel-word-pic-tail
+] JIT-WORD-JUMP jit-define
+
+[
+    ! 0 CALL f rc-relative rel-word-pic
+    absolute-call rel-word-pic
+] JIT-WORD-CALL jit-define
+
 : jit-call ( name -- )
     ! RAX 0 MOV f rc-absolute-cell rel-dlsym
     ! RAX CALL ;
-    push-link-reg
-    3 words temp0 LDRl
-    temp0 BLR
-    3 words Br
-    NOP NOP f rc-absolute-cell rel-dlsym
-    pop-link-reg ;
+    absolute-call rel-dlsym ;
 
 :: jit-call-1arg ( arg1s name -- )
     ! arg1 arg1s MOVr
@@ -106,16 +130,6 @@ big-endian off
     arg1s arg1 MOVr
     arg2s arg2 MOVr
     name jit-call ;
-
-[
-    ! pic-tail-reg 5 [RIP+] LEA
-    ! 0 JMP f rc-relative rel-word-pic-tail
-    4 words temp0 LDRl32
-    4 words temp1 ADR
-    temp1 temp0 temp0 ADDr
-    temp0 BR
-    NOP f rc-relative rel-word-pic-tail
-] JIT-WORD-JUMP jit-define
 
 : jit-load-vm ( -- ) ;
 
@@ -146,7 +160,6 @@ big-endian off
     context-retainstack-offset ctx-reg rs-reg LDRuoff ;
 
 [
-    push-link-reg
     ! ! ctx-reg is preserved across the call because it is non-volatile
     ! ! in the C ABI
     jit-save-context
@@ -155,23 +168,19 @@ big-endian off
     ! RAX 0 MOV f f rc-absolute-cell rel-dlsym
     ! RAX CALL
     vm-reg arg1 MOVr
-    3 words temp0 LDRl
-    temp0 BLR
-    3 words Br
-    NOP NOP f f rc-absolute-cell rel-dlsym
+    f jit-call
     jit-restore-context
-    pop-link-reg
 ] JIT-PRIMITIVE jit-define
 
 : jit-jump-quot ( -- )
     ! arg1 quot-entry-point-offset [+] JMP ;
-    quot-entry-point-offset arg1 temp0 LDRpre
+    quot-entry-point-offset arg1 temp0 LDUR
     temp0 BR ;
 
 : jit-call-quot ( -- )
     ! arg1 quot-entry-point-offset [+] CALL ;
     push-link-reg
-    quot-entry-point-offset arg1 temp0 LDRpre
+    quot-entry-point-offset arg1 temp0 LDUR
     temp0 BLR
     pop-link-reg ;
 
@@ -198,59 +207,29 @@ big-endian off
     vm-reg arg2 MOVr
     ! RAX 0 MOV rc-absolute-cell rel-inline-cache-miss
     ! RAX CALL
-    5 words temp0 LDRl
-    push-link-reg
-    temp0 BLR
-    pop-link-reg
-    3 words Br
-    NOP NOP rc-absolute-cell rel-inline-cache-miss
+    absolute-call nip rel-inline-cache-miss
     jit-load-context
     jit-restore-context ;
 
-[ jit-load-return-address jit-inline-cache-miss ]
-[
+[ jit-load-return-address jit-inline-cache-miss ] [
     ! RAX CALL
     push-link-reg
     temp0 BLR
     pop-link-reg
-]
-[
+] [
     ! RAX JMP
     temp0 BR
-]
-\ inline-cache-miss define-combinator-primitive
+] \ inline-cache-miss define-combinator-primitive
 
-[ jit-inline-cache-miss ]
-[
+[ jit-inline-cache-miss ] [
     ! RAX CALL
     push-link-reg
     temp0 BLR
     pop-link-reg
-]
-[
+] [
     ! RAX JMP
     temp0 BR
-]
-\ inline-cache-miss-tail define-combinator-primitive
-
-! Overflowing fixnum arithmetic
-: jit-overflow ( insn func -- )
-    ! ds-reg 8 SUB
-    jit-save-context
-    ! arg1 ds-reg [] MOV
-    ! arg2 ds-reg 8 [+] MOV
-    load-arg1/2
-    ! arg3 arg1 MOV
-    ! [ [ arg3 arg2 ] dip call ] dip
-    [ [ arg2 arg1 arg3 ] dip call ] dip
-    ! ds-reg [] arg3 MOV
-    push-down-arg3
-    ! [ JNO ]
-    [ VC B.cond ] [
-        ! arg3 vm-reg MOV
-        vm-reg arg3 MOVr
-        jit-call
-    ] jit-conditional ; inline
+] \ inline-cache-miss-tail define-combinator-primitive
 
 ! Contexts
 : jit-switch-context ( reg -- )
@@ -343,12 +322,451 @@ big-endian off
 
 [
     ! 0 [RIP+] EAX MOV rc-relative rel-safepoint
-    4 words temp0 LDRl32
-    4 words temp1 ADR
-    temp1 temp0 W0 STRr32
-    2 words Br
-    NOP rc-relative rel-safepoint
+    3 words temp0 LDRl
+    0 temp0 W0 STRuoff32
+    3 words Br
+    NOP NOP rc-absolute-cell rel-safepoint
 ] JIT-SAFEPOINT jit-define
+
+! C to Factor entry point
+[
+    0xabcd BRK
+    ! ! Optimizing compiler's side of callback accesses
+    ! ! arguments that are on the stack via the frame pointer.
+    ! ! On x86-32 fastcall, and x86-64, some arguments are passed
+    ! ! in registers, and so the only registers that are safe for
+    ! ! use here are frame-reg, nv-reg and vm-reg.
+    ! frame-reg PUSH
+    ! frame-reg stack-reg MOV
+
+    ! ! Save all non-volatile registers
+    ! nv-regs [ PUSH ] each
+    -16 SP X19 X18 STPpre
+    -16 SP X21 X20 STPpre
+    -16 SP X23 X22 STPpre
+    -16 SP X25 X24 STPpre
+    -16 SP X27 X26 STPpre
+    -16 SP X29 X28 STPpre
+    -16 SP X30 STRpre
+    stack-reg stack-frame-reg MOVsp
+
+    jit-save-tib
+
+    ! ! Load VM into vm-reg
+    ! vm-reg 0 MOV 0 rc-absolute-cell rel-vm
+    2 words vm-reg LDRl
+    3 words Br
+    NOP NOP 0 rc-absolute-cell rel-vm
+
+    ! ! Save old context
+    ! nv-reg vm-reg vm-context-offset [+] MOV
+    ! nv-reg PUSH
+    vm-context-offset vm-reg ctx-reg LDRuoff
+    8 SP ctx-reg STRuoff
+
+    ! ! Switch over to the spare context
+    ! nv-reg vm-reg vm-spare-context-offset [+] MOV
+    ! vm-reg vm-context-offset [+] nv-reg MOV
+    vm-spare-context-offset vm-reg ctx-reg LDRuoff
+    vm-context-offset vm-reg ctx-reg STRuoff
+
+    ! ! Save C callstack pointer
+    ! nv-reg context-callstack-save-offset [+] stack-reg MOV
+
+    stack-reg temp0 MOVsp
+    context-callstack-save-offset ctx-reg temp0 STRuoff
+    ! stack-reg X24 MOVsp
+    ! NOP
+
+    ! ! Load Factor stack pointers
+    ! stack-reg nv-reg context-callstack-bottom-offset [+] MOV
+    context-callstack-bottom-offset ctx-reg temp0 LDRuoff
+    temp0 stack-reg MOVsp
+
+    ctx-reg jit-update-tib
+    jit-install-seh
+
+    ! rs-reg nv-reg context-retainstack-offset [+] MOV
+    ! ds-reg nv-reg context-datastack-offset [+] MOV
+    context-retainstack-offset ctx-reg rs-reg LDRuoff
+    context-datastack-offset ctx-reg ds-reg LDRuoff
+
+    ! ! Call into Factor code
+    ! link-reg 0 MOV f rc-absolute-cell rel-word
+    ! link-reg CALL
+    3 words temp0 LDRl
+    temp0 BLR
+    3 words Br
+    NOP NOP f rc-absolute-cell rel-word
+
+    ! ! Load C callstack pointer
+    ! nv-reg vm-reg vm-context-offset [+] MOV
+    ! stack-reg nv-reg context-callstack-save-offset [+] MOV
+    vm-context-offset vm-reg ctx-reg LDRuoff
+
+    context-callstack-save-offset ctx-reg temp0 LDRuoff
+    temp0 stack-reg MOVsp
+    ! X24 stack-reg MOVsp
+    ! NOP
+
+    ! ! Load old context
+    ! nv-reg POP
+    ! vm-reg vm-context-offset [+] nv-reg MOV
+    8 SP ctx-reg LDRuoff
+    vm-context-offset vm-reg ctx-reg STRuoff
+
+    jit-restore-tib
+
+    ! ! Restore non-volatile registers
+    ! nv-regs <reversed> [ POP ] each
+    ! frame-reg POP
+    16 SP X30 LDRpost
+    16 SP X29 X28 LDPpost
+    16 SP X27 X26 LDPpost
+    16 SP X25 X24 LDPpost
+    16 SP X23 X22 LDPpost
+    16 SP X21 X20 LDPpost
+    16 SP X19 X18 LDPpost
+
+    ! ! Callbacks which return structs, or use stdcall/fastcall/thiscall,
+    ! ! need a parameter here.
+
+    ! ! See the comment for M\ x86.32 stack-cleanup in cpu.x86.32
+    ! 0xffff RET f rc-absolute-2 rel-untagged
+    4 words temp0 ADR
+    2 temp0 temp0 LDRHuoff
+    temp0 stack-reg stack-reg ADDr
+    f RET
+    NOP f rc-absolute-2 rel-untagged
+] CALLBACK-STUB jit-define
+
+[
+    ! ! load literal
+    ! temp0 0 MOV f rc-absolute-cell rel-literal
+    2 words temp0 LDRl
+    3 words Br
+    NOP NOP f rc-absolute-cell rel-literal
+    ! ! increment datastack pointer
+    ! ds-reg bootstrap-cell ADD
+    ! ! store literal on datastack
+    ! ds-reg [] temp0 MOV
+    push0
+] JIT-PUSH-LITERAL jit-define
+
+! The *-signal-handler subprimitives are special-cased in vm/quotations.cpp
+! not to trigger generation of a stack frame, so they can
+! peform their own prolog/epilog preserving registers.
+!
+! It is important that the total is 192/64 and that it matches the
+! constants in vm/cpu-x86.*.hpp
+: jit-signal-handler-prolog ( -- )
+    ! ! Return address already on stack -> 8/4 bytes.
+
+    ! ! Push all registers. 15 regs/120 bytes on 64bit, 7 regs/28 bytes
+    ! ! on 32bit -> 128/32 bytes.
+    ! signal-handler-save-regs [ PUSH ] each
+
+    ! ! Push flags -> 136/36 bytes
+    ! PUSHF
+    -16 SP X1 X0 STPpre
+    -16 SP X3 X2 STPpre
+    -16 SP X5 X4 STPpre
+    -16 SP X7 X6 STPpre
+    -16 SP X9 X8 STPpre
+    -16 SP X11 X10 STPpre
+    -16 SP X13 X12 STPpre
+    -16 SP X15 X14 STPpre
+    -16 SP X17 X16 STPpre
+    -16 SP X19 X18 STPpre
+    -16 SP X21 X20 STPpre
+    -16 SP X23 X22 STPpre
+    -16 SP X25 X24 STPpre
+    -16 SP X27 X26 STPpre
+    -16 SP X29 X28 STPpre
+    NZCV X0 MRS
+    -16 SP X0 X30 STPpre
+
+    ! ! Register parameter area 32 bytes, unused on platforms other than
+    ! ! windows 64 bit, but including it doesn't hurt. Plus
+    ! ! alignment. LEA used so we don't dirty flags -> 192/64 bytes.
+    ! stack-reg stack-reg 7 bootstrap-cells neg [+] LEA
+
+    jit-load-vm ;
+
+: jit-signal-handler-epilog ( -- )
+    ! stack-reg stack-reg 7 bootstrap-cells [+] LEA
+    ! POPF
+    ! signal-handler-save-regs reverse [ POP ] each ;
+    16 SP X0 X30 LDPpost
+    NZCV X0 MSRr
+    16 SP X29 X28 LDPpost
+    16 SP X27 X26 LDPpost
+    16 SP X25 X24 LDPpost
+    16 SP X23 X22 LDPpost
+    16 SP X21 X20 LDPpost
+    16 SP X19 X18 LDPpost
+    16 SP X17 X16 LDPpost
+    16 SP X15 X14 LDPpost
+    16 SP X13 X12 LDPpost
+    16 SP X11 X10 LDPpost
+    16 SP X9 X8 LDPpost
+    16 SP X7 X6 LDPpost
+    16 SP X5 X4 LDPpost
+    16 SP X3 X2 LDPpost
+    16 SP X1 X0 LDPpost ;
+
+[
+    ! ! load boolean
+    ! temp0 ds-reg [] MOV
+    ! ! pop boolean
+    ! ds-reg bootstrap-cell SUB
+    pop0
+    ! ! compare boolean with f
+    ! temp0 \ f type-number CMP
+    \ f type-number temp0 CMPi
+    ! ! jump to true branch if not equal
+    ! 0 JNE f rc-relative rel-word
+    5 words EQ B.cond
+    absolute-jump rel-word
+    ! ! jump to false branch if equal
+    ! 0 JMP f rc-relative rel-word
+    absolute-jump rel-word
+] JIT-IF jit-define
+
+[
+    >r
+    ! 0 CALL f rc-relative rel-word
+    absolute-call rel-word
+    r>
+] JIT-DIP jit-define
+
+[
+    >r >r
+    ! 0 CALL f rc-relative rel-word
+    absolute-call rel-word
+    r> r>
+] JIT-2DIP jit-define
+
+[
+    >r >r >r
+    ! 0 CALL f rc-relative rel-word
+    absolute-call rel-word
+    r> r> r>
+] JIT-3DIP jit-define
+
+[
+    ! ! load from stack
+    ! temp0 ds-reg [] MOV
+    ! ! pop stack
+    ! ds-reg bootstrap-cell SUB
+    pop0
+] [
+    ! temp0 word-entry-point-offset [+] CALL
+    push-link-reg
+    temp0 BLR
+    pop-link-reg
+] [
+    ! temp0 word-entry-point-offset [+] JMP
+    temp0 BR
+] \ (execute) define-combinator-primitive
+
+[
+    ! temp0 ds-reg [] MOV
+    ! ds-reg bootstrap-cell SUB
+    pop0
+    ! temp0 word-entry-point-offset [+] JMP
+    word-entry-point-offset temp0 temp0 ADDi
+    temp0 BR
+] JIT-EXECUTE jit-define
+
+! https://elixir.bootlin.com/linux/latest/source/arch/arm64/kernel/stacktrace.c#L22
+[
+    ! ! make room for LR plus magic number of callback, 16byte align
+    ! x64 ! stack-reg stack-frame-size bootstrap-cell - SUB
+    stack-frame-size stack-reg stack-reg SUBi
+    -16 SP link-reg STRpre
+] JIT-PROLOG jit-define
+
+[
+    ! x64 ! stack-reg stack-frame-size bootstrap-cell - ADD
+    16 SP link-reg LDRpost
+    stack-frame-size stack-reg stack-reg ADDi
+] JIT-EPILOG jit-define
+
+[ f RET ] JIT-RETURN jit-define
+
+! ! ! Polymorphic inline caches
+
+! The PIC stubs are not permitted to touch pic-tail-reg.
+
+! Load a value from a stack position
+[
+    ! temp1 ds-reg 0x7f [+] MOV f rc-absolute-1 rel-untagged
+    4 words temp2 ADR
+    3 temp2 temp2 LDRBuoff
+    temp2 ds-reg temp1 LDRr
+    2 words Br
+    NOP f rc-absolute-1 rel-untagged
+] PIC-LOAD jit-define
+
+[
+    ! temp1/32 tag-mask get AND
+    tag-mask get temp1 temp1 ANDi
+] PIC-TAG jit-define
+
+[
+    ! temp0 temp1 MOV
+    temp1 temp0 MOVr
+    ! temp1/32 tag-mask get AND
+    tag-mask get temp1 temp1 ANDi
+    ! temp1/32 tuple type-number CMP
+    tuple type-number temp1 CMPi
+    ! [ JNE ]
+    ! [ temp1 temp0 tuple-class-offset [+] MOV ]
+    [ NE B.cond ] [
+        tuple-class-offset temp0 temp1 LDUR
+    ] jit-conditional
+] PIC-TUPLE jit-define
+
+[
+    ! temp1/32 0x7f CMP f rc-absolute-1 rel-untagged
+    4 words temp2 ADR
+    3 temp2 temp2 LDRBuoff
+    temp2 temp1 CMPr
+    2 words Br
+    NOP f rc-absolute-1 rel-untagged
+] PIC-CHECK-TAG jit-define
+
+[
+    ! 0 JE f rc-relative rel-word
+    5 words NE B.cond
+    absolute-jump rel-word
+] PIC-HIT jit-define
+
+! ! ! Megamorphic caches
+
+[
+    ! ! class = ...
+    ! temp0 temp1 MOV
+    temp1 temp0 MOVr
+    ! temp1/32 tag-mask get AND
+    tag-mask get temp1 temp1 ANDi
+    ! temp1/32 tag-bits get SHL
+    temp1 tag
+    ! temp1/32 tuple type-number tag-fixnum CMP
+    tuple type-number tag-fixnum temp1 CMPi
+    ! [ JNE ]
+    ! [ temp1 temp0 tuple-class-offset [+] MOV ]
+    [ NE B.cond ] [
+        tuple-class-offset temp0 temp1 LDUR
+    ] jit-conditional
+    ! ! cache = ...
+    ! temp0 0 MOV f rc-absolute-cell rel-literal
+    2 words temp0 LDRl
+    3 words Br
+    NOP NOP f rc-absolute-cell rel-literal
+    ! ! key = hashcode(class)
+    ! temp2 temp1 MOV
+    temp1 temp2 MOVr
+    ! ! key &= cache.length - 1
+    ! temp2 mega-cache-size get 1 - bootstrap-cell * AND
+    mega-cache-size get 1 - bootstrap-cells temp2 temp2 ANDi
+    ! ! cache += array-start-offset
+    ! temp0 array-start-offset ADD
+    array-start-offset temp0 temp0 ADDi
+    ! ! cache += key
+    ! temp0 temp2 ADD
+    temp2 temp0 temp0 ADDr
+    ! ! if(get(cache) == class)
+    ! temp0 [] temp1 CMP
+    0 temp0 temp2 LDRuoff
+    temp1 temp2 CMPr
+    ! [ JNE ]
+    [ NE B.cond ] [
+        ! ! megamorphic_cache_hits++
+        ! temp1 0 MOV rc-absolute-cell rel-megamorphic-cache-hits
+        2 words temp1 LDRl
+        3 words Br
+        NOP NOP rc-absolute-cell rel-megamorphic-cache-hits
+        ! temp1 [] 1 ADD
+        1 temp3 MOVwi
+        temp3 temp1 STADD
+        ! ! goto get(cache + bootstrap-cell)
+        ! temp0 temp0 bootstrap-cell [+] MOV
+        bootstrap-cell temp0 temp0 LDRuoff
+        ! temp0 word-entry-point-offset [+] JMP
+        word-entry-point-offset temp0 temp0 ADDi
+        temp0 BR
+        ! ! fall-through on miss
+    ] jit-conditional
+] MEGA-LOOKUP jit-define
+
+! Comparisons
+: jit-compare ( cond -- )
+    ! ! load t
+    ! temp3 0 MOV t rc-absolute-cell rel-literal
+    2 words temp3 LDRl
+    3 words Br
+    NOP NOP t rc-absolute-cell rel-literal
+    ! ! load f
+    ! temp1 \ f type-number MOV
+    \ f type-number temp2 MOVwi
+    ! ! load first value
+    ! temp0 ds-reg [] MOV
+    ! ! adjust stack pointer
+    ! ds-reg bootstrap-cell SUB
+    load1/0
+    ! ! compare with second value
+    ! ds-reg [] temp0 CMP
+    temp1 temp0 CMPr
+    ! ! move t if true
+    ! [ temp1 temp3 ] dip execute( dst src -- )
+    [ temp2 temp3 temp0 ] dip CSEL
+    ! ! store
+    ! ds-reg [] temp1 MOV
+    1 push-down0 ;
+
+! Math
+
+! Overflowing fixnum arithmetic
+: jit-overflow ( insn func -- )
+    ! ds-reg 8 SUB
+    jit-save-context
+    ! arg1 ds-reg [] MOV
+    ! arg2 ds-reg 8 [+] MOV
+    load-arg1/2
+    ! arg3 arg1 MOV
+    ! [ [ arg3 arg2 ] dip call ] dip
+    [ [ arg2 arg1 arg3 ] dip call ] dip
+    ! ds-reg [] arg3 MOV
+    push-down-arg3
+    ! [ JNO ]
+    [ VC B.cond ] [
+        ! arg3 vm-reg MOV
+        vm-reg arg3 MOVr
+        jit-call
+    ] jit-conditional ; inline
+
+: jit-math ( insn -- )
+    ! ! load second input
+    ! temp0 ds-reg [] MOV
+    ! ! pop stack
+    ! ds-reg bootstrap-cell SUB
+    load1/0
+    ! ! compute result
+    ! [ ds-reg [] temp0 ] dip execute( dst src -- )
+    [ temp0 temp1 temp0 ] dip execute( arg2 arg1 dst -- )
+    1 push-down0 ;
+
+: jit-fixnum-/mod ( -- )
+    ! ! load second parameter
+    ! temp1 ds-reg [] MOV
+    ! ! load first parameter
+    ! div-arg ds-reg bootstrap-cell neg [+] MOV
+    load1/0
+    ! ! divide
+    temp0 temp1 temp2 SDIV
+    temp1 temp0 temp2 temp0 MSUB ;
 
 ! # All arm.64 subprimitives
 {
@@ -476,472 +894,13 @@ big-endian off
         ! 0 RET
         f RET
     ] }
-} define-sub-primitives
 
-! C to Factor entry point
-[
-    0xabcd BRK
-    ! ! Optimizing compiler's side of callback accesses
-    ! ! arguments that are on the stack via the frame pointer.
-    ! ! On x86-32 fastcall, and x86-64, some arguments are passed
-    ! ! in registers, and so the only registers that are safe for
-    ! ! use here are frame-reg, nv-reg and vm-reg.
-    ! frame-reg PUSH
-    ! frame-reg stack-reg MOV
-
-    ! ! Save all non-volatile registers
-    ! nv-regs [ PUSH ] each
-    -16 SP X19 X18 STPpre
-    -16 SP X21 X20 STPpre
-    -16 SP X23 X22 STPpre
-    -16 SP X25 X24 STPpre
-    -16 SP X27 X26 STPpre
-    -16 SP X29 X28 STPpre
-    -16 SP X30 STRpre
-    stack-reg stack-frame-reg MOVsp
-
-    jit-save-tib
-
-    ! ! Load VM into vm-reg
-    ! vm-reg 0 MOV 0 rc-absolute-cell rel-vm
-    2 words vm-reg LDRl
-    3 words Br
-    NOP NOP 0 rc-absolute-cell rel-vm
-
-    ! ! Save old context
-    ! nv-reg vm-reg vm-context-offset [+] MOV
-    ! nv-reg PUSH
-    vm-context-offset vm-reg ctx-reg LDRuoff
-    8 SP ctx-reg STRuoff
-
-    ! ! Switch over to the spare context
-    ! nv-reg vm-reg vm-spare-context-offset [+] MOV
-    ! vm-reg vm-context-offset [+] nv-reg MOV
-    vm-spare-context-offset vm-reg ctx-reg LDRuoff
-    vm-context-offset vm-reg ctx-reg STRuoff
-
-    ! ! Save C callstack pointer
-    ! nv-reg context-callstack-save-offset [+] stack-reg MOV
-
-    stack-reg temp0 MOVsp
-    context-callstack-save-offset ctx-reg temp0 STRuoff
-    ! stack-reg X24 MOVsp
-    ! NOP
-
-    ! ! Load Factor stack pointers
-    ! stack-reg nv-reg context-callstack-bottom-offset [+] MOV
-    context-callstack-bottom-offset ctx-reg temp0 LDRuoff
-    temp0 stack-reg MOVsp
-
-    ctx-reg jit-update-tib
-    jit-install-seh
-
-    ! rs-reg nv-reg context-retainstack-offset [+] MOV
-    ! ds-reg nv-reg context-datastack-offset [+] MOV
-    context-retainstack-offset ctx-reg rs-reg LDRuoff
-    context-datastack-offset ctx-reg ds-reg LDRuoff
-
-    ! ! Call into Factor code
-    ! link-reg 0 MOV f rc-absolute-cell rel-word
-    ! link-reg CALL
-    3 words temp0 LDRl
-    temp0 BLR
-    3 words Br
-    NOP NOP f rc-absolute-cell rel-word
-
-    ! ! Load C callstack pointer
-    ! nv-reg vm-reg vm-context-offset [+] MOV
-    ! stack-reg nv-reg context-callstack-save-offset [+] MOV
-    vm-context-offset vm-reg ctx-reg LDRuoff
-
-    context-callstack-save-offset ctx-reg temp0 LDRuoff
-    temp0 stack-reg MOVsp
-    ! X24 stack-reg MOVsp
-    ! NOP
-
-    ! ! Load old context
-    ! nv-reg POP
-    ! vm-reg vm-context-offset [+] nv-reg MOV
-    8 SP ctx-reg LDRuoff
-    vm-context-offset vm-reg ctx-reg STRuoff
-
-    jit-restore-tib
-
-    ! ! Restore non-volatile registers
-    ! nv-regs <reversed> [ POP ] each
-    ! frame-reg POP
-    16 SP X30 LDRpost
-    16 SP X29 X28 LDPpost
-    16 SP X27 X26 LDPpost
-    16 SP X25 X24 LDPpost
-    16 SP X23 X22 LDPpost
-    16 SP X21 X20 LDPpost
-    16 SP X19 X18 LDPpost
-
-    ! ! Callbacks which return structs, or use stdcall/fastcall/thiscall,
-    ! ! need a parameter here.
-
-    ! ! See the comment for M\ x86.32 stack-cleanup in cpu.x86.32
-    ! 0xffff RET f rc-absolute-2 rel-untagged
-    4 words temp0 ADR
-    2 temp0 temp0 LDRHuoff
-    temp0 stack-reg stack-reg ADDr
-    f RET
-    NOP f rc-absolute-2 rel-untagged
-] CALLBACK-STUB jit-define
-
-[
-    ! ! load literal
-    ! temp0 0 MOV f rc-absolute-cell rel-literal
-    2 words temp0 LDRl
-    3 words Br
-    NOP NOP f rc-absolute-cell rel-literal
-    ! ! increment datastack pointer
-    ! ds-reg bootstrap-cell ADD
-    ! ! store literal on datastack
-    ! ds-reg [] temp0 MOV
-    push0
-] JIT-PUSH-LITERAL jit-define
-
-: call-relative ( -- word class )
-    push-link-reg
-    5 words temp0 LDRl32
-    5 words temp1 ADR
-    temp1 temp0 temp0 ADDr
-    temp0 BLR
-    2 words Br
-    NOP f rc-relative
-    pop-link-reg ;
-
-[
-    ! 0 CALL f rc-relative rel-word-pic
-    call-relative rel-word-pic
-] JIT-WORD-CALL jit-define
-
-! The *-signal-handler subprimitives are special-cased in vm/quotations.cpp
-! not to trigger generation of a stack frame, so they can
-! peform their own prolog/epilog preserving registers.
-!
-! It is important that the total is 192/64 and that it matches the
-! constants in vm/cpu-x86.*.hpp
-: jit-signal-handler-prolog ( -- )
-    ! ! Return address already on stack -> 8/4 bytes.
-
-    ! ! Push all registers. 15 regs/120 bytes on 64bit, 7 regs/28 bytes
-    ! ! on 32bit -> 128/32 bytes.
-    ! signal-handler-save-regs [ PUSH ] each
-
-    ! ! Push flags -> 136/36 bytes
-    ! PUSHF
-    -16 SP X1 X0 STPpre
-    -16 SP X3 X2 STPpre
-    -16 SP X5 X4 STPpre
-    -16 SP X7 X6 STPpre
-    -16 SP X9 X8 STPpre
-    -16 SP X11 X10 STPpre
-    -16 SP X13 X12 STPpre
-    -16 SP X15 X14 STPpre
-    -16 SP X17 X16 STPpre
-    -16 SP X19 X18 STPpre
-    -16 SP X21 X20 STPpre
-    -16 SP X23 X22 STPpre
-    -16 SP X25 X24 STPpre
-    -16 SP X27 X26 STPpre
-    -16 SP X29 X28 STPpre
-    NZCV X0 MRS
-    -16 SP X0 X30 STPpre
-
-    ! ! Register parameter area 32 bytes, unused on platforms other than
-    ! ! windows 64 bit, but including it doesn't hurt. Plus
-    ! ! alignment. LEA used so we don't dirty flags -> 192/64 bytes.
-    ! stack-reg stack-reg 7 bootstrap-cells neg [+] LEA
-
-    jit-load-vm ;
-
-: jit-signal-handler-epilog ( -- )
-    ! stack-reg stack-reg 7 bootstrap-cells [+] LEA
-    ! POPF
-    ! signal-handler-save-regs reverse [ POP ] each ;
-    16 SP X0 X30 LDPpost
-    NZCV X0 MSRr
-    16 SP X29 X28 LDPpost
-    16 SP X27 X26 LDPpost
-    16 SP X25 X24 LDPpost
-    16 SP X23 X22 LDPpost
-    16 SP X21 X20 LDPpost
-    16 SP X19 X18 LDPpost
-    16 SP X17 X16 LDPpost
-    16 SP X15 X14 LDPpost
-    16 SP X13 X12 LDPpost
-    16 SP X11 X10 LDPpost
-    16 SP X9 X8 LDPpost
-    16 SP X7 X6 LDPpost
-    16 SP X5 X4 LDPpost
-    16 SP X3 X2 LDPpost
-    16 SP X1 X0 LDPpost ;
-
-[
-    ! ! load boolean
-    ! temp0 ds-reg [] MOV
-    ! ! pop boolean
-    ! ds-reg bootstrap-cell SUB
-    pop0
-    ! ! compare boolean with f
-    ! temp0 \ f type-number CMP
-    \ f type-number temp0 CMPi
-    ! ! jump to true branch if not equal
-    ! 0 JNE f rc-relative rel-word
-    6 words EQ B.cond
-    4 words temp0 LDRl32
-    4 words temp1 ADR
-    temp1 temp0 temp0 ADDr
-    temp0 BR
-    NOP f rc-relative rel-word
-    ! ! jump to false branch if equal
-    ! 0 JMP f rc-relative rel-word
-    4 words temp0 LDRl32
-    4 words temp1 ADR
-    temp1 temp0 temp0 ADDr
-    temp0 BR
-    NOP f rc-relative rel-word
-] JIT-IF jit-define
-
-[
-    >r
-    ! 0 CALL f rc-relative rel-word
-    call-relative rel-word
-    r>
-] JIT-DIP jit-define
-
-[
-    >r >r
-    ! 0 CALL f rc-relative rel-word
-    call-relative rel-word
-    r> r>
-] JIT-2DIP jit-define
-
-[
-    >r >r >r
-    ! 0 CALL f rc-relative rel-word
-    call-relative rel-word
-    r> r> r>
-] JIT-3DIP jit-define
-
-[
-    ! ! load from stack
-    ! temp0 ds-reg [] MOV
-    ! ! pop stack
-    ! ds-reg bootstrap-cell SUB
-    pop0
-]
-[
-    ! temp0 word-entry-point-offset [+] CALL
-    push-link-reg
-    temp0 BLR
-    pop-link-reg
-]
-[
-    ! temp0 word-entry-point-offset [+] JMP
-    temp0 BR
-]
-\ (execute) define-combinator-primitive
-
-[
-    ! temp0 ds-reg [] MOV
-    ! ds-reg bootstrap-cell SUB
-    pop0
-    ! temp0 word-entry-point-offset [+] JMP
-    word-entry-point-offset temp0 temp0 ADDi
-    temp0 BR
-] JIT-EXECUTE jit-define
-
-! https://elixir.bootlin.com/linux/latest/source/arch/arm64/kernel/stacktrace.c#L22
-[
-    ! ! make room for LR plus magic number of callback, 16byte align
-    ! x64 ! stack-reg stack-frame-size bootstrap-cell - SUB
-    stack-frame-size bootstrap-cell 2 * + stack-reg stack-reg SUBi
-    -16 SP link-reg stack-frame-reg STPpre
-] JIT-PROLOG jit-define
-
-[
-    ! x64 ! stack-reg stack-frame-size bootstrap-cell - ADD
-    ! -16 SP link-reg X29 LDPpre
-    16 SP link-reg stack-frame-reg LDPpost
-    stack-frame-size bootstrap-cell 2 * + stack-reg stack-reg ADDi
-] JIT-EPILOG jit-define
-
-[ f RET ] JIT-RETURN jit-define
-
-! ! ! Polymorphic inline caches
-
-! The PIC stubs are not permitted to touch pic-tail-reg.
-
-! Load a value from a stack position
-[
-    ! temp1 ds-reg 0x7f [+] MOV f rc-absolute-1 rel-untagged
-    4 words temp2 ADR
-    3 temp2 temp2 LDRBuoff
-    temp2 ds-reg temp1 LDRr
-    2 words Br
-    NOP f rc-absolute-1 rel-untagged
-] PIC-LOAD jit-define
-
-[
-    ! temp1/32 tag-mask get AND
-    tag-mask get temp1 temp1 ANDi32
-] PIC-TAG jit-define
-
-[
-    ! temp0 temp1 MOV
-    temp1 temp0 MOVr
-    ! temp1/32 tag-mask get AND
-    tag-mask get temp1 temp1 ANDi32
-    ! temp1/32 tuple type-number CMP
-    tuple type-number temp1 CMPi
-    ! [ JNE ]
-    ! [ temp1 temp0 tuple-class-offset [+] MOV ]
-    [ NE B.cond ] [
-        ! tuple-class-offset temp0 temp1 LDRuoff
-        1 temp0 temp0 ADDi
-        0 temp0 temp1 LDRuoff
-    ] jit-conditional
-] PIC-TUPLE jit-define
-
-[
-    ! temp1/32 0x7f CMP f rc-absolute-1 rel-untagged
-    4 words temp2 ADR
-    3 temp2 temp2 LDRBuoff
-    temp2 temp1 CMPr
-    2 words Br
-    NOP f rc-absolute-1 rel-untagged
-] PIC-CHECK-TAG jit-define
-
-[
-    ! 0 JE f rc-relative rel-word
-    6 words NE B.cond
-    4 words temp3 LDRl32
-    4 words temp2 ADR
-    temp3 temp2 temp2 ADDr
-    temp2 BR
-    NOP f rc-relative rel-word
-] PIC-HIT jit-define
-
-! ! ! Megamorphic caches
-
-[
-    ! ! class = ...
-    ! temp0 temp1 MOV
-    temp1 temp0 MOVr
-    ! temp1/32 tag-mask get AND
-    tag-mask get temp1 temp1 ANDi32
-    ! temp1/32 tag-bits get SHL
-    temp1 tag
-    ! temp1/32 tuple type-number tag-fixnum CMP
-    tuple type-number tag-fixnum temp1 CMPi
-    ! [ JNE ]
-    ! [ temp1 temp0 tuple-class-offset [+] MOV ]
-    [ NE B.cond ] [
-        ! tuple-class-offset temp0 temp1 LDRuoff
-        1 temp0 temp0 ADDi
-        0 temp0 temp1 LDRuoff
-    ] jit-conditional
-    ! ! cache = ...
-    ! temp0 0 MOV f rc-absolute-cell rel-literal
-    2 words temp0 LDRl
-    3 words Br
-    NOP NOP f rc-absolute-cell rel-literal
-    ! ! key = hashcode(class)
-    ! temp2 temp1 MOV
-    temp1 temp2 MOVr
-    ! ! key &= cache.length - 1
-    ! temp2 mega-cache-size get 1 - bootstrap-cell * AND
-    mega-cache-size get 1 - bootstrap-cells temp2 temp2 ANDi
-    ! ! cache += array-start-offset
-    ! temp0 array-start-offset ADD
-    array-start-offset temp0 temp0 ADDi
-    ! ! cache += key
-    ! temp0 temp2 ADD
-    temp2 temp0 temp0 ADDr
-    ! ! if(get(cache) == class)
-    ! temp0 [] temp1 CMP
-    0 temp0 temp2 LDRuoff
-    temp1 temp2 CMPr
-    ! [ JNE ]
-    [ NE B.cond ] [
-        ! ! megamorphic_cache_hits++
-        ! temp1 0 MOV rc-absolute-cell rel-megamorphic-cache-hits
-        2 words temp1 LDRl
-        3 words Br
-        NOP NOP rc-absolute-cell rel-megamorphic-cache-hits
-        ! temp1 [] 1 ADD
-        0 temp1 temp2 LDRuoff
-        1 temp2 temp2 ADDi
-        0 temp1 temp2 STRuoff
-        ! ! goto get(cache + bootstrap-cell)
-        ! temp0 temp0 bootstrap-cell [+] MOV
-        bootstrap-cell temp0 temp0 LDRuoff
-        ! temp0 word-entry-point-offset [+] JMP
-        word-entry-point-offset temp0 temp0 ADDi
-        temp0 BR
-        ! ! fall-through on miss
-    ] jit-conditional
-] MEGA-LOOKUP jit-define
-
-! Comparisons
-: jit-compare ( cond -- )
-    ! ! load t
-    ! temp3 0 MOV t rc-absolute-cell rel-literal
-    2 words temp3 LDRl
-    3 words Br
-    NOP NOP t rc-absolute-cell rel-literal
-    ! ! load f
-    ! temp1 \ f type-number MOV
-    \ f type-number temp2 MOVwi
-    ! ! load first value
-    ! temp0 ds-reg [] MOV
-    ! ! adjust stack pointer
-    ! ds-reg bootstrap-cell SUB
-    load1/0
-    ! ! compare with second value
-    ! ds-reg [] temp0 CMP
-    temp1 temp0 CMPr
-    ! ! move t if true
-    ! [ temp1 temp3 ] dip execute( dst src -- )
-    [ temp2 temp3 temp0 ] dip CSEL
-    ! ! store
-    ! ds-reg [] temp1 MOV
-    1 push-down0 ;
-
-! Math
-: jit-math ( insn -- )
-    ! ! load second input
-    ! temp0 ds-reg [] MOV
-    ! ! pop stack
-    ! ds-reg bootstrap-cell SUB
-    load1/0
-    ! ! compute result
-    ! [ ds-reg [] temp0 ] dip execute( dst src -- )
-    [ temp0 temp1 temp0 ] dip execute( arg2 arg1 dst -- )
-    1 push-down0 ;
-
-: jit-fixnum-/mod ( -- )
-    ! ! load second parameter
-    ! temp1 ds-reg [] MOV
-    ! ! load first parameter
-    ! div-arg ds-reg bootstrap-cell neg [+] MOV
-    load1/0
-    ! ! divide
-    temp0 temp1 temp2 SDIV
-    temp1 temp0 temp2 temp0 MSUB ;
-
-! # Rest of arm64 subprimitives
-{
     ! ## Fixnums
 
     ! ### Add
     { fixnum+fast [ \ ADDr jit-math ] }
 
-    ! ### Bit stuff
+    ! ### Bit manipulation
     { fixnum-bitand [ \ ANDr jit-math ] }
     { fixnum-bitnot [
         ! ! complement
@@ -978,8 +937,7 @@ big-endian off
         ! temp3 CL SAR
         temp0 temp2 temp2 ASRr
         ! temp3 tag-mask get bitnot AND
-        tag-mask get temp3 MOVwi
-        temp3 temp2 temp3 BIC
+        tag-mask get bitnot temp2 temp2 ANDi
         ! ! if shift count was negative, move temp3 to temp2
         ! shift-arg 0 CMP
         ! temp2 temp3 CMOVGE
@@ -1075,7 +1033,7 @@ big-endian off
         ! ds-reg bootstrap-cell SUB
         pop0
         ! ! turn local number into offset
-        tagged>offset
+        tagged>offset0
         ! ! decrement retain stack pointer
         ! rs-reg temp0 SUB
         temp0 rs-reg rs-reg SUBr
@@ -1085,7 +1043,7 @@ big-endian off
         ! temp0 ds-reg [] MOV
         load0
         ! ! turn local number into offset
-        tagged>offset
+        tagged>offset0
         ! ! load local value
         ! temp0 rs-reg temp0 [+] MOV
         temp0 rs-reg temp0 LDRr
@@ -1105,12 +1063,11 @@ big-endian off
         ! temp1 ds-reg [] MOV
         load1/0
         ! ! turn slot number into offset
-        tagged>offset
+        tagged>offset0
         ! ! mask off tag
         ! temp1 tag-bits get SHR
-        temp1 untag
         ! temp1 tag-bits get SHL
-        temp1 tag
+        tag-mask get bitnot temp1 temp1 ANDi
         ! ! load slot value
         ! temp0 temp1 temp0 [+] MOV
         temp1 temp0 temp0 LDRr
@@ -1142,7 +1099,7 @@ big-endian off
         load0
         ! ! compute tag
         ! temp0/32 tag-mask get AND
-        tag-mask get temp0 temp0 ANDi32
+        tag-mask get temp0 temp0 ANDi
         ! ! tag the tag
         ! temp0/32 tag-bits get SHL
         temp0 tag
@@ -1162,13 +1119,13 @@ big-endian off
     ! ! ### Dups
     { dup [ load0 push0 ] }
     { 2dup [ load1/0 push1 push0 ] }
-    { 3dup [ load3/2 load1/0 push2 push1 push0 ] }
+    { 3dup [ load2 load1/0 push2 push1 push0 ] }
     { 4dup [ load3/2 load1/0 push3 push2 push1 push0 ] }
     { dupd [ load1/0 store1 push0 ] }
 
     ! ! ### Misc shufflers
-    { over [ load1/0 push1 ] }
-    { pick [ load3/2 push2 ] }
+    { over [ load1 push1 ] }
+    { pick [ load2 push2 ] }
 
     ! ! ### Nips
     { nip [ load0 1 push-down0 ] }
@@ -1192,6 +1149,7 @@ big-endian off
         ! Pop the fake leaf frame along with our return address
         ! leaf-stack-frame-size bootstrap-cell - RET
         leaf-stack-frame-size bootstrap-cell - SP SP ADDr
+        f RET
     ] }
     { signal-handler [
         jit-signal-handler-prolog
