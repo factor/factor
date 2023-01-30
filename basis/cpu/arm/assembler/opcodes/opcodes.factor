@@ -129,12 +129,8 @@ FIELD: immlo2 2
 FIELD: immhi19 19
 
 FIELD: cond4 4
-FIELD: cmode4 4
-FIELD: CRm4 4
-FIELD: CRn4 4
 FIELD: CRm 4
 FIELD: CRn 4
-FIELD: nzcv4 4
 FIELD: nzcv 4
 FIELD: hw2 2
 FIELD: mask4 4
@@ -264,12 +260,6 @@ SINGLETONS: SPSR_EL1 SPSR_EL2 SPSR_EL3 ;
 : LE ( -- n ) 1101 >CC ; inline ! Z set OR (N not equal to V): less than or equal
 : AL ( -- n ) 1110 >CC ; inline ! always
 : NV ( -- n ) 1111 >CC ; inline ! always
-
-: imm13>parts-64 ( imm13 -- imms immr N )
-    [ -4 shift 4 bits ] [ 4 bits ] [ -8 shift ] tri ;
-
-: imm12>parts-32 ( imm12 -- imms immr N-is-0 )
-    [ -4 shift 4 bits ] [ 4 bits ] [ drop 0 ] tri ;
 
 ERROR: no-field-word vocab name ;
 
@@ -507,17 +497,17 @@ ARM-INSTRUCTION: CBZ32-encode ( 0 011010 0 imm19 Rt -- )
 ARM-INSTRUCTION: CBZ64-encode ( 1 011010 0 imm19 Rt -- )
 
 ! CCMN (immediate): Conditional Compare Negative (immediate).
-ARM-INSTRUCTION: CCMNi32-encode ( 0 0 1 11010010 imm5 cond4 1 0 Rn 0 nzcv4 -- )
-ARM-INSTRUCTION: CCMNi64-encode ( 1 0 1 11010010 imm5 cond4 1 0 Rn 0 nzcv4 -- )
+ARM-INSTRUCTION: CCMNi32-encode ( 0 0 1 11010010 imm5 cond4 1 0 Rn 0 nzcv -- )
+ARM-INSTRUCTION: CCMNi64-encode ( 1 0 1 11010010 imm5 cond4 1 0 Rn 0 nzcv -- )
 ! CCMN (register): Conditional Compare Negative (register).
-ARM-INSTRUCTION: CCMNr32-encode ( 0 0 1 11010010 Rm cond4 0 0 Rn 0 nzcv4 -- )
-ARM-INSTRUCTION: CCMNr64-encode ( 1 0 1 11010010 Rm cond4 0 0 Rn 0 nzcv4 -- )
+ARM-INSTRUCTION: CCMNr32-encode ( 0 0 1 11010010 Rm cond4 0 0 Rn 0 nzcv -- )
+ARM-INSTRUCTION: CCMNr64-encode ( 1 0 1 11010010 Rm cond4 0 0 Rn 0 nzcv -- )
 ! CCMP (immediate): Conditional Compare (immediate).
-ARM-INSTRUCTION: CCMPi32-encode ( 0 1 1 11010010 imm5 cond4 1 0 Rn 0 nzcv4 -- )
-ARM-INSTRUCTION: CCMPi64-encode ( 1 1 1 11010010 imm5 cond4 1 0 Rn 0 nzcv4 -- )
+ARM-INSTRUCTION: CCMPi32-encode ( 0 1 1 11010010 imm5 cond4 1 0 Rn 0 nzcv -- )
+ARM-INSTRUCTION: CCMPi64-encode ( 1 1 1 11010010 imm5 cond4 1 0 Rn 0 nzcv -- )
 ! CCMP (register): Conditional Compare (register).
-ARM-INSTRUCTION: CCMPr32-encode ( 0 1 1 11010010 Rm cond4 0 0 Rn 0 nzcv4 -- )
-ARM-INSTRUCTION: CCMPr64-encode ( 1 1 1 11010010 Rm cond4 0 0 Rn 0 nzcv4 -- )
+ARM-INSTRUCTION: CCMPr32-encode ( 0 1 1 11010010 Rm cond4 0 0 Rn 0 nzcv -- )
+ARM-INSTRUCTION: CCMPr64-encode ( 1 1 1 11010010 Rm cond4 0 0 Rn 0 nzcv -- )
 
 ! CFINV: Invert Carry Flag.
 ARM-INSTRUCTION: CFINV-encode ( 1101010100 0 0 0 000 0100 0000 000 11111 -- )
