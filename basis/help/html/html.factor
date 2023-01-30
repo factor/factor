@@ -187,7 +187,7 @@ M: pathname url-of
         "padding: 10px;" "padding: 0px;" replace
         "background-color: #f4efd9;" "background-color: white;" replace
         "}" ?tail drop
-        " border-bottom: 1px dashed #d5d5d5 width: 100%; padding-top: 15px; padding-bottom: 10px; }"
+        " border-bottom: 1px dashed #d5d5d5; width: 100%; padding-top: 15px; padding-bottom: 10px; }"
         append swap pick set-nth {
             ".a a { color: black; font-size: 24pt; line-height: 100%; }"
             ".a * a { color: #2a5db0; font-size: 12pt; }"
