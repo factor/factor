@@ -313,8 +313,8 @@ ARM-INSTRUCTION: ADC64-encode ( 1 0 0 11010000 Rm 000000 Rn Rd -- )
 ARM-INSTRUCTION: ADCS64-encode ( 1 0 1 11010000 Rm 000000 Rn Rd -- )
 
 ! ADD (extended register): Add (extended register).
-ARM-INSTRUCTION: ADDer32-encode ( 0 0 0 01011 00 0 Rm option3 imm3 Rn Rd -- )
-ARM-INSTRUCTION: ADDer64-encode ( 1 0 0 01011 00 0 Rm option3 imm3 Rn Rd -- )
+ARM-INSTRUCTION: ADDer32-encode ( 0 0 0 01011 00 1 Rm option3 imm3 Rn Rd -- )
+ARM-INSTRUCTION: ADDer64-encode ( 1 0 0 01011 00 1 Rm option3 imm3 Rn Rd -- )
 
 ! ADD (immediate): Add (immediate).
 ARM-INSTRUCTION: ADDi32-encode ( 0 0 0 10001 shift2 imm12 Rn Rd -- )
@@ -1454,11 +1454,11 @@ ARM-INSTRUCTION: STPsoff32-encode ( 00 101 0 010 0 imm7 Rt2 Rn Rt -- )
 ARM-INSTRUCTION: STPsoff64-encode ( 10 101 0 010 0 imm7 Rt2 Rn Rt -- )
 
 ! STR (immediate): Store Register (immediate).
-ARM-INSTRUCTION: STRpost32-encode ( 00 111 0 00 00 0 imm9 01 Rn Rt -- )
+ARM-INSTRUCTION: STRpost32-encode ( 10 111 0 00 00 0 imm9 01 Rn Rt -- )
 ARM-INSTRUCTION: STRpost64-encode ( 11 111 0 00 00 0 imm9 01 Rn Rt -- )
-ARM-INSTRUCTION: STRpre32-encode  ( 00 111 0 00 00 0 imm9 11 Rn Rt -- )
+ARM-INSTRUCTION: STRpre32-encode  ( 10 111 0 00 00 0 imm9 11 Rn Rt -- )
 ARM-INSTRUCTION: STRpre64-encode  ( 11 111 0 00 00 0 imm9 11 Rn Rt -- )
-ARM-INSTRUCTION: STRuoff32-encode ( 00 111 0 01 00 imm12 Rn Rt -- )
+ARM-INSTRUCTION: STRuoff32-encode ( 10 111 0 01 00 imm12 Rn Rt -- )
 ARM-INSTRUCTION: STRuoff64-encode ( 11 111 0 01 00 imm12 Rn Rt -- )
 
 ! STR (register): Store Register (register).

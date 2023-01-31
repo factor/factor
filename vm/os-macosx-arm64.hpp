@@ -151,7 +151,7 @@ static const unsigned char call_opcode = 0x14;
 // last byte of 12 Br in absolute-jump
 static const unsigned char jmp_opcode = 0xd6;
 
-static const unsigned SIGNAL_HANDLER_STACK_FRAME_SIZE = 256;
+static const unsigned SIGNAL_HANDLER_STACK_FRAME_SIZE = 288;
 
 
 
