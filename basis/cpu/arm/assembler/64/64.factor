@@ -10,7 +10,7 @@ IN: cpu.arm.assembler.64
 : ADCS ( Rm Rn Rd -- ) ADCS64-encode ;
 
 : ADDi ( imm12 Rn Rd -- ) [ split-imm ] 2dip ADDi64-encode ;
-: ADDr ( Rm Rn Rd -- ) [ 0 0 ] 2dip ADDer64-encode ;
+: ADDr ( Rm Rn Rd -- ) [ 3 0 ] 2dip ADDer64-encode ;
 
 : ANDi ( imm64 Rn Rd -- ) [ encode-bitmask ] 2dip ANDi64-encode ;
 : ANDr ( Rm Rn Rd -- ) [ [ 0 ] dip 0 ] 2dip ANDsr64-encode ;
@@ -41,8 +41,8 @@ IN: cpu.arm.assembler.64
 : LDPsoff ( imm10 Rn Rt2 Rt -- ) [ 8 / 7 ?sbits ] 3dip swapd LDPsoff64-encode ;
 
 : LDRl ( imm21 Rt -- ) [ 4 / 19 ?sbits ] dip LDRl64-encode ;
-: LDRpost ( imm12 Rn Rt -- ) [ 8 / 9 ?sbits ] 2dip LDRpost64-encode ;
-: LDRpre ( imm12 Rn Rt -- ) [ 8 / 9 ?sbits ] 2dip LDRpre64-encode ;
+: LDRpost ( imm9 Rn Rt -- ) [ 9 ?sbits ] 2dip LDRpost64-encode ;
+: LDRpre ( imm9 Rn Rt -- ) [ 9 ?sbits ] 2dip LDRpre64-encode ;
 : LDRr ( Rm Rn Rt -- ) [ 3 0 ] 2dip LDRr64-encode ;
 : LDRuoff ( imm15 Rn Rt -- ) [ 8 / 12 ?ubits ] 2dip LDRuoff64-encode ;
 
@@ -86,8 +86,8 @@ IN: cpu.arm.assembler.64
 : STPpre ( imm10 Rn Rt2 Rt -- ) [ 8 / 7 ?sbits ] 3dip swapd STPpre64-encode ;
 : STPsoff ( imm10 Rn Rt2 Rt -- ) [ 8 / 7 ?sbits ] 3dip swapd STPsoff64-encode ;
 
-: STRpre ( imm12 Rn Rt -- ) [ 8 / 9 ?sbits ] 2dip STRpre64-encode ;
-: STRpost ( imm12 Rn Rt -- ) [ 8 / 9 ?sbits ] 2dip STRpost64-encode ;
+: STRpre ( imm9 Rn Rt -- ) [ 9 ?sbits ] 2dip STRpre64-encode ;
+: STRpost ( imm9 Rn Rt -- ) [ 9 ?sbits ] 2dip STRpost64-encode ;
 : STRr ( Rm Rn Rt -- ) [ 3 0 ] 2dip STRr64-encode ;
 : STRuoff ( imm15 Rn Rt -- ) [ 8 / 12 ?ubits ] 2dip STRuoff64-encode ;
 

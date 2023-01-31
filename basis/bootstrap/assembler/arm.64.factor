@@ -490,6 +490,7 @@ big-endian off
     ! ! windows 64 bit, but including it doesn't hurt. Plus
     ! ! alignment. LEA used so we don't dirty flags -> 192/64 bytes.
     ! stack-reg stack-reg 7 bootstrap-cells neg [+] LEA
+    4 bootstrap-cells stack-reg stack-reg SUBi
 
     jit-load-vm ;
 

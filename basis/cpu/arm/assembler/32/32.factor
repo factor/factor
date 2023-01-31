@@ -15,7 +15,7 @@ IN: cpu.arm.assembler.32
 : LSLi ( imm6 Rn Rd -- ) [ 6 ?ubits ] 2dip LSLi32-encode ;
 : LSRi ( imm6 Rn Rd -- ) [ 6 ?ubits ] 2dip LSRi32-encode ;
 
-: STRuoff ( imm12 Rn Rt -- ) [ 4 / 12 ?ubits ] 2dip STRuoff32-encode ;
+: STRuoff ( imm14 Rn Rt -- ) [ 4 / 12 ?ubits ] 2dip STRuoff32-encode ;
 
 : SUBi ( imm12 Rn Rd -- ) [ split-imm ] 2dip SUBi32-encode ;
 
