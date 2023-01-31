@@ -288,7 +288,11 @@ M: pathname url-of
 
     ! spans before or after divs don't need line breaks
     "span><br/><div" "span><div" replace
-    "div><br/><span" "div><span" replace ;
+    "div><br/><span" "div><span" replace
+
+    ! spans before or after tables don't need line breaks
+    "span><br/><table" "span><table" replace
+    "table><br/><span" "table><span" replace ;
 
 : generate-help-file ( topic -- )
     [ help>html xml>string fix-spacing ]
