@@ -12,7 +12,7 @@ concurrency.distributed channels.remote help.cookbook
 splitting.private ;
 IN: help.tour
 
-ARTICLE: "tour-concatenative" "Concatenative Languages" 
+ARTICLE: "tour-concatenative" "Concatenative Languages"
 Factor is a { $emphasis concatenative } programming language in the spirit of Forth. What is a concatenative language?
 
 To understand concatenative programming, imagine a world where every value is a function, and the only operation
@@ -51,7 +51,7 @@ Let us start looking what Factor actually feels like. Our first words will be li
 then press enter to confirm. You will see that the stack, initially empty, now looks like
 
 { $code "5" }
-$nl
+
 You can enter more than one number, separated by spaces, like { $snippet "7 3 1" } , and get
 
 { $code "5
@@ -59,15 +59,13 @@ You can enter more than one number, separated by spaces, like { $snippet "7 3 1"
 3
 1"
 }
-$nl
+
 (the interface shows the top of the stack on the bottom). What about operations? If you write { $snippet "+" } , you will run the 
 { $snippet "+" } function, which pops the two topmost elements and pushes their sum, leaving us with
-
 { $code "5
 7
 4"
 }
-$nl
 You can put additional inputs in a single line, so for instance { $snippet "- *" } will leave the single number { $snippet "15" } on the stack (do you see why?).
 
 You may end up pushing many values to the stack, or end up with an incorrect result. You can then clear the stack with the
@@ -78,7 +76,7 @@ The function { $snippet "." } (a period or a dot) prints the item at the top of 
 If we write everything on one line, our program so far looks like
 
 { $code "5 7 3 1 + - * ." }
-$nl
+
 which shows Factor's peculiar way of doing arithmetic by putting the arguments first and the operator last - a 
 convention which is called Reverse Polish Notation (RPN). Notice that 
 RPN requires no parenthesis, unlike the polish notation of Lisps where 
@@ -87,11 +85,11 @@ used in most programming languages and in everyday arithmetic. For instance in a
 computation would be written as
 
 { $code "(* 5 (- 7 (+ 3 1)))" }
-$nl
+
 and in familiar infix notation
 
 { $code "(7 - (3 + 1)) * 5" }
-$nl
+
 Also notice that we have been able to split our computation onto many lines or combine it onto fewer lines rather arbitrarily, and that each line made sense in itself.
 ;
 
@@ -119,13 +117,13 @@ option and proceed.
 You should now have on your stack a rather opaque structure which looks like
 
 { $code "T{ range f 1 10 1 }" }
-$nl
+
 This is because our range functions are lazy and only create the range when we attempt to use it. To confirm that we 
 actually created the list of numbers from { $snippet "1" }  to { $snippet "10" } , we convert the lazy response on the 
 stack into an array using the word { $link >array } . Enter that word and your stack should now look like
 
 { $code "{ 1 2 3 4 5 6 7 8 9 10 }" }
-$nl
+
 which is promising!
 
 Next, we want to take the product of those numbers. In many functional languages, this could be done with a function 
@@ -154,7 +152,7 @@ is the word used for comments ")" . To define it, we first need to use the word 
 the word being defined, then the { $strong "stack effects" }  and finally the body, ending with the { $link POSTPONE: ; }  word:
 
 { $code ": fact ( n -- n! ) [1..b] 1 [ * ] reduce ;" }
-$nl
+
 What is a stack effect? In our case it is { $snippet "( n -- n! )" } . Stack effects are how you document the 
 inputs from the stack and outputs to the stack for your word. You can use any identifier to name the stack elements, here we 
 use { $snippet "n" } . Factor will perform a consistency check that the number of inputs and outputs you specify agrees 
@@ -163,7 +161,7 @@ with what the body does.
 If you try to write
 
 { $code ": fact ( m n -- ..b ) [1..b] 1 [ * ] reduce ;" }
-$nl
+
 Factor will signal an error that the 2 inputs { $snippet "m" }  and { $snippet "n" } are not consistent with the 
 body of the word. To restore the previous correct definition press { $snippet "Ctrl+P" }  two times to get back to the 
 previous input and then enter it.
@@ -178,7 +176,7 @@ Notice that the { $snippet "1 [ * ] reduce" }  part of the definition sort of ma
 { $code ": prod ( {x1,...,xn} -- x1*...*xn ) 1 [ * ] reduce ;
 
 : fact ( n -- n! ) [1..b] prod ;" }
-$nl
+
 Our definitions have become simpler and there was no need to pass parameters, rename local variables, or do anything 
 else that would have been necessary to refactor our function in most languages.
 
@@ -222,6 +220,7 @@ see a much more effective way to handle most needs.
 
 Here is a list of the most common shuffling words together with their effect on the stack. Try them in the listener to 
 get a feel for how they manipulate the stack.
+
 { $subsections
   dup
   drop
@@ -254,56 +253,66 @@ what we need. For instance { $snippet "5 [ 2 * ] [ 3 + ] bi" }  yields
 10
 8
 " }
-$nl
+
 { $link bi }  applies the quotation { $snippet "[ 2 * ]" }  to the value { $snippet "5" }  and then the quotation { $snippet "[ 3 + ]" }  to the value { $snippet "5" }  leaving us 
 with { $snippet "10" }  and then { $snippet "8" }  on the stack. Without { $link bi } , we would have to first { $link dup }  { $snippet "5" } , then multiply, and then { $link swap }  the 
 result of the multiplication with the second { $snippet "5" } , so we could do the addition
+
 { $code "
 5 dup 2 * swap 3 +
 " }
-$nl
+
 You can see that { $link bi }  replaces a common pattern of { $link dup } , then calculate, then { $link swap }  and calculate again.
 
 To continue our prime example, we need a way to make a range starting from { $snippet "2" } . We can define our own word for this { $snippet "[2..b]" } , using the { $link [a..b] } word:
+
 { $code "
 : [2..b] ( n -- {2,...,n} ) 2 swap [a..b] ; inline
 " }
-$nl
+
 What's up with that { $snippet "inline" }  word? This is one of the modifiers we can use after defining a word, another one being 
 { $snippet "recursive" } . This will allow us to have the definition of a short word inlined wherever it is used, rather than incurring 
 a function call.
 
 Try our new { $snippet "[2..b]" }  word and see that it works:
+
 { $code "
 6 [2..b] >array .
 " }
-$nl
+
 Using { $snippet "[2..b]" }  to produce the range of numbers from { $snippet "2" }  to the square root of an { $snippet "n" }  that is already on the stack is 
 easy: { $snippet "sqrt floor [2..b]" }  (technically { $link floor }  isn't necessary here, as { $link [a..b] }  works for non-integer bounds). Let's try 
 that out
+
 { $code "
 16 sqrt [2..b] >array .
 " }
-$nl
+
 Now, we need a word to test for divisibility. A quick search in the online help shows that { $link divisor? }  is the word we 
 want. It will help to have the arguments for testing divisibility in the other direction, so we define { $snippet "multiple?" } ":"
+
 { $code "
 : multiple? ( a b -- ? ) swap divisor? ; inline
 " }
+
 We can verify that both of these return { $link t } .
+
 { $code "
 9 3 divisor? .
 3 9 multiple? .
 " }
-$nl
+
 Since we're going to use { $link bi } in our { $snippet "prime?" }  definition, we need a second quotation. Our second 
 quotation needs to test for a value in the range being a divisor of { $snippet "n" }  - in other words we need to partially apply the word  { $snippet "multiple?" } . This can be done with the word { $link curry } , like this: { $snippet "[ multiple? ] curry" } .
 
 Finally, once we have the range of potential divisors and the test function on the stack, we can test whether any 
 element satisfied divisibility with { $link any? }  and then negate that answer with { $link not } . Our full definition of { $snippet "prime" }  looks like
+
 { $code "
-: prime? ( n -- ? ) [ sqrt [2..b] ] [ [ multiple? ] curry ] bi any? not ;
+: prime? ( n -- ? )
+    [ sqrt [2..b] ] [ [ multiple? ] curry ] bi any? not ;
 " }
+
 Altough the definition of { $snippet "prime" }  is complicated, the stack shuffling is minimal and is only used in the small helper 
 functions, which are simpler to reason about than { $snippet "prime?" } .
 
@@ -329,7 +338,7 @@ when you asked the listener to import the word { $link [1..b] } for you. You can
 with the word { $link  POSTPONE: USING: } , which is followed by a list of vocabularies and terminated by { $link POSTPONE: ; } , like
 
 { $code "USING: ranges sequences ;" }
-$nl
+
 Finally, you define the vocabulary where your definitions are stored with the word { $link POSTPONE: IN: } . If you search the online 
 help for a word you have defined so far, like { $link prime? } , you will see that your definitions have been grouped under the 
 default { $vocab-link "scratchpad" } vocabulary. By the way, this shows that the online help automatically collects information about your 
@@ -364,17 +373,21 @@ IN: github.tutorial
 
 : multiple? ( a b -- ? ) swap divisor? ; inline
 
-: prime? ( n -- ? ) [ sqrt [2..b] ] [ [ multiple? ] curry ] bi any? not ;
+: prime? ( n -- ? )
+    [ sqrt [2..b] ] [ [ multiple? ] curry ] bi any? not ;
 " }
+
 Since the vocabulary was already loaded when you scaffolded it, we need a way to refresh it from disk. You can do this 
 with { $snippet "\"github.tutorial\" refresh" } . There is also a { $link refresh-all } word, with a shortcut { $snippet "F2" } .
 
 You will be prompted a few times to use vocabularies, since your { $link POSTPONE: USING: } statement is empty. After having accepted 
 all of them, Factor suggests you a new header with all the needed imports:
+
 { $code "
 USING: kernel math.functions ranges sequences ;
 IN: github.tutorial
 " }
+
 Now that you have some words in your vocabulary, you can edit, say, the { $snippet "multiple?" } word with { $snippet "\\ multiple? edit" } . You 
 will find your editor open on the relevant line of the right file. This also works for words in the Factor distribution, 
 although it may be a bad idea to modify them.
@@ -436,7 +449,7 @@ outputs, and the second one containing the words to run in order to get that out
 { f } [ 1 prime? ] unit-test
 { t } [ 20750750228539 prime? ] unit-test
 " }
-$nl
+
 You can now run the tests with { $snippet "\"github.tutorial\" test" } . You will see that we have actually made a mistake, and 
 pressing { $snippet "F3" }  will show more details. It seems that our assertions fails for { $snippet "2" } .
 
@@ -471,6 +484,7 @@ HELP: prime?
 }
 { $description \"Tests if n is prime. n is assumed to be a positive integer.\" } ;
 " }
+
 and refresh the { $snippet "github.tutorial" }  vocabulary. If you now look at the help for { $snippet "prime?" } , for instance with 
 { $snippet "\\ prime? help" } , you will see the updated documentation.
 
@@ -482,6 +496,7 @@ You can also render the directives in the listener for quicker feedback. For ins
     { \"?\" boolean }
 } print-content
 " }
+
 The help markup contains a lot of possible directives, and you can use them to write stand-alone articles in the help 
 system. Have a look at some more with { $snippet "\"element-types\" help" } .
 ;
@@ -517,6 +532,7 @@ Let us define a class for movies:
 { $code "
 TUPLE: movie title director actors ;
 " }
+
 This also generates setters { $snippet ">>title" } , { $snippet ">>director" } and { $snippet ">>actors" } and getters { $snippet "title>>" } , { $snippet "director>>" } and { $snippet "actors>>" } . 
 For instance, we can create a new movie with
 
@@ -526,6 +542,7 @@ movie new
     \"Christopher Nolan\" >>director
     { \"Hugh Jackman\" \"Christian Bale\" \"Scarlett Johansson\" } >>actors
 " }
+
 We can also shorten this to
 
 { $code "
@@ -533,7 +550,7 @@ We can also shorten this to
 { \"Hugh Jackman\" \"Christian Bale\" \"Scarlett Johansson\" }
 movie boa
 " }
-$nl
+
 The word { $link boa } stands for 'by-order-of-arguments'. It is a constructor that fills the slots of the tuple with the 
 items on the stack in order. { $snippet "movie boa" } is called a { $strong "boa constructor" } , a pun on the Boa Constrictor. It is customary to 
 define a most common constructor called { $snippet "<movie>" } , which in our case could be simply
@@ -546,6 +563,7 @@ In fact, boa constructor are so common, that the above line can be shortened to
 { $code "
 C: <movie> movie
 " }
+
 In other cases, you may want to use some defaults, or compute some fields.
 
 The functional minded will be worried about the mutability of tuples. Actually, slots can be declared to be "read-only" 
@@ -564,17 +582,20 @@ TUPLE: band
 
 : <band> ( keyboards guitar bass drums -- band ) band boa ;
 " }
+
 together with one instance
 
 { $code "
-	\"Richard Wright\" \"David Gilmour\" \"Roger Waters\" \"Nick Mason\" <band>
+\"Richard Wright\" \"David Gilmour\" \"Roger Waters\" \"Nick Mason\" <band>
 " }
+
 Now, of course everyone knows that the star in a movie is the first actor, while in a rock band it is the bass player. 
 To encode this, we first define a { $strong "generic word" } 
 
 { $code "
 GENERIC: star ( item -- star )
 " }
+
 As you can see, it is declared with the parsing word { $link POSTPONE: GENERIC: } and declares its stack effects but it has no 
 implementation right now, hence no need for the closing { $link POSTPONE: ; } . Generic words are used to perform dynamic dispatch. We can define 
 implementations for various classes using the word { $link POSTPONE: M: }
@@ -584,6 +605,7 @@ M: movie star actors>> first ;
 
 M: band star bass>> ;
 " }
+
 If you write { $snippet "star ." } two times, you can see the different effect of calling a generic word on instances of different 
 classes.
 
@@ -595,6 +617,7 @@ Mixins are defined with the { $link POSTPONE: MIXIN: } word, and existing classe
 { $code "
 INSTANCE: class mixin
 " }
+
 Methods defined on the mixin will then be available on all classes that belong to the mixin. If you are familiar with 
 Haskell typeclasses, you will recognize a resemblance, although Haskell enforces at compile time that instance of 
 typeclasses implement certain functions, while in Factor this is informally specified in documentation.
@@ -630,6 +653,7 @@ defition. You can check by yourself doing
 
 5 inc-print
 " }
+
 and then
 
 { $code "
@@ -637,6 +661,7 @@ and then
 
 5 inc-print
 " }
+
 This allows you to keep a listener open, improve your definitions, periodically save your definitions to a file 
 and refresh to view your changes, without ever having to reload Factor.
 
@@ -645,6 +670,7 @@ You can also save the state of your current session with the word { $link save-i
 { $code "
 ./factor -i=path-to-image
 " }
+
 In fact, Factor is image-based and only uses files when loading and refreshing vocabularies.
 
 The power of the listener does not end here. Elements of the stack can be inspected by clicking on them, or by calling the 
@@ -658,11 +684,13 @@ TUPLE: trilogy first second third ;
 \"A new hope\" \"The Empire strikes back\" \"Return of the Jedi\" <trilogy>
 \"George Lucas\" 2array
 " }
+
 You will get an item that looks like
 
 { $code "
 { ~trilogy~ \"George Lucas\" }
 " }
+
 on the stack. Try clicking on it: you will be able to see the slots of the array. You can inspect a slot shown in the inspector by double clicking on it. This is extremely useful for interactive prototyping. Special objects can customize the inspector 
 by implementing the { $link content-gadget } method.
 
@@ -678,6 +706,7 @@ DEFER: fib-rec
 : fib ( n -- f(n) ) dup 2 < [ ] [ fib-rec ] if ;
 : fib-rec ( n -- f(n) ) [ 1 - fib ] [ 2 - fib ] bi + ;
 " }
+
 (notice the use of { $link POSTPONE: DEFER: } to define two mutually "recursive" words). You can benchmark the running time writing { $snippet "40 fib" }  
 and then pressing Ctrl+t instead of Enter. You will get timing information, as well as other statistics. Programmatically
 , you can use the { $link time } word on a quotation to do the same.
@@ -687,6 +716,7 @@ You can also add watches on words, to print inputs and outputs on entry and exit
 { $code "
 \\ fib watch
 " }
+
 and then run { $snippet "10 fib" }  to see what happens. You can then remove the watch with { $snippet "\\ fib reset" } .
 
 Another useful tool is the { $vocab-link "lint" }  vocabulary. This scans word definitions to find duplicated code that can be factored 
@@ -695,6 +725,7 @@ out. As an example, let us define a word to check if a string starts with anothe
 { $code "
 \"lintme\" scaffold-work
 " }
+
 and add the following definition:
 
 { $code "
@@ -703,6 +734,7 @@ IN: lintme
 
 : startswith? ( str sub -- ? ) dup length swapd head = ;
 " }
+
 Load the lint tool with { $snippet "USE: lint" }  and write { $snippet "\"lintme\" lint-vocab" } . You will get a report mentioning that the word sequence 
 { $snippet "length swapd" }  is already used in the word { $link (split) } of { $vocab-link "splitting.private" } , hence it could be factored out.
 
@@ -739,6 +771,7 @@ can encode each with two bits. Let use define a word that operates on characters
     { CHAR: t [ { t f } ] }
 } case ;
 " }
+
 where the first bit represents whether the basis is a purine or a pyrimidine, and the second one identifies bases that 
 pair together.
 
@@ -755,6 +788,7 @@ delimiters and outputs the string obtained by concatenation
 { $code "
 SYNTAX: DNA{ \"}\" parse-tokens concat suffix! ;
 " }
+
 You can test the effect by doing { $snippet "DNA{ a ccg t a g }" } , which should output { $snippet "\"accgtag\"" } . As a second approximation, we 
 transform each letter into a boolean pair:
 
@@ -762,6 +796,7 @@ transform each letter into a boolean pair:
 SYNTAX: DNA{ \"}\" parse-tokens concat
     [ dna>bits ] { } map-as suffix! ;
 " }
+
 Notice the use of { $link map-as } instead of { $link map } . Since the target collection is not a string, we did not use { $link map } , which 
 preserves the type, but { $link map-as } , which take as an additional argument an examplar of the target collection - here { $snippet "{ }" } .
 Our "final" version flattens the array of pairs with { $link concat } and finally makes into a bit array:
@@ -771,6 +806,7 @@ SYNTAX: DNA{ \"}\" parse-tokens concat
     [ dna>bits ] { } map-as
     concat >bit-array suffix! ;
 " }
+
 If you try it with { $snippet "DNA{ a ccg t a g }" } you should get
 
 { $code "
@@ -788,6 +824,7 @@ the accumulator vector. This way, we can define { $snippet "..." } simply with
 { $code "
 SYNTAX: ... unclip-last scan-object [a..b] suffix! ;
 " }
+
 You can try it with { $snippet "12 ... 18 >array" } .
 
 We only scratched the surface of parsing words; in general, they allow you to perform arbitrary computations at 
@@ -816,6 +853,7 @@ present you a version with locals (this will require the { $vocab-link "locals" 
     b b * 4 a c * * - sqrt
     +
     2 a * / ;" }
+
 In this case we have chosen the + sign, but we can do better and output both solutions:
 
 { $code "
@@ -824,6 +862,7 @@ In this case we have chosen the + sign, but we can do better and output both sol
     b b * 4 a c * * - sqrt
     [ + ] [ - ] 2bi
     [ 2 a * / ] bi@ ;" }
+
 You can check that this definition works with something like { $snippet "2 -16 30 solveq" } , which should output both { $snippet "3.0" } and { $snippet "5.0" } . 
 Apart from being written in RPN style, our first version of { $snippet "solveq" } looks exactly the same it would in a language 
 with local variables. For the second definition, we apply both the { $link + }  and { $link - }  operations to -b and delta, using the 
@@ -849,30 +888,36 @@ Let me take again { $snippet "prime?" } , but this time write it without using h
 { $code "
 : prime? ( n -- ? )
     [ sqrt 2 swap [a,b] ] [ [ swap divisor? ] curry ] bi any? not ;" }
+
 Using { $link with }  instead of { $link curry } , this simplifies to
 
 { $code "
 : prime? ( n -- ? )
     2 over sqrt [a,b] [ divisor? ] with any? not ;" }
+
 If you are not able to visualize what is happening, you may want to consider the { $vocab-link "fry" } vocabulary. It defines { $strong "fried quotations" } ";" 
 these are quotations that have holes in them - marked by { $snippet "_" } - that are filled with values from the stack.
 
 The first quotation is rewritten more simply as
 
 { $code "
-    [ '[ 2 _ sqrt [a,b] ] call ]
+[ '[ 2 _ sqrt [a,b] ] call ]
 " }
+
 Here we use a fried quotation - starting with { $link POSTPONE: '[ } - to inject the element on the top of the stack in the second 
 position, and then use { $link call } to evaluate the resulting quotation. The second quotation can be rewritten as follows:
 
 { $code "
-    [ '[ _ swap divisor? ] ]
+[ '[ _ swap divisor? ] ]
 " }
+
 so an alternative defition of { $snippet "prime?" } is
 
 { $code "
-    : prime? ( n -- ? ) [ '[ 2 _ sqrt [a,b] ] call ] [ '[ _ swap divisor? ] ] bi any? not ;
+: prime? ( n -- ? )
+    [ '[ 2 _ sqrt [a,b] ] call ] [ '[ _ swap divisor? ] ] bi any? not ;
 " }
+
 Depending on your taste, you may find this version more readable. In this case, the added clarity is probably lost due 
 to the fact that the fried quotations are themselves inside quotations, but occasionally their use can do a lot to 
 simplify the flow.
@@ -889,6 +934,7 @@ Then one can use the word { $link set }  to bind the variable and { $link get } 
 
 { $code "\"Factor\" favorite-language set
 favorite-language get" }
+
 Scopes are nested, and new scopes can be created with the word { $link with-scope } . Try for instance
 
 { $code "
@@ -897,6 +943,7 @@ Scopes are nested, and new scopes can be created with the word { $link with-scop
         \"Scala\" favorite-language set
         favorite-language get .
     ] with-scope ;" }
+
 If you run { $snippet "on-the-jvm" } , { $snippet "\"Scala\"" } will be printed, but after execution, { $snippet "favorite-language get" } will hold { $snippet "\"Factor\"" } as its value.
 
 All the tools that we have seen in this section should only be used when absolutely necessary, as they break concatenativity and make 
@@ -931,11 +978,13 @@ one is executed, and on failure, the second one is executed with the error as in
 
 { $code "
 : safe-head ( seq n -- seq' ) [ head ] [ 2drop ] recover ;" }
+
 This is an impractical example of exceptions, as Factor defines the { $link short } word, which takes a 
 sequence and a number, and returns the minimum between the length of the sequence and the number. This allows us to write simply
 
 { $code "
 : safe-head ( seq n -- seq' ) index-or-length head ;" }
+
 With this definition, we can make a word to read the first character of the first line:
 
 { $code "
@@ -943,6 +992,7 @@ With this definition, we can make a word to read the first character of the firs
     utf8 <file-reader> [
         readln 1 safe-head write nl
     ] with-input-stream ;" }
+
 Using the helper word { $link with-file-reader } , we can also shorten this to
 
 { $code "
@@ -950,12 +1000,14 @@ Using the helper word { $link with-file-reader } , we can also shorten this to
     utf8 [
         readln 1 safe-head write nl
     ] with-file-reader ;" }
+
 Unfortunately, we are limited to one line. To read more lines, we should chain calls to { $link readln } until one returns { $link f } .
 Factor helps us with { $link file-lines } , which lazily iterates "over" lines. Our "final" definition becomes
 
 { $code "
 : read-first-letters ( path -- )
     utf8 file-lines [ 1 safe-head write nl ] each ;" }
+
 When the file is small, one can also use { $link file-contents } to read the whole contents of a file in a single string. 
 Factor defines many more words for input/output, which cover many more cases, such as binary files or sockets.
 
@@ -969,6 +1021,7 @@ but we will ignore them for simplicity). Hence we can define a word that lists f
 { $code "
 : list-files-and-dirs ( path -- files dirs )
     directory-entries [ type>> +regular-file+ = ] partition ;" }
+
 With this, we can define a word { $snippet "ls" } that will print directory contents as follows:
 
 { $code "
@@ -980,6 +1033,7 @@ With this, we can define a word { $snippet "ls" } that will print directory cont
     \"FILES:\" write nl
     \"------\" write nl
     [ name>> write nl ] each ;" }
+
 Try the word on your home directory to see the effects. In the next section, we shall look at how to create an 
 executable for our simple program.
 ;
@@ -1022,13 +1076,16 @@ under the { $link command-line } dynamic variable, which holds an array of strin
 define a word which runs { $snippet "ls" } on the first command-line argument with
 
 { $code ": ls-run ( -- ) command-line get first ls ;" }
+
 Finally, we use the word { $link POSTPONE: MAIN: } to declare the main word of our vocabulary:
 
 { $code "MAIN: ls-run" }
+
 Having added those two lines to your vocabulary, you are now ready to run it. The simplest way is to run the 
 vocabulary as a script with the { $snippet "-run" } flag passed to Factor. For instance to list the contents of my home I can do
 
 { $code "$ ./factor -run=ls /home/andrea" }
+
 In order to produce an executable, we must set some options and call the { $snippet "deploy" } word. The simplest way to do this 
 graphically is to invoke the { $link deploy-tool } word. If you write { $snippet "\"ls\" deploy-tool" } , you will be presented with a window to 
 choose deployment options. For our simple case, we will leave the default options and choose Deploy.
@@ -1038,6 +1095,7 @@ After a little while, you should be presented with an executable that you can ru
 { $code "$ cd ls
 
 $ ./ls /home/andrea" }
+
 Try making the { $snippet "ls" } program more robust by handling missing command-line arguments and non-existent or non-directory 
 arguments.
 ;
@@ -1062,7 +1120,7 @@ Threads in Factor are created using a quotation and a name, with the { $link spa
 first few lines of Star Wars, one per second, each line being printed inside its own thread. First, we will assign them to a 
 dynamic variable:
 
-{ $code "
+{ $code "\
 SYMBOL: star-wars
 
 \"A long time ago, in a galaxy far, far away....
@@ -1135,7 +1193,7 @@ simplifying the above to
 18 [0..b) [
     [ wait-and-print ] curry in-thread
 ] each" }
-$nl
+
 In serious applications threads will be long-running. In order to make them 
 cooperate, one can use the { $link yield } word to signal that the thread has done a unit of work, and other threads can gain 
 control. You also may want to have a look at other words to { $link stop } , { $link suspend } or { $link resume } threads.
@@ -1155,9 +1213,7 @@ The vocabulary { $vocab-link "io.servers" } allows to write and configure TCP se
 ports and so on. The most important slot to fill is { $snippet "handler" } , which contains a quotation that is executed for each 
 incoming connection. You can see a simple example of a server with
 { $code "
-
-    \"resource:extra/time-server/time-server.factor\" edit-file
-
+\"resource:extra/time-server/time-server.factor\" edit-file
 " }
 
 We will raise the level of abstraction even more and show how to run a simple HTTP server. First, { $snippet "USE: http.server" } .
@@ -1166,6 +1222,7 @@ An HTTP application is built out of a { $strong "responder" } . A responder is e
 request to an HTTP response, but more concretely it is anything that implements the method { $snippet "call-responder*" } . Responses are 
 instances of the tuple { $link response } , so are usually generated calling { $link <response> } and customizing a few slots. Let us 
 write a simple echo responder:
+
 { $code "TUPLE: echo-responder ;
 
 : <echo-responder> ( -- responder ) echo-responder new ;
@@ -1180,6 +1237,7 @@ M: echo-responder call-responder*
 
 Responders are usually combined to form more complex responders in order to implement routing and other features. In 
 our simplistic example, we will use just this one responder, and set it globally with
+
 { $code "<echo-responder> main-responder set-global" }
 
 Once you have done this, you can start the server with { $snippet "8080 httpd" } . You can then visit { $url "https://localhost:8080/hello/%20/from/%20/factor" }
@@ -1194,6 +1252,7 @@ from Chloe templates, and in order to create a responder we will need to add rou
 
 Let use first investigate a simple example of routing. To do this, we create a special type of responder called a { $strong "dispatcher" } , that dispatches requests based on path parameters. Let us create a simple dispatcher that will choose 
 between our echo responder and a default responder used to serve static files.
+
 { $code "
 dispatcher new-dispatcher
     <echo-responder> \"echo\" add-responder
@@ -1206,6 +1265,7 @@ Of course, substitute the path { $snippet "/home/andrea" } with any folder you l
 
 Now that you know how to do routing, we can write page actions in Chloe. Things are starting to become complicated, so 
 we scaffold a vocabulary with { $snippet "\"hello-furnace\" scaffold-work" } . Make it look like this:
+
 { $code "\
 ! Copyright (C) 2014 Andrea Ferretti.
 ! See https://factorcode.org/license.txt for BSD license.
@@ -1242,6 +1302,7 @@ declare the behaviour of receiving the result of a form - but we only set its te
 dispatcher class and the relative path of the template file.
 
 In order for all this to work, create a file { $snippet "work/hello-furnace/greetings.xml" } with a content like
+
 { $code "<?xml version='1.0' ?>
 
 <t:chloe xmlns:t=\"https://factorcode.org/chloe/1.0\">
@@ -1264,11 +1325,15 @@ need a way to spawn Factor processes and communicate between them. Factor implem
 CSP model, based on the use of { $strong "channels" } .
 
 As a warm-up, we will make a simple example of communication between threads in the same process.
+
 { $code "FROM: concurrency.messaging => send receive ;" }
+
 We can start a thread that will receive a message and print it repeatedly:
+
 { $code ": print-repeatedly ( -- ) receive . print-repeatedly ;
 
 [ print-repeatedly ] \"printer\" spawn" }
+
 A thread whose quotation starts with { $link receive } and calls itself recursively behaves like an actor in Erlang or Akka. 
 We can then use { $link send } to send messages to it. Try { $snippet "\"hello\" over send" } and then { $snippet "\"threading\" over send" } .
 
@@ -1283,17 +1348,25 @@ can create a channel with { $link <channel> } , write to it with { $link to } an
 blocking: { $link to } will block until the value is read in a different thread, and { $link from } will block until a value is available.
 
 We create a channel and give it a name with
+
 { $code "SYMBOL: ch
 
 <channel> ch set" }
+
 Then we write to it in a separate thread, in order not to block the UI
+
 { $code "[ \"hello\" ch get to ] in-thread" }
+
 We can then read the value in the UI with
+
 { $code "ch get from" }
+
 We can also invert the order:
+
 { $code "[ ch get from . ] in-thread
 
 \"hello\" ch get to" }
+
 This works fine, since we had set the reader first.
 
 Now, for the interesting part: we will start a second Factor instance and communicate via message sending. Factor 
@@ -1301,41 +1374,57 @@ transparently supports sending messages over the network, serializing values wit
 
 Start another instance of Factor, and run a node server on it. We will use the word { $link <inet4> } , that creates an IPv4 
 address from a host and a port, and the { $link <node-server> } constructor
+
 { $code "USE: concurrency.distributed
 
 f 9000 <inet4> <node-server> start-server" }
+
 Here we have used { $link f } as host, which just stands for localhost. We will also start a thread that keeps a running count 
 of the numbers it has received.
+
 { $code "FROM: concurrency.messaging => send receive ;
 
 : add ( x -- y ) receive + dup . add ;
 
 [ 0 add ] \"adder\" spawn" }
+
 Once we have started the server, we can make a thread available with { $link register-remote-thread } ":"
+
 { $code "dup name>> register-remote-thread" }
+
 Now we switch to the other instance of Factor. Here we will receive a reference to the remote thread and start sending 
 numbers to it. The address of a thread is just the address of its server and the name we have registered the thread with
 , so we obtain a reference to our adder thread with
+
 { $code "f 9000 <inet4> \"adder\" <remote-thread>" }
+
 Now, we reimport { $link send } just to be sure (there is an overlap with a word having the same name in { $vocab-link "io.sockets" } , that we 
 have imported)
+
 { $code "FROM: concurrency.messaging => send receive ;" }
+
 and we can start sending numbers to it. Try { $snippet "3 over send" } , and then { $snippet "8 over send" } - you should see the running total 
 printed in the other Factor instance.
 
 What about channels? We go back to our server, and start a channel there, just as above. This time, though, we { $link publish } it to make it available remotely:
+
 { $code "USING: channels channels.remote ;
 
 <channel> dup publish" }
+
 What you get in return is an id you can use remotely to communicate. For instance, I just got 
 { $snippet "326546621698456955263335657082068225943" } (yes, they really want to be sure it is unique!).
 
 We will wait on this channel, thereby blocking the UI:
+
 { $code "swap from ." }
+
 In the other Factor instance we use the id to get a reference to the remote channel and write to it
+
 { $code "\
 f 9000 <inet4> 326546621698456955263335657082068225943 <remote-channel>
 \"Hello, channels\" over to" }
+
 In the server instance, the message should be printed.
 
 Remote channels and threads are both useful to implement distributed applications and make good use of multicore 
@@ -1368,7 +1457,9 @@ However, you can help with this by posting questions on Stack Overflow under the
 "Factor lacks native threads: although the distributed processes make up for it, they incur some cost in serialization."
 "Factor does not currently have a package manager. Most prominent packages are part of the main Factor distribution."
 }
+
 The Factor source tree is massive, so here's a few vocabularies to get you started off:
+
 { $list 
   { "We have not talked a lot about errors and exceptions. Learn more in the " { $vocab-link "debugger" } " vocabulary." } 
   { "The " { $vocab-link "macros" } " vocabulary implements a form of compile time metaprogramming less general than parsing words." }
@@ -1379,7 +1470,7 @@ The Factor source tree is massive, so here's a few vocabularies to get you start
 
 These vocabularies are a testament to the power and expressivity of Factor, and we hope that they 
 help you make something you like. Happy hacking!
-$nl
+
 { $code "\
 USE: images.http
 
@@ -1390,6 +1481,7 @@ ARTICLE: "tour" "Guided tour of Factor"
 Factor is a mature, dynamically typed language based on the concatenative paradigm. Getting started with Factor can be daunting 
 since the concatenative paradigm is different from most mainstream languages.
 This tutorial will:
+
 { $list 
   "Guide you through the basics of Factor so you can appreciate its simplicity and power."
   "Assume you are an experienced programmer familiar with a functional language"
