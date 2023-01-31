@@ -130,3 +130,9 @@ footer {
         background-color: #373e48;
     }
 }
+
+@media print {
+    body {
+        font-size: 10pt;
+    }
+}
