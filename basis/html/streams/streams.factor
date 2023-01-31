@@ -1,9 +1,8 @@
 ! Copyright (C) 2004, 2009 Slava Pestov.
 ! See https://factorcode.org/license.txt for BSD license.
-USING: accessors assocs colors combinators
-combinators.short-circuit destructors html io io.styles kernel
-make math math.functions math.parser sequences strings
-xml.syntax ;
+USING: accessors assocs colors combinators destructors html io
+io.styles kernel make math math.functions math.parser sequences
+strings xml.syntax ;
 IN: html.streams
 
 GENERIC: url-of ( object -- url )
@@ -25,11 +24,8 @@ TUPLE: html-sub-stream < html-writer style parent ;
         swap >>parent
         swap >>style ; inline
 
-: string-spans ( data -- data' )
-    [ dup string? [ [XML <span><-></span> XML] ] when ] map ;
-
 : end-sub-stream ( substream -- string style stream )
-    [ data>> string-spans ] [ style>> ] [ parent>> ] tri ;
+    [ data>> ] [ style>> ] [ parent>> ] tri ;
 
 : object-link-tag ( xml style -- xml )
     presented of [ url-of [ simple-link ] when* ] when* ;
@@ -74,9 +70,7 @@ MACRO: make-css ( pairs -- str )
     [ swap [XML <span style=<->><-></span> XML] ] unless-empty ; inline
 
 : emit-html ( stream quot -- )
-    dip data>> { [ over string? ] [ dup ?last string? ] } 0&& [
-        [ last prepend ] [ set-last ] bi
-    ] [ push ] if ; inline
+    dip data>> push ; inline
 
 : img-tag ( xml style -- xml )
     image-style of [ nip simple-image ] when* ;
@@ -121,7 +115,7 @@ M: html-span-stream dispose
             { inset padding-css, }
             { wrap-margin width-css, }
         } make-css
-    ] bi append ;
+    ] bi "display: inline-block; " 3append ;
 
 : div-tag ( xml style -- xml' )
     div-css-style
@@ -176,7 +170,7 @@ M: html-writer stream-write-table
             [ data>> [XML <td valign="top" style=<->><-></td> XML] ] with map
             [XML <tr><-></tr> XML]
         ] with map
-        [XML <table style="border-collapse: collapse;"><-></table> XML]
+        [XML <table style="display: inline-table; border-collapse: collapse;"><-></table> XML]
     ] emit-html ;
 
 M: html-writer dispose drop ;
@@ -185,4 +179,4 @@ M: html-writer dispose drop ;
     html-writer new-html-writer ;
 
 : with-html-writer ( quot -- xml )
-    <html-writer> [ swap with-output-stream* ] keep data>> string-spans ; inline
+    <html-writer> [ swap with-output-stream* ] keep data>> ; inline
