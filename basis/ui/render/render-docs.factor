@@ -24,7 +24,7 @@ HELP: gadget
         { "clipped?" "a boolean indicating if clipping will be enabled when drawing this gadget's children." }
         { "interior" { "an implementation of the " { $link "ui-pen-protocol" } } }
         { "boundary" { "an implementation of the " { $link "ui-pen-protocol" } } }
-        {  "model" { "a " { $link model } " or " { $link f } "; see " { $link "ui-control-impl" } } }
+        { "model" { "a " { $link model } " or " { $link f } "; see " { $link "ui-control-impl" } } }
     }
 "Gadgets subclass the " { $link rect } " class, and thus all instances have " { $slot "loc" } " and " { $slot "dim" } " instances holding their location and dimensions." }
 { $notes
