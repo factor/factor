@@ -67,11 +67,9 @@ C: <vocab-author> vocab-author
     $vocab-roots ;
 
 : files. ( seq -- )
-    snippet-style get [
-        code-style get [
-            [ nl ] [ [ string>> ] keep write-object ] interleave
-        ] with-nesting
-    ] with-style ;
+    code-style get [
+        [ nl ] [ [ string>> ] keep write-object ] interleave
+    ] with-nesting ;
 
 : describe-files ( vocab -- )
     vocab-files [ <pathname> ] map [
