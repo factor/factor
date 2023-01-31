@@ -19,13 +19,17 @@ ERROR: arm64-encoding-imm original n-bits-requested truncated ;
     2dup >signed dup reach =
     [ drop bits ] [ arm64-encoding-imm ] if ; inline
 
+ERROR: scaling-error original n-bits-shifted rest ;
+: ?>> ( x n -- x )
+    2dup bits [ neg shift ] [ scaling-error ] if-zero ;
+
 ! Some instructions allow an immediate literal of n bits
 ! or n bits shifted. This means there are invalid immediate
 ! values, e.g. imm12 of 1, 4096, but not 4097
 ERROR: imm-out-of-range imm n ;
 : imm-lower? ( imm n -- ? ) on-bits unmask 0 > not ;
 
- : imm-upper? ( imm n -- ? )
+: imm-upper? ( imm n -- ? )
     [ on-bits ] [ shift ] bi unmask 0 > not ;
 
 : (split-imm) ( imm n -- imm upper? )
@@ -35,7 +39,7 @@ ERROR: imm-out-of-range imm n ;
         [ imm-out-of-range ]
     } cond ;
 
-: split-imm ( imm -- shift imm' ) 12 (split-imm) 1 0 ? swap ;
+: split-imm ( imm -- shift imm ) 12 (split-imm) 1 0 ? swap ;
 
 ERROR: illegal-bitmask-immediate n ;
 : ?bitmask ( imm imm-size -- imm )
@@ -68,20 +72,20 @@ ERROR: illegal-bitmask-element n ;
     [ ?element ] keep [ >Nimms ] [ >immr ] 2bi
     { 12 0 6 } bitfield* ;
 
-: ADR ( imm21 Rd -- ) [ [ 2 bits ] [ -2 shift 19 ?sbits ] bi ] dip ADR-encode ;
+: ADR ( simm21 Rd -- ) [ [ 2 bits ] [ -2 shift 19 ?sbits ] bi ] dip ADR-encode ;
 
-: ADRP ( imm21 Rd -- ) [ 4096 / [ 2 bits ] [ -2 shift 19 ?sbits ] bi ] dip ADRP-encode ;
+: ADRP ( simm21 Rd -- ) [ 4096 / [ 2 bits ] [ -2 shift 19 ?sbits ] bi ] dip ADRP-encode ;
 
-: RET ( register/f -- ) X30 or RET-encode ;
+: RET ( Rn/f -- ) X30 or RET-encode ;
 
-: SVC ( imm16 -- ) 16 ?ubits SVC-encode ;
+: SVC ( uimm16 -- ) 16 ?ubits SVC-encode ;
 
-: BRK ( imm16 -- ) 16 ?ubits BRK-encode ;
-: HLT ( imm16 -- ) 16 ?ubits HLT-encode ;
+: BRK ( uimm16 -- ) 16 ?ubits BRK-encode ;
+: HLT ( uimm16 -- ) 16 ?ubits HLT-encode ;
 
 ! B but that is breakpoint
-: Br ( imm28 -- ) 4 / 26 ?sbits B-encode ;
-: B.cond ( imm21 cond4 -- ) [ 4 / 19 ?sbits ] dip B.cond-encode ;
-: BL ( imm28 -- ) 4 / 26 ?sbits BL-encode ;
+: Br ( simm28 -- ) 2 ?>> 26 ?sbits B-encode ;
+: B.cond ( simm21 cond -- ) [ 2 ?>> 19 ?sbits ] dip B.cond-encode ;
+: BL ( simm28 -- ) 2 ?>> 26 ?sbits BL-encode ;
 : BR ( Rn -- ) BR-encode ;
 : BLR ( Rn -- ) BLR-encode ;

@@ -241,25 +241,24 @@ SINGLETONS: SPSR_EL1 SPSR_EL2 SPSR_EL3 ;
 ! https://community.element14.com/products/devtools/technicallibrary/m/files/10863
 ! pg 16
 ! cond code set in previous arm assembly instruction
-: >CC ( x -- x ) >dec bin> ; inline
-: EQ ( -- n ) 0000 >CC ; inline ! Z set: equal
-: NE ( -- n ) 0001 >CC ; inline ! Z clear: not equal
-: CS ( -- n ) 0010 >CC ; inline ! C set: unsigned higher or same
-: HS ( -- n ) 0010 >CC ; inline !
-: CC ( -- n ) 0011 >CC ; inline ! C clear: unsigned lower
-: LO ( -- n ) 0011 >CC ; inline !
-: MI ( -- n ) 0100 >CC ; inline ! N set: negative
-: PL ( -- n ) 0101 >CC ; inline ! N clear: positive or zero
-: VS ( -- n ) 0110 >CC ; inline ! V set: overflow
-: VC ( -- n ) 0111 >CC ; inline ! V clear: no overflow
-: HI ( -- n ) 1000 >CC ; inline ! C set and Z clear: unsigned higher
-: LS ( -- n ) 1001 >CC ; inline ! C clear or Z set: unsigned lower or same
-: GE ( -- n ) 1010 >CC ; inline ! N equals V: greater or equal
-: LT ( -- n ) 1011 >CC ; inline ! N not equal to V: less than
-: GT ( -- n ) 1100 >CC ; inline ! Z clear AND (N equals V): greater than
-: LE ( -- n ) 1101 >CC ; inline ! Z set OR (N not equal to V): less than or equal
-: AL ( -- n ) 1110 >CC ; inline ! always
-: NV ( -- n ) 1111 >CC ; inline ! always
+: EQ ( -- n ) 0b0000 ; inline ! Z set: equal
+: NE ( -- n ) 0b0001 ; inline ! Z clear: not equal
+: CS ( -- n ) 0b0010 ; inline ! C set: unsigned higher or same
+: HS ( -- n ) 0b0010 ; inline !
+: CC ( -- n ) 0b0011 ; inline ! C clear: unsigned lower
+: LO ( -- n ) 0b0011 ; inline !
+: MI ( -- n ) 0b0100 ; inline ! N set: negative
+: PL ( -- n ) 0b0101 ; inline ! N clear: positive or zero
+: VS ( -- n ) 0b0110 ; inline ! V set: overflow
+: VC ( -- n ) 0b0111 ; inline ! V clear: no overflow
+: HI ( -- n ) 0b1000 ; inline ! C set and Z clear: unsigned higher
+: LS ( -- n ) 0b1001 ; inline ! C clear or Z set: unsigned lower or same
+: GE ( -- n ) 0b1010 ; inline ! N equals V: greater or equal
+: LT ( -- n ) 0b1011 ; inline ! N not equal to V: less than
+: GT ( -- n ) 0b1100 ; inline ! Z clear AND (N equals V): greater than
+: LE ( -- n ) 0b1101 ; inline ! Z set OR (N not equal to V): less than or equal
+: AL ( -- n ) 0b1110 ; inline ! always
+: NV ( -- n ) 0b1111 ; inline ! always
 
 ERROR: no-field-word vocab name ;
 
