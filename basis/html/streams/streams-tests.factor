@@ -9,15 +9,15 @@ IN: html.streams.tests
 
 [ [ ] make-html-string ] must-infer
 
-{ "<span></span>" } [
+{ "" } [
     [ "" write ] make-html-string
 ] unit-test
 
-{ "<span>a</span>" } [
+{ "a" } [
     [ CHAR: a write1 ] make-html-string
 ] unit-test
 
-{ "<span>&lt;</span>" } [
+{ "&lt;" } [
     [ "<" write ] make-html-string
 ] unit-test
 
@@ -49,7 +49,7 @@ M: funky url-of "http://www.funky-town.com/" swap town>> append ;
     ] make-html-string
 ] unit-test
 
-{ "<div style=\"background-color: #ff00ff; \"><span>cdr</span></div>" }
+{ "<div style=\"background-color: #ff00ff; display: inline-block; \">cdr</div>" }
 [
     [
         H{ { page-color T{ rgba f 1 0 1 1 } } }
@@ -57,7 +57,7 @@ M: funky url-of "http://www.funky-town.com/" swap town>> append ;
     ] make-html-string
 ] unit-test
 
-{ "<br/>" } [
+{ "<div style=\"display: inline-block; \"></div><br/>" } [
     [ H{ } [ ] with-nesting nl ] make-html-string
 ] unit-test
 
