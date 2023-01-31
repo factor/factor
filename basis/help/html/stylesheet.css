@@ -75,6 +75,14 @@ nav input {
     height: 16px;
 }
 
+.page div:not(.a) {
+    width: fit-content;
+}
+
+.page div:not(.a) table {
+    margin: 1.0rem 0;
+}
+
 footer {
     margin-top: 15px;
     border-top: 1px dashed #d5d5d5;
