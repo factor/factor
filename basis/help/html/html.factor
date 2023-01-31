@@ -172,10 +172,6 @@ M: pathname url-of
         " width: fit-content; white-space: pre-wrap; line-height: 125%;" append
     ] re-replace-with
 
-    dup { "font-family: monospace;" "background-color:" } [ subseq-of? ] with all? [
-        " margin: 1.0rem 0;" append
-    ] when
-
     dup { "border:" "background-color:" } [ subseq-of? ] with all? [
         " border-radius: 5px;" append
     ] when ;
@@ -277,26 +273,8 @@ M: pathname url-of
         [XML <-><div class="page"><-><-></div> XML]
     ] bi simple-page ;
 
-: fix-spacing ( html -- html' )
-    ! one line spacing before/after divs
-    "div><br/><br/><" "div><br/><" replace
-    "><br/><br/><div" "><br/><div" replace
-
-    ! one line spacing before after tables
-    "table><br/><br/><" "table><br/><" replace
-    "><br/><br/><table" "><br/><table" replace
-
-    ! spans before or after divs don't need line breaks
-    "span><br/><div" "span><div" replace
-    "div><br/><span" "div><span" replace
-
-    ! spans before or after tables don't need line breaks
-    "span><br/><table" "span><table" replace
-    "table><br/><span" "table><span" replace ;
-
 : generate-help-file ( topic -- )
-    [ help>html xml>string fix-spacing ]
-    [ topic>filename utf8 set-file-contents ] bi ;
+    dup topic>filename utf8 [ help>html write-xml ] with-file-writer ;
 
 : all-vocabs-really ( -- seq )
     all-disk-vocabs-recursive filter-vocabs
