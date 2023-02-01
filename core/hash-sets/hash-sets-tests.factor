@@ -3,7 +3,7 @@
 USING: accessors hash-sets kernel math prettyprint sequences
 sets sorting tools.test ;
 
-{ { 1 2 3 } } [ HS{ 1 2 3 } members natural-sort ] unit-test
+{ { 1 2 3 } } [ HS{ 1 2 3 } members sort ] unit-test
 
 { "HS{ 1 2 3 4 }" } [ HS{ 1 2 3 4 } unparse ] unit-test
 
@@ -18,7 +18,7 @@ sets sorting tools.test ;
 { t } [ 1 HS{ 1 } ?delete ] unit-test
 { f } [ 1 HS{ } ?delete ] unit-test
 { HS{ 1 2 } } [ HS{ 1 2 } fast-set ] unit-test
-{ { 1 2 } } [ HS{ 1 2 } members natural-sort ] unit-test
+{ { 1 2 } } [ HS{ 1 2 } members sort ] unit-test
 
 { HS{ 1 2 3 4 } } [ HS{ 1 2 3 } HS{ 2 3 4 } union ] unit-test
 { HS{ 2 3 } } [ HS{ 1 2 3 } HS{ 2 3 4 } intersect ] unit-test

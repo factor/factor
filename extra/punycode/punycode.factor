@@ -32,7 +32,7 @@ CONSTANT: DIGITS $[ "abcdefghijklmnopqrstuvwxyz0123456789" >byte-array ]
     ] while BASE delta * delta SKEW + /i + ;
 
 : segregate ( str -- base extended )
-    [ N < ] partition members natural-sort ;
+    [ N < ] partition members sort ;
 
 :: find-pos ( str ch i pos -- i' pos' )
     i pos 1 + str [

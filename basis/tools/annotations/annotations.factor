@@ -148,6 +148,6 @@ PRIVATE>
 
 : word-timing. ( -- )
     word-timing get >alist
-    [ second first ] sort-with
+    [ second first ] sort-by
     [ first2 first2 [ 1,000,000,000 /f ] dip 3array ] map
     simple-table. ;

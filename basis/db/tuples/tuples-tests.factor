@@ -680,7 +680,7 @@ select-me "select_me"
     [ { "test" "test2" } ] [
         select-me new NULL >>data [ "test" >>data ] update-tuples
         select-me new [ data>> ] collector [ each-tuple ] dip
-        natural-sort
+        sort
     ] unit-test
 
     [ { "test1" "test2" } ] [
@@ -688,13 +688,13 @@ select-me "select_me"
             dup data>> "test" = [ "test1" >>data ] [ drop f ] if
         ] update-tuples
         select-me new [ data>> ] collector [ each-tuple ] dip
-        natural-sort
+        sort
     ] unit-test
 
     [ { "test2" } ] [
         select-me new [ data>> "test1" = ] reject-tuples
         select-me new [ data>> ] collector [ each-tuple ] dip
-        natural-sort
+        sort
     ] unit-test ;
 
 [ test-mapping ] test-sqlite

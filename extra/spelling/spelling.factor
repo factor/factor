@@ -48,7 +48,7 @@ CONSTANT: ALPHABET "abcdefghijklmnopqrstuvwxyz"
     word 1array dictionary filter-known
     [ word edits1 dictionary filter-known ] when-empty
     [ word edits2 dictionary filter-known ] when-empty
-    [ dictionary at ] sort-with reverse! ;
+    [ dictionary at ] sort-by reverse! ;
 
 : words ( string -- words )
     >lower [ letter? not ] split-when harvest ;

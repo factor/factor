@@ -1,4 +1,5 @@
 ! Copyright (C) 2020 Doug Coleman.
+! Copyright (C) 2023 Giftpflanze.
 ! See https://factorcode.org/license.txt for BSD license.
 USING: combinators cpu.arm.assembler.opcodes grouping kernel
 math math.bitwise math.parser sequences ;

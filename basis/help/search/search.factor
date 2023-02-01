@@ -41,7 +41,7 @@ MEMO: article-words ( name -- words )
         ] [
             first '[ article-words [ _ head? ] any? ] filter
         ] if
-    ] if-empty [ article-name ] sort-with ;
+    ] if-empty [ article-name ] sort-by ;
 
 PRIVATE>
 

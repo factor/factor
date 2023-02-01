@@ -99,7 +99,7 @@ GENERIC: vocab-changed ( vocab obj -- )
 ERROR: no-vocab name ;
 
 : loaded-vocab-names ( -- seq )
-    dictionary get keys natural-sort ;
+    dictionary get keys sort ;
 
 : vocab-words ( vocab-spec -- seq )
     vocab-words-assoc values ;

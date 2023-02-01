@@ -33,7 +33,7 @@ CONSTANT: aliases {
 
 : contributors ( -- )
     changelog histogram merge-aliases
-    sort-values <reversed>
+    inv-sort-values
     simple-table. ;
 
 MAIN: contributors

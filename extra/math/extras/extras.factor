@@ -170,7 +170,7 @@ PRIVATE>
 <PRIVATE
 
 :: (gini) ( seq -- x )
-    seq natural-sort :> sorted
+    seq sort :> sorted
     seq length :> len
     sorted 0 [ + ] cum-reduce :> ( a b )
     b len a * / :> c

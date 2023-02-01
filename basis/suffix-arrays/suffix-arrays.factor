@@ -30,7 +30,7 @@ IN: suffix-arrays
 PRIVATE>
 
 : >suffix-array ( seq -- suffix-array )
-    members [ suffixes ] map concat natural-sort ;
+    members [ suffixes ] map concat sort ;
 
 SYNTAX: SA{ \ } [ >suffix-array ] parse-literal ;
 

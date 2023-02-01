@@ -53,7 +53,7 @@ TYPED:: <papier-renderer> ( -- renderer: papier-renderer )
 
 : order-slabs ( slabs eye -- slabs' )
     ! NO
-    ! '[ center>> _ v- norm-sq ] inv-sort-with ; inline
+    ! '[ center>> _ v- norm-sq ] inv-sort-by ; inline
     drop ;
 
 : render-slabs ( slabs -- vertices indexes )

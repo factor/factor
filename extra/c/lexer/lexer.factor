@@ -2,7 +2,7 @@
 ! See https://factorcode.org/license.txt for BSD license.
 USING: accessors combinators combinators.short-circuit kernel
 math.order ranges sequences sequences.generalizations
-sequences.parser sorting.functor sorting.slots unicode ;
+sequences.parser sorting unicode ;
 IN: c.lexer
 
 : take-c-comment ( sequence-parser -- seq/f )
@@ -91,10 +91,7 @@ IN: c.lexer
 : take-c-identifier ( sequence-parser -- string/f )
     [ (take-c-identifier) ] with-sequence-parser ;
 
-<< "length" [ length ] define-sorting >>
-
-: sort-tokens ( seq -- seq' )
-    { length>=< <=> } sort-by ;
+: sort-tokens ( seq -- seq' ) [ length ] inv-sort-by ;
 
 : take-c-integer ( sequence-parser -- string/f )
     [

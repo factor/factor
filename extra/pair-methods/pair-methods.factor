@@ -22,7 +22,7 @@ ERROR: no-pair-method a b generic ;
 
 : sorted-pair-methods ( word -- alist )
     "pair-generic-methods" word-prop >alist
-    [ first method-sort-key ] inv-sort-with ;
+    [ first method-sort-key ] inv-sort-by ;
 
 : pair-generic-definition ( word -- def )
     [ sorted-pair-methods [ first2 pair-method-cond ] map ]

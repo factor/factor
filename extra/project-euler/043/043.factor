@@ -82,7 +82,7 @@ PRIVATE>
     [ unclip 1 head prefix concat ] map [ all-unique? ] filter ;
 
 : add-missing-digit ( seq -- seq )
-    dup natural-sort 10 <iota> swap diff prepend ;
+    dup sort 10 <iota> swap diff prepend ;
 
 : interesting-pandigitals ( -- seq )
     17 candidates { 13 11 7 5 3 2 } [

@@ -30,5 +30,5 @@ DESTRUCTOR: freeifaddrs
         { void* } [ getifaddrs io-error ] with-out-parameters
         &freeifaddrs ifaddrs deref
         [ ifa_next>> ] follow
-        [ ifa_name>> ] map members natural-sort
+        [ ifa_name>> ] map members sort
     ] with-destructors ;

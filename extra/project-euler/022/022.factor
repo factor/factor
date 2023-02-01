@@ -37,7 +37,7 @@ IN: project-euler.022
 PRIVATE>
 
 : euler022 ( -- answer )
-    source-022 natural-sort name-scores sum ;
+    source-022 sort name-scores sum ;
 
 ! [ euler022 ] 100 ave-time
 ! 74 ms ave run time - 5.13 SD (100 trials)

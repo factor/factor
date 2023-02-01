@@ -218,5 +218,5 @@ CONSTANT: semver-gt-comparisons {
         "2.0.0"
         "2.1.0"
         "2.1.1"
-    } dup clone randomize [ semver<=> ] sort =
+    } dup clone randomize [ semver<=> ] sort-with =
 ] unit-test

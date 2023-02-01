@@ -10,7 +10,7 @@ IN: machine-learning.decision-trees
     normalized-histogram values entropy 2 log / ;
 
 : group-by-sorted ( seq quot: ( elt -- key ) -- groups )
-    [ sort-with ] keep group-by ; inline
+    [ sort-by ] keep group-by ; inline
 
 : subsets-weighted-entropy ( data-target idx -- seq )
     ! Group the data according to the given index.

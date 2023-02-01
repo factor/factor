@@ -884,7 +884,7 @@ MIXIN: empty-mixin
 
 { V{ t } } [ [ macosx unix? ] final-literals ] unit-test
 
-{ V{ array } } [ [ [ <=> ] sort [ <=> ] sort ] final-classes ] unit-test
+{ V{ array } } [ [ [ <=> ] sort-with [ <=> ] sort-with ] final-classes ] unit-test
 
 { V{ float } } [ [ fsqrt ] final-classes ] unit-test
 

@@ -81,7 +81,7 @@ C: <snake-part> snake-part
     [ dir>> move-loc ] accumulate nip ;
 
 : snake-occupied-indices ( snake head-loc -- points )
-    snake-occupied-locs [ game-loc>index ] map natural-sort ;
+    snake-occupied-locs [ game-loc>index ] map sort ;
 
 : snake-unoccupied-indices ( snake head-loc -- points )
     [ all-indices ] 2dip snake-occupied-indices without ;

@@ -35,7 +35,7 @@ IN: escape-strings
     [ length ] histogram-by
     dup keys length [0..b]
     [ [ of ] keep over [ 10^ < ] [ nip ] if ] with find nip
-    [ '[ length _ = ] filter natural-sort ] keep ! remove natural-sort here
+    [ '[ length _ = ] filter sort ] keep ! remove sort here
     [
         [ drop "" ] [
             10^ <iota> [

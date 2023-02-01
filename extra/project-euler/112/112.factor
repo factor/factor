@@ -34,7 +34,7 @@ IN: project-euler.112
 <PRIVATE
 
 : bouncy? ( n -- ? )
-    number>digits dup natural-sort
+    number>digits dup sort
     [ = not ] [ reverse = not ] 2bi and ;
 
 PRIVATE>

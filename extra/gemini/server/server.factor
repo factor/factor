@@ -58,7 +58,7 @@ TUPLE: gemini-server < threaded-server
     path [
         [ name>> "." head? ] reject
         [ { [ directory? ] [ regular-file? ] } 1|| ] filter
-        [ name>> ] sort-with
+        [ name>> ] sort-by
         [
             [ name>> ] [ directory? [ "/" append ] when ] bi
             [

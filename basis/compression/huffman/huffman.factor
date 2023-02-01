@@ -110,7 +110,7 @@ TUPLE: huffman-tree
     } cond ;
 
 : sort-values! ( obj -- sortedseq )
-    >alist [ <==> ] sort ;
+    >alist [ <==> ] sort-with ;
 
 : get-next-code ( code current -- next )
     [ reverse bit-array>integer 1 + ] [ length ] bi <bits> >bit-array reverse dup length pick length swap - [ f ] replicate append nip ;

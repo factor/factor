@@ -4,7 +4,7 @@ USING: accessors build-from-source environment html.parser
 html.parser.analyzer http.client io.backend io.directories
 io.encodings.utf8 io.files io.files.temp io.launcher
 io.pathnames kernel multiline qw sequences sorting.human
-sorting.slots windows.shell32 ;
+windows.shell32 ;
 IN: build-from-source.windows
 
 ! choco install -y meson StrawberryPerl nasm winflexbison3 glfw3

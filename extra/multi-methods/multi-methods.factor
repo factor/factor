@@ -52,7 +52,7 @@ SYMBOL: total
 
         [ [ canonicalize-specializer-1 ] dip ] assoc-map
 
-        hooks [ natural-sort ] change
+        hooks [ sort ] change
 
         [ [ canonicalize-specializer-2 ] dip ] assoc-map
 

@@ -8,7 +8,7 @@ vocabs.parser ;
 IN: did-you-mean
 
 : did-you-mean-restarts ( possibilities -- restarts )
-    natural-sort
+    sort
     [ [ [ vocabulary>> ] [ name>> ] bi "Use %s:%s" sprintf ] keep ]
     { } map>assoc ;
 

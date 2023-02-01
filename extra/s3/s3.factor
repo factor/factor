@@ -3,7 +3,7 @@
 USING: accessors assocs base64 calendar calendar.format
 calendar.parser checksums.hmac checksums.sha combinators http
 http.client kernel make math.order namespaces sequences
-sorting sorting.slots strings xml xml.traversal ;
+sorting strings xml xml.traversal ;
 IN: s3
 
 SYMBOL: key-id
@@ -16,7 +16,7 @@ TUPLE: s3-request path mime-type date method headers bucket data ;
 : hashtable>headers ( hashtable -- seq )
     [
         [ swap % ":" % % "\n" % ] "" make
-    ] { } assoc>map [ <=> ] sort ;
+    ] { } assoc>map sort ;
 
 : signature ( s3-request -- string )
     [
@@ -84,7 +84,7 @@ PRIVATE>
     f "/" H{ } clone s3-get nip >string string>xml (buckets) ;
 
 : sorted-buckets ( -- seq )
-    buckets { { date>> rfc3339>timestamp <=> } } sort-by ;
+    buckets [ date>> rfc3339>timestamp ] sort-by ;
 
 <PRIVATE
 : bucket-url ( bucket -- string )

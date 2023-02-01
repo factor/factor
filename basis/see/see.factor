@@ -255,15 +255,15 @@ M: error-class see* see-class ;
     dup implementors
     [ [ reader? ] [ writer? ] bi or ] reject
     [ lookup-method ] with map
-    natural-sort ;
+    sort ;
 
 : seeing-methods ( generic -- seq )
-    "methods" word-prop values natural-sort ;
+    "methods" word-prop values sort ;
 
 PRIVATE>
 
 : see-all ( seq -- )
-    natural-sort [ nl nl ] [ see* ] interleave ;
+    sort [ nl nl ] [ see* ] interleave ;
 
 : methods ( word -- seq )
     [

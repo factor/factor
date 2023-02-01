@@ -30,7 +30,7 @@ IN: redis.tests
 { { "aa" "ab" "ac" } } [
     [
         { "aa" "ab" "ac" "bd" } [ "hello" swap redis-set ] each
-        "a*" redis-keys natural-sort
+        "a*" redis-keys sort
     ] with-redis-test
 ] unit-test
 

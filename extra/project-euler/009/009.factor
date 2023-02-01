@@ -34,7 +34,7 @@ IN: project-euler.009
         [ sq ] bi@
         [ - 2 / , ]      ! b = (p² - q²) / 2
         [ + 2 / , ] 2bi  ! c = (p² + q²) / 2
-    ] { } make natural-sort ;
+    ] { } make sort ;
 
 : (ptriplet) ( target p q triplet -- target p q )
     sum pickd = [ next-pq 2dup abc (ptriplet) ] unless ;

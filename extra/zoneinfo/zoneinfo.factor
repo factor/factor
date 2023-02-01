@@ -148,7 +148,7 @@ MEMO: zoneinfo-assoc ( -- assoc )
 : zoneinfo-zones ( -- seq )
     raw-zone-map keys
     [ "/" subseq-of? ] partition
-    [ natural-sort ] bi@ append ;
+    [ sort ] bi@ append ;
 
 GENERIC: zone-matches? ( string rule -- ? )
 
