@@ -33,7 +33,7 @@ DEFER: write-tree
 
 :: write-tree ( path indents -- )
     path [
-        [ name>> ] sort-with [ ] [
+        [ name>> ] sort-by [ ] [
             unclip-last [
                 f indents push
                 [ indents write-entry ] each

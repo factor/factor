@@ -10,7 +10,7 @@ IN: vocabs.parser
 ERROR: no-word-error name ;
 
 : word-restarts ( possibilities -- restarts )
-    natural-sort [
+    sort [
         [ vocabulary>> "Use the " " vocabulary" surround ] keep
     ] { } map>assoc ;
 

@@ -17,7 +17,7 @@ IN: ui.gadgets.grid-lines.tests
     1array
     <grid>
     { 100 100 } >>dim
-    compute-grid-lines natural-sort
+    compute-grid-lines sort
 ] unit-test
 
 {
@@ -33,7 +33,7 @@ IN: ui.gadgets.grid-lines.tests
     <grid>
     { 10 10 } >>gap
     dup prefer
-    compute-grid-lines natural-sort
+    compute-grid-lines sort
 ] unit-test
 
 {
@@ -51,7 +51,7 @@ IN: ui.gadgets.grid-lines.tests
     2array
     <grid>
     { 200.0 200 } >>dim
-    compute-grid-lines natural-sort
+    compute-grid-lines sort
 ] unit-test
 
 {

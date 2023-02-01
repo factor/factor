@@ -77,17 +77,17 @@ tools.test ;
         "a/e/g" make-directory
         "a/e/g/e" touch-file
 
-        "**" glob natural-sort
-        "**/" glob natural-sort
-        "**/*" glob natural-sort
-        "**/**" glob natural-sort
-        "**/b" glob natural-sort
-        "**/e" glob natural-sort
-        ! "**//e" glob natural-sort
-        ! "**/**/e" glob natural-sort
-        "**/e/**" glob natural-sort
-        "a/**" glob natural-sort
-        "a" glob natural-sort
-        "a/b" glob natural-sort
+        "**" glob sort
+        "**/" glob sort
+        "**/*" glob sort
+        "**/**" glob sort
+        "**/b" glob sort
+        "**/e" glob sort
+        ! "**//e" glob sort
+        ! "**/**/e" glob sort
+        "**/e/**" glob sort
+        "a/**" glob sort
+        "a" glob sort
+        "a/b" glob sort
     ] with-test-directory
 ] unit-test

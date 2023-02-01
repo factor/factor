@@ -27,7 +27,7 @@ IN: project-euler.052
     <iota> [ 1 + * ] with map ; inline
 
 : all-same-digits? ( seq -- ? )
-    [ number>digits natural-sort ] map all-equal? ;
+    [ number>digits sort ] map all-equal? ;
 
 : candidate? ( n -- ? )
     { [ odd? ] [ 3 divisor? ] } 1&& ;

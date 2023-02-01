@@ -47,11 +47,11 @@ posting "POSTINGS"
 
 : blogroll ( -- seq )
     f <blog> select-tuples
-    [ name>> ] sort-with ;
+    [ name>> ] sort-by ;
 
 : postings ( -- seq )
     posting new select-tuples
-    [ date>> ] inv-sort-with ;
+    [ date>> ] inv-sort-by ;
 
 : <edit-blogroll-action> ( -- action )
     <page-action>
@@ -90,7 +90,7 @@ posting "POSTINGS"
     [ '[ _ <posting> ] map ] 2map concat ;
 
 : sort-entries ( entries -- entries' )
-    [ date>> ] inv-sort-with ;
+    [ date>> ] inv-sort-by ;
 
 : update-cached-postings ( -- )
     blogroll fetch-blogroll sort-entries 8 index-or-length head [

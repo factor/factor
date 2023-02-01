@@ -106,7 +106,7 @@ MEMO: routes ( -- hash ) $[ { "ABD" "BC" "C" "DCE" "ECF" } [ unclip swap 2array 
     "" 2sequence H{ { "AB" 1 } { "AD" 2 } { "BC" 5 } { "DC" 2 } { "DE" 1 } { "EC" 2 } { "EF" 1 } } at ;
 
 : test2 ( fromto -- path considered )
-    first2 [ n ] [ c ] [ 2drop 0 ] <astar> [ find-path ] [ considered natural-sort >string ] bi ;
+    first2 [ n ] [ c ] [ 2drop 0 ] <astar> [ find-path ] [ considered sort >string ] bi ;
 >>
 
 ! Check path from A to C -- all nodes but F must have been examined
@@ -129,7 +129,7 @@ MEMO: costs ( -- costs )
     routes keys [ dup dup n [ dup [ c ] dip swap 2array ] with { } map-as >hashtable 2array ] map >hashtable ;
 
 : test3 ( fromto -- path considered )
-    first2 costs <dijkstra> [ find-path ] [ considered natural-sort >string ] bi ;
+    first2 costs <dijkstra> [ find-path ] [ considered sort >string ] bi ;
 
 >>
 

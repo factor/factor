@@ -57,7 +57,7 @@ M: revision feed-entry-date date>> ;
 M: revision feed-entry-url id>> revision-url ;
 
 : reverse-chronological-order ( seq -- sorted )
-    [ date>> ] inv-sort-with ;
+    [ date>> ] inv-sort-by ;
 
 : <revision> ( id -- revision )
     revision new swap >>id ;
@@ -300,7 +300,7 @@ M: revision feed-entry-url id>> revision-url ;
 
         [
             f <article> select-tuples
-            [ title>> ] sort-with
+            [ title>> ] sort-by
             "articles" set-value
         ] >>init
 
@@ -322,7 +322,7 @@ M: revision feed-entry-url id>> revision-url ;
 
             [ f ] [
                 f <article> select-tuples
-                [ title>> ] sort-with
+                [ title>> ] sort-by
                 [ revision>> <revision> select-tuple ] map
                 swap '[ content>> _ [ first-match ] with all? ] filter
             ] if-empty

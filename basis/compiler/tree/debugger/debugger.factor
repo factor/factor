@@ -174,7 +174,7 @@ SYMBOL: node-count
             { methods-called "==== Non-inlined method calls:" }
             { intrinsics-called "==== Open-coded intrinsic calls:" }
         } [
-            nl print get keys natural-sort stack.
+            nl print get keys sort stack.
         ] assoc-each
     ] with-variables ;
 

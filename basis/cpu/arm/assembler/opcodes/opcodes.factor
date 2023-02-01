@@ -1,4 +1,5 @@
 ! Copyright (C) 2020 Doug Coleman.
+! Copyright (C) 2023 Giftpflanze.
 ! See https://factorcode.org/license.txt for BSD license.
 USING: accessors assocs classes.error classes.parser effects
 effects.parser endian kernel lexer make math math.bitwise

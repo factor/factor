@@ -114,26 +114,26 @@ TUPLE: file-responder root hook special index-names allow-listings ;
         [ ?toggle-sort-order ] 2bi append
     ] curry tri@ ;
 
-: listing-sort-with ( seq quot: ( elt -- key ) -- sortedseq )
-    sort-with sort-asc? [ reverse ] unless ; inline
+: listing-sort-by ( seq quot: ( elt -- key ) -- sortedseq )
+    sort-by sort-asc? [ reverse ] unless ; inline
 
-: sort-with-name ( {file,info} -- sorted )
-    [ first ] listing-sort-with ;
+: sort-by-name ( {file,info} -- sorted )
+    [ first ] listing-sort-by ;
 
-: sort-with-modified ( {file,info} -- sorted )
-    [ second modified>> ] listing-sort-with ;
+: sort-by-modified ( {file,info} -- sorted )
+    [ second modified>> ] listing-sort-by ;
 
 : size-without-directories ( info -- size )
     dup directory? [ drop -1 ] [ size>> ] if ;
 
-: sort-with-size ( {file,info} -- sorted )
-    [ second size-without-directories ] listing-sort-with ;
+: sort-by-size ( {file,info} -- sorted )
+    [ second size-without-directories ] listing-sort-by ;
 
 : sort-listing ( zipped-files-infos -- sorted )
     sort-column {
-        { "M" [ sort-with-modified ] }
-        { "S" [ sort-with-size ] }
-        [ drop sort-with-name ]
+        { "M" [ sort-by-modified ] }
+        { "S" [ sort-by-size ] }
+        [ drop sort-by-name ]
     } case ; inline
 
 : zip-files-infos ( files -- zipped )

@@ -232,7 +232,7 @@ PRIVATE>
 
 : find-unused-in-string ( string -- seq )
     strip-code [ get-imported-words ] [ find-used-words ] bi
-        reject-unused-vocabs natural-sort ;
+        reject-unused-vocabs sort ;
 
 : find-unused-in-file ( path -- seq )
     utf8 file-contents find-unused-in-string ;

@@ -54,7 +54,7 @@ TUPLE: code-file
         dup detect-file dup binary?
         [ f ] [ 2dup dupd first-line find-mode ] if
         code-file boa
-    ] map [ mode>> ] filter [ name>> ] sort-with ;
+    ] map [ mode>> ] filter [ name>> ] sort-by ;
 
 : html-name-char ( char -- str )
     {
@@ -67,7 +67,7 @@ TUPLE: code-file
     [ html-name-char ] { } map-as concat ".html" append ;
 
 : toc-list ( files -- list )
-    [ name>> ] map natural-sort [
+    [ name>> ] map sort [
         [ file-html-name ] keep
         [XML <li><a href=<->><-></a></li> XML]
     ] map ;

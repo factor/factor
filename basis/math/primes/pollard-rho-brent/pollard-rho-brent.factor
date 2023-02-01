@@ -70,4 +70,4 @@ DEFER: pollard-rho-brent-factors
         ] [
             [ (pollard-rho-brent-factors) ] { } make
         ] if
-    ] if natural-sort ;
+    ] if sort ;

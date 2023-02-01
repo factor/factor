@@ -206,7 +206,7 @@ C: <vocab-author> vocab-author
     [
         "Words" $heading
 
-        natural-sort
+        sort
         [ [ class? ] filter describe-classes ]
         [
             [ [ class? ] [ symbol? ] bi and ] reject
@@ -266,7 +266,7 @@ C: <vocab-author> vocab-author
 : keyed-vocabs ( str quot -- seq )
     [ all-disk-vocabs-recursive ] 2dip '[
         [ _ swap @ member? ] filter no-prefixes
-        [ name>> ] sort-with
+        [ name>> ] sort-by
     ] assoc-map ; inline
 
 : tagged ( tag -- assoc )

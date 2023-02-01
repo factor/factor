@@ -45,7 +45,7 @@ PRIVATE>
     interval-map check-instance array>> [ third-unsafe ] map ;
 
 : <interval-map> ( specification -- map )
-    all-intervals [ first-unsafe second-unsafe ] sort-with
+    all-intervals [ first-unsafe second-unsafe ] sort-by
     >intervals ensure-disjoint interval-map boa ;
 
 : <interval-set> ( specification -- map )

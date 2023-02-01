@@ -155,7 +155,7 @@ menu H{
 : <operations-menu> ( target hook -- menu )
     over object-operations
     [ primary-operation? ] partition
-    [ reverse ] [ [ command-name ] sort-with ] bi*
+    [ reverse ] [ [ command-name ] sort-by ] bi*
     { ---- } glue <commands-menu> ;
 
 : show-operations-menu ( gadget target hook -- )

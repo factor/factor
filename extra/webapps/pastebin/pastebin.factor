@@ -51,7 +51,7 @@ TUPLE: paste-state < entity annotations ;
 
 : pastes ( -- pastes )
     f <paste-state> select-tuples
-    [ date>> ] sort-with
+    [ date>> ] sort-by
     reverse ;
 
 TUPLE: annotation < entity parent ;

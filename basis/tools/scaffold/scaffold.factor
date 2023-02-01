@@ -219,7 +219,7 @@ M: object add-using
 : interesting-words ( vocab -- array )
     vocab-words
     [ { [ "help" word-prop ] [ predicate? ] } 1|| ] reject
-    natural-sort ;
+    sort ;
 
 : interesting-words. ( vocab -- )
     interesting-words [ (help.) nl ] each ;
@@ -241,7 +241,7 @@ M: object add-using
 : write-using ( vocab -- )
     "USING:" write
     using get members
-    { "help.markup" "help.syntax" } append natural-sort remove
+    { "help.markup" "help.syntax" } append sort remove
     [ bl write ] each
     " ;" print ;
 

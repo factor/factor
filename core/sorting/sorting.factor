@@ -131,17 +131,22 @@ TUPLE: merge-state
 
 PRIVATE>
 
-: sort ( seq quot: ( obj1 obj2 -- <=> ) -- sortedseq )
+: sort-with ( seq quot: ( obj1 obj2 -- <=> ) -- sortedseq )
     [ <merge> ] dip
     [ sort-pairs ] [ sort-loop ] [ drop accum>> underlying>> ] 2tri ; inline
 
-: natural-sort ( seq -- sortedseq ) [ <=> ] sort ;
+: inv-sort-with ( seq quot: ( obj1 obj2 -- <=> ) -- sortedseq )
+    '[ @ invert-comparison ] sort-with ; inline
 
-: sort-with ( seq quot: ( elt -- key ) -- sortedseq )
-    [ compare ] curry sort ; inline
+: sort ( seq -- sortedseq ) [ <=> ] sort-with ;
 
-: inv-sort-with ( seq quot: ( elt -- key ) -- sortedseq )
-    [ compare invert-comparison ] curry sort ; inline
+: inv-sort ( seq -- sortedseq ) [ >=< ] sort-with ;
+
+: sort-by ( seq quot: ( elt -- key ) -- sortedseq )
+    [ compare ] curry sort-with ; inline
+
+: inv-sort-by ( seq quot: ( elt -- key ) -- sortedseq )
+    [ compare invert-comparison ] curry sort-with ; inline
 
 <PRIVATE
 
@@ -150,24 +155,44 @@ PRIVATE>
 
 PRIVATE>
 
-GENERIC: sort-keys ( obj -- sortedseq )
+GENERIC: sort-keys ( assoc -- sorted-keys )
 
 M: object sort-keys >alist sort-keys ;
 
 M: sequence sort-keys
-    0 check-bounds [ first-unsafe ] sort-with ;
+    0 check-bounds [ first-unsafe ] sort-by ;
 
 M: hashtable sort-keys
-    >alist [ { array } declare first-unsafe ] sort-with ;
+    >alist [ { array } declare first-unsafe ] sort-by ;
 
-GENERIC: sort-values ( obj -- sortedseq )
+GENERIC: inv-sort-keys ( assoc -- sorted-keys )
+
+M: object inv-sort-keys >alist inv-sort-keys ;
+
+M: sequence inv-sort-keys
+    0 check-bounds [ first-unsafe ] inv-sort-by ;
+
+M: hashtable inv-sort-keys
+    >alist [ { array } declare first-unsafe ] inv-sort-by ;
+
+GENERIC: sort-values ( assoc -- sorted-values )
 
 M: object sort-values >alist sort-values ;
 
 M: sequence sort-values
-    1 check-bounds [ second-unsafe ] sort-with ;
+    1 check-bounds [ second-unsafe ] sort-by ;
 
 M: hashtable sort-values
-    >alist [ { array } declare second-unsafe ] sort-with ;
+    >alist [ { array } declare second-unsafe ] sort-by ;
 
 : sort-pair ( a b -- c d ) 2dup after? [ swap ] when ;
+
+GENERIC: inv-sort-values ( assoc -- sorted-values )
+
+M: object inv-sort-values >alist inv-sort-values ;
+
+M: sequence inv-sort-values
+    1 check-bounds [ second-unsafe ] inv-sort-by ;
+
+M: hashtable inv-sort-values
+    >alist [ { array } declare second-unsafe ] inv-sort-by ;

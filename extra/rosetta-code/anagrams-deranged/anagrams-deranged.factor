@@ -27,7 +27,7 @@ IN: rosettacode.anagrams-deranged
     utf8 file-lines
     H{ } clone [
         '[
-            [ natural-sort >string ] keep
+            [ sort >string ] keep
             _ [ swap suffix  ] with change-at
         ] each
     ] keep ;
@@ -39,7 +39,7 @@ IN: rosettacode.anagrams-deranged
     parse-dict-file anagrams [ derangements ] map concat ;
 
 : (longest-deranged-anagrams) ( path -- anagrams )
-    deranged-anagrams [ first length ] sort-with last ;
+    deranged-anagrams [ first length ] sort-by last ;
 
 : default-word-list ( -- path )
     URL" https://puzzlers.org/pub/wordlists/unixdict.txt"

@@ -23,7 +23,7 @@ IN: regexp.minimize
 
 :: initialize-partitions ( transition-table -- partitions )
     ! Partition table is sorted-array => ?
-    transition-table transitions>> keys natural-sort :> states
+    transition-table transitions>> keys sort :> states
     states length 2/ sq <hash-set> :> out
     states [| s1 i1 |
         states [| s2 |
@@ -47,7 +47,7 @@ IN: regexp.minimize
     ] each partitions dup cardinality size = not ;
 
 : partition>classes ( partitions -- synonyms ) ! old-state => new-state
-    members natural-sort <reversed> [ swap ] H{ } assoc-map-as ;
+    members inv-sort [ swap ] H{ } assoc-map-as ;
 
 : (state-classes) ( transition-table -- partition )
     [ initialize-partitions ] keep '[ _ partition-more ] loop ;

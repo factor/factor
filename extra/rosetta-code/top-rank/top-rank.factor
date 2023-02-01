@@ -48,7 +48,7 @@ CONSTANT: employees {
 
 : prepare-departments ( seq -- departments )
     [ department>> ] collect-by
-    [ [ salary>> ] inv-sort-with ] assoc-map ;
+    [ [ salary>> ] inv-sort-by ] assoc-map ;
 
 : first-n-each ( seq n quot -- )
     [ index-or-length head-slice ] dip each ; inline

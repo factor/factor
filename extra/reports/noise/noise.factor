@@ -120,7 +120,7 @@ M: lambda-word word-noise-factor
 : noisy-words ( -- alist )
     all-words flatten-generics
     [ word-noise-factor ] zip-with
-    sort-values reverse ;
+    inv-sort-values ;
 
 : noise. ( alist -- )
     standard-table-style [
@@ -140,7 +140,7 @@ M: lambda-word word-noise-factor
 
 : noisy-vocabs ( -- alist )
     loaded-vocab-names [ vocab-noise-factor ] zip-with
-    sort-values reverse ;
+    inv-sort-values ;
 
 : noise-report ( -- )
     "NOISY WORDS:" print

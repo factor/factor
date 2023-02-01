@@ -97,7 +97,7 @@ CONSTANT: limit 400
     solve-knapsack
     "Total value: " write number>string print
     "Items packed: " print
-    natural-sort
+    sort
     [ "   " write print ] each ;
 
 MAIN: knapsack-main

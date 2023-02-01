@@ -46,7 +46,7 @@ M: more-completions article-title
     ] "" make ;
 
 M: more-completions article-content
-    seq>> [ second >lower ] sort-with keys \ $completions prefix ;
+    seq>> [ second >lower ] sort-by keys \ $completions prefix ;
 
 :: (apropos) ( search completions category -- element )
     completions [

@@ -92,7 +92,7 @@ DEFER: (assert-heap-invariant)
     dup assert-heap-invariant
     data>>
     [ [ key>> ] map ] bi@
-    [ natural-sort ] bi@ ;
+    [ sort ] bi@ ;
 
 11 [
     [ t ] swap [ 2^ delete-test sequence= ] curry unit-test

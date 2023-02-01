@@ -47,7 +47,7 @@ IN: mason.test
 :: do-step ( errors summary-file details-file -- )
     errors
     [ error-type +linkage-error+ eq? ] reject
-    [ path>> ] map members natural-sort summary-file to-file
+    [ path>> ] map members sort summary-file to-file
     errors details-file utf8 [ errors. ] with-file-writer ;
 
 : do-tests ( -- )

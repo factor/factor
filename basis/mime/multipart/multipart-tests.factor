@@ -55,7 +55,7 @@ CONSTANT: upload3 "--3f116598c7f0431b9f98148ed235c822\r\nContent-Disposition: fo
     { "text" "text2" }
 } [
     upload3 [ separator3 parse-multipart ] with-string-reader
-    keys natural-sort
+    keys sort
 ] unit-test
 
 SYMBOL: mime-test-server

@@ -87,7 +87,7 @@ PRIVATE>
     [ '[ _ _ heap-stat-step ] each ] 2keep ;
 
 : heap-stats. ( -- )
-    heap-stats dup keys natural-sort standard-table-style [
+    heap-stats dup keys sort standard-table-style [
         [ { "Class" "Bytes" "Instances" } [ write-cell ] each ] with-row
         [
             [

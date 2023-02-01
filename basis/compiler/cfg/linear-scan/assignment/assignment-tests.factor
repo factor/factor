@@ -220,5 +220,5 @@ IN: compiler.cfg.linear-scan.assignment.tests
 
 { { 3 56 } } [
     { { 3 7 } { -1 56 } { -1 3 } } >min-heap [ -1 = ] heap-pop-while
-    natural-sort
+    sort
 ] unit-test
