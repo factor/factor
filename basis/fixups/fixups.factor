@@ -7,6 +7,7 @@ IN: fixups
 CONSTANT: vocab-renames {
     { "math.intervals" { "intervals" "0.99" } }
     { "math.ranges" { "ranges" "0.99" } }
+    { "sorting.slots" { "sorting.specification" "0.99" } }
 }
 
 CONSTANT: word-renames {
@@ -51,6 +52,13 @@ CONSTANT: word-renames {
     { "deep-subseq?" { "deep-subseq-of?" "0.99" } }
     { "overtomorrow" { "overmorrow" "0.99" } }
     { "INITIALIZE:" { "INITIALIZED-SYMBOL:" "0.99" } }
+    { "natural-sort" { "sort" "0.99" } }
+    { "sort-by-with" { "sort-with-spec-by" "0.99" } }
+    { "sort-keys-by" { "sort-keys-with-spec" "0.99" } }
+    { "sort-values-by" { "sort-values-with-spec" "0.99" } }
+    { "compare-slots" { "compare-with-spec" "0.99" } }
+    { "natural-sort!" { "sort!" "0.99" } }
+    { "natural-bubble-sort!" { "bubble-sort!" "0.99" } }
 }
 
 : compute-assoc-fixups ( continuation name assoc -- seq )

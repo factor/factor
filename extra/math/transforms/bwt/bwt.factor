@@ -7,7 +7,7 @@ IN: math.transforms.bwt
 ! Semi-efficient versions of Burrows-Wheeler Transform
 
 :: bwt ( seq -- i newseq )
-    seq all-rotations natural-sort
+    seq all-rotations sort
     [ [ n>> 0 = ] find drop ] keep
     [ last ] seq map-as ;
 

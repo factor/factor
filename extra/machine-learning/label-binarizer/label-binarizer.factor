@@ -10,7 +10,7 @@ TUPLE: label-binarizer classes_ ;
     label-binarizer new ; inline
 
 M: label-binarizer fit-y
-    [ members natural-sort ] dip classes_<< ;
+    [ members sort ] dip classes_<< ;
 
 M: label-binarizer transform-y
     classes_>> dup length '[

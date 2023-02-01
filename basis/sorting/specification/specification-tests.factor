@@ -1,8 +1,8 @@
 ! Copyright (C) 2009 Doug Coleman.
 ! See https://factorcode.org/license.txt for BSD license.
-USING: accessors math.order sorting.slots tools.test
+USING: accessors math.order sorting.specification tools.test
 arrays sequences kernel assocs multiline sorting.functor ;
-IN: sorting.literals.tests
+IN: sorting.specification.tests
 
 TUPLE: sort-test a b c tuple2 ;
 
@@ -23,7 +23,7 @@ TUPLE: tuple2 d ;
         T{ sort-test f 1 1 11 }
         T{ sort-test f 2 5 3 }
         T{ sort-test f 2 5 2 }
-    } { { a>> <=> } { b>> >=< } { c>> <=> } } sort-by
+    } { { a>> <=> } { b>> >=< } { c>> <=> } } sort-with-spec
 ] unit-test
 
 {
@@ -41,14 +41,14 @@ TUPLE: tuple2 d ;
         T{ sort-test f 1 1 11 }
         T{ sort-test f 2 5 3 }
         T{ sort-test f 2 5 2 }
-    } { { a>> <=> } { b>> >=< } { c>> <=> } } sort-by
+    } { { a>> <=> } { b>> >=< } { c>> <=> } } sort-with-spec
 ] unit-test
 
-{ { } }
-[ { } { { a>> <=> } { b>> >=< } { c>> <=> } } sort-by ] unit-test
+{ { } } [
+    { } { { a>> <=> } { b>> >=< } { c>> <=> } } sort-with-spec
+] unit-test
 
-{ { } }
-[ { } { } sort-by ] unit-test
+{ { } } [ { } { } sort-with-spec ] unit-test
 
 {
     {
@@ -67,34 +67,34 @@ TUPLE: tuple2 d ;
         T{ sort-test f 6 f f T{ tuple2 f 3 } }
         T{ sort-test f 5 f f T{ tuple2 f 3 } }
         T{ sort-test f 6 f f T{ tuple2 f 2 } }
-    } { { tuple2>> d>> <=> } { a>> <=> } } sort-by
+    } { { tuple2>> d>> <=> } { a>> <=> } } sort-with-spec
 ] unit-test
 
 
-{ { "a" "b" "c" } } [ { "b" "c" "a" } { <=> <=> } sort-by ] unit-test
-{ { "b" "c" "a" } } [ { "b" "c" "a" } { } sort-by ] unit-test
+{ { "a" "b" "c" } } [ { "b" "c" "a" } { <=> <=> } sort-with-spec ] unit-test
+{ { "b" "c" "a" } } [ { "b" "c" "a" } { } sort-with-spec ] unit-test
 
 << "length-test" [ length ] define-sorting >>
 
 { { { 1 } { 1 2 3 } { 1 3 2 } { 3 2 1 } } }
 [
     { { 3 2 1 } { 1 2 3 } { 1 3 2 } { 1 } }
-    { length-test<=> <=> } sort-by
+    { length-test<=> <=> } sort-with-spec
 ] unit-test
 
 { { { { 0 } 1 } { { 1 } 2 } { { 1 } 1 } { { 3 1 } 2 } } }
 [
     { { { 3 1 } 2 } { { 1 } 2 } { { 0 } 1 } { { 1 } 1 } }
-    { length-test<=> <=> } sort-keys-by
+    { length-test<=> <=> } sort-keys-with-spec
 ] unit-test
 
 { { { 0 { 1 } } { 1 { 1 } } { 3 { 2 4 } } { 1 { 2 0 0 0 } } } }
 [
     { { 3 { 2 4 } } { 1 { 2 0 0 0 } } { 0 { 1 } } { 1 { 1 } } }
-    { length-test<=> <=> } sort-values-by
+    { length-test<=> <=> } sort-values-with-spec
 ] unit-test
 
 { { { "apples" 1 } { "bananas" 2 } { "cherries" 3 } } } [
     H{ { "apples" 1 } { "bananas" 2 } { "cherries" 3 } }
-    { { sequences:length <=> } } sort-keys-by
+    { { sequences:length <=> } } sort-keys-with-spec
 ] unit-test

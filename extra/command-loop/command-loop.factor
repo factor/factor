@@ -25,7 +25,7 @@ GENERIC: run-command-loop ( command-loop -- )
         nl
         "Commands available:" print
         "===================" print
-        nip commands>> [ name>> ] map natural-sort
+        nip commands>> [ name>> ] map sort
         [ 6 <groups> ] [ longest length 4 + ] bi
         '[ [ _ CHAR: \s pad-tail write ] each nl ] each nl
     ] [

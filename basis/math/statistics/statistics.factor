@@ -83,10 +83,10 @@ M: ranges:range sum-of-quads
 PRIVATE>
 
 : trimmed-mean ( seq p -- x )
-    swap natural-sort trim-points <slice> mean ;
+    swap sort trim-points <slice> mean ;
 
 : winsorized-mean ( seq p -- x )
-    swap natural-sort trim-points
+    swap sort trim-points
     [ <slice> ]
     [ nip dupd nth <array> ]
     [ [ 1 - ] dip nth <array> ] 3tri
@@ -420,6 +420,6 @@ PRIVATE>
         dup dcg [
             drop 0.0
         ] [
-            swap natural-sort <reversed> dcg /f
+            swap sort <reversed> dcg /f
         ] if-zero
     ] if-empty ;

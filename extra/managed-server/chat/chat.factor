@@ -29,7 +29,7 @@ CONSTANT: line-beginning "-!- "
 : handle-help ( string -- )
     [
         "Commands: "
-        commands get keys natural-sort ", " join append send-line
+        commands get keys sort ", " join append send-line
     ] [
         chat-docs get ?at
         [ send-line ]

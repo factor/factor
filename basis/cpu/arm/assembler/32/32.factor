@@ -1,4 +1,5 @@
 ! Copyright (C) 2023 Doug Coleman.
+! Copyright (C) 2023 Giftpflanze.
 ! See https://factorcode.org/license.txt for BSD license.
 USING: cpu.arm.assembler cpu.arm.assembler.opcodes kernel math ;
 IN: cpu.arm.assembler.32

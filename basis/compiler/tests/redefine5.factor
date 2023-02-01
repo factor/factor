@@ -10,7 +10,7 @@ IN: compiler.tests.redefine5
     "USING: sorting kernel math.order ;
     IN: compiler.tests.redefine5
     GENERIC: my-generic ( a -- b )
-    M: object my-generic [ <=> ] sort ;
+    M: object my-generic sort ;
     : my-inline ( a -- b ) my-generic ;"
     eval( -- )
 ] unit-test

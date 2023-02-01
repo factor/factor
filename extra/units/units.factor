@@ -20,7 +20,7 @@ M: dimensions-not-equal summary drop "Dimensions do not match" ;
 
 : <dimensioned> ( n top bot -- obj )
     symbolic-reduce
-    [ natural-sort ] bi@
+    [ sort ] bi@
     dimensioned boa ;
 
 : >dimensioned< ( d -- n top bot )

@@ -24,7 +24,7 @@ IN: project-euler.004
     100 999 [a..b] [ 10 divisor? ] reject ;
 
 : max-palindrome ( seq -- palindrome )
-    natural-sort [ palindrome? ] find-last nip ;
+    sort [ palindrome? ] find-last nip ;
 
 PRIVATE>
 

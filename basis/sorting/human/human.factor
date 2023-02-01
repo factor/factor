@@ -49,5 +49,5 @@ M: alphanum <=>
 << "human" [ find-numbers [ <alphanum> ] map ] define-sorting >>
 << "humani" [ find-numbers [ <alphanum-insensitive> ] map ] define-sorting >>
 
-: human-sort ( seq -- seq' ) [ human<=> ] sort ;
-: humani-sort ( seq -- seq' ) [ humani<=> ] sort ;
+: human-sort ( seq -- seq' ) [ human<=> ] sort-with ;
+: humani-sort ( seq -- seq' ) [ humani<=> ] sort-with ;

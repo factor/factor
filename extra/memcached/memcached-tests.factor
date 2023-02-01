@@ -101,5 +101,5 @@ PRIVATE>
 [ "5" x m/set ] with-memcached
 [ "valuex" y m/set ] with-memcached
 { { "5" "valuex" } } [
-    [ x y z 3array m/getseq values natural-sort ] with-memcached
+    [ x y z 3array m/getseq values sort ] with-memcached
 ] unit-test

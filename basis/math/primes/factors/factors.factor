@@ -24,7 +24,7 @@ IN: math.primes.factors
     ] [
         group-factors dup empty? [
             [ first2 [0..b] [ ^ ] with map ] map
-            [ product ] product-map natural-sort
+            [ product ] product-map sort
         ] unless
     ] if ;
 

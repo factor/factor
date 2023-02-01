@@ -124,7 +124,7 @@ M: f smart-usage drop \ f smart-usage ;
             [ "method-generic" word-prop ] when
             vocabulary>>
         ] map
-    ] gather natural-sort remove sift ; inline
+    ] gather sort remove sift ; inline
 
 : vocabs. ( seq -- )
     [ dup >vocab-link write-object nl ] each ;

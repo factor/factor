@@ -42,4 +42,4 @@ PRIVATE>
 ! How many ways can we make the given amount of cents
 ! with the given set of coins?
 : make-change ( cents coins -- ways )
-    members [ ] inv-sort-with (make-change) ;
+    members inv-sort (make-change) ;

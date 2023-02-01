@@ -91,7 +91,7 @@ M: string make-slot-descriptions
     ] { } map-index-as ;
 
 M: hashtable make-slot-descriptions
-    call-next-method [ key-string>> ] sort-with ;
+    call-next-method [ key-string>> ] sort-by ;
 
 TUPLE: inspector-table < table ;
 

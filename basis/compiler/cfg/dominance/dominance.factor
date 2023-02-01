@@ -47,7 +47,7 @@ PRIVATE>
 
 : compute-dom-children ( dom-parents -- dom-childrens )
     H{ } clone [ '[ 2dup eq? [ 2drop ] [ _ push-at ] if ] assoc-each ] keep
-    [ [ number>> ] sort-with ] assoc-map ;
+    [ [ number>> ] sort-by ] assoc-map ;
 
 SYMBOLS: preorder maxpreorder ;
 

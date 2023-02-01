@@ -38,7 +38,7 @@ SYMBOLS: loop-heads visited ;
     ] if ;
 
 : sorted-successors ( bb -- seq )
-    successors>> <reversed> [ loop-nesting-at ] sort-with ;
+    successors>> <reversed> [ loop-nesting-at ] sort-by ;
 
 : process-block ( bb -- bbs )
     dup visited get ?adjoin [ dup , sorted-successors ] [ drop { } ] if

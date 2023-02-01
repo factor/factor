@@ -53,7 +53,7 @@ TUPLE: upward-slice < slice ;
         drop
         [ downward-slices ]
         [ stable-slices ]
-        [ upward-slices ] tri 3append [ from>> ] sort-with
+        [ upward-slices ] tri 3append [ from>> ] sort-by
     ] [
         zero? [ drop { } ] [ [ 0 1 ] dip stable-slice boa ] if
     ] if ;

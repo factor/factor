@@ -212,7 +212,7 @@ PRIVATE>
     0 insensitive= ;
 
 : sort-strings ( strings -- sorted )
-    [ collation-key/nfd 2array ] map natural-sort values ;
+    [ collation-key/nfd 2array ] map sort values ;
 
 : string<=> ( str1 str2 -- <=> )
     [ collation-key/nfd 2array ] compare ;

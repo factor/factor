@@ -24,7 +24,7 @@ IN: project-euler.062
 <PRIVATE
 
 : cube ( n -- n^3 ) 3 ^ ; inline
-: >key ( n -- k ) cube number>digits natural-sort ; inline
+: >key ( n -- k ) cube number>digits sort ; inline
 : has-entry? ( n assoc -- ? ) [ >key ] dip key? ; inline
 
 : (euler062) ( n assoc -- n )

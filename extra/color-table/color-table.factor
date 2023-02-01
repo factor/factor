@@ -1,9 +1,9 @@
 ! Copyright (C) 2009 Slava Pestov.
 ! See https://factorcode.org/license.txt for BSD license.
 USING: accessors colors combinators combinators.smart formatting
-kernel literals math math.functions models sorting.human
-sorting.slots strings ui ui.gadgets.scrollers
-ui.gadgets.search-tables ui.gadgets.tables ;
+kernel literals math math.functions models sorting.human strings
+ui ui.gadgets.scrollers ui.gadgets.search-tables
+ui.gadgets.tables ;
 IN: color-table
 
 ! ui.gadgets.tables demo
@@ -39,7 +39,7 @@ M: color-renderer row-value
     drop named-color ;
 
 : <color-table> ( -- table )
-    named-colors { humani<=> } sort-by <model>
+    named-colors humani-sort <model>
     color-renderer
     [ ] <search-table> dup table>>
         5 >>gap
