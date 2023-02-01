@@ -1,9 +1,24 @@
 IN: unrolled-lists
 USING: help.markup help.syntax hashtables search-deques dlists
-deques ;
+deques unrolled-lists.private ;
 
 HELP: unrolled-list
-{ $class-description "The class of unrolled lists." } ;
+{ $class-description "The class of unrolled lists."
+    $nl
+    "All nodes in an unrolled list contain an array of 32 items. Nodes point to the previous"
+    " node and next node, or " { $link f } " if they do not exist."
+    { $slots
+        { "front" { "The front " { $link node } " of the list or " { $link f } "." } }
+        { "front-pos" { "The position of the front element of the list in " 
+          { $snippet "front" } "." } }
+        { "back" { "The back " { $link node } " of the list or " { $link f } "." } }
+        { "back-pos" { "The position of the back element of the list in " 
+          { $snippet "back" } "." } }
+    }
+    $nl
+    "It is not recommended to modify any of these slots manually. Using the "
+    { $link deque } " protocol provides safer operations."
+} ;
 
 HELP: <unrolled-list>
 { $values { "list" unrolled-list } }

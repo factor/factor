@@ -1,5 +1,5 @@
 USING: unrolled-lists tools.test deques kernel sequences
-random prettyprint grouping math ;
+random prettyprint grouping math ranges ;
 
 { 1 } [ <unrolled-list> 1 over push-front pop-front ] unit-test
 { 1 } [ <unrolled-list> 1 over push-front pop-back ] unit-test
@@ -127,3 +127,14 @@ random prettyprint grouping math ;
     dup pop-back 30 assert=
     deque-empty?
 ] unit-test
+
+! In relation to https://github.com/factor/factor/issues/2729
+10 [| |
+    <unrolled-list> :> l
+    [
+        33 200 [a..b] random dup
+        l swap [1..b] [ over push-back ] each
+        swap [ dup pop-front drop ] times
+        dup pop-front swap pop-back
+    ] [ empty-deque? ] must-fail-with
+] times
