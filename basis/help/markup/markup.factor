@@ -95,8 +95,8 @@ M: f print-element drop ;
 : ($code) ( presentation quot -- )
     [
         last-element off
-        [ ($code-style) ] dip with-nesting nl
-    ] ($heading) ; inline
+        [ ($code-style) ] dip with-nesting
+    ] ($block) ($blank-line) ; inline
 
 : $code ( element -- )
     join-lines dup <input> [ write ] ($code) ;
