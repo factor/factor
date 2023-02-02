@@ -59,10 +59,10 @@ ERROR: unsupported-resolv.conf-option string ;
 : parse-integer ( string -- n )
     trim-blanks ":" ?head drop trim-blanks string>number ;
 
-: parse-option ( resolv.conf string -- resolv.conf )
-    [ dup options>> ] dip trim-blanks {
+: parse-options ( resolv.conf string -- resolv.conf )
+    [ dup options>> ] dip trim-blanks split-words [ {
         { [ "debug" ?head ] [ drop t >>debug? ] }
-        { [ "ndots:" ?head ] [ parse-integer >>ndots ] }
+        { [ "ndots" ?head ] [ parse-integer >>ndots ] }
         { [ "timeout" ?head ] [ parse-integer >>timeout ] }
         { [ "attempts" ?head ] [ parse-integer >>attempts ] }
         { [ "rotate" ?head ] [ drop t >>rotate? ] }
@@ -70,7 +70,7 @@ ERROR: unsupported-resolv.conf-option string ;
         { [ "inet6" ?head ] [ drop t >>inet6? ] }
         { [ "edns0" ?head ] [ drop t >>edns0? ] }
         [ unsupported-resolv.conf-option ]
-    } cond drop ;
+    } cond drop ] with each ;
 
 ERROR: unsupported-resolv.conf-line string ;
 
@@ -81,7 +81,7 @@ ERROR: unsupported-resolv.conf-line string ;
         { [ "lookup" ?head ] [ parse-lookup ] }
         { [ "search" ?head ] [ parse-search ] }
         { [ "sortlist" ?head ] [ parse-sortlist ] }
-        { [ "options" ?head ] [ parse-option ] }
+        { [ "options" ?head ] [ parse-options ] }
         [ unsupported-resolv.conf-line ]
     } cond ;
 
