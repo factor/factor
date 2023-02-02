@@ -158,6 +158,12 @@ M: pathname url-of
         "font-size: %dpt;" sprintf
     ] re-replace-with
 
+    R/ padding: \d+px;/ [
+        "padding: " ?head drop "px;" ?tail drop
+        string>number 2 * number>string
+        "padding: " "px;" surround
+    ] re-replace-with
+
     R/ width: \d+px;/ [
        drop ""
     ] re-replace-with
@@ -170,7 +176,7 @@ M: pathname url-of
     dup [
         [ ".a" head? ] [ "#f4efd9;" subseq-of? ] bi and
     ] find [
-        "padding: 5px;" "" replace
+        "padding: 10px;" "" replace
         "background-color: #f4efd9;" "" replace
         "}" ?tail drop
         " border-bottom: 1px dashed #d5d5d5; width: 100%; padding-top: 10px; padding-bottom: 10px; }"
