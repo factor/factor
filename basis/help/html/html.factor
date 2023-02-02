@@ -160,8 +160,8 @@ M: pathname url-of
 
     R/ padding: \d+px;/ [
         "padding: " ?head drop "px;" ?tail drop
-        string>number dup even? [ 2 * 1 + ] [ 2 * ] if
-        number>string "padding: " "px;" surround
+        string>number 1.5 * >integer number>string
+        "padding: " "px;" surround
     ] re-replace-with
 
     R/ width: \d+px;/ [
@@ -169,11 +169,11 @@ M: pathname url-of
     ] re-replace-with
 
     R/ font-family: monospace;/ [
-        " width: fit-content; white-space: pre-wrap; line-height: 125%;" append
+        " margin-top: 0.25em; width: fit-content; white-space: pre-wrap; line-height: 125%;" append
     ] re-replace-with
 
     dup { "border:" "background-color:" } [ subseq-of? ] with all? [
-        " border-radius: 5px;" append
+        " border-radius: 3px;" append
     ] when ;
 
 : fix-help-header ( classes -- classes )
@@ -185,7 +185,7 @@ M: pathname url-of
         "}" ?tail drop
         " border-bottom: 1px dashed #d5d5d5; width: 100%; padding-top: 15px; padding-bottom: 10px; }"
         append swap pick set-nth {
-            ".a a { color: black; font-size: 24pt; line-height: 100%; }"
+            ".a a { color: black; font-size: 20pt; line-height: 100%; }"
             ".a * a { color: #2a5db0; font-size: 12pt; }"
             ".a td { border: none; }"
             ".a tr:hover { background-color: white; }"
