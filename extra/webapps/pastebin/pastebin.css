@@ -1,8 +1,7 @@
 input, textarea, select {
     font-size: 12pt;
     border: 1px solid #dbdbdb;
-    border-radius: 3px;
-    padding: 7px;
+    padding: 5px;
 }
 
 textarea {
@@ -11,9 +10,8 @@ textarea {
 
 pre.code {
     border: 1px solid #dbdbdb;
-    border-radius: 3px;
     background-color: #f7f7f7;
-    padding: 7px;
+    padding: 5px;
     color: black;
 }
 
