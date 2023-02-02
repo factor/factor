@@ -158,37 +158,27 @@ M: pathname url-of
         "font-size: %dpt;" sprintf
     ] re-replace-with
 
-    R/ padding: \d+px;/ [
-        "padding: " ?head drop "px;" ?tail drop
-        string>number 1.5 * >integer number>string
-        "padding: " "px;" surround
-    ] re-replace-with
-
     R/ width: \d+px;/ [
        drop ""
     ] re-replace-with
 
     R/ font-family: monospace;/ [
-        " margin-top: 0.25em; width: fit-content; white-space: pre-wrap; line-height: 125%;" append
-    ] re-replace-with
-
-    dup { "border:" "background-color:" } [ subseq-of? ] with all? [
-        " border-radius: 3px;" append
-    ] when ;
+        " margin-top: 0.5em; width: fit-content; white-space: pre-wrap; line-height: 125%;" append
+    ] re-replace-with ;
 
 : fix-help-header ( classes -- classes )
     dup [
         [ ".a" head? ] [ "#f4efd9;" subseq-of? ] bi and
     ] find [
         "padding: 10px;" "padding: 0px;" replace
-        "background-color: #f4efd9;" "background-color: white;" replace
+        "background-color: #f4efd9;" "" replace
         "}" ?tail drop
         " border-bottom: 1px dashed #d5d5d5; width: 100%; padding-top: 15px; padding-bottom: 10px; }"
         append swap pick set-nth {
-            ".a a { color: black; font-size: 20pt; line-height: 100%; }"
+            ".a a { color: black; font-size: 24pt; line-height: 100%; }"
             ".a * a { color: #2a5db0; font-size: 12pt; }"
             ".a td { border: none; }"
-            ".a tr:hover { background-color: white; }"
+            ".a tr:hover { background-color: transparent }"
         } prepend
     ] [ drop ] if* ;
 
@@ -211,6 +201,7 @@ M: pathname url-of
                         { "#e3e2db;" "#444444;" }
                         { "white;" "#202124;" }
                         { "black;" "white;" }
+                        { "transparent;" "transparent;" }
                     } ?at [
                         but-last parse-color inverse-color color>hex ";" append
                     ] unless
