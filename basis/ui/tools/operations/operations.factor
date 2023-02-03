@@ -109,6 +109,8 @@ IN: ui.tools.operations
     { +primary+ t }
 } define-operation
 
+[ topic? ] \ com-browse-new H{ } define-operation
+
 [ word? ] \ usage. H{
     { +keyboard+ T{ key-down f { C+ } "u" } }
     { +listener+ t }
