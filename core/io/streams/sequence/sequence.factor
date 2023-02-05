@@ -24,7 +24,7 @@ SLOT: i
     [
         [ (sequence-read-length) ]
         [ [ dup pick + ] change-i underlying>> ] bi
-    ] dip [ -roll spin dupd + seq-copy-loop drop ] 3curry keep ; inline
+    ] dip [ -roll spin dupd + copy-loop drop ] 3curry keep ; inline
 
 : (sequence-read-unsafe) ( n buf stream -- count )
     [ integer>fixnum ]

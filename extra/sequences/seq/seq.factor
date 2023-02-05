@@ -18,18 +18,8 @@ M: sequence seq-shorten 2dup lengthd > [ seq-set-length ] [ drop ] if ; inline
 : seq-grow-copy ( dst n -- dst dst-n )
     [ over length + seq-lengthen ] keep 1 - ; inline
 
-: seq-copy-loop ( dst dst-i src src-i src-stop -- dst )
-    2dup >= [
-        4drop
-    ] [
-        [
-            [ copy-nth-of-unsafe ] 4keep
-            [ 1 + ] 2dip 1 +
-        ] dip seq-copy-loop
-    ] if ; inline recursive
-
 : seq-copy-unsafe ( dst dst-i src -- dst )
-    0 over length check-length seq-copy-loop ; inline
+    0 over length check-length copy-loop ; inline
 
 : seq-push-all ( dst src -- dst ) [ length seq-grow-copy ] keep seq-copy-unsafe ; inline
 
