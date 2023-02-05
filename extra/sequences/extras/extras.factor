@@ -295,11 +295,8 @@ PRIVATE>
 : 0accumulate ( ... seq quot: ( ... prev elt -- ... next ) -- ... final newseq )
     over 0accumulate-as ; inline
 
-: occurrence-count-by ( seq quot: ( elt -- elt' ) -- hash seq' )
+: occurrence-count ( seq quot: ( elt -- elt' ) -- hash seq' )
     '[ nip @ over inc-at* drop ] [ H{ } clone ] 2dip 0accumulate ; inline
-
-: occurrence-count ( seq -- hash seq' )
-    [ ] occurrence-count-by ; inline
 
 : nth-index ( n obj seq -- i )
     [ = dup [ drop 1 - dup 0 < ] when ] with find drop nip ;
@@ -842,8 +839,10 @@ PRIVATE>
 : replicate-into ( ... seq quot: ( ... -- ... newelt ) -- ... )
     over [ length ] 2dip '[ _ dip _ set-nth-unsafe ] each-integer ; inline
 
-: count-by* ( ... seq quot: ( ... elt -- ... ? ) -- ... % )
-    over [ count-by ] [ length ] bi* / ; inline
+: percent-of ( ... seq quot: ( ... elt -- ... ? ) -- ... % )
+    over length 0 =
+    [ 2drop 0 ]
+    [ over [ count ] [ length ] bi* / ] if ; inline
 
 : sequence-index-operator-last ( n seq quot -- n quot' )
     [ [ nth-unsafe ] curry [ keep ] curry ] dip compose ; inline

@@ -49,7 +49,7 @@ IN: compiler.cfg.branch-splitting
 
 UNION: irrelevant ##peek ##replace ##inc ;
 
-: split-instructions? ( insns -- ? ) [ irrelevant? not ] count-by 5 <= ;
+: split-instructions? ( insns -- ? ) [ irrelevant? not ] count 5 <= ;
 
 : short-tail-block? ( bb -- ? )
     { [ successors>> empty? ] [ instructions>> length 2 = ] } 1&& ;

@@ -70,7 +70,7 @@ IN: bloom-filters.tests
 { t } [ 1000 <iota> [ drop most-positive-fixnum random 1000 + ] map
         full-bloom-filter
         [ bloom-filter-member? ] curry map
-        [ ] count-by
+        [ ] count
         ! TODO: This should be 10, but the false positive rate is currently very
         ! high.  300 is large enough not to prevent builds from succeeding.
         300 <=

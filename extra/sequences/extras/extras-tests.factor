@@ -282,7 +282,7 @@ strings tools.test ;
 { 1 } [ { 1 f 3 2 } ?infimum ] unit-test
 { 1 } [ { 1 3 2 } ?infimum ] unit-test
 
-{ 3/10 } [ 10 <iota> [ 3 < ] count-by* ] unit-test
+{ 3/10 } [ 10 <iota> [ 3 < ] percent-of ] unit-test
 
 { { 0 } } [ "ABABA" "ABA" start-all ] unit-test
 { { 0 2 } } [ "ABABA" "ABA" start-all* ] unit-test
@@ -308,7 +308,7 @@ strings tools.test ;
     H{ { t 6 } { f 5 } }
     { 0 0 1 1 2 3 4 2 3 4 5 }
 } [
-    { 2 7 1 8 1 7 1 8 2 8 4 } [ even? ] occurrence-count-by
+    { 2 7 1 8 1 7 1 8 2 8 4 } [ even? ] occurrence-count
 ] unit-test
 
 {
@@ -322,7 +322,7 @@ strings tools.test ;
     H{ { 8 3 } { 1 3 } { 2 2 } { 4 1 } { 7 2 } }
     { 0 0 0 0 1 1 2 1 1 2 0 }
 } [
-    { 2 7 1 8 1 7 1 8 2 8 4 } [ ] occurrence-count-by
+    { 2 7 1 8 1 7 1 8 2 8 4 } [ ] occurrence-count
 ] unit-test
 
 {
