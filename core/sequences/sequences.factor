@@ -364,14 +364,14 @@ C: <copier> copier
 : subseq-unsafe ( from to seq -- subseq )
     dup subseq-unsafe-as ; inline
 
-: seq-copy-loop ( dst dst-i src src-i src-stop -- dst )
+: copy-loop ( dst dst-i src src-i src-stop -- dst )
     2dup >= [
         4drop
     ] [
         [
             [ copy-nth-of-unsafe ] 4keep
             [ 1 + ] 2dip 1 +
-        ] dip seq-copy-loop
+        ] dip copy-loop
     ] if ; inline recursive
 
 PRIVATE>
