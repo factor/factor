@@ -60,6 +60,7 @@ CONSTANT: word-renames {
     { "natural-sort!" { "sort!" "0.99" } }
     { "natural-bubble-sort!" { "bubble-sort!" "0.99" } }
     { "random-integers" { "randoms" "0.99" } }
+    { "count*" { "percent-of" "0.99" } }
     { "more?" { "deref?" "0.99" } }
 }
 

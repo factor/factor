@@ -69,13 +69,13 @@ HELP: 2map-index
 { $description "Calls the quotation with each pair of elements of the two sequences and their index on the stack, with the index on the top of the stack. Collects the outputs of the quotation and outputs them into a new sequence of the same type as the first sequence." }
 { $see-also 2map map-index } ;
 
-HELP: count-by*
+HELP: percent-of
 { $values
     { "seq" sequence }
     { "quot" { $quotation ( ... elt -- ... ? ) } }
     { "%" rational } }
 { $description "Outputs the fraction of elements in the sequence for which the predicate quotation matches." }
-{ $examples { $example "USING: math ranges prettyprint sequences.extras ;" "100 [1..b] [ even? ] count-by* ." "1/2" } } ;
+{ $examples { $example "USING: math ranges prettyprint sequences.extras ;" "100 [1..b] [ even? ] percent-of ." "1/2" } } ;
 
 HELP: collapse
 { $values

@@ -171,7 +171,7 @@ GENERIC: vall? ( v -- ? )
 M: object vall? [ ] all? ; inline
 
 GENERIC: vcount ( v -- count )
-M: object vcount [ ] count-by ; inline
+M: object vcount [ ] count ; inline
 
 GENERIC: vany? ( v -- ? )
 M: object vany? [ ] any? ; inline

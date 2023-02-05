@@ -1415,29 +1415,15 @@ HELP: map-sum
 } ;
 
 HELP: count
-{ $values { "seq" sequence } { "n" integer } }
-{ $description "Efficiently returns the number of elements that are true." }
-{ $notes "This word used to take a quotation; that word is now " { $link count-by } "." }
-{ $examples
-    { $example
-        "USING: sequences prettyprint ;"
-        "{ 1 2 f f f } count ."
-        "2"
-    }
-} ;
-
-HELP: count-by
 { $values { "seq" sequence } { "quot" quotation } { "n" integer } }
 { $description "Efficiently returns the number of elements that the predicate quotation matches." }
 { $examples
     { $example
         "USING: math ranges sequences prettyprint ;"
-        "100 [1..b] [ even? ] count-by ."
+        "100 [1..b] [ even? ] count ."
         "50"
     }
 } ;
-
-{ count count-by } related-words
 
 HELP: selector
 { $values
@@ -2031,7 +2017,6 @@ ARTICLE: "sequences-combinators" "Sequence combinators"
 "Counting:"
 { $subsections
     count
-    count-by
 }
 "Superlatives with " { $link min } " and " { $link max } ":"
 { $subsections
