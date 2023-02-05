@@ -2,7 +2,7 @@
 ! See https://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs kernel kernel.private math
 math.order math.private quotations sequences sequences.private
-sets words ;
+sets sorting words ;
 IN: combinators
 
 ! Most of these combinators have compile-time expansions in
