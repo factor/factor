@@ -69,6 +69,7 @@ SYMBOLS: factor-recaptcha-site-key factor-recaptcha-secret-key ;
 
 : <concatenative-website> ( -- responder )
     concatenative-website new-dispatcher
+        "resource:extra/websites/concatenative" <static> >>default
         URL" /wiki/view/Front Page" <redirect-responder> "" add-responder ;
 
 SYMBOLS: key-password key-file dh-file ;
