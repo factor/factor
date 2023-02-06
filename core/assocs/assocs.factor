@@ -125,6 +125,9 @@ PRIVATE>
 : of ( assoc key -- value/f )
     swap at ; inline
 
+: with-assoc ( assoc quot: ( ..a value key assoc -- ..b ) -- quot: ( ..a key value -- ..b ) )
+    curry [ swap ] prepose ; inline
+
 M: assoc assoc-clone-like
     [ dup assoc-size ] dip new-assoc
     [ [ set-at ] with-assoc assoc-each ] keep ; inline
