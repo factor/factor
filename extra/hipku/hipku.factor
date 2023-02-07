@@ -2,11 +2,9 @@
 ! See http://factorcode.org/license.txt for BSD license
 
 USING: arrays ascii combinators endian grouping ip-parser kernel
-literals math math.parser qw sequences sets splitting ;
+literals math sequences splitting ;
 
 IN: hipku
-
-! https://github.com/lord63/pyhipku/blob/master/pyhipku/decode.py
 
 <PRIVATE
 
