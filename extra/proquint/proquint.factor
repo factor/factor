@@ -1,7 +1,7 @@
 ! Copyright (C) 2023 John Benediktsson
 ! See https://factorcode.org/license.txt for BSD license
 
-USING: base64.private ip-parser kernel literals math
+USING: base64.private ip-parser kernel literals make math
 math.bitwise random sequences ;
 
 IN: proquint
@@ -9,11 +9,12 @@ IN: proquint
 ! https://arxiv.org/html/0901.4016
 
 <PRIVATE
+
 <<
 CONSTANT: consonant "bdfghjklmnprstvz"
+
 CONSTANT: vowel "aiou"
 >>
-PRIVATE>
 
 : >quint16 ( m -- str )
     5 [
@@ -24,17 +25,14 @@ PRIVATE>
         ] if
     ] "" map-integers-as reverse nip ;
 
-: >quint32 ( m -- str )
-    [ -16 shift ] keep [ 16 bits >quint16 ] bi@ "-" glue ;
+PRIVATE>
 
-: >quint48 ( m -- str )
-    { -32 -16 0 } [ 16 shift-mod >quint16 ] with map "-" join ;
-
-: >quint64 ( m -- str )
-    { -48 -32 -16 0 } [ 16 shift-mod >quint16 ] with map "-" join ;
-
-: >quint128 ( m -- str )
-    { -112 -96 -80 -64 -48 -32 -16 0 } [ 16 shift-mod >quint16 ] with map "-" join ;
+: >quint ( m bits -- str )
+    [
+        [ dup 0 > ] [
+            [ [ 16 bits >quint16 , ] [ -16 shift ] bi ] dip 16 -
+        ] while 2drop
+    ] { } make reverse "-" join ;
 
 : quint> ( str -- m )
     0 [
@@ -49,17 +47,17 @@ PRIVATE>
         ] if*
     ] reduce ;
 
-: quint-password ( -- quint )
-    48 random-bits >quint48 ;
+: quint-password ( bits -- quint )
+    [ random-bits ] [ >quint ] bi ;
 
 : ipv4>quint ( ipv4 -- str )
-    ipv4-aton >quint32 ;
+    ipv4-aton 32 >quint ;
 
 : quint>ipv4 ( str -- ipv4 )
     quint> ipv4-ntoa ;
 
 : ipv6>quint ( ipv6 -- str )
-    ipv6-aton >quint128 ;
+    ipv6-aton 128 >quint ;
 
 : quint>ipv6 ( str -- ipv6 )
     quint> ipv6-ntoa ;

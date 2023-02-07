@@ -1,4 +1,4 @@
-USING: assocs ip-parser kernel proquint tools.test ;
+USING: assocs kernel proquint tools.test ;
 
 { t } [
     {
@@ -15,8 +15,7 @@ USING: assocs ip-parser kernel proquint tools.test ;
         { "198.81.129.136"  "sinid-makam" }
         { "12.110.110.204"  "budov-kuras" }
     } [
-        [ ipv4-aton ] dip
-        [ quint> = ] [ swap >quint32 = ] 2bi and
+        [ quint>ipv4 = ] [ swap ipv4>quint = ] 2bi and
     ] assoc-all?
 ] unit-test
 
