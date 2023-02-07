@@ -164,10 +164,6 @@ M: pathname url-of
         "padding: " "px;" surround
     ] re-replace-with
 
-    R/ background-color: #f3f2ea;/ [
-        drop "background-color: #f7f7f7;"
-    ] re-replace-with
-
     R/ width: \d+px;/ [
        drop ""
     ] re-replace-with
