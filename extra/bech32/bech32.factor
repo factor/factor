@@ -1,6 +1,9 @@
+! Copyright (C) 2023 John Benediktsson
+! See https://factorcode.org/license.txt for BSD license
 
-USING: ascii byte-arrays combinators.short-circuit kernel
-literals math math.order sequences ;
+USING: ascii base64.private byte-arrays
+combinators.short-circuit kernel literals math math.order
+sequences ;
 
 IN: bech32
 
@@ -46,7 +49,7 @@ CONSTANT: alphabet $[ "qpzry9x8gf2tvdw0s3jn54khce6mua7l" >byte-array ]
             [ dup 1 83 between? not ]
             [ 2dup [ length ] [ 7 + ] bi* < ]
         } 0|| [ 3drop f f ] [
-            cut rest [ alphabet index 0xff or ] B{ } map-as
+            cut rest [ $[ alphabet alphabet-inverse ] nth 0xff or ] B{ } map-as
             dup [ 0xff = ] any? [ 3drop f f ] [
                 rot [ 2dup ] dip bech32-checksum?
                 [ 6 head* ] [ 2drop f f ] if
