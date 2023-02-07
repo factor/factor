@@ -1,4 +1,4 @@
-USING: bech32 tools.test ;
+USING: arrays bech32 sequences tools.test ;
 
 ! bech32
 
