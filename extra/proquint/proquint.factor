@@ -2,7 +2,7 @@
 ! See https://factorcode.org/license.txt for BSD license
 
 USING: base64.private ip-parser kernel literals math
-math.bitwise sequences ;
+math.bitwise random sequences ;
 
 IN: proquint
 
