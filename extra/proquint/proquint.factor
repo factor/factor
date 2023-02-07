@@ -27,6 +27,9 @@ PRIVATE>
 : >quint32 ( m -- str )
     [ -16 shift ] keep [ 16 bits >quint16 ] bi@ "-" glue ;
 
+: >quint48 ( m -- str )
+    { -32 -16 0 } [ 16 shift-mod >quint16 ] with map "-" join ;
+
 : >quint64 ( m -- str )
     { -48 -32 -16 0 } [ 16 shift-mod >quint16 ] with map "-" join ;
 
@@ -45,6 +48,9 @@ PRIVATE>
             ] if*
         ] if*
     ] reduce ;
+
+: quint-password ( -- quint )
+    48 random-bits >quint48 ;
 
 : ipv4>quint ( ipv4 -- str )
     ipv4-aton >quint32 ;
