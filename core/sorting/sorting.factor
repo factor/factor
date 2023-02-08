@@ -155,7 +155,7 @@ PRIVATE>
 
 PRIVATE>
 
-GENERIC: sort-keys ( assoc -- sortedseq )
+GENERIC: sort-keys ( obj -- sortedseq )
 
 M: object sort-keys >alist sort-keys ;
 
@@ -165,7 +165,7 @@ M: sequence sort-keys
 M: hashtable sort-keys
     >alist [ { array } declare first-unsafe ] sort-by ;
 
-GENERIC: inv-sort-keys ( assoc -- sortedseq )
+GENERIC: inv-sort-keys ( obj -- sortedseq )
 
 M: object inv-sort-keys >alist inv-sort-keys ;
 
@@ -175,7 +175,7 @@ M: sequence inv-sort-keys
 M: hashtable inv-sort-keys
     >alist [ { array } declare first-unsafe ] inv-sort-by ;
 
-GENERIC: sort-values ( assoc -- sortedseq )
+GENERIC: sort-values ( obj -- sortedseq )
 
 M: object sort-values >alist sort-values ;
 
@@ -187,7 +187,7 @@ M: hashtable sort-values
 
 : sort-pair ( a b -- c d ) 2dup after? [ swap ] when ;
 
-GENERIC: inv-sort-values ( assoc -- sortedseq )
+GENERIC: inv-sort-values ( obj -- sortedseq )
 
 M: object inv-sort-values >alist inv-sort-values ;
 
