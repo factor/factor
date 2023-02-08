@@ -213,7 +213,7 @@ CONSTANT: ipv6-schema ${
 : encode-hipku ( key schema -- hipku )
     [
         {
-            { Octet [ dup pop >title ] }
+            { Octet [ dup pop unclip ch>upper prefix ] }
             { octet [ dup pop ] }
             { octet. [ dup pop "." append ] }
             [ ]

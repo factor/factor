@@ -1,12 +1,12 @@
 
 USING: hipku tools.test ;
 
-{ "The hungry white ape\naches in the ancient canyon.\nAutumn Colors crunch." } [
+{ "The hungry white ape\naches in the ancient canyon.\nAutumn colors crunch." } [
     "127.0.0.1" >hipku
 ] unit-test
 
 { "127.0.0.1" } [
-    "The hungry white ape\naches in the ancient canyon.\nAutumn Colors crunch."
+    "The hungry white ape\naches in the ancient canyon.\nAutumn colors crunch."
     hipku>
 ] unit-test
 
