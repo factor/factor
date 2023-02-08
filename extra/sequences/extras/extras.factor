@@ -404,6 +404,11 @@ PRIVATE>
 : 2reject-map ( ... seq1 seq2 quot: ( ... elt1 elt2 -- ... ? ) map-quot: ( elt1 elt2 -- obj ) -- ... newseq )
     pick 2reject-map-as ; inline
 
+: 2push-when ( ..a elt1 elt2 quot: ( ..a elt1 elt2 -- ..b ? ) accum -- ..b )
+    [ keepd ] dip rot [ push ] [ 2drop ] if ; inline
+
+: (2selector-as) ( quot length exemplar -- selector accum )
+    new-resizable [ [ 2push-when ] 2curry ] keep ; inline
 
 : 2filter-as ( ... seq1 seq2 quot: ( ... elt1 elt2 -- ... newelt ) exemplar -- ... newseq )
     [
