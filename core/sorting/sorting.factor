@@ -148,6 +148,8 @@ PRIVATE>
 : inv-sort-by ( seq quot: ( elt -- key ) -- sortedseq )
     [ compare invert-comparison ] curry sort-with ; inline
 
+ALIAS: natural-sort sort ! temporary, deprecated
+
 <PRIVATE
 
 : check-bounds ( alist n -- alist )
