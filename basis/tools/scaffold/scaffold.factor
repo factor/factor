@@ -2,7 +2,7 @@
 ! See https://factorcode.org/license.txt for BSD license.
 USING: accessors alien arrays assocs byte-arrays calendar
 classes classes.error combinators combinators.short-circuit
-continuations eval hashtables help.markup interpolate io
+continuations effects eval hashtables help.markup interpolate io
 io.directories io.encodings.utf8 io.files io.pathnames
 io.streams.string kernel math math.parser namespaces prettyprint
 quotations sequences sets sorting splitting strings system
@@ -173,7 +173,7 @@ M: object add-using
 
 : $values. ( word -- )
     "declared-effect" word-prop [
-        [ in>> ] [ out>> ] bi
+        in-out
         2dup [ empty? ] both? [
             2drop
         ] [

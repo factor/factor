@@ -14,7 +14,7 @@ GENERIC: infer-known* ( known -- effect )
     ] [ infer-known* ] if ;
 
 IDENTITY-MEMO: inputs/outputs ( quot -- in out )
-    infer [ in>> ] [ out>> ] bi 2length ;
+    infer in-out 2length ;
 
 : inputs ( quot -- n ) inputs/outputs drop ; inline
 
@@ -24,7 +24,7 @@ IDENTITY-MEMO: inputs/outputs ( quot -- in out )
     peek-d
     infer-known [
         [ pop-d 1array #drop, ]
-        [ [ in>> ] [ out>> ] bi [ length apply-object ] bi@ ] bi*
+        [ in-out [ length apply-object ] bi@ ] bi*
     ] [
         \ inputs/outputs dup required-stack-effect apply-word/effect
         pop-d pop-d swap
