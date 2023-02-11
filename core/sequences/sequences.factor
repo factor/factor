@@ -595,27 +595,25 @@ PRIVATE>
 
 <PRIVATE
 
-: bounds-check-call ( n seq quot -- elt i )
+: bounds-check-call ( n seq quot -- obj1 obj2 )
     2over bounds-check? [ call ] [ 3drop f f ] if ; inline
 
-: find-from-unsafe ( ... n seq quot: ( ... elt -- ... ? ) -- ... i elt )
-    [ length-operator find-integer-from ] keepd
-    index/element ; inline
+: find-from-unsafe ( ... n seq quot: ( ... elt -- ... ? ) -- ... i/f seq )
+    [ length-operator find-integer-from ] keepd ; inline
 
-: find-last-from-unsafe ( ... n seq quot: ( ... elt -- ... ? ) -- ... i elt )
-    [ length-operator nip find-last-integer ] keepd
-    index/element ; inline
+: find-last-from-unsafe ( ... n seq quot: ( ... elt -- ... ? ) -- ... i/f seq )
+    [ length-operator nip find-last-integer ] keepd ; inline
 
 PRIVATE>
 
 : find-from ( ... n seq quot: ( ... elt -- ... ? ) -- ... i elt )
-    '[ _ find-from-unsafe ] bounds-check-call ; inline
+    '[ _ find-from-unsafe index/element ] bounds-check-call ; inline
 
 : find ( ... seq quot: ( ... elt -- ... ? ) -- ... i elt )
-    [ 0 ] 2dip find-from-unsafe ; inline
+    [ 0 ] 2dip find-from-unsafe index/element ; inline
 
 : find-last-from ( ... n seq quot: ( ... elt -- ... ? ) -- ... i elt )
-    '[ _ find-last-from-unsafe ] bounds-check-call ; inline
+    '[ _ find-last-from-unsafe index/element ] bounds-check-call ; inline
 
 : find-last ( ... seq quot: ( ... elt -- ... ? ) -- ... i elt )
     [ index-of-last ] dip find-last-from ; inline
@@ -634,9 +632,6 @@ PRIVATE>
 
 : push-when ( ..a elt quot: ( ..a elt -- ..b ? ) accum -- ..b )
     [ keep ] dip rot [ push ] [ 2drop ] if ; inline
-
-: call-push-when ( ..a elt quot: ( ..a elt -- ..b elt' ? ) accum -- ..b )
-    [ call ] dip swap [ push ] [ 2drop ] if ; inline
 
 <PRIVATE
 

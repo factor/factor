@@ -709,8 +709,6 @@ PRIVATE>
 
 PRIVATE>
 
-: index-of ( seq obj -- n ) '[ _ = ] find drop ;
-
 ERROR: slice-error-of from to seq ;
 
 : check-slice-of ( seq from to -- seq from to )
@@ -733,11 +731,27 @@ ERROR: slice-error-of from to seq ;
 : snip-slice-of ( seq from to -- head tail )
     [ head-slice ] [ tail-slice ] bi-curry* bi ; inline
 
+: index* ( seq obj -- n ) [ = ] curry find drop ;
+
+: index-from* ( i seq obj -- n )
+    [ = ] curry find-from drop ;
+
+: last-index* ( seq obj -- n )
+    [ = ] curry find-last drop ;
+
+: last-index-from* ( i seq obj -- n )
+    [ = ] curry find-last-from drop ;
+
+: indices* ( seq obj -- indices )
+    [ = ] curry [ swap ] prepose V{ } clone [
+        [ push ] curry [ [ drop ] if ] curry compose each-index
+    ] keep ;
+
 : remove-first ( obj seq -- seq' )
     [ index ] keep over [ remove-nth ] [ nip ] if ;
 
 : remove-first-of ( seq obj -- seq' )
-    dupd index-of [ remove-nth-of ] when* ;
+    dupd index* [ remove-nth-of ] when* ;
 
 : remove-first! ( obj seq -- seq )
     [ index ] keep over [ remove-nth! ] [ nip ] if ;
@@ -1098,3 +1112,27 @@ M: virtual-zip-index nth-unsafe
     over [ seq>> nth-unsafe ] [ 2array ] bi* ; inline
 
 INSTANCE: virtual-zip-index immutable-sequence
+
+: call-push-when ( ..a elt quot: ( ..a elt -- ..b elt' ? ) accum -- ..b )
+    [ call ] dip swap [ push ] [ 2drop ] if ; inline
+
+: find-from* ( ... n seq quot: ( ... elt -- ... ? ) -- ... elt i/f )
+    '[ _ find-from-unsafe element/index ] bounds-check-call ; inline
+
+: find* ( ... seq quot: ( ... elt -- ... ? ) -- ... elt i/f )
+    [ 0 ] 2dip find-from-unsafe element/index ; inline
+
+: find-last-from* ( ... n seq quot: ( ... elt -- ... ? ) -- ... elt i/f )
+    '[ _ find-last-from-unsafe element/index ] bounds-check-call ; inline
+
+: find-last* ( ... seq quot: ( ... elt -- ... ? ) -- ... elt i/f )
+    [ index-of-last ] dip find-last-from* ; inline
+
+: find-index-from* ( ... n seq quot: ( ... elt i -- ... ? ) -- ... elt i/f )
+    '[
+        _ [ sequence-index-operator find-integer-from ] keepd
+        element/index
+    ] bounds-check-call ; inline
+
+: find-index* ( ... seq quot: ( ... elt i -- ... ? ) -- ... elt i/f )
+    [ 0 ] 2dip find-index-from* ; inline
