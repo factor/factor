@@ -722,8 +722,14 @@ ERROR: slice-error-of from to seq ;
 : remove-nth-of ( seq n -- seq' )
     [ dup 1 + rot snip-slice ] keepd append-as ;
 
+: remove-nth-of* ( seq n -- nth seq' )
+    [ nth-of ] [ remove-nth-of ] 2bi ;
+
 : remove-nth-of! ( seq n -- seq )
     dup 1 + delete-slice-of ;
+
+: remove-nth-of*! ( seq n -- nth seq )
+    [ nth-of ] [ dup 1 + delete-slice-of ] 2bi ;
 
 : snip-of ( seq from to -- head tail )
     [ head ] [ tail ] bi-curry* bi ; inline
