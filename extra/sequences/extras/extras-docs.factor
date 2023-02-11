@@ -947,14 +947,14 @@ HELP: map-find-last-index
 
 HELP: map-from
 { $values
-    { "seq" sequence } { "quot" quotation } { "i" integer }
+    { "seq" sequence } { "quot" quotation } { "from" integer }
     { "newseq" sequence }
 }
 { $description "A version of " { $link map } " that maps the slice of " { $snippet "seq" } " beginning at index " { $snippet "i" } "." } ;
 
 HELP: map-from-as
 { $values
-    { "seq" sequence } { "quot" quotation } { "i" integer } { "exemplar" object }
+    { "seq" sequence } { "quot" quotation } { "from" integer } { "exemplar" object }
     { "newseq" sequence }
 }
 { $description "A version of " { $link map-from } " where the resultant sequence has the same class as " { $snippet "exemplar" } } ;
@@ -1128,7 +1128,7 @@ HELP: push-if-index
 
 HELP: reduce-from
 { $values
-    { "seq" sequence } { "identity" object } { "quot" quotation } { "i" integer }
+    { "seq" sequence } { "identity" object } { "quot" quotation } { "from" integer }
     { "result" object }
 } ;
 

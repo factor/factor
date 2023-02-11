@@ -1314,7 +1314,7 @@ the results of your efforts under { $url "https://localhost:8080/chloe" } . Noti
 can change the main responder dynamically.
 
 This ends our very brief tour of Furnace. Furnace is much more expansive than the examples shown here,  as it allows for many general web
-tasks. You can learn more about it in the { $link "furnace" } documentation.
+tasks. You can learn more about it in the { $vocab-link "furnace" } documentation.
 ;
 
 ARTICLE: "tour-processes" "Processes and Channels"

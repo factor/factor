@@ -1,13 +1,13 @@
 ! Copyright (C) 2005, 2010 Slava Pestov.
 ! See https://factorcode.org/license.txt for BSD license.
 USING: accessors ascii assocs calendar combinators
-combinators.short-circuit destructors environment hashtables
-http http.client.post-data http.parsers io io.crlf io.encodings
-io.encodings.ascii io.encodings.binary io.encodings.iana
-io.encodings.string io.files io.pathnames io.sockets
-io.sockets.secure io.timeouts kernel math math.order math.parser
-mime.types namespaces present sequences splitting urls
-vocabs.loader ;
+combinators.short-circuit destructors effects environment
+hashtables http http.client.post-data http.parsers io io.crlf
+io.encodings io.encodings.ascii io.encodings.binary
+io.encodings.iana io.encodings.string io.files io.pathnames
+io.sockets io.sockets.secure io.timeouts kernel math math.order
+math.parser mime.types namespaces present sequences splitting
+urls vocabs.loader ;
 IN: http.client
 
 ERROR: too-many-redirects ;
