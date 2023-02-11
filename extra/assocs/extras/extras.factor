@@ -154,9 +154,11 @@ PRIVATE>
 : sequence>hashtable ( seq map-quot insert-quot -- hashtable )
     H{ } sequence>assoc ; inline
 
+: ?1array ( obj -- seq ) dup sequence? [ 1array ] unless ; inline
+
 : expand-keys-set-at-as ( assoc exemplar -- hashtable' )
     [
-        [ swap dup sequence? [ 1array ] unless ]
+        [ swap ?1array ]
         [ '[ _ set-at ] with each ]
     ] dip assoc>object ;
 
@@ -165,7 +167,7 @@ PRIVATE>
 
 : expand-keys-push-at-as ( assoc exemplar -- hashtable' )
     [
-        [ swap dup sequence? [ 1array ] unless ]
+        [ swap ?1array ]
         [ push-at-each ]
     ] dip assoc>object ;
 
@@ -174,7 +176,7 @@ PRIVATE>
 
 : expand-keys-push-as ( assoc exemplar -- hashtable' )
     [
-        [ [ dup sequence? [ 1array ] unless ] dip ]
+        [ [ ?1array ] dip ]
         [ '[ _ 2array _ push ] each ]
     ] dip assoc>object ;
 
@@ -183,7 +185,7 @@ PRIVATE>
 
 : expand-values-set-at-as ( assoc exemplar -- hashtable' )
     [
-        [ dup sequence? [ 1array ] unless swap ]
+        [ ?1array swap ]
         [ '[ _ _ set-at ] each ]
     ] dip assoc>object ;
 
@@ -192,7 +194,7 @@ PRIVATE>
 
 : expand-values-push-at-as ( assoc exemplar -- hashtable' )
     [
-        [ dup sequence? [ 1array ] unless swap ]
+        [ ?1array swap ]
         [ '[ _ _ push-at ] each ]
     ] dip assoc>object ;
 
@@ -201,7 +203,7 @@ PRIVATE>
 
 : expand-values-push-as ( assoc exemplar -- assoc )
     [
-        [ dup sequence? [ 1array ] unless ]
+        [ ?1array ]
         [ '[ 2array _ push ] with each ]
     ] dip assoc>object ;
 
