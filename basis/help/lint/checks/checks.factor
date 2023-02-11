@@ -71,7 +71,7 @@ SYMBOL: vocab-articles
 
 : effect-values ( word -- seq )
     stack-effect
-    [ in>> ] [ out>> ] bi append
+    in-out append
     [ dup pair? [ first ] when effect>string ] map members ;
 
 : effect-effects ( word -- seq )

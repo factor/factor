@@ -1,8 +1,7 @@
 ! Copyright (C) 2005, 2009 Slava Pestov.
 ! See https://factorcode.org/license.txt for BSD license.
-USING: kernel continuations destructors io io.encodings
-io.encodings.private io.timeouts io.ports io.styles summary
-accessors delegate delegate.protocols ;
+USING: accessors delegate delegate.protocols destructors effects
+io io.encodings io.ports io.styles io.timeouts kernel ;
 IN: io.streams.duplex
 
 TUPLE: duplex-stream in out ;
@@ -16,7 +15,7 @@ CONSULT: formatted-output-stream-protocol duplex-stream out>> ;
 INSTANCE: duplex-stream input-stream
 INSTANCE: duplex-stream output-stream
 
-: >duplex-stream< ( stream -- in out ) [ in>> ] [ out>> ] bi ; inline
+: >duplex-stream< ( stream -- in out ) in-out ; inline
 
 M: duplex-stream stream-element-type
     >duplex-stream<

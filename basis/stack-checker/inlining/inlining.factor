@@ -126,7 +126,7 @@ M: declared-effect (undeclared-known) known>> (undeclared-known) ;
     [ check-call-height ] [ check-call-site-stack ] bi ;
 
 : adjust-stack-effect ( effect -- effect' )
-    [ in>> ] [ out>> ] bi
+    in-out
     meta-d length pick length [-]
     object <repetition> '[ _ prepend ] bi@
     <effect> ;
