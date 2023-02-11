@@ -1,9 +1,9 @@
 ! Copyright (C) 2009 Maxim Savchenko
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 
 USING: kernel accessors sequences sequences.private destructors math namespaces
-       openssl openssl.libcrypto byte-arrays bit-arrays.private
-       alien.c-types alien.destructors alien.data ;
+    openssl openssl.libcrypto byte-arrays bit-arrays.private
+    alien.c-types alien.destructors alien.data ;
 
 IN: ecdsa
 

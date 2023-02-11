@@ -1,5 +1,5 @@
 ! Copyright (C) 2007 Elie CHAFTARI
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 
 IN: asn1.ldap
 
@@ -65,4 +65,4 @@ CONSTANT: SearchScope_WholeSubtree    2
                  }
              }
         }
-     } ;
+    } ;

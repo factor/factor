@@ -1,5 +1,5 @@
 ! Copyright (C) 2010, 2011 Anton Gorenko, Philipp Bruschweiler.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors alien.accessors alien.c-types alien.strings arrays
 assocs classes.struct combinators continuations destructors
 environment gdk.ffi gdk.gl.ffi gdk.pixbuf.ffi glib.ffi gobject.ffi

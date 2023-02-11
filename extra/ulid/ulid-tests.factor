@@ -1,5 +1,5 @@
 ! Copyright (C) 2019 Alexander Ilin.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors endian kernel math namespaces sequences
 strings tools.test ulid ulid.private ;
 IN: ulid.tests

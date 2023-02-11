@@ -1,5 +1,5 @@
 ! Copyright (C) 2010 John Benediktsson
-! See http://factorcode.org/license.txt for BSD license
+! See https://factorcode.org/license.txt for BSD license
 
 USING: assocs calendar environment formatting grouping io.files
 kernel make math ranges sequences splitting xml.entities ;

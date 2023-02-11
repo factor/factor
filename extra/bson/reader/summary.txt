@@ -1,1 +1,0 @@
-BSON to Factor deserializer

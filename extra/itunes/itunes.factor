@@ -1,7 +1,7 @@
 ! Copyright (C) 2020 Doug Coleman.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors assocs biassocs combinators formatting
-http.client json.reader kernel literals sequences ;
+http.client json kernel literals sequences ;
 IN: itunes
 
 ERROR: http-get-error url res json ;

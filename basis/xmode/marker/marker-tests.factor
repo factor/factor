@@ -82,7 +82,7 @@ xmode.marker tools.test kernel ;
         T{ token f ">" KEYWORD2 }
     }
 } [
-     f "<!ELEMENT %hello; >" "xml" load-mode tokenize-line nip
+    f "<!ELEMENT %hello; >" "xml" load-mode tokenize-line nip
 ] unit-test
 
 {
@@ -97,7 +97,7 @@ xmode.marker tools.test kernel ;
         T{ token f ">" KEYWORD2 }
     }
 } [
-     f "<!ELEMENT %hello-world; >" "xml" load-mode tokenize-line nip
+    f "<!ELEMENT %hello-world; >" "xml" load-mode tokenize-line nip
 ] unit-test
 
 {

@@ -1,5 +1,5 @@
 ! Copyright (C) 2010 Erik Charlebois, William Schlieper.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors alien.c-types alien.data alien.syntax arrays
 assocs bit-arrays destructors game.input gdk.ffi
 io.encodings.binary io.files kernel linux.input-events

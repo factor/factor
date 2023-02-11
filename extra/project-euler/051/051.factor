@@ -1,7 +1,7 @@
 ! Copyright (C) 2009 Jon Harper.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 
-! http://projecteuler.net/index.php?section=problems&id=1
+! https://projecteuler.net/index.php?section=problems&id=1
 
 ! DESCRIPTION
 ! -----------
@@ -54,7 +54,7 @@ SYMBOL: large-families
 : save-family ( family -- )
     dup family-count get at 8 = [ large-families get adjoin ] [ drop ] if ;
 : increment-family ( family -- )
-   family-count get inc-at ;
+    family-count get inc-at ;
 : handle-family ( family -- )
     [ increment-family ] [ save-family ] bi ;
 

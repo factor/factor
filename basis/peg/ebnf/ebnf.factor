@@ -1,5 +1,5 @@
 ! Copyright (C) 2007 Chris Double.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors assocs combinators combinators.short-circuit
 effects kernel make math.parser multiline namespaces parser peg
 peg.parsers quotations sequences sequences.deep splitting
@@ -300,10 +300,10 @@ DEFER: choice-parser
     ] choice* ;
 
 : action-parser ( -- parser )
-     "[[" factor-code-parser "]]" syntax-pack ;
+    "[[" factor-code-parser "]]" syntax-pack ;
 
 : semantic-parser ( -- parser )
-     "?[" factor-code-parser "]?" syntax-pack ;
+    "?[" factor-code-parser "]?" syntax-pack ;
 
 : sequence-parser ( -- parser )
     ! A sequence of terminals and non-terminals, including
@@ -457,7 +457,7 @@ M: ebnf-sequence build-locals
                 " " %
                 %
                 " nip ]" %
-             ] "" make
+            ] "" make
         ] if
     ] if ;
 

@@ -1,11 +1,15 @@
 ! Copyright (C) 2012-2014 John Benediktsson
-! See http://factorcode.org/license.txt for BSD license
-USING: byte-arrays combinators combinators.short-circuit kernel
-math math.bitwise math.parser sequences splitting ;
+! See https://factorcode.org/license.txt for BSD license
+
+USING: arrays byte-arrays combinators combinators.short-circuit
+endian grouping kernel math math.bitwise math.parser regexp
+sequences splitting ;
 
 IN: ip-parser
 
 ERROR: malformed-ipv4 string ;
+
+ERROR: malformed-ipv6 string ;
 
 ERROR: bad-ipv4-component string ;
 
@@ -75,3 +79,11 @@ PRIVATE>
 
 : parse-ipv6 ( string -- seq )
     "::" split1 [ [ f ] [ split-ipv6 ] if-empty ] bi@ pad-ipv6 ;
+
+: ipv6-ntoa ( integer -- ip )
+    16 >be bytes>hex-string 4 <groups>
+    [ [ CHAR: 0 = ] trim-head ] map ":" join
+    R/ [:][:]+/ "::" re-replace ;
+
+: ipv6-aton ( ip -- integer )
+    parse-ipv6 0 [ [ 16 shift ] [ + ] bi* ] reduce ;

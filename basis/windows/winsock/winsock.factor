@@ -1,5 +1,5 @@
 ! Copyright (C) 2006 Mackenzie Straight, Doug Coleman.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors alien alien.c-types alien.data alien.syntax
 byte-arrays classes.struct grouping init kernel literals math
 math.parser sequences system vocabs.parser windows.com.syntax

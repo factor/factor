@@ -1,5 +1,5 @@
 ! Copyright (c) 2008, 2010 Slava Pestov
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors kernel sequences assocs io.files io.pathnames
 io.sockets io.sockets.secure io.servers
 namespaces db db.tuples db.sqlite smtp urls
@@ -69,6 +69,7 @@ SYMBOLS: factor-recaptcha-site-key factor-recaptcha-secret-key ;
 
 : <concatenative-website> ( -- responder )
     concatenative-website new-dispatcher
+        "resource:extra/websites/concatenative" <static> >>default
         URL" /wiki/view/Front Page" <redirect-responder> "" add-responder ;
 
 SYMBOLS: key-password key-file dh-file ;

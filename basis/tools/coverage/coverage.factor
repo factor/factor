@@ -1,5 +1,5 @@
 ! Copyright (C) 2011 Doug Coleman.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs classes combinators.short-circuit
 continuations io kernel math namespaces prettyprint quotations
 sequences sequences.deep splitting strings tools.annotations

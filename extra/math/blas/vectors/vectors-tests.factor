@@ -1,4 +1,7 @@
-USING: kernel math.blas.vectors math.functions sequences tools.test ;
+USING: kernel math.blas.vectors math.functions sequences system tools.test ;
+
+! disable on linux-x86-32
+os linux? cpu x86.32? and [
 
 ! clone
 
@@ -177,3 +180,5 @@ unit-test
 { dvector{ -5.0 4.0 -6.0 } } [ dvector{ 1.0 -5.0 4.0 -6.0 -1.0 } 1 3 Vsub ] unit-test
 { cvector{ -5.0 C{ 4.0 3.0 } -6.0 } } [ cvector{ 1.0 -5.0 C{ 4.0 3.0 } -6.0 -1.0 } 1 3 Vsub ] unit-test
 { zvector{ -5.0 C{ 4.0 3.0 } -6.0 } } [ zvector{ 1.0 -5.0 C{ 4.0 3.0 } -6.0 -1.0 } 1 3 Vsub ] unit-test
+
+] unless

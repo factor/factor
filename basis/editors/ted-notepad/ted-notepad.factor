@@ -4,8 +4,6 @@ IN: editors.ted-notepad
 
 SINGLETON: ted-notepad
 
-editor-class [ ted-notepad ] initialize
-
 : ted-notepad-path ( -- path )
     \ ted-notepad-path get [
         { "TED Notepad" } "tednpad.exe" find-in-applications

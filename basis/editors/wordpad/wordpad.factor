@@ -3,8 +3,6 @@ IN: editors.wordpad
 
 SINGLETON: wordpad
 
-editor-class [ wordpad ] initialize
-
 : wordpad-path ( -- path )
     \ wordpad-path get [
         { "Windows NT\\Accessories" } "wordpad.exe" find-in-applications

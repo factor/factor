@@ -4,8 +4,6 @@ IN: editors.editpadlite
 
 SINGLETON: editpadlite
 
-editor-class [ editpadlite ] initialize
-
 : editpadlite-path ( -- path )
     \ editpadlite-path get [
         {

@@ -1,5 +1,5 @@
 ! Copyright (C) 2005, 2011 Slava Pestov, Daniel Ehrenberg.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors kernel kernel.private math math.order
 math.private slots.private ;
 IN: sequences
@@ -909,7 +909,7 @@ PRIVATE>
     ] keep ;
 
 : reverse ( seq -- newseq )
-     [
+    [
         dup [ length ] keep new-sequence
         [ 0 swap copy-unsafe ] keep reverse!
     ] keep like ;

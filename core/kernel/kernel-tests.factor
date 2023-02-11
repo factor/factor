@@ -68,7 +68,7 @@ IN: kernel.tests
     2 head ${ KERNEL-ERROR ERROR-DATASTACK-OVERFLOW } =
 ] must-fail-with
 
-{ } [ [ :c ] with-string-writer drop ] unit-test
+[ [ :c ] with-string-writer ] must-not-fail
 
 [ overflow-r ] [
     2 head ${ KERNEL-ERROR ERROR-RETAINSTACK-OVERFLOW } =

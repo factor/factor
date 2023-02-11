@@ -1,6 +1,6 @@
 ! Copyright (C) 2009, 2010 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
-USING: accessors assocs combinators
+! See https://factorcode.org/license.txt for BSD license.
+USING: accessors assocs combinators combinators.short-circuit
 compiler.cfg.linear-scan.allocation.splitting
 compiler.cfg.linear-scan.allocation.state
 compiler.cfg.linear-scan.live-intervals
@@ -15,7 +15,7 @@ IN: compiler.cfg.linear-scan.allocation.spilling
     dup first-use n>> swap [ fix-lower-bound ] change-ranges drop ;
 
 : last-use-rep ( live-interval -- rep )
-    last-use [ def-rep>> ] [ use-rep>> ] bi or ; inline
+    last-use { [ def-rep>> ] [ use-rep>> ] } 1|| ; inline
 
 : assign-spill ( live-interval -- )
     dup last-use-rep dup [

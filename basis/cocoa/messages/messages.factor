@@ -1,11 +1,11 @@
 ! Copyright (C) 2006, 2010 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors alien alien.c-types alien.data alien.strings
 arrays assocs classes.struct cocoa.runtime cocoa.types
-combinators core-graphics.types generalizations
-io.encodings.utf8 kernel layouts libc make math namespaces
-sequences sets specialized-arrays splitting stack-checker
-strings words ;
+combinators continuations core-graphics.types destructors
+generalizations io io.encodings.utf8 kernel layouts libc make math
+math.parser namespaces sequences sets specialized-arrays
+splitting stack-checker strings words ;
 QUALIFIED-WITH: alien.c-types c
 IN: cocoa.messages
 
@@ -218,23 +218,37 @@ ERROR: no-objc-type name ;
     [ method-arg-type ] with map ;
 
 : method-return-type ( method -- ctype )
-    method_copyReturnType
-    [ utf8 alien>string parse-objc-type ] keep
-    (free) ;
+    method_copyReturnType [ utf8 alien>string ] [ (free) ] bi ;
+
+: method-return-type-parsed ( method -- ctype/f )
+    method-return-type
+    [ parse-objc-type ] [ 2drop f ] recover ;
 
 : method-signature ( method -- signature )
-    [ method-return-type ] [ method-arg-types ] bi 2array ;
+    [ method-return-type-parsed ] [ method-arg-types ] bi 2array ;
 
 : method-name ( method -- name )
     method_getName sel_getName ;
+
+: warn-unknown-objc-method ( classname method-name method -- )
+    '[
+        _ write bl
+        _ "`" dup surround write bl
+        "has unknown method-return-type:" write bl
+        _ method-return-type print
+    ] with-output>error ;
 
 :: register-objc-method ( classname method -- )
     method method-signature :> signature
     method method-name :> name
     classname "." name 3append :> fullname
-    signature cache-stubs
-    signature name objc-methods get set-at
-    signature fullname objc-methods get set-at ;
+    signature first [
+        signature cache-stubs
+        signature name objc-methods get set-at
+        signature fullname objc-methods get set-at
+    ] [
+        classname name method warn-unknown-objc-method
+    ] if ;
 
 : method-collisions ( -- collisions )
     objc-methods get >alist
@@ -242,10 +256,13 @@ ERROR: no-objc-type name ;
     [ first "." split1 nip ] collect-by
     [ nip values members length 1 > ] assoc-filter ;
 
+: method-count ( class -- c-direct-array )
+    0 uint <ref> [ class_copyMethodList (free) ] keep uint deref ;
+
 : each-method-in-class ( class quot: ( classname method -- ) -- )
     [
         [ class_getName ] keep
-        { uint } [ class_copyMethodList ] with-out-parameters
+        0 uint <ref> [ class_copyMethodList ] keep uint deref
     ] dip over 0 = [ 4drop ] [
         [ void* <c-direct-array> ] dip
         [ with each ] [ drop (free) ] 2bi
@@ -273,3 +290,11 @@ ERROR: no-objc-type name ;
 
 : root-class ( class -- root )
     dup class_getSuperclass [ root-class ] [ ] ?if ;
+
+: objc-class-names ( -- seq )
+    [
+        f 0 objc_getClassList
+        [ Class heap-size * malloc &free ] keep
+        dupd objc_getClassList void* <c-direct-array>
+        [ class_getName ] { } map-as
+    ] with-destructors ;

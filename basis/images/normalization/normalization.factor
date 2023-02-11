@@ -1,5 +1,5 @@
 ! Copyright (C) 2009 Doug Coleman, Keith Lazuka
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors alien.c-types alien.data byte-arrays grouping
 images kernel math math.floats.half sequences specialized-arrays ;
 FROM: alien.c-types => float ;

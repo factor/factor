@@ -1,5 +1,5 @@
 ! Copyright (C) 2009, 2011 Doug Coleman, Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors arrays combinators combinators.short-circuit
 compiler.cfg compiler.cfg.instructions compiler.cfg.predecessors
 compiler.cfg.renaming compiler.cfg.rpo compiler.cfg.utilities
@@ -52,7 +52,7 @@ UNION: irrelevant ##peek ##replace ##inc ;
 : split-instructions? ( insns -- ? ) [ irrelevant? not ] count 5 <= ;
 
 : short-tail-block? ( bb -- ? )
-    [ successors>> empty? ] [ instructions>> length 2 = ] bi and ;
+    { [ successors>> empty? ] [ instructions>> length 2 = ] } 1&& ;
 
 : short-block? ( bb -- ? )
     ! If block is empty, always split

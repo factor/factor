@@ -1,5 +1,5 @@
 ! Copyright (C) 2008 Doug Coleman.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors ftp ftp.client.listing-parser io
 io.encodings.binary io.encodings.utf8 io.files io.pathnames
 io.sockets io.streams.duplex kernel math.parser sequences

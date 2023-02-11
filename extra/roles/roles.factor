@@ -1,5 +1,5 @@
 ! Copyright (C) 2009 Joe Groff.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors arrays classes.mixin classes.parser
 classes.tuple classes.tuple.parser combinators kernel lexer make
 parser sequences sets strings words ;

@@ -38,25 +38,25 @@ unit-test
 {
     "1234"
 } [
-     "Hello world\r\n1234" <string-reader>
-     dup stream-readln drop
-     4 swap stream-read
+    "Hello world\r\n1234" <string-reader>
+    dup stream-readln drop
+    4 swap stream-read
 ] unit-test
 
 {
     "1234"
 } [
-     "Hello world\r\n1234" <string-reader>
-     dup stream-readln drop
-     4 swap stream-read-partial
+    "Hello world\r\n1234" <string-reader>
+    dup stream-readln drop
+    4 swap stream-read-partial
 ] unit-test
 
 {
     CHAR: 1
 } [
-     "Hello world\r\n1234" <string-reader>
-     dup stream-readln drop
-     stream-read1
+    "Hello world\r\n1234" <string-reader>
+    dup stream-readln drop
+    stream-read1
 ] unit-test
 
 { utf8 ascii } [

@@ -1,5 +1,5 @@
 ! Copyright (C) 2008,2011 Daniel Ehrenberg, Doug Coleman.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: byte-arrays help.markup help.syntax io.encodings.string
 strings ;
 IN: io.encodings.string

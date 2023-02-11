@@ -1,7 +1,8 @@
 ! Copyright (C) 2020 Doug Coleman.
-! See http://factorcode.org/license.txt for BSD license.
-USING: accessors combinators cpu.arm.assembler.opcodes
-kernel make math math.bitwise namespaces sequences ;
+! Copyright (C) 2023 Giftpflanze.
+! See https://factorcode.org/license.txt for BSD license.
+USING: combinators cpu.arm.assembler.opcodes grouping kernel
+math math.bitwise math.parser sequences ;
 IN: cpu.arm.assembler
 
 ! pre-index mode: computed addres is the base-register + offset
@@ -11,123 +12,81 @@ IN: cpu.arm.assembler
 ! in both modes, the base-register is updated
 
 ERROR: arm64-encoding-imm original n-bits-requested truncated ;
-: ?bits ( x n -- x ) 2dup bits dup reach = [ 2drop ] [ arm64-encoding-imm ] if ; inline
+: ?ubits ( x n -- x )
+    2dup bits dup reach =
+    [ 2drop ] [ arm64-encoding-imm ] if ; inline
 
-! : ip ( -- address ) arm64-assembler get ip>> ;
+: ?sbits ( x n -- x )
+    2dup >signed dup reach =
+    [ drop bits ] [ arm64-encoding-imm ] if ; inline
 
-: ADR ( imm21 Rd -- )
-    [ [ 2 bits ] [ -2 shift 19 ?bits ] bi ] dip ADR-encode ;
-
-: ADRP ( imm21 Rd -- )
-    [ [ 2 bits ] [ -2 shift 19 ?bits ] bi ] dip ADRP-encode ;
-
-: LDR-pre ( imm9 Rn Rt -- ) LDRpre64-encode ;
-: LDR-post ( imm9 Rn Rt -- ) LDRpost64-encode ;
-: LDR-uoff ( imm12 Rn Rt -- ) [ 8 / ] 2dip LDRuoff64-encode ;
-
-: MOVwi64 ( imm Rt -- ) [ 0 ] 2dip MOVwi64-encode ;
-: MOVr64 ( Rn Rd -- ) MOVr64-encode ;
-
-: RET ( register/f -- ) X30 or RET-encode ;
-
-! stp     x29, x30, [sp,#-16]!
-! -16 SP X30 X29 STP-pre
-: STP-pre ( offset register-offset register-mid register -- )
-    [ 8 / 7 bits ] 3dip swapd STPpre64-encode ;
-
-: STP-post ( offset register-offset register-mid register -- )
-    [ 8 / 7 bits ] 3dip swapd STPpost64-encode ;
-
-: STP-signed-offset ( offset register-offset register-mid register -- )
-    [ 8 / 7 bits ] 3dip swapd STPsoff64-encode ;
-
-
-: LDP-pre ( offset register-offset register-mid register -- )
-    [ 8 / 7 bits ] 3dip swapd LDPpre64-encode ;
-
-: LDP-post ( offset register-offset register-mid register -- )
-    [ 8 / 7 bits ] 3dip swapd LDPpost64-encode ;
-
-: LDP-signed-offset ( offset register-offset register-mid register -- )
-    [ 8 / 7 bits ] 3dip swapd LDPsoff64-encode ;
+ERROR: scaling-error original n-bits-shifted rest ;
+: ?>> ( x n -- x )
+    2dup bits [ neg shift ] [ scaling-error ] if-zero ;
 
 ! Some instructions allow an immediate literal of n bits
 ! or n bits shifted. This means there are invalid immediate
 ! values, e.g. imm12 of 1, 4096, but not 4097
 ERROR: imm-out-of-range imm n ;
-: imm-lower? ( imm n -- ? )
-    on-bits unmask 0 > not ;
+: imm-lower? ( imm n -- ? ) on-bits unmask 0 > not ;
 
- : imm-upper? ( imm n -- ? )
+: imm-upper? ( imm n -- ? )
     [ on-bits ] [ shift ] bi unmask 0 > not ;
 
-: prepare-split-imm ( imm n -- imm upper? )
+: (split-imm) ( imm n -- imm upper? )
     {
         { [ 2dup imm-lower? ] [ drop f ] }
         { [ 2dup imm-upper? ] [ drop t ] }
         [ imm-out-of-range ]
     } cond ;
 
-: ADDi32 ( imm12 Rn Rd -- )
-    [ 12 prepare-split-imm 1 0 ? swap ] 2dip
-    ADDi32-encode ;
+: split-imm ( imm -- shift imm ) 12 (split-imm) 1 0 ? swap ;
 
-: ADDi64 ( imm12 Rn Rd -- )
-    [ 12 prepare-split-imm 1 0 ? swap ] 2dip
-    ADDi64-encode ;
+ERROR: illegal-bitmask-immediate n ;
+: ?bitmask ( imm imm-size -- imm )
+    dupd on-bits 0 [ = ] bi-curry@ bi or
+    [ dup illegal-bitmask-immediate ] when ;
 
-: SUBi32 ( imm12 Rn Rd -- )
-    [ 12 prepare-split-imm 1 0 ? swap ] 2dip
-    SUBi32-encode ;
+: element-size ( imm imm-size -- imm element-size )
+    [ 2dup 2/ [ neg shift ] 2keep '[ _ on-bits bitand ] same? ]
+    [ 2/ ] while ;
 
-: SUBi64 ( imm12 Rn Rd -- )
-    [ 12 prepare-split-imm 1 0 ? swap ] 2dip
-    SUBi64-encode ;
+: bit-transitions ( imm element-size -- seq )
+    [ >bin ] dip CHAR: 0 pad-head 2 circular-clump ;
 
-: CMPi32 ( imm12 Rd -- )
-    [ 12 prepare-split-imm 1 0 ? swap ] dip
-    CMPi32-encode ;
+ERROR: illegal-bitmask-element n ;
+: ?element ( imm element-size -- element )
+    [ bits ] keep dupd bit-transitions
+    [ first2 = not ] count 2 =
+    [ dup illegal-bitmask-element ] unless ;
 
-: CMPi64 ( imm12 Rd -- )
-    [ 12 prepare-split-imm 1 0 ? swap ] dip
-    CMPi64-encode ;
+: >Nimms ( element element-size -- N imms )
+    [ bit-count 1 - ] [ log2 1 + ] bi*
+    7 [ on-bits ] bi@ bitxor bitor
+    6 toggle-bit [ -6 shift ] [ 6 bits ] bi ;
 
-: STRuoff32 ( imm12 Rn Rt -- )
-    [ -2 shift ] 2dip STRuoff32-encode ;
+: >immr ( element element-size -- immr )
+    [ bit-transitions "10" swap index 1 + ] keep mod ;
 
-: STRuoff64 ( imm12 Rn Rt -- )
-    [ -3 shift ] 2dip STRuoff64-encode ;
+: (encode-bitmask) ( imm imm-size -- (N)immrimms )
+    [ bits ] [ ?bitmask ] [ element-size ] tri
+    [ ?element ] keep [ >Nimms ] [ >immr ] 2bi
+    { 12 0 6 } bitfield* ;
 
-: STRr64 ( Rm Rn Rt -- )
-    [ 0 0 ] 2dip STRr64-encode ;
+: ADR ( simm21 Rd -- ) [ [ 2 bits ] [ -2 shift 19 ?sbits ] bi ] dip ADR-encode ;
 
-: ASRi32 ( imm6 Rn Rd -- ) [ 6 ?bits ] 2dip ASRi32-encode ;
-: ASRi64 ( imm6 Rn Rd -- ) [ 6 ?bits ] 2dip ASRi64-encode ;
-: LSLi32 ( imm6 Rn Rd -- ) [ 6 ?bits ] 2dip LSLi32-encode ;
-: LSLi64 ( imm6 Rn Rd -- ) [ 6 ?bits ] 2dip LSLi64-encode ;
-: LSRi32 ( imm6 Rn Rd -- ) [ 6 ?bits ] 2dip LSRi32-encode ;
-: LSRi64 ( imm6 Rn Rd -- ) [ 6 ?bits ] 2dip LSRi64-encode ;
+: ADRP ( simm21 Rd -- ) [ 4096 / [ 2 bits ] [ -2 shift 19 ?sbits ] bi ] dip ADRP-encode ;
 
-: SVC ( imm16 -- ) 16 ?bits SVC-encode ;
+: RET ( Rn/f -- ) X30 or RET-encode ;
 
-: ADC32 ( Rm Rn Rd -- ) ADC32-encode ;
-: ADCS32 ( Rm Rn Rd -- ) ADCS32-encode ;
-: ADC64 ( Rm Rn Rd -- ) ADC64-encode ;
-: ADCS64 ( Rm Rn Rd -- ) ADCS64-encode ;
+: SVC ( uimm16 -- ) 16 ?ubits SVC-encode ;
 
-: BRK ( imm16 -- ) 16 ?bits BRK-encode ;
-: HLT ( imm16 -- ) 16 ?bits HLT-encode ;
-
-: CBNZ ( imm19 Rt -- ) [ 19 ?bits ] dip CBNZ64-encode ;
-! cond4 is EQ NE CS HS CC LO MI PL VS VC HI LS GE LT GT LE AL NV
-: CSEL ( Rm Rn Rd cond4 -- ) -rot CSEL64-encode ;
-: CSET ( Rd cond4 -- ) swap CSET64-encode ;
-: CSETM ( Rd cond4 -- ) swap CSETM64-encode ;
+: BRK ( uimm16 -- ) 16 ?ubits BRK-encode ;
+: HLT ( uimm16 -- ) 16 ?ubits HLT-encode ;
 
 ! B but that is breakpoint
-: Br ( imm26 -- ) 26 ?bits B-encode ;
-: B.cond ( imm19 cond4 -- ) [ 19 ?bits ] dip B.cond-encode ;
-! : BL ( offset -- ) ip - 4 / BL-encode ;
-: BL ( offset -- ) BL-encode ;
+: Br ( simm28 -- ) 2 ?>> 26 ?sbits B-encode ;
+: B.cond ( simm21 cond -- ) [ 2 ?>> 19 ?sbits ] dip B.cond-encode ;
+: BL ( simm28 -- ) 2 ?>> 26 ?sbits BL-encode ;
 : BR ( Rn -- ) BR-encode ;
 : BLR ( Rn -- ) BLR-encode ;

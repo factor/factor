@@ -1,5 +1,5 @@
 ! Copyright (C) 2020 Doug Coleman.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors kernel random random.mersenne-twister
 reservoir-sampling tools.test ;
 IN: reservoir-sampling.tests

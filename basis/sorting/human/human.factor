@@ -1,8 +1,10 @@
 ! Copyright (C) 2008, 2010 Doug Coleman, Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors kernel make math math.order math.parser
-sequences sorting.functor strings unicode ;
+sequences sorting sorting.functor strings unicode ;
 IN: sorting.human
+
+<PRIVATE
 
 : cut-find ( sequence pred -- before after )
     [ drop ] [ find drop ] 2bi dup [ cut ] when ; inline
@@ -19,6 +21,8 @@ IN: sorting.human
             ] dip dup
         ] loop drop
     ] { } make ; inline
+
+PRIVATE>
 
 : find-numbers ( sequence -- sequence' )
     [ digit? ] [ string>number ] find-sequences ;
@@ -44,3 +48,6 @@ M: alphanum <=>
 
 << "human" [ find-numbers [ <alphanum> ] map ] define-sorting >>
 << "humani" [ find-numbers [ <alphanum-insensitive> ] map ] define-sorting >>
+
+: human-sort ( seq -- seq' ) [ human<=> ] sort-with ;
+: humani-sort ( seq -- seq' ) [ humani<=> ] sort-with ;

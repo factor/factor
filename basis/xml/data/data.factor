@@ -1,5 +1,5 @@
 ! Copyright (C) 2005, 2009 Daniel Ehrenberg
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs combinators
 combinators.short-circuit delegate delegate.protocols kernel
 sequences slots strings vectors words ;
@@ -205,7 +205,7 @@ CONSULT: name xml body>> ;
 PRIVATE>
 
 M: xml clone
-   xml clone-slots ;
+    xml clone-slots ;
 
 M: xml like
     swap dup xml? [ nip ] [

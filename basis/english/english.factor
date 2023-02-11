@@ -1,5 +1,5 @@
 ! Copyright (C) 2015, 2018 John Benediktsson
-! See http://factorcode.org/license.txt for BSD license
+! See https://factorcode.org/license.txt for BSD license
 USING: arrays assocs combinators kernel literals math math.order
 math.parser sequences splitting unicode ;
 IN: english

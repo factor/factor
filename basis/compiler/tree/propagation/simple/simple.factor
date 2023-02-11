@@ -1,5 +1,5 @@
 ! Copyright (C) 2008, 2010 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors alien.c-types arrays assocs classes classes.algebra
 classes.algebra.private classes.maybe classes.tuple.private
 combinators combinators.short-circuit compiler.tree
@@ -15,12 +15,6 @@ M: #introduce propagate-before
 M: #push propagate-before
     [ literal>> <literal-info> ] [ out-d>> first ] bi
     set-value-info ;
-
-: refine-value-infos ( classes/f values -- )
-    [ refine-value-info ] 2each ;
-
-: set-value-infos ( infos values -- )
-    [ set-value-info ] 2each ;
 
 M: #declare propagate-before
     ! We need to force the caller word to recompile when the

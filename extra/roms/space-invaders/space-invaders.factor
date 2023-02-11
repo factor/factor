@@ -1,7 +1,7 @@
 ! Copyright (C) 2006 Chris Double.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 !
-! Space Invaders: http://www.emuparadise.me/M.A.M.E._-_Multiple_Arcade_Machine_Emulator_ROMs/Space_Invaders_--_Space_Invaders_M/13774
+! Space Invaders: https://www.emuparadise.me/M.A.M.E._-_Multiple_Arcade_Machine_Emulator_ROMs/Space_Invaders_--_Space_Invaders_M/13774
 USING: accessors alien.c-types alien.data arrays
 combinators cpu.8080 cpu.8080.emulator io.pathnames kernel
 math math.order openal openal.alut opengl.gl sequences

@@ -1,5 +1,5 @@
 ! Copyright (C) 2008 Slava Pestov
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: kernel accessors sequences sorting math.order math.parser
 urls validators db db.types db.tuples calendar present namespaces
 html.forms
@@ -83,7 +83,7 @@ M: comment entity-url
     >>comments ;
 
 : reverse-chronological-order ( seq -- sorted )
-    [ date>> ] inv-sort-with ;
+    [ date>> ] inv-sort-by ;
 
 : validate-author ( -- )
     { { "author" [ v-username ] } } validate-params ;
@@ -173,7 +173,7 @@ M: comment entity-url
 
         { blogs "new-post" } >>template
 
-     <protected>
+    <protected>
         "make a new blog post" >>description ;
 
 : authorize-author ( author -- )
@@ -222,7 +222,7 @@ M: comment entity-url
             "author" value posts-by-url <redirect>
         ] >>submit
 
-     <protected>
+    <protected>
         "delete a blog post" >>description ;
 
 : <delete-author-action> ( -- action )
@@ -240,7 +240,7 @@ M: comment entity-url
             "author" value posts-by-url <redirect>
         ] >>submit
 
-     <protected>
+    <protected>
         "delete a blog post" >>description ;
 
 : validate-comment ( -- )
@@ -265,7 +265,7 @@ M: comment entity-url
             [ insert-tuple ] [ entity-url <redirect> ] bi
         ] >>submit
 
-     <protected>
+    <protected>
         "make a comment" >>description ;
 
 : <delete-comment-action> ( -- action )

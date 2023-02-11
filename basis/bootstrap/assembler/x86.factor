@@ -1,5 +1,5 @@
 ! Copyright (C) 2007, 2011 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: bootstrap.image.private compiler.codegen.relocation
 compiler.constants compiler.units cpu.x86.assembler
 cpu.x86.assembler.operands kernel kernel.private layouts

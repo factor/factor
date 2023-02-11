@@ -1,5 +1,5 @@
 ! Copyright (C) 2006, 2007 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: assocs kernel sequences sets ;
 IN: graphs
 
@@ -19,12 +19,12 @@ PRIVATE>
 <PRIVATE
 
  : (closure) ( vertex set quot: ( vertex -- edges ) -- )
-     2over ?adjoin [
-         [ dip ] keep [ (closure) ] 2curry each
-     ] [ 3drop ] if ; inline recursive
+    2over ?adjoin [
+        [ dip ] keep [ (closure) ] 2curry each
+    ] [ 3drop ] if ; inline recursive
 
  : new-empty-set-like ( exemplar -- set )
-     f swap set-like clone ; inline
+    f swap set-like clone ; inline
 
 PRIVATE>
 

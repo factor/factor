@@ -1,5 +1,5 @@
 ! Copyright (C) 2007, 2009 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: arrays assocs command-line continuations debugger
 formatting help.markup io io.styles kernel math memory
 namespaces sequences tools.profiler.sampling tools.test

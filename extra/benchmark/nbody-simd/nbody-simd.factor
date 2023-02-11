@@ -1,5 +1,5 @@
 ! Copyright (C) 2008, 2010 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors alien.c-types kernel math math.constants
 math.functions math.vectors math.vectors.simd.cords math.parser
 combinators.smart sequences classes.struct specialized-arrays io ;

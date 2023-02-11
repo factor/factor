@@ -1,5 +1,5 @@
 ! Copyright (C) 2009 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: alien alien.syntax assocs help.markup help.syntax kernel
 strings ;
 IN: alien.libraries
@@ -54,8 +54,8 @@ HELP: dlsym?
 
 HELP: make-library
 { $values
-     { "path" "a pathname string" } { "abi" "the ABI used by the library, either " { $link cdecl } " or " { $link stdcall } }
-     { "library" library } }
+    { "path" "a pathname string" } { "abi" "the ABI used by the library, either " { $link cdecl } " or " { $link stdcall } }
+    { "library" library } }
 { $description "Opens a C library using the path and ABI parameters and outputs a library tuple." }
 { $notes "User code should use " { $link add-library } " so that the opened library is added to a global hashtable, " { $link libraries } "." } ;
 

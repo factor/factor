@@ -1,5 +1,5 @@
 ! Copyright (C) 2009 Joe Groff.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors alien.c-types arrays classes.struct combinators
 combinators.short-circuit game.loop game.worlds gpu gpu.buffers
 gpu.framebuffers gpu.render gpu.shaders gpu.state gpu.textures
@@ -145,7 +145,8 @@ UNIFORM-TUPLE: loading-uniforms
 
 : bunny-model-path ( -- path ) "bun_zipper.ply" cache-file ;
 
-CONSTANT: bunny-model-url "http://duriansoftware.com/joe/media/bun_zipper.ply"
+CONSTANT: bunny-model-url
+"https://downloads.factorcode.org/misc/bun_zipper.ply"
 
 : download-bunny ( -- path )
     bunny-model-url bunny-model-path [ ?download-to ] keep ;

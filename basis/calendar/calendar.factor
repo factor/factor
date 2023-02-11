@@ -1,5 +1,5 @@
 ! Copyright (C) 2007 Doug Coleman.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors arrays classes.tuple combinators
 combinators.short-circuit kernel literals math math.functions
 math.intervals math.order math.statistics sequences slots.syntax
@@ -261,7 +261,7 @@ M: number +second
         [ day>>    +day    ]
         [ month>>  +month  ]
         [ year>>   +year   ]
-     } cleave ; inline
+    } cleave ; inline
 
 PRIVATE>
 
@@ -366,7 +366,7 @@ M: timestamp <=> [ >gmt tuple-slots ] compare ;
 
 : (day-of-week) ( year month day -- n )
     ! Zeller Congruence
-    ! http://web.textfiles.com/computers/formulas.txt
+    ! https://web.textfiles.com/computers/formulas.txt
     ! good for any date since October 15, 1582
     [
         dup 2 <= [ [ 1 - ] [ 12 + ] bi* ] when

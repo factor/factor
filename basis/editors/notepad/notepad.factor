@@ -1,13 +1,11 @@
 ! Copyright (C) 2009 Doug Coleman.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: arrays editors io.directories io.files io.pathnames
 kernel namespaces sequences windows.shell32 ;
 
 IN: editors.notepad
 
 SINGLETON: notepad
-
-editor-class [ notepad ] initialize
 
 : notepad-path ( -- path )
     \ notepad-path get [

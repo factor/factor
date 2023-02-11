@@ -178,14 +178,14 @@ os unix? [
 
 [ "you-cant-resolve-me!" resolve-host ] [ addrinfo-error? ] must-fail-with
 
-[ ] [ B{ 1 2 3 } f 9000 <inet4> send-once ] unit-test
-[ ] [ B{ 1 2 3 } f 9000 <inet4> broadcast-once ] unit-test
-[ ] [ B{ 1 2 3 } "0.0.0.0" 9000 <inet4> send-once ] unit-test
-[ ] [ B{ 1 2 3 } "0.0.0.0" 9000 <inet4> broadcast-once ] unit-test
+{ } [ B{ 1 2 3 } f 9000 <inet4> send-once ] unit-test
+{ } [ B{ 1 2 3 } f 9000 <inet4> broadcast-once ] unit-test
+{ } [ B{ 1 2 3 } "0.0.0.0" 9000 <inet4> send-once ] unit-test
+{ } [ B{ 1 2 3 } "0.0.0.0" 9000 <inet4> broadcast-once ] unit-test
 
 ipv6-supported? [
-    [ ] [ B{ 1 2 3 } f 9000 <inet6> send-once ] unit-test
-    [ ] [ B{ 1 2 3 } f 9000 <inet6> broadcast-once ] unit-test
-    [ ] [ B{ 1 2 3 } "::" 9000 <inet6> send-once ] unit-test
-    [ ] [ B{ 1 2 3 } "::" 9000 <inet6> broadcast-once ] unit-test
+    { } [ B{ 1 2 3 } f 9000 <inet6> send-once ] unit-test
+    { } [ B{ 1 2 3 } f 9000 <inet6> broadcast-once ] unit-test
+    { } [ B{ 1 2 3 } "::" 9000 <inet6> send-once ] unit-test
+    { } [ B{ 1 2 3 } "::" 9000 <inet6> broadcast-once ] unit-test
 ] when

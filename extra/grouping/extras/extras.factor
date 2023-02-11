@@ -22,23 +22,23 @@ IN: grouping.extras
 : group-map ( seq quot n -- result )
     { } swap group-map-as ; inline
 
-TUPLE: head-clumps seq ;
-C: <head-clumps> head-clumps
-M: head-clumps length seq>> length ;
-M: head-clumps nth-unsafe seq>> swap 1 + head-slice ;
-INSTANCE: head-clumps immutable-sequence
+TUPLE: prefixes seq ;
+C: <prefixes> prefixes
+M: prefixes length seq>> length ;
+M: prefixes nth-unsafe seq>> swap 1 + head-slice ;
+INSTANCE: prefixes immutable-sequence
 
-: head-clump ( seq -- array )
-    [ <head-clumps> ] [ [ like ] curry map ] bi ;
+: all-prefixes ( seq -- array )
+    [ <prefixes> ] [ [ like ] curry map ] bi ;
 
-TUPLE: tail-clumps seq ;
-C: <tail-clumps> tail-clumps
-M: tail-clumps length seq>> length ;
-M: tail-clumps nth-unsafe seq>> swap tail-slice ;
-INSTANCE: tail-clumps immutable-sequence
+TUPLE: suffixes seq ;
+C: <suffixes> suffixes
+M: suffixes length seq>> length ;
+M: suffixes nth-unsafe seq>> swap tail-slice ;
+INSTANCE: suffixes immutable-sequence
 
-: tail-clump ( seq -- array )
-    [ <tail-clumps> ] [ [ like ] curry map ] bi ;
+: all-suffixes ( seq -- array )
+    [ <suffixes> ] [ [ like ] curry map ] bi ;
 
 : clump-as ( seq n exemplar -- array )
     [ <clumps> ] dip [ like ] curry map ;

@@ -1,5 +1,5 @@
 ! Copyright (C) 2022 Cat Stevens.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: system vocabs.metadata ;
 IN: unix.scheduler
 

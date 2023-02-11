@@ -1,5 +1,5 @@
 ! Copyright (C) 2007, 2010 Doug Coleman, Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors alien alien.c-types alien.data arrays assocs
 classes classes.struct combinators combinators.short-circuit
 concurrency.flags continuations debugger destructors init io
@@ -78,7 +78,7 @@ TUPLE: CreateProcess-args
 ! Naked double-quotes get a backslash before them
 ! Backslashes before a double-quote get doubled in the output
 ! If there's a space, double trailing backslashes and surround by quotes
-! See http://msdn.microsoft.com/en-us/library/ms647232.aspx
+! See https://msdn.microsoft.com/en-us/library/ms647232.aspx
 : escape-argument ( str -- newstr )
     escape-double-quote
     CHAR: \s over member? [
@@ -111,8 +111,8 @@ TUPLE: CreateProcess-args
     pick group>> [
         {
             { +same-group+ [ ] }
-            { +new-session+ [ DETACHED_PROCESS bitor CREATE_NEW_PROCESS_GROUP bitor ] }
-            { +new-group+ [ DETACHED_PROCESS bitor CREATE_NEW_PROCESS_GROUP bitor ] }
+            { +new-session+ [ CREATE_NEW_PROCESS_GROUP bitor ] }
+            { +new-group+ [ CREATE_NEW_PROCESS_GROUP bitor ] }
             [ drop ]
         } case
     ] when*
@@ -209,7 +209,7 @@ M: windows (wait-for-processes)
     } case ;
 
 ! The below code is based on the example given in
-! http://msdn2.microsoft.com/en-us/library/ms682499.aspx
+! https://msdn2.microsoft.com/en-us/library/ms682499.aspx
 
 : redirect-default ( obj access-mode create-mode -- handle )
     3drop f ;

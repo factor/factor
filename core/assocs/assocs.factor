@@ -1,5 +1,5 @@
 ! Copyright (C) 2007, 2010 Daniel Ehrenberg, Slava Pestov
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors arrays kernel math sequences sequences.private
 vectors ;
 IN: assocs
@@ -238,7 +238,7 @@ M: assoc value-at* swap [ = nip ] curry assoc-find nip ;
     ] if ; inline
 
 : zip ( keys values -- alist )
-     { } zip-as ; inline
+    { } zip-as ; inline
 
 : zip-index-as ( values exemplar -- assoc )
     [ dup length <iota> ] dip zip-as ; inline

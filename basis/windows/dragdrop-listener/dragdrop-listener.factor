@@ -1,6 +1,6 @@
 ! Copyright (C) 2008, 2009 Joe Groff, Slava Pestov.
 ! Copyright (C) 2017-2018 Alexander Ilin.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors alien.accessors classes.struct kernel
 namespaces sequences ui.backend.windows ui.gadgets.worlds
 ui.gestures windows.com windows.com.wrapper windows.dropfiles

@@ -1,5 +1,5 @@
 ! Copyright (C) 2009 Jose Antonio Ortega Ruiz.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors arrays continuations debugger fry fuel.pprint io
 io.streams.string kernel listener namespaces parser.notes
 prettyprint.config sequences sets vocabs.parser ;

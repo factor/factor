@@ -1,5 +1,5 @@
 ! Copyright (C) 2003, 2010 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs combinators command-line
 compiler.units continuations debugger effects generalizations io
 io.files.temp io.files.unique kernel lexer math math.functions
@@ -22,11 +22,11 @@ SYMBOL: test-failures
 test-failures [ V{ } clone ] initialize
 
 T{ error-type-holder
-   { type +test-failure+ }
-   { word ":test-failures" }
-   { plural "unit test failures" }
-   { icon "vocab:ui/tools/error-list/icons/unit-test-error.png" }
-   { quot [ test-failures get ] }
+    { type +test-failure+ }
+    { word ":test-failures" }
+    { plural "unit test failures" }
+    { icon "vocab:ui/tools/error-list/icons/unit-test-error.png" }
+    { quot [ test-failures get ] }
 } define-error-type
 
 SYMBOL: silent-tests?
@@ -102,6 +102,9 @@ M: did-not-fail summary drop "Did not fail" ;
 
 :: (must-fail) ( quot -- error/f failed? tested? )
     [ { } quot with-datastack drop did-not-fail t ] [ drop f f ] recover t ;
+
+:: (must-not-fail) ( quot -- error/f failed? tested? )
+    [ { } quot with-datastack drop f f ] [ t ] recover t ;
 
 : experiment-title ( word -- string )
     "(" ?head drop ")" ?tail drop
@@ -211,6 +214,7 @@ TEST: must-infer-as
 TEST: must-infer
 TEST: must-fail-with
 TEST: must-fail
+TEST: must-not-fail
 
 M: test-failure error. ( error -- )
     {
@@ -226,6 +230,8 @@ M: test-failure error. ( error -- )
 
 : test-all ( -- ) "" test ;
 
+: test-root ( root -- ) "" vocabs-to-load test-vocabs ;
+
 : refresh-and-test ( prefix --  ) to-refresh [ do-refresh ] keepdd test-vocabs ;
 
 : refresh-and-test-all ( -- ) "" refresh-and-test ;
@@ -236,10 +242,10 @@ M: test-failure error. ( error -- )
     [ f long-unit-tests-enabled? set-global ] when
     [
         dup vocab-roots get member? [
-            "" vocabs-to-load [ require-all ] keep
+            [ load-root ] [ test-root ] bi
         ] [
-            [ load ] [ loaded-child-vocab-names ] bi
-        ] if test-vocabs
+            [ load ] [ test ] bi
+        ] if
     ] each
     test-failures get empty?
     [ [ "==== FAILING TESTS" print flush :test-failures ] unless ]

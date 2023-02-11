@@ -1,5 +1,5 @@
 ! Copyright (c) 2009 Samuel Tardieu.
-! See See http://factorcode.org/license.txt for BSD license.
+! See See https://factorcode.org/license.txt for BSD license.
 USING: backtrack math tools.test ;
 
 cut-amb

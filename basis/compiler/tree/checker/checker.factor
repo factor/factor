@@ -1,5 +1,5 @@
 ! Copyright (C) 2008 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs columns combinators compiler.tree
 compiler.tree.combinators compiler.tree.def-use
 compiler.tree.recursive continuations grouping kernel math

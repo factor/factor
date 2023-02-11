@@ -1,5 +1,5 @@
 ! Copyright (C) 2015 Doug Coleman.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: combinators combinators.short-circuit editors
 generalizations io.files io.pathnames io.standard-paths kernel
 make math.parser namespaces sequences system tools.which ;
@@ -13,8 +13,6 @@ MIXIN: visual-studio-code-base
 SINGLETON: visual-studio-code
 
 INSTANCE: visual-studio-code visual-studio-code-base
-
-editor-class [ visual-studio-code ] initialize
 
 HOOK: find-visual-studio-code-path editor-class ( -- path )
 

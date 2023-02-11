@@ -9,11 +9,11 @@ IN: compiler.codegen.tests
 ] unit-test
 
 
-{ } [ [ ] with-fixup drop ] unit-test
-{ } [ [ \ + %call ] with-fixup drop ] unit-test
+[ [ ] with-fixup ] must-not-fail
+[ [ \ + %call ] with-fixup ] must-not-fail
 
-{ } [ [ <label> dup define-label dup resolve-label %jump-label ] with-fixup drop ] unit-test
-{ } [ [ <label> dup define-label dup resolve-label B{ 0 0 0 0 } % rc-absolute-cell label-fixup ] with-fixup drop ] unit-test
+[ [ <label> dup define-label dup resolve-label %jump-label ] with-fixup ] must-not-fail
+[ [ <label> dup define-label dup resolve-label B{ 0 0 0 0 } % rc-absolute-cell label-fixup ] with-fixup ] must-not-fail
 
 ! Error checking
 [ [ <label> dup define-label %jump-label ] with-fixup ] must-fail

@@ -1,5 +1,5 @@
 ! Copyright (C) 2008 Doug Coleman, 2021 Giftpflanze.
-! See http://factorcode.org/license.txt for license.
+! See https://factorcode.org/license.txt for license.
 USING: accessors alien.c-types alien.data arrays byte-arrays
 combinators db db.mysql.ffi db.private destructors
 io.encodings.string io.encodings.utf8 kernel math namespaces

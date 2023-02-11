@@ -1,10 +1,10 @@
 ! Copyright (c) 2009 Aaron Schaefer.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: combinators kernel math math.primes math.primes.factors
 ranges project-euler.common sequences sequences.extras ;
 IN: project-euler.069
 
-! http://projecteuler.net/index.php?section=problems&id=69
+! https://projecteuler.net/index.php?section=problems&id=69
 
 ! DESCRIPTION
 ! -----------

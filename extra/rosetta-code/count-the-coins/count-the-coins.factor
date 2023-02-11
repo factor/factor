@@ -1,9 +1,9 @@
 ! Copyright (c) 2012 Anonymous
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: arrays math ranges sequences sets sorting ;
 IN: rosetta-code.count-the-coins
 
-! http://rosettacode.org/wiki/Count_the_coins
+! https://rosettacode.org/wiki/Count_the_coins
 
 ! There are four types of common coins in US currency: quarters
 ! (25 cents), dimes (10), nickels (5) and pennies (1). There are 6
@@ -42,4 +42,4 @@ PRIVATE>
 ! How many ways can we make the given amount of cents
 ! with the given set of coins?
 : make-change ( cents coins -- ways )
-    members [ ] inv-sort-with (make-change) ;
+    members inv-sort (make-change) ;

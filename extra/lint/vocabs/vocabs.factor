@@ -1,5 +1,5 @@
 ! Copyright (C) 2022 CapitalEx
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs combinators
 combinators.short-circuit compiler.units formatting hash-sets
 hashtables io io.encodings.utf8 io.files io.styles kernel
@@ -32,7 +32,7 @@ SYMBOL: cache
     <sequence-parser> ;
 
 : skip-after ( sequence-parser seq -- sequence-parser )
-   [ take-until-sequence* drop ] curry keep ;
+    [ take-until-sequence* drop ] curry keep ;
 
 : skip-after* ( sequence-parser object -- sequence-parser )
     [ take-until-object drop ] curry keep ;
@@ -232,7 +232,7 @@ PRIVATE>
 
 : find-unused-in-string ( string -- seq )
     strip-code [ get-imported-words ] [ find-used-words ] bi
-        reject-unused-vocabs natural-sort ;
+        reject-unused-vocabs sort ;
 
 : find-unused-in-file ( path -- seq )
     utf8 file-contents find-unused-in-string ;

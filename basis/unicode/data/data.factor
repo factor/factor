@@ -1,5 +1,5 @@
 ! Copyright (C) 2008, 2009 Daniel Ehrenberg.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: arrays ascii assocs byte-arrays combinators
 combinators.short-circuit grouping hashtables interval-sets
 io.encodings.utf8 io.files kernel make math math.bitwise
@@ -77,7 +77,7 @@ PRIVATE>
 ! Loading data from UnicodeData.txt
 
 : load-unicode-data ( -- data )
-    "vocab:unicode/UCD/UnicodeData.txt" load-data-file ;
+    "vocab:unicode/UnicodeData.txt" load-data-file ;
 
 : (process-data) ( index data -- newdata )
     [ [ nth ] keep first swap ] with { } map>assoc
@@ -103,7 +103,7 @@ PRIVATE>
     [ split-words [ hex> ] map ] assoc-map ;
 
 : exclusions-file ( -- filename )
-    "vocab:unicode/UCD/CompositionExclusions.txt" ;
+    "vocab:unicode/CompositionExclusions.txt" ;
 
 : exclusions ( -- set )
     exclusions-file utf8 file-lines
@@ -173,7 +173,7 @@ C: <code-point> code-point
 
 ! Extra properties {{[a,b],prop}}
 : parse-properties ( -- assoc )
-    "vocab:unicode/UCD/PropList.txt" load-data-file [
+    "vocab:unicode/PropList.txt" load-data-file [
         [
             ".." split1 [ dup ] unless*
             [ hex> ] bi@ 2array
@@ -190,7 +190,7 @@ C: <code-point> code-point
 
 ! Special casing data
 : load-special-casing ( -- special-casing )
-    "vocab:unicode/UCD/SpecialCasing.txt" load-data-file
+    "vocab:unicode/SpecialCasing.txt" load-data-file
     [ length 5 = ] filter
     [ [ set-code-point ] each ] H{ } make ;
 

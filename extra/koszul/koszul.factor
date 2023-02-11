@@ -1,5 +1,5 @@
 ! Copyright (C) 2006, 2007 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs combinators hashtables io kernel
 make math math.matrices math.matrices.elimination math.order
 math.parser math.vectors namespaces prettyprint sequences sets
@@ -68,7 +68,7 @@ SYMBOL: terms
     ] if ;
 
 : permutation ( seq -- perm )
-    [ natural-sort ] keep [ index ] curry map ;
+    [ sort ] keep [ index ] curry map ;
 
 : (inversions) ( n seq -- n )
     [ > ] with count ;
@@ -83,7 +83,7 @@ SYMBOL: terms
         2drop 0 { }
     ] [
         dup permutation inversions -1^ rot *
-        swap natural-sort
+        swap sort
     ] if ;
 
 : wedge ( x y -- x.y )
@@ -147,11 +147,11 @@ DEFER: (d)
     ] map sift 2nip ;
 
 : basis ( generators -- seq )
-    natural-sort dup length 2^ <iota> [ nth-basis-elt ] with map ;
+    sort dup length 2^ <iota> [ nth-basis-elt ] with map ;
 
 : (tensor) ( seq1 seq2 -- seq )
     [
-        [ prepend natural-sort ] curry map
+        [ prepend sort ] curry map
     ] with map concat ;
 
 : tensor ( graded-basis1 graded-basis2 -- bigraded-basis )

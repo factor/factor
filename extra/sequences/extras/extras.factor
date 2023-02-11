@@ -374,7 +374,7 @@ PRIVATE>
     ] if ; inline
 
 : unsurround ( newseq seq2 seq3 -- seq1 )
-   [ ?head drop ] [ ?tail drop ] bi* ;
+    [ ?head drop ] [ ?tail drop ] bi* ;
 
 : >string-list ( seq -- seq' )
     [ "\"" 1surround ] map "," join ;
@@ -484,7 +484,7 @@ PRIVATE>
     [ [ dup ] compose [ ] ] dip produce-as nip ; inline
 
 : loop>array ( ... quot: ( ... -- ... obj/f ) -- ... array )
-   { } loop>sequence ; inline
+    { } loop>sequence ; inline
 
 : zero-loop>sequence ( ... quot: ( ... n -- ... obj/f ) exemplar -- ... seq )
     [ 0 ] [ '[ _ keep 1 + swap ] ] [ loop>sequence ] tri* nip ; inline
@@ -641,6 +641,12 @@ PRIVATE>
     [ f ] [
         [ ] [ 2dup and [ min ] [ dupd ? ] if ] map-reduce
     ] if-empty ;
+
+: map-infimum ( seq quot: ( ... elt -- ... elt' ) -- elt' )
+    [ min ] map-reduce ; inline
+
+: map-supremum ( seq quot: ( ... elt -- ... elt' ) -- elt' )
+    [ max ] map-reduce ; inline
 
 : change-last ( seq quot -- )
     [ index-of-last ] [ change-nth ] bi* ; inline

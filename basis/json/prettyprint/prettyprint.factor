@@ -1,8 +1,8 @@
 ! Copyright (C) 2016 Doug Coleman.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: assocs hashtables io io.encodings.utf8 io.files
-io.streams.string json.reader json.writer kernel math namespaces
-sequences strings ;
+io.streams.string json kernel math namespaces sequences strings
+;
 IN: json.prettyprint
 
 <PRIVATE

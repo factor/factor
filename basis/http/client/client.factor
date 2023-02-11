@@ -1,5 +1,5 @@
 ! Copyright (C) 2005, 2010 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors ascii assocs calendar combinators
 combinators.short-circuit destructors environment hashtables
 http http.client.post-data http.parsers io io.crlf io.encodings
@@ -177,8 +177,8 @@ SYMBOL: redirects
 
 : no-proxy? ( request -- ? )
     get-no-proxy-list [
-       [ url>> host>> "." split ] dip "," split
-       [ "." split no-proxy-match? ] with any?
+        [ url>> host>> "." split ] dip "," split
+        [ "." split no-proxy-match? ] with any?
     ] [ drop f ] if* ;
 
 : (check-proxy) ( proxy -- ? )

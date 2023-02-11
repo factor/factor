@@ -1,5 +1,5 @@
 ! Copyright (C) 2013 Jon Harper.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors alien.data arrays assocs byte-arrays
 classes.struct combinators combinators.extras
 combinators.short-circuit destructors fry generalizations
@@ -174,7 +174,7 @@ DEFER: parse-mapping
                 ] if
             ] with-destructors
             done [ 2drop ] [
-              [ [ parser event ] dip next-complex-value ] unless ,
+                [ [ parser event ] dip next-complex-value ] unless ,
             ] if
         ] until
     ] { } make ;
@@ -205,7 +205,7 @@ M: sets:set (deref-aliases)
     [ assoc-map ] [ drop clear-assoc ] [ drop swap assoc-union! ] 2tri ; inline
 
 M: assoc (deref-aliases)
-     [ [ (deref-aliases) ] bi-curry@ bi ] withd assoc-map! ;
+    [ [ (deref-aliases) ] bi-curry@ bi ] withd assoc-map! ;
 
 : merge-values ( seq -- assoc )
     reverse [ ] [ assoc-union ] map-reduce ;

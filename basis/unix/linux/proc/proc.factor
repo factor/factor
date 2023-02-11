@@ -1,9 +1,9 @@
 ! Copyright (C) 2013 Doug Coleman.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors arrays combinators combinators.smart
 io.encodings.utf8 io.files kernel math math.order math.parser
-memoize sequences sorting.slots splitting splitting.monotonic
-strings io.pathnames calendar words ;
+memoize sequences sorting.specification splitting
+splitting.monotonic strings io.pathnames calendar words ;
 IN: unix.linux.proc
 
 ! /proc/*
@@ -110,7 +110,7 @@ ERROR: unknown-cpuinfo-line string ;
     { "" } split harvest [ lines>processor-info ] map ;
 
 : sort-cpus ( seq -- seq )
-    { { physical-id>> <=> } { core-id>> <=> } } sort-by
+    { { physical-id>> <=> } { core-id>> <=> } } sort-with-spec
     [ [ physical-id>> ] bi@ = ] monotonic-split
     [ [ [ core-id>> ] bi@ = ] monotonic-split ] map ;
 

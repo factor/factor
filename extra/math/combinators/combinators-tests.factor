@@ -1,5 +1,5 @@
 ! Copyright (C) 2013 Loryn Jenkins.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: kernel math math.combinators tools.test ;
 
 { 0 } [ -3 [ drop 0 ] when-negative ] unit-test

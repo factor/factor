@@ -1,5 +1,5 @@
 ! Copyright (C) 2007, 2009 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs combinators kernel lexer make
 namespaces parser sequences splitting xml.data xml.syntax
 xml.syntax.private xml.traversal xml.traversal.private

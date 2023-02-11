@@ -1,9 +1,9 @@
 ! Copyright (c) 2012 Anonymous
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: io kernel math math.parser ranges sequences ;
 IN: rosetta-code.multiplication-tables
 
-! http://rosettacode.org/wiki/Multiplication_tables
+! https://rosettacode.org/wiki/Multiplication_tables
 
 ! Produce a formatted 12×12 multiplication table of the kind
 ! memorized by rote when in primary school.

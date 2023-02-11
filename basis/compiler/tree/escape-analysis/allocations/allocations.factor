@@ -1,5 +1,5 @@
 ! Copyright (C) 2008, 2009 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors assocs combinators disjoint-sets fry kernel
 namespaces sequences stack-checker.values ;
 IN: compiler.tree.escape-analysis.allocations
@@ -12,17 +12,14 @@ SYMBOL: value-classes
 
 SYMBOL: allocations
 
-: (allocation) ( -- allocations )
-    allocations get ; inline
-
 : allocation ( value -- allocation )
-    (allocation) at ;
+    allocations get at ;
 
 : record-allocation ( allocation value -- )
-    (allocation) set-at ;
+    allocations get set-at ;
 
 : record-allocations ( allocations values -- )
-    (allocation) '[ _ set-at ] 2each ;
+    allocations get '[ _ set-at ] 2each ;
 
 SYMBOL: slot-accesses
 
@@ -65,14 +62,10 @@ SYMBOL: +escaping+
 : equate-values ( value1 value2 -- )
     escaping-values get equate ;
 
+DEFER: add-escaping-values
+
 : add-escaping-value ( value -- )
-    [
-        allocation {
-            { [ dup not ] [ drop ] }
-            { [ dup t eq? ] [ drop ] }
-            [ [ add-escaping-value ] each ]
-        } cond
-    ]
+    [ allocation dup boolean? [ drop ] [ add-escaping-values ] if ]
     [ +escaping+ equate-values ] bi ;
 
 : add-escaping-values ( values -- )
@@ -95,26 +88,23 @@ SYMBOL: +escaping+
 DEFER: copy-value
 
 : copy-allocation ( allocation -- allocation' )
-    {
-        { [ dup not ] [ ] }
-        { [ dup t eq? ] [ ] }
-        [ [ <value> [ introduce-value ] [ copy-value ] [ ] tri ] map ]
-    } cond ;
+    dup boolean? [
+        [ <value> [ introduce-value ] [ copy-value ] [ ] tri ] map
+    ] unless ;
+
+:: (copy-value) ( from to allocations -- )
+    from to equate-values
+    from allocations at copy-allocation to allocations set-at ;
 
 : copy-value ( from to -- )
-    [ equate-values ]
-    [ [ allocation copy-allocation ] dip record-allocation ]
-    2bi ;
+    allocations get (copy-value) ;
 
 : copy-values ( from to -- )
-    [ copy-value ] 2each ;
+    allocations get '[ _ (copy-value) ] 2each ;
 
 : copy-slot-value ( out slot# in -- )
-    allocation {
-        { [ dup not ] [ 3drop ] }
-        { [ dup t eq? ] [ 3drop ] }
-        [ nth swap copy-value ]
-    } cond ;
+    allocation dup boolean?
+    [ 3drop ] [ nth swap copy-value ] if ;
 
 SYMBOL: escaping-allocations
 

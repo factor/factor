@@ -120,8 +120,8 @@ ARTICLE: "syntax-floats" "Float syntax"
 { $subsections POSTPONE: NAN: }
 "To see the 64 bit value of " { $snippet "0/0." } " on your platform, execute the following code :"
 { $code
-     "USING: io math math.parser ;"
-     "\"NAN: \" write 0/0. double>bits >hex print"
+    "USING: io math math.parser ;"
+    "\"NAN: \" write 0/0. double>bits >hex print"
 }
 "Hexadecimal, octal and binary float literals are also supported. These consist of a hexadecimal, octal or binary literal with a decimal point and a mandatory base-two exponent expressed as a decimal number after " { $snippet "p" } " or " { $snippet "P" } ":"
 { $example
@@ -504,23 +504,16 @@ HELP: SYMBOLS:
 { $description "Creates a new symbol for every token until the " { $snippet ";" } "." }
 { $examples { $example "USING: prettyprint ;" "IN: scratchpad" "SYMBOLS: foo bar baz ;\nfoo . bar . baz ." "foo\nbar\nbaz" } } ;
 
-HELP: INITIALIZE:
-{ $syntax "INITIALIZE: word ... ;"  }
-{ $description "If " { $snippet "word" } " does not have a value in the global namespace, calls the definition and assigns the result to " { $snippet "word" } " in the global namespace." }
+HELP: INITIALIZED-SYMBOL:
+{ $syntax "INITIALIZE-SYMBOL: word [ ... ]"  }
+{ $description "Defines a new symbol " { $snippet "word" } " and sets the value in the global namespace." }
 { $examples
     { $unchecked-example
         "USING: math namespaces prettyprint ;"
-        "SYMBOL: foo"
-        "INITIALIZE: foo 15 sq ;"
+        "INITIALIZED-SYMBOL: foo [ 15 sq ]"
         "foo get-global ."
-        "225" }
-    { $unchecked-example
-        "USING: math namespaces prettyprint ;"
-        "SYMBOL: foo"
-        "1234 foo set-global"
-        "INITIALIZE: foo 15 sq ;"
-        "foo get-global ."
-        "1234" }
+        "225"
+    }
 } ;
 
 HELP: SINGLETON:
@@ -625,6 +618,8 @@ HELP: USING:
 HELP: QUALIFIED:
 { $syntax "QUALIFIED: vocab" }
 { $description "Adds the vocabulary's words, prefixed with the vocabulary name, to the search path." }
+{ $deprecated "This word is deprecated since Factor words can now be used as qualified by default. "
+{ $link POSTPONE: QUALIFIED-WITH: } " can be used for changing the qualification prefix." }
 { $notes "If adding a vocabulary introduces ambiguity, the vocabulary will take precedence when resolving any ambiguous names. This is a rare case; for example, suppose a vocabulary " { $snippet "fish" } " defines a word named " { $snippet "go:fishing" } ", and a vocabulary named " { $snippet "go" } " defines a word named " { $snippet "fishing" } ". Then, the following will call the latter word:"
   { $code
   "USE: fish"

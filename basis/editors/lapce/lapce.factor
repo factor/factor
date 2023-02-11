@@ -5,8 +5,6 @@ IN: editors.lapce
 
 SINGLETON: lapce
 
-editor-class [ lapce ] initialize
-
 HOOK: find-lapce-path os ( -- path )
 
 M: object find-lapce-path f ;

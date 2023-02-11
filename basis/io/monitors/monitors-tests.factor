@@ -126,11 +126,11 @@ sequences threads tools.test ;
             10 seconds "m" get set-timeout
 
             [
-                [ "m" get next-change ] [ ] recover
+                250 milliseconds sleep ! let the dispose run, then pump
+                [ "m" get next-change ] [ ] recover ! pump event
                 "p" get fulfill
             ] in-thread
 
-            250 milliseconds sleep
             "m" get dispose
 
             "p" get 10 seconds ?promise-timeout

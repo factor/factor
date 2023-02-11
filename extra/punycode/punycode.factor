@@ -1,5 +1,5 @@
 ! Copyright (C) 2020 John Benediktsson
-! See http://factorcode.org/license.txt for BSD license
+! See https://factorcode.org/license.txt for BSD license
 
 USING: accessors ascii byte-arrays combinators kernel literals
 math math.order sbufs sequences sequences.extras sets sorting
@@ -32,7 +32,7 @@ CONSTANT: DIGITS $[ "abcdefghijklmnopqrstuvwxyz0123456789" >byte-array ]
     ] while BASE delta * delta SKEW + /i + ;
 
 : segregate ( str -- base extended )
-    [ N < ] partition members natural-sort ;
+    [ N < ] partition members sort ;
 
 :: find-pos ( str ch i pos -- i' pos' )
     i pos 1 + str [

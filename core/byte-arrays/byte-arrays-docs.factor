@@ -49,26 +49,26 @@ HELP: >byte-array
 
 HELP: 1byte-array
 { $values
-     { "x" object }
-     { "byte-array" byte-array } }
+    { "x" object }
+    { "byte-array" byte-array } }
 { $description "Creates a new byte-array with one element." } ;
 
 HELP: 2byte-array
 { $values
-     { "x" object } { "y" object }
-     { "byte-array" byte-array } }
+    { "x" object } { "y" object }
+    { "byte-array" byte-array } }
 { $description "Creates a new byte-array with two elements." } ;
 
 HELP: 3byte-array
 { $values
-     { "x" object } { "y" object } { "z" object }
-     { "byte-array" byte-array } }
+    { "x" object } { "y" object } { "z" object }
+    { "byte-array" byte-array } }
 { $description "Creates a new byte-array with three element." } ;
 
 HELP: 4byte-array
 { $values
-     { "w" object } { "x" object } { "y" object } { "z" object }
-     { "byte-array" byte-array } }
+    { "w" object } { "x" object } { "y" object } { "z" object }
+    { "byte-array" byte-array } }
 { $description "Creates a new byte-array with four elements." } ;
 
 { 1byte-array 2byte-array 3byte-array 4byte-array } related-words

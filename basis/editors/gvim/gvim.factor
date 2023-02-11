@@ -9,9 +9,6 @@ SINGLETON: gvim
 
 INSTANCE: gvim vim-base
 
-editor-class get-global dup [ vim? not ] when
-[ gvim editor-class set-global ] unless
-
 HOOK: find-gvim-path io-backend ( -- path )
 
 M: object find-gvim-path f ;

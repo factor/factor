@@ -1,9 +1,9 @@
 ! Copyright (C) 2008 Doug Coleman.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: kernel math sequences strings tools.test unix.groups ;
 IN: unix.groups.tests
 
-{ } [ all-groups drop ] unit-test
+[ all-groups ] must-not-fail
 
 { t } [ real-group-name string? ] unit-test
 { t } [ effective-group-name string? ] unit-test
@@ -22,7 +22,7 @@ IN: unix.groups.tests
 
 { } [ [ ] with-group-cache ] unit-test
 
-{ } [ real-group-id group-name drop ] unit-test
+[ real-group-id group-name ] must-not-fail
 
 { "888888888888888" } [ 888888888888888 group-name ] unit-test
 { f } [ "please-oh-please-don't-have-a-group-named-this123lalala" group-struct ] unit-test

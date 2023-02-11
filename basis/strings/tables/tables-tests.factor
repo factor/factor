@@ -1,5 +1,5 @@
 ! Copyright (C) 2009 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: tools.test strings.tables ;
 
 { { } } [ { } format-table ] unit-test
@@ -11,3 +11,7 @@ USING: tools.test strings.tables ;
 { { "A B" "  C" "D E" } } [ { { "A" "B\nC" } { "D" "E" } } format-table ] unit-test
 
 { { "A B" "C D" "  E" } } [ { { "A" "B" } { "C" "D\nE" } } format-table ] unit-test
+
+{ { "┌───┬───┐" "│ A │ B │" "├───┼───┤" "│ C │ D │" "└───┴───┘" } }
+[ { { "A" "B" } { "C" "D" } } format-box ] unit-test
+

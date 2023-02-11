@@ -1,5 +1,5 @@
 ! Copyright (C) 2009 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors assocs colors io io.styles kernel
 make namespaces prettyprint.backend prettyprint.sections
 prettyprint.stylesheet sequences sorting vocabs vocabs.parser ;
@@ -14,8 +14,7 @@ IN: vocabs.prettyprint
 
 <PRIVATE
 
-: sort-vocabs ( seq -- seq' )
-    [ vocab-name ] sort-with ;
+: sort-vocabs ( seq -- seq' ) [ vocab-name ] sort-by ;
 
 : pprint-using ( seq -- )
     "syntax" lookup-vocab '[ _ = ] reject
@@ -89,12 +88,14 @@ CONSTANT: manifest-style H{
 }
 
 [
-    nl
-    { { font-style bold } { font-name "sans-serif" } } [
-        "Restarts were invoked adding vocabularies to the search path." print
-        "To avoid doing this in the future, add the following forms" print
-        "at the top of the source file:" print nl
-    ] with-style
-    manifest-style [ manifest get pprint-manifest ] with-nesting
-    nl nl
+    [
+        nl
+        { { font-style bold } { font-name "sans-serif" } } [
+            "Restarts were invoked adding vocabularies to the search path." print
+            "To avoid doing this in the future, add the following forms" print
+            "at the top of the source file:" print nl
+        ] with-style
+        manifest-style [ manifest get pprint-manifest ] with-nesting
+        nl nl flush
+    ] with-output>error
 ] print-use-hook set-global

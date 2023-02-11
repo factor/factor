@@ -1,5 +1,5 @@
 ! Copyright (C) 2008 Alfredo Beaumont
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 
 ! Simple Ctags generator
 ! Alfredo Beaumont <alfredo.beaumont@gmail.com>

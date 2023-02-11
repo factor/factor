@@ -1,5 +1,5 @@
 ! Copyright (C) 2008, 2011 Eduardo Cavazos, Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors arrays calendar combinators.short-circuit
 continuations io.directories io.launcher io.pathnames kernel
 layouts make mason.config mason.notify mason.platform
@@ -63,12 +63,7 @@ M: windows factor-path "./factor.com" ;
         try-process
     ] with-directory ;
 
-: mason-child-test-cmd ( -- cmd )
-    [
-        mason-child-vm ,
-        os windows? cpu x86.64? and [ "-codeheap=200" , ] when
-        "-run=mason.test" ,
-    ] { } make ;
+: mason-child-test-cmd ( -- cmd ) mason-child-vm "-run=mason.test" 2array ;
 
 : test-mason-child ( -- )
     "factor" [
@@ -77,7 +72,7 @@ M: windows factor-path "./factor.com" ;
             +closed+ >>stdin
             "../test-log" >>stdout
             +stdout+ >>stderr
-            6 hours >>timeout
+            2 hours >>timeout
             +new-group+ >>group
         try-process
     ] with-directory ;

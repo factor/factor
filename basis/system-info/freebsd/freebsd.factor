@@ -1,5 +1,5 @@
 ! Copyright (C) 2022 Alex Maestas
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: alien.c-types alien.syntax byte-arrays grouping kernel
 libc math sequences splitting strings system system-info
 unix.sysctl unix.users ;
@@ -24,9 +24,9 @@ FUNCTION-ALIAS: (xuname)
 PRIVATE>
 
 : uname ( -- seq )
-     SYS_NMLN [ (uname) ] [ group ] bi
-     dup length utsname-items assert=
-     [ >string [ zero? ] trim-tail ] map ;
+    SYS_NMLN [ (uname) ] [ group ] bi
+    dup length utsname-items assert=
+    [ >string [ zero? ] trim-tail ] map ;
 
 : sysname ( -- string ) 0 uname nth ;
 : nodename ( -- string ) 1 uname nth ;

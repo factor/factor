@@ -1,5 +1,5 @@
 ! Copyright (C) 2009 Slava Pestov
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: help.markup help.syntax kernel colors ;
 IN: fonts
 
@@ -12,15 +12,15 @@ HELP: font
 
 HELP: font-with-background
 { $values
-     { "font" font } { "color" color }
-     { "font'" font }
+    { "font" font } { "color" color }
+    { "font'" font }
 }
 { $description "Creates a new font equal to the given font, except with a different " { $slot "background" } " slot." } ;
 
 HELP: font-with-foreground
 { $values
-     { "font" font } { "color" color }
-     { "font'" font }
+    { "font" font } { "color" color }
+    { "font'" font }
 }
 { $description "Creates a new font equal to the given font, except with a different " { $slot "foreground" } " slot." } ;
 

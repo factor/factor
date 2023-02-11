@@ -1,5 +1,5 @@
 ! Copyright (C) 2005, 2009 Daniel Ehrenberg
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors ascii assocs combinators
 combinators.short-circuit hints io kernel math math.parser
 namespaces sbufs sequences splitting strings xml.char-classes
@@ -75,9 +75,9 @@ HINTS: next* { spot } ;
     ! Take the substring of a string starting at spot
     ! from code until the quotation given is true and
     ! advance spot to after the substring.
-   10 <sbuf> [
-       '[ _ keep over [ drop ] [ _ push ] if ] skip-until
-   ] keep "" like ; inline
+    10 <sbuf> [
+        '[ _ keep over [ drop ] [ _ push ] if ] skip-until
+    ] keep "" like ; inline
 
 : take-to ( seq -- string )
     '[ _ member? ] take-until ; inline
@@ -186,4 +186,4 @@ HINTS: next* { spot } ;
     [ next (parse-quote) ] [ quoteless-attr ] if ; inline
 
 : parse-quote ( -- seq )
-   f parse-quote* ;
+    f parse-quote* ;

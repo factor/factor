@@ -1,5 +1,5 @@
 ! Copyright (C) 2008, 2010 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors assocs binary-search combinators
 compiler.cfg.def-use compiler.cfg.instructions
 compiler.cfg.linear-scan.ranges compiler.cfg.linearization

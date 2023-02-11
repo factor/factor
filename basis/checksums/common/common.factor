@@ -1,5 +1,5 @@
 ! Copyright (C) 2006, 2008 Doug Coleman.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors byte-arrays byte-vectors checksums endian
 grouping kernel make math sequences ;
 IN: checksums.common

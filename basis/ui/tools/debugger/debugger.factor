@@ -1,5 +1,5 @@
 ! Copyright (C) 2006, 2011 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors arrays continuations debugger editors kernel
 models namespaces sequences ui.commands ui.debugger ui.gadgets
 ui.gadgets.labels ui.gadgets.packs ui.gadgets.panes

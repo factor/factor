@@ -1,5 +1,5 @@
 ! Copyright (C) 2013 Björn Lindqvist, John Benediktsson
-! See http://factorcode.org/license.txt for BSD license
+! See https://factorcode.org/license.txt for BSD license
 
 USING: alien.c-types alien.data alien.libraries.finder
 alien.strings arrays combinators.short-circuit environment

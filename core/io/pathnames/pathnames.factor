@@ -1,5 +1,5 @@
 ! Copyright (C) 2004, 2009 Slava Pestov, Doug Coleman.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors assocs combinators io.backend kernel math
 math.order namespaces sequences splitting strings system ;
 IN: io.pathnames
@@ -147,6 +147,8 @@ HOOK: home io-backend ( -- dir )
 
 M: object home "" resource-path ;
 
+: home-path ( path -- newpath ) home prepend-path ;
+
 GENERIC: vocab-path ( path -- newpath )
 
 GENERIC: absolute-path ( path -- path' )
@@ -226,3 +228,6 @@ C: <pathname> pathname
 M: pathname absolute-path string>> absolute-path ;
 
 M: pathname <=> [ string>> ] compare ;
+
+: >pathname ( obj -- pathname )
+    dup pathname? [ <pathname> ] unless ;

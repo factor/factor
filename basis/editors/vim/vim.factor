@@ -8,8 +8,6 @@ MIXIN: vim-base
 
 INSTANCE: vim vim-base
 
-editor-class [ vim ] initialize
-
 SYMBOL: vim-path
 
 HOOK: find-vim-path editor-class ( -- path )

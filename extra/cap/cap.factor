@@ -1,5 +1,5 @@
 ! Copyright (C) 2008 Doug Coleman, Joe Groff.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors byte-arrays images images.normalization
 images.viewer kernel math namespaces opengl opengl.gl
 sequences ui ui.gadgets.worlds ;

@@ -1,5 +1,5 @@
 ! Copyright (C) 2012 Doug Coleman.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: tools.test machine-learning.one-hot ;
 IN: machine-learning.one-hot.tests
 

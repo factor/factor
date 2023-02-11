@@ -4,8 +4,6 @@ IN: editors.ultraedit
 
 SINGLETON: ultraedit
 
-editor-class [ ultraedit ] initialize
-
 HOOK: find-ultraedit os ( -- path )
 
 M: windows find-ultraedit

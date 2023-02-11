@@ -1,7 +1,7 @@
 ! Copyright (C) 2013 Jon Harper.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 ! adapted from "yaml.h" libYAML 0.1.4
-! http://pyyaml.org/wiki/LibYAML
+! https://pyyaml.org/wiki/LibYAML
 USING: alien alien.c-types alien.destructors alien.libraries
 alien.syntax classes.struct combinators literals system
 alien.libraries.finder ;
@@ -609,9 +609,9 @@ STRUCT: yaml_node_pair_t
             { style yaml_mapping_style_t }
         ;
   UNION-STRUCT: node_data
-     { scalar scalar_node_data }
-     { sequence sequence_node_data }
-     { mapping mapping_node_data }
+    { scalar scalar_node_data }
+    { sequence sequence_node_data }
+    { mapping mapping_node_data }
   ;
 
 STRUCT: yaml_node_t

@@ -1,6 +1,6 @@
 ! Copyright (C) 2007, 2010 Daniel Ehrenberg, Bruno Deferrari,
 ! Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs combinators compiler.units
 continuations hash-sets hashtables kernel math namespaces
 parser.notes sequences sets sorting splitting vectors vocabs
@@ -10,7 +10,7 @@ IN: vocabs.parser
 ERROR: no-word-error name ;
 
 : word-restarts ( possibilities -- restarts )
-    natural-sort [
+    sort [
         [ vocabulary>> "Use the " " vocabulary" surround ] keep
     ] { } map>assoc ;
 

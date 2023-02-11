@@ -1,5 +1,5 @@
 ! Copyright (C) 2011 Joe Groff.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors assocs combinators combinators.short-circuit
 continuations formatting generalizations io io.streams.string
 kernel kernel.private layouts math math.parser math.vectors
@@ -201,7 +201,7 @@ PRIVATE>
     H{ } [ "  " <repetition> concat ] cache write ;
 
 : by-total-time ( nodes -- nodes' )
-    >alist [ second total-time>> ] inv-sort-with ;
+    >alist [ second total-time>> ] inv-sort-by ;
 
 : duration. ( duration -- )
     1000 * "%9.1f" printf ;

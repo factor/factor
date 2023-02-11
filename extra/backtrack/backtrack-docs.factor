@@ -1,5 +1,5 @@
 ! Copyright (c) 2009, 2020 Samuel Tardieu, Alexander Ilin.
-! See See http://factorcode.org/license.txt for BSD license.
+! See See https://factorcode.org/license.txt for BSD license.
 USING: help.markup help.syntax kernel quotations sequences ;
 IN: backtrack
 

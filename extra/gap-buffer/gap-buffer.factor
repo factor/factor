@@ -1,5 +1,5 @@
 ! Copyright (C) 2007 Alex Chapman All Rights Reserved.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 !
 ! gap buffer -- largely influenced by Strandh and Villeneuve's Flexichain
 ! for a good introduction see:

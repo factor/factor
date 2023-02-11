@@ -1,5 +1,5 @@
 ! Copyright (C) 2008 Doug Coleman.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors assocs classes.struct combinators
 combinators.short-circuit continuations csv fry io.backend
 io.encodings.utf8 io.files.info io.files.info.unix io.pathnames kernel
@@ -68,15 +68,21 @@ frequency pass-number ;
     CHAR: \s [ "/etc/mtab" utf8 file>csv ] with-delimiter
     [ mtab-csv>mtab-entry ] map ;
 
-: (file-system-info) ( path -- file-system-info )
-    [ new-file-system-info ] dip
+: fill-file-system-info ( file-system-info path -- file-system-info )
     [ file-system-statfs statfs>file-system-info ]
     [ file-system-statvfs statvfs>file-system-info ] bi
     file-system-calculations ; inline
 
+: file-system-info-ignore-errors ( file-system-info -- file-system-info )
+    [ new-file-system-info ] dip
+    [ fill-file-system-info ] [ 2drop ] recover ; inline
+
+: (file-system-info) ( path -- file-system-info )
+    [ new-file-system-info ] dip fill-file-system-info ;
+
 : mtab-entry>file-system-info ( mtab-entry -- file-system-info/f )
     '[
-        _ [ mount-point>> (file-system-info) ] [ ] bi
+        _ [ mount-point>> file-system-info-ignore-errors ] [ ] bi
         {
             [ file-system-name>> >>device-name ]
             [ mount-point>> >>mount-point ]
@@ -91,8 +97,8 @@ M: linux file-systems
     parse-mtab [ mtab-entry>file-system-info ] map sift ;
 
 M: linux file-system-info
-    normalize-path [ (file-system-info) ] [ ] bi
-    find-mount-point
+    normalize-path
+    [ file-system-info-ignore-errors ] [ find-mount-point ] bi
     {
         [ file-system-name>> >>device-name drop ]
         [ mount-point>> >>mount-point drop ]

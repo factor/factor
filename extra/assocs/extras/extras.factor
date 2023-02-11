@@ -1,7 +1,7 @@
 ! Copyright (C) 2012 John Benediktsson, Doug Coleman
-! See http://factorcode.org/license.txt for BSD license
+! See https://factorcode.org/license.txt for BSD license
 USING: arrays assocs assocs.private kernel math math.statistics
-sequences sets ;
+sequences sequences.extras sets ;
 IN: assocs.extras
 
 : push-at-each ( value keys assoc -- )
@@ -18,6 +18,12 @@ IN: assocs.extras
 
 : deep-set-of ( assoc seq elt -- )
     [ deep-of-but-last ] dip spin set-at ; inline
+
+: zip-longest-with ( seq1 seq2 fill -- assoc )
+    pad-longest zip ;
+
+: zip-longest ( seq1 seq2 -- assoc )
+    f zip-longest-with ;
 
 : substitute! ( seq assoc -- seq )
     substituter map! ;
@@ -79,8 +85,8 @@ IN: assocs.extras
 ! Modifies assoc1
 : assoc-merge! ( assoc1 assoc2 quot: ( value1 value2 -- new-value ) -- assoc1' )
     [| key2 val2 quot | val2 key2 pick
-     at* [ swap quot call ] [ drop ] if
-     key2 pick set-at ] curry assoc-each ; inline
+    at* [ swap quot call ] [ drop ] if
+    key2 pick set-at ] curry assoc-each ; inline
 
 ! Same as above, non-destructive
 : assoc-merge ( assoc1 assoc2 quot: ( value1 value2 -- new-value ) -- new-assoc )

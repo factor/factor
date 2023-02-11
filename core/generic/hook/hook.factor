@@ -1,5 +1,5 @@
 ! Copyright (C) 2009 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors definitions generic generic.single kernel
 kernel.private namespaces quotations sequences words ;
 QUALIFIED-WITH: generic.single.private gsp

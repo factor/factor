@@ -812,10 +812,12 @@ HELP: 3curry
 
 HELP: with
 { $values { "param" object } { "obj" object } { "quot" { $quotation ( param elt -- ... ) } } { "curried" curried } }
-{ $description "Partial application on the left. The following two lines are equivalent:"
+{ $description "Similar to how " { $link curry } " binds the element below its quotation as its first argument, "
+{ $link with } " binds the second element below " { $snippet "quot" } " as the second argument of " { $snippet "quot" } "."
+$nl
+"In other words, partial application on the left. The following two lines are equivalent:"
     { $code "swap [ swap A ] curry B" }
     { $code "[ A ] with B" }
-
 }
 { $notes "This operation is efficient and does not copy the quotation." }
 { $examples
@@ -903,8 +905,8 @@ HELP: do
 
 HELP: loop
 { $values
-     { "pred" quotation } }
-     { $description "Calls the quotation repeatedly until it outputs " { $link f } "." }
+    { "pred" quotation } }
+    { $description "Calls the quotation repeatedly until it outputs " { $link f } "." }
 { $examples "Loop until we hit a zero:"
     { $unchecked-example "USING: kernel random math io ; "
     " [ \"hi\" write bl 10 random zero? not ] loop"

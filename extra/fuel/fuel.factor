@@ -1,5 +1,5 @@
 ! Copyright (C) 2008, 2009 Jose Antonio Ortega Ruiz.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors assocs compiler.units continuations fry fuel.eval
 fuel.help fuel.xref help.topics io.pathnames kernel namespaces parser
 parser.notes sequences source-files tools.scaffold vocabs vocabs.files

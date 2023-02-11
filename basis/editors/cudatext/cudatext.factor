@@ -5,8 +5,6 @@ IN: editors.cudatext
 
 SINGLETON: cudatext
 
-editor-class [ cudatext ] initialize
-
 HOOK: find-cudatext-path os ( -- path )
 
 M: object find-cudatext-path f ;

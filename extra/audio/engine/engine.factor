@@ -1,5 +1,5 @@
 ! Copyright (C) 2009 Joe Groff.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors alien alien.data audio calendar
 combinators combinators.short-circuit destructors kernel
 literals math openal sequences sequences.generalizations

@@ -4,8 +4,6 @@ IN: editors.notepad2
 
 SINGLETON: notepad2
 
-editor-class [ notepad2 ] initialize
-
 : notepad2-path ( -- path )
     \ notepad2-path get [
         windows-directory "system32\\notepad.exe" append-path

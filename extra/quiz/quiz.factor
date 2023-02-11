@@ -1,7 +1,7 @@
 ! Copyright (C) 2021 Doug Coleman.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs combinators combinators.smart
-continuations formatting io kernel math math.functions
+continuations countries formatting io kernel math math.functions
 math.parser prettyprint quotations random sequences
 sequences.extras splitting strings unicode unicode.flags
 unicode.flags.images ;
@@ -15,9 +15,9 @@ GENERIC: >question ( obj -- question )
 
 TUPLE: question generator generated answer response parsed-response correct? ;
 
-TUPLE: true-false-question < question ;
-: <true-false-question> ( generator -- question )
-    true-false-question new
+TUPLE: boolean-question < question ;
+: <boolean-question> ( generator -- question )
+    boolean-question new
         swap >>generator ;
 
 TUPLE: string-question < question ;
@@ -37,11 +37,11 @@ TUPLE: multiple-choice-question < question n choices ;
         swap >>n
         swap >>generator ;
 
-TUPLE: true-false-response ;
+TUPLE: boolean-response ;
 TUPLE: string-response ;
 TUPLE: number-response ;
 
-M: true-false-response >question <true-false-question> ;
+M: boolean-response >question <boolean-question> ;
 M: string-response >question <string-question> ;
 M: number-response >question <number-question> ;
 M: object >question clone ;
@@ -52,73 +52,126 @@ M: multiple-choice-question generate-question*
     [ n>> ] [ generator>> ] bi
     '[ _ generate-question* ] replicate ;
 
-: trim-blanks ( seq -- seq' ) split-words harvest join-words ;
-: first-n-letters ( n -- seq ) <iota> [ CHAR: a + 1string ] map ;
-: alphabet-zip ( seq -- zip ) [ length <iota> [ CHAR: a + 1string ] { } map-as ] keep zip ;
+: trim-blanks ( seq -- seq' )
+    split-words harvest join-words ;
+
+: first-n-letters ( n -- seq )
+    <iota> [ CHAR: a + 1string ] map ;
+
+: alphabet-zip ( seq -- zip )
+    [ length <iota> [ CHAR: a + 1string ] { } map-as ] keep zip ;
+
 M: question parse-response drop trim-blanks ;
-M: true-false-question parse-response drop trim-blanks >lower "t" = ;
+M: boolean-question parse-response drop trim-blanks >lower "t" = ;
 M: number-question parse-response drop string>number ;
 
-TUPLE: multiplication < number-response count n ;
-TUPLE: sqrt-question < number-response random-choices ;
-TUPLE: sq-question < number-response random-choices ;
+TUPLE: math-multiplication < number-response count n ;
+TUPLE: math-sqrt < number-response random-choices ;
+TUPLE: math-sq < number-response random-choices ;
 TUPLE: stack-shuffler < string-response n-shufflers ;
-TUPLE: state-capital-question < string-response ;
-TUPLE: country-from-flag < string-response n ;
-TUPLE: flag-from-countries < string-response n ;
+TUPLE: state-capital < string-response ;
+TUPLE: country-code-from-flag < string-response n ;
+TUPLE: flag-from-country-code < string-response n ;
+TUPLE: country-name-from-flag < string-response n ;
+TUPLE: flag-from-country-name < string-response n ;
 
-M: multiplication generate-question*
-    [ count>> random ] [ n>> ] bi '[ _ random 2 + ] replicate
-    '[ _ product ] ;
-M: sqrt-question generate-question* random-choices>> random sq '[ _ sqrt >integer ] ;
-M: sq-question generate-question* random-choices>> random '[ _ sq ] ;
+M: math-multiplication generate-question*
+    [ count>> random ] [ n>> ] bi '[ _ random 2 + ] replicate '[ _ product ] ;
 
+M: math-sqrt generate-question*
+    random-choices>> random sq '[ _ sqrt >integer ] ;
+
+M: math-sq generate-question*
+    random-choices>> random '[ _ sq ] ;
 
 CONSTANT: state-capitals H{
-    { "Alabama" "Montgomery" } { "Alaska" "Juneau" } { "Arizona" "Phoenix" } { "Arkansas" "Little Rock" }
-    { "California" "Sacramento" } { "Colorado" "Denver" } { "Connecticut" "Hartford" } { "Delaware" "Dover" }
-    { "Florida" "Tallahassee" } { "Georgia" "Atlanta" } { "Hawaii" "Honolulu" } { "Idaho" "Boise" }
-    { "Illinois" "Springfield" } { "Indiana" "Indianapolis" } { "Iowa" "Des Moines" } { "Kansas" "Topeka" }
-    { "Kentucky" "Frankfort" } { "Louisiana" "Baton Rouge" } { "Maine" "Augusta" } { "Maryland" "Annapolis" }
-    { "Massachusetts" "Boston" } { "Michigan" "Lansing" } { "Minnesota" "Saint Paul" } { "Mississippi" "Jackson" }
-    { "Missouri" "Jefferson City" } { "Montana" "Helena" } { "Nebraska" "Lincoln" } { "Nevada" "Carson City" }
-    { "New Hampshire" "Concord" } { "New Jersey" "Trenton" } { "New Mexico" "Santa Fe" } { "New York" "Albany" }
-    { "North Carolina" "Raleigh" } { "North Dakota" "Bismarck" } { "Ohio" "Columbus" } { "Oklahoma" "Oklahoma City" }
-    { "Oregon" "Salem" } { "Pennsylvania" "Harrisburg" } { "Rhode Island" "Providence" } { "South Carolina" "Columbia" }
-    { "South Dakota" "Pierre" } { "Tennessee" "Nashville" } { "Texas" "Austin" } { "Utah" "Salt Lake City" }
-    { "Vermont" "Montpelier" } { "Virginia" "Richmond" } { "Washington" "Olympia" } { "West Virginia" "Charleston" }
-    { "Wisconsin" "Madison" } { "Wyoming" "Cheyenne" }
+    { "Alabama" "Montgomery" }
+    { "Alaska" "Juneau" }
+    { "Arizona" "Phoenix" }
+    { "Arkansas" "Little Rock" }
+    { "California" "Sacramento" }
+    { "Colorado" "Denver" }
+    { "Connecticut" "Hartford" }
+    { "Delaware" "Dover" }
+    { "Florida" "Tallahassee" }
+    { "Georgia" "Atlanta" }
+    { "Hawaii" "Honolulu" }
+    { "Idaho" "Boise" }
+    { "Illinois" "Springfield" }
+    { "Indiana" "Indianapolis" }
+    { "Iowa" "Des Moines" }
+    { "Kansas" "Topeka" }
+    { "Kentucky" "Frankfort" }
+    { "Louisiana" "Baton Rouge" }
+    { "Maine" "Augusta" }
+    { "Maryland" "Annapolis" }
+    { "Massachusetts" "Boston" }
+    { "Michigan" "Lansing" }
+    { "Minnesota" "Saint Paul" }
+    { "Mississippi" "Jackson" }
+    { "Missouri" "Jefferson City" }
+    { "Montana" "Helena" }
+    { "Nebraska" "Lincoln" }
+    { "Nevada" "Carson City" }
+    { "New Hampshire" "Concord" }
+    { "New Jersey" "Trenton" }
+    { "New Mexico" "Santa Fe" }
+    { "New York" "Albany" }
+    { "North Carolina" "Raleigh" }
+    { "North Dakota" "Bismarck" }
+    { "Ohio" "Columbus" }
+    { "Oklahoma" "Oklahoma City" }
+    { "Oregon" "Salem" }
+    { "Pennsylvania" "Harrisburg" }
+    { "Rhode Island" "Providence" }
+    { "South Carolina" "Columbia" }
+    { "South Dakota" "Pierre" }
+    { "Tennessee" "Nashville" }
+    { "Texas" "Austin" }
+    { "Utah" "Salt Lake City" }
+    { "Vermont" "Montpelier" }
+    { "Virginia" "Richmond" }
+    { "Washington" "Olympia" }
+    { "West Virginia" "Charleston" }
+    { "Wisconsin" "Madison" }
+    { "Wyoming" "Cheyenne" }
 }
 
-: state-capital ( state -- capital ) state-capitals at ;
-M: state-capital-question generate-question* drop state-capitals keys random '[ _ state-capital ] ;
-M: state-capital-question parse-response drop trim-blanks >title ;
+M: state-capital generate-question* drop state-capitals keys random '[ _ state-capitals at ] ;
+M: state-capital parse-response drop trim-blanks >title ;
 
-M: country-from-flag generate-question* drop valid-flags random '[ _ flag>unicode ] ;
-M: country-from-flag parse-response drop trim-blanks >title ;
+M: country-code-from-flag generate-question* drop valid-flags random '[ _ flag>unicode ] ;
+M: country-code-from-flag parse-response drop trim-blanks >title ;
 
-M: flag-from-countries generate-question* drop valid-flag-names random '[ _ unicode>flag ] ;
-M: flag-from-countries parse-response drop trim-blanks >title ;
+M: flag-from-country-code generate-question* drop valid-flag-names random '[ _ unicode>flag ] ;
+M: flag-from-country-code parse-response drop trim-blanks >title ;
 
-CONSTANT: stack-shufflers { dup 2dup drop 2drop swap over rot -rot roll -roll 2dup pick dupd }
+M: country-name-from-flag generate-question* drop valid-flags random '[ _ flag>country ] ;
+M: country-name-from-flag parse-response drop trim-blanks >title ;
+
+M: flag-from-country-name generate-question* drop valid-flag-names random alpha-2 ?at drop '[ _ country>flag ] ;
+M: flag-from-country-name parse-response drop trim-blanks >title ;
+
+CONSTANT: stack-shufflers {
+    dup 2dup drop 2drop swap over rot -rot roll -roll 2dup pick dupd
+}
 
 M: stack-shuffler generate-question*
     n-shufflers>> [ stack-shufflers random ] [ ] replicate-as
-    [ inputs first-n-letters ] keep
-    '[ _ _ with-datastack join-words ] ;
+    [ inputs first-n-letters ] keep '[ _ _ with-datastack join-words ] ;
 
 M: question ask-question generated>> . ;
 M: string-response ask-question generated>> . ;
 M: number-response ask-question generated>> . ;
 
 M: multiple-choice-question ask-question
-    [ generated>> . ] [ choices>> [ first2 swap "  (" ") " surround write ... ] each ] bi ;
+    [ generated>> . ] [ choices>> [ first2 swap "  (" ") " surround write ... ] each flush ] bi ;
 
 M: question check-response
     [ parsed-response>> ] [ answer>> ] bi = ;
+
 M: multiple-choice-question check-response
     [ parsed-response>> ] [ answer>> ] bi member? ;
-
 
 : score-question ( question input -- question/f )
     dup { f "q" } member? [
@@ -133,6 +186,7 @@ M: multiple-choice-question check-response
 GENERIC: generate-question ( question -- )
 
 ERROR: generator-needs-reponse-type generator ;
+
 M: object generate-question
     generator-needs-reponse-type ;
 
@@ -143,9 +197,8 @@ M: string-response generate-question
     <string-question> generate-question ;
 
 M: question generate-question
-    dup generate-question* >>generated
-    dup generated>> call( -- answer ) >>answer
-    drop ;
+    dup generate-question* [ >>generated ] keep
+    call( -- answer ) >>answer drop ;
 
 M: multiple-choice-question generate-question
     dup generate-question*
@@ -182,29 +235,39 @@ M: sequence run-multiple-choice-quiz ( seq n -- questions )
     [ length ] bi
     [ drop 0.0 ] [ /f ] if-zero 100 * "SCORE: %d%%\n" printf ;
 
-: run-states-quiz-hard ( -- )
-    T{ state-capital-question } 5 run-multiple-choice-quiz score-quiz ;
+: run-state-capital-quiz ( -- )
+    T{ state-capital } 5 run-multiple-choice-quiz score-quiz ;
 
 : run-shuffler-quiz ( -- )
     {
         T{ stack-shuffler { n-shufflers 4 } }
     } 5 run-multiple-choice-quiz score-quiz ;
 
-: run-country-from-flag-quiz ( -- )
+: run-country-code-from-flag-quiz ( -- )
     {
-        T{ country-from-flag { n 4 } }
+        T{ country-code-from-flag { n 4 } }
     } 5 run-multiple-choice-quiz score-quiz ;
 
-: run-flag-from-countries-quiz ( -- )
+: run-flag-from-country-code-quiz ( -- )
     {
-        T{ flag-from-countries { n 4 } }
+        T{ flag-from-country-code { n 4 } }
     } 5 run-multiple-choice-quiz score-quiz ;
 
-: run-main-quiz ( -- )
+: run-country-name-from-flag-quiz ( -- )
     {
-        T{ multiplication { count 10 } { n 10 } }
-        T{ sqrt-question { random-choices 100 } }
-        T{ sq-question { random-choices 100 } }
+        T{ country-name-from-flag { n 4 } }
     } 5 run-multiple-choice-quiz score-quiz ;
 
-MAIN: run-main-quiz
+: run-flag-from-country-name-quiz ( -- )
+    {
+        T{ flag-from-country-name { n 4 } }
+    } 5 run-multiple-choice-quiz score-quiz ;
+
+: run-math-quiz ( -- )
+    {
+        T{ math-multiplication { count 10 } { n 10 } }
+        T{ math-sqrt { random-choices 100 } }
+        T{ math-sq { random-choices 100 } }
+    } 5 run-multiple-choice-quiz score-quiz ;
+
+MAIN: run-math-quiz

@@ -1,5 +1,5 @@
 ! Copyright (C) 2020 Doug Coleman.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors alien.c-types alien.data alien.strings
 constructors destructors io.encodings.string io.encodings.utf8
 kernel namespaces rocksdb.ffi sequences ;

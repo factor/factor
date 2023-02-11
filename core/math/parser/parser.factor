@@ -1,5 +1,5 @@
 ! Copyright (C) 2009 Joe Groff, 2013 John Benediktsson
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors byte-arrays combinators kernel kernel.private
 layouts make math math.private sbufs sequences sequences.private
 strings ;
@@ -205,7 +205,7 @@ CONSTANT: min-magnitude-2 -1074
     -rot 10 >>radix 0 ; inline
 
 : <float-parse> ( i number-parse n -- float-parse i number-parse n )
-     [ drop nip [ radix>> ] [ magnitude>> ] bi [ 0 f ] dip float-parse boa ] 3keep ; inline
+    [ drop nip [ radix>> ] [ magnitude>> ] bi [ 0 f ] dip float-parse boa ] 3keep ; inline
 
 : if-skip ( char true false -- )
     pick ",_" member-eq? [ drop nip call ] [ nip call ] if ; inline

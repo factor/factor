@@ -1,5 +1,5 @@
 ! Copyright (C) 2017 Alexander Ilin.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: binary-search colors help.markup help.syntax kernel
 sequences splitting.monotonic ui.gadgets ui.gadgets.charts
 ui.gadgets.charts.lines.private ui.render ;

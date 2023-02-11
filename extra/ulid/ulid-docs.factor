@@ -1,5 +1,5 @@
 ! Copyright (C) 2019 Alexander Ilin.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: byte-arrays help.markup help.syntax kernel math strings
 ulid.private ;
 IN: ulid

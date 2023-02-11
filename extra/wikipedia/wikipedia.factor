@@ -1,5 +1,5 @@
 ! Copyright (C) 2012 John Benediktsson
-! See http://factorcode.org/license.txt for BSD license
+! See https://factorcode.org/license.txt for BSD license
 
 USING: accessors ascii assocs calendar colors combinators
 command-line eval formatting html.entities html.parser
@@ -19,7 +19,7 @@ language [ "en" ] initialize
 <PRIVATE
 
 : wikipedia-url ( path -- url )
-    language get swap "http://%s.wikipedia.org/%s" sprintf >url ;
+    language get swap "https://%s.wikipedia.org/%s" sprintf >url ;
 
 : header. ( string -- )
     H{ { font-size 20 } { font-style bold } } format nl ;

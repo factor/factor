@@ -1,5 +1,5 @@
 ! Copyright (C) 2016 John Benediktsson
-! See http://factorcode.org/license.txt for BSD license
+! See https://factorcode.org/license.txt for BSD license
 
 USING: alien.data command-line io io.encodings
 io.encodings.binary io.files kernel math math.bitwise
@@ -13,17 +13,17 @@ IN: tools.wc
 <PRIVATE
 
 : aligned-slices ( seq -- head tail )
-   dup length 0xf unmask cut-slice ; inline
+    dup length 0xf unmask cut-slice ; inline
 
 : count-characters ( -- n )
     0 [ length + ] each-block-slice ; inline
 
 : count-lines ( -- n )
     0 [
-       aligned-slices [
-           uchar-16 cast-array swap
-           [ CHAR: \n uchar-16-with v= vcount + >fixnum ] reduce
-       ] [ [ CHAR: \n = ] count + >fixnum ] bi*
+        aligned-slices [
+            uchar-16 cast-array swap
+            [ CHAR: \n uchar-16-with v= vcount + >fixnum ] reduce
+        ] [ [ CHAR: \n = ] count + >fixnum ] bi*
     ] each-block-slice ; inline
 
 : wc-stdin ( -- n )

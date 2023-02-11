@@ -1,5 +1,5 @@
 ! Copyright (C) 2009 Bruno Deferrari
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors assocs calendar classes combinators
 concurrency.mailboxes destructors io io.streams.duplex irc.client.base
 irc.client.chats irc.client.internals irc.client.participants
@@ -190,9 +190,10 @@ M: mb-writer dispose drop ;
   ] unit-test
 ] spawning-irc
 
-[ { H{ { "factorbot" T{ participant { nick "factorbot" } { operator t } } }
-       { "ircuser" T{ participant { nick "ircuser" } } }
-       { "voiced" T{ participant { nick "voiced" } { voice t } } } } } [
+[ { H{
+      { "factorbot" T{ participant { nick "factorbot" } { operator t } } }
+      { "ircuser" T{ participant { nick "ircuser" } } }
+      { "voiced" T{ participant { nick "voiced" } { voice t } } } } } [
       "#factortest" <irc-channel-chat>
       "ircuser" over join-participant
       [ %add-named-chat ] keep

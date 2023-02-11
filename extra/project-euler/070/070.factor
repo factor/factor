@@ -1,13 +1,13 @@
 ! Copyright (c) 2010 Aaron Schaefer. All rights reserved.
 ! The contents of this file are licensed under the Simplified BSD License
-! A copy of the license is available at http://factorcode.org/license.txt
+! A copy of the license is available at https://factorcode.org/license.txt
 USING: arrays combinators.short-circuit kernel math math.combinatorics
 math.functions math.primes project-euler.common sequences
 sequences.extras ;
 FROM: project-euler.common => permutations? ;
 IN: project-euler.070
 
-! http://projecteuler.net/index.php?section=problems&id=70
+! https://projecteuler.net/index.php?section=problems&id=70
 
 ! DESCRIPTION
 ! -----------
@@ -60,8 +60,8 @@ IN: project-euler.070
 PRIVATE>
 
 : euler070 ( -- answer )
-   likely-prime-factors 2 all-combinations [ n-and-phi ] map
-   [ fit-requirements? ] filter minimum-ratio ;
+    likely-prime-factors 2 all-combinations [ n-and-phi ] map
+    [ fit-requirements? ] filter minimum-ratio ;
 
 ! [ euler070 ] 100 ave-time
 ! 379 ms ave run time - 1.15 SD (100 trials)

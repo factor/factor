@@ -1,10 +1,10 @@
 ! Copyright (c) 2007 Samuel Tardieu.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: arrays kernel lists lists.lazy math math.algebra
 math.functions math.primes.lists project-euler.common ;
 IN: project-euler.134
 
-! http://projecteuler.net/index.php?section=problems&id=134
+! https://projecteuler.net/index.php?section=problems&id=134
 
 ! DESCRIPTION
 ! -----------

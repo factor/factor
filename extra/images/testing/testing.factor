@@ -1,5 +1,5 @@
 ! Copyright (C) 2009 Keith Lazuka.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors arrays images images.loader
 images.normalization images.viewer io io.backend io.directories
 io.encodings.binary io.files io.pathnames io.streams.byte-array

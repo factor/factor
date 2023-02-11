@@ -1,10 +1,11 @@
 ! Copyright (C) 2020 Doug Coleman.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
+
 USING: accessors arrays assocs combinators
-combinators.short-circuit io io.encodings.utf8 io.files
-json.reader kernel math math.order memoize modern.slices
-prettyprint sequences sequences.extras strings suffix-arrays
-words ;
+combinators.short-circuit io io.encodings.utf8 io.files json
+kernel math math.order memoize modern.slices prettyprint
+sequences sequences.extras strings suffix-arrays words ;
+
 IN: html5
 
 : 1sbuf ( ch -- sbuf ) [ SBUF" " clone ] dip over push ; inline
@@ -13,12 +14,12 @@ IN: html5
 ! https://html.spec.whatwg.org/multipage/parsing.html#tokenization
 
 ! https://infra.spec.whatwg.org/#namespaces
-CONSTANT: html-namespace "http://www.w3.org/1999/xhtml"
-CONSTANT: mathml-namespace "http://www.w3.org/1998/Math/MathML"
-CONSTANT: svg-namespace "http://www.w3.org/2000/svg"
-CONSTANT: xlink-namespace "http://www.w3.org/1999/xlink"
-CONSTANT: xml-namespace "http://www.w3.org/XML/1998/namespace"
-CONSTANT: xmlns-namespace "http://www.w3.org/2000/xmlns/"
+CONSTANT: html-namespace "https://www.w3.org/1999/xhtml"
+CONSTANT: mathml-namespace "https://www.w3.org/1998/Math/MathML"
+CONSTANT: svg-namespace "https://www.w3.org/2000/svg"
+CONSTANT: xlink-namespace "https://www.w3.org/1999/xlink"
+CONSTANT: xml-namespace "https://www.w3.org/XML/1998/namespace"
+CONSTANT: xmlns-namespace "https://www.w3.org/2000/xmlns/"
 
 DEFER: data-state
 DEFER: (data-state)
@@ -665,7 +666,7 @@ M: in-body-mode tree-insert*
             over tree>> push
 
             after-body-mode >>insertion-mode
-         ] }
+        ] }
         { [ dup { [ end-tag? ] [ name>> "html" = ] } 1&& ] [ drop unimplemented* ] }
         ! { [ ] [ ] }
         [
@@ -691,7 +692,7 @@ M: after-body-mode tree-insert*
         { [ dup doctype? ] [ drop ] }
         { [ dup { [ tag? ] [ name>> "html" = ] } 1&& ] [
             unimplemented*
-         ] }
+        ] }
         { [ dup { [ end-tag? ] [ name>> "html" = ] } 1&& ] [
             ! XXX: make this a function
             "html" pick tree>> find-matching-tag

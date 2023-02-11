@@ -1,5 +1,5 @@
 ! Copyright (C) 2009 Kobi Lurie, Doug Coleman.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors fry images.loader
 images.processing.rotation kernel literals math sequences
 tools.test images.processing.rotation.private ;

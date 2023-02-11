@@ -1,5 +1,5 @@
 ! Copyright (C) 2016 Doug Coleman.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs combinators combinators.extras
 combinators.short-circuit continuations io.encodings.utf8
 io.files kernel make math math.order modern.paths modern.slices
@@ -37,7 +37,7 @@ MACRO:: read-double-matched ( open-ch -- quot: ( n string tag ch -- n' string se
             ] }
             [ [ tag openstr2 n string ] dip long-opening-mismatch ]
         } case
-     ] ;
+    ] ;
 
 : read-double-matched-paren ( n string tag ch -- n' string seq ) CHAR: ( read-double-matched ;
 : read-double-matched-bracket ( n string tag ch -- n' string seq ) CHAR: [ read-double-matched ;
@@ -486,6 +486,9 @@ ERROR: compound-syntax-disallowed n seq obj ;
     [ [ vocab>literals ] [ nip ] recover ] zip-with ;
 
 : failed-lexing ( assoc -- assoc' ) [ nip array? ] assoc-reject ;
+
+: rewrite-file ( path encoding quot: ( str -- str' ) -- )
+    '[ file-contents @ ] 2keep set-file-contents ; inline
 
 : lex-core ( -- assoc ) core-vocabs lex-vocabs ;
 : lex-basis ( -- assoc ) basis-vocabs lex-vocabs ;

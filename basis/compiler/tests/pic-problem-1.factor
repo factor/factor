@@ -11,4 +11,4 @@ INSTANCE: x sequence
 
 CONSTANT: blah T{ x }
 
-[ T{ x } ] [ blah ] unit-test
+{ T{ x } } [ blah ] unit-test

@@ -1,5 +1,5 @@
 ! Copyright (C) 2009 Jose Antonio Ortega Ruiz.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 
 USING: accessors arrays assocs definitions help.topics
 io.pathnames kernel memoize namespaces sequences sets sorting
@@ -25,10 +25,10 @@ IN: fuel.xref
     [ word? ] filter [ word>xref ] map ;
 
 : group-xrefs ( xrefs -- xrefs' )
-    natural-sort [ second ] collect-by
+    sort [ second ] collect-by
     ! Change key from 'name' to { name path }
     [ [ [ third ] map-find drop 2array ] keep ] assoc-map
-    >alist natural-sort ;
+    >alist sort ;
 
 : filter-prefix ( seq prefix -- seq )
     [ drop-prefix nip empty? ] curry filter members ;
@@ -71,4 +71,4 @@ PRIVATE>
 : get-vocabs/prefix ( prefix -- seq ) all-disk-vocab-names swap filter-prefix ;
 
 : get-vocabs-words/prefix ( prefix names/f -- seq )
-    [ vocabs-words ] [ current-words ] if* natural-sort swap filter-prefix ;
+    [ vocabs-words ] [ current-words ] if* sort swap filter-prefix ;

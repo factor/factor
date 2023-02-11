@@ -1,5 +1,5 @@
 ! Copyright (C) 2010 John Benediktsson
-! See http://factorcode.org/license.txt for BSD license
+! See https://factorcode.org/license.txt for BSD license
 
 USING: alien.c-types alien.strings alien.syntax classes.struct
 core-foundation io.backend io.encodings.utf8 io.files.trash

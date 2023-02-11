@@ -1,5 +1,5 @@
 ! Copyright (C) 2010 Erik Charlebois.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors alien alien.c-types alien.data alien.strings
 alien.syntax arrays assocs classes.struct fry io.encodings.ascii
 io.mmap kernel locals math math.intervals sequences

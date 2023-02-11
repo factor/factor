@@ -1,6 +1,5 @@
 USING: accessors http http.client http.client.private
-io.encodings.string io.encodings.utf8 json.reader json.writer
-kernel strings ;
+io.encodings.string io.encodings.utf8 json kernel strings ;
 
 IN: json.http
 

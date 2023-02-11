@@ -1,5 +1,5 @@
 ! Copyright (C) 2004, 2008 Slava Pestov, Doug Coleman.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs combinators
 combinators.short-circuit continuations deques destructors
 dlists fry io io.backend io.encodings.binary io.files
@@ -244,6 +244,9 @@ M: object copy-file
         [ delete-directory ]
         bi
     ] [ delete-file ] if ;
+
+: ?delete-tree ( path -- )
+    dup file-exists? [ delete-tree ] [ drop ] if ;
 
 DEFER: copy-trees-into
 

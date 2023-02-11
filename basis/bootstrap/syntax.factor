@@ -1,5 +1,5 @@
 ! Copyright (C) 2007, 2008 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: words words.symbol sequences vocabs kernel
 compiler.units ;
 IN: bootstrap.syntax
@@ -44,7 +44,7 @@ IN: bootstrap.syntax
         "BUILTIN:"
         "SYMBOL:"
         "SYMBOLS:"
-        "INITIALIZE:"
+        "INITIALIZED-SYMBOL:"
         "CONSTANT:"
         "TUPLE:"
         "final"

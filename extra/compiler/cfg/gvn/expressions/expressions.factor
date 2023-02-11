@@ -1,5 +1,5 @@
 ! Copyright (C) 2008, 2010 Slava Pestov, 2011 Alex Vondrak.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: assocs accessors arrays classes.algebra
 combinators generic.parser kernel math namespaces
 quotations sequences slots words make sets

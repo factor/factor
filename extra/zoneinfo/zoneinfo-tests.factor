@@ -1,5 +1,5 @@
 ! Copyright (C) 2013 Doug Coleman.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors assocs calendar kernel math sequences sets
 tools.test zoneinfo ;
 
@@ -7,11 +7,11 @@ tools.test zoneinfo ;
 
 {
     T{ raw-zone
-       { name "EST" }
-       { gmt-offset "-5:00" }
-       { rules/save "-" }
-       { format "EST" }
-       { until { } }
+        { name "EST" }
+        { gmt-offset "-5:00" }
+        { rules/save "-" }
+        { format "EST" }
+        { until { } }
     }
 } [
     "EST" find-zone

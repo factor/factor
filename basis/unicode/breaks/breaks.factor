@@ -1,5 +1,5 @@
 ! Copyright (C) 2008 Daniel Ehrenberg.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors arrays combinators interval-maps kernel
 literals math namespaces sequences simple-flat-file
 unicode.categories unicode.data unicode.normalize.private words ;
@@ -16,12 +16,12 @@ IN: unicode.breaks
 >>
 
 CONSTANT: emoji-modifier-table $[
-    "resource:basis/unicode/UCD/emoji/emoji-data.txt"
+    "vocab:unicode/emoji-data.txt"
     1 "Emoji_Modifier" load-interval-file-for
 ]
 
 CONSTANT: extended-pictographic-table $[
-    "resource:basis/unicode/UCD/emoji/emoji-data.txt"
+    "vocab:unicode/emoji-data.txt"
     1 "Extended_Pictographic" load-interval-file-for
 ]
 
@@ -95,17 +95,17 @@ CATEGORY: spacing Mc ;
         { [ dup jamo? ] [ jamo-class ] }
         { [ dup hangul? ] [ hangul-class ] }
         { [ dup grapheme-control? ] [
-              control-class dup ZWJ = [
-                  drop
-                  str unclip-last-slice drop dup [
-                      [ extend? ]
-                      [ control-class Extend = ]
-                      [ modifier? ]
-                      tri or or not
-                  ] find-last drop [ swap ?nth ] [ last ] if*
-                  extended-pictographic-table interval-key? [
-                      (Extended_Pictographic-Extend*-)ZWJ
-                  ] [ ZWJ ] if
+            control-class dup ZWJ = [
+                drop
+                str unclip-last-slice drop dup [
+                    [ extend? ]
+                    [ control-class Extend = ]
+                    [ modifier? ]
+                    tri or or not
+                ] find-last drop [ swap ?nth ] [ last ] if*
+                extended-pictographic-table interval-key? [
+                    (Extended_Pictographic-Extend*-)ZWJ
+                ] [ ZWJ ] if
               ] when
           ] }
         { [ dup extend? ] [ drop Extend ] }
@@ -202,7 +202,7 @@ CONSTANT: unicode-words 19
 
 <<
 CONSTANT: word-break-table $[
-    "resource:basis/unicode/UCD/auxiliary/WordBreakProperty.txt"
+    "vocab:unicode/WordBreakProperty.txt"
     load-interval-file dup array>> [
         2 swap [
             {

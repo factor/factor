@@ -1,5 +1,5 @@
 ! Copyright (C) 2006, 2008 Daniel Ehrenberg.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors combinators io io.encodings
 io.encodings.private kernel math math.order sequences strings ;
 IN: io.encodings.utf8

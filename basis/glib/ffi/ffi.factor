@@ -1,5 +1,5 @@
 ! Copyright (C) 2010 Anton Gorenko.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors alien alien.destructors alien.libraries
 alien.strings alien.syntax combinators gobject-introspection
 gobject-introspection.standard-types io.encodings.utf8 kernel
@@ -9,7 +9,7 @@ IN: glib.ffi
 LIBRARY: glib
 
 << "glib" {
-    { [ os windows? ] [ "libglib-2.0-0.dll" ] }
+    { [ os windows? ] [ "glib-2.0-0.dll" ] }
     { [ os macosx? ] [ "libglib-2.0.dylib" ] }
     { [ os unix? ] [ "libglib-2.0.so" ] }
 } cond cdecl add-library >>

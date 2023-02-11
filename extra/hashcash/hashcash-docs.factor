@@ -1,5 +1,5 @@
 ! Copyright (C) 2022 Zoltán Kéri.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: hashcash.private help.markup help.syntax kernel math
 random.passwords strings ;
 IN: hashcash
@@ -41,8 +41,8 @@ $nl
 { $see-also ascii-password }
 { $heading "Further readings" }
 { $url "https://en.wikipedia.org/wiki/Hashcash" } $nl
-{ $url "http://www.hashcash.org/" } $nl
-{ $url "http://www.hashcash.org/papers/hashcash.pdf" } $nl
+{ $url "https://www.hashcash.org/" } $nl
+{ $url "https://www.hashcash.org/papers/hashcash.pdf" } $nl
 { $url "https://dbpedia.org/page/Hashcash" } $nl
 { $url "https://nakamoto.com/hashcash/" } ;
 

@@ -1,5 +1,5 @@
 ! Copyright (C) 2008 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors assocs combinators furnace.utilities
 html.components html.forms html.templates
 html.templates.chloe.compiler html.templates.chloe.syntax kernel
@@ -114,7 +114,7 @@ CHLOE: form
 
 : button-tag-markup ( -- xml )
     <XML
-        <t:form class="inline" xmlns:t="http://factorcode.org/chloe/1.0">
+        <t:form class="inline" xmlns:t="https://factorcode.org/chloe/1.0">
             <div style="display: inline;"><button type="submit"></button></div>
         </t:form>
     XML> body>> clone ;

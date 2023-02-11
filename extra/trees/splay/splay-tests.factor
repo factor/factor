@@ -1,5 +1,5 @@
 ! Copyright (c) 2005 Mackenzie Straight.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: assocs fry grouping kernel math random sequences sets
 tools.test trees.splay ;
 IN: trees.splay.tests

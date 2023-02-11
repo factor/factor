@@ -1,6 +1,6 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! Copyright (C) 2015 Doug Coleman.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: bootstrap.image checksums checksums.openssl io
 io.directories io.encodings.ascii io.encodings.utf8 io.files
 io.files.temp io.files.unique io.launcher io.pathnames kernel
@@ -52,6 +52,7 @@ SYMBOL: build-images-destination
 : upload-images ( -- )
     [
         \ scp-name get-global scp-name or ,
+        "-4" , ! force ipv4
         boot-image-names %
         checksums-path ,
         git-branch-destination [ print flush ] [ , ] bi
@@ -86,6 +87,7 @@ SYMBOL: build-images-destination
     [
         [
             \ scp-name get-global scp-name or ,
+            "-4" , ! force ipv4
             "." directory-files %
             build-destination ,
         ] { } make try-process
@@ -94,6 +96,7 @@ SYMBOL: build-images-destination
 : create-remote-upload-directory ( -- )
     '[
         "ssh" ,
+        "-4" , ! force ipv4
         "sheeple@downloads.factorcode.org" ,
         "mkdir -p downloads.factorcode.org/images/" factor-git-branch append ,
     ] { } make try-process ;

@@ -1,5 +1,5 @@
 ! Copyright (C) 2019-2020 KUSUMOTO Norio.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs classes classes.tuple combinators
 combinators.short-circuit compiler.units continuations
 formatting io kernel lexer lists math multiline namespaces
@@ -379,8 +379,8 @@ SYMBOL: *anonymouse-var-no*
         { [ dup __ = ] [ drop proxy-var-for-'__' ] }
         { [ dup sequence? ] [ [ replace-'__' ] map ] }
         { [ dup tuple? ] [
-              [ tuple-slots [ replace-'__' ] map ]
-              [ class-of slots>tuple ] bi ] }
+            [ tuple-slots [ replace-'__' ] map ]
+            [ class-of slots>tuple ] bi ] }
         [ ]
     } cond ;
 
@@ -570,7 +570,7 @@ PRIVATE>
             ] when
         ] loop
     ] with-return
-     bindings dup {
+    bindings dup {
         [ empty? ]
         [ first keys empty? ]
     } 1|| [ drop success? ] [ >array ] if ;
@@ -627,7 +627,7 @@ PRIVATE>
                         d-env env-clear
                         f
                     ] if
-               ] [ f ] if
+                ] [ f ] if
             ] each-until
         ] if
     ] if ;

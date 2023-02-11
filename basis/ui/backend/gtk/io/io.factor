@@ -1,5 +1,5 @@
 ! Copyright (C) 2011 Anton Gorenko.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors alien.c-types classes.struct continuations glib.ffi
 io.backend.unix.multiplexers io.thread kernel libc literals locals
 namespaces threads ;
@@ -13,9 +13,9 @@ IN: ui.backend.gtk.io
     revents>> 0 = not ;
 
 : dispatch ( source callback user-data -- ? )
-     3drop
-     0 mx get-global wait-for-events
-     yield t ;
+    3drop
+    0 mx get-global wait-for-events
+    yield t ;
 
 : <funcs> ( -- funcs )
     GSourceFuncs malloc-struct

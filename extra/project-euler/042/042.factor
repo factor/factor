@@ -1,10 +1,10 @@
 ! Copyright (c) 2008 Aaron Schaefer.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: ascii io.encodings.ascii io.files kernel make math math.functions
 project-euler.common sequences splitting ;
 IN: project-euler.042
 
-! http://projecteuler.net/index.php?section=problems&id=42
+! https://projecteuler.net/index.php?section=problems&id=42
 
 ! DESCRIPTION
 ! -----------

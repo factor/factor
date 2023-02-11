@@ -1,5 +1,5 @@
 ! Copyright (C) 2009, 2010 Phil Dawes, Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: classes.struct alien.c-types alien.syntax kernel.private ;
 IN: vm
 

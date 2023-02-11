@@ -1,5 +1,5 @@
 ! Copyright (C) 2020 Doug Coleman.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: cpu.arm.assembler cpu.arm.assembler.opcodes make math
 math.bitwise tools.test ;
 IN: cpu.arm.assembler.opcodes.tests
@@ -15,12 +15,10 @@ IN: cpu.arm.assembler.opcodes.tests
 
 { { 0xfd 0x03 0x00 0x91 } } [ [ 0 31 X29 MOVsp64-encode ] { } make ] unit-test
 
-! stp x29, x30, [sp,#-16]!
+! stp x29, x30, [sp, #-16]!
 { { 0xfd 0x7b 0xbf 0xa9 } } [ [ -16 8 / 7 bits X30 SP X29 STPpre64-encode ] { } make ] unit-test
-
 
 { { 0 0 0 0x10 } } [ [ 0 X0 ADR ] { } make ] unit-test
 { { 0 0 0 0x30 } } [ [ 1 X0 ADR ] { } make ] unit-test
 
-{ { 0 0 0 0x90 } } [ [ 0 X0 ADRP ] { } make ] unit-test
-{ { 0 0 0 0xb0 } } [ [ 1 X0 ADRP ] { } make ] unit-test
+{ { 0x90 0x20 0x00 0xb0 } } [ [ 0x411000 X16 ADRP ] { } make ] unit-test

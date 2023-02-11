@@ -1,5 +1,5 @@
 ! Copyright (C) 2008 Doug Coleman.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: help.markup help.syntax kernel strings ;
 IN: db.types
 
@@ -91,53 +91,53 @@ HELP: VARCHAR
 
 HELP: user-assigned-id-spec?
 { $values
-     { "specs" "a sequence of SQL specs" }
-     { "?" boolean } }
+    { "specs" "a sequence of SQL specs" }
+    { "?" boolean } }
 { $description "Tests if any of the SQL specs has the type " { $link +user-assigned-id+ } "." } ;
 
 HELP: bind#
 { $values
-     { "spec" "an SQL spec" } { "obj" object } }
+    { "spec" "an SQL spec" } { "obj" object } }
 { $description "A generic word that lets a database construct a literal binding." } ;
 
 HELP: bind%
 { $values
-     { "spec" "an SQL spec" } }
+    { "spec" "an SQL spec" } }
 { $description "A generic word that lets a database output a binding." } ;
 
 HELP: db-assigned-id-spec?
 { $values
-     { "specs" "a sequence of SQL specs" }
-     { "?" boolean } }
+    { "specs" "a sequence of SQL specs" }
+    { "?" boolean } }
 { $description "Tests if any of the SQL specs has the type " { $link +db-assigned-id+ } "." } ;
 
 HELP: find-primary-key
 { $values
-     { "specs" "a sequence of SQL specs" }
-     { "seq" "a sequence of SQL specs" } }
+    { "specs" "a sequence of SQL specs" }
+    { "seq" "a sequence of SQL specs" } }
 { $description "Returns the rows from the SQL specs array that are part of the primary key. Composite primary keys are supported, so this word must return a sequence." }
 { $notes "This is a low-level word." } ;
 
 HELP: no-sql-type
 { $values
-     { "type" "an SQL type" } }
+    { "type" "an SQL type" } }
 { $description "Throws an error containing an SQL type that is unsupported or the result of a typo." } ;
 
 HELP: normalize-spec
 { $values
-     { "spec" "an SQL spec" } }
+    { "spec" "an SQL spec" } }
 { $description "Normalizes an SQL spec." } ;
 
 HELP: primary-key?
 { $values
-     { "spec" "an SQL spec" }
-     { "?" boolean } }
+    { "spec" "an SQL spec" }
+    { "?" boolean } }
 { $description "Returns true if an SQL spec is a primary key." } ;
 
 HELP: relation?
 { $values
-     { "spec" "an SQL spec" }
-     { "?" boolean } }
+    { "spec" "an SQL spec" }
+    { "?" boolean } }
 { $description "Returns true if an SQL spec is a relation." } ;
 
 HELP: unknown-modifier

@@ -1,5 +1,5 @@
 ! Copyright (C) 2017 Doug Coleman.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs bootstrap.image calendar cli.git
 combinators combinators.short-circuit concurrency.combinators
 environment formatting http.client io io.directories
@@ -156,11 +156,11 @@ M: windows factor-path "./factor.com" ;
         +new-group+ >>group ;
 
 : zealot-test-commands ( path -- )
-     [
+    [
         32 <iota> [
             load-and-test-command
         ] map [ try-process ] parallel-each
-     ] with-directory ;
+    ] with-directory ;
 
 : zealot-test-commands-old ( path -- )
     [

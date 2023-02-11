@@ -1,6 +1,6 @@
 ! Copyright (C) 2010 Daniel Ehrenberg
 ! Copyright (C) 2005, 2011 John Benediktsson, Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors arrays growable.private hashtables.private
 kernel kernel.private math math.private sequences
 sequences.private sets sets.private slots.private vectors ;
@@ -99,7 +99,7 @@ PRIVATE>
     [ 0 0 ] dip <hash-array> hash-set boa ; inline
 
 M: hash-set in?
-     key@ 2nip ;
+    key@ 2nip ;
 
 M: hash-set clear-set
     [ init-hash ] [ array>> [ drop +empty+ ] map! drop ] bi ;

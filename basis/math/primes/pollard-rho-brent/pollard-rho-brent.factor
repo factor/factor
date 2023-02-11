@@ -1,5 +1,5 @@
 ! Copyright (C) 2021 Doug Coleman.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: arrays kernel make math math.order math.primes
 ranges random sorting ;
 IN: math.primes.pollard-rho-brent
@@ -70,4 +70,4 @@ DEFER: pollard-rho-brent-factors
         ] [
             [ (pollard-rho-brent-factors) ] { } make
         ] if
-    ] if natural-sort ;
+    ] if sort ;

@@ -1,5 +1,5 @@
 ! Copyright (C) 2008 Daniel Ehrenberg.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs combinators
 combinators.short-circuit combinators.smart fry kernel make
 math math.order math.parser namespaces sequences
@@ -30,7 +30,7 @@ TUPLE: weight-levels primary secondary tertiary ignorable? ;
 : parse-ducet ( file -- ducet )
     load-data-file [ [ parse-keys ] [ parse-weight ] bi* ] H{ } assoc-map-as ;
 
-"vocab:unicode/UCA/allkeys.txt" parse-ducet ducet set-global
+"vocab:unicode/allkeys.txt" parse-ducet ducet set-global
 
 ! https://www.unicode.org/reports/tr10/tr10-41.html#Well_Formed_DUCET
 ! WF5 - Well-formedness 5 condition:

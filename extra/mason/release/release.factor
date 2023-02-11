@@ -1,5 +1,5 @@
 ! Copyright (C) 2008, 2009 Eduardo Cavazos, Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: combinators mason.notify mason.release.archive
 mason.release.branch mason.release.dlls mason.release.sign
 mason.release.tidy mason.release.upload ;

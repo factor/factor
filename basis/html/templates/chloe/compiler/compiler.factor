@@ -1,5 +1,5 @@
 ! Copyright (C) 2008 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors ascii assocs combinators html.forms
 html.templates html.templates.chloe.syntax io io.streams.string
 kernel make namespaces present sequences splitting strings

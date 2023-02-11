@@ -1,5 +1,5 @@
 ! Copyright (C) 2008 Chris Double.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 
 USING: accessors kernel math peg peg.ebnf peg.ebnf.private
 peg.javascript peg.javascript.private sequences tools.test ;

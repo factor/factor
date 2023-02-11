@@ -1,7 +1,6 @@
 input, textarea, select {
     font-size: 12pt;
     border: 1px solid #d5d5d5;
-    border-radius: 5px;
     padding: 5px;
 }
 
@@ -130,10 +129,8 @@ nav img {
 }
 
 nav input {
-    border-radius: 3px;
-    padding: 3px;
-    margin-top: 0px;
-    margin-bottom: 0px;
+    margin: 0px;
+    margin-top: -2px;
 }
 
 .page nav {
@@ -188,10 +185,6 @@ nav input {
 @media (prefers-color-scheme: dark) {
     nav img {
         filter: invert(80%);
-    }
-
-    nav input {
-        font-size: smaller;
     }
 
     #left {

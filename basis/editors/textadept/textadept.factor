@@ -16,8 +16,6 @@ IN: editors.textadept
 
 SINGLETON: textadept
 
-editor-class [ textadept ] initialize
-
 HOOK: find-textadept-path os ( -- path )
 
 M: object find-textadept-path f ;

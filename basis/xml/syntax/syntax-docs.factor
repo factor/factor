@@ -1,5 +1,5 @@
 ! Copyright (C) 2005, 2009 Daniel Ehrenberg
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: help.markup help.syntax xml.data present ;
 IN: xml.syntax
 
@@ -77,7 +77,7 @@ $nl
 [let
     3 :> number
     f :> false
-    URL\" http://factorcode.org/\" :> url
+    URL\" https://factorcode.org/\" :> url
     \"hello\" :> string
     \\ drop :> word
     <XML
@@ -91,7 +91,7 @@ $nl
 ]"
 
 "<?xml version=\"1.0\" encoding=\"UTF-8\"?>
-<x number=\"3\" url=\"http://factorcode.org/\" string=\"hello\" word=\"drop\"/>" }
+<x number=\"3\" url=\"https://factorcode.org/\" string=\"hello\" word=\"drop\"/>" }
 "XML interpolation can also be used, in conjunction with " { $vocab-link "inverse" } " in pattern matching. For example:"
 { $example "USING: xml.syntax inverse ;
 : dispatch ( xml -- string )
@@ -105,5 +105,5 @@ $nl
 "apple" } ;
 
 HELP: XML-NS:
-{ $syntax "XML-NS: name http://url" }
+{ $syntax "XML-NS: name https://url" }
 { $description "Defines a new word of the given name which constructs XML names in the namespace of the given URL. The names constructed are memoized." } ;

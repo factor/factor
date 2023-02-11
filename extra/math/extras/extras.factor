@@ -1,5 +1,5 @@
 ! Copyright (C) 2012 John Benediktsson
-! See http://factorcode.org/license.txt for BSD license
+! See https://factorcode.org/license.txt for BSD license
 
 USING: accessors arrays assocs byte-arrays combinators
 combinators.short-circuit compression.zlib grouping kernel math
@@ -41,6 +41,10 @@ PRIVATE>
 
 MEMO: bernoulli ( p -- n )
     [ 1 ] [ (bernoulli) ] if-zero ;
+
+! From page 4 https://arxiv.org/ftp/arxiv/papers/2201/2201.12601.pdf
+: bernoulli-estimate-factorial ( n -- n! )
+    [ 2pi swap ^ ] [ bernoulli ] bi * 2 / ;
 
 : chi2 ( actual expected -- n )
     0 [ dup 0 > [ [ - sq ] keep / + ] [ 2drop ] if ] 2reduce ;
@@ -166,7 +170,7 @@ PRIVATE>
 <PRIVATE
 
 :: (gini) ( seq -- x )
-    seq natural-sort :> sorted
+    seq sort :> sorted
     seq length :> len
     sorted 0 [ + ] cum-reduce :> ( a b )
     b len a * / :> c
@@ -195,7 +199,7 @@ PRIVATE>
     dup sum '[ _ / dup ^ ] map-product ;
 
 : weighted-random ( histogram -- obj )
-    unzip cum-sum [ last random ] [ bisect-left ] bi swap nth ;
+    unzip cum-sum [ last >float random ] [ bisect-left ] bi swap nth ;
 
 : unique-indices ( seq -- unique indices )
     [ members ] keep over dup length <iota>

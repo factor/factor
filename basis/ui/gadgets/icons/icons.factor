@@ -1,5 +1,5 @@
 ! Copyright (C) 2009 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors kernel ui.gadgets ui.gadgets.labels ui.images
 ui.pens ui.pens.image ui.render ;
 IN: ui.gadgets.icons

@@ -1,5 +1,5 @@
 ! Copyright (C) 2005, 2009 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs combinators compiler.units
 definitions.icons effects english hashtables help.stylesheet
 help.topics io io.styles kernel make math namespaces present
@@ -96,7 +96,7 @@ M: f print-element drop ;
     [
         last-element off
         [ ($code-style) ] dip with-nesting
-    ] ($block) ; inline
+    ] ($block) ($blank-line) ; inline
 
 : $code ( element -- )
     join-lines dup <input> [ write ] ($code) ;
@@ -376,7 +376,7 @@ M: f ($instance) ($link) ;
     print-element $snippet ;
 
 : ($instances) ( element -- )
-     dup word? [ ($link) "s" print-element ] [ print-element ] if ;
+    dup word? [ ($link) "s" print-element ] [ print-element ] if ;
 
 : $sequence ( element -- )
     { "a " { $link sequence } " of " } print-element

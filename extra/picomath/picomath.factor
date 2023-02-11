@@ -1,5 +1,5 @@
 ! Copyright (C) 2011 John Benediktsson
-! See http://factorcode.org/license.txt for BSD license
+! See https://factorcode.org/license.txt for BSD license
 
 USING: combinators kernel locals math math.constants
 math.functions sequences ;
@@ -18,7 +18,7 @@ CONSTANT: p   0.3275911
 PRIVATE>
 
 ! Standalone error function erf(x)
-! http://www.johndcook.com/blog/2009/01/19/stand-alone-error-function-erf/
+! https://www.johndcook.com/blog/2009/01/19/stand-alone-error-function-erf/
 :: erf ( x -- value )
     x 0 >= 1 -1 ? :> sign
     x abs :> x!

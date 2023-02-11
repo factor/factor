@@ -1,5 +1,5 @@
 ! Copyright (C) 2010 Jon Harper.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: tools.test images.viewer images.viewer.private kernel accessors sequences images
 namespaces ui ui.gadgets.debug math opengl.textures opengl.textures.private
 models ;
@@ -14,15 +14,15 @@ IN: images.viewer.tests
 { } [ { 50 50 } gen-image "s" set ] unit-test
 { } [ "s" get <image-gadget> "ig" set ] unit-test
 "ig" get [
-   [ t ] [ "ig" get image-gadget-texture single-texture? ] unit-test
+    [ t ] [ "ig" get image-gadget-texture single-texture? ] unit-test
 ] with-grafted-gadget
 
 { } [ "s" get <model> "m" set ] unit-test
 { } [ { 150 150 } gen-image "s1" set ] unit-test
 { } [ "m" get <image-control> "ic" set ] unit-test
 "ic" get [
-   [ t ] [ "ic" get image-gadget-texture single-texture? ] unit-test
-   [ { 50 50 } ] [ "ic" get texture>> texture-size ] unit-test
+    [ t ] [ "ic" get image-gadget-texture single-texture? ] unit-test
+    [ { 50 50 } ] [ "ic" get texture>> texture-size ] unit-test
 ] with-grafted-gadget
 
 ! TODO

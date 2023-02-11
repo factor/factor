@@ -1,5 +1,5 @@
 ! Copyright (C) 2022 Doug Coleman.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors arrays ascii assocs assocs.extras base91 colors
 combinators hashtables io io.encodings.binary
 io.encodings.string io.encodings.utf8 io.files io.styles kernel
@@ -46,11 +46,11 @@ TUPLE: wordlet-game secret-word chances guesses ;
 
 : reamining-chars ( game -- chars )
     [ secret-word>> ] [ guesses>> ] bi [
-       guess>chars
+        guess>chars
     ] with map concat members
     [ background of ] assoc-map
     [ drop ] collect-value-by
-    [ [ color>n ] zip-with sort-values reverse first first ] assoc-map
+    [ [ color>n ] zip-with sort-values <reversed> first first ] assoc-map
     CHAR: a CHAR: z [a..b] [ 1string COLOR: white ] { } map>assoc [ or ] assoc-merge ;
 
 : print-remaining-chars ( game -- )

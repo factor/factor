@@ -1,5 +1,5 @@
 ! Copyright (C) 2007, 2008 Slava Pestov, Eduardo Cavazos.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors combinators kernel locals locals.types math
 prettyprint.backend prettyprint.custom prettyprint.sections
 sequences words ;

@@ -1,5 +1,5 @@
 ! Copyright (C) 2009 Doug Coleman.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors assocs c.lexer combinators
 combinators.short-circuit io io.directories io.encodings.utf8
 io.files io.pathnames io.streams.string kernel make math
@@ -158,7 +158,7 @@ ERROR: header-file-missing path ;
             drop f >>processing-disabled?
             [ 1 - ] change-ifdef-nesting
             drop
-         ] [ 2drop ] if
+        ] [ 2drop ] if
     ] [
         parse-directive
     ] if ;

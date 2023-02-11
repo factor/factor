@@ -1,5 +1,5 @@
 ! Copyright (C) 2007, 2009 Slava Pestov, Daniel Ehrenberg.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors arrays combinators combinators.short-circuit
 io.directories io.files io.files.info io.pathnames kernel
 make peg.ebnf regexp regexp.combinators sequences strings system

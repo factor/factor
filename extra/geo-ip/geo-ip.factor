@@ -1,5 +1,5 @@
 ! Copyright (C) 2008 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs combinators combinators.smart csv
 grouping http.client interval-maps io.encodings.ascii io.files
 io.files.temp io.launcher io.pathnames ip-parser kernel math
@@ -8,7 +8,7 @@ IN: geo-ip
 
 : db-path ( -- path ) "IpToCountry.csv" cache-file ;
 
-CONSTANT: db-url "http://software77.net/geo-ip/?DL=1"
+CONSTANT: db-url "https://software77.net/geo-ip/?DL=1"
 
 : download-db ( -- path )
     db-path dup file-exists? [

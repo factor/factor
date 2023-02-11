@@ -1,5 +1,5 @@
 ! Copyright (C) 2014 Benjamin Pollack
-! See http://factorcode.org/license.txt for BSD license
+! See https://factorcode.org/license.txt for BSD license
 
 USING: continuations kernel redis math math.parser sequences
 sorting tools.test ;
@@ -30,7 +30,7 @@ IN: redis.tests
 { { "aa" "ab" "ac" } } [
     [
         { "aa" "ab" "ac" "bd" } [ "hello" swap redis-set ] each
-        "a*" redis-keys natural-sort
+        "a*" redis-keys sort
     ] with-redis-test
 ] unit-test
 

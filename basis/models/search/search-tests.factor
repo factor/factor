@@ -1,5 +1,5 @@
 ! Copyright (C) 2022 Doug Coleman.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: models models.search namespaces tools.test
 ui.gadgets.panes ui.gadgets.worlds ui.tools.button-list ;
 IN: models.search.tests

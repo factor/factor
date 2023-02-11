@@ -1,5 +1,5 @@
 ! Copyright (C) 2009 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors assocs cache combinators images images.loader
 kernel math namespaces opengl opengl.textures sequences
 splitting system ui.gadgets.worlds vocabs ;

@@ -1,10 +1,11 @@
 ! Copyright (C) 2012 John Benediktsson
-! See http://factorcode.org/license.txt for BSD license
+! See https://factorcode.org/license.txt for BSD license
 
-USING: accessors arrays assocs destructors environment
-formatting io io.streams.escape-codes io.streams.string
-io.styles kernel math math.functions math.vectors namespaces
-ranges sequences strings strings.tables ;
+USING: accessors arrays assocs combinators destructors
+environment formatting io io.streams.escape-codes
+io.streams.string io.styles kernel math math.functions
+math.order namespaces ranges sequences sorting strings
+strings.tables ;
 
 IN: io.streams.256color
 
@@ -12,28 +13,7 @@ IN: io.streams.256color
 
 CONSTANT: intensities { 0x00 0x5F 0x87 0xAF 0xD7 0xFF }
 
-CONSTANT: 256colors H{
-
-    ! System colors (8 colors)
-    { {   0   0   0 } 0 }
-    { { 128   0   0 } 1 }
-    { {   0 128   0 } 2 }
-    { { 128 128   0 } 3 }
-    { {   0   0 128 } 4 }
-    { { 128   0 128 } 5 }
-    { {   0 128 128 } 6 }
-    { { 192 192 192 } 7 }
-
-    ! "Bright" version of 8 colors
-    { { 128 128 128 } 8 }
-    { { 255   0   0 } 9 }
-    { {   0 255   0 } 10 }
-    { { 255 255   0 } 11 }
-    { {   0   0 255 } 12 }
-    { { 255   0 255 } 13 }
-    { {   0 255 255 } 14 }
-    { { 255 255 255 } 15 }
-}
+CONSTANT: 256colors H{ }
 
 ! Add the RGB colors
 intensities [| r i |
@@ -52,18 +32,40 @@ intensities [| r i |
     256colors set-at
 ] each-index
 
-: color>rgb ( color -- rgb )
+: 256colors. ( -- )
+    256colors sort-values [
+        dup dup "\e[1;38;5;%sm%3s:\e[0m " printf
+        dup rot first3 "\e[38;5;%sm#%02x%02x%02x\e[0m " printf
+        6 mod 3 = [ nl ] when
+    ] assoc-each ;
+
+: color>rgb ( color -- r g b )
     [ red>> ] [ green>> ] [ blue>> ] tri
-    [ 255 * round >integer ] tri@ 3array ;
+    [ 255 * round >integer ] tri@ ;
+
+: gray? ( r g b -- ? )
+    [ max max ] [ min min ] 3bi - 8 < ;
+
+:: rgb>gray ( r g b -- color )
+    {
+        { [ r 0 4 between? ] [ 16 ] }
+        { [ r 5 8 between? ] [ 232 ] }
+        { [ r 238 246 between? ] [ 255 ] }
+        { [ r 247 255 between? ] [ 231 ] }
+        [ r 8 - 10 /i 232 + ]
+    } cond ;
+
+: rgb>256color ( r g b -- color )
+    [ 55 - 40 /f 0 max round ] tri@
+    [ 36 * ] [ 6 * + ] [ + ] tri* 16 + >integer ;
 
 : color>256color ( color -- 256color )
-    color>rgb '[ _ distance ]
-    256colors [ keys swap infimum-by ] [ at ] bi ;
+    color>rgb 3dup gray? [ rgb>gray ] [ rgb>256color ] if ;
 
-MEMO: color>foreground ( color -- string )
+: color>foreground ( color -- string )
     color>256color "\e[38;5;%sm" sprintf ;
 
-MEMO: color>background ( color -- string )
+: color>background ( color -- string )
     color>256color "\e[48;5;%sm" sprintf ;
 
 TUPLE: 256color < filter-writer ;
@@ -73,10 +75,10 @@ C: <256color> 256color
 M:: 256color stream-format ( str style stream -- )
     stream stream>> :> out
     style foreground of [ color>foreground out stream-write t ] [ f ] if*
-    style background of [ color>background out stream-write t ] [ f ] if*
-    style font-style of [ font-styles out stream-write t ] [ f ] if*
-    or or [ "\e[0m" out stream-write ] unless
-    str out stream-write ;
+    style background of [ color>background out stream-write drop t ] when*
+    style font-style of [ font-styles out stream-write drop t ] when*
+    str out stream-write
+    [ "\e[0m" out stream-write ] when ;
 
 M: 256color make-span-stream
     swap <style-stream> <ignore-close-stream> ;
@@ -94,7 +96,7 @@ M: 256color stream-write-table
     ] with-output-stream* ;
 
 M: 256color make-cell-stream
-     2drop <string-writer> <256color> ;
+    2drop <string-writer> <256color> ;
 
 M: 256color dispose drop ;
 

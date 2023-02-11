@@ -1,5 +1,5 @@
 ! Copyright (C) 2007, 2008 Phil Dawes, 2013 John Benediktsson
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: combinators io io.files io.streams.string kernel make
 math namespaces sequences sequences.private unicode ;
 IN: csv
@@ -24,7 +24,7 @@ DEFER: quoted-field,
             { CHAR: \r   [ ] } ! Error: lf inside string?
             [ [ , drop f maybe-escaped-quote ] when* ]
         } case
-     ] if ; inline recursive
+    ] if ; inline recursive
 
 : quoted-field, ( delimiter stream -- delimiter stream sep/f )
     "\"" over stream-read-until drop % t maybe-escaped-quote ;

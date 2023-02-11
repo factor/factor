@@ -1,5 +1,5 @@
 ! Copyright (C) 2007 Chris Double. All Rights Reserved.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 !
 ! Remote Channels
 USING: accessors assocs channels concurrency.distributed
@@ -14,7 +14,7 @@ IN: channels.remote
 PRIVATE>
 
 : publish ( channel -- id )
-    256 random-bits dup [ remote-channels set-at ] dip ;
+    128 random-bits dup [ remote-channels set-at ] dip ;
 
 : get-channel ( id -- channel )
     remote-channels at ;

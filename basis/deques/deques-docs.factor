@@ -16,13 +16,13 @@ HELP: deque-empty?
 
 HELP: clear-deque
 { $values
-     { "deque" deque } }
+    { "deque" deque } }
 { $description "Removes all elements from a deque." } ;
 
 HELP: deque-member?
 { $values
-     { "value" object } { "deque" deque }
-     { "?" boolean } }
+    { "value" object } { "deque" deque }
+    { "?" boolean } }
 { $description "Returns true if the " { $snippet "value" } " is found in the deque." } ;
 
 HELP: push-front
@@ -54,12 +54,12 @@ HELP: push-back*
 
 HELP: push-all-back
 { $values
-     { "seq" sequence } { "deque" deque } }
+    { "seq" sequence } { "deque" deque } }
 { $description "Pushes a sequence of elements onto the back of a deque." } ;
 
 HELP: push-all-front
 { $values
-     { "seq" sequence } { "deque" deque } }
+    { "seq" sequence } { "deque" deque } }
 { $description "Pushes a sequence of elements onto the front of a deque." } ;
 
 HELP: peek-front*
@@ -110,7 +110,7 @@ HELP: pop-back*
 
 HELP: delete-node
 { $values
-     { "node" object } { "deque" deque } }
+    { "node" object } { "deque" deque } }
 { $contract "Deletes the node from the deque." } ;
 
 HELP: deque
@@ -118,13 +118,13 @@ HELP: deque
 
 HELP: node-value
 { $values
-     { "node" object }
-     { "value" object } }
+    { "node" object }
+    { "value" object } }
 { $description "Accesses the value stored at a node." } ;
 
 HELP: slurp-deque
 { $values
-     { "deque" deque } { "quot" { $quotation ( ... obj -- ... ) } } }
+    { "deque" deque } { "quot" { $quotation ( ... obj -- ... ) } } }
 { $description "Pops off the back element of the deque and calls the quotation in a loop until the deque is empty." }
 { $examples
   { $example

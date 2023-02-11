@@ -1,5 +1,5 @@
 ! Copyright (C) 2010 Joe Groff.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: arrays globs sorting tools.test vocabs.metadata.resources ;
 IN: vocabs.metadata.resources.tests
 
@@ -21,10 +21,10 @@ IN: vocabs.metadata.resources.tests
 
 ! vocab-resource-files
 { { "bar" "bas" "foo" } }
-[ "vocabs.metadata.resources.test.1" vocab-resource-files natural-sort ] unit-test
+[ "vocabs.metadata.resources.test.1" vocab-resource-files sort ] unit-test
 
 { { "bar.wtf" "foo.wtf" } }
-[ "vocabs.metadata.resources.test.2" vocab-resource-files natural-sort ] unit-test
+[ "vocabs.metadata.resources.test.2" vocab-resource-files sort ] unit-test
 
 {
     {
@@ -36,5 +36,5 @@ IN: vocabs.metadata.resources.tests
         "resource-dir/foo"
     }
 } [
-    "vocabs.metadata.resources.test.3" vocab-resource-files natural-sort
+    "vocabs.metadata.resources.test.3" vocab-resource-files sort
 ] unit-test

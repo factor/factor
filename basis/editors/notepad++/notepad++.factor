@@ -4,8 +4,6 @@ IN: editors.notepad++
 
 SINGLETON: notepad++
 
-editor-class [ notepad++ ] initialize
-
 : notepad++-path ( -- path )
     \ notepad++-path get [
         { "notepad++" } "notepad++.exe" find-in-applications

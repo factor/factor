@@ -1,5 +1,5 @@
 ! Copyright (C) 2005, 2009 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors assocs colors combinators combinators.short-circuit
 combinators.smart fry kernel locals math.vectors memoize models
 namespaces sequences ui.commands ui.gadgets ui.gadgets.borders

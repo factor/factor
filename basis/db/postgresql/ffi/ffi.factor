@@ -1,5 +1,5 @@
 ! Copyright (C) 2007, 2008 Doug Coleman.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 ! tested on debian linux with postgresql 8.1
 USING: alien alien.c-types alien.libraries alien.syntax
 combinators system ;
@@ -242,12 +242,12 @@ FUNCTION: int    PQflush ( PGconn* conn )
 ! * use
 !
 FUNCTION: PGresult* PQfn ( PGconn* conn,
-     int fnid,
-     int* result_buf,
-     int* result_len,
-     int result_is_int,
-     PQArgBlock* args,
-     int nargs )
+    int fnid,
+    int* result_buf,
+    int* result_len,
+    int result_is_int,
+    PQArgBlock* args,
+    int nargs )
 
 ! Accessor functions for PGresult objects
 FUNCTION: ExecStatusType PQresultStatus ( PGresult* res )

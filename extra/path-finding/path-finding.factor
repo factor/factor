@@ -1,9 +1,9 @@
 ! Copyright (C) 2010 Samuel Tardieu.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors assocs heaps kernel math sequences sets ;
 IN: path-finding
 
-! This implements the A* algorithm. See http://en.wikipedia.org/wiki/A*
+! This implements the A* algorithm. See https://en.wikipedia.org/wiki/A*
 
 TUPLE: astar g in-closed-set ;
 GENERIC: cost ( from to astar -- n )

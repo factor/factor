@@ -4,8 +4,6 @@ IN: editors.textpad
 
 SINGLETON: textpad
 
-editor-class [ textpad ] initialize
-
 : textpad-path ( -- path )
     \ textpad-path get-global [
         { "TextPad 5" } "textpad.exe" find-in-applications

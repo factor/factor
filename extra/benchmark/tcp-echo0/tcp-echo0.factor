@@ -1,5 +1,5 @@
 ! Copyright (C) 2011 Doug Coleman.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors byte-arrays io io.encodings.binary io.servers
 io.sockets kernel math memoize namespaces sequences fry literals
 locals formatting ;

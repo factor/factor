@@ -1,5 +1,5 @@
 ! Copyright (C) 2008 Doug Coleman.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors alien.c-types alien.data alien.strings arrays ascii
 calendar.format calendar.parser combinators db db.postgresql.ffi
 db.types destructors io.encodings.utf8 kernel libc math math.parser

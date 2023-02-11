@@ -1,5 +1,5 @@
 ! Copyright (C) 2010, 2011 Joe Groff, Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors alien.syntax assocs cocoa cocoa.classes
 cocoa.enumeration cocoa.plists.private core-foundation
 core-foundation.data core-foundation.dictionaries
@@ -33,7 +33,7 @@ os macosx? [
         { "png" "tif" "tiff" "gif" "jpg" "jpeg" "bmp" "ico" "webp" }
     ] [
         supported-ns-image-extensions
-     ] if [ ns-image register-image-class ] each
+    ] if [ ns-image register-image-class ] each
 ] when
 
 : <CGImage> ( byte-array -- image-rep )

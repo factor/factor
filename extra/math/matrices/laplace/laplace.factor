@@ -1,5 +1,5 @@
 ! Copyright (C) 2013 Doug Coleman.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors classes kernel math math.matrices math.vectors
 sequences sequences.private ;
 IN: math.matrices.laplace

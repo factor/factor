@@ -1,5 +1,5 @@
 ! Copyright (C) 2010 Chris Double.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: assocs help.markup help.syntax kernel math sequences strings ;
 IN: bitcoin.client
 
@@ -113,9 +113,9 @@ HELP: set-generate
 }
 { $description
     "If 'gen' is true, the server starts generating bitcoins. If 'gen' is "
-     "'false' then the server stops generating bitcoins. 'n' is the number "
-     "of CPU's to use while generating. A value of '-1' means use all the "
-     "CPU's available."
+    "'false' then the server stops generating bitcoins. 'n' is the number "
+    "of CPU's to use while generating. A value of '-1' means use all the "
+    "CPU's available."
 } ;
 
 HELP: get-info

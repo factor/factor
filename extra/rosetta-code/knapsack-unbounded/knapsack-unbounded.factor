@@ -1,10 +1,10 @@
 ! Copyright (c) 2012 Anonymous
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors combinators kernel math math.order
 math.vectors sequences sequences.product combinators.short-circuit ;
 IN: rosetta-code.knapsack-unbounded
 
-! http://rosettacode.org/wiki/Knapsack_problem/Unbounded
+! https://rosettacode.org/wiki/Knapsack_problem/Unbounded
 
 ! A traveller gets diverted and has to make an unscheduled stop
 ! in what turns out to be Shangri La. Opting to leave, he is

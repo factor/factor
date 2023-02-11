@@ -1,5 +1,5 @@
 ! Copyright (C) 2018 Björn Lindqvist
-! See http://factorcode.org/license.txt for BSD license
+! See https://factorcode.org/license.txt for BSD license
 USING: formatting kernel machine-learning.data-sets
 machine-learning.decision-trees sequences tools.test ;
 IN: machine-learning.decision-trees.tests

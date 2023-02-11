@@ -1,5 +1,5 @@
 ! Copyright (C) 2009 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors compiler.cfg compiler.cfg.instructions
 compiler.cfg.rpo compiler.cfg.stacks.global
 compiler.cfg.stacks.local compiler.cfg.utilities kernel make

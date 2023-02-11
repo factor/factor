@@ -1,5 +1,5 @@
 ! Copyright (C) 2014 John Benediktsson
-! See http://factorcode.org/license.txt for BSD license
+! See https://factorcode.org/license.txt for BSD license
 
 USING: accessors arrays assocs destructors formatting io
 io.streams.escape-codes io.streams.string io.styles kernel math
@@ -54,10 +54,10 @@ C: <ansi> ansi
 M:: ansi stream-format ( str style stream -- )
     stream stream>> :> out
     style foreground of [ color>foreground out stream-write t ] [ f ] if*
-    style background of [ color>background out stream-write t ] [ f ] if*
-    style font-style of [ font-styles out stream-write t ] [ f ] if*
-    or or [ "\e[0m" out stream-write ] unless
-    str out stream-write ;
+    style background of [ color>background out stream-write drop t ] when*
+    style font-style of [ font-styles out stream-write drop t ] when*
+    str out stream-write
+    [ "\e[0m" out stream-write ] when ;
 
 M: ansi make-span-stream
     swap <style-stream> <ignore-close-stream> ;
@@ -75,7 +75,7 @@ M: ansi stream-write-table
     ] with-output-stream* ;
 
 M: ansi make-cell-stream
-     2drop <string-writer> <ansi> ;
+    2drop <string-writer> <ansi> ;
 
 M: ansi dispose drop ;
 

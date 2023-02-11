@@ -1,19 +1,18 @@
 ! Copyright (C) 2008 Doug Coleman.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: assocs help.markup help.syntax io.streams.string
 libc sequences strings ;
 IN: environment
 
 HELP: (os-envs)
 { $values
-
-     { "seq" sequence } }
+    { "seq" sequence } }
 { $description "Returns a sequence of key/value pairs from the operating system." }
 { $notes "In most cases, use " { $link os-envs } " instead." } ;
 
 HELP: (set-os-envs)
 { $values
-     { "seq" sequence } }
+    { "seq" sequence } }
 { $description "Low-level word for replacing the current set of environment variables." }
 { $notes "In most cases, use " { $link set-os-envs } " instead." } ;
 

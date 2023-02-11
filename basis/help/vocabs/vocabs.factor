@@ -1,5 +1,5 @@
 ! Copyright (C) 2007, 2010 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs classes classes.builtin
 classes.intersection classes.mixin classes.predicate
 classes.singleton classes.tuple classes.union combinators
@@ -67,11 +67,9 @@ C: <vocab-author> vocab-author
     $vocab-roots ;
 
 : files. ( seq -- )
-    snippet-style get [
-        code-style get [
-            [ nl ] [ [ string>> ] keep write-object ] interleave
-        ] with-nesting
-    ] with-style ;
+    code-style get [
+        [ nl ] [ [ string>> ] keep write-object ] interleave
+    ] with-nesting ;
 
 : describe-files ( vocab -- )
     vocab-files [ <pathname> ] map [
@@ -208,7 +206,7 @@ C: <vocab-author> vocab-author
     [
         "Words" $heading
 
-        natural-sort
+        sort
         [ [ class? ] filter describe-classes ]
         [
             [ [ class? ] [ symbol? ] bi and ] reject
@@ -268,7 +266,7 @@ C: <vocab-author> vocab-author
 : keyed-vocabs ( str quot -- seq )
     [ all-disk-vocabs-recursive ] 2dip '[
         [ _ swap @ member? ] filter no-prefixes
-        [ name>> ] sort-with
+        [ name>> ] sort-by
     ] assoc-map ; inline
 
 : tagged ( tag -- assoc )

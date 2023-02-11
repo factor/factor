@@ -4,8 +4,6 @@ IN: editors.editplus
 
 SINGLETON: editplus
 
-editor-class [ editplus ] initialize
-
 : editplus-path ( -- path )
     \ editplus-path get [
         { "EditPlus 2" } "editplus.exe" find-in-applications

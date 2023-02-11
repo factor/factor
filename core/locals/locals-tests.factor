@@ -95,7 +95,7 @@ write-test-2 "q" set
 
 :: write-test-4 ( x! -- q ) [ [let 0 :> y! f x! ] ] ;
 
-{ } [ 5 write-test-4 drop ] unit-test
+[ 5 write-test-4 ] must-not-fail
 
 :: let-let-test ( n -- n ) [let n 3 + :> n n ] ;
 
@@ -492,7 +492,7 @@ M: string ed's-bug reverse ;
 M: integer ed's-bug neg ;
 
 :: ed's-test-case ( a -- b )
-   { [ a ed's-bug ] } && ;
+    { [ a ed's-bug ] } && ;
 
 { t } [ \ ed's-test-case word-optimized? ] unit-test
 

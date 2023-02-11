@@ -1,9 +1,9 @@
 ! Copyright (c) 2008 Eric Mertens.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: kernel sequences math math.functions ranges project-euler.common ;
 IN: project-euler.190
 
-! http://projecteuler.net/index.php?section=problems&id=190
+! https://projecteuler.net/index.php?section=problems&id=190
 
 ! DESCRIPTION
 ! -----------

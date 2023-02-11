@@ -1,5 +1,5 @@
 ! Copyright (C) 2018 Björn Lindqvist
-! See http://factorcode.org/license.txt for BSD license
+! See https://factorcode.org/license.txt for BSD license
 USING: accessors assocs grouping.extras kernel math
 math.functions math.statistics sequences sequences.extras
 sorting ;
@@ -10,7 +10,7 @@ IN: machine-learning.decision-trees
     normalized-histogram values entropy 2 log / ;
 
 : group-by-sorted ( seq quot: ( elt -- key ) -- groups )
-    [ sort-with ] keep group-by ; inline
+    [ sort-by ] keep group-by ; inline
 
 : subsets-weighted-entropy ( data-target idx -- seq )
     ! Group the data according to the given index.

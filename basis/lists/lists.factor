@@ -1,5 +1,5 @@
 ! Copyright (C) 2008 James Cash, Daniel Ehrenberg, Chris Double.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors combinators combinators.short-circuit kernel
 lexer make math namespaces parser sequences words ;
 IN: lists

@@ -1,12 +1,12 @@
 ! Copyright (C) 2008 Doug Coleman, Slava Pestov, Aaron Schaefer.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: combinators.short-circuit kernel math math.constants
 math.functions math.vectors sequences ;
 IN: math.analysis
 
 <PRIVATE
 
-! http://www.rskey.org/gamma.htm  "Lanczos Approximation"
+! https://www.rskey.org/gamma.htm  "Lanczos Approximation"
 ! n=6: error ~ 3 x 10^-11
 
 CONSTANT: gamma-g6 5.15
@@ -109,7 +109,7 @@ PRIVATE>
     ] if ;
 
 ! James Stirling's approximation for N!:
-! http://www.csse.monash.edu.au/~lloyd/tildeAlgDS/Numerical/Stirling/
+! https://www.csse.monash.edu.au/~lloyd/tildeAlgDS/Numerical/Stirling/
 
 : stirling-fact ( n -- fact )
     [ pi 2 * * sqrt ]

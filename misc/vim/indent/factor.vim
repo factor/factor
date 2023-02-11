@@ -1,7 +1,7 @@
 " Vim indent file
 " Language:	Factor
 " Maintainer:	Giftpflanze <gifti@tools.wmflabs.org>
-" Last Change:	2022 August 23
+" Last Change:	2023-01-09
 
 if exists("b:did_indent")
 	finish
@@ -20,14 +20,14 @@ function! GetFactorIndent(lnum)
 	let cline = getline(a:lnum)
 	let pline = getline(a:lnum-1)
 	let pind = indent(a:lnum-1)
-	if pline =~ '^:'
+	if pline =~ '^[^ ]*:' || pline =~ '[{[]\s*$'
 		let pind += shiftwidth()
 	endif
-	if pline =~ ';$'
+	if pline =~ '^\(ALIAS\|C\|CONSTANT\|DEFER\|FORGET\|GENERIC#\?\|HELP\|\(\(SHUTDOWN\|STARTUP\)-\)\?HOOK\|IN\|INSTANCE\|MAIN\|MATH\|MIXIN\|PRIMITIVE\|QUALIFIED\(-WITH\)\?\|RENAME\|SINGLETON\|SLOT\|SYMBOL\|USE\|USING\):'
 		let pind -= shiftwidth()
 	endif
-	if pline =~ '[{[]$'
-		let pind += shiftwidth()
+	if pline =~ ';\( \(inline\|recursive\|foldable\|flushable\)\)*$'
+		let pind -= shiftwidth()
 	endif
 	if cline =~ '^\s*[\]}]'
 		let pind -= shiftwidth()

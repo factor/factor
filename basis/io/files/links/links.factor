@@ -1,5 +1,5 @@
 ! Copyright (C) 2008 Slava Pestov, Doug Coleman.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors io.backend io.files.info io.files.types
 io.pathnames kernel math namespaces system vocabs ;
 IN: io.files.links

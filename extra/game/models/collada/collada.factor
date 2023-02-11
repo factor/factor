@@ -1,5 +1,5 @@
 ! Copyright (C) 2010 Erik Charlebois
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors alien.c-types alien.data arrays assocs grouping
 hashtables kernel locals math math.parser sequences sequences.deep
 splitting xml xml.data xml.traversal math.order namespaces

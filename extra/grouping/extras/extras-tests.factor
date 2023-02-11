@@ -21,8 +21,8 @@ sequences tools.test ;
 { { { 1 2 3 } } } [ { 1 2 3 } [ 3array ] 3 group-map ] unit-test
 { { { 1 2 3 } } } [ { 1 2 3 4 } [ 3array ] 3 group-map ] unit-test
 
-{ { "tail" "ail" "il" "l" } } [ "tail" tail-clump ] unit-test
-{ { "h" "he" "hea" "head" } } [ "head" head-clump ] unit-test
+{ { "tail" "ail" "il" "l" } } [ "tail" all-suffixes ] unit-test
+{ { "h" "he" "hea" "head" } } [ "head" all-prefixes ] unit-test
 
 { { B{ 97 115 } B{ 100 102 } } } [ "asdf" 2 B{ } group-as ] unit-test
 { { { 97 115 } { 115 100 } { 100 102 } } } [ "asdf" 2 { } clump-as ] unit-test

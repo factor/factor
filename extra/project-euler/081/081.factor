@@ -1,10 +1,10 @@
 ! Copyright (c) 2009 Guillaume Nargeot.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: io.encodings.ascii io.files kernel math math.order
 math.parser project-euler.common sequences splitting ;
 IN: project-euler.081
 
-! http://projecteuler.net/index.php?section=problems&id=081
+! https://projecteuler.net/index.php?section=problems&id=081
 
 ! DESCRIPTION
 ! -----------

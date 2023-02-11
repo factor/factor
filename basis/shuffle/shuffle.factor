@@ -1,5 +1,5 @@
 ! Copyright (C) 2007 Chris Double, Doug Coleman.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors assocs combinators effects.parser
 generalizations kernel sequences sequences.generalizations ;
 IN: shuffle

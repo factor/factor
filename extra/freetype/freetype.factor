@@ -1,5 +1,5 @@
 ! Copyright (C) 2005, 2007 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: alien alien.c-types alien.syntax kernel system combinators
 alien.libraries classes.struct ;
 IN: freetype

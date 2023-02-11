@@ -4,8 +4,6 @@ IN: editors.emacs
 
 SINGLETON: emacs
 
-editor-class [ emacs ] initialize
-
 SYMBOL: emacsclient-path
 SYMBOL: emacsclient-args
 

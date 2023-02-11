@@ -1,5 +1,5 @@
 ! Copyright (C) 2010 Joe Groff.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors cursors kernel make math sequences sorting tools.test ;
 FROM: cursors => each map assoc-each assoc>map ;
 IN: cursors.tests
@@ -31,13 +31,13 @@ IN: cursors.tests
     [
         H{ { "roses" "lutefisk" } { "tulips" "lox" } }
         [ ": " glue , ] assoc-each
-    ] { } make natural-sort
+    ] { } make sort
 ] unit-test
 
 { { "roses: lutefisk" "tulips: lox" } }
 [
     H{ { "roses" "lutefisk" } { "tulips" "lox" } }
-    [ ": " glue ] { } assoc>map natural-sort
+    [ ": " glue ] { } assoc>map sort
 ] unit-test
 
 : compile-test-each ( xs -- )
@@ -58,11 +58,11 @@ IN: cursors.tests
 { { "roses: lutefisk" "tulips: lox" } }
 [
     [ H{ { "roses" "lutefisk" } { "tulips" "lox" } } compile-test-assoc-each ]
-    { } make natural-sort
+    { } make sort
 ] unit-test
 
 { { "roses: lutefisk" "tulips: lox" } }
 [
     H{ { "roses" "lutefisk" } { "tulips" "lox" } } compile-test-assoc>map
-    natural-sort
+    sort
 ] unit-test

@@ -1,5 +1,5 @@
 ! Copyright (C) 2017, 2018, 2020 Alexander Ilin.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: alien alien.c-types alien.libraries alien.syntax
 classes.struct combinators literals math.order
 sodium.ffi.const sodium.ffi.const.size_max system ;
@@ -572,7 +572,7 @@ FUNCTION: int crypto_secretstream_xchacha20poly1305_pull (
     uchar* c, ulonglong clen,
     uchar* ad, ulonglong adlen )
 FUNCTION: void crypto_secretstream_xchacha20poly1305_rekey (
-     crypto_secretstream_xchacha20poly1305_state* state )
+    crypto_secretstream_xchacha20poly1305_state* state )
 
 ! sodium_runtime_H
 FUNCTION: int sodium_runtime_has_neon ( )

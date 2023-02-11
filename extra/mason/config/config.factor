@@ -1,5 +1,5 @@
 ! Copyright (C) 2008, 2011 Eduardo Cavazos, Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: calendar io.pathnames kernel namespaces system ;
 IN: mason.config
 
@@ -109,3 +109,6 @@ scp-command [ "scp" ] initialize
 
 SYMBOL: ssh-command
 ssh-command [ "ssh" ] initialize
+
+! Notary command-line arguments
+SYMBOL: notary-args

@@ -1,5 +1,5 @@
 ! Copyright (C) 2011 Doug Coleman.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: arrays combinators.smart environment fry
 io.directories io.files io.pathnames io.standard-paths
 kernel sequences sets splitting system unicode windows.shell32 ;

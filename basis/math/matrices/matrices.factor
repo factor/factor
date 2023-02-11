@@ -1,5 +1,5 @@
 ! Copyright (C) 2005, 2010, 2018, 2020 Slava Pestov, Joe Groff, and Cat Stevens.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: arrays combinators combinators.short-circuit kernel math
 math.functions math.order math.private math.vectors ranges
 sequences sequences.deep sequences.private slots.private ;

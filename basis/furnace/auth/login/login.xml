@@ -22,7 +22,7 @@
 		<table>
 
 			<tr>
-				<th class="field-label">User name:</th>
+				<th class="field-label">Username:</th>
 				<td><t:field t:name="username" /></td>
 			</tr>
 

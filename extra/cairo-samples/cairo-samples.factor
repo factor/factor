@@ -1,8 +1,8 @@
 ! Copyright (C) 2008 Matthew Willis
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 !
 ! these samples are a subset of the samples on
-! http://cairographics.org/samples/
+! https://cairographics.org/samples/
 USING: cairo cairo.ffi locals math.constants math
 io.backend kernel alien.c-types libc namespaces
 cairo-gadgets ui.gadgets accessors specialized-arrays

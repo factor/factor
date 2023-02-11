@@ -1,5 +1,5 @@
 ! Copyright (C) 2005, 2009 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors colors combinators kernel math.rectangles
 math.vectors namespaces opengl opengl.capabilities opengl.gl
 opengl.textures sequences sets ui.gadgets ui.pens ;

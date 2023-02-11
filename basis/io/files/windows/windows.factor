@@ -1,5 +1,5 @@
 ! Copyright (C) 2008 Doug Coleman.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors alien alien.c-types alien.data alien.strings
 alien.syntax arrays ascii assocs classes.struct combinators
 combinators.short-circuit continuations destructors environment
@@ -53,7 +53,7 @@ TUPLE: io-callback port thread ;
 C: <io-callback> io-callback
 
 : <completion-port> ( handle existing -- handle )
-     f 1 CreateIoCompletionPort dup win32-error=0/f ;
+    f 1 CreateIoCompletionPort dup win32-error=0/f ;
 
 : <master-completion-port> ( -- handle )
     INVALID_HANDLE_VALUE f <completion-port> ;

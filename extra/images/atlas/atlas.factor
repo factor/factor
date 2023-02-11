@@ -1,5 +1,5 @@
 ! Copyright (C) 2010 Joe Groff.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs byte-arrays images kernel math
 math.functions math.order math.vectors sequences sorting ;
 IN: images.atlas
@@ -44,7 +44,7 @@ ERROR: atlas-image-formats-dont-match images ;
     stripe-height ;
 
 :: (pack-images) ( images atlas-width sort-quot -- placements )
-    images sort-quot inv-sort-with [ f image-placement boa ] map :> image-placements
+    images sort-quot inv-sort-by [ f image-placement boa ] map :> image-placements
     0 :> @y!
     [ image-placements atlas-width @y (pack-stripe) ] [ @y + @y! ] while*
     image-placements ; inline

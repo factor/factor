@@ -1,5 +1,5 @@
 ! Copyright (C) 2007 Alex Chapman
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs combinators
 combinators.short-circuit deques dlists kernel make math
 math.order namespaces parser prettyprint.custom random sequences
@@ -190,8 +190,8 @@ M: tree >alist
             to-key node right>> node-right?
             [ end-comparator (node>subalist-right) ]
             [
-                 [ from-key ] 2dip start-comparator
-                 end-comparator (node>subalist)
+                [ from-key ] 2dip start-comparator
+                end-comparator (node>subalist)
             ] if
         ] when
     ] when ; inline recursive

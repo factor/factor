@@ -1,5 +1,5 @@
 ! Copyright (C) 2009, 2010 Joe Groff, Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: alien.data arrays assocs combinators compiler.cfg.comparisons
 compiler.cfg.intrinsics cpu.architecture cpu.x86 cpu.x86.assembler
 cpu.x86.assembler.operands cpu.x86.features fry kernel locals macros

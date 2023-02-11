@@ -1,5 +1,5 @@
 ! Copyright (C) 2008, 2011 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors arrays ascii assocs colors
 combinators.short-circuit debugger formatting help help.home
 help.topics help.vocabs html html.streams io.directories
@@ -108,7 +108,7 @@ M: pathname url-of
             }
         });
         </script>
-     XML] ;
+    XML] ;
 
 : help-header ( stylesheet -- xml )
     help-stylesheet help-meta swap help-script 3append ;
@@ -127,7 +127,7 @@ M: pathname url-of
             <a href="/">Handbook</a>
             <a href=<->>Glossary</a>
         </nav>
-     XML] ;
+    XML] ;
 
 : help-footer ( -- xml )
     version-info "\n" split1 drop
@@ -160,8 +160,8 @@ M: pathname url-of
 
     R/ padding: \d+px;/ [
         "padding: " ?head drop "px;" ?tail drop
-        string>number dup even? [ 2 * 1 + ] [ 2 * ] if
-        number>string "padding: " "px;" surround
+        string>number 2 * number>string
+        "padding: " "px;" surround
     ] re-replace-with
 
     R/ width: \d+px;/ [
@@ -169,30 +169,22 @@ M: pathname url-of
     ] re-replace-with
 
     R/ font-family: monospace;/ [
-        " white-space: pre-wrap; line-height: 125%;" append
-    ] re-replace-with
-
-    dup { "font-family: monospace;" "background-color:" } [ subseq-of? ] with all? [
-        " margin: 10px 0px;" append
-    ] when
-
-    dup { "border:" "background-color:" } [ subseq-of? ] with all? [
-        " border-radius: 5px;" append
-    ] when ;
+        " margin-top: 0.5em; width: fit-content; white-space: pre-wrap; line-height: 125%;" append
+    ] re-replace-with ;
 
 : fix-help-header ( classes -- classes )
     dup [
         [ ".a" head? ] [ "#f4efd9;" subseq-of? ] bi and
     ] find [
-        "padding: 10px;" "padding: 0px;" replace
-        "background-color: #f4efd9;" "background-color: white;" replace
+        "padding: 10px;" "" replace
+        "background-color: #f4efd9;" "" replace
         "}" ?tail drop
-        " border-bottom: 1px dashed #d5d5d5 width: 100%; padding-top: 15px; padding-bottom: 10px; }"
+        " border-bottom: 1px dashed #d5d5d5; width: 100%; padding-top: 10px; padding-bottom: 10px; }"
         append swap pick set-nth {
             ".a a { color: black; font-size: 24pt; line-height: 100%; }"
             ".a * a { color: #2a5db0; font-size: 12pt; }"
             ".a td { border: none; }"
-            ".a tr:hover { background-color: white; }"
+            ".a tr:hover { background-color: transparent }"
         } prepend
     ] [ drop ] if* ;
 
@@ -211,9 +203,11 @@ M: pathname url-of
                         { "#333333;" "#d5d5d5;" }
                         { "#373e48;" "#ffffff;" }
                         { "#8b4500;" "orange;" }
+                        { "#d5d5d5;" "#666;" }
                         { "#e3e2db;" "#444444;" }
                         { "white;" "#202124;" }
                         { "black;" "white;" }
+                        { "transparent;" "transparent;" }
                     } ?at [
                         but-last parse-color inverse-color color>hex ";" append
                     ] unless

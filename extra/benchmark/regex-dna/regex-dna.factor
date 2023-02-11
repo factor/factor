@@ -1,10 +1,10 @@
 ! Copyright (C) 2008, 2009 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors io io.encodings.ascii io.files kernel sequences
 assocs math.parser namespaces regexp benchmark.knucleotide ;
 IN: benchmark.regex-dna
 
-! Based on http://shootout.alioth.debian.org/gp4/benchmark.php?test=regexdna&lang=ruby&id=1
+! Based on https://shootout.alioth.debian.org/gp4/benchmark.php?test=regexdna&lang=ruby&id=1
 
 : strip-line-breaks ( string -- string' )
     R/ >.*\n|\n/ "" re-replace ;

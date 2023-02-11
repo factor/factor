@@ -1,5 +1,5 @@
 ! Copyright (C) 2008 John Benediktsson
-! See http://factorcode.org/license.txt for BSD license
+! See https://factorcode.org/license.txt for BSD license
 USING: accessors arrays assocs calendar calendar.english
 calendar.private combinators combinators.smart generalizations
 io io.streams.string kernel math math.functions
@@ -195,11 +195,11 @@ MACRO: sprintf ( format-string -- quot )
 : >datetime ( timestamp -- string )
     [
        {
-          [ day-of-week day-abbreviation3 ]
-          [ month>> month-abbreviation ]
-          [ day>> pad-00 ]
-          [ >time ]
-          [ year>> number>string ]
+            [ day-of-week day-abbreviation3 ]
+            [ month>> month-abbreviation ]
+            [ day>> pad-00 ]
+            [ >time ]
+            [ year>> number>string ]
        } cleave
     ] output>array join-words ; inline
 

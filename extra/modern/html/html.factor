@@ -1,5 +1,5 @@
 ! Copyright (C) 2021 Doug Coleman.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs combinators
 combinators.short-circuit kernel make math modern modern.slices
 sequences sequences.extras shuffle combinators.extras splitting
@@ -28,6 +28,13 @@ TUPLE: doctype open close values ;
     doctype new
         swap >string >>close
         swap >>values
+        swap >string >>open ;
+
+TUPLE: cdata open close value ;
+: <cdata> ( open value close -- doctype )
+    cdata new
+        swap >string >>close
+        swap >>value
         swap >string >>open ;
 
 TUPLE: comment open payload close ;
@@ -60,17 +67,31 @@ TUPLE: self-close-tag < tag ;
         swap >string >>open
         V{ } clone >>children ;
 
+TUPLE: text text ;
+: <text> ( text -- text )
+    text new
+        swap >>text ; inline
+
 TUPLE: squote payload ;
 C: <squote> squote
 TUPLE: dquote payload ;
 C: <dquote> dquote
 
-: advance-squote-payload ( n string -- n' string )
+: advance-dquote-payload-noescape ( n string -- n' string )
     over [
-        { CHAR: \\ CHAR: ' } slice-til-separator-inclusive {
+        { CHAR: \" } slice-til-separator-inclusive {
+            { f [ to>> over string-expected-got-eof ] }
+            { CHAR: \" [ drop ] }
+        } case
+    ] [
+        string-expected-got-eof
+    ] if ;
+
+: advance-squote-payload-noescape ( n string -- n' string )
+    over [
+        { CHAR: ' } slice-til-separator-inclusive {
             { f [ to>> over string-expected-got-eof ] }
             { CHAR: ' [ drop ] }
-            { CHAR: \\ [ drop take-char drop advance-squote-payload ] }
         } case
     ] [
         string-expected-got-eof
@@ -78,16 +99,16 @@ C: <dquote> dquote
 
 :: read-string ( $n $string $char -- n' string payload )
     $n $string $char CHAR: ' =
-    [ advance-squote-payload ]
-    [ advance-dquote-payload ] if drop :> $n'
+    [ advance-squote-payload-noescape ]
+    [ advance-dquote-payload-noescape ] if drop :> $n'
     $n' $string
     $n $n' 1 - $string <slice> ;
 
 : take-tag-name ( n string -- n' string tag )
-    [ "\s\r\n/>" member? ] slice-until ;
+    [ "\t\s\r\n/>" member? ] slice-until ;
 
 : read-value ( n string -- n' string value )
-    skip-whitespace take-char {
+    take-char {
         { CHAR: ' [ CHAR: ' read-string >string <squote> ] }
         { CHAR: " [ CHAR: " read-string >string <dquote> ] }
         { CHAR: [ [ "[" throw ] }
@@ -104,10 +125,10 @@ C: <dquote> dquote
         { CHAR: ' [ first read-string >string <squote> f ] }
         { CHAR: " [ first read-string >string <dquote> f ] }
         { CHAR: ? [ ">" expect-and-span >string f swap ] }
-        { CHAR: \s [ >string f ] }
-        { CHAR: \r [ >string f ] }
-        { CHAR: \n [ >string f ] }
-        { CHAR: \t [ >string f ] }
+        { CHAR: \s [ [ 1 + ] 2dip >string f ] }
+        { CHAR: \r [ [ 1 + ] 2dip >string f ] }
+        { CHAR: \n [ [ 1 + ] 2dip >string f ] }
+        { CHAR: \t [ [ 1 + ] 2dip >string f ] }
         { f [ "efff" throw ] }
     } case ;
 
@@ -127,22 +148,27 @@ C: <dquote> dquote
     [ read-props ] 2dip-2up
     <processing-instruction> ;
 
-: read-doctype ( n string opening -- n string doctype/comment )
+: read-doctype-or-cdata ( n string opening -- n string doctype/comment )
     "!" expect-and-span
     2over 2 peek-from "--" sequence= [
         "--" expect-and-span >string
         [ "-->" slice-til-string [ >string ] bi@ ] dip-2up <comment>
     ] [
-        "DOCTYPE" expect-and-span-insensitive
-        [ read-props ] dip-2up
-        <doctype>
+        2over 1 peek-from "[" sequence= [
+            "[CDATA[" expect-and-span-insensitive
+            [ "]]" slice-til-string [ >string ] bi@ ] dip-2up <cdata>
+        ] [
+            "DOCTYPE" expect-and-span-insensitive
+            [ read-props ] dip-2up
+            <doctype>
+        ] if
     ] if ;
 
 : read-embedded-language ( n string opening -- n string embedded-language )
     "%" expect-and-span >string
     [ take-tag-name >string ] dip-1up append
     [ "%>" slice-til-string [ >string ] bi@ ] dip-2up
-     <embedded-language> ;
+    <embedded-language> ;
 
 : read-open-tag ( n string opening -- n' string tag )
     [ take-tag-name ] dip-1up
@@ -176,7 +202,7 @@ ERROR: unmatched-closing-tag-error stack tag ;
     ] if* ;
 
 : lex-html ( stack n string -- stack n' string  )
-    skip-whitespace "<" slice-til-either {
+    "<" slice-til-either {
         { CHAR: < [
             1 split-slice-back [ >string f like [ reach push ] when* ] dip
             [ 2dup peek1-from ] dip
@@ -186,14 +212,14 @@ ERROR: unmatched-closing-tag-error stack tag ;
                     swap check-tag-stack >>children
                     swap >>close-tag
                     ] }
-                { CHAR: ! [ read-doctype ] }
+                { CHAR: ! [ read-doctype-or-cdata ] }
                 { CHAR: ? [ read-processing-instruction ] }
                 { CHAR: % [ read-embedded-language ] }
                 [ drop read-open-tag ]
             } case
         ] }
         { f [ drop f ] }
-        [ drop >string ]
+        [ drop >string <text> ]
     } case [ reach push lex-html ] when* ;
 
 : string>html ( string -- sequence )
@@ -210,11 +236,18 @@ GENERIC: write-html ( tag -- )
 
 M: doctype write-html
     [ open>> % ]
-    [ values>> [ >value ] map join-words [ " " % % ] unless-empty ]
+    [ values>> [ >value ] map " " join [ " " % % ] unless-empty ]
+    [ close>> % ] tri ;
+
+M: cdata write-html
+    [ open>> % ]
+    [ value>> % ]
     [ close>> % ] tri ;
 
 : write-props ( seq -- )
-    [ dup array? [ first2 >value "=" glue ] [ >value ] if ] map join-words [ " " % % ] unless-empty ;
+    [
+        dup array? [ first2 >value "=" glue ] [ >value ] if
+    ] map " " join [ " " % % ] unless-empty ;
 
 M: processing-instruction write-html
     {

@@ -1,5 +1,5 @@
 ! Copyright (C) 2005 Alex Chapman.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: alien alien.c-types alien.libraries alien.syntax kernel
 sequences system combinators opengl.gl alien.destructors ;
 IN: opengl.glu

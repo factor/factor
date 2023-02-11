@@ -1,5 +1,5 @@
 ! Copyright (C) 2008, 2010 Eduardo Cavazos, Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: assocs combinators.smart debugger formatting
 io.encodings.utf8 io.files io.streams.string kernel literals
 mason.common mason.config mason.disk math namespaces sequences
@@ -7,7 +7,7 @@ splitting xml.syntax xml.writer ;
 IN: mason.report
 
 : git-link ( id -- link )
-    [ "http://github.com/factor/factor/commit/" "" prepend-as ] keep
+    [ "https://github.com/factor/factor/commit/" "" prepend-as ] keep
     [XML <a href=<->><-></a> XML] ;
 
 : common-report ( -- xml )

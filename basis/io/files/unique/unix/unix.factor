@@ -1,5 +1,5 @@
 ! Copyright (C) 2008 Doug Coleman.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: io.backend.unix io.files.unique.private literals system
 unix unix.ffi ;
 IN: io.files.unique.unix

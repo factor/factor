@@ -1,10 +1,10 @@
 ! Copyright (c) 2012 Anonymous
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors ascii assocs combinators io kernel math
 math.parser random ranges sequences ;
 IN: rosetta-code.bulls-and-cows
 
-! http://rosettacode.org/wiki/Bulls_and_cows
+! https://rosettacode.org/wiki/Bulls_and_cows
 
 ! This is an old game played with pencil and paper that was
 ! later implemented on computer.
@@ -58,7 +58,7 @@ TUPLE: bull ;
     } cond ;
 
 : add-to-score ( arr -- score )
-   <score> [ bull? [ inc-bulls ] [ inc-cows ] if ] reduce ;
+    <score> [ bull? [ inc-bulls ] [ inc-cows ] if ] reduce ;
 
 : check-win ( score -- ? ) bulls>> 4 = ;
 

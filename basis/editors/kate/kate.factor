@@ -5,8 +5,6 @@ IN: editors.kate
 
 SINGLETON: kate
 
-editor-class [ kate ] initialize
-
 HOOK: find-kate-path os ( -- path )
 
 M: object find-kate-path f ;

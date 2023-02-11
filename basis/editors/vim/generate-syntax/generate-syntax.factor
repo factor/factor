@@ -53,7 +53,7 @@ CONSTANT: highlighted-vocabs {
 
 : write-keywords ( vocab -- )
     lookup-vocab
-    [ name>> ] [ vocab-words [ name>> ] map ] bi natural-sort [
+    [ name>> ] [ vocab-words [ name>> ] map ] bi sort [
         [ vocab-name>syntax-group-name
             [ "SynKeywordFactorWord " write write " | " write ] keep
         ] dip

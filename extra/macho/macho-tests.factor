@@ -1,7 +1,8 @@
 ! Copyright (C) 2010 Erik Charlebois.
-! See http://factorcode.org/license.txt for BSD license.
-USING: accessors alien io io.streams.string kernel literals macho
-multiline sequences strings system tools.test ;
+! See https://factorcode.org/license.txt for BSD license.
+USING: accessors alien http.client io io.files.temp
+io.streams.string kernel literals macho multiline sequences
+strings system tools.test urls ;
 IN: macho.tests
 
 STRING: validation-output
@@ -21,13 +22,21 @@ STRING: validation-output
 
 ;
 
+: a.macho ( -- path )
+    URL" https://downloads.factorcode.org/misc/a.macho"
+    "a.macho" cache-file [ ?download-to ] keep ;
+
+: a2.macho ( -- path )
+    URL" https://downloads.factorcode.org/misc/a2.macho"
+    "a2.macho" cache-file [ ?download-to ] keep ;
+
 cpu ppc? [
     { $ validation-output }
-    [ [ "resource:extra/macho/a.macho" macho-nm ] with-string-writer ]
+    [ [ a.macho macho-nm ] with-string-writer ]
     unit-test
 
     { t } [
-        "resource:extra/macho/a2.macho" [
+        a2.macho [
             >c-ptr fat-binary-members first data>> >c-ptr macho-header 64-bit?
         ] with-mapped-macho
     ] unit-test

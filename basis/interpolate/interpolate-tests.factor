@@ -1,5 +1,5 @@
 ! Copyright (C) 2008 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: interpolate io.streams.string namespaces tools.test locals ;
 
 { "A B" } [ "A" "B" "${1} ${0}" interpolate>string ] unit-test

@@ -4,8 +4,6 @@ IN: editors.editpadpro
 
 SINGLETON: editpadpro
 
-editor-class [ editpadpro ] initialize
-
 : editpadpro-path ( -- path )
     \ editpadpro-path get [
         {

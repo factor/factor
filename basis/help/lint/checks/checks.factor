@@ -1,5 +1,5 @@
 ! Copyright (C) 2009 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs classes classes.struct
 classes.tuple combinators combinators.short-circuit debugger
 definitions effects eval formatting grouping help help.markup
@@ -47,8 +47,8 @@ SYMBOL: vocab-articles
         ] vocabs-quot get call( quot -- )
     ] leaks members no-ui-disposables
     dup length 0 > [
-       dup [ class-of ] histogram-by
-       [ "Leaked resources: " write ... ] with-string-writer simple-lint-error
+        dup [ class-of ] histogram-by
+        [ "Leaked resources: " write ... ] with-string-writer simple-lint-error
     ] [
         drop
     ] if ;
@@ -127,10 +127,10 @@ SYMBOL: vocab-articles
 : check-modules ( element -- )
     \ $vocab-link swap elements [
         second
-        vocab-exists? [
-            "$vocab-link to non-existent vocabulary"
+        dup vocab-exists? [ drop ] [
+            "$vocab-link to non-existent vocabulary ``" "''" surround
             simple-lint-error
-        ] unless
+        ] if
     ] each ;
 
 : check-slots-tables ( element -- )

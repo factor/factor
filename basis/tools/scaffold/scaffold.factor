@@ -1,5 +1,5 @@
 ! Copyright (C) 2008 Doug Coleman.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors alien arrays assocs byte-arrays calendar
 classes classes.error combinators combinators.short-circuit
 continuations eval hashtables help.markup interpolate io
@@ -72,7 +72,7 @@ ERROR: vocab-must-not-exist string ;
 : scaffold-copyright ( -- )
     "! Copyright (C) " write now year>> number>string write
     developer-name get [ "Your name" ] unless* bl write "." print
-    "! See http://factorcode.org/license.txt for BSD license." print ;
+    "! See https://factorcode.org/license.txt for BSD license." print ;
 
 : main-file-string ( vocab -- string )
     [
@@ -219,7 +219,7 @@ M: object add-using
 : interesting-words ( vocab -- array )
     vocab-words
     [ { [ "help" word-prop ] [ predicate? ] } 1|| ] reject
-    natural-sort ;
+    sort ;
 
 : interesting-words. ( vocab -- )
     interesting-words [ (help.) nl ] each ;
@@ -241,7 +241,7 @@ M: object add-using
 : write-using ( vocab -- )
     "USING:" write
     using get members
-    { "help.markup" "help.syntax" } append natural-sort remove
+    { "help.markup" "help.syntax" } append sort remove
     [ bl write ] each
     " ;" print ;
 
@@ -378,10 +378,10 @@ ${example-indent}}
 
 : scaffold-file ( path -- )
     [ touch-file ]
-    [ "Click to edit: " write <pathname> . ] bi ;
+    [ "Click to edit: " write >pathname . ] bi ;
 
 : scaffold-rc ( path -- )
-    home prepend-path scaffold-file ;
+    home-path scaffold-file ;
 
 : scaffold-factor-boot-rc ( -- )
     ".factor-boot-rc" scaffold-rc ;

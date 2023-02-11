@@ -1,8 +1,8 @@
 ! Copyright (C) 2009, 2010 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors arrays combinators combinators.short-circuit
 compiler.cfg.dominance compiler.cfg.ssa.interference.live-ranges
-kernel locals math math.order sequences sorting.slots ;
+kernel locals math math.order sequences sorting.specification ;
 IN: compiler.cfg.ssa.interference
 
 TUPLE: vreg-info vreg value def-index bb pre-of color equal-anc-in equal-anc-out ;
@@ -89,7 +89,7 @@ TUPLE: vreg-info vreg value def-index bb pre-of color equal-anc-in equal-anc-out
 
 ! Merging lists of vregs sorted by dominance.
 M: vreg-info <=> ( vreg1 vreg2 -- <=> )
-    { { pre-of>> <=> } { def-index>> <=> } } compare-slots ;
+    { { pre-of>> <=> } { def-index>> <=> } } compare-with-spec ;
 
 SYMBOLS: blue red ;
 

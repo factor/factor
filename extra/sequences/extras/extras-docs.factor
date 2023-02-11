@@ -169,7 +169,7 @@ HELP: second?
 
 HELP: subseq*
 { $values
-     { "from" integer } { "to" integer } { "seq" sequence } { "subseq" sequence } }
+    { "from" integer } { "to" integer } { "seq" sequence } { "subseq" sequence } }
 { $description "Outputs a new sequence using positions relative to one or both ends of the sequence. Positive values describes offsets relative to the start of the sequence, negative values relative to the end. Values of " { $link f } " for " { $snippet "from" } " indicate the beginning of the sequence, while an " { $link f } " for " { $snippet "to" } " indicates the end of the sequence." }
 { $notes "Both " { $snippet "from" } " and " { $snippet "to" } " can be safely set to values outside the length of the sequence. Also, " { $snippet "from" } " can safely reference a smaller or greater index position than " { $snippet "to" } "." }
 { $examples
@@ -216,7 +216,7 @@ HELP: unsurround
 
 HELP: start-all
 { $values
-     { "seq" sequence } { "subseq" sequence } { "indices" sequence } }
+    { "seq" sequence } { "subseq" sequence } { "indices" sequence } }
 { $description "Outputs the starting indices of the non-overlapping occurrences of " { $snippet "subseq" } " in " { $snippet "seq" } "." }
 { $examples
     { $example "USING: prettyprint sequences.extras ;"
@@ -429,21 +429,18 @@ HELP: (collect-with-previous)
 { $values
     { "quot" quotation } { "into" object }
     { "quot'" quotation }
-}
-{ $description "" } ;
+} ;
 
 HELP: (each-integer-with-previous)
 { $values
     { "prev" object } { "i" integer } { "n" integer } { "quot" quotation }
-}
-{ $description "" } ;
+} ;
 
 HELP: (start-all)
 { $values
     { "seq" sequence } { "subseq" object } { "increment" object }
     { "indices" object }
-}
-{ $description "" } ;
+} ;
 
 HELP: 2map-into
 { $values
@@ -474,8 +471,7 @@ HELP: 2nested-map
 HELP: 3each-from
 { $values
     { "seq1" sequence } { "seq2" sequence } { "seq3" sequence } { "quot" quotation } { "i" integer }
-}
-{ $description "" } ;
+} ;
 
 HELP: 3map-reduce
 { $values
@@ -644,8 +640,7 @@ HELP: arg-where
 
 HELP: assoc-zip-with
 { $values
-    { "seq" assoc } { "quot" quotation }
-    { "alist" "an array of key/value pairs" }
+    { "quot" quotation } { "alist" "an array of key/value pairs" }
 }
 { $description "Applies " { $snippet "quot" } " to each key-value pair in the given assoc, pushing a new assoc with the key-value pairs as keys, and the values computed by " { $snippet "quot" } " as values." } ;
 
@@ -670,8 +665,7 @@ HELP: change-nths
 HELP: collect-with-previous
 { $values
     { "n" integer } { "quot" quotation } { "into" object }
-}
-{ $description "" } ;
+} ;
 
 HELP: count-head
 { $values
@@ -685,7 +679,7 @@ HELP: count-tail
     { "seq" sequence } { "quot" quotation }
     { "n" integer }
 }
-{ $description "Count the number of values at the beginning of " { $snippet "seq" } " that return a truthy value when passed into " { $snippet "quot" } "." } ;
+{ $description "Count the number of values from the end of " { $snippet "seq" } " that return a truthy value when passed into " { $snippet "quot" } "." } ;
 
 HELP: cut-when
 { $values
@@ -704,32 +698,27 @@ HELP: drop-while
 HELP: each-index-from
 { $values
     { "seq" sequence } { "quot" quotation } { "i" integer }
-}
-{ $description "" } ;
+} ;
 
 HELP: each-integer-with-previous
 { $values
     { "n" integer } { "quot" quotation }
-}
-{ $description "" } ;
+} ;
 
 HELP: each-prior
 { $values
     { "seq" sequence } { "quot" quotation }
-}
-{ $description "" } ;
+} ;
 
 HELP: each-subseq
 { $values
     { "seq" sequence } { "quot" quotation }
-}
-{ $description "" } ;
+} ;
 
 HELP: ensure-same-underlying
 { $values
     { "slice1" slice } { "slice2" slice }
-}
-{ $description "" } ;
+} ;
 
 HELP: even-indices
 { $values
@@ -744,8 +733,7 @@ HELP: evens
 HELP: extract!
 { $values
     { "seq" sequence } { "quot" quotation }
-}
-{ $description "" } ;
+} ;
 
 HELP: filter-all-subseqs
 { $values
@@ -812,8 +800,7 @@ HELP: find-pred-loop
 { $values
     { "i" integer } { "n" integer } { "seq" sequence } { "quot" quotation }
     { "calc/f" object } { "i/f" { $maybe integer } } { "elt/f" object }
-}
-{ $description "" } ;
+} ;
 
 HELP: harvest!
 { $values
@@ -854,15 +841,13 @@ HELP: index-selector
 { $values
     { "quot" quotation }
     { "selector" object } { "accum" object }
-}
-{ $description "" } ;
+} ;
 
 HELP: index-selector-as
 { $values
     { "quot" quotation } { "exemplar" object }
     { "selector" object } { "accum" object }
-}
-{ $description "" } ;
+} ;
 
 HELP: infimum-by*
 { $values
@@ -895,8 +880,7 @@ HELP: iterate-heap-while
 { $values
     { "heap" object } { "quot1" quotation } { "quot2" quotation }
     { "obj/f" { $maybe object } } { "loop?" object }
-}
-{ $description "" } ;
+} ;
 
 HELP: last=
 { $values
@@ -999,29 +983,25 @@ HELP: map-integers-with
 { $values
     { "len" object } { "quot" quotation } { "exemplar" object }
     { "newseq" sequence }
-}
-{ $description "" } ;
+} ;
 
 HELP: map-like
 { $values
     { "seq" sequence } { "exemplar" object }
     { "seq'" sequence }
-}
-{ $description "" } ;
+} ;
 
 HELP: map-prior
 { $values
     { "seq" sequence } { "quot" quotation }
     { "seq'" sequence }
-}
-{ $description "" } ;
+} ;
 
 HELP: map-prior-as
 { $values
     { "seq" sequence } { "quot" quotation } { "exemplar" object }
     { "seq'" sequence }
-}
-{ $description "" } ;
+} ;
 
 HELP: map-product
 { $values
@@ -1041,22 +1021,19 @@ HELP: map-with-previous
 { $values
     { "seq" sequence } { "quot" quotation }
     { "newseq" sequence }
-}
-{ $description "" } ;
+} ;
 
 HELP: map-with-previous-as
 { $values
     { "seq" sequence } { "quot" quotation } { "exemplar" object }
     { "newseq" sequence }
-}
-{ $description "" } ;
+} ;
 
 HELP: map-zip-swap
 { $values
     { "quot" quotation }
     { "alist" "an array of key/value pairs" }
-}
-{ $description "" } ;
+} ;
 
 HELP: max-subarray-sum
 { $values
@@ -1069,8 +1046,7 @@ HELP: merge-slices
 { $values
     { "slice1" slice } { "slice2" slice }
     { "slice/*" object }
-}
-{ $description "" } ;
+} ;
 
 HELP: nth*
 { $values
@@ -1107,29 +1083,25 @@ HELP: one?
 { $values
     { "seq" sequence } { "quot" quotation }
     { "?" boolean }
-}
-{ $description "" } ;
+} ;
 
 HELP: ordered-slices-overlap?
 { $values
     { "slice-lt" object } { "slice-gt" object }
     { "?" boolean }
-}
-{ $description "" } ;
+} ;
 
 HELP: ordered-slices-range
 { $values
     { "slice-lt" object } { "slice-gt" object }
     { "to" integer } { "from" integer }
-}
-{ $description "" } ;
+} ;
 
 HELP: ordered-slices-touch?
 { $values
     { "slice-lt" object } { "slice-gt" object }
     { "?" boolean }
-}
-{ $description "" } ;
+} ;
 
 HELP: pad-longest
 { $values
@@ -1147,21 +1119,18 @@ HELP: prepend-lines-with-spaces
 HELP: push-if*
 { $values
     { "elt" object } { "quot" quotation } { "accum" object }
-}
-{ $description "" } ;
+} ;
 
 HELP: push-if-index
 { $values
     { "elt" object } { "i" integer } { "quot" quotation } { "accum" object }
-}
-{ $description "" } ;
+} ;
 
 HELP: reduce-from
 { $values
     { "seq" sequence } { "identity" object } { "quot" quotation } { "i" integer }
     { "result" object }
-}
-{ $description "" } ;
+} ;
 
 HELP: remove-first
 { $values
@@ -1192,8 +1161,7 @@ HELP: remove-last!
 HELP: replicate-into
 { $values
     { "seq" sequence } { "quot" quotation }
-}
-{ $description "" } ;
+} ;
 
 HELP: reverse-as
 { $values
@@ -1233,22 +1201,19 @@ HELP: selector*
 { $values
     { "quot" quotation }
     { "selector" object } { "accum" object }
-}
-{ $description "" } ;
+} ;
 
 HELP: selector-as*
 { $values
     { "quot" quotation } { "exemplar" object }
     { "selector" object } { "accum" object }
-}
-{ $description "" } ;
+} ;
 
 HELP: sequence-index-operator-last
 { $values
     { "n" integer } { "seq" sequence } { "quot" quotation }
     { "quot'" quotation }
-}
-{ $description "" } ;
+} ;
 
 HELP: sequence>slice
 { $values
@@ -1273,36 +1238,31 @@ HELP: shorten*
 { $values
     { "vector" object } { "n" integer }
     { "seq" sequence }
-}
-{ $description "" } ;
+} ;
 
 HELP: sift!
 { $values
     { "seq" sequence }
     { "newseq" sequence }
-}
-{ $description "" } ;
+} ;
 
 HELP: sift-as
 { $values
     { "seq" sequence } { "exemplar" object }
     { "newseq" sequence }
-}
-{ $description "" } ;
+} ;
 
 HELP: slice-order-by-from
 { $values
     { "slice1" slice } { "slice2" slice }
     { "slice-lt" object } { "slice-gt" object }
-}
-{ $description "" } ;
+} ;
 
 HELP: slice-when
 { $values
     { "seq" sequence } { "quot" quotation }
     { "seq'" sequence }
-}
-{ $description "" } ;
+} ;
 
 HELP: slices-don't-touch
 { $values
@@ -1315,22 +1275,19 @@ HELP: slices-overlap?
 { $values
     { "slice1" slice } { "slice2" slice }
     { "?" boolean }
-}
-{ $description "" } ;
+} ;
 
 HELP: slices-touch?
 { $values
     { "slice1" slice } { "slice2" slice }
     { "?" boolean }
-}
-{ $description "" } ;
+} ;
 
 HELP: slurp-heap-while-map
 { $values
     { "heap" object } { "quot1" quotation } { "quot2" quotation }
     { "seq" sequence }
-}
-{ $description "" } ;
+} ;
 
 HELP: span-slices
 { $values
@@ -1339,43 +1296,35 @@ HELP: span-slices
 }
 { $description "Create a virtual sequence spanning the length covered by " { $snippet "slice1" } " and " { $snippet "slice2" } ". Slices must refer to the same sequence." } ;
 
-HELP: step-slice
-{ $class-description "" } ;
-
 HELP: supremum-by*
 { $values
     { "seq" sequence } { "quot" quotation }
     { "i" integer } { "elt" object }
-}
-{ $description "" } ;
+} ;
 
 HELP: tail*-as
 { $values
     { "seq" sequence } { "n" integer } { "exemplar" object }
     { "seq'" sequence }
-}
-{ $description "" } ;
+} ;
 
 HELP: tail-as
 { $values
     { "seq" sequence } { "n" integer } { "exemplar" object }
     { "seq'" sequence }
-}
-{ $description "" } ;
+} ;
 
 HELP: take-while
 { $values
     { "seq" sequence } { "quot" quotation }
     { "head-slice" object }
-}
-{ $description "" } ;
+} ;
 
 HELP: trim-as
 { $values
     { "seq" sequence } { "quot" quotation } { "exemplar" object }
     { "newseq" sequence }
-}
-{ $description "" } ;
+} ;
 
 HELP: underlying-mismatch
 { $values
@@ -1388,35 +1337,27 @@ HELP: unordered-slices-overlap?
 { $values
     { "slice1" slice } { "slice2" slice }
     { "?" boolean }
-}
-{ $description "" } ;
+} ;
 
 HELP: unordered-slices-range
 { $values
     { "slice1" slice } { "slice2" slice }
     { "to" integer } { "from" integer }
-}
-{ $description "" } ;
+} ;
 
 HELP: unordered-slices-touch?
 { $values
     { "slice1" slice } { "slice2" slice }
     { "?" boolean }
-}
-{ $description "" } ;
+} ;
 
 HELP: until-empty
 { $values
     { "seq" sequence } { "quot" quotation }
-}
-{ $description "" } ;
-
-HELP: virtual-zip-index
-{ $class-description "" } ;
+} ;
 
 HELP: with-string-lines
 { $values
     { "str" string } { "quot" quotation }
     { "str'" string }
-}
-{ $description "" } ;
+} ;

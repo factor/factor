@@ -1,5 +1,5 @@
 ! Copyright (C) 2007 Elie CHAFTARI, 2009 Maxim Savchenko
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: alien alien.c-types alien.destructors alien.libraries
 alien.syntax classes.struct combinators system ;
 

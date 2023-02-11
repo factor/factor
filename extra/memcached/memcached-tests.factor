@@ -1,5 +1,5 @@
 ! Copyright (C) 2010 John Benediktsson
-! See http://factorcode.org/license.txt for BSD license
+! See https://factorcode.org/license.txt for BSD license
 
 USING: arrays assocs calendar io io.encodings.binary io.sockets
 io.timeouts kernel math math.functions memcached
@@ -18,9 +18,9 @@ IN: memcached.tests
 : not-found? ( quot -- )
     [ key-not-found? ] must-fail-with ;
 
-: x ( -- str ) cpu present "-x" append ;
-: y ( -- str ) cpu present "-y" append ;
-: z ( -- str ) cpu present "-z" append ;
+: x ( -- str ) os cpu [ present ] bi@ "-" glue "-x" append ;
+: y ( -- str ) os cpu [ present ] bi@ "-" glue "-y" append ;
+: z ( -- str ) os cpu [ present ] bi@ "-" glue "-z" append ;
 
 PRIVATE>
 
@@ -101,5 +101,5 @@ PRIVATE>
 [ "5" x m/set ] with-memcached
 [ "valuex" y m/set ] with-memcached
 { { "5" "valuex" } } [
-    [ x y z 3array m/getseq values natural-sort ] with-memcached
+    [ x y z 3array m/getseq values sort ] with-memcached
 ] unit-test

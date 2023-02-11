@@ -1,5 +1,5 @@
 ! Copyright (C) 2009, 2011 Joe Groff, Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors alien alien.prettyprint arrays assocs classes
 classes.struct combinators combinators.short-circuit
 continuations kernel libc make math math.parser mirrors

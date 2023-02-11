@@ -1,5 +1,5 @@
 ! Copyright (C) 2013 Jon Harper.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors calendar circular colors colors.hsv
 command-line continuations io kernel math math.parser namespaces
 openal.example sequences system timers ui ui.gadgets
@@ -65,6 +65,6 @@ M: metronome-gadget pref-dim* drop { 200 200 } ;
     "Example: metronome " write print-defaults flush ;
 
 : metronome-main ( -- )
-     [ [ metronome-cmdline metronome-ui ] [ drop metronome-usage 1 exit ] recover ] with-ui ;
+    [ [ metronome-cmdline metronome-ui ] [ drop metronome-usage 1 exit ] recover ] with-ui ;
 
 MAIN: metronome-main

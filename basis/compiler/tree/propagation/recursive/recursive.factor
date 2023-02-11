@@ -1,6 +1,7 @@
 ! Copyright (C) 2008, 2010 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
-USING: accessors classes.algebra combinators compiler.tree
+! See https://factorcode.org/license.txt for BSD license.
+USING: accessors classes.algebra combinators
+combinators.short-circuit compiler.tree
 compiler.tree.combinators compiler.tree.propagation.constraints
 compiler.tree.propagation.copy compiler.tree.propagation.info
 compiler.tree.propagation.nodes compiler.tree.propagation.simple
@@ -83,7 +84,7 @@ M: #recursive propagate-around ( #recursive -- )
     label>> enter-recursive>> node-output-infos ;
 
 : generalize-return-interval ( info -- info' )
-    dup [ literal?>> ] [ class>> null-class? ] bi or
+    dup { [ literal?>> ] [ class>> null-class? ] } 1||
     [ clone dup class>> class-interval >>interval ] unless ;
 
 : generalize-return ( infos -- infos' )

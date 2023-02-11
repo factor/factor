@@ -18,8 +18,8 @@ HELP: stop-timer
 
 HELP: every
 { $values
-     { "quot" quotation } { "interval-duration" duration }
-     { "timer" timer } }
+    { "quot" quotation } { "interval-duration" duration }
+    { "timer" timer } }
 { $description "Creates a timer that calls the quotation repeatedly, using " { $snippet "duration" } " as the frequency. The first call of " { $snippet "quot" } " will happen immediately. If the quotation throws an exception, the timer will stop." }
 { $examples
     { $code
@@ -40,8 +40,8 @@ HELP: later
 
 HELP: delayed-every
 { $values
-     { "quot" quotation } { "duration" duration }
-     { "timer" timer } }
+    { "quot" quotation } { "duration" duration }
+    { "timer" timer } }
 { $description "Creates a timer that calls " { $snippet "quot" } " repeatedly, waiting " { $snippet "duration" } " before calling " { $snippet "quot" } " the first time and then waiting " { $snippet "duration" } " between further calls. If the quotation throws an exception, the timer will stop." }
 { $examples
     { $code

@@ -1,5 +1,5 @@
 ! Copyright (C) 2009, 2010 Slava Pestov, Daniel Ehrenberg.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors combinators combinators.private
 combinators.short-circuit compiler.tree.propagation.info
 compiler.tree.propagation.inlining compiler.units continuations
@@ -114,8 +114,10 @@ GENERIC: already-inlined-quot? ( quot -- ? )
 M: curried already-inlined-quot? quot>> already-inlined-quot? ;
 
 M: composed already-inlined-quot?
-    [ first>> already-inlined-quot? ]
-    [ second>> already-inlined-quot? ] bi or ;
+    {
+        [ first>> already-inlined-quot? ]
+        [ second>> already-inlined-quot? ]
+    } 1|| ;
 
 M: quotation already-inlined-quot? already-inlined? ;
 

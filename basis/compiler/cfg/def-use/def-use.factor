@@ -1,5 +1,5 @@
 ! Copyright (C) 2008, 2011 Slava Pestov, Daniel Ehrenberg.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs combinators compiler.cfg
 compiler.cfg.instructions compiler.cfg.instructions.syntax
 compiler.cfg.rpo compiler.units generic kernel namespaces

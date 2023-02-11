@@ -1,5 +1,5 @@
 ! Copyright (C) 2014 John Benediktsson
-! See http://factorcode.org/license.txt for BSD license
+! See https://factorcode.org/license.txt for BSD license
 
 USING: arrays kernel math math.order math.private sequences
 sequences.private strings vectors ;
@@ -39,18 +39,28 @@ IN: sorting.quick
 
 PRIVATE>
 
-: sort! ( seq quot: ( obj1 obj2 -- <=> ) -- )
+: sort-with! ( seq quot: ( obj1 obj2 -- <=> ) -- )
     [ 0 over length check-array-capacity 1 - ] dip quicksort ; inline
 
-: sort-with! ( seq quot: ( elt -- key ) -- )
-    [ compare ] curry sort! ; inline
+: inv-sort-with! ( seq quot: ( obj1 obj2 -- <=> ) -- )
+    '[ @ invert-comparison ] sort-with! ; inline
 
-: inv-sort-with! ( seq quot: ( elt -- key ) -- )
-    [ compare invert-comparison ] curry sort! ; inline
+: sort-by! ( seq quot: ( elt -- key ) -- )
+    [ compare ] curry sort-with! ; inline
 
-GENERIC: natural-sort! ( seq -- )
+: inv-sort-by! ( seq quot: ( elt -- key ) -- )
+    [ compare invert-comparison ] curry sort-with! ; inline
 
-M: object natural-sort!  [ <=> ] sort! ;
-M: array natural-sort! [ <=> ] sort! ;
-M: vector natural-sort! [ <=> ] sort! ;
-M: string natural-sort! [ <=> ] sort! ;
+GENERIC: sort! ( seq -- )
+
+M: object sort! [ <=> ] sort-with! ;
+M: array sort! [ <=> ] sort-with! ;
+M: vector sort! [ <=> ] sort-with! ;
+M: string sort! [ <=> ] sort-with! ;
+
+GENERIC: inv-sort! ( seq -- )
+
+M: object inv-sort! [ <=> ] inv-sort-with! ;
+M: array inv-sort! [ <=> ] inv-sort-with! ;
+M: vector inv-sort! [ <=> ] inv-sort-with! ;
+M: string inv-sort! [ <=> ] inv-sort-with! ;

@@ -1,5 +1,5 @@
 ! Copyright (C) 2019 Jack Lucas
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors combinators kernel math namespaces raylib ;
 IN: raylib.demo
 

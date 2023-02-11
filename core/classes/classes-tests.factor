@@ -21,7 +21,7 @@ M: method-forget-class method-forget-test ;
 { { } { } } [
     all-words [ class? ] filter
     implementors-map get keys
-    [ natural-sort ] bi@
+    [ sort ] bi@
     [ diff ] [ swap diff ] 2bi
 ] unit-test
 

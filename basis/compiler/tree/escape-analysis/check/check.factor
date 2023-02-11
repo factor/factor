@@ -1,5 +1,5 @@
 ! Copyright (C) 2008, 2009 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors classes classes.tuple combinators.short-circuit
 compiler.tree compiler.tree.propagation.info kernel math
 sequences ;

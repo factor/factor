@@ -1,5 +1,5 @@
 ! Copyright (C) 2006 Matthew Willis and Chris Double.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: destructors io io.encodings.utf8 io.files kernel lists
 lists.lazy math sequences tools.test ;
 

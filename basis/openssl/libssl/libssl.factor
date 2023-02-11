@@ -1,6 +1,6 @@
 ! Copyright (C) 2007 Elie CHAFTARI
 ! Portions copyright (C) 2008 Slava Pestov
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: alien alien.c-types alien.destructors alien.libraries
 alien.libraries.finder alien.parser alien.syntax classes.struct
 combinators kernel literals namespaces openssl.libcrypto system
@@ -410,6 +410,28 @@ FUNCTION: ssl-method TLSv1_server_method (  )
 FUNCTION: ssl-method TLSv1_method (  )
 FUNCTION: ssl-method TLSv1_1_method (  )
 FUNCTION: ssl-method TLSv1_2_method (  )
+
+CONSTANT: DTLS1_VERSION_MAJOR 0xfe
+CONSTANT: SSL3_VERSION_MAJOR 0x03
+CONSTANT: SSL3_VERSION 0x0300
+CONSTANT: TLS1_VERSION 0x0301
+CONSTANT: TLS1_1_VERSION 0x0302
+CONSTANT: TLS1_2_VERSION 0x0303
+CONSTANT: TLS1_3_VERSION 0x0304
+CONSTANT: DTLS1_VERSION 0xfeff
+CONSTANT: DTLS1_2_VERSION 0xfefd
+
+FUNCTION: int SSL_CTX_set_min_proto_version ( SSL_CTX* ctx, uint16_t version )
+FUNCTION: int SSL_CTX_set_max_proto_version ( SSL_CTX* ctx, uint16_t version )
+FUNCTION: uint16_t SSL_CTX_get_min_proto_version ( SSL_CTX* ctx )
+FUNCTION: uint16_t SSL_CTX_get_max_proto_version ( SSL_CTX* ctx )
+
+FUNCTION: int SSL_set_min_proto_version ( SSL* ssl, uint16_t version )
+FUNCTION: int SSL_set_max_proto_version ( SSL* ssl, uint16_t version )
+FUNCTION: uint16_t SSL_get_min_proto_version ( SSL* ssl )
+FUNCTION: uint16_t SSL_get_max_proto_version ( SSL* ssl )
+
+FUNCTION: int SSL_version ( SSL *ssl )
 
 FUNCTION: void SSL_SESSION_free ( SSL_SESSION* ses )
 FUNCTION: void RAND_seed ( void* buf, int num )

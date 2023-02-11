@@ -1,5 +1,6 @@
 ! Copyright (C) 2020 Doug Coleman.
-! See http://factorcode.org/license.txt for BSD license.
+! Copyright (C) 2023 Giftpflanze.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors assocs classes.error classes.parser effects
 effects.parser endian kernel lexer make math math.bitwise
 math.parser multiline parser sequences vocabs.parser words
@@ -51,7 +52,6 @@ SYNTAX: REGISTER-FIELD:
     scan-new-word scan-object
     [ "width" set-word-prop ] 2keep
     make-register-checker-word ;
-
 >>
 
 <<
@@ -130,14 +130,9 @@ FIELD: immlo2 2
 FIELD: immhi19 19
 
 FIELD: cond4 4
-FIELD: cmode4 4
-FIELD: CRm4 4
-FIELD: CRn4 4
 FIELD: CRm 4
 FIELD: CRn 4
-FIELD: nzcv4 4
 FIELD: nzcv 4
-FIELD: o0 1
 FIELD: hw2 2
 FIELD: mask4 4
 
@@ -244,35 +239,27 @@ SINGLETONS: SPSR_EL1 SPSR_EL2 SPSR_EL3 ;
 
 ! Instructions
 
-! https://www.element14.com/community/servlet/JiveServlet/previewBody/41836-102-1-229511/ARM.Reference_Manual.pdf
+! https://community.element14.com/products/devtools/technicallibrary/m/files/10863
 ! pg 16
-! cond code set in prev arm assembler
-: >CC ( x -- x ) ; inline
-: EQ ( -- n ) 0000 >CC ; inline ! Z set equal
-: NE ( -- n ) 0001 >CC ; inline ! Z clear not equal
-: CS ( -- n ) 0010 >CC ; inline ! C set unsigned higher or same
-: HS ( -- n ) 0010 >CC ; inline !
-: CC ( -- n ) 0011 >CC ; inline ! C clear unsigned lower
-: LO ( -- n ) 0011 >CC ; inline !
-: MI ( -- n ) 0100 >CC ; inline ! N set negative
-: PL ( -- n ) 0101 >CC ; inline ! N clear positive or zero
-: VS ( -- n ) 0110 >CC ; inline ! V set overflow
-: VC ( -- n ) 0111 >CC ; inline ! V clear no overflow
-: HI ( -- n ) 1000 >CC ; inline ! C set and Z clear unsigned higher
-: LS ( -- n ) 1001 >CC ; inline ! C clear or Z set unsigned lower or same
-: GE ( -- n ) 1010 >CC ; inline ! N equals V greater or equal
-: LT ( -- n ) 1011 >CC ; inline ! N not equal to V less than
-: GT ( -- n ) 1100 >CC ; inline ! Z clear AND (N equals V) greater than
-: LE ( -- n ) 1101 >CC ; inline ! Z set OR (N not equal to V) less than or equal
-: AL ( -- n ) 1110 >CC ; inline ! AL (ignored) always
-: NV ( -- n ) 1111 >CC ; inline ! no value
-
-: imm13>parts-64 ( imm13 -- imms immr N )
-    [ -4 shift 4 bits ] [ 4 bits ] [ -8 shift ] tri ;
-
-: imm12>parts-32 ( imm12 -- imms immr N-is-0 )
-    [ -4 shift 4 bits ] [ 4 bits ] [ drop 0 ] tri ;
-
+! cond code set in previous arm assembly instruction
+: EQ ( -- n ) 0b0000 ; inline ! Z set: equal
+: NE ( -- n ) 0b0001 ; inline ! Z clear: not equal
+: CS ( -- n ) 0b0010 ; inline ! C set: unsigned higher or same
+: HS ( -- n ) 0b0010 ; inline !
+: CC ( -- n ) 0b0011 ; inline ! C clear: unsigned lower
+: LO ( -- n ) 0b0011 ; inline !
+: MI ( -- n ) 0b0100 ; inline ! N set: negative
+: PL ( -- n ) 0b0101 ; inline ! N clear: positive or zero
+: VS ( -- n ) 0b0110 ; inline ! V set: overflow
+: VC ( -- n ) 0b0111 ; inline ! V clear: no overflow
+: HI ( -- n ) 0b1000 ; inline ! C set and Z clear: unsigned higher
+: LS ( -- n ) 0b1001 ; inline ! C clear or Z set: unsigned lower or same
+: GE ( -- n ) 0b1010 ; inline ! N equals V: greater or equal
+: LT ( -- n ) 0b1011 ; inline ! N not equal to V: less than
+: GT ( -- n ) 0b1100 ; inline ! Z clear AND (N equals V): greater than
+: LE ( -- n ) 0b1101 ; inline ! Z set OR (N not equal to V): less than or equal
+: AL ( -- n ) 0b1110 ; inline ! always
+: NV ( -- n ) 0b1111 ; inline ! always
 
 ERROR: no-field-word vocab name ;
 
@@ -304,6 +291,7 @@ M: object value ;
 
 ERROR: bad-instruction values ;
 >>
+
 <<
 SYNTAX: ARM-INSTRUCTION:
     scan-new-word
@@ -317,8 +305,6 @@ SYNTAX: ARM-INSTRUCTION:
     ] [ in>> [ string>number ] reject { } <effect> ] bi define-declared ;
 >>
 
-
-
 ! ADC: Add with Carry.
 ! ADCS: Add with Carry, setting flags.
 ARM-INSTRUCTION: ADC32-encode ( 0 0 0 11010000 Rm 000000 Rn Rd -- )
@@ -327,8 +313,8 @@ ARM-INSTRUCTION: ADC64-encode ( 1 0 0 11010000 Rm 000000 Rn Rd -- )
 ARM-INSTRUCTION: ADCS64-encode ( 1 0 1 11010000 Rm 000000 Rn Rd -- )
 
 ! ADD (extended register): Add (extended register).
-ARM-INSTRUCTION: ADDer32-encode ( 0 0 0 01011 00 0 Rm option3 imm3 Rn Rd -- )
-ARM-INSTRUCTION: ADDer64-encode ( 1 0 0 01011 00 0 Rm option3 imm3 Rn Rd -- )
+ARM-INSTRUCTION: ADDer32-encode ( 0 0 0 01011 00 1 Rm option3 imm3 Rn Rd -- )
+ARM-INSTRUCTION: ADDer64-encode ( 1 0 0 01011 00 1 Rm option3 imm3 Rn Rd -- )
 
 ! ADD (immediate): Add (immediate).
 ARM-INSTRUCTION: ADDi32-encode ( 0 0 0 10001 shift2 imm12 Rn Rd -- )
@@ -337,8 +323,6 @@ ARM-INSTRUCTION: ADDi64-encode ( 1 0 0 10001 shift2 imm12 Rn Rd -- )
 ! ADD (shifted register): Add (shifted register).
 ARM-INSTRUCTION: ADDsr32-encode ( 0 0 0 01011 shift2 0 Rm imm6 Rn Rd -- )
 ARM-INSTRUCTION: ADDsr64-encode ( 1 0 0 01011 shift2 0 Rm imm6 Rn Rd -- )
-
-ARM-INSTRUCTION: ADDs-encode ( 01 0 11110 size2 1 Rm 10000 1 Rn Rd -- )
 
 ! ADDG: Add with Tag.
 ARM-INSTRUCTION: ADDG-encode ( 1 0 0 100011 0 uimm6 00 uimm4 Xn Xd -- )
@@ -359,7 +343,6 @@ ARM-INSTRUCTION: ADDSsr64-encode ( 1 0 1 01011 shift2 0 Rm imm6 Rn Rd -- )
 ! ADRP: Form PC-relative address to 4KB page.
 ARM-INSTRUCTION: ADR-encode  ( 0 immlo2 10000 immhi19 Rd -- )
 ARM-INSTRUCTION: ADRP-encode ( 1 immlo2 10000 immhi19 Rd -- )
-
 
 ! AND (immediate): Bitwise AND (immediate).
 ARM-INSTRUCTION: ANDi32-encode ( 0 00 100100 0 immrimms Rn Rd -- )
@@ -443,13 +426,11 @@ ARM-INSTRUCTION: BFXIL32-encode ( 0 01 100110 0 immrimms Rn Rd -- )
 ARM-INSTRUCTION: BFXIL64-encode ( 1 01 100110 Nimmrimms Rn Rd -- )
 
 ! BIC (shifted register): Bitwise Bit Clear (shifted register).
-ARM-INSTRUCTION: BIC-encode ( 0 Q 1 0111100000 a1 b1 c1 cmode4 0 1 d1 e1 f1 g1 h1 Rd -- )
-! BIC (shifted register): Bitwise Bit Clear (shifted register).
-ARM-INSTRUCTION: BICsr32-encode ( 0 00 01010 shift2 1 Rm imm6 Rn Rd -- )
-ARM-INSTRUCTION: BICsr64-encode ( 1 00 01010 shift2 1 Rm imm6 Rn Rd -- )
+ARM-INSTRUCTION: BIC32-encode ( 0 00 01010 shift2 1 Rm imm6 Rn Rd -- )
+ARM-INSTRUCTION: BIC64-encode ( 1 00 01010 shift2 1 Rm imm6 Rn Rd -- )
 ! BICS (shifted register): Bitwise Bit Clear (shifted register), setting flags.
-ARM-INSTRUCTION: BICSsr32-encode ( 0 11 01010 shift2 1 Rm imm6 Rn Rd -- )
-ARM-INSTRUCTION: BICSsr64-encode ( 1 11 01010 shift2 1 Rm imm6 Rn Rd -- )
+ARM-INSTRUCTION: BICS32-encode ( 0 11 01010 shift2 1 Rm imm6 Rn Rd -- )
+ARM-INSTRUCTION: BICS64-encode ( 1 11 01010 shift2 1 Rm imm6 Rn Rd -- )
 ! BL: Branch with Link.
 ARM-INSTRUCTION: BL-encode ( 1 00101 imm26 -- )
 ! BLR: Branch with Link to Register.
@@ -515,19 +496,18 @@ ARM-INSTRUCTION: CBNZ64-encode ( 1 011010 1 imm19 Rt -- )
 ARM-INSTRUCTION: CBZ32-encode ( 0 011010 0 imm19 Rt -- )
 ARM-INSTRUCTION: CBZ64-encode ( 1 011010 0 imm19 Rt -- )
 
-
 ! CCMN (immediate): Conditional Compare Negative (immediate).
-ARM-INSTRUCTION: CCMNi32-encode ( 0 0 1 11010010 imm5 cond4 1 0 Rn 0 nzcv4 -- )
-ARM-INSTRUCTION: CCMNi64-encode ( 1 0 1 11010010 imm5 cond4 1 0 Rn 0 nzcv4 -- )
+ARM-INSTRUCTION: CCMNi32-encode ( 0 0 1 11010010 imm5 cond4 1 0 Rn 0 nzcv -- )
+ARM-INSTRUCTION: CCMNi64-encode ( 1 0 1 11010010 imm5 cond4 1 0 Rn 0 nzcv -- )
 ! CCMN (register): Conditional Compare Negative (register).
-ARM-INSTRUCTION: CCMNr32-encode ( 0 0 1 11010010 Rm cond4 0 0 Rn 0 nzcv4 -- )
-ARM-INSTRUCTION: CCMNr64-encode ( 1 0 1 11010010 Rm cond4 0 0 Rn 0 nzcv4 -- )
+ARM-INSTRUCTION: CCMNr32-encode ( 0 0 1 11010010 Rm cond4 0 0 Rn 0 nzcv -- )
+ARM-INSTRUCTION: CCMNr64-encode ( 1 0 1 11010010 Rm cond4 0 0 Rn 0 nzcv -- )
 ! CCMP (immediate): Conditional Compare (immediate).
-ARM-INSTRUCTION: CCMPi32-encode ( 0 1 1 11010010 imm5 cond4 1 0 Rn 0 nzcv4 -- )
-ARM-INSTRUCTION: CCMPi64-encode ( 1 1 1 11010010 imm5 cond4 1 0 Rn 0 nzcv4 -- )
+ARM-INSTRUCTION: CCMPi32-encode ( 0 1 1 11010010 imm5 cond4 1 0 Rn 0 nzcv -- )
+ARM-INSTRUCTION: CCMPi64-encode ( 1 1 1 11010010 imm5 cond4 1 0 Rn 0 nzcv -- )
 ! CCMP (register): Conditional Compare (register).
-ARM-INSTRUCTION: CCMPr32-encode ( 0 1 1 11010010 Rm cond4 0 0 Rn 0 nzcv4 -- )
-ARM-INSTRUCTION: CCMPr64-encode ( 1 1 1 11010010 Rm cond4 0 0 Rn 0 nzcv4 -- )
+ARM-INSTRUCTION: CCMPr32-encode ( 0 1 1 11010010 Rm cond4 0 0 Rn 0 nzcv -- )
+ARM-INSTRUCTION: CCMPr64-encode ( 1 1 1 11010010 Rm cond4 0 0 Rn 0 nzcv -- )
 
 ! CFINV: Invert Carry Flag.
 ARM-INSTRUCTION: CFINV-encode ( 1101010100 0 0 0 000 0100 0000 000 11111 -- )
@@ -555,8 +535,8 @@ ARM-INSTRUCTION: CMNer64-encode ( 1 0 1 01011 00 1 Rm option3 imm3 Rn Rd -- )
 ARM-INSTRUCTION: CMNi32-encode ( 0 0 1 10001 shift2 imm12 Rn 11111 -- )
 ARM-INSTRUCTION: CMNi64-encode ( 1 0 1 10001 shift2 imm12 Rn 11111 -- )
 ! CMN (shifted register): Compare Negative (shifted register): an alias of ADDS (shifted register).
-ARM-INSTRUCTION: CMN-sr32-encode ( 0 0 1 01011 shift2 0 Rm imm6 Rn 11111 -- )
-ARM-INSTRUCTION: CMN-sr64-encode ( 1 0 1 01011 shift2 0 Rm imm6 Rn 11111 -- )
+ARM-INSTRUCTION: CMNsr32-encode ( 0 0 1 01011 shift2 0 Rm imm6 Rn 11111 -- )
+ARM-INSTRUCTION: CMNsr64-encode ( 1 0 1 01011 shift2 0 Rm imm6 Rn 11111 -- )
 
 ! CMP (extended register): Compare (extended register): an alias of SUBS (extended register).
 ARM-INSTRUCTION: CMPer32-encode ( 0 1 1 01011 00 1 Rm option3 imm3 Rn 11111 -- )
@@ -819,12 +799,9 @@ ARM-INSTRUCTION: LDPsoff32-encode ( 00 101 0 010 1 imm7 Rt2 Rn Rt -- )
 ARM-INSTRUCTION: LDPsoff64-encode ( 10 101 0 010 1 imm7 Rt2 Rn Rt -- )
 
 ! LDPSW: Load Pair of Registers Signed Word.
-ARM-INSTRUCTION: LDPSWpost32-encode ( 01 101 0 001 1 imm7 Rt2 Rn Rt -- )
-ARM-INSTRUCTION: LDPSWpost64-encode ( 01 101 0 001 1 imm7 Rt2 Rn Rt -- )
-ARM-INSTRUCTION: LDPSWpre32-encode  ( 01 101 0 011 1 imm7 Rt2 Rn Rt -- )
-ARM-INSTRUCTION: LDPSWpre64-encode  ( 01 101 0 011 1 imm7 Rt2 Rn Rt -- )
-ARM-INSTRUCTION: LDPSWsoff32-encode ( 01 101 0 010 1 imm7 Rt2 Rn Rt -- )
-ARM-INSTRUCTION: LDPSWsoff64-encode ( 01 101 0 010 1 imm7 Rt2 Rn Rt -- )
+ARM-INSTRUCTION: LDPSWpost-encode ( 01 101 0 001 1 imm7 Rt2 Rn Rt -- )
+ARM-INSTRUCTION: LDPSWpre-encode  ( 01 101 0 011 1 imm7 Rt2 Rn Rt -- )
+ARM-INSTRUCTION: LDPSWsoff-encode ( 01 101 0 010 1 imm7 Rt2 Rn Rt -- )
 
 ! LDR (immediate): Load Register (immediate).
 ARM-INSTRUCTION: LDRpost32-encode ( 10 111 0 00 01 0 imm9 01 Rn Rt -- )
@@ -836,7 +813,7 @@ ARM-INSTRUCTION: LDRuoff64-encode ( 11 111 0 01 01 imm12 Rn Rt -- )
 
 ! LDR (literal): Load Register (literal).
 ARM-INSTRUCTION: LDRl32-encode ( 00 011 0 00 imm19 Rt -- )
-ARM-INSTRUCTION: LDRl64-encode ( 00 011 0 00 imm19 Rt -- )
+ARM-INSTRUCTION: LDRl64-encode ( 01 011 0 00 imm19 Rt -- )
 
 ! LDR (register): Load Register (register).
 ARM-INSTRUCTION: LDRr32-encode ( 10 111 0 00 01 1 Rm option3 S 1 0 Rn Rt -- )
@@ -850,53 +827,53 @@ ARM-INSTRUCTION: LDRABoff-encode ( 11 111 0 00 1 S 1 imm9 0 1 Rn Rt  -- )
 ARM-INSTRUCTION: LDRABpre-encode ( 11 111 0 00 1 S 1 imm9 1 1 Rn Rt  -- )
 
 ! LDRB (immediate): Load Register Byte (immediate).
-ARM-INSTRUCTION: LDRBimmpost-encode ( 00 111 0 00 01 0 imm9 01 Rn Rt -- )
-ARM-INSTRUCTION: LDRBimmpre-encode ( 00 111 0 00 01 0 imm9 11 Rn Rt -- )
-ARM-INSTRUCTION: LDRBimmuoff-encode ( 00 111 0 01 01 imm12 Rn Rt -- )
+ARM-INSTRUCTION: LDRBpost-encode ( 00 111 0 00 01 0 imm9 01 Rn Rt -- )
+ARM-INSTRUCTION: LDRBpre-encode ( 00 111 0 00 01 0 imm9 11 Rn Rt -- )
+ARM-INSTRUCTION: LDRBuoff-encode ( 00 111 0 01 01 imm12 Rn Rt -- )
 
 ! LDRB (register): Load Register Byte (register).
 ! option: 010: UXTW, 110 SXTW, 111 SXTX, S shift 0/1
-ARM-INSTRUCTION: LDRBrext-encode ( 00 111 0 00 01 1 Rm option3 S 10 Rn Rt -- )
-ARM-INSTRUCTION: LDRBrshift-encode ( 00 111 0 00 01 1 Rm 011 S 10 Rn Rt -- )
+ARM-INSTRUCTION: LDRBer-encode ( 00 111 0 00 01 1 Rm option3 S 10 Rn Rt -- )
+ARM-INSTRUCTION: LDRBsr-encode ( 00 111 0 00 01 1 Rm 011 S 10 Rn Rt -- )
 
 ! LDRH (immediate): Load Register Halfword (immediate).
-ARM-INSTRUCTION: LDRHimmpost-encode ( 01 111 0 00 01 0 imm9 01 Rn Rt -- )
-ARM-INSTRUCTION: LDRHimmpre-encode ( 01 111 0 00 01 0 imm9 11 Rn Rt -- )
-ARM-INSTRUCTION: LDRHimmuoff-encode ( 01 111 0 01 01 imm12 Rn Rt -- )
+ARM-INSTRUCTION: LDRHpost-encode ( 01 111 0 00 01 0 imm9 01 Rn Rt -- )
+ARM-INSTRUCTION: LDRHpre-encode ( 01 111 0 00 01 0 imm9 11 Rn Rt -- )
+ARM-INSTRUCTION: LDRHuoff-encode ( 01 111 0 01 01 imm12 Rn Rt -- )
 
 ! LDRH (register): Load Register Halfword (register).
 ARM-INSTRUCTION: LDRHr-encode ( 01 111 0 00 01 1 Rm option3 S 10 Rn Rt  -- )
 
 ! LDRSB (immediate): Load Register Signed Byte (immediate).
-ARM-INSTRUCTION: LDRSBimmpost32-encode ( 00 111 0 00 11 0 imm9 01 Rn Rt -- )
-ARM-INSTRUCTION: LDRSBimmpost64-encode ( 00 111 0 00 10 0 imm9 01 Rn Rt -- )
-ARM-INSTRUCTION: LDRSBimmpre32-encode  ( 00 111 0 00 11 0 imm9 11 Rn Rt -- )
-ARM-INSTRUCTION: LDRSBimmpre64-encode  ( 00 111 0 00 10 0 imm9 11 Rn Rt -- )
-ARM-INSTRUCTION: LDRSBimmuoff32-encode ( 00 111 0 01 11 imm12 Rn Rt -- )
-ARM-INSTRUCTION: LDRSBimmuoff64-encode ( 00 111 0 01 10 imm12 Rn Rt -- )
+ARM-INSTRUCTION: LDRSBpost32-encode ( 00 111 0 00 11 0 imm9 01 Rn Rt -- )
+ARM-INSTRUCTION: LDRSBpost64-encode ( 00 111 0 00 10 0 imm9 01 Rn Rt -- )
+ARM-INSTRUCTION: LDRSBpre32-encode  ( 00 111 0 00 11 0 imm9 11 Rn Rt -- )
+ARM-INSTRUCTION: LDRSBpre64-encode  ( 00 111 0 00 10 0 imm9 11 Rn Rt -- )
+ARM-INSTRUCTION: LDRSBuoff32-encode ( 00 111 0 01 11 imm12 Rn Rt -- )
+ARM-INSTRUCTION: LDRSBuoff64-encode ( 00 111 0 01 10 imm12 Rn Rt -- )
 
 ! LDRSB (register): Load Register Signed Byte (register).
-ARM-INSTRUCTION: LDRSBextreg32-encode   ( 00 111 0 00 11 1 Rm option3 S 10 Rn Rt -- )
-ARM-INSTRUCTION: LDRSBshiftreg32-encode ( 00 111 0 00 11 1 Rm 011 S 10 Rn Rt -- )
-ARM-INSTRUCTION: LDRSBextreg64-encode   ( 00 111 0 00 10 1 Rm option3 S 10 Rn Rt -- )
-ARM-INSTRUCTION: LDRSBshiftreg64-encode ( 00 111 0 00 10 1 Rm 011 S 10 Rn Rt -- )
+ARM-INSTRUCTION: LDRSBer32-encode   ( 00 111 0 00 11 1 Rm option3 S 10 Rn Rt -- )
+ARM-INSTRUCTION: LDRSBsr32-encode ( 00 111 0 00 11 1 Rm 011 S 10 Rn Rt -- )
+ARM-INSTRUCTION: LDRSBer64-encode   ( 00 111 0 00 10 1 Rm option3 S 10 Rn Rt -- )
+ARM-INSTRUCTION: LDRSBsr64-encode ( 00 111 0 00 10 1 Rm 011 S 10 Rn Rt -- )
 
 ! LDRSH (immediate): Load Register Signed Halfword (immediate).
-ARM-INSTRUCTION: LDRSHimmpost32-encode ( 01 111 0 00 11 0 imm9 01 Rn Rt -- )
-ARM-INSTRUCTION: LDRSHimmpost64-encode ( 01 111 0 00 10 0 imm9 01 Rn Rt -- )
-ARM-INSTRUCTION: LDRSHimmpre32-encode  ( 01 111 0 00 11 0 imm9 11 Rn Rt -- )
-ARM-INSTRUCTION: LDRSHimmpre64-encode  ( 01 111 0 00 10 0 imm9 11 Rn Rt -- )
-ARM-INSTRUCTION: LDRSHimmuoff32-encode ( 01 111 0 01 11 imm12 Rn Rt -- )
-ARM-INSTRUCTION: LDRSHimmuoff64-encode ( 01 111 0 01 10 imm12 Rn Rt -- )
+ARM-INSTRUCTION: LDRSHpost32-encode ( 01 111 0 00 11 0 imm9 01 Rn Rt -- )
+ARM-INSTRUCTION: LDRSHpost64-encode ( 01 111 0 00 10 0 imm9 01 Rn Rt -- )
+ARM-INSTRUCTION: LDRSHpre32-encode  ( 01 111 0 00 11 0 imm9 11 Rn Rt -- )
+ARM-INSTRUCTION: LDRSHpre64-encode  ( 01 111 0 00 10 0 imm9 11 Rn Rt -- )
+ARM-INSTRUCTION: LDRSHuoff32-encode ( 01 111 0 01 11 imm12 Rn Rt -- )
+ARM-INSTRUCTION: LDRSHuoff64-encode ( 01 111 0 01 10 imm12 Rn Rt -- )
 
 ! LDRSH (register): Load Register Signed Halfword (register).
-ARM-INSTRUCTION: LDRSH32-encode ( 01 111 0 00 11 1 Rm option3 S 10 Rn Rt -- )
-ARM-INSTRUCTION: LDRSH64-encode ( 01 111 0 00 10 1 Rm option3 S 10 Rn Rt -- )
+ARM-INSTRUCTION: LDRSHr32-encode ( 01 111 0 00 11 1 Rm option3 S 10 Rn Rt -- )
+ARM-INSTRUCTION: LDRSHr64-encode ( 01 111 0 00 10 1 Rm option3 S 10 Rn Rt -- )
 
 ! LDRSW (immediate): Load Register Signed Word (immediate).
-ARM-INSTRUCTION: LDRSWimmpost32-encode ( 10 111 0 00 10 0 imm9 01 Rn Rt -- )
-ARM-INSTRUCTION: LDRSWimmpre32-encode  ( 10 111 0 00 10 0 imm9 11 Rn Rt -- )
-ARM-INSTRUCTION: LDRSWimmuoff64-encode ( 10 111 0 01 10 imm12 Rn Rt -- )
+ARM-INSTRUCTION: LDRSWpost32-encode ( 10 111 0 00 10 0 imm9 01 Rn Rt -- )
+ARM-INSTRUCTION: LDRSWpre32-encode  ( 10 111 0 00 10 0 imm9 11 Rn Rt -- )
+ARM-INSTRUCTION: LDRSWuoff64-encode ( 10 111 0 01 10 imm12 Rn Rt -- )
 
 ! LDRSW (literal): Load Register Signed Word (literal).
 ARM-INSTRUCTION: LDRSWl-encode ( 10 011 0 00 imm19 Rt -- )
@@ -1144,13 +1121,13 @@ ARM-INSTRUCTION: MOVZ64-encode ( 1 10 100101 hw2 imm16 Rd -- )
 
 ! MRS: Move System Register.
 ! System register name, encoded in the "o0:op1:CRn:CRm:op2"
-ARM-INSTRUCTION: MRS-encode ( 1101010100 1 1 o0 op3 CRn CRm op3 Rt -- )
+ARM-INSTRUCTION: MRS-encode ( 1101010100 1 op2 op3 CRn CRm op3 Rt -- )
 
 ! MSR (immediate): Move immediate value to Special Register.
-ARM-INSTRUCTION: MRSi-encode ( 1101010100 0 00 op3 0100 CRm op3 11111 -- )
+ARM-INSTRUCTION: MSRi-encode ( 1101010100 0 00 op3 0100 CRm op3 11111 -- )
 
 ! MSR (register): Move general-purpose register to System Register.
-ARM-INSTRUCTION: MRSr-encode ( 1101010100 0 1 o0 op3 CRn CRm op3 Rt -- )
+ARM-INSTRUCTION: MSRr-encode ( 1101010100 0 op2 op3 CRn CRm op3 Rt -- )
 
 ! MSUB: Multiply-Subtract.
 ARM-INSTRUCTION: MSUB32-encode ( 0 00 11011 000 Rm 1 Ra Rn Rd -- )
@@ -1165,8 +1142,8 @@ ARM-INSTRUCTION: MVN32-encode ( 0 0 1 01010 shift2 1 Rm imm6 11111 Rd -- )
 ARM-INSTRUCTION: MVN64-encode ( 1 0 1 01010 shift2 1 Rm imm6 11111 Rd -- )
 
 ! NEG (shifted register): Negate (shifted register): an alias of SUB (shifted register).
-ARM-INSTRUCTION: NEGsr32-encode ( 0 1 0 01011 shift2 0 Rm imm6 11111 Rd -- )
-ARM-INSTRUCTION: NEGsr64-encode ( 1 1 0 01011 shift2 0 Rm imm6 11111 Rd -- )
+ARM-INSTRUCTION: NEG32-encode ( 0 1 0 01011 shift2 0 Rm imm6 11111 Rd -- )
+ARM-INSTRUCTION: NEG64-encode ( 1 1 0 01011 shift2 0 Rm imm6 11111 Rd -- )
 
 ! NEGS: Negate, setting flags: an alias of SUBS (shifted register).
 ARM-INSTRUCTION: NEGS32-encode ( 0 1 1 01011 shift2 0 Rm imm6 11111 Rd -- )
@@ -1188,8 +1165,8 @@ ARM-INSTRUCTION: ORNsr32-encode ( 0 01 01010 shift2 1 Rm imm6 Rn Rd -- )
 ARM-INSTRUCTION: ORNsr64-encode ( 1 01 01010 shift2 1 Rm imm6 Rn Rd -- )
 
 ! ORR (immediate): Bitwise OR (immediate).
-ARM-INSTRUCTION: ORR32-encode ( 0 01 100100 0 immrimms Rn Rd -- )
-ARM-INSTRUCTION: ORR64-encode ( 1 01 100100 Nimmrimms Rn Rd -- )
+ARM-INSTRUCTION: ORRi32-encode ( 0 01 100100 0 immrimms Rn Rd -- )
+ARM-INSTRUCTION: ORRi64-encode ( 1 01 100100 Nimmrimms Rn Rd -- )
 
 ! ORR (shifted register): Bitwise OR (shifted register).
 ARM-INSTRUCTION: ORRsr32-encode ( 0 01 01010 shift2 0 Rm imm6 Rn Rd -- )
@@ -1217,7 +1194,6 @@ ARM-INSTRUCTION: PACIZA-encode ( 1 1 0 11010110 00001 0 0 1 000 Rn Rd -- )
 ARM-INSTRUCTION: PACIA1716-encode ( 1101010100 0 00 011 0010 0001 000 11111 -- )
 ARM-INSTRUCTION: PACIASP-encode   ( 1101010100 0 00 011 0010 0011 001 11111 -- )
 ARM-INSTRUCTION: PACIAZ-encode    ( 1101010100 0 00 011 0010 0011 000 11111 -- )
-
 
 ! PACIB, PACIB1716, PACIBSP, PACIBZ, PACIZB: Pointer Authentication Code for Instruction address, using key B.
 ! ARMv8.3
@@ -1478,11 +1454,11 @@ ARM-INSTRUCTION: STPsoff32-encode ( 00 101 0 010 0 imm7 Rt2 Rn Rt -- )
 ARM-INSTRUCTION: STPsoff64-encode ( 10 101 0 010 0 imm7 Rt2 Rn Rt -- )
 
 ! STR (immediate): Store Register (immediate).
-ARM-INSTRUCTION: STRpost32-encode ( 00 111 0 00 00 0 imm9 01 Rn Rt -- )
+ARM-INSTRUCTION: STRpost32-encode ( 10 111 0 00 00 0 imm9 01 Rn Rt -- )
 ARM-INSTRUCTION: STRpost64-encode ( 11 111 0 00 00 0 imm9 01 Rn Rt -- )
-ARM-INSTRUCTION: STRpre32-encode  ( 00 111 0 00 00 0 imm9 11 Rn Rt -- )
+ARM-INSTRUCTION: STRpre32-encode  ( 10 111 0 00 00 0 imm9 11 Rn Rt -- )
 ARM-INSTRUCTION: STRpre64-encode  ( 11 111 0 00 00 0 imm9 11 Rn Rt -- )
-ARM-INSTRUCTION: STRuoff32-encode ( 00 111 0 01 00 imm12 Rn Rt -- )
+ARM-INSTRUCTION: STRuoff32-encode ( 10 111 0 01 00 imm12 Rn Rt -- )
 ARM-INSTRUCTION: STRuoff64-encode ( 11 111 0 01 00 imm12 Rn Rt -- )
 
 ! STR (register): Store Register (register).
@@ -1490,13 +1466,13 @@ ARM-INSTRUCTION: STRr32-encode ( 10 111 0 00 00 1 Rm option3 S 10 Rn Rt -- )
 ARM-INSTRUCTION: STRr64-encode ( 11 111 0 00 00 1 Rm option3 S 10 Rn Rt -- )
 
 ! STRB (immediate): Store Register Byte (immediate).
-ARM-INSTRUCTION: STRpost-encode ( 00 111 0 00 00 0 imm9 01 Rn Rt -- )
-ARM-INSTRUCTION: STRpre-encode  ( 00 111 0 00 00 0 imm9 11 Rn Rt -- )
-ARM-INSTRUCTION: STRuoff-encode ( 00 111 0 01 00 imm12 Rn Rt -- )
+ARM-INSTRUCTION: STRBpost-encode ( 00 111 0 00 00 0 imm9 01 Rn Rt -- )
+ARM-INSTRUCTION: STRBpre-encode  ( 00 111 0 00 00 0 imm9 11 Rn Rt -- )
+ARM-INSTRUCTION: STRBuoff-encode ( 00 111 0 01 00 imm12 Rn Rt -- )
 
 ! STRB (register): Store Register Byte (register).
-ARM-INSTRUCTION: STRBext-encode   ( 00 111 0 00 00 1 Rm option3 S 10 Rn Rt -- )
-ARM-INSTRUCTION: STRBshift-encode ( 00 111 0 00 00 1 Rm 011 S 10 Rn Rt -- )
+ARM-INSTRUCTION: STRBer-encode   ( 00 111 0 00 00 1 Rm option3 S 10 Rn Rt -- )
+ARM-INSTRUCTION: STRBsr-encode ( 00 111 0 00 00 1 Rm 011 S 10 Rn Rt -- )
 
 ! STRH (immediate): Store Register Halfword (immediate).
 ARM-INSTRUCTION: STRHpost-encode ( 01 111 0 00 00 0 imm9 01 Rn Rt -- )
@@ -1504,7 +1480,7 @@ ARM-INSTRUCTION: STRHpre-encode  ( 01 111 0 00 00 0 imm9 11 Rn Rt -- )
 ARM-INSTRUCTION: STRHuoff-encode ( 01 111 0 01 00 imm12 Rn Rt -- )
 
 ! STRH (register): Store Register Halfword (register).
-ARM-INSTRUCTION: STRH-encode ( 01 111 0 00 00 1 Rm option3 S 10 Rn Rt -- )
+ARM-INSTRUCTION: STRHr-encode ( 01 111 0 00 00 1 Rm option3 S 10 Rn Rt -- )
 
 ! STSET, STSETL: Atomic bit set on word or doubleword in memory, without return: an alias of LDSET, LDSETA, LDSETAL, LDSETL.
 ! ARMv8.1

@@ -1,5 +1,5 @@
 ! Copyright (C) 2004, 2010 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors arrays byte-arrays byte-vectors classes
 classes.algebra.private classes.builtin classes.error
 classes.intersection classes.maybe classes.mixin classes.parser
@@ -135,8 +135,8 @@ IN: bootstrap.syntax
         ";" [ create-word-in [ reset-generic ] [ define-symbol ] bi ] each-token
     ] define-core-syntax
 
-    "INITIALIZE:" [
-        scan-word parse-definition [ initialize ] 2curry append!
+    "INITIALIZED-SYMBOL:" [
+        scan-new-word [ define-symbol ] [ scan-object [ initialize ] 2curry ] bi append!
     ] define-core-syntax
 
     "SINGLETONS:" [

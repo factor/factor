@@ -1,5 +1,5 @@
 ! Copyright (C) 2008 Alex Chapman
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors kernel math math.constants math.functions
 sequences sequences.modified sequences.repeating ;
 IN: synth

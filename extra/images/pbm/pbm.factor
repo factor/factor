@@ -1,5 +1,5 @@
 ! Copyright (C) 2010 Erik Charlebois.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors arrays ascii bit-arrays byte-arrays combinators
 continuations grouping images images.loader io
 io.encodings.ascii io.encodings.string io.streams.throwing

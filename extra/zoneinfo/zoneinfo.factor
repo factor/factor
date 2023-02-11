@@ -1,5 +1,5 @@
 ! Copyright (C) 2009 Doug Coleman.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors arrays ascii assocs assocs.extras calendar
 calendar.english combinators combinators.short-circuit
 combinators.smart countries grouping interval-maps
@@ -148,7 +148,7 @@ MEMO: zoneinfo-assoc ( -- assoc )
 : zoneinfo-zones ( -- seq )
     raw-zone-map keys
     [ "/" subseq-of? ] partition
-    [ natural-sort ] bi@ append ;
+    [ sort ] bi@ append ;
 
 GENERIC: zone-matches? ( string rule -- ? )
 

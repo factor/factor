@@ -1,5 +1,5 @@
 ! Copyright (C) 2009 Slava Pestov, Daniel Ehrenberg.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors combinators combinators.private compiler.test
 compiler.tree compiler.tree.builder compiler.tree.debugger
 compiler.tree.optimizer compiler.tree.propagation.call-effect
@@ -118,8 +118,8 @@ IN: compiler.tree.propagation.call-effect.tests
 { f } [ [ dup drop ] final-info first infer-value ] unit-test
 
 ! This should not hang
-{ } [ [ [ dup call( quot -- ) ] dup call( quot -- ) ] final-info drop ] unit-test
-{ } [ [ [ dup curry call( quot -- ) ] dup curry call( quot -- ) ] final-info drop ] unit-test
+[ [ [ dup call( quot -- ) ] dup call( quot -- ) ] final-info ] must-not-fail
+[ [ [ dup curry call( quot -- ) ] dup curry call( quot -- ) ] final-info ] must-not-fail
 
 ! This should get inlined, because the parameter to the curry is literal even though
 ! [ boa ] by itself doesn't infer

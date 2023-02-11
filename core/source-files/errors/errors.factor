@@ -1,5 +1,5 @@
 ! Copyright (C) 2009 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors assocs continuations definitions io
 kernel math math.parser namespaces sequences sorting ;
 IN: source-files.errors
@@ -27,7 +27,7 @@ M: source-file-error compute-restarts error>> compute-restarts ;
         swap >>error ; inline
 
 : sort-errors ( errors -- alist )
-    [ [ line#>> 0 or ] sort-with ] { } assoc-map-as sort-keys ;
+    [ [ line#>> 0 or ] sort-by ] { } assoc-map-as sort-keys ;
 
 : group-by-source-file ( errors -- assoc )
     [ path>> ] collect-by ;

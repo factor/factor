@@ -1,5 +1,5 @@
 ! Copyright (C) 2014 John Benediktsson
-! See http://factorcode.org/license.txt for BSD license
+! See https://factorcode.org/license.txt for BSD license
 
 USING: accessors colors colors.lab colors.luv colors.xyz kernel
 math math.functions math.libm math.trig ;
@@ -9,6 +9,8 @@ IN: colors.lch
 TUPLE: LCHuv l c h alpha ;
 
 C: <LCHuv> LCHuv
+
+INSTANCE: LCHuv color
 
 M: LCHuv >rgba >luva >rgba ;
 
@@ -49,6 +51,8 @@ M: luva >LCHuv
 TUPLE: LCHab l c h alpha ;
 
 C: <LCHab> LCHab
+
+INSTANCE: LCHab color
 
 M: LCHab >rgba >laba >rgba ;
 

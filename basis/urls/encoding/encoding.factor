@@ -1,5 +1,5 @@
 ! Copyright (C) 2008, 2010 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: arrays ascii assocs byte-arrays combinators
 combinators.short-circuit io.encodings io.encodings.string
 io.encodings.utf8 kernel linked-assocs make math math.parser
@@ -14,7 +14,7 @@ IN: urls.encoding
         [ "-._~/:" member? ]
     } 1|| ; foldable
 
-! see http://tools.ietf.org/html/rfc3986#section-2.2
+! see https://tools.ietf.org/html/rfc3986#section-2.2
 : gen-delim? ( ch -- ? )
     ":/?#[]@" member? ; foldable
 
@@ -24,7 +24,7 @@ IN: urls.encoding
 : reserved? ( ch -- ? )
     [ gen-delim? ] [ sub-delim? ] bi or ; foldable
 
-! see http://tools.ietf.org/html/rfc3986#section-2.3
+! see https://tools.ietf.org/html/rfc3986#section-2.3
 : unreserved? ( ch -- ? )
     {
         [ letter? ]

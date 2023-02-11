@@ -1,6 +1,6 @@
 ! Copyright (C) 2003, 2009 Slava Pestov.
 ! Copyright (C) 2008 Eduardo Cavazos.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors ascii arrays assocs combinators grouping
 io.encodings.utf8 io.files kernel lexer math math.functions
 math.parser sequences splitting vocabs.loader ;

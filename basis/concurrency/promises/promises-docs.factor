@@ -1,5 +1,5 @@
 ! Copyright (C) 2005, 2008 Chris Double, Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: calendar help.markup help.syntax kernel ;
 IN: concurrency.promises
 

@@ -1,5 +1,5 @@
 ! Copyright (C) 2010 Brennan Cheung.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 
 ! This version of the FastCGI library only supports single connections.
 ! As opposed to multiplexing multiple requests across a single

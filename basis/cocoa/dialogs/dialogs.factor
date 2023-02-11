@@ -1,5 +1,5 @@
 ! Copyright (C) 2006, 2008 Slava Pestov
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: cocoa cocoa.application cocoa.classes
 core-foundation.strings kernel splitting ;
 IN: cocoa.dialogs
@@ -12,7 +12,7 @@ IN: cocoa.dialogs
     dup 1 -> setAllowsMultipleSelection: ;
 
 : <NSDirPanel> ( -- panel ) <NSOpenPanel>
-   dup 1 -> setCanChooseDirectories: ;
+    dup 1 -> setCanChooseDirectories: ;
 
 : <NSSavePanel> ( -- panel )
     NSSavePanel -> savePanel

@@ -1,9 +1,9 @@
 ! Copyright (c) 2008 Eric Mertens.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: assocs combinators kernel math math.order namespaces sequences project-euler.common ;
 IN: project-euler.151
 
-! http://projecteuler.net/index.php?section=problems&id=151
+! https://projecteuler.net/index.php?section=problems&id=151
 
 ! DESCRIPTION
 ! -----------
@@ -63,7 +63,7 @@ DEFER: (euler151)
         { { 0 1 0 0 } [ { 0 0 1 1 } (euler151) 1 + ] }
         { { 1 0 0 0 } [ { 0 1 1 1 } (euler151) 1 + ] }
         [ [ dup length <iota> [ pick-sheet ] with map-sum ] [ sum ] bi / ]
-     } case ] cache ;
+    } case ] cache ;
 
 : euler151 ( -- answer )
     [

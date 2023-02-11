@@ -1,5 +1,5 @@
 ! Copyright (C) 2007, 2009 Daniel Ehrenberg, Slava Pestov, and Doug Coleman
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: assocs.private help.markup help.syntax kernel math
 namespaces quotations sequences ;
 IN: assocs
@@ -514,29 +514,29 @@ HELP: >alist
 
 HELP: assoc-clone-like
 { $values
-     { "assoc" assoc } { "exemplar" assoc }
-     { "newassoc" assoc } }
+    { "assoc" assoc } { "exemplar" assoc }
+    { "newassoc" assoc } }
 { $description "Outputs a newly-allocated assoc with the same elements as " { $snippet "assoc" } "." }
 { $examples { $example "USING: prettyprint assocs hashtables ;" "H{ { 1 2 } { 3 4 } } { } assoc-clone-like ." "{ { 1 2 } { 3 4 } }" } } ;
 
 HELP: assoc-union-all
 { $values
-     { "seq" "a sequence of assocs" }
-     { "union" assoc } }
+    { "seq" "a sequence of assocs" }
+    { "union" assoc } }
 { $description "Takes the union of all of the " { $snippet "assocs" } " in " { $snippet "seq" } "." }
 { $examples { $example "USING: prettyprint assocs ;" "{ H{ { 1 2 } } H{ { 3 4 } } } assoc-union-all ." "H{ { 1 2 } { 3 4 } }" } } ;
 
 HELP: assoc-map-as
 { $values
-     { "assoc" assoc } { "quot" { $quotation ( ... key value -- ... newkey newvalue ) } } { "exemplar" assoc }
-     { "newassoc" assoc } }
+    { "assoc" assoc } { "quot" { $quotation ( ... key value -- ... newkey newvalue ) } } { "exemplar" assoc }
+    { "newassoc" assoc } }
 { $description "Applies the quotation to each entry in the input assoc and collects the results in a new assoc of the same type as the exemplar." }
 { $examples { $example "USING: prettyprint assocs hashtables math ;" " H{ { 1 2 } { 3 4 } } [ sq ] { } assoc-map-as ." "{ { 1 4 } { 3 16 } }" } } ;
 
 HELP: extract-keys
 { $values
-     { "seq" sequence } { "assoc" assoc }
-     { "subassoc" assoc } }
+    { "seq" sequence } { "assoc" assoc }
+    { "subassoc" assoc } }
 { $description "Outputs an new " { $snippet "assoc" } " with key/value pairs whose keys match the elements in the input " { $snippet "seq" } "." }
 { $examples
     { $example "USING: prettyprint assocs ;"
@@ -547,7 +547,7 @@ HELP: extract-keys
 
 HELP: push-at
 { $values
-     { "value" object } { "key" object } { "assoc" assoc } }
+    { "value" object } { "key" object } { "assoc" assoc } }
 { $description "Pushes the " { $snippet "value" } " onto a " { $snippet "vector" } " stored at the " { $snippet "key" } " in the " { $snippet "assoc" } ". If the " { $snippet "key" } " does not yet exist, creates a new " { $snippet "vector" } " at that " { $snippet "key" } " and pushes the " { $snippet "value" } "." }
 { $examples { $example "USING: prettyprint assocs kernel ;"
 "H{ { \"cats\" V{ \"Mittens\" } } } \"Mew\" \"cats\" pick push-at ."
@@ -556,8 +556,8 @@ HELP: push-at
 
 HELP: search-alist
 { $values
-     { "key" object } { "alist" "an array of key/value pairs" }
-     { "pair/f" "a key/value pair" } { "i/f" integer } }
+    { "key" object } { "alist" "an array of key/value pairs" }
+    { "pair/f" "a key/value pair" } { "i/f" integer } }
 { $description "Iterates over " { $snippet "alist" } " and stops when the key is matched or the end of the " { $snippet "alist" } " has been reached. If there is no match, both outputs are " { $link f } "." }
 { $notes "This word is used to implement " { $link at* } " and " { $link set-at } " on sequences, and should not be called directly." }
 { $examples { $example "USING: prettyprint assocs.private kernel ;"
@@ -571,8 +571,8 @@ HELP: search-alist
 
 HELP: unzip
 { $values
-     { "assoc" assoc }
-     { "keys" sequence } { "values" sequence } }
+    { "assoc" assoc }
+    { "keys" sequence } { "values" sequence } }
 { $description "Outputs an array of keys and an array of values of the input " { $snippet "assoc" } "." }
 { $examples
     { $example "USING: prettyprint assocs kernel ;"
@@ -583,8 +583,8 @@ HELP: unzip
 
 HELP: zip
 { $values
-     { "keys" sequence } { "values" sequence }
-     { "alist" "an array of key/value pairs" } }
+    { "keys" sequence } { "values" sequence }
+    { "alist" "an array of key/value pairs" } }
 { $description "Combines two sequences pairwise into a single sequence of key/value pairs." }
 { $examples
     { $example "USING: prettyprint assocs ;"
@@ -595,8 +595,8 @@ HELP: zip
 
 HELP: zip-as
 { $values
-     { "keys" sequence } { "values" sequence } { "exemplar" sequence }
-     { "assoc" "a sequence of key/value pairs of type " { $snippet "exemplar" } } }
+    { "keys" sequence } { "values" sequence } { "exemplar" sequence }
+    { "assoc" "a sequence of key/value pairs of type " { $snippet "exemplar" } } }
 { $description "Combines two sequences pairwise into a single sequence of key/value pairs of type " { $snippet "exemplar" } "." }
 { $notes "Exemplar must be a sequence type; hashtables will not work yet." }
 { $examples

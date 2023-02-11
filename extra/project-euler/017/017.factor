@@ -1,10 +1,10 @@
 ! Copyright (c) 2007, 2008 Aaron Schaefer.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: ascii kernel ranges math.text.english sequences
 project-euler.common ;
 IN: project-euler.017
 
-! http://projecteuler.net/index.php?section=problems&id=17
+! https://projecteuler.net/index.php?section=problems&id=17
 
 ! DESCRIPTION
 ! -----------

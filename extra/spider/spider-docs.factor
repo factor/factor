@@ -1,22 +1,22 @@
 ! Copyright (C) 2008 Doug Coleman.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: help.markup help.syntax ;
 IN: spider
 
 HELP: <spider>
 { $values
-     { "base" "a string or url" }
-     { "spider" spider } }
+    { "base" "a string or url" }
+    { "spider" spider } }
 { $description "Creates a new web spider with a given base url." } ;
 
 HELP: run-spider
 { $values
-     { "spider" spider } }
+    { "spider" spider } }
 { $description "Runs a spider until completion. See the " { $subsection "spider-tutorial" } " for a complete description of the tuple slots that affect how thet spider works." } ;
 
 ARTICLE: "spider-tutorial" "Spider tutorial"
 "To create a new spider, call the " { $link <spider> } " word with a link to the site you wish to spider."
-{ $code "\"http://concatenative.org\" <spider>" }
+{ $code "\"https://concatenative.org\" <spider>" }
 "The max-depth is initialized to 0, which retrieves just the initial page. Let's initialize it to something more fun:"
 { $code "1 >>max-depth" }
 "Now the spider will retrieve the first page and all the pages it links to in the same domain." $nl
@@ -31,7 +31,7 @@ ARTICLE: "spider-tutorial" "Spider tutorial"
 "The full code from the tutorial."
 { $code "USING: spider calendar sequences accessors ;
 : spider-concatenative ( -- spider )
-    \"http://concatenative.org\" <spider>
+    \"https://concatenative.org\" <spider>
     1 >>max-depth
     10 >>max-count
     1.5 seconds >>sleep 

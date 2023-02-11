@@ -1,5 +1,5 @@
 ! Copyright (C) 2003, 2010 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors arrays ascii assocs base64 calendar calendar.format
 calendar.parser combinators hashtables http.parsers io io.crlf
 io.encodings.iana io.encodings.utf8 kernel make math math.parser
@@ -30,7 +30,7 @@ CONSTANT: max-redirects 10
     } cond ;
 
 : check-header-string ( str -- str )
-    ! http://en.wikipedia.org/wiki/HTTP_Header_Injection
+    ! https://en.wikipedia.org/wiki/HTTP_Header_Injection
     dup "\r\n" intersects?
     [ "Header injection attack" throw ] when ;
 

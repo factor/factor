@@ -1,6 +1,6 @@
 ! Copyright (C) 2008 Doug Coleman.
 ! Copyright (C) 2009 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors alien alien.c-types colors images images.memory
 kernel math math.rectangles sequences ;
 USE: cairo.ffi

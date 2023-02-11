@@ -1,5 +1,5 @@
 ! Copyright (C) 2008, 2009 Daniel Ehrenberg, Slava Pestov
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: kernel tools.test wrap.strings ;
 
 {

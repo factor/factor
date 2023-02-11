@@ -13,8 +13,8 @@ TUPLE: persistent-hash
 M: persistent-hash assoc-size count>> ;
 
 M: persistent-hash at*
-     [ dup hashcode >fixnum ] [ root>> ] bi* (entry-at)
-     dup [ value>> t ] [ f ] if ;
+    [ dup hashcode >fixnum ] [ root>> ] bi* (entry-at)
+    dup [ value>> t ] [ f ] if ;
 
 M: persistent-hash new-at
     [

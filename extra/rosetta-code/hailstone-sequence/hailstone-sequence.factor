@@ -1,9 +1,9 @@
 ! Copyright (c) 2012 Anonymous
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: arrays io kernel math ranges prettyprint sequences vectors ;
 IN: rosetta-code.hailstone-sequence
 
-! http://rosettacode.org/wiki/Hailstone_sequence
+! https://rosettacode.org/wiki/Hailstone_sequence
 
 ! The Hailstone sequence of numbers can be generated from a
 ! starting positive integer, n by:

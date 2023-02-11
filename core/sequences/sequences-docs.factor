@@ -549,7 +549,8 @@ HELP: find-index-from
           { "quot" { $quotation ( ... elt i -- ... ? ) } }
           { "i" { $maybe "the index of the first match" } }
           { "elt" { $maybe "the first matching element" } } }
-{ $description "A variant of " { $link find-from } " where the quotation takes both an element and its index." } ;
+{ $description "A variant of " { $link find-from } " where the quotation takes both an element and its index."
+  "The search starts from list index " { $snippet "n" } ", skipping elements up until that index." } ;
 
 HELP: map-find
 { $values { "seq" sequence } { "quot" { $quotation ( ... elt -- ... result/f ) } } { "result" "the first non-false result of the quotation" } { "elt" { $maybe "the first matching element" } } }
@@ -1490,8 +1491,8 @@ HELP: sift
 { $values
     { "seq" sequence }
     { "newseq" sequence } }
- { $description "Outputs a new sequence with all instances of " { $link f } " removed." }
- { $examples
+{ $description "Outputs a new sequence with all instances of " { $link f } " removed." }
+{ $examples
     { $example "USING: prettyprint sequences ;"
         "{ \"a\" 3 { } f } sift ."
         "{ \"a\" 3 { } }"
@@ -1574,7 +1575,7 @@ HELP: replicate-as
 { $values
     { "len" integer } { "quot" { $quotation ( ... -- ... newelt ) } } { "exemplar" sequence }
     { "newseq" sequence } }
- { $description "Calls the quotation " { $snippet "len" } " times, collecting results into a new sequence of the same type as the exemplar sequence." }
+{ $description "Calls the quotation " { $snippet "len" } " times, collecting results into a new sequence of the same type as the exemplar sequence." }
 { $examples
     { $unchecked-example "USING: prettyprint kernel sequences ;"
         "5 [ 100 random ] B{ } replicate-as ."
@@ -1612,7 +1613,7 @@ HELP: 2map-reduce
 { $values
     { "seq1" sequence } { "seq2" sequence } { "map-quot" { $quotation ( ..a elt1 elt2 -- ..a intermediate ) } } { "reduce-quot" { $quotation ( ..a prev intermediate -- ..a next ) } }
     { "result" object } }
- { $description "Calls " { $snippet "map-quot" } " on each pair of elements from " { $snippet "seq1" } " and " { $snippet "seq2" } " and combines the results using " { $snippet "reduce-quot" } " in the same manner as " { $link reduce } ", except that there is no identity element, and the sequence must have a length of at least 1." }
+{ $description "Calls " { $snippet "map-quot" } " on each pair of elements from " { $snippet "seq1" } " and " { $snippet "seq2" } " and combines the results using " { $snippet "reduce-quot" } " in the same manner as " { $link reduce } ", except that there is no identity element, and the sequence must have a length of at least 1." }
 { $errors "Throws an error if the sequence is empty." }
 { $examples { $example "USING: sequences prettyprint math ;"
     "{ 10 30 50 } { 200 400 600 } [ + ] [ + ] 2map-reduce ."

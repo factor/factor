@@ -1,5 +1,5 @@
 ! Copyright (c) 2007, 2008, 2018 Aaron Schaefer, 2022 Alexander Ilin.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: combinators combinators.short-circuit kernel math
 math.order math.parser math.text.utils namespaces sequences
 splitting ;

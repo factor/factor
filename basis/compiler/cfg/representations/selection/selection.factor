@@ -1,5 +1,5 @@
 ! Copyright (C) 2010 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs byte-arrays combinators
 compiler.cfg compiler.cfg.instructions
 compiler.cfg.loop-detection compiler.cfg.registers

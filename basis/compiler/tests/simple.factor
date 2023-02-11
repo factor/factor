@@ -5,59 +5,59 @@ definitions generic.single ;
 IN: compiler.tests.simple
 
 ! Test empty word
-[ ] [ [ ] compile-call ] unit-test
+{ } [ [ ] compile-call ] unit-test
 
 ! Test literals
-[ 1 ] [ [ 1 ] compile-call ] unit-test
-[ 31 ] [ [ 31 ] compile-call ] unit-test
-[ 255 ] [ [ 255 ] compile-call ] unit-test
-[ -1 ] [ [ -1 ] compile-call ] unit-test
-[ 65536 ] [ [ 65536 ] compile-call ] unit-test
-[ -65536 ] [ [ -65536 ] compile-call ] unit-test
-[ "hey" ] [ [ "hey" ] compile-call ] unit-test
+{ 1 } [ [ 1 ] compile-call ] unit-test
+{ 31 } [ [ 31 ] compile-call ] unit-test
+{ 255 } [ [ 255 ] compile-call ] unit-test
+{ -1 } [ [ -1 ] compile-call ] unit-test
+{ 65536 } [ [ 65536 ] compile-call ] unit-test
+{ -65536 } [ [ -65536 ] compile-call ] unit-test
+{ "hey" } [ [ "hey" ] compile-call ] unit-test
 
 ! Calls
 : no-op ( -- ) ;
 
-[ ] [ [ no-op ] compile-call ] unit-test
-[ 3 ] [ [ no-op 3 ] compile-call ] unit-test
-[ 3 ] [ [ 3 no-op ] compile-call ] unit-test
+{ } [ [ no-op ] compile-call ] unit-test
+{ 3 } [ [ no-op 3 ] compile-call ] unit-test
+{ 3 } [ [ 3 no-op ] compile-call ] unit-test
 
 : bar ( -- value ) 4 ;
 
-[ 4 ] [ [ bar no-op ] compile-call ] unit-test
-[ 4 3 ] [ [ no-op bar 3 ] compile-call ] unit-test
-[ 3 4 ] [ [ 3 no-op bar ] compile-call ] unit-test
+{ 4 } [ [ bar no-op ] compile-call ] unit-test
+{ 4 3 } [ [ no-op bar 3 ] compile-call ] unit-test
+{ 3 4 } [ [ 3 no-op bar ] compile-call ] unit-test
 
-[ ] [ no-op ] unit-test
+{ } [ no-op ] unit-test
 
 ! Conditionals
 
-[ 1 ] [ t [ [ 1 ] [ 2 ] if ] compile-call ] unit-test
-[ 2 ] [ f [ [ 1 ] [ 2 ] if ] compile-call ] unit-test
-[ 1 3 ] [ t [ [ 1 ] [ 2 ] if 3 ] compile-call ] unit-test
-[ 2 3 ] [ f [ [ 1 ] [ 2 ] if 3 ] compile-call ] unit-test
+{ 1 } [ t [ [ 1 ] [ 2 ] if ] compile-call ] unit-test
+{ 2 } [ f [ [ 1 ] [ 2 ] if ] compile-call ] unit-test
+{ 1 3 } [ t [ [ 1 ] [ 2 ] if 3 ] compile-call ] unit-test
+{ 2 3 } [ f [ [ 1 ] [ 2 ] if 3 ] compile-call ] unit-test
 
-[ "hi" ] [ 0 [ { [ "hi" ] [ "bye" ] } dispatch ] compile-call ] unit-test
-[ "bye" ] [ 1 [ { [ "hi" ] [ "bye" ] } dispatch ] compile-call ] unit-test
+{ "hi" } [ 0 [ { [ "hi" ] [ "bye" ] } dispatch ] compile-call ] unit-test
+{ "bye" } [ 1 [ { [ "hi" ] [ "bye" ] } dispatch ] compile-call ] unit-test
 
-[ "hi" 3 ] [ 0 [ { [ "hi" ] [ "bye" ] } dispatch 3 ] compile-call ] unit-test
-[ "bye" 3 ] [ 1 [ { [ "hi" ] [ "bye" ] } dispatch 3 ] compile-call ] unit-test
+{ "hi" 3 } [ 0 [ { [ "hi" ] [ "bye" ] } dispatch 3 ] compile-call ] unit-test
+{ "bye" 3 } [ 1 [ { [ "hi" ] [ "bye" ] } dispatch 3 ] compile-call ] unit-test
 
-[ 4 1 ] [ 0 [ { [ bar 1 ] [ 3 1 ] } dispatch ] compile-call ] unit-test
-[ 3 1 ] [ 1 [ { [ bar 1 ] [ 3 1 ] } dispatch ] compile-call ] unit-test
-[ 4 1 3 ] [ 0 [ { [ bar 1 ] [ 3 1 ] } dispatch 3 ] compile-call ] unit-test
-[ 3 1 3 ] [ 1 [ { [ bar 1 ] [ 3 1 ] } dispatch 3 ] compile-call ] unit-test
+{ 4 1 } [ 0 [ { [ bar 1 ] [ 3 1 ] } dispatch ] compile-call ] unit-test
+{ 3 1 } [ 1 [ { [ bar 1 ] [ 3 1 ] } dispatch ] compile-call ] unit-test
+{ 4 1 3 } [ 0 [ { [ bar 1 ] [ 3 1 ] } dispatch 3 ] compile-call ] unit-test
+{ 3 1 3 } [ 1 [ { [ bar 1 ] [ 3 1 ] } dispatch 3 ] compile-call ] unit-test
 
-[ 2 3 ] [ 1 [ { [ gc 1 ] [ gc 2 ] } dispatch 3 ] compile-call ] unit-test
+{ 2 3 } [ 1 [ { [ gc 1 ] [ gc 2 ] } dispatch 3 ] compile-call ] unit-test
 
 ! Labels
 
 : recursive-test ( ? -- ) [ f recursive-test ] when ; inline recursive
 
-[ ] [ t [ recursive-test ] compile-call ] unit-test
+{ } [ t [ recursive-test ] compile-call ] unit-test
 
-[ ] [ t recursive-test ] unit-test
+{ } [ t recursive-test ] unit-test
 
 ! Make sure error reporting works
 
@@ -66,33 +66,33 @@ IN: compiler.tests.simple
 
 ! Regression
 
-[ ] [ [ get-callstack ] compile-call drop ] unit-test
+[ [ get-callstack ] compile-call ] must-not-fail
 
 ! Regression
 
 : empty ( -- ) ;
 
-[ "b" ] [ 1 [ empty { [ "a" ] [ "b" ] } dispatch ] compile-call ] unit-test
+{ "b" } [ 1 [ empty { [ "a" ] [ "b" ] } dispatch ] compile-call ] unit-test
 
 : dummy-if-1 ( -- ) t [ ] [ ] if ;
 
-[ ] [ dummy-if-1 ] unit-test
+{ } [ dummy-if-1 ] unit-test
 
 : dummy-if-2 ( -- ) f [ ] [ ] if ;
 
-[ ] [ dummy-if-2 ] unit-test
+{ } [ dummy-if-2 ] unit-test
 
 : dummy-if-3 ( -- n ) t [ 1 ] [ 2 ] if ;
 
-[ 1 ] [ dummy-if-3 ] unit-test
+{ 1 } [ dummy-if-3 ] unit-test
 
 : dummy-if-4 ( -- n ) f [ 1 ] [ 2 ] if ;
 
-[ 2 ] [ dummy-if-4 ] unit-test
+{ 2 } [ dummy-if-4 ] unit-test
 
 : dummy-if-5 ( -- n ) 0 dup 1 fixnum<= [ drop 1 ] [ ] if ;
 
-[ 1 ] [ dummy-if-5 ] unit-test
+{ 1 } [ dummy-if-5 ] unit-test
 
 : dummy-if-6 ( n -- n )
     dup 1 fixnum<= [
@@ -101,7 +101,7 @@ IN: compiler.tests.simple
         1 fixnum- dup 1 fixnum- fixnum+
     ] if ;
 
-[ 17 ] [ 10 dummy-if-6 ] unit-test
+{ 17 } [ 10 dummy-if-6 ] unit-test
 
 : dead-code-rec ( -- obj )
     t [
@@ -110,61 +110,61 @@ IN: compiler.tests.simple
         dead-code-rec
     ] if ;
 
-[ 3.2 ] [ dead-code-rec ] unit-test
+{ 3.2 } [ dead-code-rec ] unit-test
 
 : one-rec ( ? -- obj ) [ f one-rec ] [ "hi" ] if ;
 
-[ "hi" ] [ t one-rec ] unit-test
+{ "hi" } [ t one-rec ] unit-test
 
 : after-if-test ( -- n )
     t [ ] [ ] if 5 ;
 
-[ 5 ] [ after-if-test ] unit-test
+{ 5 } [ after-if-test ] unit-test
 
 DEFER: countdown-b
 
 : countdown-a ( n -- ) dup 0 eq? [ drop ] [ 1 fixnum- countdown-b ] if ;
 : countdown-b ( n -- ) dup 0 eq? [ drop ] [ 1 fixnum- countdown-a ] if ;
 
-[ ] [ 10 countdown-b ] unit-test
+{ } [ 10 countdown-b ] unit-test
 
 : dummy-when-1 ( -- ) t [ ] when ;
 
-[ ] [ dummy-when-1 ] unit-test
+{ } [ dummy-when-1 ] unit-test
 
 : dummy-when-2 ( -- ) f [ ] when ;
 
-[ ] [ dummy-when-2 ] unit-test
+{ } [ dummy-when-2 ] unit-test
 
 : dummy-when-3 ( a -- b ) dup [ dup fixnum* ] when ;
 
-[ 16 ] [ 4 dummy-when-3 ] unit-test
-[ f ] [ f dummy-when-3 ] unit-test
+{ 16 } [ 4 dummy-when-3 ] unit-test
+{ f } [ f dummy-when-3 ] unit-test
 
 : dummy-when-4 ( a b -- a b ) dup [ dup dup fixnum* fixnum* ] when swap ;
 
-[ 64 f ] [ f 4 dummy-when-4 ] unit-test
-[ f t ] [ t f dummy-when-4 ] unit-test
+{ 64 f } [ f 4 dummy-when-4 ] unit-test
+{ f t } [ t f dummy-when-4 ] unit-test
 
 : dummy-when-5 ( a -- b ) f [ dup fixnum* ] when ;
 
-[ f ] [ f dummy-when-5 ] unit-test
+{ f } [ f dummy-when-5 ] unit-test
 
 : dummy-unless-1 ( -- ) t [ ] unless ;
 
-[ ] [ dummy-unless-1 ] unit-test
+{ } [ dummy-unless-1 ] unit-test
 
 : dummy-unless-2 ( -- ) f [ ] unless ;
 
-[ ] [ dummy-unless-2 ] unit-test
+{ } [ dummy-unless-2 ] unit-test
 
 : dummy-unless-3 ( a -- b ) dup [ drop 3 ] unless ;
 
-[ 3 ] [ f dummy-unless-3 ] unit-test
-[ 4 ] [ 4 dummy-unless-3 ] unit-test
+{ 3 } [ f dummy-unless-3 ] unit-test
+{ 4 } [ 4 dummy-unless-3 ] unit-test
 
 ! Test cond expansion
-[ "even" ] [
+{ "even" } [
     [
         2 {
             { [ dup 2 mod 0 = ] [ drop "even" ] }
@@ -173,7 +173,7 @@ DEFER: countdown-b
     ] compile-call
 ] unit-test
 
-[ "odd" ] [
+{ "odd" } [
     [
         3 {
             { [ dup 2 mod 0 = ] [ drop "even" ] }
@@ -182,7 +182,7 @@ DEFER: countdown-b
     ] compile-call
 ] unit-test
 
-[ "neither" ] [
+{ "neither" } [
     [
         3 {
             { [ dup string? ] [ drop "string" ] }
@@ -193,7 +193,7 @@ DEFER: countdown-b
     ] compile-call
 ] unit-test
 
-[ 3 ] [
+{ 3 } [
     [
         3 {
             { [ dup fixnum? ] [ ] }
@@ -209,9 +209,9 @@ M: f single-combination-test nip ;
 M: array single-combination-test drop ;
 M: integer single-combination-test drop ;
 
-[ 2 3 ] [ 2 3 t single-combination-test ] unit-test
-[ 2 3 ] [ 2 3 4 single-combination-test ] unit-test
-[ 2 f ] [ 2 3 f single-combination-test ] unit-test
+{ 2 3 } [ 2 3 t single-combination-test ] unit-test
+{ 2 3 } [ 2 3 4 single-combination-test ] unit-test
+{ 2 f } [ 2 3 f single-combination-test ] unit-test
 
 DEFER: single-combination-test-2
 
@@ -225,17 +225,17 @@ GENERIC: single-combination-test-2 ( obj -- obj )
 M: object single-combination-test-2 single-combination-test-3 ;
 M: f single-combination-test-2 single-combination-test-4 ;
 
-[ 3 ] [ t single-combination-test-2 ] unit-test
-[ 3 ] [ 3 single-combination-test-2 ] unit-test
-[ f ] [ f single-combination-test-2 ] unit-test
+{ 3 } [ t single-combination-test-2 ] unit-test
+{ 3 } [ 3 single-combination-test-2 ] unit-test
+{ f } [ f single-combination-test-2 ] unit-test
 
 ! Regression
-[ 100 ] [ [ 100 [ [ ] times ] keep ] compile-call ] unit-test
+{ 100 } [ [ 100 [ [ ] times ] keep ] compile-call ] unit-test
 
 ! Regression
 10 [
     [ "compiler.tests.foo" forget-vocab ] with-compilation-unit
-    [ t ] [
+    { t } [
         "USING: prettyprint words accessors ;
         IN: compiler.tests.foo
         : (recursive) ( -- ) (recursive) (recursive) ; inline recursive
@@ -252,7 +252,7 @@ M: quotation bad-effect-test call ; inline
 [ bad-effect-test* ] [ not-compiled? ] must-fail-with
 
 ! Don't want compiler error to stick around
-[ ] [ [ M\ quotation bad-effect-test forget ] with-compilation-unit ] unit-test
+{ } [ [ M\ quotation bad-effect-test forget ] with-compilation-unit ] unit-test
 
 ! Make sure time bombs literalize
 [ [ \ + call ] compile-call ] [ no-method? ] must-fail-with

@@ -1,5 +1,5 @@
 ! Copyright (C) 2008, 2010, 2016 Slava Pestov, Alexander Ilin
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors alien.c-types alien.data checksums checksums.common
 destructors kernel namespaces openssl openssl.libcrypto sequences ;
 IN: checksums.openssl

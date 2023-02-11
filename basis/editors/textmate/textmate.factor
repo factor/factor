@@ -4,7 +4,5 @@ IN: editors.textmate
 
 SINGLETON: textmate
 
-editor-class [ textmate ] initialize
-
 M: textmate editor-command
     [ "mate" , "-a" , "-l" , number>string , , ] { } make ;

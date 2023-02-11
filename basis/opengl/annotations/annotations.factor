@@ -1,5 +1,5 @@
 ! Copyright (C) 2009 Joe Groff.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors ascii calendar combinators.short-circuit
 compiler.units kernel namespaces opengl sequences
 tools.annotations.private vocabs words ;

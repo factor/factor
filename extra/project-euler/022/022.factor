@@ -1,10 +1,10 @@
 ! Copyright (c) 2007 Aaron Schaefer.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: ascii io.encodings.ascii io.files kernel math
 project-euler.common sequences sorting splitting ;
 IN: project-euler.022
 
-! http://projecteuler.net/index.php?section=problems&id=22
+! https://projecteuler.net/index.php?section=problems&id=22
 
 ! DESCRIPTION
 ! -----------
@@ -37,7 +37,7 @@ IN: project-euler.022
 PRIVATE>
 
 : euler022 ( -- answer )
-    source-022 natural-sort name-scores sum ;
+    source-022 sort name-scores sum ;
 
 ! [ euler022 ] 100 ave-time
 ! 74 ms ave run time - 5.13 SD (100 trials)

@@ -1,9 +1,9 @@
 ! Copyright (c) 2008 Eric Mertens.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: kernel math ranges sequences project-euler.common ;
 IN: project-euler.116
 
-! http://projecteuler.net/index.php?section=problems&id=116
+! https://projecteuler.net/index.php?section=problems&id=116
 
 ! DESCRIPTION
 ! -----------
@@ -41,7 +41,7 @@ IN: project-euler.116
     [ length swap - 1 - ] keep ?nth 0 or ;
 
 : next ( colortile seq -- )
-     [ nth* ] [ last + ] [ push ] tri ;
+    [ nth* ] [ last + ] [ push ] tri ;
 
 : ways ( length colortile -- permutations )
     V{ 1 } clone [ [ next ] 2curry times ] keep last 1 - ;

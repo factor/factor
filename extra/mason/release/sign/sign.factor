@@ -1,7 +1,8 @@
 ! Copyright (C) 2016 Doug Coleman.
-! See http://factorcode.org/license.txt for BSD license.
-USING: io.backend io.pathnames kernel literals mason.common
-sequences system ;
+! See https://factorcode.org/license.txt for BSD license.
+USING: combinators io.backend io.files.temp io.pathnames kernel
+literals make mason.common mason.config namespaces sequences
+system ;
 IN: mason.release.sign
 
 <<
@@ -28,37 +29,64 @@ HOOK: sign-factor-app os ( -- )
 
 M: object sign-factor-app ;
 
-M:: macosx sign-factor-app ( -- )
-    ${
-        "codesign" "--force" "--sign"
-        "Developer ID Application"
-        cert-path
-    }
-    "Factor.app/" make-factor-path suffix
-    short-running-process ;
+M: macosx sign-factor-app
+    {
+        "Factor.app/"
+        "libfactor.dylib"
+        "libfactor-ffi-test.dylib"
+    } [
+        [
+            "codesign" ,
+            "--entitlements" ,
+            "factor.entitlements" make-factor-path ,
+            "--option" , "runtime" , ! Hardened Runtime
+            "--force" , "--sign" ,
+            "Developer ID Application" ,
+            cert-path ,
+            make-factor-path ,
+        ] { } make short-running-process
+    ] each ;
 
 M:: windows sign-factor-app ( -- )
     { "factor.com" "factor.exe" } [
-        [
-            ${
-                "signtool" "sign"
-                "/v"
-                "/f" cert-path
-            }
-        ] dip make-factor-path suffix short-running-process
+        ${
+            "signtool" "sign"
+            "/fd" "SHA256"
+            "/v"
+            "/f" cert-path
+            "/tr" "http://time.certum.pl"
+            "/td" "SHA256"
+        } swap make-factor-path suffix short-running-process
     ] each ;
 
 HOOK: sign-archive os ( path -- )
 
 M: object sign-archive drop ;
 
-! Sign the .dmg on macOS as well to avoid Gatekeeper marking
-! the xattrs as quarantined.
-! https://github.com/factor/factor/issues/1896
-M: macosx sign-archive ( path -- )
+M: macosx sign-archive
+    ! sign the .dmg on macOS as well to avoid Gatekeeper marking
+    ! the xattrs as quarantined.
+    ! https://github.com/factor/factor/issues/1896
     ${
         "codesign" "--force" "--sign"
         "Developer ID Application"
         cert-path
-    } swap suffix
-    short-running-process ;
+    } over suffix short-running-process
+
+    ! notarize the binaries
+    [
+        "xcrun" ,
+        "notarytool" ,
+        "submit" ,
+        dup ,
+        notary-args get %
+        "--wait" ,
+    ] { } make short-running-process
+
+    ! staple the notarized ticket
+    [
+        "xcrun" ,
+        "stapler" ,
+        "staple" ,
+        ,
+    ] { } make short-running-process ;

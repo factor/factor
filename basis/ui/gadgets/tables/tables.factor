@@ -1,5 +1,5 @@
 ! Copyright (C) 2008, 2011 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors arrays colors combinators
 combinators.short-circuit fonts kernel math math.functions
 math.order math.rectangles math.vectors models namespaces opengl

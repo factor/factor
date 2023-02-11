@@ -1,5 +1,5 @@
 ! Copyright (C) 2009 Joe Groff.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: arrays destructors gpu.buffers gpu.framebuffers gpu.render
 gpu.shaders gpu.state gpu.textures images kernel math
 math.rectangles opengl.gl sequences specialized-arrays ;
@@ -118,9 +118,9 @@ CONSTANT: window-vertexes
 :: <2d-render-texture> ( dim order type -- renderbuffer texture )
     order type
     T{ texture-parameters
-       { wrap clamp-texcoord-to-edge }
-       { min-filter filter-linear }
-       { min-mipmap-filter f } }
+        { wrap clamp-texcoord-to-edge }
+        { min-filter filter-linear }
+        { min-mipmap-filter f } }
     <texture-2d> [
         0 <texture-2d-attachment> 1array f f dim <framebuffer>
         dup { { default-attachment { 0 0 0 } } } clear-framebuffer

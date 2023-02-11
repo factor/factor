@@ -1,5 +1,5 @@
 ! Copyright (C) 2008 Slava Pestov
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors calendar db.tuples db.types farkup
 furnace.actions furnace.auth furnace.boilerplate
 furnace.recaptcha furnace.redirection furnace.syndication
@@ -57,7 +57,7 @@ M: revision feed-entry-date date>> ;
 M: revision feed-entry-url id>> revision-url ;
 
 : reverse-chronological-order ( seq -- sorted )
-    [ date>> ] inv-sort-with ;
+    [ date>> ] inv-sort-by ;
 
 : <revision> ( id -- revision )
     revision new swap >>id ;
@@ -266,7 +266,7 @@ M: revision feed-entry-url id>> revision-url ;
             URL" $wiki" <redirect>
         ] >>submit
 
-     <protected>
+    <protected>
         "delete wiki articles" >>description
         { can-delete-wiki-articles? } >>capabilities ;
 
@@ -300,7 +300,7 @@ M: revision feed-entry-url id>> revision-url ;
 
         [
             f <article> select-tuples
-            [ title>> ] sort-with
+            [ title>> ] sort-by
             "articles" set-value
         ] >>init
 
@@ -322,7 +322,7 @@ M: revision feed-entry-url id>> revision-url ;
 
             [ f ] [
                 f <article> select-tuples
-                [ title>> ] sort-with
+                [ title>> ] sort-by
                 [ revision>> <revision> select-tuple ] map
                 swap '[ content>> _ [ first-match ] with all? ] filter
             ] if-empty

@@ -4,8 +4,6 @@ IN: editors.emeditor
 
 SINGLETON: emeditor
 
-editor-class [ emeditor ] initialize
-
 : emeditor-path ( -- path )
     \ emeditor-path get [
         { "EmEditor" } "emeditor.exe" find-in-applications
