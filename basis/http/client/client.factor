@@ -223,8 +223,7 @@ SYMBOL: redirects
     request [
         <request-socket> [
             [
-                in-out
-                [ ?https-tunnel ] with-streams*
+                in-out [ ?https-tunnel ] with-streams*
             ]
             [
                 out>>
