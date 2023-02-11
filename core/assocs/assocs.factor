@@ -22,6 +22,12 @@ GENERIC: unzip ( assoc -- keys values )
 
 M: assoc assoc-like drop ; inline
 
+: key? ( key assoc -- ? ) at* nip ; inline
+
+: delete-of ( assoc key -- assoc ) over delete-at ; inline
+
+: of* ( assoc key -- value/f ? ) swap at* ; inline
+
 : ?at ( key assoc -- value/key ? )
     2dup at* [ 2nip t ] [ 2drop f ] if ; inline
 
@@ -43,6 +49,9 @@ M: assoc assoc-like drop ; inline
 : assoc-operator ( assoc quot -- alist quot' )
     [ >alist ] dip [ first2 ] prepose ; inline
 
+: assoc-operator* ( assoc quot -- alist quot' )
+    [ >alist ] dip [ first2 swap ] prepose ; inline
+
 : assoc-stack-from ( key i seq -- value/f )
     over 0 < [
         3drop f
@@ -62,10 +71,11 @@ PRIVATE>
 : assoc-find ( ... assoc quot: ( ... key value -- ... ? ) -- ... key value ? )
     assoc-operator find swap [ first2-unsafe t ] [ drop f f f ] if ; inline
 
-: key? ( key assoc -- ? ) at* nip ; inline
-
 : assoc-each ( ... assoc quot: ( ... key value -- ... ) -- ... )
     assoc-operator each ; inline
+
+: assoc-each* ( ... assoc quot: ( ... value key -- ... ) -- ... )
+    assoc-operator* each ; inline
 
 : assoc>map ( ... assoc quot: ( ... key value -- ... elt ) exemplar -- ... seq )
     [ assoc-operator ] dip map-as ; inline
@@ -137,10 +147,19 @@ M: assoc keys [ drop ] { } assoc>map ;
 M: assoc values [ nip ] { } assoc>map ;
 
 : delete-at* ( key assoc -- value/f ? )
-    [ at* ] 2keep delete-at ;
+    [ at* ] [ delete-at ] 2bi ;
 
 : ?delete-at ( key assoc -- value/key ? )
-    [ ?at ] 2keep delete-at ;
+    [ ?at ] [ delete-at ] 2bi ;
+
+: delete-of* ( assoc key -- assoc value/f ? )
+    [ of* ] [ delete-of -rot ] 2bi ;
+
+: ?delete-of ( assoc key -- assoc value/key ? )
+    [ ?of ] [ delete-of -rot ] 2bi ;
+
+: rename-of ( assoc key newkey -- assoc )
+    [ delete-of* ] dip swap [ set-of ] [ 2drop ] if ;
 
 : rename-at ( newkey key assoc -- )
     [ delete-at* ] keep [ set-at ] with-assoc [ 2drop ] if ;
@@ -206,11 +225,11 @@ M: assoc values [ nip ] { } assoc>map ;
 : ?change-at ( ..a key assoc quot: ( ..a value -- ..b newvalue ) -- ..b )
     2over [ set-at ] 2curry compose [ at* ] dip [ drop ] if ; inline
 
-: change-of ( ..a assoc key quot: ( ..a value -- ..b newvalue ) -- ..b )
-    [ [ of ] dip call ] 2keepd rot set-of drop ; inline
+: change-of ( ..a assoc key quot: ( ..a value -- ..b newvalue ) -- ..b assoc )
+    [ [ of ] dip call ] 2keepd rot set-of ; inline
 
-: ?change-of ( ..a assoc key quot: ( ..a value -- ..b newvalue ) -- ..b )
-    [ set-of drop ] compose [ 2dup ?of ] dip [ 3drop ] if ; inline
+: ?change-of ( ..a assoc key quot: ( ..a value -- ..b newvalue ) -- ..b assoc )
+    [ set-of ] compose [ 2dup ?of ] dip [ 2drop ] if ; inline
 
 : at+ ( n key assoc -- ) [ 0 or + ] change-at ; inline
 
@@ -220,13 +239,13 @@ M: assoc values [ nip ] { } assoc>map ;
 
 : inc-at* ( key assoc -- old new ) [ 1 ] 2dip at+* ; inline
 
-: of+ ( assoc key n -- ) '[ 0 or _ + ] change-of ; inline
+: of+ ( assoc key n -- assoc ) '[ 0 or _ + ] change-of ; inline
 
-: of+* ( assoc key n -- old new ) '[ [ 0 or _ + ] keep swap dup ] change-of ; inline
+: of+* ( assoc key n -- assoc old new ) '[ [ 0 or _ + ] keep swap dup ] change-of ; inline
 
-: inc-of ( assoc key -- ) 1 of+ ; inline
+: inc-of ( assoc key -- assoc ) 1 of+ ; inline
 
-: inc-of* ( assoc key -- old new ) 1 of+* ; inline
+: inc-of* ( assoc key -- assoc old new ) 1 of+* ; inline
 
 : map>assoc ( ... seq quot: ( ... elt -- ... key value ) exemplar -- ... assoc )
     dup sequence? [

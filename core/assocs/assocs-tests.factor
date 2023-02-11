@@ -355,23 +355,23 @@ unit-test
 ] unit-test
 
 { H{ { 123 556 } } } [
-    H{ { 123 456 } } dup 123 [ 100 + ] change-of
+    H{ { 123 456 } } 123 [ 100 + ] change-of
 ] unit-test
 
 { H{ { 123 556 } } } [
-    H{ { 123 456 } } dup 123 [ 100 + ] ?change-of
+    H{ { 123 456 } } 123 [ 100 + ] ?change-of
 ] unit-test
 
 { H{ { 123 456 } } } [
-    H{ { 123 456 } } dup 1234 [ 100 + ] ?change-of
+    H{ { 123 456 } } 1234 [ 100 + ] ?change-of
 ] unit-test
 
 { H{ { 10 2 } } } [
-    H{ { 10 1 } } dup 10 inc-of
+    H{ { 10 1 } } 10 inc-of
 ] unit-test
 
 { H{ { 10 1001 } } } [
-    H{ { 10 1 } } dup 10 1000 of+
+    H{ { 10 1 } } 10 1000 of+
 ] unit-test
 
 { H{ { 1 100 } } f } [
