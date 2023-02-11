@@ -47,7 +47,7 @@ M: x-up >y-up-axis!
         [ 0 swap nth ]
         [ 1 swap nth neg ]
         [ 2 swap nth ] tri
-        swap -rot
+        swapd
     ] [
         [ 2 swap set-nth ]
         [ 1 swap set-nth ]
