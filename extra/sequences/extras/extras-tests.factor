@@ -308,21 +308,14 @@ strings tools.test ;
     H{ { t 6 } { f 5 } }
     { 0 0 1 1 2 3 4 2 3 4 5 }
 } [
-    { 2 7 1 8 1 7 1 8 2 8 4 } [ even? ] occurrence-count
+    { 2 7 1 8 1 7 1 8 2 8 4 } [ even? ] occurrence-count-by
 ] unit-test
 
 {
     H{ { 8 3 } { 1 3 } { 2 2 } { 4 1 } { 7 2 } }
     { 0 0 0 0 1 1 2 1 1 2 0 }
 } [
-    { 2 7 1 8 1 7 1 8 2 8 4 } occurrence-count
-] unit-test
-
-{
-    H{ { 8 3 } { 1 3 } { 2 2 } { 4 1 } { 7 2 } }
-    { 0 0 0 0 1 1 2 1 1 2 0 }
-} [
-    { 2 7 1 8 1 7 1 8 2 8 4 } [ ] occurrence-count
+    { 2 7 1 8 1 7 1 8 2 8 4 } [ ] occurrence-count-by
 ] unit-test
 
 {
