@@ -464,3 +464,26 @@ strings tools.test ;
     [ 2dup [ odd? ] bi@ or [ * ] [ 2drop f ] if  ]
     2nested-filter*
 ] unit-test
+
+{ 20 1 } [ { 10 20 30 } [ 20 = ] find* ] unit-test
+{ f f } [ { 10 20 30 } [ 21 = ] find* ] unit-test
+
+{ 20 1 } [ 0 { 10 20 30 } [ 20 = ] find-from* ] unit-test
+{ f f } [ 0 { 10 20 30 } [ 21 = ] find-from* ] unit-test
+{ 20 1 } [ 0 { 10 20 30 } [ 20 = ] find-from* ] unit-test
+{ 20 1 } [ 1 { 10 20 30 } [ 20 = ] find-from* ] unit-test
+{ f f } [ 2 { 10 20 30 } [ 20 = ] find-from* ] unit-test
+
+{ 20 1 } [ { 10 20 30 } [ 20 = ] find-last* ] unit-test
+{ f f } [ { } [ 21 = ] find-last* ] unit-test
+{ f f } [ { 10 20 30 } [ 21 = ] find-last* ] unit-test
+
+{ f f } [ 0 { 10 20 30 } [ 20 = ] find-last-from* ] unit-test
+{ 20 1 } [ 1 { 10 20 30 } [ 20 = ] find-last-from* ] unit-test
+{ 20 1 } [ 2 { 10 20 30 } [ 20 = ] find-last-from* ] unit-test
+
+{ 20 1 } [ { 10 20 30 } [ drop 20 = ] find-index* ] unit-test
+{ f f } [ { 10 20 30 } [ drop 21 = ] find-index* ] unit-test
+
+{ 20 1 } [ 0 { 10 20 30 } [ drop 20 = ] find-index-from* ] unit-test
+{ f f } [ 0 { 10 20 30 } [ drop 21 = ] find-index-from* ] unit-test
