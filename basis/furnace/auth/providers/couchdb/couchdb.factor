@@ -115,9 +115,9 @@ TUPLE: couchdb-auth-provider
     [ drop first CHAR: _ = ] assoc-reject ;
 
 : at-or-k ( key hash -- newkey )
-    dupd at [ nip ] when* ;
+    ?at drop ;
 : value-at-or-k ( key hash -- newkey )
-    dupd value-at [ nip ] when* ;
+    ?value-at drop ;
 
 : map-fields-forward ( assoc field-map -- assoc )
     [ swapd at-or-k swap ] curry assoc-map ;

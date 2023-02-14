@@ -33,7 +33,7 @@ GENERIC: word-help* ( word -- content )
 PRIVATE>
 
 : word-help ( word -- content )
-    [ dup "help" word-prop [ ] [ word-help* ] ?if ] keep
+    [ [ "help" word-prop ] [ word-help* ] ?unless ] keep
     inputs-and-outputs fix-shuffle drop ;
 
 : effect-help ( effect -- content )

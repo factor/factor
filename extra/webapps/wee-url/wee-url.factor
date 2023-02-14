@@ -26,8 +26,8 @@ short-url "SHORT_URLS" {
     '[ _ dup random-url >>short insert-tuple ] 10 retry ;
 
 : shorten ( url -- short )
-    short-url new swap >>url dup select-tuple
-    [ ] [ insert-short-url ] ?if short>> ;
+    short-url new swap >>url
+    [ select-tuple ] [ insert-short-url ] ?unless short>> ;
 
 : short>url ( short -- url )
     "$wee-url/go/" prepend >url adjust-url ;

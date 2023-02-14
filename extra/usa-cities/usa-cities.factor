@@ -21,8 +21,8 @@ ERROR: no-such-state name ;
 M: no-such-state summary drop "No such state" ;
 
 MEMO: string>state ( string -- state )
-    dup states [ name>> = ] with find nip
-    [ ] [ no-such-state ] ?if ;
+    [ states [ name>> = ] with find nip ]
+    [ no-such-state ] ?unless ;
 
 TUPLE: city
 first-zip name state latitude longitude gmt-offset dst-offset ;

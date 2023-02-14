@@ -15,11 +15,10 @@ GENERIC: baseline ( gadget -- y )
 M: gadget baseline drop f ;
 
 M: aligned-gadget baseline
-    dup baseline>>
-    [ ] [
+    [ baseline>> ] [
         [ baseline* ] [ ] [ layout-state>> ] tri
         [ drop ] [ dupd baseline<< ] if
-    ] ?if ;
+    ] ?unless ;
 
 GENERIC: cap-height* ( gadget -- y )
 
@@ -28,11 +27,10 @@ GENERIC: cap-height ( gadget -- y )
 M: gadget cap-height drop f ;
 
 M: aligned-gadget cap-height
-    dup cap-height>>
-    [ ] [
+    [ cap-height>> ] [
         [ cap-height* ] [ ] [ layout-state>> ] tri
         [ drop ] [ dupd cap-height<< ] if
-    ] ?if ;
+    ] ?unless ;
 
 <PRIVATE
 

@@ -27,7 +27,7 @@ IN: bootstrap.syntax
     "syntax" lookup-word t "delimiter" set-word-prop ;
 
 : define-core-syntax ( name quot -- )
-    [ dup "syntax" lookup-word [ ] [ no-word-error ] ?if ] dip
+    [ [ "syntax" lookup-word ] [ no-word-error ] ?unless ] dip
     define-syntax ;
 
 [

@@ -78,8 +78,9 @@ PREDICATE: fixed-size-array-type < c-array-type fixed-size>> >boolean ;
 ERROR: unknown-type-error type ;
 
 : get-type-info ( data-type -- info )
-    qualified-type-name dup type-infos get-global at
-    [ ] [ unknown-type-error ] ?if ;
+    qualified-type-name
+    [ type-infos get-global at ]
+    [ unknown-type-error ] ?unless ;
 
 : find-type-info ( data-type -- info/f )
     qualified-type-name type-infos get-global at ;

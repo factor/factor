@@ -76,7 +76,7 @@ ERROR: bad-platform name ;
 
 : vocab-platforms ( vocab -- platforms )
     "platforms.txt" vocab-file-lines
-    [ dup "system" lookup-word [ ] [ bad-platform ] ?if ] map ;
+    [ [ "system" lookup-word ] [ bad-platform ] ?unless ] map ;
 
 : supported-platform? ( platforms -- ? )
     [ t ] [ [ os swap class<= ] any? ] if-empty ;

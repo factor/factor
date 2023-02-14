@@ -126,7 +126,7 @@ PRIVATE>
             { [ use-dyld-shared-cache? ] [ _dyld_shared_cache_contains_path ] }
             [ drop f ]
         } cond
-    ] find [ nip ] when* ;
+    ] find nip ;
 
 : framework-find ( name -- path )
     dup dyld-find [ nip ] [

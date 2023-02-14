@@ -35,7 +35,7 @@ SYMBOL: IGNORE
 ERROR: not-persistent class ;
 
 : db-table-name ( class -- object )
-    dup "db-table" word-prop [ ] [ not-persistent ] ?if ;
+    [ "db-table" word-prop ] [ not-persistent ] ?unless ;
 
 : db-columns ( class -- object )
     superclasses-of [ "db-columns" word-prop ] map concat ;

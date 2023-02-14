@@ -44,8 +44,8 @@ TUPLE: line words width height baseline ;
     wrap-words [ <line> ] map! ;
 
 : cached-wrapped ( paragraph -- wrapped-paragraph )
-    dup wrapped>>
-    [ ] [ [ wrap-paragraph dup ] keep wrapped<< ] ?if ;
+    [ wrapped>> ]
+    [ [ wrap-paragraph dup ] keep wrapped<< ] ?unless ;
 
 : max-line-width ( wrapped-paragraph -- x )
     [ width>> ] [ max ] map-reduce ;

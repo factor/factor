@@ -25,11 +25,11 @@ M: line-gadget line-leading*
 GENERIC: line-leading ( gadget -- n )
 
 M: line-gadget line-leading
-    dup line-leading>>
-    [ ] [
+    [ line-leading>> ]
+    [
         [ line-leading* ] [ ] [ layout-state>> ] tri
         [ drop ] [ dupd line-leading<< ] if
-    ] ?if ;
+    ] ?unless ;
 
 GENERIC: line-height* ( gadget -- n )
 
@@ -39,11 +39,11 @@ M: line-gadget line-height*
 GENERIC: line-height ( gadget -- n )
 
 M: line-gadget line-height
-    dup line-height>>
-    [ ] [
+    [ line-height>> ]
+    [
         [ line-height* ] [ ] [ layout-state>> ] tri
         [ drop ] [ dupd line-height<< ] if
-    ] ?if ;
+    ] ?unless ;
 
 : y>line ( y gadget -- n ) line-height /i ;
 
@@ -107,11 +107,11 @@ PRIVATE>
     [ pref-dim ] [ line-gadget-dim ] bi ;
 
 M: line-gadget pref-viewport-dim
-    dup pref-viewport-dim>>
-    [ ] [
+    [ pref-viewport-dim>> ]
+    [
         [ pref-viewport-dim* ] [ ] [ layout-state>> ] tri
         [ drop ] [ dupd pref-viewport-dim<< ] if
-    ] ?if ;
+    ] ?unless ;
 
 M: line-gadget pref-dim* { 0 0 } swap line-gadget-dim ;
 

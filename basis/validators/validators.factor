@@ -33,7 +33,7 @@ IN: validators
     ] if ;
 
 : v-number ( str -- n )
-    dup string>number [ ] [ "must be a number" throw ] ?if ;
+    [ string>number ] [ "must be a number" throw ] ?unless ;
 
 : v-integer ( str -- n )
     v-number dup integer? [ "must be an integer" throw ] unless ;

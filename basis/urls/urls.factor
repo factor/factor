@@ -29,7 +29,7 @@ TUPLE: url protocol username password host port path query anchor ;
 ERROR: malformed-port string ;
 
 : parse-port ( string -- port/f )
-    [ f ] [ dup string>number [ ] [ malformed-port ] ?if ] if-empty ;
+    [ f ] [ [ string>number ] [ malformed-port ] ?unless ] if-empty ;
 
 : parse-host ( string -- host/f port/f )
     [

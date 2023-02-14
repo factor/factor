@@ -30,16 +30,17 @@ GENERIC: process-instruction ( insn -- insn' )
     insn ;
 
 : check-redundancy ( insn -- insn' )
-    dup >expr dup exprs>vns get at
-    [ redundant-instruction ] [ useful-instruction ] ?if ;
+    dup >expr
+    [ exprs>vns get at ]
+    [ redundant-instruction ] [ useful-instruction ] ??if ;
 
 M: insn process-instruction
-    dup rewrite [ process-instruction ] [ ] ?if ;
+    [ rewrite ] [ process-instruction ] ?when ;
 
 M: foldable-insn process-instruction
-    dup rewrite
+    [ rewrite ]
     [ process-instruction ]
-    [ dup defs-vregs length 1 = [ check-redundancy ] when ] ?if ;
+    [ dup defs-vregs length 1 = [ check-redundancy ] when ] ??if ;
 
 M: ##copy process-instruction
     dup [ src>> vreg>vn ] [ dst>> ] bi set-vn ;

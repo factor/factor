@@ -210,8 +210,8 @@ M: word reset-word
     [ gensym dup ] 2dip define-declared ;
 
 : reveal ( word -- )
-    dup [ name>> ] [ vocabulary>> ] bi dup vocab-words-assoc
-    [ ] [ no-vocab ] ?if set-at ;
+    dup [ name>> ] [ vocabulary>> ] bi
+    [ vocab-words-assoc ] [ no-vocab ] ?unless set-at ;
 
 ERROR: bad-create name vocab ;
 

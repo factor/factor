@@ -189,10 +189,10 @@ M: gadget dim<<
 GENERIC: pref-dim* ( gadget -- dim )
 
 : pref-dim ( gadget -- dim )
-    dup pref-dim>> [ ] [
+    [ pref-dim>> ] [
         [ pref-dim* ] [ ] [ layout-state>> ] tri
         [ drop ] [ dupd pref-dim<< ] if
-    ] ?if ;
+    ] ?unless ;
 
 : pref-dims ( gadgets -- seq ) [ pref-dim ] map ; inline
 

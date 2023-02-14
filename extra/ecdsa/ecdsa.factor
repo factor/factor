@@ -19,7 +19,7 @@ M: ec-key dispose
     EC_KEY_new_by_curve_name dup ssl-error ec-key boa ;
 
 : ec-key-handle ( -- handle )
-    ec-key get dup handle>> [ ] [ already-disposed ] ?if ;
+    ec-key get [ handle>> ] [ already-disposed ] ?unless ;
 
 DESTRUCTOR: BN_clear_free
 

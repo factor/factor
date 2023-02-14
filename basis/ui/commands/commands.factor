@@ -24,9 +24,9 @@ GENERIC: command-word ( command -- word )
     { } like command-map boa ;
 
 : commands ( class -- hash )
-    dup "commands" word-prop [ ] [
+    [ "commands" word-prop ] [
         H{ } clone [ "commands" set-word-prop ] keep
-    ] ?if ;
+    ] ?unless ;
 
 TR: convert-command-name "-" " " ;
 

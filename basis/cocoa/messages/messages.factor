@@ -71,7 +71,7 @@ ERROR: no-objc-method name ;
     objc-methods get at ;
 
 : lookup-objc-method ( name -- signature )
-    dup ?lookup-objc-method [ ] [ no-objc-method ] ?if ;
+    [ ?lookup-objc-method ] [ no-objc-method ] ?unless ;
 
 MEMO: make-prepare-send ( selector signature super? -- quot )
     [
@@ -194,8 +194,8 @@ assoc-union alien>objc-types set-global
 ERROR: no-objc-type name ;
 
 : decode-type ( ch -- ctype )
-    1string dup objc>alien-types get at
-    [ ] [ no-objc-type ] ?if ;
+    1string
+    [ objc>alien-types get at ] [ no-objc-type ] ?unless ;
 
 : (parse-objc-type) ( i string -- ctype )
     [ [ 1 + ] dip ] [ nth ] 2bi {
@@ -289,7 +289,7 @@ ERROR: no-objc-type name ;
     ] [ drop ] if ;
 
 : root-class ( class -- root )
-    dup class_getSuperclass [ root-class ] [ ] ?if ;
+    [ class_getSuperclass ] [ root-class ] ?when ;
 
 : objc-class-names ( -- seq )
     [

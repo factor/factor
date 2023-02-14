@@ -6,7 +6,8 @@ namespaces sequences sets source-files vocabs vocabs.loader ;
 IN: vocabs.refresh
 
 : source-modified? ( path -- ? )
-    dup source-files get at [
+    [ source-files get at ]
+    [
         dup path>>
         dup file-exists? [
             utf8 file-lines crc32 checksum-lines
@@ -16,7 +17,7 @@ IN: vocabs.refresh
         ] if
     ] [
         file-exists?
-    ] ?if ;
+    ] ??if ;
 
 SYMBOL: changed-vocabs
 

@@ -144,7 +144,7 @@ ERROR: no-word name ;
 
 M: ast-foreign compile-ast
     nip
-    [ class>> dup ":" split1 lookup-word [ ] [ no-word ] ?if ]
+    [ class>> [ ":" split1 lookup-word ] [ no-word ] ?unless ]
     [ name>> ] bi define-foreign
     [ nil ] ;
 

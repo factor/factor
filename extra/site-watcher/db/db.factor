@@ -76,7 +76,7 @@ spidering-site "SPIDERING_SITE" {
     spidering-site new swap >>account-name select-tuples ;
 
 : insert-site ( url -- site )
-    <site> dup select-tuple [ ] [ dup t >>up? insert-tuple ] ?if ;
+    <site> [ select-tuple ] [ dup t >>up? insert-tuple ] ?unless ;
 
 : select-account/site ( username url -- account site )
     insert-site site-id>> ;
