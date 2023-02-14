@@ -121,7 +121,7 @@ ERROR: unknown-chloe-tag tag ;
     [ chloe-tags get at ]
     [ call( tag -- ) ]
     [ unknown-chloe-tag ]
-    ??if ;
+    ?if ;
 
 : compile-string ( string -- )
     string-context? get [ escape-string ] unless [write] ;

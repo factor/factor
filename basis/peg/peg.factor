@@ -585,7 +585,7 @@ SYNTAX: PEG:
                 def call compile :> compiled-def
                 word [
                     dup compiled-def compiled-parse
-                    [ ast>> ] [ word parse-failed ] ?if
+                    [ ast>> ] [ word parse-failed ] ?if-old
                 ] effect define-declared
             ] with-compilation-unit
         ] append!

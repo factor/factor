@@ -18,4 +18,4 @@ FUNCTION: Boolean CFBundleLoadExecutable ( CFBundleRef bundle )
 : load-framework ( name -- )
     [ <CFBundle> ]
     [ CFBundleLoadExecutable drop ]
-    [ "Cannot load bundle named " prepend throw ] ??if ;
+    [ "Cannot load bundle named " prepend throw ] ?if ;

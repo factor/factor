@@ -17,10 +17,10 @@ ERROR: bad-integer-op word ;
 
 M: word integer-op-input-classes
     dup "input-classes" word-prop
-    [ ] [ bad-integer-op ] ?if ;
+    [ ] [ bad-integer-op ] ?if-old ;
 
 : generic-variant ( op -- generic-op/f )
-    dup "derived-from" word-prop [ first ] [ ] ?if ;
+    dup "derived-from" word-prop [ first ] [ ] ?if-old ;
 
 : no-overflow-variant ( op -- fast-op )
     H{

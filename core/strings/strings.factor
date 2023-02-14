@@ -71,7 +71,7 @@ M: string equal?
 M: string hashcode*
     nip
     dup string-hashcode
-    [ ] [ dup rehash-string string-hashcode ] ?if ;
+    [ ] [ dup rehash-string string-hashcode ] ?if-old ;
 
 M: string length
     length>> ; inline

@@ -22,7 +22,7 @@ ERROR: can't-deploy-library-file library ;
 : copy-library ( dir library -- )
     dup find-library*
     [ tuck file-name append-path copy-file ]
-    [ can't-deploy-library-file ] ?if ;
+    [ can't-deploy-library-file ] ?if-old ;
 
 : copy-libraries ( manifest name dir -- )
     append-path swap libraries>> [ copy-library ] with each ;

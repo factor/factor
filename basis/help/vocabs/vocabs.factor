@@ -56,7 +56,7 @@ C: <vocab-author> vocab-author
 
 : describe-help ( vocab -- )
     [
-        dup vocab-help
+        [ vocab-help ]
         [ "Documentation" $heading ($link) ]
         [ "Summary" $heading vocab-summary print-element ]
         ?if

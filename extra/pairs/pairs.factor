@@ -9,7 +9,7 @@ TUPLE: pair value key hash ;
     f pair boa ; inline
 
 : if-hash ( pair true-quot false-quot -- )
-    [ dup hash>> ] 2dip ?if ; inline
+    [ dup hash>> ] 2dip ?if-old ; inline
 
 M: pair assoc-size
     [ assoc-size 1 + ] [ drop 1 ] if-hash ; inline

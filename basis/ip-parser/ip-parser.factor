@@ -20,7 +20,7 @@ ERROR: bad-ipv4-component string ;
 
 : ipv4-component ( str -- n )
     dup dup octal? [ oct> ] [ string>number ] if
-    [ ] [ bad-ipv4-component ] ?if ;
+    [ ] [ bad-ipv4-component ] ?if-old ;
 
 : split-ipv4 ( str -- array )
     "." split [ ipv4-component ] map ;
@@ -63,7 +63,7 @@ ERROR: more-than-8-components ;
 <PRIVATE
 
 : ipv6-component ( str -- n )
-    dup hex> [ ] [ bad-ipv6-component ] ?if ;
+    dup hex> [ ] [ bad-ipv6-component ] ?if-old ;
 
 : split-ipv6 ( string -- seq )
     ":" split CHAR: . over last member? [ unclip-last ] [ f ] if

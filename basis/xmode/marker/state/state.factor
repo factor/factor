@@ -39,7 +39,7 @@ SYMBOLS: line last-offset position context
 
 : init-token-marker ( main prev-context line -- )
     line set
-    [ ] [ f <line-context> ] ?if context set
+    [ ] [ f <line-context> ] ?if-old context set
     0 position set
     0 last-offset set
     0 whitespace-end set

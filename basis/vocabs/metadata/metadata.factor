@@ -26,7 +26,7 @@ MEMO: vocab-file-lines ( vocab name -- lines/f )
     dupd vocab-file-path [
         swap [ ?delete-file ] [ swap utf8 set-file-lines ] if-empty
         \ vocab-file-lines reset-memoized
-    ] [ vocab-name no-vocab ] ?if ;
+    ] [ vocab-name no-vocab ] ?if-old ;
 
 : vocab-resources-path ( vocab -- path/f )
     "resources.txt" vocab-file-path ;

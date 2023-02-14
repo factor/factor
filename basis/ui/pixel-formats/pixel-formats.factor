@@ -53,7 +53,7 @@ TUPLE: pixel-format < disposable world handle ;
     2dup (make-pixel-format)
     [ pixel-format new-disposable swap >>handle swap >>world ]
     [ invalid-pixel-format-attributes ]
-    ?if ;
+    ?if-old ;
 
 M: pixel-format dispose*
     [ (free-pixel-format) ] [ f >>handle drop ] bi ;

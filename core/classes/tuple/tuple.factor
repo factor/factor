@@ -390,7 +390,7 @@ M: tuple equal? over tuple? [ tuple= ] [ 2drop f ] if ;
 M: tuple hashcode* [ tuple-hashcode ] recursive-hashcode ;
 
 M: tuple-class new
-    dup "prototype" word-prop [ (clone) ] [ tuple-layout <tuple> ] ?if ;
+    dup "prototype" word-prop [ (clone) ] [ tuple-layout <tuple> ] ?if-old ;
 
 M: tuple-class boa
     [ "boa-check" word-prop [ call ] when* ]

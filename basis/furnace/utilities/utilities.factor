@@ -32,7 +32,7 @@ ERROR: no-such-responder responder ;
 : base-path ( string -- seq )
     dup responder-nesting get
     [ second class-of superclasses-of [ name>> = ] with any? ] with find nip
-    [ first ] [ no-such-responder ] ?if ;
+    [ first ] [ no-such-responder ] ?if-old ;
 
 : resolve-base-path ( string -- string' )
     "$" ?head [

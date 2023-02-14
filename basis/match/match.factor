@@ -55,7 +55,7 @@ MACRO: match-cond ( assoc -- quot )
         first2
         [ [ dupd match ] curry ] dip
         [ with-variables ] curry rot
-        [ ?if ] 2curry append
+        [ ?if-old ] 2curry append
     ] reduce ;
 
 GENERIC: replace-patterns ( object -- result )
@@ -76,7 +76,7 @@ M: tuple replace-patterns tuple>array replace-patterns >tuple ;
         2drop f f
     ] [
         2dup length head over match
-        [ swap ?rest ] [ [ rest ] dip (match-first) ] ?if
+        [ swap ?rest ] [ [ rest ] dip (match-first) ] ?if-old
     ] if ;
 
 : match-first ( seq pattern-seq -- bindings )

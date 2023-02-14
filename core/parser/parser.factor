@@ -34,7 +34,7 @@ SYMBOL: auto-use?
 : private? ( word -- ? ) vocabulary>> ".private" tail? ;
 
 : use-first-word? ( words -- ? )
-    [ length 1 = ] [ ?first dup [ private? not ] [ ] ?if ] bi and
+    [ length 1 = ] [ ?first dup [ private? not ] [ ] ?if-old ] bi and
     auto-use? get and ;
 
 ! True branch is a singleton public word with no name conflicts
@@ -46,7 +46,7 @@ SYMBOL: auto-use?
     no-word-restarted ;
 
 : parse-word ( string -- word )
-    dup search [ ] [ no-word ] ?if ;
+    dup search [ ] [ no-word ] ?if-old ;
 
 ERROR: number-expected ;
 
@@ -54,12 +54,11 @@ ERROR: number-expected ;
     string>number [ number-expected ] unless* ;
 
 : parse-datum ( string -- word/number )
-    dup search [ ] [
-        dup string>number [ ] [ no-word ] ?if
-    ] ?if ;
+    [ search ]
+    [ [ string>number ] [ no-word ] ?unless ] ?unless ;
 
 : ?scan-datum ( -- word/number/f )
-    ?scan-token dup [ parse-datum ] when ;
+    ?scan-token [ parse-datum ] ?transmute ;
 
 : scan-datum ( -- word/number )
     ?scan-datum [ \ word throw-unexpected-eof ] unless* ;

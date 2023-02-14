@@ -82,7 +82,7 @@ ERROR: end-aside-in-get-error ;
 
 : end-aside ( default -- response )
     [ drop aside-id get aside-id off get-aside ]
-    [ move-on ] [ <redirect> ] ??if ;
+    [ move-on ] [ <redirect> ] ?if ;
 
 M: asides link-attr
     drop

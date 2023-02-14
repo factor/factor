@@ -27,7 +27,7 @@ CHLOE: write-title
 CHLOE: style
     [ "include" optional-attr ]
     [ utf8 file-contents [ add-style ] [code-with] ]
-    [ compile-children>string [ add-style ] [code] ] ??if ;
+    [ compile-children>string [ add-style ] [code] ] ?if ;
 
 CHLOE: write-style
     drop [
@@ -38,7 +38,7 @@ CHLOE: write-style
 CHLOE: script
     [ "include" optional-attr ]
     [ utf8 file-contents [ add-script ] [code-with] ]
-    [ compile-children>string [ add-script ] [code] ] ??if ;
+    [ compile-children>string [ add-script ] [code] ] ?if ;
 
 CHLOE: write-script
     drop [

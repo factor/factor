@@ -87,7 +87,7 @@ GENERIC: next-method-quot* ( class generic combination -- quot )
 ERROR: no-next-method method ;
 
 : (call-next-method) ( method -- )
-    dup next-method-quot [ call ] [ no-next-method ] ?if ;
+    dup next-method-quot [ call ] [ no-next-method ] ?if-old ;
 
 ERROR: check-method-error class generic ;
 

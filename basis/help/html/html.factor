@@ -15,21 +15,23 @@ IN: help.html
 
 : escape-char ( ch -- )
     dup ascii? [
-        dup H{
-            { CHAR: \" "__quo__" }
-            { CHAR: * "__star__" }
-            { CHAR: : "__colon__" }
-            { CHAR: < "__lt__" }
-            { CHAR: > "__gt__" }
-            { CHAR: ? "__que__" }
-            { CHAR: \\ "__back__" }
-            { CHAR: | "__pipe__" }
-            { CHAR: / "__slash__" }
-            { CHAR: , "__comma__" }
-            { CHAR: @ "__at__" }
-            { CHAR: # "__hash__" }
-            { CHAR: % "__percent__" }
-        } at [ % ] [ , ] ?if
+        [
+            H{
+                { CHAR: \" "__quo__" }
+                { CHAR: * "__star__" }
+                { CHAR: : "__colon__" }
+                { CHAR: < "__lt__" }
+                { CHAR: > "__gt__" }
+                { CHAR: ? "__que__" }
+                { CHAR: \\ "__back__" }
+                { CHAR: | "__pipe__" }
+                { CHAR: / "__slash__" }
+                { CHAR: , "__comma__" }
+                { CHAR: @ "__at__" }
+                { CHAR: # "__hash__" }
+                { CHAR: % "__percent__" }
+            } at
+        ] [ % ] [ , ] ?if
     ] [ number>string "__" "__" surround % ] if ;
 
 : escape-filename ( string -- filename )

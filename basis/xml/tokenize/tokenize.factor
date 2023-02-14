@@ -112,8 +112,10 @@ HINTS: next* { spot } ;
 ! Suddenly XML-specific
 
 : parse-named-entity ( accum string -- )
-    dup entities at [ swap push ] [
-        dup extra-entities get at
+    [ entities at ]
+    [ swap push ]
+    [
+        [ extra-entities get at ]
         [ swap push-all ] [ no-entity ] ?if
     ] ?if ;
 
@@ -127,7 +129,7 @@ HINTS: next* { spot } ;
 
 : parse-pe ( accum -- )
     take-; dup pe-table get at
-    [ swap push-all ] [ no-entity ] ?if ;
+    [ swap push-all ] [ no-entity ] ?if-old ;
 
 :: (parse-char) ( quot: ( ch -- ? ) accum spot -- )
     spot char>> :> char

@@ -65,7 +65,7 @@ M: struct >c-ptr
 <PRIVATE
 
 : init-struct ( class with-prototype: ( prototype -- alien ) sans-prototype: ( class -- alien ) -- alien )
-    '[ [ struct-prototype ] _ _ ??if ] keep memory>struct ; inline
+    '[ dup struct-prototype _ _ ?if-old ] keep memory>struct ; inline
 
 PRIVATE>
 

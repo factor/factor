@@ -45,7 +45,7 @@ IN: memoize
     out>> [
         packer '[
             _ dup first-unsafe
-            [ ] [ @ @ [ 0 rot set-nth-unsafe ] keep ] ?if
+            [ ] [ @ @ [ 0 rot set-nth-unsafe ] keep ] ?if-old
         ]
     ] keep unpacker compose ;
 
