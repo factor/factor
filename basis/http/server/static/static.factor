@@ -53,7 +53,7 @@ TUPLE: file-responder root hook special index-names allow-listings ;
 : serve-file ( filename -- response )
     dup mime-type
     dup file-responder get special>> at
-    [ call( filename -- response ) ] [ serve-static ] ?if ;
+    [ call( filename -- response ) ] [ serve-static ] ?if-old ;
 
 \ serve-file NOTICE add-input-logging
 
@@ -165,7 +165,7 @@ TUPLE: file-responder root hook special index-names allow-listings ;
 : serve-directory ( filename -- response )
     url get path>> "/" tail? [
         dup
-        find-index [ serve-file ] [ list-directory ] ?if
+        find-index [ serve-file ] [ list-directory ] ?if-old
     ] [
         drop
         url get clone [ "/" append ] change-path <permanent-redirect>

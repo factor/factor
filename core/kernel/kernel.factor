@@ -111,7 +111,8 @@ DEFER: if
 : ?transmute ( obj/f quot -- obj' ) dupd when ; inline
 
 ! Default
-: ?if ( ..a obj cond true: ( ..a cond -- ..b ) false: ( ..a default -- ..b ) -- ..b )
+
+: ?if-old ( ..a obj cond true: ( ..a cond -- ..b ) false: ( ..a default -- ..b ) -- ..b )
     pick [ drop [ drop ] 2dip call ] [ 2nip call ] if ; inline
 
 : ?when ( ..a obj cond: ( ..a obj -- obj/f ) true: ( ..a cond -- ..b ) -- ..b )
@@ -121,6 +122,9 @@ DEFER: if
     [ transmute* ] dip unless ; inline
 
 : ??if ( ..a obj cond: ( ..a obj -- obj/f ) true: ( ..a cond -- ..b ) false: ( ..a default -- ..b ) -- ..b )
+    [ transmute* ] 2dip if ; inline
+
+: ?if ( ..a obj cond true: ( ..a cond -- ..b ) false: ( ..a default -- ..b ) -- ..b )
     [ transmute* ] 2dip if ; inline
 
 ! Dippers.

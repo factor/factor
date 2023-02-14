@@ -37,6 +37,6 @@ M: keyword-map >alist
     dup no-word-sep>> [ ] [
         dup (keyword-map-no-word-sep) >>no-word-sep
         keyword-map-no-word-sep*
-    ] ?if ;
+    ] ?if-old ;
 
 INSTANCE: keyword-map assoc

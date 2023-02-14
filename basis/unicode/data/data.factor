@@ -67,7 +67,7 @@ PRIVATE>
         [ drop 26 ] [
             0xE0100 0xE01EF between?  5 29 ?
         ] if
-    ] ?if ; inline
+    ] ?if-old ; inline
 
 : category ( char -- category )
     category-num categories nth ;
@@ -89,7 +89,7 @@ PRIVATE>
 : (chain-decomposed) ( hash value -- newvalue )
     [
         2dup of
-        [ (chain-decomposed) ] [ 1array nip ] ?if
+        [ (chain-decomposed) ] [ 1array nip ] ?if-old
     ] with map concat ;
 
 : chain-decomposed ( hash -- newhash )

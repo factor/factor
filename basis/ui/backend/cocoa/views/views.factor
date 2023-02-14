@@ -77,7 +77,7 @@ CONSTANT: key-codes
 
 : key-code ( event -- string ? )
     dup -> keyCode key-codes at
-    [ t ] [ -> charactersIgnoringModifiers CF>string f ] ?if ;
+    [ t ] [ -> charactersIgnoringModifiers CF>string f ] ?if-old ;
 
 : event-modifiers ( event -- modifiers )
     -> modifierFlags modifiers modifier ;

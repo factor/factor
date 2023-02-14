@@ -51,7 +51,7 @@ IN: xmode.marker
 
 : mark-token ( -- )
     current-keyword
-    dup mark-number [ ] [ mark-keyword ] ?if
+    [ mark-number ] [ mark-keyword ] ?unless
     [ prev-token, ] when* ;
 
 : current-char ( -- char )
@@ -202,7 +202,7 @@ GENERIC: handle-rule-end ( match-count rule -- )
     in-rule-set>> escape-rule>> [ ] [
         parent>> in-rule-set>>
         dup [ escape-rule>> ] when
-    ] ?if ;
+    ] ?if-old ;
 
 : check-escape-rule ( rule -- ? )
     escape-rule>> [ find-escape-rule ] unless*

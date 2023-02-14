@@ -27,7 +27,7 @@ CONSTANT: final-count 28
 
 ! These numbers come from UAX 29
 : initial? ( ch -- ? )
-    dup 0x1100 0x1159 ?between? [ ] [ 0x115F = ] ?if ; inline
+    dup 0x1100 0x1159 ?between? [ ] [ 0x115F = ] ?if-old ; inline
 : medial? ( ch -- ? ) 0x1160 0x11A2 ?between? ; inline
 : final? ( ch -- ? ) 0x11A8 0x11F9 ?between? ; inline
 
@@ -71,7 +71,7 @@ CONSTANT: final-count 28
     string [
         >fixnum dup ascii? [ out push ] [
             dup hangul? [ hangul>jamo out push-all ]
-            [ dup quot call [ out push-all ] [ out push ] ?if ] if
+            [ dup quot call [ out push-all ] [ out push ] ?if-old ] if
         ] if
     ] each
     out "" like dup reorder ; inline

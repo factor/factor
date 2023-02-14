@@ -10,7 +10,7 @@ IN: compiler.cfg.gvn
 
 GENERIC: simplify ( insn -- insn' )
 
-M: insn simplify [ rewrite ] [ simplify ] [ dup >avail-insn-uses ] ??if ;
+M: insn simplify [ rewrite ] [ simplify ] [ dup >avail-insn-uses ] ?if ;
 M: array simplify [ simplify ] map ;
 M: ##copy simplify ;
 
@@ -39,7 +39,7 @@ M: ##copy value-number [ src>> vreg>vn ] [ dst>> ] bi set-vn ;
 : check-redundancy ( insn -- )
     dup >expr
     [ exprs>vns get at ]
-    [ redundant-instruction ] [ useful-instruction ] ??if ;
+    [ redundant-instruction ] [ useful-instruction ] ?if ;
 
 M: ##phi value-number
     dup inputs>> values [ vreg>vn ] map sift

@@ -72,7 +72,7 @@ CATEGORY-NOT: (uncased) Lu Ll Lt Lm Mn Me ;
     string [
         dup special-case
         [ string-quot call out push-all ]
-        [ char-quot call out push ] ?if
+        [ char-quot call out push ] ?if-old
     ] each out "" like ; inline
 
 : locale>lower ( string -- string' )

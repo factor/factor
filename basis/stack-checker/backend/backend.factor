@@ -140,7 +140,7 @@ M: object apply-object push-literal ;
     meta-d clone #return, ;
 
 : required-stack-effect ( word -- effect )
-    dup stack-effect [ ] [ missing-effect ] ?if ;
+    dup stack-effect [ ] [ missing-effect ] ?if-old ;
 
 : with-infer ( quot -- effect visitor )
     [

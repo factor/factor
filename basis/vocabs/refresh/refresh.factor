@@ -17,7 +17,7 @@ IN: vocabs.refresh
         ] if
     ] [
         file-exists?
-    ] ??if ;
+    ] ?if ;
 
 SYMBOL: changed-vocabs
 

@@ -383,8 +383,8 @@ M: ssl-handle drain
     [ handle>> ] dip
     [
         '[
-            _ dup get-session
-            [ resume-session ] [ begin-session ] ?if
+            _
+            [ get-session ] [ resume-session ] [ begin-session ] ?if
         ] with-timeout
     ] [ drop t >>connected drop ] 2bi ;
 

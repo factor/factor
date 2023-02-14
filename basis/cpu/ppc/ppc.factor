@@ -717,7 +717,7 @@ M: ppc.32 %load-memory-imm
             { float-rep  [ LFS ] }
             { double-rep [ LFD ] }
         } case
-    ] ?if ;
+    ] ?if-old ;
 
 M: ppc.64 %load-memory-imm
     [
@@ -738,7 +738,7 @@ M: ppc.64 %load-memory-imm
             { float-rep  [ [ scratch-reg ] dip LI scratch-reg LFSX ] }
             { double-rep [ [ scratch-reg ] dip LI scratch-reg LFDX ] }
         } case
-    ] ?if ;
+    ] ?if-old ;
 
 
 M: ppc.32 %load-memory
@@ -759,7 +759,7 @@ M: ppc.32 %load-memory
             { float-rep  [ LFSX ] }
             { double-rep [ LFDX ] }
         } case
-    ] ?if ;
+    ] ?if-old ;
 
 M: ppc.64 %load-memory
     [ [ 0 assert= ] bi@ ] 2dip
@@ -781,7 +781,7 @@ M: ppc.64 %load-memory
             { float-rep  [ LFSX ] }
             { double-rep [ LFDX ] }
         } case
-    ] ?if ;
+    ] ?if-old ;
 
 
 M: ppc.32 %store-memory-imm
@@ -800,7 +800,7 @@ M: ppc.32 %store-memory-imm
             { float-rep  [ STFS ] }
             { double-rep [ STFD ] }
         } case
-    ] ?if ;
+    ] ?if-old ;
 
 M: ppc.64 %store-memory-imm
     [
@@ -820,7 +820,7 @@ M: ppc.64 %store-memory-imm
             { float-rep  [ [ scratch-reg ] dip LI scratch-reg STFSX ] }
             { double-rep [ [ scratch-reg ] dip LI scratch-reg STFDX ] }
         } case
-    ] ?if ;
+    ] ?if-old ;
 
 M: ppc.32 %store-memory
     [ [ 0 assert= ] bi@ ] 2dip
@@ -839,7 +839,7 @@ M: ppc.32 %store-memory
             { float-rep  [ STFSX ] }
             { double-rep [ STFDX ] }
         } case
-    ] ?if ;
+    ] ?if-old ;
 
 M: ppc.64 %store-memory
     [ [ 0 assert= ] bi@ ] 2dip
@@ -860,7 +860,7 @@ M: ppc.64 %store-memory
             { float-rep  [ STFSX ] }
             { double-rep [ STFDX ] }
         } case
-    ] ?if ;
+    ] ?if-old ;
 
 M:: ppc %allot ( dst size class nursery-ptr -- )
     ! dst = vm->nursery.here;

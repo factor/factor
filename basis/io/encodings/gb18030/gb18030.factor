@@ -95,8 +95,7 @@ ascii <file-reader> xml>gb-data
 
 M: gb18030 encode-char
     drop [
-        dup mapping get-global at
-        [ ] [ lookup-range ] ?if
+        [ mapping get-global at ] [ lookup-range ] ?unless
     ] dip stream-write ;
 
 : second-byte? ( ch -- ? ) ! of a double-byte character
@@ -114,7 +113,7 @@ M: gb18030 encode-char
         linear dup gb>u get-global interval-at [
             [ bfirst>> - ] [ ufirst>> ] bi +
         ] [ drop replacement-char ] if*
-    ] ?if ;
+    ] ?if-old ;
 
 : four-byte ( stream byte1 byte2 -- char )
     rot 2 swap stream-read dup last-bytes?
