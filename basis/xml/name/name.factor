@@ -24,8 +24,9 @@ SYMBOL: ns-stack
     ] { } make f like ;
 
 : add-ns ( name -- )
-    dup space>> dup ns-stack get assoc-stack
-    [ ] [ nonexist-ns ] ?if >>url drop ;
+    dup space>>
+    [ ns-stack get assoc-stack ]
+    [ nonexist-ns ] ?unless >>url drop ;
 
 : push-ns ( hash -- )
     ns-stack get push ;

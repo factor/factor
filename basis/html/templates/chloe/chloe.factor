@@ -25,11 +25,9 @@ CHLOE: write-title
     [xml-code] ;
 
 CHLOE: style
-    dup "include" optional-attr [
-        utf8 file-contents [ add-style ] [code-with]
-    ] [
-        compile-children>string [ add-style ] [code]
-    ] ?if ;
+    [ "include" optional-attr ]
+    [ utf8 file-contents [ add-style ] [code-with] ]
+    [ compile-children>string [ add-style ] [code] ] ??if ;
 
 CHLOE: write-style
     drop [
@@ -38,11 +36,9 @@ CHLOE: write-style
     ] [xml-code] ;
 
 CHLOE: script
-    dup "include" optional-attr [
-        utf8 file-contents [ add-script ] [code-with]
-    ] [
-        compile-children>string [ add-script ] [code]
-    ] ?if ;
+    [ "include" optional-attr ]
+    [ utf8 file-contents [ add-script ] [code-with] ]
+    [ compile-children>string [ add-script ] [code] ] ??if ;
 
 CHLOE: write-script
     drop [
@@ -136,10 +132,10 @@ TUPLE: cached-template-state path last-modified quot ;
     ] when ;
 
 : template-quot ( chloe -- quot )
-    dup cached-template [ ] [
+    [ cached-template ] [
         [ load-template dup ] keep
         template-cache get set-at
-    ] ?if quot>> ;
+    ] ?unless quot>> ;
 
 : reset-cache ( -- )
     template-cache get clear-assoc ;

@@ -30,7 +30,7 @@ CONSTANT: ignored-words {
 }
 
 : (word-help) ( word -- content )
-    dup "help" word-prop [ ] [ word-help* ] ?if ;
+    [ "help" word-prop ] [ word-help* ] ?unless ;
 
 GENERIC: write-object* ( object -- )
 M: string write-object* write ;

@@ -12,7 +12,7 @@ MEMO: base16colors ( name -- assoc )
     utf8 file-lines parse-colors ;
 
 : named-base16 ( name -- color )
-    dup base16-theme-name get base16colors at [ ] [ no-such-color ] ?if ;
+    [ base16-theme-name get base16colors at ] [ no-such-color ] ?unless ;
 
 SINGLETON: base16-theme
 

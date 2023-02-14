@@ -88,12 +88,15 @@ M: revision feed-entry-url id>> revision-url ;
         [ validate-title ] >>init
 
         [
-            "title" value dup latest-revision [
+            "title" value
+            [
+                latest-revision
+            ] [
                 from-object
                 { wiki "view" } <chloe-content>
             ] [
                 edit-url <redirect>
-            ] ?if
+            ] ??if
         ] >>display
 
     <article-boilerplate> ;

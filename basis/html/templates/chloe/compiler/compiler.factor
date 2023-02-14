@@ -117,10 +117,11 @@ CONSTANT: self-closing-tags {
 ERROR: unknown-chloe-tag tag ;
 
 : compile-chloe-tag ( tag -- )
-    dup main>> dup chloe-tags get at
+    dup main>>
+    [ chloe-tags get at ]
     [ call( tag -- ) ]
     [ unknown-chloe-tag ]
-    ?if ;
+    ??if ;
 
 : compile-string ( string -- )
     string-context? get [ escape-string ] unless [write] ;

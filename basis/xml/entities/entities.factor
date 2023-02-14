@@ -20,7 +20,7 @@ CONSTANT: quoted-entities-out
 
 : escape-string-by ( str table -- escaped )
     ! Convert <, >, &, ' and " to HTML entities.
-    [ '[ dup _ at [ % ] [ , ] ?if ] each ] "" make ;
+    [ '[ [ _ at ] [ % ] [ , ] ??if ] each ] "" make ;
 
 : escape-string ( str -- newstr )
     entities-out escape-string-by ;

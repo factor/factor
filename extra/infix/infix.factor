@@ -102,7 +102,7 @@ M: bad-stack-effect summary
     drop "Words used in infix must declare a stack effect and return exactly one value" ;
 
 : check-word ( argcount word -- ? )
-    dup stack-effect [ ] [ bad-stack-effect ] ?if
+    [ stack-effect ] [ bad-stack-effect ] ?unless
     [ in>> length ] [ out>> length ] bi
     [ = ] dip 1 = and ;
 

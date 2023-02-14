@@ -77,7 +77,7 @@ PRIVATE>
     ] if ;
 
 : vocab-exists? ( name -- ? )
-    dup lookup-vocab [ ] [ find-vocab-root ] ?if ;
+    [ lookup-vocab ] [ find-vocab-root ] ?unless ;
 
 : vocab-append-path ( vocab path -- newpath )
     swap find-vocab-root [ prepend-path ] [ drop f ] if* ;
@@ -148,13 +148,13 @@ PRIVATE>
     ] when* require ;
 
 : run ( vocab -- )
-    dup load-vocab vocab-main [
-        execute( -- )
-    ] [
+    [ load-vocab vocab-main ]
+    [ execute( -- ) ]
+    [
         "The " write vocab-name write
         " vocabulary does not define an entry point." print
         "To define one, refer to \\ MAIN: help" print
-    ] ?if ;
+    ] ??if ;
 
 <PRIVATE
 

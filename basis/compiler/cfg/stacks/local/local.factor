@@ -52,8 +52,8 @@ SYMBOLS: locs>vregs local-peek-set replaces ;
 
 : peek-loc ( loc -- vreg )
     height-state get global-loc>local
-    dup replaces get at
-    [ ] [ dup local-peek-set get adjoin loc>vreg ] ?if ;
+    [ replaces get at ]
+    [ dup local-peek-set get adjoin loc>vreg ] ?unless ;
 
 : replace-loc ( vreg loc -- )
     height-state get global-loc>local replaces get set-at ;

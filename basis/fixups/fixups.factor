@@ -62,6 +62,7 @@ CONSTANT: word-renames {
     { "random-integers" { "randoms" "0.99" } }
     { "count*" { "percent-of" "0.99" } }
     { "more?" { "deref?" "0.99" } }
+    { "plox" { "?transmute" "0.99" } }
 }
 
 : compute-assoc-fixups ( continuation name assoc -- seq )

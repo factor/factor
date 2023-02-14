@@ -1121,24 +1121,3 @@ INSTANCE: virtual-zip-index immutable-sequence
 
 : call-push-when ( ..a elt quot: ( ..a elt -- ..b elt' ? ) accum -- ..b )
     [ call ] dip swap [ push ] [ 2drop ] if ; inline
-
-: find-from* ( ... n seq quot: ( ... elt -- ... ? ) -- ... elt i/f )
-    '[ _ find-from-unsafe element/index ] bounds-check-call ; inline
-
-: find* ( ... seq quot: ( ... elt -- ... ? ) -- ... elt i/f )
-    [ 0 ] 2dip find-from-unsafe element/index ; inline
-
-: find-last-from* ( ... n seq quot: ( ... elt -- ... ? ) -- ... elt i/f )
-    '[ _ find-last-from-unsafe element/index ] bounds-check-call ; inline
-
-: find-last* ( ... seq quot: ( ... elt -- ... ? ) -- ... elt i/f )
-    [ index-of-last ] dip find-last-from* ; inline
-
-: find-index-from* ( ... n seq quot: ( ... elt i -- ... ? ) -- ... elt i/f )
-    '[
-        _ [ sequence-index-operator find-integer-from ] keepd
-        element/index
-    ] bounds-check-call ; inline
-
-: find-index* ( ... seq quot: ( ... elt i -- ... ? ) -- ... elt i/f )
-    [ 0 ] 2dip find-index-from* ; inline

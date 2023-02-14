@@ -16,8 +16,6 @@ FUNCTION: Boolean CFBundleLoadExecutable ( CFBundleRef bundle )
     ] keep CFRelease ;
 
 : load-framework ( name -- )
-    dup <CFBundle> [
-        CFBundleLoadExecutable drop
-    ] [
-        "Cannot load bundle named " prepend throw
-    ] ?if ;
+    [ <CFBundle> ]
+    [ CFBundleLoadExecutable drop ]
+    [ "Cannot load bundle named " prepend throw ] ??if ;

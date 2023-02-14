@@ -28,7 +28,7 @@ ERROR: not-an-integer x ;
 : parse-decimal ( str -- ratio )
     split-decimal [ [ "0" ] when-empty ] bi@
     [
-        [ dup string>number [ ] [ not-an-integer ] ?if ] bi@
+        [ string>number ] [ ] [ not-an-integer ] ??if ] bi@
     ] keep length 10^ / + swap [ neg ] when ;
 
 SYNTAX: DECIMAL: scan-token parse-decimal suffix! ;

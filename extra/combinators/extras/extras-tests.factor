@@ -186,9 +186,3 @@ IN: combinators.extras.tests
 
 { 103 203 { { 1 1 } { 2 2 } { 3 3 } } }
 [ 100 200 { { 1 1 } { 2 2 } { 3 3 } } [ [ 1 + ] bi@ ] 2temp2d assoc-map ] unit-test
-
-{ 10 } [ 5 [ 2 * ] plox ] unit-test
-{ f } [ f [ 2 * ] plox ] unit-test
-
-{ 12 } [ 12 [ odd? ] [ 2/ ] plox-if ] unit-test
-{ 6 } [ 13 [ odd? ] [ 2/ ] plox-if ] unit-test

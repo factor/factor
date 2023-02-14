@@ -131,7 +131,7 @@ GENERIC: >vocab-link ( name -- vocab )
 
 M: vocab-spec >vocab-link ;
 
-M: object >vocab-link dup lookup-vocab [ ] [ <vocab-link> ] ?if ;
+M: object >vocab-link [ lookup-vocab ] [ <vocab-link> ] ?unless ;
 
 <PRIVATE
 

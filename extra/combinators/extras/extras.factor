@@ -58,12 +58,6 @@ MACRO: cleave-array ( quots -- quot )
 
 : quad@ ( w x y z quot -- ) dup dup dup quad* ; inline
 
-: plox ( ... x/f quot: ( ... x -- ... y ) -- ... y/f )
-    dupd when ; inline
-
-: plox-if ( ... x quot: ( ... x -- ... ? ) quot: ( ... x -- ... y ) -- ... y/f )
-    [ keep swap ] dip when ; inline
-
 MACRO: smart-plox ( true -- quot )
     [ inputs [ 1 - [ and ] n*quot ] keep ] keep swap
     '[ _ _ [ _ ndrop f ] smart-if ] ;
