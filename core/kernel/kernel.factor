@@ -103,9 +103,25 @@ DEFER: if
 : unless* ( ..a ? false: ( ..a -- ..a x ) -- ..a x )
     over [ drop ] [ nip call ] if ; inline
 
+: transmute* ( obj quot: ( obj -- obj/f ) -- new/old changed? )
+    over [ call ] dip over [ drop t ] [ nip f ] if ; inline
+
+: transmute ( obj quot: ( obj -- new/old ) -- new/old ) transmute* drop ; inline
+
+: ?transmute ( obj/f quot -- obj' ) dupd when ; inline
+
 ! Default
-: ?if ( ..a default cond true: ( ..a cond -- ..b ) false: ( ..a default -- ..b ) -- ..b )
+: ?if ( ..a obj cond true: ( ..a cond -- ..b ) false: ( ..a default -- ..b ) -- ..b )
     pick [ drop [ drop ] 2dip call ] [ 2nip call ] if ; inline
+
+: ?when ( ..a obj cond: ( ..a obj -- obj/f ) true: ( ..a cond -- ..b ) -- ..b )
+    [ transmute* ] dip when ; inline
+
+: ?unless ( ..a obj cond: ( ..a obj -- obj/f ) false: ( ..a default -- ..b ) -- ..b )
+    [ transmute* ] dip unless ; inline
+
+: ??if ( ..a obj cond: ( ..a obj -- obj/f ) true: ( ..a cond -- ..b ) false: ( ..a default -- ..b ) -- ..b )
+    [ transmute* ] 2dip if ; inline
 
 ! Dippers.
 ! Not declared inline because the compiler special-cases them

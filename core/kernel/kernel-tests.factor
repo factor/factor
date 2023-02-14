@@ -1,8 +1,8 @@
 USING: accessors alien alien.accessors arrays assocs byte-arrays
 continuations debugger grouping io.streams.string kernel
-kernel.private literals locals.backend math memory namespaces
-prettyprint sequences sequences.private tools.test vocabs.loader
-words ;
+kernel.private literals locals.backend math math.parser memory
+namespaces prettyprint sequences sequences.private tools.test
+vocabs.loader words ;
 IN: kernel.tests
 
 { 0 } [ f size ] unit-test
@@ -210,3 +210,9 @@ IN: kernel.tests
 { 1 2 3 4 } [ 2 3 4 1 -roll ] unit-test
 
 { } [ "kernel" reload ] long-unit-test
+
+{ 5 } [ "5" [ string>number ] transmute ] unit-test
+{ "5notanumber" } [ "5notanumber" [ string>number ] transmute ] unit-test
+
+{ 10 } [ 5 [ 2 * ] ?transmute ] unit-test
+{ f } [ f [ 2 * ] ?transmute ] unit-test
