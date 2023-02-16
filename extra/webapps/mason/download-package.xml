@@ -6,6 +6,7 @@
 	<t:title>Factor binary package for <t:label t:name="platform" /></t:title>
     <t:style t:include="resource:extra/webapps/mason/mason.css" />
 
+<div style="padding: 10px;">
 	<div><img src="//factorcode.org/logo.png" alt="Logo" width="583" height="150" /></div>
 
 	<h1>Factor binary package for <t:label t:name="platform" /></h1>
@@ -32,5 +33,6 @@
 	</table>
 
 	<p><t:xml t:name="last-report" /></p>
+</div>
 
 </t:chloe>
