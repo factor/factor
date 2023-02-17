@@ -209,3 +209,11 @@ MACRO: 4keep-under ( quot -- quot' )
 
 : closure-limit ( vertex quot: ( vertex -- edges ) n -- set )
     HS{ } closure-limit-as ; inline
+
+: 1check ( obj quot -- obj ? ) over [ call ] dip swap ; inline
+: 2check ( obj1 obj2 quot -- obj ? ) 2over [ call ] 2dip rot ; inline
+
+: 1check-when ( ..a obj cond: ( ..a obj -- obj/f ) true: ( ..a obj cond -- ..b ) -- ..b )
+    [ 1check ] dip when ; inline
+: 2check-when ( ..a obj1 obj2 cond: ( ..a obj1 obj2 -- obj/f ) true: ( ..a obj1 obj2 cond -- ..b ) -- ..b )
+    [ 2check ] dip when ; inline
