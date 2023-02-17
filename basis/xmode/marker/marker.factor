@@ -198,11 +198,11 @@ GENERIC: handle-rule-start ( match-count rule -- )
 GENERIC: handle-rule-end ( match-count rule -- )
 
 : find-escape-rule ( -- rule )
-    context get dup
-    in-rule-set>> escape-rule>> [ ] [
+    context get
+    [ in-rule-set>> escape-rule>> ] [
         parent>> in-rule-set>>
-        dup [ escape-rule>> ] when
-    ] ?if-old ;
+        [ escape-rule>> ] ?transmute
+    ] ?unless ;
 
 : check-escape-rule ( rule -- ? )
     escape-rule>> [ find-escape-rule ] unless*

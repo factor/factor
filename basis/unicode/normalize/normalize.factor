@@ -27,7 +27,7 @@ CONSTANT: final-count 28
 
 ! These numbers come from UAX 29
 : initial? ( ch -- ? )
-    dup 0x1100 0x1159 ?between? [ ] [ 0x115F = ] ?if-old ; inline
+    [ 0x1100 0x1159 ?between? ] [ 0x115F = ] ?unless ; inline
 : medial? ( ch -- ? ) 0x1160 0x11A2 ?between? ; inline
 : final? ( ch -- ? ) 0x11A8 0x11F9 ?between? ; inline
 

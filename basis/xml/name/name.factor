@@ -74,7 +74,7 @@ SYMBOL: ns-stack
     ] [ drop f ] if* ;
 
 : interpret-name ( str -- name )
-    dup prefixed-name [ ] [ <simple-name> ] ?if-old ;
+    [ prefixed-name ] [ <simple-name> ] ?unless ;
 
 PRIVATE>
 
