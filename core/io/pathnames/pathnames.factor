@@ -78,6 +78,16 @@ ERROR: no-parent-directory path ;
 
 PRIVATE>
 
+TUPLE: pathname string ;
+
+C: <pathname> pathname
+
+: >pathname ( obj -- pathname )
+    dup pathname? [ <pathname> ] unless ;
+
+: pathname> ( pathname -- obj )
+    dup pathname? [ string>> ] when ;
+
 : absolute-path? ( path -- ? )
     {
         { [ dup empty? ] [ drop f ] }
@@ -92,6 +102,7 @@ PRIVATE>
     [ trim-head-separators ] bi* "/" glue ;
 
 : append-path ( path1 path2 -- path )
+    [ pathname> ] bi@
     {
         { [ over empty? ] [ append-path-empty ] }
         { [ dup empty? ] [ drop ] }
@@ -221,13 +232,6 @@ M: object canonicalize-path-full canonicalize-path canonicalize-drive ;
 
 : >windows-path ( path -- path' ) H{ { CHAR: / CHAR: \\ } } substitute ;
 
-TUPLE: pathname string ;
-
-C: <pathname> pathname
-
 M: pathname absolute-path string>> absolute-path ;
 
 M: pathname <=> [ string>> ] compare ;
-
-: >pathname ( obj -- pathname )
-    dup pathname? [ <pathname> ] unless ;
