@@ -28,7 +28,7 @@ M: object specializer-declaration class-of ;
     [ drop object eq? ] assoc-reject
     [ [ t ] ] [
         [ swap specializer-predicate append ] { } assoc>map
-        [ ] [ swap [ f ] \ if 3array append [ ] like ] map-reduce
+        [ ] [ swap [ f ] \ if 3array [ ] append-as ] map-reduce
     ] if-empty ;
 
 : specializer-cases ( quot specializer -- alist )

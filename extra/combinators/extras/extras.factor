@@ -104,7 +104,7 @@ MACRO:: n-falsify ( n -- quot )
 
 <<
 : alist>quot* ( default assoc -- quot )
-    [ rot \ if* 3array append [ ] like ] assoc-each ;
+    [ rot \ if* 3array [ ] append-as ] assoc-each ;
 
 : cond*>quot ( assoc -- quot )
     [ dup pair? [ [ drop ] prepend [ t ] swap 2array ] unless ] map

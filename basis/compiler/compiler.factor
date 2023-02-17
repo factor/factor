@@ -74,7 +74,7 @@ M: word combinator? inline? ;
     swap [ finish-compilation ] [ compiled get set-at ] bi return ;
 
 : not-compiled-def ( word error -- def )
-    '[ _ _ not-compiled ] [ ] like ;
+    '[ _ _ not-compiled ] ;
 
 : deoptimize* ( word -- * )
     dup def>> deoptimize-with ;
