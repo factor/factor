@@ -44,8 +44,9 @@ IN: memoize
 : make/0 ( table quot effect -- quot )
     out>> [
         packer '[
-            _ dup first-unsafe
-            [ ] [ @ @ [ 0 rot set-nth-unsafe ] keep ] ?if-old
+            _
+            [ first-unsafe ]
+            [ @ @ [ 0 rot set-nth-unsafe ] keep ] ?unless
         ]
     ] keep unpacker compose ;
 

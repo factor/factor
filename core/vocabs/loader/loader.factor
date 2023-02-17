@@ -148,13 +148,14 @@ PRIVATE>
     ] when* require ;
 
 : run ( vocab -- )
-    dup load-vocab vocab-main [
-        execute( -- ) ]
+    load-vocab
+    [ vocab-main ]
+    [ execute( -- ) ]
     [
         "The " write vocab-name write
         " vocabulary does not define an entry point." print
         "To define one, refer to \\ MAIN: help" print
-    ] ?if-old ;
+    ] ?if ;
 
 <PRIVATE
 
