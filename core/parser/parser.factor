@@ -46,7 +46,7 @@ SYMBOL: auto-use?
     no-word-restarted ;
 
 : parse-word ( string -- word )
-    dup search [ ] [ no-word ] ?if-old ;
+    [ search ] [ no-word ] ?unless ;
 
 ERROR: number-expected ;
 
