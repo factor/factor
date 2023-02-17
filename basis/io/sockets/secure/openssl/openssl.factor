@@ -40,7 +40,7 @@ CONSTANT: weak-ciphers-for-compatibility
 MEMO: make-cipher-list ( -- string )
     {
         ! https://ciphersuite.info/cs/?security=recommended&software=openssl&singlepage=true
-        ! Recommended 12/28/2021
+        ! Recommended 2/16/2023
         "ECDHE-ECDSA-AES256-GCM-SHA384"
         "ECDHE-ECDSA-AES128-GCM-SHA256"
         "ECDHE-ECDSA-CHACHA20-POLY1305"
@@ -50,14 +50,16 @@ MEMO: make-cipher-list ( -- string )
         "DHE-PSK-AES256-GCM-SHA384"
         "DHE-PSK-AES128-GCM-SHA256"
         "DHE-PSK-CHACHA20-POLY1305"
+        "TLS_AES_128_GCM_SHA256"
+        "TLS_AES_256_GCM_SHA384"
 
         ! Secure 12/28/2021
         "ECDHE-RSA-AES128-GCM-SHA256"
+        "ECDHE-RSA-CHACHA20-POLY1305"
         "ECDHE-ECDSA-AES256-CCM8"
         "ECDHE-ECDSA-AES256-CCM"
         "ECDHE-ECDSA-AES128-CCM8"
         "ECDHE-ECDSA-AES128-CCM"
-        "ECDHE-RSA-CHACHA20-POLY1305"
     }
     ! XXX: Weak ciphers
     weak-ciphers-for-compatibility append
