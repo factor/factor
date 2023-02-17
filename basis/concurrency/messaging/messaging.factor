@@ -9,9 +9,9 @@ GENERIC: send ( message thread -- )
 GENERIC: mailbox-of ( thread -- mailbox )
 
 M: thread mailbox-of
-    dup mailbox>>
+    [ mailbox>> ]
     [ { mailbox } declare ]
-    [ <mailbox> [ >>mailbox drop ] keep ] ?if-old ; inline
+    [ <mailbox> [ >>mailbox drop ] keep ] ?if ; inline
 
 M: thread send
     mailbox-of mailbox-put ;

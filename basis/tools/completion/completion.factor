@@ -143,7 +143,7 @@ PRIVATE>
     ] if ;
 
 : chop-; ( seq -- seq' )
-    { ";" } split1-last [ ] [ ] ?if-old ;
+    { ";" } split1-last swap or ;
 
 : complete-vocab-list? ( tokens -- ? )
     chop-; 1 index-or-length head* "USING:" swap member? ;

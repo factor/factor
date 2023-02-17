@@ -109,11 +109,11 @@ M: gb18030 encode-char
     { [ length 2 = ] [ first quad-1/3? ] [ second quad-2/4? ] } 1&& ;
 
 : decode-quad ( byte-array -- char )
-    dup mapping get-global value-at [ ] [
+    [ mapping get-global value-at ] [
         linear dup gb>u get-global interval-at [
             [ bfirst>> - ] [ ufirst>> ] bi +
         ] [ drop replacement-char ] if*
-    ] ?if-old ;
+    ] ?unless ;
 
 : four-byte ( stream byte1 byte2 -- char )
     rot 2 swap stream-read dup last-bytes?

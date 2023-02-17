@@ -21,9 +21,10 @@ TUPLE: anon-var ;
             [
                 "}" split1-slice
                 [
-                    >string dup string>number
+                    >string
+                    [ string>number ]
                     [ 1 + stack-var boa ]
-                    [ [ anon-var new ] [ named-var boa ] if-empty ] ?if-old ,
+                    [ [ anon-var new ] [ named-var boa ] if-empty ] ?if ,
                 ]
                 [ (parse-interpolate) ] bi*
             ] when*
@@ -77,7 +78,7 @@ MACRO: interpolate ( str -- quot )
     [ interpolate ] with-string-writer ; inline
 
 : interpolate-locals-quot ( str -- quot )
-    [ dup search [ [ ] ] [ [ get ] ] ?if-old ] (interpolate-quot) ;
+    [ [ search ] [ [ ] ] [ [ get ] ] ?if ] (interpolate-quot) ;
 
 MACRO: interpolate-locals ( str -- quot )
     interpolate-locals-quot ;

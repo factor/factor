@@ -42,15 +42,15 @@ MEMO: simple-category-table ( -- table )
             simple-category-table at <category-class>
         ] }
         { [ "script=" ?head ] [
-            dup simple-script-table at
+            [ simple-script-table at ]
             [ <script-class> ]
-            [ "script=" prepend bad-class ] ?if-old
+            [ "script=" prepend bad-class ] ?if
         ] }
         [ bad-class ]
     } cond ;
 
 : unicode-class ( name -- class )
-    dup parse-unicode-class [ ] [ bad-class ] ?if-old ;
+    [ parse-unicode-class ] [ bad-class ] ?unless ;
 
 : name>class ( name -- class )
     >string simple {
@@ -106,7 +106,7 @@ MEMO: simple-category-table ( -- table )
 ERROR: nonexistent-option name ;
 
 : ch>option ( ch -- singleton )
-    dup options-assoc at [ ] [ nonexistent-option ] ?if-old ;
+    [ options-assoc at ] [ nonexistent-option ] ?unless ;
 
 : option>ch ( option -- string )
     options-assoc value-at ;

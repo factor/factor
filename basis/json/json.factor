@@ -39,7 +39,7 @@ SYMBOL: json-depth
             { "Infinity" [ 1/0. ] }
             { "-Infinity" [ -1/0. ] }
             { "NaN" [ 0/0. ] }
-            [ dup string>number [ ] [ not-a-json-number ] ?if-old ]
+            [ [ string>number ] [ not-a-json-number ] ?unless ]
         } case
     ] dip ;
 
