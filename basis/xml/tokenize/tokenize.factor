@@ -128,8 +128,9 @@ HINTS: next* { spot } ;
     ] [ parse-named-entity ] if ;
 
 : parse-pe ( accum -- )
-    take-; dup pe-table get at
-    [ swap push-all ] [ no-entity ] ?if-old ;
+    take-;
+    [ pe-table get at ]
+    [ swap push-all ] [ no-entity ] ?if ;
 
 :: (parse-char) ( quot: ( ch -- ? ) accum spot -- )
     spot char>> :> char

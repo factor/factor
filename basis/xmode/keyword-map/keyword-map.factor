@@ -34,9 +34,9 @@ M: keyword-map >alist
     keys union-all [ alpha? ] reject sort ;
 
 : keyword-map-no-word-sep* ( keyword-map -- str )
-    dup no-word-sep>> [ ] [
+    [ no-word-sep>> ] [
         dup (keyword-map-no-word-sep) >>no-word-sep
         keyword-map-no-word-sep*
-    ] ?if-old ;
+    ] ?unless ;
 
 INSTANCE: keyword-map assoc
