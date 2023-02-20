@@ -34,7 +34,7 @@ M: #push unbox-tuples* ( #push -- nodes )
 : (flatten-values) ( values accum -- )
     dup '[
         [ unboxed-allocation ]
-        [ _ (flatten-values) ] [ _ push ] ??if
+        [ _ (flatten-values) ] [ _ push ] ?if
     ] each ;
 
 : flatten-values ( values -- values' )

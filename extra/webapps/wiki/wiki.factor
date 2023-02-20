@@ -96,7 +96,7 @@ M: revision feed-entry-url id>> revision-url ;
                 { wiki "view" } <chloe-content>
             ] [
                 edit-url <redirect>
-            ] ??if
+            ] ?if
         ] >>display
 
     <article-boilerplate> ;
