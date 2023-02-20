@@ -11,8 +11,6 @@ TUPLE: effect
 { in-var read-only }
 { out-var read-only } ;
 
-: in-out ( effect -- in out ) [ in>> ] [ out>> ] bi ; inline
-
 : ?terminated ( out -- out terminated? )
     dup { "*" } = [ drop { } t ] [ f ] if ;
 
