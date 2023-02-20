@@ -69,7 +69,7 @@ IN: sequences.extras
 : push-if* ( ..a elt quot: ( ..a elt -- ..b obj/f ) accum -- ..b )
     [ call ] dip [ push ] [ drop ] if* ; inline
 
-: push? ( elt/f accum -- )
+: maybe-push ( elt/f accum -- )
     over [ push ] [ 2drop ] if ; inline
 
 <PRIVATE
@@ -999,7 +999,7 @@ INSTANCE: step-slice virtual-sequence
     [ 2over [ length ] bi@ * ] dip
     [
         new-resizable
-        [ [ push? ] curry compose 2nested-each* ] keep
+        [ [ maybe-push ] curry compose 2nested-each* ] keep
     ] keep like ; inline
 
 : 2nested-filter* ( seq1 seq-quot quot -- seq )
@@ -1025,7 +1025,7 @@ INSTANCE: step-slice virtual-sequence
     [ 2over [ length ] bi@ * ] dip
     [
         new-resizable
-        [ [ push? ] curry compose 2nested-each ] keep
+        [ [ maybe-push ] curry compose 2nested-each ] keep
     ] keep like ; inline
 
 : 2nested-filter ( seq1 seq2 quot -- seq )
@@ -1052,7 +1052,7 @@ INSTANCE: step-slice virtual-sequence
     [ 3 nover [ length ] tri@ * * ] dip
     [
         new-resizable
-        [ [ push? ] curry compose 3nested-each ] keep
+        [ [ maybe-push ] curry compose 3nested-each ] keep
     ] keep like ; inline
 
 : 3nested-filter ( seq1 seq2 seq3 quot -- seq )
