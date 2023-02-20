@@ -85,7 +85,7 @@ M: #shuffle node>quot
             [ dup { [ in-r>> empty? ] [ out-r>> empty? ] } 1&& ]
             [
                 shuffle-effect
-                [ pretty-shuffle ] [ % ] [ shuffle-node boa , ] ??if
+                [ pretty-shuffle ] [ % ] [ shuffle-node boa , ] ?if
             ]
         }
         [ drop "COMPLEX SHUFFLE" , ]
