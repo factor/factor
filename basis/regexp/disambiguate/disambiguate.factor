@@ -27,7 +27,7 @@ TUPLE: parts in out ;
     [ nip in>> ] [ out>> append ] 2bi parts boa ;
 
 : meaningful-integers ( partition table -- integers )
-    [ in-out ] dip
+    [ [ in>> ] [ out>> ] bi ] dip
     '[ [ _ at ] map intersect-all ] bi@ diff ;
 
 : class-integers ( classes integers -- table )
