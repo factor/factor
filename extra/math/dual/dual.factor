@@ -49,7 +49,7 @@ MACRO: chain-rule ( word -- e )
 : set-dual-help ( dword word -- )
     [
         [
-            stack-effect in-out append
+            stack-effect [ in>> ] [ out>> ] bi append
             [ dual ] { } map>assoc { $values } prepend
         ] [
             [

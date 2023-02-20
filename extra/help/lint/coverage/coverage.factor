@@ -98,7 +98,7 @@ M: word-help-coverage summary
 : ?remove-$values ( word spec -- spec )
     \ $values over member? [
         swap "declared-effect" word-prop [
-            in-out append [
+            [ in>> ] [ out>> ] bi append [
                 \ $values swap remove
             ] [ drop ] if-empty
     ] when* ] [ nip ] if ;
