@@ -173,7 +173,7 @@ M: object add-using
 
 : $values. ( word -- )
     "declared-effect" word-prop [
-        in-out
+        [ in>> ] [ out>> ] bi
         2dup [ empty? ] both? [
             2drop
         ] [
