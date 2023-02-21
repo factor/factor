@@ -684,6 +684,27 @@ PRIVATE>
 : map-find-index ( ... seq quot: ( ... elt index -- ... result/f ) -- ... result i elt )
     [ find-index ] (map-find-index) ; inline
 
+: find-from* ( ... n seq quot: ( ... elt -- ... ? ) -- ... elt i/f )
+    '[ _ do-find-from element/index ] bounds-check-call ; inline
+
+: find* ( ... seq quot: ( ... elt -- ... ? ) -- ... elt i/f )
+    [ 0 ] 2dip do-find-from element/index ; inline
+
+: find-last-from* ( ... n seq quot: ( ... elt -- ... ? ) -- ... elt i/f )
+    '[ _ find-last-from-unsafe element/index ] bounds-check-call ; inline
+
+: find-last* ( ... seq quot: ( ... elt -- ... ? ) -- ... elt i/f )
+    [ index-of-last ] dip find-last-from* ; inline
+
+: find-index-from* ( ... n seq quot: ( ... elt i -- ... ? ) -- ... elt i/f )
+    '[
+        _ [ sequence-index-operator find-integer-from ] keepd
+        element/index
+    ] bounds-check-call ; inline
+
+: find-index* ( ... seq quot: ( ... elt i -- ... ? ) -- ... elt i/f )
+    [ 0 ] 2dip find-index-from* ; inline
+
 : filter-length ( seq n -- seq' ) '[ length _ = ] filter ;
 
 : all-shortest ( seqs -- seqs' ) dup shortest length filter-length ;
