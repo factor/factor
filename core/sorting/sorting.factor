@@ -34,16 +34,18 @@ TUPLE: merge-state
 
 : dump-l ( merge -- )
     [ accum>> ] keep
-    [ [ to1>> ] [ from1>> fixnum-fast ] [ accum>> length integer>fixnum-strict ] tri [ fixnum+fast >>length ] 2keep ]
-    [ seq>> ]
-    [ from1>> roll dupd fixnum+fast ] tri
+    [
+        [ to1>> ] [ from1>> fixnum-fast ] [ accum>> length integer>fixnum-strict ] tri
+        [ fixnum+fast >>length ] 2keep
+    ] [ seq>> ] [ from1>> roll dupd fixnum+fast ] tri
     copy-loop drop ; inline
 
 : dump-r ( merge -- )
     [ accum>> ] keep
-    [ [ to2>> ] [ from2>> fixnum-fast ] [ accum>> length integer>fixnum-strict ] tri [ fixnum+fast >>length ] 2keep ]
-    [ seq>> ]
-    [ from2>> roll dupd fixnum+fast ] tri
+    [
+        [ to2>> ] [ from2>> fixnum-fast ] [ accum>> length integer>fixnum-strict ] tri
+        [ fixnum+fast >>length ] 2keep
+    ] [ seq>> ] [ from2>> roll dupd fixnum+fast ] tri
     copy-loop drop ; inline
 
 : l-next ( merge -- )
