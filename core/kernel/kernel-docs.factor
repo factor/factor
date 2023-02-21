@@ -717,7 +717,7 @@ HELP: unless*
 { $code "X [ Y ] unless*" "X dup [ ] [ drop Y ] if" } } ;
 
 HELP: ?if-old
-{ $values { "default" object } { "cond" "a generalized boolean" } { "true" { $quotation ( ..a cond -- ..b ) } } { "false" { $quotation ( ..a default -- ..b ) } } }
+{ $values { "obj" object } { "cond" "a generalized boolean" } { "true" { $quotation ( ..a cond -- ..b ) } } { "false" { $quotation ( ..a default -- ..b ) } } }
 { $description "If the condition is " { $link f } ", the " { $snippet "false" } " quotation is called with the " { $snippet "default" } " value on the stack. Otherwise, the " { $snippet "true" } " quotation is called with the condition on the stack." }
 { $notes
 "The following two lines are equivalent:"
