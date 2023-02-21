@@ -14,7 +14,7 @@ GENERIC: word-help* ( word -- content )
 : inputs-and-outputs ( content word -- content' word )
    over [ dup array? [ { $values } head? ] [ drop f ] if ] find drop [
         '[ _ cut unclip rest ] dip [
-            stack-effect in-out
+            stack-effect [ in>> ] [ out>> ] bi
             [ [ dup pair? [ first ] when ] map ] bi@
             [ '[ ?first _ member? ] filter ] bi-curry@
             \ $inputs \ $outputs
@@ -37,7 +37,7 @@ PRIVATE>
     inputs-and-outputs fix-shuffle drop ;
 
 : effect-help ( effect -- content )
-    in-out [
+    [ in>> ] [ out>> ] bi [
         [
             dup pair? [
                 first2 dup effect? [ \ $quotation swap 2array ] when
