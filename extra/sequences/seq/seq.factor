@@ -23,6 +23,9 @@ M: sequence seq-shorten 2dup lengthd > [ seq-set-length ] [ drop ] if ; inline
 
 : seq-push-all ( dst src -- dst ) [ length seq-grow-copy ] keep seq-copy-unsafe ; inline
 
+: check-grow-copy ( dst n src -- dst src n )
+    over [ lengthd + lengthen ] 2keep ; inline
+
 : seq-copy ( dst dst-n src -- dst ) check-grow-copy seq-copy-unsafe ; inline
 
 <PRIVATE

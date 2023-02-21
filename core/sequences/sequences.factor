@@ -326,9 +326,6 @@ C: <copier> copier
 : bounds-check-head ( n seq -- n seq )
     over 0 < [ bounds-error ] when ; inline
 
-: check-grow-copy ( dst n src -- dst src n )
-    over [ lengthd + lengthen ] 2keep ; inline
-
 : copy-unsafe ( src i dst -- )
     [ [ length check-length 0 ] keep ] 2dip <copier> (copy) drop ; inline
 
