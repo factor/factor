@@ -34,9 +34,6 @@ GENERIC: shorten ( n seq -- )
 M: sequence lengthen 2dup length > [ set-length ] [ 2drop ] if ; inline
 M: sequence shorten 2dup length < [ set-length ] [ 2drop ] if ; inline
 
-: nth-of ( seq n -- elt ) swap nth ; inline
-: set-nth-of ( seq n elt -- seq ) spin [ set-nth ] keep ; inline
-
 : 2length ( seq1 seq2 -- n1 n2 ) [ length ] bi@ ; inline
 : 3length ( seq1 seq2 seq3 -- n1 n2 n3 ) [ length ] tri@ ; inline
 
@@ -101,16 +98,6 @@ M: sequence set-nth bounds-check set-nth-unsafe ; inline
 
 M: sequence nth-unsafe nth ; inline
 M: sequence set-nth-unsafe set-nth ; inline
-
-: nth-of-unsafe ( seq n -- elt ) swap nth-unsafe ; inline
-
-: set-nth-of-unsafe ( seq n elt -- seq ) swap pick set-nth-unsafe ; inline
-
-: change-nth-unsafe ( i seq quot -- )
-    [ [ nth-unsafe ] dip call ] 2keepd set-nth-unsafe ; inline
-
-: change-nth-of-unsafe ( seq i quot -- seq )
-    [ [ nth-of-unsafe ] dip call ] 2keepd rot set-nth-of-unsafe ; inline
 
 PRIVATE>
 
@@ -201,15 +188,10 @@ PRIVATE>
 : ??nth ( n seq -- elt/f ? )
     2dup bounds-check? [ nth-unsafe t ] [ 2drop f f ] if ; inline
 
-: ?nth ( n seq -- elt/f )
-    ??nth drop ; inline
+: ?nth ( n seq -- elt/f ) ??nth drop ; inline
 
 : ?set-nth ( elt n seq -- )
     2dup bounds-check? [ set-nth-unsafe ] [ 3drop ] if ; inline
-
-: ?nth-of ( seq n -- elt/f ) swap ?nth ; inline
-
-: ??nth-of ( seq n -- elt/f ? ) swap ??nth ; inline
 
 : index-or-length ( seq n -- seq n' ) over length min ; inline
 
@@ -337,9 +319,6 @@ C: <copier> copier
     [ [ src-i>> + ] [ src>> ] bi nth-unsafe ]
     [ [ dst-i>> + ] [ dst>> ] bi set-nth-unsafe ] 2bi ; inline
 
-: copy-nth-of-unsafe ( dst dst-i src src-i -- )
-    nth-of-unsafe set-nth-of-unsafe drop ; inline
-
 : (copy) ( n copy -- dst )
     over 0 <= [ nip dst>> ] [
         [ 1 - ] dip [ copy-nth-unsafe ] [ (copy) ] 2bi
@@ -363,6 +342,16 @@ C: <copier> copier
 
 : subseq-unsafe ( from to seq -- subseq )
     dup subseq-unsafe-as ; inline
+
+: change-nth-unsafe ( i seq quot -- )
+    [ [ nth-unsafe ] dip call ] 2keepd set-nth-unsafe ; inline
+
+: nth-of-unsafe ( seq n -- elt ) swap nth-unsafe ; inline
+
+: set-nth-of-unsafe ( seq n elt -- seq ) swap pick set-nth-unsafe ; inline
+
+: copy-nth-of-unsafe ( dst dst-i src src-i -- )
+    nth-of-unsafe set-nth-of-unsafe drop ; inline
 
 : copy-loop ( dst dst-i src src-i src-stop -- dst )
     2dup >= [
