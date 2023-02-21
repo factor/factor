@@ -323,6 +323,18 @@ PRIVATE>
 : 1reduce ( seq quot: ( prev elt -- next ) -- result )
     [ ?unclip ] dip reduce ; inline
 
+<PRIVATE
+
+: change-nth-of-unsafe ( seq i quot -- seq )
+    [ [ nth-of-unsafe ] dip call ] 2keepd rot set-nth-of-unsafe ; inline
+
+PRIVATE>
+
+: nth-of ( seq n -- elt ) swap nth ; inline
+: set-nth-of ( seq n elt -- seq ) spin [ set-nth ] keep ; inline
+: ?nth-of ( seq n -- elt/f ) swap ?nth ; inline
+: ??nth-of ( seq n -- elt/f ? ) swap ??nth ; inline
+
 : reduce-of ( seq quot: ( prev elt -- next ) identity -- result )
     swap reduce ; inline
 
