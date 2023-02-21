@@ -1048,6 +1048,11 @@ HELP: merge-slices
     { "slice/*" object }
 } ;
 
+HELP: nth-of
+{ $values { "seq" sequence } { "n" "a non-negative integer" } { "elt" "the element at the " { $snippet "n" } "th index" } }
+{ $contract "Outputs the " { $snippet "n" } "th element of the sequence. Elements are numbered from zero, so the last element has an index one less than the length of the sequence. All sequences support this operation." }
+{ $errors "Throws a " { $link bounds-error } " if the index is negative, or greater than or equal to the length of the sequence." } ;
+
 HELP: nth*
 { $values
     { "n" integer } { "seq" sequence }
