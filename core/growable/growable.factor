@@ -19,6 +19,10 @@ M: growable set-nth-unsafe underlying>> set-nth-unsafe ; inline
     [ length integer>fixnum-strict ] keep
     [ set-nth-unsafe ] [ [ 1 fixnum+fast ] dip length<< ] 2bi ; inline
 
+: push-all-unsafe ( from to src dst -- )
+    [ over - swap ] 2dip pickd [ length integer>fixnum-strict ] keep
+    [ [ fixnum+fast ] dip length<< ] 2keep <copier> (copy) drop ; inline
+
 PRIVATE>
 
 : capacity ( seq -- n ) underlying>> length ; inline
