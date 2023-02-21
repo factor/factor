@@ -4,6 +4,27 @@ USING: arrays assocs assocs.private kernel math math.statistics
 sequences sequences.extras sets ;
 IN: assocs.extras
 
+: of* ( assoc key -- value/f ? ) swap at* ; inline
+
+: of+ ( assoc key n -- assoc ) '[ 0 or _ + ] change-of ; inline
+
+: of+* ( assoc key n -- assoc old new ) '[ [ 0 or _ + ] keep swap dup ] change-of ; inline
+
+: delete-of ( assoc key -- assoc ) over delete-at ; inline
+
+: delete-of* ( assoc key -- assoc value/f ? )
+    [ of* ] [ delete-of -rot ] 2bi ;
+
+: ?delete-of ( assoc key -- assoc value/key ? )
+    [ ?of ] [ delete-of -rot ] 2bi ;
+
+: rename-of ( assoc key newkey -- assoc )
+    [ delete-of* ] dip swap [ set-of ] [ 2drop ] if ;
+
+: inc-of ( assoc key -- assoc ) 1 of+ ; inline
+
+: inc-of* ( assoc key -- assoc old new ) 1 of+* ; inline
+
 : push-at-each ( value keys assoc -- )
     '[ _ push-at ] with each ; inline
 
@@ -297,3 +318,9 @@ PRIVATE>
 
 : collect-value-by-multi ( ... assoc quot: ( ... value -- ... new-keys ) -- ... assoc )
     [ H{ } clone ] 2dip collect-value-by-multi! ; inline
+
+: assoc-operator* ( assoc quot -- alist quot' )
+    [ >alist ] dip [ first2 swap ] prepose ; inline
+
+: assoc-each* ( ... assoc quot: ( ... value key -- ... ) -- ... )
+    assoc-operator* each ; inline
