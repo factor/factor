@@ -355,7 +355,7 @@ PRIVATE>
 
 :: integer-sqrt ( m -- n )
     m [ 0 ] [
-        ensure-non-negative
+        assert-non-negative
         bit-length 1 - 2 /i :> c
         1 :> a!
         0 :> d!

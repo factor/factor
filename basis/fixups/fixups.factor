@@ -64,6 +64,7 @@ CONSTANT: word-renames {
     { "more?" { "deref?" "0.99" } }
     { "plox" { "?transmute" "0.99" } }
     { "?if" { "?if-old" "0.99" } }
+    { "ensure-non-negative" { "assert-non-negative" "0.99" } }
 }
 
 : compute-assoc-fixups ( continuation name assoc -- seq )

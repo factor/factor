@@ -31,7 +31,7 @@ PRIVATE>
     normalize-base32 parse-base32 ;
 
 : >base32-crockford ( n -- base32 )
-    ensure-non-negative
+    assert-non-negative
     [ dup 0 > ] [ 32 /mod ALPHABET nth ] "" produce-as nip
     [ "0" ] when-empty reverse! ;
 

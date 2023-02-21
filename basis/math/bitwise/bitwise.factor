@@ -134,7 +134,7 @@ PRIVATE>
 GENERIC: bit-count ( obj -- n )
 
 M: integer bit-count
-    ensure-non-negative (bit-count) ; inline
+    assert-non-negative (bit-count) ; inline
 
 M: byte-array bit-count
     byte-array-bit-count ;
