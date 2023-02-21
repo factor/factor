@@ -63,7 +63,7 @@ CONSTANT: word-renames {
     { "count*" { "percent-of" "0.99" } }
     { "more?" { "deref?" "0.99" } }
     { "plox" { "?transmute" "0.99" } }
-    { "?if" { "?if-old" "0.99" } }
+    ! { "?if" { "?if-old" "0.99" } }
     { "ensure-non-negative" { "assert-non-negative" "0.99" } }
 }
 
