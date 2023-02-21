@@ -24,10 +24,6 @@ M: assoc assoc-like drop ; inline
 
 : key? ( key assoc -- ? ) at* nip ; inline
 
-: delete-of ( assoc key -- assoc ) over delete-at ; inline
-
-: of* ( assoc key -- value/f ? ) swap at* ; inline
-
 : ?at ( key assoc -- value/key ? )
     2dup at* [ 2nip t ] [ 2drop f ] if ; inline
 
@@ -48,9 +44,6 @@ M: assoc assoc-like drop ; inline
 
 : assoc-operator ( assoc quot -- alist quot' )
     [ >alist ] dip [ first2 ] prepose ; inline
-
-: assoc-operator* ( assoc quot -- alist quot' )
-    [ >alist ] dip [ first2 swap ] prepose ; inline
 
 : assoc-stack-from ( key i seq -- value/f )
     over 0 < [
@@ -73,9 +66,6 @@ PRIVATE>
 
 : assoc-each ( ... assoc quot: ( ... key value -- ... ) -- ... )
     assoc-operator each ; inline
-
-: assoc-each* ( ... assoc quot: ( ... value key -- ... ) -- ... )
-    assoc-operator* each ; inline
 
 : assoc>map ( ... assoc quot: ( ... key value -- ... elt ) exemplar -- ... seq )
     [ assoc-operator ] dip map-as ; inline
@@ -152,14 +142,6 @@ M: assoc values [ nip ] { } assoc>map ;
 : ?delete-at ( key assoc -- value/key ? )
     [ ?at ] [ delete-at ] 2bi ;
 
-: delete-of* ( assoc key -- assoc value/f ? )
-    [ of* ] [ delete-of -rot ] 2bi ;
-
-: ?delete-of ( assoc key -- assoc value/key ? )
-    [ ?of ] [ delete-of -rot ] 2bi ;
-
-: rename-of ( assoc key newkey -- assoc )
-    [ delete-of* ] dip swap [ set-of ] [ 2drop ] if ;
 
 : rename-at ( newkey key assoc -- )
     [ delete-at* ] keep [ set-at ] with-assoc [ 2drop ] if ;
@@ -238,14 +220,6 @@ M: assoc values [ nip ] { } assoc>map ;
 : inc-at ( key assoc -- ) [ 1 ] 2dip at+ ; inline
 
 : inc-at* ( key assoc -- old new ) [ 1 ] 2dip at+* ; inline
-
-: of+ ( assoc key n -- assoc ) '[ 0 or _ + ] change-of ; inline
-
-: of+* ( assoc key n -- assoc old new ) '[ [ 0 or _ + ] keep swap dup ] change-of ; inline
-
-: inc-of ( assoc key -- assoc ) 1 of+ ; inline
-
-: inc-of* ( assoc key -- assoc old new ) 1 of+* ; inline
 
 : map>assoc ( ... seq quot: ( ... elt -- ... key value ) exemplar -- ... assoc )
     dup sequence? [
