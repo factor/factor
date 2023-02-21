@@ -7,7 +7,7 @@ TUPLE: bits { number read-only } { length read-only } ;
 C: <bits> bits
 
 : make-bits ( number -- bits )
-    ensure-non-negative
+    assert-non-negative
     [ T{ bits f 0 1 } ] [ dup abs log2 1 + <bits> ] if-zero ; inline
 
 M: bits length length>> ; inline
