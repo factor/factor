@@ -33,20 +33,12 @@ TUPLE: merge-state
 : r-done? ( merge -- ? ) [ from2>> ] [ to2>> ] bi eq? ; inline
 
 : dump-l ( merge -- )
-    [ accum>> ] keep
-    [
-        [ to1>> ] [ from1>> fixnum-fast ] [ accum>> length integer>fixnum-strict ] tri
-        [ fixnum+fast >>length ] 2keep
-    ] [ seq>> ] [ from1>> roll dupd fixnum+fast ] tri
-    copy-loop drop ; inline
+    [ [ from1>> ] [ to1>> ] [ seq>> ] tri ] [ accum>> ] bi
+    push-all-unsafe ; inline
 
 : dump-r ( merge -- )
-    [ accum>> ] keep
-    [
-        [ to2>> ] [ from2>> fixnum-fast ] [ accum>> length integer>fixnum-strict ] tri
-        [ fixnum+fast >>length ] 2keep
-    ] [ seq>> ] [ from2>> roll dupd fixnum+fast ] tri
-    copy-loop drop ; inline
+    [ [ from2>> ] [ to2>> ] [ seq>> ] tri ] [ accum>> ] bi
+    push-all-unsafe ; inline
 
 : l-next ( merge -- )
     [ l-elt ] [ [ 1 + ] change-from1 accum>> ] bi push-unsafe ; inline
