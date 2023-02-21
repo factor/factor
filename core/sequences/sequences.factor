@@ -598,7 +598,7 @@ PRIVATE>
 : bounds-check-call ( n seq quot -- obj1 obj2 )
     2over bounds-check? [ call ] [ 3drop f f ] if ; inline
 
-: find-from-unsafe ( ... n seq quot: ( ... elt -- ... ? ) -- ... i/f seq )
+: do-find-from ( ... n seq quot: ( ... elt -- ... ? ) -- ... i/f seq )
     [ length-operator find-integer-from ] keepd ; inline
 
 : find-last-from-unsafe ( ... n seq quot: ( ... elt -- ... ? ) -- ... i/f seq )
@@ -607,10 +607,10 @@ PRIVATE>
 PRIVATE>
 
 : find-from ( ... n seq quot: ( ... elt -- ... ? ) -- ... i elt )
-    '[ _ find-from-unsafe index/element ] bounds-check-call ; inline
+    '[ _ do-find-from index/element ] bounds-check-call ; inline
 
 : find ( ... seq quot: ( ... elt -- ... ? ) -- ... i elt )
-    [ 0 ] 2dip find-from-unsafe index/element ; inline
+    [ 0 ] 2dip do-find-from index/element ; inline
 
 : find-last-from ( ... n seq quot: ( ... elt -- ... ? ) -- ... i elt )
     '[ _ find-last-from-unsafe index/element ] bounds-check-call ; inline
@@ -628,10 +628,10 @@ PRIVATE>
     [ 0 ] 2dip find-index-from ; inline
 
 : find-from* ( ... n seq quot: ( ... elt -- ... ? ) -- ... elt i/f )
-    '[ _ find-from-unsafe element/index ] bounds-check-call ; inline
+    '[ _ do-find-from element/index ] bounds-check-call ; inline
 
 : find* ( ... seq quot: ( ... elt -- ... ? ) -- ... elt i/f )
-    [ 0 ] 2dip find-from-unsafe element/index ; inline
+    [ 0 ] 2dip do-find-from element/index ; inline
 
 : find-last-from* ( ... n seq quot: ( ... elt -- ... ? ) -- ... elt i/f )
     '[ _ find-last-from-unsafe element/index ] bounds-check-call ; inline
