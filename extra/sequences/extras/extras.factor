@@ -1121,3 +1121,9 @@ INSTANCE: virtual-zip-index immutable-sequence
 
 : call-push-when ( ..a elt quot: ( ..a elt -- ..b elt' ? ) accum -- ..b )
     [ call ] dip swap [ push ] [ 2drop ] if ; inline
+
+: fry-map-as ( seq quot exemplar -- newseq )
+    [ 2drop length ]
+    [ overd new-sequence-like dup ]
+    [ 2nip ] 3tri
+    '[ [ [ _ nth-unsafe @ ] [ _ set-nth-unsafe ] bi ] each-integer _ _ like ] call ;
