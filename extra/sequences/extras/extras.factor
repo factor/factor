@@ -1159,4 +1159,4 @@ INSTANCE: virtual-zip-index immutable-sequence
     [ 2drop length ]
     [ overd new-sequence-like dup ]
     [ 2nip ] 3tri
-    '[ [ [ _ nth-unsafe @ ] [ _ set-nth-unsafe ] bi ] each-integer _ _ like ] call ;
+    '[ [ [ _ nth-unsafe @ ] [ _ set-nth-unsafe ] bi ] each-integer _ _ like ] call ; inline
