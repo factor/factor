@@ -716,15 +716,6 @@ HELP: unless*
 "The following two lines are equivalent:"
 { $code "X [ Y ] unless*" "X dup [ ] [ drop Y ] if" } } ;
 
-HELP: ?if-old
-{ $values { "obj" object } { "cond" "a generalized boolean" } { "true" { $quotation ( ..a cond -- ..b ) } } { "false" { $quotation ( ..a default -- ..b ) } } }
-{ $description "If the condition is " { $link f } ", the " { $snippet "false" } " quotation is called with the " { $snippet "default" } " value on the stack. Otherwise, the " { $snippet "true" } " quotation is called with the condition on the stack." }
-{ $notes
-"The following two lines are equivalent:"
-{ $code "[ X ] [ Y ] ?if" "dup [ nip X ] [ drop Y ] if" }
-"The following two lines are equivalent:"
-{ $code "[ ] [ ] ?if" "swap or" } } ;
-
 HELP: die
 { $description "Starts the front-end processor (FEP), which is a low-level debugger which can inspect memory addresses and the like. The FEP is also entered when a critical error occurs." }
 { $notes

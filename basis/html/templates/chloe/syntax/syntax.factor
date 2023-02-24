@@ -21,8 +21,8 @@ CONSTANT: chloe-ns "http://factorcode.org/chloe/1.0"
 XML-NS: chloe-name http://factorcode.org/chloe/1.0
 
 : required-attr ( tag name -- value )
-    [ nip ] [ chloe-name attr ] 2bi
-    [ ] [ " attribute is required" append throw ] ?if-old ;
+    [ nip ] [ chloe-name attr ] 2bi or*
+    [ " attribute is required" append throw ] unless ;
 
 : optional-attr ( tag name -- value )
     chloe-name attr ;
