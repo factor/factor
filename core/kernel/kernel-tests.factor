@@ -211,8 +211,8 @@ IN: kernel.tests
 
 { } [ "kernel" reload ] long-unit-test
 
-{ 5 } [ "5" [ string>number ] transmute ] unit-test
-{ "5notanumber" } [ "5notanumber" [ string>number ] transmute ] unit-test
+{ 5 t } [ "5" [ string>number ] call* ] unit-test
+{ "5notanumber" f } [ "5notanumber" [ string>number ] call* ] unit-test
 
-{ 10 } [ 5 [ 2 * ] ?transmute ] unit-test
-{ f } [ f [ 2 * ] ?transmute ] unit-test
+{ 10 } [ 5 [ 2 * ] ?call ] unit-test
+{ f } [ f [ 2 * ] ?call ] unit-test
