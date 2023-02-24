@@ -38,8 +38,7 @@ SYMBOLS: line last-offset position context
     f >>in-rule context set ;
 
 : init-token-marker ( main prev-context line -- )
-    line set
-    [ ] [ f <line-context> ] ?if-old context set
+    line set or* [ f <line-context> ] unless context set
     0 position set
     0 last-offset set
     0 whitespace-end set

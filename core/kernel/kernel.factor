@@ -112,9 +112,6 @@ DEFER: if
 
 ! Default
 
-: ?if-old ( ..a obj cond true: ( ..a cond -- ..b ) false: ( ..a default -- ..b ) -- ..b )
-    pick [ drop [ drop ] 2dip call ] [ 2nip call ] if ; inline
-
 : ?when ( ..a obj cond: ( ..a obj -- obj/f ) true: ( ..a cond -- ..b ) -- ..b )
     [ transmute* ] dip when ; inline
 
@@ -287,6 +284,8 @@ UNION: boolean POSTPONE: t POSTPONE: f ;
 : and ( obj1 obj2 -- ? ) over ? ; inline
 
 : or ( obj1 obj2 -- ? ) dupd ? ; inline
+
+: or* ( obj1 obj2 -- obj2/obj1 second? ) [ nip t ] [ f ] if* ; inline
 
 : xor ( obj1 obj2 -- ? ) [ f swap ? ] when* ; inline
 

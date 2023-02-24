@@ -113,8 +113,8 @@ IN: kernel.tests
 { 0 } [ f [ 0 ] unless* ] unit-test
 { t } [ t [ "Hello" ] unless* ] unit-test
 
-{ "2\n" } [ [ 1 2 [ . ] [ sq . ] ?if-old ] with-string-writer ] unit-test
-{ "9\n" } [ [ 3 f [ . ] [ sq . ] ?if-old ] with-string-writer ] unit-test
+{ "2\n" } [ [ 1 2 or* [ . ] [ sq . ] if ] with-string-writer ] unit-test
+{ "9\n" } [ [ 3 f or* [ . ] [ sq . ] if ] with-string-writer ] unit-test
 
 { f } [ f (clone) ] unit-test
 { -123 } [ -123 (clone) ] unit-test

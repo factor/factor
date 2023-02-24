@@ -254,7 +254,7 @@ PREDICATE: method-spec < array
     unclip generic? [ [ class? ] all? ] dip and ;
 
 syntax:M: method-spec where
-    dup unclip method [ ] [ first ] ?if-old where ;
+    dup unclip method or* [ first ] unless where ;
 
 syntax:M: method-spec set-where
     unclip method set-where ;
