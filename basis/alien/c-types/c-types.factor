@@ -54,7 +54,7 @@ UNION: c-type-name
     c-type-word pointer ;
 
 : resolve-typedef ( name -- c-type )
-    [ void? ] [ no-c-type ] ?when
+    dup void? [ no-c-type ] when
     dup c-type-name? [ lookup-c-type ] when ;
 
 M: word lookup-c-type
