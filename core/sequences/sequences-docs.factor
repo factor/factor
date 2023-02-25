@@ -180,11 +180,7 @@ HELP: ?nth
 { $values { "n" integer } { "seq" sequence } { "elt/f" { $maybe object } } }
 { $description "A forgiving version of " { $link nth } ". If the index is out of bounds, or if the sequence is " { $link f } ", simply outputs " { $link f } "." } ;
 
-HELP: ??nth
-{ $values { "n" integer } { "seq" sequence } { "elt/f" { $maybe object } } { "?" boolean } }
-{ $description "A forgiving version of " { $link nth } ". If the index is out of bounds, or if the sequence is " { $link f } ", simply outputs " { $link f } ". Also outputs a boolean to distinguish between the sequence containing an " { $link f } " or an out of bounds index." } ;
-
-{ nth ?nth ??nth } related-words
+{ nth ?nth } related-words
 
 HELP: ?set-nth
 { $values { "elt" object } { "n" integer } { "seq" sequence } }
