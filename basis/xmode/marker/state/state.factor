@@ -7,8 +7,8 @@ IN: xmode.marker.state
 ! Based on org.gjt.sp.jedit.syntax.TokenMarker
 
 SYMBOLS: line last-offset position context
- whitespace-end seen-whitespace-end?
- escaped?  process-escape?  delegate-end-escaped? ;
+whitespace-end seen-whitespace-end?
+escaped?  process-escape?  delegate-end-escaped? ;
 
 : current-rule ( -- rule )
     context get in-rule>> ;

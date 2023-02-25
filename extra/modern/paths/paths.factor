@@ -88,7 +88,7 @@ CONSTANT: core-broken-vocabs
 
 
 : all-docs-paths ( -- seq ) all-vocabs modern-docs-paths ;
- : all-tests-paths ( -- seq ) all-vocabs modern-tests-paths ;
+: all-tests-paths ( -- seq ) all-vocabs modern-tests-paths ;
 
 : all-paths ( -- seq )
     [

@@ -130,7 +130,7 @@ CONSTANT: URL V{ }
         ] with-file-reader
     ] [ drop ] if ;
 
- : gopher-ls ( args -- )
+: gopher-ls ( args -- )
     [ PAGE ] [ "-l" = ] bi* print-links ;
 
 : gopher-quit ( -- )

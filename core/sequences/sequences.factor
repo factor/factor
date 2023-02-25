@@ -180,7 +180,7 @@ PRIVATE>
 : first4 ( seq -- first second third fourth )
     3 swap bounds-check nip first4-unsafe ; inline
 
- : ?nth ( n seq -- elt/f )
+: ?nth ( n seq -- elt/f )
     2dup bounds-check? [ nth-unsafe ] [ 2drop f ] if ; inline
 
 : ?set-nth ( elt n seq -- )

@@ -132,7 +132,7 @@ CONSTANT: URL V{ }
         ] with-file-reader
     ] [ drop ] if ;
 
- : gemini-ls ( args -- )
+: gemini-ls ( args -- )
     [ PAGE ] [ "-l" = ] bi* print-links ;
 
 : gemini-quit ( -- )
