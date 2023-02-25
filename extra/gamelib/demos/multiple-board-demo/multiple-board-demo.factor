@@ -26,7 +26,7 @@ IN: multiple-board-demo
     { 500 400 } init-board-gadget
     board-init add-board ;
 
- :: display-window ( -- )
+:: display-window ( -- )
     first-gadget :> g1
     second-gadget :> g2
     { g1 g2 } horizontal 0 f <window> ! initalize two boards   

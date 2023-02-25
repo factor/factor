@@ -33,7 +33,7 @@ MACRO: map-index-compose ( seq quot -- quot' )
       [ [ bitand ] dip swap 0 = [ 2drop ] [ [ 1.0 ] 2dip swap set-nth ] if ]
       map-index-compose 2cleave ;
 
- : >pov ( byte -- symbol )
+: >pov ( byte -- symbol )
     {
          pov-neutral
          pov-up

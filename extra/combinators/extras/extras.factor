@@ -189,7 +189,7 @@ MACRO: 4keep-under ( quot -- quot' )
 : 1temp2d ( quot: ( a b c -- d e f ) -- quot ) '[ rot @ -rot ] ; inline
 : 2temp2d ( quot: ( a b c d -- e f g h ) -- quot ) '[ 2 4 0 nrotated @ 2 4 0 -nrotated ] ; inline
 
- : (closure-limit) ( vertex set quot: ( vertex -- edges ) i n -- )
+: (closure-limit) ( vertex set quot: ( vertex -- edges ) i n -- )
     2dup < [
         [ 1 + ] dip
         2reach ?adjoin [

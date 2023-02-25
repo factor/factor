@@ -65,7 +65,7 @@ C-TYPE: cairo_snurface_t
 MAIN: majn
 
 ! ! SLOT
- SLOT: komba
+SLOT: komba
 
 ! ! SYNTAX
 <<
