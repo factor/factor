@@ -1,3 +1,4 @@
+
 USING: accessors arrays assocs combinators generalizations
 grouping growable heaps kernel math math.order ranges sequences
 sequences.private shuffle sorting splitting vectors ;
@@ -59,6 +60,12 @@ IN: sequences.extras
         [ 2/ ] [ over - ] bi rot '[ _ <repetition> ] bi@
         pick surround-as
     ] if-zero ;
+
+: zip-longest-with ( seq1 seq2 fill -- assoc )
+    pad-longest zip ;
+
+: zip-longest ( seq1 seq2 -- assoc )
+    f zip-longest-with ;
 
 : change-nths ( ... indices seq quot: ( ... elt -- ... elt' ) -- ... )
     [ change-nth ] 2curry each ; inline
@@ -295,11 +302,12 @@ PRIVATE>
 : 0accumulate ( ... seq quot: ( ... prev elt -- ... next ) -- ... final newseq )
     over 0accumulate-as ; inline
 
-: occurrence-count-by ( seq quot: ( elt -- elt' ) -- hash seq' )
-    '[ nip @ over inc-at* drop ] [ H{ } clone ] 2dip 0accumulate ; inline
-
 : nth-index ( n obj seq -- i )
     [ = dup [ drop 1 - dup 0 < ] when ] with find drop nip ;
+
+: at+* ( n key assoc -- old new ) [ 0 or [ + ] keep swap dup ] change-at ; inline
+
+: inc-at* ( key assoc -- old new ) [ 1 ] 2dip at+* ; inline
 
 : progressive-index-by-as ( seq1 seq2 quot exemplar -- hash seq' )
     [
