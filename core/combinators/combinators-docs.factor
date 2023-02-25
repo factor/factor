@@ -170,7 +170,7 @@ ARTICLE: "conditionals" "Conditional combinators"
 "Forms abstracting a common stack shuffle pattern:"
 { $subsections if* when* unless* }
 "Another form abstracting a common stack shuffle pattern:"
-{ $subsections ?if }
+{ $subsections ?if ?when ?unless }
 "Sometimes instead of branching, you just need to pick one of two values:"
 { $subsections ? }
 "Two combinators which abstract out nested chains of " { $link if } ":"
