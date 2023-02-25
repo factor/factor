@@ -171,20 +171,20 @@ DEFER: if
 : 2keepd ( ..a x y z quot: ( ..a x y z -- ..b ) -- ..b x y )
     3keep drop ; inline
 
+: ?call ( ..a obj/f quot: ( ..a obj -- ..a obj' )  -- ..a obj'/f ) dupd when ; inline
+
 : transmute ( old quot: ( old -- new/f ) -- new/old new? )
     keep over [ drop t ] [ nip f ] if ; inline
 
-: ?call ( old/f quot -- old'/f ) dupd when ; inline
-
 ! Default
 
-: ?when ( ..a obj cond: ( ..a obj -- obj/f ) true: ( ..a cond -- ..b ) -- ..b )
+: ?when ( ..a default cond: ( ..a default -- ..a new/f ) true: ( ..a new -- ..b ) -- ..b )
     [ transmute ] dip when ; inline
 
-: ?unless ( ..a obj cond: ( ..a obj -- obj/f ) false: ( ..a default -- ..b ) -- ..b )
+: ?unless ( ..a default cond: ( ..a default -- ..a new/f ) false: ( ..a default -- ..b ) -- ..b )
     [ transmute ] dip unless ; inline
 
-: ?if ( ..a obj cond true: ( ..a cond -- ..b ) false: ( ..a default -- ..b ) -- ..b )
+: ?if ( ..a default cond: ( ..a default -- ..a new/f ) true: ( ..a new -- ..b ) false: ( ..a default -- ..b ) -- ..b )
     [ transmute ] 2dip if ; inline
 
 ! Cleavers

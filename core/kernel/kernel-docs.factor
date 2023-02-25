@@ -200,6 +200,34 @@ HELP: or
     { $example "USING: kernel prettyprint ;" "\"hi\" 12.0 or ." "\"hi\"" }
 } ;
 
+HELP: or*
+{ $values
+    { "obj1" "a generalized boolean" }
+    { "obj2" "a generalized boolean" }
+    { "obj2/obj1" "a generalized boolean" }
+    { "second?" "boolean" }
+}
+{ $description "A version of " { $link or } " which prefers to return second argument instead of the first. The output " { $snippet "second?" } " tells you which object was returned." }
+{ $examples
+    "Prefers the second argument:"
+    { $example "USING: arrays kernel prettyprint ;"
+        "f 3 or* 2array ."
+        "{ 3 t }"
+    }
+    "Will also return the first:"
+    { $example "USING: arrays kernel prettyprint ;"
+        "3 f or* 2array ."
+        "{ 3 f }"
+    }
+    "Can return false:"
+    { $example "USING: arrays kernel prettyprint ;"
+        "f f or* 2array ."
+        "{ f f }"
+    }
+} ;
+
+{ or or* } related-words
+
 HELP: xor
 { $values { "obj1" "a generalized boolean" } { "obj2" "a generalized boolean" } { "?" "a generalized boolean" } }
 { $description "If exactly one input is false, outputs the other input. Otherwise outputs " { $link f } "." }
@@ -715,6 +743,82 @@ HELP: unless*
 { $notes
 "The following two lines are equivalent:"
 { $code "X [ Y ] unless*" "X dup [ ] [ drop Y ] if" } } ;
+
+HELP: ?call
+{ $values
+    { "obj/f" { $maybe object } } { "quot" quotation }
+    { "obj'/f" { $maybe object } }
+}
+{ $description "Call the quotation if " { $snippet "obj" } " is not " { $snippet "f" } "." }
+{ $examples
+    "Example:"
+    { $example "USING: kernel math prettyprint ;"
+        "5 [ sq ] ?call ."
+        "25"
+    }
+    "Example:"
+    { $example "USING: kernel math prettyprint ;"
+        "f [ sq ] ?call ."
+        "f"
+    }
+} ;
+
+HELP: ?if
+{ $values
+    { "default" object } { "cond" object } { "true" object } { "false" object }
+}
+{ $warning "The old " { $snippet "?if" } " word can be refactored:" { $code "[ .. ] [ .. ] ?if\n\nor* [ .. ] [ .. ] if" } }
+{ $description "Calls " { $snippet "cond" } " on the " { $snippet "default" } " object and if " { $snippet "cond" } " outputs a new object then the " { $snippet "true" } " quotation is called with that new object. Otherwise, calls " { $snippet "false" } " with the old object." }
+{ $examples
+    "Look up an existing word or make an error pair:"
+    { $example "USING: arrays definitions kernel math prettyprint sequences vocabs.parser ;"
+        "\"+\" [ search ] [ where first ] [ \"not found\" 2array ] ?if ."
+        "\"resource:core/math/math.factor\""
+    }
+    "Try to look up a word that doesn't exist:"
+    { $example "USING: arrays definitions kernel math prettyprint sequences vocabs.parser ;"
+        "\"+++++\" [ search ] [ where first ] [ \"not found\" 2array ] ?if ."
+        "{ \"+++++\" \"not found\" }"
+    }
+} ;
+
+HELP: ?when
+{ $values
+    { "default" object } { "cond" object } { "true" object }
+}
+{ $description "Calls " { $snippet "cond" } " on the " { $snippet "default" } " object and if " { $snippet "cond" } " outputs a new object then the " { $snippet "true" } " quotation is called with that new object. Otherwise, leaves the old object on the stack." }
+{ $examples
+    "Look up an existing word or make an error pair:"
+    { $example "USING: arrays definitions kernel math prettyprint sequences vocabs.parser ;"
+        "\"+\" [ search ] [ where first ] ?when ."
+        "\"resource:core/math/math.factor\""
+    }
+    "Try to look up a word that doesn't exist:"
+    { $example "USING: arrays definitions kernel math prettyprint sequences vocabs.parser ;"
+        "\"+++++\" [ search ] [ where first ] ?when ."
+        "\"+++++\""
+    }
+} ;
+
+HELP: ?unless
+{ $values
+    { "default" object } { "cond" object } { "false" object }
+}
+{ $description "Calls " { $snippet "cond" } " on the " { $snippet "default" } " object and if " { $snippet "cond" } " outputs a new object. Otherwise, calls " { $snippet "false" } " with the old object." }
+{ $examples
+    "Look up an existing word or make an error pair:"
+    { $example "USING: arrays definitions kernel math prettyprint sequences vocabs.parser ;"
+        "\"+\" [ search ] [ \"not found\" 2array ] ?unless ."
+        "+"
+    }
+    "Try to look up a word that doesn't exist:"
+    { $example "USING: arrays definitions kernel math prettyprint sequences vocabs.parser ;"
+        "\"+++++\" [ search ] [ \"not found\" 2array ] ?unless ."
+        "{ \"+++++\" \"not found\" }"
+    }
+} ;
+
+{ ?if ?when ?unless } related-words
 
 HELP: die
 { $description "Starts the front-end processor (FEP), which is a low-level debugger which can inspect memory addresses and the like. The FEP is also entered when a critical error occurs." }
