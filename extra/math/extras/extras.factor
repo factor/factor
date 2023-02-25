@@ -5,8 +5,9 @@ USING: accessors arrays assocs byte-arrays combinators
 combinators.short-circuit compression.zlib grouping kernel math
 math.bitwise math.combinatorics math.constants math.functions
 math.order math.primes math.primes.factors math.statistics
-math.vectors random ranges ranges.private sequences
-sequences.extras sets sorting sorting.extras ;
+math.vectors namespaces random random.private ranges
+ranges.private sequences sequences.extras sets sorting
+sorting.extras ;
 
 IN: math.extras
 
@@ -200,6 +201,10 @@ PRIVATE>
 
 : weighted-random ( histogram -- obj )
     unzip cum-sum [ last >float random ] [ bisect-left ] bi swap nth ;
+
+: weighted-randoms ( length histogram -- seq )
+    unzip swap [ cum-sum [ last >float random-generator get ] keep ] dip
+    '[ 0.0 _ _ (uniform-random-float) _ bisect-left _ nth ] replicate ;
 
 : unique-indices ( seq -- unique indices )
     [ members ] keep over dup length <iota>
