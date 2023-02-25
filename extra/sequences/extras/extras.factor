@@ -309,6 +309,9 @@ PRIVATE>
 
 : inc-at* ( key assoc -- old new ) [ 1 ] 2dip at+* ; inline
 
+: occurrence-count-by ( seq quot: ( elt -- elt' ) -- hash seq' )
+    '[ nip @ over inc-at* drop ] [ H{ } clone ] 2dip 0accumulate ; inline
+
 : progressive-index-by-as ( seq1 seq2 quot exemplar -- hash seq' )
     [
         pick length '[
