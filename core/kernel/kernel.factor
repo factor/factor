@@ -117,8 +117,6 @@ DEFER: if
 ! Misfits
 : tuck ( x y -- y x y ) dup -rot ; inline
 
-: spin ( x y z -- z y x ) -rot swap ; inline
-
 : rotd ( w x y z -- x y w z ) [ rot ] dip ; inline
 
 : -rotd ( w x y z -- y w x z ) [ -rot ] dip ; inline
@@ -126,6 +124,10 @@ DEFER: if
 : roll ( w x y z -- x y z w ) rotd swap ; inline
 
 : -roll ( w x y z -- z w x y ) swap -rotd ; inline
+
+: spin ( x y z -- z y x ) -rot swap ; inline
+
+: 4spin ( w x y z -- z y x w ) -roll spin ; inline
 
 : nipd ( x y z -- y z ) [ nip ] dip ; inline
 
