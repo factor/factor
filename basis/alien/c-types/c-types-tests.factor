@@ -165,3 +165,5 @@ USE: alien.syntax
 USE: alien.c-types
 TYPEDEF: void* foo-func
 " eval( -- )
+
+[ void resolve-typedef ] [ T{ no-c-type f void } = ] must-fail-with
