@@ -11,12 +11,12 @@ ERROR: variable-required variable ;
 : 2required ( symbol1 symbol2 -- obj1 obj2 ) [ required ] bi@ ; inline
 : 2get ( symbol1 symbol2 -- obj1 obj2 ) [ get ] bi@ ; inline
 
-: ?xor ( obj1 obj2 -- xor first? )
+: xor* ( obj1 obj2 -- xor first? )
     [ swap [ 2drop f f ] [ f ] if* ]
-    [ [ t ] [ f f ] if* ] if* ;
+    [ [ t ] [ f f ] if* ] if* ; inline
 
 ERROR: one-variable-only symbol1 symbol2 value1 value2 ;
 
 : one-of ( symbol1 symbol2 -- str/f first? )
-    2dup [ get ] bi@ 2dup ?xor over
+    2dup [ get ] bi@ 2dup xor* over
     [ [ 4drop ] 2dip ] [ one-variable-only ] if ;
