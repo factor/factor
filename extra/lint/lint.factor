@@ -28,6 +28,7 @@ CONSTANT: manual-substitutions
         { when [ [ ] if ] }
         { spin [ swap rot ] }
         { >boolean [ f = not ] }
+        { keep [ over [ call ] dip ] }
     }
 
 CONSTANT: trivial-defs
