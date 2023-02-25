@@ -12,7 +12,7 @@ CONSTANT: NSStringPboardType "NSStringPboardType"
 
 : pasteboard-string ( pasteboard -- str )
     NSStringPboardType <NSString> -> stringForType:
-    [ CF>string ] ?transmute ;
+    [ CF>string ] ?call ;
 
 : set-pasteboard-types ( seq pasteboard -- )
     swap <CFArray> -> autorelease f -> declareTypes:owner: drop ;

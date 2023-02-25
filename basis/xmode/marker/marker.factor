@@ -201,7 +201,7 @@ GENERIC: handle-rule-end ( match-count rule -- )
     context get
     [ in-rule-set>> escape-rule>> ] [
         parent>> in-rule-set>>
-        [ escape-rule>> ] ?transmute
+        [ escape-rule>> ] ?call
     ] ?unless ;
 
 : check-escape-rule ( rule -- ? )
