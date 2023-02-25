@@ -8,7 +8,7 @@ IN: compiler.codegen.gc-maps
 SYMBOLS: return-addresses gc-maps ;
 
 : gc-map-needed? ( gc-map/f -- ? )
-    dup [ tuple-slots [ empty? ] all? not ] when ;
+    [ tuple-slots [ empty? ] all? not ] ?call ;
 
 : gc-map-here ( gc-map -- )
     dup gc-map-needed? [
