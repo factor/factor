@@ -333,6 +333,8 @@ PRIVATE>
 : nth-of ( seq n -- elt ) swap nth ; inline
 : set-nth-of ( seq n elt -- seq ) spin [ set-nth ] keep ; inline
 : ?nth-of ( seq n -- elt/f ) swap ?nth ; inline
+: ??nth ( n seq -- elt/f ? )
+    2dup bounds-check? [ nth-unsafe t ] [ 2drop f f ] if ; inline
 : ??nth-of ( seq n -- elt/f ? ) swap ??nth ; inline
 
 : reduce-of ( seq quot: ( prev elt -- next ) identity -- result )
