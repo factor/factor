@@ -213,16 +213,20 @@ M: object add-using
 : docs-header. ( word -- )
     "HELP: " write name>> print ;
 
-: (help.) ( word -- )
-    [ docs-header. ] [ docs-body. ] bi ;
-
 : interesting-words ( vocab -- array )
     vocab-words
     [ { [ "help" word-prop ] [ predicate? ] } 1|| ] reject
     sort ;
 
+PRIVATE>
+
+: scaffold-word-docs ( word -- )
+    [ docs-header. ] [ docs-body. ] bi ;
+
+<PRIVATE
+
 : interesting-words. ( vocab -- )
-    interesting-words [ (help.) nl ] each ;
+    interesting-words [ scaffold-word-docs nl ] each ;
 
 : docs-file-string ( vocab -- str2 )
     [
@@ -264,9 +268,11 @@ M: object add-using
 PRIVATE>
 
 : help. ( word -- )
-    [ (help.) ] [ nl vocabulary>> link-vocab ] bi ;
+    [ scaffold-word-docs ] [ nl vocabulary>> link-vocab ] bi ;
 
-: scaffold-docs ( vocab -- )
+GENERIC: scaffold-docs ( obj -- )
+
+M: string scaffold-docs ( vocab -- )
     ensure-vocab-exists
     [
         dup "-docs.factor" vocab/suffix>path scaffolding? [
@@ -275,6 +281,9 @@ PRIVATE>
             2drop
         ] if
     ] with-scaffold ;
+
+M: sequence scaffold-docs [ scaffold-word-docs nl ] each ;
+M: word scaffold-docs scaffold-word-docs ;
 
 : scaffold-undocumented ( string -- )
     [ interesting-words. ] [ link-vocab ] bi ;
