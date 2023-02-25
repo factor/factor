@@ -1074,6 +1074,10 @@ HELP: nth?
 }
 { $description "Check if the nth element of " { $snippet "seq" } " satisfies the condition given by " { $snippet "quot" } "." } ;
 
+HELP: ??nth
+{ $values { "n" integer } { "seq" sequence } { "elt/f" { $maybe object } } { "?" boolean } }
+{ $description "A forgiving version of " { $link nth } ". If the index is out of bounds, or if the sequence is " { $link f } ", simply outputs " { $link f } ". Also outputs a boolean to distinguish between the sequence containing an " { $link f } " or an out of bounds index." } ;
+
 HELP: odd-indices
 { $values
     { "seq" sequence }
