@@ -11,7 +11,7 @@ IN: cocoa.nibs
 
 : nib-named ( nib-name -- anNSNib )
     <NSString> NSNib -> alloc swap f -> initWithNibNamed:bundle:
-    dup [ -> autorelease ] when ;
+    [ -> autorelease ] ?call ;
 
 : nib-objects ( anNSNib -- objects/f )
     f

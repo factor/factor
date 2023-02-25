@@ -87,17 +87,13 @@ MACRO: n*obj ( n obj -- quot )
 MACRO:: n-falsify ( n -- quot )
     [ n ndup n n-and [ n ndrop n f n*obj ] unless ] ;
 
-! plox
-: ?1res ( ..a obj/f quot -- ..b )
-    dupd when ; inline
-
 ! when both args are true, call quot. otherwise dont
 : ?2res ( ..a obj1 obj2 quot: ( obj1 obj2 -- ? ) -- ..b )
     [ 2dup and ] dip [ 2drop f ] if ; inline
 
 ! try the quot, keep the original arg if quot is true
 : ?1arg ( obj quot: ( obj -- ? ) -- obj/f )
-    [ ?1res ] keepd '[ _ ] [ f ] if ; inline
+    [ ?call ] keepd '[ _ ] [ f ] if ; inline
 
 : ?2arg ( obj1 obj2 quot: ( obj1 obj2 -- ? ) -- obj1/f obj2/f )
     [ ?2res ] 2keepd '[ _ _ ] [ f f ] if ; inline
