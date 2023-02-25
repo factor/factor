@@ -58,7 +58,7 @@ ERROR: number-expected ;
     [ [ string>number ] [ no-word ] ?unless ] ?unless ;
 
 : ?scan-datum ( -- word/number/f )
-    ?scan-token [ parse-datum ] ?transmute ;
+    ?scan-token [ parse-datum ] ?call ;
 
 : scan-datum ( -- word/number )
     ?scan-datum [ \ word throw-unexpected-eof ] unless* ;
