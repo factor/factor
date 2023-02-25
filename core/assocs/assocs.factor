@@ -36,10 +36,6 @@ M: assoc assoc-like drop ; inline
 : set-of ( assoc key value -- assoc )
     swap pick set-at ; inline
 
-: maybe-set-of ( assoc key value -- assoc changed? )
-    [ 2dup ?of ] dip swap
-    [ dupd = [ 2drop f ] [ set-of t ] if ] [ nip set-of t ] if ;
-
 <PRIVATE
 
 : assoc-operator ( assoc quot -- alist quot' )
@@ -207,19 +203,9 @@ M: assoc values [ nip ] { } assoc>map ;
 : ?change-at ( ..a key assoc quot: ( ..a value -- ..b newvalue ) -- ..b )
     2over [ set-at ] 2curry compose [ at* ] dip [ drop ] if ; inline
 
-: change-of ( ..a assoc key quot: ( ..a value -- ..b newvalue ) -- ..b assoc )
-    [ [ of ] dip call ] 2keepd rot set-of ; inline
-
-: ?change-of ( ..a assoc key quot: ( ..a value -- ..b newvalue ) -- ..b assoc )
-    [ set-of ] compose [ 2dup ?of ] dip [ 2drop ] if ; inline
-
 : at+ ( n key assoc -- ) [ 0 or + ] change-at ; inline
 
-: at+* ( n key assoc -- old new ) [ 0 or [ + ] keep swap dup ] change-at ; inline
-
 : inc-at ( key assoc -- ) [ 1 ] 2dip at+ ; inline
-
-: inc-at* ( key assoc -- old new ) [ 1 ] 2dip at+* ; inline
 
 : map>assoc ( ... seq quot: ( ... elt -- ... key value ) exemplar -- ... assoc )
     dup sequence? [
@@ -246,9 +232,6 @@ M: assoc value-at* swap [ = nip ] curry assoc-find nip ;
 
 : push-at ( value key assoc -- )
     [ ?push ] change-at ;
-
-: push-of ( assoc key value -- assoc )
-    swap pick push-at ; inline
 
 : zip-as ( keys values exemplar -- assoc )
     dup sequence? [
