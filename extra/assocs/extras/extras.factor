@@ -21,9 +21,26 @@ IN: assocs.extras
 : rename-of ( assoc key newkey -- assoc )
     [ delete-of* ] dip swap [ set-of ] [ 2drop ] if ;
 
+: at+* ( n key assoc -- old new ) [ 0 or [ + ] keep swap dup ] change-at ; inline
+
+: inc-at* ( key assoc -- old new ) [ 1 ] 2dip at+* ; inline
+
 : inc-of ( assoc key -- assoc ) 1 of+ ; inline
 
 : inc-of* ( assoc key -- assoc old new ) 1 of+* ; inline
+
+: change-of ( ..a assoc key quot: ( ..a value -- ..b newvalue ) -- ..b assoc )
+    [ [ of ] dip call ] 2keepd rot set-of ; inline
+
+: ?change-of ( ..a assoc key quot: ( ..a value -- ..b newvalue ) -- ..b assoc )
+    [ set-of ] compose [ 2dup ?of ] dip [ 2drop ] if ; inline
+
+: maybe-set-of ( assoc key value -- assoc changed? )
+    [ 2dup ?of ] dip swap
+    [ dupd = [ 2drop f ] [ set-of t ] if ] [ nip set-of t ] if ;
+
+: push-of ( assoc key value -- assoc )
+    swap pick push-at ; inline
 
 : push-at-each ( value keys assoc -- )
     '[ _ push-at ] with each ; inline
