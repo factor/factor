@@ -1,8 +1,11 @@
 ! Copyright (C) 2012 John Benediktsson, Doug Coleman
 ! See https://factorcode.org/license.txt for BSD license
 USING: arrays assocs assocs.private kernel math math.statistics
-sequences sequences.extras sets ;
+sequences sets ;
 IN: assocs.extras
+
+: change-of ( ..a assoc key quot: ( ..a value -- ..b newvalue ) -- ..b assoc )
+    [ [ of ] dip call ] 2keepd rot set-of ; inline
 
 : of* ( assoc key -- value/f ? ) swap at* ; inline
 
@@ -21,16 +24,9 @@ IN: assocs.extras
 : rename-of ( assoc key newkey -- assoc )
     [ delete-of* ] dip swap [ set-of ] [ 2drop ] if ;
 
-: at+* ( n key assoc -- old new ) [ 0 or [ + ] keep swap dup ] change-at ; inline
-
-: inc-at* ( key assoc -- old new ) [ 1 ] 2dip at+* ; inline
-
 : inc-of ( assoc key -- assoc ) 1 of+ ; inline
 
 : inc-of* ( assoc key -- assoc old new ) 1 of+* ; inline
-
-: change-of ( ..a assoc key quot: ( ..a value -- ..b newvalue ) -- ..b assoc )
-    [ [ of ] dip call ] 2keepd rot set-of ; inline
 
 : ?change-of ( ..a assoc key quot: ( ..a value -- ..b newvalue ) -- ..b assoc )
     [ set-of ] compose [ 2dup ?of ] dip [ 2drop ] if ; inline
@@ -56,12 +52,6 @@ IN: assocs.extras
 
 : deep-set-of ( assoc seq elt -- )
     [ deep-of-but-last ] dip spin set-at ; inline
-
-: zip-longest-with ( seq1 seq2 fill -- assoc )
-    pad-longest zip ;
-
-: zip-longest ( seq1 seq2 -- assoc )
-    f zip-longest-with ;
 
 : substitute! ( seq assoc -- seq )
     substituter map! ;
