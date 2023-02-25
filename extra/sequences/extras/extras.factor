@@ -1077,7 +1077,7 @@ INSTANCE: step-slice virtual-sequence
     pick 2nested-map-as ; inline
 
 : 3nested-each ( seq1 seq2 seq3 quot -- )
-    [ spin ] dip '[
+    spind '[
         -rot [
             swap _ with with each
         ] with with each
