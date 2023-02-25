@@ -173,19 +173,22 @@ DEFER: if
 
 : ?call ( ..a obj/f quot: ( ..a obj -- ..a obj' )  -- ..a obj'/f ) dupd when ; inline
 
-: transmute ( old quot: ( old -- new/f ) -- new/old new? )
+: ?transmute ( old quot: ( old -- new/f ) -- new/old new? )
     keep over [ drop t ] [ nip f ] if ; inline
+
+: transmute ( old quot: ( old -- new/f ) -- new/old )
+    ?transmute drop ; inline
 
 ! Default
 
 : ?when ( ..a default cond: ( ..a default -- ..a new/f ) true: ( ..a new -- ..b ) -- ..b )
-    [ transmute ] dip when ; inline
+    [ ?transmute ] dip when ; inline
 
 : ?unless ( ..a default cond: ( ..a default -- ..a new/f ) false: ( ..a default -- ..b ) -- ..b )
-    [ transmute ] dip unless ; inline
+    [ ?transmute ] dip unless ; inline
 
 : ?if ( ..a default cond: ( default -- new/f ) true: ( ..a new -- ..b ) false: ( ..a default -- ..b ) -- ..b )
-    [ transmute ] 2dip if ; inline
+    [ ?transmute ] 2dip if ; inline
 
 ! Cleavers
 : bi ( x p q -- )

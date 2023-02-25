@@ -147,7 +147,7 @@ PRIVATE>
 
 :: (query) ( params -- obj assoc )
     { { "action" "query" } } params assoc-union api-call dup
-    dup "query" of [ nip ] when*
+    [ "query" of ] transmute
     "siprop" params key? [
         params { "prop" "list" "meta" } values-of sift first of
     ] unless swap ;
