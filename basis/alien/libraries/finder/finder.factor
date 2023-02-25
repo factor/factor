@@ -1,11 +1,10 @@
-USING: accessors alien.libraries kernel sequences system vocabs
-;
+USING: accessors alien.libraries kernel sequences system vocabs ;
 IN: alien.libraries.finder
 
 HOOK: find-library* os ( name -- path/f )
 
 : find-library ( name -- path/library-not-found )
-    dup find-library* [ nip ] when* ;
+    [ find-library* ] transmute ;
 
 : ?update-library ( name path abi -- )
     pick lookup-library [ dll>> dll-valid? ] [ f ] if* [
