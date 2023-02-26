@@ -188,3 +188,5 @@ IN: combinators.extras.tests
 [ 100 200 { { 1 1 } { 2 2 } { 3 3 } } [ [ 1 + ] bi@ ] 2temp2d assoc-map ] unit-test
 
 { t } [ int [ c-type-name? ] [ lookup-c-type ] 1check-when c-type? ] unit-test
+
+{ 111 112 113 114 } [ 10 100 [ 1 + + ] [ 2  + + ] [ 3 + + ] [ 4 + + ] 2quad ] unit-test

@@ -54,6 +54,10 @@ MACRO: cleave-array ( quots -- quot )
 : 4quad ( w x y z  p q r s -- )
     [ [ [ 4keep ] dip 4keep ] dip 4keep ] dip call ; inline
 
+: quad ( x p q r s -- ) [ [ [ keep ] dip keep ] dip keep ] dip call ; inline
+
+: 2quad ( x y p q r s -- ) [ [ [ 2keep ] dip 2keep ] dip 2keep ] dip call ; inline
+
 : quad* ( w x y z p q r s -- ) [ [ [ 3dip ] dip 2dip ] dip dip ] dip call ; inline
 
 : quad@ ( w x y z quot -- ) dup dup dup quad* ; inline
