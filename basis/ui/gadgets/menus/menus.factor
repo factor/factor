@@ -115,7 +115,7 @@ M: menu-button handle-gesture
 
 <PRIVATE
 
-:: next-item ( menu dir --  )
+:: next-item ( menu dir -- )
     menu [ items>> ] [ control-value ] bi :> ( items curr )
     curr [
         items length :> max

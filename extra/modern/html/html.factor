@@ -201,7 +201,7 @@ ERROR: unmatched-closing-tag-error stack tag ;
         stack name unmatched-closing-tag-error
     ] if* ;
 
-: lex-html ( stack n string -- stack n' string  )
+: lex-html ( stack n string -- stack n' string )
     "<" slice-til-either {
         { CHAR: < [
             1 split-slice-back [ >string f like [ reach push ] when* ] dip

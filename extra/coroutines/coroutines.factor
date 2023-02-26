@@ -45,7 +45,7 @@ TUPLE: coroutine resumecc exitcc originalcc ;
     [ ] >>resumecc
     exitcc>> continue-with ;
 
-: coreset ( v --  )
+: coreset ( v -- )
     current-coro get dup
     originalcc>> >>resumecc
     exitcc>> continue-with ;

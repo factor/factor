@@ -261,7 +261,7 @@ PRIVATE>
 : (collect-with-previous) ( quot into -- quot' )
     [ [ keep ] dip [ set-nth-unsafe ] keepdd ] 2curry ; inline
 
-: collect-with-previous ( n quot into --  )
+: collect-with-previous ( n quot into -- )
     (collect-with-previous) each-integer-with-previous ; inline
 
 : map-integers-with ( ... len quot: ( ... prev i -- ... elt ) exemplar -- ... newseq )

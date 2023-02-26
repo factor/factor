@@ -63,7 +63,7 @@ IN: redis
 : redis-hget ( field key -- response ) hget flush read-response ;
 : redis-hgetall ( key -- response ) hgetall flush read-response ;
 : redis-hincrby ( integer field key -- response ) hincrby flush read-response ;
-: redis-hincrbyfloat (  float field key -- response ) hincrbyfloat flush read-response ;
+: redis-hincrbyfloat ( float field key -- response ) hincrbyfloat flush read-response ;
 : redis-hkeys ( key -- response ) hkeys flush read-response ;
 : redis-hlen ( key -- response ) hlen flush read-response ;
 : redis-hmget ( seq key  -- response ) hmget flush read-response ;

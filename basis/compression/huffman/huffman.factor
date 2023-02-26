@@ -66,7 +66,7 @@ TUPLE: huffman-tree
 : gen-leaves ( lit-seq -- leaves )
     [ huffman-tree new swap >>code ] map ; 
 
-: build-leaf-table ( leaves --  )
+: build-leaf-table ( leaves -- )
     dup empty? [ drop ] [ dup first leaf-table get inc-at rest build-leaf-table ] if ;
  
 : insert-leaves ( -- ) leaf-table get unzip swap zip node-heap get heap-push-all  ;

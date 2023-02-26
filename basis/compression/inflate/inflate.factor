@@ -28,7 +28,7 @@ ERROR: bad-zlib-header ;
 : read-until-terminated ( data -- data ) 
     [ dup 8 swap bs:read 0 =  ] [  ]  until ;
 
-:: interpret-flag ( flg data  -- )
+:: interpret-flag ( flg data -- )
     27 data bs:seek 
     flg first 1 = [ 8 data bs:read data bs:seek  ] when
     flg second 1 = [ data read-until-terminated drop ] when

@@ -12,5 +12,5 @@ IN: glfw.ffi
 
 LIBRARY: glfw
 
-FUNCTION: void* glfwGetCurrentContext (  )
+FUNCTION: void* glfwGetCurrentContext ( )
 FUNCTION: void glfwMakeContextCurrent ( void* window )

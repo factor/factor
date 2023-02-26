@@ -6,7 +6,7 @@ strings windows windows.errors windows.handles windows.kernel32
 windows.types ;
 IN: windows.processes
 
-: with-open-process ( access 1/0 processid quot --  )
+: with-open-process ( access 1/0 processid quot -- )
     [ OpenProcess dup win32-error=0/f ] dip
     '[ _ <win32-handle> &dispose @ ] with-destructors ; inline
 

@@ -1600,7 +1600,7 @@ GL-FUNCTION: void glAttachShader { glAttachObjectARB } ( GLuint program, GLuint 
 GL-FUNCTION: void glBindAttribLocation { glBindAttribLocationARB } ( GLuint program, GLuint index, GLstring name )
 GL-FUNCTION: void glBlendEquationSeparate { glBlendEquationSeparateEXT } ( GLenum modeRGB, GLenum modeAlpha )
 GL-FUNCTION: void glCompileShader { glCompileShaderARB } ( GLuint shader )
-GL-FUNCTION: GLuint glCreateProgram { glCreateProgramObjectARB } (  )
+GL-FUNCTION: GLuint glCreateProgram { glCreateProgramObjectARB } ( )
 GL-FUNCTION: GLuint glCreateShader { glCreateShaderObjectARB } ( GLenum type )
 GL-FUNCTION: void glDeleteProgram { glDeleteObjectARB } ( GLuint program )
 GL-FUNCTION: void glDeleteShader { glDeleteObjectARB } ( GLuint shader )

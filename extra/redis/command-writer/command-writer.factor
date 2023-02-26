@@ -99,11 +99,11 @@ PRIVATE>
 : hgetall ( key -- ) 1array "HGETALL" write-command ;
 : hincrby ( integer field key -- )
     3array "HINCRBY" write-command ;
-: hincrbyfloat (  float field key -- )
+: hincrbyfloat ( float field key -- )
     3array "HINCRBYFLOAT" write-command ;
 : hkeys ( key -- ) 1array "HKEYS" write-command ;
 : hlen ( key -- ) 1array "HLEN" write-command ;
-: hmget ( seq key  -- ) prefix reverse "HMGET" write-command ;
+: hmget ( seq key -- ) prefix reverse "HMGET" write-command ;
 : hmset ( assoc key -- )
     [
         >alist concat reverse
