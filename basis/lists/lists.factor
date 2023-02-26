@@ -8,7 +8,7 @@ IN: lists
 MIXIN: list
 GENERIC: car ( cons -- car )
 GENERIC: cdr ( cons -- cdr )
-GENERIC: nil? ( object -- ?   )
+GENERIC: nil? ( object -- ? )
 
 TUPLE: cons-state { car read-only } { cdr read-only } ;
 

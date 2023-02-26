@@ -184,4 +184,4 @@ FUNCTION: int mbr_uuid_to_sid ( uuid_t uu, nt_sid_t *sid )
 
 TYPEDEF: char[37] uuid_string_t
 
-FUNCTION: int mbr_uuid_to_string (  uuid_t uu, c-string string )
+FUNCTION: int mbr_uuid_to_string ( uuid_t uu, c-string string )

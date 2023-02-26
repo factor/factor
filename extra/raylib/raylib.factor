@@ -828,12 +828,12 @@ FUNCTION-ALIAS: get-frame-time float GetFrameTime ( )                           
 FUNCTION-ALIAS: get-time double GetTime ( )                                              ! Get elapsed time in seconds since InitWindow()
 
 ! Misc. functions
-FUNCTION-ALIAS: get-random-value int GetRandomValue  ( int min, int max )                ! Get a random value between min and max (both included)
+FUNCTION-ALIAS: get-random-value int GetRandomValue ( int min, int max )                 ! Get a random value between min and max (both included)
 FUNCTION-ALIAS: set-random-seed void SetRandomSeed ( uint seed )                         ! Set the seed for the random number generator
-FUNCTION-ALIAS: take-screenshot void TakeScreenshot ( c-string  fileName )               ! Takes a screenshot of current screen (filename extension defines format)
+FUNCTION-ALIAS: take-screenshot void TakeScreenshot ( c-string fileName )                ! Takes a screenshot of current screen (filename extension defines format)
 FUNCTION-ALIAS: set-config-flags void SetConfigFlags ( uint flags )                      ! Setup init configuration flags (view FLAGS)
 
-! FUNCTION: void TraceLog  ( int logLevel, c-string text, ... )                            ! Show trace log messages (LOG_DEBUG, LOG_INFO, LOG_WARNING, LOG_ERROR...)
+! FUNCTION: void TraceLog ( int logLevel, c-string text, ... )                           ! Show trace log messages (LOG_DEBUG, LOG_INFO, LOG_WARNING, LOG_ERROR...)
 FUNCTION-ALIAS: set-trace-log-level void SetTraceLogLevel ( int logLevel )               ! Set the current threshold (minimum) log level
 FUNCTION-ALIAS: mem-alloc void* MemAlloc ( int size )                                    ! Internal memory allocator
 FUNCTION-ALIAS: mem-realloc void* MemRealloc ( void* ptr, int size )                     ! Internal memory reallocator

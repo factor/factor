@@ -221,7 +221,7 @@ CONSTANT: LEFT { -1 0 }
 :: find-all-rows ( board quot -- index row )
     board cells>> [ quot find swap drop ] find-all ; inline
 
-: is-empty? ( cell -- ?  )
+: is-empty? ( cell -- ? )
     { } = ;
 
 : cell-contains? ( cell object -- ? )

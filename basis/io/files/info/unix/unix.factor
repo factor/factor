@@ -14,7 +14,7 @@ blocks blocks-free blocks-available
 files files-free files-available
 name-max flags id ;
 
-HOOK: new-file-system-info os ( --  file-system-info )
+HOOK: new-file-system-info os ( -- file-system-info )
 
 M: unix new-file-system-info unix-file-system-info new ;
 

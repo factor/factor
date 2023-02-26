@@ -377,10 +377,10 @@ COM-INTERFACE: IXACT3Wave f {00000000-0000-0000-0000-000000000000}
 : XACT_CUESTATE_PAUSED            ( -- z ) XACT_STATE_PAUSED ; inline
 
 COM-INTERFACE: IXACT3Cue f {00000000-0000-0000-0000-000000000000}
-    HRESULT Play (  )
+    HRESULT Play ( )
     HRESULT Stop ( DWORD dwFlags )
     HRESULT GetState ( DWORD* pdwState )
-    HRESULT Destroy (  )
+    HRESULT Destroy ( )
     HRESULT SetMatrixCoefficients ( UINT32 uSrcChannelCount, UINT32 uDstChannelCount,  float* pMatrixCoefficients )
     XACTVARIABLEINDEX GetVariableIndex ( PCSTR szFriendlyName )
     HRESULT SetVariable ( XACTVARIABLEINDEX nIndex, XACTVARIABLEVALUE nValue )
@@ -408,8 +408,8 @@ COM-INTERFACE: IXACT3Engine IUnknown {b1ee676a-d9cd-4d2a-89a8-fa53eb9e480b}
     HRESULT GetRendererDetails ( XACTINDEX nRendererIndex, LPXACT_RENDERER_DETAILS pRendererDetails )
     HRESULT GetFinalMixFormat ( WAVEFORMATEXTENSIBLE* pFinalMixFormat )
     HRESULT Initialize ( XACT_RUNTIME_PARAMETERS* pParams )
-    HRESULT ShutDown (  )
-    HRESULT DoWork (  )
+    HRESULT ShutDown ( )
+    HRESULT DoWork ( )
     HRESULT CreateSoundBank ( void* pvBuffer, DWORD dwSize, DWORD dwFlags, DWORD dwAllocAttributes, IXACT3SoundBank** ppSoundBank )
     HRESULT CreateInMemoryWaveBank ( void* pvBuffer, DWORD dwSize, DWORD dwFlags, DWORD dwAllocAttributes, IXACT3WaveBank** ppWaveBank )
     HRESULT CreateStreamingWaveBank ( XACT_WAVEBANK_STREAMING_PARAMETERS* pParms, IXACT3WaveBank** ppWaveBank )

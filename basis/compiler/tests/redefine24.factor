@@ -11,7 +11,7 @@ TYPEDEF: alien.c-types:int type-3
 
 TYPEDEF: alien.c-types:float type-2
 
-: indirect ( x y ptr -- z  )
+: indirect ( x y ptr -- z )
     type-3 { type-2 type-2 } cdecl alien-indirect ;
 
 { } [

@@ -73,7 +73,7 @@ STRUCT: EntryNew
     [ key>> make-string ]
     [ value>> make-string ] 2tri ldcache-entry boa ;
 
-: parse ( -- entries  )
+: parse ( -- entries )
     ! Read the old header and jump past it.
     HeaderOld read-struct
     [
