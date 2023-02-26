@@ -1,6 +1,6 @@
 ! Copyright (C) 2022 Doug Coleman.
 ! See https://factorcode.org/license.txt for BSD license.
-USING: kernel math sequences sequences.private ;
+USING: kernel math sequences sequences.extras sequences.private ;
 IN: sequences.seq
 
 ! Experimental: possibly more natural implementation of some sequence words.

@@ -1,9 +1,10 @@
 ! Copyright (C) 2011 John Benediktsson
 ! See https://factorcode.org/license.txt for BSD license
 
-USING: kernel math sequences sequences.extras sequences.private ;
+USING: combinators command-line io kernel math.order math.parser
+ranges namespaces sequences ;
 
-IN: sequences.seq
+IN: tools.seq
 
 : usage ( -- )
     "Usage: seq [first [incr]] last" print ;
