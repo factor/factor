@@ -4,7 +4,7 @@
 USING: accessors arrays assocs.extras combinators
 combinators.short-circuit combinators.smart io kernel math
 math.order math.parser multiline peg.ebnf sequences
-sequences.deep splitting strings ;
+sequences.deep sequences.extras splitting strings ;
 
 IN: semver
 
