@@ -6,16 +6,17 @@ hashtables.private kernel math math.bitwise math.constants
 math.functions math.order namespaces sequences sequences.private
 sets summary system vocabs ;
 QUALIFIED-WITH: alien.c-types c
-QUALIFIED-WITH: sets sets
 IN: random
+
+USE: kernel.private
 
 SYMBOL: system-random-generator
 SYMBOL: secure-random-generator
 SYMBOL: random-generator
 
-GENERIC#: seed-random 1 ( obj seed -- obj )
-GENERIC: random-32* ( obj -- n )
-GENERIC: random-bytes* ( n obj -- byte-array )
+GENERIC#: seed-random 1 ( rnd seed -- rnd )
+GENERIC: random-32* ( rnd -- n )
+GENERIC: random-bytes* ( n rnd -- byte-array )
 
 M: object random-bytes*
     [ integer>fixnum-strict [ (byte-array) ] keep ] dip
@@ -46,15 +47,15 @@ M: f random-32* no-random-number-generator ;
 
 <PRIVATE
 
-:: (random-bits) ( numbits obj -- n )
+:: (random-bits) ( numbits rnd -- n )
     numbits 32 > [
-        obj random-32* numbits 32 - [ dup 32 > ] [
-            [ 32 shift obj random-32* + ] [ 32 - ] bi*
+        rnd random-32* numbits 32 - [ dup 32 > ] [
+            [ 32 shift rnd random-32* + ] [ 32 - ] bi*
         ] while [
-            [ shift ] keep obj random-32* swap bits +
+            [ shift ] keep rnd random-32* swap bits +
         ] unless-zero
     ] [
-        obj random-32* numbits bits
+        rnd random-32* numbits bits
     ] if ; inline
 
 PRIVATE>
@@ -65,50 +66,50 @@ PRIVATE>
 : random-bits* ( numbits -- n )
     1 - [ random-bits ] keep set-bit ;
 
+GENERIC#: random* 1 ( obj rnd -- elt )
+
+: random ( obj -- elt )
+    random-generator get random* ;
+
+: randoms ( length obj -- seq )
+    random-generator get '[ _ _ random* ] replicate ;
+
 <PRIVATE
 
 : next-power-of-2-bits ( m -- numbits )
     dup 2 <= [ drop 1 ] [ 1 - log2 1 + ] if ; inline
 
-:: random-integer-loop ( m obj -- n )
-    obj random-32* 32 m next-power-of-2-bits 32 - [ dup 0 > ] [
-        [ 32 shift obj random-32* + ] [ 32 + ] [ 32 - ] tri*
-    ] while drop [ m * ] [ neg shift ] bi* ; inline
-
-GENERIC#: (random-integer) 1 ( m obj -- n )
-M: fixnum (random-integer) random-integer-loop ;
-M: bignum (random-integer) random-integer-loop ;
-
-: random-integer ( m -- n )
-    random-generator get (random-integer) ;
+:: random-integer ( m rnd -- n )
+    m zero? [ f ] [
+        rnd random-32* { integer } declare 32 m next-power-of-2-bits 32 - [ dup 0 > ] [
+            [ 32 shift rnd random-32* { integer } declare + ] [ 32 + ] [ 32 - ] tri*
+        ] while drop [ m * ] [ neg shift ] bi*
+    ] if ; inline
 
 PRIVATE>
 
-GENERIC: random ( obj -- elt )
+M: fixnum random* random-integer ;
 
-M: integer random
-    [ f ] [ random-integer ] if-zero ;
+M: bignum random* random-integer ;
 
-M: sequence random
-    [ f ] [
-        [ length random-integer ] keep nth
-    ] if-empty ;
+M: sequence random*
+    [ f ] swap '[ [ length _ random* ] keep nth ] if-empty ;
 
-M: assoc random >alist random ;
+M: assoc random* [ >alist ] dip random* ;
 
-M: hashtable random
-    dup assoc-size [ drop f ] [
-        [ 0 ] [ array>> ] [ random ] tri* 1 + [
+M: hashtable random*
+    [ dup assoc-size [ drop f ] ] dip '[
+        [ 0 ] [ array>> ] [ _ random* ] tri* 1 + [
             [ 2dup array-nth tombstone? [ 2 + ] 2dip ] loop
         ] times [ 2 - ] dip
         [ array-nth ] [ [ 1 + ] dip array-nth ] 2bi 2array
     ] if-zero ;
 
-M: sets:set random members random ;
+M: sets:set random* [ members ] dip random* ;
 
-M: hash-set random
-    dup cardinality [ drop f ] [
-        [ 0 ] [ array>> ] [ random ] tri* 1 + [
+M: hash-set random*
+    [ dup cardinality [ drop f ] ] dip '[
+        [ 0 ] [ array>> ] [ _ random* ] tri* 1 + [
             [ 2dup array-nth tombstone? [ 1 + ] 2dip ] loop
         ] times [ 1 - ] dip array-nth
     ] if-zero ;
@@ -116,7 +117,7 @@ M: hash-set random
 : randomize-n-last ( seq n -- seq )
     [ dup length dup ] dip - 1 max '[ dup _ > ]
     random-generator get '[
-        [ _ (random-integer) ] [ 1 - ] bi
+        [ _ random* ] [ 1 - ] bi
         [ pick exchange-unsafe ] keep
     ] while drop ;
 
@@ -131,10 +132,9 @@ ERROR: too-many-samples seq n ;
     [ drop ] 2bi nths-unsafe ;
 
 : delete-random ( seq -- elt )
-    [ length random-integer ] keep
-    [ nth ] 2keep remove-nth! drop ;
+    [ length random ] keep [ nth ] 2keep remove-nth! drop ;
 
-: with-random ( obj quot -- )
+: with-random ( rnd quot -- )
     random-generator swap with-variable ; inline
 
 : with-system-random ( quot -- )
@@ -145,7 +145,7 @@ ERROR: too-many-samples seq n ;
 
 <PRIVATE
 
-: (uniform-random-float) ( min max obj -- n )
+: (uniform-random-float) ( min max rnd -- n )
     [ random-32* ] keep random-32* [ >float ] bi@
     2.0 32 ^ * +
     [ over - 2.0 -64 ^ * ] dip
@@ -156,11 +156,13 @@ PRIVATE>
 : uniform-random-float ( min max -- n )
     random-generator get (uniform-random-float) ; inline
 
-M: float random [ f ] [ 0.0 swap uniform-random-float ] if-zero ;
+M: float random*
+    [ f ] swap '[ 0.0 _ (uniform-random-float) ] if-zero ; inline
 
 <PRIVATE
 
-: (random-unit) ( obj -- n )
+! XXX: rename to random-unit*
+: (random-unit) ( rnd -- n )
     [ 0.0 1.0 ] dip (uniform-random-float) ; inline
 
 PRIVATE>
@@ -170,9 +172,6 @@ PRIVATE>
 
 : random-units ( length -- sequence )
     random-generator get '[ _ (random-unit) ] replicate ;
-
-: random-integers ( length n -- sequence )
-    random-generator get '[ _ _ (random-integer) ] replicate ;
 
 <PRIVATE
 
