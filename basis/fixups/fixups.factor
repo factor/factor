@@ -59,6 +59,7 @@ CONSTANT: word-renames {
     { "compare-slots" { "compare-with-spec" "0.99" } }
     { "natural-sort!" { "sort!" "0.99" } }
     { "natural-bubble-sort!" { "bubble-sort!" "0.99" } }
+    { "random-integers" { "randoms" "0.99" } }
 }
 
 : compute-assoc-fixups ( continuation name assoc -- seq )
