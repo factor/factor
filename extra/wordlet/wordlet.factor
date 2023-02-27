@@ -4,7 +4,7 @@ USING: accessors arrays ascii assocs assocs.extras base91 colors
 combinators hashtables io io.encodings.binary
 io.encodings.string io.encodings.utf8 io.files io.styles kernel
 literals math math.order random ranges sequences
-sequences.extras sets sorting sorting.slots splitting strings ;
+sequences.extras sets sorting.specification splitting strings ;
 IN: wordlet
 
 <PRIVATE
@@ -50,7 +50,7 @@ TUPLE: wordlet-game secret-word chances guesses ;
     ] with map concat members
     [ background of ] assoc-map
     [ drop ] collect-value-by
-    [ [ color>n ] zip-with { >=< } sort-values-by first first ] assoc-map
+    [ [ color>n ] zip-with { >=< } sort-values-with-spec first first ] assoc-map
     CHAR: a CHAR: z [a..b] [ 1string COLOR: white ] { } map>assoc [ or ] assoc-merge ;
 
 : print-remaining-chars ( game -- )

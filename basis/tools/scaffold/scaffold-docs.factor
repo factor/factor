@@ -13,8 +13,8 @@ HELP: help.
 { $description "Prints out scaffold help markup for a given word." } ;
 
 HELP: scaffold-docs
-{ $values { "vocab" vocab } }
-{ $description "Takes an existing vocabulary and creates a help file with scaffolded help for each word. This word only works if no help file yet exists." } ;
+{ $values { "obj" object } }
+{ $description "Takes a word or vocabulary name and creates a help file with scaffolded help for each word. For vocabulary names, if a file exists this word will not do anything." } ;
 
 HELP: scaffold-undocumented
 { $values

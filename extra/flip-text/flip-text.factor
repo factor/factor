@@ -91,7 +91,7 @@ CONSTANT: CHARS H{
 CHARS [ CHARS set-at ] assoc-each
 
 : ch>flip ( ch -- ch' )
-    dup CHARS at [ nip ] when* ;
+    [ CHARS at ] transmute ;
 
 PRIVATE>
 
