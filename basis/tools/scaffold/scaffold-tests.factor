@@ -17,7 +17,7 @@ IN: tools.scaffold.tests
 "
 }
 [
-    [ \ undocumented-word (help.) ] with-string-writer
+    [ \ undocumented-word scaffold-word-docs ] with-string-writer
 ] unit-test
 
 {
@@ -25,7 +25,7 @@ IN: tools.scaffold.tests
 { $class-description \"\" } ;
 " }
 [
-    [ \ iota (help.) ] with-string-writer
+    [ \ iota scaffold-word-docs ] with-string-writer
 ] unit-test
 
 { sequence t } [ "seq" lookup-type ] unit-test
@@ -37,4 +37,4 @@ IN: tools.scaffold.tests
 
 : test-maybe ( obj -- obj/f ) ;
 
-{ } [ \ test-maybe (help.) ] unit-test
+{ } [ \ test-maybe scaffold-word-docs ] unit-test
