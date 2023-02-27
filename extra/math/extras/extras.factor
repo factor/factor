@@ -402,24 +402,24 @@ TUPLE: vose
     dist assoc-size :> n
     n f <array> :> alias
 
-    dist unzip dup [ length ] [ sum ] bi / v*n :> ( items probs )
-    probs [ swap 1 < small large ? push ] each-index
+    dist unzip dup [ length ] [ sum ] bi /f v*n :> ( items probs )
+    probs [ swap 1.0 < small large ? push ] each-index
 
     [ small empty? large empty? or ] [
         small pop :> s
         large pop :> l
         l s alias set-nth
         l dup probs [ s probs nth + 1 - dup ] change-nth
-        1 < small large ? push
+        1.0 < small large ? push
     ] until
 
-    1 large [ probs set-nth ] with each
-    1 small [ probs set-nth ] with each
+    1.0 large [ probs set-nth ] with each
+    1.0 small [ probs set-nth ] with each
 
     n items probs alias vose boa ;
 
 M:: vose random* ( obj rnd -- elt )
     obj n>> rnd random* { fixnum } declare
-    dup obj probs>> nth-unsafe rnd (random-unit) >=
-    [ obj alias>> nth-unsafe ] unless
+    dup obj probs>> nth-unsafe { float } declare rnd (random-unit) >=
+    [ obj alias>> nth-unsafe { fixnum } declare ] unless
     obj items>> nth-unsafe ;
