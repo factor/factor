@@ -799,10 +799,10 @@ t emitter-canonical [
   { emitter-width 32 }
 }
 [
-{ "-     - a string that can be split
+  { "-     - a string that can be split
             in lots of places
 "
- } [ { { "a string that can be split in lots of places" } } >yaml ] unit-test
+  } [ { { "a string that can be split in lots of places" } } >yaml ] unit-test
 ] with-variables
 
 ! line break

@@ -653,7 +653,7 @@ HELP: FROM:
   { $code "USING: vocabs.parser binary-search ;" "... search ..." }
   "Because " { $link POSTPONE: FROM: } " takes precedence over a " { $link POSTPONE: USING: } ", the ambiguity can be resolved explicitly. Suppose you wanted the " { $vocab-link "binary-search" } " vocabulary's " { $snippet "search" } " word:"
   { $code "USING: vocabs.parser binary-search ;" "FROM: binary-search => search ;" "... search ..." }
- } ;
+} ;
 
 HELP: EXCLUDE:
 { $syntax "EXCLUDE: vocab => words ... ;" }

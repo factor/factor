@@ -216,7 +216,7 @@ ARTICLE: "yaml" "YAML serialization"
 - 42.0
 - 4.2e1\" yaml> ."
 "{ t f \"42\" \"42\" 42 42 42 42.0 42.0 }"
- }
+}
 { $heading "Output -- human readable" }
   { $unchecked-example "USING: yaml yaml.config ;"
 "t implicit-tags set
