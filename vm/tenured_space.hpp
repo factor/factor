@@ -28,8 +28,8 @@ struct tenured_space : free_list_allocator<object> {
   }
 
   cell next_object_after(cell scan) {
-    cell dsize = ((object*)scan)->size();
-    return next_allocated_object_after(scan + dsize);
+    cell data_size = ((object*)scan)->size();
+    return next_allocated_object_after(scan + data_size);
   }
 
   void sweep() {
