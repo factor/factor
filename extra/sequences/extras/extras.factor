@@ -1,7 +1,7 @@
-
-USING: accessors arrays assocs combinators generalizations
-grouping growable heaps kernel math math.order ranges sequences
-sequences.private shuffle sorting splitting vectors ;
+USING: accessors arrays assocs assocs.extras combinators
+generalizations grouping growable hash-sets heaps kernel math
+math.order ranges sequences sequences.private sets shuffle
+sorting splitting vectors ;
 IN: sequences.extras
 
 : find-all ( ... seq quot: ( ... elt -- ... ? ) -- ... elts )
@@ -308,6 +308,28 @@ PRIVATE>
 : at+* ( n key assoc -- old new ) [ 0 or [ + ] keep swap dup ] change-at ; inline
 
 : inc-at* ( key assoc -- old new ) [ 1 ] 2dip at+* ; inline
+
+: mark-firsts ( seq -- seq' )
+    dup length <hash-set> '[ _ ?adjoin 1 0 ? ] { } map-as ;
+
+: deduplicate ( seq -- seq' )
+    dup length <hash-set> '[ _ ?adjoin ] { } filter-as ;
+
+: deduplicate-last ( seq -- seq' )
+    <reversed> deduplicate reverse ;
+
+: classify-from ( next hash seq -- next' hash seq' )
+    '[
+        swap '[
+            dupd _ ?set-once-at
+            [ [ 1 + ] dip ] when
+        ] { } map-as
+    ] keepd swap ;
+
+: classify* ( seq -- next hash seq' )
+    [ 0 H{ } clone ] dip classify-from ;
+
+: classify ( seq -- seq' ) classify* 2nip ; inline
 
 : occurrence-count-by ( seq quot: ( elt -- elt' ) -- hash seq' )
     '[ nip @ over inc-at* drop ] [ H{ } clone ] 2dip 0accumulate ; inline

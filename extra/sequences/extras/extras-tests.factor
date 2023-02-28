@@ -304,6 +304,21 @@ strings tools.test ;
 { { } } [ { } [ + ] 0accumulate ] unit-test
 { { 100 101 103 107 } } [ { 100 1 2 4 } [ + ] 0accumulate ] unit-test
 
+{ { "y" "o" "y" "p" "o" "y" } }
+[ { "y" "o" "y" "p" "o" "y" } [ classify ] [ deduplicate ] bi nths ] unit-test
+
+{ { "take" "drop" "pick" } }
+[ { "take" "drop" "drop" "pick" "take" "take" } deduplicate ] unit-test
+
+{ { "drop" "pick" "take" } }
+[ { "take" "drop" "drop" "pick" "take" "take" } deduplicate-last ] unit-test
+
+{ { } }
+[ "" mark-firsts ] unit-test
+
+{ { 1 1 0 0 1 0 } }
+[ "abaacb" mark-firsts ] unit-test
+
 {
     H{ { t 6 } { f 5 } }
     { 0 0 1 1 2 3 4 2 3 4 5 }
@@ -325,7 +340,7 @@ strings tools.test ;
         { 109 1 } { 110 1 } { 111 1 } { 112 1 }
     }
     { 1 2 0 3 3 3 3 3 3 3 3 3 3 3 3 3 }
- } [
+} [
     "cab" "abcdefghijklmnop" progressive-index
 ] unit-test
 
