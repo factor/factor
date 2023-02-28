@@ -51,20 +51,20 @@ struct mark_bits {
     return (bits[position.first] & ((cell)1 << position.second)) != 0;
   }
 
-  void set_bitmap_range(cell* bits, const cell address, const cell dsize) {
-    std::pair<cell, cell> bstart = bitmap_deref(address);
-    std::pair<cell, cell> end = bitmap_deref(address + dsize);
+  void set_bitmap_range(cell* bits, const cell address, const cell data_size) {
+    std::pair<cell, cell> bitmap_start = bitmap_deref(address);
+    std::pair<cell, cell> end = bitmap_deref(address + data_size);
 
-    cell start_mask = ((cell)1 << bstart.second) - 1;
+    cell start_mask = ((cell)1 << bitmap_start.second) - 1;
     cell end_mask = ((cell)1 << end.second) - 1;
 
-    if (bstart.first == end.first)
-      bits[bstart.first] |= start_mask ^ end_mask;
+    if (bitmap_start.first == end.first)
+      bits[bitmap_start.first] |= start_mask ^ end_mask;
     else {
-      FACTOR_ASSERT(bstart.first < bits_size);
-      bits[bstart.first] |= ~start_mask;
+      FACTOR_ASSERT(bitmap_start.first < bits_size);
+      bits[bitmap_start.first] |= ~start_mask;
 
-      for (cell index = bstart.first + 1; index < end.first; index++)
+      for (cell index = bitmap_start.first + 1; index < end.first; index++)
         bits[index] = (cell)-1;
 
       if (end_mask != 0) {

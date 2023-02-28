@@ -16,9 +16,9 @@ struct aging_space : bump_allocator {
   }
 
   cell next_object_after(cell scan) {
-    cell dsize = ((object*)scan)->size();
-    if (scan + dsize < here)
-      return scan + dsize;
+    cell data_size = ((object*)scan)->size();
+    if (scan + data_size < here)
+      return scan + data_size;
     return 0;
   }
 
