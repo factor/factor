@@ -347,9 +347,8 @@ ARTICLE: "peg.ebnf.foreign-rules" "EBNF Foreign Rules"
        "EBNF: parse-abc [=["
        "abc = <foreign a-token> 'b' 'c'"
        "]=]"
-   }
-}
-;
+    }
+} ;
 
 ARTICLE: "peg.ebnf.tokenizers" "EBNF Tokenizers"
 "It is possible to override the tokenizer in an EBNF defined parser. "

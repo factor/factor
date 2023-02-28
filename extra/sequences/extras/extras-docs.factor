@@ -227,7 +227,7 @@ HELP: start-all
                "\"ABAABA\" \"ABA\" start-all ."
       "{ 0 3 }"
     }
- } ;
+} ;
 
 HELP: start-all*
 { $values
