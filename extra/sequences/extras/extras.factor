@@ -332,7 +332,7 @@ PRIVATE>
 : classify ( seq -- seq' ) classify* 2nip ; inline
 
 : occurrence-count-by ( seq quot: ( elt -- elt' ) -- hash seq' )
-    '[ nip @ over inc-at* drop ] [ H{ } clone ] 2dip 0accumulate ; inline
+    '[ nip @ over inc-at* drop ] [ H{ } clone ] 2dip { } 0accumulate-as ; inline
 
 : progressive-index-by-as ( seq1 seq2 quot exemplar -- hash seq' )
     [
