@@ -88,6 +88,7 @@ TUPLE: directory-iterator
     [ queue>> swap '[ _ _ [ push-front ] [ push-back ] if ] each ] bi ;
 
 : <directory-iterator> ( path bfs? -- iter )
+    [ pathname> ] dip
     <dlist> directory-iterator boa
     dup path>> over push-directory-entries ;
 

@@ -1,8 +1,42 @@
 ! Copyright (C) 2012 John Benediktsson, Doug Coleman
 ! See https://factorcode.org/license.txt for BSD license
 USING: arrays assocs assocs.private kernel math math.statistics
-sequences sequences.extras sets ;
+sequences sets ;
 IN: assocs.extras
+
+: change-of ( ..a assoc key quot: ( ..a value -- ..b newvalue ) -- ..b assoc )
+    [ [ of ] dip call ] 2keepd rot set-of ; inline
+
+: of* ( assoc key -- value/f ? ) swap at* ; inline
+
+: of+ ( assoc key n -- assoc ) '[ 0 or _ + ] change-of ; inline
+
+: of+* ( assoc key n -- assoc old new ) '[ [ 0 or _ + ] keep swap dup ] change-of ; inline
+
+: delete-of ( assoc key -- assoc ) over delete-at ; inline
+
+: delete-of* ( assoc key -- assoc value/f ? )
+    [ of* ] [ delete-of -rot ] 2bi ;
+
+: ?delete-of ( assoc key -- assoc value/key ? )
+    [ ?of ] [ delete-of -rot ] 2bi ;
+
+: rename-of ( assoc key newkey -- assoc )
+    [ delete-of* ] dip swap [ set-of ] [ 2drop ] if ;
+
+: inc-of ( assoc key -- assoc ) 1 of+ ; inline
+
+: inc-of* ( assoc key -- assoc old new ) 1 of+* ; inline
+
+: ?change-of ( ..a assoc key quot: ( ..a value -- ..b newvalue ) -- ..b assoc )
+    [ set-of ] compose [ 2dup ?of ] dip [ 2drop ] if ; inline
+
+: maybe-set-of ( assoc key value -- assoc changed? )
+    [ 2dup ?of ] dip swap
+    [ dupd = [ 2drop f ] [ set-of t ] if ] [ nip set-of t ] if ;
+
+: push-of ( assoc key value -- assoc )
+    swap pick push-at ; inline
 
 : push-at-each ( value keys assoc -- )
     '[ _ push-at ] with each ; inline
@@ -18,12 +52,6 @@ IN: assocs.extras
 
 : deep-set-of ( assoc seq elt -- )
     [ deep-of-but-last ] dip spin set-at ; inline
-
-: zip-longest-with ( seq1 seq2 fill -- assoc )
-    pad-longest zip ;
-
-: zip-longest ( seq1 seq2 -- assoc )
-    f zip-longest-with ;
 
 : substitute! ( seq assoc -- seq )
     substituter map! ;
@@ -120,6 +148,9 @@ ERROR: key-exists value key assoc ;
         drop set-at
     ] if ;
 
+: ?set-once-at ( value key assoc -- value' first-time? )
+    [ ?at not ] keep '[ [  _ set-at ] keepd t ] [ nip f ] if ;
+
 : kv-with ( obj assoc quot -- assoc curried )
     swapd [ -rotd call ] 2curry ; inline
 
@@ -154,9 +185,11 @@ PRIVATE>
 : sequence>hashtable ( seq map-quot insert-quot -- hashtable )
     H{ } sequence>assoc ; inline
 
+: ?1array ( obj -- seq ) dup sequence? [ 1array ] unless ; inline
+
 : expand-keys-set-at-as ( assoc exemplar -- hashtable' )
     [
-        [ swap dup sequence? [ 1array ] unless ]
+        [ swap ?1array ]
         [ '[ _ set-at ] with each ]
     ] dip assoc>object ;
 
@@ -165,7 +198,7 @@ PRIVATE>
 
 : expand-keys-push-at-as ( assoc exemplar -- hashtable' )
     [
-        [ swap dup sequence? [ 1array ] unless ]
+        [ swap ?1array ]
         [ push-at-each ]
     ] dip assoc>object ;
 
@@ -174,7 +207,7 @@ PRIVATE>
 
 : expand-keys-push-as ( assoc exemplar -- hashtable' )
     [
-        [ [ dup sequence? [ 1array ] unless ] dip ]
+        [ [ ?1array ] dip ]
         [ '[ _ 2array _ push ] each ]
     ] dip assoc>object ;
 
@@ -183,7 +216,7 @@ PRIVATE>
 
 : expand-values-set-at-as ( assoc exemplar -- hashtable' )
     [
-        [ dup sequence? [ 1array ] unless swap ]
+        [ ?1array swap ]
         [ '[ _ _ set-at ] each ]
     ] dip assoc>object ;
 
@@ -192,7 +225,7 @@ PRIVATE>
 
 : expand-values-push-at-as ( assoc exemplar -- hashtable' )
     [
-        [ dup sequence? [ 1array ] unless swap ]
+        [ ?1array swap ]
         [ '[ _ _ push-at ] each ]
     ] dip assoc>object ;
 
@@ -201,7 +234,7 @@ PRIVATE>
 
 : expand-values-push-as ( assoc exemplar -- assoc )
     [
-        [ dup sequence? [ 1array ] unless ]
+        [ ?1array ]
         [ '[ 2array _ push ] with each ]
     ] dip assoc>object ;
 
@@ -295,3 +328,9 @@ PRIVATE>
 
 : collect-value-by-multi ( ... assoc quot: ( ... value -- ... new-keys ) -- ... assoc )
     [ H{ } clone ] 2dip collect-value-by-multi! ; inline
+
+: assoc-operator* ( assoc quot -- alist quot' )
+    [ >alist ] dip [ first2 swap ] prepose ; inline
+
+: assoc-each* ( ... assoc quot: ( ... value key -- ... ) -- ... )
+    assoc-operator* each ; inline

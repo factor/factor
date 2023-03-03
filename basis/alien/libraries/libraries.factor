@@ -41,7 +41,7 @@ GENERIC: library-dll ( obj -- dll )
 M: f library-dll ;
 
 M: library library-dll
-    dup [ dll>> ] when ;
+    [ dll>> ] ?call ;
 
 M: string library-dll ( library -- dll )
     lookup-library library-dll ;

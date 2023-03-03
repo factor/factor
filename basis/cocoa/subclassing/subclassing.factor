@@ -33,7 +33,7 @@ IN: cocoa.subclassing
     tri ;
 
 : encode-type ( type -- encoded )
-    dup alien>objc-types get at [ ] [ no-objc-type ] ?if ;
+    [ alien>objc-types get at ] [ no-objc-type ] ?unless ;
 
 : encode-types ( return types -- encoding )
     swap prefix [ encode-type "0" append ] map concat ;

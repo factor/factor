@@ -1,7 +1,7 @@
 USING: assocs kernel literals math random sequences sorting ;
 IN: benchmark.sort
 
-CONSTANT: numbers-to-sort $[ 300,000 200 random-integers ]
+CONSTANT: numbers-to-sort $[ 300,000 200 randoms ]
 CONSTANT: alist-to-sort $[ 1,000 <iota> dup zip ]
 
 : sort-benchmark ( -- )

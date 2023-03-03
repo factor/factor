@@ -77,7 +77,7 @@ M: ranges:range sum-of-quads
 
 <PRIVATE
 
-: trim-points ( p seq -- from to seq  )
+: trim-points ( p seq -- from to seq )
     [ length [ * >integer ] keep over - ] keep ;
 
 PRIVATE>

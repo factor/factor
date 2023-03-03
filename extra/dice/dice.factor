@@ -4,8 +4,8 @@ USING: kernel lexer math math.parser namespaces
 random random.private sequences splitting ;
 IN: dice
 
-: (random-roll) ( #dice #sides obj -- n )
-    [ 0 ] 3dip '[ _ _ (random-integer) + 1 + ] times ;
+: (random-roll) ( #dice #sides rnd -- n )
+    [ 0 ] 3dip '[ _ _ random* + 1 + ] times ;
 
 : random-roll ( #dice #sides -- n )
     random-generator get (random-roll) ;

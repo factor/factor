@@ -81,7 +81,8 @@ ERROR: end-aside-in-get-error ;
     } case ;
 
 : end-aside ( default -- response )
-    aside-id get aside-id off get-aside [ move-on ] [ <redirect> ] ?if ;
+    [ drop aside-id get aside-id off get-aside ]
+    [ move-on ] [ <redirect> ] ?if ;
 
 M: asides link-attr
     drop

@@ -29,6 +29,10 @@ IN: sequences.tests
     [ 1 [ [ * ] [ + ] bi* ] reduce-index ] bi@
 ] unit-test
 
+{ -541365 } [
+    { 10 21 32 } { 500 600 700 } [ - sq ] [ - ] 2map-reduce
+] unit-test
+
 { 5040 { 1 1 2 6 24 120 720 } }
 [ { 1 2 3 4 5 6 7 } 1 [ * ] accumulate ] unit-test
 
@@ -297,6 +301,8 @@ unit-test
 { " asdf" } [ " asdf " [ CHAR: \s = ] trim-tail ] unit-test
 
 { 328350 } [ 100 <iota> [ sq ] map-sum ] unit-test
+
+{ 5 } [ { 1 f 3 f 5 f 7 f 9 f } [ ] count ] unit-test
 
 { 50 } [ 100 <iota> [ even? ] count ] unit-test
 { 50 } [ 100 <iota> [ odd?  ] count ] unit-test

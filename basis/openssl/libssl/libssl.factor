@@ -391,25 +391,25 @@ FUNCTION: int OPENSSL_init_ssl ( uint64_t opts, void* settings )
 ! API < 1.1.0, removed in new versions
 ! ------------------------------------------------------------------------------
 ! Initialization functions
-FUNCTION: int SSL_library_init (  )
+FUNCTION: int SSL_library_init ( )
 
 ! Maps OpenSSL errors to strings
-FUNCTION: void SSL_load_error_strings (  )
+FUNCTION: void SSL_load_error_strings ( )
 ! ------------------------------------------------------------------------------
 
 ! Sets the default SSL version
-FUNCTION: ssl-method SSLv2_client_method (  )
-FUNCTION: ssl-method SSLv23_client_method (  )
-FUNCTION: ssl-method SSLv23_server_method (  )
-FUNCTION: ssl-method SSLv23_method (  ) ! SSLv3 but can rollback to v2
-FUNCTION: ssl-method SSLv3_client_method (  )
-FUNCTION: ssl-method SSLv3_server_method (  )
-FUNCTION: ssl-method SSLv3_method (  )
-FUNCTION: ssl-method TLSv1_client_method (  )
-FUNCTION: ssl-method TLSv1_server_method (  )
-FUNCTION: ssl-method TLSv1_method (  )
-FUNCTION: ssl-method TLSv1_1_method (  )
-FUNCTION: ssl-method TLSv1_2_method (  )
+FUNCTION: ssl-method SSLv2_client_method ( )
+FUNCTION: ssl-method SSLv23_client_method ( )
+FUNCTION: ssl-method SSLv23_server_method ( )
+FUNCTION: ssl-method SSLv23_method ( ) ! SSLv3 but can rollback to v2
+FUNCTION: ssl-method SSLv3_client_method ( )
+FUNCTION: ssl-method SSLv3_server_method ( )
+FUNCTION: ssl-method SSLv3_method ( )
+FUNCTION: ssl-method TLSv1_client_method ( )
+FUNCTION: ssl-method TLSv1_server_method ( )
+FUNCTION: ssl-method TLSv1_method ( )
+FUNCTION: ssl-method TLSv1_1_method ( )
+FUNCTION: ssl-method TLSv1_2_method ( )
 
 CONSTANT: DTLS1_VERSION_MAJOR 0xfe
 CONSTANT: SSL3_VERSION_MAJOR 0x03
@@ -435,7 +435,7 @@ FUNCTION: int SSL_version ( SSL *ssl )
 
 FUNCTION: void SSL_SESSION_free ( SSL_SESSION* ses )
 FUNCTION: void RAND_seed ( void* buf, int num )
-FUNCTION: void* BIO_f_ssl (  )
+FUNCTION: void* BIO_f_ssl ( )
 
 ! ------------------------------------------------------------------------------
 ! SSL

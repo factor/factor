@@ -103,10 +103,6 @@ DEFER: if
 : unless* ( ..a ? false: ( ..a -- ..a x ) -- ..a x )
     over [ drop ] [ nip call ] if ; inline
 
-! Default
-: ?if ( ..a default cond true: ( ..a cond -- ..b ) false: ( ..a default -- ..b ) -- ..b )
-    pick [ drop [ drop ] 2dip call ] [ 2nip call ] if ; inline
-
 ! Dippers.
 ! Not declared inline because the compiler special-cases them
 
@@ -121,8 +117,6 @@ DEFER: if
 ! Misfits
 : tuck ( x y -- y x y ) dup -rot ; inline
 
-: spin ( x y z -- z y x ) -rot swap ; inline
-
 : rotd ( w x y z -- x y w z ) [ rot ] dip ; inline
 
 : -rotd ( w x y z -- y w x z ) [ -rot ] dip ; inline
@@ -130,6 +124,10 @@ DEFER: if
 : roll ( w x y z -- x y z w ) rotd swap ; inline
 
 : -roll ( w x y z -- z w x y ) swap -rotd ; inline
+
+: spin ( x y z -- z y x ) -rot swap ; inline
+
+: 4spin ( w x y z -- z y x w ) -roll spin ; inline
 
 : nipd ( x y z -- y z ) [ nip ] dip ; inline
 
@@ -172,6 +170,25 @@ DEFER: if
 
 : 2keepd ( ..a x y z quot: ( ..a x y z -- ..b ) -- ..b x y )
     3keep drop ; inline
+
+: ?call ( ..a obj/f quot: ( ..a obj -- ..a obj' )  -- ..a obj'/f ) dupd when ; inline
+
+: ?transmute ( old quot: ( old -- new/f ) -- new/old new? )
+    keep over [ drop t ] [ nip f ] if ; inline
+
+: transmute ( old quot: ( old -- new/f ) -- new/old )
+    ?transmute drop ; inline
+
+! Default
+
+: ?when ( ..a default cond: ( ..a default -- ..a new/f ) true: ( ..a new -- ..b ) -- ..b )
+    [ ?transmute ] dip when ; inline
+
+: ?unless ( ..a default cond: ( ..a default -- ..a new/f ) false: ( ..a default -- ..b ) -- ..b )
+    [ ?transmute ] dip unless ; inline
+
+: ?if ( ..a default cond: ( default -- new/f ) true: ( ..a new -- ..b ) false: ( ..a default -- ..b ) -- ..b )
+    [ ?transmute ] 2dip if ; inline
 
 ! Cleavers
 : bi ( x p q -- )
@@ -270,6 +287,8 @@ UNION: boolean POSTPONE: t POSTPONE: f ;
 : and ( obj1 obj2 -- ? ) over ? ; inline
 
 : or ( obj1 obj2 -- ? ) dupd ? ; inline
+
+: or* ( obj1 obj2 -- obj2/obj1 second? ) [ nip t ] [ f ] if* ; inline
 
 : xor ( obj1 obj2 -- ? ) [ f swap ? ] when* ; inline
 

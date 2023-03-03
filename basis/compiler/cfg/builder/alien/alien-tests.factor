@@ -49,7 +49,7 @@ ${
 } [
     f f cdecl f "libc" "malloc" alien-invoke-params boa
     caller-linkage
-    dup [ path>> alien>native-string ] when
+    [ path>> alien>native-string ] ?call
 ] unit-test
 
 SYMBOL: foo

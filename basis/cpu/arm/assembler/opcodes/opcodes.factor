@@ -821,10 +821,10 @@ ARM-INSTRUCTION: LDRr64-encode ( 11 111 0 00 01 1 Rm option3 S 1 0 Rn Rt -- )
 
 ! LDRAA, LDRAB: Load Register, with pointer authentication.
 ! ARMv8.3
-ARM-INSTRUCTION: LDRAAoff-encode ( 11 111 0 00 0 S 1 imm9 0 1 Rn Rt  -- )
-ARM-INSTRUCTION: LDRAApre-encode ( 11 111 0 00 0 S 1 imm9 1 1 Rn Rt  -- )
-ARM-INSTRUCTION: LDRABoff-encode ( 11 111 0 00 1 S 1 imm9 0 1 Rn Rt  -- )
-ARM-INSTRUCTION: LDRABpre-encode ( 11 111 0 00 1 S 1 imm9 1 1 Rn Rt  -- )
+ARM-INSTRUCTION: LDRAAoff-encode ( 11 111 0 00 0 S 1 imm9 0 1 Rn Rt -- )
+ARM-INSTRUCTION: LDRAApre-encode ( 11 111 0 00 0 S 1 imm9 1 1 Rn Rt -- )
+ARM-INSTRUCTION: LDRABoff-encode ( 11 111 0 00 1 S 1 imm9 0 1 Rn Rt -- )
+ARM-INSTRUCTION: LDRABpre-encode ( 11 111 0 00 1 S 1 imm9 1 1 Rn Rt -- )
 
 ! LDRB (immediate): Load Register Byte (immediate).
 ARM-INSTRUCTION: LDRBpost-encode ( 00 111 0 00 01 0 imm9 01 Rn Rt -- )
@@ -842,7 +842,7 @@ ARM-INSTRUCTION: LDRHpre-encode ( 01 111 0 00 01 0 imm9 11 Rn Rt -- )
 ARM-INSTRUCTION: LDRHuoff-encode ( 01 111 0 01 01 imm12 Rn Rt -- )
 
 ! LDRH (register): Load Register Halfword (register).
-ARM-INSTRUCTION: LDRHr-encode ( 01 111 0 00 01 1 Rm option3 S 10 Rn Rt  -- )
+ARM-INSTRUCTION: LDRHr-encode ( 01 111 0 00 01 1 Rm option3 S 10 Rn Rt -- )
 
 ! LDRSB (immediate): Load Register Signed Byte (immediate).
 ARM-INSTRUCTION: LDRSBpost32-encode ( 00 111 0 00 11 0 imm9 01 Rn Rt -- )

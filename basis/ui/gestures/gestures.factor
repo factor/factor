@@ -57,7 +57,7 @@ M: propagate-gesture-tuple send-queued-gesture
 TUPLE: propagate-key-gesture-tuple gesture world ;
 
 : world-focus ( world -- gadget )
-    dup focus>> [ world-focus ] [ ] ?if ;
+    [ focus>> ] [ world-focus ] ?when ;
 
 M: propagate-key-gesture-tuple send-queued-gesture
     [ gesture>> ] [ world>> world-focus ] bi

@@ -44,6 +44,6 @@ PRIVATE>
         {
             { [ dup not ] [ ] }
             { [ dup ends-with-terminate? ] [ out-d [ f swap <#push> ] map append ] }
-            [ in-d' out-d [ [ length ] bi@ assert= ] [ <#copy> suffix ] 2bi ]
+            [ in-d' out-d [ 2length assert= ] [ <#copy> suffix ] 2bi ]
         } cond
     ] [ inference-error? ] ignore-error/f ;

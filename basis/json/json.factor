@@ -39,7 +39,7 @@ SYMBOL: json-depth
             { "Infinity" [ 1/0. ] }
             { "-Infinity" [ -1/0. ] }
             { "NaN" [ 0/0. ] }
-            [ dup string>number [ ] [ not-a-json-number ] ?if ]
+            [ [ string>number ] [ not-a-json-number ] ?unless ]
         } case
     ] dip ;
 
@@ -134,7 +134,7 @@ DEFER: (read-json-string)
         { CHAR: t  [ "rue" pick json-expect t suffix! ] }
         { CHAR: f  [ "alse" pick json-expect f suffix! ] }
         { CHAR: n  [ "ull" pick json-expect json-null suffix! ] }
-        [ pick json-number [ suffix! ] dip [ scan ] when*  ]
+        [ pick json-number [ suffix! ] dip [ scan ] when* ]
     } case ;
 
 : json-read-input ( stream -- objects )
@@ -143,7 +143,7 @@ DEFER: (read-json-string)
         json-depth get zero? [ json-error ] unless
     ] with-variable ;
 
-: get-json ( objects  --  obj )
+: get-json ( objects -- obj )
     dup length 1 = [ first ] [ json-error ] if ;
 
 PRIVATE>
@@ -217,7 +217,7 @@ PRIVATE>
 M: string stream-json-print
     CHAR: \" over stream-write1 swap [
         {
-            { CHAR: \"  [ "\\\"" over stream-write ] }
+            { CHAR: \" [ "\\\"" over stream-write ] }
             { CHAR: \\ [ "\\\\" over stream-write ] }
             { CHAR: /  [
                 json-escape-slashes? get

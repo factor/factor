@@ -1,6 +1,6 @@
 ! Copyright (C) 2007, 2009 Daniel Ehrenberg, Slava Pestov, and Doug Coleman
 ! See https://factorcode.org/license.txt for BSD license.
-USING: assocs.private help.markup help.syntax kernel math
+USING: assocs assocs.private help.markup help.syntax kernel math
 namespaces quotations sequences ;
 IN: assocs
 

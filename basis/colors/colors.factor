@@ -91,7 +91,7 @@ PRIVATE>
 ERROR: no-such-color name ;
 
 : named-color ( name -- color )
-    dup colors at [ ] [ no-such-color ] ?if ;
+    [ colors at ] [ no-such-color ] ?unless ;
 
 : parse-color ( str -- color )
     "#" ?head [ hex>rgba ] [ named-color ] if ;

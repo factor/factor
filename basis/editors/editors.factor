@@ -104,7 +104,7 @@ PRIVATE>
 GENERIC: edit ( object -- )
 
 M: object edit
-    dup where [ first2 edit-location ] [ cannot-find-source ] ?if ;
+    [ where ] [ first2 edit-location ] [ cannot-find-source ] ?if ;
 
 M: string edit edit-vocab ;
 

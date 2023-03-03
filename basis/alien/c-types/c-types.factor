@@ -58,8 +58,8 @@ UNION: c-type-name
     dup c-type-name? [ lookup-c-type ] when ;
 
 M: word lookup-c-type
-    dup "c-type" word-prop resolve-typedef
-    [ ] [ no-c-type ] ?if ;
+    [ "c-type" word-prop resolve-typedef ]
+    [ no-c-type ] ?unless ;
 
 GENERIC: c-type-class ( name -- class )
 

@@ -1,7 +1,7 @@
 ! Copyright (C) 2005, 2009 Slava Pestov.
 ! See https://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs growable.private hashtables
-kernel kernel.private math math.order sequences
+kernel kernel.private math math.order math.private sequences
 sequences.private vectors ;
 IN: sorting
 

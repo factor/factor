@@ -19,8 +19,8 @@ ERROR: bad-ipv4-component string ;
     { [ "0" = not ] [ "0" head? ] [ "0x" head? not ] } 1&& ;
 
 : ipv4-component ( str -- n )
-    dup dup octal? [ oct> ] [ string>number ] if
-    [ ] [ bad-ipv4-component ] ?if ;
+    [ dup octal? [ oct> ] [ string>number ] if ]
+    [ bad-ipv4-component ] ?unless ;
 
 : split-ipv4 ( str -- array )
     "." split [ ipv4-component ] map ;
@@ -63,7 +63,7 @@ ERROR: more-than-8-components ;
 <PRIVATE
 
 : ipv6-component ( str -- n )
-    dup hex> [ ] [ bad-ipv6-component ] ?if ;
+    [ hex> ] [ bad-ipv6-component ] ?unless ;
 
 : split-ipv6 ( string -- seq )
     ":" split CHAR: . over last member? [ unclip-last ] [ f ] if
@@ -71,7 +71,7 @@ ERROR: more-than-8-components ;
     [ [ parse-ipv4 append ] unless-empty ] bi* ;
 
 : pad-ipv6 ( string1 string2 -- seq )
-    2dup [ length ] bi@ + 8 swap -
+    2dup 2length + 8 swap -
     dup 0 < [ more-than-8-components ] when
     <byte-array> glue ;
 

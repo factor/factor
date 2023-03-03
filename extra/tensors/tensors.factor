@@ -177,7 +177,7 @@ syntax:M: tensor like
         ] [
             [ >tensor ] dip
         ] if
-        2dup [ length ] bi@ = [ shape>> reshape ] [ drop ] if
+        2dup 2length = [ shape>> reshape ] [ drop ] if
     ] if ;
 
 syntax:M: tensor clone-like
@@ -185,7 +185,7 @@ syntax:M: tensor clone-like
     over tensor?
     [ drop clone ] [
         [ >tensor ] dip
-        2dup [ length ] bi@ = [ shape>> reshape ] [ drop ] if
+        2dup 2length = [ shape>> reshape ] [ drop ] if
     ] if ;
 
 INSTANCE: tensor sequence

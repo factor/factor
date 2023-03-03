@@ -311,7 +311,7 @@ SYMBOL: padding-no
     { } <struct-slot-spec> ;
 
 : shader-filename ( shader/program -- filename )
-    dup filename>> [ ] [ name>> where first ] ?if file-name ;
+    [ filename>> ] [ name>> where first ] ?unless file-name ;
 
 : numbered-log-line? ( log-line-components -- ? )
     {

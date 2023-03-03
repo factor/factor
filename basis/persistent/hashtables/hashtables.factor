@@ -37,7 +37,7 @@ M: persistent-hash keys >alist keys ;
 M: persistent-hash values >alist values ;
 
 : >persistent-hash ( assoc -- phash )
-    T{ persistent-hash } swap [ swap rot new-at ] assoc-each ;
+    T{ persistent-hash } swap [ spin new-at ] assoc-each ;
 
 M: persistent-hash equal?
     over persistent-hash? [ assoc= ] [ 2drop f ] if ;

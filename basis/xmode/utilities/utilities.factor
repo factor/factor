@@ -25,7 +25,7 @@ IN: xmode.utilities
     [ object set tag set ] prepose with-scope ; inline
 
 MACRO: (init-from-tag) ( specs -- quot )
-    [ tag-init-form ] map concat [ ] like
+    [ tag-init-form ] map [ ] concat-as
     [ with-tag-initializer ] curry ;
 
 : init-from-tag ( tag tuple specs -- tuple )

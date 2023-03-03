@@ -3,8 +3,8 @@
 USING: accessors arrays ascii assocs assocs.extras base91 colors
 combinators hashtables io io.encodings.binary
 io.encodings.string io.encodings.utf8 io.files io.styles kernel
-literals math random ranges sequences sequences.extras sets
-sorting splitting strings ;
+literals math math.order random ranges sequences
+sequences.extras sets sorting.specification splitting strings ;
 IN: wordlet
 
 <PRIVATE
@@ -25,13 +25,13 @@ TUPLE: wordlet-game secret-word chances guesses ;
         V{ } clone >>guesses ; inline
 
 : guess>chars ( secret guess -- seq )
-    [ zip [ first2 = not ] filter keys [ 1string ] map ] 2keep
+    [ [ = ] [ drop 1string ] { } 2reject-map-as ] 2keep
     [
         [ nip 1string ] [ = ] 2bi
         [ COLOR: green ]
         [
-            2dup swap member?
-            [ [ swap remove-first ] [ COLOR: yellow ] bi ]
+            2dup member-of?
+            [ [ remove-first-of ] [ COLOR: yellow ] bi ]
             [ COLOR: gray ] if
         ] if
         background associate 2array
@@ -50,7 +50,7 @@ TUPLE: wordlet-game secret-word chances guesses ;
     ] with map concat members
     [ background of ] assoc-map
     [ drop ] collect-value-by
-    [ [ color>n ] zip-with sort-values <reversed> first first ] assoc-map
+    [ [ color>n ] zip-with { >=< } sort-values-with-spec first first ] assoc-map
     CHAR: a CHAR: z [a..b] [ 1string COLOR: white ] { } map>assoc [ or ] assoc-merge ;
 
 : print-remaining-chars ( game -- )
@@ -61,12 +61,14 @@ TUPLE: wordlet-game secret-word chances guesses ;
         guess>chars [ format ] assoc-each nl
     ] with each nl ;
 
-: read-guess ( -- guess )
+: read-guess ( -- guess/f )
     "guess: " write
-    readln >lower dup length 5 =
-    [ " needs to have 5 letters" append print read-guess ] unless
-    dup word-list in?
-    [ " not in the word list" append print read-guess ] unless ;
+    readln >lower dup [
+        dup length 5 =
+        [ " needs to have 5 letters" append print read-guess ] unless
+        dup word-list in?
+        [ " not in the word list" append print read-guess ] unless
+    ] when ;
 
 : check-winner? ( game -- ? )
     [ secret-word>> ] [ guesses>> ?last ] bi = ;
@@ -86,15 +88,19 @@ TUPLE: wordlet-game secret-word chances guesses ;
             [ print-remaining-chars ]
             [ [ read-guess ] dip guesses>> push ]
             [
-                dup check-winner?
-                [ COLOR: green print-secret ]
-                [ play-wordlet ] if
+                dup guesses>> last [
+                    dup check-winner?
+                    [ COLOR: green print-secret ]
+                    [ play-wordlet ] if
+                ] [
+                    "you gave up, the word was " write COLOR: red print-secret
+                ] if
             ]
         } cleave
     ] if ;
 
 : play-random-wordlet-game ( -- )
-    "wordlet Started" print
+    "Wordlet Started" print
     word-list random 6 <wordlet-game> play-wordlet ;
 
 MAIN: play-random-wordlet-game

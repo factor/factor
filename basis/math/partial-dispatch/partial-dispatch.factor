@@ -16,11 +16,11 @@ M: math-partial integer-op-input-classes
 ERROR: bad-integer-op word ;
 
 M: word integer-op-input-classes
-    dup "input-classes" word-prop
-    [ ] [ bad-integer-op ] ?if ;
+    [ "input-classes" word-prop ]
+    [ bad-integer-op ] ?unless ;
 
 : generic-variant ( op -- generic-op/f )
-    dup "derived-from" word-prop [ first ] [ ] ?if ;
+    [ "derived-from" word-prop ] [ first ] ?when ;
 
 : no-overflow-variant ( op -- fast-op )
     H{

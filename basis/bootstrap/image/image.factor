@@ -288,8 +288,8 @@ ERROR: not-in-image vocabulary word ;
     [ target-word ] keep or ;
 
 : fixup-word ( word -- offset )
-    transfer-word dup lookup-object
-    [ ] [ [ vocabulary>> ] [ name>> ] bi not-in-image ] ?if ;
+    transfer-word
+    [ lookup-object ] [ [ vocabulary>> ] [ name>> ] bi not-in-image ] ?unless ;
 
 : fixup-words ( -- )
     bootstrapping-image get [ dup word? [ fixup-word ] when ] map! drop ;
@@ -361,7 +361,7 @@ M: byte-array prepare-object
 ERROR: tuple-removed class ;
 
 : require-tuple-layout ( word -- layout )
-    dup tuple-layout [ ] [ tuple-removed ] ?if ;
+    [ tuple-layout ] [ tuple-removed ] ?unless ;
 
 : (emit-tuple) ( tuple -- pointer )
     [ tuple-slots ]

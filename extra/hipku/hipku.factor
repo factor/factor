@@ -1,5 +1,5 @@
 ! Copyright (C) 2023 John Benediktsson
-! See http://factorcode.org/license.txt for BSD license
+! See https://factorcode.org/license.txt for BSD license
 
 USING: arrays ascii combinators endian grouping ip-parser kernel
 literals math sequences splitting ;

@@ -1,7 +1,7 @@
 ! Copyright (C) 2013 Doug Coleman.
 ! See https://factorcode.org/license.txt for BSD license.
-USING: arrays assocs combinators.extras io.files kernel math
-modern.slices sequences splitting tools.test ;
+USING: alien.c-types arrays assocs combinators.extras io.files
+kernel math modern.slices sequences splitting tools.test ;
 IN: combinators.extras.tests
 
 
@@ -187,8 +187,6 @@ IN: combinators.extras.tests
 { 103 203 { { 1 1 } { 2 2 } { 3 3 } } }
 [ 100 200 { { 1 1 } { 2 2 } { 3 3 } } [ [ 1 + ] bi@ ] 2temp2d assoc-map ] unit-test
 
-{ 10 } [ 5 [ 2 * ] plox ] unit-test
-{ f } [ f [ 2 * ] plox ] unit-test
+{ t } [ int [ c-type-name? ] [ lookup-c-type ] 1check-when c-type? ] unit-test
 
-{ 12 } [ 12 [ odd? ] [ 2/ ] plox-if ] unit-test
-{ 6 } [ 13 [ odd? ] [ 2/ ] plox-if ] unit-test
+{ 111 112 113 114 } [ 10 100 [ 1 + + ] [ 2  + + ] [ 3 + + ] [ 4 + + ] 2quad ] unit-test

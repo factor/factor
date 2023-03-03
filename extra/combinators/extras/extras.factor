@@ -6,9 +6,12 @@ quotations sequences sequences.generalizations sequences.private
 sets shuffle stack-checker.transforms system words ;
 IN: combinators.extras
 
+: callk ( ..a quot: ( ..a -- ..b ) -- ..b quot )
+    dup [ call ] dip ; inline
+
 : once ( quot -- ) call ; inline
-: twice ( quot -- ) dup [ call ] dip call ; inline
-: thrice ( quot -- ) dup dup [ call ] 2dip [ call ] dip call ; inline
+: twice ( quot -- ) callk call ; inline
+: thrice ( quot -- ) callk callk call ; inline
 : forever ( quot -- ) [ t ] compose loop ; inline
 
 MACRO: cond-case ( assoc -- quot )
@@ -51,15 +54,13 @@ MACRO: cleave-array ( quots -- quot )
 : 4quad ( w x y z  p q r s -- )
     [ [ [ 4keep ] dip 4keep ] dip 4keep ] dip call ; inline
 
+: quad ( x p q r s -- ) [ [ [ keep ] dip keep ] dip keep ] dip call ; inline
+
+: 2quad ( x y p q r s -- ) [ [ [ 2keep ] dip 2keep ] dip 2keep ] dip call ; inline
+
 : quad* ( w x y z p q r s -- ) [ [ [ 3dip ] dip 2dip ] dip dip ] dip call ; inline
 
 : quad@ ( w x y z quot -- ) dup dup dup quad* ; inline
-
-: plox ( ... x/f quot: ( ... x -- ... y ) -- ... y/f )
-    dupd when ; inline
-
-: plox-if ( ... x quot: ( ... x -- ... ? ) quot: ( ... x -- ... y ) -- ... y/f )
-    [ keep swap ] dip when ; inline
 
 MACRO: smart-plox ( true -- quot )
     [ inputs [ 1 - [ and ] n*quot ] keep ] keep swap
@@ -90,24 +91,20 @@ MACRO: n*obj ( n obj -- quot )
 MACRO:: n-falsify ( n -- quot )
     [ n ndup n n-and [ n ndrop n f n*obj ] unless ] ;
 
-! plox
-: ?1res ( ..a obj/f quot -- ..b )
-    dupd when ; inline
-
 ! when both args are true, call quot. otherwise dont
 : ?2res ( ..a obj1 obj2 quot: ( obj1 obj2 -- ? ) -- ..b )
     [ 2dup and ] dip [ 2drop f ] if ; inline
 
 ! try the quot, keep the original arg if quot is true
 : ?1arg ( obj quot: ( obj -- ? ) -- obj/f )
-    [ ?1res ] keepd '[ _ ] [ f ] if ; inline
+    [ ?call ] keepd '[ _ ] [ f ] if ; inline
 
 : ?2arg ( obj1 obj2 quot: ( obj1 obj2 -- ? ) -- obj1/f obj2/f )
     [ ?2res ] 2keepd '[ _ _ ] [ f f ] if ; inline
 
 <<
 : alist>quot* ( default assoc -- quot )
-    [ rot \ if* 3array append [ ] like ] assoc-each ;
+    [ rot \ if* 3array [ ] append-as ] assoc-each ;
 
 : cond*>quot ( assoc -- quot )
     [ dup pair? [ [ drop ] prepend [ t ] swap 2array ] unless ] map
@@ -196,7 +193,7 @@ MACRO: 4keep-under ( quot -- quot' )
 : 1temp2d ( quot: ( a b c -- d e f ) -- quot ) '[ rot @ -rot ] ; inline
 : 2temp2d ( quot: ( a b c d -- e f g h ) -- quot ) '[ 2 4 0 nrotated @ 2 4 0 -nrotated ] ; inline
 
- : (closure-limit) ( vertex set quot: ( vertex -- edges ) i n -- )
+: (closure-limit) ( vertex set quot: ( vertex -- edges ) i n -- )
     2dup < [
         [ 1 + ] dip
         2reach ?adjoin [
@@ -212,3 +209,11 @@ MACRO: 4keep-under ( quot -- quot' )
 
 : closure-limit ( vertex quot: ( vertex -- edges ) n -- set )
     HS{ } closure-limit-as ; inline
+
+: 1check ( obj quot -- obj ? ) over [ call ] dip swap ; inline
+: 2check ( obj1 obj2 quot -- obj ? ) 2over [ call ] 2dip rot ; inline
+
+: 1check-when ( ..a obj cond: ( ..a obj -- obj/f ) true: ( ..a obj cond -- ..b ) -- ..b )
+    [ 1check ] dip when ; inline
+: 2check-when ( ..a obj1 obj2 cond: ( ..a obj1 obj2 -- obj/f ) true: ( ..a obj1 obj2 cond -- ..b ) -- ..b )
+    [ 2check ] dip when ; inline

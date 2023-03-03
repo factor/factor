@@ -11,7 +11,7 @@ IN: compiler.tree.escape-analysis.recursive
 : congruent? ( alloc1 alloc2 -- ? )
     {
         { [ 2dup [ boolean? ] either? ] [ eq? ] }
-        { [ 2dup [ length ] bi@ = not ] [ 2drop f ] }
+        { [ 2dup 2length = not ] [ 2drop f ] }
         [ [ [ allocation ] bi@ congruent? ] 2all? ]
     } cond ;
 

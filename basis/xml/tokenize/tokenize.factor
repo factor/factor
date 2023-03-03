@@ -103,7 +103,7 @@ HINTS: next* { spot } ;
 
 : take-string ( match -- string )
     [ spot get (take-string) [ missing-close ] unless ]
-    [ dupd [ length ] bi@ - over shorten "" like ] bi ;
+    [ dupd 2length - over shorten "" like ] bi ;
 
 : expect ( string -- )
     dup length spot get '[ _ [ char>> ] keep next* ] "" replicate-as
@@ -112,8 +112,10 @@ HINTS: next* { spot } ;
 ! Suddenly XML-specific
 
 : parse-named-entity ( accum string -- )
-    dup entities at [ swap push ] [
-        dup extra-entities get at
+    [ entities at ]
+    [ swap push ]
+    [
+        [ extra-entities get at ]
         [ swap push-all ] [ no-entity ] ?if
     ] ?if ;
 
@@ -126,7 +128,8 @@ HINTS: next* { spot } ;
     ] [ parse-named-entity ] if ;
 
 : parse-pe ( accum -- )
-    take-; dup pe-table get at
+    take-;
+    [ pe-table get at ]
     [ swap push-all ] [ no-entity ] ?if ;
 
 :: (parse-char) ( quot: ( ch -- ? ) accum spot -- )

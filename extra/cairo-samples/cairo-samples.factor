@@ -146,8 +146,8 @@ M: utf8-gadget render-cairo* ( gadget -- )
     cr 256 0 cairo_rel_line_to
     cr cairo_stroke ;
 
- USING: quotations ui.gadgets.panes sequences ;
- : samples ( -- )
+USING: quotations ui.gadgets.panes sequences ;
+: samples ( -- )
     {
         arc-gadget clip-gadget clip-image-gadget dash-gadget
         gradient-gadget text-gadget utf8-gadget

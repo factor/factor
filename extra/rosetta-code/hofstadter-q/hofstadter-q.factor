@@ -34,7 +34,7 @@ IN: rosetta-code.hofstadter-q
 ! (This point is to ensure that caching and/or recursion limits,
 ! if it is a concern, is correctly handled).
 
- : next ( seq -- newseq )
+: next ( seq -- newseq )
     dup 2 tail* over length [ swap - ] curry map
     [ dupd swap nth ] map 0 [ + ] reduce suffix ;
 

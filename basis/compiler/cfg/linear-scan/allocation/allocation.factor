@@ -35,7 +35,7 @@ IN: compiler.cfg.linear-scan.allocation
 : spill-at-sync-point? ( sync-point live-interval -- ? )
     {
         [ drop keep-dst?>> not ]
-        [ [ n>> ] dip find-use dup [ def-rep>> ] when not ]
+        [ [ n>> ] dip find-use [ def-rep>> ] ?call not ]
     } 2|| ;
 
 : spill-at-sync-point ( sync-point live-interval -- ? )

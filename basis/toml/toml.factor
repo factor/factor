@@ -276,7 +276,7 @@ DEFER: update-toml
 : deep-at ( keys assoc -- value )
     swap [
         over ?at [ nip ] [
-            H{ } clone [ swap rot check-no-key set-at ] keep
+            H{ } clone [ spin check-no-key set-at ] keep
         ] if
     ] each ;
 
@@ -284,11 +284,11 @@ GENERIC: update-toml ( assoc entry -- assoc )
 
 M: entry update-toml
     [ key>> unclip-last [ over deep-at ] dip ] [ value>> ] bi
-    swap rot check-no-key set-at ;
+    spin check-no-key set-at ;
 
 M: table update-toml
     [ name>> unclip-last [ over deep-at ] dip ]
-    [ entries>> [ H{ } clone ] dip [ update-toml ] each swap rot ]
+    [ entries>> [ H{ } clone ] dip [ update-toml ] each spin ]
     [ array?>> [ push-at ] [ check-no-key set-at ] if ] tri ;
 
 PEG: parse-toml ( string -- ast ) toml-parser ;

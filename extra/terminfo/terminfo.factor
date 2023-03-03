@@ -248,7 +248,7 @@ CONSTANT: string-names {
 }
 
 : zip-names ( seq names -- assoc )
-    swap 2dup [ length ] bi@ - f <repetition> append zip ;
+    swap 2dup 2length - f <repetition> append zip ;
 
 PRIVATE>
 

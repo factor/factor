@@ -197,11 +197,11 @@ FUNCTION: PyObject* PyNumber_ToBase ( PyObject* o1, int base )
 
 ! Bytes
 FUNCTION: c-string PyBytes_AsString ( PyObject* string )
-FUNCTION: PyObject* PyBytes_FromStringAndSize ( c-string v, Py_ssize_t size  )
+FUNCTION: PyObject* PyBytes_FromStringAndSize ( c-string v, Py_ssize_t size )
 
 ! Strings
 FUNCTION: c-string PyUnicode_AsUTF8 ( PyObject* unicode )
-FUNCTION: PyObject* PyUnicode_FromStringAndSize ( c-string v, Py_ssize_t size  )
+FUNCTION: PyObject* PyUnicode_FromStringAndSize ( c-string v, Py_ssize_t size )
 FUNCTION: PyObject* PyUnicode_FromString ( c-string v )
 
 ! Ints

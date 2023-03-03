@@ -10,7 +10,7 @@ IN: webapps.mason.status-update
         swap >>cpu
         swap >>os
         swap >>host-name
-    dup select-tuple [ ] [ dup insert-tuple ] ?if ;
+    [ select-tuple ] [ dup insert-tuple ] ?unless ;
 
 : heartbeat ( builder -- )
     now >>heartbeat-timestamp

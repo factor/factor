@@ -8,7 +8,7 @@ CONSTANT: width 256
 CONSTANT: height 256
 : redraw-interval ( -- dt ) 10 milliseconds ;
 
-: <nehe5-gadget> (  -- gadget )
+: <nehe5-gadget> ( -- gadget )
     nehe5-gadget new
     0.0 >>rtri
     0.0 >>rquad ;

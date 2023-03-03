@@ -22,7 +22,7 @@ SINGLETON: acme
   "plumb" plan9-tool-path ;
 
 : (massage-pathname) ( file line -- str )
- over file-info regular-file?
+  over file-info regular-file?
   [ number>string 2array ":" join ]
   [ drop ] if ;
 

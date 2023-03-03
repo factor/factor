@@ -50,7 +50,7 @@ M: object lookup-vocab vocab-name dictionary get at ;
 ERROR: no-vocab-named name ;
 
 : ?lookup-vocab ( vocab-spec -- vocab )
-    dup lookup-vocab [ nip ] [ no-vocab-named ] if* ;
+    [ lookup-vocab ] [ no-vocab-named ] ?unless ;
 
 GENERIC: vocab-words-assoc ( vocab-spec -- assoc/f )
 
@@ -131,7 +131,7 @@ GENERIC: >vocab-link ( name -- vocab )
 
 M: vocab-spec >vocab-link ;
 
-M: object >vocab-link dup lookup-vocab [ ] [ <vocab-link> ] ?if ;
+M: object >vocab-link [ lookup-vocab ] [ <vocab-link> ] ?unless ;
 
 <PRIVATE
 

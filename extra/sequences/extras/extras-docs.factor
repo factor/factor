@@ -69,13 +69,13 @@ HELP: 2map-index
 { $description "Calls the quotation with each pair of elements of the two sequences and their index on the stack, with the index on the top of the stack. Collects the outputs of the quotation and outputs them into a new sequence of the same type as the first sequence." }
 { $see-also 2map map-index } ;
 
-HELP: count*
+HELP: percent-of
 { $values
     { "seq" sequence }
     { "quot" { $quotation ( ... elt -- ... ? ) } }
     { "%" rational } }
 { $description "Outputs the fraction of elements in the sequence for which the predicate quotation matches." }
-{ $examples { $example "USING: math ranges prettyprint sequences.extras ;" "100 [1..b] [ even? ] count* ." "1/2" } } ;
+{ $examples { $example "USING: math ranges prettyprint sequences.extras ;" "100 [1..b] [ even? ] percent-of ." "1/2" } } ;
 
 HELP: collapse
 { $values
@@ -227,7 +227,7 @@ HELP: start-all
                "\"ABAABA\" \"ABA\" start-all ."
       "{ 0 3 }"
     }
- } ;
+} ;
 
 HELP: start-all*
 { $values
@@ -947,14 +947,14 @@ HELP: map-find-last-index
 
 HELP: map-from
 { $values
-    { "seq" sequence } { "quot" quotation } { "i" integer }
+    { "seq" sequence } { "quot" quotation } { "from" integer }
     { "newseq" sequence }
 }
 { $description "A version of " { $link map } " that maps the slice of " { $snippet "seq" } " beginning at index " { $snippet "i" } "." } ;
 
 HELP: map-from-as
 { $values
-    { "seq" sequence } { "quot" quotation } { "i" integer } { "exemplar" object }
+    { "seq" sequence } { "quot" quotation } { "from" integer } { "exemplar" object }
     { "newseq" sequence }
 }
 { $description "A version of " { $link map-from } " where the resultant sequence has the same class as " { $snippet "exemplar" } } ;
@@ -1048,6 +1048,11 @@ HELP: merge-slices
     { "slice/*" object }
 } ;
 
+HELP: nth-of
+{ $values { "seq" sequence } { "n" "a non-negative integer" } { "elt" "the element at the " { $snippet "n" } "th index" } }
+{ $contract "Outputs the " { $snippet "n" } "th element of the sequence. Elements are numbered from zero, so the last element has an index one less than the length of the sequence. All sequences support this operation." }
+{ $errors "Throws a " { $link bounds-error } " if the index is negative, or greater than or equal to the length of the sequence." } ;
+
 HELP: nth*
 { $values
     { "n" integer } { "seq" sequence }
@@ -1068,6 +1073,10 @@ HELP: nth?
     { "?" boolean }
 }
 { $description "Check if the nth element of " { $snippet "seq" } " satisfies the condition given by " { $snippet "quot" } "." } ;
+
+HELP: ??nth
+{ $values { "n" integer } { "seq" sequence } { "elt/f" { $maybe object } } { "?" boolean } }
+{ $description "A forgiving version of " { $link nth } ". If the index is out of bounds, or if the sequence is " { $link f } ", simply outputs " { $link f } ". Also outputs a boolean to distinguish between the sequence containing an " { $link f } " or an out of bounds index." } ;
 
 HELP: odd-indices
 { $values
@@ -1128,7 +1137,7 @@ HELP: push-if-index
 
 HELP: reduce-from
 { $values
-    { "seq" sequence } { "identity" object } { "quot" quotation } { "i" integer }
+    { "seq" sequence } { "identity" object } { "quot" quotation } { "from" integer }
     { "result" object }
 } ;
 

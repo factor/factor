@@ -41,14 +41,14 @@ PRIVATE>
 ERROR: no-math-method left right generic ;
 
 : default-math-method ( generic -- quot )
-    [ no-math-method ] curry [ ] like ;
+    [ no-math-method ] curry ;
 
 <PRIVATE
 
 : (math-method) ( generic class -- quot )
-    over ?lookup-method
+    over ?lookup-method or*
     [ 1quotation ]
-    [ default-math-method ] ?if ;
+    [ default-math-method ] if ;
 
 PRIVATE>
 

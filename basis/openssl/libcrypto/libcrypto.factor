@@ -111,13 +111,13 @@ FUNCTION: int BIO_write ( void* b, void* buf, int len )
 
 FUNCTION: int BIO_puts ( BIO* bio, c-string buf )
 
-FUNCTION: ulong ERR_get_error (  )
+FUNCTION: ulong ERR_get_error ( )
 
 FUNCTION: void ERR_clear_error ( )
 
 FUNCTION: c-string ERR_error_string ( ulong e, void* buf )
 
-FUNCTION: void* BIO_f_buffer (  )
+FUNCTION: void* BIO_f_buffer ( )
 
 ! ===============================================
 ! evp.h
@@ -144,14 +144,14 @@ FUNCTION: void EVP_MD_CTX_free ( EVP_MD_CTX* ctx )
 ! ------------------------------------------------------------------------------
 ! API < 1.1.0, removed in new versions
 ! ------------------------------------------------------------------------------
-FUNCTION: void OpenSSL_add_all_ciphers (  )
-FUNCTION: void OpenSSL_add_all_digests (  )
+FUNCTION: void OpenSSL_add_all_ciphers ( )
+FUNCTION: void OpenSSL_add_all_digests ( )
 FUNCTION: EVP_MD_CTX* EVP_MD_CTX_create ( )
 FUNCTION: void EVP_MD_CTX_destroy ( EVP_MD_CTX* ctx )
 ! ------------------------------------------------------------------------------
 
 ! Clean them up before exiting
-FUNCTION: void EVP_cleanup (  )
+FUNCTION: void EVP_cleanup ( )
 
 FUNCTION: EVP_MD* EVP_get_digestbyname ( c-string name )
 

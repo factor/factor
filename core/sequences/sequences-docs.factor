@@ -180,6 +180,8 @@ HELP: ?nth
 { $values { "n" integer } { "seq" sequence } { "elt/f" { $maybe object } } }
 { $description "A forgiving version of " { $link nth } ". If the index is out of bounds, or if the sequence is " { $link f } ", simply outputs " { $link f } "." } ;
 
+{ nth ?nth } related-words
+
 HELP: ?set-nth
 { $values { "elt" object } { "n" integer } { "seq" sequence } }
 { $description "A forgiving version of " { $link set-nth } ". If the index is out of bounds, does nothing." } ;
@@ -556,6 +558,12 @@ HELP: map-find
 { $values { "seq" sequence } { "quot" { $quotation ( ... elt -- ... result/f ) } } { "result" "the first non-false result of the quotation" } { "elt" { $maybe "the first matching element" } } }
 { $description "Applies the quotation to each element of the sequence, until the quotation outputs a true value. If the quotation ever yields a result which is not " { $link f } ", then the value is output, along with the element of the sequence which yielded this." } ;
 
+HELP: map-find-last
+{ $values { "seq" sequence } { "quot" { $quotation ( ... elt -- ... result/f ) } } { "result" "the last non-false result of the quotation" } { "elt" { $maybe "the last matching element" } } }
+{ $description "Applies the quotation to each element of the sequence from the tail, until the quotation outputs a true value. If the quotation ever yields a result which is not " { $link f } ", then the value is output, along with the element of the sequence which yielded this." } ;
+
+{ map-find map-find-last } related-words
+
 HELP: any?
 { $values { "seq" sequence } { "quot" { $quotation ( ... elt -- ... ? ) } } { "?" boolean } }
 { $description "Tests if the sequence contains an element satisfying the predicate, by applying the predicate to each element in turn until a true value is found. If the sequence is empty or if the end of the sequence is reached, outputs " { $link f } "." } ;
@@ -568,7 +576,7 @@ HELP: all?
 { $values { "seq" sequence } { "quot" { $quotation ( ... elt -- ... ? ) } } { "?" boolean } }
 { $description "Tests if all elements in the sequence satisfy the predicate by checking each element in turn. Given an empty sequence, vacuously outputs " { $link t } "." } ;
 
-HELP: push-if
+HELP: push-when
 { $values { "elt" object } { "quot" { $quotation ( ..a elt -- ..b ? ) } } { "accum" "a resizable mutable sequence" } }
 { $description "Adds the element at the end of the sequence if the quotation yields a true value." }
 { $notes "This word is a factor of " { $link filter } "." } ;
@@ -696,7 +704,7 @@ HELP: replace-slice
 { $description "Replaces a range of elements beginning at index " { $snippet "from" } " and ending before index " { $snippet "to" } " with a new sequence." }
 { $errors "Throws an error if " { $snippet "new" } " contains elements whose types are not permissible in " { $snippet "seq" } "." } ;
 
-{ push push-either push-if pop pop* prefix suffix suffix! } related-words
+{ push push-either push-when pop pop* prefix suffix suffix! } related-words
 
 HELP: suffix
 { $values { "seq" sequence } { "elt" object } { "newseq" sequence } }
@@ -1823,11 +1831,11 @@ ARTICLE: "sequence-protocol" "Sequence protocol"
 "All sequences must know their length:"
 { $subsections length }
 "At least one of the following two generic words must have a method for accessing elements; the " { $link sequence } " mixin has default definitions which are mutually recursive:"
-{ $subsections nth nth-unsafe }
+{ $subsections nth nth-unsafe ?nth }
 "Note that sequences are always indexed starting from zero."
 $nl
 "At least one of the following two generic words must have a method for storing elements; the " { $link sequence } " mixin has default definitions which are mutually recursive:"
-{ $subsections set-nth set-nth-unsafe }
+{ $subsections set-nth set-nth-unsafe ?set-nth }
 "If your sequence is immutable, then you must implement either " { $link set-nth } " or " { $link set-nth-unsafe } " to simply call " { $link immutable } " to signal an error."
 $nl
 "The following two generic words are optional, as not all sequences are resizable:"
@@ -1912,7 +1920,7 @@ ARTICLE: "sequences-appending" "Appending sequences"
     glue-as
 }
 "Collapse a sequence unto itself:"
-{ $subsections concat join }
+{ $subsections concat concat-as join join-as }
 "A pair of words useful for aligning strings:"
 { $subsections pad-head pad-tail } ;
 
@@ -1989,12 +1997,34 @@ ARTICLE: "sequences-combinators" "Sequence combinators"
     filter-as
     partition
 }
+"Counting:"
+{ $subsections
+    count
+}
+"Superlatives with " { $link min } " and " { $link max } ":"
+{ $subsections
+    infimum
+    infimum-by
+    supremum
+    supremum-by
+    shorter
+    longer
+    shorter?
+    longer?
+    shortest
+    longest
+}
 "Generating:"
 { $subsections
     replicate
     replicate-as
     produce
     produce-as
+}
+"Math:"
+{ $subsections
+    sum
+    product
 }
 "Testing if a sequence contains elements satisfying a predicate:"
 { $subsections
@@ -2055,6 +2085,7 @@ ARTICLE: "sequences-search" "Searching sequences"
     find-last
     find-last-from
     map-find
+    map-find-last
 } ;
 
 ARTICLE: "sequences-trimming" "Trimming sequences"
@@ -2139,7 +2170,6 @@ ARTICLE: "sequences-combinator-implementation" "Implementing sequence combinator
 { $subsections
     collector
     collector-as
-    collector-for-as
 }
 "Creating a new sequence conditionally:"
 { $subsections
@@ -2160,6 +2190,7 @@ $nl
 "Computing the cartesian product of two sequences:"
 { $subsections
     cartesian-product
+    cartesian-product-as
 } ;
 
 ARTICLE: "sequences" "Sequence operations"

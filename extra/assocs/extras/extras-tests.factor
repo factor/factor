@@ -1,4 +1,5 @@
-USING: arrays assocs.extras kernel math math.order sequences tools.test ;
+USING: arrays assocs assocs.extras kernel math math.order
+sequences tools.test ;
 
 {
     H{ { 1 V{ 10 } } { 2 V{ 10 } } { 3 V{ 10 } } { 4 V{ 10 } } { 5 V{ 10 } } }
@@ -19,14 +20,6 @@ USING: arrays assocs.extras kernel math math.order sequences tools.test ;
 
 { H{ { 1 H{ { 2 H{ { 3 40 } } } } } } } [
     H{ { 1 H{ { 2 H{ { 3 4 } } } } } } dup { 1 2 3 } 40 deep-set-of
-] unit-test
-
-{ { { 1 1 } { 2 2 } { 0 3 } { 0 4 } { 0 5 } } } [
-    { 1 2 } { 1 2 3 4 5 } 0 zip-longest-with
-] unit-test
-
-{ { { 1 1 } { 2 2 } { f 3 } { f 4 } { f 5 } } } [
-    { 1 2 } { 1 2 3 4 5 } zip-longest
 ] unit-test
 
 { H{ { 2 1 } { 4 3 } } } [ H{ { 1 2 } { 3 4 } } assoc-invert ] unit-test
@@ -320,4 +313,45 @@ USING: arrays assocs.extras kernel math math.order sequences tools.test ;
 { { { 1 2 } { 3 4 } } } [
     H{ { 1 2 } { 3 4 } { 5 6 } }
     { 1 3 } { } intersect-keys-as
+] unit-test
+
+
+{ H{ { 1 100 } } } [
+    H{ } clone 1 100 set-of
+] unit-test
+
+{ H{ { 1 V{ 100 200 } } } } [
+    H{ } clone 1 100 push-of 1 200 push-of
+] unit-test
+
+{ H{ { 123 556 } } } [
+    H{ { 123 456 } } 123 [ 100 + ] change-of
+] unit-test
+
+{ H{ { 123 556 } } } [
+    H{ { 123 456 } } 123 [ 100 + ] ?change-of
+] unit-test
+
+{ H{ { 123 456 } } } [
+    H{ { 123 456 } } 1234 [ 100 + ] ?change-of
+] unit-test
+
+{ H{ { 10 2 } } } [
+    H{ { 10 1 } } 10 inc-of
+] unit-test
+
+{ H{ { 10 1001 } } } [
+    H{ { 10 1 } } 10 1000 of+
+] unit-test
+
+{ H{ { 1 100 } } f } [
+    H{ { 1 100 } } 1 100 maybe-set-of
+] unit-test
+
+{ H{ { 1 100 } { 2 100 } } t } [
+    H{ { 1 100 } } 2 100 maybe-set-of
+] unit-test
+
+{ H{ { 1 100 } } t } [
+    H{ { 1 100 } } 1 101 maybe-set-of
 ] unit-test

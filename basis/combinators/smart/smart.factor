@@ -14,7 +14,7 @@ GENERIC: infer-known* ( known -- effect )
     ] [ infer-known* ] if ;
 
 IDENTITY-MEMO: inputs/outputs ( quot -- in out )
-    infer [ in>> ] [ out>> ] bi [ length ] bi@ ;
+    infer [ in>> ] [ out>> ] bi 2length ;
 
 : inputs ( quot -- n ) inputs/outputs drop ; inline
 

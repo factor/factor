@@ -176,7 +176,7 @@ PRIVATE>
     SQL-HANDLE-STMT swap SQLFreeHandle
     succeeded? [ "odbc-free-statement failed" throw ] unless ;
 
-: odbc-execute ( statement --  )
+: odbc-execute ( statement -- )
     SQLExecute succeeded? [ "odbc-execute failed" throw ] unless ;
 
 : odbc-next-row ( statement -- bool )

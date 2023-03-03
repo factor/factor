@@ -94,6 +94,7 @@ $nl
 $nl
 "You can perform an operation on each element of an array:"
 { $example
+    "USING: io sequences prettyprint ;"
     "{ 1 2 3 } [ \"The number is \" write . ] each"
     "The number is 1\nThe number is 2\nThe number is 3"
 }

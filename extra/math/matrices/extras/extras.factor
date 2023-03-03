@@ -31,7 +31,7 @@ DEFER: alternating-sign
 PRIVATE>
 
 : <random-integer-matrix> ( m n max -- matrix )
-    '[ _ _ 1 + random-integers ] replicate
+    '[ _ _ 1 + randoms ] replicate
     finish-randomizing-matrix ; inline
 
 : <random-unit-matrix> ( m n max -- matrix )

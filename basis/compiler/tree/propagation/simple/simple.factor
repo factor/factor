@@ -47,7 +47,7 @@ M: #declare propagate-before
 ERROR: invalid-outputs #call infos ;
 
 : check-outputs ( #call infos -- infos )
-    over out-d>> over [ length ] bi@ =
+    over out-d>> over 2length =
     [ nip ] [ invalid-outputs ] if ;
 
 : call-outputs-quot ( #call word -- infos )
@@ -102,8 +102,8 @@ ERROR: invalid-outputs #call infos ;
     [ predicate-output-infos 1array ] 2bi ;
 
 : default-output-value-infos ( #call word -- infos )
-    "default-output-classes" word-prop
-    [ class-infos ] [ out-d>> length object-info <repetition> ] ?if ;
+    "default-output-classes" word-prop or*
+    [ class-infos ] [ out-d>> length object-info <repetition> ] if ;
 
 : output-value-infos ( #call word -- infos )
     {

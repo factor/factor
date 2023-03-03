@@ -59,10 +59,10 @@ PRIVATE>
         [ needs-loops ]
         [ needs-predecessors ]
         [
-            dup linear-order>> [ ] [
+            [ linear-order>> ] [
                 dup (linearization-order)
                 >>linear-order linear-order>>
-            ] ?if
+            ] ?unless
         ]
     } cleave ;
 

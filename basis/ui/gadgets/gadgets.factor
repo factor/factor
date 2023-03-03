@@ -87,7 +87,7 @@ M: gadget contains-point?
 : pick-up ( point gadget -- child/f )
     2dup [ dup point>rect ] dip children-on
     [ contains-point? ] with find-last nip
-    [ [ loc>> v- ] [ pick-up ] bi ] [ nip ] ?if ;
+    or* [ [ loc>> v- ] [ pick-up ] bi ] [ nip ] if ;
 
 : max-dims ( seq -- dim )
     [ 0 0 ] dip [ first2 swapd [ max ] 2bi@ ] each 2array ;
@@ -189,10 +189,10 @@ M: gadget dim<<
 GENERIC: pref-dim* ( gadget -- dim )
 
 : pref-dim ( gadget -- dim )
-    dup pref-dim>> [ ] [
+    [ pref-dim>> ] [
         [ pref-dim* ] [ ] [ layout-state>> ] tri
         [ drop ] [ dupd pref-dim<< ] if
-    ] ?if ;
+    ] ?unless ;
 
 : pref-dims ( gadgets -- seq ) [ pref-dim ] map ; inline
 

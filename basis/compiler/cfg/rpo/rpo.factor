@@ -17,13 +17,13 @@ IN: compiler.cfg.rpo
     [ >>number drop ] 2each ;
 
 : post-order ( cfg -- blocks )
-    dup post-order>> [ ] [
+    [ post-order>> ] [
         [
             HS{ } clone over entry>>
             post-order-traversal drop
         ] { } make dup number-blocks
         >>post-order post-order>>
-    ] ?if ;
+    ] ?unless ;
 
 : reverse-post-order ( cfg -- blocks )
     post-order <reversed> ; inline

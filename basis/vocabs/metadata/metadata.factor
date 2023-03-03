@@ -23,10 +23,10 @@ MEMO: vocab-file-lines ( vocab name -- lines/f )
     ] when ;
 
 : set-vocab-file-lines ( lines vocab name -- )
-    dupd vocab-file-path [
+    dupd vocab-file-path or* [
         swap [ ?delete-file ] [ swap utf8 set-file-lines ] if-empty
         \ vocab-file-lines reset-memoized
-    ] [ vocab-name no-vocab ] ?if ;
+    ] [ vocab-name no-vocab ] if ;
 
 : vocab-resources-path ( vocab -- path/f )
     "resources.txt" vocab-file-path ;
@@ -76,7 +76,7 @@ ERROR: bad-platform name ;
 
 : vocab-platforms ( vocab -- platforms )
     "platforms.txt" vocab-file-lines
-    [ dup "system" lookup-word [ ] [ bad-platform ] ?if ] map ;
+    [ [ "system" lookup-word ] [ bad-platform ] ?unless ] map ;
 
 : supported-platform? ( platforms -- ? )
     [ t ] [ [ os swap class<= ] any? ] if-empty ;

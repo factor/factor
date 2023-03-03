@@ -44,7 +44,7 @@ from within Factor for more information.
 
 : run-script ( file -- )
     t parser-quiet? [
-        [ parse-file [ output>array datastack. ] call( quot --  ) ]
+        [ parse-file [ output>array datastack. ] call( quot -- ) ]
         [ path>source-file main>> [ execute( -- ) ] when* ] bi
     ] with-variable ;
 

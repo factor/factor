@@ -71,7 +71,7 @@ SYMBOL: total
 : prepare-methods ( methods -- methods' prologue )
     canonicalize-specializers
     [ length [ prepare-method ] curry assoc-map ] keep
-    [ [ get ] curry ] map concat [ ] like ;
+    [ [ get ] curry ] map [ ] concat-as ;
 
 ! Part II: Topologically sorting specializers
 : maximal-element ( seq quot -- n elt )
@@ -117,7 +117,7 @@ SYMBOL: total
     [ drop object eq? ] assoc-reject
     [ [ t ] ] [
         [ (multi-predicate) ] { } assoc>map
-        unclip [ swap [ f ] \ if 3array append [ ] like ] reduce
+        unclip [ swap [ f ] \ if 3array [ ] append-as ] reduce
     ] if-empty ;
 
 : argument-count ( methods -- n )
@@ -254,7 +254,7 @@ PREDICATE: method-spec < array
     unclip generic? [ [ class? ] all? ] dip and ;
 
 syntax:M: method-spec where
-    dup unclip method [ ] [ first ] ?if where ;
+    dup unclip method or* [ first ] unless where ;
 
 syntax:M: method-spec set-where
     unclip method set-where ;

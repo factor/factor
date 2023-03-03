@@ -23,14 +23,14 @@ ERROR: invalid-cronentry value ;
     } cond ; inline recursive
 
 : parse-day ( str -- n )
-    dup string>number [ ] [
+    [ string>number ] [
         >lower $[ day-abbreviations3 [ >lower ] map ] index
-    ] ?if ;
+    ] ?unless ;
 
 : parse-month ( str -- n )
-    dup string>number [ ] [
+    [ string>number ] [
         >lower $[ month-abbreviations [ >lower ] map ] index
-    ] ?if ;
+    ] ?unless ;
 
 TUPLE: cronentry minutes hours days months days-of-week command ;
 

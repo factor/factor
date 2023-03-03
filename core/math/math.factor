@@ -131,6 +131,11 @@ GENERIC: (log2) ( x -- n ) foldable
 
 PRIVATE>
 
+ERROR: non-negative-integer-expected n ;
+
+: assert-non-negative ( n -- n )
+    dup 0 < [ non-negative-integer-expected ] when ; inline
+
 : recursive-hashcode ( n obj quot -- code )
     pick 0 <= [ 3drop 0 ] [ [ 1 - ] 2dip call ] if ; inline
 

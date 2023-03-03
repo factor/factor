@@ -26,7 +26,9 @@ CONSTANT: manual-substitutions
         { 3drop [ drop drop drop ] }
         { pop* [ pop drop ] }
         { when [ [ ] if ] }
+        { spin [ swap rot ] }
         { >boolean [ f = not ] }
+        { keep [ over [ call ] dip ] }
     }
 
 CONSTANT: trivial-defs

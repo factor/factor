@@ -62,12 +62,12 @@ PRIVATE>
     ! that this gives Cf or Mn
     ! Cf = 26; Mn = 5; Cn = 29
     ! Use a compressed array instead?
-    dup category-map ?nth [ ] [
+    [ category-map ?nth ] [
         dup 0xE0001 0xE007F between?
         [ drop 26 ] [
             0xE0100 0xE01EF between?  5 29 ?
         ] if
-    ] ?if ; inline
+    ] ?unless ; inline
 
 : category ( char -- category )
     category-num categories nth ;
@@ -88,8 +88,8 @@ PRIVATE>
 
 : (chain-decomposed) ( hash value -- newvalue )
     [
-        2dup of
-        [ (chain-decomposed) ] [ 1array nip ] ?if
+        2dup of or*
+        [ (chain-decomposed) ] [ 1array nip ] if
     ] with map concat ;
 
 : chain-decomposed ( hash -- newhash )

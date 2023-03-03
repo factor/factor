@@ -289,8 +289,14 @@ tools.test ;
 
             ! preserve file traversal order, but sort
             ! alphabetically for cross-platform testing
-            [ [ length ] bi@ = ] monotonic-split
+            [ 2length = ] monotonic-split
             [ sort ] map concat
         ] with-variable
     ] with-test-directory
 ] unit-test
+
+! test P"" pathnames
+[ "resource:extra/math" recursive-directory-files drop ] must-not-fail
+
+{ "/foo/bar" } [ P"/foo" P"./bar" append-path ] unit-test
+{ "/bar/foo" } [ P"./foo" P"/bar" prepend-path ] unit-test

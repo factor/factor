@@ -70,7 +70,7 @@ CATEGORY-NOT: (uncased) Lu Ll Lt Lm Mn Me ;
 :: map-case ( string string-quot char-quot -- case )
     string length <sbuf> :> out
     string [
-        dup special-case
+        [ special-case ]
         [ string-quot call out push-all ]
         [ char-quot call out push ] ?if
     ] each out "" like ; inline

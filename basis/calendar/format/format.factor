@@ -11,7 +11,7 @@ MACRO: formatted ( spec -- quot )
         {
             { [ dup word? ] [ 1quotation ] }
             { [ dup quotation? ] [ ] }
-            [ [ nip write ] curry [ ] like ]
+            [ [ nip write ] curry ]
         } cond
     ] map [ cleave ] curry ;
 

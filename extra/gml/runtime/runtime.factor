@@ -59,7 +59,7 @@ ERROR: unbound-name { name gml-name } ;
 
 : lookup-name ( name gml -- value )
     dupd dictionary-stack>> assoc-stack
-    [ ] [ unbound-name ] ?if ; inline
+    or* [ unbound-name ] unless ; inline
 
 GENERIC: exec-proc ( registers gml proc -- registers gml )
 

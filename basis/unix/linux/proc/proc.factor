@@ -336,5 +336,5 @@ TUPLE: pid-stat pid filename state parent-pid group-id session-id terminal#
     proc-first-line
     split-words harvest
     pid-stat "slots" word-prop length "0" pad-tail
-    [ dup string>number [ nip ] when* ] map
+    [ [ string>number ] transmute ] map
     [ pid-stat boa ] input<sequence ;

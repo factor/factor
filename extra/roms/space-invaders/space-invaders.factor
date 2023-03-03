@@ -48,7 +48,7 @@ CONSTANT: SOUND-WALK3        6
 CONSTANT: SOUND-WALK4        7
 CONSTANT: SOUND-UFO-HIT      8
 
-: init-sound ( index cpu filename  -- )
+: init-sound ( index cpu filename -- )
     absolute-path swapd [ sounds>> nth AL_BUFFER ] dip
     create-buffer-from-wav set-source-param ;
 
@@ -224,7 +224,7 @@ M: space-invaders reset
 : coin-down ( cpu -- )
     [ 1 bitor ] change-port1 drop ;
 
-: coin-up ( cpu --  )
+: coin-up ( cpu -- )
     [ 255 1 - bitand ] change-port1 drop ;
 
 : player1-down ( cpu -- )

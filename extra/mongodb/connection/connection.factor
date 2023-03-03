@@ -90,7 +90,7 @@ CONSTRUCTOR: <mdb-connection> mdb-connection ( instance -- mdb-connection ) ;
     get-nonce [ "nonce" set-cmd-opt ] [ ] bi
     calculate-key-digest "key" set-cmd-opt ; inline
 
-: perform-authentication ( --  )
+: perform-authentication ( -- )
     authenticate-cmd make-cmd
     build-auth-cmd send-cmd
     check-ok [ drop ] [ throw ] if ; inline
@@ -121,7 +121,7 @@ CONSTRUCTOR: <mdb-connection> mdb-connection ( instance -- mdb-connection ) ;
         [ split-host-str <inet> f <mdb-node> >>remote ] when* drop
     ] 2bi ;
 
-: check-node ( mdb node --  )
+: check-node ( mdb node -- )
     [ <mdb-connection> &dispose ] dip
     [ [ open-connection ] [ 3drop f ] recover ] keep swap
     [ [ get-ismaster eval-ismaster-result ] with-connection ] [ drop ] if* ;

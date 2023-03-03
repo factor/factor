@@ -22,11 +22,19 @@ GENERIC: unzip ( assoc -- keys values )
 
 M: assoc assoc-like drop ; inline
 
+: key? ( key assoc -- ? ) at* nip ; inline
+
 : ?at ( key assoc -- value/key ? )
     2dup at* [ 2nip t ] [ 2drop f ] if ; inline
 
+: ?of ( assoc key -- value/key ? )
+    swap ?at ; inline
+
 : maybe-set-at ( value key assoc -- changed? )
     3dup at* [ = [ 3drop f ] [ set-at t ] if ] [ 2drop set-at t ] if ;
+
+: set-of ( assoc key value -- assoc )
+    swap pick set-at ; inline
 
 <PRIVATE
 
@@ -47,15 +55,10 @@ M: assoc assoc-like drop ; inline
 : substituter ( assoc -- quot )
     [ ?at drop ] curry ; inline
 
-: with-assoc ( assoc quot: ( ..a value key assoc -- ..b ) -- quot: ( ..a key value -- ..b ) )
-    curry [ swap ] prepose ; inline
-
 PRIVATE>
 
 : assoc-find ( ... assoc quot: ( ... key value -- ... ? ) -- ... key value ? )
     assoc-operator find swap [ first2-unsafe t ] [ drop f f f ] if ; inline
-
-: key? ( key assoc -- ? ) at* nip ; inline
 
 : assoc-each ( ... assoc quot: ( ... key value -- ... ) -- ... )
     assoc-operator each ; inline
@@ -115,11 +118,11 @@ PRIVATE>
 : at ( key assoc -- value/f )
     at* drop ; inline
 
-: ?of ( assoc key -- value/key ? )
-    swap ?at ; inline
-
 : of ( assoc key -- value/f )
     swap at ; inline
+
+: with-assoc ( assoc quot: ( ..a value key assoc -- ..b ) -- quot: ( ..a key value -- ..b ) )
+    curry [ swap ] prepose ; inline
 
 M: assoc assoc-clone-like
     [ dup assoc-size ] dip new-assoc
@@ -130,10 +133,11 @@ M: assoc keys [ drop ] { } assoc>map ;
 M: assoc values [ nip ] { } assoc>map ;
 
 : delete-at* ( key assoc -- value/f ? )
-    [ at* ] 2keep delete-at ;
+    [ at* ] [ delete-at ] 2bi ;
 
 : ?delete-at ( key assoc -- value/key ? )
-    [ ?at ] 2keep delete-at ;
+    [ ?at ] [ delete-at ] 2bi ;
+
 
 : rename-at ( newkey key assoc -- )
     [ delete-at* ] keep [ set-at ] with-assoc [ 2drop ] if ;
@@ -157,7 +161,7 @@ M: assoc values [ nip ] { } assoc>map ;
     swap [ nip key? ] curry assoc-filter ;
 
 : assoc-union! ( assoc1 assoc2 -- assoc1 )
-    over [ set-at ] with-assoc assoc-each ;
+    [ set-of ] assoc-each ; inline
 
 : assoc-union-as ( assoc1 assoc2 exemplar -- union )
     [ [ [ assoc-size ] bi@ + ] dip new-assoc ] 2keepd

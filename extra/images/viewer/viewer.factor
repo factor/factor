@@ -14,7 +14,7 @@ M: image-gadget pref-dim* image>> [ image-dim ] [ { 640 480 } ] if* ;
 : (image-gadget-texture) ( gadget -- texture )
     dup image>> { 0 0 } <texture> >>texture texture>> ;
 : image-gadget-texture ( gadget -- texture )
-    dup texture>> [ ] [ (image-gadget-texture) ] ?if ;
+    [ texture>> ] [ (image-gadget-texture) ] ?unless ;
 
 M: image-gadget draw-gadget* ( gadget -- )
     dup image>> [

@@ -6,11 +6,8 @@ IN: math.bits
 TUPLE: bits { number read-only } { length read-only } ;
 C: <bits> bits
 
-: check-negative-bits ( n -- n )
-    dup 0 < [ non-negative-integer-expected ] when ; inline
-
 : make-bits ( number -- bits )
-    check-negative-bits
+    assert-non-negative
     [ T{ bits f 0 1 } ] [ dup abs log2 1 + <bits> ] if-zero ; inline
 
 M: bits length length>> ; inline

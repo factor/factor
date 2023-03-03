@@ -185,8 +185,8 @@ M: table layout*
     ] dip translate-column ;
 
 : table-column-alignment ( table -- seq )
-    dup renderer>> column-alignment
-    [ ] [ column-widths>> length 0 <repetition> ] ?if ;
+    [ renderer>> column-alignment ]
+    [ column-widths>> length 0 <repetition> ] ?unless ;
 
 :: row-font ( row index table -- font )
     table font>> clone

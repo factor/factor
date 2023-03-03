@@ -71,7 +71,7 @@ SYMBOLS: stacks pushed ;
 
 : top-name ( vreg -- vreg' )
     (top-name)
-    dup [ dup used-vregs get push-front ] when ;
+    [ dup used-vregs get push-front ] ?call ;
 
 RENAMING: ssa-rename [ gen-name ] [ top-name ] [ ]
 
