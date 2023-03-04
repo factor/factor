@@ -334,13 +334,14 @@ PRIVATE>
 : http-options* ( url -- response data )
     <options-request> http-request* ;
 
-: <patch-request> ( url -- request )
-    "PATCH" <client-request> ;
+: <patch-request> ( patch-data url -- request )
+    "PATCH" <client-request>
+        swap >>post-data ;
 
-: http-patch ( url -- response data )
+: http-patch ( patch-data url -- response data )
     <patch-request> http-request ;
 
-: http-patch* ( url -- response data )
+: http-patch* ( patch-data url -- response data )
     <patch-request> http-request* ;
 
 : <trace-request> ( url -- request )
