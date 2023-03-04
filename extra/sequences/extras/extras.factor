@@ -52,6 +52,9 @@ IN: sequences.extras
         ] each
     ] each end n - end seq1 subseq ;
 
+: mismatch-last ( seq1 seq2 -- i-back )
+    [ <reversed> ] bi@ mismatch ; inline
+
 : pad-longest ( seq1 seq2 elt -- seq1 seq2 )
     [ 2dup max-length ] dip [ pad-tail ] 2curry bi@ ;
 
