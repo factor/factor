@@ -36,5 +36,6 @@ IN: json.http
 : http-trace-json ( url -- response json )
     "TRACE" <json-request> http-request json> ;
 
-: http-patch-json ( url -- response json )
-    "PATCH" <json-request> http-request json> ;
+: http-patch-json ( assoc/json-string url -- response json )
+    [ <json-post-data> ] dip "PATCH" <json-request>
+      swap >>post-data http-request json> ;
