@@ -73,11 +73,14 @@ M: pasteboard set-clipboard-contents
     ! vector should be 1, since (open-window) calls auto-position
     ! after register-window.
     dup { 0 0 } = [
-        drop
-        worlds get-global length 1 <= [ -> center ] [
-            worlds get-global last second window-loc>>
-            dupd first2 <CGPoint> -> cascadeTopLeftFromPoint:
-            -> setFrameTopLeftPoint:
+        drop 
+        worlds get-global length 1 <= [
+            NSScreen -> mainScreen -> frame  size>>
+            [ w>> 16 / ] [ h>> 60 - ] bi 
+            <CGPoint> -> setFrameTopLeftPoint:
+        ] [
+            worlds get-global last second [ window-loc>> ] keep  dim>>
+            [ first2 ] bi@  drop swapd + swap  <CGPoint> -> setFrameTopLeftPoint:
         ] if
     ] [ first2 <CGPoint> -> setFrameTopLeftPoint: ] if ;
 
