@@ -334,3 +334,9 @@ PRIVATE>
 
 : assoc-each* ( ... assoc quot: ( ... value key -- ... ) -- ... )
     assoc-operator* each ; inline
+
+: collect-index-by! ( ... assoc seq quot: ( ... obj -- ... key ) -- ... assoc )
+    rot [ '[ @ swap _ push-at ] each-index ] keep ; inline
+
+: collect-index-by ( ... seq quot: ( ... obj -- ... key ) -- ... assoc )
+    [ H{ } clone ] 2dip collect-index-by! ; inline
