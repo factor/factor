@@ -2,7 +2,7 @@
 ! See https://factorcode.org/license.txt for BSD license.
 USING: accessors assocs assocs.extras calendar.parser cli.git
 formatting hashtables http.client io.pathnames json kernel math
-math.order namespaces.extras sequences sorting urls ;
+math.order namespaces.extras sequences sorting strings urls ;
 IN: github
 
 ! Github API Docs: https://docs.github.com/en/rest
@@ -14,16 +14,45 @@ IN: github
 SYMBOL: github-username
 SYMBOL: github-token
 
+: ?github-api ( str -- str' )
+    dup "https://api.github.com" head?
+    [ "https://api.github.com" prepend ] unless ;
+
 : >github-url ( str -- url )
-    >url
+    ?github-api >url
     github-username required >>username
     github-token required >>password ;
 
-: json-get ( endpoint -- json ) http-get nip json> ;
-: json-post ( post-data endpoint -- json ) http-post nip json> ;
+: ?>json ( obj -- json ) dup string? [ >json ] unless ;
+: ?json> ( obj -- json/f ) f like [ json> ] ?call ;
+
+: json-get* ( endpoint -- res json ) http-get* ?json> ;
+: json-post* ( post-data endpoint -- res json ) http-post* ?json> ;
+: json-put* ( post-data endpoint -- res json ) http-put* ?json> ;
+: json-patch* ( patch-data endpoint -- res json ) http-patch* ?json> ;
+: json-delete* ( endpoint -- res json ) http-delete* ?json> ;
+
+: github-get* ( url -- res json ) >github-url json-get* ;
+: github-post* ( post-data url -- res json ) [ ?>json ] [ >github-url ] bi* json-post* ;
+: github-put* ( post-data url -- res json ) [ ?>json ] [ >github-url ] bi* json-put* ;
+: github-patch* ( post-data url -- res json ) [ ?>json ] [ >github-url ] bi* json-patch* ;
+: github-delete* ( url -- res json ) >github-url json-delete* ;
+
+! 204 is ok, 404 is not
+: code-ok? ( response -- code ) code>> 204 = ; inline
+: github-get-code ( url -- json ) github-get* drop code-ok? ;
+
+: json-get ( endpoint -- json ) http-get nip ?json> ;
+: json-post ( post-data endpoint -- json ) http-post nip ?json> ;
+: json-put ( post-data endpoint -- json ) http-put nip ?json> ;
+: json-patch ( patch-data endpoint -- json ) http-patch nip ?json> ;
+: json-delete ( endpoint -- json ) http-delete nip ?json> ;
 
 : github-get ( url -- json ) >github-url json-get ;
-: github-post ( post-data url -- json ) >github-url json-post ;
+: github-post ( post-data url -- json ) [ ?>json ] [ >github-url ] bi* json-post ;
+: github-put ( post-data url -- json ) [ ?>json ] [ >github-url ] bi* json-put ;
+: github-patch ( post-data url -- json ) [ ?>json ] [ >github-url ] bi* json-patch ;
+: github-delete ( url -- json ) >github-url json-delete ;
 
 ! type is one of { "orgs" "users" }
 : map-github-pages ( base-url params param-string -- seq )
@@ -32,57 +61,153 @@ SYMBOL: github-token
         dup empty? [ 2drop f f ] when
     ] produce nip concat ; inline
 
+: map-github-pages-100 ( base-url -- seq )
+    { 100 } "?per_page=%d&page=%d" map-github-pages ;
+
 : get-repositories ( type org/user -- seq )
-    "https://api.github.com/%s/%s/repos" sprintf
-    { 100 } "?per_page=%d&page=%d" map-github-pages ;
+    "/%s/%s/repos" sprintf map-github-pages-100 ;
 
-: get-repository-issues ( owner repo -- seq )
-    "https://api.github.com/repos/%s/%s/issues" sprintf
-    { 100 } "?per_page=%d&page=%d" map-github-pages ;
+: list-repository-languages ( owner repo -- seq )
+    "/repos/%s/%s/languages" sprintf github-get ;
 
-: get-repository-pulls ( owner repo -- seq )
-    "https://api.github.com/repos/%s/%s/pulls" sprintf
-    { 100 } "?per_page=%d&page=%d" map-github-pages ;
+: list-repository-tags ( owner repo -- seq )
+    "/repos/%s/%s/tags" sprintf github-get ;
+
+: list-repository-teams ( owner repo -- seq )
+    "/repos/%s/%s/teams" sprintf github-get ;
+
+: list-repository-topics ( owner repo -- seq )
+    "/repos/%s/%s/topics" sprintf github-get ;
+
+: check-enabled-vulnerability-alerts ( owner repo -- json )
+    "/repos/%s/%s/vulnerability-alerts" sprintf github-get-code ;
+
+: enable-vulnerability-alerts ( owner repo -- json )
+    [ f ] 2dip
+    "/repos/%s/%s/vulnerability-alerts" sprintf github-put ;
+
+: disable-vulnerability-alerts ( owner repo -- json )
+    "/repos/%s/%s/vulnerability-alerts" sprintf github-delete ;
+
+: get-codes-of-conduct ( -- seq ) "/codes_of_conduct" github-get ;
+! key: contributor_covenant|citizen_code_of_conduct
+: get-code-of-conduct ( key -- seq ) "/codes_of_conduct/%s" sprintf github-get ;
+
+! H{ { "names" { "programming-language" "factor" "stack" "concatenative" "language" } }
+: set-repository-topics ( assoc owner repo -- json )
+    [ >json ] 2dip "/repos/%s/%s/topics" sprintf github-put ;
+
+: get-forks ( owner repo -- seq )
+    "/repos/%s/%s/forks" sprintf github-get ;
+
+! H{ { "organization" "rotcaf" } { "name" "pr-fun" } { "default_branch_only" "true" } }
+: create-fork ( json owner repo -- res )
+    [ >json ] 2dip "/repos/%s/%s/forks" sprintf github-post ;
+
+: get-issues ( owner repo -- seq )
+    "/repos/%s/%s/issues" sprintf map-github-pages-100 ;
+
+! Pull Requests
+: get-pull-requests ( owner repo -- seq )
+    "/repos/%s/%s/pulls" sprintf map-github-pages-100 ;
+
+: get-pull-request ( owner repo n -- seq )
+    "/repos/%s/%s/pulls/%d" sprintf github-get ;
+
+! H{ { "title" "pr2 - updated!" } { "head" "pr2" } { "base" "main" } { "body" "omg pr2 first post" } { "head_repo" "repo-string" } { "issue" 1 } { "draft" "true" } }
+: post-pull-request ( assoc owner repo -- res )
+    [ >json ] 2dip "/repos/%s/%s/pulls" sprintf github-post ;
+
+: update-pull-request ( assoc owner repo n -- res )
+    [ >json ] 3dip "/repos/%s/%s/pulls/%d" sprintf github-patch ;
+
+: list-commits-pull-request ( owner repo n -- res )
+    "/repos/%s/%s/pulls/%d/commits" sprintf map-github-pages-100 ;
+
+: list-files-pull-request ( owner repo n -- res )
+    "/repos/%s/%s/pulls/%d/files" sprintf map-github-pages-100 ;
+
+: pull-request-merged? ( owner repo n -- res )
+    "/repos/%s/%s/pulls/%d/merge" sprintf github-get-code ;
+
+! H{ { "commit_title" "oh wow" } { "commit_message" "messaged123" } { "merge_method" "merge|squash|rebase" } { "sha" "0c001" } }
+: merge-pull-request ( assoc owner repo n -- res )
+    [ >json ] 3dip "/repos/%s/%s/pulls/%d/merge" sprintf github-put ;
+
+! H{ { "expected_head_shastring" "0c001" } }
+: update-branch-pull-request ( assoc owner repo n -- res )
+    [ >json ] 3dip "/repos/%s/%s/pulls/%d/update-branch" sprintf github-put ;
 
 : get-users-page ( page -- seq )
-    [ "https://api.github.com/users" ] dip
+    [ "/users" ] dip
     '{ 100 _ } "?per_page=%d&page=%d" vsprintf append github-get ;
 
-: get-respository-labels ( owner repo -- seq )
-    "https://api.github.com/repos/%s/%s/labels" sprintf
-    '{ 100 } "?per_page=%d&page=%d" map-github-pages ;
+: get-labels ( owner repo -- seq )
+    "/repos/%s/%s/labels" sprintf map-github-pages-100 ;
 
-: get-respository-label-names ( owner repo -- seq )
-    get-respository-labels [ "name" of ] map ;
+: get-label-names ( owner repo -- seq )
+    get-labels [ "name" of ] map ;
 
 : get-issues-by-label ( owner repo -- seq )
-    get-repository-issues
+    get-issues
     [ "labels" of [ "name" of ] map ] collect-by-multi ;
 
 : get-issues-for-label ( owner repo label -- seq )
     [ get-issues-by-label ] dip of ;
 
 : get-issues-by-all-labels ( owner repo -- seq )
-    [ get-respository-label-names [ V{ } clone ] H{ } map>assoc ]
-    [ get-repository-issues ] 2bi
+    [ get-label-names [ V{ } clone ] H{ } map>assoc ]
+    [ get-issues ] 2bi
     [ "labels" of [ "name" of ] map ] collect-by-multi! ;
 
 : get-empty-labels ( owner repo -- seq ) get-issues-by-all-labels sift-values ;
-: get-issues-with-no-labels ( owner repo -- seq ) get-repository-issues [ "labels" of empty? ] filter ;
+: get-issues-with-no-labels ( owner repo -- seq ) get-issues [ "labels" of empty? ] filter ;
 
-: get-user ( user -- json ) "https://api.github.com/users/%s" sprintf github-get ;
+: get-user ( user -- json ) "/users/%s" sprintf github-get ;
 : get-users ( users -- seq ) [ get-user ] map ;
 
 : get-org-repositories ( org -- seq ) [ "orgs" ] dip get-repositories ;
 : get-user-repositories ( user -- seq ) [ "users" ] dip get-repositories ;
 
-: get-branches ( owner repo -- json ) "https://api.github.com/repos/%s/%s/branches" sprintf github-get ;
-: get-branch ( owner repo branch -- json ) "https://api.github.com/repos/%s/%s/branches/%s" sprintf github-get ;
+: get-branches ( owner repo -- json ) "/repos/%s/%s/branches" sprintf github-get ;
+: get-branch ( owner repo branch -- json ) "/repos/%s/%s/branches/%s" sprintf github-get ;
 : post-rename-branch ( owner repo branch new-name -- json )
     "new-name" associate -roll
-    "https://api.github.com/repos/%s/%s/branches/%s/rename" sprintf >github-url json-post ;
+    "/repos/%s/%s/branches/%s/rename" sprintf >github-url json-post ;
 
-: get-my-issues ( -- json ) "https://api.github.com/issues" github-get ;
+: get-my-issues ( -- json ) "/issues" github-get ;
+: get-my-org-issues ( org -- json ) "/orgs/%s/issues" sprintf github-get ;
+! H{ { "title" "issue 1" } { "body" "dear, i found a bug" } { "assignees" { "erg" "mrjbq7" } } } >json
+: create-issue ( json owner repo -- json )
+    "/repos/%s/%s/issues" sprintf github-post ;
+: get-issue ( owner repo n -- json )
+    "/repos/%s/%s/issues/%d" sprintf github-get ;
+! H{ { "title" "issue 1" } { "body" "dear, i found a bug" } { "state" "open|closed" } { "state_reason" "completed|not_planned|reopened|null" } { "assignees" { "erg" "mrjbq7" } } } ! milestone, labels
+: update-issue ( json owner repo n -- json )
+    "/repos/%s/%s/issues/%d" sprintf github-patch ;
+
+! issue comments
+: list-issue-comments ( owner repo -- json )
+    "/repos/%s/%s/issues/comments" sprintf github-get ;
+: list-issue-comment-by-id ( owner repo comment-id -- json )
+    "/repos/%s/%s/issues/comments/%s" sprintf github-get ;
+! H{ { "body" "update my stuff" } }
+: update-issue-comment-by-id ( json owner repo comment-id -- json )
+    "/repos/%s/%s/issues/comments/%s" sprintf github-patch ;
+: delete-issue-comment-by-id ( owner repo comment-id -- json )
+    "/repos/%s/%s/issues/comments/%s" sprintf github-delete ;
+: list-issue-comments-by-id ( owner repo comment-id -- json )
+    "/repos/%s/%s/issues/%d/comments" sprintf github-get ;
+! H{ { "body" "update my stuff" } }
+: create-issue-comment-by-id ( json owner repo issue-number -- json )
+    "/repos/%s/%s/issues/%d/comments" sprintf github-post ;
+
+! H{ { "lock_reason" "topic|too heated|resolved|spam" } }
+: lock-issue ( json owner repo n -- json )
+    "/repos/%s/%s/issues/%d/lock" sprintf github-put ;
+: unlock-issue ( owner repo n -- json )
+    "/repos/%s/%s/issues/%d/lock" sprintf github-delete ;
+: user-issues ( -- json ) "/user/issues" github-get ;
 
 : find-repos-by-name ( seq quot: ( name -- ? ) -- seq' ) '[ "name" of @ ] filter ; inline
 : find-repos-by-visibility ( seq quot: ( name -- ? ) -- seq' ) '[ "visibility" of @ ] filter ; inline
