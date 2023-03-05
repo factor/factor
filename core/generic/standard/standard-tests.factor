@@ -391,7 +391,7 @@ GENERIC: move-method-generic ( a -- b )
 
 [ "IN: generic.standard.tests.a" <string-reader> "move-method-test-1" parse-stream ] must-not-fail
 
-{ { string } } [ \ move-method-generic generic-order ] unit-test
+{ { string } } [ \ move-method-generic dispatch-order ] unit-test
 
 ! FORGET: on method wrappers
 GENERIC: forget-test ( a -- b )
