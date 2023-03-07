@@ -13,7 +13,7 @@ HELP: [let
 { $examples "See " { $link "locals-examples" } "." } ;
 
 HELP: :>
-{ $syntax ":> var" ":> var!" ":> ( var-1 var-2 ... )" }
+{ $syntax ":> var\n:> var!\n:> ( var-1 var-2 ... )" }
 { $description "Binds one or more new lexical variables. In the " { $snippet ":> var" } " form, the value on the top of the datastack is bound to a new lexical variable named " { $snippet "var" } " and is scoped to the enclosing quotation, " { $link POSTPONE: [let } " form, or " { $link POSTPONE: :: } " definition."
 $nl
 "The " { $snippet ":> ( var-1 ... )" } " form binds multiple variables to the top values of the datastack in right to left order, with the last variable bound to the top of the datastack. These two snippets have the same effect:"
