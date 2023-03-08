@@ -30,7 +30,7 @@ $nl
 "Examples of wrapped hastable objects can be seen in:"
 { $list 
   { $vocab-link "hashtables.identity" }
-  { $vocab-link "hashtables.sequence" }
+  { $vocab-link "hashtables.sequences" }
   { $vocab-link "hashtables.numbers" }
 }
 ;
