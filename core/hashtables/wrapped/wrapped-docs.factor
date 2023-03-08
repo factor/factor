@@ -8,10 +8,10 @@ HELP: wrap-key
     { "key" object } { "wrapped-hash" object }
     { "wrapped-key" object }
 }
-{ $description "" } ;
+{ $description "An object that wraps a key and provides a different hashcode implementation." } ;
 
 HELP: wrapped-hashtable
-{ $class-description "" } ;
+{ $class-description "A hashtable that uses wrapped keys to provide a different hashcode implementation." } ;
 
 ARTICLE: "hashtables.wrapped" "Wrapped Hashtable protocol"
 "The " { $vocab-link "hashtables.wrapped" } " describes a protocol for defining hashtables that "
