@@ -14,7 +14,7 @@ CONSTANT: download-url URL" https://downloads.factorcode.org/images/master/"
     md5 checksum-file bytes>hex-string ;
 
 : download-checksum ( image -- checksum )
-    download-checksums at ;
+    download-checksums at " " split1 drop ;
 
 : need-new-image? ( image -- ? )
     dup file-exists?

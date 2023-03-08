@@ -14,6 +14,8 @@ CONSTANT: openssl-md5 T{ openssl-checksum f "md5" }
 
 CONSTANT: openssl-sha1 T{ openssl-checksum f "sha1" }
 
+CONSTANT: openssl-sha256 T{ openssl-checksum f "sha256" }
+
 C: <openssl-checksum> openssl-checksum
 
 <PRIVATE
