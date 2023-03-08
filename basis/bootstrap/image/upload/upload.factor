@@ -42,8 +42,9 @@ SYMBOL: build-images-destination
     checksums-path ascii [
         boot-image-names [
             [ write bl ]
-            [ openssl-md5 checksum-file bytes>hex-string print ]
-            bi
+            [ openssl-md5 checksum-file bytes>hex-string write bl ]
+            [ openssl-sha256 checksum-file bytes>hex-string print ]
+            tri
         ] each
     ] with-file-writer ;
 
