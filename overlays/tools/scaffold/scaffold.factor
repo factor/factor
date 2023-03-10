@@ -38,8 +38,5 @@ IN: tools.scaffold
     ] if ;
 PRIVATE>
 
-: scaffold-overlays ( string -- )
-    "resource:overlays" swap scaffold-vocab-in ;
-
 : scaffold-my-work ( string -- )
     "~/factorwork" normalize-path swap scaffold-vocab-in ;
