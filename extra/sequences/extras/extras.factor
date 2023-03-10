@@ -52,6 +52,9 @@ IN: sequences.extras
         ] each
     ] each end n - end seq1 subseq ;
 
+: mismatch-last ( seq1 seq2 -- i-back )
+    [ <reversed> ] bi@ mismatch ; inline
+
 : pad-longest ( seq1 seq2 elt -- seq1 seq2 )
     [ 2dup max-length ] dip [ pad-tail ] 2curry bi@ ;
 
@@ -332,7 +335,7 @@ PRIVATE>
 : classify ( seq -- seq' ) classify* 2nip ; inline
 
 : occurrence-count-by ( seq quot: ( elt -- elt' ) -- hash seq' )
-    '[ nip @ over inc-at* drop ] [ H{ } clone ] 2dip 0accumulate ; inline
+    '[ nip @ over inc-at* drop ] [ H{ } clone ] 2dip { } 0accumulate-as ; inline
 
 : progressive-index-by-as ( seq1 seq2 quot exemplar -- hash seq' )
     [

@@ -53,7 +53,7 @@ PRIVATE>
 : method-classes ( generic -- classes )
     "methods" word-prop keys ;
 
-: order ( generic -- seq )
+: dispatch-order ( generic -- seq )
     method-classes sort-classes ;
 
 : nearest-class ( class generic -- class/f )

@@ -150,15 +150,15 @@ DEFER: foo
 ] unit-test
 
 { t } [
-    array "smudge-me" "parser.tests" lookup-word order member-eq?
+    array "smudge-me" "parser.tests" lookup-word dispatch-order member-eq?
 ] unit-test
 
 { t } [
-    integer "smudge-me" "parser.tests" lookup-word order member-eq?
+    integer "smudge-me" "parser.tests" lookup-word dispatch-order member-eq?
 ] unit-test
 
 { f } [
-    string "smudge-me" "parser.tests" lookup-word order member-eq?
+    string "smudge-me" "parser.tests" lookup-word dispatch-order member-eq?
 ] unit-test
 
 { } [

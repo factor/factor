@@ -16,7 +16,7 @@ INSTANCE: c m2
 
 { } [ [ c m1 add-mixin-instance ] with-compilation-unit ] unit-test
 
-{ { m2 m1 } } [ \ g order ] unit-test
+{ { m2 m1 } } [ \ g dispatch-order ] unit-test
 
 { 1 } [ foo ] unit-test
 

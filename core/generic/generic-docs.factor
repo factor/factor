@@ -17,8 +17,8 @@ $nl
 { $code "{ object generic class }" }
 "Neither " { $link class } " nor " { $link generic } " are subclasses of each other, and their intersection is non-empty. Calling " { $snippet "explain" } " with a word on the stack that is both a class and a generic word will print " { $snippet "a class word" } " because " { $link class } " is more specific than " { $link generic } " in the class linearization order. (One example of a word which is both a class and a generic word is the class of classes, " { $link class } ", which is also a word to get the class of an object.)"
 $nl
-"The " { $link order } " word can be useful to clarify method dispatch order:"
-{ $subsections order } ;
+"The " { $link dispatch-order } " word can be useful to clarify method dispatch order:"
+{ $subsections dispatch-order } ;
 
 ARTICLE: "generic-introspection" "Generic word introspection"
 "In most cases, generic words and methods are defined at parse time with " { $link POSTPONE: GENERIC: } " (or some other parsing word) and " { $link POSTPONE: M: } "."
@@ -148,7 +148,7 @@ HELP: <method>
 { $values { "class" class } { "generic" generic } { "method" "a new method definition" } }
 { $description "Creates a new method." } ;
 
-HELP: order
+HELP: dispatch-order
 { $values { "generic" generic } { "seq" { $sequence class } } }
 { $description "Outputs a sequence of classes for which methods have been defined on this generic word. The sequence is sorted in method dispatch order." } ;
 
@@ -167,7 +167,7 @@ HELP: create-method
 { $description "Creates a method or returns an existing one. This is the runtime equivalent of " { $link POSTPONE: M: } "." }
 { $notes "To define a method, pass the output value to " { $link define } "." } ;
 
-{ sort-classes order } related-words
+{ sort-classes dispatch-order } related-words
 
 HELP: (call-next-method)
 { $values { "method" method } }
