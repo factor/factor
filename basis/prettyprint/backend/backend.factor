@@ -5,7 +5,7 @@ classes.algebra.private classes.maybe classes.private
 classes.tuple combinators combinators.short-circuit
 continuations effects generic hash-sets hashtables io.pathnames
 io.styles kernel lists make math math.order math.parser
-namespaces prettyprint.config prettyprint.custom
+namespaces prettyprint prettyprint.config prettyprint.custom
 prettyprint.sections prettyprint.stylesheet quotations sbufs
 sequences strings vectors words ;
 QUALIFIED: sets
@@ -206,16 +206,14 @@ M: tuple pprint*
     [ nip ]
     [ [ drop ] prepose [ recover-pprint ] 2curry ] 2bi if ; inline
 
-: do-length-limit ( seq -- trimmed n/f )
-    length-limit get dup [
-        1 - over length over [-]
-        dup 1 > [ [ head-slice ] dip ] [ 2drop f ] if
-    ] when ;
-
+:: do-length-limit ( seq -- 'seq )
+    length-limit get :> ll
+    seq dup length ll >
+    [ ll 2 /i [ 1 - head ] [ tail* ] 2bi "…" glue ]
+    when ;
+   
 : pprint-elements ( seq -- )
-    do-length-limit
-    [ [ pprint* ] each ] dip
-    [ number>string "~" " more~" surround text ] when* ;
+    do-length-limit pprint ;
 
 M: quotation pprint-delims drop \ [ \ ] ;
 M: curried pprint-delims drop \ [ \ ] ;
