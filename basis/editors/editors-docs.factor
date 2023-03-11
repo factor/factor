@@ -32,7 +32,7 @@ $nl
     "a child process." }
 }
 $nl
-"Every editor is required to reserve its own " { $link editor-class }  ". For example:"
+"Every editor is required to reserve its own " { $link editor-class } ". For example:"
 { $code "SINGLETON: foo" }
 { $link editor-class } " will be set to this singleton when Factor is set to use your editor of"
 " choice. Now, we will define words that will dispatch when the editor class is set to " 
