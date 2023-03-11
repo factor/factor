@@ -4,7 +4,7 @@ USING: tools.test suffix-arrays kernel namespaces sequences ;
 
 ! built from [ all-words 10 head [ name>> ] map ]
 { } [
-     {
+    {
         "run-tests"
         "must-fail-with"
         "test-all"

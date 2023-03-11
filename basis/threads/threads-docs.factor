@@ -175,7 +175,7 @@ HELP: spawn
 $nl
 "The new thread begins with an empty data stack, an empty retain stack, and an empty catch stack. The name stack is inherited from the parent thread but may be cleared with " { $link init-namestack } "." }
 { $notes
-     "The recommended way to pass data to the new thread is to explicitly construct a quotation containing the data, for example using " { $link curry } " or " { $link compose } "."
+    "The recommended way to pass data to the new thread is to explicitly construct a quotation containing the data, for example using " { $link curry } " or " { $link compose } "."
 }
 { $examples
     "A simple thread that adds two numbers:"

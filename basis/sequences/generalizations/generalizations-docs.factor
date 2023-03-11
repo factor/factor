@@ -50,7 +50,7 @@ HELP: firstn
 
 HELP: ?firstn
 { $values { "n" integer } }
-{ $description "A generalization of " { $link ?first } " that pushes the first " { $snippet "n" } " elements of a sequence on the stack, or " { $link f }  " if the sequence is shorter than the requested number of elements." }
+{ $description "A generalization of " { $link ?first } " that pushes the first " { $snippet "n" } " elements of a sequence on the stack, or " { $link f } " if the sequence is shorter than the requested number of elements." }
 { $examples
     "Some core words expressed in terms of " { $link ?firstn } ":"
     { $table
