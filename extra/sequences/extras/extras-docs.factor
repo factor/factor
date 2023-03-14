@@ -1008,7 +1008,7 @@ HELP: map-product
     { "seq" sequence } { "quot" quotation }
     { "n" integer }
 }
-{ $description "Like " { $link map-product } ", but without creating an intermediate sequence." } ;
+{ $description "Like " { $code "map product" } ", but without creating an intermediate sequence." } ;
 
 HELP: map-sift
 { $values

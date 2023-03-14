@@ -156,14 +156,12 @@ Then subsequent fetches will automatically update any replace objects.
 
 ## Community
 
-Factor developers used to meet in the `#concatenative` channel on
-[irc.libera.chat](http://libera.chat). Drop by if you want to discuss
-anything related to Factor or language design in general.
+Factor developers are quite active in [the Factor Discord server](https://discord.gg/QxJYZx3QDf).
+Drop by if you want to discuss anything related to Factor or language design in general.
 
 * [Factor homepage](https://factorcode.org)
 * [Concatenative languages wiki](https://concatenative.org)
 * [Join the mailing list](https://concatenative.org/wiki/view/Factor/Mailing%20list)
-* [Join the Factor Discord](http://discord.gg/QxJYZx3QDf)
 * Search for "factorcode" on [Gitter](https://gitter.im/)
 
 Have fun!

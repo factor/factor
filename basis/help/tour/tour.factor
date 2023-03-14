@@ -639,9 +639,9 @@ them, which are embodied in the listener. Many functions of the listener can be 
 You have seen some examples of this:
 
 { $list
-  { "The help is navigable online, but you can also invoke it with "  { $link help }  " and print help items with "  { $link print-content }  " ; "  }
-  { "The "  { $snippet  "F2"  }  " shortcut or the words "  { $link refresh }  " and "  { $link refresh-all }  " can be used to refresh vocabularies from disk while continuing working in the listener; "  }
-  { "The "  { $link edit  }  " word gives you editor integration, but you can also click on file names in the help pages for vocabularies to open them. "  }
+  { "The help is navigable online, but you can also invoke it with " { $link help } " and print help items with " { $link print-content } " ; " }
+  { "The " { $snippet "F2" } " shortcut or the words " { $link refresh } " and " { $link refresh-all } " can be used to refresh vocabularies from disk while continuing working in the listener;" }
+  { "The " { $link edit } " word gives you editor integration, but you can also click on file names in the help pages for vocabularies to open them." }
 }
 
 The refresh is an efficient mechanism. Whenever a word is redefined, words that depend on it are recompiled against the new 
