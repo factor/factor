@@ -603,9 +603,17 @@ HELP: reject-as
 { $description "Applies the quotation to each element in turn, and outputs a new sequence of the same type as " { $snippet "exemplar" } " remove the elements of the original sequence for which the quotation output a true value." } ;
 
 HELP: reject!
-{ $values { "seq" "a resizable mutable sequence" } { "quot" { $quotation ( ... elt -- ... ? ) } } }
+{ $values { "seq" "a resizable mutable sequence." } { "quot" { $quotation ( ... elt -- ... ? ) } } }
 { $description "Applies the quotation to each element in turn, and removes elements for which the quotation outputs a true value." }
-{ $side-effects "seq" } ;
+{ $notes "seq MUST be resizeable ( see " { $link "vectors" } ")." } 
+{ $side-effects "seq" }
+{ $examples
+  "Remove the odd numbers"
+  { $example
+    "USING: sequences ;"
+    "V{ 1 2 3 4 5 6 7 8 9 0 } [ odd? ] reject! . "
+    "V{ 2 4 6 }"
+  } } ;
 
 HELP: interleave
 { $values { "seq" sequence } { "between" quotation } { "quot" { $quotation ( ... elt -- ... ) } } }
