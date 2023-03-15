@@ -127,7 +127,7 @@ DLL_OBJS = $(PLAF_DLL_OBJS) \
 
 # batch mode has ::
 .cpp.obj::
-	cl /EHsc $(CL_FLAGS) /W4 /MP /Fovm/ /c $<
+	cl /EHsc $(CL_FLAGS) /MP /Fovm/ /c $<
 
 .c.obj::
 	cl /EHsc $(CL_FLAGS) /MP /Fovm/ /c $<
