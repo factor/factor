@@ -23,6 +23,7 @@
 .*.swp
 .DS_Store
 .gdb_history
+.vs
 /factor
 /logs
 /work

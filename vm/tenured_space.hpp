@@ -6,8 +6,8 @@ struct tenured_space : free_list_allocator<object> {
   tenured_space(cell size, cell start)
       : free_list_allocator<object>(size, start), starts(size, start) {}
 
-  object* allot(cell size) {
-    object* obj = free_list_allocator<object>::allot(size);
+  object* allot(cell dsize) {
+    object* obj = free_list_allocator<object>::allot(dsize);
     if (obj) {
       starts.record_object_start_offset(obj);
       return obj;
@@ -28,8 +28,8 @@ struct tenured_space : free_list_allocator<object> {
   }
 
   cell next_object_after(cell scan) {
-    cell size = ((object*)scan)->size();
-    return next_allocated_object_after(scan + size);
+    cell data_size = ((object*)scan)->size();
+    return next_allocated_object_after(scan + data_size);
   }
 
   void sweep() {
