@@ -66,6 +66,7 @@ CONSTANT: word-renames {
     ! { "?if" { "?if" "0.99" } }
     { "ensure-non-negative" { "assert-non-negative" "0.99" } }
     { "order" { "dispatch-order" "0.99" } }
+    { "TEST:" { "DEFINE-TEST-WORD:" "0.99" } }
 }
 
 : compute-assoc-fixups ( continuation name assoc -- seq )
