@@ -1,0 +1,5 @@
+! Copyright (C) 2023 Raghu Ranganathan.
+! See https://factorcode.org/license.txt for BSD license.
+USING: ;
+IN: ui.gadgets.labels
+
