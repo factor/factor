@@ -66,3 +66,6 @@ M: standard-combination mega-cache-quot
 M: standard-generic definer drop \ GENERIC#: f ;
 
 M: simple-generic definer drop \ GENERIC: f ;
+
+M: standard-combination make-consult-quot
+    drop '[ _ call _ execute ] nip ;

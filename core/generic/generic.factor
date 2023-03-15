@@ -216,3 +216,6 @@ M: generic subwords
 
 M: class forget-methods
     [ implementors ] [ [ swap ?lookup-method ] curry ] bi map forget-all ;
+
+! Consultation/delegation support
+GENERIC: make-consult-quot ( consultation word quot combination -- consult-quot )
