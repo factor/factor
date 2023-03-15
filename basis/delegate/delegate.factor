@@ -1,10 +1,10 @@
 ! Copyright (C) 2007, 2008 Daniel Ehrenberg
 ! Portions copyright (C) 2009, 2010 Slava Pestov, Joe Groff
 ! See https://factorcode.org/license.txt for BSD license.
-USING: accessors arrays assocs classes classes.tuple
-compiler.units definitions effects fry generic generic.standard
-hashtables kernel lexer make math namespaces parser sequences
-sets slots words words.symbol ;
+USING: accessors arrays assocs classes classes.tuple combinators
+compiler.units definitions effects fry generic generic.hook generic.standard
+hashtables kernel lexer make math namespaces parser sequences sets slots
+words words.symbol ;
 IN: delegate
 
 ERROR: broadcast-words-must-have-no-outputs group ;
@@ -44,8 +44,6 @@ M: tuple-class group-words
 
 TUPLE: consultation group class quot loc ;
 
-TUPLE: hook-consultation < consultation ;
-
 TUPLE: broadcast < consultation ;
 
 : <consultation> ( group class quot -- consultation )
@@ -53,9 +51,6 @@ TUPLE: broadcast < consultation ;
 
 : <broadcast> ( group class quot -- consultation )
     [ check-broadcast-group ] 2dip f broadcast boa ;
-
-: <hook-consultation> ( group class quot -- hook-consultation )
-    f hook-consultation boa ;
 
 : create-consult-method ( word consultation -- method )
     [ class>> swap first create-method dup fake-definition ] keep
@@ -70,16 +65,10 @@ M: consult-method reset-word
 GENERIC#: (consult-method-quot) 2 ( consultation quot word -- object )
 
 M: consultation (consult-method-quot)
-    '[ _ call _ execute ] nip ;
+    dup "combination" word-prop make-consult-quot ;
 
 M: broadcast (consult-method-quot)
     '[ _ call [ _ execute ] each ] nip ;
-
-M: hook-consultation (consult-method-quot) ( consultation quot word -- object )
-    [ drop ] 2dip ! consultation no longer necessary
-    dup "combination" word-prop var>> ! (quot word var)
-    -rot ! (var quot word)
-    '[ _ _ call swap [ _ execute ] with-variable ] ;
 
 : consult-method-quot ( consultation word -- object )
     [ dup quot>> ] dip
@@ -122,10 +111,6 @@ PRIVATE>
 
 SYNTAX: CONSULT:
     scan-word scan-word parse-definition <consultation>
-    [ save-location ] [ define-consult ] bi ;
-
-SYNTAX: HOOK-CONSULT:
-    scan-word scan-word parse-definition <hook-consultation>
     [ save-location ] [ define-consult ] bi ;
 
 SYNTAX: BROADCAST:
