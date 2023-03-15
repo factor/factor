@@ -44,7 +44,7 @@ M: tuple-class group-words
 
 TUPLE: consultation group class quot loc ;
 
-TUPLE: hook-consultation < consultation hook-var ;
+TUPLE: hook-consultation < consultation ;
 
 TUPLE: broadcast < consultation ;
 
@@ -54,12 +54,8 @@ TUPLE: broadcast < consultation ;
 : <broadcast> ( group class quot -- consultation )
     [ check-broadcast-group ] 2dip f broadcast boa ;
 
-:: <hook-consultation> ( group class var quot -- hook-consultation )
-    hook-consultation new
-    group >>group
-    class >>class
-    quot >>quot
-    var >>hook-var ;
+: <hook-consultation> ( group class quot -- hook-consultation )
+    f hook-consultation boa ;
 
 : create-consult-method ( word consultation -- method )
     [ class>> swap first create-method dup fake-definition ] keep
@@ -80,7 +76,9 @@ M: broadcast (consult-method-quot)
     '[ _ call [ _ execute ] each ] nip ;
 
 M: hook-consultation (consult-method-quot) ( consultation quot word -- object )
-    [ hook-var>> ] 2dip
+    [ drop ] 2dip ! consultation no longer necessary
+    dup "combination" word-prop var>> ! (quot word var)
+    -rot ! (var quot word)
     '[ _ _ call swap [ _ execute ] with-variable ] ;
 
 : consult-method-quot ( consultation word -- object )
@@ -127,7 +125,7 @@ SYNTAX: CONSULT:
     [ save-location ] [ define-consult ] bi ;
 
 SYNTAX: HOOK-CONSULT:
-    scan-word scan-word scan-word parse-definition <hook-consultation>
+    scan-word scan-word parse-definition <hook-consultation>
     [ save-location ] [ define-consult ] bi ;
 
 SYNTAX: BROADCAST:
