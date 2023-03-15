@@ -28,6 +28,6 @@ M: hook-generic effective-method
 M: hook-combination make-consult-quot
     drop          ! combination no longer necessary
     [ drop ] 2dip ! consultation no longer necessary
-    dup "combination" word-prop var>> ! (quot word var)
-    -rot ! (var quot word)
+    [ "combination" word-prop var>> ] keep ! (quot var word)
+    [ swap ] dip ! (var quot word)
     '[ _ _ call swap [ _ execute ] with-variable ] ;
