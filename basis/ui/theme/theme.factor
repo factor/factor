@@ -1,6 +1,6 @@
 ! Copyright (C) 2016 Nicolas Pénet.
 ! See https://factorcode.org/license.txt for BSD license.
-USING: colors namespaces ;
+USING: colors delegate namespaces ;
 IN: ui.theme
 
 SYMBOL: theme
@@ -92,6 +92,37 @@ HOOK: focus-border-color theme ( -- color )
 HOOK: labeled-border-color theme ( -- color )
 
 HOOK: table-border-color theme ( -- color )
+
+! Protocol
+
+PROTOCOL: theme-protocol
+toolbar-background toolbar-button-pressed-background
+menu-background menu-border-color status-bar-background
+status-bar-foreground button-text-color
+button-clicked-text-color line-color column-title-background
+roll-button-rollover-border roll-button-selected-background
+source-files-color errors-color details-color debugger-color
+completion-color data-stack-color retain-stack-color
+call-stack-color title-bar-gradient popup-color object-color
+contents-color help-header-background
+thread-status-stopped-background
+thread-status-suspended-background
+thread-status-running-background
+thread-status-stopped-foreground
+thread-status-suspended-foreground
+thread-status-running-foreground error-summary-background
+content-background text-color link-color title-color
+heading-color snippet-color output-color
+deprecated-background-color deprecated-border-color
+warning-background-color warning-border-color
+code-background-color code-border-color help-path-border-color
+tip-background-color prompt-background-color dim-color
+highlighted-word-color string-color stack-effect-color
+vocab-background-color vocab-border-color field-border-color
+editor-caret-color selection-color panel-background-color
+focus-border-color labeled-border-color table-border-color ;
+
+! Light theme
 
 SINGLETON: light-theme
 theme [ light-theme ] initialize

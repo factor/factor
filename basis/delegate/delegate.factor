@@ -1,9 +1,9 @@
 ! Copyright (C) 2007, 2008 Daniel Ehrenberg
 ! Portions copyright (C) 2009, 2010 Slava Pestov, Joe Groff
 ! See https://factorcode.org/license.txt for BSD license.
-USING: accessors arrays assocs classes classes.tuple combinators
-compiler.units definitions effects fry generic generic.hook generic.standard
-hashtables kernel lexer make math namespaces parser sequences sets slots
+USING: accessors arrays assocs classes classes.tuple
+compiler.units definitions effects fry generic generic.standard
+hashtables kernel lexer make math parser sequences sets slots
 words words.symbol ;
 IN: delegate
 
