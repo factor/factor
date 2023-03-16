@@ -38,5 +38,5 @@ IN: tools.scaffold
     ] if ;
 PRIVATE>
 
-: scaffold-my-work ( string -- )
+: scaffold-work ( string -- )
     "~/factorwork" normalize-path swap scaffold-vocab-in ;
