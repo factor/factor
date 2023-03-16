@@ -2,6 +2,14 @@ USING: assocs core-text.fonts io.styles kernel ui.commands ui.gestures
 ui.tools.listener.completion vocabs.refresh ;
 
 IN: ui.tools.listener
+listener-gadget "toolbar" f {
+    { f restart-listener }
+    { T{ key-down f ${ os macosx? M+ A+ ? } "u" } com-auto-use }
+    { T{ key-down f ${ os macosx? M+ A+ ? } "o" } clear-output }
+    { T{ key-down f ${ os macosx? M+ A+ ? } "k" } clear-stack }
+    { T{ key-down f f "F1" } com-help }
+} define-command-map
+
 interactor "interactor" f {
     { T{ key-down f f "RET" } evaluate-input }
     { T{ key-down f { C+ } "d" } delete-next-character/eof }
