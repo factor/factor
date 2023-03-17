@@ -1,4 +1,4 @@
-USING: math words ;
+USING: kernel math words ;
 IN: syntax.terse
 
 ! shorthand/C-like bitwise ops
@@ -9,7 +9,6 @@ ALIAS: `~ bitnot
 ALIAS: `<< shift
 : `>> ( x n -- x/2^n ) neg shift ; inline
 
-: 0? ( n -- n ? )   dup zero? ; inline
 : 0≠ ( n -- ? )   0 = not ; inline
 : != ( n n -- ? )   = not ; inline
 : 0= ( n -- ? )   0 = ; inline
