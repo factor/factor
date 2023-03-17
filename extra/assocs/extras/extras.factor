@@ -21,6 +21,9 @@ IN: assocs.extras
 : ?delete-of ( assoc key -- assoc value/key ? )
     [ ?of ] [ delete-of -rot ] 2bi ;
 
+: delete-keys-of ( assoc keys -- assoc )
+    [ delete-of ] each ;
+
 : rename-of ( assoc key newkey -- assoc )
     [ delete-of* ] dip swap [ set-of ] [ 2drop ] if ;
 

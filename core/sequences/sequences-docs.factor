@@ -593,7 +593,7 @@ HELP: filter-as
 HELP: filter!
 { $values { "seq" "a resizable mutable sequence" } { "quot" { $quotation ( ... elt -- ... ? ) } } }
 { $description "Applies the quotation to each element in turn, and removes elements for which the quotation outputs a false value." }
-{ $notes "The sequence MUST be resizeable ( see " { $link "vectors" } ")." } 
+{ $notes "The sequence " { $snippet "seq" } " MUST be growable. See " { $link "growable" } "." }
 { $side-effects "seq" }
 { $examples
   "Remove the odd numbers"
@@ -615,7 +615,7 @@ HELP: reject-as
 HELP: reject!
 { $values { "seq" "a resizable mutable sequence." } { "quot" { $quotation ( ... elt -- ... ? ) } } }
 { $description "Applies the quotation to each element in turn, and removes elements for which the quotation outputs a true value." }
-{ $notes "The sequence MUST be resizeable ( see " { $link "vectors" } ")." } 
+{ $notes "The sequence " { $snippet "seq" } " MUST be growable. See " { $link "growable" } "." }
 { $side-effects "seq" }
 { $examples
   "Remove the odd numbers"
@@ -698,7 +698,7 @@ HELP: move
 HELP: remove!
 { $values { "elt" object } { "seq" "a resizable mutable sequence" } }
 { $description "Removes all elements equal to " { $snippet "elt" } " from " { $snippet "seq" } " and returns " { $snippet "seq" } "." }
-{ $notes "The sequence MUST be resizeable ( see " { $link "vectors" } ")." } 
+{ $notes "The sequence " { $snippet "seq" } " MUST be growable. See " { $link "growable" } "." }
 { $notes "This word uses equality comparison (" { $link = } ")." }
 { $side-effects "seq" } ;
 
@@ -711,7 +711,7 @@ HELP: remove-eq!
 HELP: remove-nth!
 { $values { "n" "a non-negative integer" } { "seq" "a resizable mutable sequence" } }
 { $description "Removes the " { $snippet "n" } "th element from the sequence, shifting all other elements down and reducing its length by one." }
-{ $notes "The sequence MUST be resizeable ( see " { $link "vectors" } ")." } 
+{ $notes "The sequence " { $snippet "seq" } " MUST be growable. See " { $link "growable" } "." }
 { $side-effects "seq" } ;
 
 HELP: delete-slice
@@ -736,18 +736,18 @@ HELP: suffix
 } ;
 
 HELP: suffix!
-{ $values { "seq" sequence } { "elt" object } }
+{ $values { "seq" "a resizable mutable sequence." } { "elt" object } }
 { $description "Modifiers a sequence in-place by adding " { $snippet "elt" } " to the end of " { $snippet "seq" } ". Outputs " { $snippet "seq" } "." }
-{ $notes "The sequence MUST be resizeable ( see " { $link "vectors" } ")." } 
+{ $notes "The sequence " { $snippet "seq" } " MUST be growable. See " { $link "growable" } "." }
 { $errors "Throws an error if the type of " { $snippet "elt" } " is not permitted in sequences of the same class as " { $snippet "seq" } "." }
 { $examples
     { $example "USING: prettyprint sequences ;" "V{ 1 2 3 } 4 suffix! ." "V{ 1 2 3 4 }" }
 } ;
 
 HELP: append!
-{ $values { "seq1" sequence } { "seq2" sequence } }
+{ $values { "seq1" "a resizable mutable sequence." } { "seq2" sequence } }
 { $description "Modifiers " { $snippet "seq1" } " in-place by adding the elements from " { $snippet "seq2" } " to the end and outputs " { $snippet "seq1" } "." }
-{ $notes "The sequence MUST be resizeable ( see " { $link "vectors" } ")." } 
+{ $notes "The sequence " { $snippet "seq1" } " MUST be growable. See " { $link "growable" } "." }
 { $examples
     { $example "USING: prettyprint sequences ;" "V{ 1 2 3 } { 4 5 6 } append! ." "V{ 1 2 3 4 5 6 }" }
 } ;
