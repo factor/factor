@@ -153,6 +153,19 @@ IN: scratchpad
 :: my-3array ( x y z -- array ) { x y z } ;
 1 \"two\" 3.0 my-3array"
 "\n--- Data stack:\n{ 1 \"two\" 3.0 }"
+}
+
+{ $heading "Mutable inputs in stack effect" }
+"An input in a stack effect can also be declared as mutable when the input is suffixed with " { $snippet "!" } "." 
+
+{ $example
+"USING: locals formatting math.parser ;
+IN: scratchpad
+
+:: >number ( value! -- n )
+    value string? [ value string>number value! ] when  value ; 
+1 >number  \"2\" >number"  
+"\n--- Data stack:\n1\n2"
 } ;
 
 ARTICLE: "locals-literals" "Lexical variables in literals"
@@ -202,7 +215,7 @@ $nl
 
 
 ARTICLE: "locals-mutable" "Mutable lexical variables"
-"When a lexical variable is bound using " { $link POSTPONE: :> } ", " { $link POSTPONE: :: } ", or " { $link POSTPONE: [| } ", the variable may be made mutable by suffixing its name with an exclamation point (" { $snippet "!" } ")."
+"When a lexical variable is bound using " { $link POSTPONE: :> } ", " { $link POSTPONE: :: } ", " { $link POSTPONE: [| } " or declared in the call effect, the variable may be made mutable by suffixing its name with an exclamation point (" { $snippet "!" } ")."
 $nl
 "A mutable lexical variable creates two new words in its scope. Assuming that we define a mutable variable with " { $snippet "data :> var!" } ", then:"
 $nl
