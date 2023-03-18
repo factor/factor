@@ -69,7 +69,7 @@ SYMBOL: deploy-image
     } assoc-union ;
 
 SYMBOL: deploy-directory
-"resource:" deploy-directory set-global
+"resource:bin" deploy-directory set-global
 
 : config>profile ( config -- profile )
     {
