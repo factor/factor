@@ -21,7 +21,7 @@ HELP: CONSULT:
 { $syntax "CONSULT: group class
     code ;" }
 { $values { "group" "a protocol, generic word or tuple class" } { "class" "a class" } { "code" "code to get the object to which the method should be forwarded" } }
-{ $description "Declares that objects of " { $snippet "class" } " will delegate the generic words contained in " { $snippet "group" } " to the object returned by executing " { $snippet "code" } " with the original object as an input. " { $snippet "CONSULT:" } " will overwrite any existing methods on " { $snippet "class" } " for the members of " { $snippet "group" } ", but new methods can be added after the " { $snippet "CONSULT:" } " to override the delegation." } ;
+{ $description "Declares that objects of " { $snippet "class" } " will delegate the generic words contained in " { $snippet "group" } " to the object returned by executing " { $snippet "code" } " with the original object as an input. " { $snippet "CONSULT:" } " will overwrite any existing methods on " { $snippet "class" } " for the members of " { $snippet "group" } ", but new methods can be added after the " { $snippet "CONSULT:" } " to override the delegation. Currently, this is only supported for " { $snippet "standard-combination" } " and " { $snippet "hook-combination" } " generics." } ;
 
 HELP: BROADCAST:
 { $syntax "BROADCAST: group class
@@ -63,6 +63,6 @@ $nl
     POSTPONE: CONSULT:
     define-consult
 }
-"Every tuple class has an associated protocol consisting of all of its slot accessor methods. The " { $vocab-link "delegate.protocols" } " vocabulary defines formal protocols for the various informal protocols used in the Factor core, such as " { $link "sequence-protocol" } ", " { $link "assocs-protocol" } " or " { $link "stream-protocol" } ;
+"Every tuple class has an associated protocol consisting of all of its slot accessor methods. The " { $vocab-link "delegate.protocols" } " vocabulary defines formal protocols for the various informal protocols used in the Factor core, such as " { $link "sequence-protocol" } ", " { $link "assocs-protocol" } " or " { $link "stream-protocol" } "." ;
 
 ABOUT: "delegate"
