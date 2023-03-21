@@ -68,7 +68,7 @@ IN: build-from-source.windows
 
 : build-cairo-dll ( -- )
     "https://github.com/freedesktop/cairo.git" [
-        qw{ meson setup build2 } try-process
+        qw{ meson setup --force-fallback-for=freetype2,fontconfig build2 } try-process
         "build2" prepend-current-path
         [ { "ninja" } try-process ] with-directory
         "." find-dlls copy-output-files
