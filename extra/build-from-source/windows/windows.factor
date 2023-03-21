@@ -1,17 +1,18 @@
 ! Copyright (C) 2023 Doug Coleman.
 ! See https://factorcode.org/license.txt for BSD license.
-USING: accessors build-from-source environment html.parser
-html.parser.analyzer http.client io.backend io.directories
-io.encodings.utf8 io.files io.files.temp io.launcher
-io.pathnames kernel multiline qw sequences sorting.human
+USING: accessors build-from-source continuations html.parser
+html.parser.analyzer http.client io.directories io.files.temp
+io.launcher io.pathnames kernel qw sequences sorting.human
 windows.shell32 ;
 IN: build-from-source.windows
 
-! choco install -y meson StrawberryPerl nasm winflexbison3 glfw3
+! choco install -y meson StrawberryPerl nasm winflexbison3 glfw3 jom
+! jom is for building openssl in parallel
 
 ! From `choco install -y nasm`
 ! Add nasm to path (windows+r sysdm.cpl -> Advanced tab -> Environment Variables -> New -> "c:\Program Files\NASM")
 : check-nasm ( -- ) { "nasm.exe" "-h" } try-process ;
+: have-jom? ( -- ? ) [ { "jom" } try-process t ] [ drop f ] recover ;
 
 ! From `choco install -y StrawberryPerl`
 ! make sure it is above the git /usr/bin/perl (if that is installed)
@@ -59,8 +60,8 @@ IN: build-from-source.windows
         program-files "NASM/nasm.exe" append-path "nasm.exe" prepend-current-path copy-file
         check-nasm
         check-nmake
-        { "perl" "Configure" "-DOPENSSL_PIC" "VC-WIN64A" } try-process ! "VC-WIN32"
-        { "nmake" } try-process
+        qw{ perl Configure -DOPENSSL_PIC VC-WIN64A /FS } try-process ! "VC-WIN32"
+        have-jom? qw{ jom -j 32 } { "nmake" } ? try-process
         { "apps/libssl-3-x64.dll" "apps/libcrypto-3-x64.dll" } copy-output-files
         "apps/libssl-3-x64.dll" "libssl-38.dll" copy-output-file-as
         "apps/libcrypto-3-x64.dll" "libcrypto-37.dll" copy-output-file-as
