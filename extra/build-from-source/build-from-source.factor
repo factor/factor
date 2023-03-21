@@ -57,6 +57,7 @@ ERROR: no-output-file path ;
     sync-repository-as wait-for-success ;
 
 : with-updated-git-repo-as ( git-uri path quot -- )
+    temp-directory make-directories
     '[
         _ _ [ ?sync-repository-as ] keep
         prepend-current-path _ with-directory
