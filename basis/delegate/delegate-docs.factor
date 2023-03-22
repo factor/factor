@@ -21,7 +21,10 @@ HELP: CONSULT:
 { $syntax "CONSULT: group class
     code ;" }
 { $values { "group" "a protocol, generic word or tuple class" } { "class" "a class" } { "code" "code to get the object to which the method should be forwarded" } }
-{ $description "Declares that objects of " { $snippet "class" } " will delegate the generic words contained in " { $snippet "group" } " to the object returned by executing " { $snippet "code" } " with the original object as an input. " { $snippet "CONSULT:" } " will overwrite any existing methods on " { $snippet "class" } " for the members of " { $snippet "group" } ", but new methods can be added after the " { $snippet "CONSULT:" } " to override the delegation. Currently, this is only supported for " { $snippet "standard-combination" } " and " { $snippet "hook-combination" } " generics." } ;
+{ $description "Declares that objects of " { $snippet "class" } " will delegate the generic words contained in " { $snippet "group" } " to the object returned by executing " { $snippet "code" } " with the original object as an input. " { $snippet "CONSULT:" } " will overwrite any existing methods on " { $snippet "class" } " for the members of " { $snippet "group" } ", but new methods can be added after the " { $snippet "CONSULT:" } " to override the delegation. Currently, this is only supported for " { $snippet "standard-combination" } " and " { $snippet "hook-combination" } " generics." }
+{ $heading "Example" }
+"The following code creates an " { $snippet "example-theme" } " that makes the status bar text green instead of white, and delegates all other " { $snippet "theme-protocol" } " words to " { $snippet "dark-theme" } "." $nl
+{ $code "USING: delegate ui.theme ;" "" "SINGLETON: example-theme" "CONSULT: theme-protocol example-theme dark-theme ;" "" "M: example-theme status-bar-foreground COLOR: green ;" } ;
 
 HELP: BROADCAST:
 { $syntax "BROADCAST: group class
