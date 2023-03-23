@@ -66,6 +66,6 @@ $nl
     POSTPONE: CONSULT:
     define-consult
 }
-"Every tuple class has an associated protocol consisting of all of its slot accessor methods. The " { $vocab-link "delegate.protocols" } " vocabulary defines formal protocols for the various informal protocols used in the Factor core, such as " { $link "sequence-protocol" } ", " { $link "assocs-protocol" } " or " { $link "stream-protocol" } "." ;
+"Every tuple class has an associated protocol consisting of all of its slot accessor methods. The " { $vocab-link "delegate.protocols" } " vocabulary defines formal protocols for the various informal protocols used in the Factor core, such as " { $link "sequence-protocol" } ", " { $link "assocs-protocol" } " or " { $link "stream-protocol" } ". Other vocabularies, like " { $vocab-link "ui.theme" } " also declare protocols." ;
 
 ABOUT: "delegate"
