@@ -115,6 +115,15 @@ IN: build-from-source.windows
         ] with-build-directory
     ] with-tar-gz ;
 
+: build-openal ( -- )
+    "https://github.com/kcat/openal-soft.git" [
+        [
+            { "cmake" "-G" "Visual Studio 17 2022" "-DCMAKE_BUILD_TYPE=Release" "-DBUILD_SHARED_LIBS=ON" ".." } try-process
+            qw{ msbuild OpenAL.sln /property:Configuration=Release } try-process
+            "Release/OpenAL32.dll" copy-output-file
+        ] with-build-directory
+    ] with-updated-git-repo ;
+
 : latest-pcre-tar-gz ( -- path )
     "https://ftp.exim.org/pub/pcre/" [
         http-get nip parse-html find-links concat
