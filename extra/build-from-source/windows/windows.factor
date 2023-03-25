@@ -38,8 +38,8 @@ IN: build-from-source.windows
 : build-fftw-dll ( -- )
     latest-fftw [
         [
-            { "cmake" "-DBUILD_SHARED_LIBS=ON" ".." } try-process
-            { "msbuild" "fftw.sln" "/m" "/property:Configuration=Release" } try-process
+            qw{ cmake -DBUILD_SHARED_LIBS=ON .. } try-process
+            qw{ msbuild fftw.sln /m /property:Configuration=Release } try-process
             "Release/fftw3.dll" copy-output-file
         ] with-build-directory
     ] with-tar-gz ;
@@ -47,11 +47,20 @@ IN: build-from-source.windows
 : build-winflexbison ( -- )
     "https://github.com/lexxmark/winflexbison.git" [
         [
-            { "cmake" ".." } try-process
-            { "cmake" "--build" "." "--config" "Release" "--target" "package" } try-process
+            qw{ cmake .. } try-process
+            qw{ cmake --build . --config Release --target package } try-process
         ] with-build-directory
         "bin/Release/win_bison.exe" "bison.exe" copy-vm-file-as
         "bin/Release/win_flex.exe" "flex.exe" copy-vm-file-as
+    ] with-updated-git-repo ;
+
+: build-blas ( -- )
+    "https://github.com/xianyi/OpenBLAS.git" [
+        [
+            { "cmake" "-G" "Visual Studio 17 2022" "-DCMAKE_BUILD_TYPE=Release" "-DBUILD_SHARED_LIBS=ON" ".." } try-process
+            qw{ msbuild OpenBLAS.sln /property:Configuration=Release } try-process
+            "lib/RELEASE/openblas.dll" "blas.dll" copy-output-file-as
+        ] with-build-directory
     ] with-updated-git-repo ;
 
 : build-openssl-64-dlls ( -- )
@@ -146,8 +155,8 @@ IN: build-from-source.windows
 : build-raylib-dll ( -- )
     "https://github.com/raysan5/raylib.git" [
         [
-            { "cmake" "-DCMAKE_BUILD_TYPE=Release" "-DBUILD_SHARED_LIBS=ON" "-DBUILD_EXAMPLES=OFF" "-DUSE_EXTERNAL_GLFW=OFF" ".." } try-process
-            { "msbuild" "raylib.sln" "/m" "/property:Configuration=Release" } try-process
+            qw{ cmake -DCMAKE_BUILD_TYPE=Release -DBUILD_SHARED_LIBS=ON -DBUILD_EXAMPLES=OFF -DUSE_EXTERNAL_GLFW=OFF .. } try-process
+            qw{ msbuild raylib.sln /m /property:Configuration=Release } try-process
             "raylib/Release/raylib.dll" copy-output-file
         ] with-build-directory
     ] with-updated-git-repo ;
@@ -162,16 +171,16 @@ IN: build-from-source.windows
 : build-snappy-dll ( -- )
     "https://github.com/google/snappy.git" [
         [
-            { "cmake" "-DCMAKE_BUILD_TYPE=Release" "-DBUILD_SHARED_LIBS=ON" "-DSNAPPY_BUILD_TESTS=OFF" "-DSNAPPY_BUILD_BENCHMARKS=OFF" ".." } try-process
-            { "msbuild" "Snappy.sln" "/m" "/property:Configuration=Release" } try-process
+            qw{ cmake -DCMAKE_BUILD_TYPE=Release -DBUILD_SHARED_LIBS=ON -DSNAPPY_BUILD_TESTS=OFF -DSNAPPY_BUILD_BENCHMARKS=OFF .. } try-process
+            qw{ msbuild Snappy.sln /m /property:Configuration=Release } try-process
             "Release/snappy.dll" copy-output-file
         ] with-build-directory
     ] with-updated-git-repo ;
 
 : build-sqlite3-dll ( -- )
     "https://github.com/sqlite/sqlite.git" [
-        { "nmake" "/f" "Makefile.msc" "clean" } try-process
-        { "nmake" "/f" "Makefile.msc" } try-process
+        qw{ nmake /f Makefile.msc clean } try-process
+        qw{ nmake /f Makefile.msc } try-process
         "sqlite3.dll" copy-output-file
     ] with-updated-git-repo ;
 
@@ -196,8 +205,8 @@ IN: build-from-source.windows
 
 : build-zlib-dll ( -- )
     "https://github.com/madler/zlib" [
-        { "nmake" "/f" "win32/Makefile.msc" "clean" } try-process
-        { "nmake" "/f" "win32/Makefile.msc" } try-process
+        qw{ nmake /f win32/Makefile.msc clean } try-process
+        qw{ nmake /f win32/Makefile.msc } try-process
         "zlib1.dll" copy-output-file
     ] with-updated-git-repo ;
 
@@ -244,6 +253,7 @@ IN: build-from-source.windows
     dll-out-directory make-directories
     build-cairo-dll
     build-openssl-64-dlls
+    build-blas
     build-libressl-dlls
     build-fftw-dll
     build-pcre-dll
