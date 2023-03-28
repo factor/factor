@@ -160,7 +160,7 @@ HELP: read-response-header
 { $description "Initializes the 'header', 'cookies', 'content-type', 'content-charset' and 'content-encoding' field of the response." } ;
 
 HELP: with-http-request
-{ $values { "request" request } { "quot" { $quotation ( chunk -- ) } } { "response" response } }
+{ $values { "request" request } { "quot" { $quotation ( chunk -- ) } } { "response/stream" "a response or a stream" } }
 { $description "A variant of " { $link do-http-request } " that checks that the response was successful." } ;
 
 { http-request http-request* with-http-request } related-words
