@@ -450,6 +450,7 @@ HELP: change-nth
 HELP: map!
 { $values { "seq" "a mutable sequence" } { "quot" { $quotation ( ... elt -- ... newelt ) } } }
 { $description "Applies the quotation to each element yielding a new element, storing the new elements back in the original sequence. Returns the original sequence." }
+{ $notes "The sequence MUST be resizeable ( see " { $link "vectors" } ")." } 
 { $errors "Throws an error if the sequence is immutable, or the sequence cannot hold elements of the type output by " { $snippet "quot" } "." }
 { $side-effects "seq" } ;
 
@@ -728,6 +729,7 @@ HELP: replace-slice
 HELP: suffix
 { $values { "seq" sequence } { "elt" object } { "newseq" sequence } }
 { $description "Outputs a new sequence obtained by adding " { $snippet "elt" } " at the end of " { $snippet "seq" } "." }
+{ $notes "The sequence MUST be resizeable ( see " { $link "vectors" } ")." } 
 { $errors "Throws an error if the type of " { $snippet "elt" } " is not permitted in sequences of the same class as " { $snippet "seq1" } "." }
 { $examples
     { $example "USING: prettyprint sequences ;" "{ 1 2 3 } 4 suffix ." "{ 1 2 3 4 }" }
@@ -833,6 +835,7 @@ HELP: exchange
 HELP: reverse!
 { $values { "seq" "a mutable sequence" } }
 { $description "Reverses a sequence in-place and outputs that sequence." }
+{ $notes "The sequence MUST be resizeable ( see " { $link "vectors" } ")." } 
 { $side-effects "seq" } ;
 
 HELP: padding

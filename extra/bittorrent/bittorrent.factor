@@ -48,7 +48,7 @@ torrent-port [ 6881 ] initialize
 
 : http-get-bencode ( url -- obj )
     <get-request> BV{ } clone [
-        '[ _ push-all ] with-http-request* check-response drop
+        '[ _ push-all ] do-http-request check-response drop
     ] keep B{ } like bencode> ;
 
 
