@@ -1,0 +1,480 @@
+<?xml version="1.0"?>
+<!-- This file was automatically generated from C sources - DO NOT EDIT!
+To affect the contents of this file, edit the original C definitions,
+and/or use gtk-doc annotations.  -->
+<repository version="1.2"
+            xmlns="http://www.gtk.org/introspection/core/1.0"
+            xmlns:c="http://www.gtk.org/introspection/c/1.0"
+            xmlns:glib="http://www.gtk.org/introspection/glib/1.0">
+  <include name="GLib" version="2.0"/>
+  <include name="GModule" version="2.0"/>
+  <include name="GObject" version="2.0"/>
+  <include name="Gst" version="0.10"/>
+  <include name="libxml2" version="2.0"/>
+  <package name="gstreamer-fft-0.10"/>
+  <c:include name="gst/fft/gstfft.h"/>
+  <c:include name="gst/fft/gstfftf32.h"/>
+  <c:include name="gst/fft/gstfftf64.h"/>
+  <c:include name="gst/fft/gstffts16.h"/>
+  <c:include name="gst/fft/gstffts32.h"/>
+  <namespace name="GstFft"
+             version="0.10"
+             shared-library="libgstfft-0.10.so.0"
+             c:identifier-prefixes="Gst"
+             c:symbol-prefixes="gst">
+    <record name="FFTF32" c:type="GstFFTF32">
+      <doc xml:whitespace="preserve">Instance structure for #GstFFTF32.</doc>
+      <field name="cfg" readable="0" private="1">
+        <type name="gpointer" c:type="void*"/>
+      </field>
+      <field name="inverse" readable="0" private="1">
+        <type name="gboolean" c:type="gboolean"/>
+      </field>
+      <field name="len" readable="0" private="1">
+        <type name="gint" c:type="gint"/>
+      </field>
+      <field name="_padding" readable="0" private="1">
+        <array zero-terminated="0" c:type="gpointer" fixed-size="4">
+          <type name="gpointer" c:type="gpointer"/>
+        </array>
+      </field>
+      <method name="fft" c:identifier="gst_fft_f32_fft">
+        <doc xml:whitespace="preserve">This performs the FFT on @timedata and puts the result in @freqdata.
+allocating the #GstFFTF32 instance with gst_fft_f32_new().
+domain samples.</doc>
+        <return-value transfer-ownership="none">
+          <type name="none" c:type="void"/>
+        </return-value>
+        <parameters>
+          <parameter name="timedata" transfer-ownership="none">
+            <doc xml:whitespace="preserve">Buffer of the samples in the time domain</doc>
+            <type name="gfloat" c:type="gfloat*"/>
+          </parameter>
+          <parameter name="freqdata" transfer-ownership="none">
+            <doc xml:whitespace="preserve">Target buffer for the samples in the frequency domain</doc>
+            <type name="FFTF32Complex" c:type="GstFFTF32Complex*"/>
+          </parameter>
+        </parameters>
+      </method>
+      <method name="free" c:identifier="gst_fft_f32_free">
+        <doc xml:whitespace="preserve">This frees the memory allocated for @self.</doc>
+        <return-value transfer-ownership="none">
+          <type name="none" c:type="void"/>
+        </return-value>
+      </method>
+      <method name="inverse_fft" c:identifier="gst_fft_f32_inverse_fft">
+        <doc xml:whitespace="preserve">This performs the inverse FFT on @freqdata and puts the result in @timedata.
+while allocating the #GstFFTF32 instance with gst_fft_f32_new().</doc>
+        <return-value transfer-ownership="none">
+          <type name="none" c:type="void"/>
+        </return-value>
+        <parameters>
+          <parameter name="freqdata" transfer-ownership="none">
+            <doc xml:whitespace="preserve">Buffer of the samples in the frequency domain</doc>
+            <type name="FFTF32Complex" c:type="GstFFTF32Complex*"/>
+          </parameter>
+          <parameter name="timedata" transfer-ownership="none">
+            <doc xml:whitespace="preserve">Target buffer for the samples in the time domain</doc>
+            <type name="gfloat" c:type="gfloat*"/>
+          </parameter>
+        </parameters>
+      </method>
+      <method name="window" c:identifier="gst_fft_f32_window">
+        <doc xml:whitespace="preserve">This calls the window function @window on the @timedata sample buffer.</doc>
+        <return-value transfer-ownership="none">
+          <type name="none" c:type="void"/>
+        </return-value>
+        <parameters>
+          <parameter name="timedata" transfer-ownership="none">
+            <doc xml:whitespace="preserve">Time domain samples</doc>
+            <type name="gfloat" c:type="gfloat*"/>
+          </parameter>
+          <parameter name="window" transfer-ownership="none">
+            <doc xml:whitespace="preserve">Window function to apply</doc>
+            <type name="FFTWindow" c:type="GstFFTWindow"/>
+          </parameter>
+        </parameters>
+      </method>
+    </record>
+    <record name="FFTF32Complex" c:type="GstFFTF32Complex">
+      <doc xml:whitespace="preserve">Data type for complex numbers composed of
+32 bit float.</doc>
+      <field name="r" writable="1">
+        <type name="gfloat" c:type="gfloat"/>
+      </field>
+      <field name="i" writable="1">
+        <type name="gfloat" c:type="gfloat"/>
+      </field>
+    </record>
+    <record name="FFTF64" c:type="GstFFTF64">
+      <doc xml:whitespace="preserve">Instance structure for #GstFFTF64.</doc>
+      <field name="cfg" readable="0" private="1">
+        <type name="gpointer" c:type="void*"/>
+      </field>
+      <field name="inverse" readable="0" private="1">
+        <type name="gboolean" c:type="gboolean"/>
+      </field>
+      <field name="len" readable="0" private="1">
+        <type name="gint" c:type="gint"/>
+      </field>
+      <field name="_padding" readable="0" private="1">
+        <array zero-terminated="0" c:type="gpointer" fixed-size="4">
+          <type name="gpointer" c:type="gpointer"/>
+        </array>
+      </field>
+      <method name="fft" c:identifier="gst_fft_f64_fft">
+        <doc xml:whitespace="preserve">This performs the FFT on @timedata and puts the result in @freqdata.
+allocating the #GstFFTF64 instance with gst_fft_f64_new().
+domain samples.</doc>
+        <return-value transfer-ownership="none">
+          <type name="none" c:type="void"/>
+        </return-value>
+        <parameters>
+          <parameter name="timedata" transfer-ownership="none">
+            <doc xml:whitespace="preserve">Buffer of the samples in the time domain</doc>
+            <type name="gdouble" c:type="gdouble*"/>
+          </parameter>
+          <parameter name="freqdata" transfer-ownership="none">
+            <doc xml:whitespace="preserve">Target buffer for the samples in the frequency domain</doc>
+            <type name="FFTF64Complex" c:type="GstFFTF64Complex*"/>
+          </parameter>
+        </parameters>
+      </method>
+      <method name="free" c:identifier="gst_fft_f64_free">
+        <doc xml:whitespace="preserve">This frees the memory allocated for @self.</doc>
+        <return-value transfer-ownership="none">
+          <type name="none" c:type="void"/>
+        </return-value>
+      </method>
+      <method name="inverse_fft" c:identifier="gst_fft_f64_inverse_fft">
+        <doc xml:whitespace="preserve">This performs the inverse FFT on @freqdata and puts the result in @timedata.
+while allocating the #GstFFTF64 instance with gst_fft_f64_new().</doc>
+        <return-value transfer-ownership="none">
+          <type name="none" c:type="void"/>
+        </return-value>
+        <parameters>
+          <parameter name="freqdata" transfer-ownership="none">
+            <doc xml:whitespace="preserve">Buffer of the samples in the frequency domain</doc>
+            <type name="FFTF64Complex" c:type="GstFFTF64Complex*"/>
+          </parameter>
+          <parameter name="timedata" transfer-ownership="none">
+            <doc xml:whitespace="preserve">Target buffer for the samples in the time domain</doc>
+            <type name="gdouble" c:type="gdouble*"/>
+          </parameter>
+        </parameters>
+      </method>
+      <method name="window" c:identifier="gst_fft_f64_window">
+        <doc xml:whitespace="preserve">This calls the window function @window on the @timedata sample buffer.</doc>
+        <return-value transfer-ownership="none">
+          <type name="none" c:type="void"/>
+        </return-value>
+        <parameters>
+          <parameter name="timedata" transfer-ownership="none">
+            <doc xml:whitespace="preserve">Time domain samples</doc>
+            <type name="gdouble" c:type="gdouble*"/>
+          </parameter>
+          <parameter name="window" transfer-ownership="none">
+            <doc xml:whitespace="preserve">Window function to apply</doc>
+            <type name="FFTWindow" c:type="GstFFTWindow"/>
+          </parameter>
+        </parameters>
+      </method>
+    </record>
+    <record name="FFTF64Complex" c:type="GstFFTF64Complex">
+      <doc xml:whitespace="preserve">Data type for complex numbers composed of
+64 bit float.</doc>
+      <field name="r" writable="1">
+        <type name="gdouble" c:type="gdouble"/>
+      </field>
+      <field name="i" writable="1">
+        <type name="gdouble" c:type="gdouble"/>
+      </field>
+    </record>
+    <record name="FFTS16" c:type="GstFFTS16">
+      <doc xml:whitespace="preserve">Instance structure for #GstFFTS16.</doc>
+      <field name="cfg" readable="0" private="1">
+        <type name="gpointer" c:type="void*"/>
+      </field>
+      <field name="inverse" readable="0" private="1">
+        <type name="gboolean" c:type="gboolean"/>
+      </field>
+      <field name="len" readable="0" private="1">
+        <type name="gint" c:type="gint"/>
+      </field>
+      <field name="_padding" readable="0" private="1">
+        <array zero-terminated="0" c:type="gpointer" fixed-size="4">
+          <type name="gpointer" c:type="gpointer"/>
+        </array>
+      </field>
+      <method name="fft" c:identifier="gst_fft_s16_fft">
+        <doc xml:whitespace="preserve">This performs the FFT on @timedata and puts the result in @freqdata.
+allocating the #GstFFTS16 instance with gst_fft_s16_new().
+domain samples.</doc>
+        <return-value transfer-ownership="none">
+          <type name="none" c:type="void"/>
+        </return-value>
+        <parameters>
+          <parameter name="timedata" transfer-ownership="none">
+            <doc xml:whitespace="preserve">Buffer of the samples in the time domain</doc>
+            <type name="gint16" c:type="gint16*"/>
+          </parameter>
+          <parameter name="freqdata" transfer-ownership="none">
+            <doc xml:whitespace="preserve">Target buffer for the samples in the frequency domain</doc>
+            <type name="FFTS16Complex" c:type="GstFFTS16Complex*"/>
+          </parameter>
+        </parameters>
+      </method>
+      <method name="free" c:identifier="gst_fft_s16_free">
+        <doc xml:whitespace="preserve">This frees the memory allocated for @self.</doc>
+        <return-value transfer-ownership="none">
+          <type name="none" c:type="void"/>
+        </return-value>
+      </method>
+      <method name="inverse_fft" c:identifier="gst_fft_s16_inverse_fft">
+        <doc xml:whitespace="preserve">This performs the inverse FFT on @freqdata and puts the result in @timedata.
+while allocating the #GstFFTS16 instance with gst_fft_s16_new().</doc>
+        <return-value transfer-ownership="none">
+          <type name="none" c:type="void"/>
+        </return-value>
+        <parameters>
+          <parameter name="freqdata" transfer-ownership="none">
+            <doc xml:whitespace="preserve">Buffer of the samples in the frequency domain</doc>
+            <type name="FFTS16Complex" c:type="GstFFTS16Complex*"/>
+          </parameter>
+          <parameter name="timedata" transfer-ownership="none">
+            <doc xml:whitespace="preserve">Target buffer for the samples in the time domain</doc>
+            <type name="gint16" c:type="gint16*"/>
+          </parameter>
+        </parameters>
+      </method>
+      <method name="window" c:identifier="gst_fft_s16_window">
+        <doc xml:whitespace="preserve">This calls the window function @window on the @timedata sample buffer.</doc>
+        <return-value transfer-ownership="none">
+          <type name="none" c:type="void"/>
+        </return-value>
+        <parameters>
+          <parameter name="timedata" transfer-ownership="none">
+            <doc xml:whitespace="preserve">Time domain samples</doc>
+            <type name="gint16" c:type="gint16*"/>
+          </parameter>
+          <parameter name="window" transfer-ownership="none">
+            <doc xml:whitespace="preserve">Window function to apply</doc>
+            <type name="FFTWindow" c:type="GstFFTWindow"/>
+          </parameter>
+        </parameters>
+      </method>
+    </record>
+    <record name="FFTS16Complex" c:type="GstFFTS16Complex">
+      <doc xml:whitespace="preserve">Data type for complex numbers composed of
+signed 16 bit integers.</doc>
+      <field name="r" writable="1">
+        <type name="gint16" c:type="gint16"/>
+      </field>
+      <field name="i" writable="1">
+        <type name="gint16" c:type="gint16"/>
+      </field>
+    </record>
+    <record name="FFTS32" c:type="GstFFTS32">
+      <doc xml:whitespace="preserve">Instance structure for #GstFFTS32.</doc>
+      <field name="cfg" readable="0" private="1">
+        <type name="gpointer" c:type="void*"/>
+      </field>
+      <field name="inverse" readable="0" private="1">
+        <type name="gboolean" c:type="gboolean"/>
+      </field>
+      <field name="len" readable="0" private="1">
+        <type name="gint" c:type="gint"/>
+      </field>
+      <field name="_padding" readable="0" private="1">
+        <array zero-terminated="0" c:type="gpointer" fixed-size="4">
+          <type name="gpointer" c:type="gpointer"/>
+        </array>
+      </field>
+      <method name="fft" c:identifier="gst_fft_s32_fft">
+        <doc xml:whitespace="preserve">This performs the FFT on @timedata and puts the result in @freqdata.
+allocating the #GstFFTS32 instance with gst_fft_s32_new().
+domain samples.</doc>
+        <return-value transfer-ownership="none">
+          <type name="none" c:type="void"/>
+        </return-value>
+        <parameters>
+          <parameter name="timedata" transfer-ownership="none">
+            <doc xml:whitespace="preserve">Buffer of the samples in the time domain</doc>
+            <type name="gint32" c:type="gint32*"/>
+          </parameter>
+          <parameter name="freqdata" transfer-ownership="none">
+            <doc xml:whitespace="preserve">Target buffer for the samples in the frequency domain</doc>
+            <type name="FFTS32Complex" c:type="GstFFTS32Complex*"/>
+          </parameter>
+        </parameters>
+      </method>
+      <method name="free" c:identifier="gst_fft_s32_free">
+        <doc xml:whitespace="preserve">This frees the memory allocated for @self.</doc>
+        <return-value transfer-ownership="none">
+          <type name="none" c:type="void"/>
+        </return-value>
+      </method>
+      <method name="inverse_fft" c:identifier="gst_fft_s32_inverse_fft">
+        <doc xml:whitespace="preserve">This performs the inverse FFT on @freqdata and puts the result in @timedata.
+while allocating the #GstFFTS32 instance with gst_fft_s32_new().</doc>
+        <return-value transfer-ownership="none">
+          <type name="none" c:type="void"/>
+        </return-value>
+        <parameters>
+          <parameter name="freqdata" transfer-ownership="none">
+            <doc xml:whitespace="preserve">Buffer of the samples in the frequency domain</doc>
+            <type name="FFTS32Complex" c:type="GstFFTS32Complex*"/>
+          </parameter>
+          <parameter name="timedata" transfer-ownership="none">
+            <doc xml:whitespace="preserve">Target buffer for the samples in the time domain</doc>
+            <type name="gint32" c:type="gint32*"/>
+          </parameter>
+        </parameters>
+      </method>
+      <method name="window" c:identifier="gst_fft_s32_window">
+        <doc xml:whitespace="preserve">This calls the window function @window on the @timedata sample buffer.</doc>
+        <return-value transfer-ownership="none">
+          <type name="none" c:type="void"/>
+        </return-value>
+        <parameters>
+          <parameter name="timedata" transfer-ownership="none">
+            <doc xml:whitespace="preserve">Time domain samples</doc>
+            <type name="gint32" c:type="gint32*"/>
+          </parameter>
+          <parameter name="window" transfer-ownership="none">
+            <doc xml:whitespace="preserve">Window function to apply</doc>
+            <type name="FFTWindow" c:type="GstFFTWindow"/>
+          </parameter>
+        </parameters>
+      </method>
+    </record>
+    <record name="FFTS32Complex" c:type="GstFFTS32Complex">
+      <doc xml:whitespace="preserve">Data type for complex numbers composed of
+signed 32 bit integers.</doc>
+      <field name="r" writable="1">
+        <type name="gint32" c:type="gint32"/>
+      </field>
+      <field name="i" writable="1">
+        <type name="gint32" c:type="gint32"/>
+      </field>
+    </record>
+    <enumeration name="FFTWindow" c:type="GstFFTWindow">
+      <doc xml:whitespace="preserve">The various window functions available.</doc>
+      <member name="rectangular"
+              value="0"
+              c:identifier="GST_FFT_WINDOW_RECTANGULAR"/>
+      <member name="hamming" value="1" c:identifier="GST_FFT_WINDOW_HAMMING"/>
+      <member name="hann" value="2" c:identifier="GST_FFT_WINDOW_HANN"/>
+      <member name="bartlett"
+              value="3"
+              c:identifier="GST_FFT_WINDOW_BARTLETT"/>
+      <member name="blackman"
+              value="4"
+              c:identifier="GST_FFT_WINDOW_BLACKMAN"/>
+    </enumeration>
+    <function name="fft_f32_new"
+              c:identifier="gst_fft_f32_new"
+              introspectable="0">
+      <doc xml:whitespace="preserve">This returns a new #GstFFTF32 instance with the given parameters. It makes
+sense to keep one instance for several calls for speed reasons.
+2, 3 and 5. To get the next number with this characteristics use
+gst_fft_next_fast_length().</doc>
+      <return-value>
+        <doc xml:whitespace="preserve">a new #GstFFTF32 instance.</doc>
+        <type name="FFTF32" c:type="GstFFTF32*"/>
+      </return-value>
+      <parameters>
+        <parameter name="len" transfer-ownership="none">
+          <doc xml:whitespace="preserve">Length of the FFT in the time domain</doc>
+          <type name="gint" c:type="gint"/>
+        </parameter>
+        <parameter name="inverse" transfer-ownership="none">
+          <doc xml:whitespace="preserve">%TRUE if the #GstFFTF32 instance should be used for the inverse FFT</doc>
+          <type name="gboolean" c:type="gboolean"/>
+        </parameter>
+      </parameters>
+    </function>
+    <function name="fft_f64_new"
+              c:identifier="gst_fft_f64_new"
+              introspectable="0">
+      <doc xml:whitespace="preserve">This returns a new #GstFFTF64 instance with the given parameters. It makes
+sense to keep one instance for several calls for speed reasons.
+2, 3 and 5. To get the next number with this characteristics use
+gst_fft_next_fast_length().</doc>
+      <return-value>
+        <doc xml:whitespace="preserve">a new #GstFFTF64 instance.</doc>
+        <type name="FFTF64" c:type="GstFFTF64*"/>
+      </return-value>
+      <parameters>
+        <parameter name="len" transfer-ownership="none">
+          <doc xml:whitespace="preserve">Length of the FFT in the time domain</doc>
+          <type name="gint" c:type="gint"/>
+        </parameter>
+        <parameter name="inverse" transfer-ownership="none">
+          <doc xml:whitespace="preserve">%TRUE if the #GstFFTF64 instance should be used for the inverse FFT</doc>
+          <type name="gboolean" c:type="gboolean"/>
+        </parameter>
+      </parameters>
+    </function>
+    <function name="fft_next_fast_length"
+              c:identifier="gst_fft_next_fast_length">
+      <doc xml:whitespace="preserve">Returns the next number to @n that is entirely a product
+of 2, 3 and 5. Using this as the @len parameter for
+the different GstFFT types will provide the best performance.</doc>
+      <return-value transfer-ownership="none">
+        <doc xml:whitespace="preserve">the next fast FFT length.</doc>
+        <type name="gint" c:type="gint"/>
+      </return-value>
+      <parameters>
+        <parameter name="n" transfer-ownership="none">
+          <doc xml:whitespace="preserve">Number for which the next fast length should be returned</doc>
+          <type name="gint" c:type="gint"/>
+        </parameter>
+      </parameters>
+    </function>
+    <function name="fft_s16_new"
+              c:identifier="gst_fft_s16_new"
+              introspectable="0">
+      <doc xml:whitespace="preserve">This returns a new #GstFFTS16 instance with the given parameters. It makes
+sense to keep one instance for several calls for speed reasons.
+2, 3 and 5. To get the next number with this characteristics use
+gst_fft_next_fast_length().</doc>
+      <return-value>
+        <doc xml:whitespace="preserve">a new #GstFFTS16 instance.</doc>
+        <type name="FFTS16" c:type="GstFFTS16*"/>
+      </return-value>
+      <parameters>
+        <parameter name="len" transfer-ownership="none">
+          <doc xml:whitespace="preserve">Length of the FFT in the time domain</doc>
+          <type name="gint" c:type="gint"/>
+        </parameter>
+        <parameter name="inverse" transfer-ownership="none">
+          <doc xml:whitespace="preserve">%TRUE if the #GstFFTS16 instance should be used for the inverse FFT</doc>
+          <type name="gboolean" c:type="gboolean"/>
+        </parameter>
+      </parameters>
+    </function>
+    <function name="fft_s32_new"
+              c:identifier="gst_fft_s32_new"
+              introspectable="0">
+      <doc xml:whitespace="preserve">This returns a new #GstFFTS32 instance with the given parameters. It makes
+sense to keep one instance for several calls for speed reasons.
+2, 3 and 5. To get the next number with this characteristics use
+gst_fft_next_fast_length().</doc>
+      <return-value>
+        <doc xml:whitespace="preserve">a new #GstFFTS32 instance.</doc>
+        <type name="FFTS32" c:type="GstFFTS32*"/>
+      </return-value>
+      <parameters>
+        <parameter name="len" transfer-ownership="none">
+          <doc xml:whitespace="preserve">Length of the FFT in the time domain</doc>
+          <type name="gint" c:type="gint"/>
+        </parameter>
+        <parameter name="inverse" transfer-ownership="none">
+          <doc xml:whitespace="preserve">%TRUE if the #GstFFTS32 instance should be used for the inverse FFT</doc>
+          <type name="gboolean" c:type="gboolean"/>
+        </parameter>
+      </parameters>
+    </function>
+  </namespace>
+</repository>

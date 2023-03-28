@@ -1,0 +1,306 @@
+<?xml version="1.0"?>
+<!-- This file was automatically generated from C sources - DO NOT EDIT!
+To affect the contents of this file, edit the original C definitions,
+and/or use gtk-doc annotations.  -->
+<repository version="1.2"
+            xmlns="http://www.gtk.org/introspection/core/1.0"
+            xmlns:c="http://www.gtk.org/introspection/c/1.0"
+            xmlns:glib="http://www.gtk.org/introspection/glib/1.0">
+  <include name="GLib" version="2.0"/>
+  <include name="GModule" version="2.0"/>
+  <include name="GObject" version="2.0"/>
+  <include name="Gst" version="0.10"/>
+  <include name="libxml2" version="2.0"/>
+  <package name="gstreamer-netbuffer-0.10"/>
+  <c:include name="gst/netbuffer/gstnetbuffer.h"/>
+  <namespace name="GstNetbuffer"
+             version="0.10"
+             shared-library="libgstnetbuffer-0.10.so.0"
+             c:identifier-prefixes="Gst"
+             c:symbol-prefixes="gst">
+    <record name="NetAddress" c:type="GstNetAddress">
+      <doc xml:whitespace="preserve">An opaque network address as used in #GstNetBuffer.</doc>
+      <field name="type" writable="1">
+        <type name="NetType" c:type="GstNetType"/>
+      </field>
+      <union name="address" c:type="address">
+        <field name="ip6" writable="1">
+          <array zero-terminated="0" c:type="guint8" fixed-size="16">
+            <type name="guint8" c:type="guint8"/>
+          </array>
+        </field>
+        <field name="ip4" writable="1">
+          <type name="guint32" c:type="guint32"/>
+        </field>
+      </union>
+      <field name="port" writable="1">
+        <type name="guint16" c:type="guint16"/>
+      </field>
+      <field name="_gst_reserved" writable="1">
+        <array zero-terminated="0" c:type="gpointer" fixed-size="4">
+          <type name="gpointer" c:type="gpointer"/>
+        </array>
+      </field>
+    </record>
+    <class name="NetBuffer"
+           c:symbol-prefix="netbuffer"
+           c:type="GstNetBuffer"
+           parent="Gst.Buffer"
+           glib:type-name="GstNetBuffer"
+           glib:get-type="gst_netbuffer_get_type"
+           glib:type-struct="NetBufferClass"
+           glib:fundamental="1">
+      <doc xml:whitespace="preserve">buffer for use in network sources and sinks.
+It contains the source or destination address of the buffer.</doc>
+      <constructor name="new" c:identifier="gst_netbuffer_new">
+        <doc xml:whitespace="preserve">Create a new network buffer.</doc>
+        <return-value transfer-ownership="full">
+          <doc xml:whitespace="preserve">a new #GstNetBuffer.</doc>
+          <type name="NetBuffer" c:type="GstNetBuffer*"/>
+        </return-value>
+      </constructor>
+      <field name="buffer">
+        <type name="Gst.Buffer" c:type="GstBuffer"/>
+      </field>
+      <field name="from">
+        <type name="NetAddress" c:type="GstNetAddress"/>
+      </field>
+      <field name="to">
+        <type name="NetAddress" c:type="GstNetAddress"/>
+      </field>
+      <field name="_gst_reserved">
+        <array zero-terminated="0" c:type="gpointer" fixed-size="4">
+          <type name="gpointer" c:type="gpointer"/>
+        </array>
+      </field>
+    </class>
+    <record name="NetBufferClass"
+            c:type="GstNetBufferClass"
+            glib:is-gtype-struct-for="NetBuffer">
+      <field name="buffer_class">
+        <type name="Gst.BufferClass" c:type="GstBufferClass"/>
+      </field>
+      <field name="_gst_reserved">
+        <array zero-terminated="0" c:type="gpointer" fixed-size="4">
+          <type name="gpointer" c:type="gpointer"/>
+        </array>
+      </field>
+    </record>
+    <enumeration name="NetType" c:type="GstNetType">
+      <doc xml:whitespace="preserve">The Address type used in #GstNetAddress.</doc>
+      <member name="unknown" value="0" c:identifier="GST_NET_TYPE_UNKNOWN"/>
+      <member name="ip4" value="1" c:identifier="GST_NET_TYPE_IP4"/>
+      <member name="ip6" value="2" c:identifier="GST_NET_TYPE_IP6"/>
+    </enumeration>
+    <function name="netaddress_equal"
+              c:identifier="gst_netaddress_equal"
+              version="0.10.18">
+      <doc xml:whitespace="preserve">Compare two #GstNetAddress structures</doc>
+      <return-value transfer-ownership="none">
+        <doc xml:whitespace="preserve">TRUE if they are identical, FALSE otherwise</doc>
+        <type name="gboolean" c:type="gboolean"/>
+      </return-value>
+      <parameters>
+        <parameter name="naddr1" transfer-ownership="none">
+          <doc xml:whitespace="preserve">The first #GstNetAddress</doc>
+          <type name="NetAddress" c:type="GstNetAddress*"/>
+        </parameter>
+        <parameter name="naddr2" transfer-ownership="none">
+          <doc xml:whitespace="preserve">The second #GstNetAddress</doc>
+          <type name="NetAddress" c:type="GstNetAddress*"/>
+        </parameter>
+      </parameters>
+    </function>
+    <function name="netaddress_get_address_bytes"
+              c:identifier="gst_netaddress_get_address_bytes"
+              version="0.10.22">
+      <doc xml:whitespace="preserve">Get just the address bytes stored in @naddr into @address.
+Note that @port is expressed in network byte order, use g_ntohs() to convert
+it to host order. IP4 addresses are also stored in network byte order.</doc>
+      <return-value transfer-ownership="none">
+        <doc xml:whitespace="preserve">number of bytes actually copied</doc>
+        <type name="gint" c:type="gint"/>
+      </return-value>
+      <parameters>
+        <parameter name="naddr" transfer-ownership="none">
+          <doc xml:whitespace="preserve">a network address</doc>
+          <type name="NetAddress" c:type="GstNetAddress*"/>
+        </parameter>
+        <parameter name="address" transfer-ownership="none">
+          <doc xml:whitespace="preserve">a location to store the result.</doc>
+          <type name="guint8" c:type="guint8"/>
+        </parameter>
+        <parameter name="port" transfer-ownership="none">
+          <doc xml:whitespace="preserve">a location to store the port.</doc>
+          <type name="guint16" c:type="guint16*"/>
+        </parameter>
+      </parameters>
+    </function>
+    <function name="netaddress_get_ip4_address"
+              c:identifier="gst_netaddress_get_ip4_address">
+      <doc xml:whitespace="preserve">Get the IPv4 address stored in @naddr into @address. This function requires
+that the address type of @naddr is of type #GST_NET_TYPE_IP4.
+Note that @port and @address are expressed in network byte order, use
+g_ntohs() and g_ntohl() to convert them to host order.</doc>
+      <return-value transfer-ownership="none">
+        <doc xml:whitespace="preserve">TRUE if the address could be retrieved.</doc>
+        <type name="gboolean" c:type="gboolean"/>
+      </return-value>
+      <parameters>
+        <parameter name="naddr" transfer-ownership="none">
+          <doc xml:whitespace="preserve">a network address</doc>
+          <type name="NetAddress" c:type="GstNetAddress*"/>
+        </parameter>
+        <parameter name="address" transfer-ownership="none">
+          <doc xml:whitespace="preserve">a location to store the address.</doc>
+          <type name="guint32" c:type="guint32*"/>
+        </parameter>
+        <parameter name="port" transfer-ownership="none">
+          <doc xml:whitespace="preserve">a location to store the port.</doc>
+          <type name="guint16" c:type="guint16*"/>
+        </parameter>
+      </parameters>
+    </function>
+    <function name="netaddress_get_ip6_address"
+              c:identifier="gst_netaddress_get_ip6_address">
+      <doc xml:whitespace="preserve">Get the IPv6 address stored in @naddr into @address.
+If @naddr is of type GST_NET_TYPE_IP4, the transitional IP6 address is
+returned.
+Note that @port is expressed in network byte order, use g_ntohs() to convert
+it to host order.</doc>
+      <return-value transfer-ownership="none">
+        <doc xml:whitespace="preserve">TRUE if the address could be retrieved.</doc>
+        <type name="gboolean" c:type="gboolean"/>
+      </return-value>
+      <parameters>
+        <parameter name="naddr" transfer-ownership="none">
+          <doc xml:whitespace="preserve">a network address</doc>
+          <type name="NetAddress" c:type="GstNetAddress*"/>
+        </parameter>
+        <parameter name="address" transfer-ownership="none">
+          <doc xml:whitespace="preserve">a location to store the result.</doc>
+          <type name="guint8" c:type="guint8"/>
+        </parameter>
+        <parameter name="port" transfer-ownership="none">
+          <doc xml:whitespace="preserve">a location to store the port.</doc>
+          <type name="guint16" c:type="guint16*"/>
+        </parameter>
+      </parameters>
+    </function>
+    <function name="netaddress_get_net_type"
+              c:identifier="gst_netaddress_get_net_type">
+      <doc xml:whitespace="preserve">Get the type of address stored in @naddr.</doc>
+      <return-value transfer-ownership="none">
+        <doc xml:whitespace="preserve">the network type stored in @naddr.</doc>
+        <type name="NetType" c:type="GstNetType"/>
+      </return-value>
+      <parameters>
+        <parameter name="naddr" transfer-ownership="none">
+          <doc xml:whitespace="preserve">a network address</doc>
+          <type name="NetAddress" c:type="GstNetAddress*"/>
+        </parameter>
+      </parameters>
+    </function>
+    <function name="netaddress_set_address_bytes"
+              c:identifier="gst_netaddress_set_address_bytes"
+              version="0.10.22">
+      <doc xml:whitespace="preserve">Set just the address bytes stored in @naddr into @address.
+Note that @port must be expressed in network byte order, use g_htons() to
+convert it to network byte order order. IP4 address bytes must also be
+stored in network byte order.</doc>
+      <return-value transfer-ownership="none">
+        <doc xml:whitespace="preserve">number of bytes actually copied</doc>
+        <type name="gint" c:type="gint"/>
+      </return-value>
+      <parameters>
+        <parameter name="naddr" transfer-ownership="none">
+          <doc xml:whitespace="preserve">a network address</doc>
+          <type name="NetAddress" c:type="GstNetAddress*"/>
+        </parameter>
+        <parameter name="type" transfer-ownership="none">
+          <doc xml:whitespace="preserve">the address type (IPv4 or IPV6)</doc>
+          <type name="NetType" c:type="GstNetType"/>
+        </parameter>
+        <parameter name="address" transfer-ownership="none">
+          <doc xml:whitespace="preserve">a location to store the result.</doc>
+          <type name="guint8" c:type="guint8"/>
+        </parameter>
+        <parameter name="port" transfer-ownership="none">
+          <doc xml:whitespace="preserve">a location to store the port.</doc>
+          <type name="guint16" c:type="guint16"/>
+        </parameter>
+      </parameters>
+    </function>
+    <function name="netaddress_set_ip4_address"
+              c:identifier="gst_netaddress_set_ip4_address">
+      <doc xml:whitespace="preserve">Set @naddr with the IPv4 @address and @port pair.
+Note that @port and @address must be expressed in network byte order,
+use g_htons() and g_htonl() to convert them to network byte order.</doc>
+      <return-value transfer-ownership="none">
+        <type name="none" c:type="void"/>
+      </return-value>
+      <parameters>
+        <parameter name="naddr" transfer-ownership="none">
+          <doc xml:whitespace="preserve">a network address</doc>
+          <type name="NetAddress" c:type="GstNetAddress*"/>
+        </parameter>
+        <parameter name="address" transfer-ownership="none">
+          <doc xml:whitespace="preserve">an IPv4 network address.</doc>
+          <type name="guint32" c:type="guint32"/>
+        </parameter>
+        <parameter name="port" transfer-ownership="none">
+          <doc xml:whitespace="preserve">a port number to set.</doc>
+          <type name="guint16" c:type="guint16"/>
+        </parameter>
+      </parameters>
+    </function>
+    <function name="netaddress_set_ip6_address"
+              c:identifier="gst_netaddress_set_ip6_address">
+      <doc xml:whitespace="preserve">Set @naddr with the IPv6 @address and @port pair.
+Note that @port must be expressed in network byte order, use g_htons() to convert
+it to network byte order.</doc>
+      <return-value transfer-ownership="none">
+        <type name="none" c:type="void"/>
+      </return-value>
+      <parameters>
+        <parameter name="naddr" transfer-ownership="none">
+          <doc xml:whitespace="preserve">a network address</doc>
+          <type name="NetAddress" c:type="GstNetAddress*"/>
+        </parameter>
+        <parameter name="address" transfer-ownership="none">
+          <doc xml:whitespace="preserve">an IPv6 network address.</doc>
+          <type name="guint8" c:type="guint8"/>
+        </parameter>
+        <parameter name="port" transfer-ownership="none">
+          <doc xml:whitespace="preserve">a port number to set.</doc>
+          <type name="guint16" c:type="guint16"/>
+        </parameter>
+      </parameters>
+    </function>
+    <function name="netaddress_to_string"
+              c:identifier="gst_netaddress_to_string"
+              version="0.10.24">
+      <doc xml:whitespace="preserve">Copies a string representation of @naddr into @dest. Up to @len bytes are
+copied.
+enough</doc>
+      <return-value transfer-ownership="none">
+        <doc xml:whitespace="preserve">the number of bytes which would be produced if the buffer was large</doc>
+        <type name="gint" c:type="gint"/>
+      </return-value>
+      <parameters>
+        <parameter name="naddr" transfer-ownership="none">
+          <doc xml:whitespace="preserve">a #GstNetAddress</doc>
+          <type name="NetAddress" c:type="GstNetAddress*"/>
+        </parameter>
+        <parameter name="dest" transfer-ownership="none">
+          <doc xml:whitespace="preserve">destination</doc>
+          <type name="utf8" c:type="gchar*"/>
+        </parameter>
+        <parameter name="len" transfer-ownership="none">
+          <doc xml:whitespace="preserve">len of @dest</doc>
+          <type name="gulong" c:type="gulong"/>
+        </parameter>
+      </parameters>
+    </function>
+  </namespace>
+</repository>
