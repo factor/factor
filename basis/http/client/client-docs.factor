@@ -161,13 +161,9 @@ HELP: read-response-header
 
 HELP: with-http-request
 { $values { "request" request } { "quot" { $quotation ( chunk -- ) } } { "response" response } }
-{ $description "A variant of " { $link with-http-request* } " that checks that the response was successful." } ;
+{ $description "A variant of " { $link do-http-request } " that checks that the response was successful." } ;
 
-HELP: with-http-request*
-{ $values { "request" request } { "quot" { $quotation ( chunk -- ) } } { "response" response } }
-{ $description "Sends an HTTP request to an HTTP server, and reads the response incrementally. Chunks of data are passed to the quotation as they are read. Does not throw an error if the HTTP request fails; to do so, call " { $link check-response } " on the " { $snippet "response" } "." } ;
-
-{ http-request http-request* with-http-request with-http-request* } related-words
+{ http-request http-request* with-http-request } related-words
 
 ARTICLE: "http.client.get" "GET requests with the HTTP client"
 "Basic usage involves passing a " { $link url } " and getting a " { $link response } " and data back:"
@@ -190,7 +186,6 @@ ARTICLE: "http.client.get" "GET requests with the HTTP client"
 "The " { $link http-request } " and " { $link http-request* } " words output sequences. This is undesirable if the response data may be large. Another pair of words take a quotation instead, and pass the quotation chunks of data incrementally:"
 { $subsections
     with-http-request
-    with-http-request*
 } ;
 
 ARTICLE: "http.client.post-data" "HTTP client post data"
