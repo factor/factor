@@ -1,9 +1,9 @@
 ! Copyright (C) 2005, 2010 Slava Pestov.
 ! See https://factorcode.org/license.txt for BSD license.
-USING: accessors ascii assocs calendar combinators
-combinators.short-circuit destructors effects environment
-hashtables http http.client.post-data http.parsers io io.crlf
-io.encodings io.encodings.ascii io.encodings.binary
+USING: accessors arrays ascii assocs calendar combinators
+combinators.short-circuit continuations destructors effects
+environment hashtables http http.client.post-data http.parsers
+io io.crlf io.encodings io.encodings.ascii io.encodings.binary
 io.encodings.iana io.encodings.string io.files io.pathnames
 io.sockets io.sockets.secure io.timeouts kernel math math.order
 math.parser mime.types namespaces present sequences splitting
@@ -109,8 +109,6 @@ ERROR: download-failed response ;
     read-response-line
     read-response-header ;
 
-DEFER: (with-http-request)
-
 SYMBOL: redirects
 
 : redirect-url ( request url -- request )
@@ -119,13 +117,12 @@ SYMBOL: redirects
 : redirect? ( response -- ? )
     code>> 300 399 between? ;
 
-:: do-redirect ( quot: ( chunk -- ) response -- response )
+:: prepare-redirect ( response -- response )
     redirects inc
     redirects get request get redirects>> < [
         request get clone
         response "location" header redirect-url
         response code>> 307 = [ "GET" >>method f >>post-data ] unless
-        quot (with-http-request)
     ] [ too-many-redirects ] if ; inline recursive
 
 : read-chunk-size ( -- n )
@@ -218,10 +215,22 @@ SYMBOL: redirects
         pick no-proxy? [ nip ] [ [ request-url ] dip derive-url ] if
     ] [ nip ] if check-proxy ;
 
-: (with-http-request) ( request quot: ( chunk -- ) -- response )
-    swap ?default-proxy
-    request [
-        <request-socket> [
+: upgrade-to-websocket? ( response -- ? )
+    {
+        [ response? ]
+        [ code>> 101 = ]
+        [ message>> >lower "switching protocols" = ]
+        [ header>> "connection" of "upgrade" = ]
+        [ header>> "upgrade" of "websocket" = ]
+    } 1&& ;
+
+SYMBOL: request-socket
+
+: do-http-request ( request quot: ( chunk -- ) -- response/stream )
+    [ ?default-proxy \ request ] dip dup '[
+        [
+            <request-socket> |dispose
+            dup request-socket set
             [
                 [ in>> ] [ out>> ] bi [ ?https-tunnel ] with-streams*
             ]
@@ -229,19 +238,25 @@ SYMBOL: redirects
                 out>>
                 [ request get write-request ]
                 with-output-stream*
-            ] [
+            ]
+            [
                 in>> [
-                    read-response dup redirect?
-                    request get redirects>> 0 > and [ t ] [
-                        [ nip response set ]
-                        [ read-response-body ]
-                        [ ]
-                        2tri f
+                    read-response
+                    dup redirect?
+                    request get redirects>> 0 > and [
+                        request-socket get dispose
+                        prepare-redirect _ do-http-request
+                    ] [
+                        dup upgrade-to-websocket?
+                        [ drop request-socket get ]
+                        [
+                            [ _ ] dip [ read-response-body ] keep
+                            request-socket get dispose
+                        ] if
                     ] if
                 ] with-input-stream*
             ] tri
-        ] with-disposal
-        [ do-redirect ] [ nip ] if
+        ] with-destructors
     ] with-variable ; inline recursive
 
 : <client-request> ( url method -- request )
@@ -251,14 +266,11 @@ SYMBOL: redirects
 
 PRIVATE>
 
-: with-http-request* ( request quot: ( chunk -- ) -- response )
-    [ (with-http-request) ] with-destructors ; inline
-
-: with-http-request ( request quot: ( chunk -- ) -- response )
-    with-http-request* check-response ; inline
+: with-http-request ( request quot: ( chunk -- ) -- response/stream )
+    do-http-request check-response ; inline
 
 : http-request* ( request -- response data )
-    BV{ } clone [ '[ _ push-all ] with-http-request* ] keep
+    BV{ } clone [ '[ _ push-all ] do-http-request ] keep
     B{ } like over content-encoding>> decode [ >>body ] keep ;
 
 : http-request ( request -- response data )
