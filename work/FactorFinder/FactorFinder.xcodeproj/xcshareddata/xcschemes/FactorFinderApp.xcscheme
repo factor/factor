@@ -60,7 +60,11 @@
       </BuildableProductRunnable>
       <CommandLineArguments>
          <CommandLineArgument
-            argument = "$(SRCROOT)/FactorFinder/test.factor"
+            argument = "-m ~/Library/Spotlight/FactorFinder.mdimport"
+            isEnabled = "NO">
+         </CommandLineArgument>
+         <CommandLineArgument
+            argument = "$(SRCROOT)/FactorSpotlight/test.factor"
             isEnabled = "YES">
          </CommandLineArgument>
       </CommandLineArguments>

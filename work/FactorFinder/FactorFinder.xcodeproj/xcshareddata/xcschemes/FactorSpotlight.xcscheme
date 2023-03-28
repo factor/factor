@@ -64,18 +64,22 @@
       <CommandLineArguments>
          <CommandLineArgument
             argument = "-d4"
+            isEnabled = "NO">
+         </CommandLineArgument>
+         <CommandLineArgument
+            argument = "-m  $(TARGET_BUILD_DIR/$TARGET_NAME.mdimporter)"
             isEnabled = "YES">
          </CommandLineArgument>
          <CommandLineArgument
-            argument = "-g /Users/davec/factor/FactorFinder/build/Debug/FactorSpotlight.mdimporter"
-            isEnabled = "YES">
-         </CommandLineArgument>
-         <CommandLineArgument
-            argument = "/Users/davec/Dropbox/Public/factor/FactorFinder/FactorSpotlight/test.factor"
-            isEnabled = "YES">
+            argument = "-g $(TARGET_BUILD_DIR/$TARGET_NAME.mdimporter)"
+            isEnabled = "NO">
          </CommandLineArgument>
          <CommandLineArgument
             argument = "-r ${HOME}/Library/Spotlight/FactorImporter.mdimporter"
+            isEnabled = "NO">
+         </CommandLineArgument>
+         <CommandLineArgument
+            argument = "/Users/davec/factorwork/FactorFinder/FactorSpotlight/test.factor"
             isEnabled = "NO">
          </CommandLineArgument>
       </CommandLineArguments>
