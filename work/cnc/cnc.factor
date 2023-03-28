@@ -28,18 +28,18 @@ ENUM: units +mm+ +in+ ;
 
 : define-machines ( -- )
     [ machine recreate-table
-    "SM1 3D" "Snapmaker 2" 3d 350 360 320 <machine> insert-tuple
-    "SM1 Laser" "Snapmaker 2" laser 350 360 320 <machine> insert-tuple
-    "SM1 CNC" "Snapmaker 2" cnc 350 360 320 <machine> insert-tuple
-    "SM2 3D" "Snapmaker 2" 3d  350 360 320 <machine> insert-tuple
-    "SM2 Laser" "Snapmaker 2" laser  350 360 320 <machine> insert-tuple
-    "SM2 CNC" "Snapmaker 2" cnc  350 360 320 <machine> insert-tuple
-    "P1"  "Prusa MK2.5S" 3d 250 210 210 <machine> insert-tuple
-    "P2"  "Prusa MK3S" 3d 250 210 210 <machine> insert-tuple
-    "ONE CNC" "Onefinity J50" cnc
+    "SM1 3D" "Snapmaker 2" +3d+ 350 360 320 <machine> insert-tuple
+    "SM1 Laser" "Snapmaker 2" +laser+ 350 360 320 <machine> insert-tuple
+    "SM1 CNC" "Snapmaker 2" +cnc+ 350 360 320 <machine> insert-tuple
+    "SM2 3D" "Snapmaker 2" +3d+  350 360 320 <machine> insert-tuple
+    "SM2 Laser" "Snapmaker 2" +laser+  350 360 320 <machine> insert-tuple
+    "SM2 CNC" "Snapmaker 2" +cnc+  350 360 320 <machine> insert-tuple
+    "P1"  "Prusa MK2.5S" +3d+ 250 210 210 <machine> insert-tuple
+    "P2"  "Prusa MK3S" +3d+ 250 210 210 <machine> insert-tuple
+    "ONE CNC" "Onefinity J50" +cnc+
     48.25 25.4 * >integer  32.25 25.4 * >integer  5.25 25.4 * >integer
     <machine> insert-tuple
-    "ONE Laser" "Onefinity J50" laser
+    "ONE Laser" "Onefinity J50" +laser+
     48.25 25.4 * >integer  32.25 25.4 * >integer  5.25 25.4 * >integer
     <machine> insert-tuple
     ] with-jobs-db

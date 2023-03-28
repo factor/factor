@@ -14,6 +14,6 @@ TUPLE: 1F < machine ;
 : <1F> ( -- 1F )
     1F new
     (( name model type x-max y-max z-max -- machine ))
-    "1F" "OneFinity J50" cnc 1220 812 133 <init>
+    "1F" "OneFinity J50" +cnc+ 1220 812 133 <init>
     ;
 

@@ -38,7 +38,7 @@ mtype "TYPES" {
 
 TUPLE: machine id name model type x-max y-max z-max ;
 
-ENUM: machineIs 3d cnc laser ;
+ENUM: machineIs +3d+ +cnc+ +laser+ ;
 
 machine "MACHINE" {
     { "id" "ID" +db-assigned-id+ }

@@ -97,22 +97,15 @@ FROM: cnc.gcode => f ;
     "~/Desktop/"  toolpath machine>> name>> append  " Boundary.gcode" append  utf8  
     [ toolpath boundary ] with-file-writer ;
 
-
+SYMBOL: LAST-TOOLPATH
 FROM: cnc.bit => >mm ; 
 : bit-resurface ( bit xmax ymax -- )
-    <surface-job>
-    over units>> >number 1 =
-    [  [ >mm ] dip ] when <toolpath>
+    <surface-job> <toolpath>
+    dup LAST-TOOLPATH set
     [ resurfacex  ] keep
     [ resurfacey  ] keep
     bounds-check
     ;
-
-: resurface ( xmax ymax -- )
-    "a7f018eb-9bb9-4540-8536-b6d6ffb453e4" find-bit-id >mm
-    "0" >>units
-    0.5 >>stepdown 
-    -rot bit-resurface ;
     
 GLOBAL: xmax
 GLOBAL: ymax

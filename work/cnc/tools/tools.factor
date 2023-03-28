@@ -6,14 +6,14 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors cnc cnc.gcode cnc.job cnc.jobs cnc.machine formatting
 io kernel math multiline sequences io.encodings.utf8 io.files math.parser
-cnc.machine.1F command-line namespaces variables generalizations sequences.generalizations prettyprint ;
+cnc.bit cnc.machine.1F command-line namespaces variables generalizations sequences.generalizations prettyprint ;
 IN: cnc.tools
 
 TUPLE: toolpath  id machine bit gcode ;
 : <toolpath> ( bit machine -- toolpath )
     toolpath new
     swap >>machine
-    swap >>bit
+    swap >mm >>bit
     ;
 
 FROM: cnc.gcode => f ;

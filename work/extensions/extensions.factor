@@ -1,18 +1,17 @@
 ! Copyright (C) 2012 PolyMicro Systems.
 ! See http://factorcode.org/license.txt for BSD license.
 
-USING: accessors alien.c-types alien.data assocs byte-arrays
-byte-vectors colors compiler.units definitions
-editors effects effects.parser
-extensions fonts fry help.vocabs hints io endian
-io.encodings.utf8 io.files io.standard-paths kernel
-kernel.private lexer locals macros make math math.order
-math.parser namespaces parser prettyprint.sections regexp
-sequences sequences.private serialize slots.private sorting
-splitting.extras strings.parser system tr typed ui.commands
-ui.gestures ui.text ui.tools.common ui.tools.listener ui.tools.browser
-variables vocabs.loader
-vocabs.parser words tools.scaffold ;
+USING: accessors alien.c-types alien.data assocs byte-arrays byte-vectors
+ cocoa.classes colors compiler.units core-graphics.types definitions editors
+ effects effects.parser endian extensions fonts fry
+ help.vocabs hints io io.encodings.utf8 io.files io.standard-paths
+ kernel kernel.private lexer locals macros make
+ math math.order math.parser namespaces parser prettyprint.sections
+ regexp sequences sequences.private serialize slots.private sorting
+ splitting.extras strings strings.parser system tools.scaffold tr
+ typed ui.clipboards ui.commands ui.gestures ui.text ui.tools.browser
+ ui.tools.common ui.tools.listener variables vocabs.loader vocabs.parser words
+    ;
 
 os macosx? [
     USE: cocoa.classes
@@ -134,6 +133,45 @@ M: string underlying>>  2 slot { string } declare ; inline
 
 TR: tabs>spaces "\t" "\s" ;
     
+: space? ( ch -- ? ) 32 = ;
+
+: tab? ( ch -- ? ) 9 = ;
+
+: trim-whitespace ( str -- str' )
+    [ [ space? ] [ tab? ] bi or ] trim-head
+    [ [ space? ] [ tab? ] bi or ] trim-tail
+    ;
+
+: soft-quote ( string -- string' )
+    "\"" dup surround ;
+
+: hard-quote ( string -- string' )
+    "'" dup surround ;
+
+: escape-string-by ( str table -- escaped )
+    ! Convert $ ( ) ' and " to shell escapes
+    [ '[ [ _ at ] [ % ] [ , ] ?if ] each ] "" make ; inline
+
+CONSTANT: PATH_ESCAPE_CHARS H{
+       { CHAR: \s "\\ "  }
+       { CHAR: \n "?"    }
+       { CHAR: (  "\\("  }
+       { CHAR: )  "\\)"  }
+       { CHAR: &  "\\&"  }
+       { CHAR: $  "\\$"  }
+       { CHAR: ;  "\\;"  }
+       { CHAR: "  "\""   }      ! for editor's sake "
+       { CHAR: '  "\\'"  } 
+       { CHAR: `  "\\`"  }
+       }
+       
+: escape-string ( str -- str' )
+    PATH_ESCAPE_CHARS escape-string-by ;
+    ! [ dup
+    !   [ PATH_ESCAPE_CHARS at ] [ nip ] [ drop 1string ] ?if
+    ! ] { } map-as
+    ! "" join ; 
+
 FROM: assocs => values ;
 IN: ui.gadgets.world
 : front-window ( -- world )
@@ -171,8 +209,8 @@ IN: sequences
     buckets values
     ;
 
-! IN: variables
-! SYNTAX: VARIABLE!: scan-new-word define-variable last-word variable-setter suffix! ; 
+IN: variables
+SYNTAX: VARIABLE!: scan-new-word define-variable last-word variable-setter suffix! ; 
 SYNTAX: VARIABLE:  scan-new-word define-variable scan-object suffix! last-word variable-setter suffix! ; 
 ! SYNTAX: QUOTE:  scan-new-word define-variable last-word scan-object change-global  last-word variable-setter suffix! ; 
 
@@ -374,6 +412,10 @@ IN: math.parser
 : >number ( string|number -- number )
     dup string? [ string>number ] when ;
 
-
-
+IN: scratchpad
+: >usings ( vocabs -- )
+    [ name>> ] map
+    "" [ 1 + 6 mod 0 = [ "\n" append ] when  " " append append ] reduce-index
+    "USING: " prepend " ;" append
+    clipboard get set-clipboard-contents ;
 
