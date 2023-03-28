@@ -108,9 +108,9 @@ USE: folder.collection
 
 : delete&relink ( entry1 entry2 -- )
     dup does-exist?
-    [ dup delete-entry ] when
+    [ dup entry-delete ] when
     ".... " over pathname>> append print-path
-    hardlink-entries
+    entry>hardlink
     ;
 
 :: hardlink ( dups -- )
@@ -118,7 +118,7 @@ USE: folder.collection
     "    From: " src pathnameRead append print-path 
     [ second
         "Symlink: " over pathnameRead append print-path
-        src  swap hardlink-entries
+        src  swap entry>hardlink
     ] each
     ;
 
