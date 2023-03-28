@@ -14,7 +14,7 @@ USING: accessors alien.enums alien.syntax assocs classes.tuple cnc
 IN: cnc.bit
 
 SYMBOL: amanavt-db amanavt-db [ "/Users/davec/Dropbox/3CL/Data/amanavt.db" ] initialize
-SYMBOL: amana-db amana-db [ "/Users/davec/Dropbox/3CL/Data/Amana.db" ]  initialize
+SYMBOL: bits-db-path bits-db-path [ "/Users/davec/Dropbox/3CL/Data/Bits.db" ]  initialize
 SYMBOL: vcarve-db vcarve-db [ "/Users/davec/Desktop/Imperial.db" ]  initialize
 
 ENUM: bitType +straight+ +up+ +down+ +compression+ ;
@@ -99,21 +99,21 @@ bit "amana" {
     0 >>units 
     ;
 
-TUPLE: amana < sqlite-db ;
-: <amana> ( -- <amana> )
-    amana new
-    amana-db get >>path ;
+TUPLE: bits-db < sqlite-db ;
+: <bits-db> ( -- <bits-db> )
+    bits-db new
+    bits-db-path get >>path ;
 
-: with-amana-db ( quot -- )
-    '[ <amana> _ with-db ] call ; inline
+: with-bits-db-db ( quot -- )
+    '[ <bits-db> _ with-db ] call ; inline
 
-: amana>bit ( amanavt -- bit )
+: bits-db>bit ( bits-dbvt -- bit )
     bit slots>tuple convert-bit-slots ;
 
 : amanavt>bits ( seq -- bits ? )
-    [ empty? ] [ f  ] [ [ amana>bit ] map t ] smart-if ;
+    [ empty? ] [ f  ] [ [ bits-db>bit ] map t ] smart-if ;
 
-TUPLE: vcarve < amana ;
+TUPLE: vcarve < bits-db ;
 : <vcarve> ( -- <vcarve> )
     vcarve new
     vcarve-db get >>path ;
@@ -131,18 +131,18 @@ CONSTANT: tooldata "tool_cutting_data."
     ] map string-squeeze-spaces ;
 
 SYMBOL: sql-statement 
-: do-amana ( statement -- result ? )
+: do-bits-db ( statement -- result ? )
     sql-statement set
-    [ sql-statement get sql-query ] with-amana-db
+    [ sql-statement get sql-query ] with-bits-db-db
     dup empty?
-    [ f ] [ [ amana>bit ] map t ] if ;
+    [ f ] [ [ bits-db>bit ] map t ] if ;
 
-: amana-drop ( -- )
-    "DROP TABLE IF EXISTS amana"
-    clean-whitespace  do-amana 2drop ;
+: bits-db-drop ( -- )
+    "DROP TABLE IF EXISTS bits"
+    clean-whitespace  do-bits-db 2drop ;
 
-: amana-create ( -- )
-  "CREATE TABLE IF NOT EXISTS 'amana' (
+: bits-db-create ( -- )
+  "CREATE TABLE IF NOT EXISTS 'bits' (
   'name' text NOT NULL,
   'tool_type' integer NOT NULL,
   'units' integer NOT NULL DEFAULT(0),
@@ -156,7 +156,7 @@ SYMBOL: sql-statement
   'plunge_rate' real,
   'id' text PRIMARY KEY UNIQUE NOT NULL,
   'amana_id' text )"        
-   clean-whitespace  do-amana 2drop ;
+   clean-whitespace  do-bits-db 2drop ;
 
 : amanavt-preamble ( -- sql )
     "SELECT 
@@ -177,8 +177,8 @@ SYMBOL: sql-statement
 	 INNER JOIN tool_cutting_data tcd ON ( tcd.id = te.tool_cutting_data_id  ) "
     clean-whitespace ;
 
-: amana-where ( -- sql )
-    "SELECT * FROM amana WHERE " clean-whitespace ;
+: bits-db-where ( -- sql )
+    "SELECT * FROM bits WHERE " clean-whitespace ;
     
 : geometry-clause  ( string -- clause )
     toolgeometry prepend ;
@@ -190,18 +190,22 @@ SYMBOL: sql-statement
     [ geometry-clause " and " append ] map
     "" swap [ append ] each
     "tool_cutting_data.feed_rate not null" append
-    amana-where prepend
+    bits-db-where prepend
     sql-statement set ;
 
-: bit-clause ( clauses -- 'claues )
-    [  " and " append ] map
-    "" swap [ append ] each
-    "feed_rate not null" append
-    amana-where prepend ;
+: bit-where-clause ( clauses -- 'claues )
+    dup length 1 > 
+    [ [ " and " append ] map 
+      "" swap [ append ] each
+      "id not null" append
+    ]
+    [ "" swap [ append ] each ]
+    if 
+    bits-db-where prepend ;
 
 : bit-add ( bit -- )
     tuple>array  unclip drop 
-    "INSERT OR REPLACE INTO amana VALUES (" swap ! )
+    "INSERT OR REPLACE INTO bits VALUES (" swap ! )
     [ dup string? [ hard-quote ] when
       dup ratio? [ 1.0 * ] when 
       dup number? [ number>string ] when
@@ -209,33 +213,41 @@ SYMBOL: sql-statement
       ", " append  append
     ] each
     unclip-last drop  unclip-last drop 
-    ");" append  do-amana 2drop ; 
-                                
-: bit-where ( clauses -- seq ? )
-    bit-clause do-amana ;
+    ");" append  do-bits-db 2drop ; 
 
-: find-bit-names ( named --  bit ? )
-    "name LIKE " prepend { } 1sequence bit-where ;
+: bit-delete ( bit -- )
+    "DELETE FROM bits WHERE id = '"
+    over id>> append  "'" append
+    sql-statement set
+    [ sql-statement get sql-query ] with-bits-db-db
+    2drop ;
 
-: find-bit-id ( string -- bit )
+: bit-where ( clauses -- seq )
+    bit-where-clause do-bits-db drop ;
+
+: bit-name-like ( named --  bit )
+    hard-quote
+    "name LIKE " prepend { } 1sequence bit-where  ;
+
+: bit-id= ( string -- bit )
     hard-quote  "id = "  prepend
-    amana-where prepend  do-amana
+    bits-db-where prepend  do-bits-db
     drop first ;
 
 : 1/4-bits ( -- bits )
-    { "diameter = 0.25" "units = 1" } bit-where drop ;
+    { "diameter = 0.25" "units = 1" } bit-where ;
 
 : 1/8bits ( -- bits )
-    { "diameter = 0.125" "units = 1" } bit-where drop ;
+    { "diameter = 0.125" "units = 1" } bit-where ;
 
 : metric-bits ( -- bits ) 
-    { "units = 0" } bit-where drop ;
+    { "units = 0" } bit-where ;
 
 : imperial-bits ( -- bits )
-    { "units = 0" } bit-where drop ;
+    { "units = 0" } bit-where ;
 
 : all-bits ( -- bits )
-    { "id NOT NULL" } bit-where drop ;
+    { "id NOT NULL" } bit-where ;
 
 : vcarve-bits ( -- bits )
     amanavt-preamble sql-statement set
@@ -247,8 +259,8 @@ SYMBOL: sql-statement
     vcarve new  amanavt-db get >>path  
     [ sql-statement get sql-query  ] with-db ;
 
-: create-amana-db ( -- )
-    amana-drop  amana-create 
+: create-bits-db-db ( -- )
+    bits-db-drop  bits-db-create 
     amanavt-bits  amanavt>bits drop
     [ bit-add ] each ;
 
