@@ -1,0 +1,70 @@
+<!doctype html>
+
+<html lang='en' xmlns='http://www.w3.org/1999/xhtml'> 
+<head>
+	<meta charset='utf-8' />
+	<link rel="stylesheet" type="text/css" href="factorscript.css" />
+  <title>Factorscript</title>
+  <script type="text/Javascript" src="js/jquery.js"></script>
+
+  <script type="text/Javascript" src="js/canvas.js"></script> <!-- FIXME: load only if canvas is supported -->
+  <script type="text/Javascript" src="js/ui_event.js"></script>
+  
+ 	<script type="text/Javascript" src="js/generic.js"></script>
+	<script type="text/Javascript" src="js/native_words.js"></script>
+	<script type="text/Javascript" src="js/interpreter.js"></script>
+	<script type="text/Javascript" src="js/parser.js"></script>
+	
+	<script type="text/Javascript" src="js/factorscript.js"></script>
+
+	<script type="text/html" class="factorcode">
+		: box-css "css" ".box" $2 ;
+	</script>
+	
+	<script type="text/html" class="factorcode">
+		"yellow" "background-color" box-css 
+	  "blue" "color" box-css
+	</script>
+
+	<script type="text/html" class="factorcode">
+	  [| this | 
+	  	"calculation_click" "addClass" this $1
+	  	400 "width" "css" this $2 
+	  	"pink" "background-color" box-css 
+	  ] "click" ".calculation" $$
+	</script>
+</head>
+
+<body>
+
+ <div style="text-align: center;">
+   <h1>Factorscript proof-of-concept demonstration.</h1>
+ </div>
+
+<div class="code"><pre>
+  : box-css "css" ".box" $2 ;   &lt;&ndash;&ndash; CREATES RE-USABLE WORD
+	
+  "yellow" "background-color" box-css 
+  "blue" "color" box-css
+
+  [| this | &lt;&ndash;&ndash; QUOTATION WITH A NAMED PARAMETER
+    "calculation_click" "addClass" this $1 
+    400 "width" "css" this $2 
+    "pink" "background-color" box-css 
+  ] "click" ".calculation" $$ &lt;&ndash;&ndash; CLICK EVENT
+</pre></div>
+
+ <h2 style="text-align: center;">Click on the middle box.</h2>
+
+ <div class="result">
+ </div>
+ 
+ <div class="calculation">
+ </div>
+ 
+ <div class="box"> 
+	this is a box
+ </div>
+
+</body>
+</html>

@@ -1,0 +1,47 @@
+.result {
+  margin: 30px auto;
+	width: 500px;
+	height: 150px;
+	background-color: black;
+	color: pink;
+	font-family: monospace;
+	font-size: 1.5em;
+  padding: 5px;
+}
+
+.stackvalue {
+	width: 300px,
+	background-color: red;
+  color: white;
+  padding: 5px;
+}
+
+.box {
+	width: 100px;
+	height: 100px;
+	margin: 30px auto;
+	border: 1px solid black;
+	padding: 5px;
+}
+
+.calculation {
+	margin: 0 auto;
+	width: 100px;
+	height: 50px;
+	background-color: blue;
+	color: white;
+}
+
+.calculation_click {
+	border: 2px solid brown;
+	background-color: #eee;
+}
+
+.code {
+  font-size: 1.5em;
+  font-family: monospace;
+  background-color: blue;
+  color: white;
+  padding: 5px;
+ line-height: 1.5em;	
+}

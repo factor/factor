@@ -1,0 +1,24 @@
+- write example game using interpreter as blackbox
+
+- solve problems with maybe restricted set of words
+
+
+----------------------------------
+SUBJECTS
+----------------------------------
+
+- shuffle words
+
+- quotations
+
+- basic combinators
+  * if, if*, when, when*
+
+- map, filter, each
+
+- cleave combinators
+
+- quotation with named params
+
+- parse words
+  * SYNTAX:
