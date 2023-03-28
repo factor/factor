@@ -1,17 +1,18 @@
 ! Copyright (C) 2023 Doug Coleman.
 ! See https://factorcode.org/license.txt for BSD license.
-USING: accessors build-from-source environment html.parser
-html.parser.analyzer http.client io.backend io.directories
-io.encodings.utf8 io.files io.files.temp io.launcher
-io.pathnames kernel multiline qw sequences sorting.human
+USING: accessors build-from-source continuations html.parser
+html.parser.analyzer http.client io.directories io.files.temp
+io.launcher io.pathnames kernel qw sequences sorting.human
 windows.shell32 ;
 IN: build-from-source.windows
 
-! choco install -y meson StrawberryPerl nasm winflexbison3 glfw3
+! choco install -y meson StrawberryPerl nasm winflexbison3 glfw3 jom
+! jom is for building openssl in parallel
 
 ! From `choco install -y nasm`
 ! Add nasm to path (windows+r sysdm.cpl -> Advanced tab -> Environment Variables -> New -> "c:\Program Files\NASM")
 : check-nasm ( -- ) { "nasm.exe" "-h" } try-process ;
+: have-jom? ( -- ? ) [ { "jom" } try-process t ] [ drop f ] recover ;
 
 ! From `choco install -y StrawberryPerl`
 ! make sure it is above the git /usr/bin/perl (if that is installed)
@@ -37,8 +38,8 @@ IN: build-from-source.windows
 : build-fftw-dll ( -- )
     latest-fftw [
         [
-            { "cmake" "-DBUILD_SHARED_LIBS=ON" ".." } try-process
-            { "msbuild" "fftw.sln" "/m" "/property:Configuration=Release" } try-process
+            qw{ cmake -DBUILD_SHARED_LIBS=ON .. } try-process
+            qw{ msbuild fftw.sln /m /property:Configuration=Release } try-process
             "Release/fftw3.dll" copy-output-file
         ] with-build-directory
     ] with-tar-gz ;
@@ -46,11 +47,20 @@ IN: build-from-source.windows
 : build-winflexbison ( -- )
     "https://github.com/lexxmark/winflexbison.git" [
         [
-            { "cmake" ".." } try-process
-            { "cmake" "--build" "." "--config" "Release" "--target" "package" } try-process
+            qw{ cmake .. } try-process
+            qw{ cmake --build . --config Release --target package } try-process
         ] with-build-directory
         "bin/Release/win_bison.exe" "bison.exe" copy-vm-file-as
         "bin/Release/win_flex.exe" "flex.exe" copy-vm-file-as
+    ] with-updated-git-repo ;
+
+: build-blas ( -- )
+    "https://github.com/xianyi/OpenBLAS.git" [
+        [
+            { "cmake" "-G" "Visual Studio 17 2022" "-DCMAKE_BUILD_TYPE=Release" "-DBUILD_SHARED_LIBS=ON" ".." } try-process
+            qw{ msbuild OpenBLAS.sln /property:Configuration=Release } try-process
+            "lib/RELEASE/openblas.dll" "blas.dll" copy-output-file-as
+        ] with-build-directory
     ] with-updated-git-repo ;
 
 : build-openssl-64-dlls ( -- )
@@ -59,8 +69,8 @@ IN: build-from-source.windows
         program-files "NASM/nasm.exe" append-path "nasm.exe" prepend-current-path copy-file
         check-nasm
         check-nmake
-        { "perl" "Configure" "-DOPENSSL_PIC" "VC-WIN64A" } try-process ! "VC-WIN32"
-        { "nmake" } try-process
+        qw{ perl Configure -DOPENSSL_PIC VC-WIN64A /FS } try-process ! "VC-WIN32"
+        have-jom? qw{ jom -j 32 } { "nmake" } ? try-process
         { "apps/libssl-3-x64.dll" "apps/libcrypto-3-x64.dll" } copy-output-files
         "apps/libssl-3-x64.dll" "libssl-38.dll" copy-output-file-as
         "apps/libcrypto-3-x64.dll" "libcrypto-37.dll" copy-output-file-as
@@ -68,7 +78,7 @@ IN: build-from-source.windows
 
 : build-cairo-dll ( -- )
     "https://github.com/freedesktop/cairo.git" [
-        qw{ meson setup build2 } try-process
+        qw{ meson setup --force-fallback-for=freetype2,fontconfig build2 } try-process
         "build2" prepend-current-path
         [ { "ninja" } try-process ] with-directory
         "." find-dlls copy-output-files
@@ -104,6 +114,15 @@ IN: build-from-source.windows
             } copy-output-files
         ] with-build-directory
     ] with-tar-gz ;
+
+: build-openal ( -- )
+    "https://github.com/kcat/openal-soft.git" [
+        [
+            { "cmake" "-G" "Visual Studio 17 2022" "-DCMAKE_BUILD_TYPE=Release" "-DBUILD_SHARED_LIBS=ON" ".." } try-process
+            qw{ msbuild OpenAL.sln /property:Configuration=Release } try-process
+            "Release/OpenAL32.dll" copy-output-file
+        ] with-build-directory
+    ] with-updated-git-repo ;
 
 : latest-pcre-tar-gz ( -- path )
     "https://ftp.exim.org/pub/pcre/" [
@@ -145,8 +164,8 @@ IN: build-from-source.windows
 : build-raylib-dll ( -- )
     "https://github.com/raysan5/raylib.git" [
         [
-            { "cmake" "-DCMAKE_BUILD_TYPE=Release" "-DBUILD_SHARED_LIBS=ON" "-DBUILD_EXAMPLES=OFF" "-DUSE_EXTERNAL_GLFW=OFF" ".." } try-process
-            { "msbuild" "raylib.sln" "/m" "/property:Configuration=Release" } try-process
+            qw{ cmake -DCMAKE_BUILD_TYPE=Release -DBUILD_SHARED_LIBS=ON -DBUILD_EXAMPLES=OFF -DUSE_EXTERNAL_GLFW=OFF .. } try-process
+            qw{ msbuild raylib.sln /m /property:Configuration=Release } try-process
             "raylib/Release/raylib.dll" copy-output-file
         ] with-build-directory
     ] with-updated-git-repo ;
@@ -161,16 +180,16 @@ IN: build-from-source.windows
 : build-snappy-dll ( -- )
     "https://github.com/google/snappy.git" [
         [
-            { "cmake" "-DCMAKE_BUILD_TYPE=Release" "-DBUILD_SHARED_LIBS=ON" "-DSNAPPY_BUILD_TESTS=OFF" "-DSNAPPY_BUILD_BENCHMARKS=OFF" ".." } try-process
-            { "msbuild" "Snappy.sln" "/m" "/property:Configuration=Release" } try-process
+            qw{ cmake -DCMAKE_BUILD_TYPE=Release -DBUILD_SHARED_LIBS=ON -DSNAPPY_BUILD_TESTS=OFF -DSNAPPY_BUILD_BENCHMARKS=OFF .. } try-process
+            qw{ msbuild Snappy.sln /m /property:Configuration=Release } try-process
             "Release/snappy.dll" copy-output-file
         ] with-build-directory
     ] with-updated-git-repo ;
 
 : build-sqlite3-dll ( -- )
     "https://github.com/sqlite/sqlite.git" [
-        { "nmake" "/f" "Makefile.msc" "clean" } try-process
-        { "nmake" "/f" "Makefile.msc" } try-process
+        qw{ nmake /f Makefile.msc clean } try-process
+        qw{ nmake /f Makefile.msc } try-process
         "sqlite3.dll" copy-output-file
     ] with-updated-git-repo ;
 
@@ -195,8 +214,8 @@ IN: build-from-source.windows
 
 : build-zlib-dll ( -- )
     "https://github.com/madler/zlib" [
-        { "nmake" "/f" "win32/Makefile.msc" "clean" } try-process
-        { "nmake" "/f" "win32/Makefile.msc" } try-process
+        qw{ nmake /f win32/Makefile.msc clean } try-process
+        qw{ nmake /f win32/Makefile.msc } try-process
         "zlib1.dll" copy-output-file
     ] with-updated-git-repo ;
 
@@ -243,6 +262,7 @@ IN: build-from-source.windows
     dll-out-directory make-directories
     build-cairo-dll
     build-openssl-64-dlls
+    build-blas
     build-libressl-dlls
     build-fftw-dll
     build-pcre-dll

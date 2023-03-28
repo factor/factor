@@ -1195,6 +1195,5 @@ INSTANCE: virtual-zip-index immutable-sequence
 
 : fry-map-as ( seq quot exemplar -- newseq )
     [ 2drop length ]
-    [ overd new-sequence-like dup ]
-    [ 2nip ] 3tri
-    '[ [ [ _ nth-unsafe @ ] [ _ set-nth-unsafe ] bi ] each-integer _ _ like ] call ; inline
+    [ overd new-sequence-like dup ] 3bi
+    '[ [ [ _ nth-unsafe @ ] [ _ set-nth-unsafe ] bi ] each-integer _ ] call ; inline
