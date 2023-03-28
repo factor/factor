@@ -18,6 +18,12 @@ USING: accessors assocs checksums checksums.adler-32 checksums.fnv1 classes.tupl
  words  ;
 IN: folder
 
+CONSTANT: BUNDLEID "net.polymicro."
+CONSTANT: TEST "~/Sources"
+CONSTANT: DOMAIN-ID "net.polymicro."
+    
+TUPLE: folder-entry < directory-entry path info xattrs entries fingerprint depth ;
+
 :: trunc-path ( seq -- 'seq )
     length-limit get :> ll
     seq dup length ll >
@@ -187,15 +193,7 @@ IN: io.files.types
 
 SYMBOL: +nonexistent-file+
 
-USE: io.directories
 IN: folder
-
-CONSTANT: BUNDLEID "net.polymicro."
-
-CONSTANT: TEST "~/Sources"
-CONSTANT: DOMAIN-ID "net.polymicro."
-    
-TUPLE: folder-entry < directory-entry path info xattrs entries fingerprint depth ;
 
 : (folder-entry) ( name info path -- name type path info xattrs entries fingerprint depth )
     swap normalize-path
@@ -597,7 +595,7 @@ SYMBOL: ERRORS
     2drop "Unimplemented" .
     ;
 
-: delete-entry ( entry -- )
+: entry-delete ( entry -- )
     [ dup
       [ type>> ] keep swap
       {
@@ -642,7 +640,7 @@ SYMBOL: (link-entries)
 : entry>hardlink ( entry1 entry2 -- )
     over type>> +symbolic-link+ = not [ 
         dup file-exists?
-        [ dup delete-entry 
+        [ dup entry-delete 
           [ pathname>> ] bi@
           [ make-hard-link ]
           [    "Error: " over errno>> number>string append
