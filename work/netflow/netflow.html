@@ -1,0 +1,637 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1" />
+<meta name="author" content="Caligare s.r.o." />
+<meta name="robots" content="index,follow" />
+<link rel="stylesheet" title="caligare.com" href="/main.css" type="text/css" media="screen" />
+
+<meta name="keywords" content="netflow, version 9" />
+<meta name="description" content="Netflow version 9 format." />
+<title>Netflow :: Version 9</title>
+</head>
+
+<body>
+<table width="800" cellspacing="2" cellpadding="2"><tr><td>
+<a href="http://www.caligare.com">Caligare home</a> | 
+<a href="index.htm">What's Netflow</a> | 
+<a href="netflow_format.htm">Formats</a> | 
+<a href="rfc.htm">RFC</a> | 
+<a href="configuration.htm">Configuration</a> | 
+<a href="applications.htm">Applications</a> | 
+<a href="links.htm">Links</a> | 
+<a href="http://support.caligare.com/">Netflow Forum</a> 
+<br/><br/>
+
+
+
+
+<h1>Netflow packet Version 9 (V9)</h1>
+<a href="netflow_v1.htm">version 1</a> | 
+<a href="netflow_v5.htm">version 5</a> | 
+<a href="netflow_v6.htm">version 6</a> | 
+<a href="netflow_v7.htm">version 7</a> | 
+<a href="netflow_v8.htm">version 8</a> | 
+<a href="netflow_v9.htm">version 9</a><br/>
+
+<p>
+The distinguishing feature of the NetFlow Version 9 format is that it 
+is template based. Templates provide an extensible design to the record format, 
+a feature that should allow future enhancements to NetFlow services without 
+requiring concurrent changes to the basic flow-record format.
+</p>
+
+<h2>Packet Layout</h2>
+<p>
+The NetFlow Version 9 record format consists of a packet header followed 
+by at least one or more template or data FlowSets. A template FlowSet 
+provides a description of the fields that will be present in future data 
+FlowSets. These data FlowSets may occur later within the same export 
+packet or in subsequent export packets.
+</p>
+
+<h2>Export packet</h2>
+<table border="1">
+<tr><td>Packet Header</td></tr>
+<tr><td>Template FlowSet</td></tr>
+<tr><td>Data FlowSet</td></tr>
+<tr><td>Data FlowSet</td></tr>
+<tr><td>...</td></tr>
+<tr><td>Template FlowSet</td></tr>
+<tr><td>Data FlowSet</td></tr>
+<tr><td>...</td></tr>
+</table>
+
+
+
+<h2>Flow header format</h2>
+<table border="1">
+<tr><th>Bytes</th><th>Contents</th><th>Description</th></tr>
+<tr><td>0-1</td><td>version</td><td>NetFlow export format version number</td></tr>
+<tr><td>2-3</td><td>count</td><td>Number of flow sets exported in this packet, both template and data
+(1-30).</td></tr>
+<tr><td>4-7</td><td>sys_uptime</td><td>Current time in milliseconds since the export device booted.</td></tr>
+<tr><td>8-11</td><td>unix_secs</td><td>Current count of seconds since 0000 UTC 1970.</td></tr>
+<tr><td>12-15</td><td>package_sequence</td><td>Sequence counter of all export packets sent by the export device.
+Note: This is a change from the Version 5 and Version 8 headers, where this number represented “total flows.”</td></tr>
+<tr><td>16-19</td><td>source_id</td><td>A 32-bit value that is used to guarantee uniqueness for all flows
+exported from a particular device. (The Source ID field is the equivalent of the engine type and engine ID 
+fields found in the NetFlow Version 5 and Version 8 headers). The format of this field is vendor specific. 
+In Cisco's implementation, the first two bytes are reserved for future expansion, and will always be zero. 
+Byte 3 provides uniqueness with respect to the routing engine on the exporting device. Byte 4 provides 
+uniqueness with respect to the particular line card or Versatile Interface Processor on the exporting 
+device. Collector devices should use the combination of the source IP address plus the Source ID field 
+to associate an incoming NetFlow export packet with a unique instance of NetFlow on a particular device.</td></tr>
+</table>
+
+
+
+<h2>Template FlowSet Format</h2>
+<p>
+One of the key elements in the new Version 9 format is the template FlowSet. 
+Templates greatly enhance the flexibility of the NetFlow record format, 
+because they allow a NetFlow collector or display application to process 
+NetFlow data without necessarily knowing the format of the data in advance.
+Templates are used to describe the type and length of individual fields 
+within subsequent NetFlow data records that match a template ID.
+</p>
+
+<table border="1">
+<tr><th>bit 0-15</th></tr>
+<tr><td>flowset_id = 0</td></tr>
+<tr><td>length</td></tr>
+<tr><td>template_id</td></tr>
+<tr><td>field_count</td></tr>
+<tr><td>field_1_type</td></tr>
+<tr><td>field_1_length</td></tr>
+<tr><td>field_2_type</td></tr>
+<tr><td>field_2_length</td></tr>
+<tr><td>field_3_type</td></tr>
+<tr><td>field_3_length</td></tr>
+<tr><td>...</td></tr>
+<tr><td>field_N_type</td></tr>
+<tr><td>field_N_length</td></tr>
+<tr><td>template_id</td></tr>
+<tr><td>field_count</td></tr>
+<tr><td>field_1_type</td></tr>
+<tr><td>field_1_length</td></tr>
+<tr><td>...</td></tr>
+<tr><td>field_N_type</td></tr>
+<tr><td>field_N_length</td></tr>
+</table>
+
+<br/><br/>
+
+<table border="1">
+<tr><th>Field</th><th>Description</th></tr>  
+<tr>
+<td>flowset_id</td>
+<td> 
+The flowset_id is used to distinguish template records from data records. A template 
+record always has a flowset_id in the range of 0-255. Currently template record that 
+describes flow fields has a flowset_id of zero and the template record that describes 
+option fields (described below) has a flowset_id of 1. A data record always has a 
+nonzero flowset_id greater than 255. 
+</td>
+</tr>
+
+<tr>
+<td>length</td>
+<td>
+Length refers to the total length of this FlowSet. Because an individual template FlowSet 
+may contain multiple template IDs (as illustrated above), the length value should be used 
+to determine the position of the next FlowSet record, which could be either a template 
+or a data FlowSet. 
+<br/>
+Length is expressed in type/length/value (TLV) format, meaning that the value includes the 
+bytes used for the flowset_id and the length bytes themselves, as well as the combined 
+lengths of all template records included in this FlowSet.
+</td>
+</tr>
+
+<tr>
+<td>template_id</td>
+<td> 
+As a router generates different template FlowSets to match the type of NetFlow data it will 
+be exporting, each template is given a unique ID. This uniqueness is local to the router 
+that generated the template_id. 
+<br/>
+Templates that define data record formats begin numbering at 256 since 0-255 are reserved 
+for FlowSet IDs. 
+</td>
+</tr>
+
+<tr>
+<td>field_count</td>
+<td>
+This field gives the number of fields in this template record. Because a template FlowSet 
+may contain multiple template records, this field allows the parser to determine the end 
+of the current template record and the start of the next. 
+</td>
+</tr>
+
+<tr>
+<td>field_type</td>
+<td>This numeric value represents the type of the field. The possible values of the field 
+type are vendor specific. Cisco supplied values are consistent across all platforms that 
+support NetFlow Version 9. 
+<br/>
+At the time of the initial release of the NetFlow Version 9 code (and after any subsequent 
+changes that could add new field-type definitions), Cisco provides a file that defines the 
+known field types and their lengths. 
+<br/>
+The currently defined field types are detailed below. 
+</td>
+</tr>
+
+<tr>
+<td>field_length</td>
+<td>
+This number gives the length of the above-defined field, in bytes.
+</td>
+</tr>
+</table>
+ 
+<p>
+Note the following: 
+</p>
+<ul>
+<li>Template IDs are not consistent across a router reboot. Template IDs should change only 
+if the configuration of NetFlow on the export device changes.</li>
+<li>Templates periodically expire if they are not refreshed. Templates can be refreshed in 
+two ways. A template can be resent every N number of export packets. A template can also be 
+sent on a timer, so that it is refreshed every N number of minutes. Both options are user 
+configurable.</li>
+</ul>
+
+
+<table border="1">
+<tr><th>Field Type</th><th>Value</th><th>Length (bytes)</th><th>Description</th></tr>  
+<tr><td>IN_BYTES</td><td>1</td><td>N (default is 4)</td><td>Incoming counter with length N x 8 bits 
+for number of bytes associated with an IP Flow.</td></tr>
+
+<tr><td>IN_PKTS</td><td>2</td><td>N (default is 4)</td><td>Incoming counter with length N x 8 bits 
+for the number of packets associated with an IP Flow</td></tr> 
+
+<tr><td>FLOWS</td><td>3</td><td>N</td><td>Number of flows that were aggregated; default for N is 4</td></tr>
+
+<tr><td>PROTOCOL</td><td>4</td><td>1</td><td>IP protocol byte</td></tr> 
+
+<tr><td>SRC_TOS</td><td>5</td><td>1</td><td>Type of Service byte setting when entering incoming interface</td></tr>
+
+<tr><td>TCP_FLAGS</td><td>6</td><td>1</td><td>Cumulative of all the TCP flags seen for this flow</td></tr> 
+
+<tr><td>L4_SRC_PORT</td><td>7</td><td>2</td><td>TCP/UDP source port number e.g. FTP, Telnet, or equivalent</td></tr> 
+
+<tr><td>IPV4_SRC_ADDR</td><td>8</td><td>4</td><td>IPv4 source address</td></tr> 
+
+<tr><td>SRC_MASK</td><td>9</td><td>1</td><td>The number of contiguous bits in the source address subnet mask i.e. the 
+submask in slash notation</td></tr> 
+
+<tr><td>INPUT_SNMP</td><td>10</td><td>N</td><td>Input interface index; default for N is 2 but higher values could 
+be used</td></tr> 
+
+<tr><td>L4_DST_PORT</td><td>11</td><td>2</td><td>TCP/UDP destination port number e.g. FTP, Telnet, or equivalent</td></tr> 
+
+<tr><td>IPV4_DST_ADDR</td><td>12</td><td>4</td><td>IPv4 destination address</td></tr> 
+
+<tr><td>DST_MASK</td><td>13</td><td>1</td><td>The number of contiguous bits in the destination address subnet mask 
+i.e. the submask in slash notation</td></tr> 
+
+<tr><td>OUTPUT_SNMP</td><td>14</td><td>N</td><td>Output interface index; default for N is 2 but higher values could 
+be used</td></tr> 
+
+<tr><td>IPV4_NEXT_HOP</td><td>15</td><td>4</td><td>IPv4 address of next-hop router</td></tr> 
+
+<tr><td>SRC_AS</td><td>16</td><td>N (default is 2)</td><td>Source BGP autonomous system number where N could be 2 or 4</td></tr> 
+
+<tr><td>DST_AS</td><td>17</td><td>N (default is 2)</td><td>Destination BGP autonomous system number where N could be 2 or 4</td></tr>
+
+<tr><td>BGP_IPV4_NEXT_HOP</td><td>18</td><td>4</td><td>Next-hop router's IP in the BGP domain</td></tr> 
+
+<tr><td>MUL_DST_PKTS</td><td>19</td><td>N (default is 4)</td><td>IP multicast outgoing packet counter with length 
+N x 8 bits for packets associated with the IP Flow</td></tr> 
+
+<tr><td>MUL_DST_BYTES</td><td>20</td><td>N (default is 4)</td><td>IP multicast outgoing byte counter with length 
+N x 8 bits for bytes associated with the IP Flow</td></tr> 
+
+<tr><td>LAST_SWITCHED</td><td>21</td><td>4</td><td>System uptime at which the last packet of this flow was switched</td></tr> 
+
+<tr><td>FIRST_SWITCHED</td><td>22</td><td>4</td><td>System uptime at which the first packet of this flow was switched</td></tr> 
+
+<tr><td>OUT_BYTES</td><td>23</td><td>N (default is 4)</td><td>Outgoing counter with length N x 8 bits for the number 
+of bytes associated with an IP Flow</td></tr> 
+
+<tr><td>OUT_PKTS</td><td>24</td><td>N (default is 4)</td><td>Outgoing counter with length N x 8 bits for the number 
+of packets associated with an IP Flow.</td></tr> 
+
+<tr><td>MIN_PKT_LNGTH</td><td>25</td><td>2</td><td>Minimum IP packet length on incoming packets of the flow</td></tr> 
+
+<tr><td>MAX_PKT_LNGTH</td><td>26</td><td>2</td><td>Maximum IP packet length on incoming packets of the flow</td></tr> 
+
+<tr><td>IPV6_SRC_ADDR</td><td>27</td><td>16</td><td>IPv6 Source Address</td></tr> 
+
+<tr><td>IPV6_DST_ADDR</td><td>28</td><td>16</td><td>IPv6 Destination Address</td></tr> 
+
+<tr><td>IPV6_SRC_MASK</td><td>29</td><td>1</td><td>Length of the IPv6 source mask in contiguous bits</td></tr> 
+
+<tr><td>IPV6_DST_MASK</td><td>30</td><td>1</td><td>Length of the IPv6 destination mask in contiguous bits</td></tr> 
+
+<tr><td>IPV6_FLOW_LABEL</td><td>31</td><td>3</td><td>IPv6 flow label as per RFC 2460 definition</td></tr> 
+
+<tr><td>ICMP_TYPE</td><td>32</td><td>2</td><td>Internet Control Message Protocol (ICMP) packet type; reported 
+as ((ICMP Type * 256) + ICMP code)</td></tr> 
+
+<tr><td>MUL_IGMP_TYPE</td><td>33</td><td>1</td><td>Internet Group Management Protocol (IGMP) packet type</td></tr> 
+
+<tr><td>SAMPLING_INTERVAL</td><td>34</td><td>4</td><td>When using sampled NetFlow, the rate at which packets 
+are sampled e.g. a value of 100 indicates that one of every 100 packets is sampled</td></tr> 
+
+<tr><td>SAMPLING_ALGORITHM</td><td>35</td><td>1</td><td>The type of algorithm used for sampled NetFlow: 0x01 
+Deterministic Sampling ,0x02 Random Sampling</td></tr> 
+
+<tr><td>FLOW_ACTIVE_TIMEOUT</td><td>36</td><td>2</td><td>Timeout value (in seconds) for active flow entries in 
+the NetFlow cache</td></tr>
+
+<tr><td>FLOW_INACTIVE_TIMEOUT</td><td>37</td><td>2</td><td>Timeout value (in seconds) for inactive flow entries in 
+the NetFlow cache</td></tr> 
+
+<tr><td>ENGINE_TYPE</td><td>38</td><td>1</td><td>Type of flow switching engine: RP = 0, VIP/Linecard = 1</td></tr> 
+
+<tr><td>ENGINE_ID</td><td>39</td><td>1</td><td>ID number of the flow switching engine</td></tr> 
+
+<tr><td>TOTAL_BYTES_EXP</td><td>40</td><td>N (default is 4)</td><td>Counter with length N x 8 bits for bytes for 
+the number of bytes exported by the Observation Domain</td></tr> 
+
+<tr><td>TOTAL_PKTS_EXP</td><td>41</td><td>N (default is 4)</td><td>Counter with length N x 8 bits for bytes for 
+the number of packets exported by the Observation Domain</td></tr> 
+
+<tr><td>TOTAL_FLOWS_EXP</td><td>42</td><td>N (default is 4)</td><td>Counter with length N x 8 bits for bytes for 
+the number of flows exported by the Observation Domain</td></tr>
+
+<tr><td>* Vendor Proprietary*</td><td>43</td><td>&nbsp;</td><td>&nbsp;</td></tr>
+
+<tr><td>IPV4_SRC_PREFIX</td><td>44</td><td>4</td><td>IPv4 source address prefix (specific for Catalyst architecture)</td></tr> 
+
+<tr><td>IPV4_DST_PREFIX</td><td>45</td><td>4</td><td>IPv4 destination address prefix (specific for Catalyst architecture)</td></tr> 
+
+<tr><td>MPLS_TOP_LABEL_TYPE</td><td>46</td><td>1</td><td>MPLS Top Label Type: 0x00 UNKNOWN 0x01 TE-MIDPT 
+0x02 ATOM 0x03 VPN 0x04 BGP 0x05 LDP</td></tr> 
+
+<tr><td>MPLS_TOP_LABEL_IP_ADDR</td><td>47</td><td>4</td><td>Forwarding Equivalent Class corresponding to 
+the MPLS Top Label</td></tr> 
+
+<tr><td>FLOW_SAMPLER_ID</td><td>48</td><td>1</td><td>Identifier shown in "show flow-sampler"</td></tr>
+
+<tr><td>FLOW_SAMPLER_MODE</td><td>49</td><td>1</td><td>The type of algorithm used for sampling data: 0x02 
+random sampling. Use in connection with FLOW_SAMPLER_MODE</td></tr> 
+
+<tr><td>FLOW_SAMPLER_RANDOM_INTERVAL</td><td>50</td><td>4</td><td>Packet interval at which to sample. Use in 
+connection with FLOW_SAMPLER_MODE</td></tr>
+
+<tr><td>* Vendor Proprietary*</td><td>51</td><td>&nbsp;</td><td>&nbsp;</td></tr>
+
+<tr><td>MIN_TTL</td><td>52</td><td>1</td><td>Minimum TTL on incoming packets of the flow</td></tr> 
+
+<tr><td>MAX_TTL</td><td>53</td><td>1</td><td>Maximum TTL on incoming packets of the flow</td></tr> 
+
+<tr><td>IPV4_IDENT</td><td>54</td><td>2</td><td>The IP v4 identification field</td></tr> 
+
+<tr><td>DST_TOS</td><td>55</td><td>1</td><td>Type of Service byte setting when exiting outgoing interface</td></tr> 
+
+<tr><td>IN_SRC_MAC</td><td>56</td><td>6</td><td>Incoming source MAC address</td></tr> 
+
+<tr><td>OUT_DST_MAC</td><td>57</td><td>6</td><td>Outgoing destination MAC address</td></tr> 
+
+<tr><td>SRC_VLAN</td><td>58</td><td>2</td><td>Virtual LAN identifier associated with ingress interface</td></tr> 
+
+<tr><td>DST_VLAN</td><td>59</td><td>2</td><td>Virtual LAN identifier associated with egress interface</td></tr>
+
+<tr><td>IP_PROTOCOL_VERSION</td><td>60</td><td>1</td><td>Internet Protocol Version Set to 4 for IPv4, set to 6 
+for IPv6. If not present in the template, then version 4 is assumed.</td></tr> 
+
+<tr><td>DIRECTION</td><td>61</td><td>1</td><td>Flow direction: 0 - ingress flow, 1 - egress flow</td></tr> 
+
+<tr><td>IPV6_NEXT_HOP</td><td>62</td><td>16</td><td>IPv6 address of the next-hop router</td></tr>
+
+<tr><td>BPG_IPV6_NEXT_HOP</td><td>63</td><td>16</td><td>Next-hop router in the BGP domain</td></tr> 
+
+<tr><td>IPV6_OPTION_HEADERS</td><td>64</td><td>4</td><td>Bit-encoded field identifying IPv6 option headers 
+found in the flow</td></tr>
+
+<tr><td>* Vendor Proprietary*</td><td>65</td><td>&nbsp;</td><td>&nbsp;</td></tr>
+<tr><td>* Vendor Proprietary*</td><td>66</td><td>&nbsp;</td><td>&nbsp;</td></tr>
+<tr><td>* Vendor Proprietary*</td><td>67</td><td>&nbsp;</td><td>&nbsp;</td></tr>
+<tr><td>* Vendor Proprietary*</td><td>68</td><td>&nbsp;</td><td>&nbsp;</td></tr>
+<tr><td>* Vendor Proprietary*</td><td>69</td><td>&nbsp;</td><td>&nbsp;</td></tr>
+
+<tr><td>MPLS_LABEL_1</td><td>70</td><td>3</td><td>MPLS label at position 1 in the stack</td></tr>
+
+<tr><td>MPLS_LABEL_2</td><td>71</td><td>3</td><td>MPLS label at position 2 in the stack</td></tr>
+
+<tr><td>MPLS_LABEL_3</td><td>72</td><td>3</td><td>MPLS label at position 3 in the stack</td></tr>
+
+<tr><td>MPLS_LABEL_4</td><td>73</td><td>3</td><td>MPLS label at position 4 in the stack</td></tr>
+
+<tr><td>MPLS_LABEL_5</td><td>74</td><td>3</td><td>MPLS label at position 5 in the stack</td></tr>
+
+<tr><td>MPLS_LABEL_6</td><td>75</td><td>3</td><td>MPLS label at position 6 in the stack</td></tr>
+
+<tr><td>MPLS_LABEL_7</td><td>76</td><td>3</td><td>MPLS label at position 7 in the stack</td></tr>
+
+<tr><td>MPLS_LABEL_8</td><td>77</td><td>3</td><td>MPLS label at position 8 in the stack</td></tr>
+
+<tr><td>MPLS_LABEL_9</td><td>78</td><td>3</td><td>MPLS label at position 9 in the stack</td></tr>
+
+<tr><td>MPLS_LABEL_10</td><td>79</td><td>3</td><td>MPLS label at position 10 in the stack</td></tr>
+
+<tr><td>IN_DST_MAC</td><td>80</td><td>6</td><td>Incoming destination MAC address</td></tr>
+
+<tr><td>OUT_SRC_MAC</td><td>81</td><td>6</td><td>Outgoing source MAC address</td></tr>
+
+<tr><td>IF_NAME</td><td>82</td><td>N (default specified in template)</td><td>Shortened interface name e.g. "FE1/0"</td></tr>
+
+<tr><td>IF_DESC</td><td>83</td><td>N (default specified in template)</td><td>Full interface name e.g. "FastEthernet 1/0"</td></tr>
+
+<tr><td>SAMPLER_NAME</td><td>84</td><td>N (default specified in template)</td><td>Name of the flow sampler</td></tr>
+
+<tr><td>IN_PERMANENT_BYTES</td><td>85</td><td>N (default is 4)</td><td>Running byte counter for a permanent flow</td></tr>
+
+<tr><td>IN_PERMANENT_PKTS</td><td>86</td><td>N (default is 4)</td><td>Running packet counter for a permanent flow</td></tr>
+
+<tr><td>* Vendor Proprietary*</td><td>87</td><td>&nbsp;</td><td>&nbsp;</td></tr>
+
+</table>
+
+<p>
+When extensibility is required, the new field types will be added to the list. The new field 
+types have to be updated on the Exporter and Collector but the NetFlow export format would 
+remain unchanged.
+</p>
+
+<p>
+In some cases the size of a field type is fixed by definition, for example PROTOCOL, or 
+IPV4_SRC_ADDR. However, in other cases they are defined as a variant type. This improves the 
+memory efficiency in the collector and reduces the network bandwidth requirement between the 
+Exporter and the Collector. As an example, in the case IN_BYTES, on an access router it might 
+be sufficient to use a 32 bit counter (N = 4), whilst on a core router a 64 bit counter (N = 8) 
+would be required. 
+</p>
+
+<p>
+All counters and counter-like objects are unsigned integers of size N * 8 bits.
+</p>
+
+
+<h2>Data FlowSet Format</h2>
+
+<table border="1">
+<tr><th>bit 0-15</th></tr>
+<tr><td>flowset_id = template_id (>255)</td></tr>
+<tr><td>length</td></tr>
+<tr><td>record_1-field_1_value</td></tr>
+<tr><td>record_1-field_2_value</td></tr>
+<tr><td>record_1-field_3_value</td></tr>
+<tr><td>...</td></tr>
+<tr><td>record_1-field_M_value</td></tr>
+<tr><td>record_2-field_1_value</td></tr>
+<tr><td>record_2-field_2_value</td></tr>
+<tr><td>record_2-field_3_value</td></tr>
+<tr><td>...</td></tr>
+<tr><td>record_2-field_M_value</td></tr>
+<tr><td>...</td></tr>
+<tr><td>record_N-field_M_value</td></tr>
+<tr><td>padding</td></tr>
+</table>
+
+<br/><br/>
+
+
+<table border="1">
+<tr><th>Field</th><th>Description</th></tr>  
+<tr>
+<td>flowset_id</td>
+<td>
+A FlowSet ID precedes each group of records within a NetFlow Version 9 data FlowSet. The 
+FlowSet ID maps to a (previously received) template_id. The collector and display 
+applications should use the flowset_id to map the appropriate type and length to any 
+field values that follow.
+</td>
+</tr>
+
+<tr>
+<td>length</td>
+<td>
+This field gives the length of the data FlowSet.
+<br/>
+Length is expressed in TLV format, meaning that the value includes the bytes used for 
+the flowset_id and the length bytes themselves, as well as the combined lengths of any 
+included data records. 
+</td>
+</tr>
+
+<tr>
+<td>record_N—field_M</td> 
+<td>
+The remainder of the Version 9 data FlowSet is a collection of field values. The type 
+and length of the fields have been previously defined in the template record referenced 
+by the flowset_id/template_id. 
+</td>
+</tr>
+
+<tr>
+<td>padding</td>
+<td>
+Padding should be inserted to align the end of the FlowSet on a 32 bit boundary. Pay 
+attention that the length field will include those padding bits.
+</td>
+</tr> 
+</table>
+
+<p>
+When interpreting the NetFlow Version 9 data FlowSet format, note that the fields cannot
+be parsed without a corresponding template ID. If a data FlowSet that does not have an 
+appropriate template ID is received, the record should be discarded. 
+</p>
+
+
+<h2>Options Template Format</h2>
+<p>
+One additional record type is very important within the NetFlow Version 9 specification: 
+an options template (and its corresponding options data record). Rather than supplying 
+information about IP flows, options are used to supply "meta-data" about the NetFlow 
+process itself. The format of the options template is detailed below.
+</p>
+
+
+<table border="1">
+<tr><th>bit 0-15</th></tr>
+<tr><td>flowset_id = 1</td></tr>
+<tr><td>length</td></tr>
+<tr><td>template_id</td></tr>
+<tr><td>option_scope_length</td></tr>
+<tr><td>option_length</td></tr>
+<tr><td>scope_field_1_type</td></tr>
+<tr><td>scope_field_1_length</td></tr>
+<tr><td>...</td></tr>
+<tr><td>scope_field_N_length</td></tr>
+<tr><td>option_field_1_type</td></tr>
+<tr><td>option_field_1_length</td></tr>
+<tr><td>...</td></tr>
+<tr><td>option_field_N_length</td></tr>
+<tr><td>padding</td></tr>
+</table>
+
+<br/><br/>
+
+
+<table border="1">
+<tr><th>Field</th><th>Description</th></tr>  
+<tr>
+<td>flowset_id = 1</td>
+<td>
+The flowset_id is used to distinguish template records from data records. A template record 
+always has a flowset_id of 1. A data record always has a nonzero flowset_id which is greater 
+than 255.
+</td>
+</tr>
+
+<tr>
+<td>length</td>
+<td>
+This field gives the total length of this FlowSet. Because an individual template FlowSet may 
+contain multiple template IDs, the length value should be used to determine the position of 
+the next FlowSet record, which could be either a template or a data FlowSet.
+<br/>
+Length is expressed in TLV format, meaning that the value includes the bytes used for the 
+flowset_id and the length bytes themselves, as well as the combined lengths of all template 
+records included in this FlowSet.
+</td>
+</tr>
+
+<tr>
+<td>template_id</td> 
+<td>
+As a router generates different template FlowSets to match the type of NetFlow data it will 
+be exporting, each template is given a unique ID. This uniqueness is local to the router that 
+generated the template_id. The template_id is greater than 255. Template IDs inferior to 255 
+are reserved.
+</td>
+</tr>
+ 
+<tr>
+<td>option_scope_length</td>
+<td>
+This field gives the length in bytes of any scope fields contained in this options template 
+(the use of scope is described below).
+</td>
+</tr>
+ 
+<tr>
+<td>options_length</td>
+<td>
+This field gives the length (in bytes) of any Options field definitions contained in this 
+options template.
+</td>
+</tr>
+
+<tr>
+<td>scope_field_N_type</td>
+<td>
+This field gives the relevant portion of the NetFlow process to which the options record 
+refers. Currently defined values follow: 
+<ul>
+<li>0x0001 System</li>
+<li>0x0002 Interface</li>
+<li>0x0003 Line Card</li>
+<li>0x0004 NetFlow Cache</li>
+<li>0x0005 Template</li>
+</ul>
+For example, sampled NetFlow can be implemented on a per-interface basis, so if the options 
+record were reporting on how sampling is configured, the scope for the report would be 
+0x0002 (interface). 
+</td>
+</tr>
+
+<tr>
+<td>scope_field_N_length</td>
+<td>
+This field gives the length (in bytes) of the Scope field, as it would appear in an options record. 
+</td>
+</tr>
+
+<tr>
+<td>option_field_N_type</td>
+<td>
+This numeric value represents the type of the field that appears in the options record. 
+Possible values are detailed in template flow set format (above). 
+</td>
+</tr>
+
+<tr>
+<td>option_field_N_length</td>
+<td>
+This number is the length (in bytes) of the field, as it would appear in an options record.
+</td>
+</tr>
+ 
+<tr>
+<td>padding</td>
+<td>
+Padding should be inserted to align the end of the FlowSet on a 32 bit boundary. Pay 
+attention that the length field will include those padding bits. 
+</td>
+</tr>
+</table> 
+
+<br/><br/>
+<i>Source: <a href="http://www.cisco.com/go/netflow">www.cisco.com</a></i><br/>
+
+<br/><br/>
+<i>(c) 2003-2006 Caligare s.r.o.</i><br/>
+<a href="http://www.caligare.com"><i>http://www.caligare.com</i></a><br/>
+<i>Last-modified: May 10 2006</i><br/>
+
+</td></tr></table>
+</body>
+</html>
