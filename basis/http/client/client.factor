@@ -224,6 +224,8 @@ SYMBOL: redirects
         [ header>> "upgrade" of "websocket" = ]
     } 1&& ;
 
+PRIVATE>
+
 SYMBOL: request-socket
 
 : do-http-request ( request quot: ( chunk -- ) -- response/stream )
@@ -263,8 +265,6 @@ SYMBOL: request-socket
     <request>
         swap >>method
         swap request-url >>url ; inline
-
-PRIVATE>
 
 : with-http-request ( request quot: ( chunk -- ) -- response/stream )
     do-http-request check-response ; inline
