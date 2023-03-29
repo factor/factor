@@ -21,7 +21,8 @@ CONSTANT: websocket-version "13"
     "no-cache" "Pragma" set-header
     "no-cache" "Cache-Control" set-header
     "permessage-deflate; client_max_window_bits" "Sec-WebSocket-Extensions" set-header
-    dup url>> host>> "Host" set-header ;
+    dup url>> host>> "Host" set-header
+    dup url>> [ "ws" = "http" "https" ? ] change-protocol drop ;
 
 CONSTANT: websocket-opcode-continue-frame 0
 CONSTANT: websocket-opcode-text-frame 1

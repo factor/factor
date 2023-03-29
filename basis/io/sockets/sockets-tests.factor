@@ -170,8 +170,8 @@ os unix? [
 { } [ f 0 <inet4> <datagram> dispose ] unit-test
 { } [ f 0 <inet6> <datagram> dispose ] unit-test
 
-{ 80 } [ "http" protocol-port ] unit-test
-{ f } [ f protocol-port ] unit-test
+{ 80 } [ "http" lookup-protocol-port ] unit-test
+{ f } [ f lookup-protocol-port ] unit-test
 
 { "http" } [ 80 port-protocol ] unit-test
 { f } [ f port-protocol ] unit-test

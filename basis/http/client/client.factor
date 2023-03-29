@@ -3,11 +3,11 @@
 USING: accessors arrays ascii assocs calendar combinators
 combinators.short-circuit continuations destructors effects
 environment hashtables http http.client.post-data http.parsers
-io io.crlf io.encodings io.encodings.ascii io.encodings.binary
-io.encodings.iana io.encodings.string io.files io.pathnames
-io.sockets io.sockets.secure io.timeouts kernel math math.order
-math.parser mime.types namespaces present sequences splitting
-urls vocabs.loader ;
+http.websockets io io.crlf io.encodings io.encodings.ascii
+io.encodings.binary io.encodings.iana io.encodings.string
+io.files io.pathnames io.sockets io.sockets.secure io.timeouts
+kernel math math.order math.parser mime.types namespaces present
+protocols sequences splitting urls vocabs.loader ;
 IN: http.client
 
 ERROR: too-many-redirects ;
@@ -48,7 +48,7 @@ ERROR: download-failed response ;
 : default-port? ( url -- ? )
     {
         [ port>> not ]
-        [ [ port>> ] [ protocol>> protocol-port ] bi = ]
+        [ [ port>> ] [ protocol>> lookup-protocol-port ] bi = ]
     } 1|| ;
 
 : unparse-host ( url -- string )
@@ -261,10 +261,18 @@ SYMBOL: request-socket
         ] with-destructors
     ] with-variable ; inline recursive
 
+: add-default-headers ( request -- request )
+    dup url>> protocol>> {
+        ! { [ dup { "http" "https" } member? ] [ drop add-connection-close-header ] }
+        { [ dup { "ws" "wss" } member? ] [ drop add-websocket-upgrade-headers ] }
+        [ drop ]
+    } cond ;
+
 : <client-request> ( url method -- request )
     <request>
         swap >>method
-        swap request-url >>url ; inline
+        swap request-url >>url
+        add-default-headers ; inline
 
 : with-http-request ( request quot: ( chunk -- ) -- response/stream )
     do-http-request check-response ; inline

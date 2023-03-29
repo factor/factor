@@ -63,6 +63,6 @@ M: http2-server handle-client*
 : <http2-server> ( -- server )
     ascii http2-server new-threaded-server
         "http2.server" >>name
-        "http" protocol-port >>insecure
-        "https" protocol-port >>secure ;
+        "http" lookup-protocol-port >>insecure
+        "https" lookup-protocol-port >>secure ;
 

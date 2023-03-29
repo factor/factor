@@ -4,7 +4,7 @@
 USING: accessors ascii assocs combinators
 combinators.short-circuit io.pathnames io.sockets
 io.sockets.secure kernel lexer linked-assocs make math.parser
-multiline namespaces peg.ebnf present sequences
+multiline namespaces peg.ebnf present protocols sequences
 sequences.generalizations splitting strings strings.parser
 urls.encoding vocabs.loader ;
 
@@ -115,7 +115,7 @@ M: pathname >url string>> >url ;
     ] [ 2drop ] if ;
 
 : url-port ( url -- port/f )
-    [ port>> ] [ protocol>> protocol-port ] bi over =
+    [ port>> ] [ protocol>> lookup-protocol-port ] bi over =
     [ drop f ] when ;
 
 : ipv6-host ( host -- host/ipv6 ipv6? )
@@ -201,7 +201,7 @@ PRIVATE>
     [
         [ host>> ipv6-host drop ]
         [ port>> ]
-        [ protocol>> protocol-port ]
+        [ protocol>> lookup-protocol-port ]
         tri or <inet>
     ] [
         dup protocol>> secure-protocol?
@@ -213,7 +213,7 @@ PRIVATE>
     [ port>> >>port ] bi ;
 
 : ensure-port ( url -- url' )
-    clone dup protocol>> '[ _ protocol-port or ] change-port ;
+    clone dup protocol>> '[ _ lookup-protocol-port or ] change-port ;
 
 ! Literal syntax
 SYNTAX: URL" lexer get skip-blank parse-string >url suffix! ;
