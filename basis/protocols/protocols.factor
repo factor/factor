@@ -3,8 +3,6 @@
 USING: combinators kernel sequences ;
 IN: protocols
 
-ERROR: unknown-protocol protocol ;
-
 : lookup-protocol ( string -- entry )
     {
         { "ftp"      [ { 21 f { "tcp" } } ] }
@@ -48,4 +46,4 @@ ERROR: unknown-protocol protocol ;
 
 : lookup-protocol-port ( string -- port ) lookup-protocol first ;
 : lookup-protocol-secure ( string -- ? ) lookup-protocol second ;
-: lookup-protocol-protos ( string -- port ) lookup-protocol second ;
+: lookup-protocol-protos ( string -- port ) lookup-protocol third ;
