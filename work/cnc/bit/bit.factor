@@ -232,7 +232,7 @@ SYMBOL: sql-statement
 : bit-id= ( string -- bit )
     hard-quote  "id = "  prepend
     bits-db-where prepend  do-bits-db
-    drop first ;
+    [ first ] [ drop f ] if ; 
 
 : 1/4-bits ( -- bits )
     { "diameter = 0.25" "units = 1" } bit-where ;
