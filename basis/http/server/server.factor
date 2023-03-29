@@ -7,8 +7,8 @@ http.server.remapping http.server.requests http.server.responses
 io io.crlf io.encodings io.encodings.ascii io.encodings.iana
 io.encodings.utf8 io.servers io.sockets io.sockets.secure
 io.streams.limited kernel logging logging.insomniac math
-mime.types namespaces present sequences splitting tools.time
-urls vectors vocabs vocabs.refresh xml.writer ;
+mime.types namespaces present protocols sequences splitting
+tools.time urls vectors vocabs vocabs.refresh xml.writer ;
 IN: http.server
 
 GENERIC: write-response ( response -- )
@@ -225,8 +225,8 @@ M: http-server handle-client*
 : <http-server> ( -- server )
     ascii http-server new-threaded-server
         "http.server" >>name
-        "http" protocol-port >>insecure
-        "https" protocol-port >>secure ;
+        "http" lookup-protocol-port >>insecure
+        "https" lookup-protocol-port >>secure ;
 
 : httpd ( port -- http-server )
     <http-server>

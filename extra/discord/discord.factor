@@ -8,7 +8,7 @@ threads tools.hexdump ;
 IN: discord
 
 CONSTANT: discord-api-url "https://discord.com/api/v10"
-CONSTANT: discord-bot-gateway  "https://gateway.discord.gg/gateway/bot?v=10&encoding=json"
+CONSTANT: discord-bot-gateway  "wss://gateway.discord.gg/gateway/bot?v=10&encoding=json"
 
 TUPLE: discord-webhook url id token ;
 
@@ -264,18 +264,21 @@ ENUM: discord-opcode
 : discord-connect ( config -- discord-bot )
     \ discord-bot-config [
         discord-bot-gateway <get-request>
-        add-websocket-upgrade-headers
         add-discord-auth-header
         [ drop ] do-http-request
-        [ in>> stream>> ] [ out>> stream>> ] bi
-        \ discord-bot-config get <discord-bot>
-        dup '[
-            _ \ discord-bot [
-                discord-bot get [ in>> ] [ out>> ] bi
-                [
-                    [ handle-discord-websocket ] read-websocket-loop
-                ] with-streams
-            ] with-variable
-        ] "Discord Bot" spawn
-        >>bot-thread
+        dup response? [
+            throw
+        ] [
+            [ in>> stream>> ] [ out>> stream>> ] bi
+            \ discord-bot-config get <discord-bot>
+            dup '[
+                _ \ discord-bot [
+                    discord-bot get [ in>> ] [ out>> ] bi
+                    [
+                        [ handle-discord-websocket ] read-websocket-loop
+                    ] with-streams
+                ] with-variable
+            ] "Discord Bot" spawn
+            >>bot-thread
+        ] if
     ] with-variable ;
