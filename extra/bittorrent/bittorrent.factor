@@ -100,7 +100,7 @@ M: string load-metainfo
 
 TUPLE: magnet display-name exact-length exact-topic
 web-seed acceptable-source exact-source keyword-topic
-manifest-topic address-tracker ;
+manifest-topic address-tracker select-only peer ;
 
 : magnet-link>magnet ( url -- magnet-url )
     [ magnet new ] dip
@@ -114,6 +114,8 @@ manifest-topic address-tracker ;
         [ "kt" of >>keyword-topic ]
         [ "mt" of >>manifest-topic ]
         [ "tr" of >>address-tracker ]
+        [ "so" of >>select-only ]
+        [ "x.pe" of >>peer ]
     } cleave ;
 
 : parse-peer4 ( peerbin -- inet4 )
