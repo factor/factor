@@ -14,8 +14,6 @@ USING: accessors alien.c-types alien.data assocs byte-arrays byte-vectors
     ;
 
 os macosx? [
-    USE: cocoa.classes
-    USE: core-graphics.types
     IN: cocoa
 
 : screen-size ( -- size )
@@ -407,7 +405,6 @@ IN: serialize
     ] if
     ;
 
-USING: strings ;
 IN: math.parser
 : >number ( string|number -- number )
     dup string? [ string>number ] when ;
