@@ -170,9 +170,6 @@ TUPLE: request
         "Factor http.client" "User-Agent" set-header
         max-redirects >>redirects ;
 
-: add-connection-close-header ( request -- request )
-    "close" "Connection" set-header ;
-
 : header ( request/response key -- value )
     swap header>> at ;
 

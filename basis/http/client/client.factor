@@ -263,7 +263,6 @@ SYMBOL: request-socket
 
 : add-default-headers ( request -- request )
     dup url>> protocol>> {
-        ! { [ dup { "http" "https" } member? ] [ drop add-connection-close-header ] }
         { [ dup { "ws" "wss" } member? ] [ drop add-websocket-upgrade-headers ] }
         [ drop ]
     } cond ;
