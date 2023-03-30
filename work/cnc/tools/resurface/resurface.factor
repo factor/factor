@@ -26,29 +26,37 @@ IN: cnc.tools
 :: surface-x ( gcodes toolpath -- gcodes )  ! assume starts at home, ends at home
     toolpath machine>> x-max>> :> xmax
     toolpath machine>> y-max>> :> ymax
+    toolpath bit>> stepover>> >number :> step
     0 :> x!  0 :> y! 
     gcodes
     [ x xmax <= ]
     (( up over down over ))
-    [   x ymax toolpath bit>> stepover>> >number do-x
-        x toolpath bit>> stepover>> >number 2 * + x!
-        x 0     "X %.02f Y %.02f" sprintf  suffix
+    [   x ymax step do-x
+        x step 2 * + x!
+        x 0 "X %.02f Y %.02f" sprintf  suffix
     ]  while
-    but-last
+B    but-last ! do last step to remaining distance
+    xmax step /mod nip :> laststep  x step - :> lastx
+    lastx laststep + 0 "X %.02f Y %.02f" sprintf  suffix
+    lastx ymax laststep do-x 
     ;
  
 :: surface-y ( gcodes toolpath -- gcodes )  ! assume starts at home, ends at home
     toolpath machine>> x-max>> :> xmax
     toolpath machine>> y-max>> :> ymax
+    toolpath bit>> stepover>> >number :> step
     0 :> x!  0 :> y!
     gcodes
-    [ y ymax <= ]
+    [ y ymax < ]
     (( across up back up ))
-    [   y xmax toolpath bit>> stepover>> >number do-y
-        y toolpath bit>> stepover>> >number 2 * + y!
+    [   y xmax step do-y
+        y step 2 * + y!
         0 y "X %.02f Y %.02f" sprintf  suffix
     ]  while
-    but-last
+    but-last ! do last step to remaining distance
+    ymax step /mod nip :> laststep  y step - :> lasty
+    0 lasty laststep + "X %.02f Y %.02f" sprintf  suffix
+    lasty xmax laststep do-y 
     ;
 
 : <surface-job> ( xmax ymax -- machine )
@@ -106,6 +114,11 @@ FROM: cnc.bit => >mm ;
     [ resurfacey  ] keep
     bounds-check
     ;
+
+: resurface ( xmax ymax -- bit )
+    "mukaj-togif" bit-id= 
+    1 >>stepdown-mm  2 >>rate_units  1.2 >>feed_rate  0.6 >>plunge_rate
+    rot rot [ bit-resurface ] keep ;
     
 GLOBAL: xmax
 GLOBAL: ymax
