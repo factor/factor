@@ -105,7 +105,7 @@ TUPLE: cnc-db < sqlite-db ;
     cnc-db new
     cnc-db-path get >>path ;
 
-: with-cnc-db-db ( quot -- )
+: with-cncdb ( quot -- )
     '[ <cnc-db> _ with-db ] call ; inline
 
 : cnc-db>bit ( cnc-dbvt -- bit )
@@ -132,17 +132,17 @@ CONSTANT: tooldata "tool_cutting_data."
     ] map string-squeeze-spaces ;
 
 SYMBOL: sql-statement 
-: do-cnc-db ( statement -- result ? )
+: do-cncdb ( statement -- result ? )
     sql-statement set
-    [ sql-statement get sql-query ] with-cnc-db-db
+    [ sql-statement get sql-query ] with-cncdb
     dup empty?
     [ f ] [ [ cnc-db>bit ] map t ] if ;
 
-: cnc-db-drop ( -- )
+: bit-table-drop ( -- )
     "DROP TABLE IF EXISTS bits"
-    clean-whitespace  do-cnc-db 2drop ;
+    clean-whitespace  do-cncdb 2drop ;
 
-: cnc-db-create ( -- )
+: bit-table-create ( -- )
   "CREATE TABLE IF NOT EXISTS 'bits' (
   'name' text NOT NULL,
   'tool_type' integer NOT NULL,
@@ -157,7 +157,7 @@ SYMBOL: sql-statement
   'plunge_rate' real,
   'id' text PRIMARY KEY UNIQUE NOT NULL,
   'amana_id' text )"        
-   clean-whitespace  do-cnc-db 2drop ;
+   clean-whitespace  do-cncdb 2drop ;
 
 : vcarve-preamble ( -- sql )
     "SELECT 
@@ -178,7 +178,10 @@ SYMBOL: sql-statement
 	 INNER JOIN tool_cutting_data tcd ON ( tcd.id = te.tool_cutting_data_id  ) "
     clean-whitespace ;
 
-: cnc-db-where ( -- sql )
+: amana-vcarve-preamble ( -- sql )
+    vcarve-preamble  " WHERE tg.name_format LIKE '#%' " append ;
+
+: cncdb-where ( -- sql )
     "SELECT * FROM bits WHERE " clean-whitespace ;
     
 : geometry-clause  ( string -- clause )
@@ -191,7 +194,7 @@ SYMBOL: sql-statement
     [ geometry-clause " and " append ] map
     "" swap [ append ] each
     "tool_cutting_data.feed_rate not null" append
-    cnc-db-where prepend
+    cncdb-where prepend
     sql-statement set ;
 
 : bit-where-clause ( clauses -- 'claues )
@@ -202,7 +205,7 @@ SYMBOL: sql-statement
     ]
     [ "" swap [ append ] each ]
     if 
-    cnc-db-where prepend ;
+    cncdb-where prepend ;
 
 : bit-add ( bit -- )
     tuple>array  unclip drop 
@@ -214,17 +217,17 @@ SYMBOL: sql-statement
       ", " append  append
     ] each
     unclip-last drop  unclip-last drop 
-    ");" append  do-cnc-db 2drop ; 
+    ");" append  do-cncdb 2drop ; 
 
 : bit-delete ( bit -- )
     "DELETE FROM bits WHERE id = '"
     over id>> append  "'" append
     sql-statement set
-    [ sql-statement get sql-query ] with-cnc-db-db
+    [ sql-statement get sql-query ] with-cncdb
     2drop ;
                                 
 : bit-where ( clauses -- seq )
-    bit-where-clause do-cnc-db drop ;
+    bit-where-clause do-cncdb drop ;
 
 : bit-name-like ( named --  bit )
     hard-quote
@@ -232,7 +235,7 @@ SYMBOL: sql-statement
 
 : bit-id= ( string -- bit )
     hard-quote  "id = "  prepend
-    cnc-db-where prepend  do-cnc-db
+    cncdb-where prepend  do-cncdb
     [ first ] [ drop f ] if ; 
 
 : 1/4-bits ( -- bits )
@@ -262,8 +265,8 @@ SYMBOL: sql-statement
 : spoil-bits ( -- bits )
     { "name LIKE '%SPOIL%1/4\"SHANK'" } bit-where ;
 
-: create-cnc-db-db ( -- )
-    cnc-db-drop  cnc-db-create 
+: create-cncdb-bits ( -- )
+    bit-table-drop  bit-table-create 
     amanavt-bits  amanavt>bits drop
     [ bit-add ] each ;
 
