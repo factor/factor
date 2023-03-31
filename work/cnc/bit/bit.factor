@@ -10,13 +10,13 @@ USING: accessors alien.enums alien.syntax assocs classes.tuple cnc
  models namespaces proquint quotations sequences strings
  syntax.terse ui ui.commands ui.gadgets ui.gadgets.borders ui.gadgets.editors
  ui.gadgets.labels ui.gadgets.packs ui.gadgets.toolbar ui.gadgets.worlds ui.gestures ui.tools.browser
- extensions ui.tools.common ui.tools.deploy uuid uuid.private variables  splitting ;
+ db.queries extensions ui.tools.common ui.tools.deploy uuid uuid.private variables  splitting ;
 IN: cnc.bit
 
 SYMBOL: cnc-db-path cnc-db-path [ "/Users/davec/Dropbox/3CL/Data/cnc.db" ]  initialize
 SYMBOL: amanavt-db-path amanavt-db-path [ "/Users/davec/Dropbox/3CL/Data/amanavt.db" ] initialize
 SYMBOL: imperial-db-path imperial-db-path [ "/Users/davec/Desktop/Imperial.db" ]  initialize
-SYMBOL: vcarve-db-path vcarve-db-path [ "/Volumes/C/ProgramData/Vectric/VCarve Pro/V11.5/ToolDatabase/tools.vtdb" ]  initialize
+SYMBOL: vcarve-db-path vcarve-db-path [ "/Users/davec/Dropbox/3CL/Data/tools.vtdb" ]  initialize
 SYMBOL: sql-statement 
 
 CONSTANT: toolgeometry "tool_geometry."
@@ -40,6 +40,30 @@ ENUM: RATE-UNITS { mm/sec 0 } { mm/min 1 } { m/min 2 } { in/sec 3 } { in/min 4 }
     ] map string-squeeze-spaces ;
 
 ! TUPLES
+TUPLE: bit name tool_type units diameter stepdown stepover spindle_speed spindle_dir rate_units feed_rate plunge_rate
+    id amana_id ;
+
+: <bit> ( -- <bit> )
+    bit new  1 >>tool_type  1 >>units  18000 >>spindle_speed  0 >>spindle_dir  1 >>rate_units  quintid >>id ;
+
+: convert-bit-slots ( bit -- bit )
+    [ name>> ] retain  " " split  unclip  dup unclip
+    CHAR: # =
+    [ drop  [ " " join  trim-whitespace  >>name ] dip  >>amana_id ]
+    [ 3drop ]
+    if
+    [ tool_type>> ] retain  >number >>tool_type
+    [ diameter>> ] retain  >number  >>diameter 
+    [ units>> ] retain  >number  >>units 
+    [ feed_rate>> ] retain  >number  >>feed_rate 
+    [ rate_units>> ] retain  >number  >>rate_units 
+    [ plunge_rate>> ] retain  >number  >>plunge_rate 
+    [ spindle_speed>> ] retain  >number  >>spindle_speed 
+    [ spindle_dir>> ] retain  >number  >>spindle_dir 
+    [ stepdown>> ] retain  >number  >>stepdown 
+    [ stepover>> ] retain  >number  >>stepover 
+    ;
+
 TUPLE: cnc-db < sqlite-db ;
 : <cnc-db> ( -- <cnc-db> )
     cnc-db new
@@ -48,12 +72,21 @@ TUPLE: cnc-db < sqlite-db ;
 : with-cncdb ( quot -- )
     '[ <cnc-db> _ with-db ] call ; inline
 
+: cnc-db>bit ( cnc-dbvt -- bit )
+    bit slots>tuple convert-bit-slots ;
+
+: do-cncdb ( statement -- result ? )
+    sql-statement set
+    [ sql-statement get sql-query ] with-cncdb
+    dup empty?
+    [ f ] [ [ cnc-db>bit ] map t ] if ;
+
 TUPLE: vcarve-db < cnc-db ;
 : <vcarve> ( -- <vcarve> )
     vcarve-db new
     vcarve-db-path get >>path ;
 
-: with-vcarve-db ( quot -- )
+: with-vcarvedb ( quot -- )
     '[  <vcarve> _  with-db ] call ; inline 
 
 
@@ -78,28 +111,25 @@ TUPLE: vcarve-db < cnc-db ;
 
 : vcarve-bits ( -- results )
     vcarve-preamble sql-statement set
-    [ sql-statement get sql-query ] with-vcarve-db ;
+    [ sql-statement get sql-query ] with-vcarvedb ;
 
 
-TUPLE: bit name tool_type units diameter stepdown stepover spindle_speed spindle_dir rate_units feed_rate plunge_rate
-    id amana_id ;
-: <bit> ( -- <bit> )
-    bit new  1 >>tool_type  1 >>units  18000 >>spindle_speed  0 >>spindle_dir  1 >>rate_units  quintid >>id ;
-
-
-TUPLE: bit-geometery name_format notes tool-type units diameter id ;
-TUPLE: bit-cutting-data stepdown rate_units stepover spindle_speed spindle_dir rate_units feed_rate plunge_rate notes id ;
+TUPLE: vcarve-bit-geometry name  tool_type units diameter notes id ;
+TUPLE: bit-cutting-data stepdown stepover spindle_speed spindle_dir rate_units feed_rate plunge_rate notes id ;
 TUPLE: bit-entity id material_id machine_id tool_geometry_id tool_cutting_data_id ;
+vcarve-bit-geometry "tool_geometry" {
+    { "name" "name_format" TEXT }
+    { "tool_type" "tool_type" INTEGER }
+    { "units" "units" INTEGER }
+    { "diameter" "diameter" DOUBLE }
+    { "notes" "notes" TEXT }
+    { "id" "id" TEXT }
+} define-persistent
 
+! : <bit-geometery> ( seq -- <bit-geometery> )
+!     vcarve-bit-geometry boa ;
 
-: >>diameter-mm ( object value -- object )   (inch>mm) >>diameter ;
-: >>stepover-mm ( object value -- object )   (inch>mm) >>stepover ;
-: >>stepdown-mm ( object value -- object )   (inch>mm)  >>stepdown ;
-: >>feed_rate-mm/min ( object value -- object )  25.4 * >>feed_rate  1 >>rate_units ; 
-: >>plunge_rate-mm/min ( object value -- object )  25.4 * >>plunge_rate  1 >>rate_units ; 
-
-! FROM: math.parser => >number ;
-: convert-bit-slots ( bit -- bit )
+: convert-bit-geometry ( bit -- bit )
     [ name>> ] retain  " " split  unclip  dup unclip
     CHAR: # =
     [ drop  [ " " join  trim-whitespace  >>name ] dip  >>amana_id ]
@@ -108,14 +138,52 @@ TUPLE: bit-entity id material_id machine_id tool_geometry_id tool_cutting_data_i
     [ tool_type>> ] retain  >number >>tool_type
     [ diameter>> ] retain  >number  >>diameter 
     [ units>> ] retain  >number  >>units 
-    [ feed_rate>> ] retain  >number  >>feed_rate 
-    [ rate_units>> ] retain  >number  >>rate_units 
-    [ plunge_rate>> ] retain  >number  >>plunge_rate 
-    [ spindle_speed>> ] retain  >number  >>spindle_speed 
-    [ spindle_dir>> ] retain  >number  >>spindle_dir 
-    [ stepdown>> ] retain  >number  >>stepdown 
-    [ stepover>> ] retain  >number  >>stepover 
     ;
+
+: do-vcarvedb ( statement -- result ? )
+    sql-statement set
+    [ sql-statement get sql-query ] with-vcarvedb
+    dup empty? ; 
+
+: bit-geometery-table-drop ( -- )
+    "DROP TABLE IF EXISTS bit_geometery"
+    clean-whitespace  do-cncdb 2drop ;
+
+: bit-geometery-table-create ( -- )
+  "CREATE TABLE IF NOT EXISTS bit_geometery (
+  'name' text NOT NULL,
+  'tool_type' integer NOT NULL,
+  'units' integer NOT NULL DEFAULT(0),
+  'diameter' real,
+  'notes' text,
+  'id' text PRIMARY KEY UNIQUE NOT NULL,
+  'amana_id' text )"        
+   clean-whitespace  do-cncdb 2drop ;
+
+: cncdb>bit-geometery ( cncdbvt -- bit )
+    vcarve-bit-geometry slots>tuple convert-bit-geometry ;
+
+: vcarve>bit-geometery ( seq -- bits ? )
+    [ empty? ] [ f  ] [ [ cncdb>bit-geometery ] map t ] smart-if ;
+
+: vcarve-bit-geometery ( -- bits )
+    "SELECT * FROM bit_geometery" sql-statement set
+    vcarve-db new  vcarve-db-path get >>path  
+    [ sql-statement get sql-query  ] with-db ;
+
+: convert-vcarve-bit-geometery ( -- bit-geometries )
+    ! bit-geometery-table-drop  bit-geometery-table-create
+    [ vcarve-bit-geometry ensure-table ] with-cncdb
+    [ T{ vcarve-bit-geometry { name LIKE" %SPOIL%" } }
+      select-tuples ] with-vcarvedb
+    
+    ;
+
+: >>diameter-mm ( object value -- object )   (inch>mm) >>diameter ;
+: >>stepover-mm ( object value -- object )   (inch>mm) >>stepover ;
+: >>stepdown-mm ( object value -- object )   (inch>mm)  >>stepdown ;
+: >>feed_rate-mm/min ( object value -- object )  25.4 * >>feed_rate  1 >>rate_units ; 
+: >>plunge_rate-mm/min ( object value -- object )  25.4 * >>plunge_rate  1 >>rate_units ; 
 
 bit "amana" {
     { "name" "name" TEXT }
@@ -158,17 +226,8 @@ bit "amana" {
     0 >>units 
     ;
 
-: cnc-db>bit ( cnc-dbvt -- bit )
-    bit slots>tuple convert-bit-slots ;
-
 : amanavt>bits ( seq -- bits ? )
     [ empty? ] [ f  ] [ [ cnc-db>bit ] map t ] smart-if ;
-
-: do-cncdb ( statement -- result ? )
-    sql-statement set
-    [ sql-statement get sql-query ] with-cncdb
-    dup empty?
-    [ f ] [ [ cnc-db>bit ] map t ] if ;
 
 : bit-table-drop ( -- )
     "DROP TABLE IF EXISTS bits"
@@ -341,3 +400,53 @@ bit-gadget "toolbar" f {
     [ <world-attributes> "Bit" "(" ")" surround >>title 
       [ { dialog-window } append ] change-window-controls ]
       bi  swapd open-window ; 
+
+: define-bits ( -- )
+    {
+      "Surface End Mill" 1.0 +in+ +straight+ 2 1/4 f f
+      "BINSTAK" "https://www.amazon.com/gp/product/B08SKYYN7P/ref=ppx_yo_dt_b_search_asin_title"
+      <bit> insert-tuple
+      "Carving bit flat nose" 3.175 +mm+ +compression+ 2 3.175 17 38 
+      "Genmitsu" "https://www.amazon.com/gp/product/B08CD99PWL"
+      <bit> insert-tuple
+      "Carving bit ball nose" 3.175 +mm+ +compression+ 2 3.175 17 38
+      "Genmitsu" "https://www.amazon.com/gp/product/B08CD99PWL"
+      <bit> insert-tuple
+      "Flat end mill" 0.8 +mm+ +compression+ 2 3.175 17 38
+      "Genmitsu" "https://www.amazon.com/gp/product/B08CD99PWL"
+      <bit> insert-tuple
+      "Flat end mill" 1.0 +mm+ +compression+ 2 3.175 17 38
+      "Genmitsu" "https://www.amazon.com/gp/product/B08CD99PWL"
+      <bit> insert-tuple
+      "Flat end mill" 1.2 +mm+ +compression+ 2 3.175 17 38
+      "Genmitsu" "https://www.amazon.com/gp/product/B08CD99PWL"
+      <bit> insert-tuple
+      "Flat end mill" 1.4 +mm+ +compression+ 2 3.175 17 38
+      "Genmitsu" "https://www.amazon.com/gp/product/B08CD99PWL"
+      <bit> insert-tuple
+      "Flat end mill" 1.6 +mm+ +compression+ 2 3.175 17 38
+      "Genmitsu" "https://www.amazon.com/gp/product/B08CD99PWL"
+      <bit> insert-tuple
+      "Flat end mill" 1.8 +mm+ +compression+ 2 3.175 17 38
+      "Genmitsu" "https://www.amazon.com/gp/product/B08CD99PWL"
+      <bit> insert-tuple
+      "Flat end mill" 2.0 +mm+ +compression+ 2 3.175 17 38
+      "Genmitsu" "https://www.amazon.com/gp/product/B08CD99PWL"
+      <bit> insert-tuple
+      "Flat end mill" 2.2 +mm+ +compression+ 2 3.175 17 38
+      "Genmitsu" "https://www.amazon.com/gp/product/B08CD99PWL"
+      <bit> insert-tuple
+      "Flat end mill" 2.5 +mm+ +compression+ 2 3.175 17 38
+      "Genmitsu" "https://www.amazon.com/gp/product/B08CD99PWL"
+      <bit> insert-tuple
+      "Flat end mill" 3.0 +mm+ +compression+ 2 3.175 17 38
+      "Genmitsu" "https://www.amazon.com/gp/product/B08CD99PWL"
+      <bit> insert-tuple
+      "Downcut End Mill Sprial" 3.175 +mm+ +down+ 2 3.175 17 38
+      "HOZLY" "https://www.amazon.com/gp/product/B073TXSLQK"
+      <bit> insert-tuple
+      "Downcut End Mill Sprial" 1/4 +in+ +compression+ 2 1/4 1.0 2.5
+      "EANOSIC" "https://www.amazon.com/gp/product/B09H33X98L"
+      <bit> insert-tuple
+    } drop ;
+
