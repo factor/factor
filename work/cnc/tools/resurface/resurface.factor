@@ -4,9 +4,9 @@
 ! Description: Build gcode to resurface 
 ! Copyright (C) 2023 Dave Carlton.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors cnc cnc.gcode cnc.job cnc.jobs cnc.machine cnc.tools formatting
-io kernel math multiline sequences io.encodings.utf8 io.files math.parser
-cnc.bit cnc.machine.1F command-line namespaces variables generalizations sequences.generalizations prettyprint ;
+USING: accessors cnc.bit cnc.gcode cnc.machine.1F formatting io
+io.encodings.utf8 io.files io.launcher kernel math math.parser
+multiline namespaces sequences variables syntax.terse ;
 IN: cnc.tools
 
 :: do-x ( gcodes x ymax step -- gcodes )
@@ -35,7 +35,7 @@ IN: cnc.tools
         x step 2 * + x!
         x 0 "X %.02f Y %.02f" sprintf  suffix
     ]  while
-B    but-last ! do last step to remaining distance
+    but-last ! do last step to remaining distance
     xmax step /mod nip :> laststep  x step - :> lastx
     lastx laststep + 0 "X %.02f Y %.02f" sprintf  suffix
     lastx ymax laststep do-x 
@@ -119,7 +119,20 @@ FROM: cnc.bit => >mm ;
     "mukaj-togif" bit-id= 
     1 >>stepdown-mm  2 >>rate_units  1.2 >>feed_rate  0.6 >>plunge_rate
     rot rot [ bit-resurface ] keep ;
-    
+
+: >onefinity ( -- )
+    "/usr/bin/scp /Users/davec/Desktop/Resurface* root@onefinity.local:upload/"
+    run-process wait-for-process 0=
+    [ "ok" ] [ "fail" ] if print 
+    "rsync -auv /Users/davec/Desktop/Resurface* root@onefinity.local:upload/"
+    run-process wait-for-process 0=
+    [ "ok" ] [ "fail" ] if print ;
+
+: onefinity-clear ( -- ) 
+    "ssh root@onefinity.local rm -r upload/*"
+    run-process wait-for-process 0=
+    [ "ok" ] [ "fail" ] if print ;
+
 GLOBAL: xmax
 GLOBAL: ymax
 GLOBAL: bitsize
