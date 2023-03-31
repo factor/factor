@@ -14,25 +14,83 @@ USING: accessors alien.enums alien.syntax assocs classes.tuple cnc
 IN: cnc.bit
 
 SYMBOL: cnc-db-path cnc-db-path [ "/Users/davec/Dropbox/3CL/Data/cnc.db" ]  initialize
-SYMBOL: amanavt-db amanavt-db [ "/Users/davec/Dropbox/3CL/Data/amanavt.db" ] initialize
-SYMBOL: imperial-db imperial-db [ "/Users/davec/Desktop/Imperial.db" ]  initialize
-SYMBOL: vcarve-db vcarve-db [ "/Volumes/C/ProgramData/Vectric/VCarve Pro/V11.5/ToolDatabase/tools.vtdb" ]  initialize
+SYMBOL: amanavt-db-path amanavt-db-path [ "/Users/davec/Dropbox/3CL/Data/amanavt.db" ] initialize
+SYMBOL: imperial-db-path imperial-db-path [ "/Users/davec/Desktop/Imperial.db" ]  initialize
+SYMBOL: vcarve-db-path vcarve-db-path [ "/Volumes/C/ProgramData/Vectric/VCarve Pro/V11.5/ToolDatabase/tools.vtdb" ]  initialize
+SYMBOL: sql-statement 
+
+CONSTANT: toolgeometry "tool_geometry."
+CONSTANT: tooldata "tool_cutting_data."
 
 ENUM: bitType +straight+ +up+ +down+ +compression+ ;
 ENUM: TOOLTYPE { ballnose 0 } { endmill 1 } { radius-endmill 2 } { v-bit 3 } { engraving 4 } { taper-ballmill 5 }
     { drill 6 } { diamond 7 } { threadmill 14 } { multit-thread 15 } { laser 12 } ; 
 ENUM: RATE-UNITS { mm/sec 0 } { mm/min 1 } { m/min 2 } { in/sec 3 } { in/min 4 } { ft/min 5 } ;
 
-TUPLE: bit name tool_type units diameter stepdown stepover spindle_speed spindle_dir rate_units feed_rate plunge_rate
-    id amana_id ;
-
+! Utility
 : quintid ( -- id )   uuid1 string>uuid  32 >quint ; 
-
-: <bit> ( -- <bit> )
-    bit new  1 >>tool_type  1 >>units  18000 >>spindle_speed  0 >>spindle_dir  1 >>rate_units  quintid >>id ;
 
 : (inch>mm) ( bit inch -- bit mm )
     over units>> 1 = [ 25.4 / ] when ;
+
+: clean-whitespace ( str -- 'str )
+    [  CHAR: \x09 dupd =
+       over  CHAR: \x0a = or
+       [ drop CHAR: \x20 ] when
+    ] map string-squeeze-spaces ;
+
+! TUPLES
+TUPLE: cnc-db < sqlite-db ;
+: <cnc-db> ( -- <cnc-db> )
+    cnc-db new
+    cnc-db-path get >>path ;
+
+: with-cncdb ( quot -- )
+    '[ <cnc-db> _ with-db ] call ; inline
+
+TUPLE: vcarve-db < cnc-db ;
+: <vcarve> ( -- <vcarve> )
+    vcarve-db new
+    vcarve-db-path get >>path ;
+
+: with-vcarve-db ( quot -- )
+    '[  <vcarve> _  with-db ] call ; inline 
+
+
+: vcarve-preamble ( -- sql )
+    "SELECT 
+     tg.name_format,
+     tg.tool_type,
+     tg.units,
+     tg.diameter,
+     tcd.stepdown,
+     tcd.stepover,
+     tcd.spindle_speed,
+     tcd.spindle_dir,
+     tcd.rate_units,
+     tcd.feed_rate,
+     tcd.plunge_rate,
+     te.id
+     FROM tool_entity te 
+	 INNER JOIN tool_geometry tg ON ( tg.id = te.tool_geometry_id  )  
+	 INNER JOIN tool_cutting_data tcd ON ( tcd.id = te.tool_cutting_data_id  ) "
+    clean-whitespace ;
+
+: vcarve-bits ( -- results )
+    vcarve-preamble sql-statement set
+    [ sql-statement get sql-query ] with-vcarve-db ;
+
+
+TUPLE: bit name tool_type units diameter stepdown stepover spindle_speed spindle_dir rate_units feed_rate plunge_rate
+    id amana_id ;
+: <bit> ( -- <bit> )
+    bit new  1 >>tool_type  1 >>units  18000 >>spindle_speed  0 >>spindle_dir  1 >>rate_units  quintid >>id ;
+
+
+TUPLE: bit-geometery name_format notes tool-type units diameter id ;
+TUPLE: bit-cutting-data stepdown rate_units stepover spindle_speed spindle_dir rate_units feed_rate plunge_rate notes id ;
+TUPLE: bit-entity id material_id machine_id tool_geometry_id tool_cutting_data_id ;
+
 
 : >>diameter-mm ( object value -- object )   (inch>mm) >>diameter ;
 : >>stepover-mm ( object value -- object )   (inch>mm) >>stepover ;
@@ -100,38 +158,12 @@ bit "amana" {
     0 >>units 
     ;
 
-TUPLE: cnc-db < sqlite-db ;
-: <cnc-db> ( -- <cnc-db> )
-    cnc-db new
-    cnc-db-path get >>path ;
-
-: with-cncdb ( quot -- )
-    '[ <cnc-db> _ with-db ] call ; inline
-
 : cnc-db>bit ( cnc-dbvt -- bit )
     bit slots>tuple convert-bit-slots ;
 
 : amanavt>bits ( seq -- bits ? )
     [ empty? ] [ f  ] [ [ cnc-db>bit ] map t ] smart-if ;
 
-TUPLE: vcarve < cnc-db ;
-: <vcarve> ( -- <vcarve> )
-    vcarve new
-    vcarve-db get >>path ;
-
-: with-vcarve-db ( quot -- )
-    '[  <vcarve> _  with-db ] call ; inline 
-
-CONSTANT: toolgeometry "tool_geometry."
-CONSTANT: tooldata "tool_cutting_data."
-
-: clean-whitespace ( str -- 'str )
-    [  CHAR: \x09 dupd =
-       over  CHAR: \x0a = or
-       [ drop CHAR: \x20 ] when
-    ] map string-squeeze-spaces ;
-
-SYMBOL: sql-statement 
 : do-cncdb ( statement -- result ? )
     sql-statement set
     [ sql-statement get sql-query ] with-cncdb
@@ -158,25 +190,6 @@ SYMBOL: sql-statement
   'id' text PRIMARY KEY UNIQUE NOT NULL,
   'amana_id' text )"        
    clean-whitespace  do-cncdb 2drop ;
-
-: vcarve-preamble ( -- sql )
-    "SELECT 
-     tg.name_format,
-     tg.tool_type,
-     tg.units,
-     tg.diameter,
-     tcd.stepdown,
-     tcd.stepover,
-     tcd.spindle_speed,
-     tcd.spindle_dir,
-     tcd.rate_units,
-     tcd.feed_rate,
-     tcd.plunge_rate,
-     te.id
-     FROM tool_entity te 
-	 INNER JOIN tool_geometry tg ON ( tg.id = te.tool_geometry_id  )  
-	 INNER JOIN tool_cutting_data tcd ON ( tcd.id = te.tool_cutting_data_id  ) "
-    clean-whitespace ;
 
 : amana-vcarve-preamble ( -- sql )
     vcarve-preamble  " WHERE tg.name_format LIKE '#%' " append ;
@@ -253,13 +266,9 @@ SYMBOL: sql-statement
 : all-bits ( -- bits )
     { "id NOT NULL" } bit-where ;
 
-: vcarve-bits ( -- bits )
-    vcarve-preamble sql-statement set
-    [ sql-statement get sql-query ] with-vcarve-db ;
-
 : amanavt-bits ( -- bits )
     vcarve-preamble sql-statement set
-    vcarve new  amanavt-db get >>path  
+    vcarve-db new  amanavt-db-path get >>path  
     [ sql-statement get sql-query  ] with-db ;
 
 : spoil-bits ( -- bits )
