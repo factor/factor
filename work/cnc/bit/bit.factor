@@ -4,28 +4,25 @@
 ! Description: CNC bit data
 ! Copyright (C) 2022 Dave Carlton.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors alien.enums alien.syntax assocs classes.tuple cnc
- cnc.jobs combinators combinators.smart db db.sqlite db.tuples
- db.types file.xattr hashtables kernel math math.parser
- models namespaces proquint quotations sequences strings
- syntax.terse ui ui.commands ui.gadgets ui.gadgets.borders ui.gadgets.editors
- ui.gadgets.labels ui.gadgets.packs ui.gadgets.toolbar ui.gadgets.worlds ui.gestures ui.tools.browser
- db.queries extensions ui.tools.common ui.tools.deploy uuid uuid.private variables  splitting ;
+USING:   accessors alien.enums alien.syntax assocs classes.tuple
+  cnc combinators combinators.smart db
+  db.sqlite db.tuples db.types hashtables kernel
+  math math.parser models namespaces proquint
+  sequences splitting strings syntax.terse ui
+  ui.commands ui.gadgets ui.gadgets.borders ui.gadgets.editors ui.gadgets.labels
+  ui.gadgets.packs ui.gadgets.toolbar ui.gadgets.worlds ui.gestures ui.tools.browser
+  ui.tools.common ui.tools.deploy uuid uuid.private ;
 IN: cnc.bit
 
 SYMBOL: cnc-db-path cnc-db-path [ "/Users/davec/Dropbox/3CL/Data/cnc.db" ]  initialize
 SYMBOL: amanavt-db-path amanavt-db-path [ "/Users/davec/Dropbox/3CL/Data/amanavt.db" ] initialize
 SYMBOL: imperial-db-path imperial-db-path [ "/Users/davec/Desktop/Imperial.db" ]  initialize
-SYMBOL: vcarve-db-path vcarve-db-path [ "/Users/davec/Dropbox/3CL/Data/tools.vtdb" ]  initialize
 SYMBOL: sql-statement 
 
-CONSTANT: toolgeometry "tool_geometry."
-CONSTANT: tooldata "tool_cutting_data."
-
-ENUM: bitType +straight+ +up+ +down+ +compression+ ;
-ENUM: TOOLTYPE { ballnose 0 } { endmill 1 } { radius-endmill 2 } { v-bit 3 } { engraving 4 } { taper-ballmill 5 }
+ENUM: BitType +straight+ +up+ +down+ +compression+ ;
+ENUM: ToolType { ballnose 0 } { endmill 1 } { radius-endmill 2 } { v-bit 3 } { engraving 4 } { taper-ballmill 5 }
     { drill 6 } { diamond 7 } { threadmill 14 } { multit-thread 15 } { laser 12 } ; 
-ENUM: RATE-UNITS { mm/sec 0 } { mm/min 1 } { m/min 2 } { in/sec 3 } { in/min 4 } { ft/min 5 } ;
+ENUM: RateUnits { mm/sec 0 } { mm/min 1 } { m/min 2 } { in/sec 3 } { in/min 4 } { ft/min 5 } ;
 
 ! Utility
 : quintid ( -- id )   uuid1 string>uuid  32 >quint ; 
@@ -81,53 +78,19 @@ TUPLE: cnc-db < sqlite-db ;
     dup empty?
     [ f ] [ [ cnc-db>bit ] map t ] if ;
 
-TUPLE: vcarve-db < cnc-db ;
-: <vcarve> ( -- <vcarve> )
-    vcarve-db new
-    vcarve-db-path get >>path ;
-
-: with-vcarvedb ( quot -- )
-    '[  <vcarve> _  with-db ] call ; inline 
-
-
-: vcarve-preamble ( -- sql )
-    "SELECT 
-     tg.name_format,
-     tg.tool_type,
-     tg.units,
-     tg.diameter,
-     tcd.stepdown,
-     tcd.stepover,
-     tcd.spindle_speed,
-     tcd.spindle_dir,
-     tcd.rate_units,
-     tcd.feed_rate,
-     tcd.plunge_rate,
-     te.id
-     FROM tool_entity te 
-	 INNER JOIN tool_geometry tg ON ( tg.id = te.tool_geometry_id  )  
-	 INNER JOIN tool_cutting_data tcd ON ( tcd.id = te.tool_cutting_data_id  ) "
-    clean-whitespace ;
-
-: vcarve-bits ( -- results )
-    vcarve-preamble sql-statement set
-    [ sql-statement get sql-query ] with-vcarvedb ;
-
-
-TUPLE: vcarve-bit-geometry name  tool_type units diameter notes id ;
+TUPLE: bit-geometry name  tool_type units diameter shank notes amanaid id ;
 TUPLE: bit-cutting-data stepdown stepover spindle_speed spindle_dir rate_units feed_rate plunge_rate notes id ;
 TUPLE: bit-entity id material_id machine_id tool_geometry_id tool_cutting_data_id ;
-vcarve-bit-geometry "tool_geometry" {
+bit-geometry "tool_geometry" {
     { "name" "name_format" TEXT }
     { "tool_type" "tool_type" INTEGER }
     { "units" "units" INTEGER }
     { "diameter" "diameter" DOUBLE }
+    { "shank" "shank" TEXT }
     { "notes" "notes" TEXT }
+    { "amanaid" "amanaid" TEXT }
     { "id" "id" TEXT }
 } define-persistent
-
-! : <bit-geometery> ( seq -- <bit-geometery> )
-!     vcarve-bit-geometry boa ;
 
 : convert-bit-geometry ( bit -- bit )
     [ name>> ] retain  " " split  unclip  dup unclip
@@ -139,11 +102,6 @@ vcarve-bit-geometry "tool_geometry" {
     [ diameter>> ] retain  >number  >>diameter 
     [ units>> ] retain  >number  >>units 
     ;
-
-: do-vcarvedb ( statement -- result ? )
-    sql-statement set
-    [ sql-statement get sql-query ] with-vcarvedb
-    dup empty? ; 
 
 : bit-geometery-table-drop ( -- )
     "DROP TABLE IF EXISTS bit_geometery"
@@ -160,45 +118,11 @@ vcarve-bit-geometry "tool_geometry" {
   'amana_id' text )"        
    clean-whitespace  do-cncdb 2drop ;
 
-: cncdb>bit-geometery ( cncdbvt -- bit )
-    vcarve-bit-geometry slots>tuple convert-bit-geometry ;
-
-: vcarve>bit-geometery ( seq -- bits ? )
-    [ empty? ] [ f  ] [ [ cncdb>bit-geometery ] map t ] smart-if ;
-
-: vcarve-bit-geometery ( -- bits )
-    "SELECT * FROM bit_geometery" sql-statement set
-    vcarve-db new  vcarve-db-path get >>path  
-    [ sql-statement get sql-query  ] with-db ;
-
-: convert-vcarve-bit-geometery ( -- bit-geometries )
-    ! bit-geometery-table-drop  bit-geometery-table-create
-    [ vcarve-bit-geometry ensure-table ] with-cncdb
-    [ T{ vcarve-bit-geometry { name LIKE" %SPOIL%" } }
-      select-tuples ] with-vcarvedb
-    
-    ;
-
 : >>diameter-mm ( object value -- object )   (inch>mm) >>diameter ;
 : >>stepover-mm ( object value -- object )   (inch>mm) >>stepover ;
 : >>stepdown-mm ( object value -- object )   (inch>mm)  >>stepdown ;
 : >>feed_rate-mm/min ( object value -- object )  25.4 * >>feed_rate  1 >>rate_units ; 
 : >>plunge_rate-mm/min ( object value -- object )  25.4 * >>plunge_rate  1 >>rate_units ; 
-
-bit "amana" {
-    { "name" "name" TEXT }
-    { "tool_type" "tool_type" INTEGER }
-    { "units" "units" INTEGER }
-    { "diameter" "diameter" DOUBLE }
-    { "stepdown" "stepdown" DOUBLE }
-    { "stepover" "stepdown" DOUBLE }
-    { "spindle_speed" "spindle_speed" INTEGER }
-    { "spindle_dir" "spindle_dir" INTEGER }
-    { "rate_units" "rate_units" INTEGER }
-    { "feed_rate" "feed_rate" DOUBLE }
-    { "plunge_rate" "plunge_rate" DOUBLE }
-    { "id" "id" INTEGER }
-} define-persistent
 
 : (>mm) ( bit slot-value -- mm-value bit )
     over units>> 1 = 
@@ -207,7 +131,7 @@ bit "amana" {
     ;
 
 : (>mm/min) ( bit value -- mm-value bit )
-    >number  over rate_units>> >number  <RATE-UNITS> {
+    >number  over rate_units>> >number  <RateUnits> {
         { mm/sec [ 60 * ] }
         { mm/min [ ] }
         { m/min [ 1000 * ] }
@@ -226,7 +150,7 @@ bit "amana" {
     0 >>units 
     ;
 
-: amanavt>bits ( seq -- bits ? )
+: amanavt>bitsy ( seq -- bits ? )
     [ empty? ] [ f  ] [ [ cnc-db>bit ] map t ] smart-if ;
 
 : bit-table-drop ( -- )
@@ -250,25 +174,9 @@ bit "amana" {
   'amana_id' text )"        
    clean-whitespace  do-cncdb 2drop ;
 
-: amana-vcarve-preamble ( -- sql )
-    vcarve-preamble  " WHERE tg.name_format LIKE '#%' " append ;
-
 : cncdb-where ( -- sql )
     "SELECT * FROM bits WHERE " clean-whitespace ;
     
-: geometry-clause  ( string -- clause )
-    toolgeometry prepend ;
-
-: data-clause ( string -- clause )
-    tooldata prepend ;
-
-: bit-clause1 ( clauses -- )
-    [ geometry-clause " and " append ] map
-    "" swap [ append ] each
-    "tool_cutting_data.feed_rate not null" append
-    cncdb-where prepend
-    sql-statement set ;
-
 : bit-where-clause ( clauses -- 'claues )
     dup length 1 > 
     [ [ " and " append ] map 
@@ -325,18 +233,8 @@ bit "amana" {
 : all-bits ( -- bits )
     { "id NOT NULL" } bit-where ;
 
-: amanavt-bits ( -- bits )
-    vcarve-preamble sql-statement set
-    vcarve-db new  amanavt-db-path get >>path  
-    [ sql-statement get sql-query  ] with-db ;
-
 : spoil-bits ( -- bits )
     { "name LIKE '%SPOIL%1/4\"SHANK'" } bit-where ;
-
-: create-cncdb-bits ( -- )
-    bit-table-drop  bit-table-create 
-    amanavt-bits  amanavt>bits drop
-    [ bit-add ] each ;
 
 TUPLE: bit-gadget < pack bit values ;
 SYMBOLS: bitName bitToolType bitDiameter bitUnits bitFeedRate bitRateUnits bitPlungeRate
