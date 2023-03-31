@@ -164,6 +164,9 @@ HOOK: (run-process) io-backend ( process -- handle )
     run-detached
     dup detached>> [ dup wait-for-process drop ] unless ;
 
+: run-processes ( descs -- processes )
+    [ run-process ] map ;
+
 ERROR: process-failed process ;
 
 M: process-failed error.
@@ -175,8 +178,13 @@ M: process-failed error.
 : check-success ( process status -- )
     0 = [ drop ] [ process-failed ] if ;
 
-: wait-for-success ( process -- )
+GENERIC: wait-for-success ( obj -- )
+
+M: process wait-for-success
     dup wait-for-process check-success ;
+
+M: sequence wait-for-success
+    [ wait-for-success ] each ;
 
 : try-process ( desc -- )
     run-process wait-for-success ;

@@ -16,8 +16,14 @@ cli-git-num-parallel [ cpus 2 * ] initialize
 : git-clone ( uri -- process ) [ { "git" "clone" } ] dip suffix run-process ;
 : git-pull* ( -- process ) { "git" "pull" } run-process ;
 : git-pull ( path -- process ) [ git-pull* ] with-directory ;
-: git-fetch-all* ( -- process ) { "git" "fetch" "--all" } run-process ;
+: git-fetch-all-desc ( -- process ) { "git" "fetch" "--all" } ;
+: git-fetch-all* ( -- process ) git-fetch-all-desc run-process ;
 : git-fetch-all ( path -- process ) [ git-fetch-all* ] with-directory ;
+: git-reset-hard-desc ( branch -- process ) '{ "git" "reset" "--hard" _ } ;
+: git-reset-hard ( branch -- process ) git-reset-hard-desc run-process ;
+: git-reset-hard-HEAD ( -- process ) "HEAD" git-reset-hard-desc ;
+: git-fetch-and-reset-hard ( path branch -- processes ) '[ git-fetch-all-desc _ git-reset-hard-desc 2array run-processes ] with-directory ;
+: git-fetch-and-reset-hard-HEAD ( path -- processes ) [ git-fetch-all-desc "HEAD" git-reset-hard-desc 2array run-processes ] with-directory ;
 : git-fetch-tags* ( -- process ) { "git" "fetch" "--tags" } run-process ;
 : git-fetch-tags ( path -- process ) [ git-fetch-tags* ] with-directory ;
 : git-checkout-new-branch* ( branch -- process ) [ { "git" "checkout" "-b" } ] dip suffix run-process ;
@@ -56,7 +62,7 @@ cli-git-num-parallel [ cpus 2 * ] initialize
 
 : sync-repository-as ( url path -- process )
     dup git-directory?
-    [ nip git-pull ] [ git-clone-as ] if ;
+    [ nip git-fetch-and-reset-hard-HEAD ] [ git-clone-as ] if ;
 
 : sync-repositories ( directory urls -- )
     '[
