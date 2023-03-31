@@ -2,12 +2,21 @@
 ! See https://factorcode.org/license.txt for BSD license.
 USING: accessors arrays byte-arrays classes classes.tuple
 combinators continuations db db.errors db.tuples
-db.tuples.private db.types destructors kernel make math
-math.bitwise math.intervals math.parser namespaces nmake random
-sequences strings ;
+db.tuples.private db.types destructors kernel lexer make math
+math.bitwise math.intervals math.parser namespaces nmake
+peg.search random sequences strings strings.parser ;
 IN: db.queries
 
 GENERIC: where ( specs obj -- )
+
+TUPLE: likeexp text ;
+: <likeexp> ( string -- <likeexp> )
+    likeexp boa ; 
+
+: parse-like ( accum -- accum )
+    lexer get skip-blank parse-string <likeexp> suffix! ;
+
+SYNTAX: LIKE" parse-like ; ! "
 
 SINGLETON: retryable
 : make-retryable ( obj -- obj' )
@@ -128,6 +137,11 @@ M: object where object-where ;
 M: integer where object-where ;
 
 M: string where object-where ;
+
+: like-where ( spec obj -- )
+   text>> over column-name>> 0% " LIKE " 0% bind# ;
+
+M: likeexp where like-where ;
 
 : filter-slots ( tuple specs -- specs' )
     [
