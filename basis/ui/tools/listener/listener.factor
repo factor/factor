@@ -125,6 +125,22 @@ M: word (print-input)
     [ clear-editor drop ]
     [ model>> clear-undo drop ] 2tri ;
 
+: interactor-readln-finish ( interactor -- )
+    [ control-value rest [ { "" } ] when-empty ] keep set-control-value ;
+
+: no-input? ( lines -- ? )
+    [ length 1 = ] keep { [ empty? ] [ first empty? ] } 1|| and ;
+
+: consume-char ( buffer -- buffer )
+    {   
+        { [ dup no-input?    ] [      ] }
+        { [ dup first empty? ] [ rest ] }
+        [ clone dup 0 swap [ rest ] change-nth ]
+    } cond ;
+
+: interactor-read1-finish ( interactor -- )
+    [ control-value consume-char ] keep set-control-value ;
+
 : interactor-eof ( interactor -- )
     dup interactor-busy? [
         f over interactor-continue
@@ -145,11 +161,20 @@ M: word (print-input)
         } cleave
     ] [ drop f ] if ;
 
+: yield-if-empty ( interactor -- obj )
+    dup control-value no-input? [ interactor-yield ] [ control-value ] if ;
+
 : interactor-read ( interactor -- lines )
-    [ interactor-yield ] [ interactor-finish ] bi ;
+    [ yield-if-empty ] [ interactor-finish ] bi ;
+
+: interactor-readln ( interactor -- lines )
+    [ yield-if-empty ] [ interactor-readln-finish ] bi ;
+
+: interactor-read1 ( interactor -- char )
+    [ yield-if-empty ] [ interactor-read1-finish ] bi ;
 
 M: interactor stream-readln
-    interactor-read ?first ;
+    interactor-readln ?first ;
 
 : (call-listener) ( quot command listener -- )
     input>> dup interactor-busy? [ 3drop ] [
@@ -161,12 +186,12 @@ M: interactor stream-readln
 M:: interactor stream-read-unsafe ( n buf interactor -- count )
     n [ 0 ] [
         drop
-        interactor interactor-read dup [ join-lines ] when
+        interactor interactor-readln dup [ join-lines ] when
         n index-or-length [ head-slice 0 buf copy ] keep
     ] if-zero ;
 
 M: interactor stream-read1
-    dup interactor-read {
+    dup interactor-read1 {
         { [ dup not ] [ 2drop f ] }
         { [ dup empty? ] [ drop stream-read1 ] }
         { [ dup first empty? ] [ 2drop CHAR: \n ] }
