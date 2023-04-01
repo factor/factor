@@ -79,9 +79,7 @@ TUPLE: cnc-db < sqlite-db ;
     [ f ] [ [ cnc-db>bit ] map t ] if ;
 
 TUPLE: bit-geometry name  tool_type units diameter shank notes amanaid id ;
-TUPLE: bit-cutting-data stepdown stepover spindle_speed spindle_dir rate_units feed_rate plunge_rate notes id ;
-TUPLE: bit-entity id material_id machine_id tool_geometry_id tool_cutting_data_id ;
-bit-geometry "tool_geometry" {
+bit-geometry "bit_geometry" {
     { "name" "name_format" TEXT }
     { "tool_type" "tool_type" INTEGER }
     { "units" "units" INTEGER }
@@ -117,6 +115,31 @@ bit-geometry "tool_geometry" {
   'id' text PRIMARY KEY UNIQUE NOT NULL,
   'amana_id' text )"        
    clean-whitespace  do-cncdb 2drop ;
+
+TUPLE: bit-cutting-data stepdown stepover spindle_speed spindle_dir rate_units feed_rate plunge_rate notes id ;
+bit-cutting-data "bit_cutting_data" {
+    { "stepdown" "stepdown" DOUBLE }
+    { "stepover" "stepover" DOUBLE }
+    { "spindle_speed" "spindle_speed" INTEGER }
+    { "spindle_dir" "spindle_dir" INTEGER }
+    { "rate_units" "rate_units" INTEGER }
+    { "feed_rate" "feed_rate" DOUBLE }
+    { "plunge_rate" "plunge_rate" DOUBLE }
+    { "notes" "notes" TEXT }
+    { "id" "id" TEXT }
+} define-persistent
+
+: convert-bit-cutting-data ( bit -- bit )
+    ;
+
+TUPLE: bit-entity id tool_geometry_id tool_cutting_data_id material_id machine_id ;
+bit-entity "bit_entity" {
+    { "id" "id" TEXT }
+    { "tool_geometry_id" "tool_geometry_id" TEXT }
+    { "tool_cutting_data_id" "tool_cutting_data_id" TEXT }
+    { "material_id" "material_id" TEXT }
+    { "machine_id" "machine_id" TEXT }
+} define-persistent
 
 : >>diameter-mm ( object value -- object )   (inch>mm) >>diameter ;
 : >>stepover-mm ( object value -- object )   (inch>mm) >>stepover ;
