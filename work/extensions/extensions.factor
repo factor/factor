@@ -13,6 +13,9 @@ USING: accessors alien.c-types alien.data assocs byte-arrays byte-vectors
  ui.tools.common ui.tools.listener variables vocabs.loader vocabs.parser words
     ;
 
+IN: extensions
+CONSTANT: EXTENSIONS t
+
 os macosx? [
     IN: cocoa
 

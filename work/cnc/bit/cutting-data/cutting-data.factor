@@ -1,7 +1,6 @@
 ! Copyright (C) 2023 Dave Carlton.
 ! See https://factorcode.org/license.txt for BSD license.
-USING:   db.tuples db.types 
-accessors cnc.bit db.tuples db.types kernel strings ;
+USING:  accessors cnc.bit db.tuples db.types kernel extensions ;
 IN: cnc.bit.cutting-data
 
 TUPLE: bit-cutting-data stepdown stepover spindle_speed spindle_dir rate_units feed_rate plunge_rate notes id ;

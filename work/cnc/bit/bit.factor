@@ -7,54 +7,20 @@
 USING: accessors alien.enums alien.syntax assocs classes.tuple cnc
 cnc.bit.cutting-data cnc.bit.geometry combinators combinators.smart db
 db.sqlite db.tuples db.types hashtables kernel math math.parser models
-namespaces proquint sequences splitting strings syntax.terse ui
+namespaces  sequences splitting strings syntax.terse ui
 ui.commands ui.gadgets ui.gadgets.borders ui.gadgets.editors
 ui.gadgets.labels ui.gadgets.packs ui.gadgets.toolbar
 ui.gadgets.worlds ui.gestures ui.tools.browser ui.tools.common
 ui.tools.deploy uuid uuid.private cnc.bit.geometry cnc.bit.entity ;
 IN: cnc.bit
 
-SYMBOL: cnc-db-path cnc-db-path [ "/Users/davec/Dropbox/3CL/Data/cnc.db" ]  initialize
 SYMBOL: amanavt-db-path amanavt-db-path [ "/Users/davec/Dropbox/3CL/Data/amanavt.db" ] initialize
 SYMBOL: imperial-db-path imperial-db-path [ "/Users/davec/Desktop/Imperial.db" ]  initialize
-SYMBOL: sql-statement 
 
 ENUM: BitType +straight+ +up+ +down+ +compression+ ;
 ENUM: ToolType { ballnose 0 } { endmill 1 } { radius-endmill 2 } { v-bit 3 } { engraving 4 } { taper-ballmill 5 }
     { drill 6 } { diamond 7 } { threadmill 14 } { multit-thread 15 } { laser 12 } ; 
 ENUM: RateUnits { mm/sec 0 } { mm/min 1 } { m/min 2 } { in/sec 3 } { in/min 4 } { ft/min 5 } ;
-
-DEFER: bit
-DEFER: convert-bit-slots
-TUPLE: cnc-db < sqlite-db ;
-: <cnc-db> ( -- <cnc-db> )
-    cnc-db new
-    cnc-db-path get >>path ;
-
-: with-cncdb ( quot -- )
-    '[ <cnc-db> _ with-db ] call ; inline
-
-: cnc-db>bit ( cnc-dbvt -- bit )
-    bit slots>tuple convert-bit-slots ;
-
-: do-cncdb ( statement -- result ? )
-    sql-statement set
-    [ sql-statement get sql-query ] with-cncdb
-    dup empty?
-    [ f ] [ [ cnc-db>bit ] map t ] if ;
-
-
-! Utility
-: quintid ( -- id )   uuid1 string>uuid  32 >quint ; 
-
-: (inch>mm) ( bit inch -- bit mm )
-    over units>> 1 = [ 25.4 / ] when ;
-
-: clean-whitespace ( str -- 'str )
-    [  CHAR: \x09 dupd =
-       over  CHAR: \x0a = or
-       [ drop CHAR: \x20 ] when
-    ] map string-squeeze-spaces ;
 
 ! TUPLES
 TUPLE: bit name tool_type units diameter stepdown stepover spindle_speed spindle_dir rate_units feed_rate plunge_rate
@@ -112,9 +78,6 @@ TUPLE: bit name tool_type units diameter stepdown stepover spindle_speed spindle
     mm/min enum>number >>rate_units
     0 >>units 
     ;
-
-: amanavt>bitsy ( seq -- bits ? )
-    [ empty? ] [ f  ] [ [ cnc-db>bit ] map t ] smart-if ;
 
 : bit-table-drop ( -- )
     "DROP TABLE IF EXISTS bits"
@@ -205,3 +168,4 @@ TUPLE: bit name tool_type units diameter stepdown stepover spindle_speed spindle
     [ tool_geometry_id>> bit-geometry-id= ] [ tool_cutting_data_id>> bit-cutting-data-id= ] bi
       
     ;
+

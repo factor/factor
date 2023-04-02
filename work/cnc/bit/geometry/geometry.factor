@@ -1,6 +1,6 @@
 ! Copyright (C) 2023 Dave Carlton.
 ! See https://factorcode.org/license.txt for BSD license.
-USING: accessors cnc.bit db.tuples db.types help.syntax.private
+USING: accessors cnc cnc.bit db.tuples db.types help.syntax.private
 strings kernel math.parser sequences splitting syntax.terse ;
 IN: cnc.bit.geometry
 
@@ -20,7 +20,7 @@ bit-geometry "bit-geometry" {
 : convert-bit-geometry ( bit -- bit )
     [ name>> ] retain  " " split  unclip  dup unclip
     CHAR: # =
-    [ drop  [ " " join  trim-whitespace  >>name ] dip  >>amana_id ]
+    [ drop  [ " " join  trim-whitespace  >>name ] dip  >>amanaid ]
     [ 3drop ]
     if
     [ tool_type>> ] retain  >number >>tool_type

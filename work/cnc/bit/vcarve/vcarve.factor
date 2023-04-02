@@ -1,7 +1,9 @@
 ! Copyright (C) 2023 Dave Carlton.
 ! See https://factorcode.org/license.txt for BSD license.
-USING: accessors classes.tuple cnc.bit combinators.smart db db.queries
- db.tuples db.types kernel namespaces sequences  slots.syntax splitting ascii math ;
+USING: accessors ascii classes.tuple cnc cnc.bit cnc.bit.cutting-data
+ cnc.bit.entity cnc.bit.geometry cnc.machine cnc.material combinators.smart db
+ db.queries db.tuples db.types kernel math namespaces
+ sequences slots.syntax splitting  ;
 IN: cnc.bit.vcarve
 
 SYMBOL: vcarve-db-path vcarve-db-path [ "/Users/davec/Dropbox/3CL/Data/tools.vtdb" ]  initialize
@@ -77,26 +79,10 @@ vcarve-bit-geometry "tool_geometry" {
     { "outline" "outline" BLOB }
     { "custom_attributes" "custom_attributes" TEXT }
     { "drill_bank_data_id" "drill_bank_data_id" TEXT }
-    { "id" "id" TEXT }
+    { "id" "id" TEXT +user-assigned-id+ +not-null+ }
 } define-persistent
 
-: cncdb>bit-geometery ( cncdbvt -- bit )
-    vcarve-bit-geometry slots>tuple convert-bit-geometry ;
-
-: vcarve>bit-geometery ( seq -- bits ? )
-    [ empty? ] [ f  ] [ [ cncdb>bit-geometery ] map t ] smart-if ;
-
-: vcarve-bit-geometery ( -- bits )
-    "SELECT * FROM bit_geometery" sql-statement set
-    vcarve-db new  vcarve-db-path get >>path  
-    [ sql-statement get sql-query  ] with-db ;
-
-: amanavt-bits ( -- bits )
-    vcarve-preamble sql-statement set
-    vcarve-db new  amanavt-db-path get >>path  
-    [ sql-statement get sql-query  ] with-db ;
-
-: convert-vcarve-bit-geometery ( -- vcarve-bit-geometries )
+: vcarve-bit-geometries ( -- vcarve-bit-geometries )
     [ vcarve-bit-geometry ensure-table ] with-vcarvedb
     [ T{ vcarve-bit-geometry { id LIKE" %" } }
       select-tuples ] with-vcarvedb
@@ -118,8 +104,7 @@ vcarve-bit-geometry "tool_geometry" {
 
 : create-cnc-bit-geometry ( -- )
     [ bit-geometry recreate-table
-      convert-vcarve-bit-geometery
-      [ vcarve>cnc-bit-geometry ] each 
+      vcarve-bit-geometries [ vcarve>cnc-bit-geometry ] each 
     ] with-cncdb ;
 
 
@@ -145,53 +130,115 @@ vcarve-tool-cutting-data "tool_cutting_data" {
     { "length_units" "length_units" INTEGER }
     { "line_width" "line_width" DOUBLE }
     { "laser_kerf" "laser_kerf" INTEGER }    
-    { "id" "id" TEXT }
+    { "id" "id" TEXT +user-assigned-id+ +not-null+ }
 } define-persistent
 
-: convert-vcarve-tool-cutting-data ( -- vcarve-data )
+: vcarve-tool-cutting-datas ( -- vcarve-data )
     [ vcarve-tool-cutting-data ensure-table ] with-vcarvedb
     [ T{ vcarve-tool-cutting-data { id LIKE" %" } }
       select-tuples ] with-vcarvedb ;
 
-: vcarve>cnc-bit-cutting-data ( vcarve-tool-data -- )
+: vcarve>cnc-bit-cutting-data ( vcarve-data -- )
     bit-cutting-data new
-    [ copy-slots{ stepdown stepover spindle_speed spindle_dir rate_units feed_rate plunge_rate notes id } ] 2keep
-    insert-tuple 2drop ;
+    [ copy-slots{ stepdown stepover spindle_speed spindle_dir rate_units feed_rate plunge_rate notes id } ] 
+    insert-tuple ;
     
 : create-cnc-bit-cutting-data ( -- )
     [ bit-cutting-data recreate-table
-      convert-vcarve-tool-cutting-data
-      [ vcarve>cnc-bit-cutting-data ] each 
+      vcarve-tool-cutting-datas [ vcarve>cnc-bit-cutting-data ] each 
     ] with-cncdb ;
     
 TUPLE: vcarve-tool-entity id material_id machine_id tool_geometry_id tool_cutting_data_id ;
 
 vcarve-tool-entity "tool_entity" {
-    { "id" "id" TEXT }
+    { "id" "id" TEXT +user-assigned-id+ +not-null+ }
     { "tool_geometry_id" "tool_geometry_id" TEXT }
     { "tool_cutting_data_id" "tool_cutting_data_id" TEXT }
     { "material_id" "material_id" TEXT }
     { "machine_id" "machine_id" TEXT }
 } define-persistent
 
-: convert-vcarve-tool-entity ( -- vcarve-bit-enities )
+: vcarve-tool-entities ( -- vcarve-tool-enities )
     [ vcarve-tool-entity ensure-table ] with-vcarvedb
     [ T{ vcarve-tool-entity { id LIKE" %" } }
       select-tuples ] with-vcarvedb
     ;
 
-: vcarve>cnc-bit-entity ( vcarve-bit-geometry -- )
+: vcarve>cnc-bit-entity ( vcarve>cnc-bit-entity -- )
     bit-entity new
-    [ copy-slots{ id tool_geometry_id tool_cutting_data_id material_id machine_id } ] 2keep
-    insert-tuple 2drop ;
+    [ copy-slots{ id tool_geometry_id tool_cutting_data_id material_id machine_id } ] 
+    insert-tuple ;
 
 : create-cnc-bit-entity ( -- )
     [ bit-entity recreate-table
-      convert-vcarve-tool-entity
-      [ vcarve>cnc-bit-entity ] each 
+      vcarve-tool-entities [ vcarve>cnc-bit-entity ] each 
     ] with-cncdb ;
 
 : amana-vcarve-preamble ( -- sql )
     vcarve-preamble  " WHERE tg.name_format LIKE '#%' " append ;
 
+TUPLE: vcarve-material id name ;
 
+vcarve-material "material" {
+    { "id" "id" TEXT +user-assigned-id+ +not-null+ }
+    { "name" "name" TEXT }
+} define-persistent
+
+: vcarve-materials ( -- materials )
+    [ vcarve-material ensure-table
+      T{ vcarve-material { id "NOT NULL" } } select-tuples
+    ] with-vcarvedb ;
+
+: vcarve>cnc-material ( vcarve-material -- )
+    cnc-material new
+    [ copy-slots{ id name } ]
+    insert-tuple ;
+
+: create-cnc-material ( -- )
+    [ cnc-material recreate-table
+      vcarve-materials [ vcarve>cnc-material ] each 
+    ] with-cncdb ;
+
+TUPLE: vcarve-machine name make model controller_type dimensions_units max_width max_height support_rotary support_tool_change
+    has_laser_head id ;
+
+vcarve-machine "machine" {
+    { "name" "name" TEXT }
+    { "make" "make" TEXT }
+    { "model" "model" TEXT }
+    { "controller_type" "controller_type" TEXT }
+    { "dimensions_units" "dimensions_units" INTEGER }
+    { "max_width" "max_width" INTEGER }
+    { "max_height" "max_height" INTEGER }
+    { "support_rotary" "support_rotary" INTEGER }
+    { "support_tool_change" "support_tool_change" INTEGER }
+    { "has_laser_head" "has_laser_head" INTEGER }
+    { "id" "id" TEXT +user-assigned-id+ +not-null+ }
+} define-persistent
+
+: vcarve-machines ( -- machines )
+    [ vcarve-machine ensure-table
+      T{ vcarve-machine { id "NOT NULL" } } select-tuples
+    ] with-vcarvedb ;
+
+: vcarve>cnc-machine ( vcarve-material -- )
+    cnc-machine new
+    [ copy-slots{ name make model support_rotary support_tool_change id } ] 2keep
+    over controller_type>> >>type
+    over dimensions_units>> >>units
+    over max_width>> >>xmax
+    over max_height>> >>ymax
+    insert-tuple  2drop ;
+
+: create-cnc-machine ( -- )
+    [ cnc-machine recreate-table
+      vcarve-machines [ vcarve>cnc-machine ] each 
+    ] with-cncdb ;
+
+: create-cncdb ( -- )
+    create-cnc-bit-entity
+    create-cnc-bit-cutting-data
+    create-cnc-bit-geometry
+    create-cnc-material
+    create-cnc-machine
+    ;

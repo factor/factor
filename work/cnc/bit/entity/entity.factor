@@ -1,6 +1,6 @@
 ! Copyright (C) 2023 Dave Carlton.
 ! See https://factorcode.org/license.txt for BSD license.
-USING:   accessors cnc.bit db.tuples db.types kernel
+USING:   accessors cnc cnc.bit db.tuples db.types kernel
 ;
 IN: cnc.bit.entity
 
