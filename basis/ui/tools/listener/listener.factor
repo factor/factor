@@ -116,6 +116,9 @@ M: word (print-input)
 : print-input ( object interactor -- )
     output>> [ (print-input) ] with-output-stream* ;
 
+: no-input? ( lines -- ? )
+    [ length 1 = ] keep { [ empty? ] [ first empty? ] } 1|| and ;
+
 : interactor-continue ( obj interactor -- )
     [ mailbox>> mailbox-put ] [ scroll>bottom ] bi ;
 
@@ -125,21 +128,30 @@ M: word (print-input)
     [ clear-editor drop ]
     [ model>> clear-undo drop ] 2tri ;
 
-: interactor-readln-finish ( interactor -- )
-    [ control-value rest [ { "" } ] when-empty ] keep set-control-value ;
-
-: no-input? ( lines -- ? )
-    [ length 1 = ] keep { [ empty? ] [ first empty? ] } 1|| and ;
-
-: consume-char ( buffer -- buffer )
-    {   
+: consume-char ( interactor -- seq )
+    control-value {   
         { [ dup no-input?    ] [      ] }
         { [ dup first empty? ] [ rest ] }
         [ clone dup 0 swap [ rest ] change-nth ]
-    } cond ;
+    } cond [ { "" } ] when-empty ;
+
+: consume-n-chars ( n interactor -- seq )
+    control-value join-lines swap tail split-lines [ { "" } ] when-empty ;
+
+: consume-line ( interactor -- seq )
+    control-value rest [ { "" } ] when-empty ;
+
+: write-back-unused ( quot -- )
+    [ set-control-value ] [ model>> clear-undo drop ] tri ; inline
+
+: interactor-read-unsafe-finish ( n interactor -- )
+    [ consume-n-chars ] write-back-unused ;
 
 : interactor-read1-finish ( interactor -- )
-    [ control-value consume-char ] keep set-control-value ;
+    [ consume-char ] write-back-unused ;
+
+: interactor-readln-finish ( interactor -- )
+    [ consume-line ] write-back-unused ;
 
 : interactor-eof ( interactor -- )
     dup interactor-busy? [
@@ -161,11 +173,28 @@ M: word (print-input)
         } cleave
     ] [ drop f ] if ;
 
+
 : yield-if-empty ( interactor -- obj )
-    dup control-value no-input? [ interactor-yield ] [ control-value ] if ;
+    dup control-value no-input? [ interactor-yield ] 
+                                [ control-value    ] if ;
+
+:: yield-if-underfilled ( n interactor -- obj )
+    interactor control-value join-lines length n <  
+    [ interactor interactor-yield ]
+    [ interactor control-value ] if ;
 
 : interactor-read ( interactor -- lines )
     [ yield-if-empty ] [ interactor-finish ] bi ;
+
+:: yield-until-full ( n interactor -- obj )
+    n interactor yield-if-underfilled {
+        { [ dup not ] [ ] }
+        { [ dup join-lines length n < ] [ drop n interactor yield-until-full ] }
+        [  ]
+    } cond ;
+
+: interactor-read-unsafe ( n interactor -- lines )
+    [ yield-until-full ] [ interactor-read-unsafe-finish ] 2bi ;
 
 : interactor-readln ( interactor -- lines )
     [ yield-if-empty ] [ interactor-readln-finish ] bi ;
@@ -186,7 +215,7 @@ M: interactor stream-readln
 M:: interactor stream-read-unsafe ( n buf interactor -- count )
     n [ 0 ] [
         drop
-        interactor interactor-readln dup [ join-lines ] when
+        n interactor interactor-read-unsafe dup [ join-lines ] when
         n index-or-length [ head-slice 0 buf copy ] keep
     ] if-zero ;
 
