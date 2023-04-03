@@ -26,6 +26,8 @@ cli-git-num-parallel [ cpus 2 * ] initialize
 : git-fetch-and-reset-hard-HEAD ( path -- processes ) [ git-fetch-all-desc "HEAD" git-reset-hard-desc 2array run-processes ] with-directory ;
 : git-fetch-tags* ( -- process ) { "git" "fetch" "--tags" } run-process ;
 : git-fetch-tags ( path -- process ) [ git-fetch-tags* ] with-directory ;
+: git-tag* ( -- process ) { "git" "tag" } process-lines ;
+: git-tag ( path -- process ) [ git-tag* ] with-directory ;
 : git-checkout-new-branch* ( branch -- process ) [ { "git" "checkout" "-b" } ] dip suffix run-process ;
 : git-checkout-new-branch ( path branch -- process ) '[ _ git-checkout-new-branch* ] with-directory ;
 : git-checkout-existing* ( branch/checksum -- process ) [ { "git" "checkout" } ] dip suffix run-process ;
