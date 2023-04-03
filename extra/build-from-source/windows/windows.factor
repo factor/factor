@@ -72,8 +72,6 @@ IN: build-from-source.windows
         qw{ perl Configure -DOPENSSL_PIC VC-WIN64A /FS } try-process ! "VC-WIN32"
         have-jom? qw{ jom -j 32 } { "nmake" } ? try-process
         { "apps/libssl-3-x64.dll" "apps/libcrypto-3-x64.dll" } copy-output-files
-        "apps/libssl-3-x64.dll" "libssl-38.dll" copy-output-file-as
-        "apps/libcrypto-3-x64.dll" "libcrypto-37.dll" copy-output-file-as
     ] with-updated-git-repo ;
 
 : build-cairo-dll ( -- )
