@@ -247,6 +247,9 @@ PRIVATE>
 : process-lines ( desc -- lines )
     utf8 <process-reader> stream-lines ;
 
+: process-contents ( desc -- contents )
+    utf8 <process-reader> stream-contents ;
+
 <PRIVATE
 
 : (process-writer) ( desc encoding -- stream process )
