@@ -22,6 +22,9 @@ M: json-fp-special-error summary
     [ [ drop ] prepose ]
     [ ] tri* if ; inline
 
+: json-null>f ( obj/json-null -- obj/f )
+    dup json-null = [ drop f ] when ; inline
+
 : when-json-null ( x if-null -- ) [ ] if-json-null ; inline
 
 : unless-json-null ( x else -- ) [ ] swap if-json-null ; inline
