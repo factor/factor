@@ -3,12 +3,15 @@
 ! See https://factorcode.org/license.txt for BSD license.
 USING: alien alien.c-types alien.destructors alien.libraries
 alien.libraries.finder alien.parser alien.syntax classes.struct
-combinators kernel literals namespaces openssl.libcrypto system
-words ;
+combinators kernel literals namespaces openssl.libcrypto
+sequences system words ;
 IN: openssl.libssl
 
 << "libssl" {
-    { [ os windows? ] [ "libssl-38.dll" ] }
+    { [ os windows? ] [
+          cpu x86.64 = "x64" "x86" ?
+          "libssl-3-" ".dll" surround
+    ] }
     { [ os macosx? ] [ "libssl.35.dylib" ] }
     { [ os unix? ] [ "libssl.so" ] }
 } cond cdecl add-library >>
