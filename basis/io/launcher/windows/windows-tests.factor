@@ -158,7 +158,7 @@ SYMBOLS: out-path err-path ;
             console-vm-path "-script" "stderr.factor" 3array >>command
             [ "err2" ".txt" unique-file ] with-temp-directory
             [ err-path set-global ] keep >>stderr
-        process-lines first
+        process-contents
     ] with-directory
 ] unit-test
 
