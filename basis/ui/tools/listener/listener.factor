@@ -147,6 +147,11 @@ M: word (print-input)
 : interactor-read-unsafe-finish ( n interactor -- )
     [ consume-n-chars ] write-back-unused ;
 
+DEFER: get-listener
+: interactor-read-until-finish ( str chr -- str chr )
+    over length 1 + get-listener input>> 
+    interactor-read-unsafe-finish ;
+
 : interactor-read1-finish ( interactor -- )
     [ consume-char ] write-back-unused ;
 
@@ -229,12 +234,13 @@ M: interactor stream-read1
 
 M: interactor stream-read-until
     swap '[
-        _ interactor-read [
+        _ yield-if-empty [
             join-lines CHAR: \n suffix
             [ _ member? ] dupd find
             [ [ head ] when* ] dip dup not
         ] [ f f f ] if*
-    ] [ drop ] produce swap [ concat "" prepend-as ] dip ;
+    ] [ drop ] produce swap [ concat "" prepend-as ] dip 
+    interactor-read-until-finish ;
 
 M: interactor dispose drop ;
 
