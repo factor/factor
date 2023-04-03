@@ -142,7 +142,7 @@ M: word (print-input)
     control-value rest [ { "" } ] when-empty ;
 
 : write-back-unused ( quot -- )
-    [ set-control-value ] [ model>> clear-undo drop ] tri ; inline
+    [ set-control-value ] [ model>> clear-undo ] tri ; inline
 
 : interactor-read-unsafe-finish ( n interactor -- )
     [ consume-n-chars ] write-back-unused ;
