@@ -2,7 +2,8 @@
 ! See https://factorcode.org/license.txt for BSD license.
 USING: accessors alien.syntax assocs base64 combinators
 crypto.xor endian http io io.encodings.string io.encodings.utf8
-kernel math math.bitwise multiline random sequences strings ;
+kernel math math.bitwise multiline namespaces random sequences
+strings ;
 IN: http.websockets
 
 CONSTANT: websocket-version "13"
@@ -64,23 +65,25 @@ ENUM: WEBSOCKET-CLOSE
         [ [ drop 127 ] [ 8 >be ] bi ]
     } cond ;
 
-! : send-websocket-fragmented ( bytes opcode -- ) 0b10000000 bitor
-
 : send-websocket-bytes ( bytes mask? opcode final? -- )
-    0b10000000 0b0 ? bitor write1
-    [
-        [
-            get-write-payload-length [ 0x80 bitor ] dip
-            [ write1 ] [ [ write ] when* ] bi*
-        ] [
-            4 random-bytes
-            [ write drop ]
-            [ xor-crypt [ write ] when* ] 2bi
-        ] bi
+    output-stream get disposed>> [
+        4drop
     ] [
-        [ get-write-payload-length [ write1 ] [ [ write ] when* ] bi* ]
-        [ [ write ] when* ] bi
-    ] if flush ;
+        0b10000000 0b0 ? bitor write1
+        [
+            [
+                get-write-payload-length [ 0x80 bitor ] dip
+                [ write1 ] [ [ write ] when* ] bi*
+            ] [
+                4 random-bytes
+                [ write drop ]
+                [ xor-crypt [ write ] when* ] 2bi
+            ] bi
+        ] [
+            [ get-write-payload-length [ write1 ] [ [ write ] when* ] bi* ]
+            [ [ write ] when* ] bi
+        ] if flush
+    ] if ;
 
 : send-websocket-text ( bytes mask? opcode fin? -- )
     [ utf8 encode ] 3dip send-websocket-bytes ;
