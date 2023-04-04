@@ -23,7 +23,7 @@ IN: memoize
 
 : packer ( seq -- quot )
     length dup 4 <=
-    [ { [ f ] [ ] [ 2array ] [ 3array ] [ 4array ] } nth ]
+    [ { [ t ] [ ] [ 2array ] [ 3array ] [ 4array ] } nth ]
     [ { } [nsequence] ] if ;
 
 : unpacker ( seq -- quot )
