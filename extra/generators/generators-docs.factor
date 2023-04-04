@@ -135,15 +135,13 @@ HELP: yield-from
 { $description "Delegate computation to the specified generator until it is exhausted, before resuming computation in the current generator." } ;
 
 ARTICLE: "generators" "Generators"
-"Generators in Factor are lazily executed blocks of code, which emit values on request. They are designed to work very similarly to generators found in languages like Python or JavaScript. "
-" Their implementation in Factor is a simple wrapper around " { $vocab-link "coroutines" } "."
+"Generators in Factor are lazily executed blocks of code, which emit values on request. They are designed to work very similarly to generators found in languages like Python or JavaScript."
+"Their implementation in Factor is a simple wrapper around " { $vocab-link "coroutines" } "."
 $nl
-"Generator words are created using " { $link \ GEN: } " or " { $link \ GEN:: } ". When a generator word is called, its required inputs are consumed from the stack, and a "
-{ $link generator } " object is left as output. Accordingly, the right hand side of generator word's stack effect must always be a single value. For example:"
+"Generator words are created using " { $link \ GEN: } " or " { $link \ GEN:: } ". When a generator word is called, its required inputs are consumed from the stack, and a " { $link generator } " object is left as output. Accordingly, the right hand side of generator word's stack effect must always be a single value. For example:"
 $nl
 { $code "GEN: repeat-forever ( val -- gen ) [ dup yield t ] loop ;" "GEN:: foo ( a b c -- gen ) b yield c yield a yield ;" }
-"Inside generator words, " { $link yield } " and its variants can be used. These words halt execution and pass a value to the caller. When a generator object is depleted (i.e., the word is fully finished executing), a "
-{ $link stop-generator } " error is thrown. This error can also be thrown manually inside a generator word to end execution early."
+"Inside generator words, " { $link yield } " and its variants can be used. These words halt execution and pass a value to the caller. When a generator object is depleted (i.e., the word is fully finished executing), a " { $link stop-generator } " error is thrown. This error can also be thrown manually inside a generator word to end execution early."
 $nl
 "When a generator object is depleted, its runtime is discarded and therefore any values left on its internal stack are ignored. "
 "Generator objects can also be created directly from quotations using " { $link <generator> } "."
