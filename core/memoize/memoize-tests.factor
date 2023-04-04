@@ -38,7 +38,7 @@ SYMBOL: foo-counter
 
 MEMO: foo ( -- ) foo-counter counter drop ;
 
-[ 0 1 1 1 ] [
+{ 0 1 1 1 } [
     foo-counter get-global
     foo
     foo-counter get-global
@@ -46,4 +46,16 @@ MEMO: foo ( -- ) foo-counter counter drop ;
     foo-counter get-global
     foo
     foo-counter get-global
+] unit-test
+
+SYMBOL: bar-counter
+0 bar-counter set-global
+
+MEMO: bar ( -- x ) bar-counter counter ;
+
+{ 0 1 1 1 } [
+    bar-counter get-global
+    bar
+    bar
+    bar
 ] unit-test
