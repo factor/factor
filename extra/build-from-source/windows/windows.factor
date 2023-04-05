@@ -72,8 +72,6 @@ IN: build-from-source.windows
         qw{ perl Configure -DOPENSSL_PIC VC-WIN64A /FS } try-process ! "VC-WIN32"
         have-jom? qw{ jom -j 32 } { "nmake" } ? try-process
         { "apps/libssl-3-x64.dll" "apps/libcrypto-3-x64.dll" } copy-output-files
-        "apps/libssl-3-x64.dll" "libssl-38.dll" copy-output-file-as
-        "apps/libcrypto-3-x64.dll" "libcrypto-37.dll" copy-output-file-as
     ] with-updated-git-repo ;
 
 : build-cairo-dll ( -- )
@@ -115,7 +113,7 @@ IN: build-from-source.windows
         ] with-build-directory
     ] with-tar-gz ;
 
-: build-openal ( -- )
+: build-openal-dll ( -- )
     "https://github.com/kcat/openal-soft.git" [
         [
             { "cmake" "-G" "Visual Studio 17 2022" "-DCMAKE_BUILD_TYPE=Release" "-DBUILD_SHARED_LIBS=ON" ".." } try-process
@@ -265,6 +263,7 @@ IN: build-from-source.windows
     build-blas
     build-libressl-dlls
     build-fftw-dll
+    build-openal-dll
     build-pcre-dll
     build-pcre2-dll
     build-postgres-dll
