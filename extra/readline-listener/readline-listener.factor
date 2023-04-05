@@ -1,9 +1,9 @@
 ! Copyright (C) 2011 Erik Charlebois.
 ! See https://factorcode.org/license.txt for BSD license.
 
-USING: accessors assocs colors combinators io kernel listener
-readline sequences sets splitting threads tools.completion
-unicode.data vocabs vocabs.hierarchy ;
+USING: accessors assocs colors combinators editors io kernel
+listener readline sequences sets splitting threads
+tools.completion unicode.data vocabs vocabs.hierarchy ;
 
 IN: readline-listener
 
@@ -40,6 +40,9 @@ M: readline-reader prompt.
 : prefixed-colors ( prefix -- colors )
     named-colors prefixed ;
 
+: prefixed-editors ( prefix -- editors )
+    available-editors [ "editors." ?head drop ] map prefixed ;
+
 : prefixed-chars ( prefix -- chars )
     name-map keys prefixed ;
 
@@ -52,6 +55,7 @@ M: readline-reader prompt.
             { [ dup complete-vocab? ] [ drop prefixed-vocabs ] }
             { [ dup complete-char? ] [ drop prefixed-chars ] }
             { [ dup complete-color? ] [ drop prefixed-colors ] }
+            { [ dup complete-editor? ] [ drop prefixed-editors ] }
             { [ dup complete-pathname? ] [ drop prefixed-paths ] }
             { [ dup complete-vocab-words? ] [ harvest second prefixed-vocab-words ] }
             [ drop prefixed-words ]

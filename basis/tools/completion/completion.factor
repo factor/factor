@@ -1,8 +1,8 @@
 ! Copyright (C) 2005, 2009 Slava Pestov.
 ! See https://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs colors combinators
-combinators.short-circuit io.directories io.files io.files.info
-io.pathnames kernel make math math.order sequences
+combinators.short-circuit editors io.directories io.files
+io.files.info io.pathnames kernel make math math.order sequences
 sequences.private sorting splitting splitting.monotonic unicode
 unicode.data vocabs vocabs.hierarchy ;
 IN: tools.completion
@@ -102,6 +102,9 @@ PRIVATE>
 : colors-matching ( str -- seq )
     named-colors dup zip completions ;
 
+: editors-matching ( str -- seq )
+    available-editors [ "editors." ?head drop ] map dup zip completions ;
+
 : strings-matching ( str seq -- seq' )
     dup zip completions keys ;
 
@@ -175,6 +178,8 @@ PRIVATE>
 : complete-char? ( tokens -- ? ) "CHAR:" complete-token? ;
 
 : complete-color? ( tokens -- ? ) "COLOR:" complete-token? ;
+
+: complete-editor? ( tokens -- ? ) "EDITOR:" complete-token? ;
 
 <PRIVATE
 
