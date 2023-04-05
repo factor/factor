@@ -143,3 +143,25 @@ CONSTANT: start-timestamp T{ timestamp
         "Fri, 29 Feb 2036 00:00:00 -0700"
     }
 } [ "0 0 29 2 *" next-few-times ] unit-test
+
+! At every 26th minute from 2 through 59 past hour 4.
+{
+    {
+        "Sun, 24 Mar 2019 04:02:00 -0700"
+        "Sun, 24 Mar 2019 04:28:00 -0700"
+        "Sun, 24 Mar 2019 04:54:00 -0700"
+        "Mon, 25 Mar 2019 04:02:00 -0700"
+        "Mon, 25 Mar 2019 04:28:00 -0700"
+    }
+} [ "2/26 4 * * *" next-few-times ] unit-test
+
+! At every 3rd minute from 5 through 20 past hour 4.
+{
+    {
+        "Sun, 24 Mar 2019 04:05:00 -0700"
+        "Sun, 24 Mar 2019 04:08:00 -0700"
+        "Sun, 24 Mar 2019 04:11:00 -0700"
+        "Sun, 24 Mar 2019 04:14:00 -0700"
+        "Sun, 24 Mar 2019 04:17:00 -0700"
+    }
+} [ "5-20/3 4 * * *" next-few-times ] unit-test
