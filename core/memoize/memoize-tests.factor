@@ -59,3 +59,18 @@ MEMO: bar ( -- x ) bar-counter counter ;
     bar
     bar
 ] unit-test
+
+SYMBOL: baz-counter
+0 baz-counter set-global
+
+MEMO: baz ( -- x ) baz-counter counter drop f ;
+
+{ 0 f 1 f 1 f 1 } [
+    baz-counter get-global
+    baz
+    baz-counter get-global
+    baz
+    baz-counter get-global
+    baz
+    baz-counter get-global
+] unit-test
