@@ -1,0 +1,1220 @@
+<?xml version="1.0"?>
+<!-- This file was automatically generated from C sources - DO NOT EDIT!
+To affect the contents of this file, edit the original C definitions,
+and/or use gtk-doc annotations.  -->
+<repository version="1.2"
+            xmlns="http://www.gtk.org/introspection/core/1.0"
+            xmlns:c="http://www.gtk.org/introspection/c/1.0"
+            xmlns:glib="http://www.gtk.org/introspection/glib/1.0">
+  <include name="GLib" version="2.0"/>
+  <include name="GModule" version="2.0"/>
+  <include name="GObject" version="2.0"/>
+  <include name="Gst" version="0.10"/>
+  <include name="libxml2" version="2.0"/>
+  <package name="gstreamer-sdp-0.10"/>
+  <c:include name="gst/audio/gstsdp.h"/>
+  <c:include name="gst/audio/gstsdpmessage.h"/>
+  <namespace name="GstSdp"
+             version="0.10"
+             shared-library="libgstsdp-0.10.so.0"
+             c:identifier-prefixes="Gst"
+             c:symbol-prefixes="gst">
+    <record name="SDPAttribute" c:type="GstSDPAttribute">
+      <doc xml:whitespace="preserve">The contents of the SDP "a=" field which contains a key/value pair.</doc>
+      <field name="key" writable="1">
+        <type name="utf8" c:type="gchar*"/>
+      </field>
+      <field name="value" writable="1">
+        <type name="utf8" c:type="gchar*"/>
+      </field>
+    </record>
+    <record name="SDPBandwidth" c:type="GstSDPBandwidth">
+      <doc xml:whitespace="preserve">The contents of the SDP "b=" field which specifies the proposed bandwidth to
+be used by the session or media.</doc>
+      <field name="bwtype" writable="1">
+        <type name="utf8" c:type="gchar*"/>
+      </field>
+      <field name="bandwidth" writable="1">
+        <type name="guint" c:type="guint"/>
+      </field>
+    </record>
+    <record name="SDPConnection" c:type="GstSDPConnection">
+      <doc xml:whitespace="preserve">The contents of the SDP "c=" field which contains connection data.</doc>
+      <field name="nettype" writable="1">
+        <type name="utf8" c:type="gchar*"/>
+      </field>
+      <field name="addrtype" writable="1">
+        <type name="utf8" c:type="gchar*"/>
+      </field>
+      <field name="address" writable="1">
+        <type name="utf8" c:type="gchar*"/>
+      </field>
+      <field name="ttl" writable="1">
+        <type name="guint" c:type="guint"/>
+      </field>
+      <field name="addr_number" writable="1">
+        <type name="guint" c:type="guint"/>
+      </field>
+    </record>
+    <record name="SDPKey" c:type="GstSDPKey">
+      <doc xml:whitespace="preserve">The contents of the SDP "k=" field which is used to convey encryption
+keys.</doc>
+      <field name="type" writable="1">
+        <type name="utf8" c:type="gchar*"/>
+      </field>
+      <field name="data" writable="1">
+        <type name="utf8" c:type="gchar*"/>
+      </field>
+    </record>
+    <record name="SDPMedia" c:type="GstSDPMedia">
+      <doc xml:whitespace="preserve">The contents of the SDP "m=" field with all related fields.</doc>
+      <field name="media" writable="1">
+        <type name="utf8" c:type="gchar*"/>
+      </field>
+      <field name="port" writable="1">
+        <type name="guint" c:type="guint"/>
+      </field>
+      <field name="num_ports" writable="1">
+        <type name="guint" c:type="guint"/>
+      </field>
+      <field name="proto" writable="1">
+        <type name="utf8" c:type="gchar*"/>
+      </field>
+      <field name="fmts" writable="1">
+        <array name="GLib.Array" c:type="GArray*">
+          <type name="gpointer" c:type="gpointer"/>
+        </array>
+      </field>
+      <field name="information" writable="1">
+        <type name="utf8" c:type="gchar*"/>
+      </field>
+      <field name="connections" writable="1">
+        <array name="GLib.Array" c:type="GArray*">
+          <type name="gpointer" c:type="gpointer"/>
+        </array>
+      </field>
+      <field name="bandwidths" writable="1">
+        <array name="GLib.Array" c:type="GArray*">
+          <type name="gpointer" c:type="gpointer"/>
+        </array>
+      </field>
+      <field name="key" writable="1">
+        <type name="SDPKey" c:type="GstSDPKey"/>
+      </field>
+      <field name="attributes" writable="1">
+        <array name="GLib.Array" c:type="GArray*">
+          <type name="gpointer" c:type="gpointer"/>
+        </array>
+      </field>
+      <method name="add_attribute" c:identifier="gst_sdp_media_add_attribute">
+        <doc xml:whitespace="preserve">Add the attribute with @key and @value to @media.</doc>
+        <return-value transfer-ownership="none">
+          <doc xml:whitespace="preserve">#GST_SDP_OK.</doc>
+          <type name="SDPResult" c:type="GstSDPResult"/>
+        </return-value>
+        <parameters>
+          <parameter name="key" transfer-ownership="none">
+            <doc xml:whitespace="preserve">a key</doc>
+            <type name="utf8" c:type="gchar*"/>
+          </parameter>
+          <parameter name="value" transfer-ownership="none">
+            <doc xml:whitespace="preserve">a value</doc>
+            <type name="utf8" c:type="gchar*"/>
+          </parameter>
+        </parameters>
+      </method>
+      <method name="add_bandwidth" c:identifier="gst_sdp_media_add_bandwidth">
+        <doc xml:whitespace="preserve">Add the bandwidth information with @bwtype and @bandwidth to @media.</doc>
+        <return-value transfer-ownership="none">
+          <doc xml:whitespace="preserve">#GST_SDP_OK.</doc>
+          <type name="SDPResult" c:type="GstSDPResult"/>
+        </return-value>
+        <parameters>
+          <parameter name="bwtype" transfer-ownership="none">
+            <doc xml:whitespace="preserve">the bandwidth modifier type</doc>
+            <type name="utf8" c:type="gchar*"/>
+          </parameter>
+          <parameter name="bandwidth" transfer-ownership="none">
+            <doc xml:whitespace="preserve">the bandwidth in kilobits per second</doc>
+            <type name="guint" c:type="guint"/>
+          </parameter>
+        </parameters>
+      </method>
+      <method name="add_connection"
+              c:identifier="gst_sdp_media_add_connection">
+        <doc xml:whitespace="preserve">Add the given connection parameters to @media.</doc>
+        <return-value transfer-ownership="none">
+          <doc xml:whitespace="preserve">a #GstSDPResult.</doc>
+          <type name="SDPResult" c:type="GstSDPResult"/>
+        </return-value>
+        <parameters>
+          <parameter name="nettype" transfer-ownership="none">
+            <doc xml:whitespace="preserve">the type of network. "IN" is defined to have the meaning "Internet".</doc>
+            <type name="utf8" c:type="gchar*"/>
+          </parameter>
+          <parameter name="addrtype" transfer-ownership="none">
+            <doc xml:whitespace="preserve">the type of address.</doc>
+            <type name="utf8" c:type="gchar*"/>
+          </parameter>
+          <parameter name="address" transfer-ownership="none">
+            <doc xml:whitespace="preserve">the address</doc>
+            <type name="utf8" c:type="gchar*"/>
+          </parameter>
+          <parameter name="ttl" transfer-ownership="none">
+            <doc xml:whitespace="preserve">the time to live of the address</doc>
+            <type name="guint" c:type="guint"/>
+          </parameter>
+          <parameter name="addr_number" transfer-ownership="none">
+            <doc xml:whitespace="preserve">the number of layers</doc>
+            <type name="guint" c:type="guint"/>
+          </parameter>
+        </parameters>
+      </method>
+      <method name="add_format" c:identifier="gst_sdp_media_add_format">
+        <doc xml:whitespace="preserve">Add the format information to @media.</doc>
+        <return-value transfer-ownership="none">
+          <doc xml:whitespace="preserve">#GST_SDP_OK.</doc>
+          <type name="SDPResult" c:type="GstSDPResult"/>
+        </return-value>
+        <parameters>
+          <parameter name="format" transfer-ownership="none">
+            <doc xml:whitespace="preserve">the format</doc>
+            <type name="utf8" c:type="gchar*"/>
+          </parameter>
+        </parameters>
+      </method>
+      <method name="as_text" c:identifier="gst_sdp_media_as_text">
+        <doc xml:whitespace="preserve">Convert the contents of @media to a text string.</doc>
+        <return-value transfer-ownership="full">
+          <doc xml:whitespace="preserve">A dynamically allocated string representing the media.</doc>
+          <type name="utf8" c:type="gchar*"/>
+        </return-value>
+      </method>
+      <method name="attributes_len"
+              c:identifier="gst_sdp_media_attributes_len">
+        <doc xml:whitespace="preserve">Get the number of attribute fields in @media.</doc>
+        <return-value transfer-ownership="none">
+          <doc xml:whitespace="preserve">the number of attributes in @media.</doc>
+          <type name="guint" c:type="guint"/>
+        </return-value>
+      </method>
+      <method name="bandwidths_len"
+              c:identifier="gst_sdp_media_bandwidths_len">
+        <doc xml:whitespace="preserve">Get the number of bandwidth fields in @media.</doc>
+        <return-value transfer-ownership="none">
+          <doc xml:whitespace="preserve">the number of bandwidths in @media.</doc>
+          <type name="guint" c:type="guint"/>
+        </return-value>
+      </method>
+      <method name="connections_len"
+              c:identifier="gst_sdp_media_connections_len">
+        <doc xml:whitespace="preserve">Get the number of connection fields in @media.</doc>
+        <return-value transfer-ownership="none">
+          <doc xml:whitespace="preserve">the number of connections in @media.</doc>
+          <type name="guint" c:type="guint"/>
+        </return-value>
+      </method>
+      <method name="formats_len" c:identifier="gst_sdp_media_formats_len">
+        <doc xml:whitespace="preserve">Get the number of formats in @media.</doc>
+        <return-value transfer-ownership="none">
+          <doc xml:whitespace="preserve">the number of formats in @media.</doc>
+          <type name="guint" c:type="guint"/>
+        </return-value>
+      </method>
+      <method name="free" c:identifier="gst_sdp_media_free">
+        <doc xml:whitespace="preserve">Free all resources allocated by @media. @media should not be used anymore after
+this function. This function should be used when @media was dynamically
+allocated with gst_sdp_media_new().</doc>
+        <return-value transfer-ownership="none">
+          <doc xml:whitespace="preserve">a #GstSDPResult.</doc>
+          <type name="SDPResult" c:type="GstSDPResult"/>
+        </return-value>
+      </method>
+      <method name="get_attribute" c:identifier="gst_sdp_media_get_attribute">
+        <doc xml:whitespace="preserve">Get the attribute at position @idx in @media.</doc>
+        <return-value transfer-ownership="none">
+          <doc xml:whitespace="preserve">the #GstSDPAttribute at position @idx.</doc>
+          <type name="SDPAttribute" c:type="GstSDPAttribute*"/>
+        </return-value>
+        <parameters>
+          <parameter name="idx" transfer-ownership="none">
+            <doc xml:whitespace="preserve">an index</doc>
+            <type name="guint" c:type="guint"/>
+          </parameter>
+        </parameters>
+      </method>
+      <method name="get_attribute_val"
+              c:identifier="gst_sdp_media_get_attribute_val">
+        <doc xml:whitespace="preserve">Get the first attribute value for @key in @media.</doc>
+        <return-value transfer-ownership="none">
+          <doc xml:whitespace="preserve">the first attribute value for @key.</doc>
+          <type name="utf8" c:type="gchar*"/>
+        </return-value>
+        <parameters>
+          <parameter name="key" transfer-ownership="none">
+            <doc xml:whitespace="preserve">a key</doc>
+            <type name="utf8" c:type="gchar*"/>
+          </parameter>
+        </parameters>
+      </method>
+      <method name="get_attribute_val_n"
+              c:identifier="gst_sdp_media_get_attribute_val_n">
+        <doc xml:whitespace="preserve">Get the @nth attribute value for @key in @media.</doc>
+        <return-value transfer-ownership="none">
+          <doc xml:whitespace="preserve">the @nth attribute value.</doc>
+          <type name="utf8" c:type="gchar*"/>
+        </return-value>
+        <parameters>
+          <parameter name="key" transfer-ownership="none">
+            <doc xml:whitespace="preserve">a key</doc>
+            <type name="utf8" c:type="gchar*"/>
+          </parameter>
+          <parameter name="nth" transfer-ownership="none">
+            <doc xml:whitespace="preserve">an index</doc>
+            <type name="guint" c:type="guint"/>
+          </parameter>
+        </parameters>
+      </method>
+      <method name="get_bandwidth" c:identifier="gst_sdp_media_get_bandwidth">
+        <doc xml:whitespace="preserve">Get the bandwidth at position @idx in @media.</doc>
+        <return-value transfer-ownership="none">
+          <doc xml:whitespace="preserve">the #GstSDPBandwidth at position @idx.</doc>
+          <type name="SDPBandwidth" c:type="GstSDPBandwidth*"/>
+        </return-value>
+        <parameters>
+          <parameter name="idx" transfer-ownership="none">
+            <doc xml:whitespace="preserve">an index</doc>
+            <type name="guint" c:type="guint"/>
+          </parameter>
+        </parameters>
+      </method>
+      <method name="get_connection"
+              c:identifier="gst_sdp_media_get_connection">
+        <doc xml:whitespace="preserve">Get the connection at position @idx in @media.</doc>
+        <return-value transfer-ownership="none">
+          <doc xml:whitespace="preserve">the #GstSDPConnection at position @idx.</doc>
+          <type name="SDPConnection" c:type="GstSDPConnection*"/>
+        </return-value>
+        <parameters>
+          <parameter name="idx" transfer-ownership="none">
+            <doc xml:whitespace="preserve">an index</doc>
+            <type name="guint" c:type="guint"/>
+          </parameter>
+        </parameters>
+      </method>
+      <method name="get_format" c:identifier="gst_sdp_media_get_format">
+        <doc xml:whitespace="preserve">Get the format information at position @idx in @media.</doc>
+        <return-value transfer-ownership="none">
+          <doc xml:whitespace="preserve">the format at position @idx.</doc>
+          <type name="utf8" c:type="gchar*"/>
+        </return-value>
+        <parameters>
+          <parameter name="idx" transfer-ownership="none">
+            <doc xml:whitespace="preserve">an index</doc>
+            <type name="guint" c:type="guint"/>
+          </parameter>
+        </parameters>
+      </method>
+      <method name="get_information"
+              c:identifier="gst_sdp_media_get_information">
+        <doc xml:whitespace="preserve">Get the information of @media</doc>
+        <return-value transfer-ownership="none">
+          <doc xml:whitespace="preserve">the information of @media.</doc>
+          <type name="utf8" c:type="gchar*"/>
+        </return-value>
+      </method>
+      <method name="get_key" c:identifier="gst_sdp_media_get_key">
+        <doc xml:whitespace="preserve">Get the encryption information from @media.</doc>
+        <return-value transfer-ownership="none">
+          <doc xml:whitespace="preserve">a #GstSDPKey.</doc>
+          <type name="SDPKey" c:type="GstSDPKey*"/>
+        </return-value>
+      </method>
+      <method name="get_media" c:identifier="gst_sdp_media_get_media">
+        <doc xml:whitespace="preserve">Get the media description of @media.</doc>
+        <return-value transfer-ownership="none">
+          <doc xml:whitespace="preserve">the media description.</doc>
+          <type name="utf8" c:type="gchar*"/>
+        </return-value>
+      </method>
+      <method name="get_num_ports" c:identifier="gst_sdp_media_get_num_ports">
+        <doc xml:whitespace="preserve">Get the number of ports for @media.</doc>
+        <return-value transfer-ownership="none">
+          <doc xml:whitespace="preserve">the number of ports for @media.</doc>
+          <type name="guint" c:type="guint"/>
+        </return-value>
+      </method>
+      <method name="get_port" c:identifier="gst_sdp_media_get_port">
+        <doc xml:whitespace="preserve">Get the port number for @media.</doc>
+        <return-value transfer-ownership="none">
+          <doc xml:whitespace="preserve">the port number of @media.</doc>
+          <type name="guint" c:type="guint"/>
+        </return-value>
+      </method>
+      <method name="get_proto" c:identifier="gst_sdp_media_get_proto">
+        <doc xml:whitespace="preserve">Get the transport protocol of @media</doc>
+        <return-value transfer-ownership="none">
+          <doc xml:whitespace="preserve">the transport protocol of @media.</doc>
+          <type name="utf8" c:type="gchar*"/>
+        </return-value>
+      </method>
+      <method name="init" c:identifier="gst_sdp_media_init">
+        <doc xml:whitespace="preserve">Initialize @media so that its contents are as if it was freshly allocated
+with gst_sdp_media_new(). This function is mostly used to initialize a media
+allocated on the stack. gst_sdp_media_uninit() undoes this operation.
+When this function is invoked on newly allocated data (with malloc or on the
+stack), its contents should be set to 0 before calling this function.</doc>
+        <return-value transfer-ownership="none">
+          <doc xml:whitespace="preserve">a #GstSDPResult.</doc>
+          <type name="SDPResult" c:type="GstSDPResult"/>
+        </return-value>
+      </method>
+      <method name="set_information"
+              c:identifier="gst_sdp_media_set_information">
+        <doc xml:whitespace="preserve">Set the media information of @media to @information.</doc>
+        <return-value transfer-ownership="none">
+          <doc xml:whitespace="preserve">#GST_SDP_OK.</doc>
+          <type name="SDPResult" c:type="GstSDPResult"/>
+        </return-value>
+        <parameters>
+          <parameter name="information" transfer-ownership="none">
+            <doc xml:whitespace="preserve">the media information</doc>
+            <type name="utf8" c:type="gchar*"/>
+          </parameter>
+        </parameters>
+      </method>
+      <method name="set_key" c:identifier="gst_sdp_media_set_key">
+        <doc xml:whitespace="preserve">Adds the encryption information to @media.</doc>
+        <return-value transfer-ownership="none">
+          <doc xml:whitespace="preserve">a #GstSDPResult.</doc>
+          <type name="SDPResult" c:type="GstSDPResult"/>
+        </return-value>
+        <parameters>
+          <parameter name="type" transfer-ownership="none">
+            <doc xml:whitespace="preserve">the encryption type</doc>
+            <type name="utf8" c:type="gchar*"/>
+          </parameter>
+          <parameter name="data" transfer-ownership="none">
+            <doc xml:whitespace="preserve">the encryption data</doc>
+            <type name="utf8" c:type="gchar*"/>
+          </parameter>
+        </parameters>
+      </method>
+      <method name="set_media" c:identifier="gst_sdp_media_set_media">
+        <doc xml:whitespace="preserve">Set the media description of @media to @med.</doc>
+        <return-value transfer-ownership="none">
+          <doc xml:whitespace="preserve">#GST_SDP_OK.</doc>
+          <type name="SDPResult" c:type="GstSDPResult"/>
+        </return-value>
+        <parameters>
+          <parameter name="med" transfer-ownership="none">
+            <doc xml:whitespace="preserve">the media description</doc>
+            <type name="utf8" c:type="gchar*"/>
+          </parameter>
+        </parameters>
+      </method>
+      <method name="set_port_info" c:identifier="gst_sdp_media_set_port_info">
+        <doc xml:whitespace="preserve">Set the port information in @media.</doc>
+        <return-value transfer-ownership="none">
+          <doc xml:whitespace="preserve">#GST_SDP_OK.</doc>
+          <type name="SDPResult" c:type="GstSDPResult"/>
+        </return-value>
+        <parameters>
+          <parameter name="port" transfer-ownership="none">
+            <doc xml:whitespace="preserve">the port number</doc>
+            <type name="guint" c:type="guint"/>
+          </parameter>
+          <parameter name="num_ports" transfer-ownership="none">
+            <doc xml:whitespace="preserve">the number of ports</doc>
+            <type name="guint" c:type="guint"/>
+          </parameter>
+        </parameters>
+      </method>
+      <method name="set_proto" c:identifier="gst_sdp_media_set_proto">
+        <doc xml:whitespace="preserve">Set the media transport protocol of @media to @proto.</doc>
+        <return-value transfer-ownership="none">
+          <doc xml:whitespace="preserve">#GST_SDP_OK.</doc>
+          <type name="SDPResult" c:type="GstSDPResult"/>
+        </return-value>
+        <parameters>
+          <parameter name="proto" transfer-ownership="none">
+            <doc xml:whitespace="preserve">the media transport protocol</doc>
+            <type name="utf8" c:type="gchar*"/>
+          </parameter>
+        </parameters>
+      </method>
+      <method name="uninit" c:identifier="gst_sdp_media_uninit">
+        <doc xml:whitespace="preserve">Free all resources allocated in @media. @media should not be used anymore after
+this function. This function should be used when @media was allocated on the
+stack and initialized with gst_sdp_media_init().</doc>
+        <return-value transfer-ownership="none">
+          <doc xml:whitespace="preserve">a #GstSDPResult.</doc>
+          <type name="SDPResult" c:type="GstSDPResult"/>
+        </return-value>
+      </method>
+    </record>
+    <record name="SDPMessage" c:type="GstSDPMessage">
+      <doc xml:whitespace="preserve">The contents of the SDP message.</doc>
+      <field name="version" writable="1">
+        <type name="utf8" c:type="gchar*"/>
+      </field>
+      <field name="origin" writable="1">
+        <type name="SDPOrigin" c:type="GstSDPOrigin"/>
+      </field>
+      <field name="session_name" writable="1">
+        <type name="utf8" c:type="gchar*"/>
+      </field>
+      <field name="information" writable="1">
+        <type name="utf8" c:type="gchar*"/>
+      </field>
+      <field name="uri" writable="1">
+        <type name="utf8" c:type="gchar*"/>
+      </field>
+      <field name="emails" writable="1">
+        <array name="GLib.Array" c:type="GArray*">
+          <type name="gpointer" c:type="gpointer"/>
+        </array>
+      </field>
+      <field name="phones" writable="1">
+        <array name="GLib.Array" c:type="GArray*">
+          <type name="gpointer" c:type="gpointer"/>
+        </array>
+      </field>
+      <field name="connection" writable="1">
+        <type name="SDPConnection" c:type="GstSDPConnection"/>
+      </field>
+      <field name="bandwidths" writable="1">
+        <array name="GLib.Array" c:type="GArray*">
+          <type name="gpointer" c:type="gpointer"/>
+        </array>
+      </field>
+      <field name="times" writable="1">
+        <array name="GLib.Array" c:type="GArray*">
+          <type name="gpointer" c:type="gpointer"/>
+        </array>
+      </field>
+      <field name="zones" writable="1">
+        <array name="GLib.Array" c:type="GArray*">
+          <type name="gpointer" c:type="gpointer"/>
+        </array>
+      </field>
+      <field name="key" writable="1">
+        <type name="SDPKey" c:type="GstSDPKey"/>
+      </field>
+      <field name="attributes" writable="1">
+        <array name="GLib.Array" c:type="GArray*">
+          <type name="gpointer" c:type="gpointer"/>
+        </array>
+      </field>
+      <field name="medias" writable="1">
+        <array name="GLib.Array" c:type="GArray*">
+          <type name="gpointer" c:type="gpointer"/>
+        </array>
+      </field>
+      <method name="add_attribute"
+              c:identifier="gst_sdp_message_add_attribute">
+        <doc xml:whitespace="preserve">Add the attribute with @key and @value to @msg.</doc>
+        <return-value transfer-ownership="none">
+          <doc xml:whitespace="preserve">@GST_SDP_OK.</doc>
+          <type name="SDPResult" c:type="GstSDPResult"/>
+        </return-value>
+        <parameters>
+          <parameter name="key" transfer-ownership="none">
+            <doc xml:whitespace="preserve">the key</doc>
+            <type name="utf8" c:type="gchar*"/>
+          </parameter>
+          <parameter name="value" transfer-ownership="none">
+            <doc xml:whitespace="preserve">the value</doc>
+            <type name="utf8" c:type="gchar*"/>
+          </parameter>
+        </parameters>
+      </method>
+      <method name="add_bandwidth"
+              c:identifier="gst_sdp_message_add_bandwidth">
+        <doc xml:whitespace="preserve">Add the specified bandwidth information to @msg.</doc>
+        <return-value transfer-ownership="none">
+          <doc xml:whitespace="preserve">a #GstSDPResult.</doc>
+          <type name="SDPResult" c:type="GstSDPResult"/>
+        </return-value>
+        <parameters>
+          <parameter name="bwtype" transfer-ownership="none">
+            <doc xml:whitespace="preserve">the bandwidth modifier type</doc>
+            <type name="utf8" c:type="gchar*"/>
+          </parameter>
+          <parameter name="bandwidth" transfer-ownership="none">
+            <doc xml:whitespace="preserve">the bandwidth in kilobits per second</doc>
+            <type name="guint" c:type="guint"/>
+          </parameter>
+        </parameters>
+      </method>
+      <method name="add_email" c:identifier="gst_sdp_message_add_email">
+        <doc xml:whitespace="preserve">Add @email to the list of emails in @msg.</doc>
+        <return-value transfer-ownership="none">
+          <doc xml:whitespace="preserve">a #GstSDPResult.</doc>
+          <type name="SDPResult" c:type="GstSDPResult"/>
+        </return-value>
+        <parameters>
+          <parameter name="email" transfer-ownership="none">
+            <doc xml:whitespace="preserve">an email</doc>
+            <type name="utf8" c:type="gchar*"/>
+          </parameter>
+        </parameters>
+      </method>
+      <method name="add_media" c:identifier="gst_sdp_message_add_media">
+        <doc xml:whitespace="preserve">Adds @media to the array of medias in @msg. This function takes ownership of
+the contents of @media so that @media will have to be reinitialized with
+gst_media_init() before it can be used again.</doc>
+        <return-value transfer-ownership="none">
+          <doc xml:whitespace="preserve">a #GstSDPResult.</doc>
+          <type name="SDPResult" c:type="GstSDPResult"/>
+        </return-value>
+        <parameters>
+          <parameter name="media" transfer-ownership="none">
+            <doc xml:whitespace="preserve">a #GstSDPMedia to add</doc>
+            <type name="SDPMedia" c:type="GstSDPMedia*"/>
+          </parameter>
+        </parameters>
+      </method>
+      <method name="add_phone" c:identifier="gst_sdp_message_add_phone">
+        <doc xml:whitespace="preserve">Add @phone to the list of phones in @msg.</doc>
+        <return-value transfer-ownership="none">
+          <doc xml:whitespace="preserve">a #GstSDPResult.</doc>
+          <type name="SDPResult" c:type="GstSDPResult"/>
+        </return-value>
+        <parameters>
+          <parameter name="phone" transfer-ownership="none">
+            <doc xml:whitespace="preserve">a phone</doc>
+            <type name="utf8" c:type="gchar*"/>
+          </parameter>
+        </parameters>
+      </method>
+      <method name="add_time" c:identifier="gst_sdp_message_add_time">
+        <doc xml:whitespace="preserve">Add time information @start and @stop to @msg.</doc>
+        <return-value transfer-ownership="none">
+          <doc xml:whitespace="preserve">a #GstSDPResult.</doc>
+          <type name="SDPResult" c:type="GstSDPResult"/>
+        </return-value>
+        <parameters>
+          <parameter name="start" transfer-ownership="none">
+            <doc xml:whitespace="preserve">the start time</doc>
+            <type name="utf8" c:type="gchar*"/>
+          </parameter>
+          <parameter name="stop" transfer-ownership="none">
+            <doc xml:whitespace="preserve">the stop time</doc>
+            <type name="utf8" c:type="gchar*"/>
+          </parameter>
+          <parameter name="repeat" transfer-ownership="none">
+            <doc xml:whitespace="preserve">the repeat times</doc>
+            <type name="utf8" c:type="gchar**"/>
+          </parameter>
+        </parameters>
+      </method>
+      <method name="add_zone" c:identifier="gst_sdp_message_add_zone">
+        <doc xml:whitespace="preserve">Add time zone information to @msg.</doc>
+        <return-value transfer-ownership="none">
+          <doc xml:whitespace="preserve">a #GstSDPResult.</doc>
+          <type name="SDPResult" c:type="GstSDPResult"/>
+        </return-value>
+        <parameters>
+          <parameter name="adj_time" transfer-ownership="none">
+            <doc xml:whitespace="preserve">the NTP time that a time zone adjustment happens</doc>
+            <type name="utf8" c:type="gchar*"/>
+          </parameter>
+          <parameter name="typed_time" transfer-ownership="none">
+            <doc xml:whitespace="preserve">the offset from the time when the session was first scheduled</doc>
+            <type name="utf8" c:type="gchar*"/>
+          </parameter>
+        </parameters>
+      </method>
+      <method name="as_text" c:identifier="gst_sdp_message_as_text">
+        <doc xml:whitespace="preserve">Convert the contents of @msg to a text string.</doc>
+        <return-value transfer-ownership="full">
+          <doc xml:whitespace="preserve">A dynamically allocated string representing the SDP description.</doc>
+          <type name="utf8" c:type="gchar*"/>
+        </return-value>
+      </method>
+      <method name="attributes_len"
+              c:identifier="gst_sdp_message_attributes_len">
+        <doc xml:whitespace="preserve">Get the number of attributes in @msg.</doc>
+        <return-value transfer-ownership="none">
+          <doc xml:whitespace="preserve">the number of attributes in @msg.</doc>
+          <type name="guint" c:type="guint"/>
+        </return-value>
+      </method>
+      <method name="bandwidths_len"
+              c:identifier="gst_sdp_message_bandwidths_len">
+        <doc xml:whitespace="preserve">Get the number of bandwidth information in @msg.</doc>
+        <return-value transfer-ownership="none">
+          <doc xml:whitespace="preserve">the number of bandwidth information in @msg.</doc>
+          <type name="guint" c:type="guint"/>
+        </return-value>
+      </method>
+      <method name="dump" c:identifier="gst_sdp_message_dump">
+        <doc xml:whitespace="preserve">Dump the parsed contents of @msg to stdout.</doc>
+        <return-value transfer-ownership="none">
+          <doc xml:whitespace="preserve">a #GstSDPResult.</doc>
+          <type name="SDPResult" c:type="GstSDPResult"/>
+        </return-value>
+      </method>
+      <method name="emails_len" c:identifier="gst_sdp_message_emails_len">
+        <doc xml:whitespace="preserve">Get the number of emails in @msg.</doc>
+        <return-value transfer-ownership="none">
+          <doc xml:whitespace="preserve">the number of emails in @msg.</doc>
+          <type name="guint" c:type="guint"/>
+        </return-value>
+      </method>
+      <method name="free" c:identifier="gst_sdp_message_free">
+        <doc xml:whitespace="preserve">Free all resources allocated by @msg. @msg should not be used anymore after
+this function. This function should be used when @msg was dynamically
+allocated with gst_sdp_message_new().</doc>
+        <return-value transfer-ownership="none">
+          <doc xml:whitespace="preserve">a #GstSDPResult.</doc>
+          <type name="SDPResult" c:type="GstSDPResult"/>
+        </return-value>
+      </method>
+      <method name="get_attribute"
+              c:identifier="gst_sdp_message_get_attribute">
+        <doc xml:whitespace="preserve">Get the attribute at position @idx in @msg.</doc>
+        <return-value transfer-ownership="none">
+          <doc xml:whitespace="preserve">the #GstSDPAttribute at position @idx.</doc>
+          <type name="SDPAttribute" c:type="GstSDPAttribute*"/>
+        </return-value>
+        <parameters>
+          <parameter name="idx" transfer-ownership="none">
+            <doc xml:whitespace="preserve">the index</doc>
+            <type name="guint" c:type="guint"/>
+          </parameter>
+        </parameters>
+      </method>
+      <method name="get_attribute_val"
+              c:identifier="gst_sdp_message_get_attribute_val">
+        <doc xml:whitespace="preserve">Get the first attribute with key @key in @msg.</doc>
+        <return-value transfer-ownership="none">
+          <doc xml:whitespace="preserve">the attribute value of the first attribute with @key.</doc>
+          <type name="utf8" c:type="gchar*"/>
+        </return-value>
+        <parameters>
+          <parameter name="key" transfer-ownership="none">
+            <doc xml:whitespace="preserve">the key</doc>
+            <type name="utf8" c:type="gchar*"/>
+          </parameter>
+        </parameters>
+      </method>
+      <method name="get_attribute_val_n"
+              c:identifier="gst_sdp_message_get_attribute_val_n">
+        <doc xml:whitespace="preserve">Get the @nth attribute with key @key in @msg.</doc>
+        <return-value transfer-ownership="none">
+          <doc xml:whitespace="preserve">the attribute value of the @nth attribute with @key.</doc>
+          <type name="utf8" c:type="gchar*"/>
+        </return-value>
+        <parameters>
+          <parameter name="key" transfer-ownership="none">
+            <doc xml:whitespace="preserve">the key</doc>
+            <type name="utf8" c:type="gchar*"/>
+          </parameter>
+          <parameter name="nth" transfer-ownership="none">
+            <doc xml:whitespace="preserve">the index</doc>
+            <type name="guint" c:type="guint"/>
+          </parameter>
+        </parameters>
+      </method>
+      <method name="get_bandwidth"
+              c:identifier="gst_sdp_message_get_bandwidth">
+        <doc xml:whitespace="preserve">Get the bandwidth at index @idx from @msg.</doc>
+        <return-value transfer-ownership="none">
+          <doc xml:whitespace="preserve">a #GstSDPBandwidth.</doc>
+          <type name="SDPBandwidth" c:type="GstSDPBandwidth*"/>
+        </return-value>
+        <parameters>
+          <parameter name="idx" transfer-ownership="none">
+            <doc xml:whitespace="preserve">the bandwidth index</doc>
+            <type name="guint" c:type="guint"/>
+          </parameter>
+        </parameters>
+      </method>
+      <method name="get_connection"
+              c:identifier="gst_sdp_message_get_connection">
+        <doc xml:whitespace="preserve">Get the connection of @msg.</doc>
+        <return-value transfer-ownership="none">
+          <doc xml:whitespace="preserve">a #GstSDPConnection. The result remains valid as long as @msg is valid.</doc>
+          <type name="SDPConnection" c:type="GstSDPConnection*"/>
+        </return-value>
+      </method>
+      <method name="get_email" c:identifier="gst_sdp_message_get_email">
+        <doc xml:whitespace="preserve">Get the email with number @idx from @msg.</doc>
+        <return-value transfer-ownership="none">
+          <doc xml:whitespace="preserve">the email at position @idx.</doc>
+          <type name="utf8" c:type="gchar*"/>
+        </return-value>
+        <parameters>
+          <parameter name="idx" transfer-ownership="none">
+            <doc xml:whitespace="preserve">an email index</doc>
+            <type name="guint" c:type="guint"/>
+          </parameter>
+        </parameters>
+      </method>
+      <method name="get_information"
+              c:identifier="gst_sdp_message_get_information">
+        <doc xml:whitespace="preserve">Get the information in @msg.</doc>
+        <return-value transfer-ownership="none">
+          <doc xml:whitespace="preserve">a #GstSDPResult.</doc>
+          <type name="utf8" c:type="gchar*"/>
+        </return-value>
+      </method>
+      <method name="get_key" c:identifier="gst_sdp_message_get_key">
+        <doc xml:whitespace="preserve">Get the encryption information from @msg.</doc>
+        <return-value transfer-ownership="none">
+          <doc xml:whitespace="preserve">a #GstSDPKey.</doc>
+          <type name="SDPKey" c:type="GstSDPKey*"/>
+        </return-value>
+      </method>
+      <method name="get_media" c:identifier="gst_sdp_message_get_media">
+        <doc xml:whitespace="preserve">Get the media description at index @idx in @msg.</doc>
+        <return-value transfer-ownership="none">
+          <doc xml:whitespace="preserve">a #GstSDPMedia.</doc>
+          <type name="SDPMedia" c:type="GstSDPMedia*"/>
+        </return-value>
+        <parameters>
+          <parameter name="idx" transfer-ownership="none">
+            <doc xml:whitespace="preserve">the index</doc>
+            <type name="guint" c:type="guint"/>
+          </parameter>
+        </parameters>
+      </method>
+      <method name="get_origin" c:identifier="gst_sdp_message_get_origin">
+        <doc xml:whitespace="preserve">Get the origin of @msg.</doc>
+        <return-value transfer-ownership="none">
+          <doc xml:whitespace="preserve">a #GstSDPOrigin. The result remains valid as long as @msg is valid.</doc>
+          <type name="SDPOrigin" c:type="GstSDPOrigin*"/>
+        </return-value>
+      </method>
+      <method name="get_phone" c:identifier="gst_sdp_message_get_phone">
+        <doc xml:whitespace="preserve">Get the phone with number @idx from @msg.</doc>
+        <return-value transfer-ownership="none">
+          <doc xml:whitespace="preserve">the phone at position @idx.</doc>
+          <type name="utf8" c:type="gchar*"/>
+        </return-value>
+        <parameters>
+          <parameter name="idx" transfer-ownership="none">
+            <doc xml:whitespace="preserve">a phone index</doc>
+            <type name="guint" c:type="guint"/>
+          </parameter>
+        </parameters>
+      </method>
+      <method name="get_session_name"
+              c:identifier="gst_sdp_message_get_session_name">
+        <doc xml:whitespace="preserve">Get the session name in @msg.</doc>
+        <return-value transfer-ownership="none">
+          <doc xml:whitespace="preserve">a #GstSDPResult.</doc>
+          <type name="utf8" c:type="gchar*"/>
+        </return-value>
+      </method>
+      <method name="get_time" c:identifier="gst_sdp_message_get_time">
+        <doc xml:whitespace="preserve">Get time information with index @idx from @msg.</doc>
+        <return-value transfer-ownership="none">
+          <doc xml:whitespace="preserve">a #GstSDPTime.</doc>
+          <type name="SDPTime" c:type="GstSDPTime*"/>
+        </return-value>
+        <parameters>
+          <parameter name="idx" transfer-ownership="none">
+            <doc xml:whitespace="preserve">the time index</doc>
+            <type name="guint" c:type="guint"/>
+          </parameter>
+        </parameters>
+      </method>
+      <method name="get_uri" c:identifier="gst_sdp_message_get_uri">
+        <doc xml:whitespace="preserve">Get the URI in @msg.</doc>
+        <return-value transfer-ownership="none">
+          <doc xml:whitespace="preserve">a #GstSDPResult.</doc>
+          <type name="utf8" c:type="gchar*"/>
+        </return-value>
+      </method>
+      <method name="get_version" c:identifier="gst_sdp_message_get_version">
+        <doc xml:whitespace="preserve">Get the version in @msg.</doc>
+        <return-value transfer-ownership="none">
+          <doc xml:whitespace="preserve">a #GstSDPResult.</doc>
+          <type name="utf8" c:type="gchar*"/>
+        </return-value>
+      </method>
+      <method name="get_zone" c:identifier="gst_sdp_message_get_zone">
+        <doc xml:whitespace="preserve">Get time zone information with index @idx from @msg.</doc>
+        <return-value transfer-ownership="none">
+          <doc xml:whitespace="preserve">a #GstSDPZone.</doc>
+          <type name="SDPZone" c:type="GstSDPZone*"/>
+        </return-value>
+        <parameters>
+          <parameter name="idx" transfer-ownership="none">
+            <doc xml:whitespace="preserve">the zone index</doc>
+            <type name="guint" c:type="guint"/>
+          </parameter>
+        </parameters>
+      </method>
+      <method name="init" c:identifier="gst_sdp_message_init">
+        <doc xml:whitespace="preserve">Initialize @msg so that its contents are as if it was freshly allocated
+with gst_sdp_message_new(). This function is mostly used to initialize a message
+allocated on the stack. gst_sdp_message_uninit() undoes this operation.
+When this function is invoked on newly allocated data (with malloc or on the
+stack), its contents should be set to 0 before calling this function.</doc>
+        <return-value transfer-ownership="none">
+          <doc xml:whitespace="preserve">a #GstSDPResult.</doc>
+          <type name="SDPResult" c:type="GstSDPResult"/>
+        </return-value>
+      </method>
+      <method name="medias_len" c:identifier="gst_sdp_message_medias_len">
+        <doc xml:whitespace="preserve">Get the number of media descriptions in @msg.</doc>
+        <return-value transfer-ownership="none">
+          <doc xml:whitespace="preserve">the number of media descriptions in @msg.</doc>
+          <type name="guint" c:type="guint"/>
+        </return-value>
+      </method>
+      <method name="phones_len" c:identifier="gst_sdp_message_phones_len">
+        <doc xml:whitespace="preserve">Get the number of phones in @msg.</doc>
+        <return-value transfer-ownership="none">
+          <doc xml:whitespace="preserve">the number of phones in @msg.</doc>
+          <type name="guint" c:type="guint"/>
+        </return-value>
+      </method>
+      <method name="set_connection"
+              c:identifier="gst_sdp_message_set_connection">
+        <doc xml:whitespace="preserve">Configure the SDP connection in @msg with the given parameters.</doc>
+        <return-value transfer-ownership="none">
+          <doc xml:whitespace="preserve">a #GstSDPResult.</doc>
+          <type name="SDPResult" c:type="GstSDPResult"/>
+        </return-value>
+        <parameters>
+          <parameter name="nettype" transfer-ownership="none">
+            <doc xml:whitespace="preserve">the type of network. "IN" is defined to have the meaning "Internet".</doc>
+            <type name="utf8" c:type="gchar*"/>
+          </parameter>
+          <parameter name="addrtype" transfer-ownership="none">
+            <doc xml:whitespace="preserve">the type of address.</doc>
+            <type name="utf8" c:type="gchar*"/>
+          </parameter>
+          <parameter name="address" transfer-ownership="none">
+            <doc xml:whitespace="preserve">the address</doc>
+            <type name="utf8" c:type="gchar*"/>
+          </parameter>
+          <parameter name="ttl" transfer-ownership="none">
+            <doc xml:whitespace="preserve">the time to live of the address</doc>
+            <type name="guint" c:type="guint"/>
+          </parameter>
+          <parameter name="addr_number" transfer-ownership="none">
+            <doc xml:whitespace="preserve">the number of layers</doc>
+            <type name="guint" c:type="guint"/>
+          </parameter>
+        </parameters>
+      </method>
+      <method name="set_information"
+              c:identifier="gst_sdp_message_set_information">
+        <doc xml:whitespace="preserve">Set the information in @msg.</doc>
+        <return-value transfer-ownership="none">
+          <doc xml:whitespace="preserve">a #GstSDPResult.</doc>
+          <type name="SDPResult" c:type="GstSDPResult"/>
+        </return-value>
+        <parameters>
+          <parameter name="information" transfer-ownership="none">
+            <doc xml:whitespace="preserve">the information</doc>
+            <type name="utf8" c:type="gchar*"/>
+          </parameter>
+        </parameters>
+      </method>
+      <method name="set_key" c:identifier="gst_sdp_message_set_key">
+        <doc xml:whitespace="preserve">Adds the encryption information to @msg.</doc>
+        <return-value transfer-ownership="none">
+          <doc xml:whitespace="preserve">a #GstSDPResult.</doc>
+          <type name="SDPResult" c:type="GstSDPResult"/>
+        </return-value>
+        <parameters>
+          <parameter name="type" transfer-ownership="none">
+            <doc xml:whitespace="preserve">the encryption type</doc>
+            <type name="utf8" c:type="gchar*"/>
+          </parameter>
+          <parameter name="data" transfer-ownership="none">
+            <doc xml:whitespace="preserve">the encryption data</doc>
+            <type name="utf8" c:type="gchar*"/>
+          </parameter>
+        </parameters>
+      </method>
+      <method name="set_origin" c:identifier="gst_sdp_message_set_origin">
+        <doc xml:whitespace="preserve">Configure the SDP origin in @msg with the given parameters.</doc>
+        <return-value transfer-ownership="none">
+          <doc xml:whitespace="preserve">#GST_SDP_OK.</doc>
+          <type name="SDPResult" c:type="GstSDPResult"/>
+        </return-value>
+        <parameters>
+          <parameter name="username" transfer-ownership="none">
+            <doc xml:whitespace="preserve">the user name</doc>
+            <type name="utf8" c:type="gchar*"/>
+          </parameter>
+          <parameter name="sess_id" transfer-ownership="none">
+            <doc xml:whitespace="preserve">a session id</doc>
+            <type name="utf8" c:type="gchar*"/>
+          </parameter>
+          <parameter name="sess_version" transfer-ownership="none">
+            <doc xml:whitespace="preserve">a session version</doc>
+            <type name="utf8" c:type="gchar*"/>
+          </parameter>
+          <parameter name="nettype" transfer-ownership="none">
+            <doc xml:whitespace="preserve">a network type</doc>
+            <type name="utf8" c:type="gchar*"/>
+          </parameter>
+          <parameter name="addrtype" transfer-ownership="none">
+            <doc xml:whitespace="preserve">an address type</doc>
+            <type name="utf8" c:type="gchar*"/>
+          </parameter>
+          <parameter name="addr" transfer-ownership="none">
+            <doc xml:whitespace="preserve">an address</doc>
+            <type name="utf8" c:type="gchar*"/>
+          </parameter>
+        </parameters>
+      </method>
+      <method name="set_session_name"
+              c:identifier="gst_sdp_message_set_session_name">
+        <doc xml:whitespace="preserve">Set the session name in @msg.</doc>
+        <return-value transfer-ownership="none">
+          <doc xml:whitespace="preserve">a #GstSDPResult.</doc>
+          <type name="SDPResult" c:type="GstSDPResult"/>
+        </return-value>
+        <parameters>
+          <parameter name="session_name" transfer-ownership="none">
+            <doc xml:whitespace="preserve">the session name</doc>
+            <type name="utf8" c:type="gchar*"/>
+          </parameter>
+        </parameters>
+      </method>
+      <method name="set_uri" c:identifier="gst_sdp_message_set_uri">
+        <doc xml:whitespace="preserve">Set the URI in @msg.</doc>
+        <return-value transfer-ownership="none">
+          <doc xml:whitespace="preserve">a #GstSDPResult.</doc>
+          <type name="SDPResult" c:type="GstSDPResult"/>
+        </return-value>
+        <parameters>
+          <parameter name="uri" transfer-ownership="none">
+            <doc xml:whitespace="preserve">the URI</doc>
+            <type name="utf8" c:type="gchar*"/>
+          </parameter>
+        </parameters>
+      </method>
+      <method name="set_version" c:identifier="gst_sdp_message_set_version">
+        <doc xml:whitespace="preserve">Set the version in @msg.</doc>
+        <return-value transfer-ownership="none">
+          <doc xml:whitespace="preserve">a #GstSDPResult.</doc>
+          <type name="SDPResult" c:type="GstSDPResult"/>
+        </return-value>
+        <parameters>
+          <parameter name="version" transfer-ownership="none">
+            <doc xml:whitespace="preserve">the version</doc>
+            <type name="utf8" c:type="gchar*"/>
+          </parameter>
+        </parameters>
+      </method>
+      <method name="times_len" c:identifier="gst_sdp_message_times_len">
+        <doc xml:whitespace="preserve">Get the number of time information entries in @msg.</doc>
+        <return-value transfer-ownership="none">
+          <doc xml:whitespace="preserve">the number of time information entries in @msg.</doc>
+          <type name="guint" c:type="guint"/>
+        </return-value>
+      </method>
+      <method name="uninit" c:identifier="gst_sdp_message_uninit">
+        <doc xml:whitespace="preserve">Free all resources allocated in @msg. @msg should not be used anymore after
+this function. This function should be used when @msg was allocated on the
+stack and initialized with gst_sdp_message_init().</doc>
+        <return-value transfer-ownership="none">
+          <doc xml:whitespace="preserve">a #GstSDPResult.</doc>
+          <type name="SDPResult" c:type="GstSDPResult"/>
+        </return-value>
+      </method>
+      <method name="zones_len" c:identifier="gst_sdp_message_zones_len">
+        <doc xml:whitespace="preserve">Get the number of time zone information entries in @msg.</doc>
+        <return-value transfer-ownership="none">
+          <doc xml:whitespace="preserve">the number of time zone information entries in @msg.</doc>
+          <type name="guint" c:type="guint"/>
+        </return-value>
+      </method>
+    </record>
+    <record name="SDPOrigin" c:type="GstSDPOrigin">
+      <doc xml:whitespace="preserve">The contents of the SDP "o=" field which gives the originator of the session
+(their username and the address of the user's host) plus a session id and
+session version number.</doc>
+      <field name="username" writable="1">
+        <type name="utf8" c:type="gchar*"/>
+      </field>
+      <field name="sess_id" writable="1">
+        <type name="utf8" c:type="gchar*"/>
+      </field>
+      <field name="sess_version" writable="1">
+        <type name="utf8" c:type="gchar*"/>
+      </field>
+      <field name="nettype" writable="1">
+        <type name="utf8" c:type="gchar*"/>
+      </field>
+      <field name="addrtype" writable="1">
+        <type name="utf8" c:type="gchar*"/>
+      </field>
+      <field name="addr" writable="1">
+        <type name="utf8" c:type="gchar*"/>
+      </field>
+    </record>
+    <enumeration name="SDPResult" c:type="GstSDPResult">
+      <doc xml:whitespace="preserve">Return values for the SDP functions.</doc>
+      <member name="ok" value="0" c:identifier="GST_SDP_OK"/>
+      <member name="einval" value="-1" c:identifier="GST_SDP_EINVAL"/>
+    </enumeration>
+    <record name="SDPTime" c:type="GstSDPTime">
+      <doc xml:whitespace="preserve">The contents of the SDP "t=" field which specify the start and stop times for
+a conference session.</doc>
+      <field name="start" writable="1">
+        <type name="utf8" c:type="gchar*"/>
+      </field>
+      <field name="stop" writable="1">
+        <type name="utf8" c:type="gchar*"/>
+      </field>
+      <field name="repeat" writable="1">
+        <array name="GLib.Array" c:type="GArray*">
+          <type name="gpointer" c:type="gpointer"/>
+        </array>
+      </field>
+    </record>
+    <record name="SDPZone" c:type="GstSDPZone">
+      <doc xml:whitespace="preserve">The contents of the SDP "z=" field which allows the sender to
+specify a list of time zone adjustments and offsets from the base
+time.</doc>
+      <field name="time" writable="1">
+        <type name="utf8" c:type="gchar*"/>
+      </field>
+      <field name="typed_time" writable="1">
+        <type name="utf8" c:type="gchar*"/>
+      </field>
+    </record>
+    <constant name="SDP_BWTYPE_AS" value="AS">
+      <type name="utf8" c:type="gchar*"/>
+    </constant>
+    <constant name="SDP_BWTYPE_CT" value="CT">
+      <type name="utf8" c:type="gchar*"/>
+    </constant>
+    <constant name="SDP_BWTYPE_EXT_PREFIX" value="X-">
+      <type name="utf8" c:type="gchar*"/>
+    </constant>
+    <constant name="SDP_BWTYPE_RR" value="RR">
+      <type name="utf8" c:type="gchar*"/>
+    </constant>
+    <constant name="SDP_BWTYPE_RS" value="RS">
+      <type name="utf8" c:type="gchar*"/>
+    </constant>
+    <function name="sdp_address_is_multicast"
+              c:identifier="gst_sdp_address_is_multicast"
+              version="0.10.32">
+      <doc xml:whitespace="preserve">Check if the given @addr is a multicast address.</doc>
+      <return-value transfer-ownership="none">
+        <doc xml:whitespace="preserve">TRUE when @addr is multicast.</doc>
+        <type name="gboolean" c:type="gboolean"/>
+      </return-value>
+      <parameters>
+        <parameter name="nettype" transfer-ownership="none">
+          <doc xml:whitespace="preserve">a network type</doc>
+          <type name="utf8" c:type="gchar*"/>
+        </parameter>
+        <parameter name="addrtype" transfer-ownership="none">
+          <doc xml:whitespace="preserve">an address type</doc>
+          <type name="utf8" c:type="gchar*"/>
+        </parameter>
+        <parameter name="addr" transfer-ownership="none">
+          <doc xml:whitespace="preserve">an address</doc>
+          <type name="utf8" c:type="gchar*"/>
+        </parameter>
+      </parameters>
+    </function>
+    <function name="sdp_media_new" c:identifier="gst_sdp_media_new">
+      <doc xml:whitespace="preserve">Allocate a new GstSDPMedia and store the result in @media.</doc>
+      <return-value transfer-ownership="none">
+        <doc xml:whitespace="preserve">a #GstSDPResult.</doc>
+        <type name="SDPResult" c:type="GstSDPResult"/>
+      </return-value>
+      <parameters>
+        <parameter name="media" transfer-ownership="none">
+          <doc xml:whitespace="preserve">pointer to new #GstSDPMedia</doc>
+          <type name="SDPMedia" c:type="GstSDPMedia**"/>
+        </parameter>
+      </parameters>
+    </function>
+    <function name="sdp_message_as_uri"
+              c:identifier="gst_sdp_message_as_uri"
+              version="0.10.31">
+      <doc xml:whitespace="preserve">Creates a uri from @msg with the given @scheme. The uri has the format:
+Where each value is url encoded.</doc>
+      <return-value transfer-ownership="full">
+        <doc xml:whitespace="preserve">a uri for @msg.</doc>
+        <type name="utf8" c:type="gchar*"/>
+      </return-value>
+      <parameters>
+        <parameter name="scheme" transfer-ownership="none">
+          <doc xml:whitespace="preserve">the uri scheme</doc>
+          <type name="utf8" c:type="gchar*"/>
+        </parameter>
+        <parameter name="msg" transfer-ownership="none">
+          <doc xml:whitespace="preserve">the #GstSDPMessage</doc>
+          <type name="SDPMessage" c:type="GstSDPMessage*"/>
+        </parameter>
+      </parameters>
+    </function>
+    <function name="sdp_message_new" c:identifier="gst_sdp_message_new">
+      <doc xml:whitespace="preserve">Allocate a new GstSDPMessage and store the result in @msg.</doc>
+      <return-value transfer-ownership="none">
+        <doc xml:whitespace="preserve">a #GstSDPResult.</doc>
+        <type name="SDPResult" c:type="GstSDPResult"/>
+      </return-value>
+      <parameters>
+        <parameter name="msg" transfer-ownership="none">
+          <doc xml:whitespace="preserve">pointer to new #GstSDPMessage</doc>
+          <type name="SDPMessage" c:type="GstSDPMessage**"/>
+        </parameter>
+      </parameters>
+    </function>
+    <function name="sdp_message_parse_buffer"
+              c:identifier="gst_sdp_message_parse_buffer">
+      <doc xml:whitespace="preserve">Parse the contents of @size bytes pointed to by @data and store the result in</doc>
+      <return-value transfer-ownership="none">
+        <doc xml:whitespace="preserve">#GST_SDP_OK on success.</doc>
+        <type name="SDPResult" c:type="GstSDPResult"/>
+      </return-value>
+      <parameters>
+        <parameter name="data" transfer-ownership="none">
+          <doc xml:whitespace="preserve">the start of the buffer</doc>
+          <type name="guint8" c:type="guint8*"/>
+        </parameter>
+        <parameter name="size" transfer-ownership="none">
+          <doc xml:whitespace="preserve">the size of the buffer</doc>
+          <type name="guint" c:type="guint"/>
+        </parameter>
+        <parameter name="msg" transfer-ownership="none">
+          <doc xml:whitespace="preserve">the result #GstSDPMessage</doc>
+          <type name="SDPMessage" c:type="GstSDPMessage*"/>
+        </parameter>
+      </parameters>
+    </function>
+    <function name="sdp_message_parse_uri"
+              c:identifier="gst_sdp_message_parse_uri"
+              version="0.10.31">
+      <doc xml:whitespace="preserve">Parse the null-terminated @uri and store the result in @msg.
+The uri should be of the form:
+scheme://[address[:ttl=ttl][:noa=noa]]/[sessionname]
+[#type=value *[&amp;type=value]]
+where value is url encoded. This looslely resembles
+http://tools.ietf.org/html/draft-fujikawa-sdp-url-01</doc>
+      <return-value transfer-ownership="none">
+        <doc xml:whitespace="preserve">#GST_SDP_OK on success.</doc>
+        <type name="SDPResult" c:type="GstSDPResult"/>
+      </return-value>
+      <parameters>
+        <parameter name="uri" transfer-ownership="none">
+          <doc xml:whitespace="preserve">the start of the uri</doc>
+          <type name="utf8" c:type="gchar*"/>
+        </parameter>
+        <parameter name="msg" transfer-ownership="none">
+          <doc xml:whitespace="preserve">the result #GstSDPMessage</doc>
+          <type name="SDPMessage" c:type="GstSDPMessage*"/>
+        </parameter>
+      </parameters>
+    </function>
+  </namespace>
+</repository>

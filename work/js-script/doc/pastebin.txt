@@ -1,0 +1,3 @@
+: x 0 sleep 3 random-numbers color 4 random-numbers line x ; : random-numbers 400 <array> [ random ] each ; x
+
+

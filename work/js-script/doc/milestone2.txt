@@ -1,0 +1,31 @@
+
+- sequence (protocol?)
+  * Most of the assoc, sequence, and string vocabs
+  * string is seq, "hello" [ 1 + ] map must work
+  * subseq and <slice>, the latter is virtual and mutation affects original
+  * quotations are sequences
+  * ranges, 1 10 [a,b]
+
+- immutability/mutability (e.g. dup makes shallow copy; problem for mutable objects operated with "compose" and ","
+  * vectors are resizable with prefix & suffix 
+
+- fry syntax
+  *  _ and @
+
+- SYNTAX:
+  * should support forward-reading  
+  * how are rest-strings accessed?   
+  ** call lexer with some kind of next-word
+
+- literalize, \, <wrapper>
+  * define with fry syntax?
+
+FIX
+----
+- some parsing words should not contain other definitions inside them, 
+  * e.g. SYNTAX: SYNTAX: ; ; // the inner SYNTAX: should be ignored
+
+- copy semantics are not the same as in real factor
+  * should do deep copy for some things?
+    ** problem with mutability curry, compose, "," if dup used to quotation
+

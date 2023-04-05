@@ -1,0 +1,24 @@
+
+- continuation support
+  * sleep and pressed should work anywhere (is this too hard a requirement?)
+
+- recursive calls shouldn't blow up the javascript stack
+  * create continuation if user word is called
+  ** it would be enough that call chain contained calls that have been made and only create new continuation if current word has been used before
+
+- custom words UI
+  * show popup for definition
+  * action: get all as one string
+
+- information about word categories as popup
+
+- clickable examples for words
+
+- number system
+  * should be wrapped values
+  * add support for rational numbers
+  * currently acts similarly to javascript
+
+- document architecture and some details
+  * cleanup code a bit
+

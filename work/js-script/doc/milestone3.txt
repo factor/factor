@@ -1,0 +1,37 @@
+- assoc
+  * should be modified so that operations are O(1) instead of O(n)
+  * create custom javascript map
+
+- macros
+  * how did they differ from SYNTAX:
+
+- TUPLES
+
+- CLOS object system
+
+- stack
+  * undo stack
+  ** show old stacks visually
+  ** choose one
+
+- tooltips for custom word definitions
+  * example  : custom 50 custom2 swap ;
+  ** for swap: open word definiton popup
+  ** for custom2: show arrow to custom2 definition with popup
+  ** for literal: show type
+
+- different color styles
+- syntax coloring
+
+- environment
+  * add safe mode:
+  ** limit interpreter calls (prevents infinite loops)
+
+- undoing of failed execution
+  * just backup stack is not enough, if copying is shallow
+  * mutated values are different
+
+- rest of the locals
+  * :: adder ( n -- quot ) [| m | m n + ] ;  ! closes over n
+    3 5 adder call  ====> 8
+  * [let code :> var code var code... ]

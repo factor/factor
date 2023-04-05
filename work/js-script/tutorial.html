@@ -1,0 +1,132 @@
+<!doctype html>
+
+<html lang='en' xmlns='http://www.w3.org/1999/xhtml'> 
+<head>
+	<meta charset='utf-8' />
+	<link rel="stylesheet" type="text/css" href="tutorial.css" />
+  <title>The Flow of Factor</title>
+  <script type="text/Javascript" src="js/jquery.js"></script>
+
+  <script type="text/Javascript" src="js/canvas.js"></script> <!-- FIXME: load only if canvas is supported -->
+  <script type="text/Javascript" src="js/ui_event.js"></script>
+  
+ 	<script type="text/Javascript" src="js/generic.js"></script>
+	<script type="text/Javascript" src="js/command_history.js"></script>
+	<script type="text/Javascript" src="js/tutorial.js"></script>
+	<script type="text/Javascript" src="js/native_words.js"></script>
+	<script type="text/Javascript" src="js/interpreter.js"></script>
+	<script type="text/Javascript" src="js/parser.js"></script>
+	
+	<script type="text/Javascript">
+		$(function(){ $('.javascript_support').hide(); }); // if javascript is enabled, the requirement info can be removed
+	  initTutorial();
+	</script>
+
+</head>
+
+<body>
+
+  <div class="main">
+		<div class="introduction">
+			<h1>The Flow of Factor</h1>
+			<p>This is an <em>interactive</em> tutorial about <a href="http://factorcode.org/">Factor</a> the programming language. See also visually-oriented <a href="playground.html">Factor playground.</a></p>
+			<p><strong>Feedback</strong>: henrik.huttunen@gmail.com</p>
+		</div>
+		
+		<div class="javascript_support">
+		  <h2>You must enable browser scripting to see interpreted results!</h2>
+		</div>
+		
+		<div>
+      <h2>Brief introduction to Factor</h2>
+      <p>
+        Factor is a language for practical use. It has powerful features such as closures and macros but it differs from other mainstream languages in more profound way. Mainly the programming is oriented not on data but on functions, which are called <em>words</em>. In Factor this approach comes from that mostly you don't pass parameters to functions explicitly. The values you operate upon are on an implicit stack. Also, the model of executing functions is straightforward: they are interpreted from left to right. 
+      </p>
+      <p>
+        In combination with parse time manipulation (parse words), this approach gives unique feel towards problem solving. For example, to refactor long function into subfunctions, you just cut-and-paste any sequence of words into new functions. Also understanding the flow of programs is greatly simplified. This means that libraries that are specifically suited for certain domains, are beautifully expressed but also comprehensible semantically [1].
+      </p>
+      <p><small>[1] Contrast this f.ex. to Scala, in which implicits are cumbersome and understanding expressions containing them takes effort for a novice.</small></p>
+    </div>
+    
+    <div>
+      <h2>Your first words</h2>
+      <p>This tutorial is interactive, so that you can concretely get a feel for how stack oriented approach works. Luckily for us, stack is easily visualizable. Here's our first example.</p>
+
+			<p>
+			  In below you see a stack under "before" and "after" titles. In the between is the word (i.e. function) that is executed. The word starts operating on the stack on the left; the stack after execution is on the right-hand side.
+			</p>
+
+		  <p>
+		  	Our first word is <span class="code">swap</span>, which is a basic shuffle word. It changes the stack by switching the places of two topmost values. See how values 1 and 2 appear on different slots of the stacks but 3 is not affected. 
+		  </p>      
+
+			<div class="codeblock">
+				<ul>
+					<li>1</li><li>2</li><li>3</li>
+				</ul>
+				<div class="input">swap</div>
+				<ul>
+				</ul>
+				<div class="clear"></div>
+			</div>
+
+			<p>
+			  Here's another one. <span class="code">dup</span> duplicates the topmost value.
+			</p>
+			
+			<div class="codeblock">
+			  <ul>
+			    <li>4</li>
+			  </ul>
+			  <div class="input">dup</div>
+			  <ul>
+			  </ul>
+			  <div class="clear"></div>
+			</div>      
+
+			<p>
+			  We can combine two words together by concatenating them into space-separated string. Remember that the execution goes from left to right. So here's <span class="code">swap dup</span>.
+			</p>
+			
+			<div class="codeblock">
+			  <ul>
+			    <li>4</li><li>1</li>
+			  </ul>
+			  <div class="input">swap dup</div>
+			  <ul>
+			  </ul>
+			  <div class="clear"></div>
+			</div>      
+      
+			<p>
+			  It's <em>your</em> turn to shuffle the stack. Write a combination of <em>swap</em> and <em>dup</em> into the input box and press enter or click the execute button. You can also add more values onto stack by just separating them with spaces, e.g. <span class="code">5 3</span>.
+			</p>
+
+			<div class="codeblock">
+			  <ul>
+			    <li>1</li><li>2</li>
+			  </ul>
+
+			  <div class="userinput">
+					<input />
+					<button>Execute</button>
+			  </div>
+
+			  <ul>
+			    
+			  </ul>
+			  <div class="clear"></div>
+			</div>      
+      
+    </div>
+    
+    <p>
+      This was only the beginning. I'm going to cover most basic use cases of Factor later. Stay tuned.
+    </p>
+	</div>
+
+	<footer />	
+
+</body>
+</html>
+

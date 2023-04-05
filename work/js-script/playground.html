@@ -1,0 +1,145 @@
+<!doctype html>
+
+<html lang='en' xmlns='http://www.w3.org/1999/xhtml'> 
+<head>
+	<meta charset='utf-8' />
+	<link rel="stylesheet" type="text/css" href="css.css" />
+  <title>Factor Playground</title>
+  <script type="text/Javascript" src="js/jquery.js"></script>
+  <script type="text/Javascript" src="js/jquery.json-2.2.min.js"></script> <!-- must be loaded before jstorage -->
+  <script type="text/Javascript" src="js/jstorage.js"></script>
+  
+  <script type="text/Javascript" src="js/canvas.js"></script> <!-- FIXME: load only if canvas is supported -->
+  <script type="text/Javascript" src="js/ui_event.js"></script>
+ 	<script type="text/Javascript" src="js/generic.js"></script>
+	<script type="text/Javascript" src="js/command_history.js"></script>
+	<script type="text/Javascript" src="js/main.js"></script>
+	<script type="text/Javascript" src="js/native_words.js"></script>
+	<script type="text/Javascript" src="js/interpreter.js"></script>
+	<script type="text/Javascript" src="js/parser.js"></script>
+	<script type="text/Javascript" src="js/tests.js"></script>
+	<script type="text/Javascript" src="js/examples.js"></script>
+	
+	<script type="text/Javascript">
+		try {
+	    //JSFACTOR_TESTS.run_tests();
+	  } catch(e) {
+	  	alert('failed to run tests: firebug console probably not present');
+	  }
+	  
+	  initMain();
+	</script>
+
+</head>
+
+<body>
+
+  <div class="introduction">
+    <div class="remove">Hide</div>
+		<h1>Factor playground</h1>
+		<p>The essential features of <a href="http://factorcode.org/">Factor</a> for learning. If you are new to Factor, take a look at my <a href="tutorial.html">tutorial</a>.
+		<br />Sources and wiki are available at <a href="http://bitbucket.org/egaga/js-factor/">http://bitbucket.org/egaga/js-factor/</a>
+		<br />Share your ideas and experiences in <a href="http://www.reddit.com/r/factorplayground/">reddit</a>. Direct feedback: <strong>henrik.huttunen@gmail.com</strong>
+  </div>
+  
+  <div class="main">
+    <div>
+			<div id="general_popup"></div>      
+      <div class="wrapper native">
+				<div class="popup"></div> <!-- word description popup -->
+      
+				<div class="headline">
+          <h2>Native Words</h2>
+          <span class="whatsthis">What's this?</span>
+          <div style="clear: both;"></div>
+        </div>
+        
+        <div class="whatsthis_popup">
+           Native words are predefined functions with which you can start modifying the stack.<br /><br /><strong>Hover</strong> on a word and you will see a description of it. Moreover, you are shown the word's stack effect, which tells how the word affects the stack. Here's an example:<br /><br /><span class="popupcode">( x y -- y x )</span><br /><br />Before "--" is elements that are taken from the stack (when word is used) and after "--" are the elements that are put back. Note that the names in stack effect are only descriptive.<br /><br />Factor requires you to write stack effects for your own words but this enviroment does not for ease-of-use.
+           <br /><br />Also, by hovering on word, you get an example of the use in the bottom right corner. Click on the "Step trough..." button to see the example step-by-step. 
+        </div>
+        <div id="nativewords"></div>
+      </div>
+
+      <div class="stackwrapper wrapper">
+				<div class="headline">
+          <h2>Stack</h2>
+          <span class="whatsthis">What's this?</span>
+          <div style="clear: both;"></div>
+        </div>
+
+        <div class="whatsthis_popup">Stack is the placeholder for values you operate on. Words (i.e. functions) modify the stack, starting from the topmost. You can add a number to stack by just writing it into the input and press enter.</div>        
+        <div id="stack"></div>
+      </div>
+
+   		<div class="wrapper">
+   			<div class="wrapper">
+     			<h2 style="position: absolute">History</h2> <!-- A hack; without absolute position, seems to distrubt the flow -->
+
+					<textarea id="result"></textarea>
+				</div>
+
+				<div class="wrapper">
+					<div class="headline">
+						<h2 class="all_custom_words">Custom words</h2>
+						<span class="whatsthis">What's this?</span>
+						<span class="save_custom_words" style="display: inline;">Save</span>
+						<div style="clear: both;"></div>
+					</div>
+
+					<div class="whatsthis_popup">You can define your own words (functions).<br /><br />The syntax is:<br /><br /><span class="popupcode">: wordname &lt;sequence of valid symbols&gt; ;</span><br /><br />An example  <span class="popupcode">: double 2 * ;</span> which would define a word named "double" that puts number <span class="popupcode">2</span> on the stack and then uses multiplication word named <span class="popupcode">*</span>.<br /><br />Click on "Custom words" headline and you will get all of the custom words as a string in the input. By executing that string on another session, you define all of the custom words in one go.<br /><br />Alternatively, you can save them locally, if your browser supports it. Try it out!</div>
+						<div id="words"></div>
+					</div>
+
+				<div style="clear: both;"></div>
+
+				<div class="wrapper" style="float:right">
+					<p>
+					  <label for="command">Type space-separated words</label>
+					</p>
+
+					<p>
+   				<input type="text" id="command" tabindex = "1" /> 
+   				<input id="executeButton" type="button" value="Execute" tabindex ="2" />
+   				</p>
+   				
+		<div class="examplewrapper">
+			<div id="example">
+				<span class="next">1</span> <span>2</span> <span>+</span>
+			</div>
+			<button id="exampleButton">
+			 Step through example
+			</button>
+
+		</div>
+
+   		</div>
+
+		</div>
+
+		
+		
+
+   </div>
+
+	</div>
+
+  <div class="canvaswrapper">
+
+ 		<div class="headline">
+			<h2>Drawing canvas</h2>
+			<span class="whatsthis">What's this?</span>
+			<div style="clear: both;"></div>
+		</div>
+    <div class="whatsthis_popup">HTML5 2D Canvas. You can draw on it colored lines and rectangles. See 'graph' category on native words.</div>
+
+  
+		<p class="canvas_topleft">(0, 0)</p>
+    <p class="canvas_bottomright">(600, 400)</p>
+    
+	  <canvas id="canvas" width="600" height="400"></canvas>
+	</div>
+
+</body>
+</html>
+

@@ -1,0 +1,133 @@
+footer { 
+	display: block
+}
+
+footer {
+	height: 59px;
+}
+
+.javascript_support {
+	color: red;
+}
+
+body {
+	background-color: white;
+	font-family: Verdana;
+}
+
+.main {
+	width: 800px;
+	margin: 0 auto;
+}
+
+.code { /* inlined in text */
+	-moz-box-shadow: 1px 1px 2px #bbb;
+	-webkit-box-shadow: 1px 1px 2px #bbb;
+	box-shadow: 1px 1px 2px #bbb;
+	padding: 1px 4px;
+	background-color: gray;
+	color: white;
+}
+
+.codeblock, .code {
+	font-family: monospace;
+	font-size: 1.2em;
+	-moz-box-shadow: 1px 1px 1px #bbb;
+	-webkit-box-shadow: 1px 1px 2px #bbb;
+	box-shadow: 1px 1px 2px #bbb;
+}
+
+.stack {
+	width: 300px;
+	background-color: red;
+}
+
+.codeblock ul {
+	list-style: none;
+}
+
+.codeblock {
+	width: 800px;
+	background-color: #eee;
+}
+
+.codeblock div.clear {	
+	clear: both;	
+}
+
+ 
+.userinput {
+	margin-left: 50px;
+	margin-top: 15px;
+	width: 200px;
+	float: left;
+}
+
+button {
+	margin: 5px 0px;
+}
+
+ul {
+	margin-top: 20px;
+	width: 100px;
+	float: left;
+}
+
+.input {
+	margin-left: 50px;
+	margin-right: 50px;
+	margin-top: 20px;
+	float: left;
+	border: 1px solid #ddd;
+}
+
+ul:before {
+	margin-left: -20px;
+	content: "before";
+	color: blue;
+}
+
+div + ul:before {
+	color: red;
+	content: "after"
+}
+
+ul {
+	padding-right: 5px;
+}
+
+
+li:hover {
+	background-color: #ddd;
+}
+
+
+li:first-of-type {
+	margin-top: 10px; /* space between 'before' and first list element */
+}
+
+li {
+
+	text-align: left;
+	shadow: 1px 1px 2px #bbb;
+	-moz-box-shadow: 1px 1px 2px #bbb;
+	-webkit-box-shadow: 1px 1px 2px #bbb;
+	padding: 4px 10px;
+	background-color: white;
+	border: 1px solid #eee;
+}
+
+.input {
+	font-weight: bold;
+	background-color: white;
+	padding: 4px 8px;
+}
+
+input {
+	padding: 2px 2px;
+	font-family: monospace;
+}
+
+input:focus {
+	border-color: gray;
+}

@@ -1,7 +1,7 @@
 ! Copyright (C) 2007, 2010 Eduardo Cavazos, Slava Pestov.
 ! See https://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs combinators continuations
-definitions io io.files io.pathnames kernel make namespaces
+definitions io io.directories io.files io.pathnames kernel make namespaces
 parser sequences sets splitting strings vocabs words ;
 IN: vocabs.loader
 
@@ -14,6 +14,7 @@ CONSTANT: default-vocab-roots {
     "resource:basis"
     "resource:extra"
     "resource:work"
+    "resource:overlays"
 }
 
 STARTUP-HOOK: [
@@ -68,6 +69,11 @@ PRIVATE>
     [ [ dup last ] dip append suffix ] when*
     "/" join ;
 
+: prepend-overlays-dir ( vocab str/f -- path )
+    [ vocab-name "." split ] dip
+    [ [ dup last ] dip append suffix "resource:overlays" prefix ] when*
+    "/" join ;
+
 : find-vocab-root ( vocab -- path/f )
     vocab-name dup ".private" tail? [ drop f ] [
         root-cache get 2dup at [ 2nip ] [
@@ -85,6 +91,10 @@ PRIVATE>
 : vocab-source-path ( vocab -- path/f )
     vocab-name ".private" ?tail drop
     dup ".factor" append-vocab-dir vocab-append-path ;
+
+: vocab-overlay-path ( vocab -- path/f )
+    vocab-name ".private" ?tail drop
+    dup ".factor" prepend-overlays-dir vocab-append-path ;
 
 : vocab-docs-path ( vocab -- path/f )
     vocab-name ".private" ?tail drop
@@ -112,16 +122,31 @@ require-when-table [ V{ } clone ] initialize
         ] assoc-each
     ] when ;
 
+: (load-source-finish) ( vocab quote -- )
+    [ +parsing+ >>source-loaded? ] dip
+    [ parse-file ] [ [ ] ] if*
+    [ % ] [ call( -- ) ] if-bootstrapping
+    +done+ >>source-loaded?
+    load-conditional-requires ;
+
 : load-source ( vocab -- )
     dup check-vocab-hook get call( vocab -- )
     [
-        +parsing+ >>source-loaded?
-        dup vocab-source-path [ parse-file ] [ [ ] ] if*
-        [ +parsing+ >>source-loaded? ] dip
-        [ % ] [ call( -- ) ] if-bootstrapping
-        +done+ >>source-loaded?
-        load-conditional-requires
+        dup vocab-source-path
+        (load-source-finish)
     ] [ ] [ f >>source-loaded? ] cleanup ;
+
+: load-overlay ( vocab -- )
+    "overlays" get-global [
+    dup check-vocab-hook get call( vocab -- )
+    [ dup vocab-overlay-path dup [
+          dup file-exists? [
+              dup [ "Overlay: " over append print ] when
+              (load-source-finish)
+          ] [ drop f >>overlay-loaded? drop ] if
+      ] [  drop f >>overlay-loaded? drop ] if
+    ] [ ] [ f >>overlay-loaded? ] cleanup ]
+    [ drop ] if ; 
 
 : load-docs ( vocab -- )
     load-help? get [
@@ -133,6 +158,11 @@ require-when-table [ V{ } clone ] initialize
     ] when drop ;
 
 PRIVATE>
+
+: load-overlays ( -- )
+    "resource:overlays" recursive-directory-files
+    [ "." split last "factor" = ] filter
+    [ run-file ] each ;
 
 : require-when ( if then -- )
     over [ lookup-vocab ] all? [
@@ -164,6 +194,7 @@ GENERIC: (require) ( name -- )
 M: vocab (require)
     dup source-loaded?>> +parsing+ eq? [
         dup source-loaded?>> [ dup load-source ] unless
+        dup overlay-loaded?>> [ dup load-overlay ] unless
         dup docs-loaded?>> [ dup load-docs ] unless
     ] unless drop ;
 

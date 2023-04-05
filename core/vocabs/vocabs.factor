@@ -9,7 +9,7 @@ SYMBOL: dictionary
 TUPLE: vocab < identity-tuple
 name words
 main help
-source-loaded? docs-loaded? ;
+source-loaded? docs-loaded? overlay-loaded? ;
 
 ! sources-loaded? and docs-loaded? slots could be
 SYMBOLS: +parsing+ +done+ ;

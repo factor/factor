@@ -1,0 +1,1 @@
+Vocabulary to work with /etc/hosts file

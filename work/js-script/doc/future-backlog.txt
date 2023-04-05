@@ -1,0 +1,18 @@
+
+- save environment to local database
+ ** custom words
+
+- code walker / step-by-step execution
+
+POSSIBILITIES
+
+- use modern browser support
+  * call interpreter in its own Worker thread
+
+- write interpreter in factor using earlier interpreter as blackbox :D
+- run on google appengine 
+  * contests?
+
+- click on items on stack and choose a suggested word
+  * could help in shuffling by trying out combinations
+  * also could automatically generate programs by giving stack => stack' examples

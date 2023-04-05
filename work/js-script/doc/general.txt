@@ -1,0 +1,9 @@
+Design decisions (that might change)
+-----------------------------------------
+
+- All words are in global vocabulary
+- Word lookup by name is done when executing, not in parsing phase
+  * it's easy to write functions that wait for implementation
+- No stack effect declarations
+  * could be useful for learning but this the might be annoying to write when playing around
+  * limited screen space
