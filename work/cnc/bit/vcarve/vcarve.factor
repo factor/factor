@@ -1,9 +1,9 @@
 ! Copyright (C) 2023 Dave Carlton.
 ! See https://factorcode.org/license.txt for BSD license.
-USING: accessors ascii classes.tuple cnc cnc.bit cnc.bit.cutting-data
- cnc.bit.entity cnc.bit.geometry cnc.machine cnc.material combinators.smart db
- db.queries db.tuples db.types kernel math namespaces
- sequences slots.syntax splitting  ;
+USING: accessors ascii classes classes.tuple cnc cnc.bit
+ cnc.bit.cutting-data cnc.bit.entity cnc.bit.geometry cnc.machine cnc.material combinators.smart
+ db db.queries db.tuples db.types kernel math
+ namespaces sequences slots.syntax splitting  ;
 IN: cnc.bit.vcarve
 
 SYMBOL: vcarve-db-path vcarve-db-path [ "/Users/davec/Dropbox/3CL/Data/tools.vtdb" ]  initialize
@@ -99,11 +99,11 @@ vcarve-bit-geometry "tool_geometry" {
     bit-geometry new
     [ copy-slots{ name tool_type units diameter notes id } ] 2keep
     over name>> has-shank? [ >>shank ] [ drop ] if 
-    insert-tuple 2drop ;
+    replace-tuple 2drop ;
     
 
-: create-cnc-bit-geometry ( -- )
-    [ bit-geometry recreate-table
+: update-cnc-bit-geometry ( -- )
+    [ bit-geometry ensure-table
       vcarve-bit-geometries [ vcarve>cnc-bit-geometry ] each 
     ] with-cncdb ;
 
@@ -140,11 +140,11 @@ vcarve-tool-cutting-data "tool_cutting_data" {
 
 : vcarve>cnc-bit-cutting-data ( vcarve-data -- )
     bit-cutting-data new
-    [ copy-slots{ stepdown stepover spindle_speed spindle_dir rate_units feed_rate plunge_rate notes id } ] 
-    insert-tuple ;
+    copy-slots{ stepdown stepover spindle_speed spindle_dir rate_units feed_rate plunge_rate notes id } 
+    replace-tuple ;
     
-: create-cnc-bit-cutting-data ( -- )
-    [ bit-cutting-data recreate-table
+: update-cnc-bit-cutting-data ( -- )
+    [ bit-cutting-data ensure-table
       vcarve-tool-cutting-datas [ vcarve>cnc-bit-cutting-data ] each 
     ] with-cncdb ;
     
@@ -166,11 +166,12 @@ vcarve-tool-entity "tool_entity" {
 
 : vcarve>cnc-bit-entity ( vcarve>cnc-bit-entity -- )
     bit-entity new
-    [ copy-slots{ id tool_geometry_id tool_cutting_data_id material_id machine_id } ] 
-    insert-tuple ;
+    copy-slots{ id tool_geometry_id tool_cutting_data_id material_id machine_id }
+    dup tuple-slots [ f over = [ drop NULL ] when ] map  swap class-of slots>tuple 
+    replace-tuple ;
 
-: create-cnc-bit-entity ( -- )
-    [ bit-entity recreate-table
+: update-cnc-bit-entity ( -- )
+    [ bit-entity ensure-table
       vcarve-tool-entities [ vcarve>cnc-bit-entity ] each 
     ] with-cncdb ;
 
@@ -190,12 +191,10 @@ vcarve-material "material" {
     ] with-vcarvedb ;
 
 : vcarve>cnc-material ( vcarve-material -- )
-    cnc-material new
-    [ copy-slots{ id name } ]
-    insert-tuple ;
+    material new copy-slots{ id name } ensure-table ;
 
-: create-cnc-material ( -- )
-    [ cnc-material recreate-table
+: update-cnc-material ( -- )
+    [ material ensure-table
       vcarve-materials [ vcarve>cnc-material ] each 
     ] with-cncdb ;
 
@@ -222,23 +221,23 @@ vcarve-machine "machine" {
     ] with-vcarvedb ;
 
 : vcarve>cnc-machine ( vcarve-material -- )
-    cnc-machine new
+    machine new
     [ copy-slots{ name make model support_rotary support_tool_change id } ] 2keep
     over controller_type>> >>type
     over dimensions_units>> >>units
     over max_width>> >>xmax
     over max_height>> >>ymax
-    insert-tuple  2drop ;
+    replace-tuple  2drop ;
 
-: create-cnc-machine ( -- )
-    [ cnc-machine recreate-table
+: update-cnc-machine ( -- )
+    [ machine ensure-table
       vcarve-machines [ vcarve>cnc-machine ] each 
     ] with-cncdb ;
 
-: create-cncdb ( -- )
-    create-cnc-bit-entity
-    create-cnc-bit-cutting-data
-    create-cnc-bit-geometry
-    create-cnc-material
-    create-cnc-machine
+: update-cncdb ( -- )
+    update-cnc-bit-entity
+    update-cnc-bit-cutting-data
+    update-cnc-bit-geometry
+    update-cnc-material
+    update-cnc-machine
     ;

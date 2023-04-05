@@ -5,18 +5,19 @@ strings kernel math.parser sequences splitting syntax.terse ;
 IN: cnc.bit.geometry
 
 
-TUPLE: bit-geometry name  tool_type units diameter shank notes amanaid id ;
-bit-geometry "bit-geometry" {
-    { "name" "name-format" TEXT }
+TUPLE: bit-geometry name tool_type units diameter shank notes amanaid id ;
+bit-geometry "bit_geometry" {
+    { "name" "name_format" TEXT }
     { "tool_type" "tool_type" INTEGER }
     { "units" "units" INTEGER }
     { "diameter" "diameter" DOUBLE }
     { "shank" "shank" TEXT }
     { "notes" "notes" TEXT }
     { "amanaid" "amanaid" TEXT }
-    { "id" "id" TEXT }
+    { "id" "id" TEXT +user-assigned-id+ +not-null+ }
 } define-persistent
 
+FROM: strings => trim-whitespace ; 
 : convert-bit-geometry ( bit -- bit )
     [ name>> ] retain  " " split  unclip  dup unclip
     CHAR: # =

@@ -19,8 +19,8 @@ TUPLE: toolpath  id machine bit gcode ;
 FROM: cnc.gcode => f ;
 
 :: boundary ( toolpath -- )   
-    toolpath machine>> x-max>> :> xmax
-    toolpath machine>> y-max>> :> ymax
+    toolpath machine>> xmax>> :> xmax
+    toolpath machine>> ymax>> :> ymax
     { }
     90 G +g
     g1 3000 f +g

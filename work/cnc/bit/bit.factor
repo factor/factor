@@ -11,23 +11,54 @@ namespaces  sequences splitting strings syntax.terse ui
 ui.commands ui.gadgets ui.gadgets.borders ui.gadgets.editors
 ui.gadgets.labels ui.gadgets.packs ui.gadgets.toolbar
 ui.gadgets.worlds ui.gestures ui.tools.browser ui.tools.common
-ui.tools.deploy uuid uuid.private cnc.bit.geometry cnc.bit.entity ;
+ui.tools.deploy uuid uuid.private cnc.bit.entity ;
 IN: cnc.bit
 
 SYMBOL: amanavt-db-path amanavt-db-path [ "/Users/davec/Dropbox/3CL/Data/amanavt.db" ] initialize
 SYMBOL: imperial-db-path imperial-db-path [ "/Users/davec/Desktop/Imperial.db" ]  initialize
 
-ENUM: BitType +straight+ +up+ +down+ +compression+ ;
+ENUM: BitType straight upcut downcut compression ;
 ENUM: ToolType { ballnose 0 } { endmill 1 } { radius-endmill 2 } { v-bit 3 } { engraving 4 } { taper-ballmill 5 }
     { drill 6 } { diamond 7 } { threadmill 14 } { multit-thread 15 } { laser 12 } ; 
 ENUM: RateUnits { mm/sec 0 } { mm/min 1 } { m/min 2 } { in/sec 3 } { in/min 4 } { ft/min 5 } ;
 
 ! TUPLES
-TUPLE: bit name tool_type units diameter stepdown stepover spindle_speed spindle_dir rate_units feed_rate plunge_rate
-    id amana_id entity_id ;
+TUPLE: bit name units tool_type bit_type diameter stepdown stepover spindle_speed spindle_dir
+    flutes shank flute_length shank_length 
+    rate_units feed_rate plunge_rate
+    cost make model source id amana_id entity_id ;
 
+bit "bits" {
+    { "name" "name" TEXT }
+    { "units" "units" INTEGER }
+    { "tool_type" "tool_type" INTEGER }
+    { "bit_type" "bit_type" INTEGER }
+    { "diameter" "diameter" DOUBLE }
+    { "stepdown" "stepdown" DOUBLE }
+    { "stepover" "stepover" DOUBLE }
+    { "spindle_speed" "spindle_speed" INTEGER }
+    { "spindle_dir" "spindle_dir" INTEGER }
+    { "flutes" "flutes" INTEGER }
+    { "shank" "shank" DOUBLE }
+    { "flute_length" "flute_length" DOUBLE }
+    { "shank_length" "shank_length" DOUBLE }
+    { "rate_units" "rate_units" INTEGER }
+    { "feed_rate" "feed_rate" DOUBLE }
+    { "plunge_rate" "plunge_rate" DOUBLE }
+    { "cost" "cost" DOUBLE }
+    { "make" "make" TEXT }
+    { "model" "model" TEXT }
+    { "source" "source" TEXT }
+    { "id" "id" TEXT +user-assigned-id+ +not-null+ }
+    { "amana_id" "amana_id" TEXT }
+    { "entity_id" "entity_id" TEXT }
+} define-persistent 
+
+    
 : <bit> ( -- <bit> )
-    bit new  1 >>tool_type  1 >>units  18000 >>spindle_speed  0 >>spindle_dir  1 >>rate_units  quintid >>id ;
+    bit new  1 >>units  endmill >>tool_type  upcut >>bit_type
+    18000 >>spindle_speed  0 >>spindle_dir 
+    2 >>flutes  mm/min >>rate_units  quintid >>id  ;
 
 : convert-bit-slots ( bit -- bit )
     [ name>> ] retain  " " split  unclip  dup unclip
@@ -46,6 +77,18 @@ TUPLE: bit name tool_type units diameter stepdown stepover spindle_speed spindle
     [ stepdown>> ] retain  >number  >>stepdown 
     [ stepover>> ] retain  >number  >>stepover 
     ;
+
+: cncdb>bit ( cnc-dbvt -- bit )
+    bit slots>tuple convert-bit-slots ;
+
+: do-cncdb ( statement -- result ? )
+    sql-statement set
+    [ sql-statement get sql-query ] with-cncdb
+    dup empty?
+    [ f ] [ [ cncdb>bit ] map t ] if ;
+
+: (inch>mm) ( bit inch -- bit mm )
+    over units>> 1 = [ 25.4 / ] when ;
 
 : >>diameter-mm ( object value -- object )   (inch>mm) >>diameter ;
 : >>stepover-mm ( object value -- object )   (inch>mm) >>stepover ;
@@ -163,9 +206,186 @@ TUPLE: bit name tool_type units diameter stepdown stepover spindle_speed spindle
     { "name LIKE '%SPOIL%1/4\"SHANK'" } bit-where ;
 
 
-: find-bit-id ( id -- bit bit )
-    bit-entity-id=
-    [ tool_geometry_id>> bit-geometry-id= ] [ tool_cutting_data_id>> bit-cutting-data-id= ] bi
-      
-    ;
+: define-bits ( -- )
+    [
+        <bit>
+        "Surface End Mill" >>name
+        endmill enum>number >>tool_type
+        straight enum>number >>bit_type
+        1.0 >>diameter
+        1 >>stepdown-mm
+        .250 >>stepover
+        1/4 >>shank  mm/min enum>number >>rate_units  3000 >>feed_rate  1500 >>plunge_rate 
+        "BINSTAK" >>make  "B08SKYYN7P" >>model
+        "https://www.amazon.com/gp/product/B08SKYYN7P/ref=ppx_yo_dt_b_search_asin_title" >>source 
+        replace-tuple
 
+        <bit>
+        "Carving bit flat nose" >>name
+        +mm+ enum>number >>units
+        endmill enum>number >>tool_type
+        compression enum>number >>bit_type
+        3.175 >>diameter
+        1 >>stepdown
+        3.175 .4 * >>stepover
+        3.175 >>shank  in/min enum>number >>rate_units  17 >>feed_rate  8 >>plunge_rate  
+        "Genmitsu" >>make  "/B08CD99PW" >>model "https://www.amazon.com/gp/product/B08CD99PWL" >>source
+        replace-tuple
+
+        <bit>
+        "Carving bit ball nose" >>name
+        +mm+ enum>number >>units
+        ballnose enum>number >>tool_type
+        compression enum>number >>bit_type
+        3.175 >>diameter
+        1 >>stepdown
+        3.175 .4 * >>stepover
+        3.175 >>shank  in/min enum>number >>rate_units  17 >>feed_rate  8 >>plunge_rate  
+        "Genmitsu" >>make "B08CD99PWL" >>model   "https://www.amazon.com/gp/product/B08CD99PWL" >>source 
+        replace-tuple
+
+        <bit>
+        "Flat end mill" >>name
+        +mm+ enum>number >>units
+        endmill enum>number >>tool_type
+        compression enum>number >>bit_type
+        0.8 >>diameter
+        1 >>stepdown
+        3.175 .4 * >>stepover
+        3.175 >>shank  in/min enum>number >>rate_units  17 >>feed_rate  8 >>plunge_rate  
+        "Genmitsu" >>make  "B08CD99PWL" >>model  "https://www.amazon.com/gp/product/B08CD99PWL" >>source 
+        replace-tuple
+
+        <bit>
+        "Flat end mill" >>name
+        +mm+ enum>number >>units
+        endmill enum>number >>tool_type
+        compression enum>number >>bit_type
+        1.0 >>diameter
+        1 >>stepdown
+        1 .4 * >>stepover
+        3.175 >>shank  in/min enum>number >>rate_units  17 >>feed_rate  8 >>plunge_rate  
+        "Genmitsu" >>make  "B08CD99PWL" >>model  "https://www.amazon.com/gp/product/B08CD99PWL" >>source 
+        replace-tuple
+
+        <bit>
+        "Flat end mill" >>name
+        +mm+ enum>number >>units
+        endmill enum>number >>tool_type
+        compression enum>number >>bit_type
+        1.2 >>diameter
+        1 >>stepdown
+        1.2 .4 * >>stepover
+        3.175 >>shank  in/min enum>number >>rate_units  17 >>feed_rate  8 >>plunge_rate  
+        "Genmitsu" >>make  "B08CD99PWL" >>model  "https://www.amazon.com/gp/product/B08CD99PWL" >>source 
+        replace-tuple
+
+        <bit>
+        "Flat end mill" >>name
+        +mm+ enum>number >>units
+        endmill enum>number >>tool_type
+        compression enum>number >>bit_type
+        1.4 >>diameter
+        1 >>stepdown
+        1.4 .4 * >>stepover
+        3.175 >>shank  in/min enum>number >>rate_units  17 >>feed_rate  8 >>plunge_rate  
+        "Genmitsu" >>make  "B08CD99PWL" >>model  "https://www.amazon.com/gp/product/B08CD99PWL" >>source 
+        replace-tuple
+
+        <bit>
+        "Flat end mill" >>name
+        +mm+ enum>number >>units
+        endmill enum>number >>tool_type
+        compression enum>number >>bit_type
+        1.6 >>diameter
+        1 >>stepdown
+        1.6 .4 * >>stepover
+        3.175 >>shank  in/min enum>number >>rate_units  17 >>feed_rate  8 >>plunge_rate  
+        "Genmitsu" >>make  "B08CD99PWL" >>model  "https://www.amazon.com/gp/product/B08CD99PWL" >>source 
+        replace-tuple
+
+        <bit>
+        "Flat end mill" >>name
+        +mm+ enum>number >>units
+        endmill enum>number >>tool_type
+        compression enum>number >>bit_type
+        1.8 >>diameter
+        1 >>stepdown
+        1.8 .4 * >>stepover
+        3.175 >>shank  in/min enum>number >>rate_units  17 >>feed_rate  8 >>plunge_rate  
+        "Genmitsu" >>make  "B08CD99PWL" >>model  "https://www.amazon.com/gp/product/B08CD99PWL" >>source 
+        replace-tuple
+
+        <bit>
+        "Flat end mill" >>name
+        +mm+ enum>number >>units
+        endmill enum>number >>tool_type
+        compression enum>number >>bit_type
+        1.8 >>diameter
+        1 >>stepdown
+        1.8 .4 * >>stepover
+        3.175 >>shank  in/min enum>number >>rate_units  17 >>feed_rate  8 >>plunge_rate  
+        "Genmitsu" >>make  "B08CD99PWL" >>model  "https://www.amazon.com/gp/product/B08CD99PWL" >>source 
+        replace-tuple
+
+        <bit>
+        "Flat end mill" >>name
+        +mm+ enum>number >>units
+        endmill enum>number >>tool_type
+        compression enum>number >>bit_type
+        2.0 >>diameter
+        1 >>stepdown
+        2.0 .4 * >>stepover
+        3.175 >>shank  in/min enum>number >>rate_units  17 >>feed_rate  8 >>plunge_rate  
+        "Genmitsu" >>make  "B08CD99PWL" >>model  "https://www.amazon.com/gp/product/B08CD99PWL" >>source 
+        replace-tuple
+
+        <bit>
+        "Flat end mill" >>name
+        +mm+ enum>number >>units
+        endmill enum>number >>tool_type
+        compression enum>number >>bit_type
+        2.5 >>diameter
+        1 >>stepdown
+        2.5 .4 * >>stepover
+        3.175 >>shank  in/min enum>number >>rate_units  17 >>feed_rate  8 >>plunge_rate  
+        "Genmitsu" >>make  "B08CD99PWL" >>model  "https://www.amazon.com/gp/product/B08CD99PWL" >>source 
+        replace-tuple
+
+        <bit>
+        "Flat end mill" >>name
+        +mm+ enum>number >>units
+        endmill enum>number >>tool_type
+        compression enum>number >>bit_type
+        3.0 >>diameter
+        1 >>stepdown
+        3.0 .4 * >>stepover
+        3.175 >>shank  in/min enum>number >>rate_units  17 >>feed_rate  8 >>plunge_rate  
+        "Genmitsu" >>make  "B08CD99PWL" >>model  "https://www.amazon.com/gp/product/B08CD99PWL" >>source 
+        replace-tuple
+
+        <bit>
+         "Downcut End Mill Sprial" >>name
+        +mm+ enum>number >>units
+        endmill enum>number >>tool_type
+        downcut enum>number >>bit_type
+        3.0 >>diameter
+        1 >>stepdown
+        3.0 .4 * >>stepover
+        3.175 >>shank  in/min enum>number >>rate_units  17 >>feed_rate  8 >>plunge_rate  
+        "HOZLY" >>make  "B073TXSLQK" >>model "https://www.amazon.com/gp/product/B073TXSLQK" >>source 
+        replace-tuple
+
+        <bit>
+         "Downcut End Mill Sprial" >>name
+        +mm+ enum>number >>units
+        endmill enum>number >>tool_type
+        downcut enum>number >>bit_type
+        3.0 >>diameter
+        1 >>stepdown
+        3.0 .4 * >>stepover
+        3.175 >>shank  in/min enum>number >>rate_units  17 >>feed_rate  8 >>plunge_rate  
+        "Genmitsu" >>make  "B08CD99PWL" >>model  "https://www.amazon.com/gp/product/B08CD99PWL" >>source 
+        replace-tuple
+] with-cncdb
+;

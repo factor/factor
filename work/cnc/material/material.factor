@@ -16,38 +16,35 @@ material "material" {
     { "name" "name" TEXT }
     { "source" "source" TEXT }
     { "cost" "cost" DOUBLE }
-    { "id" "id" +user-assigned-id+ }
+    { "id" "id" TEXT +user-assigned-id+ +not-null+ }
 } define-persistent 
     
 : <material> ( name source cost -- material )
-    material new
-    swap >>cost
-    swap >>source
-    swap >>name ;
+    quintid material boa ;
 
 :: find-material ( named -- material )
-    [ T{ material { name named } } select-tuple ] with-jobs-db ;
+    [ T{ material { name named } } select-tuple ] with-cncdb ;
 
 :: new-material ( named source cost -- material )
     [ material ensure-table 
       material new
       named >>name  source >>source  cost >>cost
-      dup insert-tuple
-    ] with-jobs-db ;
+      dup replace-tuple
+    ] with-cncdb ;
     
 : list-materials ( -- seq )
     1 ;
 
 : define-materials ( -- )
-    [ material recreate-table
-      "Plywoord Sanded 3/4" "Lowes" 57.00 <material> insert-tuple
-    ] with-jobs-db ;
+    [ material ensure-table
+      "Plywoord Sanded 3/4" "Lowes" 57.00 <material> replace-tuple
+    ] with-cncdb ;
 
 ! : define-all ( -- )
 !     define-types define-spindles define-machines  define-bits  define-materials ;
 
 : save-jobs ( -- )
     [  
-    ] with-jobs-db
+    ] with-cncdb
 ;
 

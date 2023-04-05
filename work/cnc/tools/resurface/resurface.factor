@@ -24,8 +24,8 @@ IN: cnc.tools
     ;
 
 :: surface-x ( gcodes toolpath -- gcodes )  ! assume starts at home, ends at home
-    toolpath machine>> x-max>> :> xmax
-    toolpath machine>> y-max>> :> ymax
+    toolpath machine>> xmax>> :> xmax
+    toolpath machine>> ymax>> :> ymax
     toolpath bit>> stepover>> >number :> step
     0 :> x!  0 :> y! 
     gcodes
@@ -42,8 +42,8 @@ IN: cnc.tools
     ;
  
 :: surface-y ( gcodes toolpath -- gcodes )  ! assume starts at home, ends at home
-    toolpath machine>> x-max>> :> xmax
-    toolpath machine>> y-max>> :> ymax
+    toolpath machine>> xmax>> :> xmax
+    toolpath machine>> ymax>> :> ymax
     toolpath bit>> stepover>> >number :> step
     0 :> x!  0 :> y!
     gcodes
@@ -63,8 +63,8 @@ IN: cnc.tools
     <1F>
     "Resurface" >>name
     "Resurface Job" >>model
-    swap >>y-max
-    swap >>x-max ;
+    swap >>ymax
+    swap >>xmax ;
 
 FROM: cnc.gcode => f ; 
 :: resurfacex ( toolpath -- )
@@ -115,10 +115,10 @@ FROM: cnc.bit => >mm ;
     bounds-check
     ;
 
-: resurface ( xmax ymax -- bit )
+: resurface ( xmax ymax -- toolpath )
     "mukaj-togif" bit-id= 
     1 >>stepdown-mm  2 >>rate_units  1.2 >>feed_rate  0.6 >>plunge_rate
-    rot rot [ bit-resurface ] keep ;
+    rot rot bit-resurface  LAST-TOOLPATH get ;
 
 : >onefinity ( -- )
     "/usr/bin/scp /Users/davec/Desktop/Resurface* root@onefinity.local:upload/"
