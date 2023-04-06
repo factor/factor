@@ -131,7 +131,7 @@ M: cgit call-responder*
         <mason-app> <login-config> <factor-boilerplate> website-db <alloy> "builds.factorcode.org" add-responder
         "~/docs" <help-webapp> "docs.factorcode.org" add-responder
         "~/gitweb" <gitweb> "gitweb.factorcode.org" add-responder
-        "/usr/share/cgit" "/usr/lib/cgit/cgit.cgi" <cgit> "cgit.factorcode.org" add-responder
+        "~/cgit" "~/cgit/cgit.cgi" <cgit> "cgit.factorcode.org" add-responder
         "~/irclogs" <static> t >>allow-listings "irclogs.factorcode.org" add-responder
     main-responder set-global ;
 
