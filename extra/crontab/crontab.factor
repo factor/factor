@@ -18,13 +18,13 @@ ERROR: invalid-cronentry value ;
         { [ CHAR: / over member? ] [
             "/" split1 [
                 quot seq parse-value
-                dup length 1 = [ seq swap first ] [ 0 ] if
+                dup length 1 = [ seq swap first seq first - ] [ 0 ] if
                 over length dup 7 = [ [ <circular> ] 2dip ] [ 1 - ] if
             ] dip string>number <range> swap nths ] }
         { [ CHAR: - over member? ] [
             "-" split1 quot bi@ [a..b] ] }
         [ quot call 1array ]
-    } cond ; inline recursive
+    } cond members sort ; inline recursive
 
 : parse-day ( str -- n )
     [ string>number dup 7 = [ drop 0 ] when ] [
@@ -68,7 +68,7 @@ CONSTANT: aliases H{
         [ [ string>number ] T{ range f 0 24 1 } parse-value ]
         [ [ string>number ] T{ range f 1 31 1 } parse-value ]
         [ [ parse-month ] T{ range f 1 12 1 } parse-value ]
-        [ [ parse-day ] T{ range f 0 7 1 } parse-value members sort ]
+        [ [ parse-day ] T{ range f 0 7 1 } parse-value ]
         [ ]
     } spread cronentry boa check-cronentry ;
 

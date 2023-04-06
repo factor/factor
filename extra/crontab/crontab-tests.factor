@@ -187,3 +187,14 @@ CONSTANT: start-timestamp T{ timestamp
         "Mon, 1 Apr 2019 04:05:00 -0700"
     }
 } [ "5 4 * * 1/3" next-few-times ] unit-test
+
+! At 04:05 on every 2nd day-of-month from 1 through 5.
+{
+    {
+        "Mon, 1 Apr 2019 04:05:00 -0700"
+        "Wed, 3 Apr 2019 04:05:00 -0700"
+        "Fri, 5 Apr 2019 04:05:00 -0700"
+        "Wed, 1 May 2019 04:05:00 -0700"
+        "Fri, 3 May 2019 04:05:00 -0700"
+    }
+} [ "5 4 1-5/2 * *" next-few-times ] unit-test
