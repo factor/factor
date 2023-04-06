@@ -26,7 +26,7 @@ ERROR: invalid-cronentry value ;
     } cond ; inline recursive
 
 : parse-day ( str -- n )
-    [ string>number ] [
+    [ string>number dup 7 = [ drop 0 ] when ] [
         >lower $[ day-abbreviations3 [ >lower ] map ] index
     ] ?unless ;
 
