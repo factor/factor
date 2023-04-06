@@ -44,9 +44,11 @@ IN: memoize
 : make/0 ( table quot effect -- quot )
     out>> [
         packer '[
-            _ dup first-unsafe dup null eq? [
-                drop @ @ [ 0 rot set-nth-unsafe ] keep
-            ] [ nip ] if
+            _ dup first-unsafe [ second-unsafe ] [
+                @ @ [
+                    1 pick set-nth-unsafe t 0 rot set-nth-unsafe
+                ] keep
+            ] if
         ]
     ] keep unpacker compose ;
 
@@ -62,11 +64,11 @@ PRIVATE>
     3tri ;
 
 : define-memoized ( word quot effect -- )
-    dup in>> length zero? [ null 1array ] [ H{ } clone ] if
+    dup in>> length zero? [ f f 2array ] [ H{ } clone ] if
     (define-memoized) ;
 
 : define-identity-memoized ( word quot effect -- )
-    dup in>> length zero? [ null 1array ] [ IH{ } clone ] if
+    dup in>> length zero? [ f f 2array ] [ IH{ } clone ] if
     (define-memoized) ;
 
 PREDICATE: memoized < word "memoize" word-prop >boolean ;
@@ -83,18 +85,18 @@ M: memoized reset-word
     bi ;
 
 : memoize-quot ( quot effect -- memo-quot )
-    dup in>> length zero? [ null 1array ] [ H{ } clone ] if
+    dup in>> length zero? [ f f 2array ] [ H{ } clone ] if
     -rot make-memoizer ;
 
 : reset-memoized ( word -- )
     "memoize" word-prop dup sequence?
-    [ null swap set-first ] [ clear-assoc ] if ;
+    [ f swap set-first ] [ clear-assoc ] if ;
 
 : invalidate-memoized ( inputs... word -- )
     [ stack-effect in>> packer call ]
     [
         "memoize" word-prop dup sequence?
-        [ null swap set-first ] [ delete-at ] if
+        [ f swap set-first ] [ delete-at ] if
     ]
     bi ;
 
