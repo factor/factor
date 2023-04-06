@@ -99,25 +99,22 @@ SYMBOLS: key-password key-file dh-file ;
         URL" /gitweb.cgi" <redirect-responder> "" add-responder
         URL" /github-sync.cgi" <redirect-responder> "github-sync" add-responder ;
 
-TUPLE: cgit < file-responder cgi ;
+TUPLE: cgit < file-responder ;
 
-: <cgit> ( root cgi -- responder )
+: <cgit> ( root -- responder )
     cgit new
-        swap >>cgi
         swap >>root
         [ (serve-static) ] >>hook
-        H{ } clone >>special ;
+        H{ } clone >>special
+    enable-cgi ;
 
 M: cgit call-responder*
     dup file-responder set
     over [ f ] [ "/" join serving-path file-exists? ] if-empty [
-        call-next-method
-    ] [
         url get
             rot "/" join "url" set-query-param
-            "cgit.cgi" >>path drop
-        cgi>> serve-cgi
-    ] if ;
+            "cgit.cgi" >>path drop { "cgit.cgi" } swap
+    ] unless call-next-method ;
 
 : init-production ( -- )
     common-configuration
@@ -131,7 +128,7 @@ M: cgit call-responder*
         <mason-app> <login-config> <factor-boilerplate> website-db <alloy> "builds.factorcode.org" add-responder
         "~/docs" <help-webapp> "docs.factorcode.org" add-responder
         "~/gitweb" <gitweb> "gitweb.factorcode.org" add-responder
-        "~/cgit" "~/cgit/cgit.cgi" <cgit> "cgit.factorcode.org" add-responder
+        "~/cgit" <cgit> "cgit.factorcode.org" add-responder
         "~/irclogs" <static> t >>allow-listings "irclogs.factorcode.org" add-responder
     main-responder set-global ;
 
