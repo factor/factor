@@ -422,11 +422,37 @@ M: object accept-completion-hook 2drop ;
 : try-parse ( lines -- quot/f )
     [ parse-lines-interactive ] [ nip '[ _ rethrow ] ] recover ;
 
+SYMBOL: +from-listener?+
+
+! Must be inlined to avoid adding this operation to the callstack
+: set-from-listener? ( -- ? )
+    get-callstack callstack>array second \ listener-step = ; inline
+
+MACRO: (stream-read-quot) ( q1 q2 -- quot/f )
+    '[ 
+        dup @ dup array? [
+            over @ try-parse
+            or* [ stream-read-quot ] unless
+        ] [ nip ] if 
+    ] ;
+
+: handle-finish ( interactor --  )
+    +from-listener?+ get
+        [ interactor-finish        ] 
+        [ interactor-readln-finish ] if ;
+
+: step-read-quot ( interactor -- quot/f )
+    [ interactor-yield ] 
+    [ interactor-finish ] (stream-read-quot) ;
+
+: direct-read-quot ( interactor -- quot/f )
+    [ yield-if-empty ] 
+    [ interactor-readln-finish 1 head ] (stream-read-quot) ;
+
 M: interactor stream-read-quot
-    dup interactor-yield dup array? [
-        over interactor-finish try-parse
-        or* [ stream-read-quot ] unless
-    ] [ nip ] if ;
+    set-from-listener?
+        [ step-read-quot ]
+        [ direct-read-quot ] if ;
 
 : interactor-operation ( gesture interactor -- ? )
     [ token-model>> value>> ] keep word-at-caret
