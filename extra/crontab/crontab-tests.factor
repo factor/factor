@@ -165,3 +165,14 @@ CONSTANT: start-timestamp T{ timestamp
         "Sun, 24 Mar 2019 04:17:00 -0700"
     }
 } [ "5-20/3 4 * * *" next-few-times ] unit-test
+
+! At 04:05 on Sunday.
+{
+    {
+        "Sun, 24 Mar 2019 04:05:00 -0700"
+        "Sun, 31 Mar 2019 04:05:00 -0700"
+        "Sun, 7 Apr 2019 04:05:00 -0700"
+        "Sun, 14 Apr 2019 04:05:00 -0700"
+        "Sun, 21 Apr 2019 04:05:00 -0700"
+    }
+} [ "5 4 * * 7" next-few-times ] unit-test
