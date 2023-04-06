@@ -2,8 +2,9 @@
 ! See https://factorcode.org/license.txt for BSD license
 
 USING: accessors arrays ascii assocs calendar calendar.english
-calendar.private combinators combinators.short-circuit io kernel
-literals math math.order math.parser ranges sequences splitting ;
+calendar.private circular combinators combinators.short-circuit
+io kernel literals math math.order math.parser ranges sequences
+sets sorting splitting ;
 
 IN: crontab
 
@@ -18,7 +19,7 @@ ERROR: invalid-cronentry value ;
             "/" split1 [
                 quot seq parse-value
                 dup length 1 = [ seq swap first ] [ 0 ] if
-                over length 1 -
+                over length dup 7 = [ [ <circular> ] 2dip ] [ 1 - ] if
             ] dip string>number <range> swap nths ] }
         { [ CHAR: - over member? ] [
             "-" split1 quot bi@ [a..b] ] }
@@ -67,7 +68,7 @@ CONSTANT: aliases H{
         [ [ string>number ] T{ range f 0 24 1 } parse-value ]
         [ [ string>number ] T{ range f 1 31 1 } parse-value ]
         [ [ parse-month ] T{ range f 1 12 1 } parse-value ]
-        [ [ parse-day ] T{ range f 0 7 1 } parse-value ]
+        [ [ parse-day ] T{ range f 0 7 1 } parse-value members sort ]
         [ ]
     } spread cronentry boa check-cronentry ;
 
@@ -94,8 +95,8 @@ CONSTANT: aliases H{
         cronentry days>> first timestamp days-in-month +
     ] unless* day - :> days-to-day
 
-    cronentry days-of-week>> T{ range f 0 7 1 } =
-    cronentry days>> T{ range f 1 31 1 } = 2array
+    cronentry days-of-week>> length 7 =
+    cronentry days>> length 31 = 2array
     {
         { { f t } [ days-to-weekday ] }
         { { t f } [ days-to-day ] }
