@@ -437,11 +437,6 @@ MACRO: (stream-read-quot) ( q1 q2 -- quot/f )
         ] [ nip ] if 
     ] ;
 
-: handle-finish ( interactor --  )
-    +from-listener?+ get
-        [ interactor-finish        ] 
-        [ interactor-readln-finish ] if ;
-
 : step-read-quot ( interactor -- quot/f )
     [ interactor-yield ] 
     [ interactor-finish ] (stream-read-quot) ;
