@@ -60,7 +60,7 @@ cli-git-num-parallel [ cpus 2 * ] initialize
     dup git-directory-name git-directory?
     [ git-directory-name git-pull ] [ git-clone ] if ;
 
-: sync-repository-as ( url path -- process )
+: sync-repository-as ( url path -- processes )
     dup git-directory?
     [ nip git-fetch-and-reset-hard-HEAD ] [ git-clone-as ] if ;
 
