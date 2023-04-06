@@ -1,10 +1,11 @@
 ! Copyright (C) 2018 John Benediktsson
 ! See https://factorcode.org/license.txt for BSD license
 
-USING: accessors arrays ascii assocs calendar calendar.english
+USING: accessors arrays ascii assocs assocs.extras calendar
+calendar.english calendar.format calendar.parser
 calendar.private circular combinators combinators.short-circuit
-io kernel literals math math.order math.parser ranges sequences
-sets sorting splitting ;
+io kernel literals math math.order math.parser prettyprint
+ranges sequences sets sorting splitting ;
 
 IN: crontab
 
@@ -136,8 +137,67 @@ PRIVATE>
 : next-times-after ( cronentry n timestamp -- timestamps )
     swap [ dupd next-time-after dup ] replicate 2nip ;
 
+: next-times-from-until ( cronentry from-timestamp until-timestamp -- timestamps )
+    [ dup second>> 0 = [ 1 minutes time- ] when ] dip
+    '[ dupd next-time-after dup dup _ before? ] [ ] produce 3nip ;
+
+: next-times-until ( cronentry timestamp -- timestamps )
+    [ now start-of-minute ] dip next-times-from-until ;
+
 : next-times ( cronentry n -- timestamps )
     now next-times-after ;
 
 : read-crontab ( -- entries )
     read-lines harvest [ parse-cronentry ] map ;
+
+: group-crons ( cronstrings from-timestamp until-timestamp -- entries )
+    '[ _ _ next-times-from-until [ timestamp>unix-time ] map ] zip-with
+    [ first2 [ 2array ] with map ] map concat
+    [ nip ] collect-key-by sort-keys ;
+
+: group-crons-for-duration-from ( cronstrings duration from-timestamp -- entries )
+    tuck time+ group-crons ;
+
+: group-crons-for-duration ( cronstrings duration -- entries )
+    now utc group-crons-for-duration-from ;
+
+: crons-for-minute ( cronstrings timestamp -- entries )
+    utc start-of-minute dup end-of-minute group-crons ;
+
+: crons-for-hour ( cronstrings timestamp -- entries )
+    utc start-of-hour dup end-of-hour group-crons ;
+
+: crons-for-day ( cronstrings timestamp -- entries )
+    utc start-of-day dup end-of-day group-crons ;
+
+: crons-for-week ( cronstrings timestamp -- entries )
+    utc start-of-week dup end-of-week group-crons ;
+
+: crons-for-month ( cronstrings timestamp -- entries )
+    utc start-of-month dup end-of-month group-crons ;
+
+: crons-for-year ( cronstrings timestamp -- entries )
+    utc start-of-year dup end-of-year group-crons ;
+
+: crons-for-decade ( cronstrings timestamp -- entries )
+    utc start-of-decade dup end-of-decade group-crons ;
+
+: crons-this-minute ( cronstrings -- entries ) now crons-for-minute ;
+: crons-this-hour ( cronstrings -- entries ) now crons-for-hour ;
+: crons-this-day ( cronstrings -- entries ) now crons-for-day ;
+ALIAS: crons-today crons-this-day
+: crons-yesterday ( cronstrings -- entries ) 1 days ago crons-for-day ;
+: crons-tomorrow ( cronstrings -- entries ) 1 days hence crons-for-day ;
+: crons-this-week ( cronstrings -- entries ) now crons-for-week ;
+: crons-this-month ( cronstrings -- entries ) now crons-for-month ;
+: crons-this-year ( cronstrings -- entries ) now crons-for-year ;
+: crons-this-decade ( cronstrings -- entries ) now crons-for-decade ;
+
+: keys-unix-to-rfc822 ( assoc -- assoc' )
+    [ unix-time>timestamp timestamp>rfc822 ] map-keys ;
+
+: keys-rfc822-to-unix ( assoc -- assoc' )
+    [ rfc822>timestamp timestamp>unix-time ] map-keys ;
+
+: grouped-crons. ( assoc -- )
+    keys-unix-to-rfc822 [ first2 [ write bl ] [ ... ] bi* ] each ;
