@@ -74,6 +74,9 @@ CONSTANT: aliases H{
 
 <PRIVATE
 
+: ?parse-cronentry ( entry -- cronentry )
+    dup cronentry? [ parse-cronentry ] unless ;
+
 :: (next-time-after) ( cronentry timestamp -- )
 
     f ! should we keep searching for a matching time
@@ -124,7 +127,8 @@ CONSTANT: aliases H{
 PRIVATE>
 
 : next-time-after ( cronentry timestamp -- timestamp )
-    1 minutes time+ 0 >>second [ (next-time-after) ] keep ;
+    [ ?parse-cronentry ] dip 1 minutes time+ 0 >>second
+    [ (next-time-after) ] keep ;
 
 : next-time ( cronentry -- timestamp )
     now next-time-after ;
