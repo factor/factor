@@ -37,3 +37,6 @@ IN: sets.extras
 
 : unique-by ( seq quot: ( elt -- key ) -- seq' )
     over length <hash-set> '[ @ _ ?adjoin ] filter ; inline
+
+: diffs ( seq1 seq2 -- diff swapdiff intersect )
+    [ diff f like ] [ swap diff f like ] [ intersect ] 2tri ;
