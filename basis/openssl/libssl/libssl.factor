@@ -9,8 +9,8 @@ IN: openssl.libssl
 
 << "libssl" {
     { [ os windows? ] [
-          cpu x86.64 = "x64" "x86" ?
-          "libssl-3-" ".dll" surround
+          cpu x86.64 = "-x64" "" ?
+          "libssl-3" ".dll" surround
     ] }
     { [ os macosx? ] [ "libssl.35.dylib" ] }
     { [ os unix? ] [ "libssl.so" ] }
