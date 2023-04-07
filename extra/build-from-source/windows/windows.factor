@@ -1,9 +1,9 @@
 ! Copyright (C) 2023 Doug Coleman.
 ! See https://factorcode.org/license.txt for BSD license.
-USING: accessors build-from-source continuations html.parser
-html.parser.analyzer http.client io.directories io.files.temp
-io.launcher io.pathnames kernel qw sequences sorting.human
-windows.shell32 ;
+USING: accessors build-from-source continuations environment
+html.parser html.parser.analyzer http.client io.directories
+io.files.temp io.launcher io.pathnames kernel qw sequences
+sorting.human windows.shell32 ;
 IN: build-from-source.windows
 
 ! choco install -y meson StrawberryPerl nasm winflexbison3 glfw3 jom
@@ -63,13 +63,25 @@ IN: build-from-source.windows
         ] with-build-directory
     ] with-updated-git-repo ;
 
+: build-openssl-32-dlls ( -- )
+    "http://github.com/openssl/openssl.git" [
+        check-perl
+        "ProgramW6432" os-env program-files or
+            "NASM/nasm.exe" append-path "nasm.exe" prepend-current-path copy-file
+        check-nasm
+        check-nmake
+        qw{ perl Configure -DOPENSSL_PIC VC-WIN32 /FS } try-process
+        have-jom? qw{ jom -j 32 } { "nmake" } ? try-process
+        { "libssl-3.dll" "libcrypto-3.dll" } copy-output-files
+    ] with-updated-git-repo ;
+
 : build-openssl-64-dlls ( -- )
     "https://github.com/openssl/openssl.git" [
         check-perl
         program-files "NASM/nasm.exe" append-path "nasm.exe" prepend-current-path copy-file
         check-nasm
         check-nmake
-        qw{ perl Configure -DOPENSSL_PIC VC-WIN64A /FS } try-process ! "VC-WIN32"
+        qw{ perl Configure -DOPENSSL_PIC VC-WIN64A /FS } try-process
         have-jom? qw{ jom -j 32 } { "nmake" } ? try-process
         { "apps/libssl-3-x64.dll" "apps/libcrypto-3-x64.dll" } copy-output-files
     ] with-updated-git-repo ;

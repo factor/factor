@@ -1,9 +1,9 @@
 ! Copyright (C) 2023 Doug Coleman.
 ! See https://factorcode.org/license.txt for BSD license.
-USING: ascii cli.git combinators.short-circuit formatting
-http.client io.directories io.files io.files.info io.files.temp
-io.launcher io.pathnames kernel layouts namespaces sequences
-splitting system ;
+USING: accessors ascii cli.git combinators.short-circuit
+formatting http.client io.directories io.files io.files.info
+io.files.temp io.launcher io.pathnames kernel layouts namespaces
+sequences splitting system ;
 IN: build-from-source
 
 : dll-out-directory ( -- path )
@@ -56,12 +56,18 @@ ERROR: no-output-file path ;
     [ dup ?delete-tree ] unless
     sync-repository-as wait-for-success ;
 
+: temp-directory-cpu ( -- path )
+    temp-directory cpu name>> append-path ;
+
+: with-temp-cpu-directory ( quot -- )
+    [ temp-directory-cpu ] dip with-directory ; inline
+
 : with-updated-git-repo-as ( git-uri path quot -- )
-    temp-directory make-directories
+    temp-directory-cpu make-directories
     '[
         _ _ [ ?sync-repository-as ] keep
         prepend-current-path _ with-directory
-    ] with-temp-directory ; inline
+    ] with-temp-cpu-directory ; inline
 
 : with-updated-git-repo ( git-uri quot -- )
     [ dup git-directory-name ] dip with-updated-git-repo-as ; inline
@@ -76,4 +82,4 @@ ERROR: no-output-file path ;
         [ file-name { "tar" "xvfz" } swap suffix try-process ]
         [ file-name ".tar.gz" ?tail drop ] tri
         prepend-current-path _ with-directory
-    ] with-temp-directory ; inline
+    ] with-temp-cpu-directory ; inline
