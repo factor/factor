@@ -8,8 +8,8 @@ IN: openssl.libcrypto
 
 << "libcrypto" {
     { [ os windows? ] [
-          cpu x86.64 = "x64" "x86" ?
-          "libcrypto-3-" ".dll" surround
+          cpu x86.64 = "-x64" "" ?
+          "libcrypto-3" ".dll" surround
     ] }
     { [ os macosx? ] [ "libcrypto.35.dylib" ] }
     { [ os unix? ] [ "libcrypto.so" ] }
