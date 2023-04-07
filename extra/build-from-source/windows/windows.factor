@@ -368,7 +368,7 @@ IN: build-from-source.windows
     build-openal-dll
     build-pcre-dll
     build-pcre2-dll
-    build-postgres-dll
+    32-bit? [ build-postgres-dll ] unless
     build-raylib-dll
     build-snappy-dll
     build-sqlite3-dll
