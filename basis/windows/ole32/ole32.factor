@@ -24,11 +24,20 @@ TYPEDEF: REFGUID LPCGUID
 TYPEDEF: REFGUID REFIID
 TYPEDEF: REFGUID REFCLSID
 
+FUNCTION: HRESULT CoInitialize ( LPVOID pvReserved )
+FUNCTION: void CoUninitialize ( )
+
 FUNCTION: HRESULT CoCreateInstance ( REFGUID rclsid, LPUNKNOWN pUnkOuter, DWORD dwClsContext, REFGUID riid, LPUNKNOWN out_ppv )
 FUNCTION: HRESULT CoCreateGuid ( GUID* pguid )
 FUNCTION: BOOL IsEqualGUID ( REFGUID rguid1, REFGUID rguid2 )
 FUNCTION: int StringFromGUID2 ( REFGUID rguid, LPOLESTR lpsz, int cchMax )
 FUNCTION: HRESULT CLSIDFromString ( LPOLESTR lpsz, REFGUID out_rguid )
+
+FUNCTION: LPVOID CoTaskMemAlloc ( SIZE_T cb )
+FUNCTION: LPVOID CoTaskMemRealloc ( LPVOID pv, SIZE_T cb )
+FUNCTION: void CoTaskMemFree ( LPVOID pv )
+FUNCTION: HRESULT CreateStreamOnHGlobal ( HGLOBAL hGlobal, BOOL fDeleteOnRelease, LPVOID* ppstm )
+FUNCTION: HRESULT CoGetClassObject ( REFCLSID rclsid, DWORD dwClsContext, LPVOID pvReserved, REFIID riid, LPVOID *ppv )
 
 CONSTANT: S_OK 0
 CONSTANT: S_FALSE 1
