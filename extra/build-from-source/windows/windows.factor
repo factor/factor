@@ -2,8 +2,8 @@
 ! See https://factorcode.org/license.txt for BSD license.
 USING: accessors build-from-source continuations environment
 html.parser html.parser.analyzer http.client io.directories
-io.files.temp io.launcher io.pathnames kernel qw sequences
-sorting.human windows.shell32 ;
+io.files.temp io.launcher io.pathnames kernel layouts qw
+sequences sorting.human windows.shell32 ;
 IN: build-from-source.windows
 
 ! choco install -y meson StrawberryPerl nasm winflexbison3 glfw3 jom
@@ -38,8 +38,13 @@ IN: build-from-source.windows
 : build-fftw-dll ( -- )
     latest-fftw [
         [
-            qw{ cmake -DBUILD_SHARED_LIBS=ON .. } try-process
-            qw{ msbuild fftw.sln /m /property:Configuration=Release } try-process
+            32-bit? [
+                { "cmake" "-G" "Visual Studio 17 2022" "-A" "Win32" "-DBUILD_SHARED_LIBS=ON" ".." } try-process
+                qw{ msbuild fftw.sln /m /property:Configuration=Release /p:Platform=Win32 } try-process
+            ] [
+                qw{ cmake -DBUILD_SHARED_LIBS=ON .. } try-process
+                qw{ msbuild fftw.sln /m /property:Configuration=Release } try-process
+            ] if
             "Release/fftw3.dll" copy-output-file
         ] with-build-directory
     ] with-tar-gz ;
@@ -57,8 +62,13 @@ IN: build-from-source.windows
 : build-blas ( -- )
     "https://github.com/xianyi/OpenBLAS.git" [
         [
-            { "cmake" "-G" "Visual Studio 17 2022" "-DCMAKE_BUILD_TYPE=Release" "-DBUILD_SHARED_LIBS=ON" ".." } try-process
-            qw{ msbuild OpenBLAS.sln /property:Configuration=Release } try-process
+            32-bit? [
+                { "cmake" "-G" "Visual Studio 17 2022" "-A" "Win32" "-DCMAKE_BUILD_TYPE=Release" "-DBUILD_SHARED_LIBS=ON" ".." } try-process
+                qw{ msbuild OpenBLAS.sln /property:Configuration=Release /p:Platform=Win32 } try-process
+            ] [
+                { "cmake" "-G" "Visual Studio 17 2022" "-DCMAKE_BUILD_TYPE=Release" "-DBUILD_SHARED_LIBS=ON" ".." } try-process
+                qw{ msbuild OpenBLAS.sln /property:Configuration=Release } try-process
+            ] if
             "lib/RELEASE/openblas.dll" "blas.dll" copy-output-file-as
         ] with-build-directory
     ] with-updated-git-repo ;
@@ -86,10 +96,13 @@ IN: build-from-source.windows
         { "apps/libssl-3-x64.dll" "apps/libcrypto-3-x64.dll" } copy-output-files
     ] with-updated-git-repo ;
 
+: build-openssl-dlls ( -- )
+    32-bit? [ build-openssl-32-dlls ] [ build-openssl-64-dlls ] if ;
+
 : build-cairo-dll ( -- )
     "https://github.com/freedesktop/cairo.git" [
-        qw{ meson setup --force-fallback-for=freetype2,fontconfig build2 } try-process
-        "build2" prepend-current-path
+        qw{ meson setup --force-fallback-for=freetype2,fontconfig,zlib,expat,expat_dep build } try-process
+        "build" prepend-current-path
         [ { "ninja" } try-process ] with-directory
         "." find-dlls copy-output-files
         {
@@ -115,8 +128,13 @@ IN: build-from-source.windows
 : build-libressl-dlls ( -- )
     latest-libressl [
         [
-            qw{ cmake -DCMAKE_BUILD_TYPE=Release -DBUILD_SHARED_LIBS=ON .. } try-process
-            qw{ msbuild LibreSSL.sln /m /property:Configuration=Release } try-process
+            32-bit? [
+                qw{ cmake -A Win32 -DCMAKE_BUILD_TYPE=Release -DBUILD_SHARED_LIBS=ON .. } try-process
+                qw{ msbuild LibreSSL.sln /m /property:Configuration=Release /p:Platform=Win32 } try-process
+            ] [
+                qw{ cmake -DCMAKE_BUILD_TYPE=Release -DBUILD_SHARED_LIBS=ON .. } try-process
+                qw{ msbuild LibreSSL.sln /m /property:Configuration=Release } try-process
+            ] if
             {
                 "crypto/Release/crypto-50.dll"
                 "ssl/Release/ssl-53.dll"
@@ -128,8 +146,24 @@ IN: build-from-source.windows
 : build-openal-dll ( -- )
     "https://github.com/kcat/openal-soft.git" [
         [
-            { "cmake" "-G" "Visual Studio 17 2022" "-DCMAKE_BUILD_TYPE=Release" "-DBUILD_SHARED_LIBS=ON" ".." } try-process
-            qw{ msbuild OpenAL.sln /property:Configuration=Release } try-process
+            32-bit? [
+                {
+                    "cmake"
+                    "-G" "Visual Studio 17 2022"
+                    "-A" "Win32"
+                    "-DCMAKE_BUILD_TYPE=Release"
+                    "-DBUILD_SHARED_LIBS=ON" ".."
+                } try-process
+                qw{ msbuild OpenAL.sln /property:Configuration=Release /p:Platform=Win32 } try-process
+            ] [
+                {
+                    "cmake"
+                    "-G" "Visual Studio 17 2022"
+                    "-DCMAKE_BUILD_TYPE=Release"
+                    "-DBUILD_SHARED_LIBS=ON" ".."
+                } try-process
+                qw{ msbuild OpenAL.sln /property:Configuration=Release } try-process
+            ] if
             "Release/OpenAL32.dll" copy-output-file
         ] with-build-directory
     ] with-updated-git-repo ;
@@ -145,8 +179,13 @@ IN: build-from-source.windows
 : build-pcre-dll ( -- )
     latest-pcre-tar-gz [
         [
-            qw{ cmake -DCMAKE_BUILD_TYPE=Release -DBUILD_SHARED_LIBS=ON -DPCRE_SUPPORT_UTF=ON -DPCRE_SUPPORT_UNICODE_PROPERTIES=ON .. } try-process
-            qw{ msbuild PCRE.sln /m /property:Configuration=Release } try-process
+            32-bit? [
+                qw{ cmake -A Win32  -DCMAKE_BUILD_TYPE=Release -DBUILD_SHARED_LIBS=ON -DPCRE_SUPPORT_UTF=ON -DPCRE_SUPPORT_UNICODE_PROPERTIES=ON -DPCRE_SUPPORT_LIBZ=OFF -DPCRE_SUPPORT_LIBBZ2=OFF -DPCRE_SUPPORT_LIBREADLINE=OFF .. } try-process
+                qw{ msbuild PCRE.sln /m /property:Configuration=Release /p:Platform=Win32 } try-process
+            ] [
+                qw{ cmake -DCMAKE_BUILD_TYPE=Release -DBUILD_SHARED_LIBS=ON -DPCRE_SUPPORT_UTF=ON -DPCRE_SUPPORT_UNICODE_PROPERTIES=ON .. } try-process
+                qw{ msbuild PCRE.sln /m /property:Configuration=Release } try-process
+            ] if
             "Release/pcre.dll" copy-output-file
         ] with-build-directory
     ] with-tar-gz ;
@@ -154,8 +193,13 @@ IN: build-from-source.windows
 : build-pcre2-dll ( -- )
     "https://github.com/PCRE2Project/pcre2.git" [
         [
-            qw{ cmake -DCMAKE_BUILD_TYPE=Release -DBUILD_SHARED_LIBS=ON -DPCRE_SUPPORT_UTF=ON -DPCRE_SUPPORT_UNICODE_PROPERTIES=ON .. } try-process
-            qw{ msbuild PCRE2.sln /m /property:Configuration=Release } try-process
+            32-bit? [
+                qw{ cmake -A Win32 -DCMAKE_BUILD_TYPE=Release -DBUILD_SHARED_LIBS=ON -DPCRE2_SUPPORT_UNICODE=ON -DPCRE2_SUPPORT_LIBZ=OFF -DPCRE2_SUPPORT_LIBBZ2=OFF -DPCRE2_SUPPORT_LIBEDIT=OFF -DPCRE2_SUPPORT_LIBREADLINE=OFF .. } try-process
+                qw{ msbuild PCRE2.sln /m /property:Configuration=Release /p:Platform=Win32 } try-process
+            ] [
+                qw{ cmake -DCMAKE_BUILD_TYPE=Release -DBUILD_SHARED_LIBS=ON -DPCRE_SUPPORT_UTF=ON -DPCRE_SUPPORT_UNICODE_PROPERTIES=ON .. } try-process
+                qw{ msbuild PCRE2.sln /m /property:Configuration=Release } try-process
+            ] if
             { "Release/pcre2-8.dll" "Release/pcre2-posix.dll" } copy-output-files
         ] with-build-directory
     ] with-updated-git-repo ;
@@ -164,18 +208,23 @@ IN: build-from-source.windows
 : build-postgres-dll ( -- )
     "https://github.com/postgres/postgres" [
         "src/tools/msvc/clean.bat" prepend-current-path try-process
-        qw{ meson setup build2 } try-process
-        "build2" prepend-current-path
+        qw{ meson setup build } try-process
+        "build" prepend-current-path
         [ { "ninja" } try-process ] with-directory
-        "build2/src/interfaces/libpq/libpq.dll" copy-output-file
+        "build/src/interfaces/libpq/libpq.dll" copy-output-file
     ] with-updated-git-repo ;
 
 ! choco install -y glfw3
 : build-raylib-dll ( -- )
     "https://github.com/raysan5/raylib.git" [
         [
-            qw{ cmake -DCMAKE_BUILD_TYPE=Release -DBUILD_SHARED_LIBS=ON -DBUILD_EXAMPLES=OFF -DUSE_EXTERNAL_GLFW=OFF .. } try-process
-            qw{ msbuild raylib.sln /m /property:Configuration=Release } try-process
+            32-bit? [
+                qw{ cmake -A Win32 -DCMAKE_BUILD_TYPE=Release -DBUILD_SHARED_LIBS=ON -DBUILD_EXAMPLES=OFF -DUSE_EXTERNAL_GLFW=OFF .. } try-process
+                qw{ msbuild raylib.sln /m /property:Configuration=Release /p:Platform=Win32 } try-process
+            ] [
+                qw{ cmake -DCMAKE_BUILD_TYPE=Release -DBUILD_SHARED_LIBS=ON -DBUILD_EXAMPLES=OFF -DUSE_EXTERNAL_GLFW=OFF .. } try-process
+                qw{ msbuild raylib.sln /m /property:Configuration=Release } try-process
+            ] if
             "raylib/Release/raylib.dll" copy-output-file
         ] with-build-directory
     ] with-updated-git-repo ;
@@ -183,15 +232,24 @@ IN: build-from-source.windows
 : build-raygui-dll ( -- )
     "https://github.com/raysan5/raygui.git" [
         "src/raygui.h" "src/raygui.c" copy-file
-        qw{ cl /O2 /I ../raylib/src/ /D_USRDLL /D_WINDLL /DRAYGUI_IMPLEMENTATION /DBUILD_LIBTYPE_SHARED src/raygui.c /LD /Feraygui.dll /link /LIBPATH ../raylib/build/raylib/Release/raylib.lib /subsystem:windows /machine:x64 } try-process
+        32-bit? [
+            qw{ cl /O2 /I ../raylib/src/ /D_USRDLL /D_WINDLL /DRAYGUI_IMPLEMENTATION /DBUILD_LIBTYPE_SHARED src/raygui.c /LD /Feraygui.dll /link /LIBPATH ../raylib/build/raylib/Release/raylib.lib /subsystem:windows /machine:x86 } try-process
+        ] [
+            qw{ cl /O2 /I ../raylib/src/ /D_USRDLL /D_WINDLL /DRAYGUI_IMPLEMENTATION /DBUILD_LIBTYPE_SHARED src/raygui.c /LD /Feraygui.dll /link /LIBPATH ../raylib/build/raylib/Release/raylib.lib /subsystem:windows /machine:x64 } try-process
+        ] if
         "raygui.dll" copy-output-file
     ] with-updated-git-repo ;
 
 : build-snappy-dll ( -- )
     "https://github.com/google/snappy.git" [
         [
-            qw{ cmake -DCMAKE_BUILD_TYPE=Release -DBUILD_SHARED_LIBS=ON -DSNAPPY_BUILD_TESTS=OFF -DSNAPPY_BUILD_BENCHMARKS=OFF .. } try-process
-            qw{ msbuild Snappy.sln /m /property:Configuration=Release } try-process
+            32-bit? [
+                qw{ cmake -A Win32 -DCMAKE_BUILD_TYPE=Release -DBUILD_SHARED_LIBS=ON -DSNAPPY_BUILD_TESTS=OFF -DSNAPPY_BUILD_BENCHMARKS=OFF .. } try-process
+                qw{ msbuild Snappy.sln /m /property:Configuration=Release /p:Platform=Win32 } try-process
+            ] [
+                qw{ cmake -DCMAKE_BUILD_TYPE=Release -DBUILD_SHARED_LIBS=ON -DSNAPPY_BUILD_TESTS=OFF -DSNAPPY_BUILD_BENCHMARKS=OFF .. } try-process
+                qw{ msbuild Snappy.sln /m /property:Configuration=Release } try-process
+            ] if
             "Release/snappy.dll" copy-output-file
         ] with-build-directory
     ] with-updated-git-repo ;
@@ -206,8 +264,13 @@ IN: build-from-source.windows
 : build-yaml-dll ( -- )
     "https://github.com/yaml/libyaml.git" [
         [
-            qw{ cmake -DBUILD_SHARED_LIBS=ON .. } try-process
-            qw{ msbuild yaml.sln /property:Configuration=Release } try-process
+            32-bit? [
+                qw{ cmake -DBUILD_SHARED_LIBS=ON -A Win32 .. } try-process
+                qw{ msbuild yaml.sln /property:Configuration=Release /p:Platform=Win32 } try-process
+            ] [
+                qw{ cmake -DBUILD_SHARED_LIBS=ON .. } try-process
+                qw{ msbuild yaml.sln /property:Configuration=Release } try-process
+            ] if
 
             "Release/yaml.dll" copy-output-file
         ] with-build-directory
@@ -216,8 +279,13 @@ IN: build-from-source.windows
 : build-zeromq-dll ( -- )
     "https://github.com/zeromq/libzmq.git" [
         [
-            qw{ cmake -DBUILD_SHARED_LIBS=ON .. } try-process
-            qw{ msbuild ZeroMQ.sln /property:Configuration=Release } try-process
+            32-bit? [
+                qw{ cmake -DBUILD_SHARED_LIBS=ON -A Win32 .. } try-process
+                qw{ msbuild ZeroMQ.sln /property:Configuration=Release /p:Platform=Win32 } try-process
+            ] [
+                qw{ cmake -DBUILD_SHARED_LIBS=ON .. } try-process
+                qw{ msbuild ZeroMQ.sln /property:Configuration=Release } try-process
+            ] if
             "bin/Release" find-dlls first "libzmq.dll" copy-output-file-as
         ] with-build-directory
     ] with-updated-git-repo ;
@@ -233,8 +301,13 @@ IN: build-from-source.windows
     "https://github.com/lz4/lz4.git" [
         "build/cmake" [
             [
-                qw{ cmake -DBUILD_SHARED_LIBS=ON .. } try-process
-                qw{ msbuild LZ4.sln /property:Configuration=Release } try-process
+                32-bit? [
+                    qw{ cmake -A Win32 -DBUILD_SHARED_LIBS=ON .. } try-process
+                    qw{ msbuild LZ4.sln /property:Configuration=Release /p:Platform=Win32 } try-process
+                ] [
+                    qw{ cmake -DBUILD_SHARED_LIBS=ON .. } try-process
+                    qw{ msbuild LZ4.sln /property:Configuration=Release } try-process
+                ] if
                 "Release/lz4.dll" copy-output-file
             ] with-build-directory
         ] with-directory
@@ -242,18 +315,35 @@ IN: build-from-source.windows
 
 : build-zstd-dll ( -- )
     "https://github.com/facebook/zstd.git" [
-        qw{
-            meson setup
-            --buildtype=debugoptimized
-            -Db_lundef=false
-            -Dauto_features=enabled
-            -Dbin_programs=true
-            -Dbin_tests=true
-            -Dbin_contrib=true
-            -Ddefault_library=both
-            -Dlz4=disabled
-            build/meson builddir
-        } try-process
+        32-bit? [
+            qw{
+                meson setup
+                --buildtype=debugoptimized
+                -Db_lundef=false
+                -Dauto_features=enabled
+                -Dbin_programs=true
+                -Dbin_tests=true
+                -Dbin_contrib=true
+                -Ddefault_library=both
+                -Dlz4=disabled
+                -Dlzma=disabled
+                -Dzlib=disabled
+                build/meson builddir
+            } try-process
+        ] [
+            qw{
+                meson setup
+                --buildtype=debugoptimized
+                -Db_lundef=false
+                -Dauto_features=enabled
+                -Dbin_programs=true
+                -Dbin_tests=true
+                -Dbin_contrib=true
+                -Ddefault_library=both
+                -Dlz4=disabled
+                build/meson builddir
+            } try-process
+        ] if
         "builddir" prepend-current-path
         [
             { "ninja" } try-process
@@ -271,7 +361,7 @@ IN: build-from-source.windows
 : build-windows-dlls ( -- )
     dll-out-directory make-directories
     build-cairo-dll
-    build-openssl-64-dlls
+    build-openssl-dlls
     build-blas
     build-libressl-dlls
     build-fftw-dll
