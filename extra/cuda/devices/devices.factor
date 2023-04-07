@@ -35,9 +35,8 @@ IN: cuda.devices
     '[ _ cuDeviceComputeCapability cuda-error ] with-out-parameters
     2array ;
 
-: cuda-device-memory ( n -- bytes )
-    [ { ulonglong } ] dip
-    '[ _ cuDeviceTotalMem_v2 cuda-error ] with-out-parameters ;
+: cuda-device-memory ( n -- memory )
+    [ 0 size_t <ref> ] dip [ cuDeviceTotalMem_v2 cuda-error ] keepd size_t deref ;
 
 : cuda-device-attribute ( attribute n -- n )
     [ { int } ] 2dip
