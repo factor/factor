@@ -1,9 +1,17 @@
 ! Copyright (C) 2023 Doug Coleman.
 ! See https://factorcode.org/license.txt for BSD license.
+<<<<<<< HEAD
 USING: accessors ascii cli.git combinators.short-circuit
 formatting http.client io.directories io.files io.files.info
 io.files.temp io.launcher io.pathnames kernel layouts namespaces
 sequences splitting system ;
+=======
+USING: arrays ascii assocs cli.git combinators
+combinators.short-circuit formatting http.client io.directories
+io.files io.files.info io.files.temp io.launcher io.pathnames
+kernel layouts math namespaces sequences sorting.human
+sorting.specification splitting system ;
+>>>>>>> 1cb55efbe6 (build-from-source: python version numbers are not all semver, find the latest one)
 IN: build-from-source
 
 : dll-out-directory ( -- path )
@@ -83,3 +91,25 @@ ERROR: no-output-file path ;
         [ file-name ".tar.gz" ?tail drop ] tri
         prepend-current-path _ with-directory
     ] with-temp-cpu-directory ; inline
+
+: split-python-version ( version -- array )
+    {
+        { [ dup "a" swap subseq? ] [ [ "a" split1 "99" or "alpha" swap ] keep 4array ] }
+        { [ dup "b" swap subseq? ] [ [ "b" split1 "99" or "beta" swap ] keep 4array ] }
+        { [ dup "rc" swap subseq? ] [ [ "rc" split1 "99" or "rc" swap ] keep 4array ] }
+        [ "z" "99" pick 4array ]
+    } cond ;
+
+: latest-python ( tags -- tag )
+    [ [ CHAR: . = ] count 2 >= ] filter
+    [ split-python-version ] map
+    [ first ] collect-by
+    { human<=> } sort-keys-with-spec
+    last second human-sort last fourth ;
+
+: latest-python2 ( tags -- tag )
+    [ "v2." head? ] filter latest-python ;
+
+: latest-python3 ( tags -- tag )
+    [ "v3." head? ] filter latest-python ;
+>>>>>>> 1cb55efbe6 (build-from-source: python version numbers are not all semver, find the latest one)
