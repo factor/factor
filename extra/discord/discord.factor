@@ -18,9 +18,10 @@ TUPLE: discord-bot-config
 
 TUPLE: discord-bot
     config in out ui-stdout bot-thread heartbeat-thread
-    send-heartbeat? messages sequence-number
+    send-heartbeat? reconnect?
+    messages sequence-number
     name application user session_id resume_gateway_url
-    guilds channels ;
+    guilds channels user-callback ;
 
 : <discord-bot> ( in out config -- discord-bot )
     discord-bot new
@@ -28,6 +29,7 @@ TUPLE: discord-bot
         swap >>out
         swap >>in
         t >>send-heartbeat?
+        t >>reconnect?
         V{ } clone >>messages
         H{ } clone >>guilds
         H{ } clone >>channels ;
@@ -67,14 +69,15 @@ TUPLE: discord-bot
 : get-discord-channel-pins ( channel-id -- json ) "/channels/%s/pins" sprintf discord-get ;
 : get-discord-channel-messages ( channel-id -- json ) "/channels/%s/messages" sprintf discord-get ;
 : get-discord-channel-message ( channel-id message-id -- json ) "/channels/%s/messages/%s" sprintf discord-get ;
-: send-message ( hashtable channel-id -- json ) "/channels/%s/messages" sprintf discord-post-json ;
+: send-message ( string channel-id -- json )
+    [ "content" associate ] dip "/channels/%s/messages" sprintf discord-post-json ;
 : ghosting-payload ( -- string )
-    { 124 124 8203 } 197
-    [ { 124 124 124 124 8203 } ] replicate concat
-    12 [ 124 ] replicate "" 3append-as ;
+    { 124 124 8203 }
+    197 [ { 124 124 124 124 8203 } ] replicate concat
+    1 [ 124 ] replicate "" 3append-as ;
 
 : ghost-ping ( message who channel-id -- json )
-    [ ghosting-payload glue "contents" associate ] dip send-message ;
+    [ ghosting-payload glue ] dip send-message ;
 
 : get-channel-webhooks ( channel-id -- json ) "/channels/%s/webhooks" sprintf discord-get ;
 : get-guild-webhooks ( guild-id -- json ) "/guilds/%s/webhooks" sprintf discord-get ;
@@ -175,6 +178,9 @@ ENUM: discord-opcode
         ]
     } cleave ;
 
+: handle-incoming-message ( guild_id channel_id message_id author content -- )
+    5drop ;
+
 : handle-discord-DISPATCH ( json -- )
     dup "t" of {
         { "AUTOMOD_ACTION" [ drop ] }
@@ -260,13 +266,22 @@ ENUM: discord-opcode
         { "MESSAGE_CREATE" [
             [
                 "MESSAGE_CREATE" write bl
-                "d" of
-                {
-                    [ [ "guild_id" of ] [ "channel_id" of ] bi guild-channel-name write bl ]
-                    [ "id" of "id:" prepend write bl ]
-                    [ "author" of "username" of ":" append write bl ]
-                    [ "content" of "`" dup surround print flush ]
-                } cleave
+                "d" of [
+                    {
+                        [ [ "guild_id" of ] [ "channel_id" of ] bi guild-channel-name write bl ]
+                        [ "id" of "id:" prepend write bl ]
+                        [ "author" of "username" of ":" append write bl ]
+                        [ "content" of "`" dup surround print flush ]
+                    } cleave
+                ] [
+                    {
+                        [ [ "guild_id" of ] [ "channel_id" of ] bi ]
+                        [ "id" of ]
+                        [ "author" of "username" of ]
+                        [ "content" of ]
+                    } cleave handle-incoming-message
+                ] bi
+
             ] with-global
         ] }
         { "MESSAGE_UPDATE" [
@@ -375,7 +390,12 @@ ENUM: discord-opcode
 : parse-discord-op ( json -- )
     [ clone now "timestamp" pick set-at discord-bot get messages>> push ] keep
     [ ] [ "s" of discord-bot get sequence-number<< ] [ "op" of ] tri {
-        { 0 [ handle-discord-DISPATCH ] }
+        { 0 [
+            [ handle-discord-DISPATCH ]
+            [
+                discord-bot get user-callback>>
+                [ [ discord-bot get ] dip call( discord-bot json -- ) ] [ drop ] if*
+            ] bi ] }
         { 6 [ handle-discord-RESUME ] }
         { 7 [ handle-discord-RECONNECT ] }
         { 10 [ handle-discord-HELLO ] }
@@ -388,6 +408,7 @@ ENUM: discord-opcode
         ]
     } case ;
 
+DEFER: discord-reconnect
 : handle-discord-websocket ( obj opcode -- loop? )
     [ "opcode: " write dup . over dup byte-array? [ utf8 decode json> ] when ... flush ] with-global
     {
@@ -395,10 +416,12 @@ ENUM: discord-opcode
             [
                 [ "closed with error, code %d" sprintf print ]
                 [ "closed with f" print ] if* flush
-            ] with-global f
+            ] with-global
+            discord-bot get reconnect?>> [
+                discord-reconnect drop
+            ] when f ! don't loop this one, reconnect makes a new thread
         ] }
         { 1 [
-            ! [ [ hexdump. flush ] with-global ]
             [ drop ]
             [ utf8 decode json> parse-discord-op ] bi
             t
@@ -409,24 +432,26 @@ ENUM: discord-opcode
         [ 2drop t ]
     } case ;
 
+: discord-reconnect ( -- discord-bot )
+    discord-bot-gateway <get-request>
+    add-discord-auth-header
+    [ drop ] do-http-request
+    dup response? [
+        throw
+    ] [
+        [ in>> stream>> ] [ out>> stream>> ] bi
+        \ discord-bot-config get <discord-bot>
+        dup '[
+            _ \ discord-bot [
+                discord-bot get [ in>> ] [ out>> ] bi
+                [
+                    [ handle-discord-websocket ] read-websocket-loop
+                ] with-streams
+            ] with-variable
+        ] "Discord Bot" spawn
+        >>bot-thread
+    ] if ;
+
+
 : discord-connect ( config -- discord-bot )
-    \ discord-bot-config [
-        discord-bot-gateway <get-request>
-        add-discord-auth-header
-        [ drop ] do-http-request
-        dup response? [
-            throw
-        ] [
-            [ in>> stream>> ] [ out>> stream>> ] bi
-            \ discord-bot-config get <discord-bot>
-            dup '[
-                _ \ discord-bot [
-                    discord-bot get [ in>> ] [ out>> ] bi
-                    [
-                        [ handle-discord-websocket ] read-websocket-loop
-                    ] with-streams
-                ] with-variable
-            ] "Discord Bot" spawn
-            >>bot-thread
-        ] if
-    ] with-variable ;
+    \ discord-bot-config [ discord-reconnect ] with-variable ;
