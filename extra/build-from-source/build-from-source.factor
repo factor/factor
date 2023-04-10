@@ -1,17 +1,10 @@
 ! Copyright (C) 2023 Doug Coleman.
 ! See https://factorcode.org/license.txt for BSD license.
-<<<<<<< HEAD
-USING: accessors ascii cli.git combinators.short-circuit
-formatting http.client io.directories io.files io.files.info
-io.files.temp io.launcher io.pathnames kernel layouts namespaces
-sequences splitting system ;
-=======
-USING: arrays ascii assocs cli.git combinators
+USING: accessors arrays assocs cli.git combinators
 combinators.short-circuit formatting http.client io.directories
 io.files io.files.info io.files.temp io.launcher io.pathnames
 kernel layouts math namespaces sequences sorting.human
-sorting.specification splitting system ;
->>>>>>> 1cb55efbe6 (build-from-source: python version numbers are not all semver, find the latest one)
+sorting.specification splitting system unicode ;
 IN: build-from-source
 
 : dll-out-directory ( -- path )
@@ -112,4 +105,3 @@ ERROR: no-output-file path ;
 
 : latest-python3 ( tags -- tag )
     [ "v3." head? ] filter latest-python ;
->>>>>>> 1cb55efbe6 (build-from-source: python version numbers are not all semver, find the latest one)
