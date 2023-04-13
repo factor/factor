@@ -1,11 +1,11 @@
 ! Copyright (C) 2022 Doug Coleman.
 ! See https://factorcode.org/license.txt for BSD license.
-USING: accessors alien.c-types assocs assocs.extras combinators
+USING: accessors assocs assocs.extras combinators
 combinators.short-circuit formatting io io.backend
 io.directories io.encodings.binary io.files io.files.info
-io.files.types io.pathnames kernel math math.statistics
-prettyprint sequences sets sorting specialized-arrays
-tools.memory.private tools.wc unicode ;
+io.files.types io.pathnames kernel math math.statistics prettyprint
+sequences sets sorting splitting tools.memory.private tools.wc
+unicode ;
 IN: codebase-analyzer
 
 : file-sizes ( paths -- assoc )
@@ -34,7 +34,8 @@ IN: codebase-analyzer
 
 : codebase-paths ( path -- seq )
     regular-directory-files
-    without-git-paths ;
+    without-git-paths
+    without-node-modules-paths ;
 
 : count-by-file-extension ( paths -- assoc )
     with-file-extensions
@@ -61,10 +62,24 @@ IN: codebase-analyzer
     [ [ file-info size>> ] map-sum ] assoc-map
     sort-values ;
 
+: upper-file? ( path -- ? )
+    {
+        [ { [ file-stem length 4 > ] [ file-extension length 3 <= ] } 1&& ]
+        [ file-stem upper? ]
+        [ file-stem [ { [ digit? ] [ "-." member? ] } 1|| ] all? not ]
+    } 1&& ;
+: upper-files ( paths -- seq ) [ upper-file? ] filter ;
+
+: configure-file? ( path -- ? ) file-name >lower { [ "configure" = ] [ "configure." head? ] } 1|| ;
+: configure-files ( paths -- paths' ) [ configure-file? ] filter ;
 
 : cmake-file? ( path -- ? ) { [ "CMakeLists.txt" tail? ] [ ".cmake" tail? ] } 1|| ;
 : cmake-files ( paths -- paths' ) [ cmake-file? ] filter ;
 : uses-cmake? ( paths -- ? ) [ cmake-file? ] any? ;
+
+: in-file? ( paths -- ? ) ".in" tail? ;
+: in-files ( paths -- seq ) [ in-file? ] filter ;
+: uses-in-files? ( paths -- ? ) [ in-file? ] any? ;
 
 : shell-file? ( path -- ? ) >lower file-extension { "sh" "zsh" } member? ;
 : shell-files ( paths -- paths' ) [ shell-file? ] filter ;
@@ -90,6 +105,9 @@ IN: codebase-analyzer
 : markdown-file? ( path -- ? ) { [ ".md" tail? ] [ ".markdown" tail? ] } 1|| ;
 : markdown-files ( paths -- paths' ) [ markdown-file? ] filter ;
 
+: dot-file? ( path -- ? ) file-name "." head? ;
+: dot-files ( paths -- paths' ) [ dot-file? ] filter ;
+
 : txt-file? ( path -- ? )
     {
         [ { [ ".txt" tail? ] [ ".TXT" tail? ] } 1|| ]
@@ -99,8 +117,11 @@ IN: codebase-analyzer
 
 : license-file? ( path -- ? )
     >lower { [ file-stem "license" = ] [ "license-mit" tail? ] } 1|| ;
-
 : license-files ( paths -- paths' ) [ license-file? ] filter ;
+
+: readme-file? ( path -- ? )
+    >lower file-stem "readme" = ;
+: readme-files ( paths -- paths' ) [ readme-file? ] filter ;
 
 : json-file? ( path -- ? )
     >lower file-extension
@@ -116,9 +137,23 @@ IN: codebase-analyzer
 : docker-files ( paths -- paths' ) [ docker-file? ] filter ;
 : uses-docker? ( paths -- ? ) [ docker-file? ] any? ;
 
-: make-file? ( path -- ? ) >lower file-name { "gnumakefile" "makefile" "nmakefile" } member? ;
+: automake-file? ( path -- ? )
+    >lower file-name
+    {
+        [ "makefile.am" tail? ]
+        [ "makefile.am.inc" tail? ]
+    } 1|| ;
+: automake-files ( paths -- paths' ) [ automake-file? ] filter ;
+: uses-automake? ( paths -- ? ) [ automake-file? ] any? ;
+
+: make-file? ( path -- ? )
+    >lower file-name { "gnumakefile" "makefile" } member? ;
 : make-files ( paths -- paths' ) [ make-file? ] filter ;
 : uses-make? ( paths -- ? ) [ make-file? ] any? ;
+
+: nmake-file? ( path -- ? ) >lower file-name "nmakefile" = ;
+: nmake-files ( paths -- paths' ) [ nmake-file? ] filter ;
+: uses-nmake? ( paths -- ? ) [ nmake-file? ] any? ;
 
 : web-file? ( path -- ? )
     >lower file-extension
@@ -163,10 +198,24 @@ IN: codebase-analyzer
             [ length "%d binary files" sprintf print ]
             [ length "%d text files" sprintf print ] bi*
         ]
-        [ uses-cmake? [ "uses cmake" print ] when ]
-        [ uses-make? [ "uses make" print ] when ]
-        [ rc-files [ length "has %d rc files" sprintf print ] unless-empty ]
-        [ ignore-files [ length "has %d ignore files" sprintf print ] unless-empty nl ]
+        [ license-files [ [ length "has %d license files" sprintf print ] [ ... ] bi ] unless-empty ]
+        [ readme-files [ "has readme files" print ... ] unless-empty ]
+        [
+            { [ dot-files ] [ rc-files diff ] [ ignore-files diff ] } cleave
+            [ "has dot files" print ... ] unless-empty
+        ]
+        [ rc-files [ [ length "has %d rc files" sprintf print ] [ ... ] bi ] unless-empty ]
+        [ configure-files [ "uses configure files" print ... ] unless-empty ]
+        [ automake-files [ "uses automake" print ... ] unless-empty ]
+        [ make-files [ "uses make" print ... ] unless-empty ]
+        [ nmake-files [ "uses nmake" print ... ] unless-empty ]
+        [ cmake-files [ "uses cmake" print ... ] unless-empty ]
+        [ in-files [ "uses 'in' files" print ... ] unless-empty ]
+        [ ignore-files [ [ length "has %d ignore files" sprintf print ] [ ... ] bi ] unless-empty nl ]
+        [
+            [ upper-files ] [ license-files diff ] [ readme-files diff ] tri
+            [ [ length "has %d UPPER files (minus license,readme files)" sprintf print ] [ ... ] bi ] unless-empty nl
+        ]
         [ "Top 20 largest files" print file-sizes sort-values 20 index-or-length tail* [ normalize-path ] map-keys reverse assoc. nl ]
         [ "Top 10 file extension sizes" print sum-sizes-by-extension 10 index-or-length tail* reverse assoc. nl ]
         [ "Top 10 text file line counts" print sum-line-counts-by-extension 10 index-or-length tail* reverse assoc. nl ]
@@ -179,4 +228,5 @@ IN: codebase-analyzer
 
 : analyze-codebases ( path -- )
     [ directory-files ] keep [ prepend-path ] curry map
+    [ file-info directory? ] filter
     [ analyze-codebase ] each ;
