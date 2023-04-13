@@ -437,3 +437,15 @@ IN: calendar
     2000 1 1 <date> 4 >>hour
     2000 1 1 <date> same-day?
 ] unit-test
+
+{
+    T{ timestamp { year 2023 } { month 4 } { day 9 } }
+    T{ timestamp
+        { year 2023 }
+        { month 4 }
+        { day 15 }
+        { hour 23 }
+        { minute 59 }
+        { second 59+999/1000 }
+    }
+} [ 2023 4 13 <date-gmt> start-of-week dup end-of-week ] unit-test

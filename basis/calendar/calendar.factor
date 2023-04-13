@@ -14,7 +14,11 @@ ERROR: not-in-interval value interval ;
 
 HOOK: gmt-offset os ( -- hours minutes seconds )
 
+ALIAS: utc-offset gmt-offset
+
 HOOK: now-gmt os ( -- timestamp )
+
+ALIAS: now-utc now-gmt
 
 TUPLE: duration
     { year real }
@@ -76,11 +80,15 @@ M: timestamp clone (clone) [ clone ] change-gmt-offset ;
 : <date-gmt> ( year month day -- timestamp )
     0 0 0 instant <timestamp> ; inline
 
+ALIAS: <date-utc> <date-gmt>
+
 : <year> ( year -- timestamp )
     1 1 <date> ; inline
 
 : <year-gmt> ( year -- timestamp )
     1 1 <date-gmt> ; inline
+
+ALIAS: <year-utc> <year-gmt>
 
 CONSTANT: average-month 30+5/12
 CONSTANT: months-per-year 12
@@ -499,8 +507,14 @@ ALIAS: start-of-day midnight
 : end-of-day ( timestamp -- timestamp' )
     clone 23 >>hour 59 >>minute 59+999/1000 >>second ; inline
 
+: first-day-of-month ( timestamp -- timestamp' )
+    clone 1 >>day ;
+
+: last-day-of-month ( timestamp -- timestamp' )
+    clone dup days-in-month >>day ; inline
+
 : start-of-month ( timestamp -- timestamp' )
-    midnight 1 >>day ; inline
+    midnight first-day-of-month ; inline
 
 : end-of-month ( timestamp -- timestamp' )
     [ end-of-day ] [ days-in-month ] bi >>day ;
@@ -510,12 +524,6 @@ ALIAS: start-of-day midnight
 
 : end-of-quarter ( timestamp -- timestamp' )
     dup quarter 1 - 3 * 3 + >>month end-of-month ; inline
-
-: first-day-of-month ( timestamp -- timestamp' )
-    clone 1 >>day ;
-
-: last-day-of-month ( timestamp -- timestamp' )
-    clone dup days-in-month >>day ; inline
 
 GENERIC: first-day-of-year ( object -- timestamp )
 M: timestamp first-day-of-year clone 1 >>month 1 >>day ;
@@ -579,7 +587,7 @@ M: integer last-day-of-year 12 31 <date> ;
     over day-of-week - ; inline
 
 : day-this-week ( timestamp n -- timestamp' )
-    day-offset days (time+) ;
+    day-offset days time+ ;
 
 : closest-day ( timestamp n -- timestamp' )
     [ dup day-of-week 7 swap - ] [ + 7 mod ] bi*
