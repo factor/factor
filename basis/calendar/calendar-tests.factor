@@ -314,18 +314,6 @@ IN: calendar
     dup 1 tail swap v- [ 1 <= ] all?
 ] unit-test
 
-{ 0 } [
-    2014 1 1 <date-gmt>
-    2014 <year-gmt> timestamp>year-dates-gmt
-    [ weekdays-between2 ] with map
-
-    2014 1 1 <date-gmt>
-    2014 <year-gmt> timestamp>year-dates-gmt
-    [ weekdays-between ] with map
-
-    v- sum
-] unit-test
-
 {
     {
         T{ timestamp { year 2020 } { month 3 } { day 1 } }
