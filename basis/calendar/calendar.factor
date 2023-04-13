@@ -762,15 +762,6 @@ ALIAS: last-day-of-week saturday
     day-of-week 6 = [ [ 1 - ] dip ] when
     day-of-week 0 = [ 1 - ] when ;
 
-CONSTANT: weekday-offsets { 0 0 1 2 3 4 5 }
-
-: weekdays-between2 ( date1 date2 -- n )
-    [ swap time- duration>days 1 + ]
-    [ [ day-of-week ] bi@ 6 swap - ] 2bi
-
-    [ + + 1.4 /i ]
-    [ [ weekday-offsets nth ] bi@ + ] 2bi - ;
-
 : sunday-of-month ( timestamp n -- timestamp' ) 0 nth-day-this-month ;
 : monday-of-month ( timestamp n -- timestamp' ) 1 nth-day-this-month ;
 : tuesday-of-month ( timestamp n -- timestamp' ) 2 nth-day-this-month ;
