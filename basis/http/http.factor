@@ -145,6 +145,9 @@ TUPLE: request
 : set-headers ( request/response assoc -- request/response )
     [ swap set-header ] assoc-each ; inline
 
+: delete-header ( request/response key -- request/response )
+    over header>> delete-at ;
+
 : basic-auth ( username password -- str )
     ":" glue >base64 "Basic " "" prepend-as ;
 
