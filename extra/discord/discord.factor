@@ -1,10 +1,10 @@
 ! Copyright (C) 2023 Doug Coleman.
 ! See https://factorcode.org/license.txt for BSD license.
 USING: accessors alien.syntax arrays assocs byte-arrays calendar
-combinators continuations formatting hashtables http http.client
-http.websockets io io.encodings.string io.encodings.utf8 json
-kernel math multiline namespaces prettyprint random sequences
-threads tools.hexdump ;
+combinators continuations destructors formatting hashtables http
+http.client http.websockets io io.encodings.string
+io.encodings.utf8 json kernel math multiline namespaces
+prettyprint random sequences threads tools.hexdump ;
 IN: discord
 
 CONSTANT: discord-api-url "https://discord.com/api/v10"
@@ -183,6 +183,18 @@ ENUM: discord-opcode
 
 : handle-discord-DISPATCH ( json -- )
     dup "t" of {
+        { "READY" [
+            [ "READY" print flush ] with-global
+            discord-bot get swap
+            {
+                [ "user" of >>user ]
+                [ "session_id" of >>session_id ]
+                [ "application" of >>application ]
+                ! [ "guilds" of >>guilds ]
+                [ "resume_gateway_url" of >>resume_gateway_url ]
+            } cleave drop
+        ] }
+
         { "AUTOMOD_ACTION" [ drop ] }
         { "AUTOMOD_RULE_CREATE" [ drop ] }
         { "AUTOMOD_RULE_UPDATE" [ drop ] }
@@ -251,18 +263,6 @@ ENUM: discord-opcode
         { "INVITE_CREATE" [ drop ] }
         { "INVITE_DELETE" [ drop ] }
 
-        { "READY" [
-            [ "READY" print flush ] with-global
-            discord-bot get swap
-            {
-                [ "user" of >>user ]
-                [ "session_id" of >>session_id ]
-                [ "application" of >>application ]
-                ! [ "guilds" of >>guilds ]
-                [ "resume_gateway_url" of >>resume_gateway_url ]
-            } cleave drop
-        ] }
-
         { "MESSAGE_CREATE" [
             [
                 "MESSAGE_CREATE" write bl
@@ -281,7 +281,6 @@ ENUM: discord-opcode
                         [ "content" of ]
                     } cleave handle-incoming-message
                 ] bi
-
             ] with-global
         ] }
         { "MESSAGE_UPDATE" [
@@ -300,13 +299,11 @@ ENUM: discord-opcode
         { "MESSAGE_DELETE" [
             [
                 "MESSAGE_DELETE" write bl
-                "d" of
-                {
+                "d" of {
                     [ [ "guild_id" of ] [ "channel_id" of ] bi guild-channel-name write bl ]
                     [ "id" of "id:" prepend print flush ]
                 } cleave
             ] with-global
-
         ] }
 
         { "MESSAGE_REACTION_ADD" [
@@ -393,9 +390,10 @@ ENUM: discord-opcode
         { 0 [
             [ handle-discord-DISPATCH ]
             [
-                discord-bot get user-callback>>
-                [ [ discord-bot get ] dip call( discord-bot json -- ) ] [ drop ] if*
-            ] bi ] }
+                [ discord-bot get ] dip over user-callback>>
+                [ [ dup "t" of ] dip call( discord-bot json message-type -- ) ] [ 2drop ] if*
+            ] bi
+        ] }
         { 6 [ handle-discord-RESUME ] }
         { 7 [ handle-discord-RECONNECT ] }
         { 10 [ handle-discord-HELLO ] }
@@ -426,9 +424,16 @@ DEFER: discord-reconnect
             [ utf8 decode json> parse-discord-op ] bi
             t
         ] }
-        { 2 [ [ [ hexdump. flush ] with-global ] when* t ] }
-        { 8 [ [ drop "close received" print flush ] with-global t ] }
-        { 9 [ [ [ "ping received" print flush ] with-global send-heartbeat ] when* t ] }
+        { 2 [
+            [ [ hexdump. flush ] with-global ] when* t
+        ] }
+        { 8 [
+            [ drop "close received" print flush ] with-global
+            discord-bot get reconnect?>> [ discord-reconnect drop ] when f
+        ] }
+        { 9 [
+            [ [ "ping received" print flush ] with-global send-heartbeat ] when* t
+        ] }
         [ 2drop t ]
     } case ;
 
@@ -452,6 +457,14 @@ DEFER: discord-reconnect
         >>bot-thread
     ] if ;
 
+M: discord-bot dispose
+    f >>reconnect?
+    f >>send-heartbeat?
+    [
+        [ in>> &dispose drop ]
+        [ out>> &dispose drop ]
+        [ f >>in f >>out drop ] tri
+    ] with-destructors ;
 
 : discord-connect ( config -- discord-bot )
     \ discord-bot-config [ discord-reconnect ] with-variable ;
