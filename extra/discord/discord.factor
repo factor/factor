@@ -1,10 +1,12 @@
 ! Copyright (C) 2023 Doug Coleman.
 ! See https://factorcode.org/license.txt for BSD license.
 USING: accessors alien.syntax arrays assocs byte-arrays calendar
-combinators continuations destructors formatting hashtables http
-http.client http.websockets io io.encodings.string
-io.encodings.utf8 json kernel math multiline namespaces
-prettyprint random sequences threads tools.hexdump ;
+combinators combinators.short-circuit continuations destructors
+formatting hashtables help http http.client http.websockets io
+io.encodings.string io.encodings.utf8 io.streams.string json
+kernel math multiline namespaces prettyprint
+prettyprint.sections random sequences splitting threads
+tools.hexdump unicode vocabs words ;
 IN: discord
 
 CONSTANT: discord-api-url "https://discord.com/api/v10"
@@ -17,10 +19,10 @@ TUPLE: discord-bot-config
     token application-id guild-id channel-id permissions ;
 
 TUPLE: discord-bot
-    config in out ui-stdout bot-thread heartbeat-thread
+    config in out bot-thread heartbeat-thread
     send-heartbeat? reconnect?
     messages sequence-number
-    name application user session_id resume_gateway_url
+    application user session_id resume_gateway_url
     guilds channels user-callback ;
 
 : <discord-bot> ( in out config -- discord-bot )
@@ -41,6 +43,14 @@ TUPLE: discord-bot
     "application/json" "Content-Type" set-header ;
 
 : json-request ( request -- json ) http-request nip utf8 decode json> ;
+: gwrite ( string -- ) [ write ] with-global ;
+: gprint ( string -- ) [ print ] with-global ;
+: gprint-flush ( string -- ) [ print flush ] with-global ;
+: gflush ( -- ) [ flush ] with-global ;
+: gbl ( -- ) [ bl ] with-global ;
+: gnl ( -- ) [ nl ] with-global ;
+: g. ( object -- ) [ . ] with-global ;
+: g... ( object -- ) [ ... ] with-global ;
 
 : >discord-url ( route -- url ) discord-api-url prepend ;
 : discord-get-request ( route -- request )
@@ -123,10 +133,10 @@ TUPLE: discord-bot
                 '[
                     _ [
                         output-stream get disposed>> [
-                            "heartbeat thread: output-stream is disposed, stopping" print f
+                            "heartbeat thread: output-stream is disposed, stopping" gprint-flush f
                         ] [
                             send-heartbeat t
-                            [ "sent heartbeat" print flush ] with-global
+                            "sent heartbeat" gprint-flush
                         ] if
                     ] [ 2drop f ] recover
                 ] [ f ] if
@@ -178,19 +188,28 @@ ENUM: discord-opcode
         ]
     } cleave ;
 
+: my-user-id ( -- id ) discord-bot get user>> "id" of ;
+: message-from-me? ( json -- ? ) "author" of "id" of my-user-id = ;
+: message-mentions ( json -- ids ) "mentions" of ;
+: message-mentions-ids ( json -- ids ) message-mentions [ "id" of ] map ;
+: message-mentions-me? ( json -- ? ) message-mentions my-user-id '[ "id" of _ = ] any? ;
+: message-mentions-me-and-not-from-me? ( json -- ? )
+    { [ message-mentions-me? ] [ message-from-me? not ] } 1&& ;
+: message-channel-id ( json -- ids ) "channel_id" of ;
+
 : handle-incoming-message ( guild_id channel_id message_id author content -- )
     5drop ;
 
 : handle-discord-DISPATCH ( json -- )
     dup "t" of {
         { "READY" [
-            [ "READY" print flush ] with-global
+            "READY" gprint-flush
             discord-bot get swap
+            "d" of
             {
                 [ "user" of >>user ]
                 [ "session_id" of >>session_id ]
                 [ "application" of >>application ]
-                ! [ "guilds" of >>guilds ]
                 [ "resume_gateway_url" of >>resume_gateway_url ]
             } cleave drop
         ] }
@@ -432,7 +451,7 @@ DEFER: discord-reconnect
             discord-bot get reconnect?>> [ discord-reconnect drop ] when f
         ] }
         { 9 [
-            [ [ "ping received" print flush ] with-global send-heartbeat ] when* t
+            [ "ping received" gprint-flush send-heartbeat ] when* t
         ] }
         [ 2drop t ]
     } case ;
@@ -468,3 +487,45 @@ M: discord-bot dispose
 
 : discord-connect ( config -- discord-bot )
     \ discord-bot-config [ discord-reconnect ] with-variable ;
+
+: reply-command ( json -- ? )
+    dup "content" of [ blank? ] trim
+    " " split1 [ [ blank? ] trim ] bi@
+    swap {
+        { "help" [
+            ":" split1 swap lookup-word dup [
+                [ [ print-topic ] with-string-writer ]
+                [ 2drop f ] recover
+            ] when "vocab:word not found (maybe it's not loaded)" or
+            swap message-channel-id send-message drop t
+        ] }
+        { "effects" [
+            all-words swap '[ name>> _ = ] filter
+            [
+                [ vocabulary-name ]
+                [ name>> ":" glue ]
+                [ props>> "declared-effect" of unparse " " glue ] tri
+            ] map [
+                "no words found" swap message-channel-id send-message drop f
+            ] [
+                "\n" join swap message-channel-id send-message drop t
+            ] if-empty
+        ] }
+        [ 3drop f ]
+    } case ;
+
+: reply-echo ( json -- ? )
+    dup message-mentions-me-and-not-from-me? [
+        [ "content" of "echobot sez: " prepend ]
+        [ message-channel-id ] bi send-message drop t
+    ] [
+        drop f
+    ] if ;
+
+: discord-help-bot-handler ( discord-bot json opcode -- )
+    [ "d" of ] dip {
+        { "MESSAGE_CREATE" [
+            nip { [ reply-command ] [ reply-echo ] } 1|| drop
+        ] }
+        [ 3drop ]
+    } case ;
