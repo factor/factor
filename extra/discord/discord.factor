@@ -450,7 +450,6 @@ M: discord-bot dispose
                 [ [ print-topic ] with-string-writer ]
                 [ 2drop f ] recover
             ] when "vocab:word not found (maybe it's not loaded)" or
-            B
             reply-message t
         ] }
         { "effects" [
