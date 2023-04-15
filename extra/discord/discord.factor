@@ -5,8 +5,8 @@ combinators combinators.short-circuit continuations destructors
 formatting hashtables help http http.client http.websockets io
 io.encodings.string io.encodings.utf8 io.streams.string json
 kernel math multiline namespaces prettyprint
-prettyprint.sections random sequences splitting strings threads
-tools.hexdump unicode vocabs words ;
+prettyprint.sections random sequences sets splitting strings
+threads tools.hexdump unicode vocabs words ;
 IN: discord
 
 CONSTANT: discord-api-url "https://discord.com/api/v10"
@@ -17,7 +17,7 @@ TUPLE: discord-webhook url id token ;
 TUPLE: discord-bot-config
     client-id client-secret
     token application-id guild-id channel-id permissions
-    user-callback ;
+    user-callback obey-names ;
 
 TUPLE: discord-bot
     config in out bot-thread heartbeat-thread
@@ -221,6 +221,9 @@ SINGLETONS:
 : message-mentions-me-and-not-from-me? ( json -- ? )
     { [ message-mentions-me? ] [ message-from-me? not ] } 1&& ;
 : message-channel-id ( json -- ids ) "channel_id" of ;
+: obey-message? ( json -- ? )
+    "author" of [ "username" of ] [ "discriminator" of ] bi "#" glue
+    discord-bot get config>> obey-names>> [ in? ] [ drop f ] if* ;
 
 : handle-incoming-message ( guild_id channel_id message_id author content -- )
     5drop ;
