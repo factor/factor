@@ -16,14 +16,15 @@ TUPLE: discord-webhook url id token ;
 
 TUPLE: discord-bot-config
     client-id client-secret
-    token application-id guild-id channel-id permissions ;
+    token application-id guild-id channel-id permissions
+    user-callback ;
 
 TUPLE: discord-bot
     config in out bot-thread heartbeat-thread
     send-heartbeat? reconnect?
     messages sequence-number
     application user session_id resume_gateway_url
-    guilds channels user-callback ;
+    guilds channels ;
 
 : <discord-bot> ( in out config -- discord-bot )
     discord-bot new
@@ -409,7 +410,7 @@ ENUM: discord-opcode
         { 0 [
             [ handle-discord-DISPATCH ]
             [
-                [ discord-bot get ] dip over user-callback>>
+                [ discord-bot get ] dip over config>> user-callback>>
                 [ [ dup "t" of ] dip call( discord-bot json message-type -- ) ] [ 2drop ] if*
             ] bi
         ] }
