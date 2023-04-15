@@ -1,11 +1,11 @@
 ! Copyright (C) 2005, 2010 Slava Pestov.
 ! See https://factorcode.org/license.txt for BSD license.
-USING: accessors arrays ascii assocs calendar combinators
-combinators.short-circuit continuations destructors effects
-environment hashtables http http.client.post-data http.parsers
-http.websockets io io.crlf io.encodings io.encodings.ascii
-io.encodings.binary io.encodings.iana io.encodings.string
-io.files io.pathnames io.sockets io.sockets.secure io.timeouts
+USING: accessors ascii assocs calendar combinators
+combinators.short-circuit destructors environment hashtables
+http http.client.post-data http.parsers http.websockets io
+io.crlf io.encodings io.encodings.ascii io.encodings.binary
+io.encodings.iana io.encodings.string io.encodings.utf8 io.files
+io.pathnames io.sockets io.sockets.secure io.timeouts json
 kernel math math.order math.parser mime.types namespaces present
 protocols sequences splitting urls vocabs.loader ;
 IN: http.client
@@ -17,8 +17,17 @@ ERROR: invalid-proxy proxy ;
 
 ERROR: download-failed response ;
 
+: handle-reponse-content ( response -- response )
+    dup content-type>> {
+        { "application/json" [ [ utf8 decode json> ] change-body ] }
+        [ drop ]
+    } case ;
+
 : check-response ( response -- response )
-    dup code>> success? [ download-failed ] unless ;
+    dup code>> success? [
+        handle-reponse-content
+        download-failed
+    ] unless ;
 
 <PRIVATE
 
