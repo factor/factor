@@ -1,6 +1,6 @@
 USING: accessors continuations http http.server
 http.server.requests io.encodings.ascii io.servers io.sockets
-io.streams.limited kernel namespaces ;
+io.streams.limited kernel namespaces protocols ;
 
 IN: http2.server
 
