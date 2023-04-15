@@ -3,7 +3,7 @@
 
 USING: accessors assocs hashtables http http.client
 io.encodings.string io.encodings.utf8 json json.http kernel
-mirrors namespaces sequences urls ;
+mirrors namespaces sequences sorting urls ;
 
 IN: openai
 
@@ -41,7 +41,10 @@ SYMBOL: openai-organization
 PRIVATE>
 
 : list-models ( -- models )
-    "models" openai-get "data" of [ "id" of ] map ;
+    "models" openai-get "data" of [ "created" of ] sort-by ;
+
+: list-model-names ( -- names )
+    list-models [ "id" of ] map ;
 
 : retrieve-model ( model-id -- data )
     "models/" prepend openai-get ;
