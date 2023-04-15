@@ -5,7 +5,7 @@ combinators combinators.short-circuit continuations destructors
 formatting hashtables help http http.client http.websockets io
 io.encodings.string io.encodings.utf8 io.streams.string json
 kernel math multiline namespaces prettyprint
-prettyprint.sections random sequences splitting threads
+prettyprint.sections random sequences splitting strings threads
 tools.hexdump unicode vocabs words ;
 IN: discord
 
@@ -22,7 +22,8 @@ TUPLE: discord-bot-config
 TUPLE: discord-bot
     config in out bot-thread heartbeat-thread
     send-heartbeat? reconnect?
-    messages sequence-number
+    sequence-number
+    messages last-message
     application user session_id resume_gateway_url
     guilds channels ;
 
@@ -80,14 +81,16 @@ TUPLE: discord-bot
 : get-discord-channel-pins ( channel-id -- json ) "/channels/%s/pins" sprintf discord-get ;
 : get-discord-channel-messages ( channel-id -- json ) "/channels/%s/messages" sprintf discord-get ;
 : get-discord-channel-message ( channel-id message-id -- json ) "/channels/%s/messages/%s" sprintf discord-get ;
-: send-message ( string channel-id -- json )
+: send-message* ( string channel-id -- json )
     [ "content" associate ] dip "/channels/%s/messages" sprintf discord-post-json ;
+: send-message ( string channel-id -- ) send-message* drop ;
+: reply-message ( string -- ) discord-bot get last-message>> "channel_id" of send-message ;
 : ghosting-payload ( -- string )
     { 124 124 8203 }
     197 [ { 124 124 124 124 8203 } ] replicate concat
     1 [ 124 ] replicate "" 3append-as ;
 
-: ghost-ping ( message who channel-id -- json )
+: ghost-ping ( message who channel-id -- )
     [ ghosting-payload glue ] dip send-message ;
 
 : get-channel-webhooks ( channel-id -- json ) "/channels/%s/webhooks" sprintf discord-get ;
@@ -133,12 +136,8 @@ TUPLE: discord-bot
                 [ send-heartbeat?>> ] [ sequence-number>> ] bi
                 '[
                     _ [
-                        output-stream get disposed>> [
-                            "heartbeat thread: output-stream is disposed, stopping" gprint-flush f
-                        ] [
-                            send-heartbeat t
-                            "sent heartbeat" gprint-flush
-                        ] if
+                        output-stream get disposed>>
+                        [ f ] [ send-heartbeat t ] if
                     ] [ 2drop f ] recover
                 ] [ f ] if
             ] loop
@@ -159,6 +158,31 @@ ENUM: discord-opcode
     { HELLO              10 }
     { HEARTBEAT_ACK      11 }
     { GUILD_SYNC         12 } ;
+
+SINGLETONS:
+    AUTOMOD_ACTION AUTOMOD_RULE_CREATE AUTOMOD_RULE_DELETE AUTOMOD_RULE_UPDATE
+    CHANNEL_CREATE CHANNEL_DELETE CHANNEL_PINS_UPDATE CHANNEL_UPDATE
+    GUILD_AVAILABLE GUILD_BAN_ADD GUILD_BAN_REMOVE
+    GUILD_CHANNEL_CREATE GUILD_CHANNEL_DELETE GUILD_CHANNEL_PINS_UPDATE GUILD_CHANNEL_UPDATE
+    GUILD_CREATE GUILD_EMOJIS_UPDATE GUILD_INTEGRATION_UPDATE GUILD_JOIN
+    GUILD_MEMBER_ADD GUILD_MEMBER_REMOVE GUILD_MEMBER_UPDATE GUILD_REMOVE
+    GUILD_ROLE_CREATE GUILD_ROLE_DELETE GUILD_ROLE_UPDATE
+    GUILD_STICKERS_UPDATE GUILD_UNAVAILABLE GUILD_UPDATE
+    INVITE_CREATE INVITE_DELETE
+    MEMBER_BAN MEMBER_JOIN MEMBER_REMOVE MEMBER_UNBAN MEMBER_UPDATE
+    MESSAGE_CREATE MESSAGE_DELETE MESSAGE_EDIT
+    MESSAGE_REACTION_ADD MESSAGE_REACTION_REMOVE MESSAGE_UPDATE
+    PRESENCE_UPDATE
+    RAW_MESSAGE_DELETE RAW_MESSAGE_EDIT
+    REACTION_ADD REACTION_CLEAR REACTION_REMOVE
+    SCHEDULED_EVENT_CREATE SCHEDULED_EVENT_REMOVE SCHEDULED_EVENT_UPDATE
+    SCHEDULED_EVENT_USER_ADD SCHEDULED_EVENT_USER_REMOVE
+    SHARD_CONNECT SHARD_DISCONNECT
+    SHARD_READY SHARD_RESUMED THREAD_CREATE
+    THREAD_DELETE THREAD_JOIN
+    THREAD_MEMBER_JOIN THREAD_MEMBER_REMOVE THREAD_UPDATE
+    VOICE_SERVER_UPDATE VOICE_STATE_UPDATE
+    READY TYPING_START USER_UPDATE WEBHOOKS_UPDATE ;
 
 : guild-name ( guild-id -- name ) discord-bot get guilds>> at "name" of ;
 : channel-name ( guild-id channel-id -- name ) 2array discord-bot get channels>> at "name" of ;
@@ -201,198 +225,127 @@ ENUM: discord-opcode
 : handle-incoming-message ( guild_id channel_id message_id author content -- )
     5drop ;
 
-: handle-discord-DISPATCH ( json -- )
-    dup "t" of {
-        { "READY" [
-            "READY" gprint-flush
-            discord-bot get swap
-            "d" of
+GENERIC: dispatch-message ( json singleton -- )
+M: object dispatch-message "unhandled: " gwrite name>> gwrite g... ;
+M: string dispatch-message "unhandled string: " gwrite gwrite g... ;
+
+M: READY dispatch-message drop
+    [ discord-bot get ] dip
+    {
+        [ "user" of >>user ]
+        [ "session_id" of >>session_id ]
+        [ "application" of >>application ]
+        [ "resume_gateway_url" of >>resume_gateway_url ]
+    } cleave drop ;
+
+M: AUTOMOD_ACTION dispatch-message 2drop ;
+M: AUTOMOD_RULE_CREATE dispatch-message 2drop ;
+M: AUTOMOD_RULE_UPDATE dispatch-message 2drop ;
+M: AUTOMOD_RULE_DELETE dispatch-message 2drop ;
+M: CHANNEL_CREATE dispatch-message drop handle-channel-message ;
+M: CHANNEL_UPDATE dispatch-message drop handle-channel-message ;
+M: CHANNEL_DELETE dispatch-message drop handle-channel-message ;
+M: CHANNEL_PINS_UPDATE dispatch-message 2drop ;
+M: GUILD_CREATE dispatch-message drop handle-guild-message ;
+M: GUILD_UPDATE dispatch-message drop handle-guild-message ;
+M: GUILD_EMOJIS_UPDATE dispatch-message 2drop ;
+M: GUILD_STICKERS_UPDATE dispatch-message 2drop ;
+M: GUILD_INTEGRATION_UPDATE dispatch-message 2drop ;
+M: GUILD_CHANNEL_CREATE dispatch-message 2drop ;
+M: GUILD_CHANNEL_UPDATE dispatch-message 2drop ;
+M: GUILD_CHANNEL_DELETE dispatch-message 2drop ;
+M: GUILD_CHANNEL_PINS_UPDATE dispatch-message 2drop ;
+M: GUILD_JOIN dispatch-message 2drop ;
+M: GUILD_REMOVE dispatch-message 2drop ;
+M: GUILD_AVAILABLE dispatch-message 2drop ;
+M: GUILD_UNAVAILABLE dispatch-message 2drop ;
+M: GUILD_MEMBER_ADD dispatch-message 2drop ;
+M: GUILD_MEMBER_REMOVE dispatch-message 2drop ;
+M: GUILD_MEMBER_UPDATE dispatch-message 2drop ;
+M: GUILD_BAN_ADD dispatch-message 2drop ;
+M: GUILD_BAN_REMOVE dispatch-message 2drop ;
+M: GUILD_ROLE_CREATE dispatch-message 2drop ;
+M: GUILD_ROLE_UPDATE dispatch-message 2drop ;
+M: GUILD_ROLE_DELETE dispatch-message 2drop ;
+M: INVITE_CREATE dispatch-message 2drop ;
+M: INVITE_DELETE dispatch-message 2drop ;
+M: MEMBER_BAN dispatch-message 2drop ;
+M: MEMBER_UNBAN dispatch-message 2drop ;
+M: MEMBER_JOIN dispatch-message 2drop ;
+M: MEMBER_REMOVE dispatch-message 2drop ;
+M: MEMBER_UPDATE dispatch-message 2drop ;
+M: PRESENCE_UPDATE dispatch-message 2drop ;
+M: RAW_MESSAGE_EDIT dispatch-message 2drop ;
+M: RAW_MESSAGE_DELETE dispatch-message 2drop ;
+M: REACTION_ADD dispatch-message 2drop ;
+M: REACTION_REMOVE dispatch-message 2drop ;
+M: REACTION_CLEAR dispatch-message 2drop ;
+M: SCHEDULED_EVENT_CREATE dispatch-message 2drop ;
+M: SCHEDULED_EVENT_REMOVE dispatch-message 2drop ;
+M: SCHEDULED_EVENT_UPDATE dispatch-message 2drop ;
+M: SCHEDULED_EVENT_USER_ADD dispatch-message 2drop ;
+M: SCHEDULED_EVENT_USER_REMOVE dispatch-message 2drop ;
+M: SHARD_CONNECT dispatch-message 2drop ;
+M: SHARD_DISCONNECT dispatch-message 2drop ;
+M: SHARD_READY dispatch-message 2drop ;
+M: SHARD_RESUMED dispatch-message 2drop ;
+M: THREAD_CREATE dispatch-message 2drop ;
+M: THREAD_JOIN dispatch-message 2drop ;
+M: THREAD_UPDATE dispatch-message 2drop ;
+M: THREAD_DELETE dispatch-message 2drop ;
+M: THREAD_MEMBER_JOIN dispatch-message 2drop ;
+M: THREAD_MEMBER_REMOVE dispatch-message 2drop ;
+M: USER_UPDATE dispatch-message 2drop ;
+M: VOICE_STATE_UPDATE dispatch-message 2drop ;
+M: VOICE_SERVER_UPDATE dispatch-message 2drop ;
+M: WEBHOOKS_UPDATE dispatch-message 2drop ;
+
+M: MESSAGE_CREATE dispatch-message drop
+    [
+        "MESSAGE_CREATE" write bl [
             {
-                [ "user" of >>user ]
-                [ "session_id" of >>session_id ]
-                [ "application" of >>application ]
-                [ "resume_gateway_url" of >>resume_gateway_url ]
-            } cleave drop
-        ] }
-
-        { "AUTOMOD_ACTION" [ drop ] }
-        { "AUTOMOD_RULE_CREATE" [ drop ] }
-        { "AUTOMOD_RULE_UPDATE" [ drop ] }
-        { "AUTOMOD_RULE_DELETE" [ drop ] }
-
-        { "CHANNEL_CREATE" [
-            [
-                "CHANNEL_CREATE:" write bl
-                "d" of handle-channel-message
-            ] with-global
-        ] }
-        { "CHANNEL_UPDATE" [
-            [
-                "CHANNEL_UPDATE:" write bl
-                "d" of handle-channel-message
-            ] with-global
-        ] }
-        { "CHANNEL_DELETE" [
-            [
-                "CHANNEL_DELETE:" write bl
-                "d" of handle-channel-message
-            ] with-global
-        ] }
-        { "CHANNEL_PINS_UPDATE" [
-            [
-                "CHANNEL_PINS_UPDATE:" write bl
-                "d" of {
-                    [ [ "guild_id" of ] [ "channel_id" of ] bi guild-channel-name write bl ]
-                    [ "last_pin_timestamp" of "last_pin_timestamp:`" "`" surround print flush ]
-                } cleave
-            ] with-global
-        ] }
-
-        { "GUILD_CREATE" [
-            [
-                "GUILD_CREATE:" print flush
-                "d" of handle-guild-message
-            ] with-global
-        ] }
-        { "GUILD_UPDATE" [
-            [
-                "GUILD_UPDATE:" print flush
-                "d" of handle-guild-message
-            ] with-global
-        ] }
-        { "GUILD_EMOJIS_UPDATE" [ drop ] }
-        { "GUILD_STICKERS_UPDATE" [ drop ] }
-        { "GUILD_INTEGRATION_UPDATE" [ drop ] }
-        { "GUILD_CHANNEL_CREATE" [ drop ] }
-        { "GUILD_CHANNEL_UPDATE" [ drop ] }
-        { "GUILD_CHANNEL_DELETE" [ drop ] }
-        { "GUILD_CHANNEL_PINS_UPDATE" [ drop ] }
-        { "GUILD_JOIN" [ drop ] }
-        { "GUILD_REMOVE" [ drop ] }
-        { "GUILD_AVAILABLE" [ drop ] }
-        { "GUILD_UNAVAILABLE" [ drop ] }
-        { "GUILD_MEMBER_ADD" [ drop ] }
-        { "GUILD_MEMBER_REMOVE" [ drop ] }
-        { "GUILD_MEMBER_UPDATE" [ drop ] }
-        { "GUILD_BAN_ADD" [ drop ] }
-        { "GUILD_BAN_REMOVE" [ drop ] }
-        { "GUILD_ROLE_CREATE" [ drop ] }
-        { "GUILD_ROLE_UPDATE" [ drop ] }
-        { "GUILD_ROLE_DELETE" [ drop ] }
-
-        { "INVITE_CREATE" [ drop ] }
-        { "INVITE_DELETE" [ drop ] }
-
-        { "MESSAGE_CREATE" [
-            [
-                "MESSAGE_CREATE" write bl
-                "d" of [
-                    {
-                        [ [ "guild_id" of ] [ "channel_id" of ] bi guild-channel-name write bl ]
-                        [ "id" of "id:" prepend write bl ]
-                        [ "author" of "username" of ":" append write bl ]
-                        [ "content" of "`" dup surround print flush ]
-                    } cleave
-                ] [
-                    {
-                        [ [ "guild_id" of ] [ "channel_id" of ] bi ]
-                        [ "id" of ]
-                        [ "author" of "username" of ]
-                        [ "content" of ]
-                    } cleave handle-incoming-message
-                ] bi
-            ] with-global
-        ] }
-        { "MESSAGE_UPDATE" [
-            [
-                "MESSAGE_UPDATE" write bl
-                "d" of
-                {
-                    [ [ "guild_id" of ] [ "channel_id" of ] bi guild-channel-name write bl ]
-                    [ "id" of "id:" prepend write bl ]
-                    [ "author" of "username" of ":" append write bl ]
-                    [ "content" of "`" dup surround print flush ]
-                } cleave
-            ] with-global
-        ] }
-        { "MESSAGE_EDIT" [ drop ] }
-        { "MESSAGE_DELETE" [
-            [
-                "MESSAGE_DELETE" write bl
-                "d" of {
-                    [ [ "guild_id" of ] [ "channel_id" of ] bi guild-channel-name write bl ]
-                    [ "id" of "id:" prepend print flush ]
-                } cleave
-            ] with-global
-        ] }
-
-        { "MESSAGE_REACTION_ADD" [
-            [
-                "MESSAGE_REACTION_ADD" write ...
-            ] with-global
-         ] }
-        { "MESSAGE_REACTION_REMOVE" [
-            [
-                "MESSAGE_REACTION_REMOVE" write ...
-            ] with-global
-        ] }
-
-        { "MEMBER_BAN" [ drop ] }
-        { "MEMBER_UNBAN" [ drop ] }
-        { "MEMBER_JOIN" [ drop ] }
-        { "MEMBER_REMOVE" [ drop ] }
-        { "MEMBER_UPDATE" [ drop ] }
-
-        { "PRESENCE_UPDATE" [ drop ] }
-
-        { "RAW_MESSAGE_EDIT" [ drop ] }
-        { "RAW_MESSAGE_DELETE" [ drop ] }
-
-        { "REACTION_ADD" [ drop ] }
-        { "REACTION_REMOVE" [ drop ] }
-        { "REACTION_CLEAR" [ drop ] }
-
-        { "SCHEDULED_EVENT_CREATE" [ drop ] }
-        { "SCHEDULED_EVENT_REMOVE" [ drop ] }
-        { "SCHEDULED_EVENT_UPDATE" [ drop ] }
-        { "SCHEDULED_EVENT_USER_ADD" [ drop ] }
-        { "SCHEDULED_EVENT_USER_REMOVE" [ drop ] }
-
-        { "SHARD_CONNECT" [ drop ] }
-        { "SHARD_DISCONNECT" [ drop ] }
-        { "SHARD_READY" [ drop ] }
-        { "SHARD_RESUMED" [ drop ] }
-
-        { "THREAD_CREATE" [ drop ] }
-        { "THREAD_JOIN" [ drop ] }
-        { "THREAD_UPDATE" [ drop ] }
-        { "THREAD_DELETE" [ drop ] }
-
-        { "THREAD_MEMBER_JOIN" [ drop ] }
-        { "THREAD_MEMBER_REMOVE" [ drop ] }
-
-        { "TYPING_START" [
-            [
-                "TYPING_START:" write bl
-                "d" of
                 [ [ "guild_id" of ] [ "channel_id" of ] bi guild-channel-name write bl ]
-                [
-                    "member" of [ "nick" of json-null>f ] [ "user" of "username" of ] bi or
-                    " started typing" append print flush
-                ] bi
-            ] with-global
-        ] }
-
-        { "USER_UPDATE" [ drop ] }
-        { "VOICE_STATE_UPDATE" [ drop ] }
-        { "VOICE_SERVER_UPDATE" [ drop ] }
-        { "WEBHOOKS_UPDATE" [ drop ] }
+                [ "id" of "id:" prepend write bl ]
+                [ "author" of "username" of ":" append write bl ]
+                [ "content" of "`" dup surround print flush ]
+            } cleave
+        ] [
+            {
+                [ [ "guild_id" of ] [ "channel_id" of ] bi ]
+                [ "id" of ]
+                [ "author" of "username" of ]
+                [ "content" of ]
+            } cleave handle-incoming-message
+        ] bi
+    ] with-global ;
+M: MESSAGE_UPDATE dispatch-message drop
+    [
+        "MESSAGE_UPDATE" write bl {
+            [ [ "guild_id" of ] [ "channel_id" of ] bi guild-channel-name write bl ]
+            [ "id" of "id:" prepend write bl ]
+            [ "author" of "username" of ":" append write bl ]
+            [ "content" of "`" dup surround print flush ]
+        } cleave
+    ] with-global ;
+M: MESSAGE_EDIT dispatch-message 2drop ;
+M: MESSAGE_DELETE dispatch-message drop
+    [
+        "MESSAGE_DELETE" write bl {
+            [ [ "guild_id" of ] [ "channel_id" of ] bi guild-channel-name write bl ]
+            [ "id" of "id:" prepend print flush ]
+        } cleave
+    ] with-global ;
+M: MESSAGE_REACTION_ADD dispatch-message 2drop ;
+M: MESSAGE_REACTION_REMOVE dispatch-message 2drop ;
+M: TYPING_START dispatch-message drop
+    [
+        "TYPING_START:" write bl
+        [ [ "guild_id" of ] [ "channel_id" of ] bi guild-channel-name write bl ]
         [
-            [
-                write " UHNANDLED" write ... flush
-            ] with-global
-        ]
-    } case ;
+            "member" of [ "nick" of json-null>f ] [ "user" of "username" of ] bi or
+            " started typing" append print flush
+        ] bi
+    ] with-global ;
 
 : handle-discord-RESUME ( json -- ) drop ;
 
@@ -405,30 +358,29 @@ ENUM: discord-opcode
 : handle-discord-HEARTBEAT_ACK ( json -- ) drop ;
 
 : parse-discord-op ( json -- )
-    [ clone now "timestamp" pick set-at discord-bot get messages>> push ] keep
+    [
+        clone now "timestamp" pick set-at discord-bot get
+        [ messages>> push ] [ [ "d" of ] dip last-message<< ] 2bi
+    ] keep
     [ ] [ "s" of discord-bot get sequence-number<< ] [ "op" of ] tri {
         { 0 [
-            [ handle-discord-DISPATCH ]
+            [ "d" of ] [ "t" of [ "discord" lookup-word ] transmute ] bi
+            [ dispatch-message ]
             [
-                [ discord-bot get ] dip over config>> user-callback>>
-                [ [ dup "t" of ] dip call( discord-bot json message-type -- ) ] [ 2drop ] if*
-            ] bi
+                discord-bot get config>> user-callback>>
+                [ call( json message-type -- ) ] [ 2drop ] if*
+            ] 2bi
         ] }
         { 6 [ handle-discord-RESUME ] }
         { 7 [ handle-discord-RECONNECT ] }
         { 10 [ handle-discord-HELLO ] }
         { 11 [ handle-discord-HEARTBEAT_ACK ] }
-        [
-            [
-                "unknown opcode:" write .
-                ... flush
-            ] with-global
-        ]
+        [ "unknown opcode:" gwrite g. g... gflush ]
     } case ;
 
 DEFER: discord-reconnect
 : handle-discord-websocket ( obj opcode -- loop? )
-    [ "opcode: " write dup . over dup byte-array? [ utf8 decode json> ] when ... flush ] with-global
+    ! [ "opcode: " write dup . over dup byte-array? [ utf8 decode json> ] when ... flush ] with-global
     {
         { f [
             [
@@ -490,7 +442,7 @@ M: discord-bot dispose
     \ discord-bot-config [ discord-reconnect ] with-variable ;
 
 : reply-command ( json -- ? )
-    dup "content" of [ blank? ] trim
+    "content" of [ blank? ] trim
     " " split1 [ [ blank? ] trim ] bi@
     swap {
         { "help" [
@@ -498,7 +450,8 @@ M: discord-bot dispose
                 [ [ print-topic ] with-string-writer ]
                 [ 2drop f ] recover
             ] when "vocab:word not found (maybe it's not loaded)" or
-            swap message-channel-id send-message drop t
+            B
+            reply-message t
         ] }
         { "effects" [
             all-words swap '[ name>> _ = ] filter
@@ -506,27 +459,21 @@ M: discord-bot dispose
                 [ vocabulary-name ]
                 [ name>> ":" glue ]
                 [ props>> "declared-effect" of unparse " " glue ] tri
-            ] map [
-                "no words found" swap message-channel-id send-message drop f
-            ] [
-                "\n" join swap message-channel-id send-message drop t
-            ] if-empty
+            ] map
+            [ "no words found" reply-message f ]
+            [ "\n" join reply-message t ] if-empty
         ] }
-        [ 3drop f ]
+        [ 2drop f ]
     } case ;
 
 : reply-echo ( json -- ? )
-    dup message-mentions-me-and-not-from-me? [
-        [ "content" of "echobot sez: " prepend ]
-        [ message-channel-id ] bi send-message drop t
-    ] [
-        drop f
-    ] if ;
+    dup message-mentions-me-and-not-from-me?
+    [ "content" of "echobot sez: " prepend reply-message t ]
+    [ drop f ] if ;
 
-: discord-help-bot-handler ( discord-bot json opcode -- )
-    [ "d" of ] dip {
-        { "MESSAGE_CREATE" [
-            nip { [ reply-command ] [ reply-echo ] } 1|| drop
-        ] }
-        [ 3drop ]
-    } case ;
+GENERIC: discord-help-bot ( json opcode -- )
+
+M: object discord-help-bot 2drop ;
+
+M: MESSAGE_CREATE discord-help-bot drop
+    { [ reply-command ] [ reply-echo ] } 1|| drop ;
