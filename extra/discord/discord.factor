@@ -475,4 +475,5 @@ GENERIC: discord-help-bot ( json opcode -- )
 M: object discord-help-bot 2drop ;
 
 M: MESSAGE_CREATE discord-help-bot drop
-    { [ reply-command ] [ reply-echo ] } 1|| drop ;
+    '[ _ { [ reply-command ] [ reply-echo ] } 1|| drop ]
+    [ g... gflush ] recover ;
