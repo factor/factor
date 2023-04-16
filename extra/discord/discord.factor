@@ -17,7 +17,8 @@ TUPLE: discord-webhook url id token ;
 TUPLE: discord-bot-config
     client-id client-secret
     token application-id guild-id channel-id permissions
-    user-callback obey-names ;
+    user-callback obey-names
+    metadata ;
 
 TUPLE: discord-bot
     config in out bot-thread heartbeat-thread
