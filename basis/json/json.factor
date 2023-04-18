@@ -314,3 +314,6 @@ M: hashtable stream-json-print json-print-assoc ;
 
 M: word stream-json-print
     [ name>> ] dip stream-json-print ;
+
+: ?>json ( obj -- json ) dup string? [ >json ] unless ;
+: ?json> ( obj -- json/f ) f like [ json> ] ?call ;
