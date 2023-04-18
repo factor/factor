@@ -3,8 +3,8 @@
 
 USING: accessors assocs calendar calendar.format
 calendar.holidays.us colors combinators concurrency.combinators
-formatting hashtables http.client io io.styles json kernel make
-math sequences ui ui.theme urls ;
+formatting graphs hashtables http.client io io.styles json
+json.http kernel make math sequences sets ui ui.theme urls ;
 
 IN: hacker-news
 
@@ -13,15 +13,14 @@ CONSTANT: christmas-green COLOR: #376627
 
 <PRIVATE
 : hacker-news-ids ( endpoint -- ids )
-    "https://hacker-news.firebaseio.com/v0/%s.json?print=pretty" sprintf
-    http-get nip json> ;
+    "https://hacker-news.firebaseio.com/v0/%s.json?print=pretty" sprintf json-get ;
 
 : hacker-news-id>json-url ( n -- url )
     "https://hacker-news.firebaseio.com/v0/item/%d.json?print=pretty" sprintf ;
 
 : hacker-news-items ( n endpoint -- seq )
     hacker-news-ids swap index-or-length head
-    [ hacker-news-id>json-url http-get nip json> ] parallel-map ;
+    [ hacker-news-id>json-url json-get ] parallel-map ;
 
 : hacker-news-top-stories ( n -- seq )
     "topstories" hacker-news-items ;
@@ -150,3 +149,17 @@ PRIVATE>
     "Hacker News - Job"
     50 hacker-news-job-stories
     hacker-news. ;
+
+: filter-comments ( seq -- seq' ) "type" of "comment" = ;
+: reject-deleted ( seq -- seq' ) [ "deleted" of ] reject ;
+
+: closure-with ( vertex quot1: ( key -- vertices ) quot2: ( vertex -- keys ) -- set )
+    over '[ @ [ @ _ map ] closure ] call ; inline
+
+: parallel-closure-with ( vertex quot1: ( key -- vertices ) quot2: ( vertex -- edges ) -- set )
+    over '[ @ [ @ _ parallel-map ] closure ] call ; inline
+
+ ! Yes, there is no api that grabs multiple comments in a single call. (4/17/2023)
+: hacker-news-comments ( id -- seq )
+    [ hacker-news-id>json-url json-get ]
+    [ "kids" of ] parallel-closure-with members ;
