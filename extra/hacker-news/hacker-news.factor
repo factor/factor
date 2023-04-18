@@ -13,14 +13,14 @@ CONSTANT: christmas-green COLOR: #376627
 
 <PRIVATE
 : hacker-news-ids ( endpoint -- ids )
-    "https://hacker-news.firebaseio.com/v0/%s.json?print=pretty" sprintf json-get ;
+    "https://hacker-news.firebaseio.com/v0/%s.json?print=pretty" sprintf http-get-json nip ;
 
 : hacker-news-id>json-url ( n -- url )
     "https://hacker-news.firebaseio.com/v0/item/%d.json?print=pretty" sprintf ;
 
 : hacker-news-items ( n endpoint -- seq )
     hacker-news-ids swap index-or-length head
-    [ hacker-news-id>json-url json-get ] parallel-map ;
+    [ hacker-news-id>json-url http-get-json ] parallel-map ;
 
 : hacker-news-top-stories ( n -- seq )
     "topstories" hacker-news-items ;
@@ -161,5 +161,5 @@ PRIVATE>
 
  ! Yes, there is no api that grabs multiple comments in a single call. (4/17/2023)
 : hacker-news-comments ( id -- seq )
-    [ hacker-news-id>json-url json-get ]
+    [ hacker-news-id>json-url http-get-json nip ]
     [ "kids" of ] parallel-closure-with members ;
