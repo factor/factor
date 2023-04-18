@@ -1,8 +1,8 @@
 ! Copyright (C) 2017 Doug Coleman.
 ! See https://factorcode.org/license.txt for BSD license.
 USING: accessors assocs assocs.extras calendar.parser cli.git
-formatting hashtables http.client io.pathnames json kernel math
-math.order namespaces.extras sequences sorting strings urls ;
+formatting hashtables io.pathnames json json.http kernel math
+math.order namespaces.extras sequences sorting urls ;
 IN: github
 
 ! Github API Docs: https://docs.github.com/en/rest
@@ -23,15 +23,6 @@ SYMBOL: github-token
     github-username required >>username
     github-token required >>password ;
 
-: ?>json ( obj -- json ) dup string? [ >json ] unless ;
-: ?json> ( obj -- json/f ) f like [ json> ] ?call ;
-
-: json-get* ( endpoint -- res json ) http-get* ?json> ;
-: json-post* ( post-data endpoint -- res json ) http-post* ?json> ;
-: json-put* ( post-data endpoint -- res json ) http-put* ?json> ;
-: json-patch* ( patch-data endpoint -- res json ) http-patch* ?json> ;
-: json-delete* ( endpoint -- res json ) http-delete* ?json> ;
-
 : github-get* ( url -- res json ) >github-url json-get* ;
 : github-post* ( post-data url -- res json ) [ ?>json ] [ >github-url ] bi* json-post* ;
 : github-put* ( post-data url -- res json ) [ ?>json ] [ >github-url ] bi* json-put* ;
@@ -41,12 +32,6 @@ SYMBOL: github-token
 ! 204 is ok, 404 is not
 : code-ok? ( response -- code ) code>> 204 = ; inline
 : github-get-code ( url -- json ) github-get* drop code-ok? ;
-
-: json-get ( endpoint -- json ) http-get nip ?json> ;
-: json-post ( post-data endpoint -- json ) http-post nip ?json> ;
-: json-put ( post-data endpoint -- json ) http-put nip ?json> ;
-: json-patch ( patch-data endpoint -- json ) http-patch nip ?json> ;
-: json-delete ( endpoint -- json ) http-delete nip ?json> ;
 
 : github-get ( url -- json ) >github-url json-get ;
 : github-post ( post-data url -- json ) [ ?>json ] [ >github-url ] bi* json-post ;
