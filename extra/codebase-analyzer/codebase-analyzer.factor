@@ -155,6 +155,10 @@ IN: codebase-analyzer
 : nmake-files ( paths -- paths' ) [ nmake-file? ] filter ;
 : uses-nmake? ( paths -- ? ) [ nmake-file? ] any? ;
 
+: gradle-file? ( path -- ? ) >lower { [ "gradle" head? ] [ ".gradle" tail? ] } 1|| ;
+: gradle-files ( paths -- paths' ) [ gradle-file? ] filter ;
+: uses-gradle? ( paths -- ? ) [ gradle-file? ] any? ;
+
 : web-file? ( path -- ? )
     >lower file-extension
     {
@@ -210,6 +214,7 @@ IN: codebase-analyzer
         [ make-files [ "uses make" print ... ] unless-empty ]
         [ nmake-files [ "uses nmake" print ... ] unless-empty ]
         [ cmake-files [ "uses cmake" print ... ] unless-empty ]
+        [ gradle-files [ "uses gradle" print ... ] unless-empty ]
         [ in-files [ "uses 'in' files" print ... ] unless-empty ]
         [ ignore-files [ [ length "has %d ignore files" sprintf print ] [ ... ] bi ] unless-empty nl ]
         [
