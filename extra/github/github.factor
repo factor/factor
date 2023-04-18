@@ -73,11 +73,33 @@ SYMBOL: github-token
 : list-repository-tags ( owner repo -- seq )
     "/repos/%s/%s/tags" sprintf github-get ;
 
+: list-repository-tags-all ( owner repo -- seq )
+    "/repos/%s/%s/git/refs/tags" sprintf github-get ;
+
+: list-repository-branches-matching ( owner repo ref -- seq )
+    "/repos/%s/%s/git/matching-refs/heads/%s" sprintf github-get ;
+
+: list-repository-tags-matching ( owner repo ref -- seq )
+    "/repos/%s/%s/git/matching-refs/tags/%s" sprintf github-get ;
+
 : list-repository-teams ( owner repo -- seq )
     "/repos/%s/%s/teams" sprintf github-get ;
 
 : list-repository-topics ( owner repo -- seq )
     "/repos/%s/%s/topics" sprintf github-get ;
+
+: github-file* ( owner repo path -- meta contents )
+    "/repos/%s/%s/contents/%s" sprintf github-get
+    dup "download_url" of http-get nip ;
+
+: github-file ( owner repo path -- contents )
+    github-file* nip ;
+
+: github-code-search ( query -- seq )
+    "/search/code?q=%s" sprintf github-get ;
+
+: github-factor-code-search ( query -- seq )
+    "/search/code?q=%s+language:factor" sprintf github-get ;
 
 : check-enabled-vulnerability-alerts ( owner repo -- json )
     "/repos/%s/%s/vulnerability-alerts" sprintf github-get-code ;
