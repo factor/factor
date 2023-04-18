@@ -1,9 +1,10 @@
 ! Copyright (C) 2023 Doug Coleman.
 ! See https://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs cli.git combinators
-combinators.short-circuit formatting http.client io.directories
-io.files io.files.info io.files.temp io.launcher io.pathnames
-kernel layouts math namespaces sequences sorting.human
+combinators.short-circuit continuations formatting github
+http.client io.directories io.files io.files.info io.files.temp
+io.launcher io.pathnames json kernel layouts math namespaces
+semver sequences sequences.extras sorting sorting.human
 sorting.specification splitting system unicode ;
 IN: build-from-source
 
@@ -100,8 +101,20 @@ ERROR: no-output-file path ;
     { human<=> } sort-keys-with-spec
     last second human-sort last fourth ;
 
-: latest-python2 ( tags -- tag )
-    [ "v2." head? ] filter latest-python ;
+: latest-semver-tags-matching ( owner repo tag-head -- ref-json/f semver/f )
+    list-repository-tags-matching
+    [ "ref" of "/" split1-last nip [ >semver ] [ 2drop f ] recover ] zip-with
+    sift-values sort-values ?last ?first2 ;
 
-: latest-python3 ( tags -- tag )
-    [ "v3." head? ] filter latest-python ;
+: latest-solr ( -- tag-json semver ) "apache" "solr" "releases/solr" latest-semver-tags-matching ;
+: latest-lucene ( -- tag-json semver ) "apache" "lucene" "releases/lucene" latest-semver-tags-matching ;
+
+: python-tags ( -- tags )
+    "python" "cpython" "v" list-repository-tags-matching
+    [ "ref" of ] map
+    [ "refs/tags/" ?head drop ] map ;
+
+: tags>latest-python2 ( tags -- tag ) [ "v2." head? ] filter latest-python ;
+: latest-python2 ( -- tag ) python-tags tags>latest-python2 ;
+: tags>latest-python3 ( tags -- tag ) [ "v3." head? ] filter latest-python ;
+: latest-python3 ( -- tag ) python-tags tags>latest-python3 ;
