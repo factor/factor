@@ -17,12 +17,13 @@ HOOK: ssl-certificate-verification-supported? secure-socket-backend ( -- ? )
 M: object ssl-supported? f ;
 M: object ssl-certificate-verification-supported? f ;
 
-SINGLETONS: TLSv1 TLSv1.1 TLSv1.2 ;
+SINGLETONS: TLSv1 TLSv1.1 TLSv1.2 TLS ;
 
 ERROR: no-tls-supported ;
 
 MEMO: best-tls-method ( -- class )
     {
+        { [ "TLS_method" "libssl" dlsym? ] [ TLS ] }
         { [ "TLSv1_2_method" "libssl" dlsym? ] [ TLSv1.2 ] }
         { [ "TLSv1_1_method" "libssl" dlsym? ] [ TLSv1.1 ] }
         { [ "TLSv1_method" "libssl" dlsym? ] [ TLSv1 ] }

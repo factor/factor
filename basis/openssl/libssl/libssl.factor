@@ -400,7 +400,7 @@ FUNCTION: int SSL_library_init ( )
 FUNCTION: void SSL_load_error_strings ( )
 ! ------------------------------------------------------------------------------
 
-! Sets the default SSL version
+! Sets the default SSL version (deprecated)
 FUNCTION: ssl-method SSLv2_client_method ( )
 FUNCTION: ssl-method SSLv23_client_method ( )
 FUNCTION: ssl-method SSLv23_server_method ( )
@@ -413,6 +413,10 @@ FUNCTION: ssl-method TLSv1_server_method ( )
 FUNCTION: ssl-method TLSv1_method ( )
 FUNCTION: ssl-method TLSv1_1_method ( )
 FUNCTION: ssl-method TLSv1_2_method ( )
+! Preferred, uses TLSv1.3 if available
+FUNCTION: ssl-method TLS_method ( )
+FUNCTION: ssl-method TLS_client_method ( )
+FUNCTION: ssl-method TLS_server_method ( )
 
 CONSTANT: DTLS1_VERSION_MAJOR 0xfe
 CONSTANT: SSL3_VERSION_MAJOR 0x03
@@ -697,3 +701,10 @@ FUNCTION: int sk_num ( _STACK* s )
 FUNCTION: void* sk_value ( _STACK* s, int v )
 
 ! ------------------------------------------------------------------------------
+
+! For TLSv1.3
+FUNCTION: void SSL_CTX_set_ciphersuites ( SSL_CTX *ctx, char *ciphersuites )
+FUNCTION: int SSL_set_ciphersuites ( SSL *ssl, char *ciphersuites )
+FUNCTION: void SSL_set_SSL_CTX ( SSL *ssl, SSL_CTX *ctx )
+FUNCTION: int SSL_set1_host ( SSL *ssl, char *hostname )
+FUNCTION: int SSL_do_handshake ( SSL *ssl )

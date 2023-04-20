@@ -22,8 +22,8 @@ maybe-init-ssl
 : new-ctx ( method -- ctx )
     SSL_CTX_new &SSL_CTX_free ;
 
-: new-tls1-ctx ( -- ctx )
-    TLSv1_client_method new-ctx ;
+: new-tls-ctx ( -- ctx )
+    TLS_client_method new-ctx ;
 
 : new-ssl ( ctx -- ssl )
     SSL_new &SSL_free ;
@@ -32,14 +32,14 @@ maybe-init-ssl
     { f f f }
 } [
     [
-        new-tls1-ctx tls-opts [ has-opt ] with map
+        new-tls-ctx tls-opts [ has-opt ] with map
     ] with-destructors
 ] unit-test
 
 ! Test setting options
 { t } [
     [
-        new-tls1-ctx tls-opts [ [ set-opt ] [ has-opt ] 2bi ] with map
+        new-tls-ctx tls-opts [ [ set-opt ] [ has-opt ] 2bi ] with map
         [ t = ] count
     ] with-destructors
     ssl-new-api? get-global 0 3 ? =
@@ -47,7 +47,7 @@ maybe-init-ssl
 
 ! Initial state
 { t } [
-    [ new-tls1-ctx new-ssl SSL_state_string_long ] with-destructors
+    [ new-tls-ctx new-ssl SSL_state_string_long ] with-destructors
     ssl-new-api? get-global
     "before SSL initialization" "before/connect initialization" ? =
 ] unit-test
@@ -56,7 +56,7 @@ maybe-init-ssl
     { "read header" 1 }
 } [
     [
-        new-tls1-ctx new-ssl {
+        new-tls-ctx new-ssl {
             SSL_rstate_string_long
             SSL_want
         } [ execute( x -- x ) ] with map
@@ -65,6 +65,6 @@ maybe-init-ssl
 
 { f } [
     [
-        new-tls1-ctx new-ssl get-ssl-peer-certificate
+        new-tls-ctx new-ssl get-ssl-peer-certificate
     ] with-destructors
 ] unit-test
