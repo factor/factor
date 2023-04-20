@@ -12,6 +12,7 @@ unicode ;
 IN: io.sockets.secure.openssl
 
 GENERIC: ssl-method ( symbol -- method )
+M: TLS ssl-method drop TLS_method ;
 M: TLSv1 ssl-method drop TLSv1_method ;
 M: TLSv1.1 ssl-method drop TLSv1_1_method ;
 M: TLSv1.2 ssl-method drop TLSv1_2_method ;
