@@ -159,6 +159,18 @@ IN: codebase-analyzer
 : gradle-files ( paths -- paths' ) [ gradle-file? ] filter ;
 : uses-gradle? ( paths -- ? ) [ gradle-file? ] any? ;
 
+: github-file? ( path -- ? ) >lower ".github" swap subseq? ;
+: github-files ( paths -- paths' ) [ github-file? ] filter ;
+: has-github-files? ( paths -- ? ) [ github-file? ] any? ;
+
+: cargo-file? ( path -- ? ) file-name { "Cargo.toml" "Cargo.lock" } member? ;
+: cargo-files ( paths -- paths' ) [ cargo-file? ] filter ;
+: has-cargo-files? ( paths -- ? ) [ cargo-file? ] any? ;
+
+: julia-project-file? ( path -- ? ) file-name { "Project.toml" } member? ;
+: julia-project-files ( paths -- paths' ) [ julia-project-file? ] filter ;
+: has-julia-project-files? ( paths -- ? ) [ julia-project-file? ] any? ;
+
 : web-file? ( path -- ? )
     >lower file-extension
     {
@@ -202,6 +214,7 @@ IN: codebase-analyzer
             [ length "%d binary files" sprintf print ]
             [ length "%d text files" sprintf print ] bi*
         ]
+        [ github-files [ "has .github files" print ... ] unless-empty ]
         [ license-files [ [ length "has %d license files" sprintf print ] [ ... ] bi ] unless-empty ]
         [ readme-files [ "has readme files" print ... ] unless-empty ]
         [
@@ -215,6 +228,8 @@ IN: codebase-analyzer
         [ nmake-files [ "uses nmake" print ... ] unless-empty ]
         [ cmake-files [ "uses cmake" print ... ] unless-empty ]
         [ gradle-files [ "uses gradle" print ... ] unless-empty ]
+        [ cargo-files [ "uses rust/cargo" print ... ] unless-empty ]
+        [ julia-project-files [ "uses julia Project.toml" print ... ] unless-empty ]
         [ in-files [ "uses 'in' files" print ... ] unless-empty ]
         [ ignore-files [ [ length "has %d ignore files" sprintf print ] [ ... ] bi ] unless-empty nl ]
         [
