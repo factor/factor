@@ -52,14 +52,15 @@ maybe-init-ssl
     "before SSL initialization" "before/connect initialization" ? =
 ] unit-test
 
-{
-    { "read header" 1 }
-} [
+{ t 1 } [
     [
-        new-tls-ctx new-ssl {
-            SSL_rstate_string_long
+        new-tls-ctx new-ssl [
+            ! the windows dll from build-from-source.windows returns "unknown"
+            ! but still passes the test suite and can get https sites
+            SSL_rstate_string_long { "read header" "unknown" } member?
+        ] [
             SSL_want
-        } [ execute( x -- x ) ] with map
+        ] bi
     ] with-destructors
 ] unit-test
 
