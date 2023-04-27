@@ -235,3 +235,5 @@ SYMBOL: github-token
 : github-git-clone ( org/user project -- process ) dup github-git-clone-as ;
 : github-ssh-clone ( org/user project -- process ) dup github-ssh-clone-as ;
 
+: github-http-uri ( org/user project -- uri ) "http://github.com/%s/%s" sprintf ;
+: github-https-uri ( org/user project -- uri ) "https://github.com/%s/%s" sprintf ;
