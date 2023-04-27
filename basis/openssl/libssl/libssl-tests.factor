@@ -55,9 +55,7 @@ maybe-init-ssl
 { t 1 } [
     [
         new-tls-ctx new-ssl [
-            ! the windows dll from build-from-source.windows returns "unknown"
-            ! but still passes the test suite and can get https sites
-            SSL_rstate_string_long { "read header" "unknown" } member?
+            SSL_rstate_string_long "read header" =
         ] [
             SSL_want
         ] bi
