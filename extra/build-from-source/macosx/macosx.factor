@@ -7,7 +7,7 @@ IN: build-from-source.macosx
 
 ! brew install pkg-config openssl@1.1 xz gdbm tcl-tk
 : build-python3-lib ( -- )
-    "https://github.com/python/cpython" "cpython3" [
+    "python" "cpython" "cpython3" [
         latest-python3 git-checkout-existing* drop
         H{ } clone
         { "brew" "--prefix" "gdbm" } process-contents
@@ -23,4 +23,4 @@ IN: build-from-source.macosx
             "--with-openssl=%s" sprintf suffix
         >>command try-process
         { "make" "-j" } try-process
-    ] with-updated-git-repo-as ;
+    ] with-updated-github-repo-as ;
