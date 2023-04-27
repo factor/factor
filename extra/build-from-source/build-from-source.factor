@@ -1,12 +1,16 @@
 ! Copyright (C) 2023 Doug Coleman.
 ! See https://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs cli.git combinators
-combinators.short-circuit continuations formatting github
-http.client io.directories io.files io.files.info io.files.temp
-io.launcher io.pathnames json kernel layouts math namespaces
-semver sequences sequences.extras sorting sorting.human
-sorting.specification splitting system unicode ;
+combinators.extras combinators.short-circuit continuations
+formatting github http.client io.directories io.files
+io.files.info io.files.temp io.launcher io.pathnames json kernel
+layouts math namespaces namespaces.extras semver sequences
+sequences.extras sorting sorting.human sorting.specification
+splitting system unicode ;
 IN: build-from-source
+
+INITIALIZED-SYMBOL: use-gitlab-git-uris [ f ]
+INITIALIZED-SYMBOL: use-github-git-uris [ t ]
 
 : dll-out-directory ( -- path )
     vm-path parent-directory cell-bits "dlls%s-out" sprintf append-path
@@ -48,31 +52,79 @@ ERROR: no-output-file path ;
 
 : with-build-directory ( quot -- ) [ "build" ] dip with-build-directory-as ; inline
 
-: empty-directory? ( path -- ? )
-    { [ directory? ] [ directory-files empty? ] } 1&& ;
-
-! Windows clears the Factor temp directory but leaves the directory names (?)
-! C:\Users\sheeple\AppData\Local\Temp\factorcode.org\Factor>
-: ?sync-repository-as ( url path -- )
-    dup { [ git-directory? ] [ ".git" append-path empty-directory? not ] } 1&&
-    [ dup ?delete-tree ] unless
-    sync-repository-as wait-for-success ;
-
 : temp-directory-cpu ( -- path )
     temp-directory cpu name>> append-path ;
 
 : with-temp-cpu-directory ( quot -- )
-    [ temp-directory-cpu ] dip with-directory ; inline
+    [ temp-directory-cpu dup make-directories ] dip with-directory ; inline
 
-: with-updated-git-repo-as ( git-uri path quot -- )
-    temp-directory-cpu make-directories
+: temp-directory-gitlab ( -- path )
+    temp-directory "gitlab" append-path ;
+
+: with-temp-gitlab-org-directory ( base org/user quot -- )
+    [ append-path temp-directory-gitlab prepend-path dup make-directories ] dip with-directory ; inline
+
+: gitlab-git-uri ( base org/user project -- uri ) "git://%s/%s/%s" sprintf ;
+: gitlab-http-uri ( base org/user project -- uri ) "http://%s/%s/%s" sprintf ;
+: gitlab-https-uri ( base org/user project -- uri ) "https://%s/%s/%s" sprintf ;
+
+: gitlab-uri ( base org/user project -- uri )
+    use-gitlab-git-uris get [ gitlab-git-uri ] [ gitlab-https-uri ] if ;
+
+! "gitlab.freedesktop.org" "cairo" "cairo"
+: sync-gitlab-pristine-repository-as ( base org/user project -- )
+    [ drop ] [ gitlab-uri ] 3bi
     '[
-        _ _ [ ?sync-repository-as ] keep
-        prepend-current-path _ with-directory
+        _ sync-repository wait-for-success
+    ] with-temp-gitlab-org-directory ;
+
+: sync-gitlab-pristine-and-clone-build-repository-as ( base org/user project build-path -- build-path )
+    [ drop sync-gitlab-pristine-repository-as ]
+    [ [ append-path append-path temp-directory-gitlab prepend-path ] dip ] 4bi
+    '[
+        _ _ [ ?delete-tree ] [ git-clone-as wait-for-success ] [ ] tri
+    ] with-temp-cpu-directory ;
+
+: with-updated-gitlab-repo-as ( base org/user project build-path-as quot -- )
+    [ sync-gitlab-pristine-and-clone-build-repository-as ] dip
+    '[
+        _ prepend-current-path _ with-directory
     ] with-temp-cpu-directory ; inline
 
-: with-updated-git-repo ( git-uri quot -- )
-    [ dup git-directory-name ] dip with-updated-git-repo-as ; inline
+: with-updated-gitlab-repo ( base org/user project quot -- )
+    [ dup git-directory-name ] dip with-updated-gitlab-repo-as ; inline
+
+: temp-directory-github ( -- path )
+    temp-directory "github" append-path ;
+
+: with-temp-github-directory ( org/user quot -- )
+    [ temp-directory-github prepend-path dup make-directories ] dip with-directory ; inline
+
+: github-uri ( org/user project -- uri )
+    use-github-git-uris get [ github-git-uri ] [ github-https-uri ] if ;
+
+: sync-github-pristine-repository-as ( org/user project -- )
+    [ drop ] [ github-uri ] [ nip ] 2tri
+    '[
+        _ _ sync-repository-as wait-for-success
+    ] with-temp-github-directory ;
+
+! "factor" "vscode-factor" "factor-buildme-here"
+: sync-github-pristine-and-clone-build-repository-as ( org/user project build-path -- build-path )
+    [ drop sync-github-pristine-repository-as ]
+    [ [ append-path temp-directory-github prepend-path ] dip ] 3bi
+    '[
+        _ _ [ ?delete-tree ] [ git-clone-as wait-for-success ] [ ] tri
+    ] with-temp-cpu-directory ;
+
+: with-updated-github-repo-as ( org/user project build-path-as quot -- )
+    [ sync-github-pristine-and-clone-build-repository-as ] dip
+    '[
+        _ prepend-current-path _ with-directory
+    ] with-temp-cpu-directory ; inline
+
+: with-updated-github-repo ( org/user project quot -- )
+    [ dup git-directory-name ] dip with-updated-github-repo-as ; inline
 
 : ?download ( path -- )
     dup file-name file-exists? [ drop ] [ download ] if ; inline
