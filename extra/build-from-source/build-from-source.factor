@@ -10,7 +10,7 @@ splitting system unicode ;
 IN: build-from-source
 
 INITIALIZED-SYMBOL: use-gitlab-git-uris [ f ]
-INITIALIZED-SYMBOL: use-github-git-uris [ t ]
+INITIALIZED-SYMBOL: use-github-git-uris [ f ]
 
 : dll-out-directory ( -- path )
     vm-path parent-directory cell-bits "dlls%s-out" sprintf append-path
