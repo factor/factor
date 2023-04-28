@@ -51,10 +51,8 @@ TUPLE: secure-context < disposable config handle ;
 HOOK: <secure-context> secure-socket-backend ( config -- context )
 
 : with-secure-context ( config quot -- )
-    [
-        [ <secure-context> ] [ [ secure-context set ] prepose ] bi*
-        with-disposal
-    ] with-scope ; inline
+    [ <secure-context> ] dip
+    '[ secure-context _ with-variable ] with-disposal ; inline
 
 TUPLE: secure
     { addrspec read-only }
