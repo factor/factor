@@ -39,7 +39,7 @@ $nl
         "] [ \"No solution.\" print ] if-amb drop"
         "23 chickens, 7 cows"
     }
-    "See more examples here: " { $url "https://re-factor.blogspot.com/search?q=backtrack" }
+    "See more examples here: " { $url "https://re.factorcode.org/tags/backtrack.html" }
 } ;
 
 HELP: fail

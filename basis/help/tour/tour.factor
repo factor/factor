@@ -645,7 +645,7 @@ You have seen some examples of this:
 }
 
 The refresh is an efficient mechanism. Whenever a word is redefined, words that depend on it are recompiled against the new 
-defition. You can check by yourself doing
+definition. You can check by yourself doing
 
 { $code "
 : inc ( x -- y ) 1 + ;
@@ -814,7 +814,7 @@ If you try it with { $snippet "DNA{ a ccg t a g }" } you should get
 " }
 
 Let us try an example from the { $url
-"https://re-factor.blogspot.com/2014/06/swift-ranges.html" "Re: Factor" } blog,
+"https://re.factorcode.org/2014/06/swift-ranges.html" "Re: Factor" } blog,
 which adds infix syntax for ranges. Until now, we have used { $link [a..b] } to create a range. We can make a 
 syntax that is friendlier to people coming from other languages using { $snippet "..." } as an infix word.
 
@@ -911,7 +911,7 @@ position, and then use { $link call } to evaluate the resulting quotation. The s
 [ '[ _ swap divisor? ] ]
 " }
 
-so an alternative defition of { $snippet "prime?" } is
+so an alternative definition of { $snippet "prime?" } is
 
 { $code "
 : prime? ( n -- ? )
@@ -979,7 +979,7 @@ one is executed, and on failure, the second one is executed with the error as in
 { $code "
 : safe-head ( seq n -- seq' ) [ head ] [ 2drop ] recover ;" }
 
-This is an impractical example of exceptions, as Factor defines the { $link short } word, which takes a 
+This is an impractical example of exceptions, as Factor defines the { $link index-or-length } word, which takes a 
 sequence and a number, and returns the minimum between the length of the sequence and the number. This allows us to write simply
 
 { $code "
@@ -990,7 +990,7 @@ With this definition, we can make a word to read the first character of the firs
 { $code "
 : read-first-letters ( path -- )
     utf8 <file-reader> [
-        readln 1 safe-head write nl
+        readln 1 safe-head print
     ] with-input-stream ;" }
 
 Using the helper word { $link with-file-reader } , we can also shorten this to
@@ -998,7 +998,7 @@ Using the helper word { $link with-file-reader } , we can also shorten this to
 { $code "
 : read-first-letters ( path -- )
     utf8 [
-        readln 1 safe-head write nl
+        readln 1 safe-head print
     ] with-file-reader ;" }
 
 Unfortunately, we are limited to one line. To read more lines, we should chain calls to { $link readln } until one returns { $link f } .
@@ -1006,7 +1006,7 @@ Factor helps us with { $link file-lines } , which lazily iterates "over" lines. 
 
 { $code "
 : read-first-letters ( path -- )
-    utf8 file-lines [ 1 safe-head write nl ] each ;" }
+    utf8 file-lines [ 1 safe-head print ] each ;" }
 
 When the file is small, one can also use { $link file-contents } to read the whole contents of a file in a single string. 
 Factor defines many more words for input/output, which cover many more cases, such as binary files or sockets.
@@ -1027,12 +1027,12 @@ With this, we can define a word { $snippet "ls" } that will print directory cont
 { $code "
 : ls ( path -- )
     list-files-and-dirs
-    \"DIRECTORIES:\" write nl
-    \"------------\" write nl
-    [ name>> write nl ] each
-    \"FILES:\" write nl
-    \"------\" write nl
-    [ name>> write nl ] each ;" }
+    \"DIRECTORIES:\" print
+    \"------------\" print
+    [ name>> print ] each
+    \"FILES:\" print
+    \"------\" print
+    [ name>> print ] each ;" }
 
 Try the word on your home directory to see the effects. In the next section, we shall look at how to create an 
 executable for our simple program.
@@ -1064,12 +1064,12 @@ PRIVATE>
 
 : ls ( path -- )
     list-files-and-dirs
-    \"DIRECTORIES:\" write nl
-    \"------------\" write nl
-    [ name>> write nl ] each
-    \"FILES:\" write nl
-    \"------\" write nl
-    [ name>> write nl ] each ;" }
+    \"DIRECTORIES:\" print
+    \"------------\" print
+    [ name>> print ] each
+    \"FILES:\" print
+    \"------\" print
+    [ name>> print ] each ;" }
 
 When we run our vocabulary, we will need to read arguments from the command line. Command-line arguments are stored 
 under the { $link command-line } dynamic variable, which holds an array of strings. Hence - forgetting any error checking - we can 
