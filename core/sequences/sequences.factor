@@ -275,7 +275,7 @@ TUPLE: repetition
     { elt read-only } ;
 
 : <repetition> ( len elt -- repetition )
-    over 0 < [ non-negative-integer-expected ] when
+    over 0 < [ non-negative-number-expected ] when
     repetition boa ; inline
 
 M: repetition length length>> ; inline

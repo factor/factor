@@ -21,11 +21,9 @@ MACRO: call-n ( n -- quot )
 MACRO: nsum ( n -- quot )
     1 - [ + ] n*quot ;
 
-ERROR: nonpositive-npick n ;
-
 MACRO: npick ( n -- quot )
     {
-        { [ dup 0 <= ] [ nonpositive-npick ] }
+        { [ dup 0 <= ] [ positive-number-expected ] }
         { [ dup 1 = ] [ drop [ dup ] ] }
         [ 1 - [ dup ] [ '[ _ dip swap ] ] swapd times ]
     } cond ;

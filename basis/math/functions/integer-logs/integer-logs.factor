@@ -73,8 +73,6 @@ M: bignum (integer-log10) bignum-integer-log10 ; inline
 
 PRIVATE>
 
-ERROR: log-expects-positive x ;
-
 <PRIVATE
 
 GENERIC: (integer-log2) ( x -- n ) foldable
@@ -102,7 +100,7 @@ M: ratio (integer-log10) [ (integer-log10) ] 10 (ratio-integer-log) ;
 PRIVATE>
 
 : integer-log10 ( x -- n )
-    [ (integer-log10) ] (integer-log) ; inline
+    assert-positive (integer-log10) ; inline
 
 : integer-log2 ( x -- n )
-    [ (integer-log2) ] (integer-log) ; inline
+    assert-positive (integer-log2) ; inline

@@ -491,13 +491,6 @@ HELP: integer>fixnum-strict
 }
 { $description "Converts a general integer to a fixed-width integer." } ;
 
-HELP: log2-expects-positive
-{ $values
-    { "x" object }
-}
-{ $description "Throws a " { $link log2-expects-positive } " error." }
-{ $see-also log2 } ;
-
 HELP: neg?
 { $values
     { "x" object }

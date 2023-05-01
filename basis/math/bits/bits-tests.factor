@@ -11,7 +11,7 @@ USING: tools.test math math.bits sequences arrays ;
 { 1 } [ 0 make-bits length ] unit-test
 { 1 } [ 1 make-bits length ] unit-test
 { 2 } [ 3 make-bits length ] unit-test
-[ -3 make-bits length ] [ non-negative-integer-expected? ] must-fail-with
+[ -3 make-bits length ] [ non-negative-number-expected? ] must-fail-with
 
 ! Odd bug
 { t } [
