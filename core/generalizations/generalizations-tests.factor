@@ -6,8 +6,8 @@ IN: generalizations.tests
 { 1 2 3 4 2 } [ 1 2 3 4 3 npick ] unit-test
 { 1 2 3 4 3 } [ 1 2 3 4 2 npick ] unit-test
 { 1 2 3 4 4 } [ 1 2 3 4 1 npick ] unit-test
-[ 1 2 3 4 0 npick ] [ nonpositive-npick? ] must-fail-with
-[ 1 2 3 4 -11 npick ] [ nonpositive-npick? ] must-fail-with
+[ 1 2 3 4 0 npick ] [ positive-number-expected? ] must-fail-with
+[ 1 2 3 4 -11 npick ] [ positive-number-expected? ] must-fail-with
 
 [ 1 1 ndup ] must-infer
 { 1 1 } [ 1 1 ndup ] unit-test
