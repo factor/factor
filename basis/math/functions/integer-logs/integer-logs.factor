@@ -94,9 +94,6 @@ M: ratio (integer-log2) [ (integer-log2) ] 2 (ratio-integer-log) ;
 
 M: ratio (integer-log10) [ (integer-log10) ] 10 (ratio-integer-log) ;
 
-: (integer-log) ( x quot -- n )
-    [ dup 0 > ] dip [ log-expects-positive ] if ; inline
-
 PRIVATE>
 
 : integer-log10 ( x -- n )
