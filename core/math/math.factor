@@ -131,19 +131,25 @@ GENERIC: (log2) ( x -- n ) foldable
 
 PRIVATE>
 
-ERROR: non-negative-integer-expected n ;
+ERROR: non-negative-number-expected n ;
 
 : assert-non-negative ( n -- n )
-    dup 0 < [ non-negative-integer-expected ] when ; inline
+    dup 0 < [ non-negative-number-expected ] when ; inline
+
+ERROR: positive-number-expected n ;
+
+: assert-positive ( n -- n )
+    dup 0 > [ positive-number-expected ] unless ; inline
+
+ERROR: negative-number-expected n ;
+
+: assert-negative ( n -- n )
+    dup 0 < [ negative-number-expected ] unless ; inline
 
 : recursive-hashcode ( n obj quot -- code )
     pick 0 <= [ 3drop 0 ] [ [ 1 - ] 2dip call ] if ; inline
 
-ERROR: log2-expects-positive x ;
-
-: log2 ( x -- n )
-    dup 0 <= [ log2-expects-positive ] [ (log2) ] if ; inline
-
+: log2 ( x -- n ) assert-positive (log2) ; inline
 : zero? ( x -- ? ) 0 number= ; inline
 : 2/ ( x -- y ) -1 shift ; inline
 : sq ( x -- y ) dup * ; inline

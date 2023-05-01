@@ -75,8 +75,8 @@ SPECIALIZED-ARRAY: uint-4
 { 6 } [ 5 next-even ] unit-test
 { 8 } [ 6 next-even ] unit-test
 
-[ -1 bit-count ] [ non-negative-integer-expected? ] must-fail-with
-[ -1 bit-length ] [ non-negative-integer-expected? ] must-fail-with
+[ -1 bit-count ] [ non-negative-number-expected? ] must-fail-with
+[ -1 bit-length ] [ non-negative-number-expected? ] must-fail-with
 
 { 0b1111 } [ 4 on-bits ] unit-test
 { 0 } [ 0 on-bits ] unit-test

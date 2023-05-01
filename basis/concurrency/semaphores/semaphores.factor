@@ -6,14 +6,8 @@ IN: concurrency.semaphores
 
 TUPLE: semaphore count threads ;
 
-ERROR: negative-count-semaphore ;
-
-M: negative-count-semaphore summary
-    drop "Cannot have semaphore with negative count" ;
-
 : <semaphore> ( n -- semaphore )
-    dup 0 < [ negative-count-semaphore ] when
-    <dlist> semaphore boa ;
+    assert-non-negative <dlist> semaphore boa ;
 
 : wait-to-acquire ( semaphore timeout -- )
     [ threads>> ] dip "semaphore" wait ;
