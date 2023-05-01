@@ -3,15 +3,13 @@
 
 USING: accessors alien.c-types alien.data alien.strings arrays
 assocs byte-arrays combinators combinators.short-circuit
-destructors grouping io.encodings.string io.encodings.utf8
-kernel literals make math pcre2.ffi regexp sequences
-specialized-arrays splitting strings ;
+destructors endian grouping io.encodings.string
+io.encodings.utf8 kernel literals make math pcre2.ffi regexp
+sequences specialized-arrays splitting strings ;
 
 SPECIALIZED-ARRAY: PCRE2_SIZE
 
 IN: pcre2
-
-! XXX: implement nametable for named captures
 
 ERROR: pcre2-error number offset ;
 
@@ -22,6 +20,12 @@ M: pcre2 dispose* handle>> pcre2_code_free ;
 ERROR: bad-option what ;
 
 <PRIVATE
+
+: replace-all ( seq subseqs new -- seq )
+    swapd '[ _ replace ] reduce ;
+
+: split-subseqs ( seq subseqs -- seqs )
+    dup first [ replace-all ] keep split-subseq [ >string ] map harvest ;
 
 : check-bad-option ( err value what -- value )
     rot 0 = [ drop ] [ bad-option ] if ;
@@ -56,16 +60,31 @@ ERROR: bad-option what ;
         [ int deref ] [ PCRE2_SIZE deref ] bi* pcre2-error
     ] if ;
 
-: pcre2-pattern-info ( handle what -- where )
+: pcre2-pattern-info-ptr ( handle what -- where )
+    [
+        { void* } [ pcre2_pattern_info ] with-out-parameters
+    ] keep check-bad-option ;
+
+: pcre2-pattern-info-number ( handle what -- where )
     [
         { uint32_t } [ pcre2_pattern_info ] with-out-parameters
     ] keep check-bad-option ;
 
+: pcre2-name-count ( handle -- n )
+    PCRE2_INFO_NAMECOUNT pcre2-pattern-info-number ;
+
+: pcre2-name-table ( handle -- ptr )
+    PCRE2_INFO_NAMETABLE pcre2-pattern-info-ptr ;
+
+: pcre2-name-entry-size ( handle -- n )
+    PCRE2_INFO_NAMEENTRYSIZE pcre2-pattern-info-number ;
+
 : pcre2-utf? ( handle -- ? )
-    PCRE2_INFO_ALLOPTIONS pcre2-pattern-info PCRE2_UTF bitand zero? not ;
+    PCRE2_INFO_ALLOPTIONS pcre2-pattern-info-number
+    PCRE2_UTF bitand zero? not ;
 
 : pcre2-crlf? ( handle -- ? )
-    PCRE2_INFO_NEWLINE pcre2-pattern-info ${
+    PCRE2_INFO_NEWLINE pcre2-pattern-info-number ${
         PCRE2_NEWLINE_ANY PCRE2_NEWLINE_CRLF PCRE2_NEWLINE_ANYCRLF
     } member? ;
 
@@ -98,18 +117,34 @@ M:: pcre2 findall ( subject obj -- matches )
         f
         pcre2_match :> rc
 
+        re pcre2-name-count :> name_count
+        name_count [
+            f
+        ] [
+            re pcre2-name-table
+            re pcre2-name-entry-size
+            [ rot * memory>byte-array ] [ <groups> ] bi
+            [ 2 cut [ be> ] [ alien>native-string ] bi* ] { } map>assoc
+        ] if-zero :> name_table
+
         rc 0 < [
             rc {
                 { PCRE2_ERROR_NOMATCH [ { } ] }
                 [ throw ]
             } case
         ] [
-            rc 1 assert=
+            rc name_count 1 + assert=
             match_data pcre2_get_ovector_pointer
-            2 PCRE2_SIZE <c-direct-array> :> ovector
+            rc assert-positive 2 * PCRE2_SIZE <c-direct-array> :> ovector
 
             [
-                ovector first2 subject subseq ,
+                [
+                    f ovector first2 subject subseq 2array ,
+                    name_table [
+                        ovector rot 2 * tail-slice first2 subject
+                        subseq 2array ,
+                    ] assoc-each
+                ] { } make ,
 
                 [
                     f :> break?!
@@ -176,8 +211,14 @@ M:: pcre2 findall ( subject obj -- matches )
 
                             f
                         ] [
-                            rc 1 assert=
-                            ovector first2 subject subseq ,
+                            rc name_count 1 + assert=
+                            [
+                                f ovector first2 subject subseq 2array ,
+                                name_table [
+                                    ovector rot 2 * tail-slice first2 subject
+                                    subseq 2array ,
+                                ] assoc-each
+                            ] { } make ,
                             t
                         ] if
                     ] if
@@ -189,3 +230,9 @@ M:: pcre2 findall ( subject obj -- matches )
 M: string findall <pcre2> [ findall ] with-disposal ;
 
 M: regexp findall raw>> findall ;
+
+: matches? ( subject obj -- ? )
+    dupd findall [ nip length 1 = ] [ ?first ?first ?last = ] 2bi and ;
+
+: split ( subject obj -- strings )
+    dupd findall [ first second ] map split-subseqs ;
