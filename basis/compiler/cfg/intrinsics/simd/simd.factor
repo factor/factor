@@ -712,7 +712,7 @@ PREDICATE: fixnum-vector-rep < int-vector-rep
         { (simd-select)             [ emit-simd-select              ] }
         { alien-vector              [ emit-alien-vector             ] }
         { set-alien-vector          [ emit-set-alien-vector         ] }
-        { assert-positive           [ drop                          ] }
+        { (simd-positive)           [ drop                          ] }
         { (simd-vgetmask)           [ emit-simd-vgetmask            ] }
     } enable-intrinsics ;
 

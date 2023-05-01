@@ -106,7 +106,7 @@ vector>vector-intrinsics [ { byte-array } "default-output-classes" set-word-prop
 
 \ (simd-select) [ 2nip scalar-output-class ] "outputs" set-word-prop
 
-\ assert-positive [
+\ (simd-positive) [
     real [0,inf] <class/interval-info> value-info-intersect
 ] "outputs" set-word-prop
 

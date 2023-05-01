@@ -238,7 +238,7 @@ M: simd-128 vnone?
     dup simd-rep [ (simd-vnone?) ] [ call-next-method ] v->x-op  ; inline
 M: simd-128 vcount
     dup simd-rep
-    [ [ (simd-vgetmask) assert-positive ] [ call-next-method ] v->x-op ]
+    [ [ (simd-vgetmask) (simd-positive) ] [ call-next-method ] v->x-op ]
     [ mask>count ] bi ; inline
 
 ! SIMD high-level specializations
@@ -252,7 +252,7 @@ M: simd-128 v+n over simd-with v+ ; inline
 M: simd-128 v-n over simd-with v- ; inline
 M: simd-128 v*n over simd-with v* ; inline
 M: simd-128 v/n over simd-with v/ ; inline
-M: simd-128 norm-sq dup vdot assert-positive ; inline
+M: simd-128 norm-sq dup vdot (simd-positive) ; inline
 M: simd-128 distance v- norm ; inline
 
 M: simd-128 >pprint-sequence ;
