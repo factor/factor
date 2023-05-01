@@ -5,7 +5,7 @@ USING: accessors alien.c-types alien.data alien.strings arrays
 assocs byte-arrays combinators combinators.short-circuit
 destructors endian grouping io.encodings.string
 io.encodings.utf8 kernel literals make math pcre2.ffi regexp
-sequences specialized-arrays splitting strings ;
+sequences sorting specialized-arrays splitting strings ;
 
 SPECIALIZED-ARRAY: PCRE2_SIZE
 
@@ -125,6 +125,7 @@ M:: pcre2 findall ( subject obj -- matches )
             re pcre2-name-entry-size
             [ rot * memory>byte-array ] [ <groups> ] bi
             [ 2 cut [ be> ] [ alien>native-string ] bi* ] { } map>assoc
+            sort-keys
         ] if-zero :> name_table
 
         rc 0 < [
