@@ -13,7 +13,7 @@ SPECIALIZED-ARRAYS:
 IN: math.vectors.simd.intrinsics
 
 ! Word props are added later
-: assert-positive ( x -- y ) ;
+: (simd-positive) ( x -- y ) ;
 
 <PRIVATE
 
