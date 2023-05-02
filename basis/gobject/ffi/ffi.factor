@@ -19,7 +19,7 @@ LIBRARY: gobject
 
 IMPLEMENT-STRUCTS: GValue GParamSpecVariant ;
 
-GIR: vocab:gobject/GObject-2.0.gir
+GIR: vocab:gir/GObject-2.0.gir
 
 FORGET: GIOCondition
 FORGET: G_IO_IN

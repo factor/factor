@@ -29,7 +29,7 @@ CONSTANT: G_MININT64  -0x8000000000000000
 CONSTANT: G_MAXINT64  0x7fffffffffffffff
 CONSTANT: G_MAXUINT64 0xffffffffffffffff
 
-GIR: vocab:glib/GLib-2.0.gir
+GIR: vocab:gir/GLib-2.0.gir
 
 DESTRUCTOR: g_source_unref
 DESTRUCTOR: g_free
