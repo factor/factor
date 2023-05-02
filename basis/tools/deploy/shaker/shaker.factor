@@ -98,7 +98,7 @@ IN: tools.deploy.shaker
     ] when ;
 
 : strip-gtk-icon ( -- )
-    "ui.backend.gtk" lookup-vocab [
+    "ui.backend.gtk2" lookup-vocab [
         "Stripping GTK icon loading code" show
         "vocab:tools/deploy/shaker/strip-gtk-icon.factor"
         run-file

@@ -1,7 +1,7 @@
 ! Copyright (C) 2010 Anton Gorenko.
 ! See https://factorcode.org/license.txt for BSD license.
-USING: alien.strings gdk.gl.ffi gobject.ffi gtk.ffi gtk.gl.ffi
-io.encodings.utf8 kernel opengl.demo-support opengl.gl ;
+USING: alien.strings gdk2.gl.ffi gobject.ffi gtk2.ffi
+gtk2.gl.ffi io.encodings.utf8 kernel opengl.demo-support opengl.gl ;
 IN: gtk-samples.opengl
 
 ! This sample is based on
