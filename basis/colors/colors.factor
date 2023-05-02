@@ -72,26 +72,25 @@ ERROR: invalid-hex-color hex ;
     } case <rgba> ;
 
 : component>hex ( f -- s )
-    255 * round >integer >hex
-    2 CHAR: 0 pad-head ;
+    255 * round >integer >hex 2 CHAR: 0 pad-head ;
 
 : (color>hex) ( seq -- hex )
-    [ component>hex ] map concat
-    "#" prepend ;
+    [ component>hex ] map concat "#" prepend ;
 
 PRIVATE>
 
 : color>hex ( color -- hex )
-    [ >rgba-components 4array ] [ opaque? ] bi
-    [ but-last ] when
-    (color>hex) ;
+    >rgba-components dup 1 number=
+    [ drop 3array ] [ 4array ] if (color>hex) ;
 
 : named-colors ( -- keys ) colors keys ;
+
+: ?named-color ( name -- color/f ) colors at ;
 
 ERROR: no-such-color name ;
 
 : named-color ( name -- color )
-    [ colors at ] [ no-such-color ] ?unless ;
+    [ ?named-color ] [ no-such-color ] ?unless ;
 
 : parse-color ( str -- color )
     "#" ?head [ hex>rgba ] [ named-color ] if ;
