@@ -3,7 +3,7 @@
 USING: accessors kernel models sequences ui.gadgets
 ui.gadgets.books ui.gadgets.borders ui.gadgets.buttons.private
 ui.gadgets.packs ui.gadgets.toolbar.private ui.gadgets.tracks
-ui.pens.solid ui.theme ;
+ui.pens.solid ui.theme ui.tools.common ;
 IN: ui.gadgets.tabbed
 
 TUPLE: tabbed-gadget < track tabs book ;
@@ -25,13 +25,14 @@ PRIVATE>
 : <tabbed-gadget> ( -- gadget )
     vertical tabbed-gadget new-track
         0 <model> >>model
-        toolbar-background <solid> >>interior
-        <shelf> >>tabs
+        toolbar-button-pressed-background <solid> >>interior
+        { 0 3 } >>gap
+        <shelf> toolbar-background <solid> >>interior >>tabs
         horizontal <track>
-            over tabs>> f track-add
+            over tabs>> 1 track-add
         f track-add
-        dup model>> <empty-book> >>book
-        dup book>> { 3 3 } <filled-border> 1 track-add ;
+        dup model>> <empty-book> white-interior >>book
+        dup book>> 1 track-add ;
 
 : add-tab ( tabbed child label -- tabbed )
     [ add-tab/book ] [ add-tab/button ] bi* ;
