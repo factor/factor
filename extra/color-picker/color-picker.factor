@@ -81,5 +81,6 @@ M: color-preview model-changed
 : <color-pickers> ( -- gadget )
     [ <color-picker> ] <color-tabs> ;
 
-MAIN-WINDOW: color-picker-window { { title "Color Picker" } }
-    <color-pickers> { 5 5 } <border> white-interior >>gadgets ;
+MAIN-WINDOW: color-picker-window
+    { { title "Color Picker" } }
+    <color-pickers> >>gadgets ;

@@ -50,4 +50,4 @@ TUPLE: color-picker-game < track ;
 
 MAIN-WINDOW: color-picker-game-window
     { { title "Color Picker Game" } }
-    <color-picker-games> { 5 5 } <border> >>gadgets ;
+    <color-picker-games> >>gadgets ;

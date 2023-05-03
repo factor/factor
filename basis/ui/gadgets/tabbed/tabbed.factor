@@ -31,8 +31,8 @@ PRIVATE>
         horizontal <track>
             over tabs>> 1 track-add
         f track-add
-        dup model>> <empty-book> white-interior >>book
-        dup book>> 1 track-add ;
+        dup model>> <empty-book> >>book
+        dup book>> { 5 5 } <filled-border> white-interior 1 track-add ;
 
 : add-tab ( tabbed child label -- tabbed )
     [ add-tab/book ] [ add-tab/button ] bi* ;
