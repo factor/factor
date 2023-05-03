@@ -31,7 +31,7 @@ ERROR: bad-option what ;
     rot 0 = [ drop ] [ bad-option ] if ;
 
 : pcre2-config-string ( what length -- string )
-    <byte-array> [ pcre2_config ] keep alien>native-string nip ;
+    <byte-array> [ pcre2_config ] keep utf8 alien>string nip ;
 
 : pcre2-config-number ( what -- n )
     [
@@ -124,7 +124,7 @@ M:: pcre2 findall ( subject obj -- matches )
             re pcre2-name-table
             re pcre2-name-entry-size
             [ rot * memory>byte-array ] [ <groups> ] bi
-            [ 2 cut [ be> ] [ alien>native-string ] bi* ] { } map>assoc
+            [ 2 cut [ be> ] [ utf8 alien>string ] bi* ] { } map>assoc
             sort-keys
         ] if-zero :> name_table
 
