@@ -2,7 +2,7 @@
 ! See https://factorcode.org/license.txt for BSD license.
 
 USING: accessors color-picker colors colors.distances formatting
-kernel math models random sequences ui ui.gadgets
+kernel math math.functions models random sequences ui ui.gadgets
 ui.gadgets.borders ui.gadgets.buttons ui.gadgets.tracks
 ui.tools.common ;
 
@@ -14,7 +14,7 @@ IN: color-picker-game
 TUPLE: color-picker-game < track ;
 
 : color-score ( color1 color2 -- n )
-    rgba-distance 1.0 swap - 100.0 * 0.5 + >integer ;
+    rgba-distance 1.0 swap - 100.0 * round >integer ;
 
 : <match-button> ( -- button )
     "Match Color" [
@@ -26,6 +26,13 @@ TUPLE: color-picker-game < track ;
         over children>> first text<< relayout
     ] <border-button> ;
 
+: <reset-button> ( -- button )
+    "Random" [
+        [ color-picker-game? ] find-parent
+        children>> first children>> first
+        model>> random-color swap set-model
+    ] <border-button> ;
+
 : <color-picker-game> ( -- gadget )
     vertical color-picker-game new-track
     white-interior { 5 5 } >>gap
@@ -33,8 +40,10 @@ TUPLE: color-picker-game < track ;
     random-color <model> <color-preview> 1/2 track-add
     \ <rgba> <color-sliders> swap over
     [ <color-preview> 1/2 track-add 1 track-add ]
-    [ f track-add <match-button> f track-add ]
-    [ <color-status> f track-add ] tri* ;
+    [ f track-add ]
+    [ <color-status> f track-add ] tri*
+    <match-button> f track-add
+    <reset-button> f track-add ;
 
 MAIN-WINDOW: color-picker-game-window
     { { title "Color Picker Game" } }
