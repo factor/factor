@@ -72,3 +72,9 @@ word wrap."
 { "Hello" } [ "\nHello\n" 10 wrap-string ] unit-test
 
 { " > > > " } [ "" 70 " > > > " wrap-indented-string ] unit-test
+
+{ "aaaa\naaaa\naa" } [
+    t break-long-words? [
+        10 CHAR: a <string> 4 wrap-string
+    ] with-variable
+] unit-test
