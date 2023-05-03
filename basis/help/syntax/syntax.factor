@@ -47,7 +47,7 @@ DEFER: HELP{
         pick ?last dup array? [ ?first ] when
         help-block? not and
     ] [
-        dup last CHAR: \s eq? not
+        dup last " (" member? not
     ] if [ CHAR: \s suffix! ] when ;
 
 :: parse-help-text ( end -- seq )
@@ -64,7 +64,7 @@ DEFER: HELP{
         obj [
             [
                 dup string? [
-                    dup ?first " .,;:" member? [
+                    dup ?first " .,;:)" member? [
                         [ push-help-space ] dip
                     ] unless append!
                 ] [
