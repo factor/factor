@@ -13,14 +13,16 @@ IN: color-picker-game
 
 TUPLE: color-picker-game < track ;
 
+: find-color-previews ( gadget -- preview1 preview2 )
+    [ color-picker-game? ] find-parent
+    children>> first children>> first2 ;
+
 : color-score ( color1 color2 -- n )
     rgba-distance 1.0 swap - 100.0 * round >integer ;
 
 : <match-button> ( -- button )
     "Match Color" [
-        dup
-        [ color-picker-game? ] find-parent
-        children>> first children>> first2
+        dup find-color-previews
         [ model>> compute-model ] bi@
         color-score "Your score: %d" sprintf
         over children>> first text<< relayout
@@ -28,9 +30,8 @@ TUPLE: color-picker-game < track ;
 
 : <reset-button> ( -- button )
     "Random" [
-        [ color-picker-game? ] find-parent
-        children>> first children>> first
-        model>> random-color swap set-model
+        find-color-previews drop model>>
+        random-color swap set-model
     ] <border-button> ;
 
 :: <color-picker-game> ( constructor -- gadget )
