@@ -61,7 +61,7 @@ M: color-preview model-changed
     [ <color-preview> 1 track-add ]
     [ <color-status> f track-add ] bi ;
 
-: <color-pickers> ( -- gadget )
+:: <color-tabs> ( quot: ( constructor -- gadget ) -- gadget )
     <tabbed-gadget> {
         <rgba>
         <hsla>
@@ -75,9 +75,11 @@ M: color-preview model-changed
         <yiqa>
         <yuva>
     } [
-        [ <color-picker> ]
-        [ name>> "<" ?head drop ">" ?tail drop add-tab ] bi
-    ] each ;
+        quot [ name>> "<" ?head drop ">" ?tail drop add-tab ] bi
+    ] each ; inline
+
+: <color-pickers> ( -- gadget )
+    [ <color-picker> ] <color-tabs> ;
 
 MAIN-WINDOW: color-picker-window { { title "Color Picker" } }
     <color-pickers> { 5 5 } <border> white-interior >>gadgets ;

@@ -33,18 +33,21 @@ TUPLE: color-picker-game < track ;
         model>> random-color swap set-model
     ] <border-button> ;
 
-: <color-picker-game> ( -- gadget )
+:: <color-picker-game> ( constructor -- gadget )
     vertical color-picker-game new-track
     white-interior { 5 5 } >>gap
     horizontal <track>
     random-color <model> <color-preview> 1/2 track-add
-    \ <rgba> <color-sliders> swap over
+    constructor <color-sliders> swap over
     [ <color-preview> 1/2 track-add 1 track-add ]
     [ f track-add ]
     [ <color-status> f track-add ] tri*
     <match-button> f track-add
     <reset-button> f track-add ;
 
+: <color-picker-games> ( -- gadget )
+    [ <color-picker-game> ] <color-tabs> ;
+
 MAIN-WINDOW: color-picker-game-window
     { { title "Color Picker Game" } }
-    <color-picker-game> { 5 5 } <border> >>gadgets ;
+    <color-picker-games> { 5 5 } <border> >>gadgets ;
