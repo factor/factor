@@ -2,7 +2,8 @@
 ! See https://factorcode.org/license.txt for BSD license.
 USING: accessors kernel models sequences ui.gadgets
 ui.gadgets.books ui.gadgets.borders ui.gadgets.buttons.private
-ui.gadgets.packs ui.gadgets.toolbar.private ui.gadgets.tracks ;
+ui.gadgets.packs ui.gadgets.toolbar.private ui.gadgets.tracks
+ui.pens.solid ui.theme ;
 IN: ui.gadgets.tabbed
 
 TUPLE: tabbed-gadget < track tabs book ;
@@ -24,6 +25,7 @@ PRIVATE>
 : <tabbed-gadget> ( -- gadget )
     vertical tabbed-gadget new-track
         0 <model> >>model
+        toolbar-background <solid> >>interior
         <shelf> >>tabs
         horizontal <track>
             over tabs>> f track-add
