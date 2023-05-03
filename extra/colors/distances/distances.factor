@@ -7,11 +7,8 @@ math.functions math.libm math.order math.trig ;
 IN: colors.distances
 
 : rgba-distance ( color1 color2 -- distance )
-    [ >rgba ] bi@
-    [ [ red>> ] bi@ - sq ]
-    [ [ blue>> ] bi@ - sq ]
-    [ [ green>> ] bi@ - sq ] 2tri
-    + + sqrt ;
+    [ >rgba ] bi@ [ red>> ] [ blue>> ] [ green>> ]
+    [ bi@ - sq ] tri-curry@ 2tri + + sqrt ;
 
 <PRIVATE
 
