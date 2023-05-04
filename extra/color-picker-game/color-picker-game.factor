@@ -36,15 +36,20 @@ TUPLE: color-picker-game < track ;
 
 :: <color-picker-game> ( constructor -- gadget )
     vertical color-picker-game new-track
-    white-interior { 5 5 } >>gap
+        white-interior { 5 5 } >>gap
+
+    random-color <model>        :> left-model
+    constructor <color-sliders> :> ( sliders right-model )
+
     horizontal <track>
-    random-color <model> <color-preview> 1/2 track-add
-    constructor <color-sliders> swap over
-    [ <color-preview> 1/2 track-add 1 track-add ]
-    [ f track-add ]
-    [ <color-status> f track-add ] tri*
-    <match-button> f track-add
-    <reset-button> f track-add ;
+        left-model <color-preview>  1/2 track-add
+        right-model <color-preview> 1/2 track-add
+    1 track-add
+
+    sliders                     f track-add
+    right-model <color-status>  f track-add
+    <match-button>              f track-add
+    <reset-button>              f track-add ;
 
 : <color-picker-games> ( -- gadget )
     [ <color-picker-game> ] <color-tabs> ;
