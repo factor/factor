@@ -178,7 +178,7 @@ ENUM: MouseButton
     MOUSE_BUTTON_MIDDLE      ! Mouse button middle (pressed wheel)
     MOUSE_BUTTON_SIDE        ! Mouse button side (advanced mouse device)
     MOUSE_BUTTON_EXTRA       ! Mouse button extra (advanced mouse device)
-    MOUSE_BUTTON_FORWARD     ! Mouse button fordward (advanced mouse device)
+    MOUSE_BUTTON_FORWARD     ! Mouse button forward (advanced mouse device)
     MOUSE_BUTTON_BACK ;      ! Mouse button back (advanced mouse device)
 
 ENUM: MouseCursor
@@ -351,10 +351,12 @@ ENUM: BlendMode
     BLEND_MULTIPLIED               ! Blend textures multiplying colors
     BLEND_ADD_COLORS               ! Blend textures adding colors (alternative)
     BLEND_SUBTRACT_COLORS          ! Blend textures subtracting colors (alternative)
-    BLEND_CUSTOM ;                 ! Belnd textures using custom src/dst factors (use rlSetBlendMode())
+    BLEND_ALPHA_PREMULTIPLY        ! Blend premultiplied textures considering alpha
+    BLEND_CUSTOM                   ! Belnd textures using custom src/dst factors (use rlSetBlendFactors())
+    BLEND_CUSTOM_SEPARATE ;        ! Blend textures using custom rgb/alpha separate src/dst factors (use rlSetBlendFactorsSeparate())
 
 ! Gestures type
-! NOTE: IT could be used as flags to enable only some gestures
+! NOTE: Provided as bit-wise flags to enable only desired gestures
 ENUM: Gestures
     { GESTURE_NONE          0 }
     { GESTURE_TAP           1 }
@@ -541,7 +543,7 @@ STRUCT: Camera3D
     { position Vector3 }  ! Camera postion
     { target Vector3 }    ! Camera target it looks-at
     { up Vector3 }        ! Camera up vector (rotation over its axis)
-    { fovy float }        ! Camera field-of-view apperature in Y (degrees) in perspective, used as near plane width in orthographic
+    { fovy float }        ! Camera field-of-view aperature in Y (degrees) in perspective, used as near plane width in orthographic
     { projection CameraProjection } ;  ! Camera projection: CAMERA_PERSPECTIVE or CAMERA_ORTHOGRAPHIC
 
 STRUCT: Camera2D
@@ -563,7 +565,7 @@ STRUCT: Mesh
     { indices ushort* }    ! Vertex indices (in case vertex data comes indexed)
     { animVertices float* }
     { animNormals float* }
-    { boneIds int* }
+    { boneIds uchar* }
     { boneWeights float* }
     { vaoId uint }         ! OpenGL Vertex Array Object id
     { vboId uint* } ;      ! OpenGL Vertex Buffer Objects id (7  types of vertex data)
@@ -682,6 +684,11 @@ STRUCT: VrStereoConfig
     { rightScreenCenter float[2] }    ! VR right screen center
     { scale float[2] }                ! VR distortion scale
     { scaleIn float[2] } ;            ! VR distortion scale in
+
+STRUCT: FilePathList
+    { capacity uint }                 ! Filepaths max entries
+    { count uint }                    ! Filepaths entries count
+    { paths char** } ;                ! Filepaths entries
 
 ! Constants ----------------------------------------------------------------
 
@@ -835,8 +842,8 @@ FUNCTION-ALIAS: set-config-flags void SetConfigFlags ( uint flags )             
 
 ! FUNCTION: void TraceLog ( int logLevel, c-string text, ... )                           ! Show trace log messages (LOG_DEBUG, LOG_INFO, LOG_WARNING, LOG_ERROR...)
 FUNCTION-ALIAS: set-trace-log-level void SetTraceLogLevel ( int logLevel )               ! Set the current threshold (minimum) log level
-FUNCTION-ALIAS: mem-alloc void* MemAlloc ( int size )                                    ! Internal memory allocator
-FUNCTION-ALIAS: mem-realloc void* MemRealloc ( void* ptr, int size )                     ! Internal memory reallocator
+FUNCTION-ALIAS: mem-alloc void* MemAlloc ( uint size )                                    ! Internal memory allocator
+FUNCTION-ALIAS: mem-realloc void* MemRealloc ( void* ptr, uint size )                     ! Internal memory reallocator
 FUNCTION-ALIAS: mem-free void MemFree ( void* ptr )                                      ! Internal memory free
 
 FUNCTION-ALIAS: open-url void OpenURL ( c-string url )                                   ! Open URL with default system browser (if available)
@@ -853,7 +860,7 @@ FUNCTION-ALIAS: open-url void OpenURL ( c-string url )                          
 FUNCTION-ALIAS: load-file-data c-string LoadFileData ( c-string fileName, uint* bytesRead )           ! Load file data as byte array (read)
 FUNCTION-ALIAS: unload-file-data void UnloadFileData ( c-string data )                                ! Unload file data allocated by LoadFileData()
 FUNCTION-ALIAS: save-file-data bool SaveFileData ( c-string fileName, void* data, uint bytesToWrite ) ! Save data to file from byte array (write), returns true on success
-FUNCTION-ALIAS: export-data-as-code bool ExportDataAsCode ( char* data, uint size, c-string fileName ) ! Export data to code (.h), returns true on success
+FUNCTION-ALIAS: export-data-as-code bool ExportDataAsCode ( uchar* data, uint size, c-string fileName ) ! Export data to code (.h), returns true on success
 FUNCTION-ALIAS: load-file-text c-string LoadFileText ( c-string fileName )                            ! Load text data from file (read), returns a ' ' terminated string
 FUNCTION-ALIAS: unload-file-text void UnloadFileText ( c-string text )                                ! Unload file text data allocated by LoadFileText()
 FUNCTION-ALIAS: save-file-text bool SaveFileText ( c-string fileName, c-string text )                 ! Save text data to file (write), string must be ' ' terminated, returns true on success
@@ -1012,6 +1019,7 @@ FUNCTION-ALIAS: check-collision-point-triangle bool CheckCollisionPointTriangle 
 FUNCTION-ALIAS: check-collision-point-poly bool CheckCollisionPointPoly ( Vector2 point, Vector2 *points, int pointCount ) ! Check if point is inside a polygon
 FUNCTION-ALIAS: check-collision-lines bool CheckCollisionLines ( Vector2 startPos1, Vector2 endPos1, Vector2 startPos2, Vector2 endPos2, Vector2* collisionPoint )  ! Check the collision between two lines defined by two points each, returns collision point by reference
 FUNCTION-ALIAS: check-collision-point-line bool CheckCollisionPointLine ( Vector2 point, Vector2 p1, Vector2 p2, int threshold ) ! Check if point belongs to line created between two points [p1] and [p2] with defined margin in pixels [threshold]
+FUNCTION-ALIAS: check-collision-point-poly bool CheckCollisionPointPoly ( Vector2 point, Vector2* points, int pointCount ) ! Check if point is within a polygon described by array of vertices
 FUNCTION-ALIAS: get-collision-rec Rectangle GetCollisionRec ( Rectangle rec1, Rectangle rec2 )                                   ! Get collision rectangle for two rectangles collision
 
 ! ------------------------------------------------------------------------------------
