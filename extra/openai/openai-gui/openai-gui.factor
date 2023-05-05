@@ -24,6 +24,10 @@ INITIALIZED-SYMBOL: OPENAI-KEY-PATH [ "~/.config/configstore/openai-key" ]
         if
     ] unless ; 
 
+: >B ( -- ) ! "
+    get-listener input>> output>> 
+    [ nl "---" print .s ]
+    with-output-stream*  ;
 
 : wrap-result ( string maxwidth -- string' )
     monospace-font " " text-width >integer /  wrap-string ;
@@ -66,6 +70,12 @@ TUPLE: gpt-gadget < track ask response ;
 
 : <response> ( gpt-gadget -- gpt-gadget )
     response>> <scroller> COLOR: gray <solid> >>boundary ;
+
+M: gpt-gadget history-value
+    ask>> editor-string 1 2array ;
+
+M: gpt-gadget set-history-value
+    [ first ] dip ask>> set-editor-string ; 
 
 gpt-gadget "toolbar" f {
     { T{ key-down f f "RET" } com-send }
