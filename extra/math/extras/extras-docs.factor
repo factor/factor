@@ -81,7 +81,7 @@ HELP: majority
 
 HELP: nonzero
 { $values { "seq" sequence } { "seq'" sequence } }
-{ $description "Outputs a new sequence of the same type as " { $snippet "seq" } " with all non-zero elements removed." } ;
+{ $description "Outputs a new sequence of the same type as " { $snippet "seq" } " with all zero elements removed." } ;
 
 HELP: round-away-from-zero
 { $values { "x" number } { "y" number } }
