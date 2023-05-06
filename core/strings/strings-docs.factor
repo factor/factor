@@ -3,7 +3,7 @@ help.vocabs ;
 IN: strings
 
 ARTICLE: "strings" "Strings"
-"The " { $vocab-link "strings" } " vocabulary implements a data type for storing text. Strings are represented as fixed-size mutable sequences of Unicode code points. Code points are represented as integers in the range [0,2,097,152]."
+"The " { $vocab-link "strings" } " vocabulary implements a data type for storing text. Strings are represented as fixed-size mutable sequences of Unicode code points. Code points are represented as integers in the range [0, 2097152]."
 $nl
 "Strings implement the " { $link "sequence-protocol" } ", and basic string manipulation can be performed with " { $link "sequences" } " from the " { $vocab-link "sequences" } " vocabulary. More text processing functionality can be found in vocabularies carrying the " { $link T{ vocab-tag { name "text" } } } " tag."
 $nl
