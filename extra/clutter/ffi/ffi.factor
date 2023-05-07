@@ -5,7 +5,7 @@ gobject-introspection kernel system vocabs ;
 IN: clutter.ffi
 
 <<
-"gtk" require
+"gtk2" require
 "atk.ffi" require
 "pango.cairo.ffi" require
 "clutter.cogl.ffi" require
