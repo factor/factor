@@ -1,4 +1,4 @@
-USING: alien.syntax classes.struct gdk.ffi kernel sequences system
+USING: alien.syntax classes.struct gdk2.ffi kernel sequences system
 tools.test ui.backend.gtk2 ui.gestures ;
 IN: ui.backend.gtk2.tests
 
