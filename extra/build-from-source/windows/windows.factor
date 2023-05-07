@@ -240,6 +240,12 @@ IN: build-from-source.windows
         "raygui.dll" copy-output-file
     ] with-updated-github-repo ;
 
+: build-ripgrep ( -- )
+    "BurntSushi" "ripgrep" [
+        qw{ cargo build --release } try-process
+        "target/release/rg.exe" copy-output-file
+    ] with-updated-github-repo ;
+
 : build-snappy-dll ( -- )
     "google" "snappy" [
         [
