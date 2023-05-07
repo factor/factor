@@ -22,7 +22,7 @@ HELP: odbc-connect
     "Connects to the database identified by the ODBC data source name (DSN). "
     "The environment handle is usually obtained by a call to " { $link odbc-init } ". The result is the ODBC connection handle which can be used in other ODBC calls. When finished with the connection handle " { $link odbc-disconnect } " must be called on it."
 }
-{ $examples { $code "dbc get \"DSN=mydsn\" odbc-connect" } }
+{ $examples { $code "dbc get \"DSN=snowflake; UID=sheeple; PWD=sekrit\" odbc-connect" } }
 { $see-also odbc-init odbc-connect odbc-disconnect odbc-prepare odbc-free-statement odbc-execute odbc-next-row odbc-number-of-columns odbc-describe-column odbc-get-field odbc-get-row-fields odbc-get-all-rows odbc-query } ;
 
 HELP: odbc-disconnect
@@ -119,4 +119,5 @@ HELP: odbc-query
 { $description
     "This word initializes odbc, connects to the database with the given DSN, executes the query string and returns the result as a sequence. It cleans up all resources it uses. It is an inefficient way of running multiple queries but is useful for the occasional query, testing at the REPL, or as an example of how to do it."
 }
+{ $examples { $code "\"select 1\" \"DSN=snowflake; UID=sheeple; PWD=sekrit\" odbc-query" } }
 { $see-also odbc-init odbc-connect odbc-disconnect odbc-prepare odbc-free-statement odbc-execute odbc-next-row odbc-number-of-columns odbc-describe-column odbc-get-field odbc-get-row-fields odbc-get-all-rows odbc-query } ;
