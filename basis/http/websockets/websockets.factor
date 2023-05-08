@@ -124,15 +124,3 @@ ERROR: unimplemented-opcode opcode message ;
 
 : read-websocket-loop ( quot: ( obj opcode -- loop? ) -- )
     '[ read-websocket _ dip and ] loop ; inline
-
-![[
-: handle-websocket ( obj opcode -- loop? )
-    {
-        { f [ [ "closed with error, code %d" sprintf . flush ] with-global f ] }
-        { 1 [ [ [ hexdump. flush ] with-global ] when* t ] }
-        { 2 [ [ [ hexdump. flush ] with-global ] when* t ] }
-        { 8 [ [ "close received, code: %d" sprintf print flush ] with-global t ] }
-        { 9 [ [ [ "ping received" print hexdump. flush ] with-global ] when* t ] }
-        [ 2drop t ]
-    } case ;
-]]
