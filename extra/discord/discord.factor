@@ -18,11 +18,12 @@ TUPLE: discord-bot-config
     client-id client-secret
     token application-id guild-id channel-id permissions
     user-callback obey-names
-    metadata ;
+    metadata
+    discord-bot ;
 
 TUPLE: discord-bot
     config in out bot-thread heartbeat-thread
-    send-heartbeat? reconnect?
+    send-heartbeat? reconnect? stop?
     sequence-number
     messages last-message
     application user session_id resume_gateway_url
@@ -35,6 +36,7 @@ TUPLE: discord-bot
         swap >>in
         t >>send-heartbeat?
         t >>reconnect?
+        f >>stop?
         V{ } clone >>messages
         H{ } clone >>guilds
         H{ } clone >>channels ;
@@ -383,58 +385,57 @@ M: TYPING_START dispatch-message drop
     } case ;
 
 DEFER: discord-reconnect
-: handle-discord-websocket ( obj opcode -- loop? )
-    ! [ "opcode: " write dup . over dup byte-array? [ utf8 decode json> ] when ... flush ] with-global
+: handle-discord-websocket ( obj opcode -- )
+    [ "opcode: " write dup . over dup byte-array? [ utf8 decode json> ] when ... flush ] with-global
     {
         { f [
             [
                 [ "closed with error, code %d" sprintf print ]
                 [ "closed with f" print ] if* flush
+                discord-bot get t >>stop? drop
             ] with-global
-            discord-bot get reconnect?>> [
-                discord-reconnect drop
-            ] when f ! don't loop this one, reconnect makes a new thread
         ] }
         { 1 [
             [ drop ]
             [ utf8 decode json> parse-discord-op ] bi
-            t
         ] }
         { 2 [
-            [ [ hexdump. flush ] with-global ] when* t
+            [ [ hexdump. flush ] with-global ] when*
         ] }
         { 8 [
             [ drop "close received" print flush ] with-global
-            discord-bot get reconnect?>> [ discord-reconnect drop ] when f
+            discord-bot get t >>stop? drop
         ] }
         { 9 [
-            [ "ping received" gprint-flush send-heartbeat ] when* t
+            [ "ping received" gprint-flush send-heartbeat ] when*
         ] }
-        [ 2drop t ]
+        [ 2drop ]
     } case ;
 
-: discord-reconnect ( -- discord-bot )
+: discord-reconnect ( -- )
+    "reconnect" g.
     discord-bot-gateway <get-request>
     add-discord-auth-header
     [ drop ] do-http-request
     dup response? [
         throw
     ] [
-        [ in>> stream>> ] [ out>> stream>> ] bi
-        \ discord-bot-config get <discord-bot>
+        [ in>> stream>> ] [ out>> stream>> ] bi \ discord-bot-config get
+        <discord-bot>
+        [ discord-bot-config get discord-bot<< ] keep
         dup '[
             _ \ discord-bot [
                 discord-bot get [ in>> ] [ out>> ] bi
                 [
-                    [ handle-discord-websocket ] read-websocket-loop
+                    [ handle-discord-websocket discord-bot-config get discord-bot>> stop?>> not ] read-websocket-loop
                 ] with-streams
             ] with-variable
-        ] "Discord Bot" spawn
-        >>bot-thread
+        ] "Discord Bot" spawn >>bot-thread discord-bot-config get discord-bot<<
     ] if ;
 
 M: discord-bot dispose
     f >>reconnect?
+    t >>stop?
     f >>send-heartbeat?
     [
         [ in>> &dispose drop ]
@@ -442,8 +443,14 @@ M: discord-bot dispose
         [ f >>in f >>out drop ] tri
     ] with-destructors ;
 
-: discord-connect ( config -- discord-bot )
-    \ discord-bot-config [ discord-reconnect ] with-variable ;
+: discord-connect ( config -- )
+    \ discord-bot-config [
+        [
+            "connecting" g.
+            discord-reconnect discord-bot-config get discord-bot>>
+            [ reconnect?>> ] [ stop?>> not ] bi and
+        ] loop
+    ] with-variable ;
 
 : reply-command ( json -- ? )
     "content" of [ blank? ] trim
