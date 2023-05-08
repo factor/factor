@@ -827,9 +827,14 @@ M: windows-ui-backend (set-fullscreen)
     [ enter-fullscreen ] [ exit-fullscreen ] if ;
 
 M: windows-ui-backend (fullscreen?)
-    handle>> hWnd>>
-    [ hwnd>RECT ] [ fullscreen-RECT ] bi
-    [ get-RECT-dimensions 2array 2nip ] same? ;
+    handle>> [
+        hWnd>>
+        [ hwnd>RECT ] [ fullscreen-RECT ] bi
+        [ get-RECT-dimensions 2array 2nip ] same?
+    ] [
+        [ "windows-ui-backend no hWnd" print ] with-global
+        f
+    ] if* ;
 
 M:: windows-ui-backend resize-window ( world dim -- )
     world handle>> hWnd>>
