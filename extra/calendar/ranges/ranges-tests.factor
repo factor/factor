@@ -12,7 +12,6 @@ USING: arrays calendar calendar.ranges kernel tools.test ;
     =
 ] unit-test
 
-
 ! forwards
 {
     {
@@ -47,3 +46,15 @@ USING: arrays calendar calendar.ranges kernel tools.test ;
     -1 days <timestamp-range> >array
 ] unit-test
 
+! duration to
+{
+    {
+        T{ timestamp { year 2023 } { month 6 } { day 21 } }
+        T{ timestamp { year 2023 } { month 6 } { day 24 } }
+        T{ timestamp { year 2023 } { month 6 } { day 27 } }
+        T{ timestamp { year 2023 } { month 6 } { day 30 } }
+    }
+} [
+    2023 06 21 <date-utc> 10 days
+    3 days <timestamp-range> >array
+] unit-test

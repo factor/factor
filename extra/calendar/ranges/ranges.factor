@@ -12,7 +12,7 @@ TUPLE: timestamp-range
     { step duration read-only } ;
 
 : <timestamp-range> ( from to step -- timestamp-range )
-    [ over time- ] dip [
+    [ dup duration? [ over time+ ] when over time- ] dip [
         [ duration>seconds ] bi@ sign/mod 0 < [ 1 + ] unless 0 max
     ] keep timestamp-range boa ;
 
