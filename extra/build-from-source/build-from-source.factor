@@ -12,9 +12,17 @@ IN: build-from-source
 INITIALIZED-SYMBOL: use-gitlab-git-uris [ f ]
 INITIALIZED-SYMBOL: use-github-git-uris [ f ]
 
+SYMBOL: out-directory
+
 : dll-out-directory ( -- path )
     vm-path parent-directory cell-bits "dlls%s-out" sprintf append-path
     dup make-directories ;
+
+: get-out-directory ( -- path )
+    out-directory get [ dll-out-directory ] unless* ;
+
+: with-out-directory ( path quot -- )
+    [ out-directory ] dip with-variable ; inline
 
 : remake-directory ( path -- )
     [ ?delete-tree ] [ make-directories ] bi ;
@@ -29,20 +37,20 @@ INITIALIZED-SYMBOL: use-github-git-uris [ f ]
 ERROR: no-output-file path ;
 : copy-output-file-as ( name new-name -- )
     [ prepend-current-path dup file-exists? [ no-output-file ] unless ]
-    [ dll-out-directory prepend-path ] bi* copy-file ;
+    [ get-out-directory prepend-path ] bi* copy-file ;
 
 : copy-vm-file-as ( name new-name -- )
     [ prepend-current-path ]
     [ vm-path parent-directory prepend-path ] bi* copy-file ;
 
 : copy-output-file ( name -- )
-    prepend-current-path dll-out-directory copy-file-into ;
+    prepend-current-path get-out-directory copy-file-into ;
 
 : copy-output-files ( seq -- )
     [ copy-output-file ] each ;
 
 : delete-output-file ( name -- )
-    dll-out-directory prepend-path ?delete-file ;
+    get-out-directory prepend-path ?delete-file ;
 
 : delete-output-files ( seq -- )
     [ delete-output-file ] each ;
