@@ -1,12 +1,13 @@
 ! Copyright (C) 2023 Doug Coleman.
 ! See https://factorcode.org/license.txt for BSD license.
 USING: accessors alien.syntax arrays assocs byte-arrays calendar
-combinators combinators.short-circuit continuations destructors
-formatting hashtables help http http.client http.websockets io
-io.encodings.string io.encodings.utf8 io.streams.string json
-kernel math multiline namespaces prettyprint
-prettyprint.sections random sequences sets splitting strings
-threads tools.hexdump unicode vocabs words ;
+combinators combinators.short-circuit concurrency.mailboxes
+continuations destructors formatting hashtables help http
+http.client http.websockets io io.encodings.string
+io.encodings.utf8 io.streams.string json kernel math multiline
+namespaces prettyprint prettyprint.sections random sequences
+sets splitting strings threads tools.hexdump unicode vocabs
+words ;
 IN: discord
 
 CONSTANT: discord-api-url "https://discord.com/api/v10"
@@ -19,7 +20,7 @@ TUPLE: discord-bot-config
     token application-id guild-id channel-id permissions
     user-callback obey-names
     metadata
-    discord-bot ;
+    discord-bot mailbox connect-thread ;
 
 TUPLE: discord-bot
     config in out bot-thread heartbeat-thread
@@ -430,6 +431,7 @@ DEFER: discord-reconnect
                     [ handle-discord-websocket discord-bot-config get discord-bot>> stop?>> not ] read-websocket-loop
                 ] with-streams
             ] with-variable
+            discord-bot-config get mailbox>> "disconnected" swap mailbox-put
         ] "Discord Bot" spawn >>bot-thread discord-bot-config get discord-bot<<
     ] if ;
 
@@ -443,13 +445,22 @@ M: discord-bot dispose
         [ f >>in f >>out drop ] tri
     ] with-destructors ;
 
+M: discord-bot-config dispose
+    discord-bot>> dispose ;
+
 : discord-connect ( config -- )
+    <mailbox> >>mailbox
     \ discord-bot-config [
         [
-            "connecting" g.
-            discord-reconnect discord-bot-config get discord-bot>>
-            [ reconnect?>> ] [ stop?>> not ] bi and
-        ] loop
+            [
+                "connecting" g.
+                discord-reconnect
+                discord-bot-config get
+                ! wait here for signal to maybe reconnect
+                [ mailbox>> mailbox-get ] [ discord-bot>> ] bi
+                [ reconnect?>> ] [ stop?>> not ] bi and
+            ] loop
+        ] "Discord bot connect loop" spawn discord-bot-config get connect-thread<<
     ] with-variable ;
 
 : reply-command ( json -- ? )
