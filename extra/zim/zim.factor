@@ -3,11 +3,11 @@
 
 USING: accessors alien.c-types alien.data arrays assocs
 binary-search classes.struct combinators
-combinators.short-circuit compression.zstd http.server
-http.server.responses io io.encodings.binary io.encodings.string
-io.encodings.utf8 io.files kernel lru-cache math math.bitwise
-math.order namespaces prettyprint sequences sequences.private
-strings ;
+combinators.short-circuit command-line compression.zstd
+http.server http.server.responses io io.encodings.binary
+io.encodings.string io.encodings.utf8 io.files io.servers kernel
+lru-cache math math.bitwise math.order namespaces sequences
+sequences.private ;
 
 IN: zim
 
@@ -189,13 +189,11 @@ M: redirect-entry read-entry-cluster
     [ header>> main-page>> ] [ read-content-index ] bi ;
 
 :: read-entry-url ( namespace url zim -- blob mime-type )
-    ! XXX: fix double read-entry-index on success
-    zim header>> entry-count>> <iota> [
-        zim read-entry-index
+    f zim header>> entry-count>> <iota> [
+        nip zim read-entry-index
         dup namespace>> namespace >=< dup +eq+ =
-        [ drop url>> url >=< ] [ nip ] if
-    ] search nip zim read-entry-index :> entry
-    entry zim read-entry-cluster ;
+        [ drop dup url>> url >=< ] when
+    ] search 2drop zim read-entry-cluster ;
 
 M: zim length header>> entry-count>> ;
 
