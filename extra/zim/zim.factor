@@ -77,8 +77,9 @@ TUPLE: redirect-entry mime-type parameter-len namespace revision
     [ read-redirect-entry ] [ read-content-entry ] if ;
 
 : read-cluster-none ( -- offsets blobs )
-    read-uint32 [ 1 - [ read-uint32 ] replicate ] [ prefix ] bi
-    dup last read ;
+    read-uint32
+    [ 4 /i 1 - [ read-uint32 ] replicate ] [ prefix ] bi
+    dup [ last ] [ first ] bi - read ;
 
 : read-cluster-zstd ( -- offsets blobs )
     zstd-uncompress-stream-frame dup uint32_t deref
@@ -126,7 +127,6 @@ TUPLE: zim path header mime-types urls titles clusters cluster-cache ;
             ] [
                 dup url-ptr-pos>> seek-absolute seek-input
                 entry-count>> [ read-uint64 ] replicate
-                ! [ seek-absolute seek-input read-entry ] map
             ] [
                 dup title-ptr-pos>> seek-absolute seek-input
                 entry-count>> [ read-uint32 ] replicate
@@ -188,14 +188,17 @@ M: redirect-entry read-entry-cluster
 : read-main-page ( zim -- blob/f mime-type/f )
     [ header>> main-page>> ] [ read-content-index ] bi ;
 
-:: read-entry-url ( namespace url zim -- blob mime-type )
+:: find-entry-url ( namespace url zim -- entry/f )
     f zim header>> entry-count>> <iota> [
         nip zim read-entry-index
         dup namespace>> namespace >=< dup +eq+ =
         [ drop dup url>> url >=< ] when
-    ] search 2drop
-    dup { [ namespace>> namespace = ] [ url>> url = ] } 1&&
-    [ zim read-entry-cluster ] [ drop f f ] if ;
+    ] search 2drop dup {
+        [ namespace>> namespace = ] [ url>> url = ]
+    } 1&& [ drop f ] unless ;
+
+: read-entry-url ( namespace url zim -- blob/f mime-type/f )
+    [ find-entry-url ] keep '[ _ read-entry-cluster ] [ f f ] if* ;
 
 M: zim length header>> entry-count>> ;
 
