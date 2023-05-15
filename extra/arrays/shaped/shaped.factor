@@ -92,6 +92,10 @@ TUPLE: col-array < shaped-array ;
 
 M: shaped-array length underlying>> length ; inline
 
+M: shaped-array nth-unsafe underlying>> nth-unsafe ;
+
+M: shaped-array like shape>> <shaped-array> ;
+
 M: shaped-array shape shape>> ;
 
 : make-shaped-array ( underlying shape class -- shaped-array )
