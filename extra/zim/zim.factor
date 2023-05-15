@@ -7,7 +7,7 @@ combinators.short-circuit command-line compression.zstd
 http.server http.server.responses io io.encodings.binary
 io.encodings.string io.encodings.utf8 io.files io.servers kernel
 lru-cache math math.bitwise math.order namespaces sequences
-sequences.private ;
+sequences.private splitting ;
 
 IN: zim
 
@@ -193,7 +193,9 @@ M: redirect-entry read-entry-cluster
         nip zim read-entry-index
         dup namespace>> namespace >=< dup +eq+ =
         [ drop dup url>> url >=< ] when
-    ] search 2drop zim read-entry-cluster ;
+    ] search 2drop
+    dup { [ namespace>> namespace = ] [ url>> url = ] } 1&&
+    [ zim read-entry-cluster ] [ drop f f ] if ;
 
 M: zim length header>> entry-count>> ;
 
@@ -204,6 +206,19 @@ M: zim nth-unsafe
     ] with-zim-reader ;
 
 INSTANCE: zim sequence
+
+M: zim assoc-size header>> entry-count>> ;
+
+M: zim at*
+    dup [
+        [
+            "/" split
+            dup { [ length 1 > ] [ first length 1 = ] } 1&&
+            [ unclip-slice first ] [ CHAR: A ] if swap "/" join
+        ] [ read-entry-url 2array t ] bi*
+    ] with-zim-reader ;
+
+INSTANCE: zim assoc
 
 CONSTANT: USER-CONTENT CHAR: C
 CONSTANT: ZIM-METADATA CHAR: M
@@ -244,7 +259,11 @@ M: zim-responder call-responder*
         zim>> dup [
             over [ read-entry-url ] [ 2nip read-main-page ] if
         ] with-zim-reader
-    ] bi* <content> binary >>content-encoding ;
+    ] bi* 2dup and [
+        <content> binary >>content-encoding
+    ] [
+        2drop <404>
+    ] if ;
 
 : zim-main ( -- )
     command-line get [
