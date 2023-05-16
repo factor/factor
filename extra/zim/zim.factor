@@ -1,4 +1,4 @@
-! Copyright (C) 2021 John Benediktsson
+! Copyright (C) 2023 John Benediktsson
 ! See https://factorcode.org/license.txt for BSD license
 
 USING: accessors alien.c-types alien.data arrays assocs
@@ -139,25 +139,6 @@ TUPLE: zim path header mime-types urls titles clusters cluster-cache ;
             ]
         } cleave 32 <lru-hash> zim boa
     ] with-file-reader ;
-
-: read-uint32-pointer ( n ptr-pos -- ptr/f )
-    over 0xffffffff = [ 2drop f ] [
-        [ 4 * ] [ + ] bi* seek-absolute seek-input read-uint32
-    ] if ;
-
-: read-uint64-pointer ( n ptr-pos -- ptr/f )
-    over 0xffffffff = [ 2drop f ] [
-        [ 8 * ] [ + ] bi* seek-absolute seek-input read-uint64
-    ] if ;
-
-: read-url-pointer ( n zim -- ptr/f )
-    header>> url-ptr-pos>> read-uint64-pointer ;
-
-: read-title-pointer ( n zim -- ptr/f )
-    header>> title-ptr-pos>> read-uint32-pointer ;
-
-: read-cluster-pointer ( n zim -- ptr/f )
-    header>> cluster-ptr-pos>> read-uint64-pointer ;
 
 : with-zim-reader ( zim quot -- )
     [ path>> binary ] [ with-file-reader ] bi* ; inline
