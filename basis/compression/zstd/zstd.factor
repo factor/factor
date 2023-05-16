@@ -49,40 +49,40 @@ PRIVATE>
     in-size <byte-vector> :> in
     out-size <byte-array> :> out
 
+    out-size <byte-vector> :> accum
+
     [
+        ZSTD_createDCtx &ZSTD_freeDCtx :> dctx
+        0 size_t <ref> :> in-pos
+        0 size_t <ref> :> out-pos
+
+        in [ underlying>> read-into drop length ] [ set-length ] bi
+
         [
-            ZSTD_createDCtx &ZSTD_freeDCtx :> dctx
-            0 size_t <ref> :> in-pos
-            0 size_t <ref> :> out-pos
+            dctx
+            out out-size out-pos
+            in in length in-pos
+            ZSTD_decompressStream_simpleArgs check-zstd-error
 
-            in [ underlying>> read-into drop length ] [ set-length ] bi
+            out out-pos size_t deref head-slice accum push-all
 
-            [
-                dctx
-                out out-size out-pos
-                in in length in-pos
-                ZSTD_decompressStream_simpleArgs check-zstd-error
+            in-pos size_t deref in-size = [
+                in [ underlying>> read-into drop length ] [ set-length ] bi
+                0 in-pos 0 size_t set-alien-value
+            ] when
 
-                out out-pos size_t deref head-slice %
+            zero? [
+                ! 0 is only seen when a frame is fully
+                ! decoded *and* fully flushed. But there may
+                ! be extra input data
+                f
+            ] [
+                ! We're not at the end of the frame *or*
+                ! we're not fully flushed.
+                in-pos size_t deref in-size =
+                out-pos size_t deref out-size < and not
 
-                in-pos size_t deref in-size = [
-                    in [ underlying>> read-into drop length ] [ set-length ] bi
-                    0 in-pos 0 size_t set-alien-value
-                ] when
-
-                zero? [
-                    ! 0 is only seen when a frame is fully
-                    ! decoded *and* fully flushed. But there may
-                    ! be extra input data
-                    f
-                ] [
-                    ! We're not at the end of the frame *or*
-                    ! we're not fully flushed.
-                    in-pos size_t deref in-size =
-                    out-pos size_t deref out-size < and not
-
-                    0 out-pos 0 size_t set-alien-value
-                ] if
-            ] loop
-        ] B{ } make
+                0 out-pos 0 size_t set-alien-value
+            ] if
+        ] loop accum B{ } like
     ] with-destructors ;
