@@ -3,11 +3,9 @@
 
 USING: accessors alien.c-types alien.data arrays assocs
 binary-search classes.struct combinators
-combinators.short-circuit command-line compression.zstd endian
-formatting http.server http.server.responses io
+combinators.short-circuit compression.zstd endian io
 io.encodings.binary io.encodings.string io.encodings.utf8
-io.files io.servers kernel lru-cache math math.bitwise
-math.order math.parser namespaces sequences sequences.extras
+io.files kernel lru-cache math math.bitwise math.order sequences
 sequences.private splitting ;
 
 IN: zim
@@ -221,60 +219,3 @@ M: zim at*
     ] with-zim-reader ;
 
 INSTANCE: zim assoc
-
-CONSTANT: USER-CONTENT CHAR: C
-CONSTANT: ZIM-METADATA CHAR: M
-CONSTANT: WELL-KNOWN CHAR: W
-CONSTANT: SEARCH-INDEX CHAR: X
-
-CONSTANT: iso639 H{
-    { "ara" "ar" }
-    { "dan" "da" }
-    { "nld" "nl" }
-    { "eng" "en" }
-    { "fin" "fi" }
-    { "fra" "fr" }
-    { "deu" "de" }
-    { "hun" "hu" }
-    { "ita" "it" }
-    { "nor" "no" }
-    { "por" "pt" }
-    { "ron" "ro" }
-    { "rus" "ru" }
-    { "spa" "es" }
-    { "swe" "sv" }
-    { "tur" "tr" }
-}
-
-TUPLE: zim-responder zim ;
-
-: <zim-responder> ( path -- zim-responder )
-    read-zim zim-responder boa ;
-
-M: zim-responder call-responder*
-    [
-        dup { [ length 1 > ] [ first length 1 = ] } 1&&
-        [ unclip-slice first ] [ f ] if swap "/" join
-        dup { "" "index.htm" "index.html" "main.htm" "main.html" }
-        member? [ drop f ] when
-    ] [
-        zim>> dup [
-            over [ read-entry-url ] [ 2nip read-main-page ] if
-        ] with-zim-reader
-    ] bi* 2dup and [
-        <content> binary >>content-encoding
-    ] [
-        2drop <404>
-    ] if ;
-
-: zim-main ( -- )
-    command-line get [
-        "Usage: zim path [port]" print
-    ] [
-        ?first2 [ string>number ] [ 8080 ] if*
-        2dup "Serving '%s' on port %d\n" printf flush
-        swap <zim-responder> main-responder set-global
-        httpd wait-for-server
-    ] if-empty ;
-
-MAIN: zim-main
