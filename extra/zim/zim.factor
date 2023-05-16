@@ -3,7 +3,7 @@
 
 USING: accessors alien.c-types alien.data arrays assocs
 binary-search classes.struct combinators
-combinators.short-circuit command-line compression.zstd
+combinators.short-circuit command-line compression.zstd endian
 http.server http.server.responses io io.encodings.binary
 io.encodings.string io.encodings.utf8 io.files io.servers kernel
 lru-cache math math.bitwise math.order namespaces sequences
@@ -12,6 +12,8 @@ sequences.private splitting ;
 IN: zim
 
 ! https://openzim.org/wiki/ZIM_file_format
+
+! XXX: make sure this is always little-endian
 
 PACKED-STRUCT: zim-header
     { magic-number uint32_t }
@@ -28,22 +30,20 @@ PACKED-STRUCT: zim-header
     { layout-page uint32_t }
     { checksum-pos uint64_t } ;
 
-! XXX: make sure this is always little-endian
-
 : read-uint16 ( -- n )
-    2 read uint16_t deref ;
+    2 read le> ;
 
 : read-uint32 ( -- n )
-    4 read uint32_t deref ;
+    4 read le> ;
 
 : read-uint64 ( -- n )
-    8 read uint64_t deref ;
+    8 read le> ;
 
 : read-string ( -- str )
     { 0 } read-until 0 assert= utf8 decode ;
 
 : read-mime-types ( -- seq )
-    [ read-string dup empty? not ] [ utf8 decode ] produce nip ;
+    [ read-string dup empty? not ] [ ] produce nip ;
 
 TUPLE: content-entry mime-type parameter-len namespace
     revision cluster-number blob-number url title parameter ;
@@ -140,24 +140,24 @@ TUPLE: zim path header mime-types urls titles clusters cluster-cache ;
         } cleave 32 <lru-hash> zim boa
     ] with-file-reader ;
 
-: read-uint32-offset ( n ptr-pos -- offset/f )
+: read-uint32-pointer ( n ptr-pos -- ptr/f )
     over 0xffffffff = [ 2drop f ] [
         [ 4 * ] [ + ] bi* seek-absolute seek-input read-uint32
     ] if ;
 
-: read-uint64-offset ( n ptr-pos -- offset/f )
+: read-uint64-pointer ( n ptr-pos -- ptr/f )
     over 0xffffffff = [ 2drop f ] [
         [ 8 * ] [ + ] bi* seek-absolute seek-input read-uint64
     ] if ;
 
-: read-url-offset ( n zim -- offset/f )
-    header>> url-ptr-pos>> read-uint64-offset ;
+: read-url-pointer ( n zim -- ptr/f )
+    header>> url-ptr-pos>> read-uint64-pointer ;
 
-: read-title-offset ( n zim -- offset/f )
-    header>> title-ptr-pos>> read-uint32-offset ;
+: read-title-pointer ( n zim -- ptr/f )
+    header>> title-ptr-pos>> read-uint32-pointer ;
 
-: read-cluster-offset ( n zim -- offset/f )
-    header>> cluster-ptr-pos>> read-uint64-offset ;
+: read-cluster-pointer ( n zim -- ptr/f )
+    header>> cluster-ptr-pos>> read-uint64-pointer ;
 
 : with-zim-reader ( zim quot -- )
     [ path>> binary ] [ with-file-reader ] bi* ; inline
@@ -165,7 +165,7 @@ TUPLE: zim path header mime-types urls titles clusters cluster-cache ;
 : read-entry-index ( n zim -- entry/f )
     urls>> nth seek-absolute seek-input read-entry ;
 
-: read-content-index ( blob-number cluster-number zim -- blob )
+: read-blob-index ( blob-number cluster-number zim -- blob )
     [ cluster-cache>> ] [ clusters>> ] bi '[
         _ nth seek-absolute seek-input
         read-cluster zim-cluster boa
@@ -176,7 +176,7 @@ GENERIC#: read-entry-content 1 ( entry zim -- blob mime-type )
 M:: content-entry read-entry-content ( entry zim -- blob mime-type )
     entry blob-number>>
     entry cluster-number>>
-    zim read-content-index
+    zim read-blob-index
     entry mime-type>>
     zim mime-types>> nth ;
 
