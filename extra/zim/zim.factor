@@ -173,12 +173,10 @@ M: integer read-entry-content
 :: (find-entry-url) ( namespace url zim -- entry/f )
     f zim header>> entry-count>> <iota> [
         nip zim read-entry-index
-        namespace [ over namespace>> <=> ] [ +eq+ ] if*
+        namespace over namespace>> <=>
         dup +eq+ = [ drop url over url>> <=> ] when
     ] search 2drop dup {
-        [ ]
-        [ namespace>> namespace [ = ] [ drop t ] if* ]
-        [ url>> url = ]
+        [ ] [ namespace>> namespace = ] [ url>> url = ]
     } 1&& [ drop f ] unless ;
 
 : find-entry-url ( namespace url zim -- entry/f )
