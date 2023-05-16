@@ -6,8 +6,8 @@ binary-search classes.struct combinators
 combinators.short-circuit command-line compression.zstd endian
 http.server http.server.responses io io.encodings.binary
 io.encodings.string io.encodings.utf8 io.files io.servers kernel
-lru-cache math math.bitwise math.order namespaces sequences
-sequences.private splitting ;
+lru-cache math math.bitwise math.order math.parser namespaces
+sequences sequences.extras sequences.private splitting ;
 
 IN: zim
 
@@ -118,7 +118,7 @@ M:: zim-cluster nth-unsafe ( n cluster -- blob )
 
 INSTANCE: zim-cluster sequence
 
-TUPLE: zim path header mime-types urls titles clusters cluster-cache ;
+TUPLE: zim path header mime-types urls titles entries clusters cluster-cache ;
 
 : read-zim ( path -- zim )
     dup binary [
@@ -134,6 +134,8 @@ TUPLE: zim path header mime-types urls titles clusters cluster-cache ;
                 dup title-ptr-pos>> seek-absolute seek-input
                 entry-count>> [ read-uint32 ] replicate
             ] [
+                entry-count>> f <array>
+            ] [
                 dup cluster-ptr-pos>> seek-absolute seek-input
                 cluster-count>> [ read-uint64 ] replicate
             ]
@@ -143,12 +145,18 @@ TUPLE: zim path header mime-types urls titles clusters cluster-cache ;
 : with-zim-reader ( zim quot -- )
     [ path>> binary ] [ with-file-reader ] bi* ; inline
 
-: read-entry-index ( n zim -- entry/f )
+: (read-entry-index) ( n zim -- entry/f )
     urls>> nth seek-absolute seek-input read-entry ;
 
+:: read-entry-index ( n zim -- entry/f )
+    zim entries>> :> entries
+    n entries nth [
+        n zim (read-entry-index) dup n entries set-nth
+    ] unless* ;
+
 : read-blob-index ( blob-number cluster-number zim -- blob )
-    [ cluster-cache>> ] [ clusters>> ] bi '[
-        _ nth seek-absolute seek-input
+    [ cluster-cache>> ] keep '[
+        _ clusters>> nth seek-absolute seek-input
         read-cluster zim-cluster boa
     ] cache nth ;
 
@@ -170,7 +178,12 @@ M: integer read-entry-content
 : read-main-page ( zim -- blob/f mime-type/f )
     [ header>> main-page>> ] [ read-entry-content ] bi ;
 
-:: (find-entry-url) ( namespace url zim -- entry/f )
+:: (find-entry-url) ( url zim -- entry/f )
+    zim header>> entry-count>> <iota> [
+        zim read-entry-index url over url>> = [ drop f ] unless
+    ] map-find drop ;
+
+:: (find-entry-url-full) ( namespace url zim -- entry/f )
     f zim header>> entry-count>> <iota> [
         nip zim read-entry-index
         namespace over namespace>> <=>
@@ -179,11 +192,10 @@ M: integer read-entry-content
         [ ] [ namespace>> namespace = ] [ url>> url = ]
     } 1&& [ drop f ] unless ;
 
-: find-entry-url ( namespace url zim -- entry/f )
-    [ [ 1array ] [ "AC" ] if* ] 2dip
-    '[ _ _ (find-entry-url) ] map-find drop ;
+: find-entry-url ( namespace/f url zim -- entry/f )
+    pick [ (find-entry-url-full) ] [ (find-entry-url) nip ] if ;
 
-: read-entry-url ( namespace url zim -- blob/f mime-type/f )
+: read-entry-url ( namespace/f url zim -- blob/f mime-type/f )
     [ find-entry-url ] keep '[ _ read-entry-content ] [ f f ] if* ;
 
 M: zim length header>> entry-count>> ;
@@ -256,10 +268,10 @@ M: zim-responder call-responder*
 
 : zim-main ( -- )
     command-line get [
-        "Usage: zim path" print
+        "Usage: zim path [port]" print
     ] [
-        first <zim-responder> main-responder set-global
-        8080 httpd wait-for-server
+        ?first2 swap <zim-responder> main-responder set-global
+        [ string>number ] [ 8080 ] if* httpd wait-for-server
     ] if-empty ;
 
 MAIN: zim-main
