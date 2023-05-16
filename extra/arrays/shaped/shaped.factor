@@ -2,7 +2,8 @@
 ! See https://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs combinators.short-circuit
 grouping kernel math math.functions math.order math.vectors
-parser prettyprint.custom sequences sequences.deep ;
+parser prettyprint.custom sequences sequences.deep
+sequences.private ;
 IN: arrays.shaped
 
 : flat? ( array -- ? ) [ sequence? ] none? ; inline
@@ -80,6 +81,7 @@ M: sequence check-underlying-shape
 ERROR: shape-mismatch shaped0 shaped1 ;
 
 DEFER: >shaped-array
+DEFER: <shaped-array>
 
 : check-shape ( shaped-array shaped-array -- shaped-array shaped-array )
     [ >shaped-array ] bi@
