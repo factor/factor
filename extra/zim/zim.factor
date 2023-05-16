@@ -28,6 +28,8 @@ PACKED-STRUCT: zim-header
     { layout-page uint32_t }
     { checksum-pos uint64_t } ;
 
+! XXX: make sure this is always little-endian
+
 : read-uint16 ( -- n )
     2 read uint16_t deref ;
 
@@ -163,31 +165,29 @@ TUPLE: zim path header mime-types urls titles clusters cluster-cache ;
 : read-entry-index ( n zim -- entry/f )
     urls>> nth seek-absolute seek-input read-entry ;
 
-: read-cluster-index ( blob-number cluster-number zim -- blob )
+: read-content-index ( blob-number cluster-number zim -- blob )
     [ cluster-cache>> ] [ clusters>> ] bi '[
         _ nth seek-absolute seek-input
         read-cluster zim-cluster boa
     ] cache nth ;
 
-DEFER: read-content-index
+GENERIC#: read-entry-content 1 ( entry zim -- blob mime-type )
 
-GENERIC#: read-entry-cluster 1 ( entry zim -- blob mime-type )
-
-M:: content-entry read-entry-cluster ( entry zim -- blob mime-type )
+M:: content-entry read-entry-content ( entry zim -- blob mime-type )
     entry blob-number>>
     entry cluster-number>>
-    zim read-cluster-index
+    zim read-content-index
     entry mime-type>>
     zim mime-types>> nth ;
 
-M: redirect-entry read-entry-cluster
-    [ redirect-index>> ] [ read-content-index ] bi* ;
+M: redirect-entry read-entry-content
+    [ redirect-index>> ] [ read-entry-content ] bi* ;
 
-: read-content-index ( n zim -- blob/f mime-type/f )
-    [ read-entry-index ] keep '[ _ read-entry-cluster ] [ f f ] if* ;
+M: integer read-entry-content
+    [ read-entry-index ] keep '[ _ read-entry-content ] [ f f ] if* ;
 
 : read-main-page ( zim -- blob/f mime-type/f )
-    [ header>> main-page>> ] [ read-content-index ] bi ;
+    [ header>> main-page>> ] [ read-entry-content ] bi ;
 
 :: find-entry-url ( namespace url zim -- entry/f )
     f zim header>> entry-count>> <iota> [
@@ -202,14 +202,14 @@ M: redirect-entry read-entry-cluster
     } 1&& [ drop f ] unless ;
 
 : read-entry-url ( namespace url zim -- blob/f mime-type/f )
-    [ find-entry-url ] keep '[ _ read-entry-cluster ] [ f f ] if* ;
+    [ find-entry-url ] keep '[ _ read-entry-content ] [ f f ] if* ;
 
 M: zim length header>> entry-count>> ;
 
 M: zim nth-unsafe
     dup [
-        [ read-entry-index ]
-        [ read-content-index drop ] 2bi 2array
+        [ read-entry-index dup ]
+        [ read-entry-content drop ] bi 2array
     ] with-zim-reader ;
 
 INSTANCE: zim sequence
