@@ -170,7 +170,7 @@ M: integer read-entry-content
 : read-main-page ( zim -- blob/f mime-type/f )
     [ header>> main-page>> ] [ read-entry-content ] bi ;
 
-:: find-entry-url ( namespace url zim -- entry/f )
+:: (find-entry-url) ( namespace url zim -- entry/f )
     f zim header>> entry-count>> <iota> [
         nip zim read-entry-index
         namespace [ over namespace>> <=> ] [ +eq+ ] if*
@@ -180,6 +180,10 @@ M: integer read-entry-content
         [ namespace>> namespace [ = ] [ drop t ] if* ]
         [ url>> url = ]
     } 1&& [ drop f ] unless ;
+
+: find-entry-url ( namespace url zim -- entry/f )
+    [ [ 1array ] [ "AC" ] if* ] 2dip
+    '[ _ _ (find-entry-url) ] map-find drop ;
 
 : read-entry-url ( namespace url zim -- blob/f mime-type/f )
     [ find-entry-url ] keep '[ _ read-entry-content ] [ f f ] if* ;
