@@ -4,10 +4,11 @@
 USING: accessors alien.c-types alien.data arrays assocs
 binary-search classes.struct combinators
 combinators.short-circuit command-line compression.zstd endian
-http.server http.server.responses io io.encodings.binary
-io.encodings.string io.encodings.utf8 io.files io.servers kernel
-lru-cache math math.bitwise math.order math.parser namespaces
-sequences sequences.extras sequences.private splitting ;
+formatting http.server http.server.responses io
+io.encodings.binary io.encodings.string io.encodings.utf8
+io.files io.servers kernel lru-cache math math.bitwise
+math.order math.parser namespaces sequences sequences.extras
+sequences.private splitting ;
 
 IN: zim
 
@@ -270,8 +271,10 @@ M: zim-responder call-responder*
     command-line get [
         "Usage: zim path [port]" print
     ] [
-        ?first2 swap <zim-responder> main-responder set-global
-        [ string>number ] [ 8080 ] if* httpd wait-for-server
+        ?first2 [ string>number ] [ 8080 ] if*
+        2dup "Serving '%s' on port %d\n" printf flush
+        swap <zim-responder> main-responder set-global
+        httpd wait-for-server
     ] if-empty ;
 
 MAIN: zim-main
