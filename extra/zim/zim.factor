@@ -121,6 +121,7 @@ TUPLE: zim path header mime-types urls titles clusters cluster-cache ;
 : read-zim ( path -- zim )
     dup binary [
         zim-header read-struct dup {
+            [ magic-number>> 0x44D495A assert= ]
             [
                 mime-list-ptr-pos>> seek-absolute seek-input
                 read-mime-types
@@ -190,11 +191,14 @@ M: redirect-entry read-entry-cluster
 
 :: find-entry-url ( namespace url zim -- entry/f )
     f zim header>> entry-count>> <iota> [
-        nip zim read-entry-index
-        dup namespace>> namespace >=< dup +eq+ =
-        [ drop dup url>> url >=< ] when
+        nip zim read-entry-index url over url>> <=>
+        dup +eq+ = [
+            namespace [ nip over namespace>> <=> ] when*
+        ] when
     ] search 2drop dup {
-        [ namespace>> namespace = ] [ url>> url = ]
+        [ ]
+        [ namespace>> namespace [ = ] [ drop t ] if* ]
+        [ url>> url = ]
     } 1&& [ drop f ] unless ;
 
 : read-entry-url ( namespace url zim -- blob/f mime-type/f )
@@ -217,7 +221,7 @@ M: zim at*
         [
             "/" split
             dup { [ length 1 > ] [ first length 1 = ] } 1&&
-            [ unclip-slice first ] [ CHAR: A ] if swap "/" join
+            [ unclip-slice first ] [ f ] if swap "/" join
         ] [ read-entry-url 2array t ] bi*
     ] with-zim-reader ;
 
@@ -255,7 +259,7 @@ TUPLE: zim-responder zim ;
 M: zim-responder call-responder*
     [
         dup { [ length 1 > ] [ first length 1 = ] } 1&&
-        [ unclip-slice first ] [ CHAR: A ] if swap "/" join
+        [ unclip-slice first ] [ f ] if swap "/" join
         dup { "" "index.htm" "index.html" "main.htm" "main.html" }
         member? [ drop f ] when
     ] [
