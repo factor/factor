@@ -28,14 +28,22 @@ M: readline-reader prompt.
 : prefixed ( prefix seq -- seq' )
     swap '[ _ head? ] filter ;
 
+: named ( seq -- seq' )
+    [ name>> ] map ;
+
+: qualified ( seq -- seq' )
+    [ [ vocabulary>> ] [ name>> ] bi ":" glue ] map ;
+
 : prefixed-words ( prefix -- words )
-    all-words [ name>> ] map! prefixed members ;
+    all-words ":" pick subseq? [
+        [ named ] [ qualified ] bi append
+    ] [ named ] if prefixed members ;
 
 : prefixed-vocabs ( prefix -- vocabs )
-    all-disk-vocabs-recursive filter-vocabs [ name>> ] map! prefixed ;
+    all-disk-vocabs-recursive filter-vocabs named prefixed ;
 
 : prefixed-vocab-words ( prefix vocab-name -- words )
-    vocab-words [ name>> ] map! prefixed ;
+    vocab-words named prefixed ;
 
 : prefixed-colors ( prefix -- colors )
     named-colors prefixed ;
