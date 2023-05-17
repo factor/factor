@@ -20,9 +20,9 @@ M: zim-responder call-responder*
         dup { "" "index.htm" "index.html" "main.htm" "main.html" }
         member? [ drop f ] when
     ] [
-        zim>> dup [
+        zim>> [
             over [ read-entry-url ] [ 2nip read-main-page ] if
-        ] with-zim-reader
+        ] with-zim
     ] bi* 2dup and [
         <content> binary >>content-encoding
     ] [
