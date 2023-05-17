@@ -2,9 +2,10 @@
 ! See https://factorcode.org/license.txt for BSD license
 
 USING: accessors alien.c-types alien.data arrays checksums
-checksums.md5 endian io io.directories io.encodings.binary
-io.encodings.string io.encodings.utf8 io.files io.files.info
-io.files.types kernel math math.statistics mime.types sequences
+checksums.md5 compression.zstd endian io io.directories
+io.encodings.binary io.encodings.string io.encodings.utf8
+io.files io.files.info io.files.types io.streams.byte-array
+kernel math math.statistics mime.types sequences
 sequences.extras sets sorting uuid zim ;
 
 IN: zim.builder
@@ -12,17 +13,29 @@ IN: zim.builder
 : write-strings ( mime-types -- )
     [ utf8 encode write 0 write1 ] each 0 write1 ;
 
-CONSTANT: COMPRESS_NONE 1
-CONSTANT: COMPRESS_ZLIB 2
-CONSTANT: COMPRESS_BZIP2 3
-CONSTANT: COMPRESS_LZMA 4
-CONSTANT: COMPRESS_ZSTD 5
+SYMBOLS: +zlib+ +bzip2+ +lzma+ +zstd+ ;
 
-: write-cluster ( blobs -- )
-    COMPRESS_NONE write1 [
+SYMBOL: zim-compression
+
+: write-cluster-none ( blobs -- )
+    1 write1 [
         dup length 1 + 4 * dup 4 >le write
         [ length + [ 4 >le write ] keep ] reduce drop
     ] [ [ write ] each ] bi ;
+
+: write-cluster-zstd ( blobs -- )
+    5 write1
+    binary [ write-cluster-none ] with-byte-writer
+    rest-slice zstd-compress write ;
+
+: write-cluster ( blobs -- )
+    zim-compression get {
+        { f [ write-cluster-none ] }
+        { +zstd+ [ write-cluster-zstd ] }
+    } case ;
+
+: cluster-bytes ( blobs -- byte-array )
+    binary [ write-cluster ] with-byte-writer ;
 
 :: build-zim ( zim-path -- )
 
@@ -57,7 +70,10 @@ CONSTANT: COMPRESS_ZSTD 5
     entry-len cum-sum0 :> entry-ptrs
     entry-len sum :> entries-len
 
-    sizes [ 9 + ] map :> cluster-len
+    paths [
+        binary file-contents 1array cluster-bytes
+    ] map :> clusters
+    clusters [ length ] map :> cluster-len
     cluster-len cum-sum0 :> cluster-ptrs
     cluster-len sum :> clusters-len
 
@@ -119,9 +135,7 @@ CONSTANT: COMPRESS_ZSTD 5
         ] 2each-index
 
         ! write-clusters
-        paths [| path |
-            path binary file-contents 1array write-cluster
-        ] each
+        clusters [ write ] each
 
     ] with-file-writer
 
