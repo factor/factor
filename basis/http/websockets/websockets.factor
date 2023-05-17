@@ -1,9 +1,9 @@
 ! Copyright (C) 2023 Doug Coleman.
 ! See https://factorcode.org/license.txt for BSD license.
 USING: accessors alien.syntax assocs base64 combinators
-crypto.xor endian http io io.encodings.string io.encodings.utf8
-kernel math math.bitwise multiline namespaces random sequences
-strings ;
+continuations crypto.xor endian http io io.encodings.string
+io.encodings.utf8 kernel math math.bitwise multiline namespaces
+random sequences strings ;
 IN: http.websockets
 
 CONSTANT: websocket-version "13"
@@ -103,36 +103,28 @@ ENUM: WEBSOCKET-CLOSE
 ERROR: unimplemented-opcode opcode message ;
 
 : read-websocket ( -- obj opcode loop? )
-    read1 [
-        ! [ 0x80 mask? drop ] [ 7 clear-bit ] bi
-        7 clear-bit
-        [
-            {
-                { f [ "disconnected" f ] }
-                { 0 [ 0 "continuation frame" unimplemented-opcode t ] }
-                { 1 [ read-payload t ] }
-                { 2 [ read-payload utf8 decode t ] }
-                { 8 [ read-payload be> f ] }
-                { 9 [ read-payload [ send-pong ] keep t ] }
-                { 0xa [ read-payload t ] }
-                [ "fall-through" unimplemented-opcode ]
-            } case
-        ] keep swap
+    [
+        read1 [
+            ! [ 0x80 mask? drop ] [ 7 clear-bit ] bi
+            7 clear-bit
+            [
+                {
+                    { f [ "disconnected" f ] }
+                    { 0 [ 0 "continuation frame" unimplemented-opcode t ] }
+                    { 1 [ read-payload t ] }
+                    { 2 [ read-payload utf8 decode t ] }
+                    { 8 [ read-payload be> f ] }
+                    { 9 [ read-payload [ send-pong ] keep t ] }
+                    { 0xa [ read-payload t ] }
+                    [ "fall-through" unimplemented-opcode ]
+                } case
+            ] keep swap
+        ] [
+            f f f
+        ] if*
     ] [
-        f f f
-    ] if* ;
+        drop f f f
+    ] recover ;
 
 : read-websocket-loop ( quot: ( obj opcode -- loop? ) -- )
     '[ read-websocket _ dip and ] loop ; inline
-
-![[
-: handle-websocket ( obj opcode -- loop? )
-    {
-        { f [ [ "closed with error, code %d" sprintf . flush ] with-global f ] }
-        { 1 [ [ [ hexdump. flush ] with-global ] when* t ] }
-        { 2 [ [ [ hexdump. flush ] with-global ] when* t ] }
-        { 8 [ [ "close received, code: %d" sprintf print flush ] with-global t ] }
-        { 9 [ [ [ "ping received" print hexdump. flush ] with-global ] when* t ] }
-        [ 2drop t ]
-    } case ;
-]]

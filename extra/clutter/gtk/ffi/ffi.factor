@@ -6,7 +6,7 @@ IN: clutter.gtk.ffi
 
 <<
 "clutter.ffi" require
-"gtk.ffi" require
+"gtk2.ffi" require
 >>
 
 LIBRARY: clutter.gtk

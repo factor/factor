@@ -1,14 +1,16 @@
 ! Copyright (C) 2008, 2009 Slava Pestov.
 ! See https://factorcode.org/license.txt for BSD license.
-USING: accessors arrays assocs boxes continuations debugger io
-io.encodings.utf8 io.files io.streams.string kernel namespaces
-prettyprint quotations sequences strings xml.data xml.syntax
-xml.writer ;
+USING: accessors arrays assocs boxes byte-arrays continuations
+debugger io io.encodings.utf8 io.files io.streams.string kernel
+namespaces prettyprint quotations sequences strings xml.data
+xml.syntax xml.writer ;
 IN: html.templates
 
 MIXIN: template
 
 GENERIC: call-template* ( template -- )
+
+M: byte-array call-template* write ;
 
 M: string call-template* write ;
 

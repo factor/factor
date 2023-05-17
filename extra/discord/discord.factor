@@ -1,12 +1,13 @@
 ! Copyright (C) 2023 Doug Coleman.
 ! See https://factorcode.org/license.txt for BSD license.
 USING: accessors alien.syntax arrays assocs byte-arrays calendar
-combinators combinators.short-circuit continuations destructors
-formatting hashtables help http http.client http.websockets io
-io.encodings.string io.encodings.utf8 io.streams.string json
-kernel math multiline namespaces prettyprint
-prettyprint.sections random sequences sets splitting strings
-threads tools.hexdump unicode vocabs words ;
+combinators combinators.short-circuit concurrency.mailboxes
+continuations destructors formatting hashtables help http
+http.client http.websockets io io.encodings.string
+io.encodings.utf8 io.streams.string json kernel math multiline
+namespaces prettyprint prettyprint.sections random sequences
+sets splitting strings threads tools.hexdump unicode vocabs
+words ;
 IN: discord
 
 CONSTANT: discord-api-url "https://discord.com/api/v10"
@@ -18,11 +19,12 @@ TUPLE: discord-bot-config
     client-id client-secret
     token application-id guild-id channel-id permissions
     user-callback obey-names
-    metadata ;
+    metadata
+    discord-bot mailbox connect-thread ;
 
 TUPLE: discord-bot
     config in out bot-thread heartbeat-thread
-    send-heartbeat? reconnect?
+    send-heartbeat? reconnect? stop?
     sequence-number
     messages last-message
     application user session_id resume_gateway_url
@@ -35,6 +37,7 @@ TUPLE: discord-bot
         swap >>in
         t >>send-heartbeat?
         t >>reconnect?
+        f >>stop?
         V{ } clone >>messages
         H{ } clone >>guilds
         H{ } clone >>channels ;
@@ -383,58 +386,58 @@ M: TYPING_START dispatch-message drop
     } case ;
 
 DEFER: discord-reconnect
-: handle-discord-websocket ( obj opcode -- loop? )
-    ! [ "opcode: " write dup . over dup byte-array? [ utf8 decode json> ] when ... flush ] with-global
+: handle-discord-websocket ( obj opcode -- )
+    [ "opcode: " write dup . over dup byte-array? [ utf8 decode json> ] when ... flush ] with-global
     {
         { f [
             [
                 [ "closed with error, code %d" sprintf print ]
                 [ "closed with f" print ] if* flush
+                discord-bot get t >>stop? drop
             ] with-global
-            discord-bot get reconnect?>> [
-                discord-reconnect drop
-            ] when f ! don't loop this one, reconnect makes a new thread
         ] }
         { 1 [
             [ drop ]
             [ utf8 decode json> parse-discord-op ] bi
-            t
         ] }
         { 2 [
-            [ [ hexdump. flush ] with-global ] when* t
+            [ [ hexdump. flush ] with-global ] when*
         ] }
         { 8 [
             [ drop "close received" print flush ] with-global
-            discord-bot get reconnect?>> [ discord-reconnect drop ] when f
+            discord-bot get t >>stop? drop
         ] }
         { 9 [
-            [ "ping received" gprint-flush send-heartbeat ] when* t
+            [ "ping received" gprint-flush send-heartbeat ] when*
         ] }
-        [ 2drop t ]
+        [ 2drop ]
     } case ;
 
-: discord-reconnect ( -- discord-bot )
+: discord-reconnect ( -- )
+    "reconnect" g.
     discord-bot-gateway <get-request>
     add-discord-auth-header
     [ drop ] do-http-request
     dup response? [
         throw
     ] [
-        [ in>> stream>> ] [ out>> stream>> ] bi
-        \ discord-bot-config get <discord-bot>
+        [ in>> stream>> ] [ out>> stream>> ] bi \ discord-bot-config get
+        <discord-bot>
+        [ discord-bot-config get discord-bot<< ] keep
         dup '[
             _ \ discord-bot [
                 discord-bot get [ in>> ] [ out>> ] bi
                 [
-                    [ handle-discord-websocket ] read-websocket-loop
+                    [ handle-discord-websocket discord-bot-config get discord-bot>> stop?>> not ] read-websocket-loop
                 ] with-streams
             ] with-variable
-        ] "Discord Bot" spawn
-        >>bot-thread
+            discord-bot-config get mailbox>> "disconnected" swap mailbox-put
+        ] "Discord Bot" spawn >>bot-thread discord-bot-config get discord-bot<<
     ] if ;
 
 M: discord-bot dispose
     f >>reconnect?
+    t >>stop?
     f >>send-heartbeat?
     [
         [ in>> &dispose drop ]
@@ -442,8 +445,23 @@ M: discord-bot dispose
         [ f >>in f >>out drop ] tri
     ] with-destructors ;
 
-: discord-connect ( config -- discord-bot )
-    \ discord-bot-config [ discord-reconnect ] with-variable ;
+M: discord-bot-config dispose
+    discord-bot>> dispose ;
+
+: discord-connect ( config -- )
+    <mailbox> >>mailbox
+    \ discord-bot-config [
+        [
+            [
+                "connecting" g.
+                discord-reconnect
+                discord-bot-config get
+                ! wait here for signal to maybe reconnect
+                [ mailbox>> mailbox-get ] [ discord-bot>> ] bi
+                [ reconnect?>> ] [ stop?>> not ] bi and
+            ] loop
+        ] "Discord bot connect loop" spawn discord-bot-config get connect-thread<<
+    ] with-variable ;
 
 : reply-command ( json -- ? )
     "content" of [ blank? ] trim

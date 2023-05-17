@@ -16,7 +16,6 @@ CONSTANT: zoneinfo-paths
     "vocab:zoneinfo/australasia"
     "vocab:zoneinfo/europe"
     "vocab:zoneinfo/northamerica"
-    "vocab:zoneinfo/pacificnew"
     "vocab:zoneinfo/southamerica"
     "vocab:zoneinfo/backzone"
     "vocab:zoneinfo/etcetera"
@@ -27,7 +26,6 @@ CONSTANT: zoneinfo-extra-paths
     "vocab:zoneinfo/backward"
     "vocab:zoneinfo/factory"
     "vocab:zoneinfo/leapseconds"
-    "vocab:zoneinfo/systemv"
 }
 
 : zoneinfo-lines ( path -- seq )
