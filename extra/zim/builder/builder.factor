@@ -2,11 +2,12 @@
 ! See https://factorcode.org/license.txt for BSD license
 
 USING: accessors alien.c-types alien.data arrays checksums
-checksums.md5 compression.zstd endian io io.directories
-io.encodings.binary io.encodings.string io.encodings.utf8
-io.files io.files.info io.files.types io.streams.byte-array
-kernel math math.statistics mime.types sequences
-sequences.extras sets sorting uuid zim ;
+checksums.md5 combinators compression.zstd endian io
+io.directories io.encodings.binary io.encodings.string
+io.encodings.utf8 io.files io.files.info io.files.types
+io.streams.byte-array kernel math math.binpack math.statistics
+mime.types namespaces sequences sequences.extras sets sorting
+uuid zim ;
 
 IN: zim.builder
 
@@ -37,6 +38,9 @@ SYMBOL: zim-compression
 : cluster-bytes ( blobs -- byte-array )
     binary [ write-cluster ] with-byte-writer ;
 
+: cluster-files ( paths -- byte-array )
+    [ binary file-contents ] map cluster-bytes ;
+
 :: build-zim ( zim-path -- )
 
     ! XXX: ZIM metadata?
@@ -64,15 +68,22 @@ SYMBOL: zim-compression
     mime-type-list [ utf8 encode length 1 + ] map-sum 1 + :> mime-type-len
     paths length 8 * :> url-ptr-len
     paths length 4 * :> title-ptr-len
-    paths length 8 * :> cluster-ptr-len
 
+    ! make the entries
     urls [ length 18 + ] map :> entry-len
     entry-len cum-sum0 :> entry-ptrs
     entry-len sum :> entries-len
 
-    paths [
-        binary file-contents 1array cluster-bytes
-    ] map :> clusters
+    ! try and make roughly 1 MB buckets
+    sizes sum 1,048,576 /mod zero? [ 1 + ] unless :> #bins
+    sizes length <iota> [ sizes nth ] #bins map-binpack :> bins
+    sizes length <iota> [| i |
+        i bins [ index ] with find i swap index 2array
+    ] map :> blobs
+
+    ! make the clusters
+    bins [ [ paths nth ] map cluster-files ] map :> clusters
+    clusters length 8 * :> cluster-ptr-len
     clusters [ length ] map :> cluster-len
     cluster-len cum-sum0 :> cluster-ptrs
     cluster-len sum :> clusters-len
@@ -101,7 +112,7 @@ SYMBOL: zim-compression
             1 >>minor-version
             uuid1 uuid-parse uint64_t cast-array >>uuid
             paths length >>entry-count
-            paths length >>cluster-count
+            clusters length >>cluster-count
             main-page 0xffffffff or >>main-page
             0xffffffff >>layout-page
             mime-list-ptr-pos >>mime-list-ptr-pos
@@ -117,7 +128,7 @@ SYMBOL: zim-compression
         entry-ptrs [ entries-pos + 8 >le write ] each
 
         ! write-title-ptrs
-        paths length [ 0xffffffff 4 >le write ] times
+        entry-ptrs [ drop 0xffffffff 4 >le write ] each
 
         ! write-cluster-ptrs
         cluster-ptrs [ cluster-pos + 8 >le write ] each
@@ -125,13 +136,13 @@ SYMBOL: zim-compression
         ! write-entries
         mime-types urls [| mime-type url i |
             mime-type mime-type-list index 2 >le write
-            0 write1           ! parameter-len
-            CHAR: C write1     ! namespace
-            0 4 >le write      ! revision
-            i 4 >le write      ! cluster-number
-            0 4 >le write      ! blob-number
-            url write 0 write1 ! url
-            0 write1           ! title
+            0 write1            ! parameter-len
+            CHAR: C write1      ! namespace
+            0 4 >le write       ! revision
+            i blobs nth first2  ! cluster-number
+            [ 4 >le write ] bi@ ! blob-number
+            url write 0 write1  ! url
+            0 write1            ! title
         ] 2each-index
 
         ! write-clusters
