@@ -115,6 +115,7 @@ require-when-table [ V{ } clone ] initialize
 : load-source ( vocab -- )
     dup check-vocab-hook get call( vocab -- )
     [
+        f >>main
         +parsing+ >>source-loaded?
         dup vocab-source-path [ parse-file ] [ [ ] ] if*
         [ +parsing+ >>source-loaded? ] dip
