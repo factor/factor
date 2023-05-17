@@ -3,7 +3,7 @@
 
 USING: accessors alien.c-types alien.data arrays assocs
 binary-search classes.struct combinators
-combinators.short-circuit compression.zstd endian io
+combinators.short-circuit compression.zstd destructors endian io
 io.encodings.binary io.encodings.string io.encodings.utf8
 io.files kernel lru-cache math math.bitwise math.order sequences
 sequences.private splitting ;
@@ -78,8 +78,8 @@ TUPLE: redirect-entry mime-type parameter-len namespace revision
     [ read-redirect-entry ] [ read-content-entry ] if ;
 
 : read-cluster-none ( -- offsets blobs )
-    read-uint32
-    [ 4 /i 1 - [ read-uint32 ] replicate ] [ prefix ] bi
+    read-uint32 dup 4 /i f <array> [ set-first ] keep
+    dup rest-slice [ drop read-uint32 ] map! drop
     dup [ last ] [ first ] bi - read ;
 
 : read-cluster-zstd ( -- offsets blobs )
@@ -117,10 +117,13 @@ M:: zim-cluster nth-unsafe ( n cluster -- blob )
 
 INSTANCE: zim-cluster sequence
 
-TUPLE: zim path header mime-types urls titles entries clusters cluster-cache ;
+TUPLE: zim stream header mime-types urls titles entries clusters
+    cluster-cache ;
+
+M: zim dispose* [ dispose f ] change-stream drop ;
 
 : read-zim ( path -- zim )
-    dup binary [
+    binary <file-reader> dup [
         zim-header read-struct dup {
             [ magic-number>> 0x44D495A assert= ]
             [
@@ -139,13 +142,15 @@ TUPLE: zim path header mime-types urls titles entries clusters cluster-cache ;
                 cluster-count>> [ read-uint64 ] replicate
             ]
         } cleave 32 <lru-hash> zim boa
-    ] with-file-reader ;
+    ] with-input-stream* ;
 
-: with-zim-reader ( zim quot -- )
-    [ path>> binary ] [ with-file-reader ] bi* ; inline
+: with-zim ( zim quot -- )
+    [ dup stream>> ] [ with-input-stream* ] bi* ; inline
 
 : (read-entry-index) ( n zim -- entry/f )
-    urls>> nth seek-absolute seek-input read-entry ;
+    urls>> nth dup 0xffffffff = [ drop f ] [
+        seek-absolute seek-input read-entry
+    ] if ;
 
 :: read-entry-index ( n zim -- entry/f )
     zim entries>> :> entries
@@ -200,22 +205,23 @@ M: integer read-entry-content
 M: zim length header>> entry-count>> ;
 
 M: zim nth-unsafe
-    dup [
+    [
+        ! read-entry-index
         [ read-entry-index dup ]
         [ read-entry-content drop ] bi 2array
-    ] with-zim-reader ;
+    ] with-zim ;
 
 INSTANCE: zim sequence
 
 M: zim assoc-size header>> entry-count>> ;
 
 M: zim at*
-    dup [
+    [
         [
             "/" split
             dup { [ length 1 > ] [ first length 1 = ] } 1&&
             [ unclip-slice first ] [ f ] if swap "/" join
         ] [ read-entry-url 2array t ] bi*
-    ] with-zim-reader ;
+    ] with-zim ;
 
 INSTANCE: zim assoc
