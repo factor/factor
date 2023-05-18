@@ -2,12 +2,12 @@
 ! See https://factorcode.org/license.txt for BSD license
 
 USING: accessors alien.c-types alien.data arrays checksums
-checksums.md5 combinators compression.zstd endian io
-io.directories io.encodings.binary io.encodings.string
+checksums.md5 combinators command-line compression.zstd endian
+io io.directories io.encodings.binary io.encodings.string
 io.encodings.utf8 io.files io.files.info io.files.types
-io.streams.byte-array kernel math math.binpack math.statistics
-mime.types namespaces sequences sequences.extras sets sorting
-uuid zim ;
+io.pathnames io.streams.byte-array kernel math math.binpack
+math.statistics mime.types namespaces sequences sequences.extras
+sets sorting splitting uuid zim ;
 
 IN: zim.builder
 
@@ -42,9 +42,7 @@ SYMBOL: zim-compression
     [ binary file-contents ] map cluster-bytes ;
 
 :: build-zim ( zim-path -- )
-
     ! XXX: ZIM metadata?
-    ! XXX: assumes one blob per cluster
 
     ! get all files and metadata
     "." recursive-directory-entries
@@ -154,6 +152,24 @@ SYMBOL: zim-compression
     zim-path md5 checksum-file :> checksum
 
     ! write-checksum
-    zim-path binary [ checksum write ] with-file-appender
+    zim-path binary [ checksum write ] with-file-appender ;
 
-    ;
+ERROR: unknown-zim-option name ;
+
+: zim-options ( command-line -- command-line' )
+    [ "--" head? ] partition swap [
+        "--" ?head drop {
+            { "zstd" [ +zstd+ zim-compression namespaces:set ] }
+            [ unknown-zim-option ]
+        } case
+    ] each ;
+
+: build-zim-main ( -- )
+    command-line get zim-options dup length 2 = [
+        first2 [ absolute-path ] bi@ [ build-zim ] with-directory
+    ] [
+        drop "Usage: zim.builder [--zstd] output-path input-dir"
+        print
+    ] if ;
+
+MAIN: build-zim-main
