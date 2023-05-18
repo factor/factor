@@ -72,8 +72,11 @@ SYMBOL: zim-compression
     entry-len cum-sum0 :> entry-ptrs
     entry-len sum :> entries-len
 
-    ! try and make roughly 1 MB buckets
-    sizes sum 1,048,576 /mod zero? [ 1 + ] unless :> #bins
+    ! try and make roughly 2 MB buckets
+    2,048 1,024 * :> max-bin-size
+    sizes [ max-bin-size > ] partition
+    [ length ] [ sum max-bin-size /mod zero? [ 1 + ] unless + ] bi* :> #bins
+    #bins paths length <= t assert=
     sizes length <iota> [ sizes nth ] #bins map-binpack :> bins
     sizes length <iota> [| i |
         i bins [ index ] with find i swap index 2array
@@ -108,7 +111,7 @@ SYMBOL: zim-compression
             0x44D495A >>magic-number
             6 >>major-version
             1 >>minor-version
-            uuid1 uuid-parse uint64_t cast-array >>uuid
+            uuid1 uuid-parse >>uuid
             paths length >>entry-count
             clusters length >>cluster-count
             main-page 0xffffffff or >>main-page
