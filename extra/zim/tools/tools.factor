@@ -48,7 +48,15 @@ IN: zim.tools
     ] with-directory ;
 
 : zim-usage ( -- )
-    "Usage: zim.dump command zim-path [args...]" print nl ;
+    "Usage: zim.tools command zim-path [args...]" print
+    nl
+    "Commands:" print
+    "    dump [directory]       extract all files" print
+    "    info                   print zim info" print
+    "    list                   list all entry urls" print
+    "    show [urls...]         show contents of urls" print
+    "    main                   show contents of main url" print
+    ;
 
 : zim-tools-main ( -- )
     command-line get dup length 2 < [
