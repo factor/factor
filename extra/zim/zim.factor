@@ -18,7 +18,7 @@ PACKED-STRUCT: zim-header
     { magic-number uint32_t }
     { major-version uint16_t }
     { minor-version uint16_t }
-    { uuid uint64_t[2] }
+    { uuid uint8_t[16] }
     { entry-count uint32_t }
     { cluster-count uint32_t }
     { url-ptr-pos uint64_t }
@@ -117,31 +117,36 @@ M:: zim-cluster nth-unsafe ( n cluster -- blob )
 
 INSTANCE: zim-cluster sequence
 
-TUPLE: zim stream header mime-types urls titles entries clusters
-    cluster-cache ;
+TUPLE: zim < disposable path stream header mime-types urls titles
+    entries clusters cluster-cache ;
 
 M: zim dispose* [ dispose f ] change-stream drop ;
 
 : read-zim ( path -- zim )
-    binary <file-reader> dup [
-        zim-header read-struct dup {
+    [ zim new-disposable ] dip [ >>path ] keep
+    binary <file-reader> [ >>stream ] keep [
+        zim-header read-struct [ >>header ] keep {
             [ magic-number>> 0x44D495A assert= ]
             [
                 mime-list-ptr-pos>> seek-absolute seek-input
-                read-mime-types
+                read-mime-types >>mime-types
             ] [
                 dup url-ptr-pos>> seek-absolute seek-input
                 entry-count>> [ read-uint64 ] replicate
+                >>urls
             ] [
                 dup title-ptr-pos>> seek-absolute seek-input
                 entry-count>> [ read-uint32 ] replicate
+                >>titles
             ] [
                 entry-count>> f <array>
+                >>entries
             ] [
                 dup cluster-ptr-pos>> seek-absolute seek-input
                 cluster-count>> [ read-uint64 ] replicate
+                >>clusters
             ]
-        } cleave 32 <lru-hash> zim boa
+        } cleave 32 <lru-hash> >>cluster-cache
     ] with-input-stream* ;
 
 : with-zim ( zim quot -- )
@@ -153,10 +158,12 @@ M: zim dispose* [ dispose f ] change-stream drop ;
     ] if ;
 
 :: read-entry-index ( n zim -- entry/f )
-    zim entries>> :> entries
-    n entries nth [
-        n zim (read-entry-index) dup n entries set-nth
-    ] unless* ;
+    n 0xffffffff = [ f ] [
+        zim entries>> :> entries
+        n entries nth [
+            n zim (read-entry-index) dup n entries set-nth
+        ] unless*
+    ] if ;
 
 : read-blob-index ( blob-number cluster-number zim -- blob )
     [ cluster-cache>> ] keep '[
