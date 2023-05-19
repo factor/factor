@@ -18,8 +18,6 @@ SLOT: file
 : CreateFile-flags ( DWORD -- DWORD )
     flags{ FILE_FLAG_BACKUP_SEMANTICS FILE_FLAG_OVERLAPPED } bitor ;
 
-HOOK: open-append os ( path -- win32-file )
-
 TUPLE: win32-file < win32-handle ptr ;
 
 : <win32-file> ( handle -- win32-file )
@@ -243,8 +241,19 @@ M: windows init-stdio
 : open-write ( path -- win32-file )
     GENERIC_WRITE CREATE_ALWAYS 0 open-file 0 >>ptr ;
 
-: (open-append) ( path -- win32-file )
-    GENERIC_WRITE OPEN_ALWAYS 0 open-file ;
+
+<PRIVATE
+
+: windows-file-size ( path -- size )
+    normalize-path 0 WIN32_FILE_ATTRIBUTE_DATA new
+    [ GetFileAttributesEx win32-error=0/f ] keep
+    [ nFileSizeLow>> ] [ nFileSizeHigh>> ] bi >64bit ;
+
+PRIVATE>
+
+: open-append ( path -- win32-file )
+    [ dup windows-file-size ] [ drop 0 ] recover
+    [ GENERIC_WRITE OPEN_ALWAYS 0 open-file ] dip >>ptr ;
 
 : maybe-create-file ( path -- win32-file ? )
     ! return true if file was just created
@@ -366,19 +375,6 @@ M: windows normalize-path
         normalize-separators
         prepend-unicode-prefix
     ] if ;
-
-<PRIVATE
-
-: windows-file-size ( path -- size )
-    normalize-path 0 WIN32_FILE_ATTRIBUTE_DATA new
-    [ GetFileAttributesEx win32-error=0/f ] keep
-    [ nFileSizeLow>> ] [ nFileSizeHigh>> ] bi >64bit ;
-
-PRIVATE>
-
-M: windows open-append
-    [ dup windows-file-size ] [ drop 0 ] recover
-    [ (open-append) ] dip >>ptr ;
 
 M: windows home
     {
