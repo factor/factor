@@ -1,8 +1,8 @@
 USING: arrays combinators destructors grouping io io.directories
-io.encodings.ascii io.encodings.utf8 io.files io.files.info
-io.files.unique io.launcher io.pathnames kernel math namespaces
-sequences sorting splitting splitting.monotonic strings system
-tools.test ;
+io.encodings.ascii io.encodings.binary io.encodings.utf8
+io.files io.files.info io.files.unique io.launcher io.pathnames
+kernel math namespaces sequences sorting splitting
+splitting.monotonic strings system tools.test ;
 
 { { "kernel" } } [
     "core" resource-path [
