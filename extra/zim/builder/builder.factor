@@ -5,9 +5,9 @@ USING: accessors alien.c-types alien.data arrays checksums
 checksums.md5 combinators command-line compression.zstd endian
 io io.directories io.encodings.binary io.encodings.string
 io.encodings.utf8 io.files io.files.info io.files.types
-io.pathnames io.streams.byte-array kernel math math.binpack
-math.statistics mime.types namespaces sequences sequences.extras
-sets sorting splitting uuid zim ;
+io.pathnames io.streams.byte-array kernel literals math
+math.binpack math.statistics mime.types namespaces sequences
+sequences.extras sets sorting splitting uuid zim ;
 
 IN: zim.builder
 
@@ -41,19 +41,67 @@ SYMBOL: zim-compression
 : cluster-files ( paths -- byte-array )
     [ binary file-contents ] map cluster-bytes ;
 
+:: new-zim ( zim-path -- )
+    zim-header heap-size :> mime-list-ptr-pos
+    mime-list-ptr-pos 1 + :> url-ptr-pos
+
+    zim-path binary [
+        zim-header new
+            0x44D495A >>magic-number
+            6 >>major-version
+            1 >>minor-version
+            uuid1 uuid-parse >>uuid
+            0 >>entry-count
+            0 >>cluster-count
+            0xffffffff >>main-page
+            0xffffffff >>layout-page
+            mime-list-ptr-pos >>mime-list-ptr-pos
+            url-ptr-pos >>url-ptr-pos
+            url-ptr-pos >>title-ptr-pos
+            url-ptr-pos >>cluster-ptr-pos
+            url-ptr-pos >>checksum-pos
+        write
+
+        0 write1 ! mime-type-ptr-list
+    ] with-file-writer
+
+    zim-path md5 checksum-file
+    zim-path binary [ write ] with-file-appender ;
+
+: update-checksum ( zim-path -- )
+    {
+        [ binary [ 0 seek-end seek-input tell-input ] with-file-reader ]
+        [ swap 16 - truncate-file ]
+        [ md5 checksum-file ]
+        [ binary [ write ] with-file-appender ]
+    } cleave ;
+
+CONSTANT: CLUSTER-SIZE $[ 2,048 1,024 * ]
+
+:: binpack-clusters ( sizes -- bins blobs )
+    sizes [ CLUSTER-SIZE > ] partition
+    [ length ] [ sum CLUSTER-SIZE /mod zero? [ 1 + ] unless + ] bi* :> #clusters
+    #clusters sizes length <= t assert=
+    sizes length <iota> [ sizes nth ] #clusters map-binpack :> bins
+    sizes length <iota> [| i |
+        i bins [ index ] with find i swap index 2array
+    ] map :> blobs bins blobs ;
+
 :: build-zim ( zim-path -- )
+
     ! XXX: ZIM metadata?
 
-    ! get all files and metadata
+    ! all files in the current directory
     "." recursive-directory-entries
     [ type>> +directory+ = ] reject
     [ name>> ] map sort :> paths
 
+    ! entry metadata for each file
     paths [ mime-type ] map :> mime-types
     paths [ utf8 encode ] map :> urls
     paths [ file-info size>> ] map :> sizes
 
-    ! calculate unique mime-types
+    ! unique mime-types list
     mime-types members sort :> mime-type-list
     mime-type-list length 0xffff < t assert=
 
@@ -72,31 +120,15 @@ SYMBOL: zim-compression
     entry-len cum-sum0 :> entry-ptrs
     entry-len sum :> entries-len
 
-    ! try and make roughly 2 MB buckets
-    2,048 1,024 * :> max-bin-size
-    sizes [ max-bin-size > ] partition
-    [ length ] [ sum max-bin-size /mod zero? [ 1 + ] unless + ] bi* :> #bins
-    #bins paths length <= t assert=
-    sizes length <iota> [ sizes nth ] #bins map-binpack :> bins
-    sizes length <iota> [| i |
-        i bins [ index ] with find i swap index 2array
-    ] map :> blobs
-
     ! make the clusters
+    sizes binpack-clusters :> ( bins blobs )
     bins [ [ paths nth ] map cluster-files ] map :> clusters
     clusters length 8 * :> cluster-ptr-len
     clusters [ length ] map :> cluster-len
     cluster-len cum-sum0 :> cluster-ptrs
     cluster-len sum :> clusters-len
 
-    ! the layout will be
-    ! 1) zim header
-    ! 2) mime-types
-    ! 3) url-ptrs
-    ! 4) title-ptrs
-    ! 5) cluster-ptrs
-    ! 6) entries
-    ! 7) clusters
+    ! compute the ptrs
     header-len dup        :> mime-list-ptr-pos
     mime-type-len + dup   :> url-ptr-pos
     url-ptr-len + dup     :> title-ptr-pos
@@ -105,6 +137,7 @@ SYMBOL: zim-compression
     entries-len + dup     :> cluster-pos
     clusters-len +        :> checksum-pos
 
+    ! write the zim file
     zim-path binary [
 
         zim-header new
@@ -124,17 +157,10 @@ SYMBOL: zim-compression
         write
 
         mime-type-list write-strings
-
-        ! write-url-ptrs
         entry-ptrs [ entries-pos + 8 >le write ] each
-
-        ! write-title-ptrs
         entry-ptrs [ drop 0xffffffff 4 >le write ] each
-
-        ! write-cluster-ptrs
         cluster-ptrs [ cluster-pos + 8 >le write ] each
 
-        ! write-entries
         mime-types urls [| mime-type url i |
             mime-type mime-type-list index 2 >le write
             0 write1            ! parameter-len
@@ -146,16 +172,12 @@ SYMBOL: zim-compression
             0 write1            ! title
         ] 2each-index
 
-        ! write-clusters
         clusters [ write ] each
-
     ] with-file-writer
 
-    ! calculate md5 checksum
-    zim-path md5 checksum-file :> checksum
-
-    ! write-checksum
-    zim-path binary [ checksum write ] with-file-appender ;
+    ! write the checksum
+    zim-path md5 checksum-file
+    zim-path binary [ write ] with-file-appender ;
 
 ERROR: unknown-zim-option name ;
 
