@@ -17,6 +17,9 @@ M: unix touch-file
         touch-mode file-mode open-file close-file
     ] if ;
 
+M: unix truncate-file
+    [ normalize-path ] dip [ truncate ] unix-system-call drop ;
+
 M: unix move-file-atomically
     [ normalize-path ] bi@ [ rename ] unix-system-call drop ;
 

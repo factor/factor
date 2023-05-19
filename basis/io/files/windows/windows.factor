@@ -252,9 +252,12 @@ M: windows init-stdio
     OPEN_ALWAYS 0 open-file
     GetLastError ERROR_ALREADY_EXISTS = not ;
 
-: set-file-pointer ( handle length method -- )
+: set-file-pointer ( win32-file length method -- )
     [ [ handle>> ] dip d>w/w LONG <ref> ] dip SetFilePointer
     INVALID_SET_FILE_POINTER = [ "SetFilePointer failed" throw ] when ;
+
+: set-end-of-file ( win32-file -- )
+    handle>> SetEndOfFile zero? [ windows-error ] unless ;
 
 M: windows (file-reader)
     open-read <input-port> ;
