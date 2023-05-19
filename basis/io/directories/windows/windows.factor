@@ -12,9 +12,12 @@ M: windows touch-file
         _ [ drop ] [ handle>> f now dup (set-file-times) ] if
     ] with-disposal ;
 
+: open-truncate ( path -- win32-file )
+    GENERIC_WRITE OPEN_EXISTING 0 open-file 0 >>ptr ;
+
 M: windows truncate-file
-    [ normalize-path open-file ] dip '[
-        [ _ FILE_END set-file-pointer ] [ set-end-of-file ] bi
+    [ normalize-path open-truncate ] dip '[
+        [ _ FILE_BEGIN set-file-pointer ] [ set-end-of-file ] bi
     ] with-disposal ;
 
 M: windows move-file
