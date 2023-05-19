@@ -263,7 +263,7 @@ PRIVATE>
 
 : set-file-pointer ( win32-file length method -- )
     [ [ handle>> ] dip d>w/w LONG <ref> ] dip SetFilePointer
-    INVALID_SET_FILE_POINTER = [ "SetFilePointer failed" throw ] when ;
+    INVALID_SET_FILE_POINTER = [ win32-error ] when ;
 
 : set-end-of-file ( win32-file -- )
     handle>> SetEndOfFile [ win32-error ] unless ;
