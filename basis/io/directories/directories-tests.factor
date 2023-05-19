@@ -301,6 +301,8 @@ splitting.monotonic strings system tools.test ;
 { "/foo/bar" } [ P"/foo" P"./bar" append-path ] unit-test
 { "/bar/foo" } [ P"./foo" P"/bar" prepend-path ] unit-test
 
+[ "resource:asdljkfasldkjfasdljfk" 0 truncate-file ] must-fail
+
 { f 16 8 } [
     [
         {
