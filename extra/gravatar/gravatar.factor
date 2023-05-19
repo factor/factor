@@ -20,7 +20,7 @@ profileBackground profileUrl requestHash thumbnailUrl urls ;
     http-get nip utf8 decode json> "entry" of first info from-slots ;
 
 ! optional .jpg
-SYMBOL: gravatar-image-extension
+SYMBOL: gravatar-image-extension?
 
 ! 1px up to 2048px
 SYMBOL: gravatar-image-size
@@ -33,7 +33,7 @@ SYMBOL: gravatar-image-rating
 
 : gravatar-image-url ( email -- url )
     gravatar-id "https://gravatar.com/avatar/" prepend
-    gravatar-image-extension [ ".jpg" append ] when >url
+    gravatar-image-extension? get [ ".jpg" append ] when >url
     gravatar-image-size get [ "s" set-query-param ] when*
     gravatar-image-type get [ "d" set-query-param ] when*
     gravatar-image-rating get [ "r" set-query-param ] when* ;
