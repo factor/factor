@@ -257,7 +257,7 @@ M: windows init-stdio
     INVALID_SET_FILE_POINTER = [ "SetFilePointer failed" throw ] when ;
 
 : set-end-of-file ( win32-file -- )
-    handle>> SetEndOfFile zero? [ windows-error ] unless ;
+    handle>> SetEndOfFile [ win32-error ] unless ;
 
 M: windows (file-reader)
     open-read <input-port> ;
