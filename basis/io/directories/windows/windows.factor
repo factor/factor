@@ -8,11 +8,15 @@ fry continuations classes.struct windows.time ;
 IN: io.directories.windows
 
 M: windows touch-file
-    [
-        normalize-path
-        maybe-create-file [ &dispose ] dip
-        [ drop ] [ handle>> f now dup (set-file-times) ] if
-    ] with-destructors ;
+    normalize-path maybe-create-file '[
+        _ [ drop ] [ handle>> f now dup (set-file-times) ] if
+    ] with-disposal ;
+
+M: windows truncate-file
+    [ normalize-path open-file ] dip '[
+        [ _ 0 FILE_END set-file-pointer ]
+        [ set-end-of-file ] bi
+    ] with-disposal ;
 
 M: windows move-file
     [ normalize-path ] bi@ MoveFile win32-error=0/f ;

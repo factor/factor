@@ -199,10 +199,10 @@ ERROR: sequence-expected obj ;
 : find-files-larger-than ( path size -- seq )
     '[ link-info size>> _ > ] find-files ;
 
-! Touching files
 HOOK: touch-file io-backend ( path -- )
 
-! Deleting files
+HOOK: truncate-file io-backend ( path n -- )
+
 HOOK: delete-file io-backend ( path -- )
 
 HOOK: delete-directory io-backend ( path -- )
@@ -213,8 +213,8 @@ HOOK: delete-directory io-backend ( path -- )
 : to-directory ( from to -- from to' )
     over file-name append-path ;
 
-! Moving and renaming files
 HOOK: move-file io-backend ( from to -- )
+
 HOOK: move-file-atomically io-backend ( from to -- )
 
 : move-file-into ( from to -- )
@@ -223,7 +223,6 @@ HOOK: move-file-atomically io-backend ( from to -- )
 : move-files-into ( files to -- )
     '[ _ move-file-into ] each ;
 
-! Copying files
 HOOK: copy-file io-backend ( from to -- )
 
 M: object copy-file
