@@ -1,9 +1,10 @@
 ! Copyright (C) 2011 John Benediktsson
 ! See https://factorcode.org/license.txt for BSD license
 
-USING: accessors ascii assocs checksums checksums.md5
-classes.tuple formatting http.client images.http json kernel
-math.parser sequences strings ;
+USING: ascii assocs checksums checksums.md5 classes.tuple
+formatting http.client images.http io.encodings.string
+io.encodings.utf8 json kernel math.parser namespaces sequences
+urls ;
 
 IN: gravatar
 
@@ -14,9 +15,28 @@ profileBackground profileUrl requestHash thumbnailUrl urls ;
 : gravatar-id ( email -- gravatar-id )
     [ blank? ] trim >lower md5 checksum-bytes bytes>hex-string ;
 
-: gravatar-info ( gravatar-id -- info )
-    "https://gravatar.com/%s.json" sprintf http-get nip
-    >string json> "entry" of first info from-slots ;
+: gravatar-info ( email -- info )
+    gravatar-id "https://gravatar.com/%s.json" sprintf
+    http-get nip utf8 decode json> "entry" of first info from-slots ;
 
-: gravatar. ( gravatar-id -- )
-    gravatar-info thumbnailUrl>> http-image. ;
+! optional .jpg
+SYMBOL: gravatar-image-extension
+
+! 1px up to 2048px
+SYMBOL: gravatar-image-size
+
+! 404, mp, identicon, monsterid, wavatar, retro, robohash, blank
+SYMBOL: gravatar-image-type
+
+! g, pg, r, x
+SYMBOL: gravatar-image-rating
+
+: gravatar-image-url ( email -- url )
+    gravatar-id "https://gravatar.com/avatar/" prepend
+    gravatar-image-extension [ ".jpg" append ] when >url
+    gravatar-image-size get [ "s" set-query-param ] when*
+    gravatar-image-type get [ "d" set-query-param ] when*
+    gravatar-image-rating get [ "r" set-query-param ] when* ;
+
+: gravatar. ( email -- )
+    gravatar-image-url http-image. ;
