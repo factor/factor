@@ -201,10 +201,12 @@ M: object refill
     [ drop [ wait-for-file ] [ finish-read ] bi ] 2bi f ;
 
 M: windows (wait-to-write)
-    [ dup handle>> drain ] with-destructors drop ;
+    dup dup handle>> drain
+    [ dupd wait-for-port (wait-to-write) ] [ drop ] if* ;
 
 M: windows (wait-to-read)
-    [ dup handle>> refill ] with-destructors drop ;
+    dup dup handle>> refill
+    [ dupd wait-for-port (wait-to-read) ] [ drop ] if* ;
 
 : make-fd-set ( socket -- fd_set )
     fd_set new swap 1array void* >c-array >>fd_array 1 >>fd_count ;
