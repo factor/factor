@@ -342,9 +342,7 @@ PRIVATE>
 ! Input ports
 : do-ssl-read ( buffer ssl-handle -- event/f )
     2dup handle>> swap [ buffer-end ] [ buffer-capacity ] bi SSL_read
-    [ check-ssl-error ] keep swap [ 2nip ] [
-        dup 0 > [ swap buffer+ ] [ 2drop ] if f
-    ] if* ;
+    dup 0 > [ nip swap buffer+ f ] [ check-ssl-error nip ] if ;
 
 : throw-if-terminated ( ssl-handle -- ssl-handle )
     dup terminated>> [ premature-close-error ] when ;
@@ -356,9 +354,7 @@ M: ssl-handle refill
 ! Output ports
 : do-ssl-write ( buffer ssl-handle -- event/f )
     2dup handle>> swap [ buffer@ ] [ buffer-length ] bi SSL_write
-    [ check-ssl-error ] keep swap [ 2nip ] [
-        dup 0 > [ swap buffer-consume ] [ 2drop ] if f
-    ] if* ;
+    dup 0 > [ nip swap buffer-consume f ] [ check-ssl-error nip ] if ;
 
 M: ssl-handle drain
     throw-if-terminated
