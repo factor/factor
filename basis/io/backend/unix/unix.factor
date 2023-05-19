@@ -78,9 +78,6 @@ M: unix wait-for-fd
         "I/O" suspend [ io-timeout ] when
     ] if ;
 
-: wait-for-port ( port event -- )
-    '[ handle>> _ wait-for-fd ] with-timeout ;
-
 ! Some general stuff
 
 M: fd refill

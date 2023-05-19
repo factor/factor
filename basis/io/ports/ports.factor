@@ -31,6 +31,9 @@ INSTANCE: input-port file-reader
 : <input-port> ( handle -- input-port )
     input-port <buffered-port> ; inline
 
+: wait-for-port ( port event -- )
+    '[ handle>> _ wait-for-fd ] with-timeout ;
+
 HOOK: (wait-to-read) io-backend ( port -- )
 
 : wait-to-read ( port -- eof? )
