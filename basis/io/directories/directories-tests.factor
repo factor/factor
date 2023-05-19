@@ -300,3 +300,16 @@ tools.test ;
 
 { "/foo/bar" } [ P"/foo" P"./bar" append-path ] unit-test
 { "/bar/foo" } [ P"./foo" P"/bar" prepend-path ] unit-test
+
+{ f 16 8 } [
+    [
+        {
+            [ touch-file ]
+            [ binary [ input-stream get stream-length ] with-file-reader ]
+            [ 16 truncate-file ]
+            [ binary [ input-stream get stream-length ] with-file-reader ]
+            [ 8 truncate-file ]
+            [ binary [ input-stream get stream-length ] with-file-reader ]
+        } cleave
+    ] with-test-file
+] unit-test
