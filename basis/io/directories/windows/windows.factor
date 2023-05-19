@@ -14,8 +14,7 @@ M: windows touch-file
 
 M: windows truncate-file
     [ normalize-path open-file ] dip '[
-        [ _ 0 FILE_END set-file-pointer ]
-        [ set-end-of-file ] bi
+        [ _ FILE_END set-file-pointer ] [ set-end-of-file ] bi
     ] with-disposal ;
 
 M: windows move-file
