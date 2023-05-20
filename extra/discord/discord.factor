@@ -385,16 +385,18 @@ M: TYPING_START dispatch-message drop
         [ "unknown opcode:" gwrite g. g... gflush ]
     } case ;
 
+: stopping-discord-bot ( -- )
+    discord-bot get t >>stop? drop ;
+
 DEFER: discord-reconnect
 : handle-discord-websocket ( obj opcode -- )
-    [ "opcode: " write dup . over dup byte-array? [ utf8 decode json> ] when ... flush ] with-global
+    "opcode: " gwrite dup g. over dup byte-array? [ utf8 decode json> ] when g... gflush
     {
         { f [
             [
-                [ "closed with error, code %d" sprintf print ]
-                [ "closed with f" print ] if* flush
-                discord-bot get t >>stop? drop
-            ] with-global
+                "closed with error, code %d" sprintf gprint-flush
+                stopping-discord-bot
+            ] [ "closed with f" gprint-flush ] if*
         ] }
         { 1 [
             [ drop ]
@@ -404,8 +406,7 @@ DEFER: discord-reconnect
             [ [ hexdump. flush ] with-global ] when*
         ] }
         { 8 [
-            [ drop "close received" print flush ] with-global
-            discord-bot get t >>stop? drop
+            drop "close received" gprint-flush
         ] }
         { 9 [
             [ "ping received" gprint-flush send-heartbeat ] when*
