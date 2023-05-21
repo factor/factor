@@ -8,6 +8,8 @@ CONSTANT: vocab-renames {
     { "math.intervals" { "intervals" "0.99" } }
     { "math.ranges" { "ranges" "0.99" } }
     { "sorting.slots" { "sorting.specification" "0.99" } }
+    { "json.reader" { "json" "0.99" } }
+    { "json.writer" { "json" "0.99" } }
 }
 
 CONSTANT: word-renames {
