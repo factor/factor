@@ -182,8 +182,10 @@ M: windows handle-length
     [ update-file-ptr ] [ buffer>> buffer-consume ] 2bi ;
 
 M: object drain
-    [ make-FileArgs dup setup-write WriteFile ]
-    [ drop [ wait-for-file ] [ finish-write ] bi ] 2bi f ;
+    [
+        [ make-FileArgs dup setup-write WriteFile ]
+        [ drop [ wait-for-file ] [ finish-write ] bi ] 2bi f
+    ] with-destructors ;
 
 : setup-read ( <FileArgs> -- hFile lpBuffer nNumberOfBytesToRead lpNumberOfBytesRead lpOverlapped )
     {
@@ -197,8 +199,10 @@ M: object drain
     [ update-file-ptr ] [ buffer>> buffer+ ] 2bi ;
 
 M: object refill
-    [ make-FileArgs dup setup-read ReadFile ]
-    [ drop [ wait-for-file ] [ finish-read ] bi ] 2bi f ;
+    [
+        [ make-FileArgs dup setup-read ReadFile ]
+        [ drop [ wait-for-file ] [ finish-read ] bi ] 2bi f
+    ] with-destructors ;
 
 M: windows (wait-to-write)
     dup dup handle>> drain
