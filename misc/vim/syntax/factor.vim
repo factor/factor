@@ -255,7 +255,7 @@ syn region  factorStructSlot      matchgroup=factorStructSlotDelims start=/\v<\{
 syn region  factorStruct          matchgroup=factorStructDelims     start=/\v<%(%(UNION-)?STRUCT):>/ skip=/\v<!>.*/  end=/\v<;>/  contains=@factorComment,factorStructSlot
 
 syn region  factorAlias             start=/\v<ALIAS:>/           skip=/\v<!>.*/     end=/\v<\S+%(\_\s+%(!>.*)?)+\S+>/   contains=@factorComment keepend
-syn region  factorAlien             start=/\v<ALIEN:>/           skip=/\v<!>.*/     end=/\v<\S+>/   contains=@factorComment,@factorHexNoRadix
+syn region  factorAlien             start=/\v<ALIEN:>/           skip=/\v<!>.*/     end=/\v>/       contains=@factorComment,@factorHexNoRadix
 syn region  factorConstant          start=/\v<CONSTANT:>/        skip=/\v<!>.*/     end=/\v<\S+>/   contains=@factorComment
 syn region  factorDefer             start=/\v<DEFER:>/           skip=/\v<!>.*/     end=/\v<\S+>/   contains=@factorComment
 syn region  factorEbnf              start=/\v<EBNF:>/            skip=/\v<!>.*/     end=/\v<\S+>/   contains=@factorComment
