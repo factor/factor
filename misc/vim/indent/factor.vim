@@ -23,7 +23,7 @@ function! GetFactorIndent(lnum)
 	if pline =~ '^[^ ]*:' || pline =~ '[{[]\s*$'
 		let pind += shiftwidth()
 	endif
-	if pline =~ '^\(ALIAS\|C\|CONSTANT\|DEFER\|FORGET\|GENERIC#\?\|HELP\|\(\(SHUTDOWN\|STARTUP\)-\)\?HOOK\|IN\|INSTANCE\|MAIN\|MATH\|MIXIN\|PRIMITIVE\|QUALIFIED\(-WITH\)\?\|RENAME\|SINGLETON\|SLOT\|SYMBOL\|USE\|USING\):'
+	if pline =~ '^\(ALIAS\|C\|CONSTANT\|DEFER\|EDITOR\|FORGET\|GENERIC#\?\|HELP\|\(\(SHUTDOWN\|STARTUP\)-\)\?HOOK\|IN\|INSTANCE\|MAIN\|MATH\|MIXIN\|PRIMITIVE\|QUALIFIED\(-WITH\)\?\|RENAME\|SINGLETON\|SLOT\|SYMBOL\|USE\|USING\):'
 		let pind -= shiftwidth()
 	endif
 	if pline =~ ';\( \(inline\|recursive\|foldable\|flushable\)\)*$'
