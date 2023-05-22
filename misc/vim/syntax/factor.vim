@@ -58,7 +58,7 @@ endif
 syn case match
 
 syn match   factorWord   /\v<\S+>/  contains=@factorWord transparent display
-syn cluster factorCluster           contains=factorWord,factorComment,factorMultilineComment,@factorClusterValue,factorDeclaration,factorCall,factorCallNextMethod,@factorWordOps,factorAlien,factorSlot,factorTuple,factorStruct
+syn cluster factorCluster           contains=factorWord,factorComment,factorMultilineComment,@factorClusterValue,factorDeclaration,factorCall,factorCallNextMethod,@factorWordOps,factorAlien,factorSlot,factorTuple,factorStruct,factorSlotsSyntax
 syn cluster factorClusterValue      contains=factorBreakpoint,factorBoolean,factorFrySpecifier,factorLocalsSpecifier,factorChar,factorString,@factorNumber,factorBackslash,factorMBackslash,factorLiteral,@factorEffect,@factorQuotation,@factorArray,factorRegexp
 
 " Almost any byte in Factor can be a part of a word
@@ -352,6 +352,8 @@ else
   syn region  factorArray9     contained matchgroup=hlLevel9 start=/\v<[^ \"\[]*\{>/         end=/\v<\}>/    contains=@factorCluster,factorArray0,factorQuotation0
 endif
 
+syn region  factorSlotsSyntax   matchgroup=factorSlotsSyntaxDelims  start=/\v<%(get|set|set-slots|slots)\[>/    end=/\v<\]>/
+
 if !exists('g:factor_syn_no_error')
   syn match   factorBracketError    /\v<\]>/
   syn match   factorBracketError    /\v<\}>/
@@ -458,6 +460,7 @@ if !exists('g:factor_syn_no_init')
   HiLink   factorSlotAttr               Special
   HiLink   factorSlotAttrInitial        factorSlotAttr
   HiLink   factorSlotAttrReadOnly       factorSlotAttr
+  HiLink   factorSlotsSyntaxDelims      Keyword
   HiLink   factorStructSlotAttr         factorSlotAttr
   HiLink   factorStructSlotAttrBits     factorStructSlotAttr
   HiLink   factorPredicate              Typedef
