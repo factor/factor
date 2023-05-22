@@ -170,7 +170,7 @@ syn region  factorNamedString       matchgroup=factorNamedStringDelims   start=/
 syn region  factorMultilineComment  start=/\v<\/\*>/              end=/\v\*\//       contains=@factorCommentContents keepend
 syn region  factorMultilineComment  start=/\v<!\[\z(\=*)\[/       end=/\v\]\z1\]/    contains=@factorCommentContents keepend
 
-syn region factorRegexp             start=/\v<%(R\/\s)/  skip=/\v%(\\\/)/  end=/\v%(\/\S*)>/
+syn region  factorRegexp            start=/\v<%(R\/\s)/  skip=/\v%(\\\/)/  end=/\v%(\/\S*)>/
 
 syn cluster factorReal              contains=@factorInteger,@factorFloat,@factorRatio,@factorBin,@factorOct,@factorHex,factorNan
 syn cluster factorNumber            contains=@factorReal,factorComplex
@@ -258,6 +258,8 @@ syn region  factorAlias             start=/\v<ALIAS:>/           skip=/\v<!>.*/ 
 syn region  factorAlien             start=/\v<ALIEN:>/           skip=/\v<!>.*/     end=/\v<\S+>/   contains=@factorComment,@factorHexNoRadix
 syn region  factorConstant          start=/\v<CONSTANT:>/        skip=/\v<!>.*/     end=/\v<\S+>/   contains=@factorComment
 syn region  factorDefer             start=/\v<DEFER:>/           skip=/\v<!>.*/     end=/\v<\S+>/   contains=@factorComment
+syn region  factorEbnf              start=/\v<EBNF:>/            skip=/\v<!>.*/     end=/\v<\S+>/   contains=@factorComment
+syn region  factorEditor            start=/\v<EDITOR:>/          skip=/\v<!>.*/     end=/\v<\S+>/   contains=@factorComment
 syn region  factorExclude           start=/\v<EXCLUDE:>/         skip=/\v<!>.*/     end=/\v<;>/     contains=@factorComment
 syn region  factorForget            start=/\v<FORGET:>/          skip=/\v<!>.*/     end=/\v<\S+>/   contains=@factorComment
 syn region  factorFrom              start=/\v<FROM:>/            skip=/\v<!>.*/     end=/\v<;>/     contains=@factorComment
@@ -441,6 +443,8 @@ if !exists('g:factor_syn_no_init')
   HiLink   factorPostpone               Define
   HiLink   factorHelp                   Define
   HiLink   factorDefer                  Define
+  HiLink   factorEbnf                   Typedef
+  HiLink   factorEditor                 Typedef
   HiLink   factorForget                 Define
   HiLink   factorAlien                  Define
   HiLink   factorSlot                   Define
@@ -501,4 +505,4 @@ delcommand HiLink
 
 let b:current_syntax = 'factor'
 
-" vim: set ft=vim et sw=2 isk+=/,\\ :
+" vim: set ts=4 ft=vim et sw=2 isk+=/,\\ :
