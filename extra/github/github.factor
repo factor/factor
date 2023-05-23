@@ -1,11 +1,10 @@
 ! Copyright (C) 2017 Doug Coleman.
 ! See https://factorcode.org/license.txt for BSD license.
-
-USING: accessors assocs assocs.extras calendar.parser cli.git
-formatting hashtables http.client io.pathnames json json.http
-kernel math math.order namespaces.extras sequences sorting urls
-;
-
+USING: accessors arrays assocs assocs.extras calendar.parser
+cli.git combinators.extras combinators.short-circuit
+continuations formatting hashtables http.client io.pathnames
+json json.http kernel math math.order namespaces.extras
+sequences sorting urls ;
 IN: github
 
 ! Github API Docs: https://docs.github.com/en/rest
@@ -46,10 +45,10 @@ SYMBOL: github-token
     "/%s/%s/repos" sprintf map-github-pages-100 ;
 
 : list-repository-languages ( owner repo -- seq )
-    "/repos/%s/%s/languages" sprintf github-get ;
+    "/repos/%s/%s/languages" sprintf map-github-pages-100 ;
 
 : list-repository-tags ( owner repo -- seq )
-    "/repos/%s/%s/tags" sprintf github-get ;
+    "/repos/%s/%s/tags" sprintf map-github-pages-100 ;
 
 : list-repository-tags-all ( owner repo -- seq )
     "/repos/%s/%s/git/refs/tags" sprintf github-get ;
@@ -66,12 +65,34 @@ SYMBOL: github-token
 : list-repository-topics ( owner repo -- seq )
     "/repos/%s/%s/topics" sprintf github-get ;
 
-: github-file* ( owner repo path -- meta contents )
+: github-file-meta-and-contents ( owner repo path -- meta contents )
     "/repos/%s/%s/contents/%s" sprintf github-get
     dup "download_url" of http-get nip ;
 
-: github-file ( owner repo path -- contents )
-    github-file* nip ;
+: github-file-contents ( owner repo path -- contents )
+    github-file-meta-and-contents nip ;
+
+: github-sha-file-meta-and-contents ( owner repo sha path -- meta/f contents/f )
+    [
+        swap
+        "/repos/%s/%s/contents/%s?ref=%s" sprintf github-get
+        dup "download_url" of http-get nip
+    ] [
+        dup { [ download-failed? ] [ response>> code>> 404 = ] } 1&&
+        [ 5drop f f ] [ rethrow ] if
+    ] recover ;
+
+: github-sha-file-contents ( owner repo sha path -- contents )
+    github-sha-file-meta-and-contents nip ;
+
+: github-sha-files-recursive-for-path ( owner repo sha path/f -- files )
+    "/repos/%s/%s/git/trees/%s?recursive=1&%s" sprintf github-get ;
+
+: github-sha-files-recursive ( owner repo sha -- files )
+    f github-sha-files-recursive-for-path ;
+
+: github-sha-files-for-path ( owner repo sha path -- files )
+    swap "/repos/%s/%s/contents/%s?ref=%s" sprintf github-get ;
 
 : github-code-search ( query -- seq )
     "/search/code?q=%s" sprintf github-get ;
@@ -98,7 +119,7 @@ SYMBOL: github-token
     [ >json ] 2dip "/repos/%s/%s/topics" sprintf github-put ;
 
 : get-forks ( owner repo -- seq )
-    "/repos/%s/%s/forks" sprintf github-get ;
+    "/repos/%s/%s/forks" sprintf map-github-pages-100 ;
 
 ! H{ { "organization" "rotcaf" } { "name" "pr-fun" } { "default_branch_only" "true" } }
 : create-fork ( json owner repo -- res )
@@ -113,6 +134,21 @@ SYMBOL: github-token
 
 : get-pull-request ( owner repo n -- seq )
     "/repos/%s/%s/pulls/%d" sprintf github-get ;
+
+: get-open-pull-requests ( owner repo -- seq )
+    "/repos/%s/%s/pulls?state=open" sprintf github-get ;
+
+: get-pull-request-files ( owner repo pr-number -- seq )
+    "/repos/%s/%s/pulls/%d/files" sprintf github-get ;
+
+: get-files-from-sha ( owner repo sha files -- seq )
+    [ "filename" of github-sha-file-meta-and-contents 2array ] with with with zip-with ;
+
+: get-pull-request-files-old-new ( owner repo pr-number -- pr pr-files old new )
+    [ drop ] [ get-pull-request ] [ get-pull-request-files ] 3tri
+    [ 2nipd ]
+    [ [ "base" of "sha" of ] dip get-files-from-sha ]
+    [ [ "head" of "sha" of ] dip get-files-from-sha ] 4tri ;
 
 ! H{ { "title" "pr2 - updated!" } { "head" "pr2" } { "base" "main" } { "body" "omg pr2 first post" } { "head_repo" "repo-string" } { "issue" 1 } { "draft" "true" } }
 : post-pull-request ( assoc owner repo -- res )
