@@ -267,6 +267,21 @@ IN: build-from-source.windows
         "sqlite3.dll" copy-output-file
     ] with-updated-github-repo ;
 
+: build-duckdb-dll ( -- )
+    "duckdb" "duckdb" [
+        [
+            32-bit? [
+                qw{ cmake -DBUILD_SHARED_LIBS=ON -A Win32 .. } try-process
+                qw{ msbuild duckdb.sln /property:Configuration=Release /p:Platform=Win32 } try-process
+            ] [
+                qw{ cmake -DBUILD_SHARED_LIBS=ON .. } try-process
+                qw{ msbuild duckdb.sln /property:Configuration=Release } try-process
+            ] if
+            "src/Release/duckdb.dll" copy-output-file
+            "Release/duckdb.exe" copy-output-file
+        ] with-build-directory
+    ] with-updated-github-repo ;
+
 : build-yaml-dll ( -- )
     "yaml" "libyaml" [
         [
