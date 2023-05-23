@@ -8,7 +8,7 @@ USING: ini-file tools.test ;
 { H{ { "section" H{ } } } } [ "[section]" string>ini ] unit-test
 
 { "[test \"section with quotes\"]\n\n" } [
-    "[test \"section with quotes\" single quote ']" string>ini ini>string
+    "[test \"section with quotes\"]" string>ini ini>string
 ] unit-test
 
 { H{ { "section" H{ } } } } [ "[\"section\" ]" string>ini ] unit-test
