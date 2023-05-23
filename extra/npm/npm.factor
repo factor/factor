@@ -39,7 +39,7 @@ M: f dev-deps drop { } ;
     [ npm-versions ] [ npm-versions sort-versions-asc ?last ] bi of ;
 
 : ?github-package-json ( owner repo -- json/f )
-    '[ _ _ "package.json" github-file json> ]
+    '[ _ _ "package.json" github-file-contents json> ]
     [ drop f ] recover ;
 
 : github-package-json-latest ( owner repo -- json/f )
