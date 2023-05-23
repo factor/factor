@@ -128,7 +128,7 @@ PRIVATE>
         dup string? [
             [ escape-string ] bi@ "%s=%s\n" printf
         ] [
-            [ escape-string "[%s]\n" printf ] dip
+            [ "[%s]\n" printf ] dip
             [ [ escape-string ] bi@ "%s=%s\n" printf ]
             assoc-each nl
         ] if
