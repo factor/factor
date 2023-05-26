@@ -56,8 +56,8 @@ TUPLE: completion model prompt suffix max_tokens temperature
     top_p n stream logprobs echo stop presence_penalty
     frequency_penalty best_of logit_bias user ;
 
-: <completion> ( model prompt -- completion )
-    completion new swap >>prompt swap >>model ;
+: <completion> ( prompt model -- completion )
+    completion new swap >>model swap >>prompt ;
 
 : create-completion ( completion -- data )
     openai-input "completions" openai-post ;
@@ -70,16 +70,16 @@ TUPLE: chat-completion model messages temperature top_p n stream
     stop max_tokens presence_penalty frequency_penalty
     logit_bias user ;
 
-: <chat-completion> ( model messages -- chat-completion )
-    chat-completion new swap >>messages swap >>model ;
+: <chat-completion> ( messages model -- chat-completion )
+    chat-completion new swap >>model swap >>messages ;
 
 : chat-completions ( chat-completion -- data )
     openai-input "chat/completions" openai-post ;
 
 TUPLE: edit model input instruction n temperature top_p ;
 
-: <edit> ( model instruction -- edit )
-    edit new swap >>instruction swap >>model ;
+: <edit> ( instruction model -- edit )
+    edit new swap >>model swap >>instruction ;
 
 : create-edit ( edit -- data )
     openai-input "edits" openai-post ;
@@ -110,8 +110,8 @@ TUPLE: image-variation image n size response_format user ;
 
 TUPLE: embeddings model input user ;
 
-: <embeddings> ( model input -- embeddings )
-    embeddings new swap >>input swap >>model ;
+: <embeddings> ( input model -- embeddings )
+    embeddings new swap >>model swap >>input ;
 
 : create-embeddings ( embeddings -- data )
     openai-input "embeddings" openai-post ;
