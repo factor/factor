@@ -78,16 +78,16 @@ IN: assocs.extras
 : map-values ( assoc quot: ( value -- value' ) -- assoc )
     '[ swap _ dip swap ] assoc-map ; inline
 
-: filter-keys ( assoc quot: ( key -- key' ) -- assoc' )
+: filter-keys ( assoc quot: ( key -- ? ) -- assoc' )
     '[ drop @ ] assoc-filter ; inline
 
-: filter-values ( assoc quot: ( value -- value' ) -- assoc' )
+: filter-values ( assoc quot: ( value -- ? ) -- assoc' )
     '[ nip @ ] assoc-filter ; inline
 
-: reject-keys ( assoc quot: ( key -- key' ) -- assoc' )
+: reject-keys ( assoc quot: ( key -- ? ) -- assoc' )
     '[ drop @ ] assoc-reject ; inline
 
-: reject-values ( assoc quot: ( value -- value' ) -- assoc' )
+: reject-values ( assoc quot: ( value -- ? ) -- assoc' )
     '[ nip @ ] assoc-reject ; inline
 
 : rekey-new-assoc ( assoc keys -- newassoc )
