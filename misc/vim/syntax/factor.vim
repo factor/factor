@@ -59,7 +59,7 @@ syn case match
 
 syn match   factorWord   /\v<\S+>/  contains=@factorWord transparent display
 syn cluster factorCluster           contains=factorWord,factorComment,factorMultilineComment,@factorClusterValue,factorDeclaration,factorCall,factorCallNextMethod,@factorWordOps,factorAlien,factorSlot,factorTuple,factorStruct,factorSlotsSyntax
-syn cluster factorClusterValue      contains=factorBreakpoint,factorBoolean,factorFrySpecifier,factorLocalsSpecifier,factorChar,factorString,@factorNumber,factorBackslash,factorMBackslash,factorLiteral,@factorEffect,@factorQuotation,@factorArray,factorRegexp
+syn cluster factorClusterValue      contains=factorBreakpoint,factorBoolean,factorFrySpecifier,factorLocalsSpecifier,factorChar,factorString,@factorNumber,factorBackslash,factorMBackslash,factorLiteral,@factorEffect,@factorEffectComment,@factorQuotation,@factorArray,factorRegexp
 
 " Almost any byte in Factor can be a part of a word
 syn iskeyword 33-126,128-255
@@ -294,11 +294,13 @@ if !exists('g:factor_syn_no_error')
 endif
 syn cluster factorEffectContents   contains=@factorComment,factorEffectDelims,factorEffectVar,factorEffectType,factorEffectRowVar
 syn cluster factorEffect           contains=factorEffect
+syn cluster factorEffectComment    contains=factorEffectComment
 " Erroring on stack effects without a "--" separator would be nice.
 " Unfortunately, that sort of vacuous detection is above Vim's pay-grade,
 "   especially when stack effects can be nested arbitrarily via types.
 syn match   factorEffectSkip       /\v%(\_\s+%(!>.*)?)*/ contains=@factorComment nextgroup=factorEffectRequired,@factorEffect transparent contained
 syn region  factorEffect       matchgroup=factorEffectDelims    start=/\v\V(\v>/  end=/\v<\V)\v>/ contains=@factorEffectContents
+syn region  factorEffectComment matchgroup=factorEffectCommentDelims   start=/\v\V((\v>/ end=/\v<\V))\v>/ contains=@factorEffectContents
 syn match   factorEffectVar        /\v<\S+>/           contained
 " Note that ":!" parses to the "!" word and doesn't lex as a comment.
 " Also, even though we take any value, the leading ":" breaking the word
@@ -383,6 +385,8 @@ if !exists('g:factor_syn_no_init')
   HiLink   factorMultilineComment       Comment
   HiLink   factorTodo                   Todo
   HiLink   factorEffect                 Type
+  HiLink   factorEffectComment          Type
+  HiLink   factorEffectCommentDelims    Comment
   HiLink   factorEffectDelims           Delimiter
   HiLink   factorEffectVar              Identifier
   HiLink   factorEffectRowVar           factorEffectVar
