@@ -18,8 +18,9 @@ M: object discord-chatgpt-bot 2drop ;
 M: MESSAGE_CREATE discord-chatgpt-bot drop
     dup obey-message? [
         "content" of "chatgpt: " ?head [
-            [ "gpt-3.5-turbo" ] dip
-            [ blank? ] trim '{ { "role" "user" } { "content" _ } } >hashtable 1array <chat-completion>
+            [ blank? ] trim
+            '{ { "role" "user" } { "content" _ } } >hashtable 1array
+            "gpt-3.5-turbo" <chat-completion>
             [ g... gflush ] [ chat-completions ] bi
             first-chat-completion reply-message
         ] [
