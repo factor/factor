@@ -3,7 +3,7 @@
 USING: accessors arrays assocs cli.git combinators
 combinators.extras combinators.short-circuit continuations
 formatting github http.client io.directories io.files
-io.files.info io.files.temp io.launcher io.pathnames json kernel
+io.files.info io.launcher io.pathnames json kernel
 layouts math namespaces namespaces.extras semver sequences
 sequences.extras sorting sorting.human sorting.specification
 splitting system unicode ;
@@ -11,6 +11,8 @@ IN: build-from-source
 
 INITIALIZED-SYMBOL: use-gitlab-git-uris [ f ]
 INITIALIZED-SYMBOL: use-github-git-uris [ f ]
+
+INITIALIZED-SYMBOL: build-from-source-directory [ "resource:build-from-source/" ]
 
 SYMBOL: out-directory
 
@@ -60,17 +62,20 @@ ERROR: no-output-file path ;
 
 : with-build-directory ( quot -- ) [ "build" ] dip with-build-directory-as ; inline
 
-: temp-directory-cpu ( -- path )
-    temp-directory cpu name>> append-path ;
+: get-build-from-source-directory ( -- path )
+    build-from-source-directory get ;
 
-: with-temp-cpu-directory ( quot -- )
-    [ temp-directory-cpu dup make-directories ] dip with-directory ; inline
+: build-from-source-directory-directory-cpu ( -- path )
+    get-build-from-source-directory cpu name>> append-path ;
 
-: temp-directory-gitlab ( -- path )
-    temp-directory "gitlab" append-path ;
+: with-build-from-source-cpu-directory ( quot -- )
+    [ build-from-source-directory-directory-cpu dup make-directories ] dip with-directory ; inline
 
-: with-temp-gitlab-org-directory ( base org/user quot -- )
-    [ append-path temp-directory-gitlab prepend-path dup make-directories ] dip with-directory ; inline
+: build-from-source-directory-gitlab ( -- path )
+    get-build-from-source-directory "gitlab" append-path ;
+
+: with-build-from-source-gitlab-org-directory ( base org/user quot -- )
+    [ append-path build-from-source-directory-gitlab prepend-path dup make-directories ] dip with-directory ; inline
 
 : gitlab-git-uri ( base org/user project -- uri ) "git://%s/%s/%s" sprintf ;
 : gitlab-http-uri ( base org/user project -- uri ) "http://%s/%s/%s" sprintf ;
@@ -84,29 +89,29 @@ ERROR: no-output-file path ;
     [ drop ] [ gitlab-uri ] 3bi
     '[
         _ sync-repository wait-for-success
-    ] with-temp-gitlab-org-directory ;
+    ] with-build-from-source-gitlab-org-directory ;
 
 : sync-gitlab-pristine-and-clone-build-repository-as ( base org/user project build-path -- build-path )
     [ drop sync-gitlab-pristine-repository-as ]
-    [ [ append-path append-path temp-directory-gitlab prepend-path ] dip ] 4bi
+    [ [ append-path append-path build-from-source-directory-gitlab prepend-path absolute-path ] dip ] 4bi
     '[
         _ _ [ ?delete-tree ] [ git-clone-as wait-for-success ] [ ] tri
-    ] with-temp-cpu-directory ;
+    ] with-build-from-source-cpu-directory ;
 
 : with-updated-gitlab-repo-as ( base org/user project build-path-as quot -- )
     [ sync-gitlab-pristine-and-clone-build-repository-as ] dip
     '[
         _ prepend-current-path _ with-directory
-    ] with-temp-cpu-directory ; inline
+    ] with-build-from-source-cpu-directory ; inline
 
 : with-updated-gitlab-repo ( base org/user project quot -- )
     [ dup git-directory-name ] dip with-updated-gitlab-repo-as ; inline
 
-: temp-directory-github ( -- path )
-    temp-directory "github" append-path ;
+: build-from-source-directory-github ( -- path )
+    get-build-from-source-directory "github" append-path ;
 
-: with-temp-github-directory ( org/user quot -- )
-    [ temp-directory-github prepend-path dup make-directories ] dip with-directory ; inline
+: with-build-from-source-github-directory ( org/user quot -- )
+    [ build-from-source-directory-github prepend-path dup make-directories ] dip with-directory ; inline
 
 : github-uri ( org/user project -- uri )
     use-github-git-uris get [ github-git-uri ] [ github-https-uri ] if ;
@@ -115,21 +120,21 @@ ERROR: no-output-file path ;
     [ drop ] [ github-uri ] [ nip ] 2tri
     '[
         _ _ sync-repository-as wait-for-success
-    ] with-temp-github-directory ;
+    ] with-build-from-source-github-directory ;
 
 ! "factor" "vscode-factor" "factor-buildme-here"
 : sync-github-pristine-and-clone-build-repository-as ( org/user project build-path -- build-path )
     [ drop sync-github-pristine-repository-as ]
-    [ [ append-path temp-directory-github prepend-path ] dip ] 3bi
+    [ [ append-path build-from-source-directory-github prepend-path absolute-path ] dip ] 3bi
     '[
         _ _ [ ?delete-tree ] [ git-clone-as wait-for-success ] [ ] tri
-    ] with-temp-cpu-directory ;
+    ] with-build-from-source-cpu-directory ;
 
 : with-updated-github-repo-as ( org/user project build-path-as quot -- )
     [ sync-github-pristine-and-clone-build-repository-as ] dip
     '[
         _ prepend-current-path _ with-directory
-    ] with-temp-cpu-directory ; inline
+    ] with-build-from-source-cpu-directory ; inline
 
 : with-updated-github-repo ( org/user project quot -- )
     [ dup git-directory-name ] dip with-updated-github-repo-as ; inline
@@ -144,7 +149,7 @@ ERROR: no-output-file path ;
         [ file-name { "tar" "xvfz" } swap suffix try-process ]
         [ file-name ".tar.gz" ?tail drop ] tri
         prepend-current-path _ with-directory
-    ] with-temp-cpu-directory ; inline
+    ] with-build-from-source-cpu-directory ; inline
 
 : split-python-version ( version -- array )
     {
