@@ -136,9 +136,9 @@ IN: build-from-source.windows
                 qw{ msbuild LibreSSL.sln /m /property:Configuration=Release } try-process
             ] if
             {
-                "crypto/Release/crypto-50.dll"
-                "ssl/Release/ssl-53.dll"
-                "tls/Release/tls-26.dll"
+                "crypto/Release/crypto-51.dll"
+                "ssl/Release/ssl-54.dll"
+                "tls/Release/tls-27.dll"
             } copy-output-files
         ] with-build-directory
     ] with-tar-gz ;
