@@ -25,42 +25,69 @@ MACRO: cond-case ( assoc -- quot )
 MACRO: cleave-array ( quots -- quot )
     [ '[ _ cleave ] ] [ length '[ _ narray ] ] bi compose ;
 
-: 3bi* ( u v w x y z p q -- )
-    [ 3dip ] dip call ; inline
-
-: 3bi@ ( u v w x y z quot -- )
-    dup 3bi* ; inline
-
-: 4bi ( w x y z p q -- )
+: 4bi ( w x y z  p q -- )
     [ 4keep ] dip call ; inline
-
-: 4bi* ( s t u v w x y z p q -- )
-    [ 4dip ] dip call ; inline
-
-: 4tri* ( o p q r  s t u v  w x y z  p q r -- )
-    [ 8 ndip ] 2dip
-    [ 4dip ] dip
-    call ; inline
-
-: 4bi@ ( s t u v  w x y z  quot -- )
-    dup 4bi* ; inline
-
-: 4tri@ ( a b c d  e f g h  i j k l  quot -- )
-    dup dup 4tri* ; inline
 
 : 4tri ( w x y z  p q r -- )
     [ [ 4keep ] dip 4keep ] dip call ; inline
 
+: quad ( x  p q r s -- )
+    [ [ [ keep ] dip keep ] dip keep ] dip call ; inline
+
+: 2quad ( x y  p q r s -- )
+    [ [ [ 2keep ] dip 2keep ] dip 2keep ] dip call ; inline
+
+: 3quad ( x y z  p q r s -- )
+    [ [ [ 3keep ] dip 3keep ] dip 3keep ] dip call ; inline
+
 : 4quad ( w x y z  p q r s -- )
     [ [ [ 4keep ] dip 4keep ] dip 4keep ] dip call ; inline
 
-: quad ( x p q r s -- ) [ [ [ keep ] dip keep ] dip keep ] dip call ; inline
+: 3bi* ( u v w  x y z  p q -- )
+    [ 3dip ] dip call ; inline
 
-: 2quad ( x y p q r s -- ) [ [ [ 2keep ] dip 2keep ] dip 2keep ] dip call ; inline
+: 4bi* ( s t u v  w x y z  p q -- )
+    [ 4dip ] dip call ; inline
 
-: quad* ( w x y z p q r s -- ) [ [ [ 3dip ] dip 2dip ] dip dip ] dip call ; inline
+: 3tri* ( r s t  u v w  x y z  p q r -- )
+    [ 6 ndip ] 2dip [ 4dip ] dip call ; inline
 
-: quad@ ( w x y z quot -- ) dup dup dup quad* ; inline
+: 4tri* ( o p q r  s t u v  w x y z  p q r -- )
+    [ 8 ndip ] 2dip [ 4dip ] dip call ; inline
+
+: quad* ( w  x  y  z  p q r s -- )
+    [ [ [ 3dip ] dip 2dip ] dip dip ] dip call ; inline
+
+: 2quad* ( s t  u v  w x  y z  p q r s -- )
+    [ [ [ 6 ndip ] dip 4dip ] dip 2dip ] dip call ; inline
+
+: 3quad* ( o p q  r s t  u v w  x y z  p q r s -- )
+    [ [ [ 9 ndip ] dip 6 ndip ] dip 3dip ] dip call ; inline
+
+: 4quad* ( k l m n  o p q r  s t u v  w x y z  p q r s -- )
+    [ [ [ 12 ndip ] dip 8 ndip ] dip 4dip ] dip call ; inline
+
+: 3bi@ ( u v w  x y z  quot -- ) dup 3bi* ; inline
+
+: 4bi@ ( s t u v  w x y z  quot -- ) dup 4bi* ; inline
+
+: 3tri@ ( r s t  u v w  x y z  p q r -- )
+    dup dup 3tri* ; inline
+
+: 4tri@ ( o p q r  s t u v  w x y z  quot -- )
+    dup dup 4tri* ; inline
+
+: quad@ ( w  x  y  z  quot -- )
+    dup dup dup quad* ; inline
+
+: 2quad@ ( s t  u v  w x  y z  p q r s -- )
+    dup dup dup 2quad* ; inline
+
+: 3quad@ ( o p q  r s t  u v w  x y z  p q r s -- )
+    dup dup dup 3quad* ; inline
+
+: 4quad@ ( k l m n  o p q r  s t u v  w x y z  p q r s -- )
+    dup dup dup 4quad* ; inline
 
 MACRO: smart-plox ( true -- quot )
     [ inputs [ 1 - [ and ] n*quot ] keep ] keep swap
