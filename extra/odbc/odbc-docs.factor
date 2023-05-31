@@ -112,12 +112,25 @@ HELP: odbc-get-all-rows
 
 HELP: odbc-query
 { $values
-    { "string" "a string containing SQL" }
     { "dsn" "a DSN string" }
+    { "string" "a string containing SQL" }
     { "result" "a sequence" }
 }
 { $description
     "This word initializes odbc, connects to the database with the given DSN, executes the query string and returns the result as a sequence. It cleans up all resources it uses. It is an inefficient way of running multiple queries but is useful for the occasional query, testing at the REPL, or as an example of how to do it."
 }
-{ $examples { $code "\"select 1\" \"DSN=snowflake; UID=sheeple; PWD=sekrit\" odbc-query" } }
+{ $examples { $code "\"DSN=snowflake; UID=sheeple; PWD=sekrit\" \"select 1\" odbc-query" } }
+{ $see-also odbc-init odbc-connect odbc-disconnect odbc-prepare odbc-free-statement odbc-execute odbc-next-row odbc-number-of-columns odbc-describe-column odbc-get-field odbc-get-row-fields odbc-get-all-rows odbc-query } ;
+
+HELP: odbc-queries
+{ $values
+    { "dsn" "a DSN string" }
+    { "strings" "a sequence of strings containing SQL" }
+    { "results" "a sequence" }
+}
+{ $description
+    "This word initializes odbc, connects to the database with the given DSN, executes the query strings and returns the result as a sequence. It cleans up all resources it uses."
+}
+{ $examples { $code "\"DSN=snowflake; UID=sheeple; PWD=sekrit\"
+{ \"select 1\" \"select 2\" \"select 3\" } odbc-queries" } }
 { $see-also odbc-init odbc-connect odbc-disconnect odbc-prepare odbc-free-statement odbc-execute odbc-next-row odbc-number-of-columns odbc-describe-column odbc-get-field odbc-get-row-fields odbc-get-all-rows odbc-query } ;

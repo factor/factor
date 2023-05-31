@@ -1,11 +1,12 @@
 ! Copyright (C) 2007 Chris Double, 2016 Alexander Ilin, 2023 Doug Coleman.
 ! See https://factorcode.org/license.txt for BSD license.
-USING: accessors alien alien.c-types alien.data alien.libraries
-alien.strings alien.syntax arrays calendar combinators
-combinators.extras continuations endian generalizations
-io.encodings.ascii io.encodings.string io.encodings.utf8 kernel
-make math pack sequences sequences.generalizations strings
-system threads vocabs.platforms ;
+USING: accessors alien alien.c-types alien.data
+alien.destructors alien.libraries alien.strings alien.syntax
+arrays calendar combinators combinators.extras continuations
+destructors endian generalizations io.encodings.ascii
+io.encodings.string io.encodings.utf8 kernel make math pack
+sequences sequences.generalizations strings system threads
+vocabs.platforms ;
 FROM: alien.c-types => float short ;
 IN: odbc
 
@@ -46,18 +47,11 @@ TYPEDEF: longlong SQLBIGINT
 TYPEDEF: ulonglong SQLUBIGINT
 64>
 
-CONSTANT: SQL-HANDLE-ENV  1
-CONSTANT: SQL-HANDLE-DBC  2
-CONSTANT: SQL-HANDLE-STMT 3
-CONSTANT: SQL-HANDLE-DESC 4
-
-CONSTANT: SQL-NULL-HANDLE f
-
 CONSTANT: SQL_MAX_MESSAGE_LENGTH 512
 
 CONSTANT: SQL_SQLSTATE_SIZE 5
 
-CONSTANT: SQL-ATTR-ODBC-VERSION 200 ! ODBC 3.8
+CONSTANT: SQL_ATTR_ODBC_VERSION 200 ! ODBC 3.8
 
 : SQL-OV-ODBC2 ( -- number ) 2 <alien> ; inline
 : SQL-OV-ODBC3 ( -- number ) 3 <alien> ; inline
@@ -67,12 +61,12 @@ CONSTANT: SQL_HANDLE_DBC 2
 CONSTANT: SQL_HANDLE_STMT 3
 CONSTANT: SQL_HANDLE_DESC 4
 
-CONSTANT: SQL_NULL_HANDLE 0
+CONSTANT: SQL_NULL_HANDLE f
 
 CONSTANT: SQL_NTS -3
 
-CONSTANT: SQL-DRIVER-NOPROMPT 0
-CONSTANT: SQL-DRIVER-PROMPT 2
+CONSTANT: SQL_DRIVER_NOPROMPT 0
+CONSTANT: SQL_DRIVER_PROMPT 2
 
 CONSTANT: SQL_COMMIT 0
 CONSTANT: SQL_ROLLBACK 1
@@ -100,69 +94,69 @@ CONSTANT: SQL_INVALID_HANDLE -2
 CONSTANT: SQL_NO_DATA 100
 
 CONSTANT: SQL_NO_DATA_FOUND 100
-CONSTANT: SQL-C-DEFAULT 99
+CONSTANT: SQL_C_DEFAULT 99
 
 SYMBOLS:
-    SQL-CHAR SQL-VARCHAR SQL-LONGVARCHAR
-    SQL-WCHAR SQL-WCHARVAR SQL-WLONGCHARVAR
-    SQL-DECIMAL SQL-SMALLINT SQL-NUMERIC SQL-INTEGER
-    SQL-REAL SQL-FLOAT SQL-DOUBLE
-    SQL-BIT
-    SQL-TINYINT SQL-BIGINT
-    SQL-BINARY SQL-VARBINARY SQL-LONGVARBINARY
-    SQL-TYPE-DATE SQL-TYPE-TIME SQL-TYPE-TIMESTAMP
-    SQL-TYPE-UTCDATETIME SQL-TYPE-UTCTIME
-    SQL-INTERVAL-MONTH SQL-INTERVAL-YEAR SQL-INTERVAL-DAY
-    SQL-INTERVAL-HOUR SQL-INTERVAL-MINUTE SQL-INTERVAL-SECOND
-    SQL-INTERVAL-YEAR-TO-MONTH
-    SQL-INTERVAL-DAY-TO-HOUR SQL-INTERVAL-DAY-TO-MINUTE
-    SQL-INTERVAL-DAY-TO-SECOND
-    SQL-INTERVAL-HOUR-TO-MINUTE SQL-INTERVAL-HOUR-TO-SECOND SQL-INTERVAL-MINUTE-TO-SECOND
-    SQL-GUID SQL-XML SQL-UDT SQL-GEOMETRY SQL-GEOMETRYCOLLECTION SQL-CIRCULARSTRING
-    SQL-COMPOUNDCURVE SQL-CURVEPOLYGON SQL-FULLTEXT SQL-FULLTEXTKEY SQL-LINESTRING
-    SQL-MULTILINESTRING SQL-MULTIPOINT SQL-MULTIPOLYGON SQL-POINT SQL-POLYGON
-    SQL-TYPE-UNKNOWN ;
+    SQL_CHAR SQL_VARCHAR SQL_LONGVARCHAR
+    SQL_WCHAR SQL_WCHARVAR SQL_WLONGCHARVAR
+    SQL_DECIMAL SQL_SMALLINT SQL_NUMERIC SQL_INTEGER
+    SQL_REAL SQL_FLOAT SQL_DOUBLE
+    SQL_BIT
+    SQL_TINYINT SQL_BIGINT
+    SQL_BINARY SQL_VARBINARY SQL_LONGVARBINARY
+    SQL_TYPE_DATE SQL_TYPE_TIME SQL_TYPE_TIMESTAMP
+    SQL_TYPE_UTCDATETIME SQL_TYPE_UTCTIME
+    SQL_INTERVAL_MONTH SQL_INTERVAL_YEAR SQL_INTERVAL_DAY
+    SQL_INTERVAL_HOUR SQL_INTERVAL_MINUTE SQL_INTERVAL_SECOND
+    SQL_INTERVAL_YEAR_TO_MONTH
+    SQL_INTERVAL_DAY_TO_HOUR SQL_INTERVAL_DAY_TO_MINUTE
+    SQL_INTERVAL_DAY_TO_SECOND
+    SQL_INTERVAL_HOUR_TO_MINUTE SQL_INTERVAL_HOUR_TO_SECOND SQL_INTERVAL_MINUTE_TO_SECOND
+    SQL_GUID SQL_XML SQL_UDT SQL_GEOMETRY SQL_GEOMETRYCOLLECTION SQL_CIRCULARSTRING
+    SQL_COMPOUNDCURVE SQL_CURVEPOLYGON SQL_FULLTEXT SQL_FULLTEXTKEY SQL_LINESTRING
+    SQL_MULTILINESTRING SQL_MULTIPOINT SQL_MULTIPOLYGON SQL_POINT SQL_POLYGON
+    SQL_TYPE_UNKNOWN ;
 
 : convert-sql-type ( number -- symbol )
     {
-        {   1 [ SQL-CHAR ] }
-        {  12 [ SQL-VARCHAR ] }
-        {  -1 [ SQL-LONGVARCHAR ] }
-        {  -8 [ SQL-WCHAR ] }
-        {  -9 [ SQL-WCHARVAR ] }
-        { -10 [ SQL-WLONGCHARVAR ] }
-        {   3 [ SQL-DECIMAL ] }
-        {   5 [ SQL-SMALLINT ] }
-        {   2 [ SQL-NUMERIC ] }
-        {   4 [ SQL-INTEGER ] }
-        {   7 [ SQL-REAL ] }
-        {   6 [ SQL-FLOAT ] }
-        {   8 [ SQL-DOUBLE ] }
-        {  -7 [ SQL-BIT ] }
-        {  -6 [ SQL-TINYINT ] }
-        {  -5 [ SQL-BIGINT ] }
-        {  -2 [ SQL-BINARY ] }
-        {  -3 [ SQL-VARBINARY ] }
-        {  -4 [ SQL-LONGVARBINARY ] }
-        {  91 [ SQL-TYPE-DATE ] }
-        {  92 [ SQL-TYPE-TIME ] }
-        {  93 [ SQL-TYPE-TIMESTAMP ] }
-        {  -151 [ SQL-XML ] }
-        {  -152 [ SQL-UDT ] }
-        {  -153 [ SQL-GEOMETRY ] }
-        {  -154 [ SQL-GEOMETRYCOLLECTION ] }
-        {  -155 [ SQL-CIRCULARSTRING ] }
-        {  -156 [ SQL-COMPOUNDCURVE ] }
-        {  -157 [ SQL-CURVEPOLYGON ] }
-        {  -158 [ SQL-FULLTEXT ] }
-        {  -159 [ SQL-FULLTEXTKEY ] }
-        {  -160 [ SQL-LINESTRING ] }
-        {  -161 [ SQL-MULTILINESTRING ] }
-        {  -162 [ SQL-MULTIPOINT ] }
-        {  -163 [ SQL-MULTIPOLYGON ] }
-        {  -164 [ SQL-POINT ] }
-        {  -165 [ SQL-POLYGON ] }
-        [ drop  SQL-TYPE-UNKNOWN ]
+        {   1 [ SQL_CHAR ] }
+        {  12 [ SQL_VARCHAR ] }
+        {  -1 [ SQL_LONGVARCHAR ] }
+        {  -8 [ SQL_WCHAR ] }
+        {  -9 [ SQL_WCHARVAR ] }
+        { -10 [ SQL_WLONGCHARVAR ] }
+        {   3 [ SQL_DECIMAL ] }
+        {   5 [ SQL_SMALLINT ] }
+        {   2 [ SQL_NUMERIC ] }
+        {   4 [ SQL_INTEGER ] }
+        {   7 [ SQL_REAL ] }
+        {   6 [ SQL_FLOAT ] }
+        {   8 [ SQL_DOUBLE ] }
+        {  -7 [ SQL_BIT ] }
+        {  -6 [ SQL_TINYINT ] }
+        {  -5 [ SQL_BIGINT ] }
+        {  -2 [ SQL_BINARY ] }
+        {  -3 [ SQL_VARBINARY ] }
+        {  -4 [ SQL_LONGVARBINARY ] }
+        {  91 [ SQL_TYPE_DATE ] }
+        {  92 [ SQL_TYPE_TIME ] }
+        {  93 [ SQL_TYPE_TIMESTAMP ] }
+        {  -151 [ SQL_XML ] }
+        {  -152 [ SQL_UDT ] }
+        {  -153 [ SQL_GEOMETRY ] }
+        {  -154 [ SQL_GEOMETRYCOLLECTION ] }
+        {  -155 [ SQL_CIRCULARSTRING ] }
+        {  -156 [ SQL_COMPOUNDCURVE ] }
+        {  -157 [ SQL_CURVEPOLYGON ] }
+        {  -158 [ SQL_FULLTEXT ] }
+        {  -159 [ SQL_FULLTEXTKEY ] }
+        {  -160 [ SQL_LINESTRING ] }
+        {  -161 [ SQL_MULTILINESTRING ] }
+        {  -162 [ SQL_MULTIPOINT ] }
+        {  -163 [ SQL_MULTIPOLYGON ] }
+        {  -164 [ SQL_POINT ] }
+        {  -165 [ SQL_POLYGON ] }
+        [ drop  SQL_TYPE_UNKNOWN ]
     } case ;
 
 
@@ -255,7 +249,7 @@ ERROR: odbc-invalid-handle-error message ;
     } case ;
 
 : succeeded? ( n -- bool )
-    ! Did the call succeed (SQL-SUCCESS or SQL-SUCCESS-WITH-INFO)
+    ! Did the call succeed (SQL_SUCCESS or SQL_SUCCESS_WITH_INFO)
     {
         { SQL_SUCCESS [ t ] }
         { SQL_SUCCESS_WITH_INFO [ t ] }
@@ -263,8 +257,8 @@ ERROR: odbc-invalid-handle-error message ;
     } case ;
 
 ERROR: odbc-statement-error state native-code message ;
-: throw-statement-error ( hstmt -- * )
-    [ SQL_HANDLE_STMT ] dip
+
+: throw-diag-odbc-error ( handle-type hstmt -- * )
     1
     SQL_SQLSTATE_SIZE SQLCHAR <c-array>
     0 SQLINTEGER <ref>
@@ -274,6 +268,12 @@ ERROR: odbc-statement-error state native-code message ;
     [ SQLGetDiagRec "SQLGetDiagRec" check-odbc ] 5 nkeep
     nip [ utf8 decode ] [ le> ] [ ] [ le> head utf8 decode ] quad*
     odbc-statement-error ;
+
+: throw-env-error ( henv -- obj )
+    [ SQL_HANDLE_ENV ] dip throw-diag-odbc-error ;
+
+: throw-statement-error ( hstmt -- * )
+    [ SQL_HANDLE_STMT ] dip throw-diag-odbc-error ;
 
 : check-statement ( retcode hstmt -- )
     swap succeeded? [ drop ] [ throw-statement-error ] if ;
@@ -286,13 +286,13 @@ ERROR: odbc-statement-error state native-code message ;
     ] if ;
 
 : alloc-env-handle ( -- handle )
-    SQL-HANDLE-ENV SQL-NULL-HANDLE alloc-handle ;
+    SQL_HANDLE_ENV SQL_NULL_HANDLE alloc-handle ;
 
 : alloc-dbc-handle ( env -- handle )
-    [ SQL-HANDLE-DBC ] dip alloc-handle ;
+    [ SQL_HANDLE_DBC ] dip alloc-handle ;
 
 : alloc-stmt-handle ( dbc -- handle )
-    [ SQL-HANDLE-STMT ] dip alloc-handle ;
+    [ SQL_HANDLE_STMT ] dip alloc-handle ;
 
 <PRIVATE
 
@@ -305,25 +305,42 @@ PRIVATE>
     [ alien-space-str ] keep ;
 
 : set-odbc-version ( env-handle -- )
-    SQL-ATTR-ODBC-VERSION SQL-OV-ODBC3 0 SQLSetEnvAttr "SQLSetEnvAttr" check-odbc ;
+    SQL_ATTR_ODBC_VERSION SQL-OV-ODBC3 0 SQLSetEnvAttr "SQLSetEnvAttr" check-odbc ;
 
 : odbc-init ( -- env )
     alloc-env-handle [ set-odbc-version ] keep ;
 
 : odbc-connect ( env dsn -- dbc )
-    [ alloc-dbc-handle dup ] dip
-    f swap utf8 string>alien dup length
+    [ alloc-dbc-handle dup f ]
+    [ utf8 string>alien dup length ] bi*
     1024 temp-string 0 short <ref>
-    SQL-DRIVER-NOPROMPT SQLDriverConnect "SQLDriverConnect" check-odbc ;
+    SQL_DRIVER_NOPROMPT SQLDriverConnect "SQLDriverConnect" check-odbc ;
 
-: odbc-disconnect ( dbc -- ) SQLDisconnect "SQLDisconnect" check-odbc ;
+: odbc-disconnect ( dbc -- )
+    [ SQLDisconnect "SQLDisconnect" check-odbc ]
+    [ SQL_HANDLE_DBC swap SQLFreeHandle "SQLFreeHandle in odbc-disconnect" check-odbc ] bi ;
 
 : odbc-prepare ( dbc string -- statement )
     [ alloc-stmt-handle dup ] dip utf8 string>alien
     dup length [ SQLPrepare ] keepdd check-statement ;
 
+: odbc-free-env ( henv -- )
+    dup SQLFreeEnv -1 = [ throw-env-error throw ] [ drop ] if ;
+
 : odbc-free-statement ( statement -- )
-    SQL-HANDLE-STMT swap SQLFreeHandle "SQLFreeHandle" check-odbc ;
+    SQL_HANDLE_STMT swap SQLFreeHandle "SQLFreeHandle" check-odbc ;
+
+TUPLE: odbc-env-destructor < alien-destructor disposed ;
+: <odbc-env-destructor> ( env -- tuple ) f odbc-env-destructor boa ; inline
+M: odbc-env-destructor dispose* alien>> odbc-free-env ;
+
+TUPLE: odbc-dbc-destructor < alien-destructor disposed ;
+: <odbc-dbc-destructor> ( env -- tuple ) f odbc-dbc-destructor boa ; inline
+M: odbc-dbc-destructor dispose* alien>> odbc-disconnect ;
+
+TUPLE: odbc-statement-destructor < alien-destructor disposed ;
+: <odbc-statement-destructor> ( env -- tuple ) f odbc-statement-destructor boa ; inline
+M: odbc-statement-destructor dispose* alien>> odbc-free-statement ;
 
 : odbc-execute ( statement -- ) [ SQLExecute ] keep check-statement ;
 
@@ -360,24 +377,24 @@ C: <column> column
 
 : dereference-type-pointer ( byte-array column -- object )
     type>> {
-        { SQL-CHAR [ utf8 alien>string ] }
-        { SQL-VARCHAR [ utf8 alien>string ] }
-        { SQL-LONGVARCHAR [ utf8 alien>string ] }
-        { SQL-WCHAR [ utf8 alien>string ] }
-        { SQL-WCHARVAR [ utf8 alien>string ] }
-        { SQL-WLONGCHARVAR [ utf8 alien>string ] }
-        { SQL-DECIMAL [ ascii alien>string ] }
-        { SQL-TYPE-TIMESTAMP [
+        { SQL_CHAR [ utf8 alien>string ] }
+        { SQL_VARCHAR [ utf8 alien>string ] }
+        { SQL_LONGVARCHAR [ utf8 alien>string ] }
+        { SQL_WCHAR [ utf8 alien>string ] }
+        { SQL_WCHARVAR [ utf8 alien>string ] }
+        { SQL_WLONGCHARVAR [ utf8 alien>string ] }
+        { SQL_DECIMAL [ ascii alien>string ] }
+        { SQL_TYPE_TIMESTAMP [
             "SSSSSSI" unpack-le 7 firstn
             1,000,000,000 / + instant <timestamp>
         ] }
-        { SQL-SMALLINT [ short deref ] }
-        { SQL-INTEGER [ long deref ] }
-        { SQL-REAL [ float deref ] }
-        { SQL-FLOAT [ double deref ] }
-        { SQL-DOUBLE [ double deref ] }
-        { SQL-TINYINT [ char deref ] }
-        { SQL-BIGINT [ longlong deref ] }
+        { SQL_SMALLINT [ short deref ] }
+        { SQL_INTEGER [ long deref ] }
+        { SQL_REAL [ float deref ] }
+        { SQL_FLOAT [ double deref ] }
+        { SQL_DOUBLE [ double deref ] }
+        { SQL_TINYINT [ char deref ] }
+        { SQL_BIGINT [ longlong deref ] }
         [ nip name>> "Unknown SQL Type: " prepend ]
     } case ;
 
@@ -391,16 +408,18 @@ C: <field> field
     ] unless
     8192 :> bufferLen
     bufferLen alien-space-str :> targetValuePtr
-    statement column number>> SQL-C-DEFAULT
-    targetValuePtr bufferLen f SQLGetData
+    statement column number>> SQL_C_DEFAULT
+    targetValuePtr bufferLen 0 SQLINTEGER <ref> :> outlen
+    outlen SQLGetData
     succeeded? [
-        targetValuePtr column [ dereference-type-pointer ] keep <field>
+        outlen SQLINTEGER deref -1 = [
+            f column <field>
+        ] [
+            targetValuePtr column dereference-type-pointer
+            column <field>
+        ] if
     ] [
-        column [
-            "SQLGetData Failed for Column: " %
-            dup name>> %
-            " of type: " % dup type>> name>> %
-        ] "" make swap <field>
+        statement throw-statement-error
     ] if ;
 
 : odbc-get-row-fields ( statement -- seq )
@@ -420,12 +439,16 @@ C: <field> field
 : odbc-get-all-rows ( statement -- seq )
     [ (odbc-get-all-rows) ] { } make ;
 
-: odbc-query ( string dsn -- result )
-    odbc-init swap odbc-connect [
-        [
-            swap odbc-prepare
-            dup odbc-execute
-            dup odbc-get-all-rows
-            swap odbc-free-statement
-        ] keep
-    ] [ odbc-disconnect ] finally ;
+: odbc-queries ( dsn strings -- results )
+    '[
+        odbc-init dup <odbc-env-destructor> &dispose drop
+        swap odbc-connect dup <odbc-dbc-destructor> &dispose drop
+        _ [
+            odbc-prepare dup <odbc-statement-destructor> &dispose
+            [ drop odbc-execute ]
+            [ drop odbc-get-all-rows ]
+            [ nip dispose ] 2tri
+        ] with map
+    ] with-destructors ;
+
+: odbc-query ( dsn string -- result ) 1array odbc-queries ;
