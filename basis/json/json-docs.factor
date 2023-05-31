@@ -9,12 +9,15 @@ HELP: read-json
 { $values { "objects" { $sequence "deserialized objects" } } }
 { $description "Reads JSON formatted strings into a vector of Factor object until the end of the stream is reached. JSON objects are converted to Factor hashtables. All other JSON objects convert to their obvious Factor equivalents." } ;
 
+{ json> read-json } related-words
+
 HELP: path>json
 { $values
     { "path" "a pathname string" }
     { "json" "a JSON object" }
 }
 { $description "Reads a file into a single JSON object. Throws an error if the file contains more than one json." } ;
+
 { path>json path>jsons } related-words
 
 HELP: path>jsons
@@ -26,10 +29,9 @@ HELP: path>jsons
 
 HELP: >json
 { $values { "obj" object } { "string" "the object converted to JSON format" } }
-{ $description "Serializes the object into a JSON formatted string." }
-{ $see-also json-print } ;
+{ $description "Serializes the object into a JSON formatted string." } ;
 
-HELP: json-print
+HELP: write-json
 { $values { "obj" object } }
 { $description "Serializes the object into a JSON formatted string and outputs it to the standard output stream."
 $nl
@@ -44,6 +46,8 @@ $nl
 }
 { $see-also >json } ;
 
+{ >json write-json } related-words
+
 { json-fp-special-error json-allow-fp-special? } related-words
 
 HELP: json-fp-special-error
@@ -52,17 +56,17 @@ HELP: json-fp-special-error
 ARTICLE: "json" "JSON serialization"
 "The " { $vocab-link "json" } " vocabulary defines words for working with JSON (JavaScript Object Notation) formats."
 $nl
-"Parsing strings in JSON format."
+"Parsing strings in JSON format:"
 { $subsections
     json>
     read-json
     path>json
     path>jsons
 }
-"Converting objects to JSON format."
+"Converting objects to JSON format:"
 { $subsections
     >json
-    json-print
+    write-json
 }
 "Working with JSON null values:"
 { $subsections
@@ -70,6 +74,13 @@ $nl
     if-json-null
     when-json-null
     unless-json-null
+}
+"Working with JSON Lines format:"
+{ $subsections
+    jsonlines>
+    read-jsonlines
+    >jsonlines
+    write-jsonlines
 }
 "For more information, see " { $url "https://en.wikipedia.org/wiki/JSON" } "." ;
 
