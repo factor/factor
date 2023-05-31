@@ -231,7 +231,7 @@ syn region  factorLiteral           start=/\v<\$>/     skip=/\v<!>.*/       end=
 
 syn match   factorSlotAttrReadOnly      /\v<read-only>/ contained
 syn match   factorSlotAttrInitial       /\v<initial:>%(\_\s+%(!>.*)?)+/ contains=@factorComment nextgroup=factorWord,@factorClusterValue contained
-syn cluster factorSlotAttr              contains=factorSlotAttrInitial,factorSlotAttrReadOnly
+syn cluster factorSlotAttr              contains=factorSlotAttrInitial,factorSlotAttrReadOnly,@factorArray
 
 syn cluster factorTupleSlotAttr         contains=@factorSlotAttr
 syn match   factorTupleSlotAttrSkip     /\v%(\_\s+%(!>.*)?)*/ contains=@factorComment nextgroup=@factorTupleSlotAttr contained transparent
