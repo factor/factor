@@ -343,3 +343,6 @@ PRIVATE>
 
 : collect-index-by ( ... seq quot: ( ... obj -- ... key ) -- ... assoc )
     [ H{ } clone ] 2dip collect-index-by! ; inline
+
+: assoc-interleave ( ... assoc between quot: ( ... key value -- ... ) -- ... )
+    [ >alist ] 2dip [ first2 ] prepose interleave ; inline
