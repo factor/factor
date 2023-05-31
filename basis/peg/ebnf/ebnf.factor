@@ -524,24 +524,8 @@ M: ebnf-non-terminal (transform)
     symbol>> parser get
     '[ _ dup _ at [ parser-not-found ] unless* nip ] box ;
 
-: transform-ebnf ( string -- object )
-    ebnf-parser parse transform ;
-
-ERROR: unable-to-fully-parse-ebnf remaining ;
-
-ERROR: could-not-parse-ebnf ;
-
-: check-parse-result ( result -- result )
-    [
-        dup remaining>> [ blank? ] trim [
-            unable-to-fully-parse-ebnf
-        ] unless-empty
-    ] [
-        could-not-parse-ebnf
-    ] if* ;
-
 : parse-ebnf ( string -- hashtable )
-    ebnf-parser (parse) check-parse-result ast>> transform ;
+    ebnf-parser parse-fully transform ;
 
 : ebnf>quot ( string -- hashtable quot: ( string -- results ) )
     parse-ebnf dup dup parser [ main of compile ] with-variable

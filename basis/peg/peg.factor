@@ -322,6 +322,22 @@ SYMBOL: delayed
 : parse ( input parser -- ast )
     (parse) ast>> ;
 
+ERROR: unable-to-fully-parse remaining ;
+
+ERROR: could-not-parse ;
+
+: check-parse-result ( result -- result )
+    [
+        dup remaining>> [ blank? ] trim [
+            unable-to-fully-parse
+        ] unless-empty
+    ] [
+        could-not-parse
+    ] if* ;
+
+: parse-fully ( input parser -- ast )
+    (parse) check-parse-result ast>> ;
+
 <PRIVATE
 
 : next-id ( -- n )
@@ -585,7 +601,7 @@ SYNTAX: PEG:
                 def call compile :> compiled-def
                 word [
                     [ compiled-def compiled-parse ]
-                    [ ast>> ]
+                    [ check-parse-result ast>> ]
                     [ word parse-failed ] ?if
                 ] effect define-declared
             ] with-compilation-unit
