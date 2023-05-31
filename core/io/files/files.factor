@@ -57,15 +57,13 @@ HOOK: (file-appender) io-backend ( path -- stream )
     [ [ print ] each ] with-file-writer ;
 
 : change-file-lines ( ..a path encoding quot: ( ..a seq -- ..b seq' ) -- ..b )
-    [ [ file-lines ] dip call ]
-    [ drop set-file-lines ] 3bi ; inline
+    '[ file-lines @ ] [ set-file-lines ] 2bi ; inline
 
 : set-file-contents ( seq path encoding -- )
     [ write ] with-file-writer ;
 
 : change-file-contents ( ..a path encoding quot: ( ..a seq -- ..b seq' ) -- ..b )
-    [ [ file-contents ] dip call ]
-    [ drop set-file-contents ] 3bi ; inline
+    '[ file-contents @ ] [ set-file-contents ] 2bi ; inline
 
 : with-file-appender ( path encoding quot -- )
     [ <file-appender> ] dip with-output-stream ; inline
