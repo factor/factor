@@ -175,3 +175,11 @@ TUPLE: person first-name age ;
 
 { "\"\\ud800\\udc01\"" }
 [ t json-escape-unicode? [ "𐀁" >json ] with-variable ] unit-test
+
+
+{ t } [
+    {
+        H{ { "foo" 1 } { "bar" 2 } }
+        H{ { "baz" 3 } { "qux" 4 } }
+    } dup >jsonlines jsonlines> =
+] unit-test

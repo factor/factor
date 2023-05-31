@@ -2,7 +2,7 @@
 
 USING: accessors ascii assocs combinators formatting hashtables
 io io.encodings.utf16.private io.encodings.utf8 io.files
-io.streams.string kernel kernel.private math math.order
+io.streams.string kernel kernel.private make math math.order
 math.parser mirrors namespaces sbufs sequences sequences.private
 strings summary tr words ;
 
@@ -140,19 +140,19 @@ DEFER: (read-json-string)
         [ pick json-number [ suffix! ] dip [ scan ] when* ]
     } case ;
 
-: json-read-input ( stream -- objects )
-    0 json-depth [
-        V{ } clone over '[ _ stream-read1 ] [ scan ] while* nip
-        json-depth get zero? [ json-error ] unless
-    ] with-variable ;
-
 : get-json ( objects -- obj )
     dup length 1 = [ first ] [ json-error ] if ;
 
 PRIVATE>
 
+: stream-read-json ( stream -- objects )
+    0 json-depth [
+        V{ } clone over '[ _ stream-read1 ] [ scan ] while* nip
+        json-depth get zero? [ json-error ] unless
+    ] with-variable ;
+
 : read-json ( -- objects )
-    input-stream get json-read-input ;
+    input-stream get stream-read-json ;
 
 GENERIC: json> ( string -- object )
 
@@ -181,43 +181,43 @@ SYMBOL: json-escape-unicode?
 f json-escape-unicode? set-global
 
 ! Writes the object out to a stream in JSON format
-GENERIC#: stream-json-print 1 ( obj stream -- )
+GENERIC#: stream-write-json 1 ( obj stream -- )
 
-: json-print ( obj -- )
-    output-stream get stream-json-print ;
+: write-json ( obj -- )
+    output-stream get stream-write-json ;
 
 : >json ( obj -- string )
     ! Returns a string representing the factor object in JSON format
-    [ json-print ] with-string-writer ;
+    [ write-json ] with-string-writer ;
 
-M: f stream-json-print
+M: f stream-write-json
     [ drop "false" ] [ stream-write ] bi* ;
 
-M: t stream-json-print
+M: t stream-write-json
     [ drop "true" ] [ stream-write ] bi* ;
 
-M: json-null stream-json-print
+M: json-null stream-write-json
     [ drop "null" ] [ stream-write ] bi* ;
 
 <PRIVATE
 
-: json-print-generic-escape-surrogate-pair ( stream char -- stream )
+: write-json-generic-escape-surrogate-pair ( stream char -- stream )
     0x10000 - [ encode-first ] [ encode-second ] bi
     "\\u%02x%02x\\u%02x%02x" sprintf over stream-write ;
 
-: json-print-generic-escape-bmp ( stream char -- stream )
+: write-json-generic-escape-bmp ( stream char -- stream )
     "\\u%04x" sprintf over stream-write ;
 
-: json-print-generic-escape ( stream char -- stream )
+: write-json-generic-escape ( stream char -- stream )
     dup 0xffff > [
-        json-print-generic-escape-surrogate-pair
+        write-json-generic-escape-surrogate-pair
     ] [
-        json-print-generic-escape-bmp
+        write-json-generic-escape-bmp
     ] if ;
 
 PRIVATE>
 
-M: string stream-json-print
+M: string stream-write-json
     CHAR: \" over stream-write1 swap [
         {
             { CHAR: \" [ "\\\"" over stream-write ] }
@@ -240,7 +240,7 @@ M: string stream-json-print
                     { [ dup control? ] [ t ] }
                     [ json-escape-unicode? get ]
                 } cond [
-                    json-print-generic-escape
+                    write-json-generic-escape
                 ] [
                     over stream-write1
                 ] if
@@ -248,7 +248,7 @@ M: string stream-json-print
         } case
     ] each CHAR: \" swap stream-write1 ;
 
-M: integer stream-json-print
+M: integer stream-write-json
     [ number>string ] [ stream-write ] bi* ;
 
 : float>json ( float -- string )
@@ -263,16 +263,16 @@ M: integer stream-json-print
         number>string
     ] if ;
 
-M: float stream-json-print
+M: float stream-write-json
     [ float>json ] [ stream-write ] bi* ;
 
-M: real stream-json-print
+M: real stream-write-json
     [ >float number>string ] [ stream-write ] bi* ;
 
-M: sequence stream-json-print
+M: sequence stream-write-json
     CHAR: [ over stream-write1 swap
     over '[ CHAR: , _ stream-write1 ]
-    pick '[ _ stream-json-print ] interleave
+    pick '[ _ stream-write-json ] interleave
     CHAR: ] swap stream-write1 ;
 
 <PRIVATE
@@ -288,7 +288,7 @@ M: integer json-coerce number>string ;
 M: float json-coerce float>json ;
 M: real json-coerce >float number>string ;
 
-:: json-print-assoc ( obj stream -- )
+:: write-json-assoc ( obj stream -- )
     CHAR: { stream stream-write1 obj >alist
     [ CHAR: , stream stream-write1 ]
     json-friendly-keys? get
@@ -297,23 +297,43 @@ M: real json-coerce >float number>string ;
             dup string?
             [ _ [ json-friendly ] when ]
             [ _ [ json-coerce ] when ] if
-            stream stream-json-print
+            stream stream-write-json
         ] [
             CHAR: : stream stream-write1
-            stream stream-json-print
+            stream stream-write-json
         ] bi*
     ] interleave
     CHAR: } stream stream-write1 ;
 
 PRIVATE>
 
-M: tuple stream-json-print
-    [ <mirror> ] dip json-print-assoc ;
+M: tuple stream-write-json
+    [ <mirror> ] dip write-json-assoc ;
 
-M: hashtable stream-json-print json-print-assoc ;
+M: hashtable stream-write-json write-json-assoc ;
 
-M: word stream-json-print
-    [ name>> ] dip stream-json-print ;
+M: word stream-write-json
+    [ name>> ] dip stream-write-json ;
 
 : ?>json ( obj -- json ) dup string? [ >json ] unless ;
 : ?json> ( obj -- json/f ) f like [ json> ] ?call ;
+
+: stream-read-jsonlines ( stream -- objects )
+    [ [ json> , ] each-stream-line ] { } make ;
+
+: read-jsonlines ( -- objects )
+    input-stream get stream-read-jsonlines ;
+
+GENERIC: jsonlines> ( string -- objects )
+
+M: string jsonlines>
+    [ read-jsonlines ] with-string-reader ;
+
+: stream-write-jsonlines ( objects stream -- )
+    [ stream-nl ] [ stream-write-json ] bi-curry interleave ;
+
+: write-jsonlines ( objects -- )
+    output-stream get stream-write-jsonlines ;
+
+: >jsonlines ( objects -- string )
+    [ write-jsonlines ] with-string-writer ;
