@@ -151,11 +151,11 @@ INSTANCE: iota immutable-sequence
 : (4sequence) ( obj1 obj2 obj3 obj4 seq -- seq )
     [ 3 swap set-nth-unsafe ] keep (3sequence) ; inline
 
-PRIVATE>
-
 : head-to-index ( seq to -- zero to seq ) [ 0 ] 2dip swap ; inline
 
 : index-to-tail ( seq from -- from length seq ) swap [ length ] keep ; inline
+
+PRIVATE>
 
 : from-tail ( seq n -- seq n' ) [ dup length ] dip - ; inline
 
