@@ -168,6 +168,39 @@ IN: build-from-source.windows
         ] with-build-directory
     ] with-updated-github-repo ;
 
+: build-grpc-dll ( -- )
+    "grpc" "grpc" [
+        qw{ git submodule init } try-process
+        qw{ git submodule update } try-process
+        qw{ rm -rf third_party\boringssl-with-bazel } try-process
+        ! grpc has a file called BUILD so use build2
+        "build2" [
+            32-bit? [
+                {
+                    "cmake"
+                    "-G" "Visual Studio 17 2022"
+                    "-A" "Win32"
+                    "-DCMAKE_BUILD_TYPE=Release"
+                    "-DBUILD_SHARED_LIBS=ON" ".."
+                } try-process
+                qw{ msbuild grpc.sln /property:Configuration=Release /p:Platform=Win32 } try-process
+            ] [
+                {
+                    "cmake"
+                    "-G" "Visual Studio 17 2022"
+                    "-DCMAKE_BUILD_TYPE=Release"
+                    "-DBUILD_SHARED_LIBS=ON" ".."
+                } try-process
+                qw{ msbuild grpc.sln /property:Configuration=Release } try-process
+            ] if
+            "bin/Release/libprotobuf-lite.dll" copy-output-file
+            "bin/Release/libprotobuf.dll" copy-output-file
+            "bin/Release/libprotoc.dll" copy-output-file
+            "bin/Release/abseil_dll.dll" copy-output-file
+            "bin/Release/protoc.exe" copy-output-file
+        ] with-build-directory-as
+    ] with-updated-github-repo ;
+
 : latest-pcre-tar-gz ( -- path )
     "https://ftp.exim.org/pub/pcre/" [
         http-get nip parse-html find-links concat
