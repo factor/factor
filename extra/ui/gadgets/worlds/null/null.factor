@@ -22,4 +22,4 @@ M: null-world resize-world drop ;
     f swap open-window* ;
 
 : into-window ( world quot -- world )
-    [ dup ] dip with-gl-context ; inline
+    dupd with-gl-context ; inline

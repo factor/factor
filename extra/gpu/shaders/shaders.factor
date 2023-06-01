@@ -456,11 +456,11 @@ TUPLE: compile-shader-error shader log ;
 TUPLE: link-program-error program log ;
 
 : throw-compile-shader-error ( shader instance -- * )
-    [ dup ] dip [ gl-shader-info-log ] [ glDeleteShader ] bi
+    dupd [ gl-shader-info-log ] [ glDeleteShader ] bi
     replace-log-line-numbers compile-shader-error boa throw ;
 
 : throw-link-program-error ( program instance -- * )
-    [ dup ] dip [ gl-program-info-log ] [ delete-gl-program ] bi
+    dupd [ gl-program-info-log ] [ delete-gl-program ] bi
     replace-log-line-numbers link-program-error boa throw ;
 
 DEFER: <shader-instance>
