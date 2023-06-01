@@ -6,8 +6,6 @@ peg peg.parsers regexp sequences splitting strings.parser ;
 
 ! https://github.com/toml-lang/toml/blob/main/toml.abnf
 
-! XXX: reload and it doesn't clear some compiled parser
-
 IN: toml
 
 ERROR: duplicate-key key ;
@@ -305,20 +303,6 @@ ALIAS: name-parser unquoted-key
     ws hide table-parser ws hide comment optional hide 4seq
     ws hide comment optional hide 2seq
     3choice newline list-of [ { } concat-as ] action ;
-
-
-! entry entry table entry entry table entry entry
-
-! tables are added to the root
-
-! accum is the root to start
-
-! tables add an accum
-! std-table key=H{}
-! array-table key={H{}}
-
-! then when we see a table, accum is changed
-
 
 : check-no-key ( key assoc -- key assoc )
     2dup at* nip [ over duplicate-key ] when ;
