@@ -95,7 +95,7 @@ INSTANCE: gb virtual-sequence
     ] [ 3drop drop ] if ;
 
 : copy-elements ( dst start end seq -- )
-    pick pick > [
+    2over > [
         [ dupd - ] dip swap copy-elements-forward
     ] [
         [ over - ] dip swap copy-elements-back
