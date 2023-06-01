@@ -72,10 +72,10 @@ M: ppc gc-root-offset
 
 : LOAD32 ( r n -- )
     [ -16 shift 0xffff bitand LIS ]
-    [ [ dup ] dip 0xffff bitand ORI ] 2bi ;
+    [ dupd 0xffff bitand ORI ] 2bi ;
 
 : LOAD64 ( r n -- )
-    [ dup ] dip {
+    dupd {
         [ nip -48 shift 0xffff bitand LIS ]
         [ -32 shift 0xffff bitand ORI ]
         [ drop 32 SLDI ]

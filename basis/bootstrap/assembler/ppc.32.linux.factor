@@ -20,7 +20,7 @@ CONSTANT: frame-reg 31
 
 : LOAD32 ( r n -- )
     [ -16 shift 0xffff bitand LIS ]
-    [ [ dup ] dip 0xffff bitand ORI ] 2bi ;
+    [ dupd 0xffff bitand ORI ] 2bi ;
 
 : jit-trap-null ( src -- ) drop ;
 : jit-load-vm ( dst -- )

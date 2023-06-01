@@ -154,7 +154,7 @@ M: mdb-collection create-collection ( collection -- )
     [ nip ] if ;
 
 : (ensure-collection) ( collection mdb-instance -- collection )
-    ensure-collection-map [ dup ] dip key?
+    ensure-collection-map dupd key?
     [ ] [
         [ ensure-valid-collection-name ]
         [ create-collection ]

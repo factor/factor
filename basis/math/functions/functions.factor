@@ -214,7 +214,7 @@ CONSTANT: log10-2 0x1.34413509f79ffp-2
     most-positive-finite-float between? ; inline
 
 : (bignum-log) ( n log-quot: ( x -- y ) log-2 -- log )
-    [ dup ] dip '[
+    dupd '[
         dup representable-as-float?
         [ >float @ ] [ frexp _ [ _ * ] bi* + ] if
     ] call ; inline
