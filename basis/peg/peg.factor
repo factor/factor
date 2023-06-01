@@ -3,8 +3,8 @@
 
 USING: accessors arrays assocs classes combinators
 combinators.short-circuit compiler.units effects.parser kernel
-make math math.order memoize.private namespaces quotations
-sequences sets splitting unicode vectors vocabs.loader words ;
+make math math.order memoize namespaces quotations sequences
+sets splitting unicode vectors vocabs.loader words ;
 
 IN: peg
 
@@ -595,7 +595,7 @@ ERROR: parse-failed input word ;
 
 SYNTAX: PEG:
     (:) [
-        f f 2array swap ( -- parser ) make/0
+        ( -- parser ) memoize-quot
         '[ @ (parse) check-parse-result ast>> ]
     ] dip define-declared ;
 
