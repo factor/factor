@@ -18,12 +18,15 @@ CONSTANT: manual-substitutions
         { rot [ swapd swap ] }
         { over [ dup swap ] }
         { swapd [ [ swap ] dip ] }
+        { dupd [ [ dup ] dip ] }
+        { 2dup [ over over ] }
         { 2swap [ -roll -roll ] }
         { 2nip [ nip nip ] }
         { 3nip [ 2nip nip ] }
         { 4nip [ 3nip nip ] }
         { 2drop [ drop drop ] }
         { 3drop [ drop drop drop ] }
+        { 4drop [ drop drop drop drop ] }
         { pop* [ pop drop ] }
         { when [ [ ] if ] }
         { spin [ swap rot ] }
