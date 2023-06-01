@@ -2,9 +2,9 @@
 ! See https://factorcode.org/license.txt for BSD license.
 
 USING: accessors arrays assocs classes combinators
-combinators.short-circuit compiler.units effects.parser fry
-kernel make math math.order namespaces quotations sequences
-sets splitting unicode vectors vocabs.loader words ;
+combinators.short-circuit compiler.units effects.parser kernel
+make math math.order memoize.private namespaces quotations
+sequences sets splitting unicode vectors vocabs.loader words ;
 
 IN: peg
 
@@ -594,18 +594,9 @@ PRIVATE>
 ERROR: parse-failed input word ;
 
 SYNTAX: PEG:
-    [let
-        (:) :> ( word def effect )
-        [
-            [
-                def call compile :> compiled-def
-                word [
-                    [ compiled-def compiled-parse ]
-                    [ check-parse-result ast>> ]
-                    [ word parse-failed ] ?if
-                ] effect define-declared
-            ] with-compilation-unit
-        ] append!
-    ] ;
+    (:) [
+        f f 2array swap ( -- parser ) make/0
+        '[ @ (parse) check-parse-result ast>> ]
+    ] dip define-declared ;
 
 { "debugger" "peg" } "peg.debugger" require-when
