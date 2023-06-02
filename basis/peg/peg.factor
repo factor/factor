@@ -593,10 +593,12 @@ PRIVATE>
 
 ERROR: parse-failed input word ;
 
+SYNTAX: PARTIAL-PEG:
+    (:) [ ( -- parser ) memoize-quot '[ @ parse ] ] dip
+    define-declared ;
+
 SYNTAX: PEG:
-    (:) [
-        ( -- parser ) memoize-quot
-        '[ @ (parse) check-parse-result ast>> ]
-    ] dip define-declared ;
+    (:) [ ( -- parser ) memoize-quot '[ @ parse-fully ] ] dip
+    define-declared ;
 
 { "debugger" "peg" } "peg.debugger" require-when
