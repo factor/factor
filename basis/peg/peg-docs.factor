@@ -179,12 +179,25 @@ HELP: box
     "The compiled result is memoized for future runs. See " { $link delay } " for a word "
     "that calls the quotation at runtime." } ;
 
+HELP: PARTIAL-PEG:
+{ $syntax "PARTIAL-PEG: word ( stack -- effect ) definition... ;" }
+{ $description "Defines a word that when called will " { $link parse }
+    " a string using the syntax defined by the parser created by the definition."
+    "The definition should have stack effect " { $snippet "( -- parser )" }
+    " and the created word " { $snippet "( string -- ast )" }
+    ". The parser is compiled when first used and then reused for each "
+    "subsequent invocation." }
+{ $notes "If the parsing fails, the word throws an exception." } ;
+
 HELP: PEG:
 { $syntax "PEG: word ( stack -- effect ) definition... ;" }
-{ $description "Defines a word that when called will parse a string using the syntax"
-    "defined by the parser created by the definition. The definition should have stack"
-    "effect " { $snippet "( -- parser )" } " and the created word "
-    { $snippet "( string -- ast )" } ". In contrast to calling the parser resulting from"
-    "the definition with " { $link parse } ", the parser is pre-compiled and not compiled"
-    "for each invocation of " { $link parse } ". If the parsing fails, the word throws an"
-    "exception." } ;
+{ $description "Defines a word that when called will " { $link parse-fully }
+    " a string using the syntax defined by the parser created by the definition."
+    "The definition should have stack effect " { $snippet "( -- parser )" }
+    " and the created word " { $snippet "( string -- ast )" }
+    ". The parser is compiled when first used and then reused for each "
+    "subsequent invocation." }
+{ $notes "If the parsing fails, the word throws an exception."
+    " If the input is not fully consumed, the word throws an exception." } ;
+
+{ POSTPONE: PARTIAL-PEG: POSTPONE: PEG: } related-words
