@@ -71,7 +71,7 @@ IN: http.parsers
         space-parser ,
     ] seq* [ "1.0" suffix! ] action ;
 
-PARTIAL-PEG: parse-request-line ( string -- triple )
+PEG: parse-request-line ( string -- triple )
     ! Triple is { method url version }
     full-request-parser simple-request-parser 2array choice ;
 
@@ -84,7 +84,7 @@ PARTIAL-PEG: parse-request-line ( string -- triple )
 : response-message-parser ( -- parser )
     text-parser repeat0 case-sensitive ;
 
-PARTIAL-PEG: parse-response-line ( string -- triple )
+PEG: parse-response-line ( string -- triple )
     ! Triple is { version code message }
     [
         space-parser ,
@@ -124,7 +124,7 @@ PARTIAL-PEG: parse-response-line ( string -- triple )
     text-parser repeat0 case-sensitive
     2choice ;
 
-PARTIAL-PEG: parse-header-line ( string -- pair )
+PEG: parse-header-line ( string -- pair )
     ! Pair is either { name value } or { f value }. If f, its a
     ! continuation of the previous header line.
     [
@@ -163,7 +163,7 @@ PARTIAL-PEG: parse-header-line ( string -- pair )
 : av-pairs-parser ( -- parser )
     av-pair-parser ";" token list-of optional ;
 
-PARTIAL-PEG: (parse-set-cookie) ( string -- alist )
+PEG: (parse-set-cookie) ( string -- alist )
     av-pairs-parser just [ sift ] action ;
 
 : cookie-value-parser ( -- parser )
@@ -179,6 +179,6 @@ PARTIAL-PEG: (parse-set-cookie) ( string -- alist )
     [ ";,=" member? not ] satisfy repeat0 [ drop f ] action
     2choice ;
 
-PARTIAL-PEG: (parse-cookie) ( string -- alist )
+PEG: (parse-cookie) ( string -- alist )
     cookie-value-parser [ ";," member? ] satisfy list-of
     optional just [ sift ] action ;
