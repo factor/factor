@@ -591,14 +591,22 @@ PRIVATE>
     ! to fix boxes so this isn't needed...
     box-parser boa f next-id parser boa [ ] action ;
 
-ERROR: parse-failed input word ;
-
 SYNTAX: PARTIAL-PEG:
-    (:) [ ( -- parser ) memoize-quot '[ @ parse ] ] dip
-    define-declared ;
+    (:) '[
+        [
+            _ _ call( -- parser ) compile
+            [ compiled-parse ast>> ] curry
+            _ define-declared
+        ] with-compilation-unit
+    ] append! ;
 
 SYNTAX: PEG:
-    (:) [ ( -- parser ) memoize-quot '[ @ parse-fully ] ] dip
-    define-declared ;
+    (:) '[
+        [
+            _ _ call( -- parser ) compile
+            [ compiled-parse check-parse-result ast>> ] curry
+            _ define-declared
+        ] with-compilation-unit
+    ] append! ;
 
 { "debugger" "peg" } "peg.debugger" require-when
