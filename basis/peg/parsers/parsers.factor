@@ -6,14 +6,18 @@ vectors ;
 FROM: peg.search => replace ;
 IN: peg.parsers
 
+<PRIVATE
+
 TUPLE: just-parser p1 ;
 
-M: just-parser (compile)
-    p1>> compile-parser-quot [
+M: just-parser parser-quot
+    p1>> execute-parser-quot [
         dup [
             dup remaining>> empty? [ drop f ] unless
         ] when
     ] compose ;
+
+PRIVATE>
 
 : just ( parser -- parser )
     just-parser boa wrap-peg ;

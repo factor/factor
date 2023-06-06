@@ -1,6 +1,7 @@
 ! Copyright (C) 2007 Chris Double.
 ! See https://factorcode.org/license.txt for BSD license.
-USING: help.markup help.syntax kernel quotations strings words ;
+USING: help.markup help.syntax kernel math quotations sequences
+strings words ;
 IN: peg
 
 HELP: parse
@@ -11,18 +12,19 @@ HELP: parse
 }
 { $description
     "Given the input string, parse it using the given parser. The result is the abstract "
-    "syntax tree returned by the parser." }
-{ $see-also compile } ;
+    "syntax tree returned by the parser." } ;
 
-HELP: compile
+HELP: parse-fully
 { $values
+  { "input" string }
   { "parser" parser }
-  { "word" word }
+  { "ast" object }
 }
 { $description
-    "Compile the parser to a word. The word will have stack effect ( -- ast )."
-}
-{ $see-also parse } ;
+    "Given the input string, parse it using the given parser. The result is the abstract "
+    "syntax tree returned by the parser. Throws an exception if the input is not fully consumed." } ;
+
+{ parse parse-fully } related-words
 
 HELP: token
 { $values

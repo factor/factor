@@ -1,12 +1,15 @@
 ! Copyright (C) 2007 Chris Double.
 ! See https://factorcode.org/license.txt for BSD license.
+
 USING: accessors assocs combinators combinators.short-circuit
 effects kernel make math.parser multiline namespaces parser peg
-peg.parsers quotations sequences sequences.deep splitting
-stack-checker strings strings.parser summary unicode
+peg.private peg.parsers quotations sequences sequences.deep
+splitting stack-checker strings strings.parser summary unicode
 vocabs.parser words ;
+
 FROM: vocabs.parser => search ;
 FROM: peg.search => replace ;
+
 IN: peg.ebnf
 
 : rule ( name word -- parser )
@@ -528,8 +531,8 @@ M: ebnf-non-terminal (transform)
     ebnf-parser parse-fully transform ;
 
 : ebnf>quot ( string -- hashtable quot: ( string -- results ) )
-    parse-ebnf dup dup parser [ main of compile ] with-variable
-    '[ [ _ compiled-parse ] with-scope ] ;
+    parse-ebnf dup dup parser [ main of compile-parser ] with-variable
+    '[ [ _ perform-parse ] with-scope ] ;
 
 PRIVATE>
 
