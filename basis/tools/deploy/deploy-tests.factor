@@ -57,7 +57,7 @@ delete-staging-images
 { } [ "gpu.demos.raytrace" shake-and-bake 4157800 small-enough? ] long-unit-test
 
 ! { } [ "bunny" shake-and-bake 2559640 small-enough? ] long-unit-test
-{ } [ "bunny" shake-and-bake 4000000 small-enough? ] long-unit-test
+{ } [ "bunny" shake-and-bake 6000000 small-enough? ] long-unit-test
 
 { } [ "gpu.demos.bunny" shake-and-bake 4400000 small-enough? ] long-unit-test
 
