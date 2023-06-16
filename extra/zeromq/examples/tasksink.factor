@@ -19,7 +19,7 @@ IN: zeromq.examples.tasksink
             10 rem zero? [ ":" ] [ "." ] if write flush
         ] each
         ! Calculate and report duration of batch
-        now swap time- duration>milliseconds "Total elapsed time: %d msec\n" printf
+        ago duration>milliseconds "Total elapsed time: %d msec\n" printf
         drop
     ] with-destructors ;
 

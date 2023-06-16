@@ -247,7 +247,7 @@ M: duration elapsed-time
     duration>seconds elapsed-time ;
 
 M: timestamp elapsed-time
-    now swap time- elapsed-time ;
+    ago elapsed-time ;
 
 ! XXX: Anything up to 2 hours is "about an hour"
 : relative-time-offset ( seconds -- string )
@@ -277,4 +277,4 @@ M: duration relative-time
     duration>seconds relative-time ;
 
 M: timestamp relative-time
-    now swap time- relative-time ;
+    ago relative-time ;
