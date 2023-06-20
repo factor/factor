@@ -13,8 +13,6 @@ IN: glfw.ffi
 } cond cdecl add-library
 >>
 
-: nullptr ( -- null ) 0 <alien> ;
-
 LIBRARY: glfw
 
 CONSTANT: GLFW_FALSE 0
