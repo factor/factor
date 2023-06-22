@@ -1,1 +1,1 @@
-Writing and reading until \r\n
+Writing with and reading until \r\n

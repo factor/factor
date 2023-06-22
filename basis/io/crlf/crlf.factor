@@ -1,7 +1,8 @@
-! Copyright (C) 2009 Daniel Ehrenberg, Slava Pestov
+! Copyright (C) 2009, 2023 Daniel Ehrenberg, Slava Pestov, Alexander Ilin
 ! See https://factorcode.org/license.txt for BSD license.
-USING: byte-vectors io io.private kernel math namespaces sbufs
-sequences splitting ;
+USING: accessors byte-vectors delegate delegate.protocols
+destructors io io.private kernel math namespaces sbufs sequences
+splitting ;
 IN: io.crlf
 
 : crlf ( -- )
@@ -61,3 +62,18 @@ IN: io.crlf
 
 : read-ignoring-crlf ( n -- seq/f )
     input-stream get stream-read-ignoring-crlf ;
+
+TUPLE: crlf-stream underlying ;
+INSTANCE: crlf-stream output-stream
+CONSULT: output-stream-protocol crlf-stream underlying>> ;
+
+C: <crlf-stream> crlf-stream
+
+M: crlf-stream dispose underlying>> dispose ;
+
+M: crlf-stream stream-nl
+    CHAR: \r over stream-write1
+    CHAR: \n swap stream-write1 ;
+
+: use-crlf ( -- )
+    output-stream [ <crlf-stream> ] change ;

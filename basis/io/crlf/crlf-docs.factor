@@ -1,6 +1,6 @@
-! Copyright (C) 2009 Daniel Ehrenberg
+! Copyright (C) 2009, 2023 Daniel Ehrenberg, Alexander Ilin
 ! See https://factorcode.org/license.txt for BSD license.
-USING: help.syntax help.markup sequences ;
+USING: help.syntax help.markup io sequences ;
 IN: io.crlf
 
 HELP: crlf
@@ -14,5 +14,8 @@ HELP: read-crlf
 HELP: read-?crlf
 { $values { "seq" sequence } }
 { $description "Reads until the next LF (line feed) or CRLF (carriage return followed by line feed) from the current input stream, throwing an error if CR is present without immediately being followed by LF." } ;
+
+HELP: use-crlf
+{ $description "Substitutes the current " { $link output-stream } " with a wrapper that outputs CR followed by LF for every " { $link stream-nl } " call (words like " { $link print } " and " { $link nl } " use that internally)." } ;
 
 { crlf>lf lf>crlf } related-words
