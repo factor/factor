@@ -5,9 +5,10 @@ combinators.short-circuit continuations destructors effects
 environment hashtables http http.client.post-data http.parsers
 http.websockets io io.crlf io.encodings io.encodings.ascii
 io.encodings.binary io.encodings.iana io.encodings.string
-io.files io.pathnames io.sockets io.sockets.secure io.timeouts
-kernel math math.order math.parser mime.types namespaces present
-protocols sequences splitting urls vocabs.loader ;
+io.files io.files.info io.pathnames io.sockets io.sockets.secure
+io.timeouts kernel math math.order math.parser mime.types
+namespaces present protocols sequences splitting urls
+vocabs.loader ;
 IN: http.client
 
 ERROR: too-many-redirects ;
@@ -292,6 +293,11 @@ SYMBOL: request-socket
 : http-get* ( url -- response data )
     <get-request> http-request* ;
 
+: file-too-old? ( file duration -- ? )
+    over file-exists? [
+        [ file-info created>> ago ] dip after?
+    ] [ 2drop t ] if ;
+
 : download-name ( url -- name )
     present file-name "?" split1 drop "/" ?tail drop ;
 
@@ -302,6 +308,9 @@ SYMBOL: request-socket
 
 : ?download-to ( url file -- )
     dup file-exists? [ 2drop ] [ download-to ] if ;
+
+: ?download-update-to ( url file duration -- )
+    2dup file-too-old? [ drop download-to ] [ 3drop ] if ;
 
 : download ( url -- )
     dup download-name download-to ;
