@@ -39,7 +39,7 @@ IN: tools.directory-to-file
     "\n\n;DIRECTORY>" surround ;
 
 : directory-to-file ( path -- )
-    [ directory-to-string ] keep ".modern" append
+    [ directory-to-string ] keep canonicalize-path ".modern" append
     utf8 set-file-contents ;
 
 : directory-to-file-main ( -- )
