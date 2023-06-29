@@ -226,7 +226,7 @@ SINGLETONS:
     { [ message-mentions-me? ] [ message-from-me? not ] } 1&& ;
 : message-channel-id ( json -- ids ) "channel_id" of ;
 : obey-message? ( json -- ? )
-    "author" of [ "username" of ] [ "discriminator" of ] bi "#" glue
+    "author" of "username" of
     discord-bot get config>> obey-names>> [ in? ] [ drop f ] if* ;
 
 : handle-incoming-message ( guild_id channel_id message_id author content -- )
