@@ -30,7 +30,7 @@ a boot image stored on factorcode.org.
 
 To check out Factor:
 
-* `git clone git://github.com/factor/factor.git`
+* git clone https://github.com/factor/factor.git
 * `cd factor`
 
 To build the latest complete Factor system from git, either use the
