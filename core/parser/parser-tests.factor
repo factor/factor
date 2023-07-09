@@ -656,3 +656,8 @@ EXCLUDE: qualified.tests.bar => x ;
         { "10 20 30 ;" } <lexer> [ parse-array-def ] with-lexer
     ] with-file-vocabs
 ] unit-test
+
+! Ensure this works when not from a source file
+[
+    "abcde" create-class-in \ tuple { "a" "b" "c" "d" "e" } define-tuple-class
+] with-compilation-unit
