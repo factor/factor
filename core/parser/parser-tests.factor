@@ -1,8 +1,9 @@
-USING: accessors arrays assocs classes compiler.units effects
-eval generic grouping io.pathnames io.streams.string kernel
-lexer math multiline namespaces parser sequences sets
-source-files source-files.errors strings tools.crossref
-tools.test vocabs vocabs.parser words words.symbol splitting ;
+USING: accessors arrays assocs classes classes.parser
+classes.tuple compiler.units effects eval generic grouping
+io.pathnames io.streams.string kernel lexer math multiline
+namespaces parser sequences sets source-files
+source-files.errors splitting strings tools.crossref tools.test
+vocabs vocabs.parser words words.symbol ;
 IN: parser.tests
 
 { 1 [ 2 [ 3 ] 4 ] 5 }
