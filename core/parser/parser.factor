@@ -7,9 +7,9 @@ sequences sets slots source-files vectors vocabs vocabs.parser
 words words.symbol ;
 IN: parser
 
-: location ( -- loc )
-    current-source-file get lexer get line>> 2dup and
-    [ [ path>> ] dip 2array ] [ 2drop f ] if ;
+: location ( -- loc/f )
+    current-source-file get lexer get 2dup and
+    [ [ path>> ] [ line>> ] bi* 2array ] [ 2drop f ] if ;
 
 : save-location ( definition -- )
     location remember-definition ;
