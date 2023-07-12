@@ -18,12 +18,13 @@ If you have found a bug in the Factor distribution,
 
 # Submitting a patch
 - Commits must always have vocabulary names prefixed to them. The commit history has many good examples of this.
-- All contributions to Factor are mandatorily under the BSD license. In new vocabularies, you must add a comment stating the same. You can use your real name or your GitHub nickname. See [this](https://github.com/factor/factor/blob/master/core/alien/alien.factor) for an example. 
+- All contributions to Factor are mandatorily under the BSD license. In new vocabularies, you must add a comment stating the same. You can use your real name or your GitHub nickname. See [this](https://github.com/factor/factor/blob/master/core/alien/alien.factor) for an example.
 - Do not submit features without creating a feature request first.
 - The repository is structured as follows:
   - `basis`: Vocabularies which are well-tested, well-documented, and have a wide variety of uses.
   - `core`: The set of libraries which are most integral for compiling and boostrapping Factor. **Do not modify core unless it is absolutely necessary.** You will need to re-bootstrap to check your changes.
-  - `extra`: Vocabularies which are in beta. May be unstable or broken. This is where most contributions start. - `misc`: Code which is not written in Factor, but holds significance to Factor users. Some editor-specific plugins reside here.
+  - `extra`: Vocabularies which are in beta. May be unstable or broken. This is where most contributions start.
+  - `misc`: Code which is not written in Factor, but holds significance to Factor users. Some editor-specific plugins reside here.
   - `vm`: Factor C++ VM files.
   - `work`: Store your personal work here. You cannot contribute changes made to work, as it is reserved for the user.
 - Style guidelines are as follows:
