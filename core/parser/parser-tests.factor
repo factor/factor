@@ -659,6 +659,11 @@ EXCLUDE: qualified.tests.bar => x ;
 ] unit-test
 
 ! Ensure this works when not from a source file
-[
-    "abcde" create-class-in \ tuple { "a" "b" "c" "d" "e" } define-tuple-class
-] with-compilation-unit
+{ } [
+    [[
+        [
+            USING: classes.parser classes.tuple compiler.units kernel ;
+            IN: parser.tests "abcde" create-class-in \ tuple { "a" "b" "c" "d" "e" } define-tuple-class
+        ] with-compilation-unit
+    ]] eval( -- )
+] unit-test
