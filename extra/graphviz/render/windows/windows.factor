@@ -7,7 +7,7 @@ kernel sequences system ;
 IN: graphviz.render.windows
 
 : graphviz-install-directories ( -- directories )
-    program-files-directories [
+    application-directories [
         directory-entries [
             {
                 [ directory? ]
