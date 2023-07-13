@@ -172,6 +172,7 @@ SYMBOL: interactive-vocabs
     "namespaces"
     "parser"
     "prettyprint"
+    "ranges"
     "see"
     "sequences"
     "slicing"
