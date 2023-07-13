@@ -113,7 +113,7 @@ $nl
 ABOUT: "parser"
 
 HELP: location
-{ $values { "loc" "a " { $snippet "{ path line# }" } " pair" } }
+{ $values { "loc/f" "a " { $snippet "{ path line# }" } " pair or " { $link f } } }
 { $description "Outputs the current parser location. This value can be passed to " { $link set-where } " or " { $link remember-definition } "." } ;
 
 HELP: save-location
