@@ -18,6 +18,28 @@ TUPLE: table name array? ;
 
 TUPLE: entry key value ;
 
+: check-no-key ( key assoc -- key assoc )
+    2dup at* nip [ over duplicate-key ] when ;
+
+: entries-at ( table keys -- key entries )
+    unclip-last -rot [
+        over ?at [ nip ] [
+            H{ } clone [ spin check-no-key set-at ] keep
+        ] if
+    ] each ;
+
+GENERIC: update-toml ( root table entry -- root table' )
+
+M: entry update-toml
+    dupd [ key>> entries-at ] [ value>> ] bi
+    -rot check-no-key set-at ;
+
+M: table update-toml
+    nip dupd [ name>> entries-at ] [ array?>> ] bi
+    H{ } clone [
+        swap [ -rot push-at ] [ -rot check-no-key set-at ] if
+    ] keep ;
+
 : ws ( -- parser )
     [ " \t" member? ] satisfy repeat0 ;
 
@@ -135,6 +157,18 @@ TUPLE: entry key value ;
 : string-parser ( -- parser )
     multi-string single-string 2choice ;
 
+: non-ascii ( -- parser )
+    0x80 0xd7ff range 0xe000 0x10ffff range 2choice ;
+
+: comment-char ( -- parser )
+    0x01 0x09 range 0x0e 0x7f range non-ascii 3choice ;
+
+: comment ( -- parser )
+    "#" token comment-char repeat0 2seq hide ;
+
+: ws-comment-newline ( -- parser )
+    ws comment optional 2seq newline list-of ;
+
 : date-parser ( -- parser )
     [
         decdigit 4 exactly-n ,
@@ -169,12 +203,8 @@ TUPLE: entry key value ;
         timezone-parser optional ,
     ] seq* [ "" concat-as ] action ;
 
-DEFER: comment
-
 : separator ( -- parser )
     "," token comment optional 2seq ;
-
-DEFER: ws-comment-newline
 
 DEFER: value-parser
 
@@ -193,8 +223,6 @@ DEFER: value-parser
     ] seq* [ first { } like ] action ;
 
 DEFER: key-value-parser
-
-DEFER: update-toml
 
 : inline-table-key-value ( -- parser )
     ws-comment-newline hide
@@ -251,18 +279,6 @@ DEFER: update-toml
 : quoted-key ( -- parser )
     multi-string single-string 2choice ;
 
-: non-ascii ( -- parser )
-    0x80 0xd7ff range 0xe000 0x10ffff range 2choice ;
-
-: comment-char ( -- parser )
-    0x01 0x09 range 0x0e 0x7f range non-ascii 3choice ;
-
-: comment ( -- parser )
-    "#" token comment-char repeat0 2seq hide ;
-
-: ws-comment-newline ( -- parser )
-    ws comment optional 2seq newline list-of ;
-
 : simple-key ( -- parser )
     unquoted-key quoted-key 2choice ;
 
@@ -277,8 +293,6 @@ DEFER: update-toml
         ws hide ,
         value-parser ,
     ] seq* [ first2 entry boa ] action ;
-
-ALIAS: name-parser unquoted-key
 
 :: table-name-parser ( begin end array? -- parser )
     [
@@ -298,35 +312,11 @@ ALIAS: name-parser unquoted-key
 : table-parser ( -- parser )
     array-table std-table 2choice ;
 
-: toml-parser ( -- parser )
+PEG: parse-toml ( string -- ast )
     ws hide key-value-parser ws hide comment optional hide 4seq
     ws hide table-parser ws hide comment optional hide 4seq
     ws hide comment optional hide 2seq
     3choice newline list-of [ { } concat-as ] action ;
-
-: check-no-key ( key assoc -- key assoc )
-    2dup at* nip [ over duplicate-key ] when ;
-
-: entries-at ( table keys -- key entries )
-    unclip-last -rot [
-        over ?at [ nip ] [
-            H{ } clone [ spin check-no-key set-at ] keep
-        ] if
-    ] each ;
-
-GENERIC: update-toml ( root table entry -- root table' )
-
-M: entry update-toml
-    dupd [ key>> entries-at ] [ value>> ] bi
-    -rot check-no-key set-at ;
-
-M: table update-toml
-    nip dupd [ name>> entries-at ] [ array?>> ] bi
-    H{ } clone [
-        swap [ -rot push-at ] [ -rot check-no-key set-at ] if
-    ] keep ;
-
-PEG: parse-toml ( string -- ast ) toml-parser ;
 
 PRIVATE>
 
