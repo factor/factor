@@ -260,7 +260,7 @@ generic-comparison-ops [
     '[ _ swap interval>> <class/interval-info> ] "outputs" set-word-prop
 ] assoc-each
 
-! For these we limit the outputted interval
+! For these we limit the output interval
 {
     { fixnum>bignum bignum }
     { fixnum>float float }

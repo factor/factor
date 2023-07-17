@@ -4,7 +4,7 @@ IN: stack-checker.known-words
 
 HELP: check-declaration
 { $values { "declaration" sequence } }
-{ $description "Checks that a declaration sequence as inputted to a " { $link declare } " word is well-formed." } ;
+{ $description "Checks that a declaration sequence as input to a " { $link declare } " word is well-formed." } ;
 
 HELP: infer-call
 { $description "Performs inferencing for the " { $link call } " word." } ;
