@@ -17,7 +17,7 @@ HELP: >yaml-docs
     { "seq" sequence }
     { "str" string }
 }
-{ $description "Serializes the sequence into a YAML formatted string. Each element is outputted as a YAML document." } ;
+{ $description "Serializes the sequence into a YAML formatted string. Each element is output as a YAML document." } ;
 
 HELP: yaml-docs>
 { $values

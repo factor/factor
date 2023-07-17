@@ -233,7 +233,7 @@ $parsing-note ;
 
 HELP: parse-array-def
 { $values { "array" "a new " { $link array } } }
-{ $description "Like " { $link parse-definition } ", except the parsed sequence it outputted as an array." }
+{ $description "Like " { $link parse-definition } ", except the parsed sequence is output as an array." }
 $parsing-note ;
 
 HELP: bootstrap-syntax
