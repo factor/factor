@@ -45,6 +45,9 @@ M: linked-assoc >alist
 M: linked-assoc clear-assoc
     [ assoc>> clear-assoc ] [ dlist>> clear-deque ] bi ;
 
+M: linked-assoc new-assoc
+    assoc>> new-assoc <dlist> linked-assoc boa ;
+
 M: linked-assoc clone
     [ assoc>> clone ] [ dlist>> clone ] bi linked-assoc boa ;
 

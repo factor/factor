@@ -78,3 +78,5 @@ tools.test ;
     { { "a" "b" } { "c" "d" } }
     [ >linked-hash ] [ >linked-hash ] bi =
 ] unit-test
+
+{ LH{ } } [ 0 LH{ { 1 2 } { 3 4 } } new-assoc ] unit-test
