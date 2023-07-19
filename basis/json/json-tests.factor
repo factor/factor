@@ -1,5 +1,5 @@
 USING: hashtables io.streams.string json json.private kernel
-literals math namespaces strings tools.test ;
+linked-assocs literals math namespaces strings tools.test ;
 IN: json.tests
 
 ! !!!!!!!!!!!!
@@ -41,17 +41,17 @@ ${ { 8 9 10 12 13 34 47 92 } >string } [ " \"\\b\\t\\n\\f\\r\\\"\\/\\\\\" " json
 ${ { 0xabcd } >string } [ " \"\\uaBCd\" " json> ] unit-test
 { "𝄞" } [ "\"\\ud834\\udd1e\"" json> ] unit-test
 
-{ H{ { "a" { } } { "b" 123 } } } [ "{\"a\":[],\"b\":123}" json> ] unit-test
+{ LH{ { "a" { } } { "b" 123 } } } [ "{\"a\":[],\"b\":123}" json> ] unit-test
 { { } } [ "[]" json> ] unit-test
 { { 1 "two" 3.0 } } [ " [1, \"two\", 3.0] " json> ] unit-test
-{ H{ } } [ "{}" json> ] unit-test
+{ LH{ } } [ "{}" json> ] unit-test
 
 ! the returned hashtable should be different every time
-{ H{ } } [ "key" "value" "{}" json> ?set-at "{}" json> nip ] unit-test
+{ LH{ } } [ "key" "value" "{}" json> ?set-at "{}" json> nip ] unit-test
 
-{ H{ { "US$" 1.0 } { "EU€" 1.5 } } } [ " { \"US$\":1.00, \"EU\\u20AC\":1.50 } " json> ] unit-test
-{ H{
-    { "fib" { 1 1 2 3 5 8 H{ { "etc" "etc" } } } }
+{ LH{ { "US$" 1.0 } { "EU€" 1.5 } } } [ " { \"US$\":1.00, \"EU\\u20AC\":1.50 } " json> ] unit-test
+{ LH{
+    { "fib" { 1 1 2 3 5 8 LH{ { "etc" "etc" } } } }
     { "prime" { 2 3 5 7 11 13 } }
 } } [ " {
     \"fib\": [1, 1,  2,   3,     5,         8,
@@ -67,13 +67,13 @@ ${ { 0xabcd } >string } [ " \"\\uaBCd\" " json> ] unit-test
 { 0 } [ "0      " json> ] unit-test
 { 0 } [ "   0   " json> ] unit-test
 
-{ V{ H{ { "a" "b" } } H{ { "c" "d" } } } }
+{ V{ LH{ { "a" "b" } } LH{ { "c" "d" } } } }
 [ "{\"a\": \"b\"} {\"c\": \"d\"}" [ read-json ] with-string-reader ] unit-test
 
 ! empty objects are allowed as values in objects
-{ H{ { "foo" H{ } } } } [ "{ \"foo\" : {}}" json> ] unit-test
+{ LH{ { "foo" LH{ } } } } [ "{ \"foo\" : {}}" json> ] unit-test
 ! And arrays
-{ { H{ } } } [ "[{}]" json> ] unit-test
+{ { LH{ } } } [ "[{}]" json> ] unit-test
 
 {
     "\0\x01\x02\x03\x04\x05\x06\a\b\t\n\v\f\r\x0e\x0f\x10\x11\x12\x13\x14\x15\x16\x17\x18\x19\x1a\e\x1c\x1d\x1e\x1f"
@@ -114,7 +114,7 @@ ${ { 0xabcd } >string } [ " \"\\uaBCd\" " json> ] unit-test
 { "\"hello world\"" } [ "hello world" >json ] unit-test
 
 { "[1,\"two\",3.0]" } [ { 1 "two" 3.0 } >json ] unit-test
-{ "{\"US$\":1.0,\"EU€\":1.5}" } [ H{ { "US$" 1.0 } { "EU€" 1.5 } } >json ] unit-test
+{ "{\"US$\":1.0,\"EU€\":1.5}" } [ LH{ { "US$" 1.0 } { "EU€" 1.5 } } >json ] unit-test
 
 { "\">json\"" } [ \ >json >json ] unit-test
 
@@ -137,31 +137,31 @@ TUPLE: person first-name age ;
 ] unit-test
 
 { "{\"1\":2,\"3\":4}" }
-[ H{ { "1" 2 } { "3" 4 } } >json ] unit-test
+[ LH{ { "1" 2 } { "3" 4 } } >json ] unit-test
 
 { "{\"1\":2,\"3\":4}" }
-[ H{ { 1 2 } { 3 4 } } >json ] unit-test
+[ LH{ { 1 2 } { 3 4 } } >json ] unit-test
 
 { "{\"\":4}" }
-[ H{ { "" 2 } { "" 4 } } >json ] unit-test
+[ LH{ { "" 2 } { "" 4 } } >json ] unit-test
 
-{ "{\"true\":4,\"false\":2,\"\":5}" }
-[ H{ { f 2 } { t 4 } { "" 5 } } >json ] unit-test
+{ "{\"false\":2,\"true\":4,\"\":5}" }
+[ LH{ { f 2 } { t 4 } { "" 5 } } >json ] unit-test
 
 { "{\"3.1\":3}" }
-[ H{ { 3.1 3 } } >json ] unit-test
+[ LH{ { 3.1 3 } } >json ] unit-test
 
 { "{\"null\":1}" }
-[ H{ { json-null 1 } } >json ] unit-test
+[ LH{ { json-null 1 } } >json ] unit-test
 
 { "{\"Infinity\":1}" }
-[ t json-allow-fp-special? [ H{ { 1/0. 1 } } >json ] with-variable ] unit-test
+[ t json-allow-fp-special? [ LH{ { 1/0. 1 } } >json ] with-variable ] unit-test
 
 { "{\"-Infinity\":1}" }
-[ t json-allow-fp-special? [ H{ { -1/0. 1 } } >json ] with-variable ] unit-test
+[ t json-allow-fp-special? [ LH{ { -1/0. 1 } } >json ] with-variable ] unit-test
 
 { "{\"NaN\":1}" }
-[ t json-allow-fp-special? [ H{ { NAN: 333 1 } } >json ] with-variable ] unit-test
+[ t json-allow-fp-special? [ LH{ { NAN: 333 1 } } >json ] with-variable ] unit-test
 
 {
     "\"\\u0000\\u0001\\u0002\\u0003\\u0004\\u0005\\u0006\\u0007\\b\\t\\n\\u000b\\f\\r\\u000e\\u000f\\u0010\\u0011\\u0012\\u0013\\u0014\\u0015\\u0016\\u0017\\u0018\\u0019\\u001a\\u001b\\u001c\\u001d\\u001e\\u001f\""
@@ -179,7 +179,7 @@ TUPLE: person first-name age ;
 
 { t } [
     {
-        H{ { "foo" 1 } { "bar" 2 } }
-        H{ { "baz" 3 } { "qux" 4 } }
+        LH{ { "foo" 1 } { "bar" 2 } }
+        LH{ { "baz" 3 } { "qux" 4 } }
     } dup >jsonlines jsonlines> =
 ] unit-test
