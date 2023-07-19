@@ -33,7 +33,7 @@ M: sequence pprint-json*
         write-spaces "]" write
     ] if-empty ;
 
-M: hashtable pprint-json*
+M: assoc pprint-json*
     dup assoc-empty? [
         drop "{ }" write
     ] [
