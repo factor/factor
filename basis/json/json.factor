@@ -2,9 +2,9 @@
 
 USING: accessors ascii assocs combinators formatting hashtables
 io io.encodings.utf16.private io.encodings.utf8 io.files
-io.streams.string kernel kernel.private make math math.order
-math.parser mirrors namespaces sbufs sequences sequences.private
-strings summary tr words ;
+io.streams.string kernel kernel.private linked-assocs make math
+math.order math.parser mirrors namespaces sbufs sequences
+sequences.private strings summary tr words ;
 
 IN: json
 
@@ -118,7 +118,7 @@ DEFER: (read-json-string)
     v-close dup pop { } like suffix! ;
 
 : json-close-hash ( accum -- accum )
-    v-close dup dup [ pop ] bi@ swap H{ } zip-as suffix! ;
+    v-close dup dup [ pop ] bi@ swap LH{ } zip-as suffix! ;
 
 : scan ( stream accum char -- stream accum )
     ! 2dup 1string swap . . ! Great for debug...
@@ -310,7 +310,7 @@ PRIVATE>
 M: tuple stream-write-json
     [ <mirror> ] dip write-json-assoc ;
 
-M: hashtable stream-write-json write-json-assoc ;
+M: assoc stream-write-json write-json-assoc ;
 
 M: word stream-write-json
     [ name>> ] dip stream-write-json ;
