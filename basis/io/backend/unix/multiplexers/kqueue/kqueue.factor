@@ -51,10 +51,10 @@ M: kqueue-mx remove-input-callbacks
 
 M: kqueue-mx remove-output-callbacks
     2dup writes>> key? [
-        [
+        [ call-next-method ] [
             [ EVFILT_WRITE EV_DELETE make-kevent ] dip
             register-kevent
-        ] [ call-next-method ] 2bi
+        ] 2bi
     ] [ 2drop f ] if ;
 
 : wait-kevent ( mx timespec -- n )
