@@ -109,6 +109,7 @@ M: fd drain
         errno {
             { EINTR [ 2drop +retry+ ] }
             { EAGAIN [ 2drop +output+ ] }
+            { ENOBUFS [ 2drop +output+ ] }
             [ (throw-errno) ]
         } case
     ] if ;
