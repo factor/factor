@@ -71,7 +71,7 @@ MACRO: cleave-array ( quots -- quot )
 
 : 4bi@ ( s t u v  w x y z  quot -- ) dup 4bi* ; inline
 
-: 3tri@ ( r s t  u v w  x y z  p q r -- )
+: 3tri@ ( r s t  u v w  x y z  quot -- )
     dup dup 3tri* ; inline
 
 : 4tri@ ( o p q r  s t u v  w x y z  quot -- )
@@ -80,13 +80,13 @@ MACRO: cleave-array ( quots -- quot )
 : quad@ ( w  x  y  z  quot -- )
     dup dup dup quad* ; inline
 
-: 2quad@ ( s t  u v  w x  y z  p q r s -- )
+: 2quad@ ( s t  u v  w x  y z  quot -- )
     dup dup dup 2quad* ; inline
 
-: 3quad@ ( o p q  r s t  u v w  x y z  p q r s -- )
+: 3quad@ ( o p q  r s t  u v w  x y z  quot -- )
     dup dup dup 3quad* ; inline
 
-: 4quad@ ( k l m n  o p q r  s t u v  w x y z  p q r s -- )
+: 4quad@ ( k l m n  o p q r  s t u v  w x y z  quot -- )
     dup dup dup 4quad* ; inline
 
 MACRO: smart-plox ( true -- quot )
