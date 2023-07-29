@@ -1,4 +1,4 @@
-! Copyright (c) 2023 Cecilia Knäbchen.
+! Copyright (c) 2023 Cecilia Knaebchen.
 ! See https://factorcode.org/license.txt for BSD license.
 USING: combinators kernel locals math math.functions project-euler.common ;
 IN: project-euler.463
