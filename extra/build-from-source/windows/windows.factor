@@ -425,6 +425,7 @@ IN: build-from-source.windows
     build-pcre2-dll
     32-bit? [ build-postgres-dll ] unless
     build-raylib-dll
+    build-raygui-dll
     build-snappy-dll
     build-sqlite3-dll
     build-yaml-dll
