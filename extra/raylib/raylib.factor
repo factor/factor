@@ -954,13 +954,9 @@ FUNCTION-ALIAS: get-gesture-pinch-angle float GetGesturePinchAngle ( )          
 ! ------------------------------------------------------------------------------------
 ! Camera System Functions (Module: rcamera)
 ! ------------------------------------------------------------------------------------
-FUNCTION-ALIAS: set-camera-mode void SetCameraMode ( Camera camera, CameraMode mode )    ! Set camera mode (multiple camera modes available)
-FUNCTION-ALIAS: update-camera void UpdateCamera ( Camera* camera )                       ! Update camera position for selected mode
 
-FUNCTION-ALIAS: set-camera-pan-control void SetCameraPanControl ( int keyPan )           ! Set camera pan key to combine with mouse movement (free camera)
-FUNCTION-ALIAS: set-camera-alt-control void SetCameraAltControl ( int keyAlt )           ! Set camera alt key to combine with mouse movement (free camera)
-FUNCTION-ALIAS: set-camera-smooth-zoom-control void SetCameraSmoothZoomControl ( int keySmoothZoom ) ! Set camera smooth zoom key to combine with mouse (free camera)
-FUNCTION-ALIAS: set-camera-move-controls void SetCameraMoveControls ( int keyFront, int keyBack, int keyRight, int keyLeft, int keyUp, int keyDown ) ! Set camera move controls (1st person and 3rd person cameras)
+FUNCTION-ALIAS: update-camera void UpdateCamera ( Camera *camera, CameraMode mode )      ! Update camera position for selected mode
+FUNCTION-ALIAS: update-camera-pro void UpdateCameraPro ( Camera *camera, Vector3 movement, Vector3 rotation, float zoom ) ! Update camera movement/rotation
 
 ! ------------------------------------------------------------------------------------
 ! Basic Shapes Drawing Functions (Module: shapes)
