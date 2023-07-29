@@ -129,7 +129,7 @@ SYMBOL: mesh-picking-frame
         init-assets :> ( tower triangle )
 
         f :> bary!
-        camera CAMERA_FREE set-camera-mode
+        camera CAMERA_FREE update-camera
 
         60 set-target-fps
         0 mesh-picking-frame set-global
@@ -139,7 +139,7 @@ SYMBOL: mesh-picking-frame
             ! NOTE: This doesn't work, probably because GL context is not handled correctly for switching?
             ! mesh-picking-frame counter 100 mod 0 = [ yield ] when
 
-            camera update-camera
+            camera CAMERA_FREE update-camera
 
             get-mouse-position camera get-mouse-ray :> ray
 
