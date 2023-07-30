@@ -27,18 +27,6 @@ HELP: >q
 }
 { $description "Sends the question to OpenAI API. Intended for simple questions using the listener." } ;
 
-HELP: com-cancel
-{ $values
-    { "window" object }
-}
-{ $description "" } ;
-
-HELP: com-send
-{ $values
-    { "window" object }
-}
-{ $description "" } ;
-
 HELP: gpt-gadget
 { $class-description "Definition of a track gadget containing an ask and response element." } ;
 
@@ -68,10 +56,10 @@ HELP: wrap-result
 }
 { $description "Takes a long string from the response and wraps it according to the repsonse pane width." } ;
 
-ARTICLE: "openai.openai-gui" "A GUI interface for OpenAI API"
-"This is intended to serve as a simple implementation to interface to the OpenAI API\n"
-"It can also be opened using words:"
+ARTICLE: "openai.ui" "A GUI interface for OpenAI API"
+"This is intended to serve as a simple implementation to interface to the OpenAI API"
 
+"It can also be opened using words:"
 { $subsections
     gpt-new
 }
@@ -81,4 +69,4 @@ ARTICLE: "openai.openai-gui" "A GUI interface for OpenAI API"
 { $vocab-link "openai" }
 ;
 
-ABOUT: "openai.openai-gui"
+ABOUT: "openai.ui"
