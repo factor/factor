@@ -29,7 +29,7 @@ $nl
     { { { $snippet "assoc" } } "an associative mapping" }
     { { { $snippet "str" } } "a string" }
     { { { $snippet "x" } ", " { $snippet "y" } ", " { $snippet "z" } } "a number" }
-    { { $snippet "loc" } "a screen location specified as a two-element array holding x and y co-ordinates" }
+    { { $snippet "loc" } "a screen location specified as a two-element array holding x and y coordinates" }
     { { $snippet "dim" } "a screen dimension specified as a two-element array holding width and height values" }
     { { $snippet "*" } "when this symbol appears by itself in the list of outputs, it means the word unconditionally throws an error" }
 }

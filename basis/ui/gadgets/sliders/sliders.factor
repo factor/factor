@@ -49,7 +49,7 @@ CONSTANT: min-thumb-dim 30
     [ elevator-length ] bi min ;
 
 : slider-scale ( slider -- n )
-    ! A scaling factor such that if x is a slider co-ordinate,
+    ! A scaling factor such that if x is a slider coordinate,
     ! x*n is the screen position of the thumb, and conversely
     ! for x/n. The '1 max' calls avoid division by zero.
     [ [ elevator-length ] [ thumb-dim ] bi - 1 max ]

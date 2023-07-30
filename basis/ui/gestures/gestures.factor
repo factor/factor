@@ -147,7 +147,7 @@ TUPLE: key-up < key-gesture ;
 
 ! Note that these are only really useful inside an event
 ! handler, and that the locations hand-loc and hand-click-loc
-! are in the co-ordinate system of the world which contains
+! are in the coordinate system of the world which contains
 ! the gadget in question.
 SYMBOL: hand-gadget
 SYMBOL: hand-world
