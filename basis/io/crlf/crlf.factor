@@ -75,5 +75,8 @@ M: crlf-stream stream-nl
     CHAR: \r over stream-write1
     CHAR: \n swap stream-write1 ;
 
-: use-crlf ( -- )
+: with-crlf-stream ( quot -- )
+    [ output-stream [ get <crlf-stream> ] keep ] dip with-variable ; inline
+
+: use-crlf-stream ( -- )
     output-stream [ <crlf-stream> ] change ;
