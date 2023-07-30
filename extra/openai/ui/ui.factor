@@ -1,13 +1,14 @@
 ! Copyright (C) 2023 Dave Carlton.
 ! See https://factorcode.org/license.txt for BSD license.
-USING: accessors assocs colors fonts io io.encodings.utf8 io.files
-kernel math namespaces openai sequences ui ui.commands ui.gadgets
-ui.gadgets.borders ui.gadgets.editors ui.gadgets.labels
-ui.gadgets.scrollers ui.gadgets.toolbar ui.gadgets.tracks ui.gestures
-ui.pens.solid ui.text ui.tools.common ui.tools.listener urls
+USING: accessors arrays assocs colors fonts io io.encodings.utf8
+io.files kernel math namespaces openai prettyprint sequences ui
+ui.commands ui.gadgets ui.gadgets.borders ui.gadgets.editors
+ui.gadgets.labels ui.gadgets.scrollers ui.gadgets.toolbar
+ui.gadgets.tracks ui.gestures ui.pens.solid ui.text
+ui.tools.browser.history ui.tools.common ui.tools.listener urls
 webbrowser wrap.strings ;
 
-IN: openai.openai-gui
+IN: openai.ui
 
 INITIALIZED-SYMBOL: OPENAI-KEY-PATH [ "~/.config/configstore/openai-key" ]
 
@@ -95,6 +96,6 @@ gpt-gadget "toolbar" f {
     init-api-key
     <gpt-gadget>
     { 5 5 } <border>  { 1 1 } >>fill
-    "GPT" open-window ; 
+    "GPT" open-window ;
 
-
+MAIN: gpt-new

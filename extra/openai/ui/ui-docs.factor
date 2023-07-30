@@ -1,7 +1,7 @@
 ! Copyright (C) 2023 Dave Carlton.
 ! See https://factorcode.org/license.txt for BSD license.
 USING: help.markup help.syntax kernel strings openai ui.commands ;
-IN: openai.openai-gui
+IN: openai.ui
 
 HELP: <ask>
 { $values
