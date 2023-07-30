@@ -50,7 +50,7 @@ MEMO:: fab ( a b -- n )
 MEMO:: B ( P Q R S -- n )
     Q P - S R - * 5000 <
     [
-        P Q [a,b] R S [a,b] [ fab ] cartesian-map [ sum ] map-sum
+        P Q [a..b] R S [a,b] [ fab ] cartesian-map [ sum ] map-sum
     ]
     [
         S 2 / floor neg R 2 / ceiling neg P 2 / ceiling Q 2 / floor B
