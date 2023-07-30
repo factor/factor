@@ -1,6 +1,7 @@
 ! Copyright (c) 2023 Cecilia Knaebchen.
 ! See https://factorcode.org/license.txt for BSD license.
-USING: kernel locals math math.functions math.ranges sequences project-euler.common ;
+USING: kernel locals math math.functions ranges sequences
+project-euler.common ;
 IN: project-euler.508
 
 ! https://projecteuler.net/index.php?section=problems&id=508
