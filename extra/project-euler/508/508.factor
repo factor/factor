@@ -61,7 +61,7 @@ MEMO:: B ( P Q R S -- n )
     ] if ;
 
 : euler508 ( -- answer )
-	10 15 ^ dup [ neg ] dip 2dup B 1000000007 mod ;
+    10 15 ^ dup [ neg ] dip 2dup B 1000000007 mod ;
 
 ! [ euler508 ] time
 ! 19 ms
