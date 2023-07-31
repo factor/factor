@@ -329,15 +329,11 @@ PRIVATE>
     dup do-ssl-accept-once
     [ [ dup file>> ] dip wait-for-fd do-ssl-accept ] [ drop ] if* ;
 
-: maybe-handshake ( ssl-handle -- )
-    dup connected>> [ drop ] [
-        dup terminated>> [
-            drop
-        ] [
-            [ [ do-ssl-accept ] with-timeout ]
-            [ t swap connected<< ] bi
-        ] if
-    ] if ;
+: maybe-handshake ( ssl-handle -- ssl-handle )
+    dup [ connected>> ] [ terminated>> ] bi or [
+        [ [ do-ssl-accept ] with-timeout ]
+        [ t >>connected ] bi
+    ] unless ;
 
 ! Input ports
 : do-ssl-read ( buffer ssl-handle -- event/f )
@@ -349,7 +345,7 @@ PRIVATE>
 
 M: ssl-handle refill
     throw-if-terminated
-    dup maybe-handshake [ buffer>> ] dip do-ssl-read ;
+    [ buffer>> ] [ maybe-handshake ] bi* do-ssl-read ;
 
 ! Output ports
 : do-ssl-write ( buffer ssl-handle -- event/f )
@@ -360,7 +356,7 @@ M: ssl-handle refill
 
 M: ssl-handle drain
     throw-if-terminated
-    dup maybe-handshake [ buffer>> ] dip do-ssl-write ;
+    [ buffer>> ] [ maybe-handshake ] bi* do-ssl-write ;
 
 ! Connect
 : do-ssl-connect-once ( ssl-handle -- event/f )
@@ -482,11 +478,13 @@ M: openssl check-certificate
 
 M: openssl send-secure-handshake
     input/output-ports
-    [ make-input/output-secure ] keep
-    [ (send-secure-handshake) ] keep
-    remote-address get dup inet? [
-        host>> swap handle>> check-certificate
-    ] [ 2drop ] if ;
+    [ make-input/output-secure ]
+    [ nip (send-secure-handshake) ]
+    [
+        nip remote-address get dup inet? [
+            host>> swap handle>> check-certificate
+        ] [ 2drop ] if
+    ] 2tri ;
 
 M: openssl accept-secure-handshake
     input/output-ports
