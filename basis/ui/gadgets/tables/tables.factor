@@ -416,7 +416,9 @@ table "row" f {
     { T{ button-down f f 3 } show-table-menu }
     { T{ key-down f f "RET" } row-action }
     { T{ key-down f f "UP" } previous-row }
+    { T{ key-down f { C+ } "p" } previous-row }
     { T{ key-down f f "DOWN" } next-row }
+    { T{ key-down f { C+ } "n" } next-row }
     { T{ key-down f f "HOME" } first-row }
     { T{ key-down f f "END" } last-row }
     { T{ key-down f f "PAGE_UP" } previous-page }
