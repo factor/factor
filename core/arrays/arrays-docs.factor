@@ -37,6 +37,8 @@ $nl
 { $subsections resize-array }
 "The class of two-element arrays:"
 { $subsections pair }
+"Conditionally creating arrays:"
+{ $subsections ?pair }
 "Arrays can be accessed without bounds checks in a pointer unsafe way."
 { $subsections "arrays-unsafe" } ;
 
@@ -78,3 +80,7 @@ HELP: resize-array
 
 HELP: pair
 { $class-description "The class of two-element arrays, known as pairs." } ;
+
+HELP: ?pair
+{ $values { "x" object } { "y" object } { "?" boolean } { "pair/f" { $maybe array } } }
+{ $description "Create a new two-element array if " { $snippet "?" } " is true, otherwise return " { $link POSTPONE: f } "." } ;

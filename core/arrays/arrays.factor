@@ -27,3 +27,4 @@ INSTANCE: array sequence
 : 4array ( w x y z -- array ) { } 4sequence ; inline
 
 PREDICATE: pair < array length>> 2 number= ;
+: ?pair ( x y ? -- pair/f ) -rot 2array and ; inline
