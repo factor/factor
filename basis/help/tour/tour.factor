@@ -321,7 +321,7 @@ quotation contains the word { $link curry } , which also operates on a quotation
 using one level of nesting for each higher-order function, unlike Lisps or more generally languages based on the lambda 
 calculus, which use one level of nesting for each function, higher-order or not.
 
-{ $link bi } and its relative { $link tri } are a small subset of the shuffle words you will use in Factor. You ahouls also become familiar with 
+{ $link bi } and its relative { $link tri } are a small subset of the shuffle words you will use in Factor. You should also become familiar with 
 { $link bi } , { $link tri } , and { $link bi@ } by reading about them in the online help and trying them out in the listener.
 
 ;
