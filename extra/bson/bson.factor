@@ -209,8 +209,7 @@ TYPED: (serialize-code) ( code: code -- )
   [ T_Binary_Custom write1 write ] bi ; inline
 
 : write-string-length ( string -- )
-    [ length>> 1 + ]
-    [ aux>> [ length ] [ 0 ] if* ] bi + write-int32 ; inline
+    [ length>> 1 + ] [ aux>> length ] bi + write-int32 ; inline
 
 TYPED: write-string ( string: string -- )
     dup write-string-length write-cstring ; inline
