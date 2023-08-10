@@ -1,5 +1,5 @@
 ! Copyright (C) 2023 Aleksander Sabak.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors assocs combinators combinators.short-circuit
 kernel math sequences sets splitting strings.parser vectors ;
 IN: brain-flak

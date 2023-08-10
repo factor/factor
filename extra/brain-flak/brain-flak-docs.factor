@@ -1,5 +1,5 @@
 ! Copyright (C) 2023 Aleksander Sabak.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: help.markup help.syntax kernel sequences strings urls ;
 IN: brain-flak
 

@@ -1,5 +1,5 @@
 ! Copyright (C) 2019 Jack Lucas
-! See http:! factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 ! These should be complete bindings to the Raylib library. (v4.0)
 ! Most of the comments are included from the original header
 ! for your convenience.
