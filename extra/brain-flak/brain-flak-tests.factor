@@ -1,5 +1,5 @@
 ! Copyright (C) 2023 Aleksander Sabak.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors brain-flak combinators.short-circuit kernel
     strings tools.test ;
 IN: brain-flak.tests
