@@ -59,3 +59,7 @@ sets sorting tools.test ;
 
 ! non-integer capacity not allowed
 [ 0.75 <hash-set> ] must-fail
+
+{ t } [ "test" dup HS{ } clone intern eq? ] unit-test
+{ t } [ "aoeu" dup clone HS{ } clone intern = ] unit-test
+{ t } [ "snth" dup clone HS{ } clone intern eq? not ] unit-test
