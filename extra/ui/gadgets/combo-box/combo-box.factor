@@ -1,12 +1,12 @@
 ! Copyright (C) 2023 Raghu Ranganathan.
 ! See https://factorcode.org/license.txt for BSD license.
 
-USING: accessors combinators kernel math math.rectangles
+USING: accessors arrays colors combinators kernel math math.rectangles
 math.vectors models namespaces opengl prettyprint sequences
 sorting ui.commands ui.gadgets ui.gadgets.borders
 ui.gadgets.buttons ui.gadgets.editors ui.gadgets.glass
 ui.gadgets.labels ui.gadgets.packs ui.gadgets.worlds
-ui.gadgets.wrappers ui.gestures ui.operations ui.pens
+ui.gadgets.borders ui.gestures ui.operations ui.pens
 ui.pens.solid ui.theme ;
 IN: ui.gadgets.combo-box
 
@@ -36,27 +36,45 @@ MEMO: combo-button-pen-interior ( -- pen )
     combo-button-pen-interior >>interior
     align-left ; inline
 
-: <combo-button> ( label quot -- combo-button )
-    combo-button new-button combo-button-theme ; inline
+:: <combo-button> ( label editor -- combo-button )
+    label [
+        label gadget-text editor set-editor-string
+        hide-glass
+    ] combo-button
+    new-button combo-button-theme ; inline
 
 PRIVATE>
 
-GENERIC: <combo-item>  ( display-model name -- combo-item )
+<PRIVATE
 
-M:: object <combo-item> ( display-model name -- combo-item )
-    name <label> [
-        name display-model set-model 
-        hide-glass
-    ] <combo-button> ;
+: (show-menu) ( owner menu -- )
+    ! screen loc doesn't work as expected here.
+    ! Might be a problem caused by testing with `gadget.' though.
+    ! [ find-world ] dip dup screen-loc point>rect show-glass ;
+    [ find-world ] dip hand-loc get-global .s point>rect show-glass ;
+    
+PRIVATE>
+
+: show-menu ( owner menu -- )
+    [ (show-menu) ] keep request-focus ;
+    
+    
+GENERIC: <combo-item>  ( editor name -- combo-item )
+
+M: object <combo-item> ( editor name -- combo-item )
+    <label> swap <combo-button> ;
 
 : <combo-items> ( items -- gadget )
     <filled-pile> swap add-gadgets ;
 
-
 :: <combo-box> ( items -- combo-box )
     <editor> :> txt
+    14 txt min-cols<<
+    items [ txt <combo-button> ] map <combo-items> :> cmenu
     "Choose an item" txt set-editor-string
-    "v" <label> [ . ] <button> :> btn
+    txt screen-loc .
+    "v" <label> [ drop txt cmenu show-menu ] <button> :> btn
     ! items txt [ display swap <combo-item> ] curry map <combo-items> :> menu
-    <shelf> { txt btn } add-gadgets { 5 12 } >>gap
-    ;
+    <shelf> txt btn 2array [ { 5 5 } <border> ] map add-gadgets
+    { 5 12 } >>gap
+    COLOR: white <solid> >>boundary ;
