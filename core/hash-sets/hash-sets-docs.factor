@@ -1,4 +1,4 @@
-USING: help.markup help.syntax math sequences sets ;
+USING: assocs help.markup help.syntax kernel math sequences sets ;
 IN: hash-sets
 
 ARTICLE: "hash-sets" "Hash sets"
@@ -20,3 +20,9 @@ HELP: <hash-set>
 HELP: >hash-set
 { $values { "members" sequence } { "hash-set" hash-set } }
 { $description "Creates a new hash set with the given members." } ;
+
+HELP: intern
+{ $values { "obj" object } { "hash-set" hash-set } { "obj'" "a previously retained or the original " { $link object } } }
+{ $description "If a value equal to " { $snippet "obj" } " is present in the " { $snippet "hash-set" } ", return the copy from the set, otherwise add " { $snippet "obj" } " to the " { $snippet "hash-set" } " and return the original. When used with strings, this word can be used to implement string interning, see https://en.wikipedia.org/wiki/String_interning." }
+{ $side-effects "hash-set" }
+{ $see-also cache } ;
