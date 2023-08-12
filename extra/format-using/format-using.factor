@@ -24,7 +24,7 @@ IN: format-using
 : sum-too-long? ( cost1 cost2 -- ? )
     [ first ] [ second ] bi* + too-long? ;
 
-: add-costs ( cost1 cost2 -- total-cost )
+: cost+ ( cost1 cost2 -- total-cost )
     [ first3 ] bi@ roll prepend [ 2nip +  dup 3 - ] dip 3array ;
 
 : cluster? ( cost -- ? )
@@ -46,7 +46,7 @@ IN: format-using
     subsystem-clusters [ [ costs ] keep 3array ] map [
         { 0 0 f } [
             dup cluster? [ [ , ] bi@ { 0 0 f } ] [
-                2dup sum-too-long? [ swap , ] [ add-costs ] if
+                2dup sum-too-long? [ swap , ] [ cost+ ] if
             ] if
         ] reduce ,
     ] { } make [ first zero? ] reject
