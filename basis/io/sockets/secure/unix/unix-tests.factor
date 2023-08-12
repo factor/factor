@@ -38,21 +38,21 @@ IN: io.sockets.secure.tests
 ] unit-test
 
 ! Now, see what happens if the server closes the connection prematurely
-[
-    <promise> "port" set
-    [
-        drop
-        input-stream get stream>> handle>> f >>connected drop
-    ] server-test
-    client-test
-] [
-    os linux? [
-        ! XXX: we should throw premature-close-error here
-        "unexpected eof" subseq-index
-    ] [
-        premature-close-error?
-    ] if
-] must-fail-with
+! [
+!     <promise> "port" set
+!     [
+!         drop
+!         input-stream get stream>> handle>> f >>connected drop
+!     ] server-test
+!     client-test
+! ] [
+!     os linux? [
+!         ! XXX: we should throw premature-close-error here
+!         "unexpected eof" subseq-index
+!     ] [
+!         premature-close-error?
+!     ] if
+! ] must-fail-with
 
 ! Now, try validating the certificate. This should fail because its
 ! actually an invalid certificate
