@@ -6,8 +6,8 @@ math.vectors models namespaces opengl prettyprint sequences
 sorting ui.commands ui.gadgets ui.gadgets.borders
 ui.gadgets.buttons ui.gadgets.editors ui.gadgets.glass
 ui.gadgets.labels ui.gadgets.packs ui.gadgets.worlds
-ui.gadgets.borders ui.gestures ui.operations ui.pens
-ui.pens.solid ui.theme ;
+ui.gestures ui.operations ui.pens ui.gadgets.line-support
+ui.pens.solid ui.theme ui.gadgets.panes fonts ;
 IN: ui.gadgets.combo-box
 
 ! Design: An editor and button.
@@ -15,6 +15,7 @@ IN: ui.gadgets.combo-box
 ! Each option should come with a quot. Or maybe I can simply take buttons for each option,
 ! to keep it flexible.
 ! A comparison quote may be taken to filter the options in the menu.
+
 
 
 TUPLE: combo-button < button ;
@@ -47,11 +48,10 @@ PRIVATE>
 
 <PRIVATE
 
-: (show-menu) ( owner menu -- )
-    ! screen loc doesn't work as expected here.
-    ! Might be a problem caused by testing with `gadget.' though.
-    ! [ find-world ] dip dup screen-loc point>rect show-glass ;
-    [ find-world ] dip hand-loc get-global .s point>rect show-glass ;
+:: (show-menu) ( owner menu -- )
+    owner find-world menu 
+    owner screen-loc 0 owner dim>> second 2array v+ point>rect
+    show-glass ;
     
 PRIVATE>
 
@@ -65,16 +65,21 @@ M: object <combo-item> ( editor name -- combo-item )
     <label> swap <combo-button> ;
 
 : <combo-items> ( items -- gadget )
-    <filled-pile> swap add-gadgets ;
+    <filled-pile> swap add-gadgets dup
+    default-font-background-color get-global <solid> swap interior<< ;
 
 :: <combo-box> ( items -- combo-box )
-    <editor> :> txt
+    <editor> 16 >>line-height :> txt
     14 txt min-cols<<
     items [ txt <combo-button> ] map <combo-items> :> cmenu
     "Choose an item" txt set-editor-string
-    txt screen-loc .
     "v" <label> [ drop txt cmenu show-menu ] <button> :> btn
     ! items txt [ display swap <combo-item> ] curry map <combo-items> :> menu
-    <shelf> txt btn 2array [ { 5 5 } <border> ] map add-gadgets
-    { 5 12 } >>gap
-    COLOR: white <solid> >>boundary ;
+    <shelf> { txt btn } [
+        dup default-font-foreground-color get-global
+        <solid> swap boundary<<
+    ] map add-gadgets
+    { 5 12 } >>gap ;
+    
+: test-code ( -- )
+  { "Hello" "World" } [ <label> ] map <combo-box> gadget. ;
