@@ -80,10 +80,16 @@ PRIVATE>
     dup length
     f BN_bin2bn ; inline
 
+: add-to-ctx ( ctx flag -- )
+    [ handle>> ] dip
+    [ [ SSL_CTX_get_options ] dip bitor ]
+    [ drop swap SSL_CTX_set_options ssl-error ] 2bi ;
+
 : disable-old-tls ( ctx -- )
-    handle>>
-    SSL_OP_NO_TLSv1 SSL_OP_NO_TLSv1_1 bitor
-    SSL_CTX_set_options ssl-error ;
+    SSL_OP_NO_TLSv1 SSL_OP_NO_TLSv1_1 bitor add-to-ctx ;
+
+: ignore-unexpected-eof ( ctx -- )
+    SSL_OP_IGNORE_UNEXPECTED_EOF add-to-ctx ;
 
 : set-session-cache ( ctx -- )
     handle>>
@@ -195,6 +201,7 @@ M: openssl <secure-context>
             [ set-verify-depth ]
             [ load-dh-params ]
             [ set-ecdh-params ]
+            [ ignore-unexpected-eof ]
             [ ]
         } cleave
     ] with-destructors ;
