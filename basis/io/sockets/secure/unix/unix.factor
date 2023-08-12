@@ -29,7 +29,8 @@ M: secure (accept)
     ] with-destructors ;
 
 : (shutdown) ( ssl-handle -- )
-    dup dup handle>> SSL_shutdown check-ssl-error
+    dup dup handle>>
+    ERR_clear_error SSL_shutdown check-ssl-error
     [ dupd wait-for-fd (shutdown) ] [ drop ] if* ;
 
 M: ssl-handle shutdown
