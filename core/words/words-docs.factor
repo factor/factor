@@ -173,7 +173,7 @@ $nl
 
     { { { $snippet "\"superclass\"" } ", " { $snippet "\"predicate-definition\"" } } { $link "predicates" } }
 
-    { { $snippet "\"members\"" } { $link "unions" } { $link "maybes" } }
+    { { $snippet "\"members\"" } { { $link "unions" } ", " { $link "maybes" } } }
     {
         { $snippet "\"instances\"" }
         { "Lists the instances of the mixin class and where they are defined - " { $link "mixins" } }
