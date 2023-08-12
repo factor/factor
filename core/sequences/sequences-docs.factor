@@ -576,6 +576,8 @@ HELP: all?
 { $values { "seq" sequence } { "quot" { $quotation ( ... elt -- ... ? ) } } { "?" boolean } }
 { $description "Tests if all elements in the sequence satisfy the predicate by checking each element in turn. Given an empty sequence, vacuously outputs " { $link t } "." } ;
 
+{ any? all? none? } related-words
+
 HELP: push-when
 { $values { "elt" object } { "quot" { $quotation ( ..a elt -- ..b ? ) } } { "accum" "a resizable mutable sequence" } }
 { $description "Adds the element at the end of the sequence if the quotation yields a true value." }
@@ -2051,6 +2053,7 @@ ARTICLE: "sequences-combinators" "Sequence combinators"
 { $subsections
     any?
     all?
+    none?
 }
 { $heading "Related Articles" }
 { $subsections
