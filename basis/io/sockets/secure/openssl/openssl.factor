@@ -80,16 +80,21 @@ PRIVATE>
     dup length
     f BN_bin2bn ; inline
 
-: add-to-ctx ( ctx flag -- )
+: add-ctx-flag ( ctx flag -- )
     [ handle>> ] dip
     [ [ SSL_CTX_get_options ] dip bitor ]
     [ drop swap SSL_CTX_set_options ssl-error ] 2bi ;
 
+: clear-ctx-flag ( ctx flag -- )
+    [ handle>> ] dip
+    [ [ SSL_CTX_get_options ] dip bitnot bitand ]
+    [ drop swap SSL_CTX_set_options ssl-error ] 2bi ;
+
 : disable-old-tls ( ctx -- )
-    SSL_OP_NO_TLSv1 SSL_OP_NO_TLSv1_1 bitor add-to-ctx ;
+    SSL_OP_NO_TLSv1 SSL_OP_NO_TLSv1_1 bitor add-ctx-flag ;
 
 : ignore-unexpected-eof ( ctx -- )
-    SSL_OP_IGNORE_UNEXPECTED_EOF add-to-ctx ;
+    SSL_OP_IGNORE_UNEXPECTED_EOF add-ctx-flag ;
 
 : set-session-cache ( ctx -- )
     handle>>
