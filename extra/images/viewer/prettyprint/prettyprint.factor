@@ -12,9 +12,6 @@ CONSTANT: approx-pixels-per-cell 8
         over >>image
         swap presented associate >>style ;
 
-M: image-section long-section
-    short-section ;
-
 M: image-section short-section
     image>> <image-gadget> output-stream get write-gadget ;
 
