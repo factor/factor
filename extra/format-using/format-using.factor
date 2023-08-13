@@ -18,8 +18,11 @@ IN: format-using
 : subsystem-clusters ( seq -- seq' )
     [ subsystem= ] monotonic-split ;
 
+: joined-length ( seq -- n )
+    [ length ] keep [ length ] map-sum + ;
+
 : costs ( vocabs -- length-on-new-line length-when-added-to-prev-line )
-    [ length 1 - ] keep [ length ] map-sum + [ indent length + ] [ 1 + ] bi ;
+    joined-length [ indent length + 1 - ] keep ;
 
 : sum-too-long? ( cost1 cost2 -- ? )
     [ first ] [ second ] bi* + too-long? ;
@@ -53,7 +56,7 @@ IN: format-using
     split-long-subsystems [ last " " join indent prepend ] map ;
 
 : oneliner-length ( vocabs -- n )
-    [ length ] keep [ length ] map-sum + "USING: ;" length + ;
+    joined-length "USING: ;" length + ;
 
 : format-using ( vocabs -- str )
     dup length 1 = [ first "USE: " prepend ] [
