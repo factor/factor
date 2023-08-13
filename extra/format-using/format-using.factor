@@ -12,11 +12,8 @@ IN: format-using
 : subsystem ( str -- str' )
     dup [ CHAR: . = ] find [ head ] [ drop ] if ;
 
-: subsystem= ( str1 str2 -- ? )
-    [ subsystem ] bi@ = ;
-
 : subsystem-clusters ( seq -- seq' )
-    [ subsystem= ] monotonic-split ;
+    [ [ subsystem ] same? ] monotonic-split ;
 
 : joined-length ( seq -- n )
     [ length ] keep [ length ] map-sum + ;
