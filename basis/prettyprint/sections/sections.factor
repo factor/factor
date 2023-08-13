@@ -110,6 +110,8 @@ M: section unindent-first-line? drop f ;
 
 M: section newline-after? drop f ;
 
+M: section long-section short-section ;
+
 M: object short-section? section-fits? ;
 
 : indent+ ( section n -- )
@@ -152,8 +154,6 @@ TUPLE: line-break < section type ;
         swap >>type ;
 
 M: line-break short-section drop ;
-
-M: line-break long-section drop ;
 
 ! Block sections
 TUPLE: block < section sections ;
@@ -229,8 +229,6 @@ TUPLE: text-section < section string ;
 
 M: text-section short-section string>> write ;
 
-M: text-section long-section short-section ;
-
 : styled-text ( string style -- ) <text> add-section ;
 
 : text ( string -- ) f styled-text ;
@@ -278,8 +276,6 @@ TUPLE: colon < block ;
 
 : <colon> ( -- block )
     colon new-block ;
-
-M: colon long-section short-section ;
 
 M: colon indent-section? drop t ;
 
