@@ -2,6 +2,8 @@
 ! See https://factorcode.org/license.txt for BSD license.
 USING: format-using qw tools.test ;
 
+{ "USING: ;" } [ { } format-using ] unit-test
+{ "USE: vocab" } [ { "vocab" } format-using ] unit-test
 { "USING:
     io.directories io.encodings.utf8 io.files io.pathnames
     kernel
