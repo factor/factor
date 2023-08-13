@@ -8,7 +8,8 @@ generic.single generic.standard io io.pathnames
 io.streams.string io.styles kernel make namespaces prettyprint
 prettyprint.backend prettyprint.config prettyprint.custom
 prettyprint.sections sequences sets slots sorting strings
-summary vocabs words words.alias words.constant words.symbol ;
+summary vocabs vocabs.prettyprint words words.alias
+words.constant words.symbol ;
 IN: see
 
 GENERIC: synopsis* ( defspec -- )
@@ -124,8 +125,6 @@ M: word declarations.
         POSTPONE: foldable
         POSTPONE: flushable
     } [ declaration. ] with each ;
-
-: pprint-; ( -- ) \ ; pprint-word ;
 
 M: object see*
     [

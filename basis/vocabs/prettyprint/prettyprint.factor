@@ -12,6 +12,8 @@ IN: vocabs.prettyprint
 : pprint-in ( vocab -- )
     [ \ IN: pprint-word pprint-vocab ] with-pprint ;
 
+: pprint-; ( -- ) \ ; pprint-word ;
+
 <PRIVATE
 
 : sort-vocabs ( seq -- seq' ) [ vocab-name ] sort-by ;
@@ -21,7 +23,7 @@ IN: vocabs.prettyprint
     sort-vocabs [
         \ USING: pprint-word
         [ pprint-vocab ] each
-        \ ; pprint-word
+        pprint-;
     ] with-pprint ;
 
 GENERIC: pprint-qualified ( qualified -- )
@@ -42,7 +44,7 @@ M: from pprint-qualified
         \ FROM: pprint-word
         [ vocab>> pprint-vocab "=>" text ]
         [ names>> [ text ] each ] bi
-        \ ; pprint-word
+        pprint-;
     ] with-pprint ;
 
 M: exclude pprint-qualified
@@ -50,7 +52,7 @@ M: exclude pprint-qualified
         \ EXCLUDE: pprint-word
         [ vocab>> pprint-vocab "=>" text ]
         [ names>> [ text ] each ] bi
-        \ ; pprint-word
+        pprint-;
     ] with-pprint ;
 
 M: rename pprint-qualified
