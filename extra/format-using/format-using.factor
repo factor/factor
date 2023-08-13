@@ -2,11 +2,12 @@
 ! See https://factorcode.org/license.txt for BSD license.
 USING:
     arrays kernel make math namespaces prettyprint.config sequences
-    sorting splitting.monotonic
+    sorting splitting.monotonic strings
 ;
 IN: format-using
 
-: indent ( -- str ) tab-size get [ CHAR: space ] replicate ; inline
+: indent-length ( -- str ) tab-size get ;
+: indent ( -- str ) indent-length CHAR: space <string> ; inline
 : width-limit ( -- n ) margin get ; inline
 : too-long? ( n -- ? ) width-limit > ; inline
 
@@ -20,7 +21,7 @@ IN: format-using
     [ length ] keep [ length ] map-sum + ;
 
 : costs ( vocabs -- length-on-new-line length-when-added-to-prev-line )
-    joined-length [ indent length + 1 - ] keep ;
+    joined-length [ indent-length + 1 - ] keep ;
 
 : sum-too-long? ( cost1 cost2 -- ? )
     [ first ] [ second ] bi* + too-long? ;
@@ -32,9 +33,9 @@ IN: format-using
     last length 1 > ; inline
 
 : split-subsystem% ( vocabs -- )
-    [ indent length 1 - f ] dip [
+    [ indent-length 1 - f ] dip [
         pick over length + 1 + dup too-long? [
-            drop [ dupd 3array , ] dip [ length indent length + ] keep 1array
+            drop [ dupd 3array , ] dip [ length indent-length + ] keep 1array
         ] [ -rot suffix nipd ] if
     ] each dupd 3array , ;
 
