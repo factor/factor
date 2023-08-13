@@ -1,12 +1,13 @@
 ! Copyright (C) 2023 Alexander Ilin.
 ! See https://factorcode.org/license.txt for BSD license.
 USING:
-    arrays kernel make math sequences sorting splitting.monotonic
+    arrays kernel make math namespaces prettyprint.config sequences
+    sorting splitting.monotonic
 ;
 IN: format-using
 
-: indent ( -- str ) "    " ; inline
-: width-limit ( -- n ) 65 ; inline
+: indent ( -- str ) tab-size get [ CHAR: space ] replicate ; inline
+: width-limit ( -- n ) margin get ; inline
 : too-long? ( n -- ? ) width-limit > ; inline
 
 : subsystem ( str -- str' )
