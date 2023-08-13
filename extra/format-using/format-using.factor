@@ -25,7 +25,7 @@ IN: format-using
     [ first ] [ second ] bi* + too-long? ;
 
 : cost+ ( cost1 cost2 -- total-cost )
-    [ first3 ] bi@ roll prepend [ 2nip +  dup 3 - ] dip 3array ;
+    [ first3 ] bi@ roll prepend [ 2nip + dup 3 - ] dip 3array ;
 
 : cluster? ( cost -- ? )
     last length 1 > ; inline
