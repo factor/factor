@@ -7,10 +7,10 @@ HELP: overwrite-with-random-bytes
 { $values { "file-name" "a filename string" } }
 { $description "Overwite the " { $snippet "file-name" } " contents with random data. The slack space at the end is not overwritten." } ;
 
-ABOUT: "findus.wipe"
+ABOUT: "wipe"
 
-ARTICLE: "findus.wipe" "findus.wipe"
-"The " { $vocab-link "findus.wipe" } " vocab provides some words for securely erasing (wiping) individual files, entire folders or the free space on a drive:"
+ARTICLE: "wipe" "wipe"
+"The " { $vocab-link "wipe" } " vocab provides some words for securely erasing (wiping) individual files, entire folders or the free space on a drive:"
 { $subsections wipe wipe-all wipe-file wipe-free-space }
 ;
 
