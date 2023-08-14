@@ -4,7 +4,7 @@ USING: accessors alien alien.prettyprint arrays assocs classes
 classes.struct combinators combinators.short-circuit
 continuations kernel libc make math math.parser mirrors
 prettyprint.backend prettyprint.custom prettyprint.sections
-see.private sequences slots summary ;
+see.private sequences slots summary vocabs.prettyprint ;
 IN: classes.struct.prettyprint
 
 <PRIVATE
