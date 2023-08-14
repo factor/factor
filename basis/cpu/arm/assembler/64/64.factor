@@ -1,7 +1,7 @@
 ! Copyright (C) 2023 Doug Coleman.
 ! Copyright (C) 2023 Giftpflanze.
 ! See https://factorcode.org/license.txt for BSD license.
-USING: cpu.arm.assembler cpu.arm.assembler.opcodes kernel math
+USING: cpu.arm.assembler cpu.arm.assembler.opcodes kernel
 math.bitwise ;
 IN: cpu.arm.assembler.64
 
@@ -23,6 +23,8 @@ IN: cpu.arm.assembler.64
 
 : CBNZ ( simm21 Rt -- ) [ 2 ?>> 19 ?sbits ] dip CBNZ64-encode ;
 
+: CLZ ( Rn Rd -- ) CLZ64-encode ;
+
 : CMPi ( imm24 Rd -- ) [ split-imm ] dip CMPi64-encode ;
 : CMPr ( Rm Rn -- ) [ 3 0 ] dip CMPer64-encode ;
 
@@ -34,8 +36,7 @@ IN: cpu.arm.assembler.64
 : EORi ( imm64 Rn Rd -- ) [ encode-bitmask ] 2dip EORi64-encode ;
 : EORr ( Rm Rn Rd -- ) [ [ 0 ] dip 0 ] 2dip EORsr64-encode ;
 
-: FPCR ( -- op0 op1 CRn CRm op2 ) 3 3 4 4 0 ;
-: FPSR ( -- op0 op1 CRn CRm op2 ) 3 3 4 4 1 ;
+: FCVTZSsi ( Rn Rd var -- ) >ftype -rot FCVTZSsi64-encode ;
 
 : LDPpost ( simm10 Rn Rt2 Rt -- ) [ 3 ?>> 7 ?sbits ] 3dip swapd LDPpost64-encode ;
 : LDPpre ( simm10 Rn Rt2 Rt -- ) [ 3 ?>> 7 ?sbits ] 3dip swapd LDPpre64-encode ;
@@ -47,25 +48,19 @@ IN: cpu.arm.assembler.64
 : LDRr ( Rm Rn Rt -- ) [ 3 0 ] 2dip LDRr64-encode ;
 : LDRuoff ( uimm15 Rn Rt -- ) [ 3 ?>> 12 ?ubits ] 2dip LDRuoff64-encode ;
 
-: LDRBr ( Rm Rn Rt -- ) [ 0 ] 2dip LDRBsr-encode ;
-: LDRBuoff ( uimm12 Rn Rt -- ) [ 12 ?ubits ] 2dip LDRBuoff-encode ;
-
-: LDRHuoff ( uimm13 Rn Rt -- ) [ 1 ?>> 12 ?ubits ] 2dip LDRHuoff-encode ;
-
 : LDUR ( simm9 Rn Rt -- ) [ 9 ?sbits ] 2dip LDUR64-encode ;
 
 : LSLi ( uimm6 Rn Rd -- ) [ 6 ?ubits ] 2dip LSLi64-encode ;
 : LSLr ( Rm Rn Rd -- ) LSLr64-encode ;
 
 : LSRi ( uimm6 Rn Rd -- ) [ 6 ?ubits ] 2dip LSRi64-encode ;
+: LSRr ( Rm Rn Rd -- ) LSRr64-encode ;
 
 : MOVr ( Rn Rd -- ) MOVr64-encode ;
 : MOVsp ( Rn Rd -- ) [ 0 ] 2dip MOVsp64-encode ;
-: MOVwi ( imm16 Rt -- ) [ [ 0 ] dip 16 bits ] dip MOVwi64-encode ;
-
-: MRS ( op0 op1 CRn CRm op2 Rt -- ) MRS-encode ;
-
-: MSRr ( op0 op1 CRn CRm op2 Rt -- ) MSRr-encode ;
+: MOVwi ( imm16 Rd -- ) [ [ 0 ] dip 16 bits ] dip MOVwi64-encode ;
+: MOVZ ( lsl imm16 Rd -- ) [ 16 bits ] dip MOVZ64-encode ;
+: MOVK ( lsl imm16 Rd -- ) [ 16 bits ] dip MOVK64-encode ;
 
 : MSUB ( Ra Rm Rn Rd -- ) [ swap ] 2dip MSUB64-encode ;
 
@@ -75,9 +70,10 @@ IN: cpu.arm.assembler.64
 
 : NEG ( Rm Rd -- ) [ [ 0 ] dip 0 ] dip NEG64-encode ;
 
-: NZCV ( -- op0 op1 CRn CRm op2 ) 3 3 4 2 0 ;
-
+: ORRi ( imm64 Rn Rd -- ) [ encode-bitmask ] 2dip ORRi64-encode ;
 : ORRr ( Rm Rn Rd -- ) [ [ 0 ] dip 0 ] 2dip ORRsr64-encode ;
+
+: SCVTFsi ( Rn Rd var -- ) >ftype -rot SCVTFsi64-encode ;
 
 : SDIV ( Rm Rn Rd -- ) SDIV64-encode ;
 

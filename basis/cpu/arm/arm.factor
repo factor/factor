@@ -5,3 +5,5 @@ IN: cpu.arm
 
 HOOK: ds-reg cpu ( -- reg )
 HOOK: rs-reg cpu ( -- reg )
+
+ALIAS: eh? f
