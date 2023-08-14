@@ -11,6 +11,6 @@ H{
     { deploy-word-props? f }
     { deploy-c-types? f }
     { deploy-help? f }
-    { deploy-name "findus.wipe" }
+    { deploy-name "wipe" }
     { deploy-unicode? f }
 }
