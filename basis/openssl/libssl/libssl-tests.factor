@@ -41,7 +41,7 @@ maybe-init-ssl
         new-tls-ctx tls-opts [ [ set-opt ] [ has-opt ] 2bi ] with map
         [ t = ] count
     ] with-destructors
-    ssl-new-api? get-global 0 3 ? =
+    ssl-new-api? get-global 0 4 ? =
 ] unit-test
 
 ! Initial state
