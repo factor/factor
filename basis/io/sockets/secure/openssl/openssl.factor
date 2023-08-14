@@ -8,7 +8,7 @@ io.encodings.string io.encodings.utf8 io.files io.pathnames
 io.ports io.sockets io.sockets.secure io.timeouts kernel libc
 math math.functions math.order math.parser namespaces openssl
 openssl.libcrypto openssl.libssl random sequences sets splitting
-unicode ;
+system unicode ;
 IN: io.sockets.secure.openssl
 
 GENERIC: ssl-method ( symbol -- method )
@@ -206,7 +206,7 @@ M: openssl <secure-context>
             [ set-verify-depth ]
             [ load-dh-params ]
             [ set-ecdh-params ]
-            [ ignore-unexpected-eof ]
+            [ os macosx? [ drop ] [ ignore-unexpected-eof ] if ]
             [ ]
         } cleave
     ] with-destructors ;
