@@ -1,4 +1,4 @@
-! Copyright (C) 2017-2019 Alexander Ilin.
+! Copyright (C) 2017-2019, 2023 Alexander Ilin.
 ! See https://factorcode.org/license.txt for BSD license.
 USING: accessors
 io io.directories io.encodings.binary io.files io.files.info
