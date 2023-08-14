@@ -7,9 +7,9 @@ HELP: overwrite-with-random-bytes
 { $values { "file-name" "a filename string" } }
 { $description "Overwite the " { $snippet "file-name" } " contents with random data. The slack space at the end is not overwritten." } ;
 
-ABOUT: "wipe"
+ABOUT: "Wipe"
 
-ARTICLE: "wipe" "wipe"
+ARTICLE: "Wipe" "Wipe"
 "The " { $vocab-link "wipe" } " vocab provides some words for securely erasing (wiping) individual files, entire folders or the free space on a drive:"
 { $subsections wipe wipe-all wipe-file wipe-free-space }
 ;
