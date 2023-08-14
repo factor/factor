@@ -97,6 +97,8 @@ FIELD: U 1
 FIELD: Z 1
 
 FIELD: sf 1
+FIELD: ftype 2
+FIELD: rmode 2
 
 FIELD: size1 1
 FIELD: size2 2
@@ -261,6 +263,30 @@ SINGLETONS: SPSR_EL1 SPSR_EL2 SPSR_EL3 ;
 : AL ( -- n ) 0b1110 ; inline ! always
 : NV ( -- n ) 0b1111 ; inline ! always
 
+! Arrangement specifiers
+
+: 8B ( -- size Q ) 0 0 ; inline
+: 16B ( -- size Q ) 0 1 ; inline
+: 4H ( -- size Q ) 1 0 ; inline
+: 8H ( -- size Q ) 1 1 ; inline
+: 2S ( -- size Q ) 2 0 ; inline
+: 4S ( -- size Q ) 2 1 ; inline
+: 2D ( -- size Q ) 3 1 ; inline
+
+! FMOVgen variants
+
+: HW ( -- sf ftype rmode opcode ) 0 3 0 6 ; inline
+: HX ( -- sf ftype rmode opcode ) 1 3 0 6 ; inline
+: WH ( -- sf ftype rmode opcode ) 0 3 0 7 ; inline
+: WS ( -- sf ftype rmode opcode ) 0 0 0 7 ; inline
+: SW ( -- sf ftype rmode opcode ) 0 0 0 6 ; inline
+: XH ( -- sf ftype rmode opcode ) 1 3 0 7 ; inline
+: XD ( -- sf ftype rmode opcode ) 1 1 0 7 ; inline
+: XD[1] ( -- sf ftype rmode opcode ) 1 2 0 7 ; inline
+: DX ( -- sf ftype rmode opcode ) 1 1 0 6 ; inline
+: D[1]X ( -- sf ftype rmode opcode ) 1 2 0 6 ; inline
+
+
 ERROR: no-field-word vocab name ;
 
 TUPLE: integer-literal value width ;
@@ -338,6 +364,9 @@ ARM-INSTRUCTION: ADDSi64-encode ( 1 0 1 10001 shift2 imm12 Rn Rd -- )
 ! ADDS (shifted register): Add (shifted register), setting flags.
 ARM-INSTRUCTION: ADDSsr32-encode ( 0 0 1 01011 shift2 0 Rm imm6 Rn Rd -- )
 ARM-INSTRUCTION: ADDSsr64-encode ( 1 0 1 01011 shift2 0 Rm imm6 Rn Rd -- )
+
+! ADDV: Add across Vector.
+ARM-INSTRUCTION: ADDV-encode ( 0 Q 0 01110 size2 11000 11011 10 Rn Rd -- )
 
 ! ADR: Form PC-relative address.
 ! ADRP: Form PC-relative address to 4KB page.
@@ -431,6 +460,7 @@ ARM-INSTRUCTION: BIC64-encode ( 1 00 01010 shift2 1 Rm imm6 Rn Rd -- )
 ! BICS (shifted register): Bitwise Bit Clear (shifted register), setting flags.
 ARM-INSTRUCTION: BICS32-encode ( 0 11 01010 shift2 1 Rm imm6 Rn Rd -- )
 ARM-INSTRUCTION: BICS64-encode ( 1 11 01010 shift2 1 Rm imm6 Rn Rd -- )
+
 ! BL: Branch with Link.
 ARM-INSTRUCTION: BL-encode ( 1 00101 imm26 -- )
 ! BLR: Branch with Link to Register.
@@ -453,6 +483,7 @@ ARM-INSTRUCTION: BRABZ-encode ( 1101011 1 0 00 11111 0000 1 1 Rn Rm -- )
 
 ! BRK: Breakpoint instruction.
 ARM-INSTRUCTION: BRK-encode ( 11010100 001 imm16 000 00 -- )
+
 ! BTI: Branch Target Identification.
 ARM-INSTRUCTION: BTI-encode ( 1101010100 0 00 011 0010 0100 000 11111 -- )
 
@@ -511,16 +542,21 @@ ARM-INSTRUCTION: CCMPr64-encode ( 1 1 1 11010010 Rm cond4 0 0 Rn 0 nzcv -- )
 
 ! CFINV: Invert Carry Flag.
 ARM-INSTRUCTION: CFINV-encode ( 1101010100 0 0 0 000 0100 0000 000 11111 -- )
+
 ! CFP: Control Flow Prediction Restriction by Context: an alias of SYS.
 ARM-INSTRUCTION: CFP-encode ( 1101010100 0 01 011 0111 0011 100 Rt -- )
+
 ! CINC: Conditional Increment: an alias of CSINC.
 ARM-INSTRUCTION: CINC32-encode ( 0 0 0 11010100 Rm cond4 0 1 Rn Rd -- )
 ARM-INSTRUCTION: CINC64-encode ( 1 0 0 11010100 Rm cond4 0 1 Rn Rd -- )
+
 ! CINV: Conditional Invert: an alias of CSINV.
 ARM-INSTRUCTION: CINV32-encode ( 0 0 0 11010100 Rm cond4 0 0 Rn Rd -- )
 ARM-INSTRUCTION: CINV64-encode ( 1 0 0 11010100 Rm cond4 0 0 Rn Rd -- )
+
 ! CLREX: Clear Exclusive.
 ARM-INSTRUCTION: CLREX-encode ( 1101010100 0 00 011 0011 CRm 010 11111 -- )
+
 ! CLS: Count Leading Sign bits.
 ARM-INSTRUCTION: CLS32-encode ( 0 1 0 11010110 00000 00010 1 Rn Rd -- )
 ARM-INSTRUCTION: CLS64-encode ( 1 1 0 11010110 00000 00010 1 Rn Rd -- )
@@ -550,9 +586,14 @@ ARM-INSTRUCTION: CMPsr64-encode ( 1 1 1 01011 shift2 0 Rm imm6 Rn Rd -- )
 
 ! CMPP: Compare with Tag: an alias of SUBPS.
 ARM-INSTRUCTION: CMPP-encode ( 1 0 1 11010110 Xm 0 0 0 0 0 0 Xn Xd -- )
+
 ! CNEG: Conditional Negate: an alias of CSNEG.
 ARM-INSTRUCTION: CNEG32-encode ( 0 1 0 11010100 Rm cond4 0 1 Rn Rd -- )
 ARM-INSTRUCTION: CNEG64-encode ( 1 1 0 11010100 Rm cond4 0 1 Rn Rd -- )
+
+! CNT: Population Count per byte.
+ARM-INSTRUCTION: CNT-encode ( 0 Q 0 01110 size2 10000 00101 10 Rn Rd -- )
+
 ! CPP: Cache Prefetch Prediction Restriction by Context: an alias of SYS.
 ARM-INSTRUCTION: CPP-encode ( 1101010100 0 01 011 0111 0011 111 Rt -- )
 
@@ -602,6 +643,7 @@ ARM-INSTRUCTION: CSNEG64-encode ( 1 1 0 11010100 Rm cond4 0 1 Rn Rd -- )
 
 ! DC: Data Cache operation: an alias of SYS.
 ARM-INSTRUCTION: DC-encode ( 1101010100 0 01 op3 0111 CRm op3 Rt -- )
+
 ! DCPS1: Debug Change PE State to EL1..
 ARM-INSTRUCTION: DCPS1-encode ( 11010100 101 imm16 000 01 -- )
 ! DCPS2: Debug Change PE State to EL2..
@@ -611,10 +653,16 @@ ARM-INSTRUCTION: DCPS3-encode ( 11010100 101 imm16 000 11 -- )
 
 ! DMB: Data Memory Barrier.
 ARM-INSTRUCTION: DMB-encode ( 1101010100 0 00 011 0011 CRm 1 01 11111 -- )
+
 ! DRPS: Debug restore process state.
 ARM-INSTRUCTION: DPRS-encode ( 1101011 0101 11111 000000 11111 00000 -- )
+
 ! DSB: Data Synchronization Barrier.
 ARM-INSTRUCTION: DSB-encode ( 1101010100 0 00 011 0011 CRm 1 00 11111 -- )
+
+! DUP (general): Duplicate general-purpose register to vector.
+ARM-INSTRUCTION: DUPgen-encode ( 0 Q 0 01110000 imm5 0 0001 1 Rn Rd -- )
+
 ! DVP: Data Value Prediction Restriction by Context: an alias of SYS.
 ARM-INSTRUCTION: DVP-encode ( 1101010100 0 01 011 0111 0011 101 Rt -- )
 
@@ -641,23 +689,59 @@ ARM-INSTRUCTION: ERETAB-encode ( 1101011 0 100 11111 0000 1 1 11111 11111 -- )
 ! ESB: Error Synchronization Barrier.
 ! ARMv8.2
 ARM-INSTRUCTION: ESB-encode ( 1101010100 0 00 011 0010 0010 000 11111 -- )
+
 ! EXTR: Extract register.
 ARM-INSTRUCTION: EXTR32-encode ( 0 00 100111 0 0 Rm imms Rn Rd -- )
 ARM-INSTRUCTION: EXTR64-encode ( 1 00 100111 1 0 Rm imms Rn Rd -- )
 
+! FADD (scalar): Floating-point Add (scalar).
+ARM-INSTRUCTION: FADDs-encode ( 0 0 0 11110 ftype 1 Rm 001 0 10 Rn Rd -- )
+
+! FCVT: Floating-point Convert percision (scalar).
+ARM-INSTRUCTION: FCVT-encode ( 0 0 0 11110 ftype 1 0001 opc2 10000 Rn Rd -- )
+
+! FCVTZS (scalar, integer): Floating-point Convert to Signed integer, rounding toward Zero (scalar).
+ARM-INSTRUCTION: FCVTZSsi64-encode ( 1 0 0 11110 ftype 1 11 000 000000 Rn Rd -- )
+
+! FDIV (scalar): Floating-point Divide (scalar).
+ARM-INSTRUCTION: FDIVs-encode ( 0 0 0 11110 ftype 1 Rm 0001 10 Rn Rd -- )
+
+! FMAX (scalar): Floating-point Maximum (scalar).
+ARM-INSTRUCTION: FMAXs-encode ( 0 0 0 11110 ftype 1 Rm 01 00 10 Rn Rd -- )
+
+! FMIN (scalar): Floating-point Minimum (scalar).
+ARM-INSTRUCTION: FMINs-encode ( 0 0 0 11110 ftype 1 Rm 01 01 10 Rn Rd -- )
+
+! FMOV (general): Floating-point Move to or from general-purpose register without conversion.
+ARM-INSTRUCTION: FMOVgen-encode ( sf 0 0 11110 ftype 1 rmode opc3 000000 Rn Rd -- )
+
+! FMUL (scalar): Floating-point Multiply (scalar).
+ARM-INSTRUCTION: FMULs-encode ( 0 0 0 11110 ftype 1 Rm 0 000 10 Rn Rd -- )
+
+! FSQRT (scalar): Floating-point Square Root (scalar).
+ARM-INSTRUCTION: FSQRTs-encode ( 0 0 0 11110 ftype 1 0000 11 10000 Rn Rd -- )
+
+! FSUB (scalar): Floating-point Subtract (scalar).
+ARM-INSTRUCTION: FSUBs-encode ( 0 0 0 11110 ftype 1 Rm 001 1 10 Rn Rd -- )
+
 ! GMI: Tag Mask Insert.
 ARM-INSTRUCTION: GMI-encode ( 1 0 0 11010110 Xm 0 0 0 1 0 1 Xn Xd -- )
+
 ! HINT: Hint instruction.
 ARM-INSTRUCTION: HINT-encode ( 1101010100 0 00 011 0010 CRm op3 11111 -- )
+
 ! HLT: Halt instruction.
 ARM-INSTRUCTION: HLT-encode ( 11010100 010 imm16 000 00 -- )
 
 ! HVC: Hypervisor Call.
 ARM-INSTRUCTION: HVC-encode ( 11010100 000 imm16 000 10 -- )
+
 ! IC: Instruction Cache operation: an alias of SYS.
 ARM-INSTRUCTION: IC-encode ( 1101010100 0 01 op3 0111 CRm op3 Rt -- )
+
 ! IRG: Insert Random Tag.
 ARM-INSTRUCTION: IRG-encode ( 1 0 0 11010110 Xm 0 0 0 1 0 0 Xn Xd -- )
+
 ! ISB: Instruction Synchronization Barrier.
 ARM-INSTRUCTION: ISB-encode ( 1101010100 0 00 011 0011 CRm 1 10 11111 -- )
 
@@ -773,9 +857,9 @@ ARM-INSTRUCTION: LDEORLH-encode  ( 01 111 0 00 0 1 1 Rs 0 010 00 Rn Rt -- )
 ! LDG: Load Allocation Tag.
 ! ARMv8.5
 ARM-INSTRUCTION: LDG-encode ( 11011001 0 1 1 imm9 0 0 Xn Xt -- )
-! LDGV: Load Allocation Tag.
+! LDGV: Load Tag Multiple.
 ! ARMv8.5
-ARM-INSTRUCTION: LDGV-encode ( 11011001 1 1 1 0 0 0 0 0 0 0 0 0 0 0 Xn Xt -- )
+ARM-INSTRUCTION: LDGM-encode ( 11011001 1 1 1 0 0 0 0 0 0 0 0 0 0 0 Xn Xt -- )
 
 ! LDLAR: Load LOAcquire Register.
 ! ARMv8.1
@@ -1287,6 +1371,9 @@ ARM-INSTRUCTION: SBFM64-encode ( 1 00 100110 1 immr imms Rn Rd -- )
 ! SBFX: Signed Bitfield Extract: an alias of SBFM.
 ARM-INSTRUCTION: SBFX32-encode ( 0 00 100110 0 immr imms Rn Rd -- )
 ARM-INSTRUCTION: SBFX64-encode ( 1 00 100110 1 immr imms Rn Rd -- )
+
+! SCVTF (scalar, integer): Signed integer Convert to Floting-point (scalar).
+ARM-INSTRUCTION: SCVTFsi64-encode ( 1 0 0 11110 ftype 1 00 010 000000 Rn Rd -- )
 
 ! SDIV: Signed Divide.
 ARM-INSTRUCTION: SDIV32-encode ( 0 0 0 11010110 Rm 00001 1 Rn Rd -- )
