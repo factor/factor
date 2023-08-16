@@ -510,3 +510,6 @@ strings tools.test ;
 { { { 1 1 } { 2 2 } { f 3 } { f 4 } { f 5 } } } [
     { 1 2 } { 1 2 3 4 5 } zip-longest
 ] unit-test
+
+{ "34_01_" } [ 2 0 3 "01_34_" [ exchange-subseq ] keep ] unit-test
+{ "cdebaf" } [ 3 0 2 "abcdef" [ exchange-subseq ] keep ] unit-test

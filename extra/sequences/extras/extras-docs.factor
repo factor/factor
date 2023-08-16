@@ -1370,3 +1370,30 @@ HELP: with-string-lines
     { "str" string } { "quot" quotation }
     { "str'" string }
 } ;
+
+HELP: exchange-subseq
+{ $values
+    { "len" { "a non-negative " { $link integer } } }
+    { "pos1" { "a non-negative " { $link integer } } }
+    { "pos2" { "a non-negative " { $link integer } } }
+    { "seq" { "a mutable " { $link sequence } } }
+}
+{ $description "Exchanges the contents of subsequences "
+{ $snippet "[pos1, pos1+len)" } " and " { $snippet "[pos2, pos2+len)" } " in "
+{ $snippet "seq" } ". Overlapping ranges are allowed. If either of the ranges exceeds the "
+{ $snippet "seq" } " length, throws an error before any modifications take place. If "
+{ $snippet "len" } " = 1, the behavior is equivalent to " { $link exchange } "." }
+{ $examples
+    "Non-overlapping ranges:"
+    { $example "USING: kernel sequences.extras prettyprint ;"
+        "2 0 3 \"01_34_\" [ exchange-subseq ] keep ."
+        "\"34_01_\""
+    }
+    "Overlapping ranges:"
+    { $example "USING: kernel sequences.extras prettyprint ;"
+        "3 0 2 \"abcdef\" [ exchange-subseq ] keep ."
+        "\"cdebaf\""
+    }
+}
+{ $side-effects "seq" }
+{ $see-also exchange } ;
