@@ -1199,7 +1199,7 @@ INSTANCE: virtual-zip-index immutable-sequence
     '[ [ [ _ nth-unsafe @ ] [ _ set-nth-unsafe ] bi ] each-integer _ ] call ; inline
 
 : exchange-subseq ( len pos1 pos2 seq -- )
-    [ 3dup max + 1 - ] dip bounds-check nip '[
+    [ [ assert-non-negative ] tri@ 3dup max + 1 - ] dip bounds-check nip '[
         2dup _ exchange-unsafe
         [ 1 - ] [ 1 + ] [ 1 + ] tri*
     ] [ pick 0 > ] swap while 3drop ;
