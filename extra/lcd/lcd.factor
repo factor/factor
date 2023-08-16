@@ -6,10 +6,10 @@ IN: lcd
 
 : lcd-digit ( digit row -- str )
     [ dup CHAR: : = [ drop 10 ] [ CHAR: 0 - ] if ] dip {
-        "  _       _  _       _   _   _   _   _      "
-        " | |  |   _| _| |_| |_  |_    | |_| |_|  *  "
-        " |_|  |  |_  _|   |  _| |_|   | |_|   |  *  "
-        "                                            "
+        "  _       _   _       _   _   _   _   _      "
+        " | |   |  _|  _| |_| |_  |_    | |_| |_|  *  "
+        " |_|   | |_   _|   |  _| |_|   | |_|   |  *  "
+        "                                             "
     } nth 4 <groups> nth ;
 
 : lcd-row ( row digit -- string )
