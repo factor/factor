@@ -16,7 +16,7 @@ IN: lcd
     '[ _ lcd-digit ] { } map-as concat ;
 
 : lcd ( digit-str -- string )
-    4 <iota> [ lcd-row ] with map join-lines ;
+    4 <iota> [ lcd-row ] with map join-lines " " append ;
 
 TUPLE: time-display < label timer ;
 
