@@ -1,9 +1,9 @@
 ! Copyright (C) 2017 Doug Coleman.
 ! See https://factorcode.org/license.txt for BSD license.
-USING: accessors arrays concurrency.combinators
-concurrency.semaphores io io.directories io.encodings.utf8
-io.files.info io.launcher io.pathnames kernel math namespaces
-sequences splitting system-info unicode ;
+USING: accessors arrays combinators.short-circuit
+concurrency.combinators concurrency.semaphores io io.directories
+io.encodings.utf8 io.files.info io.launcher io.pathnames kernel
+math namespaces sequences splitting system-info unicode ;
 IN: cli.git
 
 SYMBOL: cli-git-num-parallel
@@ -12,8 +12,12 @@ cli-git-num-parallel [ cpus 2 * ] initialize
 : git-command>string ( desc -- string )
     utf8 <process-reader> stream-contents [ blank? ] trim-tail ;
 
+: git-clone-bare-as ( uri path -- process ) [ { "git" "clone" "--bare" } ] 2dip 2array append run-process ;
+: git-clone-bare ( uri -- process ) [ { "git" "clone" "--bare" } ] dip suffix run-process ;
 : git-clone-as ( uri path -- process ) [ { "git" "clone" } ] 2dip 2array append run-process ;
 : git-clone ( uri -- process ) [ { "git" "clone" } ] dip suffix run-process ;
+: git-worktree-add ( path branch -- process ) '{ "git" "worktree" "add" _ _ } run-process ;
+: git-worktree-force-add ( path branch -- process ) '{ "git" "worktree" "add" "-f" _ _ } run-process ;
 : git-pull* ( -- process ) { "git" "pull" } run-process ;
 : git-pull ( path -- process ) [ git-pull* ] with-directory ;
 : git-fetch-all-desc ( -- process ) { "git" "fetch" "--all" } ;
@@ -57,6 +61,26 @@ cli-git-num-parallel [ cpus 2 * ] initialize
 
 : git-directory-name ( string -- string' )
     file-name ".git" ?tail drop ;
+
+: git-is-bare-repository* ( -- ? )
+    { "git" "rev-parse" "--is-bare-repository" } git-command>string "true" = ;
+
+: git-is-bare-repository ( path -- ? )
+    '[ git-is-bare-repository* ] with-directory ;
+
+: git-bare-directory? ( directory -- ? )
+    {
+        [ ?file-info [ directory? ] [ f ] if* ]
+        [ git-is-bare-repository ]
+    } 1&& ;
+
+: sync-bare-repository ( url -- process )
+    dup git-directory-name git-bare-directory?
+    [ git-directory-name git-fetch-all ] [ git-clone-bare ] if ;
+
+: sync-bare-repository-as ( url path -- processes )
+    dup git-bare-directory?
+    [ nip git-fetch-all ] [ git-clone-bare-as ] if ;
 
 : sync-repository ( url -- process )
     dup git-directory-name git-directory?
