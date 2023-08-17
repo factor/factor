@@ -13,47 +13,42 @@ DEFER: HELP{
 
 <PRIVATE
 
-:: parse-help-token ( end -- str/obj/f )
+:: parse-help-token ( end -- str/obj/f literal? )
     ?scan-token dup {
         [ "{" = [ \ HELP{ ] [ f ] if ]
         [ "syntax" lookup-word ]
         [ { [ "$" head? ] [ "help.markup" lookup-word ] } 1&& ]
         [ dup ?last ":{[(/\"" member-eq? [ search ] [ drop f ] if ]
     } 1|| {
-        { [ dup not ] [ drop ] }
-        { [ dup end eq? ] [ 2drop f ] }
+        { [ dup not ] [ drop f ] }
+        { [ dup end eq? ] [ 2drop f f ] }
         { [ dup parsing-word? ] [
-            nip V{ } clone swap execute-parsing first
-            dup wrapper? [ wrapped>> \ $link swap 2array ] when ] }
-        { [ dup ] [ nip ] }
+            [
+                nip V{ } clone swap execute-parsing first
+                dup wrapper? [ wrapped>> \ $link swap 2array ] when
+            ] keep \ " = ] }
+        { [ dup ] [ nip f ] }
     } cond ;
 
 : push-help-text ( accum sbuf obj -- accum sbuf' )
     [ dup empty? [ >string suffix! SBUF" " clone ] unless ]
     [ [ suffix! ] curry dip ] bi* ;
 
-: help-block? ( word -- ? )
-    {
-        $description $heading $subheading $syntax
-        $class-description $error-description $var-description
-        $contract $notes $curious $deprecated $errors
-        $side-effects $content $warning $subsections $nl
-        $list $table $example $unchecked-example $code
-    } member-eq? ;
-
-: push-help-space ( accum sbuf -- accum sbuf )
-    dup empty? [
-        over empty? not
-        pick ?last dup array? [ ?first ] when
-        help-block? not and
+: ?push-help-space ( accum sbuf obj -- accum sbuf' obj )
+    over empty? [
+        pick [ f ] [
+            last [ string? not ] [ \ $nl = not ] bi and
+        ] if-empty
     ] [
         dup last " (" member? not
-    ] if [ CHAR: \s suffix! ] when ;
+    ] if
+    over string? [ over ?first " .,;:)" member? not and ] when
+    [ [ CHAR: \s suffix! ] dip ] when ;
 
 :: parse-help-text ( end -- seq )
     V{ } clone SBUF" " clone [
         lexer get line>> :> m
-        end parse-help-token :> obj
+        end parse-help-token :> ( obj literal? )
         lexer get line>> :> n
 
         obj string? n m - 1 > and [
@@ -63,14 +58,9 @@ DEFER: HELP{
 
         obj [
             [
-                dup string? [
-                    dup ?first " .,;:)" member? [
-                        [ push-help-space ] dip
-                    ] unless append!
-                ] [
-                    [ push-help-space ]
-                    [ push-help-text ] bi*
-                ] if
+                literal? [ ?push-help-space ] unless
+                dup string? not literal? or
+                [ push-help-text ] [ append! ] if
             ] when*
         ] keep
     ] loop [ >string suffix! ] unless-empty >array ; inline

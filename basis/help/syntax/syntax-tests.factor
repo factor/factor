@@ -1,4 +1,4 @@
-USING: accessors eval help.markup help.syntax kernel parser
+USING: accessors eval help.markup help.syntax kernel math parser
 tools.test vocabs ;
 
 [
@@ -57,4 +57,12 @@ tools.test vocabs ;
     that
 
     the other }
+] unit-test
+
+{ { $description "the " { $link + } "'s " "are awesome" } } [
+    HELP{ $description the \ + "'s " are awesome }
+] unit-test
+
+{ { $description "the " { $link + } "'s " "are awesome" } } [
+    HELP{ $description "the " \ + "'s " are awesome }
 ] unit-test
