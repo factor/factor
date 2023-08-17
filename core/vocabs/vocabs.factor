@@ -23,7 +23,7 @@ ERROR: bad-vocab-name name ;
 
 : check-vocab-name ( name -- name )
     dup string? [ bad-vocab-name ] unless
-    dup [ ":/\\ " member? ] any? [ bad-vocab-name ] when ;
+    dup [ ":/\\ \"" member? ] any? [ bad-vocab-name ] when ;
 
 TUPLE: vocab-link name ;
 
