@@ -12,12 +12,16 @@ M: object dll-list { } ;
 
 ! Sqlite win64: https://synopse.info/files/SQLite3-64.7z
 M: windows dll-list
-    {
-        "resource:libcrypto-37.dll"
-        "resource:libssl-38.dll"
+    cpu x86.64 = {
+        "resource:libcrypto-3-x64.dll"
+        "resource:libssl-3-x64.dll"
+    } {
+        "resource:libcrypto-3.dll"
+        "resource:libssl-3.dll"
+    } ? {
         "resource:libtls-10.dll"
         "resource:sqlite3.dll"
-    } ;
+    } append ;
 
 : copy-dlls ( -- )
     dll-list [
