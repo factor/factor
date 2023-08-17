@@ -14,7 +14,7 @@ ARTICLE: "xml.data" "XML data types"
     names-match?
     assure-name
 }
-"For high-level tools for manipulating XML, see " { $vocab-link "xml.traversal" } ;
+"For high-level tools for manipulating XML, see " { $vocab-link "xml.traversal" } "." ;
 
 ARTICLE: { "xml.data" "classes" } "XML data classes"
 "XML documents and chunks are made of the following classes:"
@@ -122,8 +122,8 @@ HELP: xml
     { { $slot "after" } "whatever comes after the main tag" } } } ;
 
 HELP: <xml>
-{ $values { "prolog" "an XML " { $link prolog } } { "before" "a sequence of XML elements" }
-{ "body" tag } { "after" "a sequence of XML elements" } { "xml" "an XML document" } }
+{ $values { "prolog" "an XML " { $link prolog } } { "before" { $sequence "XML elements" } }
+{ "body" tag } { "after" { $sequence "XML elements" } } { "xml" "an XML document" } }
 { $description "Creates an XML document. The " { $slot "before" } " and "
 { $slot "after" } " slots store what comes before and after the main tag, and "
 { $slot "body" } " contains the main tag itself." } ;
@@ -275,7 +275,7 @@ HELP: <doctype-decl>
 
 HELP: unescaped
 { $class-description "When constructing XML documents to write to output, it can be useful to splice in a string which is already written. This tuple type allows for that. Printing an "
-{ $snippet "unescaped" } " is the same is printing its " { $slot "string" }
+{ $snippet "unescaped" } " is the same as printing its " { $slot "string" }
 " slot." } ;
 
 HELP: <unescaped>
