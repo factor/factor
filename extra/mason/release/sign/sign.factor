@@ -21,8 +21,6 @@ HOOK: cert-path os ( -- path/f )
 M: object cert-path f ;
 
 M: macosx cert-path home "config/mac_app.cer" append-path ;
-
-M: windows cert-path home "config/FactorSPC.pfx" append-path ;
 >>
 
 HOOK: sign-factor-app os ( -- )
@@ -48,14 +46,14 @@ M: macosx sign-factor-app
     ] each ;
 
 M:: windows sign-factor-app ( -- )
-    { "factor.com" "factor.exe" } [
+    { "factor.com" "factor.exe" "factor.dll" } [
         ${
             "signtool" "sign"
-            "/fd" "SHA256"
             "/v"
-            "/f" cert-path
-            "/tr" "http://time.certum.pl"
+            "/tr" "http://timestamp.digicert.com"
             "/td" "SHA256"
+            "/fd" "SHA256"
+            "/a"
         } swap make-factor-path suffix short-running-process
     ] each ;
 
