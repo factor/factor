@@ -40,7 +40,7 @@ DEFER: HELP{
             last [ string? not ] [ \ $nl = not ] bi and
         ] if-empty
     ] [
-        dup last " (" member? not
+        over last " (" member? not
     ] if
     over string? [ over ?first " .,;:)" member? not and ] when
     [ [ CHAR: \s suffix! ] dip ] when ;

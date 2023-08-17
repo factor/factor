@@ -66,3 +66,7 @@ tools.test vocabs ;
 { { $description "the " { $link + } "'s " "are awesome" } } [
     HELP{ $description "the " \ + "'s " are awesome }
 ] unit-test
+
+{ { $description "this and " { $link + } ", and that" } } [
+    HELP{ $description this and { $link + } , and that }
+] unit-test
