@@ -46,7 +46,12 @@ M: macosx sign-factor-app
     ] each ;
 
 M:: windows sign-factor-app ( -- )
-    { "factor.com" "factor.exe" "factor.dll" } [
+    {
+        "factor.com"
+        "factor.exe"
+        "factor.dll"
+        "libfactor-ffi-test.dll"
+    } [
         ${
             "signtool" "sign"
             "/v"
