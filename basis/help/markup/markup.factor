@@ -96,7 +96,7 @@ M: f print-element drop ;
     [
         last-element off
         [ ($code-style) ] dip with-nesting
-    ] ($block) ($blank-line) ; inline
+    ] ($block) ; inline
 
 : $code ( element -- )
     join-lines dup <input> [ write ] ($code) ;
