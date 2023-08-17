@@ -85,6 +85,7 @@ HELP: handle-ctrl-break
 { $description "If this variable is " { $link t } ", the listener will wrap the user code with calls to " { $link enable-ctrl-break } " and " { $link disable-ctrl-break } " to make it interruptible with C-Break. This includes both compilation and execution phases, so circular vocab import can be interrupted as well as infinite loops."
 $nl
 "This only works on Windows, and has no effect on other platforms."
+{ $warning "There were reports that after enabling this feature the Factor process may hang randomly, see " { $url "https://github.com/factor/factor/issues/2037" } "." }
 { $warning "If user code " { $link yield } "s or gets stuck on an asynchronous I/O operation, pressing C-Break will most likely crash the Factor VM." } } ;
 
 ABOUT: "listener"
