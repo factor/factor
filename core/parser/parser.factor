@@ -72,8 +72,7 @@ ERROR: number-expected ;
 ERROR: invalid-word-name string ;
 
 : check-word-name ( string -- string )
-    CHAR: " over index
-    [ t ] [ dup string>number ] if
+    dup "\"" = [ t ] [ dup string>number ] if
     [ invalid-word-name ] when ;
 
 : scan-word-name ( -- string )
