@@ -34,10 +34,20 @@ DEFER: HELP{
     [ dup empty? [ >string suffix! SBUF" " clone ] unless ]
     [ [ suffix! ] curry dip ] bi* ;
 
+ 
+: help-block? ( word -- ? )
+    {
+        $description $heading $subheading $syntax
+        $class-description $error-description $var-description
+        $contract $notes $curious $deprecated $errors
+        $side-effects $content $warning $subsections $nl
+        $list $table $example $unchecked-example $code
+    } member-eq? ;
+
 : ?push-help-space ( accum sbuf obj -- accum sbuf' obj )
     over empty? [
         pick [ f ] [
-            last [ string? not ] [ \ $nl = not ] bi and
+            last dup array? [ ?first ] when help-block? not
         ] if-empty
     ] [
         over last " (" member? not
