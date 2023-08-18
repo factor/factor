@@ -2,7 +2,7 @@
 ! See https://factorcode.org/license.txt for BSD license.
 USING: accessors continuations debugger http.client io
 io.encodings.utf8 io.files kernel make mason.common mason.config
-mason.email mason.twitter namespaces sequences ;
+mason.email namespaces sequences ;
 IN: mason.notify
 
 : status-notify? ( -- ? )
@@ -70,6 +70,5 @@ IN: mason.notify
     f f "finish" status-notify ;
 
 : notify-release ( archive-name -- )
-    [ "Uploaded " prepend [ print-timestamp ] [ mason-tweet ] bi ]
-    [ f swap "release" status-notify ]
-    bi ;
+    [ "Uploaded " prepend print-timestamp ]
+    [ f swap "release" status-notify ] bi ;
