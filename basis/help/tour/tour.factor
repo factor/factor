@@ -93,7 +93,7 @@ and in familiar infix notation
 Also notice that we have been able to split our computation onto many lines or combine it onto fewer lines rather arbitrarily, and that each line made sense in itself.
 ;
 
-ARTICLE: "tour-first-word" "Defining our first word" 
+ARTICLE: "tour-first-word" "Defining our first word"
 
 We will now define our first function. Factor has slightly odd naming of functions: since functions are read from left 
 to right, they are simply called { $strong "words" } , and this is what we'll call them from now on. Modules in Factor define 
@@ -181,7 +181,7 @@ Our definitions have become simpler and there was no need to pass parameters, re
 else that would have been necessary to refactor our function in most languages.
 
 Of course, Factor already has a word for calculating factorial (there is a whole { $vocab-link "math.factorials" }  
-vocabulary, including many variants of the usual factorial) and a word for calculating product "(" { $link product }  in the 
+vocabulary, including many variants of the usual factorial) and a word for calculating product " (" { $link product }  in the 
 { $vocab-link "sequences" }  vocabulary), but as it often happens, introductory examples overlap with the standard library.
 ;
 
@@ -358,7 +358,7 @@ Generate a template for a vocabulary writing
 \"github.tutorial\" scaffold-work" }
 
 You will find a file { $snippet "work/github/tutorial/tutorial.factor" } containing an empty vocabulary. Factor integrates with 
-many editors, so you can try { $snippet "\"github.tutorial\" edit" } ":" this will prompt you to choose your favourite editor, and use that 
+many editors, so you can try { $snippet "\"github.tutorial\" edit" } ": " this will prompt you to choose your favourite editor, and use that 
 editor to open the newly created vocabulary.
 
 You can add the definitions of the previous paragraph, so that it looks like
@@ -566,7 +566,7 @@ C: <movie> movie
 
 In other cases, you may want to use some defaults, or compute some fields.
 
-The functional minded will be worried about the mutability of tuples. Actually, slots can be declared to be "read-only" 
+The functional minded will be worried about the mutability of tuples. Actually, slots can be declared to be " read-only "
 with { $snippet "{ slot-name read-only } " } . In this case, the field setter will not be generated, and the value must be set a the 
 beginning with a boa constructor. Other valid slot modifiers are { $link POSTPONE: initial: } - to declare a default value - and a class word
 , such as { $snippet "integer" } , to restrict the values that can be inserted.
@@ -707,7 +707,7 @@ DEFER: fib-rec
 : fib-rec ( n -- f(n) ) [ 1 - fib ] [ 2 - fib ] bi + ;
 " }
 
-(notice the use of { $link POSTPONE: DEFER: } to define two mutually "recursive" words). You can benchmark the running time writing { $snippet "40 fib" }  
+(notice the use of { $link POSTPONE: DEFER: } to define two mutually " recursive " words). You can benchmark the running time writing { $snippet "40 fib" }  
 and then pressing Ctrl+t instead of Enter. You will get timing information, as well as other statistics. Programmatically
 , you can use the { $link time } word on a quotation to do the same.
 
@@ -775,7 +775,7 @@ can encode each with two bits. Let use define a word that operates on characters
 where the first bit represents whether the basis is a purine or a pyrimidine, and the second one identifies bases that 
 pair together.
 
-Our aim is to read a sequence of letters a, c, g, "t" - possibly with spaces - and convert them to a bit array. Factor 
+Our aim is to read a sequence of letters a, c, g, " t " - possibly with spaces - and convert them to a bit array. Factor 
 supports bit arrays, and literal bit arrays look like { $snippet "?{ f f t }" } .
 
 Our syntax for DNA will start with { $snippet "DNA{" } and get all tokens until the closing token { $snippet "}" } is found. The intermediate 
@@ -799,7 +799,7 @@ SYNTAX: DNA{ \"}\" parse-tokens concat
 
 Notice the use of { $link map-as } instead of { $link map } . Since the target collection is not a string, we did not use { $link map } , which 
 preserves the type, but { $link map-as } , which take as an additional argument an examplar of the target collection - here { $snippet "{ }" } .
-Our "final" version flattens the array of pairs with { $link concat } and finally makes into a bit array:
+Our " final " version flattens the array of pairs with { $link concat } and finally makes into a bit array:
 
 { $code "
 SYNTAX: DNA{ \"}\" parse-tokens concat
@@ -895,7 +895,7 @@ Using { $link with }  instead of { $link curry } , this simplifies to
 : prime? ( n -- ? )
     2 over sqrt [a,b] [ divisor? ] with any? not ;" }
 
-If you are not able to visualize what is happening, you may want to consider the { $vocab-link "fry" } vocabulary. It defines { $strong "fried quotations" } ";" 
+If you are not able to visualize what is happening, you may want to consider the { $vocab-link "fry" } vocabulary. It defines { $strong "fried quotations" } "; "
 these are quotations that have holes in them - marked by { $snippet "_" } - that are filled with values from the stack.
 
 The first quotation is rewritten more simply as
@@ -1002,7 +1002,7 @@ Using the helper word { $link with-file-reader } , we can also shorten this to
     ] with-file-reader ;" }
 
 Unfortunately, we are limited to one line. To read more lines, we should chain calls to { $link readln } until one returns { $link f } .
-Factor helps us with { $link file-lines } , which lazily iterates "over" lines. Our "final" definition becomes
+Factor helps us with { $link file-lines } , which lazily iterates over lines. Our " final " definition becomes
 
 { $code "
 : read-first-letters ( path -- )
@@ -1157,7 +1157,7 @@ Let us define a word for the thread workload
 : print-a-line ( i -- )
     star-wars get ?nth print ;" }
 
-If we give the i-th thread the name "\"i\"" , our example amounts to
+If we give the i-th thread the name { $snippet "i" } , our example amounts to
 
 { $code "
 18 [0..b) [

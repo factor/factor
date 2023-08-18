@@ -104,7 +104,7 @@ HELP: compile-brain-flak
 { $see-also POSTPONE: b-f" with-brain-flak } ;
 
 ARTICLE: "brain-flak" "Introduction to brain-flak"
-{ { $url URL"https://esolangs.org/wiki/Brain-Flak" "Brain-flak" } " is a stack-based esoteric language designed by Programming Puzzles and Code-Golf user " { $url URL"https://codegolf.stackexchange.com/users/31716/djmcmayhem" "DjMcMayhem" } } . The name is a cross between "\"brainfuck\"" , which was a big inspiration for the language, and "\"flak-overstow\"" , since the language is confusing and stack-based.
+{ { $url URL"https://esolangs.org/wiki/Brain-Flak" "Brain-flak" } " is a stack-based esoteric language designed by Programming Puzzles and Code-Golf user " { $url URL"https://codegolf.stackexchange.com/users/31716/djmcmayhem" "DjMcMayhem" } } . The name is a cross between " \"brainfuck\" " , which was a big inspiration for the language, and " \"flak-overstow\" " , since the language is confusing and stack-based.
 
 { $heading "Overview" }
 Brain-flak is an expression-based language written only using brackets, which must be balanced. Any other character will be ignored. Its only data type is a signed integer, which in this implementation has unbounded size.
