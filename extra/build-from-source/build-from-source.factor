@@ -1,12 +1,12 @@
 ! Copyright (C) 2023 Doug Coleman.
 ! See https://factorcode.org/license.txt for BSD license.
-USING: accessors arrays assocs cli.git combinators
-combinators.extras combinators.short-circuit continuations
-formatting github http.client io.directories io.files
-io.files.info io.launcher io.pathnames json kernel
-layouts math namespaces namespaces.extras semver sequences
-sequences.extras sorting sorting.human sorting.specification
-splitting system unicode ;
+USING: accessors arrays assocs calendar calendar.format cli.git
+combinators combinators.extras combinators.short-circuit
+continuations formatting github http.client io io.directories
+io.encodings.utf8 io.files io.files.info io.launcher
+io.pathnames json kernel layouts math namespaces
+namespaces.extras semver sequences sequences.extras sorting
+sorting.human sorting.specification splitting system unicode ;
 IN: build-from-source
 
 INITIALIZED-SYMBOL: use-gitlab-git-uris [ f ]
@@ -74,8 +74,15 @@ ERROR: no-output-file path ;
 : build-from-source-directory-gitlab ( -- path )
     get-build-from-source-directory "gitlab" append-path ;
 
-: with-build-from-source-gitlab-org-directory ( base org/user quot -- )
-    [ append-path build-from-source-directory-gitlab prepend-path dup make-directories ] dip with-directory ; inline
+: gitlab-disk-path ( base org/user project -- path )
+    3append-path
+    build-from-source-directory-gitlab prepend-path absolute-path ;
+
+: gitlab-tag-disk-checkout-path ( base org/user project tag -- path )
+    [ gitlab-disk-path ] dip append-path absolute-path ;
+
+: with-build-from-source-gitlab-bare-directory ( base org/user quot -- )
+    [ build-from-source-directory-gitlab prepend-path dup make-directories ] dip with-directory ; inline
 
 : gitlab-git-uri ( base org/user project -- uri ) "git://%s/%s/%s" sprintf ;
 : gitlab-http-uri ( base org/user project -- uri ) "http://%s/%s/%s" sprintf ;
@@ -84,60 +91,93 @@ ERROR: no-output-file path ;
 : gitlab-uri ( base org/user project -- uri )
     use-gitlab-git-uris get [ gitlab-git-uri ] [ gitlab-https-uri ] if ;
 
-! "gitlab.freedesktop.org" "cairo" "cairo"
-: sync-gitlab-pristine-repository-as ( base org/user project -- )
-    [ drop ] [ gitlab-uri ] 3bi
+: sync-gitlab-bare-repository ( base org/user project -- )
+    [ 2drop ] [ gitlab-uri ] [ nipd append-path ] 3tri
     '[
-        _ sync-repository wait-for-success
-    ] with-build-from-source-gitlab-org-directory ;
+        _ _ sync-bare-repository-as wait-for-success
+    ] with-build-from-source-gitlab-bare-directory ;
 
-: sync-gitlab-pristine-and-clone-build-repository-as ( base org/user project build-path -- build-path )
-    [ drop sync-gitlab-pristine-repository-as ]
-    [ [ append-path append-path build-from-source-directory-gitlab prepend-path absolute-path ] dip ] 4bi
-    '[
-        _ _ [ ?delete-tree ] [ git-clone-as wait-for-success ] [ ] tri
-    ] with-build-from-source-cpu-directory ;
-
-: with-updated-gitlab-repo-as ( base org/user project build-path-as quot -- )
-    [ sync-gitlab-pristine-and-clone-build-repository-as ] dip
-    '[
-        _ prepend-current-path _ with-directory
-    ] with-build-from-source-cpu-directory ; inline
-
-: with-updated-gitlab-repo ( base org/user project quot -- )
-    [ dup git-directory-name ] dip with-updated-gitlab-repo-as ; inline
+: with-bare-gitlab-repo ( base org/user project quot -- )
+    [
+        [ sync-gitlab-bare-repository ]
+        [ gitlab-disk-path ] 3bi
+    ] dip with-directory ; inline
 
 : build-from-source-directory-github ( -- path )
     get-build-from-source-directory "github" append-path ;
 
-: with-build-from-source-github-directory ( org/user quot -- )
+: github-disk-path ( org/user project -- path )
+    append-path
+    build-from-source-directory-github prepend-path absolute-path ;
+
+: github-tag-disk-checkout-path ( org/user project tag -- path )
+    [ github-disk-path ] dip append-path absolute-path ;
+
+: with-build-from-source-github-bare-directory ( org/user quot -- )
     [ build-from-source-directory-github prepend-path dup make-directories ] dip with-directory ; inline
 
 : github-uri ( org/user project -- uri )
     use-github-git-uris get [ github-git-uri ] [ github-https-uri ] if ;
 
-: sync-github-pristine-repository-as ( org/user project -- )
-    [ drop ] [ github-uri ] [ nip ] 2tri
+: sync-github-bare-repository ( org/user project -- )
+    [ drop ] [ github-uri ] [ nip git-directory-name ] 2tri
     '[
-        _ _ sync-repository-as wait-for-success
-    ] with-build-from-source-github-directory ;
+        _ _ sync-bare-repository-as wait-for-success
+    ] with-build-from-source-github-bare-directory ;
 
-! "factor" "vscode-factor" "factor-buildme-here"
-: sync-github-pristine-and-clone-build-repository-as ( org/user project build-path -- build-path )
-    [ drop sync-github-pristine-repository-as ]
-    [ [ append-path build-from-source-directory-github prepend-path absolute-path ] dip ] 3bi
+: with-github-worktree-tag ( org/user project tag quot -- )
+    [
+        {
+            [ drop sync-github-bare-repository ]
+            [ drop github-disk-path ]
+            [ github-tag-disk-checkout-path ]
+            [ 2nip ]
+        } 3cleave
+    ] dip
     '[
-        _ _ [ ?delete-tree ] [ git-clone-as wait-for-success ] [ ] tri
-    ] with-build-from-source-cpu-directory ;
+        _ _
+        over "factor-build-completed" append-path dup file-exists? [
+            utf8 file-contents
+            "%s\n- %s already built at %s" sprintf print
+        ] [
+            [
+                over "%s\n- deleting old build..." sprintf write
+                2dup [ ?delete-tree "deleted!" print ]
+                [ "- %s building..." sprintf write ] bi*
+                [ git-worktree-force-add wait-for-success ] keepd
+                _ with-directory
+                "done!" print
+                now timestamp>rfc3339
+            ] dip utf8 set-file-contents
+        ] if
+    ] with-directory ; inline
 
-: with-updated-github-repo-as ( org/user project build-path-as quot -- )
-    [ sync-github-pristine-and-clone-build-repository-as ] dip
+: with-gitlab-worktree-tag ( base org/user project tag quot -- )
+    [
+        {
+            [ drop sync-gitlab-bare-repository ]
+            [ drop gitlab-disk-path ]
+            [ gitlab-tag-disk-checkout-path ]
+            [ 3nip ]
+        } 4cleave
+    ] dip
     '[
-        _ prepend-current-path _ with-directory
-    ] with-build-from-source-cpu-directory ; inline
-
-: with-updated-github-repo ( org/user project quot -- )
-    [ dup git-directory-name ] dip with-updated-github-repo-as ; inline
+        _ _
+        over "factor-build-completed" append-path dup file-exists? [
+            utf8 file-contents
+            "%s\n- %s already built at %s" sprintf print
+        ] [
+            [
+                over "%s\n- deleting old build..." sprintf write
+                2dup [ ?delete-tree "deleted!" print ]
+                [ "- %s building..." sprintf write ] bi*
+                [ git-worktree-force-add wait-for-success ] keepd
+                _ with-directory
+                "done!" print
+                now timestamp>rfc3339
+            ] dip utf8 set-file-contents
+        ] if
+    ] with-directory ; inline
 
 : ?download ( path -- )
     dup file-name file-exists? [ drop ] [ download ] if ; inline
@@ -174,12 +214,20 @@ ERROR: no-output-file path ;
 : latest-solr ( -- tag-json semver ) "apache" "solr" "releases/solr" latest-semver-tags-matching ;
 : latest-lucene ( -- tag-json semver ) "apache" "lucene" "releases/lucene" latest-semver-tags-matching ;
 
-: python-tags ( -- tags )
-    "python" "cpython" "v" list-repository-tags-matching
+: digit-or-dot? ( str -- ? )
+    { [ digit? ] [ CHAR: . = ] } 1|| ;
+
+: tag-refs ( tags -- tags' )
     [ "ref" of ] map
     [ "refs/tags/" ?head drop ] map ;
 
+: python-tags ( -- tags )
+    "python" "cpython" "v" list-repository-tags-matching tag-refs ;
+
 : tags>latest-python2 ( tags -- tag ) [ "v2." head? ] filter latest-python ;
 : latest-python2 ( -- tag ) python-tags tags>latest-python2 ;
-: tags>latest-python3 ( tags -- tag ) [ "v3." head? ] filter latest-python ;
+: tags>latest-python3 ( tags -- tag )
+    [ "v3." head? ] filter
+    [ "." split1-last nip [ digit? ] all? ] filter
+    latest-python ;
 : latest-python3 ( -- tag ) python-tags tags>latest-python3 ;

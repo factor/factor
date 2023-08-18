@@ -1,12 +1,15 @@
 ! Copyright (C) 2023 Doug Coleman.
 ! See https://factorcode.org/license.txt for BSD license.
-USING: build-from-source cli.git io.launcher kernel sequences
-sorting ;
+USING: build-from-source cli.git github io.launcher kernel
+sequences sorting sorting.human ;
 IN: zoneinfo.update
 
+: zoneinfo-versions ( -- seq )
+    "eggert" "tz" "" list-repository-tags-matching
+    tag-refs human-sort ;
+
 : update-zoneinfo ( -- )
-    "eggert" "tz" [
-        git-tag* sort last git-reset-hard drop
+    "eggert" "tz" zoneinfo-versions last [
         { "make" "leapseconds" } run-process drop
         { "make" "version" } run-process drop
         "vocab:zoneinfo" [
@@ -29,4 +32,4 @@ IN: zoneinfo.update
                 "zone1970.tab"
             } copy-output-files
         ] with-out-directory
-    ] with-updated-github-repo ;
+    ] with-github-worktree-tag ;
