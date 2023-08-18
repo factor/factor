@@ -11,5 +11,5 @@ tools.test kernel ;
 { t } [ domainname string? ] unit-test
 
 { t } [
-    release "." split1 drop { "2" "3" "4" "5" } member?
+    release "." split1 drop { "2" "3" "4" "5" "6" } member?
 ] unit-test
