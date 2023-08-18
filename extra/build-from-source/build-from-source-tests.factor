@@ -23,7 +23,7 @@ IN: build-from-source.tests
     } tags>latest-python3
 ] unit-test
 
-{ "v3.11.0b5" } [
+{ "v3.10.10" } [
     {
         "v3.10.10"
         "v3.11.0a1"
@@ -34,7 +34,7 @@ IN: build-from-source.tests
     } tags>latest-python3
 ] unit-test
 
-{ "v3.11.0rc5" } [
+{ "v3.10.10" } [
     {
         "v3.10.10"
         "v3.11.0a1"
