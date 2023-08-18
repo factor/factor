@@ -15,7 +15,7 @@ IN: build-from-source.tests
     } tags>latest-python3
 ] unit-test
 
-{ "v3.11.0a2" } [
+{ "v3.10.10" } [
     {
         "v3.10.10"
         "v3.11.0a1"
