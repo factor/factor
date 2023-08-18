@@ -44,19 +44,19 @@ TUPLE: blahblah quux ;
 { "\nspan" }
 [ [ { { $nl } "span" } print-content ] with-markup-test ] unit-test
 
-{ "2 2 +\n\nspan" }
+{ "2 2 +\nspan" }
 [ [ { { $code "2 2 +" } "span" } print-content ] with-markup-test ] unit-test
 
-{ "2 2 +\n\n" }
+{ "2 2 +" }
 [ [ { { $code "2 2 +" } } print-content ] with-markup-test ] unit-test
 
-{ "span\n2 2 +\n\n" }
+{ "span\n2 2 +" }
 [ [ { "span" { $code "2 2 +" } } print-content ] with-markup-test ] unit-test
 
-{ "\n2 2 +\n\n" }
+{ "\n2 2 +" }
 [ [ { { $nl } { $code "2 2 +" } } print-content ] with-markup-test ] unit-test
 
-{ "span\n\n2 2 +\n\n" }
+{ "span\n\n2 2 +" }
 [ [ { "span" { $nl } { $code "2 2 +" } } print-content ] with-markup-test ] unit-test
 
 { "Heading" }
