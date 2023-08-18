@@ -47,7 +47,10 @@ DEFER: HELP{
 : ?push-help-space ( accum sbuf obj -- accum sbuf' obj )
     over empty? [
         pick [ f ] [
-            last dup array? [ ?first ] when help-block? not
+            last {
+                [ string? not ]
+                [ dup array? [ ?first ] when help-block? not ]
+            } 1&&
         ] if-empty
     ] [
         over last " (" member? not
