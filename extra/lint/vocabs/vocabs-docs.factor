@@ -59,11 +59,11 @@ HELP: find-unused.
 
 
 ARTICLE: "lint.vocabs" "The Unused Vocabulary Linter"
-"The " { $vocab-link "lint.vocabs" } " vocabulary implements a set of words designed to find unused imports."
-"It attempts to ignore USE: and USING: that are a part of a string, postponed with either POSTPONE: or \\, and" 
+"The " { $vocab-link "lint.vocabs" } " vocabulary implements a set of words designed to find unused imports. "
+"It attempts to ignore USE: and USING: that are a part of a string, postponed with either POSTPONE: or \\, and "
 "contained inside a " { $link "regexp" } "."
 $nl
-"It can sometimes be easy to lose track of what vocabularies you've imported while iterating over ideas. So to"
+"It can sometimes be easy to lose track of what vocabularies you've imported while iterating over ideas. So to "
 "find any vocabularies you feel are unused, you can run:"
 $nl
 { $example 

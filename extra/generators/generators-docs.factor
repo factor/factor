@@ -135,7 +135,7 @@ HELP: yield-from
 { $description "Delegate computation to the specified generator until it is exhausted, before resuming computation in the current generator." } ;
 
 ARTICLE: "generators" "Generators"
-"Generators in Factor are lazily executed blocks of code, which emit values on request. They are designed to work very similarly to generators found in languages like Python or JavaScript."
+"Generators in Factor are lazily executed blocks of code, which emit values on request. They are designed to work very similarly to generators found in languages like Python or JavaScript. "
 "Their implementation in Factor is a simple wrapper around " { $vocab-link "coroutines" } "."
 $nl
 "Generator words are created using " { $link \ GEN: } " or " { $link \ GEN:: } ". When a generator word is called, its required inputs are consumed from the stack, and a " { $link generator } " object is left as output. Accordingly, the right hand side of generator word's stack effect must always be a single value. For example:"
@@ -154,7 +154,7 @@ $nl
 { $subsections next* ?next* skip* }
 "Check if a generator is already exhausted:"
 { $subsections exhausted? }
-"All generator words are found in the " { $vocab-link "generators" } "vocabulary."
+"All generator words are found in the " { $vocab-link "generators" } " vocabulary."
 ;
 
 ABOUT: "generators"

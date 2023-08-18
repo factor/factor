@@ -4,7 +4,7 @@ IN: mediawiki.api
 ARTICLE: "mediawiki.api" "MediaWiki API"
 { $url "https://www.mediawiki.org/wiki/API:Main_page" }
 { $heading "Configuration" }
-"Set " { $snippet "endpoint" } " to the API entry point. An"
+"Set " { $snippet "endpoint" } " to the API entry point. An "
 "example for Wikimedia wikis:"
 { $code
 "USING: formatting mediawiki.api namespaces ;"
@@ -13,8 +13,8 @@ ARTICLE: "mediawiki.api" "MediaWiki API"
 "\"en\" \"wikipedia\" wikimedia-url endpoint set-global" }
 $nl
 "For Wikimedia wikis, also provide contact information in " {
-$snippet "contact" } " so that wiki operators can contact you in"
-"case of malfunction, including username or email, and possibly"
+$snippet "contact" } " so that wiki operators can contact you in "
+"case of malfunction, including username or email, and possibly "
 "the task name:"
 { $code
 "USING: mediawiki.api namespaces ;"
@@ -36,13 +36,13 @@ $nl
 "\"password\""
 "<password-login> password-login set-global" }
 $nl
-"If both login methods are given, OAuth is preferred. If none"
+"If both login methods are given, OAuth is preferred. If none "
 "are given, you're not logged in."
 $nl
-"If you use several wikis simultaneously, you might want to save"
-"your " { $snippet "cookies" } " (if you use the password login"
-"method) and your " { $snippet "csrf-token" } ". You also should"
-"invalidate your csrf-token before using an action that requires"
+"If you use several wikis simultaneously, you might want to save "
+"your " { $snippet "cookies" } " (if you use the password login "
+"method) and your " { $snippet "csrf-token" } ". You also should "
+"invalidate your csrf-token before using an action that requires "
 "a csrf token in a wiki for the first time:"
 { $code
 "USING: mediawiki.api namespaces ;"

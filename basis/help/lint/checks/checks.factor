@@ -154,7 +154,7 @@ SYMBOL: vocab-articles
     ] bi ;
 
 : check-whitespace ( str1 str2 -- )
-    [ " " tail? ] [ " " head? ] bi* or
+    [ ?last " (" member? ] [ ?first " )." member? ] bi* or
     [ "Missing whitespace between strings" simple-lint-error ] unless ;
 
 : check-bogus-nl ( element -- )
