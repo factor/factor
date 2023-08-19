@@ -343,6 +343,59 @@ PRIVATE>
         [ 1 + ] 2dip [ _ (random-unit) log neg + ] dip
     ] while 2drop ;
 
+:: binomial-random ( n p -- x )
+    n assert-non-negative drop
+    p 0.0 1.0 between? [
+        {
+            { [ p 0.0 = ] [ 0 ] }
+            { [ p 1.0 = ] [ n ] }
+            { [ n 1 = ] [ random-unit p < 1 0 ? ] }
+            { [ p 0.5 > ] [ n dup 1.0 p - binomial-random - ] }
+            { [ n p * 10.0 < ] [
+                ! BG: Geometric method by Devroye with running time of O(n*p).
+                ! https://dl.acm.org/doi/pdf/10.1145/42372.42381
+                1.0 p - log :> c
+                0 0 random-generator get '[
+                    _ (random-unit) log c /i 1 + +
+                    dup n <= dup [ [ 1 + ] 2dip ] when
+                ] loop drop
+            ] }
+            [
+                ! BTRS: Transformed rejection with squeeze method by Wolfgang Hörmann
+                ! https://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.47.8407&rep=rep1&type=pdf
+                n p * 10.0 >= p 0.5 <= and t assert=
+                random-generator get :> rnd
+
+                n p * 1.0 p - * sqrt :> spq
+                1.15 2.53 spq * + :> b
+                -0.0873 0.0248 b * + 0.01 p * + :> a
+                n p * 0.5 + :> c
+                0.92 4.2 b / - :> vr
+
+                2.83 5.1 b / + spq * :> alpha
+                p 1.0 p - / log :> lpq
+                n 1 + p * floor :> m
+                m 1 + lgamma n m - 1 + lgamma + :> h
+
+                f [
+                    rnd (random-unit) 0.5 - :> u
+                    rnd (random-unit) :> v
+                    0.5 u abs - :> us
+                    drop 2.0 a us / * b + u * c + floor >integer dup :> k
+                    k 0 n between? [
+                        { [ us 0.07 >= ] [ v vr <= ] } 0&& [ f ] [
+                            alpha a us sq / b + / v * log
+                            h k 1 + lgamma - n k - 1 +
+                            lgamma - k m - lpq * + >
+                        ] if
+                    ] [ t ] if
+                ] loop
+            ]
+        } cond
+    ] [
+        "p must be in the range 0.0 <= p <= 1.0" throw
+    ] if ;
+
 {
     { [ os windows? ] [ "random.windows" require ] }
     { [ os unix? ] [ "random.unix" require ] }
