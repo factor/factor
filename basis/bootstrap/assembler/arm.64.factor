@@ -2,12 +2,10 @@
 ! Copyright (C) 2023 Giftpflanze.
 ! See https://factorcode.org/license.txt for BSD license.
 USING: bootstrap.image.private compiler.codegen.relocation
-compiler.constants compiler.units cpu.arm.assembler
-cpu.arm.assembler.64 cpu.arm.assembler.opcodes
+compiler.constants compiler.units cpu.arm.64.assembler
 generic.single.private kernel kernel.private layouts
 locals.backend math math.private namespaces slots.private
 strings.private threads.private vocabs ;
-RENAME: STRuoff cpu.arm.assembler.32 => STRuoff32
 IN: bootstrap.assembler.arm
 
 8 \ cell set
@@ -23,25 +21,28 @@ big-endian off
 ! X29/FP               frame pointer
 ! X30/LR  non-volatile link register
 
-: words ( n -- n ) 4 * ;
-: stack-frame-size ( -- n ) 8 bootstrap-cells ;
+: words ( n -- n ) 4 * ; inline
+: stack-frame-size ( -- n ) 8 bootstrap-cells ; inline
 
-: return-reg ( -- reg ) X0 ;
-: arg1 ( -- reg ) X0 ;
-: arg2 ( -- reg ) X1 ;
-: arg3 ( -- reg ) X2 ;
-: arg4 ( -- reg ) X3 ;
-: temp0 ( -- reg ) X9 ;
-: temp1 ( -- reg ) X10 ;
-: temp2 ( -- reg ) X11 ;
-: temp3 ( -- reg ) X12 ;
-: stack-reg ( -- reg ) SP ;
-: link-reg ( -- reg ) X30 ; ! LR
-: stack-frame-reg ( -- reg ) X29 ; ! FP
-: vm-reg ( -- reg ) X28 ;
-: ds-reg ( -- reg ) X27 ;
-: rs-reg ( -- reg ) X26 ;
-: ctx-reg ( -- reg ) X25 ;
+: return-reg ( -- reg ) X0 ; inline
+: arg1 ( -- reg ) X0 ; inline
+: arg2 ( -- reg ) X1 ; inline
+: arg3 ( -- reg ) X2 ; inline
+: arg4 ( -- reg ) X3 ; inline
+
+: temp0 ( -- reg ) X9 ; inline
+: temp1 ( -- reg ) X10 ; inline
+: temp2 ( -- reg ) X11 ; inline
+: temp3 ( -- reg ) X12 ; inline
+: pic-tail-reg ( -- reg ) X12 ; inline
+
+: stack-reg ( -- reg ) SP ; inline
+: link-reg ( -- reg ) X30 ; inline ! LR
+: stack-frame-reg ( -- reg ) X29 ; inline ! FP
+: vm-reg ( -- reg ) X28 ; inline
+: ds-reg ( -- reg ) X27 ; inline
+: rs-reg ( -- reg ) X26 ; inline
+: ctx-reg ( -- reg ) X25 ; inline
 
 : push-link-reg ( -- ) -16 stack-reg link-reg STRpre ;
 : pop-link-reg ( -- ) 16 stack-reg link-reg LDRpost ;
@@ -89,7 +90,7 @@ big-endian off
 : absolute-jump ( -- word class )
     2 words temp0 LDRl
     temp0 BR
-    NOP NOP f rc-absolute-cell ;
+    NOP NOP f rc-absolute-cell ; inline
 
 : absolute-call ( -- word class )
     5 words temp0 LDRl
@@ -97,18 +98,23 @@ big-endian off
     temp0 BLR
     pop-link-reg
     3 words Br
-    NOP NOP f rc-absolute-cell ;
+    NOP NOP f rc-absolute-cell ; inline
 
 [
-    ! pic-tail-reg 5 [RIP+] LEA
+    ! ! pic-tail-reg 5 [RIP+] LEA
     ! why do we store the address after JMP in EBX, where is it
     ! picked up?
-    ! 0 JMP f rc-relative rel-word-pic-tail
+    4 pic-tail-reg ADR
+    ! ! 0 JMP f rc-relative rel-word-pic-tail
+    ! 0 Br f rc-relative-arm64-branch rel-word-pic-tail
     absolute-jump rel-word-pic-tail
 ] JIT-WORD-JUMP jit-define
 
 [
-    ! 0 CALL f rc-relative rel-word-pic
+    ! ! 0 CALL f rc-relative rel-word-pic
+    ! push-link-reg
+    ! 0 BL f rc-relative-arm64-branch rel-word-pic
+    ! pop-link-reg
     absolute-call rel-word-pic
 ] JIT-WORD-CALL jit-define
 
@@ -323,7 +329,7 @@ big-endian off
 [
     ! 0 [RIP+] EAX MOV rc-relative rel-safepoint
     3 words temp0 LDRl
-    0 temp0 W0 STRuoff32
+    0 temp0 W0 STRuoff
     3 words Br
     NOP NOP rc-absolute-cell rel-safepoint
 ] JIT-SAFEPOINT jit-define
@@ -526,31 +532,42 @@ big-endian off
     ! temp0 \ f type-number CMP
     \ f type-number temp0 CMPi
     ! ! jump to true branch if not equal
-    ! 0 JNE f rc-relative rel-word
+    ! ! 0 JNE f rc-relative rel-word
+    ! 0 NE B.cond f rc-relative-arm64-bcond rel-word
     5 words EQ B.cond
     absolute-jump rel-word
     ! ! jump to false branch if equal
-    ! 0 JMP f rc-relative rel-word
+    ! ! 0 JMP f rc-relative rel-word
+    ! 0 Br f rc-relative-arm64-branch rel-word
     absolute-jump rel-word
 ] JIT-IF jit-define
 
 [
     >r
-    ! 0 CALL f rc-relative rel-word
+    ! ! 0 CALL f rc-relative rel-word
+    ! push-link-reg
+    ! 0 Br f rc-relative-arm64-branch rel-word
+    ! pop-link-reg
     absolute-call rel-word
     r>
 ] JIT-DIP jit-define
 
 [
     >r >r
-    ! 0 CALL f rc-relative rel-word
+    ! ! 0 CALL f rc-relative rel-word
+    ! push-link-reg
+    ! 0 Br f rc-relative-arm64-branch rel-word
+    ! pop-link-reg
     absolute-call rel-word
     r> r>
 ] JIT-2DIP jit-define
 
 [
     >r >r >r
-    ! 0 CALL f rc-relative rel-word
+    ! ! 0 CALL f rc-relative rel-word
+    ! push-link-reg
+    ! 0 Br f rc-relative-arm64-branch rel-word
+    ! pop-link-reg
     absolute-call rel-word
     r> r> r>
 ] JIT-3DIP jit-define
@@ -585,12 +602,12 @@ big-endian off
     ! ! make room for LR plus magic number of callback, 16byte align
     ! x64 ! stack-reg stack-frame-size bootstrap-cell - SUB
     stack-frame-size stack-reg stack-reg SUBi
-    -16 SP link-reg STRpre
+    push-link-reg
 ] JIT-PROLOG jit-define
 
 [
     ! x64 ! stack-reg stack-frame-size bootstrap-cell - ADD
-    16 SP link-reg LDRpost
+    pop-link-reg
     stack-frame-size stack-reg stack-reg ADDi
 ] JIT-EPILOG jit-define
 
@@ -639,7 +656,8 @@ big-endian off
 ] PIC-CHECK-TAG jit-define
 
 [
-    ! 0 JE f rc-relative rel-word
+    ! ! 0 JE f rc-relative rel-word
+    ! 0 EQ B.cond f rc-relative-arm64-bcond rel-word
     5 words NE B.cond
     absolute-jump rel-word
 ] PIC-HIT jit-define
@@ -870,7 +888,7 @@ big-endian off
         context-callstack-bottom-offset ctx-reg arg1 LDRuoff
         ! ! Get top of callstack object -- 'src' for memcpy
         ! arg2 arg4 callstack-top-offset [+] LEA
-        callstack-top-offset temp0 arg2 ADDr
+        callstack-top-offset temp0 arg2 ADDi
         ! ! Get callstack length, in bytes --- 'len' for memcpy
         ! arg3 arg4 callstack-length-offset [+] MOV
         2 temp0 temp0 SUBi ! callstack-length-offset
@@ -1149,7 +1167,7 @@ big-endian off
         jit-signal-handler-epilog
         ! Pop the fake leaf frame along with our return address
         ! leaf-stack-frame-size bootstrap-cell - RET
-        leaf-stack-frame-size bootstrap-cell - SP SP ADDr
+        leaf-stack-frame-size bootstrap-cell - SP SP ADDi
         f RET
     ] }
     { signal-handler [

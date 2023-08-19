@@ -1,13 +1,21 @@
 ! Copyright (C) 2023 Giftpflanze.
 ! See https://factorcode.org/license.txt for BSD license.
 USING: accessors assocs compiler.cfg compiler.cfg.comparisons
-compiler.cfg.instructions compiler.cfg.intrinsics continuations
-cpu.architecture cpu.arm cpu.arm.assembler cpu.arm.assembler.64
-cpu.arm.assembler.opcodes generalizations kernel math math.order
-sequences system words.symbol ;
-FROM: cpu.arm.assembler => S D ;
+compiler.cfg.instructions compiler.cfg.intrinsics
+compiler.cfg.stack-frame compiler.codegen.labels
+compiler.codegen.relocation compiler.constants continuations
+cpu.architecture cpu.arm cpu.arm.64.assembler generalizations
+kernel layouts math math.order sequences system words.symbol ;
 IN: cpu.arm.64
 
+<< ALIAS: eh? f >>
+
+: words ( n -- n ) 4 * ; inline
+
+: temp0 ( -- reg ) X9 ; inline
+: pic-tail-reg ( -- reg ) X12 ; inline
+
+: stack-reg ( -- reg ) SP ; inline
 M: arm.64 frame-reg X29 ;
 : vm-reg ( -- reg ) X28 ; inline
 M: arm.64 ds-reg X27 ;
@@ -18,7 +26,7 @@ M: arm.64 rs-reg X26 ;
 M: arm.64 %load-immediate ( reg val -- )
     [ XZR MOVr ] [
         { 0 1 2 3 } [
-            tuck -8 * shift 0xffff bitand
+            tuck -16 * shift 0xffff bitand
         ] with map>alist [ nip 0 = ] assoc-reject
         unclip
         overd first2 rot MOVZ
@@ -26,9 +34,11 @@ M: arm.64 %load-immediate ( reg val -- )
     ] if-zero ;
 
 M: arm.64 %load-reference ( reg obj -- )
-    ! [ swap 0 MOV rc-absolute-cell rel-literal ]
-    ! [ \ f type-number MOV ] if* ;
-    2drop ;
+    [
+        3 words rot LDRl
+        3 words Br
+        NOP NOP rc-absolute-cell rel-literal
+    ] [ \ f type-number swap MOVwi ] if* ;
 
 M: arm.64 %load-float 2drop ;
 M: arm.64 %load-double 2drop ;
@@ -100,7 +110,8 @@ M: arm.64 %xor-imm spin EORi ;
 M: arm.64 %copy ( dst src rep -- )
     2over eq? [ 3drop ] [
         ! [ [ ?spill-slot ] bi@ ] dip
-        ! 2over [ register? ] both? [ copy-register* ] [ copy-memory* ] if
+        ! 2over [ register? ] both?
+        ! [ copy-register* ] [ copy-memory* ] if
         3drop
     ] if ;
 
@@ -262,14 +273,34 @@ M: arm.64 %allot 4drop ;
 M: arm.64 %write-barrier 6 ndrop ;
 M: arm.64 %write-barrier-imm 5drop ;
 
-M: arm.64 stack-frame-size ;
-M: arm.64 %call drop ;
-M: arm.64 %epilogue drop ;
-M: arm.64 %jump drop ;
-M: arm.64 %jump-label drop ;
-M: arm.64 %prologue drop ;
+M: arm.64 stack-frame-size
+    (stack-frame-size) cell + 16 align ;
+
+M: arm.64 %call
+    -16 stack-reg stack-reg STRpre
+    0 BL rc-relative-arm64-branch rel-word-pic
+    16 stack-reg stack-reg LDRpost ;
+
+M: arm.64 %epilogue
+    cell + 16 align [ stack-reg stack-reg ADDr ] unless-zero ;
+
+M: arm.64 %jump
+    4 pic-tail-reg ADR
+    0 Br rc-relative-arm64-branch rel-word-pic-tail ;
+
+M: arm.64 %jump-label
+    0 Br rc-relative-arm64-branch label-fixup ;
+
+M: arm.64 %prologue
+    cell - 16 align [ stack-reg stack-reg SUBr ] unless-zero ;
+
 M: arm.64 %return f RET ;
-M: arm.64 %safepoint ;
+
+M: arm.64 %safepoint
+    3 words temp0 LDRl
+    0 temp0 W0 STRuoff
+    3 words Br
+    NOP NOP rc-absolute-cell rel-safepoint ;
 
 M: arm.64 %compare 5drop ;
 M: arm.64 %compare-imm 5drop ;
@@ -303,23 +334,24 @@ M: arm.64 %inc drop ;
 M: arm.64 machine-registers {
     {
         int-regs {
-            X0 X1 X2 X3 X4 X5 X6 X7 X8 X9 X10 X11 X12 X13 X14 X15
+            X0 X1 X2 X3 X4 X5 X6 X7
+            X8 X9 X10 X11 X12 X13 X14 X15
             X19 X20 X21 X22 X23 X24
         }
-    }
-    {
-        float-regs
-        {
+    } {
+        float-regs {
             V0 V1 V2 V3 V4 V5 V6 V7
             V16 V17 V18 V19 V20 V21 V22 V23 V24 V25 V26 V27 V28
             V29 V30 V31
         }
     }
 } ;
+
 M: arm.64 param-regs drop {
     { int-regs { X0 X1 X2 X3 X4 X5 X6 X7 X8 } }
     { float-regs { V0 V1 V2 V3 V4 V5 V6 V7 } }
 } ;
+
 M: arm.64 return-regs {
     { int-regs { X0 X1 X2 X3 X4 X5 X6 X7 X8 } }
     { float-regs { V0 V1 V2 V3 V4 V5 V6 V7 } }
@@ -334,9 +366,12 @@ M: arm.64 %spill 3drop ;
 M: arm.64 %reload 3drop ;
 M: arm.64 gc-root-offset ;
 
-M: arm.64 immediate-arithmetic? -2147483648 2147483647 between? ;
+M: arm.64 immediate-arithmetic?
+    -2147483648 2147483647 between? ;
+
 M: arm.64 immediate-bitwise?
     [ encode-bitmask drop t ] [ 2drop f ] recover ;
+
 M: arm.64 immediate-comparand? drop eh? ;
 M: arm.64 immediate-store? drop eh? ;
 

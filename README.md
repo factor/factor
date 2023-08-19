@@ -50,7 +50,7 @@ directory and run:
 Now you should have a complete Factor system ready to run.
 
 Factor does not yet work on arm64 cpus. There is an arm64 assembler
-in `cpu.arm.assembler` and we are working on a port and also looking for
+in `cpu.arm.64.assembler` and we are working on a port and also looking for
 contributors.
 
 More information on [building factor](https://concatenative.org/wiki/view/Factor/Building%20Factor)

@@ -53,6 +53,8 @@ CONSTANT: rc-relative-ppc-3-pc 6
 CONSTANT: rc-absolute-2 10
 CONSTANT: rc-absolute-1 11
 CONSTANT: rc-absolute-ppc-2/2/2/2 12
+CONSTANT: rc-relative-arm64-branch 13
+CONSTANT: rc-relative-arm64-bcond 14
 
 CONSTANT: rt-dlsym 0
 CONSTANT: rt-entry-point 1
