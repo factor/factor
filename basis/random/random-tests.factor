@@ -88,3 +88,15 @@ math.functions sets grouping random.private math.statistics ;
     500000 [ 3 4 logistic-random-float ] replicate
     [ mean 3 .2 ~ ] [ std pi 4 * 3 sqrt / .2 ~ ] bi
 ] unit-test
+
+{ t t }
+[
+    500000 [ 10 0.6 binomial-random ] replicate
+    [ mean 6 .1 ~ ] [ std 1.5 .1 ~ ] bi
+] unit-test
+
+{ t t }
+[
+    500000 [ 100 0.8 binomial-random ] replicate
+    [ mean 80 .1 ~ ] [ std 4 .1 ~ ] bi
+] unit-test
