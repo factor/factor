@@ -73,3 +73,6 @@ FUNCTION-ALIAS: fasinh
 
 FUNCTION-ALIAS: fatanh
     double atanh ( double x )
+
+FUNCTION-ALIAS: flgamma
+    double lgamma ( double x )
