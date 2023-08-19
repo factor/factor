@@ -93,7 +93,7 @@ HELP: scaffold-tests
 { $values
     { "vocab" "a vocabulary specifier" }
 }
-{ $description "Takes an existing vocabulary and creates an empty tests file help for each word. This word only works if no tests file yet exists." } ;
+{ $description "Takes an existing vocabulary and creates an empty tests file. This word only works if no tests file yet exists." } ;
 
 HELP: scaffold-vocab-in
 { $values
