@@ -328,7 +328,9 @@ IN: build-from-source.windows
 
 : ripgrep-versions ( -- seq )
     "BurntSushi" "ripgrep" "" list-repository-tags-matching
-    tag-refs human-sort ;
+    tag-refs
+    [ [ digit-or-dot? ] all? ] filter
+    human-sort ;
 
 : build-ripgrep ( -- )
     "BurntSushi" "ripgrep" ripgrep-versions last [
@@ -506,6 +508,7 @@ IN: build-from-source.windows
     build-winflexbison
     build-openssl-dlls
     build-blas
+    build-lz4
     build-openal-dll
     build-pcre2-dll
     32-bit? [ build-postgres-dll ] unless
@@ -521,3 +524,5 @@ IN: build-from-source.windows
     build-libressl-dlls
     build-fftw-dll
     build-pcre-dll ;
+
+! build-ripgrep build-duckdb
