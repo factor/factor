@@ -198,6 +198,12 @@ M: complex log >polar [ flog ] dip rect> ; inline
 
 : logn ( x n -- y ) [ log ] bi@ / ;
 
+GENERIC: lgamma ( x -- y )
+
+M: float lgamma flgamma ;
+
+M: real lgamma >float lgamma ;
+
 <PRIVATE
 
 : most-negative-finite-float ( -- x )
