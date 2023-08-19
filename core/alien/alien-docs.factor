@@ -239,7 +239,7 @@ ARTICLE: "alien-assembly" "Calling arbitrary assembly code"
 $nl
 "Assembler opcodes are defined in CPU-specific vocabularies:"
 { $list
-    { $vocab-link "cpu.arm.assembler" }
+    { $vocab-link "cpu.arm.64.assembler" }
     { $vocab-link "cpu.ppc.assembler" }
     { $vocab-link "cpu.x86.assembler" }
 }
