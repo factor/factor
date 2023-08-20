@@ -4,6 +4,7 @@ USING: help.markup io.streams.string kernel sequences
 tools.scaffold tools.scaffold.private tools.test unicode ;
 IN: tools.scaffold.tests
 
+
 : undocumented-word ( obj1 obj2 -- obj3 obj4 )
     [ >lower ] [ >upper ] bi* ;
 
@@ -23,7 +24,8 @@ IN: tools.scaffold.tests
 {
 "HELP: iota
 { $class-description \"\" } ;
-" }
+"
+}
 [
     [ \ iota scaffold-word-docs ] with-string-writer
 ] unit-test
@@ -37,4 +39,14 @@ IN: tools.scaffold.tests
 
 : test-maybe ( obj -- obj/f ) ;
 
-{ } [ \ test-maybe scaffold-word-docs ] unit-test
+{
+"HELP: test-maybe
+{ $values
+    { \"obj\" object }
+    { \"obj/f\" { $maybe object } }
+}
+{ $description \"\" } ;
+"
+}
+[ [ \ test-maybe scaffold-word-docs ] with-string-writer ]
+unit-test
