@@ -403,11 +403,27 @@ PRIVATE>
 : rescale ( u -- v )
     dup minmax over - [ v-n ] [ v/n ] bi* ;
 
-: rankings ( histogram -- assoc )
-    sort-keys 0 swap [ rot [ + ] keep swapd ] H{ } assoc-map-as nip ;
+<PRIVATE
 
-: rank-values ( seq -- seq' )
-    dup histogram rankings '[ _ at ] map ;
+: rankings ( histogram method: ( min max -- rank ) -- assoc )
+    [ sort-keys 0 swap ] dip
+    '[ swapd dupd + _ keep -rot ] H{ } assoc-map-as nip ; inline
+
+: rank-by ( seq method: ( min max -- rank ) -- seq' )
+    [ dup histogram ] [ rankings ] bi* '[ _ at ] map ; inline
+
+PRIVATE>
+
+: rank-by-avg ( seq -- seq' ) [ + 1 + 2 / ] rank-by ;
+
+: rank-by-min ( seq -- seq' ) [ drop 1 + ] rank-by ;
+
+: rank-by-max ( seq -- seq' ) [ nip ] rank-by ;
+
+ALIAS: rank rank-by-avg
+
+: spearman-corr ( x-seq y-seq -- corr )
+    [ rank ] bi@ population-corr ;
 
 : z-score ( seq -- n )
     [ demean ] [ sample-std ] bi v/n ;

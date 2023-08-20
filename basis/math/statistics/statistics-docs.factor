@@ -82,6 +82,10 @@ HELP: population-corr
 { $values { "x-seq" sequence } { "y-seq" sequence } { "corr" "a real number" } }
 { $description "Computes the correlation of two sequences, " { $snippet "x-seq" } " and " { $snippet "y-seq" } "." } ;
 
+HELP: spearman-corr
+{ $values { "x-seq" sequence } { "y-seq" sequence } { "corr" "a real number" } }
+{ $description "Computes the Spearman's correlation of two sequences, " { $snippet "x-seq" } " and " { $snippet "y-seq" } "." $nl "For more information see " { $url "https://en.wikipedia.org/wiki/Spearman%27s_rank_correlation_coefficient" } "." } ;
+
 HELP: histogram
 { $values
     { "seq" sequence }
