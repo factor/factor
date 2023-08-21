@@ -14,8 +14,8 @@ CONSTANT: MAX_UNICODE_PATH 32768
     { "mswsock"     "mswsock.dll"        stdcall }
     { "shell32"     "shell32.dll"        stdcall }
     { "iphlpapi"    "iphlpapi.dll"       stdcall }
-    { "libc"        "msvcrt.dll"         cdecl   }
-    { "libm"        "msvcrt.dll"         cdecl   }
+    { "libc"        "ucrtbase.dll"       cdecl   }
+    { "libm"        "ucrtbase.dll"       cdecl   }
     { "gdiplus"     "gdiplus.dll"        stdcall }
     { "gl"          "opengl32.dll"       stdcall }
     { "glu"         "glu32.dll"          stdcall }
