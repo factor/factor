@@ -409,7 +409,7 @@ ${example-indent}}
     " " glue ;
 
 : run-string ( string -- datastack )
-    parse-string V{ } clone swap with-datastack ; inline
+    [ parse-string V{ } clone swap with-datastack ] with-file-vocabs ; inline
 
 : read-unit-test ( -- str/f )
     read-contents dup "" = [
