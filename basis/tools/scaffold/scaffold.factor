@@ -412,12 +412,10 @@ ${example-indent}}
     [ parse-string ] with-file-vocabs V{ } clone swap with-datastack ;
 
 : read-unit-test ( -- str/f )
-    read-contents dup "" = [
-        drop f
-    ] [
+    read-contents [ f ] [
         [ run-string [ unparse ] without-limits ] keep
         make-unit-test
-    ] if ;
+    ] if-empty ;
 
 : read-unit-tests ( -- str )
     [ read-unit-test dup ] [ ] produce nip "\n\n" join ;
