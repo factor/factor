@@ -116,7 +116,7 @@ IN: build-from-source.windows
 : cairo-versions ( -- seq )
     "gitlab.freedesktop.org" "cairo" "cairo" [
         git-tag*
-    ] with-bare-gitlab-repo
+    ] with-no-checkout-gitlab-repo
     [ [ digit-or-dot? ] all? ] filter
     human-sort ;
 

@@ -81,7 +81,7 @@ ERROR: no-output-file path ;
 : gitlab-tag-disk-checkout-path ( base org/user project tag -- path )
     [ gitlab-disk-path ] dip append-path absolute-path ;
 
-: with-build-from-source-gitlab-bare-directory ( base org/user quot -- )
+: with-build-from-source-gitlab-no-checkout-directory ( base org/user quot -- )
     [ build-from-source-directory-gitlab prepend-path dup make-directories ] dip with-directory ; inline
 
 : gitlab-git-uri ( base org/user project -- uri ) "git://%s/%s/%s" sprintf ;
@@ -91,15 +91,15 @@ ERROR: no-output-file path ;
 : gitlab-uri ( base org/user project -- uri )
     use-gitlab-git-uris get [ gitlab-git-uri ] [ gitlab-https-uri ] if ;
 
-: sync-gitlab-bare-repository ( base org/user project -- )
+: sync-gitlab-no-checkout-repository ( base org/user project -- )
     [ 2drop ] [ gitlab-uri ] [ nipd append-path ] 3tri
     '[
-        _ _ sync-bare-repository-as wait-for-success
-    ] with-build-from-source-gitlab-bare-directory ;
+        _ _ sync-no-checkout-repository-as wait-for-success
+    ] with-build-from-source-gitlab-no-checkout-directory ;
 
-: with-bare-gitlab-repo ( base org/user project quot -- )
+: with-no-checkout-gitlab-repo ( base org/user project quot -- )
     [
-        [ sync-gitlab-bare-repository ]
+        [ sync-gitlab-no-checkout-repository ]
         [ gitlab-disk-path ] 3bi
     ] dip with-directory ; inline
 
@@ -113,22 +113,26 @@ ERROR: no-output-file path ;
 : github-tag-disk-checkout-path ( org/user project tag -- path )
     [ github-disk-path ] dip append-path absolute-path ;
 
-: with-build-from-source-github-bare-directory ( org/user quot -- )
+: with-build-from-source-github-no-checkout-directory ( org/user quot -- )
     [ build-from-source-directory-github prepend-path dup make-directories ] dip with-directory ; inline
 
 : github-uri ( org/user project -- uri )
     use-github-git-uris get [ github-git-uri ] [ github-https-uri ] if ;
 
-: sync-github-bare-repository ( org/user project -- )
+: sync-github-no-checkout-repository ( org/user project -- )
     [ drop ] [ github-uri ] [ nip git-directory-name ] 2tri
     '[
-        _ _ sync-bare-repository-as wait-for-success
-    ] with-build-from-source-github-bare-directory ;
+        _ _ sync-no-checkout-repository-as wait-for-success
+    ] with-build-from-source-github-no-checkout-directory ;
+
+: check-build-completed ( path -- path' file-contents/f )
+    "factor-build-completed" append-path
+    dup file-exists? [ dup utf8 file-contents ] [ f ] if ;
 
 : with-github-worktree-tag ( org/user project tag quot -- )
     [
         {
-            [ drop sync-github-bare-repository ]
+            [ drop sync-github-no-checkout-repository ]
             [ drop github-disk-path ]
             [ github-tag-disk-checkout-path ]
             [ 2nip ]
@@ -136,9 +140,9 @@ ERROR: no-output-file path ;
     ] dip
     '[
         _ _
-        over "factor-build-completed" append-path dup file-exists? [
-            utf8 file-contents
-            "%s\n- %s already built at %s" sprintf print
+        over "build-from-source considering github %s" sprintf print
+        over check-build-completed [
+            2nip "- %s already built at %s" sprintf print
         ] [
             [
                 over "%s\n- deleting old build..." sprintf write
@@ -149,23 +153,23 @@ ERROR: no-output-file path ;
                 "done!" print
                 now timestamp>rfc3339
             ] dip utf8 set-file-contents
-        ] if
+        ] if*
     ] with-directory ; inline
 
 : with-gitlab-worktree-tag ( base org/user project tag quot -- )
     [
         {
-            [ drop sync-gitlab-bare-repository ]
+            [ drop sync-gitlab-no-checkout-repository ]
             [ drop gitlab-disk-path ]
             [ gitlab-tag-disk-checkout-path ]
             [ 3nip ]
         } 4cleave
     ] dip
     '[
-        _ _
-        over "factor-build-completed" append-path dup file-exists? [
-            utf8 file-contents
-            "%s\n- %s already built at %s" sprintf print
+        _ 
+        dup "build-from-source considering gitlab %s" sprintf print
+        over check-build-completed [
+            2nip "%s already built at %s" sprintf print
         ] [
             [
                 over "%s\n- deleting old build..." sprintf write
@@ -176,7 +180,7 @@ ERROR: no-output-file path ;
                 "done!" print
                 now timestamp>rfc3339
             ] dip utf8 set-file-contents
-        ] if
+        ] if*
     ] with-directory ; inline
 
 : ?download ( path -- )
@@ -184,11 +188,20 @@ ERROR: no-output-file path ;
 
 : with-tar-gz ( path quot -- )
     '[
-        _
-        [ ?download ]
-        [ file-name { "tar" "xvfz" } swap suffix try-process ]
-        [ file-name ".tar.gz" ?tail drop ] tri
-        prepend-current-path _ with-directory
+        _ dup "build-from-source considering tar.gz %s" sprintf print
+        dup file-name ".tar.gz" ?tail drop check-build-completed [
+            2nip "- already built at %s" sprintf print
+        ] [
+            "- building..." write
+            [
+                [ ?download ]
+                [ file-name { "tar" "xvfz" } swap suffix try-process ]
+                [ file-name ".tar.gz" ?tail drop ] tri
+                prepend-current-path _ with-directory
+                now timestamp>rfc3339
+            ] dip utf8 set-file-contents
+            "done!" print
+        ] if*
     ] with-build-from-source-cpu-directory ; inline
 
 : split-python-version ( version -- array )
