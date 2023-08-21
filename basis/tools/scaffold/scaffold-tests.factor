@@ -1,6 +1,6 @@
 ! Copyright (C) 2009 Doug Coleman.
 ! See https://factorcode.org/license.txt for BSD license.
-USING: help.markup io.streams.string kernel sequences
+USING: help.markup io.streams.string kernel math sequences
 tools.scaffold tools.scaffold.private tools.test unicode ;
 IN: tools.scaffold.tests
 
@@ -50,3 +50,31 @@ IN: tools.scaffold.tests
 }
 [ [ \ test-maybe scaffold-word-docs ] with-string-writer ]
 unit-test
+
+
+{ "{ \"foofoo\" } [\n    \"foo\" dup append\n] unit-test\n" } [
+    "\"foo\" dup append" [ read-unit-test ] with-string-reader
+] unit-test
+
+
+{
+    "{\n    \"foobarbazfoobarbazfoobarbazfoobarbazfoobarbazfoobarbazfoobarbazfoobarbaz\"\n} [\n    \"foobarbaz\" 3 [ dup append ] times\n] unit-test\n"
+} [
+    "\"foobarbaz\" 3 [ dup append ] times"
+    [ read-unit-test ] with-string-reader
+] unit-test
+
+
+{ "foobar [\n    baz\n] unit-test\n" } [
+    "foobar" "baz" make-unit-test
+] unit-test
+
+
+{ "foobar [\n    foz\n    baz\n] unit-test\n" } [
+    "foobar" "foz\nbaz" make-unit-test
+] unit-test
+
+
+{ { 2 } } [
+    "2 1 + 3 * 7 -" run-string
+] unit-test
