@@ -1,5 +1,5 @@
 ! Copyright (C) 2009 Diego Martinelli.
-! Copyright (C) 2022 Zoltán Kéri.
+! Copyright (C) 2023 Zoltán Kéri.
 ! See https://factorcode.org/license.txt for BSD license.
 USING: accessors byte-arrays calendar calendar.format
 calendar.parser checksums checksums.openssl classes.tuple
@@ -87,8 +87,7 @@ PRIVATE>
 <PRIVATE
 
 ! NOTE: Recommended expiry time is 28 days.
-SYMBOL: expiry-days
-expiry-days [ 28 ] initialize
+INITIALIZED-SYMBOL: expiry-days [ 28 ]
 
 PRIVATE>
 
