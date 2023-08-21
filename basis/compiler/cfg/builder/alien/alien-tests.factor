@@ -45,7 +45,7 @@ IN: compiler.cfg.builder.alien.tests
 ! caller-linkage
 ${
     "malloc"
-    os windows? "msvcrt.dll" f ?
+    os windows? "ucrtbase.dll" f ?
 } [
     f f cdecl f "libc" "malloc" alien-invoke-params boa
     caller-linkage
