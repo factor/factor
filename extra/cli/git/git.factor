@@ -2,8 +2,9 @@
 ! See https://factorcode.org/license.txt for BSD license.
 USING: accessors arrays combinators.short-circuit
 concurrency.combinators concurrency.semaphores io io.directories
-io.encodings.utf8 io.files.info io.launcher io.pathnames kernel
-math namespaces sequences splitting system-info unicode ;
+io.encodings.utf8 io.files io.files.info io.launcher
+io.pathnames kernel math namespaces sequences splitting
+system-info unicode ;
 IN: cli.git
 
 SYMBOL: cli-git-num-parallel
@@ -12,6 +13,8 @@ cli-git-num-parallel [ cpus 2 * ] initialize
 : git-command>string ( desc -- string )
     utf8 <process-reader> stream-contents [ blank? ] trim-tail ;
 
+: git-clone-no-checkout-as ( uri path -- process ) [ { "git" "clone" "--no-checkout" } ] 2dip 2array append run-process ;
+: git-clone-no-checkout ( uri -- process ) [ { "git" "clone" "--no-checkout" } ] dip suffix run-process ;
 : git-clone-bare-as ( uri path -- process ) [ { "git" "clone" "--bare" } ] 2dip 2array append run-process ;
 : git-clone-bare ( uri -- process ) [ { "git" "clone" "--bare" } ] dip suffix run-process ;
 : git-clone-as ( uri path -- process ) [ { "git" "clone" } ] 2dip 2array append run-process ;
@@ -32,6 +35,8 @@ cli-git-num-parallel [ cpus 2 * ] initialize
 : git-fetch-tags ( path -- process ) [ git-fetch-tags* ] with-directory ;
 : git-tag* ( -- process ) { "git" "tag" } process-lines ;
 : git-tag ( path -- process ) [ git-tag* ] with-directory ;
+: git-switch-new-branch* ( branch -- process ) [ { "git" "switch" "-c" } ] dip suffix run-process ;
+: git-switch-new-branch ( path branch -- process ) '[ _ git-switch-new-branch* ] with-directory ;
 : git-checkout-new-branch* ( branch -- process ) [ { "git" "checkout" "-b" } ] dip suffix run-process ;
 : git-checkout-new-branch ( path branch -- process ) '[ _ git-checkout-new-branch* ] with-directory ;
 : git-checkout-existing* ( branch/checksum -- process ) [ { "git" "checkout" } ] dip suffix run-process ;
@@ -53,6 +58,9 @@ cli-git-num-parallel [ cpus 2 * ] initialize
     ".git" append-path current-directory get prepend-path
     ?file-info dup [ directory? ] when ;
 
+: git-no-checkout-directory? ( directory -- ? )
+    current-directory get prepend-path file-exists? ;
+
 : git-current-branch* ( -- name )
     { "git" "rev-parse" "--abbrev-ref" "HEAD" } git-command>string ;
 
@@ -73,6 +81,17 @@ cli-git-num-parallel [ cpus 2 * ] initialize
         [ ?file-info [ directory? ] [ f ] if* ]
         [ git-is-bare-repository ]
     } 1&& ;
+
+: sync-no-checkout-repository ( url -- process )
+    dup git-directory-name git-no-checkout-directory?
+    [ git-directory-name git-fetch-all ] [ git-clone-no-checkout ] if ;
+
+: sync-no-checkout-repository-as ( url path -- processes )
+    dup git-no-checkout-directory?
+    [ nip git-fetch-all ] [
+        [ git-clone-no-checkout-as wait-for-success ]
+        [ "factor-build-from-source" git-switch-new-branch ] bi
+    ] if ;
 
 : sync-bare-repository ( url -- process )
     dup git-directory-name git-bare-directory?
