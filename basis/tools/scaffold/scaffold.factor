@@ -4,10 +4,10 @@ USING: accessors alien arrays assocs byte-arrays calendar
 classes classes.error combinators combinators.short-circuit
 continuations effects eval hashtables help.markup interpolate io
 io.directories io.encodings.utf8 io.files io.pathnames
-io.streams.string kernel math math.parser namespaces prettyprint
-prettyprint.config quotations sequences sets sorting splitting
-strings system timers unicode urls vocabs vocabs.loader
-vocabs.metadata words words.symbol ;
+io.streams.string kernel math math.parser namespaces parser
+prettyprint prettyprint.config quotations sequences sets sorting
+splitting strings system timers unicode urls vocabs
+vocabs.loader vocabs.metadata words words.symbol ;
 IN: tools.scaffold
 
 SYMBOL: developer-name
@@ -423,10 +423,8 @@ ${example-indent}}
     [ read-unit-test dup ] [ ] produce nip "\n\n" join ;
 
 : scaffold-unit-tests ( vocab -- )
-    dup scaffold-tests vocab>test-path
-    [ read-unit-test ]
-    [ dup print "\n\n" prepend
-        over utf8 [ write ] with-file-appender ] while* drop ;
+    [ scaffold-tests read-unit-tests ]
+    [ vocab>test-path utf8 [ write ] with-file-appender ] bi ;
 
 HOOK: scaffold-emacs os ( -- )
 
