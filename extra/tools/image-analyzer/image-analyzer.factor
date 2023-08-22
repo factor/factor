@@ -10,6 +10,9 @@ TUPLE: image header heap ;
 : code-heap>code-blocks ( code-heap -- code-blocks )
     binary [ [ read-code-block ] consume-stream>sequence ] with-byte-reader ;
 
+: data-heap-size ( header-struct -- data-heap-size )
+    [ escaped-data-size>> ] [ data-size>> ] bi [ nip ] unless-zero ;
+
 : data-heap>objects ( data-relocation-base data-heap -- seq )
     binary [ '[ _ read-object ] consume-stream>sequence ] with-byte-reader ;
 
@@ -23,7 +26,7 @@ TUPLE: image header heap ;
 : load-image ( image-file -- image )
     binary [
         image-header read-struct dup [
-            [ data-relocation-base>> ] [ data-size>> read ] bi
+            [ data-relocation-base>> ] [ data-heap-size read ] bi
             data-heap>objects
         ]
         [ code-size>> read code-heap>code-blocks ] bi
