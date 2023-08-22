@@ -90,7 +90,7 @@ M: arm.64 %bit-count
     D0 swap DX FMOVgen ;
 
 M: arm.64 %bit-test
-    [ 2^ swap TSTi ] dip
+    [ 2^ swap TSTi ] keep
     swap dup EQ CSEL ;
 
 M: arm.64 %and rot ANDr ;

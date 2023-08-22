@@ -226,8 +226,7 @@ use: src/int-rep ;
 
 FOLDABLE-INSN: ##bit-test
 def: dst/tagged-rep
-use: src1/int-rep src2/int-rep
-temp: temp/int-rep ;
+use: src1/int-rep src2/int-rep ;
 
 ! Float arithmetic
 FOLDABLE-INSN: ##add-float

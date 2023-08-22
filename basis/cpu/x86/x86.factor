@@ -771,9 +771,9 @@ M: x86 immediate-bitwise?
         { cc/<>= [ src1 src2 compare call( a b -- ) label JP ] }
     } case ;
 
-M:: x86 %bit-test ( dst src1 src2 temp -- )
+M:: x86 %bit-test ( dst src1 src2 -- )
     src1 src2 BT
-    dst temp \ CMOVB (%boolean) ;
+    dst src2 \ CMOVB (%boolean) ;
 
 M: x86 enable-cpu-features
     enable-min/max
