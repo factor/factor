@@ -16,7 +16,7 @@ IN: ogg
 <<
 "ogg" {
     { [ os windows? ]  [ "ogg.dll" ] }
-    { [ os macosx? ] [ "libogg.0.dylib" ] }
+    { [ os macosx? ] [ "libogg.dylib" ] }
     { [ os unix? ]   [ "libogg.so" ] }
 } cond cdecl add-library
 
