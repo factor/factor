@@ -171,7 +171,7 @@ M: pathname url-of
     ] re-replace-with
 
     R/ font-family: monospace;/ [
-        " margin-top: 0.5em; width: fit-content; white-space: pre-wrap; line-height: 125%;" append
+        " margin-top: 0.5em; margin-bottom: 0.5em; width: fit-content; white-space: pre-wrap; line-height: 125%;" append
     ] re-replace-with ;
 
 : fix-help-header ( classes -- classes )
