@@ -19,7 +19,6 @@ M: windows dll-list
         "resource:libcrypto-3.dll"
         "resource:libssl-3.dll"
     } ? {
-        "resource:libtls-10.dll"
         "resource:sqlite3.dll"
     } append ;
 
