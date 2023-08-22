@@ -1,11 +1,11 @@
 ! Copyright (C) 2023 Doug Coleman.
 ! See https://factorcode.org/license.txt for BSD license.
-USING: accessors ascii build-from-source cli.git
+USING: accessors ascii assocs build-from-source cli.git
 combinators.short-circuit combinators.smart continuations
 environment github html.parser html.parser.analyzer http.client
-io.directories io.files.temp io.launcher io.pathnames kernel
-layouts math namespaces qw sequences sorting.human splitting
-windows.shell32 ;
+io.directories io.encodings.string io.encodings.utf8
+io.files.temp io.launcher io.pathnames json kernel layouts math
+namespaces qw sequences sorting.human splitting windows.shell32 ;
 IN: build-from-source.windows
 
 ! choco install -y meson StrawberryPerl nasm winflexbison3 glfw3 jom
@@ -113,15 +113,12 @@ IN: build-from-source.windows
 : build-openssl-dlls ( -- )
     32-bit? [ build-openssl-32-dlls ] [ build-openssl-64-dlls ] if ;
 
-: cairo-versions ( -- seq )
-    "gitlab.freedesktop.org" "cairo" "cairo" [
-        git-tag*
-    ] with-no-checkout-gitlab-repo
-    [ [ digit-or-dot? ] all? ] filter
-    human-sort ;
+: cairo-versions ( -- version )
+    "https://gitlab.freedesktop.org/api/v4/projects/956/repository/tags"
+    http-get nip utf8 decode json> [ "name" of ] map ;
 
 : build-cairo-dll ( -- )
-    "gitlab.freedesktop.org" "cairo" "cairo" cairo-versions last [
+    "gitlab.freedesktop.org" "cairo" "cairo" cairo-versions first [
         qw{ meson setup --force-fallback-for=freetype2,fontconfig,zlib,expat,expat_dep build } try-process
         "build" prepend-current-path
         [ { "ninja" } try-process ] with-directory
