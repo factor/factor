@@ -9,9 +9,7 @@ IN: openal.alut
 
 << "alut" {
         { [ os windows? ]  [ "alut.dll" ] }
-        { [ os macosx? ] [
-            "/System/Library/Frameworks/OpenAL.framework/OpenAL"
-        ] }
+        { [ os macosx? ] [ "libalut.dylib" ] }
         { [ os unix?  ]  [ "libalut.so" ] }
     } cond cdecl add-library >>
 
