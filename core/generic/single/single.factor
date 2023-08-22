@@ -1,5 +1,5 @@
 ! Copyright (C) 2009, 2010 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs classes classes.algebra
 combinators combinators.private definitions effects generic
 hashtables kernel layouts make math namespaces quotations
@@ -77,7 +77,7 @@ C: <predicate-engine> predicate-engine
 
 : push-method ( method class atomic assoc -- )
     dupd [
-        [ ] [ H{ } clone <predicate-engine> ] ?if
+        or* [ H{ } clone <predicate-engine> ] unless
         [ methods>> set-at ] keep
     ] change-at ;
 

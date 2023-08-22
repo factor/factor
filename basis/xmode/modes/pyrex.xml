@@ -7,7 +7,7 @@
 		<PROPERTY NAME="indentNextLines" VALUE="\s*[^#]{3,}:\s*(#.*)?" />
 		<PROPERTY NAME="lineComment" VALUE="#" />
 	</PROPS>
-	<RULES ESCAPE="\" IGNORE_CASE="FALSE" HIGHLIGHT_DIGITS="TRUE">
+	<RULES IGNORE_CASE="FALSE" HIGHLIGHT_DIGITS="TRUE">
 
 		<IMPORT DELEGATE="python::MAIN"/>
 

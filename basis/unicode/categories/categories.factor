@@ -1,5 +1,5 @@
 ! Copyright (C) 2008 Daniel Ehrenberg.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors assocs classes.parser classes.predicate fry
 kernel math parser sequences splitting unicode.data
 unicode.data.private ;

@@ -1,5 +1,5 @@
 ! Copyright (C) 2007, 2009 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors eval kernel math.vectors parser prettyprint
 refs sequences ui.commands ui.gadgets ui.gadgets.editors
 ui.gadgets.scrollers ui.gadgets.status-bar ui.gadgets.toolbar

@@ -1,5 +1,5 @@
 ! Copyright (C) 2008 Doug Coleman.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors alien.c-types checksums checksums.common
 combinators combinators.smart endian grouping kernel
 kernel.private literals math math.bitwise ranges

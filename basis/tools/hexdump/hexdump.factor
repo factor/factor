@@ -1,5 +1,5 @@
 ! Copyright (C) 2008 Doug Coleman.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 
 USING: accessors ascii byte-arrays byte-vectors combinators
 command-line destructors fry io io.encodings io.encodings.binary
@@ -35,7 +35,7 @@ CONSTANT: hex-digits $[
     [ 0 swap length ] keep ; inline
 
 : each-byte ( from to bytes quot: ( elt -- ) -- )
-    '[ _ nth-unsafe @ ] (each-integer) ; inline
+    '[ _ nth-unsafe @ ] each-integer-from ; inline
 
 : write-bytes ( from to bytes stream -- )
     '[ hex-digits nth-unsafe _ stream-write ] each-byte ; inline

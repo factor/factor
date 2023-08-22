@@ -1,5 +1,5 @@
 ! Copyright (C) 2006 Chris Double.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: help.markup help.syntax namespaces assocs
 kernel combinators ;
 IN: match
@@ -15,7 +15,7 @@ HELP: match
 
 HELP: match-cond
 { $values { "assoc" "a sequence of pairs" } }
-{ $description "Calls the second quotation in the first pair whose first sequence yields a successful " { $link match } " against the top of the stack. The second quotation, when called, has the hashtable returned from the " { $link match } " call bound as the top namespace so " { $link get } " can be used to retrieve the values. A single quotation will always yield a true value. To have a fallthrough match clause use the " { $link _ } " match variable." }
+{ $description "Calls the second quotation in the first pair whose first sequence yields a successful " { $link match } " against the top of the stack. The second quotation, when called, has the hashtable returned from the " { $link match } " call bound as the top namespace so the match variables can be used to retrieve the values. A single quotation will always yield a true value. To have a fallthrough match clause use the " { $link _ } " match variable." }
 { $errors "Throws a " { $link no-match-cond } " error if none of the test quotations yield a true value." }
 { $examples
     { $code

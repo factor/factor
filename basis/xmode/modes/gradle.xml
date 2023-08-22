@@ -1,0 +1,51 @@
+<?xml version="1.0"?>
+<!DOCTYPE MODE SYSTEM "xmode.dtd">
+<!--
+<MODE NAME="gradle"			FILE="gradle.xml"
+				FILE_NAME_GLOB="*.{gradle}"/>
+-->
+<MODE>
+   <PROPS>
+      <PROPERTY NAME="commentStart" VALUE="/*" />
+      <PROPERTY NAME="commentEnd" VALUE="*/" />
+      <PROPERTY NAME="lineComment" VALUE="//" />
+      <PROPERTY NAME="indentOpenBrackets" VALUE="{" />
+      <PROPERTY NAME="indentCloseBrackets" VALUE="}" />
+      <PROPERTY NAME="indentNextLine" VALUE="\s*(((if|while)\s*\(|else\s*|else\s+if\s*\(|for\s*\(.*\))[^{;]*)" />
+   </PROPS>
+
+   <RULES HIGHLIGHT_DIGITS="TRUE" IGNORE_CASE="FALSE">
+      <IMPORT DELEGATE="groovy::MAIN"/>
+      
+      <MARK_PREVIOUS MATCH_TYPE="OPERATOR" TYPE="LABEL">:</MARK_PREVIOUS>
+      <MARK_PREVIOUS MATCH_TYPE="NULL" TYPE="FUNCTION"> {</MARK_PREVIOUS>
+
+      <SEQ TYPE="OPERATOR">:</SEQ>
+      <SEQ TYPE="OPERATOR">&lt;</SEQ>
+      
+      <KEYWORDS>
+         <FUNCTION>afterEvaluate</FUNCTION>
+         <FUNCTION>afterProject</FUNCTION>
+         <FUNCTION>afterTask</FUNCTION>
+         <FUNCTION>allProjects</FUNCTION>
+         <FUNCTION>apply</FUNCTION>
+         <FUNCTION>beforeTask</FUNCTION>
+         <FUNCTION>delete</FUNCTION>
+         <FUNCTION>doFirst</FUNCTION>
+         <FUNCTION>doLast</FUNCTION>
+         <FUNCTION>exclude</FUNCTION>
+         <FUNCTION>from</FUNCTION>
+         <FUNCTION>include</FUNCTION>
+         <FUNCTION>includeFlat</FUNCTION>
+         <FUNCTION>into</FUNCTION>
+         <FUNCTION>mavenRepo</FUNCTION>
+         <FUNCTION>onlyIf</FUNCTION>
+         <FUNCTION>task</FUNCTION>
+         <FUNCTION>whenReady</FUNCTION>
+         <FUNCTION>whenTaskAdded</FUNCTION>
+
+         <KEYWORD1>gradle</KEYWORD1>
+         <KEYWORD1>project</KEYWORD1>
+      </KEYWORDS>
+   </RULES>
+</MODE>

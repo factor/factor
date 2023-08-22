@@ -1,5 +1,5 @@
 ! Copyright (C) 2005, 2009 Daniel Ehrenberg
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: help.markup help.syntax ;
 IN: xml.errors
 
@@ -47,7 +47,7 @@ HELP: no-entity
 
 
 HELP: pre/post-content
-{ $class-description "Describes the error where a non-whitespace string is used before or after the main tag in an XML document. Contains two slots: " { $snippet "string" } " contains the offending string, and " { $snippet "pre?" } " is " { $snippet "t" } " if it occured before the main tag and " { $snippet "f" } " if it occured after." }
+{ $class-description "Describes the error where a non-whitespace string is used before or after the main tag in an XML document. Contains two slots: " { $snippet "string" } " contains the offending string, and " { $snippet "pre?" } " is " { $snippet "t" } " if it occurred before the main tag and " { $snippet "f" } " if it occurred after." }
 { $xml-error "hello\n<main-tag/>" } ;
 
 HELP: bad-name

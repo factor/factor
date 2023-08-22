@@ -1,5 +1,5 @@
 ! Copyright (C) 2008 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: arrays ascii combinators.short-circuit kernel make
 math.parser peg peg.parsers sequences sequences.deep strings ;
 IN: http.parsers
@@ -71,7 +71,7 @@ IN: http.parsers
         space-parser ,
     ] seq* [ "1.0" suffix! ] action ;
 
-PEG: parse-request-line ( string -- triple )
+PARTIAL-PEG: parse-request-line ( string -- triple )
     ! Triple is { method url version }
     full-request-parser simple-request-parser 2array choice ;
 
@@ -84,7 +84,7 @@ PEG: parse-request-line ( string -- triple )
 : response-message-parser ( -- parser )
     text-parser repeat0 case-sensitive ;
 
-PEG: parse-response-line ( string -- triple )
+PARTIAL-PEG: parse-response-line ( string -- triple )
     ! Triple is { version code message }
     [
         space-parser ,
@@ -124,7 +124,7 @@ PEG: parse-response-line ( string -- triple )
     text-parser repeat0 case-sensitive
     2choice ;
 
-PEG: parse-header-line ( string -- pair )
+PARTIAL-PEG: parse-header-line ( string -- pair )
     ! Pair is either { name value } or { f value }. If f, its a
     ! continuation of the previous header line.
     [
@@ -163,7 +163,7 @@ PEG: parse-header-line ( string -- pair )
 : av-pairs-parser ( -- parser )
     av-pair-parser ";" token list-of optional ;
 
-PEG: (parse-set-cookie) ( string -- alist )
+PARTIAL-PEG: (parse-set-cookie) ( string -- alist )
     av-pairs-parser just [ sift ] action ;
 
 : cookie-value-parser ( -- parser )
@@ -179,6 +179,6 @@ PEG: (parse-set-cookie) ( string -- alist )
     [ ";,=" member? not ] satisfy repeat0 [ drop f ] action
     2choice ;
 
-PEG: (parse-cookie) ( string -- alist )
+PARTIAL-PEG: (parse-cookie) ( string -- alist )
     cookie-value-parser [ ";," member? ] satisfy list-of
     optional just [ sift ] action ;

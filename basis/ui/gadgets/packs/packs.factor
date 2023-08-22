@@ -1,5 +1,5 @@
 ! Copyright (C) 2005, 2010 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors arrays combinators kernel math math.order
 math.vectors sequences ui.baseline-alignment
 ui.baseline-alignment.private ui.gadgets ;

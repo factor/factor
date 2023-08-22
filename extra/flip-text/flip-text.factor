@@ -1,5 +1,5 @@
 ! Copyright (C) 2010 John Benediktsson
-! See http://factorcode.org/license.txt for BSD license
+! See https://factorcode.org/license.txt for BSD license
 
 USING: assocs kernel sequences ;
 
@@ -91,7 +91,7 @@ CONSTANT: CHARS H{
 CHARS [ CHARS set-at ] assoc-each
 
 : ch>flip ( ch -- ch' )
-    dup CHARS at [ nip ] when* ;
+    [ CHARS at ] transmute ;
 
 PRIVATE>
 

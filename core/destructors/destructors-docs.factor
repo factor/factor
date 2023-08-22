@@ -63,7 +63,7 @@ HELP: |dispose
 
 HELP: dispose-each
 { $values
-     { "seq" sequence } }
+    { "seq" sequence } }
 { $description "Attempts to dispose of each element of a sequence and collects all of the errors into a sequence. If any errors are thrown during disposal, the last error is rethrown after all objects have been disposed." } ;
 
 HELP: disposables

@@ -1,5 +1,5 @@
 ! Copyright (C) 2010 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors calendar combinators db.tuples furnace.actions
 furnace.redirection html.forms http.server.responses io kernel
 namespaces validators webapps.mason.utils webapps.mason.backend ;
@@ -10,7 +10,7 @@ IN: webapps.mason.status-update
         swap >>cpu
         swap >>os
         swap >>host-name
-    dup select-tuple [ ] [ dup insert-tuple ] ?if ;
+    [ select-tuple ] [ dup insert-tuple ] ?unless ;
 
 : heartbeat ( builder -- )
     now >>heartbeat-timestamp

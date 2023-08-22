@@ -1,6 +1,6 @@
 ! (c) Joe Groff, see license for details
-USING: accessors combinators continuations fry kernel lexer
-math parser quotations sequences vectors words words.alias ;
+USING: accessors continuations fry kernel lexer math parser
+sequences vectors words words.alias ;
 IN: literals
 
 <PRIVATE

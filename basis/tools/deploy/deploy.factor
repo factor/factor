@@ -1,5 +1,5 @@
 ! Copyright (C) 2007, 2010 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: combinators command-line io.directories kernel namespaces
 sequences system tools.deploy.backend tools.deploy.config
 tools.deploy.config.editor vocabs vocabs.loader ;

@@ -1,5 +1,5 @@
 ! Copyright (c) 2012 Anonymous
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: kernel math namespaces sequences ;
 IN: rosetta-code.hofstadter-ffs
 

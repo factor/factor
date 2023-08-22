@@ -1,5 +1,5 @@
 ! Copyright (C) 2008 Doug Coleman.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: assocs help.markup help.syntax math sequences kernel ;
 IN: math.bitwise
 
@@ -131,8 +131,8 @@ HELP: bitroll
 
 HELP: bit-count
 { $values
-     { "obj" object }
-     { "n" integer }
+    { "obj" object }
+    { "n" integer }
 }
 { $description "Returns the number of set bits as an object. This word only works on non-negative integers or objects that can be represented as a byte-array." }
 { $examples
@@ -152,8 +152,8 @@ HELP: bit-count
 
 HELP: bitroll-32
 { $values
-     { "m" integer } { "s" integer }
-     { "n" integer }
+    { "m" integer } { "s" integer }
+    { "n" integer }
 }
 { $description "Rolls the number " { $snippet "m" } " by " { $snippet "s" } " bits to the left, wrapping around after 32 bits." }
 { $examples
@@ -169,8 +169,8 @@ HELP: bitroll-32
 
 HELP: bitroll-64
 { $values
-     { "m" integer } { "s" "a shift integer" }
-     { "n" integer }
+    { "m" integer } { "s" "a shift integer" }
+    { "n" integer }
 }
 { $description "Rolls the number " { $snippet "m" } " by " { $snippet "s" } " bits to the left, wrapping around after 64 bits." }
 { $examples
@@ -188,8 +188,8 @@ HELP: bitroll-64
 
 HELP: clear-bit
 { $values
-     { "x" integer } { "n" integer }
-     { "y" integer }
+    { "x" integer } { "n" integer }
+    { "y" integer }
 }
 { $description "Sets the " { $snippet "n" } "th bit of " { $snippet "x" } " to zero." }
 { $examples
@@ -265,8 +265,8 @@ HELP: >signed
 
 HELP: mask
 { $values
-     { "x" integer } { "n" integer }
-     { "y" integer }
+    { "x" integer } { "n" integer }
+    { "y" integer }
 }
 { $description "After the operation, only the bits that were set in both the mask and the original number are set." }
 { $examples
@@ -278,8 +278,8 @@ HELP: mask
 
 HELP: mask-bit
 { $values
-     { "m" integer } { "n" integer }
-     { "m'" integer }
+    { "m" integer } { "n" integer }
+    { "m'" integer }
 }
 { $description "Turns off all bits besides the " { $snippet "n" } "th bit." }
 { $examples
@@ -291,8 +291,8 @@ HELP: mask-bit
 
 HELP: mask?
 { $values
-     { "x" integer } { "n" integer }
-     { "?" boolean }
+    { "x" integer } { "n" integer }
+    { "?" boolean }
 }
 { $description "Returns true if all of the bits in the mask " { $snippet "n" } " are set in the integer input " { $snippet "x" } "." }
 { $examples
@@ -323,8 +323,8 @@ HELP: odd-parity?
 
 HELP: on-bits
 { $values
-     { "m" integer }
-     { "n" integer }
+    { "m" integer }
+    { "n" integer }
 }
 { $description "Returns an integer with " { $snippet "m" } " bits set." }
 { $examples
@@ -340,9 +340,9 @@ HELP: on-bits
 
 HELP: toggle-bit
 { $values
-     { "m" integer }
-     { "n" integer }
-     { "m'" integer }
+    { "m" integer }
+    { "n" integer }
+    { "m'" integer }
 }
 { $description "Toggles the " { $snippet "n" } "th bit of an integer." }
 { $examples
@@ -358,8 +358,8 @@ HELP: toggle-bit
 
 HELP: set-bit
 { $values
-     { "x" integer } { "n" integer }
-     { "y" integer }
+    { "x" integer } { "n" integer }
+    { "y" integer }
 }
 { $description "Sets the " { $snippet "n" } "th bit of " { $snippet "x" } "." }
 { $examples
@@ -371,15 +371,15 @@ HELP: set-bit
 
 HELP: shift-mod
 { $values
-     { "m" integer } { "s" integer } { "w" integer }
-     { "n" integer }
+    { "m" integer } { "s" integer } { "w" integer }
+    { "n" integer }
 }
 { $description "Calls " { $link shift } " on " { $snippet "n" } " and " { $snippet "s" } ", wrapping the result to " { $snippet "w" } " bits." } ;
 
 HELP: unmask
 { $values
-     { "x" integer } { "n" integer }
-     { "y" integer }
+    { "x" integer } { "n" integer }
+    { "y" integer }
 }
 { $description "Clears the bits in " { $snippet "x" } " if they are set in the mask " { $snippet "n" } "." }
 { $examples
@@ -391,8 +391,8 @@ HELP: unmask
 
 HELP: unmask?
 { $values
-     { "x" integer } { "n" integer }
-     { "?" boolean }
+    { "x" integer } { "n" integer }
+    { "?" boolean }
 }
 { $description "Tests whether unmasking the bits in " { $snippet "x" } " would return an integer greater than zero." }
 { $examples
@@ -404,8 +404,8 @@ HELP: unmask?
 
 HELP: w*
 { $values
-     { "x" integer } { "y" integer }
-     { "z" integer }
+    { "x" integer } { "y" integer }
+    { "z" integer }
 }
 { $description "Multiplies two integers and wraps the result to a 32-bit unsigned integer." }
 { $examples
@@ -417,8 +417,8 @@ HELP: w*
 
 HELP: w+
 { $values
-     { "x" integer } { "y" integer }
-     { "z" integer }
+    { "x" integer } { "y" integer }
+    { "z" integer }
 }
 { $description "Adds two integers and wraps the result to a 32-bit unsigned integer." }
 { $examples
@@ -430,8 +430,8 @@ HELP: w+
 
 HELP: w-
 { $values
-     { "x" integer } { "y" integer }
-     { "z" integer }
+    { "x" integer } { "y" integer }
+    { "z" integer }
 }
 { $description "Subtracts two integers and wraps the result to a 32-bit unsigned integer." }
 { $examples
@@ -443,8 +443,8 @@ HELP: w-
 
 HELP: W*
 { $values
-     { "x" integer } { "y" integer }
-     { "z" integer }
+    { "x" integer } { "y" integer }
+    { "z" integer }
 }
 { $description "Multiplies two integers and wraps the result to a 64-bit unsigned integer." }
 { $examples
@@ -456,8 +456,8 @@ HELP: W*
 
 HELP: W+
 { $values
-     { "x" integer } { "y" integer }
-     { "z" integer }
+    { "x" integer } { "y" integer }
+    { "z" integer }
 }
 { $description "Adds two integers and wraps the result to 64-bit unsigned integer." }
 { $examples
@@ -469,8 +469,8 @@ HELP: W+
 
 HELP: W-
 { $values
-     { "x" integer } { "y" integer }
-     { "z" integer }
+    { "x" integer } { "y" integer }
+    { "z" integer }
 }
 { $description "Subtracts two integers and wraps the result to a 64-bit unsigned integer." }
 { $examples
@@ -482,8 +482,8 @@ HELP: W-
 
 HELP: wrap
 { $values
-     { "m" integer } { "n" integer }
-     { "m'" integer }
+    { "m" integer } { "n" integer }
+    { "m'" integer }
 }
 { $description "Wraps an integer " { $snippet "m" } " by modding it by " { $snippet "n" } ". This word is uses bitwise arithmetic and does not actually call the modulus word, and as such can only mod by powers of two." }
 { $examples "Equivalent to modding by 8:"

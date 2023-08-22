@@ -59,8 +59,8 @@ ARTICLE: "set-operations" "Operations on sets"
 }
 "Utilities for sets and sequences:"
 { $subsections
-     within
-     without
+    within
+    without
 } ;
 
 ARTICLE: "set-implementations" "Set implementations"
@@ -199,8 +199,8 @@ HELP: set=
 
 HELP: gather
 { $values
-     { "seq" sequence } { "quot" { $quotation ( ... elt -- ... elts ) } }
-     { "newseq" sequence } }
+    { "seq" sequence } { "quot" { $quotation ( ... elt -- ... elts ) } }
+    { "newseq" sequence } }
 { $description "Maps a quotation over a sequence, concatenates the results of the mapping, and removes duplicates." } ;
 
 HELP: set-like

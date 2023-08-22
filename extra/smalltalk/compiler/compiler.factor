@@ -1,5 +1,5 @@
 ! Copyright (C) 2009 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs combinators continuations
 generic kernel locals.types math quotations sequences
 sequences.generalizations sets smalltalk.ast smalltalk.classes
@@ -144,7 +144,7 @@ ERROR: no-word name ;
 
 M: ast-foreign compile-ast
     nip
-    [ class>> dup ":" split1 lookup-word [ ] [ no-word ] ?if ]
+    [ class>> [ ":" split1 lookup-word ] [ no-word ] ?unless ]
     [ name>> ] bi define-foreign
     [ nil ] ;
 

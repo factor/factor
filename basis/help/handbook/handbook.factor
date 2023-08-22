@@ -5,7 +5,7 @@ math system strings sbufs vectors byte-arrays quotations
 io.streams.byte-array classes.builtin parser lexer
 classes.predicate classes.union classes.intersection
 classes.singleton classes.tuple help.vocabs math.parser
-accessors definitions sets lists ;
+accessors definitions sets lists help.tour ;
 IN: help.handbook
 
 ARTICLE: "conventions" "Conventions"
@@ -117,7 +117,7 @@ ARTICLE: "numbers" "Numbers"
 "Advanced features:"
 { $subsections
     "math-vectors"
-    "math-intervals"
+    "math.intervals"
 } ;
 
 USE: io.buffers
@@ -368,6 +368,7 @@ ARTICLE: "handbook" "Factor handbook"
 { $subsections
     "cookbook"
     "first-program"
+    "tour"
 }
 { $heading "Reference" }
 { $subsections

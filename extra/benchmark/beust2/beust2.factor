@@ -1,9 +1,9 @@
 ! Copyright (C) 2008 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: kernel math sequences ;
 IN: benchmark.beust2
 
-! http://crazybob.org/BeustSequence.java.html
+! https://crazybob.org/BeustSequence.java.html
 
 :: (count-numbers) ( remaining first value used max listener: ( -- ) -- ? )
     10 first - <iota> [| i |

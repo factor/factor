@@ -1,5 +1,5 @@
 ! Copyright (C) 2005, 2009 Slava Pestov
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors arrays fry kernel math math.order sequences
 ui.baseline-alignment ui.gadgets ui.gadgets.labels
 ui.gadgets.packs.private ui.render wrap.words ;
@@ -44,8 +44,8 @@ TUPLE: line words width height baseline ;
     wrap-words [ <line> ] map! ;
 
 : cached-wrapped ( paragraph -- wrapped-paragraph )
-    dup wrapped>>
-    [ ] [ [ wrap-paragraph dup ] keep wrapped<< ] ?if ;
+    [ wrapped>> ]
+    [ [ wrap-paragraph dup ] keep wrapped<< ] ?unless ;
 
 : max-line-width ( wrapped-paragraph -- x )
     [ width>> ] [ max ] map-reduce ;

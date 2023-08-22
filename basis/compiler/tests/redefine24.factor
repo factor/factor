@@ -11,29 +11,29 @@ TYPEDEF: alien.c-types:int type-3
 
 TYPEDEF: alien.c-types:float type-2
 
-: indirect ( x y ptr -- z  )
+: indirect ( x y ptr -- z )
     type-3 { type-2 type-2 } cdecl alien-indirect ;
 
-[ ] [
+{ } [
     "USING: alien.c-types alien.syntax ;
     IN: compiler.tests.redefine24 TYPEDEF: int type-2" eval( -- )
 ] unit-test
 
-[ 3 ] [ 1 2 callback indirect ] unit-test
+{ 3 } [ 1 2 callback indirect ] unit-test
 
-[ ] [
+{ } [
     "USING: alien.c-types alien.syntax ;
     IN: compiler.tests.redefine24
     TYPEDEF: float type-1
     TYPEDEF: float type-2" eval( -- )
 ] unit-test
 
-[ 3 ] [ 1.0 2.0 callback indirect ] unit-test
+{ 3 } [ 1.0 2.0 callback indirect ] unit-test
 
-[ ] [
+{ } [
     "USING: alien.c-types alien.syntax ;
     IN: compiler.tests.redefine24
     TYPEDEF: float type-3" eval( -- )
 ] unit-test
 
-[ 3.0 ] [ 1.0 2.0 callback indirect ] unit-test
+{ 3.0 } [ 1.0 2.0 callback indirect ] unit-test

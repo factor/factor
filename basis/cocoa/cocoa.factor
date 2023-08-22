@@ -1,7 +1,7 @@
 ! Copyright (C) 2006, 2009 Slava Pestov
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: assocs cocoa.messages compiler.units core-foundation.bundles
-hashtables init io kernel lexer namespaces sequences vocabs ;
+io kernel lexer namespaces sequences vocabs ;
 IN: cocoa
 
 SYMBOL: sent-messages
@@ -66,6 +66,7 @@ SYNTAX: IMPORT: scan-token [ ] import-objc-class ;
         "NSError"
         "NSEvent"
         "NSException"
+        "NSFontManager"
         "NSImage"
         "NSMenu"
         "NSMenuItem"

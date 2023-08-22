@@ -1,5 +1,5 @@
 ! Copyright (C) 2008, 2010 Slava Pestov, Daniel Ehrenberg.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors assocs combinators.short-circuit
 compiler.cfg.instructions compiler.cfg.rpo kernel namespaces
 sequences sets ;

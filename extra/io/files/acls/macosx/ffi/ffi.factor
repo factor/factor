@@ -1,5 +1,5 @@
 ! Copyright (C) 2010 Doug Coleman.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: alien.c-types alien.syntax classes.struct kernel
 literals math.order sequences unix.types ;
 IN: io.files.acls.macosx.ffi
@@ -104,25 +104,25 @@ CONSTANT: acl-flag-names {
 }
 
 STRUCT: guid_t
-   { g_guid { uchar KAUTH_GUID_SIZE } } ;
+    { g_guid { uchar KAUTH_GUID_SIZE } } ;
 
 TYPEDEF: uint kauth_ace_rights_t
 STRUCT: kauth_ace
-   { ace_applicable guid_t }
-   { ace_flags uint }
-   { ace_rights kauth_ace_rights_t } ;
+    { ace_applicable guid_t }
+    { ace_flags uint }
+    { ace_rights kauth_ace_rights_t } ;
 TYPEDEF: kauth_ace* kauth_ace_t
 
 STRUCT: kauth_acl
-   { acl_entrycount uint }
-   { acl_flags uint }
-   { acl_ace { kauth_ace 1 } } ;
+    { acl_entrycount uint }
+    { acl_flags uint }
+    { acl_ace { kauth_ace 1 } } ;
 TYPEDEF: kauth_acl* kauth_acl_t
 
 STRUCT: kauth_filesec
-   { fsec_magic uint }
-   { fsec_owner guid_t }
-   { fsec_group guid_t } ;
+    { fsec_magic uint }
+    { fsec_owner guid_t }
+    { fsec_group guid_t } ;
 TYPEDEF: kauth_filesec* kauth_filesec_t
 
 FUNCTION: int acl_dup ( acl_t acl )
@@ -184,4 +184,4 @@ FUNCTION: int mbr_uuid_to_sid ( uuid_t uu, nt_sid_t *sid )
 
 TYPEDEF: char[37] uuid_string_t
 
-FUNCTION: int mbr_uuid_to_string (  uuid_t uu, c-string string )
+FUNCTION: int mbr_uuid_to_string ( uuid_t uu, c-string string )

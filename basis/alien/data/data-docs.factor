@@ -159,8 +159,8 @@ ARTICLE: "c-boxes" "C value boxes"
   "FUNCTION: int do_foo ( int* a )"
 }
 "and writes to the pointer 'a', then it can be called like this:"
-{  $code
-   "1234 int <ref> [ do_foo ] keep int deref"
+{ $code
+    "1234 int <ref> [ do_foo ] keep int deref"
 }
 "The stack will then contain the two integers emitted by the 'do_foo' function." ;
 

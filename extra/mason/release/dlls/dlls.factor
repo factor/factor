@@ -1,6 +1,8 @@
 ! Copyright (C) 2016 Doug Coleman.
-! See http://factorcode.org/license.txt for BSD license.
-USING: io.directories kernel sequences system ;
+! See https://factorcode.org/license.txt for BSD license.
+USING: io.directories io.pathnames kernel mason.config
+namespaces sequences system ;
+
 IN: mason.release.dlls
 
 HOOK: dll-list os ( -- seq )
@@ -10,16 +12,14 @@ M: object dll-list { } ;
 ! These files should be in the directory that mason is run from.
 ! e.g. c:\factor32 or c:\factor64 on the build machine.
 
-! Sqlite win64: http://synopse.info/files/SQLite3-64.7z
 M: windows dll-list
-    {
-        "resource:libcrypto-37.dll"
-        "resource:libssl-38.dll"
-        "resource:libtls-10.dll"
-        "resource:sqlite3.dll"
-    } ;
+    cpu x86.64 =
+    { "libcrypto-3-x64.dll" "libssl-3-x64.dll" }
+    { "libcrypto-3.dll" "libssl-3.dll" } ?
+    { "sqlite3.dll" } append ;
+
+: dll-paths ( -- seq )
+    dll-root get dll-list [ append-relative-path ] with map ;
 
 : copy-dlls ( -- )
-    dll-list [
-        "factor" copy-files-into
-    ] unless-empty ;
+    dll-paths [ "factor" copy-files-into ] unless-empty ;

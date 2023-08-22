@@ -9,7 +9,7 @@ USING: assocs kernel lru-cache sorting tools.test ;
     3 3 pick set-at
     4 4 pick set-at
     5 5 pick set-at
-    >alist natural-sort
+    >alist sort
 ] unit-test
 
 {
@@ -22,7 +22,7 @@ USING: assocs kernel lru-cache sorting tools.test ;
     1 over at drop
     4 4 pick set-at
     5 5 pick set-at
-    >alist natural-sort
+    >alist sort
 ] unit-test
 
 {
@@ -37,7 +37,7 @@ USING: assocs kernel lru-cache sorting tools.test ;
     2 over at drop
     4 4 pick set-at
     5 5 pick set-at
-    >alist natural-sort
+    >alist sort
 ] unit-test
 
 {
@@ -49,7 +49,7 @@ USING: assocs kernel lru-cache sorting tools.test ;
     3 3 pick set-at
     4 4 pick set-at
     5 5 pick set-at
-    >alist natural-sort
+    >alist sort
 ] unit-test
 
 {
@@ -62,7 +62,7 @@ USING: assocs kernel lru-cache sorting tools.test ;
     1 1 pick set-at
     4 4 pick set-at
     5 5 pick set-at
-    >alist natural-sort
+    >alist sort
 ] unit-test
 
 {
@@ -74,7 +74,7 @@ USING: assocs kernel lru-cache sorting tools.test ;
     3 3 pick set-at
     4 4 pick set-at
     5 5 pick set-at
-    >alist natural-sort
+    >alist sort
 ] unit-test
 
 {
@@ -87,5 +87,5 @@ USING: assocs kernel lru-cache sorting tools.test ;
     1 over delete-at
     4 4 pick set-at
     5 5 pick set-at
-    >alist natural-sort
+    >alist sort
 ] unit-test

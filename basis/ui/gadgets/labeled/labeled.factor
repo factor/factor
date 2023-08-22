@@ -1,5 +1,5 @@
 ! Copyright (C) 2006, 2009 Slava Pestov, 2015 Nicolas Pénet.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors kernel system ui.gadgets ui.gadgets.borders
 ui.gadgets.labels ui.gadgets.packs ui.gadgets.tracks
 ui.pens.gradient ui.pens.solid ui.theme ;

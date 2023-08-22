@@ -1,5 +1,5 @@
 ! Copyright (C) 2008, 2009 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors combinators.short-circuit compiler.tree fry
 kernel namespaces sequences sets ;
 IN: compiler.tree.recursive
@@ -87,7 +87,7 @@ SYMBOL: changed?
     label>> dup not-a-loop? [ drop ] [
         recursive-nesting get <reversed> [
             2dup label>> eq? [ 2drop f ] [
-                [ label>> not-a-loop? ] [ tail?>> not ] bi or
+                { [ label>> not-a-loop? ] [ tail?>> not ] } 1||
                 [ not-a-loop changed? on ] [ drop ] if t
             ] if
         ] with all? drop

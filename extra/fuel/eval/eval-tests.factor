@@ -1,5 +1,5 @@
 ! Copyright (C) 2009 Jose Antonio Ortega Ruiz.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: continuations fuel fuel.eval io.streams.string kernel math
 namespaces random.data sequences tools.test vocabs.parser ;
 

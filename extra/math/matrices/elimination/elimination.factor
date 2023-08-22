@@ -1,5 +1,5 @@
 ! Copyright (C) 2006, 2010 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: kernel math math.matrices math.vectors namespaces
 sequences ;
 IN: math.matrices.elimination
@@ -21,7 +21,7 @@ SYMBOL: matrix
 : cols ( -- n ) 0 nth-row length ;
 
 : skip ( i seq quot -- n )
-    over [ find-from drop ] dip swap [ ] [ length ] ?if ; inline
+    over [ find-from drop ] dip swap or* [ length ] unless ; inline
 
 : first-col ( row# -- n )
     ! First non-zero column

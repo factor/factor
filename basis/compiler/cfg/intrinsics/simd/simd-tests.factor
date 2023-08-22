@@ -1,5 +1,5 @@
 ! Copyright (C) 2009 Joe Groff.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs biassocs byte-arrays classes
 compiler.cfg compiler.cfg.comparisons compiler.cfg.instructions
 compiler.cfg.intrinsics.simd compiler.cfg.intrinsics.simd.backend

@@ -22,7 +22,7 @@ static const cell addr_card_mask = card_size - 1;
 typedef uint8_t card_deck;
 
 static const cell deck_bits = card_bits + 10;
-// Number of bytes on the heap a deck addresses. Each deck as 1024
+// Number of bytes on the heap a deck addresses. Each deck has 1024
 // cards. So 256 kb.
 static const cell deck_size = 1 << deck_bits;
 static const cell cards_per_deck = 1 << 10;

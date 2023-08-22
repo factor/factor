@@ -3,7 +3,6 @@ namespaces prettyprint editors make ;
 IN: editors.textedit
 
 SINGLETON: textedit
-textedit editor-class set-global
 
 M: textedit editor-command
     drop

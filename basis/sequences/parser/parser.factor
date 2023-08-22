@@ -1,8 +1,8 @@
 ! Copyright (C) 2005, 2009 Daniel Ehrenberg, Doug Coleman.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors circular combinators.short-circuit io kernel
 math math.order sequences sequences.parser sequences.private
-sorting.functor sorting.slots unicode ;
+sorting unicode ;
 IN: sequences.parser
 
 TUPLE: sequence-parser sequence n ;
@@ -132,10 +132,7 @@ TUPLE: sequence-parser sequence n ;
         sequence-parser [ n + ] change-n drop
     ] if ;
 
-<< "length" [ length ] define-sorting >>
-
-: sort-tokens ( seq -- seq' )
-    { length>=< <=> } sort-by ;
+: sort-tokens ( seq -- seq' ) [ length ] inv-sort-by ;
 
 : take-first-matching ( sequence-parser seq -- seq )
     swap

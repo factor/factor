@@ -4,8 +4,8 @@ IN: furnace.conversations
 
 HELP: <conversations>
 { $values
-     { "responder" "a responder" }
-     { "responder'" "a new responder" }
+    { "responder" "a responder" }
+    { "responder'" "a new responder" }
 }
 { $description "Creates a new " { $link conversations } " responder wrapping an existing responder." } ;
 

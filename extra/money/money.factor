@@ -1,5 +1,5 @@
 ! Copyright (C) 2008 Doug Coleman.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: grouping io kernel lexer math math.functions math.parser
 namespaces sequences splitting ;
 IN: money
@@ -28,7 +28,7 @@ ERROR: not-an-integer x ;
 : parse-decimal ( str -- ratio )
     split-decimal [ [ "0" ] when-empty ] bi@
     [
-        [ dup string>number [ ] [ not-an-integer ] ?if ] bi@
+        [ [ string>number ] [ not-an-integer ] ?unless ] bi@
     ] keep length 10^ / + swap [ neg ] when ;
 
 SYNTAX: DECIMAL: scan-token parse-decimal suffix! ;

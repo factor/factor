@@ -1,5 +1,5 @@
 ! Copyright (C) 2010 Anton Gorenko.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors alien.c-types alien.parser arrays ascii
 classes.parser classes.struct combinators
 combinators.short-circuit gobject-introspection.repository
@@ -141,7 +141,7 @@ M: none-type return-type>c-type drop void ;
 : parameter-names&types ( callable -- names types )
     [ [ parameter-c-type ] map ] [ [ parameter-name ] map ] bi ;
 
-: def-function ( function --  )
+: def-function ( function -- )
     {
         [ return>> return-c-type ]
         [ identifier>> ]
@@ -173,7 +173,7 @@ M: type type>data-type
         [ drop "in" >>direction "none" >>transfer-ownership ]
     } cleave ;
 
-:: def-method ( method type --  )
+:: def-method ( method type -- )
     method {
         [ return>> return-c-type ]
         [ identifier>> ]
@@ -313,8 +313,8 @@ M: array-type field-type>c-type type>c-type ;
 : defer-boxeds ( boxeds -- )
     [
         [
-            dup find-existing-boxed-type
-            [ ] [ c-type>> defer-c-type ] ?if
+            [ find-existing-boxed-type ]
+            [ c-type>> defer-c-type ] ?unless
         ]
         [ name>> qualified-name ] bi
         boxed-info new swap register-type

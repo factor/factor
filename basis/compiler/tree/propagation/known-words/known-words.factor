@@ -1,5 +1,5 @@
 ! Copyright (C) 2008, 2010 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors alien alien.accessors alien.data.private arrays
 assocs byte-arrays byte-vectors classes classes.algebra classes.tuple
 classes.tuple.private combinators compiler.tree.comparisons
@@ -260,7 +260,7 @@ generic-comparison-ops [
     '[ _ swap interval>> <class/interval-info> ] "outputs" set-word-prop
 ] assoc-each
 
-! For these we limit the outputted interval
+! For these we limit the output interval
 {
     { fixnum>bignum bignum }
     { fixnum>float float }

@@ -1,5 +1,5 @@
 ! Copyright (C) 2009 Daniel Ehrenberg
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: lcs lcs.diff2html kernel tools.test strings sequences
 xml.writer ;
 

@@ -1,5 +1,5 @@
 ! Copyright (C) 2011 John Benediktsson
-! See http://factorcode.org/license.txt for BSD license
+! See https://factorcode.org/license.txt for BSD license
 
 USING: accessors arrays assocs combinators formatting
 http.client images.http images.loader images.loader.private
@@ -75,7 +75,7 @@ PRIVATE>
     [ 255 * round >integer ] tri@ "%02X%02X%02X" sprintf ;
 
 : chart>url ( chart -- url )
-    [ URL" http://chart.googleapis.com/chart" clone ] dip {
+    [ URL" https://chart.googleapis.com/chart" clone ] dip {
         [ type>> "cht" set-query-param ]
         [
             [ width>> ] [ height>> ] bi 2dup and [

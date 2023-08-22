@@ -1,5 +1,5 @@
 ! Copyright (C) 2004, 2010 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs definitions hashtables kernel
 kernel.private math math.order namespaces quotations sequences
 slots.private strings vocabs ;
@@ -210,8 +210,8 @@ M: word reset-word
     [ gensym dup ] 2dip define-declared ;
 
 : reveal ( word -- )
-    dup [ name>> ] [ vocabulary>> ] bi dup vocab-words-assoc
-    [ ] [ no-vocab ] ?if set-at ;
+    dup [ name>> ] [ vocabulary>> ] bi
+    [ vocab-words-assoc ] [ no-vocab ] ?unless set-at ;
 
 ERROR: bad-create name vocab ;
 

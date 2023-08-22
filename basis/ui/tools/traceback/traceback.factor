@@ -1,5 +1,5 @@
 ! Copyright (C) 2006, 2010 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors arrays fonts inspector kernel models
 models.arrow prettyprint sequences ui.commands ui.gadgets
 ui.gadgets.labeled ui.gadgets.panes ui.gadgets.scrollers

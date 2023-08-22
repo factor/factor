@@ -1,5 +1,5 @@
 ! Copyright (C) 2015 Doug Coleman.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors classes classes.error classes.tuple
 compiler.units effects eval generic kernel tools.test words ;
 IN: classes.error.tests

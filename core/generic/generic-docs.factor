@@ -1,6 +1,6 @@
-USING: classes classes.algebra combinators effects generic.hook
+USING: classes classes.algebra combinators effects kernel generic.hook
 generic.math generic.single generic.standard help.markup
-help.syntax math words ;
+help.syntax math quotations words ;
 IN: generic
 
 ARTICLE: "method-order" "Method precedence"
@@ -17,8 +17,8 @@ $nl
 { $code "{ object generic class }" }
 "Neither " { $link class } " nor " { $link generic } " are subclasses of each other, and their intersection is non-empty. Calling " { $snippet "explain" } " with a word on the stack that is both a class and a generic word will print " { $snippet "a class word" } " because " { $link class } " is more specific than " { $link generic } " in the class linearization order. (One example of a word which is both a class and a generic word is the class of classes, " { $link class } ", which is also a word to get the class of an object.)"
 $nl
-"The " { $link order } " word can be useful to clarify method dispatch order:"
-{ $subsections order } ;
+"The " { $link dispatch-order } " word can be useful to clarify method dispatch order:"
+{ $subsections dispatch-order } ;
 
 ARTICLE: "generic-introspection" "Generic word introspection"
 "In most cases, generic words and methods are defined at parse time with " { $link POSTPONE: GENERIC: } " (or some other parsing word) and " { $link POSTPONE: M: } "."
@@ -148,7 +148,7 @@ HELP: <method>
 { $values { "class" class } { "generic" generic } { "method" "a new method definition" } }
 { $description "Creates a new method." } ;
 
-HELP: order
+HELP: dispatch-order
 { $values { "generic" generic } { "seq" { $sequence class } } }
 { $description "Outputs a sequence of classes for which methods have been defined on this generic word. The sequence is sorted in method dispatch order." } ;
 
@@ -167,7 +167,7 @@ HELP: create-method
 { $description "Creates a method or returns an existing one. This is the runtime equivalent of " { $link POSTPONE: M: } "." }
 { $notes "To define a method, pass the output value to " { $link define } "." } ;
 
-{ sort-classes order } related-words
+{ sort-classes dispatch-order } related-words
 
 HELP: (call-next-method)
 { $values { "method" method } }
@@ -195,3 +195,10 @@ HELP: no-next-method
     }
     "This results in the method on " { $link integer } " being called, which then calls the method on " { $link number } ". The latter then calls " { $link POSTPONE: call-next-method } ", however there is no method less specific than the method on " { $link number } " and so an error is thrown."
 } ;
+
+HELP: make-consult-quot
+{ $values { "consultation" object } { "word" word } { "quot" quotation } { "combination" combination } { "consult-quot" quotation } }
+{ $contract "This generic produces the body quotation that will be used to actually effect a method consultation from the " { $vocab-link "delegate" } " vocabulary." }
+{ $notes "This is already implemented for " { $snippet "standard-combination" } " and " { $snippet "hook-combination" } ", and thus only needs to be specialized if you are implementing " { $snippet "CONSULT:" } " for a different kind of combination." }
+{ $heading "Reasoning" }
+"For standard method combinations, this calls the quotation to obtain the consulted object, and then executes the generic word, which naturally dispatches against the object on the stack. This is not sufficient for hook combinations, which must have the generic word executed with a variable bound to the result of the quotation. This generic is what allows for specializing the behavior of the methods that " { $snippet "CONSULT:" } " creates." ;

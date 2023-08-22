@@ -1,0 +1,5 @@
+User-Agent: *
+Disallow: /bg_header.jpg
+
+User-Agent: *
+Disallow: factorcode.factor

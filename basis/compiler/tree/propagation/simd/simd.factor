@@ -1,5 +1,5 @@
 ! Copyright (C) 2009 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors byte-arrays combinators compiler.cfg.builder
 compiler.tree.propagation.info compiler.tree.propagation.nodes
 continuations cpu.architecture kernel layouts math
@@ -106,7 +106,7 @@ vector>vector-intrinsics [ { byte-array } "default-output-classes" set-word-prop
 
 \ (simd-select) [ 2nip scalar-output-class ] "outputs" set-word-prop
 
-\ assert-positive [
+\ (simd-positive) [
     real [0,inf] <class/interval-info> value-info-intersect
 ] "outputs" set-word-prop
 

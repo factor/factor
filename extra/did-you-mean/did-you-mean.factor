@@ -1,5 +1,5 @@
 ! Copyright (C) 2022 John Benediktsson
-! See http://factorcode.org/license.txt for BSD license
+! See https://factorcode.org/license.txt for BSD license
 
 USING: accessors arrays assocs continuations formatting kernel
 math math.statistics parser sequences sorting spelling vocabs
@@ -8,7 +8,7 @@ vocabs.parser ;
 IN: did-you-mean
 
 : did-you-mean-restarts ( possibilities -- restarts )
-    natural-sort
+    sort
     [ [ [ vocabulary>> ] [ name>> ] bi "Use %s:%s" sprintf ] keep ]
     { } map>assoc ;
 

@@ -1,10 +1,10 @@
 ! Copyright (c) 2007 Aaron Schaefer.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: combinators.short-circuit kernel project-euler.common
 ranges sequences ;
 IN: project-euler.021
 
-! http://projecteuler.net/index.php?section=problems&id=21
+! https://projecteuler.net/index.php?section=problems&id=21
 
 ! DESCRIPTION
 ! -----------

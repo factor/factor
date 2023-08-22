@@ -1,9 +1,12 @@
-USING: editors kernel make namespaces ;
+USING: editors kernel make math.parser namespaces sequences ;
 IN: editors.nova
 
 SINGLETON: nova
-nova editor-class set-global
+
+: nova-path ( -- path )
+    \ nova-path get [ "/usr/local/bin/nova" ] unless* ;
 
 M: nova editor-command
-    drop
-    [ "open" , "-a" , "Nova" , , ] { } make ;
+    swap [
+        nova-path , "open" , , "--line" , number>string ":1" append ,
+    ] { } make ;

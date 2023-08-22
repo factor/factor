@@ -1,12 +1,11 @@
 ! Copyright (C) 2007 Clemens F. Hofreither.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 ! clemens.hofreither@gmx.net
 USING: editors io.standard-paths kernel make math.parser
 namespaces sequences system ;
 IN: editors.scite
 
 SINGLETON: scite
-scite editor-class set-global
 
 SYMBOL: scite-path
 

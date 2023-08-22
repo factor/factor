@@ -29,11 +29,11 @@ fixnum instruction_operand::load_value_2_2_2_2() {
 }
 
 // Load a value from a bitfield of a PowerPC instruction
-fixnum instruction_operand::load_value_masked(cell mask, cell bits,
-                                              cell shift) {
+fixnum instruction_operand::load_value_masked(cell mask, cell preshift,
+                                              cell bits, cell postshift) {
   int32_t* ptr = (int32_t*)(pointer - sizeof(uint32_t));
 
-  return (((*ptr & (int32_t)mask) << bits) >> bits) << shift;
+  return ((((*ptr & (int32_t)mask) >> preshift ) << bits) >> bits) << postshift;
 }
 
 fixnum instruction_operand::load_value(cell relative_to) {
@@ -47,19 +47,20 @@ fixnum instruction_operand::load_value(cell relative_to) {
     case RC_ABSOLUTE_PPC_2_2:
       return load_value_2_2();
     case RC_ABSOLUTE_PPC_2:
-      return load_value_masked(rel_absolute_ppc_2_mask, 16, 0);
+      return load_value_masked(rel_absolute_ppc_2_mask, 0, 16, 0);
     case RC_RELATIVE_PPC_2_PC:
-      return load_value_masked(rel_relative_ppc_2_mask, 16, 0) + relative_to -
-             4;
+      return load_value_masked(rel_relative_ppc_2_mask, 0, 16, 0) +
+             relative_to - 4;
     case RC_RELATIVE_PPC_3_PC:
-      return load_value_masked(rel_relative_ppc_3_mask, 6, 0) + relative_to - 4;
+      return load_value_masked(rel_relative_ppc_3_mask, 0, 6, 0) +
+             relative_to - 4;
     case RC_RELATIVE_ARM_3:
-      return load_value_masked(rel_relative_arm_3_mask, 6, 2) + relative_to +
+      return load_value_masked(rel_relative_arm_3_mask, 0, 6, 2) + relative_to +
              sizeof(cell);
     case RC_INDIRECT_ARM:
-      return load_value_masked(rel_indirect_arm_mask, 20, 0) + relative_to;
+      return load_value_masked(rel_indirect_arm_mask, 0, 20, 0) + relative_to;
     case RC_INDIRECT_ARM_PC:
-      return load_value_masked(rel_indirect_arm_mask, 20, 0) + relative_to +
+      return load_value_masked(rel_indirect_arm_mask, 0, 20, 0) + relative_to +
              sizeof(cell);
     case RC_ABSOLUTE_2:
       return *(uint16_t*)(pointer - sizeof(uint16_t));
@@ -67,6 +68,12 @@ fixnum instruction_operand::load_value(cell relative_to) {
       return *(uint8_t*)(pointer - sizeof(uint8_t));
     case RC_ABSOLUTE_PPC_2_2_2_2:
       return load_value_2_2_2_2();
+    case RC_RELATIVE_ARM64_BRANCH:
+      return load_value_masked(rel_relative_arm64_branch_mask, 0, 4, 2) +
+             relative_to;
+    case RC_RELATIVE_ARM64_BCOND:
+      return load_value_masked(rel_relative_arm64_bcond_mask, 3, 11, 0) +
+             relative_to;
     default:
       critical_error("Bad rel class", rel.klass());
       return 0;
@@ -96,9 +103,9 @@ void instruction_operand::store_value_2_2_2_2(fixnum value) {
 
 // Store a value into a bitfield of a PowerPC instruction
 void instruction_operand::store_value_masked(fixnum value, cell mask,
-                                             cell shift) {
+                                             cell shift1, cell shift2) {
   uint32_t* ptr = (uint32_t*)(pointer - sizeof(uint32_t));
-  *ptr = (uint32_t)((*ptr & ~mask) | ((value >> shift) & mask));
+  *ptr = (uint32_t)((*ptr & ~mask) | ((value >> shift1 << shift2) & mask));
 }
 
 void instruction_operand::store_value(fixnum absolute_value) {
@@ -118,24 +125,24 @@ void instruction_operand::store_value(fixnum absolute_value) {
       store_value_2_2(absolute_value);
       break;
     case RC_ABSOLUTE_PPC_2:
-      store_value_masked(absolute_value, rel_absolute_ppc_2_mask, 0);
+      store_value_masked(absolute_value, rel_absolute_ppc_2_mask, 0, 0);
       break;
     case RC_RELATIVE_PPC_2_PC:
-      store_value_masked(relative_value + 4, rel_relative_ppc_2_mask, 0);
+      store_value_masked(relative_value + 4, rel_relative_ppc_2_mask, 0, 0);
       break;
     case RC_RELATIVE_PPC_3_PC:
-      store_value_masked(relative_value + 4, rel_relative_ppc_3_mask, 0);
+      store_value_masked(relative_value + 4, rel_relative_ppc_3_mask, 0, 0);
       break;
     case RC_RELATIVE_ARM_3:
       store_value_masked(relative_value - sizeof(cell), rel_relative_arm_3_mask,
-                         2);
+                         2, 0);
       break;
     case RC_INDIRECT_ARM:
-      store_value_masked(relative_value, rel_indirect_arm_mask, 0);
+      store_value_masked(relative_value, rel_indirect_arm_mask, 0, 0);
       break;
     case RC_INDIRECT_ARM_PC:
       store_value_masked(relative_value - sizeof(cell), rel_indirect_arm_mask,
-                         0);
+                         0, 0);
       break;
     case RC_ABSOLUTE_2:
       *(uint16_t*)(pointer - sizeof(uint16_t)) = (uint16_t)absolute_value;
@@ -145,6 +152,12 @@ void instruction_operand::store_value(fixnum absolute_value) {
       break;
     case RC_ABSOLUTE_PPC_2_2_2_2:
       store_value_2_2_2_2(absolute_value);
+      break;
+    case RC_RELATIVE_ARM64_BRANCH:
+      store_value_masked(relative_value, rel_relative_arm64_branch_mask, 2, 0);
+      break;
+    case RC_RELATIVE_ARM64_BCOND:
+      store_value_masked(relative_value, rel_relative_arm64_bcond_mask, 2, 5);
       break;
     default:
       critical_error("Bad rel class", rel.klass());

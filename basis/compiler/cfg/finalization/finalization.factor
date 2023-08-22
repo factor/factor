@@ -1,5 +1,5 @@
 ! Copyright (C) 2010 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: compiler.cfg.build-stack-frame compiler.cfg.gc-checks
 compiler.cfg.linear-scan compiler.cfg.representations
 compiler.cfg.save-contexts compiler.cfg.ssa.destruction

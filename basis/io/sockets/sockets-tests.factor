@@ -1,7 +1,7 @@
-USING: continuations io.sockets io.sockets.private sequences math
-tools.test namespaces accessors kernel destructors calendar io.timeouts
-io.encodings.utf8 io concurrency.promises threads
-io.streams.string present system ;
+USING: accessors calendar concurrency.promises destructors io
+io.encodings.utf8 io.sockets io.sockets.private
+io.streams.string io.timeouts kernel math namespaces present
+protocols sequences system threads tools.test ;
 IN: io.sockets.tests
 
 os unix? [
@@ -37,8 +37,8 @@ os unix? [
 
 ! Test present on addrspecs
 { "4.4.4.4:12" } [ "4.4.4.4" 12 <inet4> present ] unit-test
-{ "::1:12" } [ "::1" 12 <inet6> present ] unit-test
-{ "fe80::1%1:12" } [ "fe80::1" 1 12 inet6 boa present ] unit-test
+{ "[::1]:12" } [ "::1" 12 <inet6> present ] unit-test
+{ "[fe80::1%1]:12" } [ "fe80::1" 1 12 inet6 boa present ] unit-test
 
 { B{ 1 2 3 4 } }
 [ "1.2.3.4" T{ inet4 } inet-pton ] unit-test
@@ -170,22 +170,22 @@ os unix? [
 { } [ f 0 <inet4> <datagram> dispose ] unit-test
 { } [ f 0 <inet6> <datagram> dispose ] unit-test
 
-{ 80 } [ "http" protocol-port ] unit-test
-{ f } [ f protocol-port ] unit-test
+{ 80 } [ "http" lookup-protocol-port ] unit-test
+{ f } [ f lookup-protocol-port ] unit-test
 
 { "http" } [ 80 port-protocol ] unit-test
 { f } [ f port-protocol ] unit-test
 
 [ "you-cant-resolve-me!" resolve-host ] [ addrinfo-error? ] must-fail-with
 
-[ ] [ B{ 1 2 3 } f 9000 <inet4> send-once ] unit-test
-[ ] [ B{ 1 2 3 } f 9000 <inet4> broadcast-once ] unit-test
-[ ] [ B{ 1 2 3 } "0.0.0.0" 9000 <inet4> send-once ] unit-test
-[ ] [ B{ 1 2 3 } "0.0.0.0" 9000 <inet4> broadcast-once ] unit-test
+{ } [ B{ 1 2 3 } f 9000 <inet4> send-once ] unit-test
+{ } [ B{ 1 2 3 } f 9000 <inet4> broadcast-once ] unit-test
+{ } [ B{ 1 2 3 } "0.0.0.0" 9000 <inet4> send-once ] unit-test
+{ } [ B{ 1 2 3 } "0.0.0.0" 9000 <inet4> broadcast-once ] unit-test
 
 ipv6-supported? [
-    [ ] [ B{ 1 2 3 } f 9000 <inet6> send-once ] unit-test
-    [ ] [ B{ 1 2 3 } f 9000 <inet6> broadcast-once ] unit-test
-    [ ] [ B{ 1 2 3 } "::" 9000 <inet6> send-once ] unit-test
-    [ ] [ B{ 1 2 3 } "::" 9000 <inet6> broadcast-once ] unit-test
+    { } [ B{ 1 2 3 } f 9000 <inet6> send-once ] unit-test
+    { } [ B{ 1 2 3 } f 9000 <inet6> broadcast-once ] unit-test
+    { } [ B{ 1 2 3 } "::" 9000 <inet6> send-once ] unit-test
+    { } [ B{ 1 2 3 } "::" 9000 <inet6> broadcast-once ] unit-test
 ] when

@@ -1,5 +1,5 @@
 ! Copyright (C) 2009 Joe Groff.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: audio.engine game.loop help.markup help.syntax
 ui.gadgets.worlds ;
 IN: game.worlds

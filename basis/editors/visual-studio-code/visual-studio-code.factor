@@ -1,5 +1,5 @@
 ! Copyright (C) 2015 Doug Coleman.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: combinators combinators.short-circuit editors
 generalizations io.files io.pathnames io.standard-paths kernel
 make math.parser namespaces sequences system tools.which ;
@@ -8,18 +8,21 @@ IN: editors.visual-studio-code
 ! Command line arguments
 ! https://code.visualstudio.com/docs/editor/command-line
 
-TUPLE: visual-studio-code ;
-T{ visual-studio-code } editor-class set-global
+MIXIN: visual-studio-code-base
+
+SINGLETON: visual-studio-code
+
+INSTANCE: visual-studio-code visual-studio-code-base
 
 HOOK: find-visual-studio-code-path editor-class ( -- path )
 
-M: visual-studio-code find-visual-studio-code-path
+M: visual-studio-code-base find-visual-studio-code-path
     os {
         { linux [
             {
                 [ "code" which ]
                 [ "Code" which ]
-                [ home "VSCode-linux-x64/Code" append-path ]
+                [ "~/VSCode-linux-x64/Code" ]
                 [ "/usr/share/code/code" ]
             } [ dup file-exists? [ drop f ] unless ] map-compose 0|| ] }
         { macosx [
@@ -45,5 +48,5 @@ ERROR: can't-find-visual-studio-code ;
         number>string ":" glue ,
     ] { } make ;
 
-M: visual-studio-code editor-command
+M: visual-studio-code-base editor-command
     visual-studio-code-editor-command ;

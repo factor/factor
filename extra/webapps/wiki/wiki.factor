@@ -1,11 +1,12 @@
 ! Copyright (C) 2008 Slava Pestov
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors calendar db.tuples db.types farkup
 furnace.actions furnace.auth furnace.boilerplate
 furnace.recaptcha furnace.redirection furnace.syndication
-furnace.utilities html.forms http.server.dispatchers
+furnace.utilities html.forms http.server http.server.dispatchers
 http.server.static kernel lcs make namespaces present random
-sequences sorting splitting urls validators ;
+regexp sequences simple-tokenizer sorting splitting unicode urls
+validators ;
 IN: webapps.wiki
 
 : wiki-url ( rest path -- url )
@@ -56,7 +57,7 @@ M: revision feed-entry-date date>> ;
 M: revision feed-entry-url id>> revision-url ;
 
 : reverse-chronological-order ( seq -- sorted )
-    [ date>> ] inv-sort-with ;
+    [ date>> ] inv-sort-by ;
 
 : <revision> ( id -- revision )
     revision new swap >>id ;
@@ -87,7 +88,10 @@ M: revision feed-entry-url id>> revision-url ;
         [ validate-title ] >>init
 
         [
-            "title" value dup latest-revision [
+            "title" value
+            [
+                latest-revision
+            ] [
                 from-object
                 { wiki "view" } <chloe-content>
             ] [
@@ -265,7 +269,7 @@ M: revision feed-entry-url id>> revision-url ;
             URL" $wiki" <redirect>
         ] >>submit
 
-     <protected>
+    <protected>
         "delete wiki articles" >>description
         { can-delete-wiki-articles? } >>capabilities ;
 
@@ -299,11 +303,38 @@ M: revision feed-entry-url id>> revision-url ;
 
         [
             f <article> select-tuples
-            [ title>> ] sort-with
+            [ title>> ] sort-by
             "articles" set-value
         ] >>init
 
         { wiki "articles" } >>template ;
+
+: <search-articles-action> ( -- action )
+    <page-action>
+
+        [
+            "search" param [ unicode:blank? ] trim
+            dup "search" set-value
+
+            [ f ] [
+                tokenize [
+                    " " "\s+" replace "\\b" dup surround
+                    "i" <optioned-regexp>
+                ] map
+            ] if-empty
+
+            [ f ] [
+                f <article> select-tuples
+                [ title>> ] sort-by
+                [ revision>> <revision> select-tuple ] map
+                swap '[ content>> _ [ first-match ] with all? ] filter
+            ] if-empty
+
+            [ "results" set-value ]
+            [ not "empty" set-value ] bi
+        ] >>init
+
+        { wiki "search" } >>template ;
 
 : list-user-edits ( -- seq )
     f <revision> "author" value >>author select-tuples
@@ -352,6 +383,7 @@ M: revision feed-entry-url id>> revision-url ;
         <rollback-action> "rollback" add-responder
         <user-edits-action> "user-edits" add-responder
         <list-articles-action> "articles" add-responder
+        <search-articles-action> "search" add-responder
         <list-changes-action> "changes" add-responder
         <user-edits-feed-action> "user-edits.atom" add-responder
         <list-changes-feed-action> "changes.atom" add-responder

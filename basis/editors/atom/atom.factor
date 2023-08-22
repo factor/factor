@@ -1,11 +1,10 @@
 ! Copyright (C) 2014 Doug Coleman.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: editors io.pathnames io.standard-paths kernel make
 math.parser namespaces sequences system ;
 IN: editors.atom
 
 SINGLETON: atom
-atom editor-class set-global
 
 SYMBOL: atom-path
 

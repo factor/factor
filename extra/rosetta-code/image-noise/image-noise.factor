@@ -1,5 +1,5 @@
 ! Copyright (C) 2012 Anonymous.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors calendar images images.viewer kernel math
 math.parser models random sequences timers ui ui.gadgets
 ui.gadgets.status-bar ui.gadgets.worlds ;

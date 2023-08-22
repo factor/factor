@@ -1,11 +1,11 @@
 ! Copyright (C) 2019 Jack Lucas
-! See http:! factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 ! These should be complete bindings to the Raylib library. (v4.0)
 ! Most of the comments are included from the original header
 ! for your convenience.
 USING: accessors alien alien.c-types alien.destructors
 alien.libraries alien.syntax classes.struct combinators kernel
-raylib.util sequences sequences.private system ;
+math raylib.util sequences sequences.private system ;
 IN: raylib
 FROM: alien.c-types => float ;
 
@@ -20,6 +20,12 @@ FROM: alien.c-types => float ;
 >>
 
 LIBRARY: raylib
+
+! Last updated 1/23/2023
+CONSTANT: RAYLIB_VERSION_MAJOR 4
+CONSTANT: RAYLIB_VERSION_MINOR 5
+CONSTANT: RAYLIB_VERSION_PATCH 0
+CONSTANT: RAYLIB_VERSION  "4.5-dev"
 
 ! Enumerations ---------------------------------------------------------
 
@@ -172,7 +178,7 @@ ENUM: MouseButton
     MOUSE_BUTTON_MIDDLE      ! Mouse button middle (pressed wheel)
     MOUSE_BUTTON_SIDE        ! Mouse button side (advanced mouse device)
     MOUSE_BUTTON_EXTRA       ! Mouse button extra (advanced mouse device)
-    MOUSE_BUTTON_FORWARD     ! Mouse button fordward (advanced mouse device)
+    MOUSE_BUTTON_FORWARD     ! Mouse button forward (advanced mouse device)
     MOUSE_BUTTON_BACK ;      ! Mouse button back (advanced mouse device)
 
 ENUM: MouseCursor
@@ -345,10 +351,12 @@ ENUM: BlendMode
     BLEND_MULTIPLIED               ! Blend textures multiplying colors
     BLEND_ADD_COLORS               ! Blend textures adding colors (alternative)
     BLEND_SUBTRACT_COLORS          ! Blend textures subtracting colors (alternative)
-    BLEND_CUSTOM ;                 ! Belnd textures using custom src/dst factors (use rlSetBlendMode())
+    BLEND_ALPHA_PREMULTIPLY        ! Blend premultiplied textures considering alpha
+    BLEND_CUSTOM                   ! Belnd textures using custom src/dst factors (use rlSetBlendFactors())
+    BLEND_CUSTOM_SEPARATE ;        ! Blend textures using custom rgb/alpha separate src/dst factors (use rlSetBlendFactorsSeparate())
 
 ! Gestures type
-! NOTE: IT could be used as flags to enable only some gestures
+! NOTE: Provided as bit-wise flags to enable only desired gestures
 ENUM: Gestures
     { GESTURE_NONE          0 }
     { GESTURE_TAP           1 }
@@ -535,7 +543,7 @@ STRUCT: Camera3D
     { position Vector3 }  ! Camera postion
     { target Vector3 }    ! Camera target it looks-at
     { up Vector3 }        ! Camera up vector (rotation over its axis)
-    { fovy float }        ! Camera field-of-view apperature in Y (degrees) in perspective, used as near plane width in orthographic
+    { fovy float }        ! Camera field-of-view aperature in Y (degrees) in perspective, used as near plane width in orthographic
     { projection CameraProjection } ;  ! Camera projection: CAMERA_PERSPECTIVE or CAMERA_ORTHOGRAPHIC
 
 STRUCT: Camera2D
@@ -557,7 +565,7 @@ STRUCT: Mesh
     { indices ushort* }    ! Vertex indices (in case vertex data comes indexed)
     { animVertices float* }
     { animNormals float* }
-    { boneIds int* }
+    { boneIds uchar* }
     { boneWeights float* }
     { vaoId uint }         ! OpenGL Vertex Array Object id
     { vboId uint* } ;      ! OpenGL Vertex Buffer Objects id (7  types of vertex data)
@@ -597,12 +605,12 @@ STRUCT: Model
     { transform Matrix }
     { meshCount int }
     { materialCount int }
-    { _meshes Mesh* }
-    { _materials Material* }
+    { _meshes void* }
+    { _materials void* }
     { meshMaterial int* }
     { boneCount int }
-    { _bones BoneInfo* }
-    { bindPose Transform* } ;
+    { _bones void* }
+    { bindPose void* } ;
 
 ARRAY-SLOT: Model Material _materials [ materialCount>> ] materials
 ARRAY-SLOT: Model Mesh _meshes [ meshCount>> ] meshes
@@ -639,6 +647,7 @@ STRUCT: Wave
 
 STRUCT: AudioStream
     { buffer void* }    ! Pointer to internal data used by the audio system
+    { processor void* } ! Pointer to internal data processor, useful for audio effects
     { sampleRate uint } ! Frequency (samples per second)
     { sampleSize uint } ! Bit depth (bits per sample): 8, 16, 32 (24 not supported)
     { channels uint } ; ! Number of channels (1-mono, 2-stereo)
@@ -675,6 +684,11 @@ STRUCT: VrStereoConfig
     { rightScreenCenter float[2] }    ! VR right screen center
     { scale float[2] }                ! VR distortion scale
     { scaleIn float[2] } ;            ! VR distortion scale in
+
+STRUCT: FilePathList
+    { capacity uint }                 ! Filepaths max entries
+    { count uint }                    ! Filepaths entries count
+    { paths char** } ;                ! Filepaths entries
 
 ! Constants ----------------------------------------------------------------
 
@@ -732,6 +746,7 @@ FUNCTION-ALIAS: set-window-position void SetWindowPosition ( int x, int y )     
 FUNCTION-ALIAS: set-window-monitor void SetWindowMonitor ( int monitor )                 ! Set monitor for the current window (fullscreen mode)
 FUNCTION-ALIAS: set-window-min-size void SetWindowMinSize ( int width, int height )      ! Set window minimum dimensions (for FLAG_WINDOW_RESIZABLE)
 FUNCTION-ALIAS: set-window-size void SetWindowSize ( int width, int height )             ! Set window dimensions
+FUNCTION-ALIAS: set-window-opacity void SetWindowOpacity ( float opacity )               ! Set window opacity [0.0f..1.0f] (only PLATFORM_DESKTOP)
 FUNCTION-ALIAS: get-window-handle void* GetWindowHandle ( )                              ! Get native window handle
 FUNCTION-ALIAS: get-screen-width int GetScreenWidth ( )                                  ! Get current screen width
 FUNCTION-ALIAS: get-screen-height int GetScreenHeight ( )                                ! Get current screen height
@@ -750,14 +765,16 @@ FUNCTION-ALIAS: get-window-scale-dpi Vector2 GetWindowScaleDPI ( )              
 FUNCTION-ALIAS: get-monitor-name c-string GetMonitorName ( int monitor )                 ! Get the human-readable, UTF-8 encoded name of the primary monitor
 FUNCTION-ALIAS: set-clipboard-text void SetClipboardText ( c-string text )               ! Set clipboard text content
 FUNCTION-ALIAS: get-clipboard-text c-string GetClipboardText ( )                         ! Get clipboard text content
+FUNCTION-ALIAS: enable-event-waiting void EnableEventWaiting ( )                         ! Enable waiting for events on EndDrawing(), no automatic event polling
+FUNCTION-ALIAS: disable-event-waiting void DisableEventWaiting ( )                       ! Disable waiting for events on EndDrawing(), automatic events polling
 
 ! Custom frame control functions
 ! NOTE: Those functions are intended for advance users that want full control over the frame processing
 ! By default EndDrawing() does this job: draws everything + SwapScreenBuffer() + manage frame timming + PollInputEvents()
-! To avoid that behaviour and control frame processes manually, enable in config.h: SUPPORT_CUSTOM_FRAME_CONTROL
+! To avoid that behavior and control frame processes manually, enable in config.h: SUPPORT_CUSTOM_FRAME_CONTROL
 FUNCTION-ALIAS: swap-screen-buffer void SwapScreenBuffer ( )                             ! Swap back buffer with front buffer (screen drawing)
 FUNCTION-ALIAS: poll-input-events void PollInputEvents ( )                               ! Register all input events
-FUNCTION-ALIAS: wait-time void WaitTime ( float ms )                                     ! Wait for some milliseconds (halt program execution)
+FUNCTION-ALIAS: wait-time void WaitTime ( double seconds )                               ! Wait for some milliseconds (halt program execution)
 
 ! Cursor-related functions
 FUNCTION-ALIAS: show-cursor void ShowCursor ( )                                          ! Shows cursor
@@ -818,16 +835,18 @@ FUNCTION-ALIAS: get-frame-time float GetFrameTime ( )                           
 FUNCTION-ALIAS: get-time double GetTime ( )                                              ! Get elapsed time in seconds since InitWindow()
 
 ! Misc. functions
-FUNCTION-ALIAS: get-random-value int GetRandomValue  ( int min, int max )                ! Get a random value between min and max (both included)
+FUNCTION-ALIAS: get-random-value int GetRandomValue ( int min, int max )                 ! Get a random value between min and max (both included)
 FUNCTION-ALIAS: set-random-seed void SetRandomSeed ( uint seed )                         ! Set the seed for the random number generator
-FUNCTION-ALIAS: take-screenshot void TakeScreenshot ( c-string  fileName )               ! Takes a screenshot of current screen (filename extension defines format)
+FUNCTION-ALIAS: take-screenshot void TakeScreenshot ( c-string fileName )                ! Takes a screenshot of current screen (filename extension defines format)
 FUNCTION-ALIAS: set-config-flags void SetConfigFlags ( uint flags )                      ! Setup init configuration flags (view FLAGS)
 
-! FUNCTION: void TraceLog  ( int logLevel, c-string text, ... )                            ! Show trace log messages (LOG_DEBUG, LOG_INFO, LOG_WARNING, LOG_ERROR...)
+! FUNCTION: void TraceLog ( int logLevel, c-string text, ... )                           ! Show trace log messages (LOG_DEBUG, LOG_INFO, LOG_WARNING, LOG_ERROR...)
 FUNCTION-ALIAS: set-trace-log-level void SetTraceLogLevel ( int logLevel )               ! Set the current threshold (minimum) log level
-FUNCTION-ALIAS: mem-alloc void* MemAlloc ( int size )                                    ! Internal memory allocator
-FUNCTION-ALIAS: mem-realloc void* MemRealloc ( void* ptr, int size )                     ! Internal memory reallocator
+FUNCTION-ALIAS: mem-alloc void* MemAlloc ( uint size )                                    ! Internal memory allocator
+FUNCTION-ALIAS: mem-realloc void* MemRealloc ( void* ptr, uint size )                     ! Internal memory reallocator
 FUNCTION-ALIAS: mem-free void MemFree ( void* ptr )                                      ! Internal memory free
+
+FUNCTION-ALIAS: open-url void OpenURL ( c-string url )                                   ! Open URL with default system browser (if available)
 
 ! Set custom callbacks
 ! WARNING: Callbacks setup is intended for advance users
@@ -841,24 +860,29 @@ FUNCTION-ALIAS: mem-free void MemFree ( void* ptr )                             
 FUNCTION-ALIAS: load-file-data c-string LoadFileData ( c-string fileName, uint* bytesRead )           ! Load file data as byte array (read)
 FUNCTION-ALIAS: unload-file-data void UnloadFileData ( c-string data )                                ! Unload file data allocated by LoadFileData()
 FUNCTION-ALIAS: save-file-data bool SaveFileData ( c-string fileName, void* data, uint bytesToWrite ) ! Save data to file from byte array (write), returns true on success
+FUNCTION-ALIAS: export-data-as-code bool ExportDataAsCode ( uchar* data, uint size, c-string fileName ) ! Export data to code (.h), returns true on success
 FUNCTION-ALIAS: load-file-text c-string LoadFileText ( c-string fileName )                            ! Load text data from file (read), returns a ' ' terminated string
 FUNCTION-ALIAS: unload-file-text void UnloadFileText ( c-string text )                                ! Unload file text data allocated by LoadFileText()
 FUNCTION-ALIAS: save-file-text bool SaveFileText ( c-string fileName, c-string text )                 ! Save text data to file (write), string must be ' ' terminated, returns true on success
 FUNCTION-ALIAS: file-exists bool FileExists ( c-string fileName )                                     ! Check if file exists
 FUNCTION-ALIAS: directory-exists bool DirectoryExists ( c-string dirPath )                            ! Check if a directory path exists
 FUNCTION-ALIAS: is-file-extension bool IsFileExtension ( c-string fileName, c-string ext )            ! Check file extension (including point: .png, .wav)
+FUNCTION-ALIAS: get-file-length int GetFileLength ( c-string fileName )                               ! Get file length in bytes (NOTE: GetFileSize() conflicts with windows.h)
 FUNCTION-ALIAS: get-file-extension c-string GetFileExtension ( c-string fileName )                    ! Get pointer to extension for a filename string (includes dot: '.png')
 FUNCTION-ALIAS: get-file-name c-string GetFileName ( c-string filePath )                              ! Get pointer to filename for a path string
 FUNCTION-ALIAS: get-file-name-without-ext c-string GetFileNameWithoutExt ( c-string filePath )        ! Get filename string without extension (uses static string)
 FUNCTION-ALIAS: get-directory-path c-string GetDirectoryPath ( c-string filePath )                    ! Get full path for a given fileName with path (uses static string)
 FUNCTION-ALIAS: get-prev-directory-path c-string GetPrevDirectoryPath ( c-string dirPath )            ! Get previous directory path for a given path (uses static string)
 FUNCTION-ALIAS: get-working-directory c-string GetWorkingDirectory ( )                                ! Get current working directory (uses static string)
-FUNCTION-ALIAS: get-directory-files char** GetDirectoryFiles ( c-string dirPath, int* count )         ! Get filenames in a directory path (memory should be freed)
-FUNCTION-ALIAS: clear-directory-files void ClearDirectoryFiles ( )                                    ! Clear directory files paths buffers (free memory)
+FUNCTION-ALIAS: get-application-directory c-string GetApplicationDirectory ( )                        ! Get the directory if the running application (uses static string)
 FUNCTION-ALIAS: change-directory bool ChangeDirectory ( c-string dir )                                ! Change working directory, return true on success
+FUNCTION-ALIAS: is-path-file bool IsPathFile ( c-string path )                                        ! Check if a given path is a file or a directory
+FUNCTION-ALIAS: load-directory-files char** LoadDirectoryFiles ( c-string dirPath, int* count )       ! Get filenames in a directory path (memory should be freed)
+FUNCTION-ALIAS: load-directory-files-ex char** LoadDirectoryFilesEx ( c-string dirPath, c-string filter, bool scanSubDirs )       ! Get filenames in a directory path (memory should be freed)
+FUNCTION-ALIAS: unload-directory-files void UnloadDirectoryFiles ( )                                  ! Clear directory files paths buffers (free memory)
 FUNCTION-ALIAS: is-file-dropped bool IsFileDropped ( )                                                ! Check if a file has been dropped into window
-FUNCTION-ALIAS: get-dropped-files c-string* GetDroppedFiles ( int* count )                            ! Get dropped files names (memory should be freed)
-FUNCTION-ALIAS: clear-dropped-files void ClearDroppedFiles ( )                                        ! Clear dropped files paths buffer (free memory)
+FUNCTION-ALIAS: load-dropped-files c-string* LoadDroppedFiles ( int* count )                          ! Get dropped files names (memory should be freed)
+FUNCTION-ALIAS: unload-dropped-files void UnloadDroppedFiles ( )                                      ! Clear dropped files paths buffer (free memory)
 FUNCTION-ALIAS: get-file-mod-time long GetFileModTime ( c-string fileName )                           ! Get file modification time (last write time)
 
 ! Compression/Encoding functionality
@@ -866,12 +890,6 @@ FUNCTION-ALIAS: compress-data uchar* CompressData ( uchar* data, int dataLength,
 FUNCTION-ALIAS: decompress-data uchar* DecompressData ( uchar* compData, int compDataLength, int* dataLength ) ! Decompress data (DEFLATE algorithm)
 FUNCTION-ALIAS: encode-data-base64 uchar* EncodeDataBase64 ( uchar* data, int dataLength, int* outputLength )  ! Encode data to Base64 string
 FUNCTION-ALIAS: decode-data-base64 uchar* DecodeDataBase64 ( uchar* data, int* outputLength )                  ! Decode Base64 string data
-
-! Persistent storage management
-FUNCTION-ALIAS: save-storage-value bool SaveStorageValue ( uint position, int value )    ! Save integer value to storage file (to defined position), returns true on success
-FUNCTION-ALIAS: load-storage-value int LoadStorageValue ( uint position )                ! Load integer value from storage file (from defined position)
-
-FUNCTION-ALIAS: open-url void OpenURL ( c-string url )                                   ! Open URL with default system browser (if available)
 
 ! ------------------------------------------------------------------------------------
 ! Input Handling Functions (Module: core)
@@ -911,6 +929,7 @@ FUNCTION-ALIAS: set-mouse-position void SetMousePosition ( int x, int y )       
 FUNCTION-ALIAS: set-mouse-offset void SetMouseOffset ( int offsetX, int offsetY )          ! Set mouse offset
 FUNCTION-ALIAS: set-mouse-scale void SetMouseScale ( float scaleX, float scaleY )          ! Set mouse scaling
 FUNCTION-ALIAS: get-mouse-wheel-move float GetMouseWheelMove ( )                           ! Get mouse wheel movement Y
+FUNCTION-ALIAS: get-mouse-wheel-move-v Vector2 GetMouseWheelMoveV ( )                      ! Get mouse wheel movement for both X and Y
 FUNCTION-ALIAS: set-mouse-cursor void SetMouseCursor ( MouseCursor cursor )                ! Set mouse cursor
 
 ! Input-related functions: touch
@@ -935,13 +954,9 @@ FUNCTION-ALIAS: get-gesture-pinch-angle float GetGesturePinchAngle ( )          
 ! ------------------------------------------------------------------------------------
 ! Camera System Functions (Module: rcamera)
 ! ------------------------------------------------------------------------------------
-FUNCTION-ALIAS: set-camera-mode void SetCameraMode ( Camera camera, CameraMode mode )    ! Set camera mode (multiple camera modes available)
-FUNCTION-ALIAS: update-camera void UpdateCamera ( Camera* camera )                       ! Update camera position for selected mode
 
-FUNCTION-ALIAS: set-camera-pan-control void SetCameraPanControl ( int keyPan )           ! Set camera pan key to combine with mouse movement (free camera)
-FUNCTION-ALIAS: set-camera-alt-control void SetCameraAltControl ( int keyAlt )           ! Set camera alt key to combine with mouse movement (free camera)
-FUNCTION-ALIAS: set-camera-smooth-zoom-control void SetCameraSmoothZoomControl ( int keySmoothZoom ) ! Set camera smooth zoom key to combine with mouse (free camera)
-FUNCTION-ALIAS: set-camera-move-controls void SetCameraMoveControls ( int keyFront, int keyBack, int keyRight, int keyLeft, int keyUp, int keyDown ) ! Set camera move controls (1st person and 3rd person cameras)
+FUNCTION-ALIAS: update-camera void UpdateCamera ( Camera *camera, CameraMode mode )      ! Update camera position for selected mode
+FUNCTION-ALIAS: update-camera-pro void UpdateCameraPro ( Camera *camera, Vector3 movement, Vector3 rotation, float zoom ) ! Update camera movement/rotation
 
 ! ------------------------------------------------------------------------------------
 ! Basic Shapes Drawing Functions (Module: shapes)
@@ -994,8 +1009,10 @@ FUNCTION-ALIAS: draw-poly-lines-ex void DrawPolyLinesEx ( Vector2 center, int si
 FUNCTION-ALIAS: check-collision-recs bool CheckCollisionRecs ( Rectangle rec1, Rectangle rec2 )                                  ! Check collision between two rectangles
 FUNCTION-ALIAS: check-collision-circles bool CheckCollisionCircles ( Vector2 center1, float radius1, Vector2 center2, float radius2 ) ! Check collision between two circles
 FUNCTION-ALIAS: check-collision-circle-rec bool CheckCollisionCircleRec ( Vector2 center, float radius, Rectangle rec )          ! Check collision between circle and rectangle
-FUNCTION-ALIAS: check-collision-point-rec bool CheckCollisionPointRec ( Vector2 point, Rectangle rec )                           ! Check if point is inside rectangle FUNCTION-ALIAS: check-collision-point-circle bool CheckCollisionPointCircle ( Vector2 point, Vector2 center, float radius )                        ! Check if point is inside circle
+FUNCTION-ALIAS: check-collision-point-rec bool CheckCollisionPointRec ( Vector2 point, Rectangle rec )                           ! Check if point is inside rectangle
+FUNCTION-ALIAS: check-collision-point-circle bool CheckCollisionPointCircle ( Vector2 point, Vector2 center, float radius )      ! Check if point is inside circle
 FUNCTION-ALIAS: check-collision-point-triangle bool CheckCollisionPointTriangle ( Vector2 point, Vector2 p1, Vector2 p2, Vector2 p3 ) ! Check if point is inside a triangle
+FUNCTION-ALIAS: check-collision-point-poly bool CheckCollisionPointPoly ( Vector2 point, Vector2* points, int pointCount ) ! Check if point is within a polygon described by array of vertices
 FUNCTION-ALIAS: check-collision-lines bool CheckCollisionLines ( Vector2 startPos1, Vector2 endPos1, Vector2 startPos2, Vector2 endPos2, Vector2* collisionPoint )  ! Check the collision between two lines defined by two points each, returns collision point by reference
 FUNCTION-ALIAS: check-collision-point-line bool CheckCollisionPointLine ( Vector2 point, Vector2 p1, Vector2 p2, int threshold ) ! Check if point belongs to line created between two points [p1] and [p2] with defined margin in pixels [threshold]
 FUNCTION-ALIAS: get-collision-rec Rectangle GetCollisionRec ( Rectangle rec1, Rectangle rec2 )                                   ! Get collision rectangle for two rectangles collision
@@ -1023,7 +1040,9 @@ FUNCTION-ALIAS: gen-image-gradient-h Image GenImageGradientH ( int width, int he
 FUNCTION-ALIAS: gen-image-gradient-radial Image GenImageGradientRadial ( int width, int height, float density, Color inner, Color outer ) ! Generate image: radial gradient
 FUNCTION-ALIAS: gen-image-checked Image GenImageChecked ( int width, int height, int checksX, int checksY, Color col1, Color col2 ) ! Generate image: checked
 FUNCTION-ALIAS: gen-image-white-noise Image GenImageWhiteNoise ( int width, int height, float factor )                           ! Generate image: white noise
+FUNCTION-ALIAS: gen-image-perlin-noise Image GenImagePerlinNoise ( int width, int height, int offsetX, int offsetY, float scale ) ! Generate image: perlin noise
 FUNCTION-ALIAS: gen-image-cellular Image GenImageCellular ( int width, int height, int tileSize )                                ! Generate image: cellular algorithm, bigger tileSize means bigger cells
+FUNCTION-ALIAS: gen-image-text Image GenImageText ( int width, int height, c-string text )                                       ! Generate image: text
 
 ! Image manipulation functions
 FUNCTION-ALIAS: image-copy Image ImageCopy ( Image image )                                                                       ! Create an image duplicate (useful for transformations)
@@ -1037,6 +1056,7 @@ FUNCTION-ALIAS: image-alpha-crop void ImageAlphaCrop ( Image* image, float thres
 FUNCTION-ALIAS: image-alpha-clear void ImageAlphaClear ( Image* image, Color color, float threshold )                            ! Clear alpha channel to desired color
 FUNCTION-ALIAS: image-alpha-mask void ImageAlphaMask ( Image* image, Image alphaMask )                                           ! Apply alpha mask to image
 FUNCTION-ALIAS: image-alpha-premultiply void ImageAlphaPremultiply ( Image* image )                                              ! Premultiply alpha channel
+FUNCTION-ALIAS: image-blur-gaussian void ImageBlurGaussian ( Image* image, int blurSize )                                        ! Blur image with gaussian
 FUNCTION-ALIAS: image-resize void ImageResize ( Image* image, int newWidth, int newHeight )                                      ! Resize image (Bicubic scaling algorithm)
 FUNCTION-ALIAS: image-resize-nn void ImageResizeNN ( Image* image, int newWidth, int newHeight )                                 ! Resize image (Nearest-Neighbor scaling algorithm)
 FUNCTION-ALIAS: image-resize-canvas void ImageResizeCanvas ( Image* image, int newWidth, int newHeight, int offsetX, int offsetY, Color fill )  ! Resize canvas and fill with color
@@ -1068,6 +1088,8 @@ FUNCTION-ALIAS: image-draw-line void ImageDrawLine ( Image* dst, int startPosX, 
 FUNCTION-ALIAS: image-draw-line-v void ImageDrawLineV ( Image* dst, Vector2 start, Vector2 end, Color color )                    ! Draw line within an image (Vector version)
 FUNCTION-ALIAS: image-draw-circle void ImageDrawCircle ( Image* dst, int centerX, int centerY, int radius, Color color )         ! Draw circle within an image
 FUNCTION-ALIAS: image-draw-circle-v void ImageDrawCircleV ( Image* dst, Vector2 center, int radius, Color color )                ! Draw circle within an image (Vector version)
+FUNCTION-ALIAS: image-draw-circle-lines void ImageDrawCircleLines ( Image* dst, int centerX, int centerY, int radius, Color color )         ! Draw circle within an image
+FUNCTION-ALIAS: image-draw-circle-lines-v void ImageDrawCircleLinesV ( Image* dst, Vector2 center, int radius, Color color )                ! Draw circle within an image (Vector version)
 FUNCTION-ALIAS: image-draw-rectangle void ImageDrawRectangle ( Image* dst, int posX, int posY, int width, int height, Color color ) ! Draw rectangle within an image
 FUNCTION-ALIAS: image-draw-rectangle-v void ImageDrawRectangleV ( Image* dst, Vector2 position, Vector2 size, Color color )      ! Draw rectangle within an image (Vector version)
 FUNCTION-ALIAS: image-draw-rectangle-rec void ImageDrawRectangleRec ( Image* dst, Rectangle rec, Color color )                   ! Draw rectangle within an image
@@ -1097,11 +1119,11 @@ FUNCTION-ALIAS: draw-texture void DrawTexture ( Texture2D texture, int posX, int
 FUNCTION-ALIAS: draw-texture-v void DrawTextureV ( Texture2D texture, Vector2 position, Color tint )                             ! Draw a Texture2D with position defined as Vector2
 FUNCTION-ALIAS: draw-texture-ex void DrawTextureEx ( Texture2D texture, Vector2 position, float rotation, float scale, Color tint ) ! Draw a Texture2D with extended parameters
 FUNCTION-ALIAS: draw-texture-rec void DrawTextureRec ( Texture2D texture, Rectangle source, Vector2 position, Color tint )       ! Draw a part of a texture defined by a rectangle
-FUNCTION-ALIAS: draw-texture-quad void DrawTextureQuad ( Texture2D texture, Vector2 tiling, Vector2 offset, Rectangle quad, Color tint ) ! Draw texture quad with tiling and offset parameters
-FUNCTION-ALIAS: draw-texture-tiled void DrawTextureTiled ( Texture2D texture, Rectangle source, Rectangle dest, Vector2 origin, float rotation, float scale, Color tint ) ! Draw part of a texture (defined by a rectangle) with rotation and scale tiled into dest.
+! FUNCTION-ALIAS: draw-texture-quad void DrawTextureQuad ( Texture2D texture, Vector2 tiling, Vector2 offset, Rectangle quad, Color tint ) ! Draw texture quad with tiling and offset parameters
+! FUNCTION-ALIAS: draw-texture-tiled void DrawTextureTiled ( Texture2D texture, Rectangle source, Rectangle dest, Vector2 origin, float rotation, float scale, Color tint ) ! Draw part of a texture (defined by a rectangle) with rotation and scale tiled into dest.
 FUNCTION-ALIAS: draw-texture-pro void DrawTexturePro ( Texture2D texture, Rectangle source, Rectangle dest, Vector2 origin, float rotation, Color tint ) ! Draw a part of a texture defined by a rectangle with 'pro' parameters
 FUNCTION-ALIAS: draw-texture-npatch void DrawTextureNPatch ( Texture2D texture, NPatchInfo nPatchInfo, Rectangle dest, Vector2 origin, float rotation, Color tint ) ! Draws a texture (or part of it) that stretches or shrinks nicely
-FUNCTION-ALIAS: draw-texture-poly void DrawTexturePoly ( Texture2D texture, Vector2 center, Vector2* points, Vector2* texcoords, int pointCount, Color tint ) ! Draw a textured polygon
+! FUNCTION-ALIAS: draw-texture-poly void DrawTexturePoly ( Texture2D texture, Vector2 center, Vector2* points, Vector2* texcoords, int pointCount, Color tint ) ! Draw a textured polygon
 
 ! Color/pixel related functions
 FUNCTION-ALIAS: fade Color Fade ( Color color, float alpha )                                   ! Get color with alpha applied, alpha goes from 0.0f to 1.0f
@@ -1110,6 +1132,9 @@ FUNCTION-ALIAS: color-normalize Vector4 ColorNormalize ( Color color )          
 FUNCTION-ALIAS: color-from-normalized Color ColorFromNormalized ( Vector4 normalized )         ! Get Color from normalized values [0..1]
 FUNCTION-ALIAS: color-to-hsv Vector3 ColorToHSV ( Color color )                                ! Get HSV values for a Color, hue [0..360], saturation/value [0..1]
 FUNCTION-ALIAS: color-from-hsv Color ColorFromHSV ( float hue, float saturation, float value ) ! Get a Color from HSV values, hue [0..360], saturation/value [0..1]
+FUNCTION-ALIAS: color-tint Color ColorTint ( Color color, Color tint )                         ! Get color with tint
+FUNCTION-ALIAS: color-brightness Color ColorBrightness ( Color color, float factor )           ! Get color with brightness
+FUNCTION-ALIAS: color-contrast Color ColorContrast ( Color color, float contrast )             ! Get color with contrast
 FUNCTION-ALIAS: color-alpha Color ColorAlpha ( Color color, float alpha )                      ! Get color with alpha applied, alpha goes from 0.0f to 1.0f
 FUNCTION-ALIAS: color-alpha-blend Color ColorAlphaBlend ( Color dst, Color src, Color tint )   ! Get src alpha-blended into dst color with tint
 FUNCTION-ALIAS: get-color Color GetColor ( uint hexValue )                                     ! Get Color structure from hexadecimal value
@@ -1131,6 +1156,7 @@ FUNCTION-ALIAS: load-font-data GlyphInfo* LoadFontData ( c-string  fileData, int
 FUNCTION-ALIAS: gen-image-font-atlas Image GenImageFontAtlas ( GlyphInfo* chars, Rectangle** recs, int glyphCount, int fontSize, int padding, int packMethod )  ! Generate image font atlas using chars info
 FUNCTION-ALIAS: unload-font-data void UnloadFontData ( GlyphInfo* chars, int glyphCount )                            ! Unload font chars info data (RAM)
 FUNCTION-ALIAS: unload-font void UnloadFont ( Font font )                                                            ! Unload Font from GPU memory (VRAM)
+FUNCTION-ALIAS: export-font-as-code bool ExportFontAsCode ( Font font, c-string fileName )                           ! Export font as code file, returns true on success
 
 ! Text drawing functions
 FUNCTION-ALIAS: draw-fps void DrawFPS ( int posX, int posY )                                                         ! Draw current FPS
@@ -1138,6 +1164,7 @@ FUNCTION-ALIAS: draw-text void DrawText ( c-string text, int posX, int posY, int
 FUNCTION-ALIAS: draw-text-ex void DrawTextEx ( Font font, c-string text, Vector2 position, float fontSize, float spacing, Color tint )  ! Draw text using font and additional parameters
 FUNCTION-ALIAS: draw-text-pro void DrawTextPro ( Font font, c-string text, Vector2 position, Vector2 origin, float rotation, float fontSize, float spacing, Color tint )  ! Draw text using Font and pro parameters (rotation)
 FUNCTION-ALIAS: draw-text-codepoint void DrawTextCodepoint ( Font font, int codepoint, Vector2 position, float fontSize, Color tint )  ! Draw one character (codepoint)
+FUNCTION-ALIAS: draw-text-codepoints void DrawTextCodepoints ( Font font, int* codepoint, int count, Vector2 position, float fontSize, float spacing,  Color tint )  ! Draw multiple character (codepoint)
 
 ! Text font info functions
 FUNCTION-ALIAS: measure-text int MeasureText ( c-string text, int fontSize )                                         ! Measure string width for default font
@@ -1147,12 +1174,15 @@ FUNCTION-ALIAS: get-glyph-info GlyphInfo GetGlyphInfo ( Font font, int codepoint
 FUNCTION-ALIAS: get-glyph-atlas-rec Rectangle GetGlyphAtlasRec ( Font font, int codepoint )                          ! Get glyph rectangle in font atlas for a codepoint (unicode character), fallback to '?' if not found
 
 ! Text codepoints management functions (unicode characters)
+FUNCTION-ALIAS: load-utf8 c-string LoadUTF8 ( int *codepoints, int length )                     ! Load UTF-8 text encoded from codepoints array
+FUNCTION-ALIAS: unload-utf8 void UnloadUTF8 ( c-string text )                                   ! Unload UTF-8 text encoded from codepoints array
 FUNCTION-ALIAS: load-codepoints int* LoadCodepoints ( c-string text, int* count )                     ! Load all codepoints from a UTF-8 text string, codepoints count returned by parameter
 FUNCTION-ALIAS: unload-codepoints void UnloadCodepoints ( int* codepoints )                           ! Unload codepoints data from memory
 FUNCTION-ALIAS: get-codepoint-count int GetCodepointCount ( c-string text )                           ! Get total number of codepoints in a UTF-8 encoded string
 FUNCTION-ALIAS: get-codepoint int GetCodepoint ( c-string text, int* bytesProcessed )                 ! Get next codepoint in a UTF-8 encoded string, 0x3f('?') is returned on failure
+FUNCTION-ALIAS: get-codepoint-next int GetCodepointNext ( c-string text, int* codepointSize )         ! Get next codepoint in a UTF-8 encoded string, 0x3f('?') is returned on failure
+FUNCTION-ALIAS: get-codepoint-previous int GetCodepointPrevious ( c-string text, int* codepointSize ) ! Get previous codepoint in a UTF-8 encoded string, 0x3f('?') is returned on failure
 FUNCTION-ALIAS: codepoint-to-utf8 c-string CodepointToUTF8 ( int codepoint, int* byteSize )           ! Encode one codepoint into UTF-8 byte array (array length returned as parameter)
-FUNCTION-ALIAS: text-codepoints-to-utf8 c-string TextCodepointsToUTF8 ( int* codepoints, int length ) ! Encode text as codepoints array into UTF-8 text string (WARNING: memory must be freed!)
 
 ! Text strings management functions (no UTF-8 strings, only byte chars)
 ! NOTE: Some strings allocate memory internally for returned strings, just be careful!
@@ -1186,8 +1216,8 @@ FUNCTION-ALIAS: draw-cube void DrawCube ( Vector3 position, float width, float h
 FUNCTION-ALIAS: draw-cube-v void DrawCubeV ( Vector3 position, Vector3 size, Color color )            ! Draw cube (Vector version)
 FUNCTION-ALIAS: draw-cube-wires void DrawCubeWires ( Vector3 position, float width, float height, float length, Color color ) ! Draw cube wires
 FUNCTION-ALIAS: draw-cube-wires-v void DrawCubeWiresV ( Vector3 position, Vector3 size, Color color ) ! Draw cube wires (Vector version)
-FUNCTION-ALIAS: draw-cube-texture void DrawCubeTexture ( Texture2D texture, Vector3 position, float width, float height, float length, Color color )  ! Draw cube textured
-FUNCTION-ALIAS: draw-cube-texture-rec void DrawCubeTextureRec ( Texture2D texture, Rectangle source, Vector3 position, float width, float height, float length, Color color )  ! Draw cube with a region of a texture
+! FUNCTION-ALIAS: draw-cube-texture void DrawCubeTexture ( Texture2D texture, Vector3 position, float width, float height, float length, Color color )  ! Draw cube textured
+! FUNCTION-ALIAS: draw-cube-texture-rec void DrawCubeTextureRec ( Texture2D texture, Rectangle source, Vector3 position, float width, float height, float length, Color color )  ! Draw cube with a region of a texture
 FUNCTION-ALIAS: draw-sphere void DrawSphere ( Vector3 centerPos, float radius, Color color )          ! Draw sphere
 FUNCTION-ALIAS: draw-sphere-ex void DrawSphereEx ( Vector3 centerPos, float radius, int rings, int slices, Color color ) ! Draw sphere with extended parameters
 FUNCTION-ALIAS: draw-sphere-wires void DrawSphereWires ( Vector3 centerPos, float radius, int rings, int slices, Color color ) ! Draw sphere wires
@@ -1195,6 +1225,8 @@ FUNCTION-ALIAS: draw-cylinder void DrawCylinder ( Vector3 position, float radius
 FUNCTION-ALIAS: draw-cylinder-ex void DrawCylinderEx ( Vector3 startPos, Vector3 endPos, float startRadius, float endRadius, int sides, Color color )  ! Draw a cylinder with base at startPos and top at endPos
 FUNCTION-ALIAS: draw-cylinder-wires void DrawCylinderWires ( Vector3 position, float radiusTop, float radiusBottom, float height, int slices, Color color )  ! Draw a cylinder/cone wires
 FUNCTION-ALIAS: draw-cylinder-wires-ex void DrawCylinderWiresEx ( Vector3 startPos, Vector3 endPos, float startRadius, float endRadius, int sides, Color color )  ! Draw a cylinder wires with base at startPos and top at endPos
+FUNCTION-ALIAS: draw-capsule void DrawCapsule ( Vector3 startPos, Vector3 endPos, float radius, int slices, int rings, Color color )  ! Draw a capsule with the center of its sphere caps at startPos and endPos
+FUNCTION-ALIAS: draw-capsule-wires void DrawCapsuleWires ( Vector3 startPos, Vector3 endPos, float radius, int slices, int rings, Color color )  ! Draw capsule wireframe with the center of its sphere caps at startPos and endPos
 FUNCTION-ALIAS: draw-plane void DrawPlane ( Vector3 centerPos, Vector2 size, Color color )            ! Draw a plane XZ
 FUNCTION-ALIAS: draw-ray void DrawRay ( Ray ray, Color color )                                        ! Draw a ray line
 FUNCTION-ALIAS: draw-grid void DrawGrid ( int slices, float spacing )                                 ! Draw a grid (centered at (0, 0, 0))
@@ -1229,7 +1261,6 @@ FUNCTION-ALIAS: draw-mesh-instanced void DrawMeshInstanced ( Mesh mesh, Material
 FUNCTION-ALIAS: export-mesh bool ExportMesh ( Mesh mesh, c-string fileName )                          ! Export mesh data to file, returns true on success
 FUNCTION-ALIAS: get-mesh-bounding-box BoundingBox GetMeshBoundingBox ( Mesh mesh )                    ! Compute mesh bounding box limits
 FUNCTION-ALIAS: gen-mesh-tangents void GenMeshTangents ( Mesh* mesh )                                 ! Compute mesh tangents
-FUNCTION-ALIAS: gen-mesh-binormals void GenMeshBinormals ( Mesh* mesh )                               ! Compute mesh binormals
 
 ! Mesh generation functions
 FUNCTION-ALIAS: gen-mesh-poly Mesh GenMeshPoly ( int sides, float radius )                            ! Generate polygonal mesh
@@ -1264,14 +1295,49 @@ FUNCTION-ALIAS: check-collision-boxes bool CheckCollisionBoxes ( BoundingBox box
 FUNCTION-ALIAS: check-collision-box-sphere bool CheckCollisionBoxSphere ( BoundingBox box, Vector3 center, float radius )             ! Check collision between box and sphere
 FUNCTION-ALIAS: get-ray-collision-sphere RayCollision GetRayCollisionSphere ( Ray ray, Vector3 center, float radius )                 ! Get collision info between ray and sphere
 FUNCTION-ALIAS: get-ray-collision-box RayCollision GetRayCollisionBox ( Ray ray, BoundingBox box )                                    ! Get collision info between ray and box
-FUNCTION-ALIAS: get-ray-collision-model RayCollision GetRayCollisionModel ( Ray ray, Model model )                                    ! Get collision info between ray and model
 FUNCTION-ALIAS: get-ray-collision-mesh RayCollision GetRayCollisionMesh ( Ray ray, Mesh mesh, Matrix transform )                      ! Get collision info between ray and mesh
 FUNCTION-ALIAS: get-ray-collision-triangle RayCollision GetRayCollisionTriangle ( Ray ray, Vector3 p1, Vector3 p2, Vector3 p3 )       ! Get collision info between ray and triangle
 FUNCTION-ALIAS: get-ray-collision-quad RayCollision GetRayCollisionQuad ( Ray ray, Vector3 p1, Vector3 p2, Vector3 p3, Vector3 p4 )   ! Get collision info between ray and quad
 
+: get-ray-collision-model ( ray model -- ray-collision )
+    [ RayCollision <struct> ] 2dip dup meshCount>> [
+        swap dup
+        [ _meshes>> <displaced-alien> ] [ transform>> ] bi*
+        get-ray-collision-mesh dup hit>> [
+            over hit>> [ 2dup [ distance>> ] bi@ < ] [ t ] if
+            [ nip ] [ drop ] if
+        ] [ drop ] if
+    ] 2with each-integer ;
+
+<PRIVATE
+: Vector3Add ( v1 v2 -- v3 )
+    [ [ x>> ] bi@ + ] [ [ y>> ] bi@ + ] [ [ z>> ] bi@ + ] 2tri
+    Vector3 boa ;
+: Vector3Scale ( v scalar -- r )
+    [ [ x>> ] [ y>> ] [ z>> ] tri ] dip '[ _ * ] tri@ Vector3 boa ;
+PRIVATE>
+
+:: get-ray-collision-ground ( ray ground-height -- ray-collision )
+    RayCollision <struct>
+    ray direction>> y>> abs 0.000001 > [
+        ray position>> y>> ground-height -
+        ray direction>> y>> neg / :> distance
+        distance 0.0 >= [
+            t >>hit
+            distance >>distance
+            dup normal>> 1.0 >>y drop
+            ray position>>
+            ray direction>> distance Vector3Scale
+            Vector3Add ground-height >>y >>point
+        ] when
+    ] when ;
+
+
 ! ------------------------------------------------------------------------------------
 ! Audio Loading and Playing Functions (Module: audio)
 ! ------------------------------------------------------------------------------------
+
+CALLBACK: void AudioCallback ( void* bufferData, int frames )
 
 ! Audio device management functions
 FUNCTION-ALIAS: init-audio-device void InitAudioDevice ( )                                      ! Initialize audio device and context
@@ -1301,6 +1367,7 @@ FUNCTION-ALIAS: get-sounds-playing int GetSoundsPlaying ( )                     
 FUNCTION-ALIAS: is-sound-playing bool IsSoundPlaying ( Sound sound )                            ! Check if a sound is currently playing
 FUNCTION-ALIAS: set-sound-volume void SetSoundVolume ( Sound sound, float volume )              ! Set volume for a sound (1.0 is max level)
 FUNCTION-ALIAS: set-sound-pitch void SetSoundPitch ( Sound sound, float pitch )                 ! Set pitch for a sound (1.0 is base level)
+FUNCTION-ALIAS: set-sound-pan void SetSoundPan ( Sound sound, float pan )                       ! Set pan for a sound (0.5 is center)
 FUNCTION-ALIAS: wave-format void WaveFormat ( Wave* wave, int sampleRate, int sampleSize, int channels ) ! Convert wave data to desired format
 FUNCTION-ALIAS: wave-copy Wave WaveCopy ( Wave wave )                                           ! Copy a wave to a new wave
 FUNCTION-ALIAS: wave-crop void WaveCrop ( Wave* wave, int initSample, int finalSample )         ! Crop a wave to defined samples range
@@ -1320,6 +1387,7 @@ FUNCTION-ALIAS: resume-music-stream void ResumeMusicStream ( Music music )      
 FUNCTION-ALIAS: seek-music-stream void SeekMusicStream ( Music music, float position )          ! Seek music to a position (in seconds)
 FUNCTION-ALIAS: set-music-volume void SetMusicVolume ( Music music, float volume )              ! Set volume for music (1.0 is max level)
 FUNCTION-ALIAS: set-music-pitch void SetMusicPitch ( Music music, float pitch )                 ! Set pitch for a music (1.0 is base level)
+FUNCTION-ALIAS: set-music-pan void SetMusicPan ( Music sound, float pan )                       ! Set pan for a music (0.5 is center)
 FUNCTION-ALIAS: get-music-time-length float GetMusicTimeLength ( Music music )                  ! Get music time length (in seconds)
 FUNCTION-ALIAS: get-music-time-played float GetMusicTimePlayed ( Music music )                  ! Get current music time played (in seconds)
 
@@ -1335,7 +1403,11 @@ FUNCTION-ALIAS: is-audio-stream-playing bool IsAudioStreamPlaying ( AudioStream 
 FUNCTION-ALIAS: stop-audio-stream void StopAudioStream ( AudioStream stream )                                     ! Stop audio stream
 FUNCTION-ALIAS: set-audio-stream-volume void SetAudioStreamVolume ( AudioStream stream, float volume )            ! Set volume for audio stream (1.0 is max level)
 FUNCTION-ALIAS: set-audio-stream-pitch void SetAudioStreamPitch ( AudioStream stream, float pitch )               ! Set pitch for audio stream (1.0 is base level)
+FUNCTION-ALIAS: set-audio-stream-pan void SetAudioStreamPan ( AudioStream stream, float pan )                     ! Set pan for audio stream (0.5 is center)
 FUNCTION-ALIAS: set-audio-stream-buffer-size-default void SetAudioStreamBufferSizeDefault ( int size )            ! Default size for new audio streams
+FUNCTION-ALIAS: set-audio-stream-callback void SetAudioStreamCallback ( AudioStream stream, AudioCallback callback ) ! Audio thread callback to request new data
+FUNCTION-ALIAS: attach-audio-stream-processor void AttachAudioStreamProcessor ( AudioStream stream, AudioCallback processor ) ! Attach audio stream processor to stream
+FUNCTION-ALIAS: detach-audio-stream-processor void DetachAudioStreamProcessor ( AudioStream stream, AudioCallback processor ) ! Detach audio stream processor from stream
 
 ! Destructors
 DESTRUCTOR: unload-audio-stream
@@ -1355,221 +1427,3 @@ DESTRUCTOR: unload-shader
 DESTRUCTOR: unload-sound
 DESTRUCTOR: unload-texture
 DESTRUCTOR: unload-wave
-
-! ------------------------------------------------------------------------------------
-! Raygui 3.0
-! ------------------------------------------------------------------------------------
-
-! Style property
-STRUCT: GuiStyleProp
-    { controlId ushort }
-    { propertyId ushort }
-    { propertyValue int } ;
-
-! Gui control state
-ENUM: GuiControlState
-    GUI_STATE_NORMAL
-    GUI_STATE_FOCUSED
-    GUI_STATE_PRESSED
-    GUI_STATE_DISABLED ;
-
-! Gui control text alignment
-ENUM: GuiTextAlignment
-    GUI_TEXT_ALIGN_LEFT
-    GUI_TEXT_ALIGN_CENTER
-    GUI_TEXT_ALIGN_RIGHT ;
-
-! Gui controls
-ENUM: GuiControl
-    DEFAULT        ! Generic control -> populates to all controls when set
-    LABEL          ! Used also for: LABELBUTTON
-    BUTTON
-    TOGGLE         ! Used also for: TOGGLEGROUP
-    SLIDER         ! Used also for: SLIDERBAR
-    PROGRESSBAR
-    CHECKBOX
-    COMBOBOX
-    DROPDOWNBOX
-    TEXTBOX        ! Used also for: TEXTBOXMULTI
-    VALUEBOX
-    SPINNER
-    LISTVIEW
-    COLORPICKER
-    SCROLLBAR
-    STATUSBAR ;
-
-! Gui base properties for every control
-! NOTE: RAYGUI_MAX_PROPS_BASE properties (by default 16 properties)
-ENUM: GuiControlProperty
-    BORDER_COLOR_NORMAL
-    BASE_COLOR_NORMAL
-    TEXT_COLOR_NORMAL
-    BORDER_COLOR_FOCUSED
-    BASE_COLOR_FOCUSED
-    TEXT_COLOR_FOCUSED
-    BORDER_COLOR_PRESSED
-    BASE_COLOR_PRESSED
-    TEXT_COLOR_PRESSED
-    BORDER_COLOR_DISABLED
-    BASE_COLOR_DISABLED
-    TEXT_COLOR_DISABLED
-    BORDER_WIDTH
-    TEXT_PADDING
-    TEXT_ALIGNMENT
-    RESERVED ;
-
-! Gui extended properties depend on control
-! NOTE: RAYGUI_MAX_PROPS_EXTENDED properties (by default 8 properties)
-
-! DEFAULT extended properties
-! NOTE: Those properties are actually common to all controls
-ENUM: GuiDefaultProperty
-    { TEXT_SIZE 16 }
-    TEXT_SPACING
-    LINE_COLOR
-    BACKGROUND_COLOR ;
-
-! Toggle/ToggleGroup
-ENUM: GuiToggleProperty
-    { GROUP_PADDING 16 } ;
-
-! Slider/SliderBar
-ENUM: GuiSliderProperty
-    { SLIDER_WIDTH 16 }
-    SLIDER_PADDING ;
-
-! ProgressBar
-ENUM: GuiProgressBarProperty
-    { PROGRESS_PADDING 16 } ;
-
-! CheckBox
-ENUM: GuiCheckBoxProperty
-    { CHECK_PADDING 16 } ;
-
-! ComboBox
-ENUM: GuiComboBoxProperty
-    { COMBO_BUTTON_WIDTH 16 }
-    COMBO_BUTTON_PADDING ;
-
-! DropdownBox
-ENUM: GuiDropdownBoxProperty
-    { ARROW_PADDING 16 }
-    DROPDOWN_ITEMS_PADDING ;
-
-! TextBox/TextBoxMulti/ValueBox/Spinner
-ENUM: GuiTextBoxProperty
-    { TEXT_INNER_PADDING 16 }
-    TEXT_LINES_PADDING
-    COLOR_SELECTED_FG
-    COLOR_SELECTED_BG ;
-
-! Spinner
-ENUM: GuiSpinnerProperty;
-    { SPIN_BUTTON_WIDTH 16 }
-    SPIN_BUTTON_PADDING ;
-
-! ScrollBar
-ENUM: GuiScrollBarProperty
-    { ARROWS_SIZE 16 }
-    ARROWS_VISIBLE
-    SCROLL_SLIDER_PADDING
-    SCROLL_SLIDER_SIZE
-    SCROLL_PADDING
-    SCROLL_SPEED ;
-
-! ScrollBar side
-ENUM: GuiScrollBarSide
-    SCROLLBAR_LEFT_SIDE
-    SCROLLBAR_RIGHT_SIDE ;
-
-! ListView
-ENUM: GuiListViewProperty
-    { LIST_ITEMS_HEIGHT 16 }
-    LIST_ITEMS_PADDING
-    SCROLLBAR_WIDTH
-    SCROLLBAR_SIDE ;
-
-! ColorPicker
-ENUM: GuiColorPickerProperty
-    { COLOR_SELECTOR_SIZE 16 }
-    HUEBAR_WIDTH                  ! Right hue bar width
-    HUEBAR_PADDING                ! Right hue bar separation from panel
-    HUEBAR_SELECTOR_HEIGHT        ! Right hue bar selector height
-    HUEBAR_SELECTOR_OVERFLOW ;    ! Right hue bar selector overflow
-
-! ----------------------------------------------------------------------------------
-! Module Functions Declaration
-! ----------------------------------------------------------------------------------
-
-! Global gui state control functions
-FUNCTION-ALIAS: gui-enable void GuiEnable ( )                                           ! Enable gui controls (global state)
-FUNCTION-ALIAS: gui-disable void GuiDisable ( )                                         ! Disable gui controls (global state)
-FUNCTION-ALIAS: gui-lock void GuiLock ( )                                               ! Lock gui controls (global state)
-FUNCTION-ALIAS: gui-unlock void GuiUnlock ( )                                           ! Unlock gui controls (global state)
-FUNCTION-ALIAS: gui-is-locked bool GuiIsLocked ( )                                      ! Check if gui is locked (global state)
-FUNCTION-ALIAS: gui-fade void GuiFade ( float alpha )                                   ! Set gui controls alpha (global state), alpha goes from 0.0f to 1.0f
-FUNCTION-ALIAS: gui-set-state void GuiSetState ( int state )                            ! Set gui state (global state)
-FUNCTION-ALIAS: gui-get-state int GuiGetState ( )                                       ! Get gui state (global state)
-
-! Font set/get functions
-FUNCTION-ALIAS: gui-set-font void GuiSetFont ( Font font )                              ! Set gui custom font (global state)
-FUNCTION-ALIAS: gui-get-font Font GuiGetFont ( )                                        ! Get gui custom font (global state)
-
-! Style set/get functions
-FUNCTION-ALIAS: gui-set-style void GuiSetStyle ( int control, int property, int value ) ! Set one style property
-FUNCTION-ALIAS: gui-get-style int GuiGetStyle ( int control, int property )             ! Get one style property
-
-! Container/separator controls, useful for controls organization
-FUNCTION-ALIAS: gui-window-box bool GuiWindowBox ( Rectangle bounds, c-string title )   ! Window Box control, shows a window that can be closed
-FUNCTION-ALIAS: gui-group-box void GuiGroupBox ( Rectangle bounds, c-string text )      ! Group Box control with text name
-FUNCTION-ALIAS: gui-line void GuiLine ( Rectangle bounds, c-string text )               ! Line separator control, could contain text
-FUNCTION-ALIAS: gui-panel void GuiPanel ( Rectangle bounds )                            ! Panel control, useful to group controls
-FUNCTION-ALIAS: gui-scroll-panel Rectangle GuiScrollPanel ( Rectangle bounds, Rectangle content, Vector2* scroll ) ! Scroll Panel control
-
-! Basic controls set
-FUNCTION-ALIAS: gui-label void GuiLabel ( Rectangle bounds, c-string text )                                                               ! Label control, shows text
-FUNCTION-ALIAS: gui-button bool GuiButton ( Rectangle bounds, c-string text )                                                             ! Button control, returns true when clicked
-FUNCTION-ALIAS: gui-label-button bool GuiLabelButton ( Rectangle bounds, c-string text )                                                  ! Label button control, show true when clicked
-FUNCTION-ALIAS: gui-toggle bool GuiToggle ( Rectangle bounds, c-string text, bool active )                                                ! Toggle Button control, returns true when active
-FUNCTION-ALIAS: gui-toggle-group int GuiToggleGroup ( Rectangle bounds, c-string text, int active )                                       ! Toggle Group control, returns active toggle index
-FUNCTION-ALIAS: gui-check-box bool GuiCheckBox ( Rectangle bounds, c-string text, bool checked )                                          ! Check Box control, returns true when active
-FUNCTION-ALIAS: gui-combo-box int GuiComboBox ( Rectangle bounds, c-string text, int active )                                             ! Combo Box control, returns selected item index
-FUNCTION-ALIAS: gui-dropdown-box bool GuiDropdownBox ( Rectangle bounds, c-string text, int* active, bool editMode )                      ! Dropdown Box control, returns selected item
-FUNCTION-ALIAS: gui-spinner bool GuiSpinner ( Rectangle bounds, c-string text, int* value, int minValue, int maxValue, bool editMode )    ! Spinner control, returns selected value
-FUNCTION-ALIAS: gui-value-box bool GuiValueBox ( Rectangle bounds, c-string text, int* value, int minValue, int maxValue, bool editMode ) ! Value Box control, updates input text with numbers
-FUNCTION-ALIAS: gui-text-box bool GuiTextBox ( Rectangle bounds, char *text, int textSize, bool editMode )                                ! Text Box control, updates input text
-FUNCTION-ALIAS: gui-text-box-multi bool GuiTextBoxMulti ( Rectangle bounds, char *text, int textSize, bool editMode )                     ! Text Box control with multiple lines
-FUNCTION-ALIAS: gui-slider float GuiSlider ( Rectangle bounds, c-string textLeft, c-string textRight, float value, float minValue, float maxValue ) ! Slider control, returns selected value
-FUNCTION-ALIAS: gui-slider-bar float GuiSliderBar ( Rectangle bounds, c-string textLeft, c-string textRight, float value, float minValue, float maxValue ) ! Slider Bar control, returns selected value
-FUNCTION-ALIAS: gui-progress-bar float GuiProgressBar ( Rectangle bounds, c-string textLeft, c-string textRight, float value, float minValue, float maxValue ) ! Progress Bar control, shows current progress value
-FUNCTION-ALIAS: gui-status-bar void GuiStatusBar ( Rectangle bounds, c-string text )                                                      ! Status Bar control, shows info text
-FUNCTION-ALIAS: gui-dummy-rec void GuiDummyRec ( Rectangle bounds, c-string text )                                                        ! Dummy control for placeholders
-FUNCTION-ALIAS: gui-scroll-bar int GuiScrollBar ( Rectangle bounds, int value, int minValue, int maxValue )                               ! Scroll Bar control
-FUNCTION-ALIAS: gui-grid Vector2 GuiGrid ( Rectangle bounds, float spacing, int subdivs )                                                 ! Grid control
-
-! Advance controls set
-FUNCTION-ALIAS: gui-list-view int GuiListView ( Rectangle bounds, c-string text, int* scrollIndex, int active )                           ! List View control, returns selected list item index
-FUNCTION-ALIAS: gui-list-view-ex int GuiListViewEx ( Rectangle bounds, c-string* text, int count, int* focus, int* scrollIndex, int active ) ! List View with extended parameters
-FUNCTION-ALIAS: gui-message-box int GuiMessageBox ( Rectangle bounds, c-string title, c-string message, c-string buttons )                ! Message Box control, displays a message
-FUNCTION-ALIAS: gui-text-input-box int GuiTextInputBox ( Rectangle bounds, c-string title, c-string message, c-string buttons, char *text ) ! Text Input Box control, ask for text
-FUNCTION-ALIAS: gui-color-picker Color GuiColorPicker ( Rectangle bounds, Color color )                                                   ! Color Picker control (multiple color controls)
-FUNCTION-ALIAS: gui-color-panel Color GuiColorPanel ( Rectangle bounds, Color color )                                                     ! Color Panel control
-FUNCTION-ALIAS: gui-color-bar-alpha float GuiColorBarAlpha ( Rectangle bounds, float alpha )                                              ! Color Bar Alpha control
-FUNCTION-ALIAS: gui-color-bar-hue float GuiColorBarHue ( Rectangle bounds, float value )                                                  ! Color Bar Hue control
-
-! Styles loading functions
-FUNCTION-ALIAS: gui-load-style-(c--string void GuiLoadStyle ( c-string fileName )          ! Load style file over global style variable (.rgs)
-FUNCTION-ALIAS: gui-load-style-default void GuiLoadStyleDefault ( )                      ! Load style default over global style
-
-FUNCTION-ALIAS: gui-icon-text c-string GuiIconText ( int iconId, c-string text )         ! Get text with icon id prepended (if supported)
-
-! Gui icons functionality
-FUNCTION-ALIAS: gui-draw-icon void GuiDrawIcon ( int iconId, int posX, int posY, int pixelSize, Color color )
-
-FUNCTION-ALIAS: gui-get-icons uint* GuiGetIcons ( )                                      ! Get full icons data pointer
-FUNCTION-ALIAS: gui-get-icon-data uint* GuiGetIconData ( int iconId )                    ! Get icon bit data
-FUNCTION-ALIAS: gui-set-icon-data void GuiSetIconData ( int iconId, uint* data )         ! Set icon bit data
-
-FUNCTION-ALIAS: gui-set-icon-pixel void GuiSetIconPixel ( int iconId, int x, int y )     ! Set icon pixel value
-FUNCTION-ALIAS: gui-clear-icon-pixel void GuiClearIconPixel ( int iconId, int x, int y ) ! Clear icon pixel value
-FUNCTION-ALIAS: gui-check-icon-pixel bool GuiCheckIconPixel ( int iconId, int x, int y ) ! Check icon pixel value

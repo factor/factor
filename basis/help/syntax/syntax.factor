@@ -1,34 +1,40 @@
 ! Copyright (C) 2005, 2009 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
+
 USING: accessors arrays ascii combinators
 combinators.short-circuit compiler.units definitions help
-help.markup help.topics kernel lexer math namespaces parser
-sequences splitting strings strings.parser vocabs.parser words ;
+help.markup help.topics kernel lexer math math.order namespaces
+parser sequences splitting strings strings.parser vocabs.parser
+words ;
+
 IN: help.syntax
 
 DEFER: HELP{
 
 <PRIVATE
 
-:: parse-help-token ( end -- str/obj/f )
+:: parse-help-token ( end -- str/obj/f literal? )
     ?scan-token dup {
         [ "{" = [ \ HELP{ ] [ f ] if ]
         [ "syntax" lookup-word ]
-        [ "help.markup" lookup-word ]
+        [ { [ "$" head? ] [ "help.markup" lookup-word ] } 1&& ]
         [ dup ?last ":{[(/\"" member-eq? [ search ] [ drop f ] if ]
     } 1|| {
-        { [ dup not ] [ drop ] }
-        { [ dup end eq? ] [ 2drop f ] }
+        { [ dup not ] [ drop f ] }
+        { [ dup end eq? ] [ 2drop f f ] }
         { [ dup parsing-word? ] [
-            nip V{ } clone swap execute-parsing first
-            dup wrapper? [ wrapped>> \ $link swap 2array ] when ] }
-        { [ dup ] [ nip ] }
+            [
+                nip V{ } clone swap execute-parsing first
+                dup wrapper? [ wrapped>> \ $link swap 2array ] when
+            ] keep \ " = ] }
+        { [ dup ] [ nip f ] }
     } cond ;
 
 : push-help-text ( accum sbuf obj -- accum sbuf' )
     [ dup empty? [ >string suffix! SBUF" " clone ] unless ]
     [ [ suffix! ] curry dip ] bi* ;
 
+ 
 : help-block? ( word -- ? )
     {
         $description $heading $subheading $syntax
@@ -38,19 +44,24 @@ DEFER: HELP{
         $list $table $example $unchecked-example $code
     } member-eq? ;
 
-: push-help-space ( accum sbuf -- accum sbuf )
-    dup empty? [
-        over empty? not
-        pick ?last dup array? [ ?first ] when
-        help-block? not and
+: ?push-help-space ( accum sbuf obj -- accum sbuf' obj )
+    over empty? [
+        pick [ f ] [
+            last {
+                [ string? not ]
+                [ dup array? [ ?first ] when help-block? not ]
+            } 1&&
+        ] if-empty
     ] [
-        dup last CHAR: \s eq? not
-    ] if [ CHAR: \s suffix! ] when ;
+        over last " (" member? not
+    ] if
+    over string? [ over ?first " .,;:)" member? not and ] when
+    [ [ CHAR: \s suffix! ] dip ] when ;
 
 :: parse-help-text ( end -- seq )
     V{ } clone SBUF" " clone [
         lexer get line>> :> m
-        end parse-help-token :> obj
+        end parse-help-token :> ( obj literal? )
         lexer get line>> :> n
 
         obj string? n m - 1 > and [
@@ -60,14 +71,9 @@ DEFER: HELP{
 
         obj [
             [
-                dup string? [
-                    dup ?first " .,;:" member? [
-                        [ push-help-space ] dip
-                    ] unless append!
-                ] [
-                    [ push-help-space ]
-                    [ push-help-text ] bi*
-                ] if
+                literal? [ ?push-help-space ] unless
+                dup string? not literal? or
+                [ push-help-text ] [ append! ] if
             ] when*
         ] keep
     ] loop [ >string suffix! ] unless-empty >array ; inline
@@ -81,8 +87,18 @@ DEFER: HELP{
         ] if
     ] produce nip ;
 
+: whitespace ( seq -- n )
+    [ [ blank? ] all? ] reject [ 0 ] [
+        [ [ blank? not ] find drop ] [ min ] map-reduce
+    ] if-empty ;
+
+: trim-whitespace ( seq -- seq' )
+    dup rest-slice dup whitespace
+    [ '[ _ index-or-length tail ] map! ] unless-zero drop
+    0 over [ [ blank? ] trim-head ] change-nth ;
+
 : code-lines ( str -- seq )
-    split-lines [ [ ascii:blank? ] trim ] map harvest ;
+    split-lines trim-whitespace [ [ blank? ] all? ] trim ;
 
 : make-example ( str -- seq )
     code-lines dup { [ array? ] [ length 1 > ] } 1&& [
@@ -100,7 +116,7 @@ DEFER: HELP{
 
 : help-text? ( word -- ? )
     {
-        $description $snippet $emphasis $strong $url $heading
+        $description $snippet $emphasis $strong $heading
         $subheading $syntax $class-description
         $error-description $var-description $contract $notes
         $curious $deprecated $errors $side-effects $content

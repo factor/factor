@@ -1,14 +1,14 @@
 ! Copyright (C) 2008 James Cash, Daniel Ehrenberg, Chris Double.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors combinators combinators.short-circuit kernel
-lexer locals make math namespaces parser sequences words ;
+lexer make math namespaces parser sequences words ;
 IN: lists
 
 ! List Protocol
 MIXIN: list
 GENERIC: car ( cons -- car )
 GENERIC: cdr ( cons -- cdr )
-GENERIC: nil? ( object -- ?   )
+GENERIC: nil? ( object -- ? )
 
 TUPLE: cons-state { car read-only } { cdr read-only } ;
 

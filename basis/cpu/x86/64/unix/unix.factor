@@ -1,5 +1,5 @@
 ! Copyright (C) 2008, 2010 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors alien.c-types arrays assocs
 compiler.cfg.builder.alien.boxing cpu.architecture cpu.x86
 cpu.x86.assembler cpu.x86.assembler.operands kernel layouts locals

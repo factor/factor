@@ -1,5 +1,5 @@
 ! Copyright (C) 2010 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: hashtables kernel assocs accessors math arrays sequences ;
 IN: pairs
 
@@ -9,7 +9,7 @@ TUPLE: pair value key hash ;
     f pair boa ; inline
 
 : if-hash ( pair true-quot false-quot -- )
-    [ dup hash>> ] 2dip ?if ; inline
+    [ hash>> ] -rot ?if ; inline
 
 M: pair assoc-size
     [ assoc-size 1 + ] [ drop 1 ] if-hash ; inline

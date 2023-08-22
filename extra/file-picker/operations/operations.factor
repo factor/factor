@@ -1,5 +1,5 @@
 ! Copyright (C) 2017 Alexander Ilin.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: byte-arrays file-picker io io.encodings.binary io.files
 kernel ui.commands ui.operations ;
 IN: file-picker.operations

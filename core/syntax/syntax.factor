@@ -1,5 +1,5 @@
 ! Copyright (C) 2004, 2010 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors arrays byte-arrays byte-vectors classes
 classes.algebra.private classes.builtin classes.error
 classes.intersection classes.maybe classes.mixin classes.parser
@@ -10,8 +10,9 @@ generic.math generic.parser generic.standard hash-sets
 hashtables hashtables.identity init io.pathnames kernel lexer
 locals.errors locals.parser macros math memoize namespaces
 parser quotations sbufs sequences slots source-files splitting
-strings strings.parser vectors vocabs.loader vocabs.parser words
-words.alias words.constant words.symbol ;
+strings strings.parser strings.parser.private vectors
+vocabs.loader vocabs.parser words words.alias words.constant
+words.symbol ;
 IN: bootstrap.syntax
 
 ! These words are defined as a top-level form, instead of with
@@ -26,7 +27,7 @@ IN: bootstrap.syntax
     "syntax" lookup-word t "delimiter" set-word-prop ;
 
 : define-core-syntax ( name quot -- )
-    [ dup "syntax" lookup-word [ ] [ no-word-error ] ?if ] dip
+    [ [ "syntax" lookup-word ] [ no-word-error ] ?unless ] dip
     define-syntax ;
 
 [
@@ -134,8 +135,8 @@ IN: bootstrap.syntax
         ";" [ create-word-in [ reset-generic ] [ define-symbol ] bi ] each-token
     ] define-core-syntax
 
-    "INITIALIZE:" [
-        scan-word parse-definition [ initialize ] 2curry append!
+    "INITIALIZED-SYMBOL:" [
+        scan-new-word [ define-symbol ] [ scan-object [ initialize ] 2curry ] bi append!
     ] define-core-syntax
 
     "SINGLETONS:" [
@@ -296,21 +297,21 @@ IN: bootstrap.syntax
     ">>>>>>" [ version-control-merge-conflict ] define-core-syntax
 
     "'[" [
-         t in-fry? [ parse-quotation ] with-variable fry append!
+        t in-fry? [ parse-quotation ] with-variable fry append!
     ] define-core-syntax
 
     "'{" [
-         t in-fry? [ \ } parse-until >array ] with-variable fry append!
+        t in-fry? [ \ } parse-until >array ] with-variable fry append!
     ] define-core-syntax
 
     "'HS{" [
-         t in-fry? [ \ } parse-until >array ] with-variable fry
-         [ >hash-set ] compose append!
+        t in-fry? [ \ } parse-until >array ] with-variable fry
+        [ >hash-set ] compose append!
     ] define-core-syntax
 
     "'H{" [
-         t in-fry? [ \ } parse-until >array ] with-variable fry
-         [ parse-hashtable ] compose append!
+        t in-fry? [ \ } parse-until >array ] with-variable fry
+        [ parse-hashtable ] compose append!
     ] define-core-syntax
 
     "_" [

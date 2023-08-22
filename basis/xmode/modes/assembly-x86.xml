@@ -15,9 +15,11 @@
 
 	<PROPS>
 		<PROPERTY NAME="lineComment" VALUE=";" />
+		<PROPERTY NAME="contextInsensitive" VALUE="true"/>
 	</PROPS>
 
-	<RULES HIGHLIGHT_DIGITS="TRUE" IGNORE_CASE="TRUE">
+	<RULES HIGHLIGHT_DIGITS="TRUE" IGNORE_CASE="TRUE"
+         DIGIT_RE="(0x)?[\p{Digit}a-fA-F_]+[hHdD]?">
 		<EOL_SPAN TYPE="COMMENT1">;</EOL_SPAN>
 
 		<SPAN TYPE="LITERAL1" NO_LINE_BREAK="TRUE">
@@ -29,6 +31,12 @@
 			<BEGIN>"</BEGIN>
 			<END>"</END>
 		</SPAN>
+
+		<!-- Multiline comment -->
+		<SPAN_REGEXP TYPE="COMMENT1" HASH_CHAR="COMMENT" AT_LINE_START="TRUE">
+			<BEGIN>comment\s+(\S)</BEGIN>
+			<END REGEXP="TRUE">$1[^$]*$</END>
+		</SPAN_REGEXP>
 
 		<!-- NASM: label inside a macro -->
 		<MARK_FOLLOWING TYPE="LABEL" MATCH_TYPE="OPERATOR"

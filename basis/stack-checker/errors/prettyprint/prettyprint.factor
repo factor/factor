@@ -1,5 +1,5 @@
 ! Copyright (C) 2008, 2010 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors arrays debugger io kernel prettyprint sequences
 stack-checker.errors summary ;
 
@@ -56,10 +56,12 @@ M: do-not-compile summary
 M: unbalanced-branches-error summary
     [ word>> name>> ] [ quots>> length 1 = ] bi
     [ "The input quotation to “" "” doesn't match its expected effect" ]
-    [ "The input quotations to “" "” don't match their expected effects" ] if
+    [ "The input quotations to “" "” do not all leave the stack at the same height" ] if
     surround ;
 
 M: unbalanced-branches-error error.
-    dup summary print
+    dup summary print nl
+    "For more information, evaluate:" print
+    "    \"inference-branches\" help" print nl
     [ quots>> ] [ declareds>> ] [ actuals>> ] tri 3array flip
     { "Input" "Expected" "Got" } prefix simple-table. ;

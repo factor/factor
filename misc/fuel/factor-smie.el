@@ -1,7 +1,7 @@
 ;;; factor-smie.el --- Helper function for indenting factor code
 
 ;; Copyright (C) 2016  Björn Lindqvist
-;; See http://factorcode.org/license.txt for BSD license.
+;; See https://factorcode.org/license.txt for BSD license.
 
 ;;; Commentary:
 

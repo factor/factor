@@ -1,5 +1,5 @@
 ! Copyright (C) 2008, 2010 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors assocs compiler.cfg.linear-scan.allocation
 compiler.cfg.linear-scan.assignment
 compiler.cfg.linear-scan.live-intervals

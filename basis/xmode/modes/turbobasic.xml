@@ -1,0 +1,368 @@
+<?xml version="1.0"?>
+<!DOCTYPE MODE SYSTEM "xmode.dtd">
+<!-- Turbobasic, 3/25/09 by Ben Dutcher  -->
+<!-- The Turbo Basic compiler was a Borland product.  It's way old.  My manual dates from 1987 -->
+<!-- The categories here are those in the manual, except where I couldn't get them to work.  -->
+
+<MODE>
+	<PROPS>
+		<PROPERTY NAME="lineComment" VALUE="'" />
+	</PROPS>
+
+	<RULES IGNORE_CASE="TRUE" HIGHLIGHT_DIGITS="TRUE" ESCAPE="\">
+		<SPAN TYPE="LITERAL1" NO_LINE_BREAK="TRUE">
+			<BEGIN>"</BEGIN>
+			<END>"</END>
+		</SPAN>
+
+		<!-- TurboBasic will use either symbol to start a comment -->
+		<EOL_SPAN TYPE="COMMENT1">'</EOL_SPAN>
+		<EOL_SPAN TYPE="COMMENT1">rem </EOL_SPAN>
+
+
+		<!-- Comparison operators -->
+		<SEQ TYPE="OPERATOR">&lt;</SEQ>
+		<SEQ TYPE="OPERATOR">&lt;=</SEQ>
+		<SEQ TYPE="OPERATOR">&gt;=</SEQ>
+		<SEQ TYPE="OPERATOR">&gt;</SEQ>
+		<SEQ TYPE="OPERATOR">=</SEQ>
+		<SEQ TYPE="OPERATOR">&lt;&gt;</SEQ>
+
+		<!-- indicate a named constant like %true.   Remember you need to define them once only.   Integers only.  -->
+		<SPAN_REGEXP HASH_CHAR="%" TYPE="MARKUP" AT_WORD_START="TRUE" NO_WORD_BREAK="TRUE">
+			<BEGIN>%</BEGIN>
+			<END>\S*</END>
+		</SPAN_REGEXP>
+
+		<!-- Arithmetic operators -->
+		<SEQ TYPE="OPERATOR">+</SEQ>
+		<SEQ TYPE="OPERATOR">-</SEQ>
+		<SEQ TYPE="OPERATOR">*</SEQ>
+		<SEQ TYPE="OPERATOR">/</SEQ>
+		<SEQ TYPE="OPERATOR">\</SEQ>
+		<SEQ TYPE="OPERATOR">^</SEQ>
+		<SEQ TYPE="OPERATOR">mod</SEQ>
+
+		<!-- File number marker like #3, but which also is used to indicate a double-precison variable like FineMeasuremet# -->
+		<SEQ TYPE="KEYWORD1" AT_WORD_START="TRUE">#</SEQ>
+
+		<!-- to handle "def FNmine(), etc.:  -->
+		<SEQ TYPE="KEYWORD1">def FN</SEQ>
+
+		<!-- rather than enter option and base as separate keywords, since they are used only in this combination -->
+		<SEQ TYPE="KEYWORD1">option base</SEQ>
+
+		<!--		<SEQ TYPE="NULL">_</SEQ>-->
+		<!-- Instruction separator -->
+		<MARK_PREVIOUS TYPE="LABEL" MATCH_TYPE="OPERATOR"
+			AT_LINE_START="TRUE">:</MARK_PREVIOUS>
+
+		<KEYWORDS>
+
+		<!-- Weirdly enough, Turbo Basic doesn't support the words TRUE or FALSE
+			so I always define them in the code. with %false = 0: %true = not %false -->
+
+		<!-- occasional test word.  It's not in the manual, but that would have been fun.  -->
+		<KEYWORD3>notalotta</KEYWORD3>
+
+			<!-- Listed as keywords, but also described as unsupported:
+			list
+			usr, usr0-usr9
+			Just listed as unsupported:
+			auto, delete, edit, load, new, renum, save, cont, merge, motor
+			-->
+		<!-- Logical operators -->
+		<KEYWORD3>and</KEYWORD3>
+		<KEYWORD3>eqv</KEYWORD3>
+		<KEYWORD3>imp</KEYWORD3>
+		<KEYWORD3>not</KEYWORD3>
+		<KEYWORD3>or</KEYWORD3>
+		<KEYWORD3>xor</KEYWORD3>
+
+			<!-- chaining -->
+			<KEYWORD1>chain</KEYWORD1>
+			<KEYWORD1>common</KEYWORD1>
+			<KEYWORD1>run</KEYWORD1>
+
+			<!-- compiler control -->
+			<KEYWORD1>dim</KEYWORD1>
+			<KEYWORD1>lbound</KEYWORD1>
+			<KEYWORD1>let</KEYWORD1>
+			<KEYWORD1>local</KEYWORD1>
+			<!-- KEYWORD1>option base</KEYWORD1 -->
+			<KEYWORD1>rem</KEYWORD1>
+			<KEYWORD1>shared</KEYWORD1>
+			<KEYWORD1>static</KEYWORD1>
+			<KEYWORD1>tron</KEYWORD1>
+			<KEYWORD1>troff</KEYWORD1>
+			<KEYWORD1>ubound</KEYWORD1>
+
+			<!-- devices -->
+			<!-- KEYWORD1>open com</KEYWORD1 -->
+			<KEYWORD1>com</KEYWORD1>
+			<KEYWORD1>inp</KEYWORD1>
+			<KEYWORD1>ioctl$</KEYWORD1>
+			<KEYWORD1>ioctl</KEYWORD1>
+			<KEYWORD1>out</KEYWORD1>
+
+			<!-- DOS -->
+			<KEYWORD1>chdir</KEYWORD1>
+			<KEYWORD1>command$</KEYWORD1>
+			<KEYWORD1>date$</KEYWORD1>
+			<KEYWORD1>environ$</KEYWORD1>
+			<KEYWORD1>environ</KEYWORD1>
+			<KEYWORD1>kill</KEYWORD1>
+			<KEYWORD1>mkdir</KEYWORD1>
+			<KEYWORD1>rmdir</KEYWORD1>
+			<KEYWORD1>shell</KEYWORD1>
+			<KEYWORD1>system</KEYWORD1>
+			<KEYWORD1>time$</KEYWORD1>
+
+			<!-- Error Handling -->
+			<KEYWORD1>eradr</KEYWORD1>
+			<KEYWORD1>erdev</KEYWORD1>
+			<KEYWORD1>erdev$</KEYWORD1>
+			<KEYWORD1>erl</KEYWORD1>
+			<KEYWORD1>error</KEYWORD1>
+			<KEYWORD1>err</KEYWORD1>
+
+			<!-- files -->
+			<KEYWORD1>bload</KEYWORD1>
+			<KEYWORD1>bsave</KEYWORD1>
+			<KEYWORD1>close</KEYWORD1>
+			<KEYWORD1>eof</KEYWORD1>
+			<KEYWORD1>field</KEYWORD1>
+			<KEYWORD1>files</KEYWORD1>
+			<KEYWORD1>get</KEYWORD1>
+			<!-- KEYWORD1>line input #</KEYWORD1 -->
+			<KEYWORD1>loc</KEYWORD1>
+			<KEYWORD1>lof</KEYWORD1>
+			<KEYWORD1>lset</KEYWORD1>
+			<KEYWORD1>name</KEYWORD1>
+			<KEYWORD1>open</KEYWORD1>
+			<!-- KEYWORD1>print #</KEYWORD1 -->
+			<KEYWORD1>put$</KEYWORD1>
+			<KEYWORD1>put</KEYWORD1>
+			<KEYWORD1>reset</KEYWORD1>
+			<KEYWORD1>rset</KEYWORD1>
+			<KEYWORD1>seek</KEYWORD1>
+			<KEYWORD1>using</KEYWORD1>
+			<!-- KEYWORD1>write #</KEYWORD1 -->
+
+			<!-- flow control -->
+			<!--KEYWORD1>call absolute</KEYWORD1 -->
+			<!-- KEYWORD1>call interrupt</KEYWORD1 -->
+			<KEYWORD1>call</KEYWORD1>
+			<KEYWORD1>call</KEYWORD1>
+			<KEYWORD1>case</KEYWORD1>
+			<KEYWORD1>def</KEYWORD1>
+			<KEYWORD1>do</KEYWORD1>
+			<KEYWORD1>elseif</KEYWORD1>
+			<!-- KEYWORD1>end case</KEYWORD1>
+			<KEYWORD1>case else</KEYWORD1 -->
+			<KEYWORD1>else</KEYWORD1>
+			<KEYWORD1>end</KEYWORD1>
+			<KEYWORD1>loop</KEYWORD1>
+			<KEYWORD1>exit</KEYWORD1>
+			<KEYWORD1>for</KEYWORD1>
+			<KEYWORD1>next</KEYWORD1>
+			<KEYWORD1>gosub</KEYWORD1>
+			<KEYWORD1>goto</KEYWORD1>
+			<KEYWORD1>if</KEYWORD1>
+			<KEYWORD1>inline</KEYWORD1>
+			<KEYWORD1>resume</KEYWORD1>
+			<KEYWORD1>return</KEYWORD1>
+			<KEYWORD1>select</KEYWORD1>
+			<KEYWORD1>step</KEYWORD1>
+			<KEYWORD1>stop</KEYWORD1>
+			<KEYWORD1>sub</KEYWORD1>
+			<KEYWORD1>then</KEYWORD1>
+			<KEYWORD1>to</KEYWORD1>
+			<KEYWORD1>until</KEYWORD1>
+			<!-- KEYWORD1>def fn</KEYWORD1>
+			<KEYWORD1>end def</KEYWORD1>
+			<KEYWORD1>end sub</KEYWORD1 -->
+			<KEYWORD1>wend</KEYWORD1>
+			<KEYWORD1>while</KEYWORD1>
+
+			<!-- draw/graphics -->
+			<KEYWORD1>circle</KEYWORD1>
+			<KEYWORD1>draw</KEYWORD1>
+			<KEYWORD1>line</KEYWORD1>
+			<KEYWORD1>paint</KEYWORD1>
+			<!-- KEYWORD1>palette using</KEYWORD1 -->
+			<KEYWORD1>palette</KEYWORD1>
+			<KEYWORD1>peek</KEYWORD1>
+			<KEYWORD1>pen</KEYWORD1>
+			<KEYWORD1>pmap</KEYWORD1>
+			<KEYWORD1>point</KEYWORD1>
+			<KEYWORD1>poke</KEYWORD1>
+			<KEYWORD1>preset</KEYWORD1>
+			<KEYWORD1>pset</KEYWORD1>
+			<KEYWORD1>put</KEYWORD1>
+			<KEYWORD1>view</KEYWORD1>
+			<KEYWORD1>window</KEYWORD1>
+
+			<!-- hardware events -->
+			<KEYWORD1>mtimer</KEYWORD1>
+			<KEYWORD1>off</KEYWORD1>
+			<KEYWORD1>on</KEYWORD1>
+			<!-- KEYWORD1>on com</KEYWORD1>
+			<KEYWORD1>on error</KEYWORD1>
+			<KEYWORD1>on key</KEYWORD1>
+			<KEYWORD1>on pen</KEYWORD1>
+			<KEYWORD1>on play</KEYWORD1>
+			<KEYWORD1>on strig</KEYWORD1>
+			<KEYWORD1>on timer</KEYWORD1 -->
+			<KEYWORD1>stick</KEYWORD1>
+			<KEYWORD1>strig</KEYWORD1>
+			<KEYWORD1>timer</KEYWORD1>
+			<KEYWORD1>wait</KEYWORD1>
+
+			<!--input -->
+			<KEYWORD1>inkey$</KEYWORD1>
+			<KEYWORD1>input$</KEYWORD1>
+			<!-- KEYWORD1>input #</KEYWORD1 -->
+			<KEYWORD1>input</KEYWORD1>
+			<KEYWORD1>instat</KEYWORD1>
+			<!-- KEYWORD1>line input</KEYWORD1 -->
+			<KEYWORD1>read</KEYWORD1>
+			<KEYWORD1>restore</KEYWORD1>
+
+			<!-- keyboard -->
+			<!-- KEYWORD1>key on</KEYWORD1>
+			<KEYWORD1>key off</KEYWORD1 -->
+			<KEYWORD1>key</KEYWORD1>
+
+			<!-- memory -->
+			<KEYWORD1>clear</KEYWORD1>
+			<!-- KEYWORD1>def seg</KEYWORD1 -->
+			<KEYWORD1>endmem</KEYWORD1>
+			<KEYWORD1>erase</KEYWORD1>
+			<KEYWORD1>fre</KEYWORD1>
+			<KEYWORD1>memset</KEYWORD1>
+			<KEYWORD1>poke</KEYWORD1>
+			<KEYWORD1>seg</KEYWORD1>
+			<KEYWORD1>varptr$</KEYWORD1>
+			<KEYWORD1>varptr</KEYWORD1>
+			<KEYWORD1>varseg</KEYWORD1>
+
+			<!-- metastatements -->
+			<KEYWORD2>$com1</KEYWORD2>
+			<KEYWORD2>$com2</KEYWORD2>
+			<KEYWORD2>$com</KEYWORD2>
+			<KEYWORD2>$debug</KEYWORD2>
+			<KEYWORD2>$dynamic</KEYWORD2>
+			<KEYWORD2>$event</KEYWORD2>
+			<KEYWORD2>$if</KEYWORD2>
+			<KEYWORD2>$else</KEYWORD2>
+			<KEYWORD2>$endif</KEYWORD2>
+			<KEYWORD2>$include</KEYWORD2>
+			<KEYWORD2>$inline</KEYWORD2>
+			<KEYWORD2>$list</KEYWORD2>
+			<KEYWORD2>$option</KEYWORD2>
+			<KEYWORD2>$segment</KEYWORD2>
+			<KEYWORD2>$sound</KEYWORD2>
+			<KEYWORD2>$stack</KEYWORD2>
+			<KEYWORD2>$static</KEYWORD2>
+
+			<!-- Miscellaneous -->
+			<KEYWORD1>data</KEYWORD1>
+			<KEYWORD1>delay</KEYWORD1>
+			<KEYWORD1>reg</KEYWORD1>
+			<KEYWORD1>swap</KEYWORD1>
+
+
+			<!-- Math Functions -->
+			<FUNCTION>abs</FUNCTION>
+			<FUNCTION>asc</FUNCTION>
+			<FUNCTION>atn</FUNCTION>
+			<FUNCTION>cdbl</FUNCTION>
+			<FUNCTION>ceil</FUNCTION>
+			<FUNCTION>cint</FUNCTION>
+			<FUNCTION>clng</FUNCTION>
+			<FUNCTION>cos</FUNCTION>
+			<FUNCTION>csng</FUNCTION>
+			<FUNCTION>cvi</FUNCTION>
+			<FUNCTION>cvl</FUNCTION>
+			<FUNCTION>cvs</FUNCTION>
+			<FUNCTION>cvd</FUNCTION>
+			<FUNCTION>cvmd</FUNCTION>
+			<FUNCTION>cvms</FUNCTION>
+			<KEYWORD2>decr</KEYWORD2>
+			<KEYWORD2>defint</KEYWORD2>
+			<KEYWORD2>deflng</KEYWORD2>
+			<KEYWORD2>defsng</KEYWORD2>
+			<KEYWORD2>defdbl</KEYWORD2>
+			<KEYWORD2>defstr</KEYWORD2>
+			<FUNCTION>exp2</FUNCTION>
+			<FUNCTION>exp10</FUNCTION>
+			<FUNCTION>exp</FUNCTION>
+			<FUNCTION>fix</FUNCTION>
+			<KEYWORD2>incr</KEYWORD2>
+			<FUNCTION>int</FUNCTION>
+			<FUNCTION>log10</FUNCTION>
+			<FUNCTION>log2</FUNCTION>
+			<FUNCTION>log</FUNCTION>
+			<FUNCTION>mki$</FUNCTION>
+			<FUNCTION>mkl$</FUNCTION>
+			<FUNCTION>mks$</FUNCTION>
+			<FUNCTION>mkd$</FUNCTION>
+			<FUNCTION>mkmd$</FUNCTION>
+			<FUNCTION>mkms$</FUNCTION>
+			<KEYWORD2>randomize</KEYWORD2>
+			<KEYWORD2>random</KEYWORD2>
+			<FUNCTION>rnd</FUNCTION>
+			<FUNCTION>sgn</FUNCTION>
+			<FUNCTION>sin</FUNCTION>
+			<FUNCTION>spc</FUNCTION>
+			<FUNCTION>sqr</FUNCTION>
+			<FUNCTION>tab</FUNCTION>
+			<FUNCTION>tan</FUNCTION>
+
+			<!-- output -->
+			<KEYWORD1>print</KEYWORD1>
+			<!-- KEYWORD1>print #</KEYWORD1>
+			<KEYWORD1>print using</KEYWORD1 -->
+			<KEYWORD1>write</KEYWORD1>
+
+			<!-- printer -->
+			<KEYWORD1>lpos</KEYWORD1>
+			<!-- KEYWORD1>lprint using</KEYWORD1  -->
+			<KEYWORD1>lprint</KEYWORD1>
+
+			<!-- screen -->
+			<KEYWORD1>cls</KEYWORD1>
+			<KEYWORD1>color</KEYWORD1>
+			<KEYWORD1>csrlin</KEYWORD1>
+			<KEYWORD1>locate</KEYWORD1>
+			<KEYWORD1>pos</KEYWORD1>
+			<KEYWORD1>screen</KEYWORD1>
+			<KEYWORD1>width</KEYWORD1>
+
+			<!-- sound -->
+			<KEYWORD1>beep</KEYWORD1>
+			<KEYWORD1>play</KEYWORD1>
+			<KEYWORD1>sound</KEYWORD1>
+
+			<!-- strings -->
+			<FUNCTION>bin$</FUNCTION>
+			<FUNCTION>chr$</FUNCTION>
+			<FUNCTION>get$</FUNCTION>
+			<FUNCTION>hex$</FUNCTION>
+			<FUNCTION>instr</FUNCTION>
+			<FUNCTION>lcase$</FUNCTION>
+			<FUNCTION>left$</FUNCTION>
+			<FUNCTION>len</FUNCTION>
+			<FUNCTION>mid$</FUNCTION>
+			<FUNCTION>oct$</FUNCTION>
+			<FUNCTION>right$</FUNCTION>
+			<FUNCTION>space$</FUNCTION>
+			<FUNCTION>str$</FUNCTION>
+			<FUNCTION>string$</FUNCTION>
+			<FUNCTION>ucase$</FUNCTION>
+			<FUNCTION>val</FUNCTION>
+
+		</KEYWORDS>
+	</RULES>
+</MODE>

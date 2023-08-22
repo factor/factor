@@ -1,5 +1,5 @@
 ! Copyright (C) 2004, 2008 Slava Pestov, Doug Coleman.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs combinators
 combinators.short-circuit continuations deques destructors
 dlists fry io io.backend io.encodings.binary io.files
@@ -88,6 +88,7 @@ TUPLE: directory-iterator
     [ queue>> swap '[ _ _ [ push-front ] [ push-back ] if ] each ] bi ;
 
 : <directory-iterator> ( path bfs? -- iter )
+    [ pathname> ] dip
     <dlist> directory-iterator boa
     dup path>> over push-directory-entries ;
 
@@ -198,10 +199,10 @@ ERROR: sequence-expected obj ;
 : find-files-larger-than ( path size -- seq )
     '[ link-info size>> _ > ] find-files ;
 
-! Touching files
 HOOK: touch-file io-backend ( path -- )
 
-! Deleting files
+HOOK: truncate-file io-backend ( path n -- )
+
 HOOK: delete-file io-backend ( path -- )
 
 HOOK: delete-directory io-backend ( path -- )
@@ -212,8 +213,8 @@ HOOK: delete-directory io-backend ( path -- )
 : to-directory ( from to -- from to' )
     over file-name append-path ;
 
-! Moving and renaming files
 HOOK: move-file io-backend ( from to -- )
+
 HOOK: move-file-atomically io-backend ( from to -- )
 
 : move-file-into ( from to -- )
@@ -222,7 +223,6 @@ HOOK: move-file-atomically io-backend ( from to -- )
 : move-files-into ( files to -- )
     '[ _ move-file-into ] each ;
 
-! Copying files
 HOOK: copy-file io-backend ( from to -- )
 
 M: object copy-file
@@ -244,6 +244,9 @@ M: object copy-file
         [ delete-directory ]
         bi
     ] [ delete-file ] if ;
+
+: ?delete-tree ( path -- )
+    dup file-exists? [ delete-tree ] [ drop ] if ;
 
 DEFER: copy-trees-into
 

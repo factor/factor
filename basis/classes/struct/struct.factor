@@ -1,6 +1,6 @@
 ! Copyright (C) 2010, 2011 Joe Groff, Daniel Ehrenberg,
 ! John Benediktsson, Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license
+! See https://factorcode.org/license.txt for BSD license
 IN: classes.struct
 DEFER: struct-slots ! for stack-checker
 DEFER: struct-class? ! for stack-checker
@@ -65,7 +65,7 @@ M: struct >c-ptr
 <PRIVATE
 
 : init-struct ( class with-prototype: ( prototype -- alien ) sans-prototype: ( class -- alien ) -- alien )
-    '[ dup struct-prototype _ _ ?if ] keep memory>struct ; inline
+    '[ [ struct-prototype ] _ _ ?if ] keep memory>struct ; inline
 
 PRIVATE>
 
@@ -88,7 +88,7 @@ PRIVATE>
 
 : sign-extend ( n bits -- n' )
     ! formula from:
-    ! http://guru.multimedia.cx/fast-sign-extension/
+    ! https://guru.multimedia.cx/fast-sign-extension/
     1 - -1 swap shift [ + ] keep bitxor ; inline
 
 : sign-extender ( signed? bits -- quot )

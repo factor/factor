@@ -1,5 +1,5 @@
 ! Copyright (C) 2011 Erik Charlebois.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: alien.data alien.libraries alien.strings compiler.units
 destructors io.encodings.utf8 kernel libc sequences words ;
 QUALIFIED: readline.ffi
@@ -25,7 +25,7 @@ IN: readline
 
 : set-completion ( quot -- )
     [
-       '[
+        '[
             [ @ [ utf8 malloc-string ] [ f ] if* ]
             readline.ffi:rl_compentry_func_t
         ] ( -- alien ) define-temp

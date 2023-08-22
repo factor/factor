@@ -1,5 +1,5 @@
 ! Copyright (C) 2006 Chris Double.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 IN: partial-continuations
 USING: arrays continuations kernel sequences ;
 

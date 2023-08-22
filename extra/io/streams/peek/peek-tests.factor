@@ -1,5 +1,5 @@
 ! Copyright (C) 2011 Doug Coleman.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: byte-arrays destructors io io.encodings.ascii
 io.encodings.binary io.files io.streams.byte-array
 io.streams.memory io.streams.peek io.streams.string kernel make

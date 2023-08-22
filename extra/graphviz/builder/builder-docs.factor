@@ -1,5 +1,5 @@
 ! Copyright (C) 2011 Alex Vondrak.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: alien graphviz graphviz.attributes graphviz.ffi
 help.markup help.syntax kernel ;
 IN: graphviz.builder

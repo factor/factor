@@ -1,5 +1,5 @@
 ! Copyright (C) 2003, 2010 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors assocs hashtables kernel kernel.private math
 sequences vectors ;
 IN: namespaces
@@ -67,6 +67,4 @@ PRIVATE>
 : with-variables ( ns quot -- ) swap >n call ndrop ; inline
 : with-scope ( quot -- ) 5 <hashtable> swap with-variables ; inline
 : with-variable ( value key quot -- ) [ associate ] dip with-variables ; inline
-: with-variable-on ( key quot -- ) [ t ] 2dip with-variable ; inline
-: with-variable-off ( key quot -- ) [ f ] 2dip with-variable ; inline
 : with-global ( quot -- ) [ global ] dip with-variables ; inline

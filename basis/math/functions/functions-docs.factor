@@ -129,6 +129,10 @@ HELP: log10
 { $values { "x" number } { "y" number } }
 { $description "Logarithm function base 10. Outputs negative infinity if " { $snippet "x" } " is 0." } ;
 
+HELP: lgamma
+{ $values { "x" number } { "y" number } }
+{ $description "Outputs the logarithm of the gamma function of " { $snippet "x" } } ;
+
 HELP: sqrt
 { $values { "x" number } { "y" number } }
 { $description "Square root function." } ;

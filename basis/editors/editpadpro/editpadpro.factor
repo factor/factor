@@ -3,7 +3,6 @@ kernel make math.parser namespaces sequences ;
 IN: editors.editpadpro
 
 SINGLETON: editpadpro
-editpadpro editor-class set-global
 
 : editpadpro-path ( -- path )
     \ editpadpro-path get [

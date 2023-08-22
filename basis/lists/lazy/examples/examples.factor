@@ -1,6 +1,6 @@
 ! Rewritten by Matthew Willis, July 2006
 ! Copyright (C) 2004 Chris Double.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 
 USING: kernel lists lists.lazy math ;
 IN: lists.lazy.examples

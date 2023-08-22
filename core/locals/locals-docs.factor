@@ -1,5 +1,5 @@
 USING: help.syntax help.markup kernel
-combinators arrays generalizations ;
+combinators arrays generalizations sequences ;
 IN: locals
 
 HELP: [|
@@ -13,7 +13,7 @@ HELP: [let
 { $examples "See " { $link "locals-examples" } "." } ;
 
 HELP: :>
-{ $syntax ":> var" ":> var!" ":> ( var-1 var-2 ... )" }
+{ $syntax ":> var\n:> var!\n:> ( var-1 var-2 ... )" }
 { $description "Binds one or more new lexical variables. In the " { $snippet ":> var" } " form, the value on the top of the datastack is bound to a new lexical variable named " { $snippet "var" } " and is scoped to the enclosing quotation, " { $link POSTPONE: [let } " form, or " { $link POSTPONE: :: } " definition."
 $nl
 "The " { $snippet ":> ( var-1 ... )" } " form binds multiple variables to the top values of the datastack in right to left order, with the last variable bound to the top of the datastack. These two snippets have the same effect:"
@@ -200,8 +200,19 @@ $nl
 }
 "One exception to the above rule is that array instances containing free lexical variables (that is, immutable lexical variables not referenced in a closure) do retain identity. This allows macros such as " { $link cond } " to expand at compile time even when their arguments reference variables." ;
 
+
 ARTICLE: "locals-mutable" "Mutable lexical variables"
-"When a lexical variable is bound using " { $link POSTPONE: :> } ", " { $link POSTPONE: :: } ", or " { $link POSTPONE: [| } ", the variable may be made mutable by suffixing its name with an exclamation point (" { $snippet "!" } "). A mutable variable's value is read by giving its name without the exclamation point as usual. To write to the variable, use its name with the " { $snippet "!" } " suffix."
+"When a lexical variable is bound using " { $link POSTPONE: :> } ", " { $link POSTPONE: :: } ", or " { $link POSTPONE: [| } ", the variable may be made mutable by suffixing its name with an exclamation point (" { $snippet "!" } ")."
+$nl
+"A mutable lexical variable creates two new words in its scope. Assuming that we define a mutable variable with " { $snippet "data :> var!" } ", then:"
+$nl
+{ $snippet "var" } " will push the value of the variable, " { $snippet "data" } " to the stack,"
+$nl
+{ $snippet "var!" } " will consume a value from the stack, and set the variable to that value."
+$nl
+"Note that using " { $link POSTPONE: :> } " will always create a new local, and will not mutate the variable. Creating a new local with the same name may cause confusion, and have undesired effects."
+$nl
+"The value of any variable can be modified by a word that modifies its arguments e.g. " { $link push } ". These words ignore mutable and immutable bindings."
 $nl
 "Mutable bindings are implemented in a manner similar to that taken by the ML language. Each mutable binding is actually an immutable binding of a mutable cell. Reading the binding automatically unboxes the value from the cell, and writing to the binding stores into it."
 $nl

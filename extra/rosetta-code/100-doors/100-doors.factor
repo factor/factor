@@ -1,9 +1,9 @@
 ! Copyright (c) 2012 Anonymous
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: bit-arrays formatting kernel math ranges sequences ;
 IN: rosetta-code.100-doors
 
-! http://rosettacode.org/wiki/100_doors
+! https://rosettacode.org/wiki/100_doors
 
 ! Problem: You have 100 doors in a row that are all initially
 ! closed. You make 100 passes by the doors. The first time

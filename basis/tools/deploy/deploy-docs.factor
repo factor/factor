@@ -21,9 +21,9 @@ ARTICLE: "tools.deploy.usage" "Deploy tool usage"
 "For example, you can deploy the " { $vocab-link "hello-ui" } " demo which comes with Factor. Note that this demo already has a deployment configuration, so nothing needs to be configured:"
 { $code "\"hello-ui\" deploy" }
 { $list
-   { "On Mac OS X, this yields a program named " { $snippet "Hello world.app" } "." }
-   { "On Windows, it yields a directory named " { $snippet "Hello world" } " containing a program named " { $snippet "hello-ui.exe" } "." }
-   { "On Unix-like systems (Linux, BSD, Solaris, etc), it yields a directory named " { $snippet "Hello world" } " containing a program named " { $snippet "hello-ui" } "." }
+    { "On Mac OS X, this yields a program named " { $snippet "Hello world.app" } "." }
+    { "On Windows, it yields a directory named " { $snippet "Hello world" } " containing a program named " { $snippet "hello-ui.exe" } "." }
+    { "On Unix-like systems (Linux, BSD, Solaris, etc), it yields a directory named " { $snippet "Hello world" } " containing a program named " { $snippet "hello-ui" } "." }
 }
 "On all platforms, running the program will display a window with a message." ;
 

@@ -1,5 +1,5 @@
 USING: help.markup help.syntax io.files.private io.pathnames
-quotations sequences ;
+math quotations sequences ;
 IN: io.directories
 
 HELP: cwd
@@ -101,6 +101,11 @@ HELP: touch-file
 { $values { "path" "a pathname string" } }
 { $description "Updates the modification time of a file or directory. If the file does not exist, creates a new, empty file." }
 { $errors "Throws an error if the file could not be touched." } ;
+
+HELP: truncate-file
+{ $values { "path" "a pathname string" } { "n" integer } }
+{ $description "Set the length of the file to " { $snippet "n" } " bytes. If the file was previously longer, the extra data is lost. If the file was previously shorter, the behavior is platform-dependent on whether the file is extended with zeros (Unix) or the contents of the extended portion are undefined (Windows)." }
+{ $errors "Throws an error if the file does not exist or the truncate operation fails." } ;
 
 HELP: move-file
 { $values { "from" "a pathname string" } { "to" "a pathname string" } }

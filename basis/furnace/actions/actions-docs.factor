@@ -8,8 +8,8 @@ HELP: <action>
 
 HELP: <chloe-content>
 { $values
-     { "path" "a path" }
-     { "response" response }
+    { "path" "a path" }
+    { "response" response }
 }
 { $description "Creates an HTTP response which serves a Chloe template. See " { $link "html.templates.chloe" } "." } ;
 
@@ -24,8 +24,8 @@ $nl
 
 HELP: new-action
 { $values
-     { "class" class }
-     { "action" action }
+    { "class" class }
+    { "action" action }
 }
 { $description "Constructs a subclass of " { $link action } "." } ;
 
@@ -46,7 +46,7 @@ HELP: validate-integer-id
 
 HELP: validate-params
 { $values
-     { "validators" "an association list mapping parameter names to validator quotations" }
+    { "validators" "an association list mapping parameter names to validator quotations" }
 }
 { $description "Validates query or POST parameters, depending on the request type, and stores them in " { $link "html.forms.values" } ". The validator quotations can execute " { $link "validators" } "." }
 { $examples

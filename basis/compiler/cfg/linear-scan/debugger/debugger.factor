@@ -1,5 +1,5 @@
 ! Copyright (C) 2008, 2009 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs
 compiler.cfg.linear-scan.allocation
 compiler.cfg.linear-scan.live-intervals kernel math namespaces

@@ -1,5 +1,5 @@
 ! Copyright (C) 2006, 2010 Slava Pestov
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors alien.c-types alien.data alien.strings classes.struct
 io.encodings.utf8 kernel namespaces sequences specialized-arrays x11
 x11.X x11.xlib ;
@@ -7,7 +7,7 @@ SPECIALIZED-ARRAY: int
 IN: x11.clipboard
 
 ! This code was based on by McCLIM's Backends/CLX/port.lisp
-! and http://common-lisp.net/~crhodes/clx/demo/clipboard.lisp.
+! and https://common-lisp.net/~crhodes/clx/demo/clipboard.lisp.
 
 : XA_CLIPBOARD ( -- atom ) "CLIPBOARD" x-atom ;
 : XA_UTF8_STRING ( -- atom ) "UTF8_STRING" x-atom ;

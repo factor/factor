@@ -1,5 +1,5 @@
 ! Copyright (C) 2008, 2010 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors command-line continuations fry init io
 io.backend io.files io.monitors io.pathnames kernel namespaces
 prettyprint sequences splitting threads tr vocabs vocabs.cache

@@ -1,9 +1,9 @@
 ! Copyright (c) 2009 Guillaume Nargeot.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: math.primes.factors project-euler.common ranges sequences ;
 IN: project-euler.072
 
-! http://projecteuler.net/index.php?section=problems&id=072
+! https://projecteuler.net/index.php?section=problems&id=072
 
 ! DESCRIPTION
 ! -----------

@@ -235,8 +235,8 @@ COM-INTERFACE: IXAudio2 IUnknown {8bcf1f58-9fe7-4583-8ac6-e2adc465c8bb}
         UINT32                   Flags
         UINT32                   DeviceIndex,
         XAUDIO2_EFFECT_CHAIN*    pEffectChain )
-    HRESULT StartEngine (   )
-    void StopEngine (   )
+    HRESULT StartEngine ( )
+    void StopEngine ( )
     HRESULT CommitChanges ( UINT32 OperationSet )
     void GetPerformanceData ( XAUDIO2_PERFORMANCE_DATA* pPerfData )
     void SetDebugConfiguration ( XAUDIO2_DEBUG_CONFIGURATION* pDebugConfiguration, void* pReserved ) ;
@@ -276,13 +276,13 @@ COM-INTERFACE: IXAudio2Voice f {00000000-0000-0000-0000-000000000000}
         UINT32         SourceChannels,
         UINT32         DestinationChannels,
         FLOAT*         pLevelMatrix,
-        UINT32         OperationSet    )
+        UINT32         OperationSet )
     void GetOutputMatrix (
         IXAudio2Voice* pDestinationVoice,
         UINT32         SourceChannels,
         UINT32         DestinationChannels,
         FLOAT*         pLevelMatrix )
-    void DestroyVoice (  ) ;
+    void DestroyVoice ( ) ;
 
 COM-INTERFACE: IXAudio2SourceVoice IXAudio2Voice {00000000-0000-0000-0000-000000000000}
     HRESULT Start ( UINT32 Flags, UINT32 OperationSet )
@@ -300,14 +300,14 @@ COM-INTERFACE: IXAudio2SubmixVoice IXAudio2Voice {00000000-0000-0000-0000-000000
 COM-INTERFACE: IXAudio2MasteringVoice IXAudio2Voice {00000000-0000-0000-0000-000000000000} ;
 
 COM-INTERFACE: IXAudio2EngineCallback f {00000000-0000-0000-0000-000000000000}
-    void OnProcessingPassStart (   )
-    void OnProcessingPassEnd (   )
+    void OnProcessingPassStart ( )
+    void OnProcessingPassEnd ( )
     void OnCriticalError ( HRESULT Error ) ;
 
 COM-INTERFACE: IXAudio2VoiceCallback f {00000000-0000-0000-0000-000000000000}
     void OnVoiceProcessingPassStart ( UINT32 BytesRequired )
-    void OnVoiceProcessingPassEnd (   )
-    void OnStreamEnd (   )
+    void OnVoiceProcessingPassEnd ( )
+    void OnStreamEnd ( )
     void OnBufferStart ( void* pBufferContext )
     void OnBufferEnd ( void* pBufferContext )
     void OnLoopEnd ( void* pBufferContext )

@@ -8,13 +8,11 @@
 
 	<t:call-next-template />
 
-	<div class="navbar">
-	<div class="navrow">
+    <nav>
 		<t:a t:href="$wiki/view" t:rest="title">Latest</t:a>
 		<t:a t:href="$wiki/revisions" t:rest="title">Revisions</t:a>
 		<t:a t:href="$wiki/edit" t:rest="title" rel="nofollow">Edit</t:a>
 		<t:button t:action="$wiki/delete" t:for="title" class="link-button link">Delete</t:button>
-	</div>
-	</div>
+	</nav>
 
 </t:chloe>

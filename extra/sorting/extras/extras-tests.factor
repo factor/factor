@@ -4,7 +4,7 @@ IN: sorting.extras
 
 { { 0 2 1 } } [ { 10 30 20 } [ <=> ] argsort ] unit-test
 { { 2 0 1 } } [
-    { "hello" "goodbye" "yo" } [ [ length ] bi@ <=> ] argsort
+    { "hello" "goodbye" "yo" } [ 2length <=> ] argsort
 ] unit-test
 
 { { "blue" "green" "purple" } } [
@@ -31,3 +31,9 @@ IN: sorting.extras
     10 <iota> >array randomize
     [ swap insort-right! ] each
 ] unit-test
+
+{ +gt+ } [ "lady" "bug" { [ length ] [ first ] } compare-with ] unit-test
+{ +lt+ } [ "bug" "lady" { [ length ] [ first ] } compare-with ] unit-test
+{ +eq+ } [ "bat" "bat" { [ length ] [ first ] } compare-with ] unit-test
+{ +lt+ } [ "bat" "cat" { [ length ] [ first ] } compare-with ] unit-test
+{ +gt+ } [ "fat" "cat" { [ length ] [ first ] } compare-with ] unit-test

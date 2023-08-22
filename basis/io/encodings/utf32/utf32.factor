@@ -1,5 +1,5 @@
 ! Copyright (C) 2009 Daniel Ehrenberg.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: combinators endian io io.encodings io.encodings.iana
 io.encodings.utf16 kernel sequences ;
 IN: io.encodings.utf32

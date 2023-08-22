@@ -1,5 +1,5 @@
 ! Copyright (C) 2009 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: compiler.units continuations fry kernel vocabs vocabs.parser ;
 IN: vocabs.generated
 
@@ -10,4 +10,4 @@ IN: vocabs.generated
                 [ _ with-current-vocab ] [ ] [ forget-vocab ] cleanup
             ] with-compilation-unit
         ] keep
-    ] ?if ; inline
+    ] [ or* ] 2dip if ; inline

@@ -1,5 +1,5 @@
 ! Copyright (C) 2007, 2008 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors assocs kernel sequences sets sorting unicode ;
 IN: xmode.keyword-map
 
@@ -31,12 +31,12 @@ M: keyword-map >alist
     assoc>> >alist ;
 
 : (keyword-map-no-word-sep) ( assoc -- str )
-    keys union-all [ alpha? ] reject natural-sort ;
+    keys union-all [ alpha? ] reject sort ;
 
 : keyword-map-no-word-sep* ( keyword-map -- str )
-    dup no-word-sep>> [ ] [
+    [ no-word-sep>> ] [
         dup (keyword-map-no-word-sep) >>no-word-sep
         keyword-map-no-word-sep*
-    ] ?if ;
+    ] ?unless ;
 
 INSTANCE: keyword-map assoc

@@ -1,5 +1,5 @@
 ! Copyright 2007, 2008 Ryan Murphy, Slava Pestov
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: arrays kernel math namespaces tools.test
 heaps heaps.private math.parser random assocs sequences sorting
 accessors math.order locals ;
@@ -92,7 +92,7 @@ DEFER: (assert-heap-invariant)
     dup assert-heap-invariant
     data>>
     [ [ key>> ] map ] bi@
-    [ natural-sort ] bi@ ;
+    [ sort ] bi@ ;
 
 11 [
     [ t ] swap [ 2^ delete-test sequence= ] curry unit-test

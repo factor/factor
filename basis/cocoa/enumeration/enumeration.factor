@@ -1,5 +1,5 @@
 ! Copyright (C) 2008 Joe Groff.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors alien.data assocs classes.struct cocoa
 cocoa.runtime cocoa.types destructors hashtables kernel libc
 sequences specialized-arrays vectors ;

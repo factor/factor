@@ -1,0 +1,64 @@
+<?xml version="1.0"?>
+<!DOCTYPE MODE SYSTEM "xmode.dtd">
+
+<!--
+  This mode highlights the syntax of haXe build file.
+-->
+<MODE>
+	<PROPS>
+		<PROPERTY NAME="lineComment" VALUE="#"/>
+		<PROPERTY NAME="contextInsensitive" VALUE="true"/>
+	</PROPS>
+
+	<RULES IGNORE_CASE="FALSE" HIGHLIGHT_DIGITS="TRUE">
+
+		<!-- Comment -->
+		<EOL_SPAN TYPE="COMMENT1">#</EOL_SPAN>
+
+		<KEYWORDS IGNORE_CASE="FALSE">
+
+			<!-- target keywords -->
+			<KEYWORD1>--next</KEYWORD1>
+			<KEYWORD1>-cpp</KEYWORD1>
+			<KEYWORD1>-js</KEYWORD1>
+			<KEYWORD1>-as3</KEYWORD1>
+			<KEYWORD1>-swf</KEYWORD1>
+			<KEYWORD1>-swf9</KEYWORD1>
+			<KEYWORD1>-neko</KEYWORD1>
+			<KEYWORD1>-php</KEYWORD1>
+			<KEYWORD1>-xml</KEYWORD1>
+
+			<!-- options -->
+			<KEYWORD2>-cp</KEYWORD2>
+			<KEYWORD2>-main</KEYWORD2>
+			<KEYWORD2>-lib</KEYWORD2>
+			<KEYWORD2>-D</KEYWORD2>
+			<KEYWORD2>-v</KEYWORD2>
+			<KEYWORD2>-debug</KEYWORD2>
+			<KEYWORD2>-swf-version</KEYWORD2>
+			<KEYWORD2>-swf-header</KEYWORD2>
+			<KEYWORD2>-swf-lib</KEYWORD2>
+			<KEYWORD2>-x</KEYWORD2>
+			<KEYWORD2>-resource</KEYWORD2>
+			<KEYWORD2>-exclude</KEYWORD2>
+			<KEYWORD2>-prompt</KEYWORD2>
+			<KEYWORD2>-cmd</KEYWORD2>
+
+			<!-- advanced options -->
+			<KEYWORD3>--flash-strict</KEYWORD3>
+			<KEYWORD3>--no-traces</KEYWORD3>
+			<KEYWORD3>--flash-use-stage</KEYWORD3>
+			<KEYWORD3>--neko-source</KEYWORD3>
+			<KEYWORD3>--gen-hx-classes</KEYWORD3>
+			<KEYWORD3>--display</KEYWORD3>
+			<KEYWORD3>--no-output</KEYWORD3>
+			<KEYWORD3>--times</KEYWORD3>
+			<KEYWORD3>--no-inline</KEYWORD3>
+			<KEYWORD3>--no-opt</KEYWORD3>
+			<KEYWORD3>--php-front</KEYWORD3>
+			<KEYWORD3>--js-namespace</KEYWORD3>
+			<KEYWORD3>--remap</KEYWORD3>
+
+		</KEYWORDS>
+	</RULES>
+</MODE>

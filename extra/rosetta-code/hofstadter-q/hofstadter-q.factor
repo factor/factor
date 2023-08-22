@@ -1,9 +1,9 @@
 ! Copyright (c) 2012 Anonymous
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: kernel math prettyprint sequences ;
 IN: rosetta-code.hofstadter-q
 
-! http://rosettacode.org/wiki/Hofstadter_Q_sequence
+! https://rosettacode.org/wiki/Hofstadter_Q_sequence
 
 ! The Hofstadter Q sequence is defined as:
 !    Q(1) = Q(2) = 1
@@ -34,7 +34,7 @@ IN: rosetta-code.hofstadter-q
 ! (This point is to ensure that caching and/or recursion limits,
 ! if it is a concern, is correctly handled).
 
- : next ( seq -- newseq )
+: next ( seq -- newseq )
     dup 2 tail* over length [ swap - ] curry map
     [ dupd swap nth ] map 0 [ + ] reduce suffix ;
 

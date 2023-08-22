@@ -3,170 +3,636 @@
 <!DOCTYPE MODE SYSTEM "xmode.dtd">
 
 <!--
-	09-10-2003 - Mirco Bova
+	Token types:
+		KEYWORD1	Internal shell commands - Fast
+		KEYWORD2	DOS-style %1, %%v, %variables%
+		KEYWORD3	Common commands arguments and glue keywords
+		KEYWORD4	Standard device names (NUL, CON, COM1, etc.)
+		FUNCTION	External commands - Slow
+		MARKUP		NT-style expanded !variables!
+		LITERAL1	Quoted "strings"
+		LITERAL2	Echo arguments
+		COMMENT1	REM remarks
+		COMMENT2	:: or :# Fake labels used as comments
+		COMMENT4	%# Fake variables used as comments #%
+
+	Known issues:
+	- The ^ escape character is not detected at all, so some rules fire when they shouldn't.
+	- The word FOR, used as an argument to another command, will trigger the rule set="FOR".
+	  This usually causes the rest of the line to be mistakenly coloured as INVALID.
+	  Fortunately, this does not happen with (echo For example) because of echo's own rules that prevent this.
+	- Same phenomenons with the word REM.
+	- The DO is not always detected when using a complex pipeline within a FOR /f %%f IN ('pipeline') DO ...
+
+	To do:
+	- Find why ESCAPE="^" does not work.
+	- Find a general way to parse the (command [arguments]) syntax.
+	  This is complicated by the fact that I/O redirections may be present ahead of the command.
+	  So the actual syntax is ([I/O redirection] command [arguments and other I/O redirections])
+	- Find a way to parse the (IF VALUE1==VALUE2 command) syntax.
+	- Parse the SET command, and flag as comment the trailing characters it ignores.
+
+        2016-12-07 - Jean-Francois Larvoire
+        Fixed indentation when a comment followed the opening parenthesis.
+        Avoid detecting arguments containing a : as labels. (Which caused the rest of the line to be flagged as comment)
+
+        2016-11-29 - Jean-Francois Larvoire
+        Added :: and :# and %#...#% comment markers.
+        Added !variables!.
+        Added %* argument line variable.
+        Added %~ qualifiers for %N command-line arguments and %%f loop variables.
+        Added many new internal and external commands added in XP, Vista, and Windows 7.
+        Recursively apply %variable% rules within !variable! rules within "string" rules.
+        Verify the FOR loops syntax, and flag common errors as INVALID. Ex: missing IN or DO.
+        Added partial support for IF, CALL, ECHO syntaxes.
+        Added < > X>&Y | & && || ( ) pilelining and sequencing operators.
+
+	2003-10-09 - Mirco Bova
 	Added some new batch commands using win2K help as reference.
 
-	04-12-2001 - Mirco Bova
+	2003-02-28 - Alex Jacoby
+	Minor enhancements.
+
+	2001-12-04 - Mirco Bova
 	this file is based on the original JEdit batch.xml mode.
 	The main upgrade consisting in adding the standard MS-DOS
 	commands as keywords and functions:
 	- keywords =		internal shell commands;
-	-	functions =		standard MS-DOS commands (.exe or .com in DOS or
-									windows\command directory).
-
-	Minor enhancements by Alex Jacoby on 28-feb-2003
+	- functions =		standard MS-DOS commands (.exe or .com in DOS or
+							  windows\command directory).
 -->
-
-<!-- The keywords and functions here defined are those of MS-DOS 6.22,
-		 plus a few as of Windows XP.
- -->
 
 <MODE>
 	<PROPS>
 		<PROPERTY NAME="lineComment" VALUE="rem" />
-		<PROPERTY NAME="indentOpenBrackets" VALUE="(" />
-		<PROPERTY NAME="indentCloseBrackets" VALUE=")" />
+		<PROPERTY NAME="indentNextLines" VALUE="(^|.*\s+)\(([^()]|\([^()]+\))*$" />
+		<PROPERTY NAME="unindentThisLine"  VALUE="^([^()]|\([^()]+\))*\).*$" />
+		<PROPERTY NAME="unindentNextLines" VALUE="^([^()]|\([^()]+\))*\).*$" />
+		<PROPERTY NAME="electricKeys" VALUE="()" /><!-- Apply the last 3 rules every time () are pressed -->
+		<PROPERTY NAME="wordBreakChars" VALUE="()&amp;|&lt;&gt;,;=" /><!-- Unused? -->
+		<PROPERTY NAME="noWordSep" VALUE="_.[]{}/\-#$*?" /><!-- Doc says: Word breaks = Any non-alphanumeric not in this list -->
 	</PROPS>
-	<RULES IGNORE_CASE="TRUE" HIGHLIGHT_DIGITS="FALSE">
-		<!-- 'echo off' statements -->
-		<SEQ TYPE="KEYWORD3">@</SEQ>
 
-		<SEQ TYPE="OPERATOR">+</SEQ>
-		<SEQ TYPE="OPERATOR">|</SEQ>
-		<SEQ TYPE="OPERATOR">&amp;</SEQ>
-		<SEQ TYPE="OPERATOR">!</SEQ>
-		<SEQ TYPE="OPERATOR">&gt;</SEQ>
-		<SEQ TYPE="OPERATOR">&lt;</SEQ>
+	<RULES IGNORE_CASE="TRUE" NO_WORD_SEP="_.[]{}/\-#$*?" HIGHLIGHT_DIGITS="FALSE">
+		<!-- Parenthesis blocks (Used for group piping) -->
+		<IMPORT DELEGATE="Parenthesis_blocks"/>
 
-		<!-- labels - eg ":test" or "goto :test" -->
-		<MARK_FOLLOWING AT_WORD_START="TRUE" TYPE="LABEL">:</MARK_FOLLOWING>
+		<!-- Pipelining operators -->
+		<IMPORT DELEGATE="Pipeline_operators"/>
 
-		<!-- comments -->
-		<EOL_SPAN_REGEXP AT_WHITESPACE_END="TRUE" HASH_CHAR="REM" TYPE="COMMENT1">REM\s</EOL_SPAN_REGEXP>
+		<!-- Anything else has to be a single command -->
+		<IMPORT DELEGATE="@Command"/>
+	</RULES>
 
-		<!-- literals -->
-		<SPAN TYPE="LITERAL1" NO_LINE_BREAK="TRUE">
+	<!-- A label, or one command, possibly not echoed, and its arguments -->
+	<RULES SET="@Command" IGNORE_CASE="TRUE" HIGHLIGHT_DIGITS="FALSE">
+		<!-- Fake :: or :# labels used for remarks. Also protect everything up to the end of line, even & operators -->
+		<!-- Must be defined before :labels to be detected -->
+		<!-- Do not use AT_WHITESPACE_END="TRUE", because comments can be located after an & operator -->
+		<EOL_SPAN_REGEXP TYPE="COMMENT4" AT_WORD_START="TRUE" HASH_CHAR="">\s*:[:#]</EOL_SPAN_REGEXP>
+
+		<!-- :labels. Anything that follows is ignored by the parser, even & operators, and can be used as a comment -->
+		<!-- Do use AT_WHITESPACE_END="TRUE", else the rule will fire for arguments containing a : -->
+		<EOL_SPAN_REGEXP MATCH_TYPE="LABEL" TYPE="COMMENT4" AT_WHITESPACE_END="TRUE" HASH_CHAR="">(?:.?[,;=\s]*):[^+:,;=\s]+</EOL_SPAN_REGEXP>
+
+		<!-- '@echo off' command prefix -->
+		<EOL_SPAN AT_WORD_START="TRUE" TYPE="OPERATOR" DELEGATE="Command">@</EOL_SPAN>
+
+		<!-- <SEQ_REGEXP HASH_CHARS=" 	" DELEGATE="Command">\s+</SEQ_REGEXP>-->
+		<IMPORT DELEGATE="Command"/>
+	</RULES>
+
+	<!-- One command and its arguments -->
+	<RULES SET="Command" IGNORE_CASE="TRUE" HIGHLIGHT_DIGITS="FALSE">
+		<!-- Argument separators -->
+		<SEQ TYPE="OPERATOR">,</SEQ>
+		<SEQ TYPE="OPERATOR">;</SEQ>
+		<SEQ TYPE="OPERATOR">=</SEQ>
+
+		<!-- REM remarks cover the whole line, even if it contains & operators -->
+		<EOL_SPAN_REGEXP TYPE="COMMENT1" AT_WORD_START="TRUE" HASH_CHAR="REM">REM\b</EOL_SPAN_REGEXP>
+
+		<!-- DOS-style %variables% -->
+		<IMPORT DELEGATE="Percent_Variable"/>
+
+		<!-- NT-style expanded !variables! -->
+		<IMPORT DELEGATE="Expand_Variable"/>
+
+		<!-- String literals -->
+		<IMPORT DELEGATE="Quoted_string"/>
+
+		<!-- Commands with special syntaxes -->
+		<IMPORT DELEGATE="Special_commands"/>
+
+		<!-- All internal and external commands -->
+		<IMPORT DELEGATE="Known_commands"/>
+
+		<!-- Standard device names -->
+		<IMPORT DELEGATE="Device_names"/>
+	</RULES>
+
+	<!-- All internal and external commands -->
+	<RULES SET="Known_commands" IGNORE_CASE="TRUE" HIGHLIGHT_DIGITS="FALSE">
+		<KEYWORDS>
+			<!-- KEYWORD1 are internal MS-DOS shell commands -->
+			<KEYWORD1>break</KEYWORD1>
+			<KEYWORD3>call</KEYWORD3>	<!-- call is a special case we want to distinguish as a KEYWORD3 -->
+			<KEYWORD1>cd</KEYWORD1>
+			<!-- <KEYWORD1>chcp</KEYWORD1>	This became an external command in NT -->
+			<KEYWORD1>chdir</KEYWORD1>
+			<KEYWORD1>cls</KEYWORD1>
+			<KEYWORD1>copy</KEYWORD1>
+			<!-- <KEYWORD1>ctty</KEYWORD1>	This became an external command in NT -->
+			<KEYWORD1>date</KEYWORD1>
+			<KEYWORD1>del</KEYWORD1>
+			<KEYWORD1>dir</KEYWORD1>
+			<KEYWORD1>echo</KEYWORD1>
+			<KEYWORD1>echo.</KEYWORD1>
+			<KEYWORD1>echo(</KEYWORD1>
+			<KEYWORD1>erase</KEYWORD1>
+			<KEYWORD1>exit</KEYWORD1>
+			<KEYWORD1>for</KEYWORD1>
+			<KEYWORD3>goto</KEYWORD3>	<!-- goto is a special case we want to distinguish as a KEYWORD3 -->
+			<KEYWORD1>if</KEYWORD1>
+			<KEYWORD1>lfnfor</KEYWORD1>
+			<KEYWORD1>lh</KEYWORD1>
+			<KEYWORD1>loadhigh</KEYWORD1>
+			<KEYWORD1>lock</KEYWORD1>
+			<KEYWORD1>md</KEYWORD1>
+			<KEYWORD1>mkdir</KEYWORD1>
+			<KEYWORD1>path</KEYWORD1>
+			<KEYWORD1>pause</KEYWORD1>
+			<KEYWORD1>prompt</KEYWORD1>
+			<KEYWORD1>rd</KEYWORD1>
+			<!-- <KEYWORD1>rem</KEYWORD1>	remarks are processed separately -->
+			<KEYWORD1>ren</KEYWORD1>
+			<KEYWORD1>rename</KEYWORD1>
+			<KEYWORD1>rmdir</KEYWORD1>
+			<KEYWORD1>set</KEYWORD1>
+			<KEYWORD1>shift</KEYWORD1>
+			<KEYWORD1>time</KEYWORD1>
+			<!-- <KEYWORD1>truename</KEYWORD1> This undocumented internal DOS command was not implemented in NT -->
+			<KEYWORD1>type</KEYWORD1>
+			<KEYWORD1>unlock</KEYWORD1>
+			<KEYWORD1>ver</KEYWORD1>
+			<KEYWORD1>verify</KEYWORD1>
+			<KEYWORD1>vol</KEYWORD1>
+
+			<!-- New internal commands in Win2K -->
+			<KEYWORD1>endlocal</KEYWORD1>
+			<KEYWORD1>move</KEYWORD1>	<!-- This was an external command in DOS -->
+			<KEYWORD1>setlocal</KEYWORD1>
+			<KEYWORD1>start</KEYWORD1>
+			<KEYWORD1>subst</KEYWORD1>	<!-- This was an external command in DOS -->
+
+			<!-- New internal commands in XP (Some may be in Win2K already) -->
+			<KEYWORD1>assoc</KEYWORD1>
+			<KEYWORD1>color</KEYWORD1>
+			<KEYWORD1>dpath</KEYWORD1>
+			<KEYWORD1>ftype</KEYWORD1>
+			<KEYWORD1>keys</KEYWORD1>
+			<KEYWORD1>popd</KEYWORD1>
+			<KEYWORD1>pushd</KEYWORD1>
+			<KEYWORD1>title</KEYWORD1>
+
+			<!-- New internal commands in Vista -->
+			<KEYWORD1>mklink</KEYWORD1>
+
+			<!-- Theare are NO new internal commands in Windows 7 to Windows 10 -->
+
+			<!-- ECHO and VERIFY and BREAK associated keywords -->
+			<KEYWORD3>on</KEYWORD3>
+			<KEYWORD3>off</KEYWORD3>
+
+			<!-- FOR associated keywords -->
+			<!-- Must _not_ be defined here, to allow catching all invalid FOR syntaxes
+			<KEYWORD3>in</KEYWORD3>
+			<KEYWORD3>do</KEYWORD3>
+			-->
+
+			<!-- IF associated keywords -->
+			<KEYWORD3>not</KEYWORD3>
+			<KEYWORD3>exist</KEYWORD3>
+			<KEYWORD3>errorlevel</KEYWORD3>
+			<KEYWORD3>==</KEYWORD3>
+			<!-- New IF keywords in Win2K -->
+			<KEYWORD1>defined</KEYWORD1>
+			<KEYWORD1>else</KEYWORD1>
+			<!-- New IF keywords in XP (May be in Win2K already) -->
+			<KEYWORD3>equ</KEYWORD3>
+			<KEYWORD3>neq</KEYWORD3>
+			<KEYWORD3>lss</KEYWORD3>
+			<KEYWORD3>leq</KEYWORD3>
+			<KEYWORD3>gtr</KEYWORD3>
+			<KEYWORD3>geq</KEYWORD3>
+
+			<!-- SETLOCAL associated keywords -->
+			<KEYWORD3>disableextensions</KEYWORD3>
+			<KEYWORD3>enableextensions</KEYWORD3>
+			<KEYWORD3>disabledelayedexpansion</KEYWORD3>
+			<KEYWORD3>enabledelayedexpansion</KEYWORD3>
+
+			<!-- FUNCTION are standard DOS or WIN32 console commands -->
+			<!-- Standard MS-DOS commands -->
+			<!-- (those you find as stand-alone .exe or .com) in win95 %windows_root%\command folder -->
+			<FUNCTION>append</FUNCTION>
+			<FUNCTION>attrib</FUNCTION>
+			<FUNCTION>chkdsk</FUNCTION>
+			<FUNCTION>choice</FUNCTION>
+			<FUNCTION>command</FUNCTION>
+			<FUNCTION>debug</FUNCTION>
+			<FUNCTION>defrag</FUNCTION>
+			<FUNCTION>deltree</FUNCTION>
+			<FUNCTION>diskcomp</FUNCTION>
+			<FUNCTION>diskcopy</FUNCTION>
+			<FUNCTION>doskey</FUNCTION>
+			<FUNCTION>drvspace</FUNCTION>
+			<FUNCTION>emm386</FUNCTION>
+			<FUNCTION>expand</FUNCTION>
+			<FUNCTION>fastopen</FUNCTION>
+			<FUNCTION>fc</FUNCTION>
+			<FUNCTION>fdisk</FUNCTION>
+			<FUNCTION>find</FUNCTION>
+			<FUNCTION>format</FUNCTION>
+			<FUNCTION>graphics</FUNCTION>
+			<FUNCTION>graftabl</FUNCTION>
+			<FUNCTION>keyb</FUNCTION>
+			<FUNCTION>label</FUNCTION>
+			<FUNCTION>loadfix</FUNCTION>
+			<FUNCTION>mem</FUNCTION>
+			<FUNCTION>mode</FUNCTION>
+			<FUNCTION>more</FUNCTION>
+			<FUNCTION>move</FUNCTION>
+			<FUNCTION>mscdex</FUNCTION>
+			<FUNCTION>net</FUNCTION>
+			<FUNCTION>nlsfunc</FUNCTION>
+			<FUNCTION>power</FUNCTION>
+			<FUNCTION>print</FUNCTION>
+			<FUNCTION>replace</FUNCTION>
+			<FUNCTION>restore</FUNCTION>
+			<FUNCTION>scandisk</FUNCTION>
+			<FUNCTION>setver</FUNCTION>
+			<FUNCTION>share</FUNCTION>
+			<FUNCTION>sort</FUNCTION>
+			<FUNCTION>subst</FUNCTION>
+			<FUNCTION>sys</FUNCTION>
+			<FUNCTION>tree</FUNCTION>
+			<FUNCTION>undelete</FUNCTION>
+			<FUNCTION>unformat</FUNCTION>
+			<FUNCTION>vsafe</FUNCTION>
+			<FUNCTION>xcopy</FUNCTION>
+
+			<!-- Additional Win9X commands -->
+			<FUNCTION>cscript</FUNCTION>
+			<FUNCTION>cvt</FUNCTION>
+			<FUNCTION>extract</FUNCTION>
+			<FUNCTION>iextract</FUNCTION>
+			<FUNCTION>scanreg</FUNCTION>
+			<FUNCTION>sulfnbk</FUNCTION>
+			<FUNCTION>xcopy32</FUNCTION>
+
+			<!-- Additional XP console commands (Most were in Win2K already) -->
+			<FUNCTION>arp</FUNCTION>
+			<FUNCTION>at</FUNCTION>
+			<FUNCTION>bootcfg</FUNCTION>
+			<FUNCTION>cacls</FUNCTION>
+			<FUNCTION>chcp</FUNCTION>	<!-- This was an internal command in DOS -->
+			<FUNCTION>chkntfs</FUNCTION>
+			<FUNCTION>cipher</FUNCTION>
+			<FUNCTION>cmd</FUNCTION>
+			<FUNCTION>comp</FUNCTION>
+			<FUNCTION>compact</FUNCTION>
+			<FUNCTION>convert</FUNCTION>
+			<FUNCTION>ctty</FUNCTION>	<!-- This was an internal command in DOS -->
+			<FUNCTION>diskpart</FUNCTION>
+			<FUNCTION>driverquery</FUNCTION>
+			<FUNCTION>eventcreate</FUNCTION>
+			<FUNCTION>findstr</FUNCTION>
+			<FUNCTION>fsutil</FUNCTION>
+			<FUNCTION>ftp</FUNCTION>
+			<FUNCTION>getmac</FUNCTION>
+			<FUNCTION>help</FUNCTION>
+			<FUNCTION>hostname</FUNCTION>
+			<FUNCTION>ipconfig</FUNCTION>
+			<FUNCTION>logman</FUNCTION>
+			<FUNCTION>logoff</FUNCTION>
+			<FUNCTION>makecab</FUNCTION>
+			<FUNCTION>mountvol</FUNCTION>
+			<FUNCTION>msg</FUNCTION>
+			<FUNCTION>nbtstat</FUNCTION>
+			<FUNCTION>netsh</FUNCTION>
+			<FUNCTION>netstat</FUNCTION>
+			<FUNCTION>nslookup</FUNCTION>
+			<FUNCTION>openfiles</FUNCTION>
+			<FUNCTION>pathping</FUNCTION>
+			<FUNCTION>ping</FUNCTION>
+			<FUNCTION>powercfg</FUNCTION>
+			<FUNCTION>qprocess</FUNCTION>
+			<FUNCTION>rasdial</FUNCTION>
+			<FUNCTION>recover</FUNCTION>
+			<FUNCTION>reg</FUNCTION>
+			<FUNCTION>regini</FUNCTION>
+			<FUNCTION>reset</FUNCTION>
+			<FUNCTION>route</FUNCTION>
+			<FUNCTION>runas</FUNCTION>
+			<FUNCTION>sc</FUNCTION>
+			<FUNCTION>schtasks</FUNCTION>
+			<FUNCTION>shutdown</FUNCTION>
+			<FUNCTION>systeminfo</FUNCTION>
+			<FUNCTION>taskkill</FUNCTION>
+			<FUNCTION>tasklist</FUNCTION>
+			<FUNCTION>telnet</FUNCTION>
+			<FUNCTION>tftp</FUNCTION>
+			<FUNCTION>tracert</FUNCTION>
+			<FUNCTION>tsconn</FUNCTION>
+			<FUNCTION>tsdisconn</FUNCTION>
+			<FUNCTION>tskill</FUNCTION>
+			<FUNCTION>w32tm</FUNCTION>
+			<FUNCTION>winrs</FUNCTION>
+			<FUNCTION>wmic</FUNCTION>
+
+			<!-- Additional Vista console commands -->
+			<FUNCTION>bcdedit</FUNCTION>
+			<FUNCTION>choice</FUNCTION>
+			<FUNCTION>certutil</FUNCTION>
+			<FUNCTION>change</FUNCTION>
+			<FUNCTION>clip</FUNCTION>
+			<FUNCTION>forfiles</FUNCTION>
+			<FUNCTION>icacls</FUNCTION>
+			<FUNCTION>pnputil</FUNCTION>
+			<FUNCTION>query</FUNCTION>
+			<FUNCTION>quser</FUNCTION>
+			<FUNCTION>setx</FUNCTION>
+			<FUNCTION>timeout</FUNCTION>
+			<FUNCTION>waitfor</FUNCTION>
+			<FUNCTION>where</FUNCTION>
+			<FUNCTION>whoami</FUNCTION>
+
+			<!-- Additional Windows 7 console commands -->
+			<FUNCTION>bcdboot</FUNCTION>
+			<FUNCTION>dism</FUNCTION>
+			<FUNCTION>djoin</FUNCTION>
+			<FUNCTION>setspn</FUNCTION>
+			<FUNCTION>tzutil</FUNCTION>
+		</KEYWORDS>
+	</RULES>
+
+	<!-- DOS-style %variables% -->
+	<RULES SET="Percent_Variable" IGNORE_CASE="FALSE" HIGHLIGHT_DIGITS="FALSE">
+		<!-- Fake %# variables #% used for commenting sections of a line -->
+		<!-- Must be defined before other %variables% to be detected -->
+		<SPAN_REGEXP TYPE="COMMENT2" HASH_CHAR="%#" NO_LINE_BREAK="TRUE">
+                        <BEGIN>%#</BEGIN>
+                        <END>#%</END>
+                </SPAN_REGEXP>
+		<!-- %%N arguments -->
+		<SEQ TYPE="KEYWORD2">%*</SEQ>
+		<SEQ_REGEXP TYPE="KEYWORD2" HASH_CHAR="%" AT_WORD_START="FALSE"
+					>%(~[fdpnxsatz]*($[^:]+:)?)?[\d]</SEQ_REGEXP>
+		<!-- for-loop %%v variable (one char after %%) -->
+		<SEQ_REGEXP TYPE="KEYWORD2" HASH_CHAR="%" AT_WORD_START="FALSE"
+					>%%(~[fdpnxsatz]*(\$[^:]+:)?)?[^,;="&amp;|%!\s]</SEQ_REGEXP>
+		<!-- %variables% -->
+		<SEQ_REGEXP TYPE="KEYWORD2" HASH_CHAR="%" AT_WORD_START="FALSE"
+					>%[^%]*%</SEQ_REGEXP>
+	</RULES>
+
+	<!-- NT-style !variables! -->
+	<RULES SET="_Expand_Variable" IGNORE_CASE="FALSE" HIGHLIGHT_DIGITS="FALSE" DEFAULT="MARKUP">
+		<!-- DOS-style %variables% inside NT-style !variables! -->
+		<IMPORT DELEGATE="Percent_Variable"/>
+	</RULES>
+	<RULES SET="Expand_Variable" IGNORE_CASE="FALSE" HIGHLIGHT_DIGITS="FALSE">
+		<!-- NT-style !variables! -->
+		<SPAN TYPE="MARKUP" NO_LINE_BREAK="TRUE" DELEGATE="_Expand_Variable">
+			<BEGIN>!</BEGIN>
+			<END>!</END>
+		</SPAN>
+	</RULES>
+
+	<!-- "Quoted strings" -->
+	<RULES SET="_Quoted_string" IGNORE_CASE="FALSE" HIGHLIGHT_DIGITS="FALSE" DEFAULT="LITERAL1">
+		<!-- DOS-style %variables% inside "Quoted strings" -->
+		<IMPORT DELEGATE="Percent_Variable"/>
+		<!-- NT-style !variables! inside "Quoted strings"-->
+		<IMPORT DELEGATE="Expand_Variable"/>
+	</RULES>
+	<RULES SET="Quoted_string" IGNORE_CASE="FALSE" HIGHLIGHT_DIGITS="FALSE">
+		<SPAN TYPE="LITERAL1" NO_LINE_BREAK="TRUE" DELEGATE="_Quoted_string">
 			<BEGIN>"</BEGIN>
 			<END>"</END>
 		</SPAN>
+	</RULES>
 
-		<!-- variables -->
-		<SEQ TYPE="KEYWORD2">%0</SEQ>
-		<SEQ TYPE="KEYWORD2">%1</SEQ>
-		<SEQ TYPE="KEYWORD2">%2</SEQ>
-		<SEQ TYPE="KEYWORD2">%3</SEQ>
-		<SEQ TYPE="KEYWORD2">%4</SEQ>
-		<SEQ TYPE="KEYWORD2">%5</SEQ>
-		<SEQ TYPE="KEYWORD2">%6</SEQ>
-		<SEQ TYPE="KEYWORD2">%7</SEQ>
-		<SEQ TYPE="KEYWORD2">%8</SEQ>
-		<SEQ TYPE="KEYWORD2">%9</SEQ>
-		<!-- for-loop variable (one char after %%) -->
-		<SEQ_REGEXP TYPE="KEYWORD2"
-					HASH_CHAR="%%"
-					AT_WORD_START="TRUE"
-					>%%[\p{Alpha}]</SEQ_REGEXP>
-		<SPAN TYPE="KEYWORD2" NO_LINE_BREAK="TRUE">
-			<BEGIN>%</BEGIN>
-			<END>%</END>
-		</SPAN>
+	<!-- Standard device names -->
+	<RULES SET="Device_names" IGNORE_CASE="TRUE" HIGHLIGHT_DIGITS="FALSE">
+		<SEQ_REGEXP TYPE="KEYWORD4" AT_WORD_START="TRUE" HASH_CHAR="NUL">NUL\b</SEQ_REGEXP>
+		<SEQ_REGEXP TYPE="KEYWORD4" AT_WORD_START="TRUE" HASH_CHAR="AUX">AUX\b</SEQ_REGEXP>
+		<SEQ_REGEXP TYPE="KEYWORD4" AT_WORD_START="TRUE" HASH_CHAR="PRN">PRN\b</SEQ_REGEXP>
+		<SEQ_REGEXP TYPE="KEYWORD4" AT_WORD_START="TRUE" HASH_CHAR="CON">CON\b</SEQ_REGEXP>
+		<SEQ_REGEXP TYPE="KEYWORD4" AT_WORD_START="TRUE" HASH_CHAR="COM">COM\d+\b</SEQ_REGEXP>
+		<SEQ_REGEXP TYPE="KEYWORD4" AT_WORD_START="TRUE" HASH_CHAR="LPT">LPT\d+\b</SEQ_REGEXP>
+	</RULES>
 
-		<KEYWORDS>
-			<!-- KEYWORD1 are internal MS-DOS shell commands -->
-			<KEYWORD1>cd</KEYWORD1>
-			<KEYWORD1>chdir</KEYWORD1>
-			<KEYWORD1>md</KEYWORD1>
-			<KEYWORD1>mkdir</KEYWORD1>
+	<!-- Pipeling and sequencing operators -->
+	<RULES SET="Pipeline_operators" IGNORE_CASE="TRUE" HIGHLIGHT_DIGITS="FALSE">
+		<SEQ_REGEXP TYPE="OPERATOR" HASH_CHAR="^">\^$</SEQ_REGEXP><!-- Line continuation character. TO DO: The delegation should continue on next line -->
+		<SEQ_REGEXP TYPE="OPERATOR" AT_WORD_START="TRUE" HASH_CHARS="&gt;0123456789">\d*&gt;(&amp;\d+)?</SEQ_REGEXP><!-- Ex: > or >> or 2> or 2>&1 -->
+		<SEQ TYPE="OPERATOR">&lt;</SEQ>
+		<SEQ TYPE="OPERATOR" DELEGATE="MAIN">&amp;&amp;</SEQ>
+		<SEQ TYPE="OPERATOR" DELEGATE="MAIN">&amp;</SEQ>
+		<SEQ TYPE="OPERATOR" DELEGATE="MAIN">||</SEQ>
+		<SEQ TYPE="OPERATOR" DELEGATE="MAIN">|</SEQ>
+		<!-- TO DO: Why aren't these ) caught by RULES SET="Parenthesis_blocks" below ?
+		     I'd like to flag only the extra ) as invalid here! -->
+		<SEQ TYPE="OPERATOR" DELEGATE="MAIN">)</SEQ>
+	</RULES>
 
-			<KEYWORD1>cls</KEYWORD1>
+	<!-- A block of commands within a pair of parenthesis -->
+	<RULES SET="Parenthesis_blocks" DEFAULT="NULL">
+		<SPAN MATCH_TYPE="OPERATOR" NO_LINE_BREAK="FALSE" DELEGATE="MAIN">
+                        <BEGIN>(</BEGIN>
+                        <END>)</END>
+                </SPAN>
+	</RULES>
 
-			<KEYWORD1>for</KEYWORD1>
-			<KEYWORD1>if</KEYWORD1>
+	<!-- Commands with special syntaxes -->
+	<RULES SET="Special_commands" DEFAULT="NULL">
+		<!-- FOR loops -->
+		<EOL_SPAN_REGEXP TYPE="KEYWORD1" AT_WORD_START="TRUE" HASH_CHAR="FOR"  DELEGATE="FOR">FOR\b</EOL_SPAN_REGEXP>
+		<!-- IF ... ELSE ... -->
+		<EOL_SPAN_REGEXP TYPE="KEYWORD1" AT_WORD_START="TRUE" HASH_CHAR="IF"   DELEGATE="IF">IF\b</EOL_SPAN_REGEXP>
+		<!-- CALL and GOTO :label -->
+		<EOL_SPAN_REGEXP TYPE="KEYWORD3" AT_WORD_START="TRUE" HASH_CHAR="CALL" DELEGATE="CALL">CALL\b</EOL_SPAN_REGEXP>
+		<EOL_SPAN_REGEXP TYPE="KEYWORD3" AT_WORD_START="TRUE" HASH_CHAR="GOTO" DELEGATE="CALL">GOTO\b</EOL_SPAN_REGEXP>
+		<!-- ECHO message. DOS documented ECHO.message to display any string. NT supports a few other characters, like ECHO(message -->
+		<EOL_SPAN_REGEXP TYPE="KEYWORD1" AT_WORD_START="TRUE" HASH_CHAR="ECHO" DELEGATE="ECHO.">ECHO[./\\:+(]</EOL_SPAN_REGEXP>
+		<EOL_SPAN_REGEXP TYPE="KEYWORD1" AT_WORD_START="TRUE" HASH_CHAR="ECHO" DELEGATE="ECHO">ECHO\b</EOL_SPAN_REGEXP>
 
-			<KEYWORD1>echo</KEYWORD1>
-			<KEYWORD1>echo.</KEYWORD1>
+		<!-- Commands with free arguments that are _not_ keywords -->
+		<!-- Workaround to avoid triggering the other rules above, if one of the arguments is FOR, IF, CALL, ... -->
+		<!-- The correct way to do this would be to find a general way to parse the (command [arguments]) syntax -->
+		<EOL_SPAN_REGEXP TYPE="KEYWORD1" AT_WORD_START="TRUE" HASH_CHAR="SET"  DELEGATE="Arguments">SET\b</EOL_SPAN_REGEXP>
+		<EOL_SPAN_REGEXP TYPE="KEYWORD1" AT_WORD_START="TRUE" HASH_CHAR="CD"   DELEGATE="Arguments">CD\b</EOL_SPAN_REGEXP>
+		<EOL_SPAN_REGEXP TYPE="KEYWORD1" AT_WORD_START="TRUE" HASH_CHAR="MD"   DELEGATE="Arguments">MD\b</EOL_SPAN_REGEXP>
+		<EOL_SPAN_REGEXP TYPE="KEYWORD1" AT_WORD_START="TRUE" HASH_CHAR="RD"   DELEGATE="Arguments">RD\b</EOL_SPAN_REGEXP>
+	</RULES>
 
-			<KEYWORD1>move</KEYWORD1>
-			<KEYWORD1>copy</KEYWORD1>
-			<KEYWORD1>move</KEYWORD1>
-			<KEYWORD1>ren</KEYWORD1>
-			<KEYWORD1>del</KEYWORD1>
-			<KEYWORD1>set</KEYWORD1>
+	<!-- Arguments -->
+	<RULES SET="Arguments" IGNORE_CASE="FALSE" HIGHLIGHT_DIGITS="FALSE" DEFAULT="NULL">
+		<IMPORT DELEGATE="Pipeline_operators"/>
+		<IMPORT DELEGATE="Percent_Variable"/>
+		<IMPORT DELEGATE="Expand_Variable"/>
+		<IMPORT DELEGATE="Quoted_string"/>
+		<IMPORT DELEGATE="Device_names"/>
+	</RULES>
 
-			<!-- new KEYWORDS from Win2K help -->
-			<KEYWORD1>call</KEYWORD1>
-			<KEYWORD1>exit</KEYWORD1>
-			<KEYWORD1>setlocal</KEYWORD1>
-			<KEYWORD1>shift</KEYWORD1>
-			<KEYWORD1>endlocal</KEYWORD1>
-			<KEYWORD1>pause</KEYWORD1>
+	<!-- FOR loops -->
+	<RULES SET="FOR" IGNORE_CASE="TRUE" HIGHLIGHT_DIGITS="FALSE">
+		<SEQ TYPE="KEYWORD3" AT_WORD_START="TRUE" DELEGATE="FOR /D">/D</SEQ>
+		<SEQ TYPE="KEYWORD3" AT_WORD_START="TRUE" DELEGATE="FOR /F">/F</SEQ>
+		<SEQ TYPE="KEYWORD3" AT_WORD_START="TRUE" DELEGATE="FOR /L">/L</SEQ>
+		<SEQ TYPE="KEYWORD3" AT_WORD_START="TRUE" DELEGATE="FOR /R">/R</SEQ>
+		<SEQ TYPE="NULL">/</SEQ>
+		<IMPORT DELEGATE="FOR %%"/><!-- Anything else is invalid here -->
+	</RULES>
+	<!-- Expect the %%v loop variable, and nothing else -->
+	<RULES SET="FOR %%" IGNORE_CASE="TRUE" HIGHLIGHT_DIGITS="FALSE">
+		<SEQ_REGEXP TYPE="INVALID"  HASH_CHAR="%%" DELEGATE="FOR IN">%%[^,;="&amp;|%!\s]\S</SEQ_REGEXP>
+		<SEQ_REGEXP TYPE="KEYWORD2" HASH_CHAR="%%" DELEGATE="FOR IN">%%[^,;="&amp;|%!\s]</SEQ_REGEXP>
+		<SEQ TYPE="NULL">%%</SEQ>
+		<SEQ TYPE="NULL">%</SEQ>
+		<IMPORT DELEGATE="INVALID"/><!-- Anything else is invalid here -->
+	</RULES>
+	<!-- Expect for /d arguments -->
+	<RULES SET="FOR /D" IGNORE_CASE="TRUE" HIGHLIGHT_DIGITS="FALSE">
+		<IMPORT DELEGATE="FOR %%"/><!-- Anything else is invalid here -->
+	</RULES>
+	<!-- Expect for /f arguments -->
+	<RULES SET="FOR /F" IGNORE_CASE="TRUE" HIGHLIGHT_DIGITS="FALSE">
+		<IMPORT DELEGATE="Quoted_string"/>
+		<IMPORT DELEGATE="FOR %%"/><!-- Anything else is invalid here -->
+	</RULES>
+	<!-- Expect for /l arguments -->
+	<RULES SET="FOR /L" IGNORE_CASE="TRUE" HIGHLIGHT_DIGITS="FALSE">
+		<IMPORT DELEGATE="FOR %%"/><!-- Anything else is invalid here -->
+	</RULES>
+	<!-- Expect for /r arguments -->
+	<RULES SET="FOR /R" IGNORE_CASE="TRUE" HIGHLIGHT_DIGITS="FALSE">
+		<!-- The pathname that follows /r is either quoted -->
+		<IMPORT DELEGATE="Quoted_string"/>
+		<!-- Or it's a sequence of pathname characters that do not need quoting -->
+		<SEQ_REGEXP TYPE="NULL" DELEGATE="FOR %%">[^%\*\?""&lt;&gt;\|\(\)\s]+</SEQ_REGEXP>
+		<IMPORT DELEGATE="FOR %%"/><!-- Anything else is invalid here -->
+	</RULES>
+	<!-- Expect the for IN keyword, and nothing else -->
+	<RULES SET="FOR IN" IGNORE_CASE="TRUE" HIGHLIGHT_DIGITS="FALSE">
+		<SEQ_REGEXP TYPE="KEYWORD3" AT_WORD_START="TRUE" HASH_CHAR="IN" DELEGATE="FOR LIST">IN\b</SEQ_REGEXP>
+		<SEQ_REGEXP TYPE="NULL" AT_WORD_START="TRUE" HASH_CHAR="I">I\b</SEQ_REGEXP><!-- Avoid showing an error while typing the I of IN -->
+		<IMPORT DELEGATE="INVALID"/><!-- Anything else is invalid here -->
+	</RULES>
+	<!-- Expect the for (list) DO sequence -->
+	<RULES SET="FOR LIST" IGNORE_CASE="TRUE" HIGHLIGHT_DIGITS="FALSE">
+		<!-- Special case of for ... in ('for ... ^(loop^)') -->
+		<SPAN MATCH_TYPE="OPERATOR" NO_LINE_BREAK="FALSE" DELEGATE="FOR /F ()">
+                        <BEGIN>^(</BEGIN>
+                        <END>^)</END>
+                </SPAN>
+		<!-- DOS-style (list of files) -->
+		<SPAN MATCH_TYPE="OPERATOR" NO_LINE_BREAK="FALSE" DELEGATE="FOR /F ()">
+                        <BEGIN>(</BEGIN>
+                        <END>)</END>
+                </SPAN>
+		<IMPORT DELEGATE="FOR DO"/><!-- Anything else is invalid here -->
+	</RULES>
+	<!-- Expect the for /F (list or 'command') -->
+	<RULES SET="FOR /F ()" IGNORE_CASE="TRUE" HIGHLIGHT_DIGITS="FALSE">
+		<!-- NT-style 'command' or `command` -->
+		<SPAN_REGEXP MATCH_TYPE="OPERATOR" HASH_CHAR="" NO_LINE_BREAK="FALSE" DELEGATE="'Command'">
+                        <BEGIN>(['`])</BEGIN>
+                        <END REGEXP="TRUE">$1</END>
+                </SPAN_REGEXP>
+		<!-- DOS-style list -->
+		<IMPORT DELEGATE="Arguments"/>
+	</RULES>
+	<!-- NT-style 'command' or `command` -->
+	<RULES SET="'Command'" IGNORE_CASE="TRUE" HIGHLIGHT_DIGITS="FALSE">
+		<!-- 
+		<SEQ_REGEXP DELEGATE="FOR DO">'\s*\)</SEQ_REGEXP>
+		-->
+		<!-- Standard device names -->
+		<IMPORT DELEGATE="Device_names"/>
+		<!-- All internal and external commands -->
+		<IMPORT DELEGATE="Known_commands"/>
+		<!-- TO DO: Why can't we delegate this to MAIN? (Breaks the end of block detection) -->
+		<!-- Known bug: Even with this workaround, an & in the pipeline will break the end of ') block detection -->
+		<IMPORT DELEGATE="Arguments"/>
+	</RULES>
+	<!-- Expect the for DO keyword -->
+	<RULES SET="FOR DO" IGNORE_CASE="TRUE" HIGHLIGHT_DIGITS="FALSE">
+		<SEQ_REGEXP TYPE="KEYWORD3" AT_WORD_START="TRUE" HASH_CHAR="DO" DELEGATE="MAIN">DO\b</SEQ_REGEXP>
+		<SEQ_REGEXP TYPE="NULL" AT_WORD_START="TRUE" HASH_CHAR="D">D\b</SEQ_REGEXP><!-- Avoid showing an error while typing the D of DO -->
+		<IMPORT DELEGATE="INVALID"/><!-- Anything else is invalid here -->
+	</RULES>
 
-			<!-- KEYWORD2 are commands options -->
+	<!-- IF ... ELSE ... -->
+	<RULES SET="IF" IGNORE_CASE="TRUE" HIGHLIGHT_DIGITS="FALSE">
+		<EOL_SPAN_REGEXP TYPE="KEYWORD3" AT_WORD_START="TRUE" HASH_CHAR="NOT" DELEGATE="IFF">NOT\b</EOL_SPAN_REGEXP>
+		<EOL_SPAN_REGEXP TYPE="KEYWORD3" AT_WORD_START="TRUE" HASH_CHAR="/I"  DELEGATE="IF COMPARE">/I\b</EOL_SPAN_REGEXP>
+		<IMPORT DELEGATE="IFF"/>
+	</RULES>
+	<RULES SET="IFF" IGNORE_CASE="TRUE" HIGHLIGHT_DIGITS="FALSE">
+		<EOL_SPAN_REGEXP TYPE="KEYWORD3" AT_WORD_START="TRUE" HASH_CHAR="DEF" DELEGATE="IF DEFINED">DEFINED\b</EOL_SPAN_REGEXP>
+		<EOL_SPAN_REGEXP TYPE="KEYWORD3" AT_WORD_START="TRUE" HASH_CHAR="EXI" DELEGATE="IF EXIST">EXIST\b</EOL_SPAN_REGEXP>
+		<EOL_SPAN_REGEXP TYPE="KEYWORD3" AT_WORD_START="TRUE" HASH_CHAR="ERR" DELEGATE="IF ERRORLEVEL">ERRORLEVEL\b</EOL_SPAN_REGEXP>
+		<EOL_SPAN_REGEXP TYPE="KEYWORD3" AT_WORD_START="TRUE" HASH_CHAR="CMD" DELEGATE="IF CMDEXTVERSION">CMDEXTVERSION\b</EOL_SPAN_REGEXP>
+		<IMPORT DELEGATE="IF COMPARE"/>
+	</RULES>
+	<RULES SET="IF DEFINED" IGNORE_CASE="TRUE" HIGHLIGHT_DIGITS="FALSE">
+		<IMPORT DELEGATE="MAIN"/><!-- For lack of a better solution -->
+	</RULES>
+	<RULES SET="IF EXIST" IGNORE_CASE="TRUE" HIGHLIGHT_DIGITS="FALSE">
+		<IMPORT DELEGATE="MAIN"/><!-- For lack of a better solution -->
+	</RULES>
+	<RULES SET="IF ERRORLEVEL" IGNORE_CASE="TRUE" HIGHLIGHT_DIGITS="FALSE">
+		<IMPORT DELEGATE="MAIN"/><!-- For lack of a better solution -->
+	</RULES>
+	<RULES SET="IF CMDEXTVERSION" IGNORE_CASE="TRUE" HIGHLIGHT_DIGITS="FALSE">
+		<IMPORT DELEGATE="MAIN"/><!-- For lack of a better solution -->
+	</RULES>
+	<RULES SET="IF COMPARE" IGNORE_CASE="TRUE" HIGHLIGHT_DIGITS="FALSE">
+		<SEQ TYPE="KEYWORD3">==</SEQ>
+		<IMPORT DELEGATE="MAIN"/><!-- For lack of a better solution -->
+	</RULES>
 
-			<KEYWORD2>defined</KEYWORD2>
-			<KEYWORD2>exist</KEYWORD2>
-			<KEYWORD2>errorlevel</KEYWORD2>
+	<!-- CALL and GOTO :label -->
+	<RULES SET="CALL" IGNORE_CASE="FALSE" HIGHLIGHT_DIGITS="FALSE" DEFAULT="NULL">
+		<IMPORT DELEGATE="Pipeline_operators"/>
+		<IMPORT DELEGATE="Percent_Variable"/>
+		<IMPORT DELEGATE="Expand_Variable"/>
+		<IMPORT DELEGATE="Quoted_string"/>
+		<IMPORT DELEGATE="Device_names"/>
+		<!-- labels - eg "call :test" or "goto :test" -->
+		<EOL_SPAN_REGEXP AT_WORD_START="TRUE" HASH_CHAR=":" TYPE="LABEL" DELEGATE="Arguments">:[^+:,;=\s]+</EOL_SPAN_REGEXP>
+	</RULES>
 
-			<!-- new KEYWORD options from Win2K help -->
-			<KEYWORD2>else</KEYWORD2>
+	<!-- ECHO message -->
+	<RULES SET="ECHO" IGNORE_CASE="TRUE" HIGHLIGHT_DIGITS="FALSE" DEFAULT="LITERAL4">
+		<!-- TO DO: (echo Off we go) is valid, and outputs the 3 words. How to catch that and color all 3 as LITERAL4? -->
+		<EOL_SPAN_REGEXP AT_WORD_START="TRUE" HASH_CHAR="O" TYPE="KEYWORD3" DELEGATE="ECHO.">(ON|OFF)\b</EOL_SPAN_REGEXP>
+		<IMPORT DELEGATE="ECHO."/>
+	</RULES>
+	<RULES SET="ECHO." IGNORE_CASE="FALSE" HIGHLIGHT_DIGITS="FALSE" DEFAULT="LITERAL4">
+		<IMPORT DELEGATE="Pipeline_operators"/>
+		<IMPORT DELEGATE="Percent_Variable"/>
+		<IMPORT DELEGATE="Expand_Variable"/>
+		<IMPORT DELEGATE="Quoted_string"/>
+		<IMPORT DELEGATE="Device_names"/>
+	</RULES>
 
-			<KEYWORD2>in</KEYWORD2>
-			<KEYWORD2>do</KEYWORD2>
-
-			<KEYWORD2>NUL</KEYWORD2>
-			<KEYWORD2>AUX</KEYWORD2>
-			<KEYWORD2>PRN</KEYWORD2>
-
-			<KEYWORD1>not</KEYWORD1>
-
-			<!-- goto is a special case we want to distinguish it -->
-			<KEYWORD3>goto</KEYWORD3>
-
-			<!-- FUNCTION are standard MS-DOS commands -->
-			<!-- (those you find as stand-alone .exe or .com) in win95 %windows_root%\command folder -->
-			<FUNCTION>APPEND</FUNCTION>
-			<FUNCTION>ATTRIB</FUNCTION>
-			<FUNCTION>CHKDSK</FUNCTION>
-			<FUNCTION>CHOICE</FUNCTION>
-			<FUNCTION>DEBUG</FUNCTION>
-			<FUNCTION>DEFRAG</FUNCTION>
-			<FUNCTION>DELTREE</FUNCTION>
-			<FUNCTION>DISKCOMP</FUNCTION>
-			<FUNCTION>DISKCOPY</FUNCTION>
-			<FUNCTION>DOSKEY</FUNCTION>
-			<FUNCTION>DRVSPACE</FUNCTION>
-			<FUNCTION>EMM386</FUNCTION>
-			<FUNCTION>EXPAND</FUNCTION>
-			<FUNCTION>FASTOPEN</FUNCTION>
-			<FUNCTION>FC</FUNCTION>
-			<FUNCTION>FDISK</FUNCTION>
-			<FUNCTION>FIND</FUNCTION>
-			<FUNCTION>FORMAT</FUNCTION>
-			<FUNCTION>GRAPHICS</FUNCTION>
-			<FUNCTION>KEYB</FUNCTION>
-			<FUNCTION>LABEL</FUNCTION>
-			<FUNCTION>LOADFIX</FUNCTION>
-			<FUNCTION>MEM</FUNCTION>
-			<FUNCTION>MODE</FUNCTION>
-			<FUNCTION>MORE</FUNCTION>
-			<FUNCTION>MOVE</FUNCTION>
-			<FUNCTION>MSCDEX</FUNCTION>
-			<FUNCTION>NLSFUNC</FUNCTION>
-			<FUNCTION>POWER</FUNCTION>
-			<FUNCTION>PRINT</FUNCTION>
-			<FUNCTION>RD</FUNCTION>
-			<FUNCTION>REPLACE</FUNCTION>
-			<FUNCTION>RESTORE</FUNCTION>
-			<FUNCTION>SETVER</FUNCTION>
-			<FUNCTION>SHARE</FUNCTION>
-			<FUNCTION>SORT</FUNCTION>
-			<FUNCTION>SUBST</FUNCTION>
-			<FUNCTION>SYS</FUNCTION>
-			<FUNCTION>TREE</FUNCTION>
-			<FUNCTION>UNDELETE</FUNCTION>
-			<FUNCTION>UNFORMAT</FUNCTION>
-			<FUNCTION>VSAFE</FUNCTION>
-			<FUNCTION>XCOPY</FUNCTION>
-		</KEYWORDS>
+	<!-- Empty ruleset to delegate to for spots where any non-whitespace is invalid -->
+	<RULES SET="INVALID" DEFAULT="INVALID">
+		<!-- Limit the error to one line -->
+		<EOL_SPAN_REGEXP TYPE="INVALID">\S.*</EOL_SPAN_REGEXP>
 	</RULES>
 </MODE>

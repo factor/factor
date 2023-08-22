@@ -1,20 +1,20 @@
 ! Copyright (C) 2011 Doug Coleman.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: arrays combinators.smart environment fry
 io.directories io.files io.pathnames io.standard-paths
 kernel sequences sets splitting system unicode windows.shell32 ;
 IN: io.standard-paths.windows
 
-: program-files-directories ( -- array )
+M: windows application-directories
     [
         program-files
         program-files-x86
         "ProgramW6432" os-env
         "LOCALAPPDATA" os-env "Programs" append-path
-    ] output>array harvest members ; inline
+    ] output>array harvest members ;
 
 : find-in-program-files ( base-directory quot -- path )
-    [ program-files-directories ]
+    [ application-directories ]
     [ '[ _ append-path ] map ]
     [ find-file-in-directories ] tri* ; inline
 

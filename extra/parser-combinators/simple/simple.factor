@@ -1,5 +1,5 @@
 ! Copyright (C) 2006 Chris Double.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: kernel math.parser parser-combinators strings unicode ;
 IN: parser-combinators.simple
 

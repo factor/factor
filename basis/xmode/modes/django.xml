@@ -1,13 +1,46 @@
 <?xml version="1.0"?>
+<!--
+Original author Ollie Rutherfurd
 
+Django 1.2 templates edit mode
+<http://docs.djangoproject.com/en/dev/topics/templates/>
+
+Updated 2010-09-10 by Jakub Roztocil <jakub@webkitchen.cz>
+* Added missing filters, tags, operators, etc.
+* Higlight Django syntax inside tags and attributes
+* Higlight CSS (and to some extent also Django tags) inside <style>
+* Higlight JavaScript inside <script>
+
+CSS & JS integration and tag highlighting inspired by the PHP mode.
+
+-->
 <MODE>
 	<PROPS>
 		<PROPERTY NAME="commentStart" VALUE="{% comment %}" />
 		<PROPERTY NAME="commentEnd" VALUE="{% endcomment %}" />
 	</PROPS>
+
 	<RULES IGNORE_CASE="TRUE">
 		<IMPORT DELEGATE="html::MAIN"/>
+		<IMPORT DELEGATE="DJANGO" />
 
+		<!-- JavaScript -->
+		<SPAN TYPE="MARKUP" DELEGATE="JAVASCRIPT_OPENTAG">
+			<BEGIN>&lt;SCRIPT</BEGIN>
+			<END>&lt;/SCRIPT&gt;</END>
+		</SPAN>
+
+		<!-- CSS -->
+		<SPAN TYPE="MARKUP" DELEGATE="CSS_OPENTAG">
+			<BEGIN>&lt;STYLE</BEGIN>
+			<END>&lt;/STYLE&gt;</END>
+		</SPAN>
+
+		<!-- TAGS -->
+		<SEQ_REGEXP HASH_CHAR="&lt;" TYPE="MARKUP" DELEGATE="TAGS">&lt;/?\w+</SEQ_REGEXP>
+	</RULES>
+
+	<RULES SET="DJANGO">
 		<SPAN TYPE="COMMENT3">
 			<BEGIN>{% comment %}</BEGIN>
 			<END>{% endcomment %}</END>
@@ -16,12 +49,63 @@
 			<BEGIN>{%</BEGIN>
 			<END>%}</END>
 		</SPAN>
-		<!-- variable -->
 		<SPAN TYPE="KEYWORD3" DELEGATE="DJANGO_VARIABLE">
 			<BEGIN>{{</BEGIN>
 			<END>}}</END>
 		</SPAN>
 	</RULES>
+
+	<!-- Javascript -->
+	<RULES SET="JAVASCRIPT_OPENTAG" DEFAULT="MARKUP">
+		<SEQ TYPE="MARKUP" DELEGATE="JAVASCRIPT">&gt;</SEQ>
+		<IMPORT DELEGATE="TAGS"/> <!-- handle Django in <script> tag -->
+		<IMPORT DELEGATE="html::TAGS" /> <!-- handle e.g. 'style="width:1px"' -->
+	</RULES>
+	<RULES SET="JAVASCRIPT" DEFAULT="MARKUP" ESCAPE="\">
+		<IMPORT DELEGATE="TO_LITERAL+DJANGO"/>
+		<IMPORT DELEGATE="DJANGO"/>
+		<IMPORT DELEGATE="javascript::MAIN"/>
+	</RULES>
+
+	<!-- CSS -->
+	<RULES SET="CSS_OPENTAG" DEFAULT="MARKUP">
+		<SEQ TYPE="MARKUP" DELEGATE="CSS">&gt;</SEQ>
+		<IMPORT DELEGATE="TO_LITERAL+DJANGO"/>
+	</RULES>
+	<RULES SET="CSS" DEFAULT="MARKUP">
+		<PROPS>
+			<PROPERTY NAME="lineComment" VALUE="" />
+		</PROPS>
+		<IMPORT DELEGATE="TO_LITERAL+DJANGO"/>
+		<IMPORT DELEGATE="DJANGO"/>
+		<IMPORT DELEGATE="css::MAIN"/>
+	</RULES>
+
+	<!-- Inside tags and attributes -->
+	<RULES SET="TAGS" DEFAULT="MARKUP">
+		<IMPORT DELEGATE="TO_LITERAL+DJANGO" />
+		<IMPORT DELEGATE="html::TAGS" /><!-- handle e.g. 'style="width:1px"' -->
+		<SEQ TYPE="MARKUP" DELEGATE="MAIN">&gt;</SEQ>
+	</RULES>
+
+	<RULES SET="TO_LITERAL+DJANGO">
+		<SPAN TYPE="LITERAL1" DELEGATE="LITERAL1+DJANGO">
+			<BEGIN>'</BEGIN>
+			<END>'</END>
+		</SPAN>
+		<SPAN TYPE="LITERAL1" DELEGATE="LITERAL1+DJANGO">
+			<BEGIN>"</BEGIN>
+			<END>"</END>
+		</SPAN>
+		<IMPORT DELEGATE="DJANGO"/>
+	</RULES>
+
+	<!-- LITERAL1 + Django syntax (eg. attribute values) -->
+	<RULES SET="LITERAL1+DJANGO" DEFAULT="LITERAL1">
+		<IMPORT DELEGATE="DJANGO"/>
+	</RULES>
+
+
 
 	<RULES SET="DJANGO_VARIABLE" DEFAULT="LITERAL4">
 		<IMPORT DELEGATE="DJANGO_CORE"/>
@@ -30,41 +114,62 @@
 	<RULES SET="DJANGO_BLOCK" DEFAULT="LITERAL4">
 		<IMPORT DELEGATE="DJANGO_CORE"/>
 		<KEYWORDS>
+
+			<OPERATOR>==</OPERATOR>
+			<OPERATOR>!=</OPERATOR>
+			<OPERATOR>&lt;</OPERATOR>
+			<OPERATOR>&gt;</OPERATOR>
+			<OPERATOR>&lt;=</OPERATOR>
+			<OPERATOR>&gt;=</OPERATOR>
+
+			<KEYWORD1>in</KEYWORD1>
+			<KEYWORD1>not</KEYWORD1>
+			<KEYWORD1>and</KEYWORD1>
+			<KEYWORD1>or</KEYWORD1>
 			<KEYWORD1>as</KEYWORD1>
+
+			<!--
+			Tags
+			<http://docs.djangoproject.com/en/1.2/ref/templates/builtins/#built-in-tag-reference>
+			-->
+			<KEYWORD1>cache</KEYWORD1>
+			<KEYWORD1>endcache</KEYWORD1>
+			<KEYWORD1>autoescape</KEYWORD1>
 			<KEYWORD1>block</KEYWORD1>
-			<KEYWORD1>blocktrans</KEYWORD1>
-			<KEYWORD1>by</KEYWORD1>
 			<KEYWORD1>endblock</KEYWORD1>
-			<KEYWORD1>endblocktrans</KEYWORD1>
-			<KEYWORD1>comment</KEYWORD1>
-			<KEYWORD1>endcomment</KEYWORD1>
+			<KEYWORD1>csrf_token</KEYWORD1>
 			<KEYWORD1>cycle</KEYWORD1>
-			<KEYWORD1>date</KEYWORD1>
 			<KEYWORD1>debug</KEYWORD1>
-			<KEYWORD1>else</KEYWORD1>
 			<KEYWORD1>extends</KEYWORD1>
 			<KEYWORD1>filter</KEYWORD1>
 			<KEYWORD1>endfilter</KEYWORD1>
 			<KEYWORD1>firstof</KEYWORD1>
+			<KEYWORD1>if</KEYWORD1>
+			<KEYWORD1>else</KEYWORD1>
+			<KEYWORD1>endif</KEYWORD1>
 			<KEYWORD1>for</KEYWORD1>
 			<KEYWORD1>endfor</KEYWORD1>
-			<KEYWORD1>if</KEYWORD1>
-			<KEYWORD1>endif</KEYWORD1>
-			<KEYWORD1>ifchanged</KEYWORD1>
+			<KEYWORD1>empty</KEYWORD1>
 			<KEYWORD1>endifchanged</KEYWORD1>
+			<KEYWORD1>endifequal</KEYWORD1>
 			<KEYWORD1>ifnotequal</KEYWORD1>
 			<KEYWORD1>endifnotequal</KEYWORD1>
-			<KEYWORD1>in</KEYWORD1>
+			<KEYWORD1>include</KEYWORD1>
 			<KEYWORD1>load</KEYWORD1>
-			<KEYWORD1>not</KEYWORD1>
 			<KEYWORD1>now</KEYWORD1>
-			<KEYWORD1>or</KEYWORD1>
-			<KEYWORD1>parsed</KEYWORD1>
 			<KEYWORD1>regroup</KEYWORD1>
+			<KEYWORD1>spaceless</KEYWORD1>
+			<KEYWORD1>endspaceless</KEYWORD1>
 			<KEYWORD1>ssi</KEYWORD1>
-			<KEYWORD1>trans</KEYWORD1>
-			<KEYWORD1>with</KEYWORD1>
+			<KEYWORD1>templatetag</KEYWORD1>
+			<KEYWORD1>url</KEYWORD1>
 			<KEYWORD1>widthratio</KEYWORD1>
+			<KEYWORD1>with</KEYWORD1>
+			<KEYWORD1>endwith</KEYWORD1>
+			<KEYWORD1>trans</KEYWORD1>
+			<KEYWORD1>blocktrans</KEYWORD1>
+			<KEYWORD1>endblocktrans</KEYWORD1>
+
 		</KEYWORDS>
 	</RULES>
 
@@ -73,15 +178,33 @@
 			<BEGIN>"</BEGIN>
 			<END>"</END>
 		</SPAN>
+		<SPAN TYPE="LITERAL2">
+			<BEGIN>'</BEGIN>
+			<END>'</END>
+		</SPAN>
 		<SEQ TYPE="OPERATOR">:</SEQ>
 		<SEQ TYPE="OPERATOR">,</SEQ>
 		<SEQ TYPE="OPERATOR">|</SEQ>
 		<KEYWORDS>
+
+			<!--
+			{% templatetag %} arguments
+			<http://docs.djangoproject.com/en/1.2/ref/templates/builtins/#templatetag>
+			-->
+			<LITERAL3>Argument</LITERAL3>
 			<LITERAL3>openblock</LITERAL3>
 			<LITERAL3>closeblock</LITERAL3>
 			<LITERAL3>openvariable</LITERAL3>
 			<LITERAL3>closevariable</LITERAL3>
+			<LITERAL3>openbrace</LITERAL3>
+			<LITERAL3>closebrace</LITERAL3>
+			<LITERAL3>opencomment</LITERAL3>
+			<LITERAL3>closecomment</LITERAL3>
 
+			<!--
+			Filters
+			http://docs.djangoproject.com/en/1.2/ref/templates/builtins/#built-in-filter-reference
+			-->
 			<FUNCTION>add</FUNCTION>
 			<FUNCTION>addslashes</FUNCTION>
 			<FUNCTION>capfirst</FUNCTION>
@@ -89,16 +212,21 @@
 			<FUNCTION>cut</FUNCTION>
 			<FUNCTION>date</FUNCTION>
 			<FUNCTION>default</FUNCTION>
+			<FUNCTION>default_if_none</FUNCTION>
 			<FUNCTION>dictsort</FUNCTION>
 			<FUNCTION>dictsortreversed</FUNCTION>
 			<FUNCTION>divisibleby</FUNCTION>
 			<FUNCTION>escape</FUNCTION>
+			<FUNCTION>escapejs</FUNCTION>
 			<FUNCTION>filesizeformat</FUNCTION>
 			<FUNCTION>first</FUNCTION>
 			<FUNCTION>fix_ampersands</FUNCTION>
 			<FUNCTION>floatformat</FUNCTION>
+			<FUNCTION>force_escape</FUNCTION>
 			<FUNCTION>get_digit</FUNCTION>
+			<FUNCTION>iriencode</FUNCTION>
 			<FUNCTION>join</FUNCTION>
+			<FUNCTION>last</FUNCTION>
 			<FUNCTION>length</FUNCTION>
 			<FUNCTION>length_is</FUNCTION>
 			<FUNCTION>linebreaks</FUNCTION>
@@ -113,14 +241,18 @@
 			<FUNCTION>random</FUNCTION>
 			<FUNCTION>removetags</FUNCTION>
 			<FUNCTION>rjust</FUNCTION>
+			<FUNCTION>safe</FUNCTION>
+			<FUNCTION>safeseq</FUNCTION>
 			<FUNCTION>slice</FUNCTION>
 			<FUNCTION>slugify</FUNCTION>
 			<FUNCTION>stringformat</FUNCTION>
 			<FUNCTION>striptags</FUNCTION>
 			<FUNCTION>time</FUNCTION>
 			<FUNCTION>timesince</FUNCTION>
+			<FUNCTION>timeuntil</FUNCTION>
 			<FUNCTION>title</FUNCTION>
 			<FUNCTION>truncatewords</FUNCTION>
+			<FUNCTION>truncatewords_html</FUNCTION>
 			<FUNCTION>unordered_list</FUNCTION>
 			<FUNCTION>upper</FUNCTION>
 			<FUNCTION>urlencode</FUNCTION>

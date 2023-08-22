@@ -1,5 +1,5 @@
 ! Copyright (C) 2015 Sankaranarayanan Viswanathan.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors assocs calendar combinators
 combinators.short-circuit destructors formatting kernel math
 math.vectors namespaces opengl opengl.textures sequences sets

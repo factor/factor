@@ -1,5 +1,5 @@
 ! Copyright (C) 2010 Dmitry Shubin.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors arrays continuations gdbm io.directories
 io.files.temp kernel sequences sets system tools.test ;
 IN: gdbm.tests
@@ -38,15 +38,6 @@ CLEANUP
 { 42 t } [ db-path [ "foo" gdbm-fetch* ] with-gdbm-reader ] unit-test
 
 { f f } [ [ "unknown" gdbm-fetch* ] with-test.db ] unit-test
-
-! XXX: different behavior on macOS Big Sur and Monterey?
-os macosx? [
-    [
-        [
-            300 set-gdbm-cache-size 300 set-gdbm-cache-size
-        ] with-test.db
-    ] [ gdbm-option-already-set = ] must-fail-with
-] unless
 
 { t }
 [

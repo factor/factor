@@ -1,5 +1,5 @@
 ! Copyright (C) 2018 Doug Coleman.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: base91 combinators command-line escape-strings io.backend
 io.directories io.encodings.binary io.encodings.utf8 io.files
 io.files.info io.pathnames kernel math namespaces sequences
@@ -39,7 +39,7 @@ IN: tools.directory-to-file
     "\n\n;DIRECTORY>" surround ;
 
 : directory-to-file ( path -- )
-    [ directory-to-string ] keep ".modern" append
+    [ directory-to-string ] keep canonicalize-path ".modern" append
     utf8 set-file-contents ;
 
 : directory-to-file-main ( -- )

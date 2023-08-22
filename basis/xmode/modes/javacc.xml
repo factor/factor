@@ -2,26 +2,36 @@
 <!DOCTYPE MODE SYSTEM "xmode.dtd">
 <MODE>
     <PROPS>
-		<PROPERTY NAME="commentStart" VALUE="/*" />
-		<PROPERTY NAME="commentEnd" VALUE="*/" />
-		<PROPERTY NAME="lineComment" VALUE="//" />
-		<PROPERTY NAME="wordBreakChars" VALUE=",+-=&lt;&gt;/?^&amp;*" />
+        <PROPERTY NAME="commentStart" VALUE="/*" />
+        <PROPERTY NAME="commentEnd" VALUE="*/" />
+        <PROPERTY NAME="lineComment" VALUE="//" />
+        <PROPERTY NAME="wordBreakChars" VALUE=",+-=&lt;&gt;/?^&amp;*" />
 
-		<!-- Auto indent -->
-		 <PROPERTY NAME="indentOpenBrackets" VALUE="{" />
-		<PROPERTY NAME="indentCloseBrackets" VALUE="}" />
-		<PROPERTY NAME="unalignedOpenBrackets" VALUE="(" />
-		<PROPERTY NAME="unalignedCloseBrackets" VALUE=")" />
-		<PROPERTY NAME="indentNextLine"
-			VALUE="\s*(((if|while)\s*\(|else\s*|else\s+if\s*\(|for\s*\(.*\))[^{;]*)" />
-		<PROPERTY NAME="unindentThisLine"
-			VALUE="^.*(default:\s*|case.*:.*)$" />
-		<PROPERTY NAME="electricKeys" VALUE=":" />
-	</PROPS>
+        <!-- Auto indent -->
+        <PROPERTY NAME="indentOpenBrackets" VALUE="{" />
+        <PROPERTY NAME="indentCloseBrackets" VALUE="}" />
+        <PROPERTY NAME="unalignedOpenBrackets" VALUE="(" />
+        <PROPERTY NAME="unalignedCloseBrackets" VALUE=")" />
+        <PROPERTY NAME="indentNextLine"
+            VALUE="\s*(((if|while)\s*\(|else\s+|else$|else\s+if\s*\(|for\s*\(.*\))[^{;]*)" />
+        <PROPERTY NAME="unindentThisLine"
+            VALUE="^.*(default:\s*|case.*:.*)$" />
+        <PROPERTY NAME="electricKeys" VALUE=":" />
+    </PROPS>
     <RULES IGNORE_CASE="FALSE">
         <IMPORT DELEGATE="java::MAIN"/>
-        
+
+        <!-- regular expression definitions -->
+        <SEQ_REGEXP HASH_CHAR="&lt;" TYPE="KEYWORD2">&lt;[[:space:]]*\w+[[:space:]]*[:]</SEQ_REGEXP>
+
+        <!-- regular expression label(s) -->
+        <SEQ_REGEXP HASH_CHAR="&lt;" TYPE="KEYWORD2">&lt;[[:space:]]*\w+([[:space:]]*[,][[:space:]]*\w+[[:space:]]*)*[[:space:]]*&gt;</SEQ_REGEXP>
+
+        <!-- private regular expression labels -->
+        <SEQ_REGEXP HASH_CHAR="#" TYPE="KEYWORD2">[#]\w+[:]</SEQ_REGEXP>
+
         <KEYWORDS>
+            <!-- javacc keywords -->
             <KEYWORD1>EOF</KEYWORD1>
             <KEYWORD1>IGNORE_CASE</KEYWORD1>
             <KEYWORD1>JAVACODE</KEYWORD1>
@@ -34,6 +44,55 @@
             <KEYWORD1>TOKEN</KEYWORD1>
             <KEYWORD1>TOKEN_MGR_DECLS</KEYWORD1>
             <KEYWORD1>options</KEYWORD1>
+        
+            <!-- javacc option keywords -->
+            <KEYWORD1>CHOICE_AMBIGUITY_CHECK</KEYWORD1>
+            <KEYWORD1>OTHER_AMBIGUITY_CHECK</KEYWORD1>
+            <KEYWORD1>STATIC</KEYWORD1>
+            <KEYWORD1>SUPPORT_CLASS_VISIBILITY_PUBLIC</KEYWORD1>
+            <KEYWORD1>DEBUG_PARSER</KEYWORD1>
+            <KEYWORD1>DEBUG_LOOKAHEAD</KEYWORD1>
+            <KEYWORD1>DEBUG_TOKEN_MANAGER</KEYWORD1>
+            <KEYWORD1>ERROR_REPORTING</KEYWORD1>
+            <KEYWORD1>JAVA_UNICODE_ESCAPE</KEYWORD1>
+            <KEYWORD1>UNICODE_INPUT</KEYWORD1>
+            <KEYWORD1>IGNORE_CASE</KEYWORD1>
+            <KEYWORD1>USER_TOKEN_MANAGER</KEYWORD1>
+            <KEYWORD1>USER_CHAR_STREAM</KEYWORD1>
+            <KEYWORD1>BUILD_PARSER</KEYWORD1>
+            <KEYWORD1>BUILD_TOKEN_MANAGER</KEYWORD1>
+            <KEYWORD1>TOKEN_EXTENDS</KEYWORD1>
+            <KEYWORD1>TOKEN_FACTORY</KEYWORD1>
+            <KEYWORD1>TOKEN_MANAGER_USES_PARSER</KEYWORD1>
+            <KEYWORD1>SANITY_CHECK</KEYWORD1>
+            <KEYWORD1>FORCE_LA_CHECK</KEYWORD1>
+            <KEYWORD1>COMMON_TOKEN_ACTION</KEYWORD1>
+            <KEYWORD1>CACHE_TOKENS</KEYWORD1>
+            <KEYWORD1>OUTPUT_DIRECTORY</KEYWORD1>
+
+            <!-- jjtree keywords -->
+            <KEYWORD1>BUILD_NODE_FILES</KEYWORD1>
+            <KEYWORD1>MULTI</KEYWORD1>
+            <KEYWORD1>NODE_DEFAULT_VOID</KEYWORD1>
+            <KEYWORD1>NODE_CLASS</KEYWORD1>
+            <KEYWORD1>NODE_FACTORY</KEYWORD1>
+            <KEYWORD1>NODE_PACKAGE</KEYWORD1>
+            <KEYWORD1>NODE_EXTENDS</KEYWORD1>
+            <KEYWORD1>NODE_PREFIX</KEYWORD1>
+            <KEYWORD1>NODE_SCOPE_HOOK</KEYWORD1>
+            <KEYWORD1>NODE_USES_PARSER</KEYWORD1>
+            <KEYWORD1>TRACK_TOKENS</KEYWORD1>
+            <KEYWORD1>STATIC</KEYWORD1>
+            <KEYWORD1>VISITOR</KEYWORD1>
+            <KEYWORD1>VISITOR_DATA_TYPE</KEYWORD1>
+            <KEYWORD1>VISITOR_RETURN_TYPE</KEYWORD1>
+            <KEYWORD1>VISITOR_EXCEPTION</KEYWORD1>
+            <KEYWORD1>JJTREE_OUTPUT_DIRECTORY</KEYWORD1>
+        
+            <!-- DEFAULT is the standard lexical state -->
+            <KEYWORD2>DEFAULT</KEYWORD2>
         </KEYWORDS>
+
     </RULES>
 </MODE>
+

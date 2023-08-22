@@ -1,5 +1,5 @@
 ! Copyright (C) 2008, 2010 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: assocs bootstrap.image checksums checksums.md5
 http.client io.files kernel math.parser splitting urls ;
 IN: bootstrap.image.download
@@ -14,7 +14,7 @@ CONSTANT: download-url URL" https://downloads.factorcode.org/images/master/"
     md5 checksum-file bytes>hex-string ;
 
 : download-checksum ( image -- checksum )
-    download-checksums at ;
+    download-checksums at " " split1 drop ;
 
 : need-new-image? ( image -- ? )
     dup file-exists?

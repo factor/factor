@@ -1,5 +1,5 @@
 ! Copyright (C) 2009 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 
 USING: accessors alien.c-types alien.data arrays assocs
 byte-arrays cache classes.struct colors combinators destructors
@@ -89,10 +89,10 @@ PRIVATE>
     [ [ { 0 0 } ] dip <RECT> ]
     [
         [let :> str str selection-start/end
-         [
-             str string>> dup selection? [ string>> ] when
-             swap >utf16-index
-         ] bi@
+            [
+                str string>> dup selection? [ string>> ] when
+                swap >utf16-index
+            ] bi@
         ]
     ] tri*
     ! iMinSel

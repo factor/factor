@@ -1,5 +1,5 @@
 ! Copyright (C) 2010 Joe Groff.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: arrays calendar help.markup help.syntax math quotations threads
 tools.profiler.sampling tools.profiler.sampling.private ;
 IN: tools.profiler.sampling

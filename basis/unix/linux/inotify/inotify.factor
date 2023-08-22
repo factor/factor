@@ -1,5 +1,5 @@
 ! Copyright (C) 2008 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: alien.c-types alien.syntax math math.bitwise classes.struct
 literals ;
 IN: unix.linux.inotify
@@ -53,5 +53,5 @@ CONSTANT: IN_ALL_EVENTS
     }
 
 FUNCTION: int inotify_init ( )
-FUNCTION: int inotify_add_watch ( int fd, c-string name, uint mask  )
+FUNCTION: int inotify_add_watch ( int fd, c-string name, uint mask )
 FUNCTION: int inotify_rm_watch ( int fd, uint wd )

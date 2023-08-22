@@ -1,5 +1,5 @@
 ! Copyright (C) 2009 Jose Antonio Ortega Ruiz.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 
 USING: accessors arrays classes.tuple combinators continuations io
 kernel lexer math prettyprint quotations sequences source-files

@@ -1,5 +1,5 @@
 ! Copyright (C) 2004, 2010 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs classes classes.private
 combinators kernel make math math.order namespaces sequences
 sets sorting vectors ;
@@ -39,6 +39,9 @@ INSTANCE: anonymous-complement classoid
     classoid check-instance anonymous-complement boa ;
 
 M: anonymous-complement rank-class drop 3 ;
+
+M: anonymous-complement predicate-def
+    class>> [ over [ instance? not ] [ 2drop t ] if ] curry ;
 
 M: anonymous-complement instance?
     over [ class>> instance? not ] [ 2drop t ] if ;
@@ -154,12 +157,13 @@ PREDICATE: nontrivial-anonymous-intersection < anonymous-intersection
     [ normalize-complement ] dip class<= ;
 
 PREDICATE: nontrivial-anonymous-complement < anonymous-complement
-    class>> {
-        [ anonymous-union? ]
-        [ anonymous-intersection? ]
-        [ class-members ]
-        [ class-participants ]
-    } cleave or or or ;
+    class>> dup anonymous-union? [ drop t ] [
+        dup anonymous-intersection? [ drop t ] [
+            dup class-members [ drop t ] [
+                class-participants
+            ] if
+        ] if
+    ] if ;
 
 PREDICATE: empty-union < anonymous-union members>> empty? ;
 
@@ -266,15 +270,14 @@ ERROR: topological-sort-failed ;
     [ topological-sort-failed ] unless* ;
 
 : sort-classes ( seq -- newseq )
-    [ class-name ] sort-with >vector
+    [ class-name ] sort-by >vector
     [ dup empty? not ]
     [ dup largest-class [ swap remove-nth! ] dip ]
     produce nip ;
 
 : smallest-class ( classes -- class/f )
     [ f ] [
-        natural-sort <reversed>
-        [ ] [ [ class<= ] most ] map-reduce
+        inv-sort [ ] [ [ class<= ] most ] map-reduce
     ] if-empty ;
 
 : flatten-class ( class -- seq )

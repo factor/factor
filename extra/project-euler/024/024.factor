@@ -1,9 +1,9 @@
 ! Copyright (c) 2008 Aaron Schaefer.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: math.combinatorics project-euler.common sequences ;
 IN: project-euler.024
 
-! http://projecteuler.net/index.php?section=problems&id=24
+! https://projecteuler.net/index.php?section=problems&id=24
 
 ! DESCRIPTION
 ! -----------

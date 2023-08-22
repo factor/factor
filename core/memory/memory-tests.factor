@@ -42,7 +42,7 @@ IN: memory.tests
 
 ! Bug found on Windows build box, having too many words in the
 ! image breaks 'become'
-{ } [ 100000 [ f <uninterned-word> ] replicate { } { } become drop ] unit-test
+[ 100000 [ f <uninterned-word> ] replicate { } { } become ] must-not-fail
 
 ! Bug: code heap collection had to be done when data heap was
 ! full, not just when code heap was full. If the code heap

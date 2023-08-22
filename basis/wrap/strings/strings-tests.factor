@@ -1,6 +1,6 @@
 ! Copyright (C) 2008, 2009 Daniel Ehrenberg, Slava Pestov
-! See http://factorcode.org/license.txt for BSD license.
-USING: kernel tools.test wrap.strings ;
+! See https://factorcode.org/license.txt for BSD license.
+USING: kernel namespaces strings tools.test wrap.strings ;
 
 {
     "This is a
@@ -72,3 +72,9 @@ word wrap."
 { "Hello" } [ "\nHello\n" 10 wrap-string ] unit-test
 
 { " > > > " } [ "" 70 " > > > " wrap-indented-string ] unit-test
+
+{ "aaaa\naaaa\naa" } [
+    t break-long-words? [
+        10 CHAR: a <string> 4 wrap-string
+    ] with-variable
+] unit-test

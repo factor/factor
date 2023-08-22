@@ -1,9 +1,9 @@
 ! Copyright (C) 2011 Erik Charlebois.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: endian kernel make math math.bitwise ;
 IN: cpu.ppc.assembler
 
-! This vocabulary implements the V2.06B Power ISA found at http://www.power.org.
+! This vocabulary implements the V2.06B Power ISA found at https://www.power.org.
 ! The names are standard and the operand order is the same as in the specification,
 ! except that displacement in d-form and ds-form instructions come after the base
 ! address register.

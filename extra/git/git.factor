@@ -1,9 +1,10 @@
 ! Copyright (C) 2015 Doug Coleman.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs assocs.extras calendar
 calendar.format checksums checksums.sha combinators
-combinators.smart compression.zlib constructors endian grouping
-io io.directories io.encodings.binary io.encodings.string
+combinators.short-circuit combinators.smart compression.zlib
+constructors endian formatting grouping hashtables ini-file io
+io.directories io.encodings.binary io.encodings.string
 io.encodings.utf8 io.files io.files.info io.pathnames
 io.streams.byte-array io.streams.peek kernel math math.bitwise
 math.parser namespaces random sequences sequences.extras
@@ -332,7 +333,7 @@ SYMBOL: initial-offset
         _ seek-absolute seek-input read-packed
     ] with-file-reader ;
 
-! http://stackoverflow.com/questions/18010820/git-the-meaning-of-object-size-returned-by-git-verify-pack
+! https://stackoverflow.com/questions/18010820/git-the-meaning-of-object-size-returned-by-git-verify-pack
 TUPLE: pack magic version count objects sha1 ;
 : parse-pack ( path -- pack )
     binary [
@@ -424,3 +425,61 @@ ERROR: repeated-parent-hash hash ;
             ] [ f ] if*
         ] follow
     ] with-variable ;
+
+: filter-git-remotes ( seq -- seq' )
+    [ drop "remote" head? ] assoc-filter ;
+
+: github-git-remote? ( hash -- ? )
+    "url" of [ CHAR: / = ] trim-tail "git@github.com:" head? ;
+
+: github-https-remote? ( hash -- ? )
+    "url" of [ CHAR: / = ] trim-tail "https://github.com/" head? ;
+
+: github-git-remote-matches? ( hash owner repo -- ? )
+    [ "url" of [ CHAR: / = ] trim-tail ] 2dip "git@github.com:%s/%s" sprintf = ;
+
+: github-https-remote-matches? ( hash owner repo -- ? )
+    [ "url" of [ CHAR: / = ] trim-tail ] 2dip "https://github.com/%s/%s" sprintf = ;
+
+: git-remote? ( hash -- ? )
+    { [ github-git-remote? ] [ github-https-remote? ] } 1|| ;
+
+: git-remote-matches? ( hash owner repo -- ? )
+    { [ github-git-remote-matches? ] [ github-https-remote-matches? ] } 3|| ;
+
+: git-config-path ( -- path )
+    current-directory get find-git-directory "config" append-path ;
+
+: parse-git-config ( -- seq )
+    git-config-path utf8 file-contents string>ini >alist ;
+
+: has-any-git-at-urls? ( git-ini -- ? )
+    [ nip github-git-remote? ] assoc-any? ;
+
+: has-remote-repo? ( git-ini owner repo -- ? )
+    '[ nip _ _ git-remote-matches? ] assoc-filter f like ;
+
+: write-git-config ( seq -- )
+    ini>string git-config-path utf8 set-file-contents ;
+
+: ensure-git-remote ( owner repo -- )
+    [ parse-git-config ] 2dip
+    3dup has-remote-repo? [
+        3drop
+    ] [
+        [
+            pick has-any-git-at-urls? [
+                [ "git@github.com:%s/%s" sprintf ]
+                [ drop "+refs/heads/*:refs/remotes/%s/*" sprintf ] 2bi
+                '{ { "url" _ } { "fetch" _ } } >hashtable
+            ] [
+                [ "https://github.com/%s/%s" sprintf ]
+                [ drop "+refs/heads/*:refs/remotes/%s/*" sprintf ] 2bi
+                '{ { "url" _ } { "fetch" _ } } >hashtable
+            ] if
+        ] 2keep "_" glue "\"" dup surround "remote " prepend swap 2array
+        suffix write-git-config
+    ] if ;
+
+: ensure-pr-remote ( pr-json -- )
+    "head" of "repo" of "full_name" of "/" split first2 ensure-git-remote ;

@@ -1,5 +1,5 @@
 ! Copyright (C) 2009 Doug Coleman.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: calendar io.encodings.utf8 io.files robots tools.test
 urls ;
 

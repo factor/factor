@@ -1,5 +1,5 @@
 ! Copyright (C) 2008 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: classes help.markup help.syntax ;
 IN: http.server.dispatchers
 
@@ -23,7 +23,7 @@ HELP: <vhost-dispatcher>
 
 HELP: add-responder
 { $values
-     { "dispatcher" dispatcher } { "responder" "a responder" } { "path" "a pathname string or hostname" } }
+    { "dispatcher" dispatcher } { "responder" "a responder" } { "path" "a pathname string or hostname" } }
 { $description "Adds a responder to a dispatcher." }
 { $notes "The " { $snippet "path" } " parameter is interpreted differently depending on the dispatcher type." }
 { $side-effects "dispatcher" } ;

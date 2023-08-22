@@ -1,5 +1,5 @@
 ! Copyright (C) 2010 Doug Coleman.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors alien alien.c-types alien.data alien.libraries
 alien.syntax classes.struct sequences system unix.time
 unix.types vocabs ;
@@ -130,8 +130,8 @@ FUNCTION: int gethostname ( c-string name, int len )
 FUNCTION: int getsockname ( int socket, sockaddr* address, socklen_t* address_len )
 FUNCTION: int getpeername ( int socket, sockaddr* address, socklen_t* address_len )
 FUNCTION: protoent* getprotobyname ( c-string name )
-FUNCTION: servent* getservbyname ( c-string name, c-string prot )
-FUNCTION: servent* getservbyport ( int port, c-string prot )
+FUNCTION: servent* getservbyname ( c-string name, c-string proto )
+FUNCTION: servent* getservbyport ( int port, c-string proto )
 FUNCTION: uid_t getuid ( )
 FUNCTION: uint htonl ( uint n )
 FUNCTION: ushort htons ( ushort n )

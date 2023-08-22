@@ -1,9 +1,9 @@
 ! Copyright (C) 2006, 2010 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: alien.syntax cocoa cocoa.application cocoa.classes
 cocoa.dialogs cocoa.nibs cocoa.pasteboard cocoa.runtime
 cocoa.subclassing core-foundation.strings eval kernel listener
-locals memory namespaces system ui.backend.cocoa
+locals memory namespaces parser system ui.backend.cocoa
 ui.theme.switching ui.tools.browser ui.tools.listener
 vocabs.refresh ;
 FROM: alien.c-types => int void ;
@@ -45,6 +45,10 @@ IN: ui.backend.cocoa.tools
 
     METHOD: id switchDarkTheme: id app [ dark-mode f ] ;
 
+    METHOD: id switchWombatTheme: id app [ wombat-mode f ] ;
+
+    METHOD: id switchBase16Theme: id app [ base16-mode f ] ;
+
     METHOD: id refreshAll: id app [ [ refresh-all ] \ refresh-all call-listener f ] ;
 ;CLASS>
 
@@ -64,8 +68,11 @@ IN: ui.backend.cocoa.tools
 
     METHOD: void evalToString: id pboard userData: id userData error: id error
     [
-        pboard error
-        [ [ (eval>string) ] with-interactive-vocabs ] do-service
+        pboard error [
+            t auto-use? [
+                [ (eval-with-stack>string) ] with-interactive-vocabs
+            ] with-variable
+        ] do-service
     ] ;
 ;CLASS>
 

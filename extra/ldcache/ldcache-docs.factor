@@ -1,5 +1,5 @@
 ! Copyright (C) 2017 Björn Lindqvist.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: help.markup help.syntax strings ;
 IN: ldcache
 

@@ -1,10 +1,10 @@
 ! Copyright (C) 2018 Doug Coleman.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors alien.c-types classes.struct kernel math
 math.bitwise random sequences slots.syntax ;
 IN: random.xoshiro
 
-! http://xoshiro.di.unimi.it/xoshiro256starstar.c
+! https://xoshiro.di.unimi.it/xoshiro256starstar.c
 
 CONSTANT: JUMP-256 {
     0x180ec6d33cfd0aba

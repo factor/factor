@@ -1,0 +1,346 @@
+<?xml version="1.0"?>
+
+<!DOCTYPE MODE SYSTEM "xmode.dtd">
+
+<MODE>
+	<PROPS>
+		<PROPERTY NAME="commentStart" VALUE="&lt;!--" />
+		<PROPERTY NAME="commentEnd" VALUE="--&gt;" />
+	</PROPS>
+	<!-- {{{ MAIN -->
+	<RULES>
+		<SPAN TYPE="MARKUP" DELEGATE="SQL">
+			<BEGIN>&lt;transaction</BEGIN>
+			<END>&lt;/transaction&gt;</END>
+		</SPAN>
+		
+		<!-- ant variables -->
+		<SPAN TYPE="KEYWORD3">
+			<BEGIN>${</BEGIN>
+			<END>}</END>
+		</SPAN>
+		
+		<!-- SGML comment -->
+		<SPAN TYPE="COMMENT1">
+			<BEGIN>&lt;!--</BEGIN>
+			<END>--&gt;</END>
+		</SPAN>
+
+		<!-- DTD Entity declarations -->
+		<SPAN TYPE="KEYWORD2" DELEGATE="ENTITY-TAGS">
+			<BEGIN>&lt;!ENTITY</BEGIN>
+			<END>&gt;</END>
+		</SPAN>
+
+		<!-- CDATA sections -->
+		<SPAN TYPE="KEYWORD2" DELEGATE="CDATA">
+			<BEGIN>&lt;![CDATA[</BEGIN>
+			<END>]]&gt;</END>
+		</SPAN>
+
+		<!-- DTD instructions -->
+		<SPAN TYPE="KEYWORD2" DELEGATE="DTD-TAGS">
+			<BEGIN>&lt;!</BEGIN>
+			<END>&gt;</END>
+		</SPAN>
+
+		<!-- PI directives -->
+		<SPAN TYPE="KEYWORD3">
+			<BEGIN>&lt;?</BEGIN>
+			<END>&gt;</END>
+		</SPAN>
+
+		<!-- markup tags -->
+		<SPAN TYPE="MARKUP" DELEGATE="TAGS">
+			<BEGIN>&lt;</BEGIN>
+			<END>&gt;</END>
+		</SPAN>
+
+		<!-- SGML entities -->
+		<SPAN TYPE="LITERAL2" NO_WORD_BREAK="TRUE">
+			<BEGIN>&amp;</BEGIN>
+			<END>;</END>
+		</SPAN>
+	</RULES>
+	<!-- }}} -->
+	
+	<!-- {{{ TAGS -->
+	<RULES SET="TAGS" DEFAULT="MARKUP" NO_WORD_SEP="-_">
+		<!-- SGML comment -->
+		<SPAN TYPE="COMMENT1">
+			<BEGIN>&lt;!--</BEGIN>
+			<END>--&gt;</END>
+		</SPAN>
+
+		<SPAN TYPE="LITERAL1" DELEGATE="STRING">
+			<BEGIN>"</BEGIN>
+			<END>"</END>
+		</SPAN>
+
+		<SPAN TYPE="LITERAL1" DELEGATE="STRING">
+			<BEGIN>'</BEGIN>
+			<END>'</END>
+		</SPAN>
+
+		<SEQ TYPE="MARKUP" DELEGATE="STRING">"</SEQ>
+
+		<SEQ TYPE="MARKUP" DELEGATE="ant::MAIN">/></SEQ>
+		<MARK_PREVIOUS TYPE="LABEL">:</MARK_PREVIOUS>
+		<SEQ TYPE="OPERATOR">:</SEQ>
+		<KEYWORDS>
+			<KEYWORD1>target</KEYWORD1>
+			
+			<KEYWORD2>project</KEYWORD2>
+			
+			<KEYWORD3>description</KEYWORD3>
+			<KEYWORD3>loadfile</KEYWORD3>
+			<KEYWORD3>loadproperties</KEYWORD3>
+			<KEYWORD3>property</KEYWORD3>
+			<KEYWORD3>xmlproperty</KEYWORD3>
+			
+			<KEYWORD4>fileset</KEYWORD4>
+			<KEYWORD4>filelist</KEYWORD4>
+			<KEYWORD4>include</KEYWORD4>
+			<KEYWORD4>exclude</KEYWORD4>
+			<KEYWORD4>filter</KEYWORD4>
+			<KEYWORD4>filterchain</KEYWORD4>
+			<KEYWORD4>path</KEYWORD4>
+			<KEYWORD4>pathelement</KEYWORD4>
+			<KEYWORD4>classpath</KEYWORD4>
+         
+         <!-- condition subelements -->
+         <KEYWORD4>istrue</KEYWORD4>
+			
+			<OPERATOR>equals</OPERATOR>
+			<OPERATOR>and</OPERATOR>
+			<OPERATOR>or</OPERATOR>
+			<OPERATOR>not</OPERATOR>
+			<OPERATOR>=</OPERATOR>
+			
+			<!-- basic file tasks -->
+			<FUNCTION>chmod</FUNCTION>
+			<FUNCTION>checksum</FUNCTION>
+			<FUNCTION>concat</FUNCTION>
+			<FUNCTION>copy</FUNCTION>
+			<FUNCTION>delete</FUNCTION>
+			<FUNCTION>echo</FUNCTION>
+			<FUNCTION>exec</FUNCTION>
+			<FUNCTION>import</FUNCTION>
+			<FUNCTION>input</FUNCTION>
+			<FUNCTION>mkdir</FUNCTION>
+			<FUNCTION>move</FUNCTION>
+			<FUNCTION>patch</FUNCTION>
+			<FUNCTION>tempfile</FUNCTION>
+			<FUNCTION>touch</FUNCTION>
+			
+			<!-- java specific tasks -->
+			<FUNCTION>java</FUNCTION>
+			<FUNCTION>javac</FUNCTION>
+			<FUNCTION>javadoc</FUNCTION>
+			<FUNCTION>junit</FUNCTION>
+			<FUNCTION>rmic</FUNCTION>
+			<FUNCTION>signjar</FUNCTION>
+			
+			<!-- archive tasks -->
+			<FUNCTION>bzip2</FUNCTION>
+			<FUNCTION>bunzip2</FUNCTION>
+			<FUNCTION>ear</FUNCTION>
+			<FUNCTION>gzip</FUNCTION>
+			<FUNCTION>gunzip</FUNCTION>
+			<FUNCTION>jar</FUNCTION>
+			<FUNCTION>unjar</FUNCTION>
+			<FUNCTION>manifest</FUNCTION>
+			<FUNCTION>tar</FUNCTION>
+			<FUNCTION>untar</FUNCTION>
+			<FUNCTION>war</FUNCTION>
+			<FUNCTION>unwar</FUNCTION>
+			<FUNCTION>zip</FUNCTION>
+			<FUNCTION>unzip</FUNCTION>
+			
+			<!-- execution tasks -->
+			<FUNCTION>ant</FUNCTION>
+			<FUNCTION>antcall</FUNCTION>
+			<FUNCTION>apply</FUNCTION>
+			<FUNCTION>dependset</FUNCTION>
+			<FUNCTION>fail</FUNCTION>
+			<FUNCTION>parallel</FUNCTION>
+			<FUNCTION>sequential</FUNCTION>
+			<FUNCTION>sleep</FUNCTION>
+			<FUNCTION>waitfor</FUNCTION>
+			
+			<!-- misc tasks -->
+			<FUNCTION>antstructure</FUNCTION>
+			<FUNCTION>available</FUNCTION>
+         <FUNCTION>condition</FUNCTION>
+			<FUNCTION>cvs</FUNCTION>
+			<FUNCTION>cvschangelog</FUNCTION>
+			<FUNCTION>cvspass</FUNCTION>
+			<FUNCTION>cvstagdiff</FUNCTION>
+			<FUNCTION>get</FUNCTION>
+			<FUNCTION>mail</FUNCTION>
+			<FUNCTION>replace</FUNCTION>
+			<FUNCTION>sql</FUNCTION>
+			<FUNCTION>style</FUNCTION>
+			<FUNCTION>taskdef</FUNCTION>
+			<FUNCTION>tstamp</FUNCTION>
+			<FUNCTION>typedef</FUNCTION>
+			<FUNCTION>xslt</FUNCTION>
+         
+         <!-- antelope tasks -->
+			<FUNCTION>assert</FUNCTION>
+			<FUNCTION>call</FUNCTION>
+			<FUNCTION>else</FUNCTION>
+			<FUNCTION>find</FUNCTION>
+			<FUNCTION>grep</FUNCTION>
+			<FUNCTION>if</FUNCTION>
+			<FUNCTION>new</FUNCTION>
+			<FUNCTION>post</FUNCTION>
+			<FUNCTION>repeat</FUNCTION>
+			<FUNCTION>suite</FUNCTION>
+			<FUNCTION>testcase</FUNCTION>
+			<FUNCTION>unset</FUNCTION>
+			<FUNCTION>var</FUNCTION>
+			
+			<!-- deprecated tasks -->
+			<INVALID>copydir</INVALID>
+			<INVALID>copyfile</INVALID>
+			<INVALID>deltree</INVALID>
+			<INVALID>execOn</INVALID>
+			<INVALID>javadoc2</INVALID>
+			<INVALID>rename</INVALID>
+		</KEYWORDS>
+	</RULES>
+	<!-- }}} -->
+	
+	<!-- {{{ DTD-TAGS -->
+	<RULES SET="DTD-TAGS" DEFAULT="KEYWORD2" IGNORE_CASE="FALSE">
+		<!-- SGML comment -->
+		<SPAN TYPE="COMMENT1">
+			<BEGIN>&lt;!--</BEGIN>
+			<END>--&gt;</END>
+		</SPAN>
+
+		<!-- SGML comment -->
+		<SPAN TYPE="COMMENT1">
+			<BEGIN>--</BEGIN>
+			<END>--</END>
+		</SPAN>
+
+		<!-- Parameter entities -->
+		<SPAN TYPE="LITERAL2" NO_WORD_BREAK="TRUE">
+			<BEGIN>%</BEGIN>
+			<END>;</END>
+		</SPAN>
+
+		<SPAN TYPE="LITERAL1">
+			<BEGIN>"</BEGIN>
+			<END>"</END>
+		</SPAN>
+
+		<SPAN TYPE="LITERAL1">
+			<BEGIN>'</BEGIN>
+			<END>'</END>
+		</SPAN>
+
+		<!-- This appears in some SGML documents -->
+		<SPAN TYPE="KEYWORD2" DELEGATE="MAIN">
+			<BEGIN>[</BEGIN>
+			<END>]</END>
+		</SPAN>
+
+		<SEQ TYPE="OPERATOR">(</SEQ>
+		<SEQ TYPE="OPERATOR">)</SEQ>
+		<SEQ TYPE="OPERATOR">|</SEQ>
+		<SEQ TYPE="OPERATOR">?</SEQ>
+		<SEQ TYPE="OPERATOR">*</SEQ>
+		<SEQ TYPE="OPERATOR">+</SEQ>
+		<SEQ TYPE="OPERATOR">,</SEQ>
+
+		<KEYWORDS>
+			<KEYWORD1>CDATA</KEYWORD1>
+			<KEYWORD1>EMPTY</KEYWORD1>
+			<KEYWORD1>INCLUDE</KEYWORD1>
+			<KEYWORD1>IGNORE</KEYWORD1>
+			<KEYWORD1>NDATA</KEYWORD1>
+			<KEYWORD1>#IMPLIED</KEYWORD1>
+			<KEYWORD1>#PCDATA</KEYWORD1>
+			<KEYWORD1>#REQUIRED</KEYWORD1>
+		</KEYWORDS>
+	</RULES>
+	<!-- }}} -->
+	
+	<!-- {{{ ENTITY-TAGS -->
+	<RULES SET="ENTITY-TAGS" DEFAULT="KEYWORD2">
+		<!-- SGML comment -->
+		<SPAN TYPE="COMMENT1">
+			<BEGIN>&lt;!--</BEGIN>
+			<END>--&gt;</END>
+		</SPAN>
+
+		<!-- SGML comment -->
+		<SPAN TYPE="COMMENT1">
+			<BEGIN>--</BEGIN>
+			<END>--</END>
+		</SPAN>
+
+		<SPAN TYPE="LITERAL1">
+			<BEGIN>"</BEGIN>
+			<END>"</END>
+		</SPAN>
+
+		<SPAN TYPE="LITERAL1">
+			<BEGIN>'</BEGIN>
+			<END>'</END>
+		</SPAN>
+
+		<SEQ TYPE="OPERATOR">=</SEQ>
+
+		<SEQ TYPE="OPERATOR">%</SEQ>
+
+		<KEYWORDS>
+			<KEYWORD1>SYSTEM</KEYWORD1>
+		</KEYWORDS>
+	</RULES>
+	<!-- }}} -->
+	
+	<!-- {{{ CDATA -->
+	<RULES SET="CDATA" DEFAULT="COMMENT2">
+		<!-- no rules -->
+	</RULES>
+	<!-- }}} -->
+	
+	<!-- {{{ STRING -->
+	<RULES SET="STRING" DEFAULT="LITERAL1">
+		<!-- ant property -->
+		<SPAN TYPE="KEYWORD3">
+			<BEGIN>${</BEGIN>
+			<END>}</END>
+		</SPAN>
+
+		<SPAN TYPE="LITERAL2" NO_WORD_BREAK="TRUE">
+			<BEGIN>&amp;</BEGIN>
+			<END>;</END>
+		</SPAN>
+		<KEYWORDS>
+			<LITERAL2>true</LITERAL2>
+			<LITERAL2>yes</LITERAL2>
+			<LITERAL2>false</LITERAL2>
+		</KEYWORDS>
+	</RULES>
+	<!-- }}} -->
+	
+	<RULES SET="SQL" DEFAULT="MARKUP">
+		<SEQ TYPE="MARKUP" DELEGATE="MAIN">/&gt;</SEQ>
+		<!--
+      <SEQ TYPE="MARKUP" DELEGATE="MySQL::MAIN">&gt;</SEQ>
+      -->
+		<!-- handle <transaction src="..."> properly -->
+		<SEQ TYPE="MARKUP" DELEGATE="BACK_TO_XML"> </SEQ>
+	</RULES>
+	
+	<RULES SET="BACK_TO_XML" DEFAULT="MARKUP">
+		<SEQ TYPE="MARKUP" DELEGATE="ant::TAGS">&gt;</SEQ>
+	</RULES>
+</MODE>
+
+ 	  	 

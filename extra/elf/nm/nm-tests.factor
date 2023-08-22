@@ -1,5 +1,5 @@
 ! Copyright (C) 2010 Erik Charlebois.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: elf.nm io io.streams.string kernel literals multiline strings
 system tools.test ;
 IN: elf.nm.tests

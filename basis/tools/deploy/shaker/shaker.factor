@@ -1,5 +1,5 @@
 ! Copyright (C) 2007, 2010 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors alien.libraries arrays assocs byte-arrays
 classes classes.builtin classes.private combinators
 combinators.private command-line compiler.crossref
@@ -98,7 +98,7 @@ IN: tools.deploy.shaker
     ] when ;
 
 : strip-gtk-icon ( -- )
-    "ui.backend.gtk" lookup-vocab [
+    "ui.backend.gtk2" lookup-vocab [
         "Stripping GTK icon loading code" show
         "vocab:tools/deploy/shaker/strip-gtk-icon.factor"
         run-file

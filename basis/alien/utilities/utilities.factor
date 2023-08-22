@@ -1,5 +1,5 @@
 ! Copyright (C) 2008 Doug Coleman.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: alien alien.c-types alien.data alien.strings
 combinators.short-circuit kernel layouts sequences
 specialized-arrays ;
@@ -7,14 +7,14 @@ IN: alien.utilities
 
 SPECIALIZED-ARRAY: void*
 
-: more? ( alien -- ? )
+: deref? ( alien -- ? )
     { [ ] [ void* deref ] } 1&& ;
 
 : advance ( void* -- void* )
     cell swap <displaced-alien> ;
 
 : alien>strings ( alien encoding -- strings )
-    [ [ dup more? ] ] dip
+    [ [ dup deref? ] ] dip
     '[ [ advance ] [ void* deref _ alien>string ] bi ]
     produce nip ;
 

@@ -1,5 +1,5 @@
 ! Copyright (C) 2008 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors alien.c-types alien.data combinators
 destructors io.backend.unix libc kernel math.bitwise sequences
 specialized-arrays unix unix.kqueue unix.time assocs
@@ -51,10 +51,10 @@ M: kqueue-mx remove-input-callbacks
 
 M: kqueue-mx remove-output-callbacks
     2dup writes>> key? [
-        [
+        [ call-next-method ] [
             [ EVFILT_WRITE EV_DELETE make-kevent ] dip
             register-kevent
-        ] [ call-next-method ] 2bi
+        ] 2bi
     ] [ 2drop f ] if ;
 
 : wait-kevent ( mx timespec -- n )

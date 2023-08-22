@@ -1,5 +1,5 @@
 ! Copyright (C) 2008 Doug Coleman.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors combinators io.files.types kernel math.parser
 sequences splitting ;
 IN: ftp.client.listing-parser

@@ -1,5 +1,5 @@
 ! Copyright (C) 2004, 2010 Mackenzie Straight, Doug Coleman.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: io.backend namespaces system vocabs ;
 IN: io.backend.windows
 

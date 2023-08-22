@@ -1,5 +1,5 @@
 ! Copyright (C) 2007, 2009 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: assocs kernel kernel.private math math.order namespaces ;
 IN: layouts
 

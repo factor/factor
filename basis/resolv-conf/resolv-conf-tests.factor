@@ -1,5 +1,5 @@
 ! Copyright (C) 2019 Doug Coleman.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: tools.test resolv-conf ;
 IN: resolv-conf.tests
 {
@@ -16,3 +16,4 @@ IN: resolv-conf.tests
     options edns0
     search localdomain" string>resolv.conf
 ] unit-test
+

@@ -1,5 +1,5 @@
 ! Copyright (C) 2005, 2008 Chris Double, Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors concurrency.mailboxes concurrency.promises
 kernel ;
 IN: concurrency.futures

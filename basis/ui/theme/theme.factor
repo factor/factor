@@ -1,6 +1,6 @@
 ! Copyright (C) 2016 Nicolas Pénet.
-! See http://factorcode.org/license.txt for BSD license.
-USING: colors namespaces ;
+! See https://factorcode.org/license.txt for BSD license.
+USING: colors delegate namespaces ;
 IN: ui.theme
 
 SYMBOL: theme
@@ -67,6 +67,7 @@ HOOK: deprecated-border-color theme ( -- color )
 HOOK: warning-background-color theme ( -- color )
 HOOK: warning-border-color theme ( -- color )
 HOOK: code-background-color theme ( -- color )
+HOOK: code-border-color theme ( -- color )
 HOOK: help-path-border-color theme ( -- color )
 
 HOOK: tip-background-color theme ( -- color )
@@ -91,6 +92,37 @@ HOOK: focus-border-color theme ( -- color )
 HOOK: labeled-border-color theme ( -- color )
 
 HOOK: table-border-color theme ( -- color )
+
+! Protocol
+
+PROTOCOL: theme-protocol
+toolbar-background toolbar-button-pressed-background
+menu-background menu-border-color status-bar-background
+status-bar-foreground button-text-color
+button-clicked-text-color line-color column-title-background
+roll-button-rollover-border roll-button-selected-background
+source-files-color errors-color details-color debugger-color
+completion-color data-stack-color retain-stack-color
+call-stack-color title-bar-gradient popup-color object-color
+contents-color help-header-background
+thread-status-stopped-background
+thread-status-suspended-background
+thread-status-running-background
+thread-status-stopped-foreground
+thread-status-suspended-foreground
+thread-status-running-foreground error-summary-background
+content-background text-color link-color title-color
+heading-color snippet-color output-color
+deprecated-background-color deprecated-border-color
+warning-background-color warning-border-color
+code-background-color code-border-color help-path-border-color
+tip-background-color prompt-background-color dim-color
+highlighted-word-color string-color stack-effect-color
+vocab-background-color vocab-border-color field-border-color
+editor-caret-color selection-color panel-background-color
+focus-border-color labeled-border-color table-border-color ;
+
+! Light theme
 
 SINGLETON: light-theme
 theme [ light-theme ] initialize
@@ -157,6 +189,7 @@ M: light-theme deprecated-border-color COLOR: #F37B00 ;
 M: light-theme warning-background-color COLOR: #F4D9D9 ;
 M: light-theme warning-border-color COLOR: #F42300 ;
 M: light-theme code-background-color COLOR: FactorLightTan ;
+M: light-theme code-border-color COLOR: FactorTan ;
 M: light-theme help-path-border-color COLOR: grey95 ;
 
 M: light-theme tip-background-color COLOR: lavender ;
@@ -167,9 +200,6 @@ M: light-theme dim-color COLOR: gray35 ;
 M: light-theme highlighted-word-color COLOR: DarkSlateGray ;
 M: light-theme string-color COLOR: LightSalmon4 ;
 M: light-theme stack-effect-color COLOR: FactorDarkSlateBlue ;
-
-M: light-theme vocab-background-color COLOR: FactorLightTan ;
-M: light-theme vocab-border-color COLOR: FactorDarkTan ;
 
 M: light-theme field-border-color COLOR: gray ;
 
@@ -246,6 +276,7 @@ M: dark-theme deprecated-border-color COLOR: solarized-yellow ;
 M: dark-theme warning-background-color COLOR: #492d33 ;
 M: dark-theme warning-border-color COLOR: solarized-red ;
 M: dark-theme code-background-color COLOR: #2F4D5B ;
+M: dark-theme code-border-color COLOR: #666666 ;
 M: dark-theme help-path-border-color COLOR: solarized-base02 ;
 
 M: dark-theme tip-background-color COLOR: #2F4D5B ;
@@ -256,9 +287,6 @@ M: dark-theme dim-color COLOR: solarized-cyan ;
 M: dark-theme highlighted-word-color COLOR: solarized-green ;
 M: dark-theme string-color COLOR: solarized-magenta ;
 M: dark-theme stack-effect-color COLOR: solarized-orange ;
-
-M: dark-theme vocab-background-color COLOR: solarized-base01 ;
-M: dark-theme vocab-border-color COLOR: solarized-base01 ;
 
 M: dark-theme field-border-color COLOR: solarized-base01 ;
 

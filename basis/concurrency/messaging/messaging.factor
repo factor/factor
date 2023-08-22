@@ -1,5 +1,5 @@
 ! Copyright (C) 2005, 2010 Chris Double, Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors concurrency.mailboxes kernel kernel.private
 namespaces summary threads ;
 IN: concurrency.messaging
@@ -9,7 +9,7 @@ GENERIC: send ( message thread -- )
 GENERIC: mailbox-of ( thread -- mailbox )
 
 M: thread mailbox-of
-    dup mailbox>>
+    [ mailbox>> ]
     [ { mailbox } declare ]
     [ <mailbox> [ >>mailbox drop ] keep ] ?if ; inline
 

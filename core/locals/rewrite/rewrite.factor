@@ -1,5 +1,5 @@
 ! Copyright (C) 2007, 2008 Slava Pestov, Eduardo Cavazos.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs classes classes.tuple combinators
 fry.private hashtables kernel locals.backend locals.errors
 locals.types macros.expander make math memoize.private

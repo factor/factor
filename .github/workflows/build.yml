@@ -6,6 +6,9 @@ on:
   pull_request:
     branches: [ master ]
 
+permissions:
+  contents: read
+
 jobs:
   build-linux:
     runs-on: ubuntu-latest
@@ -32,3 +35,18 @@ jobs:
       run: './factor -run=tools.test resource:core'
     - name: help-lint
       run: './factor -run=help.lint resource:core resource:basis'
+
+  build-windows:
+    runs-on: windows-latest
+    steps:
+    - uses: actions/checkout@v2
+    - uses: ilammy/msvc-dev-cmd@v1
+    - name: build
+      shell: cmd
+      run: build.cmd net-bootstrap
+    - name: load-all
+      shell: cmd
+      run: 'factor -e="USING: memory namespaces parser.notes vocabs.hierarchy ; parser-quiet? off load-all save"'
+    - name: test
+      shell: cmd
+      run: 'factor -run=tools.test resource:core'

@@ -1,5 +1,5 @@
 ! Copyright (C) 2005, 2010 Slava Pestov, Joe Groff.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: arrays endian kernel combinators
 combinators.short-circuit math math.bitwise locals namespaces
 make sequences words system layouts math.order accessors

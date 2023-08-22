@@ -1,5 +1,5 @@
 ! Copyright (C) 2004, 2010 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 IN: http.server.static
 DEFER: file-responder ! necessary for cgi-docs
 DEFER: <static> ! necessary for cgi-docs
@@ -52,7 +52,7 @@ TUPLE: file-responder root hook special index-names allow-listings ;
 
 : serve-file ( filename -- response )
     dup mime-type
-    dup file-responder get special>> at
+    [ file-responder get special>> at ]
     [ call( filename -- response ) ] [ serve-static ] ?if ;
 
 \ serve-file NOTICE add-input-logging
@@ -110,30 +110,30 @@ TUPLE: file-responder root hook special index-names allow-listings ;
 
 : sort-orders ( -- CO-N CO-M CO-S )
     "N" "M" "S" sort-column [
-        [ drop "?C=" ";O=" surround ]
+        [ drop "?C=" "&O=" surround ]
         [ ?toggle-sort-order ] 2bi append
     ] curry tri@ ;
 
-: listing-sort-with ( seq quot: ( elt -- key ) -- sortedseq )
-    sort-with sort-asc? [ reverse ] unless ; inline
+: listing-sort-by ( seq quot: ( elt -- key ) -- sortedseq )
+    sort-by sort-asc? [ reverse ] unless ; inline
 
-: sort-with-name ( {file,info} -- sorted )
-    [ first ] listing-sort-with ;
+: sort-by-name ( {file,info} -- sorted )
+    [ first ] listing-sort-by ;
 
-: sort-with-modified ( {file,info} -- sorted )
-    [ second modified>> ] listing-sort-with ;
+: sort-by-modified ( {file,info} -- sorted )
+    [ second modified>> ] listing-sort-by ;
 
 : size-without-directories ( info -- size )
     dup directory? [ drop -1 ] [ size>> ] if ;
 
-: sort-with-size ( {file,info} -- sorted )
-    [ second size-without-directories ] listing-sort-with ;
+: sort-by-size ( {file,info} -- sorted )
+    [ second size-without-directories ] listing-sort-by ;
 
 : sort-listing ( zipped-files-infos -- sorted )
     sort-column {
-        { "M" [ sort-with-modified ] }
-        { "S" [ sort-with-size ] }
-        [ drop sort-with-name ]
+        { "M" [ sort-by-modified ] }
+        { "S" [ sort-by-size ] }
+        [ drop sort-by-name ]
     } case ; inline
 
 : zip-files-infos ( files -- zipped )
@@ -164,8 +164,7 @@ TUPLE: file-responder root hook special index-names allow-listings ;
 
 : serve-directory ( filename -- response )
     url get path>> "/" tail? [
-        dup
-        find-index [ serve-file ] [ list-directory ] ?if
+        [ find-index ] [ serve-file ] [ list-directory ] ?if
     ] [
         drop
         url get clone [ "/" append ] change-path <permanent-redirect>

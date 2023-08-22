@@ -1,9 +1,10 @@
 ! Copyright (C) 2008, 2011 Eduardo Cavazos, Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
-USING: arrays calendar combinators continuations io.directories
-io.pathnames kernel mason.child mason.cleanup mason.common
-mason.config mason.docs mason.git mason.notify mason.platform
-mason.release mason.updates namespaces sequences ;
+! See https://factorcode.org/license.txt for BSD license.
+USING: arrays calendar combinators continuations io.backend
+io.directories io.pathnames kernel mason.child mason.cleanup
+mason.common mason.config mason.docs mason.git mason.notify
+mason.platform mason.release mason.updates namespaces sequences
+;
 IN: mason.build
 
 : create-build-dir ( -- )
@@ -16,7 +17,7 @@ IN: mason.build
 
 : clone-source ( -- )
     "Cloning GIT repository" print-timestamp
-    "git" "clone" builds-dir get "factor" append-path 3array
+    "git" "clone" builds-dir get "factor" append-path absolute-path 3array
     short-running-process ;
 
 : copy-image ( -- )

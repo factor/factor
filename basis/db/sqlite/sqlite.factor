@@ -1,5 +1,5 @@
 ! Copyright (C) 2005, 2008 Chris Double, Doug Coleman.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors classes.tuple combinators db db.private db.queries
 db.sqlite.errors db.sqlite.ffi db.sqlite.lib db.tuples
 db.tuples.private db.types destructors interpolate kernel math
@@ -260,7 +260,7 @@ M: sqlite-db-connection persistent-table
     "sql-spec" get modifiers>> [ +not-null+ = ] none? ;
 
 : delete-cascade? ( -- ? )
-    "sql-spec" get modifiers>> { +on-delete+ +cascade+ } swap subseq? ;
+    "sql-spec" get modifiers>> { +on-delete+ +cascade+ } subseq-of? ;
 
 : sqlite-trigger, ( string -- )
     { } { } <simple-statement> 3, ;

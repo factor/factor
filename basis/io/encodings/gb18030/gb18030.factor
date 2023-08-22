@@ -1,5 +1,5 @@
 ! Copyright (C) 2009 Daniel Ehrenberg
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors arrays ascii assocs biassocs byte-arrays
 combinators combinators.short-circuit interval-maps io
 io.encodings io.encodings.iana io.files kernel math
@@ -17,10 +17,10 @@ gb18030 "GB18030" register-encoding
 ! GB to mean GB18030 is a terrible abuse of notation
 
 ! Resource file from:
-! http://source.icu-project.org/repos/icu/data/trunk/charset/data/xml/gb-18030-2000.xml
+! https://source.icu-project.org/repos/icu/data/trunk/charset/data/xml/gb-18030-2000.xml
 
 ! Algorithms from:
-! http://www-128.ibm.com/developerworks/library/u-china.html
+! https://www-128.ibm.com/developerworks/library/u-china.html
 
 : linear ( bytes -- num )
     ! This hard-codes bMin and bMax
@@ -95,8 +95,7 @@ ascii <file-reader> xml>gb-data
 
 M: gb18030 encode-char
     drop [
-        dup mapping get-global at
-        [ ] [ lookup-range ] ?if
+        [ mapping get-global at ] [ lookup-range ] ?unless
     ] dip stream-write ;
 
 : second-byte? ( ch -- ? ) ! of a double-byte character
@@ -110,11 +109,11 @@ M: gb18030 encode-char
     { [ length 2 = ] [ first quad-1/3? ] [ second quad-2/4? ] } 1&& ;
 
 : decode-quad ( byte-array -- char )
-    dup mapping get-global value-at [ ] [
+    [ mapping get-global value-at ] [
         linear dup gb>u get-global interval-at [
             [ bfirst>> - ] [ ufirst>> ] bi +
         ] [ drop replacement-char ] if*
-    ] ?if ;
+    ] ?unless ;
 
 : four-byte ( stream byte1 byte2 -- char )
     rot 2 swap stream-read dup last-bytes?

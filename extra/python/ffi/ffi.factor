@@ -3,7 +3,7 @@ alien.libraries.finder alien.syntax classes.struct ;
 IN: python.ffi
 
 << "python"
-{ "python3.10" "python3.9" "python3.8" "python3.7" } find-library-from-list
+{ "python3.12" "python3.11" "python3.10" "python3.9" "python3.8" "python3.7" } find-library-from-list
 cdecl add-library >>
 
 ! Functions that return borrowed references needs to be called like this:
@@ -197,11 +197,11 @@ FUNCTION: PyObject* PyNumber_ToBase ( PyObject* o1, int base )
 
 ! Bytes
 FUNCTION: c-string PyBytes_AsString ( PyObject* string )
-FUNCTION: PyObject* PyBytes_FromStringAndSize ( c-string v, Py_ssize_t size  )
+FUNCTION: PyObject* PyBytes_FromStringAndSize ( c-string v, Py_ssize_t size )
 
 ! Strings
 FUNCTION: c-string PyUnicode_AsUTF8 ( PyObject* unicode )
-FUNCTION: PyObject* PyUnicode_FromStringAndSize ( c-string v, Py_ssize_t size  )
+FUNCTION: PyObject* PyUnicode_FromStringAndSize ( c-string v, Py_ssize_t size )
 FUNCTION: PyObject* PyUnicode_FromString ( c-string v )
 
 ! Ints

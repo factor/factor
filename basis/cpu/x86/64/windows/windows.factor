@@ -1,5 +1,5 @@
 ! Copyright (C) 2008, 2010 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: kernel layouts system math alien.c-types sequences
 compiler.cfg.registers cpu.architecture cpu.x86.assembler
 cpu.x86 cpu.x86.64 cpu.x86.assembler.operands ;

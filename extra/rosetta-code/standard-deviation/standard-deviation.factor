@@ -1,10 +1,10 @@
 ! Copyright (c) 2012 Anonymous
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors io kernel math math.functions math.parser
 sequences ;
 IN: rosetta-code.standard-deviation
 
-! http://rosettacode.org/wiki/Standard_deviation
+! https://rosettacode.org/wiki/Standard_deviation
 
 ! Write a stateful function, class, generator or coroutine that
 ! takes a series of floating point numbers, one at a time, and

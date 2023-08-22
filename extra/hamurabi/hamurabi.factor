@@ -1,5 +1,5 @@
 ! Copyright (C) 2010 John Benediktsson
-! See http://factorcode.org/license.txt for BSD license
+! See https://factorcode.org/license.txt for BSD license
 
 USING: accessors combinators combinators.short-circuit
 continuations formatting io kernel math math.functions

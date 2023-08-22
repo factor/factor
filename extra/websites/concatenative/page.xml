@@ -7,6 +7,9 @@
         <head>
             <meta name="viewport" content="width=device-width, initial-scale=1" charset="utf-8" />
 
+            <meta name="theme-color" content="#f5f5f5" media="(prefers-color-scheme: light)" />
+            <meta name="theme-color" content="#373e48" media="(prefers-color-scheme: dark)" />
+
             <t:write-title />
 
             <t:style t:include="resource:basis/xmode/code2html/stylesheet.css" />

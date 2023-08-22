@@ -1,5 +1,5 @@
 ! Copyright (C) 2008, 2009 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs classes classes.algebra
 combinators debugger definitions effects effects.parser io
 kernel make math math.order namespaces parser prettyprint
@@ -52,7 +52,7 @@ SYMBOL: total
 
         [ [ canonicalize-specializer-1 ] dip ] assoc-map
 
-        hooks [ natural-sort ] change
+        hooks [ sort ] change
 
         [ [ canonicalize-specializer-2 ] dip ] assoc-map
 
@@ -71,7 +71,7 @@ SYMBOL: total
 : prepare-methods ( methods -- methods' prologue )
     canonicalize-specializers
     [ length [ prepare-method ] curry assoc-map ] keep
-    [ [ get ] curry ] map concat [ ] like ;
+    [ [ get ] curry ] map [ ] concat-as ;
 
 ! Part II: Topologically sorting specializers
 : maximal-element ( seq quot -- n elt )
@@ -117,7 +117,7 @@ SYMBOL: total
     [ drop object eq? ] assoc-reject
     [ [ t ] ] [
         [ (multi-predicate) ] { } assoc>map
-        unclip [ swap [ f ] \ if 3array append [ ] like ] reduce
+        unclip [ swap [ f ] \ if 3array [ ] append-as ] reduce
     ] if-empty ;
 
 : argument-count ( methods -- n )
@@ -254,7 +254,7 @@ PREDICATE: method-spec < array
     unclip generic? [ [ class? ] all? ] dip and ;
 
 syntax:M: method-spec where
-    dup unclip method [ ] [ first ] ?if where ;
+    dup unclip method or* [ first ] unless where ;
 
 syntax:M: method-spec set-where
     unclip method set-where ;

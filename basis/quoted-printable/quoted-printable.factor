@@ -1,5 +1,5 @@
 ! Copyright (C) 2009 Daniel Ehrenberg
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: sequences strings kernel io.encodings.string
 math.order ascii math io io.encodings.utf8 io.streams.string
 combinators.short-circuit math.parser arrays ;
@@ -47,9 +47,9 @@ PRIVATE>
 
 : read-char ( byte -- ch )
     dup CHAR: = = [
-       drop read1 dup CHAR: \n =
-       [ drop read1 read-char ]
-       [ read1 2array hex> ] if
+        drop read1 dup CHAR: \n =
+        [ drop read1 read-char ]
+        [ read1 2array hex> ] if
     ] when ;
 
 : read-quoted ( -- bytes )

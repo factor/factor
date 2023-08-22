@@ -1,7 +1,7 @@
 USING: arrays assocs combinators combinators.short-circuit
-grouping io.encodings.utf8 io.files io.streams.null kernel
-locals math math.parser quotations random sequences splitting
-splitting.extras strings tools.test unicode
+grouping http.client io.encodings.utf8 io.files io.files.temp
+io.streams.null kernel locals math math.parser quotations random
+sequences splitting splitting.extras strings tools.test unicode
 unicode.normalize.private ;
 IN: unicode.normalize.tests
 
@@ -27,8 +27,9 @@ IN: unicode.normalize.tests
 
 ! Could use simple-flat-file after some cleanup
 : parse-normalization-tests ( -- tests )
-    "vocab:unicode/UCD/NormalizationTest.txt" utf8 file-lines
-    [ "#" head? ] reject
+    "https://downloads.factorcode.org/misc/UCD/NormalizationTest.txt"
+    "NormalizationTest.txt" cache-file [ ?download-to ] keep
+    utf8 file-lines [ "#" head? ] reject
     [ "@" head? ] split*-when
     2 <groups> [ first2 [ first ] dip 2array ] map
     values [

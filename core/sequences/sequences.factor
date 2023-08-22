@@ -1,5 +1,5 @@
 ! Copyright (C) 2005, 2011 Slava Pestov, Daniel Ehrenberg.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors kernel kernel.private math math.order
 math.private slots.private ;
 IN: sequences
@@ -15,6 +15,14 @@ GENERIC: new-resizable ( len seq -- newseq ) flushable
 GENERIC: like ( seq exemplar -- newseq ) flushable
 GENERIC: clone-like ( seq exemplar -- newseq ) flushable
 
+: lengthd ( seq obj -- n obj ) [ length ] dip ; inline
+
+: new-sequence-like ( len-exemplar type-exemplar -- newseq )
+    lengthd new-sequence ; inline
+
+: new-resizable-like ( len-exemplar type-exemplar -- newseq )
+    lengthd new-resizable ; inline
+
 : new-like ( len exemplar quot -- seq )
     over [ [ new-sequence ] dip call ] dip like ; inline
 
@@ -26,14 +34,16 @@ GENERIC: shorten ( n seq -- )
 M: sequence lengthen 2dup length > [ set-length ] [ 2drop ] if ; inline
 M: sequence shorten 2dup length < [ set-length ] [ 2drop ] if ; inline
 
+: 2length ( seq1 seq2 -- n1 n2 ) [ length ] bi@ ; inline
+: 3length ( seq1 seq2 seq3 -- n1 n2 n3 ) [ length ] tri@ ; inline
+
 : empty? ( seq -- ? ) length 0 = ; inline
 
 : if-empty ( ..a seq quot1: ( ..a -- ..b ) quot2: ( ..a seq -- ..b ) -- ..b )
     [ dup empty? ] [ [ drop ] prepose ] [ ] tri* if ; inline
 
-: when-empty ( seq quot -- ) [ ] if-empty ; inline
-
-: unless-empty ( seq quot -- ) [ ] swap if-empty ; inline
+: when-empty ( ... seq quot: ( ... -- ... obj ) -- ... seq/obj ) [ ] if-empty ; inline
+: unless-empty ( ... seq quot: ( ... seq -- ... ) -- ... ) [ ] swap if-empty ; inline
 
 : delete-all ( seq -- ) 0 swap set-length ;
 
@@ -89,9 +99,6 @@ M: sequence set-nth bounds-check set-nth-unsafe ; inline
 M: sequence nth-unsafe nth ; inline
 M: sequence set-nth-unsafe set-nth ; inline
 
-: change-nth-unsafe ( i seq quot -- )
-    [ [ nth-unsafe ] dip call ] 2keepd set-nth-unsafe ; inline
-
 PRIVATE>
 
 ! The f object supports the sequence protocol trivially
@@ -104,11 +111,8 @@ INSTANCE: f immutable-sequence
 ! Integer sequences
 TUPLE: iota { n integer read-only } ;
 
-ERROR: non-negative-integer-expected n ;
-
 : <iota> ( n -- iota )
-    dup 0 < [ non-negative-integer-expected ] when
-    iota boa ; inline
+    assert-non-negative iota boa ; inline
 
 M: iota length n>> ; inline
 M: iota nth-unsafe drop ; inline
@@ -135,12 +139,6 @@ INSTANCE: iota immutable-sequence
     [ [ nth-unsafe ] curry bi@ ]
     [ [ set-nth-unsafe ] curry bi@ ] 3bi ; inline
 
-: (head) ( seq n -- from to seq ) [ 0 ] 2dip swap ; inline
-
-: (tail) ( seq n -- from to seq ) swap [ length ] keep ; inline
-
-: from-end ( seq n -- seq n' ) [ dup length ] dip - ; inline
-
 : (1sequence) ( obj seq -- seq )
     [ 0 swap set-nth-unsafe ] keep ; inline
 
@@ -153,7 +151,13 @@ INSTANCE: iota immutable-sequence
 : (4sequence) ( obj1 obj2 obj3 obj4 seq -- seq )
     [ 3 swap set-nth-unsafe ] keep (3sequence) ; inline
 
+: head-to-index ( seq to -- zero to seq ) [ 0 ] 2dip swap ; inline
+
+: index-to-tail ( seq from -- from length seq ) swap [ length ] keep ; inline
+
 PRIVATE>
+
+: from-tail ( seq n -- seq n' ) [ dup length ] dip - ; inline
 
 : 1sequence ( obj exemplar -- seq )
     1 swap [ (1sequence) ] new-like ; inline
@@ -182,10 +186,14 @@ PRIVATE>
 : ?set-nth ( elt n seq -- )
     2dup bounds-check? [ set-nth-unsafe ] [ 3drop ] if ; inline
 
+: index-or-length ( seq n -- seq n' ) over length min ; inline
+
+: index-of-last ( seq -- n seq ) [ length 1 - ] keep ; inline
+
 : ?first ( seq -- elt/f ) 0 swap ?nth ; inline
 : ?second ( seq -- elt/f ) 1 swap ?nth ; inline
 : ?last ( seq -- elt/f )
-    [ length 1 - ] keep over 0 <
+    index-of-last over 0 <
     [ 2drop f ] [ nth-unsafe ] if ; inline
 
 MIXIN: virtual-sequence
@@ -218,6 +226,9 @@ TUPLE: slice
     { to integer read-only }
     { seq read-only } ;
 
+: >slice< ( slice -- from to seq )
+    [ from>> ] [ to>> ] [ seq>> ] tri ; inline
+
 : collapse-slice ( m n slice -- m' n' seq )
     [ from>> ] [ seq>> ] bi [ [ + ] curry bi@ ] dip ; inline
 
@@ -244,17 +255,15 @@ M: slice virtual@ [ from>> + ] [ seq>> ] bi ; inline
 
 M: slice length [ to>> ] [ from>> ] bi - ; inline
 
-: short ( seq n -- seq n' ) over length min ; inline
+: head-slice ( seq n -- slice ) head-to-index <slice> ; inline
 
-: head-slice ( seq n -- slice ) (head) <slice> ; inline
-
-: tail-slice ( seq n -- slice ) (tail) <slice> ; inline
+: tail-slice ( seq n -- slice ) index-to-tail <slice> ; inline
 
 : rest-slice ( seq -- slice ) 1 tail-slice ; inline
 
-: head-slice* ( seq n -- slice ) from-end head-slice ; inline
+: head-slice* ( seq n -- slice ) from-tail head-slice ; inline
 
-: tail-slice* ( seq n -- slice ) from-end tail-slice ; inline
+: tail-slice* ( seq n -- slice ) from-tail tail-slice ; inline
 
 : but-last-slice ( seq -- slice ) 1 head-slice* ; inline
 
@@ -266,7 +275,7 @@ TUPLE: repetition
     { elt read-only } ;
 
 : <repetition> ( len elt -- repetition )
-    over 0 < [ non-negative-integer-expected ] when
+    over 0 < [ non-negative-number-expected ] when
     repetition boa ; inline
 
 M: repetition length length>> ; inline
@@ -282,13 +291,22 @@ ERROR: integer-length-expected obj ;
 : check-length ( n -- n )
     dup integer? [ integer-length-expected ] unless ; inline
 
-TUPLE: copy-state
+: >sequence< ( seq -- i n seq )
+    [ drop 0 ] [ length check-length ] [ ] tri ; inline
+
+: length-sequence ( seq -- n seq )
+    [ length check-length ] [ ] bi ; inline
+
+: >underlying< ( slice/seq -- from to slice/seq )
+    dup slice? [ >slice< ] [ >sequence< ] if ; inline
+
+TUPLE: copier
     { src-i integer read-only }
     { src read-only }
     { dst-i integer read-only }
     { dst read-only } ;
 
-C: <copy> copy-state
+C: <copier> copier
 
 : copy-nth-unsafe ( n copy -- )
     [ [ src-i>> + ] [ src>> ] bi nth-unsafe ]
@@ -301,23 +319,39 @@ C: <copy> copy-state
 
 : subseq>copy ( from to seq -- n copy )
     [ over - check-length swap ] dip
-    3dup nip new-sequence 0 swap <copy> ; inline
+    3dup nip new-sequence 0 swap <copier> ; inline
 
 : bounds-check-head ( n seq -- n seq )
     over 0 < [ bounds-error ] when ; inline
 
-: check-copy ( src n dst -- src n dst )
-    3dup bounds-check-head
-    [ swap length + ] dip lengthen ; inline
-
 : copy-unsafe ( src i dst -- )
-    [ [ length check-length 0 ] keep ] 2dip <copy> (copy) drop ; inline
+    [ [ length check-length 0 ] keep ] 2dip <copier> (copy) drop ; inline
 
 : subseq-unsafe-as ( from to seq exemplar -- subseq )
     [ subseq>copy (copy) ] dip like ; inline
 
 : subseq-unsafe ( from to seq -- subseq )
     dup subseq-unsafe-as ; inline
+
+: change-nth-unsafe ( i seq quot -- )
+    [ [ nth-unsafe ] dip call ] 2keepd set-nth-unsafe ; inline
+
+: nth-of-unsafe ( seq n -- elt ) swap nth-unsafe ; inline
+
+: set-nth-of-unsafe ( seq n elt -- seq ) swap pick set-nth-unsafe ; inline
+
+: copy-nth-of-unsafe ( dst dst-i src src-i -- )
+    nth-of-unsafe set-nth-of-unsafe drop ; inline
+
+: copy-loop ( dst dst-i src src-i src-stop -- dst )
+    2dup >= [
+        4drop
+    ] [
+        [
+            [ copy-nth-of-unsafe ] 4keep
+            [ 1 + ] 2dip 1 +
+        ] dip copy-loop
+    ] if ; inline recursive
 
 PRIVATE>
 
@@ -327,22 +361,25 @@ PRIVATE>
 : subseq ( from to seq -- subseq )
     dup subseq-as ;
 
-: head ( seq n -- headseq ) (head) subseq ;
+: head ( seq n -- headseq ) head-to-index subseq ;
 
-: tail ( seq n -- tailseq ) (tail) subseq ;
+: tail ( seq n -- tailseq ) index-to-tail subseq ;
 
 : rest ( seq -- tailseq ) 1 tail ;
 
-: head* ( seq n -- headseq ) from-end head ;
+: head* ( seq n -- headseq ) from-tail head ;
 
-: tail* ( seq n -- tailseq ) from-end tail ;
+: tail* ( seq n -- tailseq ) from-tail tail ;
 
 : but-last ( seq -- headseq ) 1 head* ;
 
-: copy ( src i dst -- ) check-copy copy-unsafe ; inline
+: copy ( src i dst -- )
+    3dup bounds-check-head
+    [ swap length + ] dip lengthen
+    copy-unsafe ; inline
 
 M: sequence clone-like
-    [ dup length ] dip new-sequence [ 0 swap copy-unsafe ] keep ; inline
+    dupd new-sequence-like [ 0 swap copy-unsafe ] keep ; inline
 
 M: immutable-sequence clone-like like ; inline
 
@@ -358,7 +395,7 @@ M: immutable-sequence clone-like like ; inline
 PRIVATE>
 
 : append-as ( seq1 seq2 exemplar -- newseq )
-    [ 2dup [ length ] bi@ + ] dip
+    [ 2dup 2length + ] dip
     [ (append) ] new-like ; inline
 
 : append ( seq1 seq2 -- newseq ) over append-as ;
@@ -368,8 +405,8 @@ PRIVATE>
 : prepend ( seq1 seq2 -- newseq ) over prepend-as ;
 
 : 3append-as ( seq1 seq2 seq3 exemplar -- newseq )
-    [ 3dup [ length ] tri@ + + ] dip [
-        [ [ 2over [ length ] bi@ + ] dip copy-unsafe ]
+    [ 3dup 3length + + ] dip [
+        [ [ 2over 2length + ] dip copy-unsafe ]
         [ (append) ] bi
     ] new-like ; inline
 
@@ -391,107 +428,95 @@ PRIVATE>
 : change-nth ( ..a i seq quot: ( ..a elt -- ..b newelt ) -- ..b )
     [ [ nth ] dip call ] 2keepd set-nth-unsafe ; inline
 
-: min-length ( seq1 seq2 -- n ) [ length ] bi@ min ; inline
+: min-length ( seq1 seq2 -- n ) 2length min ; inline
 
-: max-length ( seq1 seq2 -- n ) [ length ] bi@ max ; inline
+: max-length ( seq1 seq2 -- n ) 2length max ; inline
 
 <PRIVATE
 
-: setup-each ( seq -- i n quot )
-    dup slice? [
-        [ from>> ] [ to>> ] [ seq>> ] tri
-    ] [
-        [ length check-length 0 swap ] keep
-    ] if [ nth-unsafe ] curry ; inline
+: sequence-operator ( seq quot -- i n quot' )
+    [ >underlying< [ nth-unsafe ] curry ] dip compose ; inline
 
-: (each) ( seq quot -- i n quot' )
-    [ setup-each ] dip compose ; inline
+: length-iterator ( seq -- n quot' )
+    length-sequence [ nth-unsafe ] curry ; inline
 
-: (each-from) ( seq quot i -- i n quot' )
-    [ (each) ] dip [ + ] curry 2dip ; inline
+: length-operator ( seq quot -- n quot' )
+    [ length-iterator ] dip compose ; inline
 
-: (collect) ( quot into -- quot' )
+: collect-into ( quot into -- quot' )
     [ [ keep ] dip set-nth-unsafe ] 2curry ; inline
 
+: collect-from ( i n quot into -- )
+    collect-into each-integer-from ; inline
+
 : collect ( n quot into -- )
-    (collect) each-integer ; inline
+    collect-into each-integer ; inline
 
-: setup-1each ( seq -- n quot )
-    [ length check-length ] keep [ nth-unsafe ] curry ; inline
-
-: (1each) ( seq quot -- n quot' )
-    [ setup-1each ] dip compose ; inline
-
-: (each-index) ( seq quot -- n quot' )
-    [ setup-1each [ keep ] curry ] dip compose ; inline
+: sequence-index-operator ( seq quot -- n quot' )
+    [ length-iterator [ keep ] curry ] dip compose ; inline
 
 : map-into ( seq quot into -- )
-    [ (1each) ] dip collect ; inline
+    [ length-operator ] dip collect ; inline
 
 : 2nth-unsafe ( n seq1 seq2 -- elt1 elt2 )
     [ nth-unsafe ] bi-curry@ bi ; inline
 
-: setup-2each ( seq1 seq2 -- n quot )
+: 2length-iterator ( seq1 seq2 -- n quot )
     [ min-length check-length ] 2keep [ 2nth-unsafe ] 2curry ; inline
 
-: (2each) ( seq1 seq2 quot -- n quot' )
-    [ setup-2each ] dip compose ; inline
+: 2length-operator ( seq1 seq2 quot -- n quot' )
+    [ 2length-iterator ] dip compose ; inline
 
 : 3nth-unsafe ( n seq1 seq2 seq3 -- elt1 elt2 elt3 )
     [ nth-unsafe ] tri-curry@ tri ; inline
 
-: setup-3each ( seq1 seq2 seq3 -- n quot )
-    [ [ length ] tri@ min min check-length ]
+: 3length-iterator ( seq1 seq2 seq3 -- n quot )
+    [ 3length min min check-length ]
     [ [ 3nth-unsafe ] 3curry ] 3bi ; inline
 
-: (3each) ( seq1 seq2 seq3 quot -- n quot' )
-    [ setup-3each ] dip compose ; inline
+: 3length-operator ( seq1 seq2 seq3 quot -- n quot' )
+    [ 3length-iterator ] dip compose ; inline
 
-: finish-find ( i seq -- i elt )
-    over [ dupd nth-unsafe ] [ drop f ] if ; inline
+: element/index ( i/f seq -- elt/f i/f )
+    '[ [ _ nth ] [ f ] if* ] keep ; inline
 
-: (find) ( seq quot quot' -- i elt )
-    pick [ [ (1each) ] dip call ] dip finish-find ; inline
+: index/element ( i/f seq -- i/f elt/f )
+    dupd '[ _ nth ] [ f ] if* ; inline
 
-: (find-from) ( n seq quot quot' -- i elt )
-    [ 2dup bounds-check? ] 2dip
-    '[ _ _ (find) ] [ 2drop f f ] if ; inline
-
-: (find-index) ( seq quot quot' -- i elt )
-    pick [ [ (each-index) ] dip call ] dip finish-find ; inline
-
-: (find-index-from) ( n seq quot quot' -- i elt )
-    [ 2dup bounds-check? ] 2dip
-    '[ _ _ (find-index) ] [ 2drop f f ] if ; inline
-
-: (accumulate) ( seq identity quot -- identity seq quot )
+: (accumulate) ( seq identity quot -- identity seq quot' )
     swapd [ keepd ] curry ; inline
 
-: (accumulate*) ( seq identity quot -- identity seq quot )
+: (accumulate*) ( seq identity quot -- identity seq quot' )
     swapd [ dup ] compose ; inline
 
 PRIVATE>
 
 : each ( ... seq quot: ( ... x -- ... ) -- ... )
-    (each) (each-integer) ; inline
+    sequence-operator each-integer-from ; inline
 
 : each-from ( ... seq quot: ( ... x -- ... ) i -- ... )
-    (each-from) (each-integer) ; inline
+    -rot length-operator each-integer-from ; inline
 
 : reduce ( ... seq identity quot: ( ... prev elt -- ... next ) -- ... result )
     swapd each ; inline
 
-: map-integers ( ... len quot: ( ... i -- ... elt ) exemplar -- ... newseq )
+: map-integers-from-as ( ... from len quot: ( ... i -- ... elt ) exemplar -- ... newseq )
+    overd [ [ collect-from ] keep ] new-like ; inline
+
+: map-integers-as ( ... len quot: ( ... i -- ... elt ) exemplar -- ... newseq )
     overd [ [ collect ] keep ] new-like ; inline
 
+: map-integers ( ... len quot: ( ... i -- ... elt ) -- ... newseq )
+    { } map-integers-as ; inline
+
 : map-as ( ... seq quot: ( ... elt -- ... newelt ) exemplar -- ... newseq )
-    [ (1each) ] dip map-integers ; inline
+    [ length-operator ] dip map-integers-as ; inline
 
 : map ( ... seq quot: ( ... elt -- ... newelt ) -- ... newseq )
     over map-as ; inline
 
 : replicate-as ( ... len quot: ( ... -- ... newelt ) exemplar -- ... newseq )
-    [ [ drop ] prepose ] dip map-integers ; inline
+    [ [ drop ] prepose ] dip map-integers-as ; inline
 
 : replicate ( ... len quot: ( ... -- ... newelt ) -- ... newseq )
     { } replicate-as ; inline
@@ -518,63 +543,79 @@ PRIVATE>
     (accumulate*) map! nip ; inline
 
 : 2each ( ... seq1 seq2 quot: ( ... elt1 elt2 -- ... ) -- ... )
-    (2each) each-integer ; inline
+    2length-operator each-integer ; inline
 
-: 2each-from ( ... seq1 seq2 quot: ( ... elt1 elt2 -- ... ) i -- ... )
-    [ (2each) ] dip -rot (each-integer) ; inline
+: 2each-from ( ... seq1 seq2 quot: ( ... elt1 elt2 -- ... ) from -- ... )
+    -roll 2length-operator each-integer-from ; inline
 
 : 2reduce ( ... seq1 seq2 identity quot: ( ... prev elt1 elt2 -- ... next ) -- ... result )
     -rotd 2each ; inline
 
 : 2map-as ( ... seq1 seq2 quot: ( ... elt1 elt2 -- ... newelt ) exemplar -- ... newseq )
-    [ (2each) ] dip map-integers ; inline
+    [ 2length-operator ] dip map-integers-as ; inline
 
 : 2map ( ... seq1 seq2 quot: ( ... elt1 elt2 -- ... newelt ) -- ... newseq )
     pick 2map-as ; inline
 
 : 2all? ( ... seq1 seq2 quot: ( ... elt1 elt2 -- ... ? ) -- ... ? )
-    (2each) all-integers? ; inline
+    2length-operator all-integers? ; inline
 
 : 2any? ( ... seq1 seq2 quot: ( ... elt1 elt2 -- ... ? ) -- ... ? )
-    [ not ] compose 2all? not ; inline
+    negate 2all? not ; inline
 
 : 3each ( ... seq1 seq2 seq3 quot: ( ... elt1 elt2 elt3 -- ... ) -- ... )
-    (3each) each-integer ; inline
+    3length-operator each-integer ; inline
 
 : 3map-as ( ... seq1 seq2 seq3 quot: ( ... elt1 elt2 elt3 -- ... newelt ) exemplar -- ... newseq )
-    [ (3each) ] dip map-integers ; inline
+    [ 3length-operator ] dip map-integers-as ; inline
 
 : 3map ( ... seq1 seq2 seq3 quot: ( ... elt1 elt2 elt3 -- ... newelt ) -- ... newseq )
     pickd swap 3map-as ; inline
 
+<PRIVATE
+
+: bounds-check-call ( n seq quot -- obj1 obj2 )
+    2over bounds-check? [ call ] [ 3drop f f ] if ; inline
+
+: do-find-from ( ... n seq quot: ( ... elt -- ... ? ) -- ... i/f seq )
+    [ length-operator find-integer-from ] keepd ; inline
+
+: find-last-from-unsafe ( ... n seq quot: ( ... elt -- ... ? ) -- ... i/f seq )
+    [ length-operator nip find-last-integer ] keepd ; inline
+
+PRIVATE>
+
 : find-from ( ... n seq quot: ( ... elt -- ... ? ) -- ... i elt )
-    [ (find-integer) ] (find-from) ; inline
+    '[ _ do-find-from index/element ] bounds-check-call ; inline
 
 : find ( ... seq quot: ( ... elt -- ... ? ) -- ... i elt )
-    [ find-integer ] (find) ; inline
+    [ 0 ] 2dip do-find-from index/element ; inline
 
 : find-last-from ( ... n seq quot: ( ... elt -- ... ? ) -- ... i elt )
-    [ nip find-last-integer ] (find-from) ; inline
+    '[ _ find-last-from-unsafe index/element ] bounds-check-call ; inline
 
 : find-last ( ... seq quot: ( ... elt -- ... ? ) -- ... i elt )
-    [ [ 1 - ] dip find-last-integer ] (find) ; inline
+    [ index-of-last ] dip find-last-from ; inline
 
 : find-index-from ( ... n seq quot: ( ... elt i -- ... ? ) -- ... i elt )
-    [ (find-integer) ] (find-index-from) ; inline
+    '[
+        _ [ sequence-index-operator find-integer-from ] keepd
+        index/element
+    ] bounds-check-call ; inline
 
 : find-index ( ... seq quot: ( ... elt i -- ... ? ) -- ... i elt )
-    [ find-integer ] (find-index) ; inline
+    [ 0 ] 2dip find-index-from ; inline
 
 : all? ( ... seq quot: ( ... elt -- ... ? ) -- ... ? )
-    (each) (all-integers?) ; inline
+    sequence-operator all-integers-from? ; inline
 
-: push-if ( ..a elt quot: ( ..a elt -- ..b ? ) accum -- ..b )
+: push-when ( ..a elt quot: ( ..a elt -- ..b ? ) accum -- ..b )
     [ keep ] dip rot [ push ] [ 2drop ] if ; inline
 
 <PRIVATE
 
 : (selector-as) ( quot length exemplar -- selector accum )
-    new-resizable [ [ push-if ] 2curry ] keep ; inline
+    new-resizable [ [ push-when ] 2curry ] keep ; inline
 
 PRIVATE>
 
@@ -591,7 +632,7 @@ PRIVATE>
     over filter-as ; inline
 
 : reject-as ( ... seq quot: ( ... elt -- ... ? ) exemplar -- ... subseq )
-    [ [ not ] compose ] [ filter-as ] bi* ; inline
+    [ negate ] [ filter-as ] bi* ; inline
 
 : reject ( ... seq quot: ( ... elt -- ... ? ) -- ... subseq )
     over reject-as ; inline
@@ -605,14 +646,8 @@ PRIVATE>
 : partition ( ... seq quot: ( ... elt -- ... ? ) -- ... trueseq falseseq )
     over [ 2selector [ each ] 2dip ] dip [ like ] curry bi@ ; inline
 
-: collector-for-as ( seq quot exemplar -- seq quot' vec )
-    [ over length ] dip new-resizable [ [ push ] curry compose ] keep ; inline
-
 : collector-as ( quot exemplar -- quot' vec )
-    [ length ] keep new-resizable [ [ push ] curry compose ] keep ; inline
-
-: collector-for ( seq quot -- seq quot' vec )
-    V{ } collector-for-as ; inline
+    dup new-resizable-like [ [ push ] curry compose ] keep ; inline
 
 : collector ( quot -- quot' vec )
     V{ } collector-as ; inline
@@ -627,13 +662,13 @@ PRIVATE>
     [ dup ] swap [ keep ] curry produce nip ; inline
 
 : each-index ( ... seq quot: ( ... elt index -- ... ) -- ... )
-    (each-index) each-integer ; inline
+    sequence-index-operator each-integer ; inline
 
 : map-index-as ( ... seq quot: ( ... elt index -- ... newelt ) exemplar -- ... newseq )
     [ dup length <iota> ] 2dip 2map-as ; inline
 
 : map-index ( ... seq quot: ( ... elt index -- ... newelt ) -- ... newseq )
-    { } map-index-as ; inline
+    over map-index-as ; inline
 
 : interleave ( ... seq between quot: ( ... elt -- ... ) -- ... )
     pick empty? [ 3drop ] [
@@ -671,6 +706,9 @@ PRIVATE>
 
 : nths ( indices seq -- seq' )
     [ [ nth ] curry ] keep map-as ;
+
+: nths-of ( seq indices -- seq' )
+    swap nths ; inline
 
 : any? ( ... seq quot: ( ... elt -- ... ? ) -- ... ? )
     find drop >boolean ; inline
@@ -711,7 +749,7 @@ M: sequence <=>
     [ 2nth-unsafe <=> ] [ [ length ] compare nip ] if ;
 
 : sequence= ( seq1 seq2 -- ? )
-    2dup [ length ] bi@ dupd =
+    2dup 2length dupd =
     [ -rot mismatch-unsafe not ] [ 3drop f ] if ; inline
 
 ERROR: assert-sequence got expected ;
@@ -753,25 +791,29 @@ M: slice hashcode* [ sequence-hashcode ] recursive-hashcode ;
 
 <PRIVATE
 
+: move-unsafe* ( to from seq -- from-nth )
+    2over =
+    [ nth-unsafe nip ]
+    [ [ nth-unsafe tuck swap ] [ set-nth-unsafe ] bi ] if ; inline
+
+: filter-from! ( store from seq quot: ( ... elt -- ... ? ) -- seq )
+    2over length < [
+        [ [ move-unsafe* ] dip call ] 4keep
+        [ swap [ 1 + ] when ] 3dip
+        [ 1 + ] 2dip filter-from!
+    ] [ drop [ nip set-length ] keep ] if ; inline recursive
+
 : move-unsafe ( to from seq -- )
     2over =
     [ 3drop ] [ [ nth-unsafe swap ] [ set-nth-unsafe ] bi ] if ; inline
 
-: (filter!) ( ... quot: ( ... elt -- ... ? ) store scan seq -- ... )
-    2dup length < [
-        [ move-unsafe ] 3keep
-        [ nth-unsafe -rot [ [ call ] keep ] dip rot [ 1 + ] when ] 2keep
-        [ 1 + ] dip
-        (filter!)
-    ] [ nip set-length drop ] if ; inline recursive
-
 PRIVATE>
 
 : filter! ( ... seq quot: ( ... elt -- ... ? ) -- ... seq )
-    swap [ [ 0 0 ] dip (filter!) ] keep ; inline
+    [ 0 0 ] 2dip filter-from! ; inline
 
 : reject! ( ... seq quot: ( ... elt -- ... ? ) -- ... seq )
-    [ not ] compose filter! ; inline
+    negate filter! ; inline
 
 : remove! ( elt seq -- seq )
     [ = ] with reject! ;
@@ -795,21 +837,21 @@ PRIVATE>
 : append! ( seq1 seq2 -- seq1 ) over push-all ; inline
 
 : last ( seq -- elt )
-    [ length 1 - ] keep
+    index-of-last
     over 0 < [ bounds-error ] [ nth-unsafe ] if ; inline
 
 <PRIVATE
 
 : last-unsafe ( seq -- elt )
-    [ length 1 - ] [ nth-unsafe ] bi ; inline
+    index-of-last nth-unsafe ; inline
 
 PRIVATE>
 
 : set-last ( elt seq -- )
-    [ length 1 - ] keep
+    index-of-last
     over 0 < [ bounds-error ] [ set-nth-unsafe ] if ; inline
 
-: pop* ( seq -- ) [ length 1 - ] [ shorten ] bi ;
+: pop* ( seq -- ) index-of-last shorten ;
 
 <PRIVATE
 
@@ -821,27 +863,12 @@ PRIVATE>
         move-backward
     ] if ;
 
-: move-forward ( shift from to seq -- )
-    2over = [
-        4drop
-    ] [
-        [ [ [ ] [ nip + ] [ 2nip ] 3tri ] dip move-unsafe 1 - ] keep
-        move-forward
-    ] if ;
-
-: (open-slice) ( shift from to seq ? -- )
-    [
-        [ [ 1 - ] bi@ ] dip move-forward
-    ] [
-        [ over - ] 2dip move-backward
-    ] if ;
-
 : open-slice ( shift from seq -- )
     pick 0 = [
         3drop
     ] [
         [ ] [ nip length + ] [ 2nip ] 3tri
-        [ pick 0 > [ [ length ] keep ] dip (open-slice) ] 2dip
+        [ [ length ] keep [ over - ] 2dip move-backward ] 2dip
         set-length
     ] if ;
 
@@ -866,7 +893,7 @@ PRIVATE>
     [ [ dup 1 + ] dip snip-slice ] keep append-as ;
 
 : pop ( seq -- elt )
-    [ length 1 - ] keep over 0 >=
+    index-of-last over 0 >=
     [ [ nth-unsafe ] [ shorten ] 2bi ]
     [ bounds-error ] if ;
 
@@ -886,7 +913,7 @@ PRIVATE>
     ] keep ;
 
 : reverse ( seq -- newseq )
-     [
+    [
         dup [ length ] keep new-sequence
         [ 0 swap copy-unsafe ] keep reverse!
     ] keep like ;
@@ -945,10 +972,10 @@ PRIVATE>
 : pad-tail ( seq n elt -- padded )
     [ append ] padding ;
 
-: shorter? ( seq1 seq2 -- ? ) [ length ] bi@ < ; inline
-: longer? ( seq1 seq2 -- ? ) [ length ] bi@ > ; inline
-: shorter ( seq1 seq2 -- seq ) [ [ length ] bi@ <= ] 2keep ? ; inline
-: longer ( seq1 seq2 -- seq ) [ [ length ] bi@ >= ] 2keep ? ; inline
+: shorter? ( seq1 seq2 -- ? ) 2length < ; inline
+: longer? ( seq1 seq2 -- ? ) 2length > ; inline
+: shorter ( seq1 seq2 -- seq ) [ 2length <= ] most ; inline
+: longer ( seq1 seq2 -- seq ) [ 2length >= ] most ; inline
 
 : head? ( seq begin -- ? )
     2dup shorter? [
@@ -1017,22 +1044,26 @@ PRIVATE>
 : cut* ( seq n -- before after )
     [ head* ] [ tail* ] 2bi ;
 
-<PRIVATE
+: subseq-starts-at? ( i seq subseq -- ? )
+    [ length swap ] keep
+    '[
+        [ + _ nth-unsafe ] keep _ nth-unsafe =
+    ] with all-integers? ; inline
 
-: (subseq-start-from) ( subseq seq n length -- subseq seq ? )
-    [
-        [ 3dup ] dip [ + swap nth-unsafe ] keep rot nth-unsafe =
-    ] all-integers? nip ; inline
+: subseq-index-from ( n seq subseq -- i/f )
+    [ 2length - 1 + ] 2keep
+    '[ _ _ subseq-starts-at? ] find-integer-from ; inline
 
-PRIVATE>
+: subseq-index ( seq subseq -- i/f ) [ 0 ] 2dip subseq-index-from ; inline
 
-: subseq-start-from ( subseq seq n -- i )
-    pick length [ pick length swap - 1 + ] keep
-    [ (subseq-start-from) ] curry (find-integer) 2nip ;
+: subseq-of? ( seq subseq -- ? ) subseq-index >boolean ; inline
 
-: subseq-start ( subseq seq -- i ) 0 subseq-start-from ; inline
+: subseq-start-from ( subseq seq n -- i/f )
+    spin subseq-index-from ; inline deprecated
 
-: subseq? ( subseq seq -- ? ) subseq-start >boolean ;
+: subseq-start ( subseq seq -- i/f ) swap subseq-index ; inline deprecated
+
+: subseq? ( subseq seq -- ? ) subseq-start >boolean ; inline deprecated
 
 : drop-prefix ( seq1 seq2 -- slice1 slice2 )
     2dup mismatch [ 2dup min-length ] unless*
@@ -1074,11 +1105,11 @@ PRIVATE>
 <PRIVATE
 
 : (trim-head) ( seq quot -- seq n )
-    over [ [ not ] compose find drop ] dip swap
+    over [ negate find drop ] dip swap
     [ dup length ] unless* ; inline
 
 : (trim-tail) ( seq quot -- seq n )
-    over [ [ not ] compose find-last drop ?1+ ] dip
+    over [ negate find-last drop ?1+ ] dip
     swap ; inline
 
 PRIVATE>
@@ -1163,14 +1194,14 @@ PRIVATE>
 
 : generic-flip ( matrix -- newmatrix )
     [ [ length ] [ min ] map-reduce ] keep
-    '[ _ [ nth-unsafe ] with { } map-as ] { } map-integers ; inline
+    '[ _ [ nth-unsafe ] with { } map-as ] map-integers ; inline
 
 USE: arrays
 
 : array-flip ( matrix -- newmatrix )
     { array } declare
     [ [ { array } declare length>> ] [ min ] map-reduce ] keep
-    '[ _ [ { array } declare array-nth ] with { } map-as ] { } map-integers ;
+    '[ _ [ { array } declare array-nth ] with { } map-as ] map-integers ;
 
 PRIVATE>
 

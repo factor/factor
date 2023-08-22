@@ -1,5 +1,5 @@
 ! Copyright (C) 2006, 2007, 2008 Alex Chapman
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 
 USING: accessors arrays colors combinators kernel math opengl
 opengl.gl sequences tetris.game tetris.piece ;
@@ -15,10 +15,10 @@ IN: tetris.gl
     piece-blocks [ draw-block ] each ;
 
 : draw-piece ( piece -- )
-    dup tetromino>> colour>> gl-color draw-piece-blocks ;
+    dup tetromino>> color>> gl-color draw-piece-blocks ;
 
 : draw-next-piece ( piece -- )
-    dup tetromino>> colour>>
+    dup tetromino>> color>>
     >rgba-components drop 0.2 <rgba> gl-color draw-piece-blocks ;
 
 ! TODO: move implementation specific stuff into tetris-board

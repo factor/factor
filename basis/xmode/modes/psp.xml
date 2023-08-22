@@ -78,13 +78,13 @@
 
 	<!-- ESCAPE is not exactly right but it is needed to correctly
 	     handle JavaScript in on* parameters -->
-	<RULES SET="TAGS" DEFAULT="MARKUP" ESCAPE="\">
-		<SPAN TYPE="LITERAL1">
+	<RULES SET="TAGS" DEFAULT="MARKUP">
+		<SPAN TYPE="LITERAL1" ESCAPE="\">
 			<BEGIN>"</BEGIN>
 			<END>"</END>
 		</SPAN>
 
-		<SPAN TYPE="LITERAL1">
+		<SPAN TYPE="LITERAL1" ESCAPE="\">
 			<BEGIN>'</BEGIN>
 			<END>'</END>
 		</SPAN>

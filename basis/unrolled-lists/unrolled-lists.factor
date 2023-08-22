@@ -1,5 +1,5 @@
-! Copyright (C) 2008 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
+! Copyright (C) 2008, 2023 Slava Pestov and Raghu Ranganathan.
+! See https://factorcode.org/license.txt for BSD license.
 USING: arrays math kernel accessors sequences sequences.private
 deques search-deques hashtables ;
 IN: unrolled-lists
@@ -54,6 +54,9 @@ M: unrolled-list clear-deque
         dup prev>> [ drop ] [ swap front>> >>prev ] if
     ] [ dup front>> >>back ] if* drop ; inline
 
+: clear-if-empty ( list -- )
+    dup deque-empty? [ dup clear-deque ] when drop ;
+
 : push-front/new ( elt list -- )
     unroll-factor 1 - >>front-pos
     [ <front-node> ] change-front
@@ -82,7 +85,7 @@ M: unrolled-list peek-front*
 : pop-front/existing ( list front -- )
     [ dup front-pos>> ] [ data>> ] bi* [ 0 ] 2dip set-nth-unsafe
     [ 1 + ] change-front-pos
-    drop ; inline
+    clear-if-empty ; inline
 
 M: unrolled-list pop-front*
     dup front>> [ empty-unrolled-list ] unless*
@@ -128,7 +131,7 @@ M: unrolled-list peek-back*
 : pop-back/existing ( list back -- )
     [ [ 1 - ] change-back-pos ] dip
     [ dup back-pos>> ] [ data>> ] bi* [ 0 ] 2dip set-nth-unsafe
-    drop ; inline
+    clear-if-empty ; inline
 
 M: unrolled-list pop-back*
     dup back>> [ empty-unrolled-list ] unless*

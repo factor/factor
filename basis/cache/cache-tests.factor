@@ -13,7 +13,7 @@ M: mock-disposable dispose* drop ;
 
 { 0 } [ "cache" get assoc-size ] unit-test
 
-{ } [ "cache" get 2 >>max-age drop ] unit-test
+[ "cache" get 2 >>max-age ] must-not-fail
 
 { } [ 1 <mock-disposable> dup "a" set 2 "cache" get set-at ] unit-test
 

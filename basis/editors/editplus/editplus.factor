@@ -3,7 +3,6 @@ namespaces ;
 IN: editors.editplus
 
 SINGLETON: editplus
-editplus editor-class set-global
 
 : editplus-path ( -- path )
     \ editplus-path get [

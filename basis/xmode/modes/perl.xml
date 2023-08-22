@@ -105,15 +105,6 @@
 		<!-- Function calls from variables -->
 		<SEQ_REGEXP HASH_CHAR="&amp;$" TYPE="FUNCTION">&amp;\$((\p{Alpha}\w*|_\w+)?::)*(\p{Alpha}\w*|_\w+|\d+)</SEQ_REGEXP>
 
-		<!-- Special handling for subs, since they can have a ' in the name;
-			 try to do highlight as well as possible - this version will
-			 highlight both 'sub' and the opening '{' as KEYWORD1, so the
-			 opening bracket will be different than other brackets. -->
-		<SPAN_REGEXP HASH_CHAR="sub" TYPE="OPERATOR" NO_LINE_BREAK="FALSE" DELEGATE="SUB_NAME">
-			<BEGIN>sub\s</BEGIN>
-			<END>{</END>
-		</SPAN_REGEXP>
-
 		<!-- Highlight calls to subs that contain ' in the name. -->
 		<SEQ_REGEXP HASH_CHAR="&amp;" TYPE="FUNCTION"
 		>&amp;\p{Alpha}[\p{Alnum}_]*'\p{Alpha}[\p{Alnum}_]*</SEQ_REGEXP>
@@ -124,11 +115,12 @@
 			<END>"</END>
 		</SPAN>
 
-		<!-- apostroph literals -->
+		<!-- apostrophe literals -->
 		<SPAN TYPE="LITERAL1" DELEGATE="APOSTR">
 			<BEGIN>'</BEGIN>
 			<END>'</END>
 		</SPAN>
+		<SEQ_REGEXP TYPE="LITERAL1">\b\w+\b(?=\s*=>)</SEQ_REGEXP>
 
 		<!-- options: -text -->
 		<SEQ_REGEXP HASH_CHAR="-" TYPE="LITERAL1">-[\p{Lower}]\w+</SEQ_REGEXP>
@@ -183,11 +175,11 @@
 		<!-- Heredoc -->
 		<SPAN_REGEXP HASH_CHAR="&lt;&lt;" TYPE="LITERAL2" DELEGATE="LITERAL">
 		<BEGIN><![CDATA[<<\p{Space}*(['"])([\p{Space}\p{Alnum}_]*)\1;?\s*]]></BEGIN>
-		<END>$2</END>
+		<END AT_LINE_START="TRUE">$2</END>
 		</SPAN_REGEXP>
 		<SPAN_REGEXP HASH_CHAR="&lt;&lt;" TYPE="LITERAL2" DELEGATE="LITERAL">
 		<BEGIN><![CDATA[<<([\p{Alpha}_][\p{Alnum}_]*);?\s*]]></BEGIN>
-		<END>$1</END>
+		<END AT_LINE_START="TRUE">$1</END>
 		</SPAN_REGEXP>
 
 		<!-- jEdit 4.1 adds regular expression syntax rules so we can
@@ -195,32 +187,92 @@
 
 		<!-- /Regexp/, avoid confusion with a sequence of two divisions! -->
 		<SEQ_REGEXP TYPE="MARKUP" HASH_CHAR="/"
-			AT_WORD_START="TRUE">/.*?[^\\]/[cgimosx]*(?!\s*[\d\$\@\(\-])</SEQ_REGEXP>
+			AT_WORD_START="TRUE">/.*?[^\\]/([cgimosx]+\b|(?=[^cgimosx])|$)(?!\s*[\d\$\@\(\{\-A-Z"'])</SEQ_REGEXP>
 
-        <!-- q//, qq//, qr//, qx// -->
+		<!-- q//, qq//, qx// -->
 		<SPAN_REGEXP HASH_CHAR="q"
-					 TYPE="MARKUP"
+					 TYPE="LITERAL1"
+					 ESCAPE="\"
 					 MATCH_TYPE="OPERATOR"
-					 DELEGATE="QUOTED"
 					 AT_WORD_START="TRUE"
 					 NO_LINE_BREAK="FALSE">
-			<BEGIN>q(?:|[qrxw])([#\[{(/|])</BEGIN>
+			<BEGIN>q[qxw]?([#/\|!])</BEGIN>
+			<END>~1</END>
+		</SPAN_REGEXP>
+		<SPAN_REGEXP HASH_CHAR="q"
+					 MATCH_TYPE="OPERATOR"
+					 DELEGATE="QUOTED_BRACKET"
+					 AT_WORD_START="TRUE"
+					 NO_LINE_BREAK="FALSE">
+			<BEGIN>q[qxw]?(\[)</BEGIN>
+			<END>~1</END>
+		</SPAN_REGEXP>
+		<SPAN_REGEXP HASH_CHAR="q"
+					 MATCH_TYPE="OPERATOR"
+					 DELEGATE="QUOTED_BRACE"
+					 AT_WORD_START="TRUE"
+					 NO_LINE_BREAK="FALSE">
+			<BEGIN>q[qxw]?(\{)</BEGIN>
+			<END>~1</END>
+		</SPAN_REGEXP>
+		<SPAN_REGEXP HASH_CHAR="q"
+					 MATCH_TYPE="OPERATOR"
+					 DELEGATE="QUOTED_PAREN"
+					 AT_WORD_START="TRUE"
+					 NO_LINE_BREAK="FALSE">
+			<BEGIN>q[qxw]?(\()</BEGIN>
 			<END>~1</END>
 		</SPAN_REGEXP>
 
+		<!-- qr// should match other regex highlight colors -->
+		<SPAN_REGEXP HASH_CHAR="q"
+					 ESCAPE="\"
+					 TYPE="LITERAL1"
+					 MATCH_TYPE="OPERATOR"
+					 AT_WORD_START="TRUE"
+					 NO_LINE_BREAK="FALSE">
+			<BEGIN>qr([#/\|!])</BEGIN>
+			<END>~1</END>
+		</SPAN_REGEXP>
+		<SPAN_REGEXP HASH_CHAR="q"
+					 DELEGATE="QUOTED_BRACKET"
+					 MATCH_TYPE="OPERATOR"
+					 AT_WORD_START="TRUE"
+					 NO_LINE_BREAK="FALSE">
+			<BEGIN>qr(\[)</BEGIN>
+			<END>~1</END>
+		</SPAN_REGEXP>
+		<SPAN_REGEXP HASH_CHAR="q"
+					 DELEGATE="QUOTED_BRACE"
+					 MATCH_TYPE="OPERATOR"
+					 AT_WORD_START="TRUE"
+					 NO_LINE_BREAK="FALSE">
+			<BEGIN>qr(\{)</BEGIN>
+			<END>~1</END>
+		</SPAN_REGEXP>
+		<SPAN_REGEXP HASH_CHAR="q"
+					 DELEGATE="QUOTED_PAREN"
+					 ESCAPE="\"
+					 MATCH_TYPE="OPERATOR"
+					 AT_WORD_START="TRUE"
+					 NO_LINE_BREAK="FALSE">
+			<BEGIN>qr(\()</BEGIN>
+ 			<END>~1</END>
+ 		</SPAN_REGEXP>
+
 		<!-- tr/// transliteration -->
 		<SEQ_REGEXP TYPE="MARKUP" HASH_CHAR="tr"
-            AT_WORD_START="TRUE">tr\s*\{.*?[^\\]\}\s*\{(?:.*?[^\\])*\}[cds]*</SEQ_REGEXP>
+            AT_WORD_START="TRUE">tr\s*\{.*?[^\\]\}\s*\{(?:.*?[^\\])*?\}[cds]*</SEQ_REGEXP>
 
 		<SEQ_REGEXP TYPE="MARKUP" HASH_CHAR="tr"
             AT_WORD_START="TRUE">tr([^\p{Alnum}\p{Space}\}])(?:.*?)\1(?:.*?)\1[cds]*</SEQ_REGEXP>
 
 		<!-- y/// translation -->
 		<SEQ_REGEXP TYPE="MARKUP" HASH_CHAR="y"
-            AT_WORD_START="TRUE">y\s*\{.*?[^\\]\}\s*\{(?:.*?[^\\])*\}[cds]*</SEQ_REGEXP>
+            AT_WORD_START="TRUE">y\s*\{.*?[^\\]\}\s*\{(?:.*?[^\\])*?\}[cds]*</SEQ_REGEXP>
 
 		<SEQ_REGEXP TYPE="MARKUP" HASH_CHAR="y"
-            AT_WORD_START="TRUE">y([^\p{Alnum}\p{Space}\}])(?:.*?)\1(?:.*?)\1[cds]*</SEQ_REGEXP>
+            AT_WORD_START="TRUE">y([^\p{Alnum}\p{Space}\}_])(?:.*?)\1(?:.*?)\1[cds]*</SEQ_REGEXP>
 
 		<!-- m// regular expression matching -->
 		<SEQ_REGEXP TYPE="MARKUP" HASH_CHAR="m"
@@ -238,6 +290,7 @@
 
 		<!-- complex operators -->
 		<SEQ TYPE="OPERATOR">||</SEQ>
+		<SEQ TYPE="OPERATOR">//</SEQ>
 		<SEQ TYPE="OPERATOR">&amp;&amp;</SEQ>
 		<SEQ TYPE="OPERATOR">!=</SEQ>
 		<SEQ TYPE="OPERATOR">&lt;=&gt;</SEQ>
@@ -246,6 +299,7 @@
 		<SEQ TYPE="OPERATOR">==</SEQ>
 		<SEQ TYPE="OPERATOR">=~</SEQ>
 		<SEQ TYPE="OPERATOR">!~</SEQ>
+		<SEQ TYPE="OPERATOR">~~</SEQ>
 
 		<SEQ TYPE="OPERATOR">+=</SEQ>
 		<SEQ TYPE="OPERATOR">-=</SEQ>
@@ -402,6 +456,7 @@
 			<KEYWORD3>read</KEYWORD3>
 			<KEYWORD3>readdir</KEYWORD3>
 			<KEYWORD3>rewinddir</KEYWORD3>
+			<KEYWORD3>say</KEYWORD3>
 			<KEYWORD3>seek</KEYWORD3>
 			<KEYWORD3>seekdir</KEYWORD3>
 			<KEYWORD3>select</KEYWORD3>
@@ -448,7 +503,9 @@
 
 			<!-- Keywords related to the control flow of your perl program -->
 			<KEYWORD1>caller</KEYWORD1>
+			<KEYWORD1>case</KEYWORD1>
 			<KEYWORD1>continue</KEYWORD1>
+			<KEYWORD1>croak</KEYWORD1>
 			<KEYWORD1>die</KEYWORD1>
 			<KEYWORD1>do</KEYWORD1>
 			<KEYWORD1>dump</KEYWORD1>
@@ -459,7 +516,14 @@
 			<KEYWORD1>next</KEYWORD1>
 			<KEYWORD1>redo</KEYWORD1>
 			<KEYWORD1>return</KEYWORD1>
+			<KEYWORD1>switch</KEYWORD1>
 			<KEYWORD1>wantarray</KEYWORD1>
+
+			<!-- Keywords related to switch -->
+			<KEYWORD1>break</KEYWORD1>
+			<KEYWORD1>default</KEYWORD1>
+			<KEYWORD1>given</KEYWORD1>
+			<KEYWORD1>when</KEYWORD1>
 
 			<!-- Keywords related to scoping -->
 			<!--<KEYWORD1>caller</KEYWORD1>-->
@@ -468,6 +532,7 @@
 			<KEYWORD1>my</KEYWORD1>
 			<KEYWORD1>our</KEYWORD1>
 			<KEYWORD1>package</KEYWORD1>
+			<KEYWORD1>state</KEYWORD1>
 			<KEYWORD1>use</KEYWORD1>
 
 			<!-- Miscellaneous functions -->
@@ -587,6 +652,8 @@
 			<KEYWORD3>localtime</KEYWORD3>
 			<KEYWORD3>time</KEYWORD3>
 			<!--<KEYWORD3>times</KEYWORD3>-->
+
+			<FUNCTION>sub</FUNCTION>
 		</KEYWORDS>
 	</RULES>
 
@@ -607,8 +674,7 @@
 			<END>}</END>
 		</SPAN>
 
-		<MARK_FOLLOWING TYPE="KEYWORD2">$#</MARK_FOLLOWING>
-		<MARK_FOLLOWING TYPE="KEYWORD2">$</MARK_FOLLOWING>
+		<SEQ_REGEXP HASH_CHAR="$" TYPE="KEYWORD2">\$#?((\p{Alpha}\w*|_\w+)?::)*(\p{Alpha}\w*|_\w+|\d+)</SEQ_REGEXP>
 
 		<SPAN TYPE="KEYWORD2" NO_LINE_BREAK="TRUE" DELEGATE="VARIABLE">
 			<BEGIN>@{</BEGIN>
@@ -695,38 +761,36 @@
 		<SEQ TYPE="OPERATOR">-&gt;</SEQ>
 	</RULES>
 
-	<RULES SET="REGEXP" DEFAULT="MARKUP" ESCAPE="\">
-		<!-- ??? -->
-		<SEQ TYPE="MARKUP">)(</SEQ>
+	<!-- Used for quote-like operators; just makes sure the brackets are balanced. -->
+	<RULES SET="QUOTED_BRACKET" DEFAULT="LITERAL1" ESCAPE="\">
+		<SPAN NO_LINE_BREAK="FALSE"
+					 TYPE="LITERAL1"
+					 MATCH_TYPE="OPERATOR"
+					 DELEGATE="QUOTED_BRACKET"
+					 HASH_CHARS="[">
+			<BEGIN>[</BEGIN>
+			<END>]</END>
+		</SPAN>
 	</RULES>
-
-	<RULES SET="SUB_NAME" DEFAULT="FUNCTION">
-		<EOL_SPAN TYPE="COMMENT1">#</EOL_SPAN>
-		<SPAN TYPE="OPERATOR" DELEGATE="SUB_PROTO">
+	<RULES SET="QUOTED_BRACE" DEFAULT="LITERAL1" ESCAPE="\">
+		<SPAN NO_LINE_BREAK="FALSE"
+					 TYPE="LITERAL1"
+					 MATCH_TYPE="OPERATOR"
+					 DELEGATE="QUOTED_BRACE"
+					 HASH_CHARS="{">
+			<BEGIN>{</BEGIN>
+			<END>}</END>
+		</SPAN>
+	</RULES>
+	<RULES SET="QUOTED_PAREN" DEFAULT="LITERAL1" ESCAPE="\">
+		<SPAN NO_LINE_BREAK="FALSE"
+					 TYPE="LITERAL1"
+					 MATCH_TYPE="OPERATOR"
+					 DELEGATE="QUOTED_PAREN"
+					 HASH_CHARS="(">
 			<BEGIN>(</BEGIN>
 			<END>)</END>
 		</SPAN>
-	</RULES>
-
-	<RULES SET="SUB_PROTO" DEFAULT="LITERAL1">
-		<SEQ TYPE="LITERAL2">$</SEQ>
-		<SEQ TYPE="LITERAL2">@</SEQ>
-		<SEQ TYPE="LITERAL2">%</SEQ>
-		<SEQ TYPE="LITERAL2">&amp;</SEQ>
-		<SEQ TYPE="LITERAL2">*</SEQ>
-		<SEQ TYPE="LITERAL3">\</SEQ>
-	</RULES>
-
-	<!-- Used for quote-like operators; just makes sure the brackets are balanced. -->
-	<RULES SET="QUOTED" DEFAULT="LITERAL1">
-		<SPAN_REGEXP NO_LINE_BREAK="FALSE"
-					 TYPE="LITERAL1"
-					 MATCH_TYPE="OPERATOR"
-					 DELEGATE="QUOTED"
-					 HASH_CHARS="|[{(/">
-			<BEGIN>([\[{\(])</BEGIN>
-			<END>~1</END>
-		</SPAN_REGEXP>
 	</RULES>
 
 </MODE>

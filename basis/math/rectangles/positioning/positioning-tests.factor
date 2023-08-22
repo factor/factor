@@ -1,5 +1,5 @@
 ! Copyright (C) 2009 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: tools.test math.rectangles math.rectangles.positioning ;
 IN: math.rectangles.positioning.tests
 
@@ -45,7 +45,7 @@ IN: math.rectangles.positioning.tests
     popup-rect
 ] unit-test
 
-{ T{ rect f { 0 50 } { 50 50 } } } [
+{ T{ rect f { 0 0 } { 50 60 } } } [
     T{ rect f { 0 50 } { 0 0 } }
     { 50 60 }
     { 100 100 }

@@ -1,9 +1,11 @@
 ! Copyright (C) 2008 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
+
 USING: accessors ascii assocs combinators
-combinators.short-circuit kernel make math namespaces regexp
-sequences strings xmode.marker.state xmode.rules xmode.tokens
-xmode.utilities ;
+combinators.short-circuit formatting kernel make math namespaces
+regexp regexp.parser sequences splitting strings
+xmode.marker.state xmode.rules xmode.tokens xmode.utilities ;
+
 IN: xmode.marker
 
 ! Next two words copied from parser-combinators
@@ -49,7 +51,7 @@ IN: xmode.marker
 
 : mark-token ( -- )
     current-keyword
-    dup mark-number [ ] [ mark-keyword ] ?if
+    [ mark-number ] [ mark-keyword ] ?unless
     [ prev-token, ] when* ;
 
 : current-char ( -- char )
@@ -72,22 +74,97 @@ M: rule match-position drop position get ;
 : rest-of-line ( -- str )
     line get position get tail-slice ;
 
+: match-start ( string regexp -- slice/f )
+    first-match dup [ dup from>> 0 = [ drop f ] unless ] when ;
+
 GENERIC: text-matches? ( string text -- match-count/f )
 
 M: f text-matches?
     2drop f ;
 
 M: string-matcher text-matches?
-    [
-        [ string>> ] [ ignore-case?>> ] bi string-head?
-    ] keep string>> length and ;
+    [ string>> ] [ ignore-case?>> ] bi
+    [ string-head? ] keepd length and ;
 
 M: regexp text-matches?
-    [ >string ] dip first-match dup [ to>> ] when ;
+    [ >string ] dip match-start dup [ to>> ] when ;
 
-: rule-start-matches? ( rule -- match-count/f )
-    [ start>> dup ] keep can-match-here? [
-        rest-of-line swap text>> text-matches?
+<PRIVATE
+
+! XXX: Terrible inefficient regexp match group support
+
+! XXX: support named-capturing groups?
+
+: group-start ( i raw -- n/f )
+    [ CHAR: ( -rot index-from ] keep 2dup
+    { [ drop ] [ [ 1 + ] dip ?nth CHAR: ? = ] } 2&&
+    [ [ 1 + ] dip group-start ] [ drop ] if ;
+
+: nth-group-start ( n raw -- n )
+    [ -1 ] 2dip '[ dup [ 1 + _ group-start ] when ] times ;
+
+: matching-paren ( str -- to )
+    0 swap [
+        {
+            { CHAR: ( [ 1 + ] }
+            { CHAR: ) [ 1 - ] }
+            [ drop ]
+        } case dup zero?
+    ] find drop nip ;
+
+: nth-group ( n raw -- before nth )
+    [ nth-group-start ] keep swap cut dup matching-paren 1 + head ;
+
+: match-group-regexp ( regexp n -- skip-regexp match-regexp )
+    [ [ options>> options>string ] [ raw>> ] bi ] dip swap
+    nth-group rot '[ _ H{ } [ <optioned-regexp> ] 2cache ] bi@ ;
+
+: skip-first-match ( match regexp -- tailseq )
+    [ >string ] dip first-match [ seq>> ] [ to>> ] bi tail ;
+
+: nth-match ( match regexp n -- slice/f )
+    match-group-regexp [ skip-first-match ] [ match-start ] bi* ;
+
+: update-match-groups ( str match regexp -- str' )
+    pick CHAR: $ swap index [
+        R/ [$]\d/ [ second CHAR: 0 - nth-match ] 2with re-replace-with
+    ] [ 2drop ] if ;
+
+GENERIC: fixup-end ( match regexp end -- end' )
+
+M: string-matcher fixup-end
+    [ string>> -rot update-match-groups ]
+    [ ignore-case?>> ] bi <string-matcher> ;
+
+MEMO: <fixup-regexp> ( raw matched options -- regexp )
+    <optioned-regexp> {
+        [ parse-tree>> ] [ options>> ] [ dfa>> ] [ next-match>> ]
+    } cleave regexp boa ;
+
+M: regexp fixup-end
+    [ raw>> [ -rot update-match-groups ] keep swap ]
+    [ options>> options>string ] bi <fixup-regexp> ;
+
+: fixup-end? ( text -- ? )
+    { [ regexp? ] [ 0 swap raw>> group-start ] } 1&& ;
+
+: fixup-end/text-matches? ( string regexp rule -- match-count/f )
+    [ >string ] 2dip [ [ match-start dup ] keep ] dip pick [
+        end>> [ [ fixup-end ] change-text drop ] [ 2drop ] if*
+    ] [
+        3drop
+    ] if dup [ to>> ] when ;
+
+PRIVATE>
+
+:: rule-start-matches? ( rule -- match-count/f )
+    rule start>> dup rule can-match-here? [
+        rest-of-line swap text>>
+        dup fixup-end? [
+            rule fixup-end/text-matches?
+        ] [
+            text-matches?
+        ] if
     ] [
         drop f
     ] if ;
@@ -107,38 +184,37 @@ M: regexp text-matches?
 
 DEFER: get-rules
 
-: get-always-rules ( vector/f ruleset -- vector/f )
-    f swap rules>> at ?push-all ;
+: get-always-rules ( ruleset -- vector/f )
+    f swap rules>> at ;
 
-: get-char-rules ( vector/f char ruleset -- vector/f )
-    [ ch>upper ] dip rules>> at ?push-all ;
+: get-char-rules ( char ruleset -- vector/f )
+    [ ch>upper ] dip rules>> at ;
 
 : get-rules ( char ruleset -- seq )
-    [ f ] 2dip [ get-char-rules ] keep get-always-rules ;
+    [ get-char-rules ] [ get-always-rules ] bi [ append ] when* ;
 
 GENERIC: handle-rule-start ( match-count rule -- )
 
 GENERIC: handle-rule-end ( match-count rule -- )
 
 : find-escape-rule ( -- rule )
-    context get dup
-    in-rule-set>> escape-rule>> [ ] [
+    context get
+    [ in-rule-set>> escape-rule>> ] [
         parent>> in-rule-set>>
-        dup [ escape-rule>> ] when
-    ] ?if ;
+        [ escape-rule>> ] ?call
+    ] ?unless ;
 
 : check-escape-rule ( rule -- ? )
-    no-escape?>> [ f ] [
-        find-escape-rule dup [
-            dup rule-start-matches? [
-                swap handle-rule-start
-                delegate-end-escaped? toggle
-                t
-            ] [
-                drop f
-            ] if*
-        ] when
-    ] if ;
+    escape-rule>> [ find-escape-rule ] unless*
+    dup [
+        dup rule-start-matches? [
+            swap handle-rule-start
+            delegate-end-escaped? toggle
+            t
+        ] [
+            drop f
+        ] if*
+    ] when ;
 
 : check-every-rule ( -- ? )
     current-char current-rule-set get-rules

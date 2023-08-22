@@ -1,3 +1,4 @@
 bindings
 graphics
 fonts
+gnome

@@ -1,5 +1,5 @@
 ! Copyright (C) 2008 Doug Coleman, Daniel Ehrenberg.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: arrays assocs byte-arrays combinators growable io
 io.encodings.binary io.streams.byte-array kernel kernel.private
 literals math math.bitwise namespaces sbufs sequences
@@ -82,7 +82,7 @@ PRIVATE>
 
 : read-ignoring ( n ignoring stream -- accum )
     pick <sbuf> [
-        '[ _ _ read1-ignoring [ ] _ push-if ] times
+        '[ _ _ read1-ignoring [ ] _ push-when ] times
     ] keep ;
 
 : decode4 ( a b c d -- x y z )
@@ -95,7 +95,7 @@ PRIVATE>
 
 :: (decode-base64) ( input output -- )
     3 <byte-array> :> data
-    [ B{ CHAR: \n CHAR: \r } input read1-ignoring dup ] [
+    [ B{ CHAR: \n CHAR: \r } input read1-ignoring ] [
         B{ CHAR: \n CHAR: \r } input read1-ignoring CHAR: = or
         B{ CHAR: \n CHAR: \r } input read1-ignoring CHAR: = or
         B{ CHAR: \n CHAR: \r } input read1-ignoring CHAR: = or
@@ -103,7 +103,7 @@ PRIVATE>
         [ CHAR: = eq? 1 0 ? ] tri@ + +
         [ head-slice* ] unless-zero
         output stream-write
-    ] while drop ;
+    ] while* ;
 
 PRIVATE>
 

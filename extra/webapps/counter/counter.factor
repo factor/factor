@@ -1,5 +1,5 @@
 ! Copyright (C) 2008 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: math kernel accessors http.server http.server.dispatchers
 furnace furnace.actions furnace.sessions furnace.redirection
 html.components html.forms io.servers urls ;

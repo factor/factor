@@ -15,7 +15,6 @@
 
 	<RULES IGNORE_CASE="FALSE"
 		HIGHLIGHT_DIGITS="TRUE"
-		ESCAPE="\"
 		NO_WORD_SEP="_-+?:"
 		DIGIT_RE="-?\d+([./]\d+)?"
 	>
@@ -44,7 +43,7 @@
 		<EOL_SPAN TYPE="COMMENT2">;;</EOL_SPAN>
 		<EOL_SPAN TYPE="COMMENT1">;</EOL_SPAN>
 
-		<SPAN TYPE="LITERAL1">
+		<SPAN TYPE="LITERAL1" ESCAPE="\">
 			<BEGIN>"</BEGIN>
 			<END>"</END>
 		</SPAN>
@@ -52,7 +51,7 @@
 		<!--
 			keywords from j
 				(http://armedbear-j.sourceforge.net/)
-                        Duplicates removed; KEYWORD1 and KEYWORD2 
+                        Duplicates removed; KEYWORD1 and KEYWORD2
                           better aligned with Emacs Lisp mode
                         Missing Common Lisp symbols added; now 970 symbols total
                         2004-01-22  dsh

@@ -1,5 +1,5 @@
 ! Copyright (C) 2008 Doug Coleman.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: help.markup help.syntax io.encodings.utf8 io.sockets
 quotations strings ;
 IN: smtp

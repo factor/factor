@@ -1,5 +1,5 @@
 ! Copyright (C) 2010 John Benediktsson
-! See http://factorcode.org/license.txt for BSD license
+! See https://factorcode.org/license.txt for BSD license
 
 USING: arrays assocs combinators.short-circuit formatting
 hashtables io io.streams.string kernel make math namespaces
@@ -7,10 +7,17 @@ quoting sequences splitting strings strings.parser ;
 
 IN: ini-file
 
+! FIXME: support "key: value" ?
+! FIXME: support "key value" ?
+! FIXME: escaped comments "\;" don't work
+! FIXME: \x???? for unicode character escapes
+! FIXME: optional value conversion (e.g., 1234, true, etc.)?
+
 <PRIVATE
 
 : escape ( ch -- ch' )
     H{
+        { CHAR: 0   CHAR: \0 }
         { CHAR: a   CHAR: \a }
         { CHAR: b   CHAR: \b }
         { CHAR: f   CHAR: \f }
@@ -23,9 +30,11 @@ IN: ini-file
         { CHAR: \\  CHAR: \\ }
         { CHAR: ?   CHAR: ? }
         { CHAR: ;   CHAR: ; }
+        { CHAR: #   CHAR: # }
         { CHAR: [   CHAR: [ }
         { CHAR: ]   CHAR: ] }
         { CHAR: =   CHAR: = }
+        { CHAR: :   CHAR: : }
     } ?at [ bad-escape ] unless ;
 
 : (unescape-string) ( str -- )
@@ -42,6 +51,7 @@ IN: ini-file
     [
         [
             H{
+                { CHAR: \0   "\\0"  }
                 { CHAR: \a   "\\a"  }
                 { CHAR: \b   "\\b"  }
                 { CHAR: \f   "\\f"  }
@@ -54,12 +64,23 @@ IN: ini-file
                 { CHAR: \\   "\\\\" }
                 { CHAR: ?    "\\?"  }
                 { CHAR: ;    "\\;"  }
+                { CHAR: #    "\\#"  }
                 { CHAR: [    "\\["  }
                 { CHAR: ]    "\\]"  }
                 { CHAR: =    "\\="  }
+                { CHAR: :    "\\:"  }
             } ?at [ % ] [ , ] if
         ] each
     ] "" make ;
+
+: should-quote? ( str -- ? )
+    {
+        [ CHAR: " swap index ]
+        [ last CHAR: \ = ]
+    } 1|| ;
+
+: escape-quoted ( str -- str' )
+    [ escape-string ] [ should-quote? ] bi [ "\"" 1surround ] when ;
 
 : space? ( ch -- ? )
     "\s\t\n\r\f\v" member-eq? ;
@@ -68,7 +89,7 @@ IN: ini-file
     [ space? ] trim ;
 
 : unwrap ( str -- str' )
-    1 swap [ length 1 - ] keep subseq ;
+    1 swap index-of-last subseq ;
 
 : uncomment ( str -- str' )
     ";#" [ over index [ head ] when* ] each ;
@@ -126,15 +147,13 @@ PRIVATE>
 : write-ini ( assoc -- )
     [
         dup string? [
-            [ escape-string ] bi@ "%s=%s\n" printf
+            [ escape-quoted ] bi@ "%s=%s\n" printf
         ] [
-            [ escape-string "[%s]\n" printf ] dip
-            [ [ escape-string ] bi@ "%s=%s\n" printf ]
+            [ escape-quoted "[%s]\n" printf ] dip
+            [ [ escape-quoted ] bi@ "%s=%s\n" printf ]
             assoc-each nl
         ] if
     ] assoc-each ;
-
-! FIXME: escaped comments "\;" don't work
 
 : string>ini ( str -- assoc )
     [ read-ini ] with-string-reader ;

@@ -1,5 +1,5 @@
 ! Copyright (C) 2017 Alexander Ilin.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: arrays combinators.short-circuit formatting
 io.directories io.encodings.utf8 io.files io.pathnames kernel
 math namespaces prettyprint sequences vocabs.loader ;
@@ -18,7 +18,7 @@ IN: help.lint.spaces
             first [
                 { [ CHAR: space = ] [ CHAR: " = ] } 1||
             ] trim-head
-            "  " swap subseq?
+            "  " subseq-of?
         ] filter
         [ drop ] [
             swap <pathname> .

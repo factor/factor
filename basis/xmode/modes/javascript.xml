@@ -10,8 +10,8 @@
 		<PROPERTY NAME="wordBreakChars" VALUE=",+-=&lt;&gt;/?^&amp;*" />
 
 		<!-- Auto indent -->
-		<PROPERTY NAME="indentOpenBrackets" VALUE="{" />
-		<PROPERTY NAME="indentCloseBrackets" VALUE="}" />
+		<PROPERTY NAME="indentOpenBrackets" VALUE="{[" />
+		<PROPERTY NAME="indentCloseBrackets" VALUE="]}" />
 		<PROPERTY NAME="unalignedOpenBrackets" VALUE="(" />
 		<PROPERTY NAME="unalignedCloseBrackets" VALUE=")" />
 		<PROPERTY NAME="indentNextLine"
@@ -21,41 +21,37 @@
 		<PROPERTY NAME="electricKeys" VALUE=":" />
 	</PROPS>
 
-	<RULES ESCAPE="\"
+	<!--{{{ rule MAIN -->
+	<RULES
 		IGNORE_CASE="FALSE"
 		HIGHLIGHT_DIGITS="TRUE"
-		DIGIT_RE="(0x[\p{XDigit}]+[lL]?|[\p{Digit}]+(e[\p{Digit}]*)?[lLdDfF]?)">
+		DIGIT_RE="((0x|0b|0o)[\p{XDigit}]+[lL]?|[\p{Digit}]+(e[\p{Digit}]*)?[lLdDfF]?)">
 
 		<!-- The rest of the javascript info -->
+
+		<SPAN TYPE="COMMENT3">
+			<BEGIN>/**</BEGIN>
+			<END>*/</END>
+		</SPAN>
 
 		<SPAN TYPE="COMMENT1">
 			<BEGIN>/*</BEGIN>
 			<END>*/</END>
 		</SPAN>
 
-		<SPAN TYPE="LITERAL1" NO_LINE_BREAK="TRUE">
-			<BEGIN>"</BEGIN>
-			<END>"</END>
-		</SPAN>
 
-		<SPAN TYPE="LITERAL1" NO_LINE_BREAK="TRUE">
-			<BEGIN>'</BEGIN>
-			<END>'</END>
-		</SPAN>
+		<IMPORT DELEGATE="STRING_LITERAL"/>
+		
 
-		<SPAN_REGEXP HASH_CHARS="ABCDEFGHIJKLMNOPQRSTUVWXYZ_" TYPE="FUNCTION" DELEGATE="FUNCTION_PARAMS">
-			<BEGIN>[A-Za-z_][\w_-]*\s*\(</BEGIN>
-			<END>)</END>
-		</SPAN_REGEXP>
+		<MARK_PREVIOUS TYPE="FUNCTION" MATCH_TYPE="OPERATOR">(</MARK_PREVIOUS>
+		<MARK_PREVIOUS TYPE="FUNCTION" MATCH_TYPE="OPERATOR"> (</MARK_PREVIOUS>
+		<SEQ TYPE="OPERATOR">)</SEQ>
 
-		<!-- Keep brackets together: -->
-		<SPAN TYPE="OPERATOR" DELEGATE="MAIN">
-			<BEGIN>(</BEGIN>
-			<END>)</END>
-		</SPAN>
-
+		<SEQ TYPE="KEYWORD1">=&gt;</SEQ>
+		
 		<SEQ TYPE="COMMENT2">//--&gt;</SEQ>
 		<EOL_SPAN TYPE="COMMENT2">//</EOL_SPAN>
+		<SEQ_REGEXP TYPE="MARKUP" HASH_CHAR="/" AT_WORD_START="TRUE">/[^\p{Blank}]*?/</SEQ_REGEXP>
 
 		<SEQ TYPE="COMMENT1">&lt;!--</SEQ>
 
@@ -82,107 +78,190 @@
 		<SEQ TYPE="OPERATOR">]</SEQ>
 		<SEQ TYPE="OPERATOR">[</SEQ>
 		<SEQ TYPE="OPERATOR">?</SEQ>
-		<MARK_PREVIOUS AT_WHITESPACE_END="TRUE"
-			MATCH_TYPE="OPERATOR"
-			TYPE="LABEL">:</MARK_PREVIOUS>
+		<MARK_PREVIOUS AT_WHITESPACE_END="TRUE" MATCH_TYPE="OPERATOR" TYPE="LABEL">:</MARK_PREVIOUS>
 		<SEQ TYPE="OPERATOR">:</SEQ>
 
+		<IMPORT DELEGATE="KEYWORDS"/>
+	</RULES>
+	<!--}}}-->
+	
+	<!--{{{ rule KEYWORDS -->
+	<RULES SET="KEYWORDS">
+		<IMPORT DELEGATE="ES_KEYWORDS"/>
+		<IMPORT DELEGATE="ADO_KEYWORDS"/>
+	</RULES>
+	<!--}}}-->
+	
+	<!--{{{ rule ES_KEYWORDS -->
+	<RULES SET="ES_KEYWORDS">
 		<KEYWORDS>
-			<!-- ECMAScript keywords -->
-			<KEYWORD1>break</KEYWORD1>
-			<KEYWORD1>continue</KEYWORD1>
-			<KEYWORD1>delete</KEYWORD1>
-			<KEYWORD1>else</KEYWORD1>
-			<KEYWORD1>for</KEYWORD1>
-			<KEYWORD1>function</KEYWORD1>
-			<KEYWORD1>if</KEYWORD1>
-			<KEYWORD1>in</KEYWORD1>
-			<KEYWORD1>new</KEYWORD1>
-			<KEYWORD1>return</KEYWORD1>
-			<LITERAL2>this</LITERAL2>
-			<KEYWORD1>typeof</KEYWORD1>
-			<KEYWORD1>var</KEYWORD1>
-			<KEYWORD3>void</KEYWORD3>
-			<KEYWORD1>while</KEYWORD1>
-			<KEYWORD1>with</KEYWORD1>
-
-			<!--ECMAScript keywords-->
-			<!-- Reserved for future use
-				(some are already used in some Javascript Engines)
-			-->
 			<KEYWORD1>abstract</KEYWORD1>
-			<KEYWORD3>boolean</KEYWORD3>
-			<KEYWORD3>byte</KEYWORD3>
+			<KEYWORD1>async</KEYWORD1>
+			<KEYWORD1>await</KEYWORD1>
+			<KEYWORD1>break</KEYWORD1>
 			<KEYWORD1>case</KEYWORD1>
 			<KEYWORD1>catch</KEYWORD1>
-			<KEYWORD3>char</KEYWORD3>
 			<KEYWORD1>class</KEYWORD1>
 			<KEYWORD1>const</KEYWORD1>
+			<KEYWORD1>continue</KEYWORD1>
 			<KEYWORD1>debugger</KEYWORD1>
 			<KEYWORD1>default</KEYWORD1>
-
+			<KEYWORD1>delete</KEYWORD1>
 			<KEYWORD1>do</KEYWORD1>
-			<KEYWORD3>double</KEYWORD3>
+			<KEYWORD1>else</KEYWORD1>
 			<KEYWORD1>enum</KEYWORD1>
-			<KEYWORD2>export</KEYWORD2>
 			<KEYWORD1>extends</KEYWORD1>
 			<KEYWORD1>final</KEYWORD1>
 			<KEYWORD1>finally</KEYWORD1>
-			<KEYWORD3>float</KEYWORD3>
+			<KEYWORD1>for</KEYWORD1>
+			<KEYWORD1>function</KEYWORD1>
+			<KEYWORD1>get</KEYWORD1>
 			<KEYWORD1>goto</KEYWORD1>
+			<KEYWORD1>if</KEYWORD1>
 			<KEYWORD1>implements</KEYWORD1>
-
-			<KEYWORD2>import</KEYWORD2>
+			<KEYWORD1>in</KEYWORD1>
 			<KEYWORD1>instanceof</KEYWORD1>
-			<KEYWORD3>int</KEYWORD3>
 			<KEYWORD1>interface</KEYWORD1>
-			<KEYWORD3>long</KEYWORD3>
+			<KEYWORD1>let</KEYWORD1>
 			<KEYWORD1>native</KEYWORD1>
-			<KEYWORD2>package</KEYWORD2>
+			<KEYWORD1>new</KEYWORD1>
+			<KEYWORD1>of</KEYWORD1>
 			<KEYWORD1>private</KEYWORD1>
 			<KEYWORD1>protected</KEYWORD1>
 			<KEYWORD1>public</KEYWORD1>
-
-			<KEYWORD3>short</KEYWORD3>
+			<KEYWORD1>return</KEYWORD1>
+			<KEYWORD1>set</KEYWORD1>
 			<KEYWORD1>static</KEYWORD1>
-			<LITERAL2>super</LITERAL2>
 			<KEYWORD1>switch</KEYWORD1>
 			<KEYWORD1>synchronized</KEYWORD1>
 			<KEYWORD1>throw</KEYWORD1>
 			<KEYWORD1>throws</KEYWORD1>
 			<KEYWORD1>transient</KEYWORD1>
 			<KEYWORD1>try</KEYWORD1>
+			<KEYWORD1>typeof</KEYWORD1>
+			<KEYWORD1>var</KEYWORD1>
 			<KEYWORD1>volatile</KEYWORD1>
-
-			<!-- Intrinsic Objects (Good idea not to use these names!!)-->
-			<KEYWORD3>Array</KEYWORD3>
-			<KEYWORD3>Boolean</KEYWORD3>
-			<KEYWORD3>Date</KEYWORD3>
-			<KEYWORD3>Function</KEYWORD3>
-			<KEYWORD3>Global</KEYWORD3>
-			<KEYWORD3>Math</KEYWORD3>
-			<KEYWORD3>Number</KEYWORD3>
-			<KEYWORD3>Object</KEYWORD3>
-			<KEYWORD3>RegExp</KEYWORD3><!-- Not ECMA -->
-			<KEYWORD3>String</KEYWORD3>
-
+			<KEYWORD1>while</KEYWORD1>
+			<KEYWORD1>with</KEYWORD1>
+			<KEYWORD1>yield</KEYWORD1>
+	
+			<KEYWORD2>export</KEYWORD2>
+			<KEYWORD2>import</KEYWORD2>
+			<KEYWORD2>package</KEYWORD2>
+			
+			<KEYWORD3>boolean</KEYWORD3>
+			<KEYWORD3>byte</KEYWORD3>
+			<KEYWORD3>char</KEYWORD3>
+			<KEYWORD3>double</KEYWORD3>
+			<KEYWORD3>float</KEYWORD3>
+			<KEYWORD3>int</KEYWORD3>
+			<KEYWORD3>long</KEYWORD3>
+			<KEYWORD3>short</KEYWORD3>
+			<KEYWORD3>void</KEYWORD3>
+	
+			<LITERAL2>super</LITERAL2>
+			<LITERAL2>this</LITERAL2>
+			
 			<!-- Literals -->
 			<LITERAL2>false</LITERAL2>
 			<LITERAL2>null</LITERAL2>
 			<LITERAL2>true</LITERAL2>
-
 			<LITERAL2>NaN</LITERAL2>
 			<LITERAL2>Infinity</LITERAL2>
-
+			
+			<!-- Value properties -->
+			<LITERAL2>undefined</LITERAL2>
+			
+			<!-- Function properties -->
+			<LITERAL2>decodeURI</LITERAL2>
+			<LITERAL2>decodeURIComponent</LITERAL2>
+			<LITERAL2>encodeURI</LITERAL2>
+			<LITERAL2>encodeURIComponent</LITERAL2>
+	
 			<!-- Global functions -->
 			<LITERAL2>eval</LITERAL2>
-			<LITERAL2>parseInt</LITERAL2>
-			<LITERAL2>parseFloat</LITERAL2>
-			<LITERAL2>escape</LITERAL2>
-			<LITERAL2>unescape</LITERAL2>
-			<LITERAL2>isNaN</LITERAL2>
 			<LITERAL2>isFinite</LITERAL2>
-
+			<LITERAL2>isNaN</LITERAL2>
+			<LITERAL2>parseFloat</LITERAL2>
+			<LITERAL2>parseInt</LITERAL2>
+	
+			<!-- Fundamental objects -->
+			<KEYWORD3>Array</KEYWORD3> 
+			<KEYWORD3>Boolean</KEYWORD3> 
+			<KEYWORD3>Date</KEYWORD3> 
+			<KEYWORD3>Error</KEYWORD3>
+			<KEYWORD3>EvalError</KEYWORD3>
+			<KEYWORD3>Function</KEYWORD3> 
+			<KEYWORD3>Global</KEYWORD3> 
+			<KEYWORD3>InternalError</KEYWORD3>
+			<KEYWORD3>Math</KEYWORD3>
+			<KEYWORD3>Number</KEYWORD3>
+			<KEYWORD3>Object</KEYWORD3>
+			<KEYWORD3>RangeError</KEYWORD3>
+			<KEYWORD3>ReferenceError</KEYWORD3>
+			<KEYWORD3>RegExp</KEYWORD3>
+			<KEYWORD3>String</KEYWORD3>
+			<KEYWORD3>Symbol</KEYWORD3>
+			<KEYWORD3>SyntaxError</KEYWORD3>
+			<KEYWORD3>TypeError</KEYWORD3>
+			<KEYWORD3>URIError</KEYWORD3>
+			
+			<!-- Indexed collections -->
+			<KEYWORD3>Float32Array</KEYWORD3>
+			<KEYWORD3>Float64Array</KEYWORD3>
+			<KEYWORD3>Int8Array</KEYWORD3>
+			<KEYWORD3>Int16Array</KEYWORD3>
+			<KEYWORD3>Int32Array</KEYWORD3>
+			<KEYWORD3>Uint8Array</KEYWORD3>
+			<KEYWORD3>Uint8ClampedArray</KEYWORD3>
+			<KEYWORD3>Uint16Array</KEYWORD3>
+			<KEYWORD3>Uint32Array</KEYWORD3>
+			
+			<!-- Keyed collections -->
+			<KEYWORD3>Map</KEYWORD3>
+			<KEYWORD3>Set</KEYWORD3>
+			<KEYWORD3>WeakMap</KEYWORD3>
+			<KEYWORD3>WeakSet</KEYWORD3>
+			
+			<!-- Structured data -->
+			<KEYWORD3>ArrayBuffer</KEYWORD3>
+			<KEYWORD3>DataView</KEYWORD3>
+			<KEYWORD3>JSON</KEYWORD3>
+			
+			<!-- Control abstraction objects -->
+			<KEYWORD3>Generator</KEYWORD3>
+			<KEYWORD3>GeneratorFunction</KEYWORD3>
+			<KEYWORD3>Promise</KEYWORD3>
+			
+			<!-- Reflection -->                           
+			<KEYWORD3>Proxy</KEYWORD3>
+			<KEYWORD3>Reflect</KEYWORD3>
+			
+			<!-- Internationalization -->
+			<KEYWORD3>Intl</KEYWORD3>
+			<KEYWORD3>Intl.Collator</KEYWORD3>
+			<KEYWORD3>Intl.DateTimeFormat</KEYWORD3>
+			<KEYWORD3>Intl.NumberFormat</KEYWORD3>
+			
+			<!-- WebAssembly -->
+			<KEYWORD3>WebAssembly</KEYWORD3>
+			<KEYWORD3>WebAssembly.CompileError</KEYWORD3>
+			<KEYWORD3>WebAssembly.Instance</KEYWORD3>
+			<KEYWORD3>WebAssembly.LinkError</KEYWORD3>
+			<KEYWORD3>WebAssembly.Memory</KEYWORD3>
+			<KEYWORD3>WebAssembly.Module</KEYWORD3>
+			<KEYWORD3>WebAssembly.RuntimeError</KEYWORD3>
+			<KEYWORD3>WebAssembly.Table</KEYWORD3>
+			
+			<!-- Other -->
+			<KEYWORD3>arguments</KEYWORD3>
+		</KEYWORDS>
+	</RULES>
+	<!--}}}-->
+	
+	<!--{{{ rule ADO_KEYWORDS -->
+	<RULES SET="ADO_KEYWORDS">
+		<KEYWORDS>
 			<!-- Comment/Uncomment your favorite ADO Constants-->
 
 			<!-- ADO Constants-->
@@ -557,16 +636,49 @@
 			<LITERAL2>adRecalcAlways</LITERAL2>
 -->
 		</KEYWORDS>
-	</RULES>
-
-	<RULES SET="FUNCTION_PARAMS">
-		<!-- Keep brackets together: -->
-		<SPAN TYPE="OPERATOR" DELEGATE="MAIN">
-			<BEGIN>(</BEGIN>
-			<END>)</END>
+	</RULES>	
+	
+	<!--{{{ rule STRING_LITERAL -->
+	<RULES SET="STRING_LITERAL">
+		<SPAN TYPE="LITERAL1" NO_LINE_BREAK="TRUE" ESCAPE="\">
+			<BEGIN>"</BEGIN>
+			<END>"</END>
 		</SPAN>
 
-		<IMPORT DELEGATE="MAIN" />
-		<!-- <SEQ TYPE="OPERATOR">)</SEQ> -->
+		<SPAN TYPE="LITERAL1" NO_LINE_BREAK="TRUE" ESCAPE="\">
+			<BEGIN>'</BEGIN>
+			<END>'</END>
+		</SPAN>
+
+		
+		<IMPORT DELEGATE="TEMPLATE_LITERAL"/>
 	</RULES>
+	<!--}}}-->
+		
+	<!--{{{ rule TEMPLATE_LITERAL_PLACEHOLDER -->
+	<RULES SET="TEMPLATE_LITERAL_PLACEHOLDER" DEFAULT="LITERAL1" ESCAPE="\">
+		<SPAN TYPE="LITERAL2" ESCAPE="\" DELEGATE="EXPRESSION">
+			<BEGIN>${</BEGIN>
+			<END>}</END>
+		</SPAN>
+	</RULES>
+	<!--}}}-->
+	
+	<!--{{{ rule TEMPLATE_LITERAL -->
+	<RULES SET="TEMPLATE_LITERAL">
+		<SPAN TYPE="LITERAL1" ESCAPE="\" DELEGATE="TEMPLATE_LITERAL_PLACEHOLDER">
+			<BEGIN>`</BEGIN>
+			<END>`</END>
+		</SPAN>
+	</RULES>
+	<!--}}}-->
+
+	<!--{{{ rule EXPRESSION -->
+	<RULES SET="EXPRESSION" ESCAPE="\" HIGHLIGHT_DIGITS="TRUE" 
+		DIGIT_RE="((0x|0b|0o)[\p{XDigit}]+[lL]?|[\p{Digit}]+(e[\p{Digit}]*)?[lLdDfF]?)">
+
+		<IMPORT DELEGATE="MAIN" />
+	</RULES>
+	<!--}}}-->
+	
 </MODE>

@@ -1,5 +1,5 @@
 ! Copyright (C) 2010 Dmitry Shubin.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors alien.c-types alien.data alien.destructors
 alien.enums alien.syntax classes.struct combinators continuations
 destructors fry gdbm.ffi io.backend kernel libc locals math namespaces

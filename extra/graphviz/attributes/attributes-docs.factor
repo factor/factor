@@ -1,5 +1,5 @@
 ! Copyright (C) 2011 Alex Vondrak.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: help.markup help.syntax strings ;
 IN: graphviz.attributes
 
@@ -31,16 +31,16 @@ HELP: <node-attributes>
 { $description "Constructs " { $instance node-attributes } " tuple with no attributes set." } ;
 
 HELP: edge-attributes
-{ $class-description "Represents Graphviz attributes that are valid for edges. See attributes marked " { $emphasis "E" } " in " { $url "http://graphviz.org/content/attrs" } ". Each slot must be " { $maybe string } "." } ;
+{ $class-description "Represents Graphviz attributes that are valid for edges. See attributes marked " { $emphasis "E" } " in " { $url "https://graphviz.org/content/attrs" } ". Each slot must be " { $maybe string } "." } ;
 
 HELP: graph-attributes
-{ $class-description "Represents Graphviz attributes that are valid for graphs and subgraphs (including clusters). See attributes marked " { $emphasis "G" } ", " { $emphasis "S" } ", and " { $emphasis "C" } " in " { $url "http://graphviz.org/content/attrs" } ". Each slot must be " { $maybe string } "." } ;
+{ $class-description "Represents Graphviz attributes that are valid for graphs and subgraphs (including clusters). See attributes marked " { $emphasis "G" } ", " { $emphasis "S" } ", and " { $emphasis "C" } " in " { $url "https://graphviz.org/content/attrs" } ". Each slot must be " { $maybe string } "." } ;
 
 HELP: node-attributes
-{ $class-description "Represents Graphviz attributes that are valid for nodes. See attributes marked " { $emphasis "N" } " in " { $url "http://graphviz.org/content/attrs" } ". Each slot must be " { $maybe string } "." } ;
+{ $class-description "Represents Graphviz attributes that are valid for nodes. See attributes marked " { $emphasis "N" } " in " { $url "https://graphviz.org/content/attrs" } ". Each slot must be " { $maybe string } "." } ;
 
 ARTICLE: "graphviz.attributes" "Graphviz attributes"
-"In Graphviz, " { $emphasis "attributes" } " control different layout characteristics of graphs, subgraphs, nodes, and edges. For example, you can specify the color of an edge or the shape of a node. Graphviz provides documentation for all valid attributes at " { $url "http://graphviz.org/content/attrs" } "."
+"In Graphviz, " { $emphasis "attributes" } " control different layout characteristics of graphs, subgraphs, nodes, and edges. For example, you can specify the color of an edge or the shape of a node. Graphviz provides documentation for all valid attributes at " { $url "https://graphviz.org/content/attrs" } "."
 $nl
 "The " { $vocab-link "graphviz.attributes" } " vocabulary simply provides three different tuples to encapsulate Graphviz attributes:"
 { $subsections node-attributes edge-attributes graph-attributes }

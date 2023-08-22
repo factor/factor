@@ -1,5 +1,5 @@
 ! Copyright (C) 2003, 2010 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors arrays colors combinators grouping io
 io.streams.string io.styles kernel make math namespaces
 prettyprint.config prettyprint.custom prettyprint.sections
@@ -70,7 +70,7 @@ SYMBOL: =>
     ] [ ] make ;
 
 : remove-breakpoints ( quot pos -- quot' )
-    1 + short cut [ (remove-breakpoints) ] bi@ [ => ] glue ;
+    1 + index-or-length cut [ (remove-breakpoints) ] bi@ [ => ] glue ;
 
 : optimized-frame? ( triple -- ? ) second word? ;
 

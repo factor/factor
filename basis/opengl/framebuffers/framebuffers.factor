@@ -1,5 +1,5 @@
 ! Copyright (C) 2008 Joe Groff.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: opengl opengl.gl combinators continuations kernel
 alien.c-types alien.data ;
 IN: opengl.framebuffers

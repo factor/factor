@@ -1,10 +1,8 @@
 ! Copyright (C) 2008 Doug Coleman, John Benediktsson.
-! See http://factorcode.org/license.txt for BSD license.
-USING: alien.c-types alien.data alien.strings alien.syntax
-arrays assocs byte-arrays core-foundation endian
-io.encodings.utf8 kernel libc sequences specialized-arrays
-splitting system system-info unix.users ;
-SPECIALIZED-ARRAY: int
+! See https://factorcode.org/license.txt for BSD license.
+USING: alien.c-types alien.data alien.strings alien.syntax arrays
+assocs byte-arrays core-foundation endian io.encodings.utf8 kernel
+libc sequences splitting system system-info unix.sysctl unix.users ;
 IN: system-info.macosx
 
 <PRIVATE
@@ -22,6 +20,8 @@ FUNCTION: OSErr Gestalt ( OSType selector, SInt32* response )
 : system-version-bugfix ( -- n ) "sys3" be> gestalt ;
 
 CONSTANT: system-code-names H{
+    { { 14 0 } "Sonoma" }
+    { { 13 0 } "Ventura" }
     { { 12 0 } "Monterey" }
     { { 11 0 } "Big Sur" }
     { { 10 16 } "Big Sur" }
@@ -44,7 +44,8 @@ CONSTANT: system-code-names H{
 }
 
 : system-code-name ( -- str/f )
-    system-version-major system-version-minor 2array
+    system-version-major
+    dup 10 = [ system-version-minor ] [ 0 ] if 2array
     system-code-names at ;
 
 PRIVATE>
@@ -55,25 +56,6 @@ M: macosx os-version
     system-version-bugfix 3array ;
 
 ! See /usr/include/sys/sysctl.h for constants
-
-LIBRARY: libc
-FUNCTION: int sysctl ( int* name, uint namelen, void* oldp, size_t* oldlenp, void* newp, size_t newlen )
-
-: (sysctl-query) ( name namelen oldp oldlenp -- oldp )
-    over [ f 0 sysctl io-error ] dip ;
-
-: sysctl-query ( seq n -- byte-array )
-    [ [ int >c-array ] [ length ] bi ] dip
-    [ <byte-array> ] [ uint <ref> ] bi (sysctl-query) ;
-
-: sysctl-query-string ( seq -- n )
-    4096 sysctl-query utf8 alien>string ;
-
-: sysctl-query-uint ( seq -- n )
-    4 sysctl-query uint deref ;
-
-: sysctl-query-ulonglong ( seq -- n )
-    8 sysctl-query ulonglong deref ;
 
 : machine ( -- str ) { 6 1 } sysctl-query-string ;
 : model ( -- str ) { 6 2 } sysctl-query-string ;

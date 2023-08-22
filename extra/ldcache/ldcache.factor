@@ -1,5 +1,5 @@
 ! Copyright (C) 2017 Björn Lindqvist.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors alien.c-types alien.strings assocs byte-arrays
 classes.struct continuations io io.encodings.binary
 io.encodings.string io.files kernel math math.bitwise sequences
@@ -73,7 +73,7 @@ STRUCT: EntryNew
     [ key>> make-string ]
     [ value>> make-string ] 2tri ldcache-entry boa ;
 
-: parse ( -- entries  )
+: parse ( -- entries )
     ! Read the old header and jump past it.
     HeaderOld read-struct
     [

@@ -24,7 +24,7 @@ HELP: gadget
         { "clipped?" "a boolean indicating if clipping will be enabled when drawing this gadget's children." }
         { "interior" { "an implementation of the " { $link "ui-pen-protocol" } } }
         { "boundary" { "an implementation of the " { $link "ui-pen-protocol" } } }
-        {  "model" { "a " { $link model } " or " { $link f } "; see " { $link "ui-control-impl" } } }
+        { "model" { "a " { $link model } " or " { $link f } "; see " { $link "ui-control-impl" } } }
     }
 "Gadgets subclass the " { $link rect } " class, and thus all instances have " { $slot "loc" } " and " { $slot "dim" } " instances holding their location and dimensions." }
 { $notes
@@ -48,8 +48,8 @@ ARTICLE: "ui-paint" "Customizing gadget appearance"
     "ui-paint-custom"
 } ;
 
-ARTICLE: "ui-paint-coord" "The UI co-ordinate system"
-"The UI uses a co-ordinate system where the y axis is oriented down. The OpenGL " { $link GL_MODELVIEW } " matrix is saved or restored when rendering a gadget, and the origin is translated to the gadget's origin within the window. The current origin is stored in a variable:"
+ARTICLE: "ui-paint-coord" "The UI coordinate system"
+"The UI uses a coordinate system where the y axis is oriented down. The OpenGL " { $link GL_MODELVIEW } " matrix is saved or restored when rendering a gadget, and the origin is translated to the gadget's origin within the window. The current origin is stored in a variable:"
 { $subsections origin }
 "Gadgets must not draw outside of their bounding box, however clipping is not enforced by default, for performance reasons. This can be changed by setting the " { $slot "clipped?" } " slot to " { $link t } " in the gadget's constructor." ;
 

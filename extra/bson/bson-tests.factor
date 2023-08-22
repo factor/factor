@@ -1,4 +1,4 @@
-USING: bson.reader bson.writer bson.constants byte-arrays io.encodings.binary
+USING: bson bson.constants byte-arrays io.encodings.binary
 io.streams.byte-array tools.test literals calendar kernel math ;
 
 IN: bson.tests
@@ -36,12 +36,18 @@ IN: bson.tests
                    { gmt-offset T{ duration { hour 2 } } } } } } turnaround
 ] unit-test
 
-{ H{ { "nested" H{ { "a" "a string" } { "b" H{ { "a" "a string" } } } } }
-     { "ref" T{ dbref f "a" "b" "c" } }
-     { "array" H{ { "a list" { 1 2.234 "hello world" } } } }
-     { "quot" [ 1 2 + ] } }
-}
-[ H{ { "nested" H{ { "a" "a string" } { "b" H{ { "a" "a string" } } } } }
-     { "ref" T{ dbref f "a" "b" "c" } }
-     { "array" H{ { "a list" { 1 2.234 "hello world" } } } }
-     { "quot" [ 1 2 + ] } } turnaround ] unit-test
+{
+     H{
+          { "nested" H{ { "a" "a string" } { "b" H{ { "a" "a string" } } } } }
+          { "ref" T{ dbref f "a" "b" "c" } }
+          { "array" H{ { "a list" { 1 2.234 "hello world" } } } }
+          { "quot" [ 1 2 + ] }
+     }
+} [
+     H{
+          { "nested" H{ { "a" "a string" } { "b" H{ { "a" "a string" } } } } }
+          { "ref" T{ dbref f "a" "b" "c" } }
+          { "array" H{ { "a list" { 1 2.234 "hello world" } } } }
+          { "quot" [ 1 2 + ] }
+     } turnaround
+] unit-test

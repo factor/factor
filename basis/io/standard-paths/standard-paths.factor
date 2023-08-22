@@ -1,5 +1,5 @@
 ! Copyright (C) 2011 Doug Coleman.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: combinators io.pathnames kernel sequences system
 vocabs ;
 IN: io.standard-paths
@@ -11,6 +11,8 @@ HOOK: find-in-path* os ( string -- path/f )
 HOOK: find-in-applications os ( directories filename -- path )
 
 HOOK: find-in-standard-login-path* os ( string -- path/f )
+
+HOOK: application-directories os ( -- paths )
 
 M: object find-in-standard-login-path*
     find-in-path* ;

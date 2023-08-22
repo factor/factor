@@ -42,27 +42,27 @@ $low-level-note ;
 
 HELP: decode-input
 { $values
-     { "encoding" "an encoding descriptor" }
+    { "encoding" "an encoding descriptor" }
 }
 { $description "Changes the encoding of the current input stream stored in the " { $link input-stream } " variable." } ;
 
 HELP: encode-output
 { $values
-     { "encoding" "an encoding descriptor" }
+    { "encoding" "an encoding descriptor" }
 }
 { $description "Changes the encoding of the current output stream stored in the " { $link output-stream } " variable." } ;
 
 HELP: re-decode
 { $values
-     { "stream" "a stream" } { "encoding" "an encoding descriptor" }
-     { "newstream" "a new stream" }
+    { "stream" "a stream" } { "encoding" "an encoding descriptor" }
+    { "newstream" "a new stream" }
 }
 { $description "Creates a new decoding stream with the supplied encoding descriptor from an existing stream by calling the " { $link <decoder> } " word." } ;
 
 HELP: re-encode
 { $values
-     { "stream" "a stream" } { "encoding" "an encoding descriptor" }
-     { "newstream" "a new stream" }
+    { "stream" "a stream" } { "encoding" "an encoding descriptor" }
+    { "newstream" "a new stream" }
 }
 { $description "Creates a new encoding stream with the supplied encoding descriptor from an existing stream by calling the " { $link <encoder> } " word." } ;
 
@@ -70,13 +70,13 @@ HELP: re-encode
 
 HELP: with-decoded-input
 { $values
-     { "encoding" "an encoding descriptor" } { "quot" quotation }
+    { "encoding" "an encoding descriptor" } { "quot" quotation }
 }
 { $description "Creates a new decoding stream with the given encoding descriptor and calls the quotation with this stream set to the " { $link input-stream } " variable. The original decoder stream is restored after the quotation returns and the stream is kept open for future input operations." } ;
 
 HELP: with-encoded-output
 { $values
-     { "encoding" "an encoding descriptor" } { "quot" quotation }
+    { "encoding" "an encoding descriptor" } { "quot" quotation }
 }
 { $description "Creates a new encoder with the given encoding descriptor and calls the quotation using this encoder. The original encoder object is restored after the quotation returns and the stream is kept open for future output operations." } ;
 

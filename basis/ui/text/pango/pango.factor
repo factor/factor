@@ -1,5 +1,5 @@
 ! Copyright (C) 2009, 2010 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors alien.c-types alien.data alien.strings arrays assocs
 cache cairo cairo.ffi classes.struct combinators destructors fonts fry
 gobject.ffi init io.encodings.utf8 kernel math math.rectangles

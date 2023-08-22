@@ -34,19 +34,19 @@ CONSTANT: MDB_USER_KEY       "mongodb_user_key"
 CONSTANT: MDB_COLLECTION_MAP "mongodb_collection_map"
 
 MEMO: id-slot ( class -- slot )
-   MDB_USER_KEY word-prop
-   dup [ drop "_id" ] unless ;
+    MDB_USER_KEY word-prop
+    dup [ drop "_id" ] unless ;
 
 PRIVATE>
 
 : >toid ( object -- toid )
-   [ id>> ] [ class-of id-slot ] bi <toid> ;
+    [ id>> ] [ class-of id-slot ] bi <toid> ;
 
 M: mdb-persistent id>> ( object -- id )
-   dup class-of id-slot reader-word execute( object -- id ) ;
+    dup class-of id-slot reader-word execute( object -- id ) ;
 
 M: mdb-persistent id<< ( object value -- )
-   over class-of id-slot writer-word execute( object value -- ) ;
+    over class-of id-slot writer-word execute( object value -- ) ;
 
 
 
@@ -98,7 +98,7 @@ GENERIC: mdb-index-map ( tuple -- sequence )
 PRIVATE>
 
 : MDB_ADDON_SLOTS ( -- slots )
-   { $[ MDB_OID_FIELD MDB_META_FIELD ] } ; inline
+    { $[ MDB_OID_FIELD MDB_META_FIELD ] } ; inline
 
 : link-class ( collection class -- )
     over classes>>
@@ -161,7 +161,7 @@ GENERIC: <mdb-tuple-collection> ( name -- mdb-tuple-collection )
 M: string <mdb-tuple-collection>
     collection-map [ ] [ key? ] 2bi
     [ at ] [ [ mdb-tuple-collection new dup ] 2dip
-             [ [ >>name ] keep ] dip set-at ] if ; inline
+    [ [ >>name ] keep ] dip set-at ] if ; inline
 M: mdb-tuple-collection <mdb-tuple-collection> ;
 M: mdb-collection <mdb-tuple-collection>
     [ name>> <mdb-tuple-collection> ] keep

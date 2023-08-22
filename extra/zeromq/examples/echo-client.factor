@@ -1,5 +1,5 @@
 ! Copyright (C) 2013 John Benediktsson.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: byte-arrays calendar destructors io kernel present strings
 threads zeromq zeromq.ffi ;
 IN: zeromq.examples.echo-client

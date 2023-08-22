@@ -1,4 +1,4 @@
-USING: classes help.markup help.syntax sequences ui.gadgets ui.tools.button-list ;
+USING: classes help.markup help.syntax sequences ui.gadgets ;
 IN: ui.tools.common
 
 HELP: set-tool-dim

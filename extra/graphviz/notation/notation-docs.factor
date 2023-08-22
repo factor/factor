@@ -1,5 +1,5 @@
 ! Copyright (C) 2011 Alex Vondrak.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: graphviz graphviz.attributes help.markup help.syntax
 kernel present sequences ;
 IN: graphviz.notation
@@ -346,7 +346,7 @@ HELP: ~->
 ;
 
 ARTICLE: { "graphviz.notation" "=attrs" } "Notation for setting Graphviz attributes"
-"The " { $vocab-link "graphviz.notation" } " vocabulary provides words for setting Graphviz attributes in a way that looks similar to the DOT language (see " { $url "http://graphviz.org/content/dot-language" } ")."
+"The " { $vocab-link "graphviz.notation" } " vocabulary provides words for setting Graphviz attributes in a way that looks similar to the DOT language (see " { $url "https://graphviz.org/content/dot-language" } ")."
 $nl
 "For every slot named, say, " { $snippet "attr" } " in the " { $link node-attributes } ", " { $link edge-attributes } ", and " { $link graph-attributes } " tuples, a generic word named " { $snippet "=attr" } " is defined with the stack effect " { $snippet "( graphviz-obj val -- graphviz-obj' )" } "."
 $nl
@@ -414,7 +414,7 @@ $nl
 ;
 
 ARTICLE: { "graphviz.notation" "synonyms" } "Aliases that resemble DOT code"
-"The " { $vocab-link "graphviz.notation" } " vocabulary provides aliases for words defined in the " { $vocab-link "graphviz" } " and " { $vocab-link "graphviz.attributes" } " vocabularies. These will make Factor code read more like DOT code (see " { $url "http://graphviz.org/content/dot-language" } ")."
+"The " { $vocab-link "graphviz.notation" } " vocabulary provides aliases for words defined in the " { $vocab-link "graphviz" } " and " { $vocab-link "graphviz.attributes" } " vocabularies. These will make Factor code read more like DOT code (see " { $url "https://graphviz.org/content/dot-language" } ")."
 $nl
 "Notation for edges without attributes:"
 { $subsections
@@ -443,7 +443,7 @@ $nl
 ;
 
 ARTICLE: "graphviz.notation" "Graphviz notation"
-"The " { $vocab-link "graphviz.notation" } " vocabulary provides words for building " { $link graph } "s in a way that looks similar to the DOT language (see " { $url "http://graphviz.org/content/dot-language" } ")."
+"The " { $vocab-link "graphviz.notation" } " vocabulary provides words for building " { $link graph } "s in a way that looks similar to the DOT language (see " { $url "https://graphviz.org/content/dot-language" } ")."
 $nl
 "The " { $vocab-link "graphviz" } " vocabulary alone already follows the general structure of the DOT language: " { $link graph } "s and " { $link subgraph } "s consist of an ordered sequence of " { $slot "statements" } "; each statement will " { $link add } " either a " { $link node } ", an " { $link edge } ", or some attribute declaration (" { $links graph-attributes node-attributes edge-attributes } "); and " { $slot "attributes" } " may be set on individual " { $link node } "s and " { $link edge } "s. Even some DOT niceties are already supported, like being able to have an " { $link edge } " between anonymous " { $link subgraph } "s. For instance, compare"
 { $code

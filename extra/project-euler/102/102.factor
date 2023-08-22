@@ -1,10 +1,10 @@
 ! Copyright (c) 2009 Guillaume Nargeot.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: arrays grouping io.encodings.ascii io.files kernel math
 math.parser sequences splitting project-euler.common ;
 IN: project-euler.102
 
-! http://projecteuler.net/index.php?section=problems&id=102
+! https://projecteuler.net/index.php?section=problems&id=102
 
 ! DESCRIPTION
 ! -----------
@@ -21,7 +21,7 @@ IN: project-euler.102
 ! XYZ does not.
 
 ! Using triangles.txt (right click and 'Save Link/Target As...'), a 27K text
-! file containing the co-ordinates of one thousand "random" triangles, find the
+! file containing the coordinates of one thousand "random" triangles, find the
 ! number of triangles for which the interior contains the origin.
 
 ! NOTE: The first two examples in the file represent the triangles in the

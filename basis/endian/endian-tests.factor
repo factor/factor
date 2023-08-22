@@ -1,5 +1,5 @@
 ! Copyright (C) 2009 Doug Coleman.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: classes endian endian.private kernel math namespaces tools.test ;
 
 { t } [ [ endianness get big-endian = ] with-big-endian ] unit-test

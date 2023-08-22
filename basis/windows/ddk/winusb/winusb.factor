@@ -1,5 +1,5 @@
 ! Copyright (C) 2010 Erik Charlebois.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: alien alien.syntax classes.struct
 windows.kernel32 windows.types alien.libraries ;
 IN: windows.ddk.winusb

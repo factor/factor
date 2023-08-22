@@ -92,7 +92,7 @@ bool quotation_jit::special_subprimitive_p(cell obj) {
          obj == parent->special_objects[UNWIND_NATIVE_FRAMES_WORD];
 }
 
-// All quotations wants a stack frame, except if they contain:
+// All quotations want a stack frame, except if they contain:
 //   1) calls to the special subprimitives, see #295.
 //   2) mega cache lookups, see #651
 bool quotation_jit::stack_frame_p() {

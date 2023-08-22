@@ -1,5 +1,5 @@
 ! Copyright (C) 2008, 2010 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors arrays combinators continuations effects
 kernel lexer make namespaces parser sequences sets
 splitting vocabs.parser words ;

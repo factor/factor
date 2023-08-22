@@ -30,7 +30,7 @@ MEMO: modes ( -- modes )
     file>xml parse-modes-tag ;
 
 MEMO: mode-names ( -- modes )
-    modes keys natural-sort ;
+    modes keys sort ;
 
 : reset-catalog ( -- )
     \ modes reset-memoized ;

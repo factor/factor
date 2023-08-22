@@ -1,5 +1,5 @@
-! Copyright (c) 2007, 2008, 2018 Aaron Schaefer.
-! See http://factorcode.org/license.txt for BSD license.
+! Copyright (c) 2007, 2008, 2018 Aaron Schaefer, 2022 Alexander Ilin.
+! See https://factorcode.org/license.txt for BSD license.
 USING: combinators combinators.short-circuit kernel math
 math.order math.parser math.text.utils namespaces sequences
 splitting ;
@@ -21,18 +21,48 @@ IN: math.text.english
         "seventy" "eighty" "ninety"
     } nth ;
 
-: scale-numbers ( n -- str )  ! up to 10^99
+: scale-numbers ( n -- str )  ! up to 10^630
     {
-        f "thousand" "million" "billion" "trillion" "quadrillion"
-        "quintillion" "sextillion" "septillion" "octillion"
-        "nonillion" "decillion" "undecillion" "duodecillion"
-        "tredecillion" "quattuordecillion" "quindecillion"
-        "sexdecillion" "septendecillion" "octodecillion" "novemdecillion"
-        "vigintillion" "unvigintillion" "duovigintillion" "trevigintillion"
-        "quattuorvigintillion" "quinvigintillion" "sexvigintillion"
-        "septvigintillion" "octovigintillion" "novemvigintillion"
-        "trigintillion" "untrigintillion" "duotrigintillion"
-    } nth ;
+        { [ dup 41 < ] [
+            {
+                f "thousand" "million" "billion" "trillion" "quadrillion"
+                "quintillion" "sextillion" "septillion" "octillion"
+                "nonillion" "decillion" "undecillion" "duodecillion"
+                "tredecillion" "quattuordecillion" "quindecillion"
+                "sexdecillion" "septendecillion" "octodecillion"
+                "novemdecillion" "vigintillion" "unvigintillion"
+                "duovigintillion" "tresvigintillion" "quattuorvigintillion"
+                "quinvigintillion" "sesvigintillion" "septemvigintillion"
+                "octovigintillion" "novemvigintillion" "trigintillion"
+                "untrigintillion" "duotrigintillion" "trestrigintillion"
+                "quattuortrigintillion" "quintrigintillion" "sestrigintillion"
+                "septentrigintillion" "octotrigintillion" "noventrigintillion"
+            } nth
+        ] }
+        { [ dup 311 < ] [
+            41 - 10 /mod [
+                {
+                    "quadragintillion" "quinquagintillion" "sexagintillion"
+                    "septuagintillion" "octogintillion" "nonagintillion"
+                    "centillion" "decicentillion" "viginticentillion"
+                    "trigintacentillion" "quadragintacentillion"
+                    "quinquagintacentillion" "sexagintacentillion"
+                    "septuagintacentillion" "octogintacentillion"
+                    "nonagintacentillion" "ducentillion"
+                } nth
+                ! Next 10^300 increments after ducentillion, which is 10^603:
+                ! "trecentillion" "quadringentillion"
+                ! "quingentillion" "sescentillion"
+                ! "septingentillion" "octingentillion"
+                ! "nongentillion" "millinillion" = 10^3003
+            ] [
+                {
+                    f "un" "duo" "tre" "quattuor"
+                    "quinqua" "se" "septe" "octo" "nove"
+                } nth
+            ] bi* swap "" append-as
+        ] }
+    } cond ;
 
 SYMBOL: and-needed?
 : set-conjunction ( seq -- )

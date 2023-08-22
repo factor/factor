@@ -1,5 +1,5 @@
 ! Copyright (C) 2008, 2011 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors arrays colors combinators
 combinators.short-circuit fonts kernel math math.functions
 math.order math.rectangles math.vectors models namespaces opengl
@@ -185,8 +185,8 @@ M: table layout*
     ] dip translate-column ;
 
 : table-column-alignment ( table -- seq )
-    dup renderer>> column-alignment
-    [ ] [ column-widths>> length 0 <repetition> ] ?if ;
+    [ renderer>> column-alignment ]
+    [ column-widths>> length 0 <repetition> ] ?unless ;
 
 :: row-font ( row index table -- font )
     table font>> clone
@@ -416,7 +416,9 @@ table "row" f {
     { T{ button-down f f 3 } show-table-menu }
     { T{ key-down f f "RET" } row-action }
     { T{ key-down f f "UP" } previous-row }
+    { T{ key-down f { C+ } "p" } previous-row }
     { T{ key-down f f "DOWN" } next-row }
+    { T{ key-down f { C+ } "n" } next-row }
     { T{ key-down f f "HOME" } first-row }
     { T{ key-down f f "END" } last-row }
     { T{ key-down f f "PAGE_UP" } previous-page }

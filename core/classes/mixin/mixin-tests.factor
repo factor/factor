@@ -96,11 +96,11 @@ TUPLE: flat-mx-2-1 ; INSTANCE: flat-mx-2-1 flat-mx-2
 
 ! Too eager with reset-class
 
-{ } [ "IN: classes.mixin.tests MIXIN: blah SINGLETON: boo INSTANCE: boo blah" <string-reader> "mixin-reset-test" parse-stream drop ] unit-test
+[ "IN: classes.mixin.tests MIXIN: blah SINGLETON: boo INSTANCE: boo blah" <string-reader> "mixin-reset-test" parse-stream  ] must-not-fail
 
 { t } [ "blah" "classes.mixin.tests" lookup-word mixin-class? ] unit-test
 
-{ } [ "IN: classes.mixin.tests MIXIN: blah" <string-reader> "mixin-reset-test" parse-stream drop ] unit-test
+[ "IN: classes.mixin.tests MIXIN: blah" <string-reader> "mixin-reset-test" parse-stream  ] must-not-fail
 
 { t } [ "blah" "classes.mixin.tests" lookup-word mixin-class? ] unit-test
 
@@ -110,11 +110,11 @@ MIXIN: empty-mixin
 
 MIXIN: move-instance-declaration-mixin
 
-{ } [ "IN: classes.mixin.tests.a USE: strings USE: classes.mixin.tests INSTANCE: string move-instance-declaration-mixin" <string-reader> "move-mixin-test-1" parse-stream drop ] unit-test
+[ "IN: classes.mixin.tests.a USE: strings USE: classes.mixin.tests INSTANCE: string move-instance-declaration-mixin" <string-reader> "move-mixin-test-1" parse-stream ] must-not-fail
 
-{ } [ "IN: classes.mixin.tests.b USE: strings USE: classes.mixin.tests INSTANCE: string move-instance-declaration-mixin" <string-reader> "move-mixin-test-2" parse-stream drop ] unit-test
+[ "IN: classes.mixin.tests.b USE: strings USE: classes.mixin.tests INSTANCE: string move-instance-declaration-mixin" <string-reader> "move-mixin-test-2" parse-stream ] must-not-fail
 
-{ } [ "IN: classes.mixin.tests.a" <string-reader> "move-mixin-test-1" parse-stream drop ] unit-test
+[ "IN: classes.mixin.tests.a" <string-reader> "move-mixin-test-1" parse-stream  ] must-not-fail
 
 { { string } } [ move-instance-declaration-mixin class-members ] unit-test
 

@@ -1,5 +1,5 @@
 ! Copyright (C) 2008, 2010 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors assocs combinators db.tuples db.types
 furnace.cache furnace.redirection furnace.sessions
 furnace.utilities hashtables html.templates.chloe.syntax http
@@ -81,7 +81,8 @@ ERROR: end-aside-in-get-error ;
     } case ;
 
 : end-aside ( default -- response )
-    aside-id get aside-id off get-aside [ move-on ] [ <redirect> ] ?if ;
+    [ drop aside-id get aside-id off get-aside ]
+    [ move-on ] [ <redirect> ] ?if ;
 
 M: asides link-attr
     drop

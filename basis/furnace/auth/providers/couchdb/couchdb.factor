@@ -1,7 +1,7 @@
 USING: accessors assocs base64 byte-arrays
 combinators.short-circuit continuations couchdb
-furnace.auth.providers json.writer kernel make mirrors
-namespaces sequences strings urls urls.encoding ;
+furnace.auth.providers json kernel make mirrors namespaces
+sequences strings urls urls.encoding ;
 IN: furnace.auth.providers.couchdb
 
 ! !!! Implement the authentication protocol for CouchDB.
@@ -115,9 +115,9 @@ TUPLE: couchdb-auth-provider
     [ drop first CHAR: _ = ] assoc-reject ;
 
 : at-or-k ( key hash -- newkey )
-    dupd at [ nip ] when* ;
+    ?at drop ;
 : value-at-or-k ( key hash -- newkey )
-    dupd value-at [ nip ] when* ;
+    ?value-at drop ;
 
 : map-fields-forward ( assoc field-map -- assoc )
     [ swapd at-or-k swap ] curry assoc-map ;
@@ -136,9 +136,9 @@ TUPLE: couchdb-auth-provider
     bi ;
 
 : user>user-hash ( user -- hash )
-     hash-mirror
-     [ [ "password" ] dip [ >base64 >string ] change-at ] keep
-     couchdb-auth-provider get field-map>> map-fields-forward ;
+    hash-mirror
+    [ [ "password" ] dip [ >base64 >string ] change-at ] keep
+    couchdb-auth-provider get field-map>> map-fields-forward ;
 
 ! Used when the user is guaranteed to exist if the logic of the Factor
 ! code is correct (e.g. when update-user is called).

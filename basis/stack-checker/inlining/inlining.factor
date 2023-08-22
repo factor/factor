@@ -1,5 +1,5 @@
 ! Copyright (C) 2008, 2010 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors arrays effects fry hints kernel locals math
 math.order namespaces sequences stack-checker.backend
 stack-checker.dependencies stack-checker.errors
@@ -126,8 +126,7 @@ M: declared-effect (undeclared-known) known>> (undeclared-known) ;
     [ check-call-height ] [ check-call-site-stack ] bi ;
 
 : adjust-stack-effect ( effect -- effect' )
-    [ in>> ] [ out>> ] bi
-    meta-d length pick length [-]
+    [ in>> ] [ out>> ] bi meta-d length pick length [-]
     object <repetition> '[ _ prepend ] bi@
     <effect> ;
 

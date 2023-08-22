@@ -1,6 +1,6 @@
 ! Copyright (C) 2008 Doug Coleman.
 ! Copyright (C) 2018 Alexander Ilin.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: classes db db.tuples.private db.types help.markup
 help.syntax kernel math quotations sequences strings ;
 IN: db.tuples
@@ -10,61 +10,61 @@ HELP: random-id-generator
 
 HELP: create-sql-statement
 { $values
-     { "class" class }
-     { "object" object } }
+    { "class" class }
+    { "object" object } }
 { $description "Generates the SQL code for creating a table for a given class." } ;
 
 HELP: drop-sql-statement
 { $values
-     { "class" class }
-     { "object" object } }
+    { "class" class }
+    { "object" object } }
 { $description "Generates the SQL code for dropping a table for a given class." } ;
 
 HELP: insert-tuple-set-key
 { $values
-     { "tuple" tuple } { "statement" statement } }
+    { "tuple" tuple } { "statement" statement } }
 { $description "Inserts a tuple and sets its primary key in one word. This is necessary for some databases." } ;
 
 HELP: <count-statement>
 { $values
-     { "query" query }
-     { "statement" statement } }
+    { "query" query }
+    { "statement" statement } }
 { $description "A database-specific hook for generating the SQL for a count statement." } ;
 
 HELP: <delete-tuples-statement>
 { $values
-     { "tuple" tuple } { "class" class }
-     { "object" object } }
+    { "tuple" tuple } { "class" class }
+    { "object" object } }
 { $description "A database-specific hook for generating the SQL for an delete statement." } ;
 
 HELP: <insert-db-assigned-statement>
 { $values
-     { "class" class }
-     { "object" object } }
+    { "class" class }
+    { "object" object } }
 { $description "A database-specific hook for generating the SQL for an insert statement with a database-assigned primary key." } ;
 
 HELP: <insert-user-assigned-statement>
 { $values
-     { "class" class }
-     { "object" object } }
+    { "class" class }
+    { "object" object } }
 { $description "A database-specific hook for generating the SQL for an insert statement with a user-assigned primary key." } ;
 
 HELP: <select-by-slots-statement>
 { $values
-     { "tuple" tuple } { "class" class }
-     { "statement" tuple } }
+    { "tuple" tuple } { "class" class }
+    { "statement" tuple } }
 { $description "A database-specific hook for generating the SQL for a select statement." } ;
 
 HELP: <update-tuple-statement>
 { $values
-     { "class" class }
-     { "object" object } }
+    { "class" class }
+    { "object" object } }
 { $description "A database-specific hook for generating the SQL for an update statement." } ;
 
 
 HELP: define-persistent
 { $values
-     { "class" class } { "table" string } { "columns" "an array of slot specifiers" } }
+    { "class" class } { "table" string } { "columns" "an array of slot specifiers" } }
 { $description "Defines a relation from a Factor " { $snippet "tuple class" } " to an SQL database table name. The format for the slot specifiers is as follows:"
 { $list
     { "a slot name from the " { $snippet "tuple class" } }
@@ -84,22 +84,22 @@ HELP: define-persistent
 
 HELP: create-table
 { $values
-     { "class" class } }
+    { "class" class } }
 { $description "Creates an SQL table from a mapping defined by " { $link define-persistent } ". If the table already exists, the database will likely throw an error." } ;
 
 HELP: ensure-table
 { $values
-     { "class" class } }
+    { "class" class } }
 { $description "Creates an SQL table from a mapping defined by " { $link define-persistent } ". If the table already exists, the error is silently ignored." } ;
 
 HELP: ensure-tables
 { $values
-     { "classes" "a sequence of classes" } }
+    { "classes" "a sequence of classes" } }
 { $description "Creates an SQL table from a mapping defined by " { $link define-persistent } ". If a table already exists, the error is silently ignored." } ;
 
 HELP: recreate-table
 { $values
-     { "class" class } }
+    { "class" class } }
 { $description "Drops an existing table and re-creates it from a mapping defined by " { $link define-persistent } ". If the table does not exist the error is silently ignored." }
 { $warning { $emphasis "THIS WORD WILL DELETE YOUR DATA." } $nl
 " Use " { $link ensure-table } " unless you want to delete the data in this table." } ;
@@ -108,25 +108,25 @@ HELP: recreate-table
 
 HELP: drop-table
 { $values
-     { "class" class } }
+    { "class" class } }
 { $description "Drops an existing table which deletes all of the data. The database will probably throw an error if the table does not exist." }
 { $warning { $emphasis "THIS WORD WILL DELETE YOUR DATA." } } ;
 
 HELP: insert-tuple
 { $values
-     { "tuple" tuple } }
+    { "tuple" tuple } }
 { $description "Inserts a tuple into a database if a relation has been defined with " { $link define-persistent } ". If a mapping states that the database assigns a primary key to the tuple, this value will be set after this word runs." }
 { $notes "Objects should only be inserted into a database once per object. To store the object after the initial insert, call " { $link update-tuple } "." } ;
 
 HELP: update-tuple
 { $values
-     { "tuple" tuple } }
+    { "tuple" tuple } }
 { $description "Updates a tuple that has already been inserted into a database. The tuple must have a primary key that has been set by " { $link insert-tuple } " or that is user-defined." } ;
 
 HELP: update-tuples
 { $values
-     { "query/tuple" tuple }
-     { "quot" { $quotation ( tuple -- tuple'/f ) } } }
+    { "query/tuple" tuple }
+    { "quot" { $quotation ( tuple -- tuple'/f ) } } }
 { $description "An SQL query is constructed from the slots of the exemplar tuple that are not " { $link f } ". The " { $snippet "quot" } " is applied to each tuple from the database that matches the query, and the changed tuple is stored back to the database. If the " { $snippet "quot" } " returns " { $link f } ", the tuple is dropped, and its data remains unmodified in the database."
 $nl
 "The word is equivalent to the following code:"
@@ -135,14 +135,14 @@ $nl
 
 HELP: delete-tuples
 { $values
-     { "tuple" tuple } }
+    { "tuple" tuple } }
 { $description "Uses the " { $snippet "tuple" } " as an exemplar object and deletes any objects that have the same slots set. If a slot is not " { $link f } ", then it is used to generate an SQL statement that deletes tuples." }
 { $warning "This word will delete your data." } ;
 
 HELP: reject-tuples
 { $values
-     { "query/tuple" tuple }
-     { "quot" { $quotation ( tuple -- ? ) } } }
+    { "query/tuple" tuple }
+    { "quot" { $quotation ( tuple -- ? ) } } }
 { $description "An SQL query is constructed from the slots of the exemplar tuple that are not " { $link f } ". The " { $snippet "quot" } " is applied to each tuple from the database that matches the query, and if it returns a true value, the row is deleted from the database."
 $nl
 "The word is equivalent to the following code:"
@@ -154,26 +154,26 @@ $nl
 
 HELP: each-tuple
 { $values
-     { "query/tuple" tuple }
-     { "quot" { $quotation ( tuple -- ) } } }
+    { "query/tuple" tuple }
+    { "quot" { $quotation ( tuple -- ) } } }
 { $description "An SQL query is constructed from the slots of the exemplar tuple that are not " { $link f } ". The " { $snippet "quot" } " is applied to each tuple from the database that matches the query constructed from the exemplar tuple." } ;
 
 HELP: select-tuple
 { $values
-     { "query/tuple" tuple }
-     { "tuple/f" { $maybe tuple } } }
+    { "query/tuple" tuple }
+    { "tuple/f" { $maybe tuple } } }
 { $description "An SQL query is constructed from the slots of the exemplar tuple that are not " { $link f } ". Returns a single tuple from the database if it matches the query constructed from the exemplar tuple." } ;
 
 HELP: select-tuples
 { $values
-     { "query/tuple" tuple }
-     { "tuples" "an array of tuples" } }
+    { "query/tuple" tuple }
+    { "tuples" "an array of tuples" } }
 { $description "An SQL query is constructed from the slots of the exemplar tuple that are not " { $link f } ". Returns an array of multiple tuples from the database that match the query constructed from the exemplar tuple." } ;
 
 HELP: count-tuples
 { $values
-     { "query/tuple" tuple }
-     { "n" integer } }
+    { "query/tuple" tuple }
+    { "n" integer } }
 { $description "Returns the number of items that would be returned if the query were a select query. Counting the tuples with this word is more efficient than calling " { $link length } " on the result of " { $link select-tuples } "." } ;
 
 { each-tuple select-tuple select-tuples count-tuples } related-words
@@ -272,7 +272,7 @@ T{ book
 "Now we've created a book. Let's save it to the database."
 { $code "USING: db db.sqlite fry io.files.temp ;
 : with-book-tutorial ( quot -- )
-     '[ \"book-tutorial.db\" temp-file <sqlite-db> _ with-db ] call ; inline
+    '[ \"book-tutorial.db\" temp-file <sqlite-db> _ with-db ] call ; inline
 
 [
     book recreate-table

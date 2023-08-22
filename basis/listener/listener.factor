@@ -1,8 +1,8 @@
 ! Copyright (C) 2003, 2009 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors colors combinators.short-circuit
 compiler.units continuations debugger fry io io.styles kernel lexer
-locals math math.parser namespaces parser parser.notes prettyprint
+math math.parser namespaces parser parser.notes prettyprint
 sequences sets source-files.errors system vocabs vocabs.loader
 vocabs.parser ;
 IN: listener
@@ -172,6 +172,7 @@ SYMBOL: interactive-vocabs
     "namespaces"
     "parser"
     "prettyprint"
+    "ranges"
     "see"
     "sequences"
     "slicing"

@@ -52,7 +52,7 @@ IN: compiler.tree.def-use.tests
     [ [ 1 ] [ 2 ] compose swap [ 1 ] [ 2 ] if + * ]
     [ dup slice? [ dup array? [ ] [ ] if ] [ ] if ]
     [ dup [ drop f ] [ "A" throw ] if ]
-    [ [ <=> ] sort ]
+    [ [ <=> ] sort-with ]
     [ [ <=> ] with search ]
 } [
     [ ] swap [ test-def-use ] curry unit-test

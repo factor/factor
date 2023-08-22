@@ -1,10 +1,10 @@
 ! Copyright (c) 2012 Anonymous
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: arrays kernel math math.functions math.trig
 math.vectors sequences ;
 IN: rosetta-code.haversine-formula
 
-! http://rosettacode.org/wiki/Haversine_formula
+! https://rosettacode.org/wiki/Haversine_formula
 
 ! The haversine formula is an equation important in navigation,
 ! giving great-circle distances between two points on a sphere

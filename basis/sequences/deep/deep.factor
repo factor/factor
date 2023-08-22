@@ -1,5 +1,5 @@
 ! Copyright (C) 2007, 2008 Daniel Ehrenberg, Doug Coleman.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: fry kernel make math sequences strings ;
 IN: sequences.deep
 
@@ -54,9 +54,9 @@ M: object branch? drop f ;
         _ swap dup branch? [ member? ] [ 2drop f ] if
     ] deep-find >boolean ;
 
-: deep-subseq? ( subseq seq -- ? )
-    swap '[
-        _ swap dup branch? [ subseq? ] [ 2drop f ] if
+: deep-subseq-of? ( seq subseq -- ? )
+   '[
+        _ over branch? [ subseq-of? ] [ 2drop f ] if
     ] deep-find >boolean ;
 
 : deep-map! ( ... obj quot: ( ... elt -- ... elt' ) -- ... obj )

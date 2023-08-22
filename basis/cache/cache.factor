@@ -1,5 +1,5 @@
 ! Copyright (C) 2009 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors assocs continuations destructors kernel math
 sequences ;
 IN: cache
@@ -19,7 +19,7 @@ M: cache-entry dispose value>> dispose ;
 
 M: cache-assoc assoc-size assoc>> assoc-size ;
 
-M: cache-assoc at* assoc>> at* [ dup [ 0 >>age value>> ] when ] dip ;
+M: cache-assoc at* assoc>> at* [ [ 0 >>age value>> ] ?call ] dip ;
 
 M: cache-assoc set-at
     check-disposed

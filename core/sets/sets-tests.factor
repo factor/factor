@@ -1,5 +1,5 @@
 ! Copyright (C) 2010 Daniel Ehrenberg, Doug Coleman.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: bit-arrays bit-sets kernel math sequences sets sorting
 tools.test ;
 IN: sets.tests
@@ -23,8 +23,8 @@ IN: sets.tests
 { 0 } [ 5 <bit-set> 10 over delete cardinality ] unit-test
 { HS{ 1 } } [ HS{ 1 2 } 2 over delete ] unit-test
 
-{ { 1 2 3 } } [ { 1 1 1 2 2 3 3 3 3 3 } dup set-like natural-sort ] unit-test
-{ { 1 2 3 } } [ HS{ 1 2 3 } { } set-like natural-sort ] unit-test
+{ { 1 2 3 } } [ { 1 1 1 2 2 3 3 3 3 3 } dup set-like sort ] unit-test
+{ { 1 2 3 } } [ HS{ 1 2 3 } { } set-like sort ] unit-test
 { { 1 2 3 } } [ { 1 2 2 3 3 } { } set-like ] unit-test
 { { 3 2 1 } } [ { 3 3 2 2 1 } { } set-like ] unit-test
 { t } [ 4 <bit-set> 1 <bit-set> set-like 4 <bit-set> = ] unit-test

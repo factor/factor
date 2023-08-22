@@ -1,5 +1,5 @@
 ! Copyright (C) 2018, 2019 Alexander Ilin.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: ascii binary-search calendar endian kernel make math
 math.bitwise math.order namespaces random sequences splitting
 summary system tr ;

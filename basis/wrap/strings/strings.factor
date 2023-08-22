@@ -1,18 +1,26 @@
 ! Copyright (C) 2009 Daniel Ehrenberg
-! See http://factorcode.org/license.txt for BSD license.
-USING: kernel math sequences splitting strings wrap ;
+! See https://factorcode.org/license.txt for BSD license.
+USING: arrays grouping kernel math namespaces sequences
+splitting strings wrap ;
 IN: wrap.strings
+
+INITIALIZED-SYMBOL: break-long-words? [ f ]
 
 <PRIVATE
 
-: wrap-split-line ( string -- elements )
-    dup [ " \t" member? not ] find drop 0 or
-    [ f swap ] [ cut ] if-zero
-    " \t" split harvest [ dup length 1 <element> ] map!
-    swap [ 0 over length <element> prefix ] when* ;
+: wrap-split-line ( string width -- elements )
+    [
+        dup [ " \t" member? not ] find drop 0 or
+        [ f swap ] [ cut ] if-zero
+        " \t" split harvest break-long-words? get
+    ] dip '[
+        [ _ group [ dup length 1 <element> ] map ] map concat
+    ] [
+        [ dup length 1 <element> ] map
+    ] if swap [ 0 over length <element> prefix ] when* ;
 
-: wrap-split-lines ( string -- elements-lines )
-    split-lines [ wrap-split-line ] map! ;
+: wrap-split-lines ( string width -- elements-lines )
+    [ split-lines ] dip '[ _ wrap-split-line ] map! ;
 
 : join-elements ( wrapped-lines -- lines )
     [ join-words ] map! ;
@@ -20,7 +28,7 @@ IN: wrap.strings
 PRIVATE>
 
 : wrap-lines ( string width -- newlines )
-    [ wrap-split-lines ] dip '[ _ wrap join-elements ] map! concat ;
+    [ wrap-split-lines ] keep '[ _ wrap join-elements ] map! concat ;
 
 : wrap-string ( string width -- newstring )
     wrap-lines join-lines ;

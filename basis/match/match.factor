@@ -1,5 +1,5 @@
 ! Copyright (C) 2006 Chris Double.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 !
 ! Based on pattern matching code from Paul Graham's book 'On Lisp'.
 USING: assocs classes classes.tuple combinators kernel lexer
@@ -55,7 +55,7 @@ MACRO: match-cond ( assoc -- quot )
         first2
         [ [ dupd match ] curry ] dip
         [ with-variables ] curry rot
-        [ ?if ] 2curry append
+        [ [ or* ] 2dip if ] 2curry append
     ] reduce ;
 
 GENERIC: replace-patterns ( object -- result )
@@ -75,8 +75,8 @@ M: tuple replace-patterns tuple>array replace-patterns >tuple ;
     2dup shorter? [
         2drop f f
     ] [
-        2dup length head over match
-        [ swap ?rest ] [ [ rest ] dip (match-first) ] ?if
+        2dup length head over match or*
+        [ swap ?rest ] [ [ rest ] dip (match-first) ] if
     ] if ;
 
 : match-first ( seq pattern-seq -- bindings )

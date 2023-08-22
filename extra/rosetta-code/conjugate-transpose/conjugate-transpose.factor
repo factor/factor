@@ -1,9 +1,9 @@
 ! Copyright (c) 2012 Anonymous
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: kernel math.functions math.matrices sequences ;
 IN: rosetta-code.conjugate-transpose
 
-! http://rosettacode.org/wiki/Conjugate_transpose
+! https://rosettacode.org/wiki/Conjugate_transpose
 
 ! Suppose that a matrix M contains complex numbers. Then the
 ! conjugate transpose of M is a matrix MH containing the complex

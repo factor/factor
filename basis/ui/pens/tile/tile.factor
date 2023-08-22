@@ -1,5 +1,5 @@
 ! Copyright (C) 2009 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors combinators kernel math.vectors opengl
 ui.images ui.pens ;
 IN: ui.pens.tile
@@ -34,8 +34,8 @@ M: tile-pen pen-pref-dim
 : render-tile ( tile x width gadget -- )
     [ orientation>> '[ _ v* ] dip ] keep
    '[
-       _ _ [ dim>> swap ] [ orientation>> ] bi set-axis
-       swap draw-scaled-image
+        _ _ [ dim>> swap ] [ orientation>> ] bi set-axis
+        swap draw-scaled-image
    ] with-translation ;
 
 M: tile-pen draw-interior

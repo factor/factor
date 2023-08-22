@@ -1,9 +1,9 @@
 ! Copyright (c) 2012 Anonymous
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: formatting io kernel math math.parser sequences ;
 IN: rosetta-code.menu
 
-! http://rosettacode.org/wiki/Menu
+! https://rosettacode.org/wiki/Menu
 
 ! Given a list containing a number of strings of which one is to
 ! be selected and a prompt string, create a function that:

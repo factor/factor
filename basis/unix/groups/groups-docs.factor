@@ -1,5 +1,5 @@
 ! Copyright (C) 2008 Doug Coleman.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: help.markup help.syntax io.streams.string kernel quotations sequences strings math ;
 IN: unix.groups
 
@@ -23,20 +23,20 @@ HELP: group-cache
 
 HELP: group-id
 { $values
-     { "string" string }
-     { "id/f" "an integer or f" } }
+    { "string" string }
+    { "id/f" "an integer or f" } }
 { $description "Returns the group id given a group name. Returns " { $link f } " if the group does not exist." } ;
 
 HELP: group-name
 { $values
-     { "id" integer }
-     { "string" string } }
+    { "id" integer }
+    { "string" string } }
 { $description "Returns the group name given a group id." } ;
 
 HELP: group-struct
 { $values
-     { "obj" object }
-     { "group/f" "a group struct or f" } }
+    { "obj" object }
+    { "group/f" "a group struct or f" } }
 { $description "Returns an alien group struct to be turned into a group tuple by calling subsequent words." } ;
 
 HELP: real-group-id
@@ -49,33 +49,33 @@ HELP: real-group-name
 
 HELP: set-effective-group
 { $values
-     { "obj" object } }
+    { "obj" object } }
 { $description "Sets the effective group id for the current user." } ;
 
 HELP: set-real-group
 { $values
-     { "obj" object } }
+    { "obj" object } }
 { $description "Sets the real group id for the current user." } ;
 
 HELP: user-groups
 { $values
-     { "string/id" "a string or a group id" }
-     { "seq" sequence } }
+    { "string/id" "a string or a group id" }
+    { "seq" sequence } }
 { $description "Returns the sequence of groups to which the user belongs." } ;
 
 HELP: with-effective-group
 { $values
-     { "string/id/f" "a string, a group id, or f" } { "quot" quotation } }
+    { "string/id/f" "a string, a group id, or f" } { "quot" quotation } }
 { $description "Sets the effective group name and calls the quotation. Restores the effective group name on success or on error after the call. If the first parameter is " { $link f } ", the quotation is called as the current user." } ;
 
 HELP: with-group-cache
 { $values
-     { "quot" quotation } }
+    { "quot" quotation } }
 { $description "Iterates over the group file using library calls and creates a cache in the " { $link group-cache } " symbol. The cache is a hashtable indexed by group id. When looking up many groups, this approach is much faster than calling system calls." } ;
 
 HELP: with-real-group
 { $values
-     { "string/id/f" "a string or a group id" } { "quot" quotation } }
+    { "string/id/f" "a string or a group id" } { "quot" quotation } }
 { $description "Sets the real group name and calls the quotation. Restores the current group name on success or on error after the call. If the first parameter is " { $link f } ", the quotation is called as the current user." } ;
 
 HELP: ?group-id

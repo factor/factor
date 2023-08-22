@@ -1,5 +1,5 @@
 ! Copyright (C) 2008 Doug Coleman.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors assocs calendar combinators.short-circuit
 concurrency.semaphores deques html.parser html.parser.analyzer
 http.client inspector io io.pathnames kernel logging math

@@ -1,6 +1,5 @@
 ! Copyright (C) 2004, 2009 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
-IN: math DEFER: <= DEFER: - ! for bootstrap
+! See https://factorcode.org/license.txt for BSD license.
 USE: slots.private
 USE: kernel.private
 USE: math.private
@@ -104,10 +103,6 @@ DEFER: if
 : unless* ( ..a ? false: ( ..a -- ..a x ) -- ..a x )
     over [ drop ] [ nip call ] if ; inline
 
-! Default
-: ?if ( ..a default cond true: ( ..a cond -- ..b ) false: ( ..a default -- ..b ) -- ..b )
-    pick [ drop [ drop ] 2dip call ] [ 2nip call ] if ; inline
-
 ! Dippers.
 ! Not declared inline because the compiler special-cases them
 
@@ -122,8 +117,6 @@ DEFER: if
 ! Misfits
 : tuck ( x y -- y x y ) dup -rot ; inline
 
-: spin ( x y z -- z y x ) -rot swap ; inline
-
 : rotd ( w x y z -- x y w z ) [ rot ] dip ; inline
 
 : -rotd ( w x y z -- y w x z ) [ -rot ] dip ; inline
@@ -131,6 +124,10 @@ DEFER: if
 : roll ( w x y z -- x y z w ) rotd swap ; inline
 
 : -roll ( w x y z -- z w x y ) swap -rotd ; inline
+
+: spin ( x y z -- z y x ) -rot swap ; inline
+
+: 4spin ( w x y z -- z y x w ) -roll spin ; inline
 
 : nipd ( x y z -- y z ) [ nip ] dip ; inline
 
@@ -173,6 +170,25 @@ DEFER: if
 
 : 2keepd ( ..a x y z quot: ( ..a x y z -- ..b ) -- ..b x y )
     3keep drop ; inline
+
+: ?call ( ..a obj/f quot: ( ..a obj -- ..a obj' )  -- ..a obj'/f ) dupd when ; inline
+
+: ?transmute ( old quot: ( old -- new/f ) -- new/old new? )
+    keep over [ drop t ] [ nip f ] if ; inline
+
+: transmute ( old quot: ( old -- new/f ) -- new/old )
+    ?transmute drop ; inline
+
+! Default
+
+: ?when ( ..a default cond: ( ..a default -- ..a new/f ) true: ( ..a new -- ..b ) -- ..b )
+    [ ?transmute ] dip when ; inline
+
+: ?unless ( ..a default cond: ( ..a default -- ..a new/f ) false: ( ..a default -- ..b ) -- ..b )
+    [ ?transmute ] dip unless ; inline
+
+: ?if ( ..a default cond: ( default -- new/f ) true: ( ..a new -- ..b ) false: ( ..a default -- ..b ) -- ..b )
+    [ ?transmute ] 2dip if ; inline
 
 ! Cleavers
 : bi ( x p q -- )
@@ -236,6 +252,9 @@ DEFER: if
 : 2with ( param1 param2 obj quot -- obj curried )
     with with ; inline
 
+: withd ( param obj quot -- obj curried )
+    swapd [ -rotd call ] 2curry ; inline
+
 : prepose ( quot1 quot2 -- composed )
     swap compose ; inline
 
@@ -269,6 +288,8 @@ UNION: boolean POSTPONE: t POSTPONE: f ;
 
 : or ( obj1 obj2 -- ? ) dupd ? ; inline
 
+: or* ( obj1 obj2 -- obj2/obj1 second? ) [ nip t ] [ f ] if* ; inline
+
 : xor ( obj1 obj2 -- ? ) [ f swap ? ] when* ; inline
 
 : both? ( x y quot -- ? ) bi@ and ; inline
@@ -276,6 +297,8 @@ UNION: boolean POSTPONE: t POSTPONE: f ;
 : either? ( x y quot -- ? ) bi@ or ; inline
 
 : most ( x y quot -- z ) 2keep ? ; inline
+
+: negate ( quot -- quot' ) [ not ] compose ; inline
 
 ! Loops
 : loop ( ... pred: ( ... -- ... ? ) -- ... )
@@ -291,7 +314,7 @@ UNION: boolean POSTPONE: t POSTPONE: f ;
     [ [ dup ] compose ] dip while drop ; inline
 
 : until ( ..a pred: ( ..a -- ..b ? ) body: ( ..b -- ..a ) -- ..b )
-    [ [ not ] compose ] dip while ; inline
+    [ negate ] dip while ; inline
 
 ! Object protocol
 GENERIC: hashcode* ( depth obj -- code ) flushable
@@ -301,9 +324,6 @@ M: object hashcode* 2drop 0 ; inline
 M: f hashcode* 2drop 31337 ; inline
 
 : hashcode ( obj -- code ) 3 swap hashcode* ; inline
-
-: recursive-hashcode ( n obj quot -- code )
-    pick 0 <= [ 3drop 0 ] [ [ 1 - ] 2dip call ] if ; inline
 
 GENERIC: equal? ( obj1 obj2 -- ? )
 

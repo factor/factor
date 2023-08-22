@@ -1,9 +1,9 @@
 ! Copyright (C) 2008, 2009 Doug Coleman.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors arrays calendar calendar.english
 calendar.format combinators io.directories io.files.info kernel
-math math.parser prettyprint sequences sorting.slots splitting
-system vocabs ;
+math math.parser prettyprint sequences sorting.specification
+splitting system vocabs ;
 IN: tools.files
 
 <PRIVATE
@@ -76,7 +76,7 @@ M: object file-spec>string
 : list-files-slow ( listing-tool -- array )
     [ path>> ] [ sort>> ] [ specs>> ] tri '[
         [ dup name>> link-info file-listing boa ] map
-        _ [ sort-by ] when*
+        _ [ sort-with-spec ] when*
         [ _ [ file-spec>string ] with map ] map
     ] with-directory-entries ; inline
 

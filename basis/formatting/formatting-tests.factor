@@ -1,5 +1,5 @@
 ! Copyright (C) 2008 John Benediktsson
-! See http://factorcode.org/license.txt for BSD license
+! See https://factorcode.org/license.txt for BSD license
 USING: calendar formatting kernel literals math math.functions
 sequences strings system tools.test ;
 IN: formatting.tests
@@ -165,16 +165,30 @@ IN: formatting.tests
 { t } [ "Thu Oct 09 12:03:15 2008" testtime "%c" strftime = ] unit-test
 { t } [ "PM" testtime "%p" strftime = ] unit-test
 
-! Differences on Windows due to rounding mode (#1792).
-${ os windows? "1.3" "1.2" ? } [ 125/100 "%.1f" sprintf ] unit-test
-${ os windows? "3" "2" ? } [ 5/2 "%.0f" sprintf ] unit-test
-! Differences on Windows due to setprecision(0)
-${ os windows? "2.500000e+00" "2e+00" ? } [ 5/2 "%.0e" sprintf ] unit-test
-${ os windows? "3.500000e+00" "4e+00" ? } [ 7/2 "%.0e" sprintf ] unit-test
-${ os windows? "1.000000e+00" "1e+00" ? } [ 1.0 "%.0e" sprintf ] unit-test
+{ "1.2" } [ 125/100 "%.1f" sprintf ] unit-test
+{ "2" } [ 5/2 "%.0f" sprintf ] unit-test
+{ "2e+00" } [ 5/2 "%.0e" sprintf ] unit-test
+{ "4e+00" } [ 7/2 "%.0e" sprintf ] unit-test
+{ "1e+00" } [ 1.0 "%.0e" sprintf ] unit-test
 
 { "00" } [ 2020 1 1 <date> "%U" strftime ] unit-test
 { "00" } [ 2020 1 1 <date> "%W" strftime ] unit-test
 
 { "44" } [ 2020 11 6 <date> "%U" strftime ] unit-test
 { "44" } [ 2020 11 6 <date> "%W" strftime ] unit-test
+
+{ "00" } [ 2022 1 1 <date> "%U" strftime ] unit-test
+{ "01" } [ 2022 1 2 <date> "%U" strftime ] unit-test
+{ "01" } [ 2022 1 3 <date> "%U" strftime ] unit-test
+
+{ "00" } [ 2022 1 1 <date> "%W" strftime ] unit-test
+{ "00" } [ 2022 1 2 <date> "%W" strftime ] unit-test
+{ "01" } [ 2022 1 3 <date> "%W" strftime ] unit-test
+
+{ "34" } [ 2022 8 27 <date> "%U" strftime ] unit-test
+{ "35" } [ 2022 8 28 <date> "%U" strftime ] unit-test
+{ "35" } [ 2022 8 29 <date> "%U" strftime ] unit-test
+
+{ "34" } [ 2022 8 27 <date> "%W" strftime ] unit-test
+{ "34" } [ 2022 8 28 <date> "%W" strftime ] unit-test
+{ "35" } [ 2022 8 29 <date> "%W" strftime ] unit-test

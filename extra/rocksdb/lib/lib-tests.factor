@@ -1,5 +1,5 @@
 ! Copyright (C) 2020 Doug Coleman.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: io.encodings.string io.encodings.utf8 kernel rocksdb.lib
 tools.test multiline ;
 IN: rocksdb.lib.tests

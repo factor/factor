@@ -1,5 +1,5 @@
 ! Copyright (C) 2005, 2009 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors combinators kernel math math.rectangles
 math.vectors models namespaces opengl sequences sorting
 ui.commands ui.gadgets ui.gadgets.borders ui.gadgets.buttons
@@ -115,7 +115,7 @@ M: menu-button handle-gesture
 
 <PRIVATE
 
-:: next-item ( menu dir --  )
+:: next-item ( menu dir -- )
     menu [ items>> ] [ control-value ] bi :> ( items curr )
     curr [
         items length :> max
@@ -155,7 +155,7 @@ menu H{
 : <operations-menu> ( target hook -- menu )
     over object-operations
     [ primary-operation? ] partition
-    [ reverse ] [ [ command-name ] sort-with ] bi*
+    [ reverse ] [ [ command-name ] sort-by ] bi*
     { ---- } glue <commands-menu> ;
 
 : show-operations-menu ( gadget target hook -- )

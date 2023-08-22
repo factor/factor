@@ -1,9 +1,10 @@
 ! Copyright (C) 2008, 2010 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors alien byte-arrays classes.algebra combinators
-compiler.cfg.instructions compiler.cfg.instructions.syntax
-compiler.cfg.registers compiler.constants effects kernel layouts
-math namespaces parser sequences splitting words ;
+combinators.short-circuit compiler.cfg.instructions
+compiler.cfg.instructions.syntax compiler.cfg.registers
+compiler.constants effects kernel layouts math namespaces parser
+sequences splitting words ;
 IN: compiler.cfg.hats
 
 <<
@@ -35,7 +36,7 @@ IN: compiler.cfg.hats
 PRIVATE>
 
 insn-classes get [
-    dup [ insn-def-slots length 1 = ] [ name>> "##" head? ] bi and
+    dup { [ insn-def-slots length 1 = ] [ name>> "##" head? ] } 1&&
     [ define-hat ] [ drop ] if
 ] each
 

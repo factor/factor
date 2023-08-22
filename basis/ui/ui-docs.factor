@@ -155,7 +155,7 @@ ARTICLE: "gadgets" "Pre-made UI gadgets"
 ARTICLE: "ui-geometry" "Gadget geometry"
 "The " { $link gadget } " class inherits from the " { $link rect } " class, and thus all gadgets have a bounding box:"
 { $subsections "math.rectangles" }
-"Word for converting from a child gadget's co-ordinate system to a parent's:"
+"Word for converting from a child gadget's coordinate system to a parent's:"
 { $subsections
     relative-loc
     screen-loc

@@ -1,7 +1,8 @@
 USING: accessors alien alien.accessors arrays assocs byte-arrays
 continuations debugger grouping io.streams.string kernel
-kernel.private literals locals.backend math memory namespaces
-prettyprint sequences sequences.private tools.test words ;
+kernel.private literals locals.backend math math.parser memory
+namespaces prettyprint sequences sequences.private tools.test
+vocabs.loader words ;
 IN: kernel.tests
 
 { 0 } [ f size ] unit-test
@@ -67,7 +68,7 @@ IN: kernel.tests
     2 head ${ KERNEL-ERROR ERROR-DATASTACK-OVERFLOW } =
 ] must-fail-with
 
-{ } [ [ :c ] with-string-writer drop ] unit-test
+[ [ :c ] with-string-writer ] must-not-fail
 
 [ overflow-r ] [
     2 head ${ KERNEL-ERROR ERROR-RETAINSTACK-OVERFLOW } =
@@ -112,8 +113,8 @@ IN: kernel.tests
 { 0 } [ f [ 0 ] unless* ] unit-test
 { t } [ t [ "Hello" ] unless* ] unit-test
 
-{ "2\n" } [ [ 1 2 [ . ] [ sq . ] ?if ] with-string-writer ] unit-test
-{ "9\n" } [ [ 3 f [ . ] [ sq . ] ?if ] with-string-writer ] unit-test
+{ "2\n" } [ [ 1 2 or* [ . ] [ sq . ] if ] with-string-writer ] unit-test
+{ "9\n" } [ [ 3 f or* [ . ] [ sq . ] if ] with-string-writer ] unit-test
 
 { f } [ f (clone) ] unit-test
 { -123 } [ -123 (clone) ] unit-test
@@ -207,3 +208,11 @@ IN: kernel.tests
 
 { 2 3 4 1 } [ 1 2 3 4 roll ] unit-test
 { 1 2 3 4 } [ 2 3 4 1 -roll ] unit-test
+
+{ } [ "kernel" reload ] long-unit-test
+
+{ 5 t } [ "5" [ string>number ] ?transmute ] unit-test
+{ "5notanumber" f } [ "5notanumber" [ string>number ] ?transmute ] unit-test
+
+{ 10 } [ 5 [ 2 * ] ?call ] unit-test
+{ f } [ f [ 2 * ] ?call ] unit-test

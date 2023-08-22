@@ -137,7 +137,7 @@ things "THINGS" {
         1 1 things boa insert-tuple
         1 0 things boa insert-tuple
         f f things boa select-tuples
-        [ [ one>> ] [ two>> ] bi 2array ] map natural-sort
+        [ [ one>> ] [ two>> ] bi 2array ] map sort
        things drop-table
     ] with-db
 ] unit-test

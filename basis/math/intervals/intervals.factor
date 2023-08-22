@@ -1,5 +1,5 @@
 ! Copyright (C) 2007, 2009 Slava Pestov, Doug Coleman.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 ! Based on Slate's src/unfinished/interval.slate by Brian Rice.
 USING: accessors kernel sequences arrays math math.order
 combinators combinators.short-circuit generic layouts memoize ;
@@ -100,7 +100,7 @@ MEMO: array-capacity-interval ( -- interval )
 
 : endpoint-max ( p1 p2 -- p3 ) [ endpoint> ] most ;
 
-: interval>points ( int -- from to )
+: interval>points ( interval -- from to )
     [ from>> ] [ to>> ] bi ;
 
 : points>interval ( seq -- interval nan? )
@@ -173,7 +173,7 @@ MEMO: array-capacity-interval ( -- interval )
 : interval-subset? ( i1 i2 -- ? )
     dupd interval-intersect = ;
 
-GENERIC: interval-contains? ( x int -- ? )
+GENERIC: interval-contains? ( x interval -- ? )
 M: empty-interval interval-contains? 2drop f ;
 M: full-interval interval-contains? 2drop t ;
 M: interval interval-contains?
@@ -182,7 +182,7 @@ M: interval interval-contains?
         [ to>>   first2 [ <= ] [ < ] if ]
     } 2&& ;
 
-: interval-zero? ( int -- ? )
+: interval-zero? ( interval -- ? )
     0 swap interval-contains? ;
 
 : interval* ( i1 i2 -- i3 )
@@ -200,7 +200,7 @@ M: interval interval-contains?
 
 : interval-sq ( i1 -- i2 ) dup interval* ;
 
-GENERIC: interval-singleton? ( int -- ? )
+GENERIC: interval-singleton? ( interval -- ? )
 M: special-interval interval-singleton? drop f ;
 M: interval interval-singleton?
     interval>points
@@ -208,7 +208,7 @@ M: interval interval-singleton?
     [ [ first ] bi@ number= ]
     [ 2drop f ] if ;
 
-GENERIC: interval-length ( int -- n )
+GENERIC: interval-length ( interval -- n )
 M: empty-interval interval-length drop 0 ;
 M: full-interval interval-length drop 1/0. ;
 M: interval interval-length
@@ -368,7 +368,7 @@ SYMBOL: incomparable
     } cond
     swap 0 [a,a] interval>= t eq? [ [0,inf] interval-intersect ] when ;
 
-: (rem-range) ( i -- i' ) interval-abs to>> first [0,b) ;
+: (rem-range) ( interval -- interval' ) interval-abs to>> first [0,b) ;
 
 : interval-rem ( i1 i2 -- i3 )
     {
@@ -378,7 +378,7 @@ SYMBOL: incomparable
         [ nip (rem-range) ]
     } cond ;
 
-: interval-nonnegative? ( i -- ? )
+: interval-nonnegative? ( interval -- ? )
     from>> first 0 >= ;
 
 : interval-negative? ( interval -- ? )

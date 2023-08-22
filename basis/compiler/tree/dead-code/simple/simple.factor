@@ -1,10 +1,10 @@
 ! Copyright (C) 2008, 2010 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs classes.algebra combinators
-compiler.tree compiler.tree.dead-code.liveness
-compiler.tree.propagation.info fry kernel locals math math.private
-namespaces sequences stack-checker.backend stack-checker.dependencies
-words ;
+combinators.short-circuit compiler.tree
+compiler.tree.dead-code.liveness compiler.tree.propagation.info
+fry kernel locals math math.private namespaces sequences
+stack-checker.backend stack-checker.dependencies words ;
 IN: compiler.tree.dead-code.simple
 
 : flushable-call? ( #call -- ? )
@@ -136,7 +136,7 @@ M: #shuffle remove-dead-code*
     [ filter-live ] change-in-r
     [ filter-live ] change-out-r
     [ filter-mapping ] change-mapping
-    dup [ in-d>> empty? ] [ in-r>> empty? ] bi and [ drop f ] when ;
+    dup { [ in-d>> empty? ] [ in-r>> empty? ] } 1&& [ drop f ] when ;
 
 M: #copy remove-dead-code*
     [ in-d>> ] [ out-d>> ] bi

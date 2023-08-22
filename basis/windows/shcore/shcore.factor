@@ -1,5 +1,5 @@
 ! Copyright (C) 2017 Benjamin Pollack.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: alien.syntax windows.types ;
 IN: windows.shcore
 
@@ -73,3 +73,4 @@ ENUM: SHELL_UI_COMPONENT
     { SHELL_UI_COMPONENT_TASKBARS 0 }
     { SHELL_UI_COMPONENT_NOTIFICATIONAREA 1 }
     { SHELL_UI_COMPONENT_DESKBAND 2 } ;
+

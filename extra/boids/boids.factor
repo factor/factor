@@ -1,6 +1,6 @@
 ! Copyright (C) 2008 Eduardo Cavazos.
 ! Copyright (C) 2011 Anton Gorenko.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 
 USING: accessors arrays boids.simulation calendar classes colors
 kernel literals math math.functions math.trig models
@@ -13,12 +13,12 @@ ui.gadgets.sliders ui.render ui.tools.common ;
 QUALIFIED-WITH: models.range mr
 IN: boids
 
-TUPLE: boids-gadget < gadget paused boids behaviours dt ;
+TUPLE: boids-gadget < gadget paused boids behaviors dt ;
 
 CONSTANT: initial-population 100
 CONSTANT: initial-dt 5
 
-: initial-behaviours ( -- seq )
+: initial-behaviors ( -- seq )
     1.0 75 -0.1 <cohesion>
     1.0 40 -0.5 <alignment>
     1.0 25 -1.0 <separation>
@@ -29,7 +29,7 @@ CONSTANT: initial-dt 5
         t >>clipped?
         ${ WIDTH HEIGHT } >>pref-dim
         initial-population random-boids >>boids
-        initial-behaviours >>behaviours
+        initial-behaviors >>behaviors
         initial-dt >>dt ;
 
 M: boids-gadget ungraft*
@@ -45,7 +45,7 @@ M: boids-gadget ungraft*
             -6.0  4.0 glVertex2f
             -6.0 -4.0 glVertex2f
             8.0 0.0 glVertex2f
-         ] do-state
+        ] do-state
     ] with-translation ;
 
 : draw-boids ( boids -- )
@@ -56,7 +56,7 @@ M: boids-gadget draw-gadget* ( boids-gadget -- )
     boids>> draw-boids ;
 
 : iterate-system ( boids-gadget -- )
-    dup [ boids>> ] [ behaviours>> ] [ dt>> ] tri
+    dup [ boids>> ] [ behaviors>> ] [ dt>> ] tri
     simulate >>boids drop ;
 
 :: start-boids-thread ( gadget -- )
@@ -160,7 +160,7 @@ TUPLE: boids-frame < pack ;
     boids-gadget simulation-panel
     add-gadget
 
-    boids-gadget behaviours>>
+    boids-gadget behaviors>>
     [ behavior-panel add-gadget ] each
 
     { 5 5 } <border> add-gadget ;

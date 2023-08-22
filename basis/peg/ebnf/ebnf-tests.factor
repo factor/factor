@@ -1,5 +1,5 @@
 ! Copyright (C) 2007 Chris Double.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 !
 USING: kernel tools.test peg peg.ebnf peg.ebnf.private words
 math math.parser sequences accessors peg.parsers parser
@@ -16,10 +16,10 @@ IN: peg.ebnf.tests
 
 {
   T{ ebnf-rule f
-     "digit"
-     T{ ebnf-choice f
+    "digit"
+    T{ ebnf-choice f
         V{ T{ ebnf-terminal f "1" } T{ ebnf-terminal f "2" } }
-     }
+    }
   }
 } [
   "digit = '1' | '2'" rule-parser parse
@@ -27,10 +27,10 @@ IN: peg.ebnf.tests
 
 {
   T{ ebnf-rule f
-     "digit"
-     T{ ebnf-sequence f
-        V{ T{ ebnf-terminal f "1" } T{ ebnf-terminal f "2" } }
-     }
+    "digit"
+    T{ ebnf-sequence f
+      V{ T{ ebnf-terminal f "1" } T{ ebnf-terminal f "2" } }
+    }
   }
 } [
   "digit = '1' '2'" rule-parser parse
@@ -38,12 +38,12 @@ IN: peg.ebnf.tests
 
 {
   T{ ebnf-choice f
-     V{
-       T{ ebnf-sequence f
-          V{ T{ ebnf-non-terminal f "one" } T{ ebnf-non-terminal f "two" } }
-       }
-       T{ ebnf-non-terminal f "three" }
-     }
+    V{
+      T{ ebnf-sequence f
+        V{ T{ ebnf-non-terminal f "one" } T{ ebnf-non-terminal f "two" } }
+      }
+      T{ ebnf-non-terminal f "three" }
+    }
   }
 } [
   "one two | three" choice-parser parse
@@ -51,7 +51,7 @@ IN: peg.ebnf.tests
 
 {
   T{ ebnf-sequence f
-     V{
+    V{
        T{ ebnf-non-terminal f "one" }
        T{ ebnf-whitespace f
          T{ ebnf-choice f
@@ -66,7 +66,7 @@ IN: peg.ebnf.tests
 
 {
   T{ ebnf-sequence f
-     V{
+    V{
        T{ ebnf-non-terminal f "one" }
        T{ ebnf-repeat0 f
           T{ ebnf-sequence f
@@ -86,7 +86,7 @@ IN: peg.ebnf.tests
 
 {
   T{ ebnf-sequence f
-     V{
+    V{
        T{ ebnf-non-terminal f "one" }
        T{ ebnf-ignore f
           T{ ebnf-sequence f
@@ -106,7 +106,7 @@ IN: peg.ebnf.tests
 
 {
   T{ ebnf-sequence f
-     V{
+    V{
          T{ ebnf-non-terminal f "one" }
          T{ ebnf-optional f T{ ebnf-non-terminal f "two" } }
          T{ ebnf-non-terminal f "three" }
@@ -645,4 +645,13 @@ Tok                = Spaces (Number | Special )
 
 { { "a" "c" } } [
     "abc" EBNF[=[ rule="a":a "b"+~ "c":c => [[ a c 2array ]] ]=]
+] unit-test
+
+! Bugfix, ensure that named vars work in groups
+{ { "a" "b" } } [
+    "ab" EBNF[=[ rule = ( "a":a "b":b ) => [[ { a b } ]] ]=]
+] unit-test
+
+{ { "a" "b" } } [
+    "a b" EBNF[=[ rule = { "a":a "b":b } => [[ { a b } ]] ]=]
 ] unit-test

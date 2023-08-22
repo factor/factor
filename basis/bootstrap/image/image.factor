@@ -1,5 +1,5 @@
 ! Copyright (C) 2004, 2011 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs byte-arrays classes
 classes.builtin classes.private classes.tuple
 classes.tuple.private combinators combinators.short-circuit
@@ -288,8 +288,8 @@ ERROR: not-in-image vocabulary word ;
     [ target-word ] keep or ;
 
 : fixup-word ( word -- offset )
-    transfer-word dup lookup-object
-    [ ] [ [ vocabulary>> ] [ name>> ] bi not-in-image ] ?if ;
+    transfer-word
+    [ lookup-object ] [ [ vocabulary>> ] [ name>> ] bi not-in-image ] ?unless ;
 
 : fixup-words ( -- )
     bootstrapping-image get [ dup word? [ fixup-word ] when ] map! drop ;
@@ -361,7 +361,7 @@ M: byte-array prepare-object
 ERROR: tuple-removed class ;
 
 : require-tuple-layout ( word -- layout )
-    dup tuple-layout [ ] [ tuple-removed ] ?if ;
+    [ tuple-layout ] [ tuple-removed ] ?unless ;
 
 : (emit-tuple) ( tuple -- pointer )
     [ tuple-slots ]
@@ -494,6 +494,13 @@ M: quotation prepare-object
     emit-words
     "Serializing JIT data..." print flush
     emit-jit-data
+! special-objects get ...
+! nl
+! "sub-primitives" print
+! sub-primitives get ...
+! \ c-to-factor of
+! 43 special-objects get set-at
+
     "Serializing global namespace..." print flush
     emit-global
     "Serializing singletons..." print flush

@@ -1,8 +1,8 @@
 ! Copyright (C) 2005, 2009 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs colors combinators
-combinators.short-circuit io.directories io.files io.files.info
-io.pathnames kernel make math math.order sequences
+combinators.short-circuit editors io.directories io.files
+io.files.info io.pathnames kernel make math math.order sequences
 sequences.private sorting splitting splitting.monotonic unicode
 unicode.data vocabs vocabs.hierarchy ;
 IN: tools.completion
@@ -44,7 +44,7 @@ PRIVATE>
 
 : score ( full fuzzy -- n )
     [
-        [ [ length ] bi@ - 15 swap [-] 3 /f ] 2keep
+        [ 2length - 15 swap [-] 3 /f ] 2keep
         runs [
             [ 0 [ pick score-1 max ] reduce nip ] keep
             length * +
@@ -87,11 +87,11 @@ PRIVATE>
 
 : qualified-named ( str -- seq/f )
     ":" split1 [
-        drop vocabs-matching keys [
+        vocabs-matching keys [
             [ vocab-words ] [ vocab-name ] bi ":" append
             [ over name>> append ] curry { } map>assoc
         ] map concat
-    ] [ drop f ] if* ;
+    ] [ drop f ] if ;
 
 : words-matching ( str -- seq )
     all-words named over qualified-named [ append ] unless-empty completions ;
@@ -101,6 +101,9 @@ PRIVATE>
 
 : colors-matching ( str -- seq )
     named-colors dup zip completions ;
+
+: editors-matching ( str -- seq )
+    available-editors [ "editors." ?head drop ] map dup zip completions ;
 
 : strings-matching ( str seq -- seq' )
     dup zip completions keys ;
@@ -131,6 +134,7 @@ PRIVATE>
     {
         "IN:" "USE:" "UNUSE:" "QUALIFIED:"
         "QUALIFIED-WITH:" "FROM:" "EXCLUDE:"
+        "REUSE:"
     } member? ; inline
 
 : complete-single-vocab? ( tokens -- ? )
@@ -142,10 +146,10 @@ PRIVATE>
     ] if ;
 
 : chop-; ( seq -- seq' )
-    { ";" } split1-last [ ] [ ] ?if ;
+    { ";" } split1-last swap or ;
 
 : complete-vocab-list? ( tokens -- ? )
-    chop-; 1 short head* "USING:" swap member? ;
+    chop-; 1 index-or-length head* "USING:" swap member? ;
 
 PRIVATE>
 
@@ -174,6 +178,8 @@ PRIVATE>
 : complete-char? ( tokens -- ? ) "CHAR:" complete-token? ;
 
 : complete-color? ( tokens -- ? ) "COLOR:" complete-token? ;
+
+: complete-editor? ( tokens -- ? ) "EDITOR:" complete-token? ;
 
 <PRIVATE
 

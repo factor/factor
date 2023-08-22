@@ -1,5 +1,5 @@
 ! Copyright (C) 2009 Doug Coleman.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: byte-arrays checksums checksums.common checksums.md5
 io.encodings.binary io.streams.byte-array kernel math.parser
 sequences tools.test ;

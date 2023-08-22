@@ -1,10 +1,10 @@
 ! Copyright (c) 2012 Anonymous
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: assocs io.encodings.utf8 io.files kernel sequences sets
 splitting vectors ;
 IN: rosetta-code.inverted-index
 
-! http://rosettacode.org/wiki/Inverted_index
+! https://rosettacode.org/wiki/Inverted_index
 
 ! An Inverted Index is a data structure used to create full text
 ! search.
@@ -25,7 +25,7 @@ IN: rosetta-code.inverted-index
     '[ _ [ _ add-to-file-list ] change-at ] each ;
 
 : (index-files) ( files index -- )
-   [ [ [ file-words ] keep ] dip swap add-to-index ] curry each ;
+    [ [ [ file-words ] keep ] dip swap add-to-index ] curry each ;
 
 : index-files ( files -- index )
     H{ } clone [ (index-files) ] keep ;

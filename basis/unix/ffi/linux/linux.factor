@@ -1,5 +1,5 @@
 ! Copyright (C) 2010 Doug Coleman.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: alien.c-types alien.syntax classes.struct unix.time
 unix.types ;
 IN: unix.ffi
@@ -121,6 +121,7 @@ FUNCTION: int readdir64_r ( void* dirp, dirent* entry, dirent** result )
 
 FUNCTION: ssize_t sendfile ( int out_fd, int in_fd, off_t* offset, size_t count )
 
+FUNCTION: int pipe2 ( int* filedes, int flags )
 
 CONSTANT: __UT_LINESIZE 32
 CONSTANT: __UT_NAMESIZE 32

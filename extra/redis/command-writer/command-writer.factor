@@ -1,7 +1,7 @@
 ! Copyright (C) 2009 Bruno Deferrari
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: arrays assocs formatting kernel math math.parser
-sequences strings ;
+sequences strings make ;
 IN: redis.command-writer
 
 <PRIVATE
@@ -22,6 +22,16 @@ M: sequence write-resp ( sequence -- )
     suffix reverse
     [ dup number? [ number>string ] when ] map
     write-resp ;
+
+: write-command-multi ( sequence command -- )
+    prepend
+    [ dup number? [ number>string ] when ] map
+    write-resp ;
+
+:: (script-eval) ( script keys args command -- )
+    [ script , keys length , keys % args % ] { } make
+    { command }
+    write-command-multi ;
 
 PRIVATE>
 
@@ -89,11 +99,11 @@ PRIVATE>
 : hgetall ( key -- ) 1array "HGETALL" write-command ;
 : hincrby ( integer field key -- )
     3array "HINCRBY" write-command ;
-: hincrbyfloat (  float field key -- )
+: hincrbyfloat ( float field key -- )
     3array "HINCRBYFLOAT" write-command ;
 : hkeys ( key -- ) 1array "HKEYS" write-command ;
 : hlen ( key -- ) 1array "HLEN" write-command ;
-: hmget ( seq key  -- ) prefix reverse "HMGET" write-command ;
+: hmget ( seq key -- ) prefix reverse "HMGET" write-command ;
 : hmset ( assoc key -- )
     [
         >alist concat reverse
@@ -122,3 +132,13 @@ PRIVATE>
 ! Remote server control
 : info ( -- ) { "INFO" } write-resp ;
 : monitor ( -- ) { "MONITOR" } write-resp ;
+
+! Lua
+: script-load ( script -- ) 1array { "SCRIPT" "LOAD" } write-command-multi ;
+: script-exists ( scripts -- ) { "SCRIPT" "EXISTS" } write-command-multi ;
+: script-flush ( -- ) { } { "SCRIPT" "FLUSH" } write-command-multi ;
+: script-kill ( -- ) { } { "SCRIPT" "KILL" } write-command-multi ;
+! YES | SYNC | NO
+: script-debug ( debug -- ) 1array { "SCRIPT" "DEBUG" } write-command-multi ;
+: script-evalsha ( sha keys args -- ) "EVALSHA" (script-eval) ;
+: script-eval ( script keys args -- ) "EVAL" (script-eval) ;

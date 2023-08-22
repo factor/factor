@@ -5,9 +5,6 @@ let
   runtimeLibs = with xorg; [
     glib
     pango cairo
-    gtk2-x11
-    gdk_pixbuf
-    gnome2.gtkglext
     pcre
     libGL
     libGLU
@@ -18,7 +15,11 @@ let
     libogg
     libvorbis
     zlib
-  ];
+  ] ++ (if stdenv.isDarwin then [] else [
+    gtk2-x11
+    gdk_pixbuf
+    gnome2.gtkglext
+  ]);
   runtimeLibPath = "/run/opengl-driver/lib:" + lib.makeLibraryPath runtimeLibs;
 in
 (mkClangShell {
@@ -29,7 +30,7 @@ in
     git
     curl
     makeWrapper
-  ];
+  ] ++ (if stdenv.isDarwin then [darwin.apple_sdk.frameworks.Cocoa] else []);
   shellHook = ''
     # Set Gdk pixbuf loaders file to the one from the build dependencies here
     unset GDK_PIXBUF_MODULE_FILE

@@ -1,7 +1,7 @@
 ! Copyright (C) 2007, 2010 Eduardo Cavazos, Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs combinators continuations
-definitions init io io.files io.pathnames kernel make namespaces
+definitions io io.files io.pathnames kernel make namespaces
 parser sequences sets splitting strings vocabs words ;
 IN: vocabs.loader
 
@@ -22,7 +22,7 @@ STARTUP-HOOK: [
 ]
 
 : add-vocab-root ( root -- )
-    trim-tail-separators dup vocab-roots get ?adjoin
+    absolute-path trim-tail-separators dup vocab-roots get ?adjoin
     [ add-vocab-root-hook get-global call( root -- ) ] [ drop ] if ;
 
 SYMBOL: root-cache
@@ -77,7 +77,7 @@ PRIVATE>
     ] if ;
 
 : vocab-exists? ( name -- ? )
-    dup lookup-vocab [ ] [ find-vocab-root ] ?if ;
+    [ lookup-vocab ] [ find-vocab-root ] ?unless ;
 
 : vocab-append-path ( vocab path -- newpath )
     swap find-vocab-root [ prepend-path ] [ drop f ] if* ;
@@ -115,6 +115,7 @@ require-when-table [ V{ } clone ] initialize
 : load-source ( vocab -- )
     dup check-vocab-hook get call( vocab -- )
     [
+        f >>main
         +parsing+ >>source-loaded?
         dup vocab-source-path [ parse-file ] [ [ ] ] if*
         [ +parsing+ >>source-loaded? ] dip
@@ -148,9 +149,10 @@ PRIVATE>
     ] when* require ;
 
 : run ( vocab -- )
-    dup load-vocab vocab-main [
-        execute( -- )
-    ] [
+    load-vocab
+    [ vocab-main ]
+    [ execute( -- ) ]
+    [
         "The " write vocab-name write
         " vocabulary does not define an entry point." print
         "To define one, refer to \\ MAIN: help" print

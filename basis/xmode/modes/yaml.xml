@@ -1,0 +1,81 @@
+<?xml version="1.0"?>
+<!--
+YAML mode by Jakub Roztočil <jakub@webkitchen.cz>
+-->
+<!DOCTYPE MODE SYSTEM "xmode.dtd">
+<MODE>
+	<PROPS>
+		<PROPERTY NAME="indentNextLines" VALUE=".+:$" />
+		<PROPERTY NAME="indentOpenBrackets" VALUE="[{|>" />
+		<PROPERTY NAME="indentCloseBrackets" VALUE="}]" />
+		<PROPERTY NAME="ignoreWhitespace" VALUE="false" />
+		<PROPERTY NAME="lineComment" VALUE="#" />
+		<!-- YAML forbids tabs -->
+		<PROPERTY NAME="noTabs" VALUE="true" />
+		<PROPERTY NAME="indentSize" VALUE="2" />
+		<PROPERTY NAME="tabSize" VALUE="2" />
+	</PROPS>
+
+	<RULES ESCAPE="\" HIGHLIGHT_DIGITS="TRUE">
+		<SEQ TYPE="KEYWORD3">...</SEQ>
+		<SEQ TYPE="KEYWORD3">---</SEQ>
+		<!-- NAME -->
+		<SEQ_REGEXP AT_WHITESPACE_END="TRUE" DELEGATE="VALUES">-( |$)</SEQ_REGEXP>
+		<IMPORT DELEGATE="NAME" />
+	</RULES>
+
+	<RULES SET="NAME">
+		<SEQ_REGEXP TYPE="KEYWORD1" DELEGATE="VALUES">[^:\[\]{},'"#]+:( |$)</SEQ_REGEXP>
+		<!-- Useful for Symfony configuration files -->
+		<SPAN TYPE="MARKUP" DELEGATE="php::PHP">
+			<BEGIN>&lt;?php</BEGIN>
+			<END>?&gt;</END>
+		</SPAN>
+	</RULES>
+
+	<RULES SET="ARRAYS">
+		<SPAN NO_LINE_BREAK="FALSE" TYPE="OPERATOR" DELEGATE="ARRAY">
+			<BEGIN>{</BEGIN>
+			<END>}</END>
+		</SPAN>
+		<SPAN NO_LINE_BREAK="FALSE" TYPE="OPERATOR" DELEGATE="ARRAY">
+			<BEGIN>[</BEGIN>
+			<END>]</END>
+		</SPAN>
+	</RULES>
+
+	<RULES SET="ARRAY">
+		<IMPORT DELEGATE="VALUES" />
+		<SEQ TYPE="OPERATOR">,</SEQ>
+	</RULES>
+
+	<RULES SET="VALUES" HIGHLIGHT_DIGITS="TRUE">
+		<EOL_SPAN TYPE="COMMENT1" AT_LINE_START="FALSE">#</EOL_SPAN>
+		<IMPORT DELEGATE="NAME" />
+		<IMPORT DELEGATE="ARRAYS" />
+		<!-- Yaml forbids tabs -->
+		<SEQ_REGEXP TYPE="INVALID">\t</SEQ_REGEXP>
+		<SPAN TYPE="LITERAL1" NO_LINE_BREAK="TRUE">
+			<BEGIN>"</BEGIN>
+			<END>"</END>
+		</SPAN>
+		<SPAN TYPE="LITERAL1" NO_LINE_BREAK="TRUE">
+			<BEGIN>'</BEGIN>
+			<END>'</END>
+		</SPAN>
+		<KEYWORDS>
+			<KEYWORD3>~</KEYWORD3>
+			<KEYWORD3>false</KEYWORD3>
+			<KEYWORD3>n</KEYWORD3>
+			<KEYWORD3>No</KEYWORD3>
+			<KEYWORD3>off</KEYWORD3>
+			<KEYWORD3>Y</KEYWORD3>
+			<KEYWORD3>true</KEYWORD3>
+			<KEYWORD3>Yes</KEYWORD3>
+			<KEYWORD3>ON</KEYWORD3>
+		</KEYWORDS>
+	</RULES>
+
+</MODE>
+
+

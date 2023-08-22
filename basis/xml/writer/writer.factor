@@ -1,5 +1,5 @@
 ! Copyright (C) 2005, 2009 Daniel Ehrenberg
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors assocs combinators io io.streams.string kernel
 namespaces sequences strings unicode wrap.strings xml.data
 xml.entities ;
@@ -101,6 +101,9 @@ M: unescaped write-xml
 
 M: comment write-xml
     "<!--" write text>> write "-->" write ;
+
+M: cdata write-xml
+    "<![CDATA[" write text>> write "]]>" write ;
 
 : write-decl ( decl name quot: ( decl -- slot ) -- )
     "<!" write swap write bl

@@ -1,7 +1,7 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! Copyright (C) 2015 Doug Coleman.
-! See http://factorcode.org/license.txt for BSD license.
-USING: bootstrap.image checksums checksums.openssl io
+! See https://factorcode.org/license.txt for BSD license.
+USING: arrays bootstrap.image checksums checksums.openssl io
 io.directories io.encodings.ascii io.encodings.utf8 io.files
 io.files.temp io.files.unique io.launcher io.pathnames kernel
 make math.parser namespaces sequences splitting system unicode ;
@@ -27,11 +27,13 @@ SYMBOL: build-images-destination
         [ unicode:blank? ] trim-tail
     ] with-directory ;
 
-: git-branch-destination ( -- dest )
+: git-branch-destinations ( -- dests )
     build-images-destination get
     "sheeple@downloads.factorcode.org:downloads.factorcode.org/images/"
     or
-    factor-git-branch "/" 3append ;
+    factor-git-branch dup { "master" "main" } member?
+    [ drop { "master" "main" } ] [ 1array ] if
+    [ "/" 3append ] with map ;
 
 : checksums-path ( -- temp ) "checksums.txt" temp-file ;
 
@@ -42,20 +44,25 @@ SYMBOL: build-images-destination
     checksums-path ascii [
         boot-image-names [
             [ write bl ]
-            [ openssl-md5 checksum-file bytes>hex-string print ]
-            bi
+            [ openssl-md5 checksum-file bytes>hex-string write bl ]
+            [ openssl-sha256 checksum-file bytes>hex-string print ]
+            tri
         ] each
     ] with-file-writer ;
 
 : scp-name ( -- path ) "scp" ;
 
 : upload-images ( -- )
-    [
-        \ scp-name get-global scp-name or ,
-        boot-image-names %
-        checksums-path ,
-        git-branch-destination [ print flush ] [ , ] bi
-    ] { } make try-process ;
+    git-branch-destinations [
+        [
+            [
+                \ scp-name get-global scp-name or ,
+                "-4" , ! force ipv4
+                boot-image-names %
+                checksums-path ,
+            ] { } make
+        ] dip suffix try-process
+    ] each ;
 
 : append-build ( path -- path' )
     vm-git-id "." glue ;
@@ -86,6 +93,7 @@ SYMBOL: build-images-destination
     [
         [
             \ scp-name get-global scp-name or ,
+            "-4" , ! force ipv4
             "." directory-files %
             build-destination ,
         ] { } make try-process
@@ -94,6 +102,7 @@ SYMBOL: build-images-destination
 : create-remote-upload-directory ( -- )
     '[
         "ssh" ,
+        "-4" , ! force ipv4
         "sheeple@downloads.factorcode.org" ,
         "mkdir -p downloads.factorcode.org/images/" factor-git-branch append ,
     ] { } make try-process ;

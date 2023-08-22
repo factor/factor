@@ -1,5 +1,5 @@
 ! Copyright (C) 2016 Alexander Ilin.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors ascii checksums checksums.common destructors io
 io.encodings.binary io.launcher kernel math.parser sequences ;
 IN: checksums.process

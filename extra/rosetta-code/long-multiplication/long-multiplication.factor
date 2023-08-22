@@ -1,9 +1,9 @@
 ! Copyright (c) 2012 Anonymous
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: kernel math math.vectors sequences ;
 IN: rosetta-code.long-multiplication
 
-! http://rosettacode.org/wiki/Long_multiplication
+! https://rosettacode.org/wiki/Long_multiplication
 
 ! In this task, explicitly implement long multiplication. This
 ! is one possible approach to arbitrary-precision integer algebra.

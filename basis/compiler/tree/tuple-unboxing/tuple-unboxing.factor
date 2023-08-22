@@ -1,5 +1,5 @@
 ! Copyright (C) 2008, 2009 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs classes.tuple.private combinators
 compiler.tree compiler.tree.builder compiler.tree.combinators
 compiler.tree.escape-analysis.allocations
@@ -33,7 +33,7 @@ M: #push unbox-tuples* ( #push -- nodes )
 
 : (flatten-values) ( values accum -- )
     dup '[
-        dup unboxed-allocation
+        [ unboxed-allocation ]
         [ _ (flatten-values) ] [ _ push ] ?if
     ] each ;
 
@@ -161,6 +161,6 @@ M: #alien-node unbox-tuples* dup in-d>> assert-not-unboxed ;
 M: #alien-callback unbox-tuples* ;
 
 : unbox-tuples ( nodes -- nodes )
-    (allocation) escaping-allocations get
+    allocations get escaping-allocations get
     [ nip key? ] curry assoc-all?
     [ [ unbox-tuples* ] map-nodes ] unless ;

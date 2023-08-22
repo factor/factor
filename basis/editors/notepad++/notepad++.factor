@@ -3,7 +3,6 @@ namespaces sequences ;
 IN: editors.notepad++
 
 SINGLETON: notepad++
-notepad++ editor-class set-global
 
 : notepad++-path ( -- path )
     \ notepad++-path get [

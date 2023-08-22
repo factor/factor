@@ -1,5 +1,5 @@
 ! Copyright (C) 2009 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 
 USING: accessors arrays assocs calendar colors combinators
 combinators.short-circuit definitions.icons documents
@@ -34,11 +34,12 @@ TUPLE: vocab-word-completion vocab-name ;
 C: <vocab-word-completion> vocab-word-completion
 
 SINGLETONS: vocab-completion color-completion char-completion
-path-completion history-completion ;
+editor-completion path-completion history-completion ;
 UNION: definition-completion word-completion
 vocab-word-completion vocab-completion ;
 UNION: code-completion definition-completion
-color-completion char-completion path-completion ;
+color-completion char-completion editor-completion
+path-completion ;
 UNION: listener-completion code-completion history-completion ;
 
 GENERIC: completion-quot ( interactor completion-mode -- quot )
@@ -50,6 +51,7 @@ M: word-completion completion-quot [ words-matching ] (completion-quot) ;
 M: vocab-word-completion completion-quot nip vocab-name>> '[ _ vocab-words-matching ] ;
 M: vocab-completion completion-quot [ vocabs-matching ] (completion-quot) ;
 M: color-completion completion-quot [ colors-matching ] (completion-quot) ;
+M: editor-completion completion-quot [ editors-matching ] (completion-quot) ;
 M: char-completion completion-quot [ chars-matching ] (completion-quot) ;
 M: path-completion completion-quot [ paths-matching ] (completion-quot) ;
 M: history-completion completion-quot drop '[ _ history-completions ] ;
@@ -65,6 +67,7 @@ M: word-completion completion-banner drop "Words" ;
 M: vocab-word-completion completion-banner drop "Words" ;
 M: vocab-completion completion-banner drop "Vocabularies" ;
 M: color-completion completion-banner drop "Colors" ;
+M: editor-completion completion-banner drop "Editors" ;
 M: char-completion completion-banner drop "Unicode code point names" ;
 M: path-completion completion-banner drop "Paths" ;
 M: history-completion completion-banner drop "Input history" ;
@@ -109,6 +112,7 @@ M: color-completion row-color
         { [ dup complete-vocab? ] [ 2drop vocab-completion ] }
         { [ dup complete-char? ] [ 2drop char-completion ] }
         { [ dup complete-color? ] [ 2drop color-completion ] }
+        { [ dup complete-editor? ] [ 2drop editor-completion ] }
         { [ dup complete-pathname? ] [ 2drop path-completion ] }
         { [ dup complete-vocab-words? ] [ nip harvest second <vocab-word-completion> ] }
         [ drop <word-completion> ]
@@ -120,7 +124,7 @@ TUPLE: completion-popup < track interactor table completion-mode ;
     [ completion-popup? ] find-parent ;
 
 : <completion-model> ( editor element quot -- model )
-    [ <element-model> ] dip '[ @ >alist 100 short head ] <arrow> ;
+    [ <element-model> ] dip '[ @ >alist 100 index-or-length head ] <arrow> ;
 
 M: completion-popup focusable-child* table>> ;
 

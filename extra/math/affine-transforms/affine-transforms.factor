@@ -13,7 +13,7 @@ CONSTANT: identity-transform T{ affine-transform f
                                 { 1.0 0.0 } { 0.0 1.0 } { 0.0 0.0 } }
 
 : axes ( a -- a' )
-     [ x>> ] [ y>> ] bi { 0.0 0.0 } <affine-transform> ;
+    [ x>> ] [ y>> ] bi { 0.0 0.0 } <affine-transform> ;
 
 : a.v ( a v -- v )
     [ [ x>> ] [ first  ] bi* v*n ]

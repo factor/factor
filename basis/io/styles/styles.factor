@@ -1,5 +1,5 @@
 ! Copyright (C) 2005, 2009 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors assocs colors delegate delegate.protocols
 destructors hashtables io io.streams.plain io.streams.string
 kernel make namespaces present sequences sets splitting strings
@@ -114,6 +114,9 @@ SYMBOL: plain
 SYMBOL: bold
 SYMBOL: italic
 SYMBOL: bold-italic
+SYMBOL: faint
+SYMBOL: underline
+SYMBOL: blink
 
 ! Character styles
 SYMBOL: foreground

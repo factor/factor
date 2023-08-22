@@ -43,7 +43,7 @@ TUPLE: point x y ;
 { 200 } [ "p" get y>> ] unit-test
 { f } [ "p" get "z>>" "accessors" lookup-word execute ] unit-test
 
-{ } [ "p" get 300 ">>z" "accessors" lookup-word execute drop ] unit-test
+[ "p" get 300 ">>z" "accessors" lookup-word execute ] must-not-fail
 
 { 3 } [ "p" get tuple-size ] unit-test
 
@@ -320,8 +320,8 @@ TUPLE: make-me-some-accessors voltage grounded? ;
 { f } [ "laptop" get voltage>> ] unit-test
 { f } [ "server" get voltage>> ] unit-test
 
-{ } [ "laptop" get 220 >>voltage drop ] unit-test
-{ } [ "server" get 110 >>voltage drop ] unit-test
+[ "laptop" get 220 >>voltage ] must-not-fail
+[ "server" get 110 >>voltage ] must-not-fail
 
 { } [ "IN: classes.tuple.tests TUPLE: electronic-device voltage grounded? ; C: <computer> computer" eval( -- ) ] unit-test
 
@@ -628,7 +628,7 @@ TUPLE: bogus-hashcode-2 x ;
 
 M: bogus-hashcode-1 hashcode* 2drop 0 >bignum ;
 
-{ } [ T{ bogus-hashcode-2 f T{ bogus-hashcode-1 } } hashcode drop ] unit-test
+[ T{ bogus-hashcode-2 f T{ bogus-hashcode-1 } } hashcode ] must-not-fail
 
 DEFER: change-slot-test
 SLOT: kex
