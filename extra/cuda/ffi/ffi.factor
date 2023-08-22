@@ -7,7 +7,7 @@ IN: cuda.ffi
 <<
 "cuda" {
     { [ os windows? ] [ "nvcuda.dll" stdcall ] }
-    { [ os macosx? ] [ "/usr/local/cuda/lib/libcuda.dylib" cdecl ] }
+    { [ os macosx? ] [ "libcuda.dylib" cdecl ] }
     { [ os unix? ] [ "libcuda.so" cdecl ] }
 } cond add-library
 >>
