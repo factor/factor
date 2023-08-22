@@ -1,4 +1,4 @@
-USING: accessors assocs combinators concurrency.promises
+USING: accessors assocs calendar combinators concurrency.promises
 continuations fry io.sockets io.sockets.secure io.streams.string
 kernel namespaces sequences smtp smtp.private smtp.server
 sorting system tools.test ;
@@ -10,7 +10,7 @@ IN: smtp.tests
         "p" get mock-smtp-server
 
         default-smtp-config
-            "localhost" "p" get ?promise <inet> >>server
+            "localhost" "p" get 5 seconds ?promise-timeout <inet> >>server
             no-auth >>auth
             os unix? [ t >>tls? ] when
         \ smtp-config
