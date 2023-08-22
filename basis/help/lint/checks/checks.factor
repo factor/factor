@@ -84,7 +84,6 @@ SYMBOL: vocab-articles
 : contains-funky-elements? ( element -- ? )
     {
         $shuffle
-        $complex-shuffle
         $values-x/y
         $predicate
         $class-description

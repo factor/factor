@@ -452,10 +452,6 @@ M: f ($instance) ($link) ;
     ?first [ ": " swap "." 4array ] [ "." append ] if*
     $description ;
 
-: $complex-shuffle ( element -- )
-    $shuffle
-    { "The data flow represented by this shuffle word might be more clearly expressed using " { $link "locals" } "." } $deprecated ;
-
 : $low-level-note ( children -- )
     drop
     "Calling this word directly is not necessary in most cases. Higher-level words call it automatically." $notes ;
