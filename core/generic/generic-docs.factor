@@ -1,6 +1,6 @@
-USING: classes classes.algebra combinators effects generic.hook
+USING: classes classes.algebra combinators effects kernel generic.hook
 generic.math generic.single generic.standard help.markup
-help.syntax math words ;
+help.syntax math quotations words ;
 IN: generic
 
 ARTICLE: "method-order" "Method precedence"
@@ -197,8 +197,8 @@ HELP: no-next-method
 } ;
 
 HELP: make-consult-quot
-! { $values { "consultation" object } { "word" word } { "quot" quotation } { "combination" combination } }
-{ $contract "This generic produces the body quotation that will be used to actually effect a method consultation from the " { $vocab-link "delegate" } "vocabulary." }
+{ $values { "consultation" object } { "word" word } { "quot" quotation } { "combination" combination } { "consult-quot" quotation } }
+{ $contract "This generic produces the body quotation that will be used to actually effect a method consultation from the " { $vocab-link "delegate" } " vocabulary." }
 { $notes "This is already implemented for " { $snippet "standard-combination" } " and " { $snippet "hook-combination" } ", and thus only needs to be specialized if you are implementing " { $snippet "CONSULT:" } " for a different kind of combination." }
 { $heading "Reasoning" }
 "For standard method combinations, this calls the quotation to obtain the consulted object, and then executes the generic word, which naturally dispatches against the object on the stack. This is not sufficient for hook combinations, which must have the generic word executed with a variable bound to the result of the quotation. This generic is what allows for specializing the behavior of the methods that " { $snippet "CONSULT:" } " creates." ;
