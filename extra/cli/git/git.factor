@@ -89,8 +89,8 @@ cli-git-num-parallel [ cpus 2 * ] initialize
 : sync-no-checkout-repository-as ( url path -- processes )
     dup git-no-checkout-directory?
     [ nip git-fetch-all ] [
-        [ git-clone-no-checkout-as wait-for-success ]
-        [ "factor-build-from-source" git-switch-new-branch ] bi
+        [ git-clone-no-checkout-as ]
+        [ "factor-build-from-source" git-switch-new-branch ] bi 2array
     ] if ;
 
 : sync-bare-repository ( url -- process )
