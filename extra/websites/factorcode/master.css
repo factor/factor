@@ -48,6 +48,10 @@ li {
     padding: 5px;
 }
 
+table {
+  border-collapse: collapse;
+}
+
 .downloads {
     width: min(520px, 100%);
     padding: 0;
