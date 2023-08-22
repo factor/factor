@@ -1,1 +1,1 @@
-Unicode 5.2 support
+Unicode support
