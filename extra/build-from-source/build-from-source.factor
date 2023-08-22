@@ -166,10 +166,10 @@ ERROR: no-output-file path ;
         } 4cleave
     ] dip
     '[
-        _ 
+        _ _
         dup "build-from-source considering gitlab %s" sprintf print
         over check-build-completed [
-            2nip "%s already built at %s" sprintf print
+            2nip "- %s already built at %s" sprintf print
         ] [
             [
                 over "%s\n- deleting old build..." sprintf write
