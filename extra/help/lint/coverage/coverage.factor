@@ -25,7 +25,6 @@ CONSTANT: ignored-words {
     $parsing-note
     $io-error
     $shuffle
-    $complex-shuffle
     $nl
 }
 
