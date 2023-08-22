@@ -1,5 +1,5 @@
 ! Copyright (C) 2009 Tim Wawrzynczak, Doug Coleman.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs byte-arrays
 combinators combinators.short-circuit combinators.smart
 continuations io.directories io.encodings.ascii
@@ -116,7 +116,7 @@ CONSTANT: id3v1+-length 227
     [ 10 over size>> 10 + ] dip <slice> filter-text-data ;
 
 : decode-text ( string -- string' )
-    dup 2 short head
+    dup 2 index-or-length head
     { { 0xff 0xfe } { 0xfe 0xff } } member?
     utf16 ascii ? decode ;
 

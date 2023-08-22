@@ -1,5 +1,5 @@
 ! Copyright (C) 2007, 2009 Daniel Ehrenberg.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: inverse tools.test arrays math kernel sequences
 math.functions math.constants continuations combinators.smart ;
 IN: inverse.tests
@@ -72,6 +72,9 @@ C: <nil> nil
 { t } [ pi [ pi ] matches? ] unit-test
 { 0.0 } [ 0.0 pi + [ pi + ] undo ] unit-test
 { } [ 3 [ __ ] undo ] unit-test
+
+{ 2 } [ 4 [ 2 swap + ] undo ] unit-test
+{ 2 } [ 4 [ 2 swap * ] undo ] unit-test
 
 { 2.0 } [ 2 3 ^ [ 3 ^ ] undo ] unit-test
 { 3.0 } [ 2 3 ^ [ 2 swap ^ ] undo ] unit-test

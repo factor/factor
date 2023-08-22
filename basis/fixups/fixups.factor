@@ -1,12 +1,15 @@
 ! Copyright (C) 2021 Doug Coleman.
-! See http://factorcode.org/license.txt for BSD license.
-USING: accessors assocs continuations kernel sequences
-vocabs vocabs.parser ;
+! See https://factorcode.org/license.txt for BSD license.
+USING: accessors assocs classes.tuple continuations kernel sequences
+slots.private vocabs vocabs.parser ;
 IN: fixups
 
 CONSTANT: vocab-renames {
     { "math.intervals" { "intervals" "0.99" } }
     { "math.ranges" { "ranges" "0.99" } }
+    { "sorting.slots" { "sorting.specification" "0.99" } }
+    { "json.reader" { "json" "0.99" } }
+    { "json.writer" { "json" "0.99" } }
 }
 
 CONSTANT: word-renames {
@@ -36,9 +39,36 @@ CONSTANT: word-renames {
     { "substitute" { "regexp.classes:(substitute)" "0.99" } }
     { "combine" { "sets:union-all" "0.99" } }
     { "refine" { "sets:intersect-all" "0.99" } }
-    { "read-json-objects" { "json.reader:read-json" "0.99" } }
+    { "read-json-objects" { "json:read-json" "0.99" } }
     { "init-namespaces" { "namespaces:init-namestack" "0.99" } }
     { "iota" { "sequences:<iota>" ".98" } }
+    { "git-checkout-existing-branch" { "git-checkout-existing" "0.99" } }
+    { "git-checkout-existing-branch*" { "git-checkout-existing*" "0.99" } }
+    { "tags" { "chloe-tags" "0.99" } }
+    { "(each)" { "sequence-operator" "0.99" } }
+    { "(each-integer)" { "each-integer-from" "0.99" } }
+    { "(find-integer)" { "find-integer-from" "0.99" } }
+    { "(all-integers?)" { "all-integers-from?" "0.99" } }
+    { "short" { "index-or-length" "0.99" } }
+    { "map-integers" { "map-integers-as" "0.99" } }
+    { "deep-subseq?" { "deep-subseq-of?" "0.99" } }
+    { "overtomorrow" { "overmorrow" "0.99" } }
+    { "INITIALIZE:" { "INITIALIZED-SYMBOL:" "0.99" } }
+    { "natural-sort" { "sort" "0.99" } }
+    { "sort-by-with" { "sort-with-spec-by" "0.99" } }
+    { "sort-keys-by" { "sort-keys-with-spec" "0.99" } }
+    { "sort-values-by" { "sort-values-with-spec" "0.99" } }
+    { "compare-slots" { "compare-with-spec" "0.99" } }
+    { "natural-sort!" { "sort!" "0.99" } }
+    { "natural-bubble-sort!" { "bubble-sort!" "0.99" } }
+    { "random-integers" { "randoms" "0.99" } }
+    { "count*" { "percent-of" "0.99" } }
+    { "more?" { "deref?" "0.99" } }
+    { "plox" { "?transmute" "0.99" } }
+    ! { "?if" { "?if" "0.99" } }
+    { "ensure-non-negative" { "assert-non-negative" "0.99" } }
+    { "order" { "dispatch-order" "0.99" } }
+    { "TEST:" { "DEFINE-TEST-WORD:" "0.99" } }
 }
 
 : compute-assoc-fixups ( continuation name assoc -- seq )
@@ -56,7 +86,8 @@ CONSTANT: word-renames {
 GENERIC: compute-fixups ( continuation error -- seq )
 
 M: object compute-fixups
-    [ error>> compute-fixups ] [ 3drop { } ] recover ;
+    "error" over ?offset-of-slot
+    [ slot compute-fixups ] [ 2drop { } ] if* ;
 
 M: f compute-fixups 2drop { } ;
 

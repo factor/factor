@@ -1,5 +1,5 @@
 ! Copyright (C) 2009, 2010 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs classes classes.builtin
 classes.error classes.intersection classes.mixin
 classes.predicate classes.singleton classes.tuple classes.union
@@ -8,7 +8,8 @@ generic.single generic.standard io io.pathnames
 io.streams.string io.styles kernel make namespaces prettyprint
 prettyprint.backend prettyprint.config prettyprint.custom
 prettyprint.sections sequences sets slots sorting strings
-summary vocabs words words.alias words.constant words.symbol ;
+summary vocabs vocabs.prettyprint words words.alias
+words.constant words.symbol ;
 IN: see
 
 GENERIC: synopsis* ( defspec -- )
@@ -124,8 +125,6 @@ M: word declarations.
         POSTPONE: foldable
         POSTPONE: flushable
     } [ declaration. ] with each ;
-
-: pprint-; ( -- ) \ ; pprint-word ;
 
 M: object see*
     [
@@ -255,15 +254,15 @@ M: error-class see* see-class ;
     dup implementors
     [ [ reader? ] [ writer? ] bi or ] reject
     [ lookup-method ] with map
-    natural-sort ;
+    sort ;
 
 : seeing-methods ( generic -- seq )
-    "methods" word-prop values natural-sort ;
+    "methods" word-prop values sort ;
 
 PRIVATE>
 
 : see-all ( seq -- )
-    natural-sort [ nl nl ] [ see* ] interleave ;
+    sort [ nl nl ] [ see* ] interleave ;
 
 : methods ( word -- seq )
     [

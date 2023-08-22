@@ -64,7 +64,7 @@ H{
 } representations set
 
 : clean-up-split ( a b -- a b )
-    [ dup [ [ >vector ] change-uses [ >vector ] change-ranges ] when ] bi@ ;
+    [ [ [ >vector ] change-uses [ >vector ] change-ranges ] ?call ] bi@ ;
 
 {
     T{ live-interval-state

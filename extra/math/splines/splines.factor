@@ -1,5 +1,5 @@
 ! Copyright (C) 2010 Erik Charlebois
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: arrays combinators grouping kernel math
 math.combinatorics math.polynomials math.vectors sequences ;
 IN: math.splines

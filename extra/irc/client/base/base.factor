@@ -1,5 +1,5 @@
 ! Copyright (C) 2009 Bruno Deferrari
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors assocs concurrency.mailboxes io irc.client.chats
 irc.messages kernel namespaces sequences strings words.symbol ;
 IN: irc.client.base
@@ -34,7 +34,7 @@ M: to-me      chat-name sender>> ;
 ! ":flogbot2_!~flogbot2@c-50-174-221-28.hsd1.ca.comcast.net JOIN #concatenative-bots"
 ! The channel>> field is empty and it's in parameters instead.
 ! This fixes chat> for these kinds of messages.
-M: to-channel chat-name dup channel>> [ ] [ parameters>> ?first ] ?if ;
+M: to-channel chat-name [ channel>> ] [ parameters>> ?first ] ?unless ;
 
 GENERIC: chat> ( obj -- chat/f )
 M: string      chat> irc> chats>> at ;

@@ -1,5 +1,5 @@
 ! Copyright (C) 2021 John Benediktsson
-! See http://factorcode.org/license.txt for BSD license
+! See https://factorcode.org/license.txt for BSD license
 
 USING: accessors arrays debugger fonts gemini kernel
 math.vectors models present sequences splitting ui ui.commands
@@ -28,8 +28,11 @@ M: gemini-gadget model-changed
     [ value>> present ]
     [ url-field>> editor>> set-editor-string ] bi* ;
 
+: ?gemini-url ( obj -- url )
+    present dup "://" subseq-of? [ "gemini://" prepend ] unless >url ;
+
 : show-gemini ( url gemini-gadget -- )
-    [ [ >url ] [ f ] if* ] dip
+    [ [ ?gemini-url ] [ f ] if* ] dip
     over [ protocol>> "gemini" = ] [ t ] if* [
         [
             2dup control-value =
@@ -40,7 +43,7 @@ M: gemini-gadget model-changed
     ] [ drop open-url ] if ;
 
 : <url-field> ( gemini-gadget -- field )
-    '[ >url _ show-gemini ] <action-field>
+    '[ _ show-gemini ] <action-field>
         "Gemini URL" >>default-text
         white-interior ;
 
@@ -107,3 +110,8 @@ gemini-gadget "scrolling" f {
 } define-command-map
 
 [ dup url? [ protocol>> "gemini" = ] [ drop f ] if ] \ com-gemini H{ { +primary+ t } } define-operation
+
+: gemini-main ( -- )
+    [ "gemini.circumlunar.space" open-gemini-window ] with-ui ;
+
+MAIN: gemini-main

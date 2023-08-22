@@ -1,5 +1,5 @@
 ! Copyright (C) 2011-2012 John Benediktsson
-! See http://factorcode.org/license.txt for BSD license
+! See https://factorcode.org/license.txt for BSD license
 USING: accessors assocs calendar combinators fonts formatting io
 io.streams.string kernel literals make math math.order
 namespaces pdf.canvas pdf.values pdf.wrap ranges sequences
@@ -52,11 +52,11 @@ GENERIC: pdf-width ( canvas obj -- n )
 <PRIVATE
 
 : (pdf-layout) ( page obj -- page )
-    [ dup ] [
+    [ ] [
         dupd [ pdf-render ] with-string-writer
         '[ _ append ] [ change-stream ] curry dip
         [ [ , <canvas> ] when ] keep
-    ] while drop ;
+    ] while* ;
 
 PRIVATE>
 
@@ -101,7 +101,7 @@ M: p pdf-render
     [
         over ?line-break
         over [ font>> ] [ avail-width ] bi visual-wrap
-        over avail-lines short cut
+        over avail-lines index-or-length cut
         [ draw-text ] [ "" concat-as ] bi*
     ] change-string dup string>> empty? [ drop f ] when ;
 
@@ -134,7 +134,7 @@ M: text pdf-render
             [ { } ] [ over [ font>> ] [ width ] bi visual-wrap ]
             if-empty
         ] dip [ prefix ] when*
-        over avail-lines short cut
+        over avail-lines index-or-length cut
         [ draw-text ] [ "" concat-as ] bi*
     ] change-string dup string>> empty? [ drop f ] when ;
 

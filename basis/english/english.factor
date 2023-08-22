@@ -1,8 +1,7 @@
 ! Copyright (C) 2015, 2018 John Benediktsson
-! See http://factorcode.org/license.txt for BSD license
-USING: accessors arrays assocs combinators help.markup kernel
-literals math math.order math.parser sequences splitting unicode
-words ;
+! See https://factorcode.org/license.txt for BSD license
+USING: arrays assocs combinators kernel literals math math.order
+math.parser sequences splitting unicode ;
 IN: english
 
 <PRIVATE
@@ -106,6 +105,11 @@ CONSTANT: plural-to-singular $[ singular-to-plural [ swap ] assoc-map ]
 
 PRIVATE>
 
+CONSTANT: vowels "aeiou"
+
+: vowel? ( ch -- ? )
+    vowels member? ; inline
+
 : singularize ( word -- singular )
     dup >lower {
         { [ dup empty? ] [ ] }
@@ -114,9 +118,7 @@ PRIVATE>
         { [ dup "s" tail? not ] [ ] }
         {
             [
-                dup "ies" ?tail [
-                    last "aeiou" member? not
-                ] [ drop f ] if
+                dup "ies" ?tail [ last vowel? not ] [ drop f ] if
             ] [ 3 head* "y" append ]
         }
         { [ dup "es" tail? ] [ 2 head* ] }
@@ -130,9 +132,7 @@ PRIVATE>
         { [ singular-to-plural ?at ] [ ] }
         {
             [
-                dup "y" ?tail [
-                    last "aeiou" member? not
-                ] [ drop f ] if
+                dup "y" ?tail [ last vowel? not ] [ drop f ] if
             ] [ but-last "ies" append ]
         }
         {
@@ -161,7 +161,7 @@ PRIVATE>
     ] when ;
 
 : a/an ( word -- article )
-    [ first ] [ length ] bi 1 = "afhilmnorsx" "aeiou" ?
+    [ first ] [ length ] bi 1 = "afhilmnorsx" vowels ?
     member? "an" "a" ? ;
 
 : ?plural-article ( word -- article )
@@ -174,15 +174,3 @@ PRIVATE>
     ] dip over length dup 3 >= [
         [ 3 > ", " " " ? " " surround ] [ 2 - pick set-nth ] bi
     ] [ 2drop ] if ;
-
-: or-markup-example ( classes -- markup )
-    [
-        dup word? [
-            [ name>> ] keep \ $link
-        ] [
-            dup \ $snippet
-        ] if swap 2array [ a/an " " append ] dip 2array
-    ] map "or" comma-list ;
-
-: $or-markup-example ( classes -- )
-    or-markup-example print-element ;

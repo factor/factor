@@ -130,8 +130,8 @@ HELP: superclass-of
 
 HELP: superclasses-of
 { $values
-     { "class" class }
-     { "supers" sequence } }
+    { "class" class }
+    { "supers" sequence } }
 { $description "Outputs a sequence of superclasses of a class along with the class itself." }
 { $examples
     { $example "USING: classes prettyprint ;"
@@ -175,8 +175,8 @@ HELP: implementors
 
 HELP: instance?
 { $values
-     { "object" object } { "class" class }
-     { "?" boolean } }
+    { "object" object } { "class" class }
+    { "?" boolean } }
 { $description "Tests whether the input object is a member of the class." } ;
 
 HELP: reset-class

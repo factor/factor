@@ -1,0 +1,85 @@
+<?xml version="1.0"?>
+<!DOCTYPE MODE SYSTEM "xmode.dtd">
+
+<!-- CPlex LP mode, by Kevin Hunter of NCSU (kmhunte@) for jEdit 4.5+ -->
+<!-- Finding an LP specification has proved difficult; the best I could do -->
+<!-- was borrow a copy of the ILOG CPLEX 10.1 User's Manual from a friend. -->
+
+<!-- For the curious reading this file: one doesn't generally create LP -->
+<!-- files by hand, but uses the output of another program (usually for -->
+<!-- debugging purposes).  Consequently, I've not include any frills, -->
+<!-- like auto indent, etc. -->
+
+<MODE>
+	<PROPS>
+		<PROPERTY NAME='wordBreakChars' VALUE='+-/*^=&lt;&gt;\' />
+	</PROPS>
+
+	<RULES
+		IGNORE_CASE='TRUE'
+		HIGHLIGHT_DIGITS='TRUE' DIGIT_RE='\d+(?:\.\d+)?|\d+(?:\.\d+)?e\d+'>
+
+		<EOL_SPAN TYPE='COMMENT1'>\</EOL_SPAN>
+
+		<SEQ TYPE='OPERATOR'>&gt;=</SEQ>
+		<SEQ TYPE='OPERATOR'>=&gt;</SEQ>
+		<SEQ TYPE='OPERATOR'>&gt;</SEQ>
+		<SEQ TYPE='OPERATOR'>&lt;=</SEQ>
+		<SEQ TYPE='OPERATOR'>=&lt;</SEQ>
+		<SEQ TYPE='OPERATOR'>&lt;</SEQ>
+		<SEQ TYPE='OPERATOR'>:</SEQ>
+		<SEQ TYPE='OPERATOR'>=</SEQ>
+		<SEQ TYPE='OPERATOR'>+</SEQ>
+		<SEQ TYPE='OPERATOR'>-</SEQ>
+		<SEQ TYPE='OPERATOR'>*</SEQ>
+		<SEQ TYPE='OPERATOR'>/</SEQ>
+
+		<KEYWORDS>
+			<KEYWORD1>maximize</KEYWORD1>
+			<KEYWORD1>maximum</KEYWORD1>
+			<KEYWORD1>minimize</KEYWORD1>
+			<KEYWORD1>minimum</KEYWORD1>
+			<KEYWORD1>min</KEYWORD1>
+			<KEYWORD1>max</KEYWORD1>
+
+			<!-- <KEYWORD1>subject to</KEYWORD1> jEdit apparently cannot -->
+			<!-- <KEYWORD1>Subject To</KEYWORD1> handle a space in this -->
+			<!-- <KEYWORD1>such that</KEYWORD1>  style of KEYWORD. -->
+			<KEYWORD1>s.t.</KEYWORD1>
+			<KEYWORD1>st.</KEYWORD1>
+			<KEYWORD1>st</KEYWORD1>
+			<KEYWORD1>end</KEYWORD1>
+
+			<KEYWORD1>bounds</KEYWORD1>
+			<KEYWORD1>bound</KEYWORD1>
+
+			<KEYWORD1>generals</KEYWORD1>
+			<KEYWORD1>general</KEYWORD1>
+			<KEYWORD1>gen</KEYWORD1>
+
+			<KEYWORD1>integers</KEYWORD1>
+			<KEYWORD1>integer</KEYWORD1>
+			<KEYWORD1>int</KEYWORD1>
+
+			<KEYWORD1>binaries</KEYWORD1>
+			<KEYWORD1>binary</KEYWORD1>
+			<KEYWORD1>bin</KEYWORD1>
+
+			<SEQ AT_LINE_START='FALSE' TYPE='KEYWORD3'>infinity</SEQ>
+			<SEQ AT_LINE_START='FALSE' TYPE='KEYWORD3'>inf</SEQ>
+			<SEQ AT_LINE_START='FALSE' TYPE='KEYWORD3'>free</SEQ>
+		</KEYWORDS>
+
+		<SEQ TYPE='KEYWORD1'>subject to</SEQ>
+		<SEQ TYPE='KEYWORD1'>such that</SEQ>
+
+		<!-- objective function and constraint labels -->
+		<SEQ_REGEXP AT_LINE_START='TRUE' TYPE='LABEL' HASH_CHARS='ABCDEFGHIJKLMNOPQRSTUVWXYZ abcdefghijklmnopqrstuvwxyz_'>[A-z_ ][\w(),]+(?=:)</SEQ_REGEXP>
+
+		<!-- Variables. -->
+		<!-- It's unfortunate for CPlex LP format that jEdit neight has a -->
+		<!-- token type of VARIABLE, nor lets the mode file define it's own, -->
+		<!-- like Vim. Oh well; arbitrarily pick a KEYWORD. -->
+		<SEQ_REGEXP AT_WORD_START='TRUE' AT_LINE_START='FALSE' TYPE='KEYWORD2' HASH_CHARS='ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz_'>[A-z_][\w!"#$%&amp;()/,.;?@_`'{}|~]*</SEQ_REGEXP>
+	</RULES>
+</MODE>

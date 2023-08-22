@@ -1,9 +1,9 @@
 ! Copyright (C) 2011-2012 John Benediktsson
-! See http://factorcode.org/license.txt for BSD license
+! See https://factorcode.org/license.txt for BSD license
 
 USING: accessors assocs calendar calendar.format colors
-combinators formatting http.client io io.styles json
-json.reader kernel make math sequences urls ;
+combinators formatting http.client io io.styles json kernel make
+math sequences urls ;
 
 IN: reddit
 
@@ -19,26 +19,26 @@ TUPLE: page url data before after ;
     } cleave \ page boa ;
 
 : get-user ( username -- page )
-    "http://api.reddit.com/user/%s" sprintf json-page ;
+    "https://api.reddit.com/user/%s" sprintf json-page ;
 
 : get-user-info ( username -- user )
-    "http://api.reddit.com/user/%s/about" sprintf
+    "https://api.reddit.com/user/%s/about" sprintf
     http-get nip json> ;
 
 : get-url-info ( url -- page )
-    "http://api.reddit.com/api/info?url=%s" sprintf json-page ;
+    "https://api.reddit.com/api/info?url=%s" sprintf json-page ;
 
 : search-reddit ( query -- page )
-    "http://api.reddit.com/search?q=%s" sprintf json-page ;
+    "https://api.reddit.com/search?q=%s" sprintf json-page ;
 
 : search-subreddits ( query -- page )
-    "http://api.reddit.com/reddits/search?q=%s" sprintf json-page ;
+    "https://api.reddit.com/reddits/search?q=%s" sprintf json-page ;
 
 : get-domains ( query -- page )
-    "http://api.reddit.com/domain/%s" sprintf json-page ;
+    "https://api.reddit.com/domain/%s" sprintf json-page ;
 
 : get-subreddit ( subreddit -- page )
-    "http://api.reddit.com/r/%s" sprintf json-page ;
+    "https://api.reddit.com/r/%s" sprintf json-page ;
 
 : next-page ( page -- page' )
     [ url>> ] [ after>> "after" set-query-param ] bi json-page ;
@@ -69,10 +69,10 @@ PRIVATE>
     get-subreddit data>> [ "url" of ] map ;
 
 : story>comments-url ( story -- url )
-    "permalink" of "http://reddit.com" prepend >url ;
+    "permalink" of "https://reddit.com" prepend >url ;
 
 : story>author-url ( story -- url )
-    "author" of "http://reddit.com/user/" prepend >url ;
+    "author" of "https://reddit.com/user/" prepend >url ;
 
 <PRIVATE
 

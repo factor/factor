@@ -1,5 +1,5 @@
 ! Copyright (C) 2007, 2008 Alex Chapman
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 
 USING: accessors colors combinators jamshred.oint
 jamshred.sound jamshred.tunnel kernel math math.order
@@ -81,14 +81,14 @@ CONSTANT: max-speed 30.0
 : almost-to-collision ( player -- distance )
     distance-to-collision 0.1 - dup 0 < [ drop 0 ] when ;
 
-: from ( player -- radius distance-from-centre )
+: from ( player -- radius distance-from-center )
     [ nearest-segment>> dup radius>> swap ] [ location>> ] bi
-    distance-from-centre ;
+    distance-from-center ;
 
 : distance-from-wall ( player -- distance ) from - ;
-: fraction-from-centre ( player -- fraction ) from swap / ;
+: fraction-from-center ( player -- fraction ) from swap / ;
 : fraction-from-wall ( player -- fraction )
-    fraction-from-centre 1 swap - ;
+    fraction-from-center 1 swap - ;
 
 : update-nearest-segment2 ( heading player -- )
     2dup distance-to-heading-segment-area 0 <= [

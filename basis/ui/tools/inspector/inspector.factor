@@ -1,5 +1,5 @@
 ! Copyright (C) 2006, 2009 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs classes combinators fonts
 formatting hashtables inspector io io.styles kernel math
 math.parser math.vectors mirrors models models.arrow namespaces
@@ -88,10 +88,10 @@ M: string make-slot-descriptions
                 "\\u{%x}" sprintf
             ] if
         ] if slot-description boa
-    ] map-index ;
+    ] { } map-index-as ;
 
 M: hashtable make-slot-descriptions
-    call-next-method [ key-string>> ] sort-with ;
+    call-next-method [ key-string>> ] sort-by ;
 
 TUPLE: inspector-table < table ;
 

@@ -1,5 +1,5 @@
 ! Copyright (C) 2009 Chris Double.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: help.syntax help.markup peg peg.search words
 multiline ;
 IN: peg.ebnf
@@ -347,9 +347,8 @@ ARTICLE: "peg.ebnf.foreign-rules" "EBNF Foreign Rules"
        "EBNF: parse-abc [=["
        "abc = <foreign a-token> 'b' 'c'"
        "]=]"
-   }
-}
-;
+    }
+} ;
 
 ARTICLE: "peg.ebnf.tokenizers" "EBNF Tokenizers"
 "It is possible to override the tokenizer in an EBNF defined parser. "

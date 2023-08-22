@@ -1,5 +1,5 @@
 ! Copyright (C) 2009, 2020 Marc Fauconneau, Abtin Molavi, and Jacob Fischer.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs bit-arrays bitstreams combinators
 hashtables heaps kernel math math.bits math.order namespaces
 sequences sorting vectors ;
@@ -45,9 +45,9 @@ TUPLE: huffman-code
     [ nip '[ _ swap _ set-at ] each ] 3bi ;
 
 :: reverse-table ( tdesc n -- rtable )
-   n f <array> <enumerated> :> table
-   tdesc [ n table update-reverse-table ] huffman-each
-   table seq>> ;
+    n f <array> <enumerated> :> table
+    tdesc [ n table update-reverse-table ] huffman-each
+    table seq>> ;
 
 TUPLE: huffman-tree
     { code maybe{ fixnum } }
@@ -66,7 +66,7 @@ TUPLE: huffman-tree
 : gen-leaves ( lit-seq -- leaves )
     [ huffman-tree new swap >>code ] map ; 
 
-: build-leaf-table ( leaves --  )
+: build-leaf-table ( leaves -- )
     dup empty? [ drop ] [ dup first leaf-table get inc-at rest build-leaf-table ] if ;
  
 : insert-leaves ( -- ) leaf-table get unzip swap zip node-heap get heap-push-all  ;
@@ -83,16 +83,16 @@ TUPLE: huffman-tree
         { [ dup leaf? ] [ code>> ?{ } swap  H{ } clone ?set-at ] }
         { [ dup left>> not ] [ right>> (generate-codes) [ ?{ t } prepend ] assoc-map ] }
         { [ dup right>> not ] [ left>> (generate-codes) [ ?{ f } prepend ] assoc-map ] }
-          [ 
+        [ 
             [ left>> (generate-codes) [ ?{ f } prepend ] assoc-map ] 
             [ right>> (generate-codes) [ ?{ t } prepend ] assoc-map ] bi assoc-union! 
-          ] 
-     } cond ;
+        ] 
+    } cond ;
 
 : generate-codes ( lit-seq -- code-dict )
     [
-       [ H{ } clone ]
-       [ H{ } clone leaf-table set
+        [ H{ } clone ]
+        [ H{ } clone leaf-table set
         <min-heap> node-heap set
         build-tree heap-pop swap (generate-codes) nip ]
         if-empty
@@ -110,10 +110,10 @@ TUPLE: huffman-tree
     } cond ;
 
 : sort-values! ( obj -- sortedseq )
-    >alist [ <==> ] sort ;
+    >alist [ <==> ] sort-with ;
 
 : get-next-code ( code current -- next )
-   [ reverse bit-array>integer 1 + ] [ length ] bi <bits> >bit-array reverse dup length pick length swap - [ f ] replicate append nip ;
+    [ reverse bit-array>integer 1 + ] [ length ] bi <bits> >bit-array reverse dup length pick length swap - [ f ] replicate append nip ;
 
 ! Does most of the work of converting a collection of codes to canonical ones. 
 : (canonize-codes) ( current codes  -- codes )

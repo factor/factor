@@ -1,5 +1,5 @@
 ! Copyright (C) 2009 Daniel Ehrenberg, Jonghyouk Yun.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors assocs biassocs byte-arrays classes.parser
 classes.singleton combinators endian generic io io.encodings
 kernel math.bitwise math.order parser sequences simple-flat-file

@@ -1,5 +1,5 @@
 ! Copyright (C) 2009, 2010 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors cache kernel math math.vectors namespaces
 sequences ui.text ui.text.private windows.uniscribe ;
 IN: ui.text.uniscribe

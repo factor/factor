@@ -1,5 +1,5 @@
 ! Copyright (C) 2008, 2011 Eduardo Cavazos, Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors arrays calendar calendar.format combinators
 continuations io io.encodings.utf8 io.files io.launcher
 io.pathnames io.sockets kernel make mason.config math namespaces

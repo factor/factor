@@ -1,10 +1,10 @@
 ! Copyright (c) 2009 Guillaume Nargeot.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors kernel math ranges project-euler.common
 sequences ;
 IN: project-euler.085
 
-! http://projecteuler.net/index.php?section=problems&id=85
+! https://projecteuler.net/index.php?section=problems&id=85
 
 ! DESCRIPTION
 ! -----------

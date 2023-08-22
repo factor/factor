@@ -1,5 +1,5 @@
 ! Copyright (C) 2011 Joe Groff.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors assocs io kernel math namespaces sequences
 system threads ;
 IN: unix.signals

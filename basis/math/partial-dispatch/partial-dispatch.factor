@@ -1,5 +1,5 @@
 ! Copyright (C) 2008 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs classes.algebra combinators
 compiler.units fry generic generic.math hashtables kernel make
 math math.private namespaces quotations sequences words ;
@@ -16,11 +16,11 @@ M: math-partial integer-op-input-classes
 ERROR: bad-integer-op word ;
 
 M: word integer-op-input-classes
-    dup "input-classes" word-prop
-    [ ] [ bad-integer-op ] ?if ;
+    [ "input-classes" word-prop ]
+    [ bad-integer-op ] ?unless ;
 
 : generic-variant ( op -- generic-op/f )
-    dup "derived-from" word-prop [ first ] [ ] ?if ;
+    [ "derived-from" word-prop ] [ first ] ?when ;
 
 : no-overflow-variant ( op -- fast-op )
     H{

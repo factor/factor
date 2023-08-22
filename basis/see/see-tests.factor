@@ -7,8 +7,8 @@ CONSTANT: test-const 10
 { "IN: see.tests\nCONSTANT: test-const 10 inline\n" }
 [ [ \ test-const see ] with-string-writer ] unit-test
 
-{ "IN: sequences\nERROR: non-negative-integer-expected n ;\n" }
-[ [ \ non-negative-integer-expected see ] with-string-writer ] unit-test
+{ "IN: math\nERROR: non-negative-number-expected n ;\n" }
+[ [ \ non-negative-number-expected see ] with-string-writer ] unit-test
 
 ALIAS: test-alias +
 

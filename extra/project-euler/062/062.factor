@@ -1,10 +1,10 @@
 ! Copyright (c) 2009 Guillaume Nargeot.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: arrays assocs hashtables kernel math math.functions
 project-euler.common sequences sorting ;
 IN: project-euler.062
 
-! http://projecteuler.net/index.php?section=problems&id=062
+! https://projecteuler.net/index.php?section=problems&id=062
 
 ! DESCRIPTION
 ! -----------
@@ -24,7 +24,7 @@ IN: project-euler.062
 <PRIVATE
 
 : cube ( n -- n^3 ) 3 ^ ; inline
-: >key ( n -- k ) cube number>digits natural-sort ; inline
+: >key ( n -- k ) cube number>digits sort ; inline
 : has-entry? ( n assoc -- ? ) [ >key ] dip key? ; inline
 
 : (euler062) ( n assoc -- n )

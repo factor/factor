@@ -1,5 +1,5 @@
 ! Copyright (C) 2008, 2010 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: calendar debugger io io.encodings.utf8 io.launcher
 irc.client irc.client.chats kernel make mason.common mason.git
 math namespaces sequences threads timers ;
@@ -39,7 +39,7 @@ M: object handle-message drop ;
         "--pretty=format:%h %an: %s" ,
         ".." glue ,
     ] { } make
-    utf8 [ read-lines ] with-process-reader ;
+    process-lines ;
 
 : updates ( from to -- lines )
     git-log reverse

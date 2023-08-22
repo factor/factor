@@ -110,7 +110,7 @@ HELP: with-fixup
   { "quot" quotation }
   { "code" sequence }
 }
-{ $description "Runs the quotation to emit compiled code. The output is a six-tuple with the same format as the one outputted by " { $link generate } "." } ;
+{ $description "Runs the quotation to emit compiled code. The output is a six-tuple with the same format as the one output by " { $link generate } "." } ;
 
 ARTICLE: "compiler.codegen" "Code generation from MR (machine representation)"
 "Code generators for cfg instructions."

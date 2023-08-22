@@ -1,11 +1,10 @@
 ! Copyright (C) 2004, 2009 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors arrays effects fry kernel locals math
 math.order namespaces quotations sequences
 stack-checker.dependencies stack-checker.errors
 stack-checker.recursive-state stack-checker.state
 stack-checker.values stack-checker.visitor words ;
-FROM: sequences.private => from-end ;
 IN: stack-checker.backend
 
 : push-d ( obj -- ) meta-d push ;
@@ -36,7 +35,7 @@ IN: stack-checker.backend
         [ introduce-values ] [ meta-d push-all ] bi
         meta-d push-all
     ] when
-    swap from-end [ tail ] [ update-inner-d ] bi ;
+    swap from-tail [ tail ] [ update-inner-d ] bi ;
 
 : shorten-by ( n seq -- )
     [ length swap - ] keep shorten ; inline
@@ -141,7 +140,7 @@ M: object apply-object push-literal ;
     meta-d clone #return, ;
 
 : required-stack-effect ( word -- effect )
-    dup stack-effect [ ] [ missing-effect ] ?if ;
+    [ stack-effect ] [ missing-effect ] ?unless ;
 
 : with-infer ( quot -- effect visitor )
     [

@@ -1,5 +1,5 @@
 ! Copyright (C) 2009 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors bit-arrays kernel math math.bitwise sequences
 sequences.private sets ;
 IN: bit-sets
@@ -35,7 +35,7 @@ ERROR: check-bit-set-failed ;
     dup bit-set? [ check-bit-set-failed ] unless ; inline
 
 : bit-set-map ( seq1 seq2 quot -- seq )
-    [ drop [ length ] bi@ [ assert= ] keep ]
+    [ drop 2length [ assert= ] keep ]
     [ [ [ underlying>> ] bi@ ] dip 2map ] 3bi
     bit-array boa ; inline
 

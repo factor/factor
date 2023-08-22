@@ -34,13 +34,13 @@ IN: sequences.deep.tests
 [ { { 1 2 3 } 4 } { { { 1 2 3 } 4 } 2 } deep-member? ] unit-test
 
 { f }
-[ { 1 2 3 4 } { 1 2 3 { 4 } } deep-subseq? ] unit-test
+[ { 1 2 3 { 4 } } { 1 2 3 4 } deep-subseq-of? ] unit-test
 
 { t }
-[ { 1 2 3 4 } { 1 2 3 4 } deep-subseq? ] unit-test
+[ { 1 2 3 4 } { 1 2 3 4 } deep-subseq-of? ] unit-test
 
 { t }
-[ { 1 2 3 4 } { { 1 2 3 4 } } deep-subseq? ] unit-test
+[ { { 1 2 3 4 } } { 1 2 3 4 } deep-subseq-of? ] unit-test
 
 { 3 } [
     { 1 { 2 3 { 4 } } 5 { { 6 } 7 } } 0 [

@@ -16,16 +16,16 @@
 		</SPAN>
 
 		<!-- JavaScript -->
-		<SPAN TYPE="MARKUP" DELEGATE="JAVASCRIPT">
-			<BEGIN>&lt;SCRIPT</BEGIN>
-			<END>&lt;/SCRIPT&gt;</END>
-		</SPAN>
+		<SPAN_REGEXP TYPE="MARKUP" DELEGATE="JAVASCRIPT" HASH_CHAR="&lt;">
+			<BEGIN>&lt;(?=SCRIPT\b)</BEGIN>
+			<END REGEXP="TRUE">(?i)(?=&lt;/SCRIPT\b)</END>
+		</SPAN_REGEXP>
 
 		<!-- stylesheet -->
-		<SPAN TYPE="MARKUP" DELEGATE="CSS">
-			<BEGIN>&lt;STYLE</BEGIN>
-			<END>&lt;/STYLE&gt;</END>
-		</SPAN>
+		<SPAN_REGEXP TYPE="MARKUP" DELEGATE="CSS" HASH_CHAR="&lt;">
+			<BEGIN>&lt;(?=STYLE\b)</BEGIN>
+			<END REGEXP="TRUE">(?i)(?=&lt;/STYLE\b)</END>
+		</SPAN_REGEXP>
 
 		<!-- DTD instructions -->
 		<SPAN TYPE="KEYWORD2" DELEGATE="xml::DTD-TAGS">
@@ -39,22 +39,29 @@
 			<END>&gt;</END>
 		</SPAN>
 
-		<!-- SGML entities -->
-		<SPAN TYPE="LITERAL2" NO_WORD_BREAK="TRUE">
-			<BEGIN>&amp;</BEGIN>
-			<END>;</END>
-		</SPAN>
+		<!-- SGML character entities -->
+		<IMPORT DELEGATE="CHARACTER_ENTITIES" />
 	</RULES>
 
-	<!-- ESCAPE is not exactly right but it is needed to correctly
-	     handle JavaScript in on* parameters -->
-	<RULES SET="TAGS" DEFAULT="MARKUP" ESCAPE="\">
-		<SPAN TYPE="LITERAL1">
+	<RULES SET="TAGS" DEFAULT="MARKUP">
+		<!-- Inline CSS -->
+ 		<SPAN_REGEXP AT_WORD_START="TRUE" TYPE="MARKUP" DELEGATE="css::PROPERTIES" HASH_CHAR="style">
+			<BEGIN>style\s*=\s*(["'])</BEGIN>
+			<END>$1</END>
+		</SPAN_REGEXP>
+
+		<!-- Javascript: delegate on* attributes to Javascript mode -->
+ 		<SPAN_REGEXP AT_WORD_START="TRUE" DELEGATE="javascript::MAIN" HASH_CHAR="on" TYPE="MARKUP">
+			<BEGIN>on[a-z]+\s*=\s*(["'])</BEGIN>
+			<END>$1</END>
+		</SPAN_REGEXP>
+
+		<!-- NOTE: no ESCAPE for quotes, at least for attributes; e.g onclick="alert(\"foo\");" is invalid! -->
+		<SPAN TYPE="LITERAL1" DELEGATE="ATTRIBUTE">
 			<BEGIN>"</BEGIN>
 			<END>"</END>
 		</SPAN>
-
-		<SPAN TYPE="LITERAL1">
+		<SPAN TYPE="LITERAL1" DELEGATE="ATTRIBUTE">
 			<BEGIN>'</BEGIN>
 			<END>'</END>
 		</SPAN>
@@ -63,38 +70,52 @@
 
 		<KEYWORDS>
 			<!-- HTML/XHTML elements, taken from http://de.selfhtml.org/html/referenz/elemente.htm -->
-			<KEYWORD1>fieldset</KEYWORD1>
+			<!-- updated to include html5 elements. Obsolete and deprecated elements
+			are still here for backward compatibility. -->
 			<KEYWORD1>a</KEYWORD1>
 			<KEYWORD1>abbr</KEYWORD1>
 			<KEYWORD1>acronym</KEYWORD1>
 			<KEYWORD1>address</KEYWORD1>
 			<KEYWORD1>applet</KEYWORD1>
 			<KEYWORD1>area</KEYWORD1>
+			<KEYWORD1>article</KEYWORD1>
+			<KEYWORD1>aside</KEYWORD1>
+			<KEYWORD1>audio</KEYWORD1>
 			<KEYWORD1>b</KEYWORD1>
 			<KEYWORD1>base</KEYWORD1>
 			<KEYWORD1>basefont</KEYWORD1>
+			<KEYWORD1>bdi</KEYWORD1>
 			<KEYWORD1>bdo</KEYWORD1>
 			<KEYWORD1>big</KEYWORD1>
 			<KEYWORD1>blockquote</KEYWORD1>
 			<KEYWORD1>body</KEYWORD1>
 			<KEYWORD1>br</KEYWORD1>
 			<KEYWORD1>button</KEYWORD1>
+			<KEYWORD1>canvas</KEYWORD1>
 			<KEYWORD1>caption</KEYWORD1>
 			<KEYWORD1>center</KEYWORD1>
 			<KEYWORD1>cite</KEYWORD1>
 			<KEYWORD1>code</KEYWORD1>
 			<KEYWORD1>col</KEYWORD1>
 			<KEYWORD1>colgroup</KEYWORD1>
+			<KEYWORD1>command</KEYWORD1>
+			<KEYWORD1>data</KEYWORD1>
+			<KEYWORD1>datalist</KEYWORD1>
 			<KEYWORD1>dd</KEYWORD1>
 			<KEYWORD1>del</KEYWORD1>
+			<KEYWORD1>details</KEYWORD1>
 			<KEYWORD1>dfn</KEYWORD1>
 			<KEYWORD1>dir</KEYWORD1>
 			<KEYWORD1>div</KEYWORD1>
 			<KEYWORD1>dl</KEYWORD1>
 			<KEYWORD1>dt</KEYWORD1>
 			<KEYWORD1>em</KEYWORD1>
+			<KEYWORD1>embed</KEYWORD1>
 			<KEYWORD1>fieldset</KEYWORD1>
+			<KEYWORD1>figcaption</KEYWORD1>
+			<KEYWORD1>figure</KEYWORD1>
 			<KEYWORD1>font</KEYWORD1>
+			<KEYWORD1>footer</KEYWORD1>
 			<KEYWORD1>form</KEYWORD1>
 			<KEYWORD1>frame</KEYWORD1>
 			<KEYWORD1>frameset</KEYWORD1>
@@ -105,6 +126,8 @@
 			<KEYWORD1>h5</KEYWORD1>
 			<KEYWORD1>h6</KEYWORD1>
 			<KEYWORD1>head</KEYWORD1>
+			<KEYWORD1>header</KEYWORD1>
+			<KEYWORD1>hgroup</KEYWORD1>
 			<KEYWORD1>hr</KEYWORD1>
 			<KEYWORD1>html</KEYWORD1>
 			<KEYWORD1>i</KEYWORD1>
@@ -114,34 +137,48 @@
 			<KEYWORD1>ins</KEYWORD1>
 			<KEYWORD1>isindex</KEYWORD1>
 			<KEYWORD1>kbd</KEYWORD1>
+			<KEYWORD1>keygen</KEYWORD1>
 			<KEYWORD1>label</KEYWORD1>
 			<KEYWORD1>legend</KEYWORD1>
 			<KEYWORD1>li</KEYWORD1>
 			<KEYWORD1>link</KEYWORD1>
 			<KEYWORD1>map</KEYWORD1>
+			<KEYWORD1>mark</KEYWORD1>
 			<KEYWORD1>menu</KEYWORD1>
 			<KEYWORD1>meta</KEYWORD1>
+			<KEYWORD1>meter</KEYWORD1>
+			<KEYWORD1>nav</KEYWORD1>
 			<KEYWORD1>noframes</KEYWORD1>
 			<KEYWORD1>noscript</KEYWORD1>
 			<KEYWORD1>object</KEYWORD1>
 			<KEYWORD1>ol</KEYWORD1>
 			<KEYWORD1>optgroup</KEYWORD1>
 			<KEYWORD1>option</KEYWORD1>
+			<KEYWORD1>output</KEYWORD1>
 			<KEYWORD1>p</KEYWORD1>
 			<KEYWORD1>param</KEYWORD1>
+			<KEYWORD1>path</KEYWORD1>
 			<KEYWORD1>pre</KEYWORD1>
+			<KEYWORD1>progress</KEYWORD1>
 			<KEYWORD1>q</KEYWORD1>
+			<KEYWORD1>rp</KEYWORD1>
+			<KEYWORD1>rt</KEYWORD1>
+			<KEYWORD1>ruby</KEYWORD1>
 			<KEYWORD1>s</KEYWORD1>
 			<KEYWORD1>samp</KEYWORD1>
 			<KEYWORD1>script</KEYWORD1>
+			<KEYWORD1>section</KEYWORD1>
 			<KEYWORD1>select</KEYWORD1>
 			<KEYWORD1>small</KEYWORD1>
+			<KEYWORD1>source</KEYWORD1>
 			<KEYWORD1>span</KEYWORD1>
 			<KEYWORD1>strike</KEYWORD1>
 			<KEYWORD1>strong</KEYWORD1>
 			<KEYWORD1>style</KEYWORD1>
 			<KEYWORD1>sub</KEYWORD1>
+			<KEYWORD1>summary</KEYWORD1>
 			<KEYWORD1>sup</KEYWORD1>
+			<KEYWORD1>svg</KEYWORD1>
 			<KEYWORD1>table</KEYWORD1>
 			<KEYWORD1>tbody</KEYWORD1>
 			<KEYWORD1>td</KEYWORD1>
@@ -149,26 +186,93 @@
 			<KEYWORD1>tfoot</KEYWORD1>
 			<KEYWORD1>th</KEYWORD1>
 			<KEYWORD1>thead</KEYWORD1>
+			<KEYWORD1>time</KEYWORD1>
 			<KEYWORD1>title</KEYWORD1>
 			<KEYWORD1>tr</KEYWORD1>
+			<KEYWORD1>track</KEYWORD1>
 			<KEYWORD1>tt</KEYWORD1>
 			<KEYWORD1>u</KEYWORD1>
 			<KEYWORD1>ul</KEYWORD1>
 			<KEYWORD1>var</KEYWORD1>
+			<KEYWORD1>video</KEYWORD1>
+			<KEYWORD1>wbr</KEYWORD1>
 		</KEYWORDS>
 	</RULES>
 
-	<RULES SET="JAVASCRIPT" DEFAULT="MARKUP" IGNORE_CASE="TRUE">
+	<!-- SCRIPT tag: Highlight tag and switch to language ruleset. -->
+	<RULES SET="JAVASCRIPT" DEFAULT="MARKUP">
+		<!--If the content of the TYPE attribute is recognized, switch to
+			language specific ruleset. -->
+		<SEQ_REGEXP TYPE="MARKUP" DELEGATE="COFFEESCRIPT_TAG"
+					HASH_CHAR="type">type(?=\s*=\s*['"]?text/coffeescript)</SEQ_REGEXP>
+		<SEQ_REGEXP TYPE="MARKUP" DELEGATE="VBSCRIPT_TAG"
+					HASH_CHAR="type">type(?=\s*=\s*['"]?text/vbscript)</SEQ_REGEXP>
+		<SEQ_REGEXP TYPE="MARKUP" DELEGATE="VBSCRIPT_TAG"
+					HASH_CHAR="language">language(?=\s*=\s*['"]?vbscript)</SEQ_REGEXP>
+		<SEQ_REGEXP TYPE="MARKUP" DELEGATE="PYTHON_SCRIPT_TAG"
+					HASH_CHAR="type">type(?=\s*=\s*['"]?\w+/python)</SEQ_REGEXP>
+		<SEQ_REGEXP TYPE="MARKUP" DELEGATE="RUBY_SCRIPT_TAG"
+					HASH_CHAR="type">type(?=\s*=\s*['"]?\w+/ruby)</SEQ_REGEXP>
+		<SEQ_REGEXP TYPE="MARKUP" DELEGATE="XML_SCRIPT_TAG"
+					HASH_CHAR="type">type(?=\s*=\s*['"]?application/xml)</SEQ_REGEXP>
+		<SEQ_REGEXP TYPE="MARKUP" DELEGATE="XQUERY_SCRIPT_TAG"
+					HASH_CHAR="type">type(?=\s*=\s*['"]?\w+/xquery)</SEQ_REGEXP>
+		<!-- Switch to JavaScript ruleset after the tag. -->
 		<SEQ TYPE="MARKUP" DELEGATE="javascript::MAIN">&gt;</SEQ>
-		<!-- handle <SCRIPT SRC="..."> properly -->
-		<SEQ TYPE="MARKUP" DELEGATE="BACK_TO_HTML">SRC=</SEQ>
+		<!-- Import rules for highlighting. -->
+		<IMPORT DELEGATE="TAGS"/>
 	</RULES>
 
-	<RULES SET="BACK_TO_HTML" DEFAULT="MARKUP">
-		<SEQ TYPE="MARKUP" DELEGATE="html::MAIN">&gt;</SEQ>
+	<!-- CoffeeScript -->
+	<RULES SET="COFFEESCRIPT_TAG" DEFAULT="MARKUP">
+		<SEQ TYPE="MARKUP" DELEGATE="coffeescript::MAIN">&gt;</SEQ>
+		<IMPORT DELEGATE="TAGS"/>
 	</RULES>
 
+	<!-- Python - provided by Gestalt -->
+	<RULES SET="PYTHON_SCRIPT_TAG" DEFAULT="MARKUP">
+		<SEQ TYPE="MARKUP" DELEGATE="python::MAIN">&gt;</SEQ>
+		<IMPORT DELEGATE="TAGS"/>
+	</RULES>
+
+	<!-- Ruby - provided by Gestalt -->
+	<RULES SET="RUBY_SCRIPT_TAG" DEFAULT="MARKUP">
+		<SEQ TYPE="MARKUP" DELEGATE="ruby::MAIN">&gt;</SEQ>
+		<IMPORT DELEGATE="TAGS"/>
+	</RULES>
+
+	<!-- VBScript - provided by Internet Explorer -->
+	<RULES SET="VBSCRIPT_TAG" DEFAULT="MARKUP">
+		<SEQ TYPE="MARKUP" DELEGATE="vbscript::MAIN">&gt;</SEQ>
+		<IMPORT DELEGATE="TAGS"/>
+	</RULES>
+
+	<!-- XML - for XAML, provided by Gestalt -->
+	<RULES SET="XML_SCRIPT_TAG" DEFAULT="MARKUP">
+		<SEQ TYPE="MARKUP" DELEGATE="xml::MAIN">&gt;</SEQ>
+		<IMPORT DELEGATE="TAGS"/>
+	</RULES>
+
+	<!-- XQUERY - provided by XQIB -->
+	<RULES SET="XQUERY_SCRIPT_TAG" DEFAULT="MARKUP">
+		<SEQ TYPE="MARKUP" DELEGATE="xq::MAIN">&gt;</SEQ>
+		<IMPORT DELEGATE="TAGS"/>
+	</RULES>
+
+	<!-- STYLE tag: Highlight tag and delegate to CSS mode. -->
 	<RULES SET="CSS" DEFAULT="MARKUP">
 		<SEQ TYPE="MARKUP" DELEGATE="css::MAIN">&gt;</SEQ>
+		<IMPORT DELEGATE="TAGS"/>
+	</RULES>
+
+	<RULES SET="ATTRIBUTE" DEFAULT="LITERAL1">
+		<IMPORT DELEGATE="CHARACTER_ENTITIES" />
+	</RULES>
+
+	<!-- SGML character entities - to be used with IMPORT tag -->
+	<RULES SET="CHARACTER_ENTITIES">
+		<SEQ_REGEXP TYPE="LITERAL2"
+					HASH_CHAR="&amp;">&amp;(#\d+|#x\p{XDigit}+|\p{Alnum}+);</SEQ_REGEXP>
+		<SEQ TYPE="INVALID">&amp;</SEQ>
 	</RULES>
 </MODE>

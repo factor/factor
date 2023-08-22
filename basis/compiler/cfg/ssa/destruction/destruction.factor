@@ -1,5 +1,5 @@
 ! Copyright (C) 2009, 2011 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors assocs compiler.cfg.def-use compiler.cfg.dominance
 compiler.cfg.instructions compiler.cfg.liveness
 compiler.cfg.parallel-copy compiler.cfg.rpo compiler.cfg.ssa.cssa

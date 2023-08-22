@@ -1,5 +1,5 @@
 ! Copyright (C) 2015 Björn Lindqvist
-! See http://factorcode.org/license.txt for BSD license
+! See https://factorcode.org/license.txt for BSD license
 !
 ! Tools to follow references in the loaded image.
 USING: accessors arrays byte-arrays fry kernel layouts math

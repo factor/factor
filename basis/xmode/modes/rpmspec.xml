@@ -5,6 +5,7 @@
 <MODE>
 	<PROPS>
 		<PROPERTY NAME="lineComment" VALUE="#" />
+		<PROPERTY NAME="contextInsensitive" VALUE="true" />
 	</PROPS>
 	<RULES>
 		<!-- comments -->
@@ -73,17 +74,22 @@
 			<KEYWORD1>Conflicts:</KEYWORD1>
 			<KEYWORD1>AutoReqProv:</KEYWORD1>
 			<KEYWORD1>BuildArch:</KEYWORD1>
+			<KEYWORD1>BuildRequires:</KEYWORD1>
 			<KEYWORD1>ExcludeArch:</KEYWORD1>
 			<KEYWORD1>ExclusiveArch:</KEYWORD1>
 			<KEYWORD1>ExclusiveOS:</KEYWORD1>
 			<KEYWORD1>BuildRoot:</KEYWORD1>
 			<KEYWORD1>NoSource:</KEYWORD1>
 			<KEYWORD1>NoPatch:</KEYWORD1>
+			<KEYWORD1>License:</KEYWORD1>
 
 			<LABEL>%prep</LABEL>
 			<LABEL>%install</LABEL>
 			<LABEL>%description</LABEL>
 			<LABEL>%build</LABEL>
+			<LABEL>%changelog</LABEL>
+			<LABEL>%configure</LABEL>
+			<LABEL>%defattr</LABEL>
 			<LABEL>%files</LABEL>
 			<LABEL>%clean</LABEL>
 			<LABEL>%pre</LABEL>

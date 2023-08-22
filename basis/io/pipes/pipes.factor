@@ -1,5 +1,5 @@
 ! Copyright (C) 2008, 2009 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors combinators concurrency.combinators destructors
 fry grouping io io.backend io.ports io.streams.duplex kernel
 math namespaces quotations sequences simple-tokenizer splitting

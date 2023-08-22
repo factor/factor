@@ -7,7 +7,7 @@ TUPLE: nehe3-gadget < gadget ;
 CONSTANT: width 256
 CONSTANT: height 256
 
-: <nehe3-gadget> (  -- gadget )
+: <nehe3-gadget> ( -- gadget )
   nehe3-gadget new ;
 
 M: nehe3-gadget draw-gadget* ( gadget -- )

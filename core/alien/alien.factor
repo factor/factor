@@ -1,8 +1,9 @@
 ! Copyright (C) 2004, 2010 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors assocs byte-arrays byte-vectors continuations
-continuations.private init kernel kernel.private math namespaces
+continuations.private kernel kernel.private math namespaces
 sequences ;
+USE: init ! required but does not reference words
 IN: alien
 
 BUILTIN: alien { underlying c-ptr read-only initial: f } expired ;

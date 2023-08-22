@@ -1,5 +1,5 @@
 ! Copyright (C) 2013 John Benediktsson
-! See http://factorcode.org/license.txt for BSD license
+! See https://factorcode.org/license.txt for BSD license
 
 USING: assocs http.client kernel make math.order sequences
 splitting urls urls.encoding ;
@@ -42,7 +42,7 @@ CONSTANT: encodings H{
     { 102 T{ encoding f "webm" "720p" "VP8" "3D" f "Vorbis" 192 } }
 }
 
-CONSTANT: video-info-url URL" http://www.youtube.com/get_video_info"
+CONSTANT: video-info-url URL" https://www.youtube.com/get_video_info"
 
 : get-video-info ( video-id -- video-info )
     video-info-url clone
@@ -61,7 +61,7 @@ CONSTANT: video-info-url URL" http://www.youtube.com/get_video_info"
 : sanitize ( title -- title' )
     [ 0 31 between? ] reject
     [ "\"#$%'*,./:;<>?^|~\\" member? ] reject
-    200 short head ;
+    200 index-or-length head ;
 
 : downloadable? ( video-info -- ? )
     "use_cipher_signature" of "False" = ;

@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 
 <!-- @RisingSun//XML//1.0//EN________________________________________________
-	
+
 	JEdit syntax mode for Io
 
 	..........................................................................
@@ -17,10 +17,10 @@
 	Creation date	:	05-May-2003
 	Last revision	:	19-May-2003
 	Revision		:	1.1
-    History			:	
+    History			:
 						19-May-2003 Added primitives highlighting.
 						05-May-2003 First release
- 
+
 	.....................................................................  -->
 
 <!-- ________________________________________________________D O C T Y P E -->
@@ -44,7 +44,7 @@
 
 	<!-- Rules____________________________________________________________ -->
 
-	<RULES ESCAPE="\" IGNORE_CASE="FALSE" HIGHLIGHT_DIGITS="TRUE">
+	<RULES IGNORE_CASE="FALSE" HIGHLIGHT_DIGITS="TRUE">
 
 		<!-- Comments_____________________________________________________ -->
 
@@ -62,13 +62,13 @@
 		<!-- Strings______________________________________________________ -->
 
 		<!-- Single quotes -->
-		<SPAN TYPE="LITERAL2">
+		<SPAN TYPE="LITERAL2" ESCAPE="\">
 			<BEGIN>"</BEGIN>
 			<END>"</END>
 		</SPAN>
 
 		<!-- Triple quotes -->
-		<SPAN TYPE="LITERAL2">
+		<SPAN TYPE="LITERAL2" ESCAPE="\">
 			<BEGIN>"""</BEGIN>
 			<END>"""</END>
 		</SPAN>

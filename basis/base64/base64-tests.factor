@@ -53,3 +53,19 @@ kernel sequences splitting strings tools.test ;
 
 { "{\"a\":\"bcd\"}" }
 [ "{\"a\":\"bcd\"}" >urlsafe-base64-jwt urlsafe-base64> >string ] unit-test
+
+{ "" } [ "" >base64 >string ] unit-test
+{ "Zg==" } [ "f" >base64 >string ] unit-test
+{ "Zm8=" } [ "fo" >base64 >string ] unit-test
+{ "Zm9v" } [ "foo" >base64 >string ] unit-test
+{ "Zm9vYg==" } [ "foob" >base64 >string ] unit-test
+{ "Zm9vYmE=" } [ "fooba" >base64 >string ] unit-test
+{ "Zm9vYmFy" } [ "foobar" >base64 >string ] unit-test
+
+{ "" } [ "" base64> >string ] unit-test
+{ "f" } [ "Zg==" base64> >string ] unit-test
+{ "fo" } [ "Zm8=" base64> >string ] unit-test
+{ "foo" } [ "Zm9v" base64> >string ] unit-test
+{ "foob" } [ "Zm9vYg==" base64> >string ] unit-test
+{ "fooba" } [ "Zm9vYmE=" base64> >string ] unit-test
+{ "foobar" } [ "Zm9vYmFy" base64> >string ] unit-test

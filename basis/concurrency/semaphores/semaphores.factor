@@ -1,19 +1,13 @@
 ! Copyright (C) 2008 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors concurrency.conditions continuations dlists
 kernel math summary ;
 IN: concurrency.semaphores
 
 TUPLE: semaphore count threads ;
 
-ERROR: negative-count-semaphore ;
-
-M: negative-count-semaphore summary
-    drop "Cannot have semaphore with negative count" ;
-
 : <semaphore> ( n -- semaphore )
-    dup 0 < [ negative-count-semaphore ] when
-    <dlist> semaphore boa ;
+    assert-non-negative <dlist> semaphore boa ;
 
 : wait-to-acquire ( semaphore timeout -- )
     [ threads>> ] dip "semaphore" wait ;

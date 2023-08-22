@@ -1,4 +1,4 @@
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors alien.enums arrays combinators.short-circuit
 continuations destructors formatting grouping io.backend io.pathnames
 kernel math math.functions.private math.vectors namespaces raylib
@@ -57,12 +57,10 @@ TUPLE: hit-state name color nearest-hit ;
     f >>hit drop ;
 
 : handle-ground-hit ( hit-state ray -- hit-state )
-    drop ;
-    ! FIXME: raylib 4.0 doesn't have GetCollisionRayGround
-    ! 0 get-collision-ray-ground
-    ! over nearest-hit>> swap update-hit?
-    ! [ >>nearest-hit ] dip
-    ! [ GREEN >>color "Ground" >>name ] when ;
+    0 get-ray-collision-ground
+    over nearest-hit>> swap update-hit?
+    [ >>nearest-hit ] dip
+    [ GREEN >>color "Ground" >>name ] when ;
 
 : handle-triangle-hit ( hit-state ray ta tb tc -- hit-state ? )
     get-ray-collision-triangle
@@ -131,7 +129,7 @@ SYMBOL: mesh-picking-frame
         init-assets :> ( tower triangle )
 
         f :> bary!
-        camera CAMERA_FREE set-camera-mode
+        camera CAMERA_FREE update-camera
 
         60 set-target-fps
         0 mesh-picking-frame set-global
@@ -141,7 +139,7 @@ SYMBOL: mesh-picking-frame
             ! NOTE: This doesn't work, probably because GL context is not handled correctly for switching?
             ! mesh-picking-frame counter 100 mod 0 = [ yield ] when
 
-            camera update-camera
+            camera CAMERA_FREE update-camera
 
             get-mouse-position camera get-mouse-ray :> ray
 
@@ -176,7 +174,7 @@ SYMBOL: mesh-picking-frame
                 tri
                 bary [ first3
                        "Barycenter: %3.2f %3.2f %3.2f" sprintf 10 ypos 45 + 10 BLACK draw-text
-                     ] when*
+                    ] when*
             ] [ drop ] if
 
             "Use Mouse to Move Camera" 10 screen-height 20 - 10 GRAY draw-text

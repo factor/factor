@@ -1,5 +1,5 @@
 ! Copyright (C) 2005, 2009 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: combinators.short-circuit hints kernel math math.order
 sequences strings ;
 IN: ascii

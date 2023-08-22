@@ -1,5 +1,5 @@
 ! Copyright (C) 2007, 2010 Chris Double, Joe Groff.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors alien alien.c-types alien.data audio.engine
 byte-arrays classes.struct combinators destructors fry io
 io.files io.encodings.binary kernel libc locals make math

@@ -1,5 +1,5 @@
 ! Copyright (C) 2009 Doug Coleman.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors assocs continuations fry http.server io
 io.encodings.ascii io.files io.files.temp io.files.unique
 io.servers io.streams.duplex io.streams.string
@@ -12,9 +12,9 @@ CONSTANT: separator1 "----WebKitFormBoundary6odjpVPXIighAE2L"
 CONSTANT: upload1 "------WebKitFormBoundary6odjpVPXIighAE2L\r\nContent-Disposition: form-data; name=\"file1\"; filename=\"up.txt\"\r\nContent-Type: text/plain\r\n\r\nuploaded!\n\r\n------WebKitFormBoundary6odjpVPXIighAE2L\r\nContent-Disposition: form-data; name=\"file2\"; filename=\"\"\r\n\r\n\r\n------WebKitFormBoundary6odjpVPXIighAE2L\r\nContent-Disposition: form-data; name=\"file3\"; filename=\"\"\r\n\r\n\r\n------WebKitFormBoundary6odjpVPXIighAE2L\r\nContent-Disposition: form-data; name=\"text1\"\r\n\r\nlol\r\n------WebKitFormBoundary6odjpVPXIighAE2L--\r\n"
 
 : mime-test-stream ( -- stream )
-   upload1
-   [ "mime" "test" unique-file ] with-temp-directory
-   ascii [ set-file-contents ] [ <file-reader> ] 2bi ;
+    upload1
+    [ "mime" "test" unique-file ] with-temp-directory
+    ascii [ set-file-contents ] [ <file-reader> ] 2bi ;
 
 { } [ mime-test-stream [ ] with-input-stream ] unit-test
 
@@ -55,7 +55,7 @@ CONSTANT: upload3 "--3f116598c7f0431b9f98148ed235c822\r\nContent-Disposition: fo
     { "text" "text2" }
 } [
     upload3 [ separator3 parse-multipart ] with-string-reader
-    keys natural-sort
+    keys sort
 ] unit-test
 
 SYMBOL: mime-test-server
@@ -84,3 +84,4 @@ SYMBOL: mime-test-server
         "\r\n\r\n" parse-multipart
     ] with-input-stream
 ] [ mime-decoding-ran-out-of-bytes? ] must-fail-with
+

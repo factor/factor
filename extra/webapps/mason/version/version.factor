@@ -1,11 +1,10 @@
 ! Copyright (C) 2010 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
-USING: accessors bitly combinators db.tuples debugger
-grouping io io.streams.string kernel make sequences
-threads mason.email mason.twitter webapps.mason.backend
-webapps.mason.version.common webapps.mason.version.data
-webapps.mason.version.files webapps.mason.version.source
-webapps.mason.version.binary ;
+! See https://factorcode.org/license.txt for BSD license.
+USING: accessors bitly combinators db.tuples debugger grouping
+io io.streams.string kernel make sequences threads mason.email
+webapps.mason.backend webapps.mason.version.common
+webapps.mason.version.data webapps.mason.version.files
+webapps.mason.version.source webapps.mason.version.binary ;
 IN: webapps.mason.version
 
 : check-releases ( builders -- )
@@ -16,12 +15,6 @@ IN: webapps.mason.version
     "Creating release directory..." print flush
     [ "mkdir -p " % "" release-directory remote-directory % "\n" % ] "" make
     execute-on-server ;
-
-: tweet-release ( version announcement-url -- )
-    [
-        "Factor " %
-        [ % " released -- " % ] [ shorten-url % ] bi*
-    ] "" make mason-tweet ;
 
 :: (do-release) ( version announcement-url -- )
     [
@@ -34,7 +27,6 @@ IN: webapps.mason.version
         version builders update-binary-releases
         version git-id do-source-release
         version git-id announcement-url update-version
-        version announcement-url tweet-release
 
         "Done." print flush
     ] with-mason-db ;

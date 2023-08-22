@@ -1,5 +1,5 @@
 ! Copyright (C) 2012 John Benediktsson
-! See http://factorcode.org/license.txt for BSD license
+! See https://factorcode.org/license.txt for BSD license
 
 USING: accessors alien.c-types classes.struct io.streams.c
 kernel math memoize scratchpad system terminal unix unix.ffi ;

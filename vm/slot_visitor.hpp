@@ -70,15 +70,15 @@ inline cell object::slot_count(Fixup fixup) const {
     switch (t) {
       // these objects do not refer to other objects at all
       case FLOAT_TYPE:
-      case BYTE_ARRAY_TYPE:
       case BIGNUM_TYPE:
+      case BYTE_ARRAY_TYPE:
       case CALLSTACK_TYPE: return 0;
-      case WORD_TYPE: return 8;
-      case ALIEN_TYPE: return 2;
-      case DLL_TYPE: return 1;
       case QUOTATION_TYPE: return 3;
-      case STRING_TYPE: return 3;
+      case ALIEN_TYPE: return 2;
       case WRAPPER_TYPE: return 1;
+      case STRING_TYPE: return 3;
+      case WORD_TYPE: return 8;
+      case DLL_TYPE: return 1;
       default:
         critical_error("Invalid header in slot_count", (cell)this);
         return 0; // can't happen

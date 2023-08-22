@@ -1,5 +1,5 @@
 ! Copyright (C) 2008, 2009 Slava Pestov
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors assocs classes continuations hashtables kernel
 math mirrors namespaces sequences strings words xml.syntax
 xml.writer ;

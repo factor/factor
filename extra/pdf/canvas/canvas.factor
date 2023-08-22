@@ -1,5 +1,5 @@
 ! Copyright (C) 2011-2012 John Benediktsson
-! See http://factorcode.org/license.txt for BSD license
+! See https://factorcode.org/license.txt for BSD license
 
 USING: accessors assocs colors combinators fonts io io.styles
 kernel math math.order namespaces pdf.text pdf.wrap sequences

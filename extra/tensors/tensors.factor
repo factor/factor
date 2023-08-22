@@ -1,5 +1,5 @@
 ! Copyright (C) 2019 HMC Clinic.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 
 USING: accessors alien alien.c-types alien.data arrays combinators
 grouping kernel math math.functions ranges math.vectors
@@ -177,7 +177,7 @@ syntax:M: tensor like
         ] [
             [ >tensor ] dip
         ] if
-        2dup [ length ] bi@ = [ shape>> reshape ] [ drop ] if
+        2dup 2length = [ shape>> reshape ] [ drop ] if
     ] if ;
 
 syntax:M: tensor clone-like
@@ -185,7 +185,7 @@ syntax:M: tensor clone-like
     over tensor?
     [ drop clone ] [
         [ >tensor ] dip
-        2dup [ length ] bi@ = [ shape>> reshape ] [ drop ] if
+        2dup 2length = [ shape>> reshape ] [ drop ] if
     ] if ;
 
 INSTANCE: tensor sequence
@@ -465,7 +465,7 @@ PRIVATE>
     ! Compute the starting index
     / truncate dupd *
     ! Compute the ending index
-    swap over +
+    tuck +
     ! Take a slice
     rot <slice> ;
 

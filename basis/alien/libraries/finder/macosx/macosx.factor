@@ -1,5 +1,5 @@
 ! Copyright (C) 2013 John Benediktsson
-! See http://factorcode.org/license.txt for BSD license
+! See https://factorcode.org/license.txt for BSD license
 
 USING: accessors alien.c-types alien.libraries.finder
 alien.syntax arrays assocs combinators environment io.files
@@ -126,11 +126,11 @@ PRIVATE>
             { [ use-dyld-shared-cache? ] [ _dyld_shared_cache_contains_path ] }
             [ drop f ]
         } cond
-    ] find [ nip ] when* ;
+    ] find nip ;
 
 : framework-find ( name -- path )
     dup dyld-find [ nip ] [
-        ".framework" over subseq-start [
+        dup ".framework" subseq-index [
             dupd head
         ] [
             [ ".framework" append ] keep

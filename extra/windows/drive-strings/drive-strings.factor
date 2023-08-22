@@ -1,5 +1,5 @@
 ! Copyright (C) 2019 Alexander Ilin.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: byte-arrays io.encodings.string io.encodings.utf16
 kernel math sequences splitting windows.kernel32 ;
 IN: windows.drive-strings

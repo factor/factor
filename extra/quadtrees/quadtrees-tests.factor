@@ -81,7 +81,7 @@ IN: quadtrees.tests
         "c" { -0.5  -0.75 } value>>key
         "d" {  0.75  0.25 } value>>key
 
-    { -0.6 -0.8 } { 0.8 1.0 } <rect> swap in-rect natural-sort
+    { -0.6 -0.8 } { 0.8 1.0 } <rect> swap in-rect sort
 ] unit-test
 
 { T{ quadtree f T{ rect f { -1.0 -1.0 } { 2.0 2.0 } } f f
@@ -197,7 +197,7 @@ IN: quadtrees.tests
         "g" {  0.25  0.25 } value>>key
         "h" {  0.75  0.75 } value>>key
 
-        >alist natural-sort
+        >alist sort
 ] unit-test
 
 TUPLE: pointy-thing center ;

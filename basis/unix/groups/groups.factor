@@ -1,5 +1,5 @@
 ! Copyright (C) 2008 Doug Coleman.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 
 USING: accessors alien.c-types alien.data alien.utilities assocs
 byte-arrays classes.struct combinators continuations grouping
@@ -48,12 +48,13 @@ M: string group-struct
 PRIVATE>
 
 : group-name ( id -- string )
-    dup group-cache get [
-        ?at [ name>> ] [ number>string ] if
-    ] [
-        group-struct [ gr_name>> ] [ f ] if*
-    ] if*
-    [ ] [ number>string ] ?if ;
+    [
+        group-cache get [
+            ?at [ name>> ] [ number>string ] if
+        ] [
+            group-struct [ gr_name>> ] [ f ] if*
+        ] if*
+    ] [ number>string ] ?unless ;
 
 : group-id ( string -- id/f )
     group-struct dup [ gr_gid>> ] when ;

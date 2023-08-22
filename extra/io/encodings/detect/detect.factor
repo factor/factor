@@ -1,5 +1,5 @@
 ! Copyright (C) 2010 Joe Groff.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: byte-arrays combinators continuations io io.encodings
 io.encodings.ascii io.encodings.binary io.encodings.iana
 io.encodings.latin1 io.encodings.string io.encodings.utf16
@@ -17,7 +17,7 @@ default-encoding [ latin1 ] initialize
 
 : prolog-encoding ( string -- iana-encoding )
     '[
-        _ "encoding=" over subseq-start
+        _ dup "encoding=" subseq-index
         10 + swap [ [ 1 - ] dip nth ] [ index-from ] [ swapd subseq ] 2tri
     ] [ drop "UTF-8" ] recover ;
 

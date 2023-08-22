@@ -1,6 +1,6 @@
 USING: accessors continuations http http.server
 http.server.requests io.encodings.ascii io.servers io.sockets
-io.streams.limited kernel namespaces ;
+io.streams.limited kernel namespaces protocols ;
 
 IN: http2.server
 
@@ -63,6 +63,6 @@ M: http2-server handle-client*
 : <http2-server> ( -- server )
     ascii http2-server new-threaded-server
         "http2.server" >>name
-        "http" protocol-port >>insecure
-        "https" protocol-port >>secure ;
+        "http" lookup-protocol-port >>insecure
+        "https" lookup-protocol-port >>secure ;
 

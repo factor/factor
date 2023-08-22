@@ -1,5 +1,5 @@
 ! Copyright (C) 2010 Doug Coleman.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: arrays command-line dns fry io kernel math.parser
 namespaces sequences strings ;
 IN: tools.dns

@@ -1,12 +1,12 @@
 ! Copyright (C) 2021 Doug Coleman.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors alien alien.c-types alien.data arrays
 classes.struct destructors endian kernel literals sequences
 strings windows windows.errors windows.handles windows.kernel32
 windows.types ;
 IN: windows.processes
 
-: with-open-process ( access 1/0 processid quot --  )
+: with-open-process ( access 1/0 processid quot -- )
     [ OpenProcess dup win32-error=0/f ] dip
     '[ _ <win32-handle> &dispose @ ] with-destructors ; inline
 

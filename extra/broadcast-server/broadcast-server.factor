@@ -1,5 +1,5 @@
 ! Copyright (C) 2021 Doug Coleman.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs calendar combinators
 continuations destructors io io.encodings.string
 io.encodings.utf8 io.files.info io.sockets io.streams.string
@@ -118,3 +118,4 @@ SINGLETONS: command data ;
 
 ! "192.168.88.255" 7777 start-broadcast-server
 ! "USE: math 2 2 + ." over send-broadcast-command
+

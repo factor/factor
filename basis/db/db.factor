@@ -1,5 +1,5 @@
 ! Copyright (C) 2008 Doug Coleman.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors assocs continuations destructors kernel
 namespaces sequences strings ;
 IN: db
@@ -99,10 +99,10 @@ M: object execute-statement*
     t >>bound? drop ;
 
 : sql-row ( result-set -- seq )
-    dup #columns [ row-column ] with { } map-integers ;
+    dup #columns [ row-column ] with map-integers ;
 
 : sql-row-typed ( result-set -- seq )
-    dup #columns [ row-column-typed ] with { } map-integers ;
+    dup #columns [ row-column-typed ] with map-integers ;
 
 : query-each ( result-set quot: ( row -- ) -- )
     over more-rows? [

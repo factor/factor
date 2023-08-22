@@ -1,11 +1,10 @@
-USING: accessors alien.libraries kernel sequences system vocabs
-;
+USING: accessors alien.libraries kernel sequences system vocabs ;
 IN: alien.libraries.finder
 
 HOOK: find-library* os ( name -- path/f )
 
 : find-library ( name -- path/library-not-found )
-    dup find-library* [ nip ] when* ;
+    [ find-library* ] transmute ;
 
 : ?update-library ( name path abi -- )
     pick lookup-library [ dll>> dll-valid? ] [ f ] if* [
@@ -18,7 +17,7 @@ HOOK: find-library* os ( name -- path/f )
 ! try to open a library that is the first name in that list anyway
 ! or "library_not_found" as a last resort for better debugging.
 : find-library-from-list ( seq -- path/f )
-    dup [ find-library* ] map-find drop
-    [ ] [ ?first "library_not_found" or ] ?if ;
+    [ [ find-library* ] map-find drop ]
+    [ ?first "library_not_found" or ] ?unless ;
 
 "alien.libraries.finder." os name>> append require

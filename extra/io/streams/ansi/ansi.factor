@@ -1,12 +1,12 @@
 ! Copyright (C) 2014 John Benediktsson
-! See http://factorcode.org/license.txt for BSD license
+! See https://factorcode.org/license.txt for BSD license
 
 USING: accessors arrays assocs destructors formatting io
-io.streams.string io.styles kernel math math.functions
-math.vectors namespaces sequences strings strings.tables ;
+io.streams.escape-codes io.streams.string io.styles kernel math
+math.functions math.vectors namespaces sequences strings
+strings.tables ;
 
 IN: io.streams.ansi
-
 <PRIVATE
 
 CONSTANT: colors H{
@@ -41,30 +41,23 @@ CONSTANT: colors H{
     colors [ keys swap infimum-by ] [ at ] bi
     dup 8 >= [ 8 - t ] [ f ] if ;
 
-: color>foreground ( color -- string )
+MEMO: color>foreground ( color -- string )
     color>ansi [ 30 + ] [ "m" ";1m" ? ] bi* "\e[%d%s" sprintf ;
 
-: color>background ( color -- string )
+MEMO: color>background ( color -- string )
     color>ansi [ 40 + ] [ "m" ";1m" ? ] bi* "\e[%d%s" sprintf ;
-
-: font-styles ( font-style -- string )
-    H{
-        { bold "\e[1m" }
-        { italic "\e[3m" }
-        { bold-italic "\e[1m\e[3m" }
-    } at "" or ;
 
 TUPLE: ansi < filter-writer ;
 
 C: <ansi> ansi
 
-M: ansi stream-format
-    [
-        [ foreground of [ color>foreground ] [ "" ] if* ]
-        [ background of [ color>background ] [ "" ] if* ]
-        [ font-style of [ font-styles ] [ "" ] if* ]
-        tri 3append [ "\e[0m" surround ] unless-empty
-    ] dip stream>> stream-write ;
+M:: ansi stream-format ( str style stream -- )
+    stream stream>> :> out
+    style foreground of [ color>foreground out stream-write t ] [ f ] if*
+    style background of [ color>background out stream-write drop t ] when*
+    style font-style of [ font-styles out stream-write drop t ] when*
+    str out stream-write
+    [ "\e[0m" out stream-write ] when ;
 
 M: ansi make-span-stream
     swap <style-stream> <ignore-close-stream> ;
@@ -82,7 +75,7 @@ M: ansi stream-write-table
     ] with-output-stream* ;
 
 M: ansi make-cell-stream
-     2drop <string-writer> <ansi> ;
+    2drop <string-writer> <ansi> ;
 
 M: ansi dispose drop ;
 

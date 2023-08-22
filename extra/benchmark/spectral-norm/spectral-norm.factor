@@ -1,8 +1,8 @@
 ! Copyright (C) 2008, 2010 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 !
 ! Factor port of
-! http://shootout.alioth.debian.org/gp4/benchmark.php?test=spectralnorm&lang=all
+! https://shootout.alioth.debian.org/gp4/benchmark.php?test=spectralnorm&lang=all
 USING: alien.c-types io kernel math math.functions math.parser
 math.vectors sequences sequences.private specialized-arrays
 typed locals ;

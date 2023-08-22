@@ -1,176 +1,354 @@
 <?xml version="1.0"?>
-
-<!-- VHDL mode, contributed by Dante Fabrizio and Nitsan Vardi -->
+<!--
+  contributed by M. Cesar R. Lacruz (mcesar@sec.upm.es)
+  v1.1 2008/08/29
+  from previous work by Dante Fabrizio and Nitsan Vardi
+-->
 
 <!DOCTYPE MODE SYSTEM "xmode.dtd">
 
 <MODE>
 	<PROPS>
-		<PROPERTY NAME="label" VALUE="VHDL" />
-		<PROPERTY NAME="lineComment" VALUE="--" />
+		<PROPERTY NAME="label" VALUE="VHDL"/>
+		<PROPERTY NAME="lineComment" VALUE="--"/>
+		<PROPERTY NAME="contextInsensitive" VALUE="true" />
 	</PROPS>
-	<RULES ESCAPE="\" IGNORE_CASE="TRUE">
-		<SPAN TYPE="LITERAL1" NO_LINE_BREAK="TRUE">
-			<BEGIN>"</BEGIN>
+	<RULES IGNORE_CASE="TRUE">
+
+		<!-- string -->
+		<SPAN_REGEXP TYPE="LITERAL4" AT_WORD_START="TRUE" NO_LINE_BREAK="TRUE">
+			<BEGIN>[box]?"</BEGIN>
 			<END>"</END>
-		</SPAN>
+		</SPAN_REGEXP>
+		<SPAN_REGEXP TYPE="LITERAL4" AT_WORD_START="TRUE" NO_LINE_BREAK="TRUE">
+			<BEGIN>[box]?%</BEGIN>
+			<END>%</END>
+		</SPAN_REGEXP>
 
-		<SEQ TYPE="NULL">'event</SEQ>
+		<!-- char -->
+		<SEQ_REGEXP TYPE="LITERAL1" HASH_CHAR="'">(?:'[\x20-\x7e\xa0-\xff]')</SEQ_REGEXP>
 
-		<SPAN TYPE="LITERAL1" NO_LINE_BREAK="TRUE">
-			<BEGIN>'</BEGIN>
-			<END>'</END>
-		</SPAN>
+		<!-- predefined attribute -->
+		<SEQ_REGEXP TYPE="KEYWORD3" HASH_CHAR="'">'left\b</SEQ_REGEXP>
+		<SEQ_REGEXP TYPE="KEYWORD3" HASH_CHAR="'">'right\b</SEQ_REGEXP>
+		<SEQ_REGEXP TYPE="KEYWORD3" HASH_CHAR="'">'low\b</SEQ_REGEXP>
+		<SEQ_REGEXP TYPE="KEYWORD3" HASH_CHAR="'">'high\b</SEQ_REGEXP>
+		<SEQ_REGEXP TYPE="KEYWORD3" HASH_CHAR="'">'ascending\b</SEQ_REGEXP>
+		<SEQ_REGEXP TYPE="KEYWORD3" HASH_CHAR="'">'image\b</SEQ_REGEXP>
+		<SEQ_REGEXP TYPE="KEYWORD3" HASH_CHAR="'">'value\b</SEQ_REGEXP>
+		<SEQ_REGEXP TYPE="KEYWORD3" HASH_CHAR="'">'pos\b</SEQ_REGEXP>
+		<SEQ_REGEXP TYPE="KEYWORD3" HASH_CHAR="'">'val\b</SEQ_REGEXP>
+		<SEQ_REGEXP TYPE="KEYWORD3" HASH_CHAR="'">'succ\b</SEQ_REGEXP>
+		<SEQ_REGEXP TYPE="KEYWORD3" HASH_CHAR="'">'pred\b</SEQ_REGEXP>
+		<SEQ_REGEXP TYPE="KEYWORD3" HASH_CHAR="'">'leftof\b</SEQ_REGEXP>
+		<SEQ_REGEXP TYPE="KEYWORD3" HASH_CHAR="'">'rightof\b</SEQ_REGEXP>
+		<SEQ_REGEXP TYPE="KEYWORD3" HASH_CHAR="'">'base\b</SEQ_REGEXP>
+		<SEQ_REGEXP TYPE="KEYWORD3" HASH_CHAR="'">'delayed\b</SEQ_REGEXP>
+		<SEQ_REGEXP TYPE="KEYWORD3" HASH_CHAR="'">'stable\b</SEQ_REGEXP>
+		<SEQ_REGEXP TYPE="KEYWORD3" HASH_CHAR="'">'quiet\b</SEQ_REGEXP>
+		<SEQ_REGEXP TYPE="KEYWORD3" HASH_CHAR="'">'transaction\b</SEQ_REGEXP>
+		<SEQ_REGEXP TYPE="KEYWORD3" HASH_CHAR="'">'event\b</SEQ_REGEXP>
+		<SEQ_REGEXP TYPE="KEYWORD3" HASH_CHAR="'">'active\b</SEQ_REGEXP>
+		<SEQ_REGEXP TYPE="KEYWORD3" HASH_CHAR="'">'last_event\b</SEQ_REGEXP>
+		<SEQ_REGEXP TYPE="KEYWORD3" HASH_CHAR="'">'last_active\b</SEQ_REGEXP>
+		<SEQ_REGEXP TYPE="KEYWORD3" HASH_CHAR="'">'last_value\b</SEQ_REGEXP>
+		<SEQ_REGEXP TYPE="KEYWORD3" HASH_CHAR="'">'driving\b</SEQ_REGEXP>
+		<SEQ_REGEXP TYPE="KEYWORD3" HASH_CHAR="'">'driving_value\b</SEQ_REGEXP>
+		<SEQ_REGEXP TYPE="KEYWORD3" HASH_CHAR="'">'range\b</SEQ_REGEXP>
+		<SEQ_REGEXP TYPE="KEYWORD3" HASH_CHAR="'">'reverse_range\b</SEQ_REGEXP>
+		<SEQ_REGEXP TYPE="KEYWORD3" HASH_CHAR="'">'length\b</SEQ_REGEXP>
+		<SEQ_REGEXP TYPE="KEYWORD3" HASH_CHAR="'">'simple_name\b</SEQ_REGEXP>
+		<SEQ_REGEXP TYPE="KEYWORD3" HASH_CHAR="'">'path_name\b</SEQ_REGEXP>
+		<SEQ_REGEXP TYPE="KEYWORD3" HASH_CHAR="'">'instance_name\b</SEQ_REGEXP>
+		<SEQ_REGEXP TYPE="KEYWORD3" HASH_CHAR="'">'foreign\b</SEQ_REGEXP>
 
+		<!-- other attribute -->
+		<MARK_FOLLOWING TYPE="KEYWORD4" MATCH_TYPE="KEYWORD3">'</MARK_FOLLOWING>
+
+		<!-- comment -->
 		<EOL_SPAN TYPE="COMMENT1">--</EOL_SPAN>
-		<SEQ TYPE="OPERATOR">=</SEQ>
+
+		<!-- label -->
+		<!-- sorry, but 'label : component_name', 'label : procedure_name'
+		      & 'label : variable :=' are not managed, as they collide with
+		      'generic_name : generic_type' -->
+		<SEQ_REGEXP TYPE="LABEL" AT_WHITESPACE_END="TRUE">
+			(\w|\w[\w\d_]*[\w\d])\s*(?=:)(?!:=)(?!:\s*\d)(?=:\s*(if\b|case\b|while\b|for\b|loop\b|next\b|null\b|block\b|process\b|wait\b|postponed\b|assert\b|with\b|entity\b|component\b|configuration\b|exit\b|return\b|(?:(?:\w[\w\d_]*\w|\w)\s*&lt;=)))
+		</SEQ_REGEXP>
+
+		<!-- operator -->
+		<SEQ TYPE="OPERATOR">(</SEQ>
+		<SEQ TYPE="OPERATOR">)</SEQ>
+		<SEQ TYPE="OPERATOR">=&gt;</SEQ>
+		<SEQ TYPE="OPERATOR">**</SEQ>
+		<SEQ TYPE="OPERATOR">:=</SEQ>
 		<SEQ TYPE="OPERATOR">/=</SEQ>
-		<SEQ TYPE="OPERATOR">!</SEQ>
-		<SEQ TYPE="OPERATOR">:</SEQ>
 		<SEQ TYPE="OPERATOR">&gt;=</SEQ>
-		<SEQ TYPE="OPERATOR">&gt;</SEQ>
 		<SEQ TYPE="OPERATOR">&lt;=</SEQ>
+		<SEQ TYPE="OPERATOR">&lt;&gt;</SEQ>
+		<SEQ TYPE="OPERATOR">=</SEQ>
+		<SEQ TYPE="OPERATOR">:</SEQ>
+		<SEQ TYPE="OPERATOR">&gt;</SEQ>
 		<SEQ TYPE="OPERATOR">&lt;</SEQ>
 		<SEQ TYPE="OPERATOR">+</SEQ>
 		<SEQ TYPE="OPERATOR">-</SEQ>
 		<SEQ TYPE="OPERATOR">/</SEQ>
 		<SEQ TYPE="OPERATOR">*</SEQ>
-
-		<SEQ TYPE="OPERATOR">**</SEQ>
-		<SEQ TYPE="OPERATOR">%</SEQ>
 		<SEQ TYPE="OPERATOR">&amp;</SEQ>
 		<SEQ TYPE="OPERATOR">|</SEQ>
-		<SEQ TYPE="OPERATOR">^</SEQ>
-		<SEQ TYPE="OPERATOR">~</SEQ>
-		<MARK_PREVIOUS TYPE="LABEL" MATCH_TYPE="OPERATOR"
-			AT_LINE_START="FALSE">: </MARK_PREVIOUS>
+
+		<!-- number -->
+		<SEQ_REGEXP TYPE="DIGIT" AT_WORD_START="TRUE"
+			>\d{1,2}#(?:(?:[\da-f][\da-f_]*\.?[\da-f_]*[\da-f])|[\da-f])#(?:e[+-]?(?:\d[\d_]*\d|\d))?
+		</SEQ_REGEXP>
+		<SEQ_REGEXP TYPE="DIGIT" AT_WORD_START="TRUE"
+			>\d{1,2}:(?:(?:[\da-f][\da-f_]*\.?[\da-f_]*[\da-f])|[\da-f]):(?:e[+-]?(?:\d[\d_]*\d|\d))?
+		</SEQ_REGEXP>
+		<SEQ_REGEXP TYPE="DIGIT" AT_WORD_START="TRUE"
+			>(?:(?:\d[\d_]*\.?[\d_]*\d)|\d)(?:e[+-]?(?:\d[\d_]*\d|\d))?
+		</SEQ_REGEXP>
 
 		<KEYWORDS>
-			<KEYWORD1>architecture</KEYWORD1>
+			<!-- VHDL-87 keyword -->
+			<KEYWORD1>access</KEYWORD1>
+			<KEYWORD1>after</KEYWORD1>
 			<KEYWORD1>alias</KEYWORD1>
- 			<KEYWORD1>assert</KEYWORD1>
-			<KEYWORD1>entity</KEYWORD1>
-			<KEYWORD1>process</KEYWORD1>
-			<KEYWORD1>variable</KEYWORD1>
-			<KEYWORD1>signal</KEYWORD1>
-			<KEYWORD1>function</KEYWORD1>
-			<KEYWORD1>generic</KEYWORD1>
-			<KEYWORD1>in</KEYWORD1>
-			<KEYWORD1>out</KEYWORD1>
-			<KEYWORD1>inout</KEYWORD1>
-			<KEYWORD1>begin</KEYWORD1>
-			<KEYWORD1>end</KEYWORD1>
-			<KEYWORD1>component</KEYWORD1>
-			<KEYWORD1>use</KEYWORD1>
-			<KEYWORD1>library</KEYWORD1>
-			<KEYWORD1>loop</KEYWORD1>
-			<KEYWORD1>constant</KEYWORD1>
-			<KEYWORD1>break</KEYWORD1>
-			<KEYWORD1>case</KEYWORD1>
-			<KEYWORD1>port</KEYWORD1>
-			<KEYWORD1>is</KEYWORD1>
-			<KEYWORD1>to</KEYWORD1>
-			<KEYWORD1>of</KEYWORD1>
+			<KEYWORD1>all</KEYWORD1>
+			<KEYWORD1>architecture</KEYWORD1>
 			<KEYWORD1>array</KEYWORD1>
-			<KEYWORD1>catch</KEYWORD1>
-			<KEYWORD1>continue</KEYWORD1>
-			<KEYWORD1>default</KEYWORD1>
-			<KEYWORD1>do</KEYWORD1>
+			<KEYWORD1>assert</KEYWORD1>
+			<KEYWORD1>attribute</KEYWORD1>
+			<KEYWORD1>begin</KEYWORD1>
+			<KEYWORD1>block</KEYWORD1>
+			<KEYWORD1>body</KEYWORD1>
+			<KEYWORD1>buffer</KEYWORD1>
+			<KEYWORD1>bus</KEYWORD1>
+			<KEYWORD1>case</KEYWORD1>
+			<KEYWORD1>component</KEYWORD1>
+			<KEYWORD1>configuration</KEYWORD1>
+			<KEYWORD1>constant</KEYWORD1>
+			<KEYWORD1>disconnect</KEYWORD1>
+			<KEYWORD1>downto</KEYWORD1>
 			<KEYWORD1>else</KEYWORD1>
 			<KEYWORD1>elsif</KEYWORD1>
-			<KEYWORD1>when</KEYWORD1>
-			<KEYWORD1>then</KEYWORD1>
-			<KEYWORD1>downto</KEYWORD1>
-			<KEYWORD1>upto</KEYWORD1>
-			<KEYWORD1>extends</KEYWORD1>
+			<KEYWORD1>end</KEYWORD1>
+			<KEYWORD1>entity</KEYWORD1>
+			<KEYWORD1>exit</KEYWORD1>
+			<KEYWORD1>file</KEYWORD1>
 			<KEYWORD1>for</KEYWORD1>
+			<KEYWORD1>function</KEYWORD1>
+			<KEYWORD1>generate</KEYWORD1>
+			<KEYWORD1>generic</KEYWORD1>
+			<KEYWORD1>guarded</KEYWORD1>
 			<KEYWORD1>if</KEYWORD1>
-			<KEYWORD1>implements</KEYWORD1>
-			<KEYWORD1>instanceof</KEYWORD1>
-			<KEYWORD1>return</KEYWORD1>
-			<KEYWORD1>static</KEYWORD1>
-			<KEYWORD1>switch</KEYWORD1>
-			<KEYWORD1>type</KEYWORD1>
-			<KEYWORD1>while</KEYWORD1>
+			<KEYWORD1>in</KEYWORD1>
+			<KEYWORD1>inout</KEYWORD1>
+			<KEYWORD1>is</KEYWORD1>
+			<KEYWORD1>label</KEYWORD1>
+			<KEYWORD1>library</KEYWORD1>
+			<KEYWORD1>linkage</KEYWORD1>
+			<KEYWORD1>loop</KEYWORD1>
+			<KEYWORD1>map</KEYWORD1>
+			<KEYWORD1>new</KEYWORD1>
+			<KEYWORD1>next</KEYWORD1>
+			<KEYWORD1>null</KEYWORD1>
+			<KEYWORD1>of</KEYWORD1>
+			<KEYWORD1>on</KEYWORD1>
+			<KEYWORD1>open</KEYWORD1>
 			<KEYWORD1>others</KEYWORD1>
-			<KEYWORD1>all</KEYWORD1>
+			<KEYWORD1>out</KEYWORD1>
+			<KEYWORD1>package</KEYWORD1>
+			<KEYWORD1>port</KEYWORD1>
+			<KEYWORD1>procedure</KEYWORD1>
+			<KEYWORD1>process</KEYWORD1>
+			<KEYWORD1>range</KEYWORD1>
 			<KEYWORD1>record</KEYWORD1>
- 			<KEYWORD1>range</KEYWORD1>
- 			<KEYWORD1>wait</KEYWORD1>
+			<KEYWORD1>register</KEYWORD1>
+			<KEYWORD1>report</KEYWORD1>
+			<KEYWORD1>return</KEYWORD1>
+			<KEYWORD1>select</KEYWORD1>
+			<KEYWORD1>severity</KEYWORD1>
+			<KEYWORD1>signal</KEYWORD1>
+			<KEYWORD1>subtype</KEYWORD1>
+			<KEYWORD1>then</KEYWORD1>
+			<KEYWORD1>to</KEYWORD1>
+			<KEYWORD1>transport</KEYWORD1>
+			<KEYWORD1>type</KEYWORD1>
+			<KEYWORD1>units</KEYWORD1>
+			<KEYWORD1>until</KEYWORD1>
+			<KEYWORD1>use</KEYWORD1>
+			<KEYWORD1>variable</KEYWORD1>
+			<KEYWORD1>wait</KEYWORD1>
+			<KEYWORD1>when</KEYWORD1>
+			<KEYWORD1>while</KEYWORD1>
+			<KEYWORD1>with</KEYWORD1>
 
-			<KEYWORD2>package</KEYWORD2>
-			<KEYWORD2>import</KEYWORD2>
-			<KEYWORD2>std_logic</KEYWORD2>
-			<KEYWORD2>std_ulogic</KEYWORD2>
-			<KEYWORD2>std_logic_vector</KEYWORD2>
-			<KEYWORD2>std_ulogic_vector</KEYWORD2>
-			<KEYWORD2>integer</KEYWORD2>
-			<KEYWORD2>natural</KEYWORD2>
-			<KEYWORD2>bit</KEYWORD2>
-			<KEYWORD2>bit_vector</KEYWORD2>
+			<!-- VHDL-93 new keyword -->
+			<KEYWORD1>group</KEYWORD1>
+			<KEYWORD1>impure</KEYWORD1>
+			<KEYWORD1>inertial</KEYWORD1>
+			<KEYWORD1>literal</KEYWORD1>
+			<KEYWORD1>postponed</KEYWORD1>
+			<KEYWORD1>pure</KEYWORD1>
+			<KEYWORD1>reject</KEYWORD1>
+			<KEYWORD1>shared</KEYWORD1>
+			<KEYWORD1>unaffected</KEYWORD1>
 
+			<!-- VHDL-2001 new keyword -->
+			<KEYWORD1>protected</KEYWORD1>
 
-			<OPERATOR>or</OPERATOR>
+			<!-- VHDL-87 keyword, but shown as operator -->
+			<OPERATOR>abs</OPERATOR>
+			<OPERATOR>and</OPERATOR>
+			<OPERATOR>mod</OPERATOR>
+			<OPERATOR>nand</OPERATOR>
 			<OPERATOR>nor</OPERATOR>
 			<OPERATOR>not</OPERATOR>
-			<OPERATOR>nand</OPERATOR>
-			<OPERATOR>and</OPERATOR>
-			<OPERATOR>xnor</OPERATOR>
+			<OPERATOR>or</OPERATOR>
+			<OPERATOR>rem</OPERATOR>
+			<OPERATOR>xor</OPERATOR>
+
+			<!-- VHDL-93 new keyword, but shown as operator -->
+			<OPERATOR>rol</OPERATOR>
+			<OPERATOR>ror</OPERATOR>
 			<OPERATOR>sll</OPERATOR>
 			<OPERATOR>srl</OPERATOR>
 			<OPERATOR>sla</OPERATOR>
 			<OPERATOR>sra</OPERATOR>
-			<OPERATOR>rol</OPERATOR>
-			<OPERATOR>ror</OPERATOR>
-			<OPERATOR>or</OPERATOR>
-			<OPERATOR>or</OPERATOR>
-			<OPERATOR>mod</OPERATOR>
-			<OPERATOR>rem</OPERATOR>
-			<OPERATOR>abs</OPERATOR>
+			<OPERATOR>xnor</OPERATOR>
 
-			<KEYWORD3>EVENT</KEYWORD3>
-			<KEYWORD3>BASE</KEYWORD3>
-			<KEYWORD3>LEFT</KEYWORD3>
-			<KEYWORD3>RIGHT</KEYWORD3>
-			<KEYWORD3>LOW</KEYWORD3>
-			<KEYWORD3>HIGH</KEYWORD3>
-			<KEYWORD3>ASCENDING</KEYWORD3>
-			<KEYWORD3>IMAGE</KEYWORD3>
-			<KEYWORD3>VALUE</KEYWORD3>
-			<KEYWORD3>POS</KEYWORD3>
-			<KEYWORD3>VAL</KEYWORD3>
-			<KEYWORD3>SUCC</KEYWORD3>
-			<KEYWORD3>VAL</KEYWORD3>
-			<KEYWORD3>POS</KEYWORD3>
-			<KEYWORD3>PRED</KEYWORD3>
-			<KEYWORD3>VAL</KEYWORD3>
-			<KEYWORD3>POS</KEYWORD3>
-			<KEYWORD3>LEFTOF</KEYWORD3>
-			<KEYWORD3>RIGHTOF</KEYWORD3>
-			<KEYWORD3>LEFT</KEYWORD3>
-			<KEYWORD3>RIGHT</KEYWORD3>
-			<KEYWORD3>LOW</KEYWORD3>
-			<KEYWORD3>HIGH</KEYWORD3>
-			<KEYWORD3>RANGE</KEYWORD3>
-			<KEYWORD3>REVERSE</KEYWORD3>
-			<KEYWORD3>LENGTH</KEYWORD3>
-			<KEYWORD3>ASCENDING</KEYWORD3>
-			<KEYWORD3>DELAYED</KEYWORD3>
-			<KEYWORD3>STABLE</KEYWORD3>
-			<KEYWORD3>QUIET</KEYWORD3>
-			<KEYWORD3>TRANSACTION</KEYWORD3>
-			<KEYWORD3>EVENT</KEYWORD3>
-			<KEYWORD3>ACTIVE</KEYWORD3>
-			<KEYWORD3>LAST</KEYWORD3>
-			<KEYWORD3>LAST</KEYWORD3>
-			<KEYWORD3>LAST</KEYWORD3>
-			<KEYWORD3>DRIVING</KEYWORD3>
-			<KEYWORD3>DRIVING</KEYWORD3>
-			<KEYWORD3>SIMPLE</KEYWORD3>
-			<KEYWORD3>INSTANCE</KEYWORD3>
-			<KEYWORD3>PATH</KEYWORD3>
+			<!-- VHDL-87 keyword, but shown as function -->
+			<FUNCTION>deallocate</FUNCTION>
 
+			<!-- built-in & standard type -->
+			<KEYWORD2>bit</KEYWORD2>
+			<KEYWORD2>bit_vector</KEYWORD2>
+			<KEYWORD2>boolean</KEYWORD2>
+			<KEYWORD2>character</KEYWORD2>
+			<KEYWORD2>delay_length</KEYWORD2>
+			<FUNCTION>now</FUNCTION>
+			<FUNCTION>file_open</FUNCTION>
+			<FUNCTION>file_close</FUNCTION>
+			<FUNCTION>read</FUNCTION>
+			<FUNCTION>write</FUNCTION>
+			<FUNCTION>endfile</FUNCTION>
+			<KEYWORD2>file_open_kind</KEYWORD2>
+			<KEYWORD2>file_open_status</KEYWORD2>
+			<KEYWORD2>integer</KEYWORD2>
+			<KEYWORD2>natural</KEYWORD2>
+			<KEYWORD2>positive</KEYWORD2>
+			<KEYWORD2>real</KEYWORD2>
+			<KEYWORD2>severity_level</KEYWORD2>
+			<KEYWORD2>string</KEYWORD2>
+			<KEYWORD2>time</KEYWORD2>
+			<!-- boolean -->
+			<LITERAL1>false</LITERAL1>
+			<LITERAL1>true</LITERAL1>
+			<!-- char, only those not having a ' ' representation -->
+			<LITERAL1>nul</LITERAL1>
+			<LITERAL1>soh</LITERAL1>
+			<LITERAL1>stx</LITERAL1>
+			<LITERAL1>etx</LITERAL1>
+			<LITERAL1>eot</LITERAL1>
+			<LITERAL1>enq</LITERAL1>
+			<LITERAL1>ack</LITERAL1>
+			<LITERAL1>bel</LITERAL1>
+			<LITERAL1>bs</LITERAL1>
+			<LITERAL1>ht</LITERAL1>
+			<LITERAL1>lf</LITERAL1>
+			<LITERAL1>vt</LITERAL1>
+			<LITERAL1>ff</LITERAL1>
+			<LITERAL1>cr</LITERAL1>
+			<LITERAL1>so</LITERAL1>
+			<LITERAL1>si</LITERAL1>
+			<LITERAL1>dle</LITERAL1>
+			<LITERAL1>dc1</LITERAL1>
+			<LITERAL1>dc2</LITERAL1>
+			<LITERAL1>dc3</LITERAL1>
+			<LITERAL1>dc4</LITERAL1>
+			<LITERAL1>nak</LITERAL1>
+			<LITERAL1>syn</LITERAL1>
+			<LITERAL1>etb</LITERAL1>
+			<LITERAL1>can</LITERAL1>
+			<LITERAL1>em</LITERAL1>
+			<LITERAL1>sub</LITERAL1>
+			<LITERAL1>esc</LITERAL1>
+			<LITERAL1>fsp</LITERAL1>
+			<LITERAL1>gsp</LITERAL1>
+			<LITERAL1>rsp</LITERAL1>
+			<LITERAL1>usp</LITERAL1>
+			<LITERAL1>del</LITERAL1>
+			<LITERAL1>c128</LITERAL1>
+			<LITERAL1>c129</LITERAL1>
+			<LITERAL1>c130</LITERAL1>
+			<LITERAL1>c131</LITERAL1>
+			<LITERAL1>c132</LITERAL1>
+			<LITERAL1>c133</LITERAL1>
+			<LITERAL1>c134</LITERAL1>
+			<LITERAL1>c135</LITERAL1>
+			<LITERAL1>c136</LITERAL1>
+			<LITERAL1>c137</LITERAL1>
+			<LITERAL1>c138</LITERAL1>
+			<LITERAL1>c139</LITERAL1>
+			<LITERAL1>c140</LITERAL1>
+			<LITERAL1>c141</LITERAL1>
+			<LITERAL1>c142</LITERAL1>
+			<LITERAL1>c143</LITERAL1>
+			<LITERAL1>c144</LITERAL1>
+			<LITERAL1>c145</LITERAL1>
+			<LITERAL1>c146</LITERAL1>
+			<LITERAL1>c147</LITERAL1>
+			<LITERAL1>c148</LITERAL1>
+			<LITERAL1>c149</LITERAL1>
+			<LITERAL1>c150</LITERAL1>
+			<LITERAL1>c151</LITERAL1>
+			<LITERAL1>c152</LITERAL1>
+			<LITERAL1>c153</LITERAL1>
+			<LITERAL1>c154</LITERAL1>
+			<LITERAL1>c155</LITERAL1>
+			<LITERAL1>c156</LITERAL1>
+			<LITERAL1>c157</LITERAL1>
+			<LITERAL1>c158</LITERAL1>
+			<LITERAL1>c159</LITERAL1>
+			<!-- severity_level -->
+			<LITERAL1>note</LITERAL1>
+			<LITERAL1>warning</LITERAL1>
+			<LITERAL1>error</LITERAL1>
+			<LITERAL1>failure</LITERAL1>
+			<!-- file_open_kind -->
+			<LITERAL1>read_mode</LITERAL1>
+			<LITERAL1>write_mode</LITERAL1>
+			<LITERAL1>append_mode</LITERAL1>
+			<!-- file_open_status -->
+			<LITERAL1>open_ok</LITERAL1>
+			<LITERAL1>status_error</LITERAL1>
+			<LITERAL1>name_error</LITERAL1>
+			<LITERAL1>mode_error</LITERAL1>
+
+			<!-- ieee.std_logic_1164 -->
+			<KEYWORD2>std_logic</KEYWORD2>
+			<KEYWORD2>std_ulogic</KEYWORD2>
+			<KEYWORD2>std_logic_vector</KEYWORD2>
+			<KEYWORD2>std_ulogic_vector</KEYWORD2>
+			<KEYWORD2>x01</KEYWORD2>
+			<KEYWORD2>x01z</KEYWORD2>
+			<KEYWORD2>ux01</KEYWORD2>
+			<KEYWORD2>ux01z</KEYWORD2>
+			<FUNCTION>to_bit</FUNCTION>
+			<FUNCTION>to_bitvector</FUNCTION>
+			<FUNCTION>to_stdulogic</FUNCTION>
+			<FUNCTION>to_stdlogicvector</FUNCTION>
+			<FUNCTION>to_stdulogicvector</FUNCTION>
+			<FUNCTION>to_x01</FUNCTION>
+			<FUNCTION>to_x01z</FUNCTION>
+			<FUNCTION>to_ux01</FUNCTION>
 			<FUNCTION>rising_edge</FUNCTION>
+			<FUNCTION>falling_edge</FUNCTION>
+			<FUNCTION>is_x</FUNCTION>
+
+			<!-- ieee.numeric_std -->
+			<KEYWORD2>signed</KEYWORD2>
+			<KEYWORD2>unsigned</KEYWORD2>
 			<FUNCTION>shift_left</FUNCTION>
 			<FUNCTION>shift_right</FUNCTION>
 			<FUNCTION>rotate_left</FUNCTION>
@@ -180,16 +358,106 @@
 			<FUNCTION>to_integer</FUNCTION>
 			<FUNCTION>to_unsigned</FUNCTION>
 			<FUNCTION>to_signed</FUNCTION>
-			<FUNCTION>unsigned</FUNCTION>
-			<FUNCTION>signed</FUNCTION>
-			<FUNCTION>to_bit</FUNCTION>
-			<FUNCTION>to_bitvector</FUNCTION>
-			<FUNCTION>to_stdulogic</FUNCTION>
-			<FUNCTION>to_stdlogicvector</FUNCTION>
-			<FUNCTION>to_stdulogicvector</FUNCTION>
 
-			<LITERAL2>false</LITERAL2>
-			<LITERAL2>true</LITERAL2>
+			<!-- std.textio -->
+			<KEYWORD2>line</KEYWORD2>
+			<KEYWORD2>text</KEYWORD2>
+			<KEYWORD2>side</KEYWORD2>
+			<KEYWORD2>width</KEYWORD2>
+			<LITERAL2>left</LITERAL2>
+			<LITERAL2>right</LITERAL2>
+			<LITERAL2>std_input</LITERAL2>
+			<LITERAL2>std_output</LITERAL2>
+			<LITERAL3>input</LITERAL3>
+			<LITERAL3>output</LITERAL3>
+			<FUNCTION>readline</FUNCTION>
+			<FUNCTION>writeline</FUNCTION>
+
+			<!-- ieee.std_logic_textio -->
+			<FUNCTION>oread</FUNCTION>
+			<FUNCTION>owrite</FUNCTION>
+			<FUNCTION>hread</FUNCTION>
+			<FUNCTION>hwrite</FUNCTION>
+
+			<!-- ieee.std_logic_arith -->
+			<KEYWORD2>signed</KEYWORD2>
+			<KEYWORD2>unsigned</KEYWORD2>
+			<KEYWORD2>small_int</KEYWORD2>
+			<FUNCTION>conv_integer</FUNCTION>
+			<FUNCTION>conv_unsigned</FUNCTION>
+			<FUNCTION>conv_signed</FUNCTION>
+			<FUNCTION>conv_std_logic_vector</FUNCTION>
+			<FUNCTION>shl</FUNCTION>
+			<FUNCTION>shr</FUNCTION>
+			<FUNCTION>ext</FUNCTION>
+			<FUNCTION>sxt</FUNCTION>
+
+			<!-- ieee.math_real -->
+			<LITERAL2>math_e</LITERAL2>
+			<LITERAL2>math_1_over_e</LITERAL2>
+			<LITERAL2>math_pi</LITERAL2>
+			<LITERAL2>math_2_pi</LITERAL2>
+			<LITERAL2>math_1_over_pi</LITERAL2>
+			<LITERAL2>math_pi_over_2</LITERAL2>
+			<LITERAL2>math_pi_over_3</LITERAL2>
+			<LITERAL2>math_pi_over_4</LITERAL2>
+			<LITERAL2>math_3_pi_over_2</LITERAL2>
+			<LITERAL2>math_log_of_2</LITERAL2>
+			<LITERAL2>math_log_of_10</LITERAL2>
+			<LITERAL2>math_log2_of_e</LITERAL2>
+			<LITERAL2>math_log10_of_e</LITERAL2>
+			<LITERAL2>math_sqrt_2</LITERAL2>
+			<LITERAL2>math_1_over_sqrt_2</LITERAL2>
+			<LITERAL2>math_sqrt_pi</LITERAL2>
+			<LITERAL2>math_deg_to_rad</LITERAL2>
+			<LITERAL2>math_rad_to_deg</LITERAL2>
+			<FUNCTION>sign</FUNCTION>
+			<FUNCTION>ceil</FUNCTION>
+			<FUNCTION>floor</FUNCTION>
+			<FUNCTION>round</FUNCTION>
+			<FUNCTION>trunc</FUNCTION>
+			<FUNCTION>realmax</FUNCTION>
+			<FUNCTION>realmin</FUNCTION>
+			<FUNCTION>uniform</FUNCTION>
+			<FUNCTION>sqrt</FUNCTION>
+			<FUNCTION>cbrt</FUNCTION>
+			<FUNCTION>exp</FUNCTION>
+			<FUNCTION>log</FUNCTION>
+			<FUNCTION>log2</FUNCTION>
+			<FUNCTION>log10</FUNCTION>
+			<FUNCTION>sin</FUNCTION>
+			<FUNCTION>cos</FUNCTION>
+			<FUNCTION>tan</FUNCTION>
+			<FUNCTION>arcsin</FUNCTION>
+			<FUNCTION>arccos</FUNCTION>
+			<FUNCTION>arctan</FUNCTION>
+			<FUNCTION>sinh</FUNCTION>
+			<FUNCTION>cosh</FUNCTION>
+			<FUNCTION>tanh</FUNCTION>
+			<FUNCTION>arcsinh</FUNCTION>
+			<FUNCTION>arccosh</FUNCTION>
+			<FUNCTION>arctanh</FUNCTION>
+
+			<!-- ieee.math_complex -->
+			<KEYWORD2>complex</KEYWORD2>
+			<KEYWORD2>positive_real</KEYWORD2>
+			<KEYWORD2>principal_value</KEYWORD2>
+			<KEYWORD2>complex_polar</KEYWORD2>
+			<KEYWORD2>re</KEYWORD2>
+			<KEYWORD2>im</KEYWORD2>
+			<KEYWORD2>mag</KEYWORD2>
+			<KEYWORD2>arg</KEYWORD2>
+			<LITERAL2>math_cbase_1</LITERAL2>
+			<LITERAL2>math_cbase_j</LITERAL2>
+			<LITERAL2>math_czero</LITERAL2>
+			<FUNCTION>cmplx</FUNCTION>
+			<FUNCTION>get_principal_value</FUNCTION>
+			<FUNCTION>complex_to_polar</FUNCTION>
+			<FUNCTION>polar_to_complex</FUNCTION>
+			<FUNCTION>conj</FUNCTION>
+
 		</KEYWORDS>
 	</RULES>
 </MODE>
+
+

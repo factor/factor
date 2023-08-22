@@ -1,5 +1,5 @@
 ! Copyright (C) 2010 Doug Coleman.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors alien.c-types alien.data alien.strings arrays
 assocs byte-arrays combinators cuda cuda.contexts cuda.ffi
 cuda.libraries io io.encodings.utf8 kernel math math.order
@@ -35,9 +35,8 @@ IN: cuda.devices
     '[ _ cuDeviceComputeCapability cuda-error ] with-out-parameters
     2array ;
 
-: cuda-device-memory ( n -- bytes )
-    [ { ulonglong } ] dip
-    '[ _ cuDeviceTotalMem_v2 cuda-error ] with-out-parameters ;
+: cuda-device-memory ( n -- memory )
+    [ 0 size_t <ref> ] dip [ cuDeviceTotalMem_v2 cuda-error ] keepd size_t deref ;
 
 : cuda-device-attribute ( attribute n -- n )
     [ { int } ] 2dip

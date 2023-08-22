@@ -1,6 +1,6 @@
 ! Copyright (C) 2007 Doug Coleman.
 ! Copyright (C) 2008 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors continuations db.tuples db.types fry furnace.actions
 furnace.boilerplate furnace.redirection furnace.utilities html.forms
 http.server.dispatchers kernel math ranges random random.data
@@ -26,8 +26,8 @@ short-url "SHORT_URLS" {
     '[ _ dup random-url >>short insert-tuple ] 10 retry ;
 
 : shorten ( url -- short )
-    short-url new swap >>url dup select-tuple
-    [ ] [ insert-short-url ] ?if short>> ;
+    short-url new swap >>url
+    [ select-tuple ] [ insert-short-url ] ?unless short>> ;
 
 : short>url ( short -- url )
     "$wee-url/go/" prepend >url adjust-url ;

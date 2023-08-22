@@ -1,5 +1,5 @@
 ! Copyright (C) 2008 Doug Coleman.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: help.markup help.syntax io.streams.string kernel quotations sequences strings math ;
 IN: unix.users
 
@@ -27,8 +27,8 @@ HELP: user-cache
 
 HELP: passwd>new-passwd
 { $values
-     { "passwd" "a passwd struct" }
-     { "new-passwd" "a passwd tuple" } }
+    { "passwd" "a passwd struct" }
+    { "new-passwd" "a passwd tuple" } }
 { $description "A platform-specific conversion routine from a passwd structure to a passwd tuple." } ;
 
 HELP: real-user-name
@@ -49,35 +49,35 @@ HELP: set-real-user
 
 HELP: user-passwd
 { $values
-     { "obj" object }
-     { "passwd/f" "passwd or f" } }
+    { "obj" object }
+    { "passwd/f" "passwd or f" } }
 { $description "Returns the passwd tuple given a user-name string or user id." } ;
 
 HELP: user-name
 { $values
-     { "id" integer }
-     { "string" string } }
+    { "id" integer }
+    { "string" string } }
 { $description "Returns the user-name associated with the user id." } ;
 
 HELP: user-id
 { $values
-     { "string" string }
-     { "id/f" "an integer or f" } }
+    { "string" string }
+    { "id/f" "an integer or f" } }
 { $description "Returns the user id associated with the user-name." } ;
 
 HELP: with-effective-user
 { $values
-     { "string/id/f" "a string, a uid, or f" } { "quot" quotation } }
+    { "string/id/f" "a string, a uid, or f" } { "quot" quotation } }
 { $description "Sets the effective user-name and calls the quotation. Restores the current user-name on success or on error after the call. If the first parameter is " { $link f } ", the quotation is called as the current user." } ;
 
 HELP: with-user-cache
 { $values
-     { "quot" quotation } }
+    { "quot" quotation } }
 { $description "Iterates over the password file using library calls and creates a cache in the " { $link user-cache } " symbol. The cache is a hashtable indexed by user id. When looking up many users, this approach is much faster than calling system calls." } ;
 
 HELP: with-real-user
 { $values
-     { "string/id/f" "a string, a uid, or f" } { "quot" quotation } }
+    { "string/id/f" "a string, a uid, or f" } { "quot" quotation } }
 { $description "Sets the real user-name and calls the quotation. Restores the current user-name on success or on error after the call. If the first parameter is " { $link f } ", the quotation is called as the current user." } ;
 
 {

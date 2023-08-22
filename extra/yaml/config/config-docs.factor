@@ -1,5 +1,5 @@
 ! Copyright (C) 2014 Jon Harper.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: help.markup help.syntax yaml.ffi yaml.conversion ;
 IN: yaml.config
 
@@ -12,7 +12,6 @@ HELP: +libyaml-default+
   emitter-unicode
   emitter-width
 } ;
-
 
 HELP: emitter-canonical
 { $var-description "If set, " { $link yaml_emitter_set_canonical } " is called with the value of this variable at the beginning of each document." } ;
@@ -66,10 +65,8 @@ ARTICLE: "yaml-output" "YAML serialization control"
 ;
 
 HELP: implicit-tags
-{ $var-description "When this is set, tags are omitted during serialization when it safe to do so. For example, 42 can be safely serialized as \"42\", but \"42\" must be serialized as \"'42'\" or \"\"42\"\" or \"!!str 42\". This uses the "
-{ $snippet "implicit" } " parameter of "
-{ $link yaml_scalar_event_initialize } ", " { $link yaml_sequence_start_event_initialize } " and " { $link yaml_mapping_start_event_initialize } "."
- } ;
+{ $var-description "When this is set, tags are omitted during serialization when it safe to do so. For example, 42 can be safely serialized as \"42\", but \"42\" must be serialized as \"'42'\" or \"\"42\"\" or \"!!str 42\". This uses the " { $snippet "implicit" } " parameter of " { $link yaml_scalar_event_initialize } ", " { $link yaml_sequence_start_event_initialize } " and " { $link yaml_mapping_start_event_initialize } "."
+} ;
 
 HELP: implicit-start
 { $var-description "The \""

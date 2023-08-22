@@ -13,7 +13,7 @@ TUPLE: illusion < arrow ;
     <illusion> dup activate-model ;
 
 : backtalk ( value object -- )
-   [ quot>> [undo] call( a -- b ) ] [ model>> ] bi set-model ;
+    [ quot>> [undo] call( a -- b ) ] [ model>> ] bi set-model ;
 
 M: illusion update-model ( model -- )
     [ [ value>> ] keep backtalk ] with-locked-model ;

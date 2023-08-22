@@ -1,5 +1,5 @@
 ! Copyright (C) 2010 Doug Coleman.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: alien.c-types cuda cuda.contexts cuda.devices
 cuda.libraries cuda.memory cuda.syntax destructors io
 io.encodings.string io.encodings.utf8 kernel math math.parser

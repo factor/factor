@@ -99,32 +99,3 @@ FROM: english => a/an ;
 
 { { "a" ", " "b" ", " "x" ", and " "c" } }
 [ { "a" "b" "x" "c" } "and" comma-list ] unit-test
-
-{ {
-    { "an " { $link object } } ", "
-    { "a " { $link pair } } ", "
-    { "a " { $link number } } ", "
-    { "an " { $link array } } ", "
-    { "a " { $link string } } ", "
-    { "a " { $link sequence } } ", or "
-    { "an " { $link assoc } }
-} } [
-    { object pair number array string sequence assoc }
-    or-markup-example
-    ! an object, a pair, a number, an array, a string, a sequence, or an assoc
-] unit-test
-
-{ {
-    { "an " { $link object } }
-} } [ { object } or-markup-example ] unit-test
-
-{ {
-    { "an " { $link object } } " or "
-    { "a " { $link pair } }
-} } [ { object pair } or-markup-example ] unit-test
-
-{ {
-    { "an " { $link object } } ", "
-    { "a " { $link pair } } ", or "
-    { "a " { $snippet "thing" } }
-} } [ { object pair "thing" } or-markup-example ] unit-test

@@ -1,5 +1,5 @@
 ! Copyright (C) 2013 John Benediktsson.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 
 USING: accessors assocs combinators formatting endian fry
 grouping hashtables io io.directories io.encodings.binary
@@ -248,7 +248,7 @@ CONSTANT: string-names {
 }
 
 : zip-names ( seq names -- assoc )
-    swap 2dup [ length ] bi@ - f <repetition> append zip ;
+    swap 2dup 2length - f <repetition> append zip ;
 
 PRIVATE>
 

@@ -1,5 +1,5 @@
 ! Copyright (C) 2008, 2010 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs io io.styles kernel logging
 logging.parser math namespaces prettyprint sequences sorting
 splitting ;
@@ -20,7 +20,7 @@ SYMBOL: message-histogram
     drop ;
 
 : recent-histogram ( assoc n -- alist )
-    [ sort-values <reversed> ] dip short head ;
+    [ sort-values <reversed> ] dip index-or-length head ;
 
 : analyze-entries ( entries word-names -- errors word-histogram message-histogram )
     [

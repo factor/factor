@@ -1,5 +1,5 @@
 ! Copyright (C) 2009 Doug Coleman.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors calendar continuations db http.client init
 kernel math math.parser namespaces sequences site-watcher.db
 site-watcher.email timers ;
@@ -19,7 +19,7 @@ STARTUP-HOOK: [ f running-site-watcher set-global ]
     ] each ;
 
 : site-up-email ( site -- body )
-    last-up>> now swap time- duration>minutes 60 /mod
+    last-up>> ago duration>minutes 60 /mod
     [ >integer number>string ] bi@
     [ " hours, " append ] [ " minutes" append ] bi* append
     "Site was down for (at least): " prepend ;

@@ -1,5 +1,5 @@
 ! Copyright (C) 2010 Anton Gorenko.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: alien alien.libraries alien.syntax combinators
 gobject-introspection system vocabs ;
 IN: gio.ffi
@@ -14,4 +14,4 @@ LIBRARY: gio
     { [ os unix? ] [ "libgio-2.0.so" ] }
 } cond cdecl add-library >>
 
-GIR: vocab:gio/Gio-2.0.gir
+GIR: vocab:gir/Gio-2.0.gir

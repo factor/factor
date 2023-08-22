@@ -1,13 +1,13 @@
 ! Copyright (C) 2008 Marc Fauconneau.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: arrays help.markup help.syntax io.streams.string
 sequences strings math suffix-arrays.private ;
 IN: suffix-arrays
 
 HELP: >suffix-array
 { $values
-     { "seq" sequence }
-     { "suffix-array" array } }
+    { "seq" sequence }
+    { "suffix-array" array } }
 { $description "Creates a suffix array from the input sequence. Suffix arrays are arrays of slices." } ;
 
 HELP: SA{
@@ -15,14 +15,14 @@ HELP: SA{
 
 HELP: suffixes
 { $values
-     { "string" string }
-     { "suffixes-seq" "a sequence of slices" } }
+    { "string" string }
+    { "suffixes-seq" "a sequence of slices" } }
 { $description "Returns a sequence of tail slices of the input string." } ;
 
 HELP: query
 { $values
-     { "begin" sequence } { "suffix-array" "a suffix-array" }
-     { "matches" array } }
+    { "begin" sequence } { "suffix-array" "a suffix-array" }
+    { "matches" array } }
 { $description "Returns a sequence of sequences from the suffix-array that contain the input sequence. An empty array is returned when there are no matches." } ;
 
 ARTICLE: "suffix-arrays" "Suffix arrays"

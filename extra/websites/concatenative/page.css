@@ -6,8 +6,9 @@ html {
     box-sizing: inherit;
 }
 
-body {
+html, body {
     margin: 0;
+    padding: 0;
 }
 
 body, button {
@@ -51,24 +52,20 @@ a:hover, .link:hover { text-decoration: underline; }
 .inline {
     display: inline;
 }
-.navbar {
-    border-bottom: 1px solid #ccc;
+
+nav {
+    border-bottom: 1px solid #d5d5d5;
     background-color: #f5f5f5;
+    padding: 10px;
+    padding-left: calc(max(50% - 500px, 0px) + 15px);
+    padding-right: calc(max(50% - 500px, 0px) + 15px);
 }
 
-.navrow {
-    max-width: 1000px;
-    position: relative;
-    left: calc(max(-500px,-50%) + 50%);
-    margin: 0;
-    padding: 10px 15px 10px 15px;
-}
-
-.navrow a, .navrow .link {
+nav a, nav .link {
     margin-right: 10px;
 }
 
-.navrow img {
+nav img {
     vertical-align: middle;
 }
 
@@ -81,4 +78,25 @@ a:hover, .link:hover { text-decoration: underline; }
 
 .big-field-label {
     vertical-align: top;
+}
+
+/* Dark mode */
+@media (prefers-color-scheme: dark) {
+    body {
+        background-color: #202124;
+        color: #bdc1c6;
+    }
+
+    title, h1, h2, h3, h4, h5, h6 {
+        color: white;
+    }
+
+    a, .link {
+        color: #8ab4f8;
+    }
+
+    nav {
+        background-color: #373e48;
+        border-bottom: 1px solid #666;
+    }
 }

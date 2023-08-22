@@ -1,5 +1,5 @@
 ! Copyright (C) 2006, 2010 Slava Pestov, Daniel Ehrenberg.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs kernel kernel.private math
 math.order math.private quotations sequences sequences.private
 sets sorting words ;
@@ -48,28 +48,32 @@ SLOT: terminated?
     [ call ] with each ;
 
 : cleave>quot ( seq -- quot )
-    [ [ keep ] curry ] map concat [ drop ] append [ ] like ;
+    [ [ keep ] curry ] map concat
+    [ drop ] [ ] append-as ;
 
 ! 2cleave
 : 2cleave ( x y seq -- )
     [ 2keep ] each 2drop ;
 
 : 2cleave>quot ( seq -- quot )
-    [ [ 2keep ] curry ] map concat [ 2drop ] append [ ] like ;
+    [ [ 2keep ] curry ] map concat
+    [ 2drop ] [ ] append-as ;
 
 ! 3cleave
 : 3cleave ( x y z seq -- )
     [ 3keep ] each 3drop ;
 
 : 3cleave>quot ( seq -- quot )
-    [ [ 3keep ] curry ] map concat [ 3drop ] append [ ] like ;
+    [ [ 3keep ] curry ] map concat
+    [ 3drop ] [ ] append-as ;
 
 ! 4cleave
 : 4cleave ( w x y z seq -- )
     [ 4keep ] each 4drop ;
 
 : 4cleave>quot ( seq -- quot )
-    [ [ 4keep ] curry ] map concat [ 4drop ] append [ ] like ;
+    [ [ 4keep ] curry ] map concat
+    [ 4drop ] [ ] append-as ;
 
 ! spread
 : shallow-spread>quot ( seq -- quot )
@@ -90,7 +94,7 @@ ERROR: no-cond ;
     [ no-cond ] if* ;
 
 : alist>quot ( default assoc -- quot )
-    [ rot \ if 3array append [ ] like ] assoc-each ;
+    [ rot \ if 3array [ ] append-as ] assoc-each ;
 
 : cond>quot ( assoc -- quot )
     [ dup pair? [ [ t ] swap 2array ] unless ] map

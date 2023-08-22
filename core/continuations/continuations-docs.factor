@@ -188,7 +188,7 @@ HELP: ignore-error
 { $description "Calls the quotation. If an exception is thrown which is matched by the 'check' quotation it is ignored. Otherwise the error is rethrown." } ;
 
 HELP: ignore-error/f
-{ $values { "quot" quotation } { "check" quotation } }
+{ $values { "quot" quotation } { "check" quotation } { "x/f" { $maybe object } } }
 { $description "Like " { $link ignore-error } ", but if a matched exception is thrown " { $link f } " is put on the stack." } ;
 
 HELP: ignore-errors
@@ -254,8 +254,8 @@ HELP: with-datastack
 
 HELP: attempt-all
 { $values
-     { "seq" sequence } { "quot" quotation }
-     { "obj" object } }
+    { "seq" sequence } { "quot" quotation }
+    { "obj" object } }
 { $description "Applies the quotation to elements in a sequence and returns the value from the first quotation that does not throw an error. If all quotations throw an error, returns the last error thrown." }
 { $examples "The first two numbers throw, the last one doesn't:"
     { $example
@@ -275,7 +275,7 @@ HELP: return
 
 HELP: with-return
 { $values
-     { "quot" quotation } }
+    { "quot" quotation } }
 { $description "Captures a continuation that can be reified by calling the " { $link return } " word. If so, it will resume execution immediately after the " { $link with-return } " word. If " { $link return } " is not called, then execution proceeds as if this word were simply " { $link call } "." }
 { $examples
     "Only \"Hi\" will print:"

@@ -1,5 +1,5 @@
 ! Copyright (C) 2019 John Benediktsson.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: base64.private byte-arrays kernel kernel.private
 literals math sequences ;
 IN: base91

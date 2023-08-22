@@ -11,8 +11,7 @@
 		<!-- Auto indent -->
 		<!-- set this to 'true' if you want to use GNU coding style -->
 	</PROPS>
-	<RULES ESCAPE="\"
-		IGNORE_CASE="TRUE"
+	<RULES IGNORE_CASE="TRUE"
 		HIGHLIGHT_DIGITS="FALSE">
 
 		<!-- C style comment -->
@@ -21,12 +20,12 @@
 			<END>*/</END>
 		</SPAN>
 
-		<SPAN TYPE="LITERAL1">
+		<SPAN TYPE="LITERAL1" ESCAPE="\">
 			<BEGIN>'</BEGIN>
 			<END>'</END>
 		</SPAN>
 
-		<SPAN TYPE="LITERAL1">
+		<SPAN TYPE="LITERAL1" ESCAPE="\">
 			<BEGIN>"</BEGIN>
 			<END>"</END>
 		</SPAN>
@@ -42,7 +41,7 @@
 		<SEQ TYPE="OPERATOR">&gt;</SEQ>
 		<SEQ TYPE="OPERATOR">&lt;</SEQ>
 		<SEQ TYPE="OPERATOR">^</SEQ>
-		<SEQ TYPE="OPERATOR">¬</SEQ>
+		<SEQ TYPE="OPERATOR">Â¬</SEQ>
 		<SEQ TYPE="OPERATOR">&amp;</SEQ>
 		<SEQ TYPE="OPERATOR">|</SEQ>
 		<SEQ TYPE="OPERATOR">.</SEQ>

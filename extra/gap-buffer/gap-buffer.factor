@@ -1,5 +1,5 @@
 ! Copyright (C) 2007 Alex Chapman All Rights Reserved.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 !
 ! gap buffer -- largely influenced by Strandh and Villeneuve's Flexichain
 ! for a good introduction see:
@@ -95,7 +95,7 @@ INSTANCE: gb virtual-sequence
     ] [ 3drop drop ] if ;
 
 : copy-elements ( dst start end seq -- )
-    pick pick > [
+    2over > [
         [ dupd - ] dip swap copy-elements-forward
     ] [
         [ over - ] dip swap copy-elements-back
@@ -262,7 +262,7 @@ M: sequence insert*
 
 : pop-start ( gb -- elem ) 0 swap pop-elem ;
 
-: pop-end ( gb -- elem ) [ length 1 - ] keep pop-elem ;
+: pop-end ( gb -- elem ) index-of-last pop-elem ;
 
 : rotate-right ( gb -- )
     dup [ pop-end ] keep push-start drop ;

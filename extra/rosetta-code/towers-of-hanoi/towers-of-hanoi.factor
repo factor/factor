@@ -1,9 +1,9 @@
 ! Copyright (c) 2012 Anonymous
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: formatting kernel math ;
 IN: rosetta-code.towers-of-hanoi
 
-! http://rosettacode.org/wiki/Towers_of_Hanoi
+! https://rosettacode.org/wiki/Towers_of_Hanoi
 
 ! In this task, the goal is to solve the Towers of Hanoi problem
 ! with recursion.

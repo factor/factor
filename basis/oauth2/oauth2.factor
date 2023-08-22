@@ -1,8 +1,7 @@
 ! Copyright (C) 2016 Björn Lindqvist.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors assocs calendar combinators http.client io
-json.reader kernel make math.order sequences unicode urls
-webbrowser ;
+json kernel make math.order sequences unicode urls webbrowser ;
 IN: oauth2
 
 : console-prompt ( query -- str/f )

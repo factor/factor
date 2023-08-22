@@ -3,7 +3,7 @@
 <!DOCTYPE MODE SYSTEM "xmode.dtd">
 
 <!-- MIPS/SPIM Assembly Mode from
-	Marc Rummel marc.rummel@stud.uni-karlsruhe.de 
+	Marc Rummel marc.rummel@stud.uni-karlsruhe.de
 	SIPM Homepage: http://www.cs.wisc.edu/~larus/spim.html
 -->
 
@@ -12,26 +12,27 @@
 	<PROPS>
 		<PROPERTY NAME="blockComment" VALUE="#" />
 		<PROPERTY NAME="wordBreakChars" VALUE=",()" />
+		<PROPERTY NAME="contextInsensitive" VALUE="true"/>
 	</PROPS>
-	
-	<RULES ESCAPE="\" HIGHLIGHT_DIGITS="TRUE" IGNORE_CASE="TRUE">
-		<!-- Comment --> 
+
+	<RULES HIGHLIGHT_DIGITS="TRUE" IGNORE_CASE="TRUE">
+		<!-- Comment -->
 		<EOL_SPAN TYPE="COMMENT1">#</EOL_SPAN>
-		
+
 		<!-- Strings -->
 		<SPAN TYPE="LITERAL1" NO_LINE_BREAK="TRUE">
 			<BEGIN>'</BEGIN>
 			<END>'</END>
 		</SPAN>
 
-		<SPAN TYPE="LITERAL1" NO_LINE_BREAK="TRUE">
+		<SPAN TYPE="LITERAL1" ESCAPE="\" NO_LINE_BREAK="TRUE">
 			<BEGIN>"</BEGIN>
 			<END>"</END>
 		</SPAN>
-		
+
 		<!-- Labels -->
 		<MARK_PREVIOUS TYPE="LABEL" AT_LINE_START="TRUE">:</MARK_PREVIOUS>
-		
+
 		<!-- Assembler directives -->
 		<KEYWORDS>
 			<KEYWORD1>.align</KEYWORD1>
@@ -49,7 +50,7 @@
 			<KEYWORD1>.space</KEYWORD1>
 			<KEYWORD1>.text</KEYWORD1>
 			<KEYWORD1>.word</KEYWORD1>
-			
+
 		<!-- MIPS/SPIM Operations -->
 			<FUNCTION>add</FUNCTION>
 			<FUNCTION>addi</FUNCTION>
@@ -220,7 +221,7 @@
 			<KEYWORD2>$sp</KEYWORD2>
 			<KEYWORD2>$fp</KEYWORD2>
 			<KEYWORD2>$ra</KEYWORD2>
-			
+
 		<!-- Floating Point Registers -->
 			<KEYWORD3>$f0</KEYWORD3>
 			<KEYWORD3>$f1</KEYWORD3>

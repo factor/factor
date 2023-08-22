@@ -1,5 +1,5 @@
 ! Copyright (C) 2008, 2009 Doug Coleman.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors arrays fry kernel locals math namespaces
 sequences sequences.private sorting ;
 IN: splitting.monotonic
@@ -53,7 +53,7 @@ TUPLE: upward-slice < slice ;
         drop
         [ downward-slices ]
         [ stable-slices ]
-        [ upward-slices ] tri 3append [ from>> ] sort-with
+        [ upward-slices ] tri 3append [ from>> ] sort-by
     ] [
         zero? [ drop { } ] [ [ 0 1 ] dip stable-slice boa ] if
     ] if ;

@@ -1,5 +1,5 @@
 ! Copyright (C) 2011 Erik Charlebois.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: parser system kernel sequences math ranges
 cpu.ppc.assembler combinators compiler.constants
 bootstrap.image.private layouts namespaces ;
@@ -20,7 +20,7 @@ CONSTANT: frame-reg 31
 
 : LOAD32 ( r n -- )
     [ -16 shift 0xffff bitand LIS ]
-    [ [ dup ] dip 0xffff bitand ORI ] 2bi ;
+    [ dupd 0xffff bitand ORI ] 2bi ;
 
 : jit-trap-null ( src -- ) drop ;
 : jit-load-vm ( dst -- )

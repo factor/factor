@@ -1,5 +1,5 @@
 ! Copyright (C) 2010 Doug Coleman.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors alien alien.data alien.syntax classes.struct
 continuations kernel libc literals sequences windows.advapi32
 windows.errors windows.kernel32 windows.types ;
@@ -8,7 +8,7 @@ IN: windows.privileges
 TYPEDEF: TOKEN_PRIVILEGES* PTOKEN_PRIVILEGES
 
 ! Security tokens
-!  http://msdn.microsoft.com/msdnmag/issues/05/03/TokenPrivileges/
+!  https://msdn.microsoft.com/msdnmag/issues/05/03/TokenPrivileges/
 
 : (open-process-token) ( handle -- handle )
     flags{ TOKEN_ADJUST_PRIVILEGES TOKEN_QUERY }

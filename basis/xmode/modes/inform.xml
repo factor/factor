@@ -23,8 +23,6 @@
             VALUE="\s*(((if|while)\s*\(|else\s*|else\s+if\s*\(|for\s*\(.*\))[^{;]*)" />
         <!-- set this to 'true' if you want to use GNU coding style -->
         <PROPERTY NAME="doubleBracketIndent" VALUE="false" />
-
-        <PROPERTY NAME="filenameGlob" VALUE="*.(inf|h)" />
     </PROPS>
 
     <RULES

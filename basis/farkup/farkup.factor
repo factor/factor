@@ -1,5 +1,5 @@
 ! Copyright (C) 2008, 2009 Doug Coleman, Daniel Ehrenberg.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs combinators io.streams.string
 kernel lists math math.order namespaces sequences splitting
 strings urls urls.encoding xml.data xml.syntax xml.writer
@@ -50,7 +50,7 @@ DEFER: (parse-paragraph)
     parse-paragraph paragraph boa ;
 
 : cut-half-slice ( string i -- before after-slice )
-    [ head ] [ 1 + short tail-slice ] 2bi ;
+    [ head ] [ 1 + index-or-length tail-slice ] 2bi ;
 
 : find-cut ( string quot -- before after delimiter )
     dupd find

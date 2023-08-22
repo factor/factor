@@ -143,3 +143,58 @@ CONSTANT: start-timestamp T{ timestamp
         "Fri, 29 Feb 2036 00:00:00 -0700"
     }
 } [ "0 0 29 2 *" next-few-times ] unit-test
+
+! At every 26th minute from 2 through 59 past hour 4.
+{
+    {
+        "Sun, 24 Mar 2019 04:02:00 -0700"
+        "Sun, 24 Mar 2019 04:28:00 -0700"
+        "Sun, 24 Mar 2019 04:54:00 -0700"
+        "Mon, 25 Mar 2019 04:02:00 -0700"
+        "Mon, 25 Mar 2019 04:28:00 -0700"
+    }
+} [ "2/26 4 * * *" next-few-times ] unit-test
+
+! At every 3rd minute from 5 through 20 past hour 4.
+{
+    {
+        "Sun, 24 Mar 2019 04:05:00 -0700"
+        "Sun, 24 Mar 2019 04:08:00 -0700"
+        "Sun, 24 Mar 2019 04:11:00 -0700"
+        "Sun, 24 Mar 2019 04:14:00 -0700"
+        "Sun, 24 Mar 2019 04:17:00 -0700"
+    }
+} [ "5-20/3 4 * * *" next-few-times ] unit-test
+
+! At 04:05 on Sunday.
+{
+    {
+        "Sun, 24 Mar 2019 04:05:00 -0700"
+        "Sun, 31 Mar 2019 04:05:00 -0700"
+        "Sun, 7 Apr 2019 04:05:00 -0700"
+        "Sun, 14 Apr 2019 04:05:00 -0700"
+        "Sun, 21 Apr 2019 04:05:00 -0700"
+    }
+} [ "5 4 * * 7" next-few-times ] unit-test
+
+! At 04:05 on every 3rd day-of-week from Monday through Sunday.
+{
+    {
+        "Sun, 24 Mar 2019 04:05:00 -0700"
+        "Mon, 25 Mar 2019 04:05:00 -0700"
+        "Thu, 28 Mar 2019 04:05:00 -0700"
+        "Sun, 31 Mar 2019 04:05:00 -0700"
+        "Mon, 1 Apr 2019 04:05:00 -0700"
+    }
+} [ "5 4 * * 1/3" next-few-times ] unit-test
+
+! At 04:05 on every 2nd day-of-month from 1 through 5.
+{
+    {
+        "Mon, 1 Apr 2019 04:05:00 -0700"
+        "Wed, 3 Apr 2019 04:05:00 -0700"
+        "Fri, 5 Apr 2019 04:05:00 -0700"
+        "Wed, 1 May 2019 04:05:00 -0700"
+        "Fri, 3 May 2019 04:05:00 -0700"
+    }
+} [ "5 4 1-5/2 * *" next-few-times ] unit-test

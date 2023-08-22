@@ -1,7 +1,7 @@
 ! Copyright (C) 2014, 2015 John Benediktsson.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors alien.c-types alien.strings alien.syntax destructors
-file-picker gobject-introspection.standard-types gtk.ffi
+file-picker gobject-introspection.standard-types gtk2.ffi
 io.encodings.utf8 kernel locals namespaces system ui.gadgets.worlds ;
 IN: file-picker.linux
 

@@ -1,5 +1,5 @@
 ! Copyright (C) 2005, 2010 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs classes classes.error combinators
 combinators.short-circuit continuations debugger effects fry
 generic help.crossref help.markup help.stylesheet help.topics io
@@ -24,7 +24,7 @@ GENERIC: word-help* ( word -- content )
     ] when* ;
 
 : fix-shuffle ( content word -- content' word )
-    over [ { $shuffle $complex-shuffle } member? ] find drop [
+    over [ \ $shuffle = ] find drop [
         '[ _ cut unclip ] dip [
             stack-effect 2array 1array glue
         ] keep
@@ -33,7 +33,7 @@ GENERIC: word-help* ( word -- content )
 PRIVATE>
 
 : word-help ( word -- content )
-    [ dup "help" word-prop [ ] [ word-help* ] ?if ] keep
+    [ [ "help" word-prop ] [ word-help* ] ?unless ] keep
     inputs-and-outputs fix-shuffle drop ;
 
 : effect-help ( effect -- content )

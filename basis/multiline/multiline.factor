@@ -1,8 +1,7 @@
 ! Copyright (C) 2007 Daniel Ehrenberg
-! See http://factorcode.org/license.txt for BSD license.
-USING: accessors combinators kernel lexer locals make math
-namespaces parser quotations sequences strings.parser
-strings.parser.private words ;
+! See https://factorcode.org/license.txt for BSD license.
+USING: accessors kernel lexer make math namespaces parser
+quotations sequences strings.parser.private words ;
 IN: multiline
 
 <PRIVATE
@@ -41,10 +40,10 @@ SYNTAX: STRING:
 :: (scan-multiline-string) ( i end lexer -- j )
     lexer line-text>> :> text
     lexer still-parsing? [
-        end text i subseq-start-from [| j |
+        i text end subseq-index-from [| j |
             i j text subseq % j end length +
         ] [
-            text i short tail % CHAR: \n ,
+            text i index-or-length tail % CHAR: \n ,
             lexer next-line
             0 end lexer (scan-multiline-string)
         ] if*
@@ -66,6 +65,8 @@ PRIVATE>
     lexer get 1 (parse-multiline-string) ;
 
 SYNTAX: /* "*/" parse-multiline-string drop ;
+
+SYNTAX: (( "))" parse-multiline-string drop ;
 
 SYNTAX: [[ "]]" parse-multiline-string suffix! ;
 SYNTAX: [=[ "]=]" parse-multiline-string suffix! ;

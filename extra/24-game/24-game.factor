@@ -43,10 +43,11 @@ CONSTANT: (operators) { + - * / rot swap q }
     '[ name>> _ = ] find nip ;
 
 : get-operator ( operators -- word )
-    dup "Operators: %u\n" printf flush
-    dup readln find-operator [ ] [
-        "Operator not found..." print get-operator
-    ] ?if ;
+    [ "Operators: %u\n" printf flush ]
+    [
+        [ readln find-operator ]
+        [ "Operator not found..." print get-operator ] ?unless
+    ] bi ;
 
 : try-operator ( array -- array )
     [ pprint nl ]

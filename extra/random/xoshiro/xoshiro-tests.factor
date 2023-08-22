@@ -1,5 +1,5 @@
 ! Copyright (C) 2018 Doug Coleman.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: kernel math random.xoshiro tools.test ;
 IN: random.xoshiro.tests
 
@@ -36,3 +36,4 @@ IN: random.xoshiro.tests
   9857397594961175947
   8327361040835137714
 } [ 0 1 2 3 long-jump-256 ] unit-test
+

@@ -1,5 +1,5 @@
 ! Copyright (C) 2019 John Benediktsson
-! See http://factorcode.org/license.txt for BSD license
+! See https://factorcode.org/license.txt for BSD license
 
 USING: byte-arrays fry kernel literals math math.bitwise
 sequences ;
@@ -39,7 +39,7 @@ IN: geohash
 <<
 CONSTANT: base32-alphabet $[ "0123456789bcdefghjkmnpqrstuvwxyz" >byte-array ]
 >>
-CONSTANT: base32-inverse $[ 256 [ base32-alphabet index 0xff or ] B{ } map-integers ]
+CONSTANT: base32-inverse $[ 256 [ base32-alphabet index 0xff or ] B{ } map-integers-as ]
 
 : base32-encode ( x -- str )
     -59 12 [

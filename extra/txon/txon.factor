@@ -1,5 +1,5 @@
 ! Copyright (C) 2011 John Benediktsson
-! See http://factorcode.org/license.txt for BSD license
+! See https://factorcode.org/license.txt for BSD license
 
 USING: assocs combinators combinators.short-circuit formatting
 grouping hashtables io kernel make math math.parser sequences
@@ -42,7 +42,7 @@ DEFER: name/values
 
 : name=value ( string -- remain term )
     [ unicode:blank? ] trim
-    ":`" over subseq? [ (name=value) ] [ f swap ] if ;
+    dup ":`" subseq-of? [ (name=value) ] [ f swap ] if ;
 
 : name/values ( string -- remain terms )
     [ dup { [ empty? not ] [ first CHAR: ` = not ] } 1&& ]

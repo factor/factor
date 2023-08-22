@@ -1,5 +1,5 @@
 ! Copyright (C) 2005, 2006 Doug Coleman.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: alien alien.c-types alien.syntax parser namespaces kernel
 math math.bitwise windows.types init assocs splitting
 sequences libc opengl.gl opengl.gl.extensions opengl.gl.windows ;

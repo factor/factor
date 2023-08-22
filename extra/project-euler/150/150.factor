@@ -1,10 +1,10 @@
 ! Copyright (c) 2008 Eric Mertens.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: kernel math math.order ranges math.statistics
 project-euler.common sequences sequences.private ;
 IN: project-euler.150
 
-! http://projecteuler.net/index.php?section=problems&id=150
+! https://projecteuler.net/index.php?section=problems&id=150
 
 ! DESCRIPTION
 ! -----------

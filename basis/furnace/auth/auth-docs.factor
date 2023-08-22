@@ -5,8 +5,8 @@ IN: furnace.auth
 
 HELP: <protected>
 { $values
-     { "responder" "a responder" }
-     { "protected" "a new responder" }
+    { "responder" "a responder" }
+    { "protected" "a new responder" }
 }
 { $description "Wraps a responder in a protected responder. Access to the wrapped responder will be conditional upon the client authenticating with the current authentication realm." } ;
 
@@ -27,15 +27,15 @@ HELP: define-capability
 
 HELP: encode-password
 { $values
-     { "string" string } { "salt" integer }
-     { "bytes" byte-array }
+    { "string" string } { "salt" integer }
+    { "bytes" byte-array }
 }
 { $description "Encodes a password with the current authentication realm's checksum." } ;
 
 HELP: have-capabilities?
 { $values
-     { "capabilities" "a sequence of capabilities" }
-     { "?" boolean }
+    { "capabilities" "a sequence of capabilities" }
+    { "?" boolean }
 }
 { $description "Tests if the currently logged-in user possesses the given capabilities." } ;
 
@@ -44,14 +44,14 @@ HELP: logged-in-user
 
 HELP: login-required
 { $values
-     { "description" string } { "capabilities" "a sequence of capabilities" }
+    { "description" string } { "capabilities" "a sequence of capabilities" }
 }
 { $description "Redirects the client to a login page." } ;
 
 HELP: login-required*
 { $values
-     { "description" string } { "capabilities" "a sequence of capabilities" } { "realm" "an authenticaiton realm" }
-     { "response" response }
+    { "description" string } { "capabilities" "a sequence of capabilities" } { "realm" "an authenticaiton realm" }
+    { "response" response }
 }
 { $contract "Constructs an HTTP response for redirecting the client to a login page." } ;
 

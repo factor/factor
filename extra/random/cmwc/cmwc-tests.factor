@@ -1,5 +1,5 @@
 ! Copyright (C) 2009 Doug Coleman.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: alien.c-types alien.data arrays kernel random random.cmwc
 sequences specialized-arrays tools.test ;
 SPECIALIZED-ARRAY: uint

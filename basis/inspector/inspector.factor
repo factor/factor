@@ -1,5 +1,5 @@
 ! Copyright (C) 2005, 2010 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors assocs continuations debugger fry hashtables io
 io.styles kernel math mirrors namespaces prettyprint
 prettyprint.custom prettyprint.sections sequences sets sorting

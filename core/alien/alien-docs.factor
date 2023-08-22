@@ -9,22 +9,25 @@ HELP: callee-cleanup?
 { $description { $link t } " if the calling convention is callee cleanup." } ;
 
 HELP: cdecl
-{ $description "This symbol is passed as the " { $snippet "abi" } " argument to " { $link alien-indirect } ", " { $link alien-callback } ", " { $link alien-assembly } ", and " { $link add-library } " to indicate that the standard C calling convention should be used, where the caller cleans up the stack frame after calling the function. This symbol only has meaning on 32-bit x86 platforms." } ;
+{ $description "This symbol is passed as the " { $snippet "abi" } " argument to " { $link alien-indirect } ", " { $link alien-callback } ", " { $link alien-assembly } ", and " { $link add-library } " to indicate that the standard C calling convention should be used, where the caller cleans up the stack frame after calling the function." } ;
 
 HELP: callsite-not-compiled
 { $error-description "Thrown if the word calling the given word was not compiled with the optimizing compiler. This can happen when experimenting with the word in this listener. To fix the problem, place the word call in a word; word definitions are automatically compiled with the optimizing compiler. Only a few words relating to calling FFI functions throws this error." } ;
 
 HELP: stdcall
-{ $description "This symbol is passed as the " { $snippet "abi" } " argument to " { $link alien-indirect } ", " { $link alien-callback } ", " { $link alien-assembly } ", and " { $link add-library } " to indicate that the Windows API calling convention should be used, where the called function cleans up its own stack frame before returning to the caller. This symbol only has meaning on 32-bit x86 platforms." } ;
+{ $description "This symbol is passed as the " { $snippet "abi" } " argument to " { $link alien-indirect } ", " { $link alien-callback } ", " { $link alien-assembly } ", and " { $link add-library } " to indicate that the Windows API calling convention should be used, where the called function cleans up its own stack frame before returning to the caller." } ;
 
 HELP: fastcall
 { $warning "In the current implementation this ABI only works for functions that take only integer and pointer arguments." }
-{ $description "This symbol is passed as the " { $snippet "abi" } " argument to " { $link alien-indirect } ", " { $link alien-callback } ", " { $link alien-assembly } ", and " { $link add-library } " to indicate that the \"fast call\" calling convention should be used, where the first two integer or pointer arguments are passed in registers and the function cleans up its own stack frame before returning to the caller. This symbol only has meaning on 32-bit x86 platforms." } ;
+{ $description "This symbol is passed as the " { $snippet "abi" } " argument to " { $link alien-indirect } ", " { $link alien-callback } ", " { $link alien-assembly } ", and " { $link add-library } " to indicate that the \"fast call\" calling convention should be used, where the first two integer or pointer arguments are passed in registers and the function cleans up its own stack frame before returning to the caller." } ;
 
 HELP: thiscall
-{ $description "This symbol is passed as the " { $snippet "abi" } " argument to " { $link alien-indirect } ", " { $link alien-callback } ", " { $link alien-assembly } ", and " { $link add-library } " to indicate that Microsoft Visual C++ calling convention should be used, where the first argument (which must be a \"this\" pointer) is passed in a register and the function cleans up its own stack frame before returning to the caller. This symbol only has meaning on 32-bit x86 platforms." } ;
+{ $description "This symbol is passed as the " { $snippet "abi" } " argument to " { $link alien-indirect } ", " { $link alien-callback } ", " { $link alien-assembly } ", and " { $link add-library } " to indicate that Microsoft Visual C++ calling convention should be used, where the first argument (which must be a \"this\" pointer) is passed in a register and the function cleans up its own stack frame before returning to the caller." } ;
 
-{ cdecl stdcall fastcall thiscall } related-words
+HELP: mingw
+{ $description "This symbol is passed as the " { $snippet "abi" } " argument to " { $link alien-indirect } ", " { $link alien-callback } ", " { $link alien-assembly } ", and " { $link add-library } " to indicate that MinGW calling convention should be used." } ;
+
+{ cdecl stdcall fastcall thiscall mingw } related-words
 
 HELP: >c-ptr
 { $values { "obj" object } { "c-ptr" c-ptr } }
@@ -236,7 +239,7 @@ ARTICLE: "alien-assembly" "Calling arbitrary assembly code"
 $nl
 "Assembler opcodes are defined in CPU-specific vocabularies:"
 { $list
-    { $vocab-link "cpu.arm.assembler" }
+    { $vocab-link "cpu.arm.64.assembler" }
     { $vocab-link "cpu.ppc.assembler" }
     { $vocab-link "cpu.x86.assembler" }
 }

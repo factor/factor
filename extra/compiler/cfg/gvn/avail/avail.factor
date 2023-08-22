@@ -1,5 +1,5 @@
 ! Copyright (C) 2011 Alex Vondrak.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors assocs compiler.cfg
 compiler.cfg.dataflow-analysis compiler.cfg.def-use
 compiler.cfg.gvn.graph compiler.cfg.renaming.functor

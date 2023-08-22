@@ -1,5 +1,5 @@
 ! Copyright (C) 2009 Slava Pestov, Joe Groff.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors alien alien.data combinators cpu.architecture
 grouping kernel libc math math.libm math.order ranges
 sequences sequences.cords sequences.generalizations sequences.private
@@ -13,7 +13,7 @@ SPECIALIZED-ARRAYS:
 IN: math.vectors.simd.intrinsics
 
 ! Word props are added later
-: assert-positive ( x -- y ) ;
+: (simd-positive) ( x -- y ) ;
 
 <PRIVATE
 

@@ -17,8 +17,8 @@
 		<PROPERTY NAME="commentStart" VALUE="/*" />
 		<PROPERTY NAME="commentEnd" VALUE="*/" />
 	</PROPS>
-	<RULES ESCAPE="\" IGNORE_CASE="FALSE" HIGHLIGHT_DIGITS="TRUE">
-	
+	<RULES IGNORE_CASE="FALSE" HIGHLIGHT_DIGITS="TRUE">
+
 		<!-- Comments -->
 		<EOL_SPAN TYPE="COMMENT1">%</EOL_SPAN>
 		<!--- ISO compliant C-style comments -->
@@ -26,23 +26,23 @@
 			<BEGIN>/*</BEGIN>
 			<END>*/</END>
 		</SPAN>
-		
+
 		<!-- String literals -->
-		<SPAN TYPE="LITERAL1" NO_LINE_BREAK="TRUE">
+		<SPAN TYPE="LITERAL1" ESCAPE="\" NO_LINE_BREAK="TRUE">
 			<BEGIN>'</BEGIN>
 			<END>'</END>
 		</SPAN>
-		<SPAN TYPE="LITERAL1" NO_LINE_BREAK="TRUE">
+		<SPAN TYPE="LITERAL1" ESCAPE="\" NO_LINE_BREAK="TRUE">
 			<BEGIN>"</BEGIN>
 			<END>"</END>
 		</SPAN>
-		
+
 		<!-- List literals -->
 		<SPAN TYPE="LITERAL2" NO_LINE_BREAK="TRUE" DELEGATE="LIST">
 			<BEGIN>[</BEGIN>
 			<END>]</END>
 		</SPAN>
-		
+
 		<!-- Operators -->
 		<SEQ TYPE="OPERATOR">--&gt;</SEQ>
 		<SEQ TYPE="OPERATOR">:-</SEQ>
@@ -78,18 +78,18 @@
 		<SEQ TYPE="OPERATOR">/</SEQ>
 		<SEQ TYPE="OPERATOR">=</SEQ>
 		<SEQ TYPE="OPERATOR">*</SEQ>
-		
+
 		<!-- The '.' at the end of each clause -->
 		<SEQ TYPE="OPERATOR">.</SEQ>
-		
+
 		<!-- Parentheses -->
 		<SEQ TYPE="MARKUP">(</SEQ>
 		<SEQ TYPE="MARKUP">)</SEQ>
 		<SEQ TYPE="NULL">{</SEQ>
 		<SEQ TYPE="NULL">}</SEQ>
-		
+
 		<KEYWORDS>
-		
+
 			<!-- Keywords that are 0 arity built-in predicates -->
 			<KEYWORD1>true</KEYWORD1>
 			<KEYWORD1>fail</KEYWORD1>
@@ -98,7 +98,7 @@
 			<KEYWORD1>nl</KEYWORD1>
 			<KEYWORD1>repeat</KEYWORD1>
 			<KEYWORD1>halt</KEYWORD1>
-			
+
 			<!-- Keywords that are built-in predicates with arity greater than or equal to 1 -->
 			<FUNCTION>call</FUNCTION>
 			<FUNCTION>catch</FUNCTION>
@@ -165,7 +165,7 @@
 			<FUNCTION>set_prolog_flag</FUNCTION>
 			<FUNCTION>current_prolog_flag</FUNCTION>
 			<FUNCTION>halt</FUNCTION> <!-- arity 1 -->
-			
+
 			<!-- Mathematical functions -->
 			<FUNCTION>sin</FUNCTION>
 			<FUNCTION>cos</FUNCTION>
@@ -173,20 +173,20 @@
 			<FUNCTION>exp</FUNCTION>
 			<FUNCTION>log</FUNCTION>
 			<FUNCTION>sqrt</FUNCTION>
-			
+
 			<!-- Keywords that should be operators -->
 			<KEYWORD2>is</KEYWORD2>
 			<KEYWORD2>rem</KEYWORD2>
 			<KEYWORD2>mod</KEYWORD2>
-			
+
 			<!-- Singleton variable -->
 			<KEYWORD3>_</KEYWORD3>
-			
+
 		</KEYWORDS>
-		
+
 	</RULES>
 
-	<RULES SET="LIST" DEFAULT="LITERAL2">
+	<RULES SET="LIST" DEFAULT="LITERAL2" ESCAPE="\">
 		<SPAN TYPE="LITERAL2" NO_LINE_BREAK="TRUE" DELEGATE="LIST">
 			<BEGIN>[</BEGIN>
 			<END>]</END>

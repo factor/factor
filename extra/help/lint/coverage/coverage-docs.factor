@@ -72,20 +72,20 @@ HELP: vocab-help-coverage.
     { $example
         "USING: help.lint.coverage ;"
         "\"english\" vocab-help-coverage."
-"[english] $or-markup-example: full help coverage
-[english] ?plural-article: full help coverage
+"[english] ?plural-article: full help coverage
 [english] ?pluralize: full help coverage
 [english] a/an: full help coverage
 [english] a10n: full help coverage
 [english] comma-list: full help coverage
 [english] count-of-things: full help coverage
-[english] or-markup-example: full help coverage
 [english] plural?: full help coverage
 [english] pluralize: full help coverage
 [english] singular?: full help coverage
 [english] singularize: full help coverage
+[english] vowel?: needs help sections: $values, $description, and $examples
+[english] vowels: needs help sections: $values, $description, and $examples
 
-100.0% of words have complete documentation"
+83.3% of words have complete documentation"
     }
 } ;
 
@@ -96,25 +96,25 @@ HELP: prefix-help-coverage.
     { $example
         "USING: help.lint.coverage ;"
         "\"english\" t prefix-help-coverage."
-"[english] $or-markup-example: full help coverage
-[english] ?plural-article: full help coverage
+"[english] ?plural-article: full help coverage
 [english] ?pluralize: full help coverage
 [english] a/an: full help coverage
 [english] a10n: full help coverage
 [english] comma-list: full help coverage
 [english] count-of-things: full help coverage
-[english] or-markup-example: full help coverage
 [english] plural?: full help coverage
 [english] pluralize: full help coverage
 [english] singular?: full help coverage
 [english] singularize: full help coverage
+[english] vowel?: needs help sections: $values, $description, and $examples
+[english] vowels: needs help sections: $values, $description, and $examples
 [english.private] $0-plurality: needs help sections: $values, $description, and $examples
 [english.private] $keep-case: needs help sections: $values, $description, and $examples
 [english.private] match-case: needs help sections: $values, $description, and $examples
 [english.private] plural-to-singular: needs help sections: $values, $description, and $examples
 [english.private] singular-to-plural: needs help sections: $values, $description, and $examples
 
-70.6% of words have complete documentation"
+58.8% of words have complete documentation"
     }
 } ;
 
@@ -126,10 +126,6 @@ HELP: <prefix-help-coverage>
         "USING: help.lint.coverage prettyprint ;"
         "\"english\" t <prefix-help-coverage> ..."
 "{
-    T{ word-help-coverage
-        { word-name $or-markup-example }
-        { 100%-coverage? t }
-    }
     T{ word-help-coverage
         { word-name ?plural-article }
         { 100%-coverage? t }
@@ -155,10 +151,6 @@ HELP: <prefix-help-coverage>
         { 100%-coverage? t }
     }
     T{ word-help-coverage
-        { word-name or-markup-example }
-        { 100%-coverage? t }
-    }
-    T{ word-help-coverage
         { word-name plural? }
         { 100%-coverage? t }
     }
@@ -173,6 +165,14 @@ HELP: <prefix-help-coverage>
     T{ word-help-coverage
         { word-name singularize }
         { 100%-coverage? t }
+    }
+    T{ word-help-coverage
+        { word-name vowel? }
+        { omitted-sections { $values $description $examples } }
+    }
+    T{ word-help-coverage
+        { word-name vowels }
+        { omitted-sections { $values $description $examples } }
     }
     T{ word-help-coverage
         { word-name $0-plurality }
@@ -221,10 +221,6 @@ HELP: <vocab-help-coverage>
         "\"english\" <vocab-help-coverage> ..."
 "{
     T{ word-help-coverage
-        { word-name $or-markup-example }
-        { 100%-coverage? t }
-    }
-    T{ word-help-coverage
         { word-name ?plural-article }
         { 100%-coverage? t }
     }
@@ -249,10 +245,6 @@ HELP: <vocab-help-coverage>
         { 100%-coverage? t }
     }
     T{ word-help-coverage
-        { word-name or-markup-example }
-        { 100%-coverage? t }
-    }
-    T{ word-help-coverage
         { word-name plural? }
         { 100%-coverage? t }
     }
@@ -267,6 +259,14 @@ HELP: <vocab-help-coverage>
     T{ word-help-coverage
         { word-name singularize }
         { 100%-coverage? t }
+    }
+    T{ word-help-coverage
+        { word-name vowel? }
+        { omitted-sections { $values $description $examples } }
+    }
+    T{ word-help-coverage
+        { word-name vowels }
+        { omitted-sections { $values $description $examples } }
     }
 }"
     }

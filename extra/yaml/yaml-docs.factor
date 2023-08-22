@@ -1,5 +1,5 @@
 ! Copyright (C) 2014 Jon Harper.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: arrays assocs byte-arrays hash-sets hashtables calendar
 help.markup help.syntax kernel linked-assocs math sequences sets
 strings yaml.ffi yaml.config yaml.conversion ;
@@ -17,7 +17,7 @@ HELP: >yaml-docs
     { "seq" sequence }
     { "str" string }
 }
-{ $description "Serializes the sequence into a YAML formatted string. Each element is outputted as a YAML document." } ;
+{ $description "Serializes the sequence into a YAML formatted string. Each element is output as a YAML document." } ;
 
 HELP: yaml-docs>
 { $values
@@ -92,7 +92,7 @@ HELP: scalar-value
 ARTICLE: "yaml-mapping" "Mapping between Factor and YAML types"
 { $heading "Types mapping" }
 "The rules in the table below are used to convert between yaml and factor objects."
-" They are based on " { $url "http://www.yaml.org/spec/1.2/spec.html" } ", section \"10.3. Core Schema\" and " { $url "http://yaml.org/type/" } ", adapted to factor's conventions."
+" They are based on " { $url "https://www.yaml.org/spec/1.2/spec.html" } ", section \"10.3. Core Schema\" and " { $url "https://yaml.org/type/" } ", adapted to factor's conventions."
 { $table
   { { $snippet "yaml" } { $snippet "factor" } }
   { { $snippet "scalars" } "" }
@@ -133,7 +133,7 @@ ARTICLE: "yaml-mapping" "Mapping between Factor and YAML types"
 
 ARTICLE: "yaml-errors" "YAML errors"
 { $heading "libYAML's errors" }
-"LibYAML exposes error when parsing/emitting yaml. See " { $url "http://pyyaml.org/wiki/LibYAML" } ". More information is available directly in pyyaml's source code in their C interface. They are groupped in the following errors:"
+"LibYAML exposes error when parsing/emitting yaml. See " { $url "https://pyyaml.org/wiki/LibYAML" } ". More information is available directly in pyyaml's source code in their C interface. They are groupped in the following errors:"
 { $list
   { $link libyaml-parser-error }
   { $link libyaml-emitter-error }
@@ -153,8 +153,8 @@ ARTICLE: "yaml-errors" "YAML errors"
 ARTICLE: "yaml-keys" "Special mapping keys"
 "The following special keys have been implemented for !!map. By default, these keys will be taken into account when deserializing yaml documents. To keep the original document structure, configuration variables can be set. See " { $link "yaml-config" } "."
 { $heading "!!merge" }
-"See " { $url "http://yaml.org/type/merge.html" } $nl
-"As per " { $url "http://sourceforge.net/p/yaml/mailman/message/12308050" }
+"See " { $url "https://yaml.org/type/merge.html" } $nl
+"As per " { $url "https://sourceforge.net/p/yaml/mailman/message/12308050" }
 ", the merge key is implemented bottom up:" $nl
 { $unchecked-example "USING: yaml prettyprint ;
 \"
@@ -166,7 +166,7 @@ foo: 1
 \" yaml> ."
 "H{ { \"baz\" 3 } { \"foo\" 1 } { \"bar\" 2 } }" }
 { $heading "!!value" }
-"See " { $url "http://yaml.org/type/value.html" } $nl
+"See " { $url "https://yaml.org/type/value.html" } $nl
 { $unchecked-example "USING: yaml prettyprint ;
 \"
 ---     # Old schema
@@ -188,7 +188,7 @@ link with:
 
 ;
 ARTICLE: "yaml" "YAML serialization"
-"The " { $vocab-link "yaml" } " vocabulary implements YAML serialization/deserialization. It uses LibYAML, a YAML parser and emitter written in C (" { $url "http://pyyaml.org/wiki/LibYAML" } ")."
+"The " { $vocab-link "yaml" } " vocabulary implements YAML serialization/deserialization. It uses LibYAML, a YAML parser and emitter written in C (" { $url "https://pyyaml.org/wiki/LibYAML" } ")."
 { $heading "Main conversion words" }
 { $subsections
     >yaml
@@ -216,7 +216,7 @@ ARTICLE: "yaml" "YAML serialization"
 - 42.0
 - 4.2e1\" yaml> ."
 "{ t f \"42\" \"42\" 42 42 42 42.0 42.0 }"
- }
+}
 { $heading "Output -- human readable" }
   { $unchecked-example "USING: yaml yaml.config ;"
 "t implicit-tags set

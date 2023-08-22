@@ -1,5 +1,5 @@
 ! Copyright (C) 2009 Bruno Deferrari
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors kernel tokyo.alien.tcadb tokyo.assoc-functor ;
 IN: tokyo.abstractdb
 

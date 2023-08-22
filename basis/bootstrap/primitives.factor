@@ -1,5 +1,5 @@
 ! Copyright (C) 2004, 2010 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: arrays assocs bootstrap.image.primitives
 bootstrap.image.private classes classes.builtin classes.intersection
 classes.predicate classes.private classes.singleton classes.tuple
@@ -177,7 +177,7 @@ define-union-class
 define-predicate-class
 
 "array-capacity" "sequences.private" lookup-word
-[ >fixnum ] bootstrap-max-array-capacity <fake-bignum> [ fixnum-bitand ] curry append
+[ integer>fixnum-strict ] bootstrap-max-array-capacity <fake-bignum> [ fixnum-bitand ] curry append
 "coercer" set-word-prop
 
 "integer-array-capacity" "sequences.private" create-word

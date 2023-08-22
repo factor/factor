@@ -1,5 +1,5 @@
 ! Copyright (C) 2009 Bruno Deferrari.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors calendar destructors formatting io io.directories
 io.encodings.utf8 io.files io.pathnames irc.client irc.client.chats
 irc.logbot.log-line irc.messages.base kernel namespaces sequences

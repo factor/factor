@@ -16,7 +16,7 @@ H{
 } "g" set
 
 { { 2 3 4 5 } } [
-    2 [ "g" get at sets:members ] closure sets:members natural-sort
+    2 [ "g" get at sets:members ] closure sets:members sort
 ] unit-test
 
 { t } [ 2 [ "g" get at sets:members ] HS{ } closure-as hash-set? ] unit-test

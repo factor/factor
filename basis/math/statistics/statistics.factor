@@ -1,5 +1,5 @@
 ! Copyright (C) 2008 Doug Coleman, Michael Judge, Loryn Jenkins.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs combinators
 combinators.short-circuit fry generalizations grouping kernel
 locals math math.functions math.order ranges math.vectors
@@ -77,16 +77,16 @@ M: ranges:range sum-of-quads
 
 <PRIVATE
 
-: trim-points ( p seq -- from to seq  )
+: trim-points ( p seq -- from to seq )
     [ length [ * >integer ] keep over - ] keep ;
 
 PRIVATE>
 
 : trimmed-mean ( seq p -- x )
-    swap natural-sort trim-points <slice> mean ;
+    swap sort trim-points <slice> mean ;
 
 : winsorized-mean ( seq p -- x )
-    swap natural-sort trim-points
+    swap sort trim-points
     [ <slice> ]
     [ nip dupd nth <array> ]
     [ [ 1 - ] dip nth <array> ] 3tri
@@ -124,7 +124,7 @@ PRIVATE>
     k seq nth-unsafe ; inline
 
 : (kth-object) ( seq k nth-quot exchange-quot quot: ( x y -- ? ) -- elt )
-    ! The algorithm modifiers seq, so we clone it
+    ! The algorithm modifies seq, so we clone it
     [ >array ] 4dip kth-object-impl ; inline
 
 : kth-object-unsafe ( seq k quot: ( x y -- ? ) -- elt )
@@ -187,7 +187,7 @@ PRIVATE>
 
 ! quantile can be any n-tile. quartile is n = 4, percentile is n = 100
 ! a,b,c,d parameters, N - number of samples, q is quantile (1/2 for median, 1/4 for 1st quartile)
-! http://mathworld.wolfram.com/Quantile.html
+! https://mathworld.wolfram.com/Quantile.html
 ! a + (N + b) q - 1
 ! could subtract 1 from a
 
@@ -251,11 +251,14 @@ PRIVATE>
 : trimean ( seq -- x )
     quartile first3 [ 2 * ] dip + + 4 / ;
 
+: histogram-by! ( assoc seq quot: ( x -- bin ) -- hashtable )
+    rot [ '[ @ _ inc-at ] each ] keep ; inline
+
 : histogram! ( hashtable seq -- hashtable )
-    over '[ _ inc-at ] each ;
+    [ ] histogram-by! ; inline
 
 : histogram-by ( seq quot: ( x -- bin ) -- hashtable )
-    H{ } clone [ '[ @ _ inc-at ] each ] keep ; inline
+    [ H{ } clone ] 2dip histogram-by! ; inline
 
 : histogram ( seq -- hashtable )
     [ ] histogram-by ;
@@ -400,11 +403,27 @@ PRIVATE>
 : rescale ( u -- v )
     dup minmax over - [ v-n ] [ v/n ] bi* ;
 
-: rankings ( histogram -- assoc )
-    sort-keys 0 swap [ rot [ + ] keep swapd ] H{ } assoc-map-as nip ;
+<PRIVATE
 
-: rank-values ( seq -- seq' )
-    dup histogram rankings '[ _ at ] map ;
+: rankings ( histogram method: ( min max -- rank ) -- assoc )
+    [ sort-keys 0 swap ] dip
+    '[ swapd dupd + _ keep -rot ] H{ } assoc-map-as nip ; inline
+
+: rank-by ( seq method: ( min max -- rank ) -- seq' )
+    [ dup histogram ] [ rankings ] bi* '[ _ at ] map ; inline
+
+PRIVATE>
+
+: rank-by-avg ( seq -- seq' ) [ + 1 + 2 / ] rank-by ;
+
+: rank-by-min ( seq -- seq' ) [ drop 1 + ] rank-by ;
+
+: rank-by-max ( seq -- seq' ) [ nip ] rank-by ;
+
+ALIAS: rank rank-by-avg
+
+: spearman-corr ( x-seq y-seq -- corr )
+    [ rank ] bi@ population-corr ;
 
 : z-score ( seq -- n )
     [ demean ] [ sample-std ] bi v/n ;
@@ -417,6 +436,6 @@ PRIVATE>
         dup dcg [
             drop 0.0
         ] [
-            swap natural-sort <reversed> dcg /f
+            swap sort <reversed> dcg /f
         ] if-zero
     ] if-empty ;

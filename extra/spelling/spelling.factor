@@ -1,12 +1,12 @@
 ! Copyright (C) 2010 John Benediktsson
-! See http://factorcode.org/license.txt for BSD license
+! See https://factorcode.org/license.txt for BSD license
 USING: arrays ascii assocs combinators combinators.smart
 http.client io.encodings.ascii io.files io.files.temp kernel
 math math.statistics ranges sequences sequences.private sorting
 splitting urls ;
 IN: spelling
 
-! http://norvig.com/spell-correct.html
+! https://norvig.com/spell-correct.html
 
 CONSTANT: ALPHABET "abcdefghijklmnopqrstuvwxyz"
 
@@ -48,7 +48,7 @@ CONSTANT: ALPHABET "abcdefghijklmnopqrstuvwxyz"
     word 1array dictionary filter-known
     [ word edits1 dictionary filter-known ] when-empty
     [ word edits2 dictionary filter-known ] when-empty
-    [ dictionary at ] sort-with reverse! ;
+    [ dictionary at ] sort-by reverse! ;
 
 : words ( string -- words )
     >lower [ letter? not ] split-when harvest ;
@@ -57,7 +57,7 @@ CONSTANT: ALPHABET "abcdefghijklmnopqrstuvwxyz"
     ascii file-contents words histogram ;
 
 MEMO: default-dictionary ( -- counts )
-    URL" http://norvig.com/big.txt" "big.txt" temp-file
+    URL" https://norvig.com/big.txt" "big.txt" temp-file
     [ ?download-to ] [ load-dictionary ] bi ;
 
 : (correct) ( word dictionary -- word/f )

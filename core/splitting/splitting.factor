@@ -1,5 +1,5 @@
 ! Copyright (C) 2005, 2009 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: arrays kernel math sbufs sequences sequences.private
 strings ;
 IN: splitting
@@ -25,21 +25,20 @@ PRIVATE>
 : ?tail-slice ( seq end -- newseq ? )
     [ tail? ] [ head-slice* ] ?chomp ;
 
-<PRIVATE
-
 : subseq-range ( seq subseq -- from/f to/f )
-    [ swap subseq-start ] keep [ dupd length + ] curry [ f f ] if* ; inline
+    tuck subseq-index [ dup rot length + ] [ drop f f ] if* ;
 
-: (split1) ( seq subseq snip-quot -- before after )
-    [ [ subseq-range ] keepd over ] dip [ 2nip f ] if ; inline
+: ?snip ( from/f to/f seq -- before after )
+    over [ snip ] [ 2nip f ] if ; inline
 
-PRIVATE>
+: ?snip-slice ( from/f to/f seq -- before after )
+    over [ snip-slice ] [ 2nip f ] if ; inline
 
 : split1 ( seq subseq -- before after )
-    [ snip ] (split1) ;
+    [ subseq-range ] keepd ?snip ; inline
 
 : split1-slice ( seq subseq -- before-slice after-slice )
-    [ snip-slice ] (split1) ;
+    [ subseq-range ] keepd ?snip-slice ; inline
 
 : split-subseq ( seq subseq -- seqs )
     [
@@ -51,18 +50,11 @@ PRIVATE>
 : replace ( seq old new -- new-seq )
     pick [ [ split-subseq ] dip ] dip join-as ;
 
-<PRIVATE
-
-: (split1-when) ( ... seq quot: ( ... elt -- ... ? ) snip-quot -- ... before-slice after-slice )
-    [ dupd find drop ] dip [ swap [ dup 1 + ] dip ] prepose [ f ] if* ; inline
-
-PRIVATE>
-
 : split1-when ( ... seq quot: ( ... elt -- ... ? ) -- ... before after )
-    [ snip ] (split1-when) ; inline
+    [ find drop ] keepd swap [ dup 1 + rot snip ] [ f ] if* ; inline
 
 : split1-when-slice ( ... seq quot: ( ... elt -- ... ? ) -- ... before-slice after-slice )
-    [ snip-slice ] (split1-when) ; inline
+    [ find drop ] keepd swap [ dup 1 + rot snip-slice ] [ f ] if* ; inline
 
 : split1-last ( seq subseq -- before after )
     [ <reversed> ] bi@ split1 [ reverse ] bi@

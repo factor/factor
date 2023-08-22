@@ -1,5 +1,5 @@
 ! Copyright (c) 2008 Slava Pestov
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors kernel sequences namespaces db db.types db.tuples validators
 hashtables urls html.forms html.components html.templates.chloe http.server
 http.server.dispatchers furnace furnace.boilerplate furnace.auth

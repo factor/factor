@@ -247,6 +247,15 @@
       <BEGIN>use[\p{Space}]*=[\p{Space}]*'</BEGIN>
       <END>'</END>
     </SPAN_REGEXP>
+    <!-- value -->
+    <SPAN_REGEXP TYPE="KEYWORD2" HASH_CHAR="value" DELEGATE="XPATH">
+      <BEGIN>value[\p{Space}]*=[\p{Space}]*"</BEGIN>
+      <END>"</END>
+    </SPAN_REGEXP>
+    <SPAN_REGEXP TYPE="KEYWORD2" HASH_CHAR="select" DELEGATE="XPATH">
+      <BEGIN>select[\p{Space}]*=[\p{Space}]*'</BEGIN>
+      <END>'</END>
+    </SPAN_REGEXP>
 
     <!-- Namespace declarations -->
     <SEQ TYPE="OPERATOR">xmlns:</SEQ>
@@ -269,8 +278,8 @@
       <KEYWORD1>comment</KEYWORD1>
       <KEYWORD1>copy</KEYWORD1>
       <KEYWORD1>copy-of</KEYWORD1>
-      <KEYWORD1>date-format</KEYWORD1>
       <KEYWORD1>decimal-format</KEYWORD1>
+      <KEYWORD1>document</KEYWORD1>
       <KEYWORD1>element</KEYWORD1>
       <KEYWORD1>fallback</KEYWORD1>
       <KEYWORD1>for-each</KEYWORD1>
@@ -292,12 +301,12 @@
       <KEYWORD1>output</KEYWORD1>
       <KEYWORD1>output-character</KEYWORD1>
       <KEYWORD1>param</KEYWORD1>
+      <KEYWORD1>perform-sort</KEYWORD1>
       <KEYWORD1>preserve-space</KEYWORD1>
       <KEYWORD1>processing-instruction</KEYWORD1>
       <KEYWORD1>result-document</KEYWORD1>
       <KEYWORD1>sequence</KEYWORD1>
       <KEYWORD1>sort</KEYWORD1>
-      <KEYWORD1>sort-key</KEYWORD1>
       <KEYWORD1>strip-space</KEYWORD1>
       <KEYWORD1>stylesheet</KEYWORD1>
       <KEYWORD1>template</KEYWORD1>
@@ -434,3 +443,5 @@
   </RULES>
 
 </MODE>
+
+ 	  	 

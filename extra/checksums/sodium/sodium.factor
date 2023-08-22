@@ -1,5 +1,5 @@
 ! Copyright (C) 2017 Alexander Ilin.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors alien byte-arrays checksums checksums.common
 destructors kernel math sequences sodium sodium.ffi ;
 IN: checksums.sodium

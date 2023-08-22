@@ -1,5 +1,5 @@
 ! Copyright (c) 2008, 2009 Slava Pestov
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors combinators.short-circuit furnace.utilities
 html.forms html.templates html.templates.chloe http.server
 http.server.filters kernel ;

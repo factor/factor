@@ -1,7 +1,7 @@
 ! Copyright (C) 2009 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
-USING: sequences kernel accessors math math.vectors
-math.rectangles math.order arrays locals fry
+! See https://factorcode.org/license.txt for BSD license.
+USING: combinators sequences kernel accessors math math.vectors
+math.rectangles math.order arrays locals
 combinators.short-circuit ;
 IN: math.rectangles.positioning
 
@@ -20,17 +20,13 @@ IN: math.rectangles.positioning
     rect-bounds [ second ] bi@ + ;
 
 : alternate-y ( visible-rect popup-dim -- y )
-    [ loc>> ] dip [ second ] bi@ - ;
+    [ loc>> ] dip [ second ] bi@ [-] ;
 
 : preferred-fit? ( visible-rect popup-dim screen-dim -- ? )
     [ [ preferred-y ] [ second ] bi* + ] dip second < ;
 
-: alternate-fit? ( visible-rect popup-dim -- ? )
-    alternate-y 0 >= ;
-
 : popup-y ( visible-rect popup-dim screen-dim -- y )
-    3dup { [ preferred-fit? not ] [ drop alternate-fit? ] } 3&&
-    [ drop alternate-y ] [ 2drop preferred-y ] if ;
+    3dup preferred-fit? [ 2drop preferred-y ] [ drop alternate-y ] if ;
 
 : popup-loc ( visible-rect popup-dim screen-dim -- loc )
     [ popup-x ] [ popup-y ] 3bi 2array ;

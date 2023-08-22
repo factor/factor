@@ -7,7 +7,7 @@ HELP: user-input
 { $description "Calls " { $link user-input* } " on every parent of the world's currently-focused child." } ;
 
 HELP: origin
-{ $var-description "Within the dynamic extent of " { $link draw-world } ", holds the co-ordinate system origin for the gadget currently being drawn." } ;
+{ $var-description "Within the dynamic extent of " { $link draw-world } ", holds the coordinate system origin for the gadget currently being drawn." } ;
 
 HELP: hand-world
 { $var-description "Global variable. The " { $link world } " containing the gadget at the mouse location." } ;
@@ -85,7 +85,7 @@ HELP: world
     }
     {
         "window-loc"
-        { "the on-screen location of the native window containing the world. The co-ordinate system here is backend-specific." }
+        { "the on-screen location of the native window containing the world. The coordinate system here is backend-specific." }
     }
     {
         "window-controls"

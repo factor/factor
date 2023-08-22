@@ -13,11 +13,11 @@ IN: compiler.cfg.build-stack-frame.tests
     144
 } [
     T{ stack-frame
-       { params 91 }
-       { allot-area-align 8 }
-       { allot-area-size 10 }
-       { spill-area-align 8 }
-       { spill-area-size 16 }
+        { params 91 }
+        { allot-area-align 8 }
+        { allot-area-size 10 }
+        { spill-area-align 8 }
+        { spill-area-size 16 }
     } finalize-stack-frame
     slots[ allot-area-base spill-area-base total-size ]
     ! Exclude any reserved stack space 32 bytes on win64, 0 bytes

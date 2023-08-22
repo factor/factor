@@ -2,7 +2,7 @@
 
 <t:chloe xmlns:t="http://factorcode.org/chloe/1.0">
 
-	<div class="navbar">
+    <nav>
 		<t:a t:href="$user-admin">List Users</t:a>
 		<t:a t:href="$user-admin/new">Add User</t:a>
 
@@ -11,7 +11,7 @@
 		</t:if>
 
 		<t:button t:action="$login-realm/logout" t:aside="begin" class="link-button link">Logout</t:button>
-	</div>
+	</nav>
 
 	<h1><t:write-title /></h1>
 

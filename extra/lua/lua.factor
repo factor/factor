@@ -1,5 +1,5 @@
 ! Copyright (C) 2010 Erik Charlebois.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors alien alien.accessors alien.c-types
 alien.libraries alien.syntax classes.struct combinators
 io.encodings.ascii kernel math system ;

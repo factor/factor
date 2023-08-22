@@ -1,0 +1,97 @@
+<?xml version="1.0"?>
+
+<!DOCTYPE MODE SYSTEM "xmode.dtd">
+<!--
+    Thiemo Kellner, 2009-08-06
+    Very basic mode for HL7 version 2.8.2 message based on Jaco de Groot's
+    csv.xml 2.2 20070213
+    Reference: http://www.hl7.org/documentcenter/private/standards/V282/HL7-xml%20v2.8.2.zip
+
+-->
+
+<MODE>
+    <RULES IGNORE_CASE="FALSE">
+        <EOL_SPAN_REGEXP TYPE="INVALID" AT_LINE_START="TRUE" >(?!ABS|ACC|ADD|ADJ|AFF|AIG|AIL|AIP|AIS|AL1|APR|ARQ|ARV|AUT|BHS|BLC|BLG|BPO|BPX|BTS|BTX|BUI|CDM|CDO|CER|CM0|CM1|CM2|CNS|CON|CSP|CSR|CSS|CTD|CTI|DB1|DG1|DMI|DON|DPS|DRG|DSC|DSP|ECD|ECR|EDU|EQP|EQU|ERR|EVN|FAC|FHS|FT1|FTS|GOL|GP1|GP2|GT1|Hxx|IAM|IAR|IIM|ILT|IN1|IN2|IN3|INV|IPC|IPR|ISD|ITM|IVC|IVT|LAN|LCC|LCH|LDP|LOC|LRL|MCP|MFA|MFE|MFI|MRG|MSA|MSH|NCK|NDS|NK1|NPU|NSC|NST|NTE|OBR|OBX|ODS|ODT|OM1|OM2|OM3|OM4|OM5|OM6|OM7|OMC|ORC|ORG|OVR|PAC|PCE|PCR|PD1|PDA|PDC|PEO|PES|PID|PKG|PM1|PMT|PR1|PRA|PRB|PRC|PRD|PRT|PSG|PSH|PSL|PSS|PTH|PV1|PV2|PYE|QAK|QID|QPD|QRD|QRF|QRI|RCP|RDF|RDT|REL|RF1|RFI|RGS|RMI|ROL|RQ1|RQD|RXA|RXC|RXD|RXE|RXG|RXO|RXR|RXV|SAC|SCD|SCH|SCP|SDD|SFT|SGH|SGT|SHP|SID|SLT|SPM|STF|STZ|TCC|TCD|TQ1|TQ2|TXA|UAC|UB1|UB2|URD|URS|VAR|VND|ZL7|Zxx|anyHL7Segment|anyZSegment)</EOL_SPAN_REGEXP>
+    </RULES>
+
+    <!-- Is superseeded by line 36
+    <RULES IGNORE_CASE="FALSE">
+        <SEQ TYPE="LITERAL1" AT_LINE_START="TRUE">OBX</SEQ>
+    </RULES>
+    -->
+
+    <!--
+        Actually the following is not strictly true. Delimiters are defined at
+        position 1 to 4 after the message header identifier MSH, e. g. MSH|^~\&
+        would mean that there are the delimiters |, ^, ~ and &. The backslash
+        is an escape. These are the HL7 recommendations that most softwares
+        adhere to but it is not guaranteed, see also http://healthstandards.com/blog/2007/09/24/hl7-separator-characters/
+        I do not think that jEdit supports the take some characters in a file to
+        highlight as token to watch for highlighting. So this mode sticks to
+        the "common sense" with respect to delimiters. And at least it only
+        supports field delimiters.
+    -->
+    <RULES>
+        <SEQ TYPE="MARKUP" DELEGATE="ODD_QUOTED" AT_LINE_START="TRUE">"</SEQ>
+        <SEQ TYPE="MARKUP" DELEGATE="FIELDDELIM_EVEN_QUOTED">|"</SEQ>
+        <EOL_SPAN_REGEXP TYPE="MARKUP" HASH_CHAR="|" DELEGATE="FIELDDELIM_LAST_COLUMN">\|(?=[^|]*$)</EOL_SPAN_REGEXP>
+        <SEQ TYPE="MARKUP" DELEGATE="FIELDDELIM_EVEN">|</SEQ>
+    </RULES>
+
+
+    <RULES SET="ODD_QUOTED">
+        <SEQ TYPE="MARKUP" DELEGATE="ODD_QUOTED">""</SEQ>
+        <SEQ_REGEXP TYPE="MARKUP" HASH_CHAR="&quot;" DELEGATE="FIELDDELIM_MAIN">"(?=\|[^"][^|]*$)</SEQ_REGEXP>
+        <SEQ TYPE="MARKUP" DELEGATE="FIELDDELIM_EVEN_QUOTED">"|"</SEQ>
+        <SEQ_REGEXP TYPE="MARKUP" HASH_CHAR="&quot;|" DELEGATE="FIELDDELIM_MAIN">"\|$</SEQ_REGEXP>
+        <SEQ TYPE="MARKUP" DELEGATE="FIELDDELIM_EVEN">"|</SEQ>
+        <SEQ_REGEXP TYPE="MARKUP" HASH_CHAR="&quot;" DELEGATE="MAIN">"$</SEQ_REGEXP>
+        <SEQ TYPE="MARKUP" DELEGATE="EVEN">"</SEQ>
+    </RULES>
+
+    <RULES DEFAULT="COMMENT1" SET="EVEN">
+        <SEQ TYPE="MARKUP" DELEGATE="FIELDDELIM_ODD_QUOTED">|"</SEQ>
+        <SEQ TYPE="MARKUP" DELEGATE="FIELDDELIM_MAIN">|</SEQ>
+    </RULES>
+
+    <RULES DEFAULT="COMMENT1" SET="EVEN_QUOTED">
+        <SEQ TYPE="MARKUP" DELEGATE="EVEN_QUOTED">""</SEQ>
+        <SEQ TYPE="MARKUP" DELEGATE="FIELDDELIM_ODD_QUOTED">"|"</SEQ>
+        <SEQ TYPE="MARKUP" DELEGATE="FIELDDELIM_MAIN">"|</SEQ>
+        <SEQ TYPE="MARKUP" DELEGATE="MAIN">"</SEQ>
+    </RULES>
+
+    <!-- Field delimiter rules -->
+
+    <RULES SET="FIELDDELIM_MAIN">
+        <SEQ TYPE="MARKUP" DELEGATE="FIELDDELIM_ODD_QUOTED" AT_LINE_START="TRUE">"</SEQ>
+        <SEQ TYPE="MARKUP" DELEGATE="FIELDDELIM_EVEN_QUOTED">|"</SEQ>
+        <EOL_SPAN_REGEXP TYPE="MARKUP" HASH_CHAR="|" DELEGATE="FIELDDELIM_LAST_COLUMN">\|(?=[^|]*$)</EOL_SPAN_REGEXP>
+        <SEQ TYPE="MARKUP" DELEGATE="FIELDDELIM_EVEN">|</SEQ>
+    </RULES>
+
+    <RULES SET="FIELDDELIM_ODD_QUOTED">
+        <SEQ TYPE="MARKUP" DELEGATE="FIELDDELIM_ODD_QUOTED">""</SEQ>
+        <SEQ_REGEXP TYPE="MARKUP" HASH_CHAR="&quot;" DELEGATE="FIELDDELIM_MAIN">"(?=\|[^"][^|]*$)</SEQ_REGEXP>
+        <SEQ TYPE="MARKUP" DELEGATE="FIELDDELIM_EVEN_QUOTED">"|"</SEQ>
+        <SEQ_REGEXP TYPE="MARKUP" HASH_CHAR="&quot;|" DELEGATE="FIELDDELIM_MAIN">"\|$</SEQ_REGEXP>
+        <SEQ TYPE="MARKUP" DELEGATE="FIELDDELIM_EVEN">"|</SEQ>
+        <SEQ_REGEXP TYPE="MARKUP" HASH_CHAR="&quot;" DELEGATE="FIELDDELIM_MAIN">"$</SEQ_REGEXP>
+        <SEQ TYPE="MARKUP" DELEGATE="FIELDDELIM_EVEN">"</SEQ>
+    </RULES>
+
+    <RULES SET="FIELDDELIM_EVEN" DEFAULT="COMMENT1">
+        <SEQ TYPE="MARKUP" DELEGATE="FIELDDELIM_ODD_QUOTED">|"</SEQ>
+        <SEQ TYPE="MARKUP" DELEGATE="FIELDDELIM_MAIN">|</SEQ>
+    </RULES>
+
+    <RULES SET="FIELDDELIM_EVEN_QUOTED" DEFAULT="COMMENT1">
+        <SEQ TYPE="MARKUP" DELEGATE="FIELDDELIM_EVEN_QUOTED">""</SEQ>
+        <SEQ TYPE="MARKUP" DELEGATE="FIELDDELIM_ODD_QUOTED">"|"</SEQ>
+        <SEQ TYPE="MARKUP" DELEGATE="FIELDDELIM_MAIN">"|</SEQ>
+        <SEQ TYPE="MARKUP" DELEGATE="FIELDDELIM_MAIN">"</SEQ>
+    </RULES>
+
+    <RULES SET="FIELDDELIM_LAST_COLUMN" DEFAULT="COMMENT1">
+    </RULES>
+</MODE>

@@ -1,5 +1,5 @@
 ! Copyright (C) 2010 Sascha Matzke.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors assocs calendar combinators
 combinators.short-circuit constructors kernel linked-assocs
 math math.bitwise random strings uuid ;
@@ -51,7 +51,7 @@ CONSTRUCTOR: <dbref> dbref ( ref id -- dbref ) ;
 TUPLE: mdbregexp { regexp string } { options string } ;
 
 : <mdbregexp> ( string -- mdbregexp )
-   [ mdbregexp new ] dip >>regexp ;
+    [ mdbregexp new ] dip >>regexp ;
 
 
 CONSTANT: MDB_OID_FIELD "_id"

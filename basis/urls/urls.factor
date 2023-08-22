@@ -1,12 +1,12 @@
 ! Copyright (C) 2008, 2011 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 
 USING: accessors ascii assocs combinators
-combinators.short-circuit fry io.encodings.string
-io.encodings.utf8 io.pathnames io.sockets io.sockets.secure
-kernel lexer linked-assocs make math math.parser multiline
-namespaces peg.ebnf present sequences sequences.generalizations
-splitting strings strings.parser urls.encoding vocabs.loader ;
+combinators.short-circuit io.pathnames io.sockets
+io.sockets.secure kernel lexer linked-assocs make math.parser
+multiline namespaces peg.ebnf present protocols sequences
+sequences.generalizations splitting strings strings.parser
+urls.encoding vocabs.loader ;
 
 IN: urls
 
@@ -29,7 +29,7 @@ TUPLE: url protocol username password host port path query anchor ;
 ERROR: malformed-port string ;
 
 : parse-port ( string -- port/f )
-    [ f ] [ dup string>number [ ] [ malformed-port ] ?if ] if-empty ;
+    [ f ] [ [ string>number ] [ malformed-port ] ?unless ] if-empty ;
 
 : parse-host ( string -- host/f port/f )
     [
@@ -115,12 +115,12 @@ M: pathname >url string>> >url ;
     ] [ 2drop ] if ;
 
 : url-port ( url -- port/f )
-    [ port>> ] [ protocol>> protocol-port ] bi over =
+    [ port>> ] [ protocol>> lookup-protocol-port ] bi over =
     [ drop f ] when ;
 
 : ipv6-host ( host -- host/ipv6 ipv6? )
     dup { [ "[" head? ] [ "]" tail? ] } 1&& [
-        1 swap [ length 1 - ] [ subseq ] bi t
+        1 swap index-of-last subseq t
     ] [ f ] if ;
 
 : unparse-host ( url -- host )
@@ -164,7 +164,7 @@ PRIVATE>
         { [ dup "/" head? ] [ nip ] }
         { [ dup empty? ] [ drop ] }
         { [ over "/" tail? ] [ append ] }
-        { [ "/" pick subseq-start not ] [ nip ] }
+        { [ over "/" subseq-index not ] [ nip ] }
         [ [ "/" split1-last drop "/" ] dip 3append ]
     } cond remove-dot-segments ;
 
@@ -201,7 +201,7 @@ PRIVATE>
     [
         [ host>> ipv6-host drop ]
         [ port>> ]
-        [ protocol>> protocol-port ]
+        [ protocol>> lookup-protocol-port ]
         tri or <inet>
     ] [
         dup protocol>> secure-protocol?
@@ -213,7 +213,7 @@ PRIVATE>
     [ port>> >>port ] bi ;
 
 : ensure-port ( url -- url' )
-    clone dup protocol>> '[ _ protocol-port or ] change-port ;
+    clone dup protocol>> '[ _ lookup-protocol-port or ] change-port ;
 
 ! Literal syntax
 SYNTAX: URL" lexer get skip-blank parse-string >url suffix! ;

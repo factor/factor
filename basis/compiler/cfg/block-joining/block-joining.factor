@@ -1,5 +1,5 @@
 ! Copyright (C) 2009 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors combinators combinators.short-circuit
 compiler.cfg compiler.cfg.predecessors compiler.cfg.rpo
 compiler.cfg.utilities kernel sequences ;

@@ -1,5 +1,5 @@
 ! Copyright (C) 2008 Alex Chapman
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors assocs couchdb hashtables kernel namespaces
 random.data sequences strings tools.test ;
 IN: couchdb.tests

@@ -1,5 +1,5 @@
 ! Copyright (c) 2008 Daniel Ehrenberg.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors arrays continuations debugger definitions
 effects effects.parser generalizations io kernel
 locals.definitions locals.parser prettyprint sequences

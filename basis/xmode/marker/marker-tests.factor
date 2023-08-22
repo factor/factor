@@ -37,13 +37,13 @@ xmode.marker tools.test kernel ;
 
 {
     {
-        T{ token f "//" COMMENT2 }
-        T{ token f " " COMMENT2 }
-        T{ token f "hello" COMMENT2 }
-        T{ token f " " COMMENT2 }
-        T{ token f "world" COMMENT2 }
+        T{ token f "#" COMMENT1 }
+        T{ token f " " COMMENT1 }
+        T{ token f "hello" COMMENT1 }
+        T{ token f " " COMMENT1 }
+        T{ token f "world" COMMENT1 }
     }
-} [ f "// hello world" "java" load-mode tokenize-line nip ] unit-test
+} [ f "# hello world" "python" load-mode tokenize-line nip ] unit-test
 
 
 {
@@ -82,7 +82,7 @@ xmode.marker tools.test kernel ;
         T{ token f ">" KEYWORD2 }
     }
 } [
-     f "<!ELEMENT %hello; >" "xml" load-mode tokenize-line nip
+    f "<!ELEMENT %hello; >" "xml" load-mode tokenize-line nip
 ] unit-test
 
 {
@@ -97,7 +97,7 @@ xmode.marker tools.test kernel ;
         T{ token f ">" KEYWORD2 }
     }
 } [
-     f "<!ELEMENT %hello-world; >" "xml" load-mode tokenize-line nip
+    f "<!ELEMENT %hello-world; >" "xml" load-mode tokenize-line nip
 ] unit-test
 
 {

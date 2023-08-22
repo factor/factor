@@ -1,5 +1,5 @@
 ! Copyright (c) 2007-2010 Slava Pestov, Doug Coleman, Aaron Schaefer, John Benediktsson.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 
 USING: accessors arrays assocs classes.tuple combinators hints
 kernel kernel.private make math math.functions math.order
@@ -48,7 +48,7 @@ PRIVATE>
     '[ dup _ >= [ 1 + ] when ] map! drop ; inline
 
 : (>permutation) ( seq n index -- seq )
-    swap [ dupd (head) <slice-unsafe> ] dip bump-indices ;
+    swap [ dupd head-to-index <slice-unsafe> ] dip bump-indices ;
 
 : >permutation ( factoradic -- permutation )
     reverse! dup [ (>permutation) ] each-index reverse! ;
@@ -139,7 +139,7 @@ PRIVATE>
     [ nip ] [ nth-unsafe ] 2bi [ > ] curry find-last drop ; inline
 
 : reverse-tail! ( n seq -- seq )
-    [ swap 1 + (tail) <slice-unsafe> reverse! drop ] keep ; inline
+    [ swap 1 + index-to-tail <slice-unsafe> reverse! drop ] keep ; inline
 
 : (next-permutation) ( seq -- seq )
     dup cut-point [
@@ -187,15 +187,15 @@ PRIVATE>
 :: nCk-with-replacement ( n k -- nCk )
     k 1 - n + factorial k factorial / n 1 - factorial / ; inline
 
-:: next-combination-with-replacement ( seq n -- seq )
-    seq n 1 - '[ _ = not ] find-last drop :> i
-    seq i tail-slice i seq nth 1 + '[ drop _ ] map! drop
-    seq ; inline
+:: next-combination-with-replacement ( seq n -- )
+    seq n 1 - '[ _ = not ] find-last drop [| i |
+        seq i tail-slice i seq nth 1 + '[ drop _ ] map! drop
+    ] when* ; inline
 
 :: combinations-with-replacement-quot ( seq k quot -- seq quot' )
     seq length :> n
     n k nCk-with-replacement <iota> k 0 <array> seq quot n
-    '[ drop _ [ _ nths-unsafe @ ] keep _ next-combination-with-replacement drop ] ; inline
+    '[ drop _ [ _ nths-unsafe @ ] keep _ next-combination-with-replacement ] ; inline
 
 PRIVATE>
 
@@ -266,23 +266,23 @@ INSTANCE: combinations immutable-sequence
     over length - '[ _ + >= ] find-index drop ; inline
 
 : increment-rest ( i seq -- )
-    [ nth-unsafe ] [ swap (tail) <slice-unsafe> ] 2bi
+    [ nth-unsafe ] [ swap index-to-tail <slice-unsafe> ] 2bi
     [ drop 1 + dup ] map! 2drop ; inline
 
 : increment-last ( seq -- )
-    [ [ length 1 - ] keep [ 1 + ] change-nth-unsafe ] unless-empty ; inline
+    [ index-of-last [ 1 + ] change-nth-unsafe ] unless-empty ; inline
 
-:: next-combination ( seq n -- seq )
+:: next-combination ( seq n -- )
     seq n find-max-index [
         1 [-] seq increment-rest
     ] [
         seq increment-last
-    ] if* seq ; inline
+    ] if* ; inline
 
 :: combinations-quot ( seq k quot -- seq quot' )
     seq length :> n
     n k nCk <iota> k <iota> >array seq quot n
-    '[ drop _ [ _ nths-unsafe @ ] keep _ next-combination drop ] ; inline
+    '[ drop _ [ _ nths-unsafe @ ] keep _ next-combination ] ; inline
 
 PRIVATE>
 

@@ -1,5 +1,5 @@
 ! Copyright (C) 2014 Benjamin Pollack
-! See http://factorcode.org/license.txt for BSD license
+! See https://factorcode.org/license.txt for BSD license
 
 USING: continuations kernel redis math math.parser sequences
 sorting tools.test ;
@@ -30,7 +30,7 @@ IN: redis.tests
 { { "aa" "ab" "ac" } } [
     [
         { "aa" "ab" "ac" "bd" } [ "hello" swap redis-set ] each
-        "a*" redis-keys natural-sort
+        "a*" redis-keys sort
     ] with-redis-test
 ] unit-test
 
@@ -65,4 +65,18 @@ IN: redis.tests
         "world" "hello" redis-set
         [ "hello" redis-incr ] [ drop t ] recover
     ] with-redis-test
+] unit-test
+
+{ "e0e1f9fabfc9d4800c877a703b823ac0578ff8db" } [
+    [ "return 1" redis-script-load ] with-redis-test
+] unit-test
+
+{ { 0 0 } } [
+    [ { "foo" "bar" } redis-script-exists ] with-redis-test
+] unit-test
+
+{ } [ [ redis-script-flush ] with-redis-test ] unit-test
+
+{ { "foo" } } [
+    [ "return { ARGV[1] }" { } { "foo" } redis-script-eval ] with-redis-test
 ] unit-test

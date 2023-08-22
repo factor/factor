@@ -1,10 +1,10 @@
 ! Copyright (c) 2008 Aaron Schaefer.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: arrays kernel math ranges namespaces project-euler.common
 sequences sequences.extras ;
 IN: project-euler.039
 
-! http://projecteuler.net/index.php?section=problems&id=39
+! https://projecteuler.net/index.php?section=problems&id=39
 
 ! DESCRIPTION
 ! -----------
@@ -14,13 +14,13 @@ IN: project-euler.039
 
 !     {20,48,52}, {24,45,51}, {30,40,50}
 
-! For which value of p < 1000, is the number of solutions maximised?
+! For which value of p < 1000, is the number of solutions maximized?
 
 
 ! SOLUTION
 ! --------
 
-! Algorithm adapted from http://mathworld.wolfram.com/PythagoreanTriple.html
+! Algorithm adapted from https://mathworld.wolfram.com/PythagoreanTriple.html
 ! Identical implementation as problem #75
 
 ! Basically, this makes an array of 1000 zeros, recursively creates primitive

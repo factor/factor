@@ -45,4 +45,19 @@ pre, code {
     .posts {
         margin-right: 0;
     }
+
+    blockquote {
+        margin: 0.5rem;
+    }
+}
+
+/* Dark mode */
+@media (prefers-color-scheme: dark) {
+    .posting-title {
+        background-color: #373e48;
+    }
+
+    pre, code {
+        color: #bdc1c6;
+    }
 }

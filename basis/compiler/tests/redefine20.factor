@@ -12,12 +12,12 @@ TUPLE: funny ;
 
 M: funny cnm-recompile-test call-next-method ;
 
-[ object ] [ funny new cnm-recompile-test ] unit-test
+{ object } [ funny new cnm-recompile-test ] unit-test
 
-[ ] [ [ funny sequence add-mixin-instance ] with-compilation-unit ] unit-test
+{ } [ [ funny sequence add-mixin-instance ] with-compilation-unit ] unit-test
 
-[ sequence ] [ funny new cnm-recompile-test ] unit-test
+{ sequence } [ funny new cnm-recompile-test ] unit-test
 
-[ ] [ [ funny sequence remove-mixin-instance ] with-compilation-unit ] unit-test
+{ } [ [ funny sequence remove-mixin-instance ] with-compilation-unit ] unit-test
 
-[ object ] [ funny new cnm-recompile-test ] unit-test
+{ object } [ funny new cnm-recompile-test ] unit-test

@@ -385,13 +385,13 @@ must-fail-with
 ! Moving a method from one vocab to another didn't always work
 GENERIC: move-method-generic ( a -- b )
 
-{ } [ "IN: generic.standard.tests.a USE: strings USE: generic.standard.tests M: string move-method-generic ;" <string-reader> "move-method-test-1" parse-stream drop ] unit-test
+[ "IN: generic.standard.tests.a USE: strings USE: generic.standard.tests M: string move-method-generic ;" <string-reader> "move-method-test-1" parse-stream ] must-not-fail
 
-{ } [ "IN: generic.standard.tests.b USE: strings USE: generic.standard.tests M: string move-method-generic ;" <string-reader> "move-method-test-2" parse-stream drop ] unit-test
+[ "IN: generic.standard.tests.b USE: strings USE: generic.standard.tests M: string move-method-generic ;" <string-reader> "move-method-test-2" parse-stream ] must-not-fail
 
-{ } [ "IN: generic.standard.tests.a" <string-reader> "move-method-test-1" parse-stream drop ] unit-test
+[ "IN: generic.standard.tests.a" <string-reader> "move-method-test-1" parse-stream ] must-not-fail
 
-{ { string } } [ \ move-method-generic order ] unit-test
+{ { string } } [ \ move-method-generic dispatch-order ] unit-test
 
 ! FORGET: on method wrappers
 GENERIC: forget-test ( a -- b )
@@ -428,11 +428,11 @@ M: slice foozul ;
 
 { } [ reversed \ foozul method-for-class M\ reversed foozul assert= ] unit-test
 { } [ { 1 2 3 } <reversed> \ foozul method-for-object M\ reversed foozul assert= ] unit-test
-{ } [ { 1 2 3 } <reversed> \ foozul effective-method M\ reversed foozul assert= drop ] unit-test
+[ { 1 2 3 } <reversed> \ foozul effective-method M\ reversed foozul assert= ] must-not-fail
 
 { } [ fixnum \ foozul method-for-class M\ integer foozul assert= ] unit-test
 { } [ 13 \ foozul method-for-object M\ integer foozul assert= ] unit-test
-{ } [ 13 \ foozul effective-method M\ integer foozul assert= drop ] unit-test
+[ 13 \ foozul effective-method M\ integer foozul assert= ] must-not-fail
 
 ! Ensure dynamic and static dispatch match in ambiguous cases
 UNION: amb-union-1a integer float ;

@@ -1,5 +1,5 @@
 ! Copyright (C) 2011 Alex Vondrak.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors assocs compiler.cfg compiler.cfg.graphviz
 compiler.cfg.gvn compiler.cfg.gvn.expressions compiler.cfg.gvn.graph
 compiler.cfg.optimizer compiler.cfg.utilities compiler.test
@@ -26,7 +26,7 @@ M: object expr>str unparse ;
     ] if ;
 
 : gvns ( -- str )
-    vregs>vns get >alist natural-sort [
+    vregs>vns get >alist sort [
         first2 value-mapping
     ] map "" concat-as ;
 
@@ -36,9 +36,9 @@ M: object expr>str unparse ;
     ] keep ;
 
 : congruence-classes ( -- str )
-    vregs>vns get invert-assoc >alist natural-sort [
+    vregs>vns get invert-assoc >alist sort [
         first2
-        natural-sort [ number>string ] map ", " join
+        sort [ number>string ] map ", " join
         over exprs>vns get value-at expr>str
         "<%d> : {%s} (%s)\\l" sprintf
     ] map "" concat-as ;

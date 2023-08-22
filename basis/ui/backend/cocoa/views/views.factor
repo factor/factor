@@ -1,5 +1,5 @@
 ! Copyright (C) 2006, 2010 Slava Pestov
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 
 USING: accessors alien alien.c-types alien.data alien.strings
 arrays assocs classes cocoa cocoa.application cocoa.classes
@@ -12,7 +12,7 @@ math.rectangles math.vectors namespaces opengl sequences
 splitting threads ui.backend.cocoa.input-methods ui.commands
 ui.gadgets ui.gadgets.editors ui.gadgets.line-support
 ui.gadgets.private ui.gadgets.worlds ui.gestures ui.private
-words ;
+ui.theme ui.theme.switching words ;
 
 IN: ui.backend.cocoa.views
 
@@ -76,8 +76,8 @@ CONSTANT: key-codes
     }
 
 : key-code ( event -- string ? )
-    dup -> keyCode key-codes at
-    [ t ] [ -> charactersIgnoringModifiers CF>string f ] ?if ;
+    dup -> keyCode key-codes at or*
+    [ t ] [ -> charactersIgnoringModifiers CF>string f ] if ;
 
 : event-modifiers ( event -- modifiers )
     -> modifierFlags modifiers modifier ;
@@ -325,12 +325,12 @@ PRIVATE>
 
     ! Light/Dark Mode
 
-!     METHOD: void viewDidChangeEffectiveAppearance [
-!         self -> effectiveAppearance -> name [
-!             CF>string "NSAppearanceNameDarkAqua" =
-!             dark-theme light-theme ? switch-theme-if-default
-!         ] when*
-!     ] ;
+    METHOD: void viewDidChangeEffectiveAppearance [
+        self -> effectiveAppearance -> name [
+            CF>string "NSAppearanceNameDarkAqua" =
+            dark-theme light-theme ? switch-theme-if-default
+        ] when*
+    ] ;
 
     ! Events
     METHOD: char acceptsFirstMouse: id event [ 0 ] ;

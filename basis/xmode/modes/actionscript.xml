@@ -38,8 +38,7 @@
 			<END>'</END>
 		</SPAN>
 
-		<MARK_PREVIOUS TYPE="FUNCTION" MATCH_TYPE="OPERATOR">(</MARK_PREVIOUS>
-		<SEQ TYPE="OPERATOR">)</SEQ>
+		<MARK_PREVIOUS TYPE="FUNCTION" MATCH_TYPE="CONTEXT">(</MARK_PREVIOUS>
 
 		<EOL_SPAN TYPE="COMMENT1">//</EOL_SPAN>
 		<SEQ TYPE="NULL">)</SEQ>
@@ -68,7 +67,7 @@
 		<SEQ TYPE="OPERATOR">]</SEQ>
 		<SEQ TYPE="OPERATOR">[</SEQ>
 		<SEQ TYPE="OPERATOR">?</SEQ>
-		<MARK_PREVIOUS TYPE="LABEL" MATCH_TYPE="OPERATOR"
+		<MARK_PREVIOUS TYPE="LABEL" MATCH_TYPE="CONTEXT"
 			AT_LINE_START="TRUE">:</MARK_PREVIOUS>
 		<SEQ TYPE="OPERATOR">:</SEQ>
 
@@ -106,6 +105,7 @@
 			<KEYWORD1>while</KEYWORD1>
 			<KEYWORD1>with</KEYWORD1>
 
+			<KEYWORD2>Bindable</KEYWORD2>
 			<!-- Built-in objects (good idea not to use these names!)-->
 			<KEYWORD3>Array</KEYWORD3>
 			<KEYWORD3>Boolean</KEYWORD3>
@@ -114,9 +114,11 @@
 			<KEYWORD3>Function</KEYWORD3>
 			<KEYWORD3>Key</KEYWORD3>
 			<KEYWORD3>MovieClip</KEYWORD3>
+			<KEYWORD3>Sprite</KEYWORD3>
 			<KEYWORD3>Math</KEYWORD3>
 			<KEYWORD3>Mouse</KEYWORD3>
 			<KEYWORD3>Number</KEYWORD3>
+			<KEYWORD3>uint</KEYWORD3>
 			<KEYWORD3>Object</KEYWORD3>
 			<KEYWORD3>Selection</KEYWORD3>
 			<KEYWORD3>Sound</KEYWORD3>
@@ -197,7 +199,7 @@
 			<LITERAL2>setInterval</LITERAL2>
 			<LITERAL2>setI</LITERAL2>
 			<KEYWORD3>MMExecute</KEYWORD3>
-
+			
 			 <!-- MovieCLip methods-->
 			<LITERAL2>attachMovie</LITERAL2>
 			<LITERAL2>createEmptyMovieClip</LITERAL2>
@@ -219,7 +221,7 @@
 			<LITERAL2>getTextSnapshot</LITERAL2>
 			<LITERAL2>getSWFVersion</LITERAL2>
 			<LITERAL2>getSWFVersion</LITERAL2>
-
+			
 			<!-- MovieCLip drawing methods  -->
 			<LITERAL2>beginFill</LITERAL2>
 			<LITERAL2>beginGradientFill</LITERAL2>
@@ -229,7 +231,7 @@
 			<LITERAL2>lineStyle</LITERAL2>
 			<LITERAL2>lineTo</LITERAL2>
 			<LITERAL2>moveTo</LITERAL2>
-
+			
 			<!-- MovieCLip properties  -->
 			<LITERAL2>enabled</LITERAL2>
 			<LITERAL2>focusEnabled</LITERAL2>
@@ -240,7 +242,7 @@
 			<LITERAL2>trackAsMenu</LITERAL2>
 			<LITERAL2>menu</LITERAL2>
 			<LITERAL2>useHandCursor</LITERAL2>
-
+			
 			<!-- MovieCLip Events  -->
 			<LITERAL2>onData</LITERAL2>
 			<LITERAL2>onDragOut</LITERAL2>
@@ -260,7 +262,7 @@
 			<LITERAL2>onRollOver</LITERAL2>
 			<LITERAL2>onSetFocus</LITERAL2>
 			<LITERAL2>onUnload</LITERAL2>
-
+			
 			<!-- MovieClipLoader class -->
 			<LITERAL2>MovieClipLoader</LITERAL2>
 			<LITERAL2>getProgress</LITERAL2>
@@ -271,11 +273,11 @@
 			<LITERAL2>onLoadProgress</LITERAL2>
 			<LITERAL2>onLoadStart</LITERAL2>
 			<LITERAL2>unloadClip</LITERAL2>
-
+			
 			<!-- PrintJob class -->
 			<LITERAL2>PrintJob</LITERAL2>
 			<LITERAL2>addPage</LITERAL2>
-
+			
 			<!-- Camera class -->
 			<LITERAL2>Camera</LITERAL2>
 			<LITERAL2>activityLevel</LITERAL2>
@@ -294,7 +296,7 @@
 			<LITERAL2>setMode</LITERAL2>
 			<LITERAL2>setMotionLevel</LITERAL2>
 			<LITERAL2>setQuality</LITERAL2>
-
+			
 			<!-- Microphone class -->
 			<LITERAL2>Microphone</LITERAL2>
 			<LITERAL2>gain</LITERAL2>
@@ -306,7 +308,7 @@
 			<LITERAL2>silenceLevel</LITERAL2>
 			<LITERAL2>silenceTimeout</LITERAL2>
 			<LITERAL2>useEchoSuppression</LITERAL2>
-
+			
 			<!-- ContextMenu Class -->
 			<LITERAL2>ContextMenu</LITERAL2>
 			<LITERAL2>builtInItems</LITERAL2>
@@ -318,17 +320,17 @@
 			<LITERAL2>ContextMenuItem</LITERAL2>
 			<LITERAL2>separatorBefore</LITERAL2>
 			<LITERAL2>visible</LITERAL2>
-
+			
 			<!-- Error class -->
 			<LITERAL2>Error</LITERAL2>
 			<LITERAL2>visible</LITERAL2>
 			<LITERAL2>message</LITERAL2>
-
+			
 			<!-- operators grenn-->
 			<KEYWORD1>instanceof</KEYWORD1>
 			<KEYWORD1>#endinitclip</KEYWORD1>
 			<KEYWORD1>#initclip</KEYWORD1>
-
+			
 			<!-- properties -->
 			<LITERAL2>_alpha</LITERAL2>
 			<LITERAL2>_currentframe</LITERAL2>
@@ -356,8 +358,8 @@
 			<LITERAL2>_level</LITERAL2>
 			<LITERAL2>_lockroot</LITERAL2>
 			<LITERAL2>_accProps</LITERAL2>
-
-
+			
+			
 			<!-- Array -->
 			<LITERAL2>sortOn</LITERAL2>
 			<LITERAL2>toString</LITERAL2>
@@ -371,13 +373,13 @@
 			<LITERAL2>pop</LITERAL2>
 			<LITERAL2>concat</LITERAL2>
 			<LITERAL2>unshift</LITERAL2>
-
+			
 			<!-- Arguments -->
 			<LITERAL2>arguments</LITERAL2>
 			<LITERAL2>callee</LITERAL2>
 			<LITERAL2>caller</LITERAL2>
 			<LITERAL2>valueOf</LITERAL2>
-
+			
 			<!-- Date Class -->
 			<LITERAL2>getDate</LITERAL2>
 			<LITERAL2>getDay</LITERAL2>
@@ -415,11 +417,11 @@
 			<LITERAL2>setUTCSeconds</LITERAL2>
 			<LITERAL2>setYear</LITERAL2>
 			<LITERAL2>UTC</LITERAL2>
-
+			
 			<!-- Function -->
 			<LITERAL2>_global</LITERAL2>
 			<LITERAL2>apply</LITERAL2>
-
+			
 			<!--  Math Class -->
 			<LITERAL2>abs</LITERAL2>
 			<LITERAL2>acos</LITERAL2>
@@ -438,7 +440,7 @@
 			<LITERAL2>sin</LITERAL2>
 			<LITERAL2>sqrt</LITERAL2>
 			<LITERAL2>tan</LITERAL2>
-
+			
 			<LITERAL2>E</LITERAL2>
 			<LITERAL2>LN2</LITERAL2>
 			<LITERAL2>LN10</LITERAL2>
@@ -447,19 +449,19 @@
 			<LITERAL2>PI</LITERAL2>
 			<LITERAL2>SQRT1_2</LITERAL2>
 			<LITERAL2>SQRT2</LITERAL2>
-
+			
 			<!-- Number -->
 			<LITERAL2>MAX_VALUE</LITERAL2>
 			<LITERAL2>MIN_VALUE</LITERAL2>
 			<LITERAL2>NEGATIVE_INFINITY</LITERAL2>
 			<LITERAL2>POSITIVE_INFINITY</LITERAL2>
-
+			
 			<!-- Object -->
 			<LITERAL2>addProperty</LITERAL2>
 			<LITERAL2>registerClass</LITERAL2>
 			<LITERAL2>unwatch</LITERAL2>
 			<LITERAL2>watch</LITERAL2>
-
+			
 			<!-- String -->
 			<LITERAL2>charAt</LITERAL2>
 			<LITERAL2>charCodeAt</LITERAL2>
@@ -471,13 +473,13 @@
 			<LITERAL2>substring</LITERAL2>
 			<LITERAL2>toLowerCase</LITERAL2>
 			<LITERAL2>toUpperCase</LITERAL2>
-
+			
 			<!-- Accessibility -->
 			<LITERAL2>Accessibility</LITERAL2>
 			<LITERAL2>isActive</LITERAL2>
 			<LITERAL2>updateProperties</LITERAL2>
-
-
+			              
+			
 			<!-- System capabilities Class-->
 			<LITERAL2>System</LITERAL2>
 			<LITERAL2>capabilities</LITERAL2>
@@ -512,13 +514,13 @@
 			<LITERAL2>version</LITERAL2>
 			<!-- System security Class -->
 			<LITERAL2>security</LITERAL2>
-
+			
 			<!-- Color Class -->
 			<LITERAL2>getRGB</LITERAL2>
 			<LITERAL2>getTransform</LITERAL2>
 			<LITERAL2>setRGB</LITERAL2>
 			<LITERAL2>setTransform</LITERAL2>
-
+			
 			<!-- Key Class -->
 			<LITERAL2>addListener</LITERAL2>
 			<LITERAL2>getAscii</LITERAL2>
@@ -544,12 +546,12 @@
 			<LITERAL2>SPACE</LITERAL2>
 			<LITERAL2>TAB</LITERAL2>
 			<LITERAL2>UP</LITERAL2>
-
+			
 			<!-- Mouse -->
 			<LITERAL2>hide</LITERAL2>
 			<LITERAL2>show</LITERAL2>
 			<LITERAL2>onMouseWheel</LITERAL2>
-
+			
 			<!-- Selection Class-->
 			<LITERAL2>getBeginIndex</LITERAL2>
 			<LITERAL2>getCaretIndex</LITERAL2>
@@ -557,14 +559,14 @@
 			<LITERAL2>getFocus</LITERAL2>
 			<LITERAL2>setFocus</LITERAL2>
 			<LITERAL2>setSelection</LITERAL2>
-
+			
 			<!-- SharedObject Class-->
 			<LITERAL2>SharedObject</LITERAL2>
 			<LITERAL2>data</LITERAL2>
 			<LITERAL2>flush</LITERAL2>
 			<LITERAL2>getLocal</LITERAL2>
 			<LITERAL2>getSize</LITERAL2>
-
+			
 			<!-- Sound Class -->
 			<LITERAL2>attachSound</LITERAL2>
 			<LITERAL2>getVolume</LITERAL2>
@@ -578,12 +580,12 @@
 			<LITERAL2>onSoundComplete</LITERAL2>
 			<LITERAL2>id3</LITERAL2>
 			<LITERAL2>onID3</LITERAL2>
-
+			
 			<!-- Video Class -->
 			<LITERAL2>Video</LITERAL2>
 			<LITERAL2>deblocking</LITERAL2>
 			<LITERAL2>smoothing</LITERAL2>
-
+			
 			<!--  Stage Class -->
 			<LITERAL2>Stage</LITERAL2>
 			<LITERAL2>align</LITERAL2>
@@ -592,7 +594,7 @@
 			<LITERAL2>showMenu</LITERAL2>
 			<LITERAL2>width</LITERAL2>
 			<LITERAL2>onResize</LITERAL2>
-
+			
 			<!-- TextField Class -->
 			<LITERAL2>getFontList</LITERAL2>
 			<LITERAL2>getNewTextFormat</LITERAL2>
@@ -629,7 +631,7 @@
 			<LITERAL2>TextField</LITERAL2>
 			<LITERAL2>mouseWheelEnabled</LITERAL2>
 			<LITERAL2>replaceText</LITERAL2>
-
+			
 			<!-- StyleSheet Class -->
 			<LITERAL2>StyleSheet</LITERAL2>
 			<LITERAL2>getStyle</LITERAL2>
@@ -637,7 +639,7 @@
 			<LITERAL2>parseCSS</LITERAL2>
 			<LITERAL2>setStyle</LITERAL2>
 			<LITERAL2>styleSheet</LITERAL2>
-
+			
 			<!-- TextFormat Class -->
 			<LITERAL2>TextFormat</LITERAL2>
 			<LITERAL2>getTextExtent</LITERAL2>
@@ -656,7 +658,7 @@
 			<LITERAL2>target</LITERAL2>
 			<LITERAL2>underline</LITERAL2>
 			<LITERAL2>url</LITERAL2>
-
+			
 			<!-- TextSnapshot object -->
 			<LITERAL2>TextSnapshot</LITERAL2>
 			<LITERAL2>findText</LITERAL2>
@@ -667,7 +669,7 @@
 			<LITERAL2>getText</LITERAL2>
 			<LITERAL2>setSelectColor</LITERAL2>
 			<LITERAL2>setSelected</LITERAL2>
-
+			
 			<!-- LoadVars Class-->
 			<LITERAL2>LoadVars</LITERAL2>
 			<LITERAL2>load</LITERAL2>
@@ -676,13 +678,13 @@
 			<LITERAL2>contentType</LITERAL2>
 			<LITERAL2>loaded</LITERAL2>
 			<LITERAL2>addRequestHeader</LITERAL2>
-
+			
 			<!-- LocalConnection Class-->
 			<LITERAL2>LocalConnection</LITERAL2>
 			<LITERAL2>allowDomain</LITERAL2>
 			<LITERAL2>allowInsecureDomain</LITERAL2>
 			<LITERAL2>domain</LITERAL2>
-
+			
 			<!-- XML Class -->
 			<LITERAL2>appendChild</LITERAL2>
 			<LITERAL2>cloneNode</LITERAL2>
@@ -711,7 +713,7 @@
 			<LITERAL2>onClose</LITERAL2>
 			<LITERAL2>onConnect</LITERAL2>
 			<LITERAL2>onXML</LITERAL2>
-
+			
 			<!-- CustomActions Class -->
 			<LITERAL2>CustomActions</LITERAL2>
 			<LITERAL2>onUpdate</LITERAL2>
@@ -719,10 +721,10 @@
 			<LITERAL2>list</LITERAL2>
 			<LITERAL2>install</LITERAL2>
 			<LITERAL2>get</LITERAL2>
-
+			
 			<!-- NetConnection Class -->
 			<LITERAL2>NetConnection</LITERAL2>
-
+			
 			<!-- NetStream Class-->
 			<LITERAL2>NetStream</LITERAL2>
 			<LITERAL2>bufferLength</LITERAL2>
@@ -733,7 +735,7 @@
 			<LITERAL2>seek</LITERAL2>
 			<LITERAL2>setBufferTime</LITERAL2>
 			<LITERAL2>time</LITERAL2>
-
+			
 			<!-- RecordSet Class -->
 			<LITERAL2>DataGlue</LITERAL2>
 			<LITERAL2>bindFormatFunction</LITERAL2>
@@ -764,7 +766,7 @@
 			<LITERAL2>setDeliveryMode</LITERAL2>
 			<LITERAL2>setField</LITERAL2>
 			<LITERAL2>sortItemsBy</LITERAL2>
-
+			
 			<!-- deprecated-->
 			<KEYWORD2>chr</KEYWORD2>
 			<KEYWORD2>mbchr</KEYWORD2>
@@ -773,12 +775,12 @@
 			<KEYWORD2>mbsubstring</KEYWORD2>
 			<KEYWORD2>ord</KEYWORD2>
 			<KEYWORD2>_highquality</KEYWORD2>
-
+			
 			<!-- END-->
-
+			
 			<!--ECMAScript keywords-->
-			<!-- Reserved for future use
-				(some are already used in some Javascript Engines)
+			<!-- Reserved for future use 
+				(some are already used in some Javascript Engines) 
 			-->
 			<KEYWORD1>abstract</KEYWORD1>
 			<KEYWORD3>boolean</KEYWORD3>
@@ -813,6 +815,7 @@
 			<KEYWORD1>protected</KEYWORD1>
 			<KEYWORD1>public</KEYWORD1>
 			<KEYWORD1>dynamic</KEYWORD1>
+			<KEYWORD1>override</KEYWORD1>
 
 			<KEYWORD3>short</KEYWORD3>
 			<KEYWORD1>static</KEYWORD1>

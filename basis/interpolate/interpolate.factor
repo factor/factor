@@ -1,8 +1,8 @@
 ! Copyright (C) 2008, 2009 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors fry generalizations io io.streams.string kernel
-locals macros make math math.order math.parser multiline
-namespaces present sequences splitting strings vocabs.parser ;
+make math math.order math.parser multiline namespaces present
+sequences splitting strings vocabs.parser ;
 IN: interpolate
 
 <PRIVATE
@@ -21,7 +21,8 @@ TUPLE: anon-var ;
             [
                 "}" split1-slice
                 [
-                    >string dup string>number
+                    >string
+                    [ string>number ]
                     [ 1 + stack-var boa ]
                     [ [ anon-var new ] [ named-var boa ] if-empty ] ?if ,
                 ]
@@ -77,7 +78,7 @@ MACRO: interpolate ( str -- quot )
     [ interpolate ] with-string-writer ; inline
 
 : interpolate-locals-quot ( str -- quot )
-    [ dup search [ [ ] ] [ [ get ] ] ?if ] (interpolate-quot) ;
+    [ [ search ] [ [ ] ] [ [ get ] ] ?if ] (interpolate-quot) ;
 
 MACRO: interpolate-locals ( str -- quot )
     interpolate-locals-quot ;

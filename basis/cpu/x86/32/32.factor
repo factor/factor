@@ -1,5 +1,5 @@
 ! Copyright (C) 2005, 2011 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors alien alien.c-types arrays classes.struct
 combinators compiler.cfg.builder.alien.boxing
 compiler.codegen.gc-maps compiler.codegen.labels

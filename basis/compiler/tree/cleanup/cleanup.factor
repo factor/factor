@@ -1,5 +1,5 @@
 ! Copyright (C) 2008, 2010 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors classes classes.algebra combinators compiler.tree
 compiler.tree.combinators compiler.tree.propagation.branches
 compiler.tree.propagation.info compiler.utilities fry kernel layouts

@@ -1,6 +1,6 @@
 ! Copyright (C) 2009 Doug Coleman.
-! See http://factorcode.org/license.txt for BSD license.
-USING: tools.test sorting.title sorting.slots ;
+! See https://factorcode.org/license.txt for BSD license.
+USING: tools.test sorting sorting.title ;
 IN: sorting.title.tests
 
 : sort-me ( -- seq )
@@ -42,5 +42,5 @@ IN: sorting.title.tests
         "la vida loca"
     }
 } [
-    sort-me { title<=> } sort-by
+    sort-me [ title<=> ] sort-with
 ] unit-test

@@ -3,7 +3,6 @@ namespaces ;
 IN: editors.emeditor
 
 SINGLETON: emeditor
-emeditor editor-class set-global
 
 : emeditor-path ( -- path )
     \ emeditor-path get [

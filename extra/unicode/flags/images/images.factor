@@ -1,5 +1,5 @@
 ! Copyright (C) 2022 Doug Coleman.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs biassocs fonts kernel ranges
 sequences sequences.extras sequences.product strings ui.text
 unicode.flags ;

@@ -10,6 +10,6 @@ IN: benchmark.completion
             remove-nth remove-nth! change-nth
         }
     ] replicate concat [ named completions ] keep
-    [ length ] bi@ assert= ;
+    2length assert= ;
 
 MAIN: completion-benchmark

@@ -1,5 +1,5 @@
 ! Copyright (C) 2009 Joe Groff.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors arrays combinators.smart game.input
 game.input.scancodes game.loop game.worlds
 gpu.render gpu.state kernel literals

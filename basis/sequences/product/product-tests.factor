@@ -1,5 +1,5 @@
 ! Copyright (C) 2009 Joe Groff.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: arrays kernel make math sequences sequences.product tools.test ;
 
 { { { 0 "a" } { 1 "a" } { 2 "a" } { 0 "b" } { 1 "b" } { 2 "b" } } }

@@ -1,5 +1,5 @@
 ! Copyright (C) 2021 Doug Coleman.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors delegate delegate.protocols destructors io
 kernel math sequences ;
 IN: io.streams.counting
@@ -51,3 +51,4 @@ M:: counting-stream stream-contents* ( stream -- seq )
 
 : with-counting-stream ( stream quot -- in-count out-count )
     [ <counting-stream> ] dip [ with-input-stream ] keepd [ in-count>> ] [ out-count>> ] bi ; inline
+

@@ -1,5 +1,5 @@
 ! Copyright (C) 2008, 2010 Slava Pestov, 2011 Alex Vondrak
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs compiler.cfg compiler.cfg.def-use
 compiler.cfg.gvn.avail compiler.cfg.gvn.expressions
 compiler.cfg.gvn.graph compiler.cfg.gvn.rewrite
@@ -10,7 +10,7 @@ IN: compiler.cfg.gvn
 
 GENERIC: simplify ( insn -- insn' )
 
-M: insn simplify dup rewrite [ simplify ] [ dup >avail-insn-uses ] ?if ;
+M: insn simplify [ rewrite ] [ simplify ] [ dup >avail-insn-uses ] ?if ;
 M: array simplify [ simplify ] map ;
 M: ##copy simplify ;
 
@@ -37,7 +37,8 @@ M: ##copy value-number [ src>> vreg>vn ] [ dst>> ] bi set-vn ;
     insn vn vns>insns get set-at ;
 
 : check-redundancy ( insn -- )
-    dup >expr dup exprs>vns get at
+    dup >expr
+    [ exprs>vns get at ]
     [ redundant-instruction ] [ useful-instruction ] ?if ;
 
 M: ##phi value-number

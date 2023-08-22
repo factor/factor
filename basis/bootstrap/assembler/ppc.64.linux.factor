@@ -1,5 +1,5 @@
 ! Copyright (C) 2011 Erik Charlebois.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: parser system kernel sequences math ranges
 cpu.ppc.assembler combinators compiler.constants
 bootstrap.image.private layouts namespaces ;
@@ -19,7 +19,7 @@ CONSTANT: frame-reg 31
 : nv-int-regs ( -- seq ) 13 31 [a..b] ;
 
 : LOAD64 ( r n -- )
-    [ dup ] dip {
+    dupd {
         [ nip -48 shift 0xffff bitand LIS ]
         [ -32 shift 0xffff bitand ORI ]
         [ drop 32 SLDI ]

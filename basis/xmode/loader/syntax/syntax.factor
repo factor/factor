@@ -1,9 +1,9 @@
 ! Copyright (C) 2007, 2009 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs combinators kernel lexer make
 namespaces parser sequences splitting xml.data xml.syntax
-xml.syntax.private xml.traversal xmode.rules xmode.tokens
-xmode.utilities ;
+xml.syntax.private xml.traversal xml.traversal.private
+xmode.rules xmode.tokens xmode.utilities ;
 IN: xmode.loader.syntax
 
 ! Rule tag parsing utilities
@@ -28,13 +28,15 @@ SYNTAX: RULE:
 
 : string>rule-set-name ( string -- name ) "MAIN" or ;
 
+: cdata>string ( tag -- string )
+    children>> [ dup cdata? [ text>> ] when ] map (children>string) ;
+
 ! PROP, PROPS
 : parse-prop-tag ( tag -- key value )
     [ "NAME" attr ] [ "VALUE" attr ] bi ;
 
 : parse-props-tag ( tag -- assoc )
-    children-tags
-    [ parse-prop-tag ] H{ } map>assoc ;
+    children-tags [ parse-prop-tag ] H{ } map>assoc ;
 
 : position-attrs ( tag -- at-line-start? at-whitespace-end? at-word-start? )
     ! XXX Wrong logic!
@@ -42,12 +44,12 @@ SYNTAX: RULE:
     [ attr string>boolean ] with map first3 ;
 
 : parse-literal-matcher ( tag -- matcher )
-    dup children>string
+    dup cdata>string
     rule-set get ignore-case?>> <string-matcher>
     swap position-attrs <matcher> ;
 
 : parse-regexp-matcher ( tag -- matcher )
-    dup children>string
+    dup cdata>string
     rule-set get ignore-case?>> <?insensitive-regexp>
     swap position-attrs <matcher> ;
 
@@ -60,16 +62,25 @@ SYNTAX: RULE:
 : delegate-attr ( -- )
     { "DELEGATE" f delegate<< } , ;
 
+! XXX: check HASH_CHAR for full prefix, not just first character
+
+: char<< ( value object -- )
+    '[ 1 head _ chars<< ] unless-empty ;
+
 : regexp-attr ( -- )
-    { "HASH_CHAR" f chars<< } , ;
+    { "HASH_CHARS" f chars<< } ,
+    { "HASH_CHAR" f char<< } , ;
 
 : match-type-attr ( -- )
     { "MATCH_TYPE" string>match-type match-token<< } , ;
 
+: string>escape ( str -- escape/f )
+    [ f ] [ <escape-rule> ] if-empty ;
+
 : span-attrs ( -- )
     { "NO_LINE_BREAK" string>boolean no-line-break?<< } ,
     { "NO_WORD_BREAK" string>boolean no-word-break?<< } ,
-    { "NO_ESCAPE" string>boolean no-escape?<< } , ;
+    { "ESCAPE" string>escape escape-rule<< } , ;
 
 : literal-start ( -- )
     [ parse-literal-matcher >>start drop ] , ;
@@ -80,26 +91,34 @@ SYNTAX: RULE:
 : literal-end ( -- )
     [ parse-literal-matcher >>end drop ] , ;
 
-! SPAN's children
 TAGS: parse-begin/end-tag ( rule tag -- )
 
 TAG: BEGIN parse-begin/end-tag
-    ! XXX
     parse-literal-matcher >>start drop ;
 
 TAG: END parse-begin/end-tag
-    ! XXX
     parse-literal-matcher >>end drop ;
 
 : parse-begin/end-tags ( -- )
-    [
-        ! XXX: handle position attrs on span tag itself
-        children-tags [ parse-begin/end-tag ] with each
-    ] , ;
+    [ children-tags [ parse-begin/end-tag ] with each ] , ;
+
+TAGS: parse-regexp-begin/end-tag ( rule tag -- )
+
+TAG: BEGIN parse-regexp-begin/end-tag
+    parse-regexp-matcher >>start drop ;
+
+! XXX: END AT_WHITESPACE_END="TRUE"?
+
+TAG: END parse-regexp-begin/end-tag
+    dup "REGEXP" attr string>boolean
+    [ parse-regexp-matcher ] [ parse-literal-matcher ] if >>end drop ;
+
+: parse-regexp-begin/end-tags ( -- )
+    [ children-tags [ parse-regexp-begin/end-tag ] with each ] , ;
 
 : init-span-tag ( -- ) [ drop init-span ] , ;
 
 : init-eol-span-tag ( -- ) [ drop init-eol-span ] , ;
 
 : parse-keyword-tag ( tag keyword-map -- )
-    [ dup main>> string>token swap children>string ] dip set-at ;
+    [ dup main>> string>token swap cdata>string ] dip set-at ;

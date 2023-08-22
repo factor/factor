@@ -1,5 +1,5 @@
 ! Copyright (C) 2012 John Benediktsson, Doug Coleman
-! See http://factorcode.org/license.txt for BSD license
+! See https://factorcode.org/license.txt for BSD license
 
 USING: accessors arrays ascii assocs byte-arrays combinators
 combinators.short-circuit concurrency.combinators csv grouping
@@ -101,10 +101,10 @@ PRIVATE>
 : load-mnist ( -- data-set )
     "resource:datasets" dup make-directories [
         {
-            "http://yann.lecun.com/exdb/mnist/train-images-idx3-ubyte.gz"
-            "http://yann.lecun.com/exdb/mnist/train-labels-idx1-ubyte.gz"
-            "http://yann.lecun.com/exdb/mnist/t10k-images-idx3-ubyte.gz"
-            "http://yann.lecun.com/exdb/mnist/t10k-labels-idx1-ubyte.gz"
+            "https://yann.lecun.com/exdb/mnist/train-images-idx3-ubyte.gz"
+            "https://yann.lecun.com/exdb/mnist/train-labels-idx1-ubyte.gz"
+            "https://yann.lecun.com/exdb/mnist/t10k-images-idx3-ubyte.gz"
+            "https://yann.lecun.com/exdb/mnist/t10k-labels-idx1-ubyte.gz"
         }
         [ [ "resource:datasets/" download-to-directory ] parallel-each ]
         [ [ dup file-stem file-exists? [ drop ] [ file-name gzip-decompress-file ] if ] each ]

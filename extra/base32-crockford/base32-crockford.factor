@@ -1,5 +1,5 @@
 ! Copyright (C) 2019 John Benediktsson
-! See http://factorcode.org/license.txt for BSD license
+! See https://factorcode.org/license.txt for BSD license
 
 USING: ascii assocs byte-arrays kernel literals math sequences ;
 
@@ -11,7 +11,7 @@ IN: base32-crockford
 CONSTANT: ALPHABET $[ "0123456789ABCDEFGHJKMNPQRSTVWXYZ" >byte-array ]
 >>
 
-CONSTANT: INVERSE $[ 256 [ ALPHABET index 0xff or ] B{ } map-integers ]
+CONSTANT: INVERSE $[ 256 [ ALPHABET index 0xff or ] B{ } map-integers-as ]
 
 CONSTANT: CHECKSUM $[ ALPHABET "*~$=U" append ]
 
@@ -31,7 +31,7 @@ PRIVATE>
     normalize-base32 parse-base32 ;
 
 : >base32-crockford ( n -- base32 )
-    dup 0 < [ non-negative-integer-expected ] when
+    assert-non-negative
     [ dup 0 > ] [ 32 /mod ALPHABET nth ] "" produce-as nip
     [ "0" ] when-empty reverse! ;
 

@@ -4,8 +4,8 @@ IN: furnace.asides
 
 HELP: <asides>
 { $values
-     { "responder" "a responder" }
-     { "responder'" "a new responder" }
+    { "responder" "a responder" }
+    { "responder'" "a new responder" }
 }
 { $description "Creates a new " { $link asides } " responder wrapping an existing responder." } ;
 

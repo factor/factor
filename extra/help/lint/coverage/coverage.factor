@@ -25,12 +25,11 @@ CONSTANT: ignored-words {
     $parsing-note
     $io-error
     $shuffle
-    $complex-shuffle
     $nl
 }
 
 : (word-help) ( word -- content )
-    dup "help" word-prop [ ] [ word-help* ] ?if ;
+    [ "help" word-prop ] [ word-help* ] ?unless ;
 
 GENERIC: write-object* ( object -- )
 M: string write-object* write ;
@@ -90,7 +89,7 @@ M: word-help-coverage summary
     } case ;
 
 : sorted-loaded-child-vocabs ( prefix -- assoc )
-    loaded-child-vocab-names natural-sort ; inline
+    loaded-child-vocab-names sort ; inline
 
 : filter-private ( seq -- no-private )
     [ ".private" ?tail nip ] reject ; inline
@@ -143,7 +142,7 @@ M: string <word-help-coverage>
 
 : <vocab-help-coverage> ( vocab-spec -- coverage )
     dup loaded-vocab? [
-        [ auto-use? off vocab-words natural-sort [ <word-help-coverage> ] map ] with-scope
+        [ auto-use? off vocab-words sort [ <word-help-coverage> ] map ] with-scope
     ] [
         unloaded-vocab
     ] if ;

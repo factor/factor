@@ -4,9 +4,9 @@ IN: compiler.tests.folding
 
 ! Calls to generic words were not folded away.
 
-[ ] [ [ "compiler.tests.redefine11" forget-vocab ] with-compilation-unit ] unit-test
+{ } [ [ "compiler.tests.redefine11" forget-vocab ] with-compilation-unit ] unit-test
 
-[ ] [
+{ } [
     "USING: math arrays ;
     IN: compiler.tests.folding
     GENERIC: foldable-generic ( a -- b ) foldable
@@ -14,14 +14,14 @@ IN: compiler.tests.folding
     eval( -- )
 ] unit-test
 
-[ ] [
+{ } [
     "USING: math arrays ;
     IN: compiler.tests.folding
     : fold-test ( -- x ) 10 foldable-generic ;"
     eval( -- )
 ] unit-test
 
-[ t ] [
+{ t } [
     "fold-test" "compiler.tests.folding" lookup-word execute
     "fold-test" "compiler.tests.folding" lookup-word execute
     eq?

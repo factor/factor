@@ -1,19 +1,29 @@
 ! Copyright (C) 2008 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
-USING: accessors assocs furnace.actions furnace.boilerplate
-furnace.redirection help.html help.topics html.components
-html.forms http.server http.server.dispatchers
+! See https://factorcode.org/license.txt for BSD license.
+USING: accessors arrays assocs continuations furnace.actions
+furnace.boilerplate furnace.redirection help.html help.topics
+html.components html.forms http.server http.server.dispatchers
 http.server.static io.directories io.files.temp io.servers
-kernel namespaces sequences unicode urls ;
+kernel namespaces sequences simple-tokenizer splitting unicode
+urls ;
 IN: webapps.help
 
 TUPLE: help-webapp < dispatcher ;
 
+: fixup-words ( title href -- title' href' )
+    dup "word-" head? [
+        dup ".html" ?tail drop "," split1-last nip dup ":" append
+        '[ " (" _ 3append ")" append _ ?head drop ] dip
+    ] when ;
+
 : links ( apropos -- seq )
-    [ swap <simple-link> ] { } assoc>map ;
+    [ swap fixup-words <simple-link> ] { } assoc>map ;
 
 : ?links ( has-links? apropos -- has-links? seq/f )
     links [ f ] [ nip t swap ] if-empty ;
+
+: ?tokenize ( str -- str' )
+    [ tokenize ] [ drop 1array ] recover ;
 
 :: <search-action> ( help-dir -- action )
     <page-action>
@@ -22,12 +32,13 @@ TUPLE: help-webapp < dispatcher ;
             f "search" param [ unicode:blank? ] trim
             dup "search" set-value [
                 help-dir [
+                    ?tokenize concat
                     [ article-apropos ?links "articles" set-value ]
                     [ word-apropos ?links "words" set-value ]
                     [ vocab-apropos ?links "vocabs" set-value ] tri
                 ] with-directory
             ] unless-empty not "empty" set-value
-            help-navbar "navbar" set-value
+            help-nav "nav" set-value
 
             { help-webapp "search" } <chloe-content>
         ] >>display

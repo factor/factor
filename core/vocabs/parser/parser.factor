@@ -1,6 +1,6 @@
 ! Copyright (C) 2007, 2010 Daniel Ehrenberg, Bruno Deferrari,
 ! Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs combinators compiler.units
 continuations hash-sets hashtables kernel math namespaces
 parser.notes sequences sets sorting splitting vectors vocabs
@@ -10,7 +10,7 @@ IN: vocabs.parser
 ERROR: no-word-error name ;
 
 : word-restarts ( possibilities -- restarts )
-    natural-sort [
+    sort [
         [ vocabulary>> "Use the " " vocabulary" surround ] keep
     ] { } map>assoc ;
 
@@ -112,7 +112,7 @@ ERROR: unbalanced-private-declaration vocab ;
 
 : use-vocab ( vocab -- )
     dup using-vocab? [
-        vocab-name "Already using ``" "'' vocabulary" surround note.
+        vocab-name "Already using “" "” vocabulary" surround note.
     ] [
         manifest get
         [ [ ?load-vocab ] dip search-vocabs>> push ]
@@ -169,7 +169,7 @@ TUPLE: rename word vocab words ;
 : <rename> ( word vocab new-name -- rename )
     [
         2dup load-vocab words>> dupd at
-        [ ] [ swap no-word-in-vocab ] ?if
+        or* [ swap no-word-in-vocab ] unless
     ] dip associate rename boa ;
 
 : add-renamed-word ( word vocab new-name -- )

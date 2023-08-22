@@ -1,5 +1,5 @@
 ! Copyright (C) 2010 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors assocs base64 calendar checksums.hmac
 checksums.sha http http.client kernel make math math.parser
 namespaces present random sequences sorting strings

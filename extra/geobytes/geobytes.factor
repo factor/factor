@@ -1,5 +1,5 @@
 ! Copyright (C) 2009 Doug Coleman.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: combinators combinators.smart csv io.encodings.latin1
 kernel math.parser memoize money sequences unicode ;
 IN: geobytes
@@ -8,7 +8,7 @@ IN: geobytes
 ! Please read their license should you choose to use it.
 ! This is just a binding to the GeoBytes CSV files.
 ! Download and install GeoBytes yourself should you wish to use it.
-! http://www.geobytes.com/GeoWorldMap.zip
+! https://www.geobytes.com/GeoWorldMap.zip
 
 CONSTANT: geobytes-cities-path "resource:GeoWorldMap/Cities.txt"
 CONSTANT: geobytes-countries-path "resource:GeoWorldMap/Countries.txt"

@@ -1,5 +1,5 @@
 ! Copyright (C) 2017 Doug Coleman.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: tools.test machine-learning.functions ;
 
 { 0 } [ 0 relu ] unit-test

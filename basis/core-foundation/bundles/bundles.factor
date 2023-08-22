@@ -1,5 +1,5 @@
 ! Copyright (C) 2008 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: alien.c-types alien.syntax core-foundation
 core-foundation.urls kernel sequences ;
 IN: core-foundation.bundles
@@ -16,8 +16,6 @@ FUNCTION: Boolean CFBundleLoadExecutable ( CFBundleRef bundle )
     ] keep CFRelease ;
 
 : load-framework ( name -- )
-    dup <CFBundle> [
-        CFBundleLoadExecutable drop
-    ] [
-        "Cannot load bundle named " prepend throw
-    ] ?if ;
+    [ <CFBundle> ]
+    [ CFBundleLoadExecutable drop ]
+    [ "Cannot load bundle named " prepend throw ] ?if ;

@@ -1,5 +1,5 @@
 ! Copyright (C) 2009 Joe Groff.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: arrays assocs classes classes.tuple.private combinators
 effects.parser generic.parser kernel math math.order parser
 quotations sequences sorting words ;
@@ -22,7 +22,7 @@ ERROR: no-pair-method a b generic ;
 
 : sorted-pair-methods ( word -- alist )
     "pair-generic-methods" word-prop >alist
-    [ first method-sort-key ] inv-sort-with ;
+    [ first method-sort-key ] inv-sort-by ;
 
 : pair-generic-definition ( word -- def )
     [ sorted-pair-methods [ first2 pair-method-cond ] map ]

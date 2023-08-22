@@ -1,5 +1,5 @@
 ! Copyright (C) 2008 Doug Coleman, Eduardo Cavazos.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors assocs combinators combinators.short-circuit
 io.files io.files.types io.pathnames kernel math strings system
 vocabs ;

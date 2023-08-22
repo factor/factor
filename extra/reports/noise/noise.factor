@@ -1,5 +1,5 @@
 ! Copyright (C) 2008 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors assocs math kernel shuffle generalizations
 words quotations arrays combinators sequences math.vectors
 io.styles prettyprint vocabs sorting io generic
@@ -120,7 +120,7 @@ M: lambda-word word-noise-factor
 : noisy-words ( -- alist )
     all-words flatten-generics
     [ word-noise-factor ] zip-with
-    sort-values reverse ;
+    inv-sort-values ;
 
 : noise. ( alist -- )
     standard-table-style [
@@ -140,7 +140,7 @@ M: lambda-word word-noise-factor
 
 : noisy-vocabs ( -- alist )
     loaded-vocab-names [ vocab-noise-factor ] zip-with
-    sort-values reverse ;
+    inv-sort-values ;
 
 : noise-report ( -- )
     "NOISY WORDS:" print

@@ -1,5 +1,5 @@
 ! Copyright (C) 2010 Joe Groff.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors arrays combinators definitions kernel
 locals.types namespaces parser quotations see sequences slots
 words ;

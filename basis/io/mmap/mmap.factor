@@ -1,5 +1,5 @@
 ! Copyright (C) 2007, 2009 Doug Coleman, Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors alien.c-types alien.data combinators
 destructors io.backend io.files.info kernel math system vocabs ;
 IN: io.mmap

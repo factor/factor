@@ -1,8 +1,8 @@
-<?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="10116" systemVersion="15E65" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none">
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="17156" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
     <dependencies>
         <deployment version="1050" identifier="macosx"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="10116"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="17156"/>
     </dependencies>
     <objects>
         <customObject id="-2" userLabel="File's Owner" customClass="NSApplication"/>
@@ -235,6 +235,18 @@
                                                 <action selector="switchDarkTheme:" target="-1" id="2ug-u3-tEU"/>
                                             </connections>
                                         </menuItem>
+                                        <menuItem title="Base16" id="c5Z-R4-x0d">
+                                            <modifierMask key="keyEquivalentModifierMask"/>
+                                            <connections>
+                                                <action selector="switchBase16Theme:" target="-1" id="ilJ-8c-q12"/>
+                                            </connections>
+                                        </menuItem>
+                                        <menuItem title="Wombat" id="5Ri-3D-AWg">
+                                            <modifierMask key="keyEquivalentModifierMask"/>
+                                            <connections>
+                                                <action selector="switchWombatTheme:" target="-1" id="BQz-Hk-EpG"/>
+                                            </connections>
+                                        </menuItem>
                                     </items>
                                 </menu>
                             </menuItem>
@@ -277,6 +289,7 @@
                     </menu>
                 </menuItem>
             </items>
+            <point key="canvasLocation" x="-52" y="128"/>
         </menu>
     </objects>
 </document>

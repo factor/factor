@@ -1,5 +1,5 @@
 ! Copyright (C) 2008 Doug Coleman.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors arrays combinators combinators.smart
 io.files.info.unix kernel math math.order math.parser sequences
 strings system tools.files tools.files.private unicode

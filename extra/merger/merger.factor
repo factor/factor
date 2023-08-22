@@ -8,7 +8,7 @@ MAIN-WINDOW: merger-window {
         { title "Merging" }
         { pref-dim { 300 220 } }
     }
-   vertical <track>
+    vertical <track>
     { "From:" "To:" } f <model> f <model> 2array
     [
         [

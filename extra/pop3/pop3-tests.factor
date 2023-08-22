@@ -1,5 +1,5 @@
 ! Copyright (C) 2009 Elie Chaftari.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: concurrency.promises namespaces kernel pop3 pop3.server
 sequences tools.test accessors calendar ;
 

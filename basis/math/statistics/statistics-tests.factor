@@ -104,12 +104,31 @@ IN: math.statistics
 
 {
     H{
-        { 97 2 }
+        { 97 5 }
         { 98 2 }
         { 99 2 }
     }
 } [
     "aabbcc" histogram
+    "aaa" histogram!
+] unit-test
+
+{
+    H{
+        { 97 5 }
+        { 98 2 }
+        { 99 2 }
+    }
+} [
+    "aabbcc" [ ] histogram-by
+    "aaa" [ ] histogram-by!
+] unit-test
+
+{
+    H{ { t 2 } { f 7 } }
+} [
+    "aabbcc" [ even? ] histogram-by
+    "aaa" [ even? ] histogram-by!
 ] unit-test
 
 { H{ { 1 1/2 } { 2 1/6 } { 3 1/3 } } }
@@ -202,17 +221,17 @@ IN: math.statistics
 
 { { 0 1/4 1/2 3/4 1 } } [ 5 <iota> rescale ] unit-test
 
-
 {
-    { 2 2 2 1 0 5 6 7 7 7 7 }
+    { 3 3 3 2 1 6 7 8 8 8 8 }
 } [
-    { 30 30 30 20 10 40 50 60 60 60 60 } rank-values
+    { 30 30 30 20 10 40 50 60 60 60 60 } rank-by-min
 ] unit-test
 
-{
-    { 1 0 2 3 4 }
-}
-[ { 3 1 4 15 92 } rank-values ] unit-test
+{ { 2 1 3 4 5 } } [ { 3 1 4 15 92 } rank ] unit-test
+
+{ { 1 1 1 4 5 6 } } [ { 1 1 1 2 3 4 } rank-by-min ] unit-test
+{ { 2 2 2 4 5 6 } } [ { 1 1 1 2 3 4 } rank-by-avg ] unit-test
+{ { 3 3 3 4 5 6 } } [ { 1 1 1 2 3 4 } rank-by-max ] unit-test
 
 { { 1 1 2 3 3 4 } }
 [ { 1 2 3 3 2 3 } [ odd? ] cum-count ] unit-test

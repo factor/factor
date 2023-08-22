@@ -1,5 +1,5 @@
 ! Copyright (C) 2009 Doug Coleman.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors calendar combinators.smart db db.sqlite
 db.tuples db.types debugger io.files.temp io.streams.string
 kernel sequences ;
@@ -76,7 +76,7 @@ spidering-site "SPIDERING_SITE" {
     spidering-site new swap >>account-name select-tuples ;
 
 : insert-site ( url -- site )
-    <site> dup select-tuple [ ] [ dup t >>up? insert-tuple ] ?if ;
+    <site> [ select-tuple ] [ dup t >>up? insert-tuple ] ?unless ;
 
 : select-account/site ( username url -- account site )
     insert-site site-id>> ;

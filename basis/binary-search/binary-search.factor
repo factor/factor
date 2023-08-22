@@ -1,12 +1,12 @@
 ! Copyright (C) 2008, 2010 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: arrays combinators kernel math math.order sequences
 sequences.private vectors ;
 IN: binary-search
 
 <PRIVATE
 
-:: (search) ( seq from to quot: ( elt -- <=> ) -- i elt )
+:: (search) ( ... seq from to quot: ( ... elt -- ... <=> ) -- ... i elt )
     from to + 2/ :> midpoint@
     midpoint@ seq nth-unsafe :> midpoint
 
@@ -22,7 +22,7 @@ IN: binary-search
 
 PRIVATE>
 
-: search ( seq quot: ( elt -- <=> ) -- i elt )
+: search ( ... seq quot: ( ... elt -- ... <=> ) -- ... i elt )
     over empty? [ 2drop f f ] [ [ 0 over length ] dip (search) ] if ; inline
 
 GENERIC: natural-search ( obj seq -- i elt )

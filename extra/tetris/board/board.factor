@@ -1,5 +1,5 @@
 ! Copyright (C) 2006, 2007, 2008 Alex Chapman
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors arrays combinators.short-circuit kernel
 math sequences tetris.piece ;
 IN: tetris.board
@@ -22,9 +22,9 @@ TUPLE: board
 : board@block ( board block -- n row )
     [ second swap rows>> nth ] keep first swap ;
 
-: set-block ( board block colour -- ) -rot board@block set-nth ;
+: set-block ( board block color -- ) -rot board@block set-nth ;
 
-: block ( board block -- colour ) board@block nth ;
+: block ( board block -- color ) board@block nth ;
 
 : block-free? ( board block -- ? ) block not ;
 

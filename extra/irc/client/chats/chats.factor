@@ -1,5 +1,5 @@
 ! Copyright (C) 2009 Bruno Deferrari
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors calendar concurrency.mailboxes
 io.encodings.utf8 io.sockets kernel ;
 IN: irc.client.chats
@@ -13,11 +13,11 @@ TUPLE: irc-nick-chat    < irc-chat name ;
 SYMBOL: +server-chat+
 
 : <irc-server-chat> ( -- irc-server-chat )
-     irc-server-chat new
+    irc-server-chat new
          <mailbox> >>in-messages ;
 
 : <irc-channel-chat> ( name -- irc-channel-chat )
-     irc-channel-chat new
+    irc-channel-chat new
          swap       >>name
          <mailbox>  >>in-messages
          f          >>password
@@ -25,7 +25,7 @@ SYMBOL: +server-chat+
          t          >>clear-participants ;
 
 : <irc-nick-chat> ( name -- irc-nick-chat )
-     irc-nick-chat new
+    irc-nick-chat new
          swap      >>name
          <mailbox> >>in-messages ;
 
@@ -33,9 +33,9 @@ TUPLE: irc-profile server port nickname password ;
 C: <irc-profile> irc-profile
 
 TUPLE: irc-client profile stream in-messages out-messages
-       chats is-running nick connect is-ready
-       reconnect-time reconnect-attempts
-       exceptions ;
+    chats is-running nick connect is-ready
+    reconnect-time reconnect-attempts
+    exceptions ;
 
 : <irc-client> ( profile -- irc-client )
     dup nickname>> irc-client new

@@ -11,8 +11,3 @@ M: parse-error error.
     ] [
         "\nGot '" write got>> write "'" print
     ] tri ;
-
-M: parse-failed error.
-    "The " write dup word>> pprint
-    " word could not parse the following input:" print nl
-    input>> . ;

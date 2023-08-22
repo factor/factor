@@ -1,5 +1,5 @@
 ! Copyright (C) 2009 Daniel Ehrenberg.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: compiler.cfg.def-use compiler.cfg.instructions
 compiler.cfg.registers compiler.cfg.utilities compiler.test namespaces
 tools.test ;

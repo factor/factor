@@ -1,5 +1,5 @@
 ! Copyright (C) 2004, 2010 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors alien alien.accessors arrays classes
 combinators compiler.units cpu.architecture delegate kernel
 layouts math math.order math.parser quotations sequences summary
@@ -58,8 +58,8 @@ UNION: c-type-name
     dup c-type-name? [ lookup-c-type ] when ;
 
 M: word lookup-c-type
-    dup "c-type" word-prop resolve-typedef
-    [ ] [ no-c-type ] ?if ;
+    [ "c-type" word-prop resolve-typedef ]
+    [ no-c-type ] ?unless ;
 
 GENERIC: c-type-class ( name -- class )
 

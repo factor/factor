@@ -17,12 +17,11 @@
 		<!-- set this to 'true' if you want to use GNU coding style -->
 		<PROPERTY NAME="doubleBracketIndent" VALUE="false" />
 	</PROPS>
-	<RULES ESCAPE="\"
-		IGNORE_CASE="FALSE"
+	<RULES IGNORE_CASE="FALSE"
 		HIGHLIGHT_DIGITS="TRUE"
 		DIGIT_RE="(0x[\p{XDigit}]+[lL]?|[\p{Digit}]+(e[\p{Digit}]*)?[lLdDfF]?)">
 
-		<SPAN TYPE="LITERAL3">
+		<SPAN TYPE="LITERAL3" ESCAPE="\">
 			<BEGIN>%{</BEGIN>
 			<END>%}</END>
 		</SPAN>

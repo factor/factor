@@ -1,5 +1,5 @@
 ! Copyright (C) 2009 Daniel Ehrenberg
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors byte-arrays classes combinators destructors
 growable io io.private io.streams.plain kernel math math.order
 sequences sequences.private strings ;
@@ -20,14 +20,11 @@ SLOT: i
 : (sequence-read-length) ( n buf stream -- buf count )
     [ underlying>> length ] [ i>> ] bi - rot min ; inline
 
-: <sequence-copy> ( dst n src-i src dst-i -- n copy )
-    [ ] curry 3curry dip <copy> ; inline
-
 : sequence-copy-unsafe ( n buf stream offset -- count )
     [
         [ (sequence-read-length) ]
         [ [ dup pick + ] change-i underlying>> ] bi
-    ] dip [ <sequence-copy> (copy) drop ] 3curry keep ; inline
+    ] dip [ 4spin dupd + copy-loop drop ] 3curry keep ; inline
 
 : (sequence-read-unsafe) ( n buf stream -- count )
     [ integer>fixnum ]

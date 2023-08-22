@@ -1,5 +1,5 @@
 ! Copyright (C) 2017-2018 Alexander Ilin.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors alien alien.data alien.libraries alien.strings
 init io.encodings.utf16 kernel literals math namespaces
 sequences ui.backend.windows ui.gadgets.worlds

@@ -1,5 +1,5 @@
 ! Copyright (C) 2012 John Benediktsson
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: kernel math math.parser regexp sequences strings ;
 IN: benchmark.regexp
 

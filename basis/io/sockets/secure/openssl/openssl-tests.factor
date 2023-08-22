@@ -1,13 +1,15 @@
 USING: accessors continuations http.client http.server io.servers
 io.sockets.secure io.sockets.secure.openssl io.timeouts kernel
-tools.test ;
+layouts tools.test ;
 IN: io.sockets.secure.openssl.tests
 
 { 200 } [ "https://www.google.se" http-get drop code>> ] unit-test
 
 [
-    <http-server> 8887 >>insecure f >>secure [
-        "https://localhost:8887" http-get
+    <http-server> cell-bits 64 = 8887 8888 ? >>insecure f >>secure [
+        cell-bits 64 =
+        "https://localhost:8887"
+        "https://localhost:8888" ? http-get
     ] with-threaded-server
 ] must-fail
 ! XXX: Make this fail with certificate-missing-error? on Windows someday.

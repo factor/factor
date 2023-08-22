@@ -1,5 +1,5 @@
 ! Copyright (C) 2008 Doug Coleman.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: checksums checksums.md5 combinators grouping kernel math
 math.bits math.functions sequences splitting ;
 IN: crypto.passwd-md5

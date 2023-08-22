@@ -1,5 +1,5 @@
 ! Copyright (C) 2008 John Benediktsson, Doug Coleman.
-! See http://factorcode.org/license.txt for BSD license
+! See https://factorcode.org/license.txt for BSD license
 USING: help.markup help.syntax math sequences ;
 IN: math.finance
 
@@ -32,43 +32,43 @@ HELP: momentum
 
 HELP: biweekly
 { $values
-     { "x" number }
-     { "y" number }
+    { "x" number }
+    { "y" number }
 }
 { $description "Divides a number by the number of two week periods in a year." } ;
 
 HELP: daily-360
 { $values
-     { "x" number }
-     { "y" number }
+    { "x" number }
+    { "y" number }
 }
 { $description "Divides a number by the number of days in a 360-day year." } ;
 
 HELP: daily-365
 { $values
-     { "x" number }
-     { "y" number }
+    { "x" number }
+    { "y" number }
 }
 { $description "Divides a number by the number of days in a 365-day year." } ;
 
 HELP: monthly
 { $values
-     { "x" number }
-     { "y" number }
+    { "x" number }
+    { "y" number }
 }
 { $description "Divides a number by the number of months in a year." } ;
 
 HELP: semimonthly
 { $values
-     { "x" number }
-     { "y" number }
+    { "x" number }
+    { "y" number }
 }
 { $description "Divides a number by the number of half-months in a year. Note that biweekly has two more periods than semimonthly." } ;
 
 HELP: weekly
 { $values
-     { "x" number }
-     { "y" number }
+    { "x" number }
+    { "y" number }
 }
 { $description "Divides a number by the number of weeks in a year." } ;
 

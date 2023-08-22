@@ -1,5 +1,5 @@
 ! Copyright (C) 2021 Doug Coleman.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors alien.c-types arrays cocoa cocoa.application
 cocoa.classes cocoa.messages cocoa.runtime cocoa.subclassing
 compiler.units kernel locals.backend math.parser sequences ;

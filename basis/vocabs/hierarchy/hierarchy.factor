@@ -1,5 +1,5 @@
 ! Copyright (C) 2007, 2009 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs combinators.short-circuit fry
 io.directories io.files io.files.info io.pathnames kernel make
 memoize namespaces sequences sets sorting splitting vocabs
@@ -18,7 +18,7 @@ M: vocab-prefix vocab-name name>> ;
     { [ directory? ] [ name>> "." head? not ] } 1&& ;
 
 : visible-dirs ( seq -- seq' )
-    [ visible-dir? ] filter [ name>> ] sort-with ;
+    [ visible-dir? ] filter [ name>> ] sort-by ;
 
 ERROR: vocab-root-required root ;
 
@@ -106,7 +106,7 @@ MEMO: all-disk-vocabs-recursive ( -- assoc )
 
 : collect-vocabs ( quot -- seq )
     [ all-disk-vocabs-recursive filter-vocabs ] dip
-    gather natural-sort ; inline
+    gather sort ; inline
 
 : maybe-include-root/prefix ( root prefix -- vocab-link/f )
     over [

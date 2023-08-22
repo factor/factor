@@ -1,5 +1,5 @@
 ! Copyright (C) 2003, 2010 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs combinators command-line
 compiler.units continuations debugger effects generalizations io
 io.files.temp io.files.unique kernel lexer math math.functions
@@ -22,11 +22,11 @@ SYMBOL: test-failures
 test-failures [ V{ } clone ] initialize
 
 T{ error-type-holder
-   { type +test-failure+ }
-   { word ":test-failures" }
-   { plural "unit test failures" }
-   { icon "vocab:ui/tools/error-list/icons/unit-test-error.png" }
-   { quot [ test-failures get ] }
+    { type +test-failure+ }
+    { word ":test-failures" }
+    { plural "unit test failures" }
+    { icon "vocab:ui/tools/error-list/icons/unit-test-error.png" }
+    { quot [ test-failures get ] }
 } define-error-type
 
 SYMBOL: silent-tests?
@@ -103,6 +103,9 @@ M: did-not-fail summary drop "Did not fail" ;
 :: (must-fail) ( quot -- error/f failed? tested? )
     [ { } quot with-datastack drop did-not-fail t ] [ drop f f ] recover t ;
 
+:: (must-not-fail) ( quot -- error/f failed? tested? )
+    [ { } quot with-datastack drop f f ] [ t ] recover t ;
+
 : experiment-title ( word -- string )
     "(" ?head drop ")" ?tail drop
     H{ { CHAR: - CHAR: \s } } substitute >title ;
@@ -134,7 +137,7 @@ MACRO: <experiment> ( word -- quot )
 
 <<
 
-SYNTAX: TEST:
+SYNTAX: DEFINE-TEST-WORD:
     scan-token
     [ create-word-in ]
     [ "(" ")" surround search '[ _ parse-test ] ] bi
@@ -202,15 +205,16 @@ PRIVATE>
 : with-test-directory ( ..a quot: ( ..a -- ..b ) -- ..b )
     [ cleanup-unique-directory ] with-temp-directory ; inline
 
-TEST: unit-test
-TEST: unit-test~
-TEST: unit-test-v~
-TEST: unit-test-comparator
-TEST: long-unit-test
-TEST: must-infer-as
-TEST: must-infer
-TEST: must-fail-with
-TEST: must-fail
+DEFINE-TEST-WORD: unit-test
+DEFINE-TEST-WORD: unit-test~
+DEFINE-TEST-WORD: unit-test-v~
+DEFINE-TEST-WORD: unit-test-comparator
+DEFINE-TEST-WORD: long-unit-test
+DEFINE-TEST-WORD: must-infer-as
+DEFINE-TEST-WORD: must-infer
+DEFINE-TEST-WORD: must-fail-with
+DEFINE-TEST-WORD: must-fail
+DEFINE-TEST-WORD: must-not-fail
 
 M: test-failure error. ( error -- )
     {
@@ -226,7 +230,9 @@ M: test-failure error. ( error -- )
 
 : test-all ( -- ) "" test ;
 
-: refresh-and-test ( prefix --  ) to-refresh [ do-refresh ] keepdd test-vocabs ;
+: test-root ( root -- ) "" vocabs-to-load test-vocabs ;
+
+: refresh-and-test ( prefix -- ) to-refresh [ do-refresh ] keepdd test-vocabs ;
 
 : refresh-and-test-all ( -- ) "" refresh-and-test ;
 
@@ -236,10 +242,10 @@ M: test-failure error. ( error -- )
     [ f long-unit-tests-enabled? set-global ] when
     [
         dup vocab-roots get member? [
-            "" vocabs-to-load [ require-all ] keep
+            [ load-root ] [ test-root ] bi
         ] [
-            [ load ] [ loaded-child-vocab-names ] bi
-        ] if test-vocabs
+            [ load ] [ test ] bi
+        ] if
     ] each
     test-failures get empty?
     [ [ "==== FAILING TESTS" print flush :test-failures ] unless ]

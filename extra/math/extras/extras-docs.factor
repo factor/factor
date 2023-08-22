@@ -1,5 +1,5 @@
 ! Copyright (C) 2012 John Benediktsson
-! See http://factorcode.org/license.txt for BSD license
+! See https://factorcode.org/license.txt for BSD license
 
 USING: help.markup help.syntax kernel math math.functions
 sequences ;
@@ -81,7 +81,7 @@ HELP: majority
 
 HELP: nonzero
 { $values { "seq" sequence } { "seq'" sequence } }
-{ $description "Outputs a new sequence of the same type as " { $snippet "seq" } " with all non-zero elements removed." } ;
+{ $description "Outputs a new sequence of the same type as " { $snippet "seq" } " with all zero elements removed." } ;
 
 HELP: round-away-from-zero
 { $values { "x" number } { "y" number } }

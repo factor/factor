@@ -95,7 +95,7 @@ os unix? [ [ 10 ] [ PCRE_CONFIG_NEWLINE pcre-config ] unit-test ] when
 ! Performance
 { 0 } [ long-string ".{0,15}foobar.{0,10}" findall length ] unit-test
 
-! Empty matches, corner case behaviour is copied from pcredemo.c
+! Empty matches, corner case behavior is copied from pcredemo.c
 { { { { f "foo" } } { { f "" } } } }
 [ "foo" ".*" findall ] unit-test
 

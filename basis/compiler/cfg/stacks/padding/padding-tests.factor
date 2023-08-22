@@ -122,7 +122,7 @@ IN: compiler.cfg.stacks.padding.tests
 
 : following-stack-state ( insns -- state )
     T{ ##branch } suffix insns>cfg trace-stack-state
-    >alist [ first ] sort-with last second ;
+    >alist [ first ] sort-by last second ;
 
 ! trace-stack-state
 {

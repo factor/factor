@@ -1,13 +1,13 @@
 ! Copyright (C) 2008, 2010 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors classes.tuple kernel math math.order sequences
 sequences.private ;
 IN: ranges
 
 TUPLE: range
-{ from read-only }
-{ length read-only }
-{ step read-only } ;
+{ from number read-only }
+{ length integer read-only }
+{ step number read-only } ;
 
 <PRIVATE
 
@@ -32,7 +32,10 @@ M: range hashcode* tuple-hashcode ;
 
 INSTANCE: range immutable-sequence
 
-M: range sum [ length ] [ first ] [ last ] tri + * 2 / ;
+M: range sum
+    dup length
+    [ drop 0 ]
+    [ swap [ first-unsafe ] [ last-unsafe ] bi + * 2 / ] if-zero ;
 
 <PRIVATE
 

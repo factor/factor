@@ -1,12 +1,14 @@
 ! Copyright (C) 2007, 2010 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
+
 USING: accessors alien.libraries.finder assocs bootstrap.image
-hashtables io io.directories io.encodings.utf8 io.files
-io.files.temp io.launcher io.pathnames kernel make
-namespaces prettyprint sequences splitting system
-tools.deploy.config tools.deploy.config.editor
+combinators.short-circuit hashtables io io.directories
+io.encodings.utf8 io.files io.files.temp io.launcher
+io.pathnames kernel make namespaces prettyprint sequences
+splitting system tools.deploy.config tools.deploy.config.editor
 tools.deploy.embed vocabs.loader vocabs.metadata.resources
 webbrowser ;
+
 IN: tools.deploy.backend
 
 : copy-vm ( executable bundle-name -- vm-path )
@@ -20,7 +22,7 @@ TUPLE: vocab-manifest vocabs libraries ;
 ERROR: can't-deploy-library-file library ;
 
 : copy-library ( dir library -- )
-    dup find-library*
+    [ find-library* ]
     [ tuck file-name append-path copy-file ]
     [ can't-deploy-library-file ] ?if ;
 
@@ -130,3 +132,13 @@ t open-directory-after-deploy? set-global
 HOOK: deploy* os ( vocab -- )
 
 HOOK: deploy-path os ( vocab -- path )
+
+STARTUP-HOOK: [
+    ! clean the old staging images
+    vm-git-id "staging." my-arch-name ".txt" 3append
+    cache-file dup {
+        [ file-exists? not ]
+        [ utf8 file-contents pick = not ]
+    } 1|| [ delete-staging-images ] when
+    utf8 set-file-contents
+]

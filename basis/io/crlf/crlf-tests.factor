@@ -26,3 +26,15 @@ USING: io.crlf tools.test io.streams.string io ;
 { "abcd" } [ "a\nb\r\ncd" [ 5 read-ignoring-crlf ] with-string-reader ] unit-test
 { "abcde" } [ "a\nb\r\ncd\r\ne" [ 5 read-ignoring-crlf ] with-string-reader ] unit-test
 { "abcde" } [ "a\nb\r\ncd\r\ne\nfghi" [ 5 read-ignoring-crlf ] with-string-reader ] unit-test
+
+{ "Hello\r\nworld.\r\n" } [
+    [ use-crlf-stream "Hello" print "world." write nl ] with-string-writer
+] unit-test
+
+{ "A\nB\r\nC\n" } [
+    [
+        "A" print
+        [ "B" print ] with-crlf-stream
+        "C" print
+    ] with-string-writer
+] unit-test

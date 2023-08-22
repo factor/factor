@@ -1,9 +1,9 @@
 ! (c) 2009 Joe Groff, see BSD license
-USING: accessors alien alien.c-types alien.complex
-alien.data alien.fortran alien.fortran.private alien.strings
-classes.struct arrays assocs byte-arrays combinators fry
-generalizations io.encodings.ascii kernel macros
-macros.expander namespaces sequences shuffle tools.test vocabs.parser ;
+USING: alien alien.c-types alien.complex alien.data
+alien.fortran alien.fortran.private alien.strings
+byte-arrays classes.struct combinators generalizations
+io.encodings.ascii kernel namespaces sequences shuffle
+tools.test vocabs.parser ;
 FROM: alien.syntax => pointer: ;
 QUALIFIED-WITH: alien.c-types c
 IN: alien.fortran.tests

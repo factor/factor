@@ -1,5 +1,5 @@
 ! Copyright (C) 2003, 2009 Slava Pestov, Joe Groff.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: kernel kernel.private ;
 IN: math
 
@@ -131,11 +131,25 @@ GENERIC: (log2) ( x -- n ) foldable
 
 PRIVATE>
 
-ERROR: log2-expects-positive x ;
+ERROR: non-negative-number-expected n ;
 
-: log2 ( x -- n )
-    dup 0 <= [ log2-expects-positive ] [ (log2) ] if ; inline
+: assert-non-negative ( n -- n )
+    dup 0 < [ non-negative-number-expected ] when ; inline
 
+ERROR: positive-number-expected n ;
+
+: assert-positive ( n -- n )
+    dup 0 > [ positive-number-expected ] unless ; inline
+
+ERROR: negative-number-expected n ;
+
+: assert-negative ( n -- n )
+    dup 0 < [ negative-number-expected ] unless ; inline
+
+: recursive-hashcode ( n obj quot -- code )
+    pick 0 <= [ 3drop 0 ] [ [ 1 - ] 2dip call ] if ; inline
+
+: log2 ( x -- n ) assert-positive (log2) ; inline
 : zero? ( x -- ? ) 0 number= ; inline
 : 2/ ( x -- y ) -1 shift ; inline
 : sq ( x -- y ) dup * ; inline
@@ -247,43 +261,31 @@ GENERIC: prev-float ( m -- n )
 : align ( m w -- n )
     1 - [ + ] keep bitnot bitand ; inline
 
-: (each-integer) ( ... i n quot: ( ... i -- ... ) -- ... )
+: each-integer-from ( ... from to quot: ( ... i -- ... ) -- ... )
     2over < [
         [ nip call ] 3keep
-        [ 1 + ] 2dip (each-integer)
+        [ 1 + ] 2dip each-integer-from
     ] [
         3drop
     ] if ; inline recursive
 
-: (find-integer) ( ... i n quot: ( ... i -- ... ? ) -- ... i/f )
-    2over < [
-        [ nip call ] 3keep roll
-        [ 2drop ]
-        [ [ 1 + ] 2dip (find-integer) ] if
-    ] [
-        3drop f
-    ] if ; inline recursive
-
-: (all-integers?) ( ... i n quot: ( ... i -- ... ? ) -- ... ? )
-    2over < [
-        [ nip call ] 3keep roll
-        [ [ 1 + ] 2dip (all-integers?) ]
-        [ 3drop f ] if
-    ] [
-        3drop t
-    ] if ; inline recursive
-
 : each-integer ( ... n quot: ( ... i -- ... ) -- ... )
-    [ 0 ] 2dip (each-integer) ; inline
+    [ 0 ] 2dip each-integer-from ; inline
 
 : times ( ... n quot: ( ... -- ... ) -- ... )
     [ drop ] prepose each-integer ; inline
 
-: find-integer ( ... n quot: ( ... i -- ... ? ) -- ... i/f )
-    [ 0 ] 2dip (find-integer) ; inline
+: find-integer-from ( ... i n quot: ( ... i -- ... ? ) -- ... i/f )
+    2over < [
+        [ nip call ] 3keep roll
+        [ 2drop ]
+        [ [ 1 + ] 2dip find-integer-from ] if
+    ] [
+        3drop f
+    ] if ; inline recursive
 
-: all-integers? ( ... n quot: ( ... i -- ... ? ) -- ... ? )
-    [ 0 ] 2dip (all-integers?) ; inline
+: find-integer ( ... n quot: ( ... i -- ... ? ) -- ... i/f )
+    [ 0 ] 2dip find-integer-from ; inline
 
 : find-last-integer ( ... n quot: ( ... i -- ... ? ) -- ... i/f )
     over 0 < [
@@ -295,3 +297,15 @@ GENERIC: prev-float ( m -- n )
             [ 1 - ] dip find-last-integer
         ] if
     ] if ; inline recursive
+
+: all-integers-from? ( ... from to quot: ( ... i -- ... ? ) -- ... ? )
+    2over < [
+        [ nip call ] 3keep roll
+        [ [ 1 + ] 2dip all-integers-from? ]
+        [ 3drop f ] if
+    ] [
+        3drop t
+    ] if ; inline recursive
+
+: all-integers? ( ... n quot: ( ... i -- ... ? ) -- ... ? )
+    [ 0 ] 2dip all-integers-from? ; inline

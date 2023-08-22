@@ -1,5 +1,5 @@
 ! Copyright (C) 2007, 2008 Slava Pestov, Doug Coleman.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: alien alien.c-types alien.data arrays assocs byte-arrays
 combinators combinators.short-circuit kernel kernel.private
 layouts math math.bits sequences sequences.private
@@ -134,7 +134,7 @@ PRIVATE>
 GENERIC: bit-count ( obj -- n )
 
 M: integer bit-count
-    dup 0 < [ non-negative-integer-expected ] when (bit-count) ; inline
+    assert-non-negative (bit-count) ; inline
 
 M: byte-array bit-count
     byte-array-bit-count ;
@@ -143,7 +143,7 @@ M: object bit-count
     binary-object uchar <c-direct-array> byte-array-bit-count ;
 
 : bit-length ( x -- n )
-    dup 0 < [ non-negative-integer-expected ] [
+    dup 0 < [ non-negative-number-expected ] [
         dup 1 > [ log2 1 + ] when
     ] if ;
 

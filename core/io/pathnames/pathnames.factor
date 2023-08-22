@@ -1,5 +1,5 @@
 ! Copyright (C) 2004, 2009 Slava Pestov, Doug Coleman.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors assocs combinators io.backend kernel math
 math.order namespaces sequences splitting strings system ;
 IN: io.pathnames
@@ -17,7 +17,7 @@ SYMBOL: current-directory
     [ path-separator? ] trim-head ;
 
 : last-path-separator ( path -- n ? )
-    [ length 1 - ] keep [ path-separator? ] find-last-from ;
+    index-of-last [ path-separator? ] find-last-from ;
 
 HOOK: root-directory? io-backend ( path -- ? )
 
@@ -78,6 +78,16 @@ ERROR: no-parent-directory path ;
 
 PRIVATE>
 
+TUPLE: pathname string ;
+
+C: <pathname> pathname
+
+: >pathname ( obj -- pathname )
+    dup pathname? [ <pathname> ] unless ;
+
+: pathname> ( pathname -- obj )
+    dup pathname? [ string>> ] when ;
+
 : absolute-path? ( path -- ? )
     {
         { [ dup empty? ] [ drop f ] }
@@ -92,6 +102,7 @@ PRIVATE>
     [ trim-head-separators ] bi* "/" glue ;
 
 : append-path ( path1 path2 -- path )
+    [ pathname> ] bi@
     {
         { [ over empty? ] [ append-path-empty ] }
         { [ dup empty? ] [ drop ] }
@@ -146,6 +157,8 @@ M: object resolve-symlinks normalize-path ;
 HOOK: home io-backend ( -- dir )
 
 M: object home "" resource-path ;
+
+: home-path ( path -- newpath ) home prepend-path ;
 
 GENERIC: vocab-path ( path -- newpath )
 
@@ -218,10 +231,6 @@ HOOK: canonicalize-path-full io-backend ( path -- path' )
 M: object canonicalize-path-full canonicalize-path canonicalize-drive ;
 
 : >windows-path ( path -- path' ) H{ { CHAR: / CHAR: \\ } } substitute ;
-
-TUPLE: pathname string ;
-
-C: <pathname> pathname
 
 M: pathname absolute-path string>> absolute-path ;
 

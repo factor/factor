@@ -1,5 +1,5 @@
 ! Copyright (C) 2009 Slava Pestov, Joe Groff.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors alien.c-types arrays assocs byte-arrays
 combinators combinators.short-circuit compiler.cfg.comparisons
 compiler.cfg.hats compiler.cfg.instructions
@@ -712,7 +712,7 @@ PREDICATE: fixnum-vector-rep < int-vector-rep
         { (simd-select)             [ emit-simd-select              ] }
         { alien-vector              [ emit-alien-vector             ] }
         { set-alien-vector          [ emit-set-alien-vector         ] }
-        { assert-positive           [ drop                          ] }
+        { (simd-positive)           [ drop                          ] }
         { (simd-vgetmask)           [ emit-simd-vgetmask            ] }
     } enable-intrinsics ;
 

@@ -1,19 +1,23 @@
 ! Copyright (C) 2007, 2008 Chris Double, Doug Coleman.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors fry kernel literals make math math.parser
 ranges peg peg.private sequences splitting strings unicode
 vectors ;
 FROM: peg.search => replace ;
 IN: peg.parsers
 
+<PRIVATE
+
 TUPLE: just-parser p1 ;
 
-M: just-parser (compile)
-    p1>> compile-parser-quot [
+M: just-parser parser-quot
+    p1>> execute-parser-quot [
         dup [
             dup remaining>> empty? [ drop f ] unless
         ] when
     ] compose ;
+
+PRIVATE>
 
 : just ( parser -- parser )
     just-parser boa wrap-peg ;

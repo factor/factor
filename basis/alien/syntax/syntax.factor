@@ -1,5 +1,5 @@
 ! Copyright (C) 2005, 2010 Slava Pestov, Alex Chapman.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: alien alien.c-types alien.enums alien.libraries
 alien.parser kernel lexer namespaces parser sequences
 strings.parser vocabs words ;

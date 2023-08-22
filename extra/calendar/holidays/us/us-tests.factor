@@ -1,5 +1,5 @@
 ! Copyright (C) 2009 Doug Coleman.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: calendar calendar.holidays calendar.holidays.us kernel
 sequences tools.test ;
 
@@ -22,3 +22,4 @@ sequences tools.test ;
 } [
     2022 <year-gmt> timestamp>year-dates-gmt [ us-federal holiday? ] filter
 ] unit-test
+

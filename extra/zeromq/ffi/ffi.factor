@@ -1,5 +1,5 @@
 ! Copyright (C) 2011-2013 Eungju PARK, John Benediktsson.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 
 USING: alien alien.accessors alien.c-types alien.data
 alien.libraries alien.syntax assocs byte-arrays classes.struct

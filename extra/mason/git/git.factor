@@ -1,5 +1,5 @@
 ! Copyright (C) 2010 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors continuations debugger io io.directories
 io.encodings.utf8 io.files io.launcher io.sockets
 io.streams.string kernel mason.common mason.email sequences
@@ -7,7 +7,7 @@ splitting ;
 IN: mason.git
 
 : git-id ( -- id )
-    { "git" "show" } utf8 [ read-lines ] with-process-reader
+    { "git" "show" } process-lines
     first split-words second ;
 
 <PRIVATE
@@ -47,7 +47,7 @@ IN: mason.git
 
 : git-pull-failed ( error -- )
     dup output-process-error? [
-        dup output>> "not uptodate. Cannot merge." swap subseq?
+        dup output>> "not uptodate. Cannot merge." subseq-of?
         [ git-repo-corrupted ]
         [ rethrow ]
         if
@@ -57,7 +57,7 @@ IN: mason.git
     { "git" "status" "--porcelain" } ;
 
 : git-status ( -- seq )
-    git-status-cmd utf8 [ read-lines ] with-process-reader ;
+    git-status-cmd process-lines ;
 
 : check-repository ( -- seq )
     "factor" [ git-status ] with-directory ;

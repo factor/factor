@@ -1,5 +1,5 @@
 ! Copyright (C) 2013 John Benediktsson
-! See http://factorcode.org/license.txt for BSD license
+! See https://factorcode.org/license.txt for BSD license
 
 USING: accessors ascii combinators io io.encodings.utf8 io.files
 io.streams.string kernel math.parser sequences splitting ;

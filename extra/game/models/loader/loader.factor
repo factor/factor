@@ -1,5 +1,5 @@
 ! Copyright (C) 2010 Erik Charlebois.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors assocs byte-arrays combinators game.models
 io.encodings.ascii io.files io.pathnames io.streams.byte-array
 kernel namespaces sequences splitting

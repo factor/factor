@@ -1,17 +1,18 @@
 ! Copyright (C) 2007, 2008, Slava Pestov, Elie CHAFTARI.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors alien alien.c-types alien.data alien.enums
-alien.strings assocs byte-arrays classes.struct combinators
-combinators.short-circuit destructors endian io io.backend
-io.buffers io.encodings.latin1 io.encodings.string
-io.encodings.utf8 io.files io.pathnames io.ports io.sockets
-io.sockets.secure io.timeouts kernel libc math math.functions
-math.order math.parser namespaces openssl openssl.libcrypto
-openssl.libssl random sequences sets splitting unicode ;
-SLOT: alpn-supported-protocols
+alien.libraries.finder alien.strings assocs byte-arrays
+classes.struct combinators combinators.short-circuit destructors
+endian io io.backend io.buffers io.encodings.latin1
+io.encodings.string io.encodings.utf8 io.files io.pathnames
+io.ports io.sockets io.sockets.secure io.timeouts kernel libc
+math math.functions math.order math.parser namespaces openssl
+openssl.libcrypto openssl.libssl random sequences sets splitting
+system unicode ;
 IN: io.sockets.secure.openssl
 
 GENERIC: ssl-method ( symbol -- method )
+M: TLS ssl-method drop TLS_method ;
 M: TLSv1 ssl-method drop TLSv1_method ;
 M: TLSv1.1 ssl-method drop TLSv1_1_method ;
 M: TLSv1.2 ssl-method drop TLSv1_2_method ;
@@ -40,7 +41,7 @@ CONSTANT: weak-ciphers-for-compatibility
 MEMO: make-cipher-list ( -- string )
     {
         ! https://ciphersuite.info/cs/?security=recommended&software=openssl&singlepage=true
-        ! Recommended 12/28/2021
+        ! Recommended 2/16/2023
         "ECDHE-ECDSA-AES256-GCM-SHA384"
         "ECDHE-ECDSA-AES128-GCM-SHA256"
         "ECDHE-ECDSA-CHACHA20-POLY1305"
@@ -50,14 +51,16 @@ MEMO: make-cipher-list ( -- string )
         "DHE-PSK-AES256-GCM-SHA384"
         "DHE-PSK-AES128-GCM-SHA256"
         "DHE-PSK-CHACHA20-POLY1305"
+        "TLS_AES_128_GCM_SHA256"
+        "TLS_AES_256_GCM_SHA384"
 
         ! Secure 12/28/2021
         "ECDHE-RSA-AES128-GCM-SHA256"
+        "ECDHE-RSA-CHACHA20-POLY1305"
         "ECDHE-ECDSA-AES256-CCM8"
         "ECDHE-ECDSA-AES256-CCM"
         "ECDHE-ECDSA-AES128-CCM8"
         "ECDHE-ECDSA-AES128-CCM"
-        "ECDHE-RSA-CHACHA20-POLY1305"
     }
     ! XXX: Weak ciphers
     weak-ciphers-for-compatibility append
@@ -77,10 +80,21 @@ PRIVATE>
     dup length
     f BN_bin2bn ; inline
 
+: add-ctx-flag ( ctx flag -- )
+    [ handle>> ] dip
+    [ [ SSL_CTX_get_options ] dip bitor ]
+    [ drop swap SSL_CTX_set_options ssl-error ] 2bi ;
+
+: clear-ctx-flag ( ctx flag -- )
+    [ handle>> ] dip
+    [ [ SSL_CTX_get_options ] dip bitnot bitand ]
+    [ drop swap SSL_CTX_set_options ssl-error ] 2bi ;
+
 : disable-old-tls ( ctx -- )
-    handle>>
-    SSL_OP_NO_TLSv1 SSL_OP_NO_TLSv1_1 bitor
-    SSL_CTX_set_options ssl-error ;
+    SSL_OP_NO_TLSv1 SSL_OP_NO_TLSv1_1 bitor add-ctx-flag ;
+
+: ignore-unexpected-eof ( ctx -- )
+    SSL_OP_IGNORE_UNEXPECTED_EOF add-ctx-flag ;
 
 : set-session-cache ( ctx -- )
     handle>>
@@ -192,6 +206,7 @@ M: openssl <secure-context>
             [ set-verify-depth ]
             [ load-dh-params ]
             [ set-ecdh-params ]
+            [ os macosx? [ drop ] [ ignore-unexpected-eof ] if ]
             [ ]
         } cleave
     ] with-destructors ;
@@ -326,40 +341,35 @@ PRIVATE>
     dup do-ssl-accept-once
     [ [ dup file>> ] dip wait-for-fd do-ssl-accept ] [ drop ] if* ;
 
-: maybe-handshake ( ssl-handle -- )
-    dup connected>> [ drop ] [
-        dup terminated>> [
-            drop
-        ] [
-            [ [ do-ssl-accept ] with-timeout ]
-            [ t swap connected<< ] bi
-        ] if
-    ] if ;
+: maybe-handshake ( ssl-handle -- ssl-handle )
+    dup [ connected>> ] [ terminated>> ] bi or [
+        [ [ do-ssl-accept ] with-timeout ]
+        [ t >>connected ] bi
+    ] unless ;
 
 ! Input ports
 : do-ssl-read ( buffer ssl-handle -- event/f )
-    2dup handle>> swap [ buffer-end ] [ buffer-capacity ] bi SSL_read
-    [ check-ssl-error ] keep swap [ 2nip ] [
-        dup 0 > [ swap buffer+ ] [ 2drop ] if f
-    ] if* ;
+    2dup handle>> swap [ buffer-end ] [ buffer-capacity ] bi
+    ERR_clear_error SSL_read dup 0 >
+    [ nip swap buffer+ f ] [ check-ssl-error nip ] if ;
 
 : throw-if-terminated ( ssl-handle -- ssl-handle )
     dup terminated>> [ premature-close-error ] when ;
 
 M: ssl-handle refill
     throw-if-terminated
-    dup maybe-handshake [ buffer>> ] dip do-ssl-read ;
+    [ buffer>> ] [ maybe-handshake ] bi* do-ssl-read ;
 
 ! Output ports
 : do-ssl-write ( buffer ssl-handle -- event/f )
-    2dup handle>> swap [ buffer@ ] [ buffer-length ] bi SSL_write
-    [ check-ssl-error ] keep swap [ 2nip ] [
-        dup 0 > [ swap buffer-consume ] [ 2drop ] if f
-    ] if* ;
+    2dup handle>> swap [ buffer@ ] [ buffer-length ] bi
+    ERR_clear_error SSL_write dup 0 > [
+        nip over buffer-consume buffer-empty? f +output+ ?
+    ] [ check-ssl-error nip ] if ;
 
 M: ssl-handle drain
     throw-if-terminated
-    dup maybe-handshake [ buffer>> ] dip do-ssl-write ;
+    [ buffer>> ] [ maybe-handshake ] bi* do-ssl-write ;
 
 ! Connect
 : do-ssl-connect-once ( ssl-handle -- event/f )
@@ -383,8 +393,8 @@ M: ssl-handle drain
     [ handle>> ] dip
     [
         '[
-            _ dup get-session
-            [ resume-session ] [ begin-session ] ?if
+            _
+            [ get-session ] [ resume-session ] [ begin-session ] ?if
         ] with-timeout
     ] [ drop t >>connected drop ] 2bi ;
 
@@ -447,7 +457,7 @@ M: ssl-handle dispose*
     ] if ;
 
 : check-subject-name ( host ssl-handle -- )
-    SSL_get_peer_certificate [
+    get-ssl-peer-certificate [
         [ alternative-dns-names ]
         [ subject-name ] bi suffix members
         2dup [ subject-names-match? ] with any?
@@ -481,11 +491,13 @@ M: openssl check-certificate
 
 M: openssl send-secure-handshake
     input/output-ports
-    [ make-input/output-secure ] keep
-    [ (send-secure-handshake) ] keep
-    remote-address get dup inet? [
-        host>> swap handle>> check-certificate
-    ] [ 2drop ] if ;
+    [ make-input/output-secure ]
+    [ nip (send-secure-handshake) ]
+    [
+        nip remote-address get dup inet? [
+            host>> swap handle>> check-certificate
+        ] [ 2drop ] if
+    ] 2tri ;
 
 M: openssl accept-secure-handshake
     input/output-ports

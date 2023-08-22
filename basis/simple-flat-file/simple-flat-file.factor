@@ -1,5 +1,5 @@
 ! Copyright (C) 2009 Daniel Ehrenberg
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: arrays ascii assocs biassocs interval-maps
 io.encodings.utf8 io.files kernel math.parser sequences sets
 splitting ;
@@ -12,7 +12,7 @@ IN: simple-flat-file
     [ drop-comment ] map harvest ;
 
 : split-column ( line -- columns )
-    " \t" split harvest 2 short head 2 f pad-tail ;
+    " \t" split harvest 2 index-or-length head 2 f pad-tail ;
 
 : parse-hex ( s -- n )
     dup [

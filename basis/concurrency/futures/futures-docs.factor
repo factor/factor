@@ -1,5 +1,5 @@
 ! Copyright (C) 2005, 2008 Chris Double, Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: concurrency.promises concurrency.messaging kernel arrays
 continuations help.markup help.syntax quotations calendar ;
 IN: concurrency.futures

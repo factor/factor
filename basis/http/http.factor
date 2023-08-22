@@ -1,5 +1,5 @@
 ! Copyright (C) 2003, 2010 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors arrays ascii assocs base64 calendar calendar.format
 calendar.parser combinators hashtables http.parsers io io.crlf
 io.encodings.iana io.encodings.utf8 kernel make math math.parser
@@ -30,7 +30,7 @@ CONSTANT: max-redirects 10
     } cond ;
 
 : check-header-string ( str -- str )
-    ! http://en.wikipedia.org/wiki/HTTP_Header_Injection
+    ! https://en.wikipedia.org/wiki/HTTP_Header_Injection
     dup "\r\n" intersects?
     [ "Header injection attack" throw ] when ;
 
@@ -142,6 +142,12 @@ TUPLE: request
 : set-header ( request/response value key -- request/response )
     pick header>> set-at ;
 
+: set-headers ( request/response assoc -- request/response )
+    [ swap set-header ] assoc-each ; inline
+
+: delete-header ( request/response key -- request/response )
+    over header>> delete-at ;
+
 : basic-auth ( username password -- str )
     ":" glue >base64 "Basic " "" prepend-as ;
 
@@ -173,7 +179,7 @@ TUPLE: request
 : add-modern-headers ( response -- response )
     "max-age=63072000; includeSubDomains; preload" "Strict-Transport-Security" set-header
     "nosniff" "X-Content-Type-Options" set-header
-    "default-src https: 'unsafe-inline'; frame-ancestors 'none'; object-src 'none'" "Content-Security-Policy" set-header
+    "default-src https: 'unsafe-inline'; frame-ancestors 'none'; object-src 'none'; img-src 'self' data:;" "Content-Security-Policy" set-header
     "DENY" "X-Frame-Options" set-header
     "1; mode=block" "X-XSS-Protection" set-header ;
 
@@ -195,7 +201,7 @@ TUPLE: response
         "close" "Connection" set-header
         now timestamp>http-string "Date" set-header
         "Factor http.server" "Server" set-header
-        add-modern-headers
+        ! XXX: add-modern-headers
         utf8 >>content-encoding
         V{ } clone >>cookies ;
 

@@ -1,5 +1,5 @@
 ! Copyright (C) 2008 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors assocs http.server http.server.responses kernel
 namespaces sequences splitting unicode urls ;
 IN: http.server.dispatchers

@@ -1,5 +1,5 @@
 ! Copyright (C) 2009 Joe Groff.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors alien alien.c-types alien.data alien.strings
 arrays assocs byte-arrays classes.mixin classes.parser
 classes.singleton classes.struct combinators
@@ -311,7 +311,7 @@ SYMBOL: padding-no
     { } <struct-slot-spec> ;
 
 : shader-filename ( shader/program -- filename )
-    dup filename>> [ ] [ name>> where first ] ?if file-name ;
+    [ filename>> ] [ name>> where first ] ?unless file-name ;
 
 : numbered-log-line? ( log-line-components -- ? )
     {
@@ -456,11 +456,11 @@ TUPLE: compile-shader-error shader log ;
 TUPLE: link-program-error program log ;
 
 : throw-compile-shader-error ( shader instance -- * )
-    [ dup ] dip [ gl-shader-info-log ] [ glDeleteShader ] bi
+    dupd [ gl-shader-info-log ] [ glDeleteShader ] bi
     replace-log-line-numbers compile-shader-error boa throw ;
 
 : throw-link-program-error ( program instance -- * )
-    [ dup ] dip [ gl-program-info-log ] [ delete-gl-program ] bi
+    dupd [ gl-program-info-log ] [ delete-gl-program ] bi
     replace-log-line-numbers link-program-error boa throw ;
 
 DEFER: <shader-instance>

@@ -1,13 +1,13 @@
 USING: arrays ascii generalizations kernel math math.parser
-sequences tools.test ;
+sequences sequences.generalizations tools.test ;
 IN: generalizations.tests
 
 { 1 2 3 4 1 } [ 1 2 3 4 4 npick ] unit-test
 { 1 2 3 4 2 } [ 1 2 3 4 3 npick ] unit-test
 { 1 2 3 4 3 } [ 1 2 3 4 2 npick ] unit-test
 { 1 2 3 4 4 } [ 1 2 3 4 1 npick ] unit-test
-[ 1 2 3 4 0 npick ] [ nonpositive-npick? ] must-fail-with
-[ 1 2 3 4 -11 npick ] [ nonpositive-npick? ] must-fail-with
+[ 1 2 3 4 0 npick ] [ positive-number-expected? ] must-fail-with
+[ 1 2 3 4 -11 npick ] [ positive-number-expected? ] must-fail-with
 
 [ 1 1 ndup ] must-infer
 { 1 1 } [ 1 1 ndup ] unit-test
@@ -28,6 +28,60 @@ IN: generalizations.tests
 { 0 } [ 0 1 2 3 4 4 ndrop ] unit-test
 [ [ 1 ] 5 ndip ] must-infer
 { 1 2 3 4 } [ 2 3 4 [ 1 ] 3 ndip ] unit-test
+
+[ [ 1 2 3 ] 2 3 0 nrotated ] must-infer
+[ [ 1 2 3 ] 2 3 0 -nrotated ] must-infer
+{ 1 2 3 4 } [ 1 2 3 4  4 4 0 nrotated ] unit-test
+{ 1 2 3 4 } [ 1 2 3 4  4 4 0 -nrotated ] unit-test
+{ 3 1 2 4 } [ 1 2 3 4  1 3 1 -nrotated ] unit-test
+
+
+{ 1 2 3  1 2 }
+[ 1 2 3  2 1 0 noverd ] unit-test
+
+{ 1 2 3  4 5 6 7 8  1 2 3  9 }
+[ 1 2 3  4 5 6 7 8  9  3 5 1 noverd ] unit-test
+
+{ t }
+[
+    1 2 3 4 5 6 7   8 9    3 2  ntuckd 10 narray
+    1 2 3 4 5 6 7   8 9  1 3 2 mntuckd 10 narray =
+] unit-test
+
+{ 1  4 5  2 3  4 5  6 7 }
+[ 1 2 3 4 5 6 7  2 4 2 mntuckd ] unit-test
+
+{ 1 2 3 4 2 3 4 5 6 5 6 7 }
+[ 1 2 3 4 5 6 7  5 2 1 mntuckd ] unit-test
+
+{ 4 5 6 7  0 1 2 3 4 5 6 7 8 9 } [
+    0 1 2 3   4 5 6 7   8 9
+    4 8 2 mntuckd
+] unit-test
+
+{ 1 2 3 5 4 } [ 1 2 3 4 5  2 0 -nrotd ] unit-test
+{ 1 2 4 3 5 } [ 1 2 3 4 5  2 1 -nrotd ] unit-test
+{ 1 3 2 4 5 } [ 1 2 3 4 5  2 2 -nrotd ] unit-test
+{ 2 1 3 4 5 } [ 1 2 3 4 5  2 3 -nrotd ] unit-test
+
+{ 1 2 3 5 4 } [ 1 2 3 4 5  2 0  nrotd ] unit-test
+{ 1 2 4 3 5 } [ 1 2 3 4 5  2 1  nrotd ] unit-test
+{ 1 3 2 4 5 } [ 1 2 3 4 5  2 2  nrotd ] unit-test
+{ 2 1 3 4 5 } [ 1 2 3 4 5  2 3  nrotd ] unit-test
+
+{ 1 2 5 3 4 } [ 1 2 3 4 5  3 0 -nrotd ] unit-test
+{ 1 2 5 3 4 } [ 1 2 3 4 5  -3 0 nrotd ] unit-test
+{ 1 4 2 3 5 } [ 1 2 3 4 5  3 1 -nrotd ] unit-test
+{ 1 4 2 3 5 } [ 1 2 3 4 5  -3 1 nrotd ] unit-test
+{ 3 1 2 4 5 } [ 1 2 3 4 5  3 2 -nrotd ] unit-test
+{ 3 1 2 4 5 } [ 1 2 3 4 5  -3 2 nrotd ] unit-test
+
+{ 1 2 4 5 3 } [ 1 2 3 4 5  3 0 nrotd ] unit-test
+{ 1 2 4 5 3 } [ 1 2 3 4 5  -3 0 -nrotd ] unit-test
+{ 1 3 4 2 5 } [ 1 2 3 4 5  3 1 nrotd ] unit-test
+{ 1 3 4 2 5 } [ 1 2 3 4 5  -3 1 -nrotd ] unit-test
+{ 2 3 1 4 5 } [ 1 2 3 4 5  3 2 nrotd ] unit-test
+{ 2 3 1 4 5 } [ 1 2 3 4 5  -3 2 -nrotd ] unit-test
 
 [ 1 2 3 4 5 [ drop drop drop drop drop 2 ] 5 nkeep ] must-infer
 [ 1 2 3 4 5 2 '[ drop drop drop drop drop _ ] 5 nkeep ] must-infer

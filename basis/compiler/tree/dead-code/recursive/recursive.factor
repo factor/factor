@@ -1,5 +1,5 @@
 ! Copyright (C) 2008, 2010 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors arrays compiler.tree
 compiler.tree.dead-code.branches
 compiler.tree.dead-code.liveness compiler.tree.dead-code.simple

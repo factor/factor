@@ -1,5 +1,5 @@
 ! Copyright (C) 2004, 2011 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors assocs classes classes.algebra
 classes.algebra.private classes.builtin classes.private
 classes.tuple classes.tuple.private combinators definitions
@@ -22,20 +22,16 @@ M: union-class union-of-builtins?
 M: class union-of-builtins?
     drop f ;
 
-: empty-union-predicate-quot ( class -- quot )
+: empty-union-predicate-quot ( class-members -- quot )
     drop [ drop f ] ;
 
-: flatten-builtins ( class/builtin-classes -- seq )
-    dup sequence? [
-        [ flatten-class ] map concat
-    ] [
-        flatten-class
-    ] if ;
+: flatten-builtins ( builtin-classes -- seq )
+    [ flatten-class ] map concat ;
 
 : builtin-union-mask ( builtin-classes -- n )
     0 [ class>type 2^ bitor ] reduce ;
 
-: builtin-union-predicate-quot ( class/builtin-classes -- quot )
+: builtin-union-predicate-quot ( builtin-classes -- quot )
     flatten-builtins dup length 1 = [
         first class>type [ eq? ] curry [ tag ] prepose
     ] [
@@ -69,8 +65,7 @@ M: class union-of-builtins?
     [ layout-of ] prepose [ drop f ] [ if ] 2curry
     [ dup tuple? ] prepose ;
 
-: full-union-predicate-quot ( class -- quot )
-    class-members
+: full-union-predicate-quot ( class-members -- quot )
     [ union-of-builtins? ] partition
     [ [ f ] [ builtin-union-predicate-quot ] if-empty ] dip
     [ [ tuple-class? ] [ tuple-layout ] bi and ] partition
@@ -80,15 +75,15 @@ M: class union-of-builtins?
     swap [ suffix ] when*
     predicate-quot ;
 
-: union-predicate-quot ( class -- quot )
+: union-predicate-quot ( class-members -- quot )
     {
-        { [ dup class-members empty? ] [ empty-union-predicate-quot ] }
-        { [ dup union-of-builtins? ] [ builtin-union-predicate-quot ] }
+        { [ dup empty? ] [ empty-union-predicate-quot ] }
+        { [ dup [ union-of-builtins? ] all? ] [ builtin-union-predicate-quot ] }
         [ full-union-predicate-quot ]
     } cond ;
 
 : define-union-predicate ( class -- )
-    dup union-predicate-quot define-predicate ;
+    dup class-members union-predicate-quot define-predicate ;
 
 M: union-class update-class define-union-predicate ;
 
@@ -112,6 +107,9 @@ M: union-class rank-class drop 7 ;
 
 M: union-class instance?
     "members" word-prop [ instance? ] with any? ;
+
+M: anonymous-union predicate-def
+    members>> union-predicate-quot ;
 
 M: anonymous-union instance?
     members>> [ instance? ] with any? ;

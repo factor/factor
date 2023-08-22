@@ -1,5 +1,5 @@
 ! Copyright (C) 2003, 2010 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: destructors kernel kernel.private math namespaces
 sequences sequences.private ;
 IN: io
@@ -56,25 +56,25 @@ SYMBOL: error-stream
     input-stream swap with-variable ; inline
 
 : with-input-stream ( stream quot -- )
-    [ with-input-stream* ] curry with-disposal ; inline
+    '[ _ with-input-stream* ] with-disposal ; inline
 
 : with-output-stream* ( stream quot -- )
     output-stream swap with-variable ; inline
 
 : with-output-stream ( stream quot -- )
-    [ with-output-stream* ] curry with-disposal ; inline
+    '[ _ with-output-stream* ] with-disposal ; inline
 
 : with-error-stream* ( stream quot -- )
     error-stream swap with-variable ; inline
 
 : with-error-stream ( stream quot -- )
-    [ with-error-stream* ] curry with-disposal ; inline
+    '[ _ with-error-stream* ] with-disposal ; inline
 
 : with-output+error-stream* ( stream quot -- )
-    [ dup ] dip [ with-error-stream* ] curry with-output-stream* ; inline
+    dupd '[ _ with-error-stream* ] with-output-stream* ; inline
 
 : with-output+error-stream ( stream quot -- )
-    [ with-output+error-stream* ] curry with-disposal ; inline
+    '[ _ with-output+error-stream* ] with-disposal ; inline
 
 : with-output>error ( quot -- )
     error-stream get swap with-output-stream* ; inline
@@ -83,19 +83,19 @@ SYMBOL: error-stream
     output-stream get swap with-error-stream* ; inline
 
 : with-streams* ( input output quot -- )
-    swapd [ with-output-stream* ] curry with-input-stream* ; inline
+    swapd '[ _ with-output-stream* ] with-input-stream* ; inline
 
 : with-streams ( input output quot -- )
     ! We have to dispose of the output stream first, so that
     ! if both streams point to the same FD, we get to flush the
     ! buffer before closing the FD.
-    swapd [ with-output-stream ] curry with-input-stream ; inline
+    swapd '[ _ with-output-stream ] with-input-stream ; inline
 
 : with-input-output+error-streams* ( input output+error quot -- )
-    swapd [ with-output+error-stream* ] curry with-input-stream* ; inline
+    swapd '[ _ with-output+error-stream* ] with-input-stream* ; inline
 
 : with-input-output+error-streams ( input output+error quot -- )
-    swapd [ with-output+error-stream ] curry with-input-stream ; inline
+    swapd '[ _ with-output+error-stream ] with-input-stream ; inline
 
 : print ( str -- ) output-stream get stream-print ; inline
 
@@ -124,7 +124,7 @@ SYMBOL: error-stream
 
 : (read-into) ( buf stream quot -- buf-slice/f )
     [ dup length over ] 2dip call
-    [ (head) <slice-unsafe> ] [ zero? not ] bi ; inline
+    [ head-to-index <slice-unsafe> ] [ zero? not ] bi ; inline
 
 PRIVATE>
 
@@ -153,7 +153,7 @@ ERROR: invalid-read-buffer buf stream ;
     input-stream get stream-read-partial-into ; inline
 
 : each-stream-line ( ... stream quot: ( ... line -- ... ) -- ... )
-    [ [ stream-readln ] curry ] dip while* ; inline
+    [ '[ _ stream-readln ] ] dip while* ; inline
 
 : each-line ( ... quot: ( ... line -- ... ) -- ... )
     input-stream get swap each-stream-line ; inline
@@ -213,25 +213,25 @@ CONSTANT: each-block-size 65536
     input-stream get stream-contents ; inline
 
 : stream-copy* ( in out -- )
-    [ stream-write ] curry each-stream-block ; inline
+    '[ _ stream-write ] each-stream-block ; inline
 
 : stream-copy ( in out -- )
-    [ [ stream-copy* ] with-disposal ] curry with-disposal ; inline
+    '[ _ [ stream-copy* ] with-disposal ] with-disposal ; inline
 
 ! Default implementations of stream operations in terms of read1/write1
 
 <PRIVATE
 
 : read-loop ( buf stream n i -- count )
-     2dup = [ 3nip ] [
+    2dup = [ 3nip ] [
         pick stream-read1 [
             over [ pick set-nth-unsafe ] 2curry 3dip
             1 + read-loop
         ] [ 3nip ] if*
-     ] if ; inline recursive
+    ] if ; inline recursive
 
 : finalize-read-until ( seq sep/f -- seq/f sep/f )
-    2dup [ empty? ] [ not ] bi* and [ 2drop f f ] when ; inline
+    [ [ f ] when-empty f ] unless* ; inline
 
 : read-until-loop ( seps stream -- seq sep/f )
     [ [ stream-read1 dup [ rot member? not ] [ nip f ] if* ] 2curry [ ] ]
@@ -247,7 +247,7 @@ M: input-stream stream-contents* (stream-contents-by-length-or-block) ; inline
 M: input-stream stream-seekable? drop f ; inline
 M: input-stream stream-length drop f ; inline
 
-M: output-stream stream-write [ stream-write1 ] curry each ; inline
+M: output-stream stream-write '[ _ stream-write1 ] each ; inline
 M: output-stream stream-flush drop ; inline
 M: output-stream stream-nl CHAR: \n swap stream-write1 ; inline
 M: output-stream stream-seekable? drop f ; inline

@@ -1,5 +1,5 @@
 ! Copyright (C) 2005, 2010 Slava Pestov, Joe Groff.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: arrays assocs combinators grouping kernel math
 math.functions math.libm math.order sequences ;
 QUALIFIED-WITH: alien.c-types c

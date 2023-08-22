@@ -1,5 +1,5 @@
 ! Copyright (C) 2009 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors arrays combinators definitions generic
 generic.single generic.single.private kernel layouts make math
 namespaces quotations sequences words ;
@@ -66,3 +66,6 @@ M: standard-combination mega-cache-quot
 M: standard-generic definer drop \ GENERIC#: f ;
 
 M: simple-generic definer drop \ GENERIC: f ;
+
+M: standard-combination make-consult-quot
+    drop '[ _ call _ execute ] nip ;

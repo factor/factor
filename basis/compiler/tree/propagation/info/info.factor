@@ -1,5 +1,5 @@
 ! Copyright (C) 2008, 2010 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs byte-arrays classes
 classes.algebra classes.singleton classes.tuple
 classes.tuple.private combinators combinators.short-circuit
@@ -83,7 +83,7 @@ UNION: fixed-length array byte-array string ;
 : empty-set? ( info -- ? )
     {
         [ class>> null-class? ]
-        [ [ interval>> empty-interval? ] [ class>> real class<= ] bi and ]
+        [ { [ interval>> empty-interval? ] [ class>> real class<= ] } 1&& ]
     } 1|| ;
 
 ! Hardcoding classes is kind of a hack.
@@ -188,11 +188,7 @@ DEFER: value-info-intersect
 DEFER: (value-info-intersect)
 
 : intersect-slot ( info1 info2 -- info )
-    {
-        { [ dup not ] [ nip ] }
-        { [ over not ] [ drop ] }
-        [ (value-info-intersect) ]
-    } cond ;
+    2dup and [ (value-info-intersect) ] [ 2drop f ] if ;
 
 : intersect-slots ( info1 info2 -- slots )
     [ slots>> ] bi@ {
@@ -231,11 +227,7 @@ DEFER: value-info-union
 DEFER: (value-info-union)
 
 : union-slot ( info1 info2 -- info )
-    {
-        { [ dup not ] [ nip ] }
-        { [ over not ] [ drop ] }
-        [ (value-info-union) ]
-    } cond ;
+    2dup and [ (value-info-union) ] [ 2drop f ] if ;
 
 : union-slots ( info1 info2 -- slots )
     [ slots>> ] bi@
@@ -295,13 +287,25 @@ SYMBOL: value-infos
 : value-info ( value -- info )
     value-info* drop ;
 
-: set-value-info ( info value -- )
-    resolve-copy value-infos get last set-at ;
+: (set-value-info) ( info value assoc -- )
+    [ resolve-copy ] dip last set-at ;
 
-: refine-value-info ( info value -- )
-    resolve-copy value-infos get
+: set-value-info ( info value -- )
+    value-infos get (set-value-info) ;
+
+: set-value-infos ( infos values -- )
+    value-infos get '[ _ (set-value-info) ] 2each ;
+
+: (refine-value-info) ( info value assoc -- )
+    [ resolve-copy ] dip
     [ assoc-stack [ value-info-intersect ] when* ] 2keep
     last set-at ;
+
+: refine-value-info ( info value -- )
+    value-infos get (refine-value-info) ;
+
+: refine-value-infos ( infos values -- )
+    value-infos get '[ _ (refine-value-info) ] 2each ;
 
 : value-literal ( value -- obj ? )
     value-info >literal< ;

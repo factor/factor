@@ -1,5 +1,5 @@
 ! Copyright (C) 2005, 2009 Daniel Ehrenberg
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: xml.data xml.writer tools.test fry xml xml.syntax kernel multiline
 xml.writer.private io.streams.string xml.traversal sequences
 io.encodings.utf8 io.files io.files.temp accessors io.directories math
@@ -13,10 +13,10 @@ IN: xml.writer.tests
 { "ns:foo" } [ T{ name { space "ns" } { main "foo" } } name>string ] unit-test
 
 : reprints-as ( to from -- )
-     [ ] [ string>xml xml>string ] bi-curry* unit-test ;
+    [ ] [ string>xml xml>string ] bi-curry* unit-test ;
 
 : pprint-reprints-as ( to from -- )
-     [ ] [ string>xml pprint-xml>string ] bi-curry* unit-test ;
+    [ ] [ string>xml pprint-xml>string ] bi-curry* unit-test ;
 
 : reprints-same ( string -- ) dup reprints-as ;
 
@@ -50,7 +50,7 @@ IN: xml.writer.tests
 ]>
 <x>&foo;</x>" pprint-reprints-as
 
-{ t } [ "<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.1//EN\" \"http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd\">" dup string>xml-chunk xml>string = ] unit-test
+{ t } [ "<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.1//EN\" \"https://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd\">" dup string>xml-chunk xml>string = ] unit-test
 { "<?xml version=\"1.0\" encoding=\"UTF-8\"?><a b=\"c\"/>" }
     [ "<a b='c'/>" string>xml xml>string ] unit-test
 { "<?xml version=\"1.0\" encoding=\"UTF-8\"?><foo>bar baz</foo>" }
@@ -58,6 +58,7 @@ IN: xml.writer.tests
 { "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<foo>\n  bar\n</foo>" }
 [ "<foo>         bar            </foo>" string>xml pprint-xml>string ] unit-test
 { "<foo'>" } [ "<foo'>" <unescaped> xml>string ] unit-test
+{ "<![CDATA[<&'\"]]>" } [ "<&'\"" <cdata> xml>string ] unit-test
 
 : test-file ( -- path )
     "test.xml" temp-file ;

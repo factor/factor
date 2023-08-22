@@ -1,5 +1,5 @@
 ! Copyright (C) 2008 Slava Pestov, James Cash.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs classes deques dlists hashtables
 kernel parser sequences.private vocabs.loader ;
 IN: linked-assocs
@@ -44,6 +44,9 @@ M: linked-assoc >alist
 
 M: linked-assoc clear-assoc
     [ assoc>> clear-assoc ] [ dlist>> clear-deque ] bi ;
+
+M: linked-assoc new-assoc
+    assoc>> new-assoc <dlist> linked-assoc boa ;
 
 M: linked-assoc clone
     [ assoc>> clone ] [ dlist>> clone ] bi linked-assoc boa ;

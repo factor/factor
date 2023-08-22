@@ -1,5 +1,5 @@
 ! Copyright (C) 2011 John Benediktsson
-! See http://factorcode.org/license.txt for BSD license
+! See https://factorcode.org/license.txt for BSD license
 
 USING: accessors furnace.actions http.server
 http.server.dispatchers http.server.responses http.server.static
@@ -26,9 +26,9 @@ TUPLE: benchmark-dispatcher < dispatcher ;
 ! Use this with apachebench:
 !
 !   * dynamic content
-!     http://localhost:8080/hello
+!     https://localhost:8080/hello
 !
 !   * static content
-!     http://localhost:8080/static/readme.html
+!     https://localhost:8080/static/readme.html
 
 MAIN: run-benchmark-webapp

@@ -1,8 +1,7 @@
 ! Copyright (C) 2009 Daniel Ehrenberg
 ! Copyright (C) 2017 John Benediktsson
-! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays kernel locals math sequences
-sequences.private ;
+! See https://factorcode.org/license.txt for BSD license.
+USING: accessors arrays kernel math sequences sequences.private ;
 IN: wrap
 
 TUPLE: element contents black white ;

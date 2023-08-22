@@ -1,5 +1,5 @@
 ! Copyright (C) 2009 Joe Groff.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors ascii calendar combinators.short-circuit
 compiler.units kernel namespaces opengl sequences
 tools.annotations.private vocabs words ;
@@ -13,7 +13,7 @@ TUPLE: gl-error-log
 gl-error-log [ V{ } clone ] initialize
 
 : <gl-error-log> ( function code -- gl-error-log )
-    [ dup ] dip <gl-error> now gl-error-log boa ;
+    dupd <gl-error> now gl-error-log boa ;
 
 : log-gl-error ( function -- )
     gl-error-code [ <gl-error-log> gl-error-log get push ] [ drop ] if* ;

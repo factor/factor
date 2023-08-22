@@ -1,0 +1,21 @@
+<?xml version='1.0' ?>
+
+<t:chloe xmlns:t="http://factorcode.org/chloe/1.0">
+
+    <t:title>Search results for '<t:label t:name="search"/>'</t:title>
+
+	<div class="description">
+	<ul>
+		<t:bind-each t:name="results">
+			<li>
+				<t:a t:href="$wiki/view" t:rest="title"><t:label t:name="title"/></t:a>
+			</li>
+		</t:bind-each>
+    </ul>
+    </div>
+
+    <t:if t:value="empty">
+    <p>No results found!</p>
+    </t:if>
+
+</t:chloe>

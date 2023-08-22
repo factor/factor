@@ -13,18 +13,22 @@
 		<PROPERTY NAME="boxComment" VALUE="*" />
 		<PROPERTY NAME="lineComment" VALUE="//" />
 	</PROPS>
-	<RULES ESCAPE="\" IGNORE_CASE="FALSE">
-		<!-- C style comment -->
-		<SPAN TYPE="COMMENT1">
-			<BEGIN>/*</BEGIN>
-			<END>*/</END>
-		</SPAN>
+	<RULES IGNORE_CASE="FALSE">
+        <EOL_SPAN TYPE="KEYWORD2"
+				  AT_WHITESPACE_END="TRUE"
+				  DELEGATE="PREPROCESSOR">#</EOL_SPAN>
+		<IMPORT DELEGATE="LEX" />
+	</RULES>
 
-		<SPAN TYPE="LITERAL1" NO_LINE_BREAK="TRUE">
+	<RULES SET="LEX" IGNORE_CASE="FALSE">
+
+		<IMPORT DELEGATE="c::COMMENTS" />
+
+		<SPAN TYPE="LITERAL1" ESCAPE="\" NO_LINE_BREAK="TRUE">
 			<BEGIN>"</BEGIN>
 			<END>"</END>
 		</SPAN>
-		<SPAN TYPE="LITERAL1" NO_LINE_BREAK="TRUE">
+		<SPAN TYPE="LITERAL1" ESCAPE="\" NO_LINE_BREAK="TRUE">
 			<BEGIN>'</BEGIN>
 			<END>'</END>
 		</SPAN>
@@ -32,8 +36,7 @@
 		<EOL_SPAN TYPE="COMMENT2">//</EOL_SPAN>
 
 		<!-- some of these should be marked OPERATOR -->
-		<!-- <SEQ TYPE="NULL">)</SEQ>
-		<SEQ TYPE="NULL">=</SEQ>
+		<!--
 		<SEQ TYPE="NULL">!</SEQ>
 		<SEQ TYPE="NULL">&gt;=</SEQ>
 		<SEQ TYPE="NULL">&lt;=</SEQ>
@@ -41,8 +44,6 @@
 		<SEQ TYPE="NULL">-</SEQ>
 		<SEQ TYPE="NULL">/</SEQ>
 		<SEQ TYPE="NULL">*</SEQ>
-		<SEQ TYPE="NULL">&gt;</SEQ>
-		<SEQ TYPE="NULL">&lt;</SEQ>
 		<SEQ TYPE="NULL">%</SEQ>
 		<SEQ TYPE="NULL">&amp;</SEQ>
 		<SEQ TYPE="NULL">|</SEQ>
@@ -58,6 +59,10 @@
 		<SEQ TYPE="OPERATOR">}</SEQ>
 		<SEQ TYPE="OPERATOR">{</SEQ>
 		<SEQ TYPE="OPERATOR">:</SEQ>
+		<SEQ TYPE="OPERATOR">&gt;</SEQ>
+		<SEQ TYPE="OPERATOR">&lt;</SEQ>
+		<SEQ TYPE="OPERATOR">=</SEQ>
+
 
 		<!-- Function calls -->
 		<MARK_PREVIOUS TYPE="FUNCTION" MATCH_TYPE="OPERATOR">(</MARK_PREVIOUS>
@@ -103,4 +108,51 @@
 			<KEYWORD3>wstring</KEYWORD3>
 		</KEYWORDS>
 	</RULES>
+
+    <!-- Preprocessor specific rules. This is borrowed from the C mode,
+	     since the IDL spec says the preprocessor is compatible with the
+		 C++ standard. -->
+    <RULES SET="PREPROCESSOR"
+        IGNORE_CASE="FALSE"
+        HIGHLIGHT_DIGITS="TRUE" DIGIT_RE="[0-9][0-9a-zA-Z]*">
+
+        <EOL_SPAN_REGEXP HASH_CHAR="include" TYPE="MARKUP" DELEGATE="INCLUDE">include\b</EOL_SPAN_REGEXP>
+        <EOL_SPAN_REGEXP HASH_CHAR="define" TYPE="MARKUP" DELEGATE="DEFINE">define\b</EOL_SPAN_REGEXP>
+        <EOL_SPAN_REGEXP HASH_CHAR="endif" TYPE="MARKUP" DELEGATE="LEX">endif\b</EOL_SPAN_REGEXP>
+        <EOL_SPAN_REGEXP HASH_CHAR="elif" TYPE="MARKUP" DELEGATE="c::CONDITION">elif\b</EOL_SPAN_REGEXP>
+        <EOL_SPAN_REGEXP HASH_CHAR="if" TYPE="MARKUP" DELEGATE="c::CONDITION">if\b</EOL_SPAN_REGEXP>
+
+        <IMPORT DELEGATE="LEX"/>
+
+        <!-- Directives -->
+        <KEYWORDS>
+            <MARKUP>ifdef</MARKUP>
+            <MARKUP>ifndef</MARKUP>
+            <MARKUP>else</MARKUP>
+            <MARKUP>undef</MARKUP>
+            <MARKUP>warning</MARKUP>
+        </KEYWORDS>
+    </RULES>
+
+    <RULES SET="INCLUDE"
+        IGNORE_CASE="FALSE"
+        HIGHLIGHT_DIGITS="TRUE" DIGIT_RE="[0-9][0-9a-zA-Z]*">
+        <SPAN TYPE="LITERAL1" NO_LINE_BREAK="TRUE">
+            <BEGIN>&lt;</BEGIN>
+            <END>&gt;</END>
+        </SPAN>
+        <SPAN TYPE="LITERAL1" NO_LINE_BREAK="TRUE">
+            <BEGIN>"</BEGIN>
+            <END>"</END>
+        </SPAN>
+        <IMPORT DELEGATE="LEX"/>
+    </RULES>
+
+    <RULES SET="DEFINE"
+        IGNORE_CASE="FALSE"
+        HIGHLIGHT_DIGITS="TRUE" DIGIT_RE="[0-9][0-9a-zA-Z]*">
+        <SEQ TYPE="OPERATOR">#</SEQ>
+        <IMPORT DELEGATE="LEX"/>
+    </RULES>
+
 </MODE>

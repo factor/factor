@@ -1,5 +1,5 @@
 ! Copyright (C) 2006 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: tools.test lcs ;
 
 { 3 } [ "sitting" "kitten" levenshtein ] unit-test

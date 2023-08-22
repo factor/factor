@@ -1,5 +1,5 @@
 ! Copyright (C) 2013 Doug Coleman.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: assocs hash-sets kernel sequences sequences.extras
 sets ;
 IN: sets.extras
@@ -37,3 +37,6 @@ IN: sets.extras
 
 : unique-by ( seq quot: ( elt -- key ) -- seq' )
     over length <hash-set> '[ @ _ ?adjoin ] filter ; inline
+
+: diffs ( seq1 seq2 -- diff swapdiff intersect )
+    [ diff f like ] [ swap diff f like ] [ intersect ] 2tri ;

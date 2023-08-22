@@ -1,5 +1,5 @@
 ! Copyright (C) 2009 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs bit-sets compiler.cfg
 compiler.cfg.dominance compiler.cfg.rpo compiler.cfg.utilities
 fry hashtables kernel locals math namespaces sequences sets ;
@@ -8,7 +8,7 @@ IN: compiler.cfg.ssa.construction.tdmsc
 ! TDMSC-I algorithm from "A Practical and Fast Iterative Algorithm for
 ! Phi-Function Computation Using DJ Graphs"
 
-! http://portal.acm.org/citation.cfm?id=1065887.1065890
+! https://portal.acm.org/citation.cfm?id=1065887.1065890
 
 <PRIVATE
 
@@ -88,4 +88,4 @@ PRIVATE>
     } apply-passes ;
 
 : merge-set ( bbs -- bbs' )
-     (merge-set) [ members ] dip nths ;
+    (merge-set) [ members ] dip nths ;

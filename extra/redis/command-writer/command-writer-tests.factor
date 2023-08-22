@@ -1,5 +1,5 @@
 ! Copyright (C) 2009 Bruno Deferrari
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: tools.test redis.command-writer io.streams.string ;
 IN: redis.command-writer.tests
 
@@ -229,3 +229,17 @@ IN: redis.command-writer.tests
 { "*1\r\n$4\r\nINFO\r\n" } [ [ info ] with-string-writer ] unit-test
 
 { "*1\r\n$7\r\nMONITOR\r\n" } [ [ monitor ] with-string-writer ] unit-test
+
+! Lua
+
+{ "*3\r\n$6\r\nSCRIPT\r\n$4\r\nLOAD\r\n$8\r\nreturn 1\r\n" } [ [ "return 1" script-load ] with-string-writer ] unit-test
+
+{ "*3\r\n$6\r\nSCRIPT\r\n$6\r\nEXISTS\r\n$9\r\nfake-hash\r\n" } [ [ { "fake-hash" } script-exists ] with-string-writer ] unit-test
+
+{ "*2\r\n$6\r\nSCRIPT\r\n$5\r\nFLUSH\r\n" } [ [ script-flush ] with-string-writer ] unit-test
+
+{ "*2\r\n$6\r\nSCRIPT\r\n$4\r\nKILL\r\n" } [ [ script-kill ] with-string-writer ] unit-test
+
+{ "*6\r\n$4\r\nEVAL\r\n$36\r\nreturn { KEYS[1], KEYS[2], ARGV[1] }\r\n$1\r\n2\r\n$1\r\na\r\n$1\r\nb\r\n$3\r\n100\r\n" } [
+    [ "return { KEYS[1], KEYS[2], ARGV[1] }" { "a" "b" } { 100 } script-eval ] with-string-writer
+] unit-test

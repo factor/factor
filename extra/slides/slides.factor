@@ -1,5 +1,5 @@
 ! Copyright (C) 2007, 2010 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors arrays colors fonts help.markup help.stylesheet
 io.styles kernel literals math models namespaces parser ranges
 sequences ui ui.gadgets ui.gadgets.books ui.gadgets.panes
@@ -30,6 +30,9 @@ CONSTANT: stylesheet
             }
         }
         { table-content-style
+            H{ { wrap-margin $[ default-font-size 83 * ] } }
+        }
+        { list-content-style
             H{ { wrap-margin $[ default-font-size 83 * ] } }
         }
         { list-style
@@ -75,7 +78,7 @@ CONSTANT: stylesheet
     ] make-pane page-theme ;
 
 : $slide ( element -- )
-    unclip $title $divider $list ;
+    unclip last-element off $title $divider last-element off $list ;
 
 TUPLE: slides < book ;
 

@@ -1,5 +1,5 @@
 ! Copyright (C) 2006 Chris Double.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs combinators fry io
 io.encodings.binary io.files io.pathnames kernel lexer make math
 math.parser namespaces parser peg peg.ebnf peg.parsers
@@ -199,7 +199,7 @@ CONSTANT: sign-flag         0x80
     swap cpu-f-bitor= ;
 
 : clear-flag ( cpu flag -- )
-     bitnot 0xFF bitand swap cpu-f-bitand= ;
+    bitnot 0xFF bitand swap cpu-f-bitand= ;
 
 : update-zero-flag ( result cpu -- )
     ! If the result of an instruction has the value 0, this
@@ -453,7 +453,7 @@ SYMBOL: rom-root
 
 : rom-dir ( -- string )
     rom-root get [
-        home "roms" append-path dup file-exists? [ drop f ] unless
+        "~/roms" dup file-exists? [ drop f ] unless
     ] unless* ;
 
 : load-rom* ( seq cpu -- )

@@ -618,7 +618,7 @@ TUPLE: immutable-prop-test-tuple { x sequence read-only } ;
     ] final-classes
 ] unit-test
 
-{ } [ [ dup 3 slot swap 4 slot dup 3 slot swap 4 slot ] final-info drop ] unit-test
+[ [ dup 3 slot swap 4 slot dup 3 slot swap 4 slot ] final-info ] must-not-fail
 
 { V{ number } } [ [ [ "Oops" throw ] [ 2 + ] if ] final-classes ] unit-test
 { V{ number } } [ [ [ 2 + ] [ "Oops" throw ] if ] final-classes ] unit-test
@@ -702,7 +702,7 @@ TUPLE: mixed-mutable-immutable { x integer } { y sequence read-only } ;
 : recursive-test-4 ( i n -- )
     2dup < [ [ 1 + ] dip recursive-test-4 ] [ 2drop ] if ; inline recursive
 
-{ } [ [ recursive-test-4 ] final-info drop ] unit-test
+[ [ recursive-test-4 ] final-info ] must-not-fail
 
 : recursive-test-5 ( a -- b )
     dup 1 <= [ drop 1 ] [ dup 1 - recursive-test-5 * ] if ; inline recursive
@@ -723,10 +723,10 @@ TUPLE: mixed-mutable-immutable { x integer } { y sequence read-only } ;
 
 { V{ integer } } [ [ 0 2 100 ^ [ nip ] each-integer ] final-classes ] unit-test
 
-{ } [ [ [ ] [ ] compose curry call ] final-info drop ] unit-test
+[ [ [ ] [ ] compose curry call ] final-info ] must-not-fail
 
 { V{ } } [
-    [ [ drop ] [ drop ] compose curry (each-integer) ] final-classes
+    [ [ drop ] [ drop ] compose curry each-integer-from ] final-classes
 ] unit-test
 
 GENERIC: iterate ( obj -- next-obj ? )
@@ -741,7 +741,7 @@ M: array iterate first t ; inline
 : hang-1 ( m -- x )
     dup 0 number= [ hang-1 ] unless ; inline recursive
 
-{ } [ [ 3 hang-1 ] final-info drop ] unit-test
+[ [ 3 hang-1 ] final-info ] must-not-fail
 
 : hang-2 ( m n -- x )
     over 0 number= [
@@ -754,7 +754,7 @@ M: array iterate first t ; inline
         ] if
     ] if ; inline recursive
 
-{ } [ [ 3 over hang-2 ] final-info drop ] unit-test
+[ [ 3 over hang-2 ] final-info ] must-not-fail
 
 { } [
     [
@@ -801,28 +801,28 @@ M: fixnum bad-generic 1 fixnum+fast ; inline
 GENERIC: infinite-loop ( a -- b )
 M: integer infinite-loop infinite-loop ;
 
-{ } [ [ { integer } declare infinite-loop ] final-classes drop ] unit-test
+[ [ { integer } declare infinite-loop ] final-classes ] must-not-fail
 
 { V{ tuple } } [ [ tuple-layout <tuple> ] final-classes ] unit-test
 
-{ } [ [ instance? ] final-classes drop ] unit-test
+[ [ instance? ] final-classes ] must-not-fail
 
 { f } [ [ V{ } clone ] final-info first literal?>> ] unit-test
 
 : fold-throw-test ( a -- b ) "A" throw ; foldable
 
-{ } [ [ 0 fold-throw-test ] final-info drop ] unit-test
+[ [ 0 fold-throw-test ] final-info ] must-not-fail
 
 : too-deep ( a b -- c )
     dup [ drop ] [ 2dup too-deep too-deep * ] if ; inline recursive
 
-{ } [ [ too-deep ] final-info drop ] unit-test
+[ [ too-deep ] final-info ] must-not-fail
 
-{ } [ [ reversed boa slice boa nth-unsafe * ] final-info drop ] unit-test
+[ [ reversed boa slice boa nth-unsafe * ] final-info ] must-not-fail
 
 MIXIN: empty-mixin
 
-{ } [ [ { empty-mixin } declare empty-mixin? ] final-info drop ] unit-test
+[ [ { empty-mixin } declare empty-mixin? ] final-info ] must-not-fail
 
 { V{ fixnum } } [ [ [ bignum-shift drop ] keep ] final-classes ] unit-test
 
@@ -884,7 +884,7 @@ MIXIN: empty-mixin
 
 { V{ t } } [ [ macosx unix? ] final-literals ] unit-test
 
-{ V{ array } } [ [ [ <=> ] sort [ <=> ] sort ] final-classes ] unit-test
+{ V{ array } } [ [ [ <=> ] sort-with [ <=> ] sort-with ] final-classes ] unit-test
 
 { V{ float } } [ [ fsqrt ] final-classes ] unit-test
 
@@ -939,7 +939,7 @@ TUPLE: littledan-1 { a read-only } ;
 
 : littledan-1-test ( -- ) 0 littledan-1 boa (littledan-1-test) ; inline
 
-{ } [ [ littledan-1-test ] final-classes drop ] unit-test
+[ [ littledan-1-test ] final-classes ] must-not-fail
 
 TUPLE: littledan-2 { from read-only } { to read-only } ;
 
@@ -949,7 +949,7 @@ TUPLE: littledan-2 { from read-only } { to read-only } ;
 : littledan-2-test ( x -- i elt )
     [ 0 ] dip { array-capacity } declare littledan-2 boa (littledan-2-test) ; inline
 
-{ } [ [ littledan-2-test ] final-classes drop ] unit-test
+[ [ littledan-2-test ] final-classes ] must-not-fail
 
 : (littledan-3-test) ( x -- )
     length 1 + f <array> (littledan-3-test) ; inline recursive
@@ -957,7 +957,7 @@ TUPLE: littledan-2 { from read-only } { to read-only } ;
 : littledan-3-test ( -- )
     0 f <array> (littledan-3-test) ; inline
 
-{ } [ [ littledan-3-test ] final-classes drop ] unit-test
+[ [ littledan-3-test ] final-classes ] must-not-fail
 
 { V{ 0 } } [ [ { } length ] final-literals ] unit-test
 
@@ -980,7 +980,7 @@ TUPLE: littledan-2 { from read-only } { to read-only } ;
 ! Mutable tuples with circularity should not cause problems
 TUPLE: circle me ;
 
-{ } [ circle new dup >>me 1quotation final-info drop ] unit-test
+[ circle new dup >>me 1quotation final-info ] must-not-fail
 
 ! Joe found an oversight
 { V{ integer } } [ [ >integer ] final-classes ] unit-test

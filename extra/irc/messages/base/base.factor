@@ -1,5 +1,5 @@
 ! Copyright (C) 2009 Bruno Deferrari
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs calendar classes.parser
 classes.tuple combinators generic.parser kernel lexer mirrors
 namespaces parser sequences splitting words ;

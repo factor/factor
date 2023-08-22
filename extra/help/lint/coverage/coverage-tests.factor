@@ -19,8 +19,8 @@ PRIVATE>
 { f } [ \ a-defined-word empty-examples? ] unit-test
 { f } [ \ keep empty-examples? ] unit-test
 
-{ { $description $values } } [ \ an-empty-word-with-a-unique-name missing-sections natural-sort ] unit-test
-{ { $description $values } } [ \ a-defined-word missing-sections natural-sort ] unit-test
+{ { $description $values } } [ \ an-empty-word-with-a-unique-name missing-sections sort ] unit-test
+{ { $description $values } } [ \ a-defined-word missing-sections sort ] unit-test
 { { } } [ \ keep missing-sections ] unit-test
 
 { { "a.b" "a.b.c" } } [ { "a.b" "a.b.private" "a.b.c.private" "a.b.c" } filter-private ] unit-test
@@ -69,7 +69,7 @@ PRIVATE>
 ] unit-test
 
 ! make sure this doesn't throw an error (would signify an issue with ignored-words)
-{ } [ { $io-error $prettyprinting-note $nl } [ <word-help-coverage> ] map drop ] unit-test
+[ { $io-error $prettyprinting-note $nl } [ <word-help-coverage> ] map ] must-not-fail
 
 
 ! Lint system is written weirdly, there's no way to invoke it and get the output

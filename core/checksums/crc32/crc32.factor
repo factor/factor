@@ -1,5 +1,5 @@
 ! Copyright (C) 2006 Doug Coleman
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: checksums kernel math sequences sequences.private ;
 IN: checksums.crc32
 

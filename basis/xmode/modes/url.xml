@@ -1,0 +1,166 @@
+<?xml version="1.0"?>
+<!DOCTYPE MODE SYSTEM "xmode.dtd">
+
+<!-- URL mode, by Kevin Hunter of caktusgroup.com (kevin@) for jEdit -->
+<!--
+Attempting to implement http://en.wikipedia.org/wiki/URI_scheme.  Most
+schemes should work.  There are some commented out.  However, as of
+Wed, 11 Jun 2008, I'm still working out some kinks.  Specifically,
+these work
+
+http://www.example.com/
+http://www.example.com/path/to/file?id=true
+http://user@example.com/path/to/file
+http://user:pass@example.com/path/to/file
+
+and these don't work:
+
+http://www.example.com   (no trailing / messes it up)
+http://www.example.com/p/t/f?id=2&var=true ('&' and 'var' do not get marked) 
+-->
+
+<MODE>
+	<PROPS>
+		<PROPERTY NAME='wordBreakChars' VALUE=',-=&lt;&gt;/?^&amp;*' />
+	</PROPS>
+
+	<RULES SET='DOMAINNAME'
+		IGNORE_CASE='TRUE'
+		>
+
+		<MARK_PREVIOUS TYPE='LITERAL2' MATCH_TYPE='OPERATOR'>@</MARK_PREVIOUS>
+		<MARK_PREVIOUS TYPE='LITERAL2' MATCH_TYPE='OPERATOR'>:</MARK_PREVIOUS>
+		<MARK_PREVIOUS TYPE='LITERAL2' MATCH_TYPE='OPERATOR'>/</MARK_PREVIOUS>
+
+		<SPAN_REGEXP MATCH_TYPE='LITERAL2' NO_LINE_BREAK='TRUE' NO_WORD_BREAK='TRUE'>
+			<BEGIN>(?=\b[\w.:-]+@(\b))</BEGIN> <!-- Why doesn't this match at the *boundary* between :// and <username>?  It's wrapped in a (?=<look ahead assertion>) -->
+			<END>$1</END>
+		</SPAN_REGEXP>
+		<SPAN_REGEXP MATCH_TYPE='LITERAL1' NO_LINE_BREAK='TRUE' NO_WORD_BREAK='TRUE'>
+			<BEGIN>(\b)[\w.-]+((?=/))</BEGIN>
+			<END>$1</END>
+		</SPAN_REGEXP>
+		<EOL_SPAN TYPE='LITERAL4' MATCH_TYPE='OPERATOR'>/</EOL_SPAN>
+	</RULES>
+	<RULES
+		IGNORE_CASE='FALSE'
+		HIGHLIGHT_DIGITS='TRUE' DIGIT_RE='[0-9][0-9a-zA-Z]*'>
+
+		<MARK_FOLLOWING TYPE='LITERAL2' MATCH_TYPE='OPERATOR'>?</MARK_FOLLOWING>
+		<!-- <MARK_FOLLOWING TYPE='LITERAL2' MATCH_TYPE='OPERATOR'>&amp;</MARK_FOLLOWING> -->
+
+		<SEQ TYPE='OPERATOR'>/</SEQ>
+		<SEQ TYPE='LITERAL4'>+</SEQ>
+
+		<SPAN_REGEXP TYPE='LITERAL1' MATCH_TYPE='OPERATOR' NO_LINE_BREAK='TRUE' NO_WORD_BREAK='FALSE'>
+			<BEGIN>=</BEGIN>
+			<END>&amp;</END>
+		</SPAN_REGEXP>
+		<SPAN DELEGATE='DOMAINNAME' TYPE='LITERAL2' MATCH_TYPE='OPERATOR' NO_LINE_BREAK='TRUE' NO_WORD_BREAK='TRUE'>
+			<BEGIN>://</BEGIN>
+			<END>/</END>
+		</SPAN>
+
+		<IMPORT DELEGATE='SCHEMES' />
+	</RULES>
+	<RULES SET='SCHEMES' IGNORE_CASE='TRUE'>
+		<KEYWORDS>
+			<!-- Url types -->
+			<KEYWORD1>aaa</KEYWORD1>             <!-- Diameter Protocol                                                 RFC 3588 -->
+			<KEYWORD1>aaas</KEYWORD1>            <!-- Diameter Protocol (secure)                                        RFC 3588 -->
+			<KEYWORD1>acap</KEYWORD1>            <!-- Application Configuration Access Protocol                         RFC 2244 -->
+			<KEYWORD1>cap</KEYWORD1>             <!-- Calendar access protocol                                          RFC 4324 -->
+			<KEYWORD1>cid</KEYWORD1>             <!-- Referencing individual parts of an SMTP/MIME message              RFC 2392 -->
+			<KEYWORD1>crid</KEYWORD1>            <!-- TV-Anytime Content Reference Identifier                           RFC 4078 -->
+			<KEYWORD1>data</KEYWORD1>            <!-- Inclusion of small data items inline                              RFC 2397 -->
+			<KEYWORD1>dav</KEYWORD1>             <!-- HTTP Extensions for Distributed Authoring (WebDAV)                RFC 2518 -->
+			<KEYWORD1>dict</KEYWORD1>            <!-- Dictionary service protocol                                       RFC 2229 -->
+			<KEYWORD1>dns</KEYWORD1>             <!-- Domain Name System                                                RFC 4501 --> 	
+			<KEYWORD1>fax</KEYWORD1>             <!-- Used for telefacsimile numbers                                    RFC 2806 -->
+			<KEYWORD1>ftp</KEYWORD1>             <!-- File Transfer Protocal                                            RFC 1738 -->
+			<KEYWORD1>file</KEYWORD1>            <!-- Addressing files on local or network file systems                 RFC 1738 -->
+			<KEYWORD1>ftp</KEYWORD1>             <!-- FTP resources                                                     RFC 1738 -->
+			<KEYWORD1>go</KEYWORD1>              <!-- Common Name Resolution Protocol                                   RFC 3368 -->
+			<KEYWORD1>gopher</KEYWORD1>          <!-- Used with Gopher protocol                                         RFC 4266 -->
+			<KEYWORD1>h323</KEYWORD1>            <!-- Used with H.323 multimedia communications                         RFC 3508 -->
+			<KEYWORD1>http</KEYWORD1>            <!-- HTTP resources                                                    RFC 2616 -->
+			<KEYWORD1>https</KEYWORD1>           <!-- HTTP connections secured using SSL/TLS                            RFC 2817 -->
+			<KEYWORD1>icap</KEYWORD1>            <!-- Internet Content Adaptation Protocol                              RFC 3507 -->
+			<KEYWORD1>im</KEYWORD1>              <!-- Instant messaging protocol                                        RFC 3860 RFC 4622 -->
+			<KEYWORD1>imap</KEYWORD1>            <!-- Accessing e-mail resources through IMAP                           RFC 2192 -->
+			<KEYWORD1>info</KEYWORD1>            <!-- Information Assets with Identifiers in Public Namespaces          RFC 4452 -->
+			<KEYWORD1>ipp</KEYWORD1>             <!-- Internet Printing Protocol                                        RFC 3510 -->
+			<KEYWORD1>iris</KEYWORD1>            <!-- Internet Registry Information Service                             RFC 3981 -->
+			<KEYWORD1>ldap</KEYWORD1>            <!-- LDAP directory request                                            RFC 2255 RFC 4516 -->
+			<!-- <KEYWORD1>mailto</KEYWORD1>          SMTP e-mail addresses and default content                         RFC 2368 --> 
+			<KEYWORD1>mid</KEYWORD1>             <!-- Referencing SMTP/MIME messages, or parts of messages.             RFC 2392 -->
+			<KEYWORD1>modem</KEYWORD1>           <!-- modem                                                             RFC 3966 -->
+			<KEYWORD1>msrp</KEYWORD1>            <!-- msrps 	Message Session Relay Protocol                           RFC 4975 -->
+			<KEYWORD1>mtqp</KEYWORD1>            <!-- Message Tracking Query Protocol                                   RFC 3887 -->
+			<KEYWORD1>mupdate</KEYWORD1>         <!-- Mailbox Update Protocol                                           RFC 3656 -->
+			<KEYWORD1>news</KEYWORD1>            <!-- (Usenet) newsgroups and postings                                  RFC 1738 -->
+			<KEYWORD1>nfs</KEYWORD1>             <!-- Network File System resources                                     RFC 2224 -->
+			<KEYWORD1>nntp</KEYWORD1>            <!-- Usenet NNTP                                                       RFC 1738 -->
+			<KEYWORD1>opaquelocktoken</KEYWORD1> <!-- opaquelocktoken                                                   RFC 4918 -->
+			<KEYWORD1>pop</KEYWORD1>             <!-- Accessing mailbox through POP3                                    RFC 2384 -->
+			<KEYWORD1>pres</KEYWORD1>            <!-- Used in Common Profile for Presence (CPP) to identify presence    RFC 3859 -->
+			<KEYWORD1>prospero</KEYWORD1>        <!-- Prospero Directory Service                                        RFC 4157 -->
+			<KEYWORD1>rtsp</KEYWORD1>            <!-- Real Time Streaming Protocol                                      RFC 2326 -->
+			<KEYWORD1>service</KEYWORD1>         <!-- ???                                                               RFC 2609 -->
+			<KEYWORD1>shttp</KEYWORD1>           <!-- Secure HTTP                                                       RFC 2660 -->
+			<!-- <KEYWORD1>sip</KEYWORD1>             Used with Session Initiation Protocol (SIP)                       RFC 3969 RFC 3261 -->
+			<!-- <KEYWORD1>sips</KEYWORD1>            Secure equivalent of sip                                          RFC 3969 RFC 3261 -->
+			<KEYWORD1>snmp</KEYWORD1>            <!-- Simple Network Management Protocol                                RFC 4088 -->
+			<KEYWORD1>tag</KEYWORD1>             <!-- ???                                                               RFC 4151 -->
+			<KEYWORD1>telnet</KEYWORD1>          <!-- Used with telnet                                                  RFC 4248 -->
+			<KEYWORD1>tftp</KEYWORD1>            <!-- Trivial File Transfer Protocol                                    RFC 3617 -->
+			<KEYWORD1>thismessage</KEYWORD1>     <!-- multipart/related relative reference resolution                   RFC 2557 -->
+			<KEYWORD1>tip</KEYWORD1>             <!-- Transaction Internet Protocol                                     RFC 2371 -->
+			<KEYWORD1>tv</KEYWORD1>              <!-- TV Broadcasts                                                     RFC 2838 -->
+			<KEYWORD1>urn</KEYWORD1>             <!-- Uniform Resource Names                                            RFC 2141 -->
+			<KEYWORD1>vemmi</KEYWORD1>           <!-- Versatile Multimedia Interface                                    RFC 2122 -->
+			<KEYWORD1>wais</KEYWORD1>            <!-- Used with Wide area information server (WAIS)                     RFC 4156 -->
+			<KEYWORD1>xmlrpc.beep</KEYWORD1>     <!-- xmlrpc.beep                                                       RFC 3529 -->
+			<KEYWORD1>xmpp</KEYWORD1>            <!-- XMPP (Jabber)                                                     RFC 5122 -->
+
+			<!-- Unofficial but common URL schemes -->
+			<KEYWORD2>chrome</KEYWORD2>           <!-- Used in Mozilla/Gecko based browsers                                  -->
+			<KEYWORD2>cvs</KEYWORD2>              <!-- Concurrent Versions System (CVS) Repository Access                    -->
+			<!-- <KEYWORD2>ed2k</KEYWORD2>             Resources available using the eDonkey2000 network                     -->
+			<KEYWORD2>feed</KEYWORD2>             <!-- web feed subscription                                                 -->
+			<KEYWORD2>fish</KEYWORD2>             <!-- Accessing another computer's files using the SSH protocol             -->
+			<KEYWORD2>gg</KEYWORD2>               <!-- Starting chat with Gadu-Gadu user                                     -->
+			<KEYWORD2>gizmoproject</KEYWORD2>     <!-- Gizmo Project calling link.                                           -->
+			<!-- <KEYWORD2>iax2</KEYWORD2>             Inter-Asterisk eXchange protocol version 2                 IETF Draft -->
+			<KEYWORD2>irc</KEYWORD2>              <!-- Connecting to a server to join a channel.                  IETF Draft -->
+			<KEYWORD2>ircs</KEYWORD2>             <!-- Secure equivalent of irc                                   IETF Draft -->
+			<KEYWORD2>keyparc</KEYWORD2>          <!-- Keyparc encrypt/decrypt resource.                                     -->
+			<KEYWORD2>lastfm</KEYWORD2>           <!-- Connecting to a radio stream from Last.fm.                            -->
+			<KEYWORD2>ldaps</KEYWORD2>            <!-- Secure equivalent of ldap                                             -->
+			<!-- <KEYWORD2>magnet</KEYWORD2>           "magnet links"                                                        -->
+			<KEYWORD2>(other</KEYWORD2>           <!-- parameters are also possible)                                         -->
+			<KEYWORD2>mms</KEYWORD2>             <!-- Windows streaming media                                               -->
+			<!-- <KEYWORD2>mvn</KEYWORD2>              Access Apache Maven repository artifacts                              -->
+			<KEYWORD2>nsfw</KEYWORD2>             <!-- Not Safe For Work                                                     -->
+			<KEYWORD2>psyc</KEYWORD2>             <!-- Used to identify or locate a person, group, or place                  -->
+			<KEYWORD2>rsync</KEYWORD2>            <!-- Rsync                                                                 -->
+			<KEYWORD2>secondlife</KEYWORD2>       <!-- Open the Map floater in Second Life                                   -->
+			<KEYWORD2>sftp</KEYWORD2>             <!-- SFTP file transfers (not FTPS (FTP/SSL))                   IETF Draft -->
+			<KEYWORD2>skype</KEYWORD2>            <!-- Launching Skype call (official; see also callto:)                     -->
+			<KEYWORD2>ssh</KEYWORD2>              <!-- SSH connections (like telnet:) and                                    -->
+			<KEYWORD2>smb</KEYWORD2>              <!-- Accessing SMB/CIFS shares                                  IETF Draft -->
+			<KEYWORD2>soldat</KEYWORD2>           <!-- Joining servers                                                       -->
+			<!-- <KEYWORD2>steam</KEYWORD2>            Interact with Steam                                                   -->
+			<KEYWORD2>teamspeak</KEYWORD2>        <!-- Joining a server.                                                     -->
+			<KEYWORD2>unreal</KEYWORD2>           <!-- Joining servers                                                       -->
+			<KEYWORD2>ut2004</KEYWORD2>           <!-- Joining servers                                                       -->
+			<KEYWORD2>ventrilo</KEYWORD2>         <!-- Joining a server.                                                     -->
+			<!-- <KEYWORD2>view-source</KEYWORD2>      Shows a web page as code 'in the raw'.                                -->
+			<KEYWORD2>webcal</KEYWORD2>           <!-- Subscribing to calendars in iCalendar format                          -->
+			<KEYWORD2>wyciwyg</KEYWORD2>          <!-- What You Cache Is What You Get WYCIWYG                                -->
+			<KEYWORD2>xfire</KEYWORD2>            <!-- Adding friends and servers, joining servers                           -->
+			<KEYWORD2>ymsgr</KEYWORD2>            <!-- Sending an instant message to a Yahoo! Contact.                       -->
+		</KEYWORDS>
+	</RULES>
+</MODE>
+ 	  	 

@@ -1,5 +1,5 @@
 ! Copyright (C) 2019 Doug Coleman.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors checksums checksums.sha documents
 escape-strings kernel math.parser models sequences ui ui.gadgets
 ui.gadgets.editors ui.gadgets.labeled ui.gadgets.scrollers

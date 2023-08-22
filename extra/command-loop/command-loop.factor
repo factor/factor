@@ -1,5 +1,5 @@
 ! Copyright (C) 2021 John Benediktsson
-! See http://factorcode.org/license.txt for BSD license
+! See https://factorcode.org/license.txt for BSD license
 
 USING: accessors ascii assocs combinators continuations debugger
 formatting grouping io kernel math sequences sorting splitting ;
@@ -25,7 +25,7 @@ GENERIC: run-command-loop ( command-loop -- )
         nl
         "Commands available:" print
         "===================" print
-        nip commands>> [ name>> ] map natural-sort
+        nip commands>> [ name>> ] map sort
         [ 6 <groups> ] [ longest length 4 + ] bi
         '[ [ _ CHAR: \s pad-tail write ] each nl ] each nl
     ] [

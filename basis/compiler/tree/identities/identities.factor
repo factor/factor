@@ -1,5 +1,5 @@
 ! Copyright (C) 2008 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors arrays combinators compiler.tree
 compiler.tree.combinators compiler.tree.propagation.info fry
 hashtables kernel math math.partial-dispatch sequences words ;

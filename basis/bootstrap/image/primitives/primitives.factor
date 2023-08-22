@@ -814,9 +814,6 @@ CONSTANT: all-primitives {
 : primitive-word ( name vocab -- word )
     create-word dup t "primitive" set-word-prop ;
 
-: set-extra-props ( word extra-props -- )
-    [ rot set-word-prop ] with assoc-each ;
-
 :: create-primitive ( vocab word effect vm-func inputs outputs extra-word -- )
     word vocab primitive-word :> word
     word vm-func primitive-quot :> quot

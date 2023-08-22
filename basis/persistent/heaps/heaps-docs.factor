@@ -15,7 +15,7 @@ HELP: pheap-empty?
 
 HELP: pheap-peek
 { $values { "heap" "a persistent heap" } { "value" "an object in the heap" } { "prio" "the minimum priority" } }
-{ $description "Gets the object in the heap with minumum priority." } ;
+{ $description "Gets the object in the heap with minimum priority." } ;
 
 HELP: pheap-push
 { $values { "value" object } { "prio" "a priority" } { "heap" "a persistent heap" } { "newheap" "a new persistent heap" } }

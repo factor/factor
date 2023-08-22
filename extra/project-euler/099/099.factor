@@ -1,11 +1,11 @@
 ! Copyright (c) 2008 Aaron Schaefer.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: io.encodings.ascii io.files kernel math math.functions
 math.parser math.vectors project-euler.common sequences
 sequences.extras splitting ;
 IN: project-euler.099
 
-! http://projecteuler.net/index.php?section=problems&id=99
+! https://projecteuler.net/index.php?section=problems&id=99
 
 ! DESCRIPTION
 ! -----------
@@ -45,7 +45,7 @@ IN: project-euler.099
 PRIVATE>
 
 : euler099 ( -- answer )
-     source-099 solve ;
+    source-099 solve ;
 
 ! [ euler099 ] 100 ave-time
 ! 16 ms ave run timen - 1.67 SD (100 trials)

@@ -1,5 +1,5 @@
 ! Copyright (C) 2004, 2011 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors alien alien.strings arrays assocs classes
 classes.builtin classes.tuple classes.tuple.parser combinators
 combinators.short-circuit compiler.errors compiler.units
@@ -119,7 +119,7 @@ HOOK: signal-error. os ( obj -- )
     third symbol>string
     [ "Symbol: " write print ]
     [ "DlError: " write find-ffi-error print ] bi
-    "See http://concatenative.org/wiki/view/Factor/Requirements" print ;
+    "See https://concatenative.org/wiki/view/Factor/Requirements" print ;
 
 : stack-underflow. ( obj name -- )
     write " stack underflow" print drop ;
@@ -202,7 +202,7 @@ M: bad-slot-value summary drop "Bad store to specialized slot" ;
 
 M: bad-slot-name summary drop "Bad slot name in object literal" ;
 
-M: bad-vocab-name summary drop "Vocab name cannot contain \":/\\ \"" ;
+M: bad-vocab-name summary drop "Vocab name cannot contain ':/\\ \"'" ;
 
 M: no-math-method summary
     drop "No suitable arithmetic method" ;

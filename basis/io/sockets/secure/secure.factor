@@ -1,5 +1,5 @@
 ! Copyright (C) 2008, 2010 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors alien.libraries calendar combinators delegate
 destructors io io.sockets io.sockets.private kernel memoize namespaces
 openssl.libssl present sequences summary system vocabs ;
@@ -17,12 +17,13 @@ HOOK: ssl-certificate-verification-supported? secure-socket-backend ( -- ? )
 M: object ssl-supported? f ;
 M: object ssl-certificate-verification-supported? f ;
 
-SINGLETONS: TLSv1 TLSv1.1 TLSv1.2 ;
+SINGLETONS: TLSv1 TLSv1.1 TLSv1.2 TLS ;
 
 ERROR: no-tls-supported ;
 
 MEMO: best-tls-method ( -- class )
     {
+        { [ "TLS_method" "libssl" dlsym? ] [ TLS ] }
         { [ "TLSv1_2_method" "libssl" dlsym? ] [ TLSv1.2 ] }
         { [ "TLSv1_1_method" "libssl" dlsym? ] [ TLSv1.1 ] }
         { [ "TLSv1_method" "libssl" dlsym? ] [ TLSv1 ] }
@@ -50,10 +51,8 @@ TUPLE: secure-context < disposable config handle ;
 HOOK: <secure-context> secure-socket-backend ( config -- context )
 
 : with-secure-context ( config quot -- )
-    [
-        [ <secure-context> ] [ [ secure-context set ] prepose ] bi*
-        with-disposal
-    ] with-scope ; inline
+    [ <secure-context> ] dip
+    '[ secure-context _ with-variable ] with-disposal ; inline
 
 TUPLE: secure
     { addrspec read-only }

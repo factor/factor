@@ -1,5 +1,5 @@
 ! Copyright (C) 2008, 2011 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors debugger continuations threads io io.styles
 prettyprint kernel make math.parser namespaces ;
 IN: debugger.threads

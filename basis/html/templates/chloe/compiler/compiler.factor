@@ -1,5 +1,5 @@
 ! Copyright (C) 2008 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors ascii assocs combinators html.forms
 html.templates html.templates.chloe.syntax io io.streams.string
 kernel make namespaces present sequences splitting strings
@@ -117,7 +117,8 @@ CONSTANT: self-closing-tags {
 ERROR: unknown-chloe-tag tag ;
 
 : compile-chloe-tag ( tag -- )
-    dup main>> dup tags get at
+    dup main>>
+    [ chloe-tags get at ]
     [ call( tag -- ) ]
     [ unknown-chloe-tag ]
     ?if ;

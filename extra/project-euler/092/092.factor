@@ -1,9 +1,9 @@
 ! Copyright (c) 2008 Aaron Schaefer, Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: kernel math ranges project-euler.common sequences ;
 IN: project-euler.092
 
-! http://projecteuler.net/index.php?section=problems&id=92
+! https://projecteuler.net/index.php?section=problems&id=92
 
 ! DESCRIPTION
 ! -----------

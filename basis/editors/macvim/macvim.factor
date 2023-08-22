@@ -2,8 +2,9 @@ USING: editors editors.vim io.pathnames io.standard-paths kernel
 namespaces ;
 IN: editors.macvim
 
-TUPLE: macvim < vim ;
-T{ macvim } editor-class set-global
+SINGLETON: macvim
+
+INSTANCE: macvim vim-base
 
 : find-macvim-bundle-path ( -- path/f )
     "org.vim.MacVim" find-native-bundle [

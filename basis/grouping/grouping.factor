@@ -1,5 +1,5 @@
 ! Copyright (C) 2005, 2010 Slava Pestov, Joe Groff.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors kernel math math.order sequences
 sequences.private ;
 IN: grouping
@@ -74,8 +74,10 @@ PRIVATE>
         2 = [
             [ first2-unsafe ] dip call
         ] [
-            [ [ first-unsafe 1 ] [ setup-each [ + ] 2dip ] bi ] dip
-            '[ @ _ keep swap ] (all-integers?) nip
+            [
+                [ first-unsafe ]
+                [ >underlying< [ nth-unsafe ] curry [ 1 + ] 2dip ] bi
+            ] dip '[ @ _ keep swap ] all-integers-from? nip
         ] if
     ] if ; inline
 

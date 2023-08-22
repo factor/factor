@@ -41,11 +41,11 @@ HELP: draw-text
 
 HELP: x>offset
 { $values { "x" real } { "font" font } { "string" string } { "n" integer } }
-{ $contract "Outputs the string index closest to the given x co-ordinate." } ;
+{ $contract "Outputs the string index closest to the given x coordinate." } ;
 
 HELP: offset>x
 { $values { "n" integer } { "font" font } { "string" string } { "x" real } }
-{ $contract "Outputs the x co-ordinate of the character at the given index." } ;
+{ $contract "Outputs the x coordinate of the character at the given index." } ;
 
 HELP: line-metrics
 { $values { "font" font } { "string" string } { "metrics" line-metrics } }

@@ -1,5 +1,5 @@
 ! Copyright (C) 2021 Your name.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: tools.test http2.hpack http2.hpack.private accessors
 kernel sequences ;
 IN: http2.hpack.tests
@@ -107,7 +107,7 @@ CONSTANT: c53h { { ":status" "200" }
 
 ! RFC7541 Appendix C.2.1
 { T{ hpack-context f 4096 { { "custom-key" "custom-header" } } } 
-   26 { "custom-key" "custom-header" } }
+    26 { "custom-key" "custom-header" } }
 [ hpack-context new c21 0 decode-field nipd ] unit-test
 
 ! RFC7541 Appendix C.2.2

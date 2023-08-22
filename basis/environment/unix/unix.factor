@@ -1,5 +1,5 @@
 ! Copyright (C) 2008 Doug Coleman.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: alien.accessors alien.c-types alien.data alien.strings
 alien.syntax alien.utilities environment io.encodings.utf8
 kernel libc system unix.ffi vocabs ;

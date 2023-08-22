@@ -1,5 +1,5 @@
 ! Copyright (C) 2007 Chris Double.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 !
 USING: kernel math math.parser arrays tools.test peg peg.parsers
 peg.search ;
