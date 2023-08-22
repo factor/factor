@@ -355,11 +355,6 @@ HELP: $class-description
 { $description "Prints a \"Class Description\" heading, and displays its content." }
 ;
 
-HELP: $complex-shuffle
-{ $values { "element" "a markup element" } }
-{ $description "Used to indicate that a shuffle word is in the " { $link "shuffle-words-complex" } "category." }
-;
-
 HELP: $content
 { $values { "element" "a markup element" } }
 { $description "Prints the content of a help article. The link to the article is given as a string or a word." }

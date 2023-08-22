@@ -24,7 +24,7 @@ GENERIC: word-help* ( word -- content )
     ] when* ;
 
 : fix-shuffle ( content word -- content' word )
-    over [ { $shuffle $complex-shuffle } member? ] find drop [
+    over [ \ $shuffle = ] find drop [
         '[ _ cut unclip ] dip [
             stack-effect 2array 1array glue
         ] keep
