@@ -112,3 +112,7 @@ ssh-command [ "ssh" ] initialize
 
 ! Notary command-line arguments
 SYMBOL: notary-args
+
+! Location of DLLs to copy
+SYMBOL: dll-root
+dll-root [ "resource:" ] initialize

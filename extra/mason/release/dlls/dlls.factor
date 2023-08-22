@@ -1,6 +1,8 @@
 ! Copyright (C) 2016 Doug Coleman.
 ! See https://factorcode.org/license.txt for BSD license.
-USING: io.directories io.pathnames kernel namespaces sequences system ;
+USING: io.directories io.pathnames kernel mason.config
+namespaces sequences system ;
+
 IN: mason.release.dlls
 
 HOOK: dll-list os ( -- seq )
@@ -9,8 +11,6 @@ M: object dll-list { } ;
 
 ! These files should be in the directory that mason is run from.
 ! e.g. c:\factor32 or c:\factor64 on the build machine.
-
-INITIALIZED-SYMBOL: dll-root [ "resource:" ]
 
 M: windows dll-list
     cpu x86.64 =
