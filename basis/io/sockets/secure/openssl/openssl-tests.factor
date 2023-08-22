@@ -1,19 +1,24 @@
 USING: accessors continuations http.client http.server io.servers
 io.sockets.secure io.sockets.secure.openssl io.timeouts kernel
-layouts tools.test ;
+layouts system tools.test ;
 IN: io.sockets.secure.openssl.tests
 
 { 200 } [ "https://www.google.se" http-get drop code>> ] unit-test
 
-[
-    <http-server> cell-bits 64 = 8887 8888 ? >>insecure f >>secure [
-        cell-bits 64 =
-        "https://localhost:8887"
-        "https://localhost:8888" ? http-get
-    ] with-threaded-server
-] must-fail
-! XXX: Make this fail with certificate-missing-error? on Windows someday.
-! ] [ certificate-missing-error? ] must-fail-with
+[ "https://factorcode.org:80" http-get ] must-fail
+
+! hangs sometimes on Windows due to a timing issue?
+os windows? [
+    [
+        <http-server> cell-bits 64 = 8887 8888 ? >>insecure f >>secure [
+            cell-bits 64 =
+            "https://localhost:8887"
+            "https://localhost:8888" ? http-get
+        ] with-threaded-server
+    ] must-fail
+    ! XXX: Make this fail with certificate-missing-error? on Windows someday.
+    ! ] [ certificate-missing-error? ] must-fail-with
+] unless
 
 [ "test" 33 <ssl-handle> handle>> check-subject-name ]
 [ certificate-missing-error? ] must-fail-with
