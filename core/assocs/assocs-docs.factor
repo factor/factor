@@ -147,6 +147,7 @@ $nl
     assoc-each
     assoc-find
     assoc-map
+    assoc-map-as
     assoc-filter
     assoc-filter-as
     assoc-reject
@@ -167,7 +168,6 @@ $nl
     map>assoc
     map>alist
     assoc>map
-    assoc-map-as
 }
 "Destructive combinators:"
 { $subsections
