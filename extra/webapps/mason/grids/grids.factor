@@ -27,19 +27,29 @@ CONSTANT: cpus
 }
 
 : render-grid-header ( -- xml )
-    oses values [ [XML <th scope='col'><-></th> XML] ] map ;
+    oses values [ [XML <th scope="col"><-></th> XML] ] map ;
 
 :: render-grid-row ( cpu quot -- xml )
     cpu second oses keys [| os | cpu os quot render-grid-cell ] map
-    [XML <tr><th scope='row'><-></th><-></tr> XML] ;
+    [XML <tr><th scope="row"><-></th><-></tr> XML] ;
 
 :: render-grid ( quot -- xml )
     render-grid-header
     cpus [ quot render-grid-row ] map
     [XML
         <table class="downloads" cellspacing="0">
+            <colgroup>
+            <col style="width: 25%" />
+            <col style="width: 25%" />
+            <col style="width: 25%" />
+            <col style="width: 25%" />
+            </colgroup>
+            <thead>
             <tr><th class="nobg">OS/CPU</th><-></tr>
+            </thead>
+            <tbody>
             <->
+            </tbody>
         </table>
     XML] ;
 
