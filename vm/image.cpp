@@ -255,6 +255,8 @@ void factor_vm::load_image(vm_parameters* p) {
   if (h.version != image_version)
     fatal_error("Bad image: version number check failed", h.version);
 
+  if (!h.version4_escape) h.data_size=h.escaped_data_size, h.escaped_data_size=0;
+
   load_data_heap(file, &h, p);
   load_code_heap(file, &h, p);
 
