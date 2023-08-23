@@ -1,5 +1,5 @@
-USING: math math.order strings system-info.windows tools.test
-system system-info ;
+USING: kernel math math.order strings system-info.windows
+tools.test system system-info ;
 
 { t } [ cpus integer? ] unit-test
 
