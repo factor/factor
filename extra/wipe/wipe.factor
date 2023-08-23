@@ -1,23 +1,19 @@
 ! Copyright (C) 2017-2019, 2023 Alexander Ilin.
 ! See https://factorcode.org/license.txt for BSD license.
-USING: accessors
-io io.directories io.encodings.binary io.files io.files.info
-io.files.unique io.streams.limited io.streams.random
-kernel math namespaces random system vocabs ;
+USING: accessors io io.directories io.encodings.binary io.files
+io.files.info io.files.unique io.streams.limited
+io.streams.random kernel namespaces system vocabs ;
 IN: wipe
 
-: remove-read-only ( file-name -- )
-    drop ; ! Do nothing by default.
+HOOK: remove-read-only os ( file-name -- )
+
+M: object remove-read-only drop ;
 
 ! Load a Windows-specific implementation of remove-read-only.
 os windows? [ "wipe.windows" require ] when
 
 : overwrite-with-random-bytes ( file-name -- )
-    [ remove-read-only ] [ file-info size>> ] [ ] tri binary [
-        <random-stream> swap limit-stream
-        0 seek-absolute output-stream get
-        [ stream-seek ] keep stream-copy
-    ] with-file-appender ;
+    [ remove-read-only ] [ file-info size>> ] [ random-file ] tri ;
 
 : make-file-empty ( file-name -- )
     binary [ ] with-file-writer ;
