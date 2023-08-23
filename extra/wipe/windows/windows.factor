@@ -1,6 +1,6 @@
 ! Copyright (C) 2023 Alexander Ilin.
 ! See https://factorcode.org/license.txt for BSD license.
-USING: io.files.windows kernel math windows.kernel32 ;
+USING: io.files.windows kernel math system windows.kernel32 wipe ;
 IN: wipe.windows
 
 : extract-bit ( n mask -- n' ? )
