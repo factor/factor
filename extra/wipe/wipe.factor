@@ -14,7 +14,7 @@ os windows? [ "wipe.windows" require ] when
 
 : overwrite-with-random-bytes ( file-name -- )
     [ remove-read-only ] [ file-info size>> ] [ ] tri binary [
-        <random-stream> limit-stream
+        <random-stream> swap limit-stream
         0 seek-absolute output-stream get
         [ stream-seek ] keep stream-copy
     ] with-file-appender ;
@@ -38,7 +38,7 @@ os windows? [ "wipe.windows" require ] when
     dup [
         file-system-info free-space>>
         "" "" unique-file binary [
-            <random-stream> limit-stream
+            <random-stream> swap limit-stream
             output-stream get stream-copy
         ] with-file-writer
     ] with-temp-directory-at ;
