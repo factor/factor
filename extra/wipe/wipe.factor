@@ -13,7 +13,11 @@ M: object remove-read-only drop ;
 os windows? [ "wipe.windows" require ] when
 
 : overwrite-with-random-bytes ( file-name -- )
-    [ remove-read-only ] [ file-info size>> ] [ random-file ] tri ;
+    [ remove-read-only ] [ file-info size>> ] [ ] tri binary [
+        <random-stream> swap limit-stream
+        0 seek-absolute output-stream get
+        [ stream-seek ] keep stream-copy
+    ] with-file-appender ;
 
 : make-file-empty ( file-name -- )
     binary [ ] with-file-writer ;
