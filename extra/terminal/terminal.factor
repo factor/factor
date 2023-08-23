@@ -20,4 +20,4 @@ HOOK: (terminal-size) os ( -- columns lines )
 
 : terminal-width ( -- width ) terminal-size first ;
 
-: terimal-height ( -- height ) terminal-size second ;
+: terminal-height ( -- height ) terminal-size second ;
