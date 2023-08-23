@@ -8,10 +8,10 @@ IN: verbal-expressions
 
 TUPLE: verbal-expression prefix source suffix modifiers ;
 
-: <verbal-expressions> ( -- verbexp )
+: <verbal-expression> ( -- verbexp )
     "" "" "" "" verbal-expression boa ; inline
 
-ALIAS: <verbexp> <verbal-expressions>
+ALIAS: <verbexp> <verbal-expression>
 
 : >regexp ( verbexp -- regexp )
     [ [ prefix>> ] [ source>> ] [ suffix>> ] tri 3append ]
