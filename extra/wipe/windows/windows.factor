@@ -6,6 +6,6 @@ IN: wipe.windows
 : extract-bit ( n mask -- n' ? )
     [ bitnot bitand ] [ bitand 0 = not ] bi-curry bi ; inline
 
-: remove-read-only ( file-name -- )
+M: windows remove-read-only
     dup GetFileAttributesW FILE_ATTRIBUTE_READONLY extract-bit
     [ set-file-attributes ] [ 2drop ] if ;
