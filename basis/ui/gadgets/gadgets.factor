@@ -386,8 +386,8 @@ M: gadget focusable-child* drop t ;
 M: f focusable-child* drop f ;
 
 : focusable-child ( gadget -- child )
-    dup focusable-child*
-    dup t eq? [ drop ] [ nip focusable-child ] if ;
+    dup focusable-child* dup boolean?
+    [ drop ] [ nip focusable-child ] if ;
 
 GENERIC: request-focus-on ( child gadget -- )
 
