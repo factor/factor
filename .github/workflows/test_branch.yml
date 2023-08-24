@@ -1,4 +1,5 @@
 name: Test Branch
+run-name: Test branch ${{ github.ref }}, run by @${{ github.triggering_actor }}
 
 on: workflow_dispatch
 
@@ -9,7 +10,7 @@ jobs:
   build-linux:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
     - name: bootstrap
       run: ./build.sh net-bootstrap
     - name: load-all
@@ -22,7 +23,7 @@ jobs:
   build-macos:
     runs-on: macos-11
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
     - name: build
       run: arch -x86_64 ./build.sh net-bootstrap
     - name: load-all
@@ -35,7 +36,7 @@ jobs:
   build-windows:
     runs-on: windows-latest
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
     - uses: ilammy/msvc-dev-cmd@v1
     - name: build
       shell: cmd
