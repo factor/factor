@@ -1,8 +1,8 @@
-! Copyright (c) 2007, 2008, 2018 Aaron Schaefer.
-! See http://factorcode.org/license.txt for BSD license.
-USING: combinators combinators.short-circuit grouping kernel
-math math.functions math.parser math.order math.text.utils namespaces
-sequences splitting ;
+! Copyright (c) 2007, 2008, 2018 Aaron Schaefer, 2022 Alexander Ilin.
+! See https://factorcode.org/license.txt for BSD license.
+USING: combinators combinators.short-circuit kernel math
+math.order math.parser math.text.utils namespaces sequences
+splitting ;
 IN: math.text.english
 
 <PRIVATE
@@ -21,18 +21,48 @@ IN: math.text.english
         "seventy" "eighty" "ninety"
     } nth ;
 
-: scale-numbers ( n -- str )  ! up to 10^99
+: scale-numbers ( n -- str )  ! up to 10^630
     {
-        f "thousand" "million" "billion" "trillion" "quadrillion"
-        "quintillion" "sextillion" "septillion" "octillion"
-        "nonillion" "decillion" "undecillion" "duodecillion"
-        "tredecillion" "quattuordecillion" "quindecillion"
-        "sexdecillion" "septendecillion" "octodecillion" "novemdecillion"
-        "vigintillion" "unvigintillion" "duovigintillion" "trevigintillion"
-        "quattuorvigintillion" "quinvigintillion" "sexvigintillion"
-        "septvigintillion" "octovigintillion" "novemvigintillion"
-        "trigintillion" "untrigintillion" "duotrigintillion"
-    } nth ;
+        { [ dup 41 < ] [
+            {
+                f "thousand" "million" "billion" "trillion" "quadrillion"
+                "quintillion" "sextillion" "septillion" "octillion"
+                "nonillion" "decillion" "undecillion" "duodecillion"
+                "tredecillion" "quattuordecillion" "quindecillion"
+                "sexdecillion" "septendecillion" "octodecillion"
+                "novemdecillion" "vigintillion" "unvigintillion"
+                "duovigintillion" "tresvigintillion" "quattuorvigintillion"
+                "quinvigintillion" "sesvigintillion" "septemvigintillion"
+                "octovigintillion" "novemvigintillion" "trigintillion"
+                "untrigintillion" "duotrigintillion" "trestrigintillion"
+                "quattuortrigintillion" "quintrigintillion" "sestrigintillion"
+                "septentrigintillion" "octotrigintillion" "noventrigintillion"
+            } nth
+        ] }
+        { [ dup 311 < ] [
+            41 - 10 /mod [
+                {
+                    "quadragintillion" "quinquagintillion" "sexagintillion"
+                    "septuagintillion" "octogintillion" "nonagintillion"
+                    "centillion" "decicentillion" "viginticentillion"
+                    "trigintacentillion" "quadragintacentillion"
+                    "quinquagintacentillion" "sexagintacentillion"
+                    "septuagintacentillion" "octogintacentillion"
+                    "nonagintacentillion" "ducentillion"
+                } nth
+                ! Next 10^300 increments after ducentillion, which is 10^603:
+                ! "trecentillion" "quadringentillion"
+                ! "quingentillion" "sescentillion"
+                ! "septingentillion" "octingentillion"
+                ! "nongentillion" "millinillion" = 10^3003
+            ] [
+                {
+                    f "un" "duo" "tre" "quattuor"
+                    "quinqua" "se" "septe" "octo" "nove"
+                } nth
+            ] bi* swap "" append-as
+        ] }
+    } cond ;
 
 SYMBOL: and-needed?
 : set-conjunction ( seq -- )
@@ -104,7 +134,7 @@ M: float number>text
         [ string>number number>text ]
         [ [ "negative " prepend ] when ] bi*
     ] [
-        [ CHAR: 0 - small-numbers ] { } map-as " " join
+        [ CHAR: 0 - small-numbers ] { } map-as join-words
     ] bi* " point " glue ;
 
 M: complex number>text
@@ -122,3 +152,15 @@ M: complex number>text
             [ drop "th" ]
         } case
     ] if ;
+
+: number-ap-style ( n -- str )
+    dup { [ integer? ] [ 0 9 between? ] } 1&&
+    [ number>text ] [ number>string ] if ;
+
+: ordinal-ap-style ( n -- str )
+    dup {
+        f "first" "second" "third" "fourth" "fifth" "sixth"
+        "seventh" "eighth" "ninth"
+    } ?nth [ nip ] [
+        [ number>string ] [ ordinal-suffix ] bi append
+    ] if* ;

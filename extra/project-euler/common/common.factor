@@ -1,11 +1,11 @@
 ! Copyright (c) 2007-2010 Aaron Schaefer.
 ! The contents of this file are licensed under the Simplified BSD License
-! A copy of the license is available at http://factorcode.org/license.txt
-USING: accessors arrays byte-arrays fry hints kernel lists make math
-    math.functions math.matrices math.order math.parser math.primes.factors
-    math.primes.lists math.primes.miller-rabin math.ranges math.ratios
-    math.vectors namespaces parser prettyprint quotations sequences sorting
-    strings unicode vocabs vocabs.parser words ;
+! A copy of the license is available at https://factorcode.org/license.txt
+USING: accessors arrays byte-arrays hints kernel lists make
+math math.functions math.matrices math.order math.parser
+math.primes.factors math.primes.lists ranges math.ratios
+math.vectors parser prettyprint sequences sorting strings
+unicode vocabs.parser words ;
 IN: project-euler.common
 
 ! A collection of words used by more than one Project Euler solution
@@ -38,38 +38,18 @@ IN: project-euler.common
 : perfect-square? ( n -- ? )
     dup sqrt mod zero? ;
 
-<PRIVATE
-
-: count-digits ( n -- byte-array )
-    10 <byte-array> [
-        '[ 10 /mod _ [ 1 + ] change-nth dup 0 > ] loop drop
-    ] keep ;
-
-HINTS: count-digits fixnum ;
-
-: max-children ( seq -- seq )
-    [ dup length 1 - <iota> [ nth-pair max , ] with each ] { } make ;
-
-! Propagate one row into the upper one
-: propagate ( bottom top -- newtop )
-    [ over rest rot first2 max rot + ] map nip ;
-
-: (sum-divisors) ( n -- sum )
-    dup sqrt >integer [1,b] [
-        [ 2dup divisor? [ 2dup / + , ] [ drop ] if ] each
-        dup perfect-square? [ sqrt >fixnum neg , ] [ drop ] if
-    ] { } make sum ;
-
-: transform ( triple matrix -- new-triple )
-    [ 1array ] dip m. first ;
-
-PRIVATE>
-
 : alpha-value ( str -- n )
     >lower [ CHAR: a - 1 + ] map-sum ;
 
 : mediant ( a/c b/d -- (a+b)/(c+d) )
     2>fraction [ + ] 2bi@ / ;
+
+<PRIVATE
+
+: max-children ( seq -- seq )
+    [ dup length 1 - <iota> [ nth-pair max , ] with each ] { } make ;
+
+PRIVATE>
 
 : max-path ( triangle -- n )
     dup length 1 > [
@@ -105,13 +85,21 @@ PRIVATE>
     number>string dup reverse = ;
 
 : pandigital? ( n -- ? )
-    number>string natural-sort >string "123456789" = ;
+    number>string sort >string "123456789" = ;
 
 : pentagonal? ( n -- ? )
     dup 0 > [ 24 * 1 + sqrt 1 + 6 / 1 mod zero? ] [ drop f ] if ; inline
 
 : penultimate ( seq -- elt )
     dup length 2 - swap nth ;
+
+<PRIVATE
+
+! Propagate one row into the upper one
+: propagate ( bottom top -- newtop )
+    [ over rest rot first2 max rot + ] map nip ;
+
+PRIVATE>
 
 ! Not strictly needed, but it is nice to be able to dump the
 ! triangle after the propagation
@@ -120,8 +108,29 @@ PRIVATE>
     [ propagate dup ] map nip
     reverse swap suffix ;
 
+<PRIVATE
+
+: count-digits ( n -- byte-array )
+    10 <byte-array> [
+        '[ 10 /mod _ [ 1 + ] change-nth dup 0 > ] loop drop
+    ] keep ;
+
+HINTS: count-digits fixnum ;
+
+PRIVATE>
+
 : permutations? ( n m -- ? )
     [ count-digits ] same? ;
+
+<PRIVATE
+
+: (sum-divisors) ( n -- sum )
+    dup sqrt >integer [1..b] [
+        [ 2dup divisor? [ 2dup / + , ] [ drop ] if ] each
+        dup perfect-square? [ sqrt >fixnum neg , ] [ drop ] if
+    ] { } make sum ;
+
+PRIVATE>
 
 : sum-divisors ( n -- sum )
     dup 4 < [ { 0 1 3 4 } nth ] [ (sum-divisors) ] if ;
@@ -146,9 +155,16 @@ PRIVATE>
 : tau* ( m -- n )
     factor-2s dup [ 1 + ]
     [ perfect-square? -1 0 ? ]
-    [ dup sqrt >fixnum [1,b] ] tri* [
+    [ dup sqrt >fixnum [1..b] ] tri* [
         dupd divisor? [ [ 2 + ] dip ] when
     ] each drop * ;
+
+<PRIVATE
+
+: transform ( triple matrix -- new-triple )
+    [ 1array ] dip mdot first ;
+
+PRIVATE>
 
 ! These transforms are for generating primitive Pythagorean triples
 : u-transform ( triple -- new-triple )

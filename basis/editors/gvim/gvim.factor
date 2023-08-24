@@ -5,8 +5,9 @@ IN: editors.gvim
 ! This code builds on the code in editors.vim; see there for
 ! more information.
 
-TUPLE: gvim < vim ;
-T{ gvim } editor-class set-global
+SINGLETON: gvim
+
+INSTANCE: gvim vim-base
 
 HOOK: find-gvim-path io-backend ( -- path )
 

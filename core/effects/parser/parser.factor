@@ -1,5 +1,5 @@
 ! Copyright (C) 2008, 2010 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors arrays combinators continuations effects
 kernel lexer make namespaces parser sequences sets
 splitting vocabs.parser words ;
@@ -33,7 +33,7 @@ ERROR: bad-standalone-effect obj ;
 : parse-standalone-type ( obj -- var )
     parse-datum
     dup parsing-word? [
-        ?execute-parsing dup length 1 =
+        V{ } clone swap execute-parsing dup length 1 =
         [ first ] [ bad-standalone-effect ] if
     ] when f swap 2array ;
 PRIVATE>
@@ -51,9 +51,7 @@ PRIVATE>
     } cond ;
 
 : parse-effect-tokens ( end -- var tokens )
-    [
-        [ t f ] dip [ parse-effect-token [ f ] 2dip ] curry [ ] while nip
-    ] { } make ;
+    '[ t f [ _ parse-effect-token [ f ] 2dip ] loop nip ] { } make ;
 
 : parse-effect ( end -- effect )
     [ "--" parse-effect-tokens ] dip parse-effect-tokens
@@ -77,7 +75,7 @@ ERROR: can't-nest-definitions word ;
     manifest get current-vocab>> t or in-definition delete ;
 
 : with-definition ( quot -- )
-    [ set-in-definition ] prepose [ unset-in-definition ] [ ] cleanup ; inline
+    [ set-in-definition ] prepose [ unset-in-definition ] finally ; inline
 
 : (:) ( -- word def effect )
     [

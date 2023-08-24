@@ -1,13 +1,14 @@
 ! Copyright (C) 2005, 2010 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
-USING: accessors ascii assocs calendar combinators.short-circuit
-destructors fry hashtables http http.client.post-data
-http.parsers io io.crlf io.encodings io.encodings.ascii
+! See https://factorcode.org/license.txt for BSD license.
+USING: accessors arrays ascii assocs calendar combinators
+combinators.short-circuit continuations destructors effects
+environment hashtables http http.client.post-data http.parsers
+http.websockets io io.crlf io.encodings io.encodings.ascii
 io.encodings.binary io.encodings.iana io.encodings.string
-io.files io.pathnames io.sockets io.sockets.secure io.timeouts
-kernel locals math math.order math.parser mime.types namespaces
-present sequences splitting urls vocabs.loader combinators
-environment ;
+io.files io.files.info io.pathnames io.sockets io.sockets.secure
+io.timeouts kernel math math.order math.parser mime.types
+namespaces present protocols sequences splitting urls
+vocabs.loader ;
 IN: http.client
 
 ERROR: too-many-redirects ;
@@ -48,7 +49,7 @@ ERROR: download-failed response ;
 : default-port? ( url -- ? )
     {
         [ port>> not ]
-        [ [ port>> ] [ protocol>> protocol-port ] bi = ]
+        [ [ port>> ] [ protocol>> lookup-protocol-port ] bi = ]
     } 1|| ;
 
 : unparse-host ( url -- string )
@@ -57,10 +58,10 @@ ERROR: download-failed response ;
     ] if ;
 
 : set-host-header ( request header -- request header )
-    over url>> unparse-host "host" pick set-at ;
+    over url>> unparse-host "Host" pick set-at ;
 
 : set-cookie-header ( header cookies -- header )
-    unparse-cookie "cookie" pick set-at ;
+    unparse-cookie "Cookie" pick set-at ;
 
 : ?set-basic-auth ( header url name -- header )
     swap [
@@ -109,8 +110,6 @@ ERROR: download-failed response ;
     read-response-line
     read-response-header ;
 
-DEFER: (with-http-request)
-
 SYMBOL: redirects
 
 : redirect-url ( request url -- request )
@@ -119,13 +118,12 @@ SYMBOL: redirects
 : redirect? ( response -- ? )
     code>> 300 399 between? ;
 
-:: do-redirect ( quot: ( chunk -- ) response -- response )
+:: prepare-redirect ( response -- response )
     redirects inc
     redirects get request get redirects>> < [
         request get clone
         response "location" header redirect-url
         response code>> 307 = [ "GET" >>method f >>post-data ] unless
-        quot (with-http-request)
     ] [ too-many-redirects ] if ; inline recursive
 
 : read-chunk-size ( -- n )
@@ -133,11 +131,10 @@ SYMBOL: redirects
     hex> [ "Bad chunk size" throw ] unless* ;
 
 : read-chunked ( quot: ( chunk -- ) -- )
-    read-chunk-size dup zero?
-    [ 2drop ] [
+    read-chunk-size [ drop ] [
         read [ swap call ] [ drop ] 2bi
         read-crlf B{ } assert= read-chunked
-    ] if ; inline recursive
+    ] if-zero ; inline recursive
 
 : read-response-body ( quot: ( chunk -- ) response -- )
     binary decode-input
@@ -178,8 +175,8 @@ SYMBOL: redirects
 
 : no-proxy? ( request -- ? )
     get-no-proxy-list [
-       [ url>> host>> "." split ] dip "," split
-       [ "." split no-proxy-match? ] with any?
+        [ url>> host>> "." split ] dip "," split
+        [ "." split no-proxy-match? ] with any?
     ] [ drop f ] if* ;
 
 : (check-proxy) ( proxy -- ? )
@@ -205,8 +202,7 @@ SYMBOL: redirects
     ] if ;
 
 : misparsed-url? ( url -- url' )
-    [ protocol>> not ] [ host>> not ] [ path>> ]
-    tri and and ;
+    [ protocol>> not ] [ host>> not ] [ path>> ] tri and and ;
 
 : request-url ( url -- url' )
     dup >url dup misparsed-url? [
@@ -220,48 +216,69 @@ SYMBOL: redirects
         pick no-proxy? [ nip ] [ [ request-url ] dip derive-url ] if
     ] [ nip ] if check-proxy ;
 
-: (with-http-request) ( request quot: ( chunk -- ) -- response )
-    swap ?default-proxy
-    request [
-        <request-socket> [
+: upgrade-to-websocket? ( response -- ? )
+    {
+        [ response? ]
+        [ code>> 101 = ]
+        [ message>> >lower "switching protocols" = ]
+        [ header>> "connection" of "upgrade" = ]
+        [ header>> "upgrade" of "websocket" = ]
+    } 1&& ;
+
+PRIVATE>
+
+SYMBOL: request-socket
+
+: do-http-request ( request quot: ( chunk -- ) -- response/stream )
+    [ ?default-proxy \ request ] dip dup '[
+        [
+            <request-socket> |dispose
+            dup request-socket set
             [
-                [ in>> ] [ out>> ] bi
-                [ ?https-tunnel ] with-streams*
+                [ in>> ] [ out>> ] bi [ ?https-tunnel ] with-streams*
             ]
             [
                 out>>
                 [ request get write-request ]
                 with-output-stream*
-            ] [
+            ]
+            [
                 in>> [
-                    read-response dup redirect?
-                    request get redirects>> 0 > and [ t ] [
-                        [ nip response set ]
-                        [ read-response-body ]
-                        [ ]
-                        2tri f
+                    read-response
+                    dup redirect?
+                    request get redirects>> 0 > and [
+                        request-socket get dispose
+                        prepare-redirect _ do-http-request
+                    ] [
+                        dup upgrade-to-websocket?
+                        [ drop request-socket get ]
+                        [
+                            [ _ ] dip [ read-response-body ] keep
+                            request-socket get dispose
+                        ] if
                     ] if
                 ] with-input-stream*
             ] tri
-        ] with-disposal
-        [ do-redirect ] [ nip ] if
+        ] with-destructors
     ] with-variable ; inline recursive
+
+: add-default-headers ( request -- request )
+    dup url>> protocol>> {
+        { [ dup { "ws" "wss" } member? ] [ drop add-websocket-upgrade-headers ] }
+        [ drop ]
+    } cond ;
 
 : <client-request> ( url method -- request )
     <request>
         swap >>method
-        swap request-url >>url ; inline
+        swap request-url >>url
+        add-default-headers ; inline
 
-PRIVATE>
-
-: with-http-request* ( request quot: ( chunk -- ) -- response )
-    [ (with-http-request) ] with-destructors ; inline
-
-: with-http-request ( request quot: ( chunk -- ) -- response )
-    with-http-request* check-response ; inline
+: with-http-request ( request quot: ( chunk -- ) -- response/stream )
+    do-http-request check-response ; inline
 
 : http-request* ( request -- response data )
-    BV{ } clone [ '[ _ push-all ] with-http-request* ] keep
+    BV{ } clone [ '[ _ push-all ] do-http-request ] keep
     B{ } like over content-encoding>> decode [ >>body ] keep ;
 
 : http-request ( request -- response data )
@@ -276,6 +293,11 @@ PRIVATE>
 : http-get* ( url -- response data )
     <get-request> http-request* ;
 
+: file-too-old? ( file duration -- ? )
+    over file-exists? [
+        [ file-info created>> ago ] dip after?
+    ] [ 2drop t ] if ;
+
 : download-name ( url -- name )
     present file-name "?" split1 drop "/" ?tail drop ;
 
@@ -285,7 +307,10 @@ PRIVATE>
     ] with-file-writer ;
 
 : ?download-to ( url file -- )
-    dup exists? [ 2drop ] [ download-to ] if ;
+    dup file-exists? [ 2drop ] [ download-to ] if ;
+
+: ?download-update-to ( url file duration -- )
+    2dup file-too-old? [ drop download-to ] [ 3drop ] if ;
 
 : download ( url -- )
     dup download-name download-to ;
@@ -336,6 +361,16 @@ PRIVATE>
 
 : http-options* ( url -- response data )
     <options-request> http-request* ;
+
+: <patch-request> ( patch-data url -- request )
+    "PATCH" <client-request>
+        swap >>post-data ;
+
+: http-patch ( patch-data url -- response data )
+    <patch-request> http-request ;
+
+: http-patch* ( patch-data url -- response data )
+    <patch-request> http-request* ;
 
 : <trace-request> ( url -- request )
     "TRACE" <client-request> ;

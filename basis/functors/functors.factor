@@ -1,5 +1,5 @@
 ! Copyright (C) 2008, 2009 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs classes.mixin classes.parser
 classes.singleton classes.tuple classes.tuple.parser combinators
 effects.parser fry functors.backend generic generic.parser
@@ -149,20 +149,22 @@ DEFER: ;FUNCTOR> delimiter
         [ nip scan-object 2array ]
     } cond ;
 
-: parse-bindings ( end -- words assoc )
+: parse-bindings ( end -- words )
+    '[ _ parse-binding dup ]
+    [ first2 [ make-local ] dip 2array ]
+    produce nip ;
+
+: with-bindings ( ..a end quot: ( ..a words -- ..b ) -- ..b )
     '[
-        building get use-words
-        [ _ parse-binding dup ]
-        [ first2 [ make-local ] dip 2array ]
-        produce nip
-    ] H{ } make ;
+        building get [ _ parse-bindings @ ] with-words
+    ] H{ } make drop ; inline
 
 : parse-functor-body ( -- form )
     functor-words [
-        "WHERE" parse-bindings drop
-        [ swap <def> suffix ] { } assoc>map concat
-        \ ;FUNCTOR> parse-until [ ] append-as
-        qualified-vocabs pop* ! unuse the bindings
+        "WHERE" [
+            [ swap <def> suffix ] { } assoc>map concat
+            \ ;FUNCTOR> parse-until [ ] append-as
+        ] with-bindings
     ] with-lambda-scope ;
 
 : (<FUNCTOR:) ( -- word def effect )

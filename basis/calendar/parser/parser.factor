@@ -1,8 +1,9 @@
 ! Copyright (C) 2008, 2010 Slava Pestov, Doug Coleman.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors assocs calendar calendar.english combinators
-continuations generalizations io io.streams.string kernel macros math
-math.functions math.parser sequences ;
+combinators.short-circuit continuations generalizations io
+io.streams.string kernel math math.functions math.parser
+sequences ;
 IN: calendar.parser
 
 : read-00 ( -- n ) 2 read string>number ;
@@ -28,7 +29,7 @@ ERROR: invalid-timestamp-format ;
 : read-sp ( -- token ) " " read-token ;
 
 : signed-gmt-offset ( dt ch -- dt' )
-    { { CHAR: + [ 1 ] } { CHAR: - [ -1 ] } } case time* ;
+    { { CHAR: + [ 1 ] } { CHAR: - [ -1 ] } } case duration* ;
 
 : read-rfc3339-gmt-offset ( ch -- dt )
     {
@@ -54,7 +55,7 @@ ERROR: invalid-timestamp-format ;
         [ string>number ] [ length 10^ ] bi / +
     ] dip ;
 
-: (rfc3339>timestamp) ( -- timestamp )
+: read-rfc3339 ( -- timestamp )
     read-ymd
     "Tt \t" expect
     read-hms
@@ -63,7 +64,7 @@ ERROR: invalid-timestamp-format ;
     <timestamp> ;
 
 : rfc3339>timestamp ( str -- timestamp )
-    [ (rfc3339>timestamp) ] with-string-reader ;
+    [ read-rfc3339 ] with-string-reader ;
 
 : parse-rfc822-military-offset ( string -- dt )
     first CHAR: A - {
@@ -99,7 +100,7 @@ CONSTANT: rfc822-named-zones H{
     ":" read-token checked-number
     read-sp checked-number ;
 
-: (rfc822>timestamp) ( -- timestamp )
+: read-rfc822 ( -- timestamp )
     "," read-token day-abbreviations3 member? check-timestamp drop
     read1 CHAR: \s assert=
     read-sp checked-number
@@ -109,13 +110,13 @@ CONSTANT: rfc822-named-zones H{
     " " read-until drop parse-rfc822-gmt-offset <timestamp> ;
 
 : rfc822>timestamp ( str -- timestamp )
-    [ (rfc822>timestamp) ] with-string-reader ;
+    [ read-rfc822 ] with-string-reader ;
 
 : check-day-name ( str -- )
     [ day-abbreviations3 member? ] [ day-names member? ] bi or
     check-timestamp drop ;
 
-: (cookie-string>timestamp-1) ( -- timestamp )
+: read-cookie-string-1 ( -- timestamp )
     "," read-token check-day-name
     read1 CHAR: \s assert=
     "-" read-token checked-number
@@ -125,9 +126,9 @@ CONSTANT: rfc822-named-zones H{
     " " read-until drop parse-rfc822-gmt-offset <timestamp> ;
 
 : cookie-string>timestamp-1 ( str -- timestamp )
-    [ (cookie-string>timestamp-1) ] with-string-reader ;
+    [ read-cookie-string-1 ] with-string-reader ;
 
-: (cookie-string>timestamp-2) ( -- timestamp )
+: read-cookie-string-2 ( -- timestamp )
     read-sp check-day-name
     read-sp month-abbreviations index 1 + check-timestamp
     read-sp checked-number
@@ -136,35 +137,21 @@ CONSTANT: rfc822-named-zones H{
     " " read-until drop parse-rfc822-gmt-offset <timestamp> ;
 
 : cookie-string>timestamp-2 ( str -- timestamp )
-    [ (cookie-string>timestamp-2) ] with-string-reader ;
-
-MACRO: attempt-all-quots ( quots -- quot )
-    dup length 1 = [ first ] [
-        unclip swap
-        [ nip attempt-all-quots ] curry
-        [ recover ] 2curry
-    ] if ;
+    [ read-cookie-string-2 ] with-string-reader ;
 
 : cookie-string>timestamp ( str -- timestamp )
     {
-        [ cookie-string>timestamp-1 ]
-        [ cookie-string>timestamp-2 ]
-        [ rfc822>timestamp ]
-    } attempt-all-quots ;
-
-: (ymdhms>timestamp) ( -- timestamp )
-    read-ymd " " expect read-hms instant <timestamp> ;
+        [ [ cookie-string>timestamp-1 ] [ 2drop f ] recover ]
+        [ [ cookie-string>timestamp-2 ] [ 2drop f ] recover ]
+        [ [ rfc822>timestamp ] [ 2drop f ] recover ]
+    } 1|| ;
 
 : ymdhms>timestamp ( str -- timestamp )
-    [ (ymdhms>timestamp) ] with-string-reader ;
-
-: (ymd>timestamp) ( -- timestamp )
-    read-ymd <date-gmt> ;
+    [ read-ymd " " expect read-hms instant <timestamp> ] with-string-reader ;
 
 : ymd>timestamp ( str -- timestamp )
-    [ (ymd>timestamp) ] with-string-reader ;
+    [ read-ymd <date-gmt> ] with-string-reader ;
 
-! Duration parsing
 : hhmm>duration ( hhmm -- duration )
     [ instant read-00 >>hour read-00 >>minute ] with-string-reader ;
 

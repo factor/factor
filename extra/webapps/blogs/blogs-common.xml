@@ -2,30 +2,30 @@
 
 <t:chloe xmlns:t="http://factorcode.org/chloe/1.0">
 
-	<t:atom t:href="$blogs/posts.atom">Recent Posts</t:atom>
+    <t:atom t:href="$blogs/posts.atom">Recent Posts</t:atom>
 
-	<t:style t:include="resource:extra/webapps/blogs/blogs.css" />
+    <t:style t:include="resource:extra/webapps/blogs/blogs.css" />
 
-	<div class="navbar">
+    <nav>
+        <t:a t:href="$blogs/">All Posts</t:a>
+        <t:a t:href="$blogs/by">My Posts</t:a>
+        <t:a t:href="$blogs/new-post">New Post</t:a>
 
-		  <t:a t:href="$blogs/">All Posts</t:a>
-		| <t:a t:href="$blogs/by">My Posts</t:a>
-		| <t:a t:href="$blogs/new-post">New Post</t:a>
+        <t:if t:code="furnace.auth:logged-in?">
 
-		<t:if t:code="furnace.auth:logged-in?">
+            <t:if t:code="furnace.auth.features.edit-profile:allow-edit-profile?">
+                <t:a t:href="$realm/edit-profile" t:aside="begin">Edit Profile</t:a>
+            </t:if>
 
-			<t:if t:code="furnace.auth.features.edit-profile:allow-edit-profile?">
-				| <t:a t:href="$realm/edit-profile" t:aside="begin">Edit Profile</t:a>
-			</t:if>
+            <t:button t:action="$login-realm/logout" t:aside="begin" class="link-button link">Logout</t:button>
 
-			| <t:button t:action="$login-realm/logout" t:aside="begin" class="link-button link">Logout</t:button>
+        </t:if>
+    </nav>
 
-		</t:if>
+    <div class="page">
+    <h1><t:write-title /></h1>
 
-	</div>
-
-	<h1><t:write-title /></h1>
-
-	<t:call-next-template />
+    <t:call-next-template />
+    </div>
 
 </t:chloe>

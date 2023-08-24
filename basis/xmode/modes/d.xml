@@ -21,8 +21,7 @@
 	<PROPERTY NAME="electricKeys" VALUE=":" />
     </PROPS>
 
-    <RULES ESCAPE="\"
-        IGNORE_CASE="FALSE"
+    <RULES IGNORE_CASE="FALSE"
         HIGHLIGHT_DIGITS="TRUE"
         DIGIT_RE="(0x[0-9a-fA-F_]+[uUlL]?|[0-9_]+(e[0-9_]*)?[uUlLdDfF]?)">
 
@@ -56,27 +55,27 @@
         <EOL_SPAN TYPE="COMMENT2">//</EOL_SPAN>
 
         <!-- Wysiwyg string literal -->
-        <SPAN TYPE="LITERAL1" NO_LINE_BREAK="TRUE" NO_ESCAPE="TRUE">
+        <SPAN TYPE="LITERAL1" NO_LINE_BREAK="TRUE">
             <BEGIN>r"</BEGIN>
             <END>"</END>
         </SPAN>
         <!-- Alternate Wysiwyg string literal -->
-        <SPAN TYPE="LITERAL1" NO_LINE_BREAK="TRUE" NO_ESCAPE="TRUE">
+        <SPAN TYPE="LITERAL1" ESCAPE="\" NO_LINE_BREAK="TRUE">
             <BEGIN>`</BEGIN>
             <END>`</END>
         </SPAN>
         <!-- Doublequoted string literal -->
-        <SPAN TYPE="LITERAL1" NO_LINE_BREAK="TRUE">
+        <SPAN TYPE="LITERAL1" ESCAPE="\" NO_LINE_BREAK="TRUE">
             <BEGIN>"</BEGIN>
             <END>"</END>
         </SPAN>
         <!-- Hex string literal -->
-        <SPAN TYPE="LITERAL1" NO_LINE_BREAK="TRUE">
+        <SPAN TYPE="LITERAL1" ESCAPE="\" NO_LINE_BREAK="TRUE">
             <BEGIN>x"</BEGIN>
             <END>"</END>
         </SPAN>
         <!-- Character literal -->
-        <SPAN TYPE="LITERAL1" NO_LINE_BREAK="TRUE">
+        <SPAN TYPE="LITERAL1" ESCAPE="\" NO_LINE_BREAK="TRUE">
             <BEGIN>'</BEGIN>
             <END>'</END>
         </SPAN>
@@ -111,100 +110,116 @@
         <MARK_FOLLOWING TYPE="KEYWORD4">@</MARK_FOLLOWING>
 
         <KEYWORDS>
-            <KEYWORD1>abstract</KEYWORD1>
-            <KEYWORD3>alias</KEYWORD3>
-            <KEYWORD4>align</KEYWORD4>
-            <KEYWORD2>asm</KEYWORD2>
-            <KEYWORD2>assert</KEYWORD2>
-            <KEYWORD3>auto</KEYWORD3>
-            <KEYWORD3>bit</KEYWORD3>
-            <KEYWORD4>body</KEYWORD4>
-            <KEYWORD1>break</KEYWORD1>
-            <KEYWORD3>byte</KEYWORD3>
-            <KEYWORD1>case</KEYWORD1>
-            <KEYWORD3>cast</KEYWORD3>
-            <KEYWORD1>catch</KEYWORD1>
-            <KEYWORD3>cent</KEYWORD3>
-            <KEYWORD3>char</KEYWORD3>
-            <KEYWORD3>class</KEYWORD3>
-            <KEYWORD3>cfloat</KEYWORD3>
-            <KEYWORD3>cdouble</KEYWORD3>
-            <KEYWORD3>creal</KEYWORD3>
-            <INVALID>const</INVALID>
-            <KEYWORD1>continue</KEYWORD1>
-            <KEYWORD3>dchar</KEYWORD3>
-            <KEYWORD2>debug</KEYWORD2>
-            <KEYWORD1>default</KEYWORD1>
-            <KEYWORD4>delegate</KEYWORD4>
-            <KEYWORD1>delete</KEYWORD1>
-            <KEYWORD2>deprecated</KEYWORD2>
-            <KEYWORD1>do</KEYWORD1>
-            <KEYWORD3>double</KEYWORD3>
-            <KEYWORD1>else</KEYWORD1>
-            <KEYWORD3>enum</KEYWORD3>
-            <KEYWORD2>export</KEYWORD2>
-            <KEYWORD2>extern</KEYWORD2>
-            <LITERAL2>false</LITERAL2>
-            <KEYWORD1>final</KEYWORD1>
-            <KEYWORD1>finally</KEYWORD1>
-            <KEYWORD3>float</KEYWORD3>
-            <KEYWORD1>for</KEYWORD1>
-            <KEYWORD1>foreach</KEYWORD1>
-            <KEYWORD4>function</KEYWORD4>
-            <INVALID>goto</INVALID>
-            <KEYWORD3>idouble</KEYWORD3>
-            <KEYWORD1>if</KEYWORD1>
-            <KEYWORD3>ifloat</KEYWORD3>
-            <KEYWORD2>import</KEYWORD2>
-            <INVALID>in</INVALID>
-            <INVALID>inout</INVALID>
-            <KEYWORD3>int</KEYWORD3>
-            <KEYWORD2>interface</KEYWORD2>
-            <KEYWORD2>invariant</KEYWORD2>
-            <KEYWORD3>ireal</KEYWORD3>
-            <OPERATOR>is</OPERATOR>
+            <KEYWORD2>abstract</KEYWORD2>
+            <KEYWORD4>alias</KEYWORD4> 
+            <KEYWORD4>align</KEYWORD4> 
+            <KEYWORD4>asm</KEYWORD4> 
+            <KEYWORD4>assert</KEYWORD4> 
+            <KEYWORD3>auto</KEYWORD3> 
+            <KEYWORD1>body</KEYWORD1> 
+            <KEYWORD3>bool</KEYWORD3> 
+            <KEYWORD1>break</KEYWORD1> 
+            <KEYWORD3>byte</KEYWORD3> 
+            <KEYWORD1>case</KEYWORD1> 
+            <KEYWORD4>cast</KEYWORD4> 
+            <KEYWORD1>catch</KEYWORD1> 
+            <KEYWORD3>cdouble</KEYWORD3> 
+            <KEYWORD3>cent</KEYWORD3> 
+            <KEYWORD3>cfloat</KEYWORD3> 
+            <KEYWORD3>char</KEYWORD3> 
+            <KEYWORD1>class</KEYWORD1> 
+            <KEYWORD2>const</KEYWORD2> 
+            <KEYWORD1>continue</KEYWORD1> 
+            <KEYWORD3>creal</KEYWORD3> 
+            <KEYWORD3>dchar</KEYWORD3> 
+            <KEYWORD1>debug</KEYWORD1> 
+            <KEYWORD1>default</KEYWORD1> 
+            <KEYWORD4>delegate</KEYWORD4> 
+            <KEYWORD4>delete</KEYWORD4>
+            <KEYWORD2>deprecated</KEYWORD2> 
+            <KEYWORD1>do</KEYWORD1> 
+            <KEYWORD3>double</KEYWORD3> 
+            <KEYWORD1>else</KEYWORD1> 
+            <KEYWORD3>enum</KEYWORD3> 
+            <KEYWORD4>export</KEYWORD4> 
+            <KEYWORD2>extern</KEYWORD2> 
+            <LITERAL1>false</LITERAL1> 
+            <KEYWORD2>final</KEYWORD2> 
+            <KEYWORD1>finally</KEYWORD1> 
+            <KEYWORD3>float</KEYWORD3> 
+            <KEYWORD1>for</KEYWORD1> 
+            <KEYWORD1>foreach</KEYWORD1> 
+            <KEYWORD1>foreach_reverse</KEYWORD1> 
+            <KEYWORD4>function</KEYWORD4> 
+            <KEYWORD1>goto</KEYWORD1> 
+            <KEYWORD3>idouble</KEYWORD3> 
+            <KEYWORD1>if</KEYWORD1> 
+            <KEYWORD3>ifloat</KEYWORD3> 
+            <KEYWORD2>immutable</KEYWORD2> 
+            <KEYWORD4>import</KEYWORD4> 
+            <KEYWORD2>in</KEYWORD2> 
+            <KEYWORD2>inout</KEYWORD2> 
+            <KEYWORD3>int</KEYWORD3> 
+            <KEYWORD3>interface</KEYWORD3> 
+            <KEYWORD4>invariant</KEYWORD4> 
+            <KEYWORD3>ireal</KEYWORD3> 
+            <KEYWORD4>is</KEYWORD4> 
+            <KEYWORD2>lazy</KEYWORD2> 
             <KEYWORD3>long</KEYWORD3>
-            <KEYWORD4>module</KEYWORD4>
-            <KEYWORD1>new</KEYWORD1>
-            <LITERAL2>null</LITERAL2>
-            <INVALID>out</INVALID>
-            <KEYWORD4>override</KEYWORD4>
-            <KEYWORD2>package</KEYWORD2>
-            <KEYWORD2>pragma</KEYWORD2>
-            <KEYWORD1>private</KEYWORD1>
-            <KEYWORD1>protected</KEYWORD1>
-            <KEYWORD1>public</KEYWORD1>
-            <KEYWORD3>real</KEYWORD3>
-            <KEYWORD1>return</KEYWORD1>
-            <KEYWORD3>short</KEYWORD3>
-            <KEYWORD1>static</KEYWORD1>
-            <KEYWORD3>struct</KEYWORD3>
-            <LITERAL2>super</LITERAL2>
-            <KEYWORD1>switch</KEYWORD1>
-            <KEYWORD1>synchronized</KEYWORD1>
-            <KEYWORD3>template</KEYWORD3>
-            <LITERAL2>this</LITERAL2>
-            <KEYWORD1>throw</KEYWORD1>
-            <LITERAL2>true</LITERAL2>
-            <KEYWORD1>try</KEYWORD1>
-            <KEYWORD3>typedef</KEYWORD3>
-            <KEYWORD1>typeof</KEYWORD1>
-            <KEYWORD3>ubyte</KEYWORD3>
-            <KEYWORD3>ucent</KEYWORD3>
-            <KEYWORD3>uint</KEYWORD3>
-            <KEYWORD3>ulong</KEYWORD3>
-            <KEYWORD3>union</KEYWORD3>
-            <KEYWORD2>unittest</KEYWORD2>
-            <KEYWORD3>ushort</KEYWORD3>
-            <KEYWORD2>version</KEYWORD2>
-            <KEYWORD3>void</KEYWORD3>
-            <KEYWORD1>volatile</KEYWORD1>
-            <KEYWORD3>wchar</KEYWORD3>
-            <KEYWORD1>while</KEYWORD1>
-            <KEYWORD2>with</KEYWORD2>
+            <INVALID>macro</INVALID> 
+            <KEYWORD4>mixin</KEYWORD4> 
+            <KEYWORD4>module</KEYWORD4> 
+            <KEYWORD4>new</KEYWORD4> 
+            <KEYWORD2>nothrow</KEYWORD2> 
+            <LITERAL1>null</LITERAL1> 
+            <KEYWORD2>out</KEYWORD2> 
+            <KEYWORD2>override</KEYWORD2>
+            <KEYWORD4>package</KEYWORD4> 
+            <KEYWORD4>pragma</KEYWORD4> 
+            <KEYWORD2>private</KEYWORD2> 
+            <KEYWORD2>protected</KEYWORD2> 
+            <KEYWORD2>public</KEYWORD2> 
+            <KEYWORD2>pure</KEYWORD2> 
+            <KEYWORD3>real</KEYWORD3> 
+            <KEYWORD2>ref</KEYWORD2> 
+            <KEYWORD1>return</KEYWORD1> 
+            <KEYWORD1>scope</KEYWORD1> 
+            <KEYWORD2>shared</KEYWORD2> 
+            <KEYWORD3>short</KEYWORD3> 
+            <KEYWORD2>static</KEYWORD2> 
+            <KEYWORD3>struct</KEYWORD3> 
+            <KEYWORD4>super</KEYWORD4> 
+            <KEYWORD1>switch</KEYWORD1> 
+            <KEYWORD2>synchronized</KEYWORD2> 
+            <KEYWORD4>template</KEYWORD4> 
+            <LITERAL1>this</LITERAL1> 
+            <KEYWORD1>throw</KEYWORD1> 
+            <LITERAL1>true</LITERAL1> 
+            <KEYWORD1>try</KEYWORD1> 
+            <KEYWORD4>typedef</KEYWORD4> 
+            <KEYWORD4>typeid</KEYWORD4> 
+            <KEYWORD4>typeof</KEYWORD4> 
+            <KEYWORD3>ubyte</KEYWORD3> 
+            <KEYWORD3>ucent</KEYWORD3> 
+            <KEYWORD3>uint</KEYWORD3> 
+            <KEYWORD3>ulong</KEYWORD3> 
+            <KEYWORD3>union</KEYWORD3> 
+            <KEYWORD1>unittest</KEYWORD1> 
+            <KEYWORD3>ushort</KEYWORD3> 
+            <KEYWORD1>version</KEYWORD1> 
+            <KEYWORD3>void</KEYWORD3> 
+            <KEYWORD2>volatile</KEYWORD2> 
+            <KEYWORD3>wchar</KEYWORD3> 
+            <KEYWORD1>while</KEYWORD1> 
+            <KEYWORD1>with</KEYWORD1> 
+            <KEYWORD1>__FILE__</KEYWORD1> 
+            <KEYWORD1>__LINE__</KEYWORD1> 
+            <KEYWORD2>__gshared</KEYWORD2> 
+            <KEYWORD1>__thread</KEYWORD1> 
+            <KEYWORD1>__traits</KEYWORD1>
         </KEYWORDS>
     </RULES>
-    <RULES SET="NESTED_COMMENT" DEFAULT="COMMENT1" ESCAPE="\">
+    <RULES SET="NESTED_COMMENT" DEFAULT="COMMENT1">
         <SPAN TYPE="COMMENT1" DELEGATE="NESTED_COMMENT">
             <BEGIN>/+</BEGIN>
             <END>+/</END>

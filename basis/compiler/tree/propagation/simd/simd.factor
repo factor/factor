@@ -1,8 +1,8 @@
 ! Copyright (C) 2009 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors byte-arrays combinators compiler.cfg.builder
 compiler.tree.propagation.info compiler.tree.propagation.nodes
-continuations cpu.architecture fry kernel layouts math
+continuations cpu.architecture kernel layouts math
 math.intervals math.vectors.simd.intrinsics namespaces sequences
 words ;
 IN: compiler.tree.propagation.simd
@@ -64,7 +64,7 @@ CONSTANT: vector>vector-intrinsics
 
 CONSTANT: vector-other-intrinsics
     {
-        (simd-v.)
+        (simd-vdot)
         (simd-vsad)
         (simd-sum)
         (simd-vany?)
@@ -96,7 +96,7 @@ vector>vector-intrinsics [ { byte-array } "default-output-classes" set-word-prop
 
 \ (simd-sum) [ nip scalar-output-class ] "outputs" set-word-prop
 
-\ (simd-v.) [ 2nip scalar-output-class ] "outputs" set-word-prop
+\ (simd-vdot) [ 2nip scalar-output-class ] "outputs" set-word-prop
 
 {
     (simd-vany?)
@@ -106,7 +106,7 @@ vector>vector-intrinsics [ { byte-array } "default-output-classes" set-word-prop
 
 \ (simd-select) [ 2nip scalar-output-class ] "outputs" set-word-prop
 
-\ assert-positive [
+\ (simd-positive) [
     real [0,inf] <class/interval-info> value-info-intersect
 ] "outputs" set-word-prop
 

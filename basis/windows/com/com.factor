@@ -11,8 +11,14 @@ COM-INTERFACE: IUnknown f {00000000-0000-0000-C000-000000000046}
     ULONG Release ( ) ;
 
 C-TYPE: IAdviseSink
-C-TYPE: IEnumFORMATETC
 C-TYPE: IEnumSTATDATA
+C-TYPE: IStorage
+
+COM-INTERFACE: IEnumFORMATETC IUnknown {00000103-0000-0000-C000-000000000046}
+    HRESULT Clone ( IEnumFORMATETC **ppenum )
+    HRESULT Next ( ULONG celt, FORMATETC *rgelt, ULONG* pceltFetched )
+    HRESULT Reset ( )
+    HRESULT Skip ( ULONG celt ) ;
 
 COM-INTERFACE: IDataObject IUnknown {0000010E-0000-0000-C000-000000000046}
     HRESULT GetData ( FORMATETC* pFormatetc, STGMEDIUM* pmedium )
@@ -25,15 +31,16 @@ COM-INTERFACE: IDataObject IUnknown {0000010E-0000-0000-C000-000000000046}
     HRESULT DUnadvise ( DWORD pdwConnection )
     HRESULT EnumDAdvise ( IEnumSTATDATA** ppenumAdvise ) ;
 
+COM-INTERFACE: IDropSource IUnknown {00000121-0000-0000-C000-000000000046}
+    HRESULT GiveFeedback ( DWORD dwEffect )
+    HRESULT QueryContinueDrag ( BOOL  fEscapePressed, DWORD grfKeyState ) ;
+
 COM-INTERFACE: IDropTarget IUnknown {00000122-0000-0000-C000-000000000046}
     HRESULT DragEnter ( IDataObject* pDataObject, DWORD grfKeyState, POINTL pt, DWORD* pdwEffect )
     HRESULT DragOver ( DWORD grfKeyState, POINTL pt, DWORD* pdwEffect )
     HRESULT DragLeave ( )
     HRESULT Drop ( IDataObject* pDataObject, DWORD grfKeyState, POINTL pt, DWORD* pdwEffect ) ;
-
-COM-INTERFACE: ISequentialStream IUnknown {0C733A30-2A1C-11CE-ADE5-00AA0044773D}
-    HRESULT Read ( void* pv, ULONG cb, ULONG* pcbRead )
-    HRESULT Write ( void* pv, ULONG cb, ULONG* pcbWritten ) ;
+C-TYPE: IEnumSTATSTG
 
 STRUCT: STATSTG
     { pwcsName LPOLESTR }
@@ -47,6 +54,39 @@ STRUCT: STATSTG
     { clsid CLSID }
     { grfStateBits DWORD }
     { reserved DWORD } ;
+
+C-TYPE: IStream
+COM-INTERFACE: IStorage IUnknown {0000000B-0000-0000-C000-000000000046}
+    HRESULT Commit ( DWORD grfCommitFlags )
+    HRESULT CopyTo ( DWORD ciidExclude, IID *rgiidExclude, SNB snbExclude, IStorage *pstgDest )
+    HRESULT CreateStorage ( OLECHAR *pwcsName, DWORD grfMode, DWORD reserved1, DWORD reserved2, IStorage **ppstg )
+    HRESULT CreateStream ( OLECHAR *pwcsName, DWORD grfMode, DWORD reserved1, DWORD reserved2, IStream **ppstm )
+    HRESULT DestroyElement ( OLECHAR *pwcsName )
+    HRESULT EnumElements ( DWORD reserved1, void *reserved2, DWORD reserved3, IEnumSTATSTG **ppenum )
+    HRESULT MoveElementTo ( OLECHAR *pwcsName, IStorage *pstgDest, OLECHAR *pwcsNewName, DWORD grfFlags )
+    HRESULT OpenStorage ( OLECHAR *pwcsName, IStorage *pstgPriority, DWORD grfMode, SNB snbExclude, DWORD reserved, IStorage **ppstg )
+    HRESULT OpenStream ( OLECHAR *pwcsName, void *reserved1, DWORD grfMode, DWORD reserved2, IStream **ppstm )
+    HRESULT RenameElement ( OLECHAR *pwcsOldName, OLECHAR *pwcsNewName )
+    HRESULT Revert ( )
+    HRESULT SetClass ( REFCLSID clsid )
+    HRESULT SetElementTimes ( OLECHAR  *pwcsName, FILETIME *pctime, FILETIME *patime, FILETIME *pmtime )
+    HRESULT SetStateBits ( DWORD grfStateBits, DWORD grfMask )
+    HRESULT Stat ( STATSTG *pstatstg, DWORD grfStatFlag ) ;
+
+TYPEDEF: IDataObject* LPDATAOBJECT
+TYPEDEF: IDropSource* LPDROPSOURCE
+
+FUNCTION: HRESULT DoDragDrop (
+    LPDATAOBJECT pDataObj,
+    LPDROPSOURCE pDropSource,
+    DWORD        dwOKEffects,
+    LPDWORD     pdwEffect
+)
+
+COM-INTERFACE: ISequentialStream IUnknown {0C733A30-2A1C-11CE-ADE5-00AA0044773D}
+    HRESULT Read ( void* pv, ULONG cb, ULONG* pcbRead )
+    HRESULT Write ( void* pv, ULONG cb, ULONG* pcbWritten ) ;
+
 
 CONSTANT: STGM_READ 0
 CONSTANT: STGM_WRITE 1
@@ -90,13 +130,13 @@ FUNCTION: void ReleaseStgMedium ( LPSTGMEDIUM pmedium )
     with-out-parameters ;
 
 : com-add-ref ( interface -- interface )
-     [ IUnknown::AddRef drop ] keep ; inline
+    [ IUnknown::AddRef drop ] keep ; inline
 
 ERROR: null-com-release ;
 : com-release ( interface -- )
     [ IUnknown::Release drop ] [ null-com-release ] if* ; inline
 
 : with-com-interface ( interface quot -- )
-    over [ com-release ] curry [ ] cleanup ; inline
+    over [ com-release ] curry finally ; inline
 
 DESTRUCTOR: com-release

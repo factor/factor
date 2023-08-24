@@ -1,7 +1,7 @@
 ! Copyright (C) 2009, 2010 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
-USING: compiler.cfg.instructions compiler.cfg.registers compiler.cfg.rpo
-cpu.architecture kernel sequences ;
+! See https://factorcode.org/license.txt for BSD license.
+USING: compiler.cfg.instructions compiler.cfg.registers
+compiler.cfg.rpo cpu.architecture kernel sequences ;
 IN: compiler.cfg.save-contexts
 
 UNION: context-modifier ##phi ##inc ##callback-inputs ;

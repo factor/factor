@@ -1,12 +1,11 @@
 ! Copyright (C) 2018 John Benediktsson.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors alien.c-types alien.data byte-arrays checksums
-combinators grouping io.binary kernel locals math math.bitwise
-sequences specialized-arrays ;
+combinators endian grouping kernel math math.bitwise sequences
+specialized-arrays ;
 SPECIALIZED-ARRAY: uint64_t
 SPECIALIZED-ARRAY: uint32_t
 SPECIALIZED-ARRAY: uint16_t
-
 IN: checksums.metrohash
 
 TUPLE: metrohash-64 seed ;
@@ -17,7 +16,7 @@ C: <metrohash-64> metrohash-64
 
 :: native-mapper ( from to bytes c-type -- seq )
     from to bytes <slice>
-    bytes byte-array? little-endian? and
+    bytes byte-array? alien.data:little-endian? and
     [ c-type cast-array ]
     [ c-type heap-size <groups> [ le> ] map ] if ; inline
 

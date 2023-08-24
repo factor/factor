@@ -1,9 +1,8 @@
 ! Copyright (C) 2005, 2009 Daniel Ehrenberg
-! See http://factorcode.org/license.txt for BSD license.
-USING: kernel namespaces xml.tokenize xml.state xml.name
-xml.data accessors arrays make xml.char-classes fry assocs sequences
-math xml.errors sets combinators io.encodings io.encodings.iana
-unicode xml.dtd strings xml.entities ;
+! See https://factorcode.org/license.txt for BSD license.
+USING: arrays assocs combinators kernel make math namespaces
+sequences sets strings unicode xml.char-classes xml.data xml.dtd
+xml.errors xml.name xml.state xml.tokenize ;
 IN: xml.elements
 
 : take-interpolated ( quot -- interpolated )
@@ -99,9 +98,9 @@ IN: xml.elements
         [ "?>" take-string append <instruction> ]
     } cond ;
 
-: take-cdata ( -- string )
+: take-cdata ( -- cdata )
     depth get zero? [ bad-cdata ] when
-    "[CDATA[" expect "]]>" take-string ;
+    "[CDATA[" expect "]]>" take-string <cdata> ;
 
 DEFER: make-tag ! Is this unavoidable?
 

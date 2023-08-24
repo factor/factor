@@ -1,6 +1,6 @@
 ! Copyright (C) 2005, 2010 Joe Groff, Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
-USING: arrays combinators kernel locals math math.functions
+! See https://factorcode.org/license.txt for BSD license.
+USING: arrays combinators kernel math
 math.libm math.order math.vectors sequences ;
 IN: math.quaternions
 
@@ -26,7 +26,7 @@ PRIVATE>
     } 2cleave (q*sign) ; inline
 
 GENERIC: qconjugate ( u -- u' )
-M: object qconjugate ( u -- u' )
+M: object qconjugate
     { 1 -1 -1 -1 } v* ; inline
 
 : qrecip ( u -- 1/u )
@@ -70,7 +70,7 @@ PRIVATE>
     { } euler-like ; inline
 
 :: slerp ( q0 q1 t -- qt )
-    q0 q1 v. -1.0 1.0 clamp :> dot
+    q0 q1 vdot -1.0 1.0 clamp :> dot
     dot facos t * :> omega
     q1 dot q0 n*v v- normalize :> qt'
     omega fcos q0 n*v omega fsin qt' n*v v+ ; inline

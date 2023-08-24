@@ -7,14 +7,13 @@ USING: io math sequences ;
 USING: io kernel sequences
 http.client xml xml.data xml.traversal ;
 
-"http://factorcode.org" http-get nip string>xml
+"https://factorcode.org" http-get nip string>xml
 "a" deep-tags-named
 [ "href" attr ] map
 [ print ] each
 ----
 USING: accessors kernel math math.constants
 math.functions prettyprint ;
-IN: shapes
 
 TUPLE: circle radius ;
 TUPLE: rectangle width height ;
@@ -50,7 +49,8 @@ USING: sequences xml.syntax xml.writer ;
 [XML <ul><-></ul> XML]
 pprint-xml
 ----
-USING: inspector io.files.info io.pathnames system tools.files ;
+USING: inspector io.files.info
+io.pathnames system tools.files ;
 
 home directory.
 home file-system-info free-space>> .
@@ -59,5 +59,59 @@ image-path file-info describe
 USING: io kernel sequences ;
 
 4 <iota> [
-    "Happy Birthday " write 2 = "dear NAME" "to You" ? print
+    "Happy Birthday " write
+    2 = "dear NAME" "to You" ? print
+] each
+----
+USING: dice formatting ;
+
+ROLL: 2d8+4
+"You do %s points of damage!" printf
+----
+USING: kernel rot13 ;
+
+"Hello, world!" rot13
+"Uryyb, jbeyq!" assert=
+----
+USING: ascii tools.test ;
+
+{ "HELLO" } [ "HeLlO" >upper ] unit-test
+{ "Hello" } [ "HeLlO" >title ] unit-test
+{ "hello" } [ "HeLlO" >lower ] unit-test
+----
+USING: io io.encodings.ascii io.files
+random sequences splitting ;
+
+"/usr/share/games/fortune/fortunes"
+ascii file-lines { "%" } split random
+[ print ] each
+----
+USING: combinators io kernel locals
+math.functions math.parser ranges
+sequences ;
+
+100 [1..b] [| i |
+    {
+        { [ i 15 divisor? ] [ "FizzBuzz" ] }
+        { [ i  3 divisor? ] [ "Fizz" ] }
+        { [ i  5 divisor? ] [ "Buzz" ] }
+        [ i number>string ]
+    } cond print
+] each
+----
+USING: kernel math sequences text-to-speech ;
+
+"factor"
+
+dup [ "aeiou" member? ] find drop [
+    [ "way" append ]
+    [ cut swap "ay" 3append ] if-zero
+] when*
+
+speak-text
+----
+USING: math.text.english morse sequences ;
+
+{ 4 8 15 16 23 42 } [
+    number>text play-as-morse
 ] each

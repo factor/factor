@@ -1,5 +1,5 @@
 ! Copyright (C) 2008, 2010 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: stack-checker.visitor kernel ;
 IN: stack-checker.visitor.dummy
 
@@ -8,7 +8,7 @@ M: f #introduce, drop ;
 M: f #call, 3drop ;
 M: f #call-recursive, 3drop ;
 M: f #push, 2drop ;
-M: f #shuffle, 4drop drop ;
+M: f #shuffle, 5drop ;
 M: f #>r, 2drop ;
 M: f #r>, 2drop ;
 M: f #return, drop ;

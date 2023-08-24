@@ -1,9 +1,8 @@
 ! Copyright (C) 2010 John Benediktsson
-! See http://factorcode.org/license.txt for BSD license
-USING: accessors byte-arrays calendar checksums
-checksums.internet combinators combinators.smart continuations
-destructors io.sockets io.sockets.icmp io.timeouts kernel
-locals pack random sequences system ;
+! See https://factorcode.org/license.txt for BSD license
+USING: accessors calendar checksums checksums.internet
+combinators.smart continuations destructors io.sockets
+io.sockets.icmp io.timeouts kernel pack random sequences system ;
 IN: ping
 
 <PRIVATE

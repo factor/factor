@@ -1,10 +1,9 @@
 ! Copyright (C) 2009 Doug Coleman.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors byte-arrays combinators io io.backend
 io.directories io.encodings.binary io.files io.files.links
 io.pathnames io.streams.byte-array io.streams.string kernel
-math math.parser namespaces sequences strings summary
-typed ;
+math math.parser namespaces sequences summary typed ;
 IN: tar
 
 CONSTANT: zero-checksum 256

@@ -27,7 +27,7 @@ RULE: SPAN span-rule parse-rule-tag
     shared-tag-attrs delegate-attr match-type-attr span-attrs parse-begin/end-tags init-span-tag ;
 
 RULE: SPAN_REGEXP span-rule parse-rule-tag
-    shared-tag-attrs delegate-attr match-type-attr span-attrs regexp-attr parse-begin/end-tags init-span-tag ;
+    shared-tag-attrs delegate-attr match-type-attr span-attrs regexp-attr parse-regexp-begin/end-tags init-span-tag ;
 
 RULE: EOL_SPAN eol-span-rule parse-rule-tag
     shared-tag-attrs delegate-attr match-type-attr literal-start init-eol-span-tag ;

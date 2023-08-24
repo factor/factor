@@ -1,5 +1,5 @@
 ! Copyright (C) 2008 Doug Coleman.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors furnace.actions furnace.redirection http.server
 http.server.dispatchers io.directories io.encodings.utf8 io.files
 io.pathnames kernel math math.parser namespaces sequences
@@ -20,7 +20,7 @@ M: imagebin call-responder*
     [ imagebin set ] [ call-next-method ] bi ;
 
 : move-image ( mime-file -- )
-    [ next-image-path dup exists? ] [ drop ] while
+    [ next-image-path dup file-exists? ] [ drop ] while
     [ [ temporary-path>> ] dip move-file ]
     [ [ filename>> ] dip ".txt" append utf8 set-file-contents ] 2bi ;
 

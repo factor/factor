@@ -1,8 +1,9 @@
 ! Copyright (C) 2009 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
-USING: accessors assocs combinators.short-circuit compiler.cfg.predecessors
-compiler.cfg.rpo compiler.cfg.utilities deques dlists functors kernel lexer
-locals namespaces sequences ;
+! See https://factorcode.org/license.txt for BSD license.
+USING: accessors assocs combinators.short-circuit
+compiler.cfg.predecessors compiler.cfg.rpo
+compiler.cfg.utilities deques dlists functors kernel lexer
+namespaces sequences ;
 IN: compiler.cfg.dataflow-analysis
 
 GENERIC: join-sets ( sets bb dfa -- set )
@@ -54,7 +55,7 @@ MIXIN: dataflow-analysis
     in-sets
     out-sets ; inline
 
-M: dataflow-analysis join-sets 2drop assoc-refine ;
+M: dataflow-analysis join-sets 2drop assoc-intersect-all ;
 M: dataflow-analysis ignore-block? drop kill-block?>> ;
 
 <FUNCTOR: define-analysis ( name -- )

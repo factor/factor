@@ -1,5 +1,5 @@
 ! Copyright (C) 2007, 2009 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: assocs init io io.encodings io.encodings.utf8 kernel
 namespaces system ;
 IN: io.backend
@@ -27,7 +27,4 @@ HOOK: normalize-path io-backend ( path -- path' )
     io-backend set-global init-io init-stdio
     "io.files" startup-hooks get at call( -- ) ;
 
-! Note that we have 'alien' in our using list so that the alien
-! init hook runs before this one.
-[ init-io embedded? [ init-stdio ] unless ]
-"io.backend" add-startup-hook
+STARTUP-HOOK: [ init-io embedded? [ init-stdio ] unless ]

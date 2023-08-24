@@ -1,5 +1,5 @@
 ! Copyright (C) 2008 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: kernel arrays namespaces math accessors alien locals
 destructors system threads io.backend.unix.multiplexers
 io.backend.unix.multiplexers.kqueue core-foundation
@@ -30,5 +30,5 @@ M: run-loop-mx add-output-callback kqueue-mx>> add-output-callback ;
 M: run-loop-mx remove-input-callbacks kqueue-mx>> remove-input-callbacks ;
 M: run-loop-mx remove-output-callbacks kqueue-mx>> remove-output-callbacks ;
 
-M: run-loop-mx wait-for-events ( nanos mx -- )
+M: run-loop-mx wait-for-events
     swap run-one-iteration [ 0 swap wait-for-events ] [ drop ] if ;

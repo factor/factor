@@ -1,7 +1,7 @@
 ! Copyright (C) 2008, 2010 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
-USING: math kernel sequences sequences.private byte-arrays
-alien prettyprint.custom parser accessors locals ;
+! See https://factorcode.org/license.txt for BSD license.
+USING: accessors alien byte-arrays kernel math parser
+prettyprint.custom sequences sequences.private ;
 IN: nibble-arrays
 
 TUPLE: nibble-array

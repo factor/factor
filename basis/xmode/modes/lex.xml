@@ -1,0 +1,38 @@
+<?xml version="1.0"?>
+<!DOCTYPE MODE SYSTEM "xmode.dtd">
+<MODE>
+    <PROPS>
+        <PROPERTY NAME="commentStart" VALUE="/*" />
+        <PROPERTY NAME="commentEnd" VALUE="*/" />
+        <PROPERTY NAME="lineComment" VALUE="//" />
+        <PROPERTY NAME="wordBreakChars" VALUE=",+-=&lt;&gt;/?^&amp;*" />
+
+        <!-- Auto indent -->
+        <PROPERTY NAME="indentOpenBrackets" VALUE="{" />
+        <PROPERTY NAME="indentCloseBrackets" VALUE="}" />
+        <PROPERTY NAME="unalignedOpenBrackets" VALUE="(" />
+        <PROPERTY NAME="unalignedCloseBrackets" VALUE=")" />
+        <PROPERTY NAME="indentNextLine"
+            VALUE="\s*(((if|while)\s*\(|else\s*|else\s+if\s*\(|for\s*\(.*\))[^{;]*)" />
+        <PROPERTY NAME="unindentThisLine"
+            VALUE="^.*(default:\s*|case.*:.*)$" />
+        <PROPERTY NAME="electricKeys" VALUE=":" />
+    </PROPS>
+    <RULES IGNORE_CASE="FALSE">
+	<IMPORT DELEGATE="c::MAIN"/>
+	<SEQ TYPE="OPERATOR">%%</SEQ>
+	<SEQ TYPE="OPERATOR">%{</SEQ>
+	<SEQ TYPE="OPERATOR">}%</SEQ>
+	<SEQ TYPE="KEYWORD1">%option</SEQ>
+	<SEQ TYPE="KEYWORD1">%top</SEQ>
+	<SEQ TYPE="KEYWORD1">%x</SEQ>
+	<SEQ TYPE="KEYWORD4">ECHO</SEQ>
+	<SEQ TYPE="KEYWORD4">BEGIN</SEQ>
+	<SEQ TYPE="KEYWORD4">REJECT</SEQ>
+	
+	<SEQ TYPE="LITERAL2">YY_CURRENT_BUFFER</SEQ>
+	<SEQ TYPE="LITERAL2">YY_START</SEQ>
+	
+	<SEQ_REGEXP HASH_CHAR="&lt;" TYPE="KEYWORD2">&lt;\w+&gt;</SEQ_REGEXP>
+    </RULES>
+</MODE>

@@ -1,28 +1,9 @@
 ! Copyright (C) 2009 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
-USING: debugger io kernel math prettyprint sequences system
-io.launcher.unix accessors strings ;
+! See https://factorcode.org/license.txt for BSD license.
+USING: debugger io kernel prettyprint sequences system
+unix.signals ;
 IN: debugger.unix
 
-CONSTANT: signal-names
-{
-    "SIGHUP" "SIGINT" "SIGQUIT" "SIGILL" "SIGTRAP" "SIGABRT"
-    "SIGEMT" "SIGFPE" "SIGKILL" "SIGBUS" "SIGSEGV" "SIGSYS"
-    "SIGPIPE" "SIGALRM" "SIGTERM" "SIGURG" "SIGSTOP" "SIGTSIP"
-    "SIGCONT" "SIGCHLD" "SIGTTIN" "SIGTTOU" "SIGIO" "SIGXCPU"
-    "SIGXFSZ" "SIGVTALRM" "SIGPROF" "SIGWINCH" "SIGINFO"
-    "SIGUSR1" "SIGUSR2"
-}
-
-GENERIC: signal-name ( obj -- str/f )
-
-M: signal signal-name n>> signal-name ;
-
-M: integer signal-name ( n -- str/f ) 1 - signal-names ?nth ;
-
-: signal-name. ( n -- )
-    signal-name [ " (" ")" surround write ] when* ;
-
-M: unix signal-error. ( obj -- )
+M: unix signal-error.
     "Unix signal #" write
     third [ pprint ] [ signal-name. ] bi nl ;

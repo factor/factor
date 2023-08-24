@@ -5,22 +5,22 @@ tools.test vocabs ;
 IN: help.lint.coverage.tests
 
 <PRIVATE
-: empty ( a v -- x y ) ;
-: nonexistent ( a v -- x y ) ;
-: defined ( x -- x ) ;
+: an-empty-word-with-a-unique-name ( a v -- x y ) ;
+: a-nonexistent-word ( a v -- x y ) ;
+: a-defined-word ( x -- x ) ;
 
-HELP: empty { $examples } ;
-HELP: nonexistent ;
-HELP: defined { $examples { $example "USING: prettyprint ; " "1 ." "1" } } ;
+HELP: an-empty-word-with-a-unique-name { $examples } ;
+HELP: a-nonexistent-word ;
+HELP: a-defined-word { $examples { $example "USING: prettyprint ; " "1 ." "1" } } ;
 PRIVATE>
 
-{ t } [ \ empty empty-examples? ] unit-test
-{ f } [ \ nonexistent empty-examples? ] unit-test
-{ f } [ \ defined empty-examples? ] unit-test
+{ t } [ \ an-empty-word-with-a-unique-name empty-examples? ] unit-test
+{ f } [ \ a-nonexistent-word empty-examples? ] unit-test
+{ f } [ \ a-defined-word empty-examples? ] unit-test
 { f } [ \ keep empty-examples? ] unit-test
 
-{ { $description $values } } [ \ empty missing-sections natural-sort ] unit-test
-{ { $description $values } } [ \ defined missing-sections natural-sort ] unit-test
+{ { $description $values } } [ \ an-empty-word-with-a-unique-name missing-sections sort ] unit-test
+{ { $description $values } } [ \ a-defined-word missing-sections sort ] unit-test
 { { } } [ \ keep missing-sections ] unit-test
 
 { { "a.b" "a.b.c" } } [ { "a.b" "a.b.private" "a.b.c.private" "a.b.c" } filter-private ] unit-test
@@ -29,13 +29,17 @@ PRIVATE>
 { "section" } [ 1 "section" ?pluralize ] unit-test
 { "sections" } [ 10 "section" ?pluralize ] unit-test
 
-{ { $examples } } [ \ empty word-defines-sections ] unit-test
-{ { $examples } } [ \ defined word-defines-sections ] unit-test
-{ { } } [ \ nonexistent word-defines-sections ] unit-test
+{ { $examples } } [ \ an-empty-word-with-a-unique-name word-defines-sections ] unit-test
+{ { $examples } } [ \ a-defined-word word-defines-sections ] unit-test
+{ { } } [ \ a-nonexistent-word word-defines-sections ] unit-test
 { { $values $description $examples } } [ \ keep word-defines-sections ] unit-test
 { { $values $contract $examples } } [ \ <word-help-coverage> word-defines-sections ] unit-test
 
-{ empty } [ "empty" find-word ] unit-test
+{ an-empty-word-with-a-unique-name } [ "an-empty-word-with-a-unique-name" find-word ] unit-test
+
+{ { } } [ \ zero-matrix? missing-sections ] unit-test
+{ t } [ \ word-help-coverage? <word-help-coverage> 100%-coverage?>> ] unit-test
+{ t } [ \ zero-matrix? <word-help-coverage> 100%-coverage?>> ] unit-test
 
 {
   V{ "[" { $[ "math" dup lookup-vocab ] } "] " { "zero?" zero? } ": " }
@@ -65,8 +69,7 @@ PRIVATE>
 ] unit-test
 
 ! make sure this doesn't throw an error (would signify an issue with ignored-words)
-! the contents of all-words is not important
-{ } [ all-words [ <word-help-coverage> ] map drop ] unit-test
+[ { $io-error $prettyprinting-note $nl } [ <word-help-coverage> ] map ] must-not-fail
 
 
 ! Lint system is written weirdly, there's no way to invoke it and get the output
@@ -101,8 +104,8 @@ PRIVATE>
   USING: definitions compiler.units ;
   IN: help.lint.coverage.tests.private
 [
-    \ empty forget
-    \ nonexistent forget
-    \ defined forget
+    \ an-empty-word-with-a-unique-name forget
+    \ a-nonexistent-word forget
+    \ a-defined-word forget
 ] with-compilation-unit
 ]] eval( -- )

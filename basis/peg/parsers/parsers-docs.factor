@@ -1,5 +1,5 @@
 ! Copyright (C) 2008 Chris Double, Doug Coleman.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: help.markup help.syntax kernel math sequences
 unicode strings ;
 IN: peg.parsers
@@ -61,7 +61,7 @@ HELP: any-char
 { $values
     { "parser" "a parser" }
 } { $description
-    "Returns a parser that matches the any single character."
+    "Returns a parser that matches any single character."
 } ;
 
 HELP: exactly-n
@@ -166,7 +166,7 @@ HELP: range-pattern
     { "parser" "a parser" }
 } { $description
 "Returns a parser that matches a single character based on the set "
-"of characters in the pattern string."
+"of characters in the pattern string. "
 "Any single character in the pattern matches that character. "
 "If the pattern begins with a ^ then the set is negated "
 "(the element matches any character not in the set). Any pair "

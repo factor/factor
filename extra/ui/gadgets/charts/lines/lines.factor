@@ -1,7 +1,7 @@
 ! Copyright (C) 2016-2017 Alexander Ilin.
-! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays assocs binary-search colors.constants
-combinators combinators.short-circuit fry kernel locals make
+! See https://factorcode.org/license.txt for BSD license.
+USING: accessors arrays assocs binary-search colors
+combinators combinators.short-circuit kernel make
 math math.order math.statistics math.vectors opengl opengl.gl
 sequences specialized-arrays splitting.monotonic ui.gadgets
 ui.gadgets.charts ui.gadgets.charts.utils ui.render ;
@@ -38,7 +38,7 @@ ALIAS: y second
 ! right of the index, plus one that's not equal, if requested.
 :: adjusted-head-slice ( n elt plus-one? seq -- slice )
     n seq elt x '[ x _ = not ] find-from drop seq swap
-    [ plus-one? [ 1 + ] when short head-slice ] when* ;
+    [ plus-one? [ 1 + ] when index-or-length head-slice ] when* ;
 
 ! : data-rect ( data -- rect )
 !    [ [ first x ] [ last x ] bi ] keep

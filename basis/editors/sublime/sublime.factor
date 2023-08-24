@@ -1,12 +1,11 @@
 ! Copyright (C) 2013 Doug Coleman.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: combinators.short-circuit editors io.pathnames
 io.standard-paths kernel make math.parser namespaces sequences
 system ;
 IN: editors.sublime
 
 SINGLETON: sublime
-sublime editor-class set-global
 
 HOOK: find-sublime-path os ( -- path )
 
@@ -31,7 +30,7 @@ M: windows find-sublime-path
         find-sublime-path [ "subl" ?find-in-path ] unless*
     ] unless* ;
 
-M: sublime editor-command ( file line -- command )
+M: sublime editor-command
     [
         sublime-path , "-a" , number>string ":" glue ,
     ] { } make ;

@@ -1,4 +1,4 @@
-USING: byte-arrays help.markup help.syntax sequences strings ;
+USING: byte-arrays help.markup help.syntax ;
 IN: checksums
 
 HELP: checksum
@@ -38,10 +38,12 @@ HELP: checksum-file
 { $values { "path" "a pathname specifier" } { "checksum" "a checksum specifier" } { "value" byte-array } }
 { $description "Computes the checksum of all data in a file." }
 { $examples
-    { $example
+    { $unchecked-example
+        ! This example fails on Windows if you ``git clone`` with Windows line-endings
+        ! Issue #2276
         "USING: checksums checksums.crc32 prettyprint ;"
-        "\"resource:LICENSE.txt\" crc32 checksum-file ."
-        "B{ 125 29 106 28 }"
+        "\"resource:core/checksums/crc32/crc-me.txt\" crc32 checksum-file ."
+        "B{ 196 202 117 155 }"
     }
 } ;
 
@@ -70,12 +72,14 @@ $nl
     get-checksum
 }
 "Checksum implementations:"
-{ $vocab-subsection "CRC32 checksum" "checksums.crc32" }
-{ $vocab-subsection "MD5 checksum" "checksums.md5" }
-{ $vocab-subsection "SHA checksums" "checksums.sha" }
-{ $vocab-subsection "Adler-32 checksum" "checksums.adler-32" }
-{ $vocab-subsection "OpenSSL checksums" "checksums.openssl" }
-{ $vocab-subsection "Internet checksum" "checksums.internet" }
-{ $vocab-subsection "Checksum using an external utility" "checksums.process" } ;
+{ $vocab-subsections
+    { "CRC32 checksum" "checksums.crc32" }
+    { "MD5 checksum" "checksums.md5" }
+    { "SHA checksums" "checksums.sha" }
+    { "Adler-32 checksum" "checksums.adler-32" }
+    { "OpenSSL checksums" "checksums.openssl" }
+    { "Internet checksum" "checksums.internet" }
+    { "Checksum using an external utility" "checksums.process" }
+} ;
 
 ABOUT: "checksums"

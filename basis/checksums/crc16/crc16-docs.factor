@@ -1,4 +1,4 @@
-USING: help.markup help.syntax math ;
+USING: help.markup help.syntax ;
 IN: checksums.crc16
 
 HELP: crc16

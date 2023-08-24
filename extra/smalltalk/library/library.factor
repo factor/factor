@@ -1,8 +1,7 @@
 ! Copyright (C) 2009 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
-USING: kernel present io math sequences assocs math.ranges
-math.order fry tools.time locals smalltalk.selectors
-smalltalk.ast smalltalk.classes ;
+! See https://factorcode.org/license.txt for BSD license.
+USING: kernel present io math sequences assocs ranges
+math.order tools.time smalltalk.selectors smalltalk.ast ;
 IN: smalltalk.library
 
 SELECTOR: print
@@ -76,9 +75,9 @@ M:: object selector-do: ( quot receiver -- nil )
 SELECTOR: to:
 SELECTOR: to:do:
 
-M: object selector-to: swap [a,b] ;
+M: object selector-to: swap [a..b] ;
 M:: object selector-to:do: ( to quot from -- nil )
-    from to [a,b] [ quot call( i -- result ) drop ] each nil ;
+    from to [a..b] [ quot call( i -- result ) drop ] each nil ;
 
 SELECTOR: value
 SELECTOR: value:

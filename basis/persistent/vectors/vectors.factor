@@ -63,7 +63,7 @@ M: persistent-vector nth-unsafe
     dup full? [ [ level>> 1node ] keep swap ] [ node-add f ] if ;
 
 : new-last ( val seq -- seq' )
-    [ length 1 - ] keep new-nth ;
+    index-of-last new-nth ;
 
 : node-set-last ( child node -- node' )
     clone [ new-last ] change-children ;
@@ -73,7 +73,7 @@ M: persistent-vector nth-unsafe
         new-child
     ] [
         [ nip ] 2keep children>> last (ppush-new-tail)
-        [ swap new-child ] [ swap node-set-last f ] ?if
+        or* [ swap new-child ] [ swap node-set-last f ] if
     ] if ;
 
 : do-expansion ( pvec root expansion/f -- pvec )
@@ -84,7 +84,7 @@ M: persistent-vector nth-unsafe
     (ppush-new-tail) do-expansion
     swap 0 1node >>tail ;
 
-M: persistent-vector ppush ( val pvec -- pvec' )
+M: persistent-vector ppush
     clone
     dup tail>> full?
     [ ppush-new-tail ] [ ppush-tail ] if
@@ -106,7 +106,7 @@ M: persistent-vector ppush ( val pvec -- pvec' )
         [ (new-nth) ] node-change-nth
     ] if ;
 
-M: persistent-vector new-nth ( obj i pvec -- pvec' )
+M: persistent-vector new-nth
     2dup count>> = [ nip ppush ] [
         clone
         2dup tail-offset >= [
@@ -159,7 +159,7 @@ M: persistent-vector new-nth ( obj i pvec -- pvec' )
 
 PRIVATE>
 
-M: persistent-vector ppop ( pvec -- pvec' )
+M: persistent-vector ppop
     dup count>> {
         { 0 [ empty-error ] }
         { 1 [ drop T{ persistent-vector } ] }

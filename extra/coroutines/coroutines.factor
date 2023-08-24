@@ -1,7 +1,6 @@
 ! Copyright (C) 2005 Chris Double, 2007 Clemens Hofreither, 2008 James Cash.
-! See http://factorcode.org/license.txt for BSD license.
-USING: kernel hashtables namespaces make continuations quotations
-accessors ;
+! See https://factorcode.org/license.txt for BSD license.
+USING: kernel hashtables namespaces make continuations accessors ;
 IN: coroutines
 
 SYMBOL: current-coro
@@ -46,7 +45,7 @@ TUPLE: coroutine resumecc exitcc originalcc ;
     [ ] >>resumecc
     exitcc>> continue-with ;
 
-: coreset ( v --  )
+: coreset ( v -- )
     current-coro get dup
     originalcc>> >>resumecc
     exitcc>> continue-with ;

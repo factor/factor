@@ -1,5 +1,5 @@
 USING: accessors alien alien.accessors alien.c-types
-alien.syntax byte-arrays continuations fry kernel layouts math
+alien.syntax byte-arrays continuations kernel layouts math
 namespaces prettyprint sequences tools.memory tools.test ;
 QUALIFIED: sets
 IN: alien.tests
@@ -58,7 +58,7 @@ cell 8 = [
 
 { "ALIEN: 1234" } [ 0x1234 <alien> unparse ] unit-test
 
-{ } [ 0 B{ 1 2 3 } <displaced-alien> drop ] unit-test
+[ 0 B{ 1 2 3 } <displaced-alien> ] must-not-fail
 
 [ 0 B{ 1 2 3 } <displaced-alien> alien-address ] must-fail
 
@@ -80,7 +80,7 @@ f initialize-test set-global
 
 { 31337 } [ initialize-test [ 69 ] initialize-alien ] unit-test
 
-{ } [ initialize-test get BAD-ALIEN >>alien drop ] unit-test
+[ initialize-test get BAD-ALIEN >>alien ] must-not-fail
 
 { 7575 } [ initialize-test [ 7575 ] initialize-alien ] unit-test
 

@@ -1,10 +1,10 @@
 ! Copyright (c) 2008 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
-USING: namespaces make accessors kernel assocs arrays io.sockets
-threads fry urls smtp validators html.forms present http
-http.server.responses http.server.redirection
-http.server.dispatchers furnace.actions furnace.auth
-furnace.auth.providers furnace.redirection furnace.utilities ;
+! See https://factorcode.org/license.txt for BSD license.
+USING: accessors arrays assocs furnace.actions furnace.auth
+furnace.auth.providers furnace.redirection furnace.utilities
+html.forms http.server.dispatchers http.server.responses
+io.sockets kernel make namespaces present smtp threads urls
+validators ;
 IN: furnace.auth.features.recover-password
 
 SYMBOL: lost-password-from

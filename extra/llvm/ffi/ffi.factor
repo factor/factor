@@ -1,13 +1,14 @@
 ! Copyright (C) 2009 Matthew Willis, 2017 Björn Lindqvist
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: alien alien.c-types alien.libraries alien.syntax combinators
 kernel ldcache system ;
 IN: llvm.ffi
 
 << "llvm" {
-    { [ os linux? ] [ "LLVM-3.9" find-so [ cdecl add-library ] [ drop ] if* ] }
-    [ drop ]
-} cond
+    { [ os linux? ] [ "LLVM-3.9" find-so ] }
+    { [ os macosx? ] [ "libLLVM.dylib" ] }
+    [ f ]
+} cond [ cdecl add-library ] [ drop ] if*
 >>
 
 LIBRARY: llvm
@@ -141,6 +142,10 @@ FUNCTION: LLVMValueRef LLVMBuildAdd ( LLVMBuilderRef Builder,
                                       LLVMValueRef RHS,
                                       c-string Name )
 FUNCTION: LLVMValueRef LLVMBuildSub ( LLVMBuilderRef Builder,
+                                      LLVMValueRef LHS,
+                                      LLVMValueRef RHS,
+                                      c-string Name )
+FUNCTION: LLVMValueRef LLVMBuildMul ( LLVMBuilderRef Builder,
                                       LLVMValueRef LHS,
                                       LLVMValueRef RHS,
                                       c-string Name )

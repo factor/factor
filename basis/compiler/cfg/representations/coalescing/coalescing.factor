@@ -1,8 +1,8 @@
 ! Copyright (C) 2010 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors assocs compiler.cfg.def-use
-compiler.cfg.instructions compiler.cfg.rpo disjoint-sets fry
-kernel namespaces sequences ;
+compiler.cfg.instructions compiler.cfg.rpo disjoint-sets kernel
+namespaces sequences ;
 IN: compiler.cfg.representations.coalescing
 
 ! Find all strongly connected components in the graph where the

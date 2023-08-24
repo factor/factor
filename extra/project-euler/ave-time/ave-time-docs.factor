@@ -1,5 +1,4 @@
-USING: arrays help.markup help.syntax math math.parser memory quotations
-    sequences system tools.time ;
+USING: help.markup help.syntax math quotations sequences ;
 IN: project-euler.ave-time
 
 HELP: collect-benchmarks

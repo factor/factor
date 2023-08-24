@@ -1,6 +1,6 @@
 ! Copyright (C) 2014 Jon Harper.
-! See http://factorcode.org/license.txt for BSD license.
-USING: help.markup help.syntax kernel quotations sequences ;
+! See https://factorcode.org/license.txt for BSD license.
+USING: help.markup help.syntax ;
 IN: tools.coverage.testvocab
 
 ARTICLE: "tools.coverage.testvocab" "Coverage tool dummy test vocabulary"

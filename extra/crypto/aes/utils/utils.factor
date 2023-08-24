@@ -1,7 +1,7 @@
 ! Copyright (C) 2013 Fred Alger
-! See http://factorcode.org/license.txt for BSD license.
-USING: arrays columns combinators generalizations grouping
-kernel locals math math.bitwise prettyprint sequences
+! See https://factorcode.org/license.txt for BSD license.
+USING: combinators grouping kernel math math.bitwise
+prettyprint sequences
 sequences.private ;
 IN: crypto.aes.utils
 : gb0 ( a -- a0 ) 0xff bitand ; inline
@@ -57,5 +57,5 @@ IN: crypto.aes.utils
     a2 2 seq set-nth-unsafe
     a3 3 seq set-nth-unsafe ;
 
-: 4th-from-end ( seq -- el )
+: 4th-from-tail ( seq -- el )
     [ length 4 - ] keep nth ;

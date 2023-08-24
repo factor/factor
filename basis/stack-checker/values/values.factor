@@ -1,5 +1,5 @@
 ! Copyright (C) 2008, 2009 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors assocs fry kernel namespaces quotations
 sequences stack-checker.errors stack-checker.recursive-state ;
 IN: stack-checker.values
@@ -122,7 +122,7 @@ M: f (literal) current-word get bad-macro-input ;
 GENERIC: known>callable ( known -- quot )
 
 : ?@ ( x -- y )
-    dup callable? [ drop _ ] unless ;
+    dup callable? [ drop \ _ ] unless ;
 
 M: object known>callable drop \ _ ;
 

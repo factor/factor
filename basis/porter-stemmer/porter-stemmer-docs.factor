@@ -6,7 +6,7 @@ HELP: step1a
 { $description "Gets rid of plurals." }
 { $examples
     { $table
-        { "Input:" "Output:" }
+        { { $strong "Input" } { $strong "Output" } }
         { "caresses" "caress" }
         { "ponies" "poni" }
         { "ties" "ti" }
@@ -20,7 +20,7 @@ HELP: step1b
 { $description "Gets rid of \"-ed\" and \"-ing\" suffixes." }
 { $examples
     { $table
-        { "Input:" "Output:" }
+        { { $strong "Input" } { $strong "Output" } }
         { "feed"  "feed" }
         { "agreed"  "agree" }
         { "disabled"  "disable" }

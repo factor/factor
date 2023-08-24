@@ -1,6 +1,6 @@
 ! Copyright (C) 2009 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
-USING: alien.syntax alien.parser words x11.io sequences kernel ;
+! See https://factorcode.org/license.txt for BSD license.
+USING: alien.parser kernel sequences words x11.io ;
 IN: x11.syntax
 
 SYNTAX: X-FUNCTION:

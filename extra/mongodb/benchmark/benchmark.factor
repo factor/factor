@@ -1,10 +1,9 @@
-USING: calendar math fry kernel assocs math.ranges bson.reader io.streams.byte-array
-sequences formatting combinators namespaces io tools.time prettyprint io.encodings.binary
-accessors words mongodb.driver strings math.parser bson.writer
-hashtables ;
+USING: accessors assocs bson calendar formatting hashtables io
+io.encodings.binary io.streams.byte-array kernel math
+math.parser mongodb.driver namespaces ranges sequences strings
+tools.time ;
 FROM: mongodb.driver => find ;
 FROM: memory => gc ;
-
 IN: mongodb.benchmark
 
 SYMBOL: collection
@@ -128,14 +127,16 @@ CONSTANT: DOC-LARGE H{ { "base_url" "http://www.example.com/test-me" }
 
 : large-doc-prepare ( -- quot: ( i -- doc ) )
     large-doc drop
-    [ "x" DOC-LARGE clone [ set-at ] keep
-       [ now "access-time" ] dip
-       [ set-at ] keep ] ;
+    [
+        "x" DOC-LARGE clone [ set-at ] keep
+        [ now "access-time" ] dip
+        [ set-at ] keep
+    ] ;
 
 : (insert) ( quot: ( i -- doc ) collection -- )
     [ trial-size ] 2dip
     '[ _ call( i -- doc ) [ _ ] dip
-       result get lasterror>> [ save ] [ save-unsafe ] if ] each-integer ;
+    result get lasterror>> [ save ] [ save-unsafe ] if ] each-integer ;
 
 : (prepare-batch) ( i b quot: ( i -- doc ) -- batch-seq )
     [ [ * ] keep 1 range boa ] dip
@@ -144,7 +145,7 @@ CONSTANT: DOC-LARGE H{ { "base_url" "http://www.example.com/test-me" }
 : (insert-batch) ( quot: ( i -- doc ) collection -- )
     [ trial-size batch-size [ / ] keep ] 2dip
     '[ _ _ (prepare-batch) [ _ ] dip
-       result get lasterror>> [ save ] [ save-unsafe ] if
+        result get lasterror>> [ save ] [ save-unsafe ] if
     ] each-integer ;
 
 : bchar ( boolean -- char )
@@ -203,12 +204,14 @@ CONSTANT: DOC-LARGE H{ { "base_url" "http://www.example.com/test-me" }
 
 : find-range ( quot -- quot: ( -- ) )
     drop
-    [ trial-size batch-size /i
-       collection-name
-       trial-size 2 / "$gt" H{ } clone [ set-at ] keep
-       [ trial-size 2 / batch-size + "$lt" ] dip [ set-at ] keep
-       "x" H{ } clone [ set-at ] keep
-       '[ _ _ <query> (find) ] times ] ;
+    [
+        trial-size batch-size /i
+        collection-name
+        trial-size 2 / "$gt" H{ } clone [ set-at ] keep
+        [ trial-size 2 / batch-size + "$lt" ] dip [ set-at ] keep
+        "x" H{ } clone [ set-at ] keep
+        '[ _ _ <query> (find) ] times
+    ] ;
 
 : batch ( -- )
     result [ t >>batch ] change ; inline
@@ -246,11 +249,17 @@ CONSTANT: DOC-LARGE H{ { "base_url" "http://www.example.com/test-me" }
     '[ <result> _ call( options -- time ) print-result ] with-scope ;
 
 : [bench-quot] ( feat-seq op-word -- quot: ( doc-word -- ) )
-    '[ _ swap _
-       '[ [ [ _ execute( -- quot ) ] dip
-          [ execute( -- ) ] each _ execute( quot -- quot ) gc
-            benchmark ] with-result ] each
-       print-separator ] ;
+    '[
+        _ swap _
+        '[
+            [
+                [ _ execute( -- quot ) ] dip
+                [ execute( -- ) ] each _ execute( quot -- quot ) gc
+                benchmark 
+            ] with-result
+        ] each
+        print-separator
+    ] ;
 
 : run-serialization-bench ( doc-word-seq feat-seq -- )
     "Serialization Tests" print

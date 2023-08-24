@@ -1,11 +1,13 @@
 ! Copyright (C) 2006, 2007, 2008 Alex Chapman
-! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays kernel math math.vectors sequences tetris.tetromino lists.lazy ;
+! See https://factorcode.org/license.txt for BSD license.
+USING: accessors arrays kernel math math.vectors sequences
+tetris.tetromino lists.lazy ;
 IN: tetris.piece
 
-! The rotation is an index into the tetromino's states array, and the
-! position is added to the tetromino's blocks to give them their location on the
-! tetris board. If the location is f then the piece is not yet on the board.
+! The rotation is an index into the tetromino's states array,
+! and the position is added to the tetromino's blocks to give
+! them their location on the tetris board. If the location is f
+! then the piece is not yet on the board.
 
 TUPLE: piece
     { tetromino tetromino }
@@ -35,12 +37,8 @@ TUPLE: piece
 : <piece-llist> ( board-width -- llist )
     [ [ <random-piece> ] curry ] keep [ <piece-llist> ] curry lazy-cons ;
 
-: modulo ( n m -- n )
-  ! -2 7 mod => -2, -2 7 modulo =>  5
-  [ mod ] [ + ] [ mod ] tri ;
-
 : (rotate-piece) ( rotation inc n-states -- rotation' )
-    [ + ] dip modulo ;
+    [ + ] dip rem ;
 
 : rotate-piece ( piece inc -- piece )
     over tetromino>> states>> length

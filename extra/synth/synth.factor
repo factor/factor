@@ -1,7 +1,10 @@
 ! Copyright (C) 2008 Alex Chapman
-! See http://factorcode.org/license.txt for BSD license.
-USING: accessors kernel locals math math.constants math.functions memoize openal openal.alut synth.buffers sequences sequences.modified sequences.repeating ;
+! See https://factorcode.org/license.txt for BSD license.
+USING: accessors kernel math math.constants math.functions
+sequences sequences.modified sequences.repeating ;
 IN: synth
+
+SLOT: sample-freq
 
 MEMO: single-sine-wave ( samples/wave -- seq )
     [ <iota> ] [ pi 2 * swap / [ * sin ] curry ] bi map ;

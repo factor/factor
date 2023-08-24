@@ -1,5 +1,5 @@
 USING: accessors continuations glib.ffi images.loader
-io.files.temp kernel sequences system tools.test ;
+io.files.temp kernel layouts sequences system tools.test ;
 IN: images.loader.tests
 
 : open-png-image ( -- image )
@@ -40,17 +40,13 @@ os { linux windows } member? [
         ] [ unknown-image-extension? ] recover
     ] unit-test
 
-    ! Windows can't save .bmp-files for unknown reason. It can load
+    ! Windows 32 can't save .bmp-files for unknown reason. It can load
     ! them though.
-    os windows? [
-        [
-            open-png-image "foo.bmp" temp-file save-graphic-image
-        ] [ unknown-image-extension? ] must-fail-with
-    ] [
+    64-bit? [
         { t } [
             open-png-image dup "bmp" convert-to =
         ] unit-test
-    ] if
+    ] when
 
     { t } [
         "vocab:images/testing/bmp/rgb_8bit.bmp" load-image dup

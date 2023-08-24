@@ -1,5 +1,5 @@
-USING: help.markup help.syntax io io.backend strings
-byte-arrays ;
+USING: help.markup help.syntax io io.backend ;
+IN: io.backend
 
 HELP: io-multiplex
 { $values { "nanos" "a non-negative integer" } }

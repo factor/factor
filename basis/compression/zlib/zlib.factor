@@ -1,9 +1,8 @@
 ! Copyright (C) 2009 Doug Coleman.
-! See http://factorcode.org/license.txt for BSD license.
-USING: accessors alien alien.c-types alien.data alien.syntax
-byte-arrays byte-vectors classes.struct combinators
-compression.zlib.ffi continuations destructors fry kernel libc
-math math.functions math.ranges sequences system ;
+! See https://factorcode.org/license.txt for BSD license.
+USING: accessors alien alien.c-types alien.data byte-vectors
+combinators compression.zlib.ffi continuations destructors
+kernel libc math math.functions ranges sequences ;
 IN: compression.zlib
 
 ERROR: zlib-failed n string ;
@@ -48,17 +47,17 @@ ERROR: zlib-failed n string ;
     ] with-destructors ;
 
 : uncompress ( byte-array -- byte-array' )
-    [ length 5 [0,b) [ 2^ * ] with map ] keep
+    [ length 5 [0..b) [ 2^ * ] with map ] keep
     '[ _ (uncompress) ] attempt-all ;
 
 
 : zlib-inflate-init ( -- z_stream_s )
-    z_stream <struct>
+    z_stream new
     dup ZLIB_VERSION over byte-length inflateInit_ zlib-error ;
 
 ! window can be 0, 15, 32, 47 (others?)
 : zlib-inflate-init2 ( window -- z_stream_s )
-    [ z_stream <struct> dup ] dip
+    [ z_stream new dup ] dip
     ZLIB_VERSION pick byte-length inflateInit2_ zlib-error ;
 
 : zlib-inflate-end ( z_stream -- )
@@ -71,4 +70,4 @@ ERROR: zlib-failed n string ;
     inflate zlib-error ;
 
 : zlib-inflate-get-header ( z_stream -- gz_header )
-    gz_header <struct> [ inflateGetHeader zlib-error ] keep ;
+    gz_header new [ inflateGetHeader zlib-error ] keep ;

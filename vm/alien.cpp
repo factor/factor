@@ -12,8 +12,7 @@ char* factor_vm::pinned_alien_offset(cell obj) {
         general_error(ERROR_EXPIRED, obj, false_object);
       if (to_boolean(ptr->base))
         type_error(ALIEN_TYPE, obj);
-      else
-        return (char*)ptr->address;
+      return (char*)ptr->address;
     }
     case F_TYPE:
       return NULL;

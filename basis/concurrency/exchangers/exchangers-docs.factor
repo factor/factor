@@ -1,4 +1,4 @@
-USING: help.markup help.syntax sequences kernel ;
+USING: help.markup help.syntax kernel ;
 IN: concurrency.exchangers
 
 HELP: exchanger

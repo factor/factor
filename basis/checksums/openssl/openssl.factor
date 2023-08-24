@@ -1,5 +1,5 @@
 ! Copyright (C) 2008, 2010, 2016 Slava Pestov, Alexander Ilin
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors alien.c-types alien.data checksums checksums.common
 destructors kernel namespaces openssl openssl.libcrypto sequences ;
 IN: checksums.openssl
@@ -13,6 +13,8 @@ INSTANCE: openssl-checksum block-checksum
 CONSTANT: openssl-md5 T{ openssl-checksum f "md5" }
 
 CONSTANT: openssl-sha1 T{ openssl-checksum f "sha1" }
+
+CONSTANT: openssl-sha256 T{ openssl-checksum f "sha256" }
 
 C: <openssl-checksum> openssl-checksum
 
@@ -33,18 +35,18 @@ M: evp-md-context dispose*
     handle>> evp-md-ctx-free ;
 
 : digest-named ( name -- md )
-    dup EVP_get_digestbyname [ ] [ unknown-digest ] ?if ;
+    [ EVP_get_digestbyname ] [ unknown-digest ] ?unless ;
 
 : set-digest ( name ctx -- )
     handle>> swap digest-named f EVP_DigestInit_ex ssl-error ;
 
-M: openssl-checksum initialize-checksum-state ( checksum -- evp-md-context )
+M: openssl-checksum initialize-checksum-state
     maybe-init-ssl name>> <evp-md-context> [ set-digest ] keep ;
 
-M: evp-md-context add-checksum-bytes ( ctx bytes -- ctx' )
+M: evp-md-context add-checksum-bytes
     [ dup handle>> ] dip dup length EVP_DigestUpdate ssl-error ;
 
-M: evp-md-context get-checksum ( ctx -- value )
+M: evp-md-context get-checksum
     handle>>
     { { int EVP_MAX_MD_SIZE } int }
     [ EVP_DigestFinal_ex ssl-error ] with-out-parameters

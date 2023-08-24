@@ -1,8 +1,7 @@
 ! Copyright (C) 2010 Doug Coleman.
-! See http://factorcode.org/license.txt for BSD license.
-USING: arrays combinators.smart io.backend io.directories
-io.launcher io.pathnames kernel locals math sequences splitting
-system ;
+! See https://factorcode.org/license.txt for BSD license.
+USING: combinators.smart io.backend io.directories io.launcher
+io.pathnames kernel math sequences splitting system ;
 IN: cuda.nvcc
 
 HOOK: nvcc-path os ( -- path )

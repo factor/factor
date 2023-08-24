@@ -1,5 +1,5 @@
 ! Copyright (C) 2009, 2010 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs classes classes.builtin
 classes.error classes.intersection classes.mixin
 classes.predicate classes.singleton classes.tuple classes.union
@@ -8,7 +8,8 @@ generic.single generic.standard io io.pathnames
 io.streams.string io.styles kernel make namespaces prettyprint
 prettyprint.backend prettyprint.config prettyprint.custom
 prettyprint.sections sequences sets slots sorting strings
-summary vocabs words words.alias words.constant words.symbol ;
+summary vocabs vocabs.prettyprint words words.alias
+words.constant words.symbol ;
 IN: see
 
 GENERIC: synopsis* ( defspec -- )
@@ -18,12 +19,13 @@ GENERIC: see* ( defspec -- )
 : see ( defspec -- ) see* nl ;
 
 : synopsis ( defspec -- str )
-    [
-        string-limit? off
-        0 margin namespaces:set
-        1 line-limit namespaces:set
-        [ synopsis* ] with-in
-    ] with-string-writer ;
+    H{
+        { string-limit? f }
+        { margin 0 }
+        { line-limit 1 }
+    } clone [
+        [ [ synopsis* ] with-in ] with-string-writer
+    ] with-variables ;
 
 : definer. ( defspec -- )
     definer drop pprint-word ;
@@ -124,8 +126,6 @@ M: word declarations.
         POSTPONE: flushable
     } [ declaration. ] with each ;
 
-: pprint-; ( -- ) \ ; pprint-word ;
-
 M: object see*
     [
         12 nesting-limit namespaces:set
@@ -165,7 +165,7 @@ M: predicate-class see-class*
     "predicate-definition" word-prop pprint-elements
     pprint-; block> block> ;
 
-M: singleton-class see-class* ( class -- )
+M: singleton-class see-class*
     \ SINGLETON: pprint-word pprint-word ;
 
 GENERIC: pprint-slot-name ( object -- )
@@ -254,15 +254,15 @@ M: error-class see* see-class ;
     dup implementors
     [ [ reader? ] [ writer? ] bi or ] reject
     [ lookup-method ] with map
-    natural-sort ;
+    sort ;
 
 : seeing-methods ( generic -- seq )
-    "methods" word-prop values natural-sort ;
+    "methods" word-prop values sort ;
 
 PRIVATE>
 
 : see-all ( seq -- )
-    natural-sort [ nl nl ] [ see* ] interleave ;
+    sort [ nl nl ] [ see* ] interleave ;
 
 : methods ( word -- seq )
     [

@@ -1,7 +1,7 @@
 ! Copyright (C) 2008, 2009 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors alien.accessors alien.c-types alien.strings
-arrays compiler.units cpu.architecture fry io.encodings.binary
+arrays compiler.units cpu.architecture io.encodings.binary
 io.encodings.utf8 kernel math sequences words ;
 IN: alien.arrays
 

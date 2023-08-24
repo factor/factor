@@ -37,15 +37,14 @@ void factor_vm::ffi_dlclose(dll* dll) {
 
 BOOL factor_vm::windows_stat(vm_char* path) {
   BY_HANDLE_FILE_INFORMATION bhfi;
-  HANDLE h = CreateFileW(path, GENERIC_READ, FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE, NULL,
+  HANDLE h = CreateFileW(path, FILE_READ_ATTRIBUTES, 0, NULL,
                          OPEN_EXISTING, FILE_FLAG_BACKUP_SEMANTICS, NULL);
 
   if (h == INVALID_HANDLE_VALUE) {
     // FindFirstFile is the only call that can stat c:\pagefile.sys
     WIN32_FIND_DATA st;
-    HANDLE h;
-
-    if (INVALID_HANDLE_VALUE == (h = FindFirstFile(path, &st)))
+    h = FindFirstFile(path, &st);
+    if (h == INVALID_HANDLE_VALUE)
       return false;
     FindClose(h);
     return true;
@@ -185,12 +184,14 @@ uint64_t nano_count() {
 
 void sleep_nanos(uint64_t nsec) { Sleep((DWORD)(nsec / 1000000)); }
 
+#ifndef EXCEPTION_DISPOSITION
 typedef enum _EXCEPTION_DISPOSITION {
   ExceptionContinueExecution = 0,
   ExceptionContinueSearch = 1,
   ExceptionNestedException = 2,
   ExceptionCollidedUnwind = 3
 } EXCEPTION_DISPOSITION;
+#endif
 
 LONG factor_vm::exception_handler(PEXCEPTION_RECORD e, void* frame, PCONTEXT c,
                                   void* dispatch) {
@@ -246,8 +247,6 @@ VM_C_API LONG exception_handler(PEXCEPTION_RECORD e, void* frame, PCONTEXT c,
 // cancellation requests to unblock the thread.
 VOID CALLBACK dummy_cb(ULONG_PTR dwParam) { (void)dwParam; }
 
-// CancelSynchronousIo is not in Windows XP
-#if _WIN32_WINNT >= 0x0600
 static void wake_up_thread(HANDLE thread) {
   if (!CancelSynchronousIo(thread)) {
     DWORD err = GetLastError();
@@ -262,9 +261,6 @@ static void wake_up_thread(HANDLE thread) {
     }
   }
 }
-#else
-static void wake_up_thread(HANDLE thread) { (void)thread; }
-#endif
 
 static BOOL WINAPI ctrl_handler(DWORD dwCtrlType) {
   switch (dwCtrlType) {

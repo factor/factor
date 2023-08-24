@@ -1,6 +1,6 @@
 ! Copyright (C) 2018 Alexander Ilin.
-! See http://factorcode.org/license.txt for BSD license.
-USING: accessors checksums checksums.common destructors fry
+! See https://factorcode.org/license.txt for BSD license.
+USING: accessors checksums checksums.common destructors
 kernel sequences ;
 IN: checksums.multi
 

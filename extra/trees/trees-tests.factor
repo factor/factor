@@ -1,5 +1,5 @@
 USING: accessors arrays assocs combinators fry kernel locals
-math math.combinatorics math.ranges namespaces random sequences
+math math.combinatorics ranges namespaces random sequences
 sequences.product tools.test trees trees.private ;
 IN: trees.tests
 
@@ -113,22 +113,22 @@ CONSTANT: test-tree2 TREE{
 
 { f } [ 99 test-tree2 lower-node ]  unit-test
 { f } [ 100 test-tree2 lower-node ]  unit-test
-100 121 (a,b] [
+100 121 (a..b] [
     [ test-tree2-lower-key 1array ] keep [ test-tree2 lower-node key>> ] curry unit-test
 ] each
 
-99 120 [a,b) [
+99 120 [a..b) [
     [ test-tree2-higher-key 1array ] keep [ test-tree2 higher-node key>> ] curry unit-test
 ] each
 { f } [ 120 test-tree2 higher-node ]  unit-test
 { f } [ 121 test-tree2 higher-node ]  unit-test
 
 { f } [ 99 test-tree2 floor-node ]  unit-test
-100 121 [a,b] [
+100 121 [a..b] [
     [ test-tree2-floor-key 1array ] keep [ test-tree2 floor-node key>> ] curry unit-test
 ] each
 
-99 120 [a,b] [
+99 120 [a..b] [
     [ test-tree2-ceiling-key 1array ] keep [ test-tree2 ceiling-node key>> ] curry unit-test
 ] each
 { f } [ 121 test-tree2 ceiling-node ]  unit-test
@@ -162,17 +162,17 @@ CONSTANT: test-tree2 TREE{
 { { 120 120 } } [ test-tree2 last-entry ] unit-test
 { 120 } [ test-tree2 last-key ] unit-test
 
-: ?a,b? ( a b ? ? -- range )
+: ?a..b? ( a b ? ? -- range )
     2array {
-        { { t t } [ [a,b] ] }
-        { { t f } [ [a,b) ] }
-        { { f t } [ (a,b] ] }
-        { { f f } [ (a,b) ] }
+        { { t t } [ [a..b] ] }
+        { { t f } [ [a..b) ] }
+        { { f t } [ (a..b] ] }
+        { { f f } [ (a..b) ] }
     } case ;
 
 ! subtree>alist
 : test-tree2-subtree>alist ( a b ? ? -- subalist )
-    ?a,b? >array [ even? ] filter [ dup 2array ] map ;
+    ?a..b? >array [ even? ] filter [ dup 2array ] map ;
 
 : subtree>alist ( from-key to-key tree start-inclusive? end-inclusive? -- alist )
     2array {
@@ -182,7 +182,7 @@ CONSTANT: test-tree2 TREE{
         { { f f } [ subtree>alist() ] }
     } case ;
 
-99 121 [a,b] 2 all-combinations
+99 121 [a..b] 2 all-combinations
 { t f } dup 2array <product-sequence> 2array
 [ first2 [ first2 ] bi@
     {
@@ -243,7 +243,7 @@ CONSTANT: test-tree2 TREE{
 
 
 { V{ { 10 10 } { 15 10 } { 20 20 }
-     { 15 20 } { 30 30 } { 35 30 }
+    { 15 20 } { 30 30 } { 35 30 }
 } } [
     TREE{ { 20 20 } { 10 10 } { 30 30 } } clone V{ } clone [
         dupd 6 [ [

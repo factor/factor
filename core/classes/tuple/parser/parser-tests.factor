@@ -1,6 +1,6 @@
 USING: accessors classes.tuple.parser lexer words classes
 sequences math kernel slots tools.test parser compiler.units
-arrays classes.tuple eval multiline ;
+arrays classes.tuple eval multiline splitting ;
 IN: classes.tuple.parser.tests
 
 TUPLE: test-1 ;
@@ -107,7 +107,7 @@ TUPLE: parsing-corner-case x ;
         "    f"
         "    3"
         "}"
-    } "\n" join eval( -- tuple )
+    } join-lines eval( -- tuple )
 ] unit-test
 
 { T{ parsing-corner-case f 3 } } [
@@ -116,7 +116,7 @@ TUPLE: parsing-corner-case x ;
         "T{ parsing-corner-case"
         "    { x 3 }"
         "}"
-    } "\n" join eval( -- tuple )
+    } join-lines eval( -- tuple )
 ] unit-test
 
 { T{ parsing-corner-case f 3 } } [
@@ -125,7 +125,7 @@ TUPLE: parsing-corner-case x ;
         "T{ parsing-corner-case {"
         "    x 3 }"
         "}"
-    } "\n" join eval( -- tuple )
+    } join-lines eval( -- tuple )
 ] unit-test
 
 
@@ -133,14 +133,14 @@ TUPLE: parsing-corner-case x ;
     {
         "USE: classes.tuple.parser.tests T{ parsing-corner-case"
         "    { x 3 }"
-    } "\n" join eval( -- tuple )
+    } join-lines eval( -- tuple )
 ] [ error>> unexpected-eof? ] must-fail-with
 
 [
     {
         "USE: classes.tuple.parser.tests T{ parsing-corner-case {"
         "    x 3 }"
-    } "\n" join eval( -- tuple )
+    } join-lines eval( -- tuple )
 ] [ error>> unexpected-eof? ] must-fail-with
 
 TUPLE: bad-inheritance-tuple ;

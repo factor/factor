@@ -1,9 +1,8 @@
 ! Copyright (C) 2007, 2008, 2009 Alex Chapman, 2009 Diego Martinelli
-! See http://factorcode.org/license.txt for BSD license.
-USING: accessors ascii assocs biassocs combinators hashtables
-kernel lists literals math namespaces make multiline openal
-openal.alut parser sequences splitting strings synth
-synth.buffers ;
+! See https://factorcode.org/license.txt for BSD license.
+USING: accessors ascii assocs biassocs combinators kernel
+literals math multiline namespaces openal openal.alut sequences
+splitting strings synth synth.buffers ;
 IN: morse
 
 ERROR: no-morse-ch ch ;
@@ -87,19 +86,19 @@ CONSTANT: morse-code-table $[
 <PRIVATE
 
 : word>morse ( str -- morse )
-    [ ch>morse ] { } map-as " " join ;
+    [ ch>morse ] { } map-as join-words ;
 
 : sentence>morse ( str -- morse )
-    " " split [ word>morse ] map " / " join ;
+    split-words [ word>morse ] map " / " join ;
 
 : trim-blanks ( str -- newstr )
     [ blank? ] trim ; inline
 
 : morse>word ( morse -- str )
-    " " split [ morse>ch ] "" map-as ;
+    split-words [ morse>ch ] "" map-as ;
 
 : morse>sentence ( morse -- sentence )
-    "/" split [ trim-blanks morse>word ] map " " join ;
+    "/" split [ trim-blanks morse>word ] map join-words ;
 
 : replace-underscores ( str -- str' )
     [ dup CHAR: _ = [ drop CHAR: - ] when ] map ;
@@ -129,7 +128,7 @@ SYMBOLS: source dot-buffer dash-buffer intra-char-gap-buffer letter-gap-buffer ;
 CONSTANT: beep-freq 880
 
 : <morse-buffer> ( -- buffer )
-    half-sample-freq <8bit-mono-buffer> ;
+    half-sample-freq <8-bit-mono-buffer> ;
 
 : sine-buffer ( seconds -- id )
     beep-freq swap <morse-buffer> >sine-wave-buffer

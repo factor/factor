@@ -1,5 +1,5 @@
 ! Copyright (C) 2008 Alex Chapman
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors arrays kernel math math.order sequences
 sequences.private ;
 IN: sequences.merged
@@ -22,10 +22,10 @@ C: <merged> merged
 M: merged length
     seqs>> [ [ length ] [ min ] map-reduce ] [ length ] bi * ; inline
 
-M: merged virtual@ ( n seq -- n' seq' )
+M: merged virtual@
     seqs>> [ length /mod ] [ nth-unsafe ] bi ; inline
 
-M: merged virtual-exemplar ( merged -- seq )
+M: merged virtual-exemplar
     seqs>> ?first ; inline
 
 INSTANCE: merged virtual-sequence

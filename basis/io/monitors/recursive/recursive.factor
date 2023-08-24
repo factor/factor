@@ -1,10 +1,9 @@
 ! Copyright (C) 2008, 2010 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
-USING: accessors sequences assocs arrays continuations
-destructors combinators kernel threads concurrency.messaging
-concurrency.mailboxes concurrency.promises io.files io.files.info
-io.directories io.pathnames io.monitors io.monitors.private
-debugger fry ;
+! See https://factorcode.org/license.txt for BSD license.
+USING: accessors assocs combinators concurrency.mailboxes
+concurrency.messaging concurrency.promises continuations
+destructors io.directories io.files.info io.monitors
+io.monitors.private io.pathnames kernel sequences threads ;
 IN: io.monitors.recursive
 
 ! Simulate recursive monitors on platforms that don't have them
@@ -20,9 +19,7 @@ DEFER: add-child-monitor
 
 : add-child-monitors ( path -- )
     ! We yield since this directory scan might take a while.
-    [
-        [ add-child-monitor ] each yield
-    ] with-qualified-directory-files ;
+    qualified-directory-files [ add-child-monitor ] each yield ;
 
 : add-child-monitor ( path -- )
     notify? [ dup { +add-file+ } monitor tget queue-change ] when

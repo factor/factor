@@ -1,11 +1,5 @@
-USING:
-    alien alien.c-types alien.data
-    alien.libraries
-    alien.syntax
-    classes.struct
-    combinators
-    kernel
-    system ;
+USING: alien alien.c-types alien.libraries alien.syntax
+classes.struct combinators system ;
 IN: pcre.ffi
 
 << "pcre" {

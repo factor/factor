@@ -33,7 +33,7 @@ TUPLE: empty-tuple ;
     [ [ ] [ ] curry curry dup 2 slot swap 3 slot dup 2 slot swap 3 slot drop ]
     [ [ ] [ ] curry curry call ]
     [ 1 cons boa over [ "A" throw ] when car>> ]
-    [ [ <=> ] sort ]
+    [ [ <=> ] sort-with ]
     [ [ <=> ] with search ]
     [ cons boa car>> void { } cdecl [ ] alien-callback ]
 } [ [ ] swap [ test-unboxing ] curry unit-test ] each

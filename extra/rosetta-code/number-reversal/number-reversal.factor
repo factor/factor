@@ -1,10 +1,10 @@
 ! Copyright (c) 2012 Anonymous
-! See http://factorcode.org/license.txt for BSD license.
-USING: formatting io kernel math math.parser math.ranges
+! See https://factorcode.org/license.txt for BSD license.
+USING: formatting io kernel math math.parser ranges
 namespaces random sequences strings ;
 IN: rosetta-code.number-reversal
 
-! http://rosettacode.org/wiki/Number_reversal_game
+! https://rosettacode.org/wiki/Number_reversal_game
 
 ! Given a jumbled list of the numbers 1 to 9 that are definitely
 ! not in ascending order, show the list then ask the player how
@@ -17,7 +17,7 @@ IN: rosetta-code.number-reversal
 ! Note: Assume the players input does not need extra validation.
 
 : make-jumbled-array ( -- sorted jumbled )
-    CHAR: 1 CHAR: 9 [a,b] [ 1string ] map dup clone randomize
+    CHAR: 1 CHAR: 9 [a..b] [ 1string ] map dup clone randomize
     [ 2dup = ] [ randomize ] while ;
 
 SYMBOL: trials

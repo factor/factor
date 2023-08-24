@@ -1,6 +1,6 @@
 ! Copyright (C) 2009 Joe Groff.
-! See http://factorcode.org/license.txt for BSD license.
-USING: help.markup help.syntax kernel words ;
+! See https://factorcode.org/license.txt for BSD license.
+USING: help.markup help.syntax ;
 IN: tools.deprecation
 
 HELP: :deprecations

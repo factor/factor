@@ -1,19 +1,19 @@
 ! Copyright (C) 2012 John Benediktsson
-! See http://factorcode.org/license.txt for BSD license
+! See https://factorcode.org/license.txt for BSD license
 
-USING: accessors arrays assocs assocs.extras byte-arrays
-combinators combinators.short-circuit compression.zlib fry
-grouping kernel locals math math.combinatorics math.constants
-math.functions math.order math.primes math.primes.factors
-math.ranges math.ranges.private math.statistics math.vectors
-memoize parser random sequences sequences.extras
-sequences.private sets sorting sorting.extras ;
+USING: accessors arrays assocs byte-arrays combinators
+combinators.short-circuit compression.zlib grouping kernel
+kernel.private math math.bitwise math.combinatorics
+math.constants math.functions math.order math.primes
+math.primes.factors math.statistics math.vectors namespaces
+random random.private ranges ranges.private sequences
+sequences.extras sequences.private sets sorting sorting.extras ;
 
 IN: math.extras
 
-<PRIVATE
-
 DEFER: stirling
+
+<PRIVATE
 
 : (stirling) ( n k -- x )
     [ [ 1 - ] bi@ stirling ]
@@ -43,6 +43,10 @@ PRIVATE>
 MEMO: bernoulli ( p -- n )
     [ 1 ] [ (bernoulli) ] if-zero ;
 
+! From page 4 https://arxiv.org/ftp/arxiv/papers/2201/2201.12601.pdf
+: bernoulli-estimate-factorial ( n -- n! )
+    [ 2pi swap ^ ] [ bernoulli ] bi * 2 / ;
+
 : chi2 ( actual expected -- n )
     0 [ dup 0 > [ [ - sq ] keep / + ] [ 2drop ] if ] 2reduce ;
 
@@ -52,7 +56,7 @@ MEMO: bernoulli ( p -- n )
     even? [ "odd degrees of freedom" throw ] unless ;
 
 : (chi2P) ( chi/2 df/2 -- p )
-    [1,b) dupd n/v cum-product swap neg e^ [ v*n sum ] keep + ;
+    [1..b) dupd n/v cum-product swap neg e^ [ v*n sum ] keep + ;
 
 PRIVATE>
 
@@ -161,20 +165,17 @@ PRIVATE>
 : sinc ( x -- y )
     [ 1 ] [ pi * [ sin ] [ / ] bi ] if-zero ;
 
-: until-zero ( n quot -- )
-    [ dup zero? ] swap until drop ; inline
-
 : cum-reduce ( seq identity quot: ( prev elt -- next ) -- result cum-result )
     [ dup rot ] dip dup '[ _ curry dip dupd @ ] each ; inline
 
 <PRIVATE
 
 :: (gini) ( seq -- x )
-    seq natural-sort :> sorted
+    seq sort :> sorted
     seq length :> len
     sorted 0 [ + ] cum-reduce :> ( a b )
-    b len a * / :> B
-    1 len recip + 2 B * - ;
+    b len a * / :> c
+    1 len recip + 2 c * - ;
 
 PRIVATE>
 
@@ -199,10 +200,16 @@ PRIVATE>
     dup sum '[ _ / dup ^ ] map-product ;
 
 : weighted-random ( histogram -- obj )
-    unzip cum-sum [ last random ] [ bisect-left ] bi swap nth ;
+    unzip cum-sum [ last >float random ] keep bisect-left swap nth ;
+
+: weighted-randoms ( length histogram -- seq )
+    unzip cum-sum swap
+    [ [ last >float random-generator get ] keep ] dip
+    '[ _ _ random* _ bisect-left _ nth ] replicate ;
 
 : unique-indices ( seq -- unique indices )
-    [ members ] keep over dup length <iota> H{ } zip-as '[ _ at ] map ;
+    [ members ] keep over dup length <iota>
+    H{ } zip-as '[ _ at ] map ;
 
 : digitize] ( seq bins -- seq' )
     '[ _ bisect-left ] map ;
@@ -217,21 +224,21 @@ PRIVATE>
 
 PRIVATE>
 
-: linspace[a,b) ( a b length -- seq )
-    steps ,b) <range> ;
+: linspace[a..b) ( a b length -- seq )
+    steps ..b) <range> ;
 
-: linspace[a,b] ( a b length -- seq )
+: linspace[a..b] ( a b length -- seq )
     {
         { [ dup 1 < ] [ 3drop { } ] }
         { [ dup 1 = ] [ 2drop 1array ] }
         [ 1 - steps <range> ]
     } cond ;
 
-: logspace[a,b) ( a b length base -- seq )
-    [ linspace[a,b) ] dip swap n^v ;
+: logspace[a..b) ( a b length base -- seq )
+    [ linspace[a..b) ] dip swap n^v ;
 
-: logspace[a,b] ( a b length base -- seq )
-    [ linspace[a,b] ] dip swap n^v ;
+: logspace[a..b] ( a b length base -- seq )
+    [ linspace[a..b] ] dip swap n^v ;
 
 : majority ( seq -- elt/f )
     [ f 0 ] dip [
@@ -290,17 +297,52 @@ PRIVATE>
     [ 0.0 0.0 ] 2dip [ 2dip rot kahan+ ] curry
     [ -rot ] prepose each nip ; inline
 
-! SYNTAX: .. dup pop scan-object [a,b) suffix! ;
-! SYNTAX: ... dup pop scan-object [a,b] suffix! ;
+<PRIVATE
 
-GENERIC: sum-squares ( seq -- n )
-M: object sum-squares [ sq ] map-sum ;
-M: iota sum-squares
-    length 1 - [ ] [ 1 + ] [ 1/2 + ] tri * * 3 / ;
+! Adaptive Precision Floating-Point Arithmetic and Fast Robust Geometric Predicates
+! www-2.cs.cmu.edu/afs/cs/project/quake/public/papers/robust-arithmetic.ps
 
-GENERIC: sum-cubes ( seq -- n )
-M: object sum-cubes [ 3 ^ ] map-sum ;
-M: iota sum-cubes sum sq ;
+: sort-partial ( x y -- x' y' )
+    2dup [ abs ] bi@ < [ swap ] when ; inline
+
+:: partial+ ( x y -- hi lo )
+    x y + dup x - :> yr y yr - ; inline
+
+:: partial-sums ( seq -- seq' )
+    V{ } clone :> partials
+    seq [
+        0 partials [
+            swapd sort-partial partial+ swapd
+            [ over partials set-nth 1 + ] unless-zero
+        ] each :> i
+        i partials shorten
+        [ i partials set-nth ] unless-zero
+    ] each partials ;
+
+:: sum-exact ( partials -- n )
+    partials [ 0.0 ] [
+        ! sum from the top, stop when sum becomes inexact
+        [ 0.0 0.0 ] dip [
+            nip partial+ dup 0.0 = not
+        ] find-last drop :> ( lo n )
+
+        ! make half-even rounding work across multiple partials
+        n [ 0 > ] [ f ] if* [
+            n 1 - partials nth
+            [ 0.0 < lo 0.0 < and ]
+            [ 0.0 > lo 0.0 > and ] bi or [
+                lo 2.0 * :> y
+                dup y + :> x
+                x over - :> yr
+                y yr = [ drop x ] when
+            ] when
+        ] when
+    ] if-empty ;
+
+PRIVATE>
+
+: sum-floats ( seq -- n )
+    partial-sums sum-exact ;
 
 : mobius ( n -- x )
     group-factors values [ 1 ] [
@@ -310,3 +352,74 @@ M: iota sum-cubes sum sq ;
 
 : kelly ( winning-probability odds -- fraction )
     [ 1 + * 1 - ] [ / ] bi ;
+
+:: integer-sqrt ( m -- n )
+    m [ 0 ] [
+        assert-non-negative
+        bit-length 1 - 2 /i :> c
+        1 :> a!
+        0 :> d!
+        c bit-length <iota> <reversed> [| s |
+            d :> e
+            c s neg shift d!
+            a d e - 1 - shift
+            m 2 c * e - d - 1 + neg shift a /i + a!
+        ] each
+        a a sq m > [ 1 - ] when
+    ] if-zero ;
+
+<PRIVATE
+
+: reduce-evens ( value u v -- value' u' v' )
+    [ 2dup [ even? ] both? ] [ [ 2 * ] [ 2/ ] [ 2/ ] tri* ] while ;
+
+: reduce-odds ( value u v -- value' u' v' )
+    [
+        [ [ dup even? ] [ 2/ ] while ] bi@
+        2dup <=> {
+            { +eq+ [ over '[ _ * ] 2dip f ] }
+            { +lt+ [ swap [ - ] keep t ] }
+            { +gt+ [ [ - ] keep t ] }
+        } case
+    ] loop ;
+
+PRIVATE>
+
+: stein ( u v -- w )
+    2dup [ zero? ] both? [ "gcd for zeros is undefined" throw ] when
+    [ dup 0 < [ neg ] when ] bi@
+    [ 1 ] 2dip reduce-evens reduce-odds 2drop ;
+
+TUPLE: vose
+    { n fixnum }
+    { items array }
+    { probs array }
+    { alias array } ;
+
+:: <vose> ( dist -- vose )
+    V{ } clone :> small
+    V{ } clone :> large
+    dist assoc-size :> n
+    n f <array> :> alias
+
+    dist unzip dup [ length ] [ sum ] bi /f v*n :> ( items probs )
+    probs [ swap 1.0 < small large ? push ] each-index
+
+    [ small empty? large empty? or ] [
+        small pop :> s
+        large pop :> l
+        l s alias set-nth
+        l dup probs [ s probs nth + 1 - dup ] change-nth
+        1.0 < small large ? push
+    ] until
+
+    1.0 large [ probs set-nth ] with each
+    1.0 small [ probs set-nth ] with each
+
+    n items probs alias vose boa ;
+
+M:: vose random* ( obj rnd -- elt )
+    obj n>> rnd random* { fixnum } declare
+    dup obj probs>> nth-unsafe { float } declare rnd (random-unit) >=
+    [ obj alias>> nth-unsafe { fixnum } declare ] unless
+    obj items>> nth-unsafe ;

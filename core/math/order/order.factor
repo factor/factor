@@ -1,5 +1,5 @@
 ! Copyright (C) 2008, 2010 Slava Pestov, Doug Coleman.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: kernel kernel.private math ;
 IN: math.order
 
@@ -37,15 +37,15 @@ GENERIC: after? ( obj1 obj2 -- ? )
 GENERIC: before=? ( obj1 obj2 -- ? )
 GENERIC: after=? ( obj1 obj2 -- ? )
 
-M: object before? ( obj1 obj2 -- ? ) <=> +lt+ eq? ; inline
-M: object after? ( obj1 obj2 -- ? ) <=> +gt+ eq? ; inline
-M: object before=? ( obj1 obj2 -- ? ) <=> +gt+ eq? not ; inline
-M: object after=? ( obj1 obj2 -- ? ) <=> +lt+ eq? not ; inline
+M: object before? <=> +lt+ eq? ; inline
+M: object after? <=> +gt+ eq? ; inline
+M: object before=? <=> +gt+ eq? not ; inline
+M: object after=? <=> +lt+ eq? not ; inline
 
-M: real before? ( obj1 obj2 -- ? ) < ; inline
-M: real after? ( obj1 obj2 -- ? ) > ; inline
-M: real before=? ( obj1 obj2 -- ? ) <= ; inline
-M: real after=? ( obj1 obj2 -- ? ) >= ; inline
+M: real before? < ; inline
+M: real after? > ; inline
+M: real before=? <= ; inline
+M: real after=? >= ; inline
 
 GENERIC: min ( obj1 obj2 -- obj )
 GENERIC: max ( obj1 obj2 -- obj )

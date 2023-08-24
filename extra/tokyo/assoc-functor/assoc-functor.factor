@@ -1,7 +1,7 @@
 ! Copyright (C) 2009 Bruno Deferrari
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors alien.c-types alien.data arrays assocs
-destructors fry functors kernel locals sequences serialize
+destructors functors kernel sequences serialize
 tokyo.alien.tcutil tokyo.utils vectors ;
 IN: tokyo.assoc-functor
 
@@ -37,16 +37,16 @@ M: TYPE assoc-size handle>> DBRNUM ;
 : DBKEYS ( db -- keys )
     [ assoc-size <vector> ] [ handle>> ] bi
     dup DBITERINIT drop 0 int <ref>
-    [ 2dup DBITERNEXT dup ] [
+    [ 2dup DBITERNEXT ] [
         [ memory>object ] [ tcfree ] bi
         reach push
-    ] while 3drop ;
+    ] while* 2drop ;
 
 M: TYPE >alist
     [ DBKEYS dup ] keep '[ dup _ at 2array ] map! drop ;
 
 M: TYPE set-at
-    handle>> swap rot [ object>bytes dup length ] bi@ DBPUT drop ;
+    handle>> spin [ object>bytes dup length ] bi@ DBPUT drop ;
 
 M: TYPE delete-at
     handle>> swap object>bytes dup length DBOUT drop ;

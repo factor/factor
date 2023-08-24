@@ -1,5 +1,5 @@
 ! Copyright (C) 2009 Joe Groff.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: fry io io.directories io.encodings.ascii
 io.encodings.utf8 io.launcher io.pathnames kernel lexer
 namespaces parser sequences splitting vocabs vocabs.loader ;

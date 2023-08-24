@@ -1,9 +1,9 @@
 ! Copyright (c) 2012 Anonymous
-! See http://factorcode.org/license.txt for BSD license.
-USING: backtrack continuations kernel prettyprint sequences ;
+! See https://factorcode.org/license.txt for BSD license.
+USING: backtrack kernel prettyprint sequences splitting ;
 IN: rosetta-code.amb
 
-! http://rosettacode.org/wiki/Amb
+! https://rosettacode.org/wiki/Amb
 
 ! Define and give an example of the Amb operator.
 
@@ -38,6 +38,6 @@ CONSTANT: words {
 : select ( seq -- seq' ) [ amb-lazy ] map ;
 
 : search ( -- )
-    words select dup sentence-match? [ " " join ] [ fail ] if . ;
+    words select dup sentence-match? [ join-words ] [ fail ] if . ;
 
 MAIN: search

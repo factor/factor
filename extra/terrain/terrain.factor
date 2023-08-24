@@ -1,15 +1,13 @@
 ! Copyright (C) 2009 Joe Groff, Doug Coleman.
-! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays combinators game.input game.loop
-game.input.scancodes grouping kernel literals locals
-math math.constants math.functions math.order math.trig
-math.vectors opengl opengl.capabilities opengl.gl
-opengl.shaders opengl.textures opengl.textures.private
-sequences sequences.product specialized-arrays
-terrain.generation terrain.shaders typed ui ui.gadgets
-ui.gadgets.worlds ui.pixel-formats game.worlds
-math.matrices.simd noise ui.gestures combinators.short-circuit
-destructors grid-meshes math.vectors.simd ;
+! See https://factorcode.org/license.txt for BSD license.
+USING: accessors arrays combinators combinators.short-circuit
+destructors game.input game.input.scancodes game.loop
+game.worlds grid-meshes grouping kernel literals math
+math.functions math.matrices.simd math.order math.trig
+math.vectors math.vectors.simd noise opengl
+opengl.capabilities opengl.gl opengl.shaders opengl.textures
+sequences specialized-arrays terrain.generation terrain.shaders
+typed ui ui.gadgets.worlds ui.gestures ui.pixel-formats ;
 QUALIFIED-WITH: alien.c-types c
 SPECIALIZED-ARRAY: c:float
 IN: terrain
@@ -169,7 +167,7 @@ terrain-world H{
     segment bitmap>> 4 <groups> :> pixels
     pixel dim pixel-indices :> indices
 
-    indices [ pixels nth COMPONENT-SCALE v. 255.0 / ] map
+    indices [ pixels nth COMPONENT-SCALE vdot 255.0 / ] map
     first4 pixel-mantissa bilerp ;
 
 : (collide) ( segment location -- location' )

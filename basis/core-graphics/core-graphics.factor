@@ -1,11 +1,11 @@
 ! Copyright (C) 2009 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 
 USING: accessors alien alien.c-types alien.data
 alien.destructors alien.syntax colors
 core-foundation.dictionaries core-foundation.strings
 core-foundation.urls core-foundation.utilities
-core-graphics.types destructors fry images images.memory kernel
+core-graphics.types destructors images images.memory kernel
 libc math opengl.gl sequences ;
 
 IN: core-graphics

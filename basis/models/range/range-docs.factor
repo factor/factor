@@ -1,5 +1,5 @@
 USING: help.syntax help.markup kernel math classes classes.tuple
-calendar models ;
+calendar models models.product ;
 IN: models.range
 
 HELP: range
@@ -50,7 +50,7 @@ ARTICLE: "models.range" "Range models"
 { $subsections "range-model-protocol" } ;
 
 ARTICLE: "range-model-protocol" "Range model protocol"
-"The range model protocol is implemented by the " { $link range } " and " { $link compose } " classes. User-defined models may implement it too."
+"The range model protocol is implemented by the " { $link range } " and " { $link product } " classes. User-defined models may implement it too."
 { $subsections
     range-value
     range-page-value

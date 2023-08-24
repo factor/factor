@@ -1,5 +1,5 @@
-USING: assocs debugger hashtables help.markup help.syntax
-kernel quotations sequences math ;
+USING: debugger hashtables help.markup help.syntax kernel math
+sequences ;
 IN: math.statistics
 
 HELP: geometric-mean
@@ -81,6 +81,10 @@ HELP: population-cov
 HELP: population-corr
 { $values { "x-seq" sequence } { "y-seq" sequence } { "corr" "a real number" } }
 { $description "Computes the correlation of two sequences, " { $snippet "x-seq" } " and " { $snippet "y-seq" } "." } ;
+
+HELP: spearman-corr
+{ $values { "x-seq" sequence } { "y-seq" sequence } { "corr" "a real number" } }
+{ $description "Computes the Spearman's correlation of two sequences, " { $snippet "x-seq" } " and " { $snippet "y-seq" } "." $nl "For more information see " { $url "https://en.wikipedia.org/wiki/Spearman%27s_rank_correlation_coefficient" } "." } ;
 
 HELP: histogram
 { $values
@@ -235,6 +239,28 @@ HELP: z-score
 { $values { "seq" sequence } { "n" number } }
 { $description "Calculates the Z-Score for " { $snippet "seq" } "." } ;
 
+HELP: dcg
+{ $values
+    { "scores" sequence }
+    { "dcg" number }
+}
+{ $description "Calculates the discounted cumulative gain from a list of scores. The discounted cumulative gain can be used to compare two lists of results against each other given scores for each of the results."
+$nl
+" See " { $url "https://en.wikipedia.org/wiki/Discounted_cumulative_gain" }
+} ;
+
+HELP: ndcg
+{ $values
+    { "scores" sequence }
+    { "ndcg" number }
+}
+{ $description "Calculates the normalized discounted cumulative gain from a list of scores. The ndcg is the discounted cumulative gain divided by the theoretical maximum dcg for the given list."
+$nl
+"See " { $url "https://en.wikipedia.org/wiki/Discounted_cumulative_gain" }
+} ;
+
+{ dcg ndcg } related-words
+
 ARTICLE: "histogram" "Computing histograms"
 "Counting elements in a sequence:"
 { $subsections
@@ -284,7 +310,9 @@ ARTICLE: "math.statistics" "Statistics"
 "Counting the frequency of occurrence of elements:"
 { $subsections "histogram" }
 "Computing cumulative sequences:"
-{ $subsections "cumulative" } ;
+{ $subsections "cumulative" }
+"Calculating discounted cumulative gain:"
+{ $subsections dcg ndcg } ;
 
 ABOUT: "math.statistics"
 
@@ -293,3 +321,5 @@ ABOUT: "math.statistics"
 { ste-ddof population-ste sample-ste } related-words
 { corr-ddof population-corr sample-corr } related-words
 { cov-ddof population-cov sample-cov } related-words
+
+{ sum-of-squares sum-of-cubes sum-of-quads } related-words

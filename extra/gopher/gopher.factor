@@ -1,13 +1,11 @@
 ! Copyright (C) 2014 John Benediktsson
-! See http://factorcode.org/license.txt for BSD license
+! See https://factorcode.org/license.txt for BSD license
 
-USING: accessors byte-arrays calendar colors.constants
-combinators formatting fry images images.loader
-images.loader.private images.viewer io io.encodings.binary
-io.encodings.string io.encodings.utf8 io.sockets io.styles
-io.timeouts kernel make math math.parser namespaces present
-prettyprint sequences splitting summary urls urls.encoding
-vocabs ;
+USING: accessors calendar colors combinators formatting
+images.loader images.loader.private images.viewer io
+io.encodings.binary io.encodings.string io.encodings.utf8
+io.sockets io.styles io.timeouts kernel make namespaces present
+prettyprint sequences splitting summary urls urls.encoding ;
 
 IN: gopher
 
@@ -42,7 +40,7 @@ CONSTANT: A_PLUS_SOUND CHAR: <
 : gopher-get ( selector -- item-type byte-array )
     "/" split1 "" or [ first ] dip
     "?" split1 [ "\t" glue ] when*
-    "\r\n" append utf8 encode write flush contents ;
+    "\r\n" append utf8 encode write flush read-contents ;
 
 PRIVATE>
 
@@ -52,7 +50,7 @@ ERROR: not-a-gopher-url url ;
     >url dup protocol>> "gopher" = [ not-a-gopher-url ] unless {
         [ host>> ]
         [ port>> 70 or <inet> binary ]
-        [ path>> rest url-encode [ "1/" ] when-empty ]
+        [ path>> rest [ "1/" ] when-empty ]
         [ query>> [ assoc>query url-decode "?" glue ] when* ]
     } cleave '[
         1 minutes input-stream get set-timeout
@@ -88,7 +86,7 @@ M: gopher-link >url
     ] if ;
 
 : gopher-text ( object -- lines )
-    utf8 decode string-lines { "." } split1 drop ;
+    utf8 decode split-lines { "." } split1 drop ;
 
 : gopher-text. ( object -- )
     gopher-text [ print ] each ;

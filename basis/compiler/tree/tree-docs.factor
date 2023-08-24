@@ -14,17 +14,17 @@ HELP: #alien-invoke
 { $see-also alien-invoke } ;
 
 HELP: #alien-callback
-{ $class-description "SSA tree node that constructs an alien callback. It is not a subclass of " { $link #alien-node } ". " } ;
+{ $class-description "SSA tree node that constructs an alien callback. It is not a subclass of " { $link #alien-node } "." } ;
 
 HELP: #call
 { $class-description "SSA tree node that calls a word. It has the following slots:"
-  { $table
-    { { $slot "word" } { "The " { $link word } " to call." } }
-    { { $slot "in-d" } { "Sequence of input variables to the call. The items are ordered from top to bottom of the stack." } }
-    { { $slot "out-d" } { "Output values of the call." } }
-    { { $slot "method" } { "If the called word is generic and inlined here, then 'method' contains the inlined " { $link quotation } "." } }
-    { { $slot "body" } { "If the called word is generic and inlined, then 'body' is a sequence of SSA nodes built from the inlined method." } }
-    { { $slot "info" } { "If the called word is generic and inlined, then the info slot contains an assoc of value infos for the body of the inlined generic. It is set during the propagation pass of the optimizer." } }
+  { $slots
+    { "word" { "The " { $link word } " to call." } }
+    { "in-d" { "Sequence of input variables to the call. The items are ordered from top to bottom of the stack." } }
+    { "out-d" { "Output values of the call." } }
+    { "method" { "If the called word is generic and inlined here, then 'method' contains the inlined " { $link quotation } "." } }
+    { "body" { "If the called word is generic and inlined, then 'body' is a sequence of SSA nodes built from the inlined method." } }
+    { "info" { "If the called word is generic and inlined, then the info slot contains an assoc of value infos for the body of the inlined generic. It is set during the propagation pass of the optimizer." } }
   }
 } ;
 
@@ -34,8 +34,8 @@ HELP: #call-recursive
 
 HELP: #declare
 { $class-description "SSA tree node emitted when " { $link declare } " declarations are encountered. It has the following slots:"
-  { $table
-    { { $slot "declaration" } { { $link assoc } " that maps values to the types they are declared as." } }
+  { $slots
+    { "declaration" { { $link assoc } " that maps values to the types they are declared as." } }
   }
 } ;
 
@@ -45,8 +45,8 @@ HELP: #enter-recursive
 
 HELP: #if
 { $class-description "SSA tree node that implements conditional branching. It has the following slots:"
-  { $table
-    { { $slot "children" }
+  { $slots
+    { "children"
       { "A two item " { $link sequence } ". The first item holds the instructions executed if the condition is true and the second those that are executed if it is not true." }
     }
   }
@@ -54,8 +54,8 @@ HELP: #if
 
 HELP: #introduce
 { $class-description "SSA tree node that puts an input value from the \"outside\" on the stack. It is used to \"introduce\" data stack parameter whenever they are needed. It has the following slots:"
-  { $table
-    { { $slot "out-d" } { "Array of values of the parameters being introduced." } }
+  { $slots
+    { "out-d" { "Array of values of the parameters being introduced." } }
   }
 } ;
 
@@ -64,25 +64,25 @@ HELP: #phi
 
 HELP: #push
 { $class-description "SSA tree node that puts a literal value on the stack. It has the following slots:"
-  { $table
-    { { $slot "out-d" } { "A one item array containing the " { $link <value> } " of the literal being pushed." } }
+  { $slots
+    { "out-d" { "A one item array containing the " { $link <value> } " of the literal being pushed." } }
   }
 }
 { $notes "A " { $link quotation } " is also a literal." } ;
 
 HELP: #recursive
 { $class-description "Instruction which encodes a loop. It has the following slots:"
-  { $table
-    { { $slot "child" } { "A sequence of nodes representing the body of the loop." } }
-    { { $slot "loop?" } { "If " { $link t } ", the recursion is implemented using a jump, otherwise as a call back to the word." } }
+  { $slots
+    { "child" { "A sequence of nodes representing the body of the loop." } }
+    { "loop?" { "If " { $link t } ", the recursion is implemented using a jump, otherwise as a call back to the word." } }
   }
 }
 { $see-also inline-recursive-word } ;
 
 HELP: #shuffle
 { $class-description "SSA tree node that represents a stack shuffling operation such as " { $link swap } ". It has the following slots:"
-  { $table
-    { { $slot "mapping" } { "An " { $link assoc } " that shows how the shuffle output values (the keys) correspond to their inputs (the values)." } }
+  { $slots
+    { "mapping" { "An " { $link assoc } " that shows how the shuffle output values (the keys) correspond to their inputs (the values)." } }
   }
 } ;
 

@@ -1,5 +1,5 @@
-USING: kernel sequences math stack-checker effects accessors
-macros fry combinators.short-circuit ;
+USING: accessors combinators.short-circuit effects kernel math
+sequences stack-checker ;
 IN: combinators.short-circuit.smart
 
 <PRIVATE

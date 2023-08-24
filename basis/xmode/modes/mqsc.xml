@@ -7,225 +7,229 @@
   - ensure your LITERAL1 and LITERAL2 colours are set differently.
 -->
 <MODE>
-  <PROPS>
-    <!-- asterisks are comments -->
-    <PROPERTY NAME="lineComment" VALUE="*"/>
-  </PROPS>
-  <!-- ignore case, highlight numbers -->
-  <RULES ESCAPE="\" IGNORE_CASE="TRUE" HIGHLIGHT_DIGITS="TRUE">
+	<PROPS>
+		<!-- asterisks are comments -->
+		<PROPERTY NAME="lineComment" VALUE="*"/>
+		<PROPERTY NAME="contextInsensitive" VALUE="true"/>
+	</PROPS>
+	<!-- ignore case, highlight numbers -->
+	<RULES IGNORE_CASE="TRUE" HIGHLIGHT_DIGITS="TRUE">
 
-    <!-- lines beginning with asterisk are comments -->
-    <EOL_SPAN TYPE="COMMENT1" AT_LINE_START="TRUE">*</EOL_SPAN>
+		<!-- lines beginning with asterisk are comments -->
+		<EOL_SPAN TYPE="COMMENT1" AT_LINE_START="TRUE">*</EOL_SPAN>
 
-    <!-- brackets on one line delimit parameter values, don't parse -->
-    <!-- case 1: string values using apostrophe marks -->
-    <SPAN TYPE="LITERAL1" NO_LINE_BREAK="TRUE" MATCH_TYPE="OPERATOR">
-      <BEGIN>('</BEGIN>
-      <END>')</END>
-    </SPAN>
-    <!-- case 2: literal values and object names -->
-    <SPAN TYPE="LITERAL2" NO_LINE_BREAK="TRUE" MATCH_TYPE="OPERATOR">
-      <BEGIN>(</BEGIN>
-      <END>)</END>
-    </SPAN>
+		<!-- brackets on one line delimit parameter values, don't parse -->
+		<!-- case 1: string values using apostrophe marks -->
+		<SPAN TYPE="LITERAL1" ESCAPE="\" NO_LINE_BREAK="TRUE" MATCH_TYPE="OPERATOR">
+			<BEGIN>('</BEGIN>
+			<END>')</END>
+		</SPAN>
+		<!-- case 2: literal values and object names -->
+		<SPAN TYPE="LITERAL2" ESCAPE="\" NO_LINE_BREAK="TRUE" MATCH_TYPE="OPERATOR">
+			<BEGIN>(</BEGIN>
+			<END>)</END>
+		</SPAN>
 
-    <!-- line continuation symbol -->
-    <SEQ TYPE="OPERATOR">+</SEQ>
+		<!-- line continuation symbol -->
+		<SEQ TYPE="OPERATOR">+</SEQ>
 
-    <KEYWORDS>
-      <!-- KEYWORD1 are core MQSC commands -->
-      <KEYWORD1>all</KEYWORD1><!-- as in DIS Q(X) ALL -->
-      <KEYWORD1>alter</KEYWORD1>
-      <KEYWORD1>alt</KEYWORD1>
-      <KEYWORD1>clear</KEYWORD1>
-      <KEYWORD1>define</KEYWORD1>
-      <KEYWORD1>def</KEYWORD1>
-      <KEYWORD1>delete</KEYWORD1>
-      <KEYWORD1>display</KEYWORD1>
-      <KEYWORD1>dis</KEYWORD1>
-      <KEYWORD1>end</KEYWORD1>
-      <KEYWORD1>like</KEYWORD1><!-- as in DEF Q(X) LIKE(Y) -->
-      <KEYWORD1>ping</KEYWORD1>
-      <KEYWORD1>refresh</KEYWORD1>
-      <KEYWORD1>ref</KEYWORD1>
-      <KEYWORD1>replace</KEYWORD1><!-- as in DEF Q(X) REPLACE -->
-      <KEYWORD1>reset</KEYWORD1>
-      <KEYWORD1>resolve</KEYWORD1>
-      <KEYWORD1>resume</KEYWORD1>
-      <KEYWORD1>start</KEYWORD1>
-      <KEYWORD1>stop</KEYWORD1>
-      <KEYWORD1>suspend</KEYWORD1>
+		<KEYWORDS>
+			<!-- KEYWORD1 are core MQSC commands -->
+			<KEYWORD1>all</KEYWORD1>
+			<!-- as in DIS Q(X) ALL -->
+			<KEYWORD1>alter</KEYWORD1>
+			<KEYWORD1>alt</KEYWORD1>
+			<KEYWORD1>clear</KEYWORD1>
+			<KEYWORD1>define</KEYWORD1>
+			<KEYWORD1>def</KEYWORD1>
+			<KEYWORD1>delete</KEYWORD1>
+			<KEYWORD1>display</KEYWORD1>
+			<KEYWORD1>dis</KEYWORD1>
+			<KEYWORD1>end</KEYWORD1>
+			<KEYWORD1>like</KEYWORD1>
+			<!-- as in DEF Q(X) LIKE(Y) -->
+			<KEYWORD1>ping</KEYWORD1>
+			<KEYWORD1>refresh</KEYWORD1>
+			<KEYWORD1>ref</KEYWORD1>
+			<KEYWORD1>replace</KEYWORD1>
+			<!-- as in DEF Q(X) REPLACE -->
+			<KEYWORD1>reset</KEYWORD1>
+			<KEYWORD1>resolve</KEYWORD1>
+			<KEYWORD1>resume</KEYWORD1>
+			<KEYWORD1>start</KEYWORD1>
+			<KEYWORD1>stop</KEYWORD1>
+			<KEYWORD1>suspend</KEYWORD1>
 
-      <!-- KEYWORD2 are object types -->
-      <KEYWORD2>channel</KEYWORD2>
-      <KEYWORD2>chl</KEYWORD2>
-      <KEYWORD2>chstatus</KEYWORD2>
-      <KEYWORD2>chst</KEYWORD2>
-      <KEYWORD2>clusqmgr</KEYWORD2>
-      <KEYWORD2>process</KEYWORD2>
-      <KEYWORD2>proc</KEYWORD2>
-      <KEYWORD2>namelist</KEYWORD2>
-      <KEYWORD2>nl</KEYWORD2>
-      <KEYWORD2>qalias</KEYWORD2>
-      <KEYWORD2>qa</KEYWORD2>
-      <KEYWORD2>qcluster</KEYWORD2>
-      <KEYWORD2>qc</KEYWORD2>
-      <KEYWORD2>qlocal</KEYWORD2>
-      <KEYWORD2>ql</KEYWORD2>
-      <KEYWORD2>qmodel</KEYWORD2>
-      <KEYWORD2>qm</KEYWORD2>
-      <KEYWORD2>qmgr</KEYWORD2>
-      <KEYWORD2>qremote</KEYWORD2>
-      <KEYWORD2>qr</KEYWORD2>
-      <KEYWORD2>queue</KEYWORD2>
+			<!-- KEYWORD2 are object types -->
+			<KEYWORD2>channel</KEYWORD2>
+			<KEYWORD2>chl</KEYWORD2>
+			<KEYWORD2>chstatus</KEYWORD2>
+			<KEYWORD2>chst</KEYWORD2>
+			<KEYWORD2>clusqmgr</KEYWORD2>
+			<KEYWORD2>process</KEYWORD2>
+			<KEYWORD2>proc</KEYWORD2>
+			<KEYWORD2>namelist</KEYWORD2>
+			<KEYWORD2>nl</KEYWORD2>
+			<KEYWORD2>qalias</KEYWORD2>
+			<KEYWORD2>qa</KEYWORD2>
+			<KEYWORD2>qcluster</KEYWORD2>
+			<KEYWORD2>qc</KEYWORD2>
+			<KEYWORD2>qlocal</KEYWORD2>
+			<KEYWORD2>ql</KEYWORD2>
+			<KEYWORD2>qmodel</KEYWORD2>
+			<KEYWORD2>qm</KEYWORD2>
+			<KEYWORD2>qmgr</KEYWORD2>
+			<KEYWORD2>qremote</KEYWORD2>
+			<KEYWORD2>qr</KEYWORD2>
+			<KEYWORD2>queue</KEYWORD2>
 
-      <!-- MARKUP are object attributes -->
-      <MARKUP>altdate</MARKUP>
-      <MARKUP>alttime</MARKUP>
-      <MARKUP>applicid</MARKUP>
-      <MARKUP>appltype</MARKUP>
-      <MARKUP>authorev</MARKUP>
-      <MARKUP>batches</MARKUP>
-      <MARKUP>batchint</MARKUP>
-      <MARKUP>batchsz</MARKUP>
-      <MARKUP>boqname</MARKUP>
-      <MARKUP>bothresh</MARKUP>
-      <MARKUP>bufsrcvd</MARKUP>
-      <MARKUP>bufssent</MARKUP>
-      <MARKUP>bytsrcvd</MARKUP>
-      <MARKUP>bytssent</MARKUP>
-      <MARKUP>ccsid</MARKUP>
-      <MARKUP>chad</MARKUP>
-      <MARKUP>chadev</MARKUP>
-      <MARKUP>chadexit</MARKUP>
-      <MARKUP>channel</MARKUP>
-      <MARKUP>chltype</MARKUP>
-      <MARKUP>chstada</MARKUP>
-      <MARKUP>chstati</MARKUP>
-      <MARKUP>clusdate</MARKUP>
-      <MARKUP>clusinfo</MARKUP>
-      <MARKUP>clusnl</MARKUP>
-      <MARKUP>clusqmgr</MARKUP>
-      <MARKUP>clusqt</MARKUP>
-      <MARKUP>cluster</MARKUP>
-      <MARKUP>clustime</MARKUP>
-      <MARKUP>clwldata</MARKUP>
-      <MARKUP>clwlexit</MARKUP>
-      <MARKUP>clwlwen</MARKUP>
-      <MARKUP>cmdlevel</MARKUP>
-      <MARKUP>commandq</MARKUP>
-      <MARKUP>conname</MARKUP>
-      <MARKUP>convert</MARKUP>
-      <MARKUP>crdate</MARKUP>
-      <MARKUP>crtime</MARKUP>
-      <MARKUP>curdepth</MARKUP>
-      <MARKUP>curluwid</MARKUP>
-      <MARKUP>curmsgs</MARKUP>
-      <MARKUP>curseqno</MARKUP>
-      <MARKUP>deadq</MARKUP>
-      <MARKUP>defbind</MARKUP>
-      <MARKUP>defprty</MARKUP>
-      <MARKUP>defpsist</MARKUP>
-      <MARKUP>defsopt</MARKUP>
-      <MARKUP>deftype</MARKUP>
-      <MARKUP>defxmitq</MARKUP>
-      <MARKUP>descr</MARKUP>
-      <MARKUP>discint</MARKUP>
-      <MARKUP>distl</MARKUP>
-      <MARKUP>envrdata</MARKUP>
-      <MARKUP>get</MARKUP>
-      <MARKUP>hardenbo</MARKUP>
-      <MARKUP>hbint</MARKUP>
-      <MARKUP>indoubt</MARKUP>
-      <MARKUP>inhibtev</MARKUP>
-      <MARKUP>initq</MARKUP>
-      <MARKUP>ipprocs</MARKUP>
-      <MARKUP>jobname</MARKUP>
-      <MARKUP>localev</MARKUP>
-      <MARKUP>longrts</MARKUP>
-      <MARKUP>longrty</MARKUP>
-      <MARKUP>longtmr</MARKUP>
-      <MARKUP>lstluwid</MARKUP>
-      <MARKUP>lstmsgda</MARKUP>
-      <MARKUP>lstmsgti</MARKUP>
-      <MARKUP>lstseqno</MARKUP>
-      <MARKUP>maxdepth</MARKUP>
-      <MARKUP>maxhands</MARKUP>
-      <MARKUP>maxmsgl</MARKUP>
-      <MARKUP>maxprty</MARKUP>
-      <MARKUP>maxumsgs</MARKUP>
-      <MARKUP>mcaname</MARKUP>
-      <MARKUP>mcastat</MARKUP>
-      <MARKUP>mcatype</MARKUP>
-      <MARKUP>mcauser</MARKUP>
-      <MARKUP>modename</MARKUP>
-      <MARKUP>mrdata</MARKUP>
-      <MARKUP>mrexit</MARKUP>
-      <MARKUP>mrrty</MARKUP>
-      <MARKUP>mrtmr</MARKUP>
-      <MARKUP>msgdata</MARKUP>
-      <MARKUP>msgdlvsq</MARKUP>
-      <MARKUP>msgexit</MARKUP>
-      <MARKUP>msgs</MARKUP>
-      <MARKUP>namcount</MARKUP>
-      <MARKUP>names</MARKUP>
-      <MARKUP>netprty</MARKUP>
-      <MARKUP>npmspeed</MARKUP>
-      <MARKUP>opprocs</MARKUP>
-      <MARKUP>password</MARKUP>
-      <MARKUP>perfmev</MARKUP>
-      <MARKUP>platform</MARKUP>
-      <MARKUP>process</MARKUP>
-      <MARKUP>put</MARKUP>
-      <MARKUP>putaut</MARKUP>
-      <MARKUP>qdepthhi</MARKUP>
-      <MARKUP>qdepthlo</MARKUP>
-      <MARKUP>qdphiev</MARKUP>
-      <MARKUP>qdploev</MARKUP>
-      <MARKUP>qdpmaxev</MARKUP>
-      <MARKUP>qmid</MARKUP>
-      <MARKUP>qmname</MARKUP>
-      <MARKUP>qmtype</MARKUP>
-      <MARKUP>qsvciev</MARKUP>
-      <MARKUP>qsvcint</MARKUP>
-      <MARKUP>qtype</MARKUP>
-      <MARKUP>rcvdata</MARKUP>
-      <MARKUP>rcvexit</MARKUP>
-      <MARKUP>remoteev</MARKUP>
-      <MARKUP>repos</MARKUP>
-      <MARKUP>reposnl</MARKUP>
-      <MARKUP>retintvl</MARKUP>
-      <MARKUP>rname</MARKUP>
-      <MARKUP>rqmname</MARKUP>
-      <MARKUP>scope</MARKUP>
-      <MARKUP>scydata</MARKUP>
-      <MARKUP>scyexit</MARKUP>
-      <MARKUP>senddata</MARKUP>
-      <MARKUP>sendexit</MARKUP>
-      <MARKUP>seqwrap</MARKUP>
-      <MARKUP>share</MARKUP>
-      <MARKUP>shortrts</MARKUP>
-      <MARKUP>shortrty</MARKUP>
-      <MARKUP>shorttmr</MARKUP>
-      <MARKUP>status</MARKUP>
-      <MARKUP>stopreq</MARKUP>
-      <MARKUP>strstpev</MARKUP>
-      <MARKUP>suspend</MARKUP>
-      <MARKUP>syncpt</MARKUP>
-      <MARKUP>targq</MARKUP>
-      <MARKUP>tpname</MARKUP>
-      <MARKUP>trigdata</MARKUP>
-      <MARKUP>trigdpth</MARKUP>
-      <MARKUP>trigger</MARKUP>
-      <MARKUP>trigint</MARKUP>
-      <MARKUP>trigmpri</MARKUP>
-      <MARKUP>trigtype</MARKUP>
-      <MARKUP>trptype</MARKUP>
-      <MARKUP>type</MARKUP>
-      <MARKUP>usage</MARKUP>
-      <MARKUP>userdata</MARKUP>
-      <MARKUP>userid</MARKUP>
-      <MARKUP>xmitq</MARKUP>
-    </KEYWORDS>
-  </RULES>
+			<!-- MARKUP are object attributes -->
+			<MARKUP>altdate</MARKUP>
+			<MARKUP>alttime</MARKUP>
+			<MARKUP>applicid</MARKUP>
+			<MARKUP>appltype</MARKUP>
+			<MARKUP>authorev</MARKUP>
+			<MARKUP>batches</MARKUP>
+			<MARKUP>batchint</MARKUP>
+			<MARKUP>batchsz</MARKUP>
+			<MARKUP>boqname</MARKUP>
+			<MARKUP>bothresh</MARKUP>
+			<MARKUP>bufsrcvd</MARKUP>
+			<MARKUP>bufssent</MARKUP>
+			<MARKUP>bytsrcvd</MARKUP>
+			<MARKUP>bytssent</MARKUP>
+			<MARKUP>ccsid</MARKUP>
+			<MARKUP>chad</MARKUP>
+			<MARKUP>chadev</MARKUP>
+			<MARKUP>chadexit</MARKUP>
+			<MARKUP>channel</MARKUP>
+			<MARKUP>chltype</MARKUP>
+			<MARKUP>chstada</MARKUP>
+			<MARKUP>chstati</MARKUP>
+			<MARKUP>clusdate</MARKUP>
+			<MARKUP>clusinfo</MARKUP>
+			<MARKUP>clusnl</MARKUP>
+			<MARKUP>clusqmgr</MARKUP>
+			<MARKUP>clusqt</MARKUP>
+			<MARKUP>cluster</MARKUP>
+			<MARKUP>clustime</MARKUP>
+			<MARKUP>clwldata</MARKUP>
+			<MARKUP>clwlexit</MARKUP>
+			<MARKUP>clwlwen</MARKUP>
+			<MARKUP>cmdlevel</MARKUP>
+			<MARKUP>commandq</MARKUP>
+			<MARKUP>conname</MARKUP>
+			<MARKUP>convert</MARKUP>
+			<MARKUP>crdate</MARKUP>
+			<MARKUP>crtime</MARKUP>
+			<MARKUP>curdepth</MARKUP>
+			<MARKUP>curluwid</MARKUP>
+			<MARKUP>curmsgs</MARKUP>
+			<MARKUP>curseqno</MARKUP>
+			<MARKUP>deadq</MARKUP>
+			<MARKUP>defbind</MARKUP>
+			<MARKUP>defprty</MARKUP>
+			<MARKUP>defpsist</MARKUP>
+			<MARKUP>defsopt</MARKUP>
+			<MARKUP>deftype</MARKUP>
+			<MARKUP>defxmitq</MARKUP>
+			<MARKUP>descr</MARKUP>
+			<MARKUP>discint</MARKUP>
+			<MARKUP>distl</MARKUP>
+			<MARKUP>envrdata</MARKUP>
+			<MARKUP>get</MARKUP>
+			<MARKUP>hardenbo</MARKUP>
+			<MARKUP>hbint</MARKUP>
+			<MARKUP>indoubt</MARKUP>
+			<MARKUP>inhibtev</MARKUP>
+			<MARKUP>initq</MARKUP>
+			<MARKUP>ipprocs</MARKUP>
+			<MARKUP>jobname</MARKUP>
+			<MARKUP>localev</MARKUP>
+			<MARKUP>longrts</MARKUP>
+			<MARKUP>longrty</MARKUP>
+			<MARKUP>longtmr</MARKUP>
+			<MARKUP>lstluwid</MARKUP>
+			<MARKUP>lstmsgda</MARKUP>
+			<MARKUP>lstmsgti</MARKUP>
+			<MARKUP>lstseqno</MARKUP>
+			<MARKUP>maxdepth</MARKUP>
+			<MARKUP>maxhands</MARKUP>
+			<MARKUP>maxmsgl</MARKUP>
+			<MARKUP>maxprty</MARKUP>
+			<MARKUP>maxumsgs</MARKUP>
+			<MARKUP>mcaname</MARKUP>
+			<MARKUP>mcastat</MARKUP>
+			<MARKUP>mcatype</MARKUP>
+			<MARKUP>mcauser</MARKUP>
+			<MARKUP>modename</MARKUP>
+			<MARKUP>mrdata</MARKUP>
+			<MARKUP>mrexit</MARKUP>
+			<MARKUP>mrrty</MARKUP>
+			<MARKUP>mrtmr</MARKUP>
+			<MARKUP>msgdata</MARKUP>
+			<MARKUP>msgdlvsq</MARKUP>
+			<MARKUP>msgexit</MARKUP>
+			<MARKUP>msgs</MARKUP>
+			<MARKUP>namcount</MARKUP>
+			<MARKUP>names</MARKUP>
+			<MARKUP>netprty</MARKUP>
+			<MARKUP>npmspeed</MARKUP>
+			<MARKUP>opprocs</MARKUP>
+			<MARKUP>password</MARKUP>
+			<MARKUP>perfmev</MARKUP>
+			<MARKUP>platform</MARKUP>
+			<MARKUP>process</MARKUP>
+			<MARKUP>put</MARKUP>
+			<MARKUP>putaut</MARKUP>
+			<MARKUP>qdepthhi</MARKUP>
+			<MARKUP>qdepthlo</MARKUP>
+			<MARKUP>qdphiev</MARKUP>
+			<MARKUP>qdploev</MARKUP>
+			<MARKUP>qdpmaxev</MARKUP>
+			<MARKUP>qmid</MARKUP>
+			<MARKUP>qmname</MARKUP>
+			<MARKUP>qmtype</MARKUP>
+			<MARKUP>qsvciev</MARKUP>
+			<MARKUP>qsvcint</MARKUP>
+			<MARKUP>qtype</MARKUP>
+			<MARKUP>rcvdata</MARKUP>
+			<MARKUP>rcvexit</MARKUP>
+			<MARKUP>remoteev</MARKUP>
+			<MARKUP>repos</MARKUP>
+			<MARKUP>reposnl</MARKUP>
+			<MARKUP>retintvl</MARKUP>
+			<MARKUP>rname</MARKUP>
+			<MARKUP>rqmname</MARKUP>
+			<MARKUP>scope</MARKUP>
+			<MARKUP>scydata</MARKUP>
+			<MARKUP>scyexit</MARKUP>
+			<MARKUP>senddata</MARKUP>
+			<MARKUP>sendexit</MARKUP>
+			<MARKUP>seqwrap</MARKUP>
+			<MARKUP>share</MARKUP>
+			<MARKUP>shortrts</MARKUP>
+			<MARKUP>shortrty</MARKUP>
+			<MARKUP>shorttmr</MARKUP>
+			<MARKUP>status</MARKUP>
+			<MARKUP>stopreq</MARKUP>
+			<MARKUP>strstpev</MARKUP>
+			<MARKUP>suspend</MARKUP>
+			<MARKUP>syncpt</MARKUP>
+			<MARKUP>targq</MARKUP>
+			<MARKUP>tpname</MARKUP>
+			<MARKUP>trigdata</MARKUP>
+			<MARKUP>trigdpth</MARKUP>
+			<MARKUP>trigger</MARKUP>
+			<MARKUP>trigint</MARKUP>
+			<MARKUP>trigmpri</MARKUP>
+			<MARKUP>trigtype</MARKUP>
+			<MARKUP>trptype</MARKUP>
+			<MARKUP>type</MARKUP>
+			<MARKUP>usage</MARKUP>
+			<MARKUP>userdata</MARKUP>
+			<MARKUP>userid</MARKUP>
+			<MARKUP>xmitq</MARKUP>
+		</KEYWORDS>
+	</RULES>
 </MODE>

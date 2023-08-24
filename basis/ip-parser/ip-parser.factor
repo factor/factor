@@ -1,11 +1,15 @@
 ! Copyright (C) 2012-2014 John Benediktsson
-! See http://factorcode.org/license.txt for BSD license
-USING: byte-arrays combinators combinators.short-circuit kernel
-math math.bitwise math.parser sequences splitting ;
+! See https://factorcode.org/license.txt for BSD license
+
+USING: arrays byte-arrays combinators combinators.short-circuit
+endian grouping kernel math math.bitwise math.parser regexp
+sequences splitting ;
 
 IN: ip-parser
 
 ERROR: malformed-ipv4 string ;
+
+ERROR: malformed-ipv6 string ;
 
 ERROR: bad-ipv4-component string ;
 
@@ -15,8 +19,8 @@ ERROR: bad-ipv4-component string ;
     { [ "0" = not ] [ "0" head? ] [ "0x" head? not ] } 1&& ;
 
 : ipv4-component ( str -- n )
-    dup dup octal? [ oct> ] [ string>number ] if
-    [ ] [ bad-ipv4-component ] ?if ;
+    [ dup octal? [ oct> ] [ string>number ] if ]
+    [ bad-ipv4-component ] ?unless ;
 
 : split-ipv4 ( str -- array )
     "." split [ ipv4-component ] map ;
@@ -59,7 +63,7 @@ ERROR: more-than-8-components ;
 <PRIVATE
 
 : ipv6-component ( str -- n )
-    dup hex> [ ] [ bad-ipv6-component ] ?if ;
+    [ hex> ] [ bad-ipv6-component ] ?unless ;
 
 : split-ipv6 ( string -- seq )
     ":" split CHAR: . over last member? [ unclip-last ] [ f ] if
@@ -67,7 +71,7 @@ ERROR: more-than-8-components ;
     [ [ parse-ipv4 append ] unless-empty ] bi* ;
 
 : pad-ipv6 ( string1 string2 -- seq )
-    2dup [ length ] bi@ + 8 swap -
+    2dup 2length + 8 swap -
     dup 0 < [ more-than-8-components ] when
     <byte-array> glue ;
 
@@ -75,3 +79,11 @@ PRIVATE>
 
 : parse-ipv6 ( string -- seq )
     "::" split1 [ [ f ] [ split-ipv6 ] if-empty ] bi@ pad-ipv6 ;
+
+: ipv6-ntoa ( integer -- ip )
+    16 >be bytes>hex-string 4 <groups>
+    [ [ CHAR: 0 = ] trim-head ] map ":" join
+    R/ [:][:]+/ "::" re-replace ;
+
+: ipv6-aton ( ip -- integer )
+    parse-ipv6 0 [ [ 16 shift ] [ + ] bi* ] reduce ;

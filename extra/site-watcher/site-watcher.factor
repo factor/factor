@@ -1,16 +1,15 @@
 ! Copyright (C) 2009 Doug Coleman.
-! See http://factorcode.org/license.txt for BSD license.
-USING: accessors timers arrays calendar combinators
-combinators.smart continuations debugger http.client fry
-init io.streams.string kernel locals math math.parser db
-namespaces sequences site-watcher.db site-watcher.email ;
+! See https://factorcode.org/license.txt for BSD license.
+USING: accessors calendar continuations db http.client init
+kernel math math.parser namespaces sequences site-watcher.db
+site-watcher.email timers ;
 IN: site-watcher
 
 SYMBOL: site-watcher-frequency
 5 minutes site-watcher-frequency set-global
 
 SYMBOL: running-site-watcher
-[ f running-site-watcher set-global ] "site-watcher" add-startup-hook
+STARTUP-HOOK: [ f running-site-watcher set-global ]
 
 <PRIVATE
 
@@ -20,7 +19,7 @@ SYMBOL: running-site-watcher
     ] each ;
 
 : site-up-email ( site -- body )
-    last-up>> now swap time- duration>minutes 60 /mod
+    last-up>> ago duration>minutes 60 /mod
     [ >integer number>string ] bi@
     [ " hours, " append ] [ " minutes" append ] bi* append
     "Site was down for (at least): " prepend ;

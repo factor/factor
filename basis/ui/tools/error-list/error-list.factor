@@ -1,21 +1,22 @@
 ! Copyright (C) 2009, 2010 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays assocs calendar colors.constants
-combinators combinators.smart compiler.errors debugger editors
-fry init io.pathnames kernel locals math.parser memoize models
-models.arrow models.arrow.smart models.delay models.mapping
-models.search namespaces prettyprint sequences sorting
-source-files.errors source-files.errors.debugger summary ui
-ui.commands ui.gadgets ui.gadgets.buttons ui.gadgets.labeled
-ui.gadgets.labels ui.gadgets.packs ui.gadgets.panes
-ui.gadgets.scrollers ui.gadgets.status-bar ui.gadgets.tables
-ui.gadgets.toolbar ui.gadgets.tracks ui.gestures ui.images
-ui.operations ui.theme ui.tools.browser ui.tools.common
-ui.tools.inspector ;
+! See https://factorcode.org/license.txt for BSD license.
+
+USING: accessors arrays assocs calendar colors combinators
+combinators.smart compiler.errors debugger editors init
+io.pathnames kernel math.parser models models.arrow
+models.arrow.smart models.delay models.mapping models.search
+namespaces prettyprint sequences sorting source-files.errors
+source-files.errors.debugger summary ui ui.commands ui.gadgets
+ui.gadgets.buttons ui.gadgets.labeled ui.gadgets.labels
+ui.gadgets.packs ui.gadgets.panes ui.gadgets.scrollers
+ui.gadgets.status-bar ui.gadgets.tables ui.gadgets.toolbar
+ui.gadgets.tracks ui.gestures ui.images ui.operations ui.theme
+ui.tools.browser ui.tools.common ui.tools.inspector ;
+
 IN: ui.tools.error-list
 
 CONSTANT: source-file-icon
-    T{ image-name f "vocab:ui/tools/error-list/icons/source-file.tiff" }
+    T{ image-name f "vocab:ui/tools/error-list/icons/source-file.png" }
 
 MEMO: error-icon ( type -- image-name )
     error-icon-path <image-name> ;
@@ -203,7 +204,7 @@ M: error-list-updater errors-changed
 
 \ show-error-list H{ { +nullary+ t } } define-command
 
-[
+STARTUP-HOOK: [
     f <model> 100 milliseconds <delay> error-list-model set-global
     error-list-updater add-error-observer
-] "ui.tools.error-list" add-startup-hook
+]

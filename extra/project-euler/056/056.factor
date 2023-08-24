@@ -1,10 +1,10 @@
 ! Copyright (c) 2008 Aaron Schaefer.
-! See http://factorcode.org/license.txt for BSD license.
-USING: kernel math.functions math.ranges project-euler.common
+! See https://factorcode.org/license.txt for BSD license.
+USING: kernel math.functions ranges project-euler.common
 sequences math.order ;
 IN: project-euler.056
 
-! http://projecteuler.net/index.php?section=problems&id=56
+! https://projecteuler.net/index.php?section=problems&id=56
 
 ! DESCRIPTION
 ! -----------
@@ -23,7 +23,7 @@ IN: project-euler.056
 ! Through analysis, you only need to check when a and b > 90
 
 : euler056 ( -- answer )
-    90 100 [a,b) dup cartesian-product concat
+    90 100 [a..b) dup cartesian-product concat
     [ first2 ^ number>digits sum ] [ max ] map-reduce ;
 
 ! [ euler056 ] 100 ave-time

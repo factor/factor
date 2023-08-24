@@ -12,19 +12,19 @@ HELP: draw-gadget*
 
 HELP: gadget
 { $class-description "An object which displays itself on the screen and acts on user input gestures. Gadgets have the following slots:"
-    { $list
-        { { $slot "pref-dim" } " - a cached value for " { $link pref-dim } "; do not read or write this slot directly." }
-        { { $slot "parent" } " - the gadget containing this one, or " { $link f } " if this gadget is not part of the visible gadget hierarchy." }
-        { { $slot "children" } " - a vector of child gadgets. Do not modify this vector directly, instead use " { $link add-gadget } ", " { $link add-gadgets } ", " { $link unparent } " or " { $link clear-gadget } "." }
-        { { $slot "graft-state" } { " - a pair of " { $link boolean } " values that represent the current graft state of the gadget and what its next state will become." } }
-        { { $slot "orientation" } " - an orientation specifier. This slot is used by layout gadgets." }
-        { { $slot "layout-state" } " - stores the layout state of the gadget. Do not read or write this slot directly, instead call " { $link relayout } " and " { $link relayout-1 } " if the gadget needs to be re-laid out." }
-        { { $slot "visible?" } " - a boolean indicating if the gadget should display and receive user input." }
-        { { $slot "root?" } " - if set to " { $link t } ", layout changes in this gadget will not propagate to the gadget's parent." }
-        { { $slot "clipped?" } " - a boolean indicating if clipping will be enabled when drawing this gadget's children." }
-        { { $slot "interior" } " - an implementation of the " { $link "ui-pen-protocol" } }
-        { { $slot "boundary" } " - an implementation of the " { $link "ui-pen-protocol" } }
-        { { $slot "model" } " - a " { $link model } " or " { $link f } "; see " { $link "ui-control-impl" } }
+    { $slots
+        { "pref-dim" { "a cached value for " { $link pref-dim } "; do not read or write this slot directly." } }
+        { "parent" { "the gadget containing this one, or " { $link f } " if this gadget is not part of the visible gadget hierarchy." } }
+        { "children" { "a vector of child gadgets. Do not modify this vector directly, instead use " { $link add-gadget } ", " { $link add-gadgets } ", " { $link unparent } " or " { $link clear-gadget } "." } }
+        { "graft-state" { "a pair of " { $link boolean } " values that represent the current graft state of the gadget and what its next state will become." } }
+        { "orientation" "an orientation specifier. This slot is used by layout gadgets." }
+        { "layout-state" { "stores the layout state of the gadget. Do not read or write this slot directly, instead call " { $link relayout } " and " { $link relayout-1 } " if the gadget needs to be re-laid out." } }
+        { "visible?" "a boolean indicating if the gadget should display and receive user input." }
+        { "root?" { "if set to " { $link t } ", layout changes in this gadget will not propagate to the gadget's parent." } }
+        { "clipped?" "a boolean indicating if clipping will be enabled when drawing this gadget's children." }
+        { "interior" { "an implementation of the " { $link "ui-pen-protocol" } } }
+        { "boundary" { "an implementation of the " { $link "ui-pen-protocol" } } }
+        { "model" { "a " { $link model } " or " { $link f } "; see " { $link "ui-control-impl" } } }
     }
 "Gadgets subclass the " { $link rect } " class, and thus all instances have " { $slot "loc" } " and " { $slot "dim" } " instances holding their location and dimensions." }
 { $notes
@@ -48,8 +48,8 @@ ARTICLE: "ui-paint" "Customizing gadget appearance"
     "ui-paint-custom"
 } ;
 
-ARTICLE: "ui-paint-coord" "The UI co-ordinate system"
-"The UI uses a co-ordinate system where the y axis is oriented down. The OpenGL " { $link GL_MODELVIEW } " matrix is saved or restored when rendering a gadget, and the origin is translated to the gadget's origin within the window. The current origin is stored in a variable:"
+ARTICLE: "ui-paint-coord" "The UI coordinate system"
+"The UI uses a coordinate system where the y axis is oriented down. The OpenGL " { $link GL_MODELVIEW } " matrix is saved or restored when rendering a gadget, and the origin is translated to the gadget's origin within the window. The current origin is stored in a variable:"
 { $subsections origin }
 "Gadgets must not draw outside of their bounding box, however clipping is not enforced by default, for performance reasons. This can be changed by setting the " { $slot "clipped?" } " slot to " { $link t } " in the gadget's constructor." ;
 

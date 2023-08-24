@@ -1,19 +1,23 @@
 ! Copyright (C) 2007, 2008 Chris Double, Doug Coleman.
-! See http://factorcode.org/license.txt for BSD license.
-USING: accessors kernel make math math.parser math.ranges peg
-peg.private peg.search sequences strings unicode vectors ;
+! See https://factorcode.org/license.txt for BSD license.
+USING: accessors fry kernel literals make math math.parser
+ranges peg peg.private sequences splitting strings unicode
+vectors ;
+FROM: peg.search => replace ;
 IN: peg.parsers
+
+<PRIVATE
 
 TUPLE: just-parser p1 ;
 
-CONSTANT: just-pattern [
-    dup [
-        dup remaining>> empty? [ drop f ] unless
-    ] when
-]
+M: just-parser parser-quot
+    p1>> execute-parser-quot [
+        dup [
+            dup remaining>> empty? [ drop f ] unless
+        ] when
+    ] compose ;
 
-M: just-parser (compile) ( parser -- quot )
-    p1>> compile-parser-quot just-pattern compose ;
+PRIVATE>
 
 : just ( parser -- parser )
     just-parser boa wrap-peg ;
@@ -31,9 +35,9 @@ M: just-parser (compile) ( parser -- quot )
 : list-of-many ( items separator -- parser )
     hide t (list-of) ;
 
-: epsilon ( -- parser ) V{ } token ;
+CONSTANT: epsilon $[ V{ } token ]
 
-: any-char ( -- parser ) [ drop t ] satisfy ;
+CONSTANT: any-char $[ [ drop t ] satisfy ]
 
 <PRIVATE
 
@@ -87,9 +91,8 @@ PRIVATE>
         [ CHAR: - = ] satisfy hide ,
         any-char ,
     ] seq* [
-        first2 [a,b] >string
-    ] action
-    replace ;
+        first2 [a..b] >string
+    ] action replace ;
 
 : range-pattern ( pattern -- parser )
     ! 'pattern' is a set of characters describing the
@@ -100,8 +103,9 @@ PRIVATE>
     ! characters separated with a dash (-) represents the
     ! range of characters from the first to the second,
     ! inclusive.
-    dup first CHAR: ^ = [
-        rest (range-pattern) [ member? not ] curry satisfy
+    "^" ?head [
+        (range-pattern) dup length 1 =
+        [ first '[ _ = ] ] [ '[ _ member? ] ] if
     ] [
-        (range-pattern) [ member? ] curry satisfy
-    ] if ;
+        [ [ not ] compose ] when satisfy
+    ] bi* ;

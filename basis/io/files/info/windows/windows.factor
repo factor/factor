@@ -1,5 +1,5 @@
 ! Copyright (C) 2008 Doug Coleman.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors alien.c-types alien.data alien.strings ascii
 calendar classes.struct combinators combinators.short-circuit
 continuations destructors fry io.backend io.files.info
@@ -19,7 +19,7 @@ TUPLE: windows-file-info < file-info-tuple attributes ;
 
 : get-compressed-file-size ( path -- n )
     { DWORD } [ GetCompressedFileSize ] with-out-parameters
-    over INVALID_FILE_SIZE = [ win32-error-string throw ] [ >64bit ] if ;
+    over INVALID_FILE_SIZE = [ win32-error ] when >64bit ;
 
 : set-windows-size-on-disk ( file-info path -- file-info )
     over attributes>> +compressed+ swap member? [
@@ -41,9 +41,8 @@ TUPLE: windows-file-info < file-info-tuple attributes ;
     } cleave ;
 
 : find-first-file-stat ( path -- WIN32_FIND_DATA )
-    WIN32_FIND_DATA <struct> [
-        FindFirstFile
-        [ INVALID_HANDLE_VALUE = [ win32-error ] when ] keep
+    WIN32_FIND_DATA new [
+        FindFirstFile check-invalid-handle
         FindClose win32-error=0/f
     ] keep ;
 
@@ -69,7 +68,7 @@ TUPLE: windows-file-info < file-info-tuple attributes ;
 
 : get-file-information ( handle -- BY_HANDLE_FILE_INFORMATION )
     [
-        BY_HANDLE_FILE_INFORMATION <struct>
+        BY_HANDLE_FILE_INFORMATION new
         [ GetFileInformationByHandle win32-error=0/f ] keep
     ] keep CloseHandle win32-error=0/f ;
 
@@ -90,12 +89,12 @@ TUPLE: windows-file-info < file-info-tuple attributes ;
         drop find-first-file-stat WIN32_FIND_DATA>file-info
     ] if ;
 
-M: windows file-info ( path -- info )
+M: windows file-info
     normalize-path
     [ get-file-information-stat ]
     [ set-windows-size-on-disk ] bi ;
 
-M: windows link-info ( path -- info )
+M: windows link-info
     file-info ;
 
 : file-executable-type ( path -- executable/f )
@@ -169,7 +168,7 @@ ERROR: not-absolute-path ;
 
 PRIVATE>
 
-M: windows file-system-info ( path -- file-system-info )
+M: windows file-system-info
     normalize-path root-directory (file-system-info) ;
 
 CONSTANT: names-buf-length 16384
@@ -184,7 +183,7 @@ CONSTANT: names-buf-length 16384
     [ path-length FindNextVolume ] with-out-parameters
     swap 0 = [
         GetLastError ERROR_NO_MORE_FILES =
-        [ drop f ] [ win32-error-string throw ] if
+        [ drop f ] [ win32-error ] if
     ] [ alien>native-string ] if ;
 
 : find-volumes ( -- array )
@@ -194,7 +193,7 @@ CONSTANT: names-buf-length 16384
             [ _ find-next-volume dup ] [ ] produce nip
             swap prefix
         ]
-    ] [ '[ _ FindVolumeClose win32-error=0/f ] ] bi [ ] cleanup ;
+    ] [ '[ _ FindVolumeClose win32-error=0/f ] ] bi finally ;
 
 ! Windows may return a volume which looks up to path ""
 ! For now, treat it like there is not a volume here
@@ -217,7 +216,7 @@ CONSTANT: names-buf-length 16384
 
 ! Can error with T{ windows-error f 21 "The device is not ready." }
 ! if there is a D: that is not ready, for instance. Ignore these drives.
-M: windows file-systems ( -- array )
+M: windows file-systems
     find-volumes [ volume>paths ] map concat [
         [ (file-system-info) ] [ 2drop f ] recover
     ] map sift ;

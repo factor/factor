@@ -1,9 +1,9 @@
 ! Copyright (C) 2008, 2009 Doug Coleman, Daniel Ehrenberg.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs combinators
-combinators.short-circuit interval-maps kernel locals
-math.parser memoize multiline peg.ebnf regexp.ast regexp.classes
-sequences sets splitting strings unicode unicode.data unicode.script ;
+combinators.short-circuit interval-maps kernel math.parser
+multiline peg.ebnf regexp.ast regexp.classes sequences sets
+splitting strings unicode unicode.data unicode.script ;
 IN: regexp.parser
 
 : allowed-char? ( ch -- ? )
@@ -42,7 +42,7 @@ MEMO: simple-category-table ( -- table )
             simple-category-table at <category-class>
         ] }
         { [ "script=" ?head ] [
-            dup simple-script-table at
+            [ simple-script-table at ]
             [ <script-class> ]
             [ "script=" prepend bad-class ] ?if
         ] }
@@ -50,7 +50,7 @@ MEMO: simple-category-table ( -- table )
     } cond ;
 
 : unicode-class ( name -- class )
-    dup parse-unicode-class [ ] [ bad-class ] ?if ;
+    [ parse-unicode-class ] [ bad-class ] ?unless ;
 
 : name>class ( name -- class )
     >string simple {
@@ -70,13 +70,14 @@ MEMO: simple-category-table ( -- table )
 
 : lookup-escape ( char -- ast )
     {
-        { CHAR: t [ CHAR: \t ] }
+        { CHAR: a [ CHAR: \a ] }
+        { CHAR: e [ CHAR: \e ] }
+        { CHAR: f [ CHAR: \f ] }
         { CHAR: n [ CHAR: \n ] }
         { CHAR: r [ CHAR: \r ] }
-        { CHAR: f [ 0xc ] }
-        { CHAR: a [ 0x7 ] }
-        { CHAR: e [ 0x1b ] }
-        { CHAR: \\ [ CHAR: \\ ] }
+        { CHAR: t [ CHAR: \t ] }
+        { CHAR: v [ CHAR: \v ] }
+        { CHAR: 0 [ CHAR: \0 ] }
 
         { CHAR: w [ c-identifier-class <primitive-class> ] }
         { CHAR: W [ c-identifier-class <primitive-class> <not-class> ] }
@@ -105,7 +106,7 @@ MEMO: simple-category-table ( -- table )
 ERROR: nonexistent-option name ;
 
 : ch>option ( ch -- singleton )
-    dup options-assoc at [ ] [ nonexistent-option ] ?if ;
+    [ options-assoc at ] [ nonexistent-option ] ?unless ;
 
 : option>ch ( option -- string )
     options-assoc value-at ;
@@ -146,8 +147,8 @@ Escape = "p{" CharacterInBracket*:s "}" => [[ s name>class <primitive-class> ]]
 EscapeSequence = "\\" Escape:e => [[ e ]]
 
 Character = EscapeSequence
-          | "$" => [[ $ <tagged-epsilon> ]]
-          | "^" => [[ ^ <tagged-epsilon> ]]
+          | "$" => [[ $crlf <tagged-epsilon> ]]
+          | "^" => [[ ^crlf <tagged-epsilon> ]]
           | . ?[ allowed-char? ]?
 
 AnyRangeCharacter = !("&&"|"||"|"--"|"~~") (EscapeSequence | .)

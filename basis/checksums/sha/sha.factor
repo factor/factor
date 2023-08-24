@@ -1,8 +1,8 @@
 ! Copyright (C) 2008 Doug Coleman.
-! See http://factorcode.org/license.txt for BSD license.
-USING: accessors alien.c-types arrays checksums checksums.common
-combinators combinators.smart fry grouping io.binary kernel
-kernel.private literals locals math math.bitwise math.ranges
+! See https://factorcode.org/license.txt for BSD license.
+USING: accessors alien.c-types checksums checksums.common
+combinators combinators.smart endian grouping kernel
+kernel.private literals math math.bitwise ranges
 sequences sequences.generalizations sequences.private
 specialized-arrays ;
 SPECIALIZED-ARRAY: uint
@@ -305,7 +305,7 @@ GENERIC: pad-initial-bytes ( string sha2 -- padded-string )
 : prepare-message-schedule ( seq sha2 -- w-seq )
     [ word-size>> <groups> ] [ block-size>> <uint-array> ] bi
     [ '[ [ be> ] dip _ set-nth-unsafe ] each-index ]
-    [ 16 over length [a,b) over '[ _ prepare-M-256 ] each ] bi ; inline
+    [ 16 over length [a..b) over '[ _ prepare-M-256 ] each ] bi ; inline
 
 :: process-chunk ( M block-size cloned-H sha2 -- )
     block-size [
@@ -356,7 +356,7 @@ M: sha-256-state get-checksum
 : prepare-sha1-message-schedule ( seq -- w-seq )
     4 <groups> 80 <uint-array>
     [ '[ [ be> ] dip _ set-nth-unsafe ] each-index ]
-    [ 16 80 [a,b) over '[ _ sha1-W ] each ] bi ; inline
+    [ 16 80 [a..b) over '[ _ sha1-W ] each ] bi ; inline
 
 : sha1-f ( B C D n -- f_nbcd )
     20 /i

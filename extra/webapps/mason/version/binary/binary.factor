@@ -1,7 +1,7 @@
 ! Copyright (C) 2010 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
-USING: io kernel make sequences webapps.mason.version.common
-webapps.mason.version.files ;
+! See https://factorcode.org/license.txt for BSD license.
+USING: io kernel make sequences splitting
+webapps.mason.version.common webapps.mason.version.files ;
 IN: webapps.mason.version.binary
 
 : binary-release-command ( version builder -- command )
@@ -13,7 +13,7 @@ IN: webapps.mason.version.binary
     ] "" make ;
 
 : binary-release-script ( version builders -- string )
-    [ binary-release-command ] with map "\n" join ;
+    [ binary-release-command ] with map join-lines ;
 
 : do-binary-release ( version builders -- )
     "Copying binary releases to release directory..." print flush

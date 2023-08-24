@@ -1,6 +1,6 @@
 ! Copyright (C) 2005, 2010 Slava Pestov, Joe Groff.
-! See http://factorcode.org/license.txt for BSD license.
-USING: arrays io.binary kernel combinators
+! See https://factorcode.org/license.txt for BSD license.
+USING: arrays endian kernel combinators
 combinators.short-circuit math math.bitwise locals namespaces
 make sequences words system layouts math.order accessors
 cpu.x86.assembler.operands cpu.x86.assembler.operands.private ;
@@ -338,7 +338,7 @@ M: immediate SBB { 0b011 t 0x80 } immediate-1/4 ;
 M: operand SBB 0o030 2-operand ;
 
 GENERIC: AND ( dst src -- )
-M: immediate AND ( dst src -- )
+M: immediate AND
     maybe-zero-extend { 0b100 t 0x80 } immediate-1/4 ;
 M: operand AND 0o040 2-operand ;
 
@@ -357,13 +357,11 @@ M: immediate XOR { 0b110 t 0x80 } immediate-1/4 ;
 M: operand XOR 0o060 2-operand ;
 
 GENERIC: CMP ( dst src -- )
-M: immediate CMP ( dst src -- )
-    { 0b111 t 0x80 } immediate-1/4 ;
+M: immediate CMP { 0b111 t 0x80 } immediate-1/4 ;
 M: operand CMP 0o070 2-operand ;
 
 GENERIC: TEST ( dst src -- )
-M: immediate TEST ( dst src -- )
-    maybe-zero-extend { 0b0 t 0xf7 } immediate-4 ;
+M: immediate TEST maybe-zero-extend { 0b0 t 0xf7 } immediate-4 ;
 M: operand TEST 0o204 2-operand ;
 
 : XCHG ( dst src -- ) 0o207 2-operand ;
@@ -371,20 +369,20 @@ M: operand TEST 0o204 2-operand ;
 : BSR ( dst src -- ) { 0x0f 0xbd } (2-operand) ;
 
 GENERIC: BT ( value n -- )
-M: immediate BT ( value n -- ) { 0b100 t { 0x0f 0xba } } immediate-1* ;
-M: operand   BT ( value n -- ) swap { 0x0f 0xa3 } (2-operand) ;
+M: immediate BT { 0b100 t { 0x0f 0xba } } immediate-1* ;
+M: operand   BT swap { 0x0f 0xa3 } (2-operand) ;
 
 GENERIC: BTC ( value n -- )
-M: immediate BTC ( value n -- ) { 0b111 t { 0x0f 0xba } } immediate-1* ;
-M: operand   BTC ( value n -- ) swap { 0x0f 0xbb } (2-operand) ;
+M: immediate BTC { 0b111 t { 0x0f 0xba } } immediate-1* ;
+M: operand   BTC swap { 0x0f 0xbb } (2-operand) ;
 
 GENERIC: BTR ( value n -- )
-M: immediate BTR ( value n -- ) { 0b110 t { 0x0f 0xba } } immediate-1* ;
-M: operand   BTR ( value n -- ) swap { 0x0f 0xb3 } (2-operand) ;
+M: immediate BTR { 0b110 t { 0x0f 0xba } } immediate-1* ;
+M: operand   BTR swap { 0x0f 0xb3 } (2-operand) ;
 
 GENERIC: BTS ( value n -- )
-M: immediate BTS ( value n -- ) { 0b101 t { 0x0f 0xba } } immediate-1* ;
-M: operand   BTS ( value n -- ) swap { 0x0f 0xab } (2-operand) ;
+M: immediate BTS { 0b101 t { 0x0f 0xba } } immediate-1* ;
+M: operand   BTS swap { 0x0f 0xab } (2-operand) ;
 
 : NOT  ( dst -- ) { 0b010 t 0xf7 } 1-operand ;
 : NEG  ( dst -- ) { 0b011 t 0xf7 } 1-operand ;

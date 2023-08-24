@@ -1,4 +1,4 @@
-USING: bit-arrays kernel locals math math.functions math.ranges
+USING: bit-arrays kernel locals math math.functions ranges
 sequences ;
 IN: benchmark.sieve
 

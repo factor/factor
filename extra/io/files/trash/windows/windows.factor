@@ -1,9 +1,9 @@
 ! Copyright (C) 2010 John Benediktsson
-! See http://factorcode.org/license.txt for BSD license
+! See https://factorcode.org/license.txt for BSD license
 
 USING: accessors alien.c-types alien.data alien.strings
-alien.syntax classes.struct destructors kernel
-io.encodings.utf16n io.files.trash libc math sequences system
+alien.syntax classes.struct destructors io.files.trash
+io.pathnames kernel libc literals math sequences system
 windows.types ;
 
 IN: io.files.trash.windows
@@ -14,7 +14,7 @@ LIBRARY: shell32
 
 TYPEDEF: WORD FILEOP_FLAGS
 
-PACKED-STRUCT: SHFILEOPSTRUCTW
+STRUCT: SHFILEOPSTRUCTW
     { hwnd HWND }
     { wFunc UINT }
     { pFrom LPCWSTR* }
@@ -52,18 +52,20 @@ PRIVATE>
 
 M: windows send-to-trash ( path -- )
     [
-        native-string>alien B{ 0 0 } append
+        absolute-path native-string>alien B{ 0 0 } append
         malloc-byte-array &free
 
-        SHFILEOPSTRUCTW <struct>
+        SHFILEOPSTRUCTW new
             f >>hwnd
             FO_DELETE >>wFunc
             swap >>pFrom
             f >>pTo
-            FOF_ALLOWUNDO
-            FOF_NOCONFIRMATION bitor
-            FOF_NOERRORUI bitor
-            FOF_SILENT bitor >>fFlags
+            flags{
+                FOF_ALLOWUNDO
+                FOF_NOCONFIRMATION
+                FOF_NOERRORUI
+                FOF_SILENT
+            } >>fFlags
 
         SHFileOperationW [ throw ] unless-zero
 

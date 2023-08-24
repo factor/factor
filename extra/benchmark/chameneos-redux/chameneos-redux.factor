@@ -1,8 +1,8 @@
 ! Copyright (C) 2009 Doug Coleman.
-! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays assocs combinators
-concurrency.mailboxes fry io kernel make math math.parser
-math.text.english sequences threads ;
+! See https://factorcode.org/license.txt for BSD license.
+USING: accessors arrays combinators concurrency.mailboxes io
+kernel make math math.parser math.text.english sequences
+splitting threads ;
 IN: benchmark.chameneos-redux
 
 SYMBOLS: red yellow blue ;
@@ -80,7 +80,7 @@ TUPLE: meeting-place count mailbox ;
     ] if ;
 
 : number>chameneos-string ( n -- string )
-    number>string string>digits [ number>text ] { } map-as " " join ;
+    number>string string>digits [ number>text ] { } map-as join-words ;
 
 : chameneos-redux ( n colors -- )
     [ <meeting-place> ] [ make-creatures ] bi*

@@ -1,5 +1,5 @@
 ! Copyright (C) 2008 Doug Coleman.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 
 USING: accessors alien.c-types alien.data alien.strings
 classes.struct combinators continuations destructors fry
@@ -277,7 +277,7 @@ PRIVATE>
             init-colors
 
             _ with-window
-        ] [ ffi:endwin curses-error ] [ ] cleanup
+        ] [ ffi:endwin curses-error ] finally
     ] with-destructors ; inline
 
 <PRIVATE

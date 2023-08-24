@@ -2,16 +2,16 @@
 
 <t:chloe xmlns:t="http://factorcode.org/chloe/1.0">
 
-	<div class="navbar">
-		  <t:a t:href="$user-admin">List Users</t:a>
-		| <t:a t:href="$user-admin/new">Add User</t:a>
+    <nav>
+		<t:a t:href="$user-admin">List Users</t:a>
+		<t:a t:href="$user-admin/new">Add User</t:a>
 
 		<t:if t:code="furnace.auth.features.edit-profile:allow-edit-profile?">
-			| <t:a t:href="$realm/edit-profile" t:aside="begin">Edit Profile</t:a>
+			<t:a t:href="$realm/edit-profile" t:aside="begin">Edit Profile</t:a>
 		</t:if>
 
-		| <t:button t:action="$login-realm/logout" t:aside="begin" class="link-button link">Logout</t:button>
-	</div>
+		<t:button t:action="$login-realm/logout" t:aside="begin" class="link-button link">Logout</t:button>
+	</nav>
 
 	<h1><t:write-title /></h1>
 

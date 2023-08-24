@@ -1,10 +1,10 @@
 ! Copyright (C) 2007, 2011 Slava Pestov, Doug Coleman,
 ! Daniel Ehrenberg.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors alien.c-types alien.data alien.strings arrays
 byte-arrays classes classes.struct combinators
-combinators.short-circuit continuations destructors fry
-grouping init io.backend io.binary io.encodings.ascii
+combinators.short-circuit continuations destructors endian fry
+grouping init io.backend io.encodings.ascii
 io.encodings.binary io.pathnames io.ports io.streams.duplex
 kernel locals math math.parser memoize namespaces present
 sequences sequences.private splitting strings summary system
@@ -89,10 +89,10 @@ PRIVATE>
 
 : <ipv4> ( host -- ipv4 ) dup check-ipv4 ipv4 boa ;
 
-M: ipv4 inet-ntop ( data addrspec -- str )
+M: ipv4 inet-ntop
     drop 4 memory>byte-array join-ipv4 ;
 
-M: ipv4 inet-pton ( str addrspec -- data )
+M: ipv4 inet-pton
     drop [ ?parse-ipv4 ] [ invalid-ipv4 ] recover ;
 
 M: ipv4 address-size drop 4 ;
@@ -101,35 +101,35 @@ M: ipv4 protocol-family drop PF_INET ;
 
 M: ipv4 sockaddr-size drop sockaddr-in heap-size ;
 
-M: ipv4 empty-sockaddr drop sockaddr-in <struct> ;
+M: ipv4 empty-sockaddr drop sockaddr-in new ;
 
 : make-sockaddr-part ( inet -- sockaddr )
-    sockaddr-in <struct>
+    sockaddr-in new
         AF_INET >>family
         swap
-        port>> htons >>port ; inline
+        port>> 0 or htons >>port ; inline
 
-M: ipv4 make-sockaddr ( inet -- sockaddr )
+M: ipv4 make-sockaddr
     [ make-sockaddr-part ]
     [ host>> "0.0.0.0" or ]
     [ inet-pton uint deref >>addr ] tri ;
 
-M: ipv4 make-sockaddr-outgoing ( inet -- sockaddr )
+M: ipv4 make-sockaddr-outgoing
     [ make-sockaddr-part ]
     [ host>> dup { f "0.0.0.0" } member? [ drop "127.0.0.1" ] when ]
     [ inet-pton uint deref >>addr ] tri ;
 
-M: ipv4 parse-sockaddr ( sockaddr-in addrspec -- newaddrspec )
+M: ipv4 parse-sockaddr
     [ addr>> uint <ref> ] dip inet-ntop <ipv4> ;
 
-TUPLE: inet4 < ipv4 { port integer read-only } ;
+TUPLE: inet4 < ipv4 { port maybe{ integer } read-only } ;
 
 : <inet4> ( host port -- inet4 )
     over check-ipv4 inet4 boa ;
 
 M: ipv4 with-port [ host>> ] dip <inet4> ;
 
-M: inet4 parse-sockaddr ( sockaddr-in addrspec -- newaddrspec )
+M: inet4 parse-sockaddr
     [ call-next-method ] [ drop port>> ntohs ] 2bi with-port ;
 
 M: inet4 present
@@ -154,7 +154,7 @@ PRIVATE>
 
 : <ipv6> ( host -- ipv6 ) dup check-ipv6 0 ipv6 boa ;
 
-M: ipv6 inet-ntop ( data addrspec -- str )
+M: ipv6 inet-ntop
     drop 16 memory>byte-array 2 <groups> [ be> >hex ] map ":" join ;
 
 <PRIVATE
@@ -164,7 +164,7 @@ M: ipv6 inet-ntop ( data addrspec -- str )
 
 PRIVATE>
 
-M: ipv6 inet-pton ( str addrspec -- data )
+M: ipv6 inet-pton
     drop [ parse-ipv6 ipv6-bytes ] [ invalid-ipv6 ] recover ;
 
 M: ipv6 address-size drop 16 ;
@@ -173,21 +173,21 @@ M: ipv6 protocol-family drop PF_INET6 ;
 
 M: ipv6 sockaddr-size drop sockaddr-in6 heap-size ;
 
-M: ipv6 empty-sockaddr drop sockaddr-in6 <struct> ;
+M: ipv6 empty-sockaddr drop sockaddr-in6 new ;
 
 : make-sockaddr-in6-part ( inet -- sockaddr )
-    sockaddr-in6 <struct>
+    sockaddr-in6 new
         AF_INET6 >>family
         swap
-        port>> htons >>port ; inline
+        port>> 0 or htons >>port ; inline
 
-M: ipv6 make-sockaddr ( inet -- sockaddr )
+M: ipv6 make-sockaddr
     [ make-sockaddr-in6-part ]
     [ [ host>> "::" or ] keep inet-pton >>addr ]
     [ scope-id>> >>scopeid ]
     tri ;
 
-M: ipv6 make-sockaddr-outgoing ( inet -- sockaddr )
+M: ipv6 make-sockaddr-outgoing
     [ make-sockaddr-in6-part ]
     [ [ host>> dup { f "::" } member? [ drop "::1" ] when ] keep inet-pton >>addr ]
     [ scope-id>> >>scopeid ]
@@ -201,7 +201,7 @@ M: ipv6 present
     [ host>> ] [ scope-id>> ] bi
     [ number>string "%" glue ] unless-zero ;
 
-TUPLE: inet6 < ipv6 { port integer read-only } ;
+TUPLE: inet6 < ipv6 { port maybe{ integer } read-only } ;
 
 : <inet6> ( host port -- inet6 )
     [ dup check-ipv6 0 ] dip inet6 boa ;
@@ -214,11 +214,11 @@ M: inet6 parse-sockaddr
     [ call-next-method ] [ drop port>> ntohs ] 2bi with-port ;
 
 M: inet6 present
-    [ call-next-method ] [ port>> number>string ] bi ":" glue ;
+    [ call-next-method "[" "]" surround ] [ port>> number>string ] bi ":" glue ;
 
 M: inet6 protocol drop 0 ;
 
-ERROR: addrinfo-error n string ;
+ERROR: addrinfo-error n string host ;
 
 <PRIVATE
 
@@ -247,7 +247,7 @@ GENERIC: (client) ( remote -- client-in client-out local )
 
 M: array (client) [ (client) 3array ] attempt-all first3 ;
 
-M: object (client) ( remote -- client-in client-out local )
+M: object (client)
     [
         [ remote>handle ] keep
         [
@@ -306,7 +306,7 @@ HOOK: (send) io-backend ( bytes addrspec datagram -- )
 HOOK: addrinfo-error-string io-backend ( n -- string )
 
 : prepare-addrinfo ( -- addrinfo )
-    addrinfo <struct>
+    addrinfo new
         PF_UNSPEC >>family
         IPPROTO_TCP >>protocol ;
 
@@ -382,8 +382,7 @@ CONSTANT: datagram-size 65536
 MEMO: ipv6-supported? ( -- ? )
     [ "::1" 0 <inet6> binary <server> dispose t ] [ drop f ] recover ;
 
-[ \ ipv6-supported? reset-memoized ]
-"io.sockets:ipv6-supported?" add-startup-hook
+STARTUP-HOOK: [ \ ipv6-supported? reset-memoized ]
 
 GENERIC: resolve-host ( addrspec -- seq )
 
@@ -398,10 +397,10 @@ M: inet present
 
 C: <inet> inet
 
-M: string resolve-host
-    f prepare-addrinfo f void* <ref> [
+M:: string resolve-host ( host -- seq )
+    host f prepare-addrinfo f void* <ref> [
         getaddrinfo [
-            dup addrinfo-error-string addrinfo-error
+            dup addrinfo-error-string host addrinfo-error
         ] unless-zero
     ] keep void* deref addrinfo memory>struct
     [ parse-addrinfo-list ] keep freeaddrinfo ;

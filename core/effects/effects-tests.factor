@@ -60,3 +60,5 @@ sequences tools.test math ;
 
 { "( :( :integer -- :integer ) :float -- :bignum )" }
 [ ( :( :integer -- :integer ) :float -- :bignum ) unparse ] unit-test
+
+{ t } [ ( ..a x quot: ( ..a -- ..b ) -- ..b ) dup clone = ] unit-test

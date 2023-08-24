@@ -1,10 +1,9 @@
 ! Copyright (C) 2009 Joe Groff.
-! See http://factorcode.org/license.txt for BSD license.
-USING: alien.c-types alien.syntax audio combinators endian
-combinators.short-circuit io io.binary io.encodings.binary
-io.files io.streams.byte-array kernel locals math
-sequences alien alien.data classes.struct accessors
-audio.chunked-file audio.loader ;
+! See https://factorcode.org/license.txt for BSD license.
+USING: accessors alien alien.c-types alien.data audio
+audio.chunked-file audio.loader classes.struct combinators
+combinators.short-circuit endian io.encodings.binary io.files
+kernel ;
 IN: audio.wav
 
 CONSTANT: RIFF-MAGIC "RIFF"
@@ -38,12 +37,12 @@ STRUCT: wav-data-chunk
 
 :: read-wav-chunks ( -- fmt data )
     f :> fmt! f :> data!
-    [ { [ fmt data and not ] [ read-chunk ] } 0&& dup ]
+    [ { [ fmt data and not ] [ read-chunk ] } 0&& ]
     [ {
         { [ dup FMT-MAGIC  wav-fmt-chunk  check-chunk ] [ wav-fmt-chunk  memory>struct fmt!  ] }
         { [ dup DATA-MAGIC wav-data-chunk check-chunk ] [ wav-data-chunk memory>struct data! ] }
         [ drop ]
-    } cond ] while drop
+    } cond ] while*
     fmt data 2dup and [ invalid-audio-file ] unless ;
 
 : verify-wav ( chunk -- )

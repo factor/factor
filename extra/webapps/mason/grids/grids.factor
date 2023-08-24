@@ -1,7 +1,7 @@
 ! Copyright (C) 2010 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors assocs db.tuples furnace.actions
-furnace.utilities http.server.responses kernel locals sequences
+furnace.utilities http.server.responses kernel sequences
 splitting urls xml.syntax xml.writer webapps.mason.backend
 webapps.mason.version.data webapps.mason.utils ;
 IN: webapps.mason.grids
@@ -9,14 +9,14 @@ IN: webapps.mason.grids
 : render-grid-cell ( cpu os quot -- xml )
     call( cpu os -- url label )
     2dup and
-    [ link [XML <td class="supported"><div class="bigdiv"><-></div></td> XML] ]
+    [ link [XML <td class="supported"><-></td> XML] ]
     [ 2drop [XML <td class="doesnotexist" /> XML] ]
     if ;
 
 CONSTANT: oses
 {
     { "windows" "Windows" }
-    { "macosx" "Mac OS X" }
+    { "macosx" "Mac OS" }
     { "linux" "Linux" }
 }
 
@@ -27,19 +27,29 @@ CONSTANT: cpus
 }
 
 : render-grid-header ( -- xml )
-    oses values [ [XML <th align='center' scope='col'><-></th> XML] ] map ;
+    oses values [ [XML <th scope="col"><-></th> XML] ] map ;
 
 :: render-grid-row ( cpu quot -- xml )
     cpu second oses keys [| os | cpu os quot render-grid-cell ] map
-    [XML <tr><th align='center' scope='row'><-></th><-></tr> XML] ;
+    [XML <tr><th scope="row"><-></th><-></tr> XML] ;
 
 :: render-grid ( quot -- xml )
     render-grid-header
     cpus [ quot render-grid-row ] map
     [XML
-        <table id="downloads" cellspacing="0">
+        <table class="downloads" cellspacing="0">
+            <colgroup>
+            <col style="width: 25%" />
+            <col style="width: 25%" />
+            <col style="width: 25%" />
+            <col style="width: 25%" />
+            </colgroup>
+            <thead>
             <tr><th class="nobg">OS/CPU</th><-></tr>
+            </thead>
+            <tbody>
             <->
+            </tbody>
         </table>
     XML] ;
 

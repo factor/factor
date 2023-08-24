@@ -1,7 +1,7 @@
 ! Copyright (C) 2011 John Benediktsson
-! See http://factorcode.org/license.txt for BSD license
+! See https://factorcode.org/license.txt for BSD license
 
-USING: kernel literals math math.functions math.ranges picomath
+USING: kernel literals math math.functions ranges picomath
 sequences tools.test ;
 
 IN: picomath
@@ -39,7 +39,7 @@ IN: picomath
     supremum 1e-3 <
 ] unit-test
 
-: factorial ( n -- n! ) [ 1 ] [ [1,b] 1 [ * ] reduce ] if-zero ;
+: factorial ( n -- n! ) [ 1 ] [ [1..b] 1 [ * ] reduce ] if-zero ;
 
 { t } [
     { 0 1 10 100 1000 10000 } [

@@ -1,11 +1,11 @@
 ! Copyright (C) 2008, 2010 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors alien.c-types alien.libraries alien.strings arrays
 assocs classes.struct combinators compiler.cfg compiler.cfg.builder
 compiler.cfg.builder.alien.boxing compiler.cfg.builder.alien.params
 compiler.cfg.hats compiler.cfg.instructions compiler.cfg.registers
 compiler.cfg.stacks compiler.cfg.stacks.local compiler.errors
-compiler.tree cpu.architecture fry kernel layouts make math namespaces
+compiler.tree cpu.architecture kernel layouts make math namespaces
 sequences sequences.generalizations words ;
 IN: compiler.cfg.builder.alien
 
@@ -15,6 +15,8 @@ IN: compiler.cfg.builder.alien
         0 stack-params set
         V{ } clone reg-values set
         V{ } clone stack-values set
+        0 int-reg-reps set
+        0 float-reg-reps set
         @
         reg-values get
         stack-values get
@@ -93,7 +95,7 @@ IN: compiler.cfg.builder.alien
         [ stack-params get [ caller-stack-cleanup ] keep ]
     } cleave ;
 
-M: #alien-invoke emit-node ( block node -- block' )
+M: #alien-invoke emit-node
     params>>
     [
         [ params>alien-insn-params ]
@@ -102,7 +104,7 @@ M: #alien-invoke emit-node ( block node -- block' )
     ]
     [ caller-return ] bi ;
 
-M: #alien-indirect emit-node ( block node -- block' )
+M: #alien-indirect emit-node
     params>>
     [
         [ ds-pop ^^unbox-any-c-ptr ] dip
@@ -111,7 +113,7 @@ M: #alien-indirect emit-node ( block node -- block' )
     ]
     [ caller-return ] bi ;
 
-M: #alien-assembly emit-node ( block node -- block' )
+M: #alien-assembly emit-node
     params>>
     [
         [ params>alien-insn-params ]
@@ -165,7 +167,7 @@ M: #alien-assembly emit-node ( block node -- block' )
 : emit-callback-outputs ( block params -- )
     [ emit-callback-return ] keep callback-stack-cleanup ;
 
-M: #alien-callback emit-node ( block node -- block' )
+M: #alien-callback emit-node
     dup params>> xt>> dup
     [
         t cfg get frame-pointer?<<

@@ -1,8 +1,8 @@
 ! Copyright (C) 2008 Matthew Willis
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 !
 ! these samples are a subset of the samples on
-! http://cairographics.org/samples/
+! https://cairographics.org/samples/
 USING: cairo cairo.ffi locals math.constants math
 io.backend kernel alien.c-types libc namespaces
 cairo-gadgets ui.gadgets accessors specialized-arrays
@@ -146,8 +146,8 @@ M: utf8-gadget render-cairo* ( gadget -- )
     cr 256 0 cairo_rel_line_to
     cr cairo_stroke ;
 
- USING: quotations ui.gadgets.panes sequences ;
- : samples ( -- )
+USING: quotations ui.gadgets.panes sequences ;
+: samples ( -- )
     {
         arc-gadget clip-gadget clip-image-gadget dash-gadget
         gradient-gadget text-gadget utf8-gadget

@@ -1,10 +1,8 @@
 ! Copyright (C) 2008 Doug Coleman.
-! See http://factorcode.org/license.txt for BSD license.
-USING: accessors alien alien.c-types alien.strings assocs
-byte-arrays classes.struct combinators combinators.short-circuit
-continuations fry grouping io.encodings.utf8 kernel math
-math.parser namespaces sequences splitting strings system unix
-unix.ffi vocabs ;
+! See https://factorcode.org/license.txt for BSD license.
+USING: accessors assocs combinators continuations kernel math
+math.parser namespaces sequences strings system unix unix.ffi
+vocabs ;
 QUALIFIED: unix.ffi
 IN: unix.users
 
@@ -15,10 +13,10 @@ HOOK: passwd>new-passwd os ( passwd -- new-passwd )
 
 <PRIVATE
 
-M: unix new-passwd ( -- passwd )
+M: unix new-passwd
     passwd new ;
 
-M: unix passwd>new-passwd ( passwd -- seq )
+M: unix passwd>new-passwd
     [ new-passwd ] dip
     {
         [ pw_name>> >>user-name ]
@@ -32,7 +30,7 @@ M: unix passwd>new-passwd ( passwd -- seq )
 
 : with-pwent ( quot -- )
     setpwent
-    [ unix.ffi:endpwent ] [ ] cleanup ; inline
+    [ unix.ffi:endpwent ] finally ; inline
 
 PRIVATE>
 
@@ -54,11 +52,11 @@ SYMBOL: user-cache
 
 GENERIC: user-passwd ( obj -- passwd/f )
 
-M: integer user-passwd ( id -- passwd/f )
+M: integer user-passwd
     user-cache get
     [ at ] [ unix.ffi:getpwuid [ passwd>new-passwd ] [ f ] if* ] if* ;
 
-M: string user-passwd ( string -- passwd/f )
+M: string user-passwd
     unix.ffi:getpwnam dup [ passwd>new-passwd ] when ;
 
 : user-name ( id -- string )
@@ -94,7 +92,7 @@ GENERIC: set-effective-user ( string/id -- )
 : (with-real-user) ( string/id quot -- )
     '[ _ set-real-user @ ]
     real-user-id '[ _ set-real-user ]
-    [ ] cleanup ; inline
+    finally ; inline
 
 : with-real-user ( string/id/f quot -- )
     over [ (with-real-user) ] [ nip call ] if ; inline
@@ -102,7 +100,7 @@ GENERIC: set-effective-user ( string/id -- )
 : (with-effective-user) ( string/id quot -- )
     '[ _ set-effective-user @ ]
     effective-user-id '[ _ set-effective-user ]
-    [ ] cleanup ; inline
+    finally ; inline
 
 : with-effective-user ( string/id/f quot -- )
     over [ (with-effective-user) ] [ nip call ] if ; inline
@@ -117,16 +115,16 @@ GENERIC: set-effective-user ( string/id -- )
 
 PRIVATE>
 
-M: integer set-real-user ( id -- )
+M: integer set-real-user
     (set-real-user) ;
 
-M: string set-real-user ( string -- )
+M: string set-real-user
     ?user-id (set-real-user) ;
 
-M: integer set-effective-user ( id -- )
+M: integer set-effective-user
     (set-effective-user) ;
 
-M: string set-effective-user ( string -- )
+M: string set-effective-user
     ?user-id (set-effective-user) ;
 
 ERROR: no-such-user obj ;

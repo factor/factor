@@ -1,8 +1,8 @@
 ! Copyright (C) 2010 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: compiler.constants cpu.x86.assembler
-cpu.x86.assembler.operands layouts locals ;
-IN: bootstrap.x86
+cpu.x86.assembler.operands layouts ;
+IN: bootstrap.assembler.x86
 
 : tib-exception-list-offset ( -- n ) 0 bootstrap-cells ;
 : tib-stack-base-offset ( -- n ) 1 bootstrap-cells ;

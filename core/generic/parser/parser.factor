@@ -1,6 +1,6 @@
 ! Copyright (C) 2008, 2009 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays combinators effects.parser generic
+! See https://factorcode.org/license.txt for BSD license.
+USING: accessors combinators effects.parser generic
 kernel namespaces parser quotations sequences words ;
 IN: generic.parser
 
@@ -35,10 +35,11 @@ SYMBOL: current-method
         [ 2drop t ] [ [ out>> length ] same? ] if
     ] 2bi and ;
 
-ERROR: bad-method-effect ;
+ERROR: bad-method-effect effect expected-effect ;
 
 : check-method-effect ( effect -- )
-    last-word generic-effect method-effect= [ bad-method-effect ] unless ;
+    last-word generic-effect 2dup method-effect=
+    [ 2drop ] [ bad-method-effect ] if ;
 
 : parse-method-definition ( -- quot )
     scan-datum {

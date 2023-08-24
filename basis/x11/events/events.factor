@@ -1,5 +1,5 @@
 ! Copyright (C) 2005, 2010 Eduardo Cavazos, Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors arrays classes.struct combinators
 combinators.short-circuit kernel math.order namespaces x11 x11.X
 x11.xlib ;
@@ -36,10 +36,10 @@ GENERIC: selection-request-event ( event window -- )
 GENERIC: client-event ( event window -- )
 
 : next-event ( -- event )
-    dpy get XEvent <struct> [ XNextEvent drop ] keep ;
+    dpy get XEvent new [ XNextEvent drop ] keep ;
 
 : mask-event ( mask -- event )
-    [ dpy get ] dip XEvent <struct> [ XMaskEvent drop ] keep ;
+    [ dpy get ] dip XEvent new [ XMaskEvent drop ] keep ;
 
 : events-queued ( mode -- n ) [ dpy get ] dip XEventsQueued ;
 

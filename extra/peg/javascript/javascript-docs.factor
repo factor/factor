@@ -1,11 +1,11 @@
 ! Copyright (C) 2007 Chris Double.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: help.markup help.syntax strings ;
 IN: peg.javascript
 
 HELP: parse-javascript
 { $values
-  { "string" string }
+  { "input" string }
   { "ast" "a JavaScript abstract syntax tree" }
 }
 { $description

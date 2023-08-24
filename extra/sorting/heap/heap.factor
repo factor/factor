@@ -1,7 +1,7 @@
 ! Copyright (C) 2014 John Benediktsson
-! See http://factorcode.org/license.txt for BSD license
+! See https://factorcode.org/license.txt for BSD license
 
-USING: assocs fry heaps kernel sequences vectors ;
+USING: heaps kernel sequences vectors ;
 
 IN: sorting.heap
 

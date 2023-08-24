@@ -1,19 +1,19 @@
-USING: help.markup help.syntax generic kernel.private parser
-kernel quotations namespaces sequences arrays effects
+USING: help.markup help.syntax
+kernel quotations sequences
 generic.standard classes.builtin slots.private classes strings math
 assocs byte-arrays alien classes.tuple ;
 IN: slots
 
 ARTICLE: "accessors" "Slot accessors"
-"For every tuple slot, a " { $emphasis "reader" } " method is defined in the " { $vocab-link "accessors" } " vocabulary. The reader is named " { $snippet { $emphasis "slot" } ">>" } " and given a tuple, pushes the slot value on the stack."
+"For every tuple slot, a " { $emphasis "reader" } " method is defined in the " { $vocab-link "accessors" } " vocabulary. The reader is named " { $snippet "slot>>" } " and given a tuple, pushes the slot value on the stack."
 $nl
-"Writable slots—that is, those not attributed " { $link read-only } "—also have a " { $emphasis "writer" } ". The writer is named " { $snippet { $emphasis "slot" } "<<" } " and stores a value into a slot. It has stack effect " { $snippet "( value object -- )" } ". If the slot is specialized to a specific class, the writer checks that the value being written into the slot is an instance of that class first. See " { $link "tuple-declarations" } " for details."
+"Writable slots —- that is, those not attributed " { $link read-only } " —- also have a " { $emphasis "writer" } ". The writer is named " { $snippet "slot<<" } " and stores a value into a slot. It has stack effect " { $snippet "( value object -- )" } ". If the slot is specialized to a specific class, the writer checks that the value being written into the slot is an instance of that class first. See " { $link "tuple-declarations" } " for details."
 $nl
 "In addition, two utility words are defined for each writable slot."
 $nl
-"The " { $emphasis "setter" } " is named " { $snippet ">>" { $emphasis "slot" } } " and stores a value into a slot. It has stack effect " { $snippet "( object value -- object )" } "."
+"The " { $emphasis "setter" } " is named " { $snippet ">>slot" } " and stores a value into a slot. It has stack effect " { $snippet "( object value -- object )" } "."
 $nl
-"The " { $emphasis "changer" } " is named " { $snippet "change-" { $emphasis "slot" } } ". It applies a quotation to the current slot value and stores the result back in the slot; it has stack effect " { $snippet "( object quot -- object )" } "."
+"The " { $emphasis "changer" } " is named " { $snippet "change-slot" } ". It applies a quotation to the current slot value and stores the result back in the slot; it has stack effect " { $snippet "( object quot -- object )" } "."
 $nl
 "Since the reader and writer are generic, words can be written which do not depend on the specific class of tuple passed in, but instead work on any tuple that defines slots with certain names."
 $nl
@@ -117,7 +117,7 @@ $nl
 ABOUT: "slots"
 
 HELP: bad-initial-value
-{ $error-description "Thrown by " { $link POSTPONE: TUPLE: } " if a slot has an impossible initial value. "
+{ $error-description "Thrown by " { $link POSTPONE: TUPLE: } " if a slot has an impossible initial value."
   { $examples
     { $unchecked-example
       "TUPLE: a { b integer initial: \"invalid\" } ;"

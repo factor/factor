@@ -1,6 +1,6 @@
 ! Copyright (C) 2003, 2010 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
-USING: accessors classes.maybe combinators
+! See https://factorcode.org/license.txt for BSD license.
+USING: accessors classes classes.maybe combinators
 combinators.short-circuit continuations hashtables io io.styles
 kernel make math namespaces prettyprint.config sequences sets
 splitting strings vocabs vocabs.parser words ;
@@ -100,7 +100,7 @@ style overhang ;
         ] change
         0 >>overhang ; inline
 
-M: section section-fits? ( section -- ? )
+M: section section-fits?
     [ end>> 1 - pprinter get last-newline>> - ]
     [ overhang>> ] bi + text-fits? ;
 
@@ -109,6 +109,8 @@ M: section indent-section? drop f ;
 M: section unindent-first-line? drop f ;
 
 M: section newline-after? drop f ;
+
+M: section long-section short-section ;
 
 M: object short-section? section-fits? ;
 
@@ -153,8 +155,6 @@ TUPLE: line-break < section type ;
 
 M: line-break short-section drop ;
 
-M: line-break long-section drop ;
-
 ! Block sections
 TUPLE: block < section sections ;
 
@@ -189,7 +189,7 @@ TUPLE: block < section sections ;
 
 : add-line-break ( type -- ) [ <line-break> add-section ] when* ;
 
-M: block section-fits? ( section -- ? )
+M: block section-fits?
     line-limit? [ drop t ] [ call-next-method ] if ;
 
 : pprint-sections ( block advancer -- )
@@ -199,7 +199,7 @@ M: block section-fits? ( section -- ? )
     ] dip
     [ [ pprint-section ] bi ] curry each ; inline
 
-M: block short-section ( block -- )
+M: block short-section
     [ advance ] pprint-sections ;
 
 : do-break ( break -- )
@@ -228,8 +228,6 @@ TUPLE: text-section < section string ;
         swap >>string ;
 
 M: text-section short-section string>> write ;
-
-M: text-section long-section short-section ;
 
 : styled-text ( string style -- ) <text> add-section ;
 
@@ -262,7 +260,7 @@ TUPLE: flow < block ;
 : <flow> ( -- block )
     flow new-block ;
 
-M: flow short-section? ( section -- ? )
+M: flow short-section?
     ! If we can make room for this entire block by inserting
     ! a newline, do it; otherwise, don't bother, print it as
     ! a short section
@@ -278,8 +276,6 @@ TUPLE: colon < block ;
 
 : <colon> ( -- block )
     colon new-block ;
-
-M: colon long-section short-section ;
 
 M: colon indent-section? drop t ;
 
@@ -339,7 +335,7 @@ SYMBOL: next
 : ?break-group ( seq -- )
     dup break-group? [ first <fresh-line ] [ drop ] if ;
 
-M: block long-section ( block -- )
+M: block long-section
     [
         sections>> chop-break group-flow [
             dup ?break-group [
@@ -368,5 +364,10 @@ M: block long-section ( block -- )
         [ pprinter-manifest ] [ f ] if
     ] with-scope ; inline
 
+: error-in-pprint ( obj -- )
+    <flow class-of name>> "~pprint error: " "~" surround text block> ;
+
 : with-pprint ( obj quot -- )
-    f make-pprint drop do-pprint ; inline
+    '[ _ f make-pprint ]
+    [ drop [ error-in-pprint ] f make-pprint ] recover
+    drop do-pprint ; inline

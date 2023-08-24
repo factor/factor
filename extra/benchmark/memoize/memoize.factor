@@ -1,6 +1,6 @@
 ! Copyright (C) 2012 John Benediktsson
-! See http://factorcode.org/license.txt for BSD license.
-USING: kernel math memoize sequences ;
+! See https://factorcode.org/license.txt for BSD license.
+USING: kernel math sequences ;
 IN: benchmark.memoize
 
 MEMO: mem0 ( -- ) ;

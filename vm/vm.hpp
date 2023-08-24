@@ -35,7 +35,7 @@ struct factor_vm {
   cell signal_handler_addr;
 
   // are we handling a memory error? used to detect double faults
-  cell faulting_p;
+  bool faulting_p;
 
   // Various special objects, accessed by special-object and
   // set-special-object primitives
@@ -70,7 +70,7 @@ struct factor_vm {
   c_to_factor_func_type c_to_factor_func;
 
   // Is profiling enabled?
-  volatile cell sampling_profiler_p;
+  volatile bool sampling_profiler_p;
   fixnum samples_per_second;
 
   // Global variables used to pass fault handler state from signal handler
@@ -102,7 +102,7 @@ struct factor_vm {
 
   // Only set if we're performing a GC
   gc_state* current_gc;
-  volatile cell current_gc_p;
+  volatile bool current_gc_p;
 
   // Set if we're in the jit
   volatile fixnum current_jit_count;
@@ -146,7 +146,7 @@ struct factor_vm {
   static bool fatal_erroring_p;
 
   // Two fep_p variants, one might be redundant.
-  volatile cell safepoint_fep_p;
+  volatile bool safepoint_fep_p;
 
   // Allow Ctrl-Break a busy loop in the Listener, only used on Windows
   volatile bool stop_on_ctrl_break;
@@ -189,8 +189,8 @@ struct factor_vm {
   void record_sample(bool prolog_p);
   void start_sampling_profiler(fixnum rate);
   void end_sampling_profiler();
-  void set_sampling_profiler(fixnum rate);
-  void primitive_sampling_profiler();
+  void set_profiling(fixnum rate);
+  void primitive_set_profiling();
   void primitive_get_samples();
   array* allot_growarr();
   void growarr_add(array *growarr_, cell value);
@@ -529,7 +529,7 @@ struct factor_vm {
   size_t safe_fread(void* ptr, size_t size, size_t nitems, FILE* stream);
   void safe_fputc(int c, FILE* stream);
   size_t safe_fwrite(void* ptr, size_t size, size_t nitems, FILE* stream);
-  int safe_ftell(FILE* stream);
+  off_t safe_ftell(FILE* stream);
   void safe_fseek(FILE* stream, off_t offset, int whence);
   void safe_fflush(FILE* stream);
   void primitive_fopen();

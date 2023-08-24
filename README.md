@@ -1,5 +1,7 @@
 # Factor
 
+![Build](https://github.com/factor/factor/actions/workflows/build.yml/badge.svg)
+
 Factor is a [concatenative](https://www.concatenative.org), stack-based
 programming language with [high-level
 features](https://concatenative.org/wiki/view/Factor/Features/The%20language)
@@ -28,23 +30,28 @@ a boot image stored on factorcode.org.
 
 To check out Factor:
 
-* `git clone git://factorcode.org/git/factor.git`
+* git clone https://github.com/factor/factor.git
 * `cd factor`
 
 To build the latest complete Factor system from git, either use the
 build script:
 
-* Windows: `build.cmd`
 * Unix: `./build.sh update`
+* Windows: `build.cmd`
+* M1 macOS: `arch -x86_64 ./build.sh update`
 
 or download the correct boot image for your system from
-http://downloads.factorcode.org/images/master/, put it in the factor
+https://downloads.factorcode.org/images/master/, put it in the `factor`
 directory and run:
 
 * Unix: `make` and then `./factor -i=boot.unix-x86.64.image`
 * Windows: `nmake /f Nmakefile x86-64` and then `factor.com -i=boot.windows-x86.64.image`
 
 Now you should have a complete Factor system ready to run.
+
+Factor does not yet work on arm64 cpus. There is an arm64 assembler
+in `cpu.arm.64.assembler` and we are working on a port and also looking for
+contributors.
 
 More information on [building factor](https://concatenative.org/wiki/view/Factor/Building%20Factor)
 and [system requirements](https://concatenative.org/wiki/view/Factor/Requirements).
@@ -66,6 +73,12 @@ A tutorial is available that can be accessed from the Factor environment:
 "first-program" help
 ```
 
+Some demos that are included in the distribution to show off various features:
+
+```factor
+"demos" run
+```
+
 Some other simple things you can try in the listener:
 
 ```factor
@@ -73,7 +86,7 @@ Some other simple things you can try in the listener:
 
 { 4 8 15 16 23 42 } [ 2 * ] map .
 
-1000 [1,b] sum .
+1000 [1..b] sum .
 
 4 <iota> [
     "Happy Birthday " write
@@ -105,6 +118,7 @@ Common arguments:
         -run=listener    run terminal listener
         -run=ui.tools    run Factor development UI
     -e=<code>        evaluate <code>
+    -ea=<code>       evaluate <code> with auto-use
     -no-user-init    suppress loading of .factor-rc
     -roots=<paths>   a list of path-delimited extra vocab roots
 
@@ -127,13 +141,33 @@ The Factor source tree is organized as follows:
 * `misc/` - editor modes, icons, etc
 * `unmaintained/` - now at [factor-unmaintained](https://github.com/factor/factor-unmaintained)
 
+## Source History
+
+During Factor's lifetime, sourcecode has lived in many repositories. Unfortunately, the first import in Git did not keep history. History has been partially recreated from what could be salvaged. Due to the nature of Git, it's only possible to add history without disturbing upstream work, by using replace objects. These need to be manually fetched, or need to be explicitly added to your git remote configuration.
+
+Use:
+`git fetch origin 'refs/replace/*:refs/replace/*'`
+
+or add the following line to your configuration file
+
+```
+[remote "origin"]
+    url = ...
+    fetch = +refs/heads/*:refs/remotes/origin/*
+    ...
+    fetch = +refs/replace/*:refs/replace/*
+```
+
+Then subsequent fetches will automatically update any replace objects.
+
 ## Community
 
-Factor developers meet in the `#concatenative` channel on
-[irc.freenode.net](http://freenode.net). Drop by if you want to discuss
-anything related to Factor or language design in general.
+Factor developers are quite active in [the Factor Discord server](https://discord.gg/QxJYZx3QDf).
+Drop by if you want to discuss anything related to Factor or language design in general.
 
 * [Factor homepage](https://factorcode.org)
 * [Concatenative languages wiki](https://concatenative.org)
+* [Join the mailing list](https://concatenative.org/wiki/view/Factor/Mailing%20list)
+* Search for "factorcode" on [Gitter](https://gitter.im/)
 
 Have fun!

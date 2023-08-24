@@ -1,5 +1,5 @@
 ! Copyright (C) 2012 John Benediktsson
-! See http://factorcode.org/license.txt for BSD license
+! See https://factorcode.org/license.txt for BSD license
 
 USING: accessors arrays classes.struct io.streams.c kernel
 math system terminal unix unix.ffi ;
@@ -20,7 +20,7 @@ STRUCT: winsize
 PRIVATE>
 
 M: unix (terminal-size)
-    stdout-handle fileno TIOCGWINSZ winsize <struct>
+    stdout-handle fileno TIOCGWINSZ winsize new
     [ ioctl ] keep swap 0 < [
         drop 0 0
     ] [

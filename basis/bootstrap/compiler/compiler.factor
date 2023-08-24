@@ -1,5 +1,5 @@
 ! Copyright (C) 2007, 2010 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs assocs.private classes
 classes.tuple.private compiler.units cpu.architecture hashtables
 hashtables.private io kernel libc math math.parser memory
@@ -83,21 +83,21 @@ gc
     "." write flush
 
     {
-        hashcode* = equal? assoc-stack (assoc-stack) get set
+        hashcode* = equal? assoc-stack assoc-stack-from get set
     } compile-unoptimized
 
     "." write flush
 
     {
-        member-eq? split harvest sift cut cut-slice subseq-start index clone
-        set-at reverse push-all class-of number>string string>number
+        member-eq? split harvest sift cut cut-slice subseq-start subseq-index
+        index clone set-at reverse push-all class-of number>string string>number
         like clone-like
     } compile-unoptimized
 
     "." write flush
 
     {
-        lines prefix suffix unclip new-assoc assoc-union!
+        read-lines prefix suffix unclip new-assoc assoc-union!
         word-prop set-word-prop 1array 2array 3array ?nth
     } compile-unoptimized
 

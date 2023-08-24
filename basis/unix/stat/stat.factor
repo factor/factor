@@ -24,7 +24,7 @@ TYPEDEF: fsid fsid_t
 << "unix.stat." os name>> append require >>
 
 : file-status ( pathname -- stat )
-    \ stat <struct> [ [ stat-func ] unix-system-call drop ] keep ;
+    \ stat new [ [ stat-func ] unix-system-call drop ] keep ;
 
 : link-status ( pathname -- stat )
-    \ stat <struct> [ [ lstat ] unix-system-call drop ] keep ;
+    \ stat new [ [ lstat ] unix-system-call drop ] keep ;

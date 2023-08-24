@@ -1,6 +1,6 @@
 ! Copyright (C) 2009 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
-USING: smtp namespaces accessors kernel arrays site-watcher.db ;
+! See https://factorcode.org/license.txt for BSD license.
+USING: accessors arrays kernel namespaces smtp ;
 IN: site-watcher.email
 
 SYMBOL: site-watcher-from

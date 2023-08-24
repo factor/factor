@@ -1,12 +1,12 @@
 ! Copyright (C) 2011 Erik Charlebois
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors alien alien.accessors alien.c-types alien.complex alien.data
 alien.libraries assocs byte-arrays classes.algebra classes.struct combinators
 compiler.cfg compiler.cfg.build-stack-frame compiler.cfg.comparisons
 compiler.cfg.instructions compiler.cfg.intrinsics compiler.cfg.registers
 compiler.cfg.stack-frame compiler.codegen compiler.codegen.fixup
 compiler.constants compiler.units cpu.architecture cpu.ppc.assembler fry io
-kernel layouts literals locals make math math.order math.ranges memory
+kernel layouts literals locals make math math.order ranges memory
 namespaces prettyprint sequences system vm words ;
 QUALIFIED-WITH: alien.c-types c
 FROM: cpu.ppc.assembler => B ;
@@ -34,9 +34,9 @@ HOOK: has-toc os ( -- ? )
 HOOK: reserved-area-size os ( -- n )
 HOOK: allows-null-dereference os ( -- ? )
 
-M: label B  ( label -- )       [ 0 B  ] dip rc-relative-ppc-3-pc label-fixup ;
-M: label BL ( label -- )       [ 0 BL ] dip rc-relative-ppc-3-pc label-fixup ;
-M: label BC ( bo bi label -- ) [ 0 BC ] dip rc-relative-ppc-2-pc label-fixup ;
+M: label B  [ 0 B  ] dip rc-relative-ppc-3-pc label-fixup ;
+M: label BL [ 0 BL ] dip rc-relative-ppc-3-pc label-fixup ;
+M: label BC [ 0 BC ] dip rc-relative-ppc-2-pc label-fixup ;
 
 CONSTANT: scratch-reg    30
 CONSTANT: fp-scratch-reg 30
@@ -44,16 +44,16 @@ CONSTANT: ds-reg         14
 CONSTANT: rs-reg         15
 CONSTANT: vm-reg         16
 
-M: ppc machine-registers ( -- assoc )
+M: ppc machine-registers
     {
-        { int-regs $[ 3 12 [a,b] 17 29 [a,b] append ] }
-        { float-regs $[ 0 29 [a,b] ] }
+        { int-regs $[ 3 12 [a..b] 17 29 [a..b] append ] }
+        { float-regs $[ 0 29 [a..b] ] }
     } ;
 
-M: ppc frame-reg ( -- reg ) 31 ;
-M: ppc.32 vm-stack-space ( -- n ) 16 ;
-M: ppc.64 vm-stack-space ( -- n ) 32 ;
-M: ppc complex-addressing? ( -- ? ) f ;
+M: ppc frame-reg 31 ;
+M: ppc.32 vm-stack-space 16 ;
+M: ppc.64 vm-stack-space 32 ;
+M: ppc complex-addressing? f ;
 
 ! PW1-PW8 parameter save slots
 : param-save-size ( -- n ) 8 cells ; foldable
@@ -67,15 +67,15 @@ M: ppc complex-addressing? ( -- ? ) f ;
 : param@ ( n -- offset )
     reserved-area-size + ;
 
-M: ppc gc-root-offset ( spill-slot -- n )
+M: ppc gc-root-offset
     n>> spill@ cell /i ;
 
 : LOAD32 ( r n -- )
     [ -16 shift 0xffff bitand LIS ]
-    [ [ dup ] dip 0xffff bitand ORI ] 2bi ;
+    [ dupd 0xffff bitand ORI ] 2bi ;
 
 : LOAD64 ( r n -- )
-    [ dup ] dip {
+    dupd {
         [ nip -48 shift 0xffff bitand LIS ]
         [ -32 shift 0xffff bitand ORI ]
         [ drop 32 SLDI ]
@@ -129,12 +129,12 @@ HOOK: %load-cell-imm-rc cpu ( -- rel-class )
 M: ppc.32 %load-cell-imm-rc rc-absolute-ppc-2/2 ;
 M: ppc.64 %load-cell-imm-rc rc-absolute-ppc-2/2/2/2  ;
 
-M: ppc.32 %load-immediate ( reg val -- )
+M: ppc.32 %load-immediate
     dup -0x8000 0x7fff between? [ LI ] [ LOAD32 ] if ;
-M: ppc.64 %load-immediate ( reg val -- )
+M: ppc.64 %load-immediate
     dup -0x8000 0x7fff between? [ LI ] [ LOAD64 ] if ;
 
-M: ppc %load-reference ( reg obj -- )
+M: ppc %load-reference
     [ [ 0 %load-cell-imm ] [ %load-cell-imm-rc rel-literal ] bi* ]
     [ \ f type-number LI ]
     if* ;
@@ -156,11 +156,11 @@ M: ds-loc loc-reg drop ds-reg ;
 M: rs-loc loc-reg drop rs-reg ;
 
 ! Load value at stack location loc into vreg.
-M: ppc %peek ( vreg loc -- )
+M: ppc %peek
     [ loc-reg ] [ n>> cells neg ] bi %load-cell ;
 
 ! Replace value at stack location loc with value in vreg.
-M: ppc %replace ( vreg loc -- )
+M: ppc %replace
     [ loc-reg ] [ n>> cells neg ] bi %store-cell ;
 
 ! Replace value at stack location with an immediate value.
@@ -176,45 +176,45 @@ M:: ppc %replace-imm ( src loc -- )
     } cond
     scratch-reg reg offset %store-cell ;
 
-M: ppc %clear ( loc -- )
+M: ppc %clear
     297 swap %replace-imm ;
 
 ! Increment stack pointer by n cells.
-M: ppc %inc ( loc -- )
+M: ppc %inc
     [ ds-loc? [ ds-reg ds-reg ] [ rs-reg rs-reg ] if ] [ n>> ] bi cells ADDI ;
 
-M: ppc stack-frame-size ( stack-frame -- i )
+M: ppc stack-frame-size
     (stack-frame-size)
     reserved-area-size +
     param-save-size +
     factor-area-size +
     16 align ;
 
-M: ppc %call ( word -- )
+M: ppc %call
     0 BL rc-relative-ppc-3-pc rel-word-pic ;
 
 : instrs ( n -- b ) 4 * ; inline
 
-M: ppc %jump ( word -- )
+M: ppc %jump
     6 0 %load-cell-imm 1 instrs %load-cell-imm-rc rel-here
     0 B rc-relative-ppc-3-pc rel-word-pic-tail ;
 
-M: ppc %dispatch ( src temp -- )
+M: ppc %dispatch
     [ nip 0 %load-cell-imm 3 instrs %load-cell-imm-rc rel-here ]
     [ swap dupd %load-cell-x ]
     [ nip MTCTR ] 2tri BCTR ;
 
-M: ppc %slot ( dst obj slot scale tag -- )
+M: ppc %slot
     [ 0 assert= ] bi@ %load-cell-x ;
 
-M: ppc %slot-imm ( dst obj slot tag -- )
+M: ppc %slot-imm
     slot-offset scratch-reg swap LI
     scratch-reg %load-cell-x ;
 
-M: ppc %set-slot ( src obj slot scale tag -- )
+M: ppc %set-slot
     [ 0 assert= ] bi@ %store-cell-x ;
 
-M: ppc %set-slot-imm ( src obj slot tag -- )
+M: ppc %set-slot-imm
     slot-offset [ scratch-reg ] dip LI scratch-reg %store-cell-x ;
 
 M: ppc    %jump-label B     ;
@@ -255,7 +255,7 @@ M: ppc.64 %log2       [ CNTLZD ] [ drop dup NEG ] [ drop dup 63 ADDI ] 2tri ;
 M: ppc.32 %bit-count  POPCNTW ;
 M: ppc.64 %bit-count  POPCNTD ;
 
-M: ppc %copy ( dst src rep -- )
+M: ppc %copy
     2over eq? [ 3drop ] [
         {
             { tagged-rep [ MR ] }
@@ -276,15 +276,15 @@ M: ppc %copy ( dst src rep -- )
         { cc/o [ 0 label BNS ] }
     } case ; inline
 
-M: ppc %fixnum-add ( label dst src1 src2 cc -- )
+M: ppc %fixnum-add
     [ ADDO. ] overflow-template ;
 
-M: ppc %fixnum-sub ( label dst src1 src2 cc -- )
+M: ppc %fixnum-sub
     [ SUBFO. ] overflow-template ;
 
-M: ppc.32 %fixnum-mul ( label dst src1 src2 cc -- )
+M: ppc.32 %fixnum-mul
     [ MULLWO. ] overflow-template ;
-M: ppc.64 %fixnum-mul ( label dst src1 src2 cc -- )
+M: ppc.64 %fixnum-mul
     [ MULLDO. ] overflow-template ;
 
 M: ppc %add-float FADD ;
@@ -292,11 +292,11 @@ M: ppc %sub-float FSUB ;
 M: ppc %mul-float FMUL ;
 M: ppc %div-float FDIV ;
 
-M: ppc %min-float ( dst src1 src2 -- )
+M: ppc %min-float
     2dup [ scratch-reg ] 2dip FSUB
     [ scratch-reg ] 2dip FSEL ;
 
-M: ppc %max-float ( dst src1 src2 -- )
+M: ppc %max-float
     2dup [ scratch-reg ] 2dip FSUB
     [ scratch-reg ] 2dip FSEL ;
 
@@ -343,26 +343,26 @@ M:: ppc.64 %float>integer ( dst src -- )
     } ;
 
 ! Return values of this class go here
-M: ppc return-regs ( -- regs )
+M: ppc return-regs
     {
         { int-regs { 3 4 5 6 } }
         { float-regs { 1 2 3 4 } }
     } ;
 
 ! Is this structure small enough to be returned in registers?
-M: ppc return-struct-in-registers? ( c-type -- ? )
+M: ppc return-struct-in-registers?
     lookup-c-type return-in-registers?>> ;
 
 ! If t, the struct return pointer is never passed in a param reg
-M: ppc struct-return-on-stack? ( -- ? ) f ;
+M: ppc struct-return-on-stack? f ;
 
 GENERIC: load-param ( reg src -- )
-M: integer load-param ( reg src -- ) int-rep %copy ;
-M: spill-slot load-param ( reg src -- ) [ 1 ] dip n>> spill@ %load-cell ;
+M: integer load-param int-rep %copy ;
+M: spill-slot load-param [ 1 ] dip n>> spill@ %load-cell ;
 
 GENERIC: store-param ( reg dst -- )
-M: integer store-param ( reg dst -- ) swap int-rep %copy ;
-M: spill-slot store-param ( reg dst -- ) [ 1 ] dip n>> spill@ %store-cell ;
+M: integer store-param swap int-rep %copy ;
+M: spill-slot store-param [ 1 ] dip n>> spill@ %store-cell ;
 
 M:: ppc %unbox ( dst src func rep -- )
     3 src load-param
@@ -459,10 +459,7 @@ M:: ppc %c-invoke ( name dll gc-map -- )
     dead-outputs [ first2 discard-reg-param ] each
     ; inline
 
-M: ppc %alien-invoke ( varargs? reg-inputs stack-inputs
-                       reg-outputs dead-outputs
-                       cleanup stack-size
-                       symbols dll gc-map -- )
+M: ppc %alien-invoke
     '[ _ _ _ %c-invoke ] emit-alien-insn ;
 
 M:: ppc %alien-indirect ( src
@@ -483,36 +480,33 @@ M:: ppc %alien-indirect ( src
         gc-map gc-map-here
     ] emit-alien-insn ;
 
-M: ppc %alien-assembly ( varargs? reg-inputs stack-inputs
-                         reg-outputs dead-outputs
-                         cleanup stack-size
-                         quot -- )
+M: ppc %alien-assembly
     '[ _ call( -- ) ] emit-alien-insn ;
 
-M: ppc %callback-inputs ( reg-outputs stack-outputs -- )
+M: ppc %callback-inputs
     [ [ first3 load-reg-param ] each ]
     [ [ first3 load-stack-param ] each ] bi*
     3 vm-reg MR
     4 0 LI
     "begin_callback" f f %c-invoke ;
 
-M: ppc %callback-outputs ( reg-inputs -- )
+M: ppc %callback-outputs
     3 vm-reg MR
     "end_callback" f f %c-invoke
     [ first3 store-reg-param ] each ;
 
-M: ppc stack-cleanup ( stack-size return abi -- n )
+M: ppc stack-cleanup
     3drop 0 ;
 
 M: ppc fused-unboxing? f ;
 
-M: ppc %alien-global ( register symbol dll -- )
+M: ppc %alien-global
     [ 0 %load-cell-imm ] 2dip %load-cell-imm-rc rel-dlsym ;
 
-M: ppc %vm-field     ( dst field -- ) [ vm-reg ] dip %load-cell  ;
-M: ppc %set-vm-field ( src field -- ) [ vm-reg ] dip %store-cell ;
+M: ppc %vm-field     [ vm-reg ] dip %load-cell  ;
+M: ppc %set-vm-field [ vm-reg ] dip %store-cell ;
 
-M: ppc %unbox-alien ( dst src -- )
+M: ppc %unbox-alien
     scratch-reg alien-offset LI scratch-reg %load-cell-x ;
 
 ! Convert a c-ptr object to a raw C pointer.
@@ -706,8 +700,8 @@ M:: ppc.64 %convert-integer ( dst src c-type -- )
         { c:ulonglong [ ] }
     } case ;
 
-M: ppc.32 %load-memory-imm ( dst base offset rep c-type -- )
-    [
+M: ppc.32 %load-memory-imm
+    or* [
         pick %trap-null
         {
             { c:char   [ [ dup ] 2dip LBZ dup EXTSB ] }
@@ -723,10 +717,10 @@ M: ppc.32 %load-memory-imm ( dst base offset rep c-type -- )
             { float-rep  [ LFS ] }
             { double-rep [ LFD ] }
         } case
-    ] ?if ;
+    ] if ;
 
-M: ppc.64 %load-memory-imm ( dst base offset rep c-type -- )
-    [
+M: ppc.64 %load-memory-imm
+    or* [
         pick %trap-null
         {
             { c:char      [ [ dup ] 2dip LBZ dup EXTSB ] }
@@ -744,12 +738,12 @@ M: ppc.64 %load-memory-imm ( dst base offset rep c-type -- )
             { float-rep  [ [ scratch-reg ] dip LI scratch-reg LFSX ] }
             { double-rep [ [ scratch-reg ] dip LI scratch-reg LFDX ] }
         } case
-    ] ?if ;
+    ] if ;
 
 
-M: ppc.32 %load-memory ( dst base displacement scale offset rep c-type -- )
+M: ppc.32 %load-memory
     [ [ 0 assert= ] bi@ ] 2dip
-    [
+    or* [
         pick %trap-null
         {
             { c:char   [ [ LBZX ] [ drop dup EXTSB ] 2bi ] }
@@ -765,11 +759,11 @@ M: ppc.32 %load-memory ( dst base displacement scale offset rep c-type -- )
             { float-rep  [ LFSX ] }
             { double-rep [ LFDX ] }
         } case
-    ] ?if ;
+    ] if ;
 
-M: ppc.64 %load-memory ( dst base displacement scale offset rep c-type -- )
+M: ppc.64 %load-memory
     [ [ 0 assert= ] bi@ ] 2dip
-    [
+    or* [
         pick %trap-null
         {
             { c:char      [ [ LBZX ] [ drop dup EXTSB ] 2bi ] }
@@ -787,11 +781,11 @@ M: ppc.64 %load-memory ( dst base displacement scale offset rep c-type -- )
             { float-rep  [ LFSX ] }
             { double-rep [ LFDX ] }
         } case
-    ] ?if ;
+    ] if ;
 
 
-M: ppc.32 %store-memory-imm ( src base offset rep c-type -- )
-    [
+M: ppc.32 %store-memory-imm
+    or* [
         {
             { c:char   [ STB ] }
             { c:uchar  [ STB ] }
@@ -806,10 +800,10 @@ M: ppc.32 %store-memory-imm ( src base offset rep c-type -- )
             { float-rep  [ STFS ] }
             { double-rep [ STFD ] }
         } case
-    ] ?if ;
+    ] if ;
 
-M: ppc.64 %store-memory-imm ( src base offset rep c-type -- )
-    [
+M: ppc.64 %store-memory-imm
+    or* [
         {
             { c:char      [ STB ] }
             { c:uchar     [ STB ] }
@@ -826,11 +820,11 @@ M: ppc.64 %store-memory-imm ( src base offset rep c-type -- )
             { float-rep  [ [ scratch-reg ] dip LI scratch-reg STFSX ] }
             { double-rep [ [ scratch-reg ] dip LI scratch-reg STFDX ] }
         } case
-    ] ?if ;
+    ] if ;
 
-M: ppc.32 %store-memory ( src base displacement scale offset rep c-type -- )
+M: ppc.32 %store-memory
     [ [ 0 assert= ] bi@ ] 2dip
-    [
+    or* [
         {
             { c:char   [ STBX ] }
             { c:uchar  [ STBX ] }
@@ -845,11 +839,11 @@ M: ppc.32 %store-memory ( src base displacement scale offset rep c-type -- )
             { float-rep  [ STFSX ] }
             { double-rep [ STFDX ] }
         } case
-    ] ?if ;
+    ] if ;
 
-M: ppc.64 %store-memory ( src base displacement scale offset rep c-type -- )
+M: ppc.64 %store-memory
     [ [ 0 assert= ] bi@ ] 2dip
-    [
+    or* [
         {
             { c:char      [ STBX ] }
             { c:uchar     [ STBX ] }
@@ -866,7 +860,7 @@ M: ppc.64 %store-memory ( src base displacement scale offset rep c-type -- )
             { float-rep  [ STFSX ] }
             { double-rep [ STFDX ] }
         } case
-    ] ?if ;
+    ] if ;
 
 M:: ppc %allot ( dst size class nursery-ptr -- )
     ! dst = vm->nursery.here;
@@ -914,7 +908,7 @@ M:: ppc %check-nursery-branch ( label size cc temp1 temp2 -- )
         { cc/<= [ 0 label BGT ] }
     } case ;
 
-M: ppc %call-gc ( gc-map -- )
+M: ppc %call-gc
     \ minor-gc %call gc-map-here ;
 
 M:: ppc %prologue ( stack-size -- )
@@ -1033,7 +1027,7 @@ M:: ppc %compare-float-unordered-branch ( label src1 src2 cc -- )
     src1 src2 cc \ (%compare-float-unordered) (%compare-float) :> ( branch1 branch2 )
     label branch1 branch2 (%branch) ;
 
-M: ppc %spill ( src rep dst -- )
+M: ppc %spill
     n>> spill@ swap  {
         { int-rep    [ [ 1 ] dip %store-cell ] }
         { tagged-rep [ [ 1 ] dip %store-cell ] }
@@ -1043,7 +1037,7 @@ M: ppc %spill ( src rep dst -- )
         { scalar-rep [ scratch-reg swap LI 1 scratch-reg STVX ] }
     } case ;
 
-M: ppc %reload ( dst rep src -- )
+M: ppc %reload
     n>> spill@ swap {
         { int-rep    [ [ 1 ] dip %load-cell ] }
         { tagged-rep [ [ 1 ] dip %load-cell ] }
@@ -1053,11 +1047,11 @@ M: ppc %reload ( dst rep src -- )
         { scalar-rep [ scratch-reg swap LI 1 scratch-reg LVX ] }
     } case ;
 
-M: ppc immediate-arithmetic? ( n -- ? ) -32768 32767 between? ;
-M: ppc immediate-bitwise?    ( n -- ? ) 0 65535 between? ;
-M: ppc immediate-store?      ( n -- ? ) immediate-comparand? ;
+M: ppc immediate-arithmetic? -32768 32767 between? ;
+M: ppc immediate-bitwise?    0 65535 between? ;
+M: ppc immediate-store?      immediate-comparand? ;
 
-M: ppc enable-cpu-features ( -- )
+M: ppc enable-cpu-features
     enable-float-intrinsics ;
 
 USE: vocabs

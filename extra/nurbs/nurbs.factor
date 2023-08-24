@@ -1,7 +1,7 @@
 ! Copyright (C) 2009 Joe Groff
-! See http://factorcode.org/license.txt for BSD license
-USING: accessors alien.c-types grouping kernel locals math
-math.order math.ranges math.vectors math.vectors.homogeneous
+! See https://factorcode.org/license.txt for BSD license
+USING: accessors alien.c-types grouping kernel math
+math.order ranges math.vectors math.vectors.homogeneous
 sequences specialized-arrays ;
 SPECIALIZED-ARRAY: alien.c-types:float
 IN: nurbs
@@ -35,7 +35,7 @@ TUPLE: nurbs-curve
     [ order-index-knot-constants ] 2with map ;
 
 : knot-constants ( curve -- knot-constants )
-    2 over order>> [a,b]
+    2 over order>> [a..b]
     [ order-knot-constants ] with map ;
 
 : update-knots ( curve -- curve )

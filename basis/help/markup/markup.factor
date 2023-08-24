@@ -1,13 +1,11 @@
 ! Copyright (C) 2005, 2009 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays assocs classes colors colors.constants
-combinators combinators.smart compiler.units definitions
-definitions.icons effects fry generic hash-sets hashtables
-help.stylesheet help.topics io io.styles kernel locals make math
-namespaces parser present prettyprint prettyprint.stylesheet
-quotations see sequences sequences.private sets slots sorting
-splitting strings urls vectors vocabs vocabs.loader words
-words.symbol ;
+! See https://factorcode.org/license.txt for BSD license.
+USING: accessors arrays assocs combinators compiler.units
+definitions.icons effects english hashtables help.stylesheet
+help.topics io io.styles kernel make math namespaces present
+prettyprint prettyprint.stylesheet quotations see sequences
+sequences.private sets sorting splitting strings urls vocabs
+words words.symbol ;
 FROM: prettyprint.sections => with-pprint ;
 IN: help.markup
 
@@ -49,9 +47,7 @@ M: f print-element drop ;
     [ print-element ] with-style ;
 
 : with-default-style ( quot -- )
-    default-span-style get [
-        default-block-style get swap with-nesting
-    ] with-style ; inline
+    default-style get swap with-nesting ; inline
 
 : print-content ( element -- )
     [ print-element ] with-default-style ;
@@ -66,9 +62,6 @@ M: f print-element drop ;
 
 : $snippet ( children -- )
     [ snippet-style get print-element* ] ($span) ;
-
-! for help-lint
-ALIAS: $slot $snippet
 
 : $emphasis ( children -- )
     [ emphasis-style get print-element* ] ($span) ;
@@ -101,14 +94,12 @@ ALIAS: $slot $snippet
 
 : ($code) ( presentation quot -- )
     [
-        code-char-style get [
-            last-element off
-            [ ($code-style) ] dip with-nesting
-        ] with-style
+        last-element off
+        [ ($code-style) ] dip with-nesting
     ] ($block) ; inline
 
 : $code ( element -- )
-    "\n" join dup <input> [ write ] ($code) ;
+    join-lines dup <input> [ write ] ($code) ;
 
 : $syntax ( element -- ) "Syntax" $heading $code ;
 
@@ -131,7 +122,7 @@ ALIAS: $slot $snippet
     "Examples" $heading print-element ;
 
 : $example ( element -- )
-    unclip-last [ "\n" join ] dip over <input> [
+    unclip-last [ join-lines ] dip over <input> [
         [ print ] [ output-style get format ] bi*
     ] ($code) ;
 
@@ -191,7 +182,7 @@ M: symbol link-effect? drop f ;
 M: word link-effect? drop t ;
 
 : $effect ( effect -- )
-    effect>string stack-effect-style get format ;
+    effect>string base-effect-style get format ;
 
 M: word link-long-text
     dup presented associate [
@@ -265,6 +256,9 @@ PRIVATE>
         if*
     ] ($subsection) ;
 
+: $vocab-subsections ( element -- )
+    [ $vocab-subsection ] each ($blank-line) ;
+
 : $vocab-link ( element -- )
     check-first [ vocab-name ] keep ($vocab-link) ;
 
@@ -286,7 +280,7 @@ PRIVATE>
     [ lookup-vocab ] map $links ;
 
 : $breadcrumbs ( topics -- )
-    [ [ ($link) ] " > " (textual-list) ] ($span) ;
+    [ [ ($link) ] " » " (textual-list) ] ($span) ;
 
 : $see-also ( topics -- )
     "See also" $heading $links ;
@@ -314,15 +308,13 @@ PRIVATE>
     check-first dup "related" word-prop remove
     [ $see-also ] unless-empty ;
 
-: ($grid) ( style quot -- )
-    [
-        table-content-style get [
-            swap [ last-element off call ] tabular-output
-        ] with-style
+: ($grid) ( style content-style quot -- )
+    '[
+        _ [ last-element off _ tabular-output ] with-style
     ] ($block) ; inline
 
 : $list ( element -- )
-    list-style get [
+    list-style get list-content-style get [
         [
             [
                 bullet get write-cell
@@ -332,7 +324,7 @@ PRIVATE>
     ] ($grid) ;
 
 : $table ( element -- )
-    table-style get [
+    table-style get table-content-style get [
         [
             [
                 [ [ print-element ] with-cell ] each
@@ -340,9 +332,15 @@ PRIVATE>
         ] each
     ] ($grid) ;
 
+! for help-lint
+ALIAS: $slot $snippet
+
+: $slots ( children -- )
+    [ unclip \ $slot swap 2array prefix ] map $table ;
+
 : a/an ( str -- str )
     [ first ] [ length ] bi 1 =
-    "afhilmnorsx" "aeiou" ? member? "an" "a" ? ;
+    "afhilmnorsx" vowels ? member? "an" "a" ? ;
 
 GENERIC: ($instance) ( element -- )
 
@@ -378,7 +376,7 @@ M: f ($instance) ($link) ;
     print-element $snippet ;
 
 : ($instances) ( element -- )
-     dup word? [ ($link) "s" print-element ] [ print-element ] if ;
+    dup word? [ ($link) "s" print-element ] [ print-element ] if ;
 
 : $sequence ( element -- )
     { "a " { $link sequence } " of " } print-element
@@ -398,9 +396,18 @@ M: f ($instance) ($link) ;
     unclip \ $snippet swap present 2array
     swap dup first word? [ \ $instance prefix ] when 2array ;
 
+: ($values) ( element -- )
+    [ [ "None" write ] ($block) ]
+    [ [ values-row ] map $table ] if-empty ;
+
+: $inputs ( element -- )
+    "Inputs" $heading ($values) ;
+
+: $outputs ( element -- )
+    "Outputs" $heading ($values) ;
+
 : $values ( element -- )
-    "Inputs and outputs" $heading
-    [ values-row ] map $table ;
+    "Inputs and outputs" $heading ($values) ;
 
 : $side-effects ( element -- )
     "Side effects" $heading "Modifies " print-element
@@ -413,11 +420,7 @@ M: f ($instance) ($link) ;
     "Notes" $heading print-element ;
 
 : ($see) ( word quot -- )
-    [
-        code-char-style get [
-            code-style get swap with-nesting
-        ] with-style
-    ] ($block) ; inline
+    [ code-style get swap with-nesting ] ($block) ; inline
 
 : $see ( element -- ) check-first [ see* ] ($see) ;
 
@@ -445,13 +448,9 @@ M: f ($instance) ($link) ;
     unclip print-element [ \ $link swap ] { } map>assoc $list ;
 
 : $shuffle ( element -- )
-    drop
-    "Shuffle word. Rearranges the top of the datastack as indicated in the stack effect pattern." $description ;
-
-: $complex-shuffle ( element -- )
-    drop
-    "Shuffle word. Rearranges the top of the datastack as indicated in the stack effect pattern." $description
-    { "The data flow represented by this shuffle word can be more clearly expressed using " { $link "locals" } "." } $deprecated ;
+    "This is a shuffle word, rearranging the top of the datastack as indicated by the word's stack effect" swap
+    ?first [ ": " swap "." 4array ] [ "." append ] if*
+    $description ;
 
 : $low-level-note ( children -- )
     drop
@@ -492,7 +491,7 @@ M: array elements*
 : elements ( elt-type element -- seq ) [ elements* ] { } make ;
 
 : collect-elements ( element seq -- elements )
-    swap '[ _ elements [ rest ] map concat ] gather ;
+    swap '[ [ _ elements* ] each ] { } make [ rest ] map concat ;
 
 : <$link> ( topic -- element )
     1array \ $link prefix ;
@@ -504,5 +503,5 @@ M: array elements*
     drop
     icons get sort-keys
     [ [ <$link> ] [ definition-icon-path <$image> ] bi* swap ] assoc-map
-    { "" "Definition class" } prefix
+    { f { $strong "Definition class" } } prefix
     $table ;

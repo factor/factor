@@ -1,9 +1,9 @@
 ! Copyright (c) 2009 Guillaume Nargeot.
-! See http://factorcode.org/license.txt for BSD license.
-USING: arrays kernel math project-euler.common sequences sorting ;
+! See https://factorcode.org/license.txt for BSD license.
+USING: kernel math project-euler.common sequences sorting ;
 IN: project-euler.112
 
-! http://projecteuler.net/index.php?section=problems&id=112
+! https://projecteuler.net/index.php?section=problems&id=112
 
 ! DESCRIPTION
 ! -----------
@@ -34,7 +34,7 @@ IN: project-euler.112
 <PRIVATE
 
 : bouncy? ( n -- ? )
-    number>digits dup natural-sort
+    number>digits dup sort
     [ = not ] [ reverse = not ] 2bi and ;
 
 PRIVATE>

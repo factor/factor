@@ -6,11 +6,11 @@ HELP: <CGRect>
 { $description "Allocates a new " { $snippet "CGRect" } " in the Factor heap." } ;
 
 HELP: <CGPoint>
-{ $values { "x" real } { "y" real } { "point" "an " { $snippet "CGPoint" } } }
+{ $values { "x" real } { "y" real } { "CGPoint" CGPoint } }
 { $description "Allocates a new " { $snippet "CGPoint" } " in the Factor heap." } ;
 
 HELP: <CGSize>
-{ $values { "w" real } { "h" real } { "size" "an " { $snippet "CGSize" } } }
+{ $values { "w" real } { "h" real } { "CGSize" CGSize } }
 { $description "Allocates a new " { $snippet "CGSize" } " in the Factor heap." } ;
 
 ARTICLE: "core-graphics.types" "Core Graphics types"

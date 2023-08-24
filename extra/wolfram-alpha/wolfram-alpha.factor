@@ -1,9 +1,9 @@
 ! Copyright (C) 2011 John Benediktsson
-! See http://factorcode.org/license.txt for BSD license
+! See https://factorcode.org/license.txt for BSD license
 
-USING: accessors colors.constants formatting http http.client
-images.gif images.http io io.styles kernel namespaces sequences
-splitting ui urls.encoding xml xml.data xml.traversal ;
+USING: accessors colors formatting http http.client images.gif
+images.http io io.styles kernel namespaces sequences splitting
+ui urls.encoding xml xml.data xml.traversal ;
 
 IN: wolfram-alpha
 
@@ -15,7 +15,7 @@ SYMBOL: wolfram-api-id
 
 : query ( query -- xml )
     url-encode wolfram-api-id get-global
-    "http://api.wolframalpha.com/v2/query?input=%s&appid=%s"
+    "https://api.wolframalpha.com/v2/query?input=%s&appid=%s"
     sprintf http-get nip string>xml
     dup "error" tag-named [
         "msg" tag-named children>string throw
@@ -43,7 +43,7 @@ PRIVATE>
         [ "title" attr "%s:\n" printf ]
         [
             "plaintext" deep-tags-named [
-                children>string string-lines
+                children>string split-lines
                 [ "  %s\n" printf ] each
             ] each
         ] bi

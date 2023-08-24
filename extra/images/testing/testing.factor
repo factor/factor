@@ -1,10 +1,9 @@
 ! Copyright (C) 2009 Keith Lazuka.
-! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays fry images images.loader
+! See https://factorcode.org/license.txt for BSD license.
+USING: accessors arrays images images.loader
 images.normalization images.viewer io io.backend io.directories
 io.encodings.binary io.files io.pathnames io.streams.byte-array
-kernel locals namespaces quotations random sequences serialize
-tools.test ;
+kernel namespaces random sequences serialize tools.test ;
 IN: images.testing
 
 <PRIVATE
@@ -27,7 +26,7 @@ PRIVATE>
     [ image. ] with-matching-files ;
 
 : ls ( dirpath extension -- )
-    [ "\"" dup surround print ] with-matching-files ;
+    [ "\"" 1surround print ] with-matching-files ;
 
 : save-as-reference-image ( path -- )
     [ load-image ] [ fig-name ] bi

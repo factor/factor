@@ -6,21 +6,21 @@ namespaces tools.test make arrays kernel fry ;
 { { } } [
     [
         { 1 10 }
-        { 1 10 } [ , "HI" , ] each-line
+        { 1 10 } [ , "HI" , ] each-doc-line
     ] { } make
 ] unit-test
 
 { { 1 "HI" } } [
     [
         { 1 10 }
-        { 1 11 } [ , "HI" , ] each-line
+        { 1 11 } [ , "HI" , ] each-doc-line
     ] { } make
 ] unit-test
 
 { { 1 "HI" 2 "HI" } } [
     [
         { 1 10 }
-        { 2 11 } [ , "HI" , ] each-line
+        { 2 11 } [ , "HI" , ] each-doc-line
     ] { } make
 ] unit-test
 
@@ -28,7 +28,7 @@ namespaces tools.test make arrays kernel fry ;
     [
         { 1 10 } { 2 11 }
         t f
-        '[ [ _ _ ] dip 3array , ] each-line
+        '[ [ _ _ ] dip 3array , ] each-doc-line
     ] { } make
 ] unit-test
 

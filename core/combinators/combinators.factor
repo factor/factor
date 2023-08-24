@@ -1,8 +1,8 @@
 ! Copyright (C) 2006, 2010 Slava Pestov, Daniel Ehrenberg.
-! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays assocs hashtables kernel kernel.private
-make math math.order math.private quotations sequences
-sequences.private sets sorting words ;
+! See https://factorcode.org/license.txt for BSD license.
+USING: accessors arrays assocs kernel kernel.private math
+math.order math.private quotations sequences sequences.private
+sets sorting words ;
 IN: combinators
 
 ! Most of these combinators have compile-time expansions in
@@ -48,28 +48,32 @@ SLOT: terminated?
     [ call ] with each ;
 
 : cleave>quot ( seq -- quot )
-    [ [ keep ] curry ] map concat [ drop ] append [ ] like ;
+    [ [ keep ] curry ] map concat
+    [ drop ] [ ] append-as ;
 
 ! 2cleave
 : 2cleave ( x y seq -- )
     [ 2keep ] each 2drop ;
 
 : 2cleave>quot ( seq -- quot )
-    [ [ 2keep ] curry ] map concat [ 2drop ] append [ ] like ;
+    [ [ 2keep ] curry ] map concat
+    [ 2drop ] [ ] append-as ;
 
 ! 3cleave
 : 3cleave ( x y z seq -- )
     [ 3keep ] each 3drop ;
 
 : 3cleave>quot ( seq -- quot )
-    [ [ 3keep ] curry ] map concat [ 3drop ] append [ ] like ;
+    [ [ 3keep ] curry ] map concat
+    [ 3drop ] [ ] append-as ;
 
 ! 4cleave
 : 4cleave ( w x y z seq -- )
     [ 4keep ] each 4drop ;
 
 : 4cleave>quot ( seq -- quot )
-    [ [ 4keep ] curry ] map concat [ 4drop ] append [ ] like ;
+    [ [ 4keep ] curry ] map concat
+    [ 4drop ] [ ] append-as ;
 
 ! spread
 : shallow-spread>quot ( seq -- quot )
@@ -90,7 +94,7 @@ ERROR: no-cond ;
     [ no-cond ] if* ;
 
 : alist>quot ( default assoc -- quot )
-    [ rot \ if 3array append [ ] like ] assoc-each ;
+    [ rot \ if 3array [ ] append-as ] assoc-each ;
 
 : cond>quot ( assoc -- quot )
     [ dup pair? [ [ t ] swap 2array ] unless ] map
@@ -165,17 +169,16 @@ ERROR: no-case object ;
     ] [ drop f ] if ;
 
 : dispatch-case-quot ( default assoc -- quot )
-    [
-        \ dup , \ integer? , [
-            \ integer>fixnum-strict , \ dup ,
-            dup keys [ infimum , ] [ supremum , ] bi \ between? ,
-            [
-                dup keys infimum , \ - ,
-                sort-keys values [ >quotation ] map ,
-                \ dispatch ,
-            ] [ ] make , dup , \ if ,
-        ] [ ] make , , \ if ,
-    ] [ ] make ;
+    swap [
+        [ keys [ infimum ] [ supremum ] bi over ]
+        [ sort-keys values [ >quotation ] map ] bi
+    ] dip dup '[
+        dup integer? [
+            integer>fixnum-strict dup _ _ between? [
+                _ - _ dispatch
+            ] _ if
+        ] _ if
+    ] ;
 
 PRIVATE>
 
@@ -188,30 +191,6 @@ PRIVATE>
         { [ dup [ wrapper? ] all? ] [ drop [ [ wrapped>> ] dip ] assoc-map hash-case-quot ] }
         [ drop linear-case-quot ]
     } cond ;
-
-: recursive-hashcode ( n obj quot -- code )
-    pick 0 <= [ 3drop 0 ] [ [ 1 - ] 2dip call ] if ; inline
-
-! These go here, not in sequences and hashtables, since those
-! two cannot depend on us
-M: sequence hashcode* [ sequence-hashcode ] recursive-hashcode ;
-
-M: array hashcode* [ sequence-hashcode ] recursive-hashcode ;
-
-M: reversed hashcode* [ sequence-hashcode ] recursive-hashcode ;
-
-M: slice hashcode* [ sequence-hashcode ] recursive-hashcode ;
-
-M: iota hashcode*
-    over 0 <= [ 2drop 0 ] [
-        nip length 0 swap [ sequence-hashcode-step ] each-integer
-    ] if ;
-
-M: hashtable hashcode*
-    [
-        dup assoc-size 1 eq?
-        [ assoc-hashcode ] [ nip assoc-size ] if
-    ] recursive-hashcode ;
 
 : to-fixed-point ( ... object quot: ( ... object(n) -- ... object(n+1) ) -- ... object(n) )
     [ keep over = ] keep [ to-fixed-point ] curry unless ; inline recursive

@@ -1,8 +1,8 @@
 ! Copyright (C) 2003, 2009 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
-USING: accessors colors colors.constants combinators.short-circuit
+! See https://factorcode.org/license.txt for BSD license.
+USING: accessors colors combinators.short-circuit
 compiler.units continuations debugger fry io io.styles kernel lexer
-locals math math.parser namespaces parser parser.notes prettyprint
+math math.parser namespaces parser parser.notes prettyprint
 sequences sets source-files.errors system vocabs vocabs.loader
 vocabs.parser ;
 IN: listener
@@ -12,7 +12,7 @@ GENERIC#: prompt. 1 ( stream prompt -- )
 
 : prompt ( -- str )
     manifest get current-vocab>> [ name>> "IN: " prepend ] [ "" ] if*
-    auto-use? get [ " auto-use" append ] when ;
+    auto-use? get [ dup empty? "" " " ? "auto-use" 3append ] when ;
 
 SYMBOL: prompt-style
 H{
@@ -21,7 +21,7 @@ H{
 } prompt-style set-global
 
 M: object prompt.
-    nip prompt-style get-global format bl flush ;
+    nip [ prompt-style get-global format bl ] unless-empty ;
 
 SYMBOL: handle-ctrl-break
 
@@ -33,7 +33,7 @@ SYMBOL: handle-ctrl-break
     ! Always call disable-ctrl-break, no matter what handle-ctrl-break
     ! says: it might've been changed just now by the user in the Listener.
     ! It's a no-op if it's not enabled.
-    [ disable-ctrl-break ] [ ] cleanup ; inline
+    [ disable-ctrl-break ] finally ; inline
 
 : parse-lines-interactive ( lines -- quot/f )
     [ [ parse-lines ] with-ctrl-break ] with-compilation-unit ;
@@ -72,7 +72,7 @@ SYMBOL: error-hook
 
 : call-error-hook ( error -- )
     error-continuation get error-hook get
-    call( continuation error -- ) ;
+    call( error continuation -- ) ;
 
 [ drop print-error-and-restarts ] error-hook set-global
 
@@ -116,17 +116,15 @@ t error-summary? set-global
         ] dip
     ] when stack. ;
 
-: datastack. ( datastack -- )
-    display-stacks? get [
-        [ nl "--- Data stack:" title. trimmed-stack. ] unless-empty
-    ] [ drop ] if ;
+: ?datastack. ( datastack -- )
+    display-stacks? get [ datastack. ] [ drop ] if ;
 
 :: listener-step ( datastack -- datastack' )
     error-summary? get [ error-summary ] when
     visible-vars.
-    datastack datastack.
+    datastack ?datastack.
     input-stream get prompt prompt.
-
+    flush
     [
         read-quot [
             '[ [ datastack _ with-datastack ] with-ctrl-break ]
@@ -140,8 +138,8 @@ t error-summary? set-global
         if
     ] recover ;
 
-: (listener) ( datastack -- )
-    listener-step (listener) ;
+: listener-loop ( datastack -- )
+    listener-step listener-loop ;
 
 PRIVATE>
 
@@ -174,6 +172,7 @@ SYMBOL: interactive-vocabs
     "namespaces"
     "parser"
     "prettyprint"
+    "ranges"
     "see"
     "sequences"
     "slicing"
@@ -224,10 +223,10 @@ SYMBOL: interactive-vocabs
 : listener ( -- )
     [
         parser-quiet? off
-        [ { } (listener) ] with-return
+        [ { } listener-loop ] with-return
     ] with-interactive-vocabs ;
 
 : listener-main ( -- )
-    version-info print flush listener ;
+    "q" get [ version-info print flush ] unless listener ;
 
 MAIN: listener-main

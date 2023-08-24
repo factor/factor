@@ -1,7 +1,7 @@
 ! Copyright (C) 2012 John Benediktsson
-! See http://factorcode.org/license.txt for BSD license
-USING: accessors combinators.short-circuit compiler.units kernel
-lexer math multiline parser sequences splitting ;
+! See https://factorcode.org/license.txt for BSD license
+USING: accessors compiler.units kernel lexer math multiline
+parser sequences splitting ;
 
 IN: literate
 

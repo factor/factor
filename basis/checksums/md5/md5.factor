@@ -1,8 +1,8 @@
 ! Copyright (C) 2006, 2008 Doug Coleman.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors alien.c-types alien.data byte-arrays checksums
-checksums.common combinators fry grouping hints kernel
-kernel.private literals locals macros math math.bitwise
+checksums.common combinators grouping hints kernel
+kernel.private literals math math.bitwise
 math.functions sequences sequences.private specialized-arrays ;
 SPECIALIZED-ARRAY: uint
 IN: checksums.md5

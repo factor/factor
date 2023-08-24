@@ -1,7 +1,7 @@
 ! Copyright (C) 2006, 2009 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
-USING: arrays combinators documents fry kernel math sequences
-accessors unicode combinators.short-circuit ;
+! See https://factorcode.org/license.txt for BSD license.
+USING: accessors arrays combinators documents kernel math
+math.order sequences unicode ;
 IN: documents.elements
 
 GENERIC: prev-elt ( loc document elt -- newloc )
@@ -56,10 +56,10 @@ M: one-char-elt next-elt 2drop ;
 <PRIVATE
 
 : blank-at? ( n seq -- n seq ? )
-    2dup ?nth blank? ;
+    2dup ?nth unicode:blank? ;
 
 : break-detector ( ? -- quot )
-    '[ blank? _ xor ] ; inline
+    '[ unicode:blank? _ xor ] ; inline
 
 : prev-word ( col str ? -- col )
     break-detector find-last-from drop ?1+ ;
@@ -106,20 +106,51 @@ M: one-line-elt prev-elt
 M: one-line-elt next-elt
     drop [ first dup ] dip doc-line length 2array ;
 
-TUPLE: page-elt { lines read-only } ;
+<PRIVATE
+
+:: prev-paragraph ( loc document -- loc' )
+    loc first 1 [-] document value>>
+    [ empty? ] find-last-from drop [ 1 + ] [ 0 ] if* :> line#
+
+    loc first line# = loc second 0 = and [
+        line# 1 [-] 0 2array
+    ] [
+        line# 0 2array
+    ] if ;
+
+:: next-paragraph ( loc document -- loc' )
+    loc first 1 + document value>>
+    [ empty? ] find-from drop :> line#
+
+    line# [
+        1 - dup document doc-line length 2array
+        dup loc = [ first 1 + 0 2array ] when
+    ] [
+        document doc-end
+    ] if* ;
+
+PRIVATE>
+
+SINGLETON: paragraph-elt
+
+M: paragraph-elt prev-elt drop prev-paragraph ;
+
+M: paragraph-elt next-elt drop next-paragraph ;
+
+TUPLE: page-elt { #lines integer read-only } ;
 
 C: <page-elt> page-elt
 
 M: page-elt prev-elt
     nip
-    2dup [ first ] [ lines>> ] bi* <
-    [ 2drop { 0 0 } ] [ lines>> neg +line ] if ;
+    2dup [ first ] [ #lines>> ] bi* <
+    [ 2drop { 0 0 } ] [ #lines>> neg +line ] if ;
 
 M: page-elt next-elt
-    3dup [ first ] [ last-line# ] [ lines>> ] tri* - >
-    [ drop nip doc-end ] [ nip lines>> +line ] if ;
+    3dup [ first ] [ last-line# ] [ #lines>> ] tri* - >
+    [ drop nip doc-end ] [ nip #lines>> +line ] if ;
 
-CONSTANT: line-elt T{ page-elt f 1 }
+CONSTANT: line-elt T{ page-elt { #lines 1 } }
 
 SINGLETON: doc-elt
 

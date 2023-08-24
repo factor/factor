@@ -1,5 +1,5 @@
 ! Copyright (C) 2008 Doug Coleman.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors io kernel math math.parser sequences system
 vocabs ;
 IN: system-info
@@ -16,6 +16,7 @@ HOOK: total-virtual-mem os ( -- n )
 HOOK: available-virtual-mem os ( -- n )
 HOOK: available-virtual-extended-mem os ( -- n )
 HOOK: computer-name os ( -- string )
+HOOK: username os ( -- string )
 
 : write-unit ( x n str -- )
     [ 2^ /f number>string write bl ] [ write ] bi* ;

@@ -1,7 +1,6 @@
 ! Copyright (C) 2008, 2009 Doug Coleman, Daniel Ehrenberg.
-! See http://factorcode.org/license.txt for BSD license.
-USING: kernel arrays accessors fry sequences regexp.classes
-math.ranges math ;
+! See https://factorcode.org/license.txt for BSD license.
+USING: accessors arrays kernel math regexp.classes sequences ;
 IN: regexp.ast
 
 TUPLE: negation term ;

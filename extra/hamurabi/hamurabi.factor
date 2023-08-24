@@ -1,9 +1,9 @@
 ! Copyright (C) 2010 John Benediktsson
-! See http://factorcode.org/license.txt for BSD license
+! See https://factorcode.org/license.txt for BSD license
 
 USING: accessors combinators combinators.short-circuit
-continuations formatting fry io kernel math math.functions
-math.order math.parser math.ranges random sequences strings ;
+continuations formatting io kernel math math.functions
+math.order math.parser random ranges strings ;
 
 IN: hamurabi
 
@@ -24,9 +24,9 @@ total-births total-deaths ;
         3 >>yield
         f >>plague
         0 >>cost
-    dup births>> >>total-births
-    dup deaths>> >>total-deaths
     dup births>> '[ _ + ] change-population
+    dup population>> >>total-births
+    dup deaths>> >>total-deaths
     dup [ harvest>> ] [ yield>> ] bi / >>acres
     dup [ harvest>> ] [ stores>> ] bi - >>eaten ;
 
@@ -47,7 +47,7 @@ total-births total-deaths ;
     [ harvest>> ] [ eaten>> ] bi - ;
 
 : #percent-died ( game -- n )
-    [ total-deaths>> 100 * ] [ total-births>> ] [ year>> ] tri / / ;
+    [ total-deaths>> ] [ total-births>> ] bi / 100 * ;
 
 : #births ( game -- n )
     {
@@ -63,7 +63,7 @@ total-births total-deaths ;
 : leave-fink ( -- )
     "DUE TO THIS EXTREME MISMANAGEMENT YOU HAVE NOT ONLY" print
     "BEEN IMPEACHED AND THROWN OUT OF OFFICE BUT YOU HAVE" print
-    "ALSO BEEN DECLARED 'NATIONAL FINK' !!" print ;
+    "ALSO BEEN DECLARED 'NATIONAL FINK'!!!!" print ;
 
 : leave-starved ( game -- game )
     dup deaths>> "YOU STARVED %d PEOPLE IN ONE YEAR!!!\n" printf
@@ -77,7 +77,7 @@ total-births total-deaths ;
 : leave-not-too-bad ( game -- game )
     "YOUR PERFORMANCE COULD HAVE BEEN SOMEWHAT BETTER, BUT" print
     "REALLY WASN'T TOO BAD AT ALL." print
-    dup population>> 4/5 * floor [0,b] random
+    dup population>> 4/5 * floor [0..b] random
     "%d PEOPLE WOULD DEARLY LIKE TO SEE YOU ASSASSINATED\n" printf
     "BUT WE ALL HAVE OUR TRIVIAL PROBLEMS" print ;
 
@@ -176,10 +176,10 @@ total-births total-deaths ;
     dup stores>> "YOU NOW HAVE %d BUSHELS IN STORE.\n\n" printf ;
 
 : update-randomness ( game -- game )
-    17 26 [a,b] random >>cost
-    5 [1,b] random >>yield
-    5 [1,b] random >>birth-factor
-    5 [1,b] random >>rat-factor
+    17 26 [a..b] random >>cost
+    5 [1..b] random >>yield
+    5 [1..b] random >>birth-factor
+    5 [1..b] random >>rat-factor
     100 random 15 < >>plague ;
 
 : update-stores ( game -- game )

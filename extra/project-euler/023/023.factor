@@ -1,10 +1,10 @@
 ! Copyright (c) 2008 Aaron Schaefer.
-! See http://factorcode.org/license.txt for BSD license.
-USING: fry kernel math math.ranges project-euler.common
+! See https://factorcode.org/license.txt for BSD license.
+USING: kernel math ranges project-euler.common
 sequences sets ;
 IN: project-euler.023
 
-! http://projecteuler.net/index.php?section=problems&id=23
+! https://projecteuler.net/index.php?section=problems&id=23
 
 ! DESCRIPTION
 ! -----------
@@ -37,10 +37,10 @@ IN: project-euler.023
 <PRIVATE
 
 : source-023 ( -- seq )
-    46 [1,b] 47 20161 2 <range> append ;
+    46 [1..b] 47 20161 2 <range> append ;
 
 : abundants-upto ( n -- seq )
-    [1,b] [ abundant? ] filter ;
+    [1..b] [ abundant? ] filter ;
 
 : possible-sums ( seq -- seq )
     HS{ } clone

@@ -1,8 +1,9 @@
 ! Copyright (C) 2010 John Benediktsson
-! See http://factorcode.org/license.txt for BSD license
+! See https://factorcode.org/license.txt for BSD license
 
 USING: alien.c-types alien.strings alien.syntax classes.struct
-core-foundation io.encodings.utf8 io.files.trash kernel system ;
+core-foundation io.backend io.encodings.utf8 io.files.trash
+kernel system ;
 
 IN: io.files.trash.macosx
 
@@ -53,11 +54,12 @@ FUNCTION: OSStatus FSPathMakeRefWithOptions (
 : <fs-ref> ( path -- fs-ref )
     utf8 string>alien
     kFSPathMakeRefDoNotFollowLeafSymlink
-    FSRef <struct>
+    FSRef new
     [ f FSPathMakeRefWithOptions check-err ] keep ;
 
 PRIVATE>
 
 M: macosx send-to-trash ( path -- )
+    normalize-path
     <fs-ref> f kFSFileOperationDefaultOptions
     FSMoveObjectToTrashSync check-err ;

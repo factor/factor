@@ -1,11 +1,11 @@
 ! Copyright (c) 2012 Anonymous
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: grouping http.client io io.encodings.utf8 io.files
-io.files.temp kernel math memoize sequences sequences.extras
+io.files.temp kernel math sequences sequences.extras
 unicode urls ;
 IN: rosetta-code.ordered-words
 
-! http://rosettacode.org/wiki/Ordered_words
+! https://rosettacode.org/wiki/Ordered_words
 
 ! Define an ordered word as a word in which the letters of the
 ! word appear in alphabetic order. Examples include 'abbey' and
@@ -18,7 +18,7 @@ IN: rosetta-code.ordered-words
 ! this page.
 
 MEMO: word-list ( -- seq )
-    URL" http://puzzlers.org/pub/wordlists/unixdict.txt"
+    URL" https://puzzlers.org/pub/wordlists/unixdict.txt"
     "unixdict.txt" temp-file
     [ ?download-to ] [ utf8 file-lines ] bi ;
 

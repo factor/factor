@@ -12,8 +12,7 @@ HELP: set-timeout
   { $unchecked-example
     "USING: calendar io.launcher io.timeouts kernel ;"
     "\"sleep 10\" >process 5 seconds over set-timeout run-process"
-    "Process was killed as a result of a call to"
-    "kill-process, or a timeout"
+    "Process was killed as a result of a call to kill-process, or a timeout"
   }
 } ;
 

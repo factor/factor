@@ -3,7 +3,6 @@ namespaces sequences ;
 IN: editors.notepad++
 
 SINGLETON: notepad++
-notepad++ editor-class set-global
 
 : notepad++-path ( -- path )
     \ notepad++-path get [
@@ -11,7 +10,7 @@ notepad++ editor-class set-global
         [ "notepad++.exe" ] unless*
     ] unless* ;
 
-M: notepad++ editor-command ( file line -- command )
+M: notepad++ editor-command
     [
         notepad++-path ,
         number>string "-n" prepend , ,

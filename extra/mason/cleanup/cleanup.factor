@@ -1,11 +1,11 @@
 ! Copyright (C) 2008 Eduardo Cavazos, Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
-USING: arrays io.directories io.directories.hierarchy io.files
-kernel mason.common mason.config mason.platform namespaces ;
+! See https://factorcode.org/license.txt for BSD license.
+USING: arrays io.directories io.files kernel mason.common
+mason.config mason.platform namespaces ;
 IN: mason.cleanup
 
 : compress ( filename -- )
-    dup exists? [
+    dup file-exists? [
         "bzip2" swap 2array short-running-process
     ] [ drop ] if ;
 

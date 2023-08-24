@@ -1,5 +1,5 @@
 ! Copyright (C) 2005, 2006 Doug Coleman.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: alien alien.c-types alien.syntax kernel windows.types
 math multiline classes.struct alien.data arrays literals ;
 QUALIFIED-WITH: alien.c-types c
@@ -193,6 +193,7 @@ CONSTANT: PROCESS_CREATE_PROCESS 0x80
 CONSTANT: PROCESS_SET_QUOTA 0x100
 CONSTANT: PROCESS_SET_INFORMATION 0x200
 CONSTANT: PROCESS_QUERY_INFORMATION 0x400
+CONSTANT: PROCESS_ALL_ACCESS 0x001F0FFF
 
 CONSTANT: MEM_COMMIT 0x1000
 CONSTANT: MEM_RELEASE  0x8000
@@ -269,6 +270,20 @@ STRUCT: TIME_ZONE_INFORMATION
     { DaylightName WCHAR[32] }
     { DaylightDate SYSTEMTIME }
     { DaylightBias LONG } ;
+
+STRUCT: DYNAMIC_TIME_ZONE_INFORMATION
+    { Bias LONG }
+    { StandardName WCHAR[32] }
+    { StandardDate SYSTEMTIME }
+    { StandardBias LONG }
+    { DaylightName WCHAR[32] }
+    { DaylightDate SYSTEMTIME }
+    { DaylightBias LONG }
+    { TimeZoneKeyName WCHAR[128] }
+    { DynamicDaylightTimeDisabled BOOLEAN } ;
+
+TYPEDEF: DYNAMIC_TIME_ZONE_INFORMATION* PDYNAMIC_TIME_ZONE_INFORMATION
+
 
 STRUCT: FILETIME
     { dwLowDateTime DWORD }
@@ -838,6 +853,31 @@ STRUCT: CONSOLE_SCREEN_BUFFER_INFO
 { srWindow SMALL_RECT }
 { dwMaximumWindowSize COORD } ;
 
+CONSTANT: HEAP_CREATE_ENABLE_EXECUTE 0x00040000
+CONSTANT: HEAP_GENERATE_EXCEPTIONS 0x00000004
+CONSTANT: HEAP_NO_SERIALIZE 0x00000001
+
+STRUCT: HEAPLIST32
+    { dwSize SIZE_T }
+    { th32ProcessID DWORD }
+    { th32HeapID ULONG_PTR }
+    { dwFlags DWORD } ;
+TYPEDEF: HEAPLIST32* PHEAPLIST32
+TYPEDEF: HEAPLIST32* LPHEAPLIST32
+
+STRUCT: HEAPENTRY32
+    { dwSize SIZE_T }
+    { hHandle HANDLE }
+    { dwAddress ULONG_PTR }
+    { dwBlockSize SIZE_T }
+    { dwFlags DWORD }
+    { dwLockCount DWORD }
+    { dwResvd DWORD }
+    { th32ProcessID DWORD }
+    { th32HeapID ULONG_PTR } ;
+TYPEDEF: HEAPENTRY32* PHEAPENTRY32
+TYPEDEF: HEAPENTRY32* LPHEAPENTRY32
+
 STRUCT: PROCESSENTRY32
     { dwSize DWORD }
     { cntUsage DWORD }
@@ -849,9 +889,49 @@ STRUCT: PROCESSENTRY32
     { pcPriClassBase LONG }
     { dwFlags DWORD }
     { szExeFile TCHAR[MAX_PATH] } ;
-
 TYPEDEF: PROCESSENTRY32* PPROCESSENTRY32
 TYPEDEF: PROCESSENTRY32* LPPROCESSENTRY32
+
+CONSTANT: MAX_MODULE_NAME32 255
+CONSTANT: MAX_MODULE_NAME32_SIZE 256
+! STRUCT: MODULEENTRY32
+!     { dwSize DWORD }
+!     { th32ModuleID DWORD }
+!     { th32ProcessID DWORD }
+!     { GlblcntUsage DWORD }
+!     { ProccntUsage DWORD }
+!     { modBaseAddr BYTE* }
+!     { modBaseSize DWORD }
+!     { hModule HMODULE }
+!     { szModule char[MAX_MODULE_NAME32_SIZE] }
+!     { szExePath char[MAX_PATH] } ;
+! TYPEDEF: MODULEENTRY32* PMODULEENTRY32
+! TYPEDEF: MODULEENTRY32* LPMODULEENTRY32
+
+STRUCT: MODULEENTRY32W
+    { dwSize DWORD }
+    { th32ModuleID DWORD }
+    { th32ProcessID DWORD }
+    { GlblcntUsage DWORD }
+    { ProccntUsage DWORD }
+    { modBaseAddr BYTE* }
+    { modBaseSize DWORD }
+    { hModule HMODULE }
+    { szModule WCHAR[MAX_MODULE_NAME32_SIZE] }
+    { szExePath WCHAR[MAX_PATH] } ;
+TYPEDEF: MODULEENTRY32W* PMODULEENTRY32W
+TYPEDEF: MODULEENTRY32W* LPMODULEENTRY32W
+
+STRUCT: THREADENTRY32
+    { dwSize DWORD }
+    { cntUsage DWORD }
+    { th32ThreadID DWORD }
+    { th32OwnerProcessID DWORD }
+    { tpBasePri LONG }
+    { tpDeltaPri LONG }
+    { dwFlags DWORD } ;
+TYPEDEF: THREADENTRY32* PTHREADENTRY32
+TYPEDEF: THREADENTRY32* LPTHREADENTRY32
 
 ! Resource IDs
 : MAKEINTRESOURCE ( int -- resource ) 0xffff bitand <alien> ; inline
@@ -1366,6 +1446,9 @@ ALIAS: GetDiskFreeSpaceEx GetDiskFreeSpaceExW
 ! FUNCTION: GetDriveTypeA
 FUNCTION: UINT GetDriveTypeW ( LPCTSTR lpRootPathName )
 ALIAS: GetDriveType GetDriveTypeW
+
+FUNCTION: DWORD GetDynamicTimeZoneInformation ( PDYNAMIC_TIME_ZONE_INFORMATION pTimeZoneInformation )
+
 FUNCTION: void* GetEnvironmentStringsW ( )
 ! FUNCTION: GetEnvironmentStringsA
 ALIAS: GetEnvironmentStrings GetEnvironmentStringsW
@@ -1409,8 +1492,9 @@ FUNCTION: DWORD GetLastError ( )
 ! FUNCTION: GetLocaleInfoW
 ! FUNCTION: GetLocalTime
 FUNCTION: DWORD GetLogicalDrives ( )
-! FUNCTION: GetLogicalDriveStringsA
-! FUNCTION: GetLogicalDriveStringsW
+FUNCTION: DWORD GetLogicalDriveStringsA ( DWORD dwBufferLength, LPWSTR lpBuffer )
+FUNCTION: DWORD GetLogicalDriveStringsW ( DWORD dwBufferLength, LPSTR lpBuffer )
+ALIAS: GetLogicalDriveStrings GetLogicalDriveStringsW
 ! FUNCTION: GetLongPathNameA
 ! FUNCTION: GetLongPathNameW
 ! FUNCTION: GetMailslotInfo
@@ -1570,13 +1654,14 @@ FUNCTION: BOOL GlobalMemoryStatusEx ( LPMEMORYSTATUSEX lpBuffer )
 FUNCTION: BOOL GlobalUnlock ( HGLOBAL hMem )
 ! FUNCTION: GlobalUnWire
 ! FUNCTION: GlobalWire
-! FUNCTION: Heap32First
-! FUNCTION: Heap32ListFirst
-! FUNCTION: Heap32ListNext
-! FUNCTION: Heap32Next
+FUNCTION: BOOL Heap32First ( LPHEAPENTRY32 lphe, DWORD th32ProcessID, ULONG_PTR th32HeapID )
+FUNCTION: BOOL Heap32ListFirst ( HANDLE hSnapshot, LPHEAPLIST32 lphl )
+FUNCTION: BOOL Heap32ListNext ( HANDLE hSnapshot, LPHEAPLIST32 lphl )
+FUNCTION: BOOL Heap32Next ( LPHEAPENTRY32 lphe )
 FUNCTION: LPVOID HeapAlloc ( HANDLE hHeap, DWORD dwFlags, SIZE_T dwBytes )
 ! FUNCTION: HeapCompact
-! FUNCTION: HeapCreate
+
+FUNCTION: HANDLE HeapCreate ( DWORD  flOptions, SIZE_T dwInitialSize, SIZE_T dwMaximumSize )
 ! FUNCTION: HeapCreateTagsW
 ! FUNCTION: HeapDestroy
 ! FUNCTION: HeapExtend
@@ -1691,10 +1776,10 @@ FUNCTION: LPVOID MapViewOfFileEx ( HANDLE hFileMappingObject,
                                  SIZE_T dwNumberOfBytesToMap,
                                  LPVOID lpBaseAddress )
 
-! FUNCTION: Module32First
-! FUNCTION: Module32FirstW
-! FUNCTION: Module32Next
-! FUNCTION: Module32NextW
+! FUNCTION: BOOL Module32First ( HANDLE hSnapshot, LPMODULEENTRY32 lpme )
+FUNCTION: BOOL Module32FirstW ( HANDLE hSnapshot, LPMODULEENTRY32W lpme )
+! FUNCTION: BOOL Module32Next ( HANDLE hSnapshot, LPMODULEENTRY32 lpme )
+FUNCTION: BOOL Module32NextW ( HANDLE hSnapshot, LPMODULEENTRY32W lpme )
 ! FUNCTION: MoveFileA
 ! FUNCTION: MoveFileExA
 FUNCTION: BOOL MoveFileExW ( LPCSTR lpExistingFile, LPCSTR lpNewFileName, DWORD dwFlags )
@@ -1752,6 +1837,8 @@ ALIAS: Process32Next Process32NextW
 ! FUNCTION: QueryDepthSList
 ! FUNCTION: QueryDosDeviceA
 ! FUNCTION: QueryDosDeviceW
+CONSTANT: PROCESS_NAME_NATIVE 1
+FUNCTION: BOOL QueryFullProcessImageNameA ( HANDLE hProcess, DWORD dwFlags, LPSTR lpExeName, PDWORD lpdwSize )
 ! FUNCTION: QueryInformationJobObject
 ! FUNCTION: QueryMemoryResourceNotification
 FUNCTION: BOOL QueryPerformanceCounter ( LARGE_INTEGER* lpPerformanceCount )
@@ -1944,13 +2031,13 @@ FUNCTION: BOOL SystemTimeToFileTime ( SYSTEMTIME* lpSystemTime, LPFILETIME lpFil
 FUNCTION: BOOL TerminateProcess ( HANDLE hProcess, DWORD uExit )
 ! FUNCTION: TerminateThread
 ! FUNCTION: TermsrvAppInstallMode
-! FUNCTION: Thread32First
-! FUNCTION: Thread32Next
+FUNCTION: BOOL Thread32First ( HANDLE hSnapshot, LPTHREADENTRY32 lpte )
+FUNCTION: BOOL Thread32Next ( HANDLE hSnapshot, LPTHREADENTRY32 lpte )
 ! FUNCTION: TlsAlloc
 ! FUNCTION: TlsFree
 ! FUNCTION: TlsGetValue
 ! FUNCTION: TlsSetValue
-! FUNCTION: Toolhelp32ReadProcessMemory
+FUNCTION: BOOL Toolhelp32ReadProcessMemory ( DWORD th32ProcessID, LPCVOID lpBaseAddress, LPVOID lpBuffer, SIZE_T cbRead, SIZE_T *lpNumberOfBytesRead )
 ! FUNCTION: TransactNamedPipe
 ! FUNCTION: TransmitCommChar
 ! FUNCTION: TrimVirtualBuffer

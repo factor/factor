@@ -1,5 +1,5 @@
 ! Copyright (C) 2011 Alex Vondrak.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors assocs compiler.cfg compiler.cfg.graphviz
 compiler.cfg.gvn compiler.cfg.gvn.expressions compiler.cfg.gvn.graph
 compiler.cfg.optimizer compiler.cfg.utilities compiler.test
@@ -14,7 +14,7 @@ M: integer-expr expr>str value>> number>string ;
 
 M: reference-expr expr>str value>> unparse ;
 
-M: sequence expr>str [ unparse ] map " " join ;
+M: sequence expr>str [ unparse ] map join-words ;
 
 M: object expr>str unparse ;
 
@@ -26,7 +26,7 @@ M: object expr>str unparse ;
     ] if ;
 
 : gvns ( -- str )
-    vregs>vns get >alist natural-sort [
+    vregs>vns get >alist sort [
         first2 value-mapping
     ] map "" concat-as ;
 
@@ -36,9 +36,9 @@ M: object expr>str unparse ;
     ] keep ;
 
 : congruence-classes ( -- str )
-    vregs>vns get invert-assoc >alist natural-sort [
+    vregs>vns get invert-assoc >alist sort [
         first2
-        natural-sort [ number>string ] map ", " join
+        sort [ number>string ] map ", " join
         over exprs>vns get value-at expr>str
         "<%d> : {%s} (%s)\\l" sprintf
     ] map "" concat-as ;
@@ -93,14 +93,14 @@ SYMBOL: iteration
     ] with-variable ;
 
 : watch-gvn ( path quot -- )
-    annotate-gvn [ test-gvn ] [ reset-gvn ] [ ] cleanup ;
+    annotate-gvn [ test-gvn ] [ reset-gvn ] finally ;
 
 : watch-gvn-cfg ( path cfg -- )
     annotate-gvn [
         { value-numbering } passes [
             0 iteration [ watch-cfg ] with-variable
         ] with-variable
-    ] [ reset-gvn ] [ ] cleanup ;
+    ] [ reset-gvn ] finally ;
 
 : watch-gvn-bb ( path insns -- )
     0 test-bb 0 get block>cfg watch-gvn-cfg ;

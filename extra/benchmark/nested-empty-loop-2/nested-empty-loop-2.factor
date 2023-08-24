@@ -1,20 +1,20 @@
 ! Copyright (C) 2008 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
-USING: kernel math math.ranges sequences locals hints ;
+! See https://factorcode.org/license.txt for BSD license.
+USING: kernel math ranges sequences locals hints ;
 IN: benchmark.nested-empty-loop-2
 
 : times ( seq quot -- ) [ drop ] prepose each ; inline
 
 :: nested-empty-loop ( n -- )
-    1 n [a,b] [
-        1 n [a,b] [
-            1 n [a,b] [
-                1 n [a,b] [
-                    1 n [a,b] [
-                        1 n [a,b] [
-                            1 n [a,b] [
-                                1 n [a,b] [
-                                    1 n [a,b] [ ] times
+    n [1..b] [
+        n [1..b] [
+            n [1..b] [
+                n [1..b] [
+                    n [1..b] [
+                        n [1..b] [
+                            n [1..b] [
+                                n [1..b] [
+                                    n [1..b] [ ] times
                                 ] times
                             ] times
                         ] times

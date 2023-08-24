@@ -1,7 +1,7 @@
 ! Copyright (C) 2009 Joe Groff.
-! See http://factorcode.org/license.txt for BSD license.
-USING: tools.test generalizations kernel math arrays sequences
-sequences.generalizations ascii fry math.parser io io.streams.string ;
+! See https://factorcode.org/license.txt for BSD license.
+USING: io io.streams.string kernel math sequences
+sequences.generalizations tools.test ;
 IN: sequences.generalizations.tests
 
 { 1 2 3 4 } [ { 1 2 3 4 } 4 firstn ] unit-test
@@ -10,7 +10,15 @@ IN: sequences.generalizations.tests
 { } [ { } 0 firstn ] unit-test
 { "a" } [ { "a" } 1 firstn ] unit-test
 
+{ } [ { } 0 ?firstn ] unit-test
+{ f } [ { } 1 ?firstn ] unit-test
+{ f f } [ { } 2 ?firstn ] unit-test
+{ 1 f } [ { 1 } 2 ?firstn ] unit-test
+{ 1 2 } [ { 1 2 } 2 ?firstn ] unit-test
+{ 1 2 } [ { 1 2 3 } 2 ?firstn ] unit-test
+
 { [ 1 2 ] } [ 1 2 2 [ ] nsequence ] unit-test
+{ { 1 2 3 4 5 } } [ 1 2 3 4 5 { 0 0 0 0 0 } 5 (nsequence) ] unit-test
 
 { { 1 2 3 4 } } [ { 1 } { 2 } { 3 } { 4 } 4 nappend ] unit-test
 { V{ 1 2 3 4 } } [ { 1 } { 2 } { 3 } { 4 } 4 V{ } nappend-as ] unit-test

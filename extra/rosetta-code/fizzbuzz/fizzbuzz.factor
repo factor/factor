@@ -1,7 +1,6 @@
 ! Copyright (c) 2012 Anonymous
-! See http://factorcode.org/license.txt for BSD license.
-USING: io kernel math math.functions math.parser math.ranges
-sequences ;
+! See https://factorcode.org/license.txt for BSD license.
+USING: io kernel math.functions math.parser ranges sequences ;
 IN: rosetta-code.fizzbuzz
 
 : fizz ( n -- str ) 3 divisor? "Fizz" "" ? ;
@@ -12,6 +11,6 @@ IN: rosetta-code.fizzbuzz
     dup [ fizz ] [ buzz ] bi append [ number>string ] [ nip ] if-empty ;
 
 : fizzbuzz-main ( -- )
-    100 [1,b] [ fizzbuzz print ] each ;
+    100 [1..b] [ fizzbuzz print ] each ;
 
 MAIN: fizzbuzz-main

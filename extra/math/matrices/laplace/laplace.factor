@@ -1,7 +1,7 @@
 ! Copyright (C) 2013 Doug Coleman.
-! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays fry kernel locals math math.matrices
-math.vectors sequences sequences.private ;
+! See https://factorcode.org/license.txt for BSD license.
+USING: accessors classes kernel math math.matrices math.vectors
+sequences sequences.private ;
 IN: math.matrices.laplace
 
 <PRIVATE
@@ -29,12 +29,7 @@ INSTANCE: missing immutable-sequence
         v* [ odd? [ neg ] when ] map-index sum
     ] if ;
 
-ERROR: not-a-square-matrix matrix ;
-
-: check-square-matrix ( matrix -- matrix )
-    dup square-matrix? [ not-a-square-matrix ] unless ; inline
-
 PRIVATE>
 
 : determinant ( matrix -- x )
-    check-square-matrix 0 swap laplace-expansion ;
+    square-matrix check-instance 0 swap laplace-expansion ;

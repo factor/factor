@@ -1,6 +1,6 @@
-USING: help.markup help.syntax kernel kernel.private io
-threads.private init quotations strings assocs heaps boxes
-namespaces deques dlists system ;
+USING: assocs boxes deques dlists heaps help.markup help.syntax
+init kernel kernel.private namespaces quotations strings system
+threads.private ;
 IN: threads
 
 ARTICLE: "threads-start/stop" "Starting and stopping threads"
@@ -72,34 +72,34 @@ ABOUT: "threads"
 
 HELP: thread
 { $class-description "A thread. The slots are as follows:"
-    { $list
+    { $slots
       {
-          { $snippet "id" }
-          " - a unique identifier assigned to each thread."
+          "id"
+          "a unique identifier assigned to each thread."
       }
       {
-          { $snippet "exit-handler" }
-          " - a " { $link quotation } " run when the thread is being stopped."
+          "exit-handler"
+          { "a " { $link quotation } " run when the thread is being stopped." }
       }
       {
-          { $snippet "name" }
-          " - the name passed to " { $link spawn } "."
+          "name"
+          { "the name passed to " { $link spawn } "." }
       }
       {
-          { $snippet "quot" }
-          " - the initial quotation passed to " { $link spawn } "."
+          "quot"
+          { "the initial quotation passed to " { $link spawn } "." }
       }
       {
-          { $snippet "runnable" }
-          " - whether the thread is runnable. Initially it is, " { $link f } "."
+          "runnable"
+          { "whether the thread is runnable. Initially it is, " { $link f } "." }
       }
       {
-          { $snippet "state" }
-          " - a " { $link string } " indicating what the thread is waiting for, or " { $link f } ". This slot is intended to be used for debugging purposes."
+          "state"
+          { "a " { $link string } " indicating what the thread is waiting for, or " { $link f } ". This slot is intended to be used for debugging purposes." }
       }
       {
-          { $snippet "context" }
-          " - a " { $link box } " holding an alien pointer to the threads " { $link context } " object."
+          "context"
+          { "a " { $link box } " holding an alien pointer to the threads " { $link context } " object." }
       }
     }
 } ;
@@ -173,9 +173,9 @@ HELP: spawn
 { $values { "quot" quotation } { "name" string } { "thread" thread } }
 { $description "Spawns a new thread. The thread begins executing the given quotation; the name is for debugging purposes. The new thread begins running immediately and the current thread is added to the end of the run queue."
 $nl
-"The new thread begins with an empty data stack, an empty retain stack, and an empty catch stack. The name stack is inherited from the parent thread but may be cleared with " { $link init-namespaces } "." }
+"The new thread begins with an empty data stack, an empty retain stack, and an empty catch stack. The name stack is inherited from the parent thread but may be cleared with " { $link init-namestack } "." }
 { $notes
-     "The recommended way to pass data to the new thread is to explicitly construct a quotation containing the data, for example using " { $link curry } " or " { $link compose } "."
+    "The recommended way to pass data to the new thread is to explicitly construct a quotation containing the data, for example using " { $link curry } " or " { $link compose } "."
 }
 { $examples
     "A simple thread that adds two numbers:"

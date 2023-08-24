@@ -1,6 +1,6 @@
-USING: arrays kernel math math.functions math.order math.vectors
-namespaces opengl opengl.gl sequences ui ui.gadgets ui.gestures
-ui.gadgets.worlds ui.render accessors combinators literals ;
+USING: accessors combinators kernel literals math math.functions
+math.order math.vectors namespaces opengl opengl.gl sequences
+ui.gadgets ui.gadgets.worlds ui.gestures ;
 IN: opengl.demo-support
 
 CONSTANT: FOV $[ 2.0 sqrt 1 + ]
@@ -55,7 +55,7 @@ M: demo-world resize-world
     [ demo-world-frustum glFrustum ] bi ;
 
 : demo-world-set-matrix ( gadget -- )
-    GL_COLOR_BUFFER_BIT GL_DEPTH_BUFFER_BIT bitor glClear
+    flags{ GL_COLOR_BUFFER_BIT GL_DEPTH_BUFFER_BIT } glClear
     GL_MODELVIEW glMatrixMode
     glLoadIdentity
     [ [ 0.0 0.0 ] dip distance>> neg glTranslatef ]

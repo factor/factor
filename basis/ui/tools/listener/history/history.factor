@@ -1,6 +1,6 @@
 ! Copyright (C) 2009 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
-USING: accessors documents fry io.styles kernel math math.order
+! See https://factorcode.org/license.txt for BSD license.
+USING: accessors documents io.styles kernel math math.order
 sequences ;
 IN: ui.tools.listener.history
 

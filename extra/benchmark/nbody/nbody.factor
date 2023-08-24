@@ -1,8 +1,8 @@
 ! Copyright (C) 2008, 2009 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
-USING: accessors specialized-arrays fry kernel
-locals math math.constants math.functions math.vectors
-prettyprint combinators.smart sequences hints arrays ;
+! See https://factorcode.org/license.txt for BSD license.
+USING: accessors specialized-arrays kernel math math.constants
+math.functions math.vectors prettyprint combinators.smart
+sequences hints arrays ;
 FROM: alien.c-types => double ;
 SPECIALIZED-ARRAY: double
 IN: benchmark.nbody

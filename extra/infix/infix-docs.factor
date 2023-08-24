@@ -1,6 +1,6 @@
 ! Copyright (C) 2009 Philipp Brüschweiler
-! See http://factorcode.org/license.txt for BSD license.
-USING: help.syntax help.markup math math.functions prettyprint locals sequences ;
+! See https://factorcode.org/license.txt for BSD license.
+USING: help.markup help.syntax math math.functions ;
 IN: infix
 
 HELP: [infix

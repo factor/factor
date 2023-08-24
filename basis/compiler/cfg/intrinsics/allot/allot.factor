@@ -1,10 +1,10 @@
 ! Copyright (C) 2008, 2010 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays byte-arrays compiler.cfg
-compiler.cfg.builder.blocks compiler.cfg.hats
-compiler.cfg.instructions compiler.cfg.registers compiler.cfg.stacks
-compiler.constants compiler.tree.propagation.info cpu.architecture fry
-kernel layouts locals math math.order namespaces sequences ;
+! See https://factorcode.org/license.txt for BSD license.
+USING: accessors arrays byte-arrays compiler.cfg.builder.blocks
+compiler.cfg.hats compiler.cfg.instructions
+compiler.cfg.registers compiler.cfg.stacks compiler.constants
+compiler.tree.propagation.info cpu.architecture kernel layouts
+math math.order sequences ;
 IN: compiler.cfg.intrinsics.allot
 
 : ##set-slots, ( regs obj class -- )

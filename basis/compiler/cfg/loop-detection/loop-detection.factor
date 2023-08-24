@@ -1,8 +1,8 @@
 ! Copyright (C) 2009 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors assocs combinators.short-circuit compiler.cfg
-compiler.cfg.predecessors compiler.cfg.utilities deques dlists fry kernel
-namespaces sequences sets ;
+compiler.cfg.predecessors compiler.cfg.utilities deques dlists
+kernel namespaces sequences sets ;
 IN: compiler.cfg.loop-detection
 
 TUPLE: natural-loop header index ends blocks ;

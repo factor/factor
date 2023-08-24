@@ -1,7 +1,7 @@
 ! Copyright (C) 2009 Doug Coleman.
-! See http://factorcode.org/license.txt for BSD license.
-USING: combinators fry kernel locals math
-math.primes combinators.short-circuit ;
+! See https://factorcode.org/license.txt for BSD license.
+USING: combinators combinators.short-circuit kernel math
+math.primes ;
 IN: math.primes.lucas-lehmer
 
 ERROR: invalid-lucas-lehmer-candidate obj ;

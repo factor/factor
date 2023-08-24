@@ -1,6 +1,6 @@
 ! Copyright (C) 2008 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
-USING: math locals hints ;
+! See https://factorcode.org/license.txt for BSD license.
+USING: math hints ;
 IN: benchmark.nested-empty-loop-1
 
 :: nested-empty-loop ( n -- )

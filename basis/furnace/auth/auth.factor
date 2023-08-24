@@ -1,19 +1,12 @@
 ! Copyright (c) 2008, 2010 Slava Pestov
-! See http://factorcode.org/license.txt for BSD license.
-USING: accessors assocs namespaces kernel sequences sets
-destructors combinators fry logging io.encodings.utf8
-io.encodings.string io.binary io.sockets.secure random checksums
-checksums.sha urls
-html.forms
-http.server
-http.server.filters
-http.server.dispatchers
-furnace.actions
-furnace.utilities
-furnace.redirection
-furnace.boilerplate
-furnace.auth.providers
-furnace.auth.providers.db ;
+! See https://factorcode.org/license.txt for BSD license.
+USING: accessors assocs checksums checksums.sha combinators
+destructors endian furnace.actions furnace.auth.providers
+furnace.auth.providers.db furnace.boilerplate
+furnace.redirection furnace.utilities html.forms http.server
+http.server.dispatchers http.server.filters io.encodings.string
+io.encodings.utf8 io.sockets.secure kernel logging namespaces
+random sequences sets urls ;
 IN: furnace.auth
 
 SYMBOL: logged-in-user
@@ -97,7 +90,7 @@ M: user-saver dispose
 
 \ init-user DEBUG add-input-logging
 
-M: realm call-responder* ( path responder -- response )
+M: realm call-responder*
     dup realm namespaces:set
     logged-in? [
         dup init-realm
@@ -146,7 +139,7 @@ TUPLE: protected < filter-responder description capabilities ;
         } cond
     ] if ;
 
-M: protected call-responder* ( path responder -- response )
+M: protected call-responder*
     dup protected namespaces:set
     dup capabilities>> have-capabilities?
     [ call-next-method ] [

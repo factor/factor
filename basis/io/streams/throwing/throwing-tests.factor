@@ -1,8 +1,9 @@
 ! Copyright (C) 2010 Doug Coleman.
-! See http://factorcode.org/license.txt for BSD license.
-USING: destructors io io.encodings.binary io.encodings.utf8
-io.files io.streams.byte-array io.streams.string
-io.streams.throwing kernel namespaces tools.test ;
+! See https://factorcode.org/license.txt for BSD license.
+USING: arrays destructors io io.encodings.binary
+io.encodings.utf8 io.files io.streams.byte-array
+io.streams.string io.streams.throwing kernel namespaces
+sequences tools.test ;
 
 { "asdf" }
 [
@@ -33,10 +34,15 @@ io.streams.throwing kernel namespaces tools.test ;
     "asdf" [ [ 2 read ] throw-on-eof 3 read ] with-string-reader
 ] unit-test
 
-{ "as" "df\n" } [
+{ t } [
     "vocab:io/streams/throwing/asdf.txt" utf8 [
         [ 2 read ] throw-on-eof 20 read
     ] with-file-reader
+    ! For Windows line endings
+    2array {
+        { "as" "df\n" }
+        { "as" "df\r\n" }
+    } member?
 ] unit-test
 
 { B{ 0 1 2 3 } B{ 0 1 2 3 } } [

@@ -1,11 +1,13 @@
 ! Copyright (C) 2009 Joe Groff.
-! See http://factorcode.org/license.txt for BSD license.
-USING: kernel sequences sequences.private math
-combinators macros math.order math.ranges quotations fry effects
-memoize.private generalizations ;
+! See https://factorcode.org/license.txt for BSD license.
+USING: arrays combinators generalizations kernel math math.order
+memoize.private quotations sequences sequences.private ;
 IN: sequences.generalizations
 
-MACRO: nsequence ( n seq -- quot )
+MACRO: (nsequence) ( n -- quot )
+    <iota> reverse [ '[ [ _ swap set-nth-unsafe ] keep ] ] map concat ;
+
+MACRO: nsequence ( n exemplar -- quot )
     [ [nsequence] ] keep '[ @ _ like ] ;
 
 MACRO: narray ( n -- quot )
@@ -32,6 +34,9 @@ MACRO: set-firstn ( n -- quot )
         [ set-firstn-unsafe ]
         bi-curry '[ _ _ bi ]
     ] if-zero ;
+
+MACRO: ?firstn ( n -- quot )
+    dup '[ _ f pad-tail _ firstn-unsafe ] ;
 
 : nappend ( n -- seq ) narray concat ; inline
 
@@ -61,7 +66,7 @@ MACRO: nset-nth-unsafe ( n -- quot )
     (neach) each-integer ; inline
 
 : nmap-as ( seq... quot exemplar n -- result )
-    '[ _ (neach) ] dip map-integers ; inline
+    '[ _ (neach) ] dip map-integers-as ; inline
 
 : nmap ( seq... quot n -- result )
     dup '[ [ _ npick ] dip swap ] dip nmap-as ; inline
@@ -86,12 +91,12 @@ MACRO: (ncollect) ( n -- quot )
 : ncollect ( len quot into... n -- )
     (ncollect) each-integer ; inline
 
-: nmap-integers ( len quot exemplar... n -- result... )
+: nmap-integers-as ( len quot exemplar... n -- result... )
     4 dupn
     '[ [ over ] _ ndip [ [ _ ncollect ] _ nkeep ] _ nnew-like ] call ; inline
 
 : mnmap-as ( m*seq quot n*exemplar m n -- result*n )
-    dup '[ [ _ (neach) ] _ ndip _ nmap-integers ] call ; inline
+    dup '[ [ _ (neach) ] _ ndip _ nmap-integers-as ] call ; inline
 
 : mnmap ( m*seq quot m n -- result*n )
     2dup '[ [ _ npick ] dip swap _ dupn ] 2dip mnmap-as ; inline
@@ -119,17 +124,17 @@ MACRO: (ncollect) ( n -- quot )
 MACRO: nmap-reduce ( map-quot reduce-quot n -- quot )
     -rot dupd compose overd over '[
         [ [ first ] _ napply @ 1 ] _ nkeep
-        _ _ (neach) (each-integer)
+        _ _ (neach) each-integer-from
     ] ;
 
 : nall? ( seqs... quot n -- ? )
     (neach) all-integers? ; inline
 
 MACRO: finish-nfind ( n -- quot )
-    [ 1 + ] keep dup dup dup '[
+    [ 1 + ] keep dup dup dup f <array> >quotation '[
         _ npick
         [ [ dup ] _ ndip _ nnth-unsafe ]
-        [ _ ndrop _ [ f ] times ]
+        [ _ ndrop @ ]
         if
     ] ;
 

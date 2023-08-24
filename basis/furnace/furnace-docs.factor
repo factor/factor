@@ -1,5 +1,4 @@
-USING: assocs help.markup help.syntax kernel
-quotations sequences strings urls xml.data http ;
+USING: help.markup help.syntax ;
 IN: furnace
 
 ARTICLE: "furnace.persistence" "Furnace persistence layer"

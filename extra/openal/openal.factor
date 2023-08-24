@@ -1,9 +1,8 @@
 ! Copyright (C) 2007 Chris Double.
-! See http://factorcode.org/license.txt for BSD license.
-USING: kernel accessors arrays alien system combinators
-alien.syntax namespaces sequences vocabs.loader
-shuffle alien.libraries generalizations
-specialized-arrays alien.destructors alien.data ;
+! See https://factorcode.org/license.txt for BSD license.
+USING: alien alien.c-types alien.data alien.destructors
+alien.libraries alien.syntax arrays combinators kernel sequences
+specialized-arrays system ;
 FROM: alien.c-types => char double float int short uchar uint
 ushort void ;
 SPECIALIZED-ARRAY: uint
@@ -116,7 +115,7 @@ FUNCTION: ALboolean alGetBoolean ( ALenum param )
 FUNCTION: ALint alGetInteger ( ALenum param )
 FUNCTION: ALfloat alGetFloat ( ALenum param )
 FUNCTION: ALdouble alGetDouble ( ALenum param )
-FUNCTION: ALenum alGetError (  )
+FUNCTION: ALenum alGetError ( )
 FUNCTION: ALboolean alIsExtensionPresent ( ALchar* extname )
 FUNCTION: void* alGetProcAddress ( ALchar* fname )
 FUNCTION: ALenum alGetEnumValue ( ALchar* ename )

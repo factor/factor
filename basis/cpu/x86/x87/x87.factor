@@ -1,5 +1,5 @@
 ! Copyright (C) 2010 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: alien.c-types alien.data combinators kernel locals system
 namespaces compiler.codegen.labels compiler.codegen.relocation
 compiler.constants compiler.cfg.comparisons
@@ -86,14 +86,14 @@ M:: x86 %float>integer ( dst src -- )
     src2 shuffle-down quot call
     ST0 FSTP ; inline
 
-M: x86 %compare-float-ordered ( dst src1 src2 cc temp -- )
+M: x86 %compare-float-ordered
     [ [ FCOMI ] compare-op ] (%compare-float) ;
 
-M: x86 %compare-float-unordered ( dst src1 src2 cc temp -- )
+M: x86 %compare-float-unordered
     [ [ FUCOMI ] compare-op ] (%compare-float) ;
 
-M: x86 %compare-float-ordered-branch ( label src1 src2 cc -- )
+M: x86 %compare-float-ordered-branch
     [ [ FCOMI ] compare-op ] (%compare-float-branch) ;
 
-M: x86 %compare-float-unordered-branch ( label src1 src2 cc -- )
+M: x86 %compare-float-unordered-branch
     [ [ FUCOMI ] compare-op ] (%compare-float-branch) ;

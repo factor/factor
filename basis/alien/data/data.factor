@@ -1,10 +1,10 @@
 ! Copyright (C) 2009, 2010 Slava Pestov, Joe Groff.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors alien alien.arrays alien.c-types alien.strings
 arrays byte-arrays combinators combinators.short-circuit
-cpu.architecture fry generalizations io io.streams.memory kernel
-libc locals macros math math.functions parser sequences
-stack-checker.dependencies summary words ;
+cpu.architecture generalizations io io.streams.memory kernel
+libc math parser sequences stack-checker.dependencies summary
+words ;
 IN: alien.data
 
 : <ref> ( value c-type -- c-ptr )
@@ -122,19 +122,19 @@ ERROR: local-allocation-error ;
 
 <PRIVATE
 
-: (local-allot) ( size align -- alien ) local-allocation-error ;
+: local-allot ( size align -- alien ) local-allocation-error ;
 
-: (cleanup-allot) ( -- )
+: cleanup-allot ( -- )
     ! Inhibit TCO in order for the last word in the quotation
     ! to still be able to access scope-allocated data.
     ;
 
-MACRO: (simple-local-allot) ( c-type -- quot )
+MACRO: simple-local-allot-quot ( c-type -- quot )
     [ add-depends-on-c-type ]
-    [ dup '[ _ heap-size _ c-type-align (local-allot) ] ] bi ;
+    [ dup '[ _ heap-size _ c-type-align local-allot ] ] bi ;
 
-: [hairy-local-allot] ( c-type initial -- quot )
-    over '[ _ (simple-local-allot) _ over 0 _ set-alien-value ] ;
+: hairy-local-allot-quot ( c-type initial -- quot )
+    over '[ _ simple-local-allot-quot _ over 0 _ set-alien-value ] ;
 
 : hairy-local-allot? ( obj -- ? )
     {
@@ -143,14 +143,15 @@ MACRO: (simple-local-allot) ( c-type -- quot )
         [ second initial: eq? ]
     } 1&& ;
 
-MACRO: (hairy-local-allot) ( obj -- quot )
-    dup hairy-local-allot?
-    [ first3 nip [hairy-local-allot] ]
-    [ '[ _ (simple-local-allot) ] ]
-    if ;
+MACRO: hairy-local-allot ( obj -- quot )
+    dup hairy-local-allot? [
+        first3 nip hairy-local-allot-quot
+    ] [
+        '[ _ simple-local-allot-quot ]
+    ] if ;
 
-MACRO: (local-allots) ( c-types -- quot )
-    [ '[ _ (hairy-local-allot) ] ] map [ ] join ;
+MACRO: local-allots ( c-types -- quot )
+    [ '[ _ hairy-local-allot ] ] map [ ] join ;
 
 MACRO: box-values ( c-types -- quot )
     [ c-type-boxer-quot ] map '[ _ spread ] ;
@@ -163,12 +164,12 @@ MACRO: out-parameters ( c-types -- quot )
 PRIVATE>
 
 : with-scoped-allocation ( c-types quot -- )
-    [ [ (local-allots) ] [ box-values ] bi ] dip call
-    (cleanup-allot) ; inline
+    [ [ local-allots ] [ box-values ] bi ] dip call
+    cleanup-allot ; inline
 
 : with-out-parameters ( c-types quot -- values... )
-    [ drop (local-allots) ] [ swap out-parameters ] 2bi
-    (cleanup-allot) ; inline
+    [ drop local-allots ] [ swap out-parameters ] 2bi
+    cleanup-allot ; inline
 
 GENERIC: binary-zero? ( value -- ? )
 

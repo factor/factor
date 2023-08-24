@@ -1,8 +1,9 @@
 ! Copyright (C) 2009 Slava Pestov, Daniel Ehrenberg.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors combinators combinators.private compiler.test
 compiler.tree compiler.tree.builder compiler.tree.debugger
 compiler.tree.optimizer compiler.tree.propagation.call-effect
+compiler.tree.propagation.info
 compiler.units effects eval fry kernel kernel.private math sequences
 tools.test ;
 IN: compiler.tree.propagation.call-effect.tests
@@ -117,8 +118,8 @@ IN: compiler.tree.propagation.call-effect.tests
 { f } [ [ dup drop ] final-info first infer-value ] unit-test
 
 ! This should not hang
-{ } [ [ [ dup call( quot -- ) ] dup call( quot -- ) ] final-info drop ] unit-test
-{ } [ [ [ dup curry call( quot -- ) ] dup curry call( quot -- ) ] final-info drop ] unit-test
+[ [ [ dup call( quot -- ) ] dup call( quot -- ) ] final-info ] must-not-fail
+[ [ [ dup curry call( quot -- ) ] dup curry call( quot -- ) ] final-info ] must-not-fail
 
 ! This should get inlined, because the parameter to the curry is literal even though
 ! [ boa ] by itself doesn't infer
@@ -157,3 +158,9 @@ TUPLE: my-tuple a b c ;
 { } [ "IN: compiler.tree.propagation.call-effect.tests TUPLE: my-tuple a b ;" eval( -- ) ] unit-test
 
 [ 1 2 3 my-quot my-word ] [ wrong-values? ] must-fail-with
+
+! Regression
+[ composed <class-info> (infer-value) ] [ uninferable? ] must-fail-with
+{ t } [ [ 1 ] [ 2 ] compose <literal-info> (infer-value) ( -- x x ) effect= ] unit-test
+{ } [ "IN: compiler.tree.propagation.call-effect.tests USING:
+kernel kernel.private ; : blub ( x -- ) { composed } declare call( -- ) ;" eval( -- ) ] unit-test

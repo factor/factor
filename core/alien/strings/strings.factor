@@ -1,7 +1,7 @@
 ! Copyright (C) 2008, 2011 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
-USING: accessors alien arrays byte-arrays byte-vectors init io
-io.encodings io.encodings.ascii io.encodings.utf16n
+! See https://factorcode.org/license.txt for BSD license.
+USING: accessors alien arrays byte-arrays byte-vectors io
+io.encodings io.encodings.ascii io.encodings.utf16
 io.encodings.utf8 io.streams.memory kernel kernel.private math
 namespaces sequences sequences.private strings strings.private
 system system.private ;
@@ -21,7 +21,7 @@ M: f alien>string
 
 ERROR: invalid-c-string string ;
 
-: check-string ( string -- )
+: check-c-string ( string -- )
     0 over member-eq? [ invalid-c-string ] [ drop ] if ;
 
 GENERIC#: string>alien 1 ( string encoding -- byte-array )
@@ -53,7 +53,7 @@ M: c-ptr string>alien drop ;
 PRIVATE>
 
 M: string string>alien
-    over check-string
+    over check-c-string
     2dup fast-string?
     [ string>alien-fast ]
     [ string>alien-slow ] if ;
@@ -90,11 +90,11 @@ M: array symbol>string [ utf8 alien>string ] map ", " join ;
 : special-object>string ( n -- str )
     special-object utf8 alien>string ;
 
-[
+STARTUP-HOOK: [
     OBJ-CPU special-object>string string>cpu \ cpu set-global
     OBJ-OS special-object>string string>os \ os set-global
     OBJ-VM-VERSION special-object>string \ vm-version set-global
     OBJ-VM-GIT-LABEL special-object>string \ vm-git-label set-global
     OBJ-VM-COMPILER special-object>string \ vm-compiler set-global
     OBJ-VM-COMPILE-TIME special-object>string \ vm-compile-time set-global
-] "alien.strings" add-startup-hook
+]

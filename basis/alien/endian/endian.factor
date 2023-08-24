@@ -1,9 +1,9 @@
 ! Copyright (C) 2011 Doug Coleman.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors alien.accessors alien.c-types alien.data arrays
-classes.struct.private combinators compiler.units endian fry
-generalizations kernel macros math math.bitwise namespaces
-sequences slots words ;
+classes.struct.private combinators compiler.units endian
+generalizations kernel math math.bitwise namespaces sequences
+slots words ;
 QUALIFIED-WITH: alien.c-types c
 IN: alien.endian
 

@@ -1,7 +1,7 @@
 ! Copyright (C) 2010 Dmitry Shubin.
-! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays assocs kernel locals math math.order
-math.ranges sequences sequences.private z-algorithm ;
+! See https://factorcode.org/license.txt for BSD license.
+USING: accessors arrays assocs kernel math math.order ranges
+sequences sequences.private z-algorithm ;
 IN: boyer-moore
 
 <PRIVATE
@@ -11,7 +11,7 @@ IN: boyer-moore
     [ [ i ] unless* ] change-nth-unsafe ; inline
 
 : normal-suffixes ( zs -- ss )
-    [ length [ f <array> ] [ [1,b) ] bi ] keep pick
+    [ length [ f <array> ] [ [1..b) ] bi ] keep pick
     [ (normal-suffixes) ] 2curry each ; inline
 
 :: (partial-suffixes) ( len old elt i -- len old/new old )
@@ -21,26 +21,26 @@ IN: boyer-moore
     [ length dup ] [ <reversed> ] bi
     [ (partial-suffixes) ] map-index 2nip ; inline
 
-: <gs-table> ( seq -- table )
+: <good-suffix-table> ( seq -- table )
     z-values [ partial-suffixes ] [ normal-suffixes ] bi
     [ [ nip ] when* ] 2map reverse! ; inline
 
-: insert-bc-shift ( table elt len i -- table )
+: insert-bad-char-shift ( table elt len i -- table )
     1 + swap - swap pick 2dup key?
     [ 3drop ] [ set-at ] if ; inline
 
-: <bc-table> ( seq -- table )
+: <bad-char-table> ( seq -- table )
     H{ } clone swap [ length ] keep
-    [ insert-bc-shift ] with each-index ; inline
+    [ insert-bad-char-shift ] with each-index ; inline
 
-TUPLE: boyer-moore pattern bc-table gs-table ;
+TUPLE: boyer-moore pattern bad-char-table good-suffix-table ;
 
-: gs-shift ( i c bm -- s ) nip gs-table>> nth-unsafe ; inline
+: good-suffix-shift ( i c boyer-moore -- s ) nip good-suffix-table>> nth-unsafe ; inline
 
-: bc-shift ( i c bm -- s ) bc-table>> at dup 1 ? + ; inline
+: bad-char-shift ( i c boyer-moore -- s ) bad-char-table>> at dup 1 ? + ; inline
 
-: do-shift ( pos i c bm -- newpos )
-    [ gs-shift ] [ bc-shift ] bi-curry 2bi max + ; inline
+: do-shift ( pos i c boyer-moore -- newpos )
+    [ good-suffix-shift ] [ bad-char-shift ] bi-curry 2bi max + ; inline
 
 : match? ( i1 s1 i2 s2 -- ? ) [ nth-unsafe ] 2bi@ = ; inline
 
@@ -48,23 +48,23 @@ TUPLE: boyer-moore pattern bc-table gs-table ;
     len 1 - [ [ pos + s1 ] keep s2 match? not ]
     find-last-integer ; inline
 
-:: (search-from) ( seq from bm -- i/f )
-    bm pattern>>      :> pat
-    pat length        :> plen
-    seq length plen - :> lim
+:: (search-from) ( seq from boyer-moore -- i/f )
+    boyer-moore pattern>> :> pat
+    pat length            :> plen
+    seq length plen -     :> lim
     from
     [
         dup lim <=
         [
             seq pat pick plen mismatch?
-            [ 2dup + seq nth-unsafe bm do-shift t ] [ f ] if*
+            [ 2dup + seq nth-unsafe boyer-moore do-shift t ] [ f ] if*
         ] [ drop f f ] if
     ] loop ; inline
 
 PRIVATE>
 
-: <boyer-moore> ( pat -- bm )
-    dup <reversed> [ <bc-table> ] [ <gs-table> ] bi
+: <boyer-moore> ( pattern -- boyer-moore )
+    dup <reversed> [ <bad-char-table> ] [ <good-suffix-table> ] bi
     boyer-moore boa ;
 
 GENERIC: search-from ( seq from obj -- i/f )

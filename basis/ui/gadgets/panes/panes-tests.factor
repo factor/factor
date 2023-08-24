@@ -2,7 +2,7 @@ USING: accessors colors fonts fry help help.markup help.stylesheet
 help.syntax help.topics inspector io io.streams.string io.styles
 kernel literals math models namespaces prettyprint see sequences
 tools.test ui.gadgets ui.gadgets.debug ui.gadgets.panes
-ui.gadgets.panes.private ;
+ui.gadgets.panes.private ui.theme ;
 IN: ui.gadgets.panes.tests
 
 : #children ( -- n ) "pane" get children>> length ;
@@ -130,25 +130,11 @@ ARTICLE: "test-article-2" "This is a test article"
 ${
     ""
     T{ font
-       { name $[ default-sans-serif-font-name ] }
-       { size $[ default-font-size ] }
-       { foreground
-         T{ rgba
-            { red 0.0 }
-            { green 0.0 }
-            { blue 0.0 }
-            { alpha 1.0 }
-         }
-       }
-       { background
-         T{ rgba
-            { red 1.0 }
-            { green 1.0 }
-            { blue 1.0 }
-            { alpha 1.0 }
-         }
-       }
+        { name $[ default-sans-serif-font-name ] }
+        { size $[ default-font-size ] }
+        { foreground $[ text-color ] }
+        { background $[ content-background ] }
     }
 } [
-    <pane> current>> smash-line [ text>> ] [ font>> ] bi
+    <pane> dup current>> smash-line [ text>> ] [ font>> ] bi
 ] unit-test

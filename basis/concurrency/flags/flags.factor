@@ -1,6 +1,6 @@
 ! Copyright (C) 2008 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
-USING: dlists kernel threads concurrency.conditions accessors ;
+! See https://factorcode.org/license.txt for BSD license.
+USING: accessors concurrency.conditions dlists kernel ;
 IN: concurrency.flags
 
 TUPLE: flag value threads ;

@@ -1,16 +1,16 @@
 ! Copyright (C) 2015 John Benediktsson
-! See http://factorcode.org/license.txt for BSD license
+! See https://factorcode.org/license.txt for BSD license
 
-USING: bit-arrays fry kernel kernel.private literals locals math
-math.functions math.private math.ranges math.statistics
-sequences sequences.private ;
+USING: bit-arrays kernel literals math math.functions
+math.private ranges math.statistics sequences
+sequences.private ;
 
 IN: math.primes.erato.fast
 
 <PRIVATE
 
 CONSTANT: wheel-2-3-5-7 $[
-    11 dup 210 + [a,b] [
+    11 dup 210 + [a..b] [
         { 2 3 5 7 } [ divisor? ] with none?
     ] B{ } filter-as differences
 ]

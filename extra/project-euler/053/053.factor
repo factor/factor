@@ -1,9 +1,9 @@
 ! Copyright (c) 2008 Aaron Schaefer.
-! See http://factorcode.org/license.txt for BSD license.
-USING: kernel math math.combinatorics math.ranges sequences project-euler.common ;
+! See https://factorcode.org/license.txt for BSD license.
+USING: kernel math math.combinatorics ranges sequences project-euler.common ;
 IN: project-euler.053
 
-! http://projecteuler.net/index.php?section=problems&id=53
+! https://projecteuler.net/index.php?section=problems&id=53
 
 ! DESCRIPTION
 ! -----------
@@ -27,7 +27,7 @@ IN: project-euler.053
 ! --------
 
 : euler053 ( -- answer )
-    23 100 [a,b] [ dup <iota> [ nCk 1000000 > ] with count ] map-sum ;
+    23 100 [a..b] [ dup <iota> [ nCk 1000000 > ] with count ] map-sum ;
 
 ! [ euler053 ] 100 ave-time
 ! 52 ms ave run time - 4.44 SD (100 trials)

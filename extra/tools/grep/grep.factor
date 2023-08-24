@@ -21,7 +21,7 @@ IN: tools.grep
     command-line get [
         grep-usage
     ] [
-        unclip ".*" dup surround <regexp> swap [
+        unclip ".*" 1surround <regexp> swap [
             grep-lines
         ] [
             [ grep-file ] with each

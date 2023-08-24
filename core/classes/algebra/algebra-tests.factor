@@ -354,7 +354,7 @@ TUPLE: xh < xb ;
 
 { t } [ { xa xb xc xd xe xf xg xh } sort-classes dup sort-classes = ] unit-test
 
-{ H{ { word word } } } [
+{ { word } } [
     generic-class flatten-class
 ] unit-test
 

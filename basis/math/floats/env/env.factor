@@ -1,9 +1,7 @@
 ! Copyright (C) 2009 Joe Groff.
-! See http://factorcode.org/license.txt for BSD license.
-USING: alien.syntax arrays assocs biassocs combinators
-combinators.short-circuit continuations generalizations kernel
-literals locals math math.bitwise sequences sets system
-vocabs ;
+! See https://factorcode.org/license.txt for BSD license.
+USING: arrays assocs combinators continuations generalizations
+kernel math math.bitwise sequences sets system vocabs ;
 IN: math.floats.env
 
 SINGLETONS:
@@ -134,14 +132,14 @@ PRIVATE>
 :: with-denormal-mode ( mode quot -- )
     denormal-mode :> orig
     mode set-denormal-mode
-    quot [ orig set-denormal-mode ] [ ] cleanup ; inline
+    quot [ orig set-denormal-mode ] finally ; inline
 
 : rounding-mode ( -- mode ) fp-env-register (get-rounding-mode) ;
 
 :: with-rounding-mode ( mode quot -- )
     rounding-mode :> orig
     mode set-rounding-mode
-    quot [ orig set-rounding-mode ] [ ] cleanup ; inline
+    quot [ orig set-rounding-mode ] finally ; inline
 
 : fp-traps ( -- exceptions )
     (fp-env-registers) [ (get-fp-traps) ] [ union ] map-reduce >array ; inline
@@ -150,7 +148,7 @@ PRIVATE>
     clear-fp-exception-flags
     fp-traps :> orig
     exceptions set-fp-traps
-    quot [ orig set-fp-traps ] [ ] cleanup ; inline
+    quot [ orig set-fp-traps ] finally ; inline
 
 : without-fp-traps ( quot -- )
     { } swap with-fp-traps ; inline

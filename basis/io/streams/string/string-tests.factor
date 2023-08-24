@@ -1,7 +1,7 @@
 USING: io.streams.string io kernel arrays namespaces make
 tools.test ;
 
-{ "" } [ "" [ contents ] with-string-reader ] unit-test
+{ "" } [ "" [ read-contents ] with-string-reader ] unit-test
 
 { "line 1" CHAR: l }
 [
@@ -10,11 +10,11 @@ tools.test ;
 unit-test
 
 { { "line 1" "line 2" "line 3" } } [
-    "line 1\nline 2\nline 3" [ lines ] with-string-reader
+    "line 1\nline 2\nline 3" [ read-lines ] with-string-reader
 ] unit-test
 
 { { "" "foo" "bar" "baz" } } [
-    "\rfoo\r\nbar\rbaz\n" [ lines ] with-string-reader
+    "\rfoo\r\nbar\rbaz\n" [ read-lines ] with-string-reader
 ] unit-test
 
 { f } [ "" [ readln ] with-string-reader ] unit-test

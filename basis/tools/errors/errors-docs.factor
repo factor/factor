@@ -5,7 +5,7 @@ compiler.errors classes strings ;
 ARTICLE: "compiler-errors" "Compiler errors"
 "After loading a vocabulary, you might see a message like:"
 { $code
-    ":errors - print 2 compiler errors"
+    ":errors - show 2 compiler errors"
 }
 "This indicates that some words did not pass the stack checker. Stack checker error conditions are documented in " { $link "inference-errors" } ", and the stack checker itself in " { $link "inference" } "."
 $nl

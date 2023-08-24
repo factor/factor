@@ -1,6 +1,6 @@
 ! Copyright (C) 2008 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
-USING: accessors kernel locals models sequences ;
+! See https://factorcode.org/license.txt for BSD license.
+USING: accessors kernel models sequences ;
 IN: models.history
 
 TUPLE: history < model back forward ;

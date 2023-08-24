@@ -1,7 +1,7 @@
-;;; fuel-scaffold.el -- interaction with tools.scaffold
+;;; fuel-scaffold.el -- interaction with tools.scaffold -*- lexical-binding: t -*-
 
 ;; Copyright (C) 2009 Jose Antonio Ortega Ruiz
-;; See http://factorcode.org/license.txt for BSD license.
+;; See https://factorcode.org/license.txt for BSD license.
 
 ;; Author: Jose Antonio Ortega Ruiz <jao@gnu.org>
 ;; Keywords: languages, fuel, factor
@@ -37,10 +37,10 @@
                            (file-name-directory file)))))
 
 (defun fuel-mode--in-docs (&optional file)
-  (fuel-mode--code-file "docs"))
+  (fuel-mode--code-file "docs" file))
 
 (defun fuel-mode--in-tests (&optional file)
-  (fuel-mode--code-file "tests"))
+  (fuel-mode--code-file "tests" file))
 
 (defun fuel-scaffold--vocab-roots ()
   (let ((cmd '(:fuel* (vocab-roots get)
@@ -66,7 +66,7 @@
 
 (defconst fuel-scaffold--tests-header-format
   "! Copyright (C) %s %s
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: %s tools.test ;
 IN: %s
 ")

@@ -1,9 +1,8 @@
 ! Copyright (C) 2008, 2010 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
-USING: kernel sequences namespaces words assocs logging sorting
-prettyprint io io.styles io.files io.encodings.utf8
-strings combinators accessors arrays math
-logging.server logging.parser calendar.format ;
+! See https://factorcode.org/license.txt for BSD license.
+USING: accessors arrays assocs io io.styles kernel logging
+logging.parser math namespaces prettyprint sequences sorting
+splitting ;
 IN: logging.analysis
 
 SYMBOL: word-names
@@ -21,7 +20,7 @@ SYMBOL: message-histogram
     drop ;
 
 : recent-histogram ( assoc n -- alist )
-    [ sort-values <reversed> ] dip short head ;
+    [ sort-values <reversed> ] dip index-or-length head ;
 
 : analyze-entries ( entries word-names -- errors word-histogram message-histogram )
     [
@@ -57,7 +56,7 @@ SYMBOL: message-histogram
     [
         [ first name>> write bl ]
         [ second write ": " write ]
-        [ third "\n" join write ]
+        [ third join-lines write ]
         tri
     ] histogram.
     nl nl

@@ -1,4 +1,5 @@
-USING: alien byte-arrays help.markup help.syntax math math.blas.vectors sequences strings ;
+USING: help.markup help.syntax math math.blas.vectors sequences
+strings ;
 IN: math.blas.matrices
 
 ARTICLE: "math.blas-summary" "Basic Linear Algebra Subroutines (BLAS) interface"

@@ -1,9 +1,9 @@
 ! Copyright (C) 2009 Maxim Savchenko
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 
 USING: kernel accessors sequences sequences.private destructors math namespaces
-       locals openssl openssl.libcrypto byte-arrays bit-arrays.private
-       alien.c-types alien.destructors alien.data ;
+    openssl openssl.libcrypto byte-arrays bit-arrays.private
+    alien.c-types alien.destructors alien.data ;
 
 IN: ecdsa
 
@@ -19,7 +19,7 @@ M: ec-key dispose
     EC_KEY_new_by_curve_name dup ssl-error ec-key boa ;
 
 : ec-key-handle ( -- handle )
-    ec-key get dup handle>> [ ] [ already-disposed ] ?if ;
+    ec-key get [ handle>> ] [ already-disposed ] ?unless ;
 
 DESTRUCTOR: BN_clear_free
 

@@ -1,5 +1,5 @@
 ! Copyright (C) 2006, 2007 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 
 USING: kernel accessors ui.gadgets ui.gestures namespaces ;
 

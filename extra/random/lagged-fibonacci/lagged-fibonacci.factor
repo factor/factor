@@ -1,8 +1,7 @@
 ! Copyright (C) 2009 Doug Coleman.
-! See http://factorcode.org/license.txt for BSD license.
-USING: accessors alien.c-types alien.data fry kernel literals
-locals math random sequences specialized-arrays namespaces
-sequences.private ;
+! See https://factorcode.org/license.txt for BSD license.
+USING: accessors alien.c-types alien.data kernel math namespaces
+random sequences sequences.private specialized-arrays ;
 SPECIALIZED-ARRAY: double
 IN: random.lagged-fibonacci
 

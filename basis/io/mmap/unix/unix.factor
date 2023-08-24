@@ -1,8 +1,7 @@
 ! Copyright (C) 2007 Doug Coleman.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors destructors io.backend.unix io.mmap
-io.mmap.private kernel libc literals locals system unix
-unix.ffi ;
+io.mmap.private kernel libc literals system unix unix.ffi ;
 IN: io.mmap.unix
 
 :: mmap-open ( path length prot flags open-mode -- alien fd )
@@ -22,6 +21,6 @@ M: unix (mapped-file-reader)
     flags{ MAP_FILE MAP_SHARED }
     O_RDONLY mmap-open ;
 
-M: unix close-mapped-file ( mmap -- )
+M: unix close-mapped-file
     [ [ address>> ] [ length>> ] bi munmap io-error ]
     [ handle>> close-file ] bi ;

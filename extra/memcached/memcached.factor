@@ -1,9 +1,9 @@
 ! Copyright (C) 2010 John Benediktsson
-! See http://factorcode.org/license.txt for BSD license
+! See https://factorcode.org/license.txt for BSD license
 
-USING: accessors arrays assocs byte-arrays combinators fry
-io io.encodings.binary io.sockets kernel make math math.parser
-namespaces pack random sequences strings ;
+USING: accessors arrays assocs byte-arrays combinators io
+io.encodings.binary io.sockets kernel math namespaces pack
+random sequences strings ;
 
 IN: memcached
 

@@ -1,8 +1,7 @@
 ! Copyright (C) 2008 Matthew Willis.
-! See http://factorcode.org/license.txt for BSD license.
-USING: sequences math kernel byte-arrays cairo.ffi cairo
-io.backend ui.gadgets accessors opengl.gl arrays fry
-classes ui.render namespaces destructors libc ;
+! See https://factorcode.org/license.txt for BSD license.
+USING: accessors cairo cairo.ffi destructors kernel libc math
+namespaces opengl.gl sequences ui.gadgets ui.render ;
 IN: cairo-gadgets
 
 SYMBOL: current-cairo

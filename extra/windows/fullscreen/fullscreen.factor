@@ -1,10 +1,10 @@
 ! Copyright (C) 2010 Doug Coleman.
-! See http://factorcode.org/license.txt for BSD license.
-USING: accessors alien.c-types arrays classes.struct fry kernel
-literals locals make math math.bitwise multiline sequences
-slots.syntax ui.backend.windows vocabs.loader windows.errors
-windows.gdi32 windows.kernel32 windows.types windows.user32
-ui.gadgets.worlds ;
+! See https://factorcode.org/license.txt for BSD license.
+USING: accessors alien.c-types alien.data classes.struct
+endian kernel literals make math math.bitwise
+sequences slots.syntax ui.backend.windows ui.gadgets.worlds
+windows.errors windows.gdi32 windows.shcore windows.types
+windows.user32 ;
 IN: windows.fullscreen
 
 : hwnd>hmonitor ( HWND -- HMONITOR )
@@ -14,7 +14,7 @@ IN: windows.fullscreen
     GetDesktopWindow hwnd>hmonitor ;
 
 :: (monitor-info>devmodes) ( monitor-info n -- )
-    DEVMODE <struct>
+    DEVMODE new
         DEVMODE heap-size >>dmSize
         flags{ DM_BITSPERPEL DM_PELSWIDTH DM_PELSHEIGHT } >>dmFields
     :> devmode
@@ -31,7 +31,7 @@ IN: windows.fullscreen
     [ 0 (monitor-info>devmodes) ] { } make ;
 
 : hmonitor>monitor-info ( HMONITOR -- monitor-info )
-    MONITORINFOEX <struct>
+    MONITORINFOEX new
         MONITORINFOEX heap-size >>cbSize
     [ GetMonitorInfo win32-error=0/f ] keep ;
 
@@ -48,7 +48,7 @@ IN: windows.fullscreen
     desktop-hmonitor hmonitor>monitor-info ;
 
 : desktop-RECT ( -- RECT )
-    GetDesktopWindow RECT <struct> [ GetWindowRect win32-error=0/f ] keep ;
+    GetDesktopWindow RECT new [ GetWindowRect win32-error=0/f ] keep ;
 
 ERROR: display-change-error n ;
 
@@ -140,3 +140,7 @@ ERROR: unsupported-resolution triple ;
 
 : set-fullscreen ( gadget triple fullscreen? -- )
     [ find-world ] 2dip (set-fullscreen) ;
+
+: get-desktop-scale-factor ( -- n )
+    desktop-hmonitor 0 DEVICE_SCALE_FACTOR <ref>
+    [ GetScaleFactorForMonitor win32-error=0/f ] keep le> ;

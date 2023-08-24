@@ -1,10 +1,10 @@
 ! Copyright (C) 2006 Chris Double.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 !
-! Space Invaders: http://www.emuparadise.me/M.A.M.E._-_Multiple_Arcade_Machine_Emulator_ROMs/Space_Invaders_--_Space_Invaders_M/13774
+! Space Invaders: https://www.emuparadise.me/M.A.M.E._-_Multiple_Arcade_Machine_Emulator_ROMs/Space_Invaders_--_Space_Invaders_M/13774
 USING: accessors alien.c-types alien.data arrays
 combinators cpu.8080 cpu.8080.emulator io.pathnames kernel
-locals math math.order openal openal.alut opengl.gl sequences
+math math.order openal openal.alut opengl.gl sequences
 specialized-arrays ui ui.gadgets ui.gestures ui.render ;
 QUALIFIED: threads
 QUALIFIED: system
@@ -48,7 +48,7 @@ CONSTANT: SOUND-WALK3        6
 CONSTANT: SOUND-WALK4        7
 CONSTANT: SOUND-UFO-HIT      8
 
-: init-sound ( index cpu filename  -- )
+: init-sound ( index cpu filename -- )
     absolute-path swapd [ sounds>> nth AL_BUFFER ] dip
     create-buffer-from-wav set-source-param ;
 
@@ -224,7 +224,7 @@ M: space-invaders reset
 : coin-down ( cpu -- )
     [ 1 bitor ] change-port1 drop ;
 
-: coin-up ( cpu --  )
+: coin-up ( cpu -- )
     [ 255 1 - bitand ] change-port1 drop ;
 
 : player1-down ( cpu -- )

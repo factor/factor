@@ -1,5 +1,5 @@
 ! Copyright (C) 2005 Chris Double. All Rights Reserved.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: channels kernel sequences sorting threads tools.test ;
 
 { V{ 10 } } [
@@ -24,7 +24,7 @@ USING: channels kernel sequences sorting threads tools.test ;
     2 over to
     1 over to
     3 swap to
-    natural-sort
+    sort
 ] unit-test
 
 { { 1 2 4 9 } } [
@@ -37,5 +37,5 @@ USING: channels kernel sequences sorting threads tools.test ;
     2dup from swap push
     2dup from swap push
     dupd from swap push
-    natural-sort
+    sort
 ] unit-test

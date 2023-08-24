@@ -1,8 +1,8 @@
 ! Copyright (C) 2010 Joe Groff.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors alien alien.c-types alien.data alien.destructors
 alien.enums continuations cuda cuda.contexts cuda.ffi
-cuda.gl.ffi destructors fry gpu.buffers kernel ;
+cuda.gl.ffi destructors gpu.buffers kernel ;
 IN: cuda.gl
 
 : create-gl-cuda-context ( device flags -- context )
@@ -39,7 +39,7 @@ DESTRUCTOR: unmap-resource
 DESTRUCTOR: free-resource
 
 : with-mapped-resource ( ..a resource quot: ( ..a device-ptr size -- ..b ) -- ..b )
-    over [ map-resource ] 2dip '[ _ unmap-resource ] [ ] cleanup ; inline
+    over [ map-resource ] 2dip '[ _ unmap-resource ] finally ; inline
 
 TUPLE: cuda-buffer
     { buffer buffer }

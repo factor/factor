@@ -1,14 +1,15 @@
 ! Copyright (C) 2004, 2011 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors alien alien.strings arrays assocs classes
-classes.builtin classes.mixin classes.tuple classes.tuple.parser
-combinators combinators.short-circuit compiler.errors compiler.units
-continuations definitions destructors effects.parser fry generic
-generic.math generic.parser generic.single grouping io io.encodings
-io.styles kernel kernel.private lexer libc make math math.order
-math.parser math.ratios namespaces parser prettyprint sequences
-sequences.private slots source-files.errors strings strings.parser
-summary system vocabs vocabs.loader vocabs.parser words ;
+classes.builtin classes.tuple classes.tuple.parser combinators
+combinators.short-circuit compiler.errors compiler.units
+continuations definitions destructors effects.parser fixups
+generic generic.math generic.parser generic.single grouping io
+io.encodings io.styles kernel kernel.private lexer libc make
+math math.order math.parser math.ratios namespaces parser
+prettyprint sequences sequences.private slots
+source-files.errors strings strings.parser summary system vocabs
+vocabs.loader vocabs.parser words ;
 IN: debugger
 
 GENERIC: error-help ( error -- topic )
@@ -41,7 +42,9 @@ M: string error. print ;
     error-continuation get name>> assoc-stack ;
 
 : :res ( n -- * )
-    1 - restarts [ nth f ] change-global continue-restart ;
+    1 - restarts [ nth f ] change-global
+    [ dup no-op-restart = [ drop f ] when ] change-obj
+    continue-restart ;
 
 : :1 ( -- * ) 1 :res ;
 : :2 ( -- * ) 2 :res ;
@@ -116,7 +119,7 @@ HOOK: signal-error. os ( obj -- )
     third symbol>string
     [ "Symbol: " write print ]
     [ "DlError: " write find-ffi-error print ] bi
-    "See http://concatenative.org/wiki/view/Factor/Requirements" print ;
+    "See https://concatenative.org/wiki/view/Factor/Requirements" print ;
 
 : stack-underflow. ( obj name -- )
     write " stack underflow" print drop ;
@@ -199,7 +202,7 @@ M: bad-slot-value summary drop "Bad store to specialized slot" ;
 
 M: bad-slot-name summary drop "Bad slot name in object literal" ;
 
-M: bad-vocab-name summary drop "Vocab name cannot contain \":/\\ \"" ;
+M: bad-vocab-name summary drop "Vocab name cannot contain ':/\\ \"'" ;
 
 M: no-math-method summary
     drop "No suitable arithmetic method" ;
@@ -212,9 +215,6 @@ M: inconsistent-next-method summary
 
 M: check-method-error summary
     drop "Invalid parameters for create-method" ;
-
-M: not-a-tuple summary
-    drop "Not a tuple" ;
 
 M: bad-superclass summary
     drop "Tuple classes can only inherit from non-final tuple classes" ;
@@ -351,7 +351,7 @@ M: lexer-error summary
     error>> summary ;
 
 M: lexer-error compute-restarts
-    error>> compute-restarts ;
+    [ error-continuation get swap compute-fixups ] [ error>> compute-restarts ] bi append ;
 
 M: lexer-error error-help
     error>> error-help ;
@@ -370,8 +370,6 @@ M: bad-escape error.
 
 M: bad-literal-tuple summary drop "Bad literal tuple" ;
 
-M: not-a-mixin-class summary drop "Not a mixin class" ;
-
 M: not-found-in-roots summary
     path>> "Cannot resolve vocab: " prepend ;
 
@@ -383,3 +381,5 @@ M: callsite-not-compiled summary
     drop "Caller not compiled with the optimizing compiler" ;
 
 { "threads" "debugger" } "debugger.threads" require-when
+
+os unix? [ "debugger.unix" require ] when

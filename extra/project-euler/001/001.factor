@@ -1,10 +1,10 @@
 ! Copyright (c) 2007-2009 Aaron Schaefer, Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
-USING: kernel math math.functions math.ranges project-euler.common sequences
+! See https://factorcode.org/license.txt for BSD license.
+USING: kernel math math.functions ranges project-euler.common sequences
     sets ;
 IN: project-euler.001
 
-! http://projecteuler.net/index.php?section=problems&id=1
+! https://projecteuler.net/index.php?section=problems&id=1
 
 ! DESCRIPTION
 ! -----------

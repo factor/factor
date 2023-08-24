@@ -29,21 +29,21 @@ HELP: global-loc>local
 
 HELP: height-state
 { $description "A tuple which keeps track of the stacks heights and increments of a " { $link basic-block } " during local analysis. The idea is that if the stack change instructions are tracked, then multiple changes can be folded into one. It has the following slots:"
-  { $table
+  { $slots
     {
-        { $slot "ds-begin" }
+        "ds-begin"
         "Datastack height at the beginning of the block."
     }
     {
-        { $slot "rs-begin" }
+        "rs-begin"
         "Retainstack height at the beginning of the block."
     }
     {
-        { $slot "ds-inc" }
+        "ds-inc"
         "Datastack change during the block."
     }
     {
-        { $slot "rs-inc" }
+        "rs-inc"
         "Retainstack change during the block."
     }
   }
@@ -103,10 +103,10 @@ HELP: replaces
 
 ARTICLE: "compiler.cfg.stacks.local" "Local stack analysis"
 "For each " { $link basic-block } " in the " { $link cfg } ", local stack analysis is performed. The analysis is started right after the block is created with " { $link begin-local-analysis } " and finished with " { $link end-local-analysis } ", when the construction of the block is complete. During the analysis, three sets containing stack locations are built:"
-{ $list
-  { { $slot "peeks" } " all stack locations that the block reads before writing" }
-  { { $slot "replaces" } " all stack locations that the block writes" }
-  { { $slot "kills" } " all stack locations which become unavailable after the block ends because of the stack height being decremented. For example, if the block contains " { $link drop } ", then D: 0 will be contained in kills because that stack location will not be live anymore." }
+{ $slots
+  { "peeks" { " all stack locations that the block reads before writing" } }
+  { "replaces" { " all stack locations that the block writes" } }
+  { "kills" { " all stack locations which become unavailable after the block ends because of the stack height being decremented. For example, if the block contains " { $link drop } ", then D: 0 will be contained in kills because that stack location will not be live anymore." } }
 }
 "This is done while constructing the CFG. These sets are then used by the " { $link end-stack-analysis } " word to emit optimal sequences of " { $link ##peek } " and " { $link ##replace } " instructions to the cfg."
 $nl

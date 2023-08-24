@@ -1,0 +1,1 @@
+Smultron editor integration

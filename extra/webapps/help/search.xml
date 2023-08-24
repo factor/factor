@@ -1,73 +1,73 @@
 <?xml version='1.0' ?>
-<!DOCTYPE html>
+
 <t:chloe xmlns:t="http://factorcode.org/chloe/1.0">
 
-<html xmlns="http://www.w3.org/1999/xhtml">
-    <head>
+    <t:title>Search - Factor Documentation</t:title>
+    <t:style t:include="resource:extra/webapps/help/search.css" />
+    <t:script t:include="resource:extra/webapps/help/search.js" />
 
-        <t:base t:href="$help-webapp/content/" />
-        <title>Search - Factor Documentation</title>
-        <style>
-            a:link { text-decoration: none; color: #104e8b; }
-            a:visited { text-decoration: none; color: #104e8b; }
-            a:active { text-decoration: none; color: #104e8b; }
-            a:hover { text-decoration: underline; color: #104e8b; }
+    <t:html t:name="nav"/>
 
-            body {
-                font-family: sans-serif; font-style: normal
-                font-size: 12pt;
-            }
+    <div class="page">
 
-            .navbar {
-                background-color: #f3f2ea;
-                padding: 5px;
-                border: 1px solid #ccc;
-                font: 9pt sans-serif;
-                margin-bottom: 10px;
-            }
+    <p><b>Search results for '<t:label t:name="search" />'</b></p>
 
-            h2 { background-color: #f5f5f5; color: #222; }
-            hr { border: 0; background-color: #ccc; color: #ccc; height: 1px; }
-        </style>
-    </head>
+    <div class="tabs">
 
-    <body>
-		<t:html t:name="navbar"/>
+    <t:if t:value="words">
+    <input class="radiotab" name="tabs" tabindex="1" type="radio" id="words" checked="checked" />
+    <label class="label" for="words">Words</label>
+    <div class="panel" tabindex="1">
+        <ul>
+            <t:each t:name="words">
+                <li> <t:link t:name="value" /> </li>
+            </t:each>
+        </ul>
+    </div>
+    </t:if>
 
-        <t:if t:value="articles">
-            <h2>Articles</h2>
-            <ul>
-                <t:each t:name="articles">
-                    <li> <t:link t:name="value" /> </li>
-                </t:each>
-            </ul>
-        </t:if>
+    <t:if t:value="vocabs">
+    <input class="radiotab" name="tabs" tabindex="1" type="radio" id="vocabs" />
+    <label class="label" for="vocabs">Vocabularies</label>
+    <div class="panel" tabindex="1">
+        <ul>
+            <t:each t:name="vocabs">
+                <li> <t:link t:name="value" /> </li>
+            </t:each>
+        </ul>
+    </div>
+    </t:if>
 
-        <t:if t:value="vocabs">
-            <h2>Vocabularies</h2>
-            <ul>
-                <t:each t:name="vocabs">
-                    <li> <t:link t:name="value" /> </li>
-                </t:each>
-            </ul>
-        </t:if>
+    <t:if t:value="articles">
+    <input class="radiotab" name="tabs" tabindex="1" type="radio" id="articles" />
+    <label class="label" for="articles">Articles</label>
+    <div class="panel" tabindex="1">
+        <ul>
+            <t:each t:name="articles">
+                <li> <t:link t:name="value" /> </li>
+            </t:each>
+        </ul>
+    </div>
+    </t:if>
 
-        <t:if t:value="words">
-            <h2>Words</h2>
-            <ul>
-                <t:each t:name="words">
-                    <li> <t:link t:name="value" /> </li>
-                </t:each>
-            </ul>
-        </t:if>
+    <t:if t:value="empty">
+    <p>No results found!</p>
+    </t:if>
 
-        <hr />
-        <p>This is the <a href="http://factorcode.org" target="_top">Factor</a>
-        documentation, generated offline from a
-        <code>load-all</code> image. If you want, you can also browse the
-        documentation from within the <a href="http://factorcode.org" target="_top">Factor</a> UI.</p>
+    </div>
 
-    </body>
-</html>
+    <br />
+    <footer>
+    <p>
+    This documentation was generated offline from a
+    <code>load-all</code> image.  If you want, you can also
+    browse the documentation from within the <a
+    href="article-ui-tools.html">UI developer tools</a>. See
+    the <a href="https://factorcode.org">Factor website</a>
+    for more information.
+    </p>
+    </footer>
+
+    </div>
 
 </t:chloe>

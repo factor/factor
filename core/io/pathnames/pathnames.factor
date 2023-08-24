@@ -1,7 +1,7 @@
 ! Copyright (C) 2004, 2009 Slava Pestov, Doug Coleman.
-! See http://factorcode.org/license.txt for BSD license.
-USING: accessors combinators io.backend kernel math math.order
-namespaces sequences splitting strings system ;
+! See https://factorcode.org/license.txt for BSD license.
+USING: accessors assocs combinators io.backend kernel math
+math.order namespaces sequences splitting strings system ;
 IN: io.pathnames
 
 SYMBOL: current-directory
@@ -17,11 +17,11 @@ SYMBOL: current-directory
     [ path-separator? ] trim-head ;
 
 : last-path-separator ( path -- n ? )
-    [ length 1 - ] keep [ path-separator? ] find-last-from ;
+    index-of-last [ path-separator? ] find-last-from ;
 
 HOOK: root-directory? io-backend ( path -- ? )
 
-M: object root-directory? ( path -- ? )
+M: object root-directory?
     [ f ] [ [ path-separator? ] all? ] if-empty ;
 
 ERROR: no-parent-directory path ;
@@ -61,13 +61,13 @@ ERROR: no-parent-directory path ;
         [ nip ]
     } cond ;
 
-: windows-absolute-path? ( path -- path ? )
+: windows-absolute-path? ( path -- ? )
     {
         { [ dup "\\\\?\\" head? ] [ t ] }
         { [ dup length 2 < ] [ f ] }
         { [ dup second CHAR: : = ] [ t ] }
         [ f ]
-    } cond ;
+    } cond nip ;
 
 : special-path? ( path -- rest ? )
     {
@@ -78,20 +78,31 @@ ERROR: no-parent-directory path ;
 
 PRIVATE>
 
+TUPLE: pathname string ;
+
+C: <pathname> pathname
+
+: >pathname ( obj -- pathname )
+    dup pathname? [ <pathname> ] unless ;
+
+: pathname> ( pathname -- obj )
+    dup pathname? [ string>> ] when ;
+
 : absolute-path? ( path -- ? )
     {
-        { [ dup empty? ] [ f ] }
-        { [ dup special-path? nip ] [ t ] }
+        { [ dup empty? ] [ drop f ] }
+        { [ dup special-path? nip ] [ drop t ] }
         { [ os windows? ] [ windows-absolute-path? ] }
-        { [ dup first path-separator? ] [ t ] }
-        [ f ]
-    } cond nip ;
+        { [ dup first path-separator? ] [ drop t ] }
+        [ drop f ]
+    } cond ;
 
 : append-relative-path ( path1 path2 -- path )
     [ trim-tail-separators ]
     [ trim-head-separators ] bi* "/" glue ;
 
 : append-path ( path1 path2 -- path )
+    [ pathname> ] bi@
     {
         { [ over empty? ] [ append-path-empty ] }
         { [ dup empty? ] [ drop ] }
@@ -128,6 +139,11 @@ PRIVATE>
 : file-extension ( path -- extension )
     file-name "." split1-last nip ;
 
+: has-file-extension? ( path -- ? )
+    dup ?last path-separator?
+    [ drop f ]
+    [ file-name CHAR: . swap member? ] if ;
+
 : path-components ( path -- seq )
     normalize-path path-separator split harvest ;
 
@@ -142,28 +158,21 @@ HOOK: home io-backend ( -- dir )
 
 M: object home "" resource-path ;
 
+: home-path ( path -- newpath ) home prepend-path ;
+
 GENERIC: vocab-path ( path -- newpath )
 
 GENERIC: absolute-path ( path -- path' )
 
 M: string absolute-path
-    "resource:" ?head [
-        trim-head-separators resource-path
-        absolute-path
-    ] [
-        "vocab:" ?head [
-            trim-head-separators vocab-path
-            absolute-path
-        ] [
-            "~" ?head [
-                trim-head-separators home prepend-path
-                absolute-path
-        ] [
-            current-directory get prepend-path
-        ] if ] if
-    ] if ;
+    {
+        { [ "resource:" ?head ] [ trim-head-separators resource-path absolute-path ] }
+        { [ "vocab:" ?head ] [ trim-head-separators vocab-path absolute-path ] }
+        { [ "~" ?head ] [ trim-head-separators home prepend-path absolute-path ] }
+        [ current-directory get prepend-path ]
+    } cond ;
 
-M: object normalize-path ( path -- path' )
+M: object normalize-path
     absolute-path ;
 
 : root-path* ( path -- path' )
@@ -213,9 +222,15 @@ HOOK: canonicalize-path io-backend ( path -- path' )
 
 M: object canonicalize-path canonicalize-path* ;
 
-TUPLE: pathname string ;
+HOOK: canonicalize-drive io-backend ( path -- path' )
 
-C: <pathname> pathname
+M: object canonicalize-drive ;
+
+HOOK: canonicalize-path-full io-backend ( path -- path' )
+
+M: object canonicalize-path-full canonicalize-path canonicalize-drive ;
+
+: >windows-path ( path -- path' ) H{ { CHAR: / CHAR: \\ } } substitute ;
 
 M: pathname absolute-path string>> absolute-path ;
 

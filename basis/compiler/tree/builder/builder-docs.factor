@@ -1,5 +1,5 @@
-USING: compiler.tree help.markup help.syntax literals quotations sequences
-stack-checker.errors words ;
+USING: compiler.tree help.markup help.syntax literals quotations
+sequences splitting stack-checker.errors words ;
 IN: compiler.tree.builder
 
 HELP: build-tree
@@ -23,7 +23,7 @@ HELP: build-sub-tree
             "    T{ #call { word * } { in-d V{ \"x\" 1 } } { out-d { 2 } } }"
             "    T{ #copy { in-d V{ 2 } } { out-d { \"y\" } } }"
             "}"
-        } "\n" join
+        } join-lines
     ]
   }
 } ;

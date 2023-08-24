@@ -277,7 +277,7 @@ HELP: if-zero
 
 HELP: when-zero
 { $values
-     { "n" number } { "quot" "the first quotation of an " { $link if-zero } } { "x" object } }
+    { "n" number } { "quot" "the first quotation of an " { $link if-zero } } { "x" object } }
 { $description "Makes an implicit check if the number is zero. A zero is dropped and the " { $snippet "quot" } " is called." }
 { $examples "This word is equivalent to " { $link if-zero } " with an empty second quotation:"
     { $example
@@ -294,7 +294,7 @@ HELP: when-zero
 
 HELP: unless-zero
 { $values
-     { "n" number } { "quot" "the second quotation of an " { $link if-zero } } }
+    { "n" number } { "quot" "the second quotation of an " { $link if-zero } } }
 { $description "Makes an implicit check if the number is zero. A zero is dropped. Otherwise, the " { $snippet "quot" } " is called on the number." }
 { $examples "This word is equivalent to " { $link if-zero } " with an empty first quotation:"
     { $example
@@ -309,10 +309,24 @@ HELP: unless-zero
     }
 } ;
 
+HELP: until-zero
+{ $values
+    { "n" number } { "quot" { $quotation ( ... x -- ... y ) } } }
+{ $description "Makes a check if the number is zero, and repeatedly calls " { $snippet "quot" } " until the value on the stack is zero." }
+{ $examples
+    { $example
+    "USING: kernel math prettyprint ;"
+    "15 [ dup . 2/ ] until-zero"
+    "15\n7\n3\n1"
+    }
+} ;
+
+{ if-zero when-zero unless-zero until-zero } related-words
+
 HELP: times
 { $values { "n" integer } { "quot" quotation } }
 { $description "Calls the quotation " { $snippet "n" } " times." }
-{ $notes "If you need to pass the current index to the quotation, use " { $link each } "." }
+{ $notes "If you need to pass the current index to the quotation, use " { $link each-integer } "." }
 { $examples
     { $example "USING: io math ;" "3 [ \"Hi\" print ] times" "Hi\nHi\nHi" }
 } ;
@@ -435,6 +449,11 @@ HELP: all-integers?
 { $description "Applies the quotation to each integer from 0 up to " { $snippet "n" } ", excluding " { $snippet "n" } ". Iteration stops when the quotation outputs " { $link f } " or the end is reached. If the quotation yields a false value for some integer, this word outputs " { $link f } ". Otherwise, this word outputs " { $link t } "." }
 { $notes "This word is used to implement " { $link all? } "." } ;
 
+HELP: find-integer-from
+{ $values { "i" integer } { "n" integer } { "quot" { $quotation ( ... i -- ... ? ) } } { "i/f" { $maybe integer } } }
+{ $description "Applies the quotation to each integer from " { $snippet "i" } " up to " { $snippet "n" } ", excluding " { $snippet "n" } ". Iteration stops when the quotation outputs a true value or the end is reached. If the quotation yields a true value for some integer, this word outputs that integer. Otherwise, this word outputs " { $link f } "." }
+{ $notes "This word is used to implement " { $link find-integer } " and " { $link find } "." } ;
+
 HELP: find-integer
 { $values { "n" integer } { "quot" { $quotation ( ... i -- ... ? ) } } { "i/f" { $maybe integer } } }
 { $description "Applies the quotation to each integer from 0 up to " { $snippet "n" } ", excluding " { $snippet "n" } ". Iteration stops when the quotation outputs a true value or the end is reached. If the quotation yields a true value for some integer, this word outputs that integer. Otherwise, this word outputs " { $link f } "." }
@@ -444,6 +463,48 @@ HELP: find-last-integer
 { $values { "n" integer } { "quot" { $quotation ( ... i -- ... ? ) } } { "i/f" { $maybe integer } } }
 { $description "Applies the quotation to each integer from " { $snippet "n" } " down to 0, inclusive. Iteration stops when the quotation outputs a true value or 0 is reached. If the quotation yields a true value for some integer, the word outputs that integer. Otherwise, the word outputs " { $link f } "." }
 { $notes "This word is used to implement " { $link find-last } "." } ;
+
+HELP: all-integers-from?
+{ $values
+    { "from" integer } { "to" integer } { "quot" quotation }
+    { "?" boolean }
+}
+{ $description "Applies the quotation to each integer in " { $snippet "[from..to)" } ", returning " { $link t } " if all results are true, " and { $link f } " otherwise." } ;
+
+HELP: each-integer-from
+{ $values
+    { "from" integer } { "to" integer } { "quot" quotation }
+}
+{ $description "Applies the quotation to each integer in " { $snippet "[from..to)" } " in order." } ;
+
+HELP: integer>fixnum
+{ $values
+    { "x" object }
+    { "y" object }
+}
+{ $description "Converts a general integer to a fixed-width integer." } ;
+
+HELP: integer>fixnum-strict
+{ $values
+    { "x" object }
+    { "y" object }
+}
+{ $description "Converts a general integer to a fixed-width integer." } ;
+
+HELP: neg?
+{ $values
+    { "x" object }
+    { "?" boolean }
+}
+{ $description "Pushes " { $link t } " if " { $snippet "x" } " is negative, else " { $link f } } ;
+
+HELP: simple-gcd
+{ $values
+    { "x" object } { "y" object }
+    { "d" object }
+}
+{ $description "Computes the GCD of two numbers." }
+{ $see-also gcd } ;
 
 ARTICLE: "division-by-zero" "Division by zero"
 "Behavior of division operations when a denominator of zero is used depends on the data types in question, as well as the platform being used."

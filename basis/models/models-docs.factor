@@ -4,12 +4,12 @@ IN: models
 
 HELP: model
 { $class-description "A mutable cell holding a single value. When the value is changed, a sequence of connected objects are notified. Models have the following slots:"
-    { $list
-        { { $slot "value" } " - the value of the model. Use " { $link set-model } " to change the value." }
-        { { $slot "connections" } " - a sequence of objects implementing the " { $link model-changed } " generic word, to be notified when the model's value changes." }
-        { { $slot "dependencies" } " - a sequence of models which should have this model added to their sequence of connections when activated." }
-        { { $slot "ref" } " - a reference count tracking the number of models which depend on this one." }
-        { { $slot "locked?" } " - a slot set by " { $link with-locked-model } " to ensure that the model doesn't get changed recursively" }
+    { $slots
+        { "value" { "the value of the model. Use " { $link set-model } " to change the value." } }
+        { "connections" { "a sequence of objects implementing the " { $link model-changed } " generic word, to be notified when the model's value changes." } }
+        { "dependencies" { "a sequence of models which should have this model added to their sequence of connections when activated." } }
+        { "ref" { "a reference count tracking the number of models which depend on this one." } }
+        { "locked?" { "a slot set by " { $link with-locked-model } " to ensure that the model doesn't get changed recursively" } }
     }
 "Other classes may inherit from " { $link model } "."
 } ;
@@ -45,6 +45,10 @@ HELP: deactivate-model
 { $values { "model" model } }
 { $description "Decrements the reference count of the model. If it reaches zero, this model is removed as a connection from all models registered as dependencies by " { $link add-dependency } "." }
 { $warning "Calls to " { $link activate-model } " and " { $link deactivate-model } " should be balanced to keep the reference counting consistent, otherwise " { $link model-changed } " might be called at the wrong time or not at all." } ;
+
+HELP: compute-model
+{ $values { "model" model } { "value" object } }
+{ $description "Activate and immediately deactivate the model, forcing recomputation of its value, which is returned. If the model is already activated, no dependencies are recalculated. Useful when using models outside of gadget context or for testing." } ;
 
 HELP: model-changed
 { $values { "model" model } { "observer" object } }

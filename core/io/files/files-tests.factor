@@ -1,5 +1,5 @@
 USING: alien alien.c-types alien.data arrays classes.struct
-compiler.units continuations destructors fry generic.single io
+compiler.units continuations destructors generic.single io
 io.backend io.directories io.encodings io.encodings.ascii
 io.encodings.binary io.encodings.latin1 io.encodings.string
 io.encodings.utf16 io.encodings.utf8 io.files io.files.private
@@ -160,7 +160,7 @@ CONSTANT: pt-array-1
 
     { } [ "test.txt" "test2.txt" move-file ] unit-test
 
-    { t } [ "test2.txt" exists? ] unit-test
+    { t } [ "test2.txt" file-exists? ] unit-test
 
     { } [ "test2.txt" delete-file ] unit-test
 ] with-test-directory
@@ -274,7 +274,7 @@ CONSTANT: pt-array-1
     [
         "resource:core" normalize-path
         [ cwd = ] [ cd ] [ cwd = ] tri
-    ] cwd '[ _ dup cd cwd = ] [ ] cleanup
+    ] cwd '[ _ dup cd cwd = ] finally
 ] unit-test
 
 { t } [

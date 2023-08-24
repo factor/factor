@@ -1,5 +1,5 @@
 ! Copyright (C) 2008, 2009 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors combinators concurrency.combinators destructors
 fry grouping io io.backend io.ports io.streams.duplex kernel
 math namespaces quotations sequences simple-tokenizer splitting
@@ -8,7 +8,7 @@ IN: io.pipes
 
 TUPLE: pipe in out ;
 
-M: pipe dispose ( pipe -- )
+M: pipe dispose
     [
         [ in>> &dispose drop ]
         [ out>> &dispose drop ] bi
@@ -42,7 +42,7 @@ M: callable run-pipeline-element
 
 GENERIC: <pipes> ( obj -- pipes )
 
-M: integer <pipes> ( n -- pipes )
+M: integer <pipes>
     [
         [ (pipe) |dispose ] replicate
         T{ pipe } [ prefix ] [ suffix ] bi

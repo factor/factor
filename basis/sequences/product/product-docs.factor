@@ -1,5 +1,5 @@
 ! Copyright (C) 2009 Joe Groff.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: assocs help.markup help.syntax quotations sequences ;
 IN: sequences.product
 
@@ -58,7 +58,12 @@ HELP: product-each
 { $description "Calls " { $snippet "quot" } " for every element of the cartesian product of " { $snippet "sequences" } "." }
 { $notes { $snippet "[ ... ] product-each" } " is equivalent to, but more efficient than, " { $snippet "<product-sequence> [ ... ] each" } "." } ;
 
-{ product-map product-each } related-words
+HELP: product-find
+{ $values { "sequences" sequence } { "quot" { $quotation ( ... seq -- ... ? ) } } { "sequence" sequence } }
+{ $description "Calls " { $snippet "quot" } " for every element of the cartesian product of " { $snippet "sequences" } ", returning the first sequence where the quotation returns a true value." }
+{ $notes { $snippet "[ ... ] product-find" } " is equivalent to, but more efficient than, " { $snippet "<product-sequence> [ ... ] find nip" } "." } ;
+
+{ product-map product-each product-find } related-words
 
 ARTICLE: "sequences.product" "Product sequences"
 "The " { $vocab-link "sequences.product" } " vocabulary provides a virtual sequence and combinators for manipulating the cartesian product of a set of sequences."
@@ -69,6 +74,7 @@ ARTICLE: "sequences.product" "Product sequences"
     product-map-as
     product-map>assoc
     product-each
+    product-find
 } ;
 
 ABOUT: "sequences.product"

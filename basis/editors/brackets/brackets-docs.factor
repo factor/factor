@@ -1,4 +1,4 @@
-USING: help.syntax help.markup ;
+USING: help.syntax ;
 IN: editors.brackets
 
 ARTICLE: "editors.brackets" "Adobe Brackets support"

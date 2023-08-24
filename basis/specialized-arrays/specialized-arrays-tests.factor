@@ -64,7 +64,7 @@ SPECIALIZED-ARRAY: test-struct
 ] unit-test
 
 : make-point ( x y -- struct )
-    test-struct <struct-boa> ;
+    test-struct boa ;
 
 { 5/4 } [
     2 <test-struct-array>

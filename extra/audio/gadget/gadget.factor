@@ -1,5 +1,5 @@
 USING: accessors audio audio.engine combinators destructors
-images.loader images.viewer init kernel locals namespaces
+images.loader images.viewer init kernel namespaces
 ui.gadgets ui.gadgets.buttons ui.gadgets.panes ;
 FROM: ui.gadgets.buttons.private => border-button-theme ;
 FROM: audio.engine.private => make-engine-current ;
@@ -16,11 +16,11 @@ CONSTANT: pause-label-image-path "vocab:audio/gadget/pause.png"
 
 SYMBOLS: play-label-image pause-label-image gadget-audio-engine ;
 
-[
+STARTUP-HOOK: [
     f play-label-image set-global
     f pause-label-image set-global
     f gadget-audio-engine set-global
-] "audio.gadget" add-startup-hook
+]
 
 : initialize-audio-gadgets ( -- )
     gadget-audio-engine get-global [

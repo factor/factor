@@ -1,5 +1,5 @@
 ! Copyright (C) 2008 Daniel Ehrenberg.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors byte-arrays byte-vectors io io.encodings
 io.streams.byte-array io.streams.string kernel locals
 sbufs sequences io.private io.encodings.ascii
@@ -13,7 +13,7 @@ IN: io.encodings.string
         ] [
             byte-array encoding <byte-reader> :> reader
             byte-array length encoding guess-decoded-length <sbuf> :> buf
-            [ reader stream-read1 dup ] [ buf push ] while drop
+            [ reader stream-read1 ] [ buf push ] while*
             buf "" like
         ] if
     ] if ; inline

@@ -1,10 +1,10 @@
 ! Copyright (C) 2008 Doug Coleman.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors arrays byte-arrays classes classes.tuple
-combinators continuations db db.errors db.private db.tuples
+combinators continuations db db.errors db.tuples
 db.tuples.private db.types destructors kernel make math
-math.bitwise math.intervals math.parser namespaces nmake
-prettyprint random sequences shuffle strings words fry ;
+math.bitwise math.intervals math.parser namespaces nmake random
+sequences strings ;
 IN: db.queries
 
 GENERIC: where ( specs obj -- )
@@ -33,7 +33,7 @@ SINGLETON: retryable
         ] if
     ] 2map >>bind-params ;
 
-M: retryable execute-statement* ( statement type -- )
+M: retryable execute-statement*
     drop [ retries>> <iota> ] [
         [
             nip
@@ -62,7 +62,7 @@ M: retryable execute-statement* ( statement type -- )
         dup column-name>> 0% " = " 0% bind%
     ] interleave ;
 
-M: db-connection <update-tuple-statement> ( class -- statement )
+M: db-connection <update-tuple-statement>
     [
         "update " 0% 0%
         " set " 0%
@@ -71,7 +71,7 @@ M: db-connection <update-tuple-statement> ( class -- statement )
         where-primary-key%
     ] query-make ;
 
-M: random-id-generator eval-generator ( singleton -- obj )
+M: random-id-generator eval-generator
     drop
     system-random-generator get [
         63 [ random-bits ] keep 1 - set-bit
@@ -102,32 +102,32 @@ M: random-id-generator eval-generator ( singleton -- obj )
 : in-parens ( quot -- )
     "(" 0% call ")" 0% ; inline
 
-M: interval where ( spec obj -- )
+M: interval where
     [
         [ from>> "from" where-interval ] [
             nip infinite-interval? [ " and " 0% ] unless
         ] [ to>> "to" where-interval ] 2tri
     ] in-parens ;
 
-M: sequence where ( spec obj -- )
+M: sequence where
     [
         [ " or " 0% ] [ dupd where ] interleave drop
     ] in-parens ;
 
-M: byte-array where ( spec obj -- )
+M: byte-array where
     over column-name>> 0% " = " 0% bind# ;
 
-M: NULL where ( spec obj -- )
+M: NULL where
     drop column-name>> 0% " is NULL" 0% ;
 
 : object-where ( spec obj -- )
     over column-name>> 0% " = " 0% bind# ;
 
-M: object where ( spec obj -- ) object-where ;
+M: object where object-where ;
 
-M: integer where ( spec obj -- ) object-where ;
+M: integer where object-where ;
 
-M: string where ( spec obj -- ) object-where ;
+M: string where object-where ;
 
 : filter-slots ( tuple specs -- specs' )
     [
@@ -145,7 +145,7 @@ M: string where ( spec obj -- ) object-where ;
 : where-clause ( tuple specs -- )
     dupd filter-slots [ drop ] [ many-where ] if-empty ;
 
-M: db-connection <delete-tuples-statement> ( tuple table -- sql )
+M: db-connection <delete-tuples-statement>
     [
         "delete from " 0% 0%
         where-clause
@@ -153,7 +153,7 @@ M: db-connection <delete-tuples-statement> ( tuple table -- sql )
 
 ERROR: all-slots-ignored class ;
 
-M: db-connection <select-by-slots-statement> ( tuple class -- statement )
+M: db-connection <select-by-slots-statement>
     [
         "select " 0%
         [ dupd filter-ignores ] dip
@@ -188,13 +188,13 @@ M: db-connection <select-by-slots-statement> ( tuple class -- statement )
         [ offset>> [ do-offset ] [ drop ] if* ]
     } 2cleave ;
 
-M: db-connection query>statement ( query -- tuple )
+M: db-connection query>statement
     [ tuple>> dup class-of ] keep
     [ <select-by-slots-statement> ] dip make-query* ;
 
 ! select ID, NAME, SCORE from EXAM limit 1 offset 3
 
-M: db-connection <count-statement> ( query -- statement )
+M: db-connection <count-statement>
     [ tuple>> dup class-of ] keep
     [ [ "select count(*) from " 0% 0% where-clause ] query-make ]
     dip make-query* ;

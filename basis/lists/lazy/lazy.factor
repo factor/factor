@@ -1,6 +1,6 @@
 ! Copyright (C) 2004, 2008 Chris Double, Matthew Willis, James Cash.
-! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays combinators io kernel lists locals math
+! See https://factorcode.org/license.txt for BSD license.
+USING: accessors arrays combinators io kernel lists math
 promises quotations sequences ;
 IN: lists.lazy
 
@@ -176,7 +176,7 @@ M: lazy-append cdr
     [ list1>> cdr ] [ list2>> ] bi lappend-lazy ;
 
 M: lazy-append nil?
-     drop f ;
+    drop f ;
 
 TUPLE: lazy-from-by n quot ;
 

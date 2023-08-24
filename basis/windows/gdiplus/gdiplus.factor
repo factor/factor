@@ -1,8 +1,8 @@
 ! Copyright (C) 2010 Joe Groff.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: alien.c-types alien.data alien.destructors alien.syntax
-classes.struct kernel math windows.com windows.com.syntax
-windows.kernel32 windows.ole32 windows.types ;
+classes.struct init kernel literals math namespaces windows.com
+windows.com.syntax windows.kernel32 windows.ole32 windows.types ;
 FROM: alien.c-types => float ;
 IN: windows.gdiplus
 
@@ -448,11 +448,11 @@ CONSTANT: PixelFormatDontCare  0
 CONSTANT: PixelFormatMax               15
 
 : PixelFormat1bppIndexed ( -- x )
-    1  1 PixelFormatIndexed PixelFormatGDI bitor pixel-format-constant ; inline
+    1  1 flags{ PixelFormatIndexed PixelFormatGDI } pixel-format-constant ; inline
 : PixelFormat4bppIndexed ( -- x )
-    2  4 PixelFormatIndexed PixelFormatGDI bitor pixel-format-constant ; inline
+    2  4 flags{ PixelFormatIndexed PixelFormatGDI } pixel-format-constant ; inline
 : PixelFormat8bppIndexed ( -- x )
-    3  8 PixelFormatIndexed PixelFormatGDI bitor pixel-format-constant ; inline
+    3  8 flags{ PixelFormatIndexed PixelFormatGDI } pixel-format-constant ; inline
 : PixelFormat16bppGrayScale ( -- x )
     4 16 PixelFormatExtended pixel-format-constant ; inline
 : PixelFormat16bppRGB555 ( -- x )
@@ -460,21 +460,21 @@ CONSTANT: PixelFormatMax               15
 : PixelFormat16bppRGB565 ( -- x )
     6 16 PixelFormatGDI pixel-format-constant ; inline
 : PixelFormat16bppARGB1555 ( -- x )
-    7 16 PixelFormatAlpha PixelFormatGDI bitor pixel-format-constant ; inline
+    7 16 flags{ PixelFormatAlpha PixelFormatGDI } pixel-format-constant ; inline
 : PixelFormat24bppRGB ( -- x )
     8 24 PixelFormatGDI pixel-format-constant ; inline
 : PixelFormat32bppRGB ( -- x )
     9 32 PixelFormatGDI pixel-format-constant ; inline
 : PixelFormat32bppARGB ( -- x )
-    10 32 PixelFormatAlpha PixelFormatGDI PixelFormatCanonical bitor bitor pixel-format-constant ; inline
+    10 32 flags{ PixelFormatAlpha PixelFormatGDI PixelFormatCanonical } pixel-format-constant ; inline
 : PixelFormat32bppPARGB ( -- x )
-    11 32 PixelFormatAlpha PixelFormatPAlpha PixelFormatGDI bitor bitor pixel-format-constant ; inline
+    11 32 flags{ PixelFormatAlpha PixelFormatPAlpha PixelFormatGDI } pixel-format-constant ; inline
 : PixelFormat48bppRGB ( -- x )
     12 48 PixelFormatExtended pixel-format-constant ; inline
 : PixelFormat64bppARGB ( -- x )
-    13 64 PixelFormatAlpha PixelFormatCanonical PixelFormatExtended bitor bitor pixel-format-constant ; inline
+    13 64 flags{ PixelFormatAlpha PixelFormatCanonical PixelFormatExtended } pixel-format-constant ; inline
 : PixelFormat64bppPARGB ( -- x )
-    14 64 PixelFormatAlpha PixelFormatPAlpha PixelFormatExtended bitor bitor pixel-format-constant ; inline
+    14 64 flags{ PixelFormatAlpha PixelFormatPAlpha PixelFormatExtended } pixel-format-constant ; inline
 
 STRUCT: ColorPalette
     { Flags UINT }
@@ -1648,3 +1648,9 @@ CONSTANT: standard-gdi+-startup-input
     GdiplusShutdown ;
 
 DESTRUCTOR: stop-gdi+
+
+SYMBOL: gdi-token
+
+STARTUP-HOOK: [ start-gdi+ gdi-token set-global ]
+
+SHUTDOWN-HOOK: [ gdi-token get-global [ stop-gdi+ ] when* ]

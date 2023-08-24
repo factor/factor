@@ -1,16 +1,12 @@
 ! Copyright (C) 2006, 2011 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays hashtables io kernel math models
-colors.constants namespaces sequences words continuations
-debugger prettyprint help editors fonts ui ui.commands
-ui.debugger ui.gestures ui.gadgets ui.pens.solid
-ui.gadgets.worlds ui.gadgets.packs ui.gadgets.buttons
-ui.gadgets.labels ui.gadgets.presentations ui.gadgets.panes
-ui.gadgets.viewports ui.gadgets.tables ui.theme
-ui.gadgets.tracks ui.gadgets.toolbar ui.gadgets.scrollers
-ui.gadgets.borders ui.gadgets.status-bar ui.theme.images
-ui.tools.traceback ui.tools.inspector ui.tools.browser
-ui.tools.common ;
+! See https://factorcode.org/license.txt for BSD license.
+USING: accessors arrays continuations debugger editors kernel
+models namespaces sequences ui.commands ui.debugger ui.gadgets
+ui.gadgets.labels ui.gadgets.packs ui.gadgets.panes
+ui.gadgets.scrollers ui.gadgets.status-bar ui.gadgets.tables
+ui.gadgets.toolbar ui.gadgets.tracks ui.gadgets.worlds
+ui.gestures ui.tools.browser ui.tools.common ui.tools.inspector
+ui.tools.traceback ;
 IN: ui.tools.debugger
 
 TUPLE: debugger < track error restarts restart-hook restart-list continuation ;
@@ -24,7 +20,14 @@ M: restart-renderer row-columns
 
 : <restart-list> ( debugger -- gadget )
     dup restarts>> f prefix <model> restart-renderer <table>
-        [ [ \ continue-restart invoke-command ] when* ] >>action
+        [
+            [
+                ! The "Abort" restart is actually an `f` object, so to show a restart
+                ! with information but do nothing, we define a no-op-restart
+                dup obj>> no-op-restart =
+                [ drop ] [ \ continue-restart invoke-command ] if
+            ] when*
+        ] >>action
         swap restart-hook>> >>hook
         t >>selection-required?
         t >>single-click? ; inline
@@ -40,7 +43,7 @@ M: restart-renderer row-columns
             [ "To continue, pick one of the options below:" <label> add-gadget ] dip
             restart-list>> add-gadget
         ] [ drop ] if
-    ] bi ;
+    ] bi <scroller> ;
 
 PRIVATE>
 
@@ -51,7 +54,7 @@ PRIVATE>
         swap >>continuation
         swap >>error
         dup <restart-list> >>restart-list
-        dup <error-display> margins white-interior f track-add
+        dup <error-display> margins white-interior 1 track-add
         add-toolbar ;
 
 M: debugger focusable-child*
@@ -88,8 +91,8 @@ debugger "gestures" f {
 \ com-edit H{ { +listener+ t } } define-command
 
 debugger "toolbar" f {
-    { T{ key-down f { C+ } "i" } com-inspect }
-    { T{ key-down f { C+ } "t" } com-traceback }
-    { T{ key-down f { C+ } "h" } com-help }
-    { T{ key-down f { C+ } "e" } com-edit }
+    { T{ key-down f f "i" } com-inspect }
+    { T{ key-down f f "t" } com-traceback }
+    { T{ key-down f f "h" } com-help }
+    { T{ key-down f f "e" } com-edit }
 } define-command-map

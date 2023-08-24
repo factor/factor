@@ -1,7 +1,7 @@
-;;; fuel-autohelp.el -- help pages in another window
+;;; fuel-autohelp.el -- help pages in another window -*- lexical-binding: t -*-
 
 ;; Copyright (C) 2013 Erik Charlebois
-;; See http://factorcode.org/license.txt for BSD license.
+;; See https://factorcode.org/license.txt for BSD license.
 
 ;; Author: Erik Charlebois <erikcharlebois@gmail.com>
 ;; Keywords: languages, fuel, factor

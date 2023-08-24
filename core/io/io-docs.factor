@@ -1,6 +1,5 @@
-USING: help.markup help.syntax quotations hashtables kernel
-classes strings continuations destructors math byte-arrays
-alien specialized-arrays sequences ;
+USING: alien byte-arrays destructors help.markup help.syntax
+kernel math quotations sequences specialized-arrays strings ;
 IN: io
 
 ARTICLE: "stream-types" "Binary and text streams"
@@ -69,8 +68,8 @@ $io-error ;
 
 HELP: stream-read-partial
 { $values
-     { "n" "a non-negative integer" } { "stream" "an input stream" }
-     { "seq/f" { $or byte-array string f } } }
+    { "n" "a non-negative integer" } { "stream" "an input stream" }
+    { "seq/f" { $or byte-array string f } } }
 { $description "Reads at most " { $snippet "n" } " elements from a stream and returns up to that many characters without blocking. If no characters are available, blocks until some are and returns them." } ;
 
 HELP: stream-read-partial-unsafe
@@ -133,14 +132,14 @@ $io-error ;
 
 HELP: stream-tell
 { $values
-     { "stream" "a stream" } { "n" integer }
+    { "stream" "a stream" } { "n" integer }
 }
 { $description "Returns the index of the stream pointer if the stream is seekable." }
 { $notes "Stream seeking is not supported on streams that do not have a known length, e.g. TCP/IP streams." } ;
 
 HELP: stream-seek
 { $values
-     { "n" integer } { "seek-type" "a seek singleton" } { "stream" "a stream" }
+    { "n" integer } { "seek-type" "a seek singleton" } { "stream" "a stream" }
 }
 { $description "Moves the pointer associated with a stream's handle to an offset " { $snippet "n" } " bytes from the seek type so that further reading or writing happens at the new location. For output streams, the buffer is flushed before seeking. Seeking past the end of an output stream will pad the difference with zeros once the stream is written to again." $nl
     "Three methods of seeking are supported:"
@@ -150,36 +149,33 @@ HELP: stream-seek
 
 HELP: stream-seekable?
 { $values
-     { "stream" "a stream" } { "?" boolean }
+    { "stream" "a stream" } { "?" boolean }
 }
 { $description "Returns true if " { $snippet "stream" } " is a seekable stream." }
 { $notes "Stream seeking is not supported on streams that do not have a known length, e.g. TCP/IP streams." } ;
 
 HELP: stream-length
 { $values
-     { "stream" "a stream" } { "n/f" { $maybe integer } }
+    { "stream" "a stream" } { "n/f" { $maybe integer } }
 }
 { $description "Returns the length of the data supplied by " { $snippet "stream" } ", or " { $link f } " if the stream is not seekable or has unknown length." }
 { $notes "Stream seeking is not supported on streams that do not have a known length, e.g. TCP/IP streams." } ;
 
 HELP: seek-absolute
 { $values
-
-     { "value" "a seek singleton" }
+    { "value" "a seek singleton" }
 }
 { $description "Seeks to an offset from the beginning of the stream." } ;
 
 HELP: seek-end
 { $values
-
-     { "value" "a seek singleton" }
+    { "value" "a seek singleton" }
 }
 { $description "Seeks to an offset from the end of the stream. If the offset puts the stream pointer past the end of the data on an output stream, writing to it will pad the difference with zeros." } ;
 
 HELP: seek-relative
 { $values
-
-     { "value" "a seek singleton" }
+    { "value" "a seek singleton" }
 }
 { $description "Seeks to an offset from the current position of the stream pointer." } ;
 
@@ -188,13 +184,13 @@ HELP: seek-relative
 
 HELP: seek-input
 { $values
-     { "n" integer } { "seek-type" "a seek singleton" }
+    { "n" integer } { "seek-type" "a seek singleton" }
 }
 { $description "Calls " { $link stream-seek } " on the stream stored in " { $link input-stream } "." } ;
 
 HELP: seek-output
 { $values
-     { "n" integer } { "seek-type" "a seek singleton" }
+    { "n" integer } { "seek-type" "a seek singleton" }
 }
 { $description "Calls " { $link stream-seek } " on the stream stored in " { $link output-stream } "." } ;
 
@@ -301,7 +297,7 @@ HELP: stream-lines
 { $values { "stream" "an input stream" } { "seq" { $sequence string } } }
 { $description "Reads lines of text until the stream is exhausted, collecting them in a sequence of strings." } ;
 
-HELP: lines
+HELP: read-lines
 { $values { "seq" { $sequence string } } }
 { $description "Reads lines of text until from the " { $link input-stream } " until it is exhausted, collecting them in a sequence of strings." } ;
 
@@ -318,7 +314,7 @@ HELP: stream-contents
 { $description "Reads all elements in the given stream until the stream is exhausted. The type of the sequence depends on the stream's element type. The stream is closed after completion." }
 $io-error ;
 
-HELP: contents
+HELP: read-contents
 { $values { "seq" { $or string byte-array } } }
 { $description "Reads all elements in the " { $link input-stream } " until the stream is exhausted. The type of the sequence depends on the stream's element type." }
 $io-error ;
@@ -476,13 +472,13 @@ $nl
 "Processing lines one by one:"
 { $subsections
     stream-lines
-    lines
+    read-lines
     each-line
 }
 "Processing blocks of data:"
 { $subsections
     stream-contents
-    contents
+    read-contents
     each-block
 }
 "Copying the contents of one stream to another:"

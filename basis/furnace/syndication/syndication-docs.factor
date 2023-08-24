@@ -1,4 +1,5 @@
-USING: help.markup help.syntax io.streams.string kernel sequences strings urls syndication calendar ;
+USING: calendar help.markup help.syntax kernel strings
+syndication urls ;
 IN: furnace.syndication
 
 HELP: <feed-action>
@@ -7,8 +8,8 @@ HELP: <feed-action>
 
 HELP: >entry
 { $values
-     { "object" object }
-     { "entry" entry }
+    { "object" object }
+    { "entry" entry }
 }
 { $contract "Converts an object into an Atom feed entry. The default implementation constructs an entry by calling "
 { $link feed-entry-title } ", "
@@ -21,38 +22,38 @@ HELP: feed-action
 
 HELP: feed-entry-date
 { $values
-     { "object" object }
-     { "timestamp" timestamp }
+    { "object" object }
+    { "timestamp" timestamp }
 }
 { $contract "Outputs a feed entry timestmap." } ;
 
 HELP: feed-entry-description
 { $values
-     { "object" object }
-     { "description" string }
+    { "object" object }
+    { "description" string }
 }
 { $contract "Outputs a feed entry description." } ;
 
 HELP: feed-entry-title
 { $values
-     { "object" object }
-     { "string" string }
+    { "object" object }
+    { "string" string }
 }
 { $contract "Outputs a feed entry title." } ;
 
 HELP: feed-entry-url
 { $values
-     { "object" object }
-     { "url" url }
+    { "object" object }
+    { "url" url }
 }
 { $contract "Outputs a feed entry URL." } ;
 
 ARTICLE: "furnace.syndication.config" "Configuring Atom feed actions"
 "Instances of " { $link feed-action } " have three slots which need to be set:"
-{ $table
-    { { $slot "title" } "The title of the feed as a string" }
-    { { $slot "url" } { "The feed " { $link url } } }
-    { { $slot "entries" } { "A quotation with stack effect " { $snippet "( -- seq )" } ", which produces a sequence of objects responding to the " { $link "furnace.syndication.protocol" } " protocol" } }
+{ $slots
+    { "title" "The title of the feed as a string" }
+    { "url" { "The feed " { $link url } } }
+    { "entries" { "A quotation with stack effect " { $snippet "( -- seq )" } ", which produces a sequence of objects responding to the " { $link "furnace.syndication.protocol" } " protocol" } }
 } ;
 
 ARTICLE: "furnace.syndication.protocol" "Atom feed entry protocol"

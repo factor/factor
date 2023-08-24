@@ -1,5 +1,5 @@
 ! Copyright (C) 2010 Jon Harper.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: help.markup help.syntax kernel strings io.pathnames images
 models opengl.textures classes ui.gadgets ;
 IN: images.viewer
@@ -37,7 +37,7 @@ HELP: set-image
 { $values
     { "gadget" image-gadget } { "object" { $or pathname string image } }
 }
-{ $description "Sets the image of this gadget. This word loads the image from disk if the input is a string or a pathname."
+{ $description "Sets the image of this gadget. This word loads the image from disk if the input is a string or a pathname. "
 "If the input is a model, gadget has to be " { $instance image-control } "." } ;
 
 HELP: image-control
@@ -57,25 +57,14 @@ HELP: image.
     { "object" { $or pathname string image } }
 }
 { $description "Displays the image in the listener." } ;
-HELP: start-control
-{ $values
-    { "gadget" gadget }
-}
-{ $description "Adds a connection between the gadget and it's model." } ;
 
-HELP: stop-control
-{ $values
-    { "gadget" gadget }
-}
-{ $description "Removes the connection between the gadget and it's model" } ;
 ARTICLE: "images.viewer" "Displaying Images"
 "The " { $vocab-link "images.viewer" } " vocabulary uses the " { $vocab-link "opengl.textures" }
 " vocabulary to display any instance of " { $link image } "." $nl
 "An " { $link image-gadget } " can be used for static images and " { $instance image-control }
 " for changing images (for example a video feed). For changing images, the image should be contained in " { $instance model }
 ". Change the model value with " { $link set-model } " or mutate the image and call "
-{ $link notify-connections } " when you want to update the image. To stop refreshing the image, call " { $link stop-control } "."
-" To start refreshing again, call " { $link start-control } "."
+{ $link notify-connections } " when you want to update the image."
 
 $nl
 "If the " { $link image } " or " { $link model } " containing the image "
@@ -90,7 +79,7 @@ $nl
 { $notes "The image can be set after the gadget has been grafted. However, for " { $instance image-gadget } ", this can "
 " be done only once. If your image is changing, you should be using " { $instance image-control } " and " { $instance model } "."
 $nl
-" Performance will be greatly reduced if you are using images that have more than 512 pixels on one of their"
+"Performance will be greatly reduced if you are using images that have more than 512 pixels on one of their"
 " axis." }
 
 

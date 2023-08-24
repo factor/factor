@@ -1,8 +1,8 @@
 ! Copyright (C) 2014 John Benediktsson
-! See http://factorcode.org/license.txt for BSD license
+! See https://factorcode.org/license.txt for BSD license
 
-USING: combinators kernel locals math math.extras
-math.extras.private math.functions math.ranges random sequences ;
+USING: combinators kernel math math.extras math.extras.private
+math.functions ranges random sequences ;
 
 IN: math.primes.solovay-strassen
 
@@ -11,7 +11,7 @@ IN: math.primes.solovay-strassen
 :: (solovay-strassen) ( n numtrials -- ? )
     numtrials <iota> [
         drop
-        n 1 - [1,b) random :> a
+        n 1 - [1..b) random :> a
         a n simple-gcd 1 > [ t ] [
             a n jacobi n mod'
             a n 1 - 2 /i n ^mod = not

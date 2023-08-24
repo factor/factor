@@ -1,5 +1,5 @@
 ! Copyright (C) 2017 Alexander Ilin.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: binary-search colors help.markup help.syntax kernel
 sequences splitting.monotonic ui.gadgets ui.gadgets.charts
 ui.gadgets.charts.lines.private ui.render ;
@@ -50,9 +50,9 @@ HELP: line
 { $class-description "This is a " { $link gadget } " which, when added as a child to the " { $link chart } ", will display its data as straight line segments. The implementation is oriented towards speed to allow large data sets to be displayed as quickly as possible."
 $nl
 "Slots:"
-{ $list
-    { { $slot "data" } " - a " { $link sequence } " of { x y } pairs sorted by non-descending x;" }
-    { { $slot "data" } " - a " { $link color } " to draw the line with." }
+{ $slots
+    { "data" { "a " { $link sequence } " of { x y } pairs sorted by non-descending x;" } }
+    { "color" { "a " { $link color } " to draw the line with." } }
 } } ;
 
 HELP: y-at

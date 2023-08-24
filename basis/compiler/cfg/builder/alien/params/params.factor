@@ -1,5 +1,5 @@
 ! Copyright (C) 2010 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: arrays assocs cpu.architecture fry kernel layouts locals
 math math.order namespaces sequences vectors ;
 IN: compiler.cfg.builder.alien.params
@@ -8,11 +8,11 @@ SYMBOL: stack-params
 
 GENERIC: alloc-stack-param ( rep -- n )
 
-M: object alloc-stack-param ( rep -- n )
+M: object alloc-stack-param
     stack-params get
     [ rep-size cell align stack-params +@ ] dip ;
 
-M: float-rep alloc-stack-param ( rep -- n )
+M: float-rep alloc-stack-param
     stack-params get swap rep-size
     [ cell align stack-params +@ ] keep
     float-right-align-on-stack? [ + ] [ drop ] if ;

@@ -1,5 +1,5 @@
 ! Copyright (C) 2012 John Benediktsson
-! See http://factorcode.org/license.txt for BSD license
+! See https://factorcode.org/license.txt for BSD license
 
 USING: accessors alien.c-types classes.struct io.streams.c
 kernel math memoize scratchpad system terminal unix unix.ffi ;
@@ -36,7 +36,7 @@ MEMO: TIOCGWINSZ ( -- x ) CHAR: t 104 winsize heap-size _IOCR ;
 PRIVATE>
 
 M: macosx (terminal-size)
-    stdout-handle fileno TIOCGWINSZ winsize <struct>
+    stdout-handle fileno TIOCGWINSZ winsize new
     [ ioctl ] keep swap 0 < [
         drop 0 0
     ] [

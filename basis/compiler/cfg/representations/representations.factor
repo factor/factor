@@ -1,5 +1,5 @@
 ! Copyright (C) 2009, 2010 Slava Pestov
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING:
 compiler.cfg
 compiler.cfg.loop-detection

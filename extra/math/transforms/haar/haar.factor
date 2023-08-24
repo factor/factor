@@ -1,10 +1,10 @@
 ! Copyright (c) 2008 Slava Pestov, Aaron Schaefer.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: assocs columns grouping kernel math math.statistics math.vectors
     sequences ;
 IN: math.transforms.haar
 
-! Haar Wavelet Transform -- http://dmr.ath.cx/gfx/haar/
+! Haar Wavelet Transform -- https://dmr.ath.cx/gfx/haar/
 
 <PRIVATE
 

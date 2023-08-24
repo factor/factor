@@ -1,6 +1,6 @@
 USING: classes.tuple.private cpu.architecture help.markup
-help.syntax kernel.private math math.vectors math.vectors.simd.intrinsics
-sequences ;
+help.syntax kernel.private math.vectors
+math.vectors.simd.intrinsics sequences ;
 IN: math.vectors.simd
 
 ARTICLE: "math.vectors.simd.intro" "Introduction to SIMD support"
@@ -23,11 +23,11 @@ $nl
 $nl
 "SSE2 introduces double-precision SIMD (" { $snippet "double-2" } ") and integer SIMD (all types). Integer SIMD is missing a few features; in particular, the " { $link vmin } " and " { $link vmax } " operations only work on " { $snippet "uchar-16" } " and " { $snippet "short-8" } "."
 $nl
-"SSE3 introduces horizontal adds (summing all components of a single vector register), which are useful for computing dot products. Where available, SSE3 operations are used to speed up " { $link sum } ", " { $link v. } ", " { $link norm-sq } ", " { $link norm } ", and " { $link distance } "."
+"SSE3 introduces horizontal adds (summing all components of a single vector register), which are useful for computing dot products. Where available, SSE3 operations are used to speed up " { $link sum } ", " { $link vdot } ", " { $link norm-sq } ", " { $link norm } ", and " { $link distance } "."
 $nl
 "SSSE3 introduces " { $link vabs } " for " { $snippet "char-16" } ", " { $snippet "short-8" } " and " { $snippet "int-4" } "."
 $nl
-"SSE4.1 introduces " { $link vmin } " and " { $link vmax } " for all remaining integer types, a faster instruction for " { $link v. } ", and a few other things."
+"SSE4.1 introduces " { $link vmin } " and " { $link vmax } " for all remaining integer types, a faster instruction for " { $link vdot } ", and a few other things."
 $nl
 "On PowerPC, or older x86 chips without SSE, software fallbacks are used for all high-level vector operations. SIMD code can run with no loss in functionality, just decreased performance."
 $nl
@@ -66,7 +66,7 @@ $nl
 ARTICLE: "math.vectors.simd.words" "SIMD vector words"
 "For each SIMD vector type, several words are defined, where " { $snippet "type" } " is the type in question:"
 { $table
-    { "Word" "Stack effect" "Description" }
+    { { $strong "Word" } { $strong "Stack effect" } { $strong "Description" } }
     { { $snippet "type-with" } { $snippet "( x -- simd-array )" } "creates a new instance where all components are set to a single scalar" }
     { { $snippet "type-boa" } { $snippet "( ... -- simd-array )" } "creates a new instance where components are read from the stack" }
     { { $snippet "type-cast" } { $snippet "( simd-array -- simd-array' )" } "creates a new SIMD array where the underlying data is taken from another SIMD array, with no format conversion" }

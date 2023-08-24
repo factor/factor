@@ -1,12 +1,12 @@
 ! Copyright (C) 2008 Alex Chapman
-! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays kernel namespaces make openal openal.alut sequences
+! See https://factorcode.org/license.txt for BSD license.
+USING: accessors arrays kernel make openal openal.alut sequences
 synth synth.buffers ;
 IN: synth.example
 
 : play-sine-wave ( freq seconds sample-freq -- )
     init-openal
-    <16bit-mono-buffer> >sine-wave-buffer send-buffer id>>
+    <16-bit-mono-buffer> >sine-wave-buffer send-buffer id>>
     1 gen-sources first
     [ AL_BUFFER rot set-source-param ] [ source-play ] bi
     check-error ;
@@ -32,7 +32,7 @@ IN: synth.example
 
 : test-note-buffer ( note -- )
     init-openal
-    test-instrument2 swap cd-sample-freq <16bit-mono-buffer>
+    test-instrument2 swap cd-sample-freq <16-bit-mono-buffer>
     >note send-buffer id>>
     1 gen-sources first [ swap queue-buffer ] [ source-play ] bi
     check-error ;

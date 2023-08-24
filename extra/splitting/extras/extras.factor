@@ -1,18 +1,16 @@
-USING: hints kernel math sequences strings ;
-
+USING: hints kernel math sequences sequences.private strings ;
 IN: splitting.extras
 
 <PRIVATE
 
-: (split*) ( seq quot: ( ... elt -- ... ? ) slice-quot -- pieces )
-    [ 0 ] 3dip pick [
-        swap curry [ [ 1 + ] when ] prepose [ 2keep ] curry
-        [ 2dup = ] prepose [ [ 1 + ] when swap ] compose [
-            [ find-from drop dup ] 2curry [ keep -rot ] curry
-        ] dip produce nip
-    ] 2keep swap [
-        [ length [ swapd dupd < ] keep ] keep
-    ] dip 2curry [ suffix ] compose [ drop ] if ; inline
+:: (split*) ( ... seq quot: ( ... elt -- ... ? ) slice-quot -- ... pieces )
+    0 [
+        [ seq quot find-from drop dup ] keep -rot
+    ] [
+        2dup = [ [ 1 + ] when seq slice-quot call ] 2keep
+        [ 1 + ] when swap
+    ] produce nip swap seq length [ dupd < ] keep
+    '[ _ seq slice-quot call suffix ] [ drop ] if ; inline
 
 PRIVATE>
 
@@ -33,21 +31,30 @@ PRIVATE>
     [ [ [ 1 ] when-zero cut-slice swap ] [ f swap ] if* ] compose
     compose produce nip ; inline
 
+: split-head ( seq quot -- before after )
+    (trim-head) cut ; inline
+
+: split-tail ( seq quot -- before after )
+    (trim-tail) cut ; inline
+
+: split-head-slice ( seq quot -- before after )
+    (trim-head) cut-slice ; inline
+
+: split-tail-slice ( seq quot -- before after )
+    (trim-tail) cut-slice ; inline
+
 <PRIVATE
 
-: (split-harvest) ( seq quot: ( ... elt -- ... ? ) slice-quot -- pieces )
-    [ [ [ not ] compose find drop 0 or ] 2keep ] dip [
-        drop
-        dupd [ find-from drop ] 2curry [ 1 + ] prepose
-        [ keep swap ] curry
-        swap [ length 2dup >= [ drop f ] when ] curry
-        [ unless* ] curry compose
-        [ [ dup ] if dup ] curry [ dup ] prepose
+:: (split-harvest) ( ... seq quot: ( ... elt -- ... ? ) slice-quot -- ... pieces )
+    seq [ quot call not ] find drop [
+        [
+            [ seq quot find-from drop ] keep swap
+            [ seq length ] unless* dup
+        ] [ f f f ] if*
     ] [
-        pick swap curry [ keep swap ] curry -rot
-        [ not ] compose [ find-from drop ] 2curry
-        [ 1 + ] prepose [ dip ] curry compose
-    ] 3bi produce 2nip ; inline
+        [ seq slice-quot call ] keep swap
+        [ 1 + seq [ quot call not ] find-from drop ] dip
+    ] produce 2nip ; inline
 
 PRIVATE>
 

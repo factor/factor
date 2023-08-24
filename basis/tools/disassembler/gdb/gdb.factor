@@ -1,12 +1,15 @@
 ! Copyright (C) 2008, 2010 Slava Pestov, Jorge Acereda Macia.
-! See http://factorcode.org/license.txt for BSD license.
-USING: io.files io.files.temp io words alien kernel math.parser
-alien.syntax io.launcher assocs arrays sequences namespaces make
-system math io.encodings.ascii accessors tools.disassembler
-tools.disassembler.private locals ;
+! See https://factorcode.org/license.txt for BSD license.
+USING: accessors io io.encodings.ascii io.files io.files.temp
+io.launcher locals make math math.parser namespaces
+tools.disassembler.private ;
 IN: tools.disassembler.gdb
 
 SINGLETON: gdb-disassembler
+
+<PRIVATE
+
+TR: tabs>spaces "\t" "\s" ;
 
 : in-file ( -- path ) "gdb-in.txt" temp-file ;
 
@@ -28,7 +31,9 @@ SINGLETON: gdb-disassembler
     try-process
     out-file ascii file-lines ;
 
+PRIVATE>
+
 M: gdb-disassembler disassemble*
-    make-disassemble-cmd run-gdb ;
+    make-disassemble-cmd run-gdb [ tabs>spaces print ] each ;
 
 gdb-disassembler disassembler-backend set-global

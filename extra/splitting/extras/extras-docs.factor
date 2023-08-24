@@ -1,4 +1,4 @@
-USING: help.markup help.syntax sequences splitting strings ;
+USING: help.markup help.syntax sequences splitting ;
 IN: splitting.extras
 
 HELP: split*-when

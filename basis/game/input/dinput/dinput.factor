@@ -1,12 +1,11 @@
 USING: accessors alien alien.c-types alien.data alien.strings
-arrays assocs byte-arrays combinators combinators.short-circuit
-continuations game.input game.input.dinput.keys-array
-io.encodings.utf16n kernel locals math
-math.bitwise math.rectangles namespaces parser sequences shuffle
-specialized-arrays ui.backend.windows vectors windows.com
-windows.directx.dinput windows.directx.dinput.constants
-windows.kernel32 windows.messages windows.ole32 windows.errors
-windows.user32 classes.struct ;
+arrays assocs byte-arrays classes.struct combinators
+combinators.short-circuit game.input
+game.input.dinput.keys-array kernel math math.bitwise
+math.rectangles namespaces sequences specialized-arrays
+ui.backend.windows vectors windows.com windows.directx.dinput
+windows.directx.dinput.constants windows.errors windows.kernel32
+windows.messages windows.ole32 windows.user32 ;
 SPECIALIZED-ARRAY: DIDEVICEOBJECTDATA
 IN: game.input.dinput
 
@@ -41,7 +40,7 @@ SYMBOLS: +dinput+ +keyboard-device+ +keyboard-state+
     get-global IDirectInputDevice8W::SetDataFormat check-ole32-error ; inline
 
 : <buffer-size-diprop> ( size -- DIPROPDWORD )
-    DIPROPDWORD <struct> [
+    DIPROPDWORD new [
         diph>>
         DIPROPDWORD heap-size  >>dwSize
         DIPROPHEADER heap-size >>dwHeaderSize
@@ -77,11 +76,11 @@ SYMBOLS: +dinput+ +keyboard-device+ +keyboard-state+
     MOUSE-BUFFER-SIZE DIDEVICEOBJECTDATA <c-array> +mouse-buffer+ set-global ;
 
 : device-info ( device -- DIDEVICEIMAGEINFOW )
-    DIDEVICEINSTANCEW <struct>
+    DIDEVICEINSTANCEW new
         DIDEVICEINSTANCEW heap-size >>dwSize
     [ IDirectInputDevice8W::GetDeviceInfo check-ole32-error ] keep ; inline
 : device-caps ( device -- DIDEVCAPS )
-    DIDEVCAPS <struct>
+    DIDEVCAPS new
         DIDEVCAPS heap-size >>dwSize
     [ IDirectInputDevice8W::GetCapabilities check-ole32-error ] keep ; inline
 
@@ -190,7 +189,7 @@ TUPLE: window-rect < rect window-loc ;
     { 0 0 } >>dim ;
 
 : (device-notification-filter) ( -- DEV_BROADCAST_DEVICEW )
-    DEV_BROADCAST_DEVICEW <struct>
+    DEV_BROADCAST_DEVICEW new
         DEV_BROADCAST_DEVICEW heap-size >>dbcc_size
         DBT_DEVTYP_DEVICEINTERFACE >>dbcc_devicetype ;
 
@@ -323,7 +322,7 @@ CONSTANT: pov-values
     IDirectInputDevice8W::GetDeviceState check-ole32-error ;
 
 : (read-controller) ( handle template -- state )
-    swap [ DIJOYSTATE2 <struct> [ get-device-state ] keep ]
+    swap [ DIJOYSTATE2 new [ get-device-state ] keep ]
     [ fill-controller-state ] [ drop f ] with-acquisition ;
 
 M: dinput-game-input-backend read-controller

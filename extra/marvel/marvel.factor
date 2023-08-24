@@ -1,15 +1,14 @@
 ! Copyright (C) 2014 Doug Coleman.
-! See http://factorcode.org/license.txt for BSD license.
-USING: assocs checksums checksums.md5 http.client json.reader
-kernel locals math.parser namespaces sequences strings system
-urls ;
+! See https://factorcode.org/license.txt for BSD license.
+USING: assocs checksums checksums.md5 http.client json kernel
+math.parser namespaces sequences strings system urls ;
 IN: marvel
 
-! http://developer.marvel.com/docs
+! https://developer.marvel.com/docs
 ! Register for an api key.
 SYMBOLS: marvel-base-url marvel-public-key marvel-private-key ;
 
-marvel-base-url [ "http://gateway.marvel.com/v1/public/" ] initialize
+marvel-base-url [ "https://gateway.marvel.com/v1/public/" ] initialize
 
 : calculate-hash ( ts -- hash )
     number>string

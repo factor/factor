@@ -1,7 +1,7 @@
 ! Copyright (C) 2008 Alex Chapman
 ! Copyright (C) 2012 John Benediktsson
-! See http://factorcode.org/license.txt for BSD license
-USING: accessors circular kernel math sequences sequences.private ;
+! See https://factorcode.org/license.txt for BSD license
+USING: accessors circular kernel math sequences ;
 IN: sequences.repeating
 
 TUPLE: cycles
@@ -14,6 +14,9 @@ TUPLE: cycles
 : cycle ( seq length -- new-seq )
     dupd <cycles> swap like ;
 
+: repeat ( seq times -- new-seq )
+    over length * cycle ;
+
 M: cycles length length>> ;
 
 M: cycles set-length length<< ;
@@ -24,21 +27,21 @@ M: cycles virtual-exemplar circular>> ;
 
 INSTANCE: cycles virtual-sequence
 
-TUPLE: repeats
+TUPLE: element-repeats
 { seq sequence read-only }
 { times integer read-only } ;
 
-C: <repeats> repeats
+C: <element-repeats> element-repeats
 
-M: repeats length [ seq>> length ] [ times>> ] bi * ;
+M: element-repeats length [ seq>> length ] [ times>> ] bi * ;
 
-M: repeats virtual@ [ times>> /i ] [ seq>> ] bi ;
+M: element-repeats virtual@ [ times>> /i ] [ seq>> ] bi ;
 
-M: repeats virtual-exemplar seq>> ;
+M: element-repeats virtual-exemplar seq>> ;
 
-INSTANCE: repeats immutable-sequence
+INSTANCE: element-repeats immutable-sequence
 
-INSTANCE: repeats virtual-sequence
+INSTANCE: element-repeats virtual-sequence
 
-: repeat ( seq times -- new-seq )
-    dupd <repeats> swap like ;
+: repeat-elements ( seq times -- new-seq )
+    dupd <element-repeats> swap like ;

@@ -1,10 +1,9 @@
 ! Copyright (C) 2017 Doug Coleman.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs combinators.short-circuit
-constructors continuations fry io io.encodings.utf8 io.files
+constructors continuations io io.encodings.utf8 io.files
 io.streams.string kernel modern modern.paths modern.slices
-multiline prettyprint sequences sequences.extras splitting
-strings vocabs.loader ;
+multiline prettyprint sequences splitting strings vocabs.loader ;
 IN: modern.out
 
 : token? ( obj -- ? )
@@ -67,7 +66,7 @@ DEFER: map-literals
 : rewrite-paths ( seq quot: ( obj -- obj' ) -- ) '[ _ rewrite-path ] each ; inline recursive
 
 : rewrite-vocab ( vocab quot: ( obj -- obj' ) -- )
-    [ [ vocab>literals ] dip map-literals ] 2keep drop write-modern-vocab ; inline recursive
+    [ [ vocab>literals ] dip map-literals ] keepd write-modern-vocab ; inline recursive
 
 : rewrite-string-exact ( string -- string' )
     string>literals write-modern-string ;
@@ -85,7 +84,7 @@ DEFER: map-literals
 
 : strings-core-to-file ( -- )
     core-vocabs
-    [ ".private" ?tail drop vocab-source-path utf8 file-contents ] map-zip
+    [ ".private" ?tail drop vocab-source-path utf8 file-contents ] zip-with
     [ "[========[" dup matching-delimiter-string surround ] assoc-map
     [
         first2 [ "VOCAB: " prepend ] dip " " glue
@@ -96,7 +95,7 @@ DEFER: map-literals
 
 : parsed-core-to-file ( -- )
     core-vocabs
-    [ vocab>literals ] map-zip
+    [ vocab>literals ] zip-with
     [
         first2 [ "<VOCAB: " prepend ] dip
         >strings

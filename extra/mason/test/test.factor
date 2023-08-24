@@ -1,12 +1,12 @@
 ! Copyright (C) 2008, 2010 Eduardo Cavazos, Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
-USING: accessors assocs benchmark bootstrap.stage2 command-line
-compiler.errors continuations debugger fry generic help.html
+! See https://factorcode.org/license.txt for BSD license.
+USING: accessors assocs benchmark bootstrap.stage2 calendar
+command-line compiler.errors continuations debugger help.html
 help.lint io io.directories io.encodings.utf8 io.files io.styles
-kernel locals mason.common namespaces parser.notes sequences
-sets sorting source-files.errors system tools.errors tools.test
-tools.time vocabs vocabs.hierarchy.private vocabs.loader
-vocabs.refresh words ;
+kernel mason.common math memory namespaces parser.notes
+sequences sets sorting source-files.errors system threads
+tools.errors tools.test tools.time vocabs
+vocabs.hierarchy.private vocabs.loader vocabs.refresh ;
 IN: mason.test
 
 : vocab-heading. ( vocab -- )
@@ -21,21 +21,22 @@ IN: mason.test
 : load-failures. ( failures -- ) [ load-error. nl ] each ;
 
 : require-all-no-restarts ( vocabs -- failures )
-    V{ } clone blacklist [
-        V{ } clone [
-            '[
-                [ require ]
-                [ swap vocab-name _ set-at ] recover
-            ] each
-        ] keep
-    ] with-variable ;
+    V{ } clone [
+        '[
+            [ require ]
+            [ swap vocab-name _ set-at ] recover
+        ] each
+    ] keep ;
 
 : load-from-root-no-restarts ( root prefix -- failures )
     vocabs-to-load require-all-no-restarts ;
 
 : load-no-restarts ( prefix -- failures )
-    [ vocab-roots get ] dip
-    '[ _ load-from-root-no-restarts ] map concat ;
+    [ vocab-roots get dup ] dip '[
+        _ swap 1 + head vocab-roots [
+            _ load-from-root-no-restarts
+        ] with-variable
+    ] map-index concat ;
 
 : do-load ( -- )
     "" load-no-restarts
@@ -43,27 +44,30 @@ IN: mason.test
     [ load-all-errors-file utf8 [ load-failures. ] with-file-writer ]
     bi ;
 
-GENERIC: word-vocabulary ( word -- vocabulary )
-
-M: word word-vocabulary vocabulary>> ;
-
-M: method word-vocabulary "method-generic" word-prop word-vocabulary ;
-
 :: do-step ( errors summary-file details-file -- )
     errors
     [ error-type +linkage-error+ eq? ] reject
-    [ path>> ] map members natural-sort summary-file to-file
+    [ path>> ] map members sort summary-file to-file
     errors details-file utf8 [ errors. ] with-file-writer ;
 
 : do-tests ( -- )
     forget-tests? on
-    test-all test-failures get
+    cpu x86.32? [
+        "resource:core" test-root
+        "resource:basis" test-root
+    ] [
+        test-all
+    ] if
+    test-failures get
     test-all-vocabs-file
     test-all-errors-file
     do-step ;
 
 : do-help-lint ( -- )
-    help-lint-all lint-failures get values
+    help-lint-all
+    ! Give the cleanup a chance to run before looking at the errors.
+    gc 2 seconds sleep
+    lint-failures get values
     help-lint-vocabs-file
     help-lint-errors-file
     do-step ;
@@ -94,7 +98,7 @@ M: method word-vocabulary "method-generic" word-prop word-vocabulary ;
 
 : run-mason-rc ( -- )
     t "user-init" [
-        ".factor-mason-rc" rc-path try-user-init
+        "~/.factor-mason-rc" try-user-init
     ] with-variable ;
 
 : check-user-init-errors ( -- ? )

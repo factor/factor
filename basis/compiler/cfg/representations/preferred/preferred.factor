@@ -1,7 +1,7 @@
 ! Copyright (C) 2009, 2010 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors arrays combinators compiler.cfg.def-use
-compiler.cfg.instructions compiler.units cpu.architecture fry
+compiler.cfg.instructions compiler.units cpu.architecture
 generic kernel namespaces sequences sequences.generalizations
 sets words ;
 FROM: compiler.cfg.instructions.syntax => insn-def-slots

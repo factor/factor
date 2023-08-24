@@ -1,5 +1,5 @@
 ! Copyright (C) 2008 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: compiler.tree.builder compiler.tree.cleanup
 compiler.tree.dead-code compiler.tree.def-use
 compiler.tree.normalization compiler.tree.propagation

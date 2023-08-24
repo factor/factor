@@ -1,5 +1,5 @@
 ! Copyright (C) 2007, 2009 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors assocs command-line fry kernel namespaces
 source-files.errors summary ;
 IN: compiler.errors
@@ -30,12 +30,12 @@ M: linkage-error error-type drop +linkage-error+ ;
     dup asset>> compiler-errors get-global set-at ;
 
 T{ error-type-holder
-   { type +compiler-error+ }
-   { word ":errors" }
-   { plural "compiler errors" }
-   { icon "vocab:ui/tools/error-list/icons/compiler-error.tiff" }
-   { quot [ compiler-errors get values ] }
-   { forget-quot [ compiler-errors get delete-at ] }
+    { type +compiler-error+ }
+    { word ":errors" }
+    { plural "compiler errors" }
+    { icon "vocab:ui/tools/error-list/icons/compiler-error.png" }
+    { quot [ compiler-errors get values ] }
+    { forget-quot [ compiler-errors get delete-at ] }
 } define-error-type
 
 : <compiler-error> ( error word -- compiler-error )
@@ -48,13 +48,13 @@ T{ error-type-holder
     '[ _ boa ] dip <linkage-error> dup asset>> linkage-errors get set-at ; inline
 
 T{ error-type-holder
-   { type +linkage-error+ }
-   { word ":linkage" }
-   { plural "linkage errors" }
-   { icon "vocab:ui/tools/error-list/icons/linkage-error.tiff" }
-   { quot [ linkage-errors get values ] }
-   { forget-quot [ linkage-errors get delete-at ] }
-   { fatal? f }
+    { type +linkage-error+ }
+    { word ":linkage" }
+    { plural "linkage errors" }
+    { icon "vocab:ui/tools/error-list/icons/linkage-error.png" }
+    { quot [ linkage-errors get values ] }
+    { forget-quot [ linkage-errors get delete-at ] }
+    { fatal? f }
 } define-error-type
 
 ERROR: no-such-library name message ;
@@ -77,7 +77,7 @@ T{ error-type-holder
     { type +user-init-error+ }
     { word ":user-init-errors" }
     { plural "rc file errors" }
-    { icon "vocab:ui/tools/error-list/icons/user-init-error.tiff" }
+    { icon "vocab:ui/tools/error-list/icons/user-init-error.png" }
     { quot [ user-init-errors get-global values ] }
     { forget-quot [ user-init-errors get-global delete-at ] }
 } define-error-type

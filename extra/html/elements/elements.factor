@@ -1,9 +1,6 @@
 ! Copyright (C) 2004, 2009 Chris Double, Daniel Ehrenberg.
-! See http://factorcode.org/license.txt for BSD license.
-USING: io io.styles kernel namespaces prettyprint quotations
-sequences strings words xml.entities compiler.units effects
-xml.data urls math math.parser combinators
-present fry io.streams.string xml.writer html ;
+! See https://factorcode.org/license.txt for BSD license.
+USING: io.styles kernel present sequences words xml.entities ;
 IN: html.elements
 
 SYMBOL: html

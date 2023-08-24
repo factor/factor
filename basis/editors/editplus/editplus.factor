@@ -3,7 +3,6 @@ namespaces ;
 IN: editors.editplus
 
 SINGLETON: editplus
-editplus editor-class set-global
 
 : editplus-path ( -- path )
     \ editplus-path get [
@@ -11,7 +10,7 @@ editplus editor-class set-global
         [ "editplus.exe" ] unless*
     ] unless* ;
 
-M: editplus editor-command ( file line -- command )
+M: editplus editor-command
     [
         editplus-path , "-cursor" , number>string , ,
     ] { } make ;

@@ -1,10 +1,8 @@
 ! Copyright (C) 2007 Daniel Ehrenberg
-! See http://factorcode.org/license.txt for BSD license.
-USING: accessors combinators kernel lexer locals make math
-namespaces parser quotations sequences words ;
+! See https://factorcode.org/license.txt for BSD license.
+USING: accessors kernel lexer make math namespaces parser
+quotations sequences strings.parser.private words ;
 IN: multiline
-
-ERROR: bad-heredoc identifier ;
 
 <PRIVATE
 
@@ -42,10 +40,10 @@ SYNTAX: STRING:
 :: (scan-multiline-string) ( i end lexer -- j )
     lexer line-text>> :> text
     lexer still-parsing? [
-        end text i subseq-start-from [| j |
+        i text end subseq-index-from [| j |
             i j text subseq % j end length +
         ] [
-            text i short tail % CHAR: \n ,
+            text i index-or-length tail % CHAR: \n ,
             lexer next-line
             0 end lexer (scan-multiline-string)
         ] if*
@@ -55,27 +53,11 @@ SYNTAX: STRING:
     [
         lexer
         [ skip-n-chars + end-text lexer (scan-multiline-string) ]
-        change-column drop
+        change-column check-space
     ] "" make ;
 
 : advance-same-line ( lexer text -- )
     length [ + ] curry change-column drop ;
-
-:: (parse-til-line-begins) ( begin-text lexer -- )
-    lexer still-parsing? [
-        lexer line-text>> begin-text sequence= [
-            lexer begin-text advance-same-line
-        ] [
-            lexer line-text>> % CHAR: \n ,
-            lexer next-line
-            begin-text lexer (parse-til-line-begins)
-        ] if
-    ] [
-        begin-text bad-heredoc
-    ] if ;
-
-: parse-til-line-begins ( begin-text lexer -- seq )
-    [ (parse-til-line-begins) ] "" make ;
 
 PRIVATE>
 
@@ -84,13 +66,7 @@ PRIVATE>
 
 SYNTAX: /* "*/" parse-multiline-string drop ;
 
-SYNTAX: HEREDOC:
-    lexer get {
-        [ skip-blank ]
-        [ rest-of-line ]
-        [ next-line ]
-        [ parse-til-line-begins ]
-    } cleave suffix! ;
+SYNTAX: (( "))" parse-multiline-string drop ;
 
 SYNTAX: [[ "]]" parse-multiline-string suffix! ;
 SYNTAX: [=[ "]=]" parse-multiline-string suffix! ;

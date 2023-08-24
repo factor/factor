@@ -1,8 +1,7 @@
 ! Copyright (C) 2008 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
-USING: backtrack shuffle math math.ranges quotations locals fry
-kernel words io memoize macros prettyprint sequences assocs
-combinators namespaces ;
+! See https://factorcode.org/license.txt for BSD license.
+USING: assocs backtrack kernel math memoize ranges sequences
+words ;
 IN: benchmark.backtrack
 
 ! This was suggested by Dr_Ford. Compute the number of quadruples
@@ -32,22 +31,22 @@ MEMO: 24-from-4 ( a b c d -- ? )
     [ some-rots do-something 24-from-3 ] [ 4drop ] if-amb ;
 
 : find-impossible-24 ( -- n )
-    10 [1,b] [| a |
-        10 [1,b] [| b |
-            10 [1,b] [| c |
-                10 [1,b] [| d |
+    10 [1..b] [| a |
+        10 [1..b] [| b |
+            10 [1..b] [| c |
+                10 [1..b] [| d |
                     a b c d 24-from-4
                 ] count
             ] map-sum
         ] map-sum
     ] map-sum ;
 
-CONSTANT: words { 24-from-1 24-from-2 24-from-3 24-from-4 }
+CONSTANT: 24-words { 24-from-1 24-from-2 24-from-3 24-from-4 }
 
 : backtrack-benchmark ( -- )
-    words [ reset-memoized ] each
+    24-words [ reset-memoized ] each
     find-impossible-24 6479 assert=
-    words [ "memoize" word-prop assoc-size ] map
+    24-words [ "memoize" word-prop assoc-size ] map
     { 1588 5137 4995 10000 } assert= ;
 
 MAIN: backtrack-benchmark

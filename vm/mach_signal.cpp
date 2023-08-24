@@ -89,6 +89,8 @@ extern "C" kern_return_t catch_exception_raise(
     mach_port_t exception_port, mach_port_t thread, mach_port_t task,
     exception_type_t exception, exception_data_t code,
     mach_msg_type_number_t code_count) {
+  (void) exception_port;
+  (void) code_count;
   // 10.6 likes to report exceptions from child processes too. Ignore those
   if (task != mach_task_self())
     return KERN_FAILURE;
@@ -149,6 +151,7 @@ extern "C" kern_return_t catch_exception_raise(
 
 // The main function of the thread listening for exceptions.
 static void* mach_exception_thread(void* arg) {
+  (void) arg;
   for (;;) {
     // These two structures contain some private kernel data. We don't need
     // to access any of it so we don't bother defining a proper struct. The

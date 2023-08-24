@@ -1,6 +1,6 @@
 USING: html.streams html.streams.private accessors io
-io.streams.string io.styles kernel namespaces tools.test
-sbufs sequences inspector colors xml.writer
+io.streams.string io.styles kernel multiline namespaces
+tools.test sbufs sequences inspector colors xml.writer
 classes.predicate prettyprint ;
 IN: html.streams.tests
 
@@ -49,7 +49,7 @@ M: funky url-of "http://www.funky-town.com/" swap town>> append ;
     ] make-html-string
 ] unit-test
 
-{ "<div style=\"background-color: #ff00ff; white-space: pre; font-family: monospace; display: inline-block; \">cdr</div>" }
+{ "<div style=\"background-color: #ff00ff; display: inline-block; \">cdr</div>" }
 [
     [
         H{ { page-color T{ rgba f 1 0 1 1 } } }
@@ -57,16 +57,50 @@ M: funky url-of "http://www.funky-town.com/" swap town>> append ;
     ] make-html-string
 ] unit-test
 
-{ "<div style=\"white-space: pre; font-family: monospace; display: inline-block; \"></div><br/>" } [
+{ "<div style=\"display: inline-block; \"></div><br/>" } [
     [ H{ } [ ] with-nesting nl ] make-html-string
 ] unit-test
 
-{ } [ [ { 1 2 3 } describe ] with-html-writer drop ] unit-test
-
-{ "<img src=\"/icons/class-word.tiff\"/>" } [
-    [
-        "text"
-        { { image-style "vocab:definitions/icons/class-word.tiff" } }
-        format
-    ] make-html-string
-] unit-test
+{ [=[
+array with 3 elements
+<br/>
+<table style="display: inline-table; border-collapse: collapse;">
+  <tr>
+    <td valign="top" style="border: 1px solid #cccccc; padding: 2px; ">
+      <div style="display: inline-block; ">
+        0
+      </div>
+    </td>
+    <td valign="top" style="border: 1px solid #cccccc; padding: 2px; ">
+      <div style="display: inline-block; ">
+        1
+      </div>
+    </td>
+  </tr>
+  <tr>
+    <td valign="top" style="border: 1px solid #cccccc; padding: 2px; ">
+      <div style="display: inline-block; ">
+        1
+      </div>
+    </td>
+    <td valign="top" style="border: 1px solid #cccccc; padding: 2px; ">
+      <div style="display: inline-block; ">
+        2
+      </div>
+    </td>
+  </tr>
+  <tr>
+    <td valign="top" style="border: 1px solid #cccccc; padding: 2px; ">
+      <div style="display: inline-block; ">
+        2
+      </div>
+    </td>
+    <td valign="top" style="border: 1px solid #cccccc; padding: 2px; ">
+      <div style="display: inline-block; ">
+        3
+      </div>
+    </td>
+  </tr>
+</table>
+<br/>]=]
+} [ [ { 1 2 3 } describe ] with-html-writer pprint-xml>string ] unit-test

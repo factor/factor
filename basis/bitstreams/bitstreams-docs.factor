@@ -1,4 +1,4 @@
-USING: help.markup help.syntax kernel strings math byte-arrays accessors ;
+USING: help.markup help.syntax kernel math byte-arrays accessors ;
 IN: bitstreams
 
 
@@ -25,7 +25,7 @@ HELP: seek
 
 HELP: align
 { $values { "n" integer } { "bitstream" bit-reader } }
-{ $description "Moves the read cursor of the bit-reader forward until its position in bits from the start of the stream is an even multiple of n. If it is already such a multiple, the cursor is not moved at all. " } ;
+{ $description "Moves the read cursor of the bit-reader forward until its position in bits from the start of the stream is an even multiple of n. If it is already such a multiple, the cursor is not moved at all." } ;
 
 HELP: enough-bits?
 { $values { "n" integer } { "bs" bit-reader } { "?" boolean } }

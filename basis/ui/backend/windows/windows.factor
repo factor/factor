@@ -1,15 +1,18 @@
 ! Copyright (C) 2005, 2006 Doug Coleman.
 ! Portions copyright (C) 2007, 2010 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
-USING: accessors alien alien.data alien.strings arrays ascii assocs
-calendar classes classes.struct colors combinators continuations fry
-io io.crlf io.encodings.utf16n kernel libc literals locals make math
-math.bitwise namespaces sequences sets specialized-arrays strings
-threads ui ui.backend ui.clipboards ui.event-loop ui.gadgets
-ui.gadgets.private ui.gadgets.worlds ui.gestures ui.pixel-formats
-ui.private windows.dwmapi windows.errors windows.gdi32
-windows.kernel32 windows.messages windows.offscreen windows.opengl32
-windows.types windows.user32 assocs.extras ;
+! See https://factorcode.org/license.txt for BSD license.
+USING: accessors alien alien.c-types alien.data alien.strings
+arrays ascii assocs assocs.extras byte-arrays calendar classes
+classes.struct colors combinators continuations io io.crlf
+io.encodings.string io.encodings.utf16 io.encodings.utf8 kernel
+libc literals make math math.bitwise namespaces sequences sets
+specialized-arrays strings threads ui ui.backend ui.clipboards
+ui.event-loop ui.gadgets ui.gadgets.private ui.gadgets.worlds
+ui.gestures ui.pixel-formats ui.private windows.dwmapi
+windows.errors windows.gdi32 windows.kernel32 windows.messages
+windows.offscreen windows.ole32 windows.opengl32 windows.shell32
+windows.types windows.user32 ;
+FROM: unicode => upper-surrogate? under-surrogate? ;
 SPECIALIZED-ARRAY: POINT
 QUALIFIED-WITH: alien.c-types c
 IN: ui.backend.windows
@@ -82,7 +85,7 @@ CONSTANT: pfd-flag-map H{
     [ value>> ] [ 0 ] if* ;
 
 : >pfd ( attributes -- pfd )
-    [ PIXELFORMATDESCRIPTOR <struct> ] dip
+    [ PIXELFORMATDESCRIPTOR new ] dip
     {
         [ drop PIXELFORMATDESCRIPTOR c:heap-size >>nSize ]
         [ drop 1 >>nVersion ]
@@ -189,7 +192,7 @@ CONSTANT: window-control>ex-style
         { minimize-button 0 }
         { maximize-button 0 }
         { resize-handles $ WS_EX_WINDOWEDGE }
-        { small-title-bar $[ WS_EX_TOOLWINDOW WS_EX_TOPMOST bitor ] }
+        { small-title-bar flags{ WS_EX_TOOLWINDOW WS_EX_TOPMOST } }
         { normal-title-bar $ WS_EX_APPWINDOW }
         { dialog-window 0 }
     }
@@ -321,40 +324,56 @@ CONSTANT: exclude-keys-wm-char
 : send-key-up ( sym action? hWnd -- )
     [ [ <key-up> ] ] dip send-key-gesture ;
 
-: key-sym ( wParam -- string/f action? )
-    {
-        {
-            [ dup LETTER? ]
-            [ shift? caps-lock? xor [ CHAR: a + CHAR: A - ] unless 1string f ]
-        }
-        { [ dup digit? ] [ 1string f ] }
-        [ wm-keydown-codes at t ]
-    } cond ;
+: key-sym ( wParam -- string/f )
+    wm-keydown-codes at ; inline
 
-:: handle-wm-keydown ( hWnd uMsg wParam lParam -- )
+:: (handle-wm-keydown/up) ( hWnd uMsg wParam lParam send-key-down/up -- )
     wParam exclude-key-wm-keydown? [
-        wParam key-sym over [
-            dup ctrl? alt? xor or [
-                hWnd send-key-down
-            ] [ 2drop ] if
-        ] [ 2drop ] if
-    ] unless ;
+        wParam key-sym [
+            t hWnd send-key-down/up execute( sym action? hWnd -- )
+        ] [
+            256 <byte-array> :> keyboard-state
+            4 <byte-array> :> chars
+            lParam -16 shift 0xff bitand :> scan-code
+            keyboard-state GetKeyboardState win32-error=0/f
+            VK_CONTROL VK_CAPITAL [ 0 swap keyboard-state set-nth ] bi@
+            wParam scan-code keyboard-state chars 2 0 ToUnicode
+            1 <=  [
+                1 chars nth 8 shift 0 chars nth bitor
+            ] [
+                3 chars nth 8 shift 2 chars nth bitor ! dead-key
+            ] if
+            1string f hWnd send-key-down/up execute( sym action? hWnd -- )
+        ] if*
+    ] unless ; inline
+
+: handle-wm-keydown ( hWnd uMsg wParam lParam -- )
+    \ send-key-down (handle-wm-keydown/up) ;
+
+SYMBOL: upper-surrogate-wm-char
 
 :: handle-wm-char ( hWnd uMsg wParam lParam -- )
     wParam exclude-key-wm-char? [
-        ctrl? alt? xor [
-            wParam 1string
-            [ f hWnd send-key-down ]
-            [ hWnd window user-input ] bi
+        ctrl? alt? xor [ ! enable AltGr combination inputs
+            wParam {
+                { [ dup upper-surrogate? ] [
+                      upper-surrogate-wm-char set-global
+                ] }
+                { [ dup under-surrogate? ] [
+                    drop
+                    upper-surrogate-wm-char get-global [
+                        wParam "" 2sequence
+                        utf16n encode utf16n decode hWnd window user-input
+                    ] when*
+                ] }
+                [ 1string hWnd window user-input
+                  f upper-surrogate-wm-char set-global ]
+            } cond
         ] unless
     ] unless ;
 
-:: handle-wm-keyup ( hWnd uMsg wParam lParam -- )
-    wParam exclude-key-wm-keydown? [
-        wParam key-sym over [
-            hWnd send-key-up
-        ] [ 2drop ] if
-    ] unless ;
+: handle-wm-keyup ( hWnd uMsg wParam lParam -- )
+    \ send-key-up (handle-wm-keydown/up) ;
 
 :: set-window-active ( hwnd uMsg wParam lParam ? -- n )
     ? hwnd window active?<<
@@ -464,7 +483,7 @@ SYMBOL: nc-buttons
     ] if ;
 
 : make-TRACKMOUSEEVENT ( hWnd -- alien )
-    TRACKMOUSEEVENT <struct>
+    TRACKMOUSEEVENT new
         swap >>hwndTrack
         TRACKMOUSEEVENT c:heap-size >>cbSize ;
 
@@ -473,7 +492,7 @@ SYMBOL: nc-buttons
     over make-TRACKMOUSEEVENT
         TME_LEAVE >>dwFlags
         0 >>dwHoverTime
-    TrackMouseEvent drop
+    TrackMouseEvent win32-error=0/f
     >lo-hi swap window move-hand fire-motion ;
 
 :: handle-wm-mousewheel ( hWnd uMsg wParam lParam -- )
@@ -493,7 +512,7 @@ SYMBOL: nc-buttons
 : ?make-glass ( world hwnd -- )
     over window-controls>> textured-background swap member-eq? [
         composition-enabled? [
-            full-window-margins DwmExtendFrameIntoClientArea drop
+            full-window-margins DwmExtendFrameIntoClientArea check-hresult
             T{ rgba f 0.0 0.0 0.0 0.0 }
         ] [ drop system-background-color ] if >>background-color
         drop
@@ -515,6 +534,9 @@ SYMBOL: wm-handlers
 wm-handlers [
     H{
         ${ WM_CLOSE [ handle-wm-close 0 ] }
+        ! ${ WM_NCCREATE [ [ 3drop EnableNonClientDpiScaling drop ] [ DefWindowProc ] 4bi ] }
+        ! ${ WM_GETDPISCALEDSIZE [ DefWindowProc ] }
+        ! ${ WM_DPICHANGED [ DefWindowProc ] }
         ${ WM_PAINT [ 4dup handle-wm-paint DefWindowProc ] }
 
         ${ WM_SIZE [ handle-wm-size 0 ] }
@@ -569,7 +591,7 @@ M: windows-ui-backend do-events
     ] if ;
 
 :: register-window-class ( class-name-ptr -- )
-    WNDCLASSEX <struct> f GetModuleHandle
+    WNDCLASSEX new f GetModuleHandle
     class-name-ptr pick GetClassInfoEx 0 = [
         WNDCLASSEX c:heap-size >>cbSize
         flags{ CS_HREDRAW CS_VREDRAW CS_OWNDC } >>style
@@ -585,6 +607,7 @@ M: windows-ui-backend do-events
     ] [ drop ] if ;
 
 : adjust-RECT ( RECT style ex-style -- )
+    ! [ 0 ] dip GetDpiForSystem AdjustWindowRectExForDpi win32-error=0/f ;
     [ 0 ] dip AdjustWindowRectEx win32-error=0/f ;
 
 : make-RECT ( world -- RECT )
@@ -612,12 +635,20 @@ M: windows-ui-backend do-events
         dup
     ] change-global ;
 
+: get-device-caps ( handle -- x y )
+    GetDC
+    [ LOGPIXELSX GetDeviceCaps ]
+    [ LOGPIXELSY GetDeviceCaps ] bi ;
+
+: get-default-device-caps ( -- x y )
+    f get-device-caps ;
+
 :: create-window ( rect style ex-style -- hwnd )
     rect style ex-style make-adjusted-RECT
     [ get-window-class f ] dip
     [
         [ ex-style ] 2dip
-        WS_CLIPSIBLINGS WS_CLIPCHILDREN bitor style bitor
+        flags{ WS_CLIPSIBLINGS WS_CLIPCHILDREN } style bitor
     ] dip get-RECT-dimensions
     f f f GetModuleHandle f CreateWindowEx dup win32-error=0/f ;
 
@@ -644,7 +675,7 @@ M: windows-ui-backend do-events
 
 : set-pixel-format ( pixel-format hdc -- )
     swap handle>>
-    PIXELFORMATDESCRIPTOR <struct> SetPixelFormat win32-error=0/f ;
+    PIXELFORMATDESCRIPTOR new SetPixelFormat win32-error=0/f ;
 
 : setup-gl ( world -- )
     [ get-dc ] keep
@@ -670,9 +701,11 @@ M: windows-ui-backend (open-window)
     [ dup handle>> hWnd>> register-window ]
     [ handle>> hWnd>> show-window ] tri ;
 
+! https://github.com/factor/factor/issues/2173
+! ignore timeout (error 258)
 M: win-base select-gl-context
-    [ hDC>> ] [ hRC>> ] bi wglMakeCurrent win32-error=0/f
-    GdiFlush drop ;
+    [ hDC>> ] [ hRC>> ] bi wglMakeCurrent win32-error=0/f-ignore-timeout
+    GdiFlush win32-error=0/f ;
 
 M: win-base flush-gl-context
     hDC>> SwapBuffers win32-error=0/f ;
@@ -704,7 +737,7 @@ M: windows-ui-backend (with-ui)
         init-win32-ui
         start-ui
         event-loop
-    ] [ cleanup-win32-ui ] [ ] cleanup ;
+    ] [ cleanup-win32-ui ] finally ;
 
 M: windows-ui-backend beep
     0 MessageBeep drop ;
@@ -714,18 +747,18 @@ M: windows-ui-backend system-alert
 
 : fullscreen-RECT ( hwnd -- RECT )
     MONITOR_DEFAULTTONEAREST MonitorFromWindow
-    MONITORINFOEX <struct>
+    MONITORINFOEX new
         MONITORINFOEX c:heap-size >>cbSize
     [ GetMonitorInfo win32-error=0/f ] keep rcMonitor>> ;
 
 : client-area>RECT ( hwnd -- RECT )
-    RECT <struct>
+    RECT new
     [ GetClientRect win32-error=0/f ]
     [ >c-ptr POINT cast-array [ ClientToScreen drop ] with each ]
     [ nip ] 2tri ;
 
 : hwnd>RECT ( hwnd -- RECT )
-    RECT <struct> [ GetWindowRect win32-error=0/f ] keep ;
+    RECT new [ GetWindowRect win32-error=0/f ] keep ;
 
 M: windows-ui-backend (grab-input)
     0 ShowCursor drop
@@ -769,13 +802,39 @@ CONSTANT: fullscreen-flags flags{ WS_CAPTION WS_BORDER WS_THICKFRAME }
         [ drop SW_RESTORE ShowWindow win32-error=0/f ]
     } 2cleave ;
 
+: ensure-null-terminated ( str -- str' )
+    dup ?last 0 = [ "\0" append ] unless ; inline
+
+: add-tray-icon ( title -- )
+    NIM_ADD
+    NOTIFYICONDATA new
+        NOTIFYICONDATA heap-size >>cbSize
+        NOTIFYICON_VERSION_4 over timeout-version>> uVersion<<
+        NIF_TIP NIF_ICON bitor >>uFlags
+        world get handle>> hWnd>> >>hWnd
+        f GetModuleHandle "APPICON" native-string>alien LoadIcon >>hIcon
+        rot ensure-null-terminated utf8 encode >>szTip
+        Shell_NotifyIcon win32-error=0/f ;
+
+: remove-tray-icon ( -- )
+    NIM_DELETE
+    NOTIFYICONDATA new
+        NOTIFYICONDATA heap-size >>cbSize
+        world get handle>> hWnd>> >>hWnd
+    Shell_NotifyIcon win32-error=0/f ;
+
 M: windows-ui-backend (set-fullscreen)
     [ enter-fullscreen ] [ exit-fullscreen ] if ;
 
 M: windows-ui-backend (fullscreen?)
-    handle>> hWnd>>
-    [ hwnd>RECT ] [ fullscreen-RECT ] bi
-    [ get-RECT-dimensions 2array 2nip ] same? ;
+    handle>> [
+        hWnd>>
+        [ hwnd>RECT ] [ fullscreen-RECT ] bi
+        [ get-RECT-dimensions 2array 2nip ] same?
+    ] [
+        [ "windows-ui-backend no hWnd" print ] with-global
+        f
+    ] if* ;
 
 M:: windows-ui-backend resize-window ( world dim -- )
     world handle>> hWnd>>

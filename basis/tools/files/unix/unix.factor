@@ -1,10 +1,9 @@
 ! Copyright (C) 2008 Doug Coleman.
-! See http://factorcode.org/license.txt for BSD license.
-USING: accessors combinators kernel system unicode io.files
-io.files.info io.files.info.unix generalizations
-strings arrays sequences math.parser unix.groups unix.users
-tools.files.private unix.stat math fry macros combinators.smart
-io tools.files math.order prettyprint ;
+! See https://factorcode.org/license.txt for BSD license.
+USING: accessors arrays combinators combinators.smart
+io.files.info.unix kernel math math.order math.parser sequences
+strings system tools.files tools.files.private unicode
+unix.groups unix.stat unix.users ;
 IN: tools.files.unix
 
 <PRIVATE
@@ -45,7 +44,7 @@ IN: tools.files.unix
         [ drop "" ]
     } cond ;
 
-M: unix (directory.) ( path -- lines )
+M: unix (directory.)
     <listing-tool>
         {
             +permissions+ +nlinks+ +user+ +group+
@@ -54,7 +53,7 @@ M: unix (directory.) ( path -- lines )
         { { directory-entry>> name>> <=> } } >>sort
     [ [ list-files ] with-group-cache ] with-user-cache ;
 
-M: unix file-spec>string ( file-listing spec -- string )
+M: unix file-spec>string
     {
         { +file-name/type+ [
             directory-entry>> [ name>> ] [ file-type>trailing ] bi append

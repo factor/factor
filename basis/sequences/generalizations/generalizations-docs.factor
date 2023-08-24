@@ -1,5 +1,5 @@
 ! Copyright (C) 2009 Joe Groff.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: help.syntax help.markup kernel sequences quotations
 math arrays combinators ;
 IN: sequences.generalizations
@@ -48,6 +48,16 @@ HELP: firstn
     }
 } ;
 
+HELP: ?firstn
+{ $values { "n" integer } }
+{ $description "A generalization of " { $link ?first } " that pushes the first " { $snippet "n" } " elements of a sequence on the stack, or " { $link f } " if the sequence is shorter than the requested number of elements." }
+{ $examples
+    "Some core words expressed in terms of " { $link ?firstn } ":"
+    { $table
+        { { $link ?first } { $snippet "1 ?firstn" } }
+    }
+} ;
+
 HELP: set-firstn
 { $values { "n" integer } }
 { $description "A generalization of " { $link set-first } " "
@@ -55,8 +65,8 @@ HELP: set-firstn
 
 HELP: nappend
 { $values
-     { "n" integer }
-     { "seq" sequence }
+    { "n" integer }
+    { "seq" sequence }
 }
 { $description "Outputs a new sequence consisting of the elements of the top " { $snippet "n" } " sequences from the datastack in turn." }
 { $errors "Throws an error if any of the sequences contain elements that are not permitted in the sequence type of the first sequence." }
@@ -69,8 +79,8 @@ HELP: nappend
 
 HELP: nappend-as
 { $values
-     { "n" integer } { "exemplar" sequence }
-     { "seq" sequence }
+    { "n" integer } { "exemplar" sequence }
+    { "seq" sequence }
 }
 { $description "Outputs a new sequence of type " { $snippet "exemplar" } " consisting of the elements of the top " { $snippet "n" } " sequences from the datastack in turn." }
 { $errors "Throws an error if any of the sequences contain elements that are not permitted in the sequence type of the first sequence." }

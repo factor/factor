@@ -1,9 +1,9 @@
 ! Copyright (C) 2013 John Benediktsson.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 
 USING: accessors alien alien.c-types alien.data byte-arrays
-checksums combinators fry grouping io.binary kernel math
-math.bitwise math.ranges sequences sequences.private ;
+checksums endian grouping kernel math math.bitwise ranges
+sequences sequences.private ;
 
 IN: checksums.superfast
 
@@ -19,7 +19,7 @@ C: <superfast> superfast
     [ -11 shift ] [ + ] bi ; inline
 
 : main-loop ( seq hash -- seq hash' )
-    over byte-array? little-endian? and [
+    over byte-array? alien.data:little-endian? and [
         [ 0 over length 4 - 4 <range> ] dip
         [ pick <displaced-alien> int deref (main-loop) ] reduce
     ] [

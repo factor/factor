@@ -1,5 +1,5 @@
 ! Copyright (C) 2009 Doug Coleman.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: classes.tuple help.markup help.syntax kernel math
 quotations sequences stack-checker arrays ;
 IN: combinators.smart
@@ -246,6 +246,10 @@ HELP: smart-2reduce
 HELP: smart-2map-reduce
 { $values { "2map-reduce-quots" sequence } }
 { $description "A version of " { $link 2map-reduce } " that takes a sequence of " { $snippet "{ 2map-quot 2reduce-quot }" } " pairs, returning the " { $link 2map-reduce } " result for each pair." } ;
+
+HELP: smart-loop
+{ $values { "quot" { $quotation ( ..a -- ..b ? ) } } }
+{ $description "A version of " { $link loop } " that runs until the " { $snippet "quot" } " returns " { $link f } " and leaves the result of the quotation on the stack." } ;
 
 ARTICLE: "combinators.smart" "Smart combinators"
 "A " { $emphasis "smart combinator" } " is a macro which reflects on the stack effect of an input quotation. The " { $vocab-link "combinators.smart" } " vocabulary implements a few simple smart combinators which look at the static stack effects of input quotations and generate code which produces or consumes the relevant number of stack values." $nl

@@ -1,9 +1,10 @@
 ! Copyright (c) 2009 Aaron Schaefer.
-! See http://factorcode.org/license.txt for BSD license.
-USING: fry kernel math math.primes math.ranges project-euler.common sequences ;
+! See https://factorcode.org/license.txt for BSD license.
+USING: kernel math math.primes project-euler.common ranges
+sequences ;
 IN: project-euler.058
 
-! http://projecteuler.net/index.php?section=problems&id=58
+! https://projecteuler.net/index.php?section=problems&id=58
 
 ! DESCRIPTION
 ! -----------
@@ -43,7 +44,7 @@ CONSTANT: PERCENT_PRIME 0.1
 !    (n-2)² + 4(n-1) = odd squares, no need to calculate
 
 : prime-corners ( n -- m )
-    3 [1,b] swap '[ _ [ 1 - * ] keep 2 - sq + prime? ] count ;
+    3 [1..b] swap '[ _ [ 1 - * ] keep 2 - sq + prime? ] count ;
 
 : total-corners ( n -- m )
     1 - 2 * ; foldable

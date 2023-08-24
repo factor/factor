@@ -3,8 +3,8 @@ sequences ;
 IN: benchmark.parse-ratio
 
 CONSTANT: test-ratios $[
-    200,000 100,000 random-integers
-    200,000 1,000 random-integers 1 v+n v/
+    200,000 100,000 randoms
+    200,000 1,000 randoms 1 v+n v/
 ]
 
 : parse-ratio-benchmark ( -- )

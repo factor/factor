@@ -1,7 +1,7 @@
 USING: accessors alien alien.c-types alien.data alien.syntax
 arrays byte-arrays classes.struct combinators.short-circuit
 continuations destructors fry io io.encodings.string
-io.encodings.utf16n kernel literals locals math sequences
+io.encodings.utf16 kernel literals locals math sequences
 strings system tools.ps windows.errors windows.handles
 windows.kernel32 windows.ntdll windows.types ;
 IN: tools.ps.windows
@@ -10,7 +10,7 @@ IN: tools.ps.windows
     0 CreateToolhelp32Snapshot dup win32-error=0/f ;
 
 : default-process-entry ( -- obj )
-    PROCESSENTRY32 <struct> PROCESSENTRY32 heap-size >>dwSize ;
+    PROCESSENTRY32 new PROCESSENTRY32 heap-size >>dwSize ;
 
 : first-process ( handle -- PROCESSENTRY32 )
     default-process-entry
@@ -28,7 +28,7 @@ IN: tools.ps.windows
 
 : query-information-process ( HANDLE -- PROCESS_BASIC_INFORMATION )
     0
-    PROCESS_BASIC_INFORMATION <struct> [
+    PROCESS_BASIC_INFORMATION new [
         dup byte-length
         f
         NtQueryInformationProcess drop
@@ -95,4 +95,4 @@ IN: tools.ps.windows
         ] map sift
     ] with-destructors ;
 
-M: windows ps ( -- assoc ) process-list ;
+M: windows ps process-list ;

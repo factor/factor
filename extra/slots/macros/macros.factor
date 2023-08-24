@@ -1,8 +1,7 @@
 ! Copyright (C) 2011 Joe Groff.
-! See http://factorcode.org/license.txt for BSD license.
-USING: combinators compiler.units fry generalizations kernel
-locals macros math quotations sequences sequences.generalizations
-slots vectors ;
+! See https://factorcode.org/license.txt for BSD license.
+USING: combinators compiler.units generalizations kernel math
+quotations sequences sequences.generalizations slots vectors ;
 IN: slots.macros
 
 ! Fundamental accessors

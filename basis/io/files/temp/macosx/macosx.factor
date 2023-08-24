@@ -1,8 +1,8 @@
 ! Copyright (C) 2012 Joe Groff.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: alien.c-types alien.syntax cocoa.plists cocoa.runtime
-cocoa.types core-foundation.strings io.directories io.files
-io.files.temp io.pathnames kernel sequences system ;
+cocoa.types core-foundation.strings io.files io.files.temp
+io.pathnames kernel sequences system ;
 IN: io.files.temp.macosx
 
 <PRIVATE
@@ -27,7 +27,7 @@ CONSTANT: factor-bundle-name "org.factorcode.Factor"
     factor-bundle-name append-path ;
 
 : first-existing ( paths -- path )
-    [ exists? ] find nip
+    [ file-exists? ] find nip
     [ "no user cache directory found" throw ] unless* ; inline
 
 PRIVATE>

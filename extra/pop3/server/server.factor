@@ -1,10 +1,9 @@
 ! Copyright (C) 2009 Elie Chaftari.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors calendar combinators concurrency.promises
-destructors fry io io.crlf io.encodings.utf8 io.sockets
-io.sockets.secure.debug io.streams.duplex io.timeouts
-kernel locals math.parser namespaces prettyprint sequences
-splitting threads ;
+destructors io io.crlf io.encodings.utf8 io.sockets
+io.sockets.secure.debug io.streams.duplex io.timeouts kernel
+math.parser namespaces sequences threads ;
 IN: pop3.server
 
 ! Mock POP3 server for testing purposes.

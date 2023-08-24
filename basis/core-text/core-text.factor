@@ -1,11 +1,12 @@
 ! Copyright (C) 2009 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors alien.c-types alien.data alien.syntax arrays
-assocs cache colors combinators core-foundation
+assocs cache classes colors combinators core-foundation
 core-foundation.attributed-strings core-foundation.strings
 core-graphics core-graphics.types core-text.fonts destructors
-fonts init kernel locals make math math.functions math.order
-math.vectors memoize namespaces sequences strings ;
+fonts io.encodings.string io.encodings.utf16 kernel make
+math math.functions math.vectors namespaces opengl sequences
+strings ;
 IN: core-text
 
 TYPEDEF: void* CTLineRef
@@ -31,10 +32,6 @@ FUNCTION: double CTLineGetTypographicBounds ( CTLineRef line, CGFloat* ascent, C
 
 FUNCTION: CGRect CTLineGetImageBounds ( CTLineRef line, CGContextRef context )
 
-SYMBOL: retina?
-
-ERROR: not-a-string object ;
-
 MEMO: make-attributes ( open-font color -- hashtable )
     [
         kCTForegroundColorAttributeName ,,
@@ -45,14 +42,14 @@ MEMO: make-attributes ( open-font color -- hashtable )
     [
         [
             dup selection? [ string>> ] when
-            dup string? [ not-a-string ] unless
+            string check-instance
         ] 2dip
         make-attributes <CFAttributedString> &CFRelease
         CTLineCreateWithAttributedString
     ] with-destructors ;
 
 TUPLE: line < disposable font string line metrics image loc dim
-render-loc render-dim ;
+render-loc render-dim render-ext ;
 
 : typographic-bounds ( line -- width ascent descent leading )
     { CGFloat CGFloat CGFloat }
@@ -79,8 +76,7 @@ render-loc render-dim ;
 
 : metrics>dim ( bounds -- dim )
     [ width>> ] [ [ ascent>> ] [ descent>> ] bi + ] bi
-    [ ceiling >integer ]
-    bi@ 2array ;
+    ceiling >integer 2array ;
 
 : fill-background ( context font dim -- )
     [ background>> >rgba-components CGContextSetRGBFillColor ]
@@ -88,8 +84,10 @@ render-loc render-dim ;
     bi-curry* bi ;
 
 : selection-rect ( dim line selection -- rect )
-    [ start>> ] [ end>> ] bi
-    [ f CTLineGetOffsetForStringIndex round ] bi-curry@ bi
+    [let [ start>> ] [ end>> ] [ string>> ] tri :> ( start end string )
+        start end [ 0 swap string subseq utf16n encode length 2 /i ] bi@
+    ]
+    [ f CTLineGetOffsetForStringIndex ] bi-curry@ bi
     [ drop nip 0 ] [ swap - swap second ] 3bi <CGRect> ;
 
 : CGRect-translate-x ( CGRect x -- CGRect' )
@@ -111,12 +109,15 @@ render-loc render-dim ;
 
 :: line-loc ( metrics loc dim -- loc )
     loc first
-    metrics ascent>> ceiling dim second loc second + - 2array ;
+    metrics ascent>> dim second loc second + - 1 - 2array ;
+
+: load-2x? ( -- ? )
+    gl-scale-factor get-global [ 1.0 > ] [ f ] if* ;
 
 :: <line> ( font string -- line )
     [
         line new-disposable
-        font retina? get-global [ cache-font@2x ] [ cache-font ] if :> open-font
+        font load-2x? [ cache-font@2x ] [ cache-font ] if :> open-font
         string open-font font foreground>> <CTLine> |CFRelease :> line
         open-font line compute-line-metrics
         [ >>metrics ] [ metrics>dim >>dim ] bi
@@ -135,12 +136,14 @@ render-loc render-dim ;
         ctline line-rect :> rect
         rect origin>> CGPoint>loc :> (loc)
         rect size>> CGSize>dim :> (dim)
+
         (loc) vfloor :> loc
-        (loc) (dim) v+ vceiling :> ext
-        ext loc [ - >integer 1 max ] 2map :> dim
+        (dim) vceiling :> dim
+        dim [ >integer 1 + ] map :> ext
 
         loc line render-loc<<
         dim line render-dim<<
+        ext line render-ext<<
 
         line metrics>> loc dim line-loc line loc<<
 
@@ -148,15 +151,16 @@ render-loc render-dim ;
 
     line render-loc>> :> loc
     line render-dim>> :> dim
+    line render-ext>> :> ext
 
-    line dim [
+    line ext [
         {
-            [ font dim fill-background ]
-            [ loc dim ctline string fill-selection-background ]
+            [ font ext fill-background ]
+            [ loc first 0 2array dim first ext second 2array ctline string fill-selection-background ]
             [ loc set-text-position ]
             [ [ ctline ] dip CTLineDraw ]
         } cleave
-    ] make-bitmap-image retina? get-global >>2x? ;
+    ] make-bitmap-image load-2x? >>2x? ;
 
 : line>image ( line -- image )
     dup image>> [ render >>image ] unless image>> ;
@@ -168,4 +172,4 @@ SYMBOL: cached-lines
 : cached-line ( font string -- line )
     cached-lines get-global [ <line> ] 2cache ;
 
-[ <cache-assoc> cached-lines set-global f retina? set-global ] "core-text" add-startup-hook
+STARTUP-HOOK: [ <cache-assoc> cached-lines set-global ]

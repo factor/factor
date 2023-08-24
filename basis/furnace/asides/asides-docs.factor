@@ -1,11 +1,11 @@
-USING: help.markup help.syntax io.streams.string urls
-furnace.redirection http furnace.sessions furnace.db ;
+USING: furnace.db furnace.redirection furnace.sessions
+help.markup help.syntax http urls ;
 IN: furnace.asides
 
 HELP: <asides>
 { $values
-     { "responder" "a responder" }
-     { "responder'" "a new responder" }
+    { "responder" "a responder" }
+    { "responder'" "a new responder" }
 }
 { $description "Creates a new " { $link asides } " responder wrapping an existing responder." } ;
 

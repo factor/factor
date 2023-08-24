@@ -1,8 +1,8 @@
 ! Copyright (C) 2008, 2010 Daniel Ehrenberg, Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors byte-arrays combinators destructors io
 io.streams.plain kernel kernel.private math namespaces sbufs
-sequences sequences.private splitting strings strings.private ;
+sequences sequences.private strings strings.private ;
 IN: io.encodings
 
 ! The encoding descriptor protocol
@@ -109,7 +109,7 @@ M: decoder stream-element-type
         over cr- dup CHAR: \n eq? [ drop (read1) ] [ nip ] if
     ] [ nip ] if ; inline
 
-M: decoder stream-read1 ( decoder -- ch )
+M: decoder stream-read1
     dup (read1) fix-cr ; inline
 
 : (read-first) ( n buf decoder -- buf stream encoding n c )

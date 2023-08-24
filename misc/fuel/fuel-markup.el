@@ -1,7 +1,7 @@
-;;; fuel-markup.el -- printing factor help markup
+;;; fuel-markup.el -- printing factor help markup -*- lexical-binding: t -*-
 
 ;; Copyright (C) 2009 Jose Antonio Ortega Ruiz
-;; See http://factorcode.org/license.txt for BSD license.
+;; See https://factorcode.org/license.txt for BSD license.
 
 ;; Author: Jose Antonio Ortega Ruiz <jao@gnu.org>
 ;; Keywords: languages, fuel, factor
@@ -109,7 +109,6 @@
     ($code . (lambda (e) (fuel-markup--code e t)))
     ($command . fuel-markup--command)
     ($command-map . fuel-markup--null)
-    ($complex-shuffle . fuel-markup--complex-shuffle)
     ($contract . fuel-markup--contract)
     ($curious . fuel-markup--curious)
     ($definition . fuel-markup--definition)
@@ -488,15 +487,6 @@ the 'words.' word emits."
          (authors (fuel-eval--retort-result (fuel-eval--send/wait cmd))))
     (fuel-markup--list
      (cons '$list (mapcar (lambda (a) (list '$link a a 'author)) authors)))))
-
-(defun fuel-markup--complex-shuffle (e)
-  (fuel-markup--description
-   `($description "Shuffle word. Rearranges the top of the datastack as "
-                  "indicated in the stack effect pattern."))
-  (fuel-markup--elem-with-heading
-   `(nil "The data flow represented by this shuffle word can be more clearly "
-         "expressed using " ($vocab-link "Lexical variables" "locals") ".")
-   "This word is deprecated"))
 
 (defun fuel-markup--list (e)
   (fuel-markup--insert-nl-if-nb)

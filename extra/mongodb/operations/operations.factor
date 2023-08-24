@@ -1,7 +1,8 @@
-USING: accessors assocs bson.reader bson.writer byte-arrays
-byte-vectors combinators formatting fry io io.binary io.encodings.private
-io.encodings.binary io.encodings.string io.encodings.utf8 io.encodings.utf8.private io.files
-kernel locals math mongodb.msg namespaces sequences uuid bson.writer.private ;
+USING: accessors assocs bson bson.private byte-arrays
+byte-vectors combinators formatting endian fry io
+io.encodings.private io.encodings.binary io.encodings.string
+io.encodings.utf8 io.encodings.utf8.private io.files kernel
+locals math mongodb.msg namespaces sequences uuid ;
 
 FROM: mongodb.connection => connection-buffer ;
 FROM: alien => byte-length ;
@@ -110,9 +111,9 @@ PRIVATE>
 
 : write-insert-message ( message -- )
     [
-       [ flags>> write-int32 ]
-       [ collection>> write-cstring ]
-       [ objects>> [ assoc>stream ] each ] tri
+        [ flags>> write-int32 ]
+        [ collection>> write-cstring ]
+        [ objects>> [ assoc>stream ] each ] tri
     ] (write-message) ; inline
 
 : write-update-message ( message -- )
@@ -148,9 +149,9 @@ PRIVATE>
 
 : write-killcursors-message ( message -- )
     [
-       [ flags>> write-int32 ]
-       [ cursors#>> write-int32 ]
-       [ cursors>> [ write-longlong ] each ] tri
+        [ flags>> write-int32 ]
+        [ cursors#>> write-int32 ]
+        [ cursors>> [ write-longlong ] each ] tri
     ] (write-message) ; inline
 
 PRIVATE>

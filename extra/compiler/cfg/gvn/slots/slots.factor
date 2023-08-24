@@ -1,7 +1,6 @@
 ! Copyright (C) 2010 Slava Pestov, 2011 Alex Vondrak.
-! See http://factorcode.org/license.txt for BSD license.
-USING: accessors combinators.short-circuit cpu.architecture fry
-kernel math
+! See https://factorcode.org/license.txt for BSD license.
+USING: accessors cpu.architecture kernel math
 compiler.cfg.instructions
 compiler.cfg.gvn.graph
 compiler.cfg.gvn.avail

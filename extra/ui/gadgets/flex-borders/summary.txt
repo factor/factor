@@ -1,0 +1,1 @@
+A border implementation that doesn't fixate the contained gadget size

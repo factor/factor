@@ -1,7 +1,7 @@
 ! Copyright (C) 2008 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: arrays assocs combinators concurrency.count-downs
-concurrency.futures fry generalizations kernel macros sequences
+concurrency.futures generalizations kernel sequences
 sequences.private sequences.product ;
 IN: concurrency.combinators
 
@@ -38,10 +38,16 @@ PRIVATE>
 : future-values ( futures -- futures )
     [ ?future ] map! ; inline
 
+: future-values-timeout ( futures timeout -- futures )
+    '[ _ ?future-timeout ] map! ; inline
+
 PRIVATE>
 
 : parallel-map ( seq quot: ( elt -- newelt ) -- newseq )
     [future] map future-values ; inline
+
+: parallel-map-timeout (  seq  quot: ( elt -- newelt ) timeout -- newseq )
+    [ [future] map ] dip future-values-timeout ; inline
 
 : parallel-assoc-map-as ( assoc quot: ( key value -- newkey newvalue ) exemplar -- newassoc )
     [

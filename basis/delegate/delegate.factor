@@ -1,10 +1,10 @@
 ! Copyright (C) 2007, 2008 Daniel Ehrenberg
 ! Portions copyright (C) 2009, 2010 Slava Pestov, Joe Groff
-! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays assocs classes.tuple definitions effects generic
-generic.standard hashtables kernel lexer math parser
-generic.parser sequences sets slots words words.symbol fry
-compiler.units make ;
+! See https://factorcode.org/license.txt for BSD license.
+USING: accessors arrays assocs classes classes.tuple
+compiler.units definitions effects fry generic generic.standard
+hashtables kernel lexer make math parser sequences sets slots
+words words.symbol ;
 IN: delegate
 
 ERROR: broadcast-words-must-have-no-outputs group ;
@@ -60,12 +60,12 @@ PREDICATE: consult-method < method
     "consultation" word-prop >boolean ;
 
 M: consult-method reset-word
-    [ call-next-method ] [ f "consultation" set-word-prop ] bi ;
+    [ call-next-method ] [ "consultation" remove-word-prop ] bi ;
 
 GENERIC#: (consult-method-quot) 2 ( consultation quot word -- object )
 
 M: consultation (consult-method-quot)
-    '[ _ call _ execute ] nip ;
+    dup "combination" word-prop make-consult-quot ;
 
 M: broadcast (consult-method-quot)
     '[ _ call [ _ execute ] each ] nip ;
@@ -159,11 +159,8 @@ M: consultation forget*
 : show-words ( wordlist' -- wordlist )
     [ dup second zero? [ first ] when ] map ;
 
-ERROR: not-a-generic word ;
-
 : check-generic ( generic -- )
-    dup array? [ first ] when
-    dup generic? [ drop ] [ not-a-generic ] if ;
+    dup array? [ first ] when generic check-instance drop ;
 
 PRIVATE>
 

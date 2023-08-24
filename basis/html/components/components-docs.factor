@@ -1,7 +1,7 @@
 ! Copyright (C) 2008 Slava Pestov
-! See http://factorcode.org/license.txt for BSD license.
-USING: help.markup help.syntax io.streams.string kernel strings
-urls lcs inspector present io ;
+! See https://factorcode.org/license.txt for BSD license.
+USING: help.markup help.syntax inspector io kernel lcs present
+strings urls ;
 IN: html.components
 
 HELP: checkbox

@@ -1,7 +1,7 @@
 ! Copyright (C) 2008 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
-USING: kernel accessors combinators namespaces strings
-logging urls http http.server http.server.responses ;
+! See https://factorcode.org/license.txt for BSD license.
+USING: accessors http http.server.responses kernel logging
+namespaces strings urls ;
 IN: http.server.redirection
 
 GENERIC: relative-to-request ( url -- url' )

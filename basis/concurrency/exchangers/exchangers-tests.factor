@@ -1,5 +1,5 @@
 USING: tools.test concurrency.exchangers
-concurrency.count-downs concurrency.promises locals kernel
+concurrency.count-downs concurrency.promises kernel
 threads ;
 FROM: sequences => 3append ;
 IN: concurrency.exchangers.tests

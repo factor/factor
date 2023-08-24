@@ -1,5 +1,5 @@
 ! Copyright (C) 2009 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: tools.test namespaces documents documents.elements ;
 IN: document.elements.tests
 
@@ -53,6 +53,36 @@ SYMBOL: doc
 ! one-line-elt
 { { 1 0 } } [ { 1 3 } doc get one-line-elt prev-elt ] unit-test
 { { 1 14 } } [ { 1 3 } doc get one-line-elt next-elt ] unit-test
+
+! paragraph-elt
+<document> doc set
+"First line
+Second line
+
+Fourth line
+Fifth line
+Sixth line
+
+
+" doc get set-doc-string
+
+{ { 0 0 } } [ { 0 0 } doc get paragraph-elt prev-elt ] unit-test
+{ { 0 0 } } [ { 0 2 } doc get paragraph-elt prev-elt ] unit-test
+{ { 0 0 } } [ { 1 2 } doc get paragraph-elt prev-elt ] unit-test
+{ { 3 0 } } [ { 5 2 } doc get paragraph-elt prev-elt ] unit-test
+{ { 3 0 } } [ { 6 0 } doc get paragraph-elt prev-elt ] unit-test
+{ { 6 0 } } [ { 7 0 } doc get paragraph-elt prev-elt ] unit-test
+{ { 7 0 } } [ { 8 0 } doc get paragraph-elt prev-elt ] unit-test
+
+{ { 1 11 } } [ { 0 3 } doc get paragraph-elt next-elt ] unit-test
+{ { 1 11 } } [ { 1 3 } doc get paragraph-elt next-elt ] unit-test
+{ { 2 0 } } [ { 1 11 } doc get paragraph-elt next-elt ] unit-test
+{ { 5 10 } } [ { 2 0 } doc get paragraph-elt next-elt ] unit-test
+{ { 5 10 } } [ { 4 2 } doc get paragraph-elt next-elt ] unit-test
+{ { 7 0 } } [ { 6 0 } doc get paragraph-elt next-elt ] unit-test
+{ { 8 0 } } [ { 7 0 } doc get paragraph-elt next-elt ] unit-test
+{ { 8 0 } } [ { 8 0 } doc get paragraph-elt next-elt ] unit-test
+
 
 ! page-elt
 <document> doc set

@@ -1,13 +1,13 @@
 ! Copyright (C) 2012 John Benediktsson
-! See http://factorcode.org/license.txt for BSD license
-USING: accessors assocs fry kernel locals sequences
-sequences.rotated sorting ;
+! See https://factorcode.org/license.txt for BSD license
+USING: accessors assocs kernel sequences sequences.rotated
+sorting ;
 IN: math.transforms.bwt
 
 ! Semi-efficient versions of Burrows-Wheeler Transform
 
 :: bwt ( seq -- i newseq )
-    seq all-rotations natural-sort
+    seq all-rotations sort
     [ [ n>> 0 = ] find drop ] keep
     [ last ] seq map-as ;
 

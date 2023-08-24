@@ -1,11 +1,11 @@
 ! Copyright (C) 2003, 2008 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
-USING: logging.server sequences namespaces concurrency.messaging
-words kernel arrays shuffle tools.annotations
-prettyprint.config prettyprint debugger io.streams.string
-splitting continuations effects generalizations parser strings
-quotations fry accessors math assocs math.order
-sequences.generalizations ;
+! See https://factorcode.org/license.txt for BSD license.
+USING: accessors arrays assocs concurrency.messaging
+continuations debugger effects generalizations io.streams.string
+kernel math.order namespaces parser prettyprint
+prettyprint.config quotations sequences
+sequences.generalizations splitting strings tools.annotations
+vocabs words ;
 IN: logging
 
 SYMBOLS: DEBUG NOTICE WARNING ERROR CRITICAL ;
@@ -46,7 +46,7 @@ ERROR: bad-log-message-parameters msg word level ;
     check-log-message
     log-service get
     2dup [ log? ] [ ] bi* and [
-        [ [ string-lines ] [ name>> ] [ name>> ] tri* ] dip
+        [ [ split-lines ] [ name>> ] [ name>> ] tri* ] dip
         4array "log-message" send-to-log-server
     ] [
         4drop
@@ -142,8 +142,6 @@ SYNTAX: LOG:
     scan-new-word dup scan-word
     '[ 1array stack>message _ _ log-message ]
     ( message -- ) define-declared ;
-
-USE: vocabs
 
 "logging.parser" require
 "logging.analysis" require

@@ -1,5 +1,5 @@
 USING: byte-arrays help.markup help.syntax math
-math.parser.private prettyprint namespaces make sequences
+math.parser.private prettyprint make sequences
 strings ;
 
 IN: math.parser

@@ -1,5 +1,5 @@
 ! Copyright (C) 2010 Dmitry Shubin.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors alien.c-types alien.data alien.destructors
 alien.enums alien.syntax classes.struct combinators continuations
 destructors fry gdbm.ffi io.backend kernel libc locals math namespaces
@@ -70,7 +70,7 @@ DESTRUCTOR: gdbm-close
 
 : object>datum ( obj -- datum )
     object>bytes [ malloc-byte-array &free ] [ length ] bi
-    datum <struct-boa> ;
+    datum boa ;
 
 : datum>object* ( datum -- obj ? )
     [ dptr>> ] [ dsize>> ] bi over
@@ -83,15 +83,15 @@ DESTRUCTOR: gdbm-close
         gdbm_store check-error
     ] with-destructors ;
 
-:: (setopt) ( value option -- )
+:: (gdbm-setopt) ( value option -- )
     [
         int heap-size dup malloc &free :> ( size ptr )
         value ptr 0 int set-alien-value
         dbf option ptr size gdbm_setopt check-error
     ] with-destructors ;
 
-: setopt ( value option -- )
-    [ GDBM_CACHESIZE = [ >c-bool ] unless ] keep (setopt) ;
+: gdbm-setopt ( value option -- )
+    [ GDBM_CACHESIZE = [ >c-bool ] unless ] keep (gdbm-setopt) ;
 
 PRIVATE>
 
@@ -101,50 +101,51 @@ PRIVATE>
 : gdbm-error-message ( error -- msg )
     enum>number gdbm_strerror ;
 
-: replace ( key content -- ) GDBM_REPLACE gdbm-store ;
-: insert ( key content -- ) GDBM_INSERT gdbm-store ;
+: gdbm-replace ( key content -- ) GDBM_REPLACE gdbm-store ;
 
-: delete ( key -- )
+: gdbm-insert ( key content -- ) GDBM_INSERT gdbm-store ;
+
+: gdbm-delete ( key -- )
     [ dbf swap object>datum gdbm_delete check-error ]
     with-destructors ;
 
-: fetch* ( key -- content ? )
+: gdbm-fetch* ( key -- content ? )
     [ dbf swap object>datum gdbm_fetch datum>object* ]
     with-destructors ;
 
-: first-key* ( -- key ? )
+: gdbm-first-key* ( -- key ? )
     [ dbf gdbm_firstkey datum>object* ] with-destructors ;
 
-: next-key* ( key -- next-key ? )
+: gdbm-next-key* ( key -- next-key ? )
     [ dbf swap object>datum gdbm_nextkey datum>object* ]
     with-destructors ;
 
-: fetch ( key -- content/f ) fetch* drop ;
-: first-key ( -- key/f ) first-key* drop ;
-: next-key ( key -- key/f ) next-key* drop ;
+: gdbm-fetch ( key -- content/f ) gdbm-fetch* drop ;
+: gdbm-first-key ( -- key/f ) gdbm-first-key* drop ;
+: gdbm-next-key ( key -- key/f ) gdbm-next-key* drop ;
 
-:: each-key ( ... quot: ( ... key -- ... ) -- ... )
-    first-key*
-    [ [ next-key* ] [ quot keep ] do while ] when drop ; inline
+:: each-gdbm-key ( ... quot: ( ... key -- ... ) -- ... )
+    gdbm-first-key*
+    [ [ gdbm-next-key* ] [ quot keep ] do while ] when drop ; inline
 
-: each-value ( ... quot: ( ... value -- ... ) -- ... )
-    [ fetch ] prepose each-key ; inline
+: each-gdbm-value ( ... quot: ( ... value -- ... ) -- ... )
+    [ gdbm-fetch ] prepose each-gdbm-key ; inline
 
-: each-record ( ... quot: ( ... key value -- ... ) -- ... )
-    [ dup fetch ] prepose each-key ; inline
+: each-gdbm-record ( ... quot: ( ... key value -- ... ) -- ... )
+    [ dup gdbm-fetch ] prepose each-gdbm-key ; inline
 
-: reorganize ( -- ) dbf gdbm_reorganize check-error ;
+: gdbm-reorganize ( -- ) dbf gdbm_reorganize check-error ;
 
-: synchronize ( -- ) dbf gdbm_sync ;
+: gdbm-synchronize ( -- ) dbf gdbm_sync ;
 
-: exists? ( key -- ? )
+: gdbm-exists? ( key -- ? )
     [ dbf swap object>datum gdbm_exists c-bool> ]
     with-destructors ;
 
-: set-cache-size ( size -- ) GDBM_CACHESIZE setopt ;
-: set-sync-mode ( ? -- ) GDBM_SYNCMODE setopt ;
-: set-block-pool ( ? -- ) GDBM_CENTFREE setopt ;
-: set-block-merging ( ? -- ) GDBM_COALESCEBLKS setopt ;
+: set-gdbm-cache-size ( size -- ) GDBM_CACHESIZE gdbm-setopt ;
+: set-gdbm-sync-mode ( ? -- ) GDBM_SYNCMODE gdbm-setopt ;
+: set-gdbm-block-pool ( ? -- ) GDBM_CENTFREE gdbm-setopt ;
+: set-gdbm-block-merging ( ? -- ) GDBM_COALESCEBLKS gdbm-setopt ;
 
 : gdbm-file-descriptor ( -- desc ) dbf gdbm_fdesc ;
 

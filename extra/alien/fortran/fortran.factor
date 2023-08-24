@@ -1,12 +1,11 @@
 ! (c) 2009 Joe Groff, see BSD license
-USING: accessors alien alien.complex alien.c-types alien.data
-alien.parser grouping alien.strings alien.syntax arrays ascii
-assocs byte-arrays combinators combinators.short-circuit fry
-generalizations kernel lexer macros math math.parser namespaces
-parser sequences sequences.generalizations splitting
-stack-checker vectors vocabs.parser words locals
-io.encodings.ascii io.encodings.string shuffle effects
-math.ranges math.order sorting strings system alien.libraries ;
+USING: accessors alien alien.c-types alien.complex alien.data
+alien.libraries alien.parser alien.strings arrays ascii assocs
+byte-arrays combinators combinators.short-circuit effects
+generalizations grouping io.encodings.ascii io.encodings.string
+kernel lexer math math.parser namespaces ranges sequences
+sequences.generalizations shuffle sorting splitting strings
+vectors words ;
 QUALIFIED-WITH: alien.c-types c
 IN: alien.fortran
 
@@ -346,7 +345,7 @@ M: character-type (<fortran-result>)
         [ (fortran-result>) ]
     } cond ;
 
-: letters ( -- seq ) CHAR: a CHAR: z [a,b] ;
+: letters ( -- seq ) CHAR: a CHAR: z [a..b] ;
 
 : (shuffle-map) ( return parameters -- ret par )
     [
@@ -358,7 +357,7 @@ M: character-type (<fortran-result>)
     ] bi* ;
 
 : (fortran-in-shuffle) ( ret par -- seq )
-    [ second ] sort-with append ;
+    [ second ] sort-by append ;
 
 : (fortran-out-shuffle) ( ret par -- seq )
     append ;

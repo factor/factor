@@ -1,16 +1,20 @@
 ! Copyright (C) 2010, 2011 Joe Groff, Daniel Ehrenberg,
 ! John Benediktsson, Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license
+! See https://factorcode.org/license.txt for BSD license
+IN: classes.struct
+DEFER: struct-slots ! for stack-checker
+DEFER: struct-class? ! for stack-checker
+DEFER: <struct-boa> ! for stack-checker
 USING: accessors alien alien.c-types alien.data alien.parser
-arrays byte-arrays classes classes.parser classes.private
+arrays assocs byte-arrays classes classes.parser classes.private
 classes.struct.bit-accessors classes.tuple classes.tuple.parser
-combinators combinators.smart cpu.architecture definitions
-delegate.private fry functors.backend generalizations generic
-generic.parser io kernel kernel.private lexer libc locals macros
-math math.order parser quotations sequences slots slots.private
+classes.tuple.private combinators combinators.short-circuit
+combinators.smart cpu.architecture definitions delegate.private
+effects functors.backend generalizations generic generic.parser
+io kernel kernel.private lexer libc math math.order parser
+quotations sequences sequences.private slots slots.private
 specialized-arrays stack-checker.dependencies summary vectors
 vocabs.loader vocabs.parser words ;
-IN: classes.struct
 
 SPECIALIZED-ARRAY: uchar
 
@@ -52,7 +56,8 @@ M: struct >c-ptr
 : memory>struct ( ptr class -- struct )
     ! This is sub-optimal if the class is not literal, but gets
     ! optimized down to efficient code if it is.
-    '[ _ boa ] call( ptr -- struct ) ; inline
+    struct-class check-instance
+    M\ tuple-class boa execute( ptr class -- struct ) ;
 
 : read-struct ( class -- struct )
     [ heap-size read ] [ memory>struct ] bi ;
@@ -60,7 +65,7 @@ M: struct >c-ptr
 <PRIVATE
 
 : init-struct ( class with-prototype: ( prototype -- alien ) sans-prototype: ( class -- alien ) -- alien )
-    '[ dup struct-prototype _ _ ?if ] keep memory>struct ; inline
+    '[ [ struct-prototype ] _ _ ?if ] keep memory>struct ; inline
 
 PRIVATE>
 
@@ -76,29 +81,20 @@ PRIVATE>
 : <struct> ( class -- struct )
     [ >c-ptr clone ] [ heap-size <byte-array> ] init-struct ; inline
 
-MACRO: <struct-boa> ( class -- quot: ( ... -- struct ) )
-    [
-        [ <wrapper> \ (struct) [ ] 2sequence ]
-        [
-            struct-slots
-            [ length \ ndip ]
-            [ [ name>> setter-word 1quotation ] map \ spread ] bi
-        ] bi
-    ] [ ] output>sequence ;
-
 <PRIVATE
+
 : pad-struct-slots ( values class -- values' class )
     [ struct-slots [ initial>> ] map over length tail append ] keep ;
 
 : sign-extend ( n bits -- n' )
     ! formula from:
-    ! http://guru.multimedia.cx/fast-sign-extension/
+    ! https://guru.multimedia.cx/fast-sign-extension/
     1 - -1 swap shift [ + ] keep bitxor ; inline
 
 : sign-extender ( signed? bits -- quot )
     '[ _ [ _ sign-extend ] when ] ;
 
-GENERIC: (reader-quot) ( slot -- quot )
+GENERIC: (reader-quot) ( slot -- quot: ( struct -- value ) )
 
 M: struct-slot-spec (reader-quot)
     [ offset>> ] [ type>> ] bi '[ >c-ptr _ _ alien-value ] ;
@@ -109,7 +105,7 @@ M: struct-bit-slot-spec (reader-quot)
     bi compose
     [ >c-ptr ] prepose ;
 
-GENERIC: (writer-quot) ( slot -- quot )
+GENERIC: (writer-quot) ( slot -- quot: ( value struct -- ) )
 
 M: struct-slot-spec (writer-quot)
     [ offset>> ] [ type>> ] bi '[ >c-ptr _ _ set-alien-value ] ;
@@ -123,19 +119,32 @@ M: struct-bit-slot-spec (writer-quot)
 : (unboxer-quot) ( class -- quot )
     drop [ >c-ptr ] ;
 
-MACRO: read-struct-slot ( slot -- quot )
+MACRO: read-struct-slot ( slot -- quot: ( struct -- value ) )
     dup type>> add-depends-on-c-type
     (reader-quot) ;
 
-MACRO: write-struct-slot ( slot -- quot )
+MACRO: write-struct-slot ( slot -- quot: ( value struct -- ) )
     dup type>> add-depends-on-c-type
     (writer-quot) ;
+
 PRIVATE>
+
+MACRO: <struct-boa> ( class -- quot: ( ... -- struct ) )
+    dup struct-slots
+    [ length ] [ [ (writer-quot) '[ over @ ] ] map ] bi
+    '[ [ _ (struct) ] _ ndip _ spread ] ;
 
 M: struct-class boa>object
     swap pad-struct-slots
     [ <struct> ] [ struct-slots ] bi
     [ [ (writer-quot) call( value struct -- ) ] with 2each ] keepd ;
+
+M: struct-class new <struct> ;
+
+M: struct-class boa <struct-boa> ;
+
+M: struct-class boa-effect
+    [ struct-slots [ name>> ] map ] [ name>> 1array ] bi <effect> ;
 
 M: struct-class initial-value* <struct> t ; inline
 
@@ -184,10 +193,9 @@ M: struct-c-type base-type ;
 : struct-slot-values-quot ( class -- quot )
     struct-slots
     [ name>> reader-word 1quotation ] map
-    \ cleave [ ] 2sequence
-    \ output>array [ ] 2sequence ;
+    '[ _ cleave>array ] ;
 
-: (define-struct-slot-values-method) ( class -- )
+: define-struct-slot-values-method ( class -- )
     [ \ struct-slot-values ] [ struct-slot-values-quot ] bi
     define-inline-method ;
 
@@ -197,9 +205,8 @@ M: struct-c-type base-type ;
 : clone-underlying ( struct -- byte-array )
     binary-object memory>byte-array ; inline
 
-: (define-clone-method) ( class -- )
-    [ \ clone ]
-    [ \ clone-underlying swap literalize \ memory>struct [ ] 3sequence ] bi
+: define-clone-method ( class -- )
+    [ \ clone ] [ '[ clone-underlying _ memory>struct ] ] bi
     define-inline-method ;
 
 : forget-clone-method ( class -- )
@@ -266,16 +273,31 @@ M: struct binary-zero? binary-object uchar <c-direct-array> [ 0 = ] all? ; inlin
         ] each
     ] [ drop f ] if ;
 
-: (struct-methods) ( class -- )
-    [ (define-struct-slot-values-method) ]
-    [ (define-clone-method) ]
-    bi ;
+: define-struct-methods ( class -- )
+    [ define-struct-slot-values-method ] [ define-clone-method ] bi ;
 
 : check-struct-slots ( slots -- )
     [ type>> lookup-c-type drop ] each ;
 
 : redefine-struct-tuple-class ( class -- )
-    [ struct f define-tuple-class ] [ make-final ] bi ;
+    [ struct f redefine-tuple-class ] [ make-final ] bi ;
+
+: resize-underlying ( struct -- )
+    [ 2 slot dup byte-array? ]
+    [ class-of "struct-size" word-prop '[ _ swap resize ] [ drop f ] if ]
+    [ 2 set-slot ] tri ;
+
+M: struct update-tuple
+    ! make sure underlying byte-array is correct size, but maybe
+    ! has incorrect contents... is there something better to do?
+    [ resize-underlying ] [ call-next-method ] bi ;
+
+: forget-struct-slot-accessors ( class -- )
+    dup "c-type" word-prop [
+        dup struct-c-type? [
+            fields>> forget-slot-accessors
+        ] [ 2drop ] if
+    ] [ drop ] if* ;
 
 :: (define-struct-class) ( class slot-specs offsets-quot alignment-quot -- )
     slot-specs check-struct-slots
@@ -287,11 +309,13 @@ M: struct binary-zero? binary-object uchar <c-direct-array> [ 0 = ] all? ; inlin
 
     class slot-specs size alignment c-type-for-class :> c-type
 
+    class forget-struct-slot-accessors
+
     c-type class typedef
     class slot-specs define-accessors
     class size "struct-size" set-word-prop
     class dup make-struct-prototype "prototype" set-word-prop
-    class (struct-methods) ; inline
+    class define-struct-methods ; inline
 
 : make-packed-slots ( slots -- slot-specs )
     make-slots [ t >>packed? ] map! ;
@@ -321,11 +345,10 @@ ERROR: invalid-struct-slot token ;
 
 M: struct-class reset-class
     {
-        [ dup "c-type" word-prop fields>> forget-slot-accessors ]
-        [
-            [ forget-struct-slot-values-method ]
-            [ forget-clone-method ] bi
-        ]
+        [ \ <struct-boa> def>> first delete-at ]
+        [ forget-struct-slot-accessors ]
+        [ forget-struct-slot-values-method ]
+        [ forget-clone-method ]
         [ { "c-type" "layout" "struct-size" } remove-word-props ]
         [ call-next-method ]
     } cleave ;

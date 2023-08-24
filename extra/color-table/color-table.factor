@@ -1,9 +1,9 @@
 ! Copyright (C) 2009 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
-USING: accessors colors.constants colors.hex combinators
-combinators.smart formatting kernel literals models
-sorting.human sorting.slots strings ui ui.gadgets.scrollers
-ui.gadgets.search-tables ui.gadgets.tables ;
+! See https://factorcode.org/license.txt for BSD license.
+USING: accessors colors combinators combinators.smart formatting
+kernel literals math math.functions models sorting.human strings
+ui ui.gadgets.scrollers ui.gadgets.search-tables
+ui.gadgets.tables ;
 IN: color-table
 
 ! ui.gadgets.tables demo
@@ -28,7 +28,7 @@ M: color-renderer row-columns
             [ red>> "%.5f" sprintf ]
             [ green>> "%.5f" sprintf ]
             [ blue>> "%.5f" sprintf ]
-            [ rgba>hex ]
+            [ color>hex ]
         } cleave
     ] output>array ;
 
@@ -39,7 +39,7 @@ M: color-renderer row-value
     drop named-color ;
 
 : <color-table> ( -- table )
-    named-colors { human<=> } sort-by <model>
+    named-colors humani-sort <model>
     color-renderer
     [ ] <search-table> dup table>>
         5 >>gap

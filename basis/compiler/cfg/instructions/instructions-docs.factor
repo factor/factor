@@ -9,27 +9,27 @@ IN: compiler.cfg.instructions
 HELP: ##alien-invoke
 { $class-description
   "An instruction for calling a function in a dynamically linked library. It has the following slots:"
-  { $table
+  { $slots
     {
-        { $slot "dead-outputs" }
+        "dead-outputs"
         { "A sequence of return values from the function that the compiler.cfg.dce pass has figured out are not used." }
     }
     {
-        { $slot "reg-inputs" }
+        "reg-inputs"
         { "Registers to use for the arguments to the function call. Each sequence item is a 3-tuple consisting of a " { $link spill-slot } ", register representation and a register. When the function is called, the parameter is copied from the spill slot to the given register." }
     }
     {
-        { $slot "stack-inputs" }
+        "stack-inputs"
         { "Stack slots used for the arguments to the function call." }
     }
     {
-        { $slot "reg-outputs" }
+        "reg-outputs"
         { "If the called function returns a value, then this slot is a one-element sequence containing a 3-tuple describing which register is used for the return value." }
     }
-    { { $slot "symbols" } { "Name of the function to call." } }
-    { { $slot "dll" } { "A dll handle or " { $link f } "." } }
+    { "symbols" { "Name of the function to call." } }
+    { "dll" { "A dll handle or " { $link f } "." } }
     {
-        { $slot "gc-map" }
+        "gc-map"
         {
             "If the invoked C function calls Factor code which triggers a GC, then a "
             { $link gc-map }
@@ -44,9 +44,9 @@ HELP: ##alien-invoke
 HELP: ##alien-indirect
 { $class-description
   "An instruction representing an indirect alien call. The first item on the datastack is a pointer to the function to call and the parameters follows. It has the following slots:"
-  { $table
-    { { $slot "src" } { "Spill slot containing the function pointer." } }
-    { { $slot "reg-outputs" } { "Sequence of output values passed in registers." } }
+  { $slots
+    { "src" { "Spill slot containing the function pointer." } }
+    { "reg-outputs" { "Sequence of output values passed in registers." } }
   }
 }
 { $see-also alien-indirect %alien-indirect } ;
@@ -54,11 +54,11 @@ HELP: ##alien-indirect
 HELP: ##allot
 { $class-description
   "An instruction for allocating memory in the nursery. Usually the instruction is preceded by " { $link ##check-nursery-branch } " which checks that there is enough room in the nursery to allocate. It has the following slots:"
-  { $table
-    { { $slot "dst" } { "Register to put the pointer to the memory in." } }
-    { { $slot "size" } { "Number of bytes to allocate." } }
-    { { $slot "class-of" } { "Class of object to allocate, e.g " { $link tuple } " or " { $link array } "." } }
-    { { $slot "temp" } { "Temporary register to clobber." } }
+  { $slots
+    { "dst" { "Register to put the pointer to the memory in." } }
+    { "size" { "Number of bytes to allocate." } }
+    { "class-of" { "Class of object to allocate, e.g " { $link tuple } " or " { $link array } "." } }
+    { "temp" { "Temporary register to clobber." } }
   }
 } ;
 
@@ -79,8 +79,8 @@ HELP: ##box-alien
 HELP: ##call
 { $class-description
   "An instruction for calling a Factor word."
-  { $table
-    { { $slot "word" } { "The word called." } }
+  { $slots
+    { "word" { "The word called." } }
   }
 } ;
 
@@ -89,11 +89,11 @@ HELP: ##check-nursery-branch
   "Instruction that inserts a conditional branch to a " { $link basic-block } " that garbage collects the nursery. The " { $vocab-link "compiler.cfg.gc-checks" } " vocab goes through each block in the " { $link cfg } " and checks if it allocates memory. If it does, then this instruction is inserted in the cfg before that block and checks if there is enough available space in the nursery. If it isn't, then a basic block containing code for garbage collecting the nursery is executed."
   $nl
   "It has the following slots:"
-  { $table
-    { { $slot "size" } { "Number of bytes the next block in the cfg will allocate." } }
-    { { $slot "cc" } { "A comparison symbol." } }
-    { { $slot "temp1" } { "First register that will be clobbered." } }
-    { { $slot "temp2" } { "Second register that will be clobbered." } }
+  { $slots
+    { "size" { "Number of bytes the next block in the cfg will allocate." } }
+    { "cc" { "A comparison symbol." } }
+    { "temp1" { "First register that will be clobbered." } }
+    { "temp2" { "Second register that will be clobbered." } }
   }
 }
 { $see-also %check-nursery-branch } ;
@@ -101,8 +101,8 @@ HELP: ##check-nursery-branch
 HELP: ##compare-float-ordered-branch
 { $class-description
   "It has the following slots:"
-  { $table
-    { { $slot "cc" } { "Comparison symbol." } }
+  { $slots
+    { "cc" { "Comparison symbol." } }
   }
 } ;
 
@@ -119,8 +119,8 @@ HELP: ##compare-integer
 
 HELP: ##copy
 { $class-description "Instruction that copies a value from one register to another of the same type. For example, you can copy between two gprs or two simd registers but not across. It has the following slots:"
-  { $table
-    { { $slot "rep" } { "Value representation. Both the source and destination register must have the same representation." } }
+  { $slots
+    { "rep" { "Value representation. Both the source and destination register must have the same representation." } }
   }
 } ;
 
@@ -139,8 +139,8 @@ HELP: ##inc
 HELP: ##jump
 { $class-description
   "An uncondiation jump instruction. It has the following slots:"
-  { $table
-    { { $slot "word" } { "Word whose address the instruction is jumping to." } }
+  { $slots
+    { "word" { "Word whose address the instruction is jumping to." } }
   }
   "Note that the optimizer is sometimes able to optimize away a " { $link ##call } " and " { $link ##return } " pair into one ##jump instruction."
 } ;
@@ -156,9 +156,9 @@ HELP: ##load-memory-imm
 HELP: ##load-reference
 { $class-description
   "An instruction for loading a pointer to an object into a register. It has the following slots:"
-  { $table
-    { { $slot "dst" } { "Register to load the pointer into." } }
-    { { $slot "obj" } { "A Factor object." } }
+  { $slots
+    { "dst" { "Register to load the pointer into." } }
+    { "obj" { "A Factor object." } }
   }
 } ;
 
@@ -174,10 +174,10 @@ HELP: ##load-vector
 HELP: ##local-allot
 { $class-description
   "An instruction for allocating memory in the words own stack frame. It's mostly used for receiving data from alien calls. It has the following slots:"
-  { $table
-    { { $slot "dst" } { "Register into which a pointer to the stack allocated memory is put." } }
-    { { $slot "size" } { "Number of bytes to allocate." } }
-    { { $slot "offset" } { } }
+  { $slots
+    { "dst" { "Register into which a pointer to the stack allocated memory is put." } }
+    { "size" { "Number of bytes to allocate." } }
+    { "offset" { } }
   }
 }
 { $see-also ##allot } ;
@@ -191,8 +191,8 @@ HELP: ##no-tco
 
 HELP: ##parallel-copy
 { $class-description "An instruction for performing multiple copies. It allows for optimizations or (or prunings) if more than one source or destination vreg is the same. They are transformed into " { $link ##copy } " instructions in " { $link destruct-ssa } ". It has the following slots:"
-  { $table
-    { { $slot "values" } { "An assoc mapping source vregs to destinations." } }
+  { $slots
+    { "values" { "An assoc mapping source vregs to destinations." } }
   }
 } ;
 
@@ -205,9 +205,9 @@ HELP: ##peek
 HELP: ##phi
 { $class-description
   "A special kind of instruction used to mark control flow. It is inserted by the " { $vocab-link "compiler.cfg.ssa.construction" } " vocab. It has the following slots:"
-  { $table
-    { { $slot "inputs" } { "An assoc containing as keys the blocks/block numbers where the vreg was defined and as values the vreg. Why care about the blocks?" } }
-    { { $slot "dst" } { "A merged vreg for the value." } }
+  { $slots
+    { "inputs" { "An assoc containing as keys the blocks/block numbers where the vreg was defined and as values the vreg. Why care about the blocks?" } }
+    { "dst" { "A merged vreg for the value." } }
   }
 } ;
 
@@ -241,22 +241,22 @@ HELP: ##save-context
 HELP: ##set-slot
 { $class-description
   "An instruction for the non-primitive, non-immediate variant of " { $link set-slot } ". It has the following slots:"
-  { $table
-    { { $slot "src" } { "Object to put in the slot." } }
-    { { $slot "obj" } { "Object to set the slot on." } }
-    { { $slot "slot" } { "Slot index." } }
-    { { $slot "tag" } { "Type tag for obj." } }
+  { $slots
+    { "src" { "Object to put in the slot." } }
+    { "obj" { "Object to set the slot on." } }
+    { "slot" { "Slot index." } }
+    { "tag" { "Type tag for obj." } }
   }
 } ;
 
 HELP: ##set-slot-imm
 { $class-description
   "An instruction for what? It has the following slots:"
-  { $table
-    { { $slot "src" } { "Register containing the value to put in the slot." } }
-    { { $slot "obj" } { "Register containing the object to set the slot on.." } }
-    { { $slot "slot" } { "Slot index." } }
-    { { $slot "tag" } { "Type tag for obj." } }
+  { $slots
+    { "src" { "Register containing the value to put in the slot." } }
+    { "obj" { "Register containing the object to set the slot on.." } }
+    { "slot" { "Slot index." } }
+    { "tag" { "Type tag for obj." } }
   }
 }
 { $see-also ##set-slot %set-slot-imm } ;
@@ -268,10 +268,10 @@ HELP: ##single>double-float
 
 HELP: ##shuffle-vector-imm
 { $class-description "Shuffles the vector in a SSE register according to the given shuffle pattern. It is used to extract a given element of the vector."
-  { $table
-    { { $slot "dst" } { "Destination register to shuffle the vector to." } }
-    { { $slot "src" } { "Source register." } }
-    { { $slot "shuffle" } { "Shuffling pattern." } }
+  { $slots
+    { "dst" { "Destination register to shuffle the vector to." } }
+    { "src" { "Source register." } }
+    { "shuffle" { "Shuffling pattern." } }
   }
 }
 { $see-also %shuffle-vector-imm } ;
@@ -279,31 +279,31 @@ HELP: ##shuffle-vector-imm
 HELP: ##slot-imm
 { $class-description
   "Instruction for reading a slot with a given index from an object."
-  { $table
-    { { $slot "dst" } { "Register to read the slot value into." } }
-    { { $slot "obj" } { "Register containing the object with the slot." } }
-    { { $slot "slot" } { "Slot index." } }
-    { { $slot "tag" } { "Type tag for obj." } }
+  { $slots
+    { "dst" { "Register to read the slot value into." } }
+    { "obj" { "Register containing the object with the slot." } }
+    { "slot" { "Slot index." } }
+    { "tag" { "Type tag for obj." } }
   }
 } { $see-also %slot-imm } ;
 
 HELP: ##spill
 { $class-description "Instruction that copies a value from a register to a " { $link spill-slot } "."
-  { $table
-    { { $slot "rep" } { "Register representation which is necessary when spilling SIMD registers." } }
+  { $slots
+    { "rep" { "Register representation which is necessary when spilling SIMD registers." } }
   }
 } { $see-also ##reload } ;
 
 HELP: ##store-memory-imm
 { $class-description "Instruction that copies an 8 byte value from a XMM register to a memory location addressed by a normal register. This instruction is often turned into a cheaper " { $link ##store-memory } " instruction in the " { $link value-numbering } " pass."
-  { $table
-    { { $slot "base" } { "Vreg that contains the base address." } }
+  { $slots
+    { "base" { "Vreg that contains the base address." } }
     {
-        { $slot "offset" }
+        "offset"
         { "Offset in bytes from the address to where the data should be written." }
     }
-    { { $slot "rep" } { "Value representation in the vector register." } }
-    { { $slot "src" } { "Vreg that contains the item to set." } }
+    { "rep" { "Value representation in the vector register." } }
+    { "src" { "Vreg that contains the item to set." } }
   }
 }
 { $see-also %store-memory-imm } ;
@@ -314,9 +314,9 @@ HELP: ##test-branch
 
 HELP: ##unbox-any-c-ptr
 { $class-description "Instruction that unboxes a pointer in a register so that it can be fed to a C FFI function. For example, if 'src' points to a " { $link byte-array } ", then in 'dst' will be put a pointer to the first byte of that byte array."
-  { $table
-    { { $slot "dst" } { "Destination register." } }
-    { { $slot "src" } { "Source register." } }
+  { $slots
+    { "dst" { "Destination register." } }
+    { "src" { "Source register." } }
   }
 }
 { $see-also %unbox-any-c-ptr } ;
@@ -327,10 +327,10 @@ HELP: ##unbox-long-long
 HELP: ##vector>scalar
 { $class-description
   "This instruction is very similar to " { $link ##copy } "."
-  { $table
-    { { $slot "dst" } { "destination vreg" } }
-    { { $slot "src" } { "source vreg" } }
-    { { $slot "rep" } { "representation for the source vreg" } }
+  { $slots
+    { "dst" { "destination vreg" } }
+    { "src" { "source vreg" } }
+    { "rep" { "representation for the source vreg" } }
   }
 }
 { $notes "The two vregs must not necessarily share the same representation." }
@@ -338,9 +338,9 @@ HELP: ##vector>scalar
 
 HELP: ##vm-field
 { $class-description "Instruction for loading a pointer to a vm field."
-  { $table
-    { { $slot "dst" } { "Register to load the field into." } }
-    { { $slot "offset" } { "Offset of the field relative to the vm address." } }
+  { $slots
+    { "dst" { "Register to load the field into." } }
+    { "offset" { "Offset of the field relative to the vm address." } }
   }
 }
 { $see-also %vm-field } ;
@@ -348,13 +348,13 @@ HELP: ##vm-field
 HELP: ##write-barrier
 { $class-description
   "An instruction for inserting a write barrier. This instruction is almost always inserted after a " { $link ##set-slot } " instruction. If the container object is in an older generation than the item inserted, this instruction guarantees that the item will not be garbage collected. It has the following slots:"
-  { $table
-    { { $slot "src" } { "Object to which the writer barrier refers." } }
-    { { $slot "slot" } { "Slot index of the object." } }
-    { { $slot "scale" } { "No idea." } }
-    { { $slot "tag" } { "Type tag for obj." } }
-    { { $slot "temp1" } { "First temporary register to clobber." } }
-    { { $slot "temp2" } { "Second temporary register to clobber." } }
+  { $slots
+    { "src" { "Object to which the writer barrier refers." } }
+    { "slot" { "Slot index of the object." } }
+    { "scale" { "No idea." } }
+    { "tag" { "Type tag for obj." } }
+    { "temp1" { "First temporary register to clobber." } }
+    { "temp2" { "Second temporary register to clobber." } }
   }
 } ;
 
@@ -396,13 +396,13 @@ HELP: gc-map-insn
 
 HELP: gc-map
 { $class-description "A tuple that holds info necessary for a gc cycle to figure out where the gc root pointers are. It has the following slots:"
-  { $table
+  { $slots
     {
-        { $slot "gc-roots" }
+        "gc-roots"
         { { $link sequence } " of vregs or spill-slots" }
     }
     {
-        { $slot "derived-roots" }
+        "derived-roots"
         { "An " { $link assoc } " of pairs of vregs or spill slots." } }
   }
   "The 'gc-roots' and 'derived-roots' slots are initially vreg integers referencing objects that are live during the gc call and needs to be spilled so that they can be traced. In the " { $link emit-gc-map-insn } " word in " { $vocab-link "compiler.cfg.linear-scan.assignment" } " they are converted to spill slots which the collector is able to trace."

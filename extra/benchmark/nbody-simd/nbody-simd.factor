@@ -1,9 +1,8 @@
 ! Copyright (C) 2008, 2010 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
-USING: accessors alien.c-types fry kernel locals math
-math.constants math.functions math.vectors math.vectors.simd
-math.vectors.simd.cords math.parser combinators.smart sequences
-hints classes.struct specialized-arrays io ;
+! See https://factorcode.org/license.txt for BSD license.
+USING: accessors alien.c-types kernel math math.constants
+math.functions math.vectors math.vectors.simd.cords math.parser
+combinators.smart sequences classes.struct specialized-arrays io ;
 IN: benchmark.nbody-simd
 
 : solar-mass ( -- x ) 4 pi sq * ; inline
@@ -17,7 +16,7 @@ STRUCT: body
 SPECIALIZED-ARRAY: body
 
 : <body> ( location velocity mass -- body )
-    [ days-per-year v*n ] [ solar-mass * ] bi* body <struct-boa> ; inline
+    [ days-per-year v*n ] [ solar-mass * ] bi* body boa ; inline
 
 : <jupiter> ( -- body )
     double-4{ 4.84143144246472090e00 -1.16032004402742839e00 -1.03622044471123109e-01 0.0 }

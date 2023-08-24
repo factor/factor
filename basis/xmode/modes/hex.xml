@@ -8,13 +8,17 @@
 -->
 
 <MODE>
-    <RULES DEFAULT="LITERAL1">
+	<PROPS>
+		<PROPERTY NAME="contextInsensitive" VALUE="true"/>
+	</PROPS>
+	<RULES DEFAULT="LITERAL1">
 
-        <MARK_PREVIOUS
-            TYPE="KEYWORD1"
-            AT_LINE_START="TRUE"
-        >:</MARK_PREVIOUS>
+		<MARK_PREVIOUS
+			TYPE="KEYWORD1"
+			AT_LINE_START="TRUE"
+			>:
+		</MARK_PREVIOUS>
 
-        <EOL_SPAN TYPE="KEYWORD2">;</EOL_SPAN>
-    </RULES>
+		<EOL_SPAN TYPE="KEYWORD2">;</EOL_SPAN>
+	</RULES>
 </MODE>

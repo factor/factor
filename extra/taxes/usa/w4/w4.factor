@@ -1,6 +1,6 @@
 ! Copyright (C) 2008 Doug Coleman.
-! See http://factorcode.org/license.txt for BSD license.
-USING: accessors kernel math ;
+! See https://factorcode.org/license.txt for BSD license.
+USING: accessors math ;
 IN: taxes.usa.w4
 
 ! Each employee fills out a w4

@@ -1,12 +1,11 @@
 ! Copyright (C) 2018 John Benediktsson
-! See http://factorcode.org/license.txt for BSD license
+! See https://factorcode.org/license.txt for BSD license
 
 USING: accessors arrays assocs bit-arrays byte-arrays calendar
-colors.constants combinators fry kernel kernel.private locals
-math math.order math.ranges namespaces opengl random sequences
+colors combinators kernel kernel.private math
+math.order ranges namespaces opengl random sequences
 sequences.private timers ui ui.commands ui.gadgets
-ui.gadgets.toolbar ui.gadgets.tracks ui.gestures ui.render words
-;
+ui.gadgets.toolbar ui.gadgets.tracks ui.gestures ui.render words ;
 
 IN: game-of-life
 
@@ -112,10 +111,10 @@ M: grid-gadget pref-dim*
     gadget grid>> grid-dim :> ( rows cols )
     COLOR: gray gl-color
     cols rows [ size * ] bi@ :> ( w h )
-    rows [0,b] [| j |
+    rows [0..b] [| j |
         j size * :> y
         { 0 y } { w y } gl-line
-        cols [0,b] [| i |
+        cols [0..b] [| i |
             i size * :> x
             { x 0 } { x h } gl-line
         ] each

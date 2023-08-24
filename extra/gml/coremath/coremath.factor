@@ -1,6 +1,6 @@
 ! Copyright (C) 2010 Slava Pestov.
 USING: gml.types gml.printer gml.runtime math math.constants
-math.functions math.matrices math.order math.ranges math.trig
+math.functions math.matrices math.order ranges math.trig
 math.vectors continuations combinators arrays kernel vectors
 accessors prettyprint fry sequences assocs locals hashtables
 grouping sorting classes.struct math.vectors.simd
@@ -71,7 +71,7 @@ FROM: generalizations => npick ;
 
 GML: add ( a b -- c ) [ + ] [ v+ ] [ v+ ] gml-math-op ;
 GML: sub ( a b -- c ) [ - ] [ v- ] [ v- ] gml-math-op ;
-GML: mul ( a b -- c ) [ * ] [ v* ] [ v. ] gml-math-op ;
+GML: mul ( a b -- c ) [ * ] [ v* ] [ vdot ] gml-math-op ;
 GML: div ( a b -- c ) [ /f ] [ v/ mask-vec3d ] [ v/ mask-vec3d ] gml-math-op ;
 GML: mod ( a b -- c ) mod ;
 
@@ -191,10 +191,10 @@ GML: aNormal ( x -- y )
     } cond ;
 
 : det2 ( x y -- z )
-    { 1 0 } vshuffle double-2{ 1 -1 } v* v. ; inline
+    { 1 0 } vshuffle double-2{ 1 -1 } v* vdot ; inline
 
 : det3 ( x y z -- w )
-    [ cross ] dip v. ; inline
+    [ cross ] dip vdot ; inline
 
 GML: determinant ( x -- y )
     {

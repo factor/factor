@@ -1,8 +1,7 @@
 ! Copyright (C) 2005, 2009 Daniel Ehrenberg, Slava Pestov
-! See http://factorcode.org/license.txt for BSD license.
-USING: xml.tokenize xml.data xml.state kernel sequences ascii
-fry xml.errors combinators hashtables namespaces xml.entities
-strings xml.name ;
+! See https://factorcode.org/license.txt for BSD license.
+USING: combinators hashtables kernel namespaces xml.data
+xml.errors xml.name xml.state xml.tokenize ;
 IN: xml.dtd
 
 : take-decl-contents ( -- first second )
@@ -27,7 +26,7 @@ UNION: dtd-acceptable
             { CHAR: \" [ parse-quote ] }
             [ drop take-external-id close ]
         } case
-   ] dip '[ swap _ [ ?set-at ] change ] 2keep ;
+    ] dip '[ swap _ [ ?set-at ] change ] 2keep ;
 
 : take-entity-decl ( -- entity-decl )
     pass-blank get-char {

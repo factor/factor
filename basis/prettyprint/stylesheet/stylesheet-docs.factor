@@ -1,6 +1,6 @@
 ! Copyright (C) 2009 Keith Lazuka.
-! See http://factorcode.org/license.txt for BSD license.
-USING: help.markup help.syntax kernel strings words ;
+! See https://factorcode.org/license.txt for BSD license.
+USING: help.markup help.syntax strings words ;
 IN: prettyprint.stylesheet
 
 HELP: effect-style

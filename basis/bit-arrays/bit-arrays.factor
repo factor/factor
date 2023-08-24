@@ -1,8 +1,8 @@
 ! Copyright (C) 2007, 2011 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
-USING: accessors alien alien.accessors byte-arrays fry io.binary
-kernel kernel.private locals math math.bitwise parser
-prettyprint.custom sequences sequences.private ;
+! See https://factorcode.org/license.txt for BSD license.
+USING: accessors alien alien.accessors byte-arrays endian
+kernel kernel.private math math.bitwise parser sequences
+sequences.private vocabs.loader ;
 IN: bit-arrays
 
 TUPLE: bit-array
@@ -98,6 +98,4 @@ SYNTAX: ?{ \ } [ >bit-array ] parse-literal ;
 
 INSTANCE: bit-array sequence
 
-M: bit-array pprint-delims drop \ ?{ \ } ;
-M: bit-array >pprint-sequence ;
-M: bit-array pprint* pprint-object ;
+{ "bit-arrays" "prettyprint" } "bit-arrays.prettyprint" require-when

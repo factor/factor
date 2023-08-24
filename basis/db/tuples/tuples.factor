@@ -1,11 +1,9 @@
 ! Copyright (C) 2008 Doug Coleman.
 ! Copyright (C) 2018 Alexander Ilin.
-! See http://factorcode.org/license.txt for BSD license.
-USING: arrays assocs classes db kernel namespaces
-classes.tuple words sequences slots math accessors
-math.parser io prettyprint continuations
-destructors mirrors sets db.types db.private fry
-combinators.short-circuit db.errors ;
+! See https://factorcode.org/license.txt for BSD license.
+USING: accessors assocs classes classes.tuple
+combinators.short-circuit continuations db db.errors db.types
+destructors kernel math.parser namespaces sequences sets words ;
 IN: db.tuples
 
 HOOK: create-sql-statement db-connection ( class -- object )
@@ -48,7 +46,7 @@ GENERIC: eval-generator ( singleton -- object )
 
 : with-disposals ( object quotation -- )
     over sequence? [
-        over '[ _ dispose-each ] [ ] cleanup
+        over '[ _ dispose-each ] finally
     ] [
         with-disposal
     ] if ; inline
@@ -163,3 +161,6 @@ ERROR: no-defined-persistent object ;
 
 : update-tuples ( query/tuple quot: ( tuple -- tuple'/f ) -- )
     '[ @ [ update-tuple ] when* ] each-tuple ; inline
+
+: reject-tuples ( query/tuple quot: ( tuple -- ? ) -- )
+    '[ dup @ [ delete-tuples ] [ drop ] if ] each-tuple ; inline

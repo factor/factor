@@ -75,8 +75,8 @@ SPECIALIZED-ARRAY: uint-4
 { 6 } [ 5 next-even ] unit-test
 { 8 } [ 6 next-even ] unit-test
 
-[ -1 bit-count ] [ non-negative-integer-expected? ] must-fail-with
-[ -1 bit-length ] [ non-negative-integer-expected? ] must-fail-with
+[ -1 bit-count ] [ non-negative-number-expected? ] must-fail-with
+[ -1 bit-length ] [ non-negative-number-expected? ] must-fail-with
 
 { 0b1111 } [ 4 on-bits ] unit-test
 { 0 } [ 0 on-bits ] unit-test
@@ -116,3 +116,7 @@ SPECIALIZED-ARRAY: uint-4
 { 3 } [ 0b101 bit-length ] unit-test
 { 3 } [ 0b110 bit-length ] unit-test
 { 3 } [ 0b111 bit-length ] unit-test
+
+{ 0x56780000 0x12340000 } [ 0x1234000056780000 d>w/w ] unit-test
+{ 0x5678 0x1234 } [ 0x12345678 w>h/h ] unit-test
+{ 0x34 0x12 } [ 0x1234 h>b/b ] unit-test

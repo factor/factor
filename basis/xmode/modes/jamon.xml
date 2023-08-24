@@ -1,0 +1,123 @@
+<?xml version="1.0"?>
+<!DOCTYPE MODE SYSTEM "xmode.dtd">
+
+<!-- Mode file for Jamon templates. See http://www.jamon.org -->
+<MODE>
+	<PROPS>
+		<PROPERTY NAME="commentStart" VALUE="&lt;%--" />
+		<PROPERTY NAME="commentEnd" VALUE="--%&gt;" />
+	</PROPS>
+	<RULES DEFAULT="LITERAL2">
+		<IMPORT DELEGATE="INLINE" />
+		<IMPORT DELEGATE="OVERRIDES" />
+		<IMPORT DELEGATE="html::MAIN"/>
+	</RULES>
+
+	<RULES SET="INLINE" DEFAULT="LITERAL2">
+		<SPAN_REGEXP HASH_CHAR="&lt;" MATCH_TYPE="OPERATOR" DELEGATE="java::MAIN">
+			<BEGIN>&lt;%(args|class|import|java|xargs)&gt;</BEGIN>
+			<END>&lt;/%$1&gt;</END>
+		</SPAN_REGEXP>
+		<SPAN_REGEXP HASH_CHAR="&lt;" MATCH_TYPE="OPERATOR" DELEGATE="java::MAIN">
+			<BEGIN>&lt;%(?:if|for|java)</BEGIN>
+			<END>%&gt;</END>
+		</SPAN_REGEXP>
+		<SEQ_REGEXP HASH_CHAR="&lt;" TYPE="OPERATOR">&lt;/%(?:if|for)&gt;</SEQ_REGEXP>
+		<SEQ TYPE="OPERATOR">&lt;%else&gt;</SEQ>
+
+		<SPAN_REGEXP HASH_CHAR="&lt;" MATCH_TYPE="OPERATOR" TYPE="KEYWORD2">
+			<BEGIN>&lt;%(?:abstract|def|doc|escape|extends|frag|method|override)</BEGIN>
+			<END>&gt;</END>
+		</SPAN_REGEXP>
+		<SPAN_REGEXP HASH_CHAR="&lt;" MATCH_TYPE="OPERATOR">
+			<BEGIN>&lt;/%(?:def|doc|frag|method|override)</BEGIN>
+			<END>&gt;</END>
+		</SPAN_REGEXP>
+
+		<SPAN TYPE="OPERATOR" DELEGATE="java::MAIN">
+			<BEGIN>&lt;%</BEGIN>
+			<END>%&gt;</END>
+		</SPAN>
+
+		<SPAN_REGEXP HASH_CHAR="&lt;" MATCH_TYPE="OPERATOR" DELEGATE="java::MAIN">
+			<BEGIN>&lt;&amp;\|?</BEGIN>
+			<END>&amp;&gt;</END>
+		</SPAN_REGEXP>
+		<SEQ TYPE="OPERATOR">&lt;/&amp;&gt;</SEQ>
+	</RULES>
+
+	<RULES SET="OVERRIDES" IGNORE_CASE="TRUE" DEFAULT="LITERAL2">
+		<!-- CSS -->
+		<SPAN TYPE="MARKUP" DELEGATE="CSS">
+			<BEGIN>&lt;style</BEGIN>
+			<END>&lt;/style&gt;</END>
+		</SPAN>
+
+		<!-- JavaScript -->
+		<SPAN_REGEXP TYPE="MARKUP" HASH_CHAR="&lt;" DELEGATE="JAVASCRIPT">
+			<BEGIN>&lt;(?i)(script)</BEGIN>
+			<END>&lt;/$1&gt;</END>
+		</SPAN_REGEXP>
+
+		<!-- HTML tags. -->
+		<SPAN TYPE="MARKUP" DELEGATE="TAGS">
+			<BEGIN>&lt;</BEGIN>
+			<END>&gt;</END>
+		</SPAN>
+	</RULES>
+
+	<RULES SET="JAVASCRIPT" DEFAULT="LITERAL1">
+		<SPAN TYPE="LITERAL1" NO_LINE_BREAK="TRUE" ESCAPE="\" DELEGATE="INLINE">
+			<BEGIN>"</BEGIN>
+			<END>"</END>
+		</SPAN>
+		<IMPORT DELEGATE="INLINE" />
+		<IMPORT DELEGATE="javascript::MAIN" />
+	</RULES>
+
+	<RULES SET="CSS" DEFAULT="LITERAL1">
+		<SPAN TYPE="LITERAL1" NO_LINE_BREAK="TRUE" ESCAPE="\" DELEGATE="INLINE">
+			<BEGIN>"</BEGIN>
+			<END>"</END>
+		</SPAN>
+		<IMPORT DELEGATE="INLINE" />
+		<IMPORT DELEGATE="css::MAIN" />
+	</RULES>
+
+	<!--
+	  This is a copy of above; IMPORT doesn't inherit DEFAULT and we need
+	  a different default depending on context.
+	-->
+	<RULES SET="INLINE_MARKUP" DEFAULT="LITERAL1">
+		<SPAN_REGEXP HASH_CHAR="&lt;" MATCH_TYPE="OPERATOR" TYPE="KEYWORD2">
+			<BEGIN>&lt;%(?:abstract|def|doc|escape|extends|frag|method|override)</BEGIN>
+			<END>&gt;</END>
+		</SPAN_REGEXP>
+		<SPAN_REGEXP HASH_CHAR="&lt;" MATCH_TYPE="OPERATOR">
+			<BEGIN>&lt;/%(?:def|doc|frag|method|override)</BEGIN>
+			<END>&gt;</END>
+		</SPAN_REGEXP>
+
+		<SPAN TYPE="OPERATOR" DELEGATE="java::MAIN">
+			<BEGIN>&lt;%</BEGIN>
+			<END>%&gt;</END>
+		</SPAN>
+
+		<SPAN_REGEXP HASH_CHAR="&lt;" MATCH_TYPE="OPERATOR" DELEGATE="java::MAIN">
+			<BEGIN>&lt;&amp;\|?</BEGIN>
+			<END>&amp;&gt;</END>
+		</SPAN_REGEXP>
+		<SEQ TYPE="OPERATOR">&lt;/&amp;&gt;</SEQ>
+	</RULES>
+
+	<RULES SET="TAGS" DEFAULT="MARKUP">
+		<SPAN TYPE="LITERAL1" DELEGATE="INLINE_MARKUP">
+			<BEGIN>"</BEGIN>
+			<END>"</END>
+		</SPAN>
+		<IMPORT DELEGATE="INLINE_MARKUP" />
+		<IMPORT DELEGATE="html::TAGS" />
+	</RULES>
+
+</MODE>
+

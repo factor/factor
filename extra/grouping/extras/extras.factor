@@ -1,47 +1,44 @@
-USING: accessors arrays combinators fry grouping
-grouping.private kernel locals macros math math.ranges sequences
-sequences.generalizations sequences.private vectors ;
+USING: accessors arrays grouping grouping.private kernel math
+sequences sequences.generalizations sequences.private vectors ;
 
 IN: grouping.extras
 
-: 2clump-map-as ( seq quot: ( elt1 elt2 -- newelt ) exemplar -- seq' )
-    [ dup 1 short tail-slice ] 2dip 2map-as ; inline
+:: clump-map-as ( seq quot exemplar n -- result )
+    seq n <clumps> [ n firstn-unsafe quot call ] exemplar map-as ; inline
 
-: 2clump-map ( seq quot: ( elt1 elt2 -- newelt ) -- seq' )
-    { } 2clump-map-as ; inline
+: clump-map ( seq quot n -- result )
+    { } swap clump-map-as ; inline
 
-: 3clump-map-as ( seq quot: ( elt1 elt2 elt3 -- newelt ) exemplar -- seq' )
-    [
-        dup [ 1 short tail-slice ] [ 2 short tail-slice ] bi
-    ] 2dip 3map-as ; inline
+:: pad-groups ( seq n elt -- padded )
+    seq dup length dup n mod [ drop ] [ n swap - + elt pad-tail ] if-zero ;
 
-: 3clump-map ( seq quot: ( elt1 elt2 elt3 -- newelt ) -- seq' )
-    { } 3clump-map-as ; inline
+:: short-groups ( seq n -- seq' )
+    seq dup length dup n mod [ drop ] [ - head-slice ] if-zero ;
 
-MACRO: nclump-map-as ( seq quot exemplar n -- result )
-    [ nip [1,b) [ [ short tail-slice ] curry ] map swap ] 2keep
-    '[ _ dup _ cleave _ _ _ nmap-as ] ;
+:: group-map-as ( seq quot exemplar n -- result )
+    seq n short-groups n <groups>
+    [ n firstn-unsafe quot call ] exemplar map-as ; inline
 
-: nclump-map ( seq quot n -- result )
-    { } swap nclump-map-as ; inline
+: group-map ( seq quot n -- result )
+    { } swap group-map-as ; inline
 
-TUPLE: head-clumps seq ;
-C: <head-clumps> head-clumps
-M: head-clumps length seq>> length ;
-M: head-clumps nth-unsafe seq>> swap 1 + head-slice ;
-INSTANCE: head-clumps immutable-sequence
+TUPLE: prefixes seq ;
+C: <prefixes> prefixes
+M: prefixes length seq>> length ;
+M: prefixes nth-unsafe seq>> swap 1 + head-slice ;
+INSTANCE: prefixes immutable-sequence
 
-: head-clump ( seq -- array )
-    [ <head-clumps> ] [ [ like ] curry map ] bi ;
+: all-prefixes ( seq -- array )
+    [ <prefixes> ] [ [ like ] curry map ] bi ;
 
-TUPLE: tail-clumps seq ;
-C: <tail-clumps> tail-clumps
-M: tail-clumps length seq>> length ;
-M: tail-clumps nth-unsafe seq>> swap tail-slice ;
-INSTANCE: tail-clumps immutable-sequence
+TUPLE: suffixes seq ;
+C: <suffixes> suffixes
+M: suffixes length seq>> length ;
+M: suffixes nth-unsafe seq>> swap tail-slice ;
+INSTANCE: suffixes immutable-sequence
 
-: tail-clump ( seq -- array )
-    [ <tail-clumps> ] [ [ like ] curry map ] bi ;
+: all-suffixes ( seq -- array )
+    [ <suffixes> ] [ [ like ] curry map ] bi ;
 
 : clump-as ( seq n exemplar -- array )
     [ <clumps> ] dip [ like ] curry map ;

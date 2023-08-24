@@ -1,6 +1,6 @@
 ! Copyright (C) 2009 Joe Groff.
-! See http://factorcode.org/license.txt for BSD license.
-USING: classes help.markup help.syntax kernel quotations ;
+! See https://factorcode.org/license.txt for BSD license.
+USING: classes help.markup help.syntax kernel ;
 IN: math.vectors.conversion
 
 HELP: bad-vconvert

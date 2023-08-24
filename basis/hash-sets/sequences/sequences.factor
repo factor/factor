@@ -1,8 +1,8 @@
 ! Copyright (C) 2013 John Benediktsson
-! See http://factorcode.org/license.txt for BSD license
+! See https://factorcode.org/license.txt for BSD license
 
-USING: accessors combinators hash-sets hash-sets.wrapped kernel
-parser sequences sets vocabs.loader ;
+USING: accessors hash-sets hash-sets.wrapped kernel math parser
+sequences vocabs.loader ;
 
 IN: hash-sets.sequences
 

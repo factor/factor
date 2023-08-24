@@ -1,5 +1,5 @@
 ! Copyright (C) 2009 Slava Pestov
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors combinators io kernel lists math math.parser
 sequences splitting ;
 IN: rpn
@@ -19,7 +19,7 @@ M: div-insn eval-insn drop [ / ] binary-op ;
 M: push-insn eval-insn value>> swons ;
 
 : rpn-tokenize ( string -- string' )
-    " " split harvest sequence>list ;
+    split-words harvest sequence>list ;
 
 : rpn-parse ( string -- tokens )
     rpn-tokenize [

@@ -1,7 +1,7 @@
 ! Copyright (C) 2009 Daniel Ehrenberg.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors assocs combinators combinators.short-circuit
-fry kernel kernel.private locals math namespaces regexp.classes
+kernel kernel.private math namespaces quotations regexp.classes
 regexp.transition-tables sequences sequences.private sets
 strings unicode words ;
 IN: regexp.compiler
@@ -30,10 +30,10 @@ M: end-of-file question>quot
         } 2&&
     ] ;
 
-M: $ question>quot
+M: $crlf question>quot
     drop [ { [ length = ] [ ?nth "\r\n" member? ] } 2|| ] ;
 
-M: ^ question>quot
+M: ^crlf question>quot
     drop [ { [ drop zero? ] [ [ 1 - ] dip ?nth "\r\n" member? ] } 2|| ] ;
 
 M: $unix question>quot
@@ -51,7 +51,7 @@ M: word-break question>quot
         [ question>> question>quot ] [ yes>> ] [ no>> ] tri
         [ (execution-quot) ] bi@
         '[ 2dup @ _ _ if ]
-    ] [ '[ _ execute ] ] if ;
+    ] [ 1quotation ] if ;
 
 : execution-quot ( next-state -- quot )
     dup sequence? [ first ] when

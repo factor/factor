@@ -8,23 +8,8 @@ IN: python
 
 ! None testing
 { t } [
-    "__builtin__" py-import "None" getattr <none> =
+    "builtins" "None" py-import-from <none> =
 ] py-test
-
-! Pretty sure the # of None references should stay constant.
-: count-none-refs ( -- n )
-    [
-        "sys" py-import "getrefcount" getattr
-        <none> <1py-tuple> call-object py>
-    ] with-destructors ;
-
-{ t } [
-    ! For some reason, the count increased by one the first time.
-    count-none-refs drop
-    count-none-refs count-none-refs =
-] py-test
-
-{ } [ { f f f } >py drop ] py-test
 
 ! Destructors
 { 1 } [ 33 >py drop always-destructors get length ] py-test
@@ -60,7 +45,7 @@ IN: python
 { t } [ Py_IsInitialized ] py-test
 
 ! py-importing
-[ { "ImportError" "No module named kolobi" f } ] [
+[ { "ModuleNotFoundError" "No module named 'kolobi'" f } ] [
     [ "kolobi" py-import ] [
         [ type>> ] [ message>> ] [ traceback>> ] tri 3array
     ] recover
@@ -179,13 +164,19 @@ IN: python
 
 ! Callbacks
 : py-map ( -- alien )
-    "__builtin__" py-import "map" getattr ;
+    "builtins" "map" py-import-from ;
+
+: py-list ( -- alien )
+    "builtins" "list" py-import-from ;
+
+: py-list-call ( alien -- seq )
+    py-list swap 1array array>py-tuple f call-object-full py> ;
 
 : py-map-call ( alien-cb -- seq )
     [
         <py-cfunction> py-map swap { 1 2 } >py 2array array>py-tuple f
         call-object-full
-    ] with-callback py> ;
+    ] with-callback py-list-call ;
 
 : always-33-fun ( -- alien )
     [ 3drop 33 >py ] PyCallback ;

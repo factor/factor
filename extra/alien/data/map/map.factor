@@ -1,8 +1,8 @@
 ! Copyright (C) 2009, 2010 Joe Groff.
-! See http://factorcode.org/license.txt for BSD license.
-USING: accessors alien alien.c-types alien.data alien.parser arrays
-byte-arrays combinators effects.parser fry generalizations grouping kernel
-lexer locals macros make math math.ranges parser sequences
+! See https://factorcode.org/license.txt for BSD license.
+USING: accessors alien alien.arrays alien.c-types alien.data
+alien.parser arrays byte-arrays combinators effects.parser fry
+generalizations grouping kernel make math sequences
 sequences.generalizations sequences.private ;
 FROM: alien.arrays => array-length ;
 IN: alien.data.map
@@ -85,7 +85,8 @@ MACRO: unpack-params ( ins -- quot )
     [ c-type-count nip '[ _ firstn-unsafe ] ] map '[ _ spread ] ;
 
 MACRO: pack-params ( outs -- quot )
-    [ ] [ c-type-count nip dup [ [ ndip _ ] dip set-firstn ] 3curry ] reduce
+    [ ] [ c-type-count nip dup
+    [ [ ndip POSTPONE: _ ] dip set-firstn ] 3curry ] reduce
     fry [ call ] compose ;
 
 :: [data-map] ( ins outs param-quot -- quot )

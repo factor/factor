@@ -1,8 +1,8 @@
 ! Copyright (C) 2005, 2008 Chris Double, Doug Coleman.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors classes.tuple combinators db db.private db.queries
 db.sqlite.errors db.sqlite.ffi db.sqlite.lib db.tuples
-db.tuples.private db.types destructors interpolate kernel locals math
+db.tuples.private db.types destructors interpolate kernel math
 math.parser namespaces nmake random sequences sequences.deep ;
 IN: db.sqlite
 
@@ -22,19 +22,19 @@ TUPLE: sqlite-db-connection < db-connection ;
 
 PRIVATE>
 
-M: sqlite-db db-open ( db -- db-connection )
+M: sqlite-db db-open
     path>> sqlite-open <sqlite-db-connection> ;
 
-M: sqlite-db-connection db-close ( handle -- ) sqlite-close ;
+M: sqlite-db-connection db-close sqlite-close ;
 
 TUPLE: sqlite-statement < statement ;
 
 TUPLE: sqlite-result-set < result-set has-more? ;
 
-M: sqlite-db-connection <simple-statement> ( str in out -- obj )
+M: sqlite-db-connection <simple-statement>
     <prepared-statement> ;
 
-M: sqlite-db-connection <prepared-statement> ( str in out -- obj )
+M: sqlite-db-connection <prepared-statement>
     sqlite-statement new-statement ;
 
 : sqlite-maybe-prepare ( statement -- statement )
@@ -43,22 +43,22 @@ M: sqlite-db-connection <prepared-statement> ( str in out -- obj )
         >>handle
     ] unless ;
 
-M: sqlite-statement dispose ( statement -- )
+M: sqlite-statement dispose
     handle>>
     [ [ sqlite3_reset drop ] keep sqlite-finalize ] when* ;
 
-M: sqlite-result-set dispose ( result-set -- )
+M: sqlite-result-set dispose
     f >>handle drop ;
 
 : reset-bindings ( statement -- )
     sqlite-maybe-prepare
     handle>> [ sqlite3_reset drop ] [ sqlite3_clear_bindings drop ] bi ;
 
-M: sqlite-statement low-level-bind ( statement -- )
+M: sqlite-statement low-level-bind
     [ handle>> ] [ bind-params>> ] bi
     [ [ key>> ] [ value>> ] [ type>> ] tri sqlite-bind-type ] with each ;
 
-M: sqlite-statement bind-statement* ( statement -- )
+M: sqlite-statement bind-statement*
     sqlite-maybe-prepare
     dup bound?>> [ dup reset-bindings ] when
     low-level-bind ;
@@ -72,12 +72,12 @@ TUPLE: sqlite-low-level-binding < low-level-binding key type ;
         swap >>value
         swap >>key ;
 
-M: sql-spec sqlite-bind-conversion ( tuple spec -- array )
+M: sql-spec sqlite-bind-conversion
     [ column-name>> ":" prepend ]
     [ slot-name>> rot get-slot-named ]
     [ type>> ] tri <sqlite-low-level-binding> ;
 
-M: literal-bind sqlite-bind-conversion ( tuple literal-bind -- array )
+M: literal-bind sqlite-bind-conversion
     nip [ key>> ] [ value>> ] [ type>> ] tri
     <sqlite-low-level-binding> ;
 
@@ -87,7 +87,7 @@ M:: generator-bind sqlite-bind-conversion ( tuple generate-bind -- array )
     obj name tuple set-slot-named
     generate-bind key>> obj generate-bind type>> <sqlite-low-level-binding> ;
 
-M: sqlite-statement bind-tuple ( tuple statement -- )
+M: sqlite-statement bind-tuple
     [
         in-params>> [ sqlite-bind-conversion ] with map
     ] keep bind-statement ;
@@ -98,31 +98,31 @@ ERROR: sqlite-last-id-fail ;
     db-connection get handle>> sqlite3_last_insert_rowid
     dup zero? [ sqlite-last-id-fail ] when ;
 
-M: sqlite-db-connection insert-tuple-set-key ( tuple statement -- )
+M: sqlite-db-connection insert-tuple-set-key
     execute-statement last-insert-id swap set-primary-key ;
 
-M: sqlite-result-set #columns ( result-set -- n )
+M: sqlite-result-set #columns
     handle>> sqlite-#columns ;
 
-M: sqlite-result-set row-column ( result-set n -- obj )
+M: sqlite-result-set row-column
     [ handle>> ] [ sqlite-column ] bi* ;
 
-M: sqlite-result-set row-column-typed ( result-set n -- obj )
+M: sqlite-result-set row-column-typed
     dup pick out-params>> nth type>>
     [ handle>> ] 2dip sqlite-column-typed ;
 
-M: sqlite-result-set advance-row ( result-set -- )
+M: sqlite-result-set advance-row
     dup handle>> sqlite-next >>has-more? drop ;
 
-M: sqlite-result-set more-rows? ( result-set -- ? )
+M: sqlite-result-set more-rows?
     has-more?>> ;
 
-M: sqlite-statement query-results ( query -- result-set )
+M: sqlite-statement query-results
     sqlite-maybe-prepare
     dup handle>> sqlite-result-set new-result-set
     dup advance-row ;
 
-M: sqlite-db-connection <insert-db-assigned-statement> ( class -- statement )
+M: sqlite-db-connection <insert-db-assigned-statement>
     [
         "insert into " 0% 0%
         "(" 0%
@@ -143,19 +143,19 @@ M: sqlite-db-connection <insert-db-assigned-statement> ( class -- statement )
         ");" 0%
     ] query-make ;
 
-M: sqlite-db-connection <insert-user-assigned-statement> ( class -- statement )
+M: sqlite-db-connection <insert-user-assigned-statement>
     <insert-db-assigned-statement> ;
 
-M: sqlite-db-connection bind# ( spec obj -- )
+M: sqlite-db-connection bind#
     [
         [ column-name>> ":" next-sql-counter surround dup 0% ]
         [ type>> ] bi
     ] dip <literal-bind> 1, ;
 
-M: sqlite-db-connection bind% ( spec -- )
+M: sqlite-db-connection bind%
     dup 1, column-name>> ":" prepend 0% ;
 
-M: sqlite-db-connection persistent-table ( -- assoc )
+M: sqlite-db-connection persistent-table
     H{
         { +db-assigned-id+ { "integer" "integer" f } }
         { +user-assigned-id+ { f f f } }
@@ -260,7 +260,7 @@ M: sqlite-db-connection persistent-table ( -- assoc )
     "sql-spec" get modifiers>> [ +not-null+ = ] none? ;
 
 : delete-cascade? ( -- ? )
-    "sql-spec" get modifiers>> { +on-delete+ +cascade+ } swap subseq? ;
+    "sql-spec" get modifiers>> { +on-delete+ +cascade+ } subseq-of? ;
 
 : sqlite-trigger, ( string -- )
     { } { } <simple-statement> 3, ;
@@ -314,16 +314,16 @@ M: sqlite-db-connection persistent-table ( -- assoc )
         ");" 0%
     ] 2bi ;
 
-M: sqlite-db-connection create-sql-statement ( class -- statement )
+M: sqlite-db-connection create-sql-statement
     [
         [ sqlite-create-table ]
         [ drop create-db-triggers ] 2bi
     ] query-make ;
 
-M: sqlite-db-connection drop-sql-statement ( class -- statements )
+M: sqlite-db-connection drop-sql-statement
     [ nip "drop table " 0% 0% ";" 0% ] query-make ;
 
-M: sqlite-db-connection compound ( string seq -- new-string )
+M: sqlite-db-connection compound
     over {
         { "default" [ first number>string " " glue ] }
         { "references" [ >reference-string ] }
@@ -331,7 +331,9 @@ M: sqlite-db-connection compound ( string seq -- new-string )
     } case ;
 
 M: sqlite-db-connection parse-db-error
-    dup n>> {
-        { 1 [ string>> parse-sqlite-sql-error ] }
-        [ drop ]
-    } case ;
+    dup sqlite-error? [
+        dup n>> {
+            { 1 [ string>> parse-sqlite-sql-error ] }
+            [ drop ]
+        } case
+    ] when ;

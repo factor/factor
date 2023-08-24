@@ -1,16 +1,10 @@
 ! Copyright (C) 2010 Slava Pestov, 2011 Alex Vondrak
-! See http://factorcode.org/license.txt for BSD license.
-USING: accessors combinators combinators.short-circuit fry
-kernel make math namespaces sequences
-cpu.architecture
-compiler.cfg.hats
-compiler.cfg.utilities
-compiler.cfg.registers
-compiler.cfg.instructions
-compiler.cfg.gvn.math
-compiler.cfg.gvn.graph
-compiler.cfg.gvn.avail
-compiler.cfg.gvn.rewrite ;
+! See https://factorcode.org/license.txt for BSD license.
+USING: accessors combinators combinators.short-circuit
+compiler.cfg.gvn.avail compiler.cfg.gvn.graph
+compiler.cfg.gvn.math compiler.cfg.gvn.rewrite compiler.cfg.hats
+compiler.cfg.instructions compiler.cfg.utilities
+cpu.architecture kernel make math namespaces sequences ;
 IN: compiler.cfg.gvn.alien
 
 M: ##box-displaced-alien rewrite

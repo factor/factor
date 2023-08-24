@@ -1,8 +1,7 @@
 ! Copyright (C) 2012 John Benediktsson
-! See http://factorcode.org/license.txt for BSD license
+! See https://factorcode.org/license.txt for BSD license
 
-USING: fry io kernel locals math random sequences
-sequences.private ;
+USING: io kernel math random sequences sequences.private ;
 
 IN: io.random
 

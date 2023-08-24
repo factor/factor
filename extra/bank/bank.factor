@@ -1,6 +1,6 @@
 ! Copyright (C) 2008 Alex Chapman
-! See http://factorcode.org/license.txt for BSD license.
-USING: accessors calendar kernel math math.order money sequences ;
+! See https://factorcode.org/license.txt for BSD license.
+USING: accessors calendar kernel math math.order sequences ;
 IN: bank
 
 TUPLE: account name interest-rate interest-payment-day opening-date transactions unpaid-interest interest-last-paid ;

@@ -1,5 +1,5 @@
 ! Copyright (C) 2008, 2010 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: alien.c-types alien.data cocoa cocoa.application
 cocoa.classes core-foundation.arrays kernel ;
 IN: cocoa.nibs
@@ -11,7 +11,7 @@ IN: cocoa.nibs
 
 : nib-named ( nib-name -- anNSNib )
     <NSString> NSNib -> alloc swap f -> initWithNibNamed:bundle:
-    dup [ -> autorelease ] when ;
+    [ -> autorelease ] ?call ;
 
 : nib-objects ( anNSNib -- objects/f )
     f

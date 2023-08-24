@@ -1,7 +1,6 @@
 ! Copyright (C) 2008 Alex Chapman
-! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays kernel locals math sequences
-sequences.private ;
+! See https://factorcode.org/license.txt for BSD license.
+USING: accessors arrays kernel math sequences sequences.private ;
 IN: sequences.modified
 
 TUPLE: modified ;

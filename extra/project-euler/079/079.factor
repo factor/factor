@@ -1,10 +1,10 @@
 ! Copyright (c) 2008 Aaron Schaefer.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: assocs io.encodings.ascii io.files kernel make math
     math.parser sequences sets project-euler.common ;
 IN: project-euler.079
 
-! http://projecteuler.net/index.php?section=problems&id=79
+! https://projecteuler.net/index.php?section=problems&id=79
 
 ! DESCRIPTION
 ! -----------
@@ -52,7 +52,7 @@ PRIVATE>
 
 : topological-sort ( seq -- seq )
     [ [ (topological-sort) ] { } make ] keep
-    combine over diff append ;
+    union-all over diff append ;
 
 : euler079 ( -- answer )
     source-079 >edges topological-sort digits>number ;

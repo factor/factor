@@ -1,5 +1,5 @@
 ! Copyright (C) 2008 Joe Groff.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: arrays fry kernel make math.order math.parser opengl.gl
 sequences sets splitting strings system ;
 IN: opengl.capabilities
@@ -11,7 +11,7 @@ IN: opengl.capabilities
     over string?  [ member? ] [ [ member? ] curry any? ] if ;
 
 : gl-extensions ( -- seq )
-    GL_EXTENSIONS glGetString " " split ;
+    GL_EXTENSIONS glGetString split-words ;
 : has-gl-extensions? ( extensions -- ? )
     gl-extensions [ (has-extension?) ] curry all? ;
 : (make-gl-extensions-error) ( required-extensions -- )

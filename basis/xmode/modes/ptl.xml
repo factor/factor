@@ -11,8 +11,9 @@
 	<PROPS>
 		<PROPERTY NAME="indentNextLines" VALUE="\s*[^#]{3,}:\s*(#.*)?" />
 		<PROPERTY NAME="lineComment" VALUE="#" />
+		<PROPERTY NAME="contextInsensitive" VALUE="true" />
 	</PROPS>
-	<RULES ESCAPE="\" IGNORE_CASE="FALSE" HIGHLIGHT_DIGITS="TRUE">
+	<RULES IGNORE_CASE="FALSE" HIGHLIGHT_DIGITS="TRUE">
 
 		<IMPORT DELEGATE="python::MAIN"/>
 

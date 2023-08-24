@@ -1,8 +1,7 @@
 ! Copyright (C) 2007, 2008 Phil Dawes, 2013 John Benediktsson
-! See http://factorcode.org/license.txt for BSD license.
-USING: combinators fry io io.files io.streams.string kernel
-make math memoize namespaces sbufs sequences sequences.private
-unicode ;
+! See https://factorcode.org/license.txt for BSD license.
+USING: combinators io io.files io.streams.string kernel make
+math namespaces sequences sequences.private unicode ;
 IN: csv
 
 SYMBOL: delimiter
@@ -25,7 +24,7 @@ DEFER: quoted-field,
             { CHAR: \r   [ ] } ! Error: lf inside string?
             [ [ , drop f maybe-escaped-quote ] when* ]
         } case
-     ] if ; inline recursive
+    ] if ; inline recursive
 
 : quoted-field, ( delimiter stream -- delimiter stream sep/f )
     "\"" over stream-read-until drop % t maybe-escaped-quote ;
@@ -35,13 +34,13 @@ DEFER: quoted-field,
 
 : ?trim ( string -- string' )
     dup length [ drop "" ] [
-        over first-unsafe blank?
-        [ drop t ] [ 1 - over nth-unsafe blank? ] if
-        [ [ blank? ] trim ] when
+        over first-unsafe unicode:blank?
+        [ drop t ] [ 1 - over nth-unsafe unicode:blank? ] if
+        [ [ unicode:blank? ] trim ] when
     ] if-zero ; inline
 
 : continue-field ( delimiter stream field-seps seq -- sep/f field )
-    swap rot stream-read-until [ "\"" glue ] dip
+    spin stream-read-until [ "\"" glue ] dip
     swap ?trim nipd ; inline
 
 : field ( delimiter stream field-seps quote-seps -- sep/f field )

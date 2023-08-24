@@ -1,8 +1,8 @@
 ! Copyright (C) 2008 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors assocs grouping kernel math parser
-persistent.assocs persistent.sequences prettyprint.custom
-sequences sequences.private vectors ;
+persistent.assocs persistent.sequences sequences
+sequences.private vectors vocabs.loader ;
 IN: vlists
 
 TUPLE: vlist
@@ -52,10 +52,6 @@ INSTANCE: vlist immutable-sequence
 
 SYNTAX: VL{ \ } [ >vlist ] parse-literal ;
 
-M: vlist pprint-delims drop \ VL{ \ } ;
-M: vlist >pprint-sequence ;
-M: vlist pprint* pprint-object ;
-
 TUPLE: valist { vlist vlist read-only } ;
 
 : <valist> ( -- valist ) <vlist> valist boa ; inline
@@ -90,6 +86,4 @@ INSTANCE: valist assoc
 
 SYNTAX: VA{ \ } [ >valist ] parse-literal ;
 
-M: valist pprint-delims drop \ VA{ \ } ;
-M: valist >pprint-sequence >alist ;
-M: valist pprint* pprint-object ;
+{ "vlists" "prettyprint" } "vlists.prettyprint" require-when

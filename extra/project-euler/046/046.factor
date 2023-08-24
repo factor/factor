@@ -1,10 +1,10 @@
 ! Copyright (c) 2008 Aaron Schaefer.
-! See http://factorcode.org/license.txt for BSD license.
-USING: kernel math math.functions math.primes math.ranges
-sequences project-euler.common math.bitwise ;
+! See https://factorcode.org/license.txt for BSD license.
+USING: kernel math math.functions math.primes ranges
+sequences project-euler.common ;
 IN: project-euler.046
 
-! http://projecteuler.net/index.php?section=problems&id=46
+! https://projecteuler.net/index.php?section=problems&id=46
 
 ! DESCRIPTION
 ! -----------
@@ -31,7 +31,7 @@ IN: project-euler.046
 <PRIVATE
 
 : perfect-squares ( n -- seq )
-    2 /i sqrt >integer [1,b] [ sq ] map ;
+    2 /i sqrt >integer [1..b] [ sq ] map ;
 
 : fits-conjecture? ( n -- ? )
     dup perfect-squares [ 2 * - ] with map [ prime? ] any? ;

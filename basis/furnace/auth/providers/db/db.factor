@@ -1,8 +1,7 @@
 ! Copyright (C) 2008 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
-USING: db db.tuples db.types accessors
-furnace.auth.providers kernel continuations
-classes.singleton ;
+! See https://factorcode.org/license.txt for BSD license.
+USING: accessors db db.tuples db.types furnace.auth.providers
+kernel ;
 IN: furnace.auth.providers.db
 
 user "USERS"

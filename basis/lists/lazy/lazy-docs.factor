@@ -1,7 +1,6 @@
 ! Copyright (C) 2006 Chris Double.
-! See http://factorcode.org/license.txt for BSD license.
-USING: help.markup help.syntax kernel lists math sequences
-strings ;
+! See https://factorcode.org/license.txt for BSD license.
+USING: help.markup help.syntax lists math sequences strings ;
 IN: lists.lazy
 
 ABOUT: "lists.lazy"

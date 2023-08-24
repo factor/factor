@@ -1,5 +1,5 @@
 ! Copyright (C) 2008, 2010 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs fry help.markup help.topics io
 kernel make math math.parser namespaces sequences sorting
 summary tools.completion vocabs.hierarchy help.vocabs
@@ -46,13 +46,13 @@ M: more-completions article-title
     ] "" make ;
 
 M: more-completions article-content
-    seq>> [ second >lower ] sort-with keys \ $completions prefix ;
+    seq>> [ second >lower ] sort-by keys \ $completions prefix ;
 
 :: (apropos) ( search completions category -- element )
     completions [
         [
             { $heading search } ,
-            [ max-completions short head keys \ $completions prefix , ]
+            [ max-completions index-or-length head keys \ $completions prefix , ]
             [
                 length max-completions >
                 [ { $link T{ more-completions f completions search category } } , ] when
@@ -89,4 +89,4 @@ M: apropos-search >link ;
 INSTANCE: apropos-search topic
 
 : apropos ( str -- )
-    [ blank? ] trim <apropos-search> print-topic ;
+    [ unicode:blank? ] trim <apropos-search> print-topic ;

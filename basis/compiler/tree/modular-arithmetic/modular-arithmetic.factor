@@ -1,5 +1,5 @@
 ! Copyright (C) 2008, 2009 Slava Pestov, Daniel Ehrenberg.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors alien.accessors assocs combinators
 combinators.short-circuit compiler.tree
 compiler.tree.combinators compiler.tree.def-use.simplified
@@ -132,7 +132,7 @@ SYMBOL: changed?
 GENERIC: optimize-modular-arithmetic* ( node -- nodes )
 
 M: #push optimize-modular-arithmetic*
-    dup [ out-d>> first modular-value? ] [ literal>> real? ] bi and
+    dup { [ out-d>> first modular-value? ] [ literal>> real? ] } 1&&
     [ [ >fixnum ] change-literal ] when ;
 
 : redundant->fixnum? ( #call -- ? )
@@ -178,7 +178,8 @@ MEMO: fixnum-coercion ( flags -- nodes )
 
 : like->fixnum? ( #call -- ? )
     word>> {
-        >fixnum bignum>fixnum float>fixnum
+        >fixnum float>fixnum
+        bignum>fixnum bignum>fixnum-strict
         integer>fixnum integer>fixnum-strict
     } member-eq? ;
 

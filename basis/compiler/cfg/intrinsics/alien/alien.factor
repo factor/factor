@@ -1,10 +1,10 @@
 ! Copyright (C) 2008, 2010 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors alien classes.algebra combinators
-combinators.short-circuit compiler.cfg compiler.cfg.builder.blocks
+combinators.short-circuit compiler.cfg.builder.blocks
 compiler.cfg.hats compiler.cfg.instructions compiler.cfg.stacks
-compiler.tree.propagation.info cpu.architecture fry kernel locals math
-namespaces sequences ;
+compiler.tree.propagation.info cpu.architecture kernel math
+sequences ;
 IN: compiler.cfg.intrinsics.alien
 
 : emit-<displaced-alien>? ( node -- ? )

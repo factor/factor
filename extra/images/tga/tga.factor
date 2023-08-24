@@ -1,9 +1,9 @@
 ! Copyright (C) 2010 Erik Charlebois
-! See http://factorcode.org/license.txt for BSD license.
-USING: accessors images images.loader io io.binary kernel
-locals math sequences io.encodings.ascii io.encodings.string
-calendar math.ranges math.parser colors arrays hashtables
-ui.pixel-formats combinators continuations io.streams.throwing ;
+! See https://factorcode.org/license.txt for BSD license.
+USING: accessors arrays calendar colors combinators
+continuations endian hashtables images images.loader io
+io.encodings.ascii io.encodings.string io.streams.throwing
+kernel math math.parser ranges sequences ;
 IN: images.tga
 
 SINGLETON: tga-image
@@ -83,12 +83,12 @@ ERROR: bad-tga-unsupported ;
 
 : read-date-timestamp ( -- timestamp )
     timestamp new
-    2 read le> dup 12 [1,b] member? [ bad-tga-timestamp ] unless >>month
-    2 read le> dup 31 [1,b] member? [ bad-tga-timestamp ] unless >>day
+    2 read le> dup 12 [1..b] member? [ bad-tga-timestamp ] unless >>month
+    2 read le> dup 31 [1..b] member? [ bad-tga-timestamp ] unless >>day
     2 read le>                                                   >>year
-    2 read le> dup 23 [0,b] member? [ bad-tga-timestamp ] unless >>hour
-    2 read le> dup 59 [0,b] member? [ bad-tga-timestamp ] unless >>minute
-    2 read le> dup 59 [0,b] member? [ bad-tga-timestamp ] unless >>second ; inline
+    2 read le> dup 23 [0..b] member? [ bad-tga-timestamp ] unless >>hour
+    2 read le> dup 59 [0..b] member? [ bad-tga-timestamp ] unless >>minute
+    2 read le> dup 59 [0..b] member? [ bad-tga-timestamp ] unless >>second ; inline
 
 : read-job-name ( -- string )
     41 read ascii decode [ 0 = ] trim ; inline
@@ -96,8 +96,8 @@ ERROR: bad-tga-unsupported ;
 : read-job-time ( -- duration )
     duration new
     2 read le>                                                   >>hour
-    2 read le> dup 59 [0,b] member? [ bad-tga-timestamp ] unless >>minute
-    2 read le> dup 59 [0,b] member? [ bad-tga-timestamp ] unless >>second ; inline
+    2 read le> dup 59 [0..b] member? [ bad-tga-timestamp ] unless >>minute
+    2 read le> dup 59 [0..b] member? [ bad-tga-timestamp ] unless >>second ; inline
 
 : read-software-id ( -- string )
     41 read ascii decode [ 0 = ] trim ; inline

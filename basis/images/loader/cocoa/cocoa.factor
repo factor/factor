@@ -1,16 +1,39 @@
 ! Copyright (C) 2010, 2011 Joe Groff, Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
-USING: accessors cocoa cocoa.classes core-foundation
-core-foundation.data core-foundation.urls core-graphics
+! See https://factorcode.org/license.txt for BSD license.
+USING: accessors alien.syntax assocs cocoa cocoa.classes
+cocoa.enumeration cocoa.plists.private core-foundation
+core-foundation.data core-foundation.dictionaries
+core-foundation.strings core-foundation.urls core-graphics
 core-graphics.private core-graphics.types destructors
-images.loader io kernel locals math sequences system ;
+images.loader io kernel math sequences system system-info ;
 IN: images.loader.cocoa
 
 SINGLETON: ns-image
 
+FUNCTION: CFDictionaryRef UTTypeCopyDeclaration ( CFStringRef inUTI )
+
+<<
+
+: supported-ns-images ( -- seq )
+    NSImage -> imageTypes [ CF>string ] NSFastEnumeration-map ;
+
+: supported-ns-images-utt ( -- seq )
+    NSImage -> imageTypes
+    [ [ CF>string ] NSFastEnumeration-map ]
+    [ [ UTTypeCopyDeclaration (plist-NSDictionary>) ] NSFastEnumeration-map ] bi zip ;
+
+: supported-ns-image-extensions ( -- seq )
+    supported-ns-images-utt
+    [ "UTTypeTagSpecification" of dup [ "public.filename-extension" of ] when ] assoc-map values concat ;
+
+>>
+
 os macosx? [
-    { "png" "tif" "tiff" "gif" "jpg" "jpeg" "bmp" "ico" }
-    [ ns-image register-image-class ] each
+    os-version first 11 < [
+        { "png" "tif" "tiff" "gif" "jpg" "jpeg" "bmp" "ico" "webp" }
+    ] [
+        supported-ns-image-extensions
+    ] if [ ns-image register-image-class ] each
 ] when
 
 : <CGImage> ( byte-array -- image-rep )

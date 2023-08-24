@@ -1,5 +1,5 @@
 ! Copyright (C) 2008 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors byte-arrays growable kernel math sequences
 sequences.private ;
 IN: byte-vectors
@@ -46,3 +46,4 @@ M: byte-array new-resizable drop <byte-vector> ; inline
 M: byte-vector new-resizable drop <byte-vector> ; inline
 
 INSTANCE: byte-vector growable
+INSTANCE: byte-vector byte-sequence

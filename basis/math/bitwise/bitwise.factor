@@ -1,9 +1,10 @@
 ! Copyright (C) 2007, 2008 Slava Pestov, Doug Coleman.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: alien alien.c-types alien.data arrays assocs byte-arrays
-combinators combinators.short-circuit fry kernel kernel.private
-layouts macros math math.bits sequences sequences.private
+combinators combinators.short-circuit kernel kernel.private
+layouts math math.bits sequences sequences.private
 specialized-arrays words ;
+IN: math.bitwise
 SPECIALIZED-ARRAY: uchar
 IN: math.bitwise
 
@@ -58,22 +59,26 @@ ERROR: bit-range-error x high low ;
 
 GENERIC: (bitfield-quot) ( spec -- quot )
 
-M: integer (bitfield-quot) ( spec -- quot )
+M: integer (bitfield-quot)
     '[ _ shift ] ;
 
-M: pair (bitfield-quot) ( spec -- quot )
+M: pair (bitfield-quot)
     first2-unsafe over word? [
         '[ _ execute _ shift ]
     ] [
         '[ _ _ shift ]
     ] if ;
 
-PRIVATE>
-
-MACRO: bitfield ( bitspec -- quot )
+: (bitfield) ( bitspec -- quot )
     [ [ 0 ] ] [
         [ (bitfield-quot) ] [ '[ @ _ dip bitor ] ] map-reduce
     ] if-empty ;
+
+PRIVATE>
+
+MACRO: bitfield ( bitspec -- quot ) (bitfield) ;
+
+MACRO: bitfield* ( bitspec -- quot ) reverse (bitfield) ;
 
 ! bit-count
 <PRIVATE
@@ -129,7 +134,7 @@ PRIVATE>
 GENERIC: bit-count ( obj -- n )
 
 M: integer bit-count
-    dup 0 < [ non-negative-integer-expected ] when (bit-count) ; inline
+    assert-non-negative (bit-count) ; inline
 
 M: byte-array bit-count
     byte-array-bit-count ;
@@ -138,10 +143,19 @@ M: object bit-count
     binary-object uchar <c-direct-array> byte-array-bit-count ;
 
 : bit-length ( x -- n )
-    dup 0 < [ non-negative-integer-expected ] [
+    dup 0 < [ non-negative-number-expected ] [
         dup 1 > [ log2 1 + ] when
     ] if ;
 
 : even-parity? ( obj -- ? ) bit-count even? ;
 
 : odd-parity? ( obj -- ? ) bit-count odd? ;
+
+: d>w/w ( d -- w1 w2 )
+    [ 0xffffffff bitand ] [ -32 shift 0xffffffff bitand ] bi ;
+
+: w>h/h ( w -- h1 h2 )
+    [ 0xffff bitand ] [ -16 shift 0xffff bitand ] bi ;
+
+: h>b/b ( h -- b1 b2 )
+    [ 0xff bitand ] [ -8 shift 0xff bitand ] bi ;

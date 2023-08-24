@@ -1,32 +1,49 @@
 ! Copyright (C) 2008 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
-USING: accessors assocs furnace.actions furnace.redirection
-help.html help.topics html.components html.forms http.server
-http.server.dispatchers http.server.static io.directories
-io.files.temp kernel locals namespaces sequences
-unicode urls ;
+! See https://factorcode.org/license.txt for BSD license.
+USING: accessors arrays assocs continuations furnace.actions
+furnace.boilerplate furnace.redirection help.html help.topics
+html.components html.forms http.server http.server.dispatchers
+http.server.static io.directories io.files.temp io.servers
+kernel namespaces sequences simple-tokenizer splitting unicode
+urls ;
 IN: webapps.help
 
 TUPLE: help-webapp < dispatcher ;
 
-: links ( seq -- seq' )
-    [ swap <simple-link> ] { } assoc>map ;
+: fixup-words ( title href -- title' href' )
+    dup "word-" head? [
+        dup ".html" ?tail drop "," split1-last nip dup ":" append
+        '[ " (" _ 3append ")" append _ ?head drop ] dip
+    ] when ;
+
+: links ( apropos -- seq )
+    [ swap fixup-words <simple-link> ] { } assoc>map ;
+
+: ?links ( has-links? apropos -- has-links? seq/f )
+    links [ f ] [ nip t swap ] if-empty ;
+
+: ?tokenize ( str -- str' )
+    [ tokenize ] [ drop 1array ] recover ;
 
 :: <search-action> ( help-dir -- action )
     <page-action>
         { help-webapp "search" } >>template
         [
-            "search" param [ blank? ] trim [
+            f "search" param [ unicode:blank? ] trim
+            dup "search" set-value [
                 help-dir [
-                    [ article-apropos links "articles" set-value ]
-                    [ word-apropos links "words" set-value ]
-                    [ vocab-apropos links "vocabs" set-value ] tri
+                    ?tokenize concat
+                    [ article-apropos ?links "articles" set-value ]
+                    [ word-apropos ?links "words" set-value ]
+                    [ vocab-apropos ?links "vocabs" set-value ] tri
                 ] with-directory
-            ] unless-empty
-            help-navbar "navbar" set-value
+            ] unless-empty not "empty" set-value
+            help-nav "nav" set-value
 
             { help-webapp "search" } <chloe-content>
-        ] >>display ;
+        ] >>display
+    <boilerplate>
+        { help-webapp "help" } >>template ;
 
 : help-url ( topic -- url )
     topic>filename "$help-webapp/content/" prepend >url ;
@@ -37,14 +54,13 @@ TUPLE: help-webapp < dispatcher ;
 
 :: <help-webapp> ( help-dir -- webapp )
     help-webapp new-dispatcher
-        <main-action> "" add-responder
-        help-dir <search-action> "search" add-responder
-        help-dir <static> "content" add-responder
-        "resource:basis/definitions/icons/" <static> "icons" add-responder ;
+        <main-action> <secure-only> "" add-responder
+        help-dir <search-action> <secure-only> "search" add-responder
+        help-dir <static> <secure-only> "content" add-responder ;
 
 : run-help-webapp ( -- )
     "docs" cache-file <help-webapp>
         main-responder set-global
-    8080 httpd drop ;
+    8080 httpd wait-for-server ;
 
 MAIN: run-help-webapp

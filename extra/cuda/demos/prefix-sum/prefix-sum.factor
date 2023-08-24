@@ -1,6 +1,6 @@
 ! Copyright (C) 2010 Doug Coleman.
-! See http://factorcode.org/license.txt for BSD license.
-USING: alien.c-types cuda cuda.contexts cuda.libraries cuda.syntax locals ;
+! See https://factorcode.org/license.txt for BSD license.
+USING: alien.c-types cuda cuda.contexts cuda.libraries cuda.syntax ;
 IN: cuda.demos.prefix-sum
 
 CUDA-LIBRARY: prefix-sum cuda32 "vocab:cuda/demos/prefix-sum/prefix-sum.ptx"

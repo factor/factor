@@ -183,9 +183,9 @@ HELP: $subsection
 { $values { "element" "a markup element of the form " { $snippet "{ topic }" } } }
 { $description "Prints a large clickable link to the help topic named by the first item in " { $snippet "element" } ". The link is printed along with its associated definition icon." }
 { $examples
-    { $markup-example { $subsections "sequences" } }
-    { $markup-example { $subsections nth } }
-    { $markup-example { $subsections each } }
+    { $markup-example { $subsection "sequences" } }
+    { $markup-example { $subsection nth } }
+    { $markup-example { $subsection each } }
 } ;
 
 HELP: $subsections
@@ -344,6 +344,85 @@ HELP: $link
     { $markup-example { $link "dlists" } }
     { $markup-example { $link + } }
 } ;
+
+HELP: $breadcrumbs
+{ $values { "topics" "topics to feature in the breadcrumb" } }
+{ $description "Displays a list of help articles or words. Used to indicate a sequence of links that lead to the current page." }
+; 
+
+HELP: $class-description
+{ $values { "element" "a markup element" } }
+{ $description "Prints a \"Class Description\" heading, and displays its content." }
+;
+
+HELP: $content
+{ $values { "element" "a markup element" } }
+{ $description "Prints the content of a help article. The link to the article is given as a string or a word." }
+;
+
+HELP: $deprecated
+{ $values { "element" "a markup element" } }
+{ $description "Prints a notice indicating that the current page describes a deprecated word." }
+;
+
+HELP: $emphasis
+{ $values { "children" "a markup element" } }
+{ $description "Prints " { $emphasis "emphasized" } "text. This is also known as italicized text." }
+;
+
+HELP: $inputs
+{ $values { "element" "a markup element" } }
+{ $description "Prints an \"Inputs\" heading, and displays the inputs for a word. Use " { $link $values } 
+  " instead, which displays both inputs and outputs if applicable." }
+;
+
+HELP: $io-error
+{ $values { "children" "a markup element" } }
+{ $description "Indicates an error class for input/output." }
+;
+
+HELP: $long-link
+{ $values { "element" "a markup element" } }
+{ $description "Prints a link to a word or article, along with its stack effect, if available." }
+;
+
+HELP: $low-level-note
+{ $values { "children" "a list of markup elements" } }
+{ $description "Prints a disclaimer, indicating that the current page describes a low level word." }
+;
+
+HELP: $methods
+{ $values { "element" "a markup element" } }
+{ $description "Prints the methods for a word. This word is only used internally." }
+;
+
+HELP: $or
+{ $values { "element" "a markup element of shape " { $snippet "{ class1 class2 }" } } }
+{ $description
+    "Produces the text “a " { $emphasis "class1" } " or " { $emphasis "class2" } 
+    "” or “an " { $emphasis "class1" } " or " { $emphasis "class2" } "”, depending on the first letter of either class name."
+}
+;
+
+HELP: $outputs
+{ $values { "element" "a markup element" } }
+{ $description "Prints an \"Outputs\" heading, and displays the outputs for a word. Use " { $link $values } 
+  " instead, which displays both inputs and outputs if applicable." }
+;
+
+HELP: $parsing-note
+{ $values { "children" "a list of markup elements" } }
+{ $description "Prints a disclaimer, indicating that the current page describes a word made to be used for parsing." }
+;
+
+HELP: $pretty-link
+{ $values { "element" "an article name or word" } }
+{ $description "Prints the link to an article or word, along with its definition icon." }
+;
+HELP: $vocab-link
+{ $values { "element" "a string" } }
+{ $description "Prints a link to a vocabulary article." }
+;
 
 HELP: textual-list
 { $values { "seq" sequence } { "quot" { $quotation ( elt -- ) } } }
@@ -529,3 +608,23 @@ HELP: vocab-help
 HELP: orphan-articles
 { $values { "seq" "vocab names" } }
 { $description "Retrieves all vocabs without parents, except for 'help.home' and 'handbook' which are special." } ;
+
+HELP: HELP{
+{ $syntax "HELP{ help-markup }" }
+{ $description "Generates help markup using syntax that does not require literal strings.
+Has some known problems with syntax words, which need to be quoted inside the " { $snippet "HELP{ }" } 
+ " definition." }
+{ $examples
+  { $code
+      "HELP{ I am a doc string.
+
+      This is a second paragraph. { $snippet \"code snippet\" }
+}"
+  }
+  "generates"
+  { $code
+      "{ \"I am a doc string.\" $nl \"This is a second paragraph.\" { $snippet \"code snippet\" } }"
+  }
+} 
+;
+

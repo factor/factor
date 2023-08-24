@@ -1,22 +1,22 @@
 ! Copyright (C) 2008 James Cash, Daniel Ehrenberg, Chris Double.
-! See http://factorcode.org/license.txt for BSD license.
-USING: accessors combinators.short-circuit kernel locals math
-sequences ;
+! See https://factorcode.org/license.txt for BSD license.
+USING: accessors combinators combinators.short-circuit kernel
+lexer make math namespaces parser sequences words ;
 IN: lists
 
 ! List Protocol
 MIXIN: list
 GENERIC: car ( cons -- car )
 GENERIC: cdr ( cons -- cdr )
-GENERIC: nil? ( object -- ?   )
+GENERIC: nil? ( object -- ? )
 
 TUPLE: cons-state { car read-only } { cdr read-only } ;
 
 C: cons cons-state
 
-M: cons-state car ( cons -- car ) car>> ;
+M: cons-state car car>> ;
 
-M: cons-state cdr ( cons -- cdr ) cdr>> ;
+M: cons-state cdr cdr>> ;
 
 SINGLETON: +nil+
 M: +nil+ nil? drop t ;
@@ -53,10 +53,22 @@ M: object nil? drop f ;
 : (leach) ( list quot -- cdr quot )
     [ [ car ] dip call ] [ [ cdr ] dip ] 2bi ; inline
 
+: (2leach) ( list1 list2 quot -- cdr1 cdr2 quot )
+    [ [ [ car ] bi@ ] dip call ] [ [ [ cdr ] bi@ ] dip ] 3bi ; inline
+
 PRIVATE>
 
 : leach ( ... list quot: ( ... elt -- ... ) -- ... )
     over nil? [ 2drop ] [ (leach) leach ] if ; inline recursive
+
+: 2leach ( ... list1 list2 quot: ( ... elt1 elt2 -- ... ) -- ... )
+    2over [ nil? ] either? [ 3drop ] [ (2leach) 2leach ] if ; inline recursive
+
+: lreduce ( ... list identity quot: ( ... prev elt -- ... next ) -- ... result )
+    swapd leach ; inline
+
+: 2lreduce ( ... list1 list2 identity quot: ( ... prev elt1 elt2 -- ... next ) -- ... result )
+    -rotd 2leach ; inline
 
 : foldl ( ... list identity quot: ( ... prev elt -- ... next ) -- ... result )
     swapd leach ; inline
@@ -102,3 +114,36 @@ INSTANCE: +nil+ list
 GENERIC: >list ( object -- list )
 
 M: list >list ;
+
+M: sequence >list sequence>list ;
+
+ERROR: list-syntax-error ;
+
+<PRIVATE
+
+: items>list ( sequence -- list )
+    [ +nil+ ] [
+        <reversed> unclip-slice [ swons ] reduce
+    ] if-empty ;
+
+: ?list-syntax-error ( right-of-dot? -- )
+    building get empty? or [ list-syntax-error ] when ;
+
+: (parse-list-literal) ( right-of-dot? -- )
+    scan-token {
+        { "}" [ drop +nil+ , ] }
+        { "." [ ?list-syntax-error t (parse-list-literal) ] }
+        [
+            parse-datum dup parsing-word? [
+                V{ } clone swap execute-parsing first
+            ] when
+            , [ "}" expect ] [ f (parse-list-literal) ] if
+        ]
+    } case ;
+
+: parse-list-literal ( -- list )
+    [ f (parse-list-literal) ] { } make items>list ;
+
+PRIVATE>
+
+SYNTAX: L{ parse-list-literal suffix! ;

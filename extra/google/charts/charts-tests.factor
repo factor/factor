@@ -1,7 +1,7 @@
 ! Copyright (C) 2016 Alexander Ilin.
-! See http://factorcode.org/license.txt for BSD license.
-USING: accessors colors.constants google.charts
-google.charts.private kernel math present sequences tools.test ;
+! See https://factorcode.org/license.txt for BSD license.
+USING: accessors colors google.charts google.charts.private
+kernel math present sequences tools.test ;
 
 ! The order of the constructors below is important, because we
 ! are testing side-effects. If you remove the clone word from

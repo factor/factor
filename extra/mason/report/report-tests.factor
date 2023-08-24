@@ -1,14 +1,13 @@
-USING: io.directories io.directories.hierarchy io.files
-io.files.temp kernel mason.common mason.config mason.report
-namespaces tools.test xml xml.writer ;
+USING: io.directories io.files io.files.temp kernel mason.common
+mason.config mason.report namespaces tools.test xml xml.writer ;
 IN: mason.report.tests
 
 { 0 0 } [ [ ] with-report ] must-infer-as
 
 : verify-report ( -- )
-     [ t ] [ "report" exists? ] unit-test
-     [ ] [ "report" file>xml drop ] unit-test
-     [ ] [ "report" delete-file ] unit-test ;
+    [ t ] [ "report" file-exists? ] unit-test
+    [ ] [ "report" file>xml drop ] unit-test
+    [ ] [ "report" delete-file ] unit-test ;
 
 "builds" temp-file builds-dir [
     [

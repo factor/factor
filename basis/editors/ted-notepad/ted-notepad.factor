@@ -3,7 +3,6 @@ math.parser namespaces sequences make ;
 IN: editors.ted-notepad
 
 SINGLETON: ted-notepad
-ted-notepad editor-class set-global
 
 : ted-notepad-path ( -- path )
     \ ted-notepad-path get [
@@ -11,7 +10,7 @@ ted-notepad editor-class set-global
         [ "TedNPad.exe" ] unless*
     ] unless* ;
 
-M: ted-notepad editor-command ( file line -- command )
+M: ted-notepad editor-command
     [
         ted-notepad-path ,
         number>string "/l" prepend , ,

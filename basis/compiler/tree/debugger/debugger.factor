@@ -1,19 +1,17 @@
 ! Copyright (C) 2006, 2010 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs combinators
 combinators.short-circuit compiler.tree compiler.tree.builder
-compiler.tree.checker compiler.tree.cleanup
-compiler.tree.combinators compiler.tree.dead-code
-compiler.tree.def-use compiler.tree.escape-analysis
-compiler.tree.identities compiler.tree.modular-arithmetic
-compiler.tree.normalization compiler.tree.optimizer
-compiler.tree.propagation compiler.tree.propagation.info
-compiler.tree.recursive compiler.tree.tuple-unboxing effects fry
-generic hints io kernel macros make match math namespaces
-prettyprint prettyprint.config prettyprint.custom
-prettyprint.sections quotations sequences sequences.private sets
-sorting words ;
-FROM: fry => _ ;
+compiler.tree.cleanup compiler.tree.combinators
+compiler.tree.dead-code compiler.tree.def-use
+compiler.tree.escape-analysis compiler.tree.identities
+compiler.tree.modular-arithmetic compiler.tree.normalization
+compiler.tree.optimizer compiler.tree.propagation
+compiler.tree.recursive compiler.tree.tuple-unboxing effects
+generic hints io kernel make match math namespaces prettyprint
+prettyprint.config prettyprint.custom prettyprint.sections
+quotations sequences sequences.private sets sorting words ;
+FROM: syntax => _ ;
 RENAME: _ match => __
 IN: compiler.tree.debugger
 
@@ -84,10 +82,10 @@ M: #shuffle node>quot
         { [ dup #>r? ] [ drop \ >R , ] }
         { [ dup #r>? ] [ drop \ R> , ] }
         {
-            [ dup [ in-r>> empty? ] [ out-r>> empty? ] bi and ]
+            [ dup { [ in-r>> empty? ] [ out-r>> empty? ] } 1&& ]
             [
-                shuffle-effect dup pretty-shuffle
-                [ % ] [ shuffle-node boa , ] ?if
+                shuffle-effect
+                [ pretty-shuffle ] [ % ] [ shuffle-node boa , ] ?if
             ]
         }
         [ drop "COMPLEX SHUFFLE" , ]
@@ -176,7 +174,7 @@ SYMBOL: node-count
             { methods-called "==== Non-inlined method calls:" }
             { intrinsics-called "==== Open-coded intrinsic calls:" }
         } [
-            nl print get keys natural-sort stack.
+            nl print get keys sort stack.
         ] assoc-each
     ] with-variables ;
 

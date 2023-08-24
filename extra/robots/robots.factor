@@ -1,7 +1,7 @@
 ! Copyright (C) 2009 Doug Coleman.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs calendar.parser combinators
-combinators.short-circuit fry globs http.client kernel math.parser
+combinators.short-circuit globs http.client kernel math.parser
 namespaces present regexp regexp.combinators sequences splitting
 splitting.monotonic unicode urls ;
 IN: robots
@@ -32,10 +32,10 @@ visit-time request-rate crawl-delay unknowns ;
     >robots.txt-url http-get nip ;
 
 : normalize-robots.txt ( string -- sitemaps seq )
-    string-lines
-    [ [ blank? ] trim ] map
+    split-lines
+    [ [ unicode:blank? ] trim ] map
     [ "#" head? ] reject harvest
-    [ ":" split1 [ [ blank? ] trim ] bi@ [ >lower ] dip  ] { } map>assoc
+    [ ":" split1 [ [ unicode:blank? ] trim ] bi@ [ >lower ] dip  ] { } map>assoc
     [ first "sitemap" = ] partition [ values ] dip
     [
         {

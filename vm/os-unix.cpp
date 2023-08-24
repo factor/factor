@@ -86,8 +86,13 @@ segment::segment(cell size_, bool executable_p) {
     prot = PROT_READ | PROT_WRITE;
 
   cell alloc_size = 2 * pagesize + size;
+#if defined(__APPLE__) && defined(FACTOR_ARM64)  // FIXME: could be in header file
+  char* array = (char*)mmap(NULL, alloc_size, prot,
+                            MAP_ANON | MAP_PRIVATE | MAP_JIT, -1, 0);
+#else
   char* array = (char*)mmap(NULL, alloc_size, prot,
                             MAP_ANON | MAP_PRIVATE, -1, 0);
+#endif
 
   if (array == (char*)-1)
     fatal_error("Out of memory in mmap", alloc_size);
@@ -126,7 +131,7 @@ void factor_vm::dispatch_signal(void* uap, void(handler)()) {
 }
 
 void memory_signal_handler(int signal, siginfo_t* siginfo, void* uap) {
-
+  (void) signal;
   cell fault_addr = (cell)siginfo->si_addr;
   cell fault_pc = (cell)UAP_PROGRAM_COUNTER(uap);
   factor_vm* vm = current_vm();
@@ -135,6 +140,7 @@ void memory_signal_handler(int signal, siginfo_t* siginfo, void* uap) {
 }
 
 void synchronous_signal_handler(int signal, siginfo_t* siginfo, void* uap) {
+  (void) siginfo;
   if (factor_vm::fatal_erroring_p)
     return;
 
@@ -153,6 +159,8 @@ static void enqueue_signal(factor_vm* vm, int signal) {
 }
 
 void enqueue_signal_handler(int signal, siginfo_t* siginfo, void* uap) {
+  (void) siginfo;
+  (void) uap;
   if (factor_vm::fatal_erroring_p)
     return;
 
@@ -162,6 +170,8 @@ void enqueue_signal_handler(int signal, siginfo_t* siginfo, void* uap) {
 }
 
 void fep_signal_handler(int signal, siginfo_t* siginfo, void* uap) {
+  (void) siginfo;
+  (void) uap;
   if (factor_vm::fatal_erroring_p)
     return;
 
@@ -174,6 +184,7 @@ void fep_signal_handler(int signal, siginfo_t* siginfo, void* uap) {
 }
 
 void sample_signal_handler(int signal, siginfo_t* siginfo, void* uap) {
+  (void) siginfo;
   factor_vm* vm = current_vm_p();
   bool foreign_thread = false;
   if (vm == NULL) {
@@ -186,7 +197,11 @@ void sample_signal_handler(int signal, siginfo_t* siginfo, void* uap) {
     enqueue_signal(vm, signal);
 }
 
-void ignore_signal_handler(int signal, siginfo_t* siginfo, void* uap) {}
+void ignore_signal_handler(int signal, siginfo_t* siginfo, void* uap) {
+  (void) signal;
+  (void) siginfo;
+  (void) uap;
+}
 
 void fpe_signal_handler(int signal, siginfo_t* siginfo, void* uap) {
   factor_vm* vm = current_vm();
@@ -376,6 +391,7 @@ bool safe_read(int fd, void* data, ssize_t size) {
 }
 
 void* stdin_loop(void* arg) {
+  (void) arg;
   unsigned char buf[4096];
   bool loop_running = true;
 

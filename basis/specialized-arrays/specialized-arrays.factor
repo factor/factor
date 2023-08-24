@@ -1,5 +1,5 @@
 ! Copyright (C) 2008, 2010 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors alien alien.c-types alien.data alien.parser
 byte-arrays classes combinators fry functors kernel lexer locals
 make math math.vectors parser prettyprint.custom sequences
@@ -121,10 +121,10 @@ PRIVATE>
 : direct-slice ( from to seq -- seq' )
     check-slice direct-slice-unsafe ; inline
 
-: direct-head ( seq n -- seq' ) (head) direct-slice ; inline
-: direct-tail ( seq n -- seq' ) (tail) direct-slice ; inline
-: direct-head* ( seq n -- seq' ) from-end direct-head ; inline
-: direct-tail* ( seq n -- seq' ) from-end direct-tail ; inline
+: direct-head ( seq n -- seq' ) head-to-index direct-slice ; inline
+: direct-tail ( seq n -- seq' ) index-to-tail direct-slice ; inline
+: direct-head* ( seq n -- seq' ) from-tail direct-head ; inline
+: direct-tail* ( seq n -- seq' ) from-tail direct-tail ; inline
 
 : define-array-vocab ( type -- vocab )
     underlying-type
@@ -135,36 +135,36 @@ ERROR: specialized-array-vocab-not-loaded c-type ;
 
 M: c-type-word c-array-constructor
     underlying-type
-    dup [ name>> "<" "-array>" surround ] [ specialized-array-vocab ] bi lookup-word
-    [ ] [ specialized-array-vocab-not-loaded ] ?if ; foldable
+    [ [ name>> "<" "-array>" surround ] [ specialized-array-vocab ] bi lookup-word ]
+    [ specialized-array-vocab-not-loaded ] ?unless ; foldable
 
 M: pointer c-array-constructor drop void* c-array-constructor ;
 
 M: c-type-word c-(array)-constructor
     underlying-type
-    dup [ name>> "(" "-array)" surround ] [ specialized-array-vocab ] bi lookup-word
-    [ ] [ specialized-array-vocab-not-loaded ] ?if ; foldable
+    [ [ name>> "(" "-array)" surround ] [ specialized-array-vocab ] bi lookup-word ]
+    [ specialized-array-vocab-not-loaded ] ?unless ; foldable
 
 M: pointer c-(array)-constructor drop void* c-(array)-constructor ;
 
 M: c-type-word c-direct-array-constructor
     underlying-type
-    dup [ name>> "<direct-" "-array>" surround ] [ specialized-array-vocab ] bi lookup-word
-    [ ] [ specialized-array-vocab-not-loaded ] ?if ; foldable
+    [ [ name>> "<direct-" "-array>" surround ] [ specialized-array-vocab ] bi lookup-word ]
+    [ specialized-array-vocab-not-loaded ] ?unless ; foldable
 
 M: pointer c-direct-array-constructor drop void* c-direct-array-constructor ;
 
 M: c-type-word c-array-type
     underlying-type
-    dup [ name>> "-array" append ] [ specialized-array-vocab ] bi lookup-word
-    [ ] [ specialized-array-vocab-not-loaded ] ?if ; foldable
+    [ [ name>> "-array" append ] [ specialized-array-vocab ] bi lookup-word ]
+    [ specialized-array-vocab-not-loaded ] ?unless ; foldable
 
 M: pointer c-array-type drop void* c-array-type ;
 
 M: c-type-word c-array-type?
     underlying-type
-    dup [ name>> "-array?" append ] [ specialized-array-vocab ] bi lookup-word
-    [ ] [ specialized-array-vocab-not-loaded ] ?if ; foldable
+    [ [ name>> "-array?" append ] [ specialized-array-vocab ] bi lookup-word ]
+    [ specialized-array-vocab-not-loaded ] ?unless ; foldable
 
 M: pointer c-array-type? drop void* c-array-type? ;
 

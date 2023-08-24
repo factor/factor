@@ -3,7 +3,6 @@ math.parser namespaces ;
 IN: editors.coteditor
 
 SINGLETON: coteditor
-coteditor editor-class set-global
 
 : find-cot-bundle-path ( -- path/f )
     "com.coteditor.CotEditor" find-native-bundle [
@@ -12,5 +11,5 @@ coteditor editor-class set-global
         f
     ] if* ;
 
-M: coteditor editor-command ( file line -- command )
+M: coteditor editor-command
     [ find-cot-bundle-path , "-l" , number>string , , ] { } make ;

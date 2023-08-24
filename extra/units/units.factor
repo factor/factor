@@ -1,6 +1,5 @@
-USING: accessors arrays io kernel math namespaces splitting
-prettyprint sequences sorting vectors words inverse summary
-shuffle math.functions sets ;
+USING: accessors arrays combinators fry inverse kernel math
+math.functions sequences sets shuffle sorting splitting summary ;
 IN: units
 
 TUPLE: dimensioned value top bot ;
@@ -21,7 +20,7 @@ M: dimensions-not-equal summary drop "Dimensions do not match" ;
 
 : <dimensioned> ( n top bot -- obj )
     symbolic-reduce
-    [ natural-sort ] bi@
+    [ sort ] bi@
     dimensioned boa ;
 
 : >dimensioned< ( d -- n top bot )
@@ -61,10 +60,22 @@ M: dimensions-not-equal summary drop "Dimensions do not match" ;
 
 : d-sq ( d -- d ) dup d* ;
 
+: d-cube ( d -- d ) dup dup d* d* ;
+
 : d-recip ( d -- d' )
     >dimensioned< recip dimension-op> ;
 
 : d/ ( d d -- d ) d-recip d* ;
+
+ERROR: dimensioned-power-op-expects-integer d n ;
+
+: d^ ( d n -- d^n )
+    dup integer? [ dimensioned-power-op-expects-integer ] unless
+    {
+        { [ dup 0 > ] [ 1 - over '[ _ d* ] times ] }
+        { [ dup 0 < ] [ 1 - abs over '[ _ d/ ] times ] }
+        { [ dup 0 = ] [ 2drop 1 scalar ] }
+    } cond ;
 
 : comparison-op ( d d -- n n ) 2dup check-dimensions 2values ;
 

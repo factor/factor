@@ -1,8 +1,8 @@
 ! Copyright (C) 2015 Björn Lindqvist.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs compiler.cfg.dataflow-analysis
 compiler.cfg.instructions compiler.cfg.linearization
-compiler.cfg.stacks.local fry kernel math math.order namespaces
+compiler.cfg.stacks.local kernel math math.order namespaces
 sequences ;
 QUALIFIED: sets
 IN: compiler.cfg.stacks.padding
@@ -15,7 +15,7 @@ IN: compiler.cfg.stacks.padding
     first2 swapd remove 2array ;
 
 : combine-stacks ( stacks -- stack )
-    [ first first ] [ [ second ] map sets:combine ] bi 2array ;
+    [ first first ] [ [ second ] map sets:union-all ] bi 2array ;
 
 : classify-read ( stack n -- val )
     swap 2dup second member? [ 2drop 2 ] [ first >= [ 1 ] [ 0 ] if ] if ;

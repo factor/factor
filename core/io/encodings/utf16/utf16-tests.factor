@@ -1,7 +1,9 @@
 ! Copyright (C) 2008 Daniel Ehrenberg.
-! See http://factorcode.org/license.txt for BSD license.
-USING: arrays io.encodings.string io.encodings.utf16 strings
+! See https://factorcode.org/license.txt for BSD license.
+USING: accessors alien.data arrays io.encodings.string
+io.encodings.utf16 io.streams.byte-array kernel strings
 tools.test ;
+IN: io.encodings.utf16.tests
 
 { { CHAR: x } } [ B{ 0 CHAR: x } utf16be decode >array ] unit-test
 { { 0x1D11E } } [ B{ 0xD8 0x34 0xDD 0x1E } utf16be decode >array ] unit-test
@@ -26,3 +28,10 @@ tools.test ;
 
 { B{ CHAR: a 0 CHAR: b 0 CHAR: c 0 } } [ "abc" utf16le encode ] unit-test
 { B{ 0 CHAR: a 0 CHAR: b 0 CHAR: c } } [ "abc" utf16be encode ] unit-test
+
+: correct-endian ( obj -- ? )
+    code>> little-endian? utf16le utf16be ? = ;
+
+{ t } [ B{ } utf16n <byte-reader> correct-endian ] unit-test
+{ t } [ utf16n <byte-writer> correct-endian ] unit-test
+

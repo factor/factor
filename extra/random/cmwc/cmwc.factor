@@ -1,7 +1,7 @@
 ! Copyright (C) 2009 Doug Coleman.
-! See http://factorcode.org/license.txt for BSD license.
-USING: accessors alien.c-types alien.data arrays fry kernel
-locals math math.bitwise random sequences sequences.private
+! See https://factorcode.org/license.txt for BSD license.
+USING: accessors alien.c-types alien.data kernel
+math math.bitwise random sequences sequences.private
 specialized-arrays ;
 SPECIALIZED-ARRAY: uint
 IN: random.cmwc

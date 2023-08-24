@@ -1,5 +1,4 @@
-USING: help.markup help.syntax words parser quotations strings
-system sequences ;
+USING: help.markup help.syntax words ;
 IN: tools.annotations
 
 ARTICLE: "tools.annotations" "Word annotations"
@@ -37,13 +36,13 @@ HELP: watch
 
 HELP: reset
 { $values
-     { "word" word } }
+    { "word" word } }
 { $description "Resets any annotations on a word." }
 { $notes "This word will remove a " { $link watch } "." } ;
 
 HELP: watch-vars
 { $values
-     { "word" word } { "vars" "a sequence of symbols" } }
+    { "word" word } { "vars" "a sequence of symbols" } }
 { $description "Annotates a word definition to print the " { $snippet "vars" } " upon entering the word. This word is useful for debugging." } ;
 
 HELP: add-timing

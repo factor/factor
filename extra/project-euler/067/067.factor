@@ -1,10 +1,10 @@
 ! Copyright (c) 2007 Samuel Tardieu, Aaron Schaefer.
-! See http://factorcode.org/license.txt for BSD license.
-USING: io.files math.parser namespaces project-euler.common
+! See https://factorcode.org/license.txt for BSD license.
+USING: io.files math.parser project-euler.common
 io.encodings.ascii sequences splitting ;
 IN: project-euler.067
 
-! http://projecteuler.net/index.php?section=problems&id=67
+! https://projecteuler.net/index.php?section=problems&id=67
 
 ! DESCRIPTION
 ! -----------
@@ -39,7 +39,7 @@ IN: project-euler.067
 
 : source-067 ( -- seq )
     "resource:extra/project-euler/067/triangle.txt"
-    ascii file-lines [ " " split [ string>number ] map ] map ;
+    ascii file-lines [ split-words [ string>number ] map ] map ;
 
 PRIVATE>
 

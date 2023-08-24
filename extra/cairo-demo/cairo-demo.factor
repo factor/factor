@@ -1,14 +1,13 @@
 ! Cairo "Hello World" demo
 !  Copyright (c) 2007 Sampo Vuori
-!    License: http://factorcode.org/license.txt
+!    License: https://factorcode.org/license.txt
 !
 ! This example is an adaptation of the following cairo sample code:
-!  http://cairographics.org/samples/text/
+!  https://cairographics.org/samples/text/
 
 
-USING: cairo.ffi math math.constants byte-arrays kernel ui
-ui.render combinators ui.gadgets opengl.gl accessors
-namespaces opengl sequences ;
+USING: accessors byte-arrays cairo.ffi combinators kernel math
+math.constants opengl.gl pango.cairo.ffi ui ui.gadgets ui.render ;
 
 IN: cairo-demo
 
@@ -20,9 +19,6 @@ IN: cairo-demo
     cairo_image_surface_create_for_data ;
 
 TUPLE: cairo-demo-gadget < gadget image-array cairo-t ;
-
-USE: io
-USE: formatting
 
 M: cairo-demo-gadget draw-gadget* ( gadget -- )
     0 0 glRasterPos2i

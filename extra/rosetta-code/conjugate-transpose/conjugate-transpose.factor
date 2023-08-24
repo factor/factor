@@ -1,9 +1,9 @@
 ! Copyright (c) 2012 Anonymous
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: kernel math.functions math.matrices sequences ;
 IN: rosetta-code.conjugate-transpose
 
-! http://rosettacode.org/wiki/Conjugate_transpose
+! https://rosettacode.org/wiki/Conjugate_transpose
 
 ! Suppose that a matrix M contains complex numbers. Then the
 ! conjugate transpose of M is a matrix MH containing the complex
@@ -35,7 +35,7 @@ IN: rosetta-code.conjugate-transpose
     dup conj-t = ;
 
 : normal-matrix? ( matrix -- ? )
-    dup conj-t [ m. ] [ swap m. ] 2bi = ;
+    dup conj-t [ mdot ] [ swap mdot ] 2bi = ;
 
 : unitary-matrix? ( matrix -- ? )
-    [ dup conj-t m. ] [ length identity-matrix ] bi = ;
+    [ dup conj-t mdot ] [ length <identity-matrix> ] bi = ;

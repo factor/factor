@@ -1,5 +1,5 @@
 ! Copyright (C) 2007, 2009 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs combinators.short-circuit fry
 io.directories io.files io.files.info io.pathnames kernel make
 memoize namespaces sequences sets sorting splitting vocabs
@@ -14,22 +14,11 @@ M: vocab-prefix vocab-name name>> ;
 
 <PRIVATE
 
+: visible-dir? ( entry -- ? )
+    { [ directory? ] [ name>> "." head? not ] } 1&& ;
+
 : visible-dirs ( seq -- seq' )
-    [
-        {
-            [ directory? ]
-            [ name>> "." head? not ]
-        } 1&&
-    ] filter ;
-
-: vocab-subdirs ( dir -- dirs )
-    directory-entries visible-dirs [ name>> ] map! natural-sort ;
-
-: vocab-dir? ( root name -- ? )
-    over
-    [ ".factor" append-vocab-dir append-path exists? ]
-    [ 2drop f ]
-    if ;
+    [ visible-dir? ] filter [ name>> ] sort-by ;
 
 ERROR: vocab-root-required root ;
 
@@ -39,20 +28,35 @@ ERROR: vocab-root-required root ;
 : ensure-vocab-root/prefix ( root prefix -- root prefix )
     [ ensure-vocab-root ] [ check-vocab-name ] bi* ;
 
-: (disk-vocab-children) ( root prefix -- vocabs )
-    check-vocab-name
-    [ vocab-dir append-path dup exists? [ vocab-subdirs ] [ drop { } ] if ]
-    [ nip [ "." append '[ _ prepend ] map! ] unless-empty ]
-    [ drop '[ _ over vocab-dir? [ >vocab-link ] [ <vocab-prefix> ] if ] map! ]
-    2tri ;
+: vocab-directory-entries ( root prefix -- vocab-path vocab-name entries )
+    ensure-vocab-root/prefix [ vocab-dir append-path ] keep
+    over dup file-exists? [ directory-entries ] [ drop { } ] if ;
 
-: disk-vocabs-recursive% ( root prefix -- )
-    dupd vocab-name (disk-vocab-children) [ % ] keep
-    [ disk-vocabs-recursive% ] with each ;
+: (disk-vocabs) ( root prefix -- seq )
+    vocab-directory-entries visible-dirs [
+        name>>
+        [ dup ".factor" append append-path append-path ]
+        [ over empty? [ nip ] [ "." glue ] if ] bi-curry bi*
+        swap file-exists? [ >vocab-link ] [ <vocab-prefix> ] if
+    ] 2with map ;
+
+DEFER: add-vocab%
+
+: add-vocab-children% ( vocab-path vocab-name entries -- )
+    visible-dirs [
+        name>>
+        [ append-path ]
+        [ over empty? [ nip ] [ "." glue ] if ] bi-curry bi*
+        over directory-entries add-vocab%
+    ] 2with each ;
+
+: add-vocab% ( vocab-path vocab-name entries -- )
+    3dup rot file-name ".factor" append '[ name>> _ =  ] any?
+    [ >vocab-link ] [ <vocab-prefix> ] if , add-vocab-children% ;
 
 : (disk-vocabs-recursive) ( root prefix -- seq )
-    [ ensure-vocab-root ] dip
-    [ disk-vocabs-recursive% ] { } make ;
+    vocab-directory-entries
+    [ add-vocab-children% ] { } make ;
 
 : no-rooted ( seq -- seq' ) [ find-vocab-root ] reject ;
 
@@ -77,7 +81,7 @@ PRIVATE>
     no-roots no-prefixes members ;
 
 : disk-vocabs-for-prefix ( prefix -- assoc )
-    [ [ vocab-roots get ] dip '[ dup _ (disk-vocab-children) ] { } map>assoc ]
+    [ [ vocab-roots get ] dip '[ dup _ (disk-vocabs) ] { } map>assoc ]
     [ unrooted-disk-vocabs [ lookup-vocab ] map! f swap 2array ]
     bi suffix ;
 
@@ -102,7 +106,7 @@ MEMO: all-disk-vocabs-recursive ( -- assoc )
 
 : collect-vocabs ( quot -- seq )
     [ all-disk-vocabs-recursive filter-vocabs ] dip
-    gather natural-sort ; inline
+    gather sort ; inline
 
 : maybe-include-root/prefix ( root prefix -- vocab-link/f )
     over [

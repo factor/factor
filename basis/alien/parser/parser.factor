@@ -1,9 +1,10 @@
 ! Copyright (C) 2008, 2010 Slava Pestov, Doug Coleman, Joe Groff.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors alien alien.c-types alien.enums alien.libraries
-arrays classes classes.parser combinators combinators.short-circuit
-compiler.units effects fry kernel lexer locals math namespaces parser
-sequences splitting summary vocabs.parser words ;
+arrays classes classes.parser combinators
+combinators.short-circuit compiler.units effects kernel lexer
+math namespaces parser sequences splitting summary vocabs.parser
+words ;
 IN: alien.parser
 
 SYMBOL: current-library

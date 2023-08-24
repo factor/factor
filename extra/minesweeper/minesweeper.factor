@@ -1,11 +1,11 @@
 ! Copyright (C) 2017 John Benediktsson
-! See http://factorcode.org/license.txt for BSD license
+! See https://factorcode.org/license.txt for BSD license
 
-USING: accessors arrays assocs calendar circular
-colors.constants combinators combinators.short-circuit
-destructors formatting fry images.loader kernel locals math
-math.order math.parser namespaces opengl opengl.textures random
-sequences timers ui ui.commands ui.gadgets ui.gadgets.toolbar
+USING: accessors arrays assocs calendar circular colors
+combinators combinators.short-circuit combinators.smart
+destructors formatting images.loader kernel math math.order
+math.parser namespaces opengl opengl.textures random sequences
+timers ui ui.commands ui.gadgets ui.gadgets.toolbar
 ui.gadgets.tracks ui.gadgets.worlds ui.gestures ui.pens.solid
 ui.render ui.tools.browser words ;
 
@@ -40,7 +40,7 @@ TUPLE: cell #adjacent mined? state ;
     [ #mines ] [ #flagged ] bi - ;
 
 : unmined-cell ( cells -- cell )
-    f [ dup mined?>> ] [ drop dup random random ] do while nip ;
+    '[ _ random random dup mined?>> ] smart-loop ;
 
 : place-mines ( cells n -- cells )
     [ dup unmined-cell t >>mined? drop ] times ;

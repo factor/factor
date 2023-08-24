@@ -44,7 +44,7 @@ C: <sphere> sphere
     [ center>> ] [ orig>> ] bi* v- ; inline
 
 : sphere-b ( v ray -- b )
-    dir>> v. ; inline
+    dir>> vdot ; inline
 
 : sphere-d ( sphere b v -- d )
     [ radius>> sq ] [ sq ] [ norm-sq ] tri* - + ; inline
@@ -107,7 +107,7 @@ CONSTANT: initial-hit T{ hit f double-array{ 0.0 0.0 0.0 } 1/0. }
 : sray-intersect ( ray scene hit -- ray )
     swap [ ray-o light vneg <ray> ] dip initial-intersect ; inline
 
-: ray-g ( hit -- g ) normal>> light v. ; inline
+: ray-g ( hit -- g ) normal>> light vdot ; inline
 
 : cast-ray ( ray scene -- g )
     2dup initial-intersect dup lambda>> 1/0. = [

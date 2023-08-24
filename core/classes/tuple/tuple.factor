@@ -1,11 +1,19 @@
 ! Copyright (C) 2005, 2010 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
+IN: classes.tuple
+! for classes.union mutual dependency
+DEFER: tuple-class?
+<PRIVATE
+DEFER: echelon-of
+DEFER: layout-of
+DEFER: layout-class-offset
+DEFER: tuple-layout
+PRIVATE>
 USING: accessors arrays assocs classes classes.algebra
 classes.algebra.private classes.builtin classes.private
 combinators definitions effects generic kernel kernel.private
 make math math.private memory namespaces quotations
 sequences sequences.private slots slots.private strings words ;
-IN: classes.tuple
 
 <PRIVATE
 PRIMITIVE: <tuple> ( layout -- tuple )
@@ -16,8 +24,6 @@ PREDICATE: tuple-class < class
     "metaclass" word-prop tuple-class eq? ;
 
 ERROR: too-many-slots class slots got max ;
-
-ERROR: not-a-tuple object ;
 
 : all-slots ( class -- slots )
     superclasses-of [ "slots" word-prop ] map concat ;
@@ -59,14 +65,12 @@ M: tuple class-of layout-of 2 slot { word } declare ; inline
     layout-of 3 slot { fixnum } declare ; inline
 
 : layout-up-to-date? ( object -- ? )
-    dup tuple?
-    [ [ layout-of ] [ class-of tuple-layout ] bi eq? ] [ drop t ] if ;
-
-: check-tuple ( object -- tuple )
-    dup tuple? [ not-a-tuple ] unless ; inline
+    dup tuple? [
+        [ layout-of ] [ class-of tuple-layout ] bi eq?
+    ] [ drop t ] if ;
 
 : prepare-tuple-slots ( tuple -- n tuple )
-    check-tuple [ tuple-size <iota> ] keep ;
+    tuple check-instance [ tuple-size <iota> ] keep ;
 
 : copy-tuple-slots ( n tuple -- array )
     [ array-nth ] curry map ;
@@ -79,16 +83,21 @@ M: tuple class-of layout-of 2 slot { word } declare ; inline
         ] 2each
     ] if-bootstrapping ; inline
 
-: initial-values ( class -- seq )
-    all-slots [ initial>> ] map ; inline
-
 : pad-slots ( seq class -- seq' class )
-    [ initial-values ] keep
-    2over [ length ] bi@ 2dup > [
+    [ all-slots ] keep 2over 2length 2dup > [
         [ nip swap ] 2dip too-many-slots
     ] [
-        drop [ tail append ] curry dip
+        drop [
+            tail-slice [ [ initial>> ] map append ] unless-empty
+        ] curry dip
     ] if ; inline
+
+: make-tuple ( seq class -- tuple )
+    tuple-layout <tuple> [
+        [ tuple-size <iota> ]
+        [ [ set-array-nth ] curry ]
+        bi 2each
+    ] keep ; inline
 
 PRIVATE>
 
@@ -97,13 +106,8 @@ PRIVATE>
 
 GENERIC: slots>tuple ( seq class -- tuple )
 
-M: tuple-class slots>tuple ( seq class -- tuple )
-    check-slots pad-slots
-    tuple-layout <tuple> [
-        [ tuple-size <iota> ]
-        [ [ set-array-nth ] curry ]
-        bi 2each
-    ] keep ;
+M: tuple-class slots>tuple
+    check-slots pad-slots make-tuple ;
 
 : tuple>array ( tuple -- array )
     [ tuple-slots ] [ class-of prefix ] bi ;
@@ -171,6 +175,9 @@ M: object final-class? drop f ;
 : define-boa-check ( class -- )
     dup boa-check-quot "boa-check" set-word-prop ;
 
+: initial-values ( class -- seq )
+    all-slots [ initial>> ] map ; inline
+
 : tuple-prototype ( class -- prototype )
     [ initial-values ] keep over [ ] any?
     [ slots>tuple ] [ 2drop f ] if ;
@@ -220,7 +227,9 @@ SYMBOL: outdated-tuples
     compute-slot-permutation
     apply-slot-permutation ;
 
-: update-tuple ( tuple -- newtuple )
+GENERIC: update-tuple ( tuple -- newtuple )
+
+M: tuple update-tuple
     [ tuple-slots ] [ layout-of ] bi
     [ permute-slots ] [ first ] bi
     slots>tuple ;
@@ -232,7 +241,7 @@ SYMBOL: outdated-tuples
 
 : update-tuples ( outdated-tuples -- )
     dup assoc-empty? [ drop ] [
-        [ [ tuple? ] instances ] dip [ outdated-tuple? ] curry filter
+        '[ dup tuple? [ _ outdated-tuple? ] [ drop f ] if ] instances
         dup [ update-tuple ] map become
     ] if ;
 
@@ -293,7 +302,7 @@ GENERIC#: (define-tuple-class) 2 ( class superclass slots -- )
 
 : reset-final ( class -- )
     dup final-class? [
-        [ f "final" set-word-prop ]
+        [ "final" remove-word-prop ]
         [ changed-conditionally ]
         bi
     ] [ drop ] if ;
@@ -320,16 +329,14 @@ M: tuple-class (define-tuple-class)
     3dup tuple-class-unchanged?
     [ 2drop ?define-symbol ] [ redefine-tuple-class ] if ;
 
-: boa-effect ( class -- effect )
+GENERIC: boa-effect ( class -- effect )
+
+M: tuple-class boa-effect
     [ all-slots [ name>> ] map ] [ name>> 1array ] bi <effect> ;
 
-ERROR: not-a-tuple-class object ;
-
-: check-tuple-class ( class -- class )
-    dup tuple-class? [ not-a-tuple-class ] unless ; inline
-
 : define-boa-word ( word class -- )
-    check-tuple-class [ [ boa ] curry ] [ boa-effect ] bi
+    tuple-class check-instance
+    [ [ boa ] curry ] [ boa-effect ] bi
     define-inline ;
 
 : forget-slot-accessors ( class slots -- )
@@ -358,7 +365,7 @@ M: tuple-class rank-class drop 1 ;
 M: tuple-class instance?
     dup echelon-of layout-class-offset tuple-instance? ;
 
-M: tuple-class (flatten-class) dup ,, ;
+M: tuple-class (flatten-class) , ;
 
 M: tuple-class (classes-intersect?)
     {
@@ -376,14 +383,14 @@ M: tuple equal? over tuple? [ tuple= ] [ 2drop f ] if ;
         [ class-of hashcode ] [ tuple-size ] bi
         [ dup fixnum+fast 82520 fixnum+fast ] [ <iota> ] bi
     ] 2keep [
-        swapd array-nth hashcode* >fixnum rot fixnum-bitxor
+        swapd array-nth hashcode* integer>fixnum rot fixnum-bitxor
         pick fixnum*fast [ [ fixnum+fast ] keep ] dip swap
     ] 2curry each drop nip 97531 fixnum+fast ; inline
 
 M: tuple hashcode* [ tuple-hashcode ] recursive-hashcode ;
 
 M: tuple-class new
-    dup "prototype" word-prop [ (clone) ] [ tuple-layout <tuple> ] ?if ;
+    [ "prototype" word-prop ] [ (clone) ] [ tuple-layout <tuple> ] ?if ;
 
 M: tuple-class boa
     [ "boa-check" word-prop [ call ] when* ]

@@ -1,10 +1,10 @@
 ! Copyright (C) 2010 Anton Gorenko.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors alien.c-types alien.parser arrays ascii
-classes.parser classes.struct combinators combinators.short-circuit
-gobject-introspection.repository gobject-introspection.types kernel
-locals make math.parser namespaces parser sequences
-splitting.monotonic vocabs.parser words words.constant ;
+classes.parser classes.struct combinators
+combinators.short-circuit gobject-introspection.repository
+gobject-introspection.types kernel make math.parser namespaces
+sequences splitting.monotonic vocabs.parser words words.constant ;
 IN: gobject-introspection.ffi
 
 : def-c-type ( c-type-name base-c-type -- )
@@ -26,7 +26,7 @@ IN: gobject-introspection.ffi
     (CREATE-C-TYPE) [ typedef ] keep ;
 
 : alias-c-type-name ( alias -- c-type-name )
-    ! <workaround for alises w/o c:type (Atk)
+    ! <workaround for aliases w/o c:type (Atk)
     [ c-type>> ] [ name>> ] bi or ;
     ! workaround>
     ! c-type>> ;
@@ -67,11 +67,21 @@ M: incorrect-type type>c-type drop void* ;
 
 GENERIC: parse-const-value ( str data-type -- value )
 
+: number-type? ( name -- ? )
+    {
+        [ "gint" head? ]
+        [ "guint" head? ]
+        [ "gchar" = ]
+        [ "guchar" = ]
+        [ "gdouble" = ]
+        [ "gfloat" = ]
+    } 1|| ;
+
 M: atomic-type parse-const-value
     name>> {
-        { "gint" [ string>number ] }
-        { "gdouble" [ string>number ] }
-    } case ;
+        { [ dup number-type? ] [ drop string>number ] }
+        { [ dup "gboolean" = ] [ drop "true" = ] }
+    } cond ;
 
 M: utf8-type parse-const-value drop ;
 
@@ -131,7 +141,7 @@ M: none-type return-type>c-type drop void ;
 : parameter-names&types ( callable -- names types )
     [ [ parameter-c-type ] map ] [ [ parameter-name ] map ] bi ;
 
-: def-function ( function --  )
+: def-function ( function -- )
     {
         [ return>> return-c-type ]
         [ identifier>> ]
@@ -163,7 +173,7 @@ M: type type>data-type
         [ drop "in" >>direction "none" >>transfer-ownership ]
     } cleave ;
 
-:: def-method ( method type --  )
+:: def-method ( method type -- )
     method {
         [ return>> return-c-type ]
         [ identifier>> ]
@@ -303,8 +313,8 @@ M: array-type field-type>c-type type>c-type ;
 : defer-boxeds ( boxeds -- )
     [
         [
-            dup find-existing-boxed-type
-            [ ] [ c-type>> defer-c-type ] ?if
+            [ find-existing-boxed-type ]
+            [ c-type>> defer-c-type ] ?unless
         ]
         [ name>> qualified-name ] bi
         boxed-info new swap register-type

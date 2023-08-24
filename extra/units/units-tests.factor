@@ -15,6 +15,12 @@ IN: units.tests
 { t } [ 1 m 2 m 3 m 3array d-product 6 m^3 = ] unit-test
 { t } [ 3 m d-recip 1/3 { } { m } <dimensioned> = ] unit-test
 
+{ t } [ 2 m  3 d^  2 m d-cube = ] unit-test
+
+{ t } [ 2 m  3 d^  8 { m m m } { } <dimensioned> = ] unit-test
+{ t } [ 2 m  -3 d^  1/8 { } { m m m } <dimensioned> = ] unit-test
+{ t } [ 2 m  0 d^  1 scalar = ] unit-test
+
 : km/L ( n -- d ) km 1 L d/ ;
 : mpg ( n -- d ) miles 1 gallons d/ ;
 

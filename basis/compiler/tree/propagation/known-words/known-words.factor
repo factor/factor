@@ -1,5 +1,5 @@
 ! Copyright (C) 2008, 2010 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors alien alien.accessors alien.data.private arrays
 assocs byte-arrays byte-vectors classes classes.algebra classes.tuple
 classes.tuple.private combinators compiler.tree.comparisons
@@ -260,7 +260,7 @@ generic-comparison-ops [
     '[ _ swap interval>> <class/interval-info> ] "outputs" set-word-prop
 ] assoc-each
 
-! For these we limit the outputted interval
+! For these we limit the output interval
 {
     { fixnum>bignum bignum }
     { fixnum>float float }
@@ -358,7 +358,7 @@ generic-comparison-ops [
 
 \ instance? [
     ! We need to force the caller word to recompile when the class
-    ! is redefined, since now we're making assumptions but the
+    ! is redefined, since now we're making assumptions about the
     ! class definition itself.
     dup literal>> classoid?
     [
@@ -386,8 +386,21 @@ generic-comparison-ops [
 \ fixnum-max { fixnum fixnum } "input-classes" set-word-prop
 \ fixnum-max [ interval-max ] [ fixnum-valued ] binary-op
 
-\ (local-allot) { alien } "default-output-classes" set-word-prop
+\ local-allot { alien } "default-output-classes" set-word-prop
 
 \ tag [
     drop fixnum 0 num-types get [a,b) <class/interval-info>
 ] "outputs" set-word-prop
+
+! Primitive resize operations
+
+: propagate-resize-fixed-length-sequence ( n-info in-info class -- out-info )
+    nip <sequence-info> ;
+
+{ { resize-array array }
+  { resize-byte-array byte-array }
+  { resize-string string } }
+[
+    [ propagate-resize-fixed-length-sequence ] curry
+    "outputs" set-word-prop
+] assoc-each

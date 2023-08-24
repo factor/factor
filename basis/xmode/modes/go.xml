@@ -1,0 +1,169 @@
+<?xml version="1.0"?>
+<!DOCTYPE MODE SYSTEM "xmode.dtd">
+<!-- Original jEdit mode by Cedric Simon. Updated by Rodrigo Moraes. -->
+<MODE>
+  <PROPS>
+    <!-- comment -->
+    <PROPERTY NAME="commentStart" VALUE="/*" />
+    <PROPERTY NAME="commentEnd" VALUE="*/" />
+    <PROPERTY NAME="lineComment" VALUE="//" />
+    <PROPERTY NAME="wordBreakChars" VALUE=",+-=&lt;&gt;/?^&amp;*" />
+    <!-- indent -->
+    <PROPERTY NAME="indentOpenBrackets" VALUE="{" />
+    <PROPERTY NAME="indentCloseBrackets" VALUE="}" />
+    <PROPERTY NAME="unalignedOpenBrackets" VALUE="(" />
+    <PROPERTY NAME="unalignedCloseBrackets" VALUE=")" />
+    <PROPERTY NAME="indentNextLine"
+      VALUE="\s*(((if)\s*\(|else\s*|else\s+if\s*\(|for\s*\(.*\))[^{;]*)" />
+    <PROPERTY NAME="unindentThisLine"
+      VALUE="^.*(default:\s*|case.*:.*)$" />
+    <PROPERTY NAME="electricKeys" VALUE=":" />
+  </PROPS>
+
+  <RULES
+    IGNORE_CASE="FALSE"
+    HIGHLIGHT_DIGITS="TRUE"
+    DIGIT_RE="[0-9][0-9a-zA-Z]*">
+
+    <SPAN TYPE="COMMENT1">
+      <BEGIN>/*</BEGIN>
+      <END>*/</END>
+    </SPAN>
+
+    <EOL_SPAN TYPE="COMMENT1">//</EOL_SPAN>
+
+    <SPAN TYPE="LITERAL1" ESCAPE="\" NO_LINE_BREAK="TRUE">
+      <BEGIN>"</BEGIN>
+      <END>"</END>
+    </SPAN>
+    <SPAN TYPE="LITERAL1" ESCAPE="\" NO_LINE_BREAK="TRUE">
+      <BEGIN>'</BEGIN>
+      <END>'</END>
+    </SPAN>
+    <SPAN TYPE="LITERAL1" NO_LINE_BREAK="FALSE">
+      <BEGIN>`</BEGIN>
+      <END>`</END>
+    </SPAN>
+
+    <SEQ TYPE="OPERATOR">+</SEQ>
+    <SEQ TYPE="OPERATOR">-</SEQ>
+    <SEQ TYPE="OPERATOR">*</SEQ>
+    <SEQ TYPE="OPERATOR">/</SEQ>
+    <SEQ TYPE="OPERATOR">%</SEQ>
+    <SEQ TYPE="OPERATOR">&amp;</SEQ>
+    <SEQ TYPE="OPERATOR">|</SEQ>
+    <SEQ TYPE="OPERATOR">^</SEQ>
+    <SEQ TYPE="OPERATOR">&lt;&lt;</SEQ>
+    <SEQ TYPE="OPERATOR">&gt;&gt;</SEQ>
+    <SEQ TYPE="OPERATOR">&amp;^</SEQ>
+    <SEQ TYPE="OPERATOR">+=</SEQ>
+    <SEQ TYPE="OPERATOR">-=</SEQ>
+    <SEQ TYPE="OPERATOR">*=</SEQ>
+    <SEQ TYPE="OPERATOR">/=</SEQ>
+    <SEQ TYPE="OPERATOR">%=</SEQ>
+    <SEQ TYPE="OPERATOR">&amp;=</SEQ>
+    <SEQ TYPE="OPERATOR">|=</SEQ>
+    <SEQ TYPE="OPERATOR">^=</SEQ>
+    <SEQ TYPE="OPERATOR">&lt;&lt;=</SEQ>
+    <SEQ TYPE="OPERATOR">&gt;&gt;=</SEQ>
+    <SEQ TYPE="OPERATOR">&amp;^=</SEQ>
+    <SEQ TYPE="OPERATOR">&amp;&amp;</SEQ>
+    <SEQ TYPE="OPERATOR">||</SEQ>
+    <SEQ TYPE="OPERATOR">&lt;-</SEQ>
+    <SEQ TYPE="OPERATOR">++</SEQ>
+    <SEQ TYPE="OPERATOR">--</SEQ>
+    <SEQ TYPE="OPERATOR">==</SEQ>
+    <SEQ TYPE="OPERATOR">&lt;</SEQ>
+    <SEQ TYPE="OPERATOR">&gt;</SEQ>
+    <SEQ TYPE="OPERATOR">=</SEQ>
+    <SEQ TYPE="OPERATOR">!</SEQ>
+    <SEQ TYPE="OPERATOR">!=</SEQ>
+    <SEQ TYPE="OPERATOR">&lt;=</SEQ>
+    <SEQ TYPE="OPERATOR">&gt;=</SEQ>
+    <SEQ TYPE="OPERATOR">:=</SEQ>
+    <SEQ TYPE="OPERATOR">...</SEQ>
+    <SEQ TYPE="OPERATOR">(</SEQ>
+    <SEQ TYPE="OPERATOR">)</SEQ>
+    <SEQ TYPE="OPERATOR">[</SEQ>
+    <SEQ TYPE="OPERATOR">]</SEQ>
+    <SEQ TYPE="OPERATOR">{</SEQ>
+    <SEQ TYPE="OPERATOR">}</SEQ>
+    <SEQ TYPE="OPERATOR">,</SEQ>
+    <SEQ TYPE="OPERATOR">.</SEQ>
+    <SEQ TYPE="OPERATOR">;</SEQ>
+    <SEQ TYPE="OPERATOR">:</SEQ>
+
+    <KEYWORDS>
+      <!-- keywords: control flow -->
+      <KEYWORD1>break</KEYWORD1>
+      <KEYWORD1>case</KEYWORD1>
+      <KEYWORD1>continue</KEYWORD1>
+      <KEYWORD1>default</KEYWORD1>
+      <KEYWORD1>defer</KEYWORD1>
+      <KEYWORD1>else</KEYWORD1>
+      <KEYWORD1>fallthrough</KEYWORD1>
+      <KEYWORD1>for</KEYWORD1>
+      <KEYWORD1>go</KEYWORD1>
+      <KEYWORD1>goto</KEYWORD1>
+      <KEYWORD1>if</KEYWORD1>
+      <KEYWORD1>range</KEYWORD1>
+      <KEYWORD1>return</KEYWORD1>
+      <KEYWORD1>select</KEYWORD1>
+      <KEYWORD1>switch</KEYWORD1>
+      <!-- keywords: "declarations" (not really) -->
+      <KEYWORD1>chan</KEYWORD1>
+      <KEYWORD1>const</KEYWORD1>
+      <KEYWORD1>func</KEYWORD1>
+      <KEYWORD1>import</KEYWORD1>
+      <KEYWORD1>interface</KEYWORD1>
+      <KEYWORD1>map</KEYWORD1>
+      <KEYWORD1>package</KEYWORD1>
+      <KEYWORD1>struct</KEYWORD1>
+      <KEYWORD1>type</KEYWORD1>
+      <KEYWORD1>var</KEYWORD1>
+      <!-- types -->
+      <KEYWORD3>bool</KEYWORD3>
+      <KEYWORD3>byte</KEYWORD3>
+      <KEYWORD3>complex64</KEYWORD3>
+      <KEYWORD3>complex128</KEYWORD3>
+      <KEYWORD3>float32</KEYWORD3>
+      <KEYWORD3>float64</KEYWORD3>
+      <KEYWORD3>int8</KEYWORD3>
+      <KEYWORD3>int16</KEYWORD3>
+      <KEYWORD3>int32</KEYWORD3>
+      <KEYWORD3>int64</KEYWORD3>
+      <KEYWORD3>string</KEYWORD3>
+      <KEYWORD3>uint8</KEYWORD3>
+      <KEYWORD3>uint16</KEYWORD3>
+      <KEYWORD3>uint32</KEYWORD3>
+      <KEYWORD3>uint64</KEYWORD3>
+      <KEYWORD3>int</KEYWORD3>
+      <KEYWORD3>uint</KEYWORD3>
+      <KEYWORD3>uintptr</KEYWORD3>
+      <KEYWORD3>rune</KEYWORD3>
+      <!-- constants -->
+      <LITERAL2>true</LITERAL2>
+      <LITERAL2>false</LITERAL2>
+      <LITERAL2>iota</LITERAL2>
+      <LITERAL2>nil</LITERAL2>
+      <!-- functions -->
+      <FUNCTION>append</FUNCTION>
+      <FUNCTION>cap</FUNCTION>
+      <FUNCTION>close</FUNCTION>
+      <FUNCTION>complex</FUNCTION>
+      <FUNCTION>copy</FUNCTION>
+      <FUNCTION>imag</FUNCTION>
+      <FUNCTION>len</FUNCTION>
+      <FUNCTION>make</FUNCTION>
+      <FUNCTION>new</FUNCTION>
+      <FUNCTION>panic</FUNCTION>
+      <FUNCTION>real</FUNCTION>
+      <FUNCTION>recover</FUNCTION>
+      <FUNCTION>print</FUNCTION>
+      <FUNCTION>println</FUNCTION>
+    </KEYWORDS>
+
+  </RULES>
+
+</MODE>
+

@@ -1,7 +1,7 @@
 ! Copyright (C) 2009 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors alien alien.c-types classes.struct functors
-kernel math math.functions quotations ;
+kernel math quotations ;
 IN: alien.complex.functor
 
 <FUNCTOR: define-complex-type ( N T -- )
@@ -18,7 +18,7 @@ WHERE
 STRUCT: T-class { real N-type } { imaginary N-type } ;
 
 : <T> ( z -- alien )
-    >rect T-class <struct-boa> >c-ptr ;
+    >rect T-class boa >c-ptr ;
 
 : *T ( alien -- z )
     T-class memory>struct [ real>> ] [ imaginary>> ] bi rect> ; inline

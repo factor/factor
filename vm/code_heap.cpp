@@ -3,7 +3,7 @@
 namespace factor {
 
 code_heap::code_heap(cell size) {
-  if (size > ((uint64_t)1 << (sizeof(cell) * 8 - 6)))
+  if (size > ((uint64_t)1 << (sizeof(cell) * 8 - 5)))
     fatal_error("Heap too large", size);
   seg = new segment(align_page(size), true);
   if (!seg)
@@ -143,6 +143,7 @@ void factor_vm::primitive_modify_code_heap() {
 
     switch (data.type()) {
       case QUOTATION_TYPE:
+      case TUPLE_TYPE: // for curry/compose, see issue #2763
         jit_compile_word(word.value(), data.value(), false);
         break;
       case ARRAY_TYPE: {

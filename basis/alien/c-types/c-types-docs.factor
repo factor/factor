@@ -1,7 +1,5 @@
-USING: alien help.syntax help.markup libc kernel.private
-byte-arrays strings hashtables alien.syntax alien.strings
-sequences io.encodings.string debugger destructors vocabs.loader
-classes.struct math kernel ;
+USING: alien alien.syntax byte-arrays classes.struct help.markup
+help.syntax kernel math sequences ;
 IN: alien.c-types
 
 HELP: heap-size
@@ -85,7 +83,7 @@ $nl
 "Pointer output values are represented in Factor as " { $link alien } "s. If the pointed-to type is a struct, the alien will automatically be wrapped in a struct object if it is not null."
 $nl
 "In " { $link POSTPONE: TYPEDEF: } ", " { $link POSTPONE: FUNCTION: } ", " { $link POSTPONE: CALLBACK: } ", and " { $link POSTPONE: STRUCT: } " definitions, pointer types can be created by suffixing " { $snippet "*" } " to a C type name. Outside of FFI definitions, a pointer C type can be created using the " { $link POSTPONE: pointer: } " syntax word:"
-{ $unchecked-example "FUNCTION: int* foo ( char* bar ) ;" }
+{ $unchecked-example "FUNCTION: int* foo ( char* bar )" }
 { $unchecked-example ": foo ( bar -- int* )
     pointer: int f \"foo\" { pointer: char } f alien-invoke ;" } } ;
 
@@ -105,7 +103,7 @@ $nl
 ARTICLE: "c-types.primitives" "Primitive C types"
 "The following numerical types are defined in the " { $vocab-link "alien.c-types" } " vocabulary; a " { $snippet "u" } " prefix denotes an unsigned type:"
 { $table
-    { "C type" "Notes" }
+    { { $strong "C type" } { $strong "Notes" } }
     { { $link char } "always 1 byte" }
     { { $link uchar } { } }
     { { $link short } "always 2 bytes" }
@@ -133,26 +131,25 @@ $nl
 ARTICLE: "c-types.ambiguity" "Word name clashes with C types"
 "Note that some of the C type word names clash with commonly-used Factor words:"
 { $list
-  { { $link short } " clashes with the " { $link sequences:short } " word in the " { $vocab-link "sequences" } " vocabulary" }
   { { $link float } " clashes with the " { $link math:float } " word in the " { $vocab-link "math" } " vocabulary" }
 }
 "If you use the wrong vocabulary, you will see a " { $link no-c-type } " error. For example, the following is " { $strong "not" } " valid, and will raise an error because the " { $link math:float } " word from the " { $vocab-link "math" } " vocabulary is not a C type:"
 { $code
   "USING: alien.syntax math prettyprint ;"
-  "FUNCTION: float magic_number ( ) ;"
+  "FUNCTION: float magic_number ( )"
   "magic_number 3.0 + ."
 }
 "The following won't work either; now the problem is that there are two vocabularies in the search path that define a word named " { $snippet "float" } ":"
 { $code
   "USING: alien.c-types alien.syntax math prettyprint ;"
-  "FUNCTION: float magic_number ( ) ;"
+  "FUNCTION: float magic_number ( )"
   "magic_number 3.0 + ."
 }
 "The correct solution is to use one of " { $link POSTPONE: FROM: } ", " { $link POSTPONE: QUALIFIED: } " or " { $link POSTPONE: QUALIFIED-WITH: } " to disambiguate word lookup:"
 { $code
   "USING: alien.syntax math prettyprint ;"
   "QUALIFIED-WITH: alien.c-types c"
-  "FUNCTION: c:float magic_number ( ) ;"
+  "FUNCTION: c:float magic_number ( )"
   "magic_number 3.0 + ."
 }
 "See " { $link "word-search-semantics" } " for details." ;

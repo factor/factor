@@ -1,6 +1,6 @@
 ! Copyright (C) 2007, 2008 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
-USING: accessors calendar colors.constants fonts kernel models
+! See https://factorcode.org/license.txt for BSD license.
+USING: accessors calendar colors fonts kernel models
 models.arrow models.delay sequences summary ui
 ui.gadgets.borders ui.gadgets.labels ui.gadgets.tracks
 ui.gadgets.worlds ui.pens.solid ui.private ui.theme ;

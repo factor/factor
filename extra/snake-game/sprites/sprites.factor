@@ -1,7 +1,7 @@
 ! Copyright (C) 2015 Sankaranarayanan Viswanathan.
-! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays assocs byte-vectors formatting fry
-images images.loader kernel locals make math math.vectors
+! See https://factorcode.org/license.txt for BSD license.
+USING: accessors arrays assocs byte-vectors formatting
+images images.loader kernel make math math.vectors
 opengl.textures sequences ;
 
 IN: snake-game.sprites

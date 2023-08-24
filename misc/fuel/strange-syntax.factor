@@ -1,6 +1,5 @@
-USING: accessors alien.c-types alien.syntax
-classes.struct colors.constants colors.hex kernel literals logging
-math ;
+USING: accessors alien.c-types alien.syntax classes.struct
+colors kernel literals logging math ;
 IN: strange
 
 ! FUEL Syntax Demo
@@ -66,7 +65,7 @@ C-TYPE: cairo_snurface_t
 MAIN: majn
 
 ! ! SLOT
- SLOT: komba
+SLOT: komba
 
 ! ! SYNTAX
 <<
@@ -77,6 +76,7 @@ ID-SYNTAX ID-SYNTAX
 
 ! ! Numbers
 { -55 -0x10 100,00 1,000,000 0x2000,0000 0b01 } drop
+{ -0x100_000 100_00 1_000_000 0x2000_0000 0b0_1 } drop
 
 ! ! Containers
 V{ 1 2 3 } drop
@@ -96,8 +96,11 @@ FUNCTION: int futimes ( int id,
 FUNCTION: int booyah ( int x )
 FUNCTION-ALIAS: test int bah ( int* ah, int[] eh )
 
-HEXCOLOR: ffffff COLOR: green NAN: 1234 CHAR: m ALIEN: 93
+COLOR: #ffffff COLOR: green NAN: 1234 CHAR: m ALIEN: 93
 2drop 2drop drop
 
 PRIMITIVE: one ( a -- b )
 PRIMITIVE: two ( c -- d )
+
+: `word ( -- ) ;
+: word ( -- ) ; ! this isn't strange, just for contrast with the above

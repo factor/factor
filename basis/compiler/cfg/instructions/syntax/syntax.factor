@@ -1,7 +1,7 @@
 ! Copyright (C) 2008, 2010 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors classes.parser classes.tuple combinators
-effects fry kernel lexer make namespaces parser sequences
+effects kernel lexer make namespaces parser sequences
 splitting words ;
 IN: compiler.cfg.instructions.syntax
 

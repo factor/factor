@@ -1,6 +1,5 @@
-USING: assocs classes help.markup help.syntax io.streams.string
-http http.server.dispatchers http.server.responses
-furnace.redirection strings html.forms ;
+USING: classes furnace.redirection help.markup help.syntax
+html.forms http http.server.dispatchers http.server.responses ;
 IN: furnace.actions
 
 HELP: <action>
@@ -9,8 +8,8 @@ HELP: <action>
 
 HELP: <chloe-content>
 { $values
-     { "path" "a path" }
-     { "response" response }
+    { "path" "a path" }
+    { "response" response }
 }
 { $description "Creates an HTTP response which serves a Chloe template. See " { $link "html.templates.chloe" } "." } ;
 
@@ -25,8 +24,8 @@ $nl
 
 HELP: new-action
 { $values
-     { "class" class }
-     { "action" action }
+    { "class" class }
+    { "action" action }
 }
 { $description "Constructs a subclass of " { $link action } "." } ;
 
@@ -47,7 +46,7 @@ HELP: validate-integer-id
 
 HELP: validate-params
 { $values
-     { "validators" "an association list mapping parameter names to validator quotations" }
+    { "validators" "an association list mapping parameter names to validator quotations" }
 }
 { $description "Validates query or POST parameters, depending on the request type, and stores them in " { $link "html.forms.values" } ". The validator quotations can execute " { $link "validators" } "." }
 { $examples
@@ -92,13 +91,15 @@ $nl
 
 ARTICLE: "furnace.actions.config" "Furnace action configuration"
 "Actions have the following slots:"
-{ $table
-  { { $slot "rest" } { "A parameter name to map the rest of the URL, after the action name, to. If this is not set, then navigating to a URL where the action is not the last path component will return to the client with an error. A more general facility can be found in the " { $vocab-link "http.server.rewrite" } " vocabulary." } }
-    { { $slot "init" } { "A quotation called at the beginning of a GET or HEAD request. Typically this quotation configures " { $link "html.forms" } " and parses query parameters." } }
-    { { $slot "authorize" } { "A quotation called at the beginning of a GET, HEAD or POST request. In GET requests, it is called after the " { $slot "init" } " quotation; in POST requests, it is called after the " { $slot "validate" } " quotation. By convention, this quotation performs custom authorization checks which depend on query parameters or POST parameters." } }
-    { { $slot "display" } { "A quotation called after the " { $slot "init" } " quotation in a GET request. This quotation must return an HTTP " { $link response } "." } }
-    { { $slot "validate" } { "A quotation called at the beginning of a POST request to validate POST parameters." } }
-    { { $slot "submit" } { "A quotation called after the " { $slot "validate" } " quotation in a POST request. This quotation must return an HTTP " { $link response } "." } }
+{ $slots
+    { "rest" { "A parameter name to map the rest of the URL, after the action name, to. If this is not set, then navigating to a URL where the action is not the last path component will return to the client with an error. A more general facility can be found in the " { $vocab-link "http.server.rewrite" } " vocabulary." } }
+    { "init" { "A quotation called at the beginning of a GET or HEAD request. Typically this quotation configures " { $link "html.forms" } " and parses query parameters." } }
+    { "authorize" { "A quotation called at the beginning of a GET, HEAD or POST request. In GET requests, it is called after the " { $slot "init" } " quotation; in POST requests, it is called after the " { $slot "validate" } " quotation. By convention, this quotation performs custom authorization checks which depend on query parameters or POST parameters." } }
+    { "display" { "A quotation called after the " { $slot "init" } " quotation in a GET request. This quotation must return an HTTP " { $link response } "." } }
+    { "validate" { "A quotation called at the beginning of a POST request to validate POST parameters." } }
+    { "submit" { "A quotation called after the " { $slot "validate" } " quotation in a POST request. This quotation must return an HTTP " { $link response } "." } }
+    { "replace" { "A quotation called after the " { $slot "validate" } " quotation in a PUT request. This quotation must return an HTTP " { $link response } "." } }
+    { "update" { "A quotation called after the " { $slot "validate" } " quotation in a PATCH request. This quotation must return an HTTP " { $link response } "." } }
 }
 "At least one of the " { $slot "display" } " and " { $slot "submit" } " slots must be set, otherwise the action will be useless." ;
 

@@ -1,7 +1,7 @@
 ! Copyright (C) 2008 William Schlieper
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 
-USING: assocs combinators continuations fry kernel macros math
+USING: assocs combinators continuations kernel math
 namespaces quotations sequences summary ;
 
 IN: backtrack

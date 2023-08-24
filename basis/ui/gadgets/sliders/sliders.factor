@@ -1,5 +1,5 @@
 ! Copyright (C) 2005, 2010 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors assocs combinators fry kernel math math.order
 math.vectors models models.range ui.gadgets ui.gadgets.buttons
 ui.gadgets.icons ui.gadgets.tracks ui.gestures ui.pens
@@ -31,7 +31,7 @@ TUPLE: elevator < gadget direction ;
 CONSTANT: elevator-padding 4
 
 : elevator-length ( slider -- n )
-    [ elevator>> dim>> ] [ orientation>> ] bi v.
+    [ elevator>> dim>> ] [ orientation>> ] bi vdot
     elevator-padding 2 * [-] ;
 
 CONSTANT: min-thumb-dim 30
@@ -49,7 +49,7 @@ CONSTANT: min-thumb-dim 30
     [ elevator-length ] bi min ;
 
 : slider-scale ( slider -- n )
-    ! A scaling factor such that if x is a slider co-ordinate,
+    ! A scaling factor such that if x is a slider coordinate,
     ! x*n is the screen position of the thumb, and conversely
     ! for x/n. The '1 max' calls avoid division by zero.
     [ [ elevator-length ] [ thumb-dim ] bi - 1 max ]
@@ -68,7 +68,7 @@ TUPLE: thumb < track ;
 
 : do-drag ( thumb -- )
     find-slider {
-        [ orientation>> drag-loc v. ]
+        [ orientation>> drag-loc vdot ]
         [ screen>slider ]
         [ saved>> + ]
         [ model>> set-range-value ]
@@ -114,13 +114,13 @@ CONSTANT: vertical-thumb-tiles
 
 : compute-direction ( elevator -- -1/1 )
     [ hand-click-rel ] [ find-slider ] bi
-    [ orientation>> v. ]
+    [ orientation>> vdot ]
     [ screen>slider ]
     [ slider-value - sgn ]
     tri ;
 
 : elevator-hold ( elevator -- )
-    [ direction>> ] [ find-slider ] bi slide-by-page ;
+    [ direction>> ] [ find-slider ] bi '[ _ slide-by-page ] when* ;
 
 : elevator-click ( elevator -- )
     dup compute-direction >>direction

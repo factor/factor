@@ -29,7 +29,7 @@ IN: tools.image-analyzer.utils
     ] ; inline
 
 : save-io-excursion ( quot -- )
-    tell-input '[ _ seek-absolute seek-input ] [ ] cleanup ; inline
+    tell-input '[ _ seek-absolute seek-input ] finally ; inline
 
 : consume-stream>sequence ( reader-quot: ( -- item )  -- seq )
     until-eof-reader '[ drop @ ] t swap follow rest ; inline

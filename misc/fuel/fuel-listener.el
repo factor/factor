@@ -1,7 +1,7 @@
-;;; fuel-listener.el --- starting the fuel listener
+;;; fuel-listener.el --- starting the fuel listener -*- lexical-binding: t -*-
 
 ;; Copyright (C) 2008, 2009, 2010  Jose Antonio Ortega Ruiz
-;; See http://factorcode.org/license.txt for BSD license.
+;; See https://factorcode.org/license.txt for BSD license.
 
 ;; Author: Jose Antonio Ortega Ruiz <jao@gnu.org>
 ;; Keywords: languages
@@ -211,6 +211,16 @@ With prefix, you're teletransported to the listener's buffer."
       (comint-send-string nil " refresh-all \"Done!\" write nl flush\n"))
     (when arg (pop-to-buffer buf))))
 
+(defun fuel-refresh-and-test-all (&optional arg)
+  "Switch to the listener buffer and invokes Factor's refresh-and-test-all.
+With prefix, you're teletransporteded to the listener's buffer."
+  (interactive "P")
+  (let ((buf (process-buffer (fuel-listener--process))))
+    (with-current-buffer buf
+      (comint-send-string nil "\"Refreshing loaded vocabs and running tests...\" write nl flush")
+      (comint-send-string nil " refresh-and-test-all \"Done!\" write nl flush\n"))
+    (when arg (pop-to-buffer buf))))
+
 (defun fuel-test-vocab (&optional arg)
   "Run the unit tests for the current vocabulary. With prefix argument, ask for
 the vocabulary name."
@@ -281,7 +291,8 @@ the vocabulary name."
          fuel-show-callees :enable (symbol-at-point))
         (mode "Autodoc mode" "\C-c\C-a" fuel-autodoc-mode))
   ("Run file" "\C-c\C-k" fuel-run-file)
-  ("Refresh vocabs" "\C-c\C-r" fuel-refresh-all))
+  ("Refresh vocabs" "\C-c\C-r" fuel-refresh-all)
+  ("Refresh vocabs and test" "\C-c\M-r" fuel-refresh-and-test-all))
 
 (define-key fuel-listener-mode-map [menu-bar completion] 'undefined)
 

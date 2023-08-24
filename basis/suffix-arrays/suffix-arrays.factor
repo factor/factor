@@ -1,6 +1,6 @@
 ! Copyright (C) 2008 Marc Fauconneau.
-! See http://factorcode.org/license.txt for BSD license.
-USING: accessors binary-search fry kernel math math.order parser
+! See https://factorcode.org/license.txt for BSD license.
+USING: accessors binary-search kernel math math.order parser
 sequences sets sorting ;
 IN: suffix-arrays
 
@@ -30,7 +30,7 @@ IN: suffix-arrays
 PRIVATE>
 
 : >suffix-array ( seq -- suffix-array )
-    members [ suffixes ] map concat natural-sort ;
+    members [ suffixes ] map concat sort ;
 
 SYNTAX: SA{ \ } [ >suffix-array ] parse-literal ;
 

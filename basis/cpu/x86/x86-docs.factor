@@ -14,7 +14,7 @@ HELP: %boolean
 
 HELP: %prepare-var-args
 { $values { "reg-inputs" sequence } }
-{ $description "Emits code needed for calling variadic functions. On " { $link unix } " " { $link x86.64 } ", the " { $link AL } " register must contain the number of float registers used. " } ;
+{ $description "Emits code needed for calling variadic functions. On " { $link unix } " " { $link x86.64 } ", the " { $link AL } " register must contain the number of float registers used." } ;
 
 HELP: JLE
 { $values { "dst" "destination offset (relative to the instruction pointer register)" } }

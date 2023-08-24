@@ -1,17 +1,16 @@
 ! Copyright (C) 2005 Chris Double. All Rights Reserved.
 ! Copyright (C) 2018 Alexander Ilin.
-! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays assocs concurrency.messaging
-continuations destructors fry init io io.encodings.binary
-io.servers io.sockets io.streams.duplex kernel namespaces
-sequences serialize threads ;
+! See https://factorcode.org/license.txt for BSD license.
+USING: accessors arrays assocs continuations destructors init io
+io.encodings.binary io.servers io.sockets io.streams.duplex
+kernel namespaces sequences serialize threads ;
 FROM: concurrency.messaging => send ;
 IN: concurrency.distributed
 
 <PRIVATE
 
 : registered-remote-threads ( -- hash )
-   \ registered-remote-threads get-global ;
+    \ registered-remote-threads get-global ;
 
 : thread-connections ( -- hash )
     \ thread-connections get-global ;
@@ -25,7 +24,7 @@ PRIVATE>
     registered-remote-threads delete-at ;
 
 : get-remote-thread ( name -- thread )
-    dup registered-remote-threads at [ ] [ threads at ] ?if ;
+    [ registered-remote-threads at ] [ threads at ] ?unless ;
 
 SYMBOL: local-node
 
@@ -60,7 +59,7 @@ C: <connection> connection
     [ stream>> dispose ] [ drop ] if ;
 
 : with-connection ( remote-thread quot -- )
-    '[ connect @ ] over [ disconnect ] curry [ ] cleanup ; inline
+    '[ connect @ ] over [ disconnect ] curry finally ; inline
 
 : send-remote-message ( message node -- )
     binary [ serialize ] with-client ;
@@ -68,17 +67,17 @@ C: <connection> connection
 : send-to-connection ( message connection -- )
     stream>> [ serialize flush ] with-stream* ;
 
-M: remote-thread send ( message thread -- )
+M: remote-thread send
     [ id>> 2array ] [ node>> ] [ thread-connections at ] tri
     [ nip send-to-connection ] [ send-remote-message ] if* ;
 
-M: thread (serialize) ( obj -- )
+M: thread (serialize)
     id>> [ local-node get insecure>> ] dip <remote-thread> (serialize) ;
 
 : stop-node ( -- )
     f local-node get insecure>> send-remote-message ;
 
-[
+STARTUP-HOOK: [
     H{ } clone \ registered-remote-threads set-global
     H{ } clone \ thread-connections set-global
-] "remote-thread-registry" add-startup-hook
+]

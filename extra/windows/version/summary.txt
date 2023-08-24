@@ -1,0 +1,1 @@
+Query file versions from their resources using the standard Version.dll

@@ -172,7 +172,7 @@ CONSTANT: SIGSYS          31
 
 FUNCTION: c-string strerror_r ( int errno, char* buf, size_t buflen )
 
-M: linux strerror ( errno -- str )
+M: linux strerror
     [
         1024 [ malloc &free ] keep strerror_r
     ] with-destructors ;

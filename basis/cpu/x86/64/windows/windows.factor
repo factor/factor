@@ -1,5 +1,5 @@
 ! Copyright (C) 2008, 2010 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: kernel layouts system math alien.c-types sequences
 compiler.cfg.registers cpu.architecture cpu.x86.assembler
 cpu.x86 cpu.x86.64 cpu.x86.assembler.operands ;
@@ -13,7 +13,7 @@ M: x86.64 param-regs
 
 M: x86.64 reserved-stack-space 4 cells ;
 
-M: x86.64 return-struct-in-registers? ( c-type -- ? )
+M: x86.64 return-struct-in-registers?
     heap-size { 1 2 4 8 } member? ;
 
 M: x86.64 value-struct? heap-size { 1 2 4 8 } member? ;
@@ -24,5 +24,4 @@ M: x86.64 dummy-int-params? t ;
 
 M: x86.64 dummy-fp-params? t ;
 
-M: x86.64 %prepare-var-args ( reg-inputs -- )
-    drop ;
+M: x86.64 %prepare-var-args drop ;

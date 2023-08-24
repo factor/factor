@@ -6,29 +6,29 @@ HELP: line-gadget
 { $class-description "Base class for gadgets that implements display of sequences of text."
   $nl
   "Line gadgets have the following slots:"
-  { $table
+  { $slots
     {
-        { $slot "font" }
+        "font"
         { "a " { $link font } "." }
     }
     {
-        { $slot "selection-color" }
+        "selection-color"
         { "a " { $link color } "." }
     }
     {
-        { $slot "min-rows" }
+        "min-rows"
         { "The preferred minimum number of visible rows when the gadget is contained in a viewport." }
     }
     {
-        { $slot "max-rows" }
+        "max-rows"
         { "The preferred maximum number of visible rows when the gadget is cotnained in a viewport." }
     }
     {
-        { $slot "min-cols" }
+        "min-cols"
         { "The preferred minimum number of visible columns when the gadget is contained in a viewport." }
     }
     {
-        { $slot "max-cols" }
+        "max-cols"
         { "The preferred maximum number of visible columns when the gadget is contained in a viewport." }
     }
   }
@@ -66,7 +66,7 @@ $nl
     first-visible-line
     last-visible-line
 }
-"Converting y co-ordinates to line numbers, and vice versa:"
+"Converting y coordinates to line numbers, and vice versa:"
 { $subsections
     line>y
     y>line

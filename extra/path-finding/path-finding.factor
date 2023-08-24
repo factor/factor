@@ -1,14 +1,14 @@
 ! Copyright (C) 2010 Samuel Tardieu.
-! See http://factorcode.org/license.txt for BSD license.
-USING: accessors assocs hash-sets heaps kernel math sequences sets shuffle ;
+! See https://factorcode.org/license.txt for BSD license.
+USING: accessors assocs heaps kernel math sequences sets ;
 IN: path-finding
 
-! This implements the A* algorithm. See http://en.wikipedia.org/wiki/A*
+! This implements the A* algorithm. See https://en.wikipedia.org/wiki/A*
 
 TUPLE: astar g in-closed-set ;
 GENERIC: cost ( from to astar -- n )
 GENERIC: heuristic ( from to astar -- n )
-GENERIC: neighbours ( node astar -- seq )
+GENERIC: neighbors ( node astar -- seq )
 
 <PRIVATE
 
@@ -46,7 +46,7 @@ TUPLE: (astar) astar goal origin in-open-set open-set ;
     [ over ] [ over [ [ origin>> at ] keep ] dip ] produce 2nip reverse ;
 
 : handle ( node astar -- )
-    dupd [ astar>> neighbours ] keep [ ?set-g ] curry with each ;
+    dupd [ astar>> neighbors ] keep [ ?set-g ] curry with each ;
 
 : (find-path) ( astar -- path/f )
     dup open-set>> heap-empty? [
@@ -64,34 +64,34 @@ TUPLE: (astar) astar goal origin in-open-set open-set ;
     <min-heap> >>open-set
     [ 0 ] 2dip [ (add-to-open-set) ] [ astar>> g>> set-at ] 3bi ;
 
-TUPLE: astar-simple < astar cost heuristic neighbours ;
+TUPLE: astar-simple < astar cost heuristic neighbors ;
 M: astar-simple cost cost>> call( n1 n2 -- c ) ;
 M: astar-simple heuristic heuristic>> call( n1 n2 -- c ) ;
-M: astar-simple neighbours neighbours>> call( n -- neighbours ) ;
+M: astar-simple neighbors neighbors>> call( n -- neighbors ) ;
 
-TUPLE: bfs < astar neighbours ;
+TUPLE: bfs < astar neighbors ;
 M: bfs cost 3drop 1 ;
 M: bfs heuristic 3drop 0 ;
-M: bfs neighbours neighbours>> at ;
+M: bfs neighbors neighbors>> at ;
 
 TUPLE: dijkstra < astar costs ;
 M: dijkstra cost costs>> swapd at at ;
 M: dijkstra heuristic 3drop 0 ;
-M: dijkstra neighbours costs>> at keys ;
+M: dijkstra neighbors costs>> at keys ;
 
 PRIVATE>
 
 : find-path ( start target astar -- path/f )
     (astar) new [ astar<< ] keep [ (init) ] [ (find-path) ] bi ;
 
-: <astar> ( neighbours cost heuristic -- astar )
-    astar-simple new swap >>heuristic swap >>cost swap >>neighbours ;
+: <astar> ( neighbors cost heuristic -- astar )
+    astar-simple new swap >>heuristic swap >>cost swap >>neighbors ;
 
 : considered ( astar -- considered )
     in-closed-set>> members ;
 
-: <bfs> ( neighbours -- astar )
-    [ bfs new ] dip >>neighbours ;
+: <bfs> ( neighbors -- astar )
+    [ bfs new ] dip >>neighbors ;
 
 : <dijkstra> ( costs -- astar )
     [ dijkstra new ] dip >>costs ;

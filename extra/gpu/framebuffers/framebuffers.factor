@@ -1,5 +1,5 @@
 ! Copyright (C) 2009 Joe Groff.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors alien.c-types alien.data arrays byte-arrays
 combinators destructors gpu gpu.buffers gpu.private gpu.textures
 gpu.textures.private images kernel locals math math.rectangles
@@ -382,8 +382,8 @@ TYPED:: copy-framebuffer ( to-fb-rect: framebuffer-rect
     GL_READ_FRAMEBUFFER from-fb-rect framebuffer>> framebuffer-handle glBindFramebuffer
     from-fb-rect [ framebuffer>> ] [ attachment>> ] bi gl-attachment glReadBuffer
     to-fb-rect attachment>> [ GL_COLOR_BUFFER_BIT ] [ 0 ] if
-    depth?   [ GL_DEPTH_BUFFER_BIT   ] [ 0 ] if bitor
-    stencil? [ GL_STENCIL_BUFFER_BIT ] [ 0 ] if bitor :> mask
+    depth?   [ GL_DEPTH_BUFFER_BIT bitor ] when
+    stencil? [ GL_STENCIL_BUFFER_BIT bitor ] when :> mask
 
     from-fb-rect rect>> rect-extent [ first2 ] bi@
     to-fb-rect   rect>> rect-extent [ first2 ] bi@

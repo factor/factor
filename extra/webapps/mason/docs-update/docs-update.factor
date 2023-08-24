@@ -1,9 +1,9 @@
 ! Copyright (C) 2010 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
-USING: accessors furnace.actions help.html
-http.server.responses io.directories io.directories.hierarchy
-io.files io.launcher io.pathnames kernel mason.config memoize
-namespaces sequences threads webapps.mason.utils ;
+! See https://factorcode.org/license.txt for BSD license.
+USING: accessors furnace.actions help.html http.server.responses
+io.directories io.files io.launcher io.pathnames kernel
+mason.config memoize namespaces sequences threads
+webapps.mason.utils ;
 IN: webapps.mason.docs-update
 
 : docs-path ( -- path )
@@ -11,16 +11,16 @@ IN: webapps.mason.docs-update
 
 : update-docs ( -- )
     home [
-        "newdocs" exists? [ "newdocs" delete-tree ] when
+        "newdocs" file-exists? [ "newdocs" delete-tree ] when
 
         "newdocs" make-directory
         "newdocs" [ { "tar" "xfz" } docs-path suffix try-process ] with-directory
 
-        "docs" exists? [ "docs" "docs.old" move-file ] when
+        "docs" file-exists? [ "docs" "docs.old" move-file ] when
         "newdocs/docs" "docs" move-file
 
         "newdocs" delete-directory
-        "docs.old" exists? [ "docs.old" delete-tree ] when
+        "docs.old" file-exists? [ "docs.old" delete-tree ] when
 
         \ load-index reset-memoized
     ] with-directory ;

@@ -1,9 +1,8 @@
 ! Copyright (C) 2006, 2009 Daniel Ehrenberg.
-! See http://factorcode.org/license.txt for BSD license.
-USING: accessors byte-arrays combinators io io.binary
-io.encodings kernel math math.private namespaces sbufs
-sequences sequences.private splitting strings strings.private
-vectors ;
+! See https://factorcode.org/license.txt for BSD license.
+USING: accessors alien.accessors byte-arrays io io.encodings
+kernel math math.private sequences sequences.private strings
+strings.private ;
 IN: io.encodings.utf16
 
 SINGLETON: utf16be
@@ -80,14 +79,17 @@ M: utf16le decode-char
     [ B{ } 2sequence ] dip stream-write ; inline
     ! [ stream-write1 ] curry bi@ ; inline
 
+: split>b/b ( h -- b1 b2 ) ! duplicate from math.bitwise:h>b/b
+    [ 0xff bitand ] [ -8 shift 0xff bitand ] bi ;
+
 : char>utf16be ( char stream -- )
     over 0xFFFF > [
         [ 0x10000 - ] dip
         [ [ encode-first ] dip stream-write2 ]
         [ [ encode-second ] dip stream-write2 ] 2bi
-    ] [ [ h>b/b swap ] dip stream-write2 ] if ; inline
+    ] [ [ split>b/b swap ] dip stream-write2 ] if ; inline
 
-M: utf16be encode-char ( char stream encoding -- )
+M: utf16be encode-char
     drop char>utf16be ;
 
 : char>utf16le ( char stream -- )
@@ -95,9 +97,9 @@ M: utf16be encode-char ( char stream encoding -- )
         [ 0x10000 - ] dip
         [ [ encode-first swap ] dip stream-write2 ]
         [ [ encode-second swap ] dip stream-write2 ] 2bi
-    ] [ [ h>b/b ] dip stream-write2 ] if ; inline
+    ] [ [ split>b/b ] dip stream-write2 ] if ; inline
 
-M: utf16le encode-char ( char stream encoding -- )
+M: utf16le encode-char
     drop char>utf16le ;
 
 : ascii-char>utf16-byte-array ( off n byte-array string -- )
@@ -155,10 +157,19 @@ CONSTANT: bom-be B{ 0xfe 0xff }
         bom-be sequence= [ utf16be ] [ missing-bom ] if
     ] if ;
 
-M: utf16 <decoder> ( stream utf16 -- decoder )
+M: utf16 <decoder>
     drop 2 over stream-read bom>le/be <decoder> ;
 
-M: utf16 <encoder> ( stream utf16 -- encoder )
+M: utf16 <encoder>
     drop bom-le over stream-write utf16le <encoder> ;
 
 PRIVATE>
+
+SINGLETON: utf16n
+
+: choose-utf16-endian ( -- descriptor )
+    B{ 1 0 0 0 } 0 alien-unsigned-4 1 = utf16le utf16be ? ; foldable
+
+M: utf16n <decoder> drop choose-utf16-endian <decoder> ;
+
+M: utf16n <encoder> drop choose-utf16-endian <encoder> ;

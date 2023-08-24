@@ -4,13 +4,13 @@
 ! Chris Double modified it to fix bugs and get it working
 ! correctly under the latest versions of Factor.
 !
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 !
 USING: accessors arrays assocs byte-arrays classes classes.tuple
-combinators hashtables hashtables.identity io io.binary
-io.encodings.binary io.encodings.string io.encodings.utf8
-io.streams.byte-array kernel locals math namespaces prettyprint
-quotations sequences sequences.private strings vocabs words ;
+combinators endian hashtables io io.encodings.binary
+io.encodings.string io.encodings.utf8 io.streams.byte-array
+kernel math namespaces prettyprint quotations sequences
+sequences.private strings vocabs words ;
 IN: serialize
 
 GENERIC: (serialize) ( obj -- )
@@ -65,10 +65,10 @@ SYMBOL: serialized
         [ CHAR: o write1 serialize-cell drop ]
     ] dip if* ; inline
 
-M: f (serialize) ( obj -- )
+M: f (serialize)
     drop CHAR: n write1 ;
 
-M: integer (serialize) ( obj -- )
+M: integer (serialize)
     [
         CHAR: z write1
     ] [
@@ -76,7 +76,7 @@ M: integer (serialize) ( obj -- )
         serialize-cell
     ] if-zero ;
 
-M: float (serialize) ( obj -- )
+M: float (serialize)
     CHAR: F write1
     double>bits serialize-cell ;
 
@@ -88,7 +88,7 @@ M: float (serialize) ( obj -- )
         [ [ (serialize) ] each ] tri
     ] curry serialize-shared ;
 
-M: tuple (serialize) ( obj -- )
+M: tuple (serialize)
     [
         CHAR: T write1
         [ class-of (serialize) ]
@@ -97,22 +97,22 @@ M: tuple (serialize) ( obj -- )
         tri
     ] serialize-shared ;
 
-M: array (serialize) ( obj -- )
+M: array (serialize)
     CHAR: a serialize-seq ;
 
-M: quotation (serialize) ( obj -- )
+M: quotation (serialize)
     [
         CHAR: q write1
         [ >array (serialize) ] [ add-object ] bi
     ] serialize-shared ;
 
-M: hashtable (serialize) ( obj -- )
+M: hashtable (serialize)
     [
         CHAR: h write1
         [ add-object ] [ >alist (serialize) ] bi
     ] serialize-shared ;
 
-M: byte-array (serialize) ( obj -- )
+M: byte-array (serialize)
     [
         CHAR: A write1
         [ add-object ]
@@ -120,7 +120,7 @@ M: byte-array (serialize) ( obj -- )
         [ write ] tri
     ] serialize-shared ;
 
-M: string (serialize) ( obj -- )
+M: string (serialize)
     [
         CHAR: s write1
         [ add-object ]
@@ -149,14 +149,14 @@ M: string (serialize) ( obj -- )
     [ vocabulary>> (serialize) ]
     bi ;
 
-M: word (serialize) ( obj -- )
+M: word (serialize)
     {
         { [ dup t eq? ] [ serialize-true ] }
         { [ dup vocabulary>> not ] [ serialize-gensym ] }
         [ serialize-word ]
     } cond ;
 
-M: wrapper (serialize) ( obj -- )
+M: wrapper (serialize)
     CHAR: W write1
     wrapped>> (serialize) ;
 

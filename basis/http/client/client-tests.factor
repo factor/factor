@@ -1,9 +1,7 @@
 USING: accessors http http.client http.client.private
-io.streams.string kernel namespaces sequences tools.test urls ;
+io.streams.string kernel namespaces sequences splitting
+tools.test urls ;
 IN: http.client.tests
-
-{ "localhost" f } [ "localhost" parse-host ] unit-test
-{ "localhost" 8888 } [ "localhost:8888" parse-host ] unit-test
 
 { "foo.txt" } [ "http://www.paulgraham.com/foo.txt" download-name ] unit-test
 { "foo.txt" } [ "http://www.arc.com/foo.txt?xxx" download-name ] unit-test
@@ -17,7 +15,7 @@ IN: http.client.tests
         { method "GET" }
         { version "1.1" }
         { cookies V{ } }
-        { header H{ { "connection" "close" } { "user-agent" "Factor http.client" } } }
+        { header H{ { "Connection" "close" } { "User-Agent" "Factor http.client" } } }
         { redirects 10 }
     }
 } [
@@ -32,7 +30,7 @@ IN: http.client.tests
         { method "GET" }
         { version "1.1" }
         { cookies V{ } }
-        { header H{ { "connection" "close" } { "user-agent" "Factor http.client" } } }
+        { header H{ { "Connection" "close" } { "User-Agent" "Factor http.client" } } }
         { redirects 10 }
     }
 } [
@@ -50,8 +48,8 @@ IN: http.client.tests
 ! hit the velox.ch website.
 ! { t } [
     ! "https://alice.sni.velox.ch" http-get nip
-    ! [ "Great!" swap subseq? ]
-    ! [ "TLS SNI Test Site: alice.sni.velox.ch" swap subseq? ] bi and
+    ! [ "Great!" subseq-of? ]
+    ! [ "TLS SNI Test Site: alice.sni.velox.ch" subseq-of? ] bi and
 ! ] unit-test
 
 { t } [
@@ -61,7 +59,7 @@ IN: http.client.tests
         "content-type: text/html; charset=UTF-8"
         "date: Wed, 12 Oct 2011 18:57:49 GMT"
         "server: Factor http.server"
-    } [ "\n" join ] [ "\r\n" join ] bi
+    } [ join-lines ] [ "\r\n" join ] bi
     [ [ read-response ] with-string-reader ] same?
 ] unit-test
 
@@ -101,7 +99,7 @@ IN: http.client.tests
     "https://www.apple.com/index.html"
     "CONNECT" <client-request>
         f >>proxy-url
-     request-uri
+    request-uri
 ] unit-test
 
 { f } [
@@ -195,20 +193,20 @@ CONSTANT: classic-proxy-settings H{
     ] with-variables
 ] unit-test
 
-{ URL" http://localhost:3128" } [
-    { { "http.proxy" "localhost:3128" } } [
+{ URL" //localhost:3128" } [
+    { { "http.proxy" "//localhost:3128" } } [
        "google.com" "GET" <client-request> ?default-proxy proxy-url>>
     ] with-variables
 ] unit-test
 
-{ URL" http://localhost:3128" } [
+{ URL" //localhost:3128" } [
     "google.com" "GET" <client-request>
-    URL" localhost:3128" >>proxy-url ?default-proxy proxy-url>>
+    URL" //localhost:3128" >>proxy-url ?default-proxy proxy-url>>
 ] unit-test
 
-{ URL" http://localhost:3128" } [
+{ URL" //localhost:3128" } [
     "google.com" "GET" <client-request>
-    "localhost:3128" >>proxy-url ?default-proxy proxy-url>>
+    "//localhost:3128" >>proxy-url ?default-proxy proxy-url>>
 ] unit-test
 
 { URL" http://proxysec.private:3128" } [
@@ -231,10 +229,10 @@ CONSTANT: classic-proxy-settings H{
 
 ! This url is misparsed bu request-url can fix it
 { T{ url
-   { protocol "http" }
-   { host "www.google.com" }
-   { path "/" }
-   { port 80 }
+    { protocol "http" }
+    { host "www.google.com" }
+    { path "/" }
+    { port 80 }
 } } [ "www.google.com" request-url ] unit-test
 
 ! This one is not fixable, leave it as it is

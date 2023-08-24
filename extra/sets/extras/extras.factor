@@ -1,7 +1,7 @@
 ! Copyright (C) 2013 Doug Coleman.
-! See http://factorcode.org/license.txt for BSD license.
-USING: assocs fry hash-sets kernel locals sequences
-sequences.extras sets ;
+! See https://factorcode.org/license.txt for BSD license.
+USING: assocs hash-sets kernel sequences sequences.extras
+sets ;
 IN: sets.extras
 
 : setwise-xor ( seq1 seq2 -- set )
@@ -37,3 +37,6 @@ IN: sets.extras
 
 : unique-by ( seq quot: ( elt -- key ) -- seq' )
     over length <hash-set> '[ @ _ ?adjoin ] filter ; inline
+
+: diffs ( seq1 seq2 -- diff swapdiff intersect )
+    [ diff f like ] [ swap diff f like ] [ intersect ] 2tri ;

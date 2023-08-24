@@ -1,5 +1,5 @@
 IN: models.arrow.smart
-USING: help.syntax help.markup models.product ;
+USING: help.syntax help.markup models.product models.arrow ;
 
 HELP: <smart-arrow>
 { $values { "quot" { $quotation ( ... -- output ) } } }
@@ -13,6 +13,10 @@ HELP: <smart-arrow>
     "3"
   }
 } ;
+
+HELP: <?smart-arrow>
+{ $values { "quot" { $quotation ( ... -- output ) } } }
+{ $description "Like " { $link <smart-arrow> } ", but with the semantics of " { $link <?arrow> } "." } ;
 
 ARTICLE: "models.arrow.smart" "Smart arrow models"
 "The " { $vocab-link "models.arrow.smart" } " vocabulary generalizes arrows to arbitrary input arity. They're called “smart” because they resemble " { $link "combinators.smart" } "."

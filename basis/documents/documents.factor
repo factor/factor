@@ -1,7 +1,7 @@
 ! Copyright (C) 2006, 2009 Slava Pestov
-! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays fry kernel locals math math.order
-math.ranges models sequences splitting ;
+! See https://factorcode.org/license.txt for BSD license.
+USING: accessors arrays kernel math math.order ranges
+models sequences splitting ;
 IN: documents
 
 : +col ( loc n -- newloc ) [ first2 ] dip + 2array ;
@@ -53,13 +53,13 @@ TUPLE: document < model locs undos redos inside-undo? ;
     to first line# =
     [ to second ] [ line# document doc-line length ] if ;
 
-: each-line ( ... from to quot: ( ... line -- ... ) -- ... )
+: each-doc-line ( ... from to quot: ( ... line -- ... ) -- ... )
     2over = [ 3drop ] [
-        [ [ first ] bi@ [a,b] ] dip each
+        [ [ first ] bi@ [a..b] ] dip each
     ] if ; inline
 
-: map-lines ( ... from to quot: ( ... line -- ... result ) -- ... results )
-    collector [ each-line ] dip ; inline
+: map-doc-lines ( ... from to quot: ( ... line -- ... result ) -- ... results )
+    collector [ each-doc-line ] dip ; inline
 
 : start/end-on-line ( from to line# document -- n1 n2 )
     [ start-on-line ] [ end-on-line ] bi-curry bi-curry bi* ;
@@ -88,7 +88,7 @@ CONSTANT: doc-start { 0 0 }
     0 swap [ append ] change-nth ;
 
 : append-last ( str seq -- )
-    [ length 1 - ] keep [ prepend ] change-nth ;
+    index-of-last [ prepend ] change-nth ;
 
 : loc-col/str ( loc document -- str col )
     [ first2 swap ] dip nth swap ;
@@ -108,16 +108,16 @@ CONSTANT: doc-start { 0 0 }
 : with-undo ( ..a document quot: ( ..a document -- ..b ) -- ..b )
     [ t >>inside-undo? ] dip keep f >>inside-undo? drop ; inline
 
-: split-lines ( str -- seq )
-    [ string-lines ] keep ?last
+: ?split-lines ( str -- seq )
+    [ split-lines ] keep ?last
     [ "\r\n" member? ] [ t ] if*
     [ "" suffix ] when ;
 
 PRIVATE>
 
 :: doc-range ( from to document -- string )
-    from to [ [ from to ] dip document (doc-range) ] map-lines
-    "\n" join ;
+    from to [ [ from to ] dip document (doc-range) ] map-doc-lines
+    join-lines ;
 
 : add-undo ( edit document -- )
     dup inside-undo?>> [ 2drop ] [
@@ -127,10 +127,18 @@ PRIVATE>
 
 :: set-doc-range ( string from to document -- )
     from to = string empty? and [
-        string split-lines :> new-lines
+        string ?split-lines :> new-lines
         new-lines from text+loc :> new-to
         from to document doc-range :> old-string
         old-string string from to new-to <edit> document add-undo
+        new-lines from to document [ (set-doc-range) ] models:change-model
+        new-to document update-locs
+    ] unless ;
+
+:: set-doc-range* ( string from to document -- )
+    from to = string empty? and [
+        string ?split-lines :> new-lines
+        new-lines from text+loc :> new-to
         new-lines from to document [ (set-doc-range) ] models:change-model
         new-to document update-locs
     ] unless ;

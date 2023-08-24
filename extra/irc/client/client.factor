@@ -1,8 +1,7 @@
 ! Copyright (C) 2008 Bruno Deferrari, Doug Coleman, Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
-USING: accessors concurrency.mailboxes destructors
-irc.client.base irc.client.chats irc.client.internals kernel
-namespaces sequences ;
+! See https://factorcode.org/license.txt for BSD license.
+USING: accessors concurrency.mailboxes irc.client.base
+irc.client.internals kernel ;
 IN: irc.client
 
 : connect-irc ( irc-client -- )

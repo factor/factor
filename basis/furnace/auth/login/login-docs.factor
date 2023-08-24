@@ -1,10 +1,10 @@
-USING: help.markup help.syntax kernel strings ;
+USING: help.markup help.syntax strings ;
 IN: furnace.auth.login
 
 HELP: <login-realm>
 { $values
-     { "responder" "a responder" } { "name" string }
-     { "realm" "a new responder" }
+    { "responder" "a responder" } { "name" string }
+    { "realm" "a new responder" }
 }
 { $description "Wraps a responder in a new login realm with the given name. The realm must be configured before use; see " { $link "furnace.auth.realm-config" } "." } ;
 

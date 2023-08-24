@@ -1,11 +1,9 @@
 ! Copyright (C) 2006 Mackenzie Straight, Doug Coleman.
-! See http://factorcode.org/license.txt for BSD license.
-USING: accessors alien alien.c-types alien.data alien.strings
-alien.syntax arrays byte-arrays classes.struct grouping init
-io.encodings.utf16n kernel literals math math.bitwise
+! See https://factorcode.org/license.txt for BSD license.
+USING: accessors alien alien.c-types alien.data alien.syntax
+byte-arrays classes.struct grouping init kernel literals math
 math.parser sequences system vocabs.parser windows.com.syntax
 windows.errors windows.kernel32 windows.types ;
-FROM: alien.c-types => short ;
 IN: windows.winsock
 
 <<
@@ -86,13 +84,54 @@ CONSTANT: AI_MASK flags{ AI_PASSIVE AI_CANONNAME AI_NUMERICHOST }
 CONSTANT: NI_NUMERICHOST 1
 CONSTANT: NI_NUMERICSERV 2
 
-CONSTANT: IPPROTO_TCP    6
-CONSTANT: IPPROTO_UDP   17
-CONSTANT: IPPROTO_RM   113
+CONSTANT: IPPROTO_IP        0           ! Dummy protocol for TCP.
+CONSTANT: IPPROTO_ICMP      1           ! Internet Control Message Protocol.
+CONSTANT: IPPROTO_IGMP      2           ! Internet Group Management Protocol. */
+CONSTANT: IPPROTO_IPIP      4           ! IPIP tunnels (older KA9Q tunnels use 94).
+CONSTANT: IPPROTO_TCP       6           ! Transmission Control Protocol.
+CONSTANT: IPPROTO_EGP       8           ! Exterior Gateway Protocol.
+CONSTANT: IPPROTO_PUP      12           ! PUP protocol.
+CONSTANT: IPPROTO_UDP      17           ! User Datagram Protocol.
+CONSTANT: IPPROTO_IDP      22           ! XNS IDP protocol.
+CONSTANT: IPPROTO_TP       29           ! SO Transport Protocol Class 4.
+CONSTANT: IPPROTO_DCCP     33           ! Datagram Congestion Control Protocol.
+CONSTANT: IPPROTO_IPV6     41           ! IPv6 header.
+CONSTANT: IPPROTO_RSVP     46           ! Reservation Protocol.
+CONSTANT: IPPROTO_GRE      47           ! General Routing Encapsulation.
+CONSTANT: IPPROTO_ESP      50           ! encapsulating security payload.
+CONSTANT: IPPROTO_AH       51           ! authentication header.
+CONSTANT: IPPROTO_MTP      92           ! Multicast Transport Protocol.
+CONSTANT: IPPROTO_BEETPH   94           ! IP option pseudo header for BEET.
+CONSTANT: IPPROTO_ENCAP    98           ! Encapsulation Header.
+CONSTANT: IPPROTO_PIM     103           ! Protocol Independent Multicast.
+CONSTANT: IPPROTO_COMP    108           ! Compression Header Protocol.
+CONSTANT: IPPROTO_RM      113           ! Reliable Multicast aka PGM
+CONSTANT: IPPROTO_SCTP    132           ! Stream Control Transmission Protocol.
+CONSTANT: IPPROTO_UDPLITE 136           ! UDP-Lite protocol.
+CONSTANT: IPPROTO_MPLS    137           ! MPLS in IP.
+CONSTANT: IPPROTO_RAW     255           ! Raw IP packets.
 
 CONSTANT: FIOASYNC      0x8004667d
 CONSTANT: FIONBIO       0x8004667e
 CONSTANT: FIONREAD      0x4004667f
+
+CONSTANT: IP_OPTIONS 1
+CONSTANT: IP_HDRINCL 2
+CONSTANT: IP_TOS 3
+CONSTANT: IP_TTL 4
+CONSTANT: IP_MULTICAST_IF 9
+CONSTANT: IP_MULTICAST_TTL 10
+CONSTANT: IP_MULTICAST_LOOP 11
+CONSTANT: IP_ADD_MEMBERSHIP 12
+CONSTANT: IP_DROP_MEMBERSHIP 13
+CONSTANT: IP_DONTFRAGMENT 14
+CONSTANT: IP_ADD_SOURCE_MEMBERSHIP 15
+CONSTANT: IP_DROP_SOURCE_MEMBERSHIP 16
+CONSTANT: IP_BLOCK_SOURCE 17
+CONSTANT: IP_UNBLOCK_SOURCE 18
+CONSTANT: IP_PKTINFO 19
+CONSTANT: IP_RECEIVE_BROADCAST 22
+
 
 CONSTANT: WSA_FLAG_OVERLAPPED 1
 ALIAS: WSA_WAIT_EVENT_0 WAIT_OBJECT_0
@@ -159,10 +198,10 @@ STRUCT: timeval
 
 GENERIC: sockaddr>ip ( sockaddr -- string )
 
-M: sockaddr-in sockaddr>ip ( sockaddr -- string )
+M: sockaddr-in sockaddr>ip
     addr>> uint <ref> [ number>string ] { } map-as "." join ;
 
-M: sockaddr-in6 sockaddr>ip ( uchar-array -- string )
+M: sockaddr-in6 sockaddr>ip
     addr>> [ >hex ] { } map-as 2 group [ concat ] map ":" join ;
 
 STRUCT: fd_set
@@ -486,5 +525,5 @@ ERROR: winsock-exception n string ;
 
 : shutdown-winsock ( -- ) WSACleanup winsock-return-check ;
 
-[ init-winsock ] "windows.winsock" add-startup-hook
-[ shutdown-winsock ] "windows.winsock" add-shutdown-hook
+STARTUP-HOOK: init-winsock
+SHUTDOWN-HOOK: shutdown-winsock

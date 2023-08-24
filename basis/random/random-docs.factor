@@ -1,22 +1,44 @@
-USING: arrays help.markup help.syntax kernel math quotations
+USING: arrays help.markup help.syntax kernel math quotations random
 sequences ;
-IN: random
+IN: combinators.random
 
 HELP: seed-random
 { $values
-    { "obj" "a random number generator" }
+    { "rnd" "a random number generator" }
     { "seed" "a seed specific to the random number generator" }
 }
 { $description "Seed the random number generator. Repeatedly seeding the random number generator should provide the same sequence of random numbers." }
 { $notes "Not supported on all random number generators." } ;
 
 HELP: random-32*
-{ $values { "obj" "a random number generator" } { "n" "an integer between 0 and 2^32-1" } }
+{ $values { "rnd" "a random number generator" } { "n" "an integer between 0 and 2^32-1" } }
 { $description "Generates a random 32-bit unsigned integer." } ;
 
+HELP: random-32
+{ $values { "n" "a 32-bit random integer" } }
+{ $description "Outputs 32 random bits. This word is more efficient than calling " { $link random } " because no scaling is done on the output." } ;
+
+{ random-32* random-32 } related-words
+
 HELP: random-bytes*
-{ $values { "n" integer } { "obj" "a random number generator" } { "byte-array" "a sequence of random bytes" } }
+{ $values { "n" integer } { "rnd" "a random number generator" } { "byte-array" "a sequence of random bytes" } }
 { $description "Generates a byte-array of " { $snippet "n" } " random bytes." } ;
+
+HELP: random-bytes
+{ $values { "n" integer } { "byte-array" "a sequence of random bytes" } }
+{ $description "Generates a byte-array of " { $snippet "n" } " random bytes." }
+{ $examples
+    { $unchecked-example "USING: prettyprint random ;"
+               "5 random-bytes ."
+               "B{ 135 50 185 119 240 }"
+    }
+} ;
+
+{ random-bytes* random-bytes } related-words
+
+HELP: random*
+{ $values { "obj" object } { "rnd" "a random number generator" } { "elt" "a random element" } }
+{ $description "Outputs a random element of the input object, or outputs " { $link f } " if the object contains no elements." } ;
 
 HELP: random
 { $values { "obj" object } { "elt" "a random element" } }
@@ -32,29 +54,17 @@ HELP: random
         "heads" }
 } ;
 
-HELP: random-32
-{ $values { "n" "a 32-bit random integer" } }
-{ $description "Outputs 32 random bits. This word is more efficient than calling " { $link random } " because no scaling is done on the output." } ;
-
-HELP: random-bytes
-{ $values { "n" integer } { "byte-array" "a sequence of random bytes" } }
-{ $description "Generates a byte-array of " { $snippet "n" } " random bytes." }
+HELP: randoms
+{ $values { "length" integer } { "obj" object } { "seq" array } }
+{ $description "Outputs an array with " { $snippet "length" } " random values generated from " { $snippet "obj" } "." }
 { $examples
     { $unchecked-example "USING: prettyprint random ;"
-               "5 random-bytes ."
-               "B{ 135 50 185 119 240 }"
-    }
-} ;
-
-HELP: random-integers
-{ $values { "length" integer } { "n" integer } { "sequence" array } }
-{ $description "Outputs an array with " { $snippet "length" } " random integers from [0,n)." }
-{ $examples
-    { $unchecked-example "USING: prettyprint random ;"
-               "10 100 random-integers ."
+               "10 100 randoms ."
                "{ 32 62 71 89 54 12 57 57 10 19 }"
     }
 } ;
+
+{ random* random randoms } related-words
 
 HELP: random-unit
 { $values { "n" float } }
@@ -87,7 +97,7 @@ HELP: random-bits*
 { $description "Returns an integer exactly " { $snippet "numbits" } " bits in length, with the topmost bit set to one." } ;
 
 HELP: with-random
-{ $values { "obj" "a random number generator" } { "quot" quotation } }
+{ $values { "rnd" "a random number generator" } { "quot" quotation } }
 { $description "Calls the quotation with the random number generator in a dynamic variable. All random numbers will be generated using this random number generator." } ;
 
 HELP: with-secure-random
@@ -102,8 +112,8 @@ HELP: with-system-random
 
 HELP: randomize
 { $values
-     { "seq" sequence }
-     { "randomized" sequence }
+    { "seq" sequence }
+    { "randomized" sequence }
 }
 { $description "Randomizes a sequence in-place with the Fisher-Yates algorithm and returns the sequence." } ;
 
@@ -122,8 +132,8 @@ HELP: sample
 
 HELP: delete-random
 { $values
-     { "seq" sequence }
-     { "elt" object } }
+    { "seq" sequence }
+    { "elt" object } }
 { $description "Deletes a random number from a sequence using " { $link remove-nth! } " and returns the deleted object." } ;
 
 ARTICLE: "random-protocol" "Random protocol"
@@ -140,8 +150,8 @@ ARTICLE: "random" "Generating random integers"
 $nl
 "The “Mersenne Twister” pseudorandom number generator algorithm is the default generator stored in " { $link random-generator } "."
 $nl
-"Generate a random object:"
-{ $subsections random }
+"Generate random object(s):"
+{ $subsections random randoms }
 "Efficient 32-bit random numbers:"
 { $subsections random-32 }
 "Combinators to change the random number generator:"
@@ -159,7 +169,7 @@ $nl
 "Deleting a random element from a sequence:"
 { $subsections delete-random }
 "Sequences of random numbers:"
-{ $subsections random-bytes random-integers random-units }
+{ $subsections random-bytes random-units }
 "Random numbers with " { $snippet "n" } " bits:"
 { $subsections
     random-bits

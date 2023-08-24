@@ -1,5 +1,5 @@
 ! Copyright (C) 2007, 2009 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs checksums checksums.crc32
 compiler.units continuations definitions io.encodings.utf8
 io.files io.pathnames kernel namespaces sequences sets
@@ -33,7 +33,7 @@ main ;
 
 : reset-checksums ( -- )
     source-files get [
-        over exists? [
+        over file-exists? [
             [ utf8 file-lines ] dip record-checksum
         ] [ 2drop ] if
     ] assoc-each ;

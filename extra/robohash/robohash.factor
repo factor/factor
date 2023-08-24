@@ -1,5 +1,5 @@
 ! Copyright (C) 2011 John Benediktsson.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 
 USING: images.http kernel sequences urls urls.encoding ;
 
@@ -8,7 +8,7 @@ IN: robohash
 <PRIVATE
 
 : robohash-url ( str -- url )
-    url-encode "http://robohash.org/" prepend >url ;
+    url-encode "https://robohash.org/" prepend >url ;
 
 : (robohash) ( str type -- image )
     [ robohash-url ] [ "set" set-query-param ] bi*

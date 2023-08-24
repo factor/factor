@@ -1,7 +1,7 @@
 ! Copyright (C) 2009 Doug Coleman.
-! See http://factorcode.org/license.txt for BSD license.
-USING: help.markup help.syntax http.server.filters kernel
-multiline furnace.actions furnace.alloy furnace.conversations ;
+! See https://factorcode.org/license.txt for BSD license.
+USING: furnace.actions furnace.alloy help.markup help.syntax
+http.server.filters ;
 IN: furnace.recaptcha
 
 HELP: <recaptcha>
@@ -36,7 +36,7 @@ $nl
 ARTICLE: "furnace.recaptcha" "Recaptcha support for Furnace"
 "The " { $vocab-link "furnace.recaptcha" } " vocabulary implements support for the recaptcha. Recaptcha is a web service that provides the user with a captcha, a test that is easy to solve by visual inspection, but hard to solve by writing a computer program. Use a captcha to protect forms from abusive users." $nl
 
-"The recaptcha responder is a " { $link filter-responder } " that wraps another responder. Set the " { $slot "domain" } ", " { $slot "public-key" } ", and " { $slot "private-key" } " slots of this responder to your recaptcha account information." $nl
+"The recaptcha responder is a " { $link filter-responder } " that wraps another responder. Set the " { $slot "domain" } ", " { $slot "site-key" } ", and " { $slot "secret-key" } " slots of this responder to your recaptcha account information." $nl
 
 "Wrapping a responder with recaptcha support:"
 { $subsections <recaptcha> }

@@ -1,9 +1,8 @@
 ! Copyright (C) 2011 Doug Coleman.
-! See http://factorcode.org/license.txt for BSD license.
-USING: alien.c-types alien.data alien.syntax classes.struct
-continuations core-foundation core-foundation.strings
-core-foundation.urls destructors kernel sequences
-specialized-arrays strings unix.ffi ;
+! See https://factorcode.org/license.txt for BSD license.
+USING: alien.c-types alien.data alien.syntax continuations
+core-foundation core-foundation.strings core-foundation.urls
+destructors kernel sequences specialized-arrays strings unix.ffi ;
 SPECIALIZED-ARRAY: char
 IN: core-foundation.launch-services
 
@@ -126,7 +125,7 @@ ERROR: core-foundation-error n ;
         kLSUnknownCreator
         swap <CFString> &CFRelease
         f
-        FSRef <struct>
+        FSRef new
         [ f LSFindApplicationForInfo cf-error ] keep
         fsref>string
     ] with-destructors ;

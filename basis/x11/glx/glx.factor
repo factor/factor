@@ -1,9 +1,9 @@
 ! Copyright (C) 2005, 2006 Eduardo Cavazos and Alex Chapman
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 !
 ! based on glx.h from xfree86, and some of glxtokens.h
-USING: alien.c-types alien.syntax kernel namespaces specialized-arrays
-x11 x11.X x11.syntax x11.xlib ;
+USING: alien.c-types alien.syntax kernel namespaces
+specialized-arrays x11 x11.X x11.syntax x11.xlib ;
 SPECIALIZED-ARRAY: int
 IN: x11.glx
 

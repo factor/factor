@@ -1,9 +1,8 @@
 ! Copyright (C) 2004, 2009 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
-USING: accessors assocs combinators destructors fry html io
-io.backend io.pathnames io.styles kernel macros make math
-math.order math.parser namespaces sequences strings words
-splitting xml xml.syntax ;
+! See https://factorcode.org/license.txt for BSD license.
+USING: accessors assocs colors combinators destructors html io
+io.styles kernel make math math.functions math.parser sequences
+strings xml.syntax ;
 IN: html.streams
 
 GENERIC: url-of ( object -- url )
@@ -34,15 +33,11 @@ TUPLE: html-sub-stream < html-writer style parent ;
 : href-link-tag ( xml style -- xml )
     href of [ simple-link ] when* ;
 
-: hex-color, ( color -- )
-    [ red>> ] [ green>> ] [ blue>> ] tri
-    [ 255 * >integer >hex 2 CHAR: 0 pad-head % ] tri@ ;
-
 : fg-css, ( color -- )
-    "color: #" % hex-color, "; " % ;
+    "color: " % color>hex % "; " % ;
 
 : bg-css, ( color -- )
-    "background-color: #" % hex-color, "; " % ;
+    "background-color: " % color>hex % "; " % ;
 
 : style-css, ( flag -- )
     dup
@@ -77,11 +72,8 @@ MACRO: make-css ( pairs -- str )
 : emit-html ( stream quot -- )
     dip data>> push ; inline
 
-: icon-path ( path -- icons-path )
-    "vocab:definitions/icons/" ?head [ "/icons/" prepend ] when ;
-
 : img-tag ( xml style -- xml )
-    image-style of [ nip icon-path simple-image ] when* ;
+    image-style of [ nip simple-image ] when* ;
 
 : format-html-span ( string style stream -- )
     [
@@ -99,7 +91,7 @@ M: html-span-stream dispose
     end-sub-stream format-html-span ;
 
 : border-css, ( border -- )
-    "border: 1px solid #" % hex-color, "; " % ;
+    "border: 1px solid " % color>hex % "; " % ;
 
 : (padding-css,) ( horizontal vertical -- )
     2dup = [
@@ -111,17 +103,19 @@ M: html-span-stream dispose
 : padding-css, ( padding -- )
     first2 (padding-css,) ;
 
-CONSTANT: pre-css "white-space: pre; font-family: monospace; "
+: width-css, ( width -- )
+    "width: " % # "px; " % ;
 
 : div-css-style ( style -- str )
+    [ span-css-style ]
     [
         {
             { page-color bg-css, }
             { border-color border-css, }
             { inset padding-css, }
+            { wrap-margin width-css, }
         } make-css
-    ] [ wrap-margin of [ pre-css append ] unless ] bi
-    "display: inline-block; " append ;
+    ] bi "display: inline-block; " 3append ;
 
 : div-tag ( xml style -- xml' )
     div-css-style

@@ -1,10 +1,11 @@
 ! Copyright (C) 2007, 2008, 2011 Doug Coleman.
-! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays assocs classes classes.tuple.private
-combinators.short-circuit continuations fry io kernel
-kernel.private locals.backend make math math.private namespaces
-prettyprint quotations sequences sequences.deep slots.private
-splitting stack-checker vocabs words words.alias ;
+! See https://factorcode.org/license.txt for BSD license.
+USING: accessors arrays assocs assocs.extras classes
+classes.tuple.private combinators.short-circuit continuations io
+kernel kernel.private locals.backend make math math.private
+namespaces prettyprint quotations sequences sequences.deep
+shuffle slots.private splitting stack-checker vocabs words
+words.alias ;
 IN: lint
 
 <PRIVATE
@@ -17,14 +18,20 @@ CONSTANT: manual-substitutions
         { rot [ swapd swap ] }
         { over [ dup swap ] }
         { swapd [ [ swap ] dip ] }
+        { dupd [ [ dup ] dip ] }
+        { 2dup [ over over ] }
+        { 2swap [ -roll -roll ] }
         { 2nip [ nip nip ] }
         { 3nip [ 2nip nip ] }
         { 4nip [ 3nip nip ] }
         { 2drop [ drop drop ] }
         { 3drop [ drop drop drop ] }
+        { 4drop [ drop drop drop drop ] }
         { pop* [ pop drop ] }
         { when [ [ ] if ] }
+        { spin [ swap rot ] }
         { >boolean [ f = not ] }
+        { keep [ over [ call ] dip ] }
     }
 
 CONSTANT: trivial-defs
@@ -218,7 +225,7 @@ CONSTANT: trivial-defs
     [ { [ callable? ] [ ignore-def? not ] } 1&& ] deep-filter ;
 
 : (load-definitions) ( word def hash -- )
-    [ all-callables ] dip '[ _ push-at ] with each ;
+    [ all-callables ] dip push-at-each ;
 
 : load-definitions ( words -- hash )
     H{ } clone [ '[ dup def>> _ (load-definitions) ] each ] keep ;
@@ -248,7 +255,7 @@ GENERIC: lint ( obj -- seq )
 M: object lint ( obj -- seq ) drop f ;
 
 M: callable lint ( quot -- seq )
-    [ lint-definitions-keys get-global ] dip '[ _ subseq? ] filter ;
+    lint-definitions-keys get-global [ subseq-of? ] with filter ;
 
 M: word lint ( word -- seq/f )
     def>> [ callable? ] deep-filter [ lint ] map concat ;
@@ -282,7 +289,7 @@ GENERIC: run-lint ( obj -- obj )
     ] assoc-filter ;
 
 M: sequence run-lint ( seq -- seq )
-    [ dup lint ] { } map>assoc trim-self
+    [ lint ] zip-with trim-self
     [ second empty? ] reject filter-symbols ;
 
 M: word run-lint ( word -- seq ) 1array run-lint ;

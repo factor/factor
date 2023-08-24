@@ -1,7 +1,7 @@
 ! Copyright (C) 2008 Doug Coleman.
-! See http://factorcode.org/license.txt for BSD license.
-USING: namespaces sequences math.parser kernel macros
-generalizations sequences.generalizations locals ;
+! See https://factorcode.org/license.txt for BSD license.
+USING: kernel math.parser namespaces sequences
+sequences.generalizations ;
 IN: nmake
 
 SYMBOL: building-seq

@@ -1,12 +1,11 @@
 ! Copyright (C) 2018 John Benediktsson
-! See http://factorcode.org/license.txt for BSD license
+! See https://factorcode.org/license.txt for BSD license
 
-USING: accessors alien.c-types alien.endian alien.strings assocs
-calendar calendar.parser classes.struct combinators fry io
-io.binary io.encodings.8-bit io.encodings.ascii
-io.encodings.binary io.encodings.string io.files
-io.streams.byte-array kernel math math.parser namespaces
-sequences splitting strings ;
+USING: accessors alien.c-types alien.endian assocs calendar
+calendar.parser classes.struct combinators endian io
+io.encodings.8-bit io.encodings.ascii io.encodings.binary
+io.encodings.string io.files io.streams.byte-array kernel math
+math.parser namespaces sequences ;
 
 IN: dbf
 
@@ -203,7 +202,7 @@ TUPLE: dbf file-header field-headers records ;
 
 : parse-date ( byte-array -- date/f )
     dup [ " \0" member? ] all? [ drop f ] [
-        binary [ (ymd>timestamp) ] with-byte-reader
+        binary [ read-ymd <date-gmt> ] with-byte-reader
     ] if ;
 
 : parse-float ( byte-array -- n )

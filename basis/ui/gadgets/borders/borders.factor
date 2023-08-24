@@ -1,14 +1,14 @@
 ! Copyright (C) 2005, 2009 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors fry kernel math math.rectangles math.vectors
-sequences ui.baseline-alignment ui.gadgets ;
+opengl sequences ui.baseline-alignment ui.gadgets ;
 IN: ui.gadgets.borders
 
 TUPLE: border < aligned-gadget
-{ size initial: { 0 0 } }
-{ fill initial: { 0 0 } }
-{ align initial: { 1/2 1/2 } }
-{ min-dim initial: { 0 0 } } ;
+    { size initial: { 0 0 } }
+    { fill initial: { 0 0 } }
+    { align initial: { 1/2 1/2 } }
+    { min-dim initial: { 0 0 } } ;
 
 : new-border ( child class -- border )
     new swap add-gadget ; inline
@@ -20,7 +20,7 @@ TUPLE: border < aligned-gadget
     <border> { 1 1 } >>fill ;
 
 : border-pref-dim ( border child-dim -- pref-dim )
-    '[ size>> 2 v*n _ v+ ] [ min-dim>> ] bi vmax ;
+    '[ size>> 2 v*n _ v+ ] [ min-dim>> ] bi vmax [ gl-round ] map ;
 
 M: border pref-dim*
     dup gadget-child pref-dim border-pref-dim ;

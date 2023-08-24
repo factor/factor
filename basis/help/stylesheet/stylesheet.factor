@@ -1,39 +1,38 @@
 ! Copyright (C) 2005, 2009 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
-USING: assocs colors.constants fonts fry io.styles kernel literals
-math namespaces sequences ui.theme ;
+! See https://factorcode.org/license.txt for BSD license.
+USING: assocs colors fonts io.styles kernel literals math
+math.order namespaces sequences ui.theme ;
 IN: help.stylesheet
 
 : wrap-margin-full ( -- n )
-    42 default-font-size * ;
+    48 default-font-size * ;
 
 : wrap-margin-table-content ( -- n )
-    29 default-font-size * ;
+    32 default-font-size * ;
+
+: wrap-margin-list-content ( -- n )
+    40 default-font-size * ;
 
 : font-size-subsection ( -- n )
-    7/6 default-font-size * >integer ;
+    14/12 default-font-size * >integer ;
 
 : font-size-title ( -- n )
-    5/3 default-font-size * >integer ;
+    20/12 default-font-size * >integer ;
 
 : font-size-heading ( -- n )
-    4/3 default-font-size * >integer ;
+    16/12 default-font-size * >integer ;
 
 : font-size-span ( -- n )
-    13/12 default-font-size * >integer ;
+    14/12 default-font-size * >integer ;
 
-SYMBOL: default-span-style
+SYMBOL: default-style
 H{
     { font-name $ default-sans-serif-font-name }
     { font-size $ font-size-span }
     { foreground $ text-color }
     { font-style plain }
-} default-span-style set-global
-
-SYMBOL: default-block-style
-H{
     { wrap-margin $ wrap-margin-full }
-} default-block-style set-global
+} default-style set-global
 
 SYMBOL: link-style
 H{
@@ -54,13 +53,16 @@ H{
     { font-style bold }
     { wrap-margin $ wrap-margin-full }
     { foreground $ title-color }
-    { page-color COLOR: FactorLightTan }
+    { page-color $ help-header-background }
     { inset { 5 5 } }
 } title-style set-global
 
 SYMBOL: help-path-style
 H{
-    { font-size $ default-font-size }
+    { font-name $ default-sans-serif-font-name }
+    { font-size $ font-size-span }
+    { font-style plain }
+    { foreground $ text-color }
     { table-gap { 5 5 } }
 } help-path-style set-global
 
@@ -86,15 +88,13 @@ H{
     { foreground $ snippet-color }
 } snippet-style set-global
 
-SYMBOL: code-char-style
+SYMBOL: code-style
 H{
     { font-name $ default-monospace-font-name }
     { font-size $ default-font-size }
-} code-char-style set-global
-
-SYMBOL: code-style
-H{
+    { foreground $ text-color }
     { page-color $ code-background-color }
+    { border-color $ code-border-color }
     { inset { 5 5 } }
     { wrap-margin f }
 } code-style set-global
@@ -138,8 +138,15 @@ H{
     { table-border $ table-border-color }
 } table-style set-global
 
+SYMBOL: list-content-style
+H{
+    { wrap-margin $ wrap-margin-list-content }
+} list-content-style set-global
+
 SYMBOL: list-style
-H{ { table-gap { 10 2 } } } list-style set-global
+H{
+    { table-gap { 5 5 } }
+} list-style set-global
 
 SYMBOL: bullet
 "• " bullet set-global
@@ -148,9 +155,9 @@ SYMBOL: bullet
     [
         font-size
         {
-            default-span-style title-style
+            default-style title-style
             help-path-style heading-style
             subsection-style snippet-style
-            code-char-style
+            code-style
         }
-    ] dip '[ get-global [ _ + ] change-at ] with each ;
+    ] dip '[ get-global [ _ + 1 max ] change-at ] with each ;

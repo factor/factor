@@ -1,10 +1,9 @@
 ! Copyright (C) 2008, 2010 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
-USING: accessors assocs sequences kernel parser fry quotations
-classes.tuple classes.singleton namespaces
-html.components
-html.templates.chloe.compiler
-html.templates.chloe.syntax ;
+! See https://factorcode.org/license.txt for BSD license.
+USING: accessors assocs classes.singleton classes.tuple
+html.components html.templates.chloe.compiler
+html.templates.chloe.syntax kernel namespaces parser quotations
+sequences ;
 IN: html.templates.chloe.components
 
 : render-quot ( -- quot )
@@ -15,7 +14,7 @@ IN: html.templates.chloe.components
 
 GENERIC: component-tag ( tag class -- )
 
-M: singleton-class component-tag ( tag class -- )
+M: singleton-class component-tag
     [ "name" required-attr compile-attr ]
     [ literalize render-quot [code-with] ]
     bi* ;
@@ -26,7 +25,7 @@ M: singleton-class component-tag ( tag class -- )
     [ [ boa ] [code-with] ]
     bi ;
 
-M: tuple-class component-tag ( tag class -- )
+M: tuple-class component-tag
     [ drop "name" required-attr compile-attr ]
     [ compile-component-attrs ] 2bi
     render-quot [code] ;

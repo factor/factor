@@ -1,11 +1,11 @@
 ! Copyright (c) 2008 Aaron Schaefer, Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
-USING: arrays ascii assocs hashtables io.encodings.ascii io.files kernel math
-    math.parser namespaces make sequences sequences.private sorting
-    splitting grouping strings sets accessors project-euler.common ;
+! See https://factorcode.org/license.txt for BSD license.
+USING: accessors arrays ascii assocs grouping io.encodings.ascii
+io.files kernel make math math.parser project-euler.common
+sequences sequences.private sets sorting splitting ;
 IN: project-euler.059
 
-! http://projecteuler.net/index.php?section=problems&id=59
+! https://projecteuler.net/index.php?section=problems&id=59
 
 ! DESCRIPTION
 ! -----------

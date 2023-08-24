@@ -1,7 +1,6 @@
 USING: accessors alien.c-types alien.syntax classes
 classes.struct compiler.units eval io.encodings.ascii kernel
 math.constants tools.test ;
-FROM: alien.c-types => short ;
 IN: alien.c-types.tests
 
 CONSTANT: xyz 123
@@ -166,3 +165,5 @@ USE: alien.syntax
 USE: alien.c-types
 TYPEDEF: void* foo-func
 " eval( -- )
+
+[ void resolve-typedef ] [ T{ no-c-type f void } = ] must-fail-with

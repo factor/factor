@@ -1,9 +1,9 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! Copyright (C) 2009 Doug Coleman.
-! See http://factorcode.org/license.txt for BSD license.
-USING: accessors byte-vectors combinators destructors fry io
-io.encodings io.files io.files.info kernel locals math
-namespaces sequences math.order ;
+! See https://factorcode.org/license.txt for BSD license.
+USING: accessors combinators destructors io io.encodings
+io.files io.files.info kernel math math.order namespaces
+sequences ;
 IN: io.streams.limited
 
 TUPLE: limited-stream stream count limit current start stop ;
@@ -22,11 +22,11 @@ INSTANCE: limited-stream input-stream
 
 GENERIC#: limit-stream 1 ( stream limit -- stream' )
 
-M: decoder limit-stream ( stream limit -- stream' )
+M: decoder limit-stream
     '[ stream>> _ limit-stream ] [ code>> ] [ cr>> ] tri
     decoder boa ; inline
 
-M: object limit-stream ( stream limit -- stream' )
+M: object limit-stream
     <limited-stream> ;
 
 : limited-input ( limit -- )
@@ -147,10 +147,10 @@ M: limited-stream stream-element-type
 
 GENERIC: unlimit-stream ( stream -- stream' )
 
-M: decoder unlimit-stream ( stream -- stream' )
+M: decoder unlimit-stream
     [ stream>> stream>> ] [ code>> ] [ cr>> ] tri decoder boa ;
 
-M: limited-stream unlimit-stream ( stream -- stream' ) stream>> ;
+M: limited-stream unlimit-stream stream>> ;
 
 : unlimited-input ( -- )
     input-stream [ unlimit-stream ] change ;

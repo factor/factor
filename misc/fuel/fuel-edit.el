@@ -1,7 +1,7 @@
-;;; fuel-edit.el -- utilities for file editing
+;;; fuel-edit.el -- utilities for file editing -*- lexical-binding: t -*-
 
 ;; Copyright (C) 2009 Jose Antonio Ortega Ruiz
-;; See http://factorcode.org/license.txt for BSD license.
+;; See https://factorcode.org/license.txt for BSD license.
 
 ;; Author: Jose Antonio Ortega Ruiz <jao@gnu.org>
 ;; Keywords: languages, fuel, factor
@@ -17,6 +17,7 @@
 (require 'fuel-eval)
 (require 'fuel-base)
 (require 'factor-mode)
+(require 'xref)
 
 (require 'etags)
 
@@ -80,7 +81,7 @@ With prefix, asks for the word to edit."
     (if (and (not arg) (factor-on-vocab))
         (fuel-edit-vocabulary nil word)
       (fuel-edit--try-edit (fuel-eval--send/wait cmd)))
-    (when marker (ring-insert find-tag-marker-ring marker))))
+    (when marker (xref-push-marker-stack marker))))
 
 (defun fuel-edit-word-doc-at-point (&optional arg word)
   "Opens a new window visiting the documentation file for the word at point.
@@ -99,7 +100,7 @@ With prefix, asks for the word to edit."
                   (y-or-n-p (concat "No documentation found. "
                                     "Do you want to open the vocab's "
                                     "doc file? ")))
-         (when marker (ring-insert find-tag-marker-ring marker))
+         (when marker (xref-push-marker-stack marker))
          (find-file-other-window
           (format "%s-docs.factor"
                   (file-name-sans-extension (buffer-file-name)))))))))

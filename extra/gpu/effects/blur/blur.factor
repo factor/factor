@@ -1,8 +1,7 @@
 ! Copyright (C) 2010 Erik Charlebois.
-! See http://factorcode.org/license.txt for BSD license.
-USING: arrays destructors fry gpu.framebuffers gpu.render gpu.shaders
-gpu.state gpu.textures gpu.util images kernel locals math
-math.rectangles sequences ;
+! See https://factorcode.org/license.txt for BSD license.
+USING: destructors gpu.render gpu.shaders gpu.state gpu.textures
+gpu.util images kernel math math.rectangles sequences ;
 IN: gpu.effects.blur
 
 GLSL-SHADER: blur-fragment-shader fragment-shader

@@ -1,5 +1,5 @@
 USING: kernel generic help.markup help.syntax math classes
-sequences quotations generic.math.private ;
+quotations generic.math.private ;
 IN: generic.math
 
 HELP: math-class-max

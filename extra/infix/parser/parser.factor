@@ -1,7 +1,7 @@
 ! Copyright (C) 2009 Philipp Brüschweiler
-! See http://factorcode.org/license.txt for BSD license.
-USING: infix.ast infix.tokenizer kernel math peg.ebnf sequences
-strings vectors multiline ;
+! See https://factorcode.org/license.txt for BSD license.
+USING: infix.ast infix.tokenizer kernel multiline peg.ebnf
+sequences strings vectors ;
 IN: infix.parser
 
 EBNF: parse-infix [=[

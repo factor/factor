@@ -1,9 +1,9 @@
 ! Copyright (c) 2012 Anonymous
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: combinators kernel ;
 IN: rosetta-code.ternary-logic
 
-! http://rosettacode.org/wiki/Ternary_logic
+! https://rosettacode.org/wiki/Ternary_logic
 
 ! In logic, a three-valued logic (also trivalent, ternary, or
 ! trinary logic, sometimes abbreviated 3VL) is any of several
@@ -43,12 +43,12 @@ M: trit >trit ;
     >trit {
         { t [ >trit ] }
         { m [ >trit { { t [ m ] } { m [ m ] } { f [ f ] } } case ] }
-        { f [ >trit drop f ] }
+        { f [ drop f ] }
     } case ;
 
 : tor ( trit1 trit2 -- trit )
     >trit {
-        { t [ >trit drop t ] }
+        { t [ drop t ] }
         { m [ >trit { { t [ t ] } { m [ m ] } { f [ m ] } } case ] }
         { f [ >trit ] }
     } case ;
@@ -56,13 +56,13 @@ M: trit >trit ;
 : txor ( trit1 trit2 -- trit )
     >trit {
         { t [ tnot ] }
-        { m [ >trit drop m ] }
+        { m [ drop m ] }
         { f [ >trit ] }
     } case ;
 
 : t= ( trit1 trit2 -- trit )
-    {
+    >trit {
         { t [ >trit ] }
-        { m [ >trit drop m ] }
+        { m [ drop m ] }
         { f [ tnot ] }
     } case ;

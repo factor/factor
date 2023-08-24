@@ -1,6 +1,6 @@
 ! Copyright (C) 2010 Doug Coleman.
-! See http://factorcode.org/license.txt for BSD license.
-USING: accessors alien.c-types classes.struct kernel memory
+! See https://factorcode.org/license.txt for BSD license.
+USING: accessors alien.c-types classes.struct kernel
 tools.memory system vm ;
 IN: tools.time.struct
 
@@ -15,14 +15,14 @@ STRUCT: benchmark-data-pair
     { stop benchmark-data } ;
 
 : <benchmark-data> ( -- benchmark-data )
-    \ benchmark-data <struct>
+    benchmark-data <struct>
         nano-count >>time
         data-room >>data-room
         code-room >>code-room
         callback-room >>callback-room ; inline
 
 : <benchmark-data-pair> ( start stop -- benchmark-data-pair )
-    \ benchmark-data-pair <struct>
+    benchmark-data-pair <struct>
         swap >>stop
         swap >>start ; inline
 

@@ -1,5 +1,5 @@
 USING: arrays kernel math math.combinatorics
-math.combinatorics.private tools.test sequences ;
+math.combinatorics.private tools.test sequences sets ;
 
 { 1 } [ -1 factorial ] unit-test ! required by other math.combinatorics words
 { 1 } [ 0 factorial ] unit-test
@@ -52,6 +52,8 @@ math.combinatorics.private tools.test sequences ;
 { "ABC" "ACB" "BAC" "BCA" "CAB" "CBA" "ABC" }
 [ "ABC" 6 [ dup dup clone-like next-permutation ] times ] unit-test
 
+{ { "AA" "AB" "AC" "BB" "BC" "CC" } } [ "ABC" 2 all-combinations-with-replacement ] unit-test
+
 { { 0 1 2 } } [ 0 3 5 combination-indices ] unit-test
 { { 2 3 4 } } [ 9 3 5 combination-indices ] unit-test
 
@@ -67,20 +69,20 @@ math.combinatorics.private tools.test sequences ;
 { { { } { 1 } { 2 } { 3 } { 1 2 } { 1 3 } { 2 3 } { 1 2 3 } } }
 [ { 1 2 3 } all-subsets ] unit-test
 
-{ { } } [ { 1 2 } 0 selections ] unit-test
+{ { } } [ { 1 2 } 0 all-selections ] unit-test
 
-{ { { 1 } { 2 } } } [ { 1 2 } 1 selections ] unit-test
-{ { { { 1 } } { 2 } } } [ { { 1 } 2 } 1 selections ] unit-test
+{ { { 1 } { 2 } } } [ { 1 2 } 1 all-selections ] unit-test
+{ { { { 1 } } { 2 } } } [ { { 1 } 2 } 1 all-selections ] unit-test
 
 { { { 1 1 } { 1 2 } { 2 1 } { 2 2 } } }
-[ { 1 2 } 2 selections ] unit-test
+[ { 1 2 } 2 all-selections ] unit-test
 
 { { { 1 1 1 } { 1 1 2 } { 1 2 1 } { 1 2 2 }
     { 2 1 1 } { 2 1 2 } { 2 2 1 } { 2 2 2 } } }
-[ { 1 2 } 3 selections ] unit-test
+[ { 1 2 } 3 all-selections ] unit-test
 
 { { "aa" "ab" "ac" "ba" "bb" "bc" "ca" "cb" "cc" } }
-[ "abc" 2 selections ] unit-test
+[ "abc" 2 all-selections ] unit-test
 
 { V{ { 1 2 } { 1 3 } } }
 [ { 1 2 3 } 2 [ { 1 } head? ] filter-combinations ] unit-test
@@ -99,6 +101,11 @@ math.combinatorics.private tools.test sequences ;
 
 { f } [ { 1 2 3 } [ last 4 = ] find-permutation ] unit-test
 { { 2 1 3 } } [ { 1 2 3 } [ first 2 = ] find-permutation ] unit-test
+
+{ t } [
+    { 1 1 1 1 1 1 1 1 2 }
+    [ all-permutations members ] [ all-unique-permutations ] bi =
+] unit-test
 
 { { { 0 1 2 } { 0 2 1 } { 1 0 2 } { 1 2 0 } { 2 0 1 } { 2 1 0 } } }
 [ 3 <iota> <permutations> >array ] unit-test

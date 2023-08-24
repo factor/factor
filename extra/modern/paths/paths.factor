@@ -1,8 +1,7 @@
 ! Copyright (C) 2015 Doug Coleman.
-! See http://factorcode.org/license.txt for BSD license.
-USING: accessors combinators.smart io.files kernel sequences
-splitting vocabs.files vocabs.hierarchy vocabs.loader
-vocabs.metadata sets ;
+! See https://factorcode.org/license.txt for BSD license.
+USING: accessors combinators.smart io.files sequences sets
+vocabs.files vocabs.hierarchy vocabs.loader ;
 IN: modern.paths
 
 ERROR: not-a-source-path path ;
@@ -12,7 +11,7 @@ ERROR: not-a-source-path path ;
     no-prefixes [ name>> ] map ;
 
 CONSTANT: core-broken-vocabs
-   {
+    {
         "vocabs.loader.test.a"
         "vocabs.loader.test.b"
         "vocabs.loader.test.c"
@@ -43,7 +42,7 @@ CONSTANT: core-broken-vocabs
         extra-vocabs
     ] { } append-outputs-as ;
 
-: filter-exists ( seq -- seq' ) [ exists? ] filter ;
+: filter-exists ( seq -- seq' ) [ file-exists? ] filter ;
 
 ! These paths have syntax errors on purpose...
 : reject-some-paths ( seq -- seq' )
@@ -89,7 +88,7 @@ CONSTANT: core-broken-vocabs
 
 
 : all-docs-paths ( -- seq ) all-vocabs modern-docs-paths ;
- : all-tests-paths ( -- seq ) all-vocabs modern-tests-paths ;
+: all-tests-paths ( -- seq ) all-vocabs modern-tests-paths ;
 
 : all-paths ( -- seq )
     [

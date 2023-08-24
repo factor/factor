@@ -1,5 +1,5 @@
 ! Copyright (C) 2017 Jon Harper.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: kernel kernel.private math math.functions
 math.functions.private math.private sequences.private ;
 IN: math.functions.integer-logs
@@ -73,13 +73,11 @@ M: bignum (integer-log10) bignum-integer-log10 ; inline
 
 PRIVATE>
 
-ERROR: log-expects-positive x ;
-
 <PRIVATE
 
 GENERIC: (integer-log2) ( x -- n ) foldable
 
-M: integer (integer-log2) ( x -- n ) (log2) ; inline
+M: integer (integer-log2) (log2) ; inline
 
 : ((ratio-integer-log)) ( ratio quot -- log )
     [ >integer ] dip call ; inline
@@ -92,17 +90,14 @@ M: integer (integer-log2) ( x -- n ) (log2) ; inline
         [ 1 + ] unless neg
     ] if ; inline
 
-M: ratio (integer-log2) ( r -- n ) [ (integer-log2) ] 2 (ratio-integer-log) ;
+M: ratio (integer-log2) [ (integer-log2) ] 2 (ratio-integer-log) ;
 
-M: ratio (integer-log10) ( r -- n )  [ (integer-log10) ] 10 (ratio-integer-log) ;
-
-: (integer-log) ( x quot -- n )
-    [ dup 0 > ] dip [ log-expects-positive ] if ; inline
+M: ratio (integer-log10) [ (integer-log10) ] 10 (ratio-integer-log) ;
 
 PRIVATE>
 
 : integer-log10 ( x -- n )
-    [ (integer-log10) ] (integer-log) ; inline
+    assert-positive (integer-log10) ; inline
 
 : integer-log2 ( x -- n )
-    [ (integer-log2) ] (integer-log) ; inline
+    assert-positive (integer-log2) ; inline

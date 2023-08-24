@@ -1,7 +1,7 @@
 ! Copyright (C) 2009 Doug Coleman.
-! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays assocs combinators.smart kernel locals
-math sequences stack-checker tools.test ;
+! See https://factorcode.org/license.txt for BSD license.
+USING: accessors arrays assocs combinators.smart kernel
+math random sequences stack-checker tools.test ;
 IN: combinators.smart.tests
 
 : test-bi ( -- 9 11 )
@@ -127,3 +127,5 @@ IN: combinators.smart.tests
 { { 1 2 3 4 } 5 6 } [ [ 1 2 3 4 5 6 ] 2 output>array-n ] unit-test
 { { } 5 6 } [ [ 5 6 ] 2 output>array-n ] unit-test
 { { 1 2 } 3 4 5 6 } [ [ 1 2 3 4 5 6 ] 4 output>array-n ] unit-test
+
+{ t } [ [ 10 random dup even? ] smart-loop odd? ] unit-test

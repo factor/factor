@@ -1,8 +1,9 @@
 ! Copyright (C) 2012 Doug Coleman.
-! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays assocs combinators.short-circuit fry
+! See https://factorcode.org/license.txt for BSD license.
+USING: accessors arrays assocs combinators.short-circuit
 grouping kernel math math.functions math.order math.vectors
-parser prettyprint.custom sequences sequences.deep ;
+parser prettyprint.custom sequences sequences.deep
+sequences.private ;
 IN: arrays.shaped
 
 : flat? ( array -- ? ) [ sequence? ] none? ; inline
@@ -80,6 +81,7 @@ M: sequence check-underlying-shape
 ERROR: shape-mismatch shaped0 shaped1 ;
 
 DEFER: >shaped-array
+DEFER: <shaped-array>
 
 : check-shape ( shaped-array shaped-array -- shaped-array shaped-array )
     [ >shaped-array ] bi@
@@ -91,6 +93,10 @@ TUPLE: row-array < shaped-array ;
 TUPLE: col-array < shaped-array ;
 
 M: shaped-array length underlying>> length ; inline
+
+M: shaped-array nth-unsafe underlying>> nth-unsafe ;
+
+M: shaped-array like shape>> <shaped-array> ;
 
 M: shaped-array shape shape>> ;
 
@@ -208,13 +214,19 @@ ERROR: shaped-bounds-error seq shape ;
 
 ! Inefficient
 : calculate-row-major-index ( seq shape -- i )
-    1 [ * ] accumulate nip reverse v. ;
+    1 [ * ] accumulate nip reverse vdot ;
 
 : calculate-column-major-index ( seq shape -- i )
-    1 [ * ] accumulate nip v. ;
+    1 [ * ] accumulate nip vdot ;
+
+: get-shaped-row-major ( seq shaped -- elt )
+    shaped-bounds-check [ shape calculate-row-major-index ] [ underlying>> ] bi nth ;
 
 : set-shaped-row-major ( obj seq shaped -- )
     shaped-bounds-check [ shape calculate-row-major-index ] [ underlying>> ] bi set-nth ;
+
+: get-shaped-column-major ( seq shaped -- elt )
+    shaped-bounds-check [ shape calculate-column-major-index ] [ underlying>> ] bi nth ;
 
 : set-shaped-column-major ( obj seq shaped -- )
     shaped-bounds-check [ shape calculate-column-major-index ] [ underlying>> ] bi set-nth ;

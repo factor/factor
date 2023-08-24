@@ -1,9 +1,10 @@
 ! Copyright (C) 2008, 2009 Doug Coleman, Daniel Ehrenberg.
-! See http://factorcode.org/license.txt for BSD license.
-USING: accessors combinators kernel kernel.private math sequences
-sequences.private strings sets assocs make lexer namespaces parser
-arrays fry locals regexp.parser splitting sorting regexp.ast
-regexp.negation regexp.compiler compiler.units words math.ranges ;
+! See https://factorcode.org/license.txt for BSD license.
+USING: accessors arrays classes compiler.units kernel
+kernel.private lexer make math ranges namespaces quotations
+regexp.ast regexp.compiler regexp.negation regexp.parser
+sequences sequences.private splitting strings vocabs.loader
+words ;
 IN: regexp
 
 TUPLE: regexp
@@ -16,20 +17,18 @@ TUPLE: reverse-regexp < regexp ;
 
 <PRIVATE
 
-M: lookahead question>quot ! Returns ( index string -- ? )
-    term>> ast>dfa dfa>shortest-word '[ f _ execute ] ;
+M: lookahead question>quot
+    ! Returns ( index string -- ? )
+    term>> ast>dfa dfa>shortest-word 1quotation [ f ] prepose ;
 
 : <reversed-option> ( ast -- reversed )
     "r" string>options <with-options> ;
 
-M: lookbehind question>quot ! Returns ( index string -- ? )
+M: lookbehind question>quot
+    ! Returns ( index string -- ? )
     term>> <reversed-option>
     ast>dfa dfa>reverse-shortest-word
-    '[ [ 1 - ] dip f _ execute ] ;
-
-: check-string ( string -- string )
-    ! Make this configurable
-    dup string? [ "String required" throw ] unless ;
+    1quotation [ [ 1 - ] dip f ] prepose ;
 
 : match-index-from ( i string regexp -- index/f )
     ! This word is unsafe. It assumes that i is a fixnum
@@ -43,7 +42,7 @@ M: reverse-regexp end/start drop length 1 - -1 swap ;
 PRIVATE>
 
 : matches? ( string regexp -- ? )
-    [ check-string ] dip
+    [ string check-instance ] dip
     [ end/start ] 2keep
     match-index-from
     [ = ] [ drop f ] if* ;
@@ -51,7 +50,7 @@ PRIVATE>
 <PRIVATE
 
 : search-range ( i string reverse? -- seq )
-    [ drop -1 ] [ length ] if [a,b] ; inline
+    [ drop -1 ] [ length ] if [a..b] ; inline
 
 :: (next-match) ( i string regexp quot: ( i string regexp -- j ) reverse? -- start end ? )
     i string regexp quot call dup
@@ -92,7 +91,7 @@ M: regexp match-iterator-start 2drop 0 ;
 M: reverse-regexp match-iterator-start drop length ;
 
 : prepare-match-iterator ( string regexp -- i string regexp )
-    [ check-string ] dip [ match-iterator-start ] 2keep ; inline
+    [ string check-instance ] dip [ match-iterator-start ] 2keep ; inline
 
 PRIVATE>
 
@@ -156,13 +155,13 @@ GENERIC: compile-regexp ( regex -- regexp )
 : regexp-initial-word ( i string regexp -- i/f )
     [ compile-regexp ] with-compilation-unit match-index-from ;
 
-M: regexp compile-regexp ( regexp -- regexp )
+M: regexp compile-regexp
     dup '[
         dup \ regexp-initial-word =
         [ drop _ get-ast ast>dfa dfa>word ] when
     ] change-dfa ;
 
-M: reverse-regexp compile-regexp ( regexp -- regexp )
+M: reverse-regexp compile-regexp
     t backwards? [ call-next-method ] with-variable ;
 
 DEFER: compile-next-match
@@ -200,10 +199,11 @@ PRIVATE>
 : take-until ( lexer -- string )
     dup skip-blank [
         dupd [
-            [ CHAR: / -rot index-from ] keep
-            over [ "Unterminated regexp" throw ] unless
-            2dup [ 1 - ] dip nth CHAR: \\ =
-            [ [ [ 1 + ] dip ] when ] keep
+            [ [ "\\/" member? ] find-from ] keep swap [
+                CHAR: \ = [ [ 2 + ] dip t ] [ f ] if
+            ] [
+                "Unterminated regexp" throw
+            ] if*
         ] loop over [ subseq ] dip 1 +
     ] change-lexer-column ;
 
@@ -218,6 +218,5 @@ PRIVATE>
 
 SYNTAX: R/ parse-regexp ;
 
-USE: vocabs.loader
 
 { "prettyprint" "regexp" } "regexp.prettyprint" require-when

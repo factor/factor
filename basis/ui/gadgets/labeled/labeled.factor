@@ -1,5 +1,5 @@
 ! Copyright (C) 2006, 2009 Slava Pestov, 2015 Nicolas Pénet.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors kernel system ui.gadgets ui.gadgets.borders
 ui.gadgets.labels ui.gadgets.packs ui.gadgets.tracks
 ui.pens.gradient ui.pens.solid ui.theme ;
@@ -11,16 +11,10 @@ TUPLE: labeled-gadget < track content ;
 
 M: labeled-gadget focusable-child* content>> ;
 
-! gradients don't work as backgrounds on windows, see #152 and #1397
-: title-bar-interior ( -- interior )
-    os windows?
-    [ toolbar-background <solid> ]
-    [ title-bar-gradient <gradient> ]
-    if ;
-
 : <title-bar> ( title -- title-bar )
     >label [ t >>bold? ] change-font
-    { 0 4 } <border> title-bar-interior >>interior ;
+    { 0 4 } <border>
+    title-bar-gradient <gradient> >>interior ;
 
 PRIVATE>
 

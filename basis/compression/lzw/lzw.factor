@@ -1,7 +1,7 @@
 ! Copyright (C) 2009 Doug Coleman.
-! See http://factorcode.org/license.txt for BSD license.
-USING: accessors combinators io kernel math math.order
-namespaces sequences vectors ;
+! See https://factorcode.org/license.txt for BSD license.
+USING: accessors combinators kernel math math.order
+sequences vectors ;
 QUALIFIED-WITH: bitstreams bs
 IN: compression.lzw
 

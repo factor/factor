@@ -1,6 +1,4 @@
-USING: generic help.markup help.syntax kernel kernel.private
-namespaces sequences words arrays help effects math
-layouts classes.private classes compiler.units ;
+USING: classes compiler.units help.markup help.syntax ;
 IN: classes.intersection
 
 ARTICLE: "intersections" "Intersection classes"
@@ -19,7 +17,7 @@ ARTICLE: "intersections" "Intersection classes"
 ABOUT: "intersections"
 
 HELP: define-intersection-class
-{ $values { "class" class } { "participants" "a sequence of classes" } }
+{ $values { "class" class } { "participants" { $sequence class } } }
 { $description "Defines a intersection class with specified participants. This is the run time equivalent of " { $link POSTPONE: INTERSECTION: } "." }
 { $notes "This word must be called from inside " { $link with-compilation-unit } "." }
 { $side-effects "class" } ;

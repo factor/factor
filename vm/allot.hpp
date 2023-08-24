@@ -20,9 +20,10 @@ inline code_block* factor_vm::allot_code_block(cell size,
 
     // Insufficient room even after code GC, give up
     if (block == NULL) {
-      std::cout << "Code heap used: " << code->allocator->occupied_space()
-                << "\n";
-      std::cout << "Code heap free: " << code->allocator->free_space << "\n";
+      std::cout << "Code heap used:               " << code->allocator->occupied_space() << "\n";
+      std::cout << "Code heap free:               " << code->allocator->free_space << "\n";
+      std::cout << "Code heap free_block_count:   " << code->allocator->free_block_count << "\n";
+      std::cout << "Code heap largest_free_block: " << code->allocator->largest_free_block() << "\n";
       std::cout << "Request       : " << block_size << "\n";
       fatal_error("Out of memory in allot_code_block", 0);
     }
@@ -63,18 +64,18 @@ inline object* factor_vm::allot_large_object(cell type, cell size) {
 inline object* factor_vm::allot_object(cell type, cell size) {
   FACTOR_ASSERT(!current_gc);
 
-  bump_allocator *nursery = data->nursery;
+  bump_allocator *data_nursery = data->nursery;
 
   // If the object is bigger than the nursery, allocate it in tenured space
-  if (size >= nursery->size)
+  if (size >= data_nursery->size)
     return allot_large_object(type, size);
 
   // If the object is smaller than the nursery, allocate it in the nursery,
   // after a GC if needed
-  if (nursery->here + size > nursery->end)
+  if (data_nursery->here + size > data_nursery->end)
     primitive_minor_gc();
 
-  object* obj = nursery->allot(size);
+  object* obj = data_nursery->allot(size);
   obj->initialize(type);
 
   return obj;

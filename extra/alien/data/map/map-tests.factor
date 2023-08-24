@@ -1,7 +1,7 @@
 ! Copyright (C) 2009, 2010 Joe Groff, Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
-USING: alien.data alien.data.map fry generalizations kernel locals math.vectors
-math.vectors.conversion math math.vectors.simd math.ranges sequences
+! See https://factorcode.org/license.txt for BSD license.
+USING: alien.data alien.data.map generalizations kernel math.vectors
+math.vectors.conversion math math.vectors.simd ranges sequences
 specialized-arrays tools.test ;
 FROM: alien.c-types => uchar short int float ;
 SPECIALIZED-ARRAYS: int float float-4 uchar-16 ;

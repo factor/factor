@@ -1,7 +1,7 @@
 ! Copyright (C) 2008 Doug Coleman.
-! See http://factorcode.org/license.txt for BSD license.
-USING: classes kernel help.markup help.syntax sequences
-alien assocs strings math quotations db.private ;
+! See https://factorcode.org/license.txt for BSD license.
+USING: alien assocs classes db.private help.markup help.syntax
+kernel math quotations sequences strings ;
 IN: db
 
 HELP: db-connection
@@ -39,8 +39,8 @@ HELP: result-set
 
 HELP: new-result-set
 { $values
-     { "query" "a query" } { "handle" alien } { "class" class }
-     { "result-set" result-set } }
+    { "query" "a query" } { "handle" alien } { "class" class }
+    { "result-set" result-set } }
 { $description "Creates a new " { $link result-set } " object of type " { $snippet "class" } "." } ;
 
 HELP: new-statement
@@ -49,12 +49,12 @@ HELP: new-statement
 
 HELP: bind-statement
 { $values
-     { "obj" object } { "statement" statement } }
+    { "obj" object } { "statement" statement } }
 { $description "Sets the statement's " { $slot "bind-params" } " and calls " { $link bind-statement* } " to do the database-specific bind. Sets " { $slot "bound?" } " to true if binding succeeds." } ;
 
 HELP: bind-statement*
 { $values
-     { "statement" statement } }
+    { "statement" statement } }
 { $description "Does a low-level bind of the SQL statement's tuple parameters if the database requires. Some databases should treat this as a no-op and bind instead when the actual statement is run." } ;
 
 HELP: <simple-statement>
@@ -74,7 +74,7 @@ HELP: prepare-statement
 
 HELP: low-level-bind
 { $values
-     { "statement" statement } }
+    { "statement" statement } }
 { $description "For use with prepared statements, methods on this word should bind the datatype in the SQL spec to its identifier in the SQL string. To name bound variables, SQLite uses identifiers in the form of " { $snippet ":name" } ", while PostgreSQL uses increasing numbers beginning with a dollar sign, e.g. " { $snippet "$1" } "." } ;
 
 HELP: query-results
@@ -123,18 +123,18 @@ HELP: in-transaction
 
 HELP: in-transaction?
 { $values
-     { "?" boolean } }
+    { "?" boolean } }
 { $description "Returns true if there is currently a transaction in progress in this scope." } ;
 
 HELP: query-each
 { $values
-     { "result-set" result-set } { "quot" quotation } }
+    { "result-set" result-set } { "quot" quotation } }
 { $description "Applies the quotation to each row of the " { $link result-set } " in order." } ;
 
 HELP: query-map
 { $values
-     { "result-set" result-set } { "quot" quotation }
-     { "seq" sequence } }
+    { "result-set" result-set } { "quot" quotation }
+    { "seq" sequence } }
 { $description "Applies the quotation to each row of the " { $link result-set } " in order." } ;
 
 HELP: rollback-transaction
@@ -142,48 +142,49 @@ HELP: rollback-transaction
 
 HELP: sql-command
 { $values
-     { "sql" string } }
+    { "sql" string } }
 { $description "Executes an SQL string using the database in the " { $link db-connection } " symbol." } ;
 
 HELP: sql-query
 { $values
-     { "sql" string }
-     { "rows" "an array of arrays of strings" } }
+    { "sql" string }
+    { "rows" "an array of arrays of strings" } }
 { $description "Runs an SQL query of raw text in the database in the " { $link db-connection } " symbol. Each row is returned as an array of strings; no type-conversions are done on the resulting data." } ;
 
 { sql-command sql-query } related-words
 
 HELP: sql-row
 { $values
-     { "result-set" result-set }
-     { "seq" sequence } }
+    { "result-set" result-set }
+    { "seq" sequence } }
 { $description "Returns the current row in a " { $link result-set } " as an array of strings." } ;
 
 HELP: sql-row-typed
 { $values
-     { "result-set" result-set }
-     { "seq" sequence } }
+    { "result-set" result-set }
+    { "seq" sequence } }
 { $description "Returns the current row in a " { $link result-set } " as an array of typed Factor objects." } ;
 
 { sql-row sql-row-typed } related-words
 
 HELP: with-db
 { $values
-     { "db" "a database configuration object" } { "quot" quotation } }
+    { "db" "a database configuration object" } { "quot" quotation } }
 { $description "Calls the quotation with a database bound to the " { $link db-connection } " symbol. See " { $link "db-custom-database-combinators" } " for help setting up database access." } ;
 
 HELP: with-transaction
 { $values
-     { "quot" quotation } }
+    { "quot" quotation } }
 { $description "Calls the quotation inside a database transaction and commits the result to the database after the quotation finishes. If the quotation throws an error, the transaction is aborted." } ;
 
 ARTICLE: "db" "Database library"
 "Accessing a database:"
 { $subsections "db-custom-database-combinators" }
 "Higher-level database help:"
-{ $vocab-subsection "Database types" "db.types" }
-{ $vocab-subsection "High-level tuple/database integration" "db.tuples" }
-$nl
+{ $vocab-subsections
+    { "Database types" "db.types" }
+    { "High-level tuple/database integration" "db.tuples" }
+}
 "Low-level database help:"
 { $subsections
     "db-protocol"
@@ -191,8 +192,10 @@ $nl
     "db-lowlevel-tutorial"
 }
 "Supported database backends:"
-{ $vocab-subsection "SQLite" "db.sqlite" }
-{ $vocab-subsection "PostgreSQL" "db.postgresql" } ;
+{ $vocab-subsections
+    { "SQLite" "db.sqlite" }
+    { "PostgreSQL" "db.postgresql" }
+} ;
 
 ARTICLE: "db-random-access-result-set" "Random access result sets"
 "Random-access result sets do not have to be traversed in order. For instance, PostgreSQL's result set object can be accessed as a matrix with i,j coordinates."

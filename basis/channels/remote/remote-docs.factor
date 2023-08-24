@@ -1,7 +1,6 @@
 ! Copyright (C) 2007 Chris Double.
-! See http://factorcode.org/license.txt for BSD license.
-USING: channels concurrency.distributed help.markup help.syntax
-io.servers strings ;
+! See https://factorcode.org/license.txt for BSD license.
+USING: channels help.markup help.syntax io.servers strings ;
 IN: channels.remote
 
 HELP: <remote-channel>

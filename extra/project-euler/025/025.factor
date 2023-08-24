@@ -1,10 +1,10 @@
 ! Copyright (c) 2008 Aaron Schaefer.
-! See http://factorcode.org/license.txt for BSD license.
-USING: kernel math math.constants math.functions math.parser memoize
-    project-euler.common sequences ;
+! See https://factorcode.org/license.txt for BSD license.
+USING: kernel math math.constants math.functions math.parser
+project-euler.common sequences ;
 IN: project-euler.025
 
-! http://projecteuler.net/index.php?section=problems&id=25
+! https://projecteuler.net/index.php?section=problems&id=25
 
 ! DESCRIPTION
 ! -----------

@@ -1,8 +1,8 @@
 ! Copyright (C) 2015 John Benediktsson
-! See http://factorcode.org/license.txt for BSD license
+! See https://factorcode.org/license.txt for BSD license
 
 USING: accessors command-line formatting io io.monitors
-io.pathnames kernel namespaces sequences ;
+kernel namespaces sequences ;
 
 IN: file-monitor
 

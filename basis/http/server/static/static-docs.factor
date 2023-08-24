@@ -1,6 +1,6 @@
 ! Copyright (C) 2008 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
-USING: help.markup help.syntax io.streams.string ;
+! See https://factorcode.org/license.txt for BSD license.
+USING: help.markup help.syntax ;
 IN: http.server.static
 
 HELP: <file-responder>
@@ -9,9 +9,9 @@ HELP: <file-responder>
 
 HELP: <static>
 { $values
-     { "root" "a pathname string" }
-     { "responder" file-responder } }
- { $description "Creates a file responder which serves content from " { $snippet "path" } "." } ;
+    { "root" "a pathname string" }
+    { "responder" file-responder } }
+{ $description "Creates a file responder which serves content from " { $snippet "path" } "." } ;
 
 HELP: enable-fhtml
 { $values { "responder" file-responder } }

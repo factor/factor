@@ -1,5 +1,5 @@
 ! Copyright (C) 2005, 2010 Eduardo Cavazos, Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors alien.data classes.struct fry kernel literals math
 math.vectors namespaces sequences x11 x11.X x11.events x11.glx
 x11.xlib ;
@@ -28,14 +28,14 @@ CONSTANT: event-mask
     }
 
 : window-attributes ( visinfo -- attributes )
-    XSetWindowAttributes <struct>
+    XSetWindowAttributes new
     0 >>background_pixel
     0 >>border_pixel
     event-mask >>event_mask
     swap create-colormap >>colormap ;
 
 : set-size-hints ( window -- )
-    XSizeHints <struct>
+    XSizeHints new
     USPosition >>flags
     [ dpy get ] 2dip XSetWMNormalHints ;
 

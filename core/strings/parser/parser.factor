@@ -1,8 +1,8 @@
 ! Copyright (C) 2008, 2009 Slava Pestov, Doug Coleman.
-! See http://factorcode.org/license.txt for BSD license.
-USING: accessors assocs combinators continuations kernel
-kernel.private lexer math math.parser namespaces sbufs sequences
-splitting strings ;
+! See https://factorcode.org/license.txt for BSD license.
+USING: accessors assocs combinators kernel kernel.private lexer
+math math.order math.parser namespaces sbufs sequences splitting
+strings ;
 IN: strings.parser
 
 ERROR: bad-escape char ;
@@ -30,8 +30,16 @@ name>char-hook [
     [ "Unicode support not available" throw ]
 ] initialize
 
+<PRIVATE
+
 : hex-escape ( str -- ch str' )
     2 cut-slice [ hex> ] dip ;
+
+: oct-escape ( str -- ch/f str' )
+    dup 3 index-or-length head-slice [
+        [ CHAR: 0 CHAR: 7 between? not ] find drop
+    ] keep '[ _ length ] unless* [ f ] when-zero
+    [ cut-slice [ oct> ] dip ] [ f swap ] if* ;
 
 : unicode-escape ( str -- ch str' )
     "{" ?head-slice [
@@ -47,19 +55,20 @@ name>char-hook [
     ] if ;
 
 : next-escape ( str -- ch str' )
-    unclip-slice {
-        { CHAR: u [ unicode-escape ] }
-        { CHAR: x [ hex-escape ] }
-        [ escape swap ]
-    } case ;
-
-<PRIVATE
+    oct-escape over [
+        nip unclip-slice {
+            { CHAR: u [ unicode-escape ] }
+            { CHAR: x [ hex-escape ] }
+            { CHAR: \n [ f swap ] }
+            [ escape swap ]
+        } case
+    ] unless ;
 
 : (unescape-string) ( accum str i/f -- accum )
     { sbuf object object } declare
     [
         cut-slice [ append! ] dip
-        rest-slice next-escape [ suffix! ] dip
+        rest-slice next-escape [ [ suffix! ] when* ] dip
         CHAR: \\ over index (unescape-string)
     ] [
         append!
@@ -106,21 +115,26 @@ PRIVATE>
 : find-next-token ( lexer -- i elt )
     { lexer } declare
     [ column>> ] [ line-text>> ] bi
-    [ "\"\\" member? ] find-from ;
+    [ "\"\\" member-eq? ] find-from ;
+
+: check-space ( lexer -- )
+    dup current-char forbid-tab {
+        { CHAR: \s [ advance-char ] }
+        { f [ drop ] }
+        [ "[space]" swap 1string "'" 1surround unexpected ]
+    } case ;
 
 DEFER: (parse-string)
 
 : parse-found-token ( accum lexer i elt -- )
     { sbuf lexer fixnum fixnum } declare
     [ over lexer-subseq pick push-all ] dip
-    CHAR: \ = [
+    CHAR: \ eq? [
         dup dup [ next-char ] bi@
         [ [ pick push ] bi@ ]
         [ drop 2dup next-line% ] if*
         (parse-string)
-    ] [
-        advance-char drop
-    ] if ;
+    ] [ dup advance-char check-space drop ] if ;
 
 : (parse-string) ( accum lexer -- )
     { sbuf lexer } declare
@@ -133,21 +147,12 @@ DEFER: (parse-string)
             (parse-string)
         ] if*
     ] [
-        "Unterminated string" throw
+        "'\"'" "[eof]" unexpected
     ] if ;
-
-: rewind-lexer-on-error ( quot -- )
-    lexer get [ line>> ] [ line-text>> ] [ column>> ] tri
-    [
-        lexer get [ column<< ] [ line-text<< ] [ line<< ] tri
-        rethrow
-    ] 3curry recover ; inline
 
 PRIVATE>
 
 : parse-string ( -- str )
-    [
-        SBUF" " clone [
-            lexer get (parse-string)
-        ] keep unescape-string
-    ] rewind-lexer-on-error ;
+    SBUF" " clone [
+        lexer get (parse-string)
+    ] keep unescape-string ;

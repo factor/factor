@@ -1,5 +1,5 @@
 ! Copyright (C) 2010 Joe Groff.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors alien alien.c-types alien.libraries alien.syntax
 classes.struct combinators kernel system ;
 IN: cuda.ffi
@@ -7,7 +7,7 @@ IN: cuda.ffi
 <<
 "cuda" {
     { [ os windows? ] [ "nvcuda.dll" stdcall ] }
-    { [ os macosx? ] [ "/usr/local/cuda/lib/libcuda.dylib" cdecl ] }
+    { [ os macosx? ] [ "libcuda.dylib" cdecl ] }
     { [ os unix? ] [ "libcuda.so" cdecl ] }
 } cond add-library
 >>
@@ -309,7 +309,7 @@ FUNCTION: CUresult cuDeviceGetCount ( int* count )
 FUNCTION: CUresult cuDeviceGetName ( char* name, int len, CUdevice dev )
 FUNCTION: CUresult cuDeviceComputeCapability ( int* major, int* minor, CUdevice dev )
 FUNCTION: CUresult cuDeviceTotalMem ( uint* bytes, CUdevice dev )
-FUNCTION: CUresult cuDeviceTotalMem_v2 ( ulonglong* bytes, CUdevice dev )
+FUNCTION: CUresult cuDeviceTotalMem_v2 ( size_t* bytes, CUdevice dev )
 FUNCTION: CUresult cuDeviceGetProperties ( CUdevprop* prop, CUdevice dev )
 FUNCTION: CUresult cuDeviceGetAttribute ( int* pi, CUdevice_attribute attrib, CUdevice dev )
 
@@ -331,7 +331,7 @@ FUNCTION: CUresult cuModuleGetFunction ( CUfunction* hfunc, CUmodule hmod, c-str
 FUNCTION: CUresult cuModuleGetGlobal ( CUdeviceptr* dptr, uint* bytes, CUmodule hmod, char* name )
 FUNCTION: CUresult cuModuleGetTexRef ( CUtexref* pTexRef, CUmodule hmod, char* name )
 
-FUNCTION: CUresult cuMemGetInfo ( uint* free, uint* total )
+FUNCTION: CUresult cuMemGetInfo ( size_t* free, size_t* total )
 
 FUNCTION: CUresult cuMemAlloc ( CUdeviceptr* dptr, uint bytesize )
 FUNCTION: CUresult cuMemAllocPitch ( CUdeviceptr* dptr,

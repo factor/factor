@@ -1,10 +1,9 @@
 ! Copyright (c) 2012 Anonymous
-! See http://factorcode.org/license.txt for BSD license.
-USING: arrays kernel locals math math.parser math.ranges
-prettyprint sequences ;
+! See https://factorcode.org/license.txt for BSD license.
+USING: arrays kernel math math.parser prettyprint ranges sequences ;
 IN: rosetta-code.gray-code
 
-! http://rosettacode.org/wiki/Gray_code
+! https://rosettacode.org/wiki/Gray_code
 
 ! Gray code is a form of binary encoding where transitions
 ! between consecutive numbers differ by only one bit. This is a
@@ -44,7 +43,7 @@ IN: rosetta-code.gray-code
     p ;
 
 : gray-code-main ( -- )
-    -1 32 [a,b] [
+    -1 32 [a..b] [
         dup [ >bin ] [ gray-encode ] bi
         [ >bin ] [ gray-decode ] bi 4array .
     ] each ;

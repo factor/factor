@@ -1,9 +1,11 @@
 ! Copyright (C) 2009, 2010 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
-USING: accessors alien.c-types arrays assocs classes classes.algebra
-classes.algebra.private classes.maybe classes.tuple
-combinators.short-circuit fry generic kernel math namespaces sequences
-sets words ;
+! See https://factorcode.org/license.txt for BSD license.
+
+USING: accessors alien.c-types arrays assocs classes
+classes.algebra classes.algebra.private classes.maybe
+classes.tuple combinators.short-circuit fry generic kernel math
+namespaces sequences sets words ;
+
 FROM: classes.tuple.private => tuple-layout ;
 IN: stack-checker.dependencies
 
@@ -22,9 +24,9 @@ SYMBOLS: +effect+ +conditional+ +definition+ ;
 
 : depends-on ( word how -- )
     over primitive? [ 2drop ] [
-        dependencies get dup [
+        dependencies get [
             swap '[ _ strongest-dependency ] change-at
-        ] [ 3drop ] if
+        ] [ 2drop ] if*
     ] if ;
 
 GENERIC: add-depends-on-class ( classoid -- )
@@ -40,6 +42,9 @@ M: anonymous-union add-depends-on-class
 
 M: anonymous-intersection add-depends-on-class
     participants>> [ add-depends-on-class ] each ;
+
+M: anonymous-complement add-depends-on-class
+    class>> add-depends-on-class ;
 
 GENERIC: add-depends-on-c-type ( c-type -- )
 
@@ -125,6 +130,17 @@ TUPLE: depends-on-tuple-layout class layout ;
 
 M: depends-on-tuple-layout satisfied?
     [ class>> tuple-layout ] [ layout>> ] bi eq? ;
+
+TUPLE: depends-on-struct-slots class slots ;
+
+: add-depends-on-struct-slots ( class slots -- )
+    [ drop +conditional+ depends-on ]
+    [ depends-on-struct-slots add-conditional-dependency ] 2bi ;
+
+SLOT: fields
+
+M: depends-on-struct-slots satisfied?
+    [ class>> "c-type" word-prop fields>> ] [ slots>> ] bi eq? ;
 
 TUPLE: depends-on-flushable word ;
 

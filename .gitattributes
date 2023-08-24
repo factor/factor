@@ -1,1 +1,12 @@
-.cvskeywords binary
+*.factor text eol=lf
+*.html text eol=lf
+*.el text eol=lf
+*.cpp text eol=lf
+*.hpp text eol=lf
+*.c text eol=lf
+*.h text eol=lf
+*.md text eol=lf
+shell.nix text eol=lf
+.gitattributes text eol=lf
+LICENSE.txt text eol=lf
+misc/vim/*/*/generated.vim linguist-generated

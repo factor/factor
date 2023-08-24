@@ -59,7 +59,7 @@ void profiling_sample::clear_counts() volatile {
   atomic::fence();
 }
 
-// Allocates memory (sample_callstacks2->add)
+// Allocates memory
 void factor_vm::record_sample(bool prolog_p) {
   profiling_sample result = current_sample.record_counts();
   if (result.empty()) {
@@ -92,14 +92,16 @@ void factor_vm::record_sample(bool prolog_p) {
   samples.push_back(result);
 }
 
-void factor_vm::set_sampling_profiler(fixnum rate) {
-  bool running_p = (atomic::load(&sampling_profiler_p) != 0);
+// Allocates memory
+void factor_vm::set_profiling(fixnum rate) {
+  bool running_p = atomic::load(&sampling_profiler_p);
   if (rate > 0 && !running_p)
     start_sampling_profiler(rate);
   else if (rate == 0 && running_p)
     end_sampling_profiler();
 }
 
+// Allocates memory
 void factor_vm::start_sampling_profiler(fixnum rate) {
   special_objects[OBJ_SAMPLE_CALLSTACKS] = tag<array>(allot_growarr());
   samples_per_second = rate;
@@ -118,8 +120,9 @@ void factor_vm::end_sampling_profiler() {
   record_sample(false);
 }
 
-void factor_vm::primitive_sampling_profiler() {
-  set_sampling_profiler(to_fixnum(ctx->pop()));
+// Allocates memory
+void factor_vm::primitive_set_profiling() {
+  set_profiling(to_fixnum(ctx->pop()));
 }
 
 // Allocates memory

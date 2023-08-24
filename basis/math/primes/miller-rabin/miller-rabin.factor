@@ -1,6 +1,6 @@
 ! Copyright (c) 2008-2009 Doug Coleman.
-! See http://factorcode.org/license.txt for BSD license.
-USING: combinators kernel locals math math.functions math.ranges
+! See https://factorcode.org/license.txt for BSD license.
+USING: combinators kernel math math.functions ranges
 random sequences ;
 IN: math.primes.miller-rabin
 
@@ -12,7 +12,7 @@ IN: math.primes.miller-rabin
     0 :> a!
     trials <iota> [
         drop
-        2 n 2 - [a,b] random a!
+        2 n 2 - [a..b] random a!
         a s n ^mod 1 = [
             f
         ] [

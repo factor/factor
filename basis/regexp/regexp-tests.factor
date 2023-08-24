@@ -49,6 +49,9 @@ IN: regexp.tests
 { t } [ "a" ".+" <regexp> matches? ] unit-test
 { t } [ "ab" ".+" <regexp> matches? ] unit-test
 
+{ t } [ "\0" "[\\0]" <regexp> matches? ] unit-test
+{ f } [ "0" "[\\0]" <regexp> matches? ] unit-test
+
 { t } [ " " "[\\s]" <regexp> matches? ] unit-test
 { f } [ "a" "[\\s]" <regexp> matches? ] unit-test
 { f } [ " " "[\\S]" <regexp> matches? ] unit-test
@@ -335,6 +338,10 @@ unit-test
 { "XhXXlXlXoX XwXoXrXlXdX" } [ "hello world" R/ e*/ "X" re-replace ] unit-test
 { "-- title --" } [ "== title ==" R/ =/ "-" re-replace ] unit-test
 
+{ "abc" } [ "a/   \\bc" "/.*\\" <regexp> "" re-replace ] unit-test
+{ "ac" } [ "a/   \\bc" R/ \/.*\\./ "" re-replace ] unit-test
+{ "abc" } [ "a/   \\bc" R/ \/.*\\/ "" re-replace ] unit-test
+
 { "" } [ "ab" "a(?!b)" <regexp> first-match >string ] unit-test
 { "a" } [ "ac" "a(?!b)" <regexp> first-match >string ] unit-test
 { t } [ "fxxbar" ".{3}(?!foo)bar" <regexp> matches? ] unit-test
@@ -505,6 +512,9 @@ unit-test
 { t } [ "abcdefg" "a(?:bcdefg)" <regexp> matches? ] unit-test
 
 { 3 } [ "caba" "(?<=b)a" <regexp> first-match from>> ] unit-test
+
+{ "<" } [ "<style>" R/ <(?=STYLE\b)/i first-match >string ] unit-test
+{ "bar" } [ "foobar" R/ (?<=FOO)BAR/i first-match >string ] unit-test
 
 { t } [ "\ra" R/ .^a/ms matches? ] unit-test
 { f } [ "\ra" R/ .^a/mds matches? ] unit-test

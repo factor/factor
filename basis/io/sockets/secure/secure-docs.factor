@@ -4,6 +4,10 @@ IN: io.sockets.secure
 HELP: secure-socket-timeout
 { $var-description "Timeout for operations not associated with a constructed port instance, such as SSL handshake and shutdown. Represented as a " { $link duration } "." } ;
 
+HELP: TLS
+{ $description "Possible value for the " { $snippet "method" } " slot of a " { $link secure-config } "."
+$nl
+"TLS uses the newest protocol (TLSv1.3 as of 4/20/2023) for secure socket communications." } ;
 
 HELP: TLSv1
 { $description "Possible value for the " { $snippet "method" } " slot of a " { $link secure-config } "."
@@ -18,16 +22,17 @@ $nl
 HELP: TLSv1.2
 { $description "Possible value for the " { $snippet "method" } " slot of a " { $link secure-config } "."
 $nl
-"TLSv1.2 is the newest protocol for secure socket communications." } ;
+"TLSv1.2 is an older protocol for secure socket communications." } ;
 
 ARTICLE: "ssl-methods" "SSL/TLS methods"
 "The " { $snippet "method" } " slot of a " { $link secure-config } " can be set to one of the following values:"
 { $subsections
+    TLS
     TLSv1
     TLSv1.1
     TLSv1.2
 }
-"The default value is " { $link TLSv1.2 } "." ;
+"The default value is " { $link TLS } "." ;
 
 HELP: secure-config
 { $class-description "Instances represent secure socket configurations." } ;
@@ -115,7 +120,7 @@ $nl
 "Upgrading a connection to a secure socket by waiting for an SSL/TLS handshake from the client:"
 { $subsections accept-secure-handshake } ;
 
-HELP: premature-close
+HELP: premature-close-error
 { $error-description "Thrown if an SSL connection is closed without the proper " { $snippet "close_notify" } " sequence." } ;
 
 HELP: certificate-verify-error
@@ -137,7 +142,7 @@ HELP: no-tls-supported
 ARTICLE: "ssl-errors" "Secure socket errors"
 "Secure sockets can throw one of several errors in addition to the usual I/O errors:"
 { $subsections
-    premature-close
+    premature-close-error
     certificate-verify-error
     subject-name-verify-error
 }

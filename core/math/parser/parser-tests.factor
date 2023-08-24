@@ -198,16 +198,20 @@ unit-test
 [ 2+1/2 -1 >base ] [ invalid-radix? ] must-fail-with
 [ 123.456 7 >base ] [ invalid-radix? ] must-fail-with
 
-{ "0/0." } [ 0.0 0.0 / number>string ] unit-test
+{  "0/0." } [  0/0. number>string ] unit-test
+{ "-0/0." } [ -0/0. number>string ] unit-test
 
-{ "1/0." } [ 1.0 0.0 / number>string ] unit-test
+{ t } [  "0/0." string>number fp-nan? ] unit-test
+{ t } [ "-0/0." string>number fp-nan? ] unit-test
 
-{ "-1/0." } [ -1.0 0.0 / number>string ] unit-test
+{ f } [  "0/0." string>number fp-sign ] unit-test
+{ t } [ "-0/0." string>number fp-sign ] unit-test
 
-{ t } [ "0/0." string>number fp-nan? ] unit-test
 
+{ "1/0." } [ 1/0. number>string ] unit-test
 { 1/0. } [ "1/0." string>number ] unit-test
 
+{ "-1/0." } [ -1/0. number>string ] unit-test
 { -1/0. } [ "-1/0." string>number ] unit-test
 
 { -0.5 } [ "-1/2." string>number ] unit-test
@@ -354,6 +358,11 @@ unit-test
 { f } [ "0x1," string>number ] unit-test
 { f } [ "0b1," string>number ] unit-test
 { f } [ "0o1," string>number ] unit-test
+
+{ f } [ "1_" string>number ] unit-test
+{ 12 } [ "1_2" string>number ] unit-test
+{ f } [ "1_2_" string>number ] unit-test
+{ 123 } [ "1_2_3" string>number ] unit-test
 
 ! #372
 ! hex float requires exponent

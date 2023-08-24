@@ -1,10 +1,10 @@
 ! Copyright (C) 2011 John Benediktsson
-! See http://factorcode.org/license.txt for BSD license
+! See https://factorcode.org/license.txt for BSD license
 
-USING: accessors arrays assocs colors.hex combinators formatting
+USING: accessors arrays assocs combinators formatting
 http.client images.http images.loader images.loader.private
-images.viewer kernel math math.order present sequences splitting
-urls ;
+images.viewer kernel math math.functions math.order present
+sequences splitting urls ;
 
 IN: google.charts
 
@@ -70,8 +70,12 @@ PRIVATE>
 
 <PRIVATE
 
+: rgba>hex ( rgba -- hex )
+    [ red>> ] [ green>> ] [ blue>> ] tri
+    [ 255 * round >integer ] tri@ "%02X%02X%02X" sprintf ;
+
 : chart>url ( chart -- url )
-    [ URL" http://chart.googleapis.com/chart" clone ] dip {
+    [ URL" https://chart.googleapis.com/chart" clone ] dip {
         [ type>> "cht" set-query-param ]
         [
             [ width>> ] [ height>> ] bi 2dup and [

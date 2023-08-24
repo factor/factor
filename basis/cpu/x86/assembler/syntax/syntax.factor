@@ -1,5 +1,5 @@
 ! Copyright (C) 2008, 2010 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: kernel words words.symbol sequences lexer parser fry
 namespaces combinators assocs math ;
 IN: cpu.x86.assembler.syntax

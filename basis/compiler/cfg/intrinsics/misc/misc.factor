@@ -1,10 +1,10 @@
 ! Copyright (C) 2008, 2010 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors classes.algebra classes.struct
-compiler.cfg.builder.blocks compiler.cfg.comparisons compiler.cfg.hats
-compiler.cfg.instructions compiler.cfg.stacks compiler.constants
-compiler.tree.propagation.info cpu.architecture kernel layouts math
-namespaces sequences vm ;
+compiler.cfg.builder.blocks compiler.cfg.comparisons
+compiler.cfg.hats compiler.cfg.instructions compiler.cfg.stacks
+compiler.constants compiler.tree.propagation.info
+cpu.architecture kernel layouts math namespaces sequences vm ;
 IN: compiler.cfg.intrinsics.misc
 
 : emit-tag ( -- )
@@ -15,14 +15,16 @@ IN: compiler.cfg.intrinsics.misc
     [ [ cc= ^^compare-integer ] binary-op ] [ [ cc= ^^compare ] binary-op ] if ;
 
 : emit-special-object ( block node -- block' )
-    dup node-input-infos first literal>> [
+    [ node-input-infos first literal>> ]
+    [
         ds-drop
         vm-special-object-offset ^^vm-field
         ds-push
     ] [ emit-primitive ] ?if ;
 
 : emit-set-special-object ( block node -- block' )
-    dup node-input-infos second literal>> [
+    [ node-input-infos second literal>> ]
+    [
         ds-drop
         [ ds-pop ] dip vm-special-object-offset ##set-vm-field,
     ] [ emit-primitive ] ?if ;
@@ -31,7 +33,7 @@ IN: compiler.cfg.intrinsics.misc
     cells "context-objects" context offset-of + ;
 
 : emit-context-object ( block node -- block' )
-    dup node-input-infos first literal>> [
+    [ node-input-infos first literal>> ] [
         "ctx" vm offset-of ^^vm-field
         ds-drop swap context-object-offset cell /i 0 ^^slot-imm ds-push
     ] [ emit-primitive ] ?if ;

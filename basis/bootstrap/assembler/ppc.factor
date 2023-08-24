@@ -1,12 +1,12 @@
 ! Copyright (C) 2011 Erik Charlebois
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: bootstrap.image.private kernel kernel.private namespaces
 system cpu.ppc.assembler compiler.units compiler.constants math
-math.private math.ranges layouts words vocabs slots.private
-locals locals.backend generic.single.private fry sequences
+math.private ranges layouts words vocabs slots.private
+locals locals.backend generic.single.private sequences
 threads.private strings.private ;
 FROM: cpu.ppc.assembler => B ;
-IN: bootstrap.ppc
+IN: bootstrap.assembler.ppc
 
 : jit-call ( string -- )
     dup
@@ -40,8 +40,8 @@ IN: bootstrap.ppc
 : restore-vec ( reg offt -- ) save-at 11 swap LI 11 1 LVXL ;
 
 ! Stop using intervals here.
-: nv-fp-regs  ( -- seq ) 14 31 [a,b] ;
-: nv-vec-regs ( -- seq ) 20 31 [a,b] ;
+: nv-fp-regs  ( -- seq ) 14 31 [a..b] ;
+: nv-vec-regs ( -- seq ) 20 31 [a..b] ;
 
 : saved-fp-regs-size  ( -- n ) 144 ;
 : saved-vec-regs-size ( -- n ) 192 ;
@@ -815,4 +815,4 @@ IN: bootstrap.ppc
     ] }
 } define-sub-primitives
 
-[ "bootstrap.ppc" forget-vocab ] with-compilation-unit
+[ "bootstrap.assembler.ppc" forget-vocab ] with-compilation-unit

@@ -1,7 +1,7 @@
-USING: arrays help.markup help.syntax strings sbufs vectors
-kernel quotations generic generic.standard classes
-math assocs sequences sequences.private combinators.private
-effects words ;
+USING: arrays assocs combinators.private effects
+generic.standard help.markup help.syntax kernel quotations
+generalizations
+sequences sequences.private words ;
 IN: combinators
 
 ARTICLE: "cleave-combinators" "Cleave combinators"
@@ -89,6 +89,7 @@ ARTICLE: "compositional-examples" "Examples of compositional combinator usage"
 { $code ": subtract-n ( seq n -- seq' ) swap [ over - ] map nip ;" }
 "Three shuffle words are required to pass the value around. Instead, the loop-invariant value can be partially applied to a quotation using " { $link curry } ", yielding a new quotation that is passed to " { $link map } ":"
 { $example
+  "USING: sequences prettyprint ;"
   ": subtract-n ( seq n -- seq' ) [ - ] curry map ;"
   "{ 10 20 30 } 5 subtract-n ."
   "{ 5 15 25 }"
@@ -169,7 +170,7 @@ ARTICLE: "conditionals" "Conditional combinators"
 "Forms abstracting a common stack shuffle pattern:"
 { $subsections if* when* unless* }
 "Another form abstracting a common stack shuffle pattern:"
-{ $subsections ?if }
+{ $subsections ?if ?when ?unless }
 "Sometimes instead of branching, you just need to pick one of two values:"
 { $subsections ? }
 "Two combinators which abstract out nested chains of " { $link if } ":"
@@ -210,6 +211,22 @@ $nl
 { $subsections "call-unsafe" }
 { $see-also "effects" "inference" } ;
 
+ARTICLE: "combinators-connection" "Combinator Connections" 
+"Factor provides several convenient implementations of combinators, specifically for simpler " 
+"cases with few stack arguments. This page will document combinators that are "
+"similar in application, but may be different in effect."
+{ $list
+  { { $link map } " generalizes " { $link call } " over " { $link sequence } "s of objects." }
+  { { $link napply } " generalizes " { $link bi@ } " and " { $link tri@ }
+    " for a number of objects on the stack." }
+  { { $link cleave } " generalizes " { $link bi } " and " { $link tri }
+    " for equal numbers of quotations and objects on the stack." }
+  { { $link spread } " generalizes " { $link  bi* } " and "  { $link tri* } " "
+    "for performing a set of operations that ignore the top n values of the stack, keeping "
+    "them as is." }  
+}
+;
+
 ARTICLE: "combinators" "Combinators"
 "A central concept in Factor is that of a " { $emphasis "combinator" } ", which is a word taking code as input."
 { $subsections
@@ -222,6 +239,7 @@ ARTICLE: "combinators" "Combinators"
     "combinators.smart"
     "combinators-quot"
     "generalizations"
+    "combinators-connection"
 }
 "More combinators are defined for working on data structures, such as " { $link "sequences-combinators" } " and " { $link "assocs-combinators" } "."
 { $see-also "quotations" } ;
@@ -347,7 +365,9 @@ HELP: case
 { $description
     "Compares " { $snippet "obj" } " against the first element of every " { $link pair } ", evaluating the first element if it is a " { $link callable } ". If a pair matches, " { $snippet "obj" } " is removed from the stack and the second element of that pair (which must be a " { $link quotation } ") is " { $link call } "ed."
     $nl
-    "If there is no case matching " { $snippet "obj" } ", the default case is taken. If the last element of " { $snippet "assoc" } " is a quotation, the quotation is called with " { $snippet "obj" } " on the stack. Otherwise, a " { $link no-case } " error is raised."
+    "If the last element of the " { $snippet assoc } " is a quotation, that quotation is the default case. The default case is called with the " { $snippet "obj" } " on the stack, if there is no other case matching " { $snippet obj } "."
+    $nl
+    "If all the cases have failed and there is no default case to execute, a " { $link no-case } " error is raised."
     $nl
     "The following two phrases are equivalent:"
     { $code "{ { X [ Y ] } { Z [ T ] } } case" }
@@ -372,10 +392,6 @@ HELP: case
 HELP: no-case
 { $description "Throws a " { $link no-case } " error." }
 { $error-description "Thrown by " { $link case } " if the object at the top of the stack does not match any case, and no default case is given." } ;
-
-HELP: recursive-hashcode
-{ $values { "n" integer } { "obj" object } { "quot" { $quotation ( n obj -- code ) } } { "code" integer } }
-{ $description "A combinator used to implement methods for the " { $link hashcode* } " generic word. If " { $snippet "n" } " is less than or equal to zero, outputs 0, otherwise calls the quotation." } ;
 
 HELP: deep-spread>quot
 { $values { "seq" sequence } { "quot" quotation } }

@@ -1,25 +1,25 @@
 ! Copyright (C) 2010 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors combinators kernel furnace.actions html.forms
 sequences sorting xml.syntax webapps.mason.backend
 webapps.mason.utils ;
 IN: webapps.mason.downloads
 
-CONSTANT: CRASHED
-[XML <span style="background-color: yellow;">CRASHED</span> XML]
+CONSTANT: OFFLINE
+[XML <span style="background-color: khaki;">OFFLINE</span> XML]
 
 CONSTANT: BROKEN
 [XML <span style="background-color: red; color: white;">BROKEN</span> XML]
 
 : builder-status ( builder -- status/f )
     {
-        { [ dup crashed? ] [ drop CRASHED ] }
+        { [ dup offline? ] [ drop OFFLINE ] }
         { [ dup broken? ] [ drop BROKEN ] }
         [ drop f ]
     } cond ;
 
 : builder-list ( seq -- xml )
-    [ os/cpu ] sort-with
+    [ os/cpu ] sort-by
     [
         [ report-url ] [ os/cpu ] [ builder-status ] tri
         [XML <li><a href=<->><-></a> <-></li> XML]

@@ -1,7 +1,6 @@
 ! Copyright (C) 2009 Joe Groff.
-! See http://factorcode.org/license.txt for BSD license.
-USING: accessors assocs kernel locals sequences ui
-ui.gadgets ui.gadgets.worlds ;
+! See https://factorcode.org/license.txt for BSD license.
+USING: accessors assocs kernel sequences ui ui.gadgets ui.gadgets.worlds ;
 IN: window-controls-demo
 
 CONSTANT: window-control-sets-to-test

@@ -1,6 +1,6 @@
 ! Copyright (C) 2009 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
-USING: accessors alien.c-types colors.constants kernel
+! See https://factorcode.org/license.txt for BSD license.
+USING: accessors alien.c-types colors kernel
 specialized-arrays tools.test ui.gadgets.labels
 ui.pens.caching ui.pens.gradient ;
 

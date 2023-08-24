@@ -1,4 +1,4 @@
-USING: help.markup help.syntax kernel words ;
+USING: help.markup help.syntax ;
 IN: classes.singleton
 
 ARTICLE: "singletons" "Singleton classes"

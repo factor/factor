@@ -1,10 +1,10 @@
 ! Copyright (C) 2007, 2008, Slava Pestov, Elie CHAFTARI.
-! See http://factorcode.org/license.txt for BSD license.
-USING: alien.libraries init kernel math namespaces openssl.libcrypto
+! See https://factorcode.org/license.txt for BSD license.
+USING: alien.libraries kernel math namespaces openssl.libcrypto
 openssl.libssl sequences ;
 IN: openssl
 
-! This code is based on http://www.rtfm.com/openssl-examples/
+! This code is based on https://www.rtfm.com/openssl-examples/
 
 SYMBOLS: ssl-initialized? ssl-new-api? ;
 
@@ -16,11 +16,11 @@ SINGLETON: openssl
 : ssl-error-string ( -- string )
     ERR_get_error (ssl-error-string) ;
 
-: (ssl-error) ( -- * )
+: throw-ssl-error ( -- * )
     ssl-error-string throw ;
 
 : ssl-error ( obj -- )
-    { f 0 } member? [ (ssl-error) ] when ;
+    { f 0 } member? [ throw-ssl-error ] when ;
 
 : init-old-api ( -- )
     SSL_library_init ssl-error
@@ -45,4 +45,4 @@ SINGLETON: openssl
         t ssl-initialized? set-global
     ] unless ;
 
-[ f ssl-initialized? set-global ] "openssl" add-startup-hook
+STARTUP-HOOK: [ f ssl-initialized? set-global ]

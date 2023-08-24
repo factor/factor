@@ -1,5 +1,5 @@
 USING: accessors arrays assocs continuations http.client kernel
-literals math math.parser math.ranges pcre pcre.ffi pcre.private
+literals math math.parser ranges pcre pcre.ffi pcre.private
 random sequences system tools.test ;
 QUALIFIED: regexp
 QUALIFIED: splitting
@@ -90,12 +90,12 @@ os unix? [ [ 10 ] [ PCRE_CONFIG_NEWLINE pcre-config ] unit-test ] when
 ] unit-test
 
 : long-string ( -- x )
-    10000 [ CHAR: a CHAR: z [a,b] random ] "" replicate-as ;
+    10000 [ CHAR: a CHAR: z [a..b] random ] "" replicate-as ;
 
 ! Performance
 { 0 } [ long-string ".{0,15}foobar.{0,10}" findall length ] unit-test
 
-! Empty matches, corner case behaviour is copied from pcredemo.c
+! Empty matches, corner case behavior is copied from pcredemo.c
 { { { { f "foo" } } { { f "" } } } }
 [ "foo" ".*" findall ] unit-test
 
@@ -153,7 +153,7 @@ version 8.36 <= [
 
 ! Bigger tests
 { t } [
-    "http://factorcode.org/" http-get nip
+    "https://factorcode.org/" http-get nip
     "href=\"(?P<link>[^\"]+)\"" findall [ "link" of ] map sequence?
 ] unit-test
 

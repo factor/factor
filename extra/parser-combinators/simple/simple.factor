@@ -1,7 +1,6 @@
 ! Copyright (C) 2006 Chris Double.
-! See http://factorcode.org/license.txt for BSD license.
-USING: kernel strings math sequences lists.lazy words
-math.parser promises parser-combinators unicode ;
+! See https://factorcode.org/license.txt for BSD license.
+USING: kernel math.parser parser-combinators strings unicode ;
 IN: parser-combinators.simple
 
 : digit-parser ( -- parser )

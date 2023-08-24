@@ -11,15 +11,15 @@ HELP: stack-frame
     { "One final " { $link cell } " of padding." }
   }
   "The stack frame is also aligned to a 16 byte boundary. It has the following slots:"
-  { $table
-    { { $slot "total-size" } { "Total size of the stack frame." } }
-    { { $slot "params" } { "Reserved parameter space." } }
-    { { $slot "allot-area-base" } { "Base offset of the allocation area." } }
-    { { $slot "allot-area-size" } { "Number of bytes requires for the allocation area." } }
-    { { $slot "allot-area-align" } { "This slot is always at least " { $link cell } " bytes." } }
-    { { $slot "spill-area-base" } { "Base offset for the spill area." } }
-    { { $slot "spill-area-size" } { "Number of bytes requires for all spill slots." } }
-    { { $slot "spill-area-align" } { "This slot is always at least " { $link cell } " bytes." } }
+  { $slots
+    { "total-size" { "Total size of the stack frame." } }
+    { "params" { "Reserved parameter space." } }
+    { "allot-area-base" { "Base offset of the allocation area." } }
+    { "allot-area-size" { "Number of bytes requires for the allocation area." } }
+    { "allot-area-align" { "This slot is always at least " { $link cell } " bytes." } }
+    { "spill-area-base" { "Base offset for the spill area." } }
+    { "spill-area-size" { "Number of bytes requires for all spill slots." } }
+    { "spill-area-align" { "This slot is always at least " { $link cell } " bytes." } }
   }
 }
 { $see-also align-stack } ;

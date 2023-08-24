@@ -1,5 +1,5 @@
+USING: calendar help.markup help.syntax ;
 IN: logging.parser
-USING: help.markup help.syntax assocs logging math calendar ;
 
 HELP: parse-log
 { $values { "lines" "a sequence of strings" } { "entries" "a sequence of log entries" } }

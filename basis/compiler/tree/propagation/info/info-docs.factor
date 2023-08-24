@@ -28,17 +28,17 @@ HELP: value-info
 { $description "Gets the value info for the given SSA value. If none is found then a null empty interval is returned." } ;
 
 HELP: value-info<=
-{ $values { "info1" value-info } { "info2" value-info } { "?" boolean } }
+{ $values { "info1" value-info-state } { "info2" value-info-state } { "?" boolean } }
 { $description "Checks if the first value info is equal to, or smaller than the second one." } ;
 
 HELP: value-info-state
 { $class-description "Represents constraints the compiler knows about the input and output variables to an SSA tree node. It has the following slots:"
-  { $table
-    { { $slot "class" } { "Class of values the variable can take." } }
-    { { $slot "interval" } { "Range of values the variable can take." } }
-    { { $slot "literal" } { "Literal value, if present." } }
-    { { $slot "literal?" } { "Whether the value of the variable is known at compile-time or not." } }
-    { { $slot "slots" } { "If the value is a literal tuple or fixed length type, then slots is a " { $link sequence } " of " { $link value-info-state } " encoding what is known about its slots at compile-time." } }
+  { $slots
+    { "class" { "Class of values the variable can take." } }
+    { "interval" { "Range of values the variable can take." } }
+    { "literal" { "Literal value, if present." } }
+    { "literal?" { "Whether the value of the variable is known at compile-time or not." } }
+    { "slots" { "If the value is a literal tuple or fixed length type, then slots is a " { $link sequence } " of " { $link value-info-state } " encoding what is known about its slots at compile-time." } }
   }
   "Don't mutate value infos you receive, always construct new ones. We don't declare the slots read-only to allow cloning followed by writing, and to simplify constructors."
 } ;

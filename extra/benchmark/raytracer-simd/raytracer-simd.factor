@@ -1,10 +1,10 @@
 ! Factor port of the raytracer benchmark from
 ! http://www.ffconsultancy.com/languages/ray_tracer/index.html
 
-USING: arrays accessors generalizations io io.files io.files.temp
+USING: arrays accessors generalizations io.files io.files.temp
 io.encodings.binary kernel math math.constants math.functions
-math.vectors math.vectors.simd math.vectors.simd.cords
-math.parser make sequences words combinators ;
+math.vectors math.vectors.simd.cords math.parser make sequences
+words combinators ;
 IN: benchmark.raytracer-simd
 
 << SYNTAX: no-compile last-word t "no-compile" set-word-prop ; >>
@@ -42,7 +42,7 @@ C: <sphere> sphere
 
 : sphere-v ( sphere ray -- v ) [ center>> ] [ orig>> ] bi* v- ; inline no-compile
 
-: sphere-b ( v ray -- b ) dir>> v. ; inline no-compile
+: sphere-b ( v ray -- b ) dir>> vdot ; inline no-compile
 
 : sphere-d ( sphere b v -- d ) [ radius>> sq ] [ sq ] [ norm-sq ] tri* - + ; inline no-compile
 
@@ -98,7 +98,7 @@ CONSTANT: initial-hit T{ hit f double-4{ 0.0 0.0 0.0 0.0 } 1/0. }
 : sray-intersect ( ray scene hit -- ray )
     swap [ ray-o light vneg <ray> ] dip initial-intersect ; inline no-compile
 
-: ray-g ( hit -- g ) normal>> light v. ; inline no-compile
+: ray-g ( hit -- g ) normal>> light vdot ; inline no-compile
 
 : cast-ray ( ray scene -- g )
     2dup initial-intersect dup lambda>> 1/0. = [

@@ -1,7 +1,7 @@
 ! Copyright (C) 2004, 2009 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
-USING: assocs continuations continuations.private kernel
-kernel.private namespaces ;
+! See https://factorcode.org/license.txt for BSD license.
+USING: assocs continuations.private kernel kernel.private
+namespaces ;
 IN: init
 
 SYMBOL: startup-hooks
@@ -25,7 +25,7 @@ shutdown-hooks [ V{ } clone ] initialize
 : add-shutdown-hook ( quot name -- )
     shutdown-hooks get set-at ;
 
-: boot ( -- ) init-namespaces init-catchstack init-error-handler ;
+: boot ( -- ) init-namestack init-catchstack init-error-handler ;
 
 : startup-quot ( -- quot ) OBJ-STARTUP-QUOT special-object ;
 

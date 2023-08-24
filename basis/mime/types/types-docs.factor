@@ -1,12 +1,12 @@
 ! Copyright (C) 2008 Doug Coleman.
-! See http://factorcode.org/license.txt for BSD license.
-USING: assocs help.markup help.syntax io.streams.string sequences ;
+! See https://factorcode.org/license.txt for BSD license.
+USING: assocs help.markup help.syntax sequences ;
 IN: mime.types
 
 HELP: mime-db
 { $values
 
-     { "seq" sequence } }
+    { "seq" sequence } }
 { $description "Outputs an array where the first element is a MIME type and the rest of the array is file extensions that have that MIME type." } ;
 
 HELP: mime-type
@@ -18,13 +18,13 @@ HELP: mime-type
 HELP: mime-types
 { $values
 
-     { "assoc" assoc } }
+    { "assoc" assoc } }
 { $description "Outputs an " { $snippet "assoc" } " made from the data in the " { $link mime-db } " word where the keys are file extensions and the values are the corresponding MIME types." } ;
 
 HELP: nonstandard-mime-types
 { $values
 
-     { "assoc" assoc } }
+    { "assoc" assoc } }
 { $description "A list of Factor-specific MIME types that are added to the MIME database loaded from disk." } ;
 
 ARTICLE: "mime.types" "MIME types"

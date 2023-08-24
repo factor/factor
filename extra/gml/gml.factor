@@ -1,8 +1,7 @@
 ! Copyright (C) 2010 Slava Pestov.
-USING: accessors continuations debugger fry io io.encodings.utf8
-io.files kernel namespaces sequences euler.b-rep euler.operators
-gml.core gml.coremath gml.b-rep gml.geometry gml.modeling
-gml.parser gml.printer gml.runtime gml.viewer ;
+USING: accessors continuations debugger euler.b-rep gml.parser
+gml.printer gml.runtime io io.encodings.utf8 io.files kernel
+namespaces sequences ;
 IN: gml
 
 TUPLE: gml-file-error pathname error ;

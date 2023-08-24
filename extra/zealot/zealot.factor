@@ -1,7 +1,7 @@
 ! Copyright (C) 2017 Doug Coleman.
-! See http://factorcode.org/license.txt for BSD license.
-USING: cli.git combinators fry io.directories io.files.info
-io.pathnames kernel sequences uuid web-services.github ;
+! See https://factorcode.org/license.txt for BSD license.
+USING: cli.git combinators io.directories io.files.info
+io.pathnames kernel sequences uuid github ;
 IN: zealot
 
 : default-zealot-directory ( chunk -- path ) [ home ".zealot" ] dip 3append-path ;
@@ -73,5 +73,5 @@ IN: zealot
     [ zealot-github-builds-path ] 2bi
     [ git-clone-as ] keep ;
 
-: zealot-build-checkout-branch ( path branch -- process )
-    '[ _ git-checkout-existing-branch* ] with-directory ;
+: zealot-build-checkout ( path branch/checksum -- process )
+    '[ _ git-checkout-existing* ] with-directory ;

@@ -1,10 +1,10 @@
 ! Copyright (c) 2007 Aaron Schaefer.
-! See http://factorcode.org/license.txt for BSD license.
-USING: combinators.short-circuit kernel make math math.functions math.ranges
+! See https://factorcode.org/license.txt for BSD license.
+USING: combinators.short-circuit kernel make math math.functions ranges
     sequences project-euler.common ;
 IN: project-euler.014
 
-! http://projecteuler.net/index.php?section=problems&id=14
+! https://projecteuler.net/index.php?section=problems&id=14
 
 ! DESCRIPTION
 ! -----------
@@ -44,7 +44,7 @@ PRIVATE>
     [ [ dup 1 > ] [ dup , next-collatz ] while , ] { } make ;
 
 : euler014 ( -- answer )
-    1000000 [1,b] { } [ collatz longer ] reduce first ;
+    1,000,000 [1..b] { } [ collatz longer ] reduce first ;
 
 ! [ euler014 ] time
 ! 52868 ms run / 483 ms GC time
@@ -61,7 +61,7 @@ PRIVATE>
 PRIVATE>
 
 : euler014a ( -- answer )
-    500000 1000000 [a,b] { 1 } [
+    500000 1000000 [a..b] { 1 } [
         dup worth-calculating? [ collatz longer ] [ drop ] if
     ] reduce first ;
 

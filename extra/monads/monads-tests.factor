@@ -1,4 +1,5 @@
-USING: tools.test math kernel sequences lists promises monads ;
+USING: tools.test math math.functions kernel sequences lists
+promises monads ;
 FROM: monads => do ;
 IN: monads.tests
 
@@ -111,6 +112,22 @@ LAZY: nats-from ( n -- list )
     5 writer-monad return
     [ drop { 1 2 3 } tell ] bind
     run-writer
+] unit-test
+
+{
+    T{ writer
+        { value 1.618033988749895 }
+        { log
+            "Started with five, took square root, added one, divided by two."
+        }
+    }
+} [
+    {
+        [ 5 "Started with five, " <writer> ]
+        [ sqrt "took square root, " <writer> ]
+        [ 1 + "added one, " <writer> ]
+        [ 2 / "divided by two." <writer> ]
+    } do
 ] unit-test
 
 { T{ identity f 7 } }

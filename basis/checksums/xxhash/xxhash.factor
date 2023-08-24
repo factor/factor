@@ -1,9 +1,10 @@
 ! Copyright (C) 2014 John Benediktsson.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 
-USING: accessors alien alien.c-types alien.data byte-arrays
-checksums combinators generalizations grouping io.binary kernel
-locals math math.bitwise math.ranges sequences ;
+USING: accessors alien.c-types alien.data byte-arrays
+checksums combinators endian generalizations grouping kernel
+math math.bitwise sequences specialized-arrays ;
+SPECIALIZED-ARRAY: uint64_t
 
 IN: checksums.xxhash
 
@@ -21,7 +22,7 @@ C: <xxhash> xxhash
 
 :: native-mapper ( from to bytes c-type -- seq )
     from to bytes <slice>
-    bytes byte-array? little-endian? and
+    bytes byte-array? alien.data:little-endian? and
     [ c-type cast-array ]
     [ c-type heap-size <groups> [ le> ] map ] if ; inline
 

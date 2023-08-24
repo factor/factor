@@ -1,14 +1,14 @@
 ! Copyright (C) 2006, 2009 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays assocs classes combinators fonts fry
-hashtables inspector io io.styles kernel math.vectors mirrors
-models models.arrow namespaces prettyprint sequences sorting ui
-ui.commands ui.gadgets ui.gadgets.labeled ui.gadgets.panes
-ui.gadgets.scrollers ui.gadgets.status-bar ui.gadgets.tables
+! See https://factorcode.org/license.txt for BSD license.
+USING: accessors arrays assocs classes combinators fonts
+formatting hashtables inspector io io.styles kernel math
+math.parser math.vectors mirrors models models.arrow namespaces
+prettyprint sequences sorting strings ui ui.commands ui.gadgets
+ui.gadgets.labeled ui.gadgets.panes ui.gadgets.scrollers
+ui.gadgets.status-bar ui.gadgets.tables
 ui.gadgets.tables.private ui.gadgets.toolbar ui.gadgets.tracks
 ui.gestures ui.operations ui.theme ui.tools.browser
-ui.tools.common ui.tools.inspector.slots ;
-
+ui.tools.common ui.tools.inspector.slots unicode ;
 IN: ui.tools.inspector
 
 TUPLE: inspector-gadget < tool table ;
@@ -68,8 +68,30 @@ GENERIC: make-slot-descriptions ( obj -- seq )
 M: object make-slot-descriptions
     make-mirror [ <slot-description> ] { } assoc>map ;
 
+M: string make-slot-descriptions
+    [
+        swap [ dup number>string ] dip dup
+        dup unicode:printable? [ 1string ] [
+            dup 0xff <= [
+                H{
+                    { CHAR: \a "\\a" }
+                    { CHAR: \b "\\b" }
+                    { CHAR: \e "\\e" }
+                    { CHAR: \f "\\f" }
+                    { CHAR: \n "\\n" }
+                    { CHAR: \r "\\r" }
+                    { CHAR: \t "\\t" }
+                    { CHAR: \v "\\v" }
+                    { CHAR: \0 "\\0" }
+                } ?at [ "\\x%02x" sprintf ] unless
+            ] [
+                "\\u{%x}" sprintf
+            ] if
+        ] if slot-description boa
+    ] { } map-index-as ;
+
 M: hashtable make-slot-descriptions
-    call-next-method [ key-string>> ] sort-with ;
+    call-next-method [ key-string>> ] sort-by ;
 
 TUPLE: inspector-table < table ;
 

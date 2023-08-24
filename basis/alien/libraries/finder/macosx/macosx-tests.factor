@@ -1,8 +1,5 @@
-
-USING: alien.libraries.finder
+USING: alien.libraries.finder alien.libraries.finder.macosx
 alien.libraries.finder.macosx.private sequences tools.test ;
-
-IN: alien.libraries.finder.macosx
 
 {
     {
@@ -44,7 +41,7 @@ IN: alien.libraries.finder.macosx
     } [ dyld-find ] map
 ] unit-test
 
-{ t } [ "libm.dylib" "m" find-library subseq? ] unit-test
-{ t } [ "libc.dylib" "c" find-library subseq? ] unit-test
-{ t } [ "libbz2.dylib" "bz2" find-library subseq? ] unit-test
-{ t } [ "AGL.framework" "AGL" find-library subseq? ] unit-test
+{ t } [ "m" find-library "libm.dylib" subseq-of? ] unit-test
+{ t } [ "c" find-library "libc.dylib" subseq-of? ] unit-test
+{ t } [ "bz2" find-library "libbz2.dylib" subseq-of? ] unit-test
+{ t } [ "AGL" find-library "AGL.framework" subseq-of? ] unit-test

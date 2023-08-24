@@ -6,19 +6,19 @@ struct aging_space : bump_allocator {
   aging_space(cell size, cell start)
       : bump_allocator(size, start), starts(size, start) {}
 
-  object* allot(cell size) {
-    if (here + size > end)
+  object* allot(cell dsize) {
+    if (here + dsize > end)
       return NULL;
 
-    object* obj = bump_allocator::allot(size);
+    object* obj = bump_allocator::allot(dsize);
     starts.record_object_start_offset(obj);
     return obj;
   }
 
   cell next_object_after(cell scan) {
-    cell size = ((object*)scan)->size();
-    if (scan + size < here)
-      return scan + size;
+    cell data_size = ((object*)scan)->size();
+    if (scan + data_size < here)
+      return scan + data_size;
     return 0;
   }
 

@@ -1,5 +1,5 @@
 USING: help.markup help.syntax io.files.private io.pathnames
-quotations ;
+math quotations sequences ;
 IN: io.directories
 
 HELP: cwd
@@ -47,7 +47,7 @@ HELP: directory-entries
 
 HELP: qualified-directory-entries
 { $values { "path" "a pathname string" } { "seq" "a sequence of " { $link directory-entry } " objects" } }
-{ $description "Outputs the contents of a directory named by " { $snippet "path" } " using absolute file paths." } ;
+{ $description "Outputs the contents of a directory named by " { $snippet "path" } " using relative file paths." } ;
 
 HELP: directory-files
 { $values { "path" "a pathname string" } { "seq" "a sequence of filenames" } }
@@ -55,7 +55,7 @@ HELP: directory-files
 
 HELP: qualified-directory-files
 { $values { "path" "a pathname string" } { "seq" "a sequence of filenames" } }
-{ $description "Outputs the contents of a directory named by " { $snippet "path" } " as a sequence of absolute paths." } ;
+{ $description "Outputs the contents of a directory named by " { $snippet "path" } " as a sequence of relative paths." } ;
 
 HELP: with-directory-files
 { $values { "path" "a pathname string" } { "quot" quotation } }
@@ -101,6 +101,11 @@ HELP: touch-file
 { $values { "path" "a pathname string" } }
 { $description "Updates the modification time of a file or directory. If the file does not exist, creates a new, empty file." }
 { $errors "Throws an error if the file could not be touched." } ;
+
+HELP: truncate-file
+{ $values { "path" "a pathname string" } { "n" integer } }
+{ $description "Set the length of the file to " { $snippet "n" } " bytes. If the file was previously longer, the extra data is lost. If the file was previously shorter, the behavior is platform-dependent on whether the file is extended with zeros (Unix) or the contents of the extended portion are undefined (Windows)." }
+{ $errors "Throws an error if the file does not exist or the truncate operation fails." } ;
 
 HELP: move-file
 { $values { "from" "a pathname string" } { "to" "a pathname string" } }
@@ -164,8 +169,6 @@ ARTICLE: "io.directories.listing" "Directory listing"
     with-directory-files
     qualified-directory-entries
     qualified-directory-files
-    with-qualified-directory-files
-    with-qualified-directory-entries
 } ;
 
 ARTICLE: "io.directories.create" "Creating directories"
@@ -202,6 +205,155 @@ $nl
 }
 "On most operating systems, files can only be moved within the same file system. To move files between file systems, use " { $link copy-file } " followed by " { $link delete-file } " on the old name." ;
 
+HELP: +depth-first+
+{ $description "Method of directory traversal that fully recurses as far as possible before backtracking." } ;
+
+HELP: +breadth-first+
+{ $description "Method of directory traversal that explores each level of graph fully before moving to the next level." } ;
+
+HELP: traversal-method
+{ $var-description "Determines directory traversal method, either " { $link +depth-first+ } " or " { $link +breadth-first+ } "." } ;
+
+HELP: each-file
+{ $values
+    { "path" "a pathname string" } { "quot" quotation }
+}
+{ $description "Traverses a directory path recursively and calls the quotation on the full pathname of each file, in a breadth-first or depth-first " { $link traversal-method } "." }
+{ $examples
+    { $unchecked-example "USING: sequences io.directories ;"
+        "\"resource:misc\" [ . ] each-file"
+        "! Recursive directory listing prints here"
+    }
+} ;
+
+HELP: recursive-directory-files
+{ $values
+    { "path" "a pathname string" }
+    { "paths" { $sequence "pathname strings" } }
+}
+{ $description "Traverses a directory path recursively and returns a sequence of files, in a breadth-first or depth-first " { $link traversal-method } "." } ;
+
+HELP: recursive-directory-entries
+{ $values
+    { "path" "a pathname string" }
+    { "directory-entries" { $sequence directory-entry } }
+}
+{ $description "Traverses a directory path recursively and returns a sequence of directory-entries, in a breadth-first or depth-first " { $link traversal-method } "." } ;
+
+HELP: find-file
+{ $values
+    { "path" "a pathname string" } { "quot" quotation }
+    { "path/f" { $maybe "pathname string" } }
+}
+{ $description "Finds the first file in the input directory matching the predicate quotation, in a breadth-first or depth-first " { $link traversal-method } "." } ;
+
+HELP: find-file-in-directories
+{ $values
+    { "directories" "a sequence of pathnames" } { "quot" quotation }
+    { "path'/f" { $maybe "pathname string" } }
+}
+{ $description "Finds the first file in the input directories matching the predicate quotation, in a breadth-first or depth-first " { $link traversal-method } "." } ;
+
+HELP: find-files
+{ $values
+    { "path" "a pathname string" } { "quot" quotation }
+    { "paths" { $sequence "pathname strings" } }
+}
+{ $description "Recursively finds all files in the input directory matching the predicate quotation, in a breadth-first or depth-first " { $link traversal-method } "." } ;
+
+HELP: find-files-in-directories
+{ $values
+    { "directories" { $sequence "directory paths" } } { "quot" quotation }
+    { "paths/f" { $maybe "a sequence of pathname strings" } }
+}
+{ $description "Finds all files in the input directories matching the predicate quotation, in a breadth-first or depth-first " { $link traversal-method } "." } ;
+
+HELP: find-files-by-extension
+{ $values
+    { "path" "a pathname string" } { "extension" "a file extension" }
+    { "seq" sequence }
+}
+{ $description "Searches a directory for all files with the given extension. File extension and filenames are converted to lower-case and compared using the " { $link tail? } " word. The file extension should contain the period." }
+{ $examples
+    { $code
+        "USING: io.directories ;"
+        "\"/\" \".mp3\" find-by-extension"
+    }
+} ;
+
+HELP: find-files-by-extensions
+{ $values
+    { "path" "a pathname string" } { "extensions" { $sequence "file extensions" } }
+    { "seq" sequence }
+}
+{ $description "Searches a directory for all files in the given list of extensions. File extensions and filenames are converted to lower-case and compared using the " { $link tail? } " word. File extensions should contain the period." }
+{ $examples
+    { $code
+        "USING: io.directories ;"
+        "\"/\" { \".jpg\" \".gif\" \".tiff\" \".png\" \".bmp\" } find-files-by-extensions"
+    }
+} ;
+
+{ find-file find-files find-file-in-directories find-files-in-directories } related-words
+
+ARTICLE: "io.directories.search" "Searching directories"
+"Traversing directories:"
+{ $subsections
+    recursive-directory-files
+    recursive-directory-entries
+    each-file
+    each-directory-entry
+}
+"Finding files by name:"
+{ $subsections
+    find-file
+    find-files
+    find-file-in-directories
+    find-files-in-directories
+}
+"Finding files by extension:"
+{ $subsections
+    find-files-by-extension
+    find-files-by-extensions
+} ;
+
+HELP: delete-tree
+{ $values { "path" "a pathname string" } }
+{ $description "Deletes a file or directory, recursing into subdirectories." }
+{ $errors "Throws an error if the deletion fails." }
+{ $warning "Misuse of this word can lead to catastrophic data loss." } ;
+
+HELP: copy-tree
+{ $values { "from" "a pathname string" } { "to" "a pathname string" } }
+{ $description "Copies a directory tree recursively." }
+{ $notes "This operation attempts to preserve original file attributes, however not all attributes may be preserved." }
+{ $errors "Throws an error if the copy operation fails." } ;
+
+HELP: copy-tree-into
+{ $values { "from" "a pathname string" } { "to" "a directory pathname string" } }
+{ $description "Copies a directory tree to another directory, recursively." }
+{ $errors "Throws an error if the copy operation fails." } ;
+
+HELP: copy-trees-into
+{ $values { "files" "a sequence of pathname strings" } { "to" "a directory pathname string" } }
+{ $description "Copies a set of directory trees to another directory, recursively." }
+{ $errors "Throws an error if the copy operation fails." } ;
+
+ARTICLE: "io.directories.hierarchy" "Directory hierarchy manipulation"
+"There is a naming scheme used by " { $vocab-link "io.directories" } ". Operations for deleting and copying files come in two forms:"
+{ $list
+    { "Words named " { $snippet { $emphasis "operation" } "-file" } " which work on regular files only." }
+    { "Words named " { $snippet { $emphasis "operation" } "-tree" } " works on directory trees recursively, and also accepts regular files." }
+}
+"Deleting directory trees recursively:"
+{ $subsections delete-tree }
+"Copying directory trees recursively:"
+{ $subsections
+    copy-tree
+    copy-tree-into
+    copy-trees-into
+} ;
+
 ARTICLE: "io.directories" "Directory manipulation"
 "The " { $vocab-link "io.directories" } " vocabulary defines words for inspecting and manipulating directories."
 { $subsections
@@ -211,6 +363,8 @@ ARTICLE: "io.directories" "Directory manipulation"
     "io.directories.create"
     "delete-move-copy"
     "io.directories.hierarchy"
+    "io.directories.search"
 } ;
+
 
 ABOUT: "io.directories"

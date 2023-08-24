@@ -1,8 +1,7 @@
 ! Copyright (C) 2011 John Benediktsson
-! See http://factorcode.org/license.txt for BSD license
+! See https://factorcode.org/license.txt for BSD license
 
-USING: accessors combinators fry hash-sets hashtables kernel
-locals math math.parser sequences sets vectors ;
+USING: accessors hash-sets kernel math sequences sets vectors ;
 
 IN: benchmark.ant
 
@@ -21,7 +20,7 @@ IN: benchmark.ant
 ! including (1000, 1000) itself?
 
 : sum-digits ( n -- x )
-    0 swap [ dup zero? ] [ 10 /mod swap [ + ] dip ] until drop ;
+    0 swap [ 10 /mod swap [ + ] dip ] until-zero ;
 
 TUPLE: point x y ;
 C: <point> point

@@ -1,5 +1,5 @@
 ! Copyright (C) 2007, 2009 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: combinators io.backend io.directories io.encodings.binary
 io.files io.pathnames kernel locals namespaces sequences splitting
 system tools.deploy.backend tools.deploy.config
@@ -21,7 +21,7 @@ CONSTANT: app-icon-resource-id "APPICON"
     vocab-dir "icon.ico" append-path ;
 
 : embed-ico ( vm-path vocab -- )
-    dup vocab-windows-icon-path vocab-append-path dup exists?
+    dup vocab-windows-icon-path vocab-append-path dup file-exists?
     [ binary file-contents app-icon-resource-id embed-icon-resource ]
     [ 2drop ] if ;
 

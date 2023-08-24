@@ -1,5 +1,5 @@
 ! Copyright (C) 2010 Marc Fauconneau.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: alien.c-types alien.data specialized-arrays kernel math
 math.functions math.vectors sequences sequences.private
 prettyprint words typed locals math.vectors.simd
@@ -60,7 +60,7 @@ IN: benchmark.spectral-norm-simd
     ] times ; inline
 
 TYPED: spectral-norm ( n: fixnum -- norm )
-    u/v [ double cast-array ] bi@ [ v. ] [ norm-sq ] bi /f sqrt ;
+    u/v [ double cast-array ] bi@ [ vdot ] [ norm-sq ] bi /f sqrt ;
 
 : spectral-norm-simd-benchmark ( -- )
     2000 spectral-norm . ;

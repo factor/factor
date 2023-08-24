@@ -1,12 +1,10 @@
 ! Copyright (C) 2003, 2010 Slava Pestov, Doug Coleman.
-! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays calendar combinators
-combinators.short-circuit concurrency.combinators
-concurrency.count-downs concurrency.flags
-concurrency.semaphores continuations debugger destructors fry
-io io.sockets io.sockets.secure io.streams.duplex io.styles
-io.timeouts kernel logging make math math.parser namespaces
-present prettyprint random sequences sets strings threads ;
+! See https://factorcode.org/license.txt for BSD license.
+USING: accessors arrays calendar concurrency.flags
+concurrency.semaphores continuations destructors io io.sockets
+io.sockets.secure io.streams.duplex io.styles io.timeouts kernel
+logging make math namespaces present prettyprint random
+sequences sets strings threads ;
 IN: io.servers
 
 TUPLE: threaded-server < identity-tuple
@@ -211,7 +209,7 @@ PRIVATE>
     '[
         [ _ threaded-server _ with-variable ]
         [ _ stop-server ]
-        [ ] cleanup
+        finally
     ] call ; inline
 
 <PRIVATE

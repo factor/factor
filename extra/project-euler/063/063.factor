@@ -1,9 +1,9 @@
 ! Copyright (c) 2009 Aaron Schaefer.
-! See http://factorcode.org/license.txt for BSD license.
-USING: kernel math math.functions math.ranges project-euler.common sequences ;
+! See https://factorcode.org/license.txt for BSD license.
+USING: kernel math math.functions ranges project-euler.common sequences ;
 IN: project-euler.063
 
-! http://projecteuler.net/index.php?section=problems&id=63
+! https://projecteuler.net/index.php?section=problems&id=63
 
 ! DESCRIPTION
 ! -----------
@@ -29,7 +29,7 @@ IN: project-euler.063
 ! Round down since we already know that particular value of n is no good.
 
 : euler063 ( -- answer )
-    9 [1,b] [ log [ 10 log dup ] dip - /i ] map-sum ;
+    9 [1..b] [ log [ 10 log dup ] dip - /i ] map-sum ;
 
 ! [ euler063 ] 100 ave-time
 ! 0 ms ave run time - 0.0 SD (100 trials)

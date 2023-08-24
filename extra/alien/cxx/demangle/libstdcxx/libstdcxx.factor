@@ -1,8 +1,8 @@
 ! Copyright (C) 2010 Joe Groff.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: alien.c-types alien.data alien.destructors alien.strings
 alien.syntax combinators destructors io.encodings.ascii kernel
-libc locals sequences ;
+libc sequences ;
 IN: alien.cxx.demangle.libstdcxx
 
 FUNCTION: char* __cxa_demangle ( char* mangled_name, char* output_buffer, size_t* length, int* status )

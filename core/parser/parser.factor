@@ -1,15 +1,15 @@
 ! Copyright (C) 2005, 2010 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays assocs classes combinators
-compiler.units continuations definitions effects io
-io.encodings.utf8 io.files kernel lexer math.parser namespaces
-parser.notes quotations sequences sets slots source-files
-vectors vocabs vocabs.parser words words.symbol ;
+! See https://factorcode.org/license.txt for BSD license.
+USING: accessors arrays classes combinators compiler.units
+continuations definitions effects io io.encodings.utf8 io.files
+kernel lexer math.parser namespaces parser.notes quotations
+sequences sets slots source-files vectors vocabs vocabs.parser
+words words.symbol ;
 IN: parser
 
-: location ( -- loc )
-    current-source-file get lexer get line>> 2dup and
-    [ [ path>> ] dip 2array ] [ 2drop f ] if ;
+: location ( -- loc/f )
+    current-source-file get lexer get 2dup and
+    [ [ path>> ] [ line>> ] bi* 2array ] [ 2drop f ] if ;
 
 : save-location ( definition -- )
     location remember-definition ;
@@ -20,8 +20,6 @@ M: parsing-word stack-effect drop ( parsed -- parsed ) ;
     current-vocab create-word dup set-last-word dup save-location ;
 
 SYMBOL: auto-use?
-
-: auto-use ( -- ) auto-use? on ;
 
 : no-word-restarted ( restart-value -- word )
     dup word? [
@@ -36,7 +34,7 @@ SYMBOL: auto-use?
 : private? ( word -- ? ) vocabulary>> ".private" tail? ;
 
 : use-first-word? ( words -- ? )
-    [ length 1 = ] [ ?first dup [ private? not ] [ ] ?if ] bi and
+    [ length 1 = ] [ ?first dup or* [ private? not ] when ] bi and
     auto-use? get and ;
 
 ! True branch is a singleton public word with no name conflicts
@@ -48,7 +46,7 @@ SYMBOL: auto-use?
     no-word-restarted ;
 
 : parse-word ( string -- word )
-    dup search [ ] [ no-word ] ?if ;
+    [ search ] [ no-word ] ?unless ;
 
 ERROR: number-expected ;
 
@@ -56,12 +54,11 @@ ERROR: number-expected ;
     string>number [ number-expected ] unless* ;
 
 : parse-datum ( string -- word/number )
-    dup search [ ] [
-        dup string>number [ ] [ no-word ] ?if
-    ] ?if ;
+    [ search ]
+    [ [ string>number ] [ no-word ] ?unless ] ?unless ;
 
 : ?scan-datum ( -- word/number/f )
-    ?scan-token dup [ parse-datum ] when ;
+    ?scan-token [ parse-datum ] ?call ;
 
 : scan-datum ( -- word/number )
     ?scan-datum [ \ word throw-unexpected-eof ] unless* ;
@@ -164,10 +161,6 @@ SYMBOL: bootstrap-syntax
         call
     ] with-manifest ; inline
 
-SYMBOL: print-use-hook
-
-print-use-hook [ [ ] ] initialize
-
 : parse-fresh ( lines -- quot )
     [
         parse-lines
@@ -180,7 +173,7 @@ print-use-hook [ [ ] ] initialize
 : filter-moved ( set1 set2 -- seq )
     swap diff members [
         {
-            { [ dup where dup [ first ] when current-source-file get path>> = not ] [ f ] }
+            { [ dup where ?first current-source-file get path>> = not ] [ f ] }
             { [ dup reader-method? ] [ f ] }
             { [ dup writer-method? ] [ f ] }
             [ t ]
@@ -246,6 +239,6 @@ print-use-hook [ [ ] ] initialize
     parse-file call( -- ) ;
 
 : ?run-file ( path -- )
-    dup exists? [ run-file ] [ drop ] if ;
+    dup file-exists? [ run-file ] [ drop ] if ;
 
 ERROR: version-control-merge-conflict ;

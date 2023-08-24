@@ -1,78 +1,102 @@
+html {
+    box-sizing: border-box;
+}
+
+*, *:before, *:after {
+    box-sizing: inherit;
+}
+
+html, body {
+    margin: 0;
+    padding: 0;
+}
+
 body, button {
-	font:9pt "Lucida Grande", "Lucida Sans Unicode", verdana, geneva, sans-serif;
-	color:#444;
+    font-size: 12pt;
+    font-family: sans-serif;
+}
+
+textarea {
+    font-size: 12pt;
+}
+
+table {
+    border-spacing: 0;
+    border-collapse: collapse;
+}
+
+pre {
+    overflow: auto;
+    font-size: smaller;
+    line-height: 125%;
 }
 
 .link-button {
-	padding: 0px;
-	background: none;
-	border: none;
+    padding: 0;
+    background: none;
+    border: none;
 }
 
-a:link, a:visited, .link {
-	color: #222;
-	border-bottom:1px dotted #666;
-	text-decoration:none;
-}
-
-a:hover, .link:hover {
-	border-bottom:1px solid #66a;
-}
+a, .link { color: #2A5DB0; }
+a:link, a:visited, a:active, .link { text-decoration: none; }
+a:hover, .link:hover { text-decoration: underline; }
 
 .error { color: #a00; }
 
 .errors li { color: #a00; }
 
 .field-label {
-	text-align: right;
+    text-align: right;
 }
 
 .inline {
-	display: inline;
+    display: inline;
 }
 
-.navbar {
-	background-color: #eeeee0;
-	padding: 5px;
-	border: 1px solid #ccc;
+nav {
+    border-bottom: 1px solid #d5d5d5;
+    background-color: #f5f5f5;
+    padding: 10px;
+    padding-left: calc(max(50% - 500px, 0px) + 15px);
+    padding-right: calc(max(50% - 500px, 0px) + 15px);
+}
+
+nav a, nav .link {
+    margin-right: 10px;
+}
+
+nav img {
+    vertical-align: middle;
+}
+
+.page {
+    max-width: 1000px;
+    position: relative;
+    left: calc(max(-500px,-50%) + 50%);
+    padding: 15px;
 }
 
 .big-field-label {
-	vertical-align: top;
+    vertical-align: top;
 }
 
-.description {
-	padding: 5px;
-	color: #000;
-}
+/* Dark mode */
+@media (prefers-color-scheme: dark) {
+    body {
+        background-color: #202124;
+        color: #bdc1c6;
+    }
 
-.description pre {
-	border: 1px dashed #ccc;
-	background-color: #f5f5f5;
-}
+    title, h1, h2, h3, h4, h5, h6 {
+        color: white;
+    }
 
-.description p:first-child {
-	margin-top: 0px;
-}
+    a, .link {
+        color: #8ab4f8;
+    }
 
-.description p:last-child {
-	margin-bottom: 0px;
+    nav {
+        background-color: #373e48;
+        border-bottom: 1px solid #666;
+    }
 }
-
-.description table, .description td {
-    border-color: #666;
-    border-style: solid;
-}
-
-.description table {
-    border-width: 0 0 1px 1px;
-    border-spacing: 0;
-    border-collapse: collapse;
-}
-
-.description td {
-    margin: 0;
-    padding: 4px;
-    border-width: 1px 1px 0 0;
-}
-

@@ -1,5 +1,5 @@
 ! Copyright (C) 2010 Joe Groff.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: alien audio byte-arrays destructors help.markup
 help.syntax kernel math strings ;
 IN: audio.engine
@@ -69,7 +69,7 @@ HELP: audio-distance
 HELP: audio-engine
 { $class-description "Objects of this class encapsulate the state for an active audio engine. Audio processing on an engine can be started and stopped with " { $link start-audio } ", " { $link start-audio* } ", and " { $link stop-audio } ". While running, " { $link update-audio } " must be called on an engine regularly to update source and listener attributes and refill buffers for streaming clips."
 $nl
-"An engine object should be treated as opaque, except for the " { $snippet "listener" } " slot. This slot may be filled with any object implementing the " { $link "audio.engine-listener" } " protocol, which will then be used to control the position, velocity, volume, and other attributes of the lisetener. By default, this slot contains an " { $link audio-listener } " tuple with all the slots set to their initial values." } ;
+"An engine object should be treated as opaque, except for the " { $snippet "listener" } " slot. This slot may be filled with any object implementing the " { $link "audio.engine-listener" } " protocol, which will then be used to control the position, velocity, volume, and other attributes of the listener. By default, this slot contains an " { $link audio-listener } " tuple with all the slots set to their initial values." } ;
 
 HELP: audio-gain
 { $values

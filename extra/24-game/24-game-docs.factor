@@ -56,7 +56,7 @@ HELP: makes-24?
 
 ARTICLE: "24-game" "The Game of 24"
 "A classic math game, where one attempts to create 24, by applying "
-"arithmetical operations and some shuffle words to a stack of 4 numbers. "
+"arithmetical operations and some shuffle words to a stack of 4 numbers."
 { $subsections
     24-game
     make-24

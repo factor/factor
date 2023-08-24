@@ -1,8 +1,8 @@
 ! Copyright (C) 2007, 2009 Elie CHAFTARI, Dirk Vleugels,
 ! Slava Pestov, Doug Coleman, Daniel Ehrenberg.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs base64 calendar calendar.format
-classes combinators debugger fry io io.crlf io.encodings
+classes combinators debugger io io.crlf io.encodings
 io.encodings.ascii io.encodings.binary io.encodings.iana
 io.encodings.string io.encodings.utf8 io.sockets
 io.sockets.secure io.timeouts kernel logging make math.order
@@ -16,6 +16,9 @@ SINGLETON: no-auth
 
 TUPLE: plain-auth username password ;
 C: <plain-auth> plain-auth
+
+TUPLE: login-auth username password ;
+C: <login-auth> login-auth
 
 : <smtp-config> ( -- smtp-config )
     smtp-config new ; inline
@@ -129,7 +132,7 @@ ERROR: smtp-transaction-failed < smtp-error ;
 
 : check-response ( response -- )
     dup code>> {
-        { [ dup { 220 235 250 221 354 } member? ] [ 2drop ] }
+        { [ dup { 220 235 250 221 334 354 } member? ] [ 2drop ] }
         { [ dup 400 499 between? ] [ drop smtp-server-busy ] }
         { [ dup 500 = ] [ drop smtp-syntax-error ] }
         { [ dup 501 = ] [ drop smtp-command-not-implemented ] }
@@ -149,12 +152,20 @@ GENERIC: send-auth ( auth -- )
 
 M: no-auth send-auth drop ;
 
+: >smtp-base64 ( str -- str' )
+    utf8 encode >base64 >string ;
+
 : plain-auth-string ( username password -- string )
-    [ "\0" prepend ] bi@ append utf8 encode >base64 >string ;
+    [ "\0" prepend ] bi@ append >smtp-base64 ;
 
 M: plain-auth send-auth
     [ username>> ] [ password>> ] bi plain-auth-string
     "AUTH PLAIN " prepend command get-ok ;
+
+M: login-auth send-auth
+    "AUTH LOGIN" command get-ok
+    [ username>> >smtp-base64 command get-ok ]
+    [ password>> >smtp-base64 command get-ok ] bi ;
 
 : auth ( -- ) smtp-config get auth>> send-auth ;
 
@@ -182,7 +193,7 @@ ERROR: invalid-header-string string ;
         "<" %
         64 random-bits #
         "-" %
-        gmt timestamp>micros #
+        now timestamp>micros #
         "@" %
         smtp-config get domain>> [ host-name ] unless* %
         ">" %
@@ -214,7 +225,10 @@ ERROR: invalid-header-string string ;
     [
         get-ok
         helo get-ok
-        smtp-config get tls?>> [ start-tls get-ok send-secure-handshake ] when
+        smtp-config get tls?>> [
+            start-tls get-ok send-secure-handshake
+            helo get-ok
+        ] when
         auth
         dup from>> extract-email mail-from get-ok
         dup to>> [ extract-email rcpt-to get-ok ] each

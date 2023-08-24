@@ -1,9 +1,8 @@
 ! Copyrigt (C) 2009 Doug Coleman, Keith Lazuka
-! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays combinators compression.lzw
-constructors destructors grouping images images.loader io
-io.binary io.buffers io.encodings.string io.encodings.utf8
-kernel make math math.bitwise namespaces sequences ;
+! See https://factorcode.org/license.txt for BSD license.
+USING: accessors arrays combinators compression.lzw constructors
+endian grouping images images.loader io io.encodings.string
+io.encodings.utf8 kernel make math math.bitwise sequences ;
 IN: images.gif
 
 SINGLETON: gif-image
@@ -115,11 +114,11 @@ CONSTANT: BLOCK-TERMINATOR 0x00
         read-sub-blocks >>comment-data ;
 
 : read-application-extension ( -- read-application-extension )
-   \ application-extension new
-       1 read le> >>block-size
-       8 read utf8 decode >>identifier
-       3 read >>authentication-code
-       read-sub-blocks >>application-data ;
+    \ application-extension new
+        1 read le> >>block-size
+        8 read utf8 decode >>identifier
+        3 read >>authentication-code
+        read-sub-blocks >>application-data ;
 
 : read-gif-header ( loading-gif -- loading-gif )
     6 read utf8 decode >>magic ;

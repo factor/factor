@@ -1,8 +1,7 @@
 ! Copyright (C) 2008 Doug Coleman.
-! See http://factorcode.org/license.txt for BSD license.
-USING: arrays assocs classes continuations destructors kernel math
-namespaces sequences classes.tuple words strings
-tools.walker accessors combinators fry db.errors ;
+! See https://factorcode.org/license.txt for BSD license.
+USING: accessors assocs continuations destructors kernel
+namespaces sequences strings ;
 IN: db
 
 TUPLE: db-connection
@@ -27,7 +26,7 @@ HOOK: parse-db-error db-connection ( error -- error' )
 
 : dispose-statements ( assoc -- ) values dispose-each ;
 
-M: db-connection dispose ( db-connection -- )
+M: db-connection dispose
     dup db-connection [
         [ dispose-statements H{ } clone ] change-insert-statements
         [ dispose-statements H{ } clone ] change-update-statements
@@ -77,7 +76,7 @@ GENERIC: bind-tuple ( tuple statement -- )
 
 GENERIC: execute-statement* ( statement type -- )
 
-M: object execute-statement* ( statement type -- )
+M: object execute-statement*
     '[
         _ _ drop query-results dispose
     ] [
@@ -100,10 +99,10 @@ M: object execute-statement* ( statement type -- )
     t >>bound? drop ;
 
 : sql-row ( result-set -- seq )
-    dup #columns [ row-column ] with { } map-integers ;
+    dup #columns [ row-column ] with map-integers ;
 
 : sql-row-typed ( result-set -- seq )
-    dup #columns [ row-column-typed ] with { } map-integers ;
+    dup #columns [ row-column-typed ] with map-integers ;
 
 : query-each ( result-set quot: ( row -- ) -- )
     over more-rows? [
@@ -139,9 +138,9 @@ HOOK: begin-transaction db-connection ( -- )
 HOOK: commit-transaction db-connection ( -- )
 HOOK: rollback-transaction db-connection ( -- )
 
-M: db-connection begin-transaction ( -- ) "BEGIN" sql-command ;
-M: db-connection commit-transaction ( -- ) "COMMIT" sql-command ;
-M: db-connection rollback-transaction ( -- ) "ROLLBACK" sql-command ;
+M: db-connection begin-transaction "BEGIN" sql-command ;
+M: db-connection commit-transaction "COMMIT" sql-command ;
+M: db-connection rollback-transaction "ROLLBACK" sql-command ;
 
 : in-transaction? ( -- ? ) in-transaction get ;
 

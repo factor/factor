@@ -1,8 +1,7 @@
 ! Copyright (C) 2010 Jon Harper.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: arrays assocs combinators combinators.short-circuit
-kernel macros math math.order quotations random sequences
-summary ;
+kernel math math.order quotations random sequences summary ;
 IN: combinators.random
 
 : ifp ( p true false -- ) [ random-unit > ] 2dip if ; inline

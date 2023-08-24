@@ -1,10 +1,8 @@
 ! Copyright (C) 2009 Doug Coleman.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors db.sqlite furnace.actions furnace.alloy
-furnace.conversations furnace.recaptcha furnace.redirection
-html.templates.chloe.compiler http.server
-http.server.dispatchers http.server.responses io.streams.string
-kernel urls xml.syntax ;
+furnace.recaptcha furnace.redirection http.server.dispatchers
+urls ;
 IN: furnace.recaptcha.example
 
 TUPLE: recaptcha-app < dispatcher recaptcha ;
@@ -20,8 +18,8 @@ TUPLE: recaptcha-app < dispatcher recaptcha ;
 : <test-recaptcha> ( responder -- recaptcha )
     <recaptcha>
         "concatenative.org" >>domain
-        "6LeJWQgAAAAAAFlYV7SuBClE9uSpGtV_ZS-qVON7" >>public-key
-        "6LeJWQgAAAAAALh-XJgSSQ6xKygRgJ8-029Ip2Xv" >>private-key ;
+        "6LeJWQgAAAAAAFlYV7SuBClE9uSpGtV_ZS-qVON7" >>site-key
+        "6LeJWQgAAAAAALh-XJgSSQ6xKygRgJ8-029Ip2Xv" >>secret-key ;
 
 : <recaptcha-app> ( -- obj )
     \ recaptcha-app new-dispatcher

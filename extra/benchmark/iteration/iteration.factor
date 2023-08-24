@@ -9,7 +9,7 @@ kernel ;
 : string-iter ( -- ) 100 [ 0 100000 <range> >string [ ] map drop ] times ;
 : sbuf-iter ( -- ) 100 [ 0 100000 <range> >sbuf [ ] map drop ] times ;
 : reverse-iter ( -- ) 100 [ 0 100000 <range> >vector <reversed> [ ] map drop ] times ;
-: dot-iter ( -- ) 100 [ 0 100000 <range> dup v. drop ] times ;
+: dot-iter ( -- ) 100 [ 0 100000 <range> dup vdot drop ] times ;
 
 : iteration-benchmark ( -- )
     vector-iter

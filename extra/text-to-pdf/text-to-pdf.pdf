@@ -46,10 +46,10 @@ BT
 /F1 10 Tf
 12 TL
 (! Copyright \(C\) 2010 John Benediktsson)'
-(! See http://factorcode.org/license.txt for BSD license)'
+(! See https://factorcode.org/license.txt for BSD license)'
 ( )'
 (USING: assocs calendar combinators environment formatting)'
-(grouping io io.files kernel make math math.ranges sequences)'
+(grouping io io.files kernel make math ranges sequences)'
 (splitting xml.entities ;)'
 ( )'
 (IN: text-to-pdf)'
@@ -176,7 +176,7 @@ BT
 (    ] { } make "\\n" join ;)'
 ( )'
 (: string>lines \( str -- lines \))'
-(    "\\t" split "    " join string-lines)'
+(    "\\t" split "    " join lines)'
 (    [ [ " " ] when-empty ] map ;)'
 ( )'
 ET
@@ -211,7 +211,7 @@ BT
 (        dup length 5 swap 2 range boa zip)'
 (        [ pdf-page , pdf-text , ] assoc-each)'
 (    ] { } make)'
-(    dup length [1,b] zip [ first2 pdf-object ] map ;)'
+(    dup length [1..b] zip [ first2 pdf-object ] map ;)'
 ( )'
 (: objects>pdf \( objects -- str \))'
 (    [ "\\n" join "\\n" append "%PDF-1.4\\n" ])'

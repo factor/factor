@@ -1,7 +1,7 @@
 ! Copyright (C) 2008 John Benediktsson
-! See http://factorcode.org/license.txt for BSD license
+! See https://factorcode.org/license.txt for BSD license
 
-USING: accessors assocs kernel locals math sequences sorting ;
+USING: accessors assocs kernel math sequences sorting ;
 
 IN: math.binpack
 

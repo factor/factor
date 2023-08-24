@@ -1,4 +1,4 @@
-VERSION = 0.98
+VERSION = 0.99
 
 # Crazy hack to do shell commands
 # We do it in Nmakefile because that way we don't have to invoke build through build.cmd
@@ -8,21 +8,21 @@ VERSION = 0.98
 !IF [git describe --all > git-describe.tmp] == 0
 GIT_DESCRIBE = \
 !INCLUDE <git-describe.tmp>
-!IF [rm git-describe.tmp] == 0
+!IF [del git-describe.tmp] == 0
 !ENDIF
 !ENDIF
 
 !IF [git rev-parse HEAD > git-id.tmp] == 0
 GIT_ID = \
 !INCLUDE <git-id.tmp>
-!IF [rm git-id.tmp] == 0
+!IF [del git-id.tmp] == 0
 !ENDIF
 !ENDIF
 
 !IF [git rev-parse --abbrev-ref HEAD > git-branch.tmp] == 0
 GIT_BRANCH = \
 !INCLUDE <git-branch.tmp>
-!IF [rm git-branch.tmp] == 0
+!IF [del git-branch.tmp] == 0
 !ENDIF
 !ENDIF
 
@@ -58,11 +58,22 @@ CL_FLAGS = $(CL_FLAGS) $(CL_FLAGS_VISTA)
 PLAF_DLL_OBJS = vm\os-windows-x86.64.obj vm\cpu-x86.obj
 SUBSYSTEM_COM_FLAGS = console
 SUBSYSTEM_EXE_FLAGS = windows
+
+!ELSE
+CL_FLAGS = $(CL_FLAGS) $(CL_FLAGS_VISTA)
+PLAF_DLL_OBJS = vm\os-windows-x86.64.obj vm\cpu-x86.obj
+SUBSYSTEM_COM_FLAGS = console
+SUBSYSTEM_EXE_FLAGS = windows
+
 !ENDIF
 
 !IF DEFINED(DEBUG)
 LINK_FLAGS = $(LINK_FLAGS) /DEBUG
 CL_FLAGS = $(CL_FLAGS) /Zi /DFACTOR_DEBUG
+!ENDIF
+
+!IF DEFINED(REPRODUCIBLE)
+CL_FLAGS = $(CL_FLAGS) /DFACTOR_REPRODUCIBLE
 !ENDIF
 
 ML_FLAGS = /nologo /safeseh
@@ -139,6 +150,16 @@ factor.com: $(EXE_OBJS) $(DLL_OBJS)
 factor.exe: $(EXE_OBJS) $(DLL_OBJS)
 	link $(LINK_FLAGS) /out:factor.exe /SUBSYSTEM:$(SUBSYSTEM_EXE_FLAGS) $(EXE_OBJS) $(DLL_OBJS)
 
+# If we compile factor.exe, run mt.exe, and run factor.exe,
+# then Windows caches the manifest. Even on a recompile without applying
+# the mt.exe tool, if the factor.exe.manifest file is present, the manifest
+# is applied. To avoid this, we delete the .manifest file on clean
+# and copy it from a reference file on compilation and mt.exe.
+#
+factor.exe.manifest: factor.exe
+	copy factor.exe.manifest.in factor.exe.manifest
+	mt -manifest factor.exe.manifest -outputresource:"factor.exe;#1"
+
 all: factor.com factor.exe factor.dll.lib libfactor-ffi-test.dll
 
 !ENDIF
@@ -170,12 +191,15 @@ clean:
 	if exist factor.lib del factor.lib
 	if exist factor.com del factor.com
 	if exist factor.exe del factor.exe
+	if exist factor.exe.manifest del factor.exe.manifest
+	if exist factor.exp del factor.exp
 	if exist factor.dll del factor.dll
 	if exist factor.dll.lib del factor.dll.lib
+	if exist factor.dll.exp del factor.dll.exp
 	if exist libfactor-ffi-test.dll del libfactor-ffi-test.dll
 	if exist libfactor-ffi-test.exp del libfactor-ffi-test.exp
 	if exist libfactor-ffi-test.lib del libfactor-ffi-test.lib
 
-.PHONY: all default x86-32 x86-64 x86-32-vista x86-64-vista clean
+.PHONY: all default x86-32 x86-64 x86-32-vista x86-64-vista clean factor.exe.manifest
 
 .SUFFIXES: .rs

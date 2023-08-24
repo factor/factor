@@ -1,11 +1,11 @@
 ! Copyright (C) 2009, 2010 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors assocs combinators combinators.short-circuit
 compiler.cfg.def-use compiler.cfg.instructions
 compiler.cfg.predecessors compiler.cfg.registers
 compiler.cfg.rpo compiler.cfg.ssa.destruction.leaders
 compiler.cfg.utilities compiler.utilities cpu.architecture
-deques dlists fry kernel locals namespaces sequences sets ;
+deques dlists kernel namespaces sequences sets ;
 IN: compiler.cfg.liveness
 
 SYMBOL: live-ins
@@ -35,7 +35,7 @@ GENERIC: visit-insn ( live-set insn -- )
 : gen-uses ( live-set insn -- )
     uses-vregs [ swap conjoin ] with each ; inline
 
-M: vreg-insn visit-insn ( live-set insn -- )
+M: vreg-insn visit-insn
     [ kill-defs ] [ gen-uses ] 2bi ;
 
 DEFER: lookup-base-pointer
@@ -98,7 +98,7 @@ M: vreg-insn lookup-base-pointer* 2drop f ;
 : fill-gc-map ( live-set gc-map -- )
     [ gc-roots ] dip [ gc-roots<< ] [ derived-roots<< ] bi ;
 
-M: gc-map-insn visit-insn ( live-set insn -- )
+M: gc-map-insn visit-insn
     [ kill-defs ] [ gc-map>> fill-gc-map ] [ gen-uses ] 2tri ;
 
 M: ##phi visit-insn kill-defs ;
@@ -124,7 +124,7 @@ M: insn visit-insn 2drop ;
 : compute-live-out ( basic-block -- live-out )
     [ successors>> [ live-in ] map ]
     [ dup successors>> [ edge-live-in ] with map ] bi
-    append assoc-combine ;
+    append assoc-union-all ;
 
 : update-live-out ( basic-block -- changed? )
     [ compute-live-out ] keep

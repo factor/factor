@@ -686,6 +686,7 @@ CONSTANT: ERROR_INC_BACKUP                         4003
 CONSTANT: ERROR_FULL_BACKUP                        4004
 CONSTANT: ERROR_REC_NON_EXISTENT                   4005
 CONSTANT: ERROR_RPL_NOT_ALLOWED                    4006
+CONSTANT: PEERDIST_ERROR_CONTENTINFO_VERSION_UNSUPPORTED 4050
 CONSTANT: ERROR_NO_BROWSER_SERVERS_FOUND           6118
 
 CONSTANT: SUBLANG_NEUTRAL 0
@@ -717,34 +718,36 @@ CONSTANT: FORMAT_MESSAGE_MAX_WIDTH_MASK   0x000000FF
     [ drop "Unknown error 0x" id 0xffff,ffff bitand >hex append ]
     [ alien>native-string [ blank? ] trim ] if ;
 
-: win32-error-string ( -- str )
-    GetLastError n>win32-error-string ;
-
 ERROR: windows-error n string ;
 
-: (win32-error) ( n -- )
-    [ dup win32-error-string windows-error ] unless-zero ;
-
-: win32-error ( -- )
-    GetLastError (win32-error) ;
-
-: win32-error=0/f ( n -- ) { 0 f } member? [ win32-error ] when ;
-: win32-error>0 ( n -- ) 0 > [ win32-error ] when ;
-: win32-error<0 ( n -- ) 0 < [ win32-error ] when ;
-: win32-error<>0 ( n -- ) zero? [ win32-error ] unless ;
+: throw-windows-error ( n -- * )
+    dup n>win32-error-string windows-error ;
 
 : n>win32-error-check ( n -- )
-    dup ERROR_SUCCESS = [
-        drop
+    [ throw-windows-error ] unless-zero ;
+
+: win32-error-ignore-timeout ( -- )
+    GetLastError
+    dup 258 = [ drop ] [ throw-windows-error ] if ;
+
+! Note that win32-error* words throw GetLastError code.
+: win32-error ( -- ) GetLastError n>win32-error-check ;
+: win32-error=0/f ( n -- ) { 0 f } member? [ win32-error ] when ;
+: win32-error=0/f-ignore-timeout ( n -- )
+    { 0 f } member? [ win32-error-ignore-timeout ] when ;
+
+: win32-allow-errors ( n allowed-seq -- n )
+    GetLastError 2dup swap member? [
+        2drop
     ] [
-        dup n>win32-error-string windows-error
+        throw-windows-error
     ] if ;
 
-: throw-win32-error ( -- * )
-    win32-error-string throw ;
+: win32-error=0/f-allowed ( n allowed-seq -- n )
+    over { 0 f } member? [ win32-allow-errors ] [ drop ] if ;
 
 : check-invalid-handle ( handle -- handle )
-    dup INVALID_HANDLE_VALUE = [ throw-win32-error ] when ;
+    dup INVALID_HANDLE_VALUE = [ win32-error ] when ;
 
 CONSTANT: expected-io-errors
     ${
@@ -756,13 +759,3 @@ CONSTANT: expected-io-errors
 
 : expected-io-error? ( error-code -- ? )
     expected-io-errors member? ;
-
-: expected-io-error ( error-code -- )
-    dup expected-io-error? [
-        drop
-    ] [
-        throw-win32-error
-    ] if ;
-
-: io-error ( return-value -- )
-    { 0 f } member? [ GetLastError expected-io-error ] when ;

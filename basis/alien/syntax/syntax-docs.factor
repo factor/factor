@@ -67,18 +67,34 @@ HELP: TYPEDEF:
 HELP: ENUM:
 { $syntax "ENUM: type words... ;" "ENUM: type < base-type words..." }
 { $values { "type" { $maybe "a name to typedef to int" } } { "words" "a sequence of word names" } }
-{ $description "Creates a c-type that boxes and unboxes integer values to symbols. A symbol is defined for each member word. The base c-type can optionally be specified and defaults to " { $link int } ". A constructor word " { $snippet "<type>" } " is defined for converting from integers to singletons. The generic word " { $link enum>number } " converts from singletons to integers. Enum-typed values are automatically prettyprinted as their singleton words. Unrecognizing enum numbers are kept as numbers." }
+{ $description "Creates a c-type that boxes and unboxes integer values to symbols. A singleton is defined for each member word which allows generic dispatch on the enum's members. The base c-type can optionally be specified and defaults to " { $link int } ". A constructor word " { $snippet "<type>" } " is defined for converting from integers to singletons. The generic word " { $link enum>number } " converts from singletons to integers. Enum-typed values are automatically prettyprinted as their singleton words. Unrecognizing enum numbers are kept as numbers." }
 { $examples
     "Here is an example enumeration definition:"
     { $code "ENUM: color_t red { green 3 } blue ;" }
+    $nl
     "The following expression returns true:"
     { $code "3 <color_t> [ green = ] [ enum>number 3 = ] bi and" }
-
+    $nl
     "Here is a version where the C-type takes a single byte:"
-    { $code "ENUM: tv_peripherals_1 < uchar\n{ appletv 1 } { chromecast 2 } { roku 4 } ;" }
-
+    { $code "ENUM: tv_peripherals_1 < uchar"
+            "{ appletv 1 } { chromecast 2 } { roku 4 } ;"
+    }
+    $nl
     "The same as above but four bytes instead of one:"
-    { $code "ENUM: tv_peripherals_4 < uint\n{ appletv 1 } { chromecast 2 } { roku 4 } ;" }
+    { $code "ENUM: tv_peripherals_4 < uint"
+            "{ appletv 1 } { chromecast 2 } { roku 4 } ;"
+    }
+    $nl
+    "We can define a generic and dispatch on it:"
+    { $code "ENUM: tv_peripherals_4 < uint"
+            "{ appletv 1 } { chromecast 2 } { roku 4 } ;"
+            ""
+            "GENERIC: watch-device ( device -- )"
+            "M: appletv watch-device drop \"watching appletv\" print ;"
+            "M: chromecast watch-device drop \"watching chromecast\" print ;"
+            ""
+            "appletv watch-device"
+    }
 } ;
 
 HELP: C-TYPE:
@@ -124,6 +140,10 @@ HELP: C-GLOBAL:
 { $syntax "C-GLOBAL: type name" }
 { $values { "type" "a C type" } { "name" "a C global variable name" } }
 { $description "Defines a getter " { $snippet "name" } " and setter " { $snippet "set-name" } " for the global value in the current library, set with " { $link POSTPONE: LIBRARY: } "." } ;
+
+HELP: INITIALIZE-ALIEN:
+{ $syntax "INITIALIZE-ALIEN: type ... ;" }
+{ $description "Initializes a " { $snippet "type" } " using the provided definition." } ;
 
 ARTICLE: "alien.enums" "Enumeration types"
 "The " { $vocab-link "alien.enums" } " vocab contains the implementation for " { $link POSTPONE: ENUM: } " C types, and provides words for converting between enum singletons and integers. It is possible to dispatch off of members of an enum."

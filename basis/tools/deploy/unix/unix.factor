@@ -1,8 +1,8 @@
 ! Copyright (C) 2008 James Cash
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: combinators io.backend io.directories io.files.info.unix
 io.pathnames kernel namespaces system tools.deploy.backend
-tools.deploy.config tools.deploy.config.editor webbrowser ;
+tools.deploy.config tools.deploy.config.editor ;
 IN: tools.deploy.unix
 
 : create-app-dir ( vocab bundle-name -- vm-path )

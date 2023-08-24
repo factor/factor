@@ -1,7 +1,6 @@
 ! Copyright (C) 2008 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
-USING: kernel accessors random math.parser locals
-sequences math ;
+! See https://factorcode.org/license.txt for BSD license.
+USING: accessors kernel math math.parser random sequences ;
 IN: furnace.auth.providers
 
 TUPLE: user

@@ -1,6 +1,6 @@
 ! Copyright (C) 2008 Daniel Ehrenberg, Doug Coleman.
-! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays assocs classes.singleton fry generic
+! See https://factorcode.org/license.txt for BSD license.
+USING: accessors arrays assocs classes.singleton generic
 hashtables io io.encodings io.encodings.iana kernel lexer parser
 sequences simple-flat-file words ;
 IN: io.encodings.8-bit

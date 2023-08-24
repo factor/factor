@@ -1,7 +1,7 @@
 ! Copyright (C) 2008 Daniel Ehrenberg.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors arrays ascii combinators
-combinators.short-circuit hints kernel locals make math
+combinators.short-circuit hints kernel make math
 math.order sbufs sequences sorting.insertion strings
 unicode.data vectors ;
 IN: unicode.normalize
@@ -27,7 +27,7 @@ CONSTANT: final-count 28
 
 ! These numbers come from UAX 29
 : initial? ( ch -- ? )
-    dup 0x1100 0x1159 ?between? [ ] [ 0x115F = ] ?if ; inline
+    [ 0x1100 0x1159 ?between? ] [ 0x115F = ] ?unless ; inline
 : medial? ( ch -- ? ) 0x1160 0x11A2 ?between? ; inline
 : final? ( ch -- ? ) 0x11A8 0x11F9 ?between? ; inline
 
@@ -71,7 +71,7 @@ CONSTANT: final-count 28
     string [
         >fixnum dup ascii? [ out push ] [
             dup hangul? [ hangul>jamo out push-all ]
-            [ dup quot call [ out push-all ] [ out push ] ?if ] if
+            [ dup quot call or* [ out push-all ] [ out push ] if ] if
         ] if
     ] each
     out "" like dup reorder ; inline
@@ -97,17 +97,17 @@ HINTS: (nfkd) string ;
 : --final? ( str i -- ? )
     2 + swap ?nth final? ;
 
-: imf, ( str i -- str i )
+: imf% ( str i -- str i )
     [ tail-slice first3 jamo>hangul , ]
     [ 3 + ] 2bi ;
 
-: im, ( str i -- str i )
+: im% ( str i -- str i )
     [ tail-slice first2 final-base jamo>hangul , ]
     [ 2 + ] 2bi ;
 
 : compose-jamo ( str i -- str i )
     2dup initial-medial? [
-        2dup --final? [ imf, ] [ im, ] if
+        2dup --final? [ imf% ] [ im% ] if
     ] [ 2dup swap nth , 1 + ] if ;
 
 : pass-combining ( str -- str i )

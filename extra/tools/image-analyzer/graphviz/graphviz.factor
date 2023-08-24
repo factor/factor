@@ -1,5 +1,5 @@
 ! Copyright (C) 2015 - 2016 Björn Lindqvist
-! See http://factorcode.org/license.txt for BSD license
+! See https://factorcode.org/license.txt for BSD license
 USING: accessors alien.strings assocs classes fry graphviz
 graphviz.attributes graphviz.notation math.bitwise sequences sets
 system tools.image-analyzer.references tools.image-analyzer.utils

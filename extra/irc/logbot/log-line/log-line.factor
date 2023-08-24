@@ -1,5 +1,5 @@
 ! Copyright (C) 2009 Bruno Deferrari.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors irc.messages irc.messages.base kernel make
 combinators sequences ;
 IN: irc.logbot.log-line
@@ -59,7 +59,7 @@ M: participant-mode >log-line
             [ " has set mode " % mode>> % ]
             [ " to " % parameter>> % ]
         } cleave
-     ] "" make ;
+    ] "" make ;
 
 M: nick >log-line
     [ "* " % dup sender>> % " is now known as " % nickname>> % ] "" make ;

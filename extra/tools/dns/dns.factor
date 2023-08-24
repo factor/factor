@@ -1,5 +1,5 @@
 ! Copyright (C) 2010 Doug Coleman.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: arrays command-line dns fry io kernel math.parser
 namespaces sequences strings ;
 IN: tools.dns
@@ -22,8 +22,13 @@ IN: tools.dns
     [ a-message. ] [ (aaaa-message.) ] bi ;
 
 : mx-line. ( host pair -- )
-    [ write " mail is handled by " write ]
-    [ first2 [ number>string write bl ] [ print ] bi* ] bi* ;
+    dup length 1 = [
+        [ write " is an alias for " write ]
+        [ first print ] bi*
+    ] [
+        [ write " mail is handled by " write ]
+        [ first2 [ number>string write bl ] [ print ] bi* ] bi*
+    ] if ;
 
 : mx-message. ( message -- )
     [ message>query-name ] [ message>mxs ] bi

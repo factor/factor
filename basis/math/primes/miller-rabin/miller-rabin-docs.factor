@@ -1,6 +1,7 @@
 ! Copyright (C) 2009 Doug Coleman.
-! See http://factorcode.org/license.txt for BSD license.
-USING: help.markup help.syntax kernel sequences math ;
+! See https://factorcode.org/license.txt for BSD license.
+USING: help.markup help.syntax kernel math
+math.primes.miller-rabin ;
 IN: math.primes.miller-rabin
 
 HELP: miller-rabin

@@ -1,11 +1,11 @@
 ! Copyright (C) 2009 Slava Pestov, Joe Groff.
-! See http://factorcode.org/license.txt for BSD license.
-USING: accessors alien.c-types arrays assocs byte-arrays combinators
-combinators.short-circuit compiler.cfg.comparisons
+! See https://factorcode.org/license.txt for BSD license.
+USING: accessors alien.c-types arrays assocs byte-arrays
+combinators combinators.short-circuit compiler.cfg.comparisons
 compiler.cfg.hats compiler.cfg.instructions
 compiler.cfg.intrinsics compiler.cfg.intrinsics.alien
 compiler.cfg.intrinsics.simd.backend compiler.cfg.stacks
-cpu.architecture fry kernel layouts locals math math.vectors
+cpu.architecture kernel layouts math math.vectors
 math.vectors.simd.intrinsics sequences specialized-arrays ;
 FROM: alien.c-types => heap-size char short int longlong float double ;
 SPECIALIZED-ARRAYS: char uchar short ushort int uint longlong ulonglong float double ;
@@ -417,7 +417,7 @@ PREDICATE: fixnum-vector-rep < int-vector-rep
         ] }
     } emit-vv-vector-op ;
 
-: emit-simd-v. ( node -- )
+: emit-simd-vdot ( node -- )
     {
         [ ^^dot-vector ]
         { float-vector-rep [ [ ^^mul-vector ] [ ^sum-vector ] bi ] }
@@ -667,7 +667,7 @@ PREDICATE: fixnum-vector-rep < int-vector-rep
         { (simd-vmin)               [ emit-simd-vmin                ] }
         { (simd-vmax)               [ emit-simd-vmax                ] }
         { (simd-vavg)               [ emit-simd-vavg                ] }
-        { (simd-v.)                 [ emit-simd-v.                  ] }
+        { (simd-vdot)               [ emit-simd-vdot                ] }
         { (simd-vsad)               [ emit-simd-vsad                ] }
         { (simd-vsqrt)              [ emit-simd-vsqrt               ] }
         { (simd-sum)                [ emit-simd-sum                 ] }
@@ -712,7 +712,7 @@ PREDICATE: fixnum-vector-rep < int-vector-rep
         { (simd-select)             [ emit-simd-select              ] }
         { alien-vector              [ emit-alien-vector             ] }
         { set-alien-vector          [ emit-set-alien-vector         ] }
-        { assert-positive           [ drop                          ] }
+        { (simd-positive)           [ drop                          ] }
         { (simd-vgetmask)           [ emit-simd-vgetmask            ] }
     } enable-intrinsics ;
 

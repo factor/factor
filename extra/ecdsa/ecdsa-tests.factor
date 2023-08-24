@@ -1,5 +1,5 @@
 ! Copyright (C) 2009 Maxim Savchenko
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 
 USING: namespaces ecdsa tools.test checksums checksums.sha ;
 IN: ecdsa.tests

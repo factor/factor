@@ -1,5 +1,5 @@
 ! Copyright (c) 2008, 2010 Slava Pestov
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors kernel sequences assocs io.files io.pathnames
 io.sockets io.sockets.secure io.servers
 namespaces db db.tuples db.sqlite smtp urls
@@ -31,7 +31,7 @@ webapps.mason.backend.watchdog
 websites.factorcode ;
 IN: websites.concatenative
 
-: website-db ( -- db ) home "website.db" append-path <sqlite-db> ;
+: website-db ( -- db ) "~/website.db" <sqlite-db> ;
 
 : init-factor-db ( -- )
     mason-db [ init-mason-db ] with-db
@@ -59,16 +59,17 @@ TUPLE: concatenative-website < dispatcher ;
         allow-edit-profile
         allow-deactivation ;
 
-SYMBOLS: factor-recaptcha-public-key factor-recaptcha-private-key ;
+SYMBOLS: factor-recaptcha-site-key factor-recaptcha-secret-key ;
 
 : <factor-recaptcha> ( responder -- responder' )
     <recaptcha>
         "concatenative.org" >>domain
-        factor-recaptcha-public-key get >>public-key
-        factor-recaptcha-private-key get >>private-key ;
+        factor-recaptcha-site-key get >>site-key
+        factor-recaptcha-secret-key get >>secret-key ;
 
 : <concatenative-website> ( -- responder )
     concatenative-website new-dispatcher
+        "resource:extra/websites/concatenative" <static> >>default
         URL" /wiki/view/Front Page" <redirect-responder> "" add-responder ;
 
 SYMBOLS: key-password key-file dh-file ;
@@ -95,7 +96,25 @@ SYMBOLS: key-password key-file dh-file ;
 : <gitweb> ( path -- responder )
     <dispatcher>
         swap <static> enable-cgi >>default
-        URL" /gitweb.cgi" <redirect-responder> "" add-responder ;
+        URL" /gitweb.cgi" <redirect-responder> "" add-responder
+        URL" /github-sync.cgi" <redirect-responder> "github-sync" add-responder ;
+
+TUPLE: cgit < file-responder ;
+
+: <cgit> ( root -- responder )
+    cgit new
+        swap >>root
+        [ (serve-static) ] >>hook
+        H{ } clone >>special
+    enable-cgi ;
+
+M: cgit call-responder*
+    dup file-responder set
+    over [ f ] [ "/" join serving-path file-exists? ] if-empty [
+        url get
+            rot "/" join "url" set-query-param
+            "cgit.cgi" >>path drop { "cgit.cgi" } swap
+    ] unless call-next-method ;
 
 : init-production ( -- )
     common-configuration
@@ -107,9 +126,12 @@ SYMBOLS: key-password key-file dh-file ;
         <pastebin> <factor-recaptcha> <login-config> <factor-boilerplate> website-db <alloy> "paste.factorcode.org" add-responder
         <planet> <login-config> <factor-boilerplate> website-db <alloy> "planet.factorcode.org" add-responder
         <mason-app> <login-config> <factor-boilerplate> website-db <alloy> "builds.factorcode.org" add-responder
-        home "docs" append-path <help-webapp> "docs.factorcode.org" add-responder
-        home "cgi" append-path <gitweb> "gitweb.factorcode.org" add-responder
-        home "irclogs" append-path <static> t >>allow-listings "irclogs.factorcode.org" add-responder
+        "~/docs" <help-webapp> "docs.factorcode.org" add-responder
+        "~/gitweb" <gitweb> "gitweb.factorcode.org" add-responder
+        "~/cgit" <cgit> "cgit.factorcode.org" add-responder
+        "~/re" <static> "re.factorcode.org" add-responder
+        "~/blogs" <static> "blogs.factorcode.org" add-responder
+        "~/irclogs" <static> t >>allow-listings "irclogs.factorcode.org" add-responder
     main-responder set-global ;
 
 : <factor-secure-config> ( -- config )

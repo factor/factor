@@ -1,41 +1,16 @@
 ! Copyright (C) 2007-2009 Samuel Tardieu.
-! See http://factorcode.org/license.txt for BSD license.
-USING: arrays assocs combinators command-line io kernel make
-math math.functions math.parser math.primes math.ranges
-namespaces sequences sequences.product sorting ;
+! See https://factorcode.org/license.txt for BSD license.
+USING: arrays combinators command-line io kernel math
+math.functions math.parser math.primes.pollard-rho-brent
+ranges math.statistics namespaces sequences
+sequences.product sets sorting splitting ;
 IN: math.primes.factors
 
-<PRIVATE
+: factors ( n -- seq ) pollard-rho-brent-factors ; flushable
 
-: count-factor ( n d -- n' c )
-    [ 1 ] 2dip [ /i ] keep
-    [ dupd /mod zero? ] curry [ nip [ 1 + ] dip ] while drop
-    swap ;
+: group-factors ( n -- seq ) factors histogram sort-keys ; flushable
 
-: write-factor ( n d -- n' d' )
-    2dup divisor? [
-        [ [ count-factor ] keep swap 2array , ] keep
-        ! If the remainder is a prime number, increase d so that
-        ! the caller stops looking for factors.
-        over prime? [ drop dup ] when
-    ] when ;
-
-: (group-factors) ( n -- seq )
-    [
-        2
-        [ 2dup sq < ] [ write-factor next-prime ] until
-        drop dup 2 < [ drop ] [ 1 2array , ] if
-    ] { } make ;
-
-PRIVATE>
-
-: group-factors ( n -- seq )
-    dup prime? [ 1 2array 1array ] [ (group-factors) ] if ; flushable
-
-: unique-factors ( n -- seq ) group-factors keys ; flushable
-
-: factors ( n -- seq )
-    group-factors [ first2 swap <array> ] map concat ; flushable
+: unique-factors ( n -- seq ) factors members ; flushable
 
 : totient ( n -- t )
     {
@@ -48,18 +23,18 @@ PRIVATE>
         1array
     ] [
         group-factors dup empty? [
-            [ first2 [0,b] [ ^ ] with map ] map
-            [ product ] product-map natural-sort
+            [ first2 [0..b] [ ^ ] with map ] map
+            [ product ] product-map sort
         ] unless
     ] if ;
 
 : unix-factor ( string -- )
     dup string>number [
         [ ": " append write ]
-        [ factors [ number>string ] map " " join print ] bi*
+        [ factors [ number>string ] map join-words print ] bi*
     ] [
         "factor: `" "' is not a valid positive integer" surround print
-    ] if* ;
+    ] if* flush ;
 
 : run-unix-factor ( -- )
     command-line get [

@@ -1,8 +1,8 @@
 ! Copyright (C) 2008 Doug Coleman, Joe Groff.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors byte-arrays images images.normalization
-images.viewer kernel math namespaces opengl opengl.gl sequences
-ui ui.backend ui.gadgets.worlds ;
+images.viewer kernel math namespaces opengl opengl.gl
+sequences ui ui.gadgets.worlds ;
 IN: cap
 
 <PRIVATE
@@ -27,15 +27,14 @@ IN: cap
 
 PRIVATE>
 
-: screenshot ( window -- bitmap )
-    [ <image>
+:: screenshot ( window -- bitmap )
+    <image>
         gl-scale-factor get-global [ 2.0 = >>2x? ] when*
-    ] dip
-    [ gl-screenshot >>bitmap ]
-    [ dim>> [ gl-scale >fixnum ] map >>dim ] bi
-    ubyte-components >>component-type
-    RGBA >>component-order
-    t >>upside-down?
+        window gl-screenshot >>bitmap
+        window dim>> [ gl-scale >fixnum ] map >>dim
+        ubyte-components >>component-type
+        RGBA >>component-order
+        t >>upside-down?
     normalize-image ;
 
 : screenshot. ( window -- )

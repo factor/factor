@@ -1,6 +1,6 @@
 ! Copyright (C) 2009 Joe Groff.
-! See http://factorcode.org/license.txt for BSD license.
-USING: alien destructors help.markup help.syntax kernel math ;
+! See https://factorcode.org/license.txt for BSD license.
+USING: alien destructors help.markup help.syntax math ;
 IN: memory.piles
 
 HELP: <pile>

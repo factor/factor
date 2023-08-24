@@ -1,5 +1,5 @@
 ! Copyright (C) 2003, 2010 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors alien.accessors byte-arrays kernel
 kernel.private math math.private sequences sequences.private
 slots.private ;
@@ -22,7 +22,12 @@ PRIMITIVE: string-nth-fast ( n string -- ch )
     f swap set-string-hashcode ; inline
 
 : rehash-string ( str -- )
-    1 over sequence-hashcode swap set-string-hashcode ; inline
+    0 over [
+        swap [
+            [ -2 fixnum-shift-fast ] [ 5 fixnum-shift-fast ] bi
+            fixnum+fast fixnum+fast
+        ] keep fixnum-bitxor
+    ] each swap set-string-hashcode ; inline
 
 : (aux) ( n string -- byte-array m )
     aux>> { byte-array } declare swap 1 fixnum-shift-fast ; inline
@@ -65,8 +70,8 @@ M: string equal?
 
 M: string hashcode*
     nip
-    dup string-hashcode
-    [ ] [ dup rehash-string string-hashcode ] ?if ;
+    [ string-hashcode ]
+    [ dup rehash-string string-hashcode ] ?unless ;
 
 M: string length
     length>> ; inline

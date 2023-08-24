@@ -1,5 +1,5 @@
 ! Copyright (C) 2009, 2010 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs classes classes.algebra
 combinators combinators.private definitions effects generic
 hashtables kernel layouts make math namespaces quotations
@@ -39,16 +39,17 @@ SYMBOL: combination
 
 HOOK: picker combination ( -- quot )
 
-M: single-combination next-method-quot* ( class generic combination -- quot )
+M: single-combination next-method-quot*
     [
-        2dup next-method dup [
+        2dup next-method [
             [
-                pick predicate-def %
+                [ picker % ] 3dip
+                [ dup predicate-def % ] 2dip
                 1quotation ,
                 [ inconsistent-next-method ] 2curry ,
                 \ if ,
-            ] [ ] make picker prepend
-        ] [ 3drop f ] if
+            ] [ ] make
+        ] [ 2drop f ] if*
     ] with-combination ;
 
 : method-for-object ( obj word -- method )
@@ -59,7 +60,7 @@ M: single-combination next-method-quot* ( class generic combination -- quot )
     bi or ;
 
 M: single-combination make-default-method
-    [ [ picker ] dip [ no-method ] curry append ] with-combination ;
+    [ [ picker ] dip '[ @ _ no-method ] ] with-combination ;
 
 ! ! ! Build an engine ! ! !
 
@@ -76,13 +77,12 @@ C: <predicate-engine> predicate-engine
 
 : push-method ( method class atomic assoc -- )
     dupd [
-        [ ] [ H{ } clone <predicate-engine> ] ?if
+        or* [ H{ } clone <predicate-engine> ] unless
         [ methods>> set-at ] keep
     ] change-at ;
 
 : flatten-method ( method class assoc -- )
-    over flatten-class keys
-    [ swap push-method ] 2with with each ;
+    over flatten-class [ swap push-method ] 2with with each ;
 
 : flatten-methods ( assoc -- assoc' )
     H{ } clone [ [ swapd flatten-method ] curry assoc-each ] keep ;

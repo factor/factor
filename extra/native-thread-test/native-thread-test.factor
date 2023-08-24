@@ -1,8 +1,7 @@
 ! Copyright (C) 2009 Phil Dawes.
-! See http://factorcode.org/license.txt for BSD license.
-USING: alien.c-types alien.strings alien.syntax io
-io.encodings.utf8 io.files kernel sequences system threads
-unix.utilities ;
+! See https://factorcode.org/license.txt for BSD license.
+USING: alien.c-types alien.strings alien.syntax alien.utilities
+io io.encodings.utf8 io.files kernel sequences system threads ;
 IN: native-thread-test
 
 FUNCTION: void* start_standalone_factor_in_new_thread ( int argc, c-string* argv )

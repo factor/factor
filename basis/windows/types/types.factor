@@ -1,8 +1,8 @@
 ! Copyright (C) 2005, 2006 Doug Coleman.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: alien.c-types alien.syntax classes.struct colors
-io.encodings.utf16n io.encodings.utf8 kernel math math.bitwise
-math.vectors sequences ;
+io.encodings.utf16 io.encodings.utf8 kernel math math.bitwise
+math.functions math.vectors sequences ;
 FROM: alien.c-types => float short ;
 IN: windows.types
 
@@ -109,6 +109,7 @@ TYPEDEF: HANDLE              HKL
 TYPEDEF: HANDLE              HLOCAL
 TYPEDEF: HANDLE              HMENU
 TYPEDEF: HANDLE              HMETAFILE
+TYPEDEF: HANDLE              HMETAFILEPICT
 TYPEDEF: HINSTANCE           HMODULE
 TYPEDEF: HANDLE              HMONITOR
 TYPEDEF: HANDLE              HPALETTE
@@ -321,7 +322,7 @@ STRUCT: PIXELFORMATDESCRIPTOR
     { dwDamageMask DWORD } ;
 
 : <RECT> ( loc dim -- RECT )
-    dupd v+ [ first2 ] bi@ RECT <struct-boa> ;
+    dupd v+ [ first2 ] bi@ RECT boa ;
 
 TYPEDEF: RECT* PRECT
 TYPEDEF: RECT* LPRECT
@@ -378,9 +379,9 @@ TYPEDEF: DWORD* LPCOLORREF
     [ -16 shift 0xff bitand ] tri ;
 
 : color>RGB ( color -- COLORREF )
-    >rgba-components drop [ 255 * >integer ] tri@ RGB ;
+    >rgba-components drop [ 255 round * >integer ] tri@ RGB ;
 : RGB>color ( COLORREF -- color )
-    >RGB< [ 1/255. * >float ] tri@ 1.0 <rgba> ;
+    >RGB< [ 255 /f ] tri@ 1.0 <rgba> ;
 
 STRUCT: TEXTMETRICW
     { tmHeight LONG }

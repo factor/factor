@@ -1,12 +1,14 @@
-# <pre>
+# tzdb data for North and Central America and environs
+
 # This file is in the public domain, so clarified as of
 # 2009-05-17 by Arthur David Olson.
 
 # also includes Central America and the Caribbean
 
-# This data is by no means authoritative; if you think you know better,
+# This file is by no means authoritative; if you think you know better,
 # go ahead and edit the file (and please send any changes to
-# tz@iana.org for general use in the future).
+# tz@iana.org for general use in the future).  For more, please see
+# the file CONTRIBUTING in the tz distribution.
 
 # From Paul Eggert (1999-03-22):
 # A reliable and entertaining source about time zones is
@@ -20,12 +22,35 @@
 # Howse writes (pp 121-125) that time zones were invented by
 # Professor Charles Ferdinand Dowd (1825-1904),
 # Principal of Temple Grove Ladies' Seminary (Saratoga Springs, NY).
-# His pamphlet ``A System of National Time for Railroads'' (1870)
+# His pamphlet "A System of National Time for Railroads" (1870)
 # was the result of his proposals at the Convention of Railroad Trunk Lines
 # in New York City (1869-10).  His 1870 proposal was based on Washington, DC,
 # but in 1872-05 he moved the proposed origin to Greenwich.
-# His proposal was adopted by the railroads on 1883-11-18 at 12:00,
-# and the most of the country soon followed suit.
+
+# From Paul Eggert (2018-03-20):
+# Dowd's proposal left many details unresolved, such as where to draw
+# lines between time zones.  The key individual who made time zones
+# work in the US was William Frederick Allen - railway engineer,
+# managing editor of the Travelers' Guide, and secretary of the
+# General Time Convention, a railway standardization group.  Allen
+# spent months in dialogs with scientific and railway leaders,
+# developed a workable plan to institute time zones, and presented it
+# to the General Time Convention on 1883-04-11, saying that his plan
+# meant "local time would be practically abolished" - a plus for
+# railway scheduling.  By the next convention on 1883-10-11 nearly all
+# railroads had agreed and it took effect on 1883-11-18.  That Sunday
+# was called the "day of two noons", as some locations observed noon
+# twice.  Allen witnessed the transition in New York City, writing:
+#
+#   I heard the bells of St. Paul's strike on the old time.  Four
+#   minutes later, obedient to the electrical signal from the Naval
+#   Observatory ... the time-ball made its rapid descent, the chimes
+#   of old Trinity rang twelve measured strokes, and local time was
+#   abandoned, probably forever.
+#
+# Most of the US soon followed suit.  See:
+# Bartky IR. The adoption of standard time. Technol Cult 1989 Jan;30(1):25-56.
+# https://dx.doi.org/10.2307/3105430
 
 # From Paul Eggert (2005-04-16):
 # That 1883 transition occurred at 12:00 new time, not at 12:00 old time.
@@ -40,8 +65,8 @@
 
 # From Paul Eggert (2001-03-06):
 # Daylight Saving Time was first suggested as a joke by Benjamin Franklin
-# in his whimsical essay ``An Economical Project for Diminishing the Cost
-# of Light'' published in the Journal de Paris (1784-04-26).
+# in his whimsical essay "An Economical Project for Diminishing the Cost
+# of Light" published in the Journal de Paris (1784-04-26).
 # Not everyone is happy with the results:
 #
 #	I don't really care how time is reckoned so long as there is some
@@ -55,23 +80,46 @@
 #	to push people into bed earlier, and get them up earlier, to make
 #	them healthy, wealthy and wise in spite of themselves.
 #
-#	-- Robertson Davies, The diary of Samuel Marchbanks,
+#	 -- Robertson Davies, The diary of Samuel Marchbanks,
 #	   Clarke, Irwin (1947), XIX, Sunday
 #
 # For more about the first ten years of DST in the United States, see
-# Robert Garland's <a href="http://www.clpgh.org/exhibit/dst.html">
-# Ten years of daylight saving from the Pittsburgh standpoint
-# (Carnegie Library of Pittsburgh, 1927)</a>.
+# Robert Garland, Ten years of daylight saving from the Pittsburgh standpoint
+# (Carnegie Library of Pittsburgh, 1927).
+# https://web.archive.org/web/20160517155308/http://www.clpgh.org/exhibit/dst.html
 #
 # Shanks says that DST was called "War Time" in the US in 1918 and 1919.
 # However, DST was imposed by the Standard Time Act of 1918, which
 # was the first nationwide legal time standard, and apparently
 # time was just called "Standard Time" or "Daylight Saving Time".
 
-# From Arthur David Olson:
-# US Daylight Saving Time ended on the last Sunday of *October* in 1974.
-# See, for example, the front page of the Saturday, 1974-10-26
-# and Sunday, 1974-10-27 editions of the Washington Post.
+# From Paul Eggert (2019-06-04):
+# Here is the legal basis for the US federal rules.
+# * Public Law 65-106 (1918-03-19) implemented standard and daylight saving
+#   time for the first time across the US, springing forward on March's last
+#   Sunday and falling back on October's last Sunday.
+#   https://www.loc.gov/law/help/statutes-at-large/65th-congress/session-2/c65s2ch24.pdf
+# * Public Law 66-40 (1919-08-20) repealed DST on October 1919's last Sunday.
+#   https://www.loc.gov/law/help/statutes-at-large/66th-congress/session-1/c66s1ch51.pdf
+# * Public Law 77-403 (1942-01-20) started wartime DST on 1942-02-09.
+#   https://www.loc.gov/law/help/statutes-at-large/77th-congress/session-2/c77s2ch7.pdf
+# * Public Law 79-187 (1945-09-25) ended wartime DST on 1945-09-30.
+#   https://www.loc.gov/law/help/statutes-at-large/79th-congress/session-1/c79s1ch388.pdf
+# * Public Law 89-387 (1966-04-13) reinstituted a national standard for DST,
+#   from April's last Sunday to October's last Sunday, effective 1967.
+#   https://www.govinfo.gov/content/pkg/STATUTE-80/pdf/STATUTE-80-Pg107.pdf
+# * Public Law 93-182 (1973-12-15) moved the 1974 spring-forward to 01-06.
+#   https://www.govinfo.gov/content/pkg/STATUTE-87/pdf/STATUTE-87-Pg707.pdf
+# * Public Law 93-434 (1974-10-05) moved the 1975 spring-forward to
+#   February's last Sunday.
+#   https://www.govinfo.gov/content/pkg/STATUTE-88/pdf/STATUTE-88-Pg1209.pdf
+# * Public Law 99-359 (1986-07-08) moved the spring-forward to April's first
+#   Sunday.
+#   https://www.govinfo.gov/content/pkg/STATUTE-100/pdf/STATUTE-100-Pg764.pdf
+# * Public Law 109-58 (2005-08-08), effective 2007, moved the spring-forward
+#   to March's second Sunday and the fall-back to November's first Sunday.
+#   https://www.govinfo.gov/content/pkg/PLAW-109publ58/pdf/PLAW-109publ58.pdf
+# All transitions are at 02:00 local time.
 
 # From Arthur David Olson:
 # Before the Uniform Time Act of 1966 took effect in 1967, observance of
@@ -80,11 +128,14 @@
 # From Arthur David Olson (2000-09-25):
 # Last night I heard part of a rebroadcast of a 1945 Arch Oboler radio drama.
 # In the introduction, Oboler spoke of "Eastern Peace Time."
-# An AltaVista search turned up
-# <a href="http://rowayton.org/rhs/hstaug45.html">:
+# An AltaVista search turned up:
+# https://web.archive.org/web/20000926032210/http://rowayton.org/rhs/hstaug45.html
 # "When the time is announced over the radio now, it is 'Eastern Peace
 # Time' instead of the old familiar 'Eastern War Time.'  Peace is wonderful."
-# </a> (August 1945) by way of confirmation.
+# (August 1945) by way of confirmation.
+#
+# From Paul Eggert (2017-09-23):
+# This was the V-J Day issue of the Clamdigger, a Rowayton, CT newsletter.
 
 # From Joseph Gallant citing
 # George H. Douglas, _The Early Days of Radio Broadcasting_ (1987):
@@ -119,7 +170,7 @@
 # U.S. government action.  So even though the "US" rules have changed
 # in the latest release, other countries won't be affected.
 
-# Rule	NAME	FROM	TO	TYPE	IN	ON	AT	SAVE	LETTER/S
+# Rule	NAME	FROM	TO	-	IN	ON	AT	SAVE	LETTER/S
 Rule	US	1918	1919	-	Mar	lastSun	2:00	1:00	D
 Rule	US	1918	1919	-	Oct	lastSun	2:00	0	S
 Rule	US	1942	only	-	Feb	9	2:00	1:00	W # War
@@ -128,7 +179,7 @@ Rule	US	1945	only	-	Sep	30	2:00	0	S
 Rule	US	1967	2006	-	Oct	lastSun	2:00	0	S
 Rule	US	1967	1973	-	Apr	lastSun	2:00	1:00	D
 Rule	US	1974	only	-	Jan	6	2:00	1:00	D
-Rule	US	1975	only	-	Feb	23	2:00	1:00	D
+Rule	US	1975	only	-	Feb	lastSun	2:00	1:00	D
 Rule	US	1976	1986	-	Apr	lastSun	2:00	1:00	D
 Rule	US	1987	2006	-	Apr	Sun>=1	2:00	1:00	D
 Rule	US	2007	max	-	Mar	Sun>=8	2:00	1:00	D
@@ -145,7 +196,7 @@ Rule	US	2007	max	-	Nov	Sun>=1	2:00	0	S
 # increase the chances that they'll actually get compiled and to
 # avoid the need to duplicate the US rules in another file.
 
-# Zone	NAME		GMTOFF	RULES	FORMAT	[UNTIL]
+# Zone	NAME		STDOFF	RULES	FORMAT	[UNTIL]
 Zone	EST		 -5:00	-	EST
 Zone	MST		 -7:00	-	MST
 Zone	HST		-10:00	-	HST
@@ -153,22 +204,6 @@ Zone	EST5EDT		 -5:00	US	E%sT
 Zone	CST6CDT		 -6:00	US	C%sT
 Zone	MST7MDT		 -7:00	US	M%sT
 Zone	PST8PDT		 -8:00	US	P%sT
-
-# From Bob Devine (1988-01-28):
-# ...Alaska (and Hawaii) had the timezone names changed in 1967.
-#    old			 new
-#    Pacific Standard Time(PST)  -same-
-#    Yukon Standard Time(YST)    -same-
-#    Central Alaska S.T. (CAT)   Alaska-Hawaii St[an]dard Time (AHST)
-#    Nome Standard Time (NT)     Bering Standard Time (BST)
-#
-# ...Alaska's timezone lines were redrawn in 1983 to give only 2 tz.
-#    The YST zone now covers nearly all of the state, AHST just part
-#    of the Aleutian islands.   No DST.
-
-# From Paul Eggert (1995-12-19):
-# The tables below use `NST', not `NT', for Nome Standard Time.
-# I invented `CAWT' for Central Alaska War Time.
 
 # From U. S. Naval Observatory (1989-01-19):
 # USA  EASTERN       5 H  BEHIND UTC    NEW YORK, WASHINGTON
@@ -182,7 +217,7 @@ Zone	PST8PDT		 -8:00	US	P%sT
 # USA  ALASKA STD    9 H  BEHIND UTC    MOST OF ALASKA     (AKST)
 # USA  ALASKA STD    8 H  BEHIND UTC    APR 3 - OCT 30 (AKDT)
 # USA  ALEUTIAN     10 H  BEHIND UTC    ISLANDS WEST OF 170W
-# USA  - " -         9 H  BEHIND UTC    APR 3 - OCT 30
+# USA    "           9 H  BEHIND UTC    APR 3 - OCT 30
 # USA  HAWAII       10 H  BEHIND UTC
 # USA  BERING       11 H  BEHIND UTC    SAMOA, MIDWAY
 
@@ -226,28 +261,49 @@ Zone	PST8PDT		 -8:00	US	P%sT
 #	Samoa standard time
 # The law doesn't give abbreviations.
 #
-# From Paul Eggert (2000-01-08), following a heads-up from Rives McDow:
-# Public law 106-564 (2000-12-23) introduced the abbreviation
-# "Chamorro Standard Time" for time in Guam and the Northern Marianas.
-# See the file "australasia".
+# From Paul Eggert (2016-12-19):
+# Here are URLs for the 1918 and 1966 legislation:
+# http://uscode.house.gov/statviewer.htm?volume=40&page=451
+# http://uscode.house.gov/statviewer.htm?volume=80&page=108
+# Although the 1918 names were officially "United States Standard
+# Eastern Time" and similarly for "Central", "Mountain", "Pacific",
+# and "Alaska", in practice "Standard" was placed just before "Time",
+# as codified in 1966.  In practice, Alaska time was abbreviated "AST"
+# before 1968.  Summarizing the 1967 name changes:
+#	1918 names			1967 names
+#  -08	Standard Pacific Time (PST)	Pacific standard time (PST)
+#  -09	(unofficial) Yukon (YST)	Yukon standard time (YST)
+#  -10	Standard Alaska Time (AST)	Alaska-Hawaii standard time (AHST)
+#  -11	(unofficial) Nome (NST)		Bering standard time (BST)
+#
+# From Paul Eggert (2023-01-23), from a 2001-01-08 heads-up from Rives McDow:
+# Public law 106-564 (2000-12-23) introduced "Chamorro standard time"
+# for time in Guam and the Northern Marianas.  See the file "australasia".
+# Also see 15 U.S.C. §263 <https://www.law.cornell.edu/uscode/text/15/263>.
+#
+# From Paul Eggert (2015-04-17):
+# HST and HDT are standardized abbreviations for Hawaii-Aleutian
+# standard and daylight times.  See section 9.47 (p 234) of the
+# U.S. Government Printing Office Style Manual (2008)
+# https://www.gpo.gov/fdsys/pkg/GPO-STYLEMANUAL-2008/pdf/GPO-STYLEMANUAL-2008.pdf
 
 # From Arthur David Olson, 2005-08-09
 # The following was signed into law on 2005-08-08.
 #
 # H.R. 6, Energy Policy Act of 2005, SEC. 110. DAYLIGHT SAVINGS.
-#   (a) Amendment- Section 3(a) of the Uniform Time Act of 1966 (15
+#   (a) Amendment.--Section 3(a) of the Uniform Time Act of 1966 (15
 #   U.S.C. 260a(a)) is amended--
-#     (1) by striking `first Sunday of April' and inserting `second
-#     Sunday of March'; and
-#     (2) by striking `last Sunday of October' and inserting `first
+#     (1) by striking "first Sunday of April" and inserting "second
+#     Sunday of March"; and
+#     (2) by striking "last Sunday of October" and inserting "first
 #     Sunday of November'.
-#   (b) Effective Date- Subsection (a) shall take effect 1 year after the
+#   (b) Effective Date.--Subsection (a) shall take effect 1 year after the
 #   date of enactment of this Act or March 1, 2007, whichever is later.
-#   (c) Report to Congress- Not later than 9 months after the effective
+#   (c) Report to Congress.--Not later than 9 months after the effective
 #   date stated in subsection (b), the Secretary shall report to Congress
 #   on the impact of this section on energy consumption in the United
 #   States.
-#   (d) Right to Revert- Congress retains the right to revert the
+#   (d) Right to Revert.--Congress retains the right to revert the
 #   Daylight Saving Time back to the 2005 time schedules once the
 #   Department study is complete.
 
@@ -269,22 +325,37 @@ Zone	PST8PDT		 -8:00	US	P%sT
 
 # From Paul Eggert (2005-08-26):
 # According to today's Huntsville Times
-# <http://www.al.com/news/huntsvilletimes/index.ssf?/base/news/1125047783228320.xml&coll=1>
+# http://www.al.com/news/huntsvilletimes/index.ssf?/base/news/1125047783228320.xml&coll=1
 # a few towns on Alabama's "eastern border with Georgia, such as Phenix City
 # in Russell County, Lanett in Chambers County and some towns in Lee County,
 # set their watches and clocks on Eastern time."  It quotes H.H. "Bubba"
 # Roberts, city administrator in Phenix City. as saying "We are in the Central
 # time zone, but we do go by the Eastern time zone because so many people work
 # in Columbus."
+#
+# From Paul Eggert (2017-02-22):
+# Four cities are involved.  The two not mentioned above are Smiths Station
+# and Valley.  Barbara Brooks, Valley's assistant treasurer, heard it started
+# because West Point Pepperell textile mills were in Alabama while the
+# corporate office was in Georgia, and residents voted to keep Eastern
+# time even after the mills closed.  See: Kazek K. Did you know which
+# Alabama towns are in a different time zone?  al.com 2017-02-06.
+# http://www.al.com/living/index.ssf/2017/02/do_you_know_which_alabama_town.html
 
-# Rule	NAME	FROM	TO	TYPE	IN	ON	AT	SAVE	LETTER
+# From Paul Eggert (2014-09-06):
+# Monthly Notices of the Royal Astronomical Society 44, 4 (1884-02-08), 208
+# says that New York City Hall time was 3 minutes 58.4 seconds fast of
+# Eastern time (i.e., -4:56:01.6) just before the 1883 switch.
+
+# Rule	NAME	FROM	TO	-	IN	ON	AT	SAVE	LETTER
 Rule	NYC	1920	only	-	Mar	lastSun	2:00	1:00	D
 Rule	NYC	1920	only	-	Oct	lastSun	2:00	0	S
 Rule	NYC	1921	1966	-	Apr	lastSun	2:00	1:00	D
 Rule	NYC	1921	1954	-	Sep	lastSun	2:00	0	S
 Rule	NYC	1955	1966	-	Oct	lastSun	2:00	0	S
-# Zone	NAME		GMTOFF	RULES	FORMAT	[UNTIL]
-Zone America/New_York	-4:56:02 -	LMT	1883 Nov 18 12:03:58
+# Zone	NAME		STDOFF	RULES	FORMAT	[UNTIL]
+		#STDOFF	-4:56:01.6
+Zone America/New_York	-4:56:02 -	LMT	1883 Nov 18 17:00u
 			-5:00	US	E%sT	1920
 			-5:00	NYC	E%sT	1942
 			-5:00	US	E%sT	1946
@@ -302,8 +373,20 @@ Zone America/New_York	-4:56:02 -	LMT	1883 Nov 18 12:03:58
 # Nebraska, eastern North Dakota, Oklahoma, eastern South Dakota,
 # western Tennessee, most of Texas, Wisconsin
 
+# From Paul Eggert (2018-01-07):
+# In 1869 the Chicago Astronomical Society contracted with the city to keep
+# time.  Though delayed by the Great Fire, by 1880 a wire ran from the
+# Dearborn Observatory (on the University of Chicago campus) to City Hall,
+# which then sent signals to police and fire stations.  However, railroads got
+# their time signals from the Allegheny Observatory, the Madison Observatory,
+# the Ann Arbor Observatory, etc., so their clocks did not agree with each
+# other or with the city's official time.  The confusion took some years to
+# clear up.  See:
+# Moser M. How Chicago gave America its time zones. Chicago. 2018-01-04.
+# http://www.chicagomag.com/city-life/January-2018/How-Chicago-Gave-America-Its-Time-Zones/
+
 # From Larry M. Smith (2006-04-26) re Wisconsin:
-# http://www.legis.state.wi.us/statutes/Stat0175.pdf ...
+# https://docs.legis.wisconsin.gov/statutes/statutes/175.pdf
 # is currently enforced at the 01:00 time of change.  Because the local
 # "bar time" in the state corresponds to 02:00, a number of citations
 # are issued for the "sale of class 'B' alcohol after prohibited
@@ -312,27 +395,62 @@ Zone America/New_York	-4:56:02 -	LMT	1883 Nov 18 12:03:58
 # From Douglas R. Bomberg (2007-03-12):
 # Wisconsin has enacted (nearly eleventh-hour) legislation to get WI
 # Statue 175 closer in synch with the US Congress' intent....
-# http://www.legis.state.wi.us/2007/data/acts/07Act3.pdf
+# https://docs.legis.wisconsin.gov/2007/related/acts/3
 
-# Rule	NAME	FROM	TO	TYPE	IN	ON	AT	SAVE	LETTER
+# From an email administrator of the City of Fort Pierre, SD (2015-12-21):
+# Fort Pierre is technically located in the Mountain time zone as is
+# the rest of Stanley County.  Most of Stanley County and Fort Pierre
+# uses the Central time zone due to doing most of their business in
+# Pierre so it simplifies schedules.  I have lived in Stanley County
+# all my life and it has been that way since I can remember.  (43 years!)
+#
+# From Paul Eggert (2015-12-25):
+# Assume this practice predates 1970, so Fort Pierre can use America/Chicago.
+
+# From Paul Eggert (2015-04-06):
+# In 1950s Nashville a public clock had dueling faces, one for conservatives
+# and the other for liberals; the two sides didn't agree about the time of day.
+# I haven't found a photo of this clock, nor have I tracked down the TIME
+# magazine report cited below, but here's the story as told by the late
+# American journalist John Seigenthaler, who was there:
+#
+# "The two [newspaper] owners held strongly contrasting political and
+# ideological views.  Evans was a New South liberal, Stahlman an Old South
+# conservative, and their two papers frequently clashed editorially, often on
+# the same day....  In the 1950s as the state legislature was grappling with
+# the question of whether to approve daylight saving time for the entire state,
+# TIME magazine reported:
+#
+# "'The Nashville Banner and The Nashville Tennessean rarely agree on anything
+# but the time of day - and last week they couldn't agree on that.'
+#
+# "It was all too true. The clock on the front of the building had two faces -
+# The Tennessean side of the building facing west, the other, east.  When it
+# was high noon Banner time, it was 11 a.m. Tennessean time."
+#
+# Seigenthaler J. For 100 years, Tennessean had it covered.
+# The Tennessean 2007-05-11, republished 2015-04-06.
+# https://www.tennessean.com/story/insider/extras/2015/04/06/archives-seigenthaler-for-100-years-the-tennessean-had-it-covered/25348545/
+
+# Rule	NAME	FROM	TO	-	IN	ON	AT	SAVE	LETTER
 Rule	Chicago	1920	only	-	Jun	13	2:00	1:00	D
 Rule	Chicago	1920	1921	-	Oct	lastSun	2:00	0	S
 Rule	Chicago	1921	only	-	Mar	lastSun	2:00	1:00	D
 Rule	Chicago	1922	1966	-	Apr	lastSun	2:00	1:00	D
 Rule	Chicago	1922	1954	-	Sep	lastSun	2:00	0	S
 Rule	Chicago	1955	1966	-	Oct	lastSun	2:00	0	S
-# Zone	NAME		GMTOFF	RULES	FORMAT	[UNTIL]
-Zone America/Chicago	-5:50:36 -	LMT	1883 Nov 18 12:09:24
+# Zone	NAME		STDOFF	RULES	FORMAT	[UNTIL]
+Zone America/Chicago	-5:50:36 -	LMT	1883 Nov 18 18:00u
 			-6:00	US	C%sT	1920
-			-6:00	Chicago	C%sT	1936 Mar  1 2:00
-			-5:00	-	EST	1936 Nov 15 2:00
+			-6:00	Chicago	C%sT	1936 Mar  1  2:00
+			-5:00	-	EST	1936 Nov 15  2:00
 			-6:00	Chicago	C%sT	1942
 			-6:00	US	C%sT	1946
 			-6:00	Chicago	C%sT	1967
 			-6:00	US	C%sT
 # Oliver County, ND switched from mountain to central time on 1992-10-25.
-Zone America/North_Dakota/Center -6:45:12 - LMT	1883 Nov 18 12:14:48
-			-7:00	US	M%sT	1992 Oct 25 02:00
+Zone America/North_Dakota/Center -6:45:12 - LMT	1883 Nov 18 19:00u
+			-7:00	US	M%sT	1992 Oct 25  2:00
 			-6:00	US	C%sT
 # Morton County, ND, switched from mountain to central time on
 # 2003-10-26, except for the area around Mandan which was already central time.
@@ -341,29 +459,25 @@ Zone America/North_Dakota/Center -6:45:12 - LMT	1883 Nov 18 12:14:48
 # Jones, Mellette, and Todd Counties in South Dakota;
 # but in practice these other counties were already observing central time.
 # See <http://www.epa.gov/fedrgstr/EPA-IMPACT/2003/October/Day-28/i27056.htm>.
-Zone America/North_Dakota/New_Salem -6:45:39 - LMT 1883 Nov 18 12:14:21
-			-7:00	US	M%sT	2003 Oct 26 02:00
+Zone America/North_Dakota/New_Salem -6:45:39 - LMT 1883 Nov 18 19:00u
+			-7:00	US	M%sT	2003 Oct 26  2:00
 			-6:00	US	C%sT
 
 # From Josh Findley (2011-01-21):
 # ...it appears that Mercer County, North Dakota, changed from the
 # mountain time zone to the central time zone at the last transition from
 # daylight-saving to standard time (on Nov. 7, 2010):
-# <a href="http://www.gpo.gov/fdsys/pkg/FR-2010-09-29/html/2010-24376.htm">
-# http://www.gpo.gov/fdsys/pkg/FR-2010-09-29/html/2010-24376.htm
-# </a>
-# <a href="http://www.bismarcktribune.com/news/local/article_1eb1b588-c758-11df-b472-001cc4c03286.html">
+# https://www.gpo.gov/fdsys/pkg/FR-2010-09-29/html/2010-24376.htm
 # http://www.bismarcktribune.com/news/local/article_1eb1b588-c758-11df-b472-001cc4c03286.html
-# </a>
 
 # From Andy Lipscomb (2011-01-24):
 # ...according to the Census Bureau, the largest city is Beulah (although
 # it's commonly referred to as Beulah-Hazen, with Hazen being the next
 # largest city in Mercer County).  Google Maps places Beulah's city hall
-# at 4715'51" north, 10146'40" west, which yields an offset of 6h47'07".
+# at 47° 15' 51" N, 101° 46' 40" W, which yields an offset of 6h47'07".
 
-Zone America/North_Dakota/Beulah -6:47:07 - LMT 1883 Nov 18 12:12:53
-			-7:00	US	M%sT	2010 Nov  7 2:00
+Zone America/North_Dakota/Beulah -6:47:07 - LMT	1883 Nov 18 19:00u
+			-7:00	US	M%sT	2010 Nov  7  2:00
 			-6:00	US	C%sT
 
 # US mountain time, represented by Denver
@@ -374,14 +488,27 @@ Zone America/North_Dakota/Beulah -6:47:07 - LMT 1883 Nov 18 12:12:53
 # western South Dakota, far western Texas (El Paso County, Hudspeth County,
 # and Pine Springs and Nickel Creek in Culberson County), Utah, Wyoming
 #
-# Rule	NAME	FROM	TO	TYPE	IN	ON	AT	SAVE	LETTER
+# From Paul Eggert (2018-10-25):
+# On 1921-03-04 federal law placed all of Texas into the central time zone.
+# However, El Paso ignored the law for decades and continued to observe
+# mountain time, on the grounds that that's what they had always done
+# and they weren't about to let the federal government tell them what to do.
+# Eventually the federal government gave in and changed the law on
+# 1970-04-10 to match what El Paso was actually doing.  Although
+# that's slightly after our 1970 cutoff, there is no need to create a
+# separate zone for El Paso since they were ignoring the law anyway.  See:
+# Long T. El Pasoans were time rebels, fought to stay in Mountain zone.
+# El Paso Times. 2018-10-24 06:40 -06.
+# https://www.elpasotimes.com/story/news/local/el-paso/2018/10/24/el-pasoans-were-time-rebels-fought-stay-mountain-zone/1744509002/
+#
+# Rule	NAME	FROM	TO	-	IN	ON	AT	SAVE	LETTER
 Rule	Denver	1920	1921	-	Mar	lastSun	2:00	1:00	D
 Rule	Denver	1920	only	-	Oct	lastSun	2:00	0	S
 Rule	Denver	1921	only	-	May	22	2:00	0	S
 Rule	Denver	1965	1966	-	Apr	lastSun	2:00	1:00	D
 Rule	Denver	1965	1966	-	Oct	lastSun	2:00	0	S
-# Zone	NAME		GMTOFF	RULES	FORMAT	[UNTIL]
-Zone America/Denver	-6:59:56 -	LMT	1883 Nov 18 12:00:04
+# Zone	NAME		STDOFF	RULES	FORMAT	[UNTIL]
+Zone America/Denver	-6:59:56 -	LMT	1883 Nov 18 19:00u
 			-7:00	US	M%sT	1920
 			-7:00	Denver	M%sT	1942
 			-7:00	US	M%sT	1946
@@ -391,48 +518,94 @@ Zone America/Denver	-6:59:56 -	LMT	1883 Nov 18 12:00:04
 # US Pacific time, represented by Los Angeles
 #
 # California, northern Idaho (Benewah, Bonner, Boundary, Clearwater,
-# Idaho, Kootenai, Latah, Lewis, Nez Perce, and Shoshone counties,
-# and the northern three-quarters of Idaho county),
-# most of Nevada, most of Oregon, and Washington
+# Kootenai, Latah, Lewis, Nez Perce, and Shoshone counties, Idaho county
+# north of the Salmon River, and the towns of Burgdorf and Warren),
+# Nevada (except West Wendover), Oregon (except the northern ¾ of
+# Malheur county), and Washington
+
+# From Paul Eggert (2016-08-20):
+# In early February 1948, in response to California's electricity shortage,
+# PG&E changed power frequency from 60 to 59.5 Hz during daylight hours,
+# causing electric clocks to lose six minutes per day.  (This did not change
+# legal time, and is not part of the data here.)  See:
+# Ross SA. An energy crisis from the past: Northern California in 1948.
+# Working Paper No. 8, Institute of Governmental Studies, UC Berkeley,
+# 1973-11.  https://escholarship.org/uc/item/8x22k30c
 #
-# Rule	NAME	FROM	TO	TYPE	IN	ON	AT	SAVE	LETTER
-Rule	CA	1948	only	-	Mar	14	2:00	1:00	D
+# In another measure to save electricity, DST was instituted from 1948-03-14
+# at 02:01 to 1949-01-16 at 02:00, with the governor having the option to move
+# the fallback transition earlier.  See pages 3-4 of:
+# http://clerk.assembly.ca.gov/sites/clerk.assembly.ca.gov/files/archive/Statutes/1948/48Vol1_Chapters.pdf
+#
+# In response:
+#
+#   Governor Warren received a torrent of objecting mail, and it is not too much
+#   to speculate that the objections to Daylight Saving Time were one important
+#   factor in the defeat of the Dewey-Warren Presidential ticket in California.
+#     -- Ross, p 25
+#
+# On December 8 the governor exercised the option, setting the date to January 1
+# (LA Times 1948-12-09).  The transition time was 02:00 (LA Times 1949-01-01).
+#
+# Despite the controversy, in 1949 California voters approved Proposition 12,
+# which established DST from April's last Sunday at 01:00 until September's
+# last Sunday at 02:00. This was amended by 1962's Proposition 6, which changed
+# the fall-back date to October's last Sunday. See:
+# https://repository.uchastings.edu/cgi/viewcontent.cgi?article=1501&context=ca_ballot_props
+# https://repository.uchastings.edu/cgi/viewcontent.cgi?article=1636&context=ca_ballot_props
+#
+# Rule	NAME	FROM	TO	-	IN	ON	AT	SAVE	LETTER
+Rule	CA	1948	only	-	Mar	14	2:01	1:00	D
 Rule	CA	1949	only	-	Jan	 1	2:00	0	S
-Rule	CA	1950	1966	-	Apr	lastSun	2:00	1:00	D
+Rule	CA	1950	1966	-	Apr	lastSun	1:00	1:00	D
 Rule	CA	1950	1961	-	Sep	lastSun	2:00	0	S
 Rule	CA	1962	1966	-	Oct	lastSun	2:00	0	S
-# Zone	NAME		GMTOFF	RULES	FORMAT	[UNTIL]
-Zone America/Los_Angeles -7:52:58 -	LMT	1883 Nov 18 12:07:02
+# Zone	NAME		STDOFF	RULES	FORMAT	[UNTIL]
+Zone America/Los_Angeles -7:52:58 -	LMT	1883 Nov 18 20:00u
 			-8:00	US	P%sT	1946
 			-8:00	CA	P%sT	1967
 			-8:00	US	P%sT
 
 # Alaska
-# AK%sT is the modern abbreviation for -9:00 per USNO.
+# AK%sT is the modern abbreviation for -09 per USNO.
 #
-# From Paul Eggert (2001-05-30):
+# From Paul Eggert (2017-06-15):
 # Howse writes that Alaska switched from the Julian to the Gregorian calendar,
 # and from east-of-GMT to west-of-GMT days, when the US bought it from Russia.
-# This was on 1867-10-18, a Friday; the previous day was 1867-10-06 Julian,
-# also a Friday.  Include only the time zone part of this transition,
-# ignoring the switch from Julian to Gregorian, since we can't represent
-# the Julian calendar.
+# On Friday, 1867-10-18 (Gregorian), at precisely 15:30 local time, the
+# Russian forts and fleet at Sitka fired salutes to mark the ceremony of
+# formal transfer.  See the Sacramento Daily Union (1867-11-14), p 3, col 2.
+# https://cdnc.ucr.edu/cgi-bin/cdnc?a=d&d=SDU18671114.2.12.1
+# Sitka workers did not change their calendars until Sunday, 1867-10-20,
+# and so celebrated two Sundays that week.  See: Ahllund T (tr Hallamaa P).
+# From the memoirs of a Finnish workman. Alaska History. 2006 Fall;21(2):1-25.
+# http://alaskahistoricalsociety.org/wp-content/uploads/2016/12/Ahllund-2006-Memoirs-of-a-Finnish-Workman.pdf
+# Include only the time zone part of this transition, ignoring the switch
+# from Julian to Gregorian, since we can't represent the Julian calendar.
 #
-# As far as we know, none of the exact locations mentioned below were
+# As far as we know, of the locations mentioned below only Sitka was
 # permanently inhabited in 1867 by anyone using either calendar.
-# (Yakutat was colonized by the Russians in 1799, but the settlement
-# was destroyed in 1805 by a Yakutat-kon war party.)  However, there
-# were nearby inhabitants in some cases and for our purposes perhaps
-# it's best to simply use the official transition.
-#
+# (Yakutat was colonized by the Russians in 1799, but the settlement was
+# destroyed in 1805 by a Yakutat-kon war party.)  Many of Alaska's inhabitants
+# were unaware of the US acquisition of Alaska, much less of any calendar or
+# time change.  However, the Russian-influenced part of Alaska did observe
+# Russian time, and it is more accurate to model this than to ignore it.
+# The database format requires an exact transition time; use the Russian
+# salute as a somewhat-arbitrary time for the formal transfer of control for
+# all of Alaska.  Sitka's UTC offset is -9:01:13; adjust its 15:30 to the
+# local times of other Alaskan locations so that they change simultaneously.
 
-# From Steve Ferguson (2011-01-31):
-# The author lives in Alaska and many of the references listed are only
-# available to Alaskan residents.
+# From Paul Eggert (2014-07-18):
+# One opinion of the early 1980s turmoil in Alaska over time zones and
+# daylight saving time appeared as graffiti on a Juneau airport wall:
+# "Welcome to Juneau.  Please turn your watch back to the 19th century."
+# See: Turner W. Alaska's four time zones now two. NY Times 1983-11-01.
+# http://www.nytimes.com/1983/11/01/us/alaska-s-four-time-zones-now-two.html
 #
-# <a href="http://www.alaskahistoricalsociety.org/index.cfm?section=discover%20alaska&page=Glimpses%20of%20the%20Past&viewpost=2&ContentId=98">
-# http://www.alaskahistoricalsociety.org/index.cfm?section=discover%20alaska&page=Glimpses%20of%20the%20Past&viewpost=2&ContentId=98
-# </a>
+# Steve Ferguson (2011-01-31) referred to the following source:
+# Norris F. Keeping time in Alaska: national directives, local response.
+# Alaska History 2001;16(1-2).
+# http://alaskahistoricalsociety.org/discover-alaska/glimpses-of-the-past/keeping-time-in-alaska/
 
 # From Arthur David Olson (2011-02-01):
 # Here's database-relevant material from the 2001 "Alaska History" article:
@@ -458,12 +631,10 @@ Zone America/Los_Angeles -7:52:58 -	LMT	1883 Nov 18 12:07:02
 # From Arthur David Olson (2011-02-09):
 # I just spoke by phone with a staff member at the Metlakatla Indian
 # Community office (using contact information available at
-# <a href="http://www.commerce.state.ak.us/dca/commdb/CIS.cfm?Comm_Boro_name=Metlakatla">
 # http://www.commerce.state.ak.us/dca/commdb/CIS.cfm?Comm_Boro_name=Metlakatla
-# </a>).
 # It's shortly after 1:00 here on the east coast of the United States;
 # the staffer said it was shortly after 10:00 there. When I asked whether
-# that meant they were on Pacific time, they said no--they were on their
+# that meant they were on Pacific time, they said no - they were on their
 # own time. I asked about daylight saving; they said it wasn't used. I
 # did not inquire about practices in the past.
 
@@ -471,68 +642,103 @@ Zone America/Los_Angeles -7:52:58 -	LMT	1883 Nov 18 12:07:02
 # For lack of better information, assume that Metlakatla's
 # abandonment of use of daylight saving resulted from the 1983 vote.
 
-# Zone	NAME		GMTOFF	RULES	FORMAT	[UNTIL]
-Zone America/Juneau	 15:02:19 -	LMT	1867 Oct 18
+# From Steffen Thorsen (2015-11-09):
+# It seems Metlakatla did go off PST on Sunday, November 1, changing
+# their time to AKST and are going to follow Alaska's DST, switching
+# between AKST and AKDT from now on....
+# https://www.krbd.org/2015/10/30/annette-island-times-they-are-a-changing/
+
+# From Ryan Stanley (2018-11-06):
+# The Metlakatla community in Alaska has decided not to change its
+# clock back an hour starting on November 4th, 2018 (day before yesterday).
+# They will be gmtoff=-28800 year-round.
+# https://www.facebook.com/141055983004923/photos/pb.141055983004923.-2207520000.1541465673./569081370202380/
+
+# From Paul Eggert (2018-12-16):
+# In a 2018-12-11 special election, Metlakatla voted to go back to
+# Alaska time (including daylight saving time) starting next year.
+# https://www.krbd.org/2018/12/12/metlakatla-to-follow-alaska-standard-time-allow-liquor-sales/
+#
+# From Ryan Stanley (2019-01-11):
+# The community will be changing back on the 20th of this month...
+# From Tim Parenti (2019-01-11):
+# Per an announcement on the Metlakatla community's official Facebook page, the
+# "fall back" will be on Sunday 2019-01-20 at 02:00:
+# https://www.facebook.com/141055983004923/photos/607150969728753/
+# So they won't be waiting for Alaska to join them on 2019-03-10, but will
+# rather change their clocks twice in seven weeks.
+
+# From Paul Eggert (2023-01-23):
+# America/Adak is for the Aleutian Islands that are part of Alaska
+# and are west of 169.5° W.
+
+# Zone	NAME		STDOFF	RULES	FORMAT	[UNTIL]
+Zone America/Juneau	 15:02:19 -	LMT	1867 Oct 19 15:33:32
 			 -8:57:41 -	LMT	1900 Aug 20 12:00
 			 -8:00	-	PST	1942
 			 -8:00	US	P%sT	1946
 			 -8:00	-	PST	1969
-			 -8:00	US	P%sT	1980 Apr 27 2:00
-			 -9:00	US	Y%sT	1980 Oct 26 2:00
-			 -8:00	US	P%sT	1983 Oct 30 2:00
+			 -8:00	US	P%sT	1980 Apr 27  2:00
+			 -9:00	US	Y%sT	1980 Oct 26  2:00
+			 -8:00	US	P%sT	1983 Oct 30  2:00
 			 -9:00	US	Y%sT	1983 Nov 30
 			 -9:00	US	AK%sT
-Zone America/Sitka	 14:58:47 -	LMT	1867 Oct 18
+Zone America/Sitka	 14:58:47 -	LMT	1867 Oct 19 15:30
 			 -9:01:13 -	LMT	1900 Aug 20 12:00
 			 -8:00	-	PST	1942
 			 -8:00	US	P%sT	1946
 			 -8:00	-	PST	1969
-			 -8:00	US	P%sT	1983 Oct 30 2:00
+			 -8:00	US	P%sT	1983 Oct 30  2:00
 			 -9:00	US	Y%sT	1983 Nov 30
 			 -9:00	US	AK%sT
-Zone America/Metlakatla	 15:13:42 -	LMT	1867 Oct 18
+Zone America/Metlakatla	 15:13:42 -	LMT	1867 Oct 19 15:44:55
 			 -8:46:18 -	LMT	1900 Aug 20 12:00
 			 -8:00	-	PST	1942
 			 -8:00	US	P%sT	1946
 			 -8:00	-	PST	1969
-			 -8:00	US	P%sT	1983 Oct 30 2:00
-			 -8:00	-	MeST
-Zone America/Yakutat	 14:41:05 -	LMT	1867 Oct 18
+			 -8:00	US	P%sT	1983 Oct 30  2:00
+			 -8:00	-	PST	2015 Nov  1  2:00
+			 -9:00	US	AK%sT	2018 Nov  4  2:00
+			 -8:00	-	PST	2019 Jan 20  2:00
+			 -9:00	US	AK%sT
+Zone America/Yakutat	 14:41:05 -	LMT	1867 Oct 19 15:12:18
 			 -9:18:55 -	LMT	1900 Aug 20 12:00
 			 -9:00	-	YST	1942
 			 -9:00	US	Y%sT	1946
 			 -9:00	-	YST	1969
 			 -9:00	US	Y%sT	1983 Nov 30
 			 -9:00	US	AK%sT
-Zone America/Anchorage	 14:00:24 -	LMT	1867 Oct 18
+Zone America/Anchorage	 14:00:24 -	LMT	1867 Oct 19 14:31:37
 			 -9:59:36 -	LMT	1900 Aug 20 12:00
-			-10:00	-	CAT	1942
-			-10:00	US	CAT/CAWT 1945 Aug 14 23:00u
-			-10:00	US	CAT/CAPT 1946 # Peace
-			-10:00	-	CAT	1967 Apr
+			-10:00	-	AST	1942
+			-10:00	US	A%sT	1967 Apr
 			-10:00	-	AHST	1969
-			-10:00	US	AH%sT	1983 Oct 30 2:00
+			-10:00	US	AH%sT	1983 Oct 30  2:00
 			 -9:00	US	Y%sT	1983 Nov 30
 			 -9:00	US	AK%sT
-Zone America/Nome	 12:58:21 -	LMT	1867 Oct 18
+Zone America/Nome	 12:58:22 -	LMT	1867 Oct 19 13:29:35
 			-11:01:38 -	LMT	1900 Aug 20 12:00
 			-11:00	-	NST	1942
 			-11:00	US	N%sT	1946
 			-11:00	-	NST	1967 Apr
 			-11:00	-	BST	1969
-			-11:00	US	B%sT	1983 Oct 30 2:00
+			-11:00	US	B%sT	1983 Oct 30  2:00
 			 -9:00	US	Y%sT	1983 Nov 30
 			 -9:00	US	AK%sT
-Zone America/Adak	 12:13:21 -	LMT	1867 Oct 18
+Zone America/Adak	 12:13:22 -	LMT	1867 Oct 19 12:44:35
 			-11:46:38 -	LMT	1900 Aug 20 12:00
 			-11:00	-	NST	1942
 			-11:00	US	N%sT	1946
 			-11:00	-	NST	1967 Apr
 			-11:00	-	BST	1969
-			-11:00	US	B%sT	1983 Oct 30 2:00
+			-11:00	US	B%sT	1983 Oct 30  2:00
 			-10:00	US	AH%sT	1983 Nov 30
-			-10:00	US	HA%sT
-# The following switches don't quite make our 1970 cutoff.
+			-10:00	US	H%sT
+# The following switches don't make our 1970 cutoff.
+#
+# Kiska observed Tokyo date and time during Japanese occupation from
+# 1942-06-06 to 1943-07-29, and similarly for Attu from 1942-06-07 to
+# 1943-05-29 (all dates American).  Both islands are now uninhabited.
 #
 # Shanks writes that part of southwest Alaska (e.g. Aniak)
 # switched from -11:00 to -10:00 on 1968-09-22 at 02:00,
@@ -547,7 +753,7 @@ Zone America/Adak	 12:13:21 -	LMT	1867 Oct 18
 #  Minutes of the Unalaska City Council Meeting, January 10, 1967:
 #  "Except for St. Paul and Akutan, Unalaska is the only important
 #  location not on Alaska Standard Time.  The following resolution was
-#  made by William Robinson and seconded by Henry Swanson:  Be it
+#  made by William Robinson and seconded by Henry Swanson: Be it
 #  resolved that the City of Unalaska hereby goes to Alaska Standard
 #  Time as of midnight Friday, January 13, 1967 (1 A.M. Saturday,
 #  January 14, Alaska Standard Time.)  This resolution was passed with
@@ -559,9 +765,7 @@ Zone America/Adak	 12:13:21 -	LMT	1867 Oct 18
 # "Hawaiian Time" by Robert C. Schmitt and Doak C. Cox appears on pages 207-225
 # of volume 26 of The Hawaiian Journal of History (1992). As of 2010-12-09,
 # the article is available at
-# <a href="http://evols.library.manoa.hawaii.edu/bitstream/10524/239/2/JL26215.pdf">
-# http://evols.library.manoa.hawaii.edu/bitstream/10524/239/2/JL26215.pdf
-# </a>
+# https://evols.library.manoa.hawaii.edu/bitstream/10524/239/2/JL26215.pdf
 # and indicates that standard time was adopted effective noon, January
 # 13, 1896 (page 218), that in "1933, the Legislature decreed daylight
 # saving for the period between the last Sunday of each April and the
@@ -582,7 +786,7 @@ Zone America/Adak	 12:13:21 -	LMT	1867 Oct 18
 # year, the standard time of this Territory shall be advanced one
 # hour...This Act shall take effect upon its approval. Approved this 26th
 # day of April, A. D. 1933. LAWRENCE M JUDD, Governor of the Territory of
-# Hawaii." Page 172:  "Act 163...Act 90 of the Session Laws of 1933 is
+# Hawaii." Page 172: "Act 163...Act 90 of the Session Laws of 1933 is
 # hereby repealed...This Act shall take effect upon its approval, upon
 # which date the standard time of this Territory shall be restored to
 # that existing immediately prior to the taking effect of said Act 90.
@@ -592,12 +796,11 @@ Zone America/Adak	 12:13:21 -	LMT	1867 Oct 18
 # Note that 1933-05-21 was a Sunday.
 # We're left to guess the time of day when Act 163 was approved; guess noon.
 
-Zone Pacific/Honolulu	-10:31:26 -	LMT	1896 Jan 13 12:00 #Schmitt&Cox
-			-10:30	-	HST	1933 Apr 30 2:00 #Laws 1933
-			-10:30	1:00	HDT	1933 May 21 12:00 #Laws 1933+12
-			-10:30	-	HST	1942 Feb 09 2:00 #Schmitt&Cox+2
-			-10:30	1:00	HDT	1945 Sep 30 2:00 #Schmitt&Cox+2
-			-10:30	-	HST	1947 Jun  8 2:00 #Schmitt&Cox+2
+# Zone	NAME		STDOFF	RULES	FORMAT	[UNTIL]
+Zone Pacific/Honolulu	-10:31:26 -	LMT	1896 Jan 13 12:00
+			-10:30	-	HST	1933 Apr 30  2:00
+			-10:30	1:00	HDT	1933 May 21 12:00
+			-10:30	US	H%sT	1947 Jun  8  2:00
 			-10:00	-	HST
 
 # Now we turn to US areas that have diverged from the consensus since 1970.
@@ -607,9 +810,9 @@ Zone Pacific/Honolulu	-10:31:26 -	LMT	1896 Jan 13 12:00 #Schmitt&Cox
 # From Paul Eggert (2002-10-20):
 #
 # The information in the rest of this paragraph is derived from the
-# <a href="http://www.dlapr.lib.az.us/links/daylight.htm">
-# Daylight Saving Time web page (2002-01-23)</a> maintained by the
-# Arizona State Library, Archives and Public Records.
+# Daylight Saving Time web page
+# <http://www.dlapr.lib.az.us/links/daylight.htm> (2002-01-23)
+# maintained by the Arizona State Library, Archives and Public Records.
 # Between 1944-01-01 and 1944-04-01 the State of Arizona used standard
 # time, but by federal law railroads, airlines, bus lines, military
 # personnel, and some engaged in interstate commerce continued to
@@ -623,21 +826,24 @@ Zone Pacific/Honolulu	-10:31:26 -	LMT	1896 Jan 13 12:00 #Schmitt&Cox
 # Shanks says the 1944 experiment came to an end on 1944-03-17.
 # Go with the Arizona State Library instead.
 
-Zone America/Phoenix	-7:28:18 -	LMT	1883 Nov 18 11:31:42
-			-7:00	US	M%sT	1944 Jan  1 00:01
-			-7:00	-	MST	1944 Apr  1 00:01
-			-7:00	US	M%sT	1944 Oct  1 00:01
+# Zone	NAME		STDOFF	RULES	FORMAT	[UNTIL]
+Zone America/Phoenix	-7:28:18 -	LMT	1883 Nov 18 19:00u
+			-7:00	US	M%sT	1944 Jan  1  0:01
+			-7:00	-	MST	1944 Apr  1  0:01
+			-7:00	US	M%sT	1944 Oct  1  0:01
 			-7:00	-	MST	1967
 			-7:00	US	M%sT	1968 Mar 21
 			-7:00	-	MST
+
 # From Arthur David Olson (1988-02-13):
 # A writer from the Inter Tribal Council of Arizona, Inc.,
 # notes in private correspondence dated 1987-12-28 that "Presently, only the
 # Navajo Nation participates in the Daylight Saving Time policy, due to its
 # large size and location in three states."  (The "only" means that other
 # tribal nations don't use DST.)
-
-Link America/Denver America/Shiprock
+#
+# From Paul Eggert (2013-08-26):
+# See America/Denver for a zone appropriate for the Navajo Nation.
 
 # Southern Idaho (Ada, Adams, Bannock, Bear Lake, Bingham, Blaine,
 # Boise, Bonneville, Butte, Camas, Canyon, Caribou, Cassia, Clark,
@@ -647,26 +853,40 @@ Link America/Denver America/Shiprock
 # quarter of Idaho county) and eastern Oregon (most of Malheur County)
 # switched four weeks late in 1974.
 #
-# Zone	NAME		GMTOFF	RULES	FORMAT	[UNTIL]
-Zone America/Boise	-7:44:49 -	LMT	1883 Nov 18 12:15:11
-			-8:00	US	P%sT	1923 May 13 2:00
+# Zone	NAME		STDOFF	RULES	FORMAT	[UNTIL]
+Zone America/Boise	-7:44:49 -	LMT	1883 Nov 18 20:00u
+			-8:00	US	P%sT	1923 May 13  2:00
 			-7:00	US	M%sT	1974
-			-7:00	-	MST	1974 Feb  3 2:00
+			-7:00	-	MST	1974 Feb  3  2:00
 			-7:00	US	M%sT
 
 # Indiana
 #
 # For a map of Indiana's time zone regions, see:
-# <a href="http://www.mccsc.edu/time.html">
-# What time is it in Indiana?
-# </a> (2006-03-01)
+# https://en.wikipedia.org/wiki/Time_in_Indiana
+#
+# From Paul Eggert (2018-11-30):
+# A brief but entertaining history of time in Indiana describes a 1949 debate
+# in the Indiana House where city legislators (who favored "fast time")
+# tussled with farm legislators (who didn't) over a bill to outlaw DST:
+#  "Lacking enough votes, the city faction tries to filibuster until time runs
+#   out on the session at midnight, but rural champion Rep. Herbert Copeland,
+#   R-Madison, leans over the gallery railing and forces the official clock
+#   back to 9 p.m., breaking it in the process.  The clock sticks on 9 as the
+#   debate rages on into the night.  The filibuster finally dies out and the
+#   bill passes, while outside the chamber, clocks read 3:30 a.m.  In the end,
+#   it doesn't matter which side won.  The law has no enforcement powers and
+#   is simply ignored by fast-time communities."
+# How Indiana went from 'God's time' to split zones and daylight-saving.
+# Indianapolis Star. 2018-11-27 14:58 -05.
+# https://www.indystar.com/story/news/politics/2018/11/27/indianapolis-indiana-time-zone-history-central-eastern-daylight-savings-time/2126300002/
 #
 # From Paul Eggert (2007-08-17):
 # Since 1970, most of Indiana has been like America/Indiana/Indianapolis,
 # with the following exceptions:
 #
 # - Gibson, Jasper, Lake, LaPorte, Newton, Porter, Posey, Spencer,
-#   Vandenburgh, and Warrick counties have been like America/Chicago.
+#   Vanderburgh, and Warrick counties have been like America/Chicago.
 #
 # - Dearborn and Ohio counties have been like America/New_York.
 #
@@ -677,48 +897,42 @@ Zone America/Boise	-7:44:49 -	LMT	1883 Nov 18 12:15:11
 #   and Switzerland counties have their own time zone histories as noted below.
 #
 # Shanks partitioned Indiana into 345 regions, each with its own time history,
-# and wrote ``Even newspaper reports present contradictory information.''
+# and wrote "Even newspaper reports present contradictory information."
 # Those Hoosiers!  Such a flighty and changeable people!
 # Fortunately, most of the complexity occurred before our cutoff date of 1970.
 #
 # Other than Indianapolis, the Indiana place names are so nondescript
-# that they would be ambiguous if we left them at the `America' level.
-# So we reluctantly put them all in a subdirectory `America/Indiana'.
+# that they would be ambiguous if we left them at the 'America' level.
+# So we reluctantly put them all in a subdirectory 'America/Indiana'.
 
-# From Paul Eggert (2005-08-16):
-# http://www.mccsc.edu/time.html says that Indiana will use DST starting 2006.
-
-# From Nathan Stratton Treadway (2006-03-30):
-# http://www.dot.gov/affairs/dot0406.htm [3705 B]
-# From Deborah Goldsmith (2006-01-18):
-# http://dmses.dot.gov/docimages/pdf95/382329_web.pdf [2.9 MB]
-# From Paul Eggert (2006-01-20):
-# It says "DOT is relocating the time zone boundary in Indiana to move Starke,
+# From Paul Eggert (2014-06-26):
+# https://www.federalregister.gov/articles/2006/01/20/06-563/standard-time-zone-boundary-in-the-state-of-indiana
+# says "DOT is relocating the time zone boundary in Indiana to move Starke,
 # Pulaski, Knox, Daviess, Martin, Pike, Dubois, and Perry Counties from the
 # Eastern Time Zone to the Central Time Zone.... The effective date of
-# this rule is 2:OO a.m. EST Sunday, April 2, 2006, which is the
+# this rule is 2 a.m. EST Sunday, April 2, 2006, which is the
 # changeover date from standard time to Daylight Saving Time."
-# Strictly speaking, this means the affected counties will change their
-# clocks twice that night, but this obviously is in error.  The intent
-# is that 01:59:59 EST be followed by 02:00:00 CDT.
+# Strictly speaking, this meant the affected counties changed their
+# clocks twice that night, but this obviously was in error.  The intent
+# was that 01:59:59 EST be followed by 02:00:00 CDT.
 
 # From Gwillim Law (2007-02-10):
 # The Associated Press has been reporting that Pulaski County, Indiana is
 # going to switch from Central to Eastern Time on March 11, 2007....
 # http://www.indystar.com/apps/pbcs.dll/article?AID=/20070207/LOCAL190108/702070524/0/LOCAL
 
-# Rule	NAME	FROM	TO	TYPE	IN	ON	AT	SAVE	LETTER
+# Rule	NAME	FROM	TO	-	IN	ON	AT	SAVE	LETTER
 Rule Indianapolis 1941	only	-	Jun	22	2:00	1:00	D
 Rule Indianapolis 1941	1954	-	Sep	lastSun	2:00	0	S
 Rule Indianapolis 1946	1954	-	Apr	lastSun	2:00	1:00	D
-# Zone	NAME		GMTOFF	RULES	FORMAT	[UNTIL]
-Zone America/Indiana/Indianapolis -5:44:38 - LMT 1883 Nov 18 12:15:22
+# Zone	NAME		STDOFF	RULES	FORMAT	[UNTIL]
+Zone America/Indiana/Indianapolis -5:44:38 - LMT 1883 Nov 18 18:00u
 			-6:00	US	C%sT	1920
 			-6:00 Indianapolis C%sT	1942
 			-6:00	US	C%sT	1946
-			-6:00 Indianapolis C%sT	1955 Apr 24 2:00
-			-5:00	-	EST	1957 Sep 29 2:00
-			-6:00	-	CST	1958 Apr 27 2:00
+			-6:00 Indianapolis C%sT	1955 Apr 24  2:00
+			-5:00	-	EST	1957 Sep 29  2:00
+			-6:00	-	CST	1958 Apr 27  2:00
 			-5:00	-	EST	1969
 			-5:00	US	E%sT	1971
 			-5:00	-	EST	2006
@@ -726,18 +940,18 @@ Zone America/Indiana/Indianapolis -5:44:38 - LMT 1883 Nov 18 12:15:22
 #
 # Eastern Crawford County, Indiana, left its clocks alone in 1974,
 # as well as from 1976 through 2005.
-# Rule	NAME	FROM	TO	TYPE	IN	ON	AT	SAVE	LETTER
+# Rule	NAME	FROM	TO	-	IN	ON	AT	SAVE	LETTER
 Rule	Marengo	1951	only	-	Apr	lastSun	2:00	1:00	D
 Rule	Marengo	1951	only	-	Sep	lastSun	2:00	0	S
 Rule	Marengo	1954	1960	-	Apr	lastSun	2:00	1:00	D
 Rule	Marengo	1954	1960	-	Sep	lastSun	2:00	0	S
-# Zone	NAME		GMTOFF	RULES	FORMAT	[UNTIL]
-Zone America/Indiana/Marengo -5:45:23 -	LMT	1883 Nov 18 12:14:37
+# Zone	NAME		STDOFF	RULES	FORMAT	[UNTIL]
+Zone America/Indiana/Marengo -5:45:23 -	LMT	1883 Nov 18 18:00u
 			-6:00	US	C%sT	1951
-			-6:00	Marengo	C%sT	1961 Apr 30 2:00
+			-6:00	Marengo	C%sT	1961 Apr 30  2:00
 			-5:00	-	EST	1969
-			-5:00	US	E%sT	1974 Jan  6 2:00
-			-6:00	1:00	CDT	1974 Oct 27 2:00
+			-5:00	US	E%sT	1974 Jan  6  2:00
+			-6:00	1:00	CDT	1974 Oct 27  2:00
 			-5:00	US	E%sT	1976
 			-5:00	-	EST	2006
 			-5:00	US	E%sT
@@ -745,7 +959,7 @@ Zone America/Indiana/Marengo -5:45:23 -	LMT	1883 Nov 18 12:14:37
 # Daviess, Dubois, Knox, and Martin Counties, Indiana,
 # switched from eastern to central time in April 2006, then switched back
 # in November 2007.
-# Rule	NAME	FROM	TO	TYPE	IN	ON	AT	SAVE	LETTER
+# Rule	NAME	FROM	TO	-	IN	ON	AT	SAVE	LETTER
 Rule Vincennes	1946	only	-	Apr	lastSun	2:00	1:00	D
 Rule Vincennes	1946	only	-	Sep	lastSun	2:00	0	S
 Rule Vincennes	1953	1954	-	Apr	lastSun	2:00	1:00	D
@@ -755,51 +969,51 @@ Rule Vincennes	1956	1963	-	Apr	lastSun	2:00	1:00	D
 Rule Vincennes	1960	only	-	Oct	lastSun	2:00	0	S
 Rule Vincennes	1961	only	-	Sep	lastSun	2:00	0	S
 Rule Vincennes	1962	1963	-	Oct	lastSun	2:00	0	S
-# Zone	NAME		GMTOFF	RULES	FORMAT	[UNTIL]
-Zone America/Indiana/Vincennes -5:50:07 - LMT	1883 Nov 18 12:09:53
+# Zone	NAME		STDOFF	RULES	FORMAT	[UNTIL]
+Zone America/Indiana/Vincennes -5:50:07 - LMT	1883 Nov 18 18:00u
 			-6:00	US	C%sT	1946
-			-6:00 Vincennes	C%sT	1964 Apr 26 2:00
+			-6:00 Vincennes	C%sT	1964 Apr 26  2:00
 			-5:00	-	EST	1969
 			-5:00	US	E%sT	1971
-			-5:00	-	EST	2006 Apr  2 2:00
-			-6:00	US	C%sT	2007 Nov  4 2:00
+			-5:00	-	EST	2006 Apr  2  2:00
+			-6:00	US	C%sT	2007 Nov  4  2:00
 			-5:00	US	E%sT
 #
 # Perry County, Indiana, switched from eastern to central time in April 2006.
-# Rule	NAME	FROM	TO	TYPE	IN	ON	AT	SAVE	LETTER
-Rule Perry	1946	only	-	Apr	lastSun	2:00	1:00	D
-Rule Perry	1946	only	-	Sep	lastSun	2:00	0	S
-Rule Perry	1953	1954	-	Apr	lastSun	2:00	1:00	D
-Rule Perry	1953	1959	-	Sep	lastSun	2:00	0	S
+# From Alois Treindl (2019-07-09):
+# The Indianapolis News, Friday 27 October 1967 states that Perry County
+# returned to CST.  It went again to EST on 27 April 1969, as documented by the
+# Indianapolis star of Saturday 26 April.
+# Rule	NAME	FROM	TO	-	IN	ON	AT	SAVE	LETTER
 Rule Perry	1955	only	-	May	 1	0:00	1:00	D
+Rule Perry	1955	1960	-	Sep	lastSun	2:00	0	S
 Rule Perry	1956	1963	-	Apr	lastSun	2:00	1:00	D
-Rule Perry	1960	only	-	Oct	lastSun	2:00	0	S
-Rule Perry	1961	only	-	Sep	lastSun	2:00	0	S
-Rule Perry	1962	1963	-	Oct	lastSun	2:00	0	S
-# Zone	NAME		GMTOFF	RULES	FORMAT	[UNTIL]
-Zone America/Indiana/Tell_City -5:47:03 - LMT	1883 Nov 18 12:12:57
+Rule Perry	1961	1963	-	Oct	lastSun	2:00	0	S
+# Zone	NAME		STDOFF	RULES	FORMAT	[UNTIL]
+Zone America/Indiana/Tell_City -5:47:03 - LMT	1883 Nov 18 18:00u
 			-6:00	US	C%sT	1946
-			-6:00 Perry	C%sT	1964 Apr 26 2:00
-			-5:00	-	EST	1969
+			-6:00 Perry	C%sT	1964 Apr 26  2:00
+			-5:00	-	EST	1967 Oct 29  2:00
+			-6:00	US	C%sT	1969 Apr 27  2:00
 			-5:00	US	E%sT	1971
-			-5:00	-	EST	2006 Apr  2 2:00
+			-5:00	-	EST	2006 Apr  2  2:00
 			-6:00	US	C%sT
 #
 # Pike County, Indiana moved from central to eastern time in 1977,
 # then switched back in 2006, then switched back again in 2007.
-# Rule	NAME	FROM	TO	TYPE	IN	ON	AT	SAVE	LETTER
+# Rule	NAME	FROM	TO	-	IN	ON	AT	SAVE	LETTER
 Rule	Pike	1955	only	-	May	 1	0:00	1:00	D
 Rule	Pike	1955	1960	-	Sep	lastSun	2:00	0	S
 Rule	Pike	1956	1964	-	Apr	lastSun	2:00	1:00	D
 Rule	Pike	1961	1964	-	Oct	lastSun	2:00	0	S
-# Zone	NAME		GMTOFF	RULES	FORMAT	[UNTIL]
-Zone America/Indiana/Petersburg -5:49:07 - LMT	1883 Nov 18 12:10:53
+# Zone	NAME		STDOFF	RULES	FORMAT	[UNTIL]
+Zone America/Indiana/Petersburg -5:49:07 - LMT	1883 Nov 18 18:00u
 			-6:00	US	C%sT	1955
-			-6:00	Pike	C%sT	1965 Apr 25 2:00
-			-5:00	-	EST	1966 Oct 30 2:00
-			-6:00	US	C%sT	1977 Oct 30 2:00
-			-5:00	-	EST	2006 Apr  2 2:00
-			-6:00	US	C%sT	2007 Nov  4 2:00
+			-6:00	Pike	C%sT	1965 Apr 25  2:00
+			-5:00	-	EST	1966 Oct 30  2:00
+			-6:00	US	C%sT	1977 Oct 30  2:00
+			-5:00	-	EST	2006 Apr  2  2:00
+			-6:00	US	C%sT	2007 Nov  4  2:00
 			-5:00	US	E%sT
 #
 # Starke County, Indiana moved from central to eastern time in 1991,
@@ -808,74 +1022,91 @@ Zone America/Indiana/Petersburg -5:49:07 - LMT	1883 Nov 18 12:10:53
 # An article on page A3 of the Sunday, 1991-10-27 Washington Post
 # notes that Starke County switched from Central time to Eastern time as of
 # 1991-10-27.
-# Rule	NAME	FROM	TO	TYPE	IN	ON	AT	SAVE	LETTER
+# Rule	NAME	FROM	TO	-	IN	ON	AT	SAVE	LETTER
 Rule	Starke	1947	1961	-	Apr	lastSun	2:00	1:00	D
 Rule	Starke	1947	1954	-	Sep	lastSun	2:00	0	S
 Rule	Starke	1955	1956	-	Oct	lastSun	2:00	0	S
 Rule	Starke	1957	1958	-	Sep	lastSun	2:00	0	S
 Rule	Starke	1959	1961	-	Oct	lastSun	2:00	0	S
-# Zone	NAME		GMTOFF	RULES	FORMAT	[UNTIL]
-Zone America/Indiana/Knox -5:46:30 -	LMT	1883 Nov 18 12:13:30
+# Zone	NAME		STDOFF	RULES	FORMAT	[UNTIL]
+Zone America/Indiana/Knox -5:46:30 -	LMT	1883 Nov 18 18:00u
 			-6:00	US	C%sT	1947
-			-6:00	Starke	C%sT	1962 Apr 29 2:00
-			-5:00	-	EST	1963 Oct 27 2:00
-			-6:00	US	C%sT	1991 Oct 27 2:00
-			-5:00	-	EST	2006 Apr  2 2:00
+			-6:00	Starke	C%sT	1962 Apr 29  2:00
+			-5:00	-	EST	1963 Oct 27  2:00
+			-6:00	US	C%sT	1991 Oct 27  2:00
+			-5:00	-	EST	2006 Apr  2  2:00
 			-6:00	US	C%sT
 #
 # Pulaski County, Indiana, switched from eastern to central time in
 # April 2006 and then switched back in March 2007.
-# Rule	NAME	FROM	TO	TYPE	IN	ON	AT	SAVE	LETTER
+# Rule	NAME	FROM	TO	-	IN	ON	AT	SAVE	LETTER
 Rule	Pulaski	1946	1960	-	Apr	lastSun	2:00	1:00	D
 Rule	Pulaski	1946	1954	-	Sep	lastSun	2:00	0	S
 Rule	Pulaski	1955	1956	-	Oct	lastSun	2:00	0	S
 Rule	Pulaski	1957	1960	-	Sep	lastSun	2:00	0	S
-# Zone	NAME		GMTOFF	RULES	FORMAT	[UNTIL]
-Zone America/Indiana/Winamac -5:46:25 - LMT	1883 Nov 18 12:13:35
+# Zone	NAME		STDOFF	RULES	FORMAT	[UNTIL]
+Zone America/Indiana/Winamac -5:46:25 - LMT	1883 Nov 18 18:00u
 			-6:00	US	C%sT	1946
-			-6:00	Pulaski	C%sT	1961 Apr 30 2:00
+			-6:00	Pulaski	C%sT	1961 Apr 30  2:00
 			-5:00	-	EST	1969
 			-5:00	US	E%sT	1971
-			-5:00	-	EST	2006 Apr  2 2:00
-			-6:00	US	C%sT	2007 Mar 11 2:00
+			-5:00	-	EST	2006 Apr  2  2:00
+			-6:00	US	C%sT	2007 Mar 11  2:00
 			-5:00	US	E%sT
 #
 # Switzerland County, Indiana, did not observe DST from 1973 through 2005.
-# Zone	NAME		GMTOFF	RULES	FORMAT	[UNTIL]
-Zone America/Indiana/Vevay -5:40:16 -	LMT	1883 Nov 18 12:19:44
-			-6:00	US	C%sT	1954 Apr 25 2:00
+# Zone	NAME		STDOFF	RULES	FORMAT	[UNTIL]
+Zone America/Indiana/Vevay -5:40:16 -	LMT	1883 Nov 18 18:00u
+			-6:00	US	C%sT	1954 Apr 25  2:00
 			-5:00	-	EST	1969
 			-5:00	US	E%sT	1973
 			-5:00	-	EST	2006
 			-5:00	US	E%sT
 
+# From Paul Eggert (2018-03-20):
+# The Louisville & Nashville Railroad's 1883-11-18 change occurred at
+# 10:00 old local time; train were supposed to come to a standstill
+# for precisely 18 minutes.  See Bartky Fig. 1 (page 50).  It is not
+# clear how this matched civil time in Louisville, so for now continue
+# to assume Louisville switched at noon new local time, like New York.
+#
+# From Michael Deckers (2019-08-06):
+# From the contemporary source given by Alois Treindl,
+# the switch in Louisville on 1946-04-28 was on 00:01
+# From Paul Eggert (2019-08-26):
+# That source was the Louisville Courier-Journal, 1946-04-27, p 4.
+# Shanks gives 02:00 for all 20th-century transition times in Louisville.
+# Evidently this is wrong for spring 1946.  Although also likely wrong
+# for other dates, we have no data.
+#
 # Part of Kentucky left its clocks alone in 1974.
 # This also includes Clark, Floyd, and Harrison counties in Indiana.
-# Rule	NAME	FROM	TO	TYPE	IN	ON	AT	SAVE	LETTER
+# Rule	NAME	FROM	TO	-	IN	ON	AT	SAVE	LETTER
 Rule Louisville	1921	only	-	May	1	2:00	1:00	D
 Rule Louisville	1921	only	-	Sep	1	2:00	0	S
-Rule Louisville	1941	1961	-	Apr	lastSun	2:00	1:00	D
+Rule Louisville	1941	only	-	Apr	lastSun	2:00	1:00	D
 Rule Louisville	1941	only	-	Sep	lastSun	2:00	0	S
+Rule Louisville	1946	only	-	Apr	lastSun	0:01	1:00	D
 Rule Louisville	1946	only	-	Jun	2	2:00	0	S
+Rule Louisville	1950	1961	-	Apr	lastSun	2:00	1:00	D
 Rule Louisville	1950	1955	-	Sep	lastSun	2:00	0	S
-Rule Louisville	1956	1960	-	Oct	lastSun	2:00	0	S
-# Zone	NAME		GMTOFF	RULES	FORMAT	[UNTIL]
-Zone America/Kentucky/Louisville -5:43:02 -	LMT	1883 Nov 18 12:16:58
+Rule Louisville	1956	1961	-	Oct	lastSun	2:00	0	S
+# Zone	NAME		STDOFF	RULES	FORMAT	[UNTIL]
+Zone America/Kentucky/Louisville -5:43:02 - LMT	1883 Nov 18 18:00u
 			-6:00	US	C%sT	1921
 			-6:00 Louisville C%sT	1942
 			-6:00	US	C%sT	1946
-			-6:00 Louisville C%sT	1961 Jul 23 2:00
+			-6:00 Louisville C%sT	1961 Jul 23  2:00
 			-5:00	-	EST	1968
-			-5:00	US	E%sT	1974 Jan  6 2:00
-			-6:00	1:00	CDT	1974 Oct 27 2:00
+			-5:00	US	E%sT	1974 Jan  6  2:00
+			-6:00	1:00	CDT	1974 Oct 27  2:00
 			-5:00	US	E%sT
 #
 # Wayne County, Kentucky
 #
-# From
-# <a href="http://www.lake-cumberland.com/life/archive/news990129time.shtml">
-# Lake Cumberland LIFE
-# </a> (1999-01-29) via WKYM-101.7:
+# From Lake Cumberland LIFE
+# http://www.lake-cumberland.com/life/archive/news990129time.shtml
+# (1999-01-29) via WKYM-101.7:
 # Clinton County has joined Wayne County in asking the DoT to change from
 # the Central to the Eastern time zone....  The Wayne County government made
 # the same request in December.  And while Russell County officials have not
@@ -892,11 +1123,10 @@ Zone America/Kentucky/Louisville -5:43:02 -	LMT	1883 Nov 18 12:16:58
 #
 # From Paul Eggert (2001-07-16):
 # The final rule was published in the
-# <a href="http://frwebgate.access.gpo.gov/cgi-bin/getdoc.cgi?dbname=2000_register&docid=fr17au00-22">
-# Federal Register 65, 160 (2000-08-17), page 50154-50158.
-# </a>
+# Federal Register 65, 160 (2000-08-17), pp 50154-50158.
+# https://www.gpo.gov/fdsys/pkg/FR-2000-08-17/html/00-20854.htm
 #
-Zone America/Kentucky/Monticello -5:39:24 - LMT	1883 Nov 18 12:20:36
+Zone America/Kentucky/Monticello -5:39:24 - LMT	1883 Nov 18 18:00u
 			-6:00	US	C%sT	1946
 			-6:00	-	CST	1968
 			-6:00	US	C%sT	2000 Oct 29  2:00
@@ -919,9 +1149,8 @@ Zone America/Kentucky/Monticello -5:39:24 - LMT	1883 Nov 18 12:20:36
 # See America/North_Dakota/Center for the Oliver County, ND change.
 # West Wendover, NV officially switched from Pacific to mountain time on
 # 1999-10-31.  See the
-# <a href="http://frwebgate.access.gpo.gov/cgi-bin/getdoc.cgi?dbname=1999_register&docid=fr21oc99-15">
-# Federal Register 64, 203 (1999-10-21), page 56705-56707.
-# </a>
+# Federal Register 64, 203 (1999-10-21), pp 56705-56707.
+# https://www.gpo.gov/fdsys/pkg/FR-1999-10-21/html/99-27240.htm
 # However, the Federal Register says that West Wendover already operated
 # on mountain time, and the rule merely made this official;
 # hence a separate tz entry is not needed.
@@ -947,38 +1176,52 @@ Zone America/Kentucky/Monticello -5:39:24 - LMT	1883 Nov 18 12:20:36
 # This story is too entertaining to be false, so go with Howse over Shanks.
 #
 # From Paul Eggert (2001-03-06):
-# Garland (1927) writes ``Cleveland and Detroit advanced their clocks
-# one hour in 1914.''  This change is not in Shanks.  We have no more
+# Garland (1927) writes "Cleveland and Detroit advanced their clocks
+# one hour in 1914."  This change is not in Shanks.  We have no more
 # info, so omit this for now.
 #
+# From Paul Eggert (2019-07-06):
+# Due to a complicated set of legal maneuvers, in 1967 Michigan did
+# not start daylight saving time when the rest of the US did.
+# Instead, it began DST on Jun 14 at 00:01.  This was big news:
+# the Detroit Free Press reported it at the top of Page 1 on
+# 1967-06-14, in an article "State Adjusting to Switch to Fast Time"
+# by Gary Blonston, above an article about Thurgood Marshall's
+# confirmation to the US Supreme Court.  Although Shanks says Detroit
+# observed DST until 1967-10-29 00:01, that time of day seems to be
+# incorrect, as the Free Press later said DST ended in Michigan at the
+# same time as the rest of the US.  Also, although Shanks reports no DST in
+# Detroit in 1968, it did observe DST that year; in the November 1968
+# election Michigan voters narrowly repealed DST, effective 1969.
+#
 # Most of Michigan observed DST from 1973 on, but was a bit late in 1975.
-# Rule	NAME	FROM	TO	TYPE	IN	ON	AT	SAVE	LETTER
+# Rule	NAME	FROM	TO	-	IN	ON	AT	SAVE	LETTER
 Rule	Detroit	1948	only	-	Apr	lastSun	2:00	1:00	D
 Rule	Detroit	1948	only	-	Sep	lastSun	2:00	0	S
-Rule	Detroit	1967	only	-	Jun	14	2:00	1:00	D
-Rule	Detroit	1967	only	-	Oct	lastSun	2:00	0	S
-# Zone	NAME		GMTOFF	RULES	FORMAT	[UNTIL]
+# Zone	NAME		STDOFF	RULES	FORMAT	[UNTIL]
 Zone America/Detroit	-5:32:11 -	LMT	1905
-			-6:00	-	CST	1915 May 15 2:00
+			-6:00	-	CST	1915 May 15  2:00
 			-5:00	-	EST	1942
 			-5:00	US	E%sT	1946
-			-5:00	Detroit	E%sT	1973
+			-5:00	Detroit	E%sT	1967 Jun 14  0:01
+			-5:00	US	E%sT	1969
+			-5:00	-	EST	1973
 			-5:00	US	E%sT	1975
-			-5:00	-	EST	1975 Apr 27 2:00
+			-5:00	-	EST	1975 Apr 27  2:00
 			-5:00	US	E%sT
 #
 # Dickinson, Gogebic, Iron, and Menominee Counties, Michigan,
 # switched from EST to CST/CDT in 1973.
-# Rule	NAME	FROM	TO	TYPE	IN	ON	AT	SAVE	LETTER
+# Rule	NAME	FROM	TO	-	IN	ON	AT	SAVE	LETTER
 Rule Menominee	1946	only	-	Apr	lastSun	2:00	1:00	D
 Rule Menominee	1946	only	-	Sep	lastSun	2:00	0	S
 Rule Menominee	1966	only	-	Apr	lastSun	2:00	1:00	D
 Rule Menominee	1966	only	-	Oct	lastSun	2:00	0	S
-# Zone	NAME		GMTOFF	RULES	FORMAT	[UNTIL]
+# Zone	NAME		STDOFF	RULES	FORMAT	[UNTIL]
 Zone America/Menominee	-5:50:27 -	LMT	1885 Sep 18 12:00
 			-6:00	US	C%sT	1946
-			-6:00 Menominee	C%sT	1969 Apr 27 2:00
-			-5:00	-	EST	1973 Apr 29 2:00
+			-6:00 Menominee	C%sT	1969 Apr 27  2:00
+			-5:00	-	EST	1973 Apr 29  2:00
 			-6:00	US	C%sT
 
 # Navassa
@@ -988,49 +1231,52 @@ Zone America/Menominee	-5:50:27 -	LMT	1885 Sep 18 12:00
 # occupied 1857/1900 by the Navassa Phosphate Co
 # US lighthouse 1917/1996-09
 # currently uninhabited
-# see Mark Fineman, ``An Isle Rich in Guano and Discord'',
+# see Mark Fineman, "An Isle Rich in Guano and Discord",
 # _Los Angeles Times_ (1998-11-10), A1, A10; it cites
 # Jimmy Skaggs, _The Great Guano Rush_ (1994).
 
 ################################################################################
 
 
-# From Paul Eggert (2006-03-22):
-# A good source for time zone historical data outside the U.S. is
+# From Paul Eggert (2017-02-10):
+#
+# Unless otherwise specified, the source for data through 1990 is:
 # Thomas G. Shanks and Rique Pottenger, The International Atlas (6th edition),
 # San Diego: ACS Publications, Inc. (2003).
+# Unfortunately this book contains many errors and cites no sources.
 #
-# Gwillim Law writes that a good source
-# for recent time zone data is the International Air Transport
+# Many years ago Gwillim Law wrote that a good source
+# for time zone data was the International Air Transport
 # Association's Standard Schedules Information Manual (IATA SSIM),
 # published semiannually.  Law sent in several helpful summaries
-# of the IATA's data after 1990.
-#
-# Except where otherwise noted, Shanks & Pottenger is the source for
-# entries through 1990, and IATA SSIM is the source for entries afterwards.
+# of the IATA's data after 1990.  Except where otherwise noted,
+# IATA SSIM is the source for entries after 1990.
 #
 # Other sources occasionally used include:
+#
+#	Milne J. Civil time. Geogr J. 1899 Feb;13(2):173-94
+#	<https://www.jstor.org/stable/1774359>.
+#
+#	Pearce C. The Great Daylight Saving Time Controversy.
+#	Australian Ebook Publisher. 2017. ISBN 978-1-925516-96-8.
 #
 #	Edward W. Whitman, World Time Differences,
 #	Whitman Publishing Co, 2 Niagara Av, Ealing, London (undated),
 #	which I found in the UCLA library.
 #
-#	<a href="http://www.pettswoodvillage.co.uk/Daylight_Savings_William_Willett.pdf">
 #	William Willett, The Waste of Daylight, 19th edition
-#	</a> (1914-03)
+#	<http://cs.ucla.edu/~eggert/The-Waste-of-Daylight-19th.pdf>
+#	[PDF] (1914-03)
 #
-#	Milne J. Civil time. Geogr J. 1899 Feb;13(2):173-94
-#	<http://www.jstor.org/stable/1774359>.
-#
-# See the `europe' file for Greenland.
+# See the 'europe' file for Greenland.
 
 # Canada
 
-# From Alain LaBont<e'> (1994-11-14):
+# From Alain LaBonté (1994-11-14):
 # I post here the time zone abbreviations standardized in Canada
 # for both English and French in the CAN/CSA-Z234.4-89 standard....
 #
-#	UTC	Standard time	Daylight savings time
+#	UTC	Standard time	Daylight saving time
 #	offset	French	English	French	English
 #	-2:30	-	-	HAT	NDT
 #	-3	-	-	HAA	ADT
@@ -1043,7 +1289,7 @@ Zone America/Menominee	-5:50:27 -	LMT	1885 Sep 18 12:00
 #	-9	HNY	YST	-	-
 #
 #	HN: Heure Normale	ST: Standard Time
-#	HA: Heure Avanc<e'>e	DT: Daylight saving Time
+#	HA: Heure Avancée	DT: Daylight saving Time
 #
 #	A: de l'Atlantique	Atlantic
 #	C: du Centre		Central
@@ -1058,7 +1304,7 @@ Zone America/Menominee	-5:50:27 -	LMT	1885 Sep 18 12:00
 # From Paul Eggert (1994-11-22):
 # Alas, this sort of thing must be handled by localization software.
 
-# Unless otherwise specified, the data for Canada are all from Shanks
+# Unless otherwise specified, the data entries for Canada are all from Shanks
 # & Pottenger.
 
 # From Chris Walton (2006-04-01, 2006-04-25, 2006-06-26, 2007-01-31,
@@ -1066,19 +1312,19 @@ Zone America/Menominee	-5:50:27 -	LMT	1885 Sep 18 12:00
 # The British Columbia government announced yesterday that it will
 # adjust daylight savings next year to align with changes in the
 # U.S. and the rest of Canada....
-# http://www2.news.gov.bc.ca/news_releases_2005-2009/2006AG0014-000330.htm
+# https://archive.news.gov.bc.ca/releases/news_releases_2005-2009/2006AG0014-000330.htm
 # ...
 # Nova Scotia
 # Daylight saving time will be extended by four weeks starting in 2007....
-# http://www.gov.ns.ca/just/regulations/rg2/2006/ma1206.pdf
+# https://www.novascotia.ca/just/regulations/rg2/2006/ma1206.pdf
 #
 # [For New Brunswick] the new legislation dictates that the time change is to
 # be done at 02:00 instead of 00:01.
-# http://www.gnb.ca/0062/acts/BBA-2006/Chap-19.pdf
+# https://www.gnb.ca/0062/acts/BBA-2006/Chap-19.pdf
 # ...
 # Manitoba has traditionally changed the clock every fall at 03:00.
 # As of 2006, the transition is to take place one hour earlier at 02:00.
-# http://web2.gov.mb.ca/laws/statutes/ccsm/o030e.php
+# https://web2.gov.mb.ca/laws/statutes/ccsm/o030e.php
 # ...
 # [Alberta, Ontario, Quebec] will follow US rules.
 # http://www.qp.gov.ab.ca/documents/spring/CH03_06.CFM
@@ -1092,7 +1338,7 @@ Zone America/Menominee	-5:50:27 -	LMT	1885 Sep 18 12:00
 # http://www.hoa.gov.nl.ca/hoa/bills/Bill0634.htm
 # ...
 # Yukon
-# http://www.gov.yk.ca/legislation/regs/oic2006_127.pdf
+# https://www.gov.yk.ca/legislation/regs/oic2006_127.pdf
 # ...
 # N.W.T. will follow US rules.  Whoever maintains the government web site
 # does not seem to believe in bookmarks.  To see the news release, click the
@@ -1105,17 +1351,16 @@ Zone America/Menominee	-5:50:27 -	LMT	1885 Sep 18 12:00
 # An amendment to the Interpretation Act was registered on February 19/2007....
 # http://action.attavik.ca/home/justice-gn/attach/2007/gaz02part2.pdf
 
-# From Paul Eggert (2006-04-25):
+# From Paul Eggert (2014-10-18):
 # H. David Matthews and Mary Vincent's map
-# <a href="http://www.canadiangeographic.ca/Magazine/SO98/geomap.asp">
 # "It's about TIME", _Canadian Geographic_ (September-October 1998)
-# </a> contains detailed boundaries for regions observing nonstandard
+# http://www.canadiangeographic.ca/Magazine/SO98/alacarte.asp
+# contains detailed boundaries for regions observing nonstandard
 # time and daylight saving time arrangements in Canada circa 1998.
 #
-# INMS, the Institute for National Measurement Standards in Ottawa, has <a
-# href="http://inms-ienm.nrc-cnrc.gc.ca/en/time_services/daylight_saving_e.php">
-# information about standard and daylight saving time zones in Canada.
-# </a> (updated periodically).
+# National Research Council Canada maintains info about time zones and DST.
+# https://www.nrc-cnrc.gc.ca/eng/services/time/time_zones.html
+# https://www.nrc-cnrc.gc.ca/eng/services/time/faq/index.html#Q5
 # Its unofficial information is often taken from Matthews and Vincent.
 
 # From Paul Eggert (2006-06-27):
@@ -1124,9 +1369,7 @@ Zone America/Menominee	-5:50:27 -	LMT	1885 Sep 18 12:00
 
 # From Chris Walton (2011-12-01)
 # In the first of Tammy Hardwick's articles
-# <a href="http://www.ilovecreston.com/?p=articles&t=spec&ar=260">
 # http://www.ilovecreston.com/?p=articles&t=spec&ar=260
-# </a>
 # she quotes the Friday November 1/1918 edition of the Creston Review.
 # The quote includes these two statements:
 # 'Sunday the CPR went back to the old system of time...'
@@ -1139,7 +1382,7 @@ Zone America/Menominee	-5:50:27 -	LMT	1885 Sep 18 12:00
 # Oct 31, to Oct 27, 1918 (and Sunday is a more likely transition day
 # than Thursday) in all Canadian rulesets.
 
-# Rule	NAME	FROM	TO	TYPE	IN	ON	AT	SAVE	LETTER/S
+# Rule	NAME	FROM	TO	-	IN	ON	AT	SAVE	LETTER/S
 Rule	Canada	1918	only	-	Apr	14	2:00	1:00	D
 Rule	Canada	1918	only	-	Oct	27	2:00	0	S
 Rule	Canada	1942	only	-	Feb	 9	2:00	1:00	W # War
@@ -1154,13 +1397,15 @@ Rule	Canada	2007	max	-	Nov	Sun>=1	2:00	0	S
 
 # Newfoundland and Labrador
 
-# From Paul Eggert (2000-10-02):
-# Matthews and Vincent (1998) write that Labrador should use NST/NDT,
-# but the only part of Labrador that follows the rules is the
-# southeast corner, including Port Hope Simpson and Mary's Harbour,
-# but excluding, say, Black Tickle.
+# From Paul Eggert (2017-10-14):
+# Legally Labrador should observe Newfoundland time; see:
+# McLeod J. Labrador time - legal or not? St. John's Telegram, 2017-10-07
+# http://www.thetelegram.com/news/local/labrador-time--legal-or-not-154860/
+# Matthews and Vincent (1998) write that the only part of Labrador
+# that follows the rules is the southeast corner, including Port Hope
+# Simpson and Mary's Harbour, but excluding, say, Black Tickle.
 
-# Rule	NAME	FROM	TO	TYPE	IN	ON	AT	SAVE	LETTER/S
+# Rule	NAME	FROM	TO	-	IN	ON	AT	SAVE	LETTER/S
 Rule	StJohns	1917	only	-	Apr	 8	2:00	1:00	D
 Rule	StJohns	1917	only	-	Sep	17	2:00	0	S
 # Whitman gives 1919 Apr 5 and 1920 Apr 5; go with Shanks & Pottenger.
@@ -1194,9 +1439,7 @@ Rule	StJohns	1960	1986	-	Oct	lastSun	2:00	0	S
 # Time to Standard Time and from Standard Time to Daylight Savings Time
 # now occurs at 2:00AM.
 # ...
-# <a href="http://www.assembly.nl.ca/legislation/sr/annualstatutes/2011/1106.chp.htm">
 # http://www.assembly.nl.ca/legislation/sr/annualstatutes/2011/1106.chp.htm
-# </a>
 # ...
 # MICHAEL PELLEY  |  Manager of Enterprise Architecture - Solution Delivery
 # Office of the Chief Information Officer
@@ -1211,7 +1454,7 @@ Rule	StJohns	2007	2011	-	Mar	Sun>=8	0:01	1:00	D
 Rule	StJohns	2007	2010	-	Nov	Sun>=1	0:01	0	S
 #
 # St John's has an apostrophe, but Posix file names can't have apostrophes.
-# Zone	NAME		GMTOFF	RULES	FORMAT	[UNTIL]
+# Zone	NAME		STDOFF	RULES	FORMAT	[UNTIL]
 Zone America/St_Johns	-3:30:52 -	LMT	1884
 			-3:30:52 StJohns N%sT	1918
 			-3:30:52 Canada	N%sT	1919
@@ -1223,8 +1466,8 @@ Zone America/St_Johns	-3:30:52 -	LMT	1884
 
 # most of east Labrador
 
-# The name `Happy Valley-Goose Bay' is too long; use `Goose Bay'.
-# Zone	NAME		GMTOFF	RULES	FORMAT	[UNTIL]
+# The name 'Happy Valley-Goose Bay' is too long; use 'Goose Bay'.
+# Zone	NAME		STDOFF	RULES	FORMAT	[UNTIL]
 Zone America/Goose_Bay	-4:01:40 -	LMT	1884 # Happy Valley-Goose Bay
 			-3:30:52 -	NST	1918
 			-3:30:52 Canada N%sT	1919
@@ -1232,22 +1475,39 @@ Zone America/Goose_Bay	-4:01:40 -	LMT	1884 # Happy Valley-Goose Bay
 			-3:30	-	NST	1936
 			-3:30	StJohns	N%sT	1942 May 11
 			-3:30	Canada	N%sT	1946
-			-3:30	StJohns	N%sT	1966 Mar 15 2:00
+			-3:30	StJohns	N%sT	1966 Mar 15  2:00
 			-4:00	StJohns	A%sT	2011 Nov
 			-4:00	Canada	A%sT
 
 
-# west Labrador, Nova Scotia, Prince Edward I
+# west Labrador, Nova Scotia, Prince Edward I,
+# Îles-de-la-Madeleine, Listuguj reserve
 
-# From Paul Eggert (2006-03-22):
+# From Brian Inglis (2015-07-20):
+# From the historical weather station records available at:
+# https://weatherspark.com/history/28351/1971/Sydney-Nova-Scotia-Canada
+# Sydney shares the same time history as Glace Bay, so was
+# likely to be the same across the island....
+# Sydney, as the capital and most populous location, or Cape Breton, would
+# have been better names for the zone had we known this in 1996.
+
+# From Paul Eggert (2015-07-20):
 # Shanks & Pottenger write that since 1970 most of this region has been like
 # Halifax.  Many locales did not observe peacetime DST until 1972;
-# Glace Bay, NS is the largest that we know of.
+# the Cape Breton area, represented by Glace Bay, is the largest we know of
+# (Glace Bay was perhaps not the best name choice but no point changing now).
 # Shanks & Pottenger also write that Liverpool, NS was the only town
 # in Canada to observe DST in 1971 but not 1970; for now we'll assume
 # this is a typo.
 
-# Rule	NAME	FROM	TO	TYPE	IN	ON	AT	SAVE	LETTER/S
+# From Jeffery Nichols (2020-01-09):
+# America/Halifax ... also applies to Îles-de-la-Madeleine and the Listuguj
+# reserve in Quebec. Officially, this came into effect on January 1, 2007
+# (Legal Time Act, CQLR c T-5.1), but the legislative debates surrounding that
+# bill say that it is "accommodating the customs and practices" of those
+# regions, which suggests that they have always been in-line with Halifax.
+
+# Rule	NAME	FROM	TO	-	IN	ON	AT	SAVE	LETTER/S
 Rule	Halifax	1916	only	-	Apr	 1	0:00	1:00	D
 Rule	Halifax	1916	only	-	Oct	 1	0:00	0	S
 Rule	Halifax	1920	only	-	May	 9	0:00	1:00	D
@@ -1289,11 +1549,11 @@ Rule	Halifax	1956	1959	-	Apr	lastSun	2:00	1:00	D
 Rule	Halifax	1956	1959	-	Sep	lastSun	2:00	0	S
 Rule	Halifax	1962	1973	-	Apr	lastSun	2:00	1:00	D
 Rule	Halifax	1962	1973	-	Oct	lastSun	2:00	0	S
-# Zone	NAME		GMTOFF	RULES	FORMAT	[UNTIL]
+# Zone	NAME		STDOFF	RULES	FORMAT	[UNTIL]
 Zone America/Halifax	-4:14:24 -	LMT	1902 Jun 15
 			-4:00	Halifax	A%sT	1918
 			-4:00	Canada	A%sT	1919
-			-4:00	Halifax	A%sT	1942 Feb  9 2:00s
+			-4:00	Halifax	A%sT	1942 Feb  9  2:00s
 			-4:00	Canada	A%sT	1946
 			-4:00	Halifax	A%sT	1974
 			-4:00	Canada	A%sT
@@ -1313,7 +1573,7 @@ Zone America/Glace_Bay	-3:59:48 -	LMT	1902 Jun 15
 # clear that this was the case since at least 1993.
 # For now, assume it started in 1993.
 
-# Rule	NAME	FROM	TO	TYPE	IN	ON	AT	SAVE	LETTER/S
+# Rule	NAME	FROM	TO	-	IN	ON	AT	SAVE	LETTER/S
 Rule	Moncton	1933	1935	-	Jun	Sun>=8	1:00	1:00	D
 Rule	Moncton	1933	1935	-	Sep	Sun>=8	1:00	0	S
 Rule	Moncton	1936	1938	-	Jun	Sun>=1	1:00	1:00	D
@@ -1327,7 +1587,7 @@ Rule	Moncton	1946	1956	-	Sep	lastSun	2:00	0	S
 Rule	Moncton	1957	1972	-	Oct	lastSun	2:00	0	S
 Rule	Moncton	1993	2006	-	Apr	Sun>=1	0:01	1:00	D
 Rule	Moncton	1993	2006	-	Oct	lastSun	0:01	0	S
-# Zone	NAME		GMTOFF	RULES	FORMAT	[UNTIL]
+# Zone	NAME		STDOFF	RULES	FORMAT	[UNTIL]
 Zone America/Moncton	-4:19:08 -	LMT	1883 Dec  9
 			-5:00	-	EST	1902 Jun 15
 			-4:00	Canada	A%sT	1933
@@ -1340,78 +1600,12 @@ Zone America/Moncton	-4:19:08 -	LMT	1883 Dec  9
 
 # Quebec
 
-# From Paul Eggert (2006-07-09):
-# Shanks & Pottenger write that since 1970 most of Quebec has been
-# like Montreal.
-
-# From Paul Eggert (2006-06-27):
-# Matthews and Vincent (1998) also write that Quebec east of the -63
-# meridian is supposed to observe AST, but residents as far east as
-# Natashquan use EST/EDT, and residents east of Natashquan use AST.
-# In "Official time in Quebec" the Quebec department of justice writes in
-# http://www.justice.gouv.qc.ca/english/publications/generale/temps-regl-1-a.htm
-# that "The residents of the Municipality of the
-# Cote-Nord-du-Golfe-Saint-Laurent and the municipalities of Saint-Augustin,
-# Bonne-Esperance and Blanc-Sablon apply the Official Time Act as it is
-# written and use Atlantic standard time all year round. The same applies to
-# the residents of the Native facilities along the lower North Shore."
-# <http://www.assnat.qc.ca/eng/37legislature2/Projets-loi/Publics/06-a002.htm>
-# says this common practice was codified into law as of 2007.
-# For lack of better info, guess this practice began around 1970, contra to
-# Shanks & Pottenger who have this region observing AST/ADT.
-
-# Rule	NAME	FROM	TO	TYPE	IN	ON	AT	SAVE	LETTER/S
-Rule	Mont	1917	only	-	Mar	25	2:00	1:00	D
-Rule	Mont	1917	only	-	Apr	24	0:00	0	S
-Rule	Mont	1919	only	-	Mar	31	2:30	1:00	D
-Rule	Mont	1919	only	-	Oct	25	2:30	0	S
-Rule	Mont	1920	only	-	May	 2	2:30	1:00	D
-Rule	Mont	1920	1922	-	Oct	Sun>=1	2:30	0	S
-Rule	Mont	1921	only	-	May	 1	2:00	1:00	D
-Rule	Mont	1922	only	-	Apr	30	2:00	1:00	D
-Rule	Mont	1924	only	-	May	17	2:00	1:00	D
-Rule	Mont	1924	1926	-	Sep	lastSun	2:30	0	S
-Rule	Mont	1925	1926	-	May	Sun>=1	2:00	1:00	D
-# The 1927-to-1937 rules can be expressed more simply as
-# Rule	Mont	1927	1937	-	Apr	lastSat	24:00	1:00	D
-# Rule	Mont	1927	1937	-	Sep	lastSat	24:00	0	S
-# The rules below avoid use of 24:00
-# (which pre-1998 versions of zic cannot handle).
-Rule	Mont	1927	only	-	May	1	0:00	1:00	D
-Rule	Mont	1927	1932	-	Sep	lastSun	0:00	0	S
-Rule	Mont	1928	1931	-	Apr	lastSun	0:00	1:00	D
-Rule	Mont	1932	only	-	May	1	0:00	1:00	D
-Rule	Mont	1933	1940	-	Apr	lastSun	0:00	1:00	D
-Rule	Mont	1933	only	-	Oct	1	0:00	0	S
-Rule	Mont	1934	1939	-	Sep	lastSun	0:00	0	S
-Rule	Mont	1946	1973	-	Apr	lastSun	2:00	1:00	D
-Rule	Mont	1945	1948	-	Sep	lastSun	2:00	0	S
-Rule	Mont	1949	1950	-	Oct	lastSun	2:00	0	S
-Rule	Mont	1951	1956	-	Sep	lastSun	2:00	0	S
-Rule	Mont	1957	1973	-	Oct	lastSun	2:00	0	S
-
-# Zone	NAME		GMTOFF	RULES	FORMAT	[UNTIL]
-Zone America/Blanc-Sablon -3:48:28 -	LMT	1884
-			-4:00	Canada	A%sT	1970
-			-4:00	-	AST
-Zone America/Montreal	-4:54:16 -	LMT	1884
-			-5:00	Mont	E%sT	1918
-			-5:00	Canada	E%sT	1919
-			-5:00	Mont	E%sT	1942 Feb  9 2:00s
-			-5:00	Canada	E%sT	1946
-			-5:00	Mont	E%sT	1974
-			-5:00	Canada	E%sT
-
+# From Paul Eggert (2020-01-10):
+# See America/Toronto for most of Quebec, including Montreal.
+# See America/Halifax for the Îles de la Madeleine and the Listuguj reserve.
+# See America/Puerto_Rico for east of Natashquan.
 
 # Ontario
-
-# From Paul Eggert (2006-07-09):
-# Shanks & Pottenger write that since 1970 most of Ontario has been like
-# Toronto.
-# Thunder Bay skipped DST in 1973.
-# Many smaller locales did not observe peacetime DST until 1974;
-# Nipigon (EST) and Rainy River (CST) are the largest that we know of.
-# Far west Ontario is like Winnipeg; far east Quebec is like Halifax.
 
 # From Mark Brader (2003-07-26):
 # [According to the Toronto Star] Orillia, Ontario, adopted DST
@@ -1420,74 +1614,18 @@ Zone America/Montreal	-4:54:16 -	LMT	1884
 # have already done so.  In Orillia DST was to run until Saturday,
 # 1912-08-31 (no time mentioned), but it was met with considerable
 # hostility from certain segments of the public, and was revoked after
-# only two weeks -- I copied it as Saturday, 1912-07-07, 22:00, but
+# only two weeks - I copied it as Saturday, 1912-07-07, 22:00, but
 # presumably that should be -07-06.  (1912-06-19, -07-12; also letters
 # earlier in June).
 #
 # Kenora, Ontario, was to abandon DST on 1914-06-01 (-05-21).
-
-# From Paul Eggert (1997-10-17):
-# Mark Brader writes that an article in the 1997-10-14 Toronto Star
-# says that Atikokan, Ontario currently does not observe DST,
-# but will vote on 11-10 whether to use EST/EDT.
-# He also writes that the
-# <a href="http://www.gov.on.ca/MBS/english/publications/statregs/conttext.html">
-# Ontario Time Act (1990, Chapter T.9)
-# </a>
-# says that Ontario east of 90W uses EST/EDT, and west of 90W uses CST/CDT.
-# Officially Atikokan is therefore on CST/CDT, and most likely this report
-# concerns a non-official time observed as a matter of local practice.
 #
-# From Paul Eggert (2000-10-02):
-# Matthews and Vincent (1998) write that Atikokan, Pickle Lake, and
-# New Osnaburgh observe CST all year, that Big Trout Lake observes
-# CST/CDT, and that Upsala and Shebandowan observe EST/EDT, all in
-# violation of the official Ontario rules.
-#
-# From Paul Eggert (2006-07-09):
-# Chris Walton (2006-07-06) mentioned an article by Stephanie MacLellan in the
-# 2005-07-21 Chronicle-Journal, which said:
-#
-#	The clocks in Atikokan stay set on standard time year-round.
-#	This means they spend about half the time on central time and
-#	the other half on eastern time.
-#
-#	For the most part, the system works, Mayor Dennis Brown said.
-#
-#	"The majority of businesses in Atikokan deal more with Eastern
-#	Canada, but there are some that deal with Western Canada," he
-#	said.  "I don't see any changes happening here."
-#
-# Walton also writes "Supposedly Pickle Lake and Mishkeegogamang
-# [New Osnaburgh] follow the same practice."
-
-# From Garry McKinnon (2006-07-14) via Chris Walton:
-# I chatted with a member of my board who has an outstanding memory
-# and a long history in Atikokan (and in the telecom industry) and he
-# can say for certain that Atikokan has been practicing the current
-# time keeping since 1952, at least.
-
-# From Paul Eggert (2006-07-17):
-# Shanks & Pottenger say that Atikokan has agreed with Rainy River
-# ever since standard time was introduced, but the information from
-# McKinnon sounds more authoritative.  For now, assume that Atikokan
-# switched to EST immediately after WWII era daylight saving time
-# ended.  This matches the old (less-populous) America/Coral_Harbour
-# entry since our cutoff date of 1970, so we can move
-# America/Coral_Harbour to the 'backward' file.
+# From Paul Eggert (2017-07-08):
+# For more on Orillia, see: Daubs K. Bold attempt at daylight saving
+# time became a comic failure in Orillia. Toronto Star 2017-07-08.
+# https://www.thestar.com/news/insight/2017/07/08/bold-attempt-at-daylight-saving-time-became-a-comic-failure-in-orillia.html
 
 # From Mark Brader (2010-03-06):
-#
-# Currently the database has:
-#
-# # Ontario
-#
-# # From Paul Eggert (2006-07-09):
-# # Shanks & Pottenger write that since 1970 most of Ontario has been like
-# # Toronto.
-# # Thunder Bay skipped DST in 1973.
-# # Many smaller locales did not observe peacetime DST until 1974;
-# # Nipigon (EST) and Rainy River (CST) are the largest that we know of.
 #
 # In the (Toronto) Globe and Mail for Saturday, 1955-09-24, in the bottom
 # right corner of page 1, it says that Toronto will return to standard
@@ -1496,10 +1634,8 @@ Zone America/Montreal	-4:54:16 -	LMT	1884
 #     The one-hour setback will go into effect throughout most of Ontario,
 #     except in areas like Windsor which remains on standard time all year.
 #
-# Windsor is, of course, a lot larger than Nipigon.
-#
-# I only came across this incidentally.  I don't know if Windsor began
-# observing DST when Detroit did, or in 1974, or on some other date.
+# ... I don't know if Windsor began observing DST when Detroit did,
+# or in 1974, or on some other date.
 #
 # By the way, the article continues by noting that:
 #
@@ -1512,9 +1648,7 @@ Zone America/Montreal	-4:54:16 -	LMT	1884
 # The Journal of The Royal Astronomical Society of Canada,
 # volume 26, number 2 (February 1932) and, as of 2010-07-17,
 # was available at
-# <a href="http://adsabs.harvard.edu/full/1932JRASC..26...49S">
 # http://adsabs.harvard.edu/full/1932JRASC..26...49S
-# </a>
 #
 # It includes the text below (starting on page 57):
 #
@@ -1525,26 +1659,26 @@ Zone America/Montreal	-4:54:16 -	LMT	1884
 # ing in 1930. The information for the province of Quebec is definite,
 # for the other provinces only approximate:
 #
-# 	Province	Daylight saving time used
+#	Province	Daylight saving time used
 # Prince Edward Island	Not used.
 # Nova Scotia		In Halifax only.
 # New Brunswick		In St. John only.
 # Quebec		In the following places:
-# 			Montreal	Lachine
-# 			Quebec		Mont-Royal
-# 			Levis		Iberville
-# 			St. Lambert	Cap de la Madeleine
-# 			Verdun		Loretteville
-# 			Westmount	Richmond
-# 			Outremont	St. Jerome
-# 			Longueuil	Greenfield Park
-# 			Arvida		Waterloo
-# 			Chambly-Canton	Beaulieu
-# 			Melbourne	La Tuque
-# 			St. Theophile	Buckingham
+#			Montreal	Lachine
+#			Quebec		Mont-Royal
+#			Lévis		Iberville
+#			St. Lambert	Cap de la Madelèine
+#			Verdun		Loretteville
+#			Westmount	Richmond
+#			Outremont	St. Jérôme
+#			Longueuil	Greenfield Park
+#			Arvida		Waterloo
+#			Chambly-Canton	Beaulieu
+#			Melbourne	La Tuque
+#			St. Théophile	Buckingham
 # Ontario		Used generally in the cities and towns along
-# 			the southerly part of the province. Not
-# 			used in the northwesterlhy part.
+#			the southerly part of the province. Not
+#			used in the northwesterly part.
 # Manitoba		Not used.
 # Saskatchewan		In Regina only.
 # Alberta		Not used.
@@ -1553,7 +1687,7 @@ Zone America/Montreal	-4:54:16 -	LMT	1884
 #   With some exceptions, the use of daylight saving may be said to be limited
 # to those cities and towns lying between Quebec city and Windsor, Ont.
 
-# Rule	NAME	FROM	TO	TYPE	IN	ON	AT	SAVE	LETTER/S
+# Rule	NAME	FROM	TO	-	IN	ON	AT	SAVE	LETTER/S
 Rule	Toronto	1919	only	-	Mar	30	23:30	1:00	D
 Rule	Toronto	1919	only	-	Oct	26	0:00	0	S
 Rule	Toronto	1920	only	-	May	 2	2:00	1:00	D
@@ -1565,19 +1699,10 @@ Rule	Toronto	1922	1923	-	May	Sun>=8	2:00	1:00	D
 # was meant.
 Rule	Toronto	1922	1926	-	Sep	Sun>=15	2:00	0	S
 Rule	Toronto	1924	1927	-	May	Sun>=1	2:00	1:00	D
-# The 1927-to-1939 rules can be expressed more simply as
-# Rule	Toronto	1927	1937	-	Sep	Sun>=25	2:00	0	S
-# Rule	Toronto	1928	1937	-	Apr	Sun>=25	2:00	1:00	D
-# Rule	Toronto	1938	1940	-	Apr	lastSun	2:00	1:00	D
-# Rule	Toronto	1938	1939	-	Sep	lastSun	2:00	0	S
-# The rules below avoid use of Sun>=25
-# (which pre-2004 versions of zic cannot handle).
-Rule	Toronto	1927	1932	-	Sep	lastSun	2:00	0	S
-Rule	Toronto	1928	1931	-	Apr	lastSun	2:00	1:00	D
-Rule	Toronto	1932	only	-	May	1	2:00	1:00	D
-Rule	Toronto	1933	1940	-	Apr	lastSun	2:00	1:00	D
-Rule	Toronto	1933	only	-	Oct	1	2:00	0	S
-Rule	Toronto	1934	1939	-	Sep	lastSun	2:00	0	S
+Rule	Toronto	1927	1937	-	Sep	Sun>=25	2:00	0	S
+Rule	Toronto	1928	1937	-	Apr	Sun>=25	2:00	1:00	D
+Rule	Toronto	1938	1940	-	Apr	lastSun	2:00	1:00	D
+Rule	Toronto	1938	1939	-	Sep	lastSun	2:00	0	S
 Rule	Toronto	1945	1946	-	Sep	lastSun	2:00	0	S
 Rule	Toronto	1946	only	-	Apr	lastSun	2:00	1:00	D
 Rule	Toronto	1947	1949	-	Apr	lastSun	0:00	1:00	D
@@ -1592,51 +1717,16 @@ Rule	Toronto	1951	1956	-	Sep	lastSun	2:00	0	S
 # Toronto Star, which said that DST was ending 1971-10-31 as usual.
 Rule	Toronto	1957	1973	-	Oct	lastSun	2:00	0	S
 
-# From Paul Eggert (2003-07-27):
-# Willett (1914-03) writes (p. 17) "In the Cities of Fort William, and
-# Port Arthur, Ontario, the principle of the Bill has been in
-# operation for the past three years, and in the City of Moose Jaw,
-# Saskatchewan, for one year."
+# The Bahamas match Toronto since 1970.
 
-# From David Bryan via Tory Tronrud, Director/Curator,
-# Thunder Bay Museum (2003-11-12):
-# There is some suggestion, however, that, by-law or not, daylight
-# savings time was being practiced in Fort William and Port Arthur
-# before 1909.... [I]n 1910, the line between the Eastern and Central
-# Time Zones was permanently moved about two hundred miles west to
-# include the Thunder Bay area....  When Canada adopted daylight
-# savings time in 1916, Fort William and Port Arthur, having done so
-# already, did not change their clocks....  During the Second World
-# War,... [t]he cities agreed to implement DST during the summer
-# months for the remainder of the war years.
-
-# Zone	NAME		GMTOFF	RULES	FORMAT	[UNTIL]
+# Zone	NAME		STDOFF	RULES	FORMAT	[UNTIL]
 Zone America/Toronto	-5:17:32 -	LMT	1895
 			-5:00	Canada	E%sT	1919
-			-5:00	Toronto	E%sT	1942 Feb  9 2:00s
+			-5:00	Toronto	E%sT	1942 Feb  9  2:00s
 			-5:00	Canada	E%sT	1946
 			-5:00	Toronto	E%sT	1974
 			-5:00	Canada	E%sT
-Zone America/Thunder_Bay -5:57:00 -	LMT	1895
-			-6:00	-	CST	1910
-			-5:00	-	EST	1942
-			-5:00	Canada	E%sT	1970
-			-5:00	Mont	E%sT	1973
-			-5:00	-	EST	1974
-			-5:00	Canada	E%sT
-Zone America/Nipigon	-5:53:04 -	LMT	1895
-			-5:00	Canada	E%sT	1940 Sep 29
-			-5:00	1:00	EDT	1942 Feb  9 2:00s
-			-5:00	Canada	E%sT
-Zone America/Rainy_River -6:18:16 -	LMT	1895
-			-6:00	Canada	C%sT	1940 Sep 29
-			-6:00	1:00	CDT	1942 Feb  9 2:00s
-			-6:00	Canada	C%sT
-Zone America/Atikokan	-6:06:28 -	LMT	1895
-			-6:00	Canada	C%sT	1940 Sep 29
-			-6:00	1:00	CDT	1942 Feb  9 2:00s
-			-6:00	Canada	C%sT	1945 Sep 30 2:00
-			-5:00	-	EST
+# For Atikokan see America/Panama.
 
 
 # Manitoba
@@ -1648,7 +1738,7 @@ Zone America/Atikokan	-6:06:28 -	LMT	1895
 # the first Sunday of April of each year and two o'clock Central
 # Standard Time in the morning of the last Sunday of October next
 # following, one hour in advance of Central Standard Time."...
-# I believe that the English legislation [of the old time act] had =
+# I believe that the English legislation [of the old time act] had
 # been assented to (March 22, 1967)....
 # Also, as far as I can tell, there was no order-in-council varying
 # the time of Daylight Saving Time for 2005 and so the provisions of
@@ -1660,7 +1750,7 @@ Zone America/Atikokan	-6:06:28 -	LMT	1895
 # starting 1966.  Since 02:00s is clearly correct for 1967 on, assume
 # it was also 02:00s in 1966.
 
-# Rule	NAME	FROM	TO	TYPE	IN	ON	AT	SAVE	LETTER/S
+# Rule	NAME	FROM	TO	-	IN	ON	AT	SAVE	LETTER/S
 Rule	Winn	1916	only	-	Apr	23	0:00	1:00	D
 Rule	Winn	1916	only	-	Sep	17	0:00	0	S
 Rule	Winn	1918	only	-	Apr	14	2:00	1:00	D
@@ -1685,7 +1775,7 @@ Rule	Winn	1963	only	-	Sep	22	2:00	0	S
 Rule	Winn	1966	1986	-	Apr	lastSun	2:00s	1:00	D
 Rule	Winn	1966	2005	-	Oct	lastSun	2:00s	0	S
 Rule	Winn	1987	2005	-	Apr	Sun>=1	2:00s	1:00	D
-# Zone	NAME		GMTOFF	RULES	FORMAT	[UNTIL]
+# Zone	NAME		STDOFF	RULES	FORMAT	[UNTIL]
 Zone America/Winnipeg	-6:28:36 -	LMT	1887 Jul 16
 			-6:00	Winn	C%sT	2006
 			-6:00	Canada	C%sT
@@ -1706,6 +1796,12 @@ Zone America/Winnipeg	-6:28:36 -	LMT	1887 Jul 16
 # From Paul Eggert (2003-07-27):
 # Willett (1914-03) notes that DST "has been in operation ... in the
 # City of Moose Jaw, Saskatchewan, for one year."
+
+# From Paul Eggert (2019-07-25):
+# Pearce's book says Regina observed DST in 1914-1917.  No dates and times,
+# unfortunately.  It also says that in 1914 Saskatoon observed DST
+# from 1 June to 6 July, and that DST was also tried out in Davidson,
+# Melfort, and Prince Albert.
 
 # From Paul Eggert (2006-03-22):
 # Shanks & Pottenger say that since 1970 this region has mostly been as Regina.
@@ -1745,7 +1841,7 @@ Zone America/Winnipeg	-6:28:36 -	LMT	1887 Jul 16
 # long and rather painful to read.
 # http://www.qp.gov.sk.ca/documents/English/Statutes/Statutes/T14.pdf
 
-# Rule	NAME	FROM	TO	TYPE	IN	ON	AT	SAVE	LETTER/S
+# Rule	NAME	FROM	TO	-	IN	ON	AT	SAVE	LETTER/S
 Rule	Regina	1918	only	-	Apr	14	2:00	1:00	D
 Rule	Regina	1918	only	-	Oct	27	2:00	0	S
 Rule	Regina	1930	1934	-	May	Sun>=1	0:00	1:00	D
@@ -1769,20 +1865,33 @@ Rule	Swift	1957	only	-	Oct	lastSun	2:00	0	S
 Rule	Swift	1959	1961	-	Apr	lastSun	2:00	1:00	D
 Rule	Swift	1959	only	-	Oct	lastSun	2:00	0	S
 Rule	Swift	1960	1961	-	Sep	lastSun	2:00	0	S
-# Zone	NAME		GMTOFF	RULES	FORMAT	[UNTIL]
+# Zone	NAME		STDOFF	RULES	FORMAT	[UNTIL]
 Zone America/Regina	-6:58:36 -	LMT	1905 Sep
-			-7:00	Regina	M%sT	1960 Apr lastSun 2:00
+			-7:00	Regina	M%sT	1960 Apr lastSun  2:00
 			-6:00	-	CST
 Zone America/Swift_Current -7:11:20 -	LMT	1905 Sep
-			-7:00	Canada	M%sT	1946 Apr lastSun 2:00
+			-7:00	Canada	M%sT	1946 Apr lastSun  2:00
 			-7:00	Regina	M%sT	1950
-			-7:00	Swift	M%sT	1972 Apr lastSun 2:00
+			-7:00	Swift	M%sT	1972 Apr lastSun  2:00
 			-6:00	-	CST
 
 
 # Alberta
 
-# Rule	NAME	FROM	TO	TYPE	IN	ON	AT	SAVE	LETTER/S
+# From Alois Treindl (2019-07-19):
+# There was no DST in Alberta in 1967... Calgary Herald, 29 April 1967.
+# 1969, no DST, from Edmonton Journal 18 April 1969
+#
+# From Paul Eggert (2019-07-25):
+# Pearce's book says that Alberta's 1948 Daylight Saving Act required
+# Mountain Standard Time without DST, and that "anyone who broke that law
+# could be fined up to $25 and costs".  There seems to be no record of
+# anybody paying the fine.  The law was not changed until an August 1971
+# plebiscite reinstituted DST in 1972.  This story is also mentioned in:
+# Boyer JP. Forcing Choice: The Risky Reward of Referendums. Dundum. 2017.
+# ISBN 978-1459739123.
+
+# Rule	NAME	FROM	TO	-	IN	ON	AT	SAVE	LETTER/S
 Rule	Edm	1918	1919	-	Apr	Sun>=8	2:00	1:00	D
 Rule	Edm	1918	only	-	Oct	27	2:00	0	S
 Rule	Edm	1919	only	-	May	27	2:00	0	S
@@ -1794,13 +1903,9 @@ Rule	Edm	1945	only	-	Aug	14	23:00u	1:00	P # Peace
 Rule	Edm	1945	only	-	Sep	lastSun	2:00	0	S
 Rule	Edm	1947	only	-	Apr	lastSun	2:00	1:00	D
 Rule	Edm	1947	only	-	Sep	lastSun	2:00	0	S
-Rule	Edm	1967	only	-	Apr	lastSun	2:00	1:00	D
-Rule	Edm	1967	only	-	Oct	lastSun	2:00	0	S
-Rule	Edm	1969	only	-	Apr	lastSun	2:00	1:00	D
-Rule	Edm	1969	only	-	Oct	lastSun	2:00	0	S
 Rule	Edm	1972	1986	-	Apr	lastSun	2:00	1:00	D
 Rule	Edm	1972	2006	-	Oct	lastSun	2:00	0	S
-# Zone	NAME		GMTOFF	RULES	FORMAT	[UNTIL]
+# Zone	NAME		STDOFF	RULES	FORMAT	[UNTIL]
 Zone America/Edmonton	-7:33:52 -	LMT	1906 Sep
 			-7:00	Edm	M%sT	1987
 			-7:00	Canada	M%sT
@@ -1812,155 +1917,224 @@ Zone America/Edmonton	-7:33:52 -	LMT	1906 Sep
 # Shanks & Pottenger write that since 1970 most of this region has
 # been like Vancouver.
 # Dawson Creek uses MST.  Much of east BC is like Edmonton.
-# Matthews and Vincent (1998) write that Creston is like Dawson Creek.
 
-# It seems though that (re: Creston) is not entirely correct:
+# From Matt Johnson (2015-09-21):
+# Fort Nelson, BC, Canada will cancel DST this year.  So while previously they
+# were aligned with America/Vancouver, they're now aligned with
+# America/Dawson_Creek.
+# http://www.northernrockies.ca/EN/meta/news/archives/2015/northern-rockies-time-change.html
+#
+# From Tim Parenti (2015-09-23):
+# This requires a new zone for the Northern Rockies Regional Municipality,
+# America/Fort_Nelson.  The resolution of 2014-12-08 was reached following a
+# 2014-11-15 poll with nearly 75% support.  Effectively, the municipality has
+# been on MST (-0700) like Dawson Creek since it advanced its clocks on
+# 2015-03-08.
+#
+# From Paul Eggert (2019-07-25):
+# Shanks says Fort Nelson did not observe DST in 1946, unlike Vancouver.
+# Alois Treindl confirmed this on 07-22, citing the 1946-04-27 Vancouver Daily
+# Province.  He also cited the 1946-09-28 Victoria Daily Times, which said
+# that Vancouver, Victoria, etc. "change at midnight Saturday"; for now,
+# guess they meant 02:00 Sunday since 02:00 was common practice in Vancouver.
+#
+# Early Vancouver, Volume Four, by Major J.S. Matthews, V.D., 2011 edition
+# says that a 1922 plebiscite adopted DST, but a 1923 plebiscite rejected it.
+# http://former.vancouver.ca/ctyclerk/archives/digitized/EarlyVan/SearchEarlyVan/Vol4pdf/MatthewsEarlyVancouverVol4_DaylightSavings.pdf
+# A catalog entry for a newspaper clipping seems to indicate that Vancouver
+# observed DST in 1941 from 07-07 through 09-27; see
+# https://searcharchives.vancouver.ca/daylight-saving-1918-starts-again-july-7-1941-start-d-s-sept-27-end-of-d-s-1941
+# We have no further details, so omit them for now.
 
-# From Chris Walton (2011-12-01):
-# There are two areas within the Canadian province of British Columbia
-# that do not currently observe daylight saving:
-# a) The Creston Valley (includes the town of Creston and surrounding area)
-# b) The eastern half of the Peace River Regional District
-# (includes the cities of Dawson Creek and Fort St. John)
-
-# Earlier this year I stumbled across a detailed article about the time
-# keeping history of Creston; it was written by Tammy Hardwick who is the
-# manager of the Creston & District Museum. The article was written in May 2009.
-# <a href="http://www.ilovecreston.com/?p=articles&t=spec&ar=260">
-# http://www.ilovecreston.com/?p=articles&t=spec&ar=260
-# </a>
-# According to the article, Creston has not changed its clocks since June 1918.
-# i.e. Creston has been stuck on UTC-7 for 93 years.
-# Dawson Creek, on the other hand, changed its clocks as recently as April 1972.
-
-# Unfortunately the exact date for the time change in June 1918 remains
-# unknown and will be difficult to ascertain.  I e-mailed Tammy a few months
-# ago to ask if Sunday June 2 was a reasonable guess.  She said it was just
-# as plausible as any other date (in June).  She also said that after writing the
-# article she had discovered another time change in 1916; this is the subject
-# of another article which she wrote in October 2010.
-# <a href="http://www.creston.museum.bc.ca/index.php?module=comments&uop=view_comment&cm+id=56">
-# http://www.creston.museum.bc.ca/index.php?module=comments&uop=view_comment&cm+id=56
-# </a>
-
-# Here is a summary of the three clock change events in Creston's history:
-# 1. 1884 or 1885: adoption of Mountain Standard Time (GMT-7)
-# Exact date unknown
-# 2. Oct 1916: switch to Pacific Standard Time (GMT-8)
-# Exact date in October unknown;  Sunday October 1 is a reasonable guess.
-# 3. June 1918: switch to Pacific Daylight Time (GMT-7)
-# Exact date in June unknown; Sunday June 2 is a reasonable guess.
-# note#1:
-# On Oct 27/1918 when daylight saving ended in the rest of Canada,
-# Creston did not change its clocks.
-# note#2:
-# During WWII when the Federal Government legislated a mandatory clock change,
-# Creston did not oblige.
-# note#3:
-# There is no guarantee that Creston will remain on Mountain Standard Time
-# (UTC-7) forever.
-# The subject was debated at least once this year by the town Council.
-# <a href="http://www.bclocalnews.com/kootenay_rockies/crestonvalleyadvance/news/116760809.html">
-# http://www.bclocalnews.com/kootenay_rockies/crestonvalleyadvance/news/116760809.html
-# </a>
-
-# During a period WWII, summer time (Daylight saying) was mandatory in Canada.
-# In Creston, that was handled by shifting the area to PST (-8:00) then applying
-# summer time to cause the offset to be -7:00, the same as it had been before
-# the change.  It can be argued that the timezone abbreviation during this
-# period should be PDT rather than MST, but that doesn't seem important enough
-# (to anyone) to further complicate the rules.
-
-# The transition dates (and times) are guesses.
-
-# Rule	NAME	FROM	TO	TYPE	IN	ON	AT	SAVE	LETTER/S
+# Rule	NAME	FROM	TO	-	IN	ON	AT	SAVE	LETTER/S
 Rule	Vanc	1918	only	-	Apr	14	2:00	1:00	D
 Rule	Vanc	1918	only	-	Oct	27	2:00	0	S
 Rule	Vanc	1942	only	-	Feb	 9	2:00	1:00	W # War
 Rule	Vanc	1945	only	-	Aug	14	23:00u	1:00	P # Peace
 Rule	Vanc	1945	only	-	Sep	30	2:00	0	S
 Rule	Vanc	1946	1986	-	Apr	lastSun	2:00	1:00	D
-Rule	Vanc	1946	only	-	Oct	13	2:00	0	S
+Rule	Vanc	1946	only	-	Sep	29	2:00	0	S
 Rule	Vanc	1947	1961	-	Sep	lastSun	2:00	0	S
 Rule	Vanc	1962	2006	-	Oct	lastSun	2:00	0	S
-# Zone	NAME		GMTOFF	RULES	FORMAT	[UNTIL]
+# Zone	NAME		STDOFF	RULES	FORMAT	[UNTIL]
 Zone America/Vancouver	-8:12:28 -	LMT	1884
 			-8:00	Vanc	P%sT	1987
 			-8:00	Canada	P%sT
 Zone America/Dawson_Creek -8:00:56 -	LMT	1884
 			-8:00	Canada	P%sT	1947
-			-8:00	Vanc	P%sT	1972 Aug 30 2:00
+			-8:00	Vanc	P%sT	1972 Aug 30  2:00
 			-7:00	-	MST
-Zone America/Creston	-7:46:04 -	LMT	1884
-			-7:00	-	MST	1916 Oct 1
-			-8:00	-	PST	1918 Jun 2
+Zone America/Fort_Nelson	-8:10:47 -	LMT	1884
+			-8:00	Vanc	P%sT	1946
+			-8:00	-	PST	1947
+			-8:00	Vanc	P%sT	1987
+			-8:00	Canada	P%sT	2015 Mar  8  2:00
 			-7:00	-	MST
+# For Creston see America/Phoenix.
 
 # Northwest Territories, Nunavut, Yukon
+
+# From Chris Walton (2022-11-06):
+# Whitehorse Star - Thursday April 22, 1965 - page 1
+# title: DST Starts Monday ...
+# https://www.newspapers.com/image/578587481/
+# The title of this first article is wrong and/or misleading.
+# Also, the start time shown in the  article is vague; it simply says "after
+# midnight" when it probably should have stated 2:00a.m....
+#
+# Whitehorse Star - Monday October 25, 1965 - page 15 ...
+# https://www.newspapers.com/image/578589147/
+# The 1965 Yukon Council minutes can be found here:
+# http://assets.yukonarchives.ca/PER_YG_06_1965_C20_S02_v1.pdf
+# ... I do not currently believe that NWT touched any of its clocks in 1965....
+#
+# Whitehorse Star - Thursday Feb 24,1966 - page 2
+# title: It's Time for YDT ...
+# https://www.newspapers.com/image/578575979/ ...
+# America/Whitehorse as a permanent change from UTC-9(YST) to
+# UTC-8(PST) at 00:00 on Sunday February 27, 1966....
+#
+# Whitehorse Star - Friday April 28,1972 - page 6
+# title: Daylight Saving Time for N.W.T....
+# https://www.newspapers.com/image/578701610/ ...
+# Nunavut and NWT zones ... DST starting in 1972.... Start and End ...
+# should be the same as the rest of Canada
+#
+#
+# From Paul Eggert (2022-11-06):
+# For now, assume Yukon's 1965-04-22 spring forward was 00:00 -> 02:00, as this
+# seems likely than 02:00 -> 04:00 and matches "after midnight".
 
 # From Paul Eggert (2006-03-22):
 # Dawson switched to PST in 1973.  Inuvik switched to MST in 1979.
 # Mathew Englander (1996-10-07) gives the following refs:
 #	* 1967. Paragraph 28(34)(g) of the Interpretation Act, S.C. 1967-68,
-#	c. 7 defines Yukon standard time as UTC-9.  This is still valid;
+#	c. 7 defines Yukon standard time as UTC-9....
 #	see Interpretation Act, R.S.C. 1985, c. I-21, s. 35(1).
+#	[https://www.canlii.org/en/ca/laws/stat/rsc-1985-c-i-21/latest/rsc-1985-c-i-21.html]
 #	* C.O. 1973/214 switched Yukon to PST on 1973-10-28 00:00.
 #	* O.I.C. 1980/02 established DST.
 #	* O.I.C. 1987/056 changed DST to Apr firstSun 2:00 to Oct lastSun 2:00.
-# Shanks & Pottenger say Yukon's 1973-10-28 switch was at 2:00; go
-# with Englander.
-# From Chris Walton (2006-06-26):
-# Here is a link to the old daylight saving portion of the interpretation
-# act which was last updated in 1987:
-# http://www.gov.yk.ca/legislation/regs/oic1987_056.pdf
+
+# From Brian Inglis (2015-04-14):
+#
+# I tried to trace the history of Yukon time and found the following
+# regulations, giving the reference title and URL if found, regulation name,
+# and relevant quote if available.  Each regulation specifically revokes its
+# predecessor.  The final reference is to the current Interpretation Act
+# authorizing and resulting from these regulatory changes.
+#
+# Only recent regulations were retrievable via Yukon government site search or
+# index, and only some via Canadian legal sources.  Other sources used include
+# articles titled "Standard Time and Time Zones in Canada" from JRASC via ADS
+# Abstracts, cited by ADO for 1932 ..., and updated versions from 1958 and
+# 1970 quoted below; each article includes current extracts from provincial
+# and territorial ST and DST regulations at the end, summaries and details of
+# standard times and daylight saving time at many locations across Canada,
+# with time zone maps, tables and calculations for Canadian Sunrise, Sunset,
+# and LMST; they also cover many countries and global locations, with a chart
+# and table showing current Universal Time offsets, and may be useful as
+# another source of information for 1970 and earlier.
+#
+# * Standard Time and Time Zones in Canada; Smith, C.C.; JRASC, Vol. 26,
+#   pp.49-77; February 1932; SAO/NASA Astrophysics Data System (ADS)
+#   http://adsabs.harvard.edu/abs/1932JRASC..26...49S from p.75:
+#   Yukon Interpretation Ordinance
+#   Yukon standard time is the local mean time at the one hundred and
+#   thirty-fifth meridian.
+#
+# * Standard Time and Time Zones in Canada; Smith, C.C.; Thomson, Malcolm M.;
+#   JRASC, Vol. 52, pp.193-223; October 1958; SAO/NASA Astrophysics Data System
+#   (ADS) http://adsabs.harvard.edu/abs/1958JRASC..52..193S from pp.220-1:
+#   Yukon Interpretation Ordinance, 1955, Chap. 16.
+#
+#     (1) Subject to this section, standard time shall be reckoned as nine
+#     hours behind Greenwich Time and called Yukon Standard Time.
+#
+#     (2) Notwithstanding subsection (1), the Commissioner may make regulations
+#     varying the manner of reckoning standard time.
+#
+# * Yukon Territory Commissioner's Order 1966-20 Interpretation Ordinance
+#   [no online source found]
+#
+# * Standard Time and Time Zones in Canada; Thomson, Malcolm M.; JRASC,
+#   Vol. 64, pp.129-162; June 1970; SAO/NASA Astrophysics Data System (ADS)
+#   http://adsabs.harvard.edu/abs/1970JRASC..64..129T from p.156: Yukon
+#   Territory Commissioner's Order 1967-59 Interpretation Ordinance ...
+#
+#     1. Commissioner's Order 1966-20 dated at Whitehorse in the Yukon
+#     Territory on 27th January, 1966, is hereby revoked.
+#
+#     2. Yukon (East) Standard Time as defined by section 36 of the
+#     Interpretation Ordinance from and after mid-night on the 28th day of May,
+#     1967 shall be reckoned in the same manner as Pacific Standard Time, that
+#     is to say, eight hours behind Greenwich Time in the area of the Yukon
+#     Territory lying east of the 138th degree longitude west.
+#
+#     3. In the remainder of the Territory, lying west of the 138th degree
+#     longitude west, Yukon (West) Standard Time shall be reckoned as nine
+#     hours behind Greenwich Time.
+#
+# * Yukon Standard Time defined as Pacific Standard Time, YCO 1973/214
+#   https://www.canlii.org/en/yk/laws/regu/yco-1973-214/latest/yco-1973-214.html
+#   C.O. 1973/214 INTERPRETATION ACT ...
+#
+#     1. Effective October 28, 1973 Commissioner's Order 1967/59 is hereby
+#     revoked.
+#
+#     2. Yukon Standard Time as defined by section 36 of the Interpretation
+#     Act from and after midnight on the twenty-eighth day of October, 1973
+#     shall be reckoned in the same manner as Pacific Standard Time, that is
+#     to say eight hours behind Greenwich Time.
+#
+# * O.I.C. 1980/02 INTERPRETATION ACT
+#   https://mm.icann.org/pipermail/tz/attachments/20201125/d5adc93b/CAYTOIC1980-02DST1980-01-04-0001.pdf
+#
+# * Yukon Daylight Saving Time, YOIC 1987/56
+#   https://www.canlii.org/en/yk/laws/regu/yoic-1987-56/latest/yoic-1987-56.html
+#   O.I.C. 1987/056 INTERPRETATION ACT ...
+#
+#   In every year between
+#     (a) two o'clock in the morning in the first Sunday in April, and
+#     (b) two o'clock in the morning in the last Sunday in October,
+#   Standard Time shall be reckoned as seven hours behind Greenwich Time and
+#   called Yukon Daylight Saving Time.
+#   ...
+#   Dated ... 9th day of March, A.D., 1987.
+#
+# * Yukon Daylight Saving Time 2006, YOIC 2006/127
+#   https://www.canlii.org/en/yk/laws/regu/yoic-2006-127/latest/yoic-2006-127.html
+#   O.I.C. 2006/127 INTERPRETATION ACT ...
+#
+#     1. In Yukon each year the time for general purposes shall be 7 hours
+#     behind Greenwich mean time during the period commencing at two o'clock
+#     in the forenoon on the second Sunday of March and ending at two o'clock
+#     in the forenoon on the first Sunday of November and shall be called
+#     Yukon Daylight Saving Time.
+#
+#     2. Order-in-Council 1987/56 is revoked.
+#
+#     3. This order comes into force January 1, 2007.
+#
+# * Interpretation Act, RSY 2002, c 125
+# https://www.canlii.org/en/yk/laws/stat/rsy-2002-c-125/latest/rsy-2002-c-125.html
+
+# From Chris Walton (2022-11-06):
+# The 5th edition of the Atlas of Canada contains a time zone map that
+# shows both legislated and observed time zone boundaries.
+# All communities on Baffin Island are shown to be observing Eastern time.
+# The date on the map is 1984.
+# https://ftp.maps.canada.ca/pub/nrcan_rncan/raster/atlas_5_ed/eng/other/referencemaps/mcr4056.pdf
 
 # From Rives McDow (1999-09-04):
 # Nunavut ... moved ... to incorporate the whole territory into one time zone.
-# <a href="http://www.nunatsiaq.com/nunavut/nvt90903_13.html">
 # Nunavut moves to single time zone Oct. 31
-# </a>
-#
-# From Antoine Leca (1999-09-06):
-# We then need to create a new timezone for the Kitikmeot region of Nunavut
-# to differentiate it from the Yellowknife region.
+# http://www.nunatsiaq.com/nunavut/nvt90903_13.html
 
 # From Paul Eggert (1999-09-20):
-# <a href="http://www.nunavut.com/basicfacts/english/basicfacts_1territory.html">
 # Basic Facts: The New Territory
-# </a> (1999) reports that Pangnirtung operates on eastern time,
-# and that Coral Harbour does not observe DST.  We don't know when
-# Pangnirtung switched to eastern time; we'll guess 1995.
-
-# From Rives McDow (1999-11-08):
-# On October 31, when the rest of Nunavut went to Central time,
-# Pangnirtung wobbled.  Here is the result of their wobble:
-#
-# The following businesses and organizations in Pangnirtung use Central Time:
-#
-#	First Air, Power Corp, Nunavut Construction, Health Center, RCMP,
-#	Eastern Arctic National Parks, A & D Specialist
-#
-# The following businesses and organizations in Pangnirtung use Eastern Time:
-#
-#	Hamlet office, All other businesses, Both schools, Airport operator
-#
-# This has made for an interesting situation there, which warranted the news.
-# No one there that I spoke with seems concerned, or has plans to
-# change the local methods of keeping time, as it evidently does not
-# really interfere with any activities or make things difficult locally.
-# They plan to celebrate New Year's turn-over twice, one hour apart,
-# so it appears that the situation will last at least that long.
-# The Nunavut Intergovernmental Affairs hopes that they will "come to
-# their senses", but the locals evidently don't see any problem with
-# the current state of affairs.
-
-# From Michaela Rodrigue, writing in the
-# <a href="http://www.nunatsiaq.com/archives/nunavut991130/nvt91119_17.html">
-# Nunatsiaq News (1999-11-19)</a>:
-# Clyde River, Pangnirtung and Sanikiluaq now operate with two time zones,
-# central - or Nunavut time - for government offices, and eastern time
-# for municipal offices and schools....  Igloolik [was similar but then]
-# made the switch to central time on Saturday, Nov. 6.
+# http://www.nunavut.com/basicfacts/english/basicfacts_1territory.html
+# (1999) reports that ... Coral Harbour does not observe DST.
 
 # From Paul Eggert (2000-10-02):
 # Matthews and Vincent (1998) say the following, but we lack histories
@@ -1974,10 +2148,8 @@ Zone America/Creston	-7:46:04 -	LMT	1884
 # Central Time and Southampton Island [in the Central zone] is not
 # required to use daylight savings.
 
-# From
-# <a href="http://www.nunatsiaq.com/archives/nunavut001130/nvt21110_02.html">
-# Nunavut now has two time zones
-# </a> (2000-11-10):
+# From <http://www.nunatsiaqonline.ca/archives/nunavut001130/nvt21110_02.html>
+# Nunavut now has two time zones (2000-11-10):
 # The Nunavut government would allow its employees in Kugluktuk and
 # Cambridge Bay to operate on central time year-round, putting them
 # one hour behind the rest of Nunavut for six months during the winter.
@@ -2005,10 +2177,7 @@ Zone America/Creston	-7:46:04 -	LMT	1884
 # [Also see <http://www.nunatsiaq.com/nunavut/nvt10309_06.html> (2001-03-09).]
 
 # From Gwillim Law (2005-05-21):
-# According to maps at
-# http://inms-ienm.nrc-cnrc.gc.ca/images/time_services/TZ01SWE.jpg
-# http://inms-ienm.nrc-cnrc.gc.ca/images/time_services/TZ01SSE.jpg
-# (both dated 2003), and
+# According to ...
 # http://www.canadiangeographic.ca/Magazine/SO98/geomap.asp
 # (from a 1998 Canadian Geographic article), the de facto and de jure time
 # for Southampton Island (at the north end of Hudson Bay) is UTC-5 all year
@@ -2017,9 +2186,11 @@ Zone America/Creston	-7:46:04 -	LMT	1884
 # predates the creation of Nunavut, it probably goes back many years....
 # The Inuktitut name of Coral Harbour is Sallit, but it's rarely used.
 #
-# From Paul Eggert (2005-07-26):
+# From Paul Eggert (2014-10-17):
 # For lack of better information, assume that Southampton Island observed
-# daylight saving only during wartime.
+# daylight saving only during wartime.  Gwillim Law's email also
+# mentioned maps now maintained by National Research Council Canada;
+# see above for an up-to-date link.
 
 # From Chris Walton (2007-03-01):
 # ... the community of Resolute (located on Cornwallis Island in
@@ -2068,9 +2239,7 @@ Zone America/Creston	-7:46:04 -	LMT	1884
 # used to be the mayor of Resolute Bay and he apparently owns half the
 # businesses including "South Camp Inn." This website has some info on
 # Aziz:
-# <a href="http://www.uphere.ca/node/493">
 # http://www.uphere.ca/node/493
-# </a>
 #
 # I sent Aziz an e-mail asking when Resolute Bay had stopped using
 # Eastern Standard Time.
@@ -2092,7 +2261,31 @@ Zone America/Creston	-7:46:04 -	LMT	1884
 # obtained in November 2008 should be ignored...
 # I apologize for reporting incorrect information in 2008.
 
-# Rule	NAME	FROM	TO	TYPE	IN	ON	AT	SAVE	LETTER/S
+# From Tim Parenti (2020-03-05):
+# The government of Yukon announced [yesterday] the cessation of seasonal time
+# changes.  "After clocks are pushed ahead one hour on March 8, the territory
+# will remain on [UTC-07].  ... [The government] found 93 per cent of
+# respondents wanted to end seasonal time changes and, of that group, 70 per
+# cent wanted 'permanent Pacific Daylight Saving Time.'"
+# https://www.cbc.ca/news/canada/north/yukon-end-daylight-saving-time-1.5486358
+#
+# Although the government press release prefers PDT, we prefer MST for
+# consistency with nearby Dawson Creek, Creston, and Fort Nelson.
+# https://yukon.ca/en/news/yukon-end-seasonal-time-change
+
+# From Andrew G. Smith (2020-09-24):
+# Yukon has completed its regulatory change to be on UTC -7 year-round....
+# http://www.gov.yk.ca/legislation/regs/oic2020_125.pdf
+# What we have done is re-defined Yukon Standard Time, as we are
+# authorized to do under section 33 of our Interpretation Act:
+# http://www.gov.yk.ca/legislation/acts/interpretation_c.pdf
+#
+# From Paul Eggert (2020-09-24):
+# tzdb uses the obsolete YST abbreviation for standard time in Yukon through
+# about 1970, and uses PST for standard time in Yukon since then.  Consistent
+# with that, use MST for -07, the new standard time in Yukon effective Nov. 1.
+
+# Rule	NAME	FROM	TO	-	IN	ON	AT	SAVE	LETTER/S
 Rule	NT_YK	1918	only	-	Apr	14	2:00	1:00	D
 Rule	NT_YK	1918	only	-	Oct	27	2:00	0	S
 Rule	NT_YK	1919	only	-	May	25	2:00	1:00	D
@@ -2100,69 +2293,63 @@ Rule	NT_YK	1919	only	-	Nov	 1	0:00	0	S
 Rule	NT_YK	1942	only	-	Feb	 9	2:00	1:00	W # War
 Rule	NT_YK	1945	only	-	Aug	14	23:00u	1:00	P # Peace
 Rule	NT_YK	1945	only	-	Sep	30	2:00	0	S
-Rule	NT_YK	1965	only	-	Apr	lastSun	0:00	2:00	DD
-Rule	NT_YK	1965	only	-	Oct	lastSun	2:00	0	S
-Rule	NT_YK	1980	1986	-	Apr	lastSun	2:00	1:00	D
-Rule	NT_YK	1980	2006	-	Oct	lastSun	2:00	0	S
+Rule	NT_YK	1972	1986	-	Apr	lastSun	2:00	1:00	D
+Rule	NT_YK	1972	2006	-	Oct	lastSun	2:00	0	S
 Rule	NT_YK	1987	2006	-	Apr	Sun>=1	2:00	1:00	D
-# Zone	NAME		GMTOFF	RULES	FORMAT	[UNTIL]
-# aka Panniqtuuq
-Zone America/Pangnirtung 0	-	zzz	1921 # trading post est.
-			-4:00	NT_YK	A%sT	1995 Apr Sun>=1 2:00
-			-5:00	Canada	E%sT	1999 Oct 31 2:00
-			-6:00	Canada	C%sT	2000 Oct 29 2:00
-			-5:00	Canada	E%sT
+Rule	Yukon	1965	only	-	Apr	lastSun	0:00	2:00	DD
+Rule	Yukon	1965	only	-	Oct	lastSun	2:00	0	S
+# Zone	NAME		STDOFF	RULES	FORMAT	[UNTIL]
 # formerly Frobisher Bay
-Zone America/Iqaluit	0	-	zzz	1942 Aug # Frobisher Bay est.
-			-5:00	NT_YK	E%sT	1999 Oct 31 2:00
-			-6:00	Canada	C%sT	2000 Oct 29 2:00
+Zone America/Iqaluit	0	-	-00	1942 Aug # Frobisher Bay est.
+			-5:00	NT_YK	E%sT	1999 Oct 31  2:00
+			-6:00	Canada	C%sT	2000 Oct 29  2:00
 			-5:00	Canada	E%sT
 # aka Qausuittuq
-Zone America/Resolute	0	-	zzz	1947 Aug 31 # Resolute founded
-			-6:00	NT_YK	C%sT	2000 Oct 29 2:00
-			-5:00	-	EST	2001 Apr  1 3:00
-			-6:00	Canada	C%sT	2006 Oct 29 2:00
-			-5:00	-	EST	2007 Mar 11 3:00
+Zone America/Resolute	0	-	-00	1947 Aug 31 # Resolute founded
+			-6:00	NT_YK	C%sT	2000 Oct 29  2:00
+			-5:00	-	EST	2001 Apr  1  3:00
+			-6:00	Canada	C%sT	2006 Oct 29  2:00
+			-5:00	-	EST	2007 Mar 11  3:00
 			-6:00	Canada	C%sT
 # aka Kangiqiniq
-Zone America/Rankin_Inlet 0	-	zzz	1957 # Rankin Inlet founded
-			-6:00	NT_YK	C%sT	2000 Oct 29 2:00
-			-5:00	-	EST	2001 Apr  1 3:00
+Zone America/Rankin_Inlet 0	-	-00	1957 # Rankin Inlet founded
+			-6:00	NT_YK	C%sT	2000 Oct 29  2:00
+			-5:00	-	EST	2001 Apr  1  3:00
 			-6:00	Canada	C%sT
 # aka Iqaluktuuttiaq
-Zone America/Cambridge_Bay 0	-	zzz	1920 # trading post est.?
-			-7:00	NT_YK	M%sT	1999 Oct 31 2:00
-			-6:00	Canada	C%sT	2000 Oct 29 2:00
-			-5:00	-	EST	2000 Nov  5 0:00
-			-6:00	-	CST	2001 Apr  1 3:00
+Zone America/Cambridge_Bay 0	-	-00	1920 # trading post est.?
+			-7:00	NT_YK	M%sT	1999 Oct 31  2:00
+			-6:00	Canada	C%sT	2000 Oct 29  2:00
+			-5:00	-	EST	2000 Nov  5  0:00
+			-6:00	-	CST	2001 Apr  1  3:00
 			-7:00	Canada	M%sT
-Zone America/Yellowknife 0	-	zzz	1935 # Yellowknife founded?
-			-7:00	NT_YK	M%sT	1980
-			-7:00	Canada	M%sT
-Zone America/Inuvik	0	-	zzz	1953 # Inuvik founded
-			-8:00	NT_YK	P%sT	1979 Apr lastSun 2:00
+Zone America/Inuvik	0	-	-00	1953 # Inuvik founded
+			-8:00	NT_YK	P%sT	1979 Apr lastSun  2:00
 			-7:00	NT_YK	M%sT	1980
 			-7:00	Canada	M%sT
 Zone America/Whitehorse	-9:00:12 -	LMT	1900 Aug 20
-			-9:00	NT_YK	Y%sT	1966 Jul 1 2:00
-			-8:00	NT_YK	P%sT	1980
-			-8:00	Canada	P%sT
+			-9:00	NT_YK	Y%sT	1965
+			-9:00	Yukon	Y%sT	1966 Feb 27  0:00
+			-8:00	-	PST	1980
+			-8:00	Canada	P%sT	2020 Nov  1
+			-7:00	-	MST
 Zone America/Dawson	-9:17:40 -	LMT	1900 Aug 20
-			-9:00	NT_YK	Y%sT	1973 Oct 28 0:00
-			-8:00	NT_YK	P%sT	1980
-			-8:00	Canada	P%sT
+			-9:00	NT_YK	Y%sT	1965
+			-9:00	Yukon	Y%sT	1973 Oct 28  0:00
+			-8:00	-	PST	1980
+			-8:00	Canada	P%sT	2020 Nov  1
+			-7:00	-	MST
 
 
 ###############################################################################
 
 # Mexico
 
-# From Paul Eggert (2001-03-05):
+# From Paul Eggert (2014-12-07):
 # The Investigation and Analysis Service of the
 # Mexican Library of Congress (MLoC) has published a
-# <a href="http://www.cddhcu.gob.mx/bibliot/publica/inveyana/polisoc/horver/">
 # history of Mexican local time (in Spanish)
-# </a>.
+# http://www.diputados.gob.mx/bibliot/publica/inveyana/polisoc/horver/index.htm
 #
 # Here are the discrepancies between Shanks & Pottenger (S&P) and the MLoC.
 # (In all cases we go with the MLoC.)
@@ -2207,9 +2394,8 @@ Zone America/Dawson	-9:17:40 -	LMT	1900 Aug 20
 # -------------- End Forwarded Message --------------
 # From Paul Eggert (1996-06-12):
 # For an English translation of the decree, see
-# <a href="http://mexico-travel.com/extra/timezone_eng.html">
-# ``Diario Oficial: Time Zone Changeover'' (1996-01-04).
-# </a>
+# "Diario Oficial: Time Zone Changeover" (1996-01-04).
+# http://mexico-travel.com/extra/timezone_eng.html
 
 # From Rives McDow (1998-10-08):
 # The State of Quintana Roo has reverted back to central STD and DST times
@@ -2221,7 +2407,7 @@ Zone America/Dawson	-9:17:40 -	LMT	1900 Aug 20
 # savings time so as to stay on the same time zone as the southern part of
 # Arizona year round.
 
-# From Jesper Norgaard, translating
+# From Jesper Nørgaard, translating
 # <http://www.reforma.com/nacional/articulo/064327/> (2001-01-17):
 # In Oaxaca, the 55.000 teachers from the Section 22 of the National
 # Syndicate of Education Workers, refuse to apply daylight saving each
@@ -2234,7 +2420,7 @@ Zone America/Dawson	-9:17:40 -	LMT	1900 Aug 20
 # January 17, 2000 - The Energy Secretary, Ernesto Martens, announced
 # that Summer Time will be reduced from seven to five months, starting
 # this year....
-# <http://www.publico.com.mx/scripts/texto3.asp?action=pagina&pag=21&pos=p&secc=naci&date=01/17/2001>
+# http://www.publico.com.mx/scripts/texto3.asp?action=pagina&pag=21&pos=p&secc=naci&date=01/17/2001
 # [translated], says "summer time will ... take effect on the first Sunday
 # in May, and end on the last Sunday of September.
 
@@ -2242,23 +2428,22 @@ Zone America/Dawson	-9:17:40 -	LMT	1900 Aug 20
 # The 2001-01-24 traditional Washington Post contained the page one
 # story "Timely Issue Divides Mexicans."...
 # http://www.washingtonpost.com/wp-dyn/articles/A37383-2001Jan23.html
-# ... Mexico City Mayor Lopez Obrador "...is threatening to keep
+# ... Mexico City Mayor López Obrador "...is threatening to keep
 # Mexico City and its 20 million residents on a different time than
-# the rest of the country..." In particular, Lopez Obrador would abolish
+# the rest of the country..." In particular, López Obrador would abolish
 # observation of Daylight Saving Time.
 
-# <a href="http://www.conae.gob.mx/ahorro/decretohorver2001.html#decre">
 # Official statute published by the Energy Department
-# </a> (2001-02-01) shows Baja and Chihauhua as still using US DST rules,
-# and Sonora with no DST.  This was reported by Jesper Norgaard (2001-02-03).
+# http://www.conae.gob.mx/ahorro/decretohorver2001.html#decre
+# (2001-02-01) shows Baja and Chihauhua as still using US DST rules,
+# and Sonora with no DST.  This was reported by Jesper Nørgaard (2001-02-03).
 
 # From Paul Eggert (2001-03-03):
 #
-# <a href="http://www.latimes.com/news/nation/20010303/t000018766.html">
+# https://www.latimes.com/archives/la-xpm-2001-mar-03-mn-32561-story.html
 # James F. Smith writes in today's LA Times
-# </a>
 # * Sonora will continue to observe standard time.
-# * Last week Mexico City's mayor Andres Manuel Lopez Obrador decreed that
+# * Last week Mexico City's mayor Andrés Manuel López Obrador decreed that
 #   the Federal District will not adopt DST.
 # * 4 of 16 district leaders announced they'll ignore the decree.
 # * The decree does not affect federal-controlled facilities including
@@ -2266,7 +2451,7 @@ Zone America/Dawson	-9:17:40 -	LMT	1900 Aug 20
 #
 # For now we'll assume that the Federal District will bow to federal rules.
 
-# From Jesper Norgaard (2001-04-01):
+# From Jesper Nørgaard (2001-04-01):
 # I found some references to the Mexican application of daylight
 # saving, which modifies what I had already sent you, stating earlier
 # that a number of northern Mexican states would go on daylight
@@ -2275,7 +2460,7 @@ Zone America/Dawson	-9:17:40 -	LMT	1900 Aug 20
 # saving all year) will follow the original decree of president
 # Vicente Fox, starting daylight saving May 6, 2001 and ending
 # September 30, 2001.
-# References: "Diario de Monterrey" <www.diariodemonterrey.com/index.asp>
+# References: "Diario de Monterrey" <http://www.diariodemonterrey.com/index.asp>
 # Palabra <http://palabra.infosel.com/010331/primera/ppri3101.pdf> (2001-03-31)
 
 # From Reuters (2001-09-04):
@@ -2287,7 +2472,7 @@ Zone America/Dawson	-9:17:40 -	LMT	1900 Aug 20
 # standard time. "This is so residents of the Federal District are not
 # subject to unexpected time changes," a statement from the court said.
 
-# From Jesper Norgaard Welen (2002-03-12):
+# From Jesper Nørgaard Welen (2002-03-12):
 # ... consulting my local grocery store(!) and my coworkers, they all insisted
 # that a new decision had been made to reinstate US style DST in Mexico....
 # http://www.conae.gob.mx/ahorro/horaver2001_m1_2002.html (2002-02-20)
@@ -2301,51 +2486,89 @@ Zone America/Dawson	-9:17:40 -	LMT	1900 Aug 20
 # > the United States.
 # Now this has passed both the Congress and the Senate, so starting from
 # 2010, some border regions will be the same:
-# <a href="http://www.signonsandiego.com/news/2009/dec/28/clocks-will-match-both-sides-border/">
 # http://www.signonsandiego.com/news/2009/dec/28/clocks-will-match-both-sides-border/
-# </a>
-# <a href="http://www.elmananarey.com/diario/noticia/nacional/noticias/empatan_horario_de_frontera_con_eu/621939">
 # http://www.elmananarey.com/diario/noticia/nacional/noticias/empatan_horario_de_frontera_con_eu/621939
-# </a>
 # (Spanish)
 #
 # Could not find the new law text, but the proposed law text changes are here:
-# <a href="http://gaceta.diputados.gob.mx/Gaceta/61/2009/dic/20091210-V.pdf">
 # http://gaceta.diputados.gob.mx/Gaceta/61/2009/dic/20091210-V.pdf
-# </a>
 # (Gaceta Parlamentaria)
 #
 # There is also a list of the votes here:
-# <a href="http://gaceta.diputados.gob.mx/Gaceta/61/2009/dic/V2-101209.html">
 # http://gaceta.diputados.gob.mx/Gaceta/61/2009/dic/V2-101209.html
-# </a>
 #
 # Our page:
-# <a href="http://www.timeanddate.com/news/time/north-mexico-dst-change.html">
-# http://www.timeanddate.com/news/time/north-mexico-dst-change.html
-# </a>
+# https://www.timeanddate.com/news/time/north-mexico-dst-change.html
 
 # From Arthur David Olson (2010-01-20):
 # The page
-# <a href="http://dof.gob.mx/nota_detalle.php?codigo=5127480&fecha=06/01/2010">
 # http://dof.gob.mx/nota_detalle.php?codigo=5127480&fecha=06/01/2010
-# </a>
 # includes this text:
 # En los municipios fronterizos de Tijuana y Mexicali en Baja California;
-# Ju&aacute;rez y Ojinaga en Chihuahua; Acu&ntilde;a y Piedras Negras en Coahuila;
-# An&aacute;huac en Nuevo Le&oacute;n; y Nuevo Laredo, Reynosa y Matamoros en
-# Tamaulipas, la aplicaci&oacute;n de este horario estacional surtir&aacute; efecto
-# desde las dos horas del segundo domingo de marzo y concluir&aacute; a las dos
+# Juárez y Ojinaga en Chihuahua; Acuña y Piedras Negras en Coahuila;
+# Anáhuac en Nuevo León; y Nuevo Laredo, Reynosa y Matamoros en
+# Tamaulipas, la aplicación de este horario estacional surtirá efecto
+# desde las dos horas del segundo domingo de marzo y concluirá a las dos
 # horas del primer domingo de noviembre.
 # En los municipios fronterizos que se encuentren ubicados en la franja
-# fronteriza norte en el territorio comprendido entre la l&iacute;nea
-# internacional y la l&iacute;nea paralela ubicada a una distancia de veinte
-# kil&oacute;metros, as&iacute; como la Ciudad de Ensenada, Baja California, hacia el
-# interior del pa&iacute;s, la aplicaci&oacute;n de este horario estacional surtir&aacute;
-# efecto desde las dos horas del segundo domingo de marzo y concluir&aacute; a
+# fronteriza norte en el territorio comprendido entre la línea
+# internacional y la línea paralela ubicada a una distancia de veinte
+# kilómetros, así como la Ciudad de Ensenada, Baja California, hacia el
+# interior del país, la aplicación de este horario estacional surtirá
+# efecto desde las dos horas del segundo domingo de marzo y concluirá a
 # las dos horas del primer domingo de noviembre.
 
-# Rule	NAME	FROM	TO	TYPE	IN	ON	AT	SAVE	LETTER/S
+# From Steffen Thorsen (2014-12-08), translated by Gwillim Law:
+# The Mexican state of Quintana Roo will likely change to EST in 2015.
+#
+# http://www.unioncancun.mx/articulo/2014/12/04/medio-ambiente/congreso-aprueba-una-hora-mas-de-sol-en-qroo
+# "With this change, the time conflict that has existed between the municipios
+# of Quintana Roo and the municipio of Felipe Carrillo Puerto may come to an
+# end. The latter declared itself in rebellion 15 years ago when a time change
+# was initiated in Mexico, and since then it has refused to change its time
+# zone along with the rest of the country."
+#
+# From Steffen Thorsen (2015-01-14), translated by Gwillim Law:
+# http://sipse.com/novedades/confirman-aplicacion-de-nueva-zona-horaria-para-quintana-roo-132331.html
+# "...the new time zone will come into effect at two o'clock on the first Sunday
+# of February, when we will have to advance the clock one hour from its current
+# time..."
+# Also, the new zone will not use DST.
+#
+# From Carlos Raúl Perasso (2015-02-02):
+# The decree that modifies the Mexican Hour System Law has finally
+# been published at the Diario Oficial de la Federación
+# http://www.dof.gob.mx/nota_detalle.php?codigo=5380123&fecha=31/01/2015
+# It establishes 5 zones for Mexico:
+# 1- Zona Centro (Central Zone): Corresponds to longitude 90 W,
+#    includes most of Mexico, excluding what's mentioned below.
+# 2- Zona Pacífico (Pacific Zone): Longitude 105 W, includes the
+#    states of Baja California Sur; Chihuahua; Nayarit (excluding Bahía
+#    de Banderas which lies in Central Zone); Sinaloa and Sonora.
+# 3- Zona Noroeste (Northwest Zone): Longitude 120 W, includes the
+#    state of Baja California.
+# 4- Zona Sureste (Southeast Zone): Longitude 75 W, includes the state
+#    of Quintana Roo.
+# 5- The islands, reefs and keys shall take their timezone from the
+#    longitude they are located at.
+
+# From Paul Eggert (2022-10-28):
+# The new Mexican law was published today:
+# https://www.dof.gob.mx/nota_detalle.php?codigo=5670045&fecha=28/10/2022
+# This abolishes DST except where US DST rules are observed,
+# and in addition changes all of Chihuahua to -06 with no DST.
+
+# From Heitor David Pinto (2022-11-28):
+# Now the northern [municipios] want to have the same time zone as the
+# respective neighboring cities in the US, for example Juárez in UTC-7 with
+# DST, matching El Paso, and Ojinaga in UTC-6 with DST, matching Presidio....
+# the president authorized the publication of the decree for November 29,
+# so the time change would occur on November 30 at 0:00.
+# http://puentelibre.mx/noticia/ciudad_juarez_cambio_horario_noviembre_2022/
+
+# Rule	NAME	FROM	TO	-	IN	ON	AT	SAVE	LETTER/S
+Rule	Mexico	1931	only	-	May	1	23:00	1:00	D
+Rule	Mexico	1931	only	-	Oct	1	0:00	0	S
 Rule	Mexico	1939	only	-	Feb	5	0:00	1:00	D
 Rule	Mexico	1939	only	-	Jun	25	0:00	0	S
 Rule	Mexico	1940	only	-	Dec	9	0:00	1:00	D
@@ -2358,138 +2581,148 @@ Rule	Mexico	1996	2000	-	Apr	Sun>=1	2:00	1:00	D
 Rule	Mexico	1996	2000	-	Oct	lastSun	2:00	0	S
 Rule	Mexico	2001	only	-	May	Sun>=1	2:00	1:00	D
 Rule	Mexico	2001	only	-	Sep	lastSun	2:00	0	S
-Rule	Mexico	2002	max	-	Apr	Sun>=1	2:00	1:00	D
-Rule	Mexico	2002	max	-	Oct	lastSun	2:00	0	S
-# Zone	NAME		GMTOFF	RULES	FORMAT	[UNTIL]
-# Quintana Roo
-Zone America/Cancun	-5:47:04 -	LMT	1922 Jan  1  0:12:56
+Rule	Mexico	2002	2022	-	Apr	Sun>=1	2:00	1:00	D
+Rule	Mexico	2002	2022	-	Oct	lastSun	2:00	0	S
+# Zone	NAME		STDOFF	RULES	FORMAT	[UNTIL]
+# Quintana Roo; represented by Cancún
+Zone America/Cancun	-5:47:04 -	LMT	1922 Jan  1  6:00u
 			-6:00	-	CST	1981 Dec 23
 			-5:00	Mexico	E%sT	1998 Aug  2  2:00
-			-6:00	Mexico	C%sT
-# Campeche, Yucatan
-Zone America/Merida	-5:58:28 -	LMT	1922 Jan  1  0:01:32
+			-6:00	Mexico	C%sT	2015 Feb  1  2:00
+			-5:00	-	EST
+# Campeche, Yucatán; represented by Mérida
+Zone America/Merida	-5:58:28 -	LMT	1922 Jan  1  6:00u
 			-6:00	-	CST	1981 Dec 23
 			-5:00	-	EST	1982 Dec  2
 			-6:00	Mexico	C%sT
-# Coahuila, Durango, Nuevo Leon, Tamaulipas (near US border)
-Zone America/Matamoros	-6:40:00 -	LMT	1921 Dec 31 23:20:00
+# Coahuila, Nuevo León, Tamaulipas (near US border)
+# This includes the following municipios:
+#   in Coahuila: Acuña, Allende, Guerrero, Hidalgo, Jiménez, Morelos, Nava,
+#     Ocampo, Piedras Negras, Villa Unión, Zaragoza
+#   in Nuevo León: Anáhuac
+#   in Tamaulipas: Nuevo Laredo, Guerrero, Mier, Miguel Alemán, Camargo,
+#     Gustavo Díaz Ordaz, Reynosa, Río Bravo, Valle Hermoso, Matamoros.
+# https://www.dof.gob.mx/nota_detalle.php?codigo=5670045&fecha=28/10/2022
+Zone America/Matamoros	-6:30:00 -	LMT	1922 Jan  1  6:00u
 			-6:00	-	CST	1988
 			-6:00	US	C%sT	1989
 			-6:00	Mexico	C%sT	2010
 			-6:00	US	C%sT
-# Coahuila, Durango, Nuevo Leon, Tamaulipas (away from US border)
-Zone America/Monterrey	-6:41:16 -	LMT	1921 Dec 31 23:18:44
+# Durango; Coahuila, Nuevo León, Tamaulipas (away from US border)
+Zone America/Monterrey	-6:41:16 -	LMT	1922 Jan  1  6:00u
 			-6:00	-	CST	1988
 			-6:00	US	C%sT	1989
 			-6:00	Mexico	C%sT
 # Central Mexico
-Zone America/Mexico_City -6:36:36 -	LMT	1922 Jan  1 0:23:24
+Zone America/Mexico_City -6:36:36 -	LMT	1922 Jan  1  7:00u
 			-7:00	-	MST	1927 Jun 10 23:00
 			-6:00	-	CST	1930 Nov 15
-			-7:00	-	MST	1931 May  1 23:00
-			-6:00	-	CST	1931 Oct
-			-7:00	-	MST	1932 Apr  1
-			-6:00	Mexico	C%sT	2001 Sep 30 02:00
+			-7:00	Mexico	M%sT	1932 Apr  1
+			-6:00	Mexico	C%sT	2001 Sep 30  2:00
 			-6:00	-	CST	2002 Feb 20
 			-6:00	Mexico	C%sT
-# Chihuahua (near US border)
-Zone America/Ojinaga	-6:57:40 -	LMT	1922 Jan 1 0:02:20
+# Chihuahua (near US border - western side)
+# This includes the municipios of Janos, Ascensión, Juárez, Guadalupe, and
+# Práxedis G Guerrero.
+# http://gaceta.diputados.gob.mx/PDF/65/2a022/nov/20221124-VII.pdf
+Zone America/Ciudad_Juarez -7:05:56 -	LMT	1922 Jan  1  7:00u
 			-7:00	-	MST	1927 Jun 10 23:00
 			-6:00	-	CST	1930 Nov 15
-			-7:00	-	MST	1931 May  1 23:00
-			-6:00	-	CST	1931 Oct
-			-7:00	-	MST	1932 Apr  1
+			-7:00	Mexico	M%sT	1932 Apr  1
 			-6:00	-	CST	1996
 			-6:00	Mexico	C%sT	1998
-			-6:00	-	CST	1998 Apr Sun>=1 3:00
+			-6:00	-	CST	1998 Apr Sun>=1  3:00
 			-7:00	Mexico	M%sT	2010
+			-7:00	US	M%sT	2022 Oct 30  2:00
+			-6:00	-	CST	2022 Nov 30  0:00
 			-7:00	US	M%sT
-# Chihuahua (away from US border)
-Zone America/Chihuahua	-7:04:20 -	LMT	1921 Dec 31 23:55:40
+# Chihuahua (near US border - eastern side)
+# This includes the municipios of Coyame del Sotol, Ojinaga, and Manuel
+# Benavides.
+# http://gaceta.diputados.gob.mx/PDF/65/2a022/nov/20221124-VII.pdf
+Zone America/Ojinaga	-6:57:40 -	LMT	1922 Jan  1  7:00u
 			-7:00	-	MST	1927 Jun 10 23:00
 			-6:00	-	CST	1930 Nov 15
-			-7:00	-	MST	1931 May  1 23:00
-			-6:00	-	CST	1931 Oct
-			-7:00	-	MST	1932 Apr  1
+			-7:00	Mexico	M%sT	1932 Apr  1
 			-6:00	-	CST	1996
 			-6:00	Mexico	C%sT	1998
-			-6:00	-	CST	1998 Apr Sun>=1 3:00
-			-7:00	Mexico	M%sT
-# Sonora
-Zone America/Hermosillo	-7:23:52 -	LMT	1921 Dec 31 23:36:08
+			-6:00	-	CST	1998 Apr Sun>=1  3:00
+			-7:00	Mexico	M%sT	2010
+			-7:00	US	M%sT	2022 Oct 30  2:00
+			-6:00	-	CST	2022 Nov 30  0:00
+			-6:00	US	C%sT
+# Chihuahua (away from US border)
+Zone America/Chihuahua	-7:04:20 -	LMT	1922 Jan  1  7:00u
 			-7:00	-	MST	1927 Jun 10 23:00
 			-6:00	-	CST	1930 Nov 15
-			-7:00	-	MST	1931 May  1 23:00
-			-6:00	-	CST	1931 Oct
-			-7:00	-	MST	1932 Apr  1
+			-7:00	Mexico	M%sT	1932 Apr  1
+			-6:00	-	CST	1996
+			-6:00	Mexico	C%sT	1998
+			-6:00	-	CST	1998 Apr Sun>=1  3:00
+			-7:00	Mexico	M%sT	2022 Oct 30  2:00
+			-6:00	-	CST
+# Sonora
+Zone America/Hermosillo	-7:23:52 -	LMT	1922 Jan  1  7:00u
+			-7:00	-	MST	1927 Jun 10 23:00
+			-6:00	-	CST	1930 Nov 15
+			-7:00	Mexico	M%sT	1932 Apr  1
 			-6:00	-	CST	1942 Apr 24
 			-7:00	-	MST	1949 Jan 14
 			-8:00	-	PST	1970
 			-7:00	Mexico	M%sT	1999
 			-7:00	-	MST
 
+# Baja California Sur, Nayarit (except Bahía de Banderas), Sinaloa
+Zone America/Mazatlan	-7:05:40 -	LMT	1922 Jan  1  7:00u
+			-7:00	-	MST	1927 Jun 10 23:00
+			-6:00	-	CST	1930 Nov 15
+			-7:00	Mexico	M%sT	1932 Apr  1
+			-6:00	-	CST	1942 Apr 24
+			-7:00	-	MST	1949 Jan 14
+			-8:00	-	PST	1970
+			-7:00	Mexico	M%sT
+
+# Bahía de Banderas
+
 # From Alexander Krivenyshev (2010-04-21):
-# According to news, Bah&iacute;a de Banderas (Mexican state of Nayarit)
+# According to news, Bahía de Banderas (Mexican state of Nayarit)
 # changed time zone UTC-7 to new time zone UTC-6 on April 4, 2010 (to
 # share the same time zone as nearby city Puerto Vallarta, Jalisco).
 #
 # (Spanish)
-# Bah&iacute;a de Banderas homologa su horario al del centro del
-# pa&iacute;s, a partir de este domingo
-# <a href="http://www.nayarit.gob.mx/notes.asp?id=20748">
+# Bahía de Banderas homologa su horario al del centro del
+# país, a partir de este domingo
 # http://www.nayarit.gob.mx/notes.asp?id=20748
-# </a>
 #
-# Bah&iacute;a de Banderas homologa su horario con el del Centro del
-# Pa&iacute;s
-# <a href="http://www.bahiadebanderas.gob.mx/principal/index.php?option=com_content&view=article&id=261:bahia-de-banderas-homologa-su-horario-con-el-del-centro-del-pais&catid=42:comunicacion-social&Itemid=50">
-# http://www.bahiadebanderas.gob.mx/principal/index.php?option=com_content&view=article&id=261:bahia-de-banderas-homologa-su-horario-con-el-del-centro-del-pais&catid=42:comunicacion-social&Itemid=50"
-# </a>
+# Bahía de Banderas homologa su horario con el del Centro del
+# País
+# http://www.bahiadebanderas.gob.mx/principal/index.php?option=com_content&view=article&id=261:bahia-de-banderas-homologa-su-horario-con-el-del-centro-del-pais&catid=42:comunicacion-social&Itemid=50
 #
 # (English)
-# Puerto Vallarta and Bah&iacute;a de Banderas: One Time Zone
-# <a href="http://virtualvallarta.com/puertovallarta/puertovallarta/localnews/2009-12-03-Puerto-Vallarta-and-Bahia-de-Banderas-One-Time-Zone.shtml">
+# Puerto Vallarta and Bahía de Banderas: One Time Zone
 # http://virtualvallarta.com/puertovallarta/puertovallarta/localnews/2009-12-03-Puerto-Vallarta-and-Bahia-de-Banderas-One-Time-Zone.shtml
-# </a>
-#
-# or
-# <a href="http://www.worldtimezone.com/dst_news/dst_news_mexico08.html">
 # http://www.worldtimezone.com/dst_news/dst_news_mexico08.html
-# </a>
 #
 # "Mexico's Senate approved the amendments to the Mexican Schedule System that
-# will allow Bah&iacute;a de Banderas and Puerto Vallarta to share the same time
+# will allow Bahía de Banderas and Puerto Vallarta to share the same time
 # zone ..."
 # Baja California Sur, Nayarit, Sinaloa
 
 # From Arthur David Olson (2010-05-01):
 # Use "Bahia_Banderas" to keep the name to fourteen characters.
 
-Zone America/Mazatlan	-7:05:40 -	LMT	1921 Dec 31 23:54:20
+Zone America/Bahia_Banderas -7:01:00 -	LMT	1922 Jan  1  7:00u
 			-7:00	-	MST	1927 Jun 10 23:00
 			-6:00	-	CST	1930 Nov 15
-			-7:00	-	MST	1931 May  1 23:00
-			-6:00	-	CST	1931 Oct
-			-7:00	-	MST	1932 Apr  1
+			-7:00	Mexico	M%sT	1932 Apr  1
 			-6:00	-	CST	1942 Apr 24
 			-7:00	-	MST	1949 Jan 14
 			-8:00	-	PST	1970
-			-7:00	Mexico	M%sT
-
-Zone America/Bahia_Banderas	-7:01:00 -	LMT	1921 Dec 31 23:59:00
-			-7:00	-	MST	1927 Jun 10 23:00
-			-6:00	-	CST	1930 Nov 15
-			-7:00	-	MST	1931 May  1 23:00
-			-6:00	-	CST	1931 Oct
-			-7:00	-	MST	1932 Apr  1
-			-6:00	-	CST	1942 Apr 24
-			-7:00	-	MST	1949 Jan 14
-			-8:00	-	PST	1970
-			-7:00	Mexico	M%sT	2010 Apr 4 2:00
+			-7:00	Mexico	M%sT	2010 Apr  4  2:00
 			-6:00	Mexico	C%sT
 
-# Baja California (near US border)
-Zone America/Tijuana	-7:48:04 -	LMT	1922 Jan  1  0:11:56
+# Baja California
+Zone America/Tijuana	-7:48:04 -	LMT	1922 Jan  1  7:00u
 			-7:00	-	MST	1924
 			-8:00	-	PST	1927 Jun 10 23:00
 			-7:00	-	MST	1930 Nov 15
@@ -2508,128 +2741,251 @@ Zone America/Tijuana	-7:48:04 -	LMT	1922 Jan  1  0:11:56
 			-8:00	US	P%sT	2002 Feb 20
 			-8:00	Mexico	P%sT	2010
 			-8:00	US	P%sT
-# Baja California (away from US border)
-Zone America/Santa_Isabel	-7:39:28 -	LMT	1922 Jan  1  0:20:32
-			-7:00	-	MST	1924
-			-8:00	-	PST	1927 Jun 10 23:00
-			-7:00	-	MST	1930 Nov 15
-			-8:00	-	PST	1931 Apr  1
-			-8:00	1:00	PDT	1931 Sep 30
-			-8:00	-	PST	1942 Apr 24
-			-8:00	1:00	PWT	1945 Aug 14 23:00u
-			-8:00	1:00	PPT	1945 Nov 12 # Peace
-			-8:00	-	PST	1948 Apr  5
-			-8:00	1:00	PDT	1949 Jan 14
-			-8:00	-	PST	1954
-			-8:00	CA	P%sT	1961
-			-8:00	-	PST	1976
-			-8:00	US	P%sT	1996
-			-8:00	Mexico	P%sT	2001
-			-8:00	US	P%sT	2002 Feb 20
-			-8:00	Mexico	P%sT
 # From Paul Eggert (2006-03-22):
 # Formerly there was an America/Ensenada zone, which differed from
 # America/Tijuana only in that it did not observe DST from 1976
 # through 1995.  This was as per Shanks (1999).  But Shanks & Pottenger say
 # Ensenada did not observe DST from 1948 through 1975.  Guy Harris reports
-# that the 1987 OAG says "Only Ensenada, Mexicale, San Felipe and
+# that the 1987 OAG says "Only Ensenada, Mexicali, San Felipe and
 # Tijuana observe DST," which agrees with Shanks & Pottenger but implies that
 # DST-observance was a town-by-town matter back then.  This concerns
 # data after 1970 so most likely there should be at least one Zone
 # other than America/Tijuana for Baja, but it's not clear yet what its
 # name or contents should be.
 #
+# From Paul Eggert (2015-10-08):
+# Formerly there was an America/Santa_Isabel zone, but this appears to
+# have come from a misreading of
+# http://dof.gob.mx/nota_detalle.php?codigo=5127480&fecha=06/01/2010
+# It has been moved to the 'backward' file.
+#
+# From Paul Eggert (2022-10-28):
+# Today's new law states that the entire state of Baja California
+# follows US DST rules, which agrees with simplifications noted above.
+#
+#
 # Revillagigedo Is
 # no information
 
 ###############################################################################
 
-# Anguilla
-# Zone	NAME		GMTOFF	RULES	FORMAT	[UNTIL]
-Zone America/Anguilla	-4:12:16 -	LMT	1912 Mar 2
-			-4:00	-	AST
-
-# Antigua and Barbuda
-# Zone	NAME		GMTOFF	RULES	FORMAT	[UNTIL]
-Zone	America/Antigua	-4:07:12 -	LMT	1912 Mar 2
-			-5:00	-	EST	1951
-			-4:00	-	AST
-
-# Bahamas
-#
-# For 1899 Milne gives -5:09:29.5; round that.
-#
-# From Sue Williams (2006-12-07):
-# The Bahamas announced about a month ago that they plan to change their DST
-# rules to sync with the U.S. starting in 2007....
-# http://www.jonesbahamas.com/?c=45&a=10412
-
-# Rule	NAME	FROM	TO	TYPE	IN	ON	AT	SAVE	LETTER/S
-Rule	Bahamas	1964	1975	-	Oct	lastSun	2:00	0	S
-Rule	Bahamas	1964	1975	-	Apr	lastSun	2:00	1:00	D
-# Zone	NAME		GMTOFF	RULES	FORMAT	[UNTIL]
-Zone	America/Nassau	-5:09:30 -	LMT	1912 Mar 2
-			-5:00	Bahamas	E%sT	1976
-			-5:00	US	E%sT
-
 # Barbados
 
-# For 1899 Milne gives -3:58:29.2; round that.
+# For 1899 Milne gives -3:58:29.2.
 
-# Rule	NAME	FROM	TO	TYPE	IN	ON	AT	SAVE	LETTER/S
+# From P Chan (2020-12-09 and 2020-12-11):
+# Standard time of GMT-4 was adopted in 1911.
+# Definition of Time Act, 1911 (1911-7) [1911-08-28]
+# 1912, Laws of Barbados (5 v.), OCLC Number: 919801291, Vol. 4, Image No. 522
+# 1944, Laws of Barbados (5 v.), OCLC Number: 84548697, Vol. 4, Image No. 122
+# http://llmc.com/browse.aspx?type=2&coll=85&div=297
+#
+# DST was observed in 1942-44.
+# Defence (Daylight Saving) Regulations, 1942, 1942-04-13
+# Defence (Daylight Saving) (Repeal) Regulations, 1942, 1942-08-22
+# Defence (Daylight Saving) Regulations, 1943, 1943-04-16
+# Defence (Daylight Saving) (Repeal) Regulations, 1943, 1943-09-01
+# Defence (Daylight Saving) Regulations, 1944, 1944-03-21
+# [Defence (Daylight Saving) (Amendment) Regulations 1944, 1944-03-28]
+# Defence (Daylight Saving) (Repeal) Regulations, 1944, 1944-08-30
+#
+# 1914-, Subsidiary Legis., Annual Vols. OCLC Number: 226290591
+# 1942: Image Nos. 527-528, 555-556
+# 1943: Image Nos. 178-179, 198
+# 1944: Image Nos. 113-115, 129
+# http://llmc.com/titledescfull.aspx?type=2&coll=85&div=297&set=98437
+#
+# From Tim Parenti (2021-02-20):
+# The transitions below are derived from P Chan's sources, except that the 1977
+# through 1980 transitions are from Shanks & Pottenger since we have no better
+# data there.  Of particular note, the 1944 DST regulation only advanced the
+# time to "exactly three and a half hours later than Greenwich mean time", as
+# opposed to "three hours" in the 1942 and 1943 regulations.
+
+# Rule	NAME	FROM	TO	-	IN	ON	AT	SAVE	LETTER/S
+Rule	Barb	1942	only	-	Apr	19	5:00u	1:00	D
+Rule	Barb	1942	only	-	Aug	31	6:00u	0	S
+Rule	Barb	1943	only	-	May	 2	5:00u	1:00	D
+Rule	Barb	1943	only	-	Sep	 5	6:00u	0	S
+Rule	Barb	1944	only	-	Apr	10	5:00u	0:30	-
+Rule	Barb	1944	only	-	Sep	10	6:00u	0	S
 Rule	Barb	1977	only	-	Jun	12	2:00	1:00	D
 Rule	Barb	1977	1978	-	Oct	Sun>=1	2:00	0	S
 Rule	Barb	1978	1980	-	Apr	Sun>=15	2:00	1:00	D
 Rule	Barb	1979	only	-	Sep	30	2:00	0	S
 Rule	Barb	1980	only	-	Sep	25	2:00	0	S
-# Zone	NAME		GMTOFF	RULES	FORMAT	[UNTIL]
-Zone America/Barbados	-3:58:29 -	LMT	1924		# Bridgetown
-			-3:58:29 -	BMT	1932	  # Bridgetown Mean Time
+# Zone	NAME		STDOFF	RULES	FORMAT	[UNTIL]
+		#STDOFF	-3:58:29.2
+Zone America/Barbados	-3:58:29 -	LMT	1911 Aug 28 # Bridgetown
+			-4:00	Barb	A%sT	1944
+			-4:00	Barb	AST/-0330 1945
 			-4:00	Barb	A%sT
 
 # Belize
-# Whitman entirely disagrees with Shanks; go with Shanks & Pottenger.
-# Rule	NAME	FROM	TO	TYPE	IN	ON	AT	SAVE	LETTER/S
-Rule	Belize	1918	1942	-	Oct	Sun>=2	0:00	0:30	HD
-Rule	Belize	1919	1943	-	Feb	Sun>=9	0:00	0	S
-Rule	Belize	1973	only	-	Dec	 5	0:00	1:00	D
-Rule	Belize	1974	only	-	Feb	 9	0:00	0	S
-Rule	Belize	1982	only	-	Dec	18	0:00	1:00	D
-Rule	Belize	1983	only	-	Feb	12	0:00	0	S
-# Zone	NAME		GMTOFF	RULES	FORMAT	[UNTIL]
-Zone	America/Belize	-5:52:48 -	LMT	1912 Apr
-			-6:00	Belize	C%sT
+
+# From P Chan (2020-11-03):
+# Below are some laws related to the time in British Honduras/Belize:
+#
+# Definition of Time Ordinance, 1927 (No.4 of 1927) [1927-04-01]
+# Ordinances of British Honduras Passed in the Year 1927, p 19-20
+# https://books.google.com/books?id=LqEpAQAAMAAJ&pg=RA3-PA19
+#
+# Definition of Time (Amendment) Ordinance, 1942 (No. 5 of 1942) [1942-06-27]
+# Ordinances of British Honduras Passed in the Year 1942, p 31-32
+# https://books.google.com/books?id=h6MpAQAAMAAJ&pg=RA6-PA95-IA44
+#
+# Definition of Time Ordinance, 1945 (No. 19 of 1945) [1945-12-15]
+# Ordinances of British Honduras Passed in the Year 1945, p 49-50
+# https://books.google.com/books?id=xaMpAQAAMAAJ&pg=RA2-PP1
+#
+# Definition of Time Ordinance, 1947 (No. 1 of 1947) [1947-03-11]
+# Ordinances of British Honduras Passed in the Year 1947, p 1-2
+# https://books.google.com/books?id=xaMpAQAAMAAJ&pg=RA3-PA1
+#
+# Time (Definition of) Ordinance  (Chapter 180)
+# The Laws of British Honduras in Force on the 15th Day of September, 1958 , Volume IV, p 2580
+# https://books.google.com/books?id=v5QpAQAAMAAJ&pg=PA2580
+#
+# Time (Definition of) (Amendment) Ordinance, 1968 (No. 13 of 1968) [1968-08-03]
+# https://books.google.com/books?id=xij7KEB_58wC&pg=RA1-PA428-IA9
+#
+# Definition of Time Act (Chapter 339)
+# Law of Belize, Revised Edition 2000
+# http://www.belizelaw.org/web/lawadmin/PDF%20files/cap339.pdf
+
+# From Paul Eggert (2020-11-03):
+# The transitions below are derived from P Chan's sources, except that the
+# 1973 through 1983 transitions are from Shanks & Pottenger since we have
+# no better data there.
+
+# Rule	NAME	FROM	TO	-	IN	ON	AT	SAVE	LETTER/S
+Rule	Belize	1918	1941	-	Oct	Sat>=1	24:00	0:30	-0530
+Rule	Belize	1919	1942	-	Feb	Sat>=8	24:00	0	CST
+Rule	Belize	1942	only	-	Jun	27	24:00	1:00	CWT
+Rule	Belize	1945	only	-	Aug	14	23:00u	1:00	CPT
+Rule	Belize	1945	only	-	Dec	15	24:00	0	CST
+Rule	Belize	1947	1967	-	Oct	Sat>=1	24:00	0:30	-0530
+Rule	Belize	1948	1968	-	Feb	Sat>=8	24:00	0	CST
+Rule	Belize	1973	only	-	Dec	 5	0:00	1:00	CDT
+Rule	Belize	1974	only	-	Feb	 9	0:00	0	CST
+Rule	Belize	1982	only	-	Dec	18	0:00	1:00	CDT
+Rule	Belize	1983	only	-	Feb	12	0:00	0	CST
+# Zone	NAME		STDOFF	RULES	FORMAT	[UNTIL]
+Zone	America/Belize	-5:52:48 -	LMT	1912 Apr  1
+			-6:00	Belize	%s
 
 # Bermuda
 
+# From Paul Eggert (2022-07-27):
 # For 1899 Milne gives -4:19:18.3 as the meridian of the clock tower,
-# Bermuda dockyard, Ireland I; round that.
+# Bermuda dockyard, Ireland I.  This agrees with standard offset given in the
+# Daylight Saving Act, 1917 cited below.
+# It is not known when this time became standard for Bermuda; guess 1890.
+# The transition to -04 was specified by:
+# 1930: The Time Zone Act, 1929 (1929: No. 39) [1929-11-08]
+# https://books.google.com/books?id=7tdMAQAAIAAJ&pg=RA54-PP1
+
+# From P Chan (2020-11-20):
+# Most of the information can be found online from the Bermuda National
+# Library - Digital Collection which includes The Royal Gazette (RG) until 1957
+# https://bnl.contentdm.oclc.org/digital/
+# I will cite the ID.  For example, [10000] means
+# https://bnl.contentdm.oclc.org/digital/collection/BermudaNP02/id/10000
+#
+# 1917: Apr 5 midnight to Sep 30 midnight
+# Daylight Saving Act, 1917 (1917 No. 13) [1917-04-02]
+# Bermuda Acts and Resolves 1917, p 37-38
+# https://books.google.com/books?id=M-lCAQAAMAAJ&pg=PA36-IA2
+# RG, 1917-04-04, p 6 [42340] gives the spring forward date.
+#
+# 1918: Apr 13 midnight to Sep 15 midnight
+# Daylight Saving Act, 1918 (1918 No. 9) [1918-04-06]
+# Bermuda Acts and Resolves 1917, p 13
+# https://books.google.com/books?id=K-lCAQAAMAAJ&pg=RA1-PA7
+#
+# Note that local mean time was still used before 1930.
+#
+# During WWII, DST was introduced by Defence Regulations
+# 1942: Jan 11 02:00 to Oct 18 02:00 [113646], [115726]
+# 1943: Mar 21 02:00 to Oct 31 02:00 [116704], [118193]
+# 1944: Mar 12 02:00 to Nov 5 02:00 [119225], [121593]
+# 1945: Mar 11 02:00 to Nov 4 02:00 [122369], [124461]
+# RG, 1942-01-08, p 2, 1942-10-12, p 2 , 1943-03-06, p 2, 1943-09-03, p 1,
+# 1944-02-29, p 6, 1944-09-20, p 2, 1945-02-13, p 2, 1945-11-03, p 1
+#
+# In 1946, the House of Assembly rejected DST twice. [128686], [128076]
+# RG, 1946-03-16 p 1,1946-04-13 p 1
+#
+# 1947: third Sunday in May 02:00 to second Sunday in September 02:00
+# DST in 1947 was defined in the Daylight Saving Act, 1947 (1947: No. 12)
+# which expired at the end of the year.  [125784] ,[132405], [144454], [138226]
+# RG, 1947-02-27, p 1, 1947-05-15, p 1, 1947-09-13, p 1, 1947-12-30, p 1
+#
+# 1948-1952: fourth Sunday in May 02:00 to first Sunday in September 02:00
+# DST in 1948 was defined in the Daylight Saving Act, 1948 (1948 : No. 12)
+# which was set to expired at the end of the year but it was extended until
+# the end of 1952 and was not further extended.
+# [129802], [139403], [146008], [135240], [144330], [139049], [143309],
+# [148271], [149773], [153589], [153802], [155924]
+# RG, 1948-04-13, p 1, 1948-05-22, p 1, 1948-09-04, p 1, 1949-05-21, p1,
+# 1949-09-03, p 1, 1950-05-27 p 1, 1950-09-02, p 1, 1951-05-27, p 1,
+# 1951-09-01, p 1, 1952-05-23, p 1, 1952-09-26, p 1, 1952-12-21, p 8
+#
+# In 1953-1955, the House of Assembly rejected DST each year. [158996],
+# [162620], [166720] RG, 1953-05-02, p 1, 1954-04-01 p 1, 1955-03-12, p 1
+#
+# 1956: fourth Sunday in May 02:00 to last Sunday in October 02:00
+# Time Zone (Seasonal Variation) Act, 1956 (1956: No.44) [1956-05-25]
+# Bermuda Public Acts 1956, p 331-332
+# https://books.google.com/books?id=Xs1AlmD_cEwC&pg=PA63
+#
+# The extension of the Act was rejected by the House of Assembly. [176218]
+# RG, 1956-12-13, p 1
+#
+# From the Chronological Table of Public and Private Acts up to 1985, it seems
+# that there does not exist other Acts related to DST before 1973.
+# https://books.google.com/books?id=r9hMAQAAIAAJ&pg=RA23-PA1
+# Public Acts of the Legislature of the Islands of Bermuda, Together with
+# Statutory Instruments in Force Thereunder, Vol VII
 
 # From Dan Jones, reporting in The Royal Gazette (2006-06-26):
-
 # Next year, however, clocks in the US will go forward on the second Sunday
 # in March, until the first Sunday in November.  And, after the Time Zone
 # (Seasonal Variation) Bill 2006 was passed in the House of Assembly on
 # Friday, the same thing will happen in Bermuda.
 # http://www.theroyalgazette.com/apps/pbcs.dll/article?AID=/20060529/NEWS/105290135
 
-# Zone	NAME		GMTOFF	RULES	FORMAT	[UNTIL]
-Zone Atlantic/Bermuda	-4:19:18 -	LMT	1930 Jan  1 2:00    # Hamilton
-			-4:00	-	AST	1974 Apr 28 2:00
-			-4:00	Bahamas	A%sT	1976
-			-4:00	US	A%sT
+# Rule	NAME	FROM	TO	-	IN	ON	AT	SAVE	LETTER/S
+Rule	Bermuda	1917	only	-	Apr	 5	24:00	1:00	-
+Rule	Bermuda	1917	only	-	Sep	30	24:00	0	-
+Rule	Bermuda	1918	only	-	Apr	13	24:00	1:00	-
+Rule	Bermuda	1918	only	-	Sep	15	24:00	0	S
+Rule	Bermuda	1942	only	-	Jan	11	 2:00	1:00	D
+Rule	Bermuda	1942	only	-	Oct	18	 2:00	0	S
+Rule	Bermuda	1943	only	-	Mar	21	 2:00	1:00	D
+Rule	Bermuda	1943	only	-	Oct	31	 2:00	0	S
+Rule	Bermuda	1944	1945	-	Mar	Sun>=8	 2:00	1:00	D
+Rule	Bermuda	1944	1945	-	Nov	Sun>=1	 2:00	0	S
+Rule	Bermuda	1947	only	-	May	Sun>=15	 2:00	1:00	D
+Rule	Bermuda	1947	only	-	Sep	Sun>=8	 2:00	0	S
+Rule	Bermuda	1948	1952	-	May	Sun>=22	 2:00	1:00	D
+Rule	Bermuda	1948	1952	-	Sep	Sun>=1	 2:00	0	S
+Rule	Bermuda	1956	only	-	May	Sun>=22	 2:00	1:00	D
+Rule	Bermuda	1956	only	-	Oct	lastSun	 2:00	0	S
 
-# Cayman Is
-# Zone	NAME		GMTOFF	RULES	FORMAT	[UNTIL]
-Zone	America/Cayman	-5:25:32 -	LMT	1890		# Georgetown
-			-5:07:12 -	KMT	1912 Feb    # Kingston Mean Time
-			-5:00	-	EST
+# Zone	NAME		STDOFF	RULES	FORMAT	[UNTIL]
+		#STDOFF	-4:19:18.3
+Zone Atlantic/Bermuda	-4:19:18 -	LMT	1890	# Hamilton
+			-4:19:18 Bermuda BMT/BST 1930 Jan 1  2:00
+			-4:00	Bermuda	A%sT	1974 Apr 28  2:00
+			-4:00	Canada	A%sT	1976
+			-4:00	US	A%sT
 
 # Costa Rica
 
-# Milne gives -5:36:13.3 as San Jose mean time; round to nearest.
+# Milne gives -5:36:13.3 as San José mean time.
 
-# Rule	NAME	FROM	TO	TYPE	IN	ON	AT	SAVE	LETTER/S
+# Rule	NAME	FROM	TO	-	IN	ON	AT	SAVE	LETTER/S
 Rule	CR	1979	1980	-	Feb	lastSun	0:00	1:00	D
 Rule	CR	1979	1980	-	Jun	Sun>=1	0:00	0	S
 Rule	CR	1991	1992	-	Jan	Sat>=15	0:00	1:00	D
@@ -2637,10 +2993,11 @@ Rule	CR	1991	1992	-	Jan	Sat>=15	0:00	1:00	D
 # go with Shanks & Pottenger.
 Rule	CR	1991	only	-	Jul	 1	0:00	0	S
 Rule	CR	1992	only	-	Mar	15	0:00	0	S
-# There are too many San Joses elsewhere, so we'll use `Costa Rica'.
-# Zone	NAME		GMTOFF	RULES	FORMAT	[UNTIL]
-Zone America/Costa_Rica	-5:36:13 -	LMT	1890		# San Jose
-			-5:36:13 -	SJMT	1921 Jan 15 # San Jose Mean Time
+# There are too many San Josés elsewhere, so we'll use 'Costa Rica'.
+# Zone	NAME		STDOFF	RULES	FORMAT	[UNTIL]
+		#STDOFF	-5:36:13.3
+Zone America/Costa_Rica	-5:36:13 -	LMT	1890        # San José
+			-5:36:13 -	SJMT	1921 Jan 15 # San José Mean Time
 			-6:00	CR	C%sT
 # Coco
 # no information; probably like America/Costa_Rica
@@ -2659,9 +3016,14 @@ Zone America/Costa_Rica	-5:36:13 -	LMT	1890		# San Jose
 # During the game, play-by-play announcer Jim Hunter noted that
 # "We'll be losing two hours of sleep...Cuba switched to Daylight Saving
 # Time today."  (The "two hour" remark referred to losing one hour of
-# sleep on 1999-03-28--when the announcers were in Cuba as it switched
-# to DST--and one more hour on 1999-04-04--when the announcers will have
+# sleep on 1999-03-28 - when the announcers were in Cuba as it switched
+# to DST - and one more hour on 1999-04-04 - when the announcers will have
 # returned to Baltimore, which switches on that date.)
+
+# From Steffen Thorsen (2013-11-11):
+# DST start in Cuba in 2004 ... does not follow the same rules as the
+# years before.  The correct date should be Sunday 2004-03-28 00:00 ...
+# https://web.archive.org/web/20040402060750/http://www.granma.cu/espanol/2004/marzo/sab27/reloj.html
 
 # From Evert van der Veer via Steffen Thorsen (2004-10-28):
 # Cuba is not going back to standard time this year.
@@ -2677,16 +3039,16 @@ Zone America/Costa_Rica	-5:36:13 -	LMT	1890		# San Jose
 # adjustment in Cuba.  We will stay in daylight saving time:
 # http://www.granma.cu/espanol/2005/noviembre/mier9/horario.html
 
-# From Jesper Norgaard Welen (2006-10-21):
+# From Jesper Nørgaard Welen (2006-10-21):
 # An article in GRANMA INTERNACIONAL claims that Cuba will end
 # the 3 years of permanent DST next weekend, see
 # http://www.granma.cu/ingles/2006/octubre/lun16/43horario.html
 # "On Saturday night, October 28 going into Sunday, October 29, at 01:00,
-# watches should be set back one hour -- going back to 00:00 hours -- returning
+# watches should be set back one hour - going back to 00:00 hours - returning
 # to the normal schedule....
 
 # From Paul Eggert (2007-03-02):
-# http://www.granma.cubaweb.cu/english/news/art89.html, dated yesterday,
+# <http://www.granma.cubaweb.cu/english/news/art89.html>, dated yesterday,
 # says Cuban clocks will advance at midnight on March 10.
 # For lack of better information, assume Cuba will use US rules,
 # except that it switches at midnight standard time as usual.
@@ -2697,13 +3059,13 @@ Zone America/Costa_Rica	-5:36:13 -	LMT	1890		# San Jose
 #
 # He supplied these references:
 #
-# http://www.prensalatina.com.mx/article.asp?ID=%7B4CC32C1B-A9F7-42FB-8A07-8631AFC923AF%7D&language=ES
+# http://www.prensalatina.com.mx/article.asp?ID={4CC32C1B-A9F7-42FB-8A07-8631AFC923AF}&language=ES
 # http://actualidad.terra.es/sociedad/articulo/cuba_llama_ahorrar_energia_cambio_1957044.htm
 #
-# From Alex Kryvenishev (2007-10-25):
+# From Alex Krivenyshev (2007-10-25):
 # Here is also article from Granma (Cuba):
 #
-# [Regira] el Horario Normal desde el [proximo] domingo 28 de octubre
+# Regirá el Horario Normal desde el próximo domingo 28 de octubre
 # http://www.granma.cubaweb.cu/2007/10/24/nacional/artic07.html
 #
 # http://www.worldtimezone.com/dst_news/dst_news_cuba03.html
@@ -2711,23 +3073,18 @@ Zone America/Costa_Rica	-5:36:13 -	LMT	1890		# San Jose
 # From Arthur David Olson (2008-03-09):
 # I'm in Maryland which is now observing United States Eastern Daylight
 # Time. At 9:44 local time I used RealPlayer to listen to
-# <a href="http://media.enet.cu/radioreloj">
 # http://media.enet.cu/radioreloj
-# </a>, a Cuban information station, and heard
+# a Cuban information station, and heard
 # the time announced as "ocho cuarenta y cuatro" ("eight forty-four"),
 # indicating that Cuba is still on standard time.
 
 # From Steffen Thorsen (2008-03-12):
 # It seems that Cuba will start DST on Sunday, 2007-03-16...
 # It was announced yesterday, according to this source (in Spanish):
-# <a href="http://www.nnc.cubaweb.cu/marzo-2008/cien-1-11-3-08.htm">
 # http://www.nnc.cubaweb.cu/marzo-2008/cien-1-11-3-08.htm
-# </a>
 #
 # Some more background information is posted here:
-# <a href="http://www.timeanddate.com/news/time/cuba-starts-dst-march-16.html">
-# http://www.timeanddate.com/news/time/cuba-starts-dst-march-16.html
-# </a>
+# https://www.timeanddate.com/news/time/cuba-starts-dst-march-16.html
 #
 # The article also says that Cuba has been observing DST since 1963,
 # while Shanks (and tzdata) has 1965 as the first date (except in the
@@ -2737,18 +3094,14 @@ Zone America/Costa_Rica	-5:36:13 -	LMT	1890		# San Jose
 # change some historic records as well.
 #
 # One example:
-# <a href="http://www.radiohc.cu/espanol/noticias/mar07/11mar/hor.htm">
 # http://www.radiohc.cu/espanol/noticias/mar07/11mar/hor.htm
-# </a>
 
-# From Jesper Norgaard Welen (2008-03-13):
+# From Jesper Nørgaard Welen (2008-03-13):
 # The Cuban time change has just been confirmed on the most authoritative
 # web site, the Granma.  Please check out
-# <a href="http://www.granma.cubaweb.cu/2008/03/13/nacional/artic10.html">
 # http://www.granma.cubaweb.cu/2008/03/13/nacional/artic10.html
-# </a>
 #
-# Basically as expected after Steffen Thorsens information, the change
+# Basically as expected after Steffen Thorsen's information, the change
 # will take place midnight between Saturday and Sunday.
 
 # From Arthur David Olson (2008-03-12):
@@ -2759,18 +3112,14 @@ Zone America/Costa_Rica	-5:36:13 -	LMT	1890		# San Jose
 # midnight between Saturday, March 07, 2009 and Sunday, March 08, 2009-
 # not on midnight March 14 / March 15 as previously thought.
 #
-# <a href="http://www.worldtimezone.com/dst_news/dst_news_cuba05.html">
 # http://www.worldtimezone.com/dst_news/dst_news_cuba05.html
 # (in Spanish)
-# </a>
 
 # From Arthur David Olson (2009-03-09)
 # I listened over the Internet to
-# <a href="http://media.enet.cu/readioreloj">
 # http://media.enet.cu/readioreloj
-# </a>
 # this morning; when it was 10:05 a. m. here in Bethesda, Maryland the
-# the time was announced as "diez cinco"--the same time as here, indicating
+# the time was announced as "diez cinco" - the same time as here, indicating
 # that has indeed switched to DST. Assume second Sunday from 2009 forward.
 
 # From Steffen Thorsen (2011-03-08):
@@ -2779,42 +3128,30 @@ Zone America/Costa_Rica	-5:36:13 -	LMT	1890		# San Jose
 # changed at all).
 #
 # Source:
-# <a href="http://granma.co.cu/2011/03/08/nacional/artic01.html">
 # http://granma.co.cu/2011/03/08/nacional/artic01.html
-# </a>
 #
 # Our info:
-# <a href="http://www.timeanddate.com/news/time/cuba-starts-dst-2011.html">
-# http://www.timeanddate.com/news/time/cuba-starts-dst-2011.html
-# </a>
+# https://www.timeanddate.com/news/time/cuba-starts-dst-2011.html
 #
 # From Steffen Thorsen (2011-10-30)
 # Cuba will end DST two weeks later this year. Instead of going back
 # tonight, it has been delayed to 2011-11-13 at 01:00.
 #
 # One source (Spanish)
-# <a href="http://www.radioangulo.cu/noticias/cuba/17105-cuba-restablecera-el-horario-del-meridiano-de-greenwich.html">
 # http://www.radioangulo.cu/noticias/cuba/17105-cuba-restablecera-el-horario-del-meridiano-de-greenwich.html
-# </a>
 #
 # Our page:
-# <a href="http://www.timeanddate.com/news/time/cuba-time-changes-2011.html">
-# http://www.timeanddate.com/news/time/cuba-time-changes-2011.html
-# </a>
+# https://www.timeanddate.com/news/time/cuba-time-changes-2011.html
 #
 # From Steffen Thorsen (2012-03-01)
 # According to Radio Reloj, Cuba will start DST on Midnight between March
 # 31 and April 1.
 #
 # Radio Reloj has the following info (Spanish):
-# <a href="http://www.radioreloj.cu/index.php/noticias-radio-reloj/71-miscelaneas/7529-cuba-aplicara-el-horario-de-verano-desde-el-1-de-abril">
 # http://www.radioreloj.cu/index.php/noticias-radio-reloj/71-miscelaneas/7529-cuba-aplicara-el-horario-de-verano-desde-el-1-de-abril
-# </a>
 #
 # Our info on it:
-# <a href="http://www.timeanddate.com/news/time/cuba-starts-dst-2012.html">
-# http://www.timeanddate.com/news/time/cuba-starts-dst-2012.html
-# </a>
+# https://www.timeanddate.com/news/time/cuba-starts-dst-2012.html
 
 # From Steffen Thorsen (2012-11-03):
 # Radio Reloj and many other sources report that Cuba is changing back
@@ -2823,7 +3160,7 @@ Zone America/Costa_Rica	-5:36:13 -	LMT	1890		# San Jose
 # From Paul Eggert (2012-11-03):
 # For now, assume the future rule is first Sunday in November.
 
-# Rule	NAME	FROM	TO	TYPE	IN	ON	AT	SAVE	LETTER/S
+# Rule	NAME	FROM	TO	-	IN	ON	AT	SAVE	LETTER/S
 Rule	Cuba	1928	only	-	Jun	10	0:00	1:00	D
 Rule	Cuba	1928	only	-	Oct	10	0:00	0	S
 Rule	Cuba	1940	1942	-	Jun	Sun>=1	0:00	1:00	D
@@ -2852,7 +3189,8 @@ Rule	Cuba	1996	only	-	Oct	 6	0:00s	0	S
 Rule	Cuba	1997	only	-	Oct	12	0:00s	0	S
 Rule	Cuba	1998	1999	-	Mar	lastSun	0:00s	1:00	D
 Rule	Cuba	1998	2003	-	Oct	lastSun	0:00s	0	S
-Rule	Cuba	2000	2004	-	Apr	Sun>=1	0:00s	1:00	D
+Rule	Cuba	2000	2003	-	Apr	Sun>=1	0:00s	1:00	D
+Rule	Cuba	2004	only	-	Mar	lastSun	0:00s	1:00	D
 Rule	Cuba	2006	2010	-	Oct	lastSun	0:00s	0	S
 Rule	Cuba	2007	only	-	Mar	Sun>=8	0:00s	1:00	D
 Rule	Cuba	2008	only	-	Mar	Sun>=15	0:00s	1:00	D
@@ -2863,15 +3201,10 @@ Rule	Cuba	2012	only	-	Apr	1	0:00s	1:00	D
 Rule	Cuba	2012	max	-	Nov	Sun>=1	0:00s	0	S
 Rule	Cuba	2013	max	-	Mar	Sun>=8	0:00s	1:00	D
 
-# Zone	NAME		GMTOFF	RULES	FORMAT	[UNTIL]
+# Zone	NAME		STDOFF	RULES	FORMAT	[UNTIL]
 Zone	America/Havana	-5:29:28 -	LMT	1890
 			-5:29:36 -	HMT	1925 Jul 19 12:00 # Havana MT
 			-5:00	Cuba	C%sT
-
-# Dominica
-# Zone	NAME		GMTOFF	RULES	FORMAT	[UNTIL]
-Zone America/Dominica	-4:05:36 -	LMT	1911 Jul 1 0:01		# Roseau
-			-4:00	-	AST
 
 # Dominican Republic
 
@@ -2893,51 +3226,37 @@ Zone America/Dominica	-4:05:36 -	LMT	1911 Jul 1 0:01		# Roseau
 # decided to revert.
 
 
-# Rule	NAME	FROM	TO	TYPE	IN	ON	AT	SAVE	LETTER/S
-Rule	DR	1966	only	-	Oct	30	0:00	1:00	D
-Rule	DR	1967	only	-	Feb	28	0:00	0	S
-Rule	DR	1969	1973	-	Oct	lastSun	0:00	0:30	HD
-Rule	DR	1970	only	-	Feb	21	0:00	0	S
-Rule	DR	1971	only	-	Jan	20	0:00	0	S
-Rule	DR	1972	1974	-	Jan	21	0:00	0	S
-# Zone	NAME		GMTOFF	RULES	FORMAT	[UNTIL]
+# Rule	NAME	FROM	TO	-	IN	ON	AT	SAVE	LETTER/S
+Rule	DR	1966	only	-	Oct	30	0:00	1:00	EDT
+Rule	DR	1967	only	-	Feb	28	0:00	0	EST
+Rule	DR	1969	1973	-	Oct	lastSun	0:00	0:30	-0430
+Rule	DR	1970	only	-	Feb	21	0:00	0	EST
+Rule	DR	1971	only	-	Jan	20	0:00	0	EST
+Rule	DR	1972	1974	-	Jan	21	0:00	0	EST
+# Zone	NAME		STDOFF	RULES	FORMAT	[UNTIL]
 Zone America/Santo_Domingo -4:39:36 -	LMT	1890
 			-4:40	-	SDMT	1933 Apr  1 12:00 # S. Dom. MT
-			-5:00	DR	E%sT	1974 Oct 27
-			-4:00	-	AST	2000 Oct 29 02:00
-			-5:00	US	E%sT	2000 Dec  3 01:00
+			-5:00	DR	%s	1974 Oct 27
+			-4:00	-	AST	2000 Oct 29  2:00
+			-5:00	US	E%sT	2000 Dec  3  1:00
 			-4:00	-	AST
 
 # El Salvador
 
-# Rule	NAME	FROM	TO	TYPE	IN	ON	AT	SAVE	LETTER/S
+# Rule	NAME	FROM	TO	-	IN	ON	AT	SAVE	LETTER/S
 Rule	Salv	1987	1988	-	May	Sun>=1	0:00	1:00	D
 Rule	Salv	1987	1988	-	Sep	lastSun	0:00	0	S
 # There are too many San Salvadors elsewhere, so use America/El_Salvador
 # instead of America/San_Salvador.
-# Zone	NAME		GMTOFF	RULES	FORMAT	[UNTIL]
-Zone America/El_Salvador -5:56:48 -	LMT	1921		# San Salvador
+# Zone	NAME		STDOFF	RULES	FORMAT	[UNTIL]
+Zone America/El_Salvador -5:56:48 -	LMT	1921 # San Salvador
 			-6:00	Salv	C%sT
-
-# Grenada
-# Zone	NAME		GMTOFF	RULES	FORMAT	[UNTIL]
-Zone	America/Grenada	-4:07:00 -	LMT	1911 Jul	# St George's
-			-4:00	-	AST
-
-# Guadeloupe
-# Zone	NAME		GMTOFF	RULES	FORMAT	[UNTIL]
-Zone America/Guadeloupe	-4:06:08 -	LMT	1911 Jun 8	# Pointe a Pitre
-			-4:00	-	AST
-# St Barthelemy
-Link America/Guadeloupe	America/St_Barthelemy
-# St Martin (French part)
-Link America/Guadeloupe	America/Marigot
 
 # Guatemala
 #
 # From Gwillim Law (2006-04-22), after a heads-up from Oscar van Vlijmen:
 # Diario Co Latino, at
-# http://www.diariocolatino.com/internacionales/detalles.asp?NewsID=8079,
+# <http://www.diariocolatino.com/internacionales/detalles.asp?NewsID=8079>,
 # says in an article dated 2006-04-19 that the Guatemalan government had
 # decided on that date to advance official time by 60 minutes, to lessen the
 # impact of the elevated cost of oil....  Daylight saving time will last from
@@ -2945,9 +3264,9 @@ Link America/Guadeloupe	America/Marigot
 # From Paul Eggert (2006-06-22):
 # The Ministry of Energy and Mines, press release CP-15/2006
 # (2006-04-19), says DST ends at 24:00.  See
-# <http://www.sieca.org.gt/Sitio_publico/Energeticos/Doc/Medidas/Cambio_Horario_Nac_190406.pdf>.
+# http://www.sieca.org.gt/Sitio_publico/Energeticos/Doc/Medidas/Cambio_Horario_Nac_190406.pdf
 
-# Rule	NAME	FROM	TO	TYPE	IN	ON	AT	SAVE	LETTER/S
+# Rule	NAME	FROM	TO	-	IN	ON	AT	SAVE	LETTER/S
 Rule	Guat	1973	only	-	Nov	25	0:00	1:00	D
 Rule	Guat	1974	only	-	Feb	24	0:00	0	S
 Rule	Guat	1983	only	-	May	21	0:00	1:00	D
@@ -2956,17 +3275,16 @@ Rule	Guat	1991	only	-	Mar	23	0:00	1:00	D
 Rule	Guat	1991	only	-	Sep	 7	0:00	0	S
 Rule	Guat	2006	only	-	Apr	30	0:00	1:00	D
 Rule	Guat	2006	only	-	Oct	 1	0:00	0	S
-# Zone	NAME		GMTOFF	RULES	FORMAT	[UNTIL]
+# Zone	NAME		STDOFF	RULES	FORMAT	[UNTIL]
 Zone America/Guatemala	-6:02:04 -	LMT	1918 Oct 5
 			-6:00	Guat	C%sT
 
 # Haiti
 # From Gwillim Law (2005-04-15):
-# Risto O. Nykanen wrote me that Haiti is now on DST.
-# I searched for confirmation, and I found a
-# <a href="http://www.haitianconsulate.org/time.doc"> press release
+# Risto O. Nykänen wrote me that Haiti is now on DST.
+# I searched for confirmation, and I found a press release
 # on the Web page of the Haitian Consulate in Chicago (2005-03-31),
-# </a>.  Translated from French, it says:
+# <http://www.haitianconsulate.org/time.doc>.  Translated from French, it says:
 #
 #  "The Prime Minister's Communication Office notifies the public in general
 #   and the press in particular that, following a decision of the Interior
@@ -3016,7 +3334,20 @@ Zone America/Guatemala	-6:02:04 -	LMT	1918 Oct 5
 # http://radiovision2000haiti.net/public/haiti-avis-changement-dheure-dimanche/
 # http://www.canalplushaiti.net/?p=6714
 
-# Rule	NAME	FROM	TO	TYPE	IN	ON	AT	SAVE	LETTER/S
+# From Steffen Thorsen (2016-03-12):
+# Jean Antoine, editor of www.haiti-reference.com informed us that Haiti
+# are not going on DST this year.  Several other resources confirm this: ...
+# https://www.radiotelevisioncaraibes.com/presse/heure_d_t_pas_de_changement_d_heure_pr_vu_pour_cet_ann_e.html
+# https://www.vantbefinfo.com/changement-dheure-pas-pour-haiti/
+# http://news.anmwe.com/haiti-lheure-nationale-ne-sera-ni-avancee-ni-reculee-cette-annee/
+
+# From Steffen Thorsen (2017-03-12):
+# We have received 4 mails from different people telling that Haiti
+# has started DST again today, and this source seems to confirm that,
+# I have not been able to find a more authoritative source:
+# https://www.haitilibre.com/en/news-20319-haiti-notices-time-change-in-haiti.html
+
+# Rule	NAME	FROM	TO	-	IN	ON	AT	SAVE	LETTER/S
 Rule	Haiti	1983	only	-	May	8	0:00	1:00	D
 Rule	Haiti	1984	1987	-	Apr	lastSun	0:00	1:00	D
 Rule	Haiti	1983	1987	-	Oct	lastSun	0:00	0	S
@@ -3026,9 +3357,11 @@ Rule	Haiti	1988	1997	-	Apr	Sun>=1	1:00s	1:00	D
 Rule	Haiti	1988	1997	-	Oct	lastSun	1:00s	0	S
 Rule	Haiti	2005	2006	-	Apr	Sun>=1	0:00	1:00	D
 Rule	Haiti	2005	2006	-	Oct	lastSun	0:00	0	S
-Rule	Haiti	2012	max	-	Mar	Sun>=8	2:00	1:00	D
-Rule	Haiti	2012	max	-	Nov	Sun>=1	2:00	0	S
-# Zone	NAME		GMTOFF	RULES	FORMAT	[UNTIL]
+Rule	Haiti	2012	2015	-	Mar	Sun>=8	2:00	1:00	D
+Rule	Haiti	2012	2015	-	Nov	Sun>=1	2:00	0	S
+Rule	Haiti	2017	max	-	Mar	Sun>=8	2:00	1:00	D
+Rule	Haiti	2017	max	-	Nov	Sun>=1	2:00	0	S
+# Zone	NAME		STDOFF	RULES	FORMAT	[UNTIL]
 Zone America/Port-au-Prince -4:49:20 -	LMT	1890
 			-4:49	-	PPMT	1917 Jan 24 12:00 # P-a-P MT
 			-5:00	Haiti	E%sT
@@ -3043,14 +3376,14 @@ Zone America/Port-au-Prince -4:49:20 -	LMT	1890
 # <http://www.latribuna.hn/99299.html> that Manuel Zelaya, the president
 # of Honduras, refused to back down on this.
 
-# From Jesper Norgaard Welen (2006-08-08):
+# From Jesper Nørgaard Welen (2006-08-08):
 # It seems that Honduras has returned from DST to standard time this Monday at
 # 00:00 hours (prolonging Sunday to 25 hours duration).
 # http://www.worldtimezone.com/dst_news/dst_news_honduras04.html
 
 # From Paul Eggert (2006-08-08):
-# Also see Diario El Heraldo, The country returns to standard time (2006-08-08)
-# <http://www.elheraldo.hn/nota.php?nid=54941&sec=12>.
+# Also see Diario El Heraldo, The country returns to standard time (2006-08-08).
+# http://www.elheraldo.hn/nota.php?nid=54941&sec=12
 # It mentions executive decree 18-2006.
 
 # From Steffen Thorsen (2006-08-17):
@@ -3062,47 +3395,46 @@ Zone America/Port-au-Prince -4:49:20 -	LMT	1890
 # http://www.laprensahn.com/pais_nota.php?id04962=7386
 # So it seems that Honduras will not enter DST this year....
 
-# Rule	NAME	FROM	TO	TYPE	IN	ON	AT	SAVE	LETTER/S
+# Rule	NAME	FROM	TO	-	IN	ON	AT	SAVE	LETTER/S
 Rule	Hond	1987	1988	-	May	Sun>=1	0:00	1:00	D
 Rule	Hond	1987	1988	-	Sep	lastSun	0:00	0	S
 Rule	Hond	2006	only	-	May	Sun>=1	0:00	1:00	D
 Rule	Hond	2006	only	-	Aug	Mon>=1	0:00	0	S
-# Zone	NAME		GMTOFF	RULES	FORMAT	[UNTIL]
+# Zone	NAME		STDOFF	RULES	FORMAT	[UNTIL]
 Zone America/Tegucigalpa -5:48:52 -	LMT	1921 Apr
 			-6:00	Hond	C%sT
 #
 # Great Swan I ceded by US to Honduras in 1972
 
 # Jamaica
-
-# From Bob Devine (1988-01-28):
-# Follows US rules.
-
-# From U. S. Naval Observatory (1989-01-19):
-# JAMAICA             5 H  BEHIND UTC
-
-# From Shanks & Pottenger:
-# Zone	NAME		GMTOFF	RULES	FORMAT	[UNTIL]
-Zone	America/Jamaica	-5:07:12 -	LMT	1890		# Kingston
-			-5:07:12 -	KMT	1912 Feb    # Kingston Mean Time
-			-5:00	-	EST	1974 Apr 28 2:00
+# Shanks & Pottenger give -5:07:12, but Milne records -5:07:10.41 from an
+# unspecified official document, and says "This time is used throughout the
+# island".  Go with Milne.
+#
+# Shanks & Pottenger give April 28 for the 1974 spring-forward transition, but
+# Lance Neita writes that Prime Minister Michael Manley decreed it January 5.
+# Assume Neita meant Jan 6 02:00, the same as the US.  Neita also writes that
+# Manley's supporters associated this act with Manley's nickname "Joshua"
+# (recall that in the Bible the sun stood still at Joshua's request),
+# and with the Rod of Correction which Manley said he had received from
+# Haile Selassie, Emperor of Ethiopia.  See:
+# Neita L. The politician in all of us. Jamaica Observer 2014-09-20
+# http://www.jamaicaobserver.com/columns/The-politician-in-all-of-us_17573647
+#
+# Zone	NAME		STDOFF	RULES	FORMAT	[UNTIL]
+		#STDOFF	-5:07:10.41
+Zone	America/Jamaica	-5:07:10 -	LMT	1890        # Kingston
+			-5:07:10 -	KMT	1912 Feb    # Kingston Mean Time
+			-5:00	-	EST	1974
 			-5:00	US	E%sT	1984
 			-5:00	-	EST
 
 # Martinique
-# Zone	NAME		GMTOFF	RULES	FORMAT	[UNTIL]
-Zone America/Martinique	-4:04:20 -      LMT	1890		# Fort-de-France
-			-4:04:20 -	FFMT	1911 May     # Fort-de-France MT
+# Zone	NAME		STDOFF	RULES	FORMAT	[UNTIL]
+Zone America/Martinique	-4:04:20 -      LMT	1890        # Fort-de-France
+			-4:04:20 -	FFMT	1911 May    # Fort-de-France MT
 			-4:00	-	AST	1980 Apr  6
 			-4:00	1:00	ADT	1980 Sep 28
-			-4:00	-	AST
-
-# Montserrat
-# From Paul Eggert (2006-03-22):
-# In 1995 volcanic eruptions forced evacuation of Plymouth, the capital.
-# world.gazetteer.com says Cork Hill is the most populous location now.
-# Zone	NAME		GMTOFF	RULES	FORMAT	[UNTIL]
-Zone America/Montserrat	-4:08:52 -	LMT	1911 Jul 1 0:01   # Cork Hill
 			-4:00	-	AST
 
 # Nicaragua
@@ -3126,93 +3458,96 @@ Zone America/Montserrat	-4:08:52 -	LMT	1911 Jul 1 0:01   # Cork Hill
 # From Gwillim Law (2005-04-21):
 # The Associated Press story on the time change, which can be found at
 # http://www.lapalmainteractivo.com/guias/content/gen/ap/America_Latina/AMC_GEN_NICARAGUA_HORA.html
-# and elsewhere, says (fifth paragraph, translated from Spanish):  "The last
+# and elsewhere, says (fifth paragraph, translated from Spanish): "The last
 # time that a change of clocks was applied to save energy was in the year 2000
-# during the Arnoldo Aleman administration."...
+# during the Arnoldo Alemán administration."...
 # The northamerica file says that Nicaragua has been on UTC-6 continuously
 # since December 1998.  I wasn't able to find any details of Nicaraguan time
 # changes in 2000.  Perhaps a note could be added to the northamerica file, to
 # the effect that we have indirect evidence that DST was observed in 2000.
 #
-# From Jesper Norgaard Welen (2005-11-02):
+# From Jesper Nørgaard Welen (2005-11-02):
 # Nicaragua left DST the 2005-10-02 at 00:00 (local time).
 # http://www.presidencia.gob.ni/presidencia/files_index/secretaria/comunicados/2005/septiembre/26septiembre-cambio-hora.htm
 # (2005-09-26)
 #
-# From Jesper Norgaard Welen (2006-05-05):
+# From Jesper Nørgaard Welen (2006-05-05):
 # http://www.elnuevodiario.com.ni/2006/05/01/nacionales/18410
 # (my informal translation)
-# By order of the president of the republic, Enrique Bolanos, Nicaragua
+# By order of the president of the republic, Enrique Bolaños, Nicaragua
 # advanced by sixty minutes their official time, yesterday at 2 in the
-# morning, and will stay that way until 30.th. of september.
+# morning, and will stay that way until 30th of September.
 #
-# From Jesper Norgaard Welen (2006-09-30):
+# From Jesper Nørgaard Welen (2006-09-30):
 # http://www.presidencia.gob.ni/buscador_gaceta/BD/DECRETOS/2006/D-063-2006P-PRN-Cambio-Hora.pdf
 # My informal translation runs:
 # The natural sun time is restored in all the national territory, in that the
 # time is returned one hour at 01:00 am of October 1 of 2006.
 #
-# Rule	NAME	FROM	TO	TYPE	IN	ON	AT	SAVE	LETTER/S
+# Rule	NAME	FROM	TO	-	IN	ON	AT	SAVE	LETTER/S
 Rule	Nic	1979	1980	-	Mar	Sun>=16	0:00	1:00	D
 Rule	Nic	1979	1980	-	Jun	Mon>=23	0:00	0	S
 Rule	Nic	2005	only	-	Apr	10	0:00	1:00	D
 Rule	Nic	2005	only	-	Oct	Sun>=1	0:00	0	S
 Rule	Nic	2006	only	-	Apr	30	2:00	1:00	D
 Rule	Nic	2006	only	-	Oct	Sun>=1	1:00	0	S
-# Zone	NAME		GMTOFF	RULES	FORMAT	[UNTIL]
+# Zone	NAME		STDOFF	RULES	FORMAT	[UNTIL]
 Zone	America/Managua	-5:45:08 -	LMT	1890
 			-5:45:12 -	MMT	1934 Jun 23 # Managua Mean Time?
 			-6:00	-	CST	1973 May
 			-5:00	-	EST	1975 Feb 16
-			-6:00	Nic	C%sT	1992 Jan  1 4:00
+			-6:00	Nic	C%sT	1992 Jan  1  4:00
 			-5:00	-	EST	1992 Sep 24
 			-6:00	-	CST	1993
 			-5:00	-	EST	1997
 			-6:00	Nic	C%sT
 
+# Cayman Is
 # Panama
-# Zone	NAME		GMTOFF	RULES	FORMAT	[UNTIL]
+#
+# Atikokan and Coral Harbour, Canada, match Panama since 1970.
+# Zone	NAME		STDOFF	RULES	FORMAT	[UNTIL]
 Zone	America/Panama	-5:18:08 -	LMT	1890
-			-5:19:36 -	CMT	1908 Apr 22   # Colon Mean Time
+			-5:19:36 -	CMT	1908 Apr 22 # Colón Mean Time
 			-5:00	-	EST
 
+# Anguilla
+# Antigua & Barbuda
+# Aruba
+# Caribbean Netherlands
+# Curaçao
+# Dominica
+# Grenada
+# Guadeloupe
+# Montserrat
 # Puerto Rico
-# There are too many San Juans elsewhere, so we'll use `Puerto_Rico'.
-# Zone	NAME		GMTOFF	RULES	FORMAT	[UNTIL]
-Zone America/Puerto_Rico -4:24:25 -	LMT	1899 Mar 28 12:00    # San Juan
+# St Barthélemy
+# St Kitts-Nevis
+# Sint Maarten / St Martin
+# St Lucia
+# St Vincent & the Grenadines
+# Trinidad & Tobago
+# Virgin Is (UK & US)
+#
+# There are too many San Juans elsewhere, so we'll use 'Puerto_Rico'.
+# Zone	NAME		STDOFF	RULES	FORMAT	[UNTIL]
+Zone America/Puerto_Rico -4:24:25 -	LMT	1899 Mar 28 12:00 # San Juan
 			-4:00	-	AST	1942 May  3
 			-4:00	US	A%sT	1946
 			-4:00	-	AST
 
-# St Kitts-Nevis
-# Zone	NAME		GMTOFF	RULES	FORMAT	[UNTIL]
-Zone America/St_Kitts	-4:10:52 -	LMT	1912 Mar 2	# Basseterre
-			-4:00	-	AST
-
-# St Lucia
-# Zone	NAME		GMTOFF	RULES	FORMAT	[UNTIL]
-Zone America/St_Lucia	-4:04:00 -	LMT	1890		# Castries
-			-4:04:00 -	CMT	1912	    # Castries Mean Time
-			-4:00	-	AST
-
 # St Pierre and Miquelon
-# There are too many St Pierres elsewhere, so we'll use `Miquelon'.
-# Zone	NAME		GMTOFF	RULES	FORMAT	[UNTIL]
-Zone America/Miquelon	-3:44:40 -	LMT	1911 May 15	# St Pierre
+# There are too many St Pierres elsewhere, so we'll use 'Miquelon'.
+# Zone	NAME		STDOFF	RULES	FORMAT	[UNTIL]
+Zone America/Miquelon	-3:44:40 -	LMT	1911 May 15 # St Pierre
 			-4:00	-	AST	1980 May
-			-3:00	-	PMST	1987 # Pierre & Miquelon Time
-			-3:00	Canada	PM%sT
-
-# St Vincent and the Grenadines
-# Zone	NAME		GMTOFF	RULES	FORMAT	[UNTIL]
-Zone America/St_Vincent	-4:04:56 -	LMT	1890		# Kingstown
-			-4:04:56 -	KMT	1912	   # Kingstown Mean Time
-			-4:00	-	AST
+			-3:00	-	-03	1987
+			-3:00	Canada	-03/-02
 
 # Turks and Caicos
 #
 # From Chris Dunn in
-# <http://bugs.debian.org/cgi-bin/bugreport.cgi?bug=415007>
+# https://bugs.debian.org/415007
 # (2007-03-15): In the Turks & Caicos Islands (America/Grand_Turk) the
 # daylight saving dates for time changes have been adjusted to match
 # the recent U.S. change of dates.
@@ -3224,28 +3559,60 @@ Zone America/St_Vincent	-4:04:56 -	LMT	1890		# Kingstown
 # "Eastern Standard Times Begins 2007
 # Clocks are set back one hour at 2:00 a.m. local Daylight Saving Time"
 # indicating that the normal ET rules are followed.
+
+# From Paul Eggert (2014-08-19):
+# The 2014-08-13 Cabinet meeting decided to stay on UT -04 year-round.  See:
+# http://tcweeklynews.com/daylight-savings-time-to-be-maintained-p5353-127.htm
+# Model this as a switch from EST/EDT to AST ...
+# From Chris Walton (2014-11-04):
+# ... the TCI government appears to have delayed the switch to
+# "permanent daylight saving time" by one year....
+# http://tcweeklynews.com/time-change-to-go-ahead-this-november-p5437-127.htm
 #
-# From Paul Eggert (2006-05-01):
-# Shanks & Pottenger say they use US DST rules, but IATA SSIM (1991/1998)
-# says they switch at midnight.  Go with Shanks & Pottenger.
+# From the Turks & Caicos Cabinet (2017-07-20), heads-up from Steffen Thorsen:
+# ... agreed to the reintroduction in TCI of Daylight Saving Time (DST)
+# during the summer months and Standard Time, also known as Local
+# Time, during the winter months with effect from April 2018 ...
+# https://www.gov.uk/government/news/turks-and-caicos-post-cabinet-meeting-statement--3
+# From Paul Eggert (2017-08-26):
+# The date of effect of the spring 2018 change appears to be March 11,
+# which makes more sense.  See: Hamilton D. Time change back
+# by March 2018 for TCI. Magnetic Media. 2017-08-25.
+# http://magneticmediatv.com/2017/08/time-change-back-by-march-2018-for-tci/
 #
-# Rule	NAME	FROM	TO	TYPE	IN	ON	AT	SAVE	LETTER/S
-Rule	TC	1979	1986	-	Apr	lastSun	2:00	1:00	D
-Rule	TC	1979	2006	-	Oct	lastSun	2:00	0	S
-Rule	TC	1987	2006	-	Apr	Sun>=1	2:00	1:00	D
-Rule	TC	2007	max	-	Mar	Sun>=8	2:00	1:00	D
-Rule	TC	2007	max	-	Nov	Sun>=1	2:00	0	S
-# Zone	NAME		GMTOFF	RULES	FORMAT	[UNTIL]
+# From P Chan (2020-11-27):
+# Standard Time Declaration Order 2015 (L.N. 15/2015)
+# http://online.fliphtml5.com/fizd/czin/#p=2
+#
+# Standard Time Declaration Order 2017 (L.N. 31/2017)
+# http://online.fliphtml5.com/fizd/dmcu/#p=2
+#
+# From Tim Parenti (2020-12-05):
+# Although L.N. 31/2017 reads that it "shall come into operation at 2:00 a.m.
+# on 11th March 2018", a precise interpretation here poses some problems.  The
+# order states that "the standard time to be observed throughout the Turks and
+# Caicos Islands shall be the same time zone as the Eastern United States of
+# America" and further clarifies "[f]or the avoidance of doubt" that it
+# "applies to the Eastern Standard Time as well as any changes thereto for
+# Daylight Saving Time."  However, as clocks in Turks and Caicos approached
+# 02:00 -04, and thus the declared implementation time, it was still 01:00 EST
+# (-05), as DST in the Eastern US would not start until an hour later.
+#
+# Since it is unlikely that those on the islands switched their clocks twice in
+# the span of an hour, we assume instead that the adoption of EDT actually took
+# effect once clocks in the Eastern US had sprung forward, from 03:00 -04.
+# This discrepancy only affects the time zone abbreviation and DST flag for the
+# intervening hour, not wall clock times, as -04 was maintained throughout.
+
+# Zone	NAME		STDOFF	RULES	FORMAT	[UNTIL]
 Zone America/Grand_Turk	-4:44:32 -	LMT	1890
-			-5:07:12 -	KMT	1912 Feb    # Kingston Mean Time
-			-5:00	TC	E%sT
+		#STDOFF	-5:07:10.41
+			-5:07:10 -	KMT	1912 Feb # Kingston Mean Time
+			-5:00	-	EST	1979
+			-5:00	US	E%sT	2015 Mar  8  2:00
+			-4:00	-	AST	2018 Mar 11  3:00
+			-5:00	US	E%sT
 
-# British Virgin Is
-# Zone	NAME		GMTOFF	RULES	FORMAT	[UNTIL]
-Zone America/Tortola	-4:18:28 -	LMT	1911 Jul    # Road Town
-			-4:00	-	AST
-
-# Virgin Is
-# Zone	NAME		GMTOFF	RULES	FORMAT	[UNTIL]
-Zone America/St_Thomas	-4:19:44 -	LMT	1911 Jul    # Charlotte Amalie
-			-4:00	-	AST
+# Local Variables:
+# coding: utf-8
+# End:

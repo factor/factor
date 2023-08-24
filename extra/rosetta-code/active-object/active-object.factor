@@ -1,10 +1,10 @@
 ! Copyright (c) 2012 Anonymous
-! See http://factorcode.org/license.txt for BSD license.
-USING: accessors calendar combinators kernel locals math
-math.constants math.functions prettyprint system threads timers ;
+! See https://factorcode.org/license.txt for BSD license.
+USING: accessors calendar kernel math math.constants
+math.functions prettyprint system threads timers ;
 IN: rosetta-code.active-object
 
-! http://rosettacode.org/wiki/Active_object
+! https://rosettacode.org/wiki/Active_object
 
 ! In object-oriented programming an object is active when its
 ! state depends on clock. Usually an active object encapsulates a

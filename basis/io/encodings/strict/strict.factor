@@ -1,6 +1,6 @@
 ! Copyright (C) 2008 Daniel Ehrenberg
-! See http://factorcode.org/license.txt for BSD license.
-USING: io.encodings kernel accessors summary ;
+! See https://factorcode.org/license.txt for BSD license.
+USING: accessors io.encodings kernel ;
 IN: io.encodings.strict
 
 TUPLE: strict-state code ;

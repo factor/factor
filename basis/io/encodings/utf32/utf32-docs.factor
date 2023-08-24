@@ -1,6 +1,6 @@
 ! Copyright (C) 2009 Daniel Ehrenberg
-! See http://factorcode.org/license.txt for BSD license.
-USING: help.markup help.syntax io.encodings strings ;
+! See https://factorcode.org/license.txt for BSD license.
+USING: help.markup help.syntax ;
 IN: io.encodings.utf32
 
 ARTICLE: "io.encodings.utf32" "UTF-32 encoding"

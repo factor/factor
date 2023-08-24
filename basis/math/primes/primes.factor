@@ -1,8 +1,8 @@
 ! Copyright (C) 2007-2009 Samuel Tardieu.
-! See http://factorcode.org/license.txt for BSD license.
-USING: combinators combinators.short-circuit fry kernel locals
+! See https://factorcode.org/license.txt for BSD license.
+USING: combinators combinators.short-circuit kernel
 math math.bitwise math.functions math.order math.primes.erato
-math.primes.erato.private math.primes.miller-rabin math.ranges
+math.primes.erato.private math.primes.miller-rabin ranges
 literals random sequences sets vectors ;
 IN: math.primes
 
@@ -41,7 +41,7 @@ PRIVATE>
 ! In order not to reallocate large vectors, we compute the upper
 ! bound of the number of primes in a given interval. We use a
 ! double inequality given by Pierre Dusart in
-! http://www.ams.org/mathscinet-getitem?mr=99d:11133 for x >
+! https://www.ams.org/mathscinet-getitem?mr=99d:11133 for x >
 ! 598. Under this limit, we know that there are at most 108
 ! primes.
 : upper-pi ( x -- y )
@@ -57,7 +57,7 @@ PRIVATE>
 
 : (primes-between) ( low high -- seq )
     [ <primes-range> ] [ <primes-vector> ] 2bi
-    [ '[ [ prime? ] _ push-if ] each ] keep ;
+    [ '[ [ prime? ] _ push-when ] each ] keep ;
 
 PRIVATE>
 

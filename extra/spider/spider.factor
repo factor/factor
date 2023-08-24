@@ -1,12 +1,10 @@
 ! Copyright (C) 2008 Doug Coleman.
-! See http://factorcode.org/license.txt for BSD license.
-USING: accessors fry html.parser html.parser.analyzer
-http.client kernel tools.time sets assocs sequences
-concurrency.combinators io threads namespaces math multiline
-math.parser inspector urls logging combinators.short-circuit
-continuations calendar prettyprint dlists deques locals
-spider.unique-deque combinators concurrency.semaphores
-io.pathnames ;
+! See https://factorcode.org/license.txt for BSD license.
+USING: accessors assocs calendar combinators.short-circuit
+concurrency.semaphores deques html.parser html.parser.analyzer
+http.client inspector io io.pathnames kernel logging math
+math.parser prettyprint sequences sets spider.unique-deque
+threads tools.time urls ;
 IN: spider
 
 TUPLE: spider

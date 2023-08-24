@@ -1,19 +1,19 @@
 ! Copyright (C) 2009 Doug Coleman.
-! See http://factorcode.org/license.txt for BSD license.
-USING: help.markup help.syntax kernel math io ;
+! See https://factorcode.org/license.txt for BSD license.
+USING: help.markup help.syntax io math ;
 IN: io.streams.limited
 
 HELP: <limited-stream>
 { $values
-     { "stream" "an input stream" } { "limit" integer }
-     { "stream'" "an input stream" }
+    { "stream" "an input stream" } { "limit" integer }
+    { "stream'" "an input stream" }
 }
 { $description "Constructs a new " { $link limited-stream } " from an existing stream. User code should use " { $link limit-stream } " or " { $link limited-input } "." } ;
 
 HELP: limit-stream
 { $values
-     { "stream" "an input stream" } { "limit" integer }
-     { "stream'" "a stream" }
+    { "stream" "an input stream" } { "limit" integer }
+    { "stream'" "a stream" }
 }
 { $description "Changes a decoder's stream to be a limited stream, or wraps " { $snippet "stream" } " in a " { $link limited-stream } "." }
 { $examples

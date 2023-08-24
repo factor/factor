@@ -1,9 +1,9 @@
 ! Copyright (c) 2008 Aaron Schaefer, Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
-USING: kernel math math.ranges project-euler.common sequences ;
+! See https://factorcode.org/license.txt for BSD license.
+USING: kernel math ranges project-euler.common sequences ;
 IN: project-euler.092
 
-! http://projecteuler.net/index.php?section=problems&id=92
+! https://projecteuler.net/index.php?section=problems&id=92
 
 ! DESCRIPTION
 ! -----------
@@ -35,7 +35,7 @@ IN: project-euler.092
     dup [ 1 = ] [ 89 = ] bi or [ next-link chain-ending ] unless ;
 
 : lower-endings ( -- seq )
-    567 [1,b] [ chain-ending ] map ;
+    567 [1..b] [ chain-ending ] map ;
 
 : fast-chain-ending ( seq n -- m )
     dup 567 > [ next-link ] when 1 - swap nth ;
@@ -43,7 +43,7 @@ IN: project-euler.092
 PRIVATE>
 
 : euler092 ( -- answer )
-    lower-endings 9999999 [1,b] [ fast-chain-ending 89 = ] with count ;
+    lower-endings 9999999 [1..b] [ fast-chain-ending 89 = ] with count ;
 
 ! [ euler092 ] 10 ave-time
 ! 33257 ms ave run time - 624.27 SD (10 trials)

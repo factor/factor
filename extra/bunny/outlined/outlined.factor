@@ -1,8 +1,7 @@
-USING: arrays bunny.model bunny.cel-shaded continuations
-destructors kernel math multiline opengl opengl.shaders
-opengl.framebuffers opengl.gl opengl.textures opengl.demo-support fry
-opengl.capabilities sequences ui.gadgets combinators accessors
-macros locals ;
+USING: accessors arrays bunny.cel-shaded bunny.model combinators
+destructors kernel literals multiline opengl opengl.capabilities
+opengl.demo-support opengl.framebuffers opengl.gl opengl.shaders
+opengl.textures sequences ;
 FROM: opengl.demo-support => rect-vertices ;
 IN: bunny.outlined
 
@@ -203,7 +202,7 @@ MACRO: (framebuffer-texture>>draw) ( iformat xformat setter -- quot )
 : clear-framebuffer ( -- )
     GL_COLOR_ATTACHMENT0 glDrawBuffer
     0.15 0.15 0.15 1.0 glClearColor
-    GL_COLOR_BUFFER_BIT GL_DEPTH_BUFFER_BIT bitor glClear
+    flags{ GL_COLOR_BUFFER_BIT GL_DEPTH_BUFFER_BIT } glClear
     GL_COLOR_ATTACHMENT1 glDrawBuffer
     0.0 0.0 0.0 0.0 glClearColor
     GL_COLOR_BUFFER_BIT glClear ;

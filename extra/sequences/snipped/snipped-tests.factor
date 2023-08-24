@@ -1,5 +1,5 @@
 ! Copyright (C) 2013 John Benediktsson
-! See http://factorcode.org/license.txt for BSD license
+! See https://factorcode.org/license.txt for BSD license
 USING: arrays sequences sequences.snipped tools.test ;
 
 { { 0 1 2 5 6 } } [ 3 5 7 <iota> <snipped> >array ] unit-test

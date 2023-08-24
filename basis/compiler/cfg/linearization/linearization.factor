@@ -1,8 +1,8 @@
 ! Copyright (C) 2009, 2010 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
-USING: accessors assocs combinators combinators.short-circuit
+! See https://factorcode.org/license.txt for BSD license.
+USING: accessors combinators combinators.short-circuit
 compiler.cfg.loop-detection compiler.cfg.predecessors
-compiler.cfg.rpo compiler.cfg.utilities deques dlists fry kernel
+compiler.cfg.rpo compiler.cfg.utilities deques dlists kernel
 make math namespaces sequences sets sorting ;
 IN: compiler.cfg.linearization
 
@@ -38,7 +38,7 @@ SYMBOLS: loop-heads visited ;
     ] if ;
 
 : sorted-successors ( bb -- seq )
-    successors>> <reversed> [ loop-nesting-at ] sort-with ;
+    successors>> <reversed> [ loop-nesting-at ] sort-by ;
 
 : process-block ( bb -- bbs )
     dup visited get ?adjoin [ dup , sorted-successors ] [ drop { } ] if
@@ -59,10 +59,10 @@ PRIVATE>
         [ needs-loops ]
         [ needs-predecessors ]
         [
-            dup linear-order>> [ ] [
+            [ linear-order>> ] [
                 dup (linearization-order)
                 >>linear-order linear-order>>
-            ] ?if
+            ] ?unless
         ]
     } cleave ;
 

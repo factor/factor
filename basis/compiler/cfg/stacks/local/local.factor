@@ -1,8 +1,9 @@
 ! Copyright (C) 2009 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays assocs combinators compiler.cfg.instructions
-compiler.cfg.parallel-copy compiler.cfg.registers fry hash-sets kernel
-make math math.order namespaces sequences sets ;
+! See https://factorcode.org/license.txt for BSD license.
+USING: accessors arrays assocs combinators
+compiler.cfg.instructions compiler.cfg.parallel-copy
+compiler.cfg.registers hash-sets kernel make math math.order
+namespaces sequences sets ;
 IN: compiler.cfg.stacks.local
 
 TUPLE: height-state ds-begin rs-begin ds-inc rs-inc ;
@@ -51,8 +52,8 @@ SYMBOLS: locs>vregs local-peek-set replaces ;
 
 : peek-loc ( loc -- vreg )
     height-state get global-loc>local
-    dup replaces get at
-    [ ] [ dup local-peek-set get adjoin loc>vreg ] ?if ;
+    [ replaces get at ]
+    [ dup local-peek-set get adjoin loc>vreg ] ?unless ;
 
 : replace-loc ( vreg loc -- )
     height-state get global-loc>local replaces get set-at ;

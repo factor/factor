@@ -1,6 +1,6 @@
 ! Copyright (C) 2006, 2008 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
-USING: accessors assocs fry help.markup kernel make quotations
+! See https://factorcode.org/license.txt for BSD license.
+USING: accessors assocs help.markup kernel make quotations
 sequences splitting tr ui.gestures unicode words ;
 IN: ui.commands
 
@@ -24,9 +24,9 @@ GENERIC: command-word ( command -- word )
     { } like command-map boa ;
 
 : commands ( class -- hash )
-    dup "commands" word-prop [ ] [
+    [ "commands" word-prop ] [
         H{ } clone [ "commands" set-word-prop ] keep
-    ] ?if ;
+    ] ?unless ;
 
 TR: convert-command-name "-" " " ;
 
@@ -82,13 +82,13 @@ TR: convert-command-name "-" " " ;
     swap pick commands set-at
     update-gestures ;
 
-M: word command-name ( word -- str )
+M: word command-name
     name>>
     "com-" ?head drop "." ?tail drop
     dup first Letter? [ rest ] unless
     (command-name) ;
 
-M: word command-description ( word -- str )
+M: word command-description
     +description+ word-prop ;
 
 : default-flags ( -- assoc )
@@ -102,9 +102,9 @@ M: word command-description ( word -- str )
     [ 1quotation ] [ +nullary+ word-prop ] bi
     [ nip ] [ curry ] if ;
 
-M: word invoke-command ( target command -- )
+M: word invoke-command
     command-quot call( -- ) ;
 
 M: word command-word ;
 
-M: f invoke-command ( target command -- ) 2drop ;
+M: f invoke-command 2drop ;

@@ -1,8 +1,8 @@
 ! Copyright (C) 2009 Daniel Ehrenberg
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors assocs biassocs byte-arrays combinators
-combinators.short-circuit io io.binary io.encodings kernel
-literals locals math namespaces sequences simple-flat-file ;
+combinators.short-circuit endian io io.encodings kernel
+literals math math.bitwise namespaces sequences simple-flat-file ;
 IN: io.encodings.iso2022
 
 SINGLETON: iso2022

@@ -1,6 +1,5 @@
 USING: alien.c-types classes.struct cocoa cocoa.application
-cocoa.classes cocoa.enumeration cocoa.plists core-foundation
-core-foundation.strings kernel ;
+cocoa.classes core-foundation core-foundation.strings kernel ;
 IN: qtkit
 
 STRUCT: QTTime
@@ -79,16 +78,14 @@ IMPORT: QTTrack
 : <movie> ( filename -- movie )
     QTMovie swap <NSString> f -> movieWithFile:error: -> retain ;
 
-: movie-attributes ( movie -- attributes )
-    -> movieAttributes plist> ;
-
-: play ( movie -- )
-    -> play ;
-: stop ( movie -- )
-    -> stop ;
-
-: movie-tracks ( movie -- tracks )
-    -> tracks NSFastEnumeration>vector ;
-
-: track-attributes ( track -- attributes )
-    -> trackAttributes plist> ;
+! XXX: comment these out to workaround build machine issue
+! : movie-attributes ( movie -- attributes )
+!     -> movieAttributes plist> ;
+! : play ( movie -- )
+!     -> play ;
+! : stop ( movie -- )
+!     -> stop ;
+! : movie-tracks ( movie -- tracks )
+!     -> tracks NSFastEnumeration>vector ;
+! : track-attributes ( track -- attributes )
+!     -> trackAttributes plist> ;

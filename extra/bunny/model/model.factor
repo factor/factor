@@ -1,15 +1,15 @@
-USING: accessors alien.c-types arrays combinators destructors
-http.client io io.encodings.ascii io.files io.files.temp kernel
-locals math math.matrices math.parser math.vectors opengl
-opengl.capabilities opengl.gl opengl.demo-support sequences
-splitting vectors words specialized-arrays alien.data ;
+USING: accessors alien.c-types alien.data arrays combinators
+destructors http.client io io.encodings.ascii io.files
+io.files.temp kernel math math.parser math.vectors opengl
+opengl.capabilities opengl.demo-support opengl.gl sequences
+specialized-arrays splitting vectors ;
 QUALIFIED-WITH: alien.c-types c
 SPECIALIZED-ARRAY: c:float
 SPECIALIZED-ARRAY: c:uint
 IN: bunny.model
 
 : numbers ( str -- seq )
-    " " split [ string>number ] map sift ;
+    split-words [ string>number ] map sift ;
 
 : (parse-model) ( vs is -- vs is )
     readln [
@@ -42,7 +42,8 @@ IN: bunny.model
 
 : model-path ( -- path ) "bun_zipper.ply" cache-file ;
 
-CONSTANT: model-url "http://duriansoftware.com/joe/media/bun_zipper.ply"
+CONSTANT: model-url
+"https://downloads.factorcode.org/misc/bun_zipper.ply"
 
 : download-bunny ( -- path )
     model-url model-path [ ?download-to ] keep ;

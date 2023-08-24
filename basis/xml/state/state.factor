@@ -1,6 +1,6 @@
 ! Copyright (C) 2005, 2009 Daniel Ehrenberg
-! See http://factorcode.org/license.txt for BSD license.
-USING: accessors kernel namespaces io math ;
+! See https://factorcode.org/license.txt for BSD license.
+USING: accessors kernel namespaces ;
 IN: xml.state
 
 TUPLE: spot char line column next check version-1.0? stream ;

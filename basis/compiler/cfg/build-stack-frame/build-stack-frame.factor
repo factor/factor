@@ -1,8 +1,8 @@
 ! Copyright (C) 2008, 2010 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
-USING: accessors compiler.cfg.instructions compiler.cfg.linearization
-compiler.cfg.rpo compiler.cfg.stack-frame cpu.architecture kernel layouts
-locals math math.order namespaces sequences ;
+! See https://factorcode.org/license.txt for BSD license.
+USING: accessors compiler.cfg.instructions
+compiler.cfg.linearization cpu.architecture kernel layouts math
+math.order namespaces sequences ;
 IN: compiler.cfg.build-stack-frame
 
 SYMBOLS: param-area-size allot-area-size allot-area-align ;

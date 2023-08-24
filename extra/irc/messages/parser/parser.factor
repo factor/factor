@@ -1,8 +1,6 @@
 ! Copyright (C) 2009 Bruno Deferrari
-! See http://factorcode.org/license.txt for BSD license.
-USING: kernel fry splitting ascii accessors combinators
-       arrays classes.tuple math.order words assocs
-       irc.messages.base sequences ;
+! See https://factorcode.org/license.txt for BSD license.
+USING: accessors irc.messages.base kernel sequences splitting ;
 IN: irc.messages.parser
 
 <PRIVATE
@@ -13,7 +11,7 @@ IN: irc.messages.parser
 : split-message ( string -- prefix command parameters trailing )
     ":" ?head [ " " split1 ] [ f swap ] if
     ":" split1
-    [ " " split harvest unclip swap ] dip ;
+    [ split-words harvest unclip swap ] dip ;
 
 : sender ( irc-message -- sender )
     prefix>> [ ":" ?head drop "!" split-at-first drop ] [ f ] if* ;

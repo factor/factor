@@ -1,7 +1,7 @@
 ! Copyright (C) 2006, 2008 Doug Coleman.
-! See http://factorcode.org/license.txt for BSD license.
-USING: accessors byte-arrays byte-vectors checksums grouping
-io.binary kernel locals make math sequences ;
+! See https://factorcode.org/license.txt for BSD license.
+USING: accessors byte-arrays byte-vectors checksums endian
+grouping kernel make math sequences ;
 IN: checksums.common
 
 : calculate-pad-length ( length -- length' )

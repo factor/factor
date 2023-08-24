@@ -1,6 +1,6 @@
 ! Copyright (C) 2011 Doug Coleman.
-! See http://factorcode.org/license.txt for BSD license.
-USING: assocs combinators continuations fry kernel lexer locals
+! See https://factorcode.org/license.txt for BSD license.
+USING: assocs combinators continuations kernel lexer
 math math.functions math.order math.parser sequences splitting ;
 IN: units.reduction
 

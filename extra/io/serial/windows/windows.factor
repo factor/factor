@@ -1,5 +1,5 @@
 ! Copyright (C) 2009 Doug Coleman.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: io.files.windows io.streams.duplex kernel math
 math.bitwise windows windows.kernel32 windows.errors accessors
 alien.c-types fry locals continuations classes.struct ;
@@ -10,7 +10,7 @@ IN: io.serial.windows
 
 : get-comm-state ( duplex -- dcb )
     in>> handle>>
-    DCB <struct> [ GetCommState win32-error=0/f ] keep ;
+    DCB new [ GetCommState win32-error=0/f ] keep ;
 
 : set-comm-state ( duplex dcb -- )
     [ in>> handle>> ] dip

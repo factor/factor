@@ -1,5 +1,5 @@
 ! Copyright (C) 2008, 2009 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors classes.struct kernel destructors bit-arrays
 sequences assocs specialized-arrays math namespaces
 libc locals fry unix unix.linux.epoll unix.time io.ports
@@ -21,7 +21,7 @@ CONSTANT: max-events 256
 M: epoll-mx dispose* fd>> close-file ;
 
 : make-event ( fd events -- event )
-    epoll-event <struct>
+    epoll-event new
         swap >>events
         tuck data>> fd<< ;
 
@@ -34,18 +34,18 @@ M: epoll-mx dispose* fd>> close-file ;
 : do-epoll-del ( fd mx events -- )
     EPOLL_CTL_DEL swap do-epoll-ctl ;
 
-M: epoll-mx add-input-callback ( thread fd mx -- )
+M: epoll-mx add-input-callback
     [ EPOLLIN do-epoll-add ] [ call-next-method ] 2bi ;
 
-M: epoll-mx add-output-callback ( thread fd mx -- )
+M: epoll-mx add-output-callback
     [ EPOLLOUT do-epoll-add ] [ call-next-method ] 2bi ;
 
-M: epoll-mx remove-input-callbacks ( fd mx -- seq )
+M: epoll-mx remove-input-callbacks
     2dup reads>> key? [
         [ call-next-method ] [ EPOLLIN do-epoll-del ] 2bi
     ] [ 2drop f ] if ;
 
-M: epoll-mx remove-output-callbacks ( fd mx -- seq )
+M: epoll-mx remove-output-callbacks
     2dup writes>> key? [
         [ EPOLLOUT do-epoll-del ] [ call-next-method ] 2bi
     ] [ 2drop f ] if ;
@@ -62,5 +62,5 @@ M: epoll-mx remove-output-callbacks ( fd mx -- seq )
 : handle-events ( mx n -- )
     [ dup events>> ] dip head-slice swap '[ _ handle-event ] each ;
 
-M: epoll-mx wait-for-events ( nanos mx -- )
+M: epoll-mx wait-for-events
     swap 60000000 or dupd wait-event handle-events ;

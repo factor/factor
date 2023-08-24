@@ -1,13 +1,16 @@
 ! Copyright (C) 2010 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors furnace.actions http.server.responses kernel
-urls xml.syntax webapps.mason.backend webapps.mason.utils ;
+sequences urls xml.syntax webapps.mason.backend
+webapps.mason.utils ;
 IN: webapps.mason.report
 
 : build-report ( -- response )
     [
         current-builder [
-            last-report>> <html-content>
+            last-report>>
+            "<div style=\"padding: 10px;\">" "</div>" surround
+            <html-content>
         ] [ <404> ] if*
     ] with-mason-db ;
 

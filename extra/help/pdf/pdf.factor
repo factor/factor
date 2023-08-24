@@ -1,9 +1,9 @@
 ! Copyright (C) 2010 John Benediktsson
-! See http://factorcode.org/license.txt for BSD license
+! See https://factorcode.org/license.txt for BSD license
 
-USING: accessors arrays assocs help help.markup help.topics
-io.encodings.utf8 io.files io.pathnames kernel pdf pdf.layout
-pdf.streams sequences sets strings ;
+USING: accessors arrays help help.markup help.topics
+io.encodings.utf8 io.files io.pathnames kernel namespaces
+pdf.canvas pdf.layout pdf.streams sequences sets strings ;
 
 IN: help.pdf
 
@@ -34,11 +34,13 @@ IN: help.pdf
 PRIVATE>
 
 : article-pdf ( str name -- )
-    [
-        [ [ print-topic ] with-pdf-writer ]
-        [ next-articles topics>pdf ] bi
-        [ <pb> 1array glue ] unless-empty
-    ] [ write-pdf ] bi* ;
+    1.25 +line-height+ [
+        [
+            [ [ print-topic ] with-pdf-writer ]
+            [ next-articles topics>pdf ] bi
+            [ <pb> 1array glue ] unless-empty
+        ] [ write-pdf ] bi*
+    ] with-variable ;
 
 : cookbook-pdf ( -- )
     "cookbook" "cookbook.pdf" article-pdf ;

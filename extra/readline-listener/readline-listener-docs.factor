@@ -1,6 +1,6 @@
 ! Copyright (C) 2011 Erik Charlebois.
-! See http://factorcode.org/license.txt for BSD license.
-USING: help.markup help.syntax vocabs.loader ;
+! See https://factorcode.org/license.txt for BSD license.
+USING: help.markup help.syntax ;
 IN: readline-listener
 
 HELP: readline-listener

@@ -1,5 +1,5 @@
-USING: assocs help.markup help.syntax io.streams.string sequences strings present math kernel byte-arrays urls
-calendar ;
+USING: calendar help.markup help.syntax kernel math present
+strings urls ;
 IN: http
 
 HELP: <request>
@@ -10,15 +10,15 @@ HELP: request
 { $description "An HTTP request."
 $nl
 "Instances contain the following slots:"
-{ $table
-    { { $slot "method" } { "The HTTP method as a " { $link string } ". The most frequently-used HTTP methods are " { $snippet "GET" } ", " { $snippet "HEAD" } " and " { $snippet "POST" } "." } }
-    { { $slot "url" } { "The " { $link url } " being requested" } }
-    { { $slot "proxy-url" } { "The proxy " { $link url } " to use, or " { $link f } " for no proxy. If not " { $link f } ", the url will additionally be " { $link derive-url } "'d from the " { $link "http.proxy-variables" } ". The proxy is used if the result has at least the " { $slot "host" } " slot set." } }
-    { { $slot "version" } { "The HTTP version. Default is " { $snippet "1.1" } " and should not be changed without good reason." } }
-    { { $slot "header" } { "An assoc of HTTP header values. See " { $link "http.headers" } } }
-    { { $slot "post-data" } { "See " { $link "http.post-data" } } }
-    { { $slot "cookies" } { "A sequence of HTTP cookies. See " { $link "http.cookies" } } }
-    { { $slot "redirects" } { "Number of redirects to attempt before throwing an error. Default is " { $snippet "max-redirects" } "." } }
+{ $slots
+    { "method" { "The HTTP method as a " { $link string } ". The most frequently-used HTTP methods are " { $snippet "GET" } ", " { $snippet "HEAD" } " and " { $snippet "POST" } "." } }
+    { "url" { "The " { $link url } " being requested" } }
+    { "proxy-url" { "The proxy " { $link url } " to use, or " { $link f } " for no proxy. If not " { $link f } ", the url will additionally be " { $link derive-url } "'d from the " { $link "http.proxy-variables" } ". The proxy is used if the result has at least the " { $slot "host" } " slot set." } }
+    { "version" { "The HTTP version. Default is " { $snippet "1.1" } " and should not be changed without good reason." } }
+    { "header" { "An assoc of HTTP header values. See " { $link "http.headers" } } }
+    { "post-data" { "See " { $link "http.post-data" } } }
+    { "cookies" { "A sequence of HTTP cookies. See " { $link "http.cookies" } } }
+    { "redirects" { "Number of redirects to attempt before throwing an error. Default is " { $snippet "max-redirects" } "." } }
 } } ;
 
 HELP: <response>
@@ -29,16 +29,16 @@ HELP: response
 { $class-description "An HTTP response."
 $nl
 "Instances contain the following slots:"
-{ $table
-    { { $slot "version" } { "The HTTP version. Default is " { $snippet "1.1" } " and should not be changed without good reason." } }
-    { { $slot "code" } { "HTTP status code, an " { $link integer } ". Examples are 200 for success, 404 for file not found, and so on." } }
-    { { $slot "message" } { "HTTP status message, only displayed to the user. If the status code is 200, the status message might be “Success”, for example." } }
-    { { $slot "header" } { "An assoc of HTTP header values. See " { $link "http.headers" } } }
-    { { $slot "cookies" } { "A sequence of HTTP cookies. See " { $link "http.cookies" } } }
-    { { $slot "content-type" } { "an HTTP content type" } }
-    { { $slot "content-charset" } { "an encoding name" } }
-    { { $slot "content-encoding" } { "an encoding descriptor. See " { $link "io.encodings" } } }
-    { { $slot "body" } { "an HTTP response body" } }
+{ $slots
+    { "version" { "The HTTP version. Default is " { $snippet "1.1" } " and should not be changed without good reason." } }
+    { "code" { "HTTP status code, an " { $link integer } ". Examples are 200 for success, 404 for file not found, and so on." } }
+    { "message" { "HTTP status message, only displayed to the user. If the status code is 200, the status message might be “Success”, for example." } }
+    { "header" { "An assoc of HTTP header values. See " { $link "http.headers" } } }
+    { "cookies" { "A sequence of HTTP cookies. See " { $link "http.cookies" } } }
+    { "content-type" { "an HTTP content type" } }
+    { "content-charset" { "an encoding name" } }
+    { "content-encoding" { "an encoding descriptor. See " { $link "io.encodings" } } }
+    { "body" { "an HTTP response body" } }
 } } ;
 
 HELP: <raw-response>
@@ -49,11 +49,11 @@ HELP: raw-response
 { $class-description "A minimal HTTP response used by webapps which need full control over all output sent to the client. Most webapps can use " { $link response } " instead."
 $nl
 "Instances contain the following slots:"
-{ $table
-    { { $slot "version" } { "The HTTP version. Default is " { $snippet "1.1" } " and should not be changed without good reason." } }
-    { { $slot "code" } { "HTTP status code, an " { $link integer } ". Examples are 200 for success, 404 for file not found, and so on." } }
-    { { $slot "message" } { "HTTP status message, only displayed to the user. If the status code is 200, the status message might be “Success”, for example." } }
-    { { $slot "body" } { "an HTTP response body" } }
+{ $slots
+    { "version" { "The HTTP version. Default is " { $snippet "1.1" } " and should not be changed without good reason." } }
+    { "code" { "HTTP status code, an " { $link integer } ". Examples are 200 for success, 404 for file not found, and so on." } }
+    { "message" { "HTTP status message, only displayed to the user. If the status code is 200, the status message might be “Success”, for example." } }
+    { "body" { "an HTTP response body" } }
 } } ;
 
 HELP: <cookie>
@@ -65,16 +65,16 @@ HELP: cookie
 "An HTTP cookie."
 $nl
 "Instances contain a number of slots which correspond exactly to the fields of a cookie in the cookie specification:"
-{ $table
-    { { $slot "name" } { "The cookie name, a " { $link string } } }
-    { { $slot "value" } { "The cookie value, an object supported by " { $link present } } }
-    { { $slot "comment" } { "A " { $link string } } }
-    { { $slot "path" } { "The pathname prefix where the cookie is valid, a " { $link string } } }
-    { { $slot "domain" } { "The domain name where the cookie is valid, a " { $link string } } }
-    { { $slot "expires" } { "The expiry time, a " { $link timestamp } " or " { $link f } " for a session cookie" } }
-    { { $slot "max-age" } { "The expiry duration, a " { $link duration } " or " { $link f } " for a session cookie" } }
-    { { $slot "http-only" } { "If set to a true value, JavaScript code cannot see the cookie" } }
-    { { $slot "secure" } { "If set to a true value, the cookie is only sent for " { $snippet "https" } " protocol connections" } }
+{ $slots
+    { "name" { "The cookie name, a " { $link string } } }
+    { "value" { "The cookie value, an object supported by " { $link present } } }
+    { "comment" { "A " { $link string } } }
+    { "path" { "The pathname prefix where the cookie is valid, a " { $link string } } }
+    { "domain" { "The domain name where the cookie is valid, a " { $link string } } }
+    { "expires" { "The expiry time, a " { $link timestamp } " or " { $link f } " for a session cookie" } }
+    { "max-age" { "The expiry duration, a " { $link duration } " or " { $link f } " for a session cookie" } }
+    { "http-only" { "If set to a true value, JavaScript code cannot see the cookie" } }
+    { "secure" { "If set to a true value, the cookie is only sent for " { $snippet "https" } " protocol connections" } }
 }
 "Only one of " { $snippet "expires" } " and " { $snippet "max-age" } " can be set; the latter is preferred and is supported by all modern browsers." } ;
 
@@ -104,11 +104,11 @@ HELP: post-data
 { $class-description "HTTP POST data passed in a POST request."
 $nl
 "Instances contain the following slots:"
-{ $table
-    { { $slot "data" } { "The POST data. This can be in a higher-level form, such as an assoc of POST parameters, a string, or an XML document" } }
-    { { $slot "params" } { "Parameters passed in the POST request." } }
-    { { $slot "content-type" } { "A MIME type" } }
-    { { $slot "content-encoding" } { "Encoding used for the POST data" } }
+{ $slots
+    { "data" { "The POST data. This can be in a higher-level form, such as an assoc of POST parameters, a string, or an XML document" } }
+    { "params" { "Parameters passed in the POST request." } }
+    { "content-type" { "A MIME type" } }
+    { "content-encoding" { "Encoding used for the POST data" } }
 } } ;
 
 HELP: set-header

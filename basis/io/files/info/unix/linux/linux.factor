@@ -1,5 +1,5 @@
 ! Copyright (C) 2008 Doug Coleman.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors assocs classes.struct combinators
 combinators.short-circuit continuations csv fry io.backend
 io.encodings.utf8 io.files.info io.files.info.unix io.pathnames kernel
@@ -13,10 +13,10 @@ namelen ;
 
 M: linux new-file-system-info linux-file-system-info new ;
 
-M: linux file-system-statfs ( path -- statfs )
-    \ statfs64 <struct> [ statfs64 io-error ] keep ;
+M: linux file-system-statfs
+    \ statfs64 new [ statfs64 io-error ] keep ;
 
-M: linux statfs>file-system-info ( file-system-info statfs -- file-system-info' )
+M: linux statfs>file-system-info
     {
         [ f_type>> >>type ]
         [ f_bsize>> >>block-size ]
@@ -31,10 +31,10 @@ M: linux statfs>file-system-info ( file-system-info statfs -- file-system-info' 
         ! [ statfs64-f_spare >>spare ]
     } cleave ;
 
-M: linux file-system-statvfs ( path -- statvfs )
-    \ statvfs64 <struct> [ statvfs64 io-error ] keep ;
+M: linux file-system-statvfs
+    \ statvfs64 new [ statvfs64 io-error ] keep ;
 
-M: linux statvfs>file-system-info ( file-system-info statfs -- file-system-info' )
+M: linux statvfs>file-system-info
     {
         [ f_flag>> >>flags ]
         [ f_namemax>> >>name-max ]
@@ -68,9 +68,21 @@ frequency pass-number ;
     CHAR: \s [ "/etc/mtab" utf8 file>csv ] with-delimiter
     [ mtab-csv>mtab-entry ] map ;
 
+: fill-file-system-info ( file-system-info path -- file-system-info )
+    [ file-system-statfs statfs>file-system-info ]
+    [ file-system-statvfs statvfs>file-system-info ] bi
+    file-system-calculations ; inline
+
+: file-system-info-ignore-errors ( file-system-info -- file-system-info )
+    [ new-file-system-info ] dip
+    [ fill-file-system-info ] [ 2drop ] recover ; inline
+
+: (file-system-info) ( path -- file-system-info )
+    [ new-file-system-info ] dip fill-file-system-info ;
+
 : mtab-entry>file-system-info ( mtab-entry -- file-system-info/f )
     '[
-        _ [ mount-point>> file-system-info ] keep
+        _ [ mount-point>> file-system-info-ignore-errors ] [ ] bi
         {
             [ file-system-name>> >>device-name ]
             [ mount-point>> >>mount-point ]
@@ -78,29 +90,15 @@ frequency pass-number ;
         } cleave
     ] [ { [ libc-error? ] [ errno>> EACCES = ] } 1&& ] ignore-error/f ;
 
+M: linux mount-points
+    parse-mtab [ [ mount-point>> ] keep ] H{ } map>assoc ;
+
 M: linux file-systems
     parse-mtab [ mtab-entry>file-system-info ] map sift ;
 
-: (find-mount-point) ( path mtab-paths -- mtab-entry )
-    2dup at* [
-        2nip
-    ] [
-        drop [ parent-directory ] dip (find-mount-point)
-    ] if ;
-
-: find-mount-point ( path -- mtab-entry )
-    resolve-symlinks
-    parse-mtab [ [ mount-point>> ] keep ] H{ } map>assoc (find-mount-point) ;
-
-M: linux file-system-info ( path -- file-system-info )
+M: linux file-system-info
     normalize-path
-    [
-        [ new-file-system-info ] dip
-        [ file-system-statfs statfs>file-system-info ]
-        [ file-system-statvfs statvfs>file-system-info ] bi
-        file-system-calculations
-    ] keep
-    find-mount-point
+    [ file-system-info-ignore-errors ] [ find-mount-point ] bi
     {
         [ file-system-name>> >>device-name drop ]
         [ mount-point>> >>mount-point drop ]

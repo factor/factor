@@ -1,8 +1,9 @@
 ! Copyright (C) 2010 John Benediktsson
-! See http://factorcode.org/license.txt for BSD license
+! See https://factorcode.org/license.txt for BSD license
 
-USING: accessors arrays combinators generic kernel io.sockets
-io.sockets.private memoize sequences system vocabs.parser ;
+USING: accessors arrays combinators io.sockets
+io.sockets.private kernel sequences system
+vocabs.parser ;
 
 IN: io.sockets.icmp
 

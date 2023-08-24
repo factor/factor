@@ -10,13 +10,40 @@ if not defined GIT_BRANCH (
 if "%1"=="/?" (
     goto usage
 ) else if "%1"=="" (
-    set _bootimage_version=%GIT_BRANCH%
+    set _git_pull=1
+    set _compile_vm=1
+    set _bootimage_type=download
+    set _bootstrap_factor=1
 ) else if "%1"=="latest" (
-    set _bootimage_version=%GIT_BRANCH%
+    set _git_pull=1
+    set _compile_vm=1
+    set _bootimage_type=download
+    set _bootstrap_factor=1
 ) else if "%1"=="update" (
-    set _bootimage_version=%GIT_BRANCH%
-) else if "%1"=="clean" (
-    set _bootimage_version=clean
+    set _git_pull=1
+    set _compile_vm=1
+    set _bootimage_type=download
+    set _bootstrap_factor=1
+) else if "%1"=="compile" (
+    set _git_pull=0
+    set _compile_vm=1
+    set _bootimage_type=current
+    set _bootstrap_factor=0
+) else if "%1"=="self-bootstrap" (
+    set _git_pull=1
+    set _compile_vm=0
+    set _bootimage_type=make
+    set _bootstrap_factor=1
+) else if "%1"=="bootstrap" (
+    set _git_pull=0
+    set _compile_vm=0
+    set _bootimage_type=current
+    set _bootstrap_factor=1
+) else if "%1"=="net-bootstrap" (
+    set _git_pull=0
+    set _compile_vm=1
+    set _bootimage_type=download
+    set _bootstrap_factor=1
 ) else goto usage
 
 if not exist Nmakefile goto wrongdir
@@ -38,30 +65,42 @@ if not errorlevel 1 (
 echo Deleting staging images from temp/...
 del temp\staging.*.image
 
-echo Updating working copy from %GIT_BRANCH%...
-call git pull git://factorcode.org/git/factor.git %GIT_BRANCH%
-if errorlevel 1 goto fail
+if "%_git_pull%"=="1" (
+    echo Updating working copy from %GIT_BRANCH%...
+    call git pull https://github.com/factor/factor %GIT_BRANCH%
+    if errorlevel 1 goto fail
+)
 
-echo Building vm...
-nmake /nologo /f Nmakefile clean
-if errorlevel 1 goto fail
+if "%_compile_vm%"=="1" (
+    echo Building vm...
+    nmake /nologo /f Nmakefile clean
+    if errorlevel 1 goto fail
 
-nmake /nologo /f Nmakefile %_target%
-if errorlevel 1 goto fail
+    nmake /nologo /f Nmakefile %_target%
+    if errorlevel 1 goto fail
+)
 
-echo Fetching %_bootimage_version% boot image...
-set boot_image_url=http://downloads.factorcode.org/images/%GIT_BRANCH%/%_bootimage% %_bootimage%
-echo URL: %boot_image_url%
-cscript /nologo misc\http-get.vbs %boot_image_url% %_bootimage%
-if errorlevel 1 goto fail
+set _bootimage_url=https://downloads.factorcode.org/images/%GIT_BRANCH%/%_bootimage%
+if "%_bootimage_type%"=="download" (
+    echo Fetching %GIT_BRANCH% boot image...
+    echo URL: %_bootimage_url%
+    cscript /nologo misc\http-get.vbs %_bootimage_url% %_bootimage%
+    if errorlevel 1 goto fail
+) else if "%_bootimage_type%"=="make" (
+    echo Making boot image...
+    .\factor.com -run=bootstrap.image %_bootimage%
+    if errorlevel 1 goto fail
+)
 
-echo Bootstrapping...
-.\factor.com -i=%_bootimage%
-if errorlevel 1 goto fail
+if "%_bootstrap_factor%"=="1" (
+    echo Bootstrapping...
+    .\factor.com -i=%_bootimage%
+    if errorlevel 1 goto fail
 
-echo Copying fresh factor.image to factor.image.fresh.
-copy factor.image factor.image.fresh
-if errorlevel 1 goto fail
+    echo Copying fresh factor.image to factor.image.fresh.
+    copy factor.image factor.image.fresh
+    if errorlevel 1 goto fail
+)
 
 echo Build complete.
 goto :EOF
@@ -80,8 +119,15 @@ echo Make sure you're running within the Visual Studio or Windows SDK environmen
 goto :EOF
 
 :usage
-echo Usage: build.cmd
+echo Usage: build.cmd [command]
 echo     Updates the working copy, cleans and builds the vm using nmake,
 echo     fetches a boot image, and bootstraps factor.
+echo:
 echo     The branch that bootstraps is the one that is checked out locally.
+echo:
+echo     compile - recompile vm
+echo     update - git pull, recompile vm, download a boot image, bootstrap
+echo     self-bootstrap - git pull, make a boot image, bootstrap
+echo     bootstrap - existing boot image, bootstrap
+echo     net-bootstrap - recompile vm, download a boot image, bootstrap
 goto :EOF

@@ -1,8 +1,8 @@
 ! Copyright (C) 2004, 2008 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
-USING: accessors alien.data assocs bit-arrays fry
-io.backend.unix io.backend.unix.multiplexers kernel layouts
-locals math math.order sequences unix.ffi unix.time ;
+! See https://factorcode.org/license.txt for BSD license.
+USING: accessors alien.data assocs bit-arrays io.backend.unix
+io.backend.unix.multiplexers kernel layouts math math.order
+sequences unix.ffi unix.time ;
 IN: io.backend.unix.multiplexers.select
 
 TUPLE: select-mx < mx read-fdset write-fdset ;

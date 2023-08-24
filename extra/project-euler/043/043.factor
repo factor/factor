@@ -1,10 +1,10 @@
 ! Copyright (c) 2008 Aaron Schaefer.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: combinators.short-circuit kernel math math.functions math.combinatorics
-    math.ranges project-euler.common sequences sets sorting ;
+    ranges project-euler.common sequences sets sorting ;
 IN: project-euler.043
 
-! http://projecteuler.net/index.php?section=problems&id=43
+! https://projecteuler.net/index.php?section=problems&id=43
 
 ! DESCRIPTION
 ! -----------
@@ -82,7 +82,7 @@ PRIVATE>
     [ unclip 1 head prefix concat ] map [ all-unique? ] filter ;
 
 : add-missing-digit ( seq -- seq )
-    dup natural-sort 10 <iota> swap diff prepend ;
+    dup sort 10 <iota> swap diff prepend ;
 
 : interesting-pandigitals ( -- seq )
     17 candidates { 13 11 7 5 3 2 } [

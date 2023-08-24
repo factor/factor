@@ -1,5 +1,5 @@
 ! Copyright (c) 2007, 2010 slava pestov.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors assocs continuations init io kernel
 kernel.private make math.parser namespaces sequences splitting ;
 IN: system
@@ -9,16 +9,18 @@ PRIMITIVE: disable-ctrl-break ( -- )
 PRIMITIVE: enable-ctrl-break ( -- )
 PRIMITIVE: nano-count ( -- ns )
 
-SINGLETONS: x86.32 x86.64 arm ppc.32 ppc.64 ;
+SINGLETONS: x86.32 x86.64 arm.32 arm.64 ppc.32 ppc.64 ;
 
 UNION: x86 x86.32 x86.64 ;
+UNION: arm arm.32 arm.64 ;
 UNION: ppc ppc.32 ppc.64 ;
 
 : cpu ( -- class ) \ cpu get-global ; foldable
 
-SINGLETONS: windows macosx linux ;
+SINGLETONS: windows macosx linux freebsd ;
 
-UNION: unix macosx linux ;
+UNION: bsd freebsd ;
+UNION: unix macosx linux freebsd bsd ;
 
 : os ( -- class ) \ os get-global ; foldable
 
@@ -41,7 +43,8 @@ UNION: unix macosx linux ;
 CONSTANT: string>cpu-hash H{
     { "x86.32" x86.32 }
     { "x86.64" x86.64 }
-    { "arm" arm }
+    { "arm.32" arm.32 }
+    { "arm.64" arm.64 }
     { "ppc.32" ppc.32 }
     { "ppc.64" ppc.64 }
 }
@@ -49,6 +52,7 @@ CONSTANT: string>cpu-hash H{
 CONSTANT: string>os-hash H{
     { "windows" windows }
     { "macosx" macosx }
+    { "freebsd" freebsd }
     { "linux" linux }
 }
 
@@ -73,7 +77,7 @@ PRIVATE>
         " " % cpu name>> %
         " (" % build # ", " %
         vm-git-ref % "-" %
-        vm-git-id 10 short head % ", " %
+        vm-git-id 10 index-or-length head % ", " %
         vm-compile-time % ")\n[" %
         vm-compiler % "] on " % os name>> %
     ] "" make ;

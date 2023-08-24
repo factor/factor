@@ -1,7 +1,7 @@
 ! Copyright (C) 2015 Sankaranarayanan Viswanathan.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors assocs calendar combinators
-combinators.short-circuit destructors formatting fry kernel math
+combinators.short-circuit destructors formatting kernel math
 math.vectors namespaces opengl opengl.textures sequences sets
 snake-game.game snake-game.sprites timers ui ui.gadgets
 ui.gadgets.worlds ui.gestures ui.render ;

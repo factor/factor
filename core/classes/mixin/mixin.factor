@@ -1,5 +1,5 @@
 ! Copyright (C) 2004, 2010 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors assocs classes classes.algebra
 classes.algebra.private classes.private classes.union
 classes.union.private combinators definitions kernel sequences
@@ -61,13 +61,8 @@ M: mixin-class rank-class drop 8 ;
 
 PRIVATE>
 
-ERROR: not-a-class object ;
-
-ERROR: not-a-mixin-class object ;
-
 : check-types ( class mixin -- class mixin )
-    [ dup class? [ not-a-class ] unless ]
-    [ dup mixin-class? [ not-a-mixin-class ] unless ] bi* ;
+    [ class check-instance ] [ mixin-class check-instance ] bi* ;
 
 : add-mixin-instance ( class mixin -- )
     check-types [ 2drop ] [ (add-mixin-instance) ] if-mixin-member? ;

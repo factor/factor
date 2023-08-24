@@ -1,12 +1,13 @@
 ! Copyright (C) 2003, 2009 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs byte-arrays byte-vectors classes
 classes.algebra.private classes.maybe classes.private
-classes.tuple combinators continuations effects generic
-hash-sets hashtables io.pathnames io.styles kernel make math
-math.order math.parser namespaces prettyprint.config
-prettyprint.custom prettyprint.sections prettyprint.stylesheet
-quotations sbufs sequences strings vectors words ;
+classes.tuple combinators combinators.short-circuit
+continuations effects generic hash-sets hashtables io.pathnames
+io.styles kernel lists make math math.order math.parser
+namespaces prettyprint.config prettyprint.custom
+prettyprint.sections prettyprint.stylesheet quotations sbufs
+sequences strings vectors words ;
 QUALIFIED: sets
 IN: prettyprint.backend
 
@@ -36,7 +37,7 @@ M: anonymous-union word-name*
 M: anonymous-intersection word-name*
     class-name "intersection{ " " }" surround ;
 
-M: word word-name* ( word -- str )
+M: word word-name*
     [ name>> "( no name )" or ] [ record-vocab ] bi ;
 
 : pprint-word ( word -- )
@@ -82,11 +83,21 @@ M: real pprint*
     } case ;
 
 M: float pprint*
-    dup fp-nan? [
-        \ NAN: [ fp-nan-payload >hex text ] pprint-prefix
-    ] [
-        call-next-method
-    ] if ;
+    {
+        { [ dup 0/0. fp-bitwise= ] [ drop "0/0." text ] }
+        { [ dup -0/0. fp-bitwise= ] [ drop "-0/0." text ] }
+        { [ dup fp-nan? ] [
+            \ NAN: [
+                [ fp-nan-payload ] [ fp-sign ] bi
+                [ 0xfffffffffffff bitxor 1 + neg ] when >hex text
+            ] pprint-prefix
+        ] }
+        { [ dup 1/0. = ] [ drop "1/0." text ] }
+        { [ dup -1/0. = ] [ drop "-1/0." text ] }
+        { [ dup 0.0 fp-bitwise= ] [ drop "0.0" text ] }
+        { [ dup -0.0 fp-bitwise= ] [ drop "-0.0" text ] }
+        [ call-next-method ]
+    } cond ;
 
 M: f pprint* drop \ f pprint-word ;
 
@@ -146,7 +157,7 @@ M: pathname pprint*
 : check-recursion ( obj quot: ( obj -- ) -- )
     nesting-limit? [
         drop
-        [ class-of name>> "~" dup surround ] keep present-text
+        [ class-of name>> "~" 1surround ] keep present-text
     ] [
         over recursion-check get member-eq? [
             drop "~circularity~" swap present-text
@@ -213,6 +224,8 @@ M: array pprint-delims drop \ { \ } ;
 M: byte-array pprint-delims drop \ B{ \ } ;
 M: byte-vector pprint-delims drop \ BV{ \ } ;
 M: vector pprint-delims drop \ V{ \ } ;
+M: cons-state pprint-delims drop \ L{ \ } ;
+M: +nil+ pprint-delims drop \ L{ \ } ;
 M: hashtable pprint-delims drop \ H{ \ } ;
 M: tuple pprint-delims drop \ T{ \ } ;
 M: wrapper pprint-delims drop \ W{ \ } ;
@@ -249,7 +262,7 @@ M: vector pprint-narrow? drop t ;
 M: hashtable pprint-narrow? drop t ;
 M: tuple pprint-narrow? drop t ;
 
-M: object pprint-object ( obj -- )
+M: object pprint-object
     [
         <flow
         dup pprint-delims [
@@ -264,9 +277,34 @@ M: object pprint* pprint-object ;
 M: vector pprint* pprint-object ;
 M: byte-vector pprint* pprint-object ;
 
+M: cons-state pprint*
+    [
+        <flow
+        dup pprint-delims [
+            pprint-word
+            dup pprint-narrow? <inset
+            [
+                building get
+                length-limit get
+                '[ dup cons-state? _ length _ < and ]
+                [ uncons swap , ] while
+            ] { } make
+            [ pprint* ] each
+            dup list? [
+                nil? [ "~more~" text ] unless
+            ] [
+                "." text pprint*
+            ] if
+            block>
+        ] dip pprint-word block>
+    ] check-recursion ;
+
+M: +nil+ pprint*
+    <flow pprint-delims [ pprint-word ] bi@ block> ;
+
 : with-extra-nesting-level ( quot -- )
     nesting-limit [ dup [ 1 + ] [ f ] if* ] change
-    [ nesting-limit set ] curry [ ] cleanup ; inline
+    [ nesting-limit set ] curry finally ; inline
 
 M: hashtable pprint*
     [ pprint-object ] with-extra-nesting-level ;

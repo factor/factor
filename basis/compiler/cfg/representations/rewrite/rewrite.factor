@@ -1,10 +1,10 @@
 ! Copyright (C) 2010 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: arrays assocs compiler.cfg.instructions
 compiler.cfg.registers compiler.cfg.renaming.functor
 compiler.cfg.representations.conversion
 compiler.cfg.representations.preferred compiler.cfg.rpo kernel
-locals make namespaces sequences ;
+make namespaces sequences ;
 IN: compiler.cfg.representations.rewrite
 
 ! Insert conversions. This introduces new temporaries, so we need

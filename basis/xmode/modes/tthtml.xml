@@ -2,7 +2,9 @@
 <!DOCTYPE MODE SYSTEM "xmode.dtd">
 <MODE>
 	<!--
-		Made by Krassimir Berov: k.berov@gmail.com 
+		Edit mode for the Perl Template Toolkit
+		http://template-toolkit.org/index.html
+		Made by Krassimir Berov: k.berov@gmail.com
 	-->
 	<PROPS>
 		<PROPERTY NAME="commentStart" VALUE="&lt;!--" />
@@ -23,13 +25,13 @@
 
 	<!-- ESCAPE is not exactly right but it is needed to correctly
 	     handle JavaScript in on* parameters -->
-	<RULES SET="TAGS" DEFAULT="MARKUP" ESCAPE="\">
-		<SPAN TYPE="LITERAL1">
+	<RULES SET="TAGS" DEFAULT="MARKUP">
+		<SPAN TYPE="LITERAL1" ESCAPE="\">
 			<BEGIN>"</BEGIN>
 			<END>"</END>
 		</SPAN>
 
-		<SPAN TYPE="LITERAL1">
+		<SPAN TYPE="LITERAL1" ESCAPE="\">
 			<BEGIN>'</BEGIN>
 			<END>'</END>
 		</SPAN>
@@ -101,7 +103,8 @@
 			HIGHLIGHT_DIGITS="TRUE"
 			DIGIT_RE="(0x[\p{XDigit}]+[lL]?|[\p{Digit}]+(e[\p{Digit}]*)?[lLdDfF]?)">
 
-		<SPAN TYPE="KEYWORD2" NO_LINE_BREAK="TRUE">
+		<!-- example: [% users.${me.id}.name %] -->
+		<SPAN TYPE="KEYWORD2" NO_LINE_BREAK="TRUE" DELEGATE="perl::VARIABLE">
 			<BEGIN>${</BEGIN>
 			<END>}</END>
 		</SPAN>

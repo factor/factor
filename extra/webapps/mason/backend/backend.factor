@@ -1,5 +1,5 @@
 ! Copyright (C) 2010 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors calendar db db.sqlite db.tuples db.types kernel
 math math.order sequences combinators.short-circuit
 io.pathnames ;
@@ -67,22 +67,22 @@ counter "COUNTER" {
 : all-builders ( -- builders )
     builder new select-tuples ; inline
 
-: crashed? ( builder -- ? )
+: offline? ( builder -- ? )
     heartbeat-timestamp>> 30 minutes ago before? ;
 
 : broken? ( builder -- ? )
     [ clean-git-id>> ] [ last-git-id>> ] bi = not ;
 
-: funny-builders ( -- crashed broken )
+: funny-builders ( -- offline broken )
     all-builders
-    [ [ crashed? ] filter ]
+    [ [ offline? ] filter ]
     [ [ broken? ] filter ]
     bi ;
 
 : os/cpu ( builder -- string )
     [ os>> ] [ cpu>> ] bi "/" glue ;
 
-: mason-db ( -- db ) home "mason.db" append-path <sqlite-db> ;
+: mason-db ( -- db ) "~/mason.db" <sqlite-db> ;
 
 : with-mason-db ( quot -- )
     mason-db [ with-transaction ] with-db ; inline

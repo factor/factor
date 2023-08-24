@@ -1,5 +1,5 @@
 ! Copyright (C) 2011 Doug Coleman.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors byte-arrays io io.encodings.binary io.servers
 io.sockets kernel math memoize namespaces sequences fry literals
 locals formatting ;
@@ -46,7 +46,7 @@ M: tcp-echo handle-client*
     <tcp-echo> [
         \ threaded-server get server>address binary [
             #times [ #bytes read-write ] times
-            contents empty? [ incorrect-#bytes ] unless
+            read-contents empty? [ incorrect-#bytes ] unless
         ] with-client
     ] with-threaded-server ;
 

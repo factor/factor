@@ -1,5 +1,5 @@
 USING: tools.test random sorting sequences hashtables assocs
-kernel fry arrays splitting namespaces math accessors vectors locals
+kernel arrays splitting namespaces math accessors vectors
 math.order grouping strings strings.private classes layouts
 cpu.architecture
 compiler.cfg
@@ -64,7 +64,7 @@ H{
 } representations set
 
 : clean-up-split ( a b -- a b )
-    [ dup [ [ >vector ] change-uses [ >vector ] change-ranges ] when ] bi@ ;
+    [ [ [ >vector ] change-uses [ >vector ] change-ranges ] ?call ] bi@ ;
 
 {
     T{ live-interval-state

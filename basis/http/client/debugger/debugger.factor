@@ -1,5 +1,5 @@
 ! Copyright (C) 2008 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: kernel summary debugger io make math.parser
 prettyprint http http.client accessors ;
 IN: http.client.debugger
@@ -10,4 +10,4 @@ M: too-many-redirects summary
 
 M: download-failed error.
     "HTTP request failed:" print nl
-    response>> . ;
+    response>> ... ;

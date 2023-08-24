@@ -1,6 +1,6 @@
 ! Copyright (C) 2009 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays colors.constants definitions help.markup
+! See https://factorcode.org/license.txt for BSD license.
+USING: accessors arrays colors definitions help.markup
 help.stylesheet io io.styles kernel literals namespaces parser
 random sequences ui.theme ;
 IN: help.tips

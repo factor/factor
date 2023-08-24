@@ -1,11 +1,10 @@
-USING: help.markup help.syntax io.streams.string
-http.server.dispatchers ;
+USING: help.markup help.syntax http.server.dispatchers ;
 IN: furnace.boilerplate
 
 HELP: <boilerplate>
 { $values
-     { "responder" "a responder" }
-     { "boilerplate" "a new boilerplate responder" }
+    { "responder" "a responder" }
+    { "boilerplate" "a new boilerplate responder" }
 }
 { $description "Wraps a responder in a boilerplate responder. The boilerplate responder needs to be configured before use; see " { $link "furnace.boilerplate.config" } "." } ;
 

@@ -1,8 +1,8 @@
 ! Copyright (C) 2009 Joe Groff.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors alien.c-types arrays byte-arrays combinators
-destructors fry gpu gpu.buffers images kernel locals math
-opengl opengl.gl opengl.textures sequences
+destructors gpu gpu.buffers images kernel math
+opengl.gl opengl.textures sequences
 specialized-arrays typed ui.gadgets.worlds variants ;
 FROM: alien.c-types => float ;
 SPECIALIZED-ARRAY: float

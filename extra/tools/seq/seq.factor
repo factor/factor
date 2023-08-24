@@ -1,8 +1,8 @@
 ! Copyright (C) 2011 John Benediktsson
-! See http://factorcode.org/license.txt for BSD license
+! See https://factorcode.org/license.txt for BSD license
 
 USING: combinators command-line io kernel math.order math.parser
-math.ranges namespaces sequences ;
+ranges namespaces sequences ;
 
 IN: tools.seq
 

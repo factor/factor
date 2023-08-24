@@ -1,6 +1,6 @@
 ! Copyright (C) 2013 John Benediktsson
-! See http://factorcode.org/license.txt for BSD license
-USING: colors kernel locals math sequences ;
+! See https://factorcode.org/license.txt for BSD license
+USING: colors kernel math sequences ;
 IN: colors.mix
 
 : linear-gradient ( color1 color2 percent -- color )

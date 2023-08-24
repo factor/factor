@@ -1,7 +1,6 @@
 ! Copyright (C) 2008, 2010 Slava Pestov
-! See http://factorcode.org/license.txt for BSD license.
-USING: accessors kernel lcs sequences strings xml.syntax
-xml.writer ;
+! See https://factorcode.org/license.txt for BSD license.
+USING: accessors kernel lcs sequences strings xml.syntax ;
 IN: lcs.diff2html
 
 GENERIC: diff-line ( obj -- xml )

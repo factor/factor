@@ -1,5 +1,5 @@
 ! Copyright (C) 2009 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors ui.gadgets.panes ui.gadgets.borders ui io io.styles ;
 IN: hello-unicode
 
@@ -8,7 +8,7 @@ IN: hello-unicode
         { { font-size 24 } } [
             "Hello" print
             "Grüß dich" print
-            "здравствуйте" print
+            "Привет" print
             "こんにちは" print
             "안녕하세요" print
             "שָׁלוֹם " print

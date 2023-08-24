@@ -14,16 +14,16 @@ HELP: link-info
 { file-info link-info file-info-tuple } related-words
 
 HELP: directory?
-{ $values { "file-info" file-info-tuple } { "?" boolean } }
-{ $description "Tests if " { $snippet "file-info" } " is a directory." } ;
+{ $values { "path/info" { $or "a pathname string" file-info-tuple } } { "?" boolean } }
+{ $description "Tests if " { $snippet "path/info" } " is a directory." } ;
 
 HELP: regular-file?
-{ $values { "file-info" file-info-tuple } { "?" boolean } }
-{ $description "Tests if " { $snippet "file-info" } " is a normal file." } ;
+{ $values { "path/info" { $or "a pathname string" file-info-tuple } } { "?" boolean } }
+{ $description "Tests if " { $snippet "path/info" } " is a normal file." } ;
 
 HELP: symbolic-link?
-{ $values { "file-info" file-info-tuple } { "?" boolean } }
-{ $description "Tests if " { $snippet "file-info" } " is a symbolic link." } ;
+{ $values { "path/info" { $or "a pathname string" file-info-tuple } } { "?" boolean } }
+{ $description "Tests if " { $snippet "path/info" } " is a symbolic link." } ;
 
 HELP: file-systems
 { $values { "array" array } }
@@ -62,19 +62,19 @@ HELP: file-executable?
 { $description "Returns whether the file specified by " { $snippet "path" } " is executable by the current process." }
 { $errors "Throws an error if the file does not exist." } ;
 
-ARTICLE: "io.files.info" "File system meta-data"
-"File meta-data:"
+ARTICLE: "io.files.info" "File system metadata"
+"File metadata:"
 { $subsections
     file-info
     link-info
-    exists?
+    file-exists?
     directory?
     regular-file?
     symbolic-link?
 }
 "File types:"
 { $subsections "file-types" }
-"File system meta-data:"
+"File system metadata:"
 { $subsections
     file-system-info
     file-systems

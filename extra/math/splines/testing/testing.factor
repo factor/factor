@@ -1,6 +1,6 @@
 ! Copyright (C) 2010 Erik Charlebois.
-! See http://factorcode.org/license.txt for BSD license.
-USING: locals math.splines math.splines.viewer arrays ;
+! See https://factorcode.org/license.txt for BSD license.
+USING: arrays math.splines math.splines.viewer ;
 IN: math.splines.testing
 
 : test1 ( -- )

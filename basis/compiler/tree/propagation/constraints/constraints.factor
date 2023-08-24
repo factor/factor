@@ -1,5 +1,5 @@
 ! Copyright (C) 2008, 2010 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs classes.algebra
 compiler.tree.propagation.copy compiler.tree.propagation.info
 kernel namespaces sequences ;
@@ -34,7 +34,7 @@ M: true-constraint satisfied?
 
 TUPLE: false-constraint value ;
 
-: =f ( value -- constriant ) resolve-copy false-constraint boa ;
+: =f ( value -- constraint ) resolve-copy false-constraint boa ;
 
 M: false-constraint assume*
     [ \ f <class-info> swap value>> refine-value-info ]

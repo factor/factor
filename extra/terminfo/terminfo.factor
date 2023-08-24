@@ -1,10 +1,11 @@
 ! Copyright (C) 2013 John Benediktsson.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 
-USING: accessors assocs combinators formatting fry grouping hashtables
-io io.binary io.directories io.encodings.binary io.files
-io.files.types io.pathnames kernel math math.parser memoize pack
-sequences sequences.generalizations splitting strings system ;
+USING: accessors assocs combinators formatting endian fry
+grouping hashtables io io.directories io.encodings.binary
+io.files io.files.types io.pathnames kernel math math.parser
+memoize pack sequences sequences.generalizations splitting
+strings system ;
 
 IN: terminfo
 
@@ -85,7 +86,7 @@ M: linux terminfo-relative-path ( name -- path )
 
 : terminfo-path ( name -- path )
     terminfo-relative-path TERMINFO-DIRS [ swap append-path ] with map
-    [ exists? ] find nip ;
+    [ file-exists? ] find nip ;
 
 : terminfo-names-for-path ( path -- names )
     [
@@ -94,7 +95,7 @@ M: linux terminfo-relative-path ( name -- path )
     ] with-directory-entries ;
 
 MEMO: terminfo-names ( -- names )
-    TERMINFO-DIRS [ exists? ] filter
+    TERMINFO-DIRS [ file-exists? ] filter
     [ terminfo-names-for-path ] map concat ;
 
 <PRIVATE
@@ -247,7 +248,7 @@ CONSTANT: string-names {
 }
 
 : zip-names ( seq names -- assoc )
-    swap 2dup [ length ] bi@ - f <repetition> append zip ;
+    swap 2dup 2length - f <repetition> append zip ;
 
 PRIVATE>
 

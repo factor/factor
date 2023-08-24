@@ -1,7 +1,7 @@
 ! Copyright (C) 2006 Chris Double.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 IN: partial-continuations
-USING: kernel continuations arrays sequences quotations ;
+USING: arrays continuations kernel sequences ;
 
 : breset ( quot -- )
     [ 1array swap keep first continue-with ] callcc1 nip ; inline

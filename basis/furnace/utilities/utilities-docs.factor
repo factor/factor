@@ -1,5 +1,5 @@
-USING: assocs help.markup help.syntax kernel
-quotations sequences strings urls xml.data http words ;
+USING: assocs help.markup help.syntax kernel strings urls words
+xml.data ;
 IN: furnace.utilities
 
 HELP: adjust-redirect-url
@@ -34,19 +34,19 @@ HELP: hidden-form-field
 HELP: link-attr
 { $values { "tag" tag } { "responder" "a responder" } }
 { $contract "Modifies an XHTML " { $snippet "a" } " tag." }
-{ $notes "This word is called by " { $link "html.templates.chloe.tags.form" } "." }
+{ $notes "This word is called by " { $vocab-link "html.templates.chloe" } "." }
 { $examples "Conversation scope adds attributes to link tags." } ;
 
 HELP: modify-form
 { $values { "responder" "a responder" } { "xml/f" "an XML chunk or f" } }
 { $contract "Emits hidden form fields using " { $link hidden-form-field } "." }
-{ $notes "This word is called by " { $link "html.templates.chloe.tags.form" } "." }
+{ $notes "This word is called by " { $vocab-link "html.templates.chloe" } "." }
 { $examples "Session management, conversation scope and asides use hidden form fields to pass state." } ;
 
 HELP: modify-query
 { $values { "query" assoc } { "responder" "a responder" } { "query'" assoc } }
 { $contract "Modifies the query parameters of a URL destined to be displayed as a link." }
-{ $notes "This word is called by " { $link "html.templates.chloe.tags.form" } "." }
+{ $notes "This word is called by " { $vocab-link "html.templates.chloe" } "." }
 { $examples "Asides add query parameters to URLs." } ;
 
 HELP: modify-redirect-query

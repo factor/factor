@@ -1,6 +1,6 @@
 ! Copyright (C) 2009 Joe Groff.
-! See http://factorcode.org/license.txt for BSD license.
-USING: accessors kernel namespaces parser sequences tools.continuations
+! See https://factorcode.org/license.txt for BSD license.
+USING: accessors kernel namespaces sequences tools.continuations
 ui.backend ui.gadgets.worlds words ;
 IN: opengl.debug
 

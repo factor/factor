@@ -1,7 +1,7 @@
-;;; fuel-debug.el -- debugging factor code
+;;; fuel-debug.el -- debugging factor code -*- lexical-binding: t -*-
 
 ;; Copyright (C) 2008, 2009, 2010 Jose Antonio Ortega Ruiz
-;; See http://factorcode.org/license.txt for BSD license.
+;; See https://factorcode.org/license.txt for BSD license.
 
 ;; Author: Jose Antonio Ortega Ruiz <jao@gnu.org>
 ;; Keywords: languages, fuel, factor
@@ -308,20 +308,21 @@ the debugger."
 
 (defun fuel-debug--replace-usings (file uses)
   (pop-to-buffer (find-file-noselect file))
-  (goto-char (point-min))
-  (if (re-search-forward "^USING: " nil t)
-      (let ((begin (point))
-            (end (or (and (re-search-forward ";\\( \\|$\\)") (point))
-                     (point))))
-        (kill-region begin end))
-    (re-search-forward "^IN: " nil t)
-    (beginning-of-line)
-    (open-line 2)
-    (insert "USING: "))
-  (let ((start (point))
-        (tokens (append uses '(";"))))
-    (insert (mapconcat 'substring-no-properties tokens " "))
-    (fill-region start (point) nil)))
+  (save-excursion
+    (goto-char (point-min))
+    (if (re-search-forward "^USING: " nil t)
+        (let ((begin (point))
+              (end (or (and (re-search-forward ";\\( \\|$\\)") (point))
+                       (point))))
+          (kill-region begin end))
+      (re-search-forward "^IN: " nil t)
+      (beginning-of-line)
+      (open-line 2)
+      (insert "USING: "))
+    (let ((start (point))
+          (tokens (append uses '(";"))))
+      (insert (mapconcat 'substring-no-properties tokens " "))
+      (fill-region start (point) nil))))
 
 (defun fuel-debug-update-usings ()
   (interactive)

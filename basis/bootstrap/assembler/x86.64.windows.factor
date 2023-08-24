@@ -1,8 +1,8 @@
 ! Copyright (C) 2008 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: cpu.x86.assembler cpu.x86.assembler.operands kernel
 layouts parser sequences ;
-IN: bootstrap.x86
+IN: bootstrap.assembler.x86
 
 DEFER: stack-reg
 
@@ -22,6 +22,6 @@ DEFER: stack-reg
 
 : red-zone-size ( -- n ) 0 ;
 
-<< "vocab:bootstrap/assembler/x86.windows.factor" parse-file suffix! >> call
-<< "vocab:bootstrap/assembler/x86.64.factor" parse-file suffix! >> call
-<< "vocab:bootstrap/assembler/x86.factor" parse-file suffix! >> call
+<< "resource:basis/bootstrap/assembler/x86.windows.factor" parse-file suffix! >> call
+<< "resource:basis/bootstrap/assembler/x86.64.factor" parse-file suffix! >> call
+<< "resource:basis/bootstrap/assembler/x86.factor" parse-file suffix! >> call

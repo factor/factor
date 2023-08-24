@@ -1,7 +1,7 @@
 ! Copyright (C) 2009 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors assocs combinators compiler.cfg.predecessors
-compiler.cfg.rpo deques dlists fry kernel locals math math.order
+compiler.cfg.rpo deques dlists kernel math math.order
 namespaces sequences sorting vectors ;
 IN: compiler.cfg.dominance
 
@@ -47,7 +47,7 @@ PRIVATE>
 
 : compute-dom-children ( dom-parents -- dom-childrens )
     H{ } clone [ '[ 2dup eq? [ 2drop ] [ _ push-at ] if ] assoc-each ] keep
-    [ [ number>> ] sort-with ] assoc-map ;
+    [ [ number>> ] sort-by ] assoc-map ;
 
 SYMBOLS: preorder maxpreorder ;
 

@@ -1,4 +1,4 @@
-USING: byte-arrays checksums checksums.murmur fry kernel math
+USING: byte-arrays checksums checksums.murmur kernel math
 sequences tools.test ;
 
 { 455139366 } [ "asdf" >byte-array 0 <murmur3-32> checksum-bytes ] unit-test
@@ -25,13 +25,13 @@ sequences tools.test ;
     }
 } [
     "1234567890" [ length 1 + ] keep 156 <murmur3-32>
-    '[ _ swap head _ checksum-bytes ] { } map-integers
+    '[ _ swap head _ checksum-bytes ] map-integers
 ] unit-test
 
 
 { t } [
     "1234567890" dup >byte-array [
         [ length 1 + ] keep 156 <murmur3-32>
-        '[ _ swap head _ checksum-bytes ] { } map-integers
+        '[ _ swap head _ checksum-bytes ] map-integers
     ] bi@ =
 ] unit-test

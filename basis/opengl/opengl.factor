@@ -1,10 +1,10 @@
 ! Copyright (C) 2005, 2009 Slava Pestov.
 ! Portions copyright (C) 2007 Eduardo Cavazos.
 ! Portions copyright (C) 2008 Joe Groff.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: alien alien.c-types alien.data assocs colors
-combinators.smart continuations fry init io kernel locals macros
-math math.parser namespaces opengl.gl sequences
+combinators.smart continuations io kernel math
+math.functions math.parser namespaces opengl.gl sequences
 sequences.generalizations specialized-arrays system words ;
 FROM: alien.c-types => float ;
 SPECIALIZED-ARRAY: float
@@ -174,7 +174,7 @@ MACRO: all-enabled-client-state ( seq quot -- quot )
 
 :: with-gl-buffer ( binding id quot -- )
     binding id glBindBuffer
-    quot [ binding 0 glBindBuffer ] [ ] cleanup ; inline
+    quot [ binding 0 glBindBuffer ] finally ; inline
 
 : with-array-element-buffers ( array-buffer element-buffer quot -- )
     [ GL_ELEMENT_ARRAY_BUFFER ] 2dip '[
@@ -189,7 +189,7 @@ MACRO: all-enabled-client-state ( seq quot -- quot )
 
 :: with-vertex-array ( id quot -- )
     id glBindVertexArray
-    quot [ 0 glBindVertexArray ] [ ] cleanup ; inline
+    quot [ 0 glBindVertexArray ] finally ; inline
 
 : <gl-buffer> ( target data hint -- id )
     pick gen-gl-buffer [
@@ -228,6 +228,15 @@ MACRO: set-draw-buffers ( buffers -- quot )
 : gl-unscale ( m -- n )
     gl-scale-factor get-global [ / ] when* ; inline
 
+: gl-floor ( m -- n )
+    gl-scale floor gl-unscale ; inline
+
+: gl-ceiling ( m -- n )
+    gl-scale ceiling gl-unscale ; inline
+
+: gl-round ( m -- n )
+    gl-scale round gl-unscale ; inline
+
 : fix-coordinates ( point1 point2 -- x1 y1 x2 y2 )
     [ first2 [ gl-scale >fixnum ] bi@ ] bi@ ;
 
@@ -244,4 +253,4 @@ MACRO: set-draw-buffers ( buffers -- quot )
     GL_MODELVIEW glMatrixMode
     glLoadIdentity ;
 
-[ f gl-scale-factor set-global ] "opengl" add-startup-hook
+STARTUP-HOOK: [ f gl-scale-factor set-global ]

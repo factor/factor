@@ -1,8 +1,8 @@
 ! Copyright (C) 2009 Doug Coleman.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs byte-arrays combinators
-combinators.short-circuit compression.lzw endian fry grouping
-images images.loader io io.binary io.encodings.ascii
+combinators.short-circuit compression.lzw endian grouping
+images images.loader io io.encodings.ascii
 io.encodings.string io.encodings.utf8 io.streams.throwing kernel
 math math.bitwise math.vectors pack sequences ;
 IN: images.tiff

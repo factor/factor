@@ -1,6 +1,6 @@
 ! Copyright (C) 2010 Joe Groff.
-! See http://factorcode.org/license.txt for BSD license.
-USING: accessors fry growable kernel locals math sequences ;
+! See https://factorcode.org/license.txt for BSD license.
+USING: accessors kernel math sequences ;
 IN: sequences.inserters
 
 TUPLE: offset-growable { underlying read-only } { offset read-only } ;

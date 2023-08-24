@@ -1,10 +1,8 @@
 ! Copyright (C) 2008 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
-USING: accessors kernel kernel.private math math.private
-math.functions math.functions.private sequences parser
-namespaces make assocs quotations arrays generic generic.math
-hashtables effects compiler.units classes.algebra fry
-combinators words ;
+! See https://factorcode.org/license.txt for BSD license.
+USING: accessors arrays assocs classes.algebra combinators
+compiler.units fry generic generic.math hashtables kernel make
+math math.private namespaces quotations sequences words ;
 IN: math.partial-dispatch
 
 PREDICATE: math-partial < word
@@ -18,11 +16,11 @@ M: math-partial integer-op-input-classes
 ERROR: bad-integer-op word ;
 
 M: word integer-op-input-classes
-    dup "input-classes" word-prop
-    [ ] [ bad-integer-op ] ?if ;
+    [ "input-classes" word-prop ]
+    [ bad-integer-op ] ?unless ;
 
 : generic-variant ( op -- generic-op/f )
-    dup "derived-from" word-prop [ first ] [ ] ?if ;
+    [ "derived-from" word-prop ] [ first ] ?when ;
 
 : no-overflow-variant ( op -- fast-op )
     H{
@@ -53,35 +51,21 @@ M: word integer-op-input-classes
     '[ [ fixnum>bignum ] dip _ execute ] ;
 
 : integer-fixnum-op-quot ( fix-word big-word -- quot )
-    [
-        [ over fixnum? ] %
-        [ '[ _ execute ] , ] [ bignum-fixnum-op-quot , ] bi* \ if ,
-    ] [ ] make ;
+    bignum-fixnum-op-quot '[ over fixnum? [ _ execute ] _ if ] ;
 
 : fixnum-integer-op-quot ( fix-word big-word -- quot )
-    [
-        [ dup fixnum? ] %
-        [ '[ _ execute ] , ] [ fixnum-bignum-op-quot , ] bi* \ if ,
-    ] [ ] make ;
+    fixnum-bignum-op-quot '[ dup fixnum? [ _ execute ] _ if ] ;
 
 : integer-bignum-op-quot ( big-word -- quot )
-    [
-        [ over fixnum? ] %
-        [ fixnum-bignum-op-quot , ] [ '[ _ execute ] , ] bi \ if ,
-    ] [ ] make ;
+    [ fixnum-bignum-op-quot ] keep
+    '[ over fixnum? _ [ _ execute ] if ] ;
 
 : integer-integer-op-quot ( fix-word big-word -- quot )
-    [
-        [ 2dup both-fixnums? ] %
-        [ '[ _ execute ] , ]
-        [
-            [
-                [ dup fixnum? ] %
-                [ bignum-fixnum-op-quot , ]
-                [ integer-bignum-op-quot , ] bi \ if ,
-            ] [ ] make ,
-        ] bi* \ if ,
-    ] [ ] make ;
+    [ bignum-fixnum-op-quot ] [ integer-bignum-op-quot ] bi
+    '[
+        2dup both-fixnums?
+        [ _ execute ] [ dup fixnum? _ _ if ] if
+    ] ;
 
 : integer-op-word ( triple -- word )
     [ name>> ] map "-" join "math.partial-dispatch" create-word ;

@@ -1,10 +1,12 @@
 ! Copyright (C) 2005, 2010 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays assocs compiler.units effects fry
-generalizations generic inspector io kernel locals macros math
-namespaces prettyprint quotations sequences sequences.deep
-sequences.generalizations sorting summary tools.time words ;
+! See https://factorcode.org/license.txt for BSD license.
+USING: accessors arrays assocs combinators.short-circuit compiler.units effects
+generalizations generic inspector io kernel math namespaces prettyprint
+quotations sequences sequences.deep sequences.generalizations sorting summary
+tools.time vocabs words ;
 IN: tools.annotations
+
+SYMBOL: override-annotations?
 
 <PRIVATE
 
@@ -15,9 +17,8 @@ M: generic (reset)
 
 M: word (reset)
     dup "unannotated-def" word-prop [
-        dup dup "unannotated-def" word-prop define
-        f "unannotated-def" set-word-prop
-    ] [ drop ] if ;
+        dupd define "unannotated-def" remove-word-prop
+    ] [ drop ] if* ;
 
 PRIVATE>
 
@@ -33,7 +34,11 @@ PREDICATE: annotated < word "unannotated-def" word-prop >boolean ;
 <PRIVATE
 
 : check-annotate-twice ( word -- word )
-    dup annotated? [ cannot-annotate-twice ] when ;
+    dup annotated?
+    [ override-annotations? get
+      [ dup reset ]
+      [ cannot-annotate-twice ] if
+    ] when ;
 
 : annotate-generic ( word quot -- )
     [ "methods" word-prop values ] dip each ; inline
@@ -67,6 +72,12 @@ PRIVATE>
 
 : deep-annotate ( word quot -- )
     [ (deep-annotate) ] with-compilation-unit ;
+
+: reset-all ( -- )
+    all-words [
+        dup { [ annotated? ] [ subwords [ annotated? ] any? ] } 1||
+        [ reset ] [ drop ] if
+    ] each ;
 
 <PRIVATE
 
@@ -137,6 +148,6 @@ PRIVATE>
 
 : word-timing. ( -- )
     word-timing get >alist
-    [ second first ] sort-with
+    [ second first ] sort-by
     [ first2 first2 [ 1,000,000,000 /f ] dip 3array ] map
     simple-table. ;

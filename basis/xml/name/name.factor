@@ -1,8 +1,8 @@
 ! Copyright (C) 2005, 2009 Daniel Ehrenberg
-! See http://factorcode.org/license.txt for BSD license.
-USING: kernel namespaces accessors xml.tokenize xml.data assocs
-xml.errors xml.char-classes combinators.short-circuit splitting
-fry xml.state sequences combinators ascii math make ;
+! See https://factorcode.org/license.txt for BSD license.
+USING: accessors ascii assocs combinators
+combinators.short-circuit kernel make math namespaces sequences
+xml.char-classes xml.data xml.errors xml.state xml.tokenize ;
 IN: xml.name
 
 ! XML namespace processing: ns = namespace
@@ -24,8 +24,9 @@ SYMBOL: ns-stack
     ] { } make f like ;
 
 : add-ns ( name -- )
-    dup space>> dup ns-stack get assoc-stack
-    [ ] [ nonexist-ns ] ?if >>url drop ;
+    dup space>>
+    [ ns-stack get assoc-stack ]
+    [ nonexist-ns ] ?unless >>url drop ;
 
 : push-ns ( hash -- )
     ns-stack get push ;
@@ -35,8 +36,8 @@ SYMBOL: ns-stack
 
 : init-ns-stack ( -- )
     V{ H{
-        { "xml" "http://www.w3.org/XML/1998/namespace" }
-        { "xmlns" "http://www.w3.org/2000/xmlns" }
+        { "xml" "https://www.w3.org/XML/1998/namespace" }
+        { "xmlns" "https://www.w3.org/2000/xmlns" }
         { "" "" }
     } } clone
     ns-stack set ;
@@ -73,7 +74,7 @@ SYMBOL: ns-stack
     ] [ drop f ] if* ;
 
 : interpret-name ( str -- name )
-    dup prefixed-name [ ] [ <simple-name> ] ?if ;
+    [ prefixed-name ] [ <simple-name> ] ?unless ;
 
 PRIVATE>
 

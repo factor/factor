@@ -1,5 +1,5 @@
-USING: arrays accessors continuations kernel math system
-sequences namespaces init vocabs combinators ;
+USING: accessors combinators continuations init kernel math
+namespaces sequences system vocabs ;
 IN: game.input
 
 SYMBOLS: game-input-backend game-input-opened ;
@@ -36,9 +36,9 @@ M: f (reset-game-input) ;
 : reset-game-input ( -- )
     (reset-game-input) ;
 
-[ reset-game-input ] "game-input" add-startup-hook
-
 PRIVATE>
+
+STARTUP-HOOK: reset-game-input
 
 ERROR: game-input-not-open ;
 
@@ -48,6 +48,7 @@ ERROR: game-input-not-open ;
     ] unless
     game-input-opened [ 1 + ] change-global
     reset-mouse ;
+
 : close-game-input ( -- )
     game-input-opened [
         dup zero? [ game-input-not-open ] when
@@ -59,7 +60,7 @@ ERROR: game-input-not-open ;
     ] unless ;
 
 : with-game-input ( quot -- )
-    open-game-input [ close-game-input ] [ ] cleanup ; inline
+    open-game-input [ close-game-input ] finally ; inline
 
 TUPLE: controller handle ;
 TUPLE: controller-state x y z rx ry rz slider pov buttons ;
@@ -108,6 +109,6 @@ SYMBOLS: pressed released ;
 {
     { [ os windows? ] [ "game.input.dinput" require ] }
     { [ os macosx? ] [ "game.input.iokit" require ] }
-    { [ os linux? ] [ "game.input.gtk" require ] }
+    { [ os linux? ] [ "game.input.gtk2" require ] }
     [ ]
 } cond

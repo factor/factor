@@ -3,7 +3,6 @@ kernel make namespaces ;
 IN: editors.editpadlite
 
 SINGLETON: editpadlite
-editpadlite editor-class set-global
 
 : editpadlite-path ( -- path )
     \ editpadlite-path get [

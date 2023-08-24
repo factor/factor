@@ -1,13 +1,12 @@
 ! Copyright (C) 2009 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs classes classes.struct
-classes.tuple combinators combinators.short-circuit
-combinators.smart continuations debugger definitions effects
-eval formatting fry grouping help help.markup help.topics io
-io.streams.string kernel macros math math.statistics namespaces
-parser.notes prettyprint sequences sequences.deep sets splitting
-strings summary tools.destructors unicode vocabs vocabs.loader
-words words.constant words.symbol ;
+classes.tuple combinators combinators.short-circuit debugger
+definitions effects eval formatting grouping help help.markup
+help.topics io io.streams.string kernel macros math
+math.statistics namespaces prettyprint sequences sequences.deep
+sets splitting strings summary tools.destructors unicode vocabs
+vocabs.loader words words.constant words.symbol ;
 IN: help.lint.checks
 
 ERROR: simple-lint-error message ;
@@ -27,34 +26,29 @@ SYMBOL: vocab-articles
             "layout" ! ui.text.pango
             "script-string" ! windows.uniscribe
             "linux-monitor" ! github issue #2014, race condition in disposing of child monitors
+            "event-stream"
+            "macosx-monitor"
+            "recursive-monitor"
+            "input-port"
+            "malloc-ptr"
+            "fd"
         } member?
     ] reject ;
-
-: eval-with-stack ( str -- output )
-    [
-        [
-            parser-quiet? on parse-string [
-                output>array [
-                    nl "--- Data stack:" print stack.
-                ] unless-empty
-            ] call( quot -- )
-        ] [ nip print-error ] recover
-    ] with-string-writer ;
 
 : check-example ( element -- )
     [
         '[
             _ rest [
-                but-last "\n" join
-                eval-with-stack
+                but-last join-lines
+                (eval-with-stack>string)
                 "\n" ?tail drop
             ] keep
             last assert=
         ] vocabs-quot get call( quot -- )
     ] leaks members no-ui-disposables
     dup length 0 > [
-       dup [ class-of ] histogram-by
-       [ "Leaked resources: " write ... ] with-string-writer simple-lint-error
+        dup [ class-of ] histogram-by
+        [ "Leaked resources: " write ... ] with-string-writer simple-lint-error
     ] [
         drop
     ] if ;
@@ -90,7 +84,6 @@ SYMBOL: vocab-articles
 : contains-funky-elements? ( element -- ? )
     {
         $shuffle
-        $complex-shuffle
         $values-x/y
         $predicate
         $class-description
@@ -126,11 +119,6 @@ SYMBOL: vocab-articles
         simple-lint-error
     ] unless ;
 
-: check-nulls ( element -- )
-    \ $values swap elements
-    null swap deep-member?
-    [ "$values should not contain null" simple-lint-error ] when ;
-
 : check-see-also ( element -- )
     \ $see-also swap elements [ rest all-unique? ] all?
     [ "$see-also are not unique" simple-lint-error ] unless ;
@@ -138,11 +126,15 @@ SYMBOL: vocab-articles
 : check-modules ( element -- )
     \ $vocab-link swap elements [
         second
-        vocab-exists? [
-            "$vocab-link to non-existent vocabulary"
+        dup vocab-exists? [ drop ] [
+            "$vocab-link to non-existent vocabulary ``" "''" surround
             simple-lint-error
-        ] unless
+        ] if
     ] each ;
+
+: check-slots-tables ( element -- )
+    \ $slots swap elements [ rest [ length 2 = ] all?  ] all?
+    [ "$slots have too many values in at least one row" simple-lint-error ] unless ;
 
 : check-rendering ( element -- )
     [ print-content ] with-string-writer drop ;
@@ -154,15 +146,18 @@ SYMBOL: vocab-articles
             simple-lint-error
         ] when
     ] [
-        "  " swap subseq? [
+        "  " subseq-of? [
             "Paragraph text should not contain double spaces"
             simple-lint-error
         ] when
     ] bi ;
 
 : check-whitespace ( str1 str2 -- )
-    [ " " tail? ] [ " " head? ] bi* or
-    [ "Missing whitespace between strings" simple-lint-error ] unless ;
+    2dup [ ?last " (" member? ] [ ?first " ).,;:" member? ] bi* or
+    [ 2drop ] [
+        "Missing whitespace between strings ``%s'' and ``%s''"
+        sprintf simple-lint-error
+    ] if ;
 
 : check-bogus-nl ( element -- )
     { { $nl } { { $nl } } } [ head? ] with any? [
@@ -219,6 +214,7 @@ SYMBOL: vocab-articles
         [ check-examples ]
         [ check-modules ]
         [ check-descriptions ]
+        [ check-slots-tables ]
     } cleave ;
 
 : files>vocabs ( -- assoc )

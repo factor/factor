@@ -1,10 +1,9 @@
 ! Copyright (C) 2003, 2010 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays classes colors.constants combinators
-continuations generic grouping io io.streams.string io.styles
-kernel make math math.parser namespaces prettyprint.config
-prettyprint.custom prettyprint.sections sequences strings
-vocabs.prettyprint words ;
+! See https://factorcode.org/license.txt for BSD license.
+USING: accessors arrays colors combinators grouping io
+io.streams.string io.styles kernel make math namespaces
+prettyprint.config prettyprint.custom prettyprint.sections
+sequences strings vocabs.prettyprint words ;
 IN: prettyprint
 
 : with-use ( obj quot -- )
@@ -35,19 +34,14 @@ IN: prettyprint
 
 : short. ( obj -- ) pprint-short nl ;
 
-: error-in-pprint ( obj -- str )
-    class-of name>> "~pprint error: " "~" surround ;
-
 : .b ( n -- ) 2 number-base [ . ] with-variable ;
 : .o ( n -- ) 8 number-base [ . ] with-variable ;
 : .h ( n -- ) 16 number-base [ . ] with-variable ;
 
-: stack. ( seq -- )
-    [
-        [ short. ] [
-            drop [ error-in-pprint ] keep write-object nl
-        ] recover
-    ] each ;
+: stack. ( seq -- ) [ short. ] each ;
+
+: datastack. ( seq -- )
+    [ nl "--- Data stack:" print stack. ] unless-empty ;
 
 : .s ( -- ) get-datastack stack. ;
 : .r ( -- ) get-retainstack stack. ;
@@ -76,7 +70,7 @@ SYMBOL: =>
     ] [ ] make ;
 
 : remove-breakpoints ( quot pos -- quot' )
-    1 + short cut [ (remove-breakpoints) ] bi@ [ => ] glue ;
+    1 + index-or-length cut [ (remove-breakpoints) ] bi@ [ => ] glue ;
 
 : optimized-frame? ( triple -- ? ) second word? ;
 
@@ -84,11 +78,7 @@ SYMBOL: =>
     first word? ;
 
 : frame-word. ( triple -- )
-    first {
-        { [ dup method? ] [ "Method: " write pprint ] }
-        { [ dup word? ] [ "Word: " write pprint ] }
-        [ drop ]
-    } cond ;
+    first pprint ;
 
 : optimized-frame. ( triple -- )
     [
@@ -100,7 +90,6 @@ SYMBOL: =>
     [
         [ "(U)" write ] with-cell
         [
-            "Quotation: " write
             dup [ second ] [ third ] bi remove-breakpoints
             H{
                 { nesting-limit 3 }

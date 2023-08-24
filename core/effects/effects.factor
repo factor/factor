@@ -1,5 +1,5 @@
 ! Copyright (C) 2006, 2010 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors arrays classes combinators kernel make math
 math.order math.parser sequences sequences.private strings words ;
 IN: effects
@@ -27,7 +27,7 @@ TUPLE: effect
     [ out>> length ] [ in>> length ] bi - ; inline
 
 : variable-effect? ( effect -- ? )
-    [ in-var>> ] [ out-var>> ] bi or ;
+    dup in-var>> [ drop t ] [ out-var>> ] if ;
 
 : bivariable-effect? ( effect -- ? )
     [ in-var>> ] [ out-var>> ] bi = not ;
@@ -44,10 +44,11 @@ TUPLE: effect
     } cond 2nip ; inline
 
 : effect= ( effect1 effect2 -- ? )
-    [ [ in>> length ] same? ]
-    [ [ out>> length ] same? ]
-    [ [ terminated?>> ] same? ]
-    2tri and and ;
+    2dup [ in>> length ] same? [
+        2dup [ out>> length ] same? [
+            [ terminated?>> ] same?
+        ] [ 2drop f ] if
+    ] [ 2drop f ] if ;
 
 GENERIC: effect>string ( obj -- str )
 M: string effect>string ;
@@ -61,20 +62,23 @@ M: pair effect>string
         nip effect>string ":" prepend
     ] if ;
 
-: stack-picture ( seq -- string )
-    [ [ effect>string % CHAR: \s , ] each ] "" make ;
+<PRIVATE
 
-: var-picture ( var -- string )
-    [ ".." " " surround ]
-    [ "" ] if* ;
+: stack-picture% ( seq -- )
+    [ effect>string % CHAR: \s , ] each ;
 
-M: effect effect>string ( effect -- string )
+: var-picture% ( var -- )
+    [ ".." % % CHAR: \s , ] when* ;
+
+PRIVATE>
+
+M: effect effect>string
     [
         "( " %
-        dup in-var>> var-picture %
-        dup in>> stack-picture % "-- " %
-        dup out-var>> var-picture %
-        dup out>> stack-picture %
+        dup in-var>> var-picture%
+        dup in>> stack-picture% "-- " %
+        dup out-var>> var-picture%
+        dup out>> stack-picture%
         dup terminated?>> [ "* " % ] when
         drop
         ")" %
@@ -102,7 +106,13 @@ M: word stack-effect
 M: deferred stack-effect call-next-method ( -- * ) or ;
 
 M: effect clone
-    [ in>> clone ] [ out>> clone ] bi <effect> ;
+    {
+        [ in>> clone ]
+        [ out>> clone ]
+        [ terminated?>> ]
+        [ in-var>> ]
+        [ out-var>> ]
+    } cleave effect boa ;
 
 : stack-height ( word -- n )
     stack-effect effect-height ; inline

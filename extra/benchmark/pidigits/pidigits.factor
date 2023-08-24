@@ -1,9 +1,8 @@
 ! Copyright (c) 2009 Aaron Schaefer. All rights reserved.
 ! The contents of this file are licensed under the Simplified BSD License
-! A copy of the license is available at http://factorcode.org/license.txt
-USING: arrays formatting fry grouping io kernel locals math
-math.functions math.matrices math.parser math.primes.factors
-math.vectors prettyprint sequences sequences.deep ;
+! A copy of the license is available at https://factorcode.org/license.txt
+USING: arrays formatting io kernel math math.matrices
+math.parser sequences ;
 IN: benchmark.pidigits
 
 : extract ( z x -- n )
@@ -19,13 +18,13 @@ IN: benchmark.pidigits
     [ 2array ] 2bi@ 2array ;
 
 : produce ( z y -- z' )
-    [ 10 ] dip -10 * 0 1 >matrix swap m. ;
+    [ 10 ] dip -10 * 0 1 >matrix swap mdot ;
 
 : gen-x ( x -- matrix )
     dup 2 * 1 + [ 2 * 0 ] keep >matrix ;
 
 : consume ( z k -- z' )
-    gen-x m. ;
+    gen-x mdot ;
 
 :: (padded-total) ( row col -- str n format )
     "" row col + "%" "s\t:%d\n"

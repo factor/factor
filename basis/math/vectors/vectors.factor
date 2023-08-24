@@ -1,8 +1,7 @@
 ! Copyright (C) 2005, 2010 Slava Pestov, Joe Groff.
-! See http://factorcode.org/license.txt for BSD license.
-USING: arrays alien.c-types assocs kernel sequences math
-math.functions grouping math.order math.libm math.floats.private
-fry combinators byte-arrays accessors locals ;
+! See https://factorcode.org/license.txt for BSD license.
+USING: arrays assocs combinators grouping kernel math
+math.functions math.libm math.order sequences ;
 QUALIFIED-WITH: alien.c-types c
 IN: math.vectors
 
@@ -131,7 +130,7 @@ M: object vshuffle2-elements
 GENERIC#: vshuffle-bytes 1 ( v perm -- w )
 
 GENERIC: vshuffle ( v perm -- w )
-M: array vshuffle ( v perm -- w )
+M: array vshuffle
     vshuffle-elements ; inline
 
 GENERIC#: vlshift 1 ( v n -- w )
@@ -217,31 +216,35 @@ M: object v?
 : vsupremum ( seq -- vmax ) [ ] [ vmax ] map-reduce ; inline
 : vinfimum ( seq -- vmin ) [ ] [ vmin ] map-reduce ; inline
 
-GENERIC: v. ( u v -- x )
-M: object v. [ * ] [ + ] 2map-reduce ; inline
+GENERIC: vdot ( u v -- x )
+M: object vdot [ * ] [ + ] 2map-reduce ; inline
 
-GENERIC: h. ( u v -- x )
-M: object h. [ conjugate * ] [ + ] 2map-reduce ; inline
+GENERIC: hdot ( u v -- x )
+M: object hdot [ conjugate * ] [ + ] 2map-reduce ; inline
 
 GENERIC: norm-sq ( v -- x )
 M: object norm-sq [ absq ] [ + ] map-reduce ; inline
 
-: l1-norm ( v -- x ) [ abs ] map-sum ; inline
+: l1-norm ( k -- x ) [ abs ] map-sum ; inline
 
-: norm ( v -- x ) norm-sq sqrt ; inline
+: l2-norm ( k -- x ) norm-sq sqrt ; inline
 
-: p-norm-default ( v p -- x )
+ALIAS: norm l2-norm
+
+: l-infinity-norm ( k -- x ) supremum ; inline
+
+: p-norm-default ( k p -- x )
     [ [ [ abs ] dip ^ ] curry map-sum ] keep recip ^ ; inline
 
-: p-norm ( v p -- x )
+: p-norm ( k p -- x )
     {
         { [ dup 1 = ] [ drop l1-norm ] }
-        { [ dup 2 = ] [ drop norm ] }
+        { [ dup 2 = ] [ drop l2-norm ] }
         { [ dup fp-infinity? ] [ drop supremum ] }
         [ p-norm-default ]
     } cond ;
 
-: normalize ( v -- w ) dup norm v/n ; inline
+: normalize ( v -- w ) dup l2-norm v/n ; inline
 
 GENERIC: distance ( u v -- x )
 M: object distance [ - absq ] [ + ] 2map-reduce sqrt ; inline
@@ -279,3 +282,19 @@ PRIVATE>
 
 : vclamp ( v min max -- w )
     rot vmin vmax ; inline
+
+: cross ( vec1 vec2 -- vec3 )
+    [ [ { 1 2 0 } vshuffle ] [ { 2 0 1 } vshuffle ] bi* v* ]
+    [ [ { 2 0 1 } vshuffle ] [ { 1 2 0 } vshuffle ] bi* v* ] 2bi v- ; inline
+
+:: normal ( vec1 vec2 vec3 -- vec4 )
+    vec2 vec1 v- vec3 vec1 v- cross normalize ; inline
+
+: proj ( v u -- w )
+    [ [ vdot ] [ norm-sq ] bi / ] keep n*v ;
+
+: perp ( v u -- w )
+    dupd proj v- ;
+
+: angle-between ( v u -- a )
+    [ normalize ] bi@ hdot acos ;

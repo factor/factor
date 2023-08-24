@@ -1,8 +1,8 @@
 ! Copyright (C) 2016 Doug Coleman.
-! See http://factorcode.org/license.txt for BSD license.
-USING: assocs fry hashtables io io.encodings.utf8 io.files
-io.streams.string json.reader json.writer kernel math namespaces
-sequences strings ;
+! See https://factorcode.org/license.txt for BSD license.
+USING: assocs hashtables io io.encodings.utf8 io.files
+io.streams.string json kernel math namespaces sequences strings
+;
 IN: json.prettyprint
 
 <PRIVATE
@@ -18,9 +18,9 @@ GENERIC: pprint-json* ( obj -- )
         <string> write
     ] when ;
 
-M: object pprint-json* json-print ;
-M: string pprint-json* json-print ;
-M: f pprint-json* json-print ;
+M: object pprint-json* write-json ;
+M: string pprint-json* write-json ;
+M: f pprint-json* write-json ;
 
 M: sequence pprint-json*
     [
@@ -33,7 +33,7 @@ M: sequence pprint-json*
         write-spaces "]" write
     ] if-empty ;
 
-M: hashtable pprint-json*
+M: assoc pprint-json*
     dup assoc-empty? [
         drop "{ }" write
     ] [

@@ -1,5 +1,5 @@
 ! Copyright (C) 2005, 2006 Doug Coleman.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors alien alien.c-types alien.syntax classes.struct
 generalizations kernel literals math math.bitwise namespaces
 parser system windows.com.syntax windows.kernel32 windows.ole32
@@ -183,11 +183,11 @@ CONSTANT: CF_LOCALE           16
 CONSTANT: CF_DIBV5            17
 CONSTANT: CF_MAX              18
 
-CONSTANT: CF_OWNERDISPLAY 0x0080
-CONSTANT: CF_DSPTEXT 0x0081
-CONSTANT: CF_DSPBITMAP 0x0082
-CONSTANT: CF_DSPMETAFILEPICT 0x0083
-CONSTANT: CF_DSPENHMETAFILE 0x008E
+CONSTANT: CF_OWNERDISPLAY     0x0080
+CONSTANT: CF_DSPTEXT          0x0081
+CONSTANT: CF_DSPBITMAP        0x0082
+CONSTANT: CF_DSPMETAFILEPICT  0x0083
+CONSTANT: CF_DSPENHMETAFILE   0x008E
 
 ! "Private" formats don't get GlobalFree()'d
 CONSTANT: CF_PRIVATEFIRST 0x200
@@ -978,16 +978,7 @@ CONSTANT: DISP_CHANGE_NOTUPDATED -3
 CONSTANT: DISP_CHANGE_BADFLAGS   -4
 CONSTANT: DISP_CHANGE_BADPARAM   -5
 
-
-
-STRUCT: DEVMODE
-    { dmDeviceName TCHAR[CCHDEVICENAME] }
-    { dmSpecVersion WORD }
-    { dmDriverVersion WORD }
-    { dmSize WORD }
-    { dmDriverExtra WORD }
-    { dmFields DWORD }
-
+STRUCT: DEVMODE_PROPS1
     { dmOrientation short }
     { dmPaperSize short }
     { dmPaperLength short }
@@ -995,14 +986,33 @@ STRUCT: DEVMODE
     { dmScale short }
     { dmCopies short }
     { dmDefaultSource short }
-    { dmPrintQuality short }
+    { dmPrintQuality short } ;
+
+STRUCT: DEVMODE_PROPS2
+    { dmPosition POINTL }
+    { dmDisplayOrientation DWORD }
+    { dmDisplayFixedOutput DWORD } ;
+
+UNION-STRUCT: DEVMODE_UNION_1
+    { props1 DEVMODE_PROPS1 }
+    { props2 DEVMODE_PROPS2 } ;
+
+STRUCT: DEVMODE
+    { dmDeviceName WCHAR[CCHDEVICENAME] }
+    { dmSpecVersion WORD }
+    { dmDriverVersion WORD }
+    { dmSize WORD }
+    { dmDriverExtra WORD }
+    { dmFields DWORD }
+
+    { props DEVMODE_UNION_1 }
 
     { dmColor short }
     { dmDuplex short }
     { dmYResolution short }
     { dmTTOption short }
     { dmCollate short }
-    { dmFormName TCHAR[CCHFORMNAME] }
+    { dmFormName WCHAR[CCHFORMNAME] }
     { dmLogPixels WORD }
     { dmBitsPerPel DWORD }
     { dmPelsWidth DWORD }
@@ -1011,34 +1021,28 @@ STRUCT: DEVMODE
     { dmDisplayFrequency DWORD }
     { dmiCMMethod DWORD }
     { dmICMIntent DWORD }
-
     { dmMediaType DWORD }
     { dmDitherType DWORD }
     { dmReserved1 DWORD }
     { dmReserved2 DWORD }
-    { dmPanningWidth DWORD } ;
+    { dmPanningWidth DWORD }
+    { dmPanningHeight DWORD } ;
 
-! union { DWORD dmDisplayFlags; DWORD dmNup; } ;
-  ! union {
-    ! struct {
-      ! short dmOrientation;
-      ! short dmPaperSize;
-      ! short dmPaperLength;
-      ! short dmPaperWidth;
-      ! short dmScale;
-      ! short dmCopies;
-      ! short dmDefaultSource;
-      ! short dmPrintQuality;
-    ! } ;
-    ! struct {
-      ! POINTL dmPosition;
-      ! DWORD dmDisplayOrientation;
-      ! DWORD dmDisplayFixedOutput;
-    ! } ;
-  ! } ;
-
+TYPEDEF: DEVMODE DEVMODEW
 TYPEDEF: DEVMODE* PDEVMODE
 TYPEDEF: DEVMODE* LPDEVMODE
+
+STRUCT: DISPLAY_DEVICEW
+    { cb DWORD }
+    { DeviceName CHAR[32] }
+    { DeviceString CHAR[128] }
+    { StateFlags DWORD }
+    { DeviceID CHAR[128] }
+    { DeviceKey CHAR[128] } ;
+TYPEDEF: DISPLAY_DEVICEW* PDISPLAY_DEVICEW
+TYPEDEF: DISPLAY_DEVICEW* LPDISPLAY_DEVICEW
+
+CALLBACK: BOOL DESKTOPENUMPROCW ( LPWSTR arg1, LPARAM arg2 )
 
 CONSTANT: MSGFLT_ADD    1
 CONSTANT: MSGFLT_REMOVE 2
@@ -1546,14 +1550,31 @@ FUNCTION: BOOL EndPaint ( HWND hWnd, PAINTSTRUCT* lpPaint )
 ! FUNCTION: EnumChildWindows
 FUNCTION: UINT EnumClipboardFormats ( UINT format )
 ! FUNCTION: EnumDesktopsA
-! FUNCTION: EnumDesktopsW
+
+FUNCTION: BOOL EnumDesktopsW (
+    HWINSTA          hwinsta,
+    DESKTOPENUMPROCW lpEnumFunc,
+    LPARAM           lParam
+)
+
 FUNCTION: BOOL EnumDesktopWindows ( HDESK hDesktop, WNDENUMPROC lpFn, LPARAM lParam )
 ! FUNCTION: EnumDisplayDevicesA
-! FUNCTION: EnumDisplayDevicesW
-! FUNCTION: BOOL EnumDisplayMonitors ( HDC hdc, LPCRECT lprcClip, MONITORENUMPROC lpfnEnum, LPARAM dwData )
+FUNCTION: BOOL EnumDisplayDevicesW (
+    LPCWSTR          lpDevice,
+    DWORD            iDevNum,
+    PDISPLAY_DEVICEW lpDisplayDevice,
+    DWORD            dwFlags
+)
+CALLBACK: BOOL MONITORENUMPROC ( HMONITOR arg1, HDC arg2, LPRECT arg3, LPARAM arg4 )
+FUNCTION: BOOL EnumDisplayMonitors ( HDC hdc, LPRECT lprcClip, MONITORENUMPROC lpfnEnum, LPARAM dwData )
 ! FUNCTION: EnumDisplaySettingsA
 ! FUNCTION: EnumDisplaySettingsExA
-! FUNCTION: EnumDisplaySettingsExW
+FUNCTION: BOOL EnumDisplaySettingsExW ( LPCWSTR  lpszDeviceName,
+  DWORD    iModeNum,
+  DEVMODEW *lpDevMode,
+  DWORD    dwFlags
+)
+
 FUNCTION: BOOL EnumDisplaySettingsW ( LPCTSTR lpszDeviceName, DWORD iModeNum, DEVMODE *lpDevMode )
 ALIAS: EnumDisplaySettings EnumDisplaySettingsW
 ! FUNCTION: EnumPropsA
@@ -1643,8 +1664,8 @@ FUNCTION: HKL GetKeyboardLayout ( DWORD idThread )
 ! FUNCTION: GetKeyboardLayoutList
 ! FUNCTION: GetKeyboardLayoutNameA
 ! FUNCTION: GetKeyboardLayoutNameW
-! FUNCTION: GetKeyboardState
-! FUNCTION: GetKeyboardType
+FUNCTION: BOOL GetKeyboardState ( BYTE *lpKeyState )
+FUNCTION: int GetKeyboardType ( int nTypeFlag )
 ! FUNCTION: GetKeyNameTextA
 ! FUNCTION: GetKeyNameTextW
 FUNCTION: SHORT GetKeyState ( int nVirtKey )
@@ -1673,8 +1694,7 @@ ALIAS: GetMessage GetMessageW
 FUNCTION: LPARAM GetMessageExtraInfo ( )
 ! FUNCTION: GetMessagePos
 ! FUNCTION: GetMessageTime
-! FUNCTION: GetMonitorInfoA
-
+! FUNCTION: BOOL GetMonitorInfoA ( HMONITOR hMonitor, LPMONITORINFO lpmi )
 FUNCTION: BOOL GetMonitorInfoW ( HMONITOR hMonitor, LPMONITORINFO lpmi )
 ALIAS: GetMonitorInfo GetMonitorInfoW
 
@@ -1685,7 +1705,7 @@ ALIAS: GetMonitorInfo GetMonitorInfoW
 FUNCTION: HWND GetParent ( HWND hWnd )
 FUNCTION: int GetPriorityClipboardFormat ( UINT* paFormatPriorityList, int cFormats )
 ! FUNCTION: GetProcessDefaultLayout
-! FUNCTION: GetProcessWindowStation
+FUNCTION: HWINSTA GetProcessWindowStation ( )
 ! FUNCTION: GetProgmanWindow
 ! FUNCTION: GetPropA
 ! FUNCTION: GetPropW
@@ -1898,7 +1918,7 @@ ALIAS: MessageBoxEx MessageBoxExW
 
 ! FUNCTION: ModifyMenuA
 ! FUNCTION: ModifyMenuW
-! FUNCTION: MonitorFromPoint
+FUNCTION: HMONITOR MonitorFromPoint ( POINT pt, DWORD dwFlags )
 ! FUNCTION: MonitorFromRect
 FUNCTION: HMONITOR MonitorFromWindow ( HWND hWnd, DWORD dwFlags )
 ! FUNCTION: mouse_event
@@ -2129,7 +2149,7 @@ ALIAS: SystemParametersInfo SystemParametersInfoW
 ! FUNCTION: TileWindows
 ! FUNCTION: ToAscii
 ! FUNCTION: ToAsciiEx
-! FUNCTION: ToUnicode
+FUNCTION: int ToUnicode ( UINT wVirtKey, UINT wScanCode, BYTE *lpKeyState, LPWSTR pwszBuff, int cchBuff, UINT wFlags )
 ! FUNCTION: ToUnicodeEx
 FUNCTION: BOOL TrackMouseEvent ( LPTRACKMOUSEEVENT lpEventTrack )
 ! FUNCTION: TrackPopupMenu
@@ -2259,3 +2279,145 @@ STRUCT: POWERBROADCAST_SETTING
 
 : msgbox ( str -- )
     f swap "DebugMsg" MB_OK MessageBox drop ;
+
+! HighDPI
+TYPEDEF: HANDLE DPI_AWARENESS_CONTEXT
+
+ENUM: DPI_AWARENESS
+    { DPI_AWARENESS_INVALID -1 }
+    { DPI_AWARENESS_UNAWARE 0 }
+    { DPI_AWARENESS_SYSTEM_AWARE 1 }
+    { DPI_AWARENESS_PER_MONITOR_AWARE 2 } ;
+
+FUNCTION: BOOL AdjustWindowRectExForDpi (
+    LPRECT lpRect,
+    DWORD  dwStyle,
+    BOOL   bMenu,
+    DWORD  dwExStyle,
+    UINT   dpi
+)
+
+FUNCTION: BOOL EnableNonClientDpiScaling (
+    HWND hwnd
+)
+
+FUNCTION: BOOL AreDpiAwarenessContextsEqual (
+    DPI_AWARENESS_CONTEXT dpiContextA,
+    DPI_AWARENESS_CONTEXT dpiContextB
+)
+
+ENUM: DIALOG_CONTROL_DPI_CHANGE_BEHAVIORS
+    DCDC_DEFAULT
+    DCDC_DISABLE_FONT_UPDATE
+    DCDC_DISABLE_RELAYOUT ;
+
+FUNCTION: DIALOG_CONTROL_DPI_CHANGE_BEHAVIORS GetDialogControlDpiChangeBehavior (
+    HWND hWnd
+)
+
+ENUM: DIALOG_DPI_CHANGE_BEHAVIORS
+    DDC_DEFAULT
+    DDC_DISABLE_ALL
+    DDC_DISABLE_RESIZE
+    DDC_DISABLE_CONTROL_RELAYOUT ;
+
+FUNCTION: DIALOG_DPI_CHANGE_BEHAVIORS GetDialogDpiChangeBehavior (
+    HWND hDlg
+)
+
+FUNCTION: UINT GetDpiForSystem ( )
+
+FUNCTION: UINT GetDpiForWindow ( HWND hwnd )
+
+FUNCTION: UINT GetSystemDpiForProcess (
+    HANDLE hProcess
+)
+
+FUNCTION: int GetSystemMetricsForDpi (
+    int  nIndex,
+    UINT dpi
+)
+
+FUNCTION: DPI_AWARENESS_CONTEXT GetThreadDpiAwarenessContext ( )
+FUNCTION: DPI_AWARENESS_CONTEXT SetThreadDpiAwarenessContext ( DPI_AWARENESS_CONTEXT dpiContext )
+
+ENUM: DPI_HOSTING_BEHAVIOR
+    DPI_HOSTING_BEHAVIOR_INVALID
+    DPI_HOSTING_BEHAVIOR_DEFAULT
+    DPI_HOSTING_BEHAVIOR_MIXED ;
+
+FUNCTION: DPI_HOSTING_BEHAVIOR GetThreadDpiHostingBehavior ( )
+
+FUNCTION: DPI_HOSTING_BEHAVIOR GetWindowDpiHostingBehavior (
+    HWND hwnd
+)
+
+FUNCTION: BOOL SetProcessDPIAware ( )
+FUNCTION: BOOL SetProcessDpiAwarenessContext ( DPI_AWARENESS_CONTEXT value )
+
+FUNCTION: DPI_AWARENESS_CONTEXT GetWindowDpiAwarenessContext ( HWND hwnd )
+FUNCTION: DPI_AWARENESS GetAwarenessFromDpiAwarenessContext ( DPI_AWARENESS_CONTEXT value )
+
+: get-thread-dpi-awareness ( -- enum )
+    GetThreadDpiAwarenessContext GetAwarenessFromDpiAwarenessContext ;
+
+FUNCTION: BOOL IsValidDpiAwarenessContext (
+    DPI_AWARENESS_CONTEXT value
+)
+
+! DPI_AWARENESS_CONTEXT experimentally:
+! USE: ranges -100 1000 [a..b] [ <alien> IsValidDpiAwarenessContext ] zip-with
+! [ nip 0 > ] assoc-filter keys .
+! { -5 -4 -3 -2 -1 17 18 34 273 529 785 }
+
+! -4 <alien> 34 <alien> AreDpiAwarenessContextsEqual . ! t
+! -5 <alien> -5 <alien> AreDpiAwarenessContextsEqual . ! t
+! -6 <alien> -6 <alien> AreDpiAwarenessContextsEqual . ! f
+: DPI_AWARENESS_CONTEXT_UNAWARE ( -- DPI_AWARENESS_CONTEXT )
+    -1 <alien> ;
+
+: DPI_AWARENESS_CONTEXT_SYSTEM_AWARE ( -- DPI_AWARENESS_CONTEXT )
+    -2 <alien> ;
+
+: DPI_AWARENESS_CONTEXT_PER_MONITOR_AWARE ( -- DPI_AWARENESS_CONTEXT )
+    -3 <alien> ;
+
+: DPI_AWARENESS_CONTEXT_PER_MONITOR_AWARE_V2 ( -- DPI_AWARENESS_CONTEXT )
+    -4 <alien> ;
+
+: DPI_AWARENESS_CONTEXT_UNAWARE_GDISCALED ( -- DPI_AWARENESS_CONTEXT )
+    -5 <alien> ;
+
+FUNCTION: BOOL LogicalToPhysicalPointForPerMonitorDPI (
+    HWND    hWnd,
+    LPPOINT lpPoint
+)
+
+FUNCTION: BOOL PhysicalToLogicalPointForPerMonitorDPI (
+    HWND    hWnd,
+    LPPOINT lpPoint
+)
+
+FUNCTION: BOOL SetDialogControlDpiChangeBehavior (
+    HWND                                hWnd,
+    DIALOG_CONTROL_DPI_CHANGE_BEHAVIORS mask,
+    DIALOG_CONTROL_DPI_CHANGE_BEHAVIORS values
+)
+
+FUNCTION: BOOL SetDialogDpiChangeBehavior (
+    HWND                        hDlg,
+    DIALOG_DPI_CHANGE_BEHAVIORS mask,
+    DIALOG_DPI_CHANGE_BEHAVIORS values
+)
+
+FUNCTION: DPI_HOSTING_BEHAVIOR SetThreadDpiHostingBehavior (
+    DPI_HOSTING_BEHAVIOR value
+)
+
+FUNCTION: BOOL SystemParametersInfoForDpi (
+    UINT  uiAction,
+    UINT  uiParam,
+    PVOID pvParam,
+    UINT  fWinIni,
+    UINT  dpi
+)

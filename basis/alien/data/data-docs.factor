@@ -1,7 +1,7 @@
-USING: alien alien.c-types help.syntax help.markup libc
-kernel.private byte-arrays math strings hashtables alien.syntax
-alien.strings sequences io.encodings.string debugger destructors
-vocabs.loader classes.struct quotations kernel ;
+USING: alien alien.c-types alien.strings alien.syntax
+byte-arrays classes.struct destructors help.markup help.syntax
+io.encodings.string kernel libc math quotations sequences
+strings ;
 IN: alien.data
 
 HELP: >c-array
@@ -41,8 +41,8 @@ HELP: memory>byte-array
 
 HELP: cast-array
 { $values { "byte-array" byte-array } { "c-type" "a C type" } { "array" "a specialized array" } }
-{ $description "Converts a byte array into a specialized array by interpreting the bytes in as machine-specific values. Code which uses this word is unportable." }
-{ $notes "The appropriate specialized array vocabulary must be loaded; otherwise, an error will be thrown. See the " { $vocab-link "specialized-arrays" } " vocabulary for details on the underlying sequence type constructed." }
+{ $description "Converts a " { $link byte-array } " into a specialized array by interpreting the bytes in it as machine-specific values. Code using this word is unportable." }
+{ $notes "The appropriate specialized array vocabulary must be loaded, otherwise an error will be thrown. See the " { $vocab-link "specialized-arrays" } " vocabulary for details on the underlying sequence type constructed." }
 { $errors "Throws an error if the type does not exist, the necessary specialized array vocabulary is not loaded, or the requested size is negative." } ;
 
 HELP: malloc-array
@@ -159,8 +159,8 @@ ARTICLE: "c-boxes" "C value boxes"
   "FUNCTION: int do_foo ( int* a )"
 }
 "and writes to the pointer 'a', then it can be called like this:"
-{  $code
-   "1234 int <ref> [ do_foo ] keep int deref"
+{ $code
+    "1234 int <ref> [ do_foo ] keep int deref"
 }
 "The stack will then contain the two integers emitted by the 'do_foo' function." ;
 
@@ -257,4 +257,4 @@ ARTICLE: "c-out-params" "Output parameters in C"
 { $code
   "1234 { c-string } [ do_frob ] with-out-parameters"
 }
-"which would put the functions return value and error string on the stack." ;
+"which would put the function's return value and error string on the stack." ;

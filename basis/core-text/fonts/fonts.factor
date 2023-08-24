@@ -1,9 +1,9 @@
 ! Copyright (C) 2009 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors alien.c-types alien.syntax assocs combinators
 core-foundation core-foundation.dictionaries
 core-foundation.strings core-graphics.types destructors fonts
-init kernel locals math memoize unix.types ;
+init kernel math memoize unix.types ;
 IN: core-text.fonts
 
 TYPEDEF: void* CTFontRef
@@ -77,7 +77,7 @@ FUNCTION: CGFloat CTFontGetXHeight ( CTFontRef font )
 
 CONSTANT: font-names
     H{
-        { "monospace" "Monaco" }
+        { "monospace" "Menlo" }
         { "sans-serif" "LucidaGrande" }
         { "serif" "Times" }
     }
@@ -118,7 +118,7 @@ MEMO: (cache-font-metrics) ( name size traits -- metrics )
 : cache-font-metrics ( font -- metrics )
     [ name>> ] [ size>> ] [ font-traits ] tri (cache-font-metrics) ;
 
-[
+STARTUP-HOOK: [
     \ (cache-font) reset-memoized
     \ (cache-font-metrics) reset-memoized
-] "core-text.fonts" add-startup-hook
+]

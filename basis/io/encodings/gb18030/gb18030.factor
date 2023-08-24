@@ -1,9 +1,10 @@
 ! Copyright (C) 2009 Daniel Ehrenberg
-! See http://factorcode.org/license.txt for BSD license.
-USING: xml xml.data kernel io io.encodings interval-maps splitting fry
-math.parser sequences combinators assocs locals accessors math arrays
-byte-arrays ascii io.files biassocs math.order namespaces
-combinators.short-circuit io.binary io.encodings.iana ;
+! See https://factorcode.org/license.txt for BSD license.
+USING: accessors arrays ascii assocs biassocs byte-arrays
+combinators combinators.short-circuit interval-maps io
+io.encodings io.encodings.iana io.files kernel math
+math.order math.parser namespaces sequences splitting xml
+xml.data ;
 FROM: io.encodings.ascii => ascii ;
 IN: io.encodings.gb18030
 
@@ -16,10 +17,10 @@ gb18030 "GB18030" register-encoding
 ! GB to mean GB18030 is a terrible abuse of notation
 
 ! Resource file from:
-! http://source.icu-project.org/repos/icu/data/trunk/charset/data/xml/gb-18030-2000.xml
+! https://source.icu-project.org/repos/icu/data/trunk/charset/data/xml/gb-18030-2000.xml
 
 ! Algorithms from:
-! http://www-128.ibm.com/developerworks/library/u-china.html
+! https://www-128.ibm.com/developerworks/library/u-china.html
 
 : linear ( bytes -- num )
     ! This hard-codes bMin and bMax
@@ -29,7 +30,7 @@ gb18030 "GB18030" register-encoding
 TUPLE: range ufirst ulast bfirst blast ;
 
 : b>byte-array ( string -- byte-array )
-    " " split [ hex> ] B{ } map-as ;
+    split-words [ hex> ] B{ } map-as ;
 
 : add-range ( contained ranges -- )
     [
@@ -92,10 +93,9 @@ ascii <file-reader> xml>gb-data
         [ ufirst>> - ] [ bfirst>> ] bi + unlinear
     ] [ encode-error ] if* ;
 
-M: gb18030 encode-char ( char stream encoding -- )
+M: gb18030 encode-char
     drop [
-        dup mapping get-global at
-        [ ] [ lookup-range ] ?if
+        [ mapping get-global at ] [ lookup-range ] ?unless
     ] dip stream-write ;
 
 : second-byte? ( ch -- ? ) ! of a double-byte character
@@ -109,11 +109,11 @@ M: gb18030 encode-char ( char stream encoding -- )
     { [ length 2 = ] [ first quad-1/3? ] [ second quad-2/4? ] } 1&& ;
 
 : decode-quad ( byte-array -- char )
-    dup mapping get-global value-at [ ] [
+    [ mapping get-global value-at ] [
         linear dup gb>u get-global interval-at [
             [ bfirst>> - ] [ ufirst>> ] bi +
         ] [ drop replacement-char ] if*
-    ] ?if ;
+    ] ?unless ;
 
 : four-byte ( stream byte1 byte2 -- char )
     rot 2 swap stream-read dup last-bytes?
@@ -128,7 +128,7 @@ M: gb18030 encode-char ( char stream encoding -- )
         [ 3drop replacement-char ]
     } cond ;
 
-M: gb18030 decode-char ( stream encoding -- char )
+M: gb18030 decode-char
     drop dup stream-read1 {
         { [ dup not ] [ 2drop f ] }
         { [ dup ascii? ] [ nip 1byte-array mapping get-global value-at ] }

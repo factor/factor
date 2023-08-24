@@ -1,5 +1,5 @@
 ! Copyright (C) 2005, 2006 Daniel Ehrenberg
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors classes classes.tuple classes.tuple.parser
 classes.tuple.private combinators generalizations kernel math
 namespaces parser sequences vocabs.loader words xml.state ;
@@ -100,7 +100,7 @@ XML-ERROR: bad-cdata ;
 
 XML-ERROR: not-enough-characters ;
 
-XML-ERROR: bad-doctype contents ;
+XML-ERROR: bad-doctype read-contents ;
 
 XML-ERROR: bad-encoding encoding ;
 

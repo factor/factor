@@ -1,6 +1,7 @@
-USING: accessors assocs base64 byte-arrays combinators.short-circuit
-continuations couchdb fry furnace.auth.providers json.writer kernel
-locals make mirrors namespaces sequences strings urls urls.encoding ;
+USING: accessors assocs base64 byte-arrays
+combinators.short-circuit continuations couchdb
+furnace.auth.providers json kernel make mirrors namespaces
+sequences strings urls urls.encoding ;
 IN: furnace.auth.providers.couchdb
 
 ! !!! Implement the authentication protocol for CouchDB.
@@ -114,9 +115,9 @@ TUPLE: couchdb-auth-provider
     [ drop first CHAR: _ = ] assoc-reject ;
 
 : at-or-k ( key hash -- newkey )
-    dupd at [ nip ] when* ;
+    ?at drop ;
 : value-at-or-k ( key hash -- newkey )
-    dupd value-at [ nip ] when* ;
+    ?value-at drop ;
 
 : map-fields-forward ( assoc field-map -- assoc )
     [ swapd at-or-k swap ] curry assoc-map ;
@@ -135,9 +136,9 @@ TUPLE: couchdb-auth-provider
     bi ;
 
 : user>user-hash ( user -- hash )
-     hash-mirror
-     [ [ "password" ] dip [ >base64 >string ] change-at ] keep
-     couchdb-auth-provider get field-map>> map-fields-forward ;
+    hash-mirror
+    [ [ "password" ] dip [ >base64 >string ] change-at ] keep
+    couchdb-auth-provider get field-map>> map-fields-forward ;
 
 ! Used when the user is guaranteed to exist if the logic of the Factor
 ! code is correct (e.g. when update-user is called).
@@ -194,19 +195,19 @@ PRIVATE>
 : <couchdb-auth-provider> ( base-url username-view -- couchdb-auth-provider )
     couchdb-auth-provider new swap >>username-view swap >>base-url ;
 
-M: couchdb-auth-provider get-user ( username provider -- user/f )
+M: couchdb-auth-provider get-user
     couchdb-auth-provider [
         (get-user) [ user-hash>user ] [ f ] if*
     ] with-variable ;
 
-M: couchdb-auth-provider new-user ( user provider -- user/f )
+M: couchdb-auth-provider new-user
     couchdb-auth-provider [
         dup (new-user) [
             username>> couchdb-auth-provider get get-user
         ] [ drop f ] if
     ] with-variable ;
 
-M: couchdb-auth-provider update-user ( user provider -- )
+M: couchdb-auth-provider update-user
     couchdb-auth-provider [
         [ username>> (get-user)/throw-on-no-user dup ]
         [ drop "_id" of get-url ]

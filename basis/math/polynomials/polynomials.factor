@@ -1,7 +1,7 @@
 ! Copyright (C) 2008 Doug Coleman.
-! See http://factorcode.org/license.txt for BSD license.
-USING: arrays combinators fry kernel macros make math math.bits
-math.order math.vectors sequences splitting vectors ;
+! See https://factorcode.org/license.txt for BSD license.
+USING: arrays combinators kernel make math math.bits
+math.vectors sequences vectors ;
 IN: math.polynomials
 
 <PRIVATE
@@ -29,14 +29,14 @@ PRIVATE>
 ALIAS: n*p n*v
 
 : pextend-conv ( p q -- p' q' )
-    2dup [ length ] bi@ + 1 - 2pad-tail ;
+    2dup 2length + 1 - 2pad-tail ;
 
 : p* ( p q -- r )
     2unempty pextend-conv
     [ drop length [ <iota> ] keep ]
     [ nip <reversed> ]
     [ drop ] 2tri
-    '[ _ _ <slice> _ v. ] map reverse! ;
+    '[ _ _ <slice> _ vdot ] map reverse! ;
 
 : p-sq ( p -- p^2 ) dup p* ; inline
 
@@ -52,7 +52,7 @@ ERROR: negative-power-polynomial p n ;
 
 : p/mod-setup ( p p -- p p n )
     2ptrim
-    2dup [ length ] bi@ -
+    2dup 2length -
     dup 1 < [ drop 1 ] when
     [ over length + 0 pad-head pextend ] keep 1 + ;
 

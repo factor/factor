@@ -1,10 +1,9 @@
 ! Copyright (C) 2009 Joe Groff.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors alien alien.c-types alien.data audio
-audio.chunked-file classes.struct combinators
-combinators.short-circuit endian io io.binary
-io.encodings.binary io.files kernel locals math sequences
-audio.loader ;
+audio.chunked-file audio.loader classes.struct combinators
+combinators.short-circuit endian io.encodings.binary io.files
+kernel math sequences ;
 IN: audio.aiff
 
 CONSTANT: FORM-MAGIC "FORM"
@@ -35,8 +34,7 @@ STRUCT: sound-data-chunk
 
 ! cheesy long-double>integer converter that assumes the long double is a positive integer
 : sample-rate>integer ( byte[10] -- sample-rate )
-    [ 2 tail-slice be> ]
-    [ 2 head-slice be> 16383 - 63 - ] bi shift ;
+    2 cut-slice [ be> ] bi@ swap 16383 - 63 - shift ;
 
 : read-form-chunk ( -- byte-array/f )
     form-chunk heap-size ensured-read* ;

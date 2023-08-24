@@ -1,9 +1,9 @@
-USING: math.ranges kernel random sequences arrays combinators ;
+USING: ranges kernel random sequences arrays combinators ;
 IN: chess960
 
 SYMBOLS: pawn rook knight bishop queen king ;
 
-: all-positions ( -- range ) 0 8 [a,b) ;
+: all-positions ( -- range ) 8 [0..b) ;
 
 : black-bishop-positions ( -- range ) 0 6 2 <range> ;
 : white-bishop-positions ( -- range ) 1 7 2 <range> ;

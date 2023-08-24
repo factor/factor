@@ -1,7 +1,7 @@
 ! Copyright (C) 2009 Bruno Deferrari
-! See http://factorcode.org/license.txt for BSD license.
-USING: help.markup help.syntax quotations kernel
-irc.messages irc.messages.base irc.messages.parser irc.client.chats ;
+! See https://factorcode.org/license.txt for BSD license.
+USING: help.markup help.syntax irc.client.chats irc.messages
+irc.messages.base ;
 IN: irc.client
 
 HELP: connect-irc "Connecting to an irc server"
@@ -70,7 +70,7 @@ ARTICLE: "irc.client" "IRC Client"
 { $heading "Special messages" }
 "Some special messages that are created by the library and not by the irc server."
 { $table
-  { { $link irc-chat-end } "sent to a chat when it has been detached from the client, the chat should stop after it receives this message. " }
+  { { $link irc-chat-end } "sent to a chat when it has been detached from the client, the chat should stop after it receives this message." }
   { { $link irc-end } " sent when the client isn't running anymore, the chat should stop after it receives this message." }
   { { $link irc-disconnected } " sent to notify chats that connection was lost." }
   { { $link irc-connected } " sent to notify chats that a connection with the irc server was established." } }
@@ -81,7 +81,7 @@ ARTICLE: "irc.client" "IRC Client"
   "SYMBOL: bot"
   "SYMBOL: mychannel"
   "! Create the profile and client objects"
-  "\"irc.freenode.org\" irc-port \"mybot123\" f <irc-profile> <irc-client> bot set"
+  "\"irc.libera.chat\" irc-port \"mybot123\" f <irc-profile> <irc-client> bot set"
   "! Connect to the server"
   "bot get connect-irc"
   "! Create a channel chat"

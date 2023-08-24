@@ -89,7 +89,7 @@ HELP: parse-host
 
 HELP: query-param
 { $values
-     { "url" url } { "key" string }
+    { "url" url } { "key" string }
     { "value" { $maybe string } } }
 { $description "Outputs the URL-decoded value of a URL query parameter." }
 { $examples
@@ -132,9 +132,13 @@ HELP: relative-url
 
 HELP: relative-url?
 { $values
-     { "url" url }
-     { "?" boolean } }
+    { "url" url }
+    { "?" boolean } }
 { $description "Tests whether a URL is relative." } ;
+
+HELP: redacted-url
+{ $values { "url" url } { "url'" url } }
+{ $description "Outputs a new URL with the password (if specified) replaced with " { $snippet "xxxxx" } ". This is useful for logging utilities where you want to avoid printing out the password in the logs." } ;
 
 HELP: secure-protocol?
 { $values { "protocol" string } { "?" boolean } }

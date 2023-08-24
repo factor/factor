@@ -1,10 +1,5 @@
 USING: furnace.recaptcha.private tools.test urls ;
 IN: furnace.recaptcha.tests
 
-{
-    URL" http://www.google.com/recaptcha/api/challenge"
-    URL" https://www.google.com/recaptcha/api/challenge"
-} [
-    f recaptcha-url
-    t recaptcha-url
-] unit-test
+{ t f } [ "{\"success\": true, \"challenge_ts\": \"2018-09-14T21:12:17Z\", \"hostname\": \"localhost\"}" parse-recaptcha-response ] unit-test
+{ f { "invalid-input-secret" } } [ "{\"success\": false, \"error-codes\": [\"invalid-input-secret\"]}" parse-recaptcha-response ] unit-test

@@ -1,9 +1,8 @@
 ! Copyright (C) 2007, 2008 Alex Chapman
-! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays colors combinators fry jamshred.oint
-kernel literals locals math math.constants math.matrices
-math.order math.quadratic math.ranges math.vectors random
-sequences specialized-arrays vectors ;
+! See https://factorcode.org/license.txt for BSD license.
+USING: accessors alien.c-types colors combinators jamshred.oint
+kernel literals math math.constants math.order math.quadratic
+math.vectors random sequences specialized-arrays vectors ;
 FROM: jamshred.oint => distance ;
 FROM: alien.c-types => float ;
 SPECIALIZED-ARRAY: float
@@ -72,7 +71,7 @@ CONSTANT: default-segment-radius 1
 
 : heading-segment ( segments current-segment heading -- segment )
     ! the next segment on the given heading
-    over forward>> v. 0 <=> {
+    over forward>> vdot 0 <=> {
         { +gt+ [ next-segment ] }
         { +lt+ [ previous-segment ] }
         { +eq+ [ nip ] } ! current segment
@@ -80,21 +79,21 @@ CONSTANT: default-segment-radius 1
 
 :: distance-to-next-segment ( current next location heading -- distance )
     current forward>> :> cf
-    cf next location>> v. cf location v. - cf heading v. / ;
+    cf next location>> vdot cf location vdot - cf heading vdot / ;
 
 :: distance-to-next-segment-area ( current next location heading -- distance )
     current forward>> :> cf
     next current half-way-between-oints :> h
-    cf h v. cf location v. - cf heading v. / ;
+    cf h vdot cf location vdot - cf heading vdot / ;
 
-: vector-to-centre ( seg loc -- v )
+: vector-to-center ( seg loc -- v )
     over location>> swap v- swap forward>> proj-perp ;
 
-: distance-from-centre ( seg loc -- distance )
-    vector-to-centre norm ;
+: distance-from-center ( seg loc -- distance )
+    vector-to-center norm ;
 
 : wall-normal ( seg oint -- n )
-    location>> vector-to-centre normalize ;
+    location>> vector-to-center normalize ;
 
 CONSTANT: distant 1000
 
@@ -110,9 +109,9 @@ CONSTANT: distant 1000
     v norm 0 = [
         distant
     ] [
-        v dup v. :> a
-        v w v. 2 * :> b
-        w dup v. r sq - :> c
+        v dup vdot :> a
+        v w vdot 2 * :> b
+        w dup vdot r sq - :> c
         c b a quadratic max-real
     ] if ;
 

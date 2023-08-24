@@ -1,5 +1,5 @@
 ! Copyright (C) 2011 Doug Coleman.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors classes classes.algebra classes.algebra.private
 classes.maybe eval generic.single kernel math slots tools.test ;
 IN: classes.maybe.tests
@@ -63,4 +63,4 @@ M: f lol2 drop "lol22" ;
 [ 3 lol2 ] [ no-method? ] must-fail-with
 
 [ "IN: classes-tests maybe{ 1 2 3 }" eval( -- ) ]
-[ error>> not-classoids? ] must-fail-with
+[ error>> not-an-instance? ] must-fail-with

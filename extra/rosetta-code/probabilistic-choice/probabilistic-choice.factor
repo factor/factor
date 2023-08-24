@@ -1,10 +1,10 @@
 ! Copyright (c) 2012 Anonymous
-! See http://factorcode.org/license.txt for BSD license.
-USING: arrays assocs combinators.random formatting fry kernel
-macros math quotations sequences ;
+! See https://factorcode.org/license.txt for BSD license.
+USING: arrays assocs combinators.random formatting kernel
+math quotations sequences ;
 IN: rosettacode.probabilistic-choice
 
-! http://rosettacode.org/wiki/Probabilistic_choice
+! https://rosettacode.org/wiki/Probabilistic_choice
 
 ! Given a mapping between items and their required probability
 ! of occurrence, generate a million items randomly subject to the
@@ -41,7 +41,7 @@ MACRO: case-probas ( data -- quot )
     [ first2 [ 1quotation ] dip [ swap 2array ] when* ] map 1quotation ;
 
 : expected ( data name -- float )
-    dupd of [ ] [ values sift sum 1 swap - ] ?if ;
+    dupd of or* [ values sift sum 1 swap - ] unless ;
 
 : generate ( # case-probas -- seq )
     H{ } clone [

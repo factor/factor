@@ -1,8 +1,8 @@
 ! Copyright (C) 2009 Daniel Ehrenberg
-! See http://factorcode.org/license.txt for BSD license.
-USING: accessors byte-arrays combinators destructors growable
-io io.private io.streams.plain kernel math math.order sequences
-sequences.private strings ;
+! See https://factorcode.org/license.txt for BSD license.
+USING: accessors byte-arrays classes combinators destructors
+growable io io.private io.streams.plain kernel math math.order
+sequences sequences.private strings ;
 IN: io.streams.sequence
 
 ! Readers
@@ -20,30 +20,19 @@ SLOT: i
 : (sequence-read-length) ( n buf stream -- buf count )
     [ underlying>> length ] [ i>> ] bi - rot min ; inline
 
-: <sequence-copy> ( dst n src-i src dst-i -- n copy )
-    [ ] curry 3curry dip <copy> ; inline
-
 : sequence-copy-unsafe ( n buf stream offset -- count )
     [
         [ (sequence-read-length) ]
         [ [ dup pick + ] change-i underlying>> ] bi
-    ] dip [ <sequence-copy> (copy) drop ] 3curry keep ; inline
-
-ERROR: not-a-byte-array obj ;
-: check-byte-array ( buf stream offset -- buf stream offset )
-    pick byte-array? [ pick not-a-byte-array ] unless ; inline
-
-ERROR: not-a-string obj ;
-: check-string ( buf stream offset -- buf stream offset )
-    pick string? [ pick not-a-string ] unless ; inline
+    ] dip [ 4spin dupd + copy-loop drop ] 3curry keep ; inline
 
 : (sequence-read-unsafe) ( n buf stream -- count )
     [ integer>fixnum ]
     [ dup slice? [ [ seq>> ] [ from>> ] bi ] [ 0 ] if ]
     [
         tuck stream-element-type +byte+ eq?
-        [ check-byte-array sequence-copy-unsafe ]
-        [ check-string sequence-copy-unsafe ] if
+        [ [ byte-array check-instance ] 2dip sequence-copy-unsafe ]
+        [ [ string check-instance ] 2dip sequence-copy-unsafe ] if
     ] tri* ; inline
 
 PRIVATE>

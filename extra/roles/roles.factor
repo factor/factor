@@ -1,9 +1,8 @@
 ! Copyright (C) 2009 Joe Groff.
-! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays classes classes.mixin classes.parser
-classes.tuple classes.tuple.parser combinators
-combinators.short-circuit kernel lexer make parser sequences
-sets strings words ;
+! See https://factorcode.org/license.txt for BSD license.
+USING: accessors arrays classes.mixin classes.parser
+classes.tuple classes.tuple.parser combinators kernel lexer make
+parser sequences sets strings words ;
 IN: roles
 
 ERROR: role-slot-overlap class slots ;

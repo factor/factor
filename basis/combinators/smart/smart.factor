@@ -1,9 +1,8 @@
 ! Copyright (C) 2009, 2011 Doug Coleman, John Benediktsson.
-! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays assocs combinators effects fry
-generalizations kernel macros math math.order memoize sequences
-sequences.generalizations sequences.private stack-checker
-stack-checker.backend stack-checker.errors stack-checker.values
+! See https://factorcode.org/license.txt for BSD license.
+USING: accessors arrays assocs combinators effects
+generalizations kernel math sequences sequences.generalizations
+stack-checker stack-checker.backend stack-checker.values
 stack-checker.visitor words ;
 IN: combinators.smart
 
@@ -15,7 +14,7 @@ GENERIC: infer-known* ( known -- effect )
     ] [ infer-known* ] if ;
 
 IDENTITY-MEMO: inputs/outputs ( quot -- in out )
-    infer [ in>> ] [ out>> ] bi [ length ] bi@ ;
+    infer [ in>> ] [ out>> ] bi 2length ;
 
 : inputs ( quot -- n ) inputs/outputs drop ; inline
 
@@ -161,3 +160,6 @@ MACRO: smart-2map-reduce ( 2map-reduce-quots -- quot )
         [ @ _ [ cleave-curry ] [ cleave-curry ] bi _ spread* ]
         1 2each-from
     ] ;
+
+: smart-loop ( ..a quot: ( ..a -- ..b ? ) -- ..b )
+    dup outputs [ ndrop ] curry while* ; inline

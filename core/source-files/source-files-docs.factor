@@ -1,5 +1,5 @@
-USING: help.markup help.syntax vocabs.loader io.pathnames strings
-definitions quotations compiler.units ;
+USING: help.markup help.syntax vocabs.loader io.pathnames
+quotations compiler.units ;
 IN: source-files
 
 ARTICLE: "source-files" "Source files"
@@ -31,12 +31,12 @@ HELP: path>source-file
 
 HELP: source-file
 { $class-description "Instances retain information about loaded source files, and have the following slots:"
-    { $list
-        { { $slot "path" } " - a pathname string." }
-        { { $slot "top-level-form" } " - a " { $link quotation } " composed of any code not used to define new words and classes" }
-        { { $slot "checksum" } " - the CRC32 checksum of the source file's contents at the time it was most recently loaded." }
-        { { $slot "definitions" } " - a pair of assocs, containing definitions and classes defined in this source file, respectively" }
-        { { $slot "main" } " - a word that gets called if you " { $link run } " the vocabulary" }
+    { $slots
+        { "path" { "a pathname string." } }
+        { "top-level-form" { " - a " { $link quotation } " composed of any code not used to define new words and classes" } }
+        { "checksum" { "the CRC32 checksum of the source file's contents at the time it was most recently loaded." } }
+        { "definitions" { "a pair of assocs, containing definitions and classes defined in this source file, respectively" } }
+        { "main" { "a word that gets called if you " { $link run } " the vocabulary" } }
     }
 } ;
 

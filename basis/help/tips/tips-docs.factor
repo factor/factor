@@ -9,9 +9,9 @@ TIP: "Learn to use " { $link "dataflow-combinators" } "." ;
 
 TIP: "Learn to use " { $link "editor" } " to be able to jump to the source code for word definitions from the listener." ;
 
-TIP: "Check out " { $url "http://concatenative.org/wiki/view/Factor/FAQ" } " to get answers to frequently-asked questions." ;
+TIP: "Check out " { $url "https://concatenative.org/wiki/view/Factor/FAQ" } " to get answers to frequently-asked questions." ;
 
-TIP: "Drop by the " { $snippet "#concatenative" } " IRC channel on " { $snippet "irc.freenode.net" } " some time." ;
+TIP: "Consider joining the Factor Discord server: " { $url "https://discord.gg/QxJYZx3QDf" } ". The developers are active and happy to help." ;
 
 TIP: "You can write documentation for your own code using the " { $link "help" } "." ;
 

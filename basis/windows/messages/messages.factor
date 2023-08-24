@@ -1,5 +1,5 @@
 ! Copyright (C) 2005, 2006 Doug Coleman.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors assocs hashtables kernel math namespaces words
 windows.types vocabs sequences ;
 IN: windows.messages
@@ -210,6 +210,10 @@ CONSTANT: WM_NCMOUSELEAVE 0x02A2
 CONSTANT: WM_WTSSESSION_CHANGE 0x02B1
 CONSTANT: WM_TABLET_FIRST 0x02c0
 CONSTANT: WM_TABLET_LAST 0x02df
+CONSTANT: WM_DPICHANGED 0x02e0
+CONSTANT: WM_DPICHANGED_BEFOREPARENT 0x02e2
+CONSTANT: WM_DPICHANGED_AFTERPARENT 0x02e3
+CONSTANT: WM_GETDPISCALEDSIZE 0x2e4
 CONSTANT: WM_CUT 0x0300
 CONSTANT: WM_COPY 0x0301
 CONSTANT: WM_PASTE 0x0302

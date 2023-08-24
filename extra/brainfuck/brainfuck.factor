@@ -1,9 +1,9 @@
 ! Copyright (C) 2009 John Benediktsson
-! See http://factorcode.org/license.txt for BSD license
+! See https://factorcode.org/license.txt for BSD license
 
-USING: accessors assocs command-line fry io io.encodings.binary
-io.files io.streams.string kernel macros math namespaces
-peg.ebnf prettyprint sequences multiline ;
+USING: accessors assocs command-line io io.encodings.binary
+io.files io.streams.string kernel math multiline namespaces
+peg.ebnf prettyprint sequences ;
 
 IN: brainfuck
 
@@ -25,9 +25,6 @@ TUPLE: brainfuck pointer memory ;
 
 : (-) ( brainfuck n -- brainfuck )
     [ get-memory ] dip - 255 bitand set-memory ;
-
-: (?) ( brainfuck -- brainfuck t/f )
-    get-memory zero? not ;
 
 : (.) ( brainfuck -- brainfuck )
     get-memory write1 ;
@@ -62,7 +59,7 @@ space    = [ \t\n\r]+ => [[ [ ] ]]
 unknown  = (.)  => [[ "Invalid input" throw ]]
 
 ops   = inc-ptr|dec-ptr|inc-mem|dec-mem|output|input|debug|space
-loop  = "[" {loop|ops}+ "]" => [[ second compose-all '[ [ (?) ] _ while ] ]]
+loop  = "[" {loop|ops}+ "]" => [[ second compose-all '[ [ get-memory zero? ] _ until ] ]]
 
 code  = (loop|ops|unknown)*  => [[ compose-all ]]
 
@@ -85,7 +82,7 @@ PRIVATE>
 
 : brainfuck-main ( -- )
     command-line get [
-        contents (run-brainfuck)
+        read-contents (run-brainfuck)
     ] [
         [ binary file-contents (run-brainfuck) ] each
     ] if-empty ;

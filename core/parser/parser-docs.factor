@@ -1,6 +1,6 @@
 USING: arrays compiler.units definitions help.markup help.syntax
-kernel lexer math namespaces quotations sequences source-files strings
-vectors vocabs vocabs.parser words words.symbol ;
+kernel lexer math namespaces quotations sequences source-files
+strings vectors vocabs vocabs.parser words words.symbol ;
 IN: parser
 
 ARTICLE: "reading-ahead" "Reading ahead"
@@ -113,7 +113,7 @@ $nl
 ABOUT: "parser"
 
 HELP: location
-{ $values { "loc" "a " { $snippet "{ path line# }" } " pair" } }
+{ $values { "loc/f" "a " { $snippet "{ path line# }" } " pair or " { $link f } } }
 { $description "Outputs the current parser location. This value can be passed to " { $link set-where } " or " { $link remember-definition } "." } ;
 
 HELP: save-location
@@ -233,7 +233,7 @@ $parsing-note ;
 
 HELP: parse-array-def
 { $values { "array" "a new " { $link array } } }
-{ $description "Like " { $link parse-definition } ", except the parsed sequence it outputted as an array." }
+{ $description "Like " { $link parse-definition } ", except the parsed sequence is output as an array." }
 $parsing-note ;
 
 HELP: bootstrap-syntax

@@ -1,9 +1,9 @@
 ! Copyright (C) 2010 Erik Charlebois.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors arrays ascii bit-arrays byte-arrays combinators
-continuations grouping images images.loader io io.encodings.ascii
-io.encodings.string kernel locals make math math.functions math.parser
-sequences io.streams.throwing ;
+continuations grouping images images.loader io
+io.encodings.ascii io.encodings.string io.streams.throwing
+kernel make math math.functions math.parser sequences ;
 IN: images.pbm
 
 SINGLETON: pbm-image
@@ -48,7 +48,7 @@ SINGLETON: pbm-image
     bitmap width <groups> [
         width 8 align 255 pad-tail
         8 <groups> [
-            [ 255 = [ f ] [ t ] if ] { } map-as
+            [ 255 = not ] { } map-as
             >bit-array reverse bit-array>integer
             1array >byte-array write
         ] each

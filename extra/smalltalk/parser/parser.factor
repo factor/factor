@@ -1,17 +1,18 @@
 ! Copyright (C) 2009 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
-USING: peg peg.ebnf smalltalk.ast sequences sequences.deep strings
-math.parser multiline kernel arrays byte-arrays math assocs accessors ;
+! See https://factorcode.org/license.txt for BSD license.
+USING: accessors arrays assocs byte-arrays kernel math
+math.parser multiline peg.ebnf sequences sequences.deep
+smalltalk.ast strings ;
 IN: smalltalk.parser
 
 ! :mode=text:noTabs=true:
 
-! Based on http://chronos-st.blogspot.com/2007/12/smalltalk-in-one-page.html
+! Based on https://chronos-st.blogspot.com/2007/12/smalltalk-in-one-page.html
 
 ERROR: bad-number str ;
 
 : check-number ( str -- n )
-    >string dup string>number [ ] [ bad-number ] ?if ;
+    >string [ string>number ] [ bad-number ] ?unless ;
 
 EBNF: parse-smalltalk [=[
 
@@ -131,7 +132,7 @@ BinaryMessage = OptionalWhiteSpace
                 OptionalWhiteSpace
                 (UnaryMessageSend | Operand):rhs
                 => [[ selector { rhs } ast-message boa ]]
-                                   
+
 KeywordMessageSegment = Keyword:k OptionalWhiteSpace (BinaryMessageSend | UnaryMessageSend | Operand):arg => [[ { k arg } ]]
 KeywordMessage = OptionalWhiteSpace
                  KeywordMessageSegment:h

@@ -1,15 +1,14 @@
 ! Copyright (C) 2004, 2010 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 IN: http.server.static
 DEFER: file-responder ! necessary for cgi-docs
 DEFER: <static> ! necessary for cgi-docs
-USING: calendar kernel math math.order math.parser namespaces
-parser sequences strings assocs hashtables debugger mime.types
-sorting logging calendar.parser accessors splitting io io.files
-io.files.info io.directories io.pathnames io.encodings.binary
-fry xml.entities destructors urls html xml.syntax
-html.templates.fhtml http http.server http.server.responses
-http.server.redirection xml.writer locals combinators ;
+USING: accessors assocs calendar.parser combinators destructors
+html html.templates.fhtml http http.server
+http.server.redirection http.server.responses io.directories
+io.encodings.binary io.files io.files.info io.pathnames kernel
+logging math.order math.parser mime.types namespaces sequences
+sorting splitting urls xml.syntax ;
 QUALIFIED: sets
 
 TUPLE: file-responder root hook special index-names allow-listings ;
@@ -53,7 +52,7 @@ TUPLE: file-responder root hook special index-names allow-listings ;
 
 : serve-file ( filename -- response )
     dup mime-type
-    dup file-responder get special>> at
+    [ file-responder get special>> at ]
     [ call( filename -- response ) ] [ serve-static ] ?if ;
 
 \ serve-file NOTICE add-input-logging
@@ -111,30 +110,30 @@ TUPLE: file-responder root hook special index-names allow-listings ;
 
 : sort-orders ( -- CO-N CO-M CO-S )
     "N" "M" "S" sort-column [
-        [ drop "?C=" ";O=" surround ]
+        [ drop "?C=" "&O=" surround ]
         [ ?toggle-sort-order ] 2bi append
     ] curry tri@ ;
 
-: listing-sort-with ( seq quot: ( elt -- key ) -- sortedseq )
-    sort-with sort-asc? [ reverse ] unless ; inline
+: listing-sort-by ( seq quot: ( elt -- key ) -- sortedseq )
+    sort-by sort-asc? [ reverse ] unless ; inline
 
-: sort-with-name ( {file,info} -- sorted )
-    [ first ] listing-sort-with ;
+: sort-by-name ( {file,info} -- sorted )
+    [ first ] listing-sort-by ;
 
-: sort-with-modified ( {file,info} -- sorted )
-    [ second modified>> ] listing-sort-with ;
+: sort-by-modified ( {file,info} -- sorted )
+    [ second modified>> ] listing-sort-by ;
 
 : size-without-directories ( info -- size )
     dup directory? [ drop -1 ] [ size>> ] if ;
 
-: sort-with-size ( {file,info} -- sorted )
-    [ second size-without-directories ] listing-sort-with ;
+: sort-by-size ( {file,info} -- sorted )
+    [ second size-without-directories ] listing-sort-by ;
 
 : sort-listing ( zipped-files-infos -- sorted )
     sort-column {
-        { "M" [ sort-with-modified ] }
-        { "S" [ sort-with-size ] }
-        [ drop sort-with-name ]
+        { "M" [ sort-by-modified ] }
+        { "S" [ sort-by-size ] }
+        [ drop sort-by-name ]
     } case ; inline
 
 : zip-files-infos ( files -- zipped )
@@ -160,25 +159,24 @@ TUPLE: file-responder root hook special index-names allow-listings ;
 
 : find-index ( filename -- path )
     file-responder get index-names>>
-    [ append-path dup exists? [ drop f ] unless ] with map-find
+    [ append-path dup file-exists? [ drop f ] unless ] with map-find
     drop ;
 
 : serve-directory ( filename -- response )
     url get path>> "/" tail? [
-        dup
-        find-index [ serve-file ] [ list-directory ] ?if
+        [ find-index ] [ serve-file ] [ list-directory ] ?if
     ] [
         drop
         url get clone [ "/" append ] change-path <permanent-redirect>
     ] if ;
 
 : serve-object ( filename -- response )
-    serving-path dup exists?
+    serving-path dup file-exists?
     [ dup file-info directory? [ serve-directory ] [ serve-file ] if ]
     [ drop <404> ]
     if ;
 
-M: file-responder call-responder* ( path responder -- response )
+M: file-responder call-responder*
     file-responder set
     ".." over member?
     [ drop <400> ] [ "/" join serve-object ] if ;

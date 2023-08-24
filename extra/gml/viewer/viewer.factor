@@ -1,15 +1,13 @@
 USING: accessors alien.c-types alien.data alien.data.map arrays
 assocs byte-arrays colors combinators combinators.short-circuit
-destructors euler.b-rep euler.b-rep.triangulation fry game.input
+destructors euler.b-rep euler.b-rep.triangulation game.input
 game.loop game.models.half-edge game.worlds gml.printer gpu
 gpu.buffers gpu.framebuffers gpu.render gpu.shaders gpu.state
-gpu.util.wasd growable images kernel literals locals math
-math.order math.ranges math.vectors math.vectors.conversion
-math.vectors.simd math.vectors.simd.cords method-chains models
-namespaces sequences sets specialized-vectors typed ui
-ui.gadgets ui.gadgets.worlds ui.gestures ui.pixel-formats
-vectors ;
-FROM: math.matrices => m.v ;
+gpu.util.wasd growable images kernel literals math math.order
+math.vectors math.vectors.conversion math.vectors.simd
+math.vectors.simd.cords method-chains models namespaces ranges
+sequences sets specialized-vectors typed ui ui.gadgets
+ui.gadgets.worlds ui.gestures ui.pixel-formats vectors ;
 FROM: models => change-model ;
 SPECIALIZED-VECTORS: ushort float-4 ;
 IN: gml.viewer
@@ -24,7 +22,7 @@ CONSTANT: selected-face-color float-4{ 1 0.9 0.8 1 }
     >rgba-components float-4-boa ; inline
 
 : face-color ( edge -- color )
-    face-normal float-4{ 0 1 0.1 0 } v. 0.3 * 0.4 + dup dup 1.0 float-4-boa ; inline
+    face-normal float-4{ 0 1 0.1 0 } vdot 0.3 * 0.4 + dup dup 1.0 float-4-boa ; inline
 
 TUPLE: b-rep-vertices
     { array byte-array read-only }
@@ -121,7 +119,7 @@ M: sequence selected-vectors [ selected-vectors ] map concat ;
     [ face-vertex-count>> ]
     [ edge-vertex-count>> + dup ]
     [ point-vertex-count>> + ] tri
-    [a,b) ushort >c-array ;
+    [a..b) ushort >c-array ;
 
 VERTEX-FORMAT: wire-vertex-format
     { "vertex"  float-components 3 f }
@@ -234,11 +232,11 @@ CONSTANT: edge-hitbox-radius 0.05
 :: line-nearest-t ( p0 u q0 v -- tp tq )
     p0 q0 v- :> w0
 
-    u u v. :> a
-    u v v. :> b
-    v v v. :> c
-    u w0 v. :> d
-    v w0 v. :> e
+    u u vdot :> a
+    u v vdot :> b
+    v v vdot :> c
+    u w0 vdot :> d
+    v w0 vdot :> e
 
     a c * b b * - :> denom
 

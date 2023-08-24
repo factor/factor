@@ -1,9 +1,8 @@
 ! Copyright (c) 2008 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
-USING: accessors assocs kernel namespaces validators html.forms urls
-http.server.dispatchers
-furnace.auth furnace.auth.providers furnace.actions
-furnace.redirection ;
+! See https://factorcode.org/license.txt for BSD license.
+USING: accessors assocs furnace.actions furnace.auth
+furnace.auth.providers html.forms http.server.dispatchers kernel
+namespaces validators ;
 IN: furnace.auth.features.registration
 
 : <register-action> ( -- action )

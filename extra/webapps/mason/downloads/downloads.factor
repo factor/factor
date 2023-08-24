@@ -1,5 +1,5 @@
 ! Copyright (C) 2010 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors furnace.actions html.components html.forms
 kernel webapps.mason.backend webapps.mason.version.data
 webapps.mason.grids webapps.mason.utils ;

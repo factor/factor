@@ -1,5 +1,7 @@
-USING: base64 io.encodings.ascii io.encodings.string kernel
-sequences splitting strings tools.test ;
+USING: base64 byte-arrays io.encodings.ascii io.encodings.string
+kernel sequences splitting strings tools.test ;
+
+{ t } [ 256 <iota> >byte-array dup >base64 base64> = ] unit-test
 
 { "abcdefghijklmnopqrstuvwxyz" } [ "abcdefghijklmnopqrstuvwxyz" ascii encode >base64 base64> ascii decode
 ] unit-test
@@ -39,3 +41,31 @@ sequences splitting strings tools.test ;
     "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJKb2UifQ.ipevRNuRP6HflG8cFKnmUPtypruRC4fb1DWtoLL62SY"
     "." split [ base64> ] map
 ] unit-test
+
+{ "01a+b/cd" } [ "\xd3V\xbeo\xf7\x1d" >base64 "" like ] unit-test
+{ "\xd3V\xbeo\xf7\x1d" } [ "01a+b/cd" base64> "" like ] unit-test
+
+{ "01a-b_cd" } [ "\xd3V\xbeo\xf7\x1d" >urlsafe-base64 "" like ] unit-test
+{ "\xd3V\xbeo\xf7\x1d" } [ "01a-b_cd" urlsafe-base64> "" like ] unit-test
+
+{ "eyJhIjoiYmNkIn0" }
+[ "{\"a\":\"bcd\"}" >urlsafe-base64-jwt >string ] unit-test
+
+{ "{\"a\":\"bcd\"}" }
+[ "{\"a\":\"bcd\"}" >urlsafe-base64-jwt urlsafe-base64> >string ] unit-test
+
+{ "" } [ "" >base64 >string ] unit-test
+{ "Zg==" } [ "f" >base64 >string ] unit-test
+{ "Zm8=" } [ "fo" >base64 >string ] unit-test
+{ "Zm9v" } [ "foo" >base64 >string ] unit-test
+{ "Zm9vYg==" } [ "foob" >base64 >string ] unit-test
+{ "Zm9vYmE=" } [ "fooba" >base64 >string ] unit-test
+{ "Zm9vYmFy" } [ "foobar" >base64 >string ] unit-test
+
+{ "" } [ "" base64> >string ] unit-test
+{ "f" } [ "Zg==" base64> >string ] unit-test
+{ "fo" } [ "Zm8=" base64> >string ] unit-test
+{ "foo" } [ "Zm9v" base64> >string ] unit-test
+{ "foob" } [ "Zm9vYg==" base64> >string ] unit-test
+{ "fooba" } [ "Zm9vYmE=" base64> >string ] unit-test
+{ "foobar" } [ "Zm9vYmFy" base64> >string ] unit-test

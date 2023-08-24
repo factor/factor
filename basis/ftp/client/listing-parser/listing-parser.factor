@@ -1,5 +1,5 @@
 ! Copyright (C) 2008 Doug Coleman.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors combinators io.files.types kernel math.parser
 sequences splitting ;
 IN: ftp.client.listing-parser
@@ -79,7 +79,7 @@ name target ;
 
 : parse-list ( ftp-response -- ftp-response )
     dup strings>>
-    [ " " split harvest ] map
+    [ split-words harvest ] map
     dup length {
         { 11 [ parse-list-11 ] }
         { 9 [ parse-list-11 ] }

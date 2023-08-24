@@ -1,7 +1,7 @@
 USING: accessors arrays bunny.cel-shaded bunny.fixed-pipeline
-bunny.model bunny.outlined destructors kernel math opengl.demo-support
-opengl.gl sequences ui ui.gadgets ui.gadgets.worlds ui.gestures
-ui.render words ui.pixel-formats ;
+bunny.model bunny.outlined destructors kernel literals math
+opengl.demo-support opengl.gl sequences ui ui.gadgets
+ui.gadgets.worlds ui.gestures ui.pixel-formats ;
 IN: bunny
 
 TUPLE: bunny-world < demo-world model-triangles geom draw-seq draw-n ;
@@ -37,7 +37,7 @@ M: bunny-world end-world
 M: bunny-world draw-world*
     dup draw-seq>> empty? [ drop ] [
         0.15 0.15 0.15 1.0 glClearColor
-        GL_DEPTH_BUFFER_BIT GL_COLOR_BUFFER_BIT bitor glClear
+        flags{ GL_DEPTH_BUFFER_BIT GL_COLOR_BUFFER_BIT } glClear
         dup demo-world-set-matrix
         GL_MODELVIEW glMatrixMode
         0.02 -0.105 0.0 glTranslatef

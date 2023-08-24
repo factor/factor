@@ -1,7 +1,6 @@
 ! Copyright (C) 2009 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
-USING: accessors colors.constants combinators kernel math
-namespaces ;
+! See https://factorcode.org/license.txt for BSD license.
+USING: accessors colors combinators kernel math namespaces ;
 IN: fonts
 
 CONSTANT: default-serif-font-name "serif"
@@ -34,8 +33,8 @@ TUPLE: font name size bold? italic? foreground background ;
 
 : reverse-video-font ( font -- font )
     clone dup
-    [ foreground>> ] [ background>> ] bi
-    [ >>background ] [ >>foreground ] bi* ;
+    [ foreground>> >>background ]
+    [ background>> >>foreground ] bi ;
 
 : derive-font ( base font -- font' )
     [

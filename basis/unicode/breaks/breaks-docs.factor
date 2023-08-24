@@ -24,7 +24,7 @@ $nl "Operations for graphemes:"
 } ;
 
 HELP: first-grapheme
-{ $values { "str" string } { "i" "an index" } }
+{ $values { "entire-str" string } { "start" string } { "i" "an index" } }
 { $description "Finds the length of the first grapheme of the string. This can be used repeatedly to efficiently traverse the graphemes of the string, using slices." } ;
 
 HELP: last-grapheme

@@ -1,33 +1,25 @@
 ! Copyright (C) 2007, 2010 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays colors fonts fry help.markup help.stylesheet
-io.styles kernel literals math math.ranges models namespaces parser
-sequences system ui ui.gadgets ui.gadgets.books ui.gadgets.panes
-ui.gestures ui.pens.gradient ui.pens.solid ;
+! See https://factorcode.org/license.txt for BSD license.
+USING: accessors arrays colors fonts help.markup help.stylesheet
+io.styles kernel literals math models namespaces parser ranges
+sequences ui ui.gadgets ui.gadgets.books ui.gadgets.panes
+ui.gestures ui.pens.gradient ;
 IN: slides
 
 CONSTANT: stylesheet
     H{
-        { default-span-style
+        { default-style
             H{
                 { font-name $ default-sans-serif-font-name }
                 { font-size $[ default-font-size 3 * ] }
-            }
-        }
-        { default-block-style
-            H{
                 { wrap-margin $[ default-font-size 92 * ] }
-            }
-        }
-        { code-char-style
-            H{
-                { font-name $ default-monospace-font-name }
-                { font-size $[ default-font-size 3 * ] }
             }
         }
         { code-style
             H{
-                { page-color T{ rgba f 0.9 0.9 0.9 1 } }
+                { font-name $ default-monospace-font-name }
+                { font-size $[ default-font-size 3 * ] }
+                { page-color T{ rgba f 0.4 0.4 0.4 0.3 } }
             }
         }
         { snippet-style
@@ -38,6 +30,9 @@ CONSTANT: stylesheet
             }
         }
         { table-content-style
+            H{ { wrap-margin $[ default-font-size 83 * ] } }
+        }
+        { list-content-style
             H{ { wrap-margin $[ default-font-size 83 * ] } }
         }
         { list-style
@@ -57,35 +52,23 @@ CONSTANT: stylesheet
         } format
     ] ($block) ;
 
-: divider-interior ( -- interior )
-    os windows? [
-        T{ rgba f 0.25 0.25 0.25 1.0 } <solid>
-    ] [ {
-            T{ rgba f 0.25 0.25 0.25 1.0 }
-            T{ rgba f 1.0 1.0 1.0 0.0 }
-        } <gradient>
-    ] if ;
-
 : $divider ( -- )
     [
         <gadget>
-            divider-interior >>interior
+            {
+                T{ rgba f 0.25 0.25 0.25 1.0 }
+                T{ rgba f 1.0 1.0 1.0 0.0 }
+            } <gradient> >>interior
             ${ default-font-size 67 * default-font-size 5/6 * } >>dim
             { 1 0 } >>orientation
         gadget.
     ] ($block) ;
 
-: page-interior ( -- interior )
-    os windows? [
-        T{ rgba f 0.8 0.8 1.0 1.0 } <solid>
-    ] [ {
-            T{ rgba f 0.8 0.8 1.0 1.0 }
-            T{ rgba f 0.8 1.0 1.0 1.0 }
-        } <gradient>
-    ] if ;
-
 : page-theme ( gadget -- gadget )
-    page-interior >>interior ;
+    {
+        T{ rgba f 0.8 0.8 1.0 1.0 }
+        T{ rgba f 0.8 1.0 1.0 1.0 }
+    } <gradient> >>interior ;
 
 : <page> ( list -- gadget )
     [
@@ -95,7 +78,7 @@ CONSTANT: stylesheet
     ] make-pane page-theme ;
 
 : $slide ( element -- )
-    unclip $title $divider $list ;
+    unclip last-element off $title $divider last-element off $list ;
 
 TUPLE: slides < book ;
 
@@ -111,7 +94,7 @@ TUPLE: slides < book ;
 : prev-page ( book -- ) -1 change-page ;
 
 : strip-tease ( data -- seq )
-    first3 2 over length [a,b] [ head 3array ] with with with map ;
+    first3 2 over length [a..b] [ head 3array ] with with with map ;
 
 SYNTAX: STRIP-TEASE:
     parse-definition strip-tease append! ;

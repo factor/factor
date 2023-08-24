@@ -1,8 +1,9 @@
 ! Copyright (C) 2010 Erik Charlebois.
-! See http://factorcode.org/license.txt for BSD license.
-USING: accessors alien.c-types ascii combinators images images.loader
-io io.encodings.ascii io.encodings.string kernel locals make math
-math.parser sequences specialized-arrays io.streams.throwing ;
+! See https://factorcode.org/license.txt for BSD license.
+USING: accessors alien.c-types ascii combinators images
+images.loader io io.encodings.ascii io.encodings.string
+io.streams.throwing kernel make math math.parser sequences
+specialized-arrays ;
 SPECIALIZED-ARRAY: ushort
 IN: images.pgm
 

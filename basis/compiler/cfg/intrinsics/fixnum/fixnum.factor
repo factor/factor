@@ -1,10 +1,11 @@
 ! Copyright (C) 2008, 2010 Slava Pestov, Doug Coleman.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors arrays combinators compiler.cfg.builder.blocks
-compiler.cfg.comparisons compiler.cfg.hats compiler.cfg.instructions
-compiler.cfg.registers compiler.cfg.stacks compiler.cfg.stacks.local
-compiler.tree.propagation.info cpu.architecture fry kernel layouts
-locals math math.intervals namespaces sequences ;
+compiler.cfg.comparisons compiler.cfg.hats
+compiler.cfg.instructions compiler.cfg.registers
+compiler.cfg.stacks compiler.cfg.stacks.local
+compiler.tree.propagation.info cpu.architecture kernel layouts
+math math.intervals namespaces sequences ;
 IN: compiler.cfg.intrinsics.fixnum
 
 : emit-both-fixnums? ( -- )
@@ -33,7 +34,7 @@ IN: compiler.cfg.intrinsics.fixnum
 : emit-fixnum-shift-fast ( block #call -- block' )
     node-input-infos second interval>> {
         { [ dup 0 [a,inf] interval-subset? ] [ drop emit-fixnum-left-shift ] }
-        { [ dup 0 [-inf,a] interval-subset? ] [ drop emit-fixnum-right-shift ] }
+        { [ dup 0 [-inf,b] interval-subset? ] [ drop emit-fixnum-right-shift ] }
         [ drop emit-fixnum-shift-general ]
     } cond ;
 

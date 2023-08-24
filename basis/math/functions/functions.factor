@@ -1,7 +1,7 @@
 ! Copyright (C) 2004, 2010 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
-USING: combinators fry kernel math math.bits math.constants
-math.libm math.order math.private sequences ;
+! See https://factorcode.org/license.txt for BSD license.
+USING: combinators kernel math math.bits math.constants
+math.libm math.order sequences ;
 IN: math.functions
 
 GENERIC: sqrt ( x -- y ) foldable
@@ -198,6 +198,12 @@ M: complex log >polar [ flog ] dip rect> ; inline
 
 : logn ( x n -- y ) [ log ] bi@ / ;
 
+GENERIC: lgamma ( x -- y )
+
+M: float lgamma flgamma ;
+
+M: real lgamma >float lgamma ;
+
 <PRIVATE
 
 : most-negative-finite-float ( -- x )
@@ -214,7 +220,7 @@ CONSTANT: log10-2 0x1.34413509f79ffp-2
     most-positive-finite-float between? ; inline
 
 : (bignum-log) ( n log-quot: ( x -- y ) log-2 -- log )
-    [ dup ] dip '[
+    dupd '[
         dup representable-as-float?
         [ >float @ ] [ frexp _ [ _ * ] bi* + ] if
     ] call ; inline
@@ -238,6 +244,19 @@ M: real log10 >float flog10 ; inline
 M: complex log10 log 10 log / ; inline
 
 M: bignum log10 [ log10 ] log10-2 (bignum-log) ;
+
+GENERIC: e^-1 ( x -- e^x-1 )
+
+M: float e^-1
+    dup abs 0.7 < [
+        dup e^ dup 1.0 = [
+            drop
+        ] [
+            [ 1.0 - * ] [ log / ] bi
+        ] if
+    ] [ e^ 1.0 - ] if ; inline
+
+M: real e^-1 >float e^-1 ; inline
 
 GENERIC: cos ( x -- y ) foldable
 
@@ -434,7 +453,11 @@ M: float round-to-odd [ (round-to-odd?) ] (float-round) ;
     [ recip 2pi * 0 swap complex boa e^ ]
     [ <iota> [ ^ * ] 2with map ] tri ;
 
+! expit
 : sigmoid ( x -- y ) neg e^ 1 + recip ; inline
+
+: logit ( x -- y ) [ ] [ 1 swap - ] bi /f log ; inline
+
 
 GENERIC: signum ( x -- y )
 

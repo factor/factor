@@ -1,4 +1,5 @@
-./basis/xmode/modes/java.xml:		<!-- for the common usage of the cvs keyword $Id: java.xml 9228 2007-03-27 22:01:25Z ezust $ -->
-./basis/xmode/modes/fortran.xml:      Version $Id: fortran.xml 10573 2007-09-14 02:04:59Z ezust $
-./basis/xmode/modes/nsis2.xml:$Id: nsis2.xml 9932 2007-07-06 15:44:46Z Vampire0 $
+./basis/xmode/modes/java-module-info.xml:		<!-- for the common usage of the cvs keyword $Id: java.xml 20772 2012-01-13 18:54:27Z kog13 $ -->
+./basis/xmode/modes/java.xml:		<!-- for the common usage of the cvs keyword $Id: java.xml 25558 2022-06-02 20:36:50Z daleanson $ -->
+./basis/xmode/modes/nsis2.xml:$Id: nsis2.xml 24789 2017-12-03 15:48:36Z ezust $
+./basis/xmode/modes/vala.xml:		<!-- for the common usage of the cvs keyword $Id: java.xml 19829 2011-08-24 09:32:24Z kpouer $ -->
 ./vm/bignumint.hpp:// $Id: s48_bignumint.h,v 1.14 2005/12/21 02:36:52 spestov Exp $

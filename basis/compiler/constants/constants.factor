@@ -1,5 +1,5 @@
 ! Copyright (C) 2008, 2010 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: alien arrays byte-arrays kernel layouts literals math
 quotations sequences strings words ;
 IN: compiler.constants
@@ -53,6 +53,8 @@ CONSTANT: rc-relative-ppc-3-pc 6
 CONSTANT: rc-absolute-2 10
 CONSTANT: rc-absolute-1 11
 CONSTANT: rc-absolute-ppc-2/2/2/2 12
+CONSTANT: rc-relative-arm64-branch 13
+CONSTANT: rc-relative-arm64-bcond 14
 
 CONSTANT: rt-dlsym 0
 CONSTANT: rt-entry-point 1

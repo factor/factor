@@ -1,12 +1,12 @@
 ! Copyright (C) 2008, 2011 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays assocs byte-arrays combinators compiler.cfg
-compiler.cfg.comparisons compiler.cfg.instructions
+! See https://factorcode.org/license.txt for BSD license.
+USING: accessors arrays assocs byte-arrays combinators
+compiler.cfg compiler.cfg.comparisons compiler.cfg.instructions
 compiler.cfg.linearization compiler.codegen.gc-maps
-compiler.codegen.labels compiler.codegen.relocation compiler.constants
-cpu.architecture fry generic.parser kernel layouts locals make math
-namespaces parser quotations sequences sequences.generalizations slots
-words ;
+compiler.codegen.labels compiler.codegen.relocation
+compiler.constants cpu.architecture generic.parser kernel
+layouts make math namespaces parser quotations sequences
+sequences.generalizations slots words ;
 IN: compiler.codegen
 
 GENERIC: generate-insn ( insn -- )

@@ -1,10 +1,11 @@
 ! Copyright (C) 2005, 2010 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays assocs combinators.smart compiler.units
-generic generic.single hash-sets.identity hashtables help
-help.crossref help.markup help.topics init io io.pathnames
-io.styles kernel namespaces quotations see sequences sets
-sorting source-files threads vocabs words ;
+! See https://factorcode.org/license.txt for BSD license.
+USING: accessors arrays assocs combinators.short-circuit
+combinators.smart compiler.units generic generic.single
+hash-sets.identity hashtables help help.crossref help.markup
+help.topics init io io.pathnames io.styles kernel namespaces
+quotations see sequences sets sorting source-files threads
+vocabs words ;
 IN: tools.crossref
 
 SYMBOL: crossref
@@ -39,7 +40,7 @@ M: callable quot-uses seq-uses ;
 
 M: wrapper quot-uses [ wrapped>> ] dip quot-uses ;
 
-M: callable uses ( quot -- seq )
+M: callable uses
     IHS{ } clone visited [
         HS{ } clone [ quot-uses ] keep members
     ] with-variable ;
@@ -51,7 +52,8 @@ M: link uses
     [ { $vocab-link } article-links [ >vocab-link ] map ]
     bi append ;
 
-M: pathname uses string>> path>source-file top-level-form>> [ uses ] [ { } ] if* ;
+M: pathname uses
+    string>> path>source-file top-level-form>> [ uses ] [ { } ] if* ;
 
 ! To make UI browser happy
 M: object uses drop f ;
@@ -117,12 +119,12 @@ M: f smart-usage drop \ f smart-usage ;
 : vocab-xref ( vocab quot: ( defspec -- seq ) -- vocabs )
     [ [ vocab-name ] [ vocab-words [ generic? ] reject ] bi ] dip map
     [
-        [ [ word? ] [ generic? not ] bi and ] filter [
+        [ { [ word? ] [ generic? not ] } 1&& ] filter [
             dup method?
             [ "method-generic" word-prop ] when
             vocabulary>>
         ] map
-    ] gather natural-sort remove sift ; inline
+    ] gather sort remove sift ; inline
 
 : vocabs. ( seq -- )
     [ dup >vocab-link write-object nl ] each ;
@@ -140,8 +142,11 @@ M: f smart-usage drop \ f smart-usage ;
 SINGLETON: invalidate-crossref
 
 M: invalidate-crossref definitions-changed
-    2drop crossref global delete-at ;
+    ! reset crossref on non-empty definitions or f which
+    ! indicates a source-file was parsed, cache otherwise
+    drop [ null? not ] [ not ] bi or
+    [ f crossref set-global ] when ;
 
-[ invalidate-crossref add-definition-observer ] "tools.crossref" add-startup-hook
+STARTUP-HOOK: [ invalidate-crossref add-definition-observer ]
 
 PRIVATE>

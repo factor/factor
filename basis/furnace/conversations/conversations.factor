@@ -1,14 +1,9 @@
 ! Copyright (C) 2008 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
-USING: namespaces assocs kernel sequences accessors hashtables
-urls db.types db.tuples math.parser fry logging combinators
-html.templates.chloe.syntax
-http http.server http.server.filters http.server.redirection
-furnace.cache
-furnace.scopes
-furnace.sessions
-furnace.utilities
-furnace.redirection ;
+! See https://factorcode.org/license.txt for BSD license.
+USING: accessors assocs db.tuples db.types furnace.cache
+furnace.redirection furnace.scopes furnace.sessions
+furnace.utilities http http.server kernel math.parser namespaces
+sequences urls ;
 IN: furnace.conversations
 
 TUPLE: conversation < scope session ;
@@ -106,7 +101,7 @@ M: conversations call-responder*
         bi
     ] [ drop ] if* ;
 
-M: conversations modify-form ( conversations -- xml/f )
+M: conversations modify-form
     drop
     conversation-id get
     conversation-id-key

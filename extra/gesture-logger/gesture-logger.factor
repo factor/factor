@@ -1,6 +1,6 @@
 ! Copyright (C) 2007, 2009 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
-USING: accessors io kernel prettyprint colors.constants ui ui.gadgets
+! See https://factorcode.org/license.txt for BSD license.
+USING: accessors io kernel prettyprint colors ui ui.gadgets
 ui.gadgets.panes ui.gadgets.scrollers ui.gestures ui.pens.solid ;
 IN: gesture-logger
 

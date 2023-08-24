@@ -1,14 +1,14 @@
 ! Copyright (C) 2010 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors continuations debugger io io.directories
-io.directories.hierarchy io.encodings.utf8 io.files io.launcher
-io.sockets io.streams.string kernel mason.common mason.email sequences
+io.encodings.utf8 io.files io.launcher io.sockets
+io.streams.string kernel mason.common mason.email sequences
 splitting ;
 IN: mason.git
 
 : git-id ( -- id )
-    { "git" "show" } utf8 [ lines ] with-process-reader
-    first " " split second ;
+    { "git" "show" } process-lines
+    first split-words second ;
 
 <PRIVATE
 
@@ -16,7 +16,7 @@ IN: mason.git
     {
         "git"
         "clone"
-        "git://factorcode.org/git/factor.git"
+        "https://github.com/factor/factor.git"
     } ;
 
 : git-clone ( -- )
@@ -28,7 +28,7 @@ IN: mason.git
     {
         "git"
         "pull"
-        "git://factorcode.org/git/factor.git"
+        "https://github.com/factor/factor.git"
         "master"
     } ;
 
@@ -47,7 +47,7 @@ IN: mason.git
 
 : git-pull-failed ( error -- )
     dup output-process-error? [
-        dup output>> "not uptodate. Cannot merge." swap subseq?
+        dup output>> "not uptodate. Cannot merge." subseq-of?
         [ git-repo-corrupted ]
         [ rethrow ]
         if
@@ -57,7 +57,7 @@ IN: mason.git
     { "git" "status" "--porcelain" } ;
 
 : git-status ( -- seq )
-    git-status-cmd utf8 [ lines ] with-process-reader ;
+    git-status-cmd process-lines ;
 
 : check-repository ( -- seq )
     "factor" [ git-status ] with-directory ;
@@ -78,7 +78,7 @@ PRIVATE>
 
 : git-clone-or-pull ( -- id )
     ! Must be run from builds-dir.
-    "factor" exists? [
+    "factor" file-exists? [
         check-repository [
             "factor" [
                 [ git-pull-cmd short-running-process ]

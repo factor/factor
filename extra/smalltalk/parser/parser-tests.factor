@@ -55,22 +55,22 @@ test         = <foreign parse-smalltalk Literal>
 
 {
     T{ ast-block
-       { arguments { "i" } }
-       { body
-         {
-             T{ ast-message-send
-                { receiver T{ ast-name { name "i" } } }
-                { selector "print" }
-             }
-         }
-       }
+        { arguments { "i" } }
+        { body
+            {
+                T{ ast-message-send
+                    { receiver T{ ast-name { name "i" } } }
+                    { selector "print" }
+                }
+            }
+        }
     }
 }
 [ "[ :i | i print ]" test-Literal ] unit-test
 
 {
     T{ ast-block
-       { body { 5 self } }
+        { body { 5 self } }
     }
 }
 [ "[5. self]" test-Literal ] unit-test
@@ -141,50 +141,50 @@ test         = <foreign parse-smalltalk Expression>
 
 {
     T{ ast-message-send
-       { receiver
-         T{ ast-message-send
-            { receiver
-              T{ ast-message-send
-                 { receiver 1 }
-                 { selector "<" }
-                 { arguments { 10 } }
-              }
+        { receiver
+            T{ ast-message-send
+                { receiver
+                T{ ast-message-send
+                    { receiver 1 }
+                    { selector "<" }
+                    { arguments { 10 } }
+                }
+                }
+                { selector "ifTrue:ifFalse:" }
+                { arguments
+                {
+                    T{ ast-block { body { "HI" } } }
+                    T{ ast-block { body { "BYE" } } }
+                }
+                }
             }
-            { selector "ifTrue:ifFalse:" }
-            { arguments
-              {
-                  T{ ast-block { body { "HI" } } }
-                  T{ ast-block { body { "BYE" } } }
-              }
-            }
-         }
-       }
-       { selector "print" }
+        }
+        { selector "print" }
     }
 }
 [ "((1 < 10) ifTrue: [ 'HI' ] ifFalse: [ 'BYE' ]) print" test-Expression ] unit-test
 
 {
     T{ ast-cascade
-       { receiver 12 }
-       { messages
-         {
-           T{ ast-message f "sqrt" }
-           T{ ast-message f "+" { 2 } }
-         }
-       }
+        { receiver 12 }
+        { messages
+            {
+            T{ ast-message f "sqrt" }
+            T{ ast-message f "+" { 2 } }
+            }
+        }
     }
 }
 [ "12 sqrt; + 2" test-Expression ] unit-test
 
 {
     T{ ast-cascade
-       { receiver T{ ast-message-send f 12 "sqrt" } }
-       { messages
-         {
-           T{ ast-message f "+" { 1 } }
-           T{ ast-message f "+" { 2 } }
-         }
+        { receiver T{ ast-message-send f 12 "sqrt" } }
+        { messages
+            {
+                T{ ast-message f "+" { 1 } }
+                T{ ast-message f "+" { 2 } }
+            }
        }
     }
 }
@@ -192,12 +192,12 @@ test         = <foreign parse-smalltalk Expression>
 
 {
     T{ ast-cascade
-       { receiver T{ ast-message-send f 12 "squared" } }
-       { messages
-         {
-           T{ ast-message f "to:" { 100 } }
-           T{ ast-message f "sqrt" }
-         }
+        { receiver T{ ast-message-send f 12 "squared" } }
+        { messages
+            {
+                T{ ast-message f "to:" { 100 } }
+                T{ ast-message f "sqrt" }
+            }
        }
     }
 }
@@ -214,14 +214,14 @@ test         = <foreign parse-smalltalk Expression>
 
 {
     T{ ast-message-send
-       { receiver
-         T{ ast-message-send
-            { receiver { T{ ast-block { body { "a" } } } } }
-            { selector "at:" }
-            { arguments { 0 } }
-         }
-       }
-       { selector "value" }
+        { receiver
+            T{ ast-message-send
+                { receiver { T{ ast-block { body { "a" } } } } }
+                { selector "at:" }
+                { arguments { 0 } }
+            }
+        }
+        { selector "value" }
     }
 }
 [ "(#(['a']) at: 0) value" test-Expression ] unit-test
@@ -294,8 +294,8 @@ test         = <foreign parse-smalltalk LocalVariableDeclarationList>
 }
 [ "class Test1 [|a|]. class Test2 extends Test1 [|b|]" parse-smalltalk ] unit-test
 
-{ } [ "class Foo []. Tests blah " parse-smalltalk drop ] unit-test
+[ "class Foo []. Tests blah " parse-smalltalk ] must-not-fail
 
-{ } [ "vocab:smalltalk/parser/test.st" ascii file-contents parse-smalltalk drop ] unit-test
+[ "vocab:smalltalk/parser/test.st" ascii file-contents parse-smalltalk ] must-not-fail
 
-{ } [ "_abc_" parse-smalltalk drop ] unit-test
+[ "_abc_" parse-smalltalk ] must-not-fail

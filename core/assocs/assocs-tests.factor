@@ -200,7 +200,7 @@ unit-test
         H{ { 1 3 } }
         H{ { 2 3 } }
         H{ { 1 2 } }
-    } assoc-combine
+    } assoc-union-all
 ] unit-test
 
 { H{ { 1 7 } } } [
@@ -208,7 +208,7 @@ unit-test
         H{ { 1 2 } { 2 4 } { 5 6 } }
         H{ { 1 3 } { 2 5 } }
         H{ { 1 7 } { 5 6 } }
-    } assoc-refine
+    } assoc-intersect-all
 ] unit-test
 
 { f } [ "a" { } assoc-stack ] unit-test
@@ -308,6 +308,19 @@ unit-test
     V{ { 11 0 } { 22 1 } { 33 2 } }
 } [ { 11 22 33 } V{ } zip-index-as ] unit-test
 
+! zip-with, zip-with-as
+{
+    { { "cat" 3 } { "food" 4 } { "is" 2 } { "yummy" 5 } }
+} [
+    { "cat" "food" "is" "yummy" } [ length ] zip-with
+] unit-test
+
+{
+    H{ { "cat" 3 } { "food" 4 } { "is" 2 } { "yummy" 5 } }
+} [
+    { "cat" "food" "is" "yummy" } [ length ] H{ } zip-with-as
+] unit-test
+
 {
     H{
         { 0 V{ 0 3 6 9 } }
@@ -317,3 +330,18 @@ unit-test
 } [
     10 <iota> [ 3 mod ] collect-by
 ] unit-test
+
+{
+    H{
+        { 0 V{ 0 3 6 9 0 3 6 9 } }
+        { 1 V{ 1 4 7 1 4 7 } }
+        { 2 V{ 2 5 8 2 5 8 } }
+    }
+} [
+    10 <iota> [ 3 mod ] collect-by
+    10 <iota> [ 3 mod ] collect-by!
+] unit-test
+
+{ H{ { 1 4 } } } [ H{ { 1 2 } } 1 over [ sq ] ?change-at ] unit-test
+{ H{ { 1 2 } } } [ H{ { 1 2 } } 2 over [ sq ] ?change-at ] unit-test
+{ H{ { 1 3 } } } [ H{ { 1 2 } } 3 1 pick [ drop dup ] ?change-at drop ] unit-test

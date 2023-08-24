@@ -1,5 +1,5 @@
 ! Copyright (C) 2008, 2009 Jose Antonio Ortega Ruiz.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors assocs compiler.units continuations fry fuel.eval
 fuel.help fuel.xref help.topics io.pathnames kernel namespaces parser
 parser.notes sequences source-files tools.scaffold vocabs vocabs.files
@@ -146,7 +146,7 @@ PRIVATE>
     [ developer-name set ] when* ;
 
 : fuel-scaffold-vocab ( root name devname -- result )
-    [ scaffold-name dup [ scaffold-vocab ] dip ] with-scope
+    [ scaffold-name dup [ scaffold-vocab-in ] dip ] with-scope
     dup require vocab-source-path absolute-path ;
 
 : fuel-scaffold-help ( name devname -- result )
@@ -155,32 +155,23 @@ PRIVATE>
 
 : fuel-scaffold-tests ( name devname -- result )
     [ scaffold-name dup require dup scaffold-tests ] with-scope
-    vocab-tests-file absolute-path ;
+    vocab-tests-path absolute-path ;
 
 : fuel-scaffold-authors ( name devname -- result )
     [ scaffold-name dup require dup scaffold-authors ] with-scope
-    [ vocab-authors-path ] keep swap vocab-append-path absolute-path ;
+    vocab-authors-path absolute-path ;
 
 : fuel-scaffold-tags ( name tags -- result )
     [ scaffold-tags ]
-    [
-        drop [ vocab-tags-path ] keep swap
-        vocab-append-path absolute-path
-    ] 2bi ;
+    [ drop vocab-tags-path absolute-path ] 2bi ;
 
 : fuel-scaffold-summary ( name summary -- result )
     [ scaffold-summary ]
-    [
-        drop [ vocab-summary-path ] keep swap
-        vocab-append-path absolute-path
-    ] 2bi ;
+    [ drop vocab-summary-path absolute-path ] 2bi ;
 
 : fuel-scaffold-platforms ( name platforms -- result )
     [ scaffold-platforms ]
-    [
-        drop [ vocab-platforms-path ] keep swap
-        vocab-append-path absolute-path
-    ] 2bi ;
+    [ drop vocab-platforms-path absolute-path ] 2bi ;
 
 : fuel-scaffold-get-root ( name -- result )
     find-vocab-root ;

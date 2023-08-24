@@ -1,7 +1,7 @@
 ! Copyright (C) 2008 Tim Wawrzynczak
-! See http://factorcode.org/license.txt for BSD license.
-USING: help.markup help.syntax sequences kernel accessors
-id3.private strings ;
+! See https://factorcode.org/license.txt for BSD license.
+USING: help.markup help.syntax id3.private kernel sequences
+strings ;
 IN: id3
 
 HELP: mp3>id3

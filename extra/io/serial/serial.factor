@@ -1,7 +1,7 @@
 ! Copyright (C) 2008 Doug Coleman.
-! See http://factorcode.org/license.txt for BSD license.
-USING: accessors destructors io kernel math.parser sequences
-summary system vocabs ;
+! See https://factorcode.org/license.txt for BSD license.
+USING: accessors destructors io.streams.duplex kernel
+math.parser sequences summary system vocabs ;
 IN: io.serial
 
 TUPLE: serial-port < disposable stream path baud
@@ -23,10 +23,7 @@ M: serial-port dispose* ( serial -- ) stream>> dispose ;
         swap >>path
         default-serial-flags ;
 
-: with-duplex-stream ( duplex-stream quot -- )
-    [ [ in>> ] [ out>> ] bi ] dip with-streams ; inline
-
 : with-serial-port ( serial-port quot -- )
-    [ open-serial ] dip with-duplex-stream ; inline
+    [ open-serial ] dip with-stream ; inline
 
 "io.serial." os name>> append require

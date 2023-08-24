@@ -33,8 +33,8 @@ MACRO: map-index-compose ( seq quot -- quot' )
       [ [ bitand ] dip swap 0 = [ 2drop ] [ [ 1.0 ] 2dip swap set-nth ] if ]
       map-index-compose 2cleave ;
 
- : >pov ( byte -- symbol )
-     {
+: >pov ( byte -- symbol )
+    {
          pov-neutral
          pov-up
          pov-down
@@ -51,7 +51,7 @@ MACRO: map-index-compose ( seq quot -- quot' )
          pov-neutral
          pov-neutral
          pov-neutral
-     } nth ;
+    } nth ;
 
 : fill-controller-state ( XINPUT_STATE -- controller-state )
     Gamepad>> controller-state new dup rot
@@ -114,13 +114,13 @@ M: xinput-game-input-backend instance-id
     if ;
 
 M: xinput-game-input-backend read-controller
-    XINPUT_STATE <struct> [ XInputGetState drop ] keep
+    XINPUT_STATE new [ XInputGetState drop ] keep
     fill-controller-state ;
 
 M: xinput-game-input-backend calibrate-controller drop ;
 
 M: xinput-game-input-backend vibrate-controller
-    [ >vibration ] bi@ XINPUT_VIBRATION <struct-boa> XInputSetState drop ;
+    [ >vibration ] bi@ XINPUT_VIBRATION boa XInputSetState drop ;
 
 M: xinput-game-input-backend read-keyboard
     +keyboard-device+ get

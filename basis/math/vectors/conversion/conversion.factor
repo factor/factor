@@ -1,8 +1,8 @@
 ! Copyright (C) 2009 Joe Groff.
-! See http://factorcode.org/license.txt for BSD license.
-USING: accessors alien arrays assocs classes combinators
-combinators.short-circuit fry kernel locals math math.vectors
-math.vectors.simd math.vectors.simd.intrinsics sequences ;
+! See https://factorcode.org/license.txt for BSD license.
+USING: accessors alien alien.c-types classes combinators
+combinators.short-circuit kernel math math.vectors.simd
+math.vectors.simd.intrinsics sequences ;
 FROM: alien.c-types =>
     char uchar short ushort int uint longlong ulonglong
     float double heap-size ;

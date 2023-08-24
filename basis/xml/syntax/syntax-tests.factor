@@ -1,8 +1,8 @@
 ! Copyright (C) 2005, 2009 Daniel Ehrenberg
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: xml io kernel math sequences strings xml.traversal
 tools.test math.parser xml.syntax xml.data xml.syntax.private
-accessors multiline locals inverse xml.writer splitting classes
+accessors multiline inverse xml.writer splitting classes
 xml.private ;
 IN: xml.syntax.tests
 
@@ -34,9 +34,9 @@ TAG: neg calculate
     calc-arith
 ] unit-test
 
-XML-NS: foo http://blah.com
+XML-NS: foo https://blah.com
 
-{ T{ name { main "bling" } { url "http://blah.com" } } } [ "bling" foo ] unit-test
+{ T{ name { main "bling" } { url "https://blah.com" } } } [ "bling" foo ] unit-test
 
 ! XML literals
 
@@ -74,14 +74,14 @@ XML-NS: foo http://blah.com
     three
   </item>
 </doc>" } [
-    "one two three" " " split
+    "one two three" split-words
     [ [XML <item><-></item> XML] ] map
     <XML <doc><-></doc> XML> pprint-xml>string
 ] unit-test
 
 { "<?xml version=\"1.0\" encoding=\"UTF-8\"?>
-<x number=\"3\" url=\"http://factorcode.org/\" string=\"hello\" word=\"drop\"/>" }
-[ 3 f "http://factorcode.org/" "hello" \ drop
+<x number=\"3\" url=\"https://factorcode.org/\" string=\"hello\" word=\"drop\"/>" }
+[ 3 f "https://factorcode.org/" "hello" \ drop
   <XML <x number=<-> false=<-> url=<-> string=<-> word=<->/> XML>
   pprint-xml>string  ] unit-test
 

@@ -1,0 +1,1 @@
+Douglas Crockford's Base 32 encoding/decoding

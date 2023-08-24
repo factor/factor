@@ -246,7 +246,7 @@ DEFER: blah4
 ! Test words with continuations
 { 0 0 } [ [ drop ] callcc0 ] must-infer-as
 { 0 1 } [ [ 4 swap continue-with ] callcc1 ] must-infer-as
-{ 2 1 } [ [ + ] [ ] [ ] cleanup ] must-infer-as
+{ 2 1 } [ [ + ] [ ] finally ] must-infer-as
 { 2 1 } [ [ + ] [ 3drop 0 ] recover ] must-infer-as
 
 ! A typo

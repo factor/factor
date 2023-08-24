@@ -1,5 +1,4 @@
-USING: help.markup help.syntax io.streams.string quotations urls
-http.server http ;
+USING: help.markup help.syntax http quotations urls ;
 IN: furnace.redirection
 
 HELP: <redirect-responder>
@@ -16,23 +15,23 @@ HELP: <secure-only>
 
 HELP: <secure-redirect>
 { $values
-     { "url" url }
-     { "response" response }
+    { "url" url }
+    { "response" response }
 }
 { $description "Creates a responder which unconditionally redirects the client to the given URL after setting its protocol to HTTPS." }
 { $notes "This word is intended to be used with a relative URL. The client is redirected to the relative URL, but with HTTPS instead of HTTP." } ;
 
 HELP: >secure-url
 { $values
-     { "url" url }
-     { "url'" url }
+    { "url" url }
+    { "url'" url }
 }
 { $description "Sets the protocol of a URL to HTTPS." } ;
 
 HELP: if-secure
 { $values
-     { "quot" quotation }
-     { "response" response }
+    { "quot" quotation }
+    { "response" response }
 }
 { $description "Runs a quotation if the current request was made over HTTPS, otherwise returns a redirect to have the client request the current page again via HTTPS." } ;
 
@@ -50,7 +49,7 @@ $nl
 } ;
 
 ARTICLE: "furnace.redirection" "Furnace redirection support"
-"The " { $vocab-link "furnace.redirection" } " vocabulary builds additional functionality on top of " { $vocab-link "http.server.redirection" } ", and integrates with various Furnace features such as " { $link "furnace.asides" } " and " { $link "furnace.conversations" } "."
+"The " { $vocab-link "furnace.redirection" } " vocabulary builds additional functionality on top of " { $vocab-link "http.server.redirection" } ", and integrates with various Furnace features such as " { $vocab-link "furnace.asides" } " and " { $vocab-link "furnace.conversations" } "."
 $nl
 "A redirection response which takes asides and conversations into account:"
 { $subsections <redirect> }

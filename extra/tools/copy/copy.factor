@@ -1,5 +1,5 @@
 ! Copyright (C) 2011 John Benediktsson
-! See http://factorcode.org/license.txt for BSD license
+! See https://factorcode.org/license.txt for BSD license
 
 USING: combinators combinators.short-circuit command-line io
 io.directories io.files io.files.info kernel math namespaces
@@ -15,7 +15,7 @@ IN: tools.copy
     [ unclip-last copy-files-into ] [ drop usage ] if ;
 
 : copy-to-file ( args -- )
-    dup last { [ exists? ] [ file-info directory? ] } 1&&
+    dup last { [ file-exists? ] [ file-info directory? ] } 1&&
     [ copy-to-dir ] [ first2 copy-file ] if ;
 
 : run-copy ( -- )

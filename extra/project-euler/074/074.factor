@@ -1,10 +1,10 @@
 ! Copyright (c) 2009 Guillaume Nargeot.
-! See http://factorcode.org/license.txt for BSD license.
-USING: hash-sets kernel math.ranges project-euler.common
+! See https://factorcode.org/license.txt for BSD license.
+USING: hash-sets kernel ranges project-euler.common
 sequences sets ;
 IN: project-euler.074
 
-! http://projecteuler.net/index.php?section=problems&id=074
+! https://projecteuler.net/index.php?section=problems&id=074
 
 ! DESCRIPTION
 ! -----------
@@ -58,7 +58,7 @@ IN: project-euler.074
 PRIVATE>
 
 : euler074 ( -- answer )
-    1000000 [1,b] [ chain-length 60 = ] count ;
+    1,000,000 [1..b] [ chain-length 60 = ] count ;
 
 ! [ euler074 ] 10 ave-time
 ! 25134 ms ave run time - 31.96 SD (10 trials)

@@ -1,5 +1,5 @@
 ! Copyright (C) 2007, 2008 Slava Pestov, 2009 Alex Chapman
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors assocs boxes kernel math namespaces
 slots.private ;
 IN: refs
@@ -60,7 +60,7 @@ INSTANCE: box ref
 
 TUPLE: assoc-ref assoc key ;
 : >assoc-ref< ( assoc-ref -- key value ) [ key>> ] [ assoc>> ] bi ; inline
-M: assoc-ref delete-ref ( assoc-ref -- ) >assoc-ref< delete-at ;
+M: assoc-ref delete-ref >assoc-ref< delete-at ;
 
 TUPLE: key-ref < assoc-ref ;
 C: <key-ref> key-ref

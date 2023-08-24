@@ -1,5 +1,5 @@
 ! Copyright (C) 2009, 2010, 2011 Joe Groff, Slava Pestov, John Benediktsson.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors alien alien.c-types alien.data alien.syntax
 assocs byte-arrays classes classes.private classes.struct
 classes.struct.prettyprint.private classes.tuple
@@ -22,6 +22,13 @@ SYMBOL: struct-test-empty
 [ [ struct-test-empty { } define-struct-class ] with-compilation-unit ]
 [ struct-must-have-slots? ] must-fail-with
 
+STRUCT: struct-test-readonly
+    { x uint read-only } ;
+
+{ S{ struct-test-readonly f 10 } } [
+    10 struct-test-readonly <struct-boa>
+] unit-test
+
 STRUCT: struct-test-foo
     { x char }
     { y int initial: 123 }
@@ -33,6 +40,8 @@ STRUCT: struct-test-bar
 
 { 12 } [ struct-test-foo heap-size ] unit-test
 { 12 } [ struct-test-foo <struct> byte-length ] unit-test
+{ t } [ [ struct-test-foo new ] { <struct> } inlined? ] unit-test
+{ t } [ [ struct-test-foo boa ] { <struct-boa> } inlined? ] unit-test
 { 16 } [ struct-test-bar heap-size ] unit-test
 { 123 } [ struct-test-foo <struct> y>> ] unit-test
 { 123 } [ struct-test-bar <struct> foo>> y>> ] unit-test
@@ -187,19 +196,22 @@ STRUCT: struct-test-string-ptr
     ] with-variables
 ] unit-test
 
+: with-default-string-writer ( quot -- str )
+    64 margin [ with-string-writer ] with-variable ; inline
+
 { "USING: alien.c-types classes.struct ;
 IN: classes.struct.tests
 STRUCT: struct-test-foo
     { x char initial: 0 } { y int initial: 123 } { z bool } ;
 " }
-[ [ struct-test-foo see ] with-string-writer ] unit-test
+[ [ struct-test-foo see ] with-default-string-writer ] unit-test
 
 { "USING: alien.c-types classes.struct ;
 IN: classes.struct.tests
 UNION-STRUCT: struct-test-float-and-bits
     { f float initial: 0.0 } { bits uint initial: 0 } ;
 " }
-[ [ struct-test-float-and-bits see ] with-string-writer ] unit-test
+[ [ struct-test-float-and-bits see ] with-default-string-writer ] unit-test
 
 { {
     T{ struct-slot-spec
@@ -503,17 +515,17 @@ UNION-STRUCT: struct-1-union { a c:int } ;
 IN: classes.struct.tests
 STRUCT: struct-1 { a int initial: 0 } ;
 " }
-[ \ struct-1 [ see ] with-string-writer ] unit-test
+[ \ struct-1 [ see ] with-default-string-writer ] unit-test
 { "USING: alien.c-types classes.struct ;
 IN: classes.struct.tests
 PACKED-STRUCT: struct-1-packed { a int initial: 0 } ;
 " }
-[ \ struct-1-packed [ see ] with-string-writer ] unit-test
+[ \ struct-1-packed [ see ] with-default-string-writer ] unit-test
 { "USING: alien.c-types classes.struct ;
 IN: classes.struct.tests
 STRUCT: struct-1-union { a int initial: 0 } ;
 " }
-[ \ struct-1-union [ see ] with-string-writer ] unit-test
+[ \ struct-1-union [ see ] with-default-string-writer ] unit-test
 
 ! Bug #206
 STRUCT: going-to-redefine { a uint } ;

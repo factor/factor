@@ -1,6 +1,6 @@
 ! Copyright (C) 2009 Bruno Deferrari.
-! See http://factorcode.org/license.txt for BSD license.
-USING: accessors calendar destructors formatting fry io io.directories
+! See https://factorcode.org/license.txt for BSD license.
+USING: accessors calendar destructors formatting io io.directories
 io.encodings.utf8 io.files io.pathnames irc.client irc.client.chats
 irc.logbot.log-line irc.messages.base kernel namespaces sequences
 splitting threads ;
@@ -18,7 +18,7 @@ SYMBOL: current-day
 SYMBOL: current-stream
 
 : bot-profile ( -- obj )
-    "irc.freenode.org" 6667
+    "irc.libera.chat" 6697
     nickserv-handle get default-nickserv-handle or
     nickserv-password get <irc-profile> ;
 

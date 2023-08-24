@@ -1,12 +1,6 @@
 ! Copyright (C) 2010 Doug Coleman.
-! See http://factorcode.org/license.txt for BSD license.
-USING: accessors alien alien.data alien.parser alien.strings
-alien.syntax arrays assocs byte-arrays classes.struct
-combinators continuations cuda.ffi
-destructors fry init io io.backend io.encodings.string
-io.encodings.utf8 kernel lexer locals macros math math.parser
-namespaces opengl.gl.extensions parser prettyprint quotations
-sequences words ;
+! See https://factorcode.org/license.txt for BSD license.
+USING: alien.c-types alien.data cuda.ffi kernel ;
 QUALIFIED-WITH: alien.c-types c
 IN: cuda
 

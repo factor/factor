@@ -1,5 +1,5 @@
 ! Copyright (C) 2013 Charles Alston, John Benediktsson
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: arrays formatting help.stylesheet io io.encodings.utf8
 io.launcher io.pathnames io.styles kernel locals memoize
 namespaces sequences sequences.generalizations splitting
@@ -42,35 +42,28 @@ IN: spotlight
 : attr|| ( attr1 attr2 -- string )
     " || " glue ;
 
-<PRIVATE
-
-: run-process-output ( command -- seq )
-    utf8 [ lines ] with-process-reader ;
-
-PRIVATE>
-
 : mdfind ( query -- results )
-    "mdfind -onlyin . %s" sprintf run-process-output ;
+    "mdfind -onlyin . %s" sprintf process-lines ;
 
 : mdfind. ( query -- )
     mdfind [ dup <pathname> write-object nl ] each ;
 
 : mdls ( path -- )
-    absolute-path "mdls" swap 2array run-process-output
+    absolute-path "mdls" swap 2array process-lines
     [ print ] each ;
 
 : mdutil ( flags on|off volume -- seq )
     [ "mdfind" swap "-" prepend "-i" ] 2dip 5 narray
-    run-process-output ;
+    process-lines ;
 
 : mdimport ( path -- seq )
-    absolute-path "mdimport " prepend run-process-output ;
+    absolute-path "mdimport " prepend process-lines ;
 
 : mdimport-with ( path options -- seq )
-    swap absolute-path "mdimport %s %s" sprintf run-process-output ;
+    swap absolute-path "mdimport %s %s" sprintf process-lines ;
 
 MEMO: kMDItems ( -- seq )
-    "mdimport -A" run-process-output
+    "mdimport -A" process-lines
     [ "'kMDItem" head? ] filter
     [ "\t" split harvest [ but-last rest ] map ] map ;
 

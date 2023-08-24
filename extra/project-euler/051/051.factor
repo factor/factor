@@ -1,7 +1,7 @@
 ! Copyright (C) 2009 Jon Harper.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 
-! http://projecteuler.net/index.php?section=problems&id=1
+! https://projecteuler.net/index.php?section=problems&id=1
 
 ! DESCRIPTION
 ! -----------
@@ -26,8 +26,8 @@
 
 ! for each prime number, count the families it belongs to. When one reaches count of 8, stop, and get the smallest number by replacing * with ones.
 
-USING: assocs fry kernel math math.combinatorics math.functions
-math.order math.parser math.primes math.ranges namespaces
+USING: assocs kernel math math.combinatorics math.functions
+math.order math.parser math.primes ranges namespaces
 project-euler.common sequences sets ;
 IN: project-euler.051
 <PRIVATE
@@ -45,7 +45,7 @@ SYMBOL: large-families
 : replace-positions-with-* ( str positions -- str )
     [ *-if-index ] curry map-index ;
 : all-positions-combinations ( seq -- combinations )
-    dup length [1,b] [ all-combinations ] with map concat ;
+    dup length [1..b] [ all-combinations ] with map concat ;
 
 : families ( stra -- seq )
     dup digits-positions values
@@ -54,7 +54,7 @@ SYMBOL: large-families
 : save-family ( family -- )
     dup family-count get at 8 = [ large-families get adjoin ] [ drop ] if ;
 : increment-family ( family -- )
-   family-count get inc-at ;
+    family-count get inc-at ;
 : handle-family ( family -- )
     [ increment-family ] [ save-family ] bi ;
 

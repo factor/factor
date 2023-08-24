@@ -1,11 +1,12 @@
 ! Copyright (C) 2008 Doug Coleman.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors alien arrays assocs byte-arrays calendar
-classes classes.error combinators combinators.short-circuit fry
-hashtables help.markup interpolate io io.directories
-io.encodings.utf8 io.files io.pathnames io.streams.string kernel
-math math.parser namespaces prettyprint quotations sequences
-sets sorting splitting strings system timers unicode urls vocabs
+classes classes.error combinators combinators.short-circuit
+continuations effects eval hashtables help.markup interpolate io
+io.directories io.encodings.utf8 io.files io.pathnames
+io.streams.string kernel math math.parser namespaces parser
+prettyprint prettyprint.config quotations sequences sets sorting
+splitting strings system timers unicode urls vocabs
 vocabs.loader vocabs.metadata words words.symbol ;
 IN: tools.scaffold
 
@@ -24,17 +25,17 @@ ERROR: vocab-must-not-exist string ;
 : ensure-vocab-exists ( string -- string )
     dup lookup-vocab [ no-vocab ] unless ;
 
-: check-root ( string -- string )
+: check-vocab-root ( string -- string )
     dup vocab-root? [ not-a-vocab-root ] unless ;
 
-: check-vocab-root/vocab ( vocab-root string -- vocab-root string )
-    [ check-root ] [ check-vocab-name ] bi* ;
+: check-vocab-root/name ( vocab-root string -- vocab-root string )
+    [ check-vocab-root ] [ check-vocab-name ] bi* ;
 
 : replace-vocab-separators ( vocab -- path )
     path-separator first CHAR: . associate substitute ;
 
 : vocab-root/vocab>path ( vocab-root vocab -- path )
-    check-vocab-root/vocab
+    check-vocab-root/name
     [ ] [ replace-vocab-separators ] bi* append-path ;
 
 : vocab>path ( vocab -- path )
@@ -57,7 +58,7 @@ ERROR: vocab-must-not-exist string ;
 
 : scaffold-directory ( vocab-root vocab -- )
     vocab-root/vocab>path
-    dup exists? [ directory-exists ] [ make-directories ] if ;
+    dup file-exists? [ directory-exists ] [ make-directories ] if ;
 
 : not-scaffolding ( path -- path )
     "Not creating scaffolding for " write dup <pathname> . ;
@@ -66,12 +67,12 @@ ERROR: vocab-must-not-exist string ;
     "Creating scaffolding for " write dup <pathname> . ;
 
 : scaffolding? ( path -- path ? )
-    dup exists? [ not-scaffolding f ] [ scaffolding t ] if ;
+    dup file-exists? [ not-scaffolding f ] [ scaffolding t ] if ;
 
 : scaffold-copyright ( -- )
     "! Copyright (C) " write now year>> number>string write
     developer-name get [ "Your name" ] unless* bl write "." print
-    "! See http://factorcode.org/license.txt for BSD license." print ;
+    "! See https://factorcode.org/license.txt for BSD license." print ;
 
 : main-file-string ( vocab -- string )
     [
@@ -125,6 +126,11 @@ ERROR: vocab-must-not-exist string ;
         { "vocab-root" "a vocabulary root string" }
         { "c-ptr" c-ptr }
         { "sequence" sequence }
+        { "slice" slice }
+        { "from" integer }
+        { "to" integer }
+        { "i" integer }
+        { "n" integer }
         { "seq" sequence }
         { "exemplar" object }
         { "assoc" assoc }
@@ -142,7 +148,7 @@ M: array add-using [ add-using ] each ;
 
 M: string add-using drop ;
 
-M: object add-using ( object -- )
+M: object add-using
     vocabulary>> using get [ adjoin ] [ drop ] if* ;
 
 : ($values.) ( array -- )
@@ -155,8 +161,8 @@ M: object add-using ( object -- )
                 [ unparse write bl ]
                 [ [ pprint ] [ add-using ] bi ] bi*
             ] [
-                drop unparse write bl null pprint
-                null add-using
+                drop unparse write bl object pprint
+                object add-using
             ] if
             " }" write
         ] interleave
@@ -207,16 +213,20 @@ M: object add-using ( object -- )
 : docs-header. ( word -- )
     "HELP: " write name>> print ;
 
-: (help.) ( word -- )
-    [ docs-header. ] [ docs-body. ] bi ;
-
 : interesting-words ( vocab -- array )
     vocab-words
     [ { [ "help" word-prop ] [ predicate? ] } 1|| ] reject
-    natural-sort ;
+    sort ;
+
+PRIVATE>
+
+: scaffold-word-docs ( word -- )
+    [ docs-header. ] [ docs-body. ] bi ;
+
+<PRIVATE
 
 : interesting-words. ( vocab -- )
-    interesting-words [ (help.) nl ] each ;
+    interesting-words [ scaffold-word-docs nl ] each ;
 
 : docs-file-string ( vocab -- str2 )
     [
@@ -235,7 +245,7 @@ M: object add-using ( object -- )
 : write-using ( vocab -- )
     "USING:" write
     using get members
-    { "help.markup" "help.syntax" } append natural-sort remove
+    { "help.markup" "help.syntax" } append sort remove
     [ bl write ] each
     " ;" print ;
 
@@ -250,6 +260,7 @@ M: object add-using ( object -- )
     [ HS{ } clone using ] dip with-variable ; inline
 
 : link-vocab ( vocab -- )
+    ".private" ?tail drop
     check-vocab
     "Edit documentation: " write
     "-docs.factor" vocab/suffix>path <pathname> . ;
@@ -257,9 +268,11 @@ M: object add-using ( object -- )
 PRIVATE>
 
 : help. ( word -- )
-    [ (help.) ] [ nl vocabulary>> link-vocab ] bi ;
+    [ scaffold-word-docs ] [ nl vocabulary>> link-vocab ] bi ;
 
-: scaffold-docs ( vocab -- )
+GENERIC: scaffold-docs ( obj -- )
+
+M: string scaffold-docs ( vocab -- )
     ensure-vocab-exists
     [
         dup "-docs.factor" vocab/suffix>path scaffolding? [
@@ -268,6 +281,9 @@ PRIVATE>
             2drop
         ] if
     ] with-scaffold ;
+
+M: sequence scaffold-docs [ scaffold-word-docs nl ] each ;
+M: word scaffold-docs scaffold-word-docs ;
 
 : scaffold-undocumented ( string -- )
     [ interesting-words. ] [ link-vocab ] bi ;
@@ -287,7 +303,7 @@ PRIVATE>
 : delete-from-root-cache ( string -- )
     root-cache get delete-at ;
 
-: scaffold-vocab ( vocab-root string -- )
+: scaffold-vocab-in ( vocab-root string -- )
     dup delete-from-root-cache
     {
         [ scaffold-directory ]
@@ -296,13 +312,22 @@ PRIVATE>
         [ nip scaffold-authors ]
     } 2cleave ;
 
-: scaffold-core ( string -- ) "resource:core" swap scaffold-vocab ;
+: scaffold-core ( string -- )
+    "resource:core" swap scaffold-vocab-in ;
 
-: scaffold-basis ( string -- ) "resource:basis" swap scaffold-vocab ;
+: scaffold-basis ( string -- )
+    "resource:basis" swap scaffold-vocab-in ;
 
-: scaffold-extra ( string -- ) "resource:extra" swap scaffold-vocab ;
+: scaffold-extra ( string -- )
+    "resource:extra" swap scaffold-vocab-in ;
 
-: scaffold-work ( string -- ) "resource:work" swap scaffold-vocab ;
+: scaffold-work ( string -- )
+    "resource:work" swap scaffold-vocab-in  ;
+
+: scaffold-vocab ( string -- )
+    "Choose a vocabulary root:" vocab-roots get
+    '[ [ "Use " prepend ] keep ] { } map>assoc throw-restarts
+    swap scaffold-vocab-in ;
 
 <PRIVATE
 
@@ -316,11 +341,13 @@ PRIVATE>
 : set-scaffold-tests-file ( vocab path -- )
     [ tests-file-string ] dip utf8 set-file-contents ;
 
+: vocab>test-path ( vocab -- string )
+    "-tests.factor" vocab/suffix>path ;
+
 PRIVATE>
 
 : scaffold-tests ( vocab -- )
-    ensure-vocab-exists
-    dup "-tests.factor" vocab/suffix>path
+    ensure-vocab-exists dup vocab>test-path
     scaffolding? [
         set-scaffold-tests-file
     ] [
@@ -330,7 +357,7 @@ PRIVATE>
 SYMBOL: nested-examples
 
 : example-using ( using -- )
-    " " join "example-using" [
+    join-words "example-using" [
         nested-examples get 4 0 ? CHAR: \s <string> "example-indent" [
             "${example-indent}\"Example:\"
 ${example-indent}{ $example \"USING: ${example-using} ;\"
@@ -359,10 +386,10 @@ ${example-indent}}
 
 : scaffold-file ( path -- )
     [ touch-file ]
-    [ "Click to edit: " write <pathname> . ] bi ;
+    [ "Click to edit: " write >pathname . ] bi ;
 
 : scaffold-rc ( path -- )
-    [ home ] dip append-path scaffold-file ;
+    home-path scaffold-file ;
 
 : scaffold-factor-boot-rc ( -- )
     ".factor-boot-rc" scaffold-rc ;
@@ -376,6 +403,27 @@ ${example-indent}}
 : scaffold-factor-roots ( -- )
     ".factor-roots" scaffold-rc ;
 
+: make-unit-test ( answer code -- str )
+    split-lines [ "    " prepend ] map "\n" join
+    "[\n" "\n] unit-test\n" surround
+    " " glue ;
+
+: run-string ( string -- datastack )
+    [ parse-string ] with-file-vocabs V{ } clone swap with-datastack ;
+
+: read-unit-test ( -- str/f )
+    read-contents [ f ] [
+        [ run-string [ unparse ] without-limits ] keep
+        make-unit-test
+    ] if-empty ;
+
+: read-unit-tests ( -- str )
+    [ read-unit-test dup ] [ ] produce nip "\n\n" join ;
+
+: scaffold-unit-tests ( vocab -- )
+    [ scaffold-tests read-unit-tests ]
+    [ vocab>test-path utf8 [ write ] with-file-appender ] bi ;
+
 HOOK: scaffold-emacs os ( -- )
 
-M: unix scaffold-emacs ( -- ) ".emacs" scaffold-rc ;
+M: unix scaffold-emacs ".emacs" scaffold-rc ;

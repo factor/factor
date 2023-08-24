@@ -1,7 +1,7 @@
 ! Copyright (C) 2010 Erik Charlebois.
-! See http://factorcode.org/license.txt for BSD license.
-USING: accessors kernel locals math math.order math.polynomials
-math.splines opengl.demo-support opengl.gl sequences ui.gadgets
+! See https://factorcode.org/license.txt for BSD license.
+USING: accessors kernel math math.order math.polynomials
+opengl.demo-support opengl.gl sequences ui.gadgets
 ui.gadgets.panes ui.render arrays ;
 IN: math.splines.viewer
 

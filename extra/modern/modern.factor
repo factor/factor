@@ -1,9 +1,10 @@
 ! Copyright (C) 2016 Doug Coleman.
-! See http://factorcode.org/license.txt for BSD license.
-USING: arrays assocs combinators combinators.short-circuit
-continuations fry io.encodings.utf8 io.files kernel locals make
-math math.order modern.paths modern.slices sequences
-sequences.extras sets splitting strings unicode vocabs.loader ;
+! See https://factorcode.org/license.txt for BSD license.
+USING: accessors arrays assocs combinators combinators.extras
+combinators.short-circuit continuations io.encodings.utf8
+io.files kernel make math math.order modern.paths modern.slices
+sequences sequences.extras sets splitting strings unicode
+vocabs.loader ;
 IN: modern
 
 ERROR: string-expected-got-eof n string ;
@@ -36,7 +37,7 @@ MACRO:: read-double-matched ( open-ch -- quot: ( n string tag ch -- n' string se
             ] }
             [ [ tag openstr2 n string ] dip long-opening-mismatch ]
         } case
-     ] ;
+    ] ;
 
 : read-double-matched-paren ( n string tag ch -- n' string seq ) CHAR: ( read-double-matched ;
 : read-double-matched-bracket ( n string tag ch -- n' string seq ) CHAR: [ read-double-matched ;
@@ -99,7 +100,7 @@ MACRO:: read-matched ( ch -- quot: ( n string tag -- n' string slice' ) )
         n string tag
         2over nth-check-eof {
             { [ dup openstreq member? ] [ ch read-double-matched ] } ! (=( or ((
-            { [ dup blank? ] [
+            { [ dup unicode:blank? ] [
                 drop dup '[ _ matching-delimiter-string closestr1 2array members lex-until ] dip
                 swap unclip-last 3array ] } ! ( foo )
             [ drop [ slice-til-whitespace drop ] dip span-slices ]  ! (foo)
@@ -109,24 +110,23 @@ MACRO:: read-matched ( ch -- quot: ( n string tag -- n' string slice' ) )
 : read-bracket ( n string slice -- n' string slice' ) CHAR: [ read-matched ;
 : read-brace ( n string slice -- n' string slice' ) CHAR: { read-matched ;
 : read-paren ( n string slice -- n' string slice' ) CHAR: ( read-matched ;
-: read-string-payload ( n string -- n' string )
+: advance-dquote-payload ( n string -- n' string )
     over [
         { CHAR: \\ CHAR: \" } slice-til-separator-inclusive {
-            { f [ drop ] }
+            { f [ to>> over string-expected-got-eof ] }
             { CHAR: \" [ drop ] }
-            { CHAR: \\ [ drop next-char-from drop read-string-payload ] }
+            { CHAR: \\ [ drop take-char drop advance-dquote-payload ] }
         } case
     ] [
         string-expected-got-eof
     ] if ;
 
 :: read-string ( n string tag -- n' string seq )
-    n string read-string-payload drop :> n'
+    n string advance-dquote-payload drop :> n'
     n' string
-    n' [ n string string-expected-got-eof ] unless
+    tag
     n n' 1 - string <slice>
-    n' 1 - n' string <slice>
-    tag -rot 3array ;
+    n' 1 - n' string <slice> 3array ;
 
 : take-comment ( n string slice -- n' string comment )
     2over ?nth CHAR: [ = [
@@ -185,7 +185,7 @@ ERROR: unexpected-terminator n string slice ;
         [ "<" head? ]
         [ length 2 >= ]
         [ rest strict-upper? not ]
-        [ [ blank? ] any? not ]
+        [ [ unicode:blank? ] any? not ]
         [ "/>" tail? ]
     } 1&& ;
 
@@ -195,7 +195,7 @@ ERROR: unexpected-terminator n string slice ;
         [ length 2 >= ]
         [ second CHAR: / = not ]
         [ rest strict-upper? not ]
-        [ [ blank? ] any? not ]
+        [ [ unicode:blank? ] any? not ]
         [ ">" tail? ]
     } 1&& ;
 
@@ -205,7 +205,7 @@ ERROR: unexpected-terminator n string slice ;
         [ length 2 >= ]
         [ second CHAR: / = not ]
         [ rest strict-upper? not ]
-        [ [ blank? ] any? not ]
+        [ [ unicode:blank? ] any? not ]
         [ ">" tail? not ]
     } 1&& ;
 
@@ -214,7 +214,7 @@ ERROR: unexpected-terminator n string slice ;
         [ "</" head? ]
         [ length 2 >= ]
         [ rest strict-upper? not ]
-        [ [ blank? ] any? not ]
+        [ [ unicode:blank? ] any? not ]
         [ ">" tail? ]
     } 1&& ;
 
@@ -285,7 +285,7 @@ ERROR: colon-word-must-be-all-uppercase-or-lowercase n string word ;
         { [ dup section-open? ] [
             [
                 matching-section-delimiter 1array lex-until
-            ] keep swap unclip-last 3array
+            ] keep-1up unclip-last 3array
         ] }
         ! <foo/>
         { [ dup html-self-close? ] [
@@ -320,7 +320,7 @@ ERROR: colon-word-must-be-all-uppercase-or-lowercase n string word ;
     } cond ;
 
 : read-acute ( n string slice -- n' string acute )
-    [ matching-section-delimiter 1array lex-until ] keep swap unclip-last 3array ;
+    [ matching-section-delimiter 1array lex-until ] keep-1up unclip-last 3array ;
 
 ! Words like append! and suffix! are allowed for now.
 : read-exclamation ( n string slice -- n' string obj )
@@ -450,8 +450,8 @@ ERROR: compound-syntax-disallowed n seq obj ;
     dup length 1 > [ compound-syntax-disallowed ] when ;
 
 : check-compound-loop ( n/f string -- n/f string ? )
-    [ ] [ peek-from ] [ previous-from ] 2tri
-    [ blank? ] bi@ or not ! no blanks between tokens
+    [ ] [ peek1-from ] [ previous-from ] 2tri
+    [ unicode:blank? ] bi@ or not ! no blanks between tokens
     pick and ; ! and a valid index
 
 : lex-factor ( n/f string/f -- n'/f string literal/f )
@@ -480,12 +480,15 @@ ERROR: compound-syntax-disallowed n seq obj ;
     utf8 file-contents string>literals ;
 
 : lex-paths ( vocabs -- assoc )
-    [ [ path>literals ] [ nip ] recover ] map-zip ;
+    [ [ path>literals ] [ nip ] recover ] zip-with ;
 
 : lex-vocabs ( vocabs -- assoc )
-    [ [ vocab>literals ] [ nip ] recover ] map-zip ;
+    [ [ vocab>literals ] [ nip ] recover ] zip-with ;
 
 : failed-lexing ( assoc -- assoc' ) [ nip array? ] assoc-reject ;
+
+: rewrite-file ( path encoding quot: ( str -- str' ) -- )
+    '[ file-contents @ ] 2keep set-file-contents ; inline
 
 : lex-core ( -- assoc ) core-vocabs lex-vocabs ;
 : lex-basis ( -- assoc ) basis-vocabs lex-vocabs ;

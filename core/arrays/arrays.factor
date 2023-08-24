@@ -1,5 +1,5 @@
 ! Copyright (C) 2005, 2010 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors kernel math sequences sequences.private ;
 IN: arrays
 
@@ -14,6 +14,7 @@ M: array nth-unsafe [ integer>fixnum ] dip array-nth ; inline
 M: array set-nth-unsafe [ integer>fixnum ] dip set-array-nth ; inline
 M: array resize resize-array ; inline
 M: array equal? over array? [ sequence= ] [ 2drop f ] if ;
+M: array hashcode* [ sequence-hashcode ] recursive-hashcode ;
 M: object new-sequence drop 0 <array> ; inline
 M: f new-sequence drop [ f ] [ 0 <array> ] if-zero ; inline
 

@@ -1,5 +1,5 @@
 ! Copyright (C) 2012 John Benediktsson
-! See http://factorcode.org/license.txt for BSD license
+! See https://factorcode.org/license.txt for BSD license
 
 USING: kernel math math.functions math.statistics math.vectors
 sequences sequences.extras ;
@@ -13,11 +13,11 @@ IN: math.similarity
     over length 3 < [ 2drop 1.0 ] [ population-corr 0.5 * 0.5 + ] if ;
 
 : cosine-similarity ( a b -- n )
-    [ v. ] [ [ norm ] bi@ * ] 2bi / ;
+    [ vdot ] [ [ norm ] bi@ * ] 2bi / ;
 
 <PRIVATE
 
-: weighted-v. ( w a b -- n )
+: weighted-vdot ( w a b -- n )
     [ * * ] [ + ] 3map-reduce ;
 
 : weighted-norm ( w a -- n )
@@ -26,5 +26,5 @@ IN: math.similarity
 PRIVATE>
 
 : weighted-cosine-similarity ( w a b -- n )
-    [ weighted-v. ]
+    [ weighted-vdot ]
     [ overd [ weighted-norm ] 2bi@ * ] 3bi / ;

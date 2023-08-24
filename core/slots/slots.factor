@@ -1,10 +1,10 @@
 ! Copyright (C) 2005, 2011 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors alien arrays assocs byte-arrays classes
 classes.algebra classes.algebra.private classes.maybe
 combinators generic generic.standard hashtables kernel
-kernel.private make math quotations sequences sequences.private
-slots.private strings words ;
+kernel.private math quotations sequences sequences.private
+strings words ;
 IN: slots
 
 <PRIVATE
@@ -36,12 +36,9 @@ PREDICATE: writer-method < method "writing" word-prop >boolean ;
 GENERIC#: reader-quot 1 ( class slot-spec -- quot )
 
 M: object reader-quot
-    nip [
-        dup offset>> ,
-        \ slot ,
-        dup class>> object bootstrap-word eq?
-        [ drop ] [ class>> 1array , \ declare , ] if
-    ] [ ] make ;
+    nip [ offset>> [ slot ] curry ] [ class>> ] bi
+    dup object bootstrap-word eq?
+    [ drop ] [ 1array [ declare ] curry compose ] if ;
 
 : reader-word ( name -- word )
     ">>" append "accessors" create-word
@@ -72,7 +69,7 @@ ERROR: bad-slot-value value class ;
 
 GENERIC: instance-check-quot ( obj -- quot )
 
-M: class instance-check-quot ( class -- quot )
+M: class instance-check-quot
     {
         { [ dup object bootstrap-word eq? ] [ drop [ ] ] }
         { [ dup "coercer" word-prop ] [ "coercer" word-prop ] }
@@ -80,12 +77,8 @@ M: class instance-check-quot ( class -- quot )
     } cond ;
 
 M: object instance-check-quot
-    [
-        \ dup ,
-        [ predicate-def % ]
-        [ [ bad-slot-value ] curry , ] bi
-        \ unless ,
-    ] [ ] make ;
+    [ predicate-def [ dup ] prepose ] keep
+    [ bad-slot-value ] curry [ unless ] curry compose ;
 
 GENERIC#: writer-quot 1 ( class slot-spec -- quot )
 
@@ -116,7 +109,7 @@ M: object writer-quot
 
 : define-setter ( name -- )
     dup setter-word dup deferred? [
-        [ \ over , swap writer-word , ] [ ] make
+        swap writer-word 1quotation [ over ] prepose
         ( object value -- object ) define-inline
     ] [ 2drop ] if ;
 
@@ -125,12 +118,10 @@ M: object writer-quot
 
 : define-changer ( name -- )
     dup changer-word dup deferred? [
-        [
-            \ over ,
-            over reader-word 1quotation
-            [ dip call ] curry [ ] like [ dip swap ] curry %
-            swap setter-word ,
-        ] [ ] make ( object quot -- object ) define-inline
+        over reader-word 1quotation
+        [ dip call ] curry [ dip swap ] curry [ over ] prepose
+        rot setter-word 1quotation compose
+        ( object quot -- object ) define-inline
     ] [ 2drop ] if ;
 
 : define-slot-methods ( class slot-spec -- )

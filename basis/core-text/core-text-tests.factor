@@ -1,9 +1,9 @@
 ! Copyright (C) 2009 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: tools.test core-text core-text.fonts core-foundation
-core-foundation.dictionaries destructors arrays kernel generalizations
-locals math accessors core-foundation.utilities combinators hashtables colors
-colors.constants ;
+core-foundation.dictionaries destructors arrays kernel
+generalizations math accessors core-foundation.utilities
+combinators hashtables colors ;
 IN: core-text.tests
 
 : test-font ( name -- font )

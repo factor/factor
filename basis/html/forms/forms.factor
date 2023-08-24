@@ -1,8 +1,8 @@
 ! Copyright (C) 2008, 2009 Slava Pestov
-! See http://factorcode.org/license.txt for BSD license.
-USING: kernel accessors strings namespaces assocs hashtables io
-mirrors math fry sequences words continuations
-xml.entities xml.writer xml.syntax ;
+! See https://factorcode.org/license.txt for BSD license.
+USING: accessors assocs classes continuations hashtables kernel
+math mirrors namespaces sequences strings words xml.syntax
+xml.writer ;
 IN: html.forms
 
 TUPLE: form errors values validation-failed ;
@@ -18,7 +18,7 @@ M: form clone
         [ clone ] change-values ;
 
 : check-value-name ( name -- name )
-    dup string? [ "Value name not a string" throw ] unless ;
+    string check-instance ;
 
 : values ( -- assoc )
     form get values>> ;

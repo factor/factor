@@ -1,6 +1,6 @@
 ! Copyright (C) 2010 Joe Groff.
-! See http://factorcode.org/license.txt for BSD license.
-USING: alien.cxx.demangle assocs combinators fry io.pathnames
+! See https://factorcode.org/license.txt for BSD license.
+USING: alien.cxx.demangle assocs combinators io.pathnames
 kernel macho sequences ;
 IN: alien.cxx.scaffold
 

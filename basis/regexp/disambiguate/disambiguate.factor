@@ -1,6 +1,6 @@
 ! Copyright (C) 2009 Daniel Ehrenberg.
-! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays assocs fry kernel locals math math.bits
+! See https://factorcode.org/license.txt for BSD license.
+USING: accessors arrays assocs effects kernel math math.bits
 regexp.ast regexp.classes regexp.transition-tables sequences
 sets ;
 IN: regexp.disambiguate
@@ -26,12 +26,9 @@ TUPLE: parts in out ;
 : add-out ( seq partition -- partition' )
     [ nip in>> ] [ out>> append ] 2bi parts boa ;
 
-: intersection ( seq -- elts/f )
-    [ f ] [ [ ] [ intersect ] map-reduce ] if-empty ;
-
 : meaningful-integers ( partition table -- integers )
     [ [ in>> ] [ out>> ] bi ] dip
-    '[ [ _ at ] map intersection ] bi@ diff ;
+    '[ [ _ at ] map intersect-all ] bi@ diff ;
 
 : class-integers ( classes integers -- table )
     '[ _ over '[ _ class-member? ] filter ] H{ } map>assoc ;

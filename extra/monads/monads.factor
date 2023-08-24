@@ -1,8 +1,6 @@
 ! Copyright (C) 2008 Slava Pestov
-! See http://factorcode.org/license.txt for BSD license.
-USING: arrays kernel sequences sequences.deep splitting
-accessors fry locals combinators namespaces lists lists.lazy
-shuffle ;
+! See https://factorcode.org/license.txt for BSD license.
+USING: accessors arrays kernel lists lists.lazy sequences ;
 IN: monads
 
 ! Functors
@@ -188,7 +186,7 @@ M: writer-monad fail   "Fail" throw ;
 
 : run-writer ( writer -- value log ) [ value>> ] [ log>> ] bi ;
 
-M: writer >>= '[ [ _ run-writer ] dip '[ @ run-writer ] dip append <writer> ] ;
+M: writer >>= '[ [ _ run-writer ] dip '[ @ run-writer ] dip prepend <writer> ] ;
 
 : pass ( writer -- writer' ) run-writer [ first2 ] dip swap call( x -- y ) <writer> ;
 : listen ( writer -- writer' ) run-writer [ 2array ] keep <writer> ;

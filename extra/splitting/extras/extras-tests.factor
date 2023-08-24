@@ -21,11 +21,13 @@ tools.test ;
 
 { { "hello" " " " " " " "world" } } [
     "hello   world"
-    [ [ blank? ] find drop ] split-find
+    [ [ ascii:blank? ] find drop ] split-find
     [ >string ] map
 ] unit-test
 
 { { } } [ "" " " split-harvest ] unit-test
+{ { } } [ " " " " split-harvest ] unit-test
+{ { } } [ "  " " " split-harvest ] unit-test
 { { "a" } } [ "a" " " split-harvest ] unit-test
 { { "a" } } [ " a" " " split-harvest ] unit-test
 { { "a" } } [ " a " " " split-harvest ] unit-test
@@ -37,3 +39,11 @@ tools.test ;
 { { "a" "b" "c" } } [ "a  b  c" " " split-harvest ] unit-test
 { { "a" "b" "c" } } [ " a  b  c" " " split-harvest ] unit-test
 { { "a" "b" "c" } } [ " a  b  c " " " split-harvest ] unit-test
+
+{ "s" "1:2:3s" } [
+    "s1:2:3s" [ letter? ] split-head
+] unit-test
+
+{ "s1:2:3" "s" } [
+    "s1:2:3s" [ letter? ] split-tail
+] unit-test

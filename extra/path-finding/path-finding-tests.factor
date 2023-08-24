@@ -1,5 +1,5 @@
 ! Copyright (C) 2010 Samuel Tardieu.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: arrays assocs combinators hashtables kernel literals math math.functions
 math.vectors memoize path-finding sequences sorting splitting strings tools.test ;
 IN: path-finding.tests
@@ -28,9 +28,9 @@ TUPLE: maze < astar ;
   6  X X X X   X   X e X
   7  X g   X           X
   8  X X X X X X X X X X"
-        "\n" split ] nth nth CHAR: X = not ;
+        split-lines ] nth nth CHAR: X = not ;
 
-M: maze neighbours
+M: maze neighbors
     drop
     first2
     { [ 1 + 2array ] [ 1 - 2array ] [ [ 1 + ] dip 2array ] [ [ 1 - ] dip 2array ] } 2cleave
@@ -99,14 +99,14 @@ M: maze cost
 
 MEMO: routes ( -- hash ) $[ { "ABD" "BC" "C" "DCE" "ECF" } [ unclip swap 2array ] map >hashtable ] ;
 
-: n ( pos -- neighbours )
+: n ( pos -- neighbors )
     routes at ;
 
 : c ( from to -- cost )
     "" 2sequence H{ { "AB" 1 } { "AD" 2 } { "BC" 5 } { "DC" 2 } { "DE" 1 } { "EC" 2 } { "EF" 1 } } at ;
 
 : test2 ( fromto -- path considered )
-    first2 [ n ] [ c ] [ 2drop 0 ] <astar> [ find-path ] [ considered natural-sort >string ] bi ;
+    first2 [ n ] [ c ] [ 2drop 0 ] <astar> [ find-path ] [ considered sort >string ] bi ;
 >>
 
 ! Check path from A to C -- all nodes but F must have been examined
@@ -129,7 +129,7 @@ MEMO: costs ( -- costs )
     routes keys [ dup dup n [ dup [ c ] dip swap 2array ] with { } map-as >hashtable 2array ] map >hashtable ;
 
 : test3 ( fromto -- path considered )
-    first2 costs <dijkstra> [ find-path ] [ considered natural-sort >string ] bi ;
+    first2 costs <dijkstra> [ find-path ] [ considered sort >string ] bi ;
 
 >>
 

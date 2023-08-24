@@ -2,8 +2,11 @@ USING: editors io.standard-paths kernel make math.parser
 namespaces sequences strings ;
 IN: editors.vim
 
-TUPLE: vim ;
-T{ vim } editor-class set-global
+SINGLETON: vim
+
+MIXIN: vim-base
+
+INSTANCE: vim vim-base
 
 SYMBOL: vim-path
 
@@ -13,14 +16,14 @@ HOOK: vim-ui? editor-class ( -- ? )
 
 SYMBOL: vim-tabs?
 
-M: vim vim-ui? f ;
+M: vim-base vim-ui? f ;
 
-M: vim find-vim-path "vim" ?find-in-path ;
+M: vim-base find-vim-path "vim" ?find-in-path ;
 
 : actual-vim-path ( -- path )
     \ vim-path get [ find-vim-path ] unless* ;
 
-M: vim editor-command ( file line -- command )
+M: vim-base editor-command
     [
         actual-vim-path dup string? [ , ] [ % ] if
         vim-ui? [ "-g" , ] when
@@ -29,4 +32,4 @@ M: vim editor-command ( file line -- command )
         ,
     ] { } make ;
 
-M: vim editor-detached? f ;
+M: vim-base editor-detached? f ;

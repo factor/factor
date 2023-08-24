@@ -1,7 +1,6 @@
 ! Copyright (C) 2009 Alaric Snell-Pym
-! See http://factorcode.org/license.txt for BSD license.
-USING: checksums classes.singleton kernel math math.ranges
-math.vectors sequences ;
+! See https://factorcode.org/license.txt for BSD license.
+USING: checksums kernel math sequences ;
 IN: checksums.fnv1
 
 SINGLETON: fnv1-32
@@ -38,67 +37,67 @@ CONSTANT: fnv1-256-basis 0xdd268dbcaac550362d98c384c4e576ccc8b1536847b6bbb31023b
 CONSTANT: fnv1-512-basis 0xb86db0b1171f4416dca1e50f309990acac87d059c90000000000000000000d21e948f68a34c192f62ea79bc942dbe7ce182036415f56e34bac982aac4afe9fd9
 CONSTANT: fnv1-1024-basis 0x5f7a76758ecc4d32e56d5a591028b74b29fc4223fdada16c3bf34eda3674da9a21d9000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000004c6d7eb6e73802734510a555f256cc005ae556bde8cc9c6a93b21aff4b16c71ee90b3
 
-M: fnv1-32 checksum-bytes ( bytes checksum -- value )
+M: fnv1-32 checksum-bytes
     drop
     fnv1-32-basis swap
     [ swap fnv1-32-prime * bitxor fnv1-32-mod bitand ] each ;
 
-M: fnv1a-32 checksum-bytes ( bytes checksum -- value )
+M: fnv1a-32 checksum-bytes
     drop
     fnv1-32-basis swap
     [ bitxor fnv1-32-prime * fnv1-32-mod bitand ] each ;
 
 
-M: fnv1-64 checksum-bytes ( bytes checksum -- value )
+M: fnv1-64 checksum-bytes
     drop
     fnv1-64-basis swap
     [ swap fnv1-64-prime * bitxor fnv1-64-mod bitand ] each ;
 
-M: fnv1a-64 checksum-bytes ( bytes checksum -- value )
+M: fnv1a-64 checksum-bytes
     drop
     fnv1-64-basis swap
     [ bitxor fnv1-64-prime * fnv1-64-mod bitand ] each ;
 
 
-M: fnv1-128 checksum-bytes ( bytes checksum -- value )
+M: fnv1-128 checksum-bytes
     drop
     fnv1-128-basis swap
     [ swap fnv1-128-prime * bitxor fnv1-128-mod bitand ] each ;
 
-M: fnv1a-128 checksum-bytes ( bytes checksum -- value )
+M: fnv1a-128 checksum-bytes
     drop
     fnv1-128-basis swap
     [ bitxor fnv1-128-prime * fnv1-128-mod bitand ] each ;
 
 
-M: fnv1-256 checksum-bytes ( bytes checksum -- value )
+M: fnv1-256 checksum-bytes
     drop
     fnv1-256-basis swap
     [ swap fnv1-256-prime * bitxor fnv1-256-mod bitand ] each ;
 
-M: fnv1a-256 checksum-bytes ( bytes checksum -- value )
+M: fnv1a-256 checksum-bytes
     drop
     fnv1-256-basis swap
     [ bitxor fnv1-256-prime * fnv1-256-mod bitand ] each ;
 
 
-M: fnv1-512 checksum-bytes ( bytes checksum -- value )
+M: fnv1-512 checksum-bytes
     drop
     fnv1-512-basis swap
     [ swap fnv1-512-prime * bitxor fnv1-512-mod bitand ] each ;
 
-M: fnv1a-512 checksum-bytes ( bytes checksum -- value )
+M: fnv1a-512 checksum-bytes
     drop
     fnv1-512-basis swap
     [ bitxor fnv1-512-prime * fnv1-512-mod bitand ] each ;
 
 
-M: fnv1-1024 checksum-bytes ( bytes checksum -- value )
+M: fnv1-1024 checksum-bytes
     drop
     fnv1-1024-basis swap
     [ swap fnv1-1024-prime * bitxor fnv1-1024-mod bitand ] each ;
 
-M: fnv1a-1024 checksum-bytes ( bytes checksum -- value )
+M: fnv1a-1024 checksum-bytes
     drop
     fnv1-1024-basis swap
     [ bitxor fnv1-1024-prime * fnv1-1024-mod bitand ] each ;

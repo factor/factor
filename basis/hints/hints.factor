@@ -1,16 +1,15 @@
 ! Copyright (C) 2008, 2010 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs byte-arrays byte-vectors classes
-combinators definitions effects fry generic generic.single
-generic.standard hashtables io.binary io.encodings
-io.streams.string kernel kernel.private math math.parser
-namespaces parser sbufs sequences sequences.private splitting
-splitting.private strings vectors words ;
+combinators definitions fry generic generic.single
+generic.standard hashtables kernel kernel.private math
+math.parser parser sbufs sequences splitting strings vectors
+words ;
 IN: hints
 
 GENERIC: specializer-predicate ( spec -- quot )
 
-M: class specializer-predicate predicate-def ;
+M: class specializer-predicate '[ _ instance? ] ;
 
 M: object specializer-predicate '[ _ eq? ] ;
 
@@ -29,7 +28,7 @@ M: object specializer-declaration class-of ;
     [ drop object eq? ] assoc-reject
     [ [ t ] ] [
         [ swap specializer-predicate append ] { } assoc>map
-        [ ] [ swap [ f ] \ if 3array append [ ] like ] map-reduce
+        [ ] [ swap [ f ] \ if 3array [ ] append-as ] map-reduce
     ] if-empty ;
 
 : specializer-cases ( quot specializer -- alist )
@@ -95,10 +94,14 @@ set-specializer
     set-specializer
 ] each
 
-{ subseq subseq-unsafe } [
-    { { fixnum fixnum string } { fixnum fixnum array } }
+{ suffix prefix } [
+    { { string object } { array object } }
     set-specializer
 ] each
+
+\ subseq
+{ { fixnum fixnum string } { fixnum fixnum array } }
+set-specializer
 
 \ reverse!
 { { string } { array } }
@@ -123,15 +126,6 @@ set-specializer
 \ member-eq? { { array } { string } } set-specializer
 
 \ assoc-stack { vector } set-specializer
-
-{ >le >be } [
-    { { fixnum fixnum } { bignum fixnum } }
-    set-specializer
-] each
-
-{ le> be> } [
-    { byte-array } set-specializer
-] each
 
 \ base> { string fixnum } set-specializer
 

@@ -1,7 +1,7 @@
 ! Copyright (C) 2011 John Benediktsson
-! See http://factorcode.org/license.txt for BSD license
+! See https://factorcode.org/license.txt for BSD license
 
-USING: accessors destructors fry io.binary io.sockets kernel
+USING: accessors destructors endian io.sockets kernel
 sequences ;
 
 IN: benchmark.udp-echo0

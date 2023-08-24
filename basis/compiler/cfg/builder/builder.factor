@@ -1,13 +1,15 @@
 ! Copyright (C) 2004, 2010 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs combinators compiler.cfg
-compiler.cfg.builder.blocks compiler.cfg.comparisons compiler.cfg.hats
-compiler.cfg.instructions compiler.cfg.intrinsics compiler.cfg.registers
-compiler.cfg.stacks compiler.cfg.stacks.local compiler.tree
-compiler.cfg.utilities cpu.architecture fry kernel locals make math
-namespaces sequences words ;
+compiler.cfg.builder.blocks compiler.cfg.comparisons
+compiler.cfg.hats compiler.cfg.instructions
+compiler.cfg.registers compiler.cfg.stacks
+compiler.cfg.stacks.local compiler.cfg.utilities compiler.tree
+cpu.architecture kernel make math namespaces sequences words ;
 IN: compiler.cfg.builder
 
+SLOT: id
+SLOT: return
 SYMBOL: procedures
 SYMBOL: loops
 
@@ -71,7 +73,7 @@ GENERIC: emit-node ( block node -- block' )
     ##branch, [ begin-basic-block ] dip
     [ label>> id>> loops get set-at ] [ child>> emit-nodes ] 2bi ;
 
-M: #recursive emit-node ( block node -- block' )
+M: #recursive emit-node
     dup label>> loop?>> [ emit-loop ] [ emit-recursive ] if ;
 
 ! #if
@@ -109,28 +111,28 @@ M: #recursive emit-node ( block node -- block' )
     ! loc>vreg sync
     ds-pop any-rep ^^copy f cc/= ##compare-imm-branch, emit-if ;
 
-M: #if emit-node ( block node -- block' )
+M: #if emit-node
     {
         { [ dup trivial-if? ] [ drop emit-trivial-if ] }
         { [ dup trivial-not-if? ] [ drop emit-trivial-not-if ] }
         [ emit-actual-if ]
     } cond ;
 
-M: #dispatch emit-node ( block node -- block' )
+M: #dispatch emit-node
     ! Inputs to the final instruction need to be copied because of
     ! loc>vreg sync. ^^offset>slot always returns a fresh vreg,
     ! though.
     ds-pop ^^offset>slot next-vreg ##dispatch, emit-if ;
 
-M: #call emit-node ( block node -- block' )
+M: #call emit-node
     dup word>> dup "intrinsic" word-prop [
         nip call( block #call -- block' )
     ] [ swap call-height emit-call ] if* ;
 
-M: #call-recursive emit-node ( block node -- block' )
+M: #call-recursive emit-node
     [ label>> id>> ] [ call-height ] bi emit-call ;
 
-M: #push emit-node ( block node -- block )
+M: #push emit-node
     literal>> ^^load-literal ds-push ;
 
 ! #shuffle
@@ -157,7 +159,7 @@ M: #push emit-node ( block node -- block )
     [ make-input-map ] [ mapping>> ] [ extract-outputs ] tri
     [ [ of of peek-loc ] 2with map ] 2with map ;
 
-M: #shuffle emit-node ( block node -- block )
+M: #shuffle emit-node
     [ out-vregs/stack ] keep store-height-changes
     first2 [ ds-loc store-vregs ] [ rs-loc store-vregs ] bi* ;
 
@@ -167,14 +169,14 @@ M: #shuffle emit-node ( block node -- block )
     t >>kill-block?
     ##safepoint, ##epilogue, ##return, ;
 
-M: #return emit-node ( block node -- block' )
+M: #return emit-node
     drop end-word ;
 
-M: #return-recursive emit-node ( block node -- block' )
+M: #return-recursive emit-node
     label>> id>> loops get key? [ ] [ end-word ] if ;
 
 ! #terminate
-M: #terminate emit-node ( block node -- block' )
+M: #terminate emit-node
     drop ##no-tco, end-basic-block f ;
 
 ! No-op nodes

@@ -1,10 +1,10 @@
 ! Copyright (C) 2009 Joe Groff.
-! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays combinators.tuple game.loop game.worlds
-generalizations gpu gpu.render gpu.shaders gpu.util gpu.util.wasd
-kernel literals math math.libm math.matrices math.order math.vectors
-method-chains sequences ui ui.gadgets ui.gadgets.worlds
-ui.pixel-formats audio.engine audio.loader locals ;
+! See https://factorcode.org/license.txt for BSD license.
+USING: accessors arrays audio.engine audio.loader game.loop
+game.worlds gpu gpu.render gpu.shaders gpu.util gpu.util.wasd
+kernel literals math math.libm math.matrices
+math.matrices.extras math.order math.vectors method-chains
+sequences ui.gadgets.worlds ui.pixel-formats ;
 IN: gpu.demos.raytrace
 
 GLSL-SHADER-FILE: raytrace-vertex-shader vertex-shader "raytrace.v.glsl"
@@ -48,8 +48,8 @@ TUPLE: raytrace-world < wasd-world
     dup dtheta>> [ + ] curry change-theta drop ;
 
 : sphere-center ( sphere -- center )
-    [ [ axis>> ] [ theta>> ] bi rotation-matrix4 ]
-    [ home>> ] bi m.v ;
+    [ [ axis>> ] [ theta>> ] bi <rotation-matrix4> ]
+    [ home>> ] bi mdotv ;
 
 M: sphere audio-position sphere-center ; inline
 M: sphere audio-distance radius>> fsqrt 2.0 * ; inline

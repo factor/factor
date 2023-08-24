@@ -1,5 +1,5 @@
 ! Copyright (C) 2009 Joe Groff.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: alien alien.c-types alien.data alien.libraries
 alien.syntax classes.struct kernel math system-info.windows
 windows.types ;
@@ -11,14 +11,13 @@ STRUCT: MARGINS
     { cyTopHeight    int }
     { cyBottomHeight int } ;
 
+C: <MARGINS> MARGINS
+
 STRUCT: DWM_BLURBEHIND
     { dwFlags                DWORD   }
     { fEnable                BOOL    }
     { hRgnBlur               HANDLE  }
     { fTransitionOnMaximized BOOL    } ;
-
-: <MARGINS> ( l r t b -- MARGINS )
-    MARGINS <struct-boa> ; inline
 
 : full-window-margins ( -- MARGINS )
     -1 -1 -1 -1 <MARGINS> ; inline

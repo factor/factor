@@ -1,9 +1,9 @@
 ! Copyright (C) 2004, 2010 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
-USING: accessors alien alien.accessors arrays classes combinators
-compiler.units cpu.architecture delegate fry kernel layouts macros
-math math.order math.parser quotations sequences summary system words
-words.symbol ;
+! See https://factorcode.org/license.txt for BSD license.
+USING: accessors alien alien.accessors arrays classes
+combinators compiler.units cpu.architecture delegate kernel
+layouts math math.order math.parser quotations sequences summary
+system words words.symbol ;
 IN: alien.c-types
 
 SYMBOLS:
@@ -58,8 +58,8 @@ UNION: c-type-name
     dup c-type-name? [ lookup-c-type ] when ;
 
 M: word lookup-c-type
-    dup "c-type" word-prop resolve-typedef
-    [ ] [ no-c-type ] ?if ;
+    [ "c-type" word-prop resolve-typedef ]
+    [ no-c-type ] ?unless ;
 
 GENERIC: c-type-class ( name -- class )
 
@@ -176,6 +176,11 @@ SYMBOLS:
     ptrdiff_t intptr_t uintptr_t size_t
     c-string int8_t uint8_t int16_t uint16_t
     int32_t uint32_t int64_t uint64_t ;
+
+SYMBOLS:
+    isize usize
+    s8 u8 s16 u16 s32 u32 s64 u64
+    f32 f64 ;
 
 CONSTANT: primitive-types
     {
@@ -388,6 +393,9 @@ M: pointer lookup-c-type
 
         \ ulonglong lookup-c-type \ uintptr_t typedef
         \ ulonglong lookup-c-type \ size_t typedef
+
+        \ longlong lookup-c-type \ isize typedef
+        \ ulonglong lookup-c-type \ usize typedef
     ] [
         ! 32bit-vm int
         <c-type>
@@ -453,6 +461,9 @@ M: pointer lookup-c-type
 
         \ uint lookup-c-type \ uintptr_t typedef
         \ uint lookup-c-type \ size_t typedef
+
+        \ int lookup-c-type \ isize typedef
+        \ uint lookup-c-type \ usize typedef
     ] if
 
     \ uchar lookup-c-type clone
@@ -471,6 +482,18 @@ M: pointer lookup-c-type
     \ uint lookup-c-type uint32_t typedef
     \ ulonglong lookup-c-type uint64_t typedef
 
+    \ char lookup-c-type s8 typedef
+    \ short lookup-c-type s16 typedef
+    \ int lookup-c-type s32 typedef
+    \ longlong lookup-c-type s64 typedef
+
+    \ uchar lookup-c-type u8 typedef
+    \ ushort lookup-c-type u16 typedef
+    \ uint lookup-c-type u32 typedef
+    \ ulonglong lookup-c-type u64 typedef
+
+    \ float lookup-c-type f32 typedef
+    \ double lookup-c-type f64 typedef
 ] with-compilation-unit
 
 M: char-16-rep rep-component-type drop char ;

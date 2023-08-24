@@ -1,9 +1,8 @@
 ! Copyright (C) 2009 Doug Coleman.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors assocs calendar calendar.format
-combinators.smart io io.crlf io.encodings.utf8 kernel locals
-managed-server namespaces sequences sorting splitting
-unicode ;
+combinators.smart io io.crlf io.encodings.utf8 kernel
+managed-server namespaces sequences sorting splitting unicode ;
 IN: managed-server.chat
 
 TUPLE: chat-server < managed-server ;
@@ -30,7 +29,7 @@ CONSTANT: line-beginning "-!- "
 : handle-help ( string -- )
     [
         "Commands: "
-        commands get keys natural-sort ", " join append send-line
+        commands get keys sort ", " join append send-line
     ] [
         chat-docs get ?at
         [ send-line ]
@@ -76,7 +75,7 @@ Displays the documentation for a command."
 Shows the list of connected users."
 "who" add-command
 
-[ drop gmt timestamp>rfc822 send-line ]
+[ drop now-gmt timestamp>rfc822 send-line ]
 "Syntax: /time
 Returns the current GMT time." "time" add-command
 
@@ -120,7 +119,7 @@ M: chat-server handle-client-join
 M: chat-server handle-client-disconnect
     [
         line-beginning username " has quit  "
-        client object>> dup [ "\"" dup surround ] when
+        client object>> dup [ "\"" 1surround ] when
     ] "" append-outputs-as send-everyone ;
 
 M: chat-server handle-already-logged-in

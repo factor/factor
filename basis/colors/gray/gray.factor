@@ -1,13 +1,15 @@
 ! Copyright (C) 2008 Eduardo Cavazos.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors colors kernel math ;
 IN: colors.gray
 
-TUPLE: gray < color { gray read-only } { alpha read-only } ;
+TUPLE: gray { gray read-only } { alpha read-only } ;
 
 C: <gray> gray
 
-M: gray >rgba ( gray -- rgba )
+INSTANCE: gray color
+
+M: gray >rgba
     [ gray>> dup dup ] [ alpha>> ] bi <rgba> ; inline
 
 M: gray red>> gray>> ;

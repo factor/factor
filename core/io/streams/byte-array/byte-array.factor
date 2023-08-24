@@ -1,8 +1,8 @@
 ! Copyright (C) 2008, 2009 Daniel Ehrenberg
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors byte-arrays byte-vectors destructors io
-io.encodings io.streams.sequence kernel math namespaces
-sequences sequences.private ;
+io.encodings io.streams.sequence kernel sequences
+sequences.private ;
 IN: io.streams.byte-array
 
 INSTANCE: byte-vector output-stream

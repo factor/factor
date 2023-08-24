@@ -1,12 +1,9 @@
 USING: accessors arrays classes classes.error combinators
-combinators.short-circuit continuations english eval formatting
-fry generic help help.lint help.lint.checks help.markup io
-io.streams.string io.styles kernel math namespaces parser
-prettyprint sequences sequences.deep sets sorting splitting strings summary
-vocabs vocabs.parser words words.alias ;
-
+continuations english formatting generic help help.lint.checks
+help.markup io io.streams.string io.styles kernel math
+namespaces parser sequences sequences.deep sets sorting
+splitting strings summary vocabs vocabs.parser words words.alias ;
 FROM: namespaces => set ;
-
 IN: help.lint.coverage
 
 TUPLE: word-help-coverage
@@ -28,9 +25,11 @@ CONSTANT: ignored-words {
     $parsing-note
     $io-error
     $shuffle
-    $complex-shuffle
     $nl
 }
+
+: (word-help) ( word -- content )
+    [ "help" word-prop ] [ word-help* ] ?unless ;
 
 GENERIC: write-object* ( object -- )
 M: string write-object* write ;
@@ -90,7 +89,7 @@ M: word-help-coverage summary
     } case ;
 
 : sorted-loaded-child-vocabs ( prefix -- assoc )
-    loaded-child-vocab-names natural-sort ; inline
+    loaded-child-vocab-names sort ; inline
 
 : filter-private ( seq -- no-private )
     [ ".private" ?tail nip ] reject ; inline
@@ -118,12 +117,12 @@ M: word-help-coverage summary
     } cond ?remove-$values ;
 
 : word-defines-sections ( word -- seq )
-    word-help [ ignored-words member? not ] filter [ ?first ] map ;
+    (word-help) [ ignored-words member? ] reject [ ?first ] map ;
 
 ! only words that need examples, need to have them nonempty
 ! not defining examples is not the same as an empty { $examples }
 : empty-examples? ( word -- ? )
-    word-help \ $examples swap elements [ f ] [ first rest empty? ] if-empty ;
+    (word-help) \ $examples swap elements [ f ] [ first rest empty? ] if-empty ;
 
 : missing-sections ( word -- missing )
     [ should-define ] [ word-defines-sections ] bi diff ;
@@ -136,15 +135,14 @@ PRIVATE>
 GENERIC: <word-help-coverage> ( word -- coverage )
 M: word <word-help-coverage>
     dup [ missing-sections ] [ empty-examples? ] bi
-    2dup 2array { { } f } =
-    word-help-coverage boa ; inline
+    2dup [ empty? ] both? word-help-coverage boa ; inline
 
 M: string <word-help-coverage>
     find-word <word-help-coverage> ; inline
 
 : <vocab-help-coverage> ( vocab-spec -- coverage )
     dup loaded-vocab? [
-        [ auto-use? off vocab-words natural-sort [ <word-help-coverage> ] map ] with-scope
+        [ auto-use? off vocab-words sort [ <word-help-coverage> ] map ] with-scope
     ] [
         unloaded-vocab
     ] if ;

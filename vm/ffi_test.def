@@ -1,5 +1,5 @@
 EXPORTS
-	ffi_test_0
+        ffi_test_0
         ffi_test_1
         ffi_test_2
         ffi_test_3
@@ -46,7 +46,7 @@ EXPORTS
         ffi_test_42
         ffi_test_43
         ffi_test_44
-	ffi_test_49
+        ffi_test_49
         ffi_test_50
         ffi_test_51
         ffi_test_52
@@ -62,6 +62,11 @@ EXPORTS
         ffi_test_63
         ffi_test_64
         ffi_test_65
+        ffi_test_66
+        ffi_test_67
+        ffi_test_68
+        ffi_test_69
+        ffi_test_70		
         bug1021_test_1
         bug1021_test_2
         bug1021_test_3

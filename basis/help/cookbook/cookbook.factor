@@ -16,12 +16,12 @@ $nl
 $nl
 "Coming back to the example in the beginning of this article, the following series of steps occurs as the code is evaluated:"
 { $table
-    { "Action" "Stack contents" }
+    { { $strong "Action" } { $strong "Stack contents" } }
     { "10 is pushed on the stack." { $snippet "10" } }
-    { { "The " { $link sq } " word is executed. It pops one input from the stack - the integer 10 - and squares it, pushing the result." } { $snippet "100" } }
+    { { "The " { $link sq } " word is executed. It pops one input from the stack (the integer 10) and squares it, pushing the result." } { $snippet "100" } }
     { { "5 is pushed on the stack." } { $snippet "100 5" } }
-    { { "The " { $link - } " word is executed. It pops two inputs from the stack - the integers 100 and 5 - and subtracts 5 from 100, pushing the result." } { $snippet "95" } }
-    { { "The " { $link . } " word is executed. It pops one input from the stack - the integer 95 - and prints it in the listener's output area." } { } }
+    { { "The " { $link - } " word is executed. It pops two inputs from the stack (the integers 100 and 5) and subtracts 5 from 100, pushing the result." } { $snippet "95" } }
+    { { "The " { $link . } " word is executed. It pops one input from the stack (the integer 95) and prints it in the listener's output area." } { } }
 }
 "Factor supports many other data types:"
 { $code
@@ -94,6 +94,7 @@ $nl
 $nl
 "You can perform an operation on each element of an array:"
 { $example
+    "USING: io sequences prettyprint ;"
     "{ 1 2 3 } [ \"The number is \" write . ] each"
     "The number is 1\nThe number is 2\nThe number is 3"
 }
@@ -190,6 +191,8 @@ ARTICLE: "cookbook-scripts" "Scripting cookbook"
 $nl
 "To run a script, simply pass it as an argument to the Factor executable:"
 { $code "./factor cleanup.factor" }
+"To test a script in the listener, you can use " { $link run-file } "." 
+$nl
 "The script may access command line arguments by inspecting the value of the " { $link command-line } " variable. It can also get its own path from the " { $link script } " variable."
 { $heading "Example: ls" }
 "Here is an example implementing a simplified version of the Unix " { $snippet "ls" } " command in Factor:"
@@ -198,7 +201,7 @@ $nl
 io.pathnames tools.files sequences kernel ;
 
 command-line get [
-    \".\". directory.
+    \".\" directory.
 ] [
     dup length 1 = [ first directory. ] [
         [ [ nl write \":\" print ] [ directory. ] bi ] each

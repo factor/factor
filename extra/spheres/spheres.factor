@@ -1,8 +1,7 @@
-USING: kernel opengl opengl.demo-support opengl.gl opengl.textures
-opengl.shaders opengl.framebuffers opengl.capabilities multiline
-ui.gadgets accessors sequences ui.render ui math locals arrays
-generalizations combinators ui.gadgets.worlds
-literals ui.pixel-formats ;
+USING: accessors arrays combinators kernel literals multiline
+opengl opengl.capabilities opengl.demo-support
+opengl.framebuffers opengl.gl opengl.shaders opengl.textures
+sequences ui ui.gadgets.worlds ui.pixel-formats ;
 IN: spheres
 
 STRING: plane-vertex-shader
@@ -206,7 +205,7 @@ M: spheres-world end-world
     program center radius (draw-sphere) ;
 
 : sphere-scene ( gadget -- )
-    GL_DEPTH_BUFFER_BIT GL_COLOR_BUFFER_BIT bitor glClear
+    flags{ GL_DEPTH_BUFFER_BIT GL_COLOR_BUFFER_BIT } glClear
     [
         solid-sphere-program>> [
             {

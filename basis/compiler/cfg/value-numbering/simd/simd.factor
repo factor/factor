@@ -1,12 +1,11 @@
 ! Copyright (C) 2008, 2010 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors alien.c-types combinators
 combinators.short-circuit compiler.cfg.instructions
 compiler.cfg.utilities compiler.cfg.value-numbering.graph
 compiler.cfg.value-numbering.math
 compiler.cfg.value-numbering.rewrite cpu.architecture
-generalizations grouping io.binary kernel locals make math
-sequences ;
+endian generalizations grouping kernel make math sequences ;
 IN: compiler.cfg.value-numbering.simd
 
 ! Some lame constant folding for SIMD intrinsics. Eventually this

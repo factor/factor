@@ -1,6 +1,6 @@
 ! Copyright (C) 2009 Doug Coleman.
-! See http://factorcode.org/license.txt for BSD license.
-USING: kernel math math.combinatorics math.ranges sequences ;
+! See https://factorcode.org/license.txt for BSD license.
+USING: kernel math math.combinatorics sequences ;
 IN: benchmark.e-ratios
 
 : calculate-e-ratios ( n -- e )

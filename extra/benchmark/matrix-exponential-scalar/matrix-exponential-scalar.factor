@@ -1,5 +1,5 @@
-USING: locals math math.combinatorics math.matrices
-prettyprint sequences typed ;
+USING: math math.combinatorics math.matrices math.matrices.extras
+prettyprint sequences ;
 IN: benchmark.matrix-exponential-scalar
 
 :: e^m ( m iterations -- e^m )
@@ -15,7 +15,7 @@ IN: benchmark.matrix-exponential-scalar
 
 :: matrix-exponential-scalar-benchmark ( -- )
     f :> result!
-    4 identity-matrix :> i4
+    4 <identity-matrix> :> i4
     10000 [
         i4 20 e^m result!
     ] times

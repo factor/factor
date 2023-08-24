@@ -1,5 +1,8 @@
 USING: kernel math.blas.matrices math.blas.vectors
-sequences tools.test ;
+sequences system tools.test ;
+
+! disable on linux-x86-32
+os linux? cpu x86.32? and [
 
 ! clone
 
@@ -706,3 +709,14 @@ sequences tools.test ;
         { 2.0 3.0 0.0          1.0 0.0 }
     } Mtranspose 2 1 3 2 Msub
 ] unit-test
+
+! Bugfix: blas-matrix-base did not handle `f smatrix{ } equal?`
+{ f } [
+    f smatrix{
+        svector{ 1.0 2.0 3.0 4.0 }
+        svector{ 2.0 2.0 3.0 4.0 }
+        svector{ 3.0 2.0 3.0 4.0 }
+    } equal?
+] unit-test
+
+] unless

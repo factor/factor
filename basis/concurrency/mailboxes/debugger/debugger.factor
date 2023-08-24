@@ -1,7 +1,7 @@
 ! Copyright (C) 2010 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
-USING: debugger accessors debugger.threads kernel
-concurrency.mailboxes ;
+! See https://factorcode.org/license.txt for BSD license.
+USING: accessors concurrency.mailboxes debugger debugger.threads
+kernel ;
 IN: concurrency.mailboxes.debugger
 
 M: linked-error error.

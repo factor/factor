@@ -1,10 +1,11 @@
 ! Copyright (C) 2013, 2016 Björn Lindqvist
-! See http://factorcode.org/license.txt for BSD license
+! See https://factorcode.org/license.txt for BSD license
 
 USING: accessors alien alien.accessors alien.c-types alien.data
-alien.enums alien.strings arrays assocs combinators fry
+alien.enums alien.strings arrays assocs combinators
 io.encodings.string io.encodings.utf8 kernel literals math
-math.bitwise math.parser pcre.ffi regexp sequences splitting strings ;
+math.bitwise math.parser pcre.ffi regexp sequences
+sequences.extras splitting strings ;
 IN: pcre
 
 ERROR: bad-option what ;
@@ -144,7 +145,7 @@ TUPLE: compiled-pcre pcre extra nametable ;
 GENERIC: findall ( subject obj -- matches )
 
 M: compiled-pcre findall
-    [ <matcher> [ findnext dup ] [ ] produce 2nip ]
+    [ <matcher> [ findnext ] loop>array nip ]
     [ nametable>> rot [ parse-match ] 2with { } map-as ] 2bi ;
 
 M: string findall

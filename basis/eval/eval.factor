@@ -1,12 +1,12 @@
 ! Copyright (C) 2008, 2009 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
-USING: splitting parser parser.notes compiler.units kernel
-namespaces debugger io.streams.string fry combinators
-effects.parser continuations ;
+! See https://factorcode.org/license.txt for BSD license.
+USING: combinators combinators.smart compiler.units
+continuations debugger effects.parser io.streams.string
+kernel namespaces parser parser.notes prettyprint splitting ;
 IN: eval
 
 : parse-string ( str -- quot )
-    [ string-lines parse-lines ] with-compilation-unit ;
+    [ split-lines parse-lines ] with-compilation-unit ;
 
 : (eval) ( str effect -- )
     [ parse-string ] dip call-effect ; inline
@@ -24,3 +24,18 @@ SYNTAX: eval( \ eval parse-call-paren ;
 
 : eval>string ( str -- output )
     [ (eval>string) ] with-file-vocabs ;
+
+: (eval-with-stack) ( str -- )
+    parse-string [ output>array datastack. ] call( quot -- ) ;
+
+: eval-with-stack ( str -- )
+    [ (eval-with-stack) ] with-file-vocabs ;
+
+: (eval-with-stack>string) ( str -- output )
+    [
+        parser-quiet? on
+        [ (eval-with-stack) ] [ nip print-error ] recover
+    ] with-string-writer ;
+
+: eval-with-stack>string ( str -- output )
+    [ (eval-with-stack>string) ] with-file-vocabs ;

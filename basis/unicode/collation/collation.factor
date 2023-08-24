@@ -1,77 +1,274 @@
 ! Copyright (C) 2008 Daniel Ehrenberg.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs combinators
-combinators.short-circuit kernel locals make math math.order
-math.parser namespaces sequences simple-flat-file splitting
-strings unicode.data ;
+combinators.short-circuit combinators.smart fry kernel make
+math math.order math.parser namespaces sequences
+simple-flat-file splitting strings unicode.data ;
 IN: unicode.collation
 
 <PRIVATE
 
 SYMBOL: ducet
 
-TUPLE: weight primary secondary tertiary ignorable? ;
+TUPLE: weight-levels primary secondary tertiary ignorable? ;
+: <weight-levels> ( primary secondary tertiary -- weight-levels> )
+    weight-levels new
+        swap >>tertiary
+        swap >>secondary
+        swap >>primary ; inline
 
 : parse-weight ( string -- weight )
     "]" split but-last [
-        weight new swap rest unclip CHAR: * = swapd >>ignorable?
+        weight-levels new swap rest unclip CHAR: * = swapd >>ignorable?
         swap "." split first3 [ hex> ] tri@
         [ >>primary ] [ >>secondary ] [ >>tertiary ] tri*
     ] map ;
 
 : parse-keys ( string -- chars )
-    " " split [ hex> ] "" map-as ;
+    split-words [ hex> ] "" map-as ;
 
 : parse-ducet ( file -- ducet )
-    load-data-file
-    [ [ parse-keys ] [ parse-weight ] bi* ] H{ } assoc-map-as ;
+    load-data-file [ [ parse-keys ] [ parse-weight ] bi* ] H{ } assoc-map-as ;
 
-"vocab:unicode/collation/allkeys.txt" parse-ducet ducet set-global
+"vocab:unicode/allkeys.txt" parse-ducet ducet set-global
 
-! Fix up table for long contractions
-: help-one ( assoc key -- )
-    ! Need to be more general? Not for DUCET, apparently
-    2 head 2dup swap key? [ 2drop ] [
-        [ [ 1string of ] with { } map-as concat ]
-        [ swap set-at ] 2bi
-    ] if ;
-
-: insert-helpers ( assoc -- )
-    dup keys [ length 3 >= ] filter
-    [ help-one ] with each ;
-
-ducet get-global insert-helpers
-
-:: base ( char -- base )
+! https://www.unicode.org/reports/tr10/tr10-41.html#Well_Formed_DUCET
+! WF5 - Well-formedness 5 condition:
+! https://www.unicode.org/reports/tr10/tr10-41.html#WF5
+!    { "0CC6" "0CC2" "0CD5" } ! 0CD5 is not a non-starter, don't add 2-gram "0CC6" "0CC2"to ducet
+!    { "0DD9" "0DCF" "0DCA" } ! already in allkeys.txt file
+!    { "0FB2" "0F71" "0F80" } ! added below
+!    { "0FB3" "0F71" "0F80" } ! added below
+! This breaks the unicode tests that ship in CollationTest_SHIFTED.txt
+! but it's supposedly more correct.
+: fixup-ducet-for-tibetan ( -- )
     {
-        { [ char 0x03400 0x04DB5 between? ] [ 0xFB80 ] } ! Extension A
-        { [ char 0x20000 0x2A6D6 between? ] [ 0xFB80 ] } ! Extension B
-        { [ char 0x04E00 0x09FC3 between? ] [ 0xFB40 ] } ! CJK
-        [ 0xFBC0 ] ! Other
+        {
+            { 0x0FB2 0x0F71 } ! CE(0FB2) CE(0F71)
+            {
+                T{ weight-levels
+                    { primary 12719 }
+                    { secondary 32 }
+                    { tertiary 2 }
+                }
+                T{ weight-levels
+                    { primary 12741 }
+                    { secondary 32 }
+                    { tertiary 2 }
+                }
+            }
+        }
+        {
+            { 0x0FB3 0x0F71 } ! CE(0FB3) CE(0F71)
+            {
+                T{ weight-levels
+                    { primary 12722 }
+                    { secondary 32 }
+                    { tertiary 2 }
+                }
+                T{ weight-levels
+                    { primary 12741 }
+                    { secondary 32 }
+                    { tertiary 2 }
+                }
+            }
+        }
+
+        {
+            { 0x0FB2 0x0F71 0x0F72 } ! CE(0FB2) CE(0F71 0F72)
+            {
+                T{ weight-levels
+                    { primary 12719 }
+                    { secondary 32 }
+                    { tertiary 2 }
+                }
+                T{ weight-levels
+                    { primary 12743 }
+                    { secondary 32 }
+                    { tertiary 2 }
+                }
+            }
+        }
+        {
+            { 0x0FB2 0x0F73        } ! CE(0FB2) CE(0F71 0F72)
+            {
+                T{ weight-levels
+                    { primary 12719 }
+                    { secondary 32 }
+                    { tertiary 2 }
+                }
+                T{ weight-levels
+                    { primary 12743 }
+                    { secondary 32 }
+                    { tertiary 2 }
+                }
+            }
+        }
+        {
+            { 0x0FB2 0x0F71 0x0F74 } ! CE(0FB2) CE(0F71 0F74)
+            {
+                T{ weight-levels
+                    { primary 12719 }
+                    { secondary 32 }
+                    { tertiary 2 }
+                }
+                T{ weight-levels
+                    { primary 12747 }
+                    { secondary 32 }
+                    { tertiary 2 }
+                }
+            }
+        }
+        {
+            { 0x0FB2 0x0F75        } ! CE(0FB2) CE(0F71 0F74)
+            {
+                T{ weight-levels
+                    { primary 12719 }
+                    { secondary 32 }
+                    { tertiary 2 }
+                }
+                T{ weight-levels
+                    { primary 12747 }
+                    { secondary 32 }
+                    { tertiary 2 }
+                }
+            }
+        }
+        {
+            { 0x0FB3 0x0F71 0x0F72 } ! CE(0FB3) CE(0F71 0F72)
+            {
+                T{ weight-levels
+                    { primary 12722 }
+                    { secondary 32 }
+                    { tertiary 2 }
+                }
+                T{ weight-levels
+                    { primary 12743 }
+                    { secondary 32 }
+                    { tertiary 2 }
+                }
+            }
+        }
+        {
+            { 0x0FB3 0x0F73        } ! CE(0FB3) CE(0F71 0F72)
+            {
+                T{ weight-levels
+                    { primary 12722 }
+                    { secondary 32 }
+                    { tertiary 2 }
+                }
+                T{ weight-levels
+                    { primary 12743 }
+                    { secondary 32 }
+                    { tertiary 2 }
+                }
+            }
+        }
+        {
+            { 0x0FB3 0x0F71 0x0F74 } ! CE(0FB3) CE(0F71 0F74)
+            {
+                T{ weight-levels
+                    { primary 12722 }
+                    { secondary 32 }
+                    { tertiary 2 }
+                }
+                T{ weight-levels
+                    { primary 12747 }
+                    { secondary 32 }
+                    { tertiary 2 }
+                }
+            }
+        }
+        {
+            { 0x0FB3 0x0F75        } ! CE(0FB3) CE(0F71 0F74)
+            {
+                T{ weight-levels
+                    { primary 12722 }
+                    { secondary 32 }
+                    { tertiary 2 }
+                }
+                T{ weight-levels
+                    { primary 12747 }
+                    { secondary 32 }
+                    { tertiary 2 }
+                }
+            }
+        }
+    } ducet get-global '[ swap >string _ set-at ] assoc-each ;
+
+! These values actually break the collation unit tests in CollationTest_SHIFTED.txt
+! So we disable those tests in favor of supposedly better collation for Tibetan.
+! https://www.unicode.org/reports/tr10/tr10-41.html#Well_Formed_DUCET
+
+fixup-ducet-for-tibetan
+
+: tangut-block? ( char -- ? )
+    {
+        [ 0x17000 0x18AFF between? ] ! Tangut and Tangut Components
+        [ 0x18D00 0x18D8F between? ] ! Tangut Supplement
+    } 1|| ; inline
+
+: nushu-block? ( char -- ? )
+    0x1b170 0x1B2FF between? ; inline
+
+: khitan-block? ( char -- ? )
+    0x18b00 0x18cff between? ; inline
+
+! https://wiki.computercraft.cc/Module:Unicode_data
+! Unicode TR10 - Computing Implicit Weights
+: base ( char -- base )
+    {
+        { [ dup 0x03400 0x04DBF between? ] [ drop 0xFB80 ] } ! Extension A
+        { [ dup 0x20000 0x2A6DF between? ] [ drop 0xFB80 ] } ! Extension B
+        { [ dup 0x2A700 0x2B739 between? ] [ drop 0xFB80 ] } ! Extension C
+        { [ dup 0x2B740 0x2B81D between? ] [ drop 0xFB80 ] } ! Extension D
+        { [ dup 0x2B820 0x2CEA1 between? ] [ drop 0xFB80 ] } ! Extension E
+        { [ dup 0x2CEB0 0x2EBE0 between? ] [ drop 0xFB80 ] } ! Extension F
+        { [ dup 0x30000 0x3134A between? ] [ drop 0xFB80 ] } ! Extension G
+        { [ dup 0x31350 0x323AF between? ] [ drop 0xFB80 ] } ! Extension H
+        { [ dup 0x2F800 0x2FA1D between? ] [ drop 0xFB80 ] } ! CJK Compatibility
+        { [ dup 0x04E00 0x09FFF between? ] [ drop 0xFB40 ] } ! CJK
+        { [ dup 0x0F900 0x0FAD9 between? ] [ drop 0xFB40 ] } ! CJK
+        [ drop 0xFBC0 ] ! Other
     } cond ;
 
-: AAAA ( char -- weight )
-    [ base ] [ -15 shift ] bi + 0x20 2 f weight boa ;
+: tangut-AAAA ( char -- weight-levels )
+    drop 0xfb00 0x0020 0x0002 <weight-levels> ; inline
 
-: BBBB ( char -- weight )
-    0x7FFF bitand 0x8000 bitor 0 0 f weight boa ;
+: tangut-BBBB ( char -- weight-levels )
+    0x17000 - 0x8000 bitor 0 0 <weight-levels> ; inline
 
-: illegal? ( char -- ? )
+: nushu-AAAA ( char -- weight-levels )
+    drop 0xfb01 0x0020 0x0002 <weight-levels> ; inline
+
+: nushu-BBBB ( char -- weight-levels )
+    0x1B170 - 0x8000 bitor 0 0 <weight-levels> ; inline
+
+: khitan-AAAA ( char -- weight-levels )
+    drop 0xfb02 0x0020 0x0002 <weight-levels> ; inline
+
+: khitan-BBBB ( char -- weight-levels )
+    0x18b00 - 0x8000 bitor 0 0 <weight-levels> ; inline
+
+: AAAA ( char -- weight-levels )
+    [ base ] [ -15 shift ] bi + 0x0020 0x0002 <weight-levels> ; inline
+
+: BBBB ( char -- weight-levels )
+    0x7FFF bitand 0x8000 bitor 0 0 <weight-levels> ; inline
+
+: derive-weight ( 1string -- weight-levels-pair )
+    first
     {
-        [ "Noncharacter_Code_Point" property? ]
-        [ category "Cs" = ]
-    } 1|| ;
-
-: derive-weight ( char -- weights )
-    first dup illegal? [
-        drop { }
-    ] [
-        [ AAAA ] [ BBBB ] bi 2array
-    ] if ;
+        { [ dup tangut-block? ] [ [ tangut-AAAA ] [ tangut-BBBB ] bi 2array ] }
+        { [ dup nushu-block? ] [ [ nushu-AAAA ] [ nushu-BBBB ] bi 2array ] }
+        { [ dup khitan-block? ] [ [ khitan-AAAA ] [ khitan-BBBB ] bi 2array ] }
+        [ [ AAAA ] [ BBBB ] bi 2array ]
+    } cond ;
 
 : building-last ( -- char )
     building get [ 0 ] [ last last ] if-empty ;
 
+! https://www.unicode.org/reports/tr10/tr10-41.html#Collation_Graphemes
 : blocked? ( char -- ? )
     combining-class dup { 0 f } member?
     [ drop building-last non-starter? ]
@@ -96,28 +293,32 @@ ducet get-global insert-helpers
 : string>graphemes ( string -- graphemes )
     [ [ add ] each ] { } make ;
 
+: char>weight-levels ( 1string -- weight-levels )
+    ducet get-global ?at [ derive-weight ] unless ; inline
+
 : graphemes>weights ( graphemes -- weights )
     [
-        dup weight? [ 1array ] ! From tailoring
-        [ dup ducet get-global at [ ] [ derive-weight ] ?if ] if
+        dup weight-levels?
+        [ 1array ] ! From tailoring
+        [ char>weight-levels ] if
     ] { } map-as concat ;
 
-: append-weights ( weights quot -- )
-    [ [ ignorable?>> ] reject ] dip map
-    [ zero? ] reject % 0 , ; inline
+: append-weights ( weight-levels quot -- seq )
+    [ [ ignorable?>> ] reject ] dip
+    map [ zero? ] reject ; inline
 
-: variable-weight ( weight -- )
-    dup ignorable?>> [ primary>> ] [ drop 0xFFFF ] if , ;
+: variable-weight ( weight-levels -- obj )
+    dup ignorable?>> [ primary>> ] [ drop 0xFFFF ] if ;
 
-: weights>bytes ( weights -- byte-array )
+: weights>bytes ( weights -- array )
     [
         {
-            [ [ primary>> ] append-weights ]
-            [ [ secondary>> ] append-weights ]
-            [ [ tertiary>> ] append-weights ]
-            [ [ variable-weight ] each ]
+            [ [ primary>> ] append-weights { 0 } ]
+            [ [ secondary>> ] append-weights { 0 } ]
+            [ [ tertiary>> ] append-weights { 0 } ]
+            [ [ [ secondary>> ] [ tertiary>> ] bi [ zero? ] both? ] reject [ variable-weight ] map ]
         } cleave
-    ] { } make ;
+    ] { } append-outputs-as ;
 
 PRIVATE>
 

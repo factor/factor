@@ -1,5 +1,5 @@
 ! Copyback (C) 2008 Daniel Ehrenberg
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: tools.test persistent.deques kernel math ;
 IN: persistent.deques.tests
 

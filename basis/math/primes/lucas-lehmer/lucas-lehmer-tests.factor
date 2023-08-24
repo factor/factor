@@ -1,5 +1,5 @@
 ! Copyright (C) 2009 Doug Coleman.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: tools.test math.primes.lucas-lehmer ;
 
 { t } [ 2 lucas-lehmer ] unit-test

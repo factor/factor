@@ -1,35 +1,27 @@
 ! Copyright (C) 2009, 2010 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
-USING: assocs accessors alien core-graphics.types core-text
-core-text.fonts kernel hashtables namespaces sequences ui.text
-ui.text.private destructors combinators core-foundation
-core-foundation.strings math math.vectors init colors
-colors.constants cache arrays images ;
+! See https://factorcode.org/license.txt for BSD license.
+USING: accessors cache core-graphics.types core-text
+core-text.fonts io.encodings.string io.encodings.utf16 kernel
+math math.vectors namespaces opengl sequences ui.text
+ui.text.private ;
 IN: ui.text.core-text
-
 SINGLETON: core-text-renderer
 
 <PRIVATE
 
-: unscale ( m -- n )
-    retina? get-global [ 2.0 / ] when ; inline
-
-: scale ( m -- n )
-    retina? get-global [ 2.0 * ] when ; inline
-
 : scale-dim ( dim -- dim' )
-    retina? get-global [ [ 2.0 / ] map ] when ; inline
+    gl-scale-factor get-global [ [ gl-unscale ] map ] when ; inline
 
 : scale-metrics ( metrics -- metrics' )
-    retina? get-global [
+    gl-scale-factor get-global [
         clone
-            [ 2.0 / ] change-width
-            [ 2.0 / ] change-ascent
-            [ 2.0 / ] change-descent
-            [ 2.0 / ] change-height
-            [ 2.0 / ] change-leading
-            [ 2.0 / ] change-cap-height
-            [ 2.0 / ] change-x-height
+            [ gl-unscale ] change-width
+            [ gl-unscale ] change-ascent
+            [ gl-unscale ] change-descent
+            [ gl-unscale ] change-height
+            [ gl-unscale ] change-leading
+            [ gl-unscale ] change-cap-height
+            [ gl-unscale ] change-x-height
     ] when ; inline
 
 PRIVATE>
@@ -42,23 +34,28 @@ M: core-text-renderer string-dim
 M: core-text-renderer flush-layout-cache
     cached-lines get-global purge-cache ;
 
-M: core-text-renderer string>image ( font string -- image loc )
+M: core-text-renderer string>image
     cached-line [ line>image ] [ loc>> scale-dim ] bi ;
 
-M: core-text-renderer x>offset ( x font string -- n )
+M:: core-text-renderer x>offset ( x font string -- n )
+    x font string
     [ 2drop 0 ] [
         cached-line line>>
-        swap scale 0 <CGPoint> CTLineGetStringIndexForPosition
+        swap gl-scale 0 <CGPoint> CTLineGetStringIndexForPosition
+        2 * 0 swap string utf16n encode subseq
+        utf16n decode length
     ] if-empty ;
 
-M: core-text-renderer offset>x ( n font string -- x )
-    cached-line line>> swap f
-    CTLineGetOffsetForStringIndex unscale ;
+M:: core-text-renderer offset>x ( n font string -- x )
+    font string cached-line line>>
+    0 n string subseq utf16n encode length 2 /i
+    f
+    CTLineGetOffsetForStringIndex gl-unscale ;
 
-M: core-text-renderer font-metrics ( font -- metrics )
+M: core-text-renderer font-metrics
     cache-font-metrics ;
 
-M: core-text-renderer line-metrics ( font string -- metrics )
+M: core-text-renderer line-metrics
     [ " " line-metrics clone 0 >>width ]
     [ cached-line metrics>> scale-metrics ]
     if-empty ;

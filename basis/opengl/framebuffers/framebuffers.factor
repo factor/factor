@@ -1,5 +1,5 @@
 ! Copyright (C) 2008 Joe Groff.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: opengl opengl.gl combinators continuations kernel
 alien.c-types alien.data ;
 IN: opengl.framebuffers
@@ -37,7 +37,7 @@ IN: opengl.framebuffers
 
 : with-framebuffer ( id quot -- )
     [ GL_DRAW_FRAMEBUFFER swap glBindFramebuffer ] dip
-    [ GL_DRAW_FRAMEBUFFER 0 glBindFramebuffer ] [ ] cleanup ; inline
+    [ GL_DRAW_FRAMEBUFFER 0 glBindFramebuffer ] finally ; inline
 
 : with-draw-read-framebuffers ( draw-id read-id quot -- )
     [
@@ -47,7 +47,7 @@ IN: opengl.framebuffers
     [
         GL_DRAW_FRAMEBUFFER 0 glBindFramebuffer
         GL_READ_FRAMEBUFFER 0 glBindFramebuffer
-    ] [ ] cleanup ; inline
+    ] finally ; inline
 
 : framebuffer-attachment ( attachment -- id )
     GL_FRAMEBUFFER swap GL_FRAMEBUFFER_ATTACHMENT_OBJECT_NAME

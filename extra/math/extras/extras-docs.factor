@@ -1,7 +1,8 @@
 ! Copyright (C) 2012 John Benediktsson
-! See http://factorcode.org/license.txt for BSD license
+! See https://factorcode.org/license.txt for BSD license
 
-USING: help.markup help.syntax kernel math math.functions sequences ;
+USING: help.markup help.syntax kernel math math.functions
+sequences ;
 
 IN: math.extras
 
@@ -58,19 +59,19 @@ HELP: sinc
 { $description "Returns the " { $link sinc } " function, calculated according to " { $snippet "sin(pi * x) / (pi * x)" } ". The name " { $link sinc } " is short for \"sine cardinal\" or \"sinus cardinalis\"." }
 { $notes { $snippet "0 sinc" } " is the limit value of 1." } ;
 
-HELP: linspace[a,b)
+HELP: linspace[a..b)
 { $values { "a" number } { "b" number } { "length" integer } { "seq" sequence } }
 { $description "Return evenly spaced numbers over an interval " { $snippet "[a,b)" } "." } ;
 
-HELP: linspace[a,b]
+HELP: linspace[a..b]
 { $values { "a" number } { "b" number } { "length" integer } { "seq" sequence } }
 { $description "Return evenly spaced numbers over an interval " { $snippet "[a,b]" } "." } ;
 
-HELP: logspace[a,b)
+HELP: logspace[a..b)
 { $values { "a" number } { "b" number } { "length" integer } { "base" number } { "seq" sequence } }
 { $description "Return evenly spaced numbers on a log scaled interval " { $snippet "[base^a,base^b)" } "." } ;
 
-HELP: logspace[a,b]
+HELP: logspace[a..b]
 { $values { "a" number } { "b" number } { "length" integer } { "base" number } { "seq" sequence } }
 { $description "Return evenly spaced numbers on a log scaled interval " { $snippet "[base^a,base^b]" } "." } ;
 
@@ -80,7 +81,7 @@ HELP: majority
 
 HELP: nonzero
 { $values { "seq" sequence } { "seq'" sequence } }
-{ $description "Outputs a new sequence of the same type as " { $snippet "seq" } " with all non-zero elements removed." } ;
+{ $description "Outputs a new sequence of the same type as " { $snippet "seq" } " with all zero elements removed." } ;
 
 HELP: round-away-from-zero
 { $values { "x" number } { "y" number } }

@@ -14,7 +14,7 @@ M: openssl ssl-certificate-verification-supported? f ;
 
 : load-windows-cert-store ( string -- HCERTSTORE )
     [ f ] dip CertOpenSystemStore
-    [ win32-error-string throw ] when-zero ;
+    [ win32-error f ] when-zero ;
 
 : X509-NAME. ( X509_NAME -- )
     f 0 X509_NAME_oneline
@@ -57,23 +57,22 @@ M: openssl ssl-certificate-verification-supported? f ;
 
 M: windows socket-handle handle>> alien-address ;
 
-M: secure remote>handle ( addrspec -- handle )
-    [ addrspec>> remote>handle ] [ hostname>> ] bi <ssl-socket> ;
+M: secure remote>handle
+    [ addrspec>> remote>handle dup FIONBIO 1 set-ioctl-socket ]
+    [ hostname>> ] bi <ssl-socket> ;
 
 GENERIC: windows-socket-handle ( obj -- handle )
 M: ssl-handle windows-socket-handle file>> ;
 M: win32-socket windows-socket-handle ;
 
-M: secure (get-local-address) ( handle remote -- sockaddr )
+M: secure (get-local-address)
     [ windows-socket-handle ] [ addrspec>> ] bi* (get-local-address) ;
 
 M: secure parse-sockaddr addrspec>> parse-sockaddr f <secure> ;
 
-M:: secure establish-connection ( client-out addrspec -- )
-    client-out handle>> file>> :> socket
-    socket FIONBIO 1 set-ioctl-socket
-    socket <output-port> addrspec addrspec>> establish-connection
-    client-out addrspec secure-connection
-    socket FIONBIO 0 set-ioctl-socket ;
+M: secure establish-connection
+    [
+        [ handle>> file>> <output-port> ] [ addrspec>> ] bi* establish-connection
+    ] [ secure-connection ] 2bi ;
 
 M: windows non-ssl-socket? win32-socket? ;

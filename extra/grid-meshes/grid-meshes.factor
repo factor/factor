@@ -1,8 +1,8 @@
 ! Copyright (C) 2009 Joe Groff.
-! See http://factorcode.org/license.txt for BSD license.
-USING: accessors alien.data.map arrays destructors fry grouping
-kernel math math.ranges math.vectors.simd opengl opengl.gl sequences
-sequences.product specialized-arrays ;
+! See https://factorcode.org/license.txt for BSD license.
+USING: accessors alien.data.map destructors grouping kernel math
+math.vectors.simd opengl opengl.gl ranges sequences
+specialized-arrays ;
 FROM: alien.c-types => float ;
 SPECIALIZED-ARRAY: float-4
 IN: grid-meshes

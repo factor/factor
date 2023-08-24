@@ -1,4 +1,4 @@
-USING: accessors assocs continuations fry hashtables kernel make
+USING: accessors assocs continuations hashtables kernel make
 math namespaces sequences tools.test ;
 
 { H{ } } [ { } [ dup ] H{ } map>assoc ] unit-test

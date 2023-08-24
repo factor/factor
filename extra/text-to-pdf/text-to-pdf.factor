@@ -1,9 +1,8 @@
 ! Copyright (C) 2010 John Benediktsson
-! See http://factorcode.org/license.txt for BSD license
+! See https://factorcode.org/license.txt for BSD license
 
-USING: assocs calendar combinators environment formatting
-grouping io io.files kernel make math math.ranges sequences
-splitting xml.entities ;
+USING: assocs calendar environment formatting grouping io.files
+kernel make math ranges sequences splitting xml.entities ;
 
 IN: text-to-pdf
 
@@ -36,7 +35,7 @@ IN: text-to-pdf
         "/Author " "USER" os-env "unknown" or pdf-string append ,
         "/Creator (created with Factor)" ,
         ">>" ,
-    ] { } make "\n" join ;
+    ] { } make join-lines ;
 
 : pdf-catalog ( -- str )
     {
@@ -44,7 +43,7 @@ IN: text-to-pdf
         "/Type /Catalog"
         "/Pages 4 0 R"
         ">>"
-    } "\n" join ;
+    } join-lines ;
 
 : pdf-font ( -- str )
     {
@@ -53,7 +52,7 @@ IN: text-to-pdf
         "/Subtype /Type1"
         "/BaseFont /Courier"
         ">>"
-    } "\n" join ;
+    } join-lines ;
 
 : pdf-pages ( n -- str )
     [
@@ -67,7 +66,7 @@ IN: text-to-pdf
             "/Kids [ " "]" surround ,
         ] bi
         ">>" ,
-    ] { } make "\n" join ;
+    ] { } make join-lines ;
 
 : pdf-text ( lines -- str )
     [
@@ -77,7 +76,7 @@ IN: text-to-pdf
         "12 TL" ,
         [ pdf-string "'" append , ] each
         "ET" ,
-    ] { } make "\n" join pdf-stream ;
+    ] { } make join-lines pdf-stream ;
 
 : pdf-page ( n -- page )
     [
@@ -87,7 +86,7 @@ IN: text-to-pdf
         1 + "/Contents %d 0 R" sprintf ,
         "/Resources << /Font << /F1 3 0 R >> >>" ,
         ">>" ,
-    ] { } make "\n" join ;
+    ] { } make join-lines ;
 
 : pdf-trailer ( objects -- str )
     [
@@ -106,10 +105,10 @@ IN: text-to-pdf
         "startxref" ,
         [ length 1 + ] map-sum 9 + "%d" sprintf ,
         "%%EOF" ,
-    ] { } make "\n" join ;
+    ] { } make join-lines ;
 
 : string>lines ( str -- lines )
-    "\t" split "    " join string-lines
+    "\t" split "    " join split-lines
     [ [ " " ] when-empty ] map ;
 
 : lines>pages ( lines -- pages )
@@ -124,10 +123,10 @@ IN: text-to-pdf
         dup length 5 swap 2 range boa zip
         [ pdf-page , pdf-text , ] assoc-each
     ] { } make
-    dup length [1,b] zip [ first2 pdf-object ] map ;
+    dup length [1..b] zip [ first2 pdf-object ] map ;
 
 : objects>pdf ( objects -- str )
-    [ "\n" join "\n" append "%PDF-1.4\n" ]
+    [ join-lines "\n" append "%PDF-1.4\n" ]
     [ pdf-trailer ] bi surround ;
 
 PRIVATE>

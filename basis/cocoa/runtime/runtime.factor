@@ -1,6 +1,6 @@
 ! Copyright (C) 2006, 2007 Slava Pestov
-! See http://factorcode.org/license.txt for BSD license.
-USING: alien.c-types alien.syntax classes.struct ;
+! See https://factorcode.org/license.txt for BSD license.
+USING: alien.c-types alien.syntax classes.struct core-foundation ;
 IN: cocoa.runtime
 
 TYPEDEF: void* SEL
@@ -16,6 +16,7 @@ FUNCTION: SEL sel_registerName ( c-string str )
 TYPEDEF: void* Class
 TYPEDEF: void* Method
 TYPEDEF: void* Protocol
+TYPEDEF: void* Ivar
 
 STRUCT: objc-super
     { receiver id }
@@ -42,6 +43,8 @@ FUNCTION: Protocol objc_getProtocol ( c-string class )
 FUNCTION: Class objc_allocateClassPair ( Class superclass, c-string name, size_t extraBytes )
 FUNCTION: void objc_registerClassPair ( Class cls )
 
+FUNCTION: void* objc_getAssociatedObject ( void* obj, c-string key )
+
 FUNCTION: id class_createInstance ( Class class, uint additionalByteCount )
 
 FUNCTION: id class_createInstanceFromZone ( Class class, uint additionalByteCount, void* zone )
@@ -55,6 +58,14 @@ FUNCTION: Method* class_copyMethodList ( Class class, uint* outCount )
 FUNCTION: Class class_getSuperclass ( Class cls )
 
 FUNCTION: c-string class_getName ( Class cls )
+
+FUNCTION: Boolean class_isMetaClass ( Class cls )
+
+FUNCTION: Method class_getInstanceVariable ( Class class, c-string str )
+
+FUNCTION: Method class_getClassVariable ( Class class, c-string str )
+
+FUNCTION: uint8_t* class_getIvarLayout ( Class class )
 
 FUNCTION: char class_addMethod ( Class class, SEL name, void* imp, void* types )
 
@@ -74,3 +85,6 @@ FUNCTION: void* method_setImplementation ( Method method, void* imp )
 FUNCTION: void* method_getImplementation ( Method method )
 
 FUNCTION: Class object_getClass ( id object )
+
+FUNCTION: void* object_getIvar ( Class class, Ivar ivar )
+

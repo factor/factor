@@ -1,11 +1,11 @@
 ! Copyright (C) 2007, 2011 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: bootstrap.image.private compiler.codegen.relocation
 compiler.constants compiler.units cpu.x86.assembler
-cpu.x86.assembler.operands kernel kernel.private layouts locals
-locals.backend math math.private memory namespaces sequences
+cpu.x86.assembler.operands kernel kernel.private layouts
+locals.backend math math.private namespaces sequences
 slots.private strings.private vocabs ;
-IN: bootstrap.x86
+IN: bootstrap.assembler.x86
 
 : temp0/32 ( -- reg )
     temp0 32-bit-version-of ;
@@ -619,4 +619,4 @@ big-endian off
     ] }
 } define-sub-primitives
 
-[ "bootstrap.x86" forget-vocab ] with-compilation-unit
+[ "bootstrap.assembler.x86" forget-vocab ] with-compilation-unit

@@ -1,9 +1,9 @@
 ! Copyright (C) 2017 Jon Harper.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors alien.c-types alien.data byte-arrays checksums
-checksums.common combinators fry grouping hints kernel
-kernel.private literals locals macros math math.bitwise
-math.functions sequences sequences.private specialized-arrays ;
+checksums.common combinators grouping hints kernel
+kernel.private math math.bitwise sequences sequences.private
+specialized-arrays ;
 SPECIALIZED-ARRAY: uint
 IN: checksums.ripemd
 

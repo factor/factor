@@ -1,5 +1,6 @@
-USING: accessors alien.c-types alien.syntax math.floats.half kernel
-math tools.test specialized-arrays alien.data classes.struct ;
+USING: accessors alien.c-types alien.data classes.struct kernel
+math math.floats.half math.order sequences specialized-arrays
+tools.test ;
 SPECIALIZED-ARRAY: half
 IN: math.floats.half.tests
 
@@ -39,10 +40,19 @@ STRUCT: halves
 { 8 } [ halves heap-size ] unit-test
 
 { 3.0 } [
-    halves <struct>
+    halves new
         3.0 >>dick
     dick>>
 ] unit-test
 
 { half-array{ 1.0 2.0 3.0 1/0. -1/0. } }
 [ { 1.0 2.0 3.0 1/0. -1/0. } half >c-array ] unit-test
+
+{ 0x1.0p-24 } [ 1 bits>half ] unit-test
+
+{ t } [
+    65536 <iota>
+    [ 0x7c01 0x7dff between? ] reject
+    [ 0xfc01 0xfdff between? ] reject
+    [ dup bits>half half>bits = ] all?
+] unit-test

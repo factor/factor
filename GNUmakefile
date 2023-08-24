@@ -1,12 +1,25 @@
 ifdef CONFIG
-	VERSION = 0.98
+	VERSION = 0.99
 	GIT_LABEL = $(shell echo `git describe --all`-`git rev-parse HEAD`)
-
 	BUNDLE = Factor.app
+	DEBUG ?= 0
+	REPRODUCIBLE ?= 0
+
+	# gmake's default CXX is g++, we prefer c++
+	SHELL_CXX = $(shell printenv CXX)
+	ifeq ($(SHELL_CXX),)
+		CXX=c++
+	else
+		CXX=$(SHELL_CXX)
+	endif
+
+	XCODE_PATH ?= /Applications/Xcode.app
+	MACOSX_32_SDK ?= MacOSX10.11.sdk
 
 	include $(CONFIG)
 
-	CFLAGS = -Wall \
+	CFLAGS += -Wall \
+		-Wextra \
 		-pedantic \
 		-DFACTOR_VERSION="$(VERSION)" \
 		-DFACTOR_GIT_LABEL="$(GIT_LABEL)" \
@@ -14,10 +27,21 @@ ifdef CONFIG
 
 	CXXFLAGS += -std=c++11
 
-	ifdef DEBUG
+	# SANITIZER=address ./build.sh compile
+	# address,thread,undefined,leak
+	ifdef SANITIZER
+		CFLAGS += -fsanitize=$(SANITIZER)
+		CXXFLAGS += -fsanitize=$(SANITIZER)
+	endif
+
+	ifneq ($(DEBUG), 0)
 		CFLAGS += -g -DFACTOR_DEBUG
 	else
 		CFLAGS += -O3
+	endif
+
+	ifneq ($(REPRODUCIBLE), 0)
+		CFLAGS += -DFACTOR_REPRODUCIBLE
 	endif
 
 	ENGINE = $(DLL_PREFIX)factor$(DLL_SUFFIX)$(DLL_EXTENSION)
@@ -138,20 +162,30 @@ help:
 	@echo "linux-x86-64"
 	@echo "linux-ppc-32"
 	@echo "linux-ppc-64"
-	@echo "linux-arm"
+	@echo "linux-arm-64"
+	@echo "freebsd-x86-32"
+	@echo "freebsd-x86-64"
 	@echo "macosx-x86-32"
 	@echo "macosx-x86-64"
 	@echo "macosx-x86-fat"
+	@echo "macosx-arm64"
 	@echo "windows-x86-32"
 	@echo "windows-x86-64"
 	@echo ""
 	@echo "Additional modifiers:"
 	@echo ""
 	@echo "DEBUG=1  compile VM with debugging information"
+	@echo "REPRODUCIBLE=1  compile VM without timestamp"
 	@echo "SITE_CFLAGS=...  additional optimization flags"
 	@echo "X11=1  force link with X11 libraries instead of Cocoa (only on Mac OS X)"
 
 ALL = factor factor-ffi-test factor-lib
+
+freebsd-x86-32:
+	$(MAKE) $(ALL) CONFIG=vm/Config.freebsd.x86.32
+
+freebsd-x86-64:
+	$(MAKE) $(ALL) CONFIG=vm/Config.freebsd.x86.64
 
 macosx-x86-32:
 	$(MAKE) $(ALL) macosx.app CONFIG=vm/Config.macosx.x86.32
@@ -161,6 +195,15 @@ macosx-x86-64:
 
 macosx-x86-fat:
 	$(MAKE) $(ALL) macosx.app CONFIG=vm/Config.macosx.x86.fat
+
+macosx-arm64:
+	$(MAKE) $(ALL) macosx.app CONFIG=vm/Config.macosx.arm64
+
+linux-arm-32:
+	$(MAKE) $(ALL) CONFIG=vm/Config.linux.arm.32
+
+linux-arm-64:
+	$(MAKE) $(ALL) CONFIG=vm/Config.linux.arm.64
 
 linux-x86-32:
 	$(MAKE) $(ALL) CONFIG=vm/Config.linux.x86.32
@@ -173,9 +216,6 @@ linux-ppc-32:
 
 linux-ppc-64:
 	$(MAKE) $(ALL) CONFIG=vm/Config.linux.ppc.64
-
-linux-arm:
-	$(MAKE) $(ALL) CONFIG=vm/Config.linux.arm
 
 windows-x86-32:
 	$(MAKE) $(ALL) CONFIG=vm/Config.windows.x86.32
@@ -191,7 +231,7 @@ macosx.app: factor
 	mkdir -p $(BUNDLE)/Contents/MacOS
 	mkdir -p $(BUNDLE)/Contents/Frameworks
 	mv $(EXECUTABLE) $(BUNDLE)/Contents/MacOS/factor
-	ln -s Factor.app/Contents/MacOS/factor ./factor
+	ln -s $(BUNDLE)/Contents/MacOS/factor ./factor
 
 $(ENGINE): $(DLL_OBJS)
 	$(TOOLCHAIN_PREFIX)$(LINKER) $(ENGINE) $(DLL_OBJS)
@@ -243,4 +283,5 @@ clean:
 	rm -f libfactor-ffi-test.*
 	rm -f Factor.app/Contents/Frameworks/libfactor.dylib
 
-.PHONY: factor factor-lib factor-console factor-ffi-test tags clean macosx.app
+.PHONY: factor factor-lib factor-console factor-ffi-test tags clean help macosx.app
+.PHONY: linux-x86-32 linux-x86-64 linux-ppc-32 linux-ppc-64 linux-arm-64 freebsd-x86-32 freebsd-x86-64 macosx-x86-32 macosx-x86-64 macosx-x86-fat macosx-arm64 windows-x86-32 windows-x86-64

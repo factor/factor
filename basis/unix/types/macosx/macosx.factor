@@ -33,3 +33,7 @@ TYPEDEF: char[512] io_string_t
 TYPEDEF: kern_return_t IOReturn
 
 TYPEDEF: uint IOOptionBits
+
+TYPEDEF: void* posix_spawn_file_actions_t
+TYPEDEF: void* posix_spawnattr_t
+TYPEDEF: uint sigset_t

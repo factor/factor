@@ -5,7 +5,7 @@ math system strings sbufs vectors byte-arrays quotations
 io.streams.byte-array classes.builtin parser lexer
 classes.predicate classes.union classes.intersection
 classes.singleton classes.tuple help.vocabs math.parser
-accessors definitions sets lists ;
+accessors definitions sets lists help.tour ;
 IN: help.handbook
 
 ARTICLE: "conventions" "Conventions"
@@ -13,7 +13,7 @@ ARTICLE: "conventions" "Conventions"
 { $heading "Glossary of terms" }
 "Common terminology and abbreviations used throughout Factor and its documentation:"
 { $table
-    { "Term" "Definition" }
+    { { $strong "Term" } { $strong "Definition" } }
     { "alist" { "an association list; see " { $link "alists" } } }
     { "assoc" { "an associative mapping; see " { $link "assocs" } } }
     { "associative mapping" { "an object whose class implements the " { $link "assocs-protocol" } } }
@@ -49,7 +49,7 @@ $nl
 { $heading "Word naming conventions" }
 "These conventions are not hard and fast, but are usually a good first step in understanding a word's behavior:"
 { $table
-    { "General form" "Description" "Examples" }
+    { { $strong "General form" } { $strong "Description" } { $strong "Examples" } }
     { { $snippet { $emphasis "foo" } "?" } "outputs a boolean" { { $link empty? } } }
     { { $snippet { $emphasis "foo" } "!" } { "a variant of " { $snippet "foo" } " which mutates one of its arguments" } { { $link append! } } }
     { { $snippet "?" { $emphasis "foo" } } { "conditionally performs " { $snippet { $emphasis "foo" } } } { { $links ?nth } } }
@@ -117,7 +117,7 @@ ARTICLE: "numbers" "Numbers"
 "Advanced features:"
 { $subsections
     "math-vectors"
-    "math-intervals"
+    "math.intervals"
 } ;
 
 USE: io.buffers
@@ -222,7 +222,6 @@ ARTICLE: "io" "Input and output"
 }
 { $heading "Utilities" }
 { $subsections
-    "stream-binary"
     "io.styles"
     "checksums"
 }
@@ -369,6 +368,7 @@ ARTICLE: "handbook" "Factor handbook"
 { $subsections
     "cookbook"
     "first-program"
+    "tour"
 }
 { $heading "Reference" }
 { $subsections

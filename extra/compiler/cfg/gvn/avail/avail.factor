@@ -1,15 +1,9 @@
 ! Copyright (C) 2011 Alex Vondrak.
-! See http://factorcode.org/license.txt for BSD license.
-USING: accessors assocs hashtables kernel namespaces sequences
-sets
-compiler.cfg
-compiler.cfg.dataflow-analysis
-compiler.cfg.def-use
-compiler.cfg.gvn.graph
-compiler.cfg.predecessors
-compiler.cfg.renaming.functor
-compiler.cfg.rpo
-compiler.utilities ;
+! See https://factorcode.org/license.txt for BSD license.
+USING: accessors assocs compiler.cfg
+compiler.cfg.dataflow-analysis compiler.cfg.def-use
+compiler.cfg.gvn.graph compiler.cfg.renaming.functor
+compiler.utilities hashtables kernel namespaces sequences ;
 IN: compiler.cfg.gvn.avail
 
 : defined ( bb -- vregs )

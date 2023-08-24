@@ -177,8 +177,6 @@ COM-INTERFACE: ID3DXBaseMesh IUnknown {7ED943DD-52E8-40b5-A8D8-76685C406330}
     HRESULT GenerateAdjacency ( FLOAT Epsilon, DWORD* pAdjacency )
     HRESULT UpdateSemantics ( D3DVERTEXELEMENT9* Declaration ) ;
 
-C-TYPE: IStream
-
 COM-INTERFACE: ID3DXMesh ID3DXBaseMesh {4020E5C2-1403-4929-883F-E2E849FAC195}
     HRESULT LockAttributeBuffer ( DWORD Flags, DWORD** ppData )
     HRESULT UnlockAttributeBuffer ( )

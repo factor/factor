@@ -1,4 +1,4 @@
-USING: arrays kernel math roman roman.private sequences tools.test ;
+USING: roman tools.test ;
 
 { "i" } [ 1 >roman ] unit-test
 { "ii" } [ 2 >roman ] unit-test

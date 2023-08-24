@@ -184,7 +184,7 @@ HELP: >n
 HELP: ndrop
 { $description "Pops a namespace from the namestack." } ;
 
-HELP: init-namespaces
+HELP: init-namestack
 { $description "Resets the namestack to its initial state, holding a single copy of the global namespace." }
 $low-level-note ;
 

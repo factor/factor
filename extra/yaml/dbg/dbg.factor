@@ -1,9 +1,9 @@
 ! Copyright (C) 2014 Jon Harper.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors alien.c-types alien.data assocs classes.struct
 combinators continuations destructors io io.backend
 io.encodings.ascii io.encodings.string io.encodings.utf8
-io.launcher kernel libc locals math.parser prettyprint sequences
+io.launcher kernel libc math.parser prettyprint sequences
 yaml.ffi yaml.private ;
 IN: yaml.dbg
 

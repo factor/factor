@@ -1,13 +1,13 @@
 ! Copyright (C) 2012 John Benediktsson
-! See http://factorcode.org/license.txt for BSD license
+! See https://factorcode.org/license.txt for BSD license
 
-USING: combinators kernel math math.combinatorics math.ranges
+USING: combinators kernel math math.combinatorics ranges
 sequences ;
 
 IN: benchmark.combinatorics
 
 : bench-combinations ( n -- )
-    [1,b] dup clone [
+    [1..b] dup clone [
         {
             [ all-combinations drop ]
             [ [ drop ] each-combination ]

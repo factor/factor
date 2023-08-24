@@ -1,5 +1,5 @@
 ! Copyright (C) 2005, 2009 Daniel Ehrenberg
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: kernel namespaces xml.name io.encodings.utf8 xml.elements
 io.encodings.utf16 xml.tokenize xml.state math ascii sequences
 io.encodings.string io.encodings combinators accessors
@@ -36,8 +36,7 @@ IN: xml.autoencoding
 : prolog-encoding ( prolog -- )
     encoding>> dup "UTF-16" =
     [ drop ] [
-        dup name>encoding
-        [ decode-stream ] [ bad-encoding ] ?if
+        [ name>encoding ] [ decode-stream ] [ bad-encoding ] ?if
     ] if ;
 
 : instruct-encoding ( instruct/prolog -- )

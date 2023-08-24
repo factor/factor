@@ -1,5 +1,5 @@
 ! Copyright (C) 2009 Joe Groff, Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: alien.c-types alien.data kernel combinators
 sequences math windows.gdi32 windows.types images
 destructors accessors fry locals classes.struct ;
@@ -7,7 +7,7 @@ IN: windows.offscreen
 
 : (bitmap-info) ( dim -- BITMAPINFO )
     [
-        BITMAPINFO <struct>
+        BITMAPINFO new
         dup bmiHeader>>
         BITMAPINFOHEADER heap-size >>biSize
     ] dip

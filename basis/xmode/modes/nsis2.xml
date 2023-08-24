@@ -1,23 +1,48 @@
-<?xml version="1.0"?>
+<?xml version="1.0" encoding="UTF-8" ?>
 
 <!DOCTYPE MODE SYSTEM "xmode.dtd">
 
 <!--
-Nullsoft Scriptable Installation System mode by Ryan Grove 2003
-Updated by Uwe (donovaly@users.sourceforge.net) 2007
+This is Nullsoft Scriptable Installation System mode by Ryan Grove 2003.
+Copyright (C) 2003 Ryan Grove
+Copyright (C) 2007-2012 Uwe Stöhr (donovaly@users.sourceforge.net)
+
+This program is free software; you can redistribute it and/or
+modify it under the terms of the GNU General Public License
+as published by the Free Software Foundation; either version 2
+of the License, or (at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program; if not, write to the Free Software
+Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+
 Updated for 4.3pre9 by Alan Ezust 2007
 $Id$
-
-This file should be accurate as of the version of NSIS 2.25. If I've left something out, please let me know.
 -->
 
 <MODE>
 	<PROPS>
+	  <PROPERTY NAME="commentStart" VALUE="/*" />
+	  <PROPERTY NAME="commentEnd" VALUE="*/" />
 		<PROPERTY NAME="lineComment" VALUE=";" />
 		<PROPERTY NAME="indentNextLine" VALUE="\s*(.*:|(function\s+.*)|(section\s+.*)|(subsection\s+.*))" />
 	</PROPS>
 
-	<RULES IGNORE_CASE="TRUE" ESCAPE="$\" HIGHLIGHT_DIGITS="TRUE" DEFAULT="NULL">
+	<RULES IGNORE_CASE="TRUE" HIGHLIGHT_DIGITS="TRUE" DEFAULT="NULL">
+	<!-- Java comment (C style) -->
+    <SPAN TYPE="COMMENT1">
+      <BEGIN>/*</BEGIN>
+      <END>*/</END>
+    </SPAN>
+
+    <!-- Silly comment -->
+    <SEQ TYPE="COMMENT1">/**/</SEQ>
+	
 		<EOL_SPAN TYPE="COMMENT1">;</EOL_SPAN>
 		<EOL_SPAN TYPE="COMMENT2">#</EOL_SPAN>
 
@@ -25,17 +50,17 @@ This file should be accurate as of the version of NSIS 2.25. If I've left someth
 		<MARK_PREVIOUS TYPE="FUNCTION" MATCH_TYPE="OPERATOR">::</MARK_PREVIOUS>
 		<MARK_PREVIOUS TYPE="LABEL" MATCH_TYPE="OPERATOR">:</MARK_PREVIOUS>
 
-		<SPAN TYPE="LITERAL1" DELEGATE="NSIS_LITERAL">
+		<SPAN TYPE="LITERAL1" ESCAPE="$\" DELEGATE="NSIS_LITERAL">
 			<BEGIN>"</BEGIN>
 			<END>"</END>
 		</SPAN>
 
-		<SPAN TYPE="LITERAL1" DELEGATE="NSIS_LITERAL">
+		<SPAN TYPE="LITERAL1" ESCAPE="$\" DELEGATE="NSIS_LITERAL">
 			<BEGIN>'</BEGIN>
 			<END>'</END>
 		</SPAN>
 
-		<SPAN TYPE="LITERAL1" DELEGATE="NSIS_LITERAL">
+		<SPAN TYPE="LITERAL1" ESCAPE="$\" DELEGATE="NSIS_LITERAL">
 			<BEGIN>`</BEGIN>
 			<END>`</END>
 		</SPAN>
@@ -44,6 +69,8 @@ This file should be accurate as of the version of NSIS 2.25. If I've left someth
 			<!-- Deprecated stuff -->
 			<INVALID>dim</INVALID>
 			<INVALID>uninstallexename</INVALID>
+			<INVALID>subsection</INVALID>
+			<INVALID>subsectionend</INVALID>
 
 			<!-- Global variables -->
 			<KEYWORD3>$0</KEYWORD3>
@@ -113,6 +140,7 @@ This file should be accurate as of the version of NSIS 2.25. If I've left someth
 			<LITERAL3>SW_SHOWMINIMIZED</LITERAL3>
 			<LITERAL3>SW_SHOWNORMAL</LITERAL3>
 			<LITERAL3>a</LITERAL3>
+			<LITERAL3>admin</LITERAL3>
 			<LITERAL3>all</LITERAL3>
 			<LITERAL3>alwaysoff</LITERAL3>
 			<LITERAL3>auto</LITERAL3>
@@ -128,6 +156,7 @@ This file should be accurate as of the version of NSIS 2.25. If I've left someth
 			<LITERAL3>false</LITERAL3>
 			<LITERAL3>force</LITERAL3>
 			<LITERAL3>hide</LITERAL3>
+			<LITERAL3>highest</LITERAL3>
 			<LITERAL3>ifnewer</LITERAL3>
 			<LITERAL3>instfiles</LITERAL3>
 			<LITERAL3>license</LITERAL3>
@@ -148,6 +177,7 @@ This file should be accurate as of the version of NSIS 2.25. If I've left someth
 			<LITERAL3>true</LITERAL3>
 			<LITERAL3>try</LITERAL3>
 			<LITERAL3>uninstConfirm</LITERAL3>
+			<LITERAL3>user</LITERAL3>
 			<LITERAL3>w</LITERAL3>
 			<LITERAL3>zlib</LITERAL3>
 			<LITERAL3>$$</LITERAL3>
@@ -248,6 +278,7 @@ This file should be accurate as of the version of NSIS 2.25. If I've left someth
 			<KEYWORD2>!cd</KEYWORD2>
 			<KEYWORD2>!echo</KEYWORD2>
 			<KEYWORD2>!error</KEYWORD2>
+			<KEYWORD2>!getdllversion</KEYWORD2>
 			<KEYWORD2>!insertmacro</KEYWORD2>
 			<KEYWORD2>!packhdr</KEYWORD2>
 			<KEYWORD2>!system</KEYWORD2>
@@ -268,9 +299,9 @@ This file should be accurate as of the version of NSIS 2.25. If I've left someth
 			<KEYWORD1>function</KEYWORD1>
 			<KEYWORD1>functionend</KEYWORD1>
 			<KEYWORD1>section</KEYWORD1>
+			<KEYWORD1>sectiongroup</KEYWORD1>
 			<KEYWORD1>sectionend</KEYWORD1>
-			<KEYWORD1>subsection</KEYWORD1>
-			<KEYWORD1>subsectionend</KEYWORD1>
+			<KEYWORD1>sectiongroupend</KEYWORD1>
 
 			<!-- Instructions -->
 			<KEYWORD2>addbrandingimage</KEYWORD2>
@@ -278,6 +309,7 @@ This file should be accurate as of the version of NSIS 2.25. If I've left someth
 			<KEYWORD2>allowrootdirinstall</KEYWORD2>
 			<KEYWORD2>allowskipfiles</KEYWORD2>
 			<KEYWORD2>autoclosewindow</KEYWORD2>
+			<KEYWORD2>bgfont</KEYWORD2>
 			<KEYWORD2>bggradient</KEYWORD2>
 			<KEYWORD2>brandingtext</KEYWORD2>
 			<KEYWORD2>bringtofront</KEYWORD2>
@@ -357,6 +389,8 @@ This file should be accurate as of the version of NSIS 2.25. If I've left someth
 			<KEYWORD2>loadlanguagefile</KEYWORD2>
 			<KEYWORD2>logset</KEYWORD2>
 			<KEYWORD2>logtext</KEYWORD2>
+			<KEYWORD2>manifestdpiaware</KEYWORD2>
+			<KEYWORD2>manifestsupportedos</KEYWORD2>
 			<KEYWORD2>miscbuttontext</KEYWORD2>
 			<KEYWORD2>name</KEYWORD2>
 			<KEYWORD2>nop</KEYWORD2>
@@ -371,6 +405,7 @@ This file should be accurate as of the version of NSIS 2.25. If I've left someth
 			<KEYWORD2>readregstr</KEYWORD2>
 			<KEYWORD2>regdll</KEYWORD2>
 			<KEYWORD2>rename</KEYWORD2>
+			<KEYWORD2>requestexecutionlevel</KEYWORD2>
 			<KEYWORD2>reservefile</KEYWORD2>
 			<KEYWORD2>rmdir</KEYWORD2>
 			<KEYWORD2>searchpath</KEYWORD2>
@@ -394,12 +429,14 @@ This file should be accurate as of the version of NSIS 2.25. If I've left someth
 			<KEYWORD2>setdatesave</KEYWORD2>
 			<KEYWORD2>setdetailsprint</KEYWORD2>
 			<KEYWORD2>setdetailsview</KEYWORD2>
+			<KEYWORD2>seterrorlevel</KEYWORD2>
 			<KEYWORD2>setfileattributes</KEYWORD2>
 			<KEYWORD2>setfont</KEYWORD2>
 			<KEYWORD2>setoutpath</KEYWORD2>
 			<KEYWORD2>setoverwrite</KEYWORD2>
 			<KEYWORD2>setpluginunload</KEYWORD2>
 			<KEYWORD2>setrebootflag</KEYWORD2>
+			<KEYWORD2>setregview</KEYWORD2>
 			<KEYWORD2>setshellvarcontext</KEYWORD2>
 			<KEYWORD2>setstaticbkcolor</KEYWORD2>
 			<KEYWORD2>setwindowlong</KEYWORD2>
@@ -413,6 +450,7 @@ This file should be accurate as of the version of NSIS 2.25. If I've left someth
 			<KEYWORD2>strcpy</KEYWORD2>
 			<KEYWORD2>strlen</KEYWORD2>
 			<KEYWORD2>subcaption</KEYWORD2>
+			<KEYWORD2>unicode</KEYWORD2>
 			<KEYWORD2>uninstallbuttontext</KEYWORD2>
 			<KEYWORD2>uninstallcaption</KEYWORD2>
 			<KEYWORD2>uninstallicon</KEYWORD2>
@@ -425,6 +463,7 @@ This file should be accurate as of the version of NSIS 2.25. If I've left someth
 			<KEYWORD2>videscription</KEYWORD2>
 			<KEYWORD2>vicompanyname</KEYWORD2>
 			<KEYWORD2>vicomments</KEYWORD2>
+			<KEYWORD2>vifileversion</KEYWORD2>
 			<KEYWORD2>vilegalcopyrights</KEYWORD2>
 			<KEYWORD2>vilegaltrademarks</KEYWORD2>
 			<KEYWORD2>viproductname</KEYWORD2>
@@ -456,6 +495,7 @@ This file should be accurate as of the version of NSIS 2.25. If I've left someth
 			<KEYWORD1>quit</KEYWORD1>
 			<KEYWORD1>seterrors</KEYWORD1>
 			<KEYWORD1>strcmp</KEYWORD1>
+			<KEYWORD1>strcmps</KEYWORD1>
 
 			<!-- Callback functions -->
 			<KEYWORD3>.onguiinit</KEYWORD3>
@@ -474,7 +514,7 @@ This file should be accurate as of the version of NSIS 2.25. If I've left someth
 		</KEYWORDS>
 	</RULES>
 
-	<RULES SET="NSIS_LITERAL" DEFAULT="LITERAL1" NO_WORD_SEP="-{}_">
+	<RULES SET="NSIS_LITERAL" ESCAPE="$\" DEFAULT="LITERAL1" NO_WORD_SEP="-{}_">
 	</RULES>
 
 </MODE>

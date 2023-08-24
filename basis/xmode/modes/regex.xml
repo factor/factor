@@ -1,0 +1,121 @@
+<?xml version="1.0"?>
+
+<!DOCTYPE MODE SYSTEM 'xmode.dtd'>
+
+<!-- Regular Expression mode, by Kevin Hunter -->
+
+<!-- Currently implemented artifacts:
+***** Classes
+[...] - user-defined character classes
+\d - Numerical characters (eq. [0-9])
+\D - Non-numerical characters (eq. [^0-9])
+\w - Alphanumeric characters and underscore (eq. [A-Za-z0-9_])
+\W - Opposite of \w (eq. [^A-Za-z0-9_])
+\s - Whitespace characters (ex. space, tab, formfeed, newline)
+\S - Non-whitespace characters
+\b - Word-break character
+.  - Any character, generally not including a newline (\n)
+
+***** Operators
+^ - Match at beginning of string
+$ - Match at end of string
+? - optionally match previous item token
+* - Match previous token 0 or more times.
++ - Match previous token 1 or more times.
+| - Logical OR, allowing the previous token or next token to match
+{m} - Match previous token exactly m times.
+{m,} - Match previous token at least m times
+{m,n} - Match previous token between m and n times, inclusive.
+
+***** Functions
+[^...] - negate user-defined character classes
+(...) - Backreference - effectively save the matched part for later use
+(?:...) - Group - Don't save, just mark the section of the pattern as a group
+(?=...) - zero-width positive lookahead assertion
+(?!...) - zero-width negative lookahead assertion
+(?<=...) - zero-width positive lookbehind assertion
+(?<!...) - zero-width negative lookbehind assertion
+
+-->
+<MODE>
+	<RULES IGNORE_CASE='FALSE' HIGHLIGHT_DIGITS='TRUE' SET='FORCED_NUMBER'>
+		<SEQ TYPE='OPERATOR'>,</SEQ>
+	</RULES>
+
+	<RULES IGNORE_CASE='FALSE' HIGHLIGHT_DIGITS='TRUE'>
+		<SEQ TYPE='NULL'>\\</SEQ>
+		<SEQ TYPE='NULL'>\(</SEQ>
+		<SEQ TYPE='NULL'>\)</SEQ>
+		<SEQ TYPE='NULL'>\[</SEQ>
+		<SEQ TYPE='NULL'>\]</SEQ>
+		<SEQ TYPE='NULL'>\{</SEQ>
+		<SEQ TYPE='NULL'>\}</SEQ>
+		<SEQ TYPE='NULL'>\^</SEQ>
+		<SEQ TYPE='NULL'>\$</SEQ>
+		<SEQ TYPE='NULL'>\?</SEQ>
+		<SEQ TYPE='NULL'>\+</SEQ>
+		<SEQ TYPE='NULL'>\*</SEQ>
+		<SEQ TYPE='NULL'>\.</SEQ>
+		<SEQ TYPE='NULL'>\|</SEQ>
+
+		<SEQ TYPE='OPERATOR'>^</SEQ>
+		<SEQ TYPE='OPERATOR'>$</SEQ>
+		<SEQ TYPE='OPERATOR'>?</SEQ>
+		<SEQ TYPE='OPERATOR'>*</SEQ>
+		<SEQ TYPE='OPERATOR'>+</SEQ>
+		<SEQ TYPE='OPERATOR'>|</SEQ>
+
+		<SEQ TYPE='KEYWORD1'>\b</SEQ>
+
+		<SEQ TYPE='DIGIT'>\d</SEQ>
+		<SEQ TYPE='LITERAL2'>\D</SEQ>
+
+		<SEQ TYPE='KEYWORD3'>\w</SEQ>
+		<SEQ TYPE='KEYWORD3'>.</SEQ>
+		<SEQ TYPE='LITERAL3'>\W</SEQ>
+
+		<SEQ TYPE='KEYWORD4'>\s</SEQ>
+		<SEQ TYPE='LITERAL4'>\S</SEQ>
+
+		<SPAN TYPE='FUNCTION' DELEGATE='MAIN'>
+			<BEGIN>[^</BEGIN> <!-- user-defined negative character class -->
+			<END>]</END>
+		</SPAN>
+
+		<SPAN TYPE='FUNCTION' DELEGATE='MAIN'>
+			<BEGIN>(?=</BEGIN> <!-- zero-width positive lookahead assertion -->
+			<END>)</END>
+		</SPAN>
+		<SPAN TYPE='FUNCTION' DELEGATE='MAIN'>
+			<BEGIN>(?!</BEGIN> <!-- zero-width negative lookahead assertion -->
+			<END>)</END>
+		</SPAN>
+		<SPAN TYPE='FUNCTION' DELEGATE='MAIN'>
+			<BEGIN><![CDATA[(?<=]]></BEGIN> <!-- zero-width positive lookbehind assertion -->
+			<END>)</END>
+		</SPAN>
+		<SPAN TYPE='FUNCTION' DELEGATE='MAIN'>
+			<BEGIN><![CDATA[(?<!]]></BEGIN> <!-- zero-width negative lookbehind assertion -->
+			<END>)</END>
+		</SPAN>
+		<SPAN TYPE='FUNCTION' DELEGATE='MAIN'>
+			<BEGIN>(?:</BEGIN> <!-- unsaved group -->
+			<END>)</END>
+		</SPAN>
+
+		<SPAN TYPE='OPERATOR' DELEGATE='FORCED_NUMBER'>
+			<BEGIN>{</BEGIN>
+			<END>}</END>
+		</SPAN>
+		<SPAN TYPE='OPERATOR' DELEGATE='MAIN'>
+			<BEGIN>[</BEGIN> <!-- user-defined character class -->
+			<END>]</END>
+		</SPAN>
+		<SPAN TYPE='FUNCTION' DELEGATE='MAIN'>
+			<BEGIN>(</BEGIN> <!-- saved group (backreference) -->
+			<END>)</END>
+		</SPAN>
+	</RULES>
+
+</MODE>
+ 	  	 

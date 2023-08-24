@@ -1,10 +1,9 @@
 ! Copyright (C) 2005, 2009 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
-USING: accessors assocs colors colors.constants delegate
-delegate.protocols destructors fry hashtables io
-io.streams.plain io.streams.string kernel make math.order
-namespaces present sequences splitting strings strings.tables
-summary ;
+! See https://factorcode.org/license.txt for BSD license.
+USING: accessors assocs colors delegate delegate.protocols
+destructors hashtables io io.streams.plain io.streams.string
+kernel make namespaces present sequences sets splitting strings
+strings.tables summary ;
 IN: io.styles
 
 GENERIC: stream-format ( str style stream -- )
@@ -62,13 +61,17 @@ C: <ignore-close-stream> ignore-close-stream
 TUPLE: style-stream < filter-writer style ;
 INSTANCE: style-stream output-stream
 
-: do-nested-style ( style style-stream -- style stream )
+<PRIVATE
+
+: nested-style ( style style-stream -- style stream )
     [ style>> swap assoc-union ] [ stream>> ] bi ; inline
+
+PRIVATE>
 
 C: <style-stream> style-stream
 
 M: style-stream stream-format
-    do-nested-style stream-format ;
+    nested-style stream-format ;
 
 M: style-stream stream-write
     [ style>> ] [ stream>> ] bi stream-format ;
@@ -77,19 +80,16 @@ M: style-stream stream-write1
     [ 1string ] dip stream-write ;
 
 M: style-stream make-span-stream
-    do-nested-style make-span-stream ;
+    nested-style make-span-stream ;
 
 M: style-stream make-block-stream
-    [ do-nested-style make-block-stream ] [ style>> ] bi
-    <style-stream> ;
+    nested-style make-block-stream ;
 
 M: style-stream make-cell-stream
-    [ do-nested-style make-cell-stream ] [ style>> ] bi
-    <style-stream> ;
+    nested-style make-cell-stream ;
 
 M: style-stream stream-write-table
-    [ [ [ stream>> ] map ] map ] [ ] [ stream>> ] tri*
-    stream-write-table ;
+    nested-style stream-write-table ;
 
 M: plain-writer stream-format
     nip stream-write ;
@@ -114,6 +114,9 @@ SYMBOL: plain
 SYMBOL: bold
 SYMBOL: italic
 SYMBOL: bold-italic
+SYMBOL: faint
+SYMBOL: underline
+SYMBOL: blink
 
 ! Character styles
 SYMBOL: foreground

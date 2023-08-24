@@ -1,8 +1,8 @@
 ! Copyright (C) 2009 Doug Coleman.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors byte-arrays byte-vectors
-combinators.short-circuit fry io.binary kernel locals math
-math.bitwise sequences sequences.private ;
+combinators.short-circuit endian kernel math math.bitwise
+sequences sequences.private ;
 IN: bitstreams
 
 TUPLE: widthed
@@ -166,10 +166,10 @@ ERROR: not-enough-bits n bit-reader ;
     bs bytes>> subseq endian> execute( seq -- x )
     n bs subseq-endian execute( bignum n bs -- bits ) ;
 
-M: lsb0-bit-reader peek ( n bs -- bits )
+M: lsb0-bit-reader peek
     \ le> \ subseq>bits-le (peek) ;
 
-M: msb0-bit-reader peek ( n bs -- bits )
+M: msb0-bit-reader peek
     \ be> \ subseq>bits-be (peek) ;
 
 :: bit-writer-bytes ( writer -- bytes )

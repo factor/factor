@@ -1,10 +1,10 @@
 ! Copyright (c) 2008 Aaron Schaefer.
-! See http://factorcode.org/license.txt for BSD license.
-USING: arrays kernel math math.ranges
+! See https://factorcode.org/license.txt for BSD license.
+USING: arrays kernel math ranges
     namespaces project-euler.common sequences ;
 IN: project-euler.075
 
-! http://projecteuler.net/index.php?section=problems&id=75
+! https://projecteuler.net/index.php?section=problems&id=75
 
 ! DESCRIPTION
 ! -----------
@@ -33,7 +33,7 @@ IN: project-euler.075
 ! SOLUTION
 ! --------
 
-! Algorithm adapted from http://mathworld.wolfram.com/PythagoreanTriple.html
+! Algorithm adapted from https://mathworld.wolfram.com/PythagoreanTriple.html
 ! Identical implementation as problem #39
 
 ! Basically, this makes an array of 2000000 zeros, recursively creates

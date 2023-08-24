@@ -1,5 +1,5 @@
 ! Copyright (C) 2007, 2008 Doug Coleman.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors classes.tuple combinators db
 db.postgresql.errors db.postgresql.ffi db.postgresql.lib
 db.private db.queries db.tuples db.tuples.private db.types
@@ -25,7 +25,7 @@ TUPLE: postgresql-statement < statement ;
 
 TUPLE: postgresql-result-set < result-set ;
 
-M: postgresql-db db-open ( db -- db-connection )
+M: postgresql-db db-open
     {
         [ host>> ]
         [ port>> ]
@@ -36,46 +36,46 @@ M: postgresql-db db-open ( db -- db-connection )
         [ password>> ]
     } cleave connect-postgres <postgresql-db-connection> ;
 
-M: postgresql-db-connection db-close ( handle -- ) PQfinish ;
+M: postgresql-db-connection db-close PQfinish ;
 
-M: postgresql-statement bind-statement* ( statement -- ) drop ;
+M: postgresql-statement bind-statement* drop ;
 
 GENERIC: postgresql-bind-conversion ( tuple object -- low-level-binding )
 
-M: sql-spec postgresql-bind-conversion ( tuple spec -- object )
+M: sql-spec postgresql-bind-conversion
     slot-name>> swap get-slot-named <low-level-binding> ;
 
-M: literal-bind postgresql-bind-conversion ( tuple literal-bind -- object )
+M: literal-bind postgresql-bind-conversion
     nip value>> <low-level-binding> ;
 
-M: generator-bind postgresql-bind-conversion ( tuple generate-bind -- object )
+M: generator-bind postgresql-bind-conversion
     dup generator-singleton>> eval-generator
     [ swap slot-name>> rot set-slot-named ] [ <low-level-binding> ] bi ;
 
-M: postgresql-statement bind-tuple ( tuple statement -- )
+M: postgresql-statement bind-tuple
     [ nip ] [
         in-params>>
         [ postgresql-bind-conversion ] with map
     ] 2bi
     >>bind-params drop ;
 
-M: postgresql-result-set #rows ( result-set -- n )
+M: postgresql-result-set #rows
     handle>> PQntuples ;
 
-M: postgresql-result-set #columns ( result-set -- n )
+M: postgresql-result-set #columns
     handle>> PQnfields ;
 
 : result-handle-n ( result-set -- handle n )
     [ handle>> ] [ n>> ] bi ;
 
-M: postgresql-result-set row-column ( result-set column -- object )
+M: postgresql-result-set row-column
     [ result-handle-n ] dip pq-get-string ;
 
-M: postgresql-result-set row-column-typed ( result-set column -- object )
+M: postgresql-result-set row-column-typed
     dup pick out-params>> nth type>>
     [ result-handle-n ] 2dip postgresql-column-typed ;
 
-M: postgresql-statement query-results ( query -- result-set )
+M: postgresql-statement query-results
     dup bind-params>> [
         over [ bind-statement ] keep
         do-postgresql-bound-statement
@@ -85,17 +85,17 @@ M: postgresql-statement query-results ( query -- result-set )
     postgresql-result-set new-result-set
     dup init-result-set ;
 
-M: postgresql-result-set advance-row ( result-set -- )
+M: postgresql-result-set advance-row
     [ 1 + ] change-n drop ;
 
-M: postgresql-result-set more-rows? ( result-set -- ? )
+M: postgresql-result-set more-rows?
     [ n>> ] [ max>> ] bi < ;
 
-M: postgresql-statement dispose ( query -- )
+M: postgresql-statement dispose
     dup handle>> PQclear
     f >>handle drop ;
 
-M: postgresql-result-set dispose ( result-set -- )
+M: postgresql-result-set dispose
     [ handle>> PQclear ]
     [
         0 >>n
@@ -103,27 +103,27 @@ M: postgresql-result-set dispose ( result-set -- )
         f >>handle drop
     ] bi ;
 
-M: postgresql-statement prepare-statement ( statement -- )
+M: postgresql-statement prepare-statement
     dup
     [ db-connection get handle>> f ] dip
     [ sql>> ] [ in-params>> ] bi
     length f PQprepare postgresql-error
     >>handle drop ;
 
-M: postgresql-db-connection <simple-statement> ( sql in out -- statement )
+M: postgresql-db-connection <simple-statement>
     postgresql-statement new-statement ;
 
-M: postgresql-db-connection <prepared-statement> ( sql in out -- statement )
+M: postgresql-db-connection <prepared-statement>
     <simple-statement> dup prepare-statement ;
 
 : bind-name% ( -- )
     CHAR: $ 0,
     sql-counter [ inc ] [ get 0# ] bi ;
 
-M: postgresql-db-connection bind% ( spec -- )
+M: postgresql-db-connection bind%
     bind-name% 1, ;
 
-M: postgresql-db-connection bind# ( spec object -- )
+M: postgresql-db-connection bind#
     [ bind-name% f swap type>> ] dip
     <literal-bind> 1, ;
 
@@ -169,7 +169,7 @@ M: postgresql-db-connection bind# ( spec object -- )
         "_seq'');' language sql;" 0%
     ] query-make ;
 
-M: postgresql-db-connection create-sql-statement ( class -- seq )
+M: postgresql-db-connection create-sql-statement
     [
         [ create-table-sql , ] keep
         dup db-assigned? [ create-function-sql , ] [ drop ] if
@@ -189,13 +189,13 @@ M: postgresql-db-connection create-sql-statement ( class -- seq )
         "drop table " 0% 0% drop
     ] query-make ;
 
-M: postgresql-db-connection drop-sql-statement ( class -- seq )
+M: postgresql-db-connection drop-sql-statement
     [
         [ drop-table-sql , ] keep
         dup db-assigned? [ drop-function-sql , ] [ drop ] if
     ] { } make ;
 
-M: postgresql-db-connection <insert-db-assigned-statement> ( class -- statement )
+M: postgresql-db-connection <insert-db-assigned-statement>
     [
         "select add_" 0% 0%
         "(" 0%
@@ -205,7 +205,7 @@ M: postgresql-db-connection <insert-db-assigned-statement> ( class -- statement 
         ");" 0%
     ] query-make ;
 
-M: postgresql-db-connection <insert-user-assigned-statement> ( class -- statement )
+M: postgresql-db-connection <insert-user-assigned-statement>
     [
         "insert into " 0% 0%
         "(" 0%
@@ -228,10 +228,10 @@ M: postgresql-db-connection <insert-user-assigned-statement> ( class -- statemen
         ");" 0%
     ] query-make ;
 
-M: postgresql-db-connection insert-tuple-set-key ( tuple statement -- )
+M: postgresql-db-connection insert-tuple-set-key
     query-modify-tuple ;
 
-M: postgresql-db-connection persistent-table ( -- hashtable )
+M: postgresql-db-connection persistent-table
     H{
         { +db-assigned-id+ { "integer" "serial" f } }
         { +user-assigned-id+ { f f f } }
@@ -271,7 +271,7 @@ M: postgresql-db-connection persistent-table ( -- hashtable )
     } ;
 
 ERROR: no-compound-found string object ;
-M: postgresql-db-connection compound ( string object -- string' )
+M: postgresql-db-connection compound
     over {
         { "default" [ first number>string " " glue ] }
         { "varchar" [ first number>string "(" ")" surround append ] }
@@ -280,7 +280,7 @@ M: postgresql-db-connection compound ( string object -- string' )
     } case ;
 
 M: postgresql-db-connection parse-db-error
-    "\n" split dup length {
+    split-lines dup length {
         { 1 [ first parse-postgresql-sql-error ] }
         { 2 [ concat parse-postgresql-sql-error ] }
         { 3 [

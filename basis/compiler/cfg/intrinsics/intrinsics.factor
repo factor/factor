@@ -1,5 +1,5 @@
 ! Copyright (C) 2008, 2010 Slava Pestov, Doug Coleman.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: assocs compiler.cfg.comparisons compiler.cfg.hats
 compiler.cfg.intrinsics.alien compiler.cfg.intrinsics.allot
 compiler.cfg.intrinsics.fixnum compiler.cfg.intrinsics.float
@@ -63,8 +63,8 @@ ERROR: inline-intrinsics-not-supported word quot ;
     { byte-arrays:<byte-array> [ emit-<byte-array> ] }
     { byte-arrays:(byte-array) [ emit-(byte-array) ] }
     { kernel:<wrapper> [ emit-simple-allot ] }
-    { alien.data.private:(local-allot) [ emit-local-allot ] }
-    { alien.data.private:(cleanup-allot) [ emit-cleanup-allot ] }
+    { alien.data.private:local-allot [ emit-local-allot ] }
+    { alien.data.private:cleanup-allot [ emit-cleanup-allot ] }
     { alien:<displaced-alien> [ emit-<displaced-alien> ] }
     { alien.accessors:alien-unsigned-1 [ int-rep alien.c-types:uchar emit-load-memory ] }
     { alien.accessors:set-alien-unsigned-1 [ int-rep alien.c-types:uchar emit-store-memory ] }

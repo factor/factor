@@ -1,9 +1,9 @@
 ! Copyright (C) 2013 John Benediktsson
-! See http://factorcode.org/license.txt for BSD license
+! See https://factorcode.org/license.txt for BSD license
 
 USING: combinators command-line generic io kernel math
-math.text.english namespaces present sequences strings system
-ui.operations vocabs ;
+math.text.english namespaces present sequences splitting
+strings system ui.operations vocabs ;
 
 IN: text-to-speech
 
@@ -32,7 +32,7 @@ M: integer speak number>text speak-text ;
     command-line get [
         [ speak ] each-line
     ] [
-        " " join speak
+        join-words speak
     ] if-empty ;
 
 MAIN: speak-main

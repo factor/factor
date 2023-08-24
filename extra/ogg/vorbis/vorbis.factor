@@ -1,5 +1,5 @@
 ! Copyright (C) 2007 Chris Double.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 !
 USING:
     alien
@@ -17,7 +17,7 @@ IN: ogg.vorbis
 <<
 "vorbis" {
     { [ os windows? ]  [ "vorbis.dll" ] }
-    { [ os macosx? ] [ "libvorbis.0.dylib" ] }
+    { [ os macosx? ] [ "libvorbis.dylib" ] }
     { [ os unix? ]   [ "libvorbis.so" ] }
 } cond cdecl add-library
 

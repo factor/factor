@@ -1,5 +1,5 @@
 ! Copyright (C) 2008 Doug Coleman.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors alien.c-types alien.data alien.strings arrays ascii
 calendar.format calendar.parser combinators db db.postgresql.ffi
 db.types destructors io.encodings.utf8 kernel libc math math.parser
@@ -13,7 +13,7 @@ IN: db.postgresql.lib
     dup zero? [
         drop f
     ] [
-        PQresultErrorMessage [ blank? ] trim
+        PQresultErrorMessage [ ascii:blank? ] trim
     ] if ;
 
 : postgres-result-error ( res -- )
@@ -21,7 +21,7 @@ IN: db.postgresql.lib
 
 : (postgresql-error-message) ( handle -- str )
     PQerrorMessage
-    "\n" split [ [ blank? ] trim ] map "\n" join ;
+    split-lines [ [ ascii:blank? ] trim ] map join-lines ;
 
 : postgresql-error-message ( -- str )
     db-connection get handle>> (postgresql-error-message) ;
@@ -31,7 +31,7 @@ IN: db.postgresql.lib
 
 ERROR: postgresql-result-null ;
 
-M: postgresql-result-null summary ( obj -- str )
+M: postgresql-result-null summary
     drop "PQexec returned f." ;
 
 : postgresql-result-ok? ( res -- ? )
@@ -126,7 +126,7 @@ M: postgresql-result-null summary ( obj -- str )
 TUPLE: postgresql-malloc-destructor alien ;
 C: <postgresql-malloc-destructor> postgresql-malloc-destructor
 
-M: postgresql-malloc-destructor dispose ( obj -- )
+M: postgresql-malloc-destructor dispose
     alien>> PQfreemem ;
 
 : &postgresql-free ( alien -- alien )

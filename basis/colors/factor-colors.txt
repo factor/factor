@@ -1,0 +1,7 @@
+! Factor UI theme colors
+243 242 234		FactorLightTan
+227 226 219		FactorTan
+172 167 147		FactorDarkTan
+ 81  91 105		FactorLightSlateBlue
+ 55  62  72		FactorDarkSlateBlue
+  0  51   0     FactorDarkGreen

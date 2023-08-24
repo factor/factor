@@ -1,11 +1,11 @@
-USING: help.markup help.syntax io.streams.string strings urls
-calendar xml.data xml.writer present ;
+USING: calendar help.markup help.syntax present strings urls
+xml.data xml.writer ;
 IN: syndication
 
 HELP: entry
 { $description "An Atom or RSS feed entry. Has the following slots:"
     { $table
-        { "Name" "Class" }
+        { { $strong "Name" } { $strong "Class" } }
         { "title" { $link string } }
         { "url" { "any class supported by " { $link present } } }
         { "description" { $link string } }
@@ -20,7 +20,7 @@ HELP: <entry>
 HELP: feed
 { $description "An Atom or RSS feed. Has the following slots:"
     { $table
-        { "Name" "Class" }
+        { { $strong "Name" } { $strong "Class" } }
         { "title" { $link string } }
         { "url" { "any class supported by " { $link present } } }
         { "entries" { "a sequence of " { $link entry } " instances" } }

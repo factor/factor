@@ -8,7 +8,7 @@ ARTICLE: "help.home" "Factor documentation"
 { $recent-searches }
 { $heading "Recently visited pages" }
 { $table
-  { "Words" "Articles" "Vocabs" }
+  { { $strong "Words" } { $strong "Articles" } { $strong "Vocabs" } }
   { { $recent recent-words } { $recent recent-articles } { $recent recent-vocabs } }
 }
 ;

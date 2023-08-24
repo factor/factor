@@ -1,5 +1,4 @@
-USING: help.syntax help.markup kernel math classes classes.tuple
-calendar models ;
+USING: help.markup help.syntax kernel models ;
 IN: models.history
 
 HELP: history

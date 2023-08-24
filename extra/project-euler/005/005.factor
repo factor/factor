@@ -1,9 +1,9 @@
 ! Copyright (c) 2007, 2009 Aaron Schaefer.
-! See http://factorcode.org/license.txt for BSD license.
-USING: math math.functions math.ranges project-euler.common sequences ;
+! See https://factorcode.org/license.txt for BSD license.
+USING: math.functions project-euler.common ranges sequences ;
 IN: project-euler.005
 
-! http://projecteuler.net/index.php?section=problems&id=5
+! https://projecteuler.net/index.php?section=problems&id=5
 
 ! DESCRIPTION
 ! -----------
@@ -18,7 +18,7 @@ IN: project-euler.005
 ! --------
 
 : euler005 ( -- answer )
-    20 [1,b] 1 [ lcm ] reduce ;
+    20 [1..b] 1 [ lcm ] reduce ;
 
 ! [ euler005 ] 100 ave-time
 ! 0 ms ave run time - 0.14 SD (100 trials)

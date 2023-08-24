@@ -1,7 +1,6 @@
 ! Copyright (C) 2016 John Benediktsson
-! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays assocs deques dlists fry hashtables
-kernel linked-assocs sets ;
+! See https://factorcode.org/license.txt for BSD license.
+USING: accessors assocs deques dlists hashtables kernel sets ;
 IN: linked-sets
 
 TUPLE: linked-set { assoc hashtable read-only } { dlist dlist read-only } ;

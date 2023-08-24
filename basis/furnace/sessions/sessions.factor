@@ -1,11 +1,9 @@
 ! Copyright (C) 2008 Doug Coleman, Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
-USING: assocs kernel math.intervals math.parser namespaces
-strings random accessors quotations hashtables sequences
-continuations fry calendar combinators combinators.short-circuit
-destructors io.sockets db db.tuples db.types
-http http.server http.server.dispatchers http.server.filters
-furnace.cache furnace.scopes furnace.utilities ;
+! See https://factorcode.org/license.txt for BSD license.
+USING: accessors combinators.short-circuit db.tuples db.types
+furnace.cache furnace.scopes furnace.utilities http http.server
+http.server.dispatchers http.server.filters io.sockets kernel
+math.parser namespaces strings ;
 IN: furnace.sessions
 
 TUPLE: session < scope user-agent client ;
@@ -98,10 +96,10 @@ CONSTANT: session-id-key "__s"
 : put-session-cookie ( response -- response' )
     <session-cookie> put-cookie ;
 
-M: sessions modify-form ( responder -- xml/f )
+M: sessions modify-form
     drop session get id>> session-id-key hidden-form-field ;
 
-M: sessions call-responder* ( path responder -- response )
+M: sessions call-responder*
     sessions set
     request-session [ begin-session ] unless*
     existing-session put-session-cookie ;

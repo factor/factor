@@ -1,9 +1,9 @@
 ! Copyright (C) 2008, 2009 Daniel Ehrenberg.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: arrays ascii assocs byte-arrays combinators
 combinators.short-circuit grouping hashtables interval-sets
-io.encodings.utf8 io.files kernel locals make math math.bitwise
-math.order math.parser math.ranges memoize namespaces sequences
+io.encodings.utf8 io.files kernel make math math.bitwise
+math.order math.parser ranges namespaces sequences
 sets simple-flat-file sorting splitting strings.parser ;
 IN: unicode.data
 
@@ -20,8 +20,8 @@ CONSTANT: category-map BV{ }
 CONSTANT: special-casing H{ }
 CONSTANT: properties H{ }
 
-: >2ch ( a b -- c ) [ 21 shift ] dip + ;
-: 2ch> ( c -- a b ) [ -21 shift ] [ 21 on-bits mask ] bi ;
+: >2ch ( a b -- c ) [ 21 shift ] dip + ; inline
+: 2ch> ( c -- a b ) [ -21 shift ] [ 21 on-bits mask ] bi ; inline
 
 PRIVATE>
 
@@ -33,7 +33,7 @@ CONSTANT: name-map H{ }
 : combining-class ( char -- n ) class-map at ; inline
 : non-starter? ( char -- ? ) combining-class { 0 f } member? not ; inline
 : property ( property -- interval-map ) properties at ; foldable
-: property? ( char property -- ? ) property interval-sets:in? ; inline
+: property? ( char property -- ? ) property interval-in? ; inline
 : special-case ( ch -- casing-tuple ) special-casing at ; inline
 
 ! For non-existent characters, use Cn
@@ -53,31 +53,31 @@ CONSTANT: categories {
 MEMO: categories-map ( -- hashtable )
     categories H{ } zip-index-as ;
 
-CONSTANT: num-chars 0x2FA1E
+CONSTANT: NUM-CHARS 0x2FA25
 
 PRIVATE>
 
-: category# ( char -- n )
+: category-num ( char -- n )
     ! There are a few characters that should be Cn
     ! that this gives Cf or Mn
     ! Cf = 26; Mn = 5; Cn = 29
     ! Use a compressed array instead?
-    dup category-map ?nth [ ] [
+    [ category-map ?nth ] [
         dup 0xE0001 0xE007F between?
         [ drop 26 ] [
             0xE0100 0xE01EF between?  5 29 ?
         ] if
-    ] ?if ; inline
+    ] ?unless ; inline
 
 : category ( char -- category )
-    category# categories nth ;
+    category-num categories nth ;
 
 <PRIVATE
 
 ! Loading data from UnicodeData.txt
 
-: load-data ( -- data )
-    "vocab:unicode/data/UnicodeData.txt" load-data-file ;
+: load-unicode-data ( -- data )
+    "vocab:unicode/UnicodeData.txt" load-data-file ;
 
 : (process-data) ( index data -- newdata )
     [ [ nth ] keep first swap ] with { } map>assoc
@@ -88,8 +88,8 @@ PRIVATE>
 
 : (chain-decomposed) ( hash value -- newvalue )
     [
-        2dup of
-        [ (chain-decomposed) ] [ 1array nip ] ?if
+        2dup of or*
+        [ (chain-decomposed) ] [ 1array nip ] if
     ] with map concat ;
 
 : chain-decomposed ( hash -- newhash )
@@ -100,18 +100,21 @@ PRIVATE>
 
 : (process-decomposed) ( data -- alist )
     5 swap (process-data)
-    [ " " split [ hex> ] map ] assoc-map ;
+    [ split-words [ hex> ] map ] assoc-map ;
 
 : exclusions-file ( -- filename )
-    "vocab:unicode/data/CompositionExclusions.txt" ;
+    "vocab:unicode/CompositionExclusions.txt" ;
 
 : exclusions ( -- set )
     exclusions-file utf8 file-lines
-    [ "#" split1 drop [ blank? ] trim-tail hex> ] map
-    [ 0 = ] reject fast-set ;
+    [ "#" split1 drop [ ascii:blank? ] trim-tail hex> ] map
+    0 swap remove ;
+
+: unique ( seq -- assoc )
+    [ dup ] H{ } map>assoc ;
 
 : remove-exclusions ( alist -- alist )
-    exclusions [ nip sets:in? ] curry assoc-reject ;
+    exclusions unique assoc-diff ;
 
 : process-canonical ( data -- hash hash )
     (process-decomposed) [ first* ] filter
@@ -138,12 +141,12 @@ PRIVATE>
     name-map sort-values keys
     [ { [ "first>" tail? ] [ "last>" tail? ] } 1|| ] filter
     2 group [
-        [ name-map at ] bi@ [ [a,b] ] [ table ?nth ] bi
+        [ name-map at ] bi@ [ [a..b] ] [ table ?nth ] bi
         [ swap table ?set-nth ] curry each
     ] assoc-each table ;
 
 :: process-category ( data -- category-listing )
-    num-chars <byte-array> :> table
+    NUM-CHARS <byte-array> :> table
     2 data (process-data) [| char cat |
         cat categories-map at char table ?set-nth
     ] assoc-each table fill-ranges ;
@@ -154,7 +157,7 @@ PRIVATE>
     ] H{ } assoc-map-as ;
 
 : multihex ( hexstring -- string )
-    " " split [ hex> ] map sift ;
+    split-words [ hex> ] map sift ;
 
 PRIVATE>
 
@@ -170,7 +173,7 @@ C: <code-point> code-point
 
 ! Extra properties {{[a,b],prop}}
 : parse-properties ( -- assoc )
-    "vocab:unicode/data/PropList.txt" load-data-file [
+    "vocab:unicode/PropList.txt" load-data-file [
         [
             ".." split1 [ dup ] unless*
             [ hex> ] bi@ 2array
@@ -187,11 +190,11 @@ C: <code-point> code-point
 
 ! Special casing data
 : load-special-casing ( -- special-casing )
-    "vocab:unicode/data/SpecialCasing.txt" load-data-file
+    "vocab:unicode/SpecialCasing.txt" load-data-file
     [ length 5 = ] filter
     [ [ set-code-point ] each ] H{ } make ;
 
-load-data {
+load-unicode-data {
     [ process-names name-map swap assoc-union! drop ]
     [ 13 swap process-data simple-lower swap assoc-union! drop ]
     [ 12 swap process-data simple-upper swap assoc-union! drop ]
@@ -212,6 +215,8 @@ load-properties properties swap assoc-union! drop
 
 PRIVATE>
 
+ERROR: invalid-unicode-character name ;
+
 [
-    name-map at [ "Invalid character" throw ] unless*
+    name-map ?at [ invalid-unicode-character ] unless
 ] name>char-hook set-global

@@ -1,9 +1,8 @@
 ! Copyright (C) 2008 Joe Groff.
-! See http://factorcode.org/license.txt for BSD license.
-USING: kernel opengl.gl alien.c-types continuations namespaces
-assocs alien alien.data alien.strings libc opengl math sequences
-combinators macros arrays io.encodings.ascii fry
-specialized-arrays destructors accessors ;
+! See https://factorcode.org/license.txt for BSD license.
+USING: alien.c-types alien.data alien.strings arrays
+continuations destructors io.encodings.ascii kernel libc math
+opengl opengl.gl sequences specialized-arrays ;
 SPECIALIZED-ARRAY: uint
 IN: opengl.shaders
 
@@ -114,7 +113,7 @@ PREDICATE: fragment-shader < gl-shader (fragment-shader?) ;
     ] each glDeleteProgram ;
 
 : with-gl-program ( program quot -- )
-    over glUseProgram [ 0 glUseProgram ] [ ] cleanup ; inline
+    over glUseProgram [ 0 glUseProgram ] finally ; inline
 
 PREDICATE: gl-program < integer (gl-program?) ;
 

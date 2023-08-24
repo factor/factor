@@ -1,6 +1,6 @@
 ! Copyright (C) 2009 Joe Groff.
-! See http://factorcode.org/license.txt for BSD license.
-USING: help.markup help.syntax kernel math ui.gadgets.worlds ;
+! See https://factorcode.org/license.txt for BSD license.
+USING: help.markup help.syntax math ui.gadgets.worlds ;
 IN: game.loop
 
 HELP: fps

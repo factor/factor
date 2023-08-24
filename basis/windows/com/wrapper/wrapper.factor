@@ -140,7 +140,7 @@ unless
     +live-wrappers+ get-global [ (allocate-wrapper) ] each
     H{ } +wrapped-objects+ set-global ;
 
-[ com-startup-hook ] "windows.com.wrapper" add-startup-hook
+STARTUP-HOOK: com-startup-hook
 
 PRIVATE>
 

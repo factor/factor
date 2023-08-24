@@ -1,8 +1,7 @@
 ! Copyright (C) 2009 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays assocs combinators kernel math
-math.statistics namespaces sequences sorting xml.syntax
-spider urls html ;
+! See https://factorcode.org/license.txt for BSD license.
+USING: accessors arrays assocs combinators html kernel math
+math.statistics namespaces sequences sorting urls xml.syntax ;
 IN: spider.report
 
 SYMBOL: network-failures
@@ -37,7 +36,7 @@ SYMBOL: time-std
 
 : process-timings ( -- )
     timings get sort-values
-    [ slowest short tail* reverse slowest-pages set ]
+    [ slowest index-or-length tail* reverse slowest-pages set ]
     [
         values [
             [ mean 1000000 /f mean-time set ]

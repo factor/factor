@@ -1,16 +1,15 @@
 ! Copyright (C) 2005, 2010 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
-USING: accessors assocs classes combinators destructors
-documents.private fonts fry io io.styles kernel locals
-math.rectangles math.vectors memoize models namespaces sequences
-sorting splitting strings ui.baseline-alignment ui.clipboards
-ui.gadgets ui.gadgets.borders ui.gadgets.grid-lines
-ui.gadgets.grids ui.gadgets.icons ui.gadgets.incremental
-ui.gadgets.labels ui.gadgets.menus ui.gadgets.packs
-ui.gadgets.paragraphs ui.gadgets.presentations
-ui.gadgets.private ui.gadgets.scrollers ui.gadgets.tracks
-ui.gestures ui.images ui.pens.solid ui.render ui.theme
-ui.traverse ;
+! See https://factorcode.org/license.txt for BSD license.
+USING: accessors arrays assocs classes combinators destructors
+documents.private fonts io io.styles kernel math math.rectangles
+math.vectors models namespaces sequences sets sorting splitting
+strings ui.baseline-alignment ui.clipboards ui.gadgets
+ui.gadgets.borders ui.gadgets.grid-lines ui.gadgets.grids
+ui.gadgets.icons ui.gadgets.incremental ui.gadgets.labels
+ui.gadgets.menus ui.gadgets.packs ui.gadgets.paragraphs
+ui.gadgets.presentations ui.gadgets.private ui.gadgets.scrollers
+ui.gadgets.tracks ui.gestures ui.images ui.pens.solid ui.render
+ui.theme ui.traverse unicode ;
 FROM: io.styles => foreground background ;
 FROM: ui.gadgets.wrappers => <wrapper> ;
 IN: ui.gadgets.panes
@@ -19,12 +18,15 @@ TUPLE: pane < track
     output current input last-line prototype scrolls?
     selection-color caret mark selecting? ;
 
-TUPLE: pane-stream pane ;
+TUPLE: pane-stream pane parent ;
 INSTANCE: pane-stream output-stream
 
-C: <pane-stream> pane-stream
+: <pane-stream> ( pane -- pane-stream )
+    f pane-stream boa ;
 
 M: pane-stream stream-element-type drop +character+ ;
+
+DEFER: write-gadget
 
 <PRIVATE
 
@@ -44,7 +46,6 @@ M: pane-stream stream-element-type drop +character+ ;
     input>> [ request-focus ] when* ;
 
 : next-line ( pane -- )
-    clear-selection
     [ input>> unparent ]
     [ init-current prepare-last-line ]
     [ focus-input ] tri ;
@@ -57,8 +58,7 @@ M: pane-stream stream-element-type drop +character+ ;
 
 M: pane gadget-selection? pane-caret&mark and ;
 
-M: pane gadget-selection ( pane -- string/f )
-    selected-subtree gadget-text ;
+M: pane gadget-selection selected-subtree gadget-text ;
 
 : init-prototype ( pane -- pane )
     <shelf> +baseline+ >>align >>prototype ; inline
@@ -85,45 +85,84 @@ M: pane selected-children
 : scroll-pane ( pane -- )
     dup scrolls?>> [ scroll>bottom ] [ drop ] if ;
 
-: smash-line ( current -- gadget )
+GENERIC: pane-label ( pane -- label )
+
+M: pane pane-label drop "" <label> ;
+
+: smash-line ( pane current -- gadget )
     dup children>> {
-        { [ dup empty? ] [ 2drop "" <label> ] }
-        { [ dup length 1 = ] [ nip first ] }
-        [ drop ]
+        { [ dup empty? ] [ 2drop pane-label ] }
+        { [ dup length 1 = ] [ 2nip first ] }
+        [ drop nip ]
     } cond ;
 
 : pane-nl ( pane -- )
     [
-        [ current>> [ unparent ] [ smash-line ] bi ] [ output>> ] bi
+        [ dup current>> [ unparent ] [ smash-line ] bi ] [ output>> ] bi
         add-incremental
     ] [ next-line ] bi ;
 
-: smash-pane ( pane -- gadget ) [ pane-nl ] [ output>> smash-line ] bi ;
+GENERIC: smash-pane ( pane -- gadget )
 
-: pane-write ( seq pane -- )
-    [ pane-nl ] [ current>> stream-write ]
-    bi-curry interleave ;
+M: pane smash-pane
+    [ pane-nl ] [ dup output>> smash-line ] bi ;
 
-: pane-format ( seq style pane -- )
-    [ nip pane-nl ] [ current>> stream-format ]
+GENERIC: pane-line ( str style gadget -- )
+
+: pane-format ( lines style pane -- )
+    [ nip pane-nl ] [ current>> pane-line ]
     bi-curry bi-curry interleave ;
 
-: do-pane-stream ( pane-stream quot -- )
-    [ pane>> ] dip keep scroll-pane ; inline
+: pane-write ( lines pane -- )
+    H{ } swap pane-format ;
+
+: pane-write1 ( char pane -- )
+    [ 1string H{ } ] dip current>> pane-line ;
+
+:: do-pane-stream ( pane-stream quot -- )
+    pane-stream pane>> :> pane
+    pane find-scroller :> scroller
+    scroller [
+        model>> {
+            [ range-value second ]
+            [ range-page-value second + ]
+            [ range-max-value second >= ]
+        } cleave
+    ] [ f ] if* :> bottom?
+    pane quot call
+    pane scrolls?>> bottom? and scroller and [
+        scroller {
+            [ model>> range-value first ]
+            [ model>> range-max-value second 2array ]
+            [ set-scroll-position ]
+        } cleave
+    ] when ; inline
 
 M: pane-stream stream-nl
     [ pane-nl ] do-pane-stream ;
 
 M: pane-stream stream-write1
-    [ current>> stream-write1 ] do-pane-stream ;
+    [ pane-write1 ] do-pane-stream ;
+
+: split-pane ( str quot: ( str -- ) -- )
+    '[
+        dup length 3639 >
+        [ 3639 over last-grapheme-from cut-slice ] [ f ] if
+        swap "" like ?split-lines @ dup
+    ] loop drop ; inline
 
 M: pane-stream stream-write
-    [ [ split-lines ] dip pane-write ] do-pane-stream ;
+    [ '[ _ pane-write ] split-pane ] do-pane-stream ;
 
 M: pane-stream stream-format
-    [ [ split-lines ] 2dip pane-format ] do-pane-stream ;
+    [ '[ _ _ pane-format ] split-pane ] do-pane-stream ;
 
-M: pane-stream dispose drop ;
+M: pane-stream dispose
+    dup parent>> [
+        [ pane>> smash-pane ] dip write-gadget
+    ] [ drop ] if* ;
+
+! M: pane-stream dispose drop ;
 
 M: pane-stream stream-flush drop ;
 
@@ -156,11 +195,8 @@ M: object write-gadget
 M: filter-writer write-gadget
     stream>> write-gadget ;
 
-M: pane-stream write-gadget ( gadget pane-stream -- )
-    pane>> current>> swap add-gadget drop ;
-
-M: style-stream write-gadget
-    stream>> write-gadget ;
+M: pane-stream write-gadget
+    [ current>> swap add-gadget drop ] do-pane-stream ;
 
 : print-gadget ( gadget stream -- )
     [ write-gadget ] [ nip stream-nl ] 2bi ;
@@ -168,22 +204,24 @@ M: style-stream write-gadget
 : gadget. ( gadget -- )
     output-stream get print-gadget ;
 
-: pane-clear ( pane -- )
+: clear-pane ( pane -- )
     clear-selection
     [ output>> clear-incremental ]
     [ current>> clear-gadget ]
     bi ;
 
 : with-pane ( pane quot -- )
-    [ [ scroll>top ] [ pane-clear ] [ <pane-stream> ] tri ] dip
-    with-output-stream* ; inline
+    over [
+        [ [ scroll>top ] [ clear-pane ] [ <pane-stream> ] tri ] dip
+        with-output-stream*
+    ] dip scroll-pane ; inline
 
 : make-pane ( quot -- gadget )
-    [ <pane> ] dip [ with-pane ] [ drop smash-pane ] 2bi ; inline
+    [ <pane> ] dip '[ _ with-pane ] keep smash-pane ; inline
 
 TUPLE: pane-control < pane quot ;
 
-M: pane-control model-changed ( model pane-control -- )
+M: pane-control model-changed
     [ value>> ] [ dup quot>> ] bi*
     '[ _ call( value -- ) ] with-pane ;
 
@@ -232,15 +270,12 @@ MEMO:: specified-font ( name style size foreground background -- font )
 : apply-background-style ( style gadget -- style gadget )
     background [ <solid> >>interior ] apply-style ;
 
-: style-label ( style gadget -- gadget )
+: apply-character-style ( style gadget -- gadget )
     apply-font-style
     apply-background-style
-    apply-presentation-style
     apply-image-style
+    apply-presentation-style
     nip ; inline
-
-: <styled-label> ( style text -- gadget )
-    <label> style-label ;
 
 ! Paragraph styles
 
@@ -259,30 +294,39 @@ MEMO:: specified-font ( name style size foreground background -- font )
 : apply-inset-style ( style gadget -- style gadget )
     inset [ <border> ] apply-style ;
 
-: style-pane ( style pane -- pane )
+: apply-paragraph-style ( style pane -- pane )
     apply-inset-style
     apply-border-color-style
     apply-page-color-style
     apply-presentation-style
     nip ;
 
-TUPLE: nested-pane-stream < pane-stream style parent ;
+: remove-paragraph-styles ( style -- style' )
+    [
+        drop HS{
+            wrap-margin border-color page-color inset presented
+        } in?
+    ] assoc-reject ;
 
-: new-nested-pane-stream ( style parent class -- stream )
-    new
-        swap >>parent
-        swap <pane> apply-wrap-style [ >>style ] [ >>pane ] bi* ; inline
+TUPLE: styled-pane < pane style ;
 
-: unnest-pane-stream ( stream -- child parent )
-    [ [ style>> ] [ pane>> smash-pane ] bi style-pane ] [ parent>> ] bi ;
+: <styled-pane> ( style -- pane )
+    f styled-pane new-pane apply-wrap-style swap >>style ;
 
-TUPLE: pane-block-stream < nested-pane-stream ;
+M: styled-pane smash-pane
+    [ style>> ] [ call-next-method apply-paragraph-style ] bi ;
 
-M: pane-block-stream dispose
-    unnest-pane-stream write-gadget ;
+: <styled-pane-stream> ( style pane-stream -- styled-stream )
+    over
+    [ <styled-pane> ]
+    [ pane-stream boa ]
+    [ remove-paragraph-styles <style-stream> ] tri* ;
+
+: make-styled-pane ( style quot -- gadget )
+    [ <styled-pane> ] dip '[ _ with-pane ] keep smash-pane ; inline
 
 M: pane-stream make-block-stream
-    pane-block-stream new-nested-pane-stream ;
+    <styled-pane-stream> ;
 
 ! Tables
 
@@ -292,70 +336,59 @@ M: pane-stream make-block-stream
 : apply-table-border-style ( style grid -- style grid )
     table-border [ <grid-lines> >>boundary ] apply-style ;
 
-: styled-grid ( style grid -- grid )
+: <styled-grid> ( style grid -- grid )
     <grid>
     f >>fill?
     apply-table-gap-style
     apply-table-border-style
-    nip ;
-
-TUPLE: pane-cell-stream < nested-pane-stream ;
-
-M: pane-cell-stream dispose drop ;
+    apply-paragraph-style ;
 
 M: pane-stream make-cell-stream
-    pane-cell-stream new-nested-pane-stream ;
+    drop f <styled-pane-stream> ;
 
 M: pane-stream stream-write-table
     [
-        swap [ [ pane>> smash-pane ] map ] map
-        styled-grid
+        swap [ [ stream>> pane>> smash-pane ] map ] map
+        <styled-grid>
     ] dip write-gadget ;
 
 ! Stream utilities
-M: pack dispose drop ;
 
-M: paragraph dispose drop ;
+: pane-bl ( style gadget -- )
+    swap " " <word-break-gadget> apply-character-style add-gadget drop ;
 
-: gadget-write ( string gadget -- )
-    swap dup empty?
-    [ 2drop ] [ <label> monospace-font >>font add-gadget drop ] if ;
+TUPLE: styled-label < label style ;
 
-M: pack stream-write gadget-write ;
+: <styled-label> ( style text -- gadget )
+    styled-label new-label over >>style
+    apply-font-style
+    apply-background-style
+    apply-image-style
+    apply-presentation-style
+    nip ;
 
-: gadget-bl ( style stream -- )
-    swap " " <word-break-gadget> style-label add-gadget drop ;
+M: styled-pane pane-label style>> "" <styled-label> ;
 
-M: paragraph stream-write
-    swap " " split
-    [ H{ } over gadget-bl ] [ over gadget-write ] interleave
-    drop ;
+: find-styled-label ( gadget -- styled-label/f )
+    dup styled-label? [
+        children>> ?last [ find-styled-label ] [ f ] if*
+    ] unless ;
 
-: gadget-write1 ( char gadget -- )
-    [ 1string ] dip stream-write ;
-
-M: pack stream-write1 gadget-write1 ;
-
-M: paragraph stream-write1
-    over CHAR: \s =
-    [ H{ } swap gadget-bl drop ] [ gadget-write1 ] if ;
-
-: empty-output? ( string style -- ? )
-    [ empty? ] [ image-style swap key? not ] bi* and ;
-
-: gadget-format ( string style stream -- )
-    [ [ empty-output? ] 2keep ] dip
-    '[ _ _ swap <styled-label> _ swap add-gadget drop ] unless ;
-
-M: pack stream-format
-    gadget-format ;
-
-M: paragraph stream-format
-    over { presented image-style } [ swap key? ] with any? [
-        gadget-format
+: pane-text ( string style gadget -- )
+    dup find-styled-label [ pick over style>> = ] [ f f ] if* [
+        2nip [ prepend ] change-text relayout
     ] [
-        [ " " split ] 2dip
-        [ gadget-bl ] [ gadget-format ] bi-curry bi-curry
+        drop [ swap <styled-label> ] [ swap add-gadget drop ] bi*
+    ] if ;
+
+M: pack pane-line pane-text ;
+
+M: paragraph pane-line
+    { presented image-style } pick '[ _ key? ] any? [
+        pane-text
+    ] [
+        [ split-words ] 2dip
+        [ pane-bl ] [ pane-text ] bi-curry bi-curry
         interleave
     ] if ;
 
@@ -364,7 +397,7 @@ M: paragraph stream-format
 
 GENERIC: sloppy-pick-up* ( loc gadget -- n )
 
-M: pack sloppy-pick-up* ( loc gadget -- n )
+M: pack sloppy-pick-up*
     [ orientation>> ] [ children>> ] bi
     [ loc>> ] (fast-children-on) ;
 
@@ -439,4 +472,5 @@ pane H{
 } set-gestures
 
 GENERIC: content-gadget ( object -- gadget/f )
+
 M: object content-gadget drop f ;

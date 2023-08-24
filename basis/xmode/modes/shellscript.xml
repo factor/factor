@@ -7,14 +7,27 @@
 		<PROPERTY NAME="lineComment" VALUE="#" />
 		<PROPERTY NAME="indentOpenBrackets" VALUE="{" />
 		<PROPERTY NAME="indentCloseBrackets" VALUE="}" />
+		<PROPERTY NAME="indentNextLines"
+			VALUE="^.*(then|do|else|case.*in)\s*(#.*)?$" />
+		<PROPERTY NAME="unindentThisLine"
+			VALUE="^\s*(fi|else|done|esac|[^(]*\).*)\s*(#.*)?$" />
+		<PROPERTY NAME="unindentNextLines"
+			VALUE="^\s*(fi|else|done|esac)\s*(#.*)?$" />
+		<!-- 3 possible values for electricKeys may be considered
+		  1. electric enter and the bracket: ")&#xA;"
+		  2. letters ending unindent rules ")iec"
+		  3. all letters ")abcdefghijklmnopqrstuvwxyz"
+		  details: http://jedit.9.n6.nabble.com/jEdit-devel-electric-keys-for-shell-mode-tp4998749.html
+		-->
+		<PROPERTY NAME="electricKeys" VALUE=")abcdefghijklmnopqrstuvwxyz" />
 	</PROPS>
-	<RULES ESCAPE="\" IGNORE_CASE="TRUE" HIGHLIGHT_DIGITS="TRUE">
+	<RULES IGNORE_CASE="TRUE" HIGHLIGHT_DIGITS="TRUE">
 		<!-- Comments -->
 		<EOL_SPAN TYPE="COMMENT2">#!</EOL_SPAN>
 		<EOL_SPAN TYPE="COMMENT1">#</EOL_SPAN>
 
-		<!-- Variables -->
-		<SPAN TYPE="KEYWORD2" NO_LINE_BREAK="TRUE">
+		<!-- BUG #3594428 (Bash Syntax Highlighting) -->
+		<SPAN TYPE="KEYWORD2" DELEGATE="LITERAL" NO_LINE_BREAK="TRUE">
 			<BEGIN>${</BEGIN>
 			<END>}</END>
 		</SPAN>
@@ -29,25 +42,25 @@
 		<MARK_PREVIOUS TYPE="KEYWORD2" MATCH_TYPE="OPERATOR">=</MARK_PREVIOUS>
 
 		<!-- weird stuff -->
-		<SPAN TYPE="KEYWORD3" DELEGATE="EXEC">
+		<SPAN TYPE="KEYWORD3" DELEGATE="EXEC" ESCAPE="\">
 			<BEGIN>$((</BEGIN>
 			<END>))</END>
 		</SPAN>
-		<SPAN TYPE="KEYWORD3" DELEGATE="EXEC">
+		<SPAN TYPE="KEYWORD3" DELEGATE="EXEC" ESCAPE="\">
 			<BEGIN>$(</BEGIN>
 			<END>)</END>
 		</SPAN>
-		<SPAN TYPE="KEYWORD3" DELEGATE="EXEC">
+		<SPAN TYPE="KEYWORD3" DELEGATE="EXEC" ESCAPE="\">
 			<BEGIN>$[</BEGIN>
 			<END>]</END>
 		</SPAN>
-		<SPAN TYPE="KEYWORD3" DELEGATE="EXEC">
+		<SPAN TYPE="KEYWORD3" DELEGATE="EXEC" ESCAPE="\">
 			<BEGIN>`</BEGIN>
 			<END>`</END>
 		</SPAN>
 
 		<!-- Literals -->
-		<SPAN TYPE="LITERAL1" DELEGATE="LITERAL">
+		<SPAN TYPE="LITERAL1" DELEGATE="LITERAL" ESCAPE="\">
 			<BEGIN>"</BEGIN>
 			<END>"</END>
 		</SPAN>
@@ -57,9 +70,9 @@
 		</SPAN>
 
 		<!-- Readins -->
-		<SPAN_REGEXP HASH_CHAR="&lt;&lt;" TYPE="LITERAL1" DELEGATE="LITERAL">
+		<SPAN_REGEXP HASH_CHAR="&lt;&lt;" TYPE="LITERAL1" DELEGATE="LITERAL" ESCAPE="\">
 			<BEGIN><![CDATA[<<[\p{Space}'"]*([\p{Alnum}_]+)[\p{Space}'"]*]]></BEGIN>
-			<END>$1</END>
+			<END AT_LINE_START="TRUE">$1</END>
 		</SPAN_REGEXP>
 
 		<!-- Operators -->

@@ -1,6 +1,6 @@
-USING: kernel math math.constants math.functions math.order
-tools.test prettyprint prettyprint.config namespaces eval
-accessors ;
+USING: accessors eval kernel math math.complex math.constants
+math.functions math.order namespaces prettyprint
+prettyprint.config tools.test ;
 
 [ 1 C{ 0 1 } rect> ] must-fail
 [ C{ 0 1 } 1 rect> ] must-fail
@@ -67,10 +67,10 @@ accessors ;
 { t } [ -1 >polar nip 3.14 3.15 between? ] unit-test
 
 ! I broke something
-{ } [ C{ 1 4 } tanh drop ] unit-test
-{ } [ C{ 1 4 } tan drop ] unit-test
-{ } [ C{ 1 4 } coth drop ] unit-test
-{ } [ C{ 1 4 } cot drop ] unit-test
+[ C{ 1 4 } tanh ] must-not-fail
+[ C{ 1 4 } tan ] must-not-fail
+[ C{ 1 4 } coth ] must-not-fail
+[ C{ 1 4 } cot ] must-not-fail
 
 { t } [ 0.0 pi rect> e^ C{ -1 0 } 1.0e-7 ~ ] unit-test
 { t } [ 0 pi rect> e^ C{ -1 0 } 1.0e-7 ~ ] unit-test

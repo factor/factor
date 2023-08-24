@@ -1,7 +1,7 @@
 ! Copyright (C) 2011 John Benediktsson
-! See http://factorcode.org/license.txt for BSD license
+! See https://factorcode.org/license.txt for BSD license
 
-USING: accessors assocs colors.hex io io.encodings.utf8 io.files
+USING: accessors assocs colors io io.encodings.utf8 io.files
 io.pathnames io.streams.string io.styles kernel locals see
 sequences splitting strings vocabs vocabs.loader words
 xmode.catalog xmode.marker ;
@@ -11,30 +11,30 @@ IN: xmode.highlight
 <PRIVATE
 
 CONSTANT: STYLES H{
-    { "NULL"     H{ { foreground HEXCOLOR: 000000 } } }
-    { "COMMENT1" H{ { foreground HEXCOLOR: cc0000 } } }
-    { "COMMENT2" H{ { foreground HEXCOLOR: ff8400 } } }
-    { "COMMENT3" H{ { foreground HEXCOLOR: 6600cc } } }
-    { "COMMENT4" H{ { foreground HEXCOLOR: cc6600 } } }
-    { "DIGIT"    H{ { foreground HEXCOLOR: ff0000 } } }
-    { "FUNCTION" H{ { foreground HEXCOLOR: 9966ff } } }
-    { "INVALID"  H{ { background HEXCOLOR: ffffcc }
-                    { foreground HEXCOLOR: ff0066 } } }
-    { "KEYWORD1" H{ { foreground HEXCOLOR: 006699 }
+    { "NULL"     H{ { foreground COLOR: #000000 } } }
+    { "COMMENT1" H{ { foreground COLOR: #cc0000 } } }
+    { "COMMENT2" H{ { foreground COLOR: #ff8400 } } }
+    { "COMMENT3" H{ { foreground COLOR: #6600cc } } }
+    { "COMMENT4" H{ { foreground COLOR: #cc6600 } } }
+    { "DIGIT"    H{ { foreground COLOR: #ff0000 } } }
+    { "FUNCTION" H{ { foreground COLOR: #9966ff } } }
+    { "INVALID"  H{ { background COLOR: #ffffcc }
+                    { foreground COLOR: #ff0066 } } }
+    { "KEYWORD1" H{ { foreground COLOR: #006699 }
                     { font-style bold } } }
-    { "KEYWORD2" H{ { foreground HEXCOLOR: 009966 }
+    { "KEYWORD2" H{ { foreground COLOR: #009966 }
                     { font-style bold } } }
-    { "KEYWORD3" H{ { foreground HEXCOLOR: 0099ff }
+    { "KEYWORD3" H{ { foreground COLOR: #0099ff }
                     { font-style bold } } }
-    { "KEYWORD4" H{ { foreground HEXCOLOR: 66ccff }
+    { "KEYWORD4" H{ { foreground COLOR: #66ccff }
                     { font-style bold } } }
-    { "LABEL"    H{ { foreground HEXCOLOR: 02b902 } } }
-    { "LITERAL1" H{ { foreground HEXCOLOR: ff00cc } } }
-    { "LITERAL2" H{ { foreground HEXCOLOR: cc00cc } } }
-    { "LITERAL3" H{ { foreground HEXCOLOR: 9900cc } } }
-    { "LITERAL4" H{ { foreground HEXCOLOR: 6600cc } } }
-    { "MARKUP"   H{ { foreground HEXCOLOR: 0000ff } } }
-    { "OPERATOR" H{ { foreground HEXCOLOR: 000000 }
+    { "LABEL"    H{ { foreground COLOR: #02b902 } } }
+    { "LITERAL1" H{ { foreground COLOR: #ff00cc } } }
+    { "LITERAL2" H{ { foreground COLOR: #cc00cc } } }
+    { "LITERAL3" H{ { foreground COLOR: #9900cc } } }
+    { "LITERAL4" H{ { foreground COLOR: #6600cc } } }
+    { "MARKUP"   H{ { foreground COLOR: #0000ff } } }
+    { "OPERATOR" H{ { foreground COLOR: #000000 }
                     { font-style bold } } }
 }
 
@@ -70,5 +70,5 @@ M: vocab highlight.
     vocab-source-path highlight. ;
 
 M: word highlight.
-    [ see ] with-string-writer string-lines
+    [ see ] with-string-writer split-lines
     "factor" highlight-lines ;

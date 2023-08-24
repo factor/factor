@@ -1,9 +1,9 @@
 ! Copyright (C) 2007 Elie CHAFTARI
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 
-USING: arrays asn1.ldap assocs byte-arrays combinators
-continuations io io.binary io.streams.string kernel math
-math.parser namespaces make pack strings sequences accessors ;
+USING: accessors arrays assocs byte-arrays combinators endian io
+io.streams.string kernel make math math.parser namespaces pack
+sequences strings ;
 
 IN: asn1
 
@@ -60,7 +60,7 @@ PRIVATE>
                 }
             }
         }
-     } ;
+    } ;
 
 SYMBOL: elements
 

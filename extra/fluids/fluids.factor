@@ -1,12 +1,10 @@
 ! Copyright (C) 2010 Erik Charlebois.
-! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays classes.struct destructors game.loop
-game.worlds gpu gpu.buffers gpu.effects.blur gpu.framebuffers
-gpu.render gpu.shaders gpu.state gpu.textures gpu.util images
-images.loader kernel literals locals make math math.rectangles
-math.vectors namespaces opengl.gl sequences specialized-arrays
-ui.gadgets.worlds ui.gestures ui.pixel-formats gpu.effects.step
-images.pgm images.ppm alien.data ;
+! See https://factorcode.org/license.txt for BSD license.
+USING: accessors alien.data classes.struct destructors game.loop
+game.worlds gpu gpu.effects.blur gpu.effects.step gpu.state
+gpu.textures gpu.util images.loader kernel literals make math
+math.vectors namespaces sequences specialized-arrays
+ui.gadgets.worlds ui.gestures ui.pixel-formats ;
 FROM: alien.c-types => float ;
 SPECIALIZED-ARRAY: float
 IN: fluids
@@ -23,7 +21,7 @@ CONSTANT: gravity { 0.0 -0.1 }
     particle [ p>> ] [ v>> ] bi dt v*n v+
     gravity dt dt * particle m>> 2 * / v*n v+ :> p'
     p' particle p>> v- dt v/n :> v'
-    p' v' particle m>> particle_t <struct-boa> ; inline
+    p' v' particle m>> particle_t boa ; inline
 
 CONSTANT: initial-particles
 particle_t-array{
@@ -115,6 +113,6 @@ fluids-world H{
     { T{ button-down } [ [
         hand-loc get float >c-array
         world get dim>> float >c-array v/ 2 v*n 1 v-n { 1 -1 } v*
-        float-array{ 0 0.2 } 2.0 particle_t <struct-boa> suffix
+        float-array{ 0 0.2 } 2.0 particle_t boa suffix
     ] change-particles drop ] }
 } set-gestures

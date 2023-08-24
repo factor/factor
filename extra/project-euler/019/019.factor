@@ -1,10 +1,10 @@
 ! Copyright (c) 2007 Samuel Tardieu, Aaron Schaefer.
-! See http://factorcode.org/license.txt for BSD license.
-USING: calendar combinators kernel math math.ranges namespaces sequences
-    math.order project-euler.common ;
+! See https://factorcode.org/license.txt for BSD license.
+USING: calendar kernel math.order project-euler.common ranges
+sequences ;
 IN: project-euler.019
 
-! http://projecteuler.net/index.php?section=problems&id=19
+! https://projecteuler.net/index.php?section=problems&id=19
 
 ! DESCRIPTION
 ! -----------
@@ -27,12 +27,12 @@ IN: project-euler.019
 ! --------
 
 ! Use Zeller congruence, which is implemented in the "calendar" module
-! already, as "zeller-congruence ( year month day -- n )" where n is
+! already, as "(day-of-week) ( year month day -- n )" where n is
 ! the day of the week (Sunday is 0).
 
 : euler019 ( -- answer )
-    1901 2000 [a,b] [
-        12 [1,b] [ 1 zeller-congruence ] with map
+    1901 2000 [a..b] [
+        12 [1..b] [ 1 (day-of-week) ] with map
     ] map concat [ 0 = ] count ;
 
 ! [ euler019 ] 100 ave-time

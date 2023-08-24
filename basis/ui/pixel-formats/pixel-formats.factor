@@ -1,6 +1,6 @@
 USING: accessors alien.c-types alien.data assocs classes
-combinators destructors fry kernel math sequences
-specialized-arrays ui.backend words ;
+combinators destructors kernel math sequences specialized-arrays
+ui.backend words ;
 SPECIALIZED-ARRAY: int
 IN: ui.pixel-formats
 
@@ -50,10 +50,10 @@ ERROR: invalid-pixel-format-attributes world attributes ;
 TUPLE: pixel-format < disposable world handle ;
 
 : <pixel-format> ( world attributes -- pixel-format )
-    2dup (make-pixel-format)
+    2dup (make-pixel-format) or*
     [ pixel-format new-disposable swap >>handle swap >>world ]
     [ invalid-pixel-format-attributes ]
-    ?if ;
+    if ;
 
 M: pixel-format dispose*
     [ (free-pixel-format) ] [ f >>handle drop ] bi ;

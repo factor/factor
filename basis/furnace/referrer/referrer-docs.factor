@@ -1,11 +1,10 @@
-USING: help.markup help.syntax io.streams.string
-furnace.utilities ;
+USING: furnace.utilities help.markup help.syntax ;
 IN: furnace.referrer
 
 HELP: <check-form-submissions>
 { $values
-     { "responder" "a responder" }
-     { "responder'" "a responder" }
+    { "responder" "a responder" }
+    { "responder'" "a responder" }
 }
 { $description "Wraps the responder in a filter responder which ensures that form submissions originate from a page on the same server. Any submissions which do not are sent back with a 403 error." } ;
 

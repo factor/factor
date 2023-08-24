@@ -1,9 +1,8 @@
 ! Copyright (C) 2009 Jason W. Merrill.
-! See http://factorcode.org/license.txt for BSD license.
-USING: kernel math math.functions math.derivatives accessors
-    macros generic compiler.units words effects vocabs
-    sequences arrays assocs generalizations fry make
-    combinators.smart help help.markup ;
+! See https://factorcode.org/license.txt for BSD license.
+USING: accessors arrays assocs combinators.smart compiler.units
+effects generalizations help help.markup kernel make math
+sequences vocabs words ;
 
 IN: math.dual
 
@@ -34,10 +33,10 @@ MACRO: ordinary-op ( word -- o )
 ! This allows a set of partial derivatives each to be evaluated
 ! at the same point.
 MACRO: duals>nweave ( n -- quot )
-   dup dup dup
-   '[
-       [ [ epsilon-part>> ] _ napply ] _ nkeep
-       [ ordinary-part>> ] _ napply _ nweave
+    dup dup dup
+    '[
+        [ [ epsilon-part>> ] _ napply ] _ nkeep
+        [ ordinary-part>> ] _ napply _ nweave
     ] ;
 
 MACRO: chain-rule ( word -- e )

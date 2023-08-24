@@ -1,9 +1,9 @@
 ! Copyright (c) 2012 Anonymous
-! See http://factorcode.org/license.txt for BSD license.
-USING: arrays fry kernel math.matrices sequences ;
+! See https://factorcode.org/license.txt for BSD license.
+USING: arrays kernel math.matrices sequences ;
 IN: rosetta-code.bitmap
 
-! http://rosettacode.org/wiki/Basic_bitmap_storage
+! https://rosettacode.org/wiki/Basic_bitmap_storage
 
 ! Show a basic storage type to handle a simple RGB raster
 ! graphics image, and some primitive associated functions.
@@ -36,7 +36,7 @@ IN: rosetta-code.bitmap
 
 ! The storage functions
 : <raster-image> ( width height -- image )
-    zero-matrix [ drop { 0 0 0 } ] mmap ;
+    <zero-matrix> [ drop { 0 0 0 } ] mmap ;
 : fill-image ( {R,G,B} image -- image )
     swap '[ drop _ ] mmap! ;
 : set-pixel ( {R,G,B} {i,j} image -- ) set-Mi,j ; inline

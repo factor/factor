@@ -1,6 +1,6 @@
 ! Copyright (c) 2007, 2008 Aaron Schaefer.
-! See http://factorcode.org/license.txt for BSD license.
-USING: combinators.smart formatting fry io kernel macros math math.functions
+! See https://factorcode.org/license.txt for BSD license.
+USING: combinators.smart formatting io kernel math math.functions
 math.statistics memory sequences tools.time ;
 IN: project-euler.ave-time
 

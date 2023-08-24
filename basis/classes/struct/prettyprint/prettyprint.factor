@@ -1,11 +1,10 @@
 ! Copyright (C) 2009, 2011 Joe Groff, Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
-USING: accessors alien alien.c-types alien.data
-alien.prettyprint arrays assocs classes classes.struct
-combinators combinators.short-circuit continuations fry kernel
-libc make math math.parser mirrors prettyprint.backend
-prettyprint.custom prettyprint.sections see.private sequences
-slots strings summary words ;
+! See https://factorcode.org/license.txt for BSD license.
+USING: accessors alien alien.prettyprint arrays assocs classes
+classes.struct combinators combinators.short-circuit
+continuations kernel libc make math math.parser mirrors
+prettyprint.backend prettyprint.custom prettyprint.sections
+see.private sequences slots summary vocabs.prettyprint ;
 IN: classes.struct.prettyprint
 
 <PRIVATE
@@ -116,7 +115,7 @@ M: struct-mirror delete-at
 M: struct-mirror clear-assoc
     object>> reset-struct-slots ;
 
-M: struct-mirror >alist ( mirror -- alist )
+M: struct-mirror >alist
     object>> [
         [ drop "underlying" ] [ >c-ptr ] bi 2array 1array
     ] [

@@ -1,11 +1,11 @@
 ! Copyright (C) 2014 Doug Coleman.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors arrays calendar calendar.parser
 io.encodings.utf8 io.files io.streams.string kernel math
 math.parser sequences splitting ascii ;
 IN: subrip-subtitles
 
-! http://en.wikipedia.org/wiki/SubRip
+! https://en.wikipedia.org/wiki/SubRip
 ! .srt
 
 TUPLE: srt-chunk id begin-time end-time rect text ;
@@ -24,9 +24,9 @@ TUPLE: srt-chunk id begin-time end-time rect text ;
     [ ?first string>number ]
     [
         ?second "  " split1
-        [ "-->" split1 [ [ blank? ] trim parse-srt-timestamp ] bi@ ]
+        [ "-->" split1 [ [ ascii:blank? ] trim parse-srt-timestamp ] bi@ ]
         [
-            [ blank? ] trim " " split sift [
+            [ ascii:blank? ] trim split-words sift [
                 f
             ] [
                 [ ":" split1 nip string>number ] map
@@ -34,14 +34,14 @@ TUPLE: srt-chunk id begin-time end-time rect text ;
             ] if-empty
         ] bi*
     ]
-    [ 2 tail "\n" join ] tri srt-chunk boa ;
+    [ 2 tail join-lines ] tri srt-chunk boa ;
 
 : parse-srt-lines ( seq -- seq' )
     { "" } split harvest
     [ parse-srt-chunk ] { } map-as ;
 
 : parse-srt-string ( seq -- seq' )
-    string-lines parse-srt-lines ;
+    split-lines parse-srt-lines ;
 
 : parse-srt-file ( path -- seq )
     utf8 file-lines parse-srt-lines ;

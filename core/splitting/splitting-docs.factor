@@ -15,11 +15,13 @@ ARTICLE: "sequences-split" "Splitting sequences"
     split1-last
     split1-last-slice
     split
+    split-indices
+    split-slice
     split-when
     split-when-slice
 }
 "Splitting a string into lines:"
-{ $subsections string-lines }
+{ $subsections split-lines }
 "Replacing subsequences with another subsequence:"
 { $subsections replace } ;
 
@@ -92,11 +94,11 @@ HELP: ?tail-slice
 { $values { "seq" sequence } { "end" sequence } { "newseq" slice } { "?" boolean } }
 { $description "Like " { $link ?tail } ", except the resulting sequence is a " { $link slice } "." } ;
 
-HELP: string-lines
+HELP: split-lines
 { $values { "seq" sequence } { "seq'" { $sequence string } } }
 { $description "Splits a string along line breaks." }
 { $examples
-    { $example "USING: prettyprint splitting ;" "\"Hello\\r\\nworld\\n\" string-lines ." "{ \"Hello\" \"world\" }" }
+    { $example "USING: prettyprint splitting ;" "\"Hello\\r\\nworld\\n\" split-lines ." "{ \"Hello\" \"world\" }" }
 } ;
 
 HELP: replace

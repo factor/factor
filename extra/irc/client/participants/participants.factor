@@ -1,7 +1,7 @@
 ! Copyright (C) 2009 Bruno Deferrari
-! See http://factorcode.org/license.txt for BSD license.
-USING: accessors assocs combinators fry hashtables
-irc.client.base irc.client.chats kernel sequences splitting ;
+! See https://factorcode.org/license.txt for BSD license.
+USING: accessors assocs combinators irc.client.base
+irc.client.chats kernel sequences splitting ;
 IN: irc.client.participants
 
 TUPLE: participant nick operator voice ;

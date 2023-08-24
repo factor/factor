@@ -1,5 +1,5 @@
 ! Copyright (C) 2010 Doug Coleman.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors alien.data alien.parser arrays assocs
 byte-arrays classes.struct classes.struct.private combinators
 combinators.short-circuit cuda cuda.ffi fry generalizations
@@ -18,9 +18,6 @@ SYMBOL: cuda-libraries
 cuda-libraries [ H{ } clone ] initialize
 
 SYMBOL: current-cuda-library
-
-: ?delete-at ( key assoc -- old/key ? )
-    2dup delete-at* [ 2nip t ] [ 2drop f ] if ; inline
 
 : cuda-param-size ( function n -- )
     cuParamSetSize cuda-error ; inline

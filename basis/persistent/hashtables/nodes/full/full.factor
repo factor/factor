@@ -1,10 +1,8 @@
 ! Based on Clojure's PersistentHashMap by Rich Hickey.
 
-USING: math accessors kernel arrays sequences sequences.private
-locals
-persistent.sequences
-persistent.hashtables.config
-persistent.hashtables.nodes ;
+USING: accessors kernel math persistent.hashtables.config
+persistent.hashtables.nodes persistent.sequences sequences
+sequences.private ;
 IN: persistent.hashtables.nodes.full
 
 M:: full-node (new-at) ( shift value key hashcode full-node -- node' added-leaf )

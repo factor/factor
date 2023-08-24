@@ -8,7 +8,7 @@ HELP: <gadget>
 
 HELP: children-on
 { $values { "rect" rect } { "gadget" gadget } { "seq" "a sequence of gadgets" } }
-{ $contract "Outputs a sequence of gadgets which potentially intersect a rectangle in the co-ordinate system of the gadget." }
+{ $contract "Outputs a sequence of gadgets which potentially intersect a rectangle in the coordinate system of the gadget." }
 { $notes "This does not have to be an accurate intersection test, and simply returning " { $link children>> } " is a valid implementation. However, an accurate intersection test reduces the amount of work done when drawing this gadget if it is partially clipped and not all children are visible." } ;
 
 HELP: control-value
@@ -36,7 +36,7 @@ HELP: nth-gadget
 HELP: relative-loc
 { $values { "fromgadget" gadget } { "togadget" gadget } { "loc" "a pair of integers" } }
 { $description
-    "Outputs the location of the top-left corner of " { $snippet "togadget" } " relative to the co-ordinate system of " { $snippet "fromgadget" } "."
+    "Outputs the location of the top-left corner of " { $snippet "togadget" } " relative to the coordinate system of " { $snippet "fromgadget" } "."
 }
 { $errors
     "Throws an error if " { $snippet "togadget" } " is not contained in a child of " { $snippet "fromgadget" } "."
@@ -46,9 +46,13 @@ HELP: user-input*
 { $values { "str" string } { "gadget" gadget } { "?" boolean } }
 { $contract "Handle free-form textual input while the gadget has keyboard focus." } ;
 
+HELP: temp-im-input
+{ $values { "str" string } { "gadget" gadget } { "?" boolean } }
+{ $contract "Handle free-form textual input while the gadget has keyboard focus. This is used to display the string being preedited by an input method on the gadget. Input by this word is not include changes in the Undo and Redo actions." } ;
+
 HELP: pick-up
 { $values { "point" "a pair of integers" } { "gadget" gadget } { "child/f" { $maybe gadget } } }
-{ $description "Outputs the child at a point in the gadget's co-ordinate system. This word recursively descends the gadget hierarchy, and so outputs the deepest child." } ;
+{ $description "Outputs the child at a point in the gadget's coordinate system. This word recursively descends the gadget hierarchy, and so outputs the deepest child." } ;
 
 HELP: max-dims
 { $values { "seq" "a sequence of pairs of integers" } { "dim" "a pair of integers" } }

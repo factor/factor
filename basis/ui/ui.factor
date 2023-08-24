@@ -1,12 +1,12 @@
 ! Copyright (C) 2006, 2010 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs boxes classes.tuple
 classes.tuple.parser combinators combinators.short-circuit
 concurrency.flags concurrency.promises continuations deques
-destructors dlists fry init kernel lexer make math
-math.functions namespaces parser sequences sets strings threads
-ui.backend ui.gadgets ui.gadgets.private ui.gadgets.worlds
-ui.gestures ui.render vectors vocabs.parser words ;
+destructors dlists kernel lexer make math math.functions
+namespaces parser sequences sets strings threads ui.backend
+ui.gadgets ui.gadgets.private ui.gadgets.worlds ui.gestures
+ui.render vectors vocabs.parser words ;
 IN: ui
 
 <PRIVATE
@@ -111,7 +111,7 @@ M: world ungraft*
     dup hand-world get-global eq?
     [ hand-loc get-global swap move-hand ] [ drop ] if ;
 
-: slurp-vector ( .. seq quot: ( ... elt -- .. ) -- )
+: slurp-vector ( ... seq quot: ( ... elt -- ... ) -- ... )
     over '[ _ empty? not ] -rot '[ _ pop @ ] while ; inline
 
 : layout-queued ( -- seq )
@@ -208,10 +208,10 @@ HOOK: close-window ui-backend ( gadget -- )
 M: object close-window
     find-world [ ungraft ] when* ;
 
-[
+STARTUP-HOOK: [
     f ui-running set-global
     <flag> ui-notify-flag set-global
-] "ui" add-startup-hook
+]
 
 HOOK: resize-window ui-backend ( world dim -- )
 M: object resize-window 2drop ;
@@ -228,7 +228,7 @@ M: object resize-window 2drop ;
             f ui-running set-global
             ! Give running ui threads a chance to finish.
             notify-ui-thread yield
-        ] [ ] cleanup
+        ] finally
     ] if ;
 
 HOOK: beep ui-backend ( -- )

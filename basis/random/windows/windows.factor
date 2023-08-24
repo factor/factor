@@ -6,7 +6,7 @@ IN: random.windows
 
 TUPLE: windows-crypto-context < win32-handle provider type ;
 
-M: windows-crypto-context dispose* ( tuple -- )
+M: windows-crypto-context dispose*
     [ handle>> 0 CryptReleaseContext win32-error=0/f ]
     [ f >>handle drop ] bi ;
 
@@ -45,7 +45,7 @@ ERROR: acquire-crypto-context-failed provider type error ;
         swap >>provider
         initialize-crypto-context ; inline
 
-M: windows-crypto-context random-bytes* ( n windows-crypto-context -- bytes )
+M: windows-crypto-context random-bytes*
     handle>> swap dup <byte-array>
     [ CryptGenRandom win32-error=0/f ] keep ;
 
@@ -56,7 +56,7 @@ M: windows-crypto-context random-bytes* ( n windows-crypto-context -- bytes )
         [ first2 <windows-crypto-context> ] attempt-all
     ] [ 2drop f ] recover ;
 
-[
+STARTUP-HOOK: [
     {
         ${ MS_ENHANCED_PROV PROV_RSA_FULL }
         ${ MS_DEF_PROV PROV_RSA_FULL }
@@ -66,4 +66,4 @@ M: windows-crypto-context random-bytes* ( n windows-crypto-context -- bytes )
         ${ MS_STRONG_PROV PROV_RSA_FULL }
         ${ MS_ENH_RSA_AES_PROV PROV_RSA_AES }
     } try-crypto-providers secure-random-generator set-global
-] "random.windows" add-startup-hook
+]

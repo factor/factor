@@ -1,10 +1,11 @@
-USING: accessors arrays db db.sqlite db.tuples db.types io.directories
-io.files.temp kernel layouts literals math.parser namespaces sequences
-sorting splitting tools.test ;
+USING: accessors arrays db db.errors db.sqlite db.tuples
+db.types io.directories io.files.temp kernel layouts literals
+math.parser namespaces sequences sorting splitting tools.test ;
+
 IN: db.sqlite.tests
 
 : normalize ( str -- str' )
-    " \n" split harvest " " join ;
+    " \n" split harvest join-words ;
 
 ! delete-trigger-restrict
 ${
@@ -21,7 +22,7 @@ ${
     {
         { "table-name" "TREE" }
         { "table-id" "NODE" }
-        { "foreign-table-name" "NODE"}
+        { "foreign-table-name" "NODE" }
         { "foreign-table-id" "ID" }
     } [ delete-trigger-restrict ] with-variables
     normalize
@@ -42,7 +43,7 @@ ${
     {
         { "table-name" "TREE" }
         { "table-id" "NODE" }
-        { "foreign-table-name" "NODE"}
+        { "foreign-table-name" "NODE" }
         { "foreign-table-id" "ID" }
     } [ insert-trigger ] with-variables normalize
 ] unit-test
@@ -136,7 +137,7 @@ things "THINGS" {
         1 1 things boa insert-tuple
         1 0 things boa insert-tuple
         f f things boa select-tuples
-        [ [ one>> ] [ two>> ] bi 2array ] map natural-sort
+        [ [ one>> ] [ two>> ] bi 2array ] map sort
        things drop-table
     ] with-db
 ] unit-test
@@ -247,3 +248,9 @@ watch "WATCH" {
         num-test3 new select-tuple
     ] with-db num>>
 ] unit-test
+
+[
+    TUPLE: no-table name ;
+    no-table "NO_TABLE" { { "name" "NAME" VARCHAR } } define-persistent
+    test.db [ no-table new select-tuple ] with-db
+] [ sql-table-missing? ] must-fail-with

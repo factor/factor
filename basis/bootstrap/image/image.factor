@@ -1,15 +1,15 @@
 ! Copyright (C) 2004, 2011 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays assocs byte-arrays classes classes.builtin
-classes.private classes.tuple classes.tuple.private combinators
-combinators.short-circuit combinators.smart
-compiler.codegen.relocation compiler.units fry generic
-generic.single.private grouping hashtables hashtables.private io
-io.binary io.encodings.binary io.files io.pathnames kernel
-kernel.private layouts locals make math math.order namespaces
-namespaces.private parser parser.notes prettyprint quotations
-sequences sequences.private source-files strings system vectors
-vocabs words ;
+! See https://factorcode.org/license.txt for BSD license.
+USING: accessors arrays assocs byte-arrays classes
+classes.builtin classes.private classes.tuple
+classes.tuple.private combinators combinators.short-circuit
+combinators.smart command-line compiler.codegen.relocation
+compiler.units endian generic generic.single.private grouping
+hashtables hashtables.private io io.encodings.binary io.files
+io.pathnames kernel kernel.private layouts make math
+math.bitwise math.order namespaces namespaces.private parser
+parser.notes prettyprint quotations sequences sequences.private
+source-files splitting strings system vectors vocabs words ;
 IN: bootstrap.image
 
 : arch-name ( os cpu -- arch )
@@ -31,6 +31,7 @@ CONSTANT: image-names
     {
         "windows-x86.32" "unix-x86.32"
         "windows-x86.64" "unix-x86.64"
+        "windows-arm.64" "unix-arm.64"
     }
 
 <PRIVATE
@@ -287,8 +288,8 @@ ERROR: not-in-image vocabulary word ;
     [ target-word ] keep or ;
 
 : fixup-word ( word -- offset )
-    transfer-word dup lookup-object
-    [ ] [ [ vocabulary>> ] [ name>> ] bi not-in-image ] ?if ;
+    transfer-word
+    [ lookup-object ] [ [ vocabulary>> ] [ name>> ] bi not-in-image ] ?unless ;
 
 : fixup-words ( -- )
     bootstrapping-image get [ dup word? [ fixup-word ] when ] map! drop ;
@@ -360,7 +361,7 @@ M: byte-array prepare-object
 ERROR: tuple-removed class ;
 
 : require-tuple-layout ( word -- layout )
-    dup tuple-layout [ ] [ tuple-removed ] ?if ;
+    [ tuple-layout ] [ tuple-removed ] ?unless ;
 
 : (emit-tuple) ( tuple -- pointer )
     [ tuple-slots ]
@@ -493,6 +494,13 @@ M: quotation prepare-object
     emit-words
     "Serializing JIT data..." print flush
     emit-jit-data
+! special-objects get ...
+! nl
+! "sub-primitives" print
+! sub-primitives get ...
+! \ c-to-factor of
+! 43 special-objects get set-at
+
     "Serializing global namespace..." print flush
     emit-global
     "Serializing singletons..." print flush
@@ -530,7 +538,7 @@ PRIVATE>
         { auto-use? f }
     } assoc-union! [
         H{ } clone special-objects set
-        "resource:/core/bootstrap/stage1.factor" run-file
+        "resource:basis/bootstrap/stage1.factor" run-file
         build-image
         write-image
     ] with-variables ;
@@ -540,3 +548,12 @@ PRIVATE>
 
 : make-my-image ( -- )
     my-arch-name make-image ;
+
+: make-image-main ( -- )
+    command-line get [
+        make-my-image
+    ] [
+        [ "boot." ?head drop ".image" ?tail drop make-image ] each
+    ] if-empty ;
+
+MAIN: make-image-main

@@ -1,11 +1,11 @@
 ! Copyright (C) 2008 Doug Coleman.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 
 USING: accessors ascii byte-arrays byte-vectors combinators
 command-line destructors fry io io.encodings io.encodings.binary
-io.files io.streams.string kernel literals locals math
-math.parser namespaces sequences sequences.private strings typed
-;
+io.encodings.string io.encodings.utf8 io.files io.streams.string
+kernel literals locals math math.parser namespaces sequences
+sequences.private strings typed ;
 
 IN: tools.hexdump
 
@@ -35,7 +35,7 @@ CONSTANT: hex-digits $[
     [ 0 swap length ] keep ; inline
 
 : each-byte ( from to bytes quot: ( elt -- ) -- )
-    '[ _ nth-unsafe @ ] (each-integer) ; inline
+    '[ _ nth-unsafe @ ] each-integer-from ; inline
 
 : write-bytes ( from to bytes stream -- )
     '[ hex-digits nth-unsafe _ stream-write ] each-byte ; inline
@@ -78,6 +78,9 @@ M: byte-array hexdump. all-bytes hexdump-bytes ;
 
 M: byte-vector hexdump. all-bytes underlying>> hexdump-bytes ;
 
+M: string hexdump. utf8 encode hexdump. ;
+
+
 : hexdump ( byte-array -- str )
     [ hexdump. ] with-string-writer ;
 
@@ -86,8 +89,7 @@ M: byte-vector hexdump. all-bytes underlying>> hexdump-bytes ;
 
 : hexdump-main ( -- )
     command-line get [
-        input-stream get dup decoder? [ stream>> ] when
-        hexdump-stream
+        input-stream get binary re-decode hexdump-stream
     ] [
         [ hexdump-file ] each
     ] if-empty ;

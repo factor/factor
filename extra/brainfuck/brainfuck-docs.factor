@@ -1,5 +1,5 @@
 ! Copyright (C) 2009 John Benediktsson
-! See http://factorcode.org/license.txt for BSD license
+! See https://factorcode.org/license.txt for BSD license
 
 USING: help.syntax help.markup brainfuck strings ;
 
@@ -16,7 +16,7 @@ HELP: run-brainfuck
     "The eight language commands, each consisting of a single character, "
     "are the following:\n"
     { $table
-        { "Character" "Meaning" }
+        { { $strong "Character" } { $strong "Meaning" } }
         { ">" "increment the data pointer (to point to the next cell to the right)." }
         { "<" "decrement the data pointer (to point to the next cell to the left)." }
         { "+" "increment (increase by one) the byte at the data pointer." }
@@ -31,7 +31,7 @@ HELP: run-brainfuck
     "substitutions, assuming ptr is of type unsigned char* and has been "
     "initialized to point to an array of zeroed bytes:\n"
     { $table
-        { "Character" "C equivalent" }
+        { { $strong "Character" } { $strong "C equivalent" } }
         { ">" "++ptr;" }
         { "<" "--ptr;" }
         { "+" "++*ptr;" }

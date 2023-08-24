@@ -1,10 +1,7 @@
 ! Copyright (C) 2009 Doug Coleman.
-! See http://factorcode.org/license.txt for BSD license.
-USING: accessors assocs calendar continuations destructors io
-io.encodings.binary io.servers io.sockets
-io.streams.duplex fry kernel locals math math.ranges multiline
-namespaces prettyprint random sequences sets splitting threads
-tools.continuations ;
+! See https://factorcode.org/license.txt for BSD license.
+USING: accessors assocs continuations io io.servers io.sockets
+kernel namespaces sequences ;
 IN: managed-server
 
 TUPLE: managed-server < threaded-server clients ;
@@ -95,7 +92,7 @@ M: managed-server handle-client*
     managed-server namespaces:set
     [ handle-managed-client ]
     [ cleanup-client ]
-    [ ] cleanup ;
+    finally ;
 
 : new-managed-server ( port name encoding class -- server )
     new-threaded-server

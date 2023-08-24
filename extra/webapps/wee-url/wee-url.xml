@@ -4,7 +4,7 @@
 
 	<t:title>WeeURL!</t:title>
 
-	<div class="navbar"><t:a t:href="$wee-url">Shorten URL</t:a></div>
+	<nav><t:a t:href="$wee-url">Shorten URL</t:a></nav>
 
 	<h1><t:write-title /></h1>
 

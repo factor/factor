@@ -1,13 +1,14 @@
 ! Copyright (C) 2008, 2011 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors assocs classes.tuple compiler.cfg
-compiler.cfg.builder compiler.cfg.finalization compiler.cfg.gc-checks
-compiler.cfg.instructions compiler.cfg.linearization
-compiler.cfg.optimizer compiler.cfg.registers
-compiler.cfg.representations compiler.cfg.save-contexts
-compiler.cfg.utilities compiler.tree.builder compiler.tree.optimizer
-formatting fry io kernel math namespaces prettyprint quotations
-sequences strings words ;
+compiler.cfg.builder compiler.cfg.finalization
+compiler.cfg.gc-checks compiler.cfg.instructions
+compiler.cfg.linearization compiler.cfg.optimizer
+compiler.cfg.registers compiler.cfg.representations
+compiler.cfg.save-contexts compiler.cfg.utilities
+compiler.tree.builder compiler.tree.optimizer formatting io
+kernel math namespaces prettyprint quotations sequences
+splitting strings words ;
 IN: compiler.cfg.debugger
 
 GENERIC: test-builder ( quot -- cfgs )
@@ -53,7 +54,7 @@ M: ##phi insn.
 M: insn insn. ( insn -- )
     tuple>array unclip-last insn-number. [
         dup string? [ ] [ unparse ] if
-    ] map " " join write nl ;
+    ] map join-words write nl ;
 
 : block-header. ( bb -- )
     [ number>> ] [ kill-block?>> "(k)" "" ? ] bi

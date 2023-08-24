@@ -1,7 +1,7 @@
 ! Copyright (C) 2010 Jon Harper.
-! See http://factorcode.org/license.txt for BSD license.
-USING: assocs help.markup help.syntax kernel quotations
-combinators.random.private sequences ;
+! See https://factorcode.org/license.txt for BSD license.
+USING: arrays combinators.random.private help.markup help.syntax
+kernel math quotations random sequences ;
 IN: combinators.random
 
 HELP: call-random

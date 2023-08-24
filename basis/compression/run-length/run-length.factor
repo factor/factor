@@ -1,8 +1,7 @@
 ! Copyright (C) 2009 Doug Coleman.
-! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays combinators grouping kernel locals math
-math.matrices math.order multiline sequences.parser sequences
-tools.continuations ;
+! See https://factorcode.org/license.txt for BSD license.
+USING: arrays combinators grouping kernel math math.matrices
+math.order sequences sequences.parser ;
 IN: compression.run-length
 
 : run-length-uncompress ( byte-array -- byte-array' )
@@ -13,7 +12,7 @@ IN: compression.run-length
 
 :: run-length-uncompress-bitmap4 ( byte-array m n -- byte-array' )
     byte-array <sequence-parser> :> sp
-    m  1 + n zero-matrix :> matrix
+    m  1 + n <zero-matrix> :> matrix
     n 4 mod n + :> stride
     0 :> i!
     0 :> j!
@@ -45,7 +44,7 @@ IN: compression.run-length
 
 :: run-length-uncompress-bitmap8 ( byte-array m n -- byte-array' )
     byte-array <sequence-parser> :> sp
-    m  1 + n zero-matrix :> matrix
+    m  1 + n <zero-matrix> :> matrix
     n 4 mod n + :> stride
     0 :> i!
     0 :> j!

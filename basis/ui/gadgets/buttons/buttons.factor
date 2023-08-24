@@ -1,11 +1,10 @@
 ! Copyright (C) 2005, 2009 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
-USING: accessors assocs colors colors.constants combinators
-combinators.short-circuit combinators.smart fry kernel locals
-math.vectors memoize models namespaces sequences system
-ui.commands ui.gadgets ui.gadgets.borders ui.gadgets.labels
-ui.gadgets.packs ui.gadgets.worlds ui.gestures ui.pens
-ui.pens.image ui.pens.solid ui.pens.tile ui.theme
+! See https://factorcode.org/license.txt for BSD license.
+USING: accessors assocs colors combinators combinators.short-circuit
+combinators.smart fry kernel locals math.vectors memoize models
+namespaces sequences ui.commands ui.gadgets ui.gadgets.borders
+ui.gadgets.labels ui.gadgets.packs ui.theme ui.gadgets.worlds
+ui.gestures ui.pens ui.pens.image ui.pens.solid ui.pens.tile
 ui.theme.images ;
 FROM: models => change-model ;
 IN: ui.gadgets.buttons
@@ -41,11 +40,14 @@ PRIVATE>
 : button-leave ( button -- )
     [ hide-status ] [ button-update ] bi ;
 
+: button-invoke ( button -- )
+    dup quot>> call( button -- ) ;
+
 : button-clicked ( button -- )
     [ ]
     [ button-update ]
     [ button-rollover? ] tri
-    [ dup quot>> call( button -- ) ] [ drop ] if ;
+    [ button-invoke ] [ drop ] if ;
 
 button H{
     { T{ button-up } [ button-clicked ] }
@@ -129,7 +131,7 @@ PRIVATE>
     ] 2dip <tile-pen> ;
 
 : <border-button-pen> ( -- pen )
-    "button" os windows? [ COLOR: grey95 ] [ transparent ] if button-text-color
+    "button" transparent button-text-color
     <border-button-state-pen> dup
     "button-clicked" transparent button-clicked-text-color
     <border-button-state-pen> dup dup

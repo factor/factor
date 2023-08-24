@@ -1,7 +1,7 @@
 ! Copyright (C) 2007, 2009 Doug Coleman.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors arrays combinators.short-circuit continuations
-destructors images images.loader io.pathnames kernel locals math
+destructors images images.loader io.pathnames kernel math
 models opengl.gl opengl.textures opengl.textures.private
 sequences strings ui ui.gadgets ui.gadgets.panes
 ui.gadgets.worlds ui.render ;
@@ -14,7 +14,7 @@ M: image-gadget pref-dim* image>> [ image-dim ] [ { 640 480 } ] if* ;
 : (image-gadget-texture) ( gadget -- texture )
     dup image>> { 0 0 } <texture> >>texture texture>> ;
 : image-gadget-texture ( gadget -- texture )
-    dup texture>> [ ] [ (image-gadget-texture) ] ?if ;
+    [ texture>> ] [ (image-gadget-texture) ] ?unless ;
 
 M: image-gadget draw-gadget* ( gadget -- )
     dup image>> [
@@ -67,7 +67,7 @@ M: multi-texture texture-size
         ] [ f ] if*
     ] [ f ] if* ;
 : same-internal-format? ( image-gadget -- ? )
-   [ texture-format ] [ image>> image-format 2drop ] bi = ;
+    [ texture-format ] [ image>> image-format 2drop ] bi = ;
 
 ! TODO: also keep multitextures if possible ?
 : keep-same-texture? ( image-gadget -- ? )
@@ -98,16 +98,7 @@ M: model set-image [ value>> >>image drop ] [ >>model ] 2bi ;
     \ image-control new-image-gadget* ;
 : image-window ( object -- ) <image-gadget> "Image" open-window ;
 
-! move these words to ui.gadgets because they affect all controls ?
-: stop-control ( gadget -- ) dup model>> [ remove-connection ] [ drop ] if* ;
-: start-control ( gadget -- ) dup model>> [ add-connection ] [ drop ] if* ;
-
 : image. ( object -- ) <image-gadget> gadget. ;
-
-<PRIVATE
-M: image-control graft* start-control ;
-M: image-control ungraft* [ stop-control ] [ call-next-method ] bi ;
-PRIVATE>
 
 M: image content-gadget
     <image-gadget> ;

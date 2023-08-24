@@ -1,10 +1,10 @@
 ! Copyright (C) 2018 John Benediktsson
-! See http://factorcode.org/license.txt for BSD license
+! See https://factorcode.org/license.txt for BSD license
 
-USING: accessors byte-arrays classes combinators io
-io.binary.fast io.encodings.binary io.files
-io.streams.byte-array kernel locals math math.order
-math.statistics sequences sets ;
+USING: accessors byte-arrays classes combinators endian io
+io.encodings.binary io.files io.streams.byte-array kernel
+math math.order math.statistics sequences sequences.extras sets
+;
 
 IN: shapefiles
 
@@ -131,7 +131,7 @@ TUPLE: record number content-length shape ;
     4 read [ be> 4 read be> read-shape record boa ] [ f ] if* ;
 
 : read-records ( -- records )
-    [ read-record dup ] [ ] produce nip ;
+    [ read-record ] loop>array ;
 
 : read-shp ( -- header records )
     read-header read-records ;
@@ -145,7 +145,7 @@ TUPLE: index offset content-length ;
     4 read [ be> 4 read be> index boa ] [ f ] if* ;
 
 : read-indices ( -- indices )
-    [ read-index dup ] [ ] produce nip ;
+    [ read-index ] loop>array ;
 
 : read-shx ( -- header indices )
     read-header read-indices ;

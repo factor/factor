@@ -1,8 +1,8 @@
 ! Copyright (C) 2006, 2010 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs classes classes.algebra
 classes.algebra.private classes.maybe classes.private
-combinators definitions kernel make math namespaces sequences
+combinators definitions kernel make namespaces sequences
 sets words ;
 IN: generic
 
@@ -53,7 +53,7 @@ PRIVATE>
 : method-classes ( generic -- classes )
     "methods" word-prop keys ;
 
-: order ( generic -- seq )
+: dispatch-order ( generic -- seq )
     method-classes sort-classes ;
 
 : nearest-class ( class generic -- class/f )
@@ -87,7 +87,7 @@ GENERIC: next-method-quot* ( class generic combination -- quot )
 ERROR: no-next-method method ;
 
 : (call-next-method) ( method -- )
-    dup next-method-quot [ call ] [ no-next-method ] ?if ;
+    [ next-method-quot ] [ call ] [ no-next-method ] ?if ;
 
 ERROR: check-method-error class generic ;
 
@@ -216,3 +216,6 @@ M: generic subwords
 
 M: class forget-methods
     [ implementors ] [ [ swap ?lookup-method ] curry ] bi map forget-all ;
+
+! Consultation/delegation support
+GENERIC: make-consult-quot ( consultation word quot combination -- consult-quot )

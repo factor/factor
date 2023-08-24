@@ -1,8 +1,8 @@
 ! Copyright (C) 2008 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
-USING: deques dlists kernel threads continuations math
-concurrency.conditions combinators.short-circuit accessors
-locals ;
+! See https://factorcode.org/license.txt for BSD license.
+USING: accessors combinators.short-circuit
+concurrency.conditions continuations deques dlists kernel math
+threads ;
 IN: concurrency.locks
 
 ! Simple critical sections
@@ -27,7 +27,7 @@ TUPLE: lock threads owner reentrant? ;
 
 :: do-lock ( lock timeout quot acquire release -- )
     lock timeout acquire call
-    quot lock release curry [ ] cleanup ; inline
+    quot lock release curry finally ; inline
 
 : (with-lock) ( lock timeout quot -- )
     [ acquire-lock ] [ release-lock ] do-lock ; inline

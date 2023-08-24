@@ -95,7 +95,7 @@ FUNCTION: HRESULT
         UINT                      VertexCount,
         UINT                      FaceCount,
         UINT                      Options,
-        ID3DX10Mesh**             ppMesh        )
+        ID3DX10Mesh**             ppMesh )
 
 CONSTANT: D3DX10_MESHOPT_COMPACT            0x01000000
 CONSTANT: D3DX10_MESHOPT_ATTR_SORT          0x02000000
@@ -118,7 +118,7 @@ COM-INTERFACE: ID3DX10SkinInfo IUnknown {420BD604-1C76-4a34-A466-E45D0658A32C}
     UINT GetNumVertices ( )
     UINT GetNumBones ( )
     UINT GetMaxBoneInfluences ( )
-    HRESULT AddVertices ( UINT  Count )
+    HRESULT AddVertices ( UINT Count )
     HRESULT RemapVertices ( UINT NewVertexCount, UINT* pVertexRemap )
     HRESULT AddBones ( UINT Count )
     HRESULT RemoveBone ( UINT Index )

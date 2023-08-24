@@ -1,14 +1,14 @@
 ! Copyright (C) 2003, 2010 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs combinators
-combinators.short-circuit continuations debugger destructors fry
+combinators.short-circuit continuations debugger destructors
 hashtables html html.streams html.templates http
 http.server.remapping http.server.requests http.server.responses
 io io.crlf io.encodings io.encodings.ascii io.encodings.iana
 io.encodings.utf8 io.servers io.sockets io.sockets.secure
 io.streams.limited kernel logging logging.insomniac math
-mime.types namespaces present sequences splitting tools.time
-urls vectors vocabs vocabs.refresh xml.writer ;
+mime.types namespaces present protocols sequences splitting
+tools.time urls vectors vocabs vocabs.refresh xml.writer ;
 IN: http.server
 
 GENERIC: write-response ( response -- )
@@ -48,13 +48,13 @@ GENERIC: write-full-response ( request response -- )
 : write-response-body ( response -- response )
     dup body>> call-template ;
 
-M: response write-response ( respose -- )
+M: response write-response
     write-response-line
     write-response-header
     flush
     drop ;
 
-M: response write-full-response ( request response -- )
+M: response write-full-response
     dup write-response
     swap method>> "HEAD" = [
         [ content-encoding>> encode-output ]
@@ -62,12 +62,12 @@ M: response write-full-response ( request response -- )
         bi
     ] unless drop ;
 
-M: raw-response write-response ( respose -- )
+M: raw-response write-response
     write-response-line
     write-response-body
     drop ;
 
-M: raw-response write-full-response ( request response -- )
+M: raw-response write-full-response
     nip write-response ;
 
 : post-request? ( -- ? ) request get method>> "POST" = ;
@@ -141,7 +141,9 @@ LOG: httpd-header NOTICE
     dup method>> {
         { "GET" [ url>> query>> ] }
         { "HEAD" [ url>> query>> ] }
+        { "OPTIONS" [ url>> query>> ] }
         { "POST" [ post-data>> params>> ] }
+        { "PUT" [ post-data>> params>> ] }
     } case ;
 
 SYMBOL: params
@@ -223,8 +225,8 @@ M: http-server handle-client*
 : <http-server> ( -- server )
     ascii http-server new-threaded-server
         "http.server" >>name
-        "http" protocol-port >>insecure
-        "https" protocol-port >>secure ;
+        "http" lookup-protocol-port >>insecure
+        "https" lookup-protocol-port >>secure ;
 
 : httpd ( port -- http-server )
     <http-server>

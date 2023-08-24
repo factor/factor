@@ -1,7 +1,8 @@
 ! Copyright (C) 2007, 2008 Slava Pestov, Eduardo Cavazos.
-! See http://factorcode.org/license.txt for BSD license.
-USING: accessors kernel locals locals.types prettyprint.backend
-prettyprint.custom prettyprint.sections sequences words ;
+! See https://factorcode.org/license.txt for BSD license.
+USING: accessors combinators kernel locals locals.types math
+prettyprint.backend prettyprint.custom prettyprint.sections
+sequences words ;
 IN: locals.prettyprint
 
 : pprint-var ( var -- )
@@ -29,12 +30,11 @@ M: lambda pprint*
 
 M: let pprint* \ [let pprint-let ;
 
-M: def pprint*
-    dup local>> word?
-    [ <block \ :> pprint-word local>> pprint-var block> ]
-    [ pprint-tuple ] if ;
-
 M: multi-def pprint*
-    dup locals>> [ word? ] all?
-    [ <block \ :> pprint-word "(" text locals>> [ pprint-var ] each ")" text block> ]
-    [ pprint-tuple ] if ;
+    dup locals>> [ word? ] all? [
+        <block \ :> pprint-word locals>> {
+            [ length 1 > [ "(" text ] when ]
+            [ [ pprint-var ] each ]
+            [ length 1 > [ ")" text ] when ]
+        } cleave block>
+    ] [ pprint-tuple ] if ;

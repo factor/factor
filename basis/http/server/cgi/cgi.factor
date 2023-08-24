@@ -1,9 +1,9 @@
 ! Copyright (C) 2007, 2009 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays assocs calendar fry http http.server io
-io.encodings io.encodings.binary io.launcher io.streams.duplex
-kernel make math.parser namespaces sequences urls urls.encoding
-;
+! See https://factorcode.org/license.txt for BSD license.
+USING: accessors arrays assocs calendar http http.server io
+io.backend io.encodings io.encodings.binary io.launcher
+io.streams.duplex kernel make math.parser namespaces sequences
+urls urls.encoding ;
 IN: http.server.cgi
 
 : cgi-variables ( script-path -- assoc )
@@ -53,7 +53,7 @@ IN: http.server.cgi
     "CGI output follows" >>message
     swap '[
         binary encode-output
-        output-stream get _ <cgi-process> binary <process-stream> [
+        output-stream get _ normalize-path <cgi-process> binary <process-stream> [
             post-request? [ request get post-data>> data>> write flush ] when
             '[ _ stream-write ] each-block
         ] with-stream

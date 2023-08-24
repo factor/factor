@@ -1,5 +1,5 @@
 USING: tools.test concurrency.locks concurrency.count-downs
-concurrency.messaging concurrency.mailboxes locals kernel
+concurrency.messaging concurrency.mailboxes kernel
 threads sequences calendar accessors ;
 IN: concurrency.locks.tests
 
@@ -65,7 +65,7 @@ IN: concurrency.locks.tests
     ] with-lock
 ] unit-test
 
-{ } [ <rw-lock> drop ] unit-test
+[ <rw-lock> ] must-not-fail
 
 { } [ <rw-lock> [ ] with-read-lock ] unit-test
 

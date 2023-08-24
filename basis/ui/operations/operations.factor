@@ -1,7 +1,7 @@
 ! Copyright (C) 2006, 2009 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays assocs combinators.short-circuit fry
-kernel linked-assocs namespaces sequences ui.commands words ;
+! See https://factorcode.org/license.txt for BSD license.
+USING: accessors arrays assocs combinators.short-circuit kernel
+linked-assocs namespaces sequences ui.commands words ;
 IN: ui.operations
 
 SYMBOL: +keyboard+
@@ -54,9 +54,8 @@ operations [ <linked-hash> ] initialize
     dup primary-operation invoke-command ;
 
 : secondary-operation ( obj -- operation )
-    dup
-    [ command>> +secondary+ word-prop ] find-operation
-    [ ] [ primary-operation ] ?if ;
+    [ [ command>> +secondary+ word-prop ] find-operation ]
+    [ primary-operation ] ?unless ;
 
 : invoke-secondary-operation ( obj -- )
     dup secondary-operation invoke-command ;
@@ -91,5 +90,5 @@ operations [ <linked-hash> ] initialize
 : operation-quot ( target operation -- quot )
     [ translator>> ] [ command>> ] bi '[ _ @ _ execute ] ;
 
-M: operation invoke-command ( target command -- )
+M: operation invoke-command
     operation-quot call( -- ) ;

@@ -98,7 +98,7 @@ HELP: deploy-directory
 HELP: deploy-io
 { $description "The level of I/O support required by the deployed image:"
     { $table
-        { "Value" "Description" }
+        { { $strong "Value" } { $strong "Description" } }
         { "1" "No input/output" }
         { "2" "Basic ANSI C streams" }
         { "3" "Non-blocking streams and networking" }
@@ -109,7 +109,7 @@ HELP: deploy-io
 HELP: deploy-reflection
 { $description "The level of reflection support required by the deployed image."
     { $table
-        { "Value" "Description" }
+        { { $strong "Value" } { $strong "Description" } }
         { "1" "No reflection" }
         { "2" "Retain word names" }
         { "3" "Prettyprinter" }

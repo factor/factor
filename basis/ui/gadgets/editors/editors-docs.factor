@@ -11,12 +11,20 @@ HELP: editor
 { $class-description "An editor is a control for editing a multi-line passage of text stored in a " { $link document } " model. Editors are created by calling " { $link <editor> } "."
 $nl
 "Editors have the following slots:"
-{ $list
-    { { $snippet "caret-color" } " - a " { $link color } "." }
-    { { $snippet "caret" } " - a " { $link model } " storing a line/column pair." }
-    { { $snippet "mark" } " - a " { $link model } " storing a line/column pair. If there is no selection, the mark is equal to the caret, otherwise the mark is located at the opposite end of the selection from the caret." }
-    { { $snippet "focused?" } " - a boolean." }
-} }
+{ $slots
+    { "caret" { "a " { $link model } " storing a line/column pair." } }
+    { "mark" { "a " { $link model } " storing a line/column pair. If there is no selection, the mark is equal to the caret, otherwise the mark is located at the opposite end of the selection from the caret." } }
+    { "focused?" { "a boolean." } }
+    { "preedit-start" { "a line/column pair or " { $link f } ". It represents the starting point of the string being edited by an input method." } }
+    { "preedit-end" { "a line/column pair or " { $link f } ". It represents the end point of the string being edited by an input method." } }
+    { "preedit-selected-start" { "a line/column pair or " { $link f } ". It represents the starting point of the string being selected by an input method." } }
+    { "preedit-selected-end" { "a line/column pair or " { $link f } ". It represents the end point of the string being selected by an input method." } }
+    { "preedit-selection-mode?" { "a boolean. It means the mode of selecting convertion canditate word. The caret in an editor is not drawn if it is true." } }
+    { "preedit-underlines" { "an array or " { $link f } ". It stores underline attributes for its preedit area." } }
+}
+$nl
+" Slots that are prefixed with \"preedit-\" should not be modified directly. They are changed by the platform-dependent backend."
+}
 { $see-also line-gadget } ;
 
 HELP: <editor>
@@ -24,6 +32,17 @@ HELP: <editor>
 { $description "Creates a new " { $link editor } " with an empty document." } ;
 
 { editor-caret editor-mark } related-words
+
+HELP: caret-style
+{ $description "Caret styles available:"
+{ $table
+  { "Value" "Shape" }
+  { { $link +line+ } "line (default)" }
+  { { $link +box+ } "box" }
+  { { $link +filled+ } "filled box" }
+}
+}
+{ $references "Set desired caret style in your .factor-rc file" "rc-files" } ;
 
 HELP: editor-caret
 { $values { "editor" editor } { "loc" "a pair of integers" } }
@@ -65,7 +84,7 @@ HELP: <model-field>
 
 HELP: <action-field>
 { $values { "quot" { $quotation ( string -- ) } } { "gadget" editor } }
-{ $description "Creates an editor gadget with a blank model. Whenever a value is entered into the editor and Return pressed, the value is pushed on the stack as a string and the specified quotation is called. Note that the quotation cannot update the value in the field. " } ;
+{ $description "Creates an editor gadget with a blank model. Whenever a value is entered into the editor and Return pressed, the value is pushed on the stack as a string and the specified quotation is called. Note that the quotation cannot update the value in the field." } ;
 
 
 HELP: editor-string

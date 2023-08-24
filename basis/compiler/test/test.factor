@@ -1,5 +1,5 @@
 ! Copyright (C) 2010 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs compiler.cfg compiler.cfg.debugger
 compiler.cfg.def-use compiler.cfg.linearization compiler.cfg.registers
 compiler.cfg.representations.preferred compiler.cfg.rpo
@@ -7,7 +7,7 @@ compiler.cfg.stacks compiler.cfg.stacks.local compiler.cfg.utilities
 compiler.tree.builder compiler.tree.checker compiler.tree.def-use
 compiler.tree.normalization compiler.tree.propagation
 compiler.tree.propagation.info compiler.tree.recursive compiler.units
-fry hashtables kernel math namespaces sequences stack-checker
+hashtables kernel math namespaces sequences stack-checker
 tools.test vectors vocabs words ;
 IN: compiler.test
 

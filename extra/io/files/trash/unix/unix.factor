@@ -1,11 +1,11 @@
 ! Copyright (C) 2010 John Benediktsson
-! See http://factorcode.org/license.txt for BSD license
+! See https://factorcode.org/license.txt for BSD license
 
-USING: accessors calendar combinators.short-circuit environment
-formatting io io.directories io.encodings.utf8 io.files
-io.files.info io.files.info.unix io.files.trash io.files.types
-io.pathnames kernel math math.parser sequences system unix.stat
-unix.users xdg ;
+USING: accessors calendar combinators.short-circuit formatting
+io io.backend io.directories io.encodings.utf8 io.files
+io.files.info io.files.info.unix io.files.trash io.pathnames
+kernel math math.parser sequences system unix.stat unix.users
+xdg ;
 
 IN: io.files.trash.unix
 
@@ -44,7 +44,7 @@ IN: io.files.trash.unix
     top-directory dup trash-home top-directory = [
         drop trash-home
     ] [
-        dup ".Trash" append-path exists?
+        dup ".Trash" append-path file-exists?
         [ trash-1 ] [ trash-2 ] if
         [ make-user-directory ] keep
     ] if ;
@@ -57,7 +57,7 @@ IN: io.files.trash.unix
     ] dip swap "%s%s %s%s" sprintf ;
 
 : safe-file-name ( path -- path' )
-    dup 0 [ over exists? ] [
+    dup 0 [ over file-exists? ] [
         [ parent-directory to-directory ] [ 1 + ] bi*
         [ (safe-file-name) ] keep
     ] while drop nip ;
@@ -65,7 +65,7 @@ IN: io.files.trash.unix
 PRIVATE>
 
 M: unix send-to-trash ( path -- )
-    dup trash-path [
+    normalize-path dup trash-path [
         "files" append-path [ make-user-directory ] keep
         to-directory safe-file-name
     ] [

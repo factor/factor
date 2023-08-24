@@ -1,6 +1,9 @@
 ! Copyright (C) 2006, 2007, 2008 Alex Chapman
-! See http://factorcode.org/license.txt for BSD license.
-USING: accessors combinators kernel lists math math.functions sequences system tetris.board tetris.piece tetris.tetromino ;
+! See https://factorcode.org/license.txt for BSD license.
+
+USING: accessors combinators kernel lists math math.functions
+sequences system tetris.board tetris.piece ;
+
 IN: tetris.game
 
 TUPLE: tetris
@@ -19,7 +22,8 @@ CONSTANT: default-height 20
     dupd <board> swap <piece-llist>
     tetris new swap >>pieces swap >>board ;
 
-: <default-tetris> ( -- tetris ) default-width default-height <tetris> ;
+: <default-tetris> ( -- tetris )
+    default-width default-height <tetris> ;
 
 : <new-tetris> ( old -- new )
     board>> [ width>> ] [ height>> ] bi <tetris> ;
@@ -31,14 +35,14 @@ CONSTANT: default-height 20
 : toggle-pause ( tetris -- )
     [ not ] change-paused? drop ;
 
-: level>> ( tetris -- level )
+: level ( tetris -- level )
     rows>> 1 + 10 / ceiling ;
 
 : update-interval ( tetris -- interval )
-    level>> 1 - 60 * 1,000,000,000 swap - ;
+    level 1 - 60 * 1,000,000,000 swap - ;
 
 : add-block ( tetris block -- )
-    over [ board>> ] 2dip current-piece tetromino>> colour>> set-block ;
+    over [ board>> ] 2dip current-piece tetromino>> color>> set-block ;
 
 : game-over? ( tetris -- ? )
     [ board>> ] [ next-piece ] bi piece-valid? not ;
@@ -60,7 +64,7 @@ CONSTANT: default-height 20
     } case swap 1 + * ;
 
 : add-score ( tetris n-rows -- tetris )
-    over level>> swap rows-score swap [ + ] change-score ;
+    over level swap rows-score swap [ + ] change-score ;
 
 : add-rows ( tetris rows -- tetris )
     swap [ + ] change-rows ;
@@ -69,8 +73,8 @@ CONSTANT: default-height 20
     [ add-score ] keep add-rows drop ;
 
 : lock-piece ( tetris -- )
-    [ dup current-piece piece-blocks [ add-block ] with each ] keep
-    new-current-piece dup board>> check-rows score-rows ;
+    [ dup current-piece piece-blocks [ add-block ] with each ]
+    [ new-current-piece dup board>> check-rows score-rows ] bi ;
 
 : can-rotate? ( tetris -- ? )
     [ board>> ] [ current-piece clone 1 rotate-piece ] bi piece-valid? ;

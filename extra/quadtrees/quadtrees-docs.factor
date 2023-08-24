@@ -1,4 +1,4 @@
-USING: arrays assocs help.markup help.syntax math.rectangles quadtrees quotations sequences ;
+USING: arrays help.markup help.syntax math.rectangles quadtrees quotations sequences ;
 IN: quadtrees
 
 ARTICLE: "quadtrees" "Quadtrees"

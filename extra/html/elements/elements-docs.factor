@@ -1,4 +1,4 @@
-USING: help.markup help.syntax io present html ;
+USING: help.markup help.syntax io present ;
 IN: html.elements
 
 ARTICLE: "html.elements" "HTML elements"

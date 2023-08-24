@@ -1,8 +1,6 @@
 ! Copyright (C) 2009 Keith Lazuka, Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
-USING: assocs colors colors.constants combinators
-combinators.short-circuit hashtables io.styles kernel literals
-namespaces sequences words words.symbol ;
+! See https://factorcode.org/license.txt for BSD license.
+USING: assocs colors io.styles kernel namespaces sequences words ;
 IN: prettyprint.stylesheet
 
 <PRIVATE
@@ -50,11 +48,11 @@ H{
 : vocab-style ( vocab -- style )
     presented base-vocab-style get clone [ set-at ] keep ;
 
-SYMBOL: stack-effect-style
+SYMBOL: base-effect-style
 H{
-    { foreground COLOR: FactorDarkGreen }
+    { foreground COLOR: FactorDarkSlateBlue }
     { font-style plain }
-} stack-effect-style set-global
+} base-effect-style set-global
 
 : effect-style ( effect -- style )
-    presented stack-effect-style get clone [ set-at ] keep ;
+    presented base-effect-style get clone [ set-at ] keep ;

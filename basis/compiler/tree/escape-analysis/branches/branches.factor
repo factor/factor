@@ -1,5 +1,5 @@
 ! Copyright (C) 2008 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors compiler.tree
 compiler.tree.escape-analysis.allocations
 compiler.tree.escape-analysis.nodes
@@ -9,7 +9,7 @@ IN: compiler.tree.escape-analysis.branches
 
 M: #branch escape-analysis*
     [ in-d>> add-escaping-values ]
-    [ live-children sift [ (escape-analysis) ] each ]
+    [ live-children [ [ (escape-analysis) ] when* ] each ]
     bi ;
 
 : (merge-allocations) ( values -- allocation )

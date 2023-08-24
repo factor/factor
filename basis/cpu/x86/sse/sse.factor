@@ -1,5 +1,5 @@
 ! Copyright (C) 2009, 2010 Joe Groff, Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: alien.data arrays assocs combinators compiler.cfg.comparisons
 compiler.cfg.intrinsics cpu.architecture cpu.x86 cpu.x86.assembler
 cpu.x86.assembler.operands cpu.x86.features fry kernel locals macros
@@ -35,16 +35,16 @@ M: x86 integer-float-needs-stack-frame? f ;
 M: x86 %integer>float [ drop dup XORPS ] [ CVTSI2SD ] 2bi ;
 M: x86 %float>integer CVTTSD2SI ;
 
-M: x86 %compare-float-ordered ( dst src1 src2 cc temp -- )
+M: x86 %compare-float-ordered
     [ COMISD ] (%compare-float) ;
 
-M: x86 %compare-float-unordered ( dst src1 src2 cc temp -- )
+M: x86 %compare-float-unordered
     [ UCOMISD ] (%compare-float) ;
 
-M: x86 %compare-float-ordered-branch ( label src1 src2 cc -- )
+M: x86 %compare-float-ordered-branch
     [ COMISD ] (%compare-float-branch) ;
 
-M: x86 %compare-float-unordered-branch ( label src1 src2 cc -- )
+M: x86 %compare-float-unordered-branch
     [ UCOMISD ] (%compare-float-branch) ;
 
 ! SIMD
@@ -262,7 +262,7 @@ M: x86 %shuffle-vector-halves-imm-reps
         { sse2? { double-2-rep } }
     } available-reps ;
 
-M: x86 %shuffle-vector ( dst src shuffle rep -- )
+M: x86 %shuffle-vector
     two-operand PSHUFB ;
 
 M: x86 %shuffle-vector-reps
@@ -331,14 +331,14 @@ M: x86 %unsigned-pack-vector-reps
         { sse4.1? { int-4-rep } }
     } available-reps ;
 
-M: x86 %tail>head-vector ( dst src rep -- )
+M: x86 %tail>head-vector
     dup {
         { float-4-rep [ drop UNPCKHPD ] }
         { double-2-rep [ drop UNPCKHPD ] }
         [ drop [ %copy ] [ drop PUNPCKHQDQ ] 3bi ]
     } case ;
 
-M: x86 %unpack-vector-head ( dst src rep -- )
+M: x86 %unpack-vector-head
     {
         { char-16-rep  [ PMOVSXBW ] }
         { uchar-16-rep [ PMOVZXBW ] }
@@ -349,13 +349,13 @@ M: x86 %unpack-vector-head ( dst src rep -- )
         { float-4-rep  [ CVTPS2PD ] }
     } case ;
 
-M: x86 %unpack-vector-head-reps ( -- reps )
+M: x86 %unpack-vector-head-reps
     {
         { sse2? { float-4-rep } }
         { sse4.1? { char-16-rep uchar-16-rep short-8-rep ushort-8-rep int-4-rep uint-4-rep } }
     } available-reps ;
 
-M: x86 %integer>float-vector ( dst src rep -- )
+M: x86 %integer>float-vector
     {
         { int-4-rep [ CVTDQ2PS ] }
     } case ;
@@ -365,7 +365,7 @@ M: x86 %integer>float-vector-reps
         { sse2? { int-4-rep } }
     } available-reps ;
 
-M: x86 %float>integer-vector ( dst src rep -- )
+M: x86 %float>integer-vector
     {
         { float-4-rep [ CVTTPS2DQ ] }
     } case ;
@@ -405,7 +405,7 @@ M: x86 %float>integer-vector-reps
         { cc> [ [ PCMPGTQ ] [ PCMPGTD ] [ PCMPGTW ] [ PCMPGTB ] (%compare-int-vector) ] }
     } case ;
 
-M: x86 %compare-vector ( dst src1 src2 rep cc -- )
+M: x86 %compare-vector
     [ [ two-operand ] keep ] dip
     over float-vector-rep?
     [ %compare-float-vector ]
@@ -481,7 +481,7 @@ M: x86 %compare-vector-ccs
         [ drop PMOVMSKB 0xffff ]
     } case ;
 
-M: x86 %move-vector-mask ( dst src rep -- )
+M: x86 %move-vector-mask
     (%move-vector-mask) drop ;
 
 M: x86 %move-vector-mask-reps
@@ -512,7 +512,7 @@ M: x86 %test-vector-reps
         { sse2? { double-2-rep char-16-rep uchar-16-rep short-8-rep ushort-8-rep int-4-rep uint-4-rep longlong-2-rep ulonglong-2-rep } }
     } available-reps ;
 
-M: x86 %add-vector ( dst src1 src2 rep -- )
+M: x86 %add-vector
     [ two-operand ] keep
     {
         { float-4-rep [ ADDPS ] }
@@ -533,7 +533,7 @@ M: x86 %add-vector-reps
         { sse2? { double-2-rep char-16-rep uchar-16-rep short-8-rep ushort-8-rep int-4-rep uint-4-rep longlong-2-rep ulonglong-2-rep } }
     } available-reps ;
 
-M: x86 %saturated-add-vector ( dst src1 src2 rep -- )
+M: x86 %saturated-add-vector
     [ two-operand ] keep
     {
         { char-16-rep [ PADDSB ] }
@@ -547,7 +547,7 @@ M: x86 %saturated-add-vector-reps
         { sse2? { char-16-rep uchar-16-rep short-8-rep ushort-8-rep } }
     } available-reps ;
 
-M: x86 %add-sub-vector ( dst src1 src2 rep -- )
+M: x86 %add-sub-vector
     [ two-operand ] keep
     {
         { float-4-rep [ ADDSUBPS ] }
@@ -559,7 +559,7 @@ M: x86 %add-sub-vector-reps
         { sse3? { float-4-rep double-2-rep } }
     } available-reps ;
 
-M: x86 %sub-vector ( dst src1 src2 rep -- )
+M: x86 %sub-vector
     [ two-operand ] keep
     {
         { float-4-rep [ SUBPS ] }
@@ -580,7 +580,7 @@ M: x86 %sub-vector-reps
         { sse2? { double-2-rep char-16-rep uchar-16-rep short-8-rep ushort-8-rep int-4-rep uint-4-rep longlong-2-rep ulonglong-2-rep } }
     } available-reps ;
 
-M: x86 %saturated-sub-vector ( dst src1 src2 rep -- )
+M: x86 %saturated-sub-vector
     [ two-operand ] keep
     {
         { char-16-rep [ PSUBSB ] }
@@ -594,7 +594,7 @@ M: x86 %saturated-sub-vector-reps
         { sse2? { char-16-rep uchar-16-rep short-8-rep ushort-8-rep } }
     } available-reps ;
 
-M: x86 %mul-vector ( dst src1 src2 rep -- )
+M: x86 %mul-vector
     [ two-operand ] keep
     {
         { float-4-rep [ MULPS ] }
@@ -612,7 +612,7 @@ M: x86 %mul-vector-reps
         { sse4.1? { int-4-rep uint-4-rep } }
     } available-reps ;
 
-M: x86 %mul-high-vector ( dst src1 src2 rep -- )
+M: x86 %mul-high-vector
     [ two-operand ] keep
     {
         { short-8-rep  [ PMULHW ] }
@@ -624,7 +624,7 @@ M: x86 %mul-high-vector-reps
         { sse2? { short-8-rep ushort-8-rep } }
     } available-reps ;
 
-M: x86 %mul-horizontal-add-vector ( dst src1 src2 rep -- )
+M: x86 %mul-horizontal-add-vector
     [ two-operand ] keep
     {
         { char-16-rep  [ PMADDUBSW ] }
@@ -638,7 +638,7 @@ M: x86 %mul-horizontal-add-vector-reps
         { ssse3? { char-16-rep uchar-16-rep } }
     } available-reps ;
 
-M: x86 %div-vector ( dst src1 src2 rep -- )
+M: x86 %div-vector
     [ two-operand ] keep
     {
         { float-4-rep [ DIVPS ] }
@@ -651,7 +651,7 @@ M: x86 %div-vector-reps
         { sse2? { double-2-rep } }
     } available-reps ;
 
-M: x86 %min-vector ( dst src1 src2 rep -- )
+M: x86 %min-vector
     [ two-operand ] keep
     {
         { char-16-rep [ PMINSB ] }
@@ -671,7 +671,7 @@ M: x86 %min-vector-reps
         { sse4.1? { char-16-rep ushort-8-rep int-4-rep uint-4-rep } }
     } available-reps ;
 
-M: x86 %max-vector ( dst src1 src2 rep -- )
+M: x86 %max-vector
     [ two-operand ] keep
     {
         { char-16-rep [ PMAXSB ] }
@@ -691,7 +691,7 @@ M: x86 %max-vector-reps
         { sse4.1? { char-16-rep ushort-8-rep int-4-rep uint-4-rep } }
     } available-reps ;
 
-M: x86 %avg-vector ( dst src1 src2 rep -- )
+M: x86 %avg-vector
     [ two-operand ] keep
     {
         { uchar-16-rep [ PAVGB ] }
@@ -726,7 +726,7 @@ M: x86 %sad-vector-reps
         { sse2? { uchar-16-rep } }
     } available-reps ;
 
-M: x86 %horizontal-add-vector ( dst src1 src2 rep -- )
+M: x86 %horizontal-add-vector
     [ two-operand ] keep
     signed-rep {
         { float-4-rep  [ HADDPS ] }
@@ -741,7 +741,7 @@ M: x86 %horizontal-add-vector-reps
         { ssse3? { int-4-rep uint-4-rep short-8-rep ushort-8-rep } }
     } available-reps ;
 
-M: x86 %horizontal-shl-vector-imm ( dst src1 src2 rep -- )
+M: x86 %horizontal-shl-vector-imm
     two-operand PSLLDQ ;
 
 M: x86 %horizontal-shl-vector-imm-reps
@@ -749,7 +749,7 @@ M: x86 %horizontal-shl-vector-imm-reps
         { sse2? { char-16-rep uchar-16-rep short-8-rep ushort-8-rep int-4-rep uint-4-rep longlong-2-rep ulonglong-2-rep float-4-rep double-2-rep } }
     } available-reps ;
 
-M: x86 %horizontal-shr-vector-imm ( dst src1 src2 rep -- )
+M: x86 %horizontal-shr-vector-imm
     two-operand PSRLDQ ;
 
 M: x86 %horizontal-shr-vector-imm-reps
@@ -757,7 +757,7 @@ M: x86 %horizontal-shr-vector-imm-reps
         { sse2? { char-16-rep uchar-16-rep short-8-rep ushort-8-rep int-4-rep uint-4-rep longlong-2-rep ulonglong-2-rep float-4-rep double-2-rep } }
     } available-reps ;
 
-M: x86 %abs-vector ( dst src rep -- )
+M: x86 %abs-vector
     {
         { char-16-rep [ PABSB ] }
         { short-8-rep [ PABSW ] }
@@ -769,7 +769,7 @@ M: x86 %abs-vector-reps
         { ssse3? { char-16-rep short-8-rep int-4-rep } }
     } available-reps ;
 
-M: x86 %sqrt-vector ( dst src rep -- )
+M: x86 %sqrt-vector
     {
         { float-4-rep [ SQRTPS ] }
         { double-2-rep [ SQRTPD ] }
@@ -781,7 +781,7 @@ M: x86 %sqrt-vector-reps
         { sse2? { double-2-rep } }
     } available-reps ;
 
-M: x86 %and-vector ( dst src1 src2 rep -- )
+M: x86 %and-vector
     [ two-operand ] keep
     {
         { float-4-rep [ ANDPS ] }
@@ -795,7 +795,7 @@ M: x86 %and-vector-reps
         { sse2? { double-2-rep char-16-rep uchar-16-rep short-8-rep ushort-8-rep int-4-rep uint-4-rep longlong-2-rep ulonglong-2-rep } }
     } available-reps ;
 
-M: x86 %andn-vector ( dst src1 src2 rep -- )
+M: x86 %andn-vector
     [ two-operand ] keep
     {
         { float-4-rep [ ANDNPS ] }
@@ -809,7 +809,7 @@ M: x86 %andn-vector-reps
         { sse2? { double-2-rep char-16-rep uchar-16-rep short-8-rep ushort-8-rep int-4-rep uint-4-rep longlong-2-rep ulonglong-2-rep } }
     } available-reps ;
 
-M: x86 %or-vector ( dst src1 src2 rep -- )
+M: x86 %or-vector
     [ two-operand ] keep
     {
         { float-4-rep [ ORPS ] }
@@ -823,7 +823,7 @@ M: x86 %or-vector-reps
         { sse2? { double-2-rep char-16-rep uchar-16-rep short-8-rep ushort-8-rep int-4-rep uint-4-rep longlong-2-rep ulonglong-2-rep } }
     } available-reps ;
 
-M: x86 %xor-vector ( dst src1 src2 rep -- )
+M: x86 %xor-vector
     [ two-operand ] keep
     {
         { float-4-rep [ XORPS ] }
@@ -837,7 +837,7 @@ M: x86 %xor-vector-reps
         { sse2? { double-2-rep char-16-rep uchar-16-rep short-8-rep ushort-8-rep int-4-rep uint-4-rep longlong-2-rep ulonglong-2-rep } }
     } available-reps ;
 
-M: x86 %shl-vector ( dst src1 src2 rep -- )
+M: x86 %shl-vector
     [ two-operand ] keep
     {
         { short-8-rep [ PSLLW ] }
@@ -853,7 +853,7 @@ M: x86 %shl-vector-reps
         { sse2? { short-8-rep ushort-8-rep int-4-rep uint-4-rep longlong-2-rep ulonglong-2-rep } }
     } available-reps ;
 
-M: x86 %shr-vector ( dst src1 src2 rep -- )
+M: x86 %shr-vector
     [ two-operand ] keep
     {
         { short-8-rep [ PSRAW ] }
@@ -911,9 +911,9 @@ M: x86 %integer>scalar drop MOVD ;
         ] }
     } case ;
 
-M: x86.32 %scalar>integer ( dst src rep -- ) %scalar>integer-32 ;
+M: x86.32 %scalar>integer %scalar>integer-32 ;
 
-M: x86.64 %scalar>integer ( dst src rep -- )
+M: x86.64 %scalar>integer
     {
         { longlong-scalar-rep  [ MOVD ] }
         { ulonglong-scalar-rep [ MOVD ] }

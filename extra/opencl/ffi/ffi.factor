@@ -1,8 +1,7 @@
 ! Copyright (C) 2010 Erik Charlebois.
-! See http://factorcode.org/license.txt for BSD license.
-USING: alien alien.c-types alien.data alien.libraries alien.syntax
-classes.struct combinators system alien.accessors byte-arrays
-kernel ;
+! See https://factorcode.org/license.txt for BSD license.
+USING: alien alien.c-types alien.libraries alien.syntax
+classes.struct combinators system ;
 IN: opencl.ffi
 
 << "opencl" {
@@ -416,7 +415,7 @@ FUNCTION: cl_int clGetPlatformInfo ( cl_platform_id platform, cl_platform_info p
 FUNCTION: cl_int clGetDeviceIDs ( cl_platform_id platform, cl_device_type device_type, cl_uint num_entries, cl_device_id* devices, cl_uint* num_devices )
 FUNCTION: cl_int clGetDeviceInfo ( cl_device_id device, cl_device_info param_name, size_t param_value_size, void* param_value, size_t* param_value_size_ret )
 CALLBACK: void cl_create_context_cb ( char* a, void* b, size_t s, void* c )
-FUNCTION: cl_context clCreateContext ( cl_context_properties*  properties, cl_uint num_devices, cl_device_id* devices, cl_create_context_cb pfn_notify, void* user_data, cl_int* errcode_ret )
+FUNCTION: cl_context clCreateContext ( cl_context_properties* properties, cl_uint num_devices, cl_device_id* devices, cl_create_context_cb pfn_notify, void* user_data, cl_int* errcode_ret )
 FUNCTION: cl_context clCreateContextFromType ( cl_context_properties* properties, cl_device_type device_type, cl_create_context_cb pfn_notify, void* user_data, cl_int* errcode_ret )
 FUNCTION: cl_int clRetainContext ( cl_context context )
 FUNCTION: cl_int clReleaseContext ( cl_context context )
@@ -440,8 +439,8 @@ FUNCTION: cl_int clReleaseSampler ( cl_sampler sampler )
 FUNCTION: cl_int clGetSamplerInfo ( cl_sampler sampler, cl_sampler_info param_name, size_t param_value_size, void* param_value, size_t* param_value_size_ret )
 FUNCTION: cl_program clCreateProgramWithSource ( cl_context context, cl_uint count, char** strings, size_t* lengths, cl_int* errcode_ret )
 FUNCTION: cl_program clCreateProgramWithBinary ( cl_context context, cl_uint num_devices, cl_device_id* device_list, size_t* lengths, char** binaries, cl_int* binary_status, cl_int* errcode_ret )
-FUNCTION: cl_int clRetainProgram ( cl_program  program )
-FUNCTION: cl_int clReleaseProgram ( cl_program  program )
+FUNCTION: cl_int clRetainProgram ( cl_program program )
+FUNCTION: cl_int clReleaseProgram ( cl_program program )
 CALLBACK: void cl_build_program_cb ( cl_program program, void* user_data )
 FUNCTION: cl_int clBuildProgram ( cl_program program, cl_uint num_devices, cl_device_id* device_list, char* options, cl_build_program_cb pfn_notify, void* user_data )
 FUNCTION: cl_int clUnloadCompiler ( )
@@ -456,8 +455,8 @@ FUNCTION: cl_int clGetKernelInfo ( cl_kernel kernel, cl_kernel_info param_name, 
 FUNCTION: cl_int clGetKernelWorkGroupInfo ( cl_kernel kernel, cl_device_id device, cl_kernel_work_group_info param_name, size_t param_value_size, void* param_value, size_t* param_value_size_ret )
 FUNCTION: cl_int clWaitForEvents ( cl_uint num_events, cl_event* event_list )
 FUNCTION: cl_int clGetEventInfo ( cl_event event, cl_event_info param_name, size_t param_value_size, void* param_value, size_t* param_value_size_ret )
-FUNCTION: cl_int clRetainEvent ( cl_event  event )
-FUNCTION: cl_int clReleaseEvent ( cl_event  event )
+FUNCTION: cl_int clRetainEvent ( cl_event event )
+FUNCTION: cl_int clReleaseEvent ( cl_event event )
 FUNCTION: cl_int clGetEventProfilingInfo ( cl_event event, cl_profiling_info param_name, size_t param_value_size, void* param_value, size_t* param_value_size_ret )
 FUNCTION: cl_int clFlush ( cl_command_queue command_queue )
 FUNCTION: cl_int clFinish ( cl_command_queue command_queue )
@@ -468,11 +467,11 @@ FUNCTION: cl_int clEnqueueReadImage ( cl_command_queue command_queue, cl_mem ima
 FUNCTION: cl_int clEnqueueWriteImage ( cl_command_queue command_queue, cl_mem image, cl_bool blocking_write, size_t** origin, size_t** region, size_t input_row_pitch, size_t input_slice_pitch, void* ptr, cl_uint num_events_in_wait_list, cl_event* event_wait_list, cl_event* event )
 FUNCTION: cl_int clEnqueueCopyImage ( cl_command_queue command_queue, cl_mem src_image, cl_mem dst_image, size_t** src_origin, size_t** dst_origin, size_t** region, cl_uint num_events_in_wait_list, cl_event* event_wait_list, cl_event* event )
 FUNCTION: cl_int clEnqueueCopyImageToBuffer ( cl_command_queue command_queue, cl_mem src_image, cl_mem dst_buffer, size_t** src_origin, size_t** region, size_t dst_offset, cl_uint num_events_in_wait_list, cl_event* event_wait_list, cl_event* event )
-FUNCTION: cl_int clEnqueueCopyBufferToImage ( cl_command_queue  command_queue, cl_mem src_buffer, cl_mem dst_image, size_t src_offset, size_t** dst_origin, size_t** region, cl_uint num_events_in_wait_list, cl_event* event_wait_list, cl_event* event )
-FUNCTION: void* clEnqueueMapBuffer ( cl_command_queue  command_queue, cl_mem buffer, cl_bool blocking_map, cl_map_flags map_flags, size_t offset, size_t cb, cl_uint num_events_in_wait_list, cl_event* event_wait_list, cl_event* event, cl_int* errcode_ret )
+FUNCTION: cl_int clEnqueueCopyBufferToImage ( cl_command_queue command_queue, cl_mem src_buffer, cl_mem dst_image, size_t src_offset, size_t** dst_origin, size_t** region, cl_uint num_events_in_wait_list, cl_event* event_wait_list, cl_event* event )
+FUNCTION: void* clEnqueueMapBuffer ( cl_command_queue command_queue, cl_mem buffer, cl_bool blocking_map, cl_map_flags map_flags, size_t offset, size_t cb, cl_uint num_events_in_wait_list, cl_event* event_wait_list, cl_event* event, cl_int* errcode_ret )
 FUNCTION: void* clEnqueueMapImage ( cl_command_queue command_queue, cl_mem image, cl_bool blocking_map, cl_map_flags map_flags, size_t** origin, size_t** region, size_t* image_row_pitch, size_t* image_slice_pitch, cl_uint num_events_in_wait_list, cl_event* event_wait_list, cl_event* event, cl_int* errcode_ret )
-FUNCTION: cl_int clEnqueueUnmapMemObject ( cl_command_queue  command_queue, cl_mem memobj, void* mapped_ptr, cl_uint num_events_in_wait_list, cl_event* event_wait_list, cl_event* event )
-FUNCTION: cl_int clEnqueueNDRangeKernel ( cl_command_queue command_queue, cl_kernel kernel, cl_uint work_dim, size_t* global_work_offset, size_t* global_work_size, size_t* local_work_size, cl_uint num_events_in_wait_list, cl_event*  event_wait_list, cl_event* event )
+FUNCTION: cl_int clEnqueueUnmapMemObject ( cl_command_queue command_queue, cl_mem memobj, void* mapped_ptr, cl_uint num_events_in_wait_list, cl_event* event_wait_list, cl_event* event )
+FUNCTION: cl_int clEnqueueNDRangeKernel ( cl_command_queue command_queue, cl_kernel kernel, cl_uint work_dim, size_t* global_work_offset, size_t* global_work_size, size_t* local_work_size, cl_uint num_events_in_wait_list, cl_event* event_wait_list, cl_event* event )
 CALLBACK: void cl_enqueue_task_cb ( void* args )
 FUNCTION: cl_int clEnqueueTask ( cl_command_queue command_queue, cl_kernel kernel, cl_uint num_events_in_wait_list, cl_event* event_wait_list, cl_event* event )
 FUNCTION: cl_int clEnqueueNativeKernel ( cl_command_queue command_queue, cl_enqueue_task_cb user_func, void* args, size_t cb_args, cl_uint num_mem_objects, cl_mem* mem_list, void** args_mem_loc, cl_uint num_events_in_wait_list, cl_event* event_wait_list, cl_event* event )

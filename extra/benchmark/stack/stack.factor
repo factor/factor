@@ -1,4 +1,4 @@
-USING: kernel sequences math math.functions vectors ;
+USING: kernel sequences math vectors ;
 IN: benchmark.stack
 
 : stack-loop ( vec -- )

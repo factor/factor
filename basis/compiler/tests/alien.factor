@@ -2,7 +2,7 @@ USING: accessors alien alien.c-types alien.complex alien.data alien.libraries
 alien.syntax arrays byte-arrays classes classes.struct combinators
 combinators.extras compiler compiler.test concurrency.promises continuations
 destructors effects generalizations io io.backend io.pathnames
-io.streams.string kernel kernel.private libc layouts math math.bitwise
+io.streams.string kernel kernel.private libc layouts locals math math.bitwise
 math.private memory namespaces namespaces.private random parser quotations
 sequences slots.private specialized-arrays stack-checker stack-checker.errors
 system threads tools.test words ;
@@ -39,28 +39,28 @@ IN: compiler.tests.alien
 LIBRARY: f-cdecl
 
 FUNCTION: void ffi_test_0 ( )
-[ ] [ ffi_test_0 ] unit-test
+{ } [ ffi_test_0 ] unit-test
 
 FUNCTION: int ffi_test_1 ( )
-[ 3 ] [ ffi_test_1 ] unit-test
+{ 3 } [ ffi_test_1 ] unit-test
 
-[ ] [ \ ffi_test_1 def>> [ drop ] append compile-call ] unit-test
+{ } [ \ ffi_test_1 def>> [ drop ] append compile-call ] unit-test
 
 FUNCTION: int ffi_test_2 ( int x, int y )
-[ 5 ] [ 2 3 ffi_test_2 ] unit-test
+{ 5 } [ 2 3 ffi_test_2 ] unit-test
 [ "hi" 3 ffi_test_2 ] must-fail
 
 FUNCTION: int ffi_test_3 ( int x, int y, int z, int t )
-[ 25 ] [ 2 3 4 5 ffi_test_3 ] unit-test
+{ 25 } [ 2 3 4 5 ffi_test_3 ] unit-test
 
 FUNCTION: float ffi_test_4 ( )
-[ 1.5 ] [ ffi_test_4 ] unit-test
+{ 1.5 } [ ffi_test_4 ] unit-test
 
 FUNCTION: double ffi_test_5 ( )
-[ 1.5 ] [ ffi_test_5 ] unit-test
+{ 1.5 } [ ffi_test_5 ] unit-test
 
 FUNCTION: int ffi_test_9 ( int a, int b, int c, int d, int e, int f, int g )
-[ 28 ] [ 1 2 3 4 5 6 7 ffi_test_9 ] unit-test
+{ 28 } [ 1 2 3 4 5 6 7 ffi_test_9 ] unit-test
 [ "a" 2 3 4 5 6 7 ffi_test_9 ] must-fail
 [ 1 2 3 4 5 6 "a" ffi_test_9 ] must-fail
 
@@ -71,27 +71,27 @@ STRUCT: FOO { x int } { y int } ;
 
 FUNCTION: int ffi_test_11 ( int a, FOO b, int c )
 
-[ 14 ] [ 1 2 3 make-FOO 4 ffi_test_11 ] unit-test
+{ 14 } [ 1 2 3 make-FOO 4 ffi_test_11 ] unit-test
 
 FUNCTION: int ffi_test_13 ( int a, int b, int c, int d, int e, int f, int g, int h, int i, int j, int k )
 
-[ 66 ] [ 1 2 3 4 5 6 7 8 9 10 11 ffi_test_13 ] unit-test
+{ 66 } [ 1 2 3 4 5 6 7 8 9 10 11 ffi_test_13 ] unit-test
 
 FUNCTION: FOO ffi_test_14 ( int x, int y )
 
-[ 11 6 ] [ 11 6 ffi_test_14 [ x>> ] [ y>> ] bi ] unit-test
+{ 11 6 } [ 11 6 ffi_test_14 [ x>> ] [ y>> ] bi ] unit-test
 
 FUNCTION: c-string ffi_test_15 ( c-string x, c-string y )
 
-[ "foo" ] [ "xy" "zt" ffi_test_15 ] unit-test
-[ "bar" ] [ "xy" "xy" ffi_test_15 ] unit-test
+{ "foo" } [ "xy" "zt" ffi_test_15 ] unit-test
+{ "bar" } [ "xy" "xy" ffi_test_15 ] unit-test
 [ 1 2 ffi_test_15 ] must-fail
 
 STRUCT: BAR { x long } { y long } { z long } ;
 
 FUNCTION: BAR ffi_test_16 ( long x, long y, long z )
 
-[ 11 6 -7 ] [
+{ 11 6 -7 } [
     11 6 -7 ffi_test_16 [ x>> ] [ y>> ] [ z>> ] tri
 ] unit-test
 
@@ -99,7 +99,7 @@ STRUCT: TINY { x int } ;
 
 FUNCTION: TINY ffi_test_17 ( int x )
 
-[ 11 ] [ 11 ffi_test_17 x>> ] unit-test
+{ 11 } [ 11 ffi_test_17 x>> ] unit-test
 
 [ [ alien-indirect ] infer ] [ inference-error? ] must-fail-with
 
@@ -108,14 +108,14 @@ FUNCTION: TINY ffi_test_17 ( int x )
 
 { 1 1 } [ indirect-test-1 ] must-infer-as
 
-[ 3 ] [ &: ffi_test_1 indirect-test-1 ] unit-test
+{ 3 } [ &: ffi_test_1 indirect-test-1 ] unit-test
 
 : indirect-test-1' ( ptr -- )
     int { } cdecl alien-indirect drop ;
 
 { 1 0 } [ indirect-test-1' ] must-infer-as
 
-[ ] [ &: ffi_test_1 indirect-test-1' ] unit-test
+{ } [ &: ffi_test_1 indirect-test-1' ] unit-test
 
 [ -1 indirect-test-1 ] must-fail
 
@@ -124,28 +124,26 @@ FUNCTION: TINY ffi_test_17 ( int x )
 
 { 3 1 } [ indirect-test-2 ] must-infer-as
 
-[ 5 ]
-[ 2 3 &: ffi_test_2 indirect-test-2 ]
-unit-test
+{ 5 } [ 2 3 &: ffi_test_2 indirect-test-2 ] unit-test
 
 : indirect-test-3 ( a b c d ptr -- result )
     int { int int int int } stdcall alien-indirect
     gc ;
 
-[ f ] [ "f-stdcall" library-dll f = ] unit-test
-[ stdcall ] [ "f-stdcall" lookup-library abi>> ] unit-test
+{ f } [ "f-stdcall" library-dll f = ] unit-test
+{ stdcall } [ "f-stdcall" lookup-library abi>> ] unit-test
 
 : ffi_test_18 ( w x y z -- int )
     int "f-stdcall" "ffi_test_18" { int int int int } f
     alien-invoke gc ;
 
-[ 25 ] [ 2 3 4 5 ffi_test_18 ] unit-test
+{ 25 } [ 2 3 4 5 ffi_test_18 ] unit-test
 
 : ffi_test_19 ( x y z -- BAR )
     BAR "f-stdcall" "ffi_test_19" { long long long } f
     alien-invoke gc ;
 
-[ 11 6 -7 ] [
+{ 11 6 -7 } [
     11 6 -7 ffi_test_19 [ x>> ] [ y>> ] [ z>> ] tri
 ] unit-test
 
@@ -155,26 +153,26 @@ unit-test
     int "f-stdcall" "ffi_test_18" { int int int int } f alien-invoke
     gc ;
 
-[ 25 85 ] [ 2 3 4 5 6 7 8 9 multi_ffi_test_18 ] unit-test
+{ 25 85 } [ 2 3 4 5 6 7 8 9 multi_ffi_test_18 ] unit-test
 
 FUNCTION: double ffi_test_6 ( float x, float y )
-[ 6.0 ] [ 3.0 2.0 ffi_test_6 ] unit-test
+{ 6.0 } [ 3.0 2.0 ffi_test_6 ] unit-test
 [ "a" "b" ffi_test_6 ] must-fail
 
 FUNCTION: double ffi_test_7 ( double x, double y )
-[ 6.0 ] [ 3.0 2.0 ffi_test_7 ] unit-test
+{ 6.0 } [ 3.0 2.0 ffi_test_7 ] unit-test
 
 FUNCTION: double ffi_test_8 ( double x, float y, double z, float t, int w )
-[ 19.0 ] [ 3.0 2.0 1.0 6.0 7 ffi_test_8 ] unit-test
+{ 19.0 } [ 3.0 2.0 1.0 6.0 7 ffi_test_8 ] unit-test
 
 FUNCTION: int ffi_test_10 ( int a, int b, double c, int d, float e, int f, int g, int h )
-[ -34 ] [ 1 2 3.0 4 5.0 6 7 8 ffi_test_10 ] unit-test
+{ -34 } [ 1 2 3.0 4 5.0 6 7 8 ffi_test_10 ] unit-test
 
 FUNCTION: void ffi_test_20 ( double x1, double x2, double x3,
     double y1, double y2, double y3,
     double z1, double z2, double z3 )
 
-[ ] [ 1.0 2.0 3.0 4.0 5.0 6.0 7.0 8.0 9.0 ffi_test_20 ] unit-test
+{ } [ 1.0 2.0 3.0 4.0 5.0 6.0 7.0 8.0 9.0 ffi_test_20 ] unit-test
 
 ! Make sure XT doesn't get clobbered in stack frame
 
@@ -184,7 +182,7 @@ FUNCTION: void ffi_test_20 ( double x1, double x2, double x3,
     { int int int int int int int int int int int int int int int int int int int int int int int int int int int int int int int int int int int int int int int int int int } f
     alien-invoke gc 3 ;
 
-[ 861 3 ] [ 42 [ ] each-integer ffi_test_31 ] unit-test
+{ 861 3 } [ 42 [ ] each-integer ffi_test_31 ] unit-test
 
 : ffi_test_31_point_5 ( a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a -- result )
     float
@@ -192,17 +190,15 @@ FUNCTION: void ffi_test_20 ( double x1, double x2, double x3,
     { float float float float float float float float float float float float float float float float float float float float float float float float float float float float float float float float float float float float float float float float float float } f
     alien-invoke ;
 
-[ 861.0 ] [ 42 [ >float ] each-integer ffi_test_31_point_5 ] unit-test
+{ 861.0 } [ 42 [ >float ] each-integer ffi_test_31_point_5 ] unit-test
 
 FUNCTION: longlong ffi_test_21 ( long x, long y )
 
-[ 121932631112635269 ]
-[ 123456789 987654321 ffi_test_21 ] unit-test
+{ 121932631112635269 } [ 123456789 987654321 ffi_test_21 ] unit-test
 
 FUNCTION: long ffi_test_22 ( long x, longlong y, longlong z )
 
-[ 987655432 ]
-[ 1111 121932631112635269 123456789 ffi_test_22 ] unit-test
+{ 987655432 } [ 1111 121932631112635269 123456789 ffi_test_22 ] unit-test
 
 [ 1111 f 123456789 ffi_test_22 ] must-fail
 
@@ -219,13 +215,13 @@ STRUCT: RECT
 
 FUNCTION: int ffi_test_12 ( int a, int b, RECT c, int d, int e, int f )
 
-[ 45 ] [ 1 2 3.0 4.0 5.0 6.0 <RECT> 7 8 9 ffi_test_12 ] unit-test
+{ 45 } [ 1 2 3.0 4.0 5.0 6.0 <RECT> 7 8 9 ffi_test_12 ] unit-test
 
 [ 1 2 { 1 2 3 } 7 8 9 ffi_test_12 ] must-fail
 
 FUNCTION: float ffi_test_23 ( float[3] x, float[3] y )
 
-[ 32.0 ] [
+{ 32.0 } [
     { 1.0 2.0 3.0 } float >c-array
     { 4.0 5.0 6.0 } float >c-array
     ffi_test_23
@@ -236,49 +232,49 @@ STRUCT: test-struct-1 { x char[1] } ;
 
 FUNCTION: test-struct-1 ffi_test_24 ( )
 
-[ S{ test-struct-1 { x char-array{ 1 } } } ] [ ffi_test_24 ] unit-test
+{ S{ test-struct-1 { x char-array{ 1 } } } } [ ffi_test_24 ] unit-test
 
 STRUCT: test-struct-2 { x char[2] } ;
 
 FUNCTION: test-struct-2 ffi_test_25 ( )
 
-[ S{ test-struct-2 { x char-array{ 1 2 } } } ] [ ffi_test_25 ] unit-test
+{ S{ test-struct-2 { x char-array{ 1 2 } } } } [ ffi_test_25 ] unit-test
 
 STRUCT: test-struct-3 { x char[3] } ;
 
 FUNCTION: test-struct-3 ffi_test_26 ( )
 
-[ S{ test-struct-3 { x char-array{ 1 2 3 } } } ] [ ffi_test_26 ] unit-test
+{ S{ test-struct-3 { x char-array{ 1 2 3 } } } } [ ffi_test_26 ] unit-test
 
 STRUCT: test-struct-4 { x char[4] } ;
 
 FUNCTION: test-struct-4 ffi_test_27 ( )
 
-[ S{ test-struct-4 { x char-array{ 1 2 3 4 } } } ] [ ffi_test_27 ] unit-test
+{ S{ test-struct-4 { x char-array{ 1 2 3 4 } } } } [ ffi_test_27 ] unit-test
 
 STRUCT: test-struct-5 { x char[5] } ;
 
 FUNCTION: test-struct-5 ffi_test_28 ( )
 
-[ S{ test-struct-5 { x char-array{ 1 2 3 4 5 } } } ] [ ffi_test_28 ] unit-test
+{ S{ test-struct-5 { x char-array{ 1 2 3 4 5 } } } } [ ffi_test_28 ] unit-test
 
 STRUCT: test-struct-6 { x char[6] } ;
 
 FUNCTION: test-struct-6 ffi_test_29 ( )
 
-[ S{ test-struct-6 { x char-array{ 1 2 3 4 5 6 } } } ] [ ffi_test_29 ] unit-test
+{ S{ test-struct-6 { x char-array{ 1 2 3 4 5 6 } } } } [ ffi_test_29 ] unit-test
 
 STRUCT: test-struct-7 { x char[7] } ;
 
 FUNCTION: test-struct-7 ffi_test_30 ( )
 
-[ S{ test-struct-7 { x char-array{ 1 2 3 4 5 6 7 } } } ] [ ffi_test_30 ] unit-test
+{ S{ test-struct-7 { x char-array{ 1 2 3 4 5 6 7 } } } } [ ffi_test_30 ] unit-test
 
 STRUCT: test-struct-8 { x double } { y double } ;
 
 FUNCTION: double ffi_test_32 ( test-struct-8 x, int y )
 
-[ 9.0 ] [
+{ 9.0 } [
     test-struct-8 <struct>
     1.0 >>x
     2.0 >>y
@@ -289,7 +285,7 @@ STRUCT: test-struct-9 { x float } { y float } ;
 
 FUNCTION: double ffi_test_33 ( test-struct-9 x, int y )
 
-[ 9.0 ] [
+{ 9.0 } [
     test-struct-9 <struct>
     1.0 >>x
     2.0 >>y
@@ -300,7 +296,7 @@ STRUCT: test-struct-10 { x float } { y int } ;
 
 FUNCTION: double ffi_test_34 ( test-struct-10 x, int y )
 
-[ 9.0 ] [
+{ 9.0 } [
     test-struct-10 <struct>
     1.0 >>x
     2 >>y
@@ -311,7 +307,7 @@ STRUCT: test-struct-11 { x int } { y int } ;
 
 FUNCTION: double ffi_test_35 ( test-struct-11 x, int y )
 
-[ 9.0 ] [
+{ 9.0 } [
     test-struct-11 <struct>
     1 >>x
     2 >>y
@@ -326,11 +322,11 @@ STRUCT: test-struct-12 { a int } { x double } ;
 
 FUNCTION: double ffi_test_36 ( test-struct-12 x )
 
-[ 1.23456 ] [ 1.23456 make-struct-12 ffi_test_36 ] unit-test
+{ 1.23456 } [ 1.23456 make-struct-12 ffi_test_36 ] unit-test
 
 FUNCTION: ulonglong ffi_test_38 ( ulonglong x, ulonglong y )
 
-[ t ] [ 31 2^ 32 2^ ffi_test_38 63 2^ = ] unit-test
+{ t } [ 31 2^ 32 2^ ffi_test_38 63 2^ = ] unit-test
 
 ! Test callbacks
 : callback-throws ( -- x )
@@ -342,7 +338,7 @@ FUNCTION: ulonglong ffi_test_38 ( ulonglong x, ulonglong y )
 
 : callback-1 ( -- callback ) void { } cdecl [ ] alien-callback ;
 
-[ 0 1 ] [ [ callback-1 ] infer [ in>> length ] [ out>> length ] bi ] unit-test
+{ 0 1 } [ [ callback-1 ] infer [ in>> length ] [ out>> length ] bi ] unit-test
 
 { t } [ callback-1 [ alien? ] with-callback ] unit-test
 
@@ -375,28 +371,28 @@ FUNCTION: ulonglong ffi_test_38 ( ulonglong x, ulonglong y )
 : callback-5b ( -- callback )
     void { } cdecl [ compact-gc ] alien-callback ;
 
-[ "testing" ] [
+{ "testing" } [
     "testing" callback-5b [ callback_test_1 ] with-callback
 ] unit-test
 
 : callback-6 ( -- callback )
     void { } cdecl [ [ continue ] callcc0 ] alien-callback ;
 
-[ 1 2 3 ] [
+{ 1 2 3 } [
     callback-6 [ callback_test_1 1 2 3 ] with-callback
 ] unit-test
 
 : callback-7 ( -- callback )
     void { } cdecl [ 1000000 sleep ] alien-callback ;
 
-[ 1 2 3 ] [ callback-7 [ callback_test_1 1 2 3 ] with-callback ] unit-test
+{ 1 2 3 } [ callback-7 [ callback_test_1 1 2 3 ] with-callback ] unit-test
 
-[ f ] [ namespace global eq? ] unit-test
+{ f } [ namespace global eq? ] unit-test
 
 : callback-8 ( -- callback )
     void { } cdecl [ [ ] in-thread yield ] alien-callback ;
 
-[ ] [ callback-8 [ callback_test_1 ] with-callback ] unit-test
+{ } [ callback-8 [ callback_test_1 ] with-callback ] unit-test
 
 : callback-9 ( -- callback )
     int { int int int } cdecl [
@@ -405,13 +401,13 @@ FUNCTION: ulonglong ffi_test_38 ( ulonglong x, ulonglong y )
 
 FUNCTION: void ffi_test_36_point_5 ( )
 
-[ ] [ ffi_test_36_point_5 ] unit-test
+{ } [ ffi_test_36_point_5 ] unit-test
 
 FUNCTION: int ffi_test_37 ( void* func )
 
-[ 1 ] [ callback-9 [ ffi_test_37 ] with-callback ] unit-test
+{ 1 } [ callback-9 [ ffi_test_37 ] with-callback ] unit-test
 
-[ 7 ] [ callback-9 [ ffi_test_37 ] with-callback ] unit-test
+{ 7 } [ callback-9 [ ffi_test_37 ] with-callback ] unit-test
 
 STRUCT: test_struct_13
     { x1 float }
@@ -432,7 +428,7 @@ STRUCT: test_struct_13
 
 FUNCTION: int ffi_test_39 ( long a, long b, test_struct_13 s )
 
-[ 21 ] [ 12347 12347 make-test-struct-13 ffi_test_39 ] unit-test
+{ 21 } [ 12347 12347 make-test-struct-13 ffi_test_39 ] unit-test
 
 ! Joe Groff found this problem
 STRUCT: double-rect
@@ -479,7 +475,7 @@ STRUCT: test_struct_14
 
 FUNCTION: test_struct_14 ffi_test_40 ( double x1, double x2 )
 
-[ 1.0 2.0 ] [
+{ 1.0 2.0 } [
     1.0 2.0 ffi_test_40 [ x1>> ] [ x2>> ] bi
 ] unit-test
 
@@ -502,7 +498,7 @@ FUNCTION: test_struct_14 ffi_test_40 ( double x1, double x2 )
 
 FUNCTION: test-struct-12 ffi_test_41 ( int a, double x )
 
-[ 1 2.0 ] [
+{ 1 2.0 } [
     1 2.0 ffi_test_41
     [ a>> ] [ x>> ] bi
 ] unit-test
@@ -530,7 +526,7 @@ STRUCT: test_struct_15
 
 FUNCTION: test_struct_15 ffi_test_42 ( float x, float y )
 
-[ 1.0 2.0 ] [ 1.0 2.0 ffi_test_42 [ x>> ] [ y>> ] bi ] unit-test
+{ 1.0 2.0 } [ 1.0 2.0 ffi_test_42 [ x>> ] [ y>> ] bi ] unit-test
 
 : callback-12 ( -- callback )
     test_struct_15 { float float } cdecl
@@ -543,7 +539,7 @@ FUNCTION: test_struct_15 ffi_test_42 ( float x, float y )
 : callback-12-test ( x1 x2 callback -- result )
     test_struct_15 { float float } cdecl alien-indirect ;
 
-[ 1.0 2.0 ] [
+{ 1.0 2.0 } [
     1.0 2.0 callback-12 [
         callback-12-test [ x>> ] [ y>> ] bi
     ] with-callback
@@ -555,7 +551,7 @@ STRUCT: test_struct_16
 
 FUNCTION: test_struct_16 ffi_test_43 ( float x, int a )
 
-[ 1.0 2 ] [ 1.0 2 ffi_test_43 [ x>> ] [ a>> ] bi ] unit-test
+{ 1.0 2 } [ 1.0 2 ffi_test_43 [ x>> ] [ a>> ] bi ] unit-test
 
 : callback-13 ( -- callback )
     test_struct_16 { float int } cdecl
@@ -576,26 +572,26 @@ FUNCTION: test_struct_16 ffi_test_43 ( float x, int a )
 
 FUNCTION: test_struct_14 ffi_test_44 ( ) inline
 
-[ 1.0 2.0 ] [ ffi_test_44 [ x1>> ] [ x2>> ] bi ] unit-test
+{ 1.0 2.0 } [ ffi_test_44 [ x1>> ] [ x2>> ] bi ] unit-test
 
 : stack-frame-bustage ( -- a b ) ffi_test_44 gc 3 ;
 
-[ ] [ stack-frame-bustage 2drop ] unit-test
+[ stack-frame-bustage ] must-not-fail
 
 ! C99 tests
 os windows? [
 
     FUNCTION: complex-float ffi_test_45 ( int x )
 
-    [ C{ 3.0 0.0 } ] [ 3 ffi_test_45 ] unit-test
+    { C{ 3.0 0.0 } } [ 3 ffi_test_45 ] unit-test
 
     FUNCTION: complex-double ffi_test_46 ( int x )
 
-    [ C{ 3.0 0.0 } ] [ 3 ffi_test_46 ] unit-test
+    { C{ 3.0 0.0 } } [ 3 ffi_test_46 ] unit-test
 
     FUNCTION: complex-float ffi_test_47 ( complex-float x, complex-double y )
 
-    [ C{ 4.0 4.0 } ] [
+    { C{ 4.0 4.0 } } [
         C{ 1.0 2.0 }
         C{ 1.5 1.0 } ffi_test_47
     ] unit-test
@@ -608,7 +604,7 @@ os windows? [
 
     FUNCTION: short ffi_test_48 ( bool-field-test x )
 
-    [ 123 ] [
+    { 123 } [
         bool-field-test <struct>
             123 >>parents
         ffi_test_48
@@ -635,15 +631,15 @@ os windows? [
 { 200 } [
     thread-callback-2 [ thread-callback-invoker ] with-callback
 ] unit-test
-[ 100 ] [ "p" get ?promise ] unit-test
+{ 100 } [ "p" get ?promise ] unit-test
 
 ! More alien-assembly tests are in cpu.* vocabs
 : assembly-test-1 ( -- ) void { } cdecl [ ] alien-assembly ;
 
-[ ] [ assembly-test-1 ] unit-test
+{ } [ assembly-test-1 ] unit-test
 
-[ f ] [ "f-fastcall" library-dll f = ] unit-test
-[ fastcall ] [ "f-fastcall" lookup-library abi>> ] unit-test
+{ f } [ "f-fastcall" library-dll f = ] unit-test
+{ fastcall } [ "f-fastcall" lookup-library abi>> ] unit-test
 
 : ffi_test_49 ( x -- int )
     int "f-fastcall" "ffi_test_49" { int } f
@@ -659,10 +655,10 @@ os windows? [
     3dip
     int "f-fastcall" "ffi_test_51" { int int int } f alien-invoke gc ;
 
-[ 4 ] [ 3 ffi_test_49 ] unit-test
-[ 8 ] [ 3 4 ffi_test_50 ] unit-test
-[ 13 ] [ 3 4 5 ffi_test_51 ] unit-test
-[ 13 22 ] [ 3 4 5 6 7 8 multi_ffi_test_51 ] unit-test
+{ 4 } [ 3 ffi_test_49 ] unit-test
+{ 8 } [ 3 4 ffi_test_50 ] unit-test
+{ 13 } [ 3 4 5 ffi_test_51 ] unit-test
+{ 13 22 } [ 3 4 5 6 7 8 multi_ffi_test_51 ] unit-test
 
 : ffi_test_52 ( x y z -- int )
     int "f-fastcall" "ffi_test_52" { int float int } f
@@ -681,24 +677,24 @@ os windows? [
 FUNCTION: longlong ffi_test_59 ( longlong x )
 FUNCTION: ulonglong ffi_test_60 ( ulonglong x )
 
-[ t ] [ most-positive-fixnum 1 + [ ffi_test_59 ] keep = ] unit-test
-[ t ] [ most-positive-fixnum 1 + [ ffi_test_60 ] keep = ] unit-test
+{ t } [ most-positive-fixnum 1 + [ ffi_test_59 ] keep = ] unit-test
+{ t } [ most-positive-fixnum 1 + [ ffi_test_60 ] keep = ] unit-test
 
-[ -1 ] [ -1 ffi_test_59 ] unit-test
-[ -1 ] [ 0xffffffffffffffff ffi_test_59 ] unit-test
-[ 0xffffffffffffffff ] [ -1 ffi_test_60 ] unit-test
-[ 0xffffffffffffffff ] [ 0xffffffffffffffff ffi_test_60 ] unit-test
+{ -1 } [ -1 ffi_test_59 ] unit-test
+{ -1 } [ 0xffffffffffffffff ffi_test_59 ] unit-test
+{ 0xffffffffffffffff } [ -1 ffi_test_60 ] unit-test
+{ 0xffffffffffffffff } [ 0xffffffffffffffff ffi_test_60 ] unit-test
 
 ! GCC bugs
 mingw? [
-    [ 13 ] [ 3 4.0 5 ffi_test_52 ] unit-test
+    { 13 } [ 3 4.0 5 ffi_test_52 ] unit-test
 
-    [ 19 ] [ 3 4.0 5 6 ffi_test_53 ] unit-test
+    { 19 } [ 3 4.0 5 6 ffi_test_53 ] unit-test
 ] unless
 
-[ S{ test-struct-11 f 7 -1 } ] [ 3 4 ffi_test_57 ] unit-test
+{ S{ test-struct-11 f 7 -1 } } [ 3 4 ffi_test_57 ] unit-test
 
-[ S{ test-struct-11 f 7 -3 } ] [ 3 4 7 ffi_test_58 ] unit-test
+{ S{ test-struct-11 f 7 -3 } } [ 3 4 7 ffi_test_58 ] unit-test
 
 : fastcall-ii-indirect ( x y ptr -- result )
     int { int int } fastcall alien-indirect ;
@@ -718,31 +714,29 @@ mingw? [
 : fastcall-struct-return-iii-indirect ( x y z ptr -- result )
     test-struct-11 { int int int } fastcall alien-indirect ;
 
-[ 8 ] [
+{ 8 } [
     3 4 &: ffi_test_50 fastcall-ii-indirect
 ] unit-test
 
-[ 13 ] [
+{ 13 } [
     3 4 5 &: ffi_test_51 fastcall-iii-indirect
 ] unit-test
 
 mingw? [
-    [ 13 ] [
+    { 13 } [
         3 4.0 5 &: ffi_test_52 fastcall-ifi-indirect
     ] unit-test
 
-    [ 19 ] [
+    { 19 } [
         3 4.0 5 6 &: ffi_test_53 fastcall-ifii-indirect
     ] unit-test
 ] unless
 
-[ S{ test-struct-11 f 7 -1 } ]
-[
+{ S{ test-struct-11 f 7 -1 } } [
     3 4 &: ffi_test_57 fastcall-struct-return-ii-indirect
 ] unit-test
 
-[ S{ test-struct-11 f 7 -3 } ]
-[
+{ S{ test-struct-11 f 7 -3 } } [
     3 4 7 &: ffi_test_58 fastcall-struct-return-iii-indirect
 ] unit-test
 
@@ -762,35 +756,35 @@ mingw? [
 
 : fastcall-struct-return-ii-callback ( -- ptr )
     test-struct-11 { int int } fastcall
-    [ [ + ] [ - ] 2bi test-struct-11 <struct-boa> ] alien-callback ;
+    [ [ + ] [ - ] 2bi test-struct-11 boa ] alien-callback ;
 
 : fastcall-struct-return-iii-callback ( -- ptr )
     test-struct-11 { int int int } fastcall
-    [ [ drop + ] [ - nip ] 3bi test-struct-11 <struct-boa> ] alien-callback ;
+    [ [ drop + ] [ - nip ] 3bi test-struct-11 boa ] alien-callback ;
 
 { 8 } [
     3 4 fastcall-ii-callback [ fastcall-ii-indirect ] with-callback
 ] unit-test
 
-[ 13 ] [
+{ 13 } [
     3 4 5 fastcall-iii-callback [ fastcall-iii-indirect ] with-callback
 ] unit-test
 
-[ 13 ] [
+{ 13 } [
     3 4.0 5 fastcall-ifi-callback [ fastcall-ifi-indirect ] with-callback
 ] unit-test
 
-[ 19 ] [
+{ 19 } [
     3 4.0 5 6 fastcall-ifii-callback [ fastcall-ifii-indirect ] with-callback
 ] unit-test
 
-[ S{ test-struct-11 f 7 -1 } ] [
+{ S{ test-struct-11 f 7 -1 } } [
     3 4 fastcall-struct-return-ii-callback [
         fastcall-struct-return-ii-indirect
     ] with-callback
 ] unit-test
 
-[ S{ test-struct-11 f 7 -3 } ] [
+{ S{ test-struct-11 f 7 -3 } } [
     3 4 7 fastcall-struct-return-iii-callback [
         fastcall-struct-return-iii-indirect
     ] with-callback
@@ -802,7 +796,7 @@ mingw? [
 : x64-regression-2 ( x x x x x c -- y )
     int { int int int int int } cdecl alien-indirect ; inline
 
-[ 661 ] [
+{ 661 } [
     100 500 50 10 1 x64-regression-1 [ x64-regression-2 ] with-callback
 ] unit-test
 
@@ -811,24 +805,24 @@ mingw? [
     1.5 >>x 2.0 >>y [ x>> ] [ y>> ] bi * >fixnum
 ] with-scoped-allocation ;
 
-[ 3 ] [ blah ] unit-test
+{ 3 } [ blah ] unit-test
 
 : out-param-test-1 ( -- b )
     { int } [ [ 12 ] dip 0 int set-alien-value ] with-out-parameters ;
 
-[ 12 ] [ out-param-test-1 ] unit-test
+{ 12 } [ out-param-test-1 ] unit-test
 
 : out-param-test-2 ( -- b )
     { { int initial: 12 } } [ drop ] with-out-parameters ;
 
-[ 12 ] [ out-param-test-2 ] unit-test
+{ 12 } [ out-param-test-2 ] unit-test
 
 : out-param-test-3 ( -- x y )
     { { RECT initial: S{ RECT { x 3 } { y 4 } } } } [ drop ]
     with-out-parameters
     [ x>> ] [ y>> ] bi ;
 
-[ 3.0 4.0 ] [ out-param-test-3 ] unit-test
+{ 3.0 4.0 } [ out-param-test-3 ] unit-test
 
 : out-param-callback ( -- a )
     void { int pointer: int } cdecl
@@ -840,7 +834,7 @@ mingw? [
         alien-indirect
     ] with-out-parameters ;
 
-[ 12 ] [
+{ 12 } [
     6 out-param-callback [ out-param-indirect ] with-callback
 ] unit-test
 
@@ -853,7 +847,7 @@ mingw? [
 
 TUPLE: some-tuple x ;
 
-[ T{ some-tuple f 5.0 } ] [
+{ T{ some-tuple f 5.0 } } [
     [
         some-tuple new
         aa-callback-1 [
@@ -866,7 +860,7 @@ TUPLE: some-tuple x ;
 : anton's-regression ( -- )
     f (free) f (free) ;
 
-[ ] [ anton's-regression ] unit-test
+{ } [ anton's-regression ] unit-test
 
 os windows? [
 
@@ -962,4 +956,118 @@ FUNCTION: void* bug1021_test_3 ( c-string a )
 
 { } [
     10000 [ 0 doit 33 assert= ] times
+] unit-test
+
+! Tests for System V AMD64 ABI 
+STRUCT: test_struct_66 { mem1 ulong } { mem2 ulong } ;
+STRUCT: test_struct_68 { mem1 ulong } { mem2 ulong } { mem3 ulong } ;
+STRUCT: test_struct_69 { mem1 float } { mem2 ulong } { mem3 ulong } ;
+FUNCTION: ulong ffi_test_66 ( ulong a, ulong b, ulong c, test_struct_66 d, test_struct_66 e )
+FUNCTION: ulong ffi_test_67 ( ulong a, ulong b, ulong c, test_struct_66 d, test_struct_66 e ulong _f )
+FUNCTION: ulong ffi_test_68 ( ulong a, ulong b, ulong c, test_struct_66 d, test_struct_68 e test_struct_66 _f )
+FUNCTION: ulong ffi_test_69 ( ulong a, ulong b, ulong c, test_struct_66 d, test_struct_69 e test_struct_66 _f )
+FUNCTION: ulong ffi_test_70 ( test_struct_68 a test_struct_68 b, test_struct_66 c )  
+
+{ 28 } [ 1 2 3 S{ test_struct_66 f 4 5 } S{ test_struct_66 f 6 7 } ffi_test_66 ] unit-test
+
+: callback-14 ( -- callback )
+    ulong { ulong ulong ulong test_struct_66 test_struct_66 } cdecl
+    [| a b c d e |
+        a b + c +
+        d [ mem1>> + ] [ mem2>> + ] bi
+        e [ mem1>> + ] [ mem2>> + ] bi
+    ] alien-callback ;
+
+: callback-14-test ( a b c d e callback -- result )
+    ulong { ulong ulong ulong test_struct_66 test_struct_66 } cdecl alien-indirect ;
+
+{ 28 } [
+    1 2 3 S{ test_struct_66 f 4 5 } S{ test_struct_66 f 6 7 } callback-14 [
+        callback-14-test
+    ] with-callback
+] unit-test
+
+{ 44 } [ 1 2 3 S{ test_struct_66 f 4 5 } S{ test_struct_66 f 6 7 } 8 ffi_test_67 ] unit-test
+
+: callback-15 ( -- callback )
+    ulong { ulong ulong ulong test_struct_66 test_struct_66 ulong } cdecl
+    [| a b c d e _f |
+        a b + c +
+        d [ mem1>> + ] [ mem2>> + ] bi
+        e [ mem1>> + ] [ mem2>> + ] bi
+        _f 2 * + 
+    ] alien-callback ;
+
+: callback-15-test ( a b c d e _f callback -- result )
+    ulong { ulong ulong ulong test_struct_66 test_struct_66 ulong } cdecl alien-indirect ;
+
+{ 44 } [
+    1 2 3 S{ test_struct_66 f 4 5 } S{ test_struct_66 f 6 7 } 8 callback-15 [
+        callback-15-test
+    ] with-callback
+] unit-test
+
+{ 55 } [
+    1 2 3 S{ test_struct_66 f 4 5 } S{ test_struct_68 f 6 7 8 } S{ test_struct_66 f 9 10 } ffi_test_68
+] unit-test
+
+: callback-16 ( -- callback )
+    ulong { ulong ulong ulong test_struct_66 test_struct_68 test_struct_66 } cdecl
+    [| a b c d e _f |
+        a b + c +
+        d [ mem1>> + ] [ mem2>> + ] bi
+        e [ mem1>> + ] [ mem2>> + ] [ mem3>> + ] tri
+        _f [ mem1>> + ] [ mem2>> + ] bi
+    ] alien-callback ;
+
+: callback-16-test ( a b c d e _f callback -- result )
+    ulong { ulong ulong ulong test_struct_66 test_struct_68 test_struct_66 } cdecl alien-indirect ;
+
+{ 55 } [
+    1 2 3 S{ test_struct_66 f 4 5 } S{ test_struct_68 f 6 7 8 } S{ test_struct_66 f 9 10 } callback-16 [
+        callback-16-test
+    ] with-callback
+] unit-test
+
+{ 55 } [
+    1 2 3 S{ test_struct_66 f 4 5 } S{ test_struct_69 f 6.0 7 8 } S{ test_struct_66 f 9 10 } ffi_test_69
+] unit-test
+
+: callback-17 ( -- callback )
+    ulong { ulong ulong ulong test_struct_66 test_struct_69 test_struct_66 } cdecl
+    [| a b c d e _f |
+        a b + c +
+        d [ mem1>> + ] [ mem2>> + ] bi
+        e [ mem1>> >integer + ] [ mem2>> + ] [ mem3>> + ] tri
+        _f [ mem1>> + ] [ mem2>> + ] bi
+    ] alien-callback ;
+
+: callback-17-test ( a b c d e _f callback -- result )
+    ulong { ulong ulong ulong test_struct_66 test_struct_69 test_struct_66 } cdecl alien-indirect ;
+
+{ 55 } [
+    1 2 3 S{ test_struct_66 f 4 5 } S{ test_struct_69 f 6.0 7 8 } S{ test_struct_66 f 9 10 } callback-17 [
+        callback-17-test
+    ] with-callback
+] unit-test
+
+{ 36 } [
+    S{ test_struct_68 f 1 2 3 } S{ test_struct_68 f 4 5 6 } S{ test_struct_66 f 7 8 } ffi_test_70
+] unit-test
+
+: callback-18 ( -- callback )
+    ulong { test_struct_68 test_struct_68 test_struct_66 } cdecl
+    [| a b c |
+        a [ mem1>> ] [ mem2>> + ] [ mem3>> + ] tri     
+        b [ mem1>> + ] [ mem2>> + ] [ mem3>> + ] tri
+        c [ mem1>> + ] [ mem2>> + ] bi
+    ] alien-callback ;
+
+: callback-18-test ( a b c callback -- result )
+    ulong { test_struct_68 test_struct_68 test_struct_66 } cdecl alien-indirect ;
+
+{ 36 } [
+    S{ test_struct_68 f 1 2 3 } S{ test_struct_68 f 4 5 6 } S{ test_struct_66 f 7 8 } callback-18 [
+        callback-18-test
+    ] with-callback
 ] unit-test

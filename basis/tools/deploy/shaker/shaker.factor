@@ -1,15 +1,17 @@
 ! Copyright (C) 2007, 2010 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
-USING: accessors alien.libraries arrays assocs byte-arrays classes
-classes.builtin combinators combinators.private command-line
-compiler.crossref compiler.errors compiler.units continuations
-definitions fry generic generic.single generic.standard grouping
-hashtables init io io.backend io.encodings.utf8 io.files io.pathnames
-io.streams.c kernel kernel.private locals make math memoize memory
-namespaces parser parser.notes quotations sequences sequences.deep
-sequences.private sets slots.private source-files source-files.errors
-strings strings.parser system tools.deploy.config vocabs vocabs.loader
-vocabs.loader.private vocabs.parser words ;
+! See https://factorcode.org/license.txt for BSD license.
+USING: accessors alien.libraries arrays assocs byte-arrays
+classes classes.builtin classes.private combinators
+combinators.private command-line compiler.crossref
+compiler.errors compiler.units continuations definitions generic
+generic.single generic.standard grouping hashtables init io
+io.backend io.encodings.utf8 io.files io.pathnames io.streams.c
+kernel kernel.private make math memoize memory namespaces parser
+parser.notes quotations sequences sequences.deep
+sequences.private sets slots.private source-files
+source-files.errors strings strings.parser system
+tools.deploy.config vocabs vocabs.loader vocabs.loader.private
+vocabs.parser words ;
 QUALIFIED: classes.private
 IN: tools.deploy.shaker
 
@@ -96,7 +98,7 @@ IN: tools.deploy.shaker
     ] when ;
 
 : strip-gtk-icon ( -- )
-    "ui.backend.gtk" lookup-vocab [
+    "ui.backend.gtk2" lookup-vocab [
         "Stripping GTK icon loading code" show
         "vocab:tools/deploy/shaker/strip-gtk-icon.factor"
         run-file

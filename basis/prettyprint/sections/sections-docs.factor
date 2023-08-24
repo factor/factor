@@ -37,7 +37,7 @@ HELP: short-section
 
 HELP: long-section
 { $values { "section" section } }
-{ $contract "Prints a section which spans multiple lines. This should use a layout strategy maximizing readability and minimizing line length." } ;
+{ $contract "Prints a section which spans multiple lines. This should use a layout strategy maximizing readability and minimizing line length. Default implementation calls " { $link short-section } "." } ;
 
 HELP: indent-section?
 { $values { "section" section } { "?" boolean } }
@@ -193,7 +193,7 @@ HELP: flow
 { $class-description "A " { $link block } " section printed on its own line if it can fit entirely on one line." } ;
 
 HELP: <flow
-{ $description "Begins a " { $link flow } " section. " } ;
+{ $description "Begins a " { $link flow } " section." } ;
 
 HELP: colon
 { $class-description "A " { $link block } " section. When printed as a " { $link long-section } ", indents every line except the first." }

@@ -1,11 +1,13 @@
 ! Copyright (C) 2011-2012 John Benediktsson
-! See http://factorcode.org/license.txt for BSD license
+! See https://factorcode.org/license.txt for BSD license
 
-USING: accessors assocs colors.constants combinators fonts fry
-io io.styles kernel math math.order pdf.text pdf.wrap sequences
+USING: accessors assocs colors combinators fonts io io.styles
+kernel math math.order namespaces pdf.text pdf.wrap sequences
 ui.text ;
 
 IN: pdf.canvas
+
+SYMBOL: +line-height+
 
 TUPLE: margin left right top bottom ;
 
@@ -87,11 +89,18 @@ foreground background page-color inset line-height metrics ;
 : inc-y ( canvas n -- )
     '[ _ + ] change-y drop ;
 
+<PRIVATE
+
+: (line-height) ( canvas -- n )
+    line-height>> +line-height+ get [ * >integer ] when* ;
+
+PRIVATE>
+
 : line-height ( canvas -- n )
-    [ line-height>> ] [ inset>> first 2 * ] bi + ;
+    [ (line-height) ] [ inset>> first 2 * ] bi + ;
 
 : line-break ( canvas -- )
-    [ line-height>> ] keep [ + ] change-y 0 >>x
+    [ (line-height) ] keep [ + ] change-y 0 >>x
     dup metrics>> height>> >>line-height drop ;
 
 : ?line-break ( canvas -- )

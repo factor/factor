@@ -1,5 +1,5 @@
 ! Copyright (C) 2008, 2010 Slava Pestov, Joe Groff.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors alien alien.c-types alien.enums alien.strings
 alien.syntax arrays assocs combinators combinators.short-circuit
 definitions effects kernel math.parser prettyprint.backend
@@ -135,4 +135,4 @@ M: enum-c-type-word synopsis*
         [ lookup-c-type base-type>> dup int eq? [ drop ] [ "<" text pprint-word ] if ]
     } cleave ;
 M: enum-c-type-word definition
-   lookup-c-type members>> ;
+    lookup-c-type members>> ;

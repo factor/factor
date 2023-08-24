@@ -1,11 +1,11 @@
 ! Copyright (c) 2009 Aaron Schaefer.
-! See http://factorcode.org/license.txt for BSD license.
-USING: arrays byte-arrays fry kernel math math.combinatorics math.functions
-    math.parser math.primes project-euler.common sequences sets ;
+! See https://factorcode.org/license.txt for BSD license.
+USING: arrays kernel math math.primes project-euler.common
+sequences sets ;
 FROM: project-euler.common => permutations? ;
 IN: project-euler.049
 
-! http://projecteuler.net/index.php?section=problems&id=49
+! https://projecteuler.net/index.php?section=problems&id=49
 
 ! DESCRIPTION
 ! -----------

@@ -1,6 +1,5 @@
-USING: accessors alien.c-types io.encodings.utf8 kernel
-sequences tools.test unix.ffi unix.utilities ;
-IN: unix.ffi.tests
+USING: accessors alien.c-types alien.utilities io.encodings.utf8
+kernel sequences tools.test unix.ffi ;
 
 { 80 } [ "http" f getservbyname port>> ntohs ] unit-test
 

@@ -6,16 +6,16 @@
 
 	<table width="100%">
 		<tr>
-			<th align="left" width="50%">Summary:</th>
-			<th align="left" width="100">Paste by:</th>
-			<th align="left" width="200">Date:</th>
+			<th align="left" width="70%">Summary</th>
+			<th align="left" width="125">Username</th>
+			<th align="left" width="200">Date</th>
 		</tr>
 
 		<t:bind-each t:name="pastes">
 			<tr>
 				<td><t:a t:href="$pastebin/paste" t:query="id"><t:label t:name="summary" /></t:a></td>
 				<td><t:label t:name="author" /></td>
-				<td><t:label t:name="date" /></td>
+				<td style="white-space: nowrap"><t:label t:name="date" /></td>
 			</tr>
 		</t:bind-each>
 	</table>

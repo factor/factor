@@ -1,7 +1,7 @@
 ! Copyright (C) 2009 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
-USING: accessors assocs colors.constants fry io io.styles kernel
-make namespaces parser prettyprint.backend prettyprint.sections
+! See https://factorcode.org/license.txt for BSD license.
+USING: accessors assocs colors io io.styles kernel
+make namespaces prettyprint.backend prettyprint.sections
 prettyprint.stylesheet sequences sorting vocabs vocabs.parser ;
 FROM: io.styles => inset ;
 IN: vocabs.prettyprint
@@ -12,22 +12,23 @@ IN: vocabs.prettyprint
 : pprint-in ( vocab -- )
     [ \ IN: pprint-word pprint-vocab ] with-pprint ;
 
+: pprint-; ( -- ) \ ; pprint-word ;
+
 <PRIVATE
 
-: sort-vocabs ( seq -- seq' )
-    [ vocab-name ] sort-with ;
+: sort-vocabs ( seq -- seq' ) [ vocab-name ] sort-by ;
 
 : pprint-using ( seq -- )
     "syntax" lookup-vocab '[ _ = ] reject
     sort-vocabs [
         \ USING: pprint-word
         [ pprint-vocab ] each
-        \ ; pprint-word
+        pprint-;
     ] with-pprint ;
 
 GENERIC: pprint-qualified ( qualified -- )
 
-M: qualified pprint-qualified ( qualified -- )
+M: qualified pprint-qualified
     [
         dup [ vocab>> vocab-name ] [ prefix>> ] bi = [
             \ QUALIFIED: pprint-word
@@ -38,23 +39,23 @@ M: qualified pprint-qualified ( qualified -- )
         ] if
     ] with-pprint ;
 
-M: from pprint-qualified ( from -- )
+M: from pprint-qualified
     [
         \ FROM: pprint-word
         [ vocab>> pprint-vocab "=>" text ]
         [ names>> [ text ] each ] bi
-        \ ; pprint-word
+        pprint-;
     ] with-pprint ;
 
-M: exclude pprint-qualified ( exclude -- )
+M: exclude pprint-qualified
     [
         \ EXCLUDE: pprint-word
         [ vocab>> pprint-vocab "=>" text ]
         [ names>> [ text ] each ] bi
-        \ ; pprint-word
+        pprint-;
     ] with-pprint ;
 
-M: rename pprint-qualified ( rename -- )
+M: rename pprint-qualified
     [
         \ RENAME: pprint-word
         [ word>> text ]
@@ -84,17 +85,19 @@ PRIVATE>
 
 CONSTANT: manifest-style H{
     { page-color COLOR: FactorLightTan }
-    { border-color COLOR: FactorDarkTan }
+    { border-color COLOR: FactorTan }
     { inset { 5 5 } }
 }
 
 [
-    nl
-    { { font-style bold } { font-name "sans-serif" } } [
-        "Restarts were invoked adding vocabularies to the search path." print
-        "To avoid doing this in the future, add the following forms" print
-        "at the top of the source file:" print nl
-    ] with-style
-    manifest-style [ manifest get pprint-manifest ] with-nesting
-    nl nl
+    [
+        nl
+        { { font-style bold } { font-name "sans-serif" } } [
+            "Restarts were invoked adding vocabularies to the search path." print
+            "To avoid doing this in the future, add the following forms" print
+            "at the top of the source file:" print nl
+        ] with-style
+        manifest-style [ manifest get pprint-manifest ] with-nesting
+        nl nl flush
+    ] with-output>error
 ] print-use-hook set-global

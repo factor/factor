@@ -1,7 +1,6 @@
 ! Copyright (C) 2008 Eric Mertens.
-! See http://factorcode.org/license.txt for BSD license.
-USING: accessors assocs fry hashtables kernel locals math
-sequences ;
+! See https://factorcode.org/license.txt for BSD license.
+USING: accessors assocs hashtables kernel math sequences ;
 IN: disjoint-sets
 
 TUPLE: disjoint-set

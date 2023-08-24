@@ -1,11 +1,9 @@
-
 USING: accessors arrays assocs combinators.short-circuit fry
 hints interval-maps kernel math math.order sequences sorting
 strings unicode.breaks.private unicode.case.private
 unicode.categories unicode.collation unicode.collation.private
 unicode.data unicode.data.private unicode.normalize.private
-unicode.script ;
-
+unicode.script ranges ;
 IN: unicode
 
 CATEGORY: blank Zs Zl Zp | "\r\n\t" member? ;
@@ -43,17 +41,30 @@ CATEGORY: math Sm | "Other_Math" property? ;
 
 : ch>title ( ch -- title ) simple-title ?at drop ; inline
 
-: first-grapheme ( str -- i )
-    unclip-slice grapheme-class over
-    [ grapheme-class [ nip ] [ grapheme-break? ] 2bi ] find drop
-    nip swap length or 1 + ;
+:: first-grapheme ( entire-str start -- i )
+    start :> pos!
+    entire-str length :> str-len
+    0 pos 1 + entire-str <slice> grapheme-class
+    pos 1 + str-len 1 - min pos!
+    pos str-len 1 - [a..b] [
+        1 + 0 swap entire-str <slice> grapheme-class
+        dup rot swap grapheme-break?
+    ] find drop nip
+    [ 1 + ] [ str-len start - ] if* ;
 
-: first-grapheme-from ( start str -- i )
-    over tail-slice first-grapheme + ;
+:: first-grapheme-from ( start str -- i )
+    str start first-grapheme start + ;
 
-: last-grapheme ( str -- i )
-    unclip-last-slice grapheme-class swap
-    [ grapheme-class dup rot grapheme-break? ] find-last drop ?1+ nip ;
+:: last-grapheme ( str -- i )
+    str length 1 - :> pos!
+    pos 0 = [ 0 ] [
+        str grapheme-class
+        pos 1 - 0 max pos!
+        0 pos [a..b] [
+            0 swap 1 + str <slice> grapheme-class
+            dup rot grapheme-break?
+        ] find-last drop ?1+ nip
+    ] if ;
 
 : last-grapheme-from ( end str -- i )
     swap head-slice last-grapheme ;
@@ -65,8 +76,16 @@ CATEGORY: math Sm | "Other_Math" property? ;
 
 PRIVATE>
 
-: >graphemes ( str -- graphemes )
-    [ first-grapheme ] >pieces ;
+:: >graphemes ( str -- graphemes )
+    str length :> str-len
+    0 :> pos! 0 :> old-pos!
+    [ f ! dummy
+      pos old-pos! old-pos str-len < [
+          str pos first-grapheme pos + pos! pos str-len <=
+      ] [ f ] if ]
+    [ drop old-pos pos str <slice> ] produce nip ;
+
+: count-graphemes ( str -- n ) >graphemes length ; inline
 
 : string-reverse ( str -- rts )
     >graphemes reverse! concat ;
@@ -164,15 +183,17 @@ HINTS: string-append string string ;
 : nfkc ( string -- nfkc )
     [ (nfkd) combine ] with-string ;
 
-: collation-key ( string -- key )
-    nfd string>graphemes graphemes>weights
-    filter-ignorable weights>bytes ;
+: collation-key/nfd ( string -- key nfd )
+    nfd [
+        string>graphemes graphemes>weights
+        filter-ignorable weights>bytes
+    ] keep ;
 
 <PRIVATE
 
 : insensitive= ( str1 str2 levels-removed -- ? )
     [
-        [ collation-key ] dip
+        [ collation-key/nfd drop ] dip
         [ [ 0 = not ] trim-tail but-last ] times
     ] curry same? ;
 
@@ -190,11 +211,22 @@ PRIVATE>
 : quaternary= ( str1 str2 -- ? )
     0 insensitive= ;
 
-: w/collation-key ( str -- {str,key} )
-    [ collation-key ] keep 2array ;
-
 : sort-strings ( strings -- sorted )
-    [ w/collation-key ] map natural-sort values ;
+    [ collation-key/nfd 2array ] map sort values ;
 
 : string<=> ( str1 str2 -- <=> )
-    [ w/collation-key ] compare ;
+    [ collation-key/nfd 2array ] compare ;
+
+: upper-surrogate? ( ch -- ? ) 0xD800 0xDBFF between? ; inline
+
+: under-surrogate? ( ch -- ? ) 0xDC00 0xDFFF between? ; inline
+
+CONSTANT: unicode-supported {
+    "collation"
+}
+
+CONSTANT: unicode-unsupported {
+    "bidi"
+}
+
+CONSTANT: unicode-version "14.0.0"

@@ -42,7 +42,7 @@ HELP: doc-lines
 { $notes "The range is created by calling " { $link <slice> } "." }
 { $errors "Throws an error if " { $snippet "from" } " or " { $snippet "to" } " is out of bounds." } ;
 
-HELP: each-line
+HELP: each-doc-line
 { $values { "from" "a non-negative integer" } { "to" "a non-negative integer" } { "quot" { $quotation ( ... line -- ... ) } } }
 { $description "Applies the quotation to each line in the range." }
 { $notes "The range is created by calling " { $link <slice> } "." }
@@ -56,6 +56,12 @@ HELP: doc-range
 HELP: set-doc-range
 { $values { "string" string } { "from" "a pair of integers" } { "to" "a pair of integers" } { "document" document } }
 { $description "Replaces all text between two line/column number pairs with " { $snippet "string" } ". The string may use either " { $snippet "\\n" } ", " { $snippet "\\r\\n" } " or " { $snippet "\\r" } " line separators." }
+{ $errors "Throws an error if " { $snippet "from" } " or " { $snippet "to" } " is out of bounds." }
+{ $side-effects "document" } ;
+
+HELP: set-doc-range*
+{ $values { "string" string } { "from" "a pair of integers" } { "to" "a pair of integers" } { "document" document } }
+{ $description "Replaces all text between two line/column number pairs with " { $snippet "string" } ". The string may use either " { $snippet "\\n" } ", " { $snippet "\\r\\n" } " or " { $snippet "\\r" } " line separators.\n\nThis word differs from " { $link set-doc-range } " in that it does not include changes in the Undo and Redo actions." }
 { $errors "Throws an error if " { $snippet "from" } " or " { $snippet "to" } " is out of bounds." }
 { $side-effects "document" } ;
 
@@ -113,7 +119,10 @@ ARTICLE: "documents" "Documents"
     remove-doc-range
 }
 "A combinator:"
-{ $subsections each-line }
+{ $subsections
+    each-doc-line
+    map-doc-lines
+}
 "More info:"
 { $subsections
     "document-locs"

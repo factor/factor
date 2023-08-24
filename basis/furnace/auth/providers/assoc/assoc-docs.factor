@@ -1,4 +1,4 @@
-USING: help.markup help.syntax io.streams.string ;
+USING: help.markup help.syntax ;
 IN: furnace.auth.providers.assoc
 
 HELP: <users-in-memory>

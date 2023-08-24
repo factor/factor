@@ -1,6 +1,7 @@
 ! Copyright (C) 2009 Joe Groff.
-! See http://factorcode.org/license.txt for BSD license.
-USING: accessors alien alien.c-types alien.data destructors kernel libc math ;
+! See https://factorcode.org/license.txt for BSD license.
+USING: accessors alien alien.c-types destructors kernel libc
+math ;
 IN: memory.piles
 
 TUPLE: pile

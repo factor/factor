@@ -1,5 +1,4 @@
-USING: io io.files sequences xml xml.traversal
-io.encodings.ascii kernel ;
+USING: io.files sequences xml xml.traversal io.encodings.ascii kernel ;
 IN: msxml-to-csv
 
 : (msxml>csv) ( xml -- table )

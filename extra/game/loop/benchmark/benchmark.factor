@@ -1,5 +1,5 @@
 ! Copyright (C) 2009 Joe Groff.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors alien.c-types classes.struct game.loop
 game.loop.private kernel sequences specialized-vectors
 tools.time.struct ;
@@ -13,7 +13,7 @@ STRUCT: game-loop-benchmark
 SPECIALIZED-VECTOR: game-loop-benchmark
 
 : <game-loop-benchmark> ( benchmark-data-pair tick frame -- obj )
-    \ game-loop-benchmark <struct>
+    \ game-loop-benchmark new
         swap >>frame#
         swap >>tick#
         swap >>benchmark-data-pair ; inline

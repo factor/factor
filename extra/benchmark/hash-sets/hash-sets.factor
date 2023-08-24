@@ -1,5 +1,5 @@
 
-USING: combinators fry hash-sets kernel literals
+USING: combinators hash-sets kernel literals
 math math.combinatorics sequences sets ;
 
 IN: benchmark.hash-sets

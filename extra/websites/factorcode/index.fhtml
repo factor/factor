@@ -1,51 +1,53 @@
-<% USING: namespaces http.client kernel io.files splitting random io io.encodings.utf8 sequences
-webapps.mason.version.data webapps.mason.backend webapps.mason.grids webapps.mason.downloads 
-webapps.mason.utils html.elements html.streams accessors
-xml.writer xmode.highlight ; %>
+<%
+
+USING: accessors html.elements html.streams http.client io io.encodings.utf8
+io.files kernel multiline namespaces random sequences splitting
+webapps.mason.backend webapps.mason.downloads webapps.mason.grids
+webapps.mason.utils webapps.mason.version.data xml.writer xmode.highlight ;
+
+%>
 
 <!DOCTYPE html>
 
-<html xmlns="http://www.w3.org/1999/xhtml">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
 <head>
-<meta http-equiv="Content-type" content="text/html; charset=utf-8" />
+<meta http-equiv="Content-type" content="text/html; charset=utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png"/>
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png"/>
+<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png"/>
 
 <title>Factor programming language</title>
 <link rel="stylesheet" href="master.css" type="text/css" media="screen" title="no title" charset="utf-8" />
 </head>
 
 <body>
+<center>
+<img id="logo" src="logo.png" width="583" height="150" alt="Factor programming language" />
 
-<div align="center">
-<img src="logo.png" height="150" alt="Factor programming language" />
-</div>
+<div class="page">
 
-<table border="0" width="100%">
+<h1>Why Factor</h1>
 
-<tr>
-<td width="50%" valign="top">
+<p>The <b>Factor programming language</b> is a <a href="http://www.concatenative.org/">concatenative</a>, stack-based programming language with <a href="http://concatenative.org/wiki/view/Factor/Features/The%20language">high-level features</a> including dynamic types, extensible syntax, macros, and garbage collection.  On a practical side, Factor has a <a href="http://docs.factorcode.org/content/article-vocab-index.html">full-featured library</a>, supports many different platforms, and has been extensively documented.</p>
+<p>The implementation is <a href="http://concatenative.org/wiki/view/Factor/Optimizing%20compiler">fully compiled</a> for performance, while still supporting <a href="http://concatenative.org/wiki/view/Factor/Interactive%20development">interactive development</a>. Factor applications are portable between all common platforms. Factor can <a href="http://concatenative.org/wiki/view/Factor/Deployment">deploy stand-alone applications</a> on all platforms. Full <a href="https://github.com/factor/factor">source code</a> for the Factor project is available under a <a href="https://factorcode.org/license.txt">BSD license</a>.</p>
 
-<h1>Why Factor?</h1>
-
-<p>The <big>Factor programming language</big> combines <a href="http://concatenative.org/wiki/view/Factor/Features/The%20language">powerful language features</a> with a <a href="http://docs.factorcode.org/content/article-vocab-index.html">full-featured library</a>. The implementation is <a href="http://concatenative.org/wiki/view/Factor/Optimizing%20compiler">fully compiled</a> for performance, while still supporting <a href="http://concatenative.org/wiki/view/Factor/Interactive development">interactive development</a>. Factor applications are portable between all common platforms. Factor can <a href="http://concatenative.org/wiki/view/Factor/Deployment">deploy stand-alone applications</a> on all platforms. Full source code for the Factor project is available under a <a href="http://factorcode.org/license.txt">BSD license</a>.</p>
+<div class="left">
 
 <ul>
-<li>Screenshots: <a href="http://factorcode.org/factor-macosx.png">Mac OS X</a>, <a href="http://factorcode.org/factor-windows7.png">Windows</a></li>
-<li><a href="http://concatenative.org/wiki/view/Factor">Learn more about Factor</a></li>
-<li><a href="http://concatenative.org/wiki/view/Factor/Learning">Get started programming with Factor</a></li>
-<li><a href="http://concatenative.org/wiki/view/Factor/FAQ">Get answers to frequently-asked questions</a></li>
-<li><a href="http://docs.factorcode.org/">Read Factor reference documentation online</a></li>
-<li><a href="http://concatenative.org/wiki/view/Concatenative%20language">Learn more about concatenative programming</a></li>
-<li><a href="http://github.com/factor/factor/issues">Report a bug</a></li>
+<li><a href="https://concatenative.org/wiki/view/Factor">Learn more about Factor</a></li>
+<li><a href="https://concatenative.org/wiki/view/Factor/Learning">Get started programming with Factor</a></li>
+<li><a href="https://concatenative.org/wiki/view/Factor/FAQ">Get answers to frequently-asked questions</a></li>
+<li><a href="https://docs.factorcode.org/">Read Factor reference documentation online</a></li>
+<li><a href="https://concatenative.org/wiki/view/Concatenative%20language">Learn more about concatenative programming</a></li>
+<li><a href="https://concatenative.org/wiki/view/Factor/Examples">See some example programs</a></li>
+<li><a href="https://github.com/factor/factor/issues">Report a bug</a></li>
+<li>Screenshots on <a href="https://factorcode.org/factor-macosx.png">Mac OS X</a>, <a href="https://factorcode.org/factor-windows7.png">Windows</a></li>
 </ul>
 
-<p>Most of the above links point to pages on the <a href="http://concatenative.org">concatenative.org wiki</a>.</p>
-</td>
+</div>
 
-<td width="50%" valign="top">
-
-<h1>Show me some code!</h1>
-
-<p>Factor belongs to the family of <em><a href="http://concatenative.org/wiki/view/Concatenative%20language">concatenative languages</a></em>: this means that, at the lowest level, a Factor program is a series of words (functions) that manipulate a stack of references to dynamically-typed values. This gives the language a powerful foundation which allows many abstractions and paradigms to be built on top. Reload this page to see a random code example below.</p>
+<div class="right">
 
 <pre><%
 "resource:extra/websites/factorcode/examples.txt" utf8 file-lines
@@ -54,23 +56,20 @@ xml.writer xmode.highlight ; %>
 xml>string write-html
 %></pre>
 
-<p>See the <a href="http://concatenative.org/wiki/view/Factor/Examples">example programs</a> page on the wiki for more.</p>
+</div>
 
-</td>
-</tr>
+<div style="clear: both;"></div>
 
-</table>
 
 <h1>Downloads</h1>
 
 <% [ %>
 
-<p>To download a binary, follow the link corresponding to your computer's CPU/OS configuration. Binary packages are the recommended route for new users who wish to try Factor.</p>
+<p>To download a binary, follow the link for the desired OS / CPU configuration. Binary packages are the recommended route for new users who wish to try Factor.</p>
 
 <h2>Stable release:
 <% latest-version <a [ announcement-url>> =href a> ] [ version>> write ] bi </a> %>
 </h2>
-
 <% release-grid write-xml %>
 
 <p><b>Source code</b>:
@@ -78,31 +77,28 @@ xml>string write-html
 </p>
 
 <h2>Development release</h2>
-
 <% package-grid write-xml %>
 
 <% ] with-mason-db %>
 
-<p>Stable and development releases are built and uploaded by the <a href="http://concatenative.org/wiki/view/Factor/Build farm">build farm</a>. Follow <a href="http://twitter.com/FactorBuilds">@FactorBuilds</a> on Twitter to receive notifications. If you're curious, take a look at the <a href="http://builds.factorcode.org/dashboard">build farm dashboard</a>.</p>
+<p><b>Source code</b>: available via <a href="https://github.com/factor/factor/">github</a> or <a href="https://gitweb.factorcode.org/">gitweb</a> or <a href="https://cgit.factorcode.org/">cgit</a>.</p>
 
-<p><b>Source code</b> is stored in our <a href="http://concatenative.org/wiki/view/Factor/GIT repository">GIT repository</a>. Source can can be browsed online via <a href="http://github.com/factor/factor/">github</a> or <a href="http://gitweb.factorcode.org/">gitweb</a>.</p>
+<p>Stable and development releases are built and uploaded by the <a href="https://concatenative.org/wiki/view/Factor/Build%20farm">build farm</a>. Follow <a href="https://twitter.com/FactorBuilds">@FactorBuilds</a> on Twitter to receive notifications. If you're curious, take a look at the <a href="https://builds.factorcode.org/dashboard">build farm dashboard</a>. You can also <a href="https://concatenative.org/wiki/view/Factor/Building%20Factor">build Factor</a> on your own platform from source.</p>
 
-<h1>More</h1>
+<h2>Older releases</h2>
+<a href="https://downloads.factorcode.org/releases/">Download older releases</a> from <a href="https://downloads.factorcode.org/releases/0.29/">Factor 0.29</a> to the current release.
+
+<h1>Community</h1>
 
 <ul>
-<li><a href="http://concatenative.org/wiki/view/Factor/Mailing list">Join the mailing list</a></li>
-<li><a href="http://concatenative.org/wiki/view/Concatenative IRC channel">Join the IRC channel</a></li>
-<li><a href="http://planet.factorcode.org/">planet.factorcode.org</a> - Factor community blogs</li>
-<li><a href="http://concatenative.org/wiki/view/Concatenative%20language/Publications">Academic publications</a></li>
-<li><a href="http://paste.factorcode.org/">Factor community pastebin</a> - if you're in an IRC channel and want to share some code</li>
+<li><a href="https://concatenative.org/wiki/view/Factor/Mailing%20list">Join the mailing list</a></li>
+<li><a href="https://discord.gg/QxJYZx3QDf">Join the Discord</a></li>
+<li><a href="https://concatenative.org/wiki/view/Concatenative%20IRC%20channel">Join the IRC channel</a></li>
+<li><a href="https://planet.factorcode.org/">Factor community blogs</a></li>
+<li><a href="https://paste.factorcode.org/">Factor community pastebin</a> - if you're in an IRC channel and want to share some code</li>
+<li><a href="https://concatenative.org/wiki/view/Concatenative%20language/Publications">Academic publications</a></li>
 </ul>
-
-<br/>
-<table align="center"><tr>
-<td>Hosting provided by</td>
-<td><img src="rackspace.jpg" height="80" alt="Rackspace" /></td>
-</tr>
-</table>
-
+</div>
+</center>
 </body>
 </html>

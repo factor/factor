@@ -1,9 +1,8 @@
 ! Copyright (c) 2014 John Benediktsson
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 
-USING: alien.c-types destructors fftw.ffi fry kernel locals math
-math.functions math.vectors sequences sequences.private
-specialized-arrays ;
+USING: alien.c-types destructors fftw.ffi kernel math
+math.vectors sequences sequences.private specialized-arrays ;
 SPECIALIZED-ARRAY: double
 SPECIALIZED-ARRAY: fftw_complex
 

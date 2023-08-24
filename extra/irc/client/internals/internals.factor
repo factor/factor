@@ -1,9 +1,10 @@
 ! Copyright (C) 2009 Bruno Deferrari
-! See http://factorcode.org/license.txt for BSD license.
-USING: accessors assocs arrays concurrency.mailboxes continuations destructors
-hashtables io irc.client.base irc.client.chats irc.messages kernel namespaces
-strings words.symbol irc.messages.base irc.client.participants fry threads
-combinators irc.messages.parser math sequences ;
+! See https://factorcode.org/license.txt for BSD license.
+USING: accessors arrays assocs combinators concurrency.mailboxes
+continuations destructors io irc.client.base irc.client.chats
+irc.client.participants irc.messages irc.messages.base
+irc.messages.parser kernel math sequences strings threads
+words.symbol ;
 IN: irc.client.internals
 
 : do-connect ( server port quot: ( host port -- stream ) attempts -- stream/f )
@@ -45,10 +46,10 @@ IN: irc.client.internals
     ] [ (terminate-irc) ] if* ;
 
 : (do-login) ( -- )
-     irc>
-     [ profile>> password>> [ /PASS ] when* ]
-     [ nick>> /LOGIN ]
-     bi ;
+    irc>
+    [ profile>> password>> [ /PASS ] when* ]
+    [ nick>> /LOGIN ]
+    bi ;
 
 GENERIC: initialize-chat ( chat -- )
 M: irc-chat         initialize-chat drop ;

@@ -1,5 +1,5 @@
 ! Copyright (C) 2005, 2009 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: combinators.short-circuit hints kernel math math.order
 sequences strings ;
 IN: ascii
@@ -24,7 +24,7 @@ IN: ascii
         [ [ 1 ] when-zero cut-slice swap ]
         [ f 0 rot [ length ] keep <slice> ] if*
     ] produce nip ;
-: capitalize ( str -- str' ) unclip [ >lower ] [ ch>upper ] bi* prefix ;
+: capitalize ( str -- str' ) >lower 0 over [ ch>upper ] change-nth ;
 : >title ( str -- title ) >words [ capitalize ] map concat ;
 
 HINTS: >lower string ;

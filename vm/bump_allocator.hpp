@@ -14,9 +14,9 @@ struct bump_allocator {
     return (cell)obj >= start && (cell)obj < end;
   }
 
-  object* allot(cell size) {
+  object* allot(cell data_size) {
     cell h = here;
-    here = h + align(size, data_alignment);
+    here = h + align(data_size, data_alignment);
     return (object*)h;
   }
 

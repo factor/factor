@@ -1,9 +1,9 @@
 ! Copyright (c) 2008 Eric Mertens.
-! See http://factorcode.org/license.txt for BSD license.
-USING: arrays assocs kernel math math.ranges sequences project-euler.common ;
+! See https://factorcode.org/license.txt for BSD license.
+USING: arrays assocs kernel math ranges sequences project-euler.common ;
 IN: project-euler.164
 
-! http://projecteuler.net/index.php?section=problems&id=164
+! https://projecteuler.net/index.php?section=problems&id=164
 
 ! DESCRIPTION
 ! -----------
@@ -25,7 +25,7 @@ IN: project-euler.164
     [ swap next-keys [ pick at+ ] with each ] assoc-each ;
 
 : init-table ( -- assoc )
-    9 [1,b] [ 1array 1 ] H{ } map>assoc ;
+    9 [1..b] [ 1array 1 ] H{ } map>assoc ;
 
 PRIVATE>
 

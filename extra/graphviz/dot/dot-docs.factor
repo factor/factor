@@ -1,5 +1,5 @@
 ! Copyright (C) 2012 Alex Vondrak.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: graphviz help.markup help.syntax kernel strings ;
 IN: graphviz.dot
 
@@ -10,7 +10,7 @@ HELP: write-dot
 { $description "Converts " { $snippet "graph" } " into its equivalent DOT code, saving the file to " { $snippet "path" } " using the given character " { $snippet "encoding" } "." } ;
 
 ARTICLE: "graphviz.dot" "Translating Factor graphs into DOT"
-"The " { $vocab-link "graphviz.dot" } " vocabulary implements a word to translate Factor " { $link graph } " objects into equivalent DOT code (see " { $url "http://graphviz.org/content/dot-language" } ")."
+"The " { $vocab-link "graphviz.dot" } " vocabulary implements a word to translate Factor " { $link graph } " objects into equivalent DOT code (see " { $url "https://graphviz.org/content/dot-language" } ")."
 { $subsections write-dot }
 "Because the data structure of Factor " { $link graph } " objects so closely maps to the DOT language, the translation is straightforward. This also means that rendering Factor " { $link graph } "s using the " { $vocab-link "graphviz.render" } " vocabulary should generally work exactly as though you had written the DOT code to start with."
 $nl

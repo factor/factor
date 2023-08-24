@@ -1,7 +1,6 @@
 ! Copyright (C) 2009 Daniel Ehrenberg
-! See http://factorcode.org/license.txt for BSD license.
-USING: alien.accessors fry kernel locals math math.bitwise
-math.order sequences ;
+! See https://factorcode.org/license.txt for BSD license.
+USING: alien.accessors kernel math math.bitwise math.order ;
 IN: classes.struct.bit-accessors
 
 ! Bitfield accessors are little-endian on all platforms

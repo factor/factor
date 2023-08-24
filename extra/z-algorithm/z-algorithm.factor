@@ -1,7 +1,6 @@
 ! Copyright (C) 2010 Dmitry Shubin.
-! See http://factorcode.org/license.txt for BSD license.
-USING: arrays kernel locals math math.ranges sequences
-sequences.private ;
+! See https://factorcode.org/license.txt for BSD license.
+USING: arrays kernel math ranges sequences sequences.private ;
 IN: z-algorithm
 
 : lcp ( seq1 seq2 -- n )
@@ -30,7 +29,7 @@ IN: z-algorithm
 :: (z-values) ( seq -- Z )
     seq length dup 0 <array> :> ( len Z )
     len 0 Z set-nth
-    seq Z 0 0 len [1,b) [ z-value ] each 4drop
+    seq Z 0 0 len [1..b) [ z-value ] each 4drop
     Z ; inline
 
 PRIVATE>

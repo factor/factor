@@ -1,10 +1,10 @@
 ! Copyright (c) 2012 Anonymous
-! See http://factorcode.org/license.txt for BSD license.
-USING: kernel prettyprint sequences arrays math math.vectors ;
+! See https://factorcode.org/license.txt for BSD license.
+USING: kernel math math.vectors sequences ;
 IN: rosetta-code.raycasting
 
 
-! http://rosettacode.org/wiki/Ray-casting_algorithm
+! https://rosettacode.org/wiki/Ray-casting_algorithm
 
 ! Given a point and a polygon, check if the point is inside or
 ! outside the polygon using the ray-casting algorithm.

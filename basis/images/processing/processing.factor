@@ -1,8 +1,7 @@
 ! Copyright (C) 2009 Marc Fauconneau.
-! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays byte-arrays combinators grouping images
-kernel locals math math.order
-math.ranges math.vectors sequences sequences.deep fry ;
+! See https://factorcode.org/license.txt for BSD license.
+USING: accessors arrays byte-arrays images kernel math
+math.order math.vectors sequences sequences.deep ;
 IN: images.processing
 
 : coord-matrix ( dim -- m )

@@ -1,7 +1,8 @@
 ! Copyright (C) 2008 Daniel Ehrenberg.
-! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays assocs binary-search grouping kernel
-locals make math math.order sequences sequences.private sorting ;
+! See https://factorcode.org/license.txt for BSD license.
+USING: accessors arrays assocs binary-search classes grouping
+kernel make math math.order sequences sequences.private
+sorting ;
 IN: interval-maps
 
 ! Intervals are triples of { start end value }
@@ -28,15 +29,10 @@ TUPLE: interval-map { array array read-only } ;
 : >intervals ( specification -- intervals )
     [ suffix ] { } assoc>map concat 3 group ;
 
-ERROR: not-an-interval-map obj ;
-
-: check-interval-map ( map -- map )
-    dup interval-map? [ not-an-interval-map ] unless ; inline
-
 PRIVATE>
 
 : interval-at* ( key map -- value ? )
-    check-interval-map
+    interval-map check-instance
     [ drop ] [ find-interval ] 2bi
     [ nip ] [ interval-contains? ] 2bi
     [ third-unsafe t ] [ drop f f ] if ; inline
@@ -46,10 +42,10 @@ PRIVATE>
 : interval-key? ( key map -- ? ) interval-at* nip ; inline
 
 : interval-values ( map -- values )
-    check-interval-map array>> [ third-unsafe ] map ;
+    interval-map check-instance array>> [ third-unsafe ] map ;
 
 : <interval-map> ( specification -- map )
-    all-intervals [ first-unsafe second-unsafe ] sort-with
+    all-intervals [ first-unsafe second-unsafe ] sort-by
     >intervals ensure-disjoint interval-map boa ;
 
 : <interval-set> ( specification -- map )

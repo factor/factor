@@ -1,12 +1,13 @@
 ! Copyright (C) 2014 John Benediktsson
-! See http://factorcode.org/license.txt for BSD license
+! See https://factorcode.org/license.txt for BSD license
 
-USING: accessors arrays debugger fonts fry gopher gopher.private
-kernel math.vectors models present sequences ui ui.commands ui.gadgets
-ui.gadgets.editors ui.gadgets.panes ui.gadgets.scrollers
-ui.gadgets.status-bar ui.gadgets.toolbar ui.gadgets.tracks
-ui.gadgets.viewports ui.gestures ui.operations ui.tools.browser
-ui.tools.browser.history ui.tools.common urls webbrowser ;
+USING: accessors arrays debugger fonts gopher gopher.private
+kernel math.vectors models present sequences ui ui.commands
+ui.gadgets ui.gadgets.editors ui.gadgets.panes
+ui.gadgets.scrollers ui.gadgets.status-bar ui.gadgets.toolbar
+ui.gadgets.tracks ui.gadgets.viewports ui.gestures ui.operations
+ui.tools.browser ui.tools.browser.history ui.tools.common urls
+webbrowser ;
 
 IN: gopher.ui
 
@@ -27,8 +28,11 @@ M: gopher-gadget model-changed
     [ value>> present ]
     [ url-field>> editor>> set-editor-string ] bi* ;
 
+: ?gopher-url ( obj -- url )
+    present dup "://" subseq-of? [ "gopher://" prepend ] unless >url ;
+
 : show-gopher ( url gopher-gadget -- )
-    [ [ >url ] [ f ] if* ] dip
+    [ [ ?gopher-url ] [ f ] if* ] dip
     over [ protocol>> "gopher" = ] [ t ] if* [
         [
             2dup control-value =
@@ -39,7 +43,7 @@ M: gopher-gadget model-changed
     ] [ drop open-url ] if ;
 
 : <url-field> ( gopher-gadget -- field )
-    '[ >url _ show-gopher ] <action-field>
+    '[ _ show-gopher ] <action-field>
         "Gopher URL" >>default-text
         white-interior ;
 
@@ -96,3 +100,8 @@ gopher-gadget "scrolling" f {
 } define-command-map
 
 [ gopher-link? ] \ com-gopher H{ { +primary+ t } } define-operation
+
+: gopher-main ( -- )
+    [ "gopher.quux.org" open-gopher-window ] with-ui ;
+
+MAIN: gopher-main

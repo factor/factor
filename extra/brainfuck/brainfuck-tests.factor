@@ -1,8 +1,8 @@
 ! Copyright (C) 2009 John Benediktsson
-! See http://factorcode.org/license.txt for BSD license
+! See https://factorcode.org/license.txt for BSD license
 
 USING: brainfuck io.streams.string kernel literals math
-math.parser math.ranges sequences tools.test ;
+math.parser ranges sequences splitting tools.test ;
 
 [ "+" run-brainfuck ] must-infer
 [ "+" get-brainfuck ] must-infer
@@ -67,7 +67,7 @@ math.parser math.ranges sequences tools.test ;
 
 ! Squares of numbers from 0 to 100
 
-${ 100 [0,b] [ dup * number>string ] map "\n" join "\n" append }
+${ 100 [0..b] [ dup * number>string ] map join-lines "\n" append }
 [
     "
     ++++[>+++++<-]>[<+++++>-]+<+[

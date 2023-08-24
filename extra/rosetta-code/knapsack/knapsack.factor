@@ -1,10 +1,10 @@
 ! Copyright (c) 2012 Anonymous
-! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays fry io kernel locals make math
-math.order math.parser math.ranges sequences sorting ;
+! See https://factorcode.org/license.txt for BSD license.
+USING: accessors arrays io kernel make math math.order
+math.parser ranges sequences sorting ;
 IN: rosetta-code.knapsack
 
-! http://rosettacode.org/wiki/Knapsack_problem/0-1
+! https://rosettacode.org/wiki/Knapsack_problem/0-1
 
 ! A tourist wants to make a good trip at the weekend with his
 ! friends. They will go to the mountains to see the wonders of
@@ -24,7 +24,7 @@ IN: rosetta-code.knapsack
 
 ! Which items does the tourist carry in his knapsack so that
 ! their total weight does not exceed 400 dag [4 kg], and their
-! total value is maximised?
+! total value is maximized?
 
 TUPLE: item
     name weight value ;
@@ -63,7 +63,7 @@ CONSTANT: limit 400
     item-no table nth :> prev
     item-no 1 + table nth :> curr
     item-no items nth :> item
-    limit [1,b] [| weight |
+    limit [1..b] [| weight |
         weight prev nth
         weight item weight>> - dup 0 >=
         [ prev nth item value>> + max ]
@@ -97,7 +97,7 @@ CONSTANT: limit 400
     solve-knapsack
     "Total value: " write number>string print
     "Items packed: " print
-    natural-sort
+    sort
     [ "   " write print ] each ;
 
 MAIN: knapsack-main

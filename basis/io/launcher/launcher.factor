@@ -1,5 +1,5 @@
 ! Copyright (C) 2008, 2011 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 
 USING: accessors assocs calendar combinators concurrency.flags
 debugger destructors environment fry init io io.backend
@@ -93,10 +93,10 @@ SYMBOL: wait-delay
     5 wait-delay set-global
     [ wait-loop t ] "Process wait" spawn-server drop ;
 
-[
+STARTUP-HOOK: [
     H{ } clone processes set-global
     start-wait-thread
-] "io.launcher" add-startup-hook
+]
 
 : process-started ( process handle -- )
     >>handle
@@ -164,6 +164,9 @@ HOOK: (run-process) io-backend ( process -- handle )
     run-detached
     dup detached>> [ dup wait-for-process drop ] unless ;
 
+: run-processes ( descs -- processes )
+    [ run-process ] map ;
+
 ERROR: process-failed process ;
 
 M: process-failed error.
@@ -175,8 +178,13 @@ M: process-failed error.
 : check-success ( process status -- )
     0 = [ drop ] [ process-failed ] if ;
 
-: wait-for-success ( process -- )
+GENERIC: wait-for-success ( obj -- )
+
+M: process wait-for-success
     dup wait-for-process check-success ;
+
+M: sequence wait-for-success
+    [ wait-for-success ] each ;
 
 : try-process ( desc -- )
     run-process wait-for-success ;
@@ -238,6 +246,9 @@ PRIVATE>
 
 : process-lines ( desc -- lines )
     utf8 <process-reader> stream-lines ;
+
+: process-contents ( desc -- contents )
+    utf8 <process-reader> stream-contents ;
 
 <PRIVATE
 

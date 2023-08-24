@@ -1,7 +1,7 @@
 ! Copyright (C) 2008 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
-USING: accessors kernel arrays namespaces sequences continuations
-destructors io.sockets alien alien.syntax ;
+! See https://factorcode.org/license.txt for BSD license.
+USING: accessors alien continuations destructors io.sockets
+kernel namespaces sequences ;
 IN: io.pools
 
 TUPLE: pool connections disposed expired ;

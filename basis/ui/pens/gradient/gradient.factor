@@ -1,8 +1,8 @@
 ! Copyright (C) 2009 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors alien.data arrays colors combinators kernel
-locals math math.vectors opengl opengl.gl sequences
-specialized-arrays ui.pens ui.pens.caching ;
+math math.vectors opengl opengl.gl sequences specialized-arrays
+ui.pens ui.pens.caching ;
 FROM: alien.c-types => float ;
 SPECIALIZED-ARRAY: float
 IN: ui.pens.gradient
@@ -24,7 +24,7 @@ TUPLE: gradient < caching-pen colors last-vertices last-colors ;
     [ >rgba-components 4array dup 2array ] map concat concat
     float >c-array ;
 
-M: gradient recompute-pen ( gadget gradient -- )
+M: gradient recompute-pen
     [ nip ] [ [ [ orientation>> ] [ dim>> ] bi ] [ colors>> ] bi* ] 2bi
     [ gradient-vertices >>last-vertices ]
     [ gradient-colors >>last-colors ]

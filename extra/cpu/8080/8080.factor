@@ -1,7 +1,7 @@
 ! Copyright (C) 2006 Chris Double.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 !
-USING: cpu.8080.emulator tools.time ;
+USING: cpu.8080.emulator ;
 IN: cpu.8080
 
 INSTRUCTION: NOP          ; opcode: 00 cycles: 04

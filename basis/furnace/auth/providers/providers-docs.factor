@@ -3,17 +3,17 @@ IN: furnace.auth.providers
 
 HELP: user
 { $class-description "The class of users. Instances have the following slots:"
-{ $table
-    { { $slot "username" } { "The username, used to identify the user for login purposes" } }
-    { { $slot "realname" } { "The user's real name, optional" } }
-    { { $slot "password" } { "The user's password, encoded with a checksum" } }
-    { { $slot "salt" } { "A random salt prepended to the password to ensure that two users with the same plain-text password still have different checksum output" } }
-    { { $slot "email" } { "The user's e-mail address, optional" } }
-    { { $slot "ticket" } { "Used for password recovery" } }
-    { { $slot "capabilities" } { "A sequence of capabilities; see " { $link "furnace.auth.capabilities" } } }
-    { { $slot "profile" } { "A hashtable with webapp-specific configuration" } }
-    { { $slot "deleted" } { "A boolean indicating whether the user is active or not. This allows a user account to be deactivated without removing the user from the database" } }
-    { { $slot "changed?" } { "A boolean indicating whether the user has changed since being retrieved from the database" } }
+{ $slots
+    { "username" { "The username, used to identify the user for login purposes" } }
+    { "realname" { "The user's real name, optional" } }
+    { "password" { "The user's password, encoded with a checksum" } }
+    { "salt" { "A random salt prepended to the password to ensure that two users with the same plain-text password still have different checksum output" } }
+    { "email" { "The user's e-mail address, optional" } }
+    { "ticket" { "Used for password recovery" } }
+    { "capabilities" { "A sequence of capabilities; see " { $link "furnace.auth.capabilities" } } }
+    { "profile" { "A hashtable with webapp-specific configuration" } }
+    { "deleted" { "A boolean indicating whether the user is active or not. This allows a user account to be deactivated without removing the user from the database" } }
+    { "changed?" { "A boolean indicating whether the user has changed since being retrieved from the database" } }
 } } ;
 
 HELP: add-user
@@ -30,7 +30,7 @@ HELP: new-user
 
 HELP: update-user
 { $values { "user" user } { "provider" "an authentication provider" } }
-{ $contract "Stores a user back to an authentication provider after being changed. This is a no-op with in-memory providers; providers which use an external store will save the user in this word. " } ;
+{ $contract "Stores a user back to an authentication provider after being changed. This is a no-op with in-memory providers; providers which use an external store will save the user in this word." } ;
 
 ARTICLE: "furnace.auth.providers.protocol" "Authentication provider protocol"
 "The " { $vocab-link "furnace.auth.providers" } " vocabulary implements a protocol for persistence and authentication of users."

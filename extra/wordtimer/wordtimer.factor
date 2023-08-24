@@ -64,7 +64,7 @@ SYMBOL: *calling*
     *wordtimes* [ (correct-for-timing-overhead) ] change-global ;
 
 : print-word-timings ( -- )
-    *wordtimes* get-global [ swap suffix ] { } assoc>map natural-sort reverse pprint ;
+    *wordtimes* get-global [ swap suffix ] { } assoc>map inv-sort pprint ;
 
 : wordtimer-call ( quot -- )
     reset-word-timer

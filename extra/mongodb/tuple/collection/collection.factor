@@ -1,8 +1,9 @@
-USING: accessors arrays assocs bson.constants classes classes.tuple
-combinators continuations fry kernel mongodb.driver sequences strings
-vectors words combinators.smart literals memoize slots constructors
-hashtables ;
+USING: accessors arrays assocs bson.constants classes
+classes.tuple combinators constructors hashtables kernel
+literals mongodb.driver mongodb.tuple sequences slots strings
+vectors words ;
 
+! XXX: This is weird, two IN: forms
 IN: mongodb.tuple
 
 SINGLETONS: +transient+ +load+ +user-defined-key+ ;
@@ -33,19 +34,19 @@ CONSTANT: MDB_USER_KEY       "mongodb_user_key"
 CONSTANT: MDB_COLLECTION_MAP "mongodb_collection_map"
 
 MEMO: id-slot ( class -- slot )
-   MDB_USER_KEY word-prop
-   dup [ drop "_id" ] unless ;
+    MDB_USER_KEY word-prop
+    dup [ drop "_id" ] unless ;
 
 PRIVATE>
 
 : >toid ( object -- toid )
-   [ id>> ] [ class-of id-slot ] bi <toid> ;
+    [ id>> ] [ class-of id-slot ] bi <toid> ;
 
 M: mdb-persistent id>> ( object -- id )
-   dup class-of id-slot reader-word execute( object -- id ) ;
+    dup class-of id-slot reader-word execute( object -- id ) ;
 
 M: mdb-persistent id<< ( object value -- )
-   over class-of id-slot writer-word execute( object value -- ) ;
+    over class-of id-slot writer-word execute( object value -- ) ;
 
 
 
@@ -66,10 +67,10 @@ GENERIC: mdb-index-map ( tuple -- sequence )
     [ superclass-of [ (mdb-collection) ] [ f ] if* ] if* ; inline recursive
 
 : (mdb-slot-map) ( class -- slot-map )
-    superclasses-of [ MDB_SLOTDEF_MAP word-prop ] map assoc-combine  ; inline
+    superclasses-of [ MDB_SLOTDEF_MAP word-prop ] map assoc-union-all  ; inline
 
 : (mdb-index-map) ( class -- index-map )
-    superclasses-of [ MDB_INDEX_MAP word-prop ] map assoc-combine ; inline
+    superclasses-of [ MDB_INDEX_MAP word-prop ] map assoc-union-all ; inline
 
 : split-optl ( seq -- key options )
     [ first ] [ rest ] bi ; inline
@@ -97,7 +98,7 @@ GENERIC: mdb-index-map ( tuple -- sequence )
 PRIVATE>
 
 : MDB_ADDON_SLOTS ( -- slots )
-   { $[ MDB_OID_FIELD MDB_META_FIELD ] } ; inline
+    { $[ MDB_OID_FIELD MDB_META_FIELD ] } ; inline
 
 : link-class ( collection class -- )
     over classes>>
@@ -119,7 +120,7 @@ PRIVATE>
 
 : set-index-map ( class index-list -- )
     [ dup user-defined-key-index ] dip index-list>map 2array
-    assoc-combine MDB_INDEX_MAP set-word-prop ; inline
+    assoc-union-all MDB_INDEX_MAP set-word-prop ; inline
 
 M: tuple-class tuple-collection ( tuple -- mdb-collection )
     (mdb-collection) ;
@@ -134,14 +135,14 @@ M: tuple-class mdb-slot-map ( class -- assoc )
     (mdb-slot-map) ;
 
 M: mdb-collection mdb-slot-map ( collection -- assoc )
-    classes>> [ mdb-slot-map ] map assoc-combine ;
+    classes>> [ mdb-slot-map ] map assoc-union-all ;
 
 M: mdb-persistent mdb-index-map
     class-of (mdb-index-map) ;
 M: tuple-class mdb-index-map
     (mdb-index-map) ;
 M: mdb-collection mdb-index-map
-    classes>> [ mdb-index-map ] map assoc-combine ;
+    classes>> [ mdb-index-map ] map assoc-union-all ;
 
 <PRIVATE
 
@@ -160,7 +161,7 @@ GENERIC: <mdb-tuple-collection> ( name -- mdb-tuple-collection )
 M: string <mdb-tuple-collection>
     collection-map [ ] [ key? ] 2bi
     [ at ] [ [ mdb-tuple-collection new dup ] 2dip
-             [ [ >>name ] keep ] dip set-at ] if ; inline
+    [ [ >>name ] keep ] dip set-at ] if ; inline
 M: mdb-tuple-collection <mdb-tuple-collection> ;
 M: mdb-collection <mdb-tuple-collection>
     [ name>> <mdb-tuple-collection> ] keep

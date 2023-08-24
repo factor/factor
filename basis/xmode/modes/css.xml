@@ -12,10 +12,9 @@
 		<PROPERTY NAME="noWordSep" VALUE="_" />
 	</PROPS>
 
-	<RULES ESCAPE="\"
-		IGNORE_CASE="TRUE"
+	<RULES IGNORE_CASE="TRUE"
 		HIGHLIGHT_DIGITS="TRUE"
-		DIGIT_RE="-?[\p{Digit}]+(pt|pc|in|mm|cm|em|ex|px|ms|s|%)"
+		DIGIT_RE="-?\d+(\.\d+)?(pt|pc|in|mm|cm|em|ex|px|ms|s|%|)"
 		NO_WORD_SEP="-_%">
 
 		<!-- classes: -->
@@ -29,6 +28,12 @@
 
 		<SEQ TYPE="OPERATOR" DELEGATE="PSEUDO">:</SEQ>
 		<SEQ TYPE="OPERATOR">,</SEQ>
+
+		<!-- @media statements (doesn't count as a property block): -->
+		<SPAN_REGEXP HASH_CHAR="@" TYPE="LITERAL2" DELEGATE="MAIN">
+			<BEGIN>^@(media|supports).*\{</BEGIN>
+			<END>}</END>
+		</SPAN_REGEXP>
 
 		<!-- property blocks: -->
 		<SPAN TYPE="OPERATOR" DELEGATE="PROPERTIES">
@@ -63,19 +68,43 @@
 		<IMPORT DELEGATE="GLOBAL" />
 
 		<KEYWORDS>
+			<KEYWORD4>active</KEYWORD4>
 			<KEYWORD4>after</KEYWORD4>
 			<KEYWORD4>before</KEYWORD4>
+			<KEYWORD4>checked</KEYWORD4>
+			<KEYWORD4>disabled</KEYWORD4>
+			<KEYWORD4>empty</KEYWORD4>
+			<KEYWORD4>enabled</KEYWORD4>
 			<KEYWORD4>first-child</KEYWORD4>
-			<KEYWORD4>link</KEYWORD4>
-			<KEYWORD4>visited</KEYWORD4>
-			<KEYWORD4>active</KEYWORD4>
-			<KEYWORD4>hover</KEYWORD4>
+			<KEYWORD4>first-letter</KEYWORD4>
+			<KEYWORD4>first-line</KEYWORD4>
+			<KEYWORD4>first-of-type</KEYWORD4>
 			<KEYWORD4>focus</KEYWORD4>
+			<KEYWORD4>hover</KEYWORD4>
+			<KEYWORD4>in-range</KEYWORD4>
+			<KEYWORD4>invalid</KEYWORD4>
+			<KEYWORD4>lang</KEYWORD4>
+			<KEYWORD4>last-child</KEYWORD4>
+			<KEYWORD4>last-of-type</KEYWORD4>
+			<KEYWORD4>link</KEYWORD4>
+			<KEYWORD4>not</KEYWORD4>
+			<KEYWORD4>nth-child</KEYWORD4>
+			<KEYWORD4>nth-last-child</KEYWORD4>
+			<KEYWORD4>nth-last-of-type</KEYWORD4>
+			<KEYWORD4>nth-of-type</KEYWORD4>
+			<KEYWORD4>only-of-type</KEYWORD4>
+			<KEYWORD4>only-child</KEYWORD4>
+			<KEYWORD4>optional</KEYWORD4>
+			<KEYWORD4>out-of-range</KEYWORD4>
+			<KEYWORD4>read-only</KEYWORD4>
+			<KEYWORD4>read-write</KEYWORD4>
+			<KEYWORD4>required</KEYWORD4>
+			<KEYWORD4>root</KEYWORD4>
+			<KEYWORD4>selection</KEYWORD4>
+			<KEYWORD4>target</KEYWORD4>
+			<KEYWORD4>valid</KEYWORD4>
+			<KEYWORD4>visited</KEYWORD4>
 		</KEYWORDS>
-	</RULES>
-
-
-	<RULES SET="LITERAL" DEFAULT="LITERAL1" ESCAPE="\">
 	</RULES>
 
 	<!-- Properties: -->
@@ -88,164 +117,174 @@
 		<IMPORT DELEGATE="GLOBAL" />
 
 		<KEYWORDS>
-			<!-- CSS2 properties -->
+			<!-- CSS 1-3 properties filtered by major browser support 2016 -->
 
-			<!-- Color and background properties -->
+			<KEYWORD2>background-clip</KEYWORD2>
+			<KEYWORD2>align-content</KEYWORD2>
+			<KEYWORD2>align-items</KEYWORD2>
+			<KEYWORD2>align-self</KEYWORD2>
+			<KEYWORD2>animation</KEYWORD2>
+			<KEYWORD2>animation-delay</KEYWORD2>
+			<KEYWORD2>animation-direction</KEYWORD2>
+			<KEYWORD2>animation-duration</KEYWORD2>
+			<KEYWORD2>animation-iteration-count</KEYWORD2>
+			<KEYWORD2>animation-name</KEYWORD2>
+			<KEYWORD2>animation-play-state</KEYWORD2>
+			<KEYWORD2>animation-timing-function</KEYWORD2>
+			<KEYWORD2>backface-visibility</KEYWORD2>
 			<KEYWORD2>background</KEYWORD2>
 			<KEYWORD2>background-attachment</KEYWORD2>
+			<KEYWORD2>background-clip</KEYWORD2>
 			<KEYWORD2>background-color</KEYWORD2>
 			<KEYWORD2>background-image</KEYWORD2>
+			<KEYWORD2>background-origin</KEYWORD2>
 			<KEYWORD2>background-position</KEYWORD2>
 			<KEYWORD2>background-repeat</KEYWORD2>
+			<KEYWORD2>background-size</KEYWORD2>
+			<KEYWORD2>border</KEYWORD2>
+			<KEYWORD2>border-bottom</KEYWORD2>
+			<KEYWORD2>border-bottom-color</KEYWORD2>
+			<KEYWORD2>border-bottom-left-radius</KEYWORD2>
+			<KEYWORD2>border-bottom-right-radius</KEYWORD2>
+			<KEYWORD2>border-bottom-style</KEYWORD2>
+			<KEYWORD2>border-bottom-width</KEYWORD2>
+			<KEYWORD2>border-collapse</KEYWORD2>
+			<KEYWORD2>border-color</KEYWORD2>
+			<KEYWORD2>border-image</KEYWORD2>
+			<KEYWORD2>border-image-outset</KEYWORD2>
+			<KEYWORD2>border-image-repeat</KEYWORD2>
+			<KEYWORD2>border-image-slice</KEYWORD2>
+			<KEYWORD2>border-image-source</KEYWORD2>
+			<KEYWORD2>border-image-width</KEYWORD2>
+			<KEYWORD2>border-left</KEYWORD2>
+			<KEYWORD2>border-left-color</KEYWORD2>
+			<KEYWORD2>border-left-style</KEYWORD2>
+			<KEYWORD2>border-left-width</KEYWORD2>
+			<KEYWORD2>border-radius</KEYWORD2>
+			<KEYWORD2>border-right</KEYWORD2>
+			<KEYWORD2>border-right-color</KEYWORD2>
+			<KEYWORD2>border-right-style</KEYWORD2>
+			<KEYWORD2>border-right-width</KEYWORD2>
+			<KEYWORD2>border-spacing</KEYWORD2>
+			<KEYWORD2>border-style</KEYWORD2>
+			<KEYWORD2>border-top</KEYWORD2>
+			<KEYWORD2>border-top-color</KEYWORD2>
+			<KEYWORD2>border-top-left-radius</KEYWORD2>
+			<KEYWORD2>border-top-right-radius</KEYWORD2>
+			<KEYWORD2>border-top-style</KEYWORD2>
+			<KEYWORD2>border-top-width</KEYWORD2>
+			<KEYWORD2>border-width</KEYWORD2>
+			<KEYWORD2>bottom</KEYWORD2>
+			<KEYWORD2>box-shadow</KEYWORD2>
+			<KEYWORD2>box-sizing</KEYWORD2>
+			<KEYWORD2>caption-side</KEYWORD2>
+			<KEYWORD2>clear</KEYWORD2>
+			<KEYWORD2>clip</KEYWORD2>
 			<KEYWORD2>color</KEYWORD2>
-
-			<!-- Font properties -->
+			<KEYWORD2>column-count</KEYWORD2>
+			<KEYWORD2>column-gap</KEYWORD2>
+			<KEYWORD2>column-rule</KEYWORD2>
+			<KEYWORD2>column-rule-color</KEYWORD2>
+			<KEYWORD2>column-rule-style</KEYWORD2>
+			<KEYWORD2>column-rule-width</KEYWORD2>
+			<KEYWORD2>column-span</KEYWORD2>
+			<KEYWORD2>column-width</KEYWORD2>
+			<KEYWORD2>columns</KEYWORD2>
+			<KEYWORD2>content</KEYWORD2>
+			<KEYWORD2>counter-increment</KEYWORD2>
+			<KEYWORD2>counter-reset</KEYWORD2>
+			<KEYWORD2>cursor</KEYWORD2>
+			<KEYWORD2>direction</KEYWORD2>
+			<KEYWORD2>display</KEYWORD2>
+			<KEYWORD2>empty-cells</KEYWORD2>
+			<KEYWORD2>fill</KEYWORD2>
+			<KEYWORD2>flex</KEYWORD2>
+			<KEYWORD2>flex-basis</KEYWORD2>
+			<KEYWORD2>flex-direction</KEYWORD2>
+			<KEYWORD2>flex-flow</KEYWORD2>
+			<KEYWORD2>flex-grow</KEYWORD2>
+			<KEYWORD2>flex-shrink</KEYWORD2>
+			<KEYWORD2>flex-wrap</KEYWORD2>
+			<KEYWORD2>float</KEYWORD2>
 			<KEYWORD2>font</KEYWORD2>
 			<KEYWORD2>font-family</KEYWORD2>
 			<KEYWORD2>font-size</KEYWORD2>
-			<KEYWORD2>font-size-adjust</KEYWORD2>
 			<KEYWORD2>font-style</KEYWORD2>
 			<KEYWORD2>font-variant</KEYWORD2>
 			<KEYWORD2>font-weight</KEYWORD2>
-			<KEYWORD2>font-stretch</KEYWORD2>
-			<KEYWORD2>src</KEYWORD2>
-			<KEYWORD2>definition-src</KEYWORD2>
-			<KEYWORD2>unicode-range</KEYWORD2>
-			<KEYWORD2>panose-1</KEYWORD2>
-			<KEYWORD2>stemv</KEYWORD2>
-			<KEYWORD2>stemh</KEYWORD2>
-			<KEYWORD2>units-per-em</KEYWORD2>
-			<KEYWORD2>slope</KEYWORD2>
-			<KEYWORD2>cap-height</KEYWORD2>
-			<KEYWORD2>x-height</KEYWORD2>
-			<KEYWORD2>ascent</KEYWORD2>
-			<KEYWORD2>descent</KEYWORD2>
-			<KEYWORD2>baseline</KEYWORD2>
-			<KEYWORD2>centerline</KEYWORD2>
-			<KEYWORD2>mathline</KEYWORD2>
-			<KEYWORD2>topline</KEYWORD2>
-
-			<!-- Text properties -->
-			<KEYWORD2>letter-spacing</KEYWORD2>
-			<KEYWORD2>text-align</KEYWORD2>
-			<KEYWORD2>text-shadow</KEYWORD2>
-			<KEYWORD2>text-decoration</KEYWORD2>
-			<KEYWORD2>text-indent</KEYWORD2>
-			<KEYWORD2>text-transform</KEYWORD2>
-			<KEYWORD2>word-spacing</KEYWORD2>
-			<KEYWORD2>letter-spacing</KEYWORD2>
-			<KEYWORD2>white-space</KEYWORD2>
-
-			<!-- Box properties -->
-			<KEYWORD2>border</KEYWORD2>
-			<KEYWORD2>bottom</KEYWORD2>
-			<KEYWORD2>border-collapse</KEYWORD2>
-			<KEYWORD2>border-spacing</KEYWORD2>
-			<KEYWORD2>border-bottom</KEYWORD2>
-			<KEYWORD2>border-bottom-style</KEYWORD2>
-			<KEYWORD2>border-bottom-width</KEYWORD2>
-			<KEYWORD2>border-bottom-color</KEYWORD2>
-			<KEYWORD2>border-left</KEYWORD2>
-			<KEYWORD2>border-left-style</KEYWORD2>
-			<KEYWORD2>border-left-width</KEYWORD2>
-			<KEYWORD2>border-left-color</KEYWORD2>
-			<KEYWORD2>border-right</KEYWORD2>
-			<KEYWORD2>border-right-style</KEYWORD2>
-			<KEYWORD2>border-right-width</KEYWORD2>
-			<KEYWORD2>border-right-color</KEYWORD2>
-			<KEYWORD2>border-top</KEYWORD2>
-			<KEYWORD2>border-top-style</KEYWORD2>
-			<KEYWORD2>border-top-width</KEYWORD2>
-			<KEYWORD2>border-top-color</KEYWORD2>
-			<KEYWORD2>border-color</KEYWORD2>
-			<KEYWORD2>border-style</KEYWORD2>
-			<KEYWORD2>border-width</KEYWORD2>
-			<KEYWORD2>clear</KEYWORD2>
-			<KEYWORD2>float</KEYWORD2>
 			<KEYWORD2>height</KEYWORD2>
+			<KEYWORD2>justify-content</KEYWORD2>
+			<KEYWORD2>left</KEYWORD2>
+			<KEYWORD2>letter-spacing</KEYWORD2>
+			<KEYWORD2>line-break</KEYWORD2>
+			<KEYWORD2>line-height</KEYWORD2>
+			<KEYWORD2>list-style</KEYWORD2>
+			<KEYWORD2>list-style-image</KEYWORD2>
+			<KEYWORD2>list-style-position</KEYWORD2>
+			<KEYWORD2>list-style-type</KEYWORD2>
 			<KEYWORD2>margin</KEYWORD2>
 			<KEYWORD2>margin-bottom</KEYWORD2>
 			<KEYWORD2>margin-left</KEYWORD2>
 			<KEYWORD2>margin-right</KEYWORD2>
 			<KEYWORD2>margin-top</KEYWORD2>
+			<KEYWORD2>max-height</KEYWORD2>
+			<KEYWORD2>max-width</KEYWORD2>
+			<KEYWORD2>min-height</KEYWORD2>
+			<KEYWORD2>min-width</KEYWORD2>
+			<KEYWORD2>object-fit</KEYWORD2>
+			<KEYWORD2>opacity</KEYWORD2>
+			<KEYWORD2>order</KEYWORD2>
+			<KEYWORD2>orphans</KEYWORD2>
+			<KEYWORD2>outline</KEYWORD2>
+			<KEYWORD2>outline-color</KEYWORD2>
+			<KEYWORD2>outline-offset</KEYWORD2>
+			<KEYWORD2>outline-style</KEYWORD2>
+			<KEYWORD2>outline-width</KEYWORD2>
+			<KEYWORD2>overflow</KEYWORD2>
+			<KEYWORD2>overflow-wrap</KEYWORD2>
+			<KEYWORD2>overflow-x</KEYWORD2>
+			<KEYWORD2>overflow-y</KEYWORD2>
 			<KEYWORD2>padding</KEYWORD2>
 			<KEYWORD2>padding-bottom</KEYWORD2>
 			<KEYWORD2>padding-left</KEYWORD2>
 			<KEYWORD2>padding-right</KEYWORD2>
 			<KEYWORD2>padding-top</KEYWORD2>
-			<KEYWORD2>clear</KEYWORD2>
-
-			<!-- Visual formatting properties -->
-			<KEYWORD2>display</KEYWORD2>
-			<KEYWORD2>position</KEYWORD2>
-			<KEYWORD2>top</KEYWORD2>
-			<KEYWORD2>right</KEYWORD2>
-			<KEYWORD2>bottom</KEYWORD2>
-			<KEYWORD2>left</KEYWORD2>
-			<KEYWORD2>float</KEYWORD2>
-			<KEYWORD2>z-index</KEYWORD2>
-			<KEYWORD2>direction</KEYWORD2>
-			<KEYWORD2>unicode-bidi</KEYWORD2>
-			<KEYWORD2>width</KEYWORD2>
-			<KEYWORD2>min-width</KEYWORD2>
-			<KEYWORD2>max-width</KEYWORD2>
-			<KEYWORD2>height</KEYWORD2>
-			<KEYWORD2>min-height</KEYWORD2>
-			<KEYWORD2>max-height</KEYWORD2>
-			<KEYWORD2>line-height</KEYWORD2>
-			<KEYWORD2>vertical-align</KEYWORD2>
-
-			<!-- Visual effects -->
-			<KEYWORD2>overflow</KEYWORD2>
-			<KEYWORD2>clip</KEYWORD2>
-			<KEYWORD2>visibility</KEYWORD2>
-
-			<!-- Page properties -->
-			<KEYWORD2>size</KEYWORD2>
-			<KEYWORD2>marks</KEYWORD2>
-			<KEYWORD2>page-break-before</KEYWORD2>
 			<KEYWORD2>page-break-after</KEYWORD2>
+			<KEYWORD2>page-break-before</KEYWORD2>
 			<KEYWORD2>page-break-inside</KEYWORD2>
-			<KEYWORD2>page</KEYWORD2>
-			<KEYWORD2>orphans</KEYWORD2>
-			<KEYWORD2>widows</KEYWORD2>
-
-			<!-- Table properties -->
-			<KEYWORD2>caption-side</KEYWORD2>
+			<KEYWORD2>perspective</KEYWORD2>
+			<KEYWORD2>perspective-origin</KEYWORD2>
+			<KEYWORD2>position</KEYWORD2>
+			<KEYWORD2>quotes</KEYWORD2>
+			<KEYWORD2>resize</KEYWORD2>
+			<KEYWORD2>right</KEYWORD2>
 			<KEYWORD2>table-layout</KEYWORD2>
-			<KEYWORD2>border-collapse</KEYWORD2>
-			<KEYWORD2>border-spacing</KEYWORD2>
-			<KEYWORD2>empty-cells</KEYWORD2>
-			<KEYWORD2>speak-headers</KEYWORD2>
+			<KEYWORD2>text-align</KEYWORD2>
+			<KEYWORD2>text-decoration</KEYWORD2>
+			<KEYWORD2>text-indent</KEYWORD2>
+			<KEYWORD2>text-overflow</KEYWORD2>
+			<KEYWORD2>text-shadow</KEYWORD2>
+			<KEYWORD2>text-transform</KEYWORD2>
+			<KEYWORD2>top</KEYWORD2>
+			<KEYWORD2>transform</KEYWORD2>
+			<KEYWORD2>transform-origin</KEYWORD2>
+			<KEYWORD2>transform-style</KEYWORD2>
+			<KEYWORD2>transition</KEYWORD2>
+			<KEYWORD2>transition-delay</KEYWORD2>
+			<KEYWORD2>transition-duration</KEYWORD2>
+			<KEYWORD2>transition-property</KEYWORD2>
+			<KEYWORD2>transition-timing-function</KEYWORD2>
+			<KEYWORD2>unicode-bidi</KEYWORD2>
+			<KEYWORD2>vertical-align</KEYWORD2>
+			<KEYWORD2>visibility</KEYWORD2>
+			<KEYWORD2>white-space</KEYWORD2>
+			<KEYWORD2>widows</KEYWORD2>
+			<KEYWORD2>width</KEYWORD2>
+			<KEYWORD2>word-break</KEYWORD2>
+			<KEYWORD2>word-spacing</KEYWORD2>
+			<KEYWORD2>word-wrap</KEYWORD2>
+			<KEYWORD2>z-index</KEYWORD2>
 
-			<!-- User interface -->
-			<KEYWORD2>cursor</KEYWORD2>
-			<KEYWORD2>outline</KEYWORD2>
-			<KEYWORD2>outline-width</KEYWORD2>
-			<KEYWORD2>outline-style</KEYWORD2>
-			<KEYWORD2>outline-color</KEYWORD2>
-
-			<!-- Aural properties -->
-			<KEYWORD2>azimuth</KEYWORD2>
-			<KEYWORD2>volume</KEYWORD2>
-			<KEYWORD2>speak</KEYWORD2>
-			<KEYWORD2>pause</KEYWORD2>
-			<KEYWORD2>pause-before</KEYWORD2>
-			<KEYWORD2>pause-after</KEYWORD2>
-			<KEYWORD2>cue</KEYWORD2>
-			<KEYWORD2>cue-before</KEYWORD2>
-			<KEYWORD2>cue-after</KEYWORD2>
-			<KEYWORD2>play-during</KEYWORD2>
-			<KEYWORD2>elevation</KEYWORD2>
-			<KEYWORD2>speech-rate</KEYWORD2>
-			<KEYWORD2>voice-family</KEYWORD2>
-			<KEYWORD2>pitch</KEYWORD2>
-			<KEYWORD2>pitch-range</KEYWORD2>
-			<KEYWORD2>stress</KEYWORD2>
-			<KEYWORD2>richness</KEYWORD2>
-			<KEYWORD2>speak-punctuation</KEYWORD2>
-			<KEYWORD2>speak-numeral</KEYWORD2>
-			<KEYWORD2>speak-header-cell</KEYWORD2>
 		</KEYWORDS>
 	</RULES>
 
@@ -253,25 +292,21 @@
 	<!-- Values: -->
 	<RULES SET="PROP_VALUE"
 		HIGHLIGHT_DIGITS="TRUE"
-		DIGIT_RE="-?[\p{Digit}]+(pt|pc|in|mm|cm|em|ex|px|ms|s|%)"
-		NO_WORD_SEP="-_%"
-		ESCAPE="\">
+		DIGIT_RE="-?\d+(\.\d+)?(pt|pc|in|mm|cm|em|ex|px|ms|s|%|)"
+		NO_WORD_SEP="-_%">
 
-		<SPAN DELEGATE="LITERAL">
-			<BEGIN>"</BEGIN>
-			<END>"</END>
-		</SPAN>
-
-		<!-- "functions" -->
-		<SPAN_REGEXP DELEGATE="LITERAL" HASH_CHARS="RU" TYPE="KEYWORD1">
-			<BEGIN>(rgb|url)\s*\(</BEGIN>
-			<END>)</END>
+		<SPAN_REGEXP TYPE="LITERAL1" ESCAPE="\" HASH_CHARS="&quot;'">
+			<BEGIN>(["'])</BEGIN>
+			<END>$1</END>
 		</SPAN_REGEXP>
 
-		<!-- <SEQ DELEGATE="PROP_VALUE_COLOR">#</SEQ> -->
-		<MARK_FOLLOWING TYPE="DIGIT">#</MARK_FOLLOWING>
+		<!-- "functions" -->
 
-		<SEQ_REGEXP HASH_CHAR="!" TYPE="KEYWORD2">!\s*important</SEQ_REGEXP>
+		<!-- url without quotes -->
+		<SPAN_REGEXP TYPE="LITERAL1" MATCH_TYPE="KEYWORD1" HASH_CHAR="url(" ESCAPE="\">
+			<BEGIN>url\((?=\s*[^"'])</BEGIN>
+			<END>)</END>
+		</SPAN_REGEXP>
 
 		<!-- proprietary IE function: -->
 		<SPAN_REGEXP TYPE="FUNCTION" DELEGATE="javascript::MAIN" HASH_CHAR="expression">
@@ -279,359 +314,484 @@
 			<END>)</END>
 		</SPAN_REGEXP>
 
+		<!-- all other functions -->
+		<SPAN_REGEXP TYPE="KEYWORD1" DELEGATE="PROP_VALUE">
+			<BEGIN>[\w-]+\(</BEGIN>
+			<END>)</END>
+		</SPAN_REGEXP>
+
+		<MARK_FOLLOWING TYPE="DIGIT">#</MARK_FOLLOWING>
+
+		<SEQ_REGEXP HASH_CHAR="!" TYPE="KEYWORD2">!\s*important</SEQ_REGEXP>
+
 		<!-- Delegate back: -->
 		<SEQ TYPE="OPERATOR" DELEGATE="PROPERTIES">;</SEQ>
-		<SEQ TYPE="INVALID" DELEGATE="MAIN">}</SEQ> <!-- end properties block, but it's invalid -->
+		<SEQ TYPE="OPERATOR" DELEGATE="MAIN">}</SEQ>
 
 		<IMPORT DELEGATE="GLOBAL" />
 
 		<KEYWORDS>
-			<KEYWORD3>left</KEYWORD3>
-			<KEYWORD3>right</KEYWORD3>
-			<KEYWORD3>below</KEYWORD3>
-			<KEYWORD3>level</KEYWORD3>
-			<KEYWORD3>above</KEYWORD3>
-			<KEYWORD3>higher</KEYWORD3>
-			<KEYWORD3>lower</KEYWORD3>
-			<KEYWORD3>show</KEYWORD3>
-			<KEYWORD3>hide</KEYWORD3>
-			<KEYWORD3>normal</KEYWORD3>
-			<KEYWORD3>wider</KEYWORD3>
-			<KEYWORD3>narrower</KEYWORD3>
-			<KEYWORD3>ultra-condensed</KEYWORD3>
-			<KEYWORD3>extra-condensed</KEYWORD3>
-			<KEYWORD3>condensed</KEYWORD3>
-			<KEYWORD3>semi-condensed</KEYWORD3>
-			<KEYWORD3>semi-expanded</KEYWORD3>
-			<KEYWORD3>expanded</KEYWORD3>
-			<KEYWORD3>extra-expanded</KEYWORD3>
-			<KEYWORD3>ultra-expanded</KEYWORD3>
-			<KEYWORD3>normal</KEYWORD3>
-			<KEYWORD3>italic</KEYWORD3>
-			<KEYWORD3>oblique</KEYWORD3>
-			<KEYWORD3>normal</KEYWORD3>
-			<KEYWORD3>xx-small</KEYWORD3>
-			<KEYWORD3>x-small</KEYWORD3>
-			<KEYWORD3>small</KEYWORD3>
-			<KEYWORD3>large</KEYWORD3>
-			<KEYWORD3>x-large</KEYWORD3>
-			<KEYWORD3>xx-large</KEYWORD3>
-			<KEYWORD3>thin</KEYWORD3>
-			<KEYWORD3>thick</KEYWORD3>
-			<KEYWORD3>smaller</KEYWORD3>
-			<KEYWORD3>larger</KEYWORD3>
-			<KEYWORD3>small-caps</KEYWORD3>
-			<KEYWORD3>inherit</KEYWORD3>
-			<KEYWORD3>bold</KEYWORD3>
-			<KEYWORD3>bolder</KEYWORD3>
-			<KEYWORD3>lighter</KEYWORD3>
-			<KEYWORD3>inside</KEYWORD3>
-			<KEYWORD3>outside</KEYWORD3>
-			<KEYWORD3>disc</KEYWORD3>
-			<KEYWORD3>circle</KEYWORD3>
-			<KEYWORD3>square</KEYWORD3>
-			<KEYWORD3>decimal</KEYWORD3>
-			<KEYWORD3>decimal-leading-zero</KEYWORD3>
-			<KEYWORD3>lower-roman</KEYWORD3>
-			<KEYWORD3>upper-roman</KEYWORD3>
-			<KEYWORD3>lower-greek</KEYWORD3>
-			<KEYWORD3>lower-alpha</KEYWORD3>
-			<KEYWORD3>lower-latin</KEYWORD3>
-			<KEYWORD3>upper-alpha</KEYWORD3>
-			<KEYWORD3>upper-latin</KEYWORD3>
-			<KEYWORD3>hebrew</KEYWORD3>
-			<KEYWORD3>armenian</KEYWORD3>
-			<KEYWORD3>georgian</KEYWORD3>
-			<KEYWORD3>cjk-ideographic</KEYWORD3>
-			<KEYWORD3>hiragana</KEYWORD3>
-			<KEYWORD3>katakana</KEYWORD3>
-			<KEYWORD3>hiragana-iroha</KEYWORD3>
-			<KEYWORD3>katakana-iroha</KEYWORD3>
-			<KEYWORD3>crop</KEYWORD3>
-			<KEYWORD3>cross</KEYWORD3>
-			<KEYWORD3>invert</KEYWORD3>
-			<KEYWORD3>hidden</KEYWORD3>
-			<KEYWORD3>always</KEYWORD3>
-			<KEYWORD3>avoid</KEYWORD3>
-			<KEYWORD3>x-low</KEYWORD3>
-			<KEYWORD3>low</KEYWORD3>
-			<KEYWORD3>high</KEYWORD3>
-			<KEYWORD3>x-high</KEYWORD3>
-			<KEYWORD3>absolute</KEYWORD3>
-			<KEYWORD3>fixed</KEYWORD3>
-			<KEYWORD3>relative</KEYWORD3>
-			<KEYWORD3>static</KEYWORD3>
-			<KEYWORD3>portrait</KEYWORD3>
-			<KEYWORD3>landscape</KEYWORD3>
-			<KEYWORD3>spell-out</KEYWORD3>
-			<KEYWORD3>digits</KEYWORD3>
-			<KEYWORD3>continuous</KEYWORD3>
-			<KEYWORD3>x-slow</KEYWORD3>
-			<KEYWORD3>slow</KEYWORD3>
-			<KEYWORD3>fast</KEYWORD3>
-			<KEYWORD3>x-fast</KEYWORD3>
-			<KEYWORD3>faster</KEYWORD3>
-			<KEYWORD3>slower</KEYWORD3>
-			<KEYWORD3>underline</KEYWORD3>
-			<KEYWORD3>overline</KEYWORD3>
-			<KEYWORD3>line-through</KEYWORD3>
-			<KEYWORD3>blink</KEYWORD3>
-			<KEYWORD3>capitalize</KEYWORD3>
-			<KEYWORD3>uppercase</KEYWORD3>
-			<KEYWORD3>lowercase</KEYWORD3>
-			<KEYWORD3>embed</KEYWORD3>
-			<KEYWORD3>bidi-override</KEYWORD3>
-			<KEYWORD3>baseline</KEYWORD3>
-			<KEYWORD3>sub</KEYWORD3>
-			<KEYWORD3>super</KEYWORD3>
-			<KEYWORD3>top</KEYWORD3>
-			<KEYWORD3>text-top</KEYWORD3>
-			<KEYWORD3>middle</KEYWORD3>
-			<KEYWORD3>bottom</KEYWORD3>
-			<KEYWORD3>text-bottom</KEYWORD3>
-			<KEYWORD3>visible</KEYWORD3>
-			<KEYWORD3>hidden</KEYWORD3>
-			<KEYWORD3>collapse</KEYWORD3>
-			<KEYWORD3>soft</KEYWORD3>
-			<KEYWORD3>loud</KEYWORD3>
-			<KEYWORD3>x-loud</KEYWORD3>
-			<KEYWORD3>pre</KEYWORD3>
-			<KEYWORD3>nowrap</KEYWORD3>
-			<KEYWORD3>dotted</KEYWORD3>
-			<KEYWORD3>dashed</KEYWORD3>
-			<KEYWORD3>solid</KEYWORD3>
-			<KEYWORD3>double</KEYWORD3>
-			<KEYWORD3>groove</KEYWORD3>
-			<KEYWORD3>ridge</KEYWORD3>
-			<KEYWORD3>inset</KEYWORD3>
-			<KEYWORD3>outset</KEYWORD3>
-			<KEYWORD3>once</KEYWORD3>
-			<KEYWORD3>both</KEYWORD3>
-			<KEYWORD3>silent</KEYWORD3>
-			<KEYWORD3>medium</KEYWORD3>
-			<KEYWORD3>mix</KEYWORD3>
-			<KEYWORD3>male</KEYWORD3>
-			<KEYWORD3>female</KEYWORD3>
-			<KEYWORD3>child</KEYWORD3>
-			<KEYWORD3>code</KEYWORD3>
+            <KEYWORD3>above</KEYWORD3>
+            <KEYWORD3>absolute</KEYWORD3>
+            <KEYWORD3>absolute-colorimetric</KEYWORD3>
+            <KEYWORD3>adjacent</KEYWORD3>
+            <KEYWORD3>after</KEYWORD3>
+            <KEYWORD3>after-edge</KEYWORD3>
+            <KEYWORD3>all</KEYWORD3>
+            <KEYWORD3>allow-end</KEYWORD3>
+            <KEYWORD3>alphabetic</KEYWORD3>
+            <KEYWORD3>alphabetical</KEYWORD3>
+            <KEYWORD3>alternate</KEYWORD3>
+            <KEYWORD3>always</KEYWORD3>
+            <KEYWORD3>armenian</KEYWORD3>
+            <KEYWORD3>attr</KEYWORD3>
+            <KEYWORD3>auto</KEYWORD3>
+            <KEYWORD3>avoid</KEYWORD3>
+            <KEYWORD3>back</KEYWORD3>
+            <KEYWORD3>balance</KEYWORD3>
+            <KEYWORD3>baseline</KEYWORD3>
+            <KEYWORD3>before</KEYWORD3>
+            <KEYWORD3>before-edge</KEYWORD3>
+            <KEYWORD3>behind</KEYWORD3>
+            <KEYWORD3>bidi-override</KEYWORD3>
+            <KEYWORD3>blink</KEYWORD3>
+            <KEYWORD3>block</KEYWORD3>
+            <KEYWORD3>block-axis</KEYWORD3>
+            <KEYWORD3>block-line-height</KEYWORD3>
+            <KEYWORD3>blur</KEYWORD3>
+            <KEYWORD3>bold</KEYWORD3>
+            <KEYWORD3>bolder</KEYWORD3>
+            <KEYWORD3>border-box</KEYWORD3>
+            <KEYWORD3>border-box </KEYWORD3>
+            <KEYWORD3>both</KEYWORD3>
+            <KEYWORD3>bottom</KEYWORD3>
+            <KEYWORD3>break-all</KEYWORD3>
+            <KEYWORD3>break-word</KEYWORD3>
+            <KEYWORD3>button</KEYWORD3>
+            <KEYWORD3>capitalize</KEYWORD3>
+            <KEYWORD3>caps-height</KEYWORD3>
+            <KEYWORD3>caption</KEYWORD3>
+            <KEYWORD3>center</KEYWORD3>
+            <KEYWORD3>center bottom</KEYWORD3>
+            <KEYWORD3>center center</KEYWORD3>
+            <KEYWORD3>center top</KEYWORD3>
+            <KEYWORD3>central</KEYWORD3>
+            <KEYWORD3>circle</KEYWORD3>
+            <KEYWORD3>clip</KEYWORD3>
+            <KEYWORD3>close-quote</KEYWORD3>
+            <KEYWORD3>collapse</KEYWORD3>
+            <KEYWORD3>color</KEYWORD3>
+            <KEYWORD3>condensed</KEYWORD3>
+            <KEYWORD3>consider-shifts</KEYWORD3>
+            <KEYWORD3>contain</KEYWORD3>
+            <KEYWORD3>content</KEYWORD3>
+            <KEYWORD3>content-box</KEYWORD3>
+            <KEYWORD3>counter</KEYWORD3>
+            <KEYWORD3>cover</KEYWORD3>
+            <KEYWORD3>crop</KEYWORD3>
+            <KEYWORD3>cross</KEYWORD3>
+            <KEYWORD3>crosshair</KEYWORD3>
+            <KEYWORD3>cubic-bezier</KEYWORD3>
+            <KEYWORD3>current</KEYWORD3>
+            <KEYWORD3>cursive</KEYWORD3>
+            <KEYWORD3>dashed</KEYWORD3>
+            <KEYWORD3>decimal</KEYWORD3>
+            <KEYWORD3>decimal-leading-zero</KEYWORD3>
+            <KEYWORD3>default</KEYWORD3>
+            <KEYWORD3>disc</KEYWORD3>
+            <KEYWORD3>disregard-shifts</KEYWORD3>
+            <KEYWORD3>distribute</KEYWORD3>
+            <KEYWORD3>distribute-letter</KEYWORD3>
+            <KEYWORD3>distribute-space</KEYWORD3>
+            <KEYWORD3>dotted</KEYWORD3>
+            <KEYWORD3>double</KEYWORD3>
+            <KEYWORD3>resize</KEYWORD3>
+            <KEYWORD3>e-resize</KEYWORD3>
+            <KEYWORD3>ease</KEYWORD3>
+            <KEYWORD3>ease-in</KEYWORD3>
+            <KEYWORD3>ease-in-out</KEYWORD3>
+            <KEYWORD3>ease-out</KEYWORD3>
+            <KEYWORD3>ellipsis</KEYWORD3>
+            <KEYWORD3>embed</KEYWORD3>
+            <KEYWORD3>end</KEYWORD3>
+            <KEYWORD3>end-edge</KEYWORD3>
+            <KEYWORD3>exclude-ruby</KEYWORD3>
+            <KEYWORD3>extra-condensed</KEYWORD3>
+            <KEYWORD3>extra-expanded</KEYWORD3>
+            <KEYWORD3>family-name</KEYWORD3>
+            <KEYWORD3>fantasy</KEYWORD3>
+            <KEYWORD3>fast</KEYWORD3>
+            <KEYWORD3>field</KEYWORD3>
+            <KEYWORD3>fill</KEYWORD3>
+            <KEYWORD3>first</KEYWORD3>
+            <KEYWORD3>fixed</KEYWORD3>
+            <KEYWORD3>flat</KEYWORD3>
+            <KEYWORD3>font-family</KEYWORD3>
+            <KEYWORD3>font-size</KEYWORD3>
+            <KEYWORD3>forward</KEYWORD3>
+            <KEYWORD3>front</KEYWORD3>
+            <KEYWORD3>georgian</KEYWORD3>
+            <KEYWORD3>grid-height</KEYWORD3>
+            <KEYWORD3>groove</KEYWORD3>
+            <KEYWORD3>h-shadow</KEYWORD3>
+            <KEYWORD3>hanging</KEYWORD3>
+            <KEYWORD3>help</KEYWORD3>
+            <KEYWORD3>here</KEYWORD3>
+            <KEYWORD3>hidden</KEYWORD3>
+            <KEYWORD3>hide</KEYWORD3>
+            <KEYWORD3>high</KEYWORD3>
+            <KEYWORD3>horizontal</KEYWORD3>
+            <KEYWORD3>hyphenate</KEYWORD3>
+            <KEYWORD3>icon</KEYWORD3>
+            <KEYWORD3>ideographic</KEYWORD3>
+            <KEYWORD3>include-ruby</KEYWORD3>
+            <KEYWORD3>infinite</KEYWORD3>
+            <KEYWORD3>inherit</KEYWORD3>
+            <KEYWORD3>initial</KEYWORD3>
+            <KEYWORD3>inline</KEYWORD3>
+            <KEYWORD3>inline-axis</KEYWORD3>
+            <KEYWORD3>inline-block</KEYWORD3>
+            <KEYWORD3>inline-line-height</KEYWORD3>
+            <KEYWORD3>inline-table</KEYWORD3>
+            <KEYWORD3>inset</KEYWORD3>
+            <KEYWORD3>inside</KEYWORD3>
+            <KEYWORD3>integer</KEYWORD3>
+            <KEYWORD3>inter-cluster</KEYWORD3>
+            <KEYWORD3>inter-ideograph</KEYWORD3>
+            <KEYWORD3>inter-word</KEYWORD3>
+            <KEYWORD3>italic</KEYWORD3>
+            <KEYWORD3>justify</KEYWORD3>
+            <KEYWORD3>kashida</KEYWORD3>
+            <KEYWORD3>landscape</KEYWORD3>
+            <KEYWORD3>large</KEYWORD3>
+            <KEYWORD3>larger</KEYWORD3>
+            <KEYWORD3>last</KEYWORD3>
+            <KEYWORD3>left</KEYWORD3>
+            <KEYWORD3>left bottom</KEYWORD3>
+            <KEYWORD3>left center</KEYWORD3>
+            <KEYWORD3>left top</KEYWORD3>
+            <KEYWORD3>leftwards</KEYWORD3>
+            <KEYWORD3>length</KEYWORD3>
+            <KEYWORD3>lighter</KEYWORD3>
+            <KEYWORD3>line-edge</KEYWORD3>
+            <KEYWORD3>line-through</KEYWORD3>
+            <KEYWORD3>linear</KEYWORD3>
+            <KEYWORD3>list-item</KEYWORD3>
+            <KEYWORD3>loud</KEYWORD3>
+            <KEYWORD3>low</KEYWORD3>
+            <KEYWORD3>lower-alpha</KEYWORD3>
+            <KEYWORD3>lower-greek</KEYWORD3>
+            <KEYWORD3>lower-latin</KEYWORD3>
+            <KEYWORD3>lower-roman</KEYWORD3>
+            <KEYWORD3>lowercase</KEYWORD3>
+            <KEYWORD3>ltr</KEYWORD3>
+            <KEYWORD3>manual</KEYWORD3>
+            <KEYWORD3>mathematical</KEYWORD3>
+            <KEYWORD3>max-height</KEYWORD3>
+            <KEYWORD3>max-size</KEYWORD3>
+            <KEYWORD3>medium</KEYWORD3>
+            <KEYWORD3>meet</KEYWORD3>
+            <KEYWORD3>menu</KEYWORD3>
+            <KEYWORD3>message-box</KEYWORD3>
+            <KEYWORD3>middle</KEYWORD3>
+            <KEYWORD3>modal</KEYWORD3>
+            <KEYWORD3>moderate</KEYWORD3>
+            <KEYWORD3>monospace</KEYWORD3>
+            <KEYWORD3>move</KEYWORD3>
+            <KEYWORD3>multiple</KEYWORD3>
+            <KEYWORD3>n-resize</KEYWORD3>
+            <KEYWORD3>name</KEYWORD3>
+            <KEYWORD3>narrower</KEYWORD3>
+            <KEYWORD3>ne-resize</KEYWORD3>
+            <KEYWORD3>new</KEYWORD3>
+            <KEYWORD3>no-change</KEYWORD3>
+            <KEYWORD3>no-close-quote</KEYWORD3>
+            <KEYWORD3>no-content</KEYWORD3>
+            <KEYWORD3>no-display</KEYWORD3>
+            <KEYWORD3>no-limit</KEYWORD3>
+            <KEYWORD3>no-open-quote</KEYWORD3>
+            <KEYWORD3>no-repeat</KEYWORD3>
+            <KEYWORD3>none</KEYWORD3>
+            <KEYWORD3>normal</KEYWORD3>
+            <KEYWORD3>nowrap</KEYWORD3>
+            <KEYWORD3>nw-resize</KEYWORD3>
+            <KEYWORD3>oblique</KEYWORD3>
+            <KEYWORD3>open-quote</KEYWORD3>
+            <KEYWORD3>outset</KEYWORD3>
+            <KEYWORD3>outside</KEYWORD3>
+            <KEYWORD3>overline</KEYWORD3>
+            <KEYWORD3>padding-box</KEYWORD3>
+            <KEYWORD3>page-size</KEYWORD3>
+            <KEYWORD3>parent</KEYWORD3>
+            <KEYWORD3>paused</KEYWORD3>
+            <KEYWORD3>percentage</KEYWORD3>
+            <KEYWORD3>perceptual</KEYWORD3>
+            <KEYWORD3>pointer</KEYWORD3>
+            <KEYWORD3>portrait</KEYWORD3>
+            <KEYWORD3>pre</KEYWORD3>
+            <KEYWORD3>pre-line</KEYWORD3>
+            <KEYWORD3>pre-wrap</KEYWORD3>
+            <KEYWORD3>preserve-3d</KEYWORD3>
+            <KEYWORD3>progress</KEYWORD3>
+            <KEYWORD3>reduced</KEYWORD3>
+            <KEYWORD3>relative</KEYWORD3>
+            <KEYWORD3>relative-colorimetric</KEYWORD3>
+            <KEYWORD3>repeat</KEYWORD3>
+            <KEYWORD3>repeat-x</KEYWORD3>
+            <KEYWORD3>repeat-y</KEYWORD3>
+            <KEYWORD3>reset-size</KEYWORD3>
+            <KEYWORD3>reverse</KEYWORD3>
+            <KEYWORD3>ridge</KEYWORD3>
+            <KEYWORD3>right</KEYWORD3>
+            <KEYWORD3>right bottom</KEYWORD3>
+            <KEYWORD3>right center</KEYWORD3>
+            <KEYWORD3>right top</KEYWORD3>
+            <KEYWORD3>rightwards</KEYWORD3>
+            <KEYWORD3>root</KEYWORD3>
+            <KEYWORD3>round</KEYWORD3>
+            <KEYWORD3>rtl</KEYWORD3>
+            <KEYWORD3>run-in</KEYWORD3>
+            <KEYWORD3>running</KEYWORD3>
+            <KEYWORD3>s-resize</KEYWORD3>
+            <KEYWORD3>sans-serif</KEYWORD3>
+            <KEYWORD3>saturation</KEYWORD3>
+            <KEYWORD3>scroll</KEYWORD3>
+            <KEYWORD3>se-resize</KEYWORD3>
+            <KEYWORD3>self</KEYWORD3>
+            <KEYWORD3>semi-condensed</KEYWORD3>
+            <KEYWORD3>semi-expanded</KEYWORD3>
+            <KEYWORD3>separate</KEYWORD3>
+            <KEYWORD3>serif</KEYWORD3>
+            <KEYWORD3>shape</KEYWORD3>
+            <KEYWORD3>show</KEYWORD3>
+            <KEYWORD3>silent</KEYWORD3>
+            <KEYWORD3>single</KEYWORD3>
+            <KEYWORD3>slice</KEYWORD3>
+            <KEYWORD3>slide</KEYWORD3>
+            <KEYWORD3>slow</KEYWORD3>
+            <KEYWORD3>small</KEYWORD3>
+            <KEYWORD3>small-caps</KEYWORD3>
+            <KEYWORD3>small-caption</KEYWORD3>
+            <KEYWORD3>smaller</KEYWORD3>
+            <KEYWORD3>soft</KEYWORD3>
+            <KEYWORD3>solid</KEYWORD3>
+            <KEYWORD3>spread</KEYWORD3>
+            <KEYWORD3>square</KEYWORD3>
+            <KEYWORD3>start</KEYWORD3>
+            <KEYWORD3>static</KEYWORD3>
+            <KEYWORD3>status-bar</KEYWORD3>
+            <KEYWORD3>stretch</KEYWORD3>
+            <KEYWORD3>strong</KEYWORD3>
+            <KEYWORD3>sub</KEYWORD3>
+            <KEYWORD3>super</KEYWORD3>
+            <KEYWORD3>suppress</KEYWORD3>
+            <KEYWORD3>sw-resize</KEYWORD3>
+            <KEYWORD3>tab</KEYWORD3>
+            <KEYWORD3>table</KEYWORD3>
+            <KEYWORD3>table-caption</KEYWORD3>
+            <KEYWORD3>table-cell</KEYWORD3>
+            <KEYWORD3>table-column</KEYWORD3>
+            <KEYWORD3>table-column-group</KEYWORD3>
+            <KEYWORD3>table-footer-group</KEYWORD3>
+            <KEYWORD3>table-header-group</KEYWORD3>
+            <KEYWORD3>table-row</KEYWORD3>
+            <KEYWORD3>table-row-group</KEYWORD3>
+            <KEYWORD3>text</KEYWORD3>
+            <KEYWORD3>text-after-edge</KEYWORD3>
+            <KEYWORD3>text-before-edge</KEYWORD3>
+            <KEYWORD3>text-bottom</KEYWORD3>
+            <KEYWORD3>text-size</KEYWORD3>
+            <KEYWORD3>text-top</KEYWORD3>
+            <KEYWORD3>thick</KEYWORD3>
+            <KEYWORD3>thin</KEYWORD3>
+            <KEYWORD3>to</KEYWORD3>
+            <KEYWORD3>top</KEYWORD3>
+            <KEYWORD3>transparent</KEYWORD3>
+            <KEYWORD3>ultra-condensed</KEYWORD3>
+            <KEYWORD3>ultra-expanded</KEYWORD3>
+            <KEYWORD3>underline</KEYWORD3>
+            <KEYWORD3>unrestricted</KEYWORD3>
+            <KEYWORD3>upper-alpha</KEYWORD3>
+            <KEYWORD3>upper-latin</KEYWORD3>
+            <KEYWORD3>upper-roman</KEYWORD3>
+            <KEYWORD3>uppercase</KEYWORD3>
+            <KEYWORD3>url</KEYWORD3>
+            <KEYWORD3>use-script</KEYWORD3>
+            <KEYWORD3>v-shadow</KEYWORD3>
+            <KEYWORD3>vertical</KEYWORD3>
+            <KEYWORD3>visible</KEYWORD3>
+            <KEYWORD3>w-resize</KEYWORD3>
+            <KEYWORD3>wait</KEYWORD3>
+            <KEYWORD3>weak</KEYWORD3>
+            <KEYWORD3>wider</KEYWORD3>
+            <KEYWORD3>window</KEYWORD3>
+            <KEYWORD3>x-fast</KEYWORD3>
+            <KEYWORD3>x-high</KEYWORD3>
+            <KEYWORD3>x-large</KEYWORD3>
+            <KEYWORD3>x-loud</KEYWORD3>
+            <KEYWORD3>x-low</KEYWORD3>
+            <KEYWORD3>x-slow</KEYWORD3>
+            <KEYWORD3>x-small</KEYWORD3>
+            <KEYWORD3>x-soft</KEYWORD3>
+            <KEYWORD3>x-strong</KEYWORD3>
+            <KEYWORD3>x-weak</KEYWORD3>
+            <KEYWORD3>xx-large</KEYWORD3>
+            <KEYWORD3>xx-small</KEYWORD3>
 
-			<!-- measurement units -->
-			<KEYWORD3>left-side</KEYWORD3>
-			<KEYWORD3>far-left</KEYWORD3>
-			<KEYWORD3>center-left</KEYWORD3>
-			<KEYWORD3>center</KEYWORD3>
-			<KEYWORD3>right</KEYWORD3>
-			<KEYWORD3>center-right</KEYWORD3>
-			<KEYWORD3>far-right</KEYWORD3>
-			<KEYWORD3>right-side</KEYWORD3>
-			<KEYWORD3>justify</KEYWORD3>
-			<KEYWORD3>behind</KEYWORD3>
-			<KEYWORD3>leftwards</KEYWORD3>
-			<KEYWORD3>rightwards</KEYWORD3>
-			<KEYWORD3>inherit</KEYWORD3>
-			<KEYWORD3>scroll</KEYWORD3>
-			<KEYWORD3>fixed</KEYWORD3>
-			<KEYWORD3>transparent</KEYWORD3>
-			<KEYWORD3>none</KEYWORD3>
-			<KEYWORD3>repeat</KEYWORD3>
-			<KEYWORD3>repeat-x</KEYWORD3>
-			<KEYWORD3>repeat-y</KEYWORD3>
-			<KEYWORD3>no-repeat</KEYWORD3>
-			<KEYWORD3>collapse</KEYWORD3>
-			<KEYWORD3>separate</KEYWORD3>
-			<KEYWORD3>auto</KEYWORD3>
-			<KEYWORD3>open-quote</KEYWORD3>
-			<KEYWORD3>close-quote</KEYWORD3>
-			<KEYWORD3>no-open-quote</KEYWORD3>
-			<KEYWORD3>no-close-quote</KEYWORD3>
-			<KEYWORD3>cue-before</KEYWORD3>
-			<KEYWORD3>cue-after</KEYWORD3>
-			<KEYWORD3>crosshair</KEYWORD3>
-			<KEYWORD3>default</KEYWORD3>
-			<KEYWORD3>pointer</KEYWORD3>
-			<KEYWORD3>move</KEYWORD3>
-			<KEYWORD3>e-resize</KEYWORD3>
-			<KEYWORD3>ne-resize</KEYWORD3>
-			<KEYWORD3>nw-resize</KEYWORD3>
-			<KEYWORD3>n-resize</KEYWORD3>
-			<KEYWORD3>se-resize</KEYWORD3>
-			<KEYWORD3>sw-resize</KEYWORD3>
-			<KEYWORD3>s-resize</KEYWORD3>
-			<KEYWORD3>w-resize</KEYWORD3>
-			<KEYWORD3>text</KEYWORD3>
-			<KEYWORD3>wait</KEYWORD3>
-			<KEYWORD3>help</KEYWORD3>
-			<KEYWORD3>ltr</KEYWORD3>
-			<KEYWORD3>rtl</KEYWORD3>
-			<KEYWORD3>inline</KEYWORD3>
-			<KEYWORD3>block</KEYWORD3>
-			<KEYWORD3>list-item</KEYWORD3>
-			<KEYWORD3>run-in</KEYWORD3>
-			<KEYWORD3>compact</KEYWORD3>
-			<KEYWORD3>marker</KEYWORD3>
-			<KEYWORD3>table</KEYWORD3>
-			<KEYWORD3>inline-table</KEYWORD3>
-			<KEYWORD3>inline-block</KEYWORD3>
-			<KEYWORD3>table-row-group</KEYWORD3>
-			<KEYWORD3>table-header-group</KEYWORD3>
-			<KEYWORD3>table-footer-group</KEYWORD3>
-			<KEYWORD3>table-row</KEYWORD3>
-			<KEYWORD3>table-column-group</KEYWORD3>
-			<KEYWORD3>table-column</KEYWORD3>
-			<KEYWORD3>table-cell</KEYWORD3>
-			<KEYWORD3>table-caption</KEYWORD3>
-
-			<!-- Colors -->
-			<KEYWORD4>aliceblue</KEYWORD4>
-			<KEYWORD4>antiquewhite</KEYWORD4>
-			<KEYWORD4>aqua</KEYWORD4>
-			<KEYWORD4>aquamarine</KEYWORD4>
-			<KEYWORD4>azure</KEYWORD4>
-			<KEYWORD4>beige</KEYWORD4>
-			<KEYWORD4>bisque</KEYWORD4>
-			<KEYWORD4>black</KEYWORD4>
-			<KEYWORD4>blanchedalmond</KEYWORD4>
-			<KEYWORD4>blue</KEYWORD4>
-			<KEYWORD4>blueviolet</KEYWORD4>
-			<KEYWORD4>brown</KEYWORD4>
-			<KEYWORD4>burlywood</KEYWORD4>
-			<KEYWORD4>cadetblue</KEYWORD4>
-			<KEYWORD4>chartreuse</KEYWORD4>
-			<KEYWORD4>chocolate</KEYWORD4>
-			<KEYWORD4>coral</KEYWORD4>
-			<KEYWORD4>cornflowerblue</KEYWORD4>
-			<KEYWORD4>cornsilk</KEYWORD4>
-			<KEYWORD4>crimson</KEYWORD4>
-			<KEYWORD4>cyan</KEYWORD4>
-			<KEYWORD4>darkblue</KEYWORD4>
-			<KEYWORD4>darkcyan</KEYWORD4>
-			<KEYWORD4>darkgoldenrod</KEYWORD4>
-			<KEYWORD4>darkgray</KEYWORD4>
-			<KEYWORD4>darkgreen</KEYWORD4>
-			<KEYWORD4>darkgrey</KEYWORD4>
-			<KEYWORD4>darkkhaki</KEYWORD4>
-			<KEYWORD4>darkmagenta</KEYWORD4>
-			<KEYWORD4>darkolivegreen</KEYWORD4>
-			<KEYWORD4>darkorange</KEYWORD4>
-			<KEYWORD4>darkorchid</KEYWORD4>
-			<KEYWORD4>darkred</KEYWORD4>
-			<KEYWORD4>darksalmon</KEYWORD4>
-			<KEYWORD4>darkseagreen</KEYWORD4>
-			<KEYWORD4>darkslateblue</KEYWORD4>
-			<KEYWORD4>darkslategray</KEYWORD4>
-			<KEYWORD4>darkslategrey</KEYWORD4>
-			<KEYWORD4>darkturquoise</KEYWORD4>
-			<KEYWORD4>darkviolet</KEYWORD4>
-			<KEYWORD4>darkpink</KEYWORD4>
-			<KEYWORD4>deepskyblue</KEYWORD4>
-			<KEYWORD4>dimgray</KEYWORD4>
-			<KEYWORD4>dimgrey</KEYWORD4>
-			<KEYWORD4>dodgerblue</KEYWORD4>
-			<KEYWORD4>firebrick</KEYWORD4>
-			<KEYWORD4>floralwhite</KEYWORD4>
-			<KEYWORD4>forestgreen</KEYWORD4>
-			<KEYWORD4>fushia</KEYWORD4>
-			<KEYWORD4>gainsboro</KEYWORD4>
-			<KEYWORD4>ghostwhite</KEYWORD4>
-			<KEYWORD4>gold</KEYWORD4>
-			<KEYWORD4>goldenrod</KEYWORD4>
-			<KEYWORD4>gray</KEYWORD4>
-			<KEYWORD4>green</KEYWORD4>
-			<KEYWORD4>greenyellow</KEYWORD4>
-			<KEYWORD4>grey</KEYWORD4>
-			<KEYWORD4>honeydew</KEYWORD4>
-			<KEYWORD4>hotpink</KEYWORD4>
-			<KEYWORD4>indianred</KEYWORD4>
-			<KEYWORD4>indigo</KEYWORD4>
-			<KEYWORD4>ivory</KEYWORD4>
-			<KEYWORD4>khaki</KEYWORD4>
-			<KEYWORD4>lavender</KEYWORD4>
-			<KEYWORD4>lavenderblush</KEYWORD4>
-			<KEYWORD4>lawngreen</KEYWORD4>
-			<KEYWORD4>lemonchiffon</KEYWORD4>
-			<KEYWORD4>lightblue</KEYWORD4>
-			<KEYWORD4>lightcoral</KEYWORD4>
-			<KEYWORD4>lightcyan</KEYWORD4>
-			<KEYWORD4>lightgoldenrodyellow</KEYWORD4>
-			<KEYWORD4>lightgray</KEYWORD4>
-			<KEYWORD4>lightgreen</KEYWORD4>
-			<KEYWORD4>lightgrey</KEYWORD4>
-			<KEYWORD4>lightpink</KEYWORD4>
-			<KEYWORD4>lightsalmon</KEYWORD4>
-			<KEYWORD4>lightseagreen</KEYWORD4>
-			<KEYWORD4>lightskyblue</KEYWORD4>
-			<KEYWORD4>lightslategray</KEYWORD4>
-			<KEYWORD4>lightslategrey</KEYWORD4>
-			<KEYWORD4>lightsteelblue</KEYWORD4>
-			<KEYWORD4>lightyellow</KEYWORD4>
-			<KEYWORD4>lime</KEYWORD4>
-			<KEYWORD4>limegreen</KEYWORD4>
-			<KEYWORD4>linen</KEYWORD4>
-			<KEYWORD4>magenta</KEYWORD4>
-			<KEYWORD4>maroon</KEYWORD4>
-			<KEYWORD4>mediumaquamarine</KEYWORD4>
-			<KEYWORD4>mediumblue</KEYWORD4>
-			<KEYWORD4>mediumorchid</KEYWORD4>
-			<KEYWORD4>mediumpurple</KEYWORD4>
-			<KEYWORD4>mediumseagreen</KEYWORD4>
-			<KEYWORD4>mediumslateblue</KEYWORD4>
-			<KEYWORD4>mediumspringgreen</KEYWORD4>
-			<KEYWORD4>mediumturquoise</KEYWORD4>
-			<KEYWORD4>mediumvioletred</KEYWORD4>
-			<KEYWORD4>midnightblue</KEYWORD4>
-			<KEYWORD4>mintcream</KEYWORD4>
-			<KEYWORD4>mistyrose</KEYWORD4>
-			<KEYWORD4>mocassin</KEYWORD4>
-			<KEYWORD4>navawhite</KEYWORD4>
-			<KEYWORD4>navy</KEYWORD4>
-			<KEYWORD4>oldlace</KEYWORD4>
-			<KEYWORD4>olive</KEYWORD4>
-			<KEYWORD4>olidrab</KEYWORD4>
-			<KEYWORD4>orange</KEYWORD4>
-			<KEYWORD4>orangered</KEYWORD4>
-			<KEYWORD4>orchid</KEYWORD4>
-			<KEYWORD4>palegoldenrod</KEYWORD4>
-			<KEYWORD4>palegreen</KEYWORD4>
-			<KEYWORD4>paleturquoise</KEYWORD4>
-			<KEYWORD4>paletvioletred</KEYWORD4>
-			<KEYWORD4>papayawhip</KEYWORD4>
-			<KEYWORD4>peachpuff</KEYWORD4>
-			<KEYWORD4>peru</KEYWORD4>
-			<KEYWORD4>pink</KEYWORD4>
-			<KEYWORD4>plum</KEYWORD4>
-			<KEYWORD4>powderblue</KEYWORD4>
-			<KEYWORD4>purple</KEYWORD4>
-			<KEYWORD4>red</KEYWORD4>
-			<KEYWORD4>rosybrown</KEYWORD4>
-			<KEYWORD4>royalblue</KEYWORD4>
-			<KEYWORD4>saddlebrown</KEYWORD4>
-			<KEYWORD4>salmon</KEYWORD4>
-			<KEYWORD4>sandybrown</KEYWORD4>
-			<KEYWORD4>seagreen</KEYWORD4>
-			<KEYWORD4>seashell</KEYWORD4>
-			<KEYWORD4>sienna</KEYWORD4>
-			<KEYWORD4>silver</KEYWORD4>
-			<KEYWORD4>skyblue</KEYWORD4>
-			<KEYWORD4>slateblue</KEYWORD4>
-			<KEYWORD4>slategray</KEYWORD4>
-			<KEYWORD4>slategrey</KEYWORD4>
-			<KEYWORD4>snow</KEYWORD4>
-			<KEYWORD4>springgreen</KEYWORD4>
-			<KEYWORD4>steelblue</KEYWORD4>
-			<KEYWORD4>tan</KEYWORD4>
-			<KEYWORD4>teal</KEYWORD4>
-			<KEYWORD4>thistle</KEYWORD4>
-			<KEYWORD4>tomato</KEYWORD4>
-			<KEYWORD4>turquoise</KEYWORD4>
-			<KEYWORD4>violet</KEYWORD4>
-			<KEYWORD4>wheat</KEYWORD4>
-			<KEYWORD4>white</KEYWORD4>
-			<KEYWORD4>whitesmoke</KEYWORD4>
-			<KEYWORD4>yellow</KEYWORD4>
-			<KEYWORD4>yellowgreen</KEYWORD4>
+            <!-- Colors -->
+            <KEYWORD4>aliceblue</KEYWORD4>
+            <KEYWORD4>antiquewhite</KEYWORD4>
+            <KEYWORD4>aqua</KEYWORD4>
+            <KEYWORD4>aquamarine</KEYWORD4>
+            <KEYWORD4>azure</KEYWORD4>
+            <KEYWORD4>beige</KEYWORD4>
+            <KEYWORD4>bisque</KEYWORD4>
+            <KEYWORD4>black</KEYWORD4>
+            <KEYWORD4>blanchedalmond</KEYWORD4>
+            <KEYWORD4>blue</KEYWORD4>
+            <KEYWORD4>blueviolet</KEYWORD4>
+            <KEYWORD4>brown</KEYWORD4>
+            <KEYWORD4>burlywood</KEYWORD4>
+            <KEYWORD4>cadetblue</KEYWORD4>
+            <KEYWORD4>chartreuse</KEYWORD4>
+            <KEYWORD4>chocolate</KEYWORD4>
+            <KEYWORD4>coral</KEYWORD4>
+            <KEYWORD4>cornflowerblue</KEYWORD4>
+            <KEYWORD4>cornsilk</KEYWORD4>
+            <KEYWORD4>crimson</KEYWORD4>
+            <KEYWORD4>cyan</KEYWORD4>
+            <KEYWORD4>darkblue</KEYWORD4>
+            <KEYWORD4>darkcyan</KEYWORD4>
+            <KEYWORD4>darkgoldenrod</KEYWORD4>
+            <KEYWORD4>darkgray</KEYWORD4>
+            <KEYWORD4>darkgreen</KEYWORD4>
+            <KEYWORD4>darkgrey</KEYWORD4>
+            <KEYWORD4>darkkhaki</KEYWORD4>
+            <KEYWORD4>darkmagenta</KEYWORD4>
+            <KEYWORD4>darkolivegreen</KEYWORD4>
+            <KEYWORD4>darkorange</KEYWORD4>
+            <KEYWORD4>darkorchid</KEYWORD4>
+            <KEYWORD4>darkred</KEYWORD4>
+            <KEYWORD4>darksalmon</KEYWORD4>
+            <KEYWORD4>darkseagreen</KEYWORD4>
+            <KEYWORD4>darkslateblue</KEYWORD4>
+            <KEYWORD4>darkslategray</KEYWORD4>
+            <KEYWORD4>darkslategrey</KEYWORD4>
+            <KEYWORD4>darkturquoise</KEYWORD4>
+            <KEYWORD4>darkviolet</KEYWORD4>
+            <KEYWORD4>deeppink</KEYWORD4>
+            <KEYWORD4>deepskyblue</KEYWORD4>
+            <KEYWORD4>dimgray</KEYWORD4>
+            <KEYWORD4>dimgrey</KEYWORD4>
+            <KEYWORD4>dodgerblue</KEYWORD4>
+            <KEYWORD4>firebrick</KEYWORD4>
+            <KEYWORD4>floralwhite</KEYWORD4>
+            <KEYWORD4>forestgreen</KEYWORD4>
+            <KEYWORD4>fuchsia</KEYWORD4>
+            <KEYWORD4>gainsboro</KEYWORD4>
+            <KEYWORD4>ghostwhite</KEYWORD4>
+            <KEYWORD4>gold</KEYWORD4>
+            <KEYWORD4>goldenrod</KEYWORD4>
+            <KEYWORD4>gray</KEYWORD4>
+            <KEYWORD4>green</KEYWORD4>
+            <KEYWORD4>greenyellow</KEYWORD4>
+            <KEYWORD4>grey</KEYWORD4>
+            <KEYWORD4>honeydew</KEYWORD4>
+            <KEYWORD4>hotpink</KEYWORD4>
+            <KEYWORD4>indianred</KEYWORD4>
+            <KEYWORD4>indigo</KEYWORD4>
+            <KEYWORD4>ivory</KEYWORD4>
+            <KEYWORD4>khaki</KEYWORD4>
+            <KEYWORD4>lavender</KEYWORD4>
+            <KEYWORD4>lavenderblush</KEYWORD4>
+            <KEYWORD4>lawngreen</KEYWORD4>
+            <KEYWORD4>lemonchiffon</KEYWORD4>
+            <KEYWORD4>lightblue</KEYWORD4>
+            <KEYWORD4>lightcoral</KEYWORD4>
+            <KEYWORD4>lightcyan</KEYWORD4>
+            <KEYWORD4>lightgoldenrodyellow</KEYWORD4>
+            <KEYWORD4>lightgray</KEYWORD4>
+            <KEYWORD4>lightgreen</KEYWORD4>
+            <KEYWORD4>lightgrey</KEYWORD4>
+            <KEYWORD4>lightpink</KEYWORD4>
+            <KEYWORD4>lightsalmon</KEYWORD4>
+            <KEYWORD4>lightseagreen</KEYWORD4>
+            <KEYWORD4>lightskyblue</KEYWORD4>
+            <KEYWORD4>lightslategray</KEYWORD4>
+            <KEYWORD4>lightslategrey</KEYWORD4>
+            <KEYWORD4>lightsteelblue</KEYWORD4>
+            <KEYWORD4>lightyellow</KEYWORD4>
+            <KEYWORD4>lime</KEYWORD4>
+            <KEYWORD4>limegreen</KEYWORD4>
+            <KEYWORD4>linen</KEYWORD4>
+            <KEYWORD4>magenta</KEYWORD4>
+            <KEYWORD4>maroon</KEYWORD4>
+            <KEYWORD4>mediumaquamarine</KEYWORD4>
+            <KEYWORD4>mediumblue</KEYWORD4>
+            <KEYWORD4>mediumorchid</KEYWORD4>
+            <KEYWORD4>mediumpurple</KEYWORD4>
+            <KEYWORD4>mediumseagreen</KEYWORD4>
+            <KEYWORD4>mediumslateblue</KEYWORD4>
+            <KEYWORD4>mediumspringgreen</KEYWORD4>
+            <KEYWORD4>mediumturquoise</KEYWORD4>
+            <KEYWORD4>mediumvioletred</KEYWORD4>
+            <KEYWORD4>midnightblue</KEYWORD4>
+            <KEYWORD4>mintcream</KEYWORD4>
+            <KEYWORD4>mistyrose</KEYWORD4>
+            <KEYWORD4>moccasin</KEYWORD4>
+            <KEYWORD4>navajowhite</KEYWORD4>
+            <KEYWORD4>navy</KEYWORD4>
+            <KEYWORD4>oldlace</KEYWORD4>
+            <KEYWORD4>olive</KEYWORD4>
+            <KEYWORD4>olivedrab</KEYWORD4>
+            <KEYWORD4>orange</KEYWORD4>
+            <KEYWORD4>orangered</KEYWORD4>
+            <KEYWORD4>orchid</KEYWORD4>
+            <KEYWORD4>palegoldenrod</KEYWORD4>
+            <KEYWORD4>palegreen</KEYWORD4>
+            <KEYWORD4>paleturquoise</KEYWORD4>
+            <KEYWORD4>palevioletred</KEYWORD4>
+            <KEYWORD4>papayawhip</KEYWORD4>
+            <KEYWORD4>peachpuff</KEYWORD4>
+            <KEYWORD4>peru</KEYWORD4>
+            <KEYWORD4>pink</KEYWORD4>
+            <KEYWORD4>plum</KEYWORD4>
+            <KEYWORD4>powderblue</KEYWORD4>
+            <KEYWORD4>purple</KEYWORD4>
+            <KEYWORD4>red</KEYWORD4>
+            <KEYWORD4>rosybrown</KEYWORD4>
+            <KEYWORD4>royalblue</KEYWORD4>
+            <KEYWORD4>saddlebrown</KEYWORD4>
+            <KEYWORD4>salmon</KEYWORD4>
+            <KEYWORD4>sandybrown</KEYWORD4>
+            <KEYWORD4>seagreen</KEYWORD4>
+            <KEYWORD4>seashell</KEYWORD4>
+            <KEYWORD4>sienna</KEYWORD4>
+            <KEYWORD4>silver</KEYWORD4>
+            <KEYWORD4>skyblue</KEYWORD4>
+            <KEYWORD4>slateblue</KEYWORD4>
+            <KEYWORD4>slategray</KEYWORD4>
+            <KEYWORD4>slategrey</KEYWORD4>
+            <KEYWORD4>snow</KEYWORD4>
+            <KEYWORD4>springgreen</KEYWORD4>
+            <KEYWORD4>steelblue</KEYWORD4>
+            <KEYWORD4>tan</KEYWORD4>
+            <KEYWORD4>teal</KEYWORD4>
+            <KEYWORD4>thistle</KEYWORD4>
+            <KEYWORD4>tomato</KEYWORD4>
+            <KEYWORD4>turquoise</KEYWORD4>
+            <KEYWORD4>violet</KEYWORD4>
+            <KEYWORD4>wheat</KEYWORD4>
+            <KEYWORD4>white</KEYWORD4>
+            <KEYWORD4>whitesmoke</KEYWORD4>
+            <KEYWORD4>yellow</KEYWORD4>
+            <KEYWORD4>yellowgreen</KEYWORD4>
 
 			<!-- "functions", here for autocomplete: -->
 			<KEYWORD1>rgb</KEYWORD1>
+			<KEYWORD1>rgba</KEYWORD1>
+			<KEYWORD1>hsl</KEYWORD1>
+			<KEYWORD1>hsla</KEYWORD1>
 			<KEYWORD1>url</KEYWORD1>
 		</KEYWORDS>
 	</RULES>
@@ -640,7 +800,7 @@
 	<RULES SET="GLOBAL">
 		<SEQ TYPE="OPERATOR">:</SEQ>
 		<SEQ TYPE="NULL">;</SEQ>
-		<SPAN TYPE="NULL" DELEGATE="LITERAL">
+		<SPAN TYPE="NULL" ESCAPE="\">
 			<BEGIN>(</BEGIN>
 			<END>)</END>
 		</SPAN>
@@ -671,6 +831,8 @@
 			<KEYWORD2>@media</KEYWORD2>
 			<KEYWORD2>@page</KEYWORD2>
 			<KEYWORD2>@font-face</KEYWORD2>
+			<KEYWORD2>@namespace</KEYWORD2>
+			<KEYWORD2>@comment</KEYWORD2>
 		</KEYWORDS>
 	</RULES>
 

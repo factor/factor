@@ -1,5 +1,5 @@
 ! Copyright (C) 2007, 2010 Daniel Ehrenberg, Slava Pestov
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors arrays kernel math sequences sequences.private
 vectors ;
 IN: assocs
@@ -18,26 +18,35 @@ GENERIC: assoc-clone-like ( assoc exemplar -- newassoc )
 GENERIC: >alist ( assoc -- newassoc )
 GENERIC: keys ( assoc -- keys )
 GENERIC: values ( assoc -- values )
+GENERIC: unzip ( assoc -- keys values )
 
 M: assoc assoc-like drop ; inline
+
+: key? ( key assoc -- ? ) at* nip ; inline
 
 : ?at ( key assoc -- value/key ? )
     2dup at* [ 2nip t ] [ 2drop f ] if ; inline
 
+: ?of ( assoc key -- value/key ? )
+    swap ?at ; inline
+
 : maybe-set-at ( value key assoc -- changed? )
     3dup at* [ = [ 3drop f ] [ set-at t ] if ] [ 2drop set-at t ] if ;
 
+: set-of ( assoc key value -- assoc )
+    swap pick set-at ; inline
+
 <PRIVATE
 
-: (assoc-each) ( assoc quot -- seq quot' )
+: assoc-operator ( assoc quot -- alist quot' )
     [ >alist ] dip [ first2 ] prepose ; inline
 
-: (assoc-stack) ( key i seq -- value )
+: assoc-stack-from ( key i seq -- value/f )
     over 0 < [
         3drop f
     ] [
         3dup nth-unsafe at*
-        [ 3nip ] [ drop [ 1 - ] dip (assoc-stack) ] if
+        [ 3nip ] [ drop [ 1 - ] dip assoc-stack-from ] if
     ] if ; inline recursive
 
 : search-alist ( key alist -- pair/f i/f )
@@ -46,21 +55,16 @@ M: assoc assoc-like drop ; inline
 : substituter ( assoc -- quot )
     [ ?at drop ] curry ; inline
 
-: with-assoc ( assoc quot: ( ..a value key assoc -- ..b ) -- quot: ( ..a key value -- ..b ) )
-    curry [ swap ] prepose ; inline
-
 PRIVATE>
 
 : assoc-find ( ... assoc quot: ( ... key value -- ... ? ) -- ... key value ? )
-    (assoc-each) find swap [ first2-unsafe t ] [ drop f f f ] if ; inline
-
-: key? ( key assoc -- ? ) at* nip ; inline
+    assoc-operator find swap [ first2-unsafe t ] [ drop f f f ] if ; inline
 
 : assoc-each ( ... assoc quot: ( ... key value -- ... ) -- ... )
-    (assoc-each) each ; inline
+    assoc-operator each ; inline
 
 : assoc>map ( ... assoc quot: ( ... key value -- ... elt ) exemplar -- ... seq )
-    [ (assoc-each) ] dip map-as ; inline
+    [ assoc-operator ] dip map-as ; inline
 
 : assoc-map-as ( ... assoc quot: ( ... key value -- ... newkey newvalue ) exemplar -- ... newassoc )
     [ [ 2array ] compose { } assoc>map ] dip assoc-like ; inline
@@ -69,7 +73,7 @@ PRIVATE>
     over assoc-map-as ; inline
 
 : assoc-filter-as ( ... assoc quot: ( ... key value -- ... ? ) exemplar -- ... subassoc )
-    [ (assoc-each) filter ] dip assoc-like ; inline
+    [ assoc-operator filter ] dip assoc-like ; inline
 
 : assoc-filter ( ... assoc quot: ( ... key value -- ... ? ) -- ... subassoc )
     over assoc-filter-as ; inline
@@ -102,7 +106,7 @@ PRIVATE>
     [ nip empty? ] assoc-reject ; inline
 
 : assoc-partition ( ... assoc quot: ( ... key value -- ... ? ) -- ... true-assoc false-assoc )
-    [ (assoc-each) partition ] [ drop ] 2bi
+    [ assoc-operator partition ] [ drop ] 2bi
     [ assoc-like ] curry bi@ ; inline
 
 : assoc-any? ( ... assoc quot: ( ... key value -- ... ? ) -- ... ? )
@@ -114,13 +118,13 @@ PRIVATE>
 : at ( key assoc -- value/f )
     at* drop ; inline
 
-: ?of ( assoc key -- value/key ? )
-    swap ?at ; inline
-
 : of ( assoc key -- value/f )
     swap at ; inline
 
-M: assoc assoc-clone-like ( assoc exemplar -- newassoc )
+: with-assoc ( assoc quot: ( ..a value key assoc -- ..b ) -- quot: ( ..a key value -- ..b ) )
+    curry [ swap ] prepose ; inline
+
+M: assoc assoc-clone-like
     [ dup assoc-size ] dip new-assoc
     [ [ set-at ] with-assoc assoc-each ] keep ; inline
 
@@ -128,8 +132,12 @@ M: assoc keys [ drop ] { } assoc>map ;
 
 M: assoc values [ nip ] { } assoc>map ;
 
-: delete-at* ( key assoc -- old ? )
-    [ at* ] 2keep delete-at ;
+: delete-at* ( key assoc -- value/f ? )
+    [ at* ] [ delete-at ] 2bi ;
+
+: ?delete-at ( key assoc -- value/key ? )
+    [ ?at ] [ delete-at ] 2bi ;
+
 
 : rename-at ( newkey key assoc -- )
     [ delete-at* ] keep [ set-at ] with-assoc [ 2drop ] if ;
@@ -138,7 +146,7 @@ M: assoc values [ nip ] { } assoc>map ;
     assoc-size 0 = ; inline
 
 : assoc-stack ( key seq -- value )
-    [ length 1 - ] keep (assoc-stack) ; flushable
+    index-of-last assoc-stack-from ; flushable
 
 : assoc-subset? ( assoc1 assoc2 -- ? )
     [ at* [ = ] [ 2drop f ] if ] with-assoc assoc-all? ;
@@ -153,7 +161,7 @@ M: assoc values [ nip ] { } assoc>map ;
     swap [ nip key? ] curry assoc-filter ;
 
 : assoc-union! ( assoc1 assoc2 -- assoc1 )
-    over [ set-at ] with-assoc assoc-each ;
+    [ set-of ] assoc-each ; inline
 
 : assoc-union-as ( assoc1 assoc2 exemplar -- union )
     [ [ [ assoc-size ] bi@ + ] dip new-assoc ] 2keepd
@@ -162,10 +170,10 @@ M: assoc values [ nip ] { } assoc>map ;
 : assoc-union ( assoc1 assoc2 -- union )
     over assoc-union-as ;
 
-: assoc-combine ( seq -- union )
+: assoc-union-all ( seq -- union )
     H{ } clone [ assoc-union! ] reduce ;
 
-: assoc-refine ( seq -- assoc )
+: assoc-intersect-all ( seq -- assoc )
     [ f ] [ [ ] [ assoc-intersect ] map-reduce ] if-empty ;
 
 : assoc-differ ( key -- quot )
@@ -192,6 +200,9 @@ M: assoc values [ nip ] { } assoc>map ;
 : change-at ( ..a key assoc quot: ( ..a value -- ..b newvalue ) -- ..b )
     [ [ at ] dip call ] [ drop ] 3bi set-at ; inline
 
+: ?change-at ( ..a key assoc quot: ( ..a value -- ..b newvalue ) -- ..b )
+    2over [ set-at ] 2curry compose [ at* ] dip [ drop ] if ; inline
+
 : at+ ( n key assoc -- ) [ 0 or + ] change-at ; inline
 
 : inc-at ( key assoc -- ) [ 1 ] 2dip at+ ; inline
@@ -214,6 +225,9 @@ M: assoc value-at* swap [ = nip ] curry assoc-find nip ;
 
 : value-at ( value assoc -- key/f ) value-at* drop ;
 
+: ?value-at ( value assoc -- key/value ? )
+    2dup value-at* [ 2nip t ] [ 2drop f ] if ; inline
+
 : value? ( value assoc -- ? ) value-at* nip ;
 
 : push-at ( value key assoc -- )
@@ -228,7 +242,7 @@ M: assoc value-at* swap [ = nip ] curry assoc-find nip ;
     ] if ; inline
 
 : zip ( keys values -- alist )
-     { } zip-as ; inline
+    { } zip-as ; inline
 
 : zip-index-as ( values exemplar -- assoc )
     [ dup length <iota> ] dip zip-as ; inline
@@ -236,13 +250,22 @@ M: assoc value-at* swap [ = nip ] curry assoc-find nip ;
 : zip-index ( values -- alist )
     { } zip-index-as ; inline
 
-: unzip ( assoc -- keys values )
+M: assoc unzip
     dup assoc-empty? [ drop { } { } ] [ >alist flip first2 ] if ;
 
-: collect-by ( ... seq quot: ( ... obj -- ... key ) -- ... assoc )
-    [ keep swap ] curry H{ } clone [
+: zip-with-as ( ... seq quot: ( ... key -- ... value ) exemplar -- ... assoc )
+    [ [ keep swap ] curry ] dip map>assoc ; inline
+
+: zip-with ( ... seq quot: ( ... key -- ... value ) -- ... alist )
+    { } zip-with-as ; inline
+
+: collect-by! ( ... assoc seq quot: ( ... obj -- ... key ) -- ... assoc )
+    [ keep swap ] curry rot [
         [ push-at ] curry compose each
     ] keep ; inline
+
+: collect-by ( ... seq quot: ( ... obj -- ... key ) -- ... assoc )
+    [ H{ } clone ] 2dip collect-by! ; inline
 
 M: sequence at*
     search-alist [ second t ] [ f ] if ;
@@ -293,11 +316,13 @@ M: enumerated set-at seq>> set-nth ; inline
 
 M: enumerated delete-at seq>> remove-nth! drop ; inline
 
-M: enumerated >alist ( enumerated -- alist ) ; inline
+M: enumerated >alist ; inline
 
 M: enumerated keys seq>> length <iota> >array ; inline
 
 M: enumerated values seq>> >array ; inline
+
+M: enumerated unzip seq>> [ length <iota> ] keep [ >array ] bi@ ;
 
 M: enumerated assoc-size seq>> length ; inline
 

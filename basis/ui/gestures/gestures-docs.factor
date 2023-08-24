@@ -41,18 +41,18 @@ HELP: drag
 
 HELP: button-up
 { $class-description "Mouse button up gesture. Instances have two slots:"
-    { $list
-        { { $snippet "mods" } " - a sequence of modifiers; see " { $link "keyboard-gestures" } }
-        { { $snippet "#" } " - a mouse button number, or " { $link f } " indicating no specific button is expected" }
+    { $slots
+        { "mods" { "a sequence of modifiers; see " { $link "keyboard-gestures" } } }
+        { "#" { "a mouse button number, or " { $link f } " indicating no specific button is expected" } }
     }
 }
 { $examples { $code "T{ button-up f f 1 }" "T{ button-up }" } } ;
 
 HELP: button-down
 { $class-description "Mouse button down gesture. Instances have two slots:"
-    { $list
-        { { $snippet "mods" } " - a sequence of modifiers; see " { $link "keyboard-gestures" } }
-        { { $snippet "#" } " - a mouse button number, or " { $link f } " indicating no specific button is expected" }
+    { $slots
+        { "mods" { "a sequence of modifiers; see " { $link "keyboard-gestures" } } }
+        { "#" { "a mouse button number, or " { $link f } " indicating no specific button is expected" } }
     }
 }
 { $examples { $code "T{ button-down f f 1 }" "T{ button-down }" } } ;
@@ -125,28 +125,28 @@ HELP: C+
 { $description "Control key modifier." } ;
 
 HELP: A+
-{ $description "Alt key modifier." } ;
+{ $description "Alt key modifier. This is the Option key on Mac OS X." } ;
 
 HELP: M+
-{ $description "Meta key modifier. This is the Command key on Mac OS X and the Windows key on other Unices and Windows." } ;
+{ $description "Meta key modifier. This is the Command key on Mac OS X and the Windows key on other Unix and Windows platforms." } ;
 
 HELP: S+
 { $description "Shift key modifier." } ;
 
 HELP: key-down
 { $class-description "Key down gesture. Instances have two slots:"
-    { $list
-        { { $snippet "mods" } " - a sequence of modifiers; see " { $link "keyboard-gestures" } }
-    { { $snippet "sym" } " - a string denoting the key pressed; see " { $link "keyboard-gestures" } }
+    { $slots
+        { "mods" { "a sequence of modifiers; see " { $link "keyboard-gestures" } } }
+        { "sym" { "a string denoting the key pressed; see " { $link "keyboard-gestures" } } }
     }
 }
 { $examples { $code "T{ key-down f { C+ } \"a\" }" "T{ key-down f f \"TAB\" }" } } ;
 
 HELP: key-up
 { $class-description "Key up gesture. Instances have two slots:"
-    { $list
-        { { $snippet "mods" } " - a sequence of modifiers; see " { $link "keyboard-gestures" } }
-    { { $snippet "sym" } " - a string denoting the key pressed; see " { $link "keyboard-gestures" } }
+    { $slots
+        { "mods" { "a sequence of modifiers; see " { $link "keyboard-gestures" } } }
+    { "sym" { "a string denoting the key pressed; see " { $link "keyboard-gestures" } } }
     }
 }
 { $examples { $code "T{ key-up f { C+ } \"a\" }" "T{ key-up f f \"TAB\" }" } } ;
@@ -248,9 +248,9 @@ ARTICLE: "gesture-differences" "Gesture handling differences between platforms"
 "On Mac OS X, the modifier keys map as follows:"
 { $table
     { { $link S+ } "Shift" }
-    { { $link A+ } "Command (Apple)" }
+    { { $link A+ } "Option" }
     { { $link C+ } "Control" }
-    { { $link M+ } "Option" }
+    { { $link M+ } "Command (Apple)" }
 }
 "On Windows and X11:"
 { $table
@@ -428,7 +428,14 @@ ARTICLE: "filedrop-gestures" "File drop gestures"
 HELP: file-drop
 { $class-description "File drop gesture. The " { $slot "mods" } " slot contains the keyboard modifiers active at the time of the drop (see " { $link "keyboard-gestures" } "). The " { $link dropped-files } " global variable contains an array of full paths of the files that were dropped."
 $nl
-"The " { $link hand-loc } " global variable contains the drop location. If the user dropped files onto the non-client area of a window (the caption or the border), the gesture will not be triggered, but the contents of the " { $link dropped-files } " will be updated." } ;
+"The " { $link hand-loc } " global variable contains the drop location. If the user dropped files onto the non-client area of a window (the caption or the border), the gesture will not be triggered, but the contents of the " { $link dropped-files } " will be updated." }
+{ $examples
+"A typical gesture handler looks like this:
+" { $snippet "your-gadget-class H{
+    { T{ file-drop } [
+        dropped-files get-global [ nip ] curry models:change-model
+    ] }
+} set-gestures" } } ;
 
 HELP: dropped-files
 { $var-description "The global variable holds an array of full paths of the files that were dropped by the last " { $link file-drop } " gesture." } ;

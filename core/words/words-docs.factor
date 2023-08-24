@@ -91,7 +91,7 @@ ARTICLE: "word-props" "Word properties"
 $nl
 "The following are some of the properties used by the library:"
 { $table
-  { "Property" "Documentation" }
+  { { $strong "Property" } { $strong "Documentation" } }
   {
       { $snippet "\"declared-effect\"" } { $link "effects" }
   }
@@ -162,7 +162,7 @@ $nl
 }
 "Properties which are defined for classes only:"
 { $table
-    { "Property" "Documentation" }
+    { { $strong "Property" } { $strong "Documentation" } }
     { { $snippet "\"class\"" } { "A boolean indicating whether this word is a class - " { $link "classes" } } }
 
     { { $snippet "\"coercer\"" } { "A quotation for converting the top of the stack to an instance of this class" } }
@@ -173,7 +173,7 @@ $nl
 
     { { { $snippet "\"superclass\"" } ", " { $snippet "\"predicate-definition\"" } } { $link "predicates" } }
 
-    { { $snippet "\"members\"" } { $link "unions" } { $link "maybes" } }
+    { { $snippet "\"members\"" } { { $link "unions" } ", " { $link "maybes" } } }
     {
         { $snippet "\"instances\"" }
         { "Lists the instances of the mixin class and where they are defined - " { $link "mixins" } }
@@ -207,7 +207,7 @@ $nl
     { { $snippet "name" } "a word name" }
     { { $snippet "vocabulary" } "a word vocabulary name" }
     { { $snippet "def" } "a definition quotation" }
-    { { $snippet "props" } "an assoc of word properties, including documentation and other meta-data" }
+    { { $snippet "props" } "an assoc of word properties, including documentation and other metadata" }
 }
 "Words are instances of a class."
 { $subsections
@@ -366,12 +366,6 @@ HELP: create-word
 { $values { "name" string } { "vocab" string } { "word" word } }
 { $description "Creates a new word. If the vocabulary already contains a word with the requested name, outputs the existing word. The vocabulary must exist already; if it does not, you must call " { $link create-vocab } " first." }
 { $notes "This word must be called from inside " { $link with-compilation-unit } ". Parsing words should call " { $link create-word-in } " instead of this word." } ;
-
-HELP: constructor-word
-{ $values { "name" string } { "vocab" string } { "word" word } }
-{ $description "Creates a new word, surrounding " { $snippet "name" } " in angle brackets." }
-{ $notes "This word must be called from inside " { $link with-compilation-unit } "." }
-{ $examples { $example "USING: compiler.units prettyprint words ;" "[ \"salmon\" \"scratchpad\" constructor-word ] with-compilation-unit ." "<salmon>" } } ;
 
 { POSTPONE: FORGET: forget forget* forget-vocab } related-words
 

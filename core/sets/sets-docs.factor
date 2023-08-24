@@ -1,5 +1,5 @@
-USING: assocs hashtables help.markup help.syntax kernel
-quotations sequences vectors ;
+USING: assocs help.markup help.syntax kernel
+sequences vectors ;
 IN: sets
 
 ARTICLE: "sets" "Sets"
@@ -43,6 +43,11 @@ ARTICLE: "set-operations" "Operations on sets"
     subset?
     set=
 }
+"Operations on groups of sets:"
+{ $subsections
+    union-all
+    intersect-all
+}
 "An optional generic word for creating sets of the same class as a given set:"
 { $subsections set-like }
 "An optional generic word for creating a set with a fast lookup operation, if the set itself has a slow lookup operation:"
@@ -54,8 +59,8 @@ ARTICLE: "set-operations" "Operations on sets"
 }
 "Utilities for sets and sequences:"
 { $subsections
-     within
-     without
+    within
+    without
 } ;
 
 ARTICLE: "set-implementations" "Set implementations"
@@ -111,7 +116,8 @@ HELP: clear-set
 
 HELP: members
 { $values { "set" set } { "seq" sequence } }
-{ $description "Creates a sequence with a single copy of each member of the set." $nl "Each set type is expected to implement a method on this generic word." } ;
+{ $description "Creates a sequence with a single copy of each member of the set." $nl "Each set type is expected to implement a method on this generic word." }
+{ $notes "This will preserve the ordering of unique elements when called on a " { $link sequence } "." } ;
 
 HELP: in?
 { $values { "elt" object } { "set" set } { "?" boolean } }
@@ -153,10 +159,6 @@ HELP: intersect
     { $example "USING: sets prettyprint ;" "{ 1 2 3 } { 2 3 4 } intersect ." "{ 2 3 }" }
 } ;
 
-HELP: intersection
-{ $values { "sets" sequence } { "set/f" { $maybe set } } }
-{ $description "Outputs the intersection of all the sets of the sequence " { $snippet "sets" } ", or " { $link f } " if " { $snippet "sets" } " is empty." } ;
-
 HELP: union
 { $values { "set1" set } { "set2" set } { "set" set } }
 { $description "Outputs a set consisting of elements present in either " { $snippet "set1" } " or " { $snippet "set2" } " which does not contain duplicate values." $nl "This word has a default definition which works for all sets, but set implementations may override the default for efficiency." }
@@ -197,9 +199,9 @@ HELP: set=
 
 HELP: gather
 { $values
-     { "seq" sequence } { "quot" quotation }
-     { "newseq" sequence } }
-{ $description "Maps a quotation onto a sequence, concatenates the results of the mapping, and removes duplicates." } ;
+    { "seq" sequence } { "quot" { $quotation ( ... elt -- ... elts ) } }
+    { "newseq" sequence } }
+{ $description "Maps a quotation over a sequence, concatenates the results of the mapping, and removes duplicates." } ;
 
 HELP: set-like
 { $values { "set" set } { "exemplar" set } { "set'" set } }
@@ -224,10 +226,10 @@ HELP: cardinality
 { $values { "set" set } { "n" "a non-negative integer" } }
 { $description "Returns the number of elements in the set. All sets support this operation." } ;
 
-HELP: combine
+HELP: intersect-all
+{ $values { "sets" sequence } { "set/f" { $maybe set } } }
+{ $description "Outputs the intersection of all the sets of the sequence " { $snippet "sets" } ", or " { $link f } " if " { $snippet "sets" } " is empty." } ;
+
+HELP: union-all
 { $values { "sets" { $sequence set } } { "set/f" { $maybe set } } }
 { $description "Outputs the union of a sequence of sets, or " { $link f } " if the sequence is empty." } ;
-
-HELP: refine
-{ $values { "sets" { $sequence set } } { "set/f" { $maybe set } } }
-{ $description "Outputs the intersection of a sequence of sets, or " { $link f } " if the sequence is empty." } ;

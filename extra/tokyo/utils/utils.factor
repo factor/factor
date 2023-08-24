@@ -1,6 +1,6 @@
 ! Copyright (C) 2009 Bruno Deferrari
-! See http://factorcode.org/license.txt for BSD license.
-USING: io io.streams.memory serialize kernel ;
+! See https://factorcode.org/license.txt for BSD license.
+USING: io.streams.memory serialize ;
 IN: tokyo.utils
 
 : memory>object ( memory -- object )

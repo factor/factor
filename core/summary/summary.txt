@@ -1,0 +1,1 @@
+Generic word for converting an object into a brief one-line string

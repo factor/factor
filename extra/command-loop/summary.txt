@@ -1,0 +1,1 @@
+Generic line-oriented command interpreter.

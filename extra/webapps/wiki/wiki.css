@@ -1,51 +1,216 @@
-.comparison th {
-    border-width: 1px;
-    border-color: #666;
-    border-style: solid;
+input, textarea, select {
+    font-size: 12pt;
+    border: 1px solid #d5d5d5;
+    padding: 5px;
+}
+
+textarea {
+    width: 100%;
+}
+
+table {
+    table-layout: fixed;
+}
+
+td {
+    word-wrap: break-word;
+}
+
+table.comparison {
+    width: 100%;
+}
+
+table.comparison th {
     width: 50%;
 }
 
-.comparison table {
-    border-color: #666;
-    border-style: solid;
-    border-width: 1px;
-    border-spacing: 0;
-    border-collapse: collapse;
+table.comparison th, table.comparison td {
+    border: 1px solid #d5d5d5;
 }
 
 .insert {
     background-color: #9f9;
+    color: black;
 }
 
 .delete {
     background-color: #f99;
+    color: black;
 }
 
-.revisions table, .revisions td, .revisions th {
-    border-color: #666;
-    border-style: solid;
+table.revisions {
+    width: 100%;
 }
 
-.revisions table {
-    border-width: 0 0 1px 1px;
-    border-spacing: 0;
-    border-collapse: collapse;
-}
-
-.revisions td, .revisions th {
+table.revisions td, table.revisions th {
     margin: 0;
     padding: 4px;
-    border-width: 1px 1px 0 0;
+}
+
+table.revisions, table.revisions th, table.revisions td {
+    border: 1px solid #d5d5d5;
+}
+
+/* Dark mode */
+@media (prefers-color-scheme: dark) {
+    table.comparison, table.comparison th, table.comparison td {
+        border-color: #666;
+    }
+
+    table.revisions, table.revisions th, table.revisions td {
+        border-color: #666;
+    }
+}
+
+.description {
+    line-height: 150%;
+}
+
+.description pre {
+    padding: 0.5em;
+    background-color: #f5f5f5;
+}
+
+.description h1 { font-size: 1.5em; }
+.description h2 { font-size: 1.17em; }
+.description h3 { font-size: 1.0em; }
+.description h4 { font-size: 0.83em; }
+.description h5 { font-size: 0.67em; }
+
+.description p:first-child { margin-top: 0px; }
+.description p:last-child { margin-bottom: 0px; }
+
+#left {
+    position: absolute;
+    top: 0;
+    left: calc(min(100vw - 200px, 800px));
+    width: 200px;
+    z-index: 99;
+    border: none;
+    border-left: 1px solid #d5d5d5;
+}
+
+#right {
+    width: calc(100vw - 200px);
+    max-width: calc(min(100vw - 230px, 770px));
 }
 
 .contents {
-    padding: 4px;
-    margin: 4px;
-    border: 1px dashed gray;
-    background: #f5f1fd;
-    width: 200px;
+    font-size: 90%;
+    margin: 0;
+    padding: 15px;
+    padding-top: 0px;
+    line-height: 130%;
 }
 
-.footer {
-    font-size: 75%;
+.contents ul {
+    list-style-type: none;
+    margin: 0;
+    padding-left: 20px;
+}
+
+.page nav {
+    margin: -15px;
+    margin-top: 0px;
+    background: none;
+}
+
+.page img {
+    max-width: 100%;
+}
+
+.page hr {
+    height: 1px;
+}
+
+nav img {
+    margin-right: 5px;
+    display: none;
+}
+
+nav input {
+    margin: 0px;
+    margin-top: -2px;
+}
+
+.page nav {
+    width: calc(100vw - 200px);
+    max-width: 800px;
+    left: 0;
+    border-top: 1px solid #d5d5d5;
+    border-bottom: 1px solid #d5d5d5;
+    margin-top: 15px;
+}
+
+.page footer {
+    padding: 15px;
+    padding-left: 0;
+    padding-right: 0;
+    font-size: smaller;
+}
+
+@media screen and (max-width: 600px) {
+    #left {
+        position: absolute;
+        display: none;
+        left: 0;
+        top: 0;
+        background: #f5f5f5;
+        border: none;
+        border-right: 1px solid #d5d5d5;
+        border-bottom: 1px solid #d5d5d5;
+        padding-top: 0px;
+        box-shadow: 5px 5px 10px #aaa;
+    }
+
+    #right {
+        width: 100%;
+        max-width: 100%;
+    }
+
+    nav img {
+        display: inline;
+    }
+
+    .page {
+        width: 100%;
+    }
+
+    .page nav {
+        width: 100vw;
+    }
+}
+
+/* Dark mode */
+@media (prefers-color-scheme: dark) {
+    nav img {
+        filter: invert(80%);
+    }
+
+    #left {
+        border: none;
+        border-left: 1px solid #666;
+    }
+
+    .description pre {
+        color: black;
+        background-color: white;
+        filter: invert(80%);
+    }
+
+    .page nav {
+        border-top: 1px solid #666;
+        border-bottom: 1px solid #666;
+    }
+}
+
+@media screen and (max-width: 600px) and (prefers-color-scheme: dark) {
+
+    #left {
+        background-color: #373e48;
+        border: none;
+        border-right: 1px solid #666;
+        border-bottom: 1px solid #666;
+        box-shadow: 5px 5px 10px #333;
+    }
 }

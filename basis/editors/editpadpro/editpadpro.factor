@@ -3,7 +3,6 @@ kernel make math.parser namespaces sequences ;
 IN: editors.editpadpro
 
 SINGLETON: editpadpro
-editpadpro editor-class set-global
 
 : editpadpro-path ( -- path )
     \ editpadpro-path get [
@@ -14,7 +13,7 @@ editpadpro editor-class set-global
         } 0||
     ] unless* ;
 
-M: editpadpro editor-command ( file line -- command )
+M: editpadpro editor-command
     [
         editpadpro-path , number>string "/l" prepend , ,
     ] { } make ;

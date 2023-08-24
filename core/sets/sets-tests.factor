@@ -1,5 +1,5 @@
 ! Copyright (C) 2010 Daniel Ehrenberg, Doug Coleman.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: bit-arrays bit-sets kernel math sequences sets sorting
 tools.test ;
 IN: sets.tests
@@ -23,8 +23,8 @@ IN: sets.tests
 { 0 } [ 5 <bit-set> 10 over delete cardinality ] unit-test
 { HS{ 1 } } [ HS{ 1 2 } 2 over delete ] unit-test
 
-{ { 1 2 3 } } [ { 1 1 1 2 2 3 3 3 3 3 } dup set-like natural-sort ] unit-test
-{ { 1 2 3 } } [ HS{ 1 2 3 } { } set-like natural-sort ] unit-test
+{ { 1 2 3 } } [ { 1 1 1 2 2 3 3 3 3 3 } dup set-like sort ] unit-test
+{ { 1 2 3 } } [ HS{ 1 2 3 } { } set-like sort ] unit-test
 { { 1 2 3 } } [ { 1 2 2 3 3 } { } set-like ] unit-test
 { { 3 2 1 } } [ { 3 3 2 2 1 } { } set-like ] unit-test
 { t } [ 4 <bit-set> 1 <bit-set> set-like 4 <bit-set> = ] unit-test
@@ -104,14 +104,13 @@ IN: sets.tests
 { { 1 } } [ { 1 2 3 } { 2 3 4 } without ] unit-test
 { { 1 1 } } [ { 1 1 2 3 3 } { 2 3 4 4 } without ] unit-test
 
-! combine
-{ { 1 2 3 } } [ { { 1 } { 2 } { 1 3 } } combine ] unit-test
-{ f } [ { } combine ] unit-test
+{ f } [ { } union-all ] unit-test
+{ { 1 2 3 } } [ { { 1 } { 2 } { 1 3 } } union-all ] unit-test
 
-! refine
-{ { 2 } } [
-    { { 2 3 } { 2 4 } { 9 8 4 2 } } refine
-] unit-test
+{ f } [ { } intersect-all ] unit-test
+{ HS{ } } [ { HS{ } } intersect-all ] unit-test
+{ HS{ 1 } } [ { HS{ 1 2 3 } HS{ 1 } } intersect-all ] unit-test
+{ { 2 } } [ { { 2 3 } { 2 4 } { 9 8 4 2 } } intersect-all ] unit-test
 
 { { 1 4 9 16 25 36 } }
 [ { { 1 2 3 } { 4 5 6 } } [ [ sq ] map ] gather ] unit-test
@@ -139,10 +138,6 @@ M: null-set members drop f ;
 { HS{ 1 } } [ HS{ 1 } HS{ } union! ] unit-test
 { HS{ 1 } } [ HS{ } HS{ 1 } union! ] unit-test
 { HS{ 1 2 3 } } [ HS{ 1 } HS{ 1 2 3 } union! ] unit-test
-
-{ f } [ { } intersection ] unit-test
-{ HS{ } } [ { HS{ } } intersection ] unit-test
-{ HS{ 1 } } [ { HS{ 1 2 3 } HS{ 1 } } intersection ] unit-test
 
 { HS{ } } [ HS{ } HS{ } diff! ] unit-test
 { HS{ 1 } } [ HS{ 1 2 3 } HS{ 2 3 } diff! ] unit-test

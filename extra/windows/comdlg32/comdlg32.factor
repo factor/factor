@@ -1,8 +1,7 @@
 ! Copyright (C) 2017 Alexander Ilin.
-! See http://factorcode.org/license.txt for BSD license.
-USING: accessors alien alien.c-types alien.libraries
-alien.syntax classes.struct destructors kernel libc math
-sequences strings windows windows.types ;
+! See https://factorcode.org/license.txt for BSD license.
+USING: alien alien.libraries alien.syntax classes.struct
+windows.types ;
 
 IN: windows.comdlg32
 

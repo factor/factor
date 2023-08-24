@@ -1,10 +1,10 @@
 ! Copyright (c) 2009 Guillaume Nargeot.
-! See http://factorcode.org/license.txt for BSD license.
-USING: accessors kernel math math.ranges project-euler.common
-sequences locals ;
+! See https://factorcode.org/license.txt for BSD license.
+USING: accessors kernel math ranges project-euler.common
+sequences ;
 IN: project-euler.085
 
-! http://projecteuler.net/index.php?section=problems&id=85
+! https://projecteuler.net/index.php?section=problems&id=85
 
 ! DESCRIPTION
 ! -----------
@@ -30,8 +30,8 @@ IN: project-euler.085
     2dup [ 1 + ] bi@ * * * 4 /i ; inline
 
 :: each-unique-product ( ... a b quot: ( ... i j -- ... ) -- ... )
-    a b [a,b] [| i |
-        i b [a,b] [| j |
+    a b [a..b] [| i |
+        i b [a..b] [| j |
             i j quot call
         ] each
     ] each ; inline

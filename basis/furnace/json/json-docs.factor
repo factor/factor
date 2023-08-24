@@ -1,5 +1,4 @@
-USING: kernel http.server help.markup help.syntax http
-vocabs.loader ;
+USING: help.markup help.syntax http kernel ;
 IN: furnace.json
 
 HELP: <json-content>

@@ -32,3 +32,10 @@ USING: ip-parser kernel sequences tools.test ;
         "2001:db8::ff00:42:8329"
     } [ parse-ipv6 { 8193 3512 0 0 0 65280 66 33577 } = ] all?
 ] unit-test
+
+{ 1 } [ "::1" ipv6-aton ] unit-test
+{ "::1" } [ 1 ipv6-ntoa ] unit-test
+{ 0x10000000000000000000000000000 } [ "1::" ipv6-aton ] unit-test
+{ "1::" } [ 0x10000000000000000000000000000 ipv6-ntoa ] unit-test
+{ 0x10002000000000000000000030004 } [ "1:2::3:4" ipv6-aton ] unit-test
+{ "1:2::3:4" } [ 0x10002000000000000000000030004 ipv6-ntoa ] unit-test

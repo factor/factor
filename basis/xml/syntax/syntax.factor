@@ -1,11 +1,10 @@
 ! Copyright (C) 2005, 2009 Daniel Ehrenberg
-! See http://factorcode.org/license.txt for BSD license.
-USING: words assocs kernel accessors parser vocabs.parser
-effects.parser sequences summary lexer splitting combinators
-locals memoize sequences.deep xml.data xml.state xml namespaces
-present arrays generalizations sequences.generalizations strings
-make math macros multiline combinators.short-circuit sorting fry
-unicode effects ;
+! See https://factorcode.org/license.txt for BSD license.
+USING: accessors arrays assocs combinators effects
+effects.parser kernel lexer make math memoize multiline
+namespaces parser present sequences sequences.deep
+sequences.generalizations strings summary unicode
+words xml xml.data xml.state ;
 IN: xml.syntax
 
 <PRIVATE
@@ -45,13 +44,13 @@ SYNTAX: XML-NS:
     [ values [ interpolated? ] filter ] dip each ; inline
 
 : (each-interpolated) ( ... item quot: ( ... interpolated -- ... ) -- ... )
-     {
+    {
         { [ over interpolated? ] [ call ] }
         { [ over tag? ] [ [ attrs>> ] dip each-attrs ] }
         { [ over attrs? ] [ each-attrs ] }
         { [ over xml? ] [ [ body>> ] dip (each-interpolated) ] }
         [ 2drop ]
-     } cond ; inline recursive
+    } cond ; inline recursive
 
 : each-interpolated ( xml quot -- )
     '[ _ (each-interpolated) ] deep-each ; inline

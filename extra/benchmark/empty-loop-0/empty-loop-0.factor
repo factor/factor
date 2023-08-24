@@ -1,4 +1,4 @@
-USING: math math.private kernel sequences ;
+USING: math.private kernel ;
 IN: benchmark.empty-loop-0
 
 : empty-loop-0 ( n -- )

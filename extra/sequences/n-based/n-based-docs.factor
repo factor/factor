@@ -1,5 +1,5 @@
 ! (c)2008 Joe Groff, see BSD license etc.
-USING: help.markup help.syntax kernel math sequences ;
+USING: help.markup help.syntax math sequences ;
 IN: sequences.n-based
 
 HELP: <n-based-assoc>

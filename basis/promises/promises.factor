@@ -1,6 +1,6 @@
 ! Copyright (C) 2004, 2006 Chris Double, Matthew Willis.
-! See http://factorcode.org/license.txt for BSD license.
-USING: accessors effects.parser fry generalizations kernel
+! See https://factorcode.org/license.txt for BSD license.
+USING: accessors effects.parser generalizations kernel
 sequences words ;
 IN: promises
 

@@ -1,6 +1,6 @@
 ! Copyright (C) 2009 Keith Lazuka.
-! See http://factorcode.org/license.txt for BSD license.
-USING: help.markup help.syntax kernel images ;
+! See https://factorcode.org/license.txt for BSD license.
+USING: help.markup help.syntax images ;
 IN: images.normalization
 
 HELP: normalize-image

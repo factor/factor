@@ -19,7 +19,19 @@ IN: sequences.tests
 
 { "cba" } [ "abcdef" 3 head-slice reverse ] unit-test
 
-{ 5040 } [ [ 1 2 3 4 5 6 7 ] 1 [ * ] reduce ] unit-test
+{ 5040 5040 } [
+    [ 1 2 3 4 5 6 7 ] dup rest-slice
+    [ 1 [ * ] reduce ] bi@
+] unit-test
+
+{ 10079 6459 } [
+    [ 1 2 3 4 5 6 7 ] dup rest-slice
+    [ 1 [ [ * ] [ + ] bi* ] reduce-index ] bi@
+] unit-test
+
+{ -541365 } [
+    { 10 21 32 } { 500 600 700 } [ - sq ] [ - ] 2map-reduce
+] unit-test
 
 { 5040 { 1 1 2 6 24 120 720 } }
 [ { 1 2 3 4 5 6 7 } 1 [ * ] accumulate ] unit-test
@@ -163,7 +175,7 @@ IN: sequences.tests
 { { 1 3 2 4 } } [ { 1 2 3 4 } clone 1 2 pick exchange ] unit-test
 
 { { "" "a" "aa" "aaa" } }
-[ 4 [ CHAR: a <string> ] { } map-integers ]
+[ 4 [ CHAR: a <string> ] map-integers ]
 unit-test
 
 { V{ 1 3 5 7 9 } } [ 10 <iota> >vector [ even? ] reject! ] unit-test
@@ -290,6 +302,8 @@ unit-test
 
 { 328350 } [ 100 <iota> [ sq ] map-sum ] unit-test
 
+{ 5 } [ { 1 f 3 f 5 f 7 f 9 f } [ ] count ] unit-test
+
 { 50 } [ 100 <iota> [ even? ] count ] unit-test
 { 50 } [ 100 <iota> [ odd?  ] count ] unit-test
 
@@ -363,13 +377,18 @@ M: bogus-hashcode hashcode* 2drop 0 >bignum ;
 { { { { 1 "a" } { 1 "b" } } { { 2 "a" } { 2 "b" } } } }
 [ { 1 2 } { "a" "b" } cartesian-product ] unit-test
 
+{ 2 4 } [ { 1 2 3 } { 4 5 6 } [ [ even? ] both? ] cartesian-find ] unit-test
+{ f f } [ { 1 2 3 } { 4 5 6 } [ [ 10 > ] both? ] cartesian-find ] unit-test
+
 [ { } [ string>digits sum ] [ + ] map-reduce ] must-infer
 [ { } [ ] [ + ] map-reduce ] must-fail
 { 4 } [ { 1 1 } [ 1 + ] [ + ] map-reduce ] unit-test
+{ 2 18 } [ 2 { 3 3 3 } [ dupd * ] [ + ] map-reduce ] unit-test
 
 [ { } { } [ [ string>digits product ] bi@ + ] [ + ] 2map-reduce ] must-infer
 [ { } { } [ + ] [ + ] 2map-reduce ] must-fail
 { 24 } [ { 1 2 } { 3 4 } [ + ] [ * ] 2map-reduce ] unit-test
+{ 2 96 } [ 2 { 3 3 3 3 } { 4 4 4 4 } [ [ dup ] 2dip * * ] [ + ] 2map-reduce ] unit-test
 
 { 4 } [ 5 <iota> [ ] supremum-by ] unit-test
 { 0 } [ 5 <iota> [ ] infimum-by ] unit-test
@@ -401,6 +420,8 @@ M: bogus-hashcode hashcode* 2drop 0 >bignum ;
 { { 0 } } [ 1 0 <repetition> >array ] unit-test
 { { 0 0 0 } } [ 3 0 <repetition> >array ] unit-test
 
+{ "ABCD" } [ "AAAA" [ + ] map-index ] unit-test
+
 {
     { 11 23 35 }
 } [ { 11 22 33 } [ + ] map-index ] unit-test
@@ -418,3 +439,16 @@ M: bogus-hashcode hashcode* 2drop 0 >bignum ;
 } [ { 11 22 33 } [ + ] BV{ } map-index-as ] unit-test
 
 { t } [ { } { 99 88 } [ <= ] 2all? ] unit-test
+
+{ f } [ { } { 99 88 } [ <= ] 2any? ] unit-test
+{ t } [ { 2 4 5 8 } { 2 4 6 8 } [ < ] 2any? ] unit-test
+{ f } [ { 2 4 6 8 } { 2 4 6 8 } [ < ] 2any? ] unit-test
+
+{ "ollo" } [ "ll" "o" 1surround ] unit-test
+{ "ollo" } [ { CHAR: l CHAR: l } "o" 1surround ] unit-test
+
+{ { CHAR: o CHAR: l CHAR: l CHAR: o } }
+[ { CHAR: l CHAR: l } "o" { } 1surround-as ] unit-test
+
+{ "ollo" }
+[ { CHAR: l CHAR: l } "o" "" 1surround-as ] unit-test

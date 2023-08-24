@@ -1,10 +1,9 @@
 ! Copyright (C) 2008 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: assocs calendar calendar.format combinators
 concurrency.messaging continuations debugger destructors init io
 io.directories io.encodings.utf8 io.files io.pathnames kernel
-locals math math.parser math.ranges namespaces sequences
-strings threads ;
+math math.parser ranges namespaces sequences strings threads ;
 IN: logging.server
 
 : log-root ( -- string )
@@ -33,10 +32,10 @@ SYMBOL: log-files
     [ close-log-streams path \ log-root set-global quot call ]
     \ log-root get-global
     [ \ log-root set-global close-log-streams ] curry
-    [ ] cleanup ; inline
+    finally ; inline
 
 : timestamp-header. ( -- )
-    "[" write now (timestamp>rfc3339) "] " write ;
+    "[" write now write-rfc3339 "] " write ;
 
 : multiline-header ( -- str ) 20 CHAR: - <string> ; foldable
 
@@ -68,14 +67,11 @@ SYMBOL: log-files
 
 CONSTANT: keep-logs 10
 
-: ?delete-file ( path -- )
-    dup exists? [ delete-file ] [ drop ] if ;
-
 : delete-oldest ( service -- )
     keep-logs log# ?delete-file ;
 
 : ?move-file ( old new -- )
-    over exists? [ move-file ] [ 2drop ] if ;
+    over file-exists? [ move-file ] [ 2drop ] if ;
 
 : advance-log ( path n -- )
     [ 1 - log# ] 2keep log# ?move-file ;
@@ -85,7 +81,7 @@ CONSTANT: keep-logs 10
     [
         log-path
         [ delete-oldest ]
-        [ keep-logs 1 [a,b] [ advance-log ] with each ] bi
+        [ keep-logs 1 [a..b] [ advance-log ] with each ] bi
     ] bi ;
 
 : (rotate-logs) ( -- )
@@ -101,7 +97,7 @@ CONSTANT: keep-logs 10
 
 : log-server ( -- )
     [
-        init-namespaces
+        init-namestack
         [ log-server-loop ]
         [ error. (close-logs) ]
         recover t
@@ -109,7 +105,7 @@ CONSTANT: keep-logs 10
     "Log server" spawn-server
     "log-server" set-global ;
 
-[
+STARTUP-HOOK: [
     H{ } clone log-files set-global
     log-server
-] "logging" add-startup-hook
+]

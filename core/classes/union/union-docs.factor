@@ -21,12 +21,12 @@ ARTICLE: "unions" "Union classes"
 ABOUT: "unions"
 
 HELP: (define-union-class)
-{ $values { "class" class } { "members" "a sequence of classes" } }
+{ $values { "class" class } { "members" { $sequence class } } }
 { $description "Defines a union class." }
 { $errors "Throws " { $link cannot-reference-self } " if the definition references itself." } ;
 
 HELP: define-union-class
-{ $values { "class" class } { "members" "a sequence of classes" } }
+{ $values { "class" class } { "members" { $sequence class } } }
 { $description "Defines a union class with specified members. This is the run time equivalent of " { $link POSTPONE: UNION: } "." }
 { $notes "This word must be called from inside " { $link with-compilation-unit } "." }
 { $side-effects "class"

@@ -1,5 +1,5 @@
 ! Copyright (C) 2009 Joe Groff.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors arrays classes classes.mixin classes.parser
 classes.singleton classes.tuple classes.tuple.parser
 classes.union combinators inverse kernel lexer macros make

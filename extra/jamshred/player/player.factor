@@ -1,9 +1,10 @@
 ! Copyright (C) 2007, 2008 Alex Chapman
-! See http://factorcode.org/license.txt for BSD license.
-USING: accessors colors.constants combinators jamshred.log
-jamshred.oint jamshred.sound jamshred.tunnel kernel locals math
-math.constants math.order math.ranges math.vectors math.matrices
-sequences shuffle specialized-arrays strings system ;
+! See https://factorcode.org/license.txt for BSD license.
+
+USING: accessors colors combinators jamshred.oint
+jamshred.sound jamshred.tunnel kernel math math.order
+math.vectors ranges sequences specialized-arrays
+strings system ;
 QUALIFIED-WITH: alien.c-types c
 SPECIALIZED-ARRAY: c:float
 IN: jamshred.player
@@ -44,7 +45,7 @@ CONSTANT: max-speed 30.0
 : moved ( player -- ) nano-count swap last-move<< ;
 
 : speed-range ( -- range )
-    max-speed [0,b] ;
+    max-speed [0..b] ;
 
 : change-player-speed ( inc player -- )
     [ + 0 max-speed clamp ] change-speed drop ;
@@ -80,14 +81,14 @@ CONSTANT: max-speed 30.0
 : almost-to-collision ( player -- distance )
     distance-to-collision 0.1 - dup 0 < [ drop 0 ] when ;
 
-: from ( player -- radius distance-from-centre )
+: from ( player -- radius distance-from-center )
     [ nearest-segment>> dup radius>> swap ] [ location>> ] bi
-    distance-from-centre ;
+    distance-from-center ;
 
 : distance-from-wall ( player -- distance ) from - ;
-: fraction-from-centre ( player -- fraction ) from swap / ;
+: fraction-from-center ( player -- fraction ) from swap / ;
 : fraction-from-wall ( player -- fraction )
-    fraction-from-centre 1 swap - ;
+    fraction-from-center 1 swap - ;
 
 : update-nearest-segment2 ( heading player -- )
     2dup distance-to-heading-segment-area 0 <= [
@@ -130,11 +131,10 @@ CONSTANT: max-speed 30.0
     ?move-player-freely over 0 > [
         ! bounce
         drag-player
-        (move-player)
     ] when ;
 
 : move-player ( player -- )
     [ update-time ] [ distance-to-move ] [ (move-player) 2drop ] tri ;
 
 : update-player ( player -- )
-    [ move-player ] [ nearest-segment>> "white" named-color swap color<< ] bi ;
+    [ move-player ] [ nearest-segment>> COLOR: white swap color<< ] bi ;

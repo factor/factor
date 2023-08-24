@@ -1,5 +1,5 @@
 USING: accessors destructors windows.privileges
-io.files.windows io.mmap io.mmap.private kernel literals locals
+io.files.windows io.mmap io.mmap.private kernel literals
 math math.bitwise system windows.errors windows.handles
 windows.kernel32 ;
 IN: io.mmap.windows
@@ -44,7 +44,7 @@ M: windows (mapped-file-reader)
         -rot <win32-mapped-file>
     ] with-destructors ;
 
-M: windows close-mapped-file ( mapped-file -- )
+M: windows close-mapped-file
     [
         [ handle>> &dispose drop ]
         [ address>> UnmapViewOfFile win32-error=0/f ] bi

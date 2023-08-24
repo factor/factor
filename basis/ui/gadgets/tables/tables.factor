@@ -1,12 +1,12 @@
 ! Copyright (C) 2008, 2011 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays colors colors.constants combinators
-combinators.short-circuit fonts fry kernel locals math
-math.functions math.order math.rectangles math.vectors models
-namespaces opengl sequences splitting strings ui.commands
-ui.gadgets ui.gadgets.line-support ui.gadgets.menus
-ui.gadgets.scrollers ui.gadgets.status-bar ui.gadgets.worlds
-ui.gestures ui.images ui.pens.solid ui.render ui.text ui.theme ;
+! See https://factorcode.org/license.txt for BSD license.
+USING: accessors arrays colors combinators
+combinators.short-circuit fonts kernel math math.functions
+math.order math.rectangles math.vectors models namespaces opengl
+sequences splitting strings ui.commands ui.gadgets
+ui.gadgets.line-support ui.gadgets.menus ui.gadgets.scrollers
+ui.gadgets.status-bar ui.gadgets.worlds ui.gestures ui.images
+ui.pens.solid ui.render ui.text ui.theme ;
 IN: ui.gadgets.tables
 
 ! Row renderer protocol
@@ -17,6 +17,7 @@ GENERIC: column-titles ( renderer -- strings )
 
 GENERIC: row-columns ( row renderer -- columns )
 GENERIC: row-value ( row renderer -- object )
+GENERIC: row-summary ( row renderer -- object )
 GENERIC: row-color ( row renderer -- color )
 GENERIC: row-value? ( value row renderer -- ? )
 
@@ -29,6 +30,7 @@ M: object column-titles drop f ;
 
 M: trivial-renderer row-columns drop ;
 M: object row-value drop ;
+M: object row-summary row-value ;
 M: object row-color 2drop f ;
 M: object row-value? drop eq? ;
 
@@ -71,7 +73,7 @@ M: f cell-dim 2drop 0 0 0 ;
 M: f draw-cell 2drop ;
 
 : single-line ( str -- str' )
-    dup [ "\r\n" member? ] any? [ string-lines " " join ] when ;
+    dup [ "\r\n" member? ] any? [ split-lines join-words ] when ;
 
 M: string cell-dim single-line text-dim first2 ceiling 0 ;
 M: string draw-cell single-line draw-text ;
@@ -183,8 +185,8 @@ M: table layout*
     ] dip translate-column ;
 
 : table-column-alignment ( table -- seq )
-    dup renderer>> column-alignment
-    [ ] [ column-widths>> length 0 <repetition> ] ?if ;
+    [ renderer>> column-alignment ]
+    [ column-widths>> length 0 <repetition> ] ?unless ;
 
 :: row-font ( row index table -- font )
     table font>> clone
@@ -216,7 +218,7 @@ M: table draw-gadget*
         ] with-variable
     ] if ;
 
-M: table line-height* ( table -- y )
+M: table line-height*
     [ font>> ] [ renderer>> prototype-row ] bi
     [ cell-dim + nip ] with [ max ] map-reduce ;
 
@@ -240,7 +242,7 @@ PRIVATE>
 
 : show-row-summary ( table n -- )
     over nth-row
-    [ swap [ renderer>> row-value ] keep show-summary ]
+    [ swap [ renderer>> row-summary ] keep show-summary ]
     [ drop hide-status ]
     if ;
 
@@ -326,10 +328,9 @@ M: table model-changed
 PRIVATE>
 
 : row-action ( table -- )
-    dup selected-row
-    [ swap [ dup hook>> call( table -- ) ] [ action>> call( value -- ) ] bi ]
-    [ 2drop ]
-    if ;
+    dup selected-row [
+        over action>> call( value -- )
+    ] [ drop ] if dup hook>> call( table -- ) ;
 
 : row-action? ( table -- ? )
     single-click?>> hand-click# get 2 = or ;
@@ -415,7 +416,9 @@ table "row" f {
     { T{ button-down f f 3 } show-table-menu }
     { T{ key-down f f "RET" } row-action }
     { T{ key-down f f "UP" } previous-row }
+    { T{ key-down f { C+ } "p" } previous-row }
     { T{ key-down f f "DOWN" } next-row }
+    { T{ key-down f { C+ } "n" } next-row }
     { T{ key-down f f "HOME" } first-row }
     { T{ key-down f f "END" } last-row }
     { T{ key-down f f "PAGE_UP" } previous-page }

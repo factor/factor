@@ -1,8 +1,7 @@
 ! Copyright (c) 2008 Slava Pestov
-! See http://factorcode.org/license.txt for BSD license.
-USING: accessors byte-vectors destructors io io.backend
-io.encodings.binary io.files io.streams.byte-array kernel
-sequences ;
+! See https://factorcode.org/license.txt for BSD license.
+USING: accessors byte-vectors destructors io io.encodings.binary
+io.files io.streams.byte-array kernel sequences ;
 IN: checksums
 
 MIXIN: checksum
@@ -23,16 +22,18 @@ M: checksum checksum-lines
 : checksum-file ( path checksum -- value )
     [ binary <file-reader> ] dip checksum-stream ;
 
-TUPLE: checksum-state checksum { bytes byte-vector } ;
+TUPLE: checksum-state < disposable
+    checksum
+    { bytes byte-vector } ;
 
-M: checksum-state dispose drop ;
+M: checksum-state dispose* drop ;
 
 M: checksum-state clone
     call-next-method
     [ clone ] change-bytes ;
 
 : new-checksum-state ( class -- checksum-state )
-    new BV{ } clone >>bytes ;
+    new-disposable BV{ } clone >>bytes ;
 
 GENERIC: initialize-checksum-state ( checksum -- checksum-state )
 GENERIC#: add-checksum-bytes 1 ( checksum-state data -- checksum-state )

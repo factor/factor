@@ -1,8 +1,7 @@
 ! Copyright (C) 2009 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
-USING: accessors alien.c-types alien.data colors help.markup
-help.syntax kernel opengl opengl.gl sequences math.vectors
-ui.gadgets ui.pens specialized-arrays ;
+! See https://factorcode.org/license.txt for BSD license.
+USING: accessors alien.c-types alien.data kernel opengl
+opengl.gl sequences specialized-arrays ui.gadgets ui.pens ;
 SPECIALIZED-ARRAY: float
 IN: ui.pens.polygon
 

@@ -1,5 +1,5 @@
 ! Copyright (C) 2008 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors fry kernel models timers ;
 IN: models.delay
 
@@ -10,18 +10,12 @@ TUPLE: delay < model model timeout timer ;
 
 : <delay> ( model timeout -- delay )
     f delay new-model
+        dup '[ _ update-delay-model ] pick f <timer> >>timer
         swap >>timeout
         over >>model
     [ add-dependency ] keep ;
 
-: stop-delay ( delay -- )
-    timer>> [ stop-timer ] when* ;
-
-: start-delay ( delay -- )
-    [ '[ _ f >>timer update-delay-model ] ]
-    [ timeout>> later ]
-    [ timer<< ] tri ;
-
-M: delay model-changed nip dup stop-delay start-delay ;
+M: delay model-changed
+    nip timer>> restart-timer ;
 
 M: delay model-activated update-delay-model ;

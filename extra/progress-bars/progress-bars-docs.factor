@@ -1,6 +1,6 @@
 ! Copyright (C) 2011 Doug Coleman.
-! See http://factorcode.org/license.txt for BSD license.
-USING: help.markup help.syntax kernel math strings ;
+! See https://factorcode.org/license.txt for BSD license.
+USING: help.markup help.syntax math strings ;
 IN: progress-bars
 
 HELP: make-progress-bar

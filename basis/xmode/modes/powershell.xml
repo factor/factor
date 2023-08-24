@@ -1,0 +1,580 @@
+<?xml version="1.0"?>
+<!DOCTYPE MODE SYSTEM "xmode.dtd">
+
+<!-- Windows PowerShell mode -->
+<MODE>
+	<PROPS>
+		<PROPERTY NAME="commentStart" VALUE="&lt;#" />
+		<PROPERTY NAME="commentEnd" VALUE="#&gt;" />
+		<PROPERTY NAME="lineComment" VALUE="#" />
+		<PROPERTY NAME="indentOpenBrackets" VALUE="{" />
+		<PROPERTY NAME="indentCloseBrackets" VALUE="}" />
+	</PROPS>
+	
+	<RULES SET="PS_OPERATOR">
+		<SEQ TYPE="OPERATOR">-eq</SEQ>
+		<SEQ TYPE="OPERATOR">-ne</SEQ>
+		<SEQ TYPE="OPERATOR">-gt</SEQ>
+		<SEQ TYPE="OPERATOR">-ge</SEQ>
+		<SEQ TYPE="OPERATOR">-lt</SEQ>
+		<SEQ TYPE="OPERATOR">-le</SEQ>
+		<SEQ TYPE="OPERATOR">-ieq</SEQ>
+		<SEQ TYPE="OPERATOR">-ine</SEQ>
+		<SEQ TYPE="OPERATOR">-igt</SEQ>
+		<SEQ TYPE="OPERATOR">-ige</SEQ>
+		<SEQ TYPE="OPERATOR">-ilt</SEQ>
+		<SEQ TYPE="OPERATOR">-ile</SEQ>
+		<SEQ TYPE="OPERATOR">-ceq</SEQ>
+		<SEQ TYPE="OPERATOR">-cne</SEQ>
+		<SEQ TYPE="OPERATOR">-cgt</SEQ>
+		<SEQ TYPE="OPERATOR">-cge</SEQ>
+		<SEQ TYPE="OPERATOR">-clt</SEQ>
+		<SEQ TYPE="OPERATOR">-cle</SEQ>
+		<SEQ TYPE="OPERATOR">-like</SEQ>
+		<SEQ TYPE="OPERATOR">-notlike</SEQ>
+		<SEQ TYPE="OPERATOR">-match</SEQ>
+		<SEQ TYPE="OPERATOR">-notmatch</SEQ>
+		<SEQ TYPE="OPERATOR">-ilike</SEQ>
+		<SEQ TYPE="OPERATOR">-inotlike</SEQ>
+		<SEQ TYPE="OPERATOR">-imatch</SEQ>
+		<SEQ TYPE="OPERATOR">-inotmatch</SEQ>
+		<SEQ TYPE="OPERATOR">-clike</SEQ>
+		<SEQ TYPE="OPERATOR">-cnotlike</SEQ>
+		<SEQ TYPE="OPERATOR">-cmatch</SEQ>
+		<SEQ TYPE="OPERATOR">-cnotmatch</SEQ>
+		<SEQ TYPE="OPERATOR">-contains </SEQ>
+		<SEQ TYPE="OPERATOR">-notcontains</SEQ>
+		<SEQ TYPE="OPERATOR">-icontains</SEQ>
+		<SEQ TYPE="OPERATOR">-inotcontains</SEQ>
+		<SEQ TYPE="OPERATOR">-ccontains</SEQ>
+		<SEQ TYPE="OPERATOR">-cnotcontains</SEQ>
+		<SEQ TYPE="OPERATOR">-isnot</SEQ>
+		<SEQ TYPE="OPERATOR">-is</SEQ>
+		<SEQ TYPE="OPERATOR">-as</SEQ>
+		<SEQ TYPE="OPERATOR">-replace</SEQ>
+		<SEQ TYPE="OPERATOR">-ireplace</SEQ>
+		<SEQ TYPE="OPERATOR">-creplace</SEQ>
+		<SEQ TYPE="OPERATOR">-and</SEQ>
+		<SEQ TYPE="OPERATOR">-or</SEQ>
+		<SEQ TYPE="OPERATOR">-band</SEQ>
+		<SEQ TYPE="OPERATOR">-bor</SEQ>
+		<SEQ TYPE="OPERATOR">-not</SEQ>
+		<SEQ TYPE="OPERATOR">-bnot</SEQ>
+		<SEQ TYPE="OPERATOR">-f</SEQ>
+		<SEQ TYPE="OPERATOR">-xor</SEQ>
+		<SEQ TYPE="OPERATOR">-bxor</SEQ>
+		<SEQ TYPE="OPERATOR">+=</SEQ>
+		<SEQ TYPE="OPERATOR">-=</SEQ>
+		<SEQ TYPE="OPERATOR">*=</SEQ>
+		<SEQ TYPE="OPERATOR">/=</SEQ>
+		<SEQ TYPE="OPERATOR">%=</SEQ>
+		<SEQ TYPE="OPERATOR">--</SEQ>
+		<SEQ TYPE="OPERATOR">++</SEQ>
+		<SEQ TYPE="OPERATOR">+</SEQ>
+		<!-- <SEQ TYPE="OPERATOR">-</SEQ> -->
+		<SEQ TYPE="OPERATOR">*</SEQ>
+		<SEQ TYPE="OPERATOR">/</SEQ>
+		<SEQ TYPE="OPERATOR">%</SEQ>
+		<SEQ TYPE="OPERATOR">=</SEQ>
+		<SEQ TYPE="OPERATOR">!</SEQ>
+		<SEQ TYPE="OPERATOR">`</SEQ>
+	</RULES>
+	
+	<RULES SET="PS_PREVAR">
+		<KEYWORDS>
+			<KEYWORD2>$foreach</KEYWORD2>
+			<KEYWORD2>$LastExitCode</KEYWORD2>
+			<KEYWORD2>$Match</KEYWORD2>
+			<KEYWORD2>$OFS</KEYWORD2>
+			<KEYWORD2>$StackTrace</KEYWORD2>
+			<KEYWORD2>$Error</KEYWORD2>
+			<KEYWORD2>$DebugPreference</KEYWORD2>
+			<KEYWORD2>$PROFILE</KEYWORD2>
+			<KEYWORD2>$HOME</KEYWORD2>
+			<KEYWORD2>$Host</KEYWORD2>
+			<KEYWORD2>$MaximumHistoryCount</KEYWORD2>
+			<KEYWORD2>$MaximumAliasCount</KEYWORD2>
+			<KEYWORD2>$input</KEYWORD2>
+			<KEYWORD2>$ReportErrorShowSource</KEYWORD2>
+			<KEYWORD2>$ExecutionContext</KEYWORD2>
+			<KEYWORD2>$true</KEYWORD2>
+			<KEYWORD2>$VerbosePreference</KEYWORD2>
+			<KEYWORD2>$ShellId</KEYWORD2>
+			<KEYWORD2>$false</KEYWORD2>
+			<KEYWORD2>$switch</KEYWORD2>
+			<KEYWORD2>$null</KEYWORD2>
+			<KEYWORD2>$MaximumFunctionCount</KEYWORD2>
+			<KEYWORD2>$line</KEYWORD2>
+			<KEYWORD2>$ConsoleFileName</KEYWORD2>
+			<KEYWORD2>$ReportErrorShowStackTrace</KEYWORD2>
+			<KEYWORD2>$FormatEnumerationLimit</KEYWORD2>
+			<KEYWORD2>$PSHOME</KEYWORD2>
+			<KEYWORD2>$lastWord</KEYWORD2>
+			<KEYWORD2>$MyInvocation</KEYWORD2>
+			<KEYWORD2>$PWD</KEYWORD2>
+			<KEYWORD2>$ReportErrorShowExceptionClass</KEYWORD2>
+			<KEYWORD2>$ProgressPreference</KEYWORD2>
+			<KEYWORD2>$ErrorActionPreference</KEYWORD2>
+			<KEYWORD2>$args</KEYWORD2>
+			<KEYWORD2>$MaximumErrorCount</KEYWORD2>
+			<KEYWORD2>$NestedPromptLevel</KEYWORD2>
+			<KEYWORD2>$WhatIfPreference</KEYWORD2>
+			<KEYWORD2>$ReportErrorShowInnerException</KEYWORD2>
+			<KEYWORD2>$ErrorView</KEYWORD2>
+			<KEYWORD2>$WarningPreference</KEYWORD2>
+			<KEYWORD2>$PID</KEYWORD2>
+			<KEYWORD2>$ConfirmPreference</KEYWORD2>
+			<KEYWORD2>$MaximumDriveCount</KEYWORD2>
+			<KEYWORD2>$MaximumVariableCount</KEYWORD2>
+			<KEYWORD2>$this</KEYWORD2>
+			<KEYWORD2>$$</KEYWORD2>
+			<KEYWORD2>$^</KEYWORD2>
+			<KEYWORD2>$_</KEYWORD2>
+			<KEYWORD2>$?</KEYWORD2>
+		</KEYWORDS>
+	</RULES>
+
+	<RULES HIGHLIGHT_DIGITS="TRUE"
+		DIGIT_RE="[0-9][0-9a-zA-Z]*"
+		NO_WORD_SEP="-">
+ 		<EOL_SPAN TYPE="COMMENT1">#</EOL_SPAN>
+ 		
+ 		<SPAN TYPE="COMMENT2">
+ 			<BEGIN>&lt;#</BEGIN>
+			<END>#&gt;</END>
+		</SPAN>
+
+		<SEQ_REGEXP HASH_CHAR="$" TYPE="KEYWORD2">[\$]+[a-zA-Z_\x7f-\xff][a-zA-Z0-9_\x7f-\xff]*</SEQ_REGEXP>
+
+		<IMPORT DELEGATE="PS_PREVAR"/>
+		<IMPORT DELEGATE="PS_OPERATOR"/>
+
+		<SPAN TYPE="LITERAL4">
+			<BEGIN>"</BEGIN>
+			<END>"</END>
+		</SPAN>
+
+		<SPAN TYPE="LITERAL1">
+			<BEGIN>'</BEGIN>
+			<END>'</END>
+		</SPAN>
+
+		<SEQ TYPE="MARKUP">,</SEQ>
+		<SEQ TYPE="MARKUP">.</SEQ>
+		<SEQ TYPE="MARKUP">::</SEQ>
+		<SEQ TYPE="MARKUP">|</SEQ>
+		<SEQ TYPE="MARKUP">{</SEQ>
+		<SEQ TYPE="MARKUP">}</SEQ>
+		<SEQ TYPE="MARKUP">&gt;</SEQ>
+		<SEQ TYPE="MARKUP">&gt;&gt;</SEQ>
+		<SPAN TYPE="LABEL">
+			<BEGIN>[</BEGIN>
+			<END>]</END>
+		</SPAN>
+		
+		<MARK_PREVIOUS TYPE="FUNCTION" MATCH_TYPE="MARKUP">(</MARK_PREVIOUS>
+		<SEQ TYPE="MARKUP">)</SEQ>
+
+		<KEYWORDS>
+			<KEYWORD1>begin</KEYWORD1>
+			<KEYWORD1>break</KEYWORD1>
+			<KEYWORD1>catch</KEYWORD1>
+			<KEYWORD1>continue</KEYWORD1>
+			<KEYWORD1>default</KEYWORD1>
+			<KEYWORD1>do</KEYWORD1>
+			<KEYWORD1>else</KEYWORD1>
+			<KEYWORD1>elseif</KEYWORD1>
+			<KEYWORD1>end</KEYWORD1>
+			<KEYWORD1>filter</KEYWORD1>
+			<KEYWORD1>finally</KEYWORD1>
+			<KEYWORD1>for</KEYWORD1>
+			<KEYWORD1>foreach</KEYWORD1>
+			<KEYWORD1>function</KEYWORD1>
+			<KEYWORD1>if</KEYWORD1>
+			<KEYWORD1>in</KEYWORD1>
+			<KEYWORD1>param</KEYWORD1>
+			<KEYWORD1>process</KEYWORD1>
+			<KEYWORD1>return</KEYWORD1>
+			<KEYWORD1>switch</KEYWORD1>
+			<KEYWORD1>throw</KEYWORD1>
+			<KEYWORD1>trap</KEYWORD1>
+			<KEYWORD1>try</KEYWORD1>
+			<KEYWORD1>until</KEYWORD1>
+			<KEYWORD1>where</KEYWORD1>
+			<KEYWORD1>while</KEYWORD1>
+			<KEYWORD1>ref</KEYWORD1>
+
+			<KEYWORD3>Add-Computer</KEYWORD3>
+			<KEYWORD3>Add-Content</KEYWORD3>
+			<KEYWORD3>Add-History</KEYWORD3>
+			<KEYWORD3>Add-Member</KEYWORD3>
+			<KEYWORD3>Add-PSSnapin</KEYWORD3>
+			<KEYWORD3>Add-Type</KEYWORD3>
+			<KEYWORD3>Checkpoint-Computer</KEYWORD3>
+			<KEYWORD3>Clear-Content</KEYWORD3>
+			<KEYWORD3>Clear-EventLog</KEYWORD3>
+			<KEYWORD3>Clear-History</KEYWORD3>
+			<KEYWORD3>Clear-Item</KEYWORD3>
+			<KEYWORD3>Clear-ItemProperty</KEYWORD3>
+			<KEYWORD3>Clear-Variable</KEYWORD3>
+			<KEYWORD3>Compare-Object</KEYWORD3>
+			<KEYWORD3>Complete-Transaction</KEYWORD3>
+			<KEYWORD3>Connect-WSMan</KEYWORD3>
+			<KEYWORD3>ConvertFrom-Csv</KEYWORD3>
+			<KEYWORD3>ConvertFrom-SecureString</KEYWORD3>
+			<KEYWORD3>ConvertFrom-StringData</KEYWORD3>
+			<KEYWORD3>Convert-Path</KEYWORD3>
+			<KEYWORD3>ConvertTo-Csv</KEYWORD3>
+			<KEYWORD3>ConvertTo-Html</KEYWORD3>
+			<KEYWORD3>ConvertTo-SecureString</KEYWORD3>
+			<KEYWORD3>ConvertTo-Xml</KEYWORD3>
+			<KEYWORD3>Copy-Item</KEYWORD3>
+			<KEYWORD3>Copy-ItemProperty</KEYWORD3>
+			<KEYWORD3>Debug-Process</KEYWORD3>
+			<KEYWORD3>Disable-ComputerRestore</KEYWORD3>
+			<KEYWORD3>Disable-PSBreakpoint</KEYWORD3>
+			<KEYWORD3>Disable-PSSessionConfiguration</KEYWORD3>
+			<KEYWORD3>Disable-WSManCredSSP</KEYWORD3>
+			<KEYWORD3>Disconnect-WSMan</KEYWORD3>
+			<KEYWORD3>Enable-ComputerRestore</KEYWORD3>
+			<KEYWORD3>Enable-PSBreakpoint</KEYWORD3>
+			<KEYWORD3>Enable-PSSessionConfiguration</KEYWORD3>
+			<KEYWORD3>Enable-WSManCredSSP</KEYWORD3>
+			<KEYWORD3>Enter-PSSession</KEYWORD3>
+			<KEYWORD3>Exit-PSSession</KEYWORD3>
+			<KEYWORD3>Export-Alias</KEYWORD3>
+			<KEYWORD3>Export-Clixml</KEYWORD3>
+			<KEYWORD3>Export-Console</KEYWORD3>
+			<KEYWORD3>Export-Counter</KEYWORD3>
+			<KEYWORD3>Export-Csv</KEYWORD3>
+			<KEYWORD3>Export-FormatData</KEYWORD3>
+			<KEYWORD3>Export-ModuleMember</KEYWORD3>
+			<KEYWORD3>Export-PSSession</KEYWORD3>
+			<KEYWORD3>ForEach-Object</KEYWORD3>
+			<KEYWORD3>Format-Custom</KEYWORD3>
+			<KEYWORD3>Format-List</KEYWORD3>
+			<KEYWORD3>Format-Table</KEYWORD3>
+			<KEYWORD3>Format-Wide</KEYWORD3>
+			<KEYWORD3>Get-Acl</KEYWORD3>
+			<KEYWORD3>Get-Alias</KEYWORD3>
+			<KEYWORD3>Get-AuthenticodeSignature</KEYWORD3>
+			<KEYWORD3>Get-ChildItem</KEYWORD3>
+			<KEYWORD3>Get-Command</KEYWORD3>
+			<KEYWORD3>Get-ComputerRestorePoint</KEYWORD3>
+			<KEYWORD3>Get-Content</KEYWORD3>
+			<KEYWORD3>Get-Counter</KEYWORD3>
+			<KEYWORD3>Get-Credential</KEYWORD3>
+			<KEYWORD3>Get-Culture</KEYWORD3>
+			<KEYWORD3>Get-Date</KEYWORD3>
+			<KEYWORD3>Get-Event</KEYWORD3>
+			<KEYWORD3>Get-EventLog</KEYWORD3>
+			<KEYWORD3>Get-EventSubscriber</KEYWORD3>
+			<KEYWORD3>Get-ExecutionPolicy</KEYWORD3>
+			<KEYWORD3>Get-FormatData</KEYWORD3>
+			<KEYWORD3>Get-Help</KEYWORD3>
+			<KEYWORD3>Get-History</KEYWORD3>
+			<KEYWORD3>Get-Host</KEYWORD3>
+			<KEYWORD3>Get-HotFix</KEYWORD3>
+			<KEYWORD3>Get-Item</KEYWORD3>
+			<KEYWORD3>Get-ItemProperty</KEYWORD3>
+			<KEYWORD3>Get-Job</KEYWORD3>
+			<KEYWORD3>Get-Location</KEYWORD3>
+			<KEYWORD3>Get-Member</KEYWORD3>
+			<KEYWORD3>Get-Module</KEYWORD3>
+			<KEYWORD3>Get-PfxCertificate</KEYWORD3>
+			<KEYWORD3>Get-Process</KEYWORD3>
+			<KEYWORD3>Get-PSBreakpoint</KEYWORD3>
+			<KEYWORD3>Get-PSCallStack</KEYWORD3>
+			<KEYWORD3>Get-PSDrive</KEYWORD3>
+			<KEYWORD3>Get-PSProvider</KEYWORD3>
+			<KEYWORD3>Get-PSSession</KEYWORD3>
+			<KEYWORD3>Get-PSSessionConfiguration</KEYWORD3>
+			<KEYWORD3>Get-PSSnapin</KEYWORD3>
+			<KEYWORD3>Get-Random</KEYWORD3>
+			<KEYWORD3>Get-Service</KEYWORD3>
+			<KEYWORD3>Get-TraceSource</KEYWORD3>
+			<KEYWORD3>Get-Transaction</KEYWORD3>
+			<KEYWORD3>Get-UICulture</KEYWORD3>
+			<KEYWORD3>Get-Unique</KEYWORD3>
+			<KEYWORD3>Get-Variable</KEYWORD3>
+			<KEYWORD3>Get-WinEvent</KEYWORD3>
+			<KEYWORD3>Get-WmiObject</KEYWORD3>
+			<KEYWORD3>Get-WSManCredSSP</KEYWORD3>
+			<KEYWORD3>Get-WSManInstance</KEYWORD3>
+			<KEYWORD3>Group-Object</KEYWORD3>
+			<KEYWORD3>Import-Alias</KEYWORD3>
+			<KEYWORD3>Import-Clixml</KEYWORD3>
+			<KEYWORD3>Import-Counter</KEYWORD3>
+			<KEYWORD3>Import-Csv</KEYWORD3>
+			<KEYWORD3>Import-LocalizedData</KEYWORD3>
+			<KEYWORD3>Import-Module</KEYWORD3>
+			<KEYWORD3>Import-PSSession</KEYWORD3>
+			<KEYWORD3>Invoke-Command</KEYWORD3>
+			<KEYWORD3>Invoke-Expression</KEYWORD3>
+			<KEYWORD3>Invoke-History</KEYWORD3>
+			<KEYWORD3>Invoke-Item</KEYWORD3>
+			<KEYWORD3>Invoke-WmiMethod</KEYWORD3>
+			<KEYWORD3>Invoke-WSManAction</KEYWORD3>
+			<KEYWORD3>Join-Path</KEYWORD3>
+			<KEYWORD3>Limit-EventLog</KEYWORD3>
+			<KEYWORD3>Measure-Command</KEYWORD3>
+			<KEYWORD3>Measure-Object</KEYWORD3>
+			<KEYWORD3>Move-Item</KEYWORD3>
+			<KEYWORD3>Move-ItemProperty</KEYWORD3>
+			<KEYWORD3>New-Alias</KEYWORD3>
+			<KEYWORD3>New-Event</KEYWORD3>
+			<KEYWORD3>New-EventLog</KEYWORD3>
+			<KEYWORD3>New-Item</KEYWORD3>
+			<KEYWORD3>New-ItemProperty</KEYWORD3>
+			<KEYWORD3>New-Module</KEYWORD3>
+			<KEYWORD3>New-ModuleManifest</KEYWORD3>
+			<KEYWORD3>New-Object</KEYWORD3>
+			<KEYWORD3>New-PSDrive</KEYWORD3>
+			<KEYWORD3>New-PSSession</KEYWORD3>
+			<KEYWORD3>New-Service</KEYWORD3>
+			<KEYWORD3>New-TimeSpan</KEYWORD3>
+			<KEYWORD3>New-Variable</KEYWORD3>
+			<KEYWORD3>New-WebServiceProxy</KEYWORD3>
+			<KEYWORD3>New-WSManInstance</KEYWORD3>
+			<KEYWORD3>New-WSManSessionOption</KEYWORD3>
+			<KEYWORD3>Out-Default</KEYWORD3>
+			<KEYWORD3>Out-File</KEYWORD3>
+			<KEYWORD3>Out-GridView</KEYWORD3>
+			<KEYWORD3>Out-Host</KEYWORD3>
+			<KEYWORD3>Out-Null</KEYWORD3>
+			<KEYWORD3>Out-Printer</KEYWORD3>
+			<KEYWORD3>Out-String</KEYWORD3>
+			<KEYWORD3>Pop-Location</KEYWORD3>
+			<KEYWORD3>Push-Location</KEYWORD3>
+			<KEYWORD3>Read-Host</KEYWORD3>
+			<KEYWORD3>Receive-Job</KEYWORD3>
+			<KEYWORD3>Register-EngineEvent</KEYWORD3>
+			<KEYWORD3>Register-ObjectEvent</KEYWORD3>
+			<KEYWORD3>Register-PSSessionConfiguration</KEYWORD3>
+			<KEYWORD3>Register-WmiEvent</KEYWORD3>
+			<KEYWORD3>Remove-Computer</KEYWORD3>
+			<KEYWORD3>Remove-Event</KEYWORD3>
+			<KEYWORD3>Remove-EventLog</KEYWORD3>
+			<KEYWORD3>Remove-Item</KEYWORD3>
+			<KEYWORD3>Remove-ItemProperty</KEYWORD3>
+			<KEYWORD3>Remove-Job</KEYWORD3>
+			<KEYWORD3>Remove-Module</KEYWORD3>
+			<KEYWORD3>Remove-PSBreakpoint</KEYWORD3>
+			<KEYWORD3>Remove-PSDrive</KEYWORD3>
+			<KEYWORD3>Remove-PSSession</KEYWORD3>
+			<KEYWORD3>Remove-PSSnapin</KEYWORD3>
+			<KEYWORD3>Remove-Variable</KEYWORD3>
+			<KEYWORD3>Remove-WmiObject</KEYWORD3>
+			<KEYWORD3>Remove-WSManInstance</KEYWORD3>
+			<KEYWORD3>Rename-Computer</KEYWORD3>
+			<KEYWORD3>Rename-Item</KEYWORD3>
+			<KEYWORD3>Rename-ItemProperty</KEYWORD3>
+			<KEYWORD3>Reset-ComputerMachinePassword</KEYWORD3>
+			<KEYWORD3>Resolve-Path</KEYWORD3>
+			<KEYWORD3>Restart-Computer</KEYWORD3>
+			<KEYWORD3>Restart-Service</KEYWORD3>
+			<KEYWORD3>Restore-Computer</KEYWORD3>
+			<KEYWORD3>Resume-Service</KEYWORD3>
+			<KEYWORD3>Select-Object</KEYWORD3>
+			<KEYWORD3>Select-String</KEYWORD3>
+			<KEYWORD3>Select-Xml</KEYWORD3>
+			<KEYWORD3>Send-MailMessage</KEYWORD3>
+			<KEYWORD3>Set-Acl</KEYWORD3>
+			<KEYWORD3>Set-Alias</KEYWORD3>
+			<KEYWORD3>Set-AuthenticodeSignature</KEYWORD3>
+			<KEYWORD3>Set-Content</KEYWORD3>
+			<KEYWORD3>Set-Date</KEYWORD3>
+			<KEYWORD3>Set-ExecutionPolicy</KEYWORD3>
+			<KEYWORD3>Set-Item</KEYWORD3>
+			<KEYWORD3>Set-ItemProperty</KEYWORD3>
+			<KEYWORD3>Set-Location</KEYWORD3>
+			<KEYWORD3>Set-PSBreakpoint</KEYWORD3>
+			<KEYWORD3>Set-PSDebug</KEYWORD3>
+			<KEYWORD3>Set-PSSessionConfiguration</KEYWORD3>
+			<KEYWORD3>Set-Service</KEYWORD3>
+			<KEYWORD3>Set-StrictMode</KEYWORD3>
+			<KEYWORD3>Set-TraceSource</KEYWORD3>
+			<KEYWORD3>Set-Variable</KEYWORD3>
+			<KEYWORD3>Set-WmiInstance</KEYWORD3>
+			<KEYWORD3>Set-WSManInstance</KEYWORD3>
+			<KEYWORD3>Set-WSManQuickConfig</KEYWORD3>
+			<KEYWORD3>Show-EventLog</KEYWORD3>
+			<KEYWORD3>Sort-Object</KEYWORD3>
+			<KEYWORD3>Split-Path</KEYWORD3>
+			<KEYWORD3>Start-Job</KEYWORD3>
+			<KEYWORD3>Start-Process</KEYWORD3>
+			<KEYWORD3>Start-Service</KEYWORD3>
+			<KEYWORD3>Start-Sleep</KEYWORD3>
+			<KEYWORD3>Start-Transaction</KEYWORD3>
+			<KEYWORD3>Start-Transcript</KEYWORD3>
+			<KEYWORD3>Stop-Computer</KEYWORD3>
+			<KEYWORD3>Stop-Job</KEYWORD3>
+			<KEYWORD3>Stop-Process</KEYWORD3>
+			<KEYWORD3>Stop-Service</KEYWORD3>
+			<KEYWORD3>Stop-Transcript</KEYWORD3>
+			<KEYWORD3>Suspend-Service</KEYWORD3>
+			<KEYWORD3>Tee-Object</KEYWORD3>
+			<KEYWORD3>Test-ComputerSecureChannel</KEYWORD3>
+			<KEYWORD3>Test-Connection</KEYWORD3>
+			<KEYWORD3>Test-ModuleManifest</KEYWORD3>
+			<KEYWORD3>Test-Path</KEYWORD3>
+			<KEYWORD3>Test-WSMan</KEYWORD3>
+			<KEYWORD3>Trace-Command</KEYWORD3>
+			<KEYWORD3>Undo-Transaction</KEYWORD3>
+			<KEYWORD3>Unregister-Event</KEYWORD3>
+			<KEYWORD3>Unregister-PSSessionConfiguration</KEYWORD3>
+			<KEYWORD3>Update-FormatData</KEYWORD3>
+			<KEYWORD3>Update-List</KEYWORD3>
+			<KEYWORD3>Update-TypeData</KEYWORD3>
+			<KEYWORD3>Use-Transaction</KEYWORD3>
+			<KEYWORD3>Wait-Event</KEYWORD3>
+			<KEYWORD3>Wait-Job</KEYWORD3>
+			<KEYWORD3>Wait-Process</KEYWORD3>
+			<KEYWORD3>Where-Object</KEYWORD3>
+			<KEYWORD3>Write-Debug</KEYWORD3>
+			<KEYWORD3>Write-Error</KEYWORD3>
+			<KEYWORD3>Write-EventLog</KEYWORD3>
+			<KEYWORD3>Write-Host</KEYWORD3>
+			<KEYWORD3>Write-Output</KEYWORD3>
+			<KEYWORD3>Write-Progress</KEYWORD3>
+			<KEYWORD3>Write-Verbose</KEYWORD3>
+			<KEYWORD3>Write-Warning</KEYWORD3>
+
+<!-- 			<KEYWORD3>%</KEYWORD3>
+			<KEYWORD3>?</KEYWORD3> -->
+			<KEYWORD3>ac</KEYWORD3>
+			<KEYWORD3>asnp</KEYWORD3>
+			<KEYWORD3>cat</KEYWORD3>
+			<KEYWORD3>cd</KEYWORD3>
+			<KEYWORD3>chdir</KEYWORD3>
+			<KEYWORD3>clc</KEYWORD3>
+			<KEYWORD3>clear</KEYWORD3>
+			<KEYWORD3>clhy</KEYWORD3>
+			<KEYWORD3>cli</KEYWORD3>
+			<KEYWORD3>clp</KEYWORD3>
+			<KEYWORD3>cls</KEYWORD3>
+			<KEYWORD3>clv</KEYWORD3>
+			<KEYWORD3>compare</KEYWORD3>
+			<KEYWORD3>copy</KEYWORD3>
+			<KEYWORD3>cp</KEYWORD3>
+			<KEYWORD3>cpi</KEYWORD3>
+			<KEYWORD3>cpp</KEYWORD3>
+			<KEYWORD3>cvpa</KEYWORD3>
+			<KEYWORD3>dbp</KEYWORD3>
+			<KEYWORD3>del</KEYWORD3>
+			<KEYWORD3>diff</KEYWORD3>
+			<KEYWORD3>dir</KEYWORD3>
+			<KEYWORD3>ebp</KEYWORD3>
+			<KEYWORD3>echo</KEYWORD3>
+			<KEYWORD3>emm</KEYWORD3>
+			<KEYWORD3>epal</KEYWORD3>
+			<KEYWORD3>epcsv</KEYWORD3>
+			<KEYWORD3>EPSN</KEYWORD3>
+			<KEYWORD3>erase</KEYWORD3>
+			<KEYWORD3>ETSN</KEYWORD3>
+			<KEYWORD3>EXSN</KEYWORD3>
+			<KEYWORD3>fc</KEYWORD3>
+			<KEYWORD3>fl</KEYWORD3>
+			<KEYWORD3>ft</KEYWORD3>
+			<KEYWORD3>fw</KEYWORD3>
+			<KEYWORD3>gal</KEYWORD3>
+			<KEYWORD3>gbp</KEYWORD3>
+			<KEYWORD3>gc</KEYWORD3>
+			<KEYWORD3>gci</KEYWORD3>
+			<KEYWORD3>gcm</KEYWORD3>
+			<KEYWORD3>gcs</KEYWORD3>
+			<KEYWORD3>gdr</KEYWORD3>
+			<KEYWORD3>ghy</KEYWORD3>
+			<KEYWORD3>gi</KEYWORD3>
+			<KEYWORD3>gjb</KEYWORD3>
+			<KEYWORD3>gl</KEYWORD3>
+			<KEYWORD3>gm</KEYWORD3>
+			<KEYWORD3>gmo</KEYWORD3>
+			<KEYWORD3>gp</KEYWORD3>
+			<KEYWORD3>gps</KEYWORD3>
+			<KEYWORD3>grid</KEYWORD3>
+			<KEYWORD3>group</KEYWORD3>
+			<KEYWORD3>gsn</KEYWORD3>
+			<KEYWORD3>gsnp</KEYWORD3>
+			<KEYWORD3>gsv</KEYWORD3>
+			<KEYWORD3>gu</KEYWORD3>
+			<KEYWORD3>gv</KEYWORD3>
+			<KEYWORD3>gwmi</KEYWORD3>
+			<KEYWORD3>h</KEYWORD3>
+			<KEYWORD3>history</KEYWORD3>
+			<KEYWORD3>icm</KEYWORD3>
+			<KEYWORD3>iex</KEYWORD3>
+			<KEYWORD3>ihy</KEYWORD3>
+			<KEYWORD3>ii</KEYWORD3>
+			<KEYWORD3>imo</KEYWORD3>
+			<KEYWORD3>ipal</KEYWORD3>
+			<KEYWORD3>ipcsv</KEYWORD3>
+			<KEYWORD3>IPSN</KEYWORD3>
+			<KEYWORD3>iwmi</KEYWORD3>
+			<KEYWORD3>kill</KEYWORD3>
+			<KEYWORD3>lp</KEYWORD3>
+			<KEYWORD3>ls</KEYWORD3>
+			<KEYWORD3>man</KEYWORD3>
+			<KEYWORD3>md</KEYWORD3>
+			<KEYWORD3>measure</KEYWORD3>
+			<KEYWORD3>mi</KEYWORD3>
+			<KEYWORD3>mount</KEYWORD3>
+			<KEYWORD3>move</KEYWORD3>
+			<KEYWORD3>mp</KEYWORD3>
+			<KEYWORD3>mv</KEYWORD3>
+			<KEYWORD3>nal</KEYWORD3>
+			<KEYWORD3>ndr</KEYWORD3>
+			<KEYWORD3>ni</KEYWORD3>
+			<KEYWORD3>nmo</KEYWORD3>
+			<KEYWORD3>nsn</KEYWORD3>
+			<KEYWORD3>nv</KEYWORD3>
+			<KEYWORD3>ogv</KEYWORD3>
+			<KEYWORD3>oh</KEYWORD3>
+			<KEYWORD3>popd</KEYWORD3>
+			<KEYWORD3>ps</KEYWORD3>
+			<KEYWORD3>pushd</KEYWORD3>
+			<KEYWORD3>pwd</KEYWORD3>
+			<KEYWORD3>r</KEYWORD3>
+			<KEYWORD3>rbp</KEYWORD3>
+			<KEYWORD3>rcjb</KEYWORD3>
+			<KEYWORD3>rd</KEYWORD3>
+			<KEYWORD3>rdr</KEYWORD3>
+			<KEYWORD3>ren</KEYWORD3>
+			<KEYWORD3>ri</KEYWORD3>
+			<KEYWORD3>rjb</KEYWORD3>
+			<KEYWORD3>rm</KEYWORD3>
+			<KEYWORD3>rmdir</KEYWORD3>
+			<KEYWORD3>rni</KEYWORD3>
+			<KEYWORD3>rnp</KEYWORD3>
+			<KEYWORD3>rp</KEYWORD3>
+			<KEYWORD3>rsn</KEYWORD3>
+			<KEYWORD3>rsnp</KEYWORD3>
+			<KEYWORD3>rv</KEYWORD3>
+			<KEYWORD3>rvpa</KEYWORD3>
+			<KEYWORD3>rwmi</KEYWORD3>
+			<KEYWORD3>sajb</KEYWORD3>
+			<KEYWORD3>sal</KEYWORD3>
+			<KEYWORD3>sasv</KEYWORD3>
+			<KEYWORD3>sbp</KEYWORD3>
+			<KEYWORD3>sc</KEYWORD3>
+			<KEYWORD3>select</KEYWORD3>
+			<KEYWORD3>set</KEYWORD3>
+			<KEYWORD3>si</KEYWORD3>
+			<KEYWORD3>sl</KEYWORD3>
+			<KEYWORD3>sleep</KEYWORD3>
+			<KEYWORD3>sort</KEYWORD3>
+			<KEYWORD3>sp</KEYWORD3>
+			<KEYWORD3>spjb</KEYWORD3>
+			<KEYWORD3>spps</KEYWORD3>
+			<KEYWORD3>spsv</KEYWORD3>
+			<KEYWORD3>start</KEYWORD3>
+			<KEYWORD3>sv</KEYWORD3>
+			<KEYWORD3>swmi</KEYWORD3>
+			<KEYWORD3>tee</KEYWORD3>
+			<KEYWORD3>type</KEYWORD3>
+			<KEYWORD3>wjb</KEYWORD3>
+			<KEYWORD3>write</KEYWORD3>
+		</KEYWORDS>
+	</RULES>
+</MODE>
+ 	  	 

@@ -1,5 +1,5 @@
 ! Copyright (C) 2007 Chris Double.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 !
 USING: kernel tools.test peg peg.ebnf peg.ebnf.private words
 math math.parser sequences accessors peg.parsers parser
@@ -16,10 +16,10 @@ IN: peg.ebnf.tests
 
 {
   T{ ebnf-rule f
-     "digit"
-     T{ ebnf-choice f
+    "digit"
+    T{ ebnf-choice f
         V{ T{ ebnf-terminal f "1" } T{ ebnf-terminal f "2" } }
-     }
+    }
   }
 } [
   "digit = '1' | '2'" rule-parser parse
@@ -27,10 +27,10 @@ IN: peg.ebnf.tests
 
 {
   T{ ebnf-rule f
-     "digit"
-     T{ ebnf-sequence f
-        V{ T{ ebnf-terminal f "1" } T{ ebnf-terminal f "2" } }
-     }
+    "digit"
+    T{ ebnf-sequence f
+      V{ T{ ebnf-terminal f "1" } T{ ebnf-terminal f "2" } }
+    }
   }
 } [
   "digit = '1' '2'" rule-parser parse
@@ -38,12 +38,12 @@ IN: peg.ebnf.tests
 
 {
   T{ ebnf-choice f
-     V{
-       T{ ebnf-sequence f
-          V{ T{ ebnf-non-terminal f "one" } T{ ebnf-non-terminal f "two" } }
-       }
-       T{ ebnf-non-terminal f "three" }
-     }
+    V{
+      T{ ebnf-sequence f
+        V{ T{ ebnf-non-terminal f "one" } T{ ebnf-non-terminal f "two" } }
+      }
+      T{ ebnf-non-terminal f "three" }
+    }
   }
 } [
   "one two | three" choice-parser parse
@@ -51,7 +51,7 @@ IN: peg.ebnf.tests
 
 {
   T{ ebnf-sequence f
-     V{
+    V{
        T{ ebnf-non-terminal f "one" }
        T{ ebnf-whitespace f
          T{ ebnf-choice f
@@ -66,7 +66,7 @@ IN: peg.ebnf.tests
 
 {
   T{ ebnf-sequence f
-     V{
+    V{
        T{ ebnf-non-terminal f "one" }
        T{ ebnf-repeat0 f
           T{ ebnf-sequence f
@@ -86,7 +86,7 @@ IN: peg.ebnf.tests
 
 {
   T{ ebnf-sequence f
-     V{
+    V{
        T{ ebnf-non-terminal f "one" }
        T{ ebnf-ignore f
           T{ ebnf-sequence f
@@ -106,7 +106,7 @@ IN: peg.ebnf.tests
 
 {
   T{ ebnf-sequence f
-     V{
+    V{
          T{ ebnf-non-terminal f "one" }
          T{ ebnf-optional f T{ ebnf-non-terminal f "two" } }
          T{ ebnf-non-terminal f "three" }
@@ -213,7 +213,7 @@ IN: peg.ebnf.tests
 ] must-fail
 
 { 3 } [
-  { 1 2 "a" 4 } EBNF[=[ num=. ?[ number? ]? list=list:x num:y => [[ x y + ]] | num ]=]
+  { 1 2 "a" 4 } PARTIAL-EBNF[=[ num=. ?[ number? ]? list=list:x num:y => [[ x y + ]] | num ]=]
 ] unit-test
 
 [
@@ -405,7 +405,7 @@ main = Primary
 ] unit-test
 
 { V{ } } [
-  "ab cab c" EBNF[=[ a="a" "b" foo=(a "c")* ]=]
+  "ab cab c" PARTIAL-EBNF[=[ a="a" "b" foo=(a "c")* ]=]
 ] unit-test
 
 { V{ V{ V{ "a" "b" } "c" } V{ V{ "a" "b" } "c" } } } [
@@ -417,11 +417,11 @@ main = Primary
 ] unit-test
 
 { V{ } } [
-  "ab c ab c" EBNF[=[ a="a" "b" foo=(a "c")* ]=]
+  "ab c ab c" PARTIAL-EBNF[=[ a="a" "b" foo=(a "c")* ]=]
 ] unit-test
 
 { V{ } } [
-  "ab c ab c" EBNF[=[ a="a" "b" foo=(a "c")* ]=]
+  "ab c ab c" PARTIAL-EBNF[=[ a="a" "b" foo=(a "c")* ]=]
 ] unit-test
 
 { V{ "a" "a" "a" } } [
@@ -572,7 +572,7 @@ Tok                = Spaces (Number | Special )
 ] unit-test
 
 { "++" } [
-  "++--" EBNF[=[ tokenizer=("++" | "--") main="++" ]=]
+  "++--" PARTIAL-EBNF[=[ tokenizer=("++" | "--") main="++" ]=]
 ] unit-test
 
 { "\\" } [
@@ -601,4 +601,57 @@ Tok                = Spaces (Number | Special )
 } [
     EBNF: foo2 [=[  Bar = "a":a-1 "a":a-2 => [[ a-1 a-2 2array ]] ]=]
     "aa" foo2
+] unit-test
+
+{ "abc" } [
+    EBNF: parse-til-right-bracket [=[
+    foo = [^\]]+
+    ]=]
+    PARTIAL-EBNF: parse-til-right-bracket* parse-til-right-bracket
+    "abc]" parse-til-right-bracket* >string
+] unit-test
+
+! Doesn't match anything, don't run it.
+{ } [
+    EBNF: parse-empty-range [=[
+    foo = []+
+    ]=]
+] unit-test
+
+[
+    [==[
+      EBNF: parse-empty-squote [=[
+        foo = ''
+      ]=]
+    ]==] parse-string
+] must-fail
+
+[
+    [==[
+      EBNF: parse-empty-squote [=[
+        foo = ""
+      ]=]
+    ]==] parse-string
+] must-fail
+
+! Bugfix, ensure that ~ rules are ignored with local labels
+{ { "a" "c" } } [
+    "abc" EBNF[=[ rule="a":a "b"~ "c":c => [[ a c 2array ]] ]=]
+] unit-test
+
+{ { "a" "c" } } [
+    "abc" EBNF[=[ rule="a":a "b"*~ "c":c => [[ a c 2array ]] ]=]
+] unit-test
+
+{ { "a" "c" } } [
+    "abc" EBNF[=[ rule="a":a "b"+~ "c":c => [[ a c 2array ]] ]=]
+] unit-test
+
+! Bugfix, ensure that named vars work in groups
+{ { "a" "b" } } [
+    "ab" EBNF[=[ rule = ( "a":a "b":b ) => [[ { a b } ]] ]=]
+] unit-test
+
+{ { "a" "b" } } [
+    "a b" EBNF[=[ rule = { "a":a "b":b } => [[ { a b } ]] ]=]
 ] unit-test

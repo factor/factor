@@ -5,6 +5,9 @@ LIBS = -ldl -lm -lrt -lpthread -Wl,--export-dynamic
 
 # clang spams warnings if we use -Wl,--no-as-needed with -c
 # -Wl,--no-as-needed is a gcc optimization, not required
-ifneq ($(CXX),clang++)
+# we want to work with g++ aliased as c++ here, too
+IS_GCC = $(shell $(CXX) --version | grep -o 'Free Software Foundation')
+
+ifeq ($(IS_GCC),Free Software Foundation)
 	SITE_CFLAGS += -Wl,--no-as-needed
 endif

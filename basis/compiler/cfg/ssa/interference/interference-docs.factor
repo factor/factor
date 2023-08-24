@@ -8,9 +8,9 @@ HELP: sets-interfere?
 HELP: vreg-info
 { $class-description
   "Slots:"
-  { $table
-    { { $slot "vreg" } { "The vreg the vreg-info is the info for." } }
-    { { $slot "bb" } { "The " { $link basic-block } " in which the vreg is defined." } }
+  { $slots
+    { "vreg" { "The vreg the vreg-info is the info for." } }
+    { "bb" { "The " { $link basic-block } " in which the vreg is defined." } }
   }
 } ;
 

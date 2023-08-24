@@ -1,7 +1,7 @@
 ! Copyright (C) 2007, 2008 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: assocs calendar help.markup help.syntax io io.files
-io.launcher.private kernel literals quotations sequences ;
+io.launcher.private kernel literals quotations splitting ;
 IN: io.launcher
 
 ARTICLE: "io.launcher.command" "Specifying a command"
@@ -127,7 +127,19 @@ HELP: run-process
     "T{ process\n    { command \"pwd\" }\n    { environment H{ } }\n    { environment-mode +append-environment+ }\n    { group +same-group+ }\n    { status 0 }\n}"
   }
 }
-{ $notes "The output value can be passed to " { $link wait-for-process } " to get an exit code." } ;
+{ $notes "The output value will either have the exit code set or can be passed to " { $link wait-for-process } " to get an exit code in the case of a " { $snippet "detached" } " process." } ;
+
+HELP: run-processes
+{ $values { "descs" "a sequence of launch descriptors" } { "processes" "a sequence of " { $link process } } }
+{ $description "Launches a sequence of processes that will execute in serial by default or in parallel if " { $snippet "detached" } " is true. Each desc can either be a string, a sequence of strings or a " { $link process } ". See " { $link "io.launcher.descriptors" } " for details." }
+{ $examples
+  { $unchecked-example
+    "USING: io.launcher prettyprint ;"
+    "{ \"ls\" \"ls\" } run-processes ."
+    "{ T{ process\n    { command \"ls\" }\n    { environment H{ } }\n    { environment-mode +append-environment+ }\n    { group +same-group+ }\n    { status 0 }\n}\nT{ process\n    { command \"ls\" }\n    { environment H{ } }\n    { environment-mode +append-environment+ }\n    { group +same-group+ }\n    { status 0 }\n} }"
+  }
+}
+{ $notes "The output values will have an exit code set or can be passed to " { $link wait-for-process } " to get an exit code in the case of " { $snippet "detached" } " processes." } ;
 
 HELP: run-detached
 { $values { "desc" "a launch descriptor" } { "process" process } }
@@ -163,12 +175,12 @@ HELP: try-process
             "        }"
             "    }"
             "}"
-        } "\n" join
+        } join-lines
     ]
   }
 } ;
 
-{ run-process try-process run-detached } related-words
+{ run-process run-processes try-process run-detached } related-words
 
 HELP: kill-process
 { $values { "process" process } }
@@ -236,8 +248,8 @@ HELP: with-process-reader
 { $description "Launches a process and redirects its output via a pipe. The quotation is called with " { $link input-stream } " rebound to this pipe." }
 { $examples
   { $unchecked-example
-    "USING: io.launcher prettyprint ;"
-    "\"ls -dl /etc\" utf8 [ contents ] with-process-reader ."
+    "USING: io.launcher prettyprint io.encodings.utf8 ;"
+    "\"ls -dl /etc\" utf8 [ read-contents ] with-process-reader ."
     "\"drwxr-xr-x 213 root root 12288 mar 11 18:52 /etc\\n\""
   }
 } ;
@@ -281,8 +293,13 @@ ARTICLE: "io.launcher.launch" "Launching processes"
 "Launching processes:"
 { $subsections
     run-process
+    run-processes
     try-process
     run-detached
+}
+"Waiting for detached processes:"
+{ $subsections
+    wait-for-process
 }
 "Redirecting standard input and output to a pipe:"
 { $subsections
@@ -300,7 +317,7 @@ ARTICLE: "io.launcher.launch" "Launching processes"
 ARTICLE: "io.launcher.examples" "Launcher examples"
 "Starting a command and waiting for it to finish:"
 { $code
-    "\"ls /etc\" run-process"
+    "\"ls /etc\" run-process wait-for-process"
 }
 "Starting a program in the background:"
 { $code

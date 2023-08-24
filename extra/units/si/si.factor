@@ -57,7 +57,7 @@ IN: units.si
 : T ( n -- tesla ) { kg } { s s A } <dimensioned> ;
 : H ( n -- henry ) { m m kg } { s s A A } <dimensioned> ;
 : deg-C ( n -- Celsius ) 27315/100 + { K } { } <dimensioned> ;
-ALIAS: °C deg-C
+ALIAS: Â°C deg-C
 : lm ( n -- lumen ) { m m cd } { m m } <dimensioned> ;
 : lx ( n -- lux ) { m m cd } { m m m m  } <dimensioned> ;
 : Bq ( n -- becquerel ) { } { s } <dimensioned> ;
@@ -95,27 +95,50 @@ ALIAS: °C deg-C
 : hours ( n -- dimensioned ) 60 * minutes ;
 : days ( n -- dimensioned ) 24 * hours ;
 
-! Y Z E P T G M k h da 1 d c m mu n p f a z y
-: yotta ( n -- x ) 1000000000000000000000000 * ;
-: zetta ( n -- x ) 1000000000000000000000 * ;
-: exa   ( n -- x ) 1000000000000000000 * ;
-: peta  ( n -- x ) 1000000000000000 * ;
-: tera  ( n -- x ) 1000000000000 * ;
-: giga  ( n -- x ) 1000000000 * ;
-: mega  ( n -- x ) 1000000 * ;
-: kilo  ( n -- x ) 1000 * ;
-: hecto ( n -- x ) 100 * ;
-: deca  ( n -- x ) 10 * ;
-: deci  ( n -- x ) 10 / ;
-: centi ( n -- x ) 100 / ;
-: milli ( n -- x ) 1000 / ;
-: micro ( n -- x ) 1000000 / ;
-: nano  ( n -- x ) 1000000000 / ;
-: pico  ( n -- x ) 1000000000000 / ;
-: femto ( n -- x ) 1000000000000000 / ;
-: atto  ( n -- x ) 1000000000000000000 / ;
-: zepto ( n -- x ) 1000000000000000000000 / ;
-: yocto ( n -- x ) 1000000000000000000000000 / ;
+! Q R Y Z E P T G M k h da 1 d c m mu n p f a z y r q
+: quetta ( n -- x ) 1000000000000000000000000000000 * ;
+: ronna  ( n -- x ) 1000000000000000000000000000 * ;
+: yotta  ( n -- x ) 1000000000000000000000000 * ;
+: zetta  ( n -- x ) 1000000000000000000000 * ;
+: exa    ( n -- x ) 1000000000000000000 * ;
+: peta   ( n -- x ) 1000000000000000 * ;
+: tera   ( n -- x ) 1000000000000 * ;
+: giga   ( n -- x ) 1000000000 * ;
+: mega   ( n -- x ) 1000000 * ;
+: kilo   ( n -- x ) 1000 * ;
+: hecto  ( n -- x ) 100 * ;
+: deca   ( n -- x ) 10 * ;
+: deci   ( n -- x ) 10 / ;
+: centi  ( n -- x ) 100 / ;
+: milli  ( n -- x ) 1000 / ;
+: micro  ( n -- x ) 1000000 / ;
+: nano   ( n -- x ) 1000000000 / ;
+: pico   ( n -- x ) 1000000000000 / ;
+: femto  ( n -- x ) 1000000000000000 / ;
+: atto   ( n -- x ) 1000000000000000000 / ;
+: zepto  ( n -- x ) 1000000000000000000000 / ;
+: yocto  ( n -- x ) 1000000000000000000000000 / ;
+: ronto  ( n -- x ) 1000000000000000000000000000 / ;
+: quecto ( n -- x ) 1000000000000000000000000000000 / ;
+
+! Yi Zi Ei Pi Ti Gi Mi Ki
+: yobi ( n -- x ) 1208925819614629174706176 * ;
+: zebi ( n -- x ) 1180591620717411303424 * ;
+: exbi ( n -- x ) 1152921504606846976 * ;
+: pebi ( n -- x ) 1125899906842624 * ;
+: tebi ( n -- x ) 1099511627776 * ;
+: gibi ( n -- x ) 1073741824 * ;
+: mebi ( n -- x ) 1048576 * ;
+: kibi ( n -- x ) 1024 * ;
+
+ALIAS: Yi yobi
+ALIAS: Zi zebi
+ALIAS: Ei exbi
+ALIAS: Pi pebi
+ALIAS: Ti tebi
+ALIAS: Gi gibi
+ALIAS: Mi mebi
+ALIAS: Ki kibi
 
 : km ( n -- dimensioned ) kilo m ;
 : cm ( n -- dimensioned ) centi m ;

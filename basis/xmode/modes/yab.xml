@@ -1,0 +1,319 @@
+<?xml version="1.0"?>
+
+<!DOCTYPE MODE SYSTEM "xmode.dtd">
+
+<!-- YAB (YABasic) 3/22/09 by Ben Dutcher -->
+<!-- roughly based on the grouping in the YAB documentation -->
+<MODE>
+	<PROPS>
+		<PROPERTY NAME="lineComment" VALUE="'" />
+		<PROPERTY NAME="contextInsensitive" VALUE="true" />
+	</PROPS>
+
+	<RULES IGNORE_CASE="TRUE" HIGHLIGHT_DIGITS="TRUE" ESCAPE="\">
+		<SPAN TYPE="LITERAL1" NO_LINE_BREAK="TRUE">
+			<BEGIN>"</BEGIN>
+			<END>"</END>
+		</SPAN>
+
+		<!-- YAB uses both the logical operator AND, and the bitwise function AND() -->
+		<!-- Doing something wrong here.  Goal is to mark the "and" of "and(a,b)" as a function,
+		      but not mark the opening "(".  I'm using  SEQ instead, even though it does mark the "(".
+		-->
+		<!-- MARK_PREVIOUS AT_WORD_START="TRUE"
+   MATCH_TYPE="FUNCTION">"and("</MARK_PREVIOUS -->
+
+		<!-- YAB has a large number of comment tags -->
+		<EOL_SPAN TYPE="COMMENT1">rem </EOL_SPAN>
+		<EOL_SPAN TYPE="COMMENT2">//</EOL_SPAN>
+		<EOL_SPAN TYPE="COMMENT3" AT_LINE_START="TRUE">documentation</EOL_SPAN>
+		<EOL_SPAN TYPE="COMMENT3" AT_LINE_START="TRUE">docu</EOL_SPAN>
+		<EOL_SPAN TYPE="COMMENT3" AT_LINE_START="TRUE">doc</EOL_SPAN>
+		<EOL_SPAN TYPE="COMMENT4" AT_LINE_START="TRUE">#</EOL_SPAN>
+
+		<!-- Comparison operators -->
+		<SEQ TYPE="OPERATOR">&lt;</SEQ>
+		<SEQ TYPE="OPERATOR">&lt;=</SEQ>
+		<SEQ TYPE="OPERATOR">&gt;=</SEQ>
+		<SEQ TYPE="OPERATOR">&gt;</SEQ>
+		<SEQ TYPE="OPERATOR">=</SEQ>
+		<SEQ TYPE="OPERATOR">&lt;&gt;</SEQ>
+
+		<!-- Arithmetic operators -->
+		<SEQ TYPE="OPERATOR">+</SEQ>
+		<SEQ TYPE="OPERATOR">-</SEQ>
+		<SEQ TYPE="OPERATOR">*</SEQ>
+		<SEQ TYPE="OPERATOR">/</SEQ>
+		<SEQ TYPE="OPERATOR">**</SEQ>
+		<SEQ TYPE="OPERATOR">^</SEQ>
+		<!-- YAB uses both the logical operator AND, and the bitwise function AND() -->
+		<!-- Unfortuantely, this also marks the opening "(" -->
+		<SEQ TYPE="FUNCTION" AT_WORD_START="TRUE">and(</SEQ>
+
+		<!-- Concatenation operators -->
+		<!-- strings -->
+		<SEQ TYPE="OPERATOR">&amp;</SEQ>
+
+		<!--		<SEQ TYPE="NULL">_</SEQ>-->
+		<!-- Instruction separator -->
+		<MARK_PREVIOUS TYPE="LABEL" MATCH_TYPE="OPERATOR"
+			AT_LINE_START="TRUE">:</MARK_PREVIOUS>
+
+		<KEYWORDS>
+
+			<!--  just testing! -->
+			<KEYWORD4>alotta</KEYWORD4>
+
+			<!-- Conditional Statements -->
+			<KEYWORD1>case</KEYWORD1>
+			<KEYWORD1>default</KEYWORD1>
+			<KEYWORD1>else</KEYWORD1>
+			<KEYWORD1>elseif</KEYWORD1>
+			<KEYWORD1>elsif</KEYWORD1>
+			<KEYWORD1>endif</KEYWORD1>
+			<KEYWORD1>fi</KEYWORD1>
+			<KEYWORD1>if</KEYWORD1>
+			<KEYWORD1>switch</KEYWORD1>
+			<KEYWORD1>then</KEYWORD1>
+
+			<!-- naviagation -->
+			<KEYWORD1>gosub</KEYWORD1>
+			<KEYWORD1>goto</KEYWORD1>
+			<KEYWORD1>label</KEYWORD1>
+			<KEYWORD1>return</KEYWORD1>
+
+			<!-- special -->
+			<KEYWORD1>bind</KEYWORD1>
+			<KEYWORD1>compile</KEYWORD1>
+
+			<!-- Loop Statements -->
+			<KEYWORD1>break</KEYWORD1>
+			<KEYWORD1>continue</KEYWORD1>
+			<KEYWORD1>do</KEYWORD1>
+			<KEYWORD1>each</KEYWORD1>
+			<KEYWORD1>for</KEYWORD1>
+			<KEYWORD1>in</KEYWORD1>
+			<KEYWORD1>loop</KEYWORD1>
+			<KEYWORD1>next</KEYWORD1>
+			<KEYWORD1>repeat</KEYWORD1>
+			<KEYWORD1>step</KEYWORD1>
+			<KEYWORD1>to</KEYWORD1>
+			<KEYWORD1>until</KEYWORD1>
+			<KEYWORD1>wend</KEYWORD1>
+			<KEYWORD1>while</KEYWORD1>
+
+
+			<!-- Closing, Exit Statements -->
+			<KEYWORD1>end</KEYWORD1>
+			<KEYWORD1>exit</KEYWORD1>
+
+			<!-- control -->
+			<KEYWORD1>pause</KEYWORD1>
+			<KEYWORD1>sleep</KEYWORD1>
+			<KEYWORD1>wait</KEYWORD1>
+
+			<!-- Methods, Functions, Class, Properties, Variables -->
+			<KEYWORD1>export</KEYWORD1>
+			<KEYWORD1>import</KEYWORD1>
+			<KEYWORD1>local</KEYWORD1>
+			<KEYWORD1>numparam</KEYWORD1>
+			<KEYWORD1>numparams</KEYWORD1>
+			<KEYWORD1>static</KEYWORD1>
+			<KEYWORD1>sub</KEYWORD1>
+			<KEYWORD1>subroutine</KEYWORD1>
+			<!-- end sub -->
+
+
+			<!-- Declaration -->
+			<KEYWORD1>const</KEYWORD1>
+			<KEYWORD1>dim</KEYWORD1>
+			<KEYWORD1>redim</KEYWORD1>
+
+			<!-- Comments -->
+			<KEYWORD3>rem</KEYWORD3>
+			<KEYWORD2>documentation</KEYWORD2>
+			<KEYWORD3>docu$</KEYWORD3>
+			<KEYWORD2>docu</KEYWORD2>
+			<KEYWORD2>doc</KEYWORD2>
+
+			<!-- Function Call - Dynamic Evaluation -->
+			<KEYWORD1>execute$</KEYWORD1>
+			<KEYWORD1>execute</KEYWORD1>
+			<KEYWORD1>system</KEYWORD1>
+			<KEYWORD1>system$</KEYWORD1>
+
+			<!-- Miscellaneous -->
+			<KEYWORD1>beep</KEYWORD1>
+			<KEYWORD1>bell</KEYWORD1>
+			<KEYWORD1>clear</KEYWORD1>
+			<KEYWORD1>data</KEYWORD1>
+			<KEYWORD1>erase</KEYWORD1>
+			<KEYWORD1>error</KEYWORD1>
+			<KEYWORD1>explicit</KEYWORD1>
+			<KEYWORD1>getscreen$</KEYWORD1>
+			<KEYWORD1>goto</KEYWORD1>
+			<KEYWORD1>interrupt</KEYWORD1>
+			<KEYWORD1>on</KEYWORD1>
+			<KEYWORD1>option</KEYWORD1>
+			<KEYWORD1>putscreen</KEYWORD1>
+			<KEYWORD1>randomize</KEYWORD1>
+			<KEYWORD1>read</KEYWORD1>
+			<KEYWORD1>restore</KEYWORD1>
+			<KEYWORD1>resume</KEYWORD1>
+			<KEYWORD1>screen</KEYWORD1>
+			<!-- on interrupt -->
+			<!-- clear screen -->
+
+
+			<!-- I/O -->
+			<KEYWORD1>@</KEYWORD1>
+			<KEYWORD1>as</KEYWORD1>
+			<KEYWORD1>at</KEYWORD1>
+			<KEYWORD1>close</KEYWORD1>
+			<KEYWORD1>eof</KEYWORD1>
+			<KEYWORD1>inkey$</KEYWORD1>
+			<KEYWORD1>input</KEYWORD1>
+			<KEYWORD1>line</KEYWORD1>
+			<KEYWORD1>mouseb</KEYWORD1>
+			<KEYWORD1>mousemod</KEYWORD1>
+			<KEYWORD1>mousex</KEYWORD1>
+			<KEYWORD1>mousey</KEYWORD1>
+			<KEYWORD1>open</KEYWORD1>
+			<KEYWORD1>peek$</KEYWORD1>
+			<KEYWORD1>peek</KEYWORD1>
+			<KEYWORD1>poke</KEYWORD1>
+			<KEYWORD1>print</KEYWORD1>
+			<KEYWORD1>printer</KEYWORD1>
+			<KEYWORD1>reading</KEYWORD1>
+			<KEYWORD1>seek</KEYWORD1>
+			<KEYWORD1>tell</KEYWORD1>
+			<KEYWORD1>using</KEYWORD1>
+			<KEYWORD1>writing</KEYWORD1>
+			<!-- line input -->
+			<!-- for reading as, for writing as -->
+			<!-- open printer, close printer -->
+			<!-- print color, print colour, print reverse, print at, print @ -->
+
+			<!-- draw -->
+			<KEYWORD1>backcolor</KEYWORD1>
+			<KEYWORD1>backcolour</KEYWORD1>
+			<KEYWORD1>box</KEYWORD1>
+			<KEYWORD1>circle</KEYWORD1>
+			<KEYWORD1>clear</KEYWORD1>
+			<KEYWORD1>color</KEYWORD1>
+			<KEYWORD1>colour</KEYWORD1>
+			<KEYWORD1>curve</KEYWORD1>
+			<KEYWORD1>dot</KEYWORD1>
+			<KEYWORD1>fill</KEYWORD1>
+			<KEYWORD1>getbit$</KEYWORD1>
+			<KEYWORD1>line</KEYWORD1>
+			<KEYWORD1>new</KEYWORD1>
+			<!-- open window, window origin, close curve, clear window, close window, new curve -->
+			<KEYWORD1>origin</KEYWORD1>
+			<KEYWORD1>putbit</KEYWORD1>
+			<KEYWORD1>rectangle</KEYWORD1>
+			<KEYWORD1>reverse</KEYWORD1>
+			<KEYWORD1>text</KEYWORD1>
+			<KEYWORD1>triangle</KEYWORD1>
+			<KEYWORD1>window</KEYWORD1>
+
+			<!-- Operators -->
+
+			<!-- Arithmetic operators -->
+			<OPERATOR>let</OPERATOR>
+			<OPERATOR>mod</OPERATOR>
+
+			<!-- Logical operators -->
+			<KEYWORD3>and</KEYWORD3>
+			<KEYWORD3>eor</KEYWORD3>
+			<KEYWORD3>imp</KEYWORD3>
+			<KEYWORD3>not</KEYWORD3>
+			<KEYWORD3>or</KEYWORD3>
+			<KEYWORD3>xor</KEYWORD3>
+
+			<!-- Datatypes Constants/Literals -->
+			<KEYWORD3>false</KEYWORD3>
+			<KEYWORD3>true</KEYWORD3>
+
+			<!-- Miscellaneous  -->
+			<LITERAL2>euler</LITERAL2>
+			<LITERAL2>pi</LITERAL2>
+
+			<!-- Built-in Functions -->
+			<!-- Array Handling -->
+			<KEYWORD2>arraydimension</KEYWORD2>
+			<KEYWORD2>arraydim</KEYWORD2>
+			<KEYWORD2>arraysize</KEYWORD2>
+
+			<!-- Conversion Functions (Radix) -->
+			<FUNCTION>bin$</FUNCTION>
+			<FUNCTION>dec</FUNCTION>
+			<FUNCTION>hex$</FUNCTION>
+			<FUNCTION>str$</FUNCTION>
+
+			<!-- Date/Time Functions -->
+			<FUNCTION>date$</FUNCTION>
+			<FUNCTION>time$</FUNCTION>
+
+			<!-- Math Functions -->
+			<FUNCTION>abs</FUNCTION>
+			<FUNCTION>acos</FUNCTION>
+			<!-- FUNCTION>and(</FUNCTION  -->
+			<FUNCTION>asin</FUNCTION>
+			<FUNCTION>atan</FUNCTION>
+			<FUNCTION>bin$</FUNCTION>
+			<FUNCTION>cos</FUNCTION>
+			<FUNCTION>dec</FUNCTION>
+			<FUNCTION>eor</FUNCTION>
+			<FUNCTION>exp</FUNCTION>
+			<FUNCTION>fix</FUNCTION>
+			<FUNCTION>frac</FUNCTION>
+			<FUNCTION>int</FUNCTION>
+			<FUNCTION>log</FUNCTION>
+			<FUNCTION>max</FUNCTION>
+			<FUNCTION>min</FUNCTION>
+			<FUNCTION>ran</FUNCTION>
+			<FUNCTION>sgn</FUNCTION>
+			<FUNCTION>sig</FUNCTION>
+			<FUNCTION>sin</FUNCTION>
+			<FUNCTION>sqr</FUNCTION>
+			<FUNCTION>sqrt</FUNCTION>
+			<FUNCTION>tan</FUNCTION>
+
+			<!-- Strings -->
+			<FUNCTION>asc</FUNCTION>
+			<FUNCTION>chr$</FUNCTION>
+			<FUNCTION>glob</FUNCTION>
+			<FUNCTION>hex$</FUNCTION>
+			<FUNCTION>instr</FUNCTION>
+			<FUNCTION>left$</FUNCTION>
+			<FUNCTION>len</FUNCTION>
+			<FUNCTION>lower$</FUNCTION>
+			<FUNCTION>ltrim$</FUNCTION>
+			<FUNCTION>mid$</FUNCTION>
+			<FUNCTION>right$</FUNCTION>
+			<FUNCTION>rinstr</FUNCTION>
+			<FUNCTION>rtrim$</FUNCTION>
+			<FUNCTION>split</FUNCTION>
+			<FUNCTION>token</FUNCTION>
+			<FUNCTION>trim$</FUNCTION>
+			<FUNCTION>upper$</FUNCTION>
+			<FUNCTION>val</FUNCTION>
+
+			<!-- YABasic listed keywords that aren't described in the YABasic documentation:
+			bitblit$
+			bitblit
+			bitblt$
+			bitblt
+			filled
+			mousebutton
+			mousemodifier
+			rect
+			split$
+			token$
+			-->
+
+
+		</KEYWORDS>
+	</RULES>
+</MODE>

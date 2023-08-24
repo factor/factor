@@ -1,7 +1,7 @@
 ! Copyright (C) 2009 Elie Chaftari.
-! See http://factorcode.org/license.txt for BSD license.
-USING: arrays assocs help.markup help.syntax kernel math
-sequences strings ;
+! See https://factorcode.org/license.txt for BSD license.
+USING: arrays assocs help.markup help.syntax math sequences
+strings ;
 IN: pop3
 
 HELP: <pop3-account>
@@ -90,19 +90,19 @@ HELP: list
 
 HELP: pop3-account
 { $class-description "A POP3 account on a POP3 server. It has the following slots:"
-    { $table
-        { { $slot "#" } "The ephemeral ordinal number of the message." }
-        { { $slot "host" } "The name or IP address of the remote host to which a POP3 connection is required." }
-        { { $slot "port" } "The POP3 server port (defaults to 110)." }
-        { { $slot "timeout" } "Maximum time in minutes to wait for a response from the POP3 server (defaults to 1 minutes)." }
-        { { $slot "user" } "The userID of the account on the POP3 server." }
-        { { $slot "pwd" } { "The clear-text password for the userID." } }
-        { { $slot "stream" } { "The duplex input/output stream wrapping the POP3 session." } }
-        { { $slot "capa" } { "A list of the mail server capabilities." } }
-        { { $slot "count" } { "Number of messages in the mailbox." } }
-        { { $slot "list" } { "A list of every message with its number and size in bytes" } }
-        { { $slot "uidls" } { "The UIDL (Unique IDentification Listing) of every message in the mailbox together with its ordinal number." } }
-        { { $slot "messages" } { "A sequence of email tuples in the mailbox containing each email's headers, number, uidl, and size." } }
+    { $slots
+        { "#" "The ephemeral ordinal number of the message." }
+        { "host" "The name or IP address of the remote host to which a POP3 connection is required." }
+        { "port" "The POP3 server port (defaults to 110)." }
+        { "timeout" "Maximum time in minutes to wait for a response from the POP3 server (defaults to 1 minutes)." }
+        { "user" "The userID of the account on the POP3 server." }
+        { "pwd" { "The clear-text password for the userID." } }
+        { "stream" { "The duplex input/output stream wrapping the POP3 session." } }
+        { "capa" { "A list of the mail server capabilities." } }
+        { "count" { "Number of messages in the mailbox." } }
+        { "list" { "A list of every message with its number and size in bytes" } }
+        { "uidls" { "The UIDL (Unique IDentification Listing) of every message in the mailbox together with its ordinal number." } }
+        { "messages" { "A sequence of email tuples in the mailbox containing each email's headers, number, uidl, and size." } }
     }
 "The " { $slot "host" } " is required; the rest are either set by default or optional." $nl
 "The " { $slot "user" } " and " { $slot "pwd" } " must either be set before using " { $link connect } " or immediately after it with the " { $link >user } " and " { $link >pwd } " words."
@@ -110,14 +110,14 @@ HELP: pop3-account
 
 HELP: message
 { $class-description "An e-mail message having the following slots:"
-    { $table
-        { { $slot "#" } "The ephemeral ordinal number of the message." }
-        { { $slot "uidl" } "The POP3 UIDL (Unique IDentification Listing) of the message." }
-        { { $slot "headers" } "The From:, Subject:, and To: headers of the message." }
-        { { $slot "from" } "The sender of the message. An e-mail address." }
-        { { $slot "to" } "The recipients of the message." }
-        { { $slot "subject" } { "The subject of the message." } }
-        { { $slot "size" } { "The size of the message in octets." } }
+    { $slots
+        { "#" "The ephemeral ordinal number of the message." }
+        { "uidl" "The POP3 UIDL (Unique IDentification Listing) of the message." }
+        { "headers" "The From:, Subject:, and To: headers of the message." }
+        { "from" "The sender of the message. An e-mail address." }
+        { "to" "The recipients of the message." }
+        { "subject" { "The subject of the message." } }
+        { "size" { "The size of the message in octets." } }
     }
 } ;
 
@@ -299,7 +299,7 @@ $nl
     }
 }
 $nl
-"The messages marked for deletion are actually deleted only when " { $link close } " is called. This should be the last command you issue. "
+"The messages marked for deletion are actually deleted only when " { $link close } " is called. This should be the last command you issue."
 { $subsections close }
 { $examples
     { $code

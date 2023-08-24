@@ -1,8 +1,7 @@
 ! Copyright (C) 2008 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
-USING: combinators.short-circuit math math.order math.parser
-kernel sequences sequences.deep peg peg.parsers assocs arrays
-hashtables strings namespaces make ascii ;
+! See https://factorcode.org/license.txt for BSD license.
+USING: arrays ascii combinators.short-circuit kernel make
+math.parser peg peg.parsers sequences sequences.deep strings ;
 IN: http.parsers
 
 : except ( quot -- parser )
@@ -11,8 +10,14 @@ IN: http.parsers
 : except-these ( quots -- parser )
     [ 1|| ] curry except ; inline
 
+: cookie-key-disallow? ( ch -- ? )
+    " \t,;=" member? ;
+
 : tspecial? ( ch -- ? )
     "()<>@,;:\\\"/[]?={} \t" member? ;
+
+: cookie-key-parser ( -- parser )
+    { [ control? ] [ cookie-key-disallow? ] } except-these repeat1 ;
 
 : token-parser ( -- parser )
     { [ control? ] [ tspecial? ] } except-these repeat1 ;
@@ -30,7 +35,7 @@ IN: http.parsers
     [ token ] map choice ;
 
 : http-method-parser ( -- parser )
-    { "OPTIONS" "GET" "HEAD" "POST" "PUT" "DELETE" "TRACE" "CONNECT" } one-of ;
+    { "OPTIONS" "GET" "HEAD" "POST" "PUT" "DELETE" "TRACE" "CONNECT" "PATCH" } one-of ;
 
 : url-parser ( -- parser )
     [ " \t\r\n" member? ] except repeat1 case-sensitive ;
@@ -66,7 +71,7 @@ IN: http.parsers
         space-parser ,
     ] seq* [ "1.0" suffix! ] action ;
 
-PEG: parse-request-line ( string -- triple )
+PARTIAL-PEG: parse-request-line ( string -- triple )
     ! Triple is { method url version }
     full-request-parser simple-request-parser 2array choice ;
 
@@ -79,7 +84,7 @@ PEG: parse-request-line ( string -- triple )
 : response-message-parser ( -- parser )
     text-parser repeat0 case-sensitive ;
 
-PEG: parse-response-line ( string -- triple )
+PARTIAL-PEG: parse-response-line ( string -- triple )
     ! Triple is { version code message }
     [
         space-parser ,
@@ -119,7 +124,7 @@ PEG: parse-response-line ( string -- triple )
     text-parser repeat0 case-sensitive
     2choice ;
 
-PEG: parse-header-line ( string -- pair )
+PARTIAL-PEG: parse-header-line ( string -- pair )
     ! Pair is either { name value } or { f value }. If f, its a
     ! continuation of the previous header line.
     [
@@ -144,7 +149,7 @@ PEG: parse-header-line ( string -- pair )
     2choice case-sensitive ;
 
 : attr-parser ( -- parser )
-    token-parser case-sensitive ;
+    cookie-key-parser case-sensitive ;
 
 : av-pair-parser ( -- parser )
     [
@@ -158,7 +163,7 @@ PEG: parse-header-line ( string -- pair )
 : av-pairs-parser ( -- parser )
     av-pair-parser ";" token list-of optional ;
 
-PEG: (parse-set-cookie) ( string -- alist )
+PARTIAL-PEG: (parse-set-cookie) ( string -- alist )
     av-pairs-parser just [ sift ] action ;
 
 : cookie-value-parser ( -- parser )
@@ -174,6 +179,6 @@ PEG: (parse-set-cookie) ( string -- alist )
     [ ";,=" member? not ] satisfy repeat0 [ drop f ] action
     2choice ;
 
-PEG: (parse-cookie) ( string -- alist )
+PARTIAL-PEG: (parse-cookie) ( string -- alist )
     cookie-value-parser [ ";," member? ] satisfy list-of
     optional just [ sift ] action ;

@@ -1,7 +1,7 @@
-;;; fuel-tests.el -- unit tests for fuel
+;;; fuel-tests.el -- unit tests for fuel -*- lexical-binding: t -*-
 
 ;; Copyright (C) 2014 Björn Lindqvist
-;; See http://factorcode.org/license.txt for BSD license.
+;; See https://factorcode.org/license.txt for BSD license.
 
 ;; Author: Björn Lindqvist <bjourne@gmail.com>
 ;; Keywords: languages, fuel, factor

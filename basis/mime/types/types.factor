@@ -1,8 +1,8 @@
 ! Copyright (C) 2004, 2010 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
-USING: io.pathnames io.files io.encodings.ascii
-io.encodings.binary io.encodings.utf8 assocs sequences
-splitting kernel make fry memoize ;
+! See https://factorcode.org/license.txt for BSD license.
+USING: assocs io.encodings.ascii io.encodings.binary
+io.encodings.utf8 io.files io.pathnames kernel make sequences
+splitting ;
 IN: mime.types
 
 MEMO: mime-db ( -- seq )

@@ -1,5 +1,5 @@
 ! Copyright (C) 2010 Joe Groff.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors assocs combinators euler.b-rep fry
 game.models.half-edge grouping io kernel locals math
 math.parser math.vectors.simd.cords sequences splitting ;
@@ -53,7 +53,7 @@ PRIVATE>
     dup connect-opposite-edges ;
 
 : parse-vertex ( line -- position )
-    " " split first3 [ string>number >float ] tri@ 0.0 double-4-boa ;
+    split-words first3 [ string>number >float ] tri@ 0.0 double-4-boa ;
 
 : read-vertex ( line vertices -- )
     [ parse-vertex ] dip push ;
@@ -63,7 +63,7 @@ PRIVATE>
     dup 0 >= [ nip 1 - ] [ [ length ] dip + ] if ;
 
 : parse-face ( line vertices -- vertices )
-    [ " " split ] dip '[ _ parse-face-index ] map ;
+    [ split-words ] dip '[ _ parse-face-index ] map ;
 
 : read-face ( line vertices faces -- )
     [ parse-face ] dip push ;

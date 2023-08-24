@@ -1,8 +1,9 @@
 ! Copyright (C) 2004, 2010 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors assocs byte-arrays byte-vectors continuations
-continuations.private init kernel kernel.private math namespaces
+continuations.private kernel kernel.private math namespaces
 sequences ;
+USE: init ! required but does not reference words
 IN: alien
 
 BUILTIN: alien { underlying c-ptr read-only initial: f } expired ;
@@ -105,12 +106,12 @@ ERROR: callsite-not-compiled word ;
 ! cleared on startup.
 SYMBOL: callbacks
 
-[ H{ } clone callbacks set-global ] "alien" add-startup-hook
+STARTUP-HOOK: [ H{ } clone callbacks set-global ]
 
 ! Used by compiler.codegen to wrap callback bodies
 : do-callback ( callback-quot wait-quot: ( callback -- ) -- )
     t CONTEXT-OBJ-IN-CALLBACK-P set-context-object
-    init-namespaces
+    init-namestack
     init-catchstack
     current-callback
     [ 2drop call ] [ swap call( callback -- ) drop ] 3bi ; inline
@@ -131,7 +132,7 @@ PRIVATE>
     [ callbacks get delete-values ] [ free-callback ] bi ;
 
 : with-callback ( alien quot -- )
-    over [ unregister-and-free-callback ] curry [ ] cleanup ; inline
+    over [ unregister-and-free-callback ] curry finally ; inline
 
 : initialize-alien ( symbol quot -- )
     swap dup get-global dup recompute-value?

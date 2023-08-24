@@ -1,7 +1,8 @@
 ! Copyright (C) 2009 Doug Coleman.
-! See http://factorcode.org/license.txt for BSD license.
-USING: continuations decimals grouping kernel kernel.private literals
-locals math math.functions math.order random tools.test ;
+! See https://factorcode.org/license.txt for BSD license.
+USING: continuations decimals grouping kernel kernel.private
+literals locals math math.functions math.order prettyprint
+random tools.test ;
 IN: decimals.tests
 
 { t } [
@@ -49,3 +50,11 @@ ERROR: decimal-test-failure D1 D2 quot ;
 { f } [ DECIMAL: -2 DECIMAL: -2 before? ] unit-test
 { t } [ DECIMAL: -3 DECIMAL: -2 before? ] unit-test
 { t } [ DECIMAL: .5 DECIMAL: 0 DECIMAL: 1.0 between? ] unit-test
+
+{ "DECIMAL: 0" } [ DECIMAL: 0 unparse ] unit-test
+{ "DECIMAL: 0.1" } [ DECIMAL: 0.1 unparse ] unit-test
+{ "DECIMAL: 1" } [ DECIMAL: 1.0 unparse ] unit-test
+{ "DECIMAL: 1.01" } [ DECIMAL: 1.01 unparse ] unit-test
+{ "DECIMAL: -0.1" } [ DECIMAL: -0.1 unparse ] unit-test
+{ "DECIMAL: -1" } [ DECIMAL: -1.0 unparse ] unit-test
+{ "DECIMAL: -1.01" } [ DECIMAL: -1.01 unparse ] unit-test

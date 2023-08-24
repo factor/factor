@@ -1,6 +1,6 @@
 ! (c) 2009 Joe Groff, see BSD license
-USING: assocs kernel math.rectangles combinators accessors locals
-math.vectors vectors sequences math combinators.short-circuit arrays fry ;
+USING: assocs kernel math.rectangles combinators accessors
+math.vectors vectors sequences math combinators.short-circuit arrays ;
 IN: quadtrees
 
 TUPLE: quadtree { bounds rect } point value ll lr ul ur leaf? ;
@@ -193,6 +193,6 @@ M: quadtree clear-assoc ( assoc -- )
     drop ;
 
 : swizzle ( sequence quot -- sequence' )
-    [ dup ] dip map
+    dupd map
     [ zip ] [ rect-containing <quadtree> ] bi
     [ '[ first2 _ set-at ] each ] [ values ] bi ; inline

@@ -1,7 +1,6 @@
-USING: accessors arrays calendar circular colors
-colors.constants fry kernel locals math math.order math.vectors
-namespaces opengl processing.shapes sequences threads timers ui
-ui.gadgets ui.gestures ui.render ;
+USING: accessors arrays calendar circular colors kernel locals
+math math.order math.vectors namespaces opengl processing.shapes
+sequences timers ui ui.gadgets ui.gestures ui.render ;
 
 IN: trails
 
@@ -11,16 +10,15 @@ IN: trails
     ! Return the mouse location relative to the current gadget
     hand-loc get hand-gadget get screen-loc v- ;
 
-: point-list ( n -- seq ) { 0 0 } <array> <circular> ;
-
 : percent->radius ( percent -- radius ) neg 1 + 25 * 5 max ;
 
-: dot ( pos percent -- ) percent->radius draw-circle ;
+: dot ( pos percent -- )
+    '[ _ percent->radius draw-circle ] when* ;
 
 TUPLE: trails-gadget < gadget points timer ;
 
 M: trails-gadget graft*
-    [ timer>> start-timer yield ] [ call-next-method ] bi ;
+    [ timer>> start-timer ] [ call-next-method ] bi ;
 
 M: trails-gadget ungraft*
     [ timer>> stop-timer ] [ call-next-method ] bi ;
@@ -28,7 +26,7 @@ M: trails-gadget ungraft*
 :: iterate-system ( GADGET -- )
     ! Add a valid point if the mouse is in the gadget
     ! Otherwise, add an "invisible" point
-    hand-gadget get GADGET = [ mouse ] [ { -10 -10 } ] if
+    hand-gadget get GADGET = [ mouse ] [ f ] if
     GADGET points>> circular-push ;
 
 M: trails-gadget pref-dim* drop { 500 500 } ;
@@ -44,7 +42,7 @@ M:: trails-gadget draw-gadget* ( GADGET -- )
 
 : <trails-gadget> ( -- trails-gadget )
     trails-gadget new
-        300 point-list >>points
+        300 f <array> <circular> >>points
         t >>clipped?
         dup '[ _ dup iterate-system relayout-1 ]
         f 10 milliseconds <timer> >>timer ;

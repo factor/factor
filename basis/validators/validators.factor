@@ -1,8 +1,7 @@
 ! Copyright (C) 2006, 2010 Slava Pestov
-! See http://factorcode.org/license.txt for BSD license.
-USING: arrays assocs classes continuations hashtables kernel
-make math math.functions math.parser math.ranges namespaces
-quotations regexp sequences sets unicode words xmode.catalog ;
+! See https://factorcode.org/license.txt for BSD license.
+USING: kernel make math math.functions math.parser ranges regexp
+sequences sets unicode xmode.catalog ;
 IN: validators
 
 : v-checkbox ( str -- ? )
@@ -34,7 +33,7 @@ IN: validators
     ] if ;
 
 : v-number ( str -- n )
-    dup string>number [ ] [ "must be a number" throw ] ?if ;
+    [ string>number ] [ "must be a number" throw ] ?unless ;
 
 : v-integer ( str -- n )
     v-number dup integer? [ "must be an integer" throw ] unless ;
@@ -58,14 +57,14 @@ IN: validators
     [ 2drop ] [ drop "invalid " prepend throw ] if ;
 
 : v-email ( str -- str )
-    ! From http://www.regular-expressions.info/email.html
+    ! From https://www.regular-expressions.info/email.html
     320 v-max-length
     "e-mail"
     R/ [A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}/i
     v-regexp ;
 
 : v-url ( str -- str )
-    "URL" R/ (?:ftp|http|https):\\/\\/\S+/ v-regexp ;
+    "URL" R/ (?:ftp|http|https):\/\/\S+/ v-regexp ;
 
 : v-captcha ( str -- str )
     dup empty? [ "must remain blank" throw ] unless ;
@@ -98,7 +97,7 @@ IN: validators
 
 : v-credit-card ( str -- n )
     "- " without
-    dup CHAR: 0 CHAR: 9 [a,b] diff empty? [
+    dup CHAR: 0 CHAR: 9 [a..b] diff empty? [
         13 v-min-length
         16 v-max-length
         dup luhn? [ string>number ] [

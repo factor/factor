@@ -1,10 +1,10 @@
 ! Copyright (c) 2007 Aaron Schaefer.
-! See http://factorcode.org/license.txt for BSD license.
-USING: combinators.short-circuit kernel math math.functions
-    math.ranges namespaces project-euler.common sequences ;
+! See https://factorcode.org/license.txt for BSD license.
+USING: combinators.short-circuit kernel project-euler.common
+ranges sequences ;
 IN: project-euler.021
 
-! http://projecteuler.net/index.php?section=problems&id=21
+! https://projecteuler.net/index.php?section=problems&id=21
 
 ! DESCRIPTION
 ! -----------
@@ -30,7 +30,7 @@ IN: project-euler.021
     { [ = not ] [ sum-proper-divisors = ] } 2&& ;
 
 : euler021 ( -- answer )
-    10000 [1,b] [ dup amicable? [ drop 0 ] unless ] map-sum ;
+    10,000 [1..b] [ dup amicable? [ drop 0 ] unless ] map-sum ;
 
 ! [ euler021 ] 100 ave-time
 ! 335 ms ave run time - 18.63 SD (100 trials)

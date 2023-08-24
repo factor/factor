@@ -1,15 +1,11 @@
 ! Copyright (C) 2010 Slava Pestov, 2011 Alex Vondrak.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors combinators combinators.short-circuit
-cpu.architecture fry kernel layouts locals make math namespaces
-sequences
-compiler.cfg.instructions
-compiler.cfg.registers
-compiler.cfg.utilities
-compiler.cfg.gvn.folding
-compiler.cfg.gvn.graph
-compiler.cfg.gvn.avail
-compiler.cfg.gvn.rewrite ;
+compiler.cfg.gvn.avail compiler.cfg.gvn.folding
+compiler.cfg.gvn.graph compiler.cfg.gvn.rewrite
+compiler.cfg.instructions compiler.cfg.registers
+compiler.cfg.utilities cpu.architecture kernel layouts make math
+namespaces ;
 IN: compiler.cfg.gvn.math
 
 : f-insn? ( insn -- ? )

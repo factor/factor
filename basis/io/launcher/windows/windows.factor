@@ -1,5 +1,5 @@
 ! Copyright (C) 2007, 2010 Doug Coleman, Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors alien alien.c-types alien.data arrays assocs
 classes classes.struct combinators combinators.short-circuit
 concurrency.flags continuations debugger destructors init io
@@ -28,10 +28,10 @@ TUPLE: CreateProcess-args
 
 : default-CreateProcess-args ( -- obj )
     CreateProcess-args new
-        STARTUPINFO <struct>
+        STARTUPINFO new
         dup class-of heap-size >>cb
     >>lpStartupInfo
-    PROCESS_INFORMATION <struct> >>lpProcessInformation
+    PROCESS_INFORMATION new >>lpProcessInformation
     TRUE >>bInheritHandles
     0 >>dwCreateFlags ;
 
@@ -78,15 +78,15 @@ TUPLE: CreateProcess-args
 ! Naked double-quotes get a backslash before them
 ! Backslashes before a double-quote get doubled in the output
 ! If there's a space, double trailing backslashes and surround by quotes
-! See http://msdn.microsoft.com/en-us/library/ms647232.aspx
+! See https://msdn.microsoft.com/en-us/library/ms647232.aspx
 : escape-argument ( str -- newstr )
     escape-double-quote
     CHAR: \s over member? [
-        fix-trailing-backslashes "\"" dup surround
+        fix-trailing-backslashes "\"" 1surround
     ] when ;
 
 : join-arguments ( args -- cmd-line )
-    [ escape-argument ] map " " join ;
+    [ escape-argument ] map join-words ;
 
 : lookup-priority ( process -- n )
     priority>> {
@@ -111,8 +111,8 @@ TUPLE: CreateProcess-args
     pick group>> [
         {
             { +same-group+ [ ] }
-            { +new-session+ [ DETACHED_PROCESS bitor CREATE_NEW_PROCESS_GROUP bitor ] }
-            { +new-group+ [ DETACHED_PROCESS bitor CREATE_NEW_PROCESS_GROUP bitor ] }
+            { +new-session+ [ CREATE_NEW_PROCESS_GROUP bitor ] }
+            { +new-group+ [ CREATE_NEW_PROCESS_GROUP bitor ] }
             [ drop ]
         } case
     ] when*
@@ -146,7 +146,7 @@ TUPLE: CreateProcess-args
     fill-startup-info
     nip ;
 
-M: windows (current-process) ( -- handle )
+M: windows (current-process)
     GetCurrentProcessId ;
 
 ERROR: launch-error process error ;
@@ -157,7 +157,7 @@ M: launch-error error.
     "Launch descriptor:" print nl
     process>> . ;
 
-M: windows (kill-process) ( process -- )
+M: windows (kill-process)
     handle>> hProcess>> 255 TerminateProcess win32-error=0/f ;
 
 : dispose-process ( process-information -- )
@@ -176,7 +176,7 @@ M: windows (kill-process) ( process -- )
     over handle>> dispose-process
     notify-exit ;
 
-M: windows (wait-for-processes) ( -- ? )
+M: windows (wait-for-processes)
     processes get keys dup
     [ handle>> hProcess>> ] void*-array{ } map-as
     [ length ] keep 0 0
@@ -209,7 +209,7 @@ M: windows (wait-for-processes) ( -- ? )
     } case ;
 
 ! The below code is based on the example given in
-! http://msdn2.microsoft.com/en-us/library/ms682499.aspx
+! https://msdn2.microsoft.com/en-us/library/ms682499.aspx
 
 : redirect-default ( obj access-mode create-mode -- handle )
     3drop f ;
@@ -285,7 +285,7 @@ M: windows (wait-for-processes) ( -- ? )
     [ [ redirect-stderr ] dip hStdError<< ]
     [ [ redirect-stdin ] dip hStdInput<< ] 3tri ;
 
-M: windows (run-process) ( process -- handle )
+M: windows (run-process)
     [
         [
             dup make-CreateProcess-args

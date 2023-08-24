@@ -1,14 +1,13 @@
 ! Copyright (C) 2009 Joe Groff.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors alien.c-types arrays classes.struct combinators
 combinators.short-circuit game.loop game.worlds gpu gpu.buffers
-gpu.util.wasd gpu.framebuffers gpu.render gpu.shaders gpu.state
-gpu.textures gpu.util grouping http.client images images.loader
-images.tiff io io.encodings.ascii io.files io.files.temp kernel
-locals math math.matrices math.vectors.simd math.parser math.vectors
-method-chains namespaces sequences splitting threads ui ui.gadgets
-ui.gadgets.worlds ui.pixel-formats specialized-arrays
-specialized-vectors literals ;
+gpu.framebuffers gpu.render gpu.shaders gpu.state gpu.textures
+gpu.util gpu.util.wasd grouping http.client images images.loader
+io io.encodings.ascii io.files io.files.temp kernel literals
+math.parser math.vectors math.vectors.simd method-chains
+namespaces sequences specialized-arrays specialized-vectors
+threads ui.gadgets.worlds ui.pixel-formats ;
 FROM: alien.c-types => float ;
 SPECIALIZED-ARRAY: float
 SPECIALIZED-VECTOR: uint
@@ -86,7 +85,7 @@ UNIFORM-TUPLE: loading-uniforms
     [ string>number ] map ; inline
 
 : <bunny-vertex> ( vertex -- struct )
-    bunny-vertex-struct <struct>
+    bunny-vertex-struct new
         swap first3 0.0 float-4-boa >>vertex ; inline
 
 : (read-line-tokens) ( seq stream -- seq )
@@ -104,7 +103,7 @@ UNIFORM-TUPLE: loading-uniforms
     V{ } clone swap (read-line-tokens) ;
 
 : each-line-tokens ( quot -- )
-    input-stream get [ stream-read-line-tokens ] curry each-morsel ; inline
+    [ input-stream get [ stream-read-line-tokens ] curry ] dip while* ; inline
 
 : (parse-bunny-model) ( vs is -- vs is )
     [
@@ -146,7 +145,8 @@ UNIFORM-TUPLE: loading-uniforms
 
 : bunny-model-path ( -- path ) "bun_zipper.ply" cache-file ;
 
-CONSTANT: bunny-model-url "http://duriansoftware.com/joe/media/bun_zipper.ply"
+CONSTANT: bunny-model-url
+"https://downloads.factorcode.org/misc/bun_zipper.ply"
 
 : download-bunny ( -- path )
     bunny-model-url bunny-model-path [ ?download-to ] keep ;

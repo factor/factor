@@ -1,5 +1,5 @@
 ! Copyright (C) 2007, 2009 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: assocs kernel kernel.private math math.order namespaces ;
 IN: layouts
 
@@ -48,9 +48,9 @@ SYMBOL: header-bits
 
 : cell-bits ( -- n ) 8 cells ; inline
 
-: 32bit? ( -- ? ) cell-bits 32 = ; inline
+: 32-bit? ( -- ? ) cell-bits 32 = ; inline
 
-: 64bit? ( -- ? ) cell-bits 64 = ; inline
+: 64-bit? ( -- ? ) cell-bits 64 = ; inline
 
 : bootstrap-cell ( -- n ) \ cell get cell or ; inline
 

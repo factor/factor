@@ -1,12 +1,11 @@
-USING: help.markup help.syntax io.streams.string quotations
-strings calendar serialize furnace.db words words.symbol
-kernel ;
+USING: calendar furnace.db help.markup help.syntax kernel
+words.symbol ;
 IN: furnace.sessions
 
 HELP: <sessions>
 { $values
-     { "responder" "a responder" }
-     { "responder'" "a new responder" }
+    { "responder" "a responder" }
+    { "responder'" "a new responder" }
 }
 { $description "Wraps a responder in a session manager responder." } ;
 
@@ -24,9 +23,9 @@ HELP: sset
 
 ARTICLE: "furnace.sessions.config" "Session manager configuration"
 "The " { $link sessions } " tuple has two slots which contain configuration parameters:"
-{ $table
-    { { $slot "verify?" } { "If set to a true value, the client IP address and user agent of each session is tracked, and checked every time a client attempts to re-establish a session. While this does not offer any real security, it can thwart unskilled packet-sniffing attacks. On by default." } }
-    { { $slot "timeout" } { "A " { $link duration } " storing the maximum time that inactive sessions will be stored on the server. The default timeout is 20 minutes. Note that for sessions to actually expire, you must start a thread to do so; see the " { $vocab-link "furnace.alloy" } " vocabulary for an easy way of doing this." } }
+{ $slots
+    { "verify?" { "If set to a true value, the client IP address and user agent of each session is tracked, and checked every time a client attempts to re-establish a session. While this does not offer any real security, it can thwart unskilled packet-sniffing attacks. On by default." } }
+    { "timeout" { "A " { $link duration } " storing the maximum time that inactive sessions will be stored on the server. The default timeout is 20 minutes. Note that for sessions to actually expire, you must start a thread to do so; see the " { $vocab-link "furnace.alloy" } " vocabulary for an easy way of doing this." } }
 } ;
 
 ARTICLE: "furnace.sessions.serialize" "Session state serialization"

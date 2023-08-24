@@ -211,7 +211,7 @@ HELP: <datagram>
     { $code "f 0 <inet4> <datagram>" }
     "To accept UDP/IP packets from the loopback interface only, use an address specifier like the following:"
     { $code "\"127.0.0.1\" 1234 <inet4> <datagram>" }
-    "Since " { $link resolve-host } " can return multiple address specifiers, your code must create a datagram socket for each one and co-ordinate packet sending accordingly."
+    "Since " { $link resolve-host } " can return multiple address specifiers, your code must create a datagram socket for each one and coordinate packet sending accordingly."
 }
 { $errors "Throws an error if the port is already in use, or if the OS forbids access." } ;
 
@@ -246,6 +246,16 @@ HELP: broadcast-once
     "Send a datagram to localhost, port 7777:"
     { $example "USING: io.sockets prettyprint ;"
         "B{ 1 2 3 } f 7777 <inet4> broadcast-once"
+        ""
+    }
+    "Send a datagram to the broadcast address, port 7777:"
+    { $example "USING: io.sockets prettyprint ;"
+        "B{ 1 2 3 } \"192.168.88.255\" 7777 <inet4> broadcast-once"
+        ""
+    }
+    "Receive a datagram on port 7777:"
+    { $unchecked-example "USING: destructors kernel io.sockets ;"
+        "f 7777 <inet4> <datagram> [ receive ] [ dispose ] bi"
         ""
     }
 }

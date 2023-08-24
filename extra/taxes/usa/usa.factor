@@ -1,8 +1,7 @@
 ! Copyright (C) 2008 Doug Coleman.
-! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays assocs kernel math math.intervals
-namespaces sequences money math.order taxes.usa.w4
-taxes.usa.futa math.finance ;
+! See https://factorcode.org/license.txt for BSD license.
+USING: accessors kernel math math.order sequences ;
+USE: taxes.usa.w4
 IN: taxes.usa
 
 ! Withhold: FICA, Medicare, Federal (FICA is social security)

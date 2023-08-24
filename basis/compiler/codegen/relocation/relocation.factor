@@ -1,8 +1,8 @@
 ! Copyright (C) 2011 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors alien.accessors alien.strings
-compiler.constants kernel make math math.bitwise memoize
-namespaces sequences ;
+compiler.constants kernel make math math.bitwise namespaces
+sequences ;
 IN: compiler.codegen.relocation
 
 SYMBOL: extra-offset  ! Only used by non-optimizing compiler

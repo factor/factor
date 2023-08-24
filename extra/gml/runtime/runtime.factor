@@ -1,6 +1,6 @@
 ! Copyright (C) 2010 Slava Pestov.
 USING: accessors arrays assocs fry generic.parser kernel locals
-locals.parser macros math math.ranges memoize parser sequences
+locals.parser macros math ranges memoize parser sequences
 sequences.private strings strings.parser lexer namespaces
 vectors words generalizations sequences.generalizations
 effects.parser gml.types ;
@@ -59,7 +59,7 @@ ERROR: unbound-name { name gml-name } ;
 
 : lookup-name ( name gml -- value )
     dupd dictionary-stack>> assoc-stack
-    [ ] [ unbound-name ] ?if ; inline
+    or* [ unbound-name ] unless ; inline
 
 GENERIC: exec-proc ( registers gml proc -- registers gml )
 

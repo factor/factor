@@ -1,8 +1,8 @@
 ! Copyright (C) 2010 Erik Charlebois.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors ascii combinators images images.loader io
-io.encodings.ascii io.encodings.string kernel locals make math
-math.parser sequences io.streams.throwing ;
+io.encodings.ascii io.encodings.string io.streams.throwing
+kernel make math math.parser sequences ;
 IN: images.ppm
 
 SINGLETON: ppm-image

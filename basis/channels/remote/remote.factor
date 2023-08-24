@@ -1,10 +1,10 @@
 ! Copyright (C) 2007 Chris Double. All Rights Reserved.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 !
 ! Remote Channels
-USING: kernel init namespaces assocs arrays random
-sequences channels match concurrency.messaging
-concurrency.distributed threads accessors ;
+USING: accessors assocs channels concurrency.distributed
+concurrency.messaging init kernel match namespaces random
+threads ;
 IN: channels.remote
 
 <PRIVATE
@@ -14,7 +14,7 @@ IN: channels.remote
 PRIVATE>
 
 : publish ( channel -- id )
-    256 random-bits dup [ remote-channels set-at ] dip ;
+    128 random-bits dup [ remote-channels set-at ] dip ;
 
 : get-channel ( id -- channel )
     remote-channels at ;
@@ -60,13 +60,13 @@ C: <remote-channel> remote-channel
 
 PRIVATE>
 
-M: remote-channel to ( value remote-channel -- )
+M: remote-channel to
     [ id>> swap to-message boa ] keep send-message drop ;
 
-M: remote-channel from ( remote-channel -- value )
+M: remote-channel from
     [ id>> from-message boa ] keep send-message ;
 
-[
+STARTUP-HOOK: [
     H{ } clone \ remote-channels set-global
     start-channel-node
-] "channel-registry" add-startup-hook
+]

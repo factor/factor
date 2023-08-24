@@ -1,9 +1,9 @@
 ! Copyright (C) 2011 Erik Charlebois.
-! See http://factorcode.org/license.txt for BSD license.
-USING: kernel namespaces words math math.order locals math.bitwise io.binary make ;
+! See https://factorcode.org/license.txt for BSD license.
+USING: endian kernel make math math.bitwise ;
 IN: cpu.ppc.assembler
 
-! This vocabulary implements the V2.06B Power ISA found at http://www.power.org.
+! This vocabulary implements the V2.06B Power ISA found at https://www.power.org.
 ! The names are standard and the operand order is the same as in the specification,
 ! except that displacement in d-form and ds-form instructions come after the base
 ! address register.
@@ -115,16 +115,16 @@ IN: cpu.ppc.assembler
 
 ! 2.4 Branch Instructions
 GENERIC: B ( target_addr/label -- )
-M: integer B ( target_addr -- ) -2 shift 0 0 18 i-insn ;
+M: integer B -2 shift 0 0 18 i-insn ;
 
 GENERIC: BL ( target_addr/label -- )
-M: integer BL ( target_addr -- ) -2 shift 0 1 18 i-insn ;
+M: integer BL -2 shift 0 1 18 i-insn ;
 
 : BA  ( target_addr -- ) -2 shift 1 0 18 i-insn ;
 : BLA ( target_addr -- ) -2 shift 1 1 18 i-insn ;
 
 GENERIC: BC ( bo bi target_addr/label -- )
-M: integer BC ( bo bi target_addr -- ) -2 shift 0 0 16 b-insn ;
+M: integer BC -2 shift 0 0 16 b-insn ;
 
 : BCA  ( bo bi target_addr -- ) -2 shift 1 0 16 b-insn ;
 : BCL  ( bo bi target_addr -- ) -2 shift 0 1 16 b-insn ;

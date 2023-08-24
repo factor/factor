@@ -1,7 +1,7 @@
 ! Copyright (C) 2008, 2009 Doug Coleman, Daniel Ehrenberg.
-! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays assocs combinators fry io.streams.string
-kernel lists locals math math.order namespaces sequences splitting
+! See https://factorcode.org/license.txt for BSD license.
+USING: accessors arrays assocs combinators io.streams.string
+kernel lists math math.order namespaces sequences splitting
 strings urls urls.encoding xml.data xml.syntax xml.writer
 xmode.code2html ;
 IN: farkup
@@ -50,7 +50,7 @@ DEFER: (parse-paragraph)
     parse-paragraph paragraph boa ;
 
 : cut-half-slice ( string i -- before after-slice )
-    [ head ] [ 1 + short tail-slice ] 2bi ;
+    [ head ] [ 1 + index-or-length tail-slice ] 2bi ;
 
 : find-cut ( string quot -- before after delimiter )
     dupd find
@@ -108,12 +108,12 @@ DEFER: (parse-paragraph)
     [ cut-slice ] [ f ] if* swap ;
 
 :: (take-until) ( state delimiter accum -- string/f state' )
-    state empty? [ accum "\n" join f ] [
+    state empty? [ accum join-lines f ] [
         state unclip-slice :> ( rest first )
         first delimiter split1 :> ( before after )
         before accum push
         after [
-            accum "\n" join
+            accum join-lines
             rest after prefix
         ] [
             rest delimiter accum (take-until)
@@ -203,21 +203,21 @@ DEFER: (parse-paragraph)
     } case ;
 
 : parse-farkup ( string -- farkup )
-    string-lines [ dup empty? not ] [ parse-item ] produce nip sift ;
+    split-lines [ dup empty? not ] [ parse-item ] produce nip sift ;
 
 CONSTANT: invalid-url "javascript:alert('Invalid URL in farkup');"
 
-: check-url ( href -- href' )
+: check-url ( href -- href' absolute? )
     {
-        { [ dup empty? ] [ drop invalid-url ] }
-        { [ dup [ 127 > ] any? ] [ drop invalid-url ] }
-        { [ dup first "/\\" member? ] [ drop invalid-url ] }
-        { [ CHAR: : over member? ] [ dup absolute-url? [ drop invalid-url ] unless ] }
-        [ relative-link-prefix get prepend "" like url-encode ]
+        { [ dup empty? ] [ drop invalid-url f ] }
+        { [ dup [ 127 > ] any? ] [ drop invalid-url f ] }
+        { [ dup first "/\\" member? ] [ drop invalid-url f ] }
+        { [ CHAR: : over member? ] [ dup absolute-url? [ t ] [ drop invalid-url f ] if ] }
+        [ relative-link-prefix get prepend "" like url-encode f ]
     } cond ;
 
 : render-code ( string mode -- xml )
-    [ string-lines ] dip htmlize-lines
+    [ split-lines ] dip htmlize-lines
     [XML <pre><-></pre> XML] ;
 
 GENERIC: (write-farkup) ( farkup -- xml )
@@ -242,7 +242,7 @@ M: paragraph (write-farkup) "p" farkup-inside ;
 M: table (write-farkup) "table" farkup-inside ;
 
 : write-link ( href text -- xml )
-    [ check-url link-no-follow? get "nofollow" and ] dip
+    [ check-url link-no-follow? get "nofollow" and and ] dip
     [XML <a href=<-> rel=<->><-></a> XML] ;
 
 : write-image-link ( href text -- xml )
@@ -250,7 +250,7 @@ M: table (write-farkup) "table" farkup-inside ;
         2drop
         [XML <strong>Images are not allowed</strong> XML]
     ] [
-        [ check-url ] [ f like ] bi*
+        [ check-url drop ] [ f like ] bi*
         [XML <img src=<-> alt=<->/> XML]
     ] if ;
 

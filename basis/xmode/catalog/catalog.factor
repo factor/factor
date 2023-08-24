@@ -1,5 +1,5 @@
-USING: accessors assocs globs io.pathnames kernel memoize
-namespaces regexp sequences sorting splitting strings
+USING: accessors assocs classes globs io.pathnames kernel
+memoize namespaces regexp sequences sorting splitting strings
 unicode xml xml.data xml.syntax xml.traversal xmode.loader
 xmode.rules xmode.utilities ;
 IN: xmode.catalog
@@ -30,7 +30,7 @@ MEMO: modes ( -- modes )
     file>xml parse-modes-tag ;
 
 MEMO: mode-names ( -- modes )
-    modes keys natural-sort ;
+    modes keys sort ;
 
 : reset-catalog ( -- )
     \ modes reset-memoized ;
@@ -57,7 +57,7 @@ DEFER: finalize-rule-set
 : resolve-delegate ( rule -- )
     dup delegate>> dup string? [
         get-rule-set
-        dup rule-set? [ "not a rule set" throw ] unless
+        rule-set check-instance
         swap rule-sets [ dup finalize-rule-set ] with-variable
         >>delegate drop
     ] [ 2drop ] if ;

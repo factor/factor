@@ -1,5 +1,5 @@
 ! Copyright (C) 2007 Chris Double.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 !
 USING: continuations kernel tools.test strings namespaces make arrays
 sequences peg peg.private peg.parsers words math accessors ;
@@ -184,7 +184,7 @@ IN: peg.tests
     ! Ensure a circular parser doesn't loop infinitely
     [ f , "a" token , ] seq*
     dup peg>> parsers>>
-    dupd 0 swap set-nth compile word?
+    dupd 0 swap set-nth compile-parser word?
 ] unit-test
 
 [

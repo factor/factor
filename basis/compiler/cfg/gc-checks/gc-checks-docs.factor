@@ -1,8 +1,7 @@
-USING: compiler.cfg compiler.cfg.instructions help.markup help.syntax kernel
-layouts math sequences slots.private ;
+USING: compiler.cfg compiler.cfg.gc-checks compiler.cfg.gc-checks.private
+compiler.cfg.instructions help.markup help.syntax kernel layouts math sequences
+slots.private ;
 IN: compiler.cfg.gc-checks
-
-<PRIVATE
 
 HELP: add-gc-checks
 { $values { "insns-seq" "a sequence of instruction sequences" } }
@@ -39,8 +38,6 @@ HELP: insert-gc-check?
 HELP: insert-gc-checks
 { $values { "cfg" cfg } }
 { $description "Inserts gc checks in each " { $link basic-block } " in the cfg where they are needed." } ;
-
-PRIVATE>
 
 HELP: process-block
 { $values { "bb" basic-block } }

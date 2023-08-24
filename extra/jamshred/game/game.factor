@@ -1,6 +1,7 @@
 ! Copyright (C) 2007, 2008 Alex Chapman
-! See http://factorcode.org/license.txt for BSD license.
-USING: accessors kernel opengl arrays sequences jamshred.log jamshred.player jamshred.sound jamshred.tunnel math math.constants math.vectors ;
+! See https://factorcode.org/license.txt for BSD license.
+USING: accessors arrays jamshred.player jamshred.sound
+jamshred.tunnel kernel math math.constants sequences ;
 IN: jamshred.game
 
 TUPLE: jamshred sounds tunnel players running quit ;

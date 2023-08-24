@@ -1,5 +1,5 @@
 ! Copyright (C) 2008, 2010 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors concurrency.mailboxes continuations destructors
 fry io.backend io.timeouts kernel namespaces sequences system
 vocabs ;
@@ -16,7 +16,7 @@ M: object dispose-monitors ;
 : with-monitors ( quot -- )
     [
         init-monitors
-        [ dispose-monitors ] [ ] cleanup
+        [ dispose-monitors ] finally
     ] with-scope ; inline
 
 TUPLE: monitor < disposable path queue timeout ;

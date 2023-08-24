@@ -1,6 +1,6 @@
 ! Copyright (C) 2008, 2010 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
-USING: deques threads kernel arrays sequences timers fry ;
+! See https://factorcode.org/license.txt for BSD license.
+USING: deques kernel threads timers ;
 IN: concurrency.conditions
 
 : notify-1 ( deque -- )

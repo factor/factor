@@ -1,8 +1,8 @@
 ! Copyright (C) 2010 Erik Charlebois.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors alien alien.c-types alien.data arrays
 byte-arrays combinators combinators.smart destructors
-io.encodings.ascii io.encodings.string kernel libc locals make
+io.encodings.ascii io.encodings.string kernel libc literals make
 math namespaces opencl.ffi sequences specialized-arrays
 variants ;
 IN: opencl
@@ -184,7 +184,7 @@ M: cl-read-access       buffer-access-constant drop CL_MEM_READ_ONLY ;
 M: cl-write-access      buffer-access-constant drop CL_MEM_WRITE_ONLY ;
 
 GENERIC: buffer-map-flags ( buffer-access-mode -- n )
-M: cl-read-write-access buffer-map-flags drop CL_MAP_READ CL_MAP_WRITE bitor ;
+M: cl-read-write-access buffer-map-flags drop flags{ CL_MAP_READ CL_MAP_WRITE } ;
 M: cl-read-access       buffer-map-flags drop CL_MAP_READ ;
 M: cl-write-access      buffer-map-flags drop CL_MAP_WRITE ;
 
@@ -225,14 +225,14 @@ M: cl-filter-linear  filter-mode-constant drop CL_FILTER_LINEAR ;
     } cleave ;
 
 : cl_device_fp_config>flags ( ulong -- sequence )
-    [ {
+    {
         [ CL_FP_DENORM           bitand 0 = [ f ] [ cl-denorm           ] if ]
         [ CL_FP_INF_NAN          bitand 0 = [ f ] [ cl-inf-and-nan      ] if ]
         [ CL_FP_ROUND_TO_NEAREST bitand 0 = [ f ] [ cl-round-to-nearest ] if ]
         [ CL_FP_ROUND_TO_ZERO    bitand 0 = [ f ] [ cl-round-to-zero    ] if ]
         [ CL_FP_ROUND_TO_INF     bitand 0 = [ f ] [ cl-round-to-inf     ] if ]
         [ CL_FP_FMA              bitand 0 = [ f ] [ cl-fma              ] if ]
-    } cleave ] { } output>sequence sift ;
+    } cleave>array sift ;
 
 : cl_device_mem_cache_type>cache-type ( uint -- cache-type )
     {

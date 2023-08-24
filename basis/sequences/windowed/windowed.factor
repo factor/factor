@@ -1,7 +1,7 @@
 ! Copyright (C) 2012 Doug Coleman.
-! See http://factorcode.org/license.txt for BSD license.
-USING: accessors fry kernel locals math math.order
-math.statistics sequences sequences.private ;
+! See https://factorcode.org/license.txt for BSD license.
+USING: accessors kernel math math.order math.statistics
+sequences sequences.private ;
 IN: sequences.windowed
 
 TUPLE: windowed-sequence
@@ -26,8 +26,8 @@ M: windowed-sequence length
 
 :: rolling-map ( ... seq n quot: ( ... slice -- ... elt ) -- ... newseq )
     seq length [
-        [ n [-] ] [ seq <slice-unsafe> ] bi quot call
-    ] { } map-integers ; inline
+        1 + [ n [-] ] [ seq <slice-unsafe> ] bi quot call
+    ] map-integers ; inline
 
 : rolling-sum ( seq n -- newseq )
     [ sum ] rolling-map ;

@@ -1,8 +1,7 @@
 ! Copyright (C) 2009 Bruno Deferrari
-! See http://factorcode.org/license.txt for BSD license.
-USING: alien alien.c-types alien.libraries alien.syntax
-combinators kernel tokyo.alien.tchdb tokyo.alien.tcutil
-tokyo.alien.tcbdb tokyo.alien.tcfdb tokyo.alien.tctdb ;
+! See https://factorcode.org/license.txt for BSD license.
+USING: alien.c-types alien.syntax tokyo.alien.tcbdb
+tokyo.alien.tcutil ;
 IN: tokyo.alien.tcadb
 
 LIBRARY: tokyocabinet

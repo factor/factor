@@ -1,4 +1,4 @@
-USING: help.markup help.syntax kernel math sequences ;
+USING: help.markup help.syntax sequences ;
 IN: base64
 
 HELP: >base64

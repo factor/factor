@@ -1,12 +1,10 @@
 ! Copyright (C) 2006, 2009 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
-USING: accessors assocs colors colors.constants combinators
-concurrency.messaging formatting fry inspector kernel make
-models models.arrow namespaces sequences threads tools.walker ui
-ui.commands ui.gadgets ui.gadgets.buttons ui.gadgets.labels
-ui.gadgets.status-bar ui.theme ui.gadgets.toolbar
-ui.gadgets.tracks ui.gestures ui.pens.solid ui.tools.browser
-ui.tools.common ui.tools.listener ui.tools.traceback ;
+! See https://factorcode.org/license.txt for BSD license.
+USING: accessors assocs combinators concurrency.messaging kernel
+models namespaces sequences threads tools.walker ui ui.commands
+ui.gadgets ui.gadgets.labels ui.gadgets.status-bar
+ui.gadgets.toolbar ui.gadgets.tracks ui.gestures ui.pens.solid
+ui.theme ui.tools.browser ui.tools.common ui.tools.traceback ;
 IN: ui.tools.walker
 
 TUPLE: walker-gadget < tool

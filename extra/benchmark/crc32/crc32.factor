@@ -1,4 +1,4 @@
-USING: checksums checksums.crc32 io.encodings.ascii io.files kernel math ;
+USING: checksums checksums.crc32 kernel math ;
 IN: benchmark.crc32
 
 : crc32-benchmark ( -- )

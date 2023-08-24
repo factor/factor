@@ -1,11 +1,11 @@
 ! Copyright (C) 2004, 2010 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors assocs classes classes.algebra combinators
 combinators.short-circuit compiler.cfg compiler.cfg.builder
 compiler.cfg.builder.alien compiler.cfg.finalization
 compiler.cfg.optimizer compiler.codegen compiler.crossref
 compiler.errors compiler.tree.builder compiler.tree.optimizer
-compiler.units compiler.utilities continuations definitions fry
+compiler.units compiler.utilities continuations definitions
 generic generic.single io kernel macros make namespaces
 sequences sets stack-checker.dependencies stack-checker.errors
 stack-checker.inlining vocabs.loader words ;
@@ -167,7 +167,7 @@ M: optimizing-compiler to-recompile ( -- words )
         outdated-conditional-usages %
 
         changed-definitions get filter-word-defs dup zip ,
-    ] { } make assoc-combine keys ;
+    ] { } make assoc-union-all keys ;
 
 M: optimizing-compiler process-forgotten-words
     [ delete-compiled-xref ] each ;

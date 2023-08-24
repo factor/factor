@@ -1,5 +1,5 @@
 ! Copyright (C) 2012 Doug Coleman.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: kernel machine-learning.label-encoder
 machine-learning.transformer tools.test ;
 

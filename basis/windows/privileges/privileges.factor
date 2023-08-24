@@ -1,15 +1,14 @@
 ! Copyright (C) 2010 Doug Coleman.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors alien alien.data alien.syntax classes.struct
-continuations fry kernel libc literals locals sequences
-windows.advapi32 windows.errors windows.kernel32 windows.types
-alien.c-types ;
+continuations kernel libc literals sequences windows.advapi32
+windows.errors windows.kernel32 windows.types ;
 IN: windows.privileges
 
 TYPEDEF: TOKEN_PRIVILEGES* PTOKEN_PRIVILEGES
 
 ! Security tokens
-!  http://msdn.microsoft.com/msdnmag/issues/05/03/TokenPrivileges/
+!  https://msdn.microsoft.com/msdnmag/issues/05/03/TokenPrivileges/
 
 : (open-process-token) ( handle -- handle )
     flags{ TOKEN_ADJUST_PRIVILEGES TOKEN_QUERY }
@@ -25,14 +24,14 @@ TYPEDEF: TOKEN_PRIVILEGES* PTOKEN_PRIVILEGES
     ! quot: ( token-handle -- token-handle )
     [ open-process-token ] dip
     [ keep ] curry
-    [ CloseHandle drop ] [ ] cleanup ; inline
+    [ CloseHandle drop ] finally ; inline
 
 : lookup-privilege ( string -- luid )
-    [ f ] dip LUID <struct>
+    [ f ] dip LUID new
     [ LookupPrivilegeValue win32-error=0/f ] keep ;
 
 :: make-token-privileges ( name enabled? -- obj )
-    TOKEN_PRIVILEGES <struct>
+    TOKEN_PRIVILEGES new
         1 >>PrivilegeCount
         LUID_AND_ATTRIBUTES malloc-struct &free
             enabled? [ SE_PRIVILEGE_ENABLED >>Attributes ] when
@@ -52,4 +51,4 @@ TYPEDEF: TOKEN_PRIVILEGES* PTOKEN_PRIVILEGES
 : with-privileges ( seq quot -- )
     [ '[ _ [ t set-privilege ] each @ ] ]
     [ drop '[ _ [ f set-privilege ] each ] ]
-    2bi [ ] cleanup ; inline
+    2bi finally ; inline

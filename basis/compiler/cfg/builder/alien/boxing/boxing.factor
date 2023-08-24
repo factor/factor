@@ -1,28 +1,39 @@
 ! Copyright (C) 2010 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors alien.c-types arrays assocs classes.struct
 combinators compiler.cfg.builder.alien.params compiler.cfg.hats
 compiler.cfg.instructions compiler.cfg.intrinsics.allot
-compiler.cfg.registers cpu.architecture fry kernel layouts
+compiler.cfg.registers cpu.architecture kernel layouts
 locals math namespaces sequences system ;
 QUALIFIED-WITH: alien.c-types c
 IN: compiler.cfg.builder.alien.boxing
 
 SYMBOL: struct-return-area
 
+SYMBOLS: int-reg-reps float-reg-reps ;
+
+: reg-reps ( reps -- int-reps float-reps )
+    [ second ] reject [ [ first int-rep? ] count ] [ length over - ] bi ;
+
+: record-reg-reps ( reps -- reps )            
+    dup reg-reps [ int-reg-reps +@ ] [ float-reg-reps +@ ] bi* ;
+
+: unrecord-reg-reps ( reps -- reps )
+    dup reg-reps [ neg int-reg-reps +@ ] [ neg float-reg-reps +@ ] bi* ;
+
 GENERIC: flatten-c-type ( c-type -- pairs )
 
 M: c-type flatten-c-type
-    rep>> f f 3array 1array ;
+    rep>> f f 3array 1array record-reg-reps ;
 
 M: long-long-type flatten-c-type
-    drop 2 [ int-rep long-long-on-stack? f 3array ] replicate ;
+    drop 2 [ int-rep long-long-on-stack? f 3array ] replicate record-reg-reps ;
 
 HOOK: flatten-struct-type cpu ( type -- pairs )
 HOOK: flatten-struct-type-return cpu ( type -- pairs )
 
 M: object flatten-struct-type
-    heap-size cell align cell /i { int-rep f f } <array> ;
+    heap-size cell align cell /i { int-rep f f } <array> record-reg-reps ;
 
 M: struct-c-type flatten-c-type
     flatten-struct-type ;
@@ -70,14 +81,14 @@ M: c-type unbox
             [ swap ^^unbox ]
         } case 1array
     ]
-    [ drop f f 3array 1array ] 2bi ;
+    [ drop f f 3array 1array ] 2bi record-reg-reps ;
 
 M: long-long-type unbox
     [ next-vreg next-vreg 2dup ] 2dip unboxer>> ##unbox-long-long, 2array
     int-rep long-long-on-stack? long-long-odd-register? 3array
-    int-rep long-long-on-stack? f 3array 2array ;
+    int-rep long-long-on-stack? f 3array 2array record-reg-reps ;
 
-M: struct-c-type unbox ( src c-type -- vregs reps )
+M: struct-c-type unbox
     [ ^^unbox-any-c-ptr ] dip explode-struct ;
 
 : frob-struct ( c-type -- c-type )

@@ -4,55 +4,52 @@
 
 	<t:atom t:href="$planet/feed.xml">[ planet-factor ]</t:atom>
 
-	<t:title>[ planet-factor ]</t:title>
+    <div class="posts">
 
-	<table width="100%" cellpadding="10">
-		<tr>
-			<td>
+	    <t:title>[ planet-factor ]</t:title>
 
-				<t:bind-each t:name="postings">
+        <t:bind-each t:name="postings">
 
-					<h2 class="posting-title">
-						<t:a t:value="url"><t:label t:name="title" /></t:a>
-					</h2>
+            <h2 class="posting-title">
+                <t:a t:value="url"><t:label t:name="title" /></t:a>
+            </h2>
 
-					<p class="posting-body">
-						<t:html t:name="description" />
-					</p>
+            <div class="posting-body">
+                <t:html t:name="description" />
+            </div>
 
-					<p class="posting-date">
-						<t:a t:value="url"><t:label t:name="date" /></t:a>
-					</p>
+            <p class="posting-date">
+                <t:a t:value="url"><t:label t:name="date" /></t:a>
+            </p>
 
-				</t:bind-each>
+        </t:bind-each>
 
-			</td>
+    </div>
 
-			<td valign="top" width="25%" class="infobox">
+    <div class="infobox">
 
-				<h2>Blogroll</h2>
+        <h2>Blogroll</h2>
 
-				<ul>
-					<t:each t:name="blogroll">
-						<li>
-							<t:link t:name="value"/>
-						</li>
-					</t:each>
-				</ul>
+        <ul>
+            <t:each t:name="blogroll">
+                <li>
+                    <t:link t:name="value"/>
+                </li>
+            </t:each>
+        </ul>
 
-				<hr/>
+        <hr size="1" />
 
-				<p>
-				    <strong>planet-factor</strong> is an Atom/RSS aggregator that collects the
-				    contents of <a href="http://factorcode.org/">Factor</a>-related blogs. It is inspired by
-				    <a href="http://planet.lisp.org">Planet Lisp</a>.
-				</p>
-				<p>
-				    <img src="http://planet.factorcode.org/icons/feed-icon-14x14.png" />
-				    <t:a t:href="$planet/feed.xml">Syndicate</t:a>
-				</p>
-			</td>
-		</tr>
-	</table>
+        <p>
+            <strong>planet-factor</strong> is an Atom/RSS aggregator that collects the
+            contents of <a href="https://factorcode.org/">Factor</a>-related blogs. It is inspired by
+            <a href="https://planet.lisp.org">Planet Lisp</a>.
+        </p>
+        <p>
+            <img src="icons/feed-icon-14x14.png" />
+            <t:a t:href="$planet/feed.xml">Syndicate</t:a>
+        </p>
+
+	</div>
 
 </t:chloe>

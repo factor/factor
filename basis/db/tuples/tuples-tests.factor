@@ -1,10 +1,9 @@
 ! Copyright (C) 2008 Doug Coleman.
 ! Copyright (C) 2018 Alexander Ilin.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors calendar calendar.parser classes continuations
-db.tester db.tuples db.types kernel math math.intervals math.ranges
+db.tester db.tuples db.types kernel math math.intervals ranges
 namespaces random sequences sorting strings tools.test urls ;
-FROM: math.ranges => [a,b] ;
 IN: db.tuples.tests
 
 TUPLE: person the-id the-name the-number the-real
@@ -104,7 +103,7 @@ SYMBOL: person4
             T{ duration f 0 0 0 12 34 56 }
             f
             H{ { 1 2 } { 3 4 } { 5 "lol" } }
-            URL" http://www.google.com/search?hl=en&q=trailer+park+boys&btnG=Google+Search"
+            URL" https://www.google.com/search?hl=en&q=trailer+park+boys&btnG=Google+Search"
         }
     ] [ T{ person f 4 } select-tuple ] unit-test
 
@@ -123,7 +122,7 @@ SYMBOL: person4
     "2008-11-22 00:00:00" ymdhms>timestamp
     "12:34:56" hms>duration
     f H{ { 1 2 } { 3 4 } { 5 "lol" } }
-    URL" http://www.google.com/search?hl=en&q=trailer+park+boys&btnG=Google+Search" ;
+    URL" https://www.google.com/search?hl=en&q=trailer+park+boys&btnG=Google+Search" ;
 
 : db-assigned-person-schema ( -- )
     person "PERSON"
@@ -305,7 +304,7 @@ TUPLE: exam id name score ;
 
 : random-exam ( -- exam )
         f
-        6 [ CHAR: a CHAR: z [a,b] random ] replicate >string
+        6 [ CHAR: a CHAR: z [a..b] random ] replicate >string
         100 random
     exam boa ;
 
@@ -681,7 +680,7 @@ select-me "select_me"
     [ { "test" "test2" } ] [
         select-me new NULL >>data [ "test" >>data ] update-tuples
         select-me new [ data>> ] collector [ each-tuple ] dip
-        natural-sort
+        sort
     ] unit-test
 
     [ { "test1" "test2" } ] [
@@ -689,7 +688,13 @@ select-me "select_me"
             dup data>> "test" = [ "test1" >>data ] [ drop f ] if
         ] update-tuples
         select-me new [ data>> ] collector [ each-tuple ] dip
-        natural-sort
+        sort
+    ] unit-test
+
+    [ { "test2" } ] [
+        select-me new [ data>> "test1" = ] reject-tuples
+        select-me new [ data>> ] collector [ each-tuple ] dip
+        sort
     ] unit-test ;
 
 [ test-mapping ] test-sqlite

@@ -1,6 +1,6 @@
 ! Copyright (C) 2007, 2010 Doug Coleman, Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
-USING: accessors assocs continuations init kernel namespaces
+! See https://factorcode.org/license.txt for BSD license.
+USING: accessors assocs continuations kernel namespaces
 sequences sets ;
 IN: destructors
 
@@ -37,10 +37,16 @@ ERROR: already-disposed disposable ;
 : check-disposed ( disposable -- disposable )
     dup disposed>> [ already-disposed ] when ; inline
 
-GENERIC: dispose ( disposable -- )
+: if-disposed ( ..a disposable quot1: ( ..a -- ..b ) quot2: ( ..a disposable -- ..b ) -- ..b )
+    [ dup disposed>> ] [ [ drop ] prepose ] [ ] tri* if ; inline
 
-: unless-disposed ( disposable quot -- )
-    [ dup disposed>> [ drop ] ] dip if ; inline
+: when-disposed ( ..a disposable quot1: ( ..a -- ..b ) quot2: ( ..a disposable -- ..b ) -- ..b )
+    [ ] if-disposed ; inline
+
+: unless-disposed ( ... disposable quot: ( ... disposable -- ... ) -- ... )
+    [ ] swap if-disposed ; inline
+
+GENERIC: dispose ( disposable -- )
 
 M: object dispose [ t >>disposed dispose* ] unless-disposed ;
 
@@ -59,7 +65,7 @@ M: disposable dispose
     [ last rethrow ] unless-empty ;
 
 : with-disposal ( object quot -- )
-    over [ dispose ] curry [ ] cleanup ; inline
+    over [ dispose ] curry finally ; inline
 
 <PRIVATE
 
@@ -90,13 +96,13 @@ PRIVATE>
         cleanup
     ] with-variables ; inline
 
-[
+STARTUP-HOOK: [
     HS{ } clone disposables set-global
     V{ } clone always-destructors set-global
     V{ } clone error-destructors set-global
-] "destructors" add-startup-hook
+]
 
-[
+SHUTDOWN-HOOK: [
     do-always-destructors
     do-error-destructors
-] "destructors" add-shutdown-hook
+]

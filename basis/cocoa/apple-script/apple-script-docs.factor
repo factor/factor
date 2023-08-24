@@ -1,6 +1,9 @@
 USING: help.markup help.syntax strings ;
-
 IN: cocoa.apple-script
+
+HELP: quote-apple-script
+{ $values { "str" string } { "str'" string } }
+{ $description "Escape special characters in a string to make it suitable as a literal string in AppleScript code." } ;
 
 HELP: run-apple-script
 { $values { "str" string } }

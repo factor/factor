@@ -1,18 +1,18 @@
-USING: arrays help.markup help.syntax math kernel sequences ;
+USING: help.markup help.syntax sequences ;
 IN: source-files.errors
 
 HELP: error-type-holder
 { $description "A definition of a class of errors"
   $nl
   "Instances contain the following slots:"
-  { $table
-    { { $slot "type" } { "symbol representing the error type." } }
-    { { $slot "word" } { "name of the word that lists all errors of this error type." } }
-    { { $slot "plural" } { "pluralized description of this error type." } }
-    { { $slot "icon" } { "path to an icon image representing this error type." } }
-    { { $slot "quot" } { "quotation that produces a list of all errors of this type." } }
-    { { $slot "forget-quot" } { "a quotation that removes errors of this type for a given word." } }
-    { { $slot "fatal?" } { "whether the error is fatal or not. default " { $link t } "." } }
+  { $slots
+    { "type" { "symbol representing the error type." } }
+    { "word" { "name of the word that lists all errors of this error type." } }
+    { "plural" { "pluralized description of this error type." } }
+    { "icon" { "path to an icon image representing this error type." } }
+    { "quot" { "quotation that produces a list of all errors of this type." } }
+    { "forget-quot" { "a quotation that removes errors of this type for a given word." } }
+    { "fatal?" { "whether the error is fatal or not. default " { $link t } "." } }
   }
 } ;
 

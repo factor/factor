@@ -1,5 +1,5 @@
 USING: kernel literals math math.constants math.functions math.libm
-math.order math.ranges math.private sequences tools.test math.floats.env ;
+math.order ranges math.private sequences tools.test math.floats.env ;
 
 IN: math.functions.tests
 
@@ -38,7 +38,7 @@ IN: math.functions.tests
 { 0 } [ 0 3.0 ^ ] unit-test
 { 0 } [ 0 3 ^ ] unit-test
 
-: factorial ( n -- n! ) [ 1 ] [ [1,b] 1 [ * ] reduce ] if-zero ;
+: factorial ( n -- n! ) [ 1 ] [ [1..b] 1 [ * ] reduce ] if-zero ;
 
 { 0.0 0 } [ 0 frexp ] unit-test
 { 0.5 1 } [ 1 frexp ] unit-test
@@ -95,6 +95,28 @@ CONSTANT: log10-factorial-1000 0x1.40f3593ed6f8ep11
 
 { e 1.e-10 } [ 1 e^ ] unit-test~
 { 1.0 1.e-10 } [ -1 e^ e * ] unit-test~
+
+{ 0.0 } [ 0.0 e^-1 ] unit-test
+{ -0.0 } [ -0.0 e^-1 ] unit-test
+{ 1/0. } [ 1/0. e^-1 ] unit-test
+{ -1.0 } [ -1/0. e^-1 ] unit-test
+{ -1.0 } [ -1/0. e^-1 ] unit-test
+{ t } [ NAN: 8000000000000 dup e^-1 [ fp-nan-payload ] same? ] unit-test
+{ 5e-324 } [ 5e-324 e^-1 ] unit-test
+{ 1e-20 } [ 1e-20 e^-1 ] unit-test
+{ -5e-324 } [ -5e-324 e^-1 ] unit-test
+{ -1e-20 } [ -1e-20 e^-1 ] unit-test
+{ 1.0000000000500000e-10 } [ 1e-10 e^-1 ] unit-test
+{ 22025.465794806718 } [ 10.0 e^-1 ] unit-test
+{ -9.999999999500001e-11 } [ -1e-10 e^-1 ] unit-test
+{ -0.9999546000702375 } [ -10.0 e^-1 ] unit-test
+{ -1.0 } [ -38.0 e^-1 ] unit-test
+{ -1.0 } [ -1e50 e^-1 ] unit-test
+{ 1.9424263952412558e+130 } [ 300 e^-1 ] unit-test
+{ 1.7976931346824240e+308 } [ 709.78271289328393 e^-1 ] unit-test
+{ 1/0. } [ 1000.0 e^-1 ] unit-test
+{ 1/0. } [ 1e50 e^-1 ] unit-test
+{ 1/0. } [ 1.79e308 e^-1 ] unit-test
 
 { 1.0 } [ 0 cosh ] unit-test
 { 1.0 } [ 0.0 cosh ] unit-test
@@ -268,6 +290,7 @@ CONSTANT: log10-factorial-1000 0x1.40f3593ed6f8ep11
 { t } [ 3 15 roots [ 15 ^ 3 .01 ~ ] all? ] unit-test
 
 { .5 } [ 0 sigmoid ] unit-test
+{ t } [ 0 [ sigmoid logit ] keep .000001 ~ ] unit-test
 
 { 1 } [ 12 signum ] unit-test
 { -1 } [ -5.0 signum ] unit-test

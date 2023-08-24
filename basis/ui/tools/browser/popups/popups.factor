@@ -1,6 +1,6 @@
 ! Copyright (C) 2009 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays assocs definitions.icons fry help
+! See https://factorcode.org/license.txt for BSD license.
+USING: accessors arrays assocs definitions.icons help
 help.topics kernel math.rectangles models.arrow namespaces
 sequences tools.crossref ui.gadgets ui.gadgets.glass
 ui.gadgets.labeled ui.gadgets.search-tables ui.gadgets.tables
@@ -20,8 +20,7 @@ TUPLE: links-popup < wrapper ;
 
 : <links-table> ( model quot -- table )
     '[
-        @ sort-articles
-        [ dup article-title ] { } map>assoc
+        @ sort-articles [ article-title ] zip-with
     ] <arrow> link-renderer [ second ] <search-table> dup table>>
         [ invoke-primary-operation ] >>action
         [ hide-glass ] >>hook

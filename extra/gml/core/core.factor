@@ -1,5 +1,5 @@
 ! Copyright (C) 2010 Slava Pestov.
-USING: gml.types gml.printer gml.runtime math math.ranges
+USING: gml.types gml.printer gml.runtime math ranges
 continuations combinators arrays kernel vectors accessors
 prettyprint fry sequences assocs locals hashtables grouping
 sorting models ;
@@ -70,11 +70,11 @@ GML: flatten ( array -- flatarray )
     [ dup array? [ 1array ] unless ] map concat ;
 GML: reverse ( array -- reversed ) reverse ;
 GML: slice ( array n k -- slice )
-    [a,b) swap '[ _ wrap nth ] map ;
+    [a..b) swap '[ _ wrap nth ] map ;
 GML:: subarray ( array n k -- slice )
     k n k + array subseq ;
 GML: sort-number-permutation ( array -- permutation )
-    zip-index sort-keys reverse values ;
+    zip-index sort-keys <reversed> values ;
 
 ! Dictionaries
 ERROR: not-a-dict object ;

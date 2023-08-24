@@ -1,5 +1,4 @@
-USING: assocs hashtables.private help.markup help.syntax kernel
-sequences ;
+USING: assocs help.markup help.syntax kernel hashtables.private ;
 IN: hashtables
 
 ARTICLE: "hashtables.private" "Hashtable implementation details"
@@ -119,8 +118,8 @@ HELP: associate
 
 HELP: ?set-at
 { $values
-     { "value" object } { "key" object } { "assoc/f" "an assoc or " { $link f } }
-     { "assoc" assoc } }
+    { "value" object } { "key" object } { "assoc/f" "an assoc or " { $link f } }
+    { "assoc" assoc } }
 { $description "If the third input is an assoc, stores the key/value pair into that assoc, or else creates a new hashtable with the key/value pair as its only entry." } ;
 
 HELP: >hashtable

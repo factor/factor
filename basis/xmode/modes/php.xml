@@ -2,7 +2,9 @@
 
 <!DOCTYPE MODE SYSTEM "xmode.dtd">
 
-<!-- Catalog entry:
+<!--
+ * :tabSize=8:indentSize=8:noTabs=false:
+ * :folding=explicit:collapseFolds=1:Catalog entry:
 <MODE NAME="php" FILE="php.xml"
 				FILE_NAME_GLOB="*.{php3,php4,php5,php,phtml}"
 				FIRST_LINE_GLOB="&lt;?php*" />
@@ -51,8 +53,8 @@ TODO:
 		<!-- Auto indent -->
 		<PROPERTY NAME="indentOpenBrackets" VALUE="{" />
 		<PROPERTY NAME="indentCloseBrackets" VALUE="}" />
-		<PROPERTY NAME="unalignedOpenBrackets" VALUE="(" />
-		<PROPERTY NAME="unalignedCloseBrackets" VALUE=")" />
+		<PROPERTY NAME="unalignedOpenBrackets" VALUE="([" />
+		<PROPERTY NAME="unalignedCloseBrackets" VALUE=")]" />
 		<PROPERTY NAME="indentNextLine"
 			VALUE="\s*(((if|while|else\s*(if)?|for(each)?|switch|declare)\s*\(.*\)[^{:;]*)|(do\s*[^\({:;]*))" />
 		<PROPERTY NAME="lineUpClosingBracket" VALUE="true" /><!-- @deprecated since 4.3pre2 -->
@@ -141,10 +143,17 @@ TODO:
 			<END>;</END>
 		</SPAN>
 	</RULES>
-
-
+	
+	<!--{{{ rule TAGS -->
 	<!-- HTML tags (from MAIN rule) -->
 	<RULES SET="TAGS" DEFAULT="MARKUP" ESCAPE="\">
+		<PROPS>
+			<!-- comment props for "HTML"/not-PHP: -->
+			<PROPERTY NAME="commentStart" VALUE="&lt;!--" />
+			<PROPERTY NAME="commentEnd" VALUE="--&gt;" />
+			<PROPERTY NAME="lineComment" VALUE="" />
+		</PROPS>
+
 		<SEQ TYPE="MARKUP" DELEGATE="MAIN">&gt;</SEQ><!-- from SEQ_REGEXP delegate -->
 
 		<IMPORT DELEGATE="TO_LITERAL+PHP" />
@@ -152,15 +161,18 @@ TODO:
 		<IMPORT DELEGATE="INVALID_LT" />
 		<IMPORT DELEGATE="html::TAGS" />
 	</RULES>
+	<!--}}}-->
 
-
+	<!--{{{ rule CSS_OPENTAG -->
 	<!-- CSS where PHP code may be injected -->
 	<RULES SET="CSS_OPENTAG" DEFAULT="MARKUP">
 		<SEQ TYPE="MARKUP" DELEGATE="CSS">&gt;</SEQ>
 
 		<IMPORT DELEGATE="TO_LITERAL+PHP"/>
 	</RULES>
+	<!--}}}-->
 
+	<!--{{{ rule CSS -->
 	<RULES SET="CSS" DEFAULT="MARKUP">
 		<!-- CSS has no line comment: -->
 		<PROPS>
@@ -174,20 +186,27 @@ TODO:
 		<IMPORT DELEGATE="TO_PHP"/>
 		<IMPORT DELEGATE="css::MAIN"/>
 	</RULES>
+	<!--}}}-->
 
-
+	<!--{{{ rule OBJECT_PHP -->
 	<!-- Helper for class references in rule PHP -->
 	<RULES SET="OBJECT_PHP" DEFAULT="KEYWORD4" ESCAPE="\"> <!-- TODO: ESCAPE should not be needed, see http://sourceforge.net/tracker/index.php?func=detail&aid=1600458&group_id=588&atid=100588 -->
-		<SPAN TYPE="OPERATOR" DELEGATE="PHP">
+		<SPAN TYPE="OPERATOR" DELEGATE="PHP_EXPRESSION">
 			<BEGIN>[</BEGIN>
 			<END>]</END>
 		</SPAN>
 
-		<!-- Keep brackets together and handle the expression therein with "PHP" -->
-		<SPAN TYPE="OPERATOR" DELEGATE="PHP">
+		<!-- Keep brackets together and handle the expression therein with "PHP_EXPRESSION" -->
+		<SPAN TYPE="OPERATOR" DELEGATE="PHP_EXPRESSION">
 			<BEGIN>(</BEGIN>
 			<END>)</END>
 		</SPAN>
+
+		<!-- Delegate expressions methods/members, e.g. $a->{'bar-'.substr($b,1)}: -->
+		<SPAN_REGEXP HASH_CHAR="-&gt;" TYPE="KEYWORD4" DELEGATE="PHP_EXPRESSION">
+			<BEGIN>-&gt;\s*\{</BEGIN>
+			<END>}</END>
+		</SPAN_REGEXP>
 
 		<!-- Recurse methods: -->
 		<SEQ_REGEXP HASH_CHAR="-&gt;" TYPE="FUNCTION" DELEGATE="OBJECT_PHP">-&gt;\s*\w+\s*(?=\()</SEQ_REGEXP>
@@ -195,112 +214,191 @@ TODO:
 		<!-- Recurse members: -->
 		<SEQ_REGEXP TYPE="KEYWORD4" HASH_CHAR="-&gt;" DELEGATE="OBJECT_PHP">-&gt;\w*</SEQ_REGEXP>
 
-		<!-- Operators delegate back to PHP {{{ -->
-		<SEQ DELEGATE="PHP"> </SEQ>
-		<SEQ TYPE="OPERATOR" DELEGATE="PHP">!</SEQ>
-		<SEQ TYPE="OPERATOR" DELEGATE="PHP">%</SEQ>
-		<SEQ TYPE="OPERATOR" DELEGATE="PHP">&amp;</SEQ>
-		<SEQ TYPE="OPERATOR" DELEGATE="PHP">&gt;</SEQ>
-		<SEQ TYPE="OPERATOR" DELEGATE="PHP">&lt;</SEQ>
-		<SEQ TYPE="OPERATOR" DELEGATE="PHP">*</SEQ>
-		<SEQ TYPE="OPERATOR" DELEGATE="PHP">+</SEQ>
-		<SEQ TYPE="OPERATOR" DELEGATE="PHP">,</SEQ>
-		<SEQ TYPE="OPERATOR" DELEGATE="PHP">-</SEQ><!-- "->" gets handled before -->
-		<SEQ TYPE="OPERATOR" DELEGATE="PHP">.</SEQ>
-		<SEQ_REGEXP HASH_CHAR="/" TYPE="OPERATOR" DELEGATE="PHP">/(?!/)</SEQ_REGEXP>
-		<SEQ_REGEXP HASH_CHAR=":" TYPE="OPERATOR" DELEGATE="PHP">:(?!:)</SEQ_REGEXP><!-- not "::" -->
-		<SEQ TYPE="OPERATOR" DELEGATE="PHP">;</SEQ>
-		<SEQ TYPE="OPERATOR" DELEGATE="PHP">=</SEQ>
-		<SEQ TYPE="OPERATOR" DELEGATE="PHP">?</SEQ>
-		<SEQ TYPE="OPERATOR" DELEGATE="PHP">@</SEQ>
-		<SEQ TYPE="OPERATOR" DELEGATE="PHP">[</SEQ>
-		<SEQ TYPE="OPERATOR" DELEGATE="PHP">]</SEQ>
-		<SEQ TYPE="OPERATOR" DELEGATE="PHP">^</SEQ>
-		<SEQ TYPE="OPERATOR" DELEGATE="PHP">`</SEQ>
-		<SEQ TYPE="OPERATOR" DELEGATE="PHP">{</SEQ>
-		<SEQ TYPE="OPERATOR" DELEGATE="PHP">|</SEQ>
-		<SEQ TYPE="OPERATOR" DELEGATE="PHP">}</SEQ>
-		<SEQ TYPE="OPERATOR" DELEGATE="PHP">~</SEQ>
-		<!-- }}} -->
-
-		<IMPORT DELEGATE="PHP" />
-		<IMPORT DELEGATE="PHP_VAR" />
-		<IMPORT DELEGATE="PHP_KEYWORDS" />
-	</RULES>
-
-
-	<!-- PHP literal where variables get parsed -->
-	<RULES SET="PHP_LITERAL2" DEFAULT="LITERAL2" ESCAPE="\">
-		<SPAN_REGEXP HASH_CHAR="{" TYPE="LITERAL2" DELEGATE="OBJECT_PHP">
-			<BEGIN>\{(?=\$)</BEGIN>
-			<END>}</END>
-		</SPAN_REGEXP>
-		<IMPORT DELEGATE="PHP_VAR" />
-	</RULES>
-
-
-	<!-- PHP literal in backticks, where variables get parsed; see PHP_LITERAL2 -->
-	<RULES SET="PHP_LITERAL3" DEFAULT="LITERAL3" ESCAPE="\">
-		<SPAN_REGEXP HASH_CHAR="{" TYPE="LITERAL3" DELEGATE="OBJECT_PHP">
-			<BEGIN>\{(?=\$)</BEGIN>
-			<END>}</END>
-		</SPAN_REGEXP>
-		<IMPORT DELEGATE="PHP_VAR" />
-	</RULES>
-
-
-	<!-- PHP heredoc blocks, where variables get parsed; see PHP_LITERAL2 -->
-	<RULES SET="PHP_LITERAL4" DEFAULT="LITERAL4" ESCAPE="\">
-		<SPAN_REGEXP HASH_CHAR="{" TYPE="LITERAL4" DELEGATE="OBJECT_PHP">
-			<BEGIN>\{(?=\$)</BEGIN>
-			<END>}</END>
-		</SPAN_REGEXP>
-		<IMPORT DELEGATE="PHP_VAR" />
-	</RULES>
-
-
-	<!-- Helper for class / interface definition -->
-	<RULES SET="DEF_CLASS" DEFAULT="KEYWORD4">
-		<SEQ TYPE="OPERATOR" DELEGATE="PHP">{</SEQ>
-
-		<!-- TODO: redundant comments {{{ -->
-		<!-- Silly comment -->
-		<SEQ TYPE="COMMENT1">/**/</SEQ>
-
-		<!-- PHPdoc comment -->
-		<SPAN TYPE="COMMENT3" DELEGATE="PHPDOC">
-			<BEGIN>/**</BEGIN>
-			<END>*/</END>
-		</SPAN>
-
+		<!-- Handle comments (without phpdoc, which makes no sense here) -->
 		<SPAN TYPE="COMMENT1">
 			<BEGIN>/*</BEGIN>
 			<END>*/</END>
 		</SPAN>
-
 		<EOL_SPAN TYPE="COMMENT2">//</EOL_SPAN>
 		<EOL_SPAN TYPE="COMMENT4">#</EOL_SPAN>
-		<!-- redundant }}} -->
+
+		<!-- Operators delegate back to PHP_EXPRESSION {{{ -->
+		<SEQ_REGEXP DELEGATE="PHP_EXPRESSION">\s</SEQ_REGEXP>
+		<SEQ TYPE="OPERATOR" DELEGATE="PHP_EXPRESSION">!</SEQ>
+		<SEQ TYPE="OPERATOR" DELEGATE="PHP_EXPRESSION">%</SEQ>
+		<SEQ TYPE="OPERATOR" DELEGATE="PHP_EXPRESSION">&amp;</SEQ>
+		<SEQ TYPE="OPERATOR" DELEGATE="PHP_EXPRESSION">&gt;</SEQ>
+		<SEQ TYPE="OPERATOR" DELEGATE="PHP_EXPRESSION">&lt;</SEQ>
+		<SEQ TYPE="OPERATOR" DELEGATE="PHP_EXPRESSION">*</SEQ>
+		<SEQ TYPE="OPERATOR" DELEGATE="PHP_EXPRESSION">/</SEQ>
+		<SEQ TYPE="OPERATOR" DELEGATE="PHP_EXPRESSION">+</SEQ>
+		<SEQ TYPE="OPERATOR" DELEGATE="PHP_EXPRESSION">,</SEQ>
+		<SEQ TYPE="OPERATOR" DELEGATE="PHP_EXPRESSION">-</SEQ><!-- "->" gets handled before -->
+		<SEQ TYPE="OPERATOR" DELEGATE="PHP_EXPRESSION">.</SEQ>
+		<SEQ_REGEXP HASH_CHAR="/" TYPE="OPERATOR" DELEGATE="PHP_EXPRESSION">/(?!/)</SEQ_REGEXP>
+		<SEQ_REGEXP HASH_CHAR=":" TYPE="OPERATOR" DELEGATE="PHP_EXPRESSION">:(?!:)</SEQ_REGEXP><!-- not "::" -->
+		<SEQ TYPE="OPERATOR" DELEGATE="PHP">;</SEQ>
+		<SEQ TYPE="OPERATOR" DELEGATE="PHP_EXPRESSION">=</SEQ>
+		<SEQ TYPE="OPERATOR" DELEGATE="PHP_EXPRESSION">?</SEQ>
+		<SEQ TYPE="OPERATOR" DELEGATE="PHP_EXPRESSION">@</SEQ>
+		<SEQ TYPE="OPERATOR" DELEGATE="PHP_EXPRESSION">[</SEQ>
+		<SEQ TYPE="OPERATOR" DELEGATE="PHP_EXPRESSION">]</SEQ>
+		<SEQ TYPE="OPERATOR" DELEGATE="PHP_EXPRESSION">^</SEQ>
+		<SEQ TYPE="OPERATOR" DELEGATE="PHP_EXPRESSION">`</SEQ>
+		<SEQ TYPE="OPERATOR" DELEGATE="PHP_EXPRESSION">{</SEQ>
+		<SEQ TYPE="OPERATOR" DELEGATE="PHP_EXPRESSION">|</SEQ>
+		<SEQ TYPE="OPERATOR" DELEGATE="PHP_EXPRESSION">}</SEQ>
+		<SEQ TYPE="OPERATOR" DELEGATE="PHP_EXPRESSION">~</SEQ>
+		<SEQ TYPE="OPERATOR" DELEGATE="PHP_EXPRESSION">\</SEQ>
+		<!-- }}} -->
+
+		<IMPORT DELEGATE="PHP_EXPRESSION" />
+		<IMPORT DELEGATE="PHP_VAR" />
+		<IMPORT DELEGATE="PHP_KEYWORDS" />
+	</RULES>
+	<!--}}}-->
+
+	<!--{{{ rule PHP_LITERAL2 -->
+	<!-- PHP literal where variables get parsed -->
+	<RULES SET="PHP_LITERAL2" DEFAULT="LITERAL2" ESCAPE="\">
+		<!-- expressions in curly braces ("{$foo}") -->
+		<SPAN_REGEXP HASH_CHAR="{" TYPE="LITERAL2" DELEGATE="OBJECT_PHP">
+			<BEGIN>\{(?=\$)</BEGIN>
+			<END>}</END>
+		</SPAN_REGEXP>
+
+		<!-- Vars like "${foo}" (does not work for objects/methods) -->
+		<SEQ_REGEXP HASH_CHAR="$" TYPE="KEYWORD3">[\$]+\{[a-zA-Z_\x7f-\xff][a-zA-Z0-9_\x7f-\xff]*\}</SEQ_REGEXP>
+
+		<IMPORT DELEGATE="PHP_VAR" />
+	</RULES>
+	<!--}}}-->
+
+	<!--{{{ rule PHP_LITERAL3 -->
+	<!-- PHP literal in backticks, where variables get parsed; based on PHP_LITERAL2 -->
+	<RULES SET="PHP_LITERAL3" DEFAULT="LITERAL3" ESCAPE="\">
+		<!-- expressions in curly braces ("{$foo}") -->
+		<SPAN_REGEXP HASH_CHAR="{" TYPE="LITERAL3" DELEGATE="OBJECT_PHP">
+			<BEGIN>\{(?=\$)</BEGIN>
+			<END>}</END>
+		</SPAN_REGEXP>
+
+		<!-- Vars like "${foo}" (does not work for objects/methods) -->
+		<SEQ_REGEXP HASH_CHAR="$" TYPE="KEYWORD3">[\$]+\{[a-zA-Z_\x7f-\xff][a-zA-Z0-9_\x7f-\xff]*\}</SEQ_REGEXP>
+
+		<IMPORT DELEGATE="PHP_VAR" />
+	</RULES>
+	<!--}}}-->
+
+	<!--{{{ rule PHP_LITERAL4 -->
+	<!-- PHP heredoc blocks, where variables get parsed; see PHP_LITERAL2 -->
+	<RULES SET="PHP_LITERAL4" DEFAULT="LITERAL4" ESCAPE="\">
+		<!-- expressions in curly braces ("{$foo}") -->
+		<SPAN_REGEXP HASH_CHAR="{" TYPE="LITERAL4" DELEGATE="OBJECT_PHP">
+			<BEGIN>\{(?=\$)</BEGIN>
+			<END>}</END>
+		</SPAN_REGEXP>
+
+		<!-- Vars like "${foo}" (does not work for objects/methods) -->
+		<SEQ_REGEXP HASH_CHAR="$" TYPE="KEYWORD3">[\$]+\{[a-zA-Z_\x7f-\xff][a-zA-Z0-9_\x7f-\xff]*\}</SEQ_REGEXP>
+
+		<IMPORT DELEGATE="PHP_VAR" />
+	</RULES>
+	<!--}}}-->
+
+	<!--{{{ rul -->
+	<!-- Helper for class / interface definition -->
+	<RULES SET="DEF_CLASS" DEFAULT="KEYWORD4">
+		<!-- back to "PHP" for curly brace, the closing one gets handled there -->
+		<SEQ TYPE="OPERATOR" DELEGATE="PHP">{</SEQ>
+		<!-- Invalid, go back: -->
+		<SEQ TYPE="INVALID" DELEGATE="PHP">;</SEQ>
+		<SEQ TYPE="INVALID" DELEGATE="PHP">=</SEQ>
+
+		<IMPORT DELEGATE="PHP_COMMENTS" />
 
 		<KEYWORDS>
 			<KEYWORD1>extends</KEYWORD1>
 			<KEYWORD1>implements</KEYWORD1>
 		</KEYWORDS>
 	</RULES>
+	<!--}}}-->
 
+	<!--{{{ rule DEF_FUNCTION -->
+	<!-- Function definition -->
+	<RULES SET="DEF_FUNCTION" DEFAULT="FUNCTION">
+		<!-- Invalid, go back: -->
+		<SEQ TYPE="INVALID" DELEGATE="PHP">;</SEQ>
 
-	<!-- PHP variables (PHPDOC_VAR for phpdoc blocks) -->
-	<RULES SET="PHP_VAR">
-		<!-- (Class-)Variables -->
-		<SEQ_REGEXP HASH_CHAR="$" TYPE="KEYWORD4">\$\w+(?=\s*=\s*(&amp;\s*)?new)</SEQ_REGEXP>
+		<SEQ TYPE="OPERATOR">&amp;</SEQ><!-- return by reference -->
+		<SEQ TYPE="OPERATOR" DELEGATE="DEF_FUNCTION_ARGS">(</SEQ>
 
-		<!-- Normal variables -->
-		<MARK_FOLLOWING TYPE="KEYWORD3">$</MARK_FOLLOWING>
+		<IMPORT DELEGATE="PHP_COMMENTS" />
 	</RULES>
+	<!--}}}-->
 
+	<!--{{{ rule DEF_FUNCTION_ARGS -->
+	<!-- Arguments of a function definition -->
+	<RULES SET="DEF_FUNCTION_ARGS" DEFAULT="KEYWORD4">
+		<!-- back to "PHP" for closing bracket: -->
+		<SEQ TYPE="OPERATOR" DELEGATE="PHP">)</SEQ>
 
-	<RULES SET="PHP" ESCAPE="\" HIGHLIGHT_DIGITS="TRUE" DIGIT_RE="(0x[0-9a-f]+|([0-9]*\.)?[0-9]+(e[+-]?[0-9]+)?)">
-		<!-- Silly comment -->
+		<SEQ TYPE="OPERATOR" DELEGATE="DEF_FUNCTION_ARGS_VALUE">=</SEQ>
+		<SEQ TYPE="OPERATOR">,</SEQ>
+
+		<IMPORT DELEGATE="PHP_VAR" />
+		<IMPORT DELEGATE="PHP_COMMENTS" />
+		<IMPORT DELEGATE="PHP_TYPES" />
+	</RULES>
+	<!--}}}-->
+
+	<!--{{{ rule DEF_FUNCTION_ARGS_VALUE -->
+	<!-- Default values of a function argument -->
+	<RULES SET="DEF_FUNCTION_ARGS_VALUE" HIGHLIGHT_DIGITS="TRUE" DIGIT_RE="(0x[0-9a-f]+|([0-9]*\.)?[0-9]+(e[+-]?[0-9]+)?)">
+		<!-- Literals, without var substitution: -->
+		<SPAN TYPE="LITERAL1" ESCAPE="\">
+			<BEGIN>'</BEGIN>
+			<END>'</END>
+		</SPAN>
+		<SPAN TYPE="LITERAL1">
+			<BEGIN>"</BEGIN>
+			<END>"</END>
+		</SPAN>
+
+		<SPAN_REGEXP HASH_CHAR="array" TYPE="KEYWORD4" DELEGATE="DEF_FUNCTION_ARGS_VALUE_ARRAY">
+			<BEGIN>array\s*\(</BEGIN>
+			<END>)</END>
+		</SPAN_REGEXP>
+		<SEQ TYPE="KEYWORD4">null</SEQ>
+
+		<SEQ TYPE="OPERATOR" DELEGATE="DEF_FUNCTION_ARGS">,</SEQ>
+		<SEQ TYPE="OPERATOR" DELEGATE="PHP">)</SEQ>
+
+		<IMPORT DELEGATE="PHP_COMMENTS" />
+		<IMPORT DELEGATE="PHP_BASIC_KEYWORD1" />
+	</RULES>
+	<!--}}}-->
+
+	<!--{{{ rule DEF_FUNCTION_ARGS_VALUE_ARRAY -->
+	<!-- Body of "array(...)" in function argument default values -->
+	<RULES SET="DEF_FUNCTION_ARGS_VALUE_ARRAY" HIGHLIGHT_DIGITS="TRUE" DIGIT_RE="(0x[0-9a-f]+|([0-9]*\.)?[0-9]+(e[+-]?[0-9]+)?)">
+		<!-- Literals, without var substitution: -->
+		<SPAN TYPE="LITERAL1" ESCAPE="\">
+			<BEGIN>'</BEGIN>
+			<END>'</END>
+		</SPAN>
+		<SPAN TYPE="LITERAL1">
+			<BEGIN>"</BEGIN>
+			<END>"</END>
+		</SPAN>
+		<SEQ TYPE="OPERATOR">,</SEQ>
+	</RULES>
+	<!--}}}-->
+
+	<!--{{{ rule PHP_COMMENTS -->
+	<!-- Comments in PHP -->
+	<RULES SET="PHP_COMMENTS">
+		<!-- special case -->
 		<SEQ TYPE="COMMENT1">/**/</SEQ>
 
 		<!-- PHPdoc comment -->
@@ -309,12 +407,68 @@ TODO:
 			<END>*/</END>
 		</SPAN>
 
+		<!-- range comment -->
 		<SPAN TYPE="COMMENT1">
 			<BEGIN>/*</BEGIN>
 			<END>*/</END>
 		</SPAN>
 
-		<SPAN TYPE="LITERAL1">
+		<!-- line comments -->
+		<EOL_SPAN TYPE="COMMENT2">//</EOL_SPAN>
+		<EOL_SPAN TYPE="COMMENT4">#</EOL_SPAN>
+	</RULES>
+	<!--}}}-->
+
+	<!--{{{ rule PHP_VAR -->
+	<!-- PHP variables (PHPDOC_VAR for phpdoc blocks) -->
+	<RULES SET="PHP_VAR">
+
+		<!-- Normal variables -->
+		<!-- Not using MARK_FOLLOWING, which would match $foo\" completely (in PHP_LITERAL2) -->
+		<SEQ_REGEXP HASH_CHAR="$" TYPE="KEYWORD3">[\$]+[a-zA-Z_\x7f-\xff][a-zA-Z0-9_\x7f-\xff]*</SEQ_REGEXP>
+	</RULES>
+	<!--}}}-->
+
+	<!--{{{ rule PHP -->
+	<RULES SET="PHP" ESCAPE="\" HIGHLIGHT_DIGITS="TRUE" DIGIT_RE="(0x[0-9a-f]+|([0-9]*\.)?[0-9]+(e[+-]?[0-9]+)?)">
+		<!-- Class definitions.
+		     This uses SEQ_REGEXP (instead of SPAN_*) for the keywords only,
+				 so that the curly braces can be highlighted as operator. -->
+		<SEQ_REGEXP HASH_CHARS="ci" AT_WORD_START="TRUE" DELEGATE="DEF_CLASS" TYPE="KEYWORD1">(class|interface)(\s+|$)</SEQ_REGEXP>
+
+		<SEQ_REGEXP HASH_CHAR="function" AT_WORD_START="TRUE" DELEGATE="DEF_FUNCTION" TYPE="KEYWORD1">(function)(\s+|$)</SEQ_REGEXP>
+
+		<!-- Imports: -->
+		<IMPORT DELEGATE="PHP_EXPRESSION" />
+	</RULES>
+	<!--}}}-->
+
+	<!--{{{ rule PHP_EXPRESSION -->
+	<!-- A basic PHP expression, as it can be used in $a->{EXPR} -->
+	<RULES SET="PHP_EXPRESSION" ESCAPE="\" HIGHLIGHT_DIGITS="TRUE" DIGIT_RE="(0x[0-9a-f]+|([0-9]*\.)?[0-9]+(e[+-]?[0-9]+)?)">
+		<!-- Comments: -->
+		<!-- special case -->
+		<SEQ TYPE="COMMENT1">/**/</SEQ>
+		<!-- PHPdoc comment -->
+		<SPAN TYPE="COMMENT3" DELEGATE="PHPDOC">
+			<BEGIN>/**</BEGIN>
+			<END>*/</END>
+		</SPAN>
+		<!-- range comment -->
+		<SPAN TYPE="COMMENT1">
+			<BEGIN>/*</BEGIN>
+			<END>*/</END>
+		</SPAN>
+		<!-- line comments: -->
+		<SEQ_REGEXP HASH_CHAR="//" TYPE="COMMENT2" DELEGATE="MAIN"><![CDATA[//.*?\?>]]></SEQ_REGEXP> <!-- fallback to MAIN on closing ?> inside line comment -->
+		<EOL_SPAN TYPE="COMMENT2">//</EOL_SPAN>
+		<EOL_SPAN TYPE="COMMENT4">#</EOL_SPAN>
+
+		<!-- back to MAIN for "?>" -->
+		<SEQ TYPE="MARKUP" DELEGATE="MAIN">?&gt;</SEQ>
+
+		<!-- Literals: -->
+		<SPAN TYPE="LITERAL1" ESCAPE="\">
 			<BEGIN>'</BEGIN>
 			<END>'</END>
 		</SPAN>
@@ -327,17 +481,40 @@ TODO:
 			<END>`</END>
 		</SPAN>
 
-		<EOL_SPAN TYPE="COMMENT2">//</EOL_SPAN>
-		<EOL_SPAN TYPE="COMMENT4">#</EOL_SPAN>
-
+		<!--
+		TODO: these should not highlight e.g. "(int)$bar"
+		-->
 		<MARK_PREVIOUS TYPE="FUNCTION" MATCH_TYPE="OPERATOR">(</MARK_PREVIOUS>
 		<MARK_PREVIOUS TYPE="FUNCTION" MATCH_TYPE="OPERATOR"> (</MARK_PREVIOUS>
 
+		<!-- Variable functions, e.g. $foo() -->
+		<SEQ_REGEXP HASH_CHAR="$" TYPE="FUNCTION">[\$]+[a-zA-Z_\x7f-\xff][a-zA-Z0-9_\x7f-\xff]*\s*(?=\()</SEQ_REGEXP>
+
 		<!-- Readins/Heredoc -->
 		<SPAN_REGEXP HASH_CHAR="&lt;&lt;&lt;" TYPE="LITERAL4" DELEGATE="PHP_LITERAL4">
-			<BEGIN><![CDATA[<<<[\p{Space}'"]*([\p{Alnum}_]+)[\p{Space}'"]*]]></BEGIN>
+			<BEGIN><![CDATA[<<<[\p{Space}]*("?)([\p{Alnum}_]+)\1[\p{Space}]*$]]></BEGIN>
+			<END AT_LINE_START="TRUE">$2</END>
+		</SPAN_REGEXP>
+
+		<!-- Nowdoc (http://php.net/manual/en/language.types.string.php#language.types.string.syntax.nowdoc) -->
+		<SPAN_REGEXP HASH_CHAR="&lt;&lt;&lt;" TYPE="LITERAL1">
+			<BEGIN><![CDATA[<<<[\p{Space}]*'([\p{Alnum}_]+)'[\p{Space}]*$]]></BEGIN>
 			<END AT_LINE_START="TRUE">$1</END>
 		</SPAN_REGEXP>
+
+
+		<!-- Keep blocks of curly braces (scopes) together.
+		     This is required e.g. for handling $a->{if(1){ echo 1; }}. -->
+		<!--
+		TODO: this does not work with the following and therefore is commented out (should match brackets in PHP blocks only!):
+		<?php { ?>
+		}
+		<?php } ?>
+		<SPAN TYPE="OPERATOR" DELEGATE="PHP">
+			<BEGIN>{</BEGIN>
+			<END>}</END>
+		</SPAN>
+		-->
 
 		<!-- operators -->
 		<!-- {{{ -->
@@ -346,6 +523,8 @@ TODO:
 		<SEQ TYPE="OPERATOR">&amp;</SEQ>
 		<SEQ TYPE="OPERATOR">&gt;</SEQ>
 		<SEQ TYPE="OPERATOR">&lt;</SEQ>
+
+		<!-- TODO: does not get used, because of MARK_PREVIOUS for FUNCTION below -->
 		<SEQ TYPE="OPERATOR">(array)</SEQ>
 		<SEQ TYPE="OPERATOR">(bool)</SEQ>
 		<SEQ TYPE="OPERATOR">(boolean)</SEQ>
@@ -356,6 +535,7 @@ TODO:
 		<SEQ TYPE="OPERATOR">(object)</SEQ>
 		<SEQ TYPE="OPERATOR">(real)</SEQ>
 		<SEQ TYPE="OPERATOR">(string)</SEQ>
+
 		<SEQ TYPE="OPERATOR">*</SEQ>
 		<SEQ TYPE="OPERATOR">+</SEQ>
 		<SEQ TYPE="OPERATOR">,</SEQ>
@@ -363,7 +543,7 @@ TODO:
 		<SEQ TYPE="OPERATOR">.</SEQ>
 		<SEQ TYPE="OPERATOR">/</SEQ>
 		<SEQ_REGEXP HASH_CHAR=":" TYPE="OPERATOR">:(?!:)</SEQ_REGEXP><!-- not "::" -->
-		<SEQ TYPE="OPERATOR">;</SEQ>
+		<SEQ TYPE="OPERATOR" DELEGATE="PHP">;</SEQ><!-- expression end => PHP -->
 		<SEQ TYPE="OPERATOR">=</SEQ>
 		<SEQ TYPE="OPERATOR">?</SEQ>
 		<SEQ TYPE="OPERATOR">@</SEQ>
@@ -371,33 +551,32 @@ TODO:
 		<SEQ TYPE="OPERATOR">]</SEQ>
 		<SEQ TYPE="OPERATOR">^</SEQ>
 		<SEQ TYPE="OPERATOR">`</SEQ>
-		<SEQ TYPE="OPERATOR">{</SEQ>
 		<SEQ TYPE="OPERATOR">|</SEQ>
-		<SEQ TYPE="OPERATOR">}</SEQ>
 		<SEQ TYPE="OPERATOR">~</SEQ>
 		<SEQ TYPE="OPERATOR">(</SEQ>
 		<SEQ TYPE="OPERATOR">)</SEQ>
+		<SEQ TYPE="OPERATOR">{</SEQ>
+		<SEQ TYPE="OPERATOR">}</SEQ>
 		<!-- }}} -->
 
-		<!-- Fix this variables to not start class definitions -->
-		<SEQ_REGEXP HASH_CHAR="$class" TYPE="KEYWORD3">\$class\w*</SEQ_REGEXP>
-		<SEQ_REGEXP HASH_CHAR="$interface" TYPE="KEYWORD3">\$interface\w*</SEQ_REGEXP>
-
-		<!-- Class definitions -->
-		<SEQ_REGEXP HASH_CHAR="class" AT_WORD_START="TRUE" DELEGATE="DEF_CLASS" TYPE="KEYWORD1">class(\s+|$)</SEQ_REGEXP>
-		<SEQ_REGEXP HASH_CHAR="interface" AT_WORD_START="TRUE" DELEGATE="DEF_CLASS" TYPE="KEYWORD1">interface(\s+|$)</SEQ_REGEXP>
-
-
-		<!-- to OBJECT_PHP: (Class-)Variables/Methods -->
-		<SEQ_REGEXP TYPE="KEYWORD4" HASH_CHAR="$" DELEGATE="OBJECT_PHP">\$\w+(?=(\[\$?[\s\w'"]+\])?-&gt;)</SEQ_REGEXP>
-		<MARK_PREVIOUS TYPE="KEYWORD4">::</MARK_PREVIOUS>
+		<!-- handle "new" keyword: -->
+		<SEQ_REGEXP TYPE="KEYWORD1" HASH_CHAR="new" AT_WORD_START="TRUE" DELEGATE="PHP_VAR_NEW_KW">new\s+</SEQ_REGEXP>
 
 		<!-- Imports: -->
-		<IMPORT DELEGATE="PHP_KEYWORDS" />
 		<IMPORT DELEGATE="PHP_VAR" />
+		<!-- TODO: split this, so e.g. "new", "class" etc don't show up here, but only in "PHP" -->
+		<IMPORT DELEGATE="PHP_KEYWORDS" />
 	</RULES>
+	<!--}}}-->
 
+	<!--{{{ rule PHP_VAR_NEW_KW -->
+	<RULES SET="PHP_VAR_NEW_KW" DEFAULT="KEYWORD4">
+		<SEQ TYPE="OPERATOR" DELEGATE="PHP_EXPRESSION">(</SEQ>
+		<SEQ TYPE="OPERATOR" DELEGATE="PHP">;</SEQ>
+	</RULES>
+	<!--}}}-->
 
+	<!--{{{ rule PHP_BASIC_KEYWORD1 -->
 	<RULES SET="PHP_BASIC_KEYWORD1">
 		<KEYWORDS>
 			<KEYWORD1>true</KEYWORD1>
@@ -405,8 +584,32 @@ TODO:
 			<KEYWORD1>null</KEYWORD1>
 		</KEYWORDS>
 	</RULES>
+	<!--}}}-->
 
+	<!--{{{  -->
+	<RULES SET="PHP_TYPES">
+		<!-- Taken from: http://php.net/manual/en/language.types.php -->
+		<KEYWORDS>
+			<OPERATOR>array</OPERATOR>
+			<OPERATOR>bool</OPERATOR>
+			<OPERATOR>boolean</OPERATOR>
+			<OPERATOR>callback</OPERATOR>
+			<OPERATOR>double</OPERATOR>
+			<OPERATOR>float</OPERATOR>
+			<OPERATOR>int</OPERATOR>
+			<OPERATOR>integer</OPERATOR>
+			<OPERATOR>mixed</OPERATOR>
+			<OPERATOR>number</OPERATOR>
+			<OPERATOR>NULL</OPERATOR>
+			<OPERATOR>object</OPERATOR>
+			<OPERATOR>real</OPERATOR><!-- not listed, but valid in a typecast -->
+			<OPERATOR>resource</OPERATOR>
+			<OPERATOR>string</OPERATOR>
+		</KEYWORDS>
+	</RULES>
+	<!--}}}-->
 
+	<!--{{{ rule PHP_KEYWORDS -->
 	<RULES SET="PHP_KEYWORDS">
 		<IMPORT DELEGATE="KEYWORDS_VISIBILITY" />
 		<IMPORT DELEGATE="PHP_BASIC_KEYWORD1" />
@@ -1906,6 +2109,8 @@ TODO:
 			<KEYWORD2>jewishtojd</KEYWORD2>
 			<KEYWORD2>join</KEYWORD2>
 			<KEYWORD2>jpeg2wbmp</KEYWORD2>
+			<KEYWORD2>json_decode</KEYWORD2>
+			<KEYWORD2>json_encode</KEYWORD2>
 			<KEYWORD2>juliantojd</KEYWORD2>
 			<KEYWORD2>key</KEYWORD2> <!-- arrayiterator, directoryiterator, filteriterator, hw_api_attribute, recursivedirectoryiterator, recursiveiteratoriterator, simplexmliterator -->
 			<KEYWORD2>krsort</KEYWORD2>
@@ -2197,6 +2402,7 @@ TODO:
 			<KEYWORD2>mdecrypt_generic</KEYWORD2>
 			<KEYWORD2>memcache_debug</KEYWORD2>
 			<KEYWORD2>memory_get_usage</KEYWORD2>
+			<KEYWORD2>memory_get_peak_usage</KEYWORD2>
 			<KEYWORD2>metaphone</KEYWORD2>
 			<KEYWORD2>method_exists</KEYWORD2>
 			<KEYWORD2>mhash</KEYWORD2>
@@ -3244,6 +3450,7 @@ TODO:
 			<KEYWORD2>proc_open</KEYWORD2>
 			<KEYWORD2>proc_terminate</KEYWORD2>
 			<KEYWORD2>process</KEYWORD2> <!-- domxsltstylesheet -->
+			<KEYWORD2>property_exists</KEYWORD2>
 			<KEYWORD2>pspell_add_to_personal</KEYWORD2>
 			<KEYWORD2>pspell_add_to_session</KEYWORD2>
 			<KEYWORD2>pspell_check</KEYWORD2>
@@ -4382,10 +4589,12 @@ TODO:
 			<!-- Language constructs (69)
 				http://www.php.net/manual/en/reserved.php -->
 			<KEYWORD1>__CLASS__</KEYWORD1>
+			<KEYWORD1>__DIR__</KEYWORD1>
 			<KEYWORD1>__FILE__</KEYWORD1>
 			<KEYWORD1>__FUNCTION__</KEYWORD1>
 			<KEYWORD1>__LINE__</KEYWORD1>
 			<KEYWORD1>__METHOD__</KEYWORD1>
+			<KEYWORD1>__NAMESPACE__</KEYWORD1>
 			<KEYWORD1>abstract</KEYWORD1>
 			<OPERATOR>and</OPERATOR>
 			<KEYWORD1>array</KEYWORD1>
@@ -4422,6 +4631,7 @@ TODO:
 			<KEYWORD1>foreach</KEYWORD1>
 			<KEYWORD1>function</KEYWORD1>
 			<KEYWORD1>global</KEYWORD1>
+			<KEYWORD1>goto</KEYWORD1>
 			<KEYWORD1>if</KEYWORD1>
 			<KEYWORD1>implements</KEYWORD1>
 			<KEYWORD1>include</KEYWORD1>
@@ -4430,6 +4640,7 @@ TODO:
 			<KEYWORD1>interface</KEYWORD1>
 			<KEYWORD1>isset</KEYWORD1>
 			<KEYWORD1>list</KEYWORD1>
+			<KEYWORD1>namespace</KEYWORD1>
 			<KEYWORD1>new</KEYWORD1>
 			<KEYWORD1>null</KEYWORD1>
 			<KEYWORD1>old_function</KEYWORD1>
@@ -4476,6 +4687,7 @@ TODO:
 			<KEYWORD2>xdebug_is_enabled</KEYWORD2>
 			<KEYWORD2>xdebug_memory_usage</KEYWORD2>
 			<KEYWORD2>xdebug_peak_memory_usage</KEYWORD2>
+			<KEYWORD2>xdebug_print_function_stack</KEYWORD2>
 			<KEYWORD2>xdebug_start_code_coverage</KEYWORD2>
 			<KEYWORD2>xdebug_start_profiling</KEYWORD2><!-- version 1 only -->
 			<KEYWORD2>xdebug_start_trace</KEYWORD2><!-- version 1 only -->
@@ -4545,8 +4757,9 @@ TODO:
 			<KEYWORD4>stdClass</KEYWORD4>
 		</KEYWORDS>
 	</RULES>
+	<!--}}}-->
 
-
+	<!--{{{ rule KEYWORDS_VISIBILITY -->
 	<RULES SET="KEYWORDS_VISIBILITY">
 		<KEYWORDS>
 			<KEYWORD1>private</KEYWORD1>
@@ -4554,16 +4767,17 @@ TODO:
 			<KEYWORD1>public</KEYWORD1>
 		</KEYWORDS>
 	</RULES>
+	<!--}}}-->
 
-
-	<!-- Javascript -->
+	<!--{{{ rule JAVASCRIPT_OPENTAG -->
 	<RULES SET="JAVASCRIPT_OPENTAG" DEFAULT="MARKUP">
 		<SEQ TYPE="MARKUP" DELEGATE="JAVASCRIPT">&gt;</SEQ>
 		<IMPORT DELEGATE="TO_LITERAL+PHP"/> <!-- handle PHP in <script> tag -->
 		<IMPORT DELEGATE="html::TAGS" /> <!-- handle e.g. 'style="width:1px"' -->
 	</RULES>
+	<!--}}}-->
 
-
+	<!--{{{ rule TO_LITERAL+PHP -->
 	<!-- Handle literals, but allow switching to PHP therein, e.g. from html TAGS -->
 	<RULES SET="TO_LITERAL+PHP">
 		<SPAN TYPE="LITERAL1" DELEGATE="LITERAL1+PHP">
@@ -4576,34 +4790,38 @@ TODO:
 		</SPAN>
 		<IMPORT DELEGATE="TO_PHP"/>
 	</RULES>
+	<!--}}}-->
 
-
+	<!--{{{ rule JAVASCRIPT -->
 	<RULES SET="JAVASCRIPT" DEFAULT="MARKUP" ESCAPE="\">
 		<IMPORT DELEGATE="TO_LITERAL+PHP"/>
 		<IMPORT DELEGATE="TO_PHP"/>
 		<IMPORT DELEGATE="javascript::MAIN"/>
 	</RULES>
+	<!--}}}-->
 
-
+	<!--{{{ rule LITERAL1+PHP -->
 	<!-- Handle PHP tags in LITERAL1, e.g. in the "type" attribute of a <SCRIPT> tag -->
-	<RULES SET="LITERAL1+PHP" DEFAULT="LITERAL1">
+	<RULES SET="LITERAL1+PHP" DEFAULT="LITERAL1" ESCAPE="\">
 		<IMPORT DELEGATE="TO_PHP"/>
 	</RULES>
+	<!--}}}-->
 
-
+	<!--{{{ rule LITERAL2+PHP -->
 	<!-- Handle PHP tags in LITERAL2, e.g. in the "type" attribute of a <SCRIPT> tag -->
-	<RULES SET="LITERAL2+PHP" DEFAULT="LITERAL2">
+	<RULES SET="LITERAL2+PHP" DEFAULT="LITERAL2" ESCAPE="\">
 		<IMPORT DELEGATE="TO_PHP"/>
 	</RULES>
+	<!--}}}-->
 
-
+	<!--{{{ rule COMMENT1+PHP -->
 	<!-- Handle PHP tags in comments -->
 	<RULES SET="COMMENT1+PHP" DEFAULT="COMMENT1">
 		<IMPORT DELEGATE="TO_PHP"/>
 	</RULES>
+	<!--}}}-->
 
-
-	<!-- Go to PHP mode again -->
+	<!--{{{ Go to PHP mode again -->
 	<RULES SET="TO_PHP" DEFAULT="MARKUP">
 		<SPAN TYPE="MARKUP" DELEGATE="PHP">
 			<BEGIN>&lt;?php</BEGIN>
@@ -4620,114 +4838,58 @@ TODO:
 			<END>%&gt;</END>
 		</SPAN>
 	</RULES>
+	<!--}}}-->
 
+	<RULES SET="PHPDOC_BLOCK" DEFAULT="COMMENT4" IGNORE_CASE="TRUE"/>
 
-	<!-- Extended label block, also uses "|" as seperator -->
-	<RULES SET="PHPDOC_LABEL_BLOCK_EXTENDED" DEFAULT="COMMENT3"
-		HIGHLIGHT_DIGITS="TRUE" DIGIT_RE="(0x[0-9a-f]+|([0-9]*\.)?[0-9]+(e[+-]?[0-9]+)?)">
-		<SEQ TYPE="OPERATOR">|</SEQ>
+	<!--{{{ rule PHPDOC -->
+	<RULES SET="PHPDOC" DEFAULT="COMMENT3" IGNORE_CASE="TRUE">
 
-		<!-- Delegate back (gets not caught from PHPDOC_LABEL_BLOCK): -->
-		<IMPORT DELEGATE="PHPDOC_DELEGATE_LABEL_BLOCKS" />
-		<IMPORT DELEGATE="PHPDOC_LABEL_BLOCK" />
-
-		<IMPORT DELEGATE="PHPDOC_LABEL_KEYWORDS" />
-		<IMPORT DELEGATE="PHPDOC" />
-		<IMPORT DELEGATE="PHPDOC_VAR" />
-		<IMPORT DELEGATE="PHP_BASIC_KEYWORD1" />
-	</RULES>
-
-	<!-- A block after a label tag like "@see" -->
-	<RULES SET="PHPDOC_LABEL_BLOCK" DEFAULT="COMMENT3"
-		HIGHLIGHT_DIGITS="TRUE" DIGIT_RE="(0x[0-9a-f]+|([0-9]*\.)?[0-9]+(e[+-]?[0-9]+)?)">
-
-		<!-- Delegate back -->
-		<!-- <IMPORT DELEGATE="PHPDOC_DELEGATE_LABEL_BLOCKS" /> -->
-
-		<SEQ TYPE="COMMENT3" DELEGATE="PHPDOC">*/</SEQ>
-
-		<MARK_PREVIOUS TYPE="FUNCTION">()</MARK_PREVIOUS>
-
-		<IMPORT DELEGATE="PHPDOC_LABEL_KEYWORDS" />
-		<IMPORT DELEGATE="PHPDOC" />
-		<IMPORT DELEGATE="PHPDOC_VAR" />
-		<IMPORT DELEGATE="PHP_BASIC_KEYWORD1" />
-
-		<!-- Taken from: http://php.net/manual/en/language.types.php -->
-		<KEYWORDS>
-			<OPERATOR>array</OPERATOR>
-			<OPERATOR>bool</OPERATOR>
-			<OPERATOR>boolean</OPERATOR>
-			<OPERATOR>callback</OPERATOR>
-			<OPERATOR>double</OPERATOR>
-			<OPERATOR>float</OPERATOR>
-			<OPERATOR>int</OPERATOR>
-			<OPERATOR>integer</OPERATOR>
-			<OPERATOR>mixed</OPERATOR>
-			<OPERATOR>number</OPERATOR>
-			<OPERATOR>NULL</OPERATOR>
-			<OPERATOR>object</OPERATOR>
-			<OPERATOR>real</OPERATOR><!-- not listed, but valid in a typecast -->
-			<OPERATOR>resource</OPERATOR>
-			<OPERATOR>string</OPERATOR>
-		</KEYWORDS>
-	</RULES>
-
-
-	<!-- A block after @access -->
-	<RULES SET="PHPDOC_LABEL_BLOCK_ACCESS" DEFAULT="COMMENT3"
-		HIGHLIGHT_DIGITS="TRUE" DIGIT_RE="(0x[0-9a-f]+|([0-9]*\.)?[0-9]+(e[+-]?[0-9]+)?)">
-		<IMPORT DELEGATE="KEYWORDS_VISIBILITY" />
-
-		<!-- Delegate back: -->
-		<IMPORT DELEGATE="PHPDOC_DELEGATE_LABEL_BLOCKS"/>
-	</RULES>
-
-
-	<RULES SET="PHPDOC_BLOCK" DEFAULT="COMMENT3"
-		HIGHLIGHT_DIGITS="TRUE" DIGIT_RE="(0x[0-9a-f]+|([0-9]*\.)?[0-9]+(e[+-]?[0-9]+)?)">
-		<!-- highlight function/method name as token type FUNCTION -->
-		<MARK_PREVIOUS TYPE="FUNCTION">()</MARK_PREVIOUS>
-
-		<!-- Delegate back: -->
-		<IMPORT DELEGATE="PHPDOC_DELEGATE_LABEL_BLOCKS"/>
-		<IMPORT DELEGATE="PHPDOC"/>
-		<IMPORT DELEGATE="PHPDOC_VAR"/>
-	</RULES>
-
-
-	<!-- Helper for class references in rule PHPDOC -->
-	<RULES SET="OBJECT_PHPDOC">
-		<SPAN TYPE="OPERATOR" DELEGATE="PHP">
-			<BEGIN>[</BEGIN>
-			<END>]</END>
+		<!--{{{ HTML comments -->
+		<SPAN TYPE="COMMENT1">
+			<BEGIN>&lt;!--</BEGIN>
+			<END>--&gt;</END>
 		</SPAN>
-		<SEQ_REGEXP TYPE="FUNCTION" HASH_CHAR="-&gt;" DELEGATE="PHPDOC">-&gt;\w+\s*(?=\()</SEQ_REGEXP>
-		<SEQ_REGEXP TYPE="KEYWORD4" HASH_CHAR="-&gt;" DELEGATE="OBJECT_PHPDOC">-&gt;\w+(?=(\[[\s\w'"]+\])?-&gt;)</SEQ_REGEXP>
-		<SEQ_REGEXP TYPE="KEYWORD4" HASH_CHAR="-&gt;" DELEGATE="PHPDOC">-&gt;\w*</SEQ_REGEXP>
+		<!--}}}-->
 
-		<IMPORT DELEGATE="PHP_KEYWORDS" />
-	</RULES>
+		<!--{{{ PHPdoc allows this -->
+		<SEQ TYPE="COMMENT3">&lt;&lt;</SEQ>
+		<SEQ TYPE="COMMENT3">&lt;=</SEQ>
+		<SEQ TYPE="COMMENT3">&lt; </SEQ>
+		<!--}}}-->
+
+		<!--{{{ strings in quotes -->
+		<SPAN TYPE="LITERAL1" ESCAPE="\" NO_LINE_BREAK="TRUE">
+		<BEGIN>&quot;</BEGIN>
+		<END>&quot;</END>
+		</SPAN>
+		<!--}}}-->
+
+		<!--{{{ HTML tag -->
+		<SPAN TYPE="MARKUP" DELEGATE="xml::TAGS"
+			NO_LINE_BREAK="TRUE">
+			<BEGIN>&lt;</BEGIN>
+			<END>&gt;</END>
+		</SPAN>
+		<!--}}}-->
+
+		<SPAN_REGEXP TYPE="LABEL" HASH_CHAR="@" NO_WORD_BREAK="FALSE" DELEGATE="PHPDOC_BLOCK">
+			<BEGIN>@(?:param|throws|exception|serialField)(\s)</BEGIN>
+			<END>$1</END>
+		</SPAN_REGEXP>
+
+		<SPAN_REGEXP TYPE="LABEL" HASH_CHAR="{@" NO_WORD_BREAK="FALSE" DELEGATE="PHPDOC_BLOCK">
+			<BEGIN>\{@(internal|link)\s</BEGIN>
+			<END>}</END>
+		</SPAN_REGEXP>
 
 
-	<!-- Almost like PHP_VAR - but with another delegate -->
-	<RULES SET="PHPDOC_VAR">
-		<!-- (Class-)Variables -->
-		<SEQ_REGEXP TYPE="KEYWORD4" HASH_CHAR="$" DELEGATE="OBJECT_PHPDOC">\$\w+(?=(\[[\s\w'"]+\])?-&gt;)</SEQ_REGEXP>
+		<SPAN DELEGATE="PHP" TYPE="MARKUP">
+			<BEGIN>&lt;code&gt;</BEGIN>
+			<END>&lt;/code&gt;</END>
+		</SPAN>
 
-		<MARK_PREVIOUS TYPE="KEYWORD4">::</MARK_PREVIOUS>
-
-		<SEQ_REGEXP HASH_CHAR="$" TYPE="KEYWORD4">\$\w+(?=\s*=\s*(&amp;\s*)?new)</SEQ_REGEXP>
-
-		<!-- Normal variables -->
-		<MARK_FOLLOWING TYPE="KEYWORD3">$</MARK_FOLLOWING>
-	</RULES>
-
-
-	<!-- phpdoc / phpDocumentor label tags -->
-	<RULES SET="PHPDOC_LABEL_KEYWORDS">
-		<!-- {{{
-			Some (@global, @param, ..) are here just for complete-word -->
+		<!--{{{ keywords -->
 		<KEYWORDS>
 			<LABEL>@abstract</LABEL>
 			<LABEL>@access</LABEL>
@@ -4754,77 +4916,16 @@ TODO:
 			<LABEL>@static</LABEL>
 			<LABEL>@staticvar</LABEL>
 			<LABEL>@subpackage</LABEL>
+			<LABEL>@throws</LABEL>
 			<LABEL>@todo</LABEL>
 			<LABEL>@tutorial</LABEL>
 			<LABEL>@uses</LABEL>
 			<LABEL>@var</LABEL>
 			<LABEL>@version</LABEL>
 		</KEYWORDS>
-		<!-- }}} -->
+		<!--}}}-->
 	</RULES>
-
-
-	<!-- Delegate to PHPDOC_LABEL_BLOCK[_EXTENDED|_ACCESS] or back to PHPDOC -->
-	<RULES SET="PHPDOC_DELEGATE_LABEL_BLOCKS" DEFAULT="COMMENT3">
-		<!-- Delegate empty line (just an asterisk) back to PHPDOC -->
-		<SEQ_REGEXP TYPE="COMMENT3" AT_WHITESPACE_END="TRUE" DELEGATE="PHPDOC" HASH_CHAR="*">\*\s*$</SEQ_REGEXP>
-
-		<SEQ_REGEXP TYPE="LABEL" HASH_CHAR="@"
-			DELEGATE="PHPDOC_LABEL_BLOCK_EXTENDED">@(global|param|return|staticvar|var)</SEQ_REGEXP>
-
-		<SEQ_REGEXP TYPE="LABEL" HASH_CHAR="@"
-			DELEGATE="PHPDOC_LABEL_BLOCK">@(deprecated|see|uses)</SEQ_REGEXP>
-
-		<SEQ TYPE="LABEL" DELEGATE="PHPDOC_LABEL_BLOCK_ACCESS">@access</SEQ>
-
-		<!-- Delegate the remaining phpdoc tags back to PHPDOC_BLOCK: -->
-		<SEQ_REGEXP TYPE="LABEL" HASH_CHAR="@"
-			DELEGATE="PHPDOC_BLOCK">@(abstract|author|category|const|constant|copyright|example|filesource|final|ignore|internal|license|link|name|package|since|static|subpackage|todo|tutorial|version)</SEQ_REGEXP>
-	</RULES>
-
-
-	<!-- The main phpdoc rules -->
-	<RULES SET="PHPDOC" DEFAULT="COMMENT3" IGNORE_CASE="TRUE"
-		HIGHLIGHT_DIGITS="TRUE" DIGIT_RE="(0x[0-9a-f]+|([0-9]*\.)?[0-9]+(e[+-]?[0-9]+)?)">
-		<!-- HTML comments -->
-		<SPAN TYPE="COMMENT1">
-			<BEGIN>&lt;!--</BEGIN>
-			<END>--&gt;</END>
-		</SPAN>
-
-		<SPAN TYPE="LABEL" DELEGATE="PHPDOC_BLOCK">
-			<BEGIN>{@internal</BEGIN>
-			<END>}}</END>
-		</SPAN>
-
-		<SPAN TYPE="LABEL" DELEGATE="PHPDOC_BLOCK">
-			<BEGIN>{@link</BEGIN>
-			<END>}</END>
-		</SPAN>
-
-		<!-- PHPdoc allows this -->
-		<SEQ TYPE="COMMENT3">&lt;&lt;</SEQ>
-		<SEQ TYPE="COMMENT3">&lt;=</SEQ>
-		<SEQ TYPE="COMMENT3">&lt; </SEQ>
-
-		<SPAN DELEGATE="PHP" TYPE="MARKUP">
-			<BEGIN>&lt;code&gt;</BEGIN>
-			<END>&lt;/code&gt;</END>
-		</SPAN>
-
-		<!-- HTML tags -->
-		<SPAN TYPE="MARKUP" DELEGATE="xml::TAGS" NO_LINE_BREAK="TRUE">
-			<BEGIN>&lt;</BEGIN>
-			<END>&gt;</END>
-		</SPAN>
-
-		<!-- Imports: -->
-		<IMPORT DELEGATE="PHPDOC_DELEGATE_LABEL_BLOCKS" />
-		<IMPORT DELEGATE="PHPDOC_LABEL_KEYWORDS" />
-		<IMPORT DELEGATE="PHPDOC_VAR" />
-		<IMPORT DELEGATE="PHP_BASIC_KEYWORD1" />
-	</RULES>
-
+	<!--}}}-->
 
 	<RULES SET="INVALID_LT" DEFAULT="INVALID">
 		<SEQ TYPE="INVALID">&lt;</SEQ>

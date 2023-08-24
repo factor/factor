@@ -1,10 +1,10 @@
 ! Copyright (C) 2009 Philipp Brüschweiler
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors combinators combinators.short-circuit effects
-effects.parser fry infix.ast infix.parser kernel locals
-locals.parser locals.types math math.functions math.order
-math.ranges multiline parser quotations sequences summary
-vocabs.parser words words.constant ;
+effects.parser infix.ast infix.parser kernel locals.parser
+locals.types math math.functions math.order multiline parser
+quotations ranges sequences summary vocabs.parser words
+words.constant ;
 IN: infix
 
 <PRIVATE
@@ -102,7 +102,7 @@ M: bad-stack-effect summary
     drop "Words used in infix must declare a stack effect and return exactly one value" ;
 
 : check-word ( argcount word -- ? )
-    dup stack-effect [ ] [ bad-stack-effect ] ?if
+    [ stack-effect ] [ bad-stack-effect ] ?unless
     [ in>> length ] [ out>> length ] bi
     [ = ] dip 1 = and ;
 

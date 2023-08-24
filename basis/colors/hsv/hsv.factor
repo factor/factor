@@ -1,19 +1,21 @@
 ! Copyright (C) 2008 Eduardo Cavazos.
-! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays colors combinators fry kernel locals
-math math.functions random sequences sorting ;
+! See https://factorcode.org/license.txt for BSD license.
+USING: accessors colors combinators kernel math math.functions
+random sequences sorting ;
 IN: colors.hsv
 
 ! h [0,360)
 ! s [0,1]
 ! v [0,1]
-TUPLE: hsva < color
+TUPLE: hsva
 { hue read-only }
 { saturation read-only }
 { value read-only }
 { alpha read-only } ;
 
 C: <hsva> hsva
+
+INSTANCE: hsva color
 
 <PRIVATE
 
@@ -29,7 +31,7 @@ C: <hsva> hsva
 
 PRIVATE>
 
-M: hsva >rgba ( hsva -- rgba )
+M: hsva >rgba
     [
         dup Hi
         {

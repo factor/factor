@@ -1,7 +1,6 @@
 ! Copyright (C) 2009 Doug Coleman.
-! See http://factorcode.org/license.txt for BSD license.
-USING: accessors combinators db kernel sequences peg.ebnf
-strings db.errors multiline ;
+! See https://factorcode.org/license.txt for BSD license.
+USING: db.errors kernel multiline peg.ebnf sequences strings ;
 IN: db.sqlite.errors
 
 TUPLE: unparsed-sqlite-error error ;

@@ -1,5 +1,5 @@
 ! Copyright (C) 2008, 2010 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors command-line continuations fry init io
 io.backend io.files io.monitors io.pathnames kernel namespaces
 prettyprint sequences splitting threads tr vocabs vocabs.cache
@@ -13,7 +13,7 @@ TR: convert-separators "/\\" ".." ;
     trim-tail-separators
     convert-separators ;
 
-: path>vocab-name ( path -- vocab )
+: path>vocab-parent-dir ( path -- path' )
     dup ".factor" tail? [ parent-directory ] when ;
 
 : chop-vocab-root ( path -- path' )
@@ -24,8 +24,8 @@ TR: convert-separators "/\\" ".." ;
     [ head? ] with find nip
     ?head drop ;
 
-: path>vocab ( path -- vocab )
-    chop-vocab-root path>vocab-name vocab-dir>vocab-name ;
+: path>vocab-name ( path -- vocab-name )
+    chop-vocab-root path>vocab-parent-dir vocab-dir>vocab-name ;
 
 : monitor-loop ( monitor -- )
     ! On OS X, monitors give us the full path, so we chop it
@@ -33,7 +33,7 @@ TR: convert-separators "/\\" ".." ;
     [
         next-change path>>
         [
-            path>vocab
+            path>vocab-name
             [ changed-vocab ] [ reset-cache ] bi
         ] [
             [
@@ -44,7 +44,7 @@ TR: convert-separators "/\\" ".." ;
     ] [ monitor-loop ] bi ;
 
 : (start-vocab-monitor) ( vocab-root -- )
-    dup exists?
+    dup file-exists?
     [ [ t <monitor> monitor-loop ] with-monitors ] [ drop ] if ;
 
 : start-vocab-monitor ( vocab-root -- )
@@ -65,7 +65,7 @@ TR: convert-separators "/\\" ".." ;
     HS{ } clone changed-vocabs set-global
     loaded-vocab-names [ changed-vocab ] each ;
 
-[
+STARTUP-HOOK: [
     "-no-monitors" (command-line) member? [
         [ drop ] add-vocab-root-hook set-global
         f changed-vocabs set-global
@@ -74,4 +74,4 @@ TR: convert-separators "/\\" ".." ;
         vocab-roots get [ start-vocab-monitor ] each
         [ start-vocab-monitor ] add-vocab-root-hook set-global
     ] if
-] "vocabs.refresh.monitor" add-startup-hook
+]

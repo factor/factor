@@ -5,7 +5,7 @@
 	<t:title><t:label t:name="title" /></t:title>
 
 	<div class="description">
-		<t:farkup t:name="content" />
+		<t:farkup t:name="content" t:no-follow="true" />
 	</div>
 
 	<p>

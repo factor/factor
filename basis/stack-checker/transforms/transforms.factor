@@ -1,11 +1,13 @@
 ! Copyright (C) 2007, 2009 Slava Pestov, Daniel Ehrenberg.
-! See http://factorcode.org/license.txt for BSD license.
-USING: accessors classes.tuple classes.tuple.private combinators
-combinators.short-circuit continuations fry generic kernel
-locals namespaces quotations sequences stack-checker.backend
-stack-checker.dependencies stack-checker.errors
-stack-checker.recursive-state stack-checker.values
-stack-checker.visitor words ;
+! See https://factorcode.org/license.txt for BSD license.
+
+USING: accessors classes.struct classes.tuple
+classes.tuple.private combinators combinators.short-circuit
+continuations generic kernel namespaces quotations sequences
+stack-checker.backend stack-checker.dependencies
+stack-checker.errors stack-checker.recursive-state
+stack-checker.values stack-checker.visitor words ;
+
 IN: stack-checker.transforms
 
 : call-transformer ( stack quot -- newquot )
@@ -138,14 +140,18 @@ IN: stack-checker.transforms
 
 ! Constructors
 \ boa [
-    dup tuple-class? [
-        dup tuple-layout
-        [ add-depends-on-tuple-layout ]
-        [ [ "boa-check" word-prop [ ] or ] dip ] 2bi
-        '[ @ _ <tuple-boa> ]
-    ] [
-        \ boa time-bomb
-    ] if
+    {
+        { [ dup struct-class? ] [
+            dup dup struct-slots add-depends-on-struct-slots
+            '[ _ <struct-boa> ] ] }
+        { [ dup tuple-class? ] [
+            dup tuple-layout
+            [ add-depends-on-tuple-layout ]
+            [ [ "boa-check" word-prop [ ] or ] dip ] 2bi
+            '[ @ _ <tuple-boa> ]
+            ] }
+        [ \ boa time-bomb ]
+    } cond
 ] 1 define-transform
 
 \ boa t "no-compile" set-word-prop

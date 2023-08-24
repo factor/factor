@@ -1,10 +1,9 @@
 ! Copyright (C) 2009 Elie Chaftari.
-! See http://factorcode.org/license.txt for BSD license.
-USING: accessors annotations arrays assocs calendar combinators
-fry hashtables io io.crlf io.encodings.utf8 io.sockets
-io.streams.duplex io.timeouts kernel make math math.parser
-math.ranges namespaces prettyprint sequences splitting
-strings ;
+! See https://factorcode.org/license.txt for BSD license.
+USING: accessors assocs calendar combinators io io.crlf
+io.encodings.utf8 io.sockets io.streams.duplex io.timeouts
+kernel make math math.parser namespaces ranges sequences
+splitting ;
 IN: pop3
 
 TUPLE: pop3-account
@@ -45,14 +44,14 @@ TUPLE: raw-source top headers content ;
 : get-ok-and-total ( -- total )
     stream [
         readln dup "+OK" head? [
-            " " split second string>number dup account count<<
+            split-words second string>number dup account count<<
         ] [ throw ] if
     ] with-stream* ;
 
 : get-ok-and-uidl ( -- uidl )
     stream [
         readln dup "+OK" head? [
-            " " split last
+            split-words last
         ] [ throw ] if
     ] with-stream* ;
 
@@ -181,7 +180,7 @@ PRIVATE>
 
 : consolidate ( -- seq )
     count zero? [ "No mail for account." ] [
-        1 account count>> [a,b] [
+        1 account count>> [a..b] [
             {
                 [ 0 top drop ]
                 [ <message> swap >># ]

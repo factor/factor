@@ -1,4 +1,4 @@
-USING: eval multiline sequences tools.test ;
+USING: accessors eval lexer multiline sequences tools.test ;
 IN: multiline.tests
 
 STRING: test-it
@@ -8,68 +8,6 @@ bar
 ;
 
 { "foo\nbar\n" } [ test-it ] unit-test
-
-
-! HEREDOC:
-
-{ "foo\nbar\n" } [ HEREDOC: END
-foo
-bar
-END
-] unit-test
-
-{ "" } [ HEREDOC: END
-END
-] unit-test
-
-{ " END\n" } [ HEREDOC: END
- END
-END
-] unit-test
-
-{ "\n" } [ HEREDOC: END
-
-END
-] unit-test
-
-{ "x\n" } [ HEREDOC: END
-x
-END
-] unit-test
-
-{ "x\n" } [ HEREDOC:       END
-x
-END
-] unit-test
-
-! there's a space after xyz
-{ "xyz \n" } [ HEREDOC: END
-xyz 
-END
-] unit-test
-
-{ "} ! * # \" «\n" } [ HEREDOC: END
-} ! * # " «
-END
-] unit-test
-
-{ 21 "foo\nbar\n" " HEREDOC: FOO\n FOO\n" 22 } [ 21 HEREDOC: X
-foo
-bar
-X
-HEREDOC: END
- HEREDOC: FOO
- FOO
-END
-22 ] unit-test
-
-{ "lol\n xyz\n" }
-[
-HEREDOC: xyz
-lol
- xyz
-xyz
-] unit-test
 
 /*
 <<
@@ -92,3 +30,9 @@ bar
 }" eval
 ] must-fail
 */
+
+{ "abc" } [ "USE: multiline [=[ abc]=]" eval( -- string ) ] unit-test
+[ "USE: multiline [=[" eval( -- string ) ] [ error>> unexpected? ] must-fail-with
+[ "USE: multiline [=[ abc" eval( -- string ) ] [ error>> unexpected? ] must-fail-with
+[ "USE: multiline [=[ abc\n\n" eval( -- string ) ] [ error>> unexpected? ] must-fail-with
+[ "USE: multiline [=[ hello]=]length" eval( -- string ) ] [ error>> unexpected? ] must-fail-with

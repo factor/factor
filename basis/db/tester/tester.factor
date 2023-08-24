@@ -1,13 +1,13 @@
 ! Copyright (C) 2008 Slava Pestov, Doug Coleman.
-! See http://factorcode.org/license.txt for BSD license.
-USING: concurrency.combinators db db.pools db.sqlite db.tuples
-db.types destructors kernel math random threads tools.test sequences
-io io.pools prettyprint db.postgresql accessors io.files.temp
-namespaces fry system math.parser db.queries assocs ;
+! See https://factorcode.org/license.txt for BSD license.
+USING: accessors assocs concurrency.combinators db db.pools
+db.postgresql db.queries db.sqlite db.tuples db.types
+destructors io.files.temp kernel math math.parser namespaces
+random sequences system threads tools.test ;
 IN: db.tester
 
 : postgresql-test-db-name ( -- string )
-    cpu name>> "-" "factor-test" 3append
+    os name>> cpu name>> "-" glue "-factor-test" append
     H{ { CHAR: - CHAR: _ } { CHAR: . CHAR: _ } } substitute ;
 
 : postgresql-test-db ( -- postgresql-db )
@@ -34,9 +34,9 @@ IN: db.tester
     ] call ; inline
 
 : test-postgresql ( quot -- )
-
     '[
-        os windows? cpu x86.64? and [
+        ! disable on windows-x86-32
+        os windows? cpu x86.32? and [
             postgresql-template1-db [
                 postgresql-test-db-name ensure-database
             ] with-db
@@ -48,19 +48,19 @@ IN: db.tester
 TUPLE: test-1 id a b c ;
 
 test-1 "TEST1" {
-   { "id" "ID" INTEGER +db-assigned-id+ }
-   { "a" "A" { VARCHAR 256 } +not-null+ }
-   { "b" "B" { VARCHAR 256 } +not-null+ }
-   { "c" "C" { VARCHAR 256 } +not-null+ }
+    { "id" "ID" INTEGER +db-assigned-id+ }
+    { "a" "A" { VARCHAR 256 } +not-null+ }
+    { "b" "B" { VARCHAR 256 } +not-null+ }
+    { "c" "C" { VARCHAR 256 } +not-null+ }
 } define-persistent
 
 TUPLE: test-2 id x y z ;
 
 test-2 "TEST2" {
-   { "id" "ID" INTEGER +db-assigned-id+ }
-   { "x" "X" { VARCHAR 256 } +not-null+ }
-   { "y" "Y" { VARCHAR 256 } +not-null+ }
-   { "z" "Z" { VARCHAR 256 } +not-null+ }
+    { "id" "ID" INTEGER +db-assigned-id+ }
+    { "x" "X" { VARCHAR 256 } +not-null+ }
+    { "y" "Y" { VARCHAR 256 } +not-null+ }
+    { "z" "Z" { VARCHAR 256 } +not-null+ }
 } define-persistent
 
 : test-1-tuple ( -- tuple )

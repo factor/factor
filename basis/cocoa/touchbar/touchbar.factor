@@ -1,8 +1,7 @@
 ! Copyright (C) 2017 Doug Coleman.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: alien.c-types cocoa cocoa.classes cocoa.messages
-cocoa.runtime combinators core-foundation.strings kernel locals
-;
+cocoa.runtime combinators core-foundation.strings kernel ;
 IN: cocoa.touchbar
 
 : make-touchbar ( seq self -- touchbar )

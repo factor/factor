@@ -1,9 +1,9 @@
 ! Copyright (C) 2009 Doug Coleman, Keith Lazuka
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors images.png images.testing io.directories
 io.encodings.binary io.files kernel sequences tools.test ;
 
-! Test files from PngSuite (http://www.libpng.org/pub/png/pngsuite.html)
+! Test files from PngSuite (https://www.libpng.org/pub/png/pngsuite.html)
 
 ! The subset of the suite that should work given the current implementation.
 "vocab:images/testing/png" [

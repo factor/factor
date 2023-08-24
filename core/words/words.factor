@@ -1,5 +1,5 @@
 ! Copyright (C) 2004, 2010 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs definitions hashtables kernel
 kernel.private math math.order namespaces quotations sequences
 slots.private strings vocabs ;
@@ -23,8 +23,7 @@ PRIVATE>
 
 M: word execute (execute) ;
 
-M: word <=>
-    [ [ name>> ] [ vocabulary>> ] bi 2array ] compare ;
+M: word <=> [ [ name>> ] [ vocabulary>> ] bi 2array ] compare ;
 
 M: word definer drop \ : \ ; ;
 
@@ -129,15 +128,12 @@ M: word parent-word drop f ;
 : word-prop? ( obj string -- ? )
     over word? [ word-prop ] [ 2drop f ] if ; inline
 
-: word-props? ( obj seq -- ? )
-    over word? [ [ word-prop ] with all? ] [ 2drop f ] if ; inline
-
 : inline? ( obj -- ? ) "inline" word-prop? ; inline
 
 : recursive? ( obj -- ? ) "recursive" word-prop? ; inline
 
 : inline-recursive? ( obj -- ? )
-    { "inline" "recursive" } word-props? ; inline
+    dup inline? [ recursive? ] [ drop f ] if ; inline
 
 ERROR: cannot-be-inline word ;
 
@@ -214,8 +210,8 @@ M: word reset-word
     [ gensym dup ] 2dip define-declared ;
 
 : reveal ( word -- )
-    dup [ name>> ] [ vocabulary>> ] bi dup vocab-words-assoc
-    [ ] [ no-vocab ] ?if set-at ;
+    dup [ name>> ] [ vocabulary>> ] bi
+    [ vocab-words-assoc ] [ no-vocab ] ?unless set-at ;
 
 ERROR: bad-create name vocab ;
 
@@ -230,9 +226,6 @@ ERROR: bad-create name vocab ;
         dup reveal
         dup changed-definition
     ] if* ;
-
-: constructor-word ( name vocab -- word )
-    [ "<" ">" surround ] dip create-word ;
 
 PREDICATE: parsing-word < word "parsing" word-prop ;
 

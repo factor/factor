@@ -1,17 +1,14 @@
 ! Copyright (C) 2014 John Benediktsson
-! See http://factorcode.org/license.txt for BSD license
+! See https://factorcode.org/license.txt for BSD license
 
-USING: accessors colors colors.lab colors.lch kernel locals math
+USING: accessors colors colors.lab colors.lch kernel math
 math.functions math.libm math.order math.trig ;
 
 IN: colors.distances
 
 : rgba-distance ( color1 color2 -- distance )
-    [ >rgba ] bi@
-    [ [ red>> ] bi@ - sq ]
-    [ [ blue>> ] bi@ - sq ]
-    [ [ green>> ] bi@ - sq ] 2tri
-    + + sqrt ;
+    [ >rgba ] bi@ [ red>> ] [ blue>> ] [ green>> ]
+    [ bi@ - sq ] tri-curry@ 2tri + + sqrt ;
 
 <PRIVATE
 

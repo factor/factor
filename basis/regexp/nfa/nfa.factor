@@ -1,7 +1,7 @@
 ! Copyright (C) 2008, 2009 Doug Coleman, Daniel Ehrenberg.
-! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays assocs combinators.short-circuit fry
-kernel locals math memoize namespaces regexp.ast regexp.classes
+! See https://factorcode.org/license.txt for BSD license.
+USING: accessors arrays assocs combinators.short-circuit kernel
+math namespaces regexp.ast regexp.classes
 regexp.transition-tables sequences sets unicode vectors ;
 IN: regexp.nfa
 
@@ -53,26 +53,14 @@ M:: star nfa-node ( node -- start end )
     s1 s3 epsilon-transition
     s2 s3 ;
 
-GENERIC: modify-epsilon ( tag -- newtag )
+DEFER: modify-class
+
 ! Potential off-by-one errors when lookaround nested in lookbehind
 
-M: object modify-epsilon ;
-
-: line-option ( multiline unix-lines default -- option )
-    multiline option? [
-        drop [ unix-lines option? ] 2dip swap ?
-    ] [ 2nip ] if ;
-
-M: $ modify-epsilon
-    $unix end-of-input line-option ;
-
-M: ^ modify-epsilon
-    ^unix beginning-of-input line-option ;
-
 M: tagged-epsilon nfa-node
-    clone [ modify-epsilon ] change-tag add-simple-entry ;
+    clone [ modify-class ] change-tag add-simple-entry ;
 
-M: concatenation nfa-node ( node -- start end )
+M: concatenation nfa-node
     [ first>> ] [ second>> ] bi
     reversed-regexp option? [ swap ] when
     [ nfa-node ] bi@
@@ -87,7 +75,7 @@ M: concatenation nfa-node ( node -- start end )
     s3 s5 epsilon-transition
     s4 s5 ;
 
-M: alternation nfa-node ( node -- start end )
+M: alternation nfa-node
     [ first>> ] [ second>> ] bi
     [ nfa-node ] bi@
     alternate-nodes ;
@@ -96,15 +84,37 @@ GENERIC: modify-class ( char-class -- char-class' )
 
 M: object modify-class ;
 
+M: concatenation modify-class
+    [ first>> ] [ second>> ] bi [ modify-class ] bi@
+    concatenation boa ;
+
+M: alternation modify-class
+    [ first>> ] [ second>> ] bi [ modify-class ] bi@
+    alternation boa ;
+
+M: lookahead modify-class
+    term>> modify-class lookahead boa ;
+
+M: lookbehind modify-class
+    term>> modify-class lookbehind boa ;
+
+: line-option ( multiline unix-lines default -- option )
+    multiline option? [
+        drop [ unix-lines option? ] 2dip swap ?
+    ] [ 2nip ] if ;
+
+M: $crlf modify-class
+    $unix end-of-input line-option ;
+
+M: ^crlf modify-class
+    ^unix beginning-of-input line-option ;
+
 M: integer modify-class
     case-insensitive option? [
         dup Letter? [
             [ ch>lower ] [ ch>upper ] bi 2array <or-class>
         ] when
     ] when ;
-
-M: integer nfa-node ( node -- start end )
-    modify-class add-simple-entry ;
 
 M: primitive-class modify-class
     class>> modify-class <primitive-class> ;
@@ -151,7 +161,7 @@ M: range-class modify-class
 M: object nfa-node
     modify-class add-simple-entry ;
 
-M: with-options nfa-node ( node -- start end )
+M: with-options nfa-node
     dup options>> [ tree>> nfa-node ] using-options ;
 
 : construct-nfa ( ast -- nfa-table )

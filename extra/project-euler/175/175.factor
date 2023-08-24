@@ -1,9 +1,10 @@
 ! Copyright (c) 2007 Samuel Tardieu.
-! See http://factorcode.org/license.txt for BSD license.
-USING: combinators kernel math math.parser math.ranges sequences vectors project-euler.common ;
+! See https://factorcode.org/license.txt for BSD license.
+USING: combinators kernel math math.parser project-euler.common
+sequences ;
 IN: project-euler.175
 
-! http://projecteuler.net/index.php?section=problems&id=175
+! https://projecteuler.net/index.php?section=problems&id=175
 
 ! DESCRIPTION
 ! -----------

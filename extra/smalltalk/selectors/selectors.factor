@@ -1,6 +1,6 @@
 ! Copyright (C) 2009, 2010 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
-USING: arrays combinators effects generic generic.standard
+! See https://factorcode.org/license.txt for BSD license.
+USING: arrays combinators effects generic.standard
 kernel sequences words lexer ;
 IN: smalltalk.selectors
 

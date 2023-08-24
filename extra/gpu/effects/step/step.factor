@@ -1,7 +1,7 @@
 ! Copyright (C) 2010 Erik Charlebois.
-! See http://factorcode.org/license.txt for BSD license.
-USING: destructors gpu.render gpu.shaders gpu.state gpu.textures
-gpu.util images kernel locals math.rectangles ;
+! See https://factorcode.org/license.txt for BSD license.
+USING: destructors gpu.render gpu.shaders gpu.state gpu.util
+images kernel math.rectangles ;
 IN: gpu.effects.step
 
 GLSL-SHADER: step-fragment-shader fragment-shader

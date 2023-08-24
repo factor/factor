@@ -1,7 +1,7 @@
 ! Copyright (C) 2008 Doug Coleman.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors furnace.actions http.server
-http.server.dispatchers html.forms io.sockets
+http.server.dispatchers html.forms io.servers io.sockets
 namespaces prettyprint kernel ;
 IN: webapps.ip
 
@@ -18,6 +18,6 @@ TUPLE: ip-app < dispatcher ;
 
 : run-ip-app ( -- )
     <ip-app> main-responder set-global
-    8080 httpd drop ;
+    8080 httpd wait-for-server ;
 
 MAIN: run-ip-app

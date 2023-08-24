@@ -1,7 +1,6 @@
 ! Copyright (C) 2011 Doug Coleman.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: dlists kernel prettyprint.custom ;
-IN: dlists.prettyprint
 
 M: dlist pprint-delims drop \ DL{ \ } ;
 M: dlist >pprint-sequence dlist>sequence ;

@@ -1,14 +1,14 @@
-USING: accessors arrays colors.constants file-picker fry
-io.directories kernel math.rectangles models sequences sets ui
-ui.gadgets ui.gadgets.buttons ui.gadgets.glass
-ui.gadgets.labeled ui.gadgets.labels ui.gadgets.tracks ;
+USING: accessors arrays file-picker io.directories kernel
+math.rectangles models sequences sets ui ui.gadgets
+ui.gadgets.buttons ui.gadgets.glass ui.gadgets.labeled
+ui.gadgets.labels ui.gadgets.tracks ;
 IN: merger
 
 MAIN-WINDOW: merger-window {
         { title "Merging" }
         { pref-dim { 300 220 } }
     }
-   vertical <track>
+    vertical <track>
     { "From:" "To:" } f <model> f <model> 2array
     [
         [

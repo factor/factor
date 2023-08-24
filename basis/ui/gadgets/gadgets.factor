@@ -1,8 +1,9 @@
 ! Copyright (C) 2005, 2010 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays binary-search combinators concurrency.flags
-deques fry kernel locals make math math.order math.rectangles
-math.vectors models namespaces sequences threads vectors ;
+! See https://factorcode.org/license.txt for BSD license.
+USING: accessors arrays binary-search combinators
+concurrency.flags deques kernel make math math.order
+math.rectangles math.vectors models namespaces sequences threads
+vectors vocabs.loader ;
 IN: ui.gadgets
 
 ! Values for orientation slot
@@ -29,8 +30,6 @@ M: gadget equal? 2drop f ;
 
 M: gadget hashcode* nip identity-hashcode ;
 
-M: gadget model-changed 2drop ;
-
 : gadget-child ( gadget -- child ) children>> first ; inline
 
 : nth-gadget ( n gadget -- child ) children>> nth ; inline
@@ -55,6 +54,10 @@ GENERIC: user-input* ( str gadget -- ? )
 
 M: gadget user-input* 2drop t ;
 
+GENERIC: temp-im-input ( str gadget -- ? )
+
+M: gadget temp-im-input 2drop t ;
+
 GENERIC: children-on ( rect gadget -- seq )
 
 M: gadget children-on nip children>> ;
@@ -65,7 +68,7 @@ M: gadget children-on nip children>> ;
     children [
         [ point ] dip
         quot call( value -- loc ) v-
-        axis v. 0 <=>
+        axis vdot 0 <=>
     ] search drop ; inline
 
 PRIVATE>
@@ -75,16 +78,16 @@ PRIVATE>
     rect rect-bounds v+ axis children quot (fast-children-on) ?1+
     children <slice> ; inline
 
-M: gadget contains-rect? ( bounds gadget -- ? )
+M: gadget contains-rect?
     dup visible?>> [ call-next-method ] [ 2drop f ] if ;
 
-M: gadget contains-point? ( loc gadget -- ? )
+M: gadget contains-point?
     dup visible?>> [ call-next-method ] [ 2drop f ] if ;
 
 : pick-up ( point gadget -- child/f )
     2dup [ dup point>rect ] dip children-on
     [ contains-point? ] with find-last nip
-    [ [ loc>> v- ] [ pick-up ] bi ] [ nip ] ?if ;
+    or* [ [ loc>> v- ] [ pick-up ] bi ] [ nip ] if ;
 
 : max-dims ( seq -- dim )
     [ 0 0 ] dip [ first2 swapd [ max ] 2bi@ ] each 2array ;
@@ -178,7 +181,7 @@ M: gadget dim-changed
 
 PRIVATE>
 
-M: gadget dim<< ( dim gadget -- )
+M: gadget dim<<
     2dup dim>> =
     [ 2drop ]
     [ [ nip ] [ call-next-method ] 2bi dim-changed ] if ;
@@ -186,10 +189,10 @@ M: gadget dim<< ( dim gadget -- )
 GENERIC: pref-dim* ( gadget -- dim )
 
 : pref-dim ( gadget -- dim )
-    dup pref-dim>> [ ] [
+    [ pref-dim>> ] [
         [ pref-dim* ] [ ] [ layout-state>> ] tri
         [ drop ] [ dupd pref-dim<< ] if
-    ] ?if ;
+    ] ?unless ;
 
 : pref-dims ( gadgets -- seq ) [ pref-dim ] map ; inline
 
@@ -197,7 +200,7 @@ M: gadget pref-dim* dim>> ;
 
 GENERIC: layout* ( gadget -- )
 
-M: gadget layout* drop ;
+M: object layout* drop ;
 
 : prefer ( gadget -- ) dup pref-dim >>dim drop ;
 
@@ -210,11 +213,11 @@ M: gadget layout* drop ;
 
 GENERIC: graft* ( gadget -- )
 
-M: gadget graft* drop ;
+M: object graft* drop ;
 
 GENERIC: ungraft* ( gadget -- )
 
-M: gadget ungraft* drop ;
+M: object ungraft* drop ;
 
 <PRIVATE
 
@@ -305,16 +308,15 @@ M: gadget remove-gadget 2drop ;
 : unparent ( gadget -- )
     not-in-layout
     [
-        dup parent>> dup
-        [
-            [ remove-gadget ] [
-                over (unparent)
+        dup parent>> [
+            {
+                [ remove-gadget ]
+                [ drop (unparent) ]
                 [ unfocus-gadget ]
                 [ children>> remove! drop ]
                 [ nip relayout ]
-                2tri
-            ] 2bi
-        ] [ 2drop ] if
+            } 2cleave
+        ] [ drop ] if*
     ] when* ;
 
 : clear-gadget ( gadget -- )
@@ -381,6 +383,8 @@ GENERIC: focusable-child* ( gadget -- child/t )
 
 M: gadget focusable-child* drop t ;
 
+M: f focusable-child* drop f ;
+
 : focusable-child ( gadget -- child )
     dup focusable-child*
     dup t eq? [ drop ] [ nip focusable-child ] if ;
@@ -397,6 +401,8 @@ M: f request-focus-on 2drop ;
 : focus-path ( gadget -- seq )
     [ focus>> ] follow ;
 
-USE: vocabs.loader
+GENERIC: preedit? ( gadget -- ? )
+
+M: gadget preedit? drop f ;
 
 { "ui.gadgets" "prettyprint" } "ui.gadgets.prettyprint" require-when

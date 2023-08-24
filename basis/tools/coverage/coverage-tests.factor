@@ -1,5 +1,5 @@
 ! Copyright (C) 2014 Jon Harper.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: arrays kernel sequences sorting tools.coverage
 tools.coverage.private tools.coverage.testvocab
 tools.coverage.testvocab.child tools.coverage.testvocab.private
@@ -11,7 +11,7 @@ tools.test vocabs.loader ;
 {
   { halftested mconcat testcond testfry testif testifprivate testmacro untested
 }
-} [ "tools.coverage.testvocab" [ ] map-words natural-sort ] unit-test
+} [ "tools.coverage.testvocab" [ ] map-words sort ] unit-test
 
 { t } [
   "tools.coverage.testvocab"
@@ -21,7 +21,7 @@ tools.test vocabs.loader ;
 
 {
   { testifprivate }
-} [ "tools.coverage.testvocab.private" [ ] map-words natural-sort ] unit-test
+} [ "tools.coverage.testvocab.private" [ ] map-words sort ] unit-test
 
 { t } [
   "tools.coverage.testvocab.private"
@@ -44,7 +44,7 @@ tools.test vocabs.loader ;
     { testmacro { } }
     { untested { [ ] } }
   }
-} [ "tools.coverage.testvocab" [ reload ] [ test-coverage natural-sort ] bi ] unit-test
+} [ "tools.coverage.testvocab" [ reload ] [ test-coverage sort ] bi ] unit-test
 
 { 0.75 } [ "tools.coverage.testvocab.child" [ reload ] [ %coverage ] bi ] unit-test
 
@@ -70,6 +70,6 @@ tools.test vocabs.loader ;
 }
 } [
   "tools.coverage.testvocab.child" reload
-  "tools.coverage.testvocab" [ reload ] [ test-coverage-recursively ] bi natural-sort
-  [ first2 natural-sort 2array ] map
+  "tools.coverage.testvocab" [ reload ] [ test-coverage-recursively ] bi sort
+  [ first2 sort 2array ] map
 ] unit-test

@@ -1,8 +1,8 @@
 ! Copyright (C) 2004, 2010 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors assocs classes classes.algebra
 classes.algebra.private classes.builtin classes.private
-combinators kernel make sequences words ;
+combinators kernel make sequences splitting words ;
 IN: classes.intersection
 
 PREDICATE: intersection-class < class
@@ -10,7 +10,7 @@ PREDICATE: intersection-class < class
 
 <PRIVATE
 
-: intersection-predicate-quot ( members -- quot )
+: intersection-predicate-quot ( participants -- quot )
     [
         [ drop t ]
     ] [
@@ -46,13 +46,16 @@ M: intersection-class (flatten-class)
 
 M: anonymous-intersection (flatten-class)
     participants>> [ full-cover ] [
-        [ flatten-class keys ]
+        [ flatten-class ]
         [ intersect-flattened-classes ] map-reduce
-        [ dup ,, ] each
+        %
     ] if-empty ;
 
 M: anonymous-intersection class-name
-    participants>> [ class-name ] map " " join ;
+    participants>> [ class-name ] map join-words ;
+
+M: anonymous-intersection predicate-def
+    participants>> intersection-predicate-quot ;
 
 PRIVATE>
 

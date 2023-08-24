@@ -1,8 +1,8 @@
 ! Copyright (C) 2009, 2010 Slava Pestov, Joe Groff.
-! See http://factorcode.org/license.txt for BSD license.
-USING: accessors alien alien.strings assocs compiler.errors
-io.backend kernel namespaces destructors sequences strings
-system io.pathnames fry combinators vocabs ;
+! See https://factorcode.org/license.txt for BSD license.
+USING: accessors alien alien.strings assocs combinators
+compiler.errors destructors kernel namespaces sequences strings
+system vocabs ;
 IN: alien.libraries
 
 PRIMITIVE: dll-valid? ( dll -- ? )
@@ -41,7 +41,7 @@ GENERIC: library-dll ( obj -- dll )
 M: f library-dll ;
 
 M: library library-dll
-    dup [ dll>> ] when ;
+    [ dll>> ] ?call ;
 
 M: string library-dll ( library -- dll )
     lookup-library library-dll ;

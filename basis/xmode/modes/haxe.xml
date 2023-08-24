@@ -1,0 +1,179 @@
+<?xml version="1.0"?>
+<!DOCTYPE MODE SYSTEM "xmode.dtd">
+
+<!--
+  ~ jEdit - Programmer's Text Editor
+  ~ :tabSize=8:indentSize=8:noTabs=false:
+  ~ :folding=explicit:collapseFolds=1:
+  ~
+  ~ Copyright © 2010 jEdit contributors
+  ~
+  ~ This program is free software; you can redistribute it and/or
+  ~ modify it under the terms of the GNU General Public License
+  ~ as published by the Free Software Foundation; either version 2
+  ~ of the License, or any later version.
+  ~ This program is distributed in the hope that it will be useful,
+  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  ~ GNU General Public License for more details.
+  ~
+  ~ You should have received a copy of the GNU General Public License
+  ~ along with this program; if not, write to the Free Software
+  ~ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+  -->
+
+<!--
+  This mode highlights the syntax of haXe, but unlike most modes,
+  it does not attempt to highlight standard API, except those core
+  types defined prior to any imports, e.g. the Bool class.
+-->
+<MODE>
+  <PROPS>
+    <PROPERTY NAME="indentOpenBrackets" VALUE="{" />
+    <PROPERTY NAME="indentCloseBrackets" VALUE="}" />
+    <!-- the ; hack is there so that stuff like if(bob) fred();
+         does not indent the next line -->
+    <PROPERTY NAME="indentPrevLine"
+      VALUE="\s*(if|while)\s*(|else|case|default:)[^;]*|for\s*\(.*)" />
+    <!-- set this to 'true' if you want to use GNU coding style -->
+    <PROPERTY NAME="doubleBracketIndent" VALUE="false" />
+    <PROPERTY NAME="lineUpClosingBracket" VALUE="true" />
+    <PROPERTY NAME="commentStart" VALUE="/*" />
+    <PROPERTY NAME="commentEnd" VALUE="*/" />
+    <PROPERTY NAME="lineComment" VALUE="//" />
+    <PROPERTY NAME="wordBreakChars" VALUE="+-.,=&lt;&gt;/?^&amp;*" />
+  </PROPS>
+
+  <RULES ESCAPE="\\"
+         IGNORE_CASE="FALSE" HIGHLIGHT_DIGITS="TRUE"
+         DIGIT_RE="(0x[[:xdigit:]]+|[[:digit:]]+((E|e|)[[:digit:]]*)?)">
+    <!-- whitespace: (space and tab) -->
+    <SPAN TYPE="COMMENT1">
+      <BEGIN>/*</BEGIN>
+      <END>*/</END>
+    </SPAN>
+
+    <SPAN TYPE="LITERAL1" NO_LINE_BREAK="TRUE">
+      <BEGIN>"</BEGIN>
+      <END>"</END>
+    </SPAN>
+
+    <SPAN TYPE="LITERAL1" NO_LINE_BREAK="TRUE">
+      <BEGIN>'</BEGIN>
+      <END>'</END>
+    </SPAN>
+
+    <!-- Mark anything preceding ( as a function. -->
+    <MARK_PREVIOUS TYPE="FUNCTION" MATCH_TYPE="CONTEXT">(</MARK_PREVIOUS>
+    <!-- Sometimes I leave a space. -->
+    <MARK_PREVIOUS TYPE="FUNCTION" MATCH_TYPE="CONTEXT"> (</MARK_PREVIOUS>
+
+    <EOL_SPAN TYPE="COMMENT1">//</EOL_SPAN>
+                
+    <!-- Make preprocessor directive look like comment 3 -->
+    <EOL_SPAN TYPE="COMMENT3">#</EOL_SPAN>
+
+    <!-- Regular expression highlighting -->
+    <SEQ_REGEXP TYPE="MARKUP"
+                HASH_CHAR="~"
+                AT_WORD_START="TRUE"
+    >~([[:punct:]])(?:.*?[^\\])*?\1[sgiexom]*</SEQ_REGEXP>
+                
+    <SEQ TYPE="NULL">)</SEQ>
+    <SEQ TYPE="NULL">(</SEQ>
+
+    <SEQ TYPE="OPERATOR">=</SEQ>
+    <SEQ TYPE="OPERATOR">!</SEQ>
+    <SEQ TYPE="OPERATOR">+</SEQ>
+    <SEQ TYPE="OPERATOR">-</SEQ>
+    <SEQ TYPE="OPERATOR">/</SEQ>
+    <SEQ TYPE="OPERATOR">*</SEQ>
+    <SEQ TYPE="OPERATOR">&gt;</SEQ>
+    <SEQ TYPE="OPERATOR">&lt;</SEQ>
+    <SEQ TYPE="OPERATOR">%</SEQ>
+    <SEQ TYPE="OPERATOR">&amp;</SEQ>
+    <SEQ TYPE="OPERATOR">|</SEQ>
+    <SEQ TYPE="OPERATOR">^</SEQ>
+    <SEQ TYPE="OPERATOR">~</SEQ>
+    <SEQ TYPE="OPERATOR">.</SEQ>
+    <SEQ TYPE="OPERATOR">}</SEQ>
+    <SEQ TYPE="OPERATOR">{</SEQ>
+    <SEQ TYPE="OPERATOR">,</SEQ>
+    <SEQ TYPE="OPERATOR">;</SEQ>
+    <SEQ TYPE="OPERATOR">]</SEQ>
+    <SEQ TYPE="OPERATOR">[</SEQ>
+    <SEQ TYPE="OPERATOR">?</SEQ>
+    <SEQ TYPE="OPERATOR">:</SEQ>
+                
+    <KEYWORDS>
+                
+      <!-- haXe's flow control words -->
+      <KEYWORD1>break</KEYWORD1>
+      <KEYWORD1>case</KEYWORD1>
+      <KEYWORD1>catch</KEYWORD1>
+      <KEYWORD1>continue</KEYWORD1>
+      <KEYWORD1>default</KEYWORD1>
+      <KEYWORD1>never</KEYWORD1>
+      <KEYWORD1>do</KEYWORD1>
+      <KEYWORD1>else</KEYWORD1>
+      <KEYWORD1>for</KEYWORD1>
+      <KEYWORD1>if</KEYWORD1>
+      <KEYWORD1>in</KEYWORD1>
+      <KEYWORD1>return</KEYWORD1>
+      <KEYWORD1>switch</KEYWORD1>
+      <KEYWORD1>throw</KEYWORD1>
+      <KEYWORD1>try</KEYWORD1>
+      <KEYWORD1>while</KEYWORD1>
+
+      <!-- haXe's declarative words -->
+      <KEYWORD2>class</KEYWORD2>
+      <KEYWORD2>enum</KEYWORD2>
+      <KEYWORD2>extends</KEYWORD2>
+      <KEYWORD2>extern</KEYWORD2>
+      <KEYWORD2>function</KEYWORD2>
+      <KEYWORD2>implements</KEYWORD2>
+      <KEYWORD2>import</KEYWORD2>
+      <KEYWORD2>using</KEYWORD2>
+      <KEYWORD2>interface</KEYWORD2>
+      <KEYWORD2>inline</KEYWORD2>
+      <KEYWORD2>override</KEYWORD2>
+      <KEYWORD2>package</KEYWORD2>
+      <KEYWORD2>private</KEYWORD2>
+      <KEYWORD2>public</KEYWORD2>
+      <KEYWORD2>static</KEYWORD2>
+      <KEYWORD2>typedef</KEYWORD2>
+      <KEYWORD2>using</KEYWORD2>
+      <KEYWORD2>var</KEYWORD2>
+      <KEYWORD2>dynamic</KEYWORD2>
+
+      <!-- Built-in types -->
+      <KEYWORD3>ArrayAccess</KEYWORD3>
+      <KEYWORD3>Array</KEYWORD3>
+      <KEYWORD3>Bool</KEYWORD3>
+      <KEYWORD3>Dynamic</KEYWORD3>
+      <KEYWORD3>Float</KEYWORD3>
+      <KEYWORD3>Int</KEYWORD3>
+      <KEYWORD3>Iterator</KEYWORD3>
+      <KEYWORD3>Iterable</KEYWORD3>
+      <KEYWORD3>Null</KEYWORD3>
+      <KEYWORD3>Object</KEYWORD3>
+      <KEYWORD3>String</KEYWORD3>
+      <KEYWORD3>UInt</KEYWORD3>
+      <KEYWORD3>Void</KEYWORD3>
+
+      <!-- Special keywords -->
+      <LITERAL2>cast</LITERAL2>
+      <LITERAL2>new</LITERAL2>
+      <LITERAL2>super</LITERAL2>
+      <LITERAL2>this</LITERAL2>
+      <LITERAL2>trace</LITERAL2>
+      <LITERAL2>typeof</LITERAL2>
+      <LITERAL2>untyped</LITERAL2>
+      <!-- Literals -->
+      <LITERAL2>false</LITERAL2>
+      <LITERAL2>null</LITERAL2>
+      <LITERAL2>true</LITERAL2>
+      <LITERAL2>undefined</LITERAL2>
+    </KEYWORDS>
+  </RULES>
+</MODE>

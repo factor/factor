@@ -1,13 +1,12 @@
-USING: assocs classes help.markup help.syntax kernel
-quotations strings words words.symbol furnace.auth.providers.db
-checksums.sha furnace.auth.providers math byte-arrays
-http ;
+USING: byte-arrays checksums.sha furnace.auth.providers
+furnace.auth.providers.db help.markup help.syntax http kernel
+math strings words.symbol ;
 IN: furnace.auth
 
 HELP: <protected>
 { $values
-     { "responder" "a responder" }
-     { "protected" "a new responder" }
+    { "responder" "a responder" }
+    { "protected" "a new responder" }
 }
 { $description "Wraps a responder in a protected responder. Access to the wrapped responder will be conditional upon the client authenticating with the current authentication realm." } ;
 
@@ -28,15 +27,15 @@ HELP: define-capability
 
 HELP: encode-password
 { $values
-     { "string" string } { "salt" integer }
-     { "bytes" byte-array }
+    { "string" string } { "salt" integer }
+    { "bytes" byte-array }
 }
 { $description "Encodes a password with the current authentication realm's checksum." } ;
 
 HELP: have-capabilities?
 { $values
-     { "capabilities" "a sequence of capabilities" }
-     { "?" boolean }
+    { "capabilities" "a sequence of capabilities" }
+    { "?" boolean }
 }
 { $description "Tests if the currently logged-in user possesses the given capabilities." } ;
 
@@ -45,14 +44,14 @@ HELP: logged-in-user
 
 HELP: login-required
 { $values
-     { "description" string } { "capabilities" "a sequence of capabilities" }
+    { "description" string } { "capabilities" "a sequence of capabilities" }
 }
 { $description "Redirects the client to a login page." } ;
 
 HELP: login-required*
 { $values
-     { "description" string } { "capabilities" "a sequence of capabilities" } { "realm" "an authenticaiton realm" }
-     { "response" response }
+    { "description" string } { "capabilities" "a sequence of capabilities" } { "realm" "an authenticaiton realm" }
+    { "response" response }
 }
 { $contract "Constructs an HTTP response for redirecting the client to a login page." } ;
 
@@ -98,18 +97,18 @@ ARTICLE: "furnace.auth.protected" "Protected resources"
     <protected>
 }
 "Protected responders have the following two slots which may be set:"
-{ $table
-    { { $slot "description" } "A string identifying the protected resource for user interface purposes" }
-    { { $slot "capabilities" } { "A sequence of capabilities; see " { $link "furnace.auth.capabilities" } } }
+{ $slots
+    { "description" "A string identifying the protected resource for user interface purposes" }
+    { "capabilities" { "A sequence of capabilities; see " { $link "furnace.auth.capabilities" } } }
 } ;
 
 ARTICLE: "furnace.auth.realm-config" "Authentication realm configuration"
 "Instances of subclasses of " { $link realm } " have the following slots which may be set:"
-{ $table
-    { { $slot "name" } "A string identifying the realm for user interface purposes" }
-    { { $slot "users" } { "An authentication provider (see " { $link "furnace.auth.providers" } "). By default, the " { $link users-in-db } " provider is used." } }
-    { { $slot "checksum" } { "An implementation of the checksum protocol used for verifying passwords (see " { $link "checksums" } "). The " { $link sha-256 } " checksum is used by default." } }
-    { { $slot "secure" } { "A boolean, that when set to a true value, forces the client to access the authentication realm via HTTPS. An attempt to access the realm via HTTP results in a redirect to the corresponding HTTPS URL. On by default." } }
+{ $slots
+    { "name" "A string identifying the realm for user interface purposes" }
+    { "users" { "An authentication provider (see " { $link "furnace.auth.providers" } "). By default, the " { $link users-in-db } " provider is used." } }
+    { "checksum" { "An implementation of the checksum protocol used for verifying passwords (see " { $link "checksums" } "). The " { $link sha-256 } " checksum is used by default." } }
+    { "secure" { "A boolean, that when set to a true value, forces the client to access the authentication realm via HTTPS. An attempt to access the realm via HTTP results in a redirect to the corresponding HTTPS URL. On by default." } }
 } ;
 
 ARTICLE: "furnace.auth.providers" "Authentication providers"
@@ -121,7 +120,6 @@ $nl
     "furnace.auth.providers.null"
     "furnace.auth.providers.assoc"
     "furnace.auth.providers.db"
-    "furnace.auth.providers.couchdb"
 } ;
 
 ARTICLE: "furnace.auth.features" "Optional authentication features"
@@ -194,8 +192,6 @@ $nl
 { $subsections "furnace.auth.users" }
 "Authentication realms can be adorned with additional functionality."
 { $subsections "furnace.auth.features" }
-"An administration tool."
-{ $subsections "webapps.user-admin" }
 "A concrete example."
 { $subsections "furnace.auth.example" } ;
 

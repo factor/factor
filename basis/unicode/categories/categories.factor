@@ -1,5 +1,5 @@
 ! Copyright (C) 2008 Daniel Ehrenberg.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors assocs classes.parser classes.predicate fry
 kernel math parser sequences splitting unicode.data
 unicode.data.private ;
@@ -11,7 +11,7 @@ SYMBOLS: Cn Lu Ll Lt Lm Lo Mn Mc Me Nd Nl No Pc Pd Ps Pe Pi Pf Po Sm Sc Sk So Zs
 <PRIVATE
 
 : [category] ( categories code -- quot )
-    '[ integer>fixnum-strict dup category# _ member? [ drop t ] _ if ] ;
+    '[ integer>fixnum-strict dup category-num _ member? [ drop t ] _ if ] ;
 
 : integer-predicate-class ( word predicate -- )
     integer swap define-predicate-class ;

@@ -1,4 +1,4 @@
-USING: accessors arrays colors colors.constants kernel tetris.board tetris.piece tools.test ;
+USING: accessors arrays colors kernel tetris.board tetris.piece tools.test ;
 
 { { { f f } { f f } { f f } } } [ 2 3 make-rows ] unit-test
 { { { f f } { f f } { f f } } } [ 2 3 <board> rows>> ] unit-test

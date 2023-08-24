@@ -1,7 +1,7 @@
 ! Copyright (C) 2011 John Benediktsson
-! See http://factorcode.org/license.txt for BSD license
+! See https://factorcode.org/license.txt for BSD license
 
-USING: command-line io kernel namespaces sequences ;
+USING: command-line io kernel namespaces sequences splitting ;
 
 IN: tools.echo
 
@@ -9,7 +9,7 @@ IN: tools.echo
     [ first "-n" = ] keep over [ rest ] when ;
 
 : echo-args ( args -- )
-    -n? " " join write [ nl ] unless ;
+    -n? join-words write [ nl ] unless ;
 
 : run-echo ( -- )
     command-line get [ nl ] [ echo-args ] if-empty ;

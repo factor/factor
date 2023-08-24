@@ -1,10 +1,8 @@
 ! Based on Clojure's PersistentHashMap by Rich Hickey.
 
-USING: math math.bitwise arrays kernel accessors locals sequences
-sequences.private
-persistent.sequences
-persistent.hashtables.config
-persistent.hashtables.nodes ;
+USING: accessors kernel math math.bitwise
+persistent.hashtables.config persistent.hashtables.nodes
+persistent.sequences sequences sequences.private ;
 IN: persistent.hashtables.nodes.bitmap
 
 : index ( bit bitmap -- n ) [ 1 - ] dip bitand bit-count ; inline
@@ -76,4 +74,4 @@ M:: bitmap-node (pluck-at) ( key hashcode bitmap-node -- node' )
         ] if
     ] if ;
 
-M: bitmap-node >alist% ( node -- ) nodes>> >alist-each% ;
+M: bitmap-node >alist% nodes>> >alist-each% ;

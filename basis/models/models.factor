@@ -1,7 +1,6 @@
 ! Copyright (C) 2006, 2008 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
-USING: accessors generic kernel math sequences arrays assocs
-calendar math.order continuations fry ;
+! See https://factorcode.org/license.txt for BSD license.
+USING: accessors continuations kernel math math.order sequences ;
 IN: models
 
 TUPLE: model < identity-tuple
@@ -54,7 +53,11 @@ DEFER: remove-connection
         drop
     ] if ;
 
+: compute-model ( model -- value )
+    [ activate-model ] [ deactivate-model ] [ value>> ] tri ;
+
 GENERIC: model-changed ( model observer -- )
+M: object model-changed 2drop ;
 
 : add-connection ( observer model -- )
     dup connections>>
@@ -68,7 +71,7 @@ GENERIC: model-changed ( model observer -- )
 : with-locked-model ( model quot -- )
     [ '[ _ t >>locked? @ ] ]
     [ drop '[ f _ locked?<< ] ]
-    2bi [ ] cleanup ; inline
+    2bi finally ; inline
 
 GENERIC: update-model ( model -- )
 

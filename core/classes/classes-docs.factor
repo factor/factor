@@ -1,5 +1,4 @@
-USING: classes.private help.markup help.syntax kernel quotations
-sequences words ;
+USING: classes.private help.markup help.syntax kernel sequences words ;
 IN: classes
 
 ARTICLE: "class-predicates" "Class predicate words"
@@ -87,7 +86,7 @@ HELP: class-usage
 { $description "Lists all classes that uses or depends on this class." } ;
 
 HELP: classes
-{ $values { "seq" "a sequence of class words" } }
+{ $values { "seq" { $sequence class } } }
 { $description "Finds all class words in the dictionary." } ;
 
 HELP: contained-classes
@@ -96,7 +95,7 @@ HELP: contained-classes
 { $see-also all-contained-classes } ;
 
 HELP: define-predicate
-{ $values { "class" class } { "quot" quotation } }
+{ $values { "class" class } { "quot" { $quotation ( obj -- ? ) } } }
 { $description "Defines a predicate word for a class." }
 $low-level-note ;
 
@@ -105,7 +104,7 @@ HELP: metaclass-changed
 { $description "Notifies the class 'class' that its metaclass 'use' has changed." } ;
 
 HELP: predicate-def
-{ $values { "obj" "a type object" } { "quot" quotation } }
+{ $values { "obj" "a type object" } { "quot" { $quotation ( obj -- ? ) } } }
 { $description "Outputs a quotation that can be used to check if objects are an instance of the given type." }
 { $examples
   { $example
@@ -131,8 +130,8 @@ HELP: superclass-of
 
 HELP: superclasses-of
 { $values
-     { "class" class }
-     { "supers" sequence } }
+    { "class" class }
+    { "supers" sequence } }
 { $description "Outputs a sequence of superclasses of a class along with the class itself." }
 { $examples
     { $example "USING: classes prettyprint ;"
@@ -166,18 +165,18 @@ HELP: class-participants
 { $description "If " { $snippet "class" } " is an intersection class, outputs a sequence of its participant classes, otherwise outputs " { $link f } "." } ;
 
 HELP: define-class
-{ $values { "word" word } { "superclass" class } { "members" "a sequence of class words" } { "participants" "a sequence of class words" } { "metaclass" class } }
+{ $values { "word" word } { "superclass" class } { "members" { $sequence class } } { "participants" { $sequence class } } { "metaclass" class } }
 { $description "Sets a property indicating this word is a class word, thus making it an instance of " { $link class } ", and registers it with " { $link update-map } "." }
 $low-level-note ;
 
 HELP: implementors
-{ $values { "class/classes" "a class or a sequence of classes" } { "seq" "a sequence of generic words" } }
+{ $values { "class/classes" { $or class { $sequence class } } } { "seq" "a sequence of generic words" } }
 { $description "Finds all generic words in the dictionary implementing methods for the given set of classes." } ;
 
 HELP: instance?
 { $values
-     { "object" object } { "class" class }
-     { "?" boolean } }
+    { "object" object } { "class" class }
+    { "?" boolean } }
 { $description "Tests whether the input object is a member of the class." } ;
 
 HELP: reset-class

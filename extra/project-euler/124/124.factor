@@ -1,10 +1,10 @@
 ! Copyright (c) 2009 Guillaume Nargeot.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: arrays kernel math.primes.factors
-math.ranges project-euler.common sequences sorting ;
+ranges project-euler.common sequences sorting ;
 IN: project-euler.124
 
-! http://projecteuler.net/index.php?section=problems&id=124
+! https://projecteuler.net/index.php?section=problems&id=124
 
 ! DESCRIPTION
 ! -----------
@@ -43,7 +43,7 @@ IN: project-euler.124
     unique-factors product ; inline
 
 : rads-upto ( n -- seq )
-    [0,b] [ dup rad 2array ] map ;
+    [0..b] [ dup rad 2array ] map ;
 
 : (euler124) ( -- seq )
     100000 rads-upto sort-values ;

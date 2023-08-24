@@ -1,7 +1,7 @@
 ! Copyright (C) 2015 Doug Coleman.
-! See http://factorcode.org/license.txt for BSD license.
-USING: accessors classes.private classes.tuple
-classes.tuple.private combinators kernel parser sequences words ;
+! See https://factorcode.org/license.txt for BSD license.
+USING: classes.private classes.tuple classes.tuple.private
+combinators kernel words ;
 IN: classes.error
 
 PREDICATE: error-class < tuple-class

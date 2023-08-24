@@ -3,10 +3,10 @@ USING: help.syntax help.markup http.server ;
 
 HELP: rewrite
 { $class-description "The class of directory rewrite responders. The slots are as follows:"
-{ $list
-  { { $slot "default" } " - the responder to call if no file name is provided." }
-  { { $slot "child" } " - the responder to call if a file name is provided." }
-  { { $slot "param" } " - the name of a request parameter which will store the first path component of the file name passed to the responder." }
+{ $slots
+  { "default" "the responder to call if no file name is provided." }
+  { "child" "the responder to call if a file name is provided." }
+  { "param" "the name of a request parameter which will store the first path component of the file name passed to the responder." }
 } } ;
 
 HELP: <rewrite>
@@ -23,11 +23,11 @@ HELP: <rewrite>
 
 HELP: vhost-rewrite
 { $class-description "The class of virtual host rewrite responders. The slots are as follows:"
-{ $list
-  { { $slot "default" } " - the responder to call if no host name prefix is provided." }
-  { { $slot "child" } " - the responder to call if a host name prefix is provided." }
-  { { $slot "param" } " - the name of a request parameter which will store the first host name component of the host name passed to the responder." }
-  { { $slot "suffix" } " - the domain name suffix which will be chopped off the end of the request's host name in order to produce the parameter." }
+{ $slots
+  { "default" "the responder to call if no host name prefix is provided." }
+  { "child" " the responder to call if a host name prefix is provided." }
+  { "param" "the name of a request parameter which will store the first host name component of the host name passed to the responder." }
+  { "suffix" "the domain name suffix which will be chopped off the end of the request's host name in order to produce the parameter." }
 } } ;
 
 HELP: <vhost-rewrite>

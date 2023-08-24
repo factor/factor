@@ -1,5 +1,5 @@
 ! Copyright (C) 2006 Chris Double. All Rights Reserved.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: kernel tools.test peg fjsc ;
 
 { T{ ast-expression f V{ T{ ast-number f 55 } T{ ast-identifier f "2abc1" } T{ ast-number f 100 } } } } [

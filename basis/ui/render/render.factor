@@ -1,8 +1,8 @@
 ! Copyright (C) 2005, 2009 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
-USING: accessors colors colors.constants combinators kernel
-math.rectangles math.vectors namespaces opengl opengl.capabilities
-opengl.gl opengl.textures sequences sets ui.gadgets ui.pens ;
+! See https://factorcode.org/license.txt for BSD license.
+USING: accessors colors combinators kernel math.rectangles
+math.vectors namespaces opengl opengl.capabilities opengl.gl
+opengl.textures sequences sets ui.gadgets ui.pens ;
 IN: ui.render
 
 SYMBOL: clip
@@ -41,11 +41,7 @@ SLOT: background-color
     GL_SCISSOR_TEST glEnable
     GL_SRC_ALPHA GL_ONE_MINUS_SRC_ALPHA glBlendFunc
     init-matrices
-    [ init-clip ]
-    [
-        background-color>> >rgba-components glClearColor
-        GL_COLOR_BUFFER_BIT glClear
-    ] bi ;
+    [ init-clip ] [ background-color>> gl-clear ] bi ;
 
 GENERIC: draw-gadget* ( gadget -- )
 

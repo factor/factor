@@ -1,5 +1,5 @@
 ! Copyright (C) 2005, 2011 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: alien alien.c-types assocs combinators compiler.cfg.intrinsics
 compiler.codegen.gc-maps compiler.codegen.labels
 compiler.codegen.relocation compiler.constants cpu.architecture
@@ -40,16 +40,16 @@ M: x86.64 machine-registers
 : vm-reg ( -- reg ) R13 ; inline
 : nv-reg ( -- reg ) RBX ; inline
 
-M: x86.64 %vm-field ( dst offset -- )
+M: x86.64 %vm-field
     [ vm-reg ] dip [+] MOV ;
 
 M:: x86.64 %load-vector ( dst val rep -- )
     dst 0 [RIP+] rep copy-memory* val rc-relative rel-binary-literal ;
 
-M: x86.64 %set-vm-field ( src offset -- )
+M: x86.64 %set-vm-field
     [ vm-reg ] dip [+] swap MOV ;
 
-M: x86.64 %vm-field-ptr ( dst offset -- )
+M: x86.64 %vm-field-ptr
     [ vm-reg ] dip [+] LEA ;
 
 M: x86.64 %prepare-jump
@@ -83,7 +83,7 @@ M:: x86.64 %load-reg-param ( vreg rep reg -- )
 M:: x86.64 %store-reg-param ( vreg rep reg -- )
     reg vreg rep %copy ;
 
-M: x86.64 %discard-reg-param ( rep reg -- )
+M: x86.64 %discard-reg-param
     2drop ;
 
 M:: x86.64 %unbox ( dst src func rep -- )
@@ -102,12 +102,12 @@ M: x86.64 %c-invoke
     [ R11 0 MOV rc-absolute-cell rel-dlsym R11 CALL ] dip
     gc-map-here ;
 
-M: x86.64 %begin-callback ( -- )
+M: x86.64 %begin-callback
     param-reg-0 vm-reg MOV
     param-reg-1 0 MOV
     "begin_callback" f f %c-invoke ;
 
-M: x86.64 %end-callback ( -- )
+M: x86.64 %end-callback
     param-reg-0 vm-reg MOV
     "end_callback" f f %c-invoke ;
 
@@ -122,7 +122,7 @@ M: x86.64 long-long-on-stack? f ;
 
 M: x86.64 struct-return-on-stack? f ;
 
-M: x86.64 (cpuid) ( rax rcx regs -- )
+M: x86.64 (cpuid)
     void { uint uint void* } cdecl [
         RAX param-reg-0 MOV
         RCX param-reg-1 MOV

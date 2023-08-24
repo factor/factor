@@ -1,7 +1,7 @@
-;;; fuel-mode.el --- Major mode for editing Factor programs.
+;;; fuel-mode.el --- Major mode for editing Factor programs. -*- lexical-binding: t -*-
 
 ;; Copyright (C) 2008, 2009, 2010 Jose Antonio Ortega Ruiz
-;; See http://factorcode.org/license.txt for BSD license.
+;; See https://factorcode.org/license.txt for BSD license.
 
 ;; Author: Jose Antonio Ortega Ruiz <jao@gnu.org>
 ;; Keywords: languages, fuel, factor
@@ -226,6 +226,7 @@ interacting with a factor listener is at your disposal.
   ("Run file" ("\C-c\C-k" "\C-c\C-l" "\C-c\C-e\C-k") fuel-run-file)
   ("Run unit tests" "\C-c\C-t" fuel-test-vocab)
   ("Refresh vocabs" "\C-c\C-r" fuel-refresh-all)
+  ("Refresh vocabs and test" "\C-c\M-r" fuel-refresh-and-test-all)
   --
   (menu "Switch to"
         ("Listener" "\C-c\C-z" run-factor)

@@ -2,24 +2,33 @@
 <!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml">
 
-	<t:chloe xmlns:t="http://factorcode.org/chloe/1.0">
+    <t:chloe xmlns:t="http://factorcode.org/chloe/1.0">
 
-		<head>
-			<t:write-title />
+        <head>
+            <meta name="viewport" content="width=device-width, initial-scale=1" charset="utf-8" />
 
-			<t:style t:include="resource:basis/xmode/code2html/stylesheet.css" />
+            <meta name="theme-color" content="#f5f5f5" media="(prefers-color-scheme: light)" />
+            <meta name="theme-color" content="#373e48" media="(prefers-color-scheme: dark)" />
 
-			<t:style t:include="resource:extra/websites/concatenative/page.css" />
+            <t:write-title />
 
-			<t:write-style />
+            <t:style t:include="resource:basis/xmode/code2html/stylesheet.css" />
 
-			<t:write-atom />
-		</head>
+            <t:style t:include="resource:extra/websites/concatenative/page.css" />
 
-		<body>
-			<t:call-next-template />
-		</body>
+            <t:write-style />
 
-	</t:chloe>
+            <t:write-script />
+
+            <t:write-atom />
+        </head>
+
+        <body>
+
+            <t:call-next-template />
+
+        </body>
+
+    </t:chloe>
 
 </html>

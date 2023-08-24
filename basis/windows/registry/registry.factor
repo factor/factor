@@ -1,9 +1,9 @@
 ! Copyright (C) 2010 Doug Coleman.
 ! Copyright (C) 2018 Alexander Ilin.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors alien.c-types alien.data byte-arrays
 classes.struct continuations io.encodings.string
-io.encodings.utf16n kernel literals locals math sequences sets
+io.encodings.utf16 kernel literals locals math sequences sets
 splitting windows windows.advapi32 windows.errors
 windows.kernel32 windows.time windows.types ;
 IN: windows.registry
@@ -45,23 +45,19 @@ CONSTANT: registry-value-max-length 16384
     f 0 KEY_ALL_ACCESS f create-key* drop ;
 
 : close-key ( hkey -- )
-    RegCloseKey dup ERROR_SUCCESS = [
-        drop
-    ] [
-        n>win32-error-string throw
-    ] if ;
+    RegCloseKey n>win32-error-check ;
 
 :: with-open-registry-key ( key subkey mode quot -- )
     key subkey mode open-key :> hkey
     [ hkey quot call ]
     [ hkey close-key ]
-    [ ] cleanup ; inline
+    finally ; inline
 
 :: with-create-registry-key ( key subkey quot -- )
     key subkey create-key :> hkey
     [ hkey quot call ]
     [ hkey close-key ]
-    [ ] cleanup ; inline
+    finally ; inline
 
 <PRIVATE
 
@@ -82,7 +78,7 @@ PRIVATE>
             key value-name ptr1 lpType buffer
             grow-buffer reg-query-value-ex
         ] [
-            ret n>win32-error-string throw
+            ret throw-windows-error
         ] if
     ] if ;
 
@@ -136,7 +132,7 @@ TUPLE: registry-enum-key ;
     0 DWORD <ref> dup :> max-value
     0 DWORD <ref> dup :> max-value-data
     0 DWORD <ref> dup :> security-descriptor
-    FILETIME <struct> dup :> last-write-time
+    FILETIME new dup :> last-write-time
     RegQueryInfoKey :> ret
     ret ERROR_SUCCESS = [
         key
@@ -204,7 +200,7 @@ TUPLE: registry-enum-key ;
 
 :: change-registry-value ( key subkey value-name quot: ( value -- value' ) -- )
     0 DWORD <ref> :> type
-    key subkey KEY_QUERY_VALUE KEY_SET_VALUE bitor [
+    key subkey flags{ KEY_QUERY_VALUE KEY_SET_VALUE } [
         dup :> hkey value-name f type MAX_PATH <byte-array>
         reg-query-value-ex
         type DWORD deref ${ REG_SZ REG_EXPAND_SZ REG_MULTI_SZ } in?
@@ -221,4 +217,11 @@ TUPLE: registry-enum-key ;
         ] when
         [ hkey value-name type DWORD deref ] dip dup length
         set-reg-key
+    ] with-open-registry-key ;
+
+:: query-registry ( key subkey value-name -- value )
+    key subkey KEY_READ [
+        value-name f 0 DWORD <ref> dup :> ptype MAX_PATH <byte-array> reg-query-value-ex
+        ptype DWORD deref dup :> type ${ REG_SZ REG_EXPAND_SZ REG_MULTI_SZ } in?
+        [ utf16n decode type REG_MULTI_SZ = [ "\0" split 2 ] [ 1 ] if head* ] when
     ] with-open-registry-key ;

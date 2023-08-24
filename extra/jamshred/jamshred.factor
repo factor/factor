@@ -1,9 +1,9 @@
 ! Copyright (C) 2007, 2008 Alex Chapman
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors arrays calendar jamshred.game jamshred.gl
-jamshred.player jamshred.log kernel math math.constants
-math.rectangles math.vectors namespaces sequences threads ui
-ui.backend ui.gadgets ui.gadgets.worlds ui.gestures ui.render ;
+jamshred.player kernel math math.constants math.vectors
+namespaces sequences threads ui ui.gadgets ui.gadgets.worlds
+ui.gestures ui.render ;
 IN: jamshred
 
 TUPLE: jamshred-gadget < gadget { jamshred jamshred } last-hand-loc ;
@@ -77,6 +77,7 @@ jamshred-gadget H{
     { T{ key-down f f "DOWN" } [ jamshred>> jamshred-player -1 swap change-player-speed ] }
     { T{ key-down f f "LEFT" } [ jamshred>> 1 jamshred-roll ] }
     { T{ key-down f f "RIGHT" } [ jamshred>> -1 jamshred-roll ] }
+    { T{ key-down f f "ESC" } [ quit ] }
     { T{ key-down f f "q" } [ quit ] }
     { motion [ handle-mouse-motion ] }
     { mouse-scroll [ handle-mouse-scroll ] }

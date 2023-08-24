@@ -1,15 +1,15 @@
 ! Copyright (c) 2014 John Benediktsson
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 
 USING: alien alien.c-types alien.destructors alien.libraries
-alien.libraries.finder alien.syntax combinators kernel system ;
+alien.libraries.finder alien.syntax combinators system ;
 
 IN: fftw.ffi
 
 LIBRARY: fftw3
 
 << "fftw3" {
-    { [ os windows? ] [ "libfftw3-3.dll" ] }
+    { [ os windows? ] [ { "fftw3.dll" "libfftw3-3.dll" } find-library-from-list ] }
     { [ os macosx? ] [ "libfftw3.dylib" ] }
     { [ os unix? ] [ "libfftw3.so" ] }
 } cond cdecl add-library >>

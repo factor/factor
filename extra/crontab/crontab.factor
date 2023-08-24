@@ -1,11 +1,15 @@
 ! Copyright (C) 2018 John Benediktsson
-! See http://factorcode.org/license.txt for BSD license
+! See https://factorcode.org/license.txt for BSD license
 
-USING: accessors arrays ascii assocs calendar calendar.english
-calendar.private combinators io kernel literals locals math
-math.order math.parser math.ranges sequences splitting ;
+USING: accessors arrays ascii assocs assocs.extras calendar
+calendar.english calendar.format calendar.parser
+calendar.private circular combinators combinators.short-circuit
+io kernel literals math math.order math.parser prettyprint
+ranges sequences sets sorting splitting ;
 
 IN: crontab
+
+ERROR: invalid-cronentry value ;
 
 :: parse-value ( value quot: ( value -- value' ) seq -- value )
     value {
@@ -13,22 +17,25 @@ IN: crontab
             "," split [ quot seq parse-value ] map concat ] }
         { [ dup "*" = ] [ drop seq ] }
         { [ CHAR: / over member? ] [
-            "/" split1 [ quot seq parse-value 0 over length 1 - ] dip
-            string>number <range> swap nths ] }
+            "/" split1 [
+                quot seq parse-value
+                dup length 1 = [ seq swap first seq first - ] [ 0 ] if
+                over length dup 7 = [ [ <circular> ] 2dip ] [ 1 - ] if
+            ] dip string>number <range> swap nths ] }
         { [ CHAR: - over member? ] [
-            "-" split1 quot bi@ [a,b] ] }
+            "-" split1 quot bi@ [a..b] ] }
         [ quot call 1array ]
-    } cond ; inline recursive
+    } cond members sort ; inline recursive
 
 : parse-day ( str -- n )
-    dup string>number [ ] [
+    [ string>number dup 7 = [ drop 0 ] when ] [
         >lower $[ day-abbreviations3 [ >lower ] map ] index
-    ] ?if ;
+    ] ?unless ;
 
 : parse-month ( str -- n )
-    dup string>number [ ] [
+    [ string>number ] [
         >lower $[ month-abbreviations [ >lower ] map ] index
-    ] ?if ;
+    ] ?unless ;
 
 TUPLE: cronentry minutes hours days months days-of-week command ;
 
@@ -42,63 +49,155 @@ CONSTANT: aliases H{
     { "@hourly"   "0 * * * *" }
 }
 
+: check-cronentry ( cronentry -- cronentry )
+    dup {
+        [ days-of-week>> [ 0 6 between? ] all? ]
+        [ months>> [ 1 12 between? ] all? ]
+        [
+            [ days>> 1 ] [ months>> ] bi [
+                { 0 31 29 31 30 31 30 31 31 30 31 30 31 } nth
+            ] map supremum [ between? ] 2curry all?
+        ]
+        [ minutes>> [ 0 59 between? ] all? ]
+        [ hours>> [ 0 23 between? ] all? ]
+    } 1&& [ invalid-cronentry ] unless ;
+
 : parse-cronentry ( entry -- cronentry )
     " " split1 [ aliases ?at drop ] dip " " glue
     " " split1 " " split1 " " split1 " " split1 " " split1 {
         [ [ string>number ] T{ range f 0 60 1 } parse-value ]
         [ [ string>number ] T{ range f 0 24 1 } parse-value ]
-        [ [ string>number ] T{ range f 0 31 1 } parse-value ]
-        [ [ parse-month ] T{ range f 0 12 1 } parse-value ]
+        [ [ string>number ] T{ range f 1 31 1 } parse-value ]
+        [ [ parse-month ] T{ range f 1 12 1 } parse-value ]
         [ [ parse-day ] T{ range f 0 7 1 } parse-value ]
         [ ]
-    } spread cronentry boa ;
+    } spread cronentry boa check-cronentry ;
 
-:: next-time-after ( cronentry timestamp -- )
+<PRIVATE
+
+: ?parse-cronentry ( entry -- cronentry )
+    dup cronentry? [ parse-cronentry ] unless ;
+
+:: (next-time-after) ( cronentry timestamp -- )
+
+    f ! should we keep searching for a matching time
 
     timestamp month>> :> month
-    cronentry months>> [ month >= ] find nip [
-        dup month = [ drop f ] [ timestamp month<< t ] if
-    ] [
-        timestamp cronentry months>> first >>month 1 +year
-    ] if* [ cronentry timestamp next-time-after ] when
-
-    timestamp hour>> :> hour
-    cronentry hours>> [ hour >= ] find nip [
-        dup hour = [ drop f ] [
-            timestamp hour<< 0 timestamp minute<< t
-        ] if
-    ] [
-        timestamp cronentry hours>> first >>hour 1 +day
-    ] if* [ cronentry timestamp next-time-after ] when
-
-    timestamp minute>> :> minute
-    cronentry minutes>> [ minute >= ] find nip [
-        dup minute = [ drop f ] [ timestamp minute<< t ] if
-    ] [
-        timestamp cronentry minutes>> first >>minute 1 +hour
-    ] if* [ cronentry timestamp next-time-after ] when
+    cronentry months>> [ month >= ] find nip
+    dup month = [ drop ] [
+        [ cronentry months>> first timestamp 1 +year drop ] unless*
+        timestamp 1 >>day 0 >>hour 0 >>minute month<< drop t
+    ] if
 
     timestamp day-of-week :> weekday
     cronentry days-of-week>> [ weekday >= ] find nip [
         cronentry days-of-week>> first 7 +
-    ] unless* weekday -
+    ] unless* weekday - :> days-to-weekday
 
     timestamp day>> :> day
     cronentry days>> [ day >= ] find nip [
-        day -
-    ] [
-        timestamp 1 months time+
-        cronentry days>> first >>day
-        day-of-year timestamp day-of-year -
-    ] if*
+        cronentry days>> first timestamp days-in-month +
+    ] unless* day - :> days-to-day
 
-    min [
-        timestamp swap +day drop
-        cronentry timestamp next-time-after
-    ] unless-zero ;
+    cronentry days-of-week>> length 7 =
+    cronentry days>> length 31 = 2array
+    {
+        { { f t } [ days-to-weekday ] }
+        { { t f } [ days-to-day ] }
+        [ drop days-to-weekday days-to-day min ]
+    } case [
+        timestamp 0 >>hour 0 >>minute swap +day 2drop t
+    ] unless-zero
+
+    timestamp hour>> :> hour
+    cronentry hours>> [ hour >= ] find nip
+    dup hour = [ drop ] [
+        [ cronentry hours>> first timestamp 1 +day drop ] unless*
+        timestamp 0 >>minute hour<< drop t
+    ] if
+
+    timestamp minute>> :> minute
+    cronentry minutes>> [ minute >= ] find nip
+    dup minute = [ drop ] [
+        [ cronentry minutes>> first timestamp 1 +hour drop ] unless*
+        timestamp minute<< drop t
+    ] if
+
+    [ cronentry timestamp (next-time-after) ] when ;
+
+PRIVATE>
+
+: next-time-after ( cronentry timestamp -- timestamp )
+    [ ?parse-cronentry ] dip 1 minutes time+ 0 >>second
+    [ (next-time-after) ] keep ;
 
 : next-time ( cronentry -- timestamp )
-    now 0 >>second [ next-time-after ] keep ;
+    now next-time-after ;
 
-: parse-crontab ( -- entries )
-    lines [ [ f ] [ parse-cronentry ] if-empty ] map harvest ;
+: next-times-after ( cronentry n timestamp -- timestamps )
+    swap [ dupd next-time-after dup ] replicate 2nip ;
+
+: next-times-from-until ( cronentry from-timestamp until-timestamp -- timestamps )
+    [ dup second>> 0 = [ 1 minutes time- ] when ] dip
+    '[ dupd next-time-after dup dup _ before? ] [ ] produce 3nip ;
+
+: next-times-until ( cronentry timestamp -- timestamps )
+    [ now start-of-minute ] dip next-times-from-until ;
+
+: next-times ( cronentry n -- timestamps )
+    now next-times-after ;
+
+: read-crontab ( -- entries )
+    read-lines harvest [ parse-cronentry ] map ;
+
+: group-crons ( cronstrings from-timestamp until-timestamp -- entries )
+    '[ _ _ next-times-from-until [ timestamp>unix-time ] map ] zip-with
+    [ first2 [ 2array ] with map ] map concat
+    [ nip ] collect-key-by sort-keys ;
+
+: group-crons-for-duration-from ( cronstrings duration from-timestamp -- entries )
+    tuck time+ group-crons ;
+
+: group-crons-for-duration ( cronstrings duration -- entries )
+    now utc group-crons-for-duration-from ;
+
+: crons-for-minute ( cronstrings timestamp -- entries )
+    utc start-of-minute dup end-of-minute group-crons ;
+
+: crons-for-hour ( cronstrings timestamp -- entries )
+    utc start-of-hour dup end-of-hour group-crons ;
+
+: crons-for-day ( cronstrings timestamp -- entries )
+    utc start-of-day dup end-of-day group-crons ;
+
+: crons-for-week ( cronstrings timestamp -- entries )
+    utc start-of-week dup end-of-week group-crons ;
+
+: crons-for-month ( cronstrings timestamp -- entries )
+    utc start-of-month dup end-of-month group-crons ;
+
+: crons-for-year ( cronstrings timestamp -- entries )
+    utc start-of-year dup end-of-year group-crons ;
+
+: crons-for-decade ( cronstrings timestamp -- entries )
+    utc start-of-decade dup end-of-decade group-crons ;
+
+: crons-this-minute ( cronstrings -- entries ) now crons-for-minute ;
+: crons-this-hour ( cronstrings -- entries ) now crons-for-hour ;
+: crons-this-day ( cronstrings -- entries ) now crons-for-day ;
+ALIAS: crons-today crons-this-day
+: crons-yesterday ( cronstrings -- entries ) 1 days ago crons-for-day ;
+: crons-tomorrow ( cronstrings -- entries ) 1 days hence crons-for-day ;
+: crons-this-week ( cronstrings -- entries ) now crons-for-week ;
+: crons-this-month ( cronstrings -- entries ) now crons-for-month ;
+: crons-this-year ( cronstrings -- entries ) now crons-for-year ;
+: crons-this-decade ( cronstrings -- entries ) now crons-for-decade ;
+
+: keys-unix-to-rfc822 ( assoc -- assoc' )
+    [ unix-time>timestamp timestamp>rfc822 ] map-keys ;
+
+: keys-rfc822-to-unix ( assoc -- assoc' )
+    [ rfc822>timestamp timestamp>unix-time ] map-keys ;
+
+: grouped-crons. ( assoc -- )
+    keys-unix-to-rfc822 [ first2 [ write bl ] [ ... ] bi* ] each ;

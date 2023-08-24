@@ -1,8 +1,8 @@
 ! Copyright (C) 2009 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
-USING: assocs kernel accessors quotations slots words
-sequences namespaces combinators combinators.short-circuit
-summary smalltalk.classes ;
+! See https://factorcode.org/license.txt for BSD license.
+USING: accessors assocs combinators combinators.short-circuit
+kernel namespaces quotations sequences slots smalltalk.classes
+summary words ;
 IN: smalltalk.compiler.lexenv
 
 ! local-readers: assoc string => word

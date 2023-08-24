@@ -1,9 +1,9 @@
 ! Copyright (c) 2007 Samuel Tardieu.
-! See http://factorcode.org/license.txt for BSD license.
-USING: kernel math math.functions math.ranges sequences project-euler.common ;
+! See https://factorcode.org/license.txt for BSD license.
+USING: kernel math math.functions ranges sequences project-euler.common ;
 IN: project-euler.173
 
-! http://projecteuler.net/index.php?section=problems&id=173
+! https://projecteuler.net/index.php?section=problems&id=173
 
 ! DESCRIPTION
 ! -----------
@@ -25,7 +25,7 @@ IN: project-euler.173
 <PRIVATE
 
 : laminae ( upper -- n )
-    4 / dup sqrt [1,b] 0 rot [ over /i - - ] curry reduce ;
+    4 / dup sqrt [1..b] 0 rot [ over /i - - ] curry reduce ;
 
 PRIVATE>
 

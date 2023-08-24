@@ -1,7 +1,6 @@
-USING: accessors alien.data.map arrays byte-arrays combinators
-combinators.smart fry grouping images kernel math
-math.matrices.simd math.order math.vectors noise random
-sequences math.vectors.simd typed ;
+USING: accessors alien.data.map byte-arrays combinators grouping
+images kernel math math.matrices.simd math.order math.vectors
+math.vectors.simd noise random sequences typed ;
 FROM: alien.c-types => float uchar ;
 IN: terrain.generation
 

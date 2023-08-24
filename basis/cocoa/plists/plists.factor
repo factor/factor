@@ -1,10 +1,10 @@
 ! Copyright (C) 2007, 2009 Slava Pestov.
 ! Copyright (C) 2008 Joe Groff.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: alien.c-types alien.data arrays byte-arrays cocoa
 cocoa.application cocoa.classes cocoa.enumeration combinators
 core-foundation.data core-foundation.strings
-core-foundation.utilities fry io.backend kernel macros math
+core-foundation.utilities io.backend kernel math
 quotations sequences ;
 IN: cocoa.plists
 

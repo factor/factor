@@ -1,5 +1,5 @@
 USING: vocabs vocabs.loader.private help.markup help.syntax
-words strings io hashtables ;
+words hashtables ;
 IN: vocabs.loader
 
 ARTICLE: "add-vocab-roots" "Working with code outside of the Factor source tree"

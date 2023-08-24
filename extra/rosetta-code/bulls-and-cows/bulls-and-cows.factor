@@ -1,11 +1,10 @@
 ! Copyright (c) 2012 Anonymous
-! See http://factorcode.org/license.txt for BSD license.
-USING: accessors assocs combinators fry grouping hashtables
-kernel locals math math.parser math.ranges random sequences
-strings io ascii ;
+! See https://factorcode.org/license.txt for BSD license.
+USING: accessors ascii assocs combinators io kernel math
+math.parser random ranges sequences ;
 IN: rosetta-code.bulls-and-cows
 
-! http://rosettacode.org/wiki/Bulls_and_cows
+! https://rosettacode.org/wiki/Bulls_and_cows
 
 ! This is an old game played with pencil and paper that was
 ! later implemented on computer.
@@ -40,7 +39,7 @@ TUPLE: bull ;
 : inc-bulls ( score -- score ) [ 1 + ] change-bulls ;
 : inc-cows ( score -- score ) [ 1 + ] change-cows ;
 
-: random-nums ( -- seq ) 9 [1,b] 4 sample ;
+: random-nums ( -- seq ) 9 [1..b] 4 sample ;
 
 : add-digits ( seq -- n ) 0 [ swap 10 * + ] reduce number>string ;
 
@@ -59,7 +58,7 @@ TUPLE: bull ;
     } cond ;
 
 : add-to-score ( arr -- score )
-   <score> [ bull? [ inc-bulls ] [ inc-cows ] if ] reduce ;
+    <score> [ bull? [ inc-bulls ] [ inc-cows ] if ] reduce ;
 
 : check-win ( score -- ? ) bulls>> 4 = ;
 

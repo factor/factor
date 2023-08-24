@@ -1,5 +1,5 @@
 ! Copyright (C) 2004, 2010 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors assocs combinators definitions graphs kernel
 make namespaces quotations sequences sets words words.symbol ;
 IN: classes
@@ -92,10 +92,10 @@ M: object predicate-def
 M: predicate flushable? drop t ;
 
 M: predicate forget*
-    [ call-next-method ] [ f "predicating" set-word-prop ] bi ;
+    [ call-next-method ] [ "predicating" remove-word-prop ] bi ;
 
 M: predicate reset-word
-    [ call-next-method ] [ f "predicating" set-word-prop ] bi ;
+    [ call-next-method ] [ "predicating" remove-word-prop ] bi ;
 
 : define-predicate ( class quot -- )
     [ predicate-word ] dip ( object -- ? ) define-declared ;
@@ -220,11 +220,11 @@ GENERIC: update-methods ( class seq -- )
     dup class-usages
     [ nip [ update-class ] each ] [ update-methods ] 2bi ;
 
-: check-inheritance ( subclass superclass -- )
-    2dup superclass-of? [ bad-inheritance ] [ 2drop ] if ;
+: check-inheritance ( subclass superclass -- subclass superclass )
+    2dup superclass-of? [ bad-inheritance ] when ;
 
 : define-class ( word superclass members participants metaclass -- )
-    [ 2dup check-inheritance ] 3dip
+    [ check-inheritance ] 3dip
     make-class-props [ (define-class) ] [ drop changed-definition ] 2bi ;
 
 : forget-predicate ( class -- )
@@ -253,5 +253,10 @@ PRIVATE>
 M: class metaclass-changed
     swap class? [ drop ] [ forget-class ] if ;
 
-M: class forget* ( class -- )
+M: class forget*
     [ call-next-method ] [ forget-class ] bi ;
+
+ERROR: not-an-instance obj class ;
+
+: check-instance ( obj class -- obj )
+    [ dupd instance? ] keep [ not-an-instance ] curry unless ; inline

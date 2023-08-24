@@ -1,5 +1,5 @@
 ! Copyright (C) 2007, 2008 Slava Pestov, Eduardo Cavazos.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors definitions effects generic kernel locals
 macros memoize prettyprint prettyprint.backend see words ;
 IN: locals.definitions
@@ -12,9 +12,9 @@ M: lambda-word definition
     "lambda" word-prop body>> ;
 
 M: lambda-word reset-word
-    [ call-next-method ] [ f "lambda" set-word-prop ] bi ;
+    [ call-next-method ] [ "lambda" remove-word-prop ] bi ;
 
-INTERSECTION: lambda-macro macro lambda-word ;
+PREDICATE: lambda-macro < macro lambda-word? ;
 
 M: lambda-macro definer drop \ MACRO:: \ ; ;
 
@@ -22,9 +22,9 @@ M: lambda-macro definition
     "lambda" word-prop body>> ;
 
 M: lambda-macro reset-word
-    [ call-next-method ] [ f "lambda" set-word-prop ] bi ;
+    [ call-next-method ] [ "lambda" remove-word-prop ] bi ;
 
-INTERSECTION: lambda-method method lambda-word ;
+PREDICATE: lambda-method < method lambda-word? ;
 
 M: lambda-method definer drop \ M:: \ ; ;
 
@@ -32,9 +32,9 @@ M: lambda-method definition
     "lambda" word-prop body>> ;
 
 M: lambda-method reset-word
-    [ call-next-method ] [ f "lambda" set-word-prop ] bi ;
+    [ call-next-method ] [ "lambda" remove-word-prop ] bi ;
 
-INTERSECTION: lambda-memoized memoized lambda-word ;
+PREDICATE: lambda-memoized < memoized lambda-word? ;
 
 M: lambda-memoized definer drop \ MEMO:: \ ; ;
 
@@ -42,7 +42,7 @@ M: lambda-memoized definition
     "lambda" word-prop body>> ;
 
 M: lambda-memoized reset-word
-    [ call-next-method ] [ f "lambda" set-word-prop ] bi ;
+    [ call-next-method ] [ "lambda" remove-word-prop ] bi ;
 
 : method-stack-effect ( method -- effect )
     dup "lambda" word-prop vars>>

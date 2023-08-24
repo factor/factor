@@ -1,8 +1,8 @@
 ! Copyright (C) 2014 John Benediktsson
-! See http://factorcode.org/license.txt for BSD license
+! See https://factorcode.org/license.txt for BSD license
 
 USING: assocs combinators.short-circuit kernel make math
-math.order math.parser math.ranges regexp sequences splitting
+math.order math.parser ranges regexp sequences splitting
 strings ;
 
 IN: html.entities
@@ -28,12 +28,12 @@ PRIVATE>
 
 : html-escape ( str -- newstr )
     [
-        [ dup next-escape dup ] [ escape, ] while 2drop ,
+        [ dup next-escape ] [ escape, ] while* drop ,
     ] { } make dup length 1 > [ concat ] [ first ] if ;
 
 <PRIVATE
 
-! see http://www.w3.org/TR/html5/syntax.html#tokenizing-character-references
+! see https://www.w3.org/TR/html5/syntax.html#tokenizing-character-references
 
 CONSTANT: invalid-charrefs H{
     { 0x00 "\u00fffd" }  ! REPLACEMENT CHARACTER
@@ -95,7 +95,7 @@ CONSTANT: invalid-codepoints {
     0x10fffe 0x10ffff
 }
 
-! see http://www.w3.org/TR/html5/syntax.html#named-character-references
+! see https://www.w3.org/TR/html5/syntax.html#named-character-references
 
 CONSTANT: html5 H{
     { "Aacute" "\xc1" }
@@ -2344,7 +2344,7 @@ CONSTANT: html5 H{
 : named-charref ( str -- newstr )
     html5 ?at [
         ! find the longest matching name
-        dup dup length 1 (a,b) [ head html5 at ] with map-find
+        dup dup length 1 (a..b) [ head html5 at ] with map-find
         [ swapd tail append ] [ drop "&" prepend ] if*
     ] unless ;
 

@@ -1,10 +1,9 @@
 ! Copyright (c) 2012 Anonymous
-! See http://factorcode.org/license.txt for BSD license.
-USING: bit-arrays formatting fry kernel math math.ranges
-sequences ;
+! See https://factorcode.org/license.txt for BSD license.
+USING: bit-arrays formatting kernel math ranges sequences ;
 IN: rosetta-code.100-doors
 
-! http://rosettacode.org/wiki/100_doors
+! https://rosettacode.org/wiki/100_doors
 
 ! Problem: You have 100 doors in a row that are all initially
 ! closed. You make 100 passes by the doors. The first time
@@ -31,7 +30,7 @@ CONSTANT: number-of-doors 100
     [ multiples ] dip '[ _ [ not ] change-nth ] each ;
 
 : toggle-all-multiples ( doors -- )
-    [ number-of-doors [1,b] ] dip '[ _ toggle-multiples ] each ;
+    [ number-of-doors [1..b] ] dip '[ _ toggle-multiples ] each ;
 
 : print-doors ( doors -- )
     [

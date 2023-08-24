@@ -1,8 +1,8 @@
 ! Copyright (C) 2009 Bruno Deferrari
-! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays assocs calendar classes.parser classes.tuple
-       combinators fry generic.parser kernel lexer
-       mirrors namespaces parser sequences splitting strings words ;
+! See https://factorcode.org/license.txt for BSD license.
+USING: accessors arrays assocs calendar classes.parser
+classes.tuple combinators generic.parser kernel lexer mirrors
+namespaces parser sequences splitting words ;
 IN: irc.messages.base
 
 TUPLE: irc-message line prefix command parameters trailing timestamp sender ;
@@ -51,7 +51,7 @@ M: irc-message post-process-irc-message drop ;
 
 GENERIC: fill-irc-message-slots ( irc-message -- )
 M: irc-message fill-irc-message-slots
-    gmt >>timestamp
+    now-gmt >>timestamp
     {
         [ process-irc-trailing ]
         [ process-irc-prefix ]
@@ -80,9 +80,9 @@ M: irc-message set-irc-command
     {
         [ prefix>> ]
         [ command>> ]
-        [ parameters>> " " join ]
+        [ parameters>> join-words ]
         [ trailing>> dup [ CHAR: : prefix ] when ]
-    } cleave 4array sift " " join ;
+    } cleave 4array sift join-words ;
 
 <PRIVATE
 : ?define-irc-parameters ( class slot-names -- )

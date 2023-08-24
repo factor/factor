@@ -1,7 +1,7 @@
 ! Copyright (C) 2007, 2009 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
-USING: accessors assocs fry kernel models models.mapping
-namespaces sequences tools.deploy tools.deploy.config
+! See https://factorcode.org/license.txt for BSD license.
+USING: accessors assocs kernel models models.mapping namespaces
+sequences tools.deploy tools.deploy.config
 tools.deploy.config.editor ui ui.commands ui.gadgets
 ui.gadgets.borders ui.gadgets.buttons ui.gadgets.editors
 ui.gadgets.labels ui.gadgets.packs ui.gadgets.toolbar

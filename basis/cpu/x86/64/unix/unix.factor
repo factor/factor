@@ -1,9 +1,9 @@
 ! Copyright (C) 2008, 2010 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors alien.c-types arrays assocs
 compiler.cfg.builder.alien.boxing cpu.architecture cpu.x86
-cpu.x86.assembler cpu.x86.assembler.operands kernel layouts make math
-math.order sequences splitting system ;
+cpu.x86.assembler cpu.x86.assembler.operands kernel layouts locals
+make math math.order namespaces sequences splitting system ;
 IN: cpu.x86.64.unix
 
 M: x86.64 param-regs
@@ -24,18 +24,28 @@ M: x86.64 reserved-stack-space 0 ;
         [ 8 mod zero? [ t , ] when , ] assoc-each
     ] { } make { t } split harvest ;
 
-: flatten-small-struct ( c-type -- seq )
-    struct-types&offset split-struct [
+:: flatten-small-struct ( c-type -- seq )
+    c-type struct-types&offset split-struct [
         [ lookup-c-type c-type-rep reg-class-of ] map
         int-regs swap member? int-rep double-rep ?
         f f 3array
-    ] map ;
+    ] map :> reps
+    int-reg-reps get float-reg-reps get and [
+        reps reg-reps :> ( int-mems float-mems )
+        int-reg-reps get int-mems + 6 >
+        float-reg-reps get float-mems + 8 > or [
+            reps [ first t f 3array ] map
+        ] [ reps ] if
+    ] [ reps ] if ;
 
-M: x86.64 flatten-struct-type ( c-type -- seq )
+M: x86.64 flatten-struct-type
     dup heap-size 16 <=
-    [ flatten-small-struct ] [ call-next-method [ first t f 3array ] map ] if ;
+    [ flatten-small-struct record-reg-reps ] [
+        call-next-method unrecord-reg-reps
+        [ first t f 3array ] map
+    ] if ;
 
-M: x86.64 return-struct-in-registers? ( c-type -- ? )
+M: x86.64 return-struct-in-registers?
     heap-size 2 cells <= ;
 
 M: x86.64 dummy-stack-params? f ;
@@ -44,6 +54,6 @@ M: x86.64 dummy-int-params? f ;
 
 M: x86.64 dummy-fp-params? f ;
 
-M: x86.64 %prepare-var-args ( reg-inputs -- )
+M: x86.64 %prepare-var-args
     [ second reg-class-of float-regs? ] count 8 min
     [ EAX EAX XOR ] [ <byte> AL swap MOV ] if-zero ;

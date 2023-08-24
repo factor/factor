@@ -1,11 +1,12 @@
 ! Copyright (C) 2010 Doug Coleman.
-! See http://factorcode.org/license.txt for BSD license.
-USING: assocs combinators fry grouping http.client io
-io.encodings.binary io.files io.files.temp io.files.unique
-json.reader kernel locals make namespaces sequences urls ;
+! See https://factorcode.org/license.txt for BSD license.
+
+USING: assocs combinators grouping http.client io io.files.temp
+io.files.unique json kernel make sequences urls ;
+
 IN: google.translate
 
-CONSTANT: google-translate-url "http://ajax.googleapis.com/ajax/services/language/translate"
+CONSTANT: google-translate-url "https://ajax.googleapis.com/ajax/services/language/translate"
 
 CONSTANT: maximum-translation-size 5120
 
@@ -52,7 +53,7 @@ TUPLE: response-error response error ;
     ] loop drop ;
 
 : translate-tts ( text -- file )
-    "http://translate.google.com/translate_tts?tl=en" >url
+    "https://translate.google.com/translate_tts?tl=en" >url
     swap "q" set-query-param [
         "" ".mp3" unique-file [ download-to ] keep
     ] with-temp-directory ;

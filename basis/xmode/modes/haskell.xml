@@ -3,8 +3,7 @@
 <!DOCTYPE MODE SYSTEM "xmode.dtd">
 
 <!--
-	Haskell mode by Kristian Ovaska (kristian.ovaska@helsinki.fi)
-	Based on Haskell 98
+	Haskell mode by Stephen Blackheath
 -->
 
 <MODE>
@@ -13,12 +12,9 @@
 		<PROPERTY NAME="commentStart" VALUE="{-" />
 		<PROPERTY NAME="commentEnd" VALUE="-}" />
 		<PROPERTY NAME="lineComment" VALUE="--" />
-		<!-- apparently, this is required... -->
-		<PROPERTY NAME="tabSize" VALUE="8" />
-		<PROPERTY NAME="indentSize" VALUE="8" />
 	</PROPS>
 
-	<RULES IGNORE_CASE="FALSE" HIGHLIGHT_DIGITS="TRUE" ESCAPE="\">
+	<RULES IGNORE_CASE="FALSE" HIGHLIGHT_DIGITS="FALSE">
 		<!-- Pragmas. -->
 		<SPAN TYPE="COMMENT2">
 			<BEGIN>{-#</BEGIN>
@@ -32,149 +28,97 @@
 
 		<EOL_SPAN TYPE="COMMENT1">--</EOL_SPAN>
 
-		<SPAN TYPE="LITERAL1" NO_LINE_BREAK="TRUE">
+		<SPAN TYPE="LITERAL1" ESCAPE="\" NO_LINE_BREAK="TRUE">
 			<BEGIN>"</BEGIN>
 			<END>"</END>
 		</SPAN>
 
-		<!-- ' causes problems because not all ' are character
-		definitions. I implemented an ugly and partial workaround. -->
-		<SEQ TYPE="LITERAL1">' '</SEQ>
-		<SEQ TYPE="LITERAL1">'!'</SEQ>
-		<SEQ TYPE="LITERAL1">'"'</SEQ>
-		<SEQ TYPE="LITERAL1">'$'</SEQ>
-		<SEQ TYPE="LITERAL1">'%'</SEQ>
-		<SEQ TYPE="LITERAL1">'/'</SEQ>
-		<SEQ TYPE="LITERAL1">'('</SEQ>
-		<SEQ TYPE="LITERAL1">')'</SEQ>
-		<SEQ TYPE="LITERAL1">'['</SEQ>
-		<SEQ TYPE="LITERAL1">']'</SEQ>
-		<SEQ TYPE="LITERAL1">'+'</SEQ>
-		<SEQ TYPE="LITERAL1">'-'</SEQ>
-		<SEQ TYPE="LITERAL1">'*'</SEQ>
-		<SEQ TYPE="LITERAL1">'='</SEQ>
-		<SEQ TYPE="LITERAL1">'/'</SEQ>
-		<SEQ TYPE="LITERAL1">'^'</SEQ>
-		<SEQ TYPE="LITERAL1">'.'</SEQ>
-		<SEQ TYPE="LITERAL1">','</SEQ>
-		<SEQ TYPE="LITERAL1">':'</SEQ>
-		<SEQ TYPE="LITERAL1">';'</SEQ>
-		<SEQ TYPE="LITERAL1">'&lt;'</SEQ>
-		<SEQ TYPE="LITERAL1">'&gt;'</SEQ>
-		<SEQ TYPE="LITERAL1">'|'</SEQ>
-		<SEQ TYPE="LITERAL1">'@'</SEQ>
-
-		<SPAN TYPE="LITERAL1" NO_WORD_BREAK="TRUE">
+		<SPAN TYPE="LITERAL2" NO_WORD_BREAK="TRUE">
 			<BEGIN>'</BEGIN>
 			<END>'</END>
 		</SPAN>
 
-		<SEQ TYPE="OPERATOR">..</SEQ>
-		<SEQ TYPE="OPERATOR">&amp;&amp;</SEQ>
-		<SEQ TYPE="OPERATOR">::</SEQ>
+                <!-- Reserved words. -->
+                <SEQ_REGEXP TYPE="KEYWORD1">case(?![a-z_A-Z0-9'])</SEQ_REGEXP>
+                <SEQ_REGEXP TYPE="KEYWORD1">class(?![a-z_A-Z0-9'])</SEQ_REGEXP>
+                <SEQ_REGEXP TYPE="KEYWORD1">data(?![a-z_A-Z0-9'])</SEQ_REGEXP>
+                <SEQ_REGEXP TYPE="KEYWORD1">default(?![a-z_A-Z0-9'])</SEQ_REGEXP>
+                <SEQ_REGEXP TYPE="KEYWORD1">deriving(?![a-z_A-Z0-9'])</SEQ_REGEXP>
+                <SEQ_REGEXP TYPE="KEYWORD1">do(?![a-z_A-Z0-9'])</SEQ_REGEXP>
+                <SEQ_REGEXP TYPE="KEYWORD1">else(?![a-z_A-Z0-9'])</SEQ_REGEXP>
+                <SEQ_REGEXP TYPE="KEYWORD1">if(?![a-z_A-Z0-9'])</SEQ_REGEXP>
+                <SEQ_REGEXP TYPE="KEYWORD1">import(?![a-z_A-Z0-9'])</SEQ_REGEXP>
+                <SEQ_REGEXP TYPE="KEYWORD1">in(?![a-z_A-Z0-9'])</SEQ_REGEXP>
+                <SEQ_REGEXP TYPE="KEYWORD1">infix(?![a-z_A-Z0-9'])</SEQ_REGEXP>
+                <SEQ_REGEXP TYPE="KEYWORD1">infixl(?![a-z_A-Z0-9'])</SEQ_REGEXP>
+                <SEQ_REGEXP TYPE="KEYWORD1">infixr(?![a-z_A-Z0-9'])</SEQ_REGEXP>
+                <SEQ_REGEXP TYPE="KEYWORD1">instance(?![a-z_A-Z0-9'])</SEQ_REGEXP>
+                <SEQ_REGEXP TYPE="KEYWORD1">let(?![a-z_A-Z0-9'])</SEQ_REGEXP>
+                <SEQ_REGEXP TYPE="KEYWORD1">module(?![a-z_A-Z0-9'])</SEQ_REGEXP>
+                <SEQ_REGEXP TYPE="KEYWORD1">newtype(?![a-z_A-Z0-9'])</SEQ_REGEXP>
+                <SEQ_REGEXP TYPE="KEYWORD1">of(?![a-z_A-Z0-9'])</SEQ_REGEXP>
+                <SEQ_REGEXP TYPE="KEYWORD1">then(?![a-z_A-Z0-9'])</SEQ_REGEXP>
+                <SEQ_REGEXP TYPE="KEYWORD1">type(?![a-z_A-Z0-9'])</SEQ_REGEXP>
+                <SEQ_REGEXP TYPE="KEYWORD1">where(?![a-z_A-Z0-9'])</SEQ_REGEXP>
+                <SEQ_REGEXP TYPE="KEYWORD1">_(?![a-z_A-Z0-9'])</SEQ_REGEXP>
+                <SEQ_REGEXP TYPE="KEYWORD1">as(?![a-z_A-Z0-9'])</SEQ_REGEXP>
+                <SEQ_REGEXP TYPE="KEYWORD1">qualified(?![a-z_A-Z0-9'])</SEQ_REGEXP>
+                <SEQ_REGEXP TYPE="KEYWORD1">hiding(?![a-z_A-Z0-9'])</SEQ_REGEXP>
+                <!-- Non-Haskell-98 keywords -->
+                <SEQ_REGEXP TYPE="KEYWORD1">foreign(?![a-z_A-Z0-9'])</SEQ_REGEXP>
+                <SEQ_REGEXP TYPE="KEYWORD1">family(?![a-z_A-Z0-9'])</SEQ_REGEXP>
+                <!-- GHC extension keywords -->
+                <SEQ_REGEXP TYPE="KEYWORD1">proc(?![a-z_A-Z0-9'])</SEQ_REGEXP>
+                <SEQ_REGEXP TYPE="KEYWORD1">rec(?![a-z_A-Z0-9'])</SEQ_REGEXP>
+                <SEQ_REGEXP TYPE="KEYWORD1">mdo(?![a-z_A-Z0-9'])</SEQ_REGEXP>
 
-		<SEQ TYPE="OPERATOR">&lt;</SEQ>
-		<SEQ TYPE="OPERATOR">&gt;</SEQ>
-		<SEQ TYPE="OPERATOR">+</SEQ>
-		<SEQ TYPE="OPERATOR">-</SEQ>
-		<SEQ TYPE="OPERATOR">*</SEQ>
-		<SEQ TYPE="OPERATOR">/</SEQ>
-		<SEQ TYPE="OPERATOR">%</SEQ>
-		<SEQ TYPE="OPERATOR">^</SEQ>
-		<SEQ TYPE="OPERATOR">=</SEQ>
-		<SEQ TYPE="OPERATOR">|</SEQ>
-		<SEQ TYPE="OPERATOR">@</SEQ>
-		<SEQ TYPE="OPERATOR">~</SEQ>
-		<SEQ TYPE="OPERATOR">!</SEQ>
-		<SEQ TYPE="OPERATOR">$</SEQ>
+                <SEQ_REGEXP TYPE="DIGIT">0[xXoO][0-9a-fA-F]+</SEQ_REGEXP>
+                <SEQ_REGEXP TYPE="DIGIT">[0-9]+(\.[0-9]+)?([eE][+-]?[0-9]+)?</SEQ_REGEXP>
+                
+                <!-- Reserved operators -->
+                <SEQ_REGEXP TYPE="KEYWORD4">\.\.(?![!#$%&amp;\*+\./&lt;=&gt;?@\\\^\|\-~:])</SEQ_REGEXP>
+                <SEQ_REGEXP TYPE="KEYWORD4">:(?![!#$%&amp;\*+\./&lt;=&gt;?@\\\^\|\-~:])</SEQ_REGEXP>
+                <SEQ_REGEXP TYPE="KEYWORD4">::(?![!#$%&amp;\*+\./&lt;=&gt;?@\\\^\|\-~:])</SEQ_REGEXP>
+                <SEQ_REGEXP TYPE="KEYWORD4">=(?![!#$%&amp;\*+\./&lt;=&gt;?@\\\^\|\-~:])</SEQ_REGEXP>
+                <SEQ TYPE="KEYWORD4">\</SEQ>
+                <SEQ_REGEXP TYPE="KEYWORD4">\|(?![!#$%&amp;\*+\./&lt;=&gt;?@\\\^\|\-~:])</SEQ_REGEXP>
+                <SEQ_REGEXP TYPE="KEYWORD4">&lt;-(?![!#$%&amp;\*+\./&lt;=&gt;?@\\\^\|\-~:])</SEQ_REGEXP>
+                <SEQ_REGEXP TYPE="KEYWORD4">-&gt;(?![!#$%&amp;\*+\./&lt;=&gt;?@\\\^\|\-~:])</SEQ_REGEXP>
+                <SEQ_REGEXP TYPE="KEYWORD4">@(?![!#$%&amp;\*+\./&lt;=&gt;?@\\\^\|\-~:])</SEQ_REGEXP>
+                <SEQ_REGEXP TYPE="KEYWORD4">~(?![!#$%&amp;\*+\./&lt;=&gt;?@\\\^\|\-~:])</SEQ_REGEXP>
+                <SEQ_REGEXP TYPE="KEYWORD4">=&gt;(?![!#$%&amp;\*+\./&lt;=&gt;?@\\\^\|\-~:])</SEQ_REGEXP>
 
-		<!-- Defining this as OPERATOR causes float numbers not to be
-		highlighted... Which is more important? -->
-		<!-- <SEQ TYPE="NULL">.</SEQ> -->
+                <!-- GHC extension reserved operators -->
+                <SEQ_REGEXP TYPE="KEYWORD4">-(&lt;{1,2})(?![!#$%&amp;\*+\./&lt;=&gt;?@\\\^\|\-~:])</SEQ_REGEXP>
 
-		<KEYWORDS>
-			<!-- Reserved words. -->
-			<KEYWORD1>case</KEYWORD1>
-			<KEYWORD1>class</KEYWORD1>
-			<KEYWORD1>data</KEYWORD1>
-			<KEYWORD1>default</KEYWORD1>
-			<KEYWORD1>deriving</KEYWORD1>
-			<KEYWORD1>do</KEYWORD1>
-			<KEYWORD1>else</KEYWORD1>
-			<KEYWORD1>if</KEYWORD1>
-			<KEYWORD1>import</KEYWORD1>
-			<KEYWORD1>in</KEYWORD1>
-			<KEYWORD1>infix</KEYWORD1>
-			<KEYWORD1>infixl</KEYWORD1>
-			<KEYWORD1>infixr</KEYWORD1>
-			<KEYWORD1>instance</KEYWORD1>
-			<KEYWORD1>let</KEYWORD1>
-			<KEYWORD1>module</KEYWORD1>
-			<KEYWORD1>newtype</KEYWORD1>
-			<KEYWORD1>of</KEYWORD1>
-			<KEYWORD1>then</KEYWORD1>
-			<KEYWORD1>type</KEYWORD1>
-			<KEYWORD1>where</KEYWORD1>
-			<KEYWORD1>_</KEYWORD1>
-			<KEYWORD1>as</KEYWORD1>
-			<KEYWORD1>qualified</KEYWORD1>
-			<KEYWORD1>hiding</KEYWORD1>
+                <!-- Normal operators, backquoted operators -->
+                <SEQ_REGEXP TYPE="OPERATOR">([A-Z][a-z_A-Z0-9']*\.)*[!#$%&amp;\*+\./&lt;=&gt;?@\\\^\|\-~][!#$%&amp;\*+\./&lt;=&gt;?@\\\^\|\-~:]*</SEQ_REGEXP>
+                <SEQ_REGEXP TYPE="OPERATOR">`([A-Z][a-z_A-Z0-9']*\.)*[a-z_][a-z_A-Z0-9']*`</SEQ_REGEXP>
 
-			<KEYWORD3>Addr</KEYWORD3>
-			<KEYWORD3>Bool</KEYWORD3>
-			<KEYWORD3>Bounded</KEYWORD3>
-			<KEYWORD3>Char</KEYWORD3>
-			<KEYWORD3>Double</KEYWORD3>
-			<KEYWORD3>Either</KEYWORD3>
-			<KEYWORD3>Enum</KEYWORD3>
-			<KEYWORD3>Eq</KEYWORD3>
-			<KEYWORD3>FilePath</KEYWORD3>
-			<KEYWORD3>Float</KEYWORD3>
-			<KEYWORD3>Floating</KEYWORD3>
-			<KEYWORD3>Fractional</KEYWORD3>
-			<KEYWORD3>Functor</KEYWORD3>
-			<KEYWORD3>IO</KEYWORD3>
-			<KEYWORD3>IOError</KEYWORD3>
-			<KEYWORD3>IOResult</KEYWORD3>
-			<KEYWORD3>Int</KEYWORD3>
-			<KEYWORD3>Integer</KEYWORD3>
-			<KEYWORD3>Integral</KEYWORD3>
-			<KEYWORD3>Ix</KEYWORD3>
-			<KEYWORD3>Maybe</KEYWORD3>
-			<KEYWORD3>Monad</KEYWORD3>
-			<KEYWORD3>Num</KEYWORD3>
-			<KEYWORD3>Ord</KEYWORD3>
-			<KEYWORD3>Ordering</KEYWORD3>
-			<KEYWORD3>Ratio</KEYWORD3>
-			<KEYWORD3>Rational</KEYWORD3>
-			<KEYWORD3>Read</KEYWORD3>
-			<KEYWORD3>ReadS</KEYWORD3>
-			<KEYWORD3>Real</KEYWORD3>
-			<KEYWORD3>RealFloat</KEYWORD3>
-			<KEYWORD3>RealFrac</KEYWORD3>
-			<KEYWORD3>Show</KEYWORD3>
-			<KEYWORD3>ShowS</KEYWORD3>
-			<KEYWORD3>String</KEYWORD3>
+                <!-- variable/function (qualified or not) -->
+                <SEQ_REGEXP TYPE="NULL">([A-Z][a-z_A-Z0-9']*\.)*[a-z_][a-z_A-Z0-9']*</SEQ_REGEXP>
+                <!-- contructor/type (qualified or not) -->
+                <SEQ_REGEXP TYPE="KEYWORD2">[A-Z][a-z_A-Z0-9']*(\.[A-Z][a-z_A-Z0-9']*)*</SEQ_REGEXP>
 
-			<LITERAL2>:</LITERAL2>
-			<LITERAL2>EQ</LITERAL2>
-			<LITERAL2>False</LITERAL2>
-			<LITERAL2>GT</LITERAL2>
-			<LITERAL2>Just</LITERAL2>
-			<LITERAL2>LT</LITERAL2>
-			<LITERAL2>Left</LITERAL2>
-			<LITERAL2>Nothing</LITERAL2>
-			<LITERAL2>Right</LITERAL2>
-			<LITERAL2>True</LITERAL2>
+                <!-- Operators in parentheses appear like functions, but this
+                    doesn't match the special case of (..) used for imports -->
+                <SEQ_REGEXP TYPE="NULL">\(\s*([A-Z][a-z_A-Z0-9']*\.)*[!#$%&amp;\*+\./&lt;=&gt;?@\\\^\|\-~]\s*\)</SEQ_REGEXP>
+                <SEQ_REGEXP TYPE="NULL">\(\s*([A-Z][a-z_A-Z0-9']*\.)*[!#$%&amp;\*+\./&lt;=&gt;?@\\\^\|\-~][!#$%&amp;\*+/&lt;=&gt;?@\\\^\|\-~:][!#$%&amp;\*+\./&lt;=&gt;?@\\\^\|\-~:]*\s*\)</SEQ_REGEXP>
+                <SEQ_REGEXP TYPE="NULL">\(\s*([A-Z][a-z_A-Z0-9']*\.)*[!#$%&amp;\*+/&lt;=&gt;?@\\\^\|\-~][!#$%&amp;\*+\./&lt;=&gt;?@\\\^\|\-~:][!#$%&amp;\*+\./&lt;=&gt;?@\\\^\|\-~:]*\s*\)</SEQ_REGEXP>
+                <SEQ_REGEXP TYPE="NULL">\(\s*([A-Z][a-z_A-Z0-9']*\.)*[!#$%&amp;\*+\./&lt;=&gt;?@\\\^\|\-~][!#$%&amp;\*+\./&lt;=&gt;?@\\\^\|\-~:]{2,}\)</SEQ_REGEXP>
 
-			<OPERATOR>quot</OPERATOR>
-			<OPERATOR>rem</OPERATOR>
-			<OPERATOR>div</OPERATOR>
-			<OPERATOR>mod</OPERATOR>
-			<OPERATOR>elem</OPERATOR>
-			<OPERATOR>notElem</OPERATOR>
-			<OPERATOR>seq</OPERATOR>
-		</KEYWORDS>
+                <!-- Infix constructors -->
+                <SEQ_REGEXP TYPE="KEYWORD2">([A-Z][a-z_A-Z0-9']*\.)*:[!#$%&amp;\*+\./&lt;=&gt;?@\\\^\|\-~:]*</SEQ_REGEXP>
+                <!-- Infix constructors in parentheses -->
+                <SEQ_REGEXP TYPE="KEYWORD2">\(\s*([A-Z][a-z_A-Z0-9']*\.)*:[!#$%&amp;\*+\./&lt;=&gt;?@\\\^\|\-~:]*\s*\)</SEQ_REGEXP>
+
+                <!-- (, including the specific case of (..) but excluding all other cases
+                    where it's an operator in parentheses -->
+                <SEQ_REGEXP TYPE="KEYWORD3">\((?!\s*([!#$%&amp;\*+\./&lt;=&gt;?@\\\^\|\-~]\s*\)|[!#$%&amp;\*+\./&lt;=&gt;?@\\\^\|\-~][!#$%&amp;\*+/&lt;=&gt;?@\\\^\|\-~:][!#$%&amp;\*+\./&lt;=&gt;?@\\\^\|\-~:]*\s*\)|[!#$%&amp;\*+/&lt;=&gt;?@\\\^\|\-~][!#$%&amp;\*+\./&lt;=&gt;?@\\\^\|\-~:][!#$%&amp;\*+\./&lt;=&gt;?@\\\^\|\-~:]*\s*\)|[!#$%&amp;\*+\./&lt;=&gt;?@\\\^\|\-~][!#$%&amp;\*+\./&lt;=&gt;?@\\\^\|\-~:]{2,}\s*\)))</SEQ_REGEXP>
+                <SEQ TYPE="KEYWORD3">)</SEQ>
+                <SEQ TYPE="KEYWORD3">,</SEQ>
+                <SEQ TYPE="KEYWORD3">[</SEQ>
+                <SEQ TYPE="KEYWORD3">]</SEQ>
 	</RULES>
 
 </MODE>

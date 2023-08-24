@@ -1,5 +1,5 @@
 ! Copyright (C) 2005, 2010 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors alien arrays assocs byte-arrays classes.algebra
 classes.struct combinators compiler compiler.cfg
 compiler.cfg.comparisons compiler.cfg.instructions
@@ -46,7 +46,7 @@ HOOK: pic-tail-reg cpu ( -- reg )
 
 : align-stack ( n -- n' ) 16 align ;
 
-M: x86 stack-frame-size ( stack-frame -- i )
+M: x86 stack-frame-size
     (stack-frame-size)
     reserved-stack-space +
     cell +
@@ -60,7 +60,7 @@ M: x86 test-instruction? t ;
 
 M: x86 immediate-store? immediate-comparand? ;
 
-M: x86 %load-immediate ( reg val -- )
+M: x86 %load-immediate
     { fixnum } declare [ 32-bit-version-of dup XOR ] [ MOV ] if-zero ;
 
 M: x86 %load-reference
@@ -90,13 +90,13 @@ M: x86 %replace-imm
         [ [ 0 MOV ] dip rc-absolute rel-literal ]
     } cond ;
 
-M: x86 %clear ( loc -- )
+M: x86 %clear
     297 swap %replace-imm ;
 
-M: x86 %inc ( loc -- )
+M: x86 %inc
     [ n>> ] [ ds-loc? ds-reg rs-reg ? ] bi (%inc) ;
 
-M: x86 %call ( word -- ) 0 CALL rc-relative rel-word-pic ;
+M: x86 %call 0 CALL rc-relative rel-word-pic ;
 
 : xt-tail-pic-offset ( -- n )
     ! See the comment in vm/cpu-x86.hpp
@@ -104,21 +104,21 @@ M: x86 %call ( word -- ) 0 CALL rc-relative rel-word-pic ;
 
 HOOK: %prepare-jump cpu ( -- )
 
-M: x86 %jump ( word -- )
+M: x86 %jump
     %prepare-jump
     0 JMP rc-relative rel-word-pic-tail ;
 
-M: x86 %jump-label ( label -- ) 0 JMP rc-relative label-fixup ;
+M: x86 %jump-label 0 JMP rc-relative label-fixup ;
 
-M: x86 %return ( -- ) 0 RET ;
+M: x86 %return 0 RET ;
 
 : (%slot) ( obj slot scale tag -- op ) neg <indirect> ; inline
 : (%slot-imm) ( obj slot tag -- op ) slot-offset [+] ; inline
 
-M: x86 %slot ( dst obj slot scale tag -- ) (%slot) MOV ;
-M: x86 %slot-imm ( dst obj slot tag -- ) (%slot-imm) MOV ;
-M: x86 %set-slot ( src obj slot scale tag -- ) (%slot) swap MOV ;
-M: x86 %set-slot-imm ( src obj slot tag -- ) (%slot-imm) swap MOV ;
+M: x86 %slot (%slot) MOV ;
+M: x86 %slot-imm (%slot-imm) MOV ;
+M: x86 %set-slot (%slot) swap MOV ;
+M: x86 %set-slot-imm (%slot-imm) swap MOV ;
 
 :: two-operand ( dst src1 src2 rep -- dst src )
     dst src2 eq? dst src1 eq? not and [ "Cannot handle this case" throw ] when
@@ -130,13 +130,13 @@ M: x86 %set-slot-imm ( src obj slot tag -- ) (%slot-imm) swap MOV ;
     dst ; inline
 
 M: x86 %add     2over eq? [ nip ADD ] [ [+] LEA ] if ;
-M: x86 %add-imm ( dst src1 src2 -- )
+M: x86 %add-imm
     2over eq? [
         nip { { 1 [ INC ] } { -1 [ DEC ] } [ ADD ] } case
     ] [ [+] LEA ] if ;
 
 M: x86 %sub     int-rep two-operand SUB ;
-M: x86 %sub-imm ( dst src1 src2 -- )
+M: x86 %sub-imm
     2over eq? [
         nip { { 1 [ DEC ] } { -1 [ INC ] } [ SUB ] } case
     ] [ neg [+] LEA ] if ;
@@ -173,7 +173,7 @@ M: object copy-memory* copy-register* ;
 
 : ?spill-slot ( obj -- obj ) dup spill-slot? [ n>> spill@ ] when ;
 
-M: x86 %copy ( dst src rep -- )
+M: x86 %copy
     2over eq? [ 3drop ] [
         [ [ ?spill-slot ] bi@ ] dip
         2over [ register? ] both? [ copy-register* ] [ copy-memory* ] if
@@ -186,16 +186,16 @@ M: x86 %copy ( dst src rep -- )
         { cc/o [ JNO ] }
     } case ; inline
 
-M: x86 %fixnum-add ( label dst src1 src2 cc -- )
+M: x86 %fixnum-add
     [ ADD ] fixnum-overflow ;
 
-M: x86 %fixnum-sub ( label dst src1 src2 cc -- )
+M: x86 %fixnum-sub
     [ SUB ] fixnum-overflow ;
 
-M: x86 %fixnum-mul ( label dst src1 src2 cc -- )
+M: x86 %fixnum-mul
     [ IMUL2 ] fixnum-overflow ;
 
-M: x86 %unbox-alien ( dst src -- )
+M: x86 %unbox-alien
     alien-offset [+] MOV ;
 
 M:: x86 %unbox-any-c-ptr ( dst src -- )
@@ -364,7 +364,7 @@ M: x86.64 has-small-reg? 2drop t ;
 : %sign-extend ( dst src bits -- )
     [ MOVSX ] (%convert-integer) ; inline
 
-M: x86 %convert-integer ( dst src c-type -- )
+M: x86 %convert-integer
     {
         { c:char   [ 8 %sign-extend ] }
         { c:uchar  [ 8 %zero-extend ] }
@@ -400,7 +400,7 @@ M: x86 %convert-integer ( dst src c-type -- )
     [ [ drop 1array ] [ [+] ] 2bi ] 2dip ;
 
 : (%load-memory) ( dst exclude address rep c-type -- )
-    [
+    or* [
         {
             { c:char   [ 8 %alien-signed-getter ] }
             { c:uchar  [ 8 %alien-unsigned-getter ] }
@@ -409,16 +409,16 @@ M: x86 %convert-integer ( dst src c-type -- )
             { c:int    [ 32 %alien-signed-getter ] }
             { c:uint   [ 32 [ 2drop ] %alien-integer-getter ] }
         } case
-    ] [ nipd %copy ] ?if ;
+    ] [ nipd %copy ] if ;
 
-M: x86 %load-memory ( dst base displacement scale offset rep c-type -- )
+M: x86 %load-memory
     (%memory) (%load-memory) ;
 
-M: x86 %load-memory-imm ( dst base offset rep c-type -- )
+M: x86 %load-memory-imm
     (%memory-imm) (%load-memory) ;
 
 : (%store-memory) ( src exclude address rep c-type -- )
-    [
+    or* [
         {
             { c:char   [ 8 %alien-integer-setter ] }
             { c:uchar  [ 8 %alien-integer-setter ] }
@@ -427,12 +427,12 @@ M: x86 %load-memory-imm ( dst base offset rep c-type -- )
             { c:int    [ 32 %alien-integer-setter ] }
             { c:uint   [ 32 %alien-integer-setter ] }
         } case
-    ] [ [ nip swap ] dip %copy ] ?if ;
+    ] [ [ nip swap ] dip %copy ] if ;
 
-M: x86 %store-memory ( src base displacement scale offset rep c-type -- )
+M: x86 %store-memory
     (%memory) (%store-memory) ;
 
-M: x86 %store-memory-imm ( src base offset rep c-type -- )
+M: x86 %store-memory-imm
     (%memory-imm) (%store-memory) ;
 
 : shift-count? ( reg -- ? ) { ECX RCX } member-eq? ;
@@ -510,16 +510,16 @@ M:: x86 %check-nursery-branch ( label size cc temp1 temp2 -- )
 M: x86 gc-root-offset
     n>> spill-offset special-offset cell + cell /i ;
 
-M: x86 %call-gc ( gc-map -- )
+M: x86 %call-gc
     \ minor-gc %call
     gc-map-here ;
 
-M: x86 %alien-global ( dst symbol library -- )
+M: x86 %alien-global
     [ 0 MOV ] 2dip rc-absolute-cell rel-dlsym ;
 
-M: x86 %prologue ( n -- ) cell - decr-stack-reg ;
+M: x86 %prologue cell - decr-stack-reg ;
 
-M: x86 %epilogue ( n -- ) cell - incr-stack-reg ;
+M: x86 %epilogue cell - incr-stack-reg ;
 
 :: (%boolean) ( dst temp insn -- )
     dst \ f type-number MOV
@@ -610,10 +610,10 @@ M:: x86 %dispatch ( src temp -- )
     [ (align-code) ]
     bi ;
 
-M: x86 %spill ( src rep dst -- )
+M: x86 %spill
     -rot %copy ;
 
-M: x86 %reload ( dst rep src -- )
+M: x86 %reload
     swap %copy ;
 
 M:: x86 %local-allot ( dst size align offset -- )
@@ -661,10 +661,7 @@ M:: x86 %alien-assembly ( varargs? reg-inputs stack-inputs
     reg-outputs [ first3 %load-reg-param ] each
     dead-outputs [ first2 %discard-reg-param ] each ;
 
-M: x86 %alien-invoke ( varargs? reg-inputs stack-inputs
-                       reg-outputs dead-outputs
-                       cleanup stack-size
-                       symbols dll gc-map -- )
+M: x86 %alien-invoke
     '[ _ _ _ %c-invoke ] %alien-assembly ;
 
 M:: x86 %alien-indirect ( src
@@ -681,14 +678,14 @@ M:: x86 %alien-indirect ( src
 
 HOOK: %begin-callback cpu ( -- )
 
-M: x86 %callback-inputs ( reg-outputs stack-outputs -- )
+M: x86 %callback-inputs
     [ [ first3 %load-reg-param ] each ]
     [ [ first3 %load-stack-param ] each ] bi*
     %begin-callback ;
 
 HOOK: %end-callback cpu ( -- )
 
-M: x86 %callback-outputs ( reg-inputs -- )
+M: x86 %callback-outputs
     %end-callback
     [ first3 %store-reg-param ] each ;
 
@@ -708,10 +705,10 @@ M: x86 long-long-odd-register? f ;
 
 M: x86 float-right-align-on-stack? f ;
 
-M: x86 immediate-arithmetic? ( n -- ? )
+M: x86 immediate-arithmetic?
     -0x80000000 0x7fffffff between? ;
 
-M: x86 immediate-bitwise? ( n -- ? )
+M: x86 immediate-bitwise?
     -0x80000000 0x7fffffff between? ;
 
 :: %cmov-float= ( dst src -- )
@@ -778,7 +775,7 @@ M:: x86 %bit-test ( dst src1 src2 temp -- )
     src1 src2 BT
     dst temp \ CMOVB (%boolean) ;
 
-M: x86 enable-cpu-features ( -- )
+M: x86 enable-cpu-features
     enable-min/max
     enable-log2
     enable-bit-test

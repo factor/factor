@@ -1,13 +1,12 @@
 ! Copyright (C) 2009 Doug Coleman, Keith Lazuka
-! See http://factorcode.org/license.txt for BSD license.
-USING: accessors alien.c-types alien.data byte-arrays
-combinators fry grouping images kernel locals math math.vectors
-sequences specialized-arrays math.floats.half ;
+! See https://factorcode.org/license.txt for BSD license.
+USING: accessors alien.c-types alien.data byte-arrays grouping
+images kernel math math.floats.half sequences specialized-arrays ;
 FROM: alien.c-types => float ;
+IN: images.normalization
 SPECIALIZED-ARRAY: half
 SPECIALIZED-ARRAY: float
 SPECIALIZED-ARRAY: ushort
-IN: images.normalization
 
 <PRIVATE
 

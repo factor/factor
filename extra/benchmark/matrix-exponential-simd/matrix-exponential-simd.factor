@@ -1,4 +1,4 @@
-USING: locals math math.combinatorics math.matrices.simd
+USING: math math.combinatorics math.matrices.simd
 prettyprint sequences typed ;
 IN: benchmark.matrix-exponential-simd
 

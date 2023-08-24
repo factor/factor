@@ -1,7 +1,6 @@
 ! Copyright (C) 2005, 2006 Daniel Ehrenberg
-! See http://factorcode.org/license.txt for BSD license.
-USING: namespaces make kernel assocs sequences fry
-io.files io.encodings.binary xml.state ;
+! See https://factorcode.org/license.txt for BSD license.
+USING: assocs kernel make namespaces sequences xml.state ;
 IN: xml.entities
 
 CONSTANT: entities-out
@@ -21,7 +20,7 @@ CONSTANT: quoted-entities-out
 
 : escape-string-by ( str table -- escaped )
     ! Convert <, >, &, ' and " to HTML entities.
-    [ '[ dup _ at [ % ] [ , ] ?if ] each ] "" make ;
+    [ '[ [ _ at ] [ % ] [ , ] ?if ] each ] "" make ;
 
 : escape-string ( str -- newstr )
     entities-out escape-string-by ;

@@ -1,5 +1,5 @@
 ! Copyright (C) 2011 John Benediktsson
-! See http://factorcode.org/license.txt for BSD license
+! See https://factorcode.org/license.txt for BSD license
 
 USING: accessors formatting html.entities html.parser
 html.parser.analyzer html.parser.printer http.client images.http
@@ -13,8 +13,8 @@ IN: xkcd
 
 : comic-image ( url -- image )
     http-get nip
-    R/ \/\/imgs\.xkcd\.com\\/comics\\/[^\.]+\.(png|jpg)/
-    first-match >string "http:" prepend load-http-image ;
+    R/ \/\/imgs\.xkcd\.com\/comics\/[^\.]+\.(png|jpg)/
+    first-match >string "https:" prepend load-http-image ;
 
 : comic-image. ( url -- )
     comic-image image. ;
@@ -32,7 +32,7 @@ IN: xkcd
 PRIVATE>
 
 : xkcd-url ( n -- url )
-    "http://xkcd.com/%s/" sprintf ;
+    "https://xkcd.com/%s/" sprintf ;
 
 : xkcd-image ( n -- image )
     xkcd-url comic-image ;
@@ -41,10 +41,10 @@ PRIVATE>
     xkcd-url comic. ;
 
 : random-xkcd. ( -- )
-    "http://dynamic.xkcd.com/random/comic/" comic. ;
+    "https://c.xkcd.com/random/comic/" comic. ;
 
 : latest-xkcd. ( -- )
-    "http://xkcd.com" comic. ;
+    "https://xkcd.com" comic. ;
 
 TUPLE: xkcd number image ;
 

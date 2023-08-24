@@ -1,8 +1,8 @@
 ! Copyright (C) 2008, 2010 Eduardo Cavazos, Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
-USING: accessors calendar combinators continuations debugger fry
-io kernel make mason.common mason.config mason.platform
-math.order namespaces sequences smtp ;
+! See https://factorcode.org/license.txt for BSD license.
+USING: accessors calendar combinators continuations debugger io
+kernel make mason.common mason.config mason.platform math.order
+namespaces sequences smtp ;
 IN: mason.email
 
 : mason-email ( body content-type subject -- )
@@ -25,7 +25,7 @@ IN: mason.email
 : report-subject ( status -- string )
     [
         subject-prefix %
-        current-git-id get 7 short head %
+        current-git-id get 7 index-or-length head %
         " -- " %
         {
             { status-clean [ "clean" ] }

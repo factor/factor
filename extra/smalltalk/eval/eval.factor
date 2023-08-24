@@ -1,8 +1,7 @@
 ! Copyright (C) 2009 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
-USING: io.files io.encodings.utf8
-compiler.units smalltalk.parser smalltalk.compiler
-smalltalk.library ;
+! See https://factorcode.org/license.txt for BSD license.
+USING: compiler.units io.encodings.utf8 io.files
+smalltalk.compiler smalltalk.parser ;
 IN: smalltalk.eval
 
 : eval-smalltalk ( string -- result )

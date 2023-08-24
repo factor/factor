@@ -1,8 +1,7 @@
 ! Copyright (C) 2008, 2010 Slava Pestov, Joe Groff.
-! See http://factorcode.org/license.txt for BSD license.
-USING: accessors assocs sequences sorting binary-search fry math
-math.order arrays classes combinators kernel functors locals
-math.functions math.vectors ;
+! See https://factorcode.org/license.txt for BSD license.
+USING: accessors classes functors kernel math math.vectors
+sequences ;
 IN: sequences.cords
 
 MIXIN: cord
@@ -78,8 +77,7 @@ M: cord v*                [ v*                ] [ call-next-method ] cord-2map ;
 M: cord v/                [ v/                ] [ call-next-method ] cord-2map ; inline
 M: cord vmin              [ vmin              ] [ call-next-method ] cord-2map ; inline
 M: cord vmax              [ vmax              ] [ call-next-method ] cord-2map ; inline
-M: cord v.
-    [ v.                ] [ + ] [ call-next-method ] cord-2both ; inline
+M: cord vdot              [ vdot              ] [ + ] [ call-next-method ] cord-2both ; inline
 M: cord vsqrt             [ vsqrt             ] cord-map  ; inline
 M: cord sum               [ sum               ] cord-both + ; inline
 M: cord vabs              [ vabs              ] cord-map  ; inline
@@ -106,7 +104,7 @@ M: cord vunordered?       [ vunordered?       ] [ call-next-method ] cord-2map ;
 M: cord vany?             [ vany?             ] cord-both or  ; inline
 M: cord vall?             [ vall?             ] cord-both and ; inline
 M: cord vnone?            [ vnone?            ] cord-both and ; inline
-M: cord vshuffle-elements 
+M: cord vshuffle-elements
     [ [ head>> ] [ tail>> ] bi ] [ split-shuffle ] bi*
     [ vshuffle2-elements ] bi-curry@ 2bi cord-append ; inline
 

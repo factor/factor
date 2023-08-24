@@ -1,10 +1,10 @@
 ! Copyright (C) 2009, 2010 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
-USING: accessors alien.data assocs cache colors.constants
-destructors kernel opengl opengl.gl opengl.capabilities
-combinators images images.tessellation grouping sequences math
-math.statistics math.vectors generalizations fry arrays
-namespaces system locals literals specialized-arrays ;
+! See https://factorcode.org/license.txt for BSD license.
+USING: accessors alien.data arrays assocs colors combinators
+destructors images images.tessellation kernel literals math
+math.statistics math.vectors namespaces opengl
+opengl.capabilities opengl.gl sequences specialized-arrays
+system ;
 FROM: alien.c-types => int float ;
 SPECIALIZED-ARRAY: float
 IN: opengl.textures

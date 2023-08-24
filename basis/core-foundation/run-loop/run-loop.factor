@@ -1,5 +1,5 @@
 ! Copyright (C) 2008, 2010 Slava Pestov
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors alien alien.c-types alien.syntax
 core-foundation core-foundation.file-descriptors
 core-foundation.strings core-foundation.time
@@ -102,8 +102,8 @@ SYMBOL: run-loop
     ] change-timers drop ;
 
 SYMBOL: thread-timer
-[ f thread-timer set-global ]
-"core-foundation.run-loop" add-startup-hook
+
+STARTUP-HOOK: [ f thread-timer set-global ]
 
 : (reset-thread-timer) ( timer -- )
     sleep-time

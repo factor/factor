@@ -1,8 +1,7 @@
 ! Copyright (C) 2008 Doug Coleman.
-! See http://factorcode.org/license.txt for BSD license.
-USING: kernel base64 checksums.md5 sequences checksums
-locals prettyprint math math.bits grouping io combinators
-fry make combinators.short-circuit math.functions splitting ;
+! See https://factorcode.org/license.txt for BSD license.
+USING: checksums checksums.md5 combinators grouping kernel math
+math.bits math.functions sequences splitting ;
 IN: crypto.passwd-md5
 
 <PRIVATE
@@ -18,7 +17,7 @@ PRIVATE>
 
 :: passwd-md5 ( magic salt password -- bytes )
     password magic salt 3append
-    salt password dup surround md5 checksum-bytes
+    salt password 1surround md5 checksum-bytes
     password length
     [ 16 / ceiling swap <repetition> concat ] keep
     head-slice append
@@ -42,7 +41,7 @@ PRIVATE>
     11 final nth 2 to64 3append ;
 
 : parse-shadow-password ( string -- magic salt password )
-    "$" split harvest first3 [ "$" dup surround ] 2dip ;
+    "$" split harvest first3 [ "$" 1surround ] 2dip ;
 
 : authenticate-password ( shadow password -- ? )
     '[ parse-shadow-password drop _ passwd-md5 ] keep = ;

@@ -1,10 +1,10 @@
 ! Copyright (C) 2010 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors combinators combinators.short-circuit
 compiler.cfg.hats compiler.cfg.instructions
 compiler.cfg.utilities compiler.cfg.value-numbering.graph
 compiler.cfg.value-numbering.math
-compiler.cfg.value-numbering.rewrite cpu.architecture fry kernel
+compiler.cfg.value-numbering.rewrite cpu.architecture kernel
 make math sequences ;
 IN: compiler.cfg.value-numbering.alien
 

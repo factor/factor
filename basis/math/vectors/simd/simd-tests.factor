@@ -1,6 +1,6 @@
 USING: accessors arrays classes compiler.test compiler.tree.debugger
 effects fry io kernel kernel.private math math.functions
-math.private math.vectors math.vectors.simd math.ranges
+math.private math.vectors math.vectors.simd ranges
 math.vectors.simd.private prettyprint random sequences system
 tools.test vocabs assocs compiler.cfg.debugger words
 locals combinators cpu.architecture namespaces byte-arrays alien
@@ -80,7 +80,7 @@ CONSTANT: vector-words
         { vneg { +vector+ -> +vector+ } }
         { vs- { +vector+ +vector+ -> +vector+ } }
         { v-n { +vector+ +scalar+ -> +vector+ } }
-        { v. { +vector+ +vector+ -> +scalar+ } }
+        { vdot { +vector+ +vector+ -> +scalar+ } }
         { vsad { +vector+ +vector+ -> +scalar+ } }
         { v/ { +vector+ +vector+ -> +vector+ } }
         { v/n { +vector+ +scalar+ -> +vector+ } }
@@ -481,7 +481,7 @@ simd-classes [
         _ [ [
             _ new
             [ [ length <iota> ] keep like ]
-            [ [ length dup dup + [a,b) ] keep like ] bi [ ] 2sequence
+            [ [ length dup dup + [a..b) ] keep like ] bi [ ] 2sequence
         ] dip '[ _ vshuffle2-elements ] ]
         [ = ] check-optimizer
     ] unit-test

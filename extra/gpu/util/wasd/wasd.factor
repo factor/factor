@@ -1,11 +1,11 @@
 ! Copyright (C) 2009 Joe Groff.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors arrays combinators.smart game.input
 game.input.scancodes game.loop game.worlds
 gpu.render gpu.state kernel literals
 locals math math.constants math.functions math.matrices
-math.order math.vectors opengl.gl sequences
-ui ui.gadgets.worlds specialized-arrays audio.engine ;
+math.matrices.extras math.order math.vectors opengl.gl
+sequences ui ui.gadgets.worlds specialized-arrays audio.engine ;
 FROM: alien.c-types => float ;
 SPECIALIZED-ARRAY: float
 IN: gpu.util.wasd
@@ -38,14 +38,15 @@ GENERIC: wasd-fly-vertically? ( world -- ? )
 M: wasd-world wasd-fly-vertically? drop t ;
 
 : wasd-mv-matrix ( world -- matrix )
-    [ { 1.0 0.0 0.0 } swap pitch>> rotation-matrix4 ]
-    [ { 0.0 1.0 0.0 } swap yaw>>   rotation-matrix4 ]
-    [ location>> vneg translation-matrix4 ] tri m. m. ;
+    [ { 1.0 0.0 0.0 } swap pitch>> <rotation-matrix4> ]
+    [ { 0.0 1.0 0.0 } swap yaw>>   <rotation-matrix4> ]
+    [ location>> vneg <translation-matrix4> ] tri mdot mdot ;
 
 : wasd-mv-inv-matrix ( world -- matrix )
-    [ location>> translation-matrix4 ]
-    [ {  0.0 -1.0 0.0 } swap yaw>>   rotation-matrix4 ]
-    [ { -1.0  0.0 0.0 } swap pitch>> rotation-matrix4 ] tri m. m. ;
+    [ location>> <translation-matrix4> ]
+    [ {  0.0 -1.0 0.0 } swap yaw>>   <rotation-matrix4> ]
+    [ { -1.0  0.0 0.0 } swap pitch>> <rotation-matrix4> ] tri
+    mdot mdot ;
 
 : wasd-p-matrix ( world -- matrix )
     p-matrix>> ;
@@ -63,13 +64,13 @@ CONSTANT: fov 0.7
     world wasd-far-plane :> far-plane
 
     world wasd-fov-vector near-plane v*n
-    near-plane far-plane frustum-matrix4 ;
+    near-plane far-plane <frustum-matrix4> ;
 
 :: wasd-pixel-ray ( world loc -- direction )
     loc world dim>> [ /f 0.5 - 2.0 * ] 2map
     world wasd-fov-vector v*
     first2 neg -1.0 0.0 4array
-    world wasd-mv-inv-matrix swap m.v ;
+    world wasd-mv-inv-matrix swap mdotv ;
 
 : set-wasd-view ( world location yaw pitch -- world )
     [ >>location ] [ >>yaw ] [ >>pitch ] tri* ;
@@ -85,7 +86,7 @@ CONSTANT: fov 0.7
     cosy         0.0       siny        neg  3array
     siny sinp *  cosp      cosy sinp *      3array
     siny cosp *  sinp neg  cosy cosp *      3array 3array
-    v swap v.m ;
+    v swap vdotm ;
 
 : ?pitch ( world -- pitch )
     dup wasd-fly-vertically? [ pitch>> ] [ drop 0.0 ] if ;

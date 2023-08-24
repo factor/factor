@@ -1,7 +1,8 @@
 ! Copyright (C) 2008 Doug Coleman, Michael Judge, Loryn Jenkins.
-! See http://factorcode.org/license.txt for BSD license.
-USING: arrays assocs combinators fry generalizations grouping
-kernel locals math math.functions math.order math.vectors
+! See https://factorcode.org/license.txt for BSD license.
+USING: accessors arrays assocs combinators
+combinators.short-circuit fry generalizations grouping kernel
+locals math math.functions math.order ranges math.vectors
 sequences sequences.private sorting ;
 IN: math.statistics
 
@@ -16,8 +17,45 @@ IN: math.statistics
 : mean ( seq -- x )
     0 mean-ddof ; inline
 
-: sum-of-squares ( seq -- x )
-    [ sq ] map-sum ; inline
+: meanest ( seq -- x )
+    [ mean ] keep [ - abs ] with infimum-by ;
+
+GENERIC: sum-of-squares ( seq -- x )
+M: object sum-of-squares [ sq ] map-sum ;
+M: iota sum-of-squares
+    n>> 1 - [ ] [ 1 + ] [ 1/2 + ] tri * * 3 / ;
+M: ranges:range sum-of-squares
+    dup { [ step>> 1 = ] [ from>> integer? ] } 1&& [
+        [ from>> ] [ length>> ] bi dupd +
+        [ <iota> sum-of-squares ] bi@ swap -
+    ] [ call-next-method ] if ;
+
+GENERIC: sum-of-cubes ( seq -- x )
+M: object sum-of-cubes [ 3 ^ ] map-sum ;
+M: iota sum-of-cubes sum sq ;
+M: ranges:range sum-of-cubes
+    dup { [ step>> 1 = ] [ from>> integer? ] } 1&& [
+        [ from>> ] [ length>> ] bi dupd +
+        [ <iota> sum-of-cubes ] bi@ swap -
+    ] [ call-next-method ] if ;
+
+GENERIC: sum-of-quads ( seq -- x )
+M: object sum-of-quads [ 4 ^ ] map-sum ;
+M: iota sum-of-quads
+    [let n>> 1 - :> n
+        n 0 > [
+            n
+            n 1 +
+            n 2 * 1 +
+            n sq 3 * n 3 * + 1 -
+            * * * 30 /
+        ] [ 0 ] if
+    ] ;
+M: ranges:range sum-of-quads
+    dup { [ step>> 1 = ] [ from>> integer? ] } 1&& [
+        [ from>> ] [ length>> ] bi dupd +
+        [ <iota> sum-of-quads ] bi@ swap -
+    ] [ call-next-method ] if ;
 
 : sum-of-squared-errors ( seq -- x )
     [ mean ] keep [ - sq ] with map-sum ; inline
@@ -39,16 +77,16 @@ IN: math.statistics
 
 <PRIVATE
 
-: trim-points ( p seq -- from to seq  )
+: trim-points ( p seq -- from to seq )
     [ length [ * >integer ] keep over - ] keep ;
 
 PRIVATE>
 
 : trimmed-mean ( seq p -- x )
-    swap natural-sort trim-points <slice> mean ;
+    swap sort trim-points <slice> mean ;
 
 : winsorized-mean ( seq p -- x )
-    swap natural-sort trim-points
+    swap sort trim-points
     [ <slice> ]
     [ nip dupd nth <array> ]
     [ [ 1 - ] dip nth <array> ] 3tri
@@ -86,7 +124,7 @@ PRIVATE>
     k seq nth-unsafe ; inline
 
 : (kth-object) ( seq k nth-quot exchange-quot quot: ( x y -- ? ) -- elt )
-    ! The algorithm modifiers seq, so we clone it
+    ! The algorithm modifies seq, so we clone it
     [ >array ] 4dip kth-object-impl ; inline
 
 : kth-object-unsafe ( seq k quot: ( x y -- ? ) -- elt )
@@ -149,7 +187,7 @@ PRIVATE>
 
 ! quantile can be any n-tile. quartile is n = 4, percentile is n = 100
 ! a,b,c,d parameters, N - number of samples, q is quantile (1/2 for median, 1/4 for 1st quartile)
-! http://mathworld.wolfram.com/Quantile.html
+! https://mathworld.wolfram.com/Quantile.html
 ! a + (N + b) q - 1
 ! could subtract 1 from a
 
@@ -201,14 +239,26 @@ PRIVATE>
 : quartile ( seq -- seq' )
     { 1/4 1/2 3/4 } quantile5 ;
 
+: interquartile ( seq -- q1 q3 )
+    quartile [ first ] [ last ] bi ;
+
+: interquartile-range ( seq -- n )
+    interquartile - ;
+
+: midhinge ( seq -- n )
+    interquartile + 2 / ;
+
 : trimean ( seq -- x )
     quartile first3 [ 2 * ] dip + + 4 / ;
 
+: histogram-by! ( assoc seq quot: ( x -- bin ) -- hashtable )
+    rot [ '[ @ _ inc-at ] each ] keep ; inline
+
 : histogram! ( hashtable seq -- hashtable )
-    over '[ _ inc-at ] each ;
+    [ ] histogram-by! ; inline
 
 : histogram-by ( seq quot: ( x -- bin ) -- hashtable )
-    H{ } clone [ '[ @ _ inc-at ] each ] keep ; inline
+    [ H{ } clone ] 2dip histogram-by! ; inline
 
 : histogram ( seq -- hashtable )
     [ ] histogram-by ;
@@ -230,6 +280,9 @@ PRIVATE>
 
 : range ( seq -- x )
     minmax swap - ;
+
+: fivenum ( seq -- seq' )
+    [ quartile ] [ minmax ] bi [ prefix ] [ suffix ] bi* ;
 
 : var-ddof ( seq n -- x )
     2dup [ length ] dip - 0 <= [
@@ -350,11 +403,39 @@ PRIVATE>
 : rescale ( u -- v )
     dup minmax over - [ v-n ] [ v/n ] bi* ;
 
-: rankings ( histogram -- assoc )
-    sort-keys 0 swap [ rot [ + ] keep swapd ] H{ } assoc-map-as nip ;
+<PRIVATE
 
-: rank-values ( seq -- seq' )
-    dup histogram rankings '[ _ at ] map ;
+: rankings ( histogram method: ( min max -- rank ) -- assoc )
+    [ sort-keys 0 swap ] dip
+    '[ swapd dupd + _ keep -rot ] H{ } assoc-map-as nip ; inline
+
+: rank-by ( seq method: ( min max -- rank ) -- seq' )
+    [ dup histogram ] [ rankings ] bi* '[ _ at ] map ; inline
+
+PRIVATE>
+
+: rank-by-avg ( seq -- seq' ) [ + 1 + 2 / ] rank-by ;
+
+: rank-by-min ( seq -- seq' ) [ drop 1 + ] rank-by ;
+
+: rank-by-max ( seq -- seq' ) [ nip ] rank-by ;
+
+ALIAS: rank rank-by-avg
+
+: spearman-corr ( x-seq y-seq -- corr )
+    [ rank ] bi@ population-corr ;
 
 : z-score ( seq -- n )
     [ demean ] [ sample-std ] bi v/n ;
+
+: dcg ( scores -- dcg )
+    dup length 1 + 2 swap [a..b] [ log 2 log /f ] map v/ sum ;
+
+: ndcg ( scores -- ndcg )
+    [ 0.0 ] [
+        dup dcg [
+            drop 0.0
+        ] [
+            swap sort <reversed> dcg /f
+        ] if-zero
+    ] if-empty ;

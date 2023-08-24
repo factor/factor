@@ -1,5 +1,5 @@
 ! Copyright (C) 2009 Joe Groff.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs kernel locals math sequences
 sequences.private ;
 IN: sequences.product
@@ -78,3 +78,10 @@ M: product-sequence nth
         sequences [ quot call 2array i result set-nth-unsafe i 1 + i! ] product-each
         result
     ] new-like exemplar assoc-like ; inline
+
+:: product-find ( ... sequences quot: ( ... seq -- ... ? ) -- ... sequence )
+    sequences start-product-iter :> ( ns lengths )
+    lengths [ 0 = ] any? [ f ] [
+        f [ ns lengths end-product-iter? over or ]
+        [ drop ns sequences nths quot keep and ns lengths product-iter ] until
+    ] if ; inline

@@ -1,9 +1,9 @@
 ! Copyright (C) 2003, 2009 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
-USING: accessors alien.strings assocs continuations fry init
-io.encodings.utf8 io.files io.pathnames kernel kernel.private
-namespaces parser parser.notes sequences source-files
-source-files.errors splitting system vocabs.loader ;
+! See https://factorcode.org/license.txt for BSD license.
+USING: accessors alien.strings assocs continuations
+io.encodings.utf8 io.files kernel kernel.private namespaces
+parser sequences source-files.errors splitting system
+vocabs.loader ;
 IN: command-line
 
 SYMBOL: user-init-errors
@@ -24,10 +24,12 @@ SYMBOL: command-line
 : (command-line) ( -- args )
     OBJ-ARGS special-object sift [ alien>native-string ] map ;
 
-: rc-path ( name -- path )
-    home prepend-path ;
+: delete-user-init-errors ( file -- )
+    user-init-errors get delete-at* nip
+    [ notify-error-observers ] when ;
 
 : try-user-init ( file -- )
+    [ delete-user-init-errors ] keep
     "user-init" get swap '[
         _ [ ?run-file ] [
             <user-init-error>
@@ -37,14 +39,14 @@ SYMBOL: command-line
     ] when ;
 
 : run-bootstrap-init ( -- )
-    ".factor-boot-rc" rc-path try-user-init ;
+    "~/.factor-boot-rc" try-user-init ;
 
 : run-user-init ( -- )
-    ".factor-rc" rc-path try-user-init ;
+    "~/.factor-rc" try-user-init ;
 
 : load-vocab-roots ( -- )
     "user-init" get [
-        ".factor-roots" rc-path dup exists? [
+        "~/.factor-roots" dup file-exists? [
             utf8 file-lines harvest [ add-vocab-root ] each
         ] [ drop ] if
         "roots" get [
@@ -60,15 +62,10 @@ SYMBOL: command-line
 : param ( param -- )
     "=" split1 [ var-param ] [ bool-param ] if* ;
 
-: run-script ( file -- )
-    t parser-quiet? [
-        [ run-file ]
-        [ path>source-file main>> [ execute( -- ) ] when* ] bi
-    ] with-variable ;
-
 : (parse-command-line) ( args -- )
     [
         unclip "-" ?head [
+            [ CHAR: - = ] trim-head
             [ param ] [ "run=" head? ] bi
             [ command-line set ]
             [ (parse-command-line) ] if
@@ -98,9 +95,9 @@ SYMBOL: main-vocab-hook
         main-vocab "run" set
     ] with-global ;
 
-[
+STARTUP-HOOK: [
     H{ } user-init-errors set-global
     default-cli-args
-] "command-line" add-startup-hook
+]
 
 { "debugger" "command-line" } "command-line.debugger" require-when

@@ -1,5 +1,5 @@
 ! Copyright (C) 2012 Doug Coleman.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs continuations io.directories kernel
 math.parser sequences splitting system tools.ps unix.linux.proc ;
 IN: tools.ps.linux
@@ -11,13 +11,13 @@ IN: tools.ps.linux
         [ "()" member? ] trim
         "[" "]" surround
     ] [
-        nip "\0" split harvest " " join
+        nip "\0" split harvest join-words
     ] if-empty ;
 
 : safe-ps-cmdline ( path -- string/f )
     [ ps-cmdline ] [ 2drop f ] recover ;
 
-M: linux ps ( -- assoc )
+M: linux ps
     "/proc" [
         "." directory-files [ string>number ] filter
         [ dup safe-ps-cmdline 2array ] map sift-values

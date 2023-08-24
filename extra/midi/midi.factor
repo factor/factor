@@ -1,7 +1,7 @@
 ! Copyright (C) 2015 John Benediktsson
-! See http://factorcode.org/license.txt for BSD license
+! See https://factorcode.org/license.txt for BSD license
 
-USING: accessors assocs byte-arrays combinators fry io io.binary
+USING: accessors assocs byte-arrays combinators endian io
 io.encodings.binary io.encodings.string io.encodings.utf8
 io.files io.streams.byte-array io.streams.peek kernel literals
 make math sequences sequences.generalizations ;

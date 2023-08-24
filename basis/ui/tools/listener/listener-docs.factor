@@ -10,9 +10,9 @@ HELP: <listener-gadget>
 
 HELP: interactor
 { $class-description "An interactor is an " { $link editor } " intended to be used as the input component of a " { $link "ui-listener" } ". It has the following slots:"
-{ $table
+{ $slots
   {
-      { $slot "waiting" }
+      "waiting"
       { "If waiting is " { $link t } ", the interactor is waiting for user input, and invoking " { $link evaluate-input } " resumes the thread." }
   }
 }
@@ -50,33 +50,6 @@ $nl
 { $command-map interactor "quotation" }
 { $heading "Editing commands" }
 "The text editing commands are standard; see " { $link "gadgets-editors-commands" } "."
-$nl
-"If you want to add support for Emacs-style text entry, specifically the following:"
-$nl
-{ $table
-    { "Ctrl-k" "Delete to end of line" }
-    { "Ctrl-a" "Move cursor to start of line" }
-    { "Ctrl-e" "Move cursor to end of line" }
-}
-$nl
-"Then you can run the following code, or add it to your " { $link ".factor-rc" } "."
-$nl
-{ $code
-    "USING: accessors assocs kernel sequences sets ui.commands
-ui.gadgets.editors ui.gestures ui.tools.listener ;
-
-\"multiline\" multiline-editor get-command-at [
-    {
-        { T{ key-down f { C+ } \"k\" } delete-to-end-of-line }
-        { T{ key-down f { C+ } \"a\" } start-of-line }
-        { T{ key-down f { C+ } \"e\" } end-of-line }
-    } append members
-] change-commands drop multiline-editor update-gestures
-
-\"interactor\" interactor get-command-at [
-    [ drop T{ key-down f { C+ } \"k\" } = ] assoc-reject
-] change-commands drop interactor update-gestures"
-}
 $nl
 { $heading "Implementation" }
 "Listeners are instances of " { $link listener-gadget } ". The listener consists of an output area (instance of " { $link pane } ") and an input area (instance of " { $link interactor } "). Clickable presentations can also be printed to the listener; see " { $link "ui-presentations" } "." ;

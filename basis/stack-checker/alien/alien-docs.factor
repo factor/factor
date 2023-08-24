@@ -4,10 +4,10 @@ IN: stack-checker.alien
 
 HELP: alien-node-params
 { $class-description "Base class for the parameter slot of " { $link #alien-node } " nodes. It has the following slots:"
-  { $table
-    { { $slot "return" } { "a " { $link c-type-name } " which indicates the type of the functions return value." } }
-    { { $slot "parameters" } { "a " { $link sequence } " of " { $link c-type-name } " giving the types of the functions parameters." } }
-    { { $slot "abi" } { "calling convention of the function the node parameters operates on." } }
+  { $slots
+    { "return" { "a " { $link c-type-name } " which indicates the type of the functions return value." } }
+    { "parameters" { "a " { $link sequence } " of " { $link c-type-name } " giving the types of the functions parameters." } }
+    { "abi" { "calling convention of the function the node parameters operates on." } }
   }
 }
 { $see-also abi } ;

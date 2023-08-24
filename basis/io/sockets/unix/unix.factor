@@ -1,10 +1,12 @@
 ! Copyright (C) 2004, 2008 Slava Pestov, Ivan Tikhonov.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
+
 USING: accessors alien alien.c-types alien.data alien.strings
-byte-arrays classes.struct combinators destructors io.backend.unix
-io.encodings.ascii io.encodings.utf8 io.files io.pathnames io.sockets
-io.sockets.private kernel libc locals math namespaces sequences system
-unix unix.ffi vocabs ;
+byte-arrays classes.struct combinators destructors
+io.backend.unix io.encodings.ascii io.encodings.utf8 io.files
+io.pathnames io.ports io.sockets io.sockets.private kernel libc
+locals math namespaces sequences system unix unix.ffi vocabs ;
+
 IN: io.sockets.unix
 
 : socket-fd ( domain type protocol -- fd )
@@ -163,12 +165,12 @@ M: local protocol-family drop PF_UNIX ;
 
 M: local sockaddr-size drop sockaddr-un heap-size ;
 
-M: local empty-sockaddr drop sockaddr-un <struct> ;
+M: local empty-sockaddr drop sockaddr-un new ;
 
 M: local make-sockaddr
     path>> absolute-path
     dup length 1 + max-un-path > [ "Path too long" throw ] when
-    sockaddr-un <struct>
+    sockaddr-un new
         AF_UNIX >>family
         swap utf8 string>alien >>path ;
 

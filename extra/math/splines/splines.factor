@@ -1,9 +1,7 @@
 ! Copyright (C) 2010 Erik Charlebois
-! See http://factorcode.org/license.txt for BSD license.
-USING: accessors combinators kernel locals math math.combinatorics
-math.polynomials opengl.gl sequences ui.gadgets ui.gadgets.panes
-ui.render arrays grouping math.vectors assocs
-ui.gestures ;
+! See https://factorcode.org/license.txt for BSD license.
+USING: arrays combinators grouping kernel math
+math.combinatorics math.polynomials math.vectors sequences ;
 IN: math.splines
 
 <PRIVATE

@@ -1,16 +1,16 @@
 ! Copyright (C) 2011 John Benediktsson
-! See http://factorcode.org/license.txt for BSD license
+! See https://factorcode.org/license.txt for BSD license
 
-USING: accessors arrays assocs assocs.extras classes.tuple
-colors.constants combinators formatting fry http.client io
-io.styles json.reader kernel sequences urls wrap.strings ;
+USING: accessors assocs.extras classes.tuple colors combinators
+formatting http.client io io.styles json kernel sequences urls
+wrap.strings ;
 
 IN: google.search
 
 <PRIVATE
 
 : search-url ( query -- url )
-    URL" http://ajax.googleapis.com/ajax/services/search/web" clone
+    URL" https://ajax.googleapis.com/ajax/services/search/web" clone
         "1.0" "v" set-query-param
         swap "q" set-query-param
         "8" "rsz" set-query-param
@@ -23,7 +23,7 @@ PRIVATE>
 
 : google-search ( query -- results )
     search-url http-get nip json>
-    { "responseData" "results" } deep-at
+    { "responseData" "results" } deep-of
     [ \ search-result from-slots ] map ;
 
 <PRIVATE

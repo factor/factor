@@ -19,7 +19,7 @@
         <SEQ TYPE="COMMENT1">/**/</SEQ>
 
         <!-- Javadoc comment -->
-        <SPAN TYPE="COMMENT3">
+        <SPAN TYPE="COMMENT3" DELEGATE="java::JAVADOC">
             <BEGIN>/**</BEGIN>
             <END>*/</END>
         </SPAN>

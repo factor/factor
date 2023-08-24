@@ -1,5 +1,5 @@
 ! Copyright (C) 2009 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: tools.test core-foundation core-foundation.dictionaries
 arrays destructors core-foundation.strings kernel namespaces ;
 IN: core-foundation.dictionaries.tests

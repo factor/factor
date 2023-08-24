@@ -1,5 +1,4 @@
-USING: help.markup help.syntax io.streams.string strings
-http math furnace.json ;
+USING: help.markup help.syntax http math strings ;
 IN: http.server.responses
 
 HELP: <content>

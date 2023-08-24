@@ -1,13 +1,9 @@
 ! Copyright (C) 2008 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
-USING: kernel sequences db.tuples timers calendar db fry
-furnace.db
-furnace.cache
-furnace.asides
-furnace.sessions
-furnace.conversations
-furnace.auth.providers
-furnace.auth.login.permits ;
+! See https://factorcode.org/license.txt for BSD license.
+USING: calendar db db.tuples furnace.asides
+furnace.auth.login.permits furnace.auth.providers furnace.cache
+furnace.conversations furnace.db furnace.sessions kernel
+sequences timers ;
 IN: furnace.alloy
 
 CONSTANT: state-classes { session aside conversation permit }

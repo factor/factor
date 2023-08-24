@@ -1,5 +1,5 @@
 USING: alien alien.c-types cpu.x86.64 cpu.x86.assembler
-cpu.x86.assembler.operands math.floats.env.x86 sequences system ;
+cpu.x86.assembler.operands math.floats.env.x86 system ;
 IN: math.floats.env.x86.64
 
 M: x86.64 get-sse-env

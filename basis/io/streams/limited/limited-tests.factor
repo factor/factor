@@ -104,22 +104,22 @@ namespaces strings tools.test ;
 
 { "asdf" } [
     "asdf" <string-reader> 2 <limited-stream> [
-        unlimited-input contents
+        unlimited-input read-contents
     ] with-input-stream
 ] unit-test
 
 { "asdf" } [
     "asdf" <string-reader> 2 <limited-stream> [
-        [ contents ] with-unlimited-input
+        [ read-contents ] with-unlimited-input
     ] with-input-stream
 ] unit-test
 
 { "gh" } [
     "asdfgh" <string-reader> 4 <limited-stream> [
         2 [
-            [ contents drop ] with-unlimited-input
+            [ read-contents drop ] with-unlimited-input
         ] with-limited-input
-        [ contents ] with-unlimited-input
+        [ read-contents ] with-unlimited-input
     ] with-input-stream
 ] unit-test
 

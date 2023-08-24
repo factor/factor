@@ -1,6 +1,5 @@
-USING: io.backend io.directories io.files.private io.files.temp
-io.files.unique io.pathnames kernel locals math multiline
-namespaces sequences system tools.test ;
+USING: io.backend io.directories io.files.private io.pathnames
+kernel math namespaces sequences system tools.test vocabs.loader ;
 
 { "passwd" } [ "/etc/passwd" file-name ] unit-test
 { "awk" } [ "/usr/libexec/awk/" file-name ] unit-test
@@ -61,8 +60,8 @@ H{
     { current-directory "." }
     { "resource-path" ".." }
 } [
-    [ "../core/bootstrap/stage2.factor" ]
-    [ "resource:core/bootstrap/stage2.factor" absolute-path ]
+    [ "../basis/bootstrap/stage2.factor" ]
+    [ "resource:basis/bootstrap/stage2.factor" absolute-path ]
     unit-test
 ] with-variables
 
@@ -158,3 +157,35 @@ os windows? [
     { "/" } [ "/Users/foo/bar////.//../../../../../../////./." root-path ] unit-test
     { "/" } [ "/Users/////" root-path ] unit-test
 ] if
+
+{ t } [ "." has-file-extension? ] unit-test
+{ t } [ ".." has-file-extension? ] unit-test
+{ t } [ "a.b" has-file-extension? ] unit-test
+{ f } [ "a/" has-file-extension? ] unit-test
+{ f } [ "a.b/" has-file-extension? ] unit-test
+{ t } [ "math.factor" has-file-extension? ] unit-test
+{ t } [ "math." has-file-extension? ] unit-test
+{ f } [ "math" has-file-extension? ] unit-test
+
+{ "resource:core/math" } [ "math" vocab-path ] unit-test
+{ "resource:core/math/" } [ "math/" vocab-path ] unit-test
+
+[ "math.omg" vocab-path ] [ not-found-in-roots? ] must-fail-with
+[ "math.omg/" vocab-path ] [ not-found-in-roots? ] must-fail-with
+[ "accessors" vocab-path ] [ not-found-in-roots? ] must-fail-with
+[ "asdfasdfasdfasfd1231231" vocab-path ] [ not-found-in-roots? ] must-fail-with
+[ "resource:extra/benchmark/sum-file/sum-file.txt/" vocab-path ]
+[ not-found-in-roots? ] must-fail-with
+
+{ "resource:extra/benchmark/sum-file/sum-file.txt" }
+[ "benchmark/sum-file/sum-file.txt" vocab-path ] unit-test
+
+{ "resource:extra/benchmark/sum-file" }
+[ "benchmark/sum-file" vocab-path ] unit-test
+
+{ "resource:extra/benchmark/sum-file/" }
+[ "benchmark/sum-file/" vocab-path ] unit-test
+
+! Would be a core/ path except the path already exists in basis
+{ "resource:basis/bootstrap/finish-bootstrap.factor" }
+[ "bootstrap/finish-bootstrap.factor" vocab-path ] unit-test

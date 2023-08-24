@@ -5,12 +5,6 @@
 #include <wchar.h>
 #endif
 
-#if _WIN32_WINNT != 0x0600
-#undef _WIN32_WINNT
-#define _WIN32_WINNT 0x0501  // For AddVectoredExceptionHandler, WinXP support
-//#define _WIN32_WINNT 0x0600  // For CancelSynchronousIo
-#endif
-
 #ifndef UNICODE
 #define UNICODE
 #endif
@@ -91,5 +85,37 @@ inline static void breakpoint() { DebugBreak(); }
 #define FUNCTION_TOC_POINTER(ptr) ptr
 
 extern HANDLE boot_thread;
+
+inline static std::string to_utf8(const wchar_t* buffer, int len) {
+  int nChars = ::WideCharToMultiByte(
+    CP_UTF8,
+    0,
+    buffer,
+    len,
+    NULL,
+    0,
+    NULL,
+    NULL);
+  if (nChars == 0) return "";
+
+  std::string newbuffer;
+  newbuffer.resize(nChars) ;
+  ::WideCharToMultiByte(
+    CP_UTF8,
+    0,
+    buffer,
+    len,
+    const_cast<char*>(newbuffer.c_str()),
+    nChars,
+    NULL,
+    NULL);
+  return newbuffer;
+}
+
+inline static std::string to_utf8(const std::wstring& str) {
+  return to_utf8(str.c_str(), (int)str.size());
+}
+
+#define AS_UTF8(ptr) to_utf8(ptr)
 
 }

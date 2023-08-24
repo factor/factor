@@ -1,5 +1,5 @@
 ! Copyright (C) 2008 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: kernel io.backend io.monitors io.monitors.recursive
 io.files io.pathnames io.buffers io.ports io.timeouts
 io.backend.unix io.encodings.utf8 unix.linux.inotify assocs
@@ -44,7 +44,7 @@ TUPLE: linux-monitor < monitor wd inotify watches ;
         "Calling <monitor> outside with-monitors" throw
     ] unless ;
 
-M: linux (monitor) ( path recursive? mailbox -- monitor )
+M: linux (monitor)
     swap [
         <recursive-monitor>
     ] [
@@ -52,7 +52,7 @@ M: linux (monitor) ( path recursive? mailbox -- monitor )
         IN_CHANGE_EVENTS swap add-watch
     ] if ;
 
-M: linux-monitor dispose* ( monitor -- )
+M: linux-monitor dispose*
     [ [ wd>> ] [ watches>> ] bi delete-at ]
     [
         dup inotify>> disposed>> [ drop ] [

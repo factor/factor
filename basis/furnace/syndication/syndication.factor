@@ -1,8 +1,8 @@
 ! Copyright (C) 2008, 2010 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
-USING: accessors kernel sequences fry combinators syndication
-http.server.responses http.server.redirection furnace.actions
-furnace.utilities io.encodings.utf8 ;
+! See https://factorcode.org/license.txt for BSD license.
+USING: accessors combinators furnace.actions furnace.utilities
+http.server.responses io.encodings.utf8 kernel sequences
+syndication ;
 IN: furnace.syndication
 
 GENERIC: feed-entry-title ( object -- string )
@@ -29,7 +29,7 @@ M: object >entry
         } cleave ;
 
 : process-entries ( seq -- seq' )
-    20 short head-slice [
+    20 index-or-length head-slice [
         >entry clone
         [ adjust-url ] change-url
     ] map ;

@@ -2,7 +2,7 @@ USING: accessors alien alien.c-types arrays assocs bit-arrays
 cocoa.application cocoa.enumeration cocoa.plists combinators
 combinators.short-circuit core-foundation core-foundation.data
 core-foundation.run-loop core-foundation.strings destructors
-game.input hints iokit iokit.hid kernel locals math namespaces
+game.input hints iokit iokit.hid kernel math namespaces
 sequences vectors ;
 IN: game.input.iokit
 
@@ -334,28 +334,30 @@ M: iokit-game-input-backend (close-game-input)
         f +controller-states+ set-global
     ] when ;
 
-M: iokit-game-input-backend get-controllers ( -- sequence )
+M: iokit-game-input-backend get-controllers
     +controller-states+ get-global keys [ controller boa ] map ;
 
-: ?join ( pre post sep -- string )
-    2over subseq-start [ swap 2nip ] [ [ 2array ] dip join ] if ;
+: ?glue ( seq subseq sep -- string )
+    2over subseq-index [ drop nip ] [ glue ] if ;
 
-M: iokit-game-input-backend product-string ( controller -- string )
+M: iokit-game-input-backend product-string
     handle>>
-    [ kIOHIDManufacturerKey device-property ]
-    [ kIOHIDProductKey      device-property ] bi " " ?join ;
-M: iokit-game-input-backend product-id ( controller -- integer )
+    [ kIOHIDProductKey      device-property ]
+    [ kIOHIDManufacturerKey device-property ] bi " " ?glue ;
+
+M: iokit-game-input-backend product-id
     handle>>
     [ kIOHIDVendorIDKey  device-property ]
     [ kIOHIDProductIDKey device-property ] bi 2array ;
-M: iokit-game-input-backend instance-id ( controller -- integer )
+
+M: iokit-game-input-backend instance-id
     handle>> kIOHIDLocationIDKey device-property ;
 
-M: iokit-game-input-backend read-controller ( controller -- controller-state )
+M: iokit-game-input-backend read-controller
     handle>> +controller-states+ get-global at clone ;
 
-M: iokit-game-input-backend read-keyboard ( -- keyboard-state )
+M: iokit-game-input-backend read-keyboard
     +keyboard-state+ get-global clone keyboard-state boa ;
 
-M: iokit-game-input-backend calibrate-controller ( controller -- )
+M: iokit-game-input-backend calibrate-controller
     drop ;

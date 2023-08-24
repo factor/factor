@@ -1,5 +1,5 @@
-USING: assocs continuations help.markup help.syntax parser sequences strings
-words vocabs ;
+USING: assocs continuations help.markup help.syntax parser quotations
+sequences strings words vocabs ;
 IN: vocabs.parser
 
 ARTICLE: "word-search-errors" "Word lookup errors"
@@ -162,12 +162,17 @@ HELP: add-renamed-word
 { $notes "This word is used to implement " { $link POSTPONE: RENAME: } "." } ;
 
 HELP: use-words
-{ $values { "assoc" assoc } }
+{ $values { "words" assoc } }
 { $description "Adds an assoc mapping word names to words to the current manifest." } ;
 
 HELP: unuse-words
-{ $values { "assoc" assoc } }
+{ $values { "words" assoc } }
 { $description "Removes an assoc mapping word names to words from the current manifest." } ;
+
+HELP: with-words
+{ $values { "words" assoc } { "quot" quotation } }
+{ $description "Calls a quotation with the words added to the current manifest, removing them from the manifest afterwards and properly handling any errors and restarts." }
+;
 
 HELP: ambiguous-use-error
 { $error-description "Thrown when a word name referenced in source file is available in more than one vocabulary in the manifest. Such cases must be explicitly disambiguated using " { $link POSTPONE: FROM: } ", " { $link POSTPONE: EXCLUDE: } ", " { $link POSTPONE: QUALIFIED: } ", or " { $link POSTPONE: QUALIFIED-WITH: } "." } ;

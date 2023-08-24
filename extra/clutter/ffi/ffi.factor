@@ -1,11 +1,11 @@
 ! Copyright (C) 2010 Anton Gorenko.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: alien alien.libraries alien.syntax cairo.ffi combinators
 gobject-introspection kernel system vocabs ;
 IN: clutter.ffi
 
 <<
-"gtk" require
+"gtk2" require
 "atk.ffi" require
 "pango.cairo.ffi" require
 "clutter.cogl.ffi" require

@@ -1,7 +1,7 @@
 ! Copyright (C) 2012 John Benediktsson
-! See http://factorcode.org/license.txt for BSD license
-USING: arrays kernel layouts locals math math.functions
-math.order math.statistics sequences ;
+! See https://factorcode.org/license.txt for BSD license
+USING: arrays kernel layouts math math.functions math.order
+math.statistics sequences ;
 IN: math.cardinality
 
 GENERIC: trailing-zeros ( m -- n )

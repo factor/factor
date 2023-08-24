@@ -21,11 +21,22 @@ vectors ;
 { f } [ "amigo" "hola" subseq-start ] unit-test
 { f } [ "holaa" "hola" subseq-start ] unit-test
 
+{ 3 } [ "hola" "a" subseq-index ] unit-test
+{ f } [ "hola" "x" subseq-index ] unit-test
+{ 0 } [ "a" "" subseq-index ] unit-test
+{ 0 } [ "" "" subseq-index ] unit-test
+{ 0 } [ "hola" "hola" subseq-index ] unit-test
+{ 1 } [ "hola" "ol" subseq-index ] unit-test
+{ f } [ "hola" "amigo" subseq-index ] unit-test
+{ f } [ "hola" "holaa" subseq-index ] unit-test
+
 { "Beginning" } [ "Beginning and end" 9 head ] unit-test
 
 { f } [ CHAR: I "team" member? ] unit-test
 { t } [ "ea" "team" subseq? ] unit-test
 { f } [ "actore" "Factor" subseq? ] unit-test
+{ t } [ "team" "ea" subseq-of? ] unit-test
+{ f } [ "Factor" "actore" subseq-of? ] unit-test
 
 { "end" } [ "Beginning and end" 14 tail ] unit-test
 

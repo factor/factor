@@ -1,13 +1,13 @@
 ! Copyright (C) 2018 John Benediktsson
-! See http://factorcode.org/license.txt for BSD license
+! See https://factorcode.org/license.txt for BSD license
 
 USING: backtrack backtrack.private combinators.short-circuit
-kernel locals math math.functions math.primes
+kernel math math.functions math.primes
 project-euler.common sequences ;
 
 IN: project-euler.060
 
-! http://projecteuler.net/problem=60
+! https://projecteuler.net/problem=60
 
 ! DESCRIPTION
 ! -----------

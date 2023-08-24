@@ -1,10 +1,10 @@
 ! Copyright (c) 2008 Aaron Schaefer.
-! See http://factorcode.org/license.txt for BSD license.
-USING: kernel math math.combinatorics math.functions math.parser math.ranges
+! See https://factorcode.org/license.txt for BSD license.
+USING: kernel math math.combinatorics math.functions math.parser ranges
     project-euler.common sequences sets ;
 IN: project-euler.032
 
-! http://projecteuler.net/index.php?section=problems&id=32
+! https://projecteuler.net/index.php?section=problems&id=32
 
 ! DESCRIPTION
 ! -----------
@@ -69,7 +69,7 @@ PRIVATE>
 PRIVATE>
 
 : euler032a ( -- answer )
-    50 [1,b] 2000 [1,b]
+    50 [1..b] 2000 [1..b]
     [ mmp ] cartesian-map concat
     [ pandigital? ] filter
     products members sum ;

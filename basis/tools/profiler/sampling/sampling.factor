@@ -1,15 +1,15 @@
 ! Copyright (C) 2011 Joe Groff.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors assocs combinators combinators.short-circuit
-continuations formatting fry generalizations hashtables.identity
-io kernel kernel.private layouts locals math math.parser
-math.vectors memory namespaces prettyprint sequences
+continuations formatting generalizations io io.streams.string
+kernel kernel.private layouts math math.parser math.vectors
+memory namespaces prettyprint sequences
 sequences.generalizations sets sorting ;
 IN: tools.profiler.sampling
 
 <PRIVATE
-PRIMITIVE: (get-samples) ( -- samples/f )
-PRIMITIVE: profiling ( n -- )
+PRIMITIVE: get-samples ( -- samples/f )
+PRIMITIVE: set-profiling ( n -- )
 PRIVATE>
 
 SYMBOL: samples-per-second
@@ -19,7 +19,7 @@ samples-per-second [ 1,000 ] initialize
 <PRIVATE
 SYMBOL: raw-profile-data
 CONSTANT: ignore-words
-    { signal-handler leaf-signal-handler profiling minor-gc }
+    { signal-handler leaf-signal-handler set-profiling minor-gc }
 
 : ignore-word? ( word -- ? ) ignore-words member? ; inline
 PRIVATE>
@@ -28,9 +28,9 @@ PRIVATE>
     raw-profile-data get-global [ "No profile data" throw ] unless* ;
 
 : profile ( quot -- )
-    samples-per-second get-global profiling
-    [ 0 profiling (get-samples) raw-profile-data set-global ]
-    [ ] cleanup ; inline
+    samples-per-second get-global set-profiling
+    [ 0 set-profiling get-samples raw-profile-data set-global ]
+    finally ; inline
 
 : total-sample-count ( sample -- count ) 0 swap nth ;
 : gc-sample-count ( sample -- count ) 1 swap nth ;
@@ -198,10 +198,10 @@ PRIVATE>
 <PRIVATE
 
 : depth. ( depth -- )
-    [ "  " write ] times ;
+    H{ } [ "  " <repetition> concat ] cache write ;
 
 : by-total-time ( nodes -- nodes' )
-    >alist [ second total-time>> ] inv-sort-with ;
+    >alist [ second total-time>> ] inv-sort-by ;
 
 : duration. ( duration -- )
     1000 * "%9.1f" printf ;
@@ -209,26 +209,28 @@ PRIVATE>
 : percentage. ( num denom -- )
     [ 100 * ] dip /f "%6.2f" printf ;
 
-DEFER: (profile.)
+DEFER: profile-depth.
 
 :: times. ( node -- )
-    node {
-        [ depth>> number>string 4 CHAR: \s pad-head write bl ]
-        [ total-time>> duration. bl ]
-        [ [ gc-time>> ] [ total-time>> ] bi percentage. bl ]
-        [ [ jit-time>> ] [ total-time>> ] bi percentage. bl ]
-        [ [ foreign-time>> ] [ total-time>> ] bi percentage. bl ]
-        [ [ foreign-thread-time>> ] [ total-time>> ] bi percentage. bl ]
-    } cleave ;
+    [
+        node {
+            [ depth>> number>string 4 CHAR: \s pad-head write bl ]
+            [ total-time>> duration. bl ]
+            [ [ gc-time>> ] [ total-time>> ] bi percentage. bl ]
+            [ [ jit-time>> ] [ total-time>> ] bi percentage. bl ]
+            [ [ foreign-time>> ] [ total-time>> ] bi percentage. bl ]
+            [ [ foreign-thread-time>> ] [ total-time>> ] bi percentage. bl ]
+        } cleave
+    ] with-string-writer write ;
 
-:: (profile-node.) ( word node depth -- )
+:: profile-node. ( word node depth -- )
     node times.
     depth depth.
     word pprint-short nl
-    node children>> depth 1 + (profile.) ;
+    node children>> depth 1 + profile-depth. ;
 
-: (profile.) ( nodes depth -- )
-    [ by-total-time ] dip '[ _ (profile-node.) ] assoc-each ;
+: profile-depth. ( nodes depth -- )
+    [ by-total-time ] dip '[ _ profile-node. ] assoc-each ;
 
 : profile-heading. ( -- )
     "depth   time ms  GC %  JIT %  FFI %   FT %" print ;
@@ -237,5 +239,4 @@ DEFER: (profile.)
 PRIVATE>
 
 : profile. ( tree -- )
-    profile-heading.
-    [ 0 (profile-node.) ] assoc-each ;
+    profile-heading. [ 0 profile-node. ] assoc-each ;

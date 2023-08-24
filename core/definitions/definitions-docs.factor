@@ -1,5 +1,5 @@
-USING: generic hash-sets help.markup help.syntax words math source-files
-parser quotations compiler.units ;
+USING: compiler.units generic hash-sets help.markup help.syntax
+parser ;
 IN: definitions
 
 ARTICLE: "definition-protocol" "Definition protocol"
@@ -78,7 +78,7 @@ HELP: changed-definition
 { $description "Adds the definition to the unit's " { $link changed-definitions } "." } ;
 
 HELP: changed-definitions
-{ $var-description "A set that contains all words and vocabs whose definitions have changed or are new. " }
+{ $var-description "A set that contains all words and vocabs whose definitions have changed or are new." }
 { $see-also changed-definition } ;
 
 HELP: changed-effects

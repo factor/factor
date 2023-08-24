@@ -1,18 +1,18 @@
 ! Copyright (C) 2008 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: io.backend io.files io.files.links io.pathnames kernel
 sequences system unix unix.ffi ;
 IN: io.files.links.unix
 
-M: unix make-link ( path1 path2 -- )
+M: unix make-link
     normalize-path [ symlink ] unix-system-call drop ;
 
-M: unix make-hard-link ( path1 path2 -- )
+M: unix make-hard-link
     normalize-path [ link ] unix-system-call drop ;
 
-M: unix read-link ( path -- path' )
+M: unix read-link
     normalize-path read-symbolic-link ;
 
-M: unix resolve-symlinks ( path -- path' )
+M: unix resolve-symlinks
     path-components "/"
-    [ append-path dup exists? [ follow-links ] when ] reduce ;
+    [ append-path dup file-exists? [ follow-links ] when ] reduce ;

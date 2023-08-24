@@ -1,10 +1,9 @@
 ! Copyright (C) 2008, 2010 Slava Pestov, Jorge Acereda Macia.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: alien alien.c-types alien.libraries alien.syntax arrays
-combinators destructors fry kernel layouts libc make math
-math.order math.parser namespaces sequences splitting system
-tools.disassembler.private tools.disassembler.utils tools.memory
-;
+combinators destructors io kernel layouts libc make math
+math.order math.parser namespaces sequences system
+tools.disassembler.private tools.memory ;
 IN: tools.disassembler.udis
 
 << "libudis86" {
@@ -56,41 +55,29 @@ FUNCTION: c-string ud_lookup_mnemonic ( int c )
 
 SINGLETON: udis-disassembler
 
+<PRIVATE
+
 : buf/len ( from to -- buf len ) [ drop <alien> ] [ swap - ] 2bi ;
 
-: resolve-call ( str -- str' ) "0x" split1-last [ resolve-xt append ] when* ;
-
-: format-disassembly ( lines -- lines' )
-    dup [ second length ] [ max ] map-reduce
-    '[
-        [
-            [ first >hex cell 2 * CHAR: 0 pad-head % ": " % ]
-            [ second _ CHAR: \s pad-tail % "  " % ]
-            [ third resolve-call % ]
-            tri
-        ] "" make
-    ] map ;
-
-: (disassemble) ( ud -- lines )
+: make-disassembly ( ud -- lines )
     [
-        dup '[
-            _ ud_disassemble 0 =
-            [ f ] [
-                _
-                [ ud_insn_off ]
-                [ ud_insn_hex ]
-                [ ud_insn_asm ]
-                tri 3array , t
-            ] if
-        ] loop
+        [ dup ud_disassemble 0 = ] [
+            dup
+            [ ud_insn_off ]
+            [ ud_insn_hex ]
+            [ ud_insn_asm ]
+            tri 3array ,
+        ] until drop
     ] { } make ;
 
-M: udis-disassembler disassemble* ( from to -- buffer )
+PRIVATE>
+
+M: udis-disassembler disassemble*
     '[
         _ _
         [ drop ud_set_pc ]
         [ buf/len ud_set_input_buffer ]
-        [ 2drop (disassemble) format-disassembly ]
+        [ 2drop make-disassembly write-disassembly ]
         3tri
     ] with-ud ;
 

@@ -1,8 +1,7 @@
 ! Copyright (C) 2004 Chris Double.
-! See http://factorcode.org/license.txt for BSD license.
-USING: lists lists.lazy promises kernel sequences strings math
-arrays splitting quotations combinators namespaces locals
-unicode sequences.deep accessors ;
+! See https://factorcode.org/license.txt for BSD license.
+USING: accessors arrays kernel lists lists.lazy math promises
+sequences sequences.deep strings unicode ;
 IN: parser-combinators
 
 ! Parser combinator protocol

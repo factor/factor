@@ -1,7 +1,7 @@
 ! Copyright (C) 2009 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors alien.data classes.struct combinators.smart
-fry kernel math math.functions math.order math.parser sequences
+kernel math math.functions math.order math.parser sequences
 specialized-arrays io ;
 FROM: alien.c-types => float ;
 IN: benchmark.struct-arrays
@@ -37,7 +37,7 @@ SPECIALIZED-ARRAY: point
     [ x>> max ] [ y>> max ] [ z>> max ] change-xyz ; inline
 
 : <zero-point> ( -- point )
-    0 0 0 point <struct-boa> ; inline
+    0 0 0 point boa ; inline
 
 : max-points ( points -- point )
     <zero-point> [ max-point ] reduce ; inline

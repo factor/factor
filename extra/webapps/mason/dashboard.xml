@@ -2,7 +2,8 @@
 
 <t:chloe xmlns:t="http://factorcode.org/chloe/1.0">
 	<t:title>Mason dashboard</t:title>
-
+    <t:style t:include="resource:extra/webapps/mason/mason.css" />
+    <div style="padding: 10px;">
 	<h1>Build machines</h1>
 	<t:xml t:name="builders" />
 
@@ -24,4 +25,5 @@
 
 		<p><button type="submit">Go</button></p>
 	</t:form>
+	</div>
 </t:chloe>

@@ -1,6 +1,6 @@
 ! Copyright (C) 2009 Joe Groff.
-! See http://factorcode.org/license.txt for BSD license.
-USING: help help.markup help.syntax kernel quotations ;
+! See https://factorcode.org/license.txt for BSD license.
+USING: help.markup help.syntax kernel math.floats.env quotations ;
 IN: math.floats.env
 
 HELP: fp-exception
@@ -55,11 +55,11 @@ HELP: +denormal-flush+
 { $class-description "This symbol represents the non-IEEE-754-compliant flush-denormals-to-zero " { $link fp-denormal-mode } "." } ;
 
 HELP: fp-exception-flags
-{ $values { "exceptions" "a sequence of " { $link fp-exception } " symbols" } }
+{ $values { "exceptions" { $sequence fp-exception } } }
 { $description "Returns the set of floating-point exception flags that have been raised." } ;
 
 HELP: set-fp-exception-flags
-{ $values { "exceptions" "a sequence of " { $link fp-exception } " symbols" } }
+{ $values { "exceptions" { $sequence fp-exception } } }
 { $description "Replaces the set of floating-point exception flags with the set specified in " { $snippet "exceptions" } "." }
 { $notes "On Intel platforms, the legacy x87 floating-point unit does not support setting exception flags, so this word only clears the x87 exception flags. However, the SSE unit's flags are set as expected." } ;
 
@@ -67,7 +67,7 @@ HELP: clear-fp-exception-flags
 { $description "Clears all of the floating-point exception flags." } ;
 
 HELP: collect-fp-exceptions
-{ $values { "quot" quotation } { "exceptions" "a sequence of " { $link fp-exception } " symbols" } }
+{ $values { "quot" quotation } { "exceptions" { $sequence fp-exception } } }
 { $description "Clears the floating-point exception flags and then calls " { $snippet "quot" } ", returning the set of floating-point exceptions raised during its execution and placing them on the datastack on " { $snippet "quot" } "'s completion." } ;
 
 { fp-exception-flags set-fp-exception-flags clear-fp-exception-flags collect-fp-exceptions } related-words
@@ -93,11 +93,11 @@ HELP: with-rounding-mode
 { rounding-mode with-rounding-mode } related-words
 
 HELP: fp-traps
-{ $values { "exceptions" "a sequence of " { $link fp-exception } " symbols" } }
+{ $values { "exceptions" { $sequence fp-exception } } }
 { $description "Returns the set of floating point exceptions with processor traps currently set." } ;
 
 HELP: with-fp-traps
-{ $values { "exceptions" "a sequence of " { $link fp-exception } " symbols" } { "quot" quotation } }
+{ $values { "exceptions" { $sequence fp-exception } } { "quot" quotation } }
 { $description "Clears the floating-point exception flags and replaces the exception mask, enabling processor traps for the set of exception conditions specified in " { $snippet "exceptions" } " for the dynamic extent of " { $snippet "quot" } ". The original exception mask is restored on " { $snippet "quot" } "'s completion." } ;
 
 HELP: without-fp-traps
@@ -107,7 +107,7 @@ HELP: without-fp-traps
 { fp-traps with-fp-traps without-fp-traps vm-error>exception-flags vm-error-exception-flag? } related-words
 
 HELP: vm-error>exception-flags
-{ $values { "error" "a floating-point error object from the Factor VM" } { "exceptions" "a sequence of " { $link fp-exception } " symbols" } }
+{ $values { "error" "a floating-point error object from the Factor VM" } { "exceptions" { $sequence fp-exception } } }
 { $description "When a floating-point trap is raised, the Factor VM reports the trap by throwing a Factor exception containing the exception flags at the time the trap was raised. This word extracts the exception flag information from " { $snippet "error" } " and converts it into a sequence of " { $link fp-exception } "s." } ;
 
 HELP: vm-error-exception-flag?

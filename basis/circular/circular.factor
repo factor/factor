@@ -1,6 +1,6 @@
 ! Copyright (C) 2005, 2006 Alex Chapman, Daniel Ehrenberg
-! See http://factorcode.org/license.txt for BSD license
-USING: accessors arrays fry kernel math sequences strings ;
+! See https://factorcode.org/license.txt for BSD license
+USING: accessors arrays kernel math sequences strings ;
 IN: circular
 
 TUPLE: circular { seq read-only } { start integer } ;

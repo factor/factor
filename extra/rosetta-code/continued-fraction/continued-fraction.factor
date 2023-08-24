@@ -1,10 +1,10 @@
 ! Copyright (c) 2012 Anonymous
-! See http://factorcode.org/license.txt for BSD license.
-USING: arrays combinators io kernel locals math math.functions
-math.ranges prettyprint sequences ;
+! See https://factorcode.org/license.txt for BSD license.
+USING: arrays combinators io kernel math math.functions
+ranges prettyprint sequences ;
 IN: rosetta-code.continued-fraction
 
-! http://rosettacode.org/wiki/Continued_fraction
+! https://rosettacode.org/wiki/Continued_fraction
 
 ! A number may be represented as a continued fraction (see
 ! Mathworld for more information) as follows:
@@ -50,7 +50,7 @@ M: pi cfrac-b
 
 :: cfrac-estimate ( cfrac terms -- number )
     terms cfrac cfrac-a             ! top = last a_n
-    terms 1 - 1 [a,b] [ :> n
+    terms 1 - 1 [a..b] [ :> n
         n cfrac cfrac-b swap /      ! top = b_n / top
         n cfrac cfrac-a +           ! top = top + a_n
     ] each ;

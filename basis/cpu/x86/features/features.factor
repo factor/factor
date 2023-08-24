@@ -1,5 +1,5 @@
 ! Copyright (C) 2009, 2010 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: alien alien.c-types alien.data arrays assocs combinators
 compiler.codegen.labels cpu.architecture cpu.x86.assembler
 cpu.x86.assembler.operands init kernel math math.order
@@ -164,8 +164,9 @@ HOOK: (cpuid) cpu ( rax rcx regs -- )
 MEMO: enable-popcnt? ( -- ? )
     popcnt? "disable-popcnt" get not and ;
 
-[ { sse-version enable-popcnt? } [ reset-memoized ] each ]
-"cpu.x86.features" add-startup-hook
+STARTUP-HOOK: [
+    { sse-version enable-popcnt? } [ reset-memoized ] each
+]
 
 : sse-string ( version -- string )
     {

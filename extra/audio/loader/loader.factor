@@ -1,7 +1,6 @@
 ! Copyright (C) 2009 Joe Groff.
-! See http://factorcode.org/license.txt for BSD license.
-USING: ascii assocs io.pathnames kernel namespaces
-vocabs ;
+! See https://factorcode.org/license.txt for BSD license.
+USING: ascii assocs io.pathnames kernel namespaces vocabs ;
 IN: audio.loader
 
 ERROR: unknown-audio-extension extension ;

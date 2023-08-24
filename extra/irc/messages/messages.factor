@@ -1,8 +1,7 @@
 ! Copyright (C) 2009 Bruno Deferrari
-! See http://factorcode.org/license.txt for BSD license.
-USING: kernel fry splitting ascii calendar accessors combinators
-arrays classes.tuple math.order words assocs strings irc.messages.base
-combinators.short-circuit math sequences ;
+! See https://factorcode.org/license.txt for BSD license.
+USING: accessors ascii combinators.short-circuit
+irc.messages.base kernel math sequences splitting ;
 IN: irc.messages
 
 ! connection
@@ -68,7 +67,7 @@ PREDICATE: ctcp < privmsg
 PREDICATE: action < ctcp trailing>> rest "ACTION" head? ;
 
 M: rpl-names post-process-irc-message ( rpl-names -- )
-    [ [ blank? ] trim " " split ] change-nicks drop ;
+    [ [ ascii:blank? ] trim split-words ] change-nicks drop ;
 
 M: ctcp post-process-irc-message ( ctcp -- )
     [ rest but-last ] change-text drop ;

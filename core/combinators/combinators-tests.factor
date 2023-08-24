@@ -120,9 +120,9 @@ IN: combinators.tests
 
 : cond-test-6 ( a -- b )
     {
-       [ drop "really early" ]
-       { [ dup 2 mod 1 = ] [ drop "odd" ] }
-       { [ dup 2 mod 0 = ] [ drop "even" ] }
+        [ drop "really early" ]
+        { [ dup 2 mod 1 = ] [ drop "odd" ] }
+        { [ dup 2 mod 0 = ] [ drop "even" ] }
     } cond ;
 
 { "really early" } [ 2 cond-test-6 ] unit-test

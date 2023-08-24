@@ -1,5 +1,5 @@
 ! Copyright (C) 2010 Erik Charlebois
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: assocs game.models.obj.private help.markup help.syntax
 io.pathnames kernel sequences strings ;
 IN: game.models.obj
@@ -18,7 +18,7 @@ HELP: cm
 
 HELP: md
 { $values { "material-dictionary" assoc } }
-{ $description "Convenience word for accessing the material dictionary while parsing primitives. " } ;
+{ $description "Convenience word for accessing the material dictionary while parsing primitives." } ;
 
 HELP: strings>numbers
 { $values { "strings" sequence } { "numbers" sequence } }

@@ -1,5 +1,5 @@
 ! Copyright (C) 2006, 2009 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors fonts kernel locals math math.order
 math.rectangles math.vectors models namespaces opengl sequences
 ui.commands ui.gadgets ui.gadgets.labels ui.gadgets.packs

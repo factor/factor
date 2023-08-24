@@ -1,7 +1,7 @@
 ! Copyright (C) 2011 John Benediktsson.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 
-USING: ascii combinators combinators.short-circuit fry kernel
+USING: ascii combinators combinators.short-circuit kernel
 math sequences ;
 
 IN: successor

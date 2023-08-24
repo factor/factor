@@ -1,7 +1,7 @@
-;;; fuel-autodoc.el -- doc snippets in the echo area
+;;; fuel-autodoc.el -- doc snippets in the echo area -*- lexical-binding: t -*-
 
 ;; Copyright (C) 2008, 2009 Jose Antonio Ortega Ruiz
-;; See http://factorcode.org/license.txt for BSD license.
+;; See https://factorcode.org/license.txt for BSD license.
 
 ;; Author: Jose Antonio Ortega Ruiz <jao@gnu.org>
 ;; Keywords: languages, fuel, factor
@@ -46,7 +46,7 @@
         (let* ((ret (fuel-eval--send/wait cmd fuel-autodoc--timeout))
                (res (fuel-eval--retort-result ret)))
           (if (not res)
-              (message "No synposis for '%s'" word)
+              (message "No synopsis for '%s'" word)
             (if fuel-autodoc-minibuffer-font-lock
                 (factor-font-lock-string res)
               res)))))))

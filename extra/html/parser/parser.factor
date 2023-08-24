@@ -1,8 +1,8 @@
 ! Copyright (C) 2008 Doug Coleman.
-! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays hashtables sequences.parser
-html.parser.utils kernel namespaces sequences make math
-unicode combinators.short-circuit quoting fry ;
+! See https://factorcode.org/license.txt for BSD license.
+USING: accessors combinators.short-circuit html.parser.utils
+kernel make math namespaces quoting sequences sequences.parser
+unicode ;
 IN: html.parser
 
 TUPLE: tag name attributes text closing? ;

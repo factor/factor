@@ -1,5 +1,5 @@
 ! Copyright (C) 2011 Erik Charlebois
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors system kernel layouts combinators
 compiler.cfg.builder.alien.boxing sequences arrays math
 alien.c-types cpu.architecture cpu.ppc alien.complex ;
@@ -7,11 +7,11 @@ IN: cpu.ppc.64.linux
 
 M: linux lr-save 2 cells ;
 
-M: linux has-toc ( -- ? ) t ;
+M: linux has-toc t ;
 
-M: linux reserved-area-size ( -- n ) 6 cells ;
+M: linux reserved-area-size 6 cells ;
 
-M: linux allows-null-dereference ( -- ? ) f ;
+M: linux allows-null-dereference f ;
 
 M: ppc param-regs
     drop {
@@ -33,7 +33,7 @@ M: ppc long-long-odd-register? f ;
 
 M: ppc float-right-align-on-stack? t ;
 
-M: ppc flatten-struct-type ( type -- seq )
+M: ppc flatten-struct-type
     {
         { [ dup lookup-c-type complex-double lookup-c-type = ]
           [ drop { { double-rep f f } { double-rep f f } } ] }
@@ -42,7 +42,7 @@ M: ppc flatten-struct-type ( type -- seq )
         [ heap-size cell align cell /i { int-rep f f } <repetition> ]
     } cond ;
 
-M: ppc flatten-struct-type-return ( type -- seq )
+M: ppc flatten-struct-type-return
     {
         { [ dup lookup-c-type complex-double lookup-c-type = ]
           [ drop { { double-rep f f } { double-rep f f } } ] }

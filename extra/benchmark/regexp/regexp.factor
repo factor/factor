@@ -1,7 +1,6 @@
 ! Copyright (C) 2012 John Benediktsson
-! See http://factorcode.org/license.txt for BSD license.
-USING: arrays fry kernel math math.parser regexp sequences
-strings ;
+! See https://factorcode.org/license.txt for BSD license.
+USING: kernel math math.parser regexp sequences strings ;
 IN: benchmark.regexp
 
 : regexp-benchmark ( -- )

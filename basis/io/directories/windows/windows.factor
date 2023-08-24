@@ -1,5 +1,5 @@
 ! Copyright (C) 2008 Doug Coleman.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: system io.directories alien.strings
 io.pathnames io.backend io.files.windows destructors
 kernel accessors calendar windows windows.errors
@@ -7,17 +7,23 @@ windows.kernel32 alien.c-types sequences splitting
 fry continuations classes.struct windows.time ;
 IN: io.directories.windows
 
-M: windows touch-file ( path -- )
-    [
-        normalize-path
-        maybe-create-file [ &dispose ] dip
-        [ drop ] [ handle>> f now dup (set-file-times) ] if
-    ] with-destructors ;
+M: windows touch-file
+    normalize-path maybe-create-file '[
+        _ [ drop ] [ handle>> f now dup (set-file-times) ] if
+    ] with-disposal ;
 
-M: windows move-file ( from to -- )
+: open-truncate ( path -- win32-file )
+    GENERIC_WRITE OPEN_EXISTING 0 open-file 0 >>ptr ;
+
+M: windows truncate-file
+    [ normalize-path open-truncate ] dip '[
+        [ _ FILE_BEGIN set-file-pointer ] [ set-end-of-file ] bi
+    ] with-disposal ;
+
+M: windows move-file
     [ normalize-path ] bi@ MoveFile win32-error=0/f ;
 
-M: windows move-file-atomically ( from to -- )
+M: windows move-file-atomically
     [ normalize-path ] bi@ 0 MoveFileEx win32-error=0/f ;
 
 ERROR: file-delete-failed path error ;
@@ -31,25 +37,24 @@ ERROR: file-delete-failed path error ;
 : (delete-file) ( path -- )
     dup DeleteFile 0 = [
         GetLastError ERROR_ACCESS_DENIED =
-        [ delete-read-only-file ] [ throw-win32-error ] if
+        [ delete-read-only-file ] [ drop win32-error ] if
     ] [ drop ] if ;
 
-M: windows delete-file ( path -- )
+M: windows delete-file
     absolute-path
     [ (delete-file) ]
-    [ \ file-delete-failed boa rethrow ] recover ;
+    [ file-delete-failed boa rethrow ] recover ;
 
-M: windows make-directory ( path -- )
+M: windows make-directory
     normalize-path
     f CreateDirectory win32-error=0/f ;
 
-M: windows delete-directory ( path -- )
+M: windows delete-directory
     normalize-path
     RemoveDirectory win32-error=0/f ;
 
 : find-first-file ( path WIN32_FIND_DATA -- WIN32_FIND_DATA HANDLE )
-    [ nip ] [ FindFirstFile ] 2bi
-    [ INVALID_HANDLE_VALUE = [ win32-error-string throw ] when ] keep ;
+    [ nip ] [ FindFirstFile ] 2bi check-invalid-handle ;
 
 : find-next-file ( HANDLE WIN32_FIND_DATA -- WIN32_FIND_DATA/f )
     [ nip ] [ FindNextFile ] 2bi 0 = [
@@ -72,9 +77,9 @@ C: <windows-directory-entry> windows-directory-entry
     [ [ nFileSizeLow>> ] [ nFileSizeHigh>> ] bi >64bit ] tri
     <windows-directory-entry> ; inline
 
-M: windows (directory-entries) ( path -- seq )
+M: windows (directory-entries)
     "\\" ?tail drop "\\*" append
-    WIN32_FIND_DATA <struct>
+    WIN32_FIND_DATA new
     find-first-file over
     [ >windows-directory-entry ] 2dip
     [
@@ -84,4 +89,4 @@ M: windows (directory-entries) ( path -- seq )
             produce nip
             over name>> "." = [ nip ] [ swap prefix ] if
         ]
-    ] [ drop '[ _ FindClose win32-error=0/f ] ] 2bi [ ] cleanup ;
+    ] [ drop '[ _ FindClose win32-error=0/f ] ] 2bi finally ;

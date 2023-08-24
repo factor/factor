@@ -1,18 +1,18 @@
 ! Copyright (C) 2013 John Benediktsson
-! See http://factorcode.org/license.txt for BSD license
+! See https://factorcode.org/license.txt for BSD license
 
-USING: combinators combinators.short-circuit fry inverse kernel
-math math.functions math.primes math.ranges memoize sequences ;
+USING: combinators combinators.short-circuit inverse kernel
+math math.functions math.primes ranges sequences ;
 
 IN: math.factorials
 
 MEMO: factorial ( n -- n! )
-    dup 1 > [ [1,b] product ] [ drop 1 ] if ;
+    dup 1 > [ [1..b] product ] [ drop 1 ] if ;
 
 ALIAS: n! factorial
 
 : factorials ( n -- seq )
-    1 swap [0,b] [ dup 1 > [ * ] [ drop ] if dup ] map nip ;
+    1 swap [0..b] [ dup 1 > [ * ] [ drop ] if dup ] map nip ;
 
 MEMO: double-factorial ( n -- n!! )
     dup [ even? ] [ 0 < ] bi [
@@ -31,7 +31,7 @@ ALIAS: n!! double-factorial
         { [ over 1 <= ] [ nip factorial recip ] }
         [
             2dup < [ t ] [ swap f ] if
-            [ (a,b] product ] dip [ recip ] when
+            [ (a..b] product ] dip [ recip ] when
         ]
     } cond ;
 
@@ -41,7 +41,7 @@ ALIAS: n!! double-factorial
         { 0 [ drop 0 ] }
         [
             dup 0 < [ neg [ + ] keep t ] [ f ] if
-            [ dupd + [a,b) product ] dip
+            [ dupd + [a..b) product ] dip
             [ recip ] when
         ]
     } case ;
@@ -54,7 +54,7 @@ ALIAS: pochhammer rising-factorial
         { 0 [ drop 0 ] }
         [
             dup 0 < [ neg [ + ] keep t ] [ f ] if
-            [ dupd - swap (a,b] product ] dip
+            [ dupd - swap (a..b] product ] dip
             [ recip ] when
         ]
     } case ;
@@ -87,23 +87,23 @@ ALIAS: pochhammer rising-factorial
 
 : super-factorial ( n -- m )
     dup 1 > [
-        [1,b] [ factorial ] [ * ] map-reduce
+        [1..b] [ factorial ] [ * ] map-reduce
     ] [ drop 1 ] if ;
 
 : hyper-factorial ( n -- m )
     dup 1 > [
-        [1,b] [ dup ^ ] [ * ] map-reduce
+        [1..b] [ dup ^ ] [ * ] map-reduce
     ] [ drop 1 ] if ;
 
 : alternating-factorial ( n -- m )
     dup 1 > [
-        [ [1,b] ] keep even? '[
+        [ [1..b] ] keep even? '[
             [ factorial ] [ odd? _ = ] bi [ neg ] when
         ] map-sum
     ] [ drop 1 ] if ;
 
 : exponential-factorial ( n -- m )
-    dup 1 > [ [1,b] 1 [ swap ^ ] reduce ] [ drop 1 ] if ;
+    dup 1 > [ [1..b] 1 [ swap ^ ] reduce ] [ drop 1 ] if ;
 
 <PRIVATE
 

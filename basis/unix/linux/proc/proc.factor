@@ -1,9 +1,9 @@
 ! Copyright (C) 2013 Doug Coleman.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors arrays combinators combinators.smart
 io.encodings.utf8 io.files kernel math math.order math.parser
-memoize sequences sorting.slots splitting splitting.monotonic
-strings io.pathnames calendar words ;
+memoize sequences sorting.specification splitting
+splitting.monotonic strings io.pathnames calendar words ;
 IN: unix.linux.proc
 
 ! /proc/*
@@ -48,7 +48,8 @@ TUPLE: processor-info
     { address-sizes array }
     { power-management string }
     { tlb-size string }
-    { bugs string } ;
+    { bugs string }
+    { vmx-flags string } ;
 
 
 ERROR: unknown-cpuinfo-line string ;
@@ -58,13 +59,13 @@ ERROR: unknown-cpuinfo-line string ;
     [ CHAR: \t = ] trim-tail [ [ CHAR: \s = ] trim ] bi@
     {
         { "address sizes" [
-            "," split [ [ CHAR: \s = ] trim " " split first string>number ] map
+            "," split [ [ CHAR: \s = ] trim split-words first string>number ] map
             >>address-sizes
         ] }
         { "apicid" [ string>number >>apicid ] }
         { "bogomips" [ string>number >>bogomips ] }
         { "cache size" [
-            " " split first [ CHAR: \s = ] trim
+            split-words first [ CHAR: \s = ] trim
             string>number 1024 * >>cache-size
         ] }
         { "cache_alignment" [ string>number >>cache-alignment ] }
@@ -77,7 +78,7 @@ ERROR: unknown-cpuinfo-line string ;
         { "cpuid level" [ string>number >>cpuid-level ] }
         { "f00f_bug" [ "yes" = >>f00f-bug? ] }
         { "fdiv_bug" [ "yes" = >>fdiv-bug? ] }
-        { "flags" [ " " split harvest >>flags ] }
+        { "flags" [ split-words harvest >>flags ] }
         { "fpu" [ "yes" = >>fpu? ] }
         { "fpu_exception" [ "yes" = >>fpu-exception? ] }
         { "hlt_bug" [ "yes" = >>hlt-bug? ] }
@@ -94,6 +95,7 @@ ERROR: unknown-cpuinfo-line string ;
         { "wp" [ "yes" = >>wp? ] }
         { "TLB size" [ >>tlb-size ] }
         { "bugs" [ >>bugs ] }
+        { "vmx flags" [ >>vmx-flags ] }
         [ unknown-cpuinfo-line ]
     } case ;
 
@@ -108,7 +110,7 @@ ERROR: unknown-cpuinfo-line string ;
     { "" } split harvest [ lines>processor-info ] map ;
 
 : sort-cpus ( seq -- seq )
-    { { physical-id>> <=> } { core-id>> <=> } } sort-by
+    { { physical-id>> <=> } { core-id>> <=> } } sort-with-spec
     [ [ physical-id>> ] bi@ = ] monotonic-split
     [ [ [ core-id>> ] bi@ = ] monotonic-split ] map ;
 
@@ -128,7 +130,7 @@ TUPLE: proc-loadavg
 
 : parse-proc-loadavg ( -- obj )
     "/proc/loadavg" utf8 file-lines first
-    " " split [
+    split-words [
         {
             [ string>number ]
             [ string>number ]
@@ -187,7 +189,7 @@ TUPLE: proc-meminfo
 ! Different kernels have fewer fields. Make sure we have enough.
 : parse-proc-meminfo ( -- meminfo )
     "/proc/meminfo" utf8 file-lines
-    [ " " split harvest second string>number 1024 * ] map
+    [ split-words harvest second string>number 1024 * ] map
     proc-meminfo "slots" word-prop length f pad-tail
     [ proc-meminfo boa ] input<sequence ;
 
@@ -206,7 +208,7 @@ TUPLE: proc-stat
 TUPLE: proc-cpu-stat name user nice system idle iowait irq softirq steal guest guest-nice ;
 
 : line>cpu ( string -- cpu )
-    " " split
+    split-words
     unclip-slice
     [ [ [ CHAR: \s = ] trim string>number ] map ] dip prefix
     [ proc-cpu-stat boa ] input<sequence ;
@@ -218,7 +220,7 @@ TUPLE: proc-cpu-stat name user nice system idle iowait irq softirq steal guest g
         [ second [ line>cpu ] map ]
         [
             third
-            [ " " split1 nip " " split [ string>number ] map ] map
+            [ " " split1 nip split-words [ string>number ] map ] map
             [
                 {
                     [ ]
@@ -273,19 +275,19 @@ TUPLE: proc-uptime up idle ;
 
 : parse-proc-uptime ( -- uptime )
     "/proc/uptime" utf8 file-lines first
-    " " split first2 [ string>number seconds ] bi@
+    split-words first2 [ string>number seconds ] bi@
     proc-uptime boa ;
 
 ! /proc/pid/*
 
 GENERIC#: proc-pid-path 1 ( object string -- path )
 
-M: integer proc-pid-path ( pid string -- path )
+M: integer proc-pid-path
     [ "/proc/" ] 2dip
     [ number>string "/" append ] dip
     3append ;
 
-M: string proc-pid-path ( pid-string string -- path )
+M: string proc-pid-path
     [ "/proc/" ] 2dip [ append-path ] dip append-path ;
 
 : proc-file-lines ( path -- strings ) utf8 file-lines ;
@@ -332,7 +334,7 @@ TUPLE: pid-stat pid filename state parent-pid group-id session-id terminal#
 : parse-proc-pid-stat ( pid -- stat )
     "stat" proc-pid-path
     proc-first-line
-    " " split harvest
+    split-words harvest
     pid-stat "slots" word-prop length "0" pad-tail
-    [ dup string>number [ nip ] when* ] map
+    [ [ string>number ] transmute ] map
     [ pid-stat boa ] input<sequence ;

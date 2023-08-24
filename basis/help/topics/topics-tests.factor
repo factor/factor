@@ -1,6 +1,5 @@
-USING: accessors definitions help help.topics help.crossref
-help.markup help.syntax kernel sequences tools.test words parser
-namespaces assocs source-files eval ;
+USING: accessors assocs eval help help.markup help.topics
+namespaces source-files splitting tools.test ;
 IN: help.topics.tests
 
 ! Test help cross-referencing
@@ -21,7 +20,7 @@ SYMBOL: foo
         "ARTICLE: { \"test\" 1 } \"Hello\""
         "\"abc\""
         "\"def\" ;"
-    } "\n" join
+    } join-lines
     [
         "testfile" path>source-file current-source-file set
         eval( -- )

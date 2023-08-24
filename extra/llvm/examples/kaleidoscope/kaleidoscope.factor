@@ -1,5 +1,5 @@
-USING: accessors arrays combinators io kernel math.parser peg prettyprint
-sequences strings unicode peg.ebnf multiline ;
+USING: accessors arrays kernel math.parser multiline peg
+peg.ebnf sequences strings ;
 IN: llvm.examples.kaleidoscope
 
 TUPLE: ast-binop lhs rhs operator ;

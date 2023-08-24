@@ -1,11 +1,10 @@
 ! Copyright (C) 2007, 2008 Alex Chapman
-! See http://factorcode.org/license.txt for BSD license.
-USING: accessors alien.c-types jamshred.game jamshred.oint
-jamshred.player jamshred.tunnel kernel math math.constants
-math.functions math.vectors opengl opengl.gl opengl.glu
-opengl.demo-support sequences specialized-arrays locals ;
-FROM: alien.c-types => float ;
-SPECIALIZED-ARRAY: float
+! See https://factorcode.org/license.txt for BSD license.
+USING: accessors alien.c-types jamshred.game jamshred.tunnel
+kernel literals math math.constants math.functions
+math.vectors opengl opengl.demo-support opengl.gl opengl.glu
+sequences specialized-arrays ;
+SPECIALIZED-ARRAY: alien.c-types:float
 IN: jamshred.gl
 
 CONSTANT: min-vertices 6
@@ -100,7 +99,7 @@ CONSTANT: wall-drawing-offset 0.15
     GL_COLOR_MATERIAL glDisable ;
 
 : pre-draw ( width height -- )
-    GL_COLOR_BUFFER_BIT GL_DEPTH_BUFFER_BIT bitor glClear
+    flags{ GL_COLOR_BUFFER_BIT GL_DEPTH_BUFFER_BIT } glClear
     GL_PROJECTION glMatrixMode glLoadIdentity
     dup 0 = [ 2drop ] [ / >float 45.0 swap 0.1 100.0 gluPerspective ] if
     GL_MODELVIEW glMatrixMode glLoadIdentity ;

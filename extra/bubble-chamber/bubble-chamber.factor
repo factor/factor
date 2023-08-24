@@ -1,10 +1,10 @@
 USING: accessors arrays ascii calendar colors colors.gray
-combinators.short-circuit fry kernel locals math math.constants
-math.functions math.libm math.order math.points math.ranges
-math.vectors namespaces opengl processing.shapes quotations
-random sequences splitting threads timers ui ui.gadgets
-ui.gadgets.borders ui.gadgets.buttons ui.gadgets.frame-buffer
-ui.gadgets.packs ui.gestures ;
+combinators.short-circuit kernel math math.constants
+math.functions math.libm math.order math.points math.vectors
+namespaces opengl processing.shapes quotations random ranges
+sequences splitting timers ui ui.gadgets ui.gadgets.borders
+ui.gadgets.buttons ui.gadgets.frame-buffer ui.gadgets.packs
+ui.gestures ;
 
 IN: bubble-chamber
 
@@ -121,8 +121,8 @@ M: axion move
   T{ gray f 0.06 0.59 } stroke-color set
   dup pos>> draw
 
-  1 4 [a,b] [ axion-white axion-point- ] each
-  1 4 [a,b] [ axion-black axion-point+ ] each
+  4 [1..b] [ axion-white axion-point- ] each
+  4 [1..b] [ axion-black axion-point+ ] each
 
   dup vel>> move-by
 
@@ -232,7 +232,7 @@ TUPLE: muon < particle ;
 M: muon collide
 
   dup center           >>pos
-  2 32 [a,b] random    >>speed
+  2 32 [a..b] random    >>speed
   0.0001 0.001 2random >>speed-d
 
   dup collision-theta  -0.1 0.1 2random + >>theta
@@ -316,7 +316,7 @@ TUPLE: bubble-chamber < frame-buffer
   particles collision-theta size timer ;
 
 M: bubble-chamber graft*
-    [ timer>> start-timer yield ] [ call-next-method ] bi ;
+    [ timer>> start-timer ] [ call-next-method ] bi ;
 
 M: bubble-chamber ungraft*
     [ timer>> stop-timer ] [ call-next-method ] bi ;

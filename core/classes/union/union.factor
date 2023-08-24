@@ -1,9 +1,10 @@
 ! Copyright (C) 2004, 2011 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors assocs classes classes.algebra
 classes.algebra.private classes.builtin classes.private
-combinators definitions kernel kernel.private math math.private
-quotations sequences sets words ;
+classes.tuple classes.tuple.private combinators definitions
+kernel kernel.private math math.private quotations sequences
+slots.private sorting splitting words ;
 IN: classes.union
 
 PREDICATE: union-class < class
@@ -21,32 +22,68 @@ M: union-class union-of-builtins?
 M: class union-of-builtins?
     drop f ;
 
-: fast-union-mask ( class -- n )
-    [ 0 ] dip flatten-class
-    [ drop class>type 2^ bitor ] assoc-each ;
-
-: empty-union-predicate-quot ( class -- quot )
+: empty-union-predicate-quot ( class-members -- quot )
     drop [ drop f ] ;
 
-: fast-union-predicate-quot ( class -- quot )
-    fast-union-mask 1quotation
-    [ tag 1 swap fixnum-shift-fast ]
-    [ fixnum-bitand 0 eq? not ]
-    surround ;
+: flatten-builtins ( builtin-classes -- seq )
+    [ flatten-class ] map concat ;
 
-: slow-union-predicate-quot ( class -- quot )
-    class-members [ predicate-def ] map unclip swap
+: builtin-union-mask ( builtin-classes -- n )
+    0 [ class>type 2^ bitor ] reduce ;
+
+: builtin-union-predicate-quot ( builtin-classes -- quot )
+    flatten-builtins dup length 1 = [
+        first class>type [ eq? ] curry [ tag ] prepose
+    ] [
+        builtin-union-mask 1quotation
+        [ tag 1 swap fixnum-shift-fast ]
+        [ fixnum-bitand 0 eq? not ]
+        surround
+    ] if ;
+
+: predicate-quot ( predicates -- quot )
+    unclip swap
     [ [ dup ] prepend [ drop t ] ] { } map>assoc alist>quot ;
 
-: union-predicate-quot ( class -- quot )
+! this replicates logic in classes.tuple, keep in sync
+: tuple-union-predicate-quot/1 ( tuple-classes -- quot )
+    [ [ eq? ] curry ] map predicate-quot
+    [ 7 slot ] prepose ;
+
+: tuple-union-predicate-quot/n ( echelon tuple-classes -- quot )
+    [ layout-class-offset ] dip
+    [ [ eq? ] curry ] map predicate-quot
+    over [ slot ] curry prepose [ drop f ] [ if ] 2curry
+    swap [ fixnum>= ] curry [ dup 1 slot ] prepose prepose ;
+
+: tuple-union-predicate-quot ( tuple-classes -- quot )
+    [ echelon-of 1 = ] partition
+    [ [ f ] [ tuple-union-predicate-quot/1 ] if-empty ] dip
+    [ echelon-of ] collect-by sort-keys
+    [ tuple-union-predicate-quot/n ] { } assoc>map
+    swap [ suffix ] when* predicate-quot
+    [ layout-of ] prepose [ drop f ] [ if ] 2curry
+    [ dup tuple? ] prepose ;
+
+: full-union-predicate-quot ( class-members -- quot )
+    [ union-of-builtins? ] partition
+    [ [ f ] [ builtin-union-predicate-quot ] if-empty ] dip
+    [ [ tuple-class? ] [ tuple-layout ] bi and ] partition
+    [ [ f ] [ tuple-union-predicate-quot ] if-empty ] dip
+    [ predicate-def ] map
+    swap [ suffix ] when*
+    swap [ suffix ] when*
+    predicate-quot ;
+
+: union-predicate-quot ( class-members -- quot )
     {
-        { [ dup class-members empty? ] [ empty-union-predicate-quot ] }
-        { [ dup union-of-builtins? ] [ fast-union-predicate-quot ] }
-        [ slow-union-predicate-quot ]
+        { [ dup empty? ] [ empty-union-predicate-quot ] }
+        { [ dup [ union-of-builtins? ] all? ] [ builtin-union-predicate-quot ] }
+        [ full-union-predicate-quot ]
     } cond ;
 
 : define-union-predicate ( class -- )
-    dup union-predicate-quot define-predicate ;
+    dup class-members union-predicate-quot define-predicate ;
 
 M: union-class update-class define-union-predicate ;
 
@@ -71,11 +108,14 @@ M: union-class rank-class drop 7 ;
 M: union-class instance?
     "members" word-prop [ instance? ] with any? ;
 
+M: anonymous-union predicate-def
+    members>> union-predicate-quot ;
+
 M: anonymous-union instance?
     members>> [ instance? ] with any? ;
 
 M: anonymous-union class-name
-    members>> [ class-name ] map " " join ;
+    members>> [ class-name ] map join-words ;
 
 M: union-class normalize-class
     class-members <anonymous-union> normalize-class ;

@@ -32,8 +32,8 @@ namespace factor {
       _(minor_gc) _(modify_code_heap) _(nano_count) _(quotation_code)          \
       _(quotation_compiled_p) _(reset_dispatch_stats) _(resize_array)          \
       _(resize_byte_array) _(resize_string) _(retainstack_for)                 \
-      _(sampling_profiler) _(save_image) _(set_context_object)                 \
-      _(set_datastack) _(set_innermost_stack_frame_quotation)                  \
+      _(save_image) _(set_context_object) _(set_datastack)                     \
+      _(set_innermost_stack_frame_quotation) _(set_profiling)                  \
       _(set_retainstack) _(set_slot) _(set_special_object)                     \
       _(set_string_nth_fast) _(size) _(sleep) _(special_object) _(string)      \
       _(strip_stack_traces) _(tuple) _(tuple_boa)                              \

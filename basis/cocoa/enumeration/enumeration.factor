@@ -1,8 +1,9 @@
 ! Copyright (C) 2008 Joe Groff.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors alien.data assocs classes.struct cocoa
-cocoa.runtime cocoa.types destructors fry hashtables kernel libc
-locals sequences specialized-arrays vectors ;
+cocoa.runtime cocoa.types destructors hashtables kernel libc
+sequences specialized-arrays vectors ;
+IN: cocoa.enumeration
 SPECIALIZED-ARRAY: id
 IN: cocoa.enumeration
 

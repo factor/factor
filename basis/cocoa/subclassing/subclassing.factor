@@ -1,8 +1,8 @@
 ! Copyright (C) 2006, 2010 Slava Pestov, Joe Groff.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors alien alien.parser alien.strings arrays assocs
-cocoa.messages cocoa.runtime combinators compiler.units fry
-io.encodings.utf8 kernel lexer locals locals.parser locals.types
+cocoa.messages cocoa.runtime combinators compiler.units
+io.encodings.utf8 kernel lexer locals.parser locals.types
 make namespaces parser sequences words ;
 IN: cocoa.subclassing
 
@@ -33,7 +33,7 @@ IN: cocoa.subclassing
     tri ;
 
 : encode-type ( type -- encoded )
-    dup alien>objc-types get at [ ] [ no-objc-type ] ?if ;
+    [ alien>objc-types get at ] [ no-objc-type ] ?unless ;
 
 : encode-types ( return types -- encoding )
     swap prefix [ encode-type "0" append ] map concat ;

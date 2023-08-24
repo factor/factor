@@ -1,7 +1,7 @@
-USING: accessors arrays bootstrap.image continuations
-io.directories io.files.info io.files.temp io.launcher
-io.backend kernel layouts math sequences system
-tools.deploy.backend tools.deploy.config.editor ;
+USING: accessors arrays bootstrap.image io.backend
+io.directories io.files.info io.files.temp io.launcher kernel
+layouts math sequences system tools.deploy.backend
+tools.deploy.config.editor ;
 IN: tools.deploy.test
 
 : test-image ( -- str )

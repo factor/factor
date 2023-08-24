@@ -1,6 +1,6 @@
 ! Copyright (c) 2008 Reginald Keith Ford II.
-! See http://factorcode.org/license.txt for BSD license.
-USING: kernel math arrays sequences ;
+! See https://factorcode.org/license.txt for BSD license.
+USING: kernel math arrays ;
 IN: math.function-tools
 
 ! Tools for quickly comparing, transforming, and evaluating mathematical functions

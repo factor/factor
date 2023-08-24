@@ -1,5 +1,5 @@
 ! Copyright (C) 2007, 2009 Slava Pestov, Doug Coleman.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 
 USING: accessors alien alien.c-types alien.data alien.strings
 byte-arrays classes.struct combinators destructors io.backend
@@ -17,17 +17,17 @@ IN: io.sockets.windows
 : set-ioctl-socket ( handle cmd arg -- )
     [ handle>> ] 2dip ulong <ref> ioctlsocket socket-error ;
 
-M: windows addrinfo-error-string ( n -- string )
+M: windows addrinfo-error-string
     n>win32-error-string ;
 
-M: windows sockaddr-of-family ( alien af -- addrspec )
+M: windows sockaddr-of-family
     {
         { AF_INET [ sockaddr-in memory>struct ] }
         { AF_INET6 [ sockaddr-in6 memory>struct ] }
         [ 2drop f ]
     } case ;
 
-M: windows addrspec-of-family ( af -- addrspec )
+M: windows addrspec-of-family
     {
         { AF_INET [ T{ ipv4 } ] }
         { AF_INET6 [ T{ ipv6 } ] }
@@ -39,7 +39,7 @@ TUPLE: win32-socket < win32-file ;
 : <win32-socket> ( handle -- win32-socket )
     win32-socket new-win32-handle ;
 
-M: win32-socket dispose* ( stream -- )
+M: win32-socket dispose*
     handle>> closesocket socket-error* ;
 
 : unspecific-sockaddr/size ( addrspec -- sockaddr len )
@@ -54,18 +54,18 @@ M: win32-socket dispose* ( stream -- )
     dup socket-error
     opened-socket ;
 
-M: object (get-local-address) ( socket addrspec -- sockaddr )
+M: object (get-local-address)
     [ handle>> ] dip empty-sockaddr/size int <ref>
     [ getsockname socket-error ] keepd ;
 
-M: object (get-remote-address) ( socket addrspec -- sockaddr )
+M: object (get-remote-address)
     [ handle>> ] dip empty-sockaddr/size int <ref>
     [ getpeername socket-error ] keepd ;
 
 : bind-socket ( win32-socket sockaddr len -- )
     [ handle>> ] 2dip bind socket-error ;
 
-M: object remote>handle ( addrspec -- handle )
+M: object remote>handle
     [ SOCK_STREAM open-socket ] keep
     [
         bind-local-address get
@@ -77,23 +77,23 @@ M: object remote>handle ( addrspec -- handle )
     [ open-socket ] [ drop ] 2bi
     [ make-sockaddr/size bind-socket ] [ drop ] 2bi ;
 
-! http://support.microsoft.com/kb/127144
+! https://support.microsoft.com/kb/127144
 ! NOTE: Possibly tweak this because of SYN flood attacks
 : listen-backlog ( -- n ) 0x7fffffff ; inline
 
-M: object (server) ( addrspec -- handle )
+M: object (server)
     [
         SOCK_STREAM server-socket
         dup handle>> listen-backlog listen winsock-return-check
     ] with-destructors ;
 
-M: windows (datagram) ( addrspec -- handle )
+M: windows (datagram)
     [ SOCK_DGRAM server-socket ] with-destructors ;
 
-M: windows (raw) ( addrspec -- handle )
+M: windows (raw)
     [ SOCK_RAW server-socket ] with-destructors ;
 
-M: windows (broadcast) ( datagram -- datagram )
+M: windows (broadcast)
     dup handle>> SOL_SOCKET SO_BROADCAST set-socket-option ;
 
 : malloc-int ( n -- alien )
@@ -146,7 +146,7 @@ TUPLE: ConnectEx-args port
     stdcall alien-indirect drop
     winsock-error ; inline
 
-M: object establish-connection ( client-out remote -- )
+M: object establish-connection
     make-sockaddr/size-outgoing <ConnectEx-args>
         swap >>port
         dup port>> handle>> handle>> >>s
@@ -203,7 +203,7 @@ TUPLE: AcceptEx-args port
     ] [ port>> addr>> protocol-family ] bi
     sockaddr-of-family ; inline
 
-M: object (accept) ( server addr -- handle sockaddr )
+M: object (accept)
     [
         <AcceptEx-args>
         {
@@ -265,7 +265,7 @@ TUPLE: WSARecvFrom-args port
     [ lpFromLen>> int deref ]
     tri memcpy ; inline
 
-M: windows (receive-unsafe) ( n buf datagram -- count addrspec )
+M: windows (receive-unsafe)
     [
         <WSARecvFrom-args>
         [ call-WSARecvFrom ]
@@ -309,7 +309,7 @@ TUPLE: WSASendTo-args port
         [ lpCompletionRoutine>> ]
     } cleave WSASendTo socket-error* ; inline
 
-M: windows (send) ( packet addrspec datagram -- )
+M: windows (send)
     [
         <WSASendTo-args>
         [ call-WSASendTo ]

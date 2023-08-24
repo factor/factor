@@ -1,7 +1,7 @@
 ! Copyright (C) 2008, 2010 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
-USING: make math math.functions kernel io io.styles prettyprint
-combinators hints fry sequences ;
+! See https://factorcode.org/license.txt for BSD license.
+USING: make math math.functions kernel prettyprint
+combinators hints sequences ;
 IN: benchmark.partial-sums
 
 ! Helper words

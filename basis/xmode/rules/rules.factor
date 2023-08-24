@@ -1,8 +1,7 @@
 ! Copyright (C) 2008 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
-USING: accessors xmode.tokens xmode.keyword-map kernel
-sequences vectors assocs strings memoize unicode
-regexp ;
+! See https://factorcode.org/license.txt for BSD license.
+USING: accessors assocs kernel regexp sequences unicode
+xmode.keyword-map ;
 IN: xmode.rules
 
 TUPLE: string-matcher string ignore-case? ;
@@ -39,16 +38,11 @@ MEMO: standard-rule-set ( id -- ruleset )
     imports>> push ;
 
 : inverted-index ( hashes key index -- )
+    [ [ { f } ] when-empty ] 2dip
     [ swapd push-at ] 2curry each ;
 
-: ?push-all ( seq1 seq2 -- seq1+seq2 )
-    [
-        over [ [ V{ } like ] dip append! ] [ nip ] if
-    ] when* ;
-
 : rule-set-no-word-sep* ( ruleset -- str )
-    [ no-word-sep>> ]
-    [ keywords>> ] bi
+    [ no-word-sep>> ] [ keywords>> ] bi
     dup [ keyword-map-no-word-sep* ] when
     "_" 3append ;
 
@@ -61,13 +55,13 @@ C: <matcher> matcher
 TUPLE: rule
 no-line-break?
 no-word-break?
-no-escape?
 start
 end
 match-token
 body-token
 delegate
 chars
+escape-rule
 ;
 
 TUPLE: seq-rule < rule ;
@@ -96,11 +90,13 @@ TUPLE: escape-rule < rule ;
     f <string-matcher> f f f <matcher>
     escape-rule new swap >>start ;
 
+ERROR: text-required ;
+
 GENERIC: text-hash-char ( text -- ch )
 
 M: f text-hash-char ;
 
-M: string-matcher text-hash-char string>> first ;
+M: string-matcher text-hash-char string>> [ text-required ] [ first ] if-empty ;
 
 M: regexp text-hash-char drop f ;
 
@@ -112,10 +108,6 @@ M: regexp text-hash-char drop f ;
     [ dup rule-chars* >upper swap ] dip rules>> inverted-index ;
 
 : add-escape-rule ( string ruleset -- )
-    over [
-        [ <escape-rule> ] dip
-        2dup escape-rule<<
-        add-rule
-    ] [
-        2drop
-    ] if ;
+    '[
+        <escape-rule> _ [ escape-rule<< ] [ add-rule ] 2bi
+    ] unless-empty ;

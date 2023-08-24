@@ -1,8 +1,9 @@
 ! Copyright (C) 2009 Bruno Deferrari
-! See http://factorcode.org/license.txt for BSD license.
-USING: accessors calendar io io.sockets io.streams.duplex
-io.timeouts kernel redis.command-writer redis.response-parser
-io.encodings.utf8 ;
+! See https://factorcode.org/license.txt for BSD license.
+USING: accessors calendar io io.encodings.utf8 io.sockets
+io.streams.duplex io.timeouts kernel redis.command-writer
+redis.response-parser ;
+QUALIFIED: namespaces
 IN: redis
 
 ! Connection
@@ -62,7 +63,7 @@ IN: redis
 : redis-hget ( field key -- response ) hget flush read-response ;
 : redis-hgetall ( key -- response ) hgetall flush read-response ;
 : redis-hincrby ( integer field key -- response ) hincrby flush read-response ;
-: redis-hincrbyfloat (  float field key -- response ) hincrbyfloat flush read-response ;
+: redis-hincrbyfloat ( float field key -- response ) hincrbyfloat flush read-response ;
 : redis-hkeys ( key -- response ) hkeys flush read-response ;
 : redis-hlen ( key -- response ) hlen flush read-response ;
 : redis-hmget ( seq key  -- response ) hmget flush read-response ;
@@ -90,15 +91,27 @@ IN: redis
 : redis-info ( -- response ) info flush read-response ;
 : redis-monitor ( -- response ) monitor flush read-response ;
 
+! Lua
+: redis-script-load ( script -- script ) script-load flush read-response ;
+: redis-script-exists ( sequence -- sequence ) script-exists flush read-response ;
+: redis-script-flush ( -- ) script-flush flush check-response ;
+: redis-script-kill ( -- ) script-kill flush check-response ;
+: redis-script-eval ( script keys args -- result ) script-eval flush read-response ;
+: redis-script-evalsha ( sha keys args -- result ) script-evalsha flush read-response ;
+
 ! Redis object
 TUPLE: redis host port encoding password ;
 
-CONSTANT: default-redis-port 6379
+SYMBOL: redis-host
+"127.0.0.1" redis-host namespaces:set-global
+
+SYMBOL: redis-port
+6379 redis-port namespaces:set-global
 
 : <redis> ( -- redis )
     redis new
-        "127.0.0.1" >>host
-        default-redis-port >>port
+        redis-host namespaces:get >>host
+        redis-port namespaces:get >>port
         utf8 >>encoding ;
 
 : redis-do-connect ( redis -- stream )

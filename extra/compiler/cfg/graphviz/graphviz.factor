@@ -1,5 +1,5 @@
 ! Copyright (C) 2011 Alex Vondrak.
-! See http://factorcode.org/license.txt for BSD license
+! See https://factorcode.org/license.txt for BSD license
 
 USING: accessors fry io io.directories io.pathnames
 io.streams.string kernel math math.parser namespaces
@@ -24,7 +24,7 @@ FROM: compiler.cfg.linearization => number-blocks ;
 IN: compiler.cfg.graphviz
 
 : left-justify ( str -- str' )
-    string-lines "\\l" join ;
+    split-lines "\\l" join ;
 
 : left-justified ( quot -- str )
     with-string-writer left-justify ; inline

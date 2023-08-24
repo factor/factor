@@ -1,6 +1,6 @@
 ! Copyright (C) 2008, 2009 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays colors.constants dlists io io.streams.string
+! See https://factorcode.org/license.txt for BSD license.
+USING: accessors arrays colors dlists io io.streams.string
 kernel namespaces opengl sequences ui ui.baseline-alignment ui.gadgets
 ui.gadgets.buttons ui.gadgets.labels ui.gadgets.private ui.pens
 ui.render ui.text vectors ;

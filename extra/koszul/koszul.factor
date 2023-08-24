@@ -1,9 +1,9 @@
 ! Copyright (C) 2006, 2007 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays assocs combinators fry hashtables io
-kernel locals make math math.matrices math.matrices.elimination
-math.order math.parser math.vectors namespaces prettyprint
-sequences sets shuffle sorting splitting ;
+! See https://factorcode.org/license.txt for BSD license.
+USING: accessors arrays assocs combinators hashtables io kernel
+make math math.matrices math.matrices.elimination math.order
+math.parser math.vectors namespaces prettyprint sequences sets
+shuffle sorting splitting ;
 IN: koszul
 
 ! Utilities
@@ -68,7 +68,7 @@ SYMBOL: terms
     ] if ;
 
 : permutation ( seq -- perm )
-    [ natural-sort ] keep [ index ] curry map ;
+    [ sort ] keep [ index ] curry map ;
 
 : (inversions) ( n seq -- n )
     [ > ] with count ;
@@ -83,7 +83,7 @@ SYMBOL: terms
         2drop 0 { }
     ] [
         dup permutation inversions -1^ rot *
-        swap natural-sort
+        swap sort
     ] if ;
 
 : wedge ( x y -- x.y )
@@ -147,11 +147,11 @@ DEFER: (d)
     ] map sift 2nip ;
 
 : basis ( generators -- seq )
-    natural-sort dup length 2^ <iota> [ nth-basis-elt ] with map ;
+    sort dup length 2^ <iota> [ nth-basis-elt ] with map ;
 
 : (tensor) ( seq1 seq2 -- seq )
     [
-        [ prepend natural-sort ] curry map
+        [ prepend sort ] curry map
     ] with map concat ;
 
 : tensor ( graded-basis1 graded-basis2 -- bigraded-basis )
@@ -203,8 +203,8 @@ DEFER: (d)
     [ v- ] 2map ;
 
 ! Laplacian
-: m.m' ( matrix -- matrix' ) dup flip m. ;
-: m'.m ( matrix -- matrix' ) dup flip swap m. ;
+: mdotm' ( matrix -- matrix' ) dup flip mdot ;
+: m'dotm ( matrix -- matrix' ) dup flip swap mdot ;
 
 : empty-matrix? ( matrix -- ? )
     [ t ] [ first empty? ] if-empty ;
@@ -221,7 +221,7 @@ DEFER: (d)
     ] if ;
 
 : laplacian-matrix ( basis1 basis2 basis3 -- matrix )
-    dupd d-matrix m.m' [ d-matrix m'.m ] dip ?m+ ;
+    dupd d-matrix mdotm' [ d-matrix m'dotm ] dip ?m+ ;
 
 : laplacian-betti ( basis1 basis2 basis3 -- n )
     laplacian-matrix null/rank drop ;

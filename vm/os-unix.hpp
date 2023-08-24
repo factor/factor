@@ -10,7 +10,6 @@
 #include <signal.h>
 #include <pthread.h>
 #include <sched.h>
-
 #include "atomic-gcc.hpp"
 
 namespace factor {
@@ -54,4 +53,5 @@ void check_ENOMEM(const char* msg);
 
 static inline void breakpoint() { __builtin_trap(); }
 
+#define AS_UTF8(ptr) ptr
 }

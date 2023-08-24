@@ -1,0 +1,170 @@
+<?xml version="1.0"?>
+
+<!DOCTYPE MODE SYSTEM "xmode.dtd">
+
+<MODE>
+	<PROPS>
+		<PROPERTY NAME="commentStart" VALUE="&lt;!--" />
+		<PROPERTY NAME="commentEnd" VALUE="--&gt;" />
+	</PROPS>
+	<RULES>
+	
+		
+		<!-- SGML comment -->
+		<SPAN TYPE="COMMENT1">
+			<BEGIN>&lt;!--</BEGIN>
+			<END>--&gt;</END>
+		</SPAN>
+
+		<!-- DTD Entity declarations -->
+		<SPAN TYPE="KEYWORD2" DELEGATE="ENTITY-TAGS">
+			<BEGIN>&lt;!ENTITY</BEGIN>
+			<END>&gt;</END>
+		</SPAN>
+
+		<!-- CDATA sections -->
+		<SPAN TYPE="KEYWORD2" DELEGATE="ACTIONSCRIPT">
+			<BEGIN>&lt;![CDATA</BEGIN>
+			<END>]]&gt;</END>
+		</SPAN>
+
+		<!-- DTD instructions -->
+		<SPAN TYPE="KEYWORD2" DELEGATE="DTD-TAGS">
+			<BEGIN>&lt;!</BEGIN>
+			<END>&gt;</END>
+		</SPAN>
+
+		<!-- PI directives -->
+		<SPAN TYPE="KEYWORD3">
+			<BEGIN>&lt;?</BEGIN>
+			<END>&gt;</END>
+		</SPAN>
+
+		<!-- markup tags -->
+		<SPAN TYPE="MARKUP" DELEGATE="TAGS">
+			<BEGIN>&lt;</BEGIN>
+			<END>&gt;</END>
+		</SPAN>
+
+		<!-- SGML entities -->
+		<SPAN TYPE="LITERAL2" NO_WORD_BREAK="TRUE">
+			<BEGIN>&amp;</BEGIN>
+			<END>;</END>
+		</SPAN>
+		
+	</RULES>
+	<RULES SET="ACTIONSCRIPT" DEFAULT="MARKUP" IGNORE_CASE="FALSE">
+		<SEQ TYPE="KEYWORD2" DELEGATE="actionscript::MAIN">[</SEQ>
+	</RULES>
+<RULES SET="TAGS" DEFAULT="MARKUP" NO_WORD_SEP="-_">
+		<!-- SGML comment -->
+		<SPAN TYPE="COMMENT1">
+			<BEGIN>&lt;!--</BEGIN>
+			<END>--&gt;</END>
+		</SPAN>
+
+		<SPAN TYPE="LITERAL3" NO_LINE_BREAK="FALSE" >
+			<BEGIN>"{</BEGIN>
+			<END>}"</END>
+		</SPAN>
+		
+		<SPAN TYPE="LITERAL1" NO_LINE_BREAK="FALSE">
+			<BEGIN>"</BEGIN>
+			<END>"</END>
+		</SPAN>
+
+		<SPAN TYPE="LITERAL1" NO_LINE_BREAK="FALSE">
+			<BEGIN>'</BEGIN>
+			<END>'</END>
+		</SPAN>
+
+		<SEQ TYPE="MARKUP">/</SEQ>
+		<MARK_PREVIOUS TYPE="LABEL" MATCH_TYPE="CONTEXT">:</MARK_PREVIOUS>
+		<SEQ TYPE="OPERATOR">:</SEQ>
+	</RULES>
+	
+	<RULES SET="DTD-TAGS" DEFAULT="KEYWORD2" IGNORE_CASE="FALSE">
+		<!-- SGML comment -->
+		<SPAN TYPE="COMMENT1">
+			<BEGIN>&lt;!--</BEGIN>
+			<END>--&gt;</END>
+		</SPAN>
+
+		<!-- SGML comment -->
+		<SPAN TYPE="COMMENT1">
+			<BEGIN>--</BEGIN>
+			<END>--</END>
+		</SPAN>
+
+		<!-- Parameter entities -->
+		<SPAN TYPE="LITERAL2" NO_WORD_BREAK="TRUE">
+			<BEGIN>%</BEGIN>
+			<END>;</END>
+		</SPAN>
+
+		<SPAN TYPE="LITERAL1" NO_LINE_BREAK="FALSE">
+			<BEGIN>"</BEGIN>
+			<END>"</END>
+		</SPAN>
+
+		<SPAN TYPE="LITERAL1" NO_LINE_BREAK="FALSE">
+			<BEGIN>'</BEGIN>
+			<END>'</END>
+		</SPAN>
+
+		<!-- This appears in some SGML documents -->
+		<SPAN TYPE="KEYWORD2" DELEGATE="MAIN">
+			<BEGIN>[</BEGIN>
+			<END>]</END>
+		</SPAN>
+
+		<SEQ TYPE="OPERATOR">(</SEQ>
+		<SEQ TYPE="OPERATOR">)</SEQ>
+		<SEQ TYPE="OPERATOR">|</SEQ>
+		<SEQ TYPE="OPERATOR">?</SEQ>
+		<SEQ TYPE="OPERATOR">*</SEQ>
+		<SEQ TYPE="OPERATOR">+</SEQ>
+		<SEQ TYPE="OPERATOR">,</SEQ>
+
+		<KEYWORDS>
+			<KEYWORD1>EMPTY</KEYWORD1>
+			<KEYWORD1>INCLUDE</KEYWORD1>
+			<KEYWORD1>IGNORE</KEYWORD1>
+			<KEYWORD1>NDATA</KEYWORD1>
+			<KEYWORD1>#IMPLIED</KEYWORD1>
+			<KEYWORD1>#PCDATA</KEYWORD1>
+			<KEYWORD1>#REQUIRED</KEYWORD1>
+		</KEYWORDS>
+	</RULES>
+	<RULES SET="ENTITY-TAGS" DEFAULT="KEYWORD2">
+		<!-- SGML comment -->
+		<SPAN TYPE="COMMENT1">
+			<BEGIN>&lt;!--</BEGIN>
+			<END>--&gt;</END>
+		</SPAN>
+
+		<!-- SGML comment -->
+		<SPAN TYPE="COMMENT1">
+			<BEGIN>--</BEGIN>
+			<END>--</END>
+		</SPAN>
+
+		<SPAN TYPE="LITERAL1" NO_LINE_BREAK="FALSE">
+			<BEGIN>"</BEGIN>
+			<END>"</END>
+		</SPAN>
+
+		<SPAN TYPE="LITERAL1" NO_LINE_BREAK="FALSE">
+			<BEGIN>'</BEGIN>
+			<END>'</END>
+		</SPAN>
+
+		<SEQ TYPE="OPERATOR">=</SEQ>
+
+		<SEQ TYPE="OPERATOR">%</SEQ>
+
+		<KEYWORDS>
+			<KEYWORD1>SYSTEM</KEYWORD1>
+		</KEYWORDS>
+	</RULES>
+</MODE>

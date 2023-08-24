@@ -1,11 +1,10 @@
 ! Copyright (C) 2013 John Benediktsson
-! See http://factorcode.org/license.txt for BSD license
+! See https://factorcode.org/license.txt for BSD license
 
-USING: kernel literals math math.constants math.functions
-memoize sequences sequences.extras sets sets.extras ;
+USING: kernel math math.constants math.functions sequences sets
+sets.extras ;
 
 IN: math.unicode
-
 CONSTANT: ½ 1/2
 CONSTANT: ¼ 1/4
 CONSTANT: ¾ 3/4

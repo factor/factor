@@ -1,12 +1,14 @@
 ! Copyright (C) 2005, 2010 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays combinators fry kernel math math.order
+! See https://factorcode.org/license.txt for BSD license.
+USING: accessors arrays combinators kernel math math.order
 math.vectors sequences ui.baseline-alignment
 ui.baseline-alignment.private ui.gadgets ;
 IN: ui.gadgets.packs
 
 TUPLE: pack < aligned-gadget
-{ align initial: 0 } { fill initial: 0 } { gap initial: { 0 0 } } ;
+    { align initial: 0 }
+    { fill initial: 0 }
+    { gap initial: { 0 0 } } ;
 
 <PRIVATE
 
@@ -23,7 +25,7 @@ TUPLE: pack < aligned-gadget
     [ { 0 0 } ] dip '[ v+ _ v+ ] accumulate nip ;
 
 : numerically-aligned-locs ( sizes pack -- seq )
-    [ align>> ] [ dim>> ] bi '[ [ _ _ ] dip v- [ * >integer ] with map ] map ;
+    [ align>> ] [ dim>> ] bi rot [ v- [ * ] with map ] 2with map ;
 
 : baseline-aligned-locs ( pack -- seq )
     children>> align-baselines [ 0 swap 2array ] map ;
@@ -37,15 +39,10 @@ TUPLE: pack < aligned-gadget
 : packed-locs ( sizes pack -- seq )
     [ aligned-locs ] [ gap>> gap-locs ] [ nip ] 2tri orient ;
 
-: round-dims ( seq -- newseq )
-    [ { 0 0 } ] dip
-    [ swap v- dup vceiling [ swap v- ] keep ] map
-    nip ;
-
 PRIVATE>
 
 : pack-layout ( pack sizes -- )
-    [ round-dims packed-dims ] [ drop ] 2bi
+    [ packed-dims ] [ drop ] 2bi
     [ children>> [ dim<< ] 2each ]
     [ [ packed-locs ] [ children>> ] bi [ loc<< ] 2each ] 2bi ;
 
@@ -99,5 +96,5 @@ M: pack cap-height* pack-cap-height ;
 M: pack layout*
     dup children>> pref-dims pack-layout ;
 
-M: pack children-on ( rect gadget -- seq )
+M: pack children-on
     [ orientation>> ] [ children>> ] bi [ loc>> ] fast-children-on ;

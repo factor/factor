@@ -1,5 +1,5 @@
 ! Copyright (C) 2008 Daniel Ehrenberg
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: kernel strings io.files assocs
 splitting sequences io namespaces sets
 io.encodings.ascii io.encodings.utf8 io.encodings.utf16 ;
@@ -20,7 +20,7 @@ PRIVATE>
 <PRIVATE
 : parse-iana ( file -- synonym-set )
     utf8 file-lines { "" } split [
-        [ " " split ] map
+        [ split-words ] map
         [ first { "Name:" "Alias:" } member? ] filter
         values { "None" } diff
     ] map harvest ;

@@ -26,6 +26,14 @@ HELP: eval(
 }
 { $errors "Throws an error if the input is malformed, or if the evaluation itself throws an error." } ;
 
+HELP: eval-with-stack
+{ $values { "str" string } }
+{ $description "Parses Factor source code from " { $snippet "str" } ", and then calls the resulting quotation, printing the data stack if any objects are left." } ;
+
+HELP: eval-with-stack>string
+{ $values { "str" string } { "output" string } }
+{ $description "Evaluates the Factor code in " { $snippet "str" } " with " { $link output-stream } " rebound to a string output stream, printing the data stack if any objects are left, then outputs the resulting string." } ;
+
 HELP: eval>string
 { $values { "str" string } { "output" string } }
 { $description "Evaluates the Factor code in " { $snippet "str" } " with " { $link output-stream } " rebound to a string output stream, then outputs the resulting string. The code in the string must not take or leave any values on the stack." }

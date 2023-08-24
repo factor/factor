@@ -1,12 +1,10 @@
 ! Copyright (C) 2009 Tim Wawrzynczak, Doug Coleman.
-! See http://factorcode.org/license.txt for BSD license.
-USING: sequences io io.encodings.binary io.files io.pathnames
-strings kernel math io.mmap accessors combinators math.ranges
-unicode byte-arrays io.encodings.string
-io.encodings.utf16 assocs math.parser combinators.short-circuit
-fry namespaces combinators.smart splitting io.encodings.ascii
-arrays io.files.info io.directories.search literals
-math.functions continuations ;
+! See https://factorcode.org/license.txt for BSD license.
+USING: accessors arrays assocs byte-arrays
+combinators combinators.short-circuit combinators.smart
+continuations io.directories io.encodings.ascii
+io.encodings.string io.encodings.utf16 io.mmap kernel math
+math.functions math.parser sequences splitting unicode ;
 FROM: alien.c-types => uchar ;
 IN: id3
 
@@ -118,7 +116,7 @@ CONSTANT: id3v1+-length 227
     [ 10 over size>> 10 + ] dip <slice> filter-text-data ;
 
 : decode-text ( string -- string' )
-    dup 2 short head
+    dup 2 index-or-length head
     { { 0xff 0xfe } { 0xfe 0xff } } member?
     utf16 ascii ? decode ;
 

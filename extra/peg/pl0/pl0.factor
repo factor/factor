@@ -1,11 +1,9 @@
 ! Copyright (C) 2007 Chris Double.
-! See http://factorcode.org/license.txt for BSD license.
-USING: kernel arrays strings math.parser sequences
-peg peg.ebnf peg.parsers memoize namespaces math
-multiline ;
+! See https://factorcode.org/license.txt for BSD license.
+USING: math.parser multiline peg.ebnf strings ;
 IN: peg.pl0
 
-! Grammar for PL/0 based on http://en.wikipedia.org/wiki/PL/0
+! Grammar for PL/0 based on https://en.wikipedia.org/wiki/PL/0
 
 EBNF: pl0 [=[
 

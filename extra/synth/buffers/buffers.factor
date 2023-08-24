@@ -1,50 +1,49 @@
 ! Copyright (C) 2008 Alex Chapman
-! See http://factorcode.org/license.txt for BSD license.
-USING: accessors alien combinators kernel locals math
-math.ranges openal sequences sequences.merged specialized-arrays ;
-FROM: alien.c-types => short uchar ;
+! See https://factorcode.org/license.txt for BSD license.
+USING: accessors alien alien.c-types combinators kernel math
+openal sequences sequences.merged specialized-arrays ;
 SPECIALIZED-ARRAY: uchar
 SPECIALIZED-ARRAY: short
 IN: synth.buffers
 
-TUPLE: buffer sample-freq 8bit? id ;
+TUPLE: buffer sample-freq 8-bit? id ;
 
-: <buffer> ( sample-freq 8bit? -- buffer )
+: <buffer> ( sample-freq 8-bit? -- buffer )
     f buffer boa ;
 
 TUPLE: mono-buffer < buffer data ;
 
-: <mono-buffer> ( sample-freq 8bit? -- buffer )
+: <mono-buffer> ( sample-freq 8-bit? -- buffer )
     f f mono-buffer boa ;
 
-: <8bit-mono-buffer> ( sample-freq -- buffer ) t <mono-buffer> ;
-: <16bit-mono-buffer> ( sample-freq -- buffer ) f <mono-buffer> ;
+: <8-bit-mono-buffer> ( sample-freq -- buffer ) t <mono-buffer> ;
+: <16-bit-mono-buffer> ( sample-freq -- buffer ) f <mono-buffer> ;
 
 TUPLE: stereo-buffer < buffer left-data right-data ;
 
-: <stereo-buffer> ( sample-freq 8bit? -- buffer )
+: <stereo-buffer> ( sample-freq 8-bit? -- buffer )
     f f f stereo-buffer boa ;
 
-: <8bit-stereo-buffer> ( sample-freq -- buffer ) t <stereo-buffer> ;
-: <16bit-stereo-buffer> ( sample-freq -- buffer ) f <stereo-buffer> ;
+: <8-bit-stereo-buffer> ( sample-freq -- buffer ) t <stereo-buffer> ;
+: <16-bit-stereo-buffer> ( sample-freq -- buffer ) f <stereo-buffer> ;
 
-PREDICATE: 8bit-buffer < buffer 8bit?>> ;
-PREDICATE: 16bit-buffer < buffer 8bit?>> not ;
-INTERSECTION: 8bit-mono-buffer 8bit-buffer mono-buffer ;
-INTERSECTION: 16bit-mono-buffer 16bit-buffer mono-buffer ;
-INTERSECTION: 8bit-stereo-buffer 8bit-buffer stereo-buffer ;
-INTERSECTION: 16bit-stereo-buffer 16bit-buffer stereo-buffer ;
+PREDICATE: 8-bit-buffer < buffer 8-bit?>> ;
+PREDICATE: 16-bit-buffer < buffer 8-bit?>> not ;
+INTERSECTION: 8-bit-mono-buffer 8-bit-buffer mono-buffer ;
+INTERSECTION: 16-bit-mono-buffer 16-bit-buffer mono-buffer ;
+INTERSECTION: 8-bit-stereo-buffer 8-bit-buffer stereo-buffer ;
+INTERSECTION: 16-bit-stereo-buffer 16-bit-buffer stereo-buffer ;
 
 GENERIC: buffer-format ( buffer -- format )
-M: 8bit-mono-buffer buffer-format drop AL_FORMAT_MONO8 ;
-M: 16bit-mono-buffer buffer-format drop AL_FORMAT_MONO16 ;
-M: 8bit-stereo-buffer buffer-format drop AL_FORMAT_STEREO8 ;
-M: 16bit-stereo-buffer buffer-format drop AL_FORMAT_STEREO16 ;
+M: 8-bit-mono-buffer buffer-format drop AL_FORMAT_MONO8 ;
+M: 16-bit-mono-buffer buffer-format drop AL_FORMAT_MONO16 ;
+M: 8-bit-stereo-buffer buffer-format drop AL_FORMAT_STEREO8 ;
+M: 16-bit-stereo-buffer buffer-format drop AL_FORMAT_STEREO16 ;
 
-: 8bit-buffer-data ( seq -- data size )
+: 8-bit-buffer-data ( seq -- data size )
     [ 128 * >integer 128 + ] uchar-array{ } map-as [ underlying>> ] [ length ] bi ;
 
-: 16bit-buffer-data ( seq -- data size )
+: 16-bit-buffer-data ( seq -- data size )
     [ 32768 * >integer ] short-array{ } map-as [ underlying>> ] [ byte-length ] bi ;
 
 : stereo-data ( stereo-buffer -- left right )
@@ -54,12 +53,12 @@ M: 16bit-stereo-buffer buffer-format drop AL_FORMAT_STEREO16 ;
     stereo-data <2merged> ;
 
 GENERIC: buffer-data ( buffer -- data size )
-M: 8bit-mono-buffer buffer-data data>> 8bit-buffer-data ;
-M: 16bit-mono-buffer buffer-data data>> 16bit-buffer-data ;
-M: 8bit-stereo-buffer buffer-data
-    interleaved-stereo-data 8bit-buffer-data ;
-M: 16bit-stereo-buffer buffer-data
-    interleaved-stereo-data 16bit-buffer-data ;
+M: 8-bit-mono-buffer buffer-data data>> 8-bit-buffer-data ;
+M: 16-bit-mono-buffer buffer-data data>> 16-bit-buffer-data ;
+M: 8-bit-stereo-buffer buffer-data
+    interleaved-stereo-data 8-bit-buffer-data ;
+M: 16-bit-stereo-buffer buffer-data
+    interleaved-stereo-data 16-bit-buffer-data ;
 
 CONSTANT: telephone-sample-freq 8000
 CONSTANT: half-sample-freq 22050

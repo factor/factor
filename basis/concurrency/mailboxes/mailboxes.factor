@@ -1,8 +1,7 @@
 ! Copyright (C) 2005, 2010 Chris Double, Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors concurrency.conditions continuations deques
-destructors dlists fry kernel locals sequences threads
-vocabs.loader ;
+destructors dlists kernel sequences threads vocabs.loader ;
 IN: concurrency.mailboxes
 
 TUPLE: mailbox { threads dlist } { data dlist } ;

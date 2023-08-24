@@ -1,14 +1,17 @@
 ! Copyright (C) 2008, 2011 Slava Pestov, Daniel Ehrenberg.
-! See http://factorcode.org/license.txt for BSD license.
-USING: accessors alien.c-types assocs classes classes.algebra
-classes.tuple classes.tuple.private combinators
-combinators.short-circuit compiler.tree.propagation.info effects
-fry generalizations generic generic.single growable hash-sets
-hashtables kernel layouts locals math math.integers.private
-math.intervals math.order math.partial-dispatch math.private
-namespaces quotations sequences sequences.generalizations
-sequences.private sets sets.private stack-checker
-stack-checker.dependencies vectors words ;
+! See https://factorcode.org/license.txt for BSD license.
+
+USING: accessors alien.c-types arrays assocs byte-arrays classes
+classes.algebra classes.struct classes.tuple
+classes.tuple.private combinators combinators.short-circuit
+compiler.tree.propagation.info effects generalizations generic
+generic.single growable hash-sets hashtables kernel layouts math
+math.integers.private math.intervals math.order
+math.partial-dispatch math.private namespaces quotations
+sequences sequences.generalizations sequences.private sets
+sets.private stack-checker stack-checker.dependencies strings
+vectors words ;
+
 FROM: math => float ;
 IN: compiler.tree.propagation.transforms
 
@@ -57,7 +60,7 @@ IN: compiler.tree.propagation.transforms
     [ interval>> ] [ literal>> ] bi* {
         [ nip integer? ]
         [ nip all-ones? ]
-        [ 0 swap [a,b] interval-subset? ]
+        [ [0,b] interval-subset? ]
     } 2&& ;
 
 : zero-bitand? ( value1 value2 -- ? )
@@ -77,19 +80,19 @@ IN: compiler.tree.propagation.transforms
         in-d>> first2 [ value-info ] bi@ {
             {
                 [ 2dup zero-bitand? ]
-                [ 2drop [ 2drop 0 ] ]
+                [ nip class>> bignum = 0 >bignum 0 ? '[ 2drop _ ] ]
             }
             {
                 [ 2dup swap zero-bitand? ]
-                [ 2drop [ 2drop 0 ] ]
+                [ drop class>> bignum = 0 >bignum 0 ? '[ 2drop _ ] ]
             }
             {
                 [ 2dup redundant-bitand? ]
-                [ 2drop [ drop ] ]
+                [ nip class>> bignum = [ drop >bignum ] [ drop ] ? ]
             }
             {
                 [ 2dup swap redundant-bitand? ]
-                [ 2drop [ nip ] ]
+                [ drop class>> bignum = [ nip >bignum ] [ nip ] ? ]
             }
             {
                 [ 2dup simplify-bitand? ]
@@ -181,22 +184,38 @@ ERROR: bad-partial-eval quot word ;
     ] "custom-inlining" set-word-prop ;
 
 : inline-new ( class -- quot/f )
-    dup tuple-class? [
-        dup tuple-layout
-        [ add-depends-on-tuple-layout ]
-        [ drop all-slots [ initial>> literalize ] [ ] map-as ]
-        [ nip ]
-        2tri
-        '[ @ _ <tuple-boa> ]
-    ] [ drop f ] if ;
+    {
+        { [ dup struct-class? ] [
+            dup dup struct-slots add-depends-on-struct-slots
+            '[ _ <struct> ] ] }
+        { [ dup tuple-class? ] [
+            dup tuple-layout
+            [ add-depends-on-tuple-layout ]
+            [ drop all-slots [ initial>> literalize ] [ ] map-as ]
+            [ nip ]
+            2tri
+            '[ @ _ <tuple-boa> ]
+            ] }
+        [ drop f ]
+    } cond ;
 
 \ new [ inline-new ] 1 define-partial-eval
+
+\ memory>struct [
+    dup struct-class? [
+        dup tuple-layout
+        [ add-depends-on-tuple-layout ]
+        [ [ "boa-check" word-prop [ ] or ] dip ] 2bi
+        '[ @ _ <tuple-boa> ]
+    ] [ drop f ] if
+] 1 define-partial-eval
 
 \ instance? [
     dup classoid?
     [
         predicate-def
-        ! union{ and intersection{ have useless expansions, and recurse infinitely
+        ! union{ and intersection{ and not{ have useless
+        ! expansions, and recurse infinitely
         dup { [ length 2 >= ] [ second \ instance? = ] } 1&& [
             drop f
         ] when
@@ -352,3 +371,13 @@ M\ sets:set intersects? [ intersects?-quot ] 1 define-partial-eval
         [ f ]
     } cond 2nip
 ] "custom-inlining" set-word-prop
+
+: constant-number-info? ( info -- ? )
+    { [ value-info-state? ] [ literal?>> ] [ class>> integer class<= ] } 1&& ;
+
+! Resize-sequences to existing length can be optimized out
+{ resize-array resize-string resize-byte-array } [
+    in-d>> first2 [ value-info ] bi@ slots>> ?first
+    { [ [ constant-number-info? ] both? ] [ [ literal>> ] bi@ = ] } 2&&
+    [ [ nip ] ] [ f ] if
+] [ "custom-inlining" set-word-prop ] curry each

@@ -169,11 +169,15 @@ HELP: throw
 { $values { "error" object } }
 { $description "Saves the current continuation in the " { $link error-continuation } " global variable and throws an error. Execution does not continue at the point after the " { $link throw } " call. Rather, the innermost catch block is invoked, and execution continues at that point." } ;
 
-{ cleanup recover } related-words
+{ cleanup recover finally } related-words
 
 HELP: cleanup
 { $values { "try" { $quotation ( ..a -- ..a ) } } { "cleanup-always" { $quotation ( ..a -- ..b ) } } { "cleanup-error" { $quotation ( ..b -- ..b ) } } }
 { $description "Calls the " { $snippet "try" } " quotation. If no error is thrown, calls " { $snippet "cleanup-always" } " without restoring the data stack. If an error is thrown, restores the data stack, calls " { $snippet "cleanup-always" } " followed by " { $snippet "cleanup-error" } ", and rethrows the error." } ;
+
+HELP: finally
+{ $values { "try" { $quotation ( ..a -- ..a ) } } { "cleanup-always" { $quotation ( ..a -- ..b ) } } }
+{ $description "Same as " { $link cleanup } ", but with empty " { $snippet "cleanup-error" } " quotation. Useful when some cleanup code needs to be run after the " { $snippet "try" } " quotation whether an error was thrown or not, but when nothing specific needs to be done about any errors." } ;
 
 HELP: recover
 { $values { "try" { $quotation ( ..a -- ..b ) } } { "recovery" { $quotation ( ..a error -- ..b ) } } }
@@ -184,7 +188,7 @@ HELP: ignore-error
 { $description "Calls the quotation. If an exception is thrown which is matched by the 'check' quotation it is ignored. Otherwise the error is rethrown." } ;
 
 HELP: ignore-error/f
-{ $values { "quot" quotation } { "check" quotation } }
+{ $values { "quot" quotation } { "check" quotation } { "x/f" { $maybe object } } }
 { $description "Like " { $link ignore-error } ", but if a matched exception is thrown " { $link f } " is put on the stack." } ;
 
 HELP: ignore-errors
@@ -250,8 +254,8 @@ HELP: with-datastack
 
 HELP: attempt-all
 { $values
-     { "seq" sequence } { "quot" quotation }
-     { "obj" object } }
+    { "seq" sequence } { "quot" quotation }
+    { "obj" object } }
 { $description "Applies the quotation to elements in a sequence and returns the value from the first quotation that does not throw an error. If all quotations throw an error, returns the last error thrown." }
 { $examples "The first two numbers throw, the last one doesn't:"
     { $example
@@ -271,7 +275,7 @@ HELP: return
 
 HELP: with-return
 { $values
-     { "quot" quotation } }
+    { "quot" quotation } }
 { $description "Captures a continuation that can be reified by calling the " { $link return } " word. If so, it will resume execution immediately after the " { $link with-return } " word. If " { $link return } " is not called, then execution proceeds as if this word were simply " { $link call } "." }
 { $examples
     "Only \"Hi\" will print:"

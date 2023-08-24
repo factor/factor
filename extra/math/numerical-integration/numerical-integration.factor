@@ -1,6 +1,6 @@
 ! Copyright (C) 2008 Doug Coleman.
-! See http://factorcode.org/license.txt for BSD license.
-USING: kernel math math.ranges math.vectors namespaces
+! See https://factorcode.org/license.txt for BSD license.
+USING: kernel math ranges math.vectors namespaces
 sequences ;
 IN: math.numerical-integration
 
@@ -18,4 +18,4 @@ SYMBOL: num-steps
 : integrate-simpson ( from to quot -- x )
     [ setup-simpson-range dup ] dip
     map dup generate-simpson-weights
-    v. swap [ third ] keep first - 6 / * ; inline
+    vdot swap [ third ] keep first - 6 / * ; inline

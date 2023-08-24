@@ -1,7 +1,8 @@
 USING: accessors compiler.units continuations debugger
 definitions eval io.streams.string kernel math namespaces parser
-prettyprint sequences sets source-files tools.test vocabs
-vocabs.files vocabs.loader vocabs.parser vocabs.refresh words ;
+prettyprint sequences sets source-files system tools.test vocabs
+vocabs.files vocabs.loader vocabs.metadata vocabs.parser
+vocabs.refresh words ;
 IN: vocabs.loader.tests
 
 ! This vocab should not exist, but just in case...
@@ -192,3 +193,6 @@ forget-junk
 [
     "mnop" [ "vocabs.loader.test." swap suffix forget-vocab ] each
 ] with-compilation-unit
+
+[ os unix? "windows" "unix" ? require ]
+[ error>> unsupported-platform? ] must-fail-with

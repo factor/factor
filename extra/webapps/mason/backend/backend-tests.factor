@@ -20,5 +20,5 @@ IN: webapps.mason.backend.tests
 
 { f f } [
     builder new now >>heartbeat-timestamp
-    [ broken? ] [ crashed? ] bi
+    [ broken? ] [ offline? ] bi
 ] unit-test

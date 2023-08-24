@@ -1,5 +1,5 @@
 ! Copyright (C) 2010 Doug Coleman.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors destructors kernel windows.errors
 windows.kernel32 windows.types ;
 IN: windows.handles
@@ -17,5 +17,5 @@ TUPLE: win32-handle < disposable handle ;
 : <win32-handle> ( handle -- win32-handle )
     win32-handle new-win32-handle ;
 
-M: win32-handle dispose* ( handle -- )
+M: win32-handle dispose*
     handle>> CloseHandle win32-error=0/f ;

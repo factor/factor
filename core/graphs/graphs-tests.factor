@@ -1,4 +1,5 @@
-USING: assocs graphs kernel namespaces sorting tools.test ;
+USING: assocs graphs hash-sets kernel math namespaces sequences sorting
+tools.test vectors ;
 QUALIFIED: sets
 
 H{ } "g" set
@@ -15,5 +16,13 @@ H{
 } "g" set
 
 { { 2 3 4 5 } } [
-    2 [ "g" get at sets:members ] closure sets:members natural-sort
+    2 [ "g" get at sets:members ] closure sets:members sort
+] unit-test
+
+{ t } [ 2 [ "g" get at sets:members ] HS{ } closure-as hash-set? ] unit-test
+{ t } [ 2 [ "g" get at sets:members ] closure hash-set? ] unit-test
+{ t } [ 2 [ "g" get at sets:members ] V{ } closure-as vector? ] unit-test
+
+{ V{ 5 4 3 2 1 0 } } [
+    5 [ [ f ] [ <iota> <reversed> ] if-zero ] V{ } closure-as
 ] unit-test

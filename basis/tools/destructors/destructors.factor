@@ -1,7 +1,7 @@
 ! Copyright (C) 2009 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs classes combinators.smart
-continuations destructors fry io io.styles kernel namespaces
+continuations destructors io io.styles kernel namespaces
 prettyprint sequences sets sorting ;
 IN: tools.destructors
 
@@ -11,7 +11,7 @@ IN: tools.destructors
     members [ class-of ] collect-by ;
 
 : (disposables.) ( set -- )
-    class-tally >alist [ first2 [ length ] keep 3array ] map [ second ] sort-with
+    class-tally >alist [ first2 [ length ] keep 3array ] map [ second ] sort-by
     standard-table-style [
         [
             [ "Disposable class" write ] with-cell
@@ -31,7 +31,7 @@ IN: tools.destructors
     ] tabular-output nl ;
 
 : sort-disposables ( seq -- seq' )
-    [ disposable? ] partition [ [ id>> ] sort-with ] dip append ;
+    [ disposable? ] partition [ [ id>> ] sort-by ] dip append ;
 
 PRIVATE>
 
@@ -47,7 +47,7 @@ PRIVATE>
     t debug-leaks? set-global
     [
         [ call disposables get clone ] dip
-    ] [ f debug-leaks? set-global ] [ ] cleanup
+    ] [ f debug-leaks? set-global ] finally
     diff ; inline
 
 : leaks. ( quot -- )

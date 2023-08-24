@@ -1,6 +1,6 @@
 ! Copyright (C) 2004, 2010 Slava Pestov.
 ! Copyright (C) 2008, Doug Coleman.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: combinators kernel kernel.private math math.order
 math.private ;
 IN: math.integers
@@ -223,7 +223,7 @@ M: bignum (log2) bignum-log2 ; inline
 : bignum/f ( m n -- f )
     [ [ abs ] bi@ /f-abs ] [ [ 0 < ] bi@ xor ] 2bi [ neg ] when ; inline
 
-M: bignum /f ( m n -- f ) { bignum bignum } declare bignum/f ;
+M: bignum /f { bignum bignum } declare bignum/f ;
 
 CONSTANT: bignum/f-threshold 0x20,0000,0000,0000
 

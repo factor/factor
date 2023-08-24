@@ -1,10 +1,9 @@
 ! Copyright (C) 2008, 2011 Eduardo Cavazos, Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays calendar combinators
-combinators.short-circuit continuations fry io.directories
-io.launcher io.pathnames kernel layouts macros make mason.config
-mason.notify mason.platform mason.report math.parser namespaces
-quotations sequences splitting system system-info ;
+! See https://factorcode.org/license.txt for BSD license.
+USING: accessors arrays calendar combinators.short-circuit
+continuations io.directories io.launcher io.pathnames kernel
+layouts make mason.config mason.notify mason.platform
+mason.report namespaces quotations sequences system ;
 IN: mason.child
 
 : gnu-make-cmd ( -- args )
@@ -73,7 +72,7 @@ M: windows factor-path "./factor.com" ;
             +closed+ >>stdin
             "../test-log" >>stdout
             +stdout+ >>stderr
-            6 hours >>timeout
+            2 hours >>timeout
             +new-group+ >>group
         try-process
     ] with-directory ;

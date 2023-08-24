@@ -1,10 +1,9 @@
 ! Copyright (C) 2009, 2010 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
-USING: accessors binary-search combinators
-compiler.cfg.linear-scan.allocation.state
+! See https://factorcode.org/license.txt for BSD license.
+USING: accessors compiler.cfg.linear-scan.allocation.state
 compiler.cfg.linear-scan.live-intervals
-compiler.cfg.linear-scan.ranges fry hints kernel locals math math.order
-namespaces sequences ;
+compiler.cfg.linear-scan.ranges hints kernel math namespaces
+sequences ;
 IN: compiler.cfg.linear-scan.allocation.splitting
 
 : split-uses ( uses n -- before after )

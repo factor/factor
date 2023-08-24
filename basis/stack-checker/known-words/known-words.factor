@@ -1,5 +1,5 @@
 ! Copyright (C) 2004, 2011 Slava Pestov, Daniel Ehrenberg.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: fry accessors alien alien.accessors alien.private arrays
 byte-arrays classes continuations.private effects generic
 hashtables hashtables.private io io.backend io.files

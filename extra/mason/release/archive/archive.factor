@@ -1,8 +1,7 @@
 ! Copyright (C) 2008 Eduardo Cavazos, Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
-USING: accessors combinators io.directories
-io.directories.hierarchy io.files io.pathnames kernel literals
-locals make mason.common mason.config mason.platform namespaces
+! See https://factorcode.org/license.txt for BSD license.
+USING: accessors combinators io.directories io.pathnames kernel
+make mason.common mason.config mason.platform namespaces
 sequences system words ;
 IN: mason.release.archive
 

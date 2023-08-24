@@ -1,6 +1,6 @@
 USING: accessors arrays assocs compiler.cfg.dominance
 compiler.cfg.dominance.private compiler.cfg.utilities compiler.test
-grouping kernel math.ranges namespaces sequences sets tools.test ;
+grouping kernel ranges namespaces sequences sets tools.test ;
 IN: compiler.cfg.dominance.tests
 
 : test-dominance ( -- )
@@ -52,7 +52,7 @@ V{ } 4 test-bb
 
 { } [ test-dominance ] unit-test
 
-{ t } [ 0 4 [a,b] [ get dom-parent 0 get eq? ] all? ] unit-test
+{ t } [ 0 4 [a..b] [ get dom-parent 0 get eq? ] all? ] unit-test
 
 ! The other example from the paper
 V{ } 0 test-bb
@@ -71,7 +71,7 @@ V{ } 5 test-bb
 
 { } [ test-dominance ] unit-test
 
-{ t } [ 0 5 [a,b] [ get dom-parent 0 get eq? ] all? ] unit-test
+{ t } [ 0 5 [a..b] [ get dom-parent 0 get eq? ] all? ] unit-test
 
 : non-det-test ( -- cfg )
     9 <iota> [ V{ } clone over insns>block ] { } map>assoc dup

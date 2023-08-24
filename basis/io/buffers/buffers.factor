@@ -1,6 +1,6 @@
 ! Copyright (C) 2004, 2005 Mackenzie Straight.
 ! Copyright (C) 2006, 2010 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors alien alien.accessors alien.data byte-arrays
 combinators destructors kernel libc math math.order math.private
 sequences sequences.private typed ;
@@ -80,7 +80,7 @@ TYPED: buffer-find ( seps buffer: buffer -- n/f )
     [
         swap [ [ pos>> ] [ fill>> ] [ ptr>> ] tri ] dip
         [ swap alien-unsigned-1 ] [ member-eq? ] bi-curry*
-        compose (find-integer)
+        compose find-integer-from
     ] [
         [ pos>> - ] curry [ f ] if*
     ] bi ; inline

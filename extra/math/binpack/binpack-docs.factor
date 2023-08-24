@@ -1,7 +1,7 @@
 ! Copyright (C) 2008 John Benediktsson
-! See http://factorcode.org/license.txt for BSD license
+! See https://factorcode.org/license.txt for BSD license
 
-USING: help.syntax help.markup kernel assocs sequences quotations ;
+USING: help.markup help.syntax sequences ;
 
 IN: math.binpack
 

@@ -1,5 +1,5 @@
 ! Copyright (C) 2008 Doug Coleman.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors classes.struct combinators io.backend.unix
 io.ports io.serial io.streams.duplex kernel libc literals math
 system unix unix.ffi io.serial.linux.ffi ;
@@ -23,7 +23,7 @@ IN: io.serial.linux
     stream>> in>> handle>> fd>> ;
 
 : get-fd-termios ( fd -- serial )
-    termios <struct> [ tcgetattr io-error ] keep ;
+    termios new [ tcgetattr io-error ] keep ;
 
 : set-termios ( serial -- )
     [ serial-fd get-fd-termios ] keep termios<< ;

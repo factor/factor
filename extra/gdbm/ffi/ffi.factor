@@ -1,5 +1,5 @@
 ! Copyright (C) 2010 Dmitry Shubin.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: alien alien.c-types alien.libraries alien.libraries.finder
 alien.syntax classes.struct combinators kernel system ;
 IN: gdbm.ffi

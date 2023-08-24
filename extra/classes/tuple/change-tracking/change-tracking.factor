@@ -1,6 +1,6 @@
 ! Copyright (C) 2009 Joe Groff.
-! See http://factorcode.org/license.txt for BSD license.
-USING: accessors classes classes.tuple fry kernel sequences slots ;
+! See https://factorcode.org/license.txt for BSD license.
+USING: accessors classes classes.tuple kernel sequences slots ;
 IN: classes.tuple.change-tracking
 
 TUPLE: change-tracking-tuple

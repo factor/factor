@@ -1,8 +1,8 @@
 ! Copyright (C) 2017-2018 Alexander Ilin.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors alien alien.data alien.libraries alien.strings
-continuations fry init io.encodings.utf16n kernel literals math
-namespaces sequences ui.backend.windows ui.gadgets.worlds
+init io.encodings.utf16 kernel literals math namespaces
+sequences ui.backend.windows ui.gadgets.worlds
 ui.gestures windows.errors windows.messages windows.shell32
 windows.types windows.user32 ;
 IN: windows.dropfiles
@@ -20,7 +20,7 @@ IN: windows.dropfiles
     ] with map ;
 
 ! : point-from-hdrop ( hdrop -- loc )
-!    POINT <struct> [ DragQueryPoint drop ] keep [ x>> ] [ y>> ] bi 2array ;
+!    POINT new [ DragQueryPoint drop ] keep [ x>> ] [ y>> ] bi 2array ;
 
 : handle-wm-dropfiles ( hdrop -- )
     <alien> [ filenames-from-hdrop dropped-files set-global ] [ DragFinish ] bi
@@ -62,6 +62,4 @@ IN: windows.dropfiles
 : reject-files ( -- )
     world get world-reject-files ;
 
-[
-    f \ init-message-filter set-global
-] "init-dropfiles" add-startup-hook
+STARTUP-HOOK: [ f \ init-message-filter set-global ]

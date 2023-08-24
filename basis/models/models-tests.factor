@@ -1,5 +1,5 @@
-USING: arrays generic kernel math models models.product
-namespaces sequences assocs accessors tools.test ;
+USING: accessors arrays assocs generic kernel math models models.arrow
+models.product namespaces sequences tools.test ;
 IN: models.tests
 
 TUPLE: model-tester hit? ;
@@ -43,3 +43,7 @@ T{ model-tester f f } "tester" set
     T{ model-tester f f } clone V{ 5 } clone <model> 2dup add-connection
     [ pop-model ] [ value>> ] bi
 ] unit-test
+
+{ f } [ 46 <model> [ 1 + ] <arrow> value>> ] unit-test
+{ 47 } [ 46 <model> [ 1 + ] <arrow> compute-model ] unit-test
+{ 0 } [ 46 <model> [ 1 + ] <arrow> [ compute-model drop ] keep ref>> ] unit-test

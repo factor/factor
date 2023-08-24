@@ -3,7 +3,6 @@ namespaces sequences ;
 IN: editors.textpad
 
 SINGLETON: textpad
-textpad editor-class set-global
 
 : textpad-path ( -- path )
     \ textpad-path get-global [
@@ -11,7 +10,7 @@ textpad editor-class set-global
         [ "TextPad.exe" ] unless*
     ] unless* ;
 
-M: textpad editor-command ( file line -- command )
+M: textpad editor-command
     [
         textpad-path ,
         [ , ] [ number>string "(" ",0)" surround , ] bi*

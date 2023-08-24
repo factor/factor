@@ -1,10 +1,10 @@
 ! Copyright (C) 2009, 2010, 2011 Joe Groff, Slava Pestov, Doug Coleman.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors arrays classes classes.algebra classes.tuple
-combinators combinators.short-circuit definitions effects
-effects.parser fry generalizations kernel kernel.private locals
-locals.parser macros quotations sequences slots
-stack-checker.dependencies words ;
+classes.struct combinators combinators.short-circuit definitions
+effects effects.parser fry generalizations kernel kernel.private
+locals.parser quotations sequences slots stack-checker.dependencies
+words ;
 FROM: classes.tuple.private => tuple-layout ;
 IN: typed
 
@@ -24,6 +24,7 @@ PREDICATE: typed-word < word "typed-word" word-prop >boolean ;
         [ all-slots empty? not ]
         [ immutable-tuple-class? ]
         [ final-class? ]
+        [ struct-class? not ] ! for struct boa change
     } 1&& ;
 
 ! typed inputs

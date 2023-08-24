@@ -1,8 +1,8 @@
 ! Copyright (C) 2009 Bruno Deferrari
-! See http://factorcode.org/license.txt for BSD license.
-USING: alien alien.c-types alien.libraries alien.syntax
-combinators kernel tokyo.alien.tcutil ;
-IN: tokyo.alien.tcfdb
+! See https://factorcode.org/license.txt for BSD license.
+USING: alien.c-types alien.syntax tokyo.alien.tchdb
+tokyo.alien.tcutil ;
+IN: tokyo.alien.tctdb
 
 TYPEDEF: void* TCFDB
 

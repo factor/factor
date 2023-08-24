@@ -1,5 +1,5 @@
 ! Copyright (C) 2009 Joe Groff.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs biassocs byte-arrays classes
 compiler.cfg compiler.cfg.comparisons compiler.cfg.instructions
 compiler.cfg.intrinsics.simd compiler.cfg.intrinsics.simd.backend
@@ -238,13 +238,13 @@ M: horizontal-cpu %horizontal-add-vector-reps signed-reps ;
 M: horizontal-cpu %unpack-vector-head-reps signed-reps ;
 M: horizontal-cpu %unpack-vector-tail-reps signed-reps ;
 
-! v.
+! vdot
 { { ##dot-vector } }
-[ dot-cpu float-4-rep [ emit-simd-v. ] test-emit ]
+[ dot-cpu float-4-rep [ emit-simd-vdot ] test-emit ]
 unit-test
 
 { { ##mul-vector ##horizontal-add-vector ##horizontal-add-vector ##vector>scalar } }
-[ horizontal-cpu float-4-rep [ emit-simd-v. ] test-emit ]
+[ horizontal-cpu float-4-rep [ emit-simd-vdot ] test-emit ]
 unit-test
 
 { {
@@ -253,7 +253,7 @@ unit-test
     ##merge-vector-head ##merge-vector-tail ##add-vector
     ##vector>scalar
 } }
-[ simple-ops-cpu float-4-rep [ emit-simd-v. ] test-emit ]
+[ simple-ops-cpu float-4-rep [ emit-simd-vdot ] test-emit ]
 unit-test
 
 ! vsqrt

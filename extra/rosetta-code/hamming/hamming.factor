@@ -1,9 +1,9 @@
 ! Copyright (c) 2012 Anonymous
-! See http://factorcode.org/license.txt for BSD license.
-USING: accessors deques dlists fry kernel make math math.order ;
+! See https://factorcode.org/license.txt for BSD license.
+USING: accessors deques dlists kernel make math math.order ;
 IN: rosetta-code.hamming
 
-! http://rosettacode.org/wiki/Hamming_numbers#Factor
+! https://rosettacode.org/wiki/Hamming_numbers#Factor
 
 ! Hamming numbers are numbers of the form
 !    H = 2^i * 3^j * 5^k        where i, j, k >= 0

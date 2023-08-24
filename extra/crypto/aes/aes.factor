@@ -1,13 +1,13 @@
 ! Copyright (C) 2013 Fred Alger
 ! Some parts Copyright (C) 2008 Doug Coleman.
-! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays assocs combinators crypto.aes.utils
-generalizations grouping kernel locals math math.bitwise
-math.ranges memoize namespaces sequences sequences.private
-sequences.unrolled ;
+! See https://factorcode.org/license.txt for BSD license.
+USING: accessors arrays assocs byte-arrays crypto.aes.utils
+generalizations kernel literals math math.bitwise ranges
+namespaces sequences sequences.private sequences.unrolled ;
 IN: crypto.aes
 
 CONSTANT: AES_BLOCK_SIZE 16
+
 ! FIPS-197 AES
 ! input block, state, output block -- 4 32-bit words
 CONSTANT: FIPS-197 {
@@ -21,8 +21,8 @@ CONSTANT: FIPS-197 {
 : (nrounds) ( byte-array -- rounds )
     length 8 * FIPS-197 at ;
 
-: sbox ( -- array )
-{
+<<
+CONSTANT: sbox B{
     0x63 0x7c 0x77 0x7b 0xf2 0x6b 0x6f 0xc5
     0x30 0x01 0x67 0x2b 0xfe 0xd7 0xab 0x76
     0xca 0x82 0xc9 0x7d 0xfa 0x59 0x47 0xf0
@@ -55,11 +55,13 @@ CONSTANT: FIPS-197 {
     0x9b 0x1e 0x87 0xe9 0xce 0x55 0x28 0xdf
     0x8c 0xa1 0x89 0x0d 0xbf 0xe6 0x42 0x68
     0x41 0x99 0x2d 0x0f 0xb0 0x54 0xbb 0x16
-} ;
+}
+>>
 
-: inv-sbox ( -- array )
-    256 0 <array>
-    dup 256 [ dup sbox nth rot set-nth ] with each-integer ;
+CONSTANT: inv-sbox $[
+    256 <byte-array>
+    dup 256 [ dup sbox nth rot set-nth ] with each-integer
+]
 
 ! applies sbox to each byte of word
 : subword ( word -- word' )
@@ -153,10 +155,10 @@ M: aes-256-key key-expand-round ( temp i -- temp' )
 
 : (key-sched-round) ( output temp i -- output' )
     key-expand-round
-    [ dup 4th-from-end ] dip bitxor suffix! ; inline
+    [ dup 4th-from-tail ] dip bitxor suffix! ; inline
 
 : (sched-interval) ( K Nr -- seq )
-    [ length ] dip 1 + 4 * [a,b) ;    ! over the interval Nk...Nb(Nr + 1)
+    [ length ] dip 1 + 4 * [a..b) ;    ! over the interval Nk...Nb(Nr + 1)
 
 : (init-round) ( out -- out temp quot )
     [ ]
@@ -223,7 +225,7 @@ SINGLETON: aes-encrypt
     c0 gb0   c1 gb1   c2 gb2   c3 gb3   >ui32 ; ! c3'
 
 : (add-round-key) ( key state -- state' )
-   4 [ bitxor ] unrolled-2map ;
+    4 [ bitxor ] unrolled-2map ;
 
 : add-round-key ( aes n -- aes' )
     over (key-at-nth-round) swap
@@ -258,7 +260,7 @@ SINGLETON: aes-encrypt
 
 M: aes-encrypt (expand-key) (expand-enc-key) ;
 M: aes-encrypt (first-round) add-first-round-key ;
-M: aes-encrypt (counter) 0 swap (a,b) ;
+M: aes-encrypt (counter) [1..b) ;
 M: aes-encrypt (round) aes-round ;
 M: aes-encrypt (final-round) [ final-round ] change-state add-final-round-key ;
 
@@ -272,7 +274,7 @@ M:: aes-decrypt (expand-key) ( K Nr -- sched )
 M: aes-decrypt (first-round) ( aes -- aes' )
     add-final-round-key ;
 
-M: aes-decrypt (counter) ( nrounds -- seq ) 0 swap (a,b) <reversed> ;
+M: aes-decrypt (counter) ( nrounds -- seq ) [1..b) <reversed> ;
 M: aes-decrypt (final-round) ( aes -- aes' )
     [ [ inv-subword ] map unshift-rows  ] change-state
     add-first-round-key ;

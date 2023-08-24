@@ -1,5 +1,5 @@
 ! Copyright (C) 2010 Joe Groff.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors alien alien.c-types alien.data alien.enums alien.strings
 assocs byte-arrays classes.struct destructors grouping images images.loader
 io kernel libc locals math mime.types namespaces sequences specialized-arrays
@@ -17,8 +17,7 @@ os windows? [
 
 <PRIVATE
 
-: <GpRect> ( x y w h -- rect )
-    GpRect <struct-boa> ; inline
+C: <GpRect> GpRect
 
 : stream>gdi+-bitmap ( stream -- bitmap )
     stream>IStream &com-release
@@ -64,7 +63,7 @@ os windows? [
 ERROR: unsupported-pixel-format component-order ;
 
 : check-pixel-format ( component-order -- )
-    dup { BGRX BGRA } member? [ drop ] [ unsupported-pixel-format ] if ;
+    dup { BGRX BGRA RGBA } member? [ drop ] [ unsupported-pixel-format ] if ;
 
 : image>gdi+-bitmap ( image -- bitmap )
     dup component-order>> check-pixel-format
@@ -84,14 +83,10 @@ ERROR: unsupported-pixel-format component-order ;
     nip swap ImageCodecInfo <c-direct-array> ;
 
 : extension>mime-type ( extension -- mime-type )
-    ! Crashes if you let this mime through on my machine.
-    dup mime-types at dup "image/bmp" = [ unknown-image-extension ] when nip ;
+    mime-types ?at [ unknown-image-extension ] unless ;
 
 : mime-type>clsid ( mime-type -- clsid )
     image-encoders [ MimeType>> alien>native-string = ] with find nip Clsid>> ;
-
-: startup-gdi+ ( -- )
-    start-gdi+ &stop-gdi+ drop ;
 
 : write-image-to-stream ( image stream extension -- )
     [ image>gdi+-bitmap ]
@@ -102,10 +97,10 @@ ERROR: unsupported-pixel-format component-order ;
 PRIVATE>
 
 M: gdi+-image stream>image*
-    drop startup-gdi+
+    drop
     stream>gdi+-bitmap
     gdi+-bitmap>data
     data>image ;
 
-M: gdi+-image image>stream ( image extension class -- )
-    drop startup-gdi+ output-stream get swap write-image-to-stream ;
+M: gdi+-image image>stream
+    drop output-stream get swap write-image-to-stream ;

@@ -1,10 +1,9 @@
 USING: accessors alien arrays byte-arrays classes combinators
-cpu.architecture effects fry functors generalizations generic
-generic.parser kernel lexer literals locals macros math math.functions
-math.vectors math.vectors.private math.vectors.simd.intrinsics
-namespaces parser prettyprint.custom quotations sequences
-sequences.generalizations sequences.private vocabs vocabs.loader
-words math.bitwise ;
+cpu.architecture effects functors generalizations kernel lexer
+literals math math.bitwise math.vectors
+math.vectors.simd.intrinsics parser prettyprint.custom
+quotations sequences sequences.generalizations sequences.private
+words ;
 QUALIFIED-WITH: alien.c-types c
 IN: math.vectors.simd
 
@@ -94,7 +93,7 @@ DEFER: simd-construct-op
 
 : (vvx->v-op) ( a b obj rep quot: ( (a) (b) obj rep -- (c) ) -- c )
     [ [ simd-unbox ] [ underlying>> ] bi* ] 3dip 2curry 2curry make-underlying ; inline
-    
+
 : vv->v-op ( a b rep quot: ( (a) (b) rep -- (c) ) fallback-quot -- c )
     [ '[ _ (vv->v-op) ] ] [ '[ drop @ ] ] bi* if-both-vectors-match ; inline
 
@@ -171,8 +170,8 @@ M: simd-128 vmin
     dup simd-rep [ (simd-vmin) ] [ call-next-method ] vv->v-op ; inline
 M: simd-128 vmax
     dup simd-rep [ (simd-vmax) ] [ call-next-method ] vv->v-op ; inline
-M: simd-128 v.
-    dup simd-rep [ (simd-v.) ] [ call-next-method ] vv->x-op ; inline
+M: simd-128 vdot
+    dup simd-rep [ (simd-vdot) ] [ call-next-method ] vv->x-op ; inline
 M: simd-128 vsad
     dup simd-rep [ (simd-vsad) ] [ call-next-method ] vv->x-op ; inline
 M: simd-128 vsqrt
@@ -239,7 +238,7 @@ M: simd-128 vnone?
     dup simd-rep [ (simd-vnone?) ] [ call-next-method ] v->x-op  ; inline
 M: simd-128 vcount
     dup simd-rep
-    [ [ (simd-vgetmask) assert-positive ] [ call-next-method ] v->x-op ]
+    [ [ (simd-vgetmask) (simd-positive) ] [ call-next-method ] v->x-op ]
     [ mask>count ] bi ; inline
 
 ! SIMD high-level specializations
@@ -253,7 +252,7 @@ M: simd-128 v+n over simd-with v+ ; inline
 M: simd-128 v-n over simd-with v- ; inline
 M: simd-128 v*n over simd-with v* ; inline
 M: simd-128 v/n over simd-with v/ ; inline
-M: simd-128 norm-sq dup v. assert-positive ; inline
+M: simd-128 norm-sq dup vdot (simd-positive) ; inline
 M: simd-128 distance v- norm ; inline
 
 M: simd-128 >pprint-sequence ;
@@ -353,7 +352,7 @@ SIMD-128: double-2
 
 ! misc
 
-M: simd-128 vshuffle ( u perm -- v )
+M: simd-128 vshuffle
     vshuffle-bytes ; inline
 
 M: uchar-16 v*hs+
@@ -368,5 +367,3 @@ M: short-8 v*hs+
     short-8-rep [ (simd-v*hs+) ] [ call-next-method ] vv->v-op int-4-cast ; inline
 M: int-4 v*hs+
     int-4-rep [ (simd-v*hs+) ] [ call-next-method ] vv->v-op longlong-2-cast ; inline
-
-{ "math.vectors.simd" "mirrors" } "math.vectors.simd.mirrors" require-when

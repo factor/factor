@@ -1,5 +1,4 @@
-USING: help.markup help.syntax assocs strings logging
-logging.analysis smtp ;
+USING: help.markup help.syntax logging.analysis ;
 IN: logging.insomniac
 
 HELP: insomniac-sender

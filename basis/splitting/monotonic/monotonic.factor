@@ -1,5 +1,5 @@
 ! Copyright (C) 2008, 2009 Doug Coleman.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors arrays fry kernel locals math namespaces
 sequences sequences.private sorting ;
 IN: splitting.monotonic
@@ -7,19 +7,19 @@ IN: splitting.monotonic
 <PRIVATE
 
 :: monotonic-split-impl ( seq quot slice-quot n -- pieces )
-    V{ 0 } clone :> accum
+    V{ } clone :> accum
 
-    0 seq [ ] [
+    0 0 seq [ ] [
         [ 1 + ] 2dip [
-            quot call [ dup accum push ] unless
+            quot call [
+                [ seq slice-quot call accum push ] keep dup
+            ] unless
         ] keep
     ] map-reduce drop
 
-    n = [ n accum push ] unless
+    n = [ drop ] [ n seq slice-quot call accum push ] if
 
-    accum dup rest-slice [
-        seq slice-quot call
-    ] { } 2map-as ; inline
+    accum { } like ; inline
 
 : (monotonic-split) ( seq quot slice-quot -- pieces )
     pick length [ 3drop { } ] [ monotonic-split-impl ] if-zero ; inline
@@ -53,7 +53,7 @@ TUPLE: upward-slice < slice ;
         drop
         [ downward-slices ]
         [ stable-slices ]
-        [ upward-slices ] tri 3append [ from>> ] sort-with
+        [ upward-slices ] tri 3append [ from>> ] sort-by
     ] [
         zero? [ drop { } ] [ [ 0 1 ] dip stable-slice boa ] if
     ] if ;

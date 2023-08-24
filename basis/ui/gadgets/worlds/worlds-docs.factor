@@ -7,7 +7,7 @@ HELP: user-input
 { $description "Calls " { $link user-input* } " on every parent of the world's currently-focused child." } ;
 
 HELP: origin
-{ $var-description "Within the dynamic extent of " { $link draw-world } ", holds the co-ordinate system origin for the gadget currently being drawn." } ;
+{ $var-description "Within the dynamic extent of " { $link draw-world } ", holds the coordinate system origin for the gadget currently being drawn." } ;
 
 HELP: hand-world
 { $var-description "Global variable. The " { $link world } " containing the gadget at the mouse location." } ;
@@ -46,49 +46,49 @@ HELP: focus-path
 
 HELP: world
 { $class-description "A gadget which appears at the top of the gadget hieararchy, and in turn may be displayed in a native window. Worlds have the following slots:"
-  { $table
+  { $slots
     {
-        { $slot "active?" }
+        "active?"
         { "an " { $link integer } " initially set to 0. The active " { $link ui-backend } " increases the value in steps up to 100 while the native window containing the world is being initialized but not yet visible on the screen. The world is only redrawn when the value is 100 which prevents redundant redraws from happening during initialization. The slot is set to 0 if an error is thrown while drawing the world; this prevents multiple debugger windows from being shown." }
     }
     {
-        { $slot "layers" }
+        "layers"
         { "a sequence of glass panes in front of the primary gadget, used to implement behaviors such as popup menus which are hidden when the mouse is clicked outside the menu. See " { $link "ui.gadgets.glass" } "." }
     }
     {
-        { $slot "title" }
+        "title"
         { "a string to be displayed in the title bar of the native window containing the world." }
     }
     {
-        { $slot "status" }
+        "status"
         { "a " { $link model } " holding a string to be displayed in the world's status bar." }
     }
     {
-        { $slot "status-owner" }
+        "status-owner"
         { "the gadget that displayed the most recent status message." }
     }
     {
-        { $slot "focus" }
+        "focus"
         { "the current owner of the keyboard focus in the world." }
     }
     {
-        { $slot "focused?" }
+        "focused?"
         { "a boolean indicating if the native window containing the world has keyboard focus." }
     }
     {
-        { $slot "grab-input?" }
+        "grab-input?"
         { "if set to " { $link t } ", the world will hide the mouse cursor and disable normal mouse input while focused. Use " { $link grab-input } " and " { $link ungrab-input } " to change this setting." }
     }
     {
-        { $slot "handle" }
+        "handle"
         { "a backend-specific native handle representing the native window containing the world, or " { $link f } " if the world is not grafted." }
     }
     {
-        { $slot "window-loc" }
-        { "the on-screen location of the native window containing the world. The co-ordinate system here is backend-specific." }
+        "window-loc"
+        { "the on-screen location of the native window containing the world. The coordinate system here is backend-specific." }
     }
     {
-        { $slot "window-controls" }
+        "window-controls"
         { "the set of " { $link "ui.gadgets.worlds-window-controls" } " with which the world window was created." }
     }
   }

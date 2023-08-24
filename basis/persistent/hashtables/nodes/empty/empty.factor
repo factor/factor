@@ -1,6 +1,6 @@
 ! Based on Clojure's PersistentHashMap by Rich Hickey.
 
-USING: accessors kernel locals persistent.hashtables.nodes ;
+USING: accessors kernel persistent.hashtables.nodes ;
 IN: persistent.hashtables.nodes.empty
 
 M: empty-node (entry-at) 3drop f ;

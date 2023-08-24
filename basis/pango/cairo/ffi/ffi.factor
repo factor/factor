@@ -1,7 +1,8 @@
 ! Copyright (C) 2010 Anton Gorenko.
-! See http://factorcode.org/license.txt for BSD license.
-USING: alien alien.libraries alien.syntax cairo.ffi combinators
-kernel gobject-introspection system vocabs ;
+! See https://factorcode.org/license.txt for BSD license.
+USING: alien alien.libraries alien.syntax combinators
+gobject-introspection system vocabs ;
+USE: cairo.ffi
 IN: pango.cairo.ffi
 
 << "pango.ffi" require >>
@@ -19,4 +20,4 @@ FOREIGN-RECORD-TYPE: cairo.ScaledFont cairo_scaled_font_t
 FOREIGN-ENUM-TYPE: cairo.FontType cairo_font_type_t
 FOREIGN-RECORD-TYPE: cairo.FontOptions cairo_font_options_t
 
-GIR: vocab:pango/cairo/PangoCairo-1.0.gir
+GIR: vocab:gir/PangoCairo-1.0.gir

@@ -1,11 +1,10 @@
 ! Copyright (C) 2010 Doug Coleman.
-! See http://factorcode.org/license.txt for BSD license.
-USING: accessors alien alien.c-types alien.data alien.strings
-alien.syntax arrays byte-arrays classes.struct combinators
-combinators.smart destructors io.encodings.string
-io.encodings.utf8 io.sockets io.sockets.private kernel libc
-make refs sequences sequences.extras windows.errors
-windows.kernel32 windows.types windows.winsock fry ;
+! See https://factorcode.org/license.txt for BSD license.
+USING: accessors alien alien.c-types alien.data alien.syntax
+classes.struct combinators combinators.smart destructors
+io.encodings.string io.encodings.utf8 io.sockets.private kernel
+libc make sequences windows.errors windows.kernel32
+windows.types windows.winsock ;
 IN: windows.iphlpapi
 
 LIBRARY: iphlpapi
@@ -46,19 +45,22 @@ CONSTANT: MAX_DNS_SUFFIX_STRING_LENGTH 256 ! 246?
 CONSTANT: MAX_DHCPV6_DUID_LENGTH 130
 CONSTANT: MAX_ADAPTER_NAME 128
 
+<<
 STRUCT: IP_ADDRESS_STRING
     { String char[16] } ;
+>>
 
 TYPEDEF: IP_ADDRESS_STRING* PIP_ADDRESS_STRING
 TYPEDEF: IP_ADDRESS_STRING IP_MASK_STRING
 TYPEDEF: IP_MASK_STRING* PIP_MASK_STRING
 
+<<
 STRUCT: IP_ADDR_STRING
     { Next IP_ADDR_STRING* }
     { IpAddress IP_ADDRESS_STRING }
     { IpMask IP_MASK_STRING }
     { Context DWORD } ;
-
+>>
 TYPEDEF: IP_ADDR_STRING* PIP_ADDR_STRING
 
 STRUCT: FIXED_INFO
@@ -386,7 +388,7 @@ FUNCTION: DWORD GetAdaptersInfo (
 FUNCTION: DWORD GetNetworkParams ( PFIXED_INFO pFixedInfo, PULONG pOutBufLen )
 
 : get-fixed-info ( -- FIXED_INFO )
-    FIXED_INFO <struct> dup byte-length ulong <ref>
+    FIXED_INFO new dup byte-length ulong <ref>
     [ GetNetworkParams n>win32-error-check ] keepd ;
 
 : dns-server-ips ( -- sequence )
@@ -404,7 +406,7 @@ FUNCTION: DWORD GetNetworkParams ( PFIXED_INFO pFixedInfo, PULONG pOutBufLen )
 <PRIVATE
 
 : loop-list ( obj -- seq )
-    [ [ dup [ Next>> ] when ] keep ] loop>array nip ;
+    [ Next>> ] follow ;
 
 ! Don't use this, use each/map-adapters
 : iterate-interfaces ( -- seq )

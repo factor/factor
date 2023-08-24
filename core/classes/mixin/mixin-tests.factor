@@ -1,7 +1,7 @@
 USING: accessors arrays assocs classes classes.algebra classes.mixin
 classes.mixin.private classes.union.private compiler.units definitions
-eval hashtables kernel math parser sequences source-files strings
-tools.test vectors words ;
+eval hashtables kernel math parser sequences source-files splitting
+strings tools.test vectors words ;
 IN: classes.mixin.tests
 
 ! Test mixins
@@ -60,7 +60,7 @@ USE: io.streams.string
             "INSTANCE: sequence mixin-forget-test"
             "GENERIC: mixin-forget-test-g ( x -- y )"
             "M: mixin-forget-test mixin-forget-test-g ;"
-        } "\n" join <string-reader> "mixin-forget-test"
+        } join-lines <string-reader> "mixin-forget-test"
         parse-stream drop
     ] unit-test
 
@@ -75,7 +75,7 @@ USE: io.streams.string
             "INSTANCE: hashtable mixin-forget-test"
             "GENERIC: mixin-forget-test-g ( x -- y )"
             "M: mixin-forget-test mixin-forget-test-g ;"
-        } "\n" join <string-reader> "mixin-forget-test"
+        } join-lines <string-reader> "mixin-forget-test"
         parse-stream drop
     ] unit-test
 
@@ -96,11 +96,11 @@ TUPLE: flat-mx-2-1 ; INSTANCE: flat-mx-2-1 flat-mx-2
 
 ! Too eager with reset-class
 
-{ } [ "IN: classes.mixin.tests MIXIN: blah SINGLETON: boo INSTANCE: boo blah" <string-reader> "mixin-reset-test" parse-stream drop ] unit-test
+[ "IN: classes.mixin.tests MIXIN: blah SINGLETON: boo INSTANCE: boo blah" <string-reader> "mixin-reset-test" parse-stream  ] must-not-fail
 
 { t } [ "blah" "classes.mixin.tests" lookup-word mixin-class? ] unit-test
 
-{ } [ "IN: classes.mixin.tests MIXIN: blah" <string-reader> "mixin-reset-test" parse-stream drop ] unit-test
+[ "IN: classes.mixin.tests MIXIN: blah" <string-reader> "mixin-reset-test" parse-stream  ] must-not-fail
 
 { t } [ "blah" "classes.mixin.tests" lookup-word mixin-class? ] unit-test
 
@@ -110,11 +110,11 @@ MIXIN: empty-mixin
 
 MIXIN: move-instance-declaration-mixin
 
-{ } [ "IN: classes.mixin.tests.a USE: strings USE: classes.mixin.tests INSTANCE: string move-instance-declaration-mixin" <string-reader> "move-mixin-test-1" parse-stream drop ] unit-test
+[ "IN: classes.mixin.tests.a USE: strings USE: classes.mixin.tests INSTANCE: string move-instance-declaration-mixin" <string-reader> "move-mixin-test-1" parse-stream ] must-not-fail
 
-{ } [ "IN: classes.mixin.tests.b USE: strings USE: classes.mixin.tests INSTANCE: string move-instance-declaration-mixin" <string-reader> "move-mixin-test-2" parse-stream drop ] unit-test
+[ "IN: classes.mixin.tests.b USE: strings USE: classes.mixin.tests INSTANCE: string move-instance-declaration-mixin" <string-reader> "move-mixin-test-2" parse-stream ] must-not-fail
 
-{ } [ "IN: classes.mixin.tests.a" <string-reader> "move-mixin-test-1" parse-stream drop ] unit-test
+[ "IN: classes.mixin.tests.a" <string-reader> "move-mixin-test-1" parse-stream  ] must-not-fail
 
 { { string } } [ move-instance-declaration-mixin class-members ] unit-test
 
@@ -125,7 +125,7 @@ SYMBOL: a-symbol
     [
         \ a-symbol \ silly-mixin add-mixin-instance
     ] with-compilation-unit
-] [ not-a-class? ] must-fail-with
+] [ not-an-instance? ] must-fail-with
 
 SYMBOL: not-a-mixin
 TUPLE: a-class ;
@@ -134,7 +134,7 @@ TUPLE: a-class ;
     [
         \ a-class \ not-a-mixin add-mixin-instance
     ] with-compilation-unit
-] [ not-a-mixin-class? ] must-fail-with
+] [ not-an-instance? ] must-fail-with
 
 ! Changing a mixin member's metaclass should not remove it from the mixin
 MIXIN: metaclass-change-mixin

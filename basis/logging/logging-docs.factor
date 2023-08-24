@@ -1,6 +1,6 @@
+USING: help.markup help.syntax logging.server quotations strings
+words ;
 IN: logging
-USING: help.markup help.syntax assocs math calendar
-logging.server strings words quotations ;
 
 HELP: DEBUG
 { $description "Log level for debug messages." } ;

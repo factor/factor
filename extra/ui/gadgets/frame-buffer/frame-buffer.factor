@@ -1,5 +1,5 @@
-USING: accessors alien.c-types alien.data combinators grouping
-kernel locals math math.vectors opengl opengl.gl sequences
+USING: accessors alien.c-types alien.data grouping kernel
+math math.vectors opengl opengl.gl sequences
 specialized-arrays ui.gadgets ui.render ;
 SPECIALIZED-ARRAY: uint
 IN: ui.gadgets.frame-buffer

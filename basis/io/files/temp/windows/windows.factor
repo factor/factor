@@ -1,10 +1,9 @@
 ! Copyright (C) 2012 Joe Groff.
-! See http://factorcode.org/license.txt for BSD license.
-USING: alien.data alien.strings io.directories
-io.files.temp io.pathnames kernel math
-memoize specialized-arrays system windows.errors
-windows.kernel32 windows.ole32 windows.shell32
-windows.types ;
+! See https://factorcode.org/license.txt for BSD license.
+USING: alien.data alien.strings io.directories io.files.temp
+io.pathnames kernel literals math memoize specialized-arrays
+system windows.errors windows.kernel32 windows.ole32
+windows.shell32 windows.types ;
 SPECIALIZED-ARRAY: WCHAR
 IN: io.files.temp.windows
 
@@ -19,7 +18,7 @@ PRIVATE>
 
 : get-appdata-directory ( -- path )
     f
-    CSIDL_LOCAL_APPDATA CSIDL_FLAG_CREATE bitor
+    flags{ CSIDL_LOCAL_APPDATA CSIDL_FLAG_CREATE }
     f
     0
     MAX_PATH 1 + WCHAR <c-array>

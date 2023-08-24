@@ -1,6 +1,6 @@
-USING: arrays assocs combinators hashtables io
-io.encodings.ascii io.encodings.string io.streams.string kernel
-math math.parser sequences strings ;
+USING: arrays assocs byte-arrays combinators io
+io.encodings.binary io.streams.byte-array io.streams.string
+kernel linked-assocs math math.parser sequences sequences.extras strings ;
 IN: bencode
 
 GENERIC: >bencode ( obj -- bencode )
@@ -11,6 +11,8 @@ M: integer >bencode
 M: string >bencode
     [ length number>string ":" ] keep 3append ;
 
+M: byte-array >bencode "" like >bencode ;
+
 M: sequence >bencode
     [ >bencode ] map concat "l" "e" surround ;
 
@@ -18,24 +20,26 @@ M: assoc >bencode
     [ [ >bencode ] bi@ append ] { } assoc>map concat
     "d" "e" surround ;
 
-<PRIVATE
-
 DEFER: read-bencode
+
+<PRIVATE
 
 : read-integer ( -- obj )
     "e" read-until CHAR: e assert= string>number ;
 
 : read-list ( -- obj )
-    [ read-bencode dup ] [ ] produce nip ;
+    [ read-bencode ] loop>array ;
 
 : read-dictionary ( -- obj )
     [
-        read-bencode [ read-bencode 2array ] [ f ] if* dup
-    ] [ ] produce nip >hashtable ;
+        read-bencode [ read-bencode 2array ] [ f ] if*
+    ] loop>array >linked-hash ;
 
 : read-string ( prefix -- obj )
     ":" read-until CHAR: : assert= swap prefix
-    string>number read ascii decode ;
+    string>number read "" like ;
+
+PRIVATE>
 
 : read-bencode ( -- obj )
     read1 {
@@ -46,7 +50,10 @@ DEFER: read-bencode
         [ read-string ]
     } case ;
 
-PRIVATE>
+GENERIC: bencode> ( bencode -- obj )
 
-: bencode> ( bencode -- obj )
+M: byte-array bencode>
+    binary [ read-bencode ] with-byte-reader ;
+
+M: string bencode>
     [ read-bencode ] with-string-reader ;

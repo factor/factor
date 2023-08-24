@@ -1,9 +1,9 @@
 ! Copyright (C) 2005, 2010 Slava Pestov.
 ! Copyright (C) 2008 Eduardo Cavazos.
-! See http://factorcode.org/license.txt for BSD license.
-USING: accessors alien.c-types alien.syntax byte-arrays classes.struct
+! See https://factorcode.org/license.txt for BSD license.
+USING: accessors alien.c-types alien.syntax byte-arrays
 combinators.short-circuit combinators.smart generalizations kernel
-libc locals math sequences sequences.generalizations strings system
+libc math sequences sequences.generalizations strings system
 unix.ffi vocabs.loader ;
 IN: unix
 
@@ -68,12 +68,10 @@ M: unix open-file [ open ] unix-system-call ;
 
 : make-fifo ( path mode -- ) [ mkfifo ] unix-system-call drop ;
 
-: truncate-file ( path n -- ) [ truncate ] unix-system-call drop ;
-
 : touch ( filename -- ) f [ utime ] unix-system-call drop ;
 
 : change-file-times ( filename access modification -- )
-    utimbuf <struct>
+    utimbuf new
         swap >>modtime
         swap >>actime
         [ utime ] unix-system-call drop ;

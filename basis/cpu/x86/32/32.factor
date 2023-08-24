@@ -1,5 +1,5 @@
 ! Copyright (C) 2005, 2011 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors alien alien.c-types arrays classes.struct
 combinators compiler.cfg.builder.alien.boxing
 compiler.codegen.gc-maps compiler.codegen.labels
@@ -26,18 +26,18 @@ M: x86.32 rs-reg EDI ;
 M: x86.32 stack-reg ESP ;
 M: x86.32 frame-reg EBP ;
 
-M: x86.32 immediate-comparand? ( obj -- ? ) drop t ;
+M: x86.32 immediate-comparand? drop t ;
 
 M:: x86.32 %load-vector ( dst val rep -- )
     dst 0 [] rep copy-memory* val rc-absolute rel-binary-literal ;
 
-M: x86.32 %vm-field ( dst field -- )
+M: x86.32 %vm-field
     [ 0 [] MOV ] dip rc-absolute-cell rel-vm ;
 
-M: x86.32 %set-vm-field ( dst field -- )
+M: x86.32 %set-vm-field
     [ 0 [] swap MOV ] dip rc-absolute-cell rel-vm ;
 
-M: x86.32 %vm-field-ptr ( dst field -- )
+M: x86.32 %vm-field-ptr
     [ 0 MOV ] dip rc-absolute-cell rel-vm ;
 
 M: x86.32 %mark-card
@@ -61,7 +61,7 @@ M: x86.32 vm-stack-space 16 ;
 : save-vm-ptr ( n -- )
     stack@ 0 MOV 0 rc-absolute-cell rel-vm ;
 
-M: x86.32 return-struct-in-registers? ( c-type -- ? )
+M: x86.32 return-struct-in-registers?
     lookup-c-type
     [ return-in-registers?>> ]
     [ heap-size { 1 2 4 8 } member? ] bi
@@ -87,7 +87,7 @@ M: x86.32 return-regs
 M: x86.32 %prepare-jump
     pic-tail-reg 0 MOV xt-tail-pic-offset rc-absolute-cell rel-here ;
 
-M: x86.32 %load-stack-param ( dst rep n -- )
+M: x86.32 %load-stack-param
     next-stack@ swap pick register? [ %copy ] [
         {
             { int-rep [ [ EAX ] dip MOV ?spill-slot EAX MOV ] }
@@ -96,7 +96,7 @@ M: x86.32 %load-stack-param ( dst rep n -- )
         } case
     ] if ;
 
-M: x86.32 %store-stack-param ( src rep n -- )
+M: x86.32 %store-stack-param
     stack@ swap pick register? [ swapd %copy ] [
         {
             { int-rep [ [ [ EAX ] dip ?spill-slot MOV ] [ EAX MOV ] bi* ] }
@@ -115,7 +115,7 @@ M: x86.32 %store-stack-param ( src rep n -- )
         dst ?spill-slot x87-insn execute
     ] if ; inline
 
-M: x86.32 %load-reg-param ( vreg rep reg -- )
+M: x86.32 %load-reg-param
     swap {
         { int-rep [ int-rep %copy ] }
         { float-rep [ drop \ FSTPS float-rep load-float-return ] }
@@ -132,14 +132,14 @@ M: x86.32 %load-reg-param ( vreg rep reg -- )
         src ?spill-slot x87-insn execute
     ] if ; inline
 
-M: x86.32 %store-reg-param ( vreg rep reg -- )
+M: x86.32 %store-reg-param
     swap {
         { int-rep [ swap int-rep %copy ] }
         { float-rep [ drop \ FLDS float-rep store-float-return ] }
         { double-rep [ drop \ FLDL double-rep store-float-return ] }
     } case ;
 
-M: x86.32 %discard-reg-param ( rep reg -- )
+M: x86.32 %discard-reg-param
     drop {
         { int-rep [ ] }
         { float-rep [ ST0 FSTP ] }
@@ -179,12 +179,12 @@ M:: x86.32 %box-long-long ( dst src1 src2 func gc-map -- )
 M: x86.32 %c-invoke
     [ 0 CALL rc-relative rel-dlsym ] dip gc-map-here ;
 
-M: x86.32 %begin-callback ( -- )
+M: x86.32 %begin-callback
     0 save-vm-ptr
     4 stack@ 0 MOV
     "begin_callback" f f %c-invoke ;
 
-M: x86.32 %end-callback ( -- )
+M: x86.32 %end-callback
     0 save-vm-ptr
     "end_callback" f f %c-invoke ;
 
@@ -192,7 +192,7 @@ M: x86.32 %end-callback ( -- )
     ! MINGW ABI incompatibility disaster
     [ large-struct? ] [ mingw eq? os windows? not or ] bi* and ;
 
-M: x86.32 %prepare-var-args ( reg-inputs -- ) drop ;
+M: x86.32 %prepare-var-args drop ;
 
 M:: x86.32 stack-cleanup ( stack-size return abi -- n )
     ! a) Functions which are stdcall/fastcall/thiscall have to
@@ -205,7 +205,7 @@ M:: x86.32 stack-cleanup ( stack-size return abi -- n )
         [ 0 ]
     } cond ;
 
-M: x86.32 %cleanup ( n -- )
+M: x86.32 %cleanup
     [ ESP swap SUB ] unless-zero ;
 
 M: x86.32 %safepoint
@@ -224,7 +224,7 @@ M: x86.32 flatten-struct-type
 
 M: x86.32 struct-return-on-stack? os linux? not ;
 
-M: x86.32 (cpuid) ( eax ecx regs -- )
+M: x86.32 (cpuid)
     void { uint uint void* } cdecl [
         ! Save ds-reg, rs-reg
         EDI PUSH
