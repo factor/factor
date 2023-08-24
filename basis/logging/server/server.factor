@@ -70,9 +70,6 @@ CONSTANT: keep-logs 10
 : delete-oldest ( service -- )
     keep-logs log# ?delete-file ;
 
-: ?move-file ( old new -- )
-    over file-exists? [ move-file ] [ 2drop ] if ;
-
 : advance-log ( path n -- )
     [ 1 - log# ] 2keep log# ?move-file ;
 

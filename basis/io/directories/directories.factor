@@ -215,6 +215,9 @@ HOOK: delete-directory io-backend ( path -- )
 
 HOOK: move-file io-backend ( from to -- )
 
+: ?move-file ( from to -- )
+    over file-exists? [ move-file ] [ 2drop ] if ;
+
 HOOK: move-file-atomically io-backend ( from to -- )
 
 : move-file-into ( from to -- )
