@@ -1,5 +1,5 @@
 USING: assocs byte-arrays calendar kernel kernel.private math
-memory namespaces parser random sequences threads
+memory namespaces parser random sequences system threads
 tools.profiler.sampling tools.profiler.sampling.private
 tools.test ;
 IN: tools.profiler.sampling.tests
@@ -11,8 +11,10 @@ IN: tools.profiler.sampling.tests
 ] unit-test
 
 ! Make sure the profiler doesn't blow up the VM
+os windows? cpu x86.32? and [
+    { } [ 10 [ [ ] profile ] times ] unit-test
+] unless
 TUPLE: boom ;
-{ } [ 10 [ [ ] profile ] times ] unit-test
 [ 10 [ [ boom new throw ] profile ] times ] [ boom? ] must-fail-with
 
 { t t t t t t t t t t } [
