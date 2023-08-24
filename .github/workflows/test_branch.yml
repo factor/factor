@@ -1,5 +1,5 @@
 name: Test Branch
-run-name: Test branch ${{ github.ref }}, run by @${{ github.triggering_actor }}
+run-name: Test branch ${{ github.ref }}
 
 on: workflow_dispatch
 
