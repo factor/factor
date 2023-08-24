@@ -85,7 +85,12 @@ if "%_bootimage_type%"=="download" (
     echo Fetching %GIT_BRANCH% boot image...
     echo URL: %_bootimage_url%
     cscript /nologo misc\http-get.vbs %_bootimage_url% %_bootimage%
-    if errorlevel 1 goto fail
+    if errorlevel 1 (
+        echo boot image for branch %GIT_BRANCH% is not on server, trying master instead
+        set _bootimage_url=https://downloads.factorcode.org/images/master/%_bootimage%
+        cscript /nologo misc\http-get.vbs %_bootimage_url% %_bootimage%
+        if errorlevel 1 goto fail
+    )
 ) else if "%_bootimage_type%"=="make" (
     echo Making boot image...
     .\factor.com -run=bootstrap.image %_bootimage%
