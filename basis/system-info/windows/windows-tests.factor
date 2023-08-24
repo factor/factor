@@ -1,8 +1,5 @@
-USING: kernel math math.order strings system-info.windows
-tools.test system system-info ;
+USING: math strings tools.test system-info ;
 
 { t } [ cpus integer? ] unit-test
 
-cpu x86.32 = [
-    { t } [ username string? ] unit-test
-] unless
+{ t } [ username string? ] unit-test

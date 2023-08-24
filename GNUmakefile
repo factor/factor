@@ -1,5 +1,5 @@
 ifdef CONFIG
-	VERSION = 0.99
+	VERSION = 0.100
 	GIT_LABEL = $(shell echo `git describe --all`-`git rev-parse HEAD`)
 	BUNDLE = Factor.app
 	DEBUG ?= 0
