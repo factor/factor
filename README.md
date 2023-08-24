@@ -73,6 +73,12 @@ A tutorial is available that can be accessed from the Factor environment:
 "first-program" help
 ```
 
+Some demos that are included in the distribution to show off various features:
+
+```factor
+"demos" run
+```
+
 Some other simple things you can try in the listener:
 
 ```factor
