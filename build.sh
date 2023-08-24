@@ -566,8 +566,8 @@ set_boot_image_vars() {
     local url="https://downloads.factorcode.org/images/${CURRENT_BRANCH}/checksums.txt"
     $ECHO "Getting checksum from ${url}"
     check_url $url
-    $ECHO "got checksum!"
     if [[ $? -eq 0 ]]; then
+        $ECHO "got checksum!"
         CHECKSUM_URL="$url"
         BOOT_IMAGE_URL="https://downloads.factorcode.org/images/${CURRENT_BRANCH}/${BOOT_IMAGE}"
     else
