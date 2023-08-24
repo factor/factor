@@ -383,7 +383,7 @@ GENERIC: focusable-child* ( gadget -- child/t )
 
 M: gadget focusable-child* drop t ;
 
-M: f focusable-child* drop f ;
+M: f focusable-child* drop t ;
 
 : focusable-child ( gadget -- child )
     dup focusable-child*
