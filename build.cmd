@@ -1,6 +1,15 @@
 @echo off
 setlocal
 
+goto start
+
+:download
+rem branch url filename
+echo Fetching %1 boot image from %2
+cscript /nologo misc\http-get.vbs %2 %3
+exit /b
+
+:start
 : Check which branch we are on, or just assume master if we are not in a git repository
 for /f %%z in ('git rev-parse --abbrev-ref HEAD') do set GIT_BRANCH=%%z
 if not defined GIT_BRANCH (
@@ -44,6 +53,11 @@ if "%1"=="/?" (
     set _compile_vm=1
     set _bootimage_type=download
     set _bootstrap_factor=1
+) else if "%1"=="update-boot-image" (
+    set _git_pull=0
+    set _compile_vm=0
+    set _bootimage_type=download
+    set _bootstrap_factor=0
 ) else goto usage
 
 if not exist Nmakefile goto wrongdir
@@ -82,16 +96,12 @@ if "%_compile_vm%"=="1" (
 
 set _bootimage_url=https://downloads.factorcode.org/images/%GIT_BRANCH%/%_bootimage%
 if "%_bootimage_type%"=="download" (
-    echo Fetching %GIT_BRANCH% boot image...
-    echo URL: %_bootimage_url%
-    cscript /nologo misc\http-get.vbs %_bootimage_url% %_bootimage%
+    call :download %GIT_BRANCH% %_bootimage_url% %_bootimage%
     if errorlevel 1 (
         echo boot image for branch %GIT_BRANCH% is not on server, trying master instead
-        set _masterbootimage_url=https://downloads.factorcode.org/images/master/%_bootimage%
-        echo URL: %_masterbootimage_url%
-        cscript /nologo misc\http-get.vbs %_masterbootimage_url% %_bootimage%
-        if errorlevel 1 goto fail
+        call :download master https://downloads.factorcode.org/images/master/%_bootimage% %_bootimage%
     )
+    if errorlevel 1 goto fail
 ) else if "%_bootimage_type%"=="make" (
     echo Making boot image...
     .\factor.com -run=bootstrap.image %_bootimage%
@@ -136,4 +146,5 @@ echo     update - git pull, recompile vm, download a boot image, bootstrap
 echo     self-bootstrap - git pull, make a boot image, bootstrap
 echo     bootstrap - existing boot image, bootstrap
 echo     net-bootstrap - recompile vm, download a boot image, bootstrap
+echo     update-boot-image - get the boot image for the current branch
 goto :EOF
