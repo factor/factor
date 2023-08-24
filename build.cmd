@@ -87,10 +87,9 @@ if "%_bootimage_type%"=="download" (
     cscript /nologo misc\http-get.vbs %_bootimage_url% %_bootimage%
     if errorlevel 1 (
         echo boot image for branch %GIT_BRANCH% is not on server, trying master instead
-        set "_bootimage_url="
-        set "_bootimage_url=https://downloads.factorcode.org/images/master/%_bootimage%"
-        echo URL: %_bootimage_url%
-        cscript /nologo misc\http-get.vbs %_bootimage_url% %_bootimage%
+        set _masterbootimage_url=https://downloads.factorcode.org/images/master/%_bootimage%
+        echo URL: %_masterbootimage_url%
+        cscript /nologo misc\http-get.vbs %_masterbootimage_url% %_bootimage%
         if errorlevel 1 goto fail
     )
 ) else if "%_bootimage_type%"=="make" (
