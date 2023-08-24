@@ -127,10 +127,10 @@ DLL_OBJS = $(PLAF_DLL_OBJS) \
 	vm\zstd.obj
 
 # batch mode has ::
-.cpp.obj::
+.c.obj::
 	cl /EHsc $(CL_FLAGS) /MP /Fovm/ /c $<
 
-.c.obj::
+.cpp.obj::
 	cl /EHsc $(CL_FLAGS) /MP /Fovm/ /c $<
 
 .asm.obj:
