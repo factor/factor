@@ -22,15 +22,3 @@ LINKER = $(CXX) $(TARGET) $(CFLAGS) $(CXXFLAGS) $(SHARED_FLAG) -single_module \
 
 LINK_WITH_ENGINE = -lfactor
 
-LEOPARD_P := $(shell [[ `uname -r | sed -E -e 's/^([0-9]+).*/\1/'` -le 9 ]]; echo $$?)
-XCODE_4_P := $(shell [[ `xcodebuild -version | sed -E -ne 's/^Xcode ([0-9]+).([0-9]).*/\1\2/p'` -ge 43 ]]; echo $$?)
-
-ifeq ($(LEOPARD_P),0)
-	CC ?= gcc-4.2
-	CXX ?= g++-4.2
-endif
-
-ifeq ($(XCODE_4_P),0)
-	CC ?= clang
-	CXX ?= clang++
-endif
