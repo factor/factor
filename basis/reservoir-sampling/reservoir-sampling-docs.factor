@@ -9,18 +9,25 @@ HELP: <reservoir-sampler>
 
 HELP: reservoir-sample
 { $values obj: object sampler: object }
-{ $description Feeds a sample to a \ reservoir-sampler which will maintain a vector of samples with equal probability. This word is especially useful when you do not know how many objects will appear but wish to sample them with equal probability, such as in a stream with unknown length. }
-{ $unchecked-example
-    [=[ 
-        USING: prettyprint io strings math reservoir-sampling
-        kernel accessors io.streams.string ;
-        
-        "Nothing will fundamentally change." [
-            10 <reservoir-sampler>
-            [ [ read1 dup ] swap '[ dup 1string . _ reservoir-sample ] while ] keep nip sampled>> >string .
-        ] with-string-reader
-        ""
-    ]=]
+{ $description
+    Feeds a sample to a \ reservoir-sampler which will maintain a vector of samples
+    with equal probability. This word is especially useful when you do not know how
+    many objects will appear but wish to sample them with equal probability, such
+    as in a stream with unknown length.
+
+    An example where characters from a string are sampled:
+    { $code
+        [=[
+            USING: prettyprint io strings math reservoir-sampling
+            kernel accessors io.streams.string ;
+
+            "Nothing will fundamentally change." [
+                10 <reservoir-sampler> [
+                    [ read1 ] swap '[ dup 1string . _ reservoir-sample ] while*
+                ] keep sampled>> >string .
+            ] with-string-reader
+        ]=]
+    }
 } ;
 
 HELP: reservoir-sample-iteration
