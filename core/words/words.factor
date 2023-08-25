@@ -199,6 +199,8 @@ M: word reset-word
 : <word> ( name vocab -- word )
     over hashcode over hashcode hash-combine >fixnum (word) dup new-word ;
 
+PREDICATE: uninterned-word < word vocabulary>> not ;
+
 : <uninterned-word> ( name -- word )
     f \ <uninterned-word> counter >fixnum (word)
     new-words get [ dup new-word ] when ;
