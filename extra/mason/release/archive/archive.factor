@@ -39,7 +39,7 @@ IN: mason.release.archive
     "dmg-root" delete-tree ;
 
 :: make-unix-archive ( archive-name -- )
-    { "tar" "-cvzf" archive-name "factor" } short-running-process ;
+    { "tar" "-cvz" "--no-xattrs" "-f" archive-name "factor" } short-running-process ;
 
 : make-archive ( archive-name -- )
     target-os get {
