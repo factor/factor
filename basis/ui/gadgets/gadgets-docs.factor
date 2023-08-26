@@ -171,8 +171,8 @@ HELP: find-parent
 { $description "Outputs the first parent of the gadget, starting from the gadget itself, for which the quotation outputs a true value, or " { $link f } " if the quotation outputs " { $link f } " for every parent." } ;
 
 HELP: focusable-child*
-{ $values { "gadget" gadget } { "child/t" "a " { $link gadget } " or " { $link t } } }
-{ $description "Outputs the child of the gadget which would prefer to receive keyboard focus, or " { $link t } " if the gadget itself should receive focus." }
+{ $values { "gadget" gadget } { "child/f" { $maybe gadget } } }
+{ $description "Outputs the child of the gadget which would prefer to receive keyboard focus, or " { $link f } " if the gadget itself should receive focus." }
 { $examples "For example, if your gadget consists of an editor together with an output area whose contents react to changes in editor contents, then the " { $link focusable-child* } " method for your gadget class should return the editor, so that when the gadget is displayed in a window or passed to " { $link request-focus } ", the editor receives keyboard focus automatically." } ;
 
 HELP: focusable-child

@@ -156,7 +156,7 @@ M: world layout*
     [ call-next-method ]
     [ dup layers>> [ as-big-as-possible ] with each ] bi ;
 
-M: world focusable-child* children>> [ t ] [ first ] if-empty ;
+M: world focusable-child* children>> ?first ;
 
 M: world children-on nip children>> ;
 

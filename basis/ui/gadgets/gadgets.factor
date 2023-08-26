@@ -379,15 +379,12 @@ PRIVATE>
         [ parent>> child? ]
     } cond ;
 
-GENERIC: focusable-child* ( gadget -- child/t )
+GENERIC: focusable-child* ( gadget -- child/f )
 
-M: gadget focusable-child* drop t ;
-
-M: f focusable-child* drop t ;
+M: object focusable-child* drop f ;
 
 : focusable-child ( gadget -- child )
-    dup focusable-child*
-    dup t eq? [ drop ] [ nip focusable-child ] if ;
+    dup focusable-child* [ nip focusable-child ] when* ;
 
 GENERIC: request-focus-on ( child gadget -- )
 
