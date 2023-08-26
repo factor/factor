@@ -123,6 +123,14 @@ IN: codebase-analyzer
     >lower file-stem "readme" = ;
 : readme-files ( paths -- paths' ) [ readme-file? ] filter ;
 
+: owners-file? ( path -- ? )
+    >lower file-stem "owners" = ;
+: owners-files ( paths -- paths' ) [ owners-file? ] filter ;
+
+: version-file? ( path -- ? )
+    >lower file-stem "version" = ;
+: version-files ( paths -- paths' ) [ version-file? ] filter ;
+
 : json-file? ( path -- ? )
     >lower file-extension
     { "json" "jsonc" } member? ;
@@ -217,6 +225,8 @@ IN: codebase-analyzer
         [ github-files [ "has .github files" print ... ] unless-empty ]
         [ license-files [ [ length "has %d license files" sprintf print ] [ ... ] bi ] unless-empty ]
         [ readme-files [ "has readme files" print ... ] unless-empty ]
+        [ owners-files [ "has owners files" print ... ] unless-empty ]
+        [ version-files [ "has version files" print ... ] unless-empty ]
         [
             { [ dot-files ] [ rc-files diff ] [ ignore-files diff ] } cleave
             [ "has dot files" print ... ] unless-empty
@@ -233,8 +243,14 @@ IN: codebase-analyzer
         [ in-files [ "uses 'in' files" print ... ] unless-empty ]
         [ ignore-files [ [ length "has %d ignore files" sprintf print ] [ ... ] bi ] unless-empty nl ]
         [
-            [ upper-files ] [ license-files diff ] [ readme-files diff ] tri
-            [ [ length "has %d UPPER files (minus license,readme files)" sprintf print ] [ ... ] bi ] unless-empty nl
+            [ upper-files ] keep
+            {
+                [ license-files diff ]
+                [ readme-files diff ]
+                [ owners-files diff ]
+                [ version-files diff ]
+            } cleave
+            [ [ length "has %d UPPER files (minus license,readme,owner,version)" sprintf print ] [ ... ] bi ] unless-empty nl
         ]
         [ "Top 20 largest files" print file-sizes sort-values 20 index-or-length tail* [ normalize-path ] map-keys reverse assoc. nl ]
         [ "Top 10 file extension sizes" print sum-sizes-by-extension 10 index-or-length tail* reverse assoc. nl ]
