@@ -62,8 +62,6 @@ M: list draw-gadget*
         ] when*
     ] with-translation ;
 
-M: list focusable-child* drop t ;
-
 : list-value ( list -- object )
     dup index>> swap control-value ?nth ;
 
