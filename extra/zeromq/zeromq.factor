@@ -6,10 +6,10 @@ memoize sequences zeromq.ffi ;
 
 IN: zeromq
 
-TUPLE: zmq-error n string ;
+ERROR: zmq-error n string ;
 
 : throw-zmq-error ( -- )
-    zmq_errno dup zmq_strerror zmq-error boa throw ; inline
+    zmq_errno dup zmq_strerror zmq-error ; inline
 
 : check-zmq-error ( retval -- )
     [ throw-zmq-error ] unless-zero ; inline
