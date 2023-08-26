@@ -6,7 +6,7 @@ IN: mason.docs
 
 : make-docs-archive ( -- )
     [
-        { "tar" "cfz" }
+        { "tar" "-cz" "--no-xattrs" "-f" }
         "docs.tar.gz" temp-file suffix
         "docs" suffix
         short-running-process
