@@ -1,13 +1,13 @@
 ! Copyright (C) 2005, 2010 Slava Pestov.
 ! See https://factorcode.org/license.txt for BSD license.
-USING: accessors arrays assocs combinators.short-circuit
-combinators.smart compiler.units generic generic.single
-hash-sets.identity hashtables help help.crossref help.markup
-help.topics init io io.pathnames io.styles kernel namespaces
-quotations see sequences sets sorting source-files threads
-vocabs words ;
+USING: accessors arrays assocs bit-arrays byte-arrays
+byte-vectors combinators.short-circuit combinators.smart
+compiler.units generic generic.single hash-sets.identity
+hashtables help help.crossref help.markup help.topics init io
+io.pathnames io.styles kernel lists math.bits namespaces
+quotations ranges sbufs see sequences sets sorting source-files
+specialized-arrays strings threads vocabs words ;
 IN: tools.crossref
-
 SYMBOL: crossref
 
 GENERIC: uses ( defspec -- seq )
@@ -18,6 +18,18 @@ SYMBOL: visited
 
 GENERIC#: quot-uses 1 ( obj set -- )
 
+UNION: ingored-sequences
+    iota
+    range
+    bits
+    byte-array
+    byte-vector
+    sbuf
+    string
+    specialized-array
+    bit-array ;
+
+M: ingored-sequences quot-uses 2drop ;
 M: object quot-uses 2drop ;
 
 M: word quot-uses over crossref? [ adjoin ] [ 2drop ] if ;
@@ -32,13 +44,22 @@ M: word quot-uses over crossref? [ adjoin ] [ 2drop ] if ;
         [ quot-uses ] curry [ bi@ ] curry assoc-each
     ] [ 2drop ] if ; inline
 
-M: array quot-uses seq-uses ;
+: list-uses ( list set -- )
+    over visited get ?adjoin [
+        [ quot-uses ] curry leach
+    ] [ 2drop ] if ; inline
 
-M: hashtable quot-uses assoc-uses ;
+M: sequence quot-uses seq-uses ;
+
+M: assoc quot-uses assoc-uses ;
+
+M: list quot-uses list-uses ;
 
 M: callable quot-uses seq-uses ;
 
 M: wrapper quot-uses [ wrapped>> ] dip quot-uses ;
+
+M: uninterned-word quot-uses [ def>> ] dip quot-uses ;
 
 M: callable uses
     IHS{ } clone visited [
@@ -57,6 +78,7 @@ M: pathname uses
 
 ! To make UI browser happy
 M: object uses drop f ;
+M: ingored-sequences uses drop f ;
 
 : crossref-def ( defspec -- )
     dup uses [ crossref get-global adjoin-at ] with each ;
