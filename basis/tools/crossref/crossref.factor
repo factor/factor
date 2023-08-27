@@ -18,7 +18,7 @@ SYMBOL: visited
 
 GENERIC#: quot-uses 1 ( obj set -- )
 
-UNION: ingored-sequences
+UNION: ignored-sequences
     iota
     range
     bits
@@ -29,7 +29,7 @@ UNION: ingored-sequences
     specialized-array
     bit-array ;
 
-M: ingored-sequences quot-uses 2drop ;
+M: ignored-sequences quot-uses 2drop ;
 M: object quot-uses 2drop ;
 
 M: word quot-uses over crossref? [ adjoin ] [ 2drop ] if ;
@@ -78,7 +78,7 @@ M: pathname uses
 
 ! To make UI browser happy
 M: object uses drop f ;
-M: ingored-sequences uses drop f ;
+M: ignored-sequences uses drop f ;
 
 : crossref-def ( defspec -- )
     dup uses [ crossref get-global adjoin-at ] with each ;
