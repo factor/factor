@@ -1,0 +1,232 @@
+<?xml version="1.0"?>
+<!DOCTYPE MODE SYSTEM "xmode.dtd"><!--
+
+  Markdown mode for jEdit by Peter Lynch (http://peterlynch.ca)
+  Original inspiration drawn from Ali Rantakari's jEdit mode at http://hasseg.org
+  Markdown home: http://daringfireball.net/projects/markdown/
+
+  Suggested Habits and limitations for using this syntax
+  * first rule - avoid being 'lazy' as defined in the spec. This means not indenting lines 2 - n in unordered lists and
+    similar laziness. Not being lazy gives you better syntax highlighting.
+  * prefix all blockquote lines with 'greater than' char, avoid being lazy, since jedit mode regexp
+    can't cross lines
+  * try to keep code blocks 4 spaces single tab deep only
+  * add an extra space for inline links or image links that are in a paragraph and happen to wrap to
+    start on the beginning of a line. A leading space should turn coloring on for those links
+  * brackets '[' or ']' appearing in paragraphs that are not part of a link definition should have the leding bracket escaped
+    to prevent this mode thinking you are starting a link reference
+  * block level html in a blockquote will still be parsed for markdown syntax, even though the spec says
+    markdown is not parsed for in block level html
+  * determining the difference between a code block and list paragraph indented 4 spaces(or tab) is impossible
+    so to help identify code blocks any paragraph indented four spaces is treated as such
+  * tabs are assumed to be taken as four spaces.
+  * link label definitions should start at the beginning of a line and NOT up to 3 spaces leading as allowed by the spec
+
+-->
+<MODE>
+  <PROPS>
+    <PROPERTY NAME="tabSize" VALUE="4" />
+    <PROPERTY NAME="indentSize" VALUE="4" />
+    <PROPERTY NAME="maxLineLen" VALUE="120" />
+    <PROPERTY NAME="commentStart" VALUE="&lt;!--" />
+    <PROPERTY NAME="commentEnd" VALUE="--&gt;" />
+  </PROPS>
+
+  <!-- ================ MAIN ================================= -->
+  <RULES IGNORE_CASE="TRUE">
+
+    <!-- HANDLE BLOCK LEVEL HTML ELEMENTS -->
+    <!-- SGML comment -->
+    <SPAN TYPE="COMMENT1">
+      <BEGIN>&lt;!--</BEGIN>
+      <END>--&gt;</END>
+    </SPAN>
+    <!-- JavaScript -->
+    <SPAN AT_LINE_START="TRUE" TYPE="MARKUP" DELEGATE="html::JAVASCRIPT">
+      <BEGIN>&lt;script</BEGIN>
+      <END>&lt;/script&gt;</END>
+    </SPAN>
+    <!-- special hr case -->
+    <SEQ_REGEXP AT_LINE_START="TRUE" TYPE="MARKUP">&lt;hr\b([^&lt;&gt;])*?/?&gt;</SEQ_REGEXP>
+    <!-- block level html must be at the start of a line we isolate this because block
+    level html should not be parsed for markdown syntax -->
+    <SPAN_REGEXP HASH_CHAR="&lt;" AT_LINE_START="TRUE" TYPE="MARKUP" DELEGATE="BLOCK_HTML_TAGS">
+      <BEGIN>&lt;(p|div|h[1-6]|blockquote|pre|table|dl|ol|ul|noscript|form|fieldset|iframe|math|ins|del)\b</BEGIN>
+      <END>&lt;/$1&gt;</END>
+    </SPAN_REGEXP>
+    <!-- ignore dangling less thans to allow for things like 4 < 5 -->
+    <SEQ TYPE="NULL"> &lt; </SEQ>
+    <!-- HANDLE OTHER INLINE HTML ELEMENTS -->
+    <SPAN TYPE="MARKUP" DELEGATE="INLINE_MARKUP">
+      <BEGIN>&lt;</BEGIN>
+      <END>&gt;</END>
+    </SPAN>
+    <!-- THE REST IS MARKDOWN -->
+    <IMPORT DELEGATE="MARKDOWN" />
+  </RULES>
+
+  <!-- ================ INLINE HTML ================================= -->
+  <RULES SET="INLINE_MARKUP" DEFAULT="MARKUP">
+    <IMPORT DELEGATE="html::TAGS" />
+  </RULES>
+
+  <!-- ================ BLOCK LEVEL HTML ================================= -->
+  <RULES SET="BLOCK_HTML_TAGS" DEFAULT="MARKUP">
+    <!-- any line indented less than 4 spaces is not valid markdown in block html -->
+    <EOL_SPAN_REGEXP AT_LINE_START="TRUE" TYPE="INVALID">[\S]+</EOL_SPAN_REGEXP>
+    <EOL_SPAN_REGEXP AT_LINE_START="TRUE" TYPE="INVALID"> {1,3}[\S]+</EOL_SPAN_REGEXP>
+    <EOL_SPAN_REGEXP AT_LINE_START="TRUE" DELEGATE="html::MAIN">( {4}|\t)</EOL_SPAN_REGEXP>
+    <SPAN TYPE="LITERAL1">
+      <BEGIN>"</BEGIN>
+      <END>"</END>
+    </SPAN>
+    <SPAN TYPE="LITERAL1">
+      <BEGIN>'</BEGIN>
+      <END>'</END>
+    </SPAN>
+    <SEQ TYPE="OPERATOR">=</SEQ>
+  </RULES>
+
+  <!-- ================ MARKDOWN ================================= -->
+  <RULES SET="MARKDOWN" IGNORE_CASE="FALSE">
+    <!-- blockquotes, also handles nested blockquote chars &#09; is tab -->
+    <EOL_SPAN_REGEXP HASH_CHARS=" &gt;" AT_LINE_START="TRUE" MATCH_TYPE="LITERAL3" DELEGATE="MARKDOWN_BLOCKQUOTE">[ \t]*(&gt;[ \t]{1})+</EOL_SPAN_REGEXP>
+    <!-- literal characters (i.e. cases where they won't specify formatting)  -->
+    <SEQ TYPE="NULL"> * </SEQ>
+    <SEQ TYPE="NULL"> _ </SEQ>
+    <SEQ TYPE="NULL">\][</SEQ>
+    <SEQ_REGEXP TYPE="NULL" HASH_CHAR="\">\\[\Q*_\`[](){}#+.!-\E]</SEQ_REGEXP>
+		<!-- GitHub-flavored code blocks -->
+		<SPAN TYPE="LITERAL2" AT_LINE_START="TRUE" DELEGATE="ruby::MAIN">
+		  <BEGIN>``` ruby</BEGIN>
+		  <END>```</END>
+		</SPAN>
+		<SPAN TYPE="LITERAL2" AT_LINE_START="TRUE">
+		  <BEGIN>```</BEGIN>
+		  <END>```</END>
+		</SPAN>
+    <!-- inline code: `NSString* str = @"hi!";` using backticks-->
+    <SPAN_REGEXP TYPE="LITERAL2" HASH_CHARS="`">
+      <BEGIN>(`{1,2})</BEGIN>
+      <END>$1</END>
+    </SPAN_REGEXP>
+    <!-- telling difference between code blocks and list paragraphs is impossible until regexp cross line boundaries -->
+    <EOL_SPAN_REGEXP TYPE="LITERAL2" AT_LINE_START="TRUE" HASH_CHARS=" &#09;">( {4,}|\t+)\S</EOL_SPAN_REGEXP>
+    <!-- <EOL_SPAN_REGEXP TYPE="LITERAL2" AT_LINE_START="TRUE" HASH_CHARS=" &#09;">( {4,}|\t+){2,}</EOL_SPAN_REGEXP> -->
+    <!-- headers (setext-style:) -->
+    <EOL_SPAN_REGEXP TYPE="KEYWORD1" AT_LINE_START="TRUE" HASH_CHARS="=-">[=-]+</EOL_SPAN_REGEXP>
+    <!-- headers (atx-style:) -->
+    <EOL_SPAN_REGEXP TYPE="KEYWORD1" AT_LINE_START="TRUE" HASH_CHAR="#">#{1,6}[ \t]*(.+?)</EOL_SPAN_REGEXP>
+    <!-- horizontal rules -->
+    <EOL_SPAN_REGEXP TYPE="KEYWORD1" HASH_CHARS="-*_ &#09;" AT_LINE_START="TRUE">[ ]{0,2}([ ]?[-_*][ ]?){3,}[ \t]*</EOL_SPAN_REGEXP>
+    <!-- lists (unordered) -->
+    <!-- <SEQ_REGEXP TYPE="KEYWORD2" AT_LINE_START="TRUE" HASH_CHARS="*+- &#09;">[ \t]{0,3}[*+-][ \t]+</SEQ_REGEXP> -->
+    <SEQ_REGEXP TYPE="KEYWORD2" AT_LINE_START="TRUE" HASH_CHARS="+-* &#09;">[ \t]{0,}[*+-][ \t]+</SEQ_REGEXP>
+    <!-- lists (ordered) -->
+    <SEQ_REGEXP TYPE="KEYWORD2" AT_LINE_START="TRUE" HASH_CHARS="0123456789 &#09;">[ \t]{0,}\d+\.[ \t]+</SEQ_REGEXP>
+    <!-- Link Label definitions all on one line -->
+    <EOL_SPAN_REGEXP TYPE="LABEL" AT_WHITESPACE_END="TRUE" DELEGATE="LINK_LABEL_DEFINITION">\[(.*?)\]\:</EOL_SPAN_REGEXP>
+    <!-- Inline images and page links and pointers ![alt text](/path/to/img.jpg "Title for this") -->
+    <SPAN_REGEXP TYPE="KEYWORD4" MATCH_TYPE="OPERATOR" NO_LINE_BREAK="TRUE" AT_LINE_START="FALSE" HASH_CHARS=" ![" DELEGATE="LINK_INLINE_URL_TITLE">
+      <BEGIN> !?\[[\p{Alnum}\p{Blank}]*</BEGIN>
+      <END>\]</END>
+    </SPAN_REGEXP>
+    <!-- emphasis (strong) -->
+    <SPAN_REGEXP TYPE="LITERAL3" HASH_CHARS="*_" AT_WORD_START="TRUE" NO_LINE_BREAK="TRUE">
+      <BEGIN>(\*\*|__)</BEGIN>
+      <END>$1</END>
+    </SPAN_REGEXP>
+    <!-- emphasis (em) -->
+    <SPAN_REGEXP TYPE="LITERAL4" HASH_CHARS="*_" AT_WORD_START="TRUE" NO_LINE_BREAK="TRUE">
+      <BEGIN>(\*|_)</BEGIN>
+      <END>$1</END>
+    </SPAN_REGEXP>
+  </RULES>
+
+  <!-- ================ LINK PROCESSING ================================= -->
+  <RULES DEFAULT="KEYWORD3" SET="LINK_LABEL_DEFINITION">
+    <SEQ_REGEXP TYPE="NULL" HASH_CHAR="\">\\[\Q*_\`[](){}#+.!-\E]</SEQ_REGEXP>
+    <SEQ TYPE="OPERATOR">"</SEQ>
+    <SEQ TYPE="OPERATOR">(</SEQ>
+    <SEQ TYPE="OPERATOR">)</SEQ>
+    <IMPORT DELEGATE="MARKDOWN" />
+  </RULES>
+  <RULES SET="LINK_INLINE_URL_TITLE">
+    <!-- the closing bracket of the link text-->
+    <SEQ TYPE="OPERATOR">]</SEQ>
+    <!-- span containing the link label pointer to the definition -->
+    <SPAN_REGEXP TYPE="KEYWORD4" MATCH_TYPE="OPERATOR" NO_LINE_BREAK="TRUE" AT_LINE_START="FALSE" HASH_CHAR="[" DELEGATE="LINK_INLINE_LABEL_CLOSE">
+      <BEGIN>\[</BEGIN>
+      <END>\]</END>
+    </SPAN_REGEXP>
+    <!-- span containing the url and optional title -->
+    <SPAN_REGEXP TYPE="KEYWORD4" MATCH_TYPE="OPERATOR" NO_LINE_BREAK="TRUE" AT_LINE_START="FALSE" HASH_CHAR="(" DELEGATE="LINK_INLINE_URL_TITLE_CLOSE">
+      <BEGIN>\(</BEGIN>
+      <END>\)</END>
+    </SPAN_REGEXP>
+  </RULES>
+  <RULES DEFAULT="KEYWORD3" SET="LINK_INLINE_URL_TITLE_CLOSE">
+    <!-- the closing paren and loop back to MAIN -->
+    <EOL_SPAN TYPE="NULL" MATCH_TYPE="OPERATOR" DELEGATE="MAIN">)</EOL_SPAN>
+  </RULES>
+  <RULES DEFAULT="LABEL" SET="LINK_INLINE_LABEL_CLOSE">
+    <!-- the closing bracket and loop back to MAIN -->
+    <EOL_SPAN TYPE="NULL" MATCH_TYPE="OPERATOR" DELEGATE="MAIN">]</EOL_SPAN>
+  </RULES>
+
+  <!-- ================ MARKDOWN EMBEDDED IN A BLOCKQUOTE  ================================= -->
+   <!--
+    repetitive: these are the same markdown rules but no AT_LINE_START=TRUE because they are
+    part of a blockquote match which already matched at line start didn't see a better way at
+    the time
+    -->
+  <RULES SET="MARKDOWN_BLOCKQUOTE" IGNORE_CASE="FALSE">
+    <!-- ignore dangling less thans to allow for things like 4 < 5 -->
+    <SEQ TYPE="NULL"> &lt; </SEQ>
+    <!-- HANDLE OTHER INLINE HTML ELEMENTS -->
+    <SPAN TYPE="MARKUP" DELEGATE="INLINE_MARKUP">
+      <BEGIN>&lt;</BEGIN>
+      <END>&gt;</END>
+    </SPAN>
+    <!-- literal characters (i.e. cases where they won't specify formatting)  -->
+    <SEQ TYPE="NULL"> * </SEQ>
+    <SEQ TYPE="NULL"> _ </SEQ>
+    <SEQ TYPE="NULL">\][</SEQ>
+    <SEQ_REGEXP TYPE="NULL" HASH_CHAR="\">\\[\Q*_\`[](){}#+.!-\E]</SEQ_REGEXP>
+    <!-- inline code: `NSString* str = @"hi!";` using backticks-->
+    <SPAN_REGEXP TYPE="LITERAL2" HASH_CHARS="`">
+      <BEGIN>(`{1,2})</BEGIN>
+      <END>$1</END>
+    </SPAN_REGEXP>
+    <!-- telling difference between code blocks and list paragraphs is impossible until regexp cross line boundaries -->
+    <EOL_SPAN_REGEXP TYPE="LITERAL2" HASH_CHARS=" &#09;">( {4,}|\t+)\S</EOL_SPAN_REGEXP>
+    <!-- <EOL_SPAN_REGEXP TYPE="LITERAL2" AT_LINE_START="TRUE" HASH_CHARS=" &#09;">( {4,}|\t+){2,}</EOL_SPAN_REGEXP> -->
+    <!-- headers (setext-style:) -->
+    <EOL_SPAN_REGEXP TYPE="KEYWORD1" HASH_CHARS="=-">[=-]+</EOL_SPAN_REGEXP>
+    <!-- headers (atx-style:) -->
+    <EOL_SPAN_REGEXP TYPE="KEYWORD1" HASH_CHAR="#">#{1,6}[ \t]*(.+?)</EOL_SPAN_REGEXP>
+    <!-- horizontal rules -->
+    <EOL_SPAN_REGEXP TYPE="KEYWORD1" HASH_CHARS="-*_ &#09;">[ ]{0,2}([ ]?[-_*][ ]?){3,}[ \t]*</EOL_SPAN_REGEXP>
+    <!-- lists (unordered) -->
+    <SEQ_REGEXP TYPE="KEYWORD2" HASH_CHARS="*+- &#09;">[ \t]{0,}[*+-][ \t]+</SEQ_REGEXP>
+    <!-- lists (ordered) -->
+    <SEQ_REGEXP TYPE="KEYWORD2" HASH_CHARS="0123456789 &#09;">[ \t]{0,}\d+\.[ \t]+</SEQ_REGEXP>
+    <!-- Link Label definitions all on one line -->
+    <EOL_SPAN_REGEXP TYPE="LABEL" DELEGATE="LINK_LABEL_DEFINITION">\[(.*?)\]\:</EOL_SPAN_REGEXP>
+    <!-- Inline images and page links and pointers ![alt text](/path/to/img.jpg "Title for this") -->
+    <SPAN_REGEXP TYPE="KEYWORD4" MATCH_TYPE="OPERATOR" NO_LINE_BREAK="TRUE" AT_LINE_START="FALSE" HASH_CHARS=" ![" DELEGATE="LINK_INLINE_URL_TITLE">
+      <BEGIN> !?\[[\p{Alnum}\p{Blank}]*</BEGIN>
+      <END>\]</END>
+    </SPAN_REGEXP>
+    <!-- emphasis (strong) -->
+    <SPAN_REGEXP TYPE="LITERAL3" HASH_CHARS="*_">
+      <BEGIN>(\*\*|__)</BEGIN>
+      <END>$1</END>
+    </SPAN_REGEXP>
+    <!-- emphasis (em) -->
+    <SPAN_REGEXP TYPE="LITERAL4" HASH_CHARS="*_">
+      <BEGIN>(\*|_)</BEGIN>
+      <END>$1</END>
+    </SPAN_REGEXP>
+  </RULES>
+</MODE>

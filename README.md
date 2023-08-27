@@ -30,7 +30,7 @@ a boot image stored on factorcode.org.
 
 To check out Factor:
 
-* `git clone git://github.com/factor/factor.git`
+* git clone https://github.com/factor/factor.git
 * `cd factor`
 
 To build the latest complete Factor system from git, either use the
@@ -50,7 +50,7 @@ directory and run:
 Now you should have a complete Factor system ready to run.
 
 Factor does not yet work on arm64 cpus. There is an arm64 assembler
-in `cpu.arm.assembler` and we are working on a port and also looking for
+in `cpu.arm.64.assembler` and we are working on a port and also looking for
 contributors.
 
 More information on [building factor](https://concatenative.org/wiki/view/Factor/Building%20Factor)
@@ -71,6 +71,12 @@ A tutorial is available that can be accessed from the Factor environment:
 
 ```factor
 "first-program" help
+```
+
+Some demos that are included in the distribution to show off various features:
+
+```factor
+"demos" run
 ```
 
 Some other simple things you can try in the listener:
@@ -156,15 +162,12 @@ Then subsequent fetches will automatically update any replace objects.
 
 ## Community
 
-Factor developers used to meet in the `#concatenative` channel on
-[irc.freenode.net](http://freenode.net). Drop by if you want to discuss
-anything related to Factor or language design in general.
+Factor developers are quite active in [the Factor Discord server](https://discord.gg/QxJYZx3QDf).
+Drop by if you want to discuss anything related to Factor or language design in general.
 
 * [Factor homepage](https://factorcode.org)
 * [Concatenative languages wiki](https://concatenative.org)
 * [Join the mailing list](https://concatenative.org/wiki/view/Factor/Mailing%20list)
 * Search for "factorcode" on [Gitter](https://gitter.im/)
-* Search for "Factor" on [Discord](https://discord.com/)
-* [Join the Slack group](https://factorcode.slack.com/)
 
 Have fun!

@@ -1,5 +1,5 @@
 ! Copyright (C) 2010 Philipp Brüschweiler.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: combinators continuations curses io io.encodings.string
 io.encodings.utf8 io.streams.plain kernel listener make math
 namespaces sequences ;

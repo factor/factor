@@ -1,5 +1,5 @@
 ! Copyright (C) 2005, 2010 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors alien arrays assocs byte-arrays classes.algebra
 classes.struct combinators compiler compiler.cfg
 compiler.cfg.comparisons compiler.cfg.instructions
@@ -400,7 +400,7 @@ M: x86 %convert-integer
     [ [ drop 1array ] [ [+] ] 2bi ] 2dip ;
 
 : (%load-memory) ( dst exclude address rep c-type -- )
-    [
+    or* [
         {
             { c:char   [ 8 %alien-signed-getter ] }
             { c:uchar  [ 8 %alien-unsigned-getter ] }
@@ -409,7 +409,7 @@ M: x86 %convert-integer
             { c:int    [ 32 %alien-signed-getter ] }
             { c:uint   [ 32 [ 2drop ] %alien-integer-getter ] }
         } case
-    ] [ nipd %copy ] ?if ;
+    ] [ nipd %copy ] if ;
 
 M: x86 %load-memory
     (%memory) (%load-memory) ;
@@ -418,7 +418,7 @@ M: x86 %load-memory-imm
     (%memory-imm) (%load-memory) ;
 
 : (%store-memory) ( src exclude address rep c-type -- )
-    [
+    or* [
         {
             { c:char   [ 8 %alien-integer-setter ] }
             { c:uchar  [ 8 %alien-integer-setter ] }
@@ -427,7 +427,7 @@ M: x86 %load-memory-imm
             { c:int    [ 32 %alien-integer-setter ] }
             { c:uint   [ 32 %alien-integer-setter ] }
         } case
-    ] [ [ nip swap ] dip %copy ] ?if ;
+    ] [ [ nip swap ] dip %copy ] if ;
 
 M: x86 %store-memory
     (%memory) (%store-memory) ;

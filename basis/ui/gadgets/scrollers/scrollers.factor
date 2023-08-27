@@ -1,5 +1,5 @@
 ! Copyright (C) 2005, 2009 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors arrays combinators combinators.short-circuit
 kernel math.rectangles math.vectors models models.product
 models.range namespaces sequences ui.gadgets ui.gadgets.frames

@@ -1,0 +1,97 @@
+<?xml version="1.0"?>
+<!-- http://avro.apache.org/ -->
+<!DOCTYPE MODE SYSTEM "xmode.dtd">
+<MODE>
+	<PROPS>
+		<PROPERTY NAME="commentStart" VALUE="/*" />
+		<PROPERTY NAME="commentEnd" VALUE="*/" />
+		<PROPERTY NAME="lineComment" VALUE="//" />
+		<PROPERTY NAME="wordBreakChars" VALUE=",=;*" />
+
+		<!-- Auto indent -->
+		<PROPERTY NAME="indentOpenBrackets" VALUE="{" />
+		<PROPERTY NAME="indentCloseBrackets" VALUE="}" />
+		<PROPERTY NAME="unalignedOpenBrackets" VALUE="(" />
+		<PROPERTY NAME="unalignedCloseBrackets" VALUE=")" />
+	</PROPS>
+
+	<RULES IGNORE_CASE="FALSE"
+	       HIGHLIGHT_DIGITS="TRUE"
+	       DIGIT_RE="(0[lL]?|[1-9]\d{0,9}(\d{0,9}[lL])?|0[xX]\p{XDigit}{1,8}(\p{XDigit}{0,8}[lL])?|0[0-7]{1,11}([0-7]{0,11}[lL])?|([0-9]+\.[0-9]*|\.[0-9]+)([eE][+-]?[0-9]+)?[fFdD]?|[0-9]+([eE][+-]?[0-9]+[fFdD]?|([eE][+-]?[0-9]+)?[fFdD]))">
+
+		<!-- Silly comment -->
+		<SEQ TYPE="COMMENT1">/**/</SEQ>
+
+		<!-- C/C++ style comment -->
+		<SPAN TYPE="COMMENT1">
+			<BEGIN>/*</BEGIN>
+			<END>*/</END>
+		</SPAN>
+
+		<EOL_SPAN TYPE="COMMENT2">//</EOL_SPAN>
+
+		<!-- Strings -->
+		<SPAN TYPE="LITERAL1" ESCAPE="\" NO_LINE_BREAK="TRUE">
+			<BEGIN>&quot;</BEGIN>
+			<END>&quot;</END>
+		</SPAN>
+
+		<!-- Annotations -->
+		<MARK_FOLLOWING TYPE="KEYWORD4">@</MARK_FOLLOWING>
+
+		<!-- Functions -->
+		<MARK_PREVIOUS TYPE="FUNCTION" MATCH_TYPE="OPERATOR">(</MARK_PREVIOUS>
+		<SEQ TYPE="OPERATOR">)</SEQ>
+
+		<!-- Operators / others. -->
+		<SEQ TYPE="OPERATOR">)</SEQ>
+		<SEQ TYPE="OPERATOR">(</SEQ>
+		<SEQ TYPE="OPERATOR">}</SEQ>
+		<SEQ TYPE="OPERATOR">{</SEQ>
+		<SEQ TYPE="OPERATOR">[</SEQ>
+		<SEQ TYPE="OPERATOR">]</SEQ>
+		<SEQ TYPE="OPERATOR">&lt;</SEQ>
+		<SEQ TYPE="OPERATOR">&gt;</SEQ>
+
+		<!-- Reserved word escaping. -->
+		<SPAN TYPE="NULL" NO_LINE_BREAK="TRUE">
+			<BEGIN>`</BEGIN>
+			<END>`</END>
+		</SPAN>
+
+		<!-- Import statements. -->
+		<SEQ TYPE="KEYWORD2">import idl</SEQ>
+		<SEQ TYPE="KEYWORD2">import protocol</SEQ>
+		<SEQ TYPE="KEYWORD2">import schema</SEQ>
+
+		<KEYWORDS>
+			<KEYWORD2>throws</KEYWORD2>
+			<KEYWORD2>oneway</KEYWORD2>
+
+			<!-- Types. -->
+			<KEYWORD3>array</KEYWORD3>
+			<KEYWORD3>boolean</KEYWORD3>
+			<KEYWORD3>bytes</KEYWORD3>
+			<KEYWORD3>double</KEYWORD3>
+			<KEYWORD3>enum</KEYWORD3>
+			<KEYWORD3>error</KEYWORD3>
+			<KEYWORD3>fixed</KEYWORD3>
+			<KEYWORD3>float</KEYWORD3>
+			<KEYWORD3>int</KEYWORD3>
+			<KEYWORD3>long</KEYWORD3>
+			<KEYWORD2>map</KEYWORD2>
+			<KEYWORD3>protocol</KEYWORD3>
+			<KEYWORD3>record</KEYWORD3>
+			<KEYWORD3>string</KEYWORD3>
+			<KEYWORD3>union</KEYWORD3>
+			<KEYWORD3>void</KEYWORD3>
+
+			<!-- Constants. -->
+			<KEYWORD4>null</KEYWORD4>
+			<KEYWORD4>true</KEYWORD4>
+			<KEYWORD4>false</KEYWORD4>
+		</KEYWORDS>
+	</RULES>
+
+</MODE>
+

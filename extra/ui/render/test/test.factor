@@ -1,5 +1,5 @@
 ! Copyright (C) 2008, 2009 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors colors arrays kernel sequences math byte-arrays
 namespaces grouping fry cap images.bitmap ui.gadgets ui.gadgets.packs
 ui.gadgets.borders ui.gadgets.grids ui.gadgets.grid-lines

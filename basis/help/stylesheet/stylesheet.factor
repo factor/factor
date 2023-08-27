@@ -1,5 +1,5 @@
 ! Copyright (C) 2005, 2009 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: assocs colors fonts io.styles kernel literals math
 math.order namespaces sequences ui.theme ;
 IN: help.stylesheet
@@ -94,6 +94,7 @@ H{
     { font-size $ default-font-size }
     { foreground $ text-color }
     { page-color $ code-background-color }
+    { border-color $ code-border-color }
     { inset { 5 5 } }
     { wrap-margin f }
 } code-style set-global

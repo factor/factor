@@ -1,5 +1,5 @@
 ! Copyright (C) 2006 Chris Double.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: help.syntax help.markup
 threads kernel arrays quotations strings ;
 IN: concurrency.messaging
@@ -61,7 +61,7 @@ ARTICLE: "concurrency-synchronous-sends" "Synchronous sends"
 { $subsections reply-synchronous handle-synchronous }
 "An example:"
 { $example
-    "USING: concurrency.messaging threads ;"
+    "USING: concurrency.messaging kernel threads ;"
     "IN: scratchpad"
     ": pong-server ( -- )"
     "    [ drop \"pong\" ] handle-synchronous ;"

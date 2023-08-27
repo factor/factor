@@ -1,5 +1,5 @@
 ! Copyright (C) 2008, 2009 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: cocoa cocoa.application cocoa.types cocoa.classes cocoa.windows
 core-graphics.types kernel math.bitwise literals ;
 IN: webkit-demo

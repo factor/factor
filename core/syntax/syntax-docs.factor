@@ -120,8 +120,8 @@ ARTICLE: "syntax-floats" "Float syntax"
 { $subsections POSTPONE: NAN: }
 "To see the 64 bit value of " { $snippet "0/0." } " on your platform, execute the following code :"
 { $code
-     "USING: io math math.parser ;"
-     "\"NAN: \" write 0/0. double>bits >hex print"
+    "USING: io math math.parser ;"
+    "\"NAN: \" write 0/0. double>bits >hex print"
 }
 "Hexadecimal, octal and binary float literals are also supported. These consist of a hexadecimal, octal or binary literal with a decimal point and a mandatory base-two exponent expressed as a decimal number after " { $snippet "p" } " or " { $snippet "P" } ":"
 { $example
@@ -192,6 +192,7 @@ ARTICLE: "escape" "Character escape codes"
     { { $snippet "\\u" { $emphasis "xxxxxx" } } { "The Unicode code point with hexadecimal number " { $snippet { $emphasis "xxxxxx" } } } }
     { { $snippet "\\u{" { $emphasis "xx" } "}" } { "The Unicode code point with hexadecimal number " { $snippet { $emphasis "xx" } } } }
     { { $snippet "\\u{" { $emphasis "name" } "}" } { "The Unicode code point named " { $snippet { $emphasis "name" } } } }
+    { { $snippet "\\xxx" } "an octal escape specified by one, two, or three octal digits" }
 } ;
 
 ARTICLE: "syntax-strings" "Character and string syntax"
@@ -503,23 +504,16 @@ HELP: SYMBOLS:
 { $description "Creates a new symbol for every token until the " { $snippet ";" } "." }
 { $examples { $example "USING: prettyprint ;" "IN: scratchpad" "SYMBOLS: foo bar baz ;\nfoo . bar . baz ." "foo\nbar\nbaz" } } ;
 
-HELP: INITIALIZE:
-{ $syntax "INITIALIZE: word ... ;"  }
-{ $description "If " { $snippet "word" } " does not have a value in the global namespace, calls the definition and assigns the result to " { $snippet "word" } " in the global namespace." }
+HELP: INITIALIZED-SYMBOL:
+{ $syntax "INITIALIZE-SYMBOL: word [ ... ]"  }
+{ $description "Defines a new symbol " { $snippet "word" } " and sets the value in the global namespace." }
 { $examples
     { $unchecked-example
         "USING: math namespaces prettyprint ;"
-        "SYMBOL: foo"
-        "INITIALIZE: foo 15 sq ;"
+        "INITIALIZED-SYMBOL: foo [ 15 sq ]"
         "foo get-global ."
-        "225" }
-    { $unchecked-example
-        "USING: math namespaces prettyprint ;"
-        "SYMBOL: foo"
-        "1234 foo set-global"
-        "INITIALIZE: foo 15 sq ;"
-        "foo get-global ."
-        "1234" }
+        "225"
+    }
 } ;
 
 HELP: SINGLETON:
@@ -624,6 +618,8 @@ HELP: USING:
 HELP: QUALIFIED:
 { $syntax "QUALIFIED: vocab" }
 { $description "Adds the vocabulary's words, prefixed with the vocabulary name, to the search path." }
+{ $deprecated "This word is deprecated since Factor words can now be used as qualified by default. "
+{ $link POSTPONE: QUALIFIED-WITH: } " can be used for changing the qualification prefix." }
 { $notes "If adding a vocabulary introduces ambiguity, the vocabulary will take precedence when resolving any ambiguous names. This is a rare case; for example, suppose a vocabulary " { $snippet "fish" } " defines a word named " { $snippet "go:fishing" } ", and a vocabulary named " { $snippet "go" } " defines a word named " { $snippet "fishing" } ". Then, the following will call the latter word:"
   { $code
   "USE: fish"
@@ -657,7 +653,7 @@ HELP: FROM:
   { $code "USING: vocabs.parser binary-search ;" "... search ..." }
   "Because " { $link POSTPONE: FROM: } " takes precedence over a " { $link POSTPONE: USING: } ", the ambiguity can be resolved explicitly. Suppose you wanted the " { $vocab-link "binary-search" } " vocabulary's " { $snippet "search" } " word:"
   { $code "USING: vocabs.parser binary-search ;" "FROM: binary-search => search ;" "... search ..." }
- } ;
+} ;
 
 HELP: EXCLUDE:
 { $syntax "EXCLUDE: vocab => words ... ;" }
@@ -896,7 +892,9 @@ HELP: ERROR:
     "The following two snippets are equivalent:"
     { $code
         "ERROR: invalid-values x y ;"
-        ""
+    }
+    $nl
+    { $code
         "TUPLE: invalid-values x y ;"
         ": invalid-values ( x y -- * )"
         "    \\ invalid-values boa throw ;"
@@ -921,7 +919,11 @@ HELP: C:
 HELP: MAIN:
 { $syntax "MAIN: word" }
 { $values { "word" word } }
-{ $description "Defines the main entry point for the current vocabulary and source file. This word will be executed when this vocabulary is passed to " { $link run } " or the source file is run as a script." } ;
+{ $description "Defines the main entry point for the current vocabulary and source file. This word will be executed when this vocabulary is passed to " { $link run } " or the source file is run as a script."
+    $nl
+    "If a quotation is passed instead of a word, then it will be run as the main entry point, in the same way." 
+    { $warning "Quotation support in " { $snippet "MAIN:" } " is test functionality. Use it with caution." }
+} ;
 
 HELP: <PRIVATE
 { $syntax "<PRIVATE ... PRIVATE>" }

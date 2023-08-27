@@ -1,6 +1,6 @@
 ! Copyright (C) 2005 Alex Chapman
 ! Copyright (C) 2006, 2010 Slava Pestov
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors compiler.units html.templates io
 io.encodings.utf8 io.files kernel lexer lexer.private math
 namespaces parser parser.notes quotations sequences splitting
@@ -23,7 +23,7 @@ M: template-lexer skip-word
 DEFER: <% delimiter
 
 : check-<% ( lexer -- col )
-    "<%" swap [ line-text>> ] [ column>> ] bi subseq-start-from ;
+    [ column>> ] [ line-text>> ] bi "<%" subseq-index-from ;
 
 : found-<% ( accum lexer col -- accum )
     [

@@ -1,5 +1,5 @@
 ! Copyright (C) 2009 Jason W. Merrill.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors effects kernel lexer ranges parser
 sequences words ;
 IN: math.derivatives.syntax

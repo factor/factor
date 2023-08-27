@@ -4,8 +4,7 @@
 
 	<t:style t:include="resource:extra/webapps/planet/planet.css" />
 
-	<div class="navbar">
-	<div class="navrow">
+    <nav>
 		<a href="https://factorcode.org"><img src="https://factorcode.org/favicon.ico" width="24" height="24" /></a>
 
 		<t:a t:href="$planet">Front Page</t:a>
@@ -19,8 +18,7 @@
 	
 			<t:button t:action="$login-realm/logout" t:aside="begin" class="link-button link">Logout</t:button>
         </t:if>
-	</div>
-	</div>
+	</nav>
 
     <div class="page">
 	<h1><t:write-title /></h1>

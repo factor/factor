@@ -1,5 +1,5 @@
 ! Copyright (C) 2007 Doug Coleman.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors destructors io.backend.unix io.mmap
 io.mmap.private kernel libc literals system unix unix.ffi ;
 IN: io.mmap.unix

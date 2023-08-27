@@ -1,6 +1,6 @@
-USING: accessors arrays ascii io io.streams.string kernel make
-math math.vectors random sequences sequences.extras strings
-tools.test vectors vocabs ;
+USING: accessors arrays ascii grouping io io.streams.string
+kernel make math prettyprint ranges sequences sequences.extras
+strings tools.test ;
 
 { V{ { 0 104 } { 2 108 } { 3 108 } } } [ "hello" [ even? ] find-all ] unit-test
 
@@ -113,8 +113,35 @@ tools.test vectors vocabs ;
 { "bcde" } [ "abcd" [ 1 + ] [ drop t ] map-filter ] unit-test
 { { 0 4 16 36 64 } } [ 10 <iota> [ sq ] [ even? ] { } map-filter-as ] unit-test
 
+{ 120000 } [ { 10 20 30 40 50 60 } 1 [ * ] 3 reduce-from ] unit-test
+
+{ 21 } [
+    { 1 2 3 } { 4 5 6 } 0 [ + + ] 0 2reduce-from
+] unit-test
+
+{ 16 } [
+    { 1 2 3 } { 4 5 6 } 0 [ + + ] 1 2reduce-from
+] unit-test
+
 { V{ 0 4 16 36 64 } } [ 10 <iota> [ even? ] [ sq ] filter-map ] unit-test
+{ V{ 0 4 16 36 64 } } [ 10 <iota> [ even? ] [ sq ] filter-map ] unit-test
+{ V{ 2 6 10 14 18 } } [ 10 <iota> [ odd? ] [ 2 * ] V{ } filter-map-as ] unit-test
 { { 2 6 10 14 18 } } [ 10 <iota> [ odd? ] [ 2 * ] { } filter-map-as ] unit-test
+
+{ V{ 1 9 25 49 81 } } [ 10 <iota> [ even? ] [ sq ] reject-map ] unit-test
+{ V{ 1 9 25 49 81 } } [ 10 <iota> [ even? ] [ sq ] reject-map ] unit-test
+{ V{ 0 4 8 12 16 }  } [ 10 <iota> [ odd? ] [ 2 * ] V{ } reject-map-as ] unit-test
+{ { 0 4 8 12 16 }   } [ 10 <iota> [ odd? ] [ 2 * ] { } reject-map-as ] unit-test
+
+{ V{ 0 4 16 36 64 } } [ 10 <iota> [ dup even? [ sq t ] [ f ] if ] filter-map* ] unit-test
+{ V{ 0 4 16 36 64 } } [ 10 <iota> [ sq dup even? ] filter-map* ] unit-test
+{ V{ 2 6 10 14 18 } } [ 10 <iota> [ dup odd? [ 2 * t ] [ f ] if ] V{ } filter-map-as* ] unit-test
+{ { 2 6 10 14 18 } } [ 10 <iota> [ dup odd? [ 2 * t ] [ f ] if ] { } filter-map-as* ] unit-test
+
+{ V{ 1 9 25 49 81 } } [ 10 <iota> [ dup even? [ t ] [ sq f ] if ] reject-map* ] unit-test
+{ V{ 1 9 25 49 81 } } [ 10 <iota> [ sq dup even? ] reject-map* ] unit-test
+{ V{ 0 4 8 12 16 }  } [ 10 <iota> [ dup odd? [ t ] [ 2 * f ] if ] V{ } reject-map-as* ] unit-test
+{ { 0 4 8 12 16 }   } [ 10 <iota> [ dup odd? [ t ] [ 2 * f ] if ] { } reject-map-as* ] unit-test
 
 { 8 } [ 3 <iota> dup [ 1 + * ] 2map-sum ] unit-test
 { 4 } [ "hello" "jello" [ = ] 2count ] unit-test
@@ -163,6 +190,9 @@ tools.test vectors vocabs ;
 { V{ 0 4 } } [ { 5 3 2 10 5 } [ 5 = ] arg-where ] unit-test
 { { 2 1 0 4 3 } } [ { 5 3 2 10 5 } arg-sort ] unit-test
 
+{ 10 } [ { 4 3 2 1 } [ 10 * ] map-infimum ] unit-test
+{ 40 } [ { 4 3 2 1 } [ 10 * ] map-supremum ] unit-test
+
 { t } [ { 1 2 3 4 5 } 1 first= ] unit-test
 { t } [ { 1 2 3 4 5 } 2 second= ] unit-test
 { t } [ { 1 2 3 4 5 } 3 third= ] unit-test
@@ -191,6 +221,20 @@ tools.test vectors vocabs ;
 { V{ 1 } } [ 1 0 V{ } [ insert-nth! ] keep ] unit-test
 { V{ 1 2 3 4 } } [ 2 1 V{ 1 3 4 } [ insert-nth! ] keep ] unit-test
 
+{ V{ 1 3 } } [ V{ 1 2 3 } 1 2 delete-slice-of ] unit-test
+{ V{ 1 2 } } [ V{ 1 2 3 } 2 remove-nth-of! ] unit-test
+
+{
+    T{ slice { to 1 } { seq V{ 1 2 3 4 5 } } }
+    T{ slice { from 2 } { to 5 } { seq V{ 1 2 3 4 5 } } }
+} [
+    V{ 1 2 3 4 5 } 1 2 snip-slice-of
+] unit-test
+
+{ V{ 1 } V{ 3 4 5 } } [
+    V{ 1 2 3 4 5 } 1 2 snip-of
+] unit-test
+
 { "abc" } [ B{ 97 98 99 100 101 102 103 } 3 "" head-as ] unit-test
 { "abcd" } [ B{ 97 98 99 100 101 102 103 } 3 "" head*-as ] unit-test
 { "defg" } [ B{ 97 98 99 100 101 102 103 } 3 "" tail-as ] unit-test
@@ -204,6 +248,12 @@ tools.test vectors vocabs ;
 
 { t 3 3 } [ 10 <iota> [ [ odd? ] [ 1 > ] bi* and ] map-find-index ] unit-test
 { f f f } [ 10 <iota> [ [ odd? ] [ 9 > ] bi* and ] map-find-index ] unit-test
+
+{ { 0 400 900 } }
+[ { 10 20 30 } [ sq ] 1 map-from ] unit-test
+
+{ V{ f 400 900 } }
+[ { 10 20 30 } [ sq ] 1 V{ } map-from-as ] unit-test
 
 { "abcdef" } [ f f "abcdef" subseq* ] unit-test
 { "abcdef" } [ 0 f "abcdef" subseq* ] unit-test
@@ -232,7 +282,7 @@ tools.test vectors vocabs ;
 { 1 } [ { 1 f 3 2 } ?infimum ] unit-test
 { 1 } [ { 1 3 2 } ?infimum ] unit-test
 
-{ 3/10 } [ 10 <iota> [ 3 < ] count* ] unit-test
+{ 3/10 } [ 10 <iota> [ 3 < ] percent-of ] unit-test
 
 { { 0 } } [ "ABABA" "ABA" start-all ] unit-test
 { { 0 2 } } [ "ABABA" "ABA" start-all* ] unit-test
@@ -240,7 +290,67 @@ tools.test vectors vocabs ;
 { 1 } [ "ABABA" "ABA" count-subseq ] unit-test
 { 2 } [ "ABABA" "ABA" count-subseq* ] unit-test
 
-{ 120000 } [ { 10 20 30 40 50 60 } 1 [ * ] 3 reduce-from ] unit-test
+{ 0 } [ { } [ + ] 0reduce ] unit-test
+{ 107 } [ { 100 1 2 4 } [ + ] 0reduce ] unit-test
+{ 0 } [ { 100 1 2 4 } [ * ] 0reduce ] unit-test
+
+{ f } [ { } [ + ] 1reduce ] unit-test
+{ 107 } [ { 100 1 2 4 } [ + ] 1reduce ] unit-test
+{ 800 } [ { 100 1 2 4 } [ * ] 1reduce ] unit-test
+
+{ 800 } [ { 100 1 2 4 } [ * ] 1 reduce-of ] unit-test
+{ 800 { 1 100 100 200 } } [ { 100 1 2 4 } [ * ] 1 accumulate-of ] unit-test
+
+{ { } } [ { } [ + ] 0accumulate ] unit-test
+{ { 100 101 103 107 } } [ { 100 1 2 4 } [ + ] 0accumulate ] unit-test
+
+{ { "y" "o" "y" "p" "o" "y" } }
+[ { "y" "o" "y" "p" "o" "y" } [ classify ] [ deduplicate ] bi nths ] unit-test
+
+{ { "take" "drop" "pick" } }
+[ { "take" "drop" "drop" "pick" "take" "take" } deduplicate ] unit-test
+
+{ { "drop" "pick" "take" } }
+[ { "take" "drop" "drop" "pick" "take" "take" } deduplicate-last ] unit-test
+
+{ { } }
+[ "" mark-firsts ] unit-test
+
+{ { 1 1 0 0 1 0 } }
+[ "abaacb" mark-firsts ] unit-test
+
+{
+    H{ { t 6 } { f 5 } }
+    { 0 0 1 1 2 3 4 2 3 4 5 }
+} [
+    { 2 7 1 8 1 7 1 8 2 8 4 } [ even? ] occurrence-count-by
+] unit-test
+
+{
+    H{ { 8 3 } { 1 3 } { 2 2 } { 4 1 } { 7 2 } }
+    { 0 0 0 0 1 1 2 1 1 2 0 }
+} [
+    { 2 7 1 8 1 7 1 8 2 8 4 } [ ] occurrence-count-by
+] unit-test
+
+{
+    H{
+        { 97 1 } { 98 1 } { 99 1 } { 100 1 } { 101 1 } { 102 1 }
+        { 103 1 } { 104 1 } { 105 1 } { 106 1 } { 107 1 } { 108 1 }
+        { 109 1 } { 110 1 } { 111 1 } { 112 1 }
+    }
+    { 1 2 0 3 3 3 3 3 3 3 3 3 3 3 3 3 }
+} [
+    "cab" "abcdefghijklmnop" progressive-index
+] unit-test
+
+{ H{ { 97 5 } } { 0 1 2 3 3 } } [
+    "aaa" "aaaaa" progressive-index
+] unit-test
+
+{ H{ { 97 5 } { 98 5 } } { 0 3 1 4 2 5 5 5 5 5 } } [
+    "aaabb" "ababababab" progressive-index
+] unit-test
 
 { { 0 1 2 3 } } [ 8 <iota> [ 4 < ] take-while >array ] unit-test
 { { } } [ { 15 16 } [ 4 < ] take-while >array ] unit-test
@@ -286,3 +396,120 @@ tools.test vectors vocabs ;
 { { 1 3 } } [ 1 4 2 10 <iota> <step-slice> >array ] unit-test
 { { 1 3 } } [ 1 5 2 10 <iota> <step-slice> >array ] unit-test
 { { 1 3 5 } } [ 1 6 2 10 <iota> <step-slice> >array ] unit-test
+
+{ { 102 306 1530 } } [
+    { 2 3 5 } [ swap [ * ] [ 100 + ] if* ] map-with-previous
+] unit-test
+
+{ { } } [
+    { } [ nip ] map-with-previous
+] unit-test
+
+{ { -1 2 -3 4 -5 } } [ { 1 2 3 4 5 } [ odd? ] [ neg ] map-if ] unit-test
+
+{ { { 100 0 } { 200 1 } { 300 2 } { 400 3 } } } [
+    { 100 200 300 400 } <zip-index> >array
+] unit-test
+
+{ } [
+    { } [ - . ] each-prior
+] unit-test
+
+{ } [
+    1000 { } [ - . ] each-prior-from
+] unit-test
+
+{ } [
+    { 5 16 42 103 } [ - . ] each-prior
+] unit-test
+
+{ } [
+    1 { 5 16 42 103 } [ - . ] each-prior-from
+] unit-test
+
+
+{ { } } [
+    { } [ - ] map-prior
+] unit-test
+
+{ V{ 5 11 26 61 } } [
+    V{ 5 16 42 103 } [ - ] map-prior
+] unit-test
+
+{ V{ f f 26 61 } } [
+    2 V{ 5 16 42 103 } [ - ] map-prior-from
+] unit-test
+
+{ V{ f f 26 61 } } [
+    2 { 5 16 42 103 } [ - ] V{ } map-prior-from-as
+] unit-test
+
+{ V{ } } [
+    { } [ - ] V{ } map-prior-as
+] unit-test
+
+{ { 5 11 26 61 } } [
+    V{ 5 16 42 103 } [ - ] { } map-prior-as
+] unit-test
+
+{ f } [ 0 CHAR: a "foo" nth-index ] unit-test
+{ 0 } [ 0 CHAR: a "abba" nth-index ] unit-test
+{ 3 } [ 1 CHAR: a "abba" nth-index ] unit-test
+{ f } [ 2 CHAR: a "abba" nth-index ] unit-test
+
+{ { -995 11 26 61 } } [
+    1000 V{ 5 16 42 103 } [ - ] { } map-prior-identity-as
+] unit-test
+
+{ V{ 1 4 9 } } [
+    { 1 2 3 } { 1 2 3 }
+    [ 2dup 2array all-eq? [ * ] [ 2drop f ] if ]
+    V{ } 2nested-filter-as
+] unit-test
+
+{ V{ 1 8 27 } } [
+    { 1 2 3 } { 1 2 3 } { 1 2 3 }
+    [ 3dup 3array all-eq? [ * * ] [ 3drop f ] if ]
+    V{ } 3nested-filter-as
+] unit-test
+
+{ V{ 0 2 0 3 6 4 12 0 5 10 15 20 } } [
+    6 [1..b)
+    [ [0..b) ]
+    [ 2dup [ odd? ] bi@ or [ * ] [ 2drop f ] if  ]
+    2nested-filter*
+] unit-test
+
+{ 20 1 } [ { 10 20 30 } [ 20 = ] find* ] unit-test
+{ f f } [ { 10 20 30 } [ 21 = ] find* ] unit-test
+
+{ 20 1 } [ 0 { 10 20 30 } [ 20 = ] find-from* ] unit-test
+{ f f } [ 0 { 10 20 30 } [ 21 = ] find-from* ] unit-test
+{ 20 1 } [ 0 { 10 20 30 } [ 20 = ] find-from* ] unit-test
+{ 20 1 } [ 1 { 10 20 30 } [ 20 = ] find-from* ] unit-test
+{ f f } [ 2 { 10 20 30 } [ 20 = ] find-from* ] unit-test
+
+{ 20 1 } [ { 10 20 30 } [ 20 = ] find-last* ] unit-test
+{ f f } [ { } [ 21 = ] find-last* ] unit-test
+{ f f } [ { 10 20 30 } [ 21 = ] find-last* ] unit-test
+
+{ f f } [ 0 { 10 20 30 } [ 20 = ] find-last-from* ] unit-test
+{ 20 1 } [ 1 { 10 20 30 } [ 20 = ] find-last-from* ] unit-test
+{ 20 1 } [ 2 { 10 20 30 } [ 20 = ] find-last-from* ] unit-test
+
+{ 20 1 } [ { 10 20 30 } [ drop 20 = ] find-index* ] unit-test
+{ f f } [ { 10 20 30 } [ drop 21 = ] find-index* ] unit-test
+
+{ 20 1 } [ 0 { 10 20 30 } [ drop 20 = ] find-index-from* ] unit-test
+{ f f } [ 0 { 10 20 30 } [ drop 21 = ] find-index-from* ] unit-test
+
+{ { { 1 1 } { 2 2 } { 0 3 } { 0 4 } { 0 5 } } } [
+    { 1 2 } { 1 2 3 4 5 } 0 zip-longest-with
+] unit-test
+
+{ { { 1 1 } { 2 2 } { f 3 } { f 4 } { f 5 } } } [
+    { 1 2 } { 1 2 3 4 5 } zip-longest
+] unit-test
+
+{ "34_01_" } [ 2 0 3 "01_34_" [ exchange-subseq ] keep ] unit-test
+{ "cdebaf" } [ 3 0 2 "abcdef" [ exchange-subseq ] keep ] unit-test

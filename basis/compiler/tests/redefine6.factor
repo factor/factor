@@ -4,9 +4,9 @@ IN: compiler.tests.redefine6
 
 ! Mixin redefinition did not recompile all necessary words.
 
-[ ] [ [ "compiler.tests.redefine6" forget-vocab ] with-compilation-unit ] unit-test
+{ } [ [ "compiler.tests.redefine6" forget-vocab ] with-compilation-unit ] unit-test
 
-[ ] [
+{ } [
     "USING: kernel kernel.private ;
     IN: compiler.tests.redefine6
     GENERIC: my-generic ( a -- b )
@@ -16,7 +16,7 @@ IN: compiler.tests.redefine6
     eval( -- )
 ] unit-test
 
-[ ] [
+{ } [
     "USING: kernel ;
     IN: compiler.tests.redefine6
     TUPLE: my-tuple ;
@@ -25,7 +25,7 @@ IN: compiler.tests.redefine6
     eval( -- )
 ] unit-test
 
-[ 1 ] [
+{ 1 } [
     "my-tuple" "compiler.tests.redefine6" lookup-word boa
     "my-inline" "compiler.tests.redefine6" lookup-word execute
 ] unit-test

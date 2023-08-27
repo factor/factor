@@ -1,5 +1,5 @@
 ! Copyright (C) 2005, 2009 Daniel Ehrenberg
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs combinators
 combinators.short-circuit delegate delegate.protocols kernel
 sequences slots strings vectors words ;
@@ -84,6 +84,9 @@ C: <contained> contained
 
 TUPLE: comment { text string } ;
 C: <comment> comment
+
+TUPLE: cdata { text string } ;
+C: <cdata> cdata
 
 TUPLE: directive ;
 
@@ -202,7 +205,7 @@ CONSULT: name xml body>> ;
 PRIVATE>
 
 M: xml clone
-   xml clone-slots ;
+    xml clone-slots ;
 
 M: xml like
     swap dup xml? [ nip ] [
@@ -220,7 +223,7 @@ TUPLE: unescaped string ;
 C: <unescaped> unescaped
 
 UNION: xml-data
-    tag comment string directive instruction unescaped ;
+    tag comment cdata string directive instruction unescaped ;
 
 TUPLE: xml-chunk seq ;
 C: <xml-chunk> xml-chunk

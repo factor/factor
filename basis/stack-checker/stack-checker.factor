@@ -1,14 +1,14 @@
 ! Copyright (C) 2004, 2010 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
-USING: accessors kernel io effects namespaces sequences
-quotations vocabs vocabs.loader generic words
-stack-checker.backend stack-checker.state
-stack-checker.known-words stack-checker.transforms
-stack-checker.errors stack-checker.inlining
-stack-checker.visitor.dummy ;
+! See https://factorcode.org/license.txt for BSD license.
+USING: accessors classes effects generic io kernel namespaces
+quotations sequences stack-checker.backend stack-checker.errors
+stack-checker.inlining stack-checker.known-words
+stack-checker.state stack-checker.transforms
+stack-checker.visitor.dummy vocabs vocabs.loader words ;
 IN: stack-checker
 
 : infer ( quot -- effect )
+    callable check-instance
     [ infer-quot-here ] with-infer drop ;
 
 : infer. ( quot -- )

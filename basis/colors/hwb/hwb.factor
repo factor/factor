@@ -1,5 +1,5 @@
 ! Copyright (C) 2022 John Benediktsson
-! See http://factorcode.org/license.txt for BSD license
+! See https://factorcode.org/license.txt for BSD license
 
 USING: accessors colors colors.gray colors.hsl combinators
 kernel math math.order ;

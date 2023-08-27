@@ -1,5 +1,5 @@
 ! Copyright (C) 2007, 2009 Daniel Ehrenberg.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs bit-arrays byte-arrays classes
 classes.tuple combinators combinators.short-circuit
 combinators.smart continuations effects generalizations
@@ -155,9 +155,9 @@ ERROR: missing-literal ;
     dup { [ word? ] [ symbol? not ] } 1&&
     [ missing-literal ] when ;
 
-\ + [ - ] [ - ] define-math-inverse
+\ + [ - ] [ swap - ] define-math-inverse
 \ - [ + ] [ - ] define-math-inverse
-\ * [ / ] [ / ] define-math-inverse
+\ * [ / ] [ swap / ] define-math-inverse
 \ / [ * ] [ / ] define-math-inverse
 \ ^ [ recip ^ ] [ swap [ log ] bi@ / ] define-math-inverse
 

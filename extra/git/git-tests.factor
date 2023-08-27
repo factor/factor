@@ -1,5 +1,5 @@
 ! Copyright (C) 2015 Doug Coleman.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors fry git io io.directories io.encodings.utf8
 io.launcher io.streams.string kernel sequences tools.test ;
 IN: git.tests

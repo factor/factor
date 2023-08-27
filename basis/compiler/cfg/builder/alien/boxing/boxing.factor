@@ -1,5 +1,5 @@
 ! Copyright (C) 2010 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors alien.c-types arrays assocs classes.struct
 combinators compiler.cfg.builder.alien.params compiler.cfg.hats
 compiler.cfg.instructions compiler.cfg.intrinsics.allot

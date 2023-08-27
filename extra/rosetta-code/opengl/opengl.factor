@@ -1,10 +1,10 @@
 ! Copyright (c) 2012 Anonymous
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors kernel math math.rectangles opengl.gl
 sequences ui ui.gadgets ui.render ;
 IN: rosetta-code.opengl
 
-! http://rosettacode.org/wiki/OpenGL
+! https://rosettacode.org/wiki/OpenGL
 
 ! In this task, the goal is to display a smooth shaded triangle
 ! with OpenGL.

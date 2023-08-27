@@ -1,5 +1,5 @@
 ! Copyright (C) 2008 Doug Coleman.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors alien alien.c-types alien.data alien.strings
 alien.syntax arrays ascii assocs classes.struct combinators
 combinators.short-circuit continuations destructors environment
@@ -17,8 +17,6 @@ SLOT: file
 
 : CreateFile-flags ( DWORD -- DWORD )
     flags{ FILE_FLAG_BACKUP_SEMANTICS FILE_FLAG_OVERLAPPED } bitor ;
-
-HOOK: open-append os ( path -- win32-file )
 
 TUPLE: win32-file < win32-handle ptr ;
 
@@ -53,7 +51,7 @@ TUPLE: io-callback port thread ;
 C: <io-callback> io-callback
 
 : <completion-port> ( handle existing -- handle )
-     f 1 CreateIoCompletionPort dup win32-error=0/f ;
+    f 1 CreateIoCompletionPort dup win32-error=0/f ;
 
 : <master-completion-port> ( -- handle )
     INVALID_HANDLE_VALUE f <completion-port> ;
@@ -184,8 +182,10 @@ M: windows handle-length
     [ update-file-ptr ] [ buffer>> buffer-consume ] 2bi ;
 
 M: object drain
-    [ make-FileArgs dup setup-write WriteFile ]
-    [ drop [ wait-for-file ] [ finish-write ] bi ] 2bi f ;
+    [
+        [ make-FileArgs dup setup-write WriteFile ]
+        [ drop [ wait-for-file ] [ finish-write ] bi ] 2bi f
+    ] with-destructors ;
 
 : setup-read ( <FileArgs> -- hFile lpBuffer nNumberOfBytesToRead lpNumberOfBytesRead lpOverlapped )
     {
@@ -199,14 +199,18 @@ M: object drain
     [ update-file-ptr ] [ buffer>> buffer+ ] 2bi ;
 
 M: object refill
-    [ make-FileArgs dup setup-read ReadFile ]
-    [ drop [ wait-for-file ] [ finish-read ] bi ] 2bi f ;
+    [
+        [ make-FileArgs dup setup-read ReadFile ]
+        [ drop [ wait-for-file ] [ finish-read ] bi ] 2bi f
+    ] with-destructors ;
 
 M: windows (wait-to-write)
-    [ dup handle>> drain ] with-destructors drop ;
+    dup dup handle>> drain
+    [ dupd wait-for-port (wait-to-write) ] [ drop ] if* ;
 
 M: windows (wait-to-read)
-    [ dup handle>> refill ] with-destructors drop ;
+    dup dup handle>> refill
+    [ dupd wait-for-port (wait-to-read) ] [ drop ] if* ;
 
 : make-fd-set ( socket -- fd_set )
     fd_set new swap 1array void* >c-array >>fd_array 1 >>fd_count ;
@@ -243,8 +247,19 @@ M: windows init-stdio
 : open-write ( path -- win32-file )
     GENERIC_WRITE CREATE_ALWAYS 0 open-file 0 >>ptr ;
 
-: (open-append) ( path -- win32-file )
-    GENERIC_WRITE OPEN_ALWAYS 0 open-file ;
+
+<PRIVATE
+
+: windows-file-size ( path -- size )
+    normalize-path 0 WIN32_FILE_ATTRIBUTE_DATA new
+    [ GetFileAttributesEx win32-error=0/f ] keep
+    [ nFileSizeLow>> ] [ nFileSizeHigh>> ] bi >64bit ;
+
+PRIVATE>
+
+: open-append ( path -- win32-file )
+    [ dup windows-file-size ] [ drop 0 ] recover
+    [ GENERIC_WRITE OPEN_ALWAYS 0 open-file ] dip >>ptr ;
 
 : maybe-create-file ( path -- win32-file ? )
     ! return true if file was just created
@@ -252,9 +267,12 @@ M: windows init-stdio
     OPEN_ALWAYS 0 open-file
     GetLastError ERROR_ALREADY_EXISTS = not ;
 
-: set-file-pointer ( handle length method -- )
+: set-file-pointer ( win32-file length method -- )
     [ [ handle>> ] dip d>w/w LONG <ref> ] dip SetFilePointer
-    INVALID_SET_FILE_POINTER = [ "SetFilePointer failed" throw ] when ;
+    INVALID_SET_FILE_POINTER = [ win32-error ] when ;
+
+: set-end-of-file ( win32-file -- )
+    handle>> SetEndOfFile [ win32-error ] unless ;
 
 M: windows (file-reader)
     open-read <input-port> ;
@@ -364,21 +382,9 @@ M: windows normalize-path
         prepend-unicode-prefix
     ] if ;
 
-<PRIVATE
-
-: windows-file-size ( path -- size )
-    normalize-path 0 WIN32_FILE_ATTRIBUTE_DATA new
-    [ GetFileAttributesEx win32-error=0/f ] keep
-    [ nFileSizeLow>> ] [ nFileSizeHigh>> ] bi >64bit ;
-
-PRIVATE>
-
-M: windows open-append
-    [ dup windows-file-size ] [ drop 0 ] recover
-    [ (open-append) ] dip >>ptr ;
-
 M: windows home
     {
+        [ "HOME" os-env ]
         [ "HOMEDRIVE" os-env "HOMEPATH" os-env append-path ]
         [ "USERPROFILE" os-env ]
         [ my-documents ]

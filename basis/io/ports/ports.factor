@@ -1,5 +1,5 @@
 ! Copyright (C) 2005, 2010 Slava Pestov, Doug Coleman
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors alien classes combinators destructors hints io
 io.backend io.buffers io.encodings io.files io.timeouts kernel
 kernel.private libc locals math math.order math.private
@@ -31,6 +31,9 @@ INSTANCE: input-port file-reader
 : <input-port> ( handle -- input-port )
     input-port <buffered-port> ; inline
 
+: wait-for-port ( port event -- )
+    '[ handle>> _ wait-for-fd ] with-timeout ;
+
 HOOK: (wait-to-read) io-backend ( port -- )
 
 : wait-to-read ( port -- eof? )
@@ -58,11 +61,10 @@ M: input-port stream-read1
 :: read-loop ( dst n-remaining port n-read -- n-total )
     n-remaining port read-step :> ( n-buffered ptr )
     ptr [
-        dst ptr n-buffered memcpy
+        n-read dst <displaced-alien> ptr n-buffered memcpy
         n-remaining n-buffered fixnum-fast :> n-remaining'
         n-read n-buffered fixnum+fast :> n-read'
-        n-buffered dst <displaced-alien> :> dst'
-        dst' n-remaining' port n-read' read-loop
+        dst n-remaining' port n-read' read-loop
     ] [ n-read ] if ; inline recursive
 
 PRIVATE>
@@ -137,24 +139,21 @@ M: output-port stream-write1
 
 <PRIVATE
 
-:: port-write ( c-ptr n-remaining port -- )
+:: port-write ( src n-remaining port n-write  -- )
     port buffer>> :> buffer
-    n-remaining buffer size>> min :> n-write
+    n-remaining buffer size>> min :> n-chunk
 
-    n-write port wait-to-write
-    c-ptr n-write buffer buffer-write
+    n-chunk port wait-to-write
+    n-write src >c-ptr <displaced-alien> n-chunk buffer buffer-write
 
-    n-remaining n-write fixnum-fast dup 0 > [
-        n-write c-ptr <displaced-alien> swap port port-write
+    n-remaining n-chunk fixnum-fast dup 0 > [
+        src swap port n-write n-chunk fixnum+fast port-write
     ] [ drop ] if ; inline recursive
 
 PRIVATE>
 
 M: output-port stream-write
-    check-disposed [
-        binary-object
-        [ c-ptr check-instance ] [ integer>fixnum-strict ] bi*
-    ] [ port-write ] bi* ;
+    [ dup byte-length integer>fixnum-strict ] dip check-disposed 0 port-write ;
 
 HOOK: tell-handle os ( handle -- n )
 

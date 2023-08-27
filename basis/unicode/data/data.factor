@@ -1,9 +1,9 @@
 ! Copyright (C) 2008, 2009 Daniel Ehrenberg.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: arrays ascii assocs byte-arrays combinators
 combinators.short-circuit grouping hashtables interval-sets
-io.encodings.utf8 io.files kernel locals make math math.bitwise
-math.order math.parser ranges memoize namespaces sequences
+io.encodings.utf8 io.files kernel make math math.bitwise
+math.order math.parser ranges namespaces sequences
 sets simple-flat-file sorting splitting strings.parser ;
 IN: unicode.data
 
@@ -53,7 +53,7 @@ CONSTANT: categories {
 MEMO: categories-map ( -- hashtable )
     categories H{ } zip-index-as ;
 
-CONSTANT: NUM-CHARS 0x2FA1E
+CONSTANT: NUM-CHARS 0x2FA25
 
 PRIVATE>
 
@@ -62,12 +62,12 @@ PRIVATE>
     ! that this gives Cf or Mn
     ! Cf = 26; Mn = 5; Cn = 29
     ! Use a compressed array instead?
-    dup category-map ?nth [ ] [
+    [ category-map ?nth ] [
         dup 0xE0001 0xE007F between?
         [ drop 26 ] [
             0xE0100 0xE01EF between?  5 29 ?
         ] if
-    ] ?if ; inline
+    ] ?unless ; inline
 
 : category ( char -- category )
     category-num categories nth ;
@@ -77,7 +77,7 @@ PRIVATE>
 ! Loading data from UnicodeData.txt
 
 : load-unicode-data ( -- data )
-    "vocab:unicode/UCD/UnicodeData.txt" load-data-file ;
+    "vocab:unicode/UnicodeData.txt" load-data-file ;
 
 : (process-data) ( index data -- newdata )
     [ [ nth ] keep first swap ] with { } map>assoc
@@ -88,8 +88,8 @@ PRIVATE>
 
 : (chain-decomposed) ( hash value -- newvalue )
     [
-        2dup of
-        [ (chain-decomposed) ] [ 1array nip ] ?if
+        2dup of or*
+        [ (chain-decomposed) ] [ 1array nip ] if
     ] with map concat ;
 
 : chain-decomposed ( hash -- newhash )
@@ -103,7 +103,7 @@ PRIVATE>
     [ split-words [ hex> ] map ] assoc-map ;
 
 : exclusions-file ( -- filename )
-    "vocab:unicode/UCD/CompositionExclusions.txt" ;
+    "vocab:unicode/CompositionExclusions.txt" ;
 
 : exclusions ( -- set )
     exclusions-file utf8 file-lines
@@ -173,7 +173,7 @@ C: <code-point> code-point
 
 ! Extra properties {{[a,b],prop}}
 : parse-properties ( -- assoc )
-    "vocab:unicode/UCD/PropList.txt" load-data-file [
+    "vocab:unicode/PropList.txt" load-data-file [
         [
             ".." split1 [ dup ] unless*
             [ hex> ] bi@ 2array
@@ -190,7 +190,7 @@ C: <code-point> code-point
 
 ! Special casing data
 : load-special-casing ( -- special-casing )
-    "vocab:unicode/UCD/SpecialCasing.txt" load-data-file
+    "vocab:unicode/SpecialCasing.txt" load-data-file
     [ length 5 = ] filter
     [ [ set-code-point ] each ] H{ } make ;
 
@@ -215,6 +215,8 @@ load-properties properties swap assoc-union! drop
 
 PRIVATE>
 
+ERROR: invalid-unicode-character name ;
+
 [
-    name-map at [ "Invalid character" throw ] unless*
+    name-map ?at [ invalid-unicode-character ] unless
 ] name>char-hook set-global

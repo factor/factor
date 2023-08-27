@@ -54,7 +54,7 @@ M: ##tagged>integer coalesce-now
 
 M: ##phi coalesce-now
     [ dst>> ] [ inputs>> values ] bi zip-scalar
-    natural-sort t try-eliminate-copies ;
+    sort t try-eliminate-copies ;
 
 GENERIC: coalesce-later ( insn -- )
 

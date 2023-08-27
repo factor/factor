@@ -17,13 +17,13 @@
 		<SEQ TYPE="MARKUP" DELEGATE="ASPPL">&lt;%@LANGUAGE="PERLSCRIPT"%</SEQ>
 
 		<!-- Inlined server-side VBScript -->
-		<SPAN TYPE="MARKUP" DELEGATE="vbscript::MAIN">
+		<SPAN TYPE="MARKUP" DELEGATE="VB_ASP_WRAPPER">
 			<BEGIN>&lt;%</BEGIN>
 			<END>%&gt;</END>
 		</SPAN>
 
 		<!-- Server-side VBScript -->
-		<SPAN TYPE="MARKUP" DELEGATE="vbscript::MAIN">
+		<SPAN TYPE="MARKUP" DELEGATE="VB_SCRIPT_WRAPPER">
 			<BEGIN>&lt;script language="vbscript" runat="server"&gt;</BEGIN>
 			<END>&lt;/script&gt;</END>
 		</SPAN>
@@ -97,13 +97,13 @@
 	     ****************************************************************** -->
 	<RULES SET="ASPVB" IGNORE_CASE="TRUE">
 		<!-- Inlined server-side VBScript -->
-		<SPAN TYPE="MARKUP" DELEGATE="vbscript::MAIN">
+		<SPAN TYPE="MARKUP" DELEGATE="VB_ASP_WRAPPER">
 			<BEGIN>&lt;%</BEGIN>
 			<END>%&gt;</END>
 		</SPAN>
 
 		<!-- Server-side VBScript -->
-		<SPAN TYPE="MARKUP" DELEGATE="vbscript::MAIN">
+		<SPAN TYPE="MARKUP" DELEGATE="VB_SCRIPT_WRAPPER">
 			<BEGIN>&lt;script language="vbscript" runat="server"&gt;</BEGIN>
 			<END>&lt;/script&gt;</END>
 		</SPAN>
@@ -188,7 +188,7 @@
 		</SPAN>
 
 		<!-- Server-side VBScript -->
-		<SPAN TYPE="MARKUP" DELEGATE="vbscript::MAIN">
+		<SPAN TYPE="MARKUP" DELEGATE="VB_SCRIPT_WRAPPER">
 			<BEGIN>&lt;script language="vbscript" runat="server"&gt;</BEGIN>
 			<END>&lt;/script&gt;</END>
 		</SPAN>
@@ -273,7 +273,7 @@
 		</SPAN>
 
 		<!-- Server-side VBScript -->
-		<SPAN TYPE="MARKUP" DELEGATE="vbscript::MAIN">
+		<SPAN TYPE="MARKUP" DELEGATE="VB_SCRIPT_WRAPPER">
 			<BEGIN>&lt;script language="vbscript" runat="server"&gt;</BEGIN>
 			<END>&lt;/script&gt;</END>
 		</SPAN>
@@ -352,7 +352,7 @@
 	     ****************************************************************** -->
 	<RULES SET="ASPVB_TAGS" DEFAULT="MARKUP">
 		<!-- Server-side VBScript -->
-		<SPAN TYPE="MARKUP" DELEGATE="vbscript::MAIN">
+		<SPAN TYPE="MARKUP" DELEGATE="VB_ASP_WRAPPER">
 			<BEGIN>&lt;%</BEGIN>
 			<END>%&gt;</END>
 		</SPAN>
@@ -372,7 +372,7 @@
 
 	<RULES SET="ASPVB_LIT1" DEFAULT="LITERAL1">
 		<!-- Server-side VBScript -->
-		<SPAN TYPE="MARKUP" DELEGATE="vbscript::MAIN">
+		<SPAN TYPE="MARKUP" DELEGATE="VB_ASP_WRAPPER">
 			<BEGIN>&lt;%</BEGIN>
 			<END>%&gt;</END>
 		</SPAN>
@@ -437,7 +437,7 @@
 	<!-- These three rules sets handle server side scripts being mixed into client side javascript -->
 	<RULES SET="ASPVB_CSJS">
 		<!-- Server-side VBScript -->
-		<SPAN TYPE="MARKUP" DELEGATE="vbscript::MAIN">
+		<SPAN TYPE="MARKUP" DELEGATE="VB_ASP_WRAPPER">
 			<BEGIN>&lt;%</BEGIN>
 			<END>%&gt;</END>
 		</SPAN>
@@ -465,7 +465,7 @@
 	<!-- These three rules sets handle server side scripts being mixed into stylesheets -->
 	<RULES SET="ASPVB_STYLE">
 		<!-- Server-side VBScript -->
-		<SPAN TYPE="MARKUP" DELEGATE="vbscript::MAIN">
+		<SPAN TYPE="MARKUP" DELEGATE="VB_ASP_WRAPPER">
 			<BEGIN>&lt;%</BEGIN>
 			<END>%&gt;</END>
 		</SPAN>
@@ -493,7 +493,7 @@
 	<!-- These three rules sets handle server side scripts being mixed into SGML Comments -->
 	<RULES SET="ASPVB_SGML" DEFAULT="COMMENT1">
 		<!-- Server-side VBScript -->
-		<SPAN TYPE="MARKUP" DELEGATE="vbscript::MAIN">
+		<SPAN TYPE="MARKUP" DELEGATE="VB_ASP_WRAPPER">
 			<BEGIN>&lt;%</BEGIN>
 			<END>%&gt;</END>
 		</SPAN>
@@ -514,5 +514,31 @@
 			<END>%&gt;</END>
 		</SPAN>
 	</RULES>
+	
+	
+	<!-- Close VB single line comment with ending tag -->
+
+	<!-- VB between ASP tags -->
+	<RULES SET="ASP_ENDING">
+		<SEQ TYPE="MARKUP" DELEGATE="MAIN"><![CDATA[%>]]></SEQ>
+	</RULES>
+
+	<RULES SET="VB_ASP_WRAPPER" IGNORE_CASE="TRUE">
+		<SEQ_REGEXP HASH_CHAR="'" TYPE="COMMENT1" DELEGATE="ASP_ENDING"><![CDATA['.*?(?=%>)]]></SEQ_REGEXP>
+		
+		<IMPORT DELEGATE="vbscript::MAIN"/>
+	</RULES>
+
+	<!-- VB between SCRIPT tags -->
+ 	<RULES SET="SCRIPT_ENDING">
+		<SEQ TYPE="MARKUP" DELEGATE="MAIN"><![CDATA[</script>]]></SEQ>
+	</RULES>
+
+	<RULES SET="VB_SCRIPT_WRAPPER" IGNORE_CASE="TRUE">
+		<SEQ_REGEXP HASH_CHAR="'" TYPE="COMMENT1" DELEGATE="ASP_ENDING"><![CDATA['.*?(?=</script>)]]></SEQ_REGEXP>
+		
+		<IMPORT DELEGATE="vbscript::MAIN"/>
+	</RULES>
+
 </MODE>
 

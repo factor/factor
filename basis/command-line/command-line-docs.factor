@@ -75,7 +75,7 @@ ARTICLE: "bootstrap-cli-args" "Command line switches for bootstrap"
     { { $snippet "compiler" } "The compiler." }
     { { $snippet "tools" } "Terminal-based developer tools." }
     { { $snippet "help" } "The help system." }
-    { { $snippet "help.handbook" } "The help handbook." }
+    { { $snippet "handbook" } "The help handbook." }
     { { $snippet "ui" } "The graphical user interface." }
     { { $snippet "ui.tools" } "Graphical developer tools." }
     { { $snippet "io" } "Non-blocking I/O and networking." }

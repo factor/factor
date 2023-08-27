@@ -1,5 +1,5 @@
 ! Copyright (C) 2003, 2010 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: system kernel math namespaces io prettyprint tools.memory
 tools.dispatch ;
 IN: tools.time

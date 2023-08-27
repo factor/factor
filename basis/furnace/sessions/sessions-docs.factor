@@ -4,8 +4,8 @@ IN: furnace.sessions
 
 HELP: <sessions>
 { $values
-     { "responder" "a responder" }
-     { "responder'" "a new responder" }
+    { "responder" "a responder" }
+    { "responder'" "a new responder" }
 }
 { $description "Wraps a responder in a session manager responder." } ;
 

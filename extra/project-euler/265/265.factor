@@ -1,10 +1,10 @@
 ! Copyright (c) 2010 Samuel Tardieu.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: generalizations kernel math math.functions project-euler.common
 sequences sets ;
 IN: project-euler.265
 
-! http://projecteuler.net/index.php?section=problems&id=265
+! https://projecteuler.net/index.php?section=problems&id=265
 
 ! 2^(N) binary digits can be placed in a circle so that all the N-digit
 ! clockwise subsequences are distinct.

@@ -1,5 +1,5 @@
 ! Copyright (C) 2014 John Benediktsson
-! See http://factorcode.org/license.txt for BSD license
+! See https://factorcode.org/license.txt for BSD license
 
 USING: accessors colors colors.xyz colors.xyz.private kernel
 math math.functions ;
@@ -9,6 +9,8 @@ IN: colors.lab
 TUPLE: laba l a b alpha ;
 
 C: <laba> laba
+
+INSTANCE: laba color
 
 M: laba >rgba >xyza >rgba ;
 

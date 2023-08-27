@@ -7,7 +7,7 @@ HELP: stack-visitor
 
 HELP: #>r,
 { $values { "inputs" sequence } { "outputs" sequence } }
-{ $description "Emits a " { $link #shuffle } " node that copies values from the data stack to the retain stack. This node is primarily outputted by the " { $link dip } " word and its relatives." }
+{ $description "Emits a " { $link #shuffle } " node that copies values from the data stack to the retain stack. This node is primarily output by the " { $link dip } " word and its relatives." }
 { $examples
   { $example
     "USING: namespaces prettyprint stack-checker.visitor ;"

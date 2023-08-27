@@ -1,5 +1,5 @@
 ! Copyright (C) 2008, 2010 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors http io.encodings.utf8 io.streams.string kernel
 xml.syntax xml.writer ;
 IN: http.server.responses

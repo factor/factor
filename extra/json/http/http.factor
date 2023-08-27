@@ -1,6 +1,5 @@
 USING: accessors http http.client http.client.private
-io.encodings.string io.encodings.utf8 json.reader json.writer
-kernel strings ;
+io.encodings.string io.encodings.utf8 json kernel strings ;
 
 IN: json.http
 
@@ -37,5 +36,6 @@ IN: json.http
 : http-trace-json ( url -- response json )
     "TRACE" <json-request> http-request json> ;
 
-: http-patch-json ( url -- response json )
-    "PATCH" <json-request> http-request json> ;
+: http-patch-json ( assoc/json-string url -- response json )
+    [ <json-post-data> ] dip "PATCH" <json-request>
+      swap >>post-data http-request json> ;

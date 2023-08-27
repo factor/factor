@@ -1,0 +1,47 @@
+<?xml version="1.0"?>
+<!DOCTYPE MODE SYSTEM "xmode.dtd">
+<MODE>
+    <PROPS>
+        <PROPERTY NAME="commentStart" VALUE="/*" />
+        <PROPERTY NAME="commentEnd" VALUE="*/" />
+        <PROPERTY NAME="lineComment" VALUE="//" />
+        <PROPERTY NAME="wordBreakChars" VALUE=",+-=&lt;&gt;/?^&amp;*" />
+
+        <!-- Auto indent -->
+        <PROPERTY NAME="indentOpenBrackets" VALUE="{" />
+        <PROPERTY NAME="indentCloseBrackets" VALUE="}" />
+        <PROPERTY NAME="unalignedOpenBrackets" VALUE="(" />
+        <PROPERTY NAME="unalignedCloseBrackets" VALUE=")" />
+        <PROPERTY NAME="indentNextLine"
+            VALUE="\s*(((if|while)\s*\(|else\s*|else\s+if\s*\(|for\s*\(.*\))[^{;]*)" />
+        <PROPERTY NAME="unindentThisLine"
+            VALUE="^.*(default:\s*|case.*:.*)$" />
+        <PROPERTY NAME="electricKeys" VALUE=":" />
+    </PROPS>
+    <RULES IGNORE_CASE="FALSE">
+	<IMPORT DELEGATE="java::MAIN"/>
+	<SEQ TYPE="OPERATOR">%%</SEQ>
+	<SEQ TYPE="KEYWORD1">%class</SEQ>
+	<SEQ TYPE="KEYWORD1">%class</SEQ>
+	<SEQ TYPE="KEYWORD1">%implements</SEQ>
+	<SEQ TYPE="KEYWORD1">%extends</SEQ>
+	
+	<SEQ TYPE="KEYWORD1">%public</SEQ>
+	<SEQ TYPE="KEYWORD1">%abstract</SEQ>
+	<SEQ TYPE="KEYWORD1">%final</SEQ>
+	<SEQ TYPE="KEYWORD1">%apiprivate</SEQ>
+	
+	<SEQ TYPE="KEYWORD1">%unicode</SEQ>
+	<SEQ TYPE="KEYWORD1">%line</SEQ>
+	<SEQ TYPE="KEYWORD1">%char</SEQ>
+	<SEQ TYPE="KEYWORD1">%cup</SEQ>
+	<SEQ TYPE="KEYWORD1">%column</SEQ>
+	<SEQ TYPE="KEYWORD1">%standalone</SEQ>
+	<SEQ TYPE="KEYWORD1">ignorecase</SEQ>
+	<SEQ TYPE="KEYWORD1">%type</SEQ>
+	<SEQ TYPE="KEYWORD1">%debug</SEQ>
+	<SEQ TYPE="OPERATOR">%%</SEQ>
+
+	<SEQ_REGEXP HASH_CHAR="&lt;" TYPE="KEYWORD2">&lt;\w+&gt;</SEQ_REGEXP>
+    </RULES>
+</MODE>

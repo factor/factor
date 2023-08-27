@@ -1,5 +1,5 @@
 ! Copyright (c) 2009, 2020 Samuel Tardieu, Alexander Ilin.
-! See See http://factorcode.org/license.txt for BSD license.
+! See See https://factorcode.org/license.txt for BSD license.
 USING: help.markup help.syntax kernel quotations sequences ;
 IN: backtrack
 
@@ -39,7 +39,7 @@ $nl
         "] [ \"No solution.\" print ] if-amb drop"
         "23 chickens, 7 cows"
     }
-    "See more examples here: " { $url "https://re-factor.blogspot.com/search?q=backtrack" }
+    "See more examples here: " { $url "https://re.factorcode.org/tags/backtrack.html" }
 } ;
 
 HELP: fail

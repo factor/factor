@@ -1,0 +1,1 @@
+A window that accepts files drag-and-dropped from the operating system

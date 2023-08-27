@@ -1,5 +1,5 @@
 ! Copyright (C) 2006, 2011 Slava Pestov
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs calendar colors combinators
 combinators.short-circuit documents documents.elements fonts fry
 grouping kernel literals locals make math math.functions
@@ -8,11 +8,13 @@ models.arrow namespaces opengl opengl.gl sequences sorting
 splitting system timers ui.baseline-alignment ui.clipboards
 ui.commands ui.gadgets ui.gadgets.borders
 ui.gadgets.line-support ui.gadgets.menus ui.gadgets.scrollers
-ui.gestures ui.pens.solid ui.render ui.text ui.theme unicode ;
+prettyprint math.parser
+ui.gestures ui.pens.solid ui.render ui.text ui.theme unicode variables ;
 IN: ui.gadgets.editors
 
 TUPLE: editor < line-gadget
     caret mark
+    caret-shape
     focused? blink blink-timer
     default-text
     preedit-start
@@ -23,6 +25,10 @@ TUPLE: editor < line-gadget
     preedit-underlines ;
 
 M: editor preedit? preedit-start>> ;
+
+SYMBOLS: +line+ +box+ +filled+ ;
+SYMBOL: caret-style
++line+ caret-style set-global
 
 <PRIVATE
 
@@ -167,11 +173,32 @@ M: editor ungraft*
     { [ focused?>> ] [ blink>> ]
       [ [ preedit? not ] [ preedit-selection-mode?>> not ] bi or ] } 1&& ;
 
+: caret-line ( editor -- loc dim )
+    [ caret-loc ] [ caret-dim ] bi ;
+
+: caret-rect ( editor -- loc dim )
+    caret-line second [ 2 / ] keep 2array ;
+
+: draw-caret-line ( editor -- )
+    caret-line over v+ gl-line ;
+
+: draw-caret-rect ( editor -- )
+    caret-rect gl-rect ;
+
+: draw-caret-rect-filled ( editor -- )
+    caret-rect gl-fill-rect ;
+
+: draw-caret-shape ( editor -- )
+    caret-style get {
+        { +box+ [ draw-caret-rect ] }
+        { +filled+ [ draw-caret-rect-filled ] }
+        [ drop  draw-caret-line ]
+    } case ;
+
 : draw-caret ( editor -- )
     dup draw-caret? [
         [ editor-caret-color gl-color ] dip
-        [ caret-loc ] [ caret-dim ] bi
-        over v+ gl-line
+        draw-caret-shape
     ] [ drop ] if ;
 
 :: draw-preedit-underlines ( editor -- )

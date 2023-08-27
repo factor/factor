@@ -1,7 +1,7 @@
 ;;; fuel-xref.el -- showing cross-reference info -*- lexical-binding: t -*-
 
 ;; Copyright (C) 2008, 2009, 2010 Jose Antonio Ortega Ruiz
-;; See http://factorcode.org/license.txt for BSD license.
+;; See https://factorcode.org/license.txt for BSD license.
 
 ;; Author: Jose Antonio Ortega Ruiz <jao@gnu.org>
 ;; Keywords: languages, fuel, factor
@@ -114,7 +114,7 @@ cursor at the first ocurrence of the used word."
   (newline))
 
 (defun fuel-xref--insert-vocab-words (vocab-def xrefs)
-  (destructuring-bind (vocab file) vocab-def
+  (cl-destructuring-bind (vocab file) vocab-def
     (insert "in ")
     (fuel-xref--insert-link (or vocab "unknown vocabs") file 1)
     (let ((count-str (fuel-xref--pluralize-count (length xrefs) "word")))
@@ -144,7 +144,7 @@ cursor at the first ocurrence of the used word."
          (title-str (format "%s %s %s:\n\n" count-str cc search-str)))
     (erase-buffer)
     (insert title-str)
-    (loop for (vocab _ file line-num) in xrefs do
+    (cl-loop for (vocab _ file line-num) in xrefs do
           (insert "  ")
           (fuel-xref--insert-link vocab file line-num)
           (newline)))

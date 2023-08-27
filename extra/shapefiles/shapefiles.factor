@@ -1,5 +1,5 @@
 ! Copyright (C) 2018 John Benediktsson
-! See http://factorcode.org/license.txt for BSD license
+! See https://factorcode.org/license.txt for BSD license
 
 USING: accessors byte-arrays classes combinators endian io
 io.encodings.binary io.files io.streams.byte-array kernel

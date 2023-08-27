@@ -1,5 +1,5 @@
 ! Copyright (C) 2008 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors binary-search combinators combinators.smart csv
 io.encodings.ascii kernel math.order math.parser sequences
 summary ;
@@ -21,8 +21,8 @@ ERROR: no-such-state name ;
 M: no-such-state summary drop "No such state" ;
 
 MEMO: string>state ( string -- state )
-    dup states [ name>> = ] with find nip
-    [ ] [ no-such-state ] ?if ;
+    [ states [ name>> = ] with find nip ]
+    [ no-such-state ] ?unless ;
 
 TUPLE: city
 first-zip name state latitude longitude gmt-offset dst-offset ;

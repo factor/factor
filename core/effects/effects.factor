@@ -1,5 +1,5 @@
 ! Copyright (C) 2006, 2010 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors arrays classes combinators kernel make math
 math.order math.parser sequences sequences.private strings words ;
 IN: effects
@@ -27,7 +27,7 @@ TUPLE: effect
     [ out>> length ] [ in>> length ] bi - ; inline
 
 : variable-effect? ( effect -- ? )
-    [ in-var>> ] [ out-var>> ] bi or ;
+    dup in-var>> [ drop t ] [ out-var>> ] if ;
 
 : bivariable-effect? ( effect -- ? )
     [ in-var>> ] [ out-var>> ] bi = not ;
@@ -44,10 +44,11 @@ TUPLE: effect
     } cond 2nip ; inline
 
 : effect= ( effect1 effect2 -- ? )
-    [ [ in>> length ] same? ]
-    [ [ out>> length ] same? ]
-    [ [ terminated?>> ] same? ]
-    2tri and and ;
+    2dup [ in>> length ] same? [
+        2dup [ out>> length ] same? [
+            [ terminated?>> ] same?
+        ] [ 2drop f ] if
+    ] [ 2drop f ] if ;
 
 GENERIC: effect>string ( obj -- str )
 M: string effect>string ;

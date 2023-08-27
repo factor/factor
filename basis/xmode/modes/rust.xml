@@ -1,0 +1,305 @@
+<?xml version="1.0"?>
+<!--
+ * :tabSize=8:indentSize=8:noTabs=false:
+ * :folding=explicit:collapseFolds=1:
+-->
+<!DOCTYPE MODE SYSTEM "xmode.dtd">
+
+<!-- updated for Rust 1.0 -->
+<MODE>
+	<PROPS>
+		<PROPERTY NAME="commentStart" VALUE="/*" />
+		<PROPERTY NAME="commentEnd" VALUE="*/" />
+		<PROPERTY NAME="lineComment" VALUE="//" />
+		<PROPERTY NAME="wordBreakChars" VALUE=",+-=&lt;&gt;/?^&amp;*" />
+
+		<!-- Auto indent -->
+		<PROPERTY NAME="indentOpenBrackets" VALUE="{" />
+		<PROPERTY NAME="indentCloseBrackets" VALUE="}" />
+		<PROPERTY NAME="unalignedOpenBrackets" VALUE="(" />
+		<PROPERTY NAME="unalignedCloseBrackets" VALUE=")" />
+	</PROPS>
+	<RULES IGNORE_CASE="FALSE"
+		HIGHLIGHT_DIGITS="TRUE"
+		DIGIT_RE="(0b[01_]+|0o[0-8_]+|0x[0-9a-fA-F_]+|[0-9_]+)([iu](8|16|32|64)|isize|usize)?|[0-9_]+([eE][0-9_]*)?(f32|f64)?">
+
+		<!-- Silly comment -->
+		<SEQ TYPE="COMMENT1">/**/</SEQ>
+
+		<!-- Doc comment -->
+		<SPAN TYPE="COMMENT3" DELEGATE="NESTED_DOC_COMMENT">
+			<BEGIN>/**</BEGIN>
+			<END>*/</END>
+		</SPAN>
+
+		<!-- Range comment -->
+		<SPAN TYPE="COMMENT1" DELEGATE="NESTED_COMMENT">
+			<BEGIN>/*</BEGIN>
+			<END>*/</END>
+		</SPAN>
+
+		<EOL_SPAN TYPE="COMMENT3">///</EOL_SPAN>
+
+		<EOL_SPAN TYPE="COMMENT2">//</EOL_SPAN>
+
+		<SPAN_REGEXP TYPE="LITERAL1" HASH_CHAR="br">
+			<BEGIN>br(#*)"</BEGIN>
+			<END>"$1</END>
+		</SPAN_REGEXP>
+		<SPAN TYPE="LITERAL1" DELEGATE="DOUBLEQUOTE_LITERAL" NO_LINE_BREAK="FALSE">
+			<BEGIN>b"</BEGIN>
+			<END>"</END>
+		</SPAN>
+		<SPAN_REGEXP TYPE="LITERAL1" HASH_CHAR="r">
+			<BEGIN>r(#*)"</BEGIN>
+			<END>"$1</END>
+		</SPAN_REGEXP>
+		<SPAN TYPE="LITERAL1" DELEGATE="DOUBLEQUOTE_LITERAL" NO_LINE_BREAK="FALSE">
+			<BEGIN>"</BEGIN>
+			<END>"</END>
+		</SPAN>
+		<SEQ_REGEXP TYPE="LITERAL3" HASH_CHARS="b'">b?'(.|\\([\\'nrt0]|x[a-fA-F\d]{2}|u\{[a-fA-F\d]{1,6}\}))'</SEQ_REGEXP>
+
+		<!-- Lifetimes -->
+		<!-- I tried to use MARK_FOLLOWING here, but it breaks the char
+		literal _above_ -->
+		<SEQ_REGEXP TYPE="KEYWORD4" HASH_CHAR="'">'\w+</SEQ_REGEXP>
+
+		<!-- Attributes -->
+		<SPAN TYPE="KEYWORD4" DELEGATE="ATTRIBUTE" NO_LINE_BREAK="FALSE">
+			<BEGIN>#[</BEGIN>
+			<END>]</END>
+		</SPAN>
+		<SPAN TYPE="KEYWORD4" DELEGATE="ATTRIBUTE" NO_LINE_BREAK="FALSE">
+			<BEGIN>#![</BEGIN>
+			<END>]</END>
+		</SPAN>
+
+		<SEQ TYPE="OPERATOR">=</SEQ>
+		<SEQ TYPE="OPERATOR">!</SEQ>
+		<SEQ TYPE="OPERATOR">&gt;=</SEQ>
+		<SEQ TYPE="OPERATOR">&lt;=</SEQ>
+		<SEQ TYPE="OPERATOR">+</SEQ>
+		<SEQ TYPE="OPERATOR">-</SEQ>
+		<SEQ TYPE="OPERATOR">/</SEQ>
+
+		<!-- workaround to stop "*" from being colorized
+		     in use statements. -->
+		<SEQ TYPE="NULL">::*</SEQ>
+
+		<SEQ TYPE="OPERATOR">*</SEQ>
+		<SEQ TYPE="OPERATOR">&gt;</SEQ>
+		<SEQ TYPE="OPERATOR">&lt;</SEQ>
+		<SEQ TYPE="OPERATOR">%</SEQ>
+		<SEQ TYPE="OPERATOR">&amp;</SEQ>
+		<SEQ TYPE="OPERATOR">|</SEQ>
+		<SEQ TYPE="OPERATOR">^</SEQ>
+		<SEQ TYPE="OPERATOR">}</SEQ>
+		<SEQ TYPE="OPERATOR">{</SEQ>
+
+		<!-- Function calls -->
+		<MARK_PREVIOUS TYPE="FUNCTION" MATCH_TYPE="OPERATOR">(</MARK_PREVIOUS>
+		<SEQ TYPE="OPERATOR">)</SEQ>
+
+		<SEQ TYPE="OPERATOR">=</SEQ>
+		<SEQ TYPE="OPERATOR">(</SEQ>
+		<SEQ TYPE="OPERATOR">)</SEQ>
+		<SEQ TYPE="OPERATOR">,</SEQ>
+
+		<KEYWORDS>
+			<!--{{{ stmts and exprs -->
+			<KEYWORD1>as</KEYWORD1>
+			<KEYWORD1>box</KEYWORD1>
+			<KEYWORD1>break</KEYWORD1>
+			<KEYWORD1>const</KEYWORD1>
+			<KEYWORD1>continue</KEYWORD1>
+			<KEYWORD1>else</KEYWORD1>
+			<KEYWORD1>for</KEYWORD1>
+			<KEYWORD1>if</KEYWORD1>
+			<KEYWORD1>in</KEYWORD1>
+			<KEYWORD1>let</KEYWORD1>
+			<KEYWORD1>loop</KEYWORD1>
+			<KEYWORD1>match</KEYWORD1>
+			<KEYWORD1>move</KEYWORD1>
+			<KEYWORD1>mut</KEYWORD1>
+			<KEYWORD1>ref</KEYWORD1>
+			<KEYWORD1>return</KEYWORD1>
+			<KEYWORD1>unsafe</KEYWORD1>
+			<KEYWORD1>while</KEYWORD1>
+			<!--}}}-->
+
+			<!--{{{ view item keywords -->
+			<KEYWORD2>extern</KEYWORD2>
+			<KEYWORD2>crate</KEYWORD2>
+			<KEYWORD2>mod</KEYWORD2>
+			<KEYWORD2>fn</KEYWORD2>
+			<KEYWORD2>type</KEYWORD2>
+			<KEYWORD2>struct</KEYWORD2>
+			<KEYWORD2>enum</KEYWORD2>
+			<KEYWORD2>static</KEYWORD2>
+			<KEYWORD2>trait</KEYWORD2>
+			<KEYWORD2>impl</KEYWORD2>
+			<KEYWORD2>use</KEYWORD2>
+			<KEYWORD2>super</KEYWORD2>
+			<KEYWORD2>priv</KEYWORD2>
+			<KEYWORD2>pub</KEYWORD2>
+			<KEYWORD2>where</KEYWORD2>
+			<!--}}}-->
+
+			<!--{{{ literals -->
+			<LITERAL2>false</LITERAL2>
+			<LITERAL2>true</LITERAL2>
+			<LITERAL2>self</LITERAL2>
+			<!--}}}-->
+
+			<!--{{{ primitive types from libcore -->
+			<KEYWORD3>bool</KEYWORD3>
+			<KEYWORD3>char</KEYWORD3>
+			<KEYWORD3>f32</KEYWORD3>
+			<KEYWORD3>f64</KEYWORD3>
+			<KEYWORD3>i16</KEYWORD3>
+			<KEYWORD3>i32</KEYWORD3>
+			<KEYWORD3>i64</KEYWORD3>
+			<KEYWORD3>i8</KEYWORD3>
+			<KEYWORD3>isize</KEYWORD3>
+			<KEYWORD3>str</KEYWORD3>
+			<KEYWORD3>u16</KEYWORD3>
+			<KEYWORD3>u32</KEYWORD3>
+			<KEYWORD3>u64</KEYWORD3>
+			<KEYWORD3>u8</KEYWORD3>
+			<KEYWORD3>usize</KEYWORD3>
+
+			<KEYWORD4>Copy</KEYWORD4>
+			<KEYWORD4>Send</KEYWORD4>
+			<KEYWORD4>Sized</KEYWORD4>
+			<KEYWORD4>Sync</KEYWORD4>
+			<KEYWORD4>Drop</KEYWORD4>
+			<KEYWORD4>Fn</KEYWORD4>
+			<KEYWORD4>FnMut</KEYWORD4>
+			<KEYWORD4>FnOnce</KEYWORD4>
+			<KEYWORD4>drop</KEYWORD4>
+			<KEYWORD4>Box</KEYWORD4>
+			<KEYWORD4>Clone</KEYWORD4>
+			<KEYWORD4>PartialEq</KEYWORD4>
+			<KEYWORD4>PartialOrd</KEYWORD4>
+			<KEYWORD4>Eq</KEYWORD4>
+			<KEYWORD4>Ord</KEYWORD4>
+			<KEYWORD4>AsRef</KEYWORD4>
+			<KEYWORD4>AsMut</KEYWORD4>
+			<KEYWORD4>Into</KEYWORD4>
+			<KEYWORD4>From</KEYWORD4>
+			<KEYWORD4>DoubleEndedIterator</KEYWORD4>
+			<KEYWORD4>ExactSizeIterator</KEYWORD4>
+			<KEYWORD4>Iterator</KEYWORD4>
+			<KEYWORD4>Extend</KEYWORD4>
+			<KEYWORD4>Option</KEYWORD4>
+			<KEYWORD4>Some</KEYWORD4>
+			<KEYWORD4>None</KEYWORD4>
+			<KEYWORD4>Result</KEYWORD4>
+			<KEYWORD4>Ok</KEYWORD4>
+			<KEYWORD4>Err</KEYWORD4>
+			<KEYWORD4>String</KEYWORD4>
+			<KEYWORD4>ToString</KEYWORD4>
+			<KEYWORD4>Vec</KEYWORD4>
+			<!--}}}-->
+		</KEYWORDS>
+	</RULES>
+
+	<!--{{{ DOUBLEQUOTE_LITERAL rule -->
+	<RULES SET="DOUBLEQUOTE_LITERAL" DEFAULT="LITERAL1" IGNORE_CASE="TRUE">
+		<SEQ TYPE="LITERAL4">\"</SEQ>
+		<SEQ TYPE="LITERAL4">\\</SEQ>
+		<SEQ TYPE="LITERAL4">\n</SEQ>
+		<SEQ TYPE="LITERAL4">\r</SEQ>
+		<SEQ TYPE="LITERAL4">\t</SEQ>
+		<SEQ TYPE="LITERAL4">\0</SEQ>
+		<SEQ_REGEXP HASH_CHAR="\x" TYPE="LITERAL4">\\x[a-f\d]{2}</SEQ_REGEXP>
+		<SEQ_REGEXP HASH_CHAR="\u" TYPE="LITERAL4">\\u\{[a-f\d]{1,6}\}</SEQ_REGEXP>
+	</RULES> <!--}}}-->
+
+	<!--{{{ ATTRIBUTE rule -->
+	<RULES SET="ATTRIBUTE" DEFAULT="KEYWORD4" IGNORE_CASE="FALSE">
+	<KEYWORDS>
+		<!-- Crate-only attributes -->
+		<KEYWORD2>crate_name</KEYWORD2>
+		<KEYWORD2>crate_type</KEYWORD2>
+		<KEYWORD2>feature</KEYWORD2>
+		<KEYWORD2>no_builtins</KEYWORD2>
+		<KEYWORD2>no_main</KEYWORD2>
+		<KEYWORD2>no_start</KEYWORD2>
+		<KEYWORD2>no_std</KEYWORD2>
+		<KEYWORD2>plugin</KEYWORD2>
+
+		<!-- Module-only attributes -->
+		<KEYWORD2>no_implicit_prelude</KEYWORD2>
+		<KEYWORD2>path</KEYWORD2>
+
+		<!-- Function-only attributes -->
+		<KEYWORD2>main</KEYWORD2>
+		<KEYWORD2>plugin_registrar</KEYWORD2>
+		<KEYWORD2>start</KEYWORD2>
+		<KEYWORD2>test</KEYWORD2>
+		<KEYWORD2>should_panic</KEYWORD2>
+		<KEYWORD2>cold</KEYWORD2>
+
+		<!-- Static-only attributes -->
+		<KEYWORD2>thread_local</KEYWORD2>
+
+		<!-- FFI attributes -->
+		<KEYWORD2>link_args</KEYWORD2>
+		<KEYWORD2>link</KEYWORD2>
+		<KEYWORD2>link_name</KEYWORD2>
+		<KEYWORD2>linkage</KEYWORD2>
+		<KEYWORD2>repr</KEYWORD2>
+
+		<!-- Macro-related attributes -->
+		<KEYWORD2>macro_use</KEYWORD2>
+		<KEYWORD2>macro_reexport</KEYWORD2>
+		<KEYWORD2>macro_export</KEYWORD2>
+		<KEYWORD2>no_link</KEYWORD2>
+
+		<!-- Miscellaneous attributes -->
+		<KEYWORD2>export_name</KEYWORD2>
+		<KEYWORD2>link_section</KEYWORD2>
+		<KEYWORD2>no_mangle</KEYWORD2>
+		<KEYWORD2>packed</KEYWORD2>
+		<KEYWORD2>simd</KEYWORD2>
+		<KEYWORD2>static_assert</KEYWORD2>
+		<KEYWORD2>unsafe_destructor</KEYWORD2>
+		<KEYWORD2>unsafe_no_drop_flag</KEYWORD2>
+		<KEYWORD2>doc</KEYWORD2>
+		<KEYWORD2>rustc_on_unimplemented</KEYWORD2>
+
+		<KEYWORD2>cfg</KEYWORD2>
+
+		<KEYWORD2>allow</KEYWORD2>
+		<KEYWORD2>deny</KEYWORD2>
+		<KEYWORD2>forbid</KEYWORD2>
+		<KEYWORD2>warn</KEYWORD2>
+
+		<KEYWORD2>lang</KEYWORD2>
+
+		<KEYWORD2>inline</KEYWORD2>
+
+		<KEYWORD2>derive</KEYWORD2>
+	</KEYWORDS>
+	</RULES> <!--}}}-->
+
+	<!--{{{ NESTED_DOC_COMMENT rule -->
+	<RULES SET="NESTED_DOC_COMMENT" DEFAULT="COMMENT3">
+		<!-- mark everything in doc comment as doc comment -->
+		<SPAN TYPE="COMMENT3" DELEGATE="NESTED_DOC_COMMENT">
+			<BEGIN>/*</BEGIN>
+			<END>*/</END>
+		</SPAN>
+	</RULES> <!--}}}-->
+
+	<!--{{{ NESTED_COMMENT rule -->
+	<RULES SET="NESTED_COMMENT" DEFAULT="COMMENT1">
+		<SPAN TYPE="COMMENT1" DELEGATE="NESTED_COMMENT">
+			<BEGIN>/*</BEGIN>
+			<END>*/</END>
+		</SPAN>
+	</RULES> <!--}}}-->
+
+</MODE>

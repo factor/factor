@@ -4,8 +4,9 @@
 
     <t:title>Search - Factor Documentation</t:title>
     <t:style t:include="resource:extra/webapps/help/search.css" />
+    <t:script t:include="resource:extra/webapps/help/search.js" />
 
-    <t:html t:name="navbar"/>
+    <t:html t:name="nav"/>
 
     <div class="page">
 
@@ -56,7 +57,7 @@
     </div>
 
     <br />
-    <div class="footer">
+    <footer>
     <p>
     This documentation was generated offline from a
     <code>load-all</code> image.  If you want, you can also
@@ -65,7 +66,7 @@
     the <a href="https://factorcode.org">Factor website</a>
     for more information.
     </p>
-    </div>
+    </footer>
 
     </div>
 

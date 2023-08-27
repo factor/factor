@@ -1,5 +1,5 @@
 ! Copyright (C) 2022 Doug Coleman.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: tools.test dns ;
 IN: dns.tests
 
@@ -10,3 +10,4 @@ IN: dns.tests
 
 ! "1.1.1.1" reverse-ipv4-lookup
 ! "one.one.one.one" A IN dns-query
+

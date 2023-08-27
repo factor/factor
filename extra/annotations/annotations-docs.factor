@@ -47,7 +47,7 @@ PRIVATE>
 {
     "The " { $vocab-link "annotations" } " vocabulary provides syntax for comment-like annotations that can be looked up with Factor's " { $link usage } " mechanism."
 }
-annotation-tags natural-sort
+annotation-tags sort
 [
     [ \ $subsection swap comment-word 2array ] map append
     "To look up annotations:" suffix

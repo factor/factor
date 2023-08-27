@@ -11,8 +11,8 @@ IN: tools.profiler.sampling.tests
 ] unit-test
 
 ! Make sure the profiler doesn't blow up the VM
-TUPLE: boom ;
 { } [ 10 [ [ ] profile ] times ] unit-test
+TUPLE: boom ;
 [ 10 [ [ boom new throw ] profile ] times ] [ boom? ] must-fail-with
 
 { t t t t t t t t t t } [

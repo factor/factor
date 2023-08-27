@@ -1,5 +1,5 @@
 ! Copyright (c) 2008 Slava Pestov
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors byte-vectors destructors io io.encodings.binary
 io.files io.streams.byte-array kernel sequences ;
 IN: checksums

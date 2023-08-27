@@ -33,6 +33,17 @@ HELP: <editor>
 
 { editor-caret editor-mark } related-words
 
+HELP: caret-style
+{ $description "Caret styles available:"
+{ $table
+  { "Value" "Shape" }
+  { { $link +line+ } "line (default)" }
+  { { $link +box+ } "box" }
+  { { $link +filled+ } "filled box" }
+}
+}
+{ $references "Set desired caret style in your .factor-rc file" "rc-files" } ;
+
 HELP: editor-caret
 { $values { "editor" editor } { "loc" "a pair of integers" } }
 { $description "Outputs the current caret location as a line/column number pair." } ;

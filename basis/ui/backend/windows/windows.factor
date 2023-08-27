@@ -1,6 +1,6 @@
 ! Copyright (C) 2005, 2006 Doug Coleman.
 ! Portions copyright (C) 2007, 2010 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors alien alien.c-types alien.data alien.strings
 arrays ascii assocs assocs.extras byte-arrays calendar classes
 classes.struct colors combinators continuations io io.crlf
@@ -357,15 +357,15 @@ SYMBOL: upper-surrogate-wm-char
         ctrl? alt? xor [ ! enable AltGr combination inputs
             wParam {
                 { [ dup upper-surrogate? ] [
-                      upper-surrogate-wm-char set-global ]
-                }
+                      upper-surrogate-wm-char set-global
+                ] }
                 { [ dup under-surrogate? ] [
-                      drop
-                      upper-surrogate-wm-char get-global [
-                          wParam "" 2sequence
-                          utf16n encode utf16n decode hWnd window user-input
-                      ] when* ]
-                }
+                    drop
+                    upper-surrogate-wm-char get-global [
+                        wParam "" 2sequence
+                        utf16n encode utf16n decode hWnd window user-input
+                    ] when*
+                ] }
                 [ 1string hWnd window user-input
                   f upper-surrogate-wm-char set-global ]
             } cond
@@ -827,9 +827,14 @@ M: windows-ui-backend (set-fullscreen)
     [ enter-fullscreen ] [ exit-fullscreen ] if ;
 
 M: windows-ui-backend (fullscreen?)
-    handle>> hWnd>>
-    [ hwnd>RECT ] [ fullscreen-RECT ] bi
-    [ get-RECT-dimensions 2array 2nip ] same? ;
+    handle>> [
+        hWnd>>
+        [ hwnd>RECT ] [ fullscreen-RECT ] bi
+        [ get-RECT-dimensions 2array 2nip ] same?
+    ] [
+        [ "windows-ui-backend no hWnd" print ] with-global
+        f
+    ] if* ;
 
 M:: windows-ui-backend resize-window ( world dim -- )
     world handle>> hWnd>>

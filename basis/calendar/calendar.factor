@@ -1,5 +1,5 @@
 ! Copyright (C) 2007 Doug Coleman.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors arrays classes.tuple combinators
 combinators.short-circuit kernel literals math math.functions
 math.intervals math.order math.statistics sequences slots.syntax
@@ -14,7 +14,11 @@ ERROR: not-in-interval value interval ;
 
 HOOK: gmt-offset os ( -- hours minutes seconds )
 
+ALIAS: utc-offset gmt-offset
+
 HOOK: now-gmt os ( -- timestamp )
+
+ALIAS: now-utc now-gmt
 
 TUPLE: duration
     { year real }
@@ -76,11 +80,15 @@ M: timestamp clone (clone) [ clone ] change-gmt-offset ;
 : <date-gmt> ( year month day -- timestamp )
     0 0 0 instant <timestamp> ; inline
 
+ALIAS: <date-utc> <date-gmt>
+
 : <year> ( year -- timestamp )
     1 1 <date> ; inline
 
 : <year-gmt> ( year -- timestamp )
     1 1 <date-gmt> ; inline
+
+ALIAS: <year-utc> <year-gmt>
 
 CONSTANT: average-month 30+5/12
 CONSTANT: months-per-year 12
@@ -261,7 +269,7 @@ M: number +second
         [ day>>    +day    ]
         [ month>>  +month  ]
         [ year>>   +year   ]
-     } cleave ; inline
+    } cleave ; inline
 
 PRIVATE>
 
@@ -366,7 +374,7 @@ M: timestamp <=> [ >gmt tuple-slots ] compare ;
 
 : (day-of-week) ( year month day -- n )
     ! Zeller Congruence
-    ! http://web.textfiles.com/computers/formulas.txt
+    ! https://web.textfiles.com/computers/formulas.txt
     ! good for any date since October 15, 1582
     [
         dup 2 <= [ [ 1 - ] [ 12 + ] bi* ] when
@@ -487,7 +495,7 @@ M: timestamp days-in-year year>> days-in-year ;
 : today ( -- timestamp ) now midnight ; inline
 : tomorrow ( -- timestamp ) 1 days hence midnight ; inline
 : yesterday ( -- timestamp ) 1 days ago midnight ; inline
-: overtomorrow ( -- timestamp ) 2 days hence midnight ; inline
+: overmorrow ( -- timestamp ) 2 days hence midnight ; inline
 : ereyesterday ( -- timestamp ) 2 days ago midnight ; inline
 
 : today? ( timestamp -- ? ) now same-day? ; inline
@@ -499,8 +507,14 @@ ALIAS: start-of-day midnight
 : end-of-day ( timestamp -- timestamp' )
     clone 23 >>hour 59 >>minute 59+999/1000 >>second ; inline
 
+: first-day-of-month ( timestamp -- timestamp' )
+    clone 1 >>day ;
+
+: last-day-of-month ( timestamp -- timestamp' )
+    clone dup days-in-month >>day ; inline
+
 : start-of-month ( timestamp -- timestamp' )
-    midnight 1 >>day ; inline
+    midnight first-day-of-month ; inline
 
 : end-of-month ( timestamp -- timestamp' )
     [ end-of-day ] [ days-in-month ] bi >>day ;
@@ -510,12 +524,6 @@ ALIAS: start-of-day midnight
 
 : end-of-quarter ( timestamp -- timestamp' )
     dup quarter 1 - 3 * 3 + >>month end-of-month ; inline
-
-: first-day-of-month ( timestamp -- timestamp' )
-    clone 1 >>day ;
-
-: last-day-of-month ( timestamp -- timestamp' )
-    clone dup days-in-month >>day ; inline
 
 GENERIC: first-day-of-year ( object -- timestamp )
 M: timestamp first-day-of-year clone 1 >>month 1 >>day ;
@@ -579,7 +587,7 @@ M: integer last-day-of-year 12 31 <date> ;
     over day-of-week - ; inline
 
 : day-this-week ( timestamp n -- timestamp' )
-    day-offset days (time+) ;
+    day-offset days time+ ;
 
 : closest-day ( timestamp n -- timestamp' )
     [ dup day-of-week 7 swap - ] [ + 7 mod ] bi*
@@ -753,15 +761,6 @@ ALIAS: last-day-of-week saturday
     ] 2keep
     day-of-week 6 = [ [ 1 - ] dip ] when
     day-of-week 0 = [ 1 - ] when ;
-
-CONSTANT: weekday-offsets { 0 0 1 2 3 4 5 }
-
-: weekdays-between2 ( date1 date2 -- n )
-    [ swap time- duration>days 1 + ]
-    [ [ day-of-week ] bi@ 6 swap - ] 2bi
-
-    [ + + 1.4 /i ]
-    [ [ weekday-offsets nth ] bi@ + ] 2bi - ;
 
 : sunday-of-month ( timestamp n -- timestamp' ) 0 nth-day-this-month ;
 : monday-of-month ( timestamp n -- timestamp' ) 1 nth-day-this-month ;

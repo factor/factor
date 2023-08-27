@@ -1,5 +1,5 @@
 ! Copyright (C) 2008 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: kernel sequences accessors namespaces combinators words
 assocs db.tuples arrays splitting strings validators urls fry
 html.forms

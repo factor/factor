@@ -1,6 +1,6 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! Copyright (C) 2009 Doug Coleman.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors combinators destructors io io.encodings
 io.files io.files.info kernel math math.order namespaces
 sequences ;

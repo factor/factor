@@ -1,6 +1,6 @@
 ! Copyright (C) 2008 Eduardo Cavazos.
 ! Copyright (C) 2011 Anton Gorenko.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors arrays combinators.short-circuit kernel math
 math.vectors random sequences ;
 IN: boids.simulation
@@ -8,7 +8,7 @@ IN: boids.simulation
 CONSTANT: WIDTH 512
 CONSTANT: HEIGHT 512
 
-TUPLE: behaviour
+TUPLE: behavior
     { weight float }
     { radius float }
     { angle-cos float } ;
@@ -41,28 +41,28 @@ C: <boid> boid
 : in-view? ( self other angle-cos -- ? )
     [ relative-angle ] dip >= ; inline
 
-:: within-neighborhood? ( self other behaviour -- ? )
+:: within-neighborhood? ( self other behavior -- ? )
     self other {
         [ eq? not ]
-        [ behaviour radius>> in-radius? ]
-        [ behaviour angle-cos>> in-view? ]
+        [ behavior radius>> in-radius? ]
+        [ behavior angle-cos>> in-view? ]
     } 2&& ; inline
 
-:: neighbors ( boid boids behaviour -- neighbors )
-    boid boids [ behaviour within-neighborhood? ] with filter ;
+:: neighbors ( boid boids behavior -- neighbors )
+    boid boids [ behavior within-neighborhood? ] with filter ;
 
-GENERIC: force ( neighbors boid behaviour -- force )
+GENERIC: force ( neighbors boid behavior -- force )
 
-:: (force) ( boid boids behaviour -- force )
-    boid boids behaviour neighbors
-    [ { 0.0 0.0 } ] [ boid behaviour force ] if-empty ;
+:: (force) ( boid boids behavior -- force )
+    boid boids behavior neighbors
+    [ { 0.0 0.0 } ] [ boid behavior force ] if-empty ;
 
 : wrap-pos ( pos -- pos )
     WIDTH HEIGHT 2array [ [ + ] keep mod ] 2map ;
 
-:: simulate ( boids behaviours dt -- boids )
+:: simulate ( boids behaviors dt -- boids )
     boids [| boid |
-        boid boids behaviours
+        boid boids behaviors
         [ [ (force) ] keep weight>> v*n ] 2with map vsum :> a
 
         boid vel>> a dt v*n v+ normalize :> vel
@@ -78,21 +78,21 @@ GENERIC: force ( neighbors boid behaviour -- force )
         <boid>
     ] replicate ;
 
-TUPLE: cohesion < behaviour ;
-TUPLE: alignment < behaviour ;
-TUPLE: separation < behaviour ;
+TUPLE: cohesion < behavior ;
+TUPLE: alignment < behavior ;
+TUPLE: separation < behavior ;
 
 C: <cohesion> cohesion
 C: <alignment> alignment
 C: <separation> separation
 
-M: cohesion force ( neighbors boid behaviour -- force )
+M: cohesion force ( neighbors boid behavior -- force )
     drop [ [ pos>> ] map vavg ] [ pos>> ] bi* v- normalize ;
 
-M: alignment force ( neighbors boid behaviour -- force )
+M: alignment force ( neighbors boid behavior -- force )
     2drop [ vel>> ] map vsum normalize ;
 
-M:: separation force ( neighbors boid behaviour -- force )
-    behaviour radius>> :> r
+M:: separation force ( neighbors boid behavior -- force )
+    behavior radius>> :> r
     boid pos>> neighbors
     [ pos>> v- [ normalize ] [ r v/n ] bi v- ] with map vsum ;

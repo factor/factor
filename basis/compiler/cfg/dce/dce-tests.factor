@@ -1,5 +1,5 @@
 ! Copyright (C) 2009 Daniel Ehrenberg.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors kernel compiler.cfg compiler.cfg.dce compiler.cfg.instructions
 compiler.cfg.registers compiler.cfg.utilities cpu.architecture tools.test ;
 IN: compiler.cfg.dce.tests

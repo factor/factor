@@ -1,5 +1,5 @@
 ! Copyright (C) 2009, 2010 Slava Pestov, Joe Groff.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors assocs classes.algebra combinators
 combinators.short-circuit continuations io.directories
 io.encodings.utf8 io.files io.pathnames kernel make math.parser
@@ -23,10 +23,10 @@ MEMO: vocab-file-lines ( vocab name -- lines/f )
     ] when ;
 
 : set-vocab-file-lines ( lines vocab name -- )
-    dupd vocab-file-path [
+    dupd vocab-file-path or* [
         swap [ ?delete-file ] [ swap utf8 set-file-lines ] if-empty
         \ vocab-file-lines reset-memoized
-    ] [ vocab-name no-vocab ] ?if ;
+    ] [ vocab-name no-vocab ] if ;
 
 : vocab-resources-path ( vocab -- path/f )
     "resources.txt" vocab-file-path ;
@@ -76,7 +76,7 @@ ERROR: bad-platform name ;
 
 : vocab-platforms ( vocab -- platforms )
     "platforms.txt" vocab-file-lines
-    [ dup "system" lookup-word [ ] [ bad-platform ] ?if ] map ;
+    [ [ "system" lookup-word ] [ bad-platform ] ?unless ] map ;
 
 : supported-platform? ( platforms -- ? )
     [ t ] [ [ os swap class<= ] any? ] if-empty ;
@@ -104,11 +104,11 @@ M: unsupported-platform summary
 : vocab-metadata-files ( vocab -- paths )
     [
         {
-            [ vocab-summary-path file-exists?, ]
             [ vocab-authors-path file-exists?, ]
-            [ vocab-tags-path file-exists?, ]
             [ vocab-platforms-path file-exists?, ]
             [ vocab-resources-path file-exists?, ]
+            [ vocab-summary-path file-exists?, ]
+            [ vocab-tags-path file-exists?, ]
         } cleave
     ] { } make ;
 

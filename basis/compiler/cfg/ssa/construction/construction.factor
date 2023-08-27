@@ -1,5 +1,5 @@
 ! Copyright (C) 2009, 2010 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors assocs combinators compiler.cfg
 compiler.cfg.def-use compiler.cfg.dominance
 compiler.cfg.instructions compiler.cfg.registers
@@ -71,7 +71,7 @@ SYMBOLS: stacks pushed ;
 
 : top-name ( vreg -- vreg' )
     (top-name)
-    dup [ dup used-vregs get push-front ] when ;
+    [ dup used-vregs get push-front ] ?call ;
 
 RENAMING: ssa-rename [ gen-name ] [ top-name ] [ ]
 

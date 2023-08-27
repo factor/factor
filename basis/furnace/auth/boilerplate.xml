@@ -2,8 +2,9 @@
 
 <t:chloe xmlns:t="http://factorcode.org/chloe/1.0">
 
+    <div style="padding: 10px;">
 	<h1><t:write-title /></h1>
 
 	<t:call-next-template />
-
+    </div>
 </t:chloe>

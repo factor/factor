@@ -1,7 +1,8 @@
 ! Copyright (C) 2008, 2009 Slava Pestov, Doug Coleman.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors assocs combinators kernel kernel.private lexer
-math math.parser namespaces sbufs sequences splitting strings ;
+math math.order math.parser namespaces sbufs sequences splitting
+strings ;
 IN: strings.parser
 
 ERROR: bad-escape char ;
@@ -29,8 +30,16 @@ name>char-hook [
     [ "Unicode support not available" throw ]
 ] initialize
 
+<PRIVATE
+
 : hex-escape ( str -- ch str' )
     2 cut-slice [ hex> ] dip ;
+
+: oct-escape ( str -- ch/f str' )
+    dup 3 index-or-length head-slice [
+        [ CHAR: 0 CHAR: 7 between? not ] find drop
+    ] keep '[ _ length ] unless* [ f ] when-zero
+    [ cut-slice [ oct> ] dip ] [ f swap ] if* ;
 
 : unicode-escape ( str -- ch str' )
     "{" ?head-slice [
@@ -46,14 +55,14 @@ name>char-hook [
     ] if ;
 
 : next-escape ( str -- ch str' )
-    unclip-slice {
-        { CHAR: u [ unicode-escape ] }
-        { CHAR: x [ hex-escape ] }
-        { CHAR: \n [ f swap ] }
-        [ escape swap ]
-    } case ;
-
-<PRIVATE
+    oct-escape over [
+        nip unclip-slice {
+            { CHAR: u [ unicode-escape ] }
+            { CHAR: x [ hex-escape ] }
+            { CHAR: \n [ f swap ] }
+            [ escape swap ]
+        } case
+    ] unless ;
 
 : (unescape-string) ( accum str i/f -- accum )
     { sbuf object object } declare

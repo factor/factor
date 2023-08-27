@@ -1,5 +1,5 @@
 USING: help.markup help.syntax io.files.private io.pathnames
-quotations sequences ;
+math quotations sequences ;
 IN: io.directories
 
 HELP: cwd
@@ -82,6 +82,10 @@ HELP: delete-file
 { $description "Deletes a file." }
 { $errors "Throws an error if the file could not be deleted." } ;
 
+HELP: ?delete-file
+{ $values { "path" "a pathname string" } }
+{ $description "Calls " { $link delete-file } " if the " { $snippet "path" } " file exists." } ;
+
 HELP: make-directory
 { $values { "path" "a pathname string" } }
 { $description "Creates a directory." }
@@ -102,11 +106,20 @@ HELP: touch-file
 { $description "Updates the modification time of a file or directory. If the file does not exist, creates a new, empty file." }
 { $errors "Throws an error if the file could not be touched." } ;
 
+HELP: truncate-file
+{ $values { "path" "a pathname string" } { "n" integer } }
+{ $description "Set the length of the file to " { $snippet "n" } " bytes. If the file was previously longer, the extra data is lost. If the file was previously shorter, the behavior is platform-dependent on whether the file is extended with zeros (Unix) or the contents of the extended portion are undefined (Windows)." }
+{ $errors "Throws an error if the file does not exist or the truncate operation fails." } ;
+
 HELP: move-file
 { $values { "from" "a pathname string" } { "to" "a pathname string" } }
 { $description "Moves or renames a file. This operation is not guaranteed to be atomic. In particular, if you attempt to move a file across volumes, this will copy the file and then delete the original in a nontransactional manner." }
 { $errors "Throws an error if the file does not exist or if the move operation fails." }
 { $see-also move-file-atomically } ;
+
+HELP: ?move-file
+{ $values { "from" "a pathname string" } { "to" "a pathname string" } }
+{ $description "Calls " { $link move-file } " if the " { $snippet "from" } " file exists." } ;
 
 HELP: move-file-atomically
 { $values { "from" "a pathname string" } { "to" "a pathname string" } }

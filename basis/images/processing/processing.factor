@@ -1,5 +1,5 @@
 ! Copyright (C) 2009 Marc Fauconneau.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors arrays byte-arrays images kernel math
 math.order math.vectors sequences sequences.deep ;
 IN: images.processing

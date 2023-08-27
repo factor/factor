@@ -1,9 +1,9 @@
 ! Copyright (c) 2012 Anonymous
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: io kernel math math.functions sequences splitting strings ;
 IN: rosetta.align-columns
 
-! http://rosettacode.org/wiki/Align_columns
+! https://rosettacode.org/wiki/Align_columns
 
 ! Given a text file of many lines, where fields within a line
 ! are delineated by a single 'dollar' character, write a program

@@ -1,5 +1,5 @@
 ! Copyright (C) 2012 John Benediktsson
-! See http://factorcode.org/license.txt for BSD license
+! See https://factorcode.org/license.txt for BSD license
 
 USING: arrays combinators combinators.short-circuit help
 help.apropos help.markup help.stylesheet help.topics io
@@ -37,11 +37,11 @@ MEMO: article-words ( name -- words )
     search-words [ { } ] [
         [ all-articles ] dip
         dup length 1 > [
-            '[ article-words _ swap subseq? ] filter
+            '[ article-words _ subseq-of? ] filter
         ] [
             first '[ article-words [ _ head? ] any? ] filter
         ] if
-    ] if-empty [ article-name ] sort-with ;
+    ] if-empty [ article-name ] sort-by ;
 
 PRIVATE>
 

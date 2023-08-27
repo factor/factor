@@ -1,5 +1,5 @@
 ! Copyright (C) 2008 Doug Coleman.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: math.primes kernel math math.functions namespaces
 sequences accessors ;
 IN: crypto.rsa

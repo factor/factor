@@ -1,0 +1,1 @@
+Bech32 encoding/decoding

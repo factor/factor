@@ -1,5 +1,5 @@
 ! Copyright (C) 2008 Doug Coleman.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors alien.data arrays calendar calendar.unix
 classes.struct combinators combinators.short-circuit io.backend
 io.files.info io.files.types kernel libc math math.bitwise
@@ -14,7 +14,7 @@ blocks blocks-free blocks-available
 files files-free files-available
 name-max flags id ;
 
-HOOK: new-file-system-info os ( --  file-system-info )
+HOOK: new-file-system-info os ( -- file-system-info )
 
 M: unix new-file-system-info unix-file-system-info new ;
 

@@ -1,5 +1,5 @@
 ! Copyright (C) 2007 Chris Double.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: alien alien.c-types alien.libraries alien.syntax
 combinators kernel namespaces openal openal.alut.backend
 specialized-arrays system vocabs ;
@@ -9,9 +9,7 @@ IN: openal.alut
 
 << "alut" {
         { [ os windows? ]  [ "alut.dll" ] }
-        { [ os macosx? ] [
-            "/System/Library/Frameworks/OpenAL.framework/OpenAL"
-        ] }
+        { [ os macosx? ] [ "libalut.dylib" ] }
         { [ os unix?  ]  [ "libalut.so" ] }
     } cond cdecl add-library >>
 

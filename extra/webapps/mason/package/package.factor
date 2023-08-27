@@ -1,5 +1,5 @@
 ! Copyright (C) 2010 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors arrays combinators furnace.actions html.forms
 kernel xml.syntax mason.platform mason.report present
 sequences webapps.mason webapps.mason.report

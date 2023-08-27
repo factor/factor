@@ -1,5 +1,5 @@
 ! Copyright (C) 2008 Doug Coleman.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: farkup kernel peg peg.ebnf tools.test namespaces xml
 urls.encoding assocs xml.traversal xml.data sequences random
 io continuations math ;
@@ -98,9 +98,9 @@ link-no-follow? off
 
 { "<p><img src=\"lol.jpg\" alt=\"lol.jpg\"/></p>" } [ "[[image:lol.jpg]]" convert-farkup ] unit-test
 { "<p><img src=\"lol.jpg\" alt=\"teh lol\"/></p>" } [ "[[image:lol.jpg|teh lol]]" convert-farkup ] unit-test
-{ "<p><a href=\"http://lol.com\">http://lol.com</a></p>" } [ "[[http://lol.com]]" convert-farkup ] unit-test
-{ "<p><a href=\"http://lol.com\">haha</a></p>" } [ "[[http://lol.com|haha]]" convert-farkup ] unit-test
-{ "<p><a href=\"http://lol.com/search?q=sex\">haha</a></p>" } [ "[[http://lol.com/search?q=sex|haha]]" convert-farkup ] unit-test
+{ "<p><a href=\"https://lol.com\">https://lol.com</a></p>" } [ "[[https://lol.com]]" convert-farkup ] unit-test
+{ "<p><a href=\"https://lol.com\">haha</a></p>" } [ "[[https://lol.com|haha]]" convert-farkup ] unit-test
+{ "<p><a href=\"https://lol.com/search?q=sex\">haha</a></p>" } [ "[[https://lol.com/search?q=sex|haha]]" convert-farkup ] unit-test
 { "<p><a href=\"Foo/Bar\">Bar</a></p>" } [ "[[Foo/Bar]]" convert-farkup ] unit-test
 
 "/wiki/view/" relative-link-prefix [
@@ -120,9 +120,9 @@ link-no-follow? off
 } [ "Feature comparison:\n\n|a|Factor|Java|Lisp|\n|Coolness|Yes|No|No|\n|Badass|Yes|No|No|\n|Enterprise|Yes|Yes|No|\n|Kosher|Yes|No|Yes|\n" convert-farkup ] unit-test
 
 {
-    "<p>This wiki is written in <a href=\"Factor\">Factor</a> and is hosted on a <a href=\"http://linode.com\">http://linode.com</a> virtual server.</p>"
+    "<p>This wiki is written in <a href=\"Factor\">Factor</a> and is hosted on a <a href=\"https://linode.com\">https://linode.com</a> virtual server.</p>"
 } [
-    "This wiki is written in [[Factor]] and is hosted on a [[http://linode.com|http://linode.com]] virtual server."
+    "This wiki is written in [[Factor]] and is hosted on a [[https://linode.com|https://linode.com]] virtual server."
     convert-farkup
 ] unit-test
 
@@ -135,7 +135,7 @@ link-no-follow? off
 { "<p>asdf</p><ul><li>lol</li><li>haha</li></ul>" } [ "asdf\n-lol\n-haha" convert-farkup ] unit-test
 
 { "<p>asdf</p><ul><li>lol</li><li>haha</li></ul>" }
- [ "asdf\n\n-lol\n-haha" convert-farkup ] unit-test
+[ "asdf\n\n-lol\n-haha" convert-farkup ] unit-test
 
 { "<hr/>" } [ "___" convert-farkup ] unit-test
 { "<hr/>" } [ "___\n" convert-farkup ] unit-test
@@ -208,4 +208,4 @@ link-no-follow? off
     ] all-integers?
 ] unit-test
 
-{ "<p><a href=\"http://foo.com/~foo\">http://foo.com/~foo</a></p>" } [ "[[http://foo.com/~foo]]" convert-farkup ] unit-test
+{ "<p><a href=\"https://foo.com/~foo\">https://foo.com/~foo</a></p>" } [ "[[https://foo.com/~foo]]" convert-farkup ] unit-test

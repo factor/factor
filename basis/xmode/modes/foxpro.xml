@@ -11,6 +11,7 @@
 			VALUE="\s*(((if|do\swhile|do\scase|try)\s*\(|else\s*|elseif\s*\|case|catch(|for\s*\(.*\))[^{;]*)" />
 
 		<PROPERTY NAME="lineComment" VALUE="&amp;&amp;" />
+		<PROPERTY NAME="contextInsensitive" VALUE="true"/>
 	</PROPS>
 
 	<RULES IGNORE_CASE="TRUE" HIGHLIGHT_DIGITS="TRUE">

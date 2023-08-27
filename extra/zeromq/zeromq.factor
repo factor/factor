@@ -1,15 +1,15 @@
 ! Copyright (C) 2011-2013 Eungju PARK, John Benediktsson.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors alien.c-types alien.data arrays byte-arrays
 classes.struct combinators destructors fry kernel libc math math.order
 memoize sequences zeromq.ffi ;
 
 IN: zeromq
 
-TUPLE: zmq-error n string ;
+ERROR: zmq-error n string ;
 
 : throw-zmq-error ( -- )
-    zmq_errno dup zmq_strerror zmq-error boa throw ; inline
+    zmq_errno dup zmq_strerror zmq-error ; inline
 
 : check-zmq-error ( retval -- )
     [ throw-zmq-error ] unless-zero ; inline

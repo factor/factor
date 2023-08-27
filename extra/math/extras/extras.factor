@@ -1,12 +1,13 @@
 ! Copyright (C) 2012 John Benediktsson
-! See http://factorcode.org/license.txt for BSD license
+! See https://factorcode.org/license.txt for BSD license
 
 USING: accessors arrays assocs byte-arrays combinators
-combinators.short-circuit compression.zlib grouping kernel math
-math.bitwise math.combinatorics math.constants math.functions
-math.order math.primes math.primes.factors math.statistics
-math.vectors random ranges ranges.private sequences
-sequences.extras sets sorting sorting.extras ;
+combinators.short-circuit compression.zlib grouping kernel
+kernel.private math math.bitwise math.combinatorics
+math.constants math.functions math.order math.primes
+math.primes.factors math.statistics math.vectors namespaces
+random random.private ranges ranges.private sequences
+sequences.extras sequences.private sets sorting sorting.extras ;
 
 IN: math.extras
 
@@ -41,6 +42,10 @@ PRIVATE>
 
 MEMO: bernoulli ( p -- n )
     [ 1 ] [ (bernoulli) ] if-zero ;
+
+! From page 4 https://arxiv.org/ftp/arxiv/papers/2201/2201.12601.pdf
+: bernoulli-estimate-factorial ( n -- n! )
+    [ 2pi swap ^ ] [ bernoulli ] bi * 2 / ;
 
 : chi2 ( actual expected -- n )
     0 [ dup 0 > [ [ - sq ] keep / + ] [ 2drop ] if ] 2reduce ;
@@ -166,7 +171,7 @@ PRIVATE>
 <PRIVATE
 
 :: (gini) ( seq -- x )
-    seq natural-sort :> sorted
+    seq sort :> sorted
     seq length :> len
     sorted 0 [ + ] cum-reduce :> ( a b )
     b len a * / :> c
@@ -195,7 +200,12 @@ PRIVATE>
     dup sum '[ _ / dup ^ ] map-product ;
 
 : weighted-random ( histogram -- obj )
-    unzip cum-sum [ last random ] [ bisect-left ] bi swap nth ;
+    unzip cum-sum [ last >float random ] keep bisect-left swap nth ;
+
+: weighted-randoms ( length histogram -- seq )
+    unzip cum-sum swap
+    [ [ last >float random-generator get ] keep ] dip
+    '[ _ _ random* _ bisect-left _ nth ] replicate ;
 
 : unique-indices ( seq -- unique indices )
     [ members ] keep over dup length <iota>
@@ -345,7 +355,7 @@ PRIVATE>
 
 :: integer-sqrt ( m -- n )
     m [ 0 ] [
-        dup 0 < [ non-negative-integer-expected ] when
+        assert-non-negative
         bit-length 1 - 2 /i :> c
         1 :> a!
         0 :> d!
@@ -380,4 +390,36 @@ PRIVATE>
     [ dup 0 < [ neg ] when ] bi@
     [ 1 ] 2dip reduce-evens reduce-odds 2drop ;
 
+TUPLE: vose
+    { n fixnum }
+    { items array }
+    { probs array }
+    { alias array } ;
 
+:: <vose> ( dist -- vose )
+    V{ } clone :> small
+    V{ } clone :> large
+    dist assoc-size :> n
+    n f <array> :> alias
+
+    dist unzip dup [ length ] [ sum ] bi /f v*n :> ( items probs )
+    probs [ swap 1.0 < small large ? push ] each-index
+
+    [ small empty? large empty? or ] [
+        small pop :> s
+        large pop :> l
+        l s alias set-nth
+        l dup probs [ s probs nth + 1 - dup ] change-nth
+        1.0 < small large ? push
+    ] until
+
+    1.0 large [ probs set-nth ] with each
+    1.0 small [ probs set-nth ] with each
+
+    n items probs alias vose boa ;
+
+M:: vose random* ( obj rnd -- elt )
+    obj n>> rnd random* { fixnum } declare
+    dup obj probs>> nth-unsafe { float } declare rnd (random-unit) >=
+    [ obj alias>> nth-unsafe { fixnum } declare ] unless
+    obj items>> nth-unsafe ;

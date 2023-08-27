@@ -1,4 +1,4 @@
 USING: alien.libraries.finder sequences tools.test ;
 
-{ t } [ "libm.so" "m" find-library subseq? ] unit-test
-{ t } [ "libc.so" "c" find-library subseq? ] unit-test
+{ t } [ "m" find-library "libm.so" subseq-of? ] unit-test
+{ t } [ "c" find-library "libc.so" subseq-of? ] unit-test

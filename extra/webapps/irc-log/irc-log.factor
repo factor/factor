@@ -1,5 +1,5 @@
 ! Copyright (C) 2008 Doug Coleman.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: calendar kernel http.server.dispatchers prettyprint
 sequences formatting furnace.actions html.forms accessors
 furnace.redirection ;
@@ -10,7 +10,7 @@ TUPLE: irclog-app < dispatcher ;
 : irc-link ( channel -- string )
     now -7 hours convert-timezone >date<
     [ unparse 2 tail ] 2dip
-    "http://bespin.org/~nef/logs/%s/%02s.%02d.%02d"
+    "https://bespin.org/~nef/logs/%s/%02s.%02d.%02d"
     sprintf ;
 
 : <display-irclog-action> ( -- action )

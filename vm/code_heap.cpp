@@ -143,6 +143,7 @@ void factor_vm::primitive_modify_code_heap() {
 
     switch (data.type()) {
       case QUOTATION_TYPE:
+      case TUPLE_TYPE: // for curry/compose, see issue #2763
         jit_compile_word(word.value(), data.value(), false);
         break;
       case ARRAY_TYPE: {

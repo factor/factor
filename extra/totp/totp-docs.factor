@@ -1,5 +1,5 @@
 ! Copyright (C) 2018, 2020 Alexander Ilin.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: byte-arrays calendar checksums checksums.sha help.markup
 help.syntax kernel math strings ;
 IN: totp
@@ -9,7 +9,7 @@ ABOUT: "totp"
 ARTICLE: "totp" "Time-Based One-Time Passwords"
 "The " { $vocab-link "totp" } " vocab implements time-based one-time password generation as described in RFC 6238 (" { $url "https://tools.ietf.org/html/rfc6238" } ")."
 $nl
-"The idea is that a client is able to prove its identity to a server by sumbmitting a password that is only valid for a short period of time. The password needs to be sent via a secure channel inside that time period, and client and server must have a shared secret established in advance. The TOTP protocol uses the number of whole 30-second intervals passed in Unix time as a counter value, which it authenticates with an HMAC and converts into a string of " { $link digits } ". Client and server must use the same secret key, the same hash for the HMAC, the same time reference point (not necessarily Unix time) and the same time interval length for the counter. The string of digits used as the password should be long enough to balance convenience and brute-force attack resistance. For 30-second intervals 6 or more digits are typically used."
+"The idea is that a client is able to prove its identity to a server by submitting a password that is only valid for a short period of time. The password needs to be sent via a secure channel inside that time period, and client and server must have a shared secret established in advance. The TOTP protocol uses the number of whole 30-second intervals passed in Unix time as a counter value, which it authenticates with an HMAC and converts into a string of " { $link digits } ". Client and server must use the same secret key, the same hash for the HMAC, the same time reference point (not necessarily Unix time) and the same time interval length for the counter. The string of digits used as the password should be long enough to balance convenience and brute-force attack resistance. For 30-second intervals 6 or more digits are typically used."
 $nl
 "Both client and server are able to generate exactly the same digits from the shared secret using their current time as the counter. Server can be programmed to accept values from the adjacent time slots, so that time drift and network delays are compensated for, though that somewhat weakens the system."
 $nl

@@ -1,5 +1,5 @@
 ! Copyright (C) 2010 Joe Groff.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: help.markup help.syntax math sequences sequences.private ;
 IN: sequences.unrolled
 
@@ -66,11 +66,11 @@ HELP: unrolled-map-index
 }
 { $description "Unrolled version of " { $link map-index } " that maps over the first " { $snippet "len" } " elements of " { $snippet "seq" } ". " { $snippet "len" } " must be a compile-time constant. If " { $snippet "seq" } " has fewer than " { $snippet "len" } " elements, raises an " { $link unrolled-bounds-error } "." } ;
 
-HELP: unrolled-map-integers
+HELP: unrolled-map-integers-as
 { $values
     { "n" integer } { "quot" { $quotation ( n -- value ) } } { "exemplar" sequence } { "newseq" sequence }
 }
-{ $description "Unrolled version of " { $link map-integers } ". " { $snippet "n" } " must be a compile-time constant." } ;
+{ $description "Unrolled version of " { $link map-integers-as } ". " { $snippet "n" } " must be a compile-time constant." } ;
 
 ARTICLE: "sequences.unrolled" "Unrolled sequence iteration combinators"
 "The " { $vocab-link "sequences.unrolled" } " vocabulary provides versions of some of the " { $link "sequences-combinators" } " that unroll their loops, that is, expand to a constant number of repetitions of a quotation rather than an explicit loop. These unrolled combinators all require a constant integer value to indicate the number of unrolled iterations to perform."
@@ -89,7 +89,7 @@ $nl
 "Unrolled versions of low-level iteration combinators:"
 { $subsections
     unrolled-each-integer
-    unrolled-map-integers
+    unrolled-map-integers-as
     unrolled-collect
 } ;
 

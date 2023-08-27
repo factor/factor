@@ -1,5 +1,5 @@
 ! Copyright (C) 2021 Doug Coleman.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors kernel namespaces retries tools.test ;
 IN: retries.tests
 
@@ -67,5 +67,6 @@ IN: retries.tests
 
 { } [
     [ 2 = [ "not 2!" throw ] unless ]
-     1.1 100 <exponential-wait> 3 retries
+    1.1 100 <exponential-wait> 3 retries
 ] unit-test
+

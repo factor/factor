@@ -2,179 +2,215 @@
 
 <!DOCTYPE MODE SYSTEM "xmode.dtd">
 
-<!-- SML MODE by Ingmar Stein -->
+<!-- SML MODE 1.0.1 by Lucas Dixon, based on Ingmar Stein's ml mode -->
 <MODE>
-	<PROPS>
-		<PROPERTY NAME="commentStart" VALUE="(*"/>
-		<PROPERTY NAME="commentEnd" VALUE="*)"/>
-	</PROPS>
+  <PROPS>
+    <PROPERTY NAME="commentStart" VALUE="(*"/>
+    <PROPERTY NAME="commentEnd" VALUE="*)"/>
+    <PROPERTY NAME="wordBreakChars" VALUE=",+-=&lt;&gt;/?^&amp;*\\/(){}" />
+<!-- JEdit's indent mechanism is not expressive enough for ML.
+     It is best not to even try to have automated indentation for ML until significant improvements are made to the indent language. -->
+<!--
+    <PROPERTY NAME="doubleBracketIndent" VALUE="false" />
+    <PROPERTY NAME="lineUpClosingBracket" VALUE="true" />
+    <PROPERTY NAME="unalignedOpenBrackets" VALUE="([{" />
+    <PROPERTY NAME="unalignedCloseBrackets" VALUE=")]}" />
+    <PROPERTY NAME="indentOpenBrackets" VALUE="([{" />
+    <PROPERTY NAME="indentCloseBrackets" VALUE=")]}" />
+    <PROPERTY NAME="indentNextLines"
+      VALUE="(^|.*\s+)(let|sig|struct|local)(\W+.*|)$" />
+    <PROPERTY NAME="unindentNextLines"
+      VALUE="(^|.*\s+)(end)(\W+.*|)$" />
+    <PROPERTY NAME="unindentThisLine"
+      VALUE="(^|\s+)(local|val|fun|end|in|open)(\W+.*|)$" />
+-->
+  </PROPS>
 
-	<RULES ESCAPE="\" IGNORE_CASE="FALSE" HIGHLIGHT_DIGITS="TRUE">
-		<!-- comments -->
-		<SPAN TYPE="COMMENT1">
-			<BEGIN>(*</BEGIN>
-			<END>*)</END>
-		</SPAN>
+  <RULES IGNORE_CASE="FALSE" HIGHLIGHT_DIGITS="TRUE">
+    <!-- comments -->
+    <SPAN TYPE="COMMENT1">
+      <BEGIN>(*</BEGIN>
+      <END>*)</END>
+    </SPAN>
 
-		<!-- character literals -->
-		<SPAN TYPE="LITERAL1" NO_LINE_BREAK="TRUE">
-			<BEGIN>#"</BEGIN>
-			<END>"</END>
-		</SPAN>
+    <!-- character literals -->
+    <SPAN TYPE="LITERAL1" ESCAPE="\" NO_LINE_BREAK="TRUE">
+      <BEGIN>#"</BEGIN>
+      <END>"</END>
+    </SPAN>
 
-		<!-- string literals -->
-		<SPAN TYPE="LITERAL1" NO_LINE_BREAK="TRUE">
-			<BEGIN>"</BEGIN>
-			<END>"</END>
-		</SPAN>
+    <!-- string literals -->
+    <SPAN TYPE="LITERAL1" ESCAPE="\" NO_LINE_BREAK="TRUE">
+      <BEGIN>"</BEGIN>
+      <END>"</END>
+    </SPAN>
 
-		<!-- built-in operators -->
+    <!-- built-in operators -->
 
-		<!-- infix precedence 7 -->
-		<SEQ TYPE="OPERATOR">/</SEQ>
-		<SEQ TYPE="OPERATOR">*</SEQ>
+    <!-- infix precedence 7 -->
+    <SEQ TYPE="OPERATOR">/</SEQ>
+    <SEQ TYPE="OPERATOR">*</SEQ>
 
-		<!-- infix precedence 6 -->
-		<SEQ TYPE="OPERATOR">+</SEQ>
-		<SEQ TYPE="OPERATOR">-</SEQ>
-		<SEQ TYPE="OPERATOR">^</SEQ>
+    <!-- reserved & operator characters -->
+    <SEQ TYPE="OPERATOR">+</SEQ>
+    <SEQ TYPE="OPERATOR">-</SEQ>
+    <SEQ TYPE="OPERATOR">^</SEQ>
+    <SEQ TYPE="OPERATOR">@</SEQ>
+    <SEQ TYPE="OPERATOR">=</SEQ>
+    <SEQ TYPE="OPERATOR">&lt;</SEQ>
+    <SEQ TYPE="OPERATOR">&gt;</SEQ>
+    <SEQ TYPE="OPERATOR">(</SEQ>
+    <SEQ TYPE="OPERATOR">)</SEQ>
+    <SEQ TYPE="OPERATOR">[</SEQ>
+    <SEQ TYPE="OPERATOR">]</SEQ>
+    <SEQ TYPE="OPERATOR">{</SEQ>
+    <SEQ TYPE="OPERATOR">}</SEQ>
+    <SEQ TYPE="OPERATOR">,</SEQ>
+    <SEQ TYPE="OPERATOR">:</SEQ>
+    <SEQ TYPE="OPERATOR">;</SEQ>
+    <SEQ TYPE="OPERATOR">|</SEQ>
+    <SEQ TYPE="OPERATOR">#</SEQ>
 
-		<!-- infix precedence 5 -->
-		<SEQ TYPE="OPERATOR">::</SEQ>
-		<SEQ TYPE="OPERATOR">@</SEQ>
 
-		<!-- infix precedence 4 -->
-		<SEQ TYPE="OPERATOR">=</SEQ>
-		<SEQ TYPE="OPERATOR">&lt;&gt;</SEQ>
-		<SEQ TYPE="OPERATOR">&lt;=</SEQ>
-		<SEQ TYPE="OPERATOR">&lt;</SEQ>
-		<SEQ TYPE="OPERATOR">&gt;=</SEQ>
-		<SEQ TYPE="OPERATOR">&gt;</SEQ>
+    <MARK_FOLLOWING TYPE="FUNCTION"
+    MATCH_TYPE="KEYWORD1">fun </MARK_FOLLOWING>
+    <MARK_FOLLOWING TYPE="FUNCTION"
+    MATCH_TYPE="KEYWORD1">val </MARK_FOLLOWING>
+    <MARK_FOLLOWING TYPE="FUNCTION"
+    MATCH_TYPE="KEYWORD1">exception </MARK_FOLLOWING>
 
-		<!-- infix precedence 3 -->
-		<SEQ TYPE="OPERATOR">:=</SEQ>
+    <MARK_FOLLOWING TYPE="FUNCTION"
+    MATCH_TYPE="KEYWORD1">type </MARK_FOLLOWING>
+    <MARK_FOLLOWING TYPE="FUNCTION"
+    MATCH_TYPE="KEYWORD1">abstype </MARK_FOLLOWING>
+     <MARK_FOLLOWING TYPE="FUNCTION"
+    MATCH_TYPE="KEYWORD1">eqtype </MARK_FOLLOWING>
+    <MARK_FOLLOWING TYPE="FUNCTION"
+    MATCH_TYPE="KEYWORD1">datatype </MARK_FOLLOWING>
 
-		<!-- reserved words -->
-		<!-- <SEQ TYPE="NULL">(</SEQ>
-		<SEQ TYPE="NULL">)</SEQ>
-		<SEQ TYPE="NULL">[</SEQ>
-		<SEQ TYPE="NULL">]</SEQ>
-		<SEQ TYPE="NULL">{</SEQ>
-		<SEQ TYPE="NULL">}</SEQ>
-		<SEQ TYPE="NULL">,</SEQ>
-		<SEQ TYPE="NULL">:&gt;</SEQ>
-		<SEQ TYPE="NULL">:</SEQ>
-		<SEQ TYPE="NULL">;</SEQ>
-		<SEQ TYPE="NULL">...</SEQ>
-		<SEQ TYPE="NULL">_</SEQ>
-		<SEQ TYPE="NULL">|</SEQ>
-		<SEQ TYPE="NULL">=&gt;</SEQ>
-		<SEQ TYPE="NULL">-&gt;</SEQ>
-		<SEQ TYPE="NULL">#</SEQ> -->
+    <MARK_FOLLOWING TYPE="LITERAL3"
+    MATCH_TYPE="KEYWORD1">functor </MARK_FOLLOWING>
+    <MARK_FOLLOWING TYPE="LITERAL3"
+    MATCH_TYPE="KEYWORD1">structure </MARK_FOLLOWING>
+    <MARK_FOLLOWING TYPE="LITERAL3"
+    MATCH_TYPE="KEYWORD1">signature </MARK_FOLLOWING>
 
-		<KEYWORDS>
-			<!-- built-in operators -->
+    <!-- reserved words -->
+    <KEYWORDS>
+      <!-- built-in operators -->
 
-			<!-- infix precedence 7 -->
-			<OPERATOR>div</OPERATOR>
-			<OPERATOR>mod</OPERATOR>
+      <!-- infix precedence 7 -->
+      <OPERATOR>div</OPERATOR>
+      <OPERATOR>mod</OPERATOR>
 
-			<!-- infix precedence 3 -->
-			<OPERATOR>o</OPERATOR>
+      <!-- infix precedence 3 -->
+      <OPERATOR>o</OPERATOR>
 
-			<!-- infix precedence 0 -->
-			<OPERATOR>before</OPERATOR>
+      <!-- infix precedence 0 -->
+      <OPERATOR>before</OPERATOR>
 
-			<!-- reserved words -->
-			<KEYWORD1>abstype</KEYWORD1>
-			<KEYWORD1>and</KEYWORD1>
-			<KEYWORD1>andalso</KEYWORD1>
-			<KEYWORD1>as</KEYWORD1>
-			<KEYWORD1>case</KEYWORD1>
-			<KEYWORD1>do</KEYWORD1>
-			<KEYWORD1>datatype</KEYWORD1>
-			<KEYWORD1>else</KEYWORD1>
-			<KEYWORD1>end</KEYWORD1>
-			<KEYWORD1>eqtype</KEYWORD1>
-			<KEYWORD1>exception</KEYWORD1>
-			<KEYWORD1>fn</KEYWORD1>
-			<KEYWORD1>fun</KEYWORD1>
-			<KEYWORD1>functor</KEYWORD1>
-			<KEYWORD1>handle</KEYWORD1>
-			<KEYWORD1>if</KEYWORD1>
-			<KEYWORD1>in</KEYWORD1>
-			<KEYWORD1>include</KEYWORD1>
-			<KEYWORD1>infix</KEYWORD1>
-			<KEYWORD1>infixr</KEYWORD1>
-			<KEYWORD1>let</KEYWORD1>
-			<KEYWORD1>local</KEYWORD1>
-			<KEYWORD1>nonfix</KEYWORD1>
-			<KEYWORD1>of</KEYWORD1>
-			<KEYWORD1>op</KEYWORD1>
-			<KEYWORD1>open</KEYWORD1>
-			<KEYWORD1>orelse</KEYWORD1>
-			<KEYWORD1>raise</KEYWORD1>
-			<KEYWORD1>rec</KEYWORD1>
-			<KEYWORD1>sharing</KEYWORD1>
-			<KEYWORD1>sig</KEYWORD1>
-			<KEYWORD1>signature</KEYWORD1>
-			<KEYWORD1>struct</KEYWORD1>
-			<KEYWORD1>structure</KEYWORD1>
-			<KEYWORD1>then</KEYWORD1>
-			<KEYWORD1>type</KEYWORD1>
-			<KEYWORD1>val</KEYWORD1>
-			<KEYWORD1>where</KEYWORD1>
-			<KEYWORD1>with</KEYWORD1>
-			<KEYWORD1>withtype</KEYWORD1>
-			<KEYWORD1>while</KEYWORD1>
+      <!-- type def -->
+      <KEYWORD1>abstype</KEYWORD1>
+      <KEYWORD1>datatype</KEYWORD1>
+      <KEYWORD1>eqtype</KEYWORD1>
+      <KEYWORD1>type</KEYWORD1>
 
-			<!-- built-in types -->
-			<KEYWORD3>array</KEYWORD3>
-			<KEYWORD3>bool</KEYWORD3>
-			<KEYWORD3>char</KEYWORD3>
-			<KEYWORD3>exn</KEYWORD3>
-			<KEYWORD3>frag</KEYWORD3>
-			<KEYWORD3>int</KEYWORD3>
-			<KEYWORD3>list</KEYWORD3>
-			<KEYWORD3>option</KEYWORD3>
-			<KEYWORD3>order</KEYWORD3>
-			<KEYWORD3>real</KEYWORD3>
-			<KEYWORD3>ref</KEYWORD3>
-			<KEYWORD3>string</KEYWORD3>
-			<KEYWORD3>substring</KEYWORD3>
-			<KEYWORD3>unit</KEYWORD3>
-			<KEYWORD3>vector</KEYWORD3>
-			<KEYWORD3>word</KEYWORD3>
-			<KEYWORD3>word8</KEYWORD3>
+      <!-- value definitions -->
+      <KEYWORD1>exception</KEYWORD1>
+      <KEYWORD1>fun</KEYWORD1>
+      <KEYWORD1>val</KEYWORD1>
+      <KEYWORD1>fn</KEYWORD1>
 
-			<!-- build-in exception constructors -->
-			<KEYWORD2>Bind</KEYWORD2>
-			<KEYWORD2>Chr</KEYWORD2>
-			<KEYWORD2>Domain</KEYWORD2>
-			<KEYWORD2>Div</KEYWORD2>
-			<KEYWORD2>Fail</KEYWORD2>
-			<KEYWORD2>Graphic</KEYWORD2>
-			<KEYWORD2>Interrupt</KEYWORD2>
-			<KEYWORD2>Io</KEYWORD2>
-			<KEYWORD2>Match</KEYWORD2>
-			<KEYWORD2>Option</KEYWORD2>
-			<KEYWORD2>Ord</KEYWORD2>
-			<KEYWORD2>Overflow</KEYWORD2>
-			<KEYWORD2>Size</KEYWORD2>
-			<KEYWORD2>Subscript</KEYWORD2>
-			<KEYWORD2>SysErr</KEYWORD2>
+      <!-- generic definitional -->
+      <KEYWORD1>and</KEYWORD1>
+      <KEYWORD1>end</KEYWORD1>
+      <KEYWORD1>in</KEYWORD1>
+      <KEYWORD1>infix</KEYWORD1>
+      <KEYWORD1>infixr</KEYWORD1>
+      <KEYWORD1>let</KEYWORD1>
+      <KEYWORD1>local</KEYWORD1>
+      <KEYWORD1>as</KEYWORD1>
+      <KEYWORD1>of</KEYWORD1>
+      <KEYWORD1>op</KEYWORD1>
 
-			<!-- built-in literals -->
-			<LITERAL2>false</LITERAL2>
-			<LITERAL2>true</LITERAL2>
-			<LITERAL2>QUOTE</LITERAL2>
-			<LITERAL2>ANTIQUOTE</LITERAL2>
-			<LITERAL2>nil</LITERAL2>
-			<LITERAL2>NONE</LITERAL2>
-			<LITERAL2>SOME</LITERAL2>
-			<LITERAL2>LESS</LITERAL2>
-			<LITERAL2>EQUAL</LITERAL2>
-			<LITERAL2>GREATER</LITERAL2>
-		</KEYWORDS>
-	</RULES>
+      <!-- module level -->
+      <KEYWORD1>functor</KEYWORD1>
+      <KEYWORD1>include</KEYWORD1>
+      <KEYWORD1>open</KEYWORD1>
+      <KEYWORD1>sharing</KEYWORD1>
+      <KEYWORD1>sig</KEYWORD1>
+      <KEYWORD1>signature</KEYWORD1>
+      <KEYWORD1>struct</KEYWORD1>
+      <KEYWORD1>structure</KEYWORD1>
+      <KEYWORD1>where</KEYWORD1>
+      <KEYWORD1>with</KEYWORD1>
+
+      <!-- logic/control flow -->
+      <KEYWORD1>andalso</KEYWORD1>
+      <KEYWORD1>orelse</KEYWORD1>
+      <KEYWORD1>else</KEYWORD1>
+      <KEYWORD1>if</KEYWORD1>
+      <KEYWORD1>case</KEYWORD1>
+      <KEYWORD1>handle</KEYWORD1>
+      <KEYWORD1>raise</KEYWORD1>
+      <KEYWORD1>then</KEYWORD1>
+
+      <!--- other -->
+      <KEYWORD1>do</KEYWORD1>
+      <KEYWORD1>nonfix</KEYWORD1>
+      <KEYWORD1>rec</KEYWORD1>
+      <KEYWORD1>withtype</KEYWORD1>
+      <KEYWORD1>while</KEYWORD1>
+
+      <!-- built-in types -->
+      <KEYWORD3>array</KEYWORD3>
+      <KEYWORD3>bool</KEYWORD3>
+      <KEYWORD3>char</KEYWORD3>
+      <KEYWORD3>exn</KEYWORD3>
+      <KEYWORD3>frag</KEYWORD3>
+      <KEYWORD3>int</KEYWORD3>
+      <KEYWORD3>list</KEYWORD3>
+      <KEYWORD3>option</KEYWORD3>
+      <KEYWORD3>order</KEYWORD3>
+      <KEYWORD3>real</KEYWORD3>
+      <KEYWORD3>ref</KEYWORD3>
+      <KEYWORD3>string</KEYWORD3>
+      <KEYWORD3>substring</KEYWORD3>
+      <KEYWORD3>unit</KEYWORD3>
+      <KEYWORD3>vector</KEYWORD3>
+      <KEYWORD3>word</KEYWORD3>
+      <KEYWORD3>word8</KEYWORD3>
+
+      <!-- build-in exception constructors -->
+      <KEYWORD2>Bind</KEYWORD2>
+      <KEYWORD2>Chr</KEYWORD2>
+      <KEYWORD2>Domain</KEYWORD2>
+      <KEYWORD2>Div</KEYWORD2>
+      <KEYWORD2>Fail</KEYWORD2>
+      <KEYWORD2>Graphic</KEYWORD2>
+      <KEYWORD2>Interrupt</KEYWORD2>
+      <KEYWORD2>Io</KEYWORD2>
+      <KEYWORD2>Match</KEYWORD2>
+      <KEYWORD2>Option</KEYWORD2>
+      <KEYWORD2>Ord</KEYWORD2>
+      <KEYWORD2>Overflow</KEYWORD2>
+      <KEYWORD2>Size</KEYWORD2>
+      <KEYWORD2>Subscript</KEYWORD2>
+      <KEYWORD2>SysErr</KEYWORD2>
+
+      <!-- built-in literals -->
+      <LITERAL2>false</LITERAL2>
+      <LITERAL2>true</LITERAL2>
+      <LITERAL2>QUOTE</LITERAL2>
+      <LITERAL2>ANTIQUOTE</LITERAL2>
+      <LITERAL2>nil</LITERAL2>
+      <LITERAL2>NONE</LITERAL2>
+      <LITERAL2>SOME</LITERAL2>
+      <LITERAL2>LESS</LITERAL2>
+      <LITERAL2>EQUAL</LITERAL2>
+      <LITERAL2>GREATER</LITERAL2>
+    </KEYWORDS>
+
+  </RULES>
 </MODE>
+

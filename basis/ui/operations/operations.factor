@@ -1,5 +1,5 @@
 ! Copyright (C) 2006, 2009 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs combinators.short-circuit kernel
 linked-assocs namespaces sequences ui.commands words ;
 IN: ui.operations
@@ -54,9 +54,8 @@ operations [ <linked-hash> ] initialize
     dup primary-operation invoke-command ;
 
 : secondary-operation ( obj -- operation )
-    dup
-    [ command>> +secondary+ word-prop ] find-operation
-    [ ] [ primary-operation ] ?if ;
+    [ [ command>> +secondary+ word-prop ] find-operation ]
+    [ primary-operation ] ?unless ;
 
 : invoke-secondary-operation ( obj -- )
     dup secondary-operation invoke-command ;

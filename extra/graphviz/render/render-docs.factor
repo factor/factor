@@ -1,5 +1,5 @@
 ! Copyright (C) 2012 Alex Vondrak.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: graphviz help.markup help.syntax images.viewer
 io.encodings.latin1 io.encodings.utf8 io.launcher kernel
 strings ;
@@ -52,7 +52,7 @@ HELP: default-layout
 
 HELP: graph-encoding
 { $var-description "The character encoding used when writing " { $instance graph } " to a DOT file." }
-{ $notes "To match Graphviz's valid values for a graph's " { $snippet "charset" } " attribute (see " { $url "http://graphviz.org/content/attrs#dcharset" } "), this global variable must either be " { $link utf8 } " or " { $link latin1 } ". If it does not match your graph's " { $snippet "charset" } ", your output may be incorrect." } ;
+{ $notes "To match Graphviz's valid values for a graph's " { $snippet "charset" } " attribute (see " { $url "https://graphviz.org/content/attrs#dcharset" } "), this global variable must either be " { $link utf8 } " or " { $link latin1 } ". If it does not match your graph's " { $snippet "charset" } ", your output may be incorrect." } ;
 
 HELP: preview-format
 { $var-description "A " { $link string } " representing the output format implicitly used by " { $link preview } " and " { $link preview-window } "." } ;
@@ -69,7 +69,7 @@ $nl
 $nl
 { $snippet "layout" } " is the layout engine to use (e.g., " { $snippet "\"dot\"" } ")."
 $nl
-"Essentially, you can think of it as equivalent to running the Graphviz command \"" { $strong "dot" } " " { $snippet "path" } " " { $strong "-O" } " " { $strong "-T" } { $snippet "format" } " " { $strong "-K" } { $snippet "layout" } "\". See " { $url "http://graphviz.org/content/command-line-invocation" } "."
+"Essentially, you can think of it as equivalent to running the Graphviz command \"" { $strong "dot" } " " { $snippet "path" } " " { $strong "-O" } " " { $strong "-T" } { $snippet "format" } " " { $strong "-K" } { $snippet "layout" } "\". See " { $url "https://graphviz.org/content/command-line-invocation" } "."
 }
 { $errors
 "If the Graphviz process encounters an error, its output will be captured and thrown as " { $instance output-process-error } " by Factor."
@@ -364,13 +364,13 @@ HELP: xdot
 { $description "Invokes " { $link graphviz* } " with " { $snippet "\"xdot\"" } " supplied as the output format. That is, the following two lines are equivalent:" { $code "graph path \"xdot\" graphviz*" "graph path xdot" } } ;
 
 ARTICLE: { "graphviz.render" "layouts" } "Rendering graphs by layout engine"
-"For each \"standard\" layout command listed in " { $url "http://graphviz.org/Documentation.php" } ", the " { $vocab-link "graphviz.render" } " vocabulary defines a corresponding word that calls " { $link graphviz } " with that layout engine already supplied as an argument. For instance, instead of writing" { $code "graph path format \"dot\" graphviz" } "you can simply write" { $code "graph path format dot" }
+"For each \"standard\" layout command listed in " { $url "https://graphviz.org/Documentation.php" } ", the " { $vocab-link "graphviz.render" } " vocabulary defines a corresponding word that calls " { $link graphviz } " with that layout engine already supplied as an argument. For instance, instead of writing" { $code "graph path format \"dot\" graphviz" } "you can simply write" { $code "graph path format dot" }
 $nl
 "The following words are defined:"
 { $subsections circo dot fdp neato osage sfdp twopi } ;
 
 ARTICLE: { "graphviz.render" "formats" } "Rendering graphs by output format"
-"For each output format listed in " { $url "http://graphviz.org/content/output-formats" } ", the " { $vocab-link "graphviz.render" } " vocabulary defines a corresponding word that calls " { $link graphviz* } " with that format already supplied as an argument. For instance, instead of writing" { $code "graph path \"png\" graphviz*" } "you can simply write" { $code "graph path png" }
+"For each output format listed in " { $url "https://graphviz.org/content/output-formats" } ", the " { $vocab-link "graphviz.render" } " vocabulary defines a corresponding word that calls " { $link graphviz* } " with that format already supplied as an argument. For instance, instead of writing" { $code "graph path \"png\" graphviz*" } "you can simply write" { $code "graph path png" }
 $nl
 "In the case of the " { $snippet "dot" } " output format (which already has the " { $link dot } " shortcut defined for the layout engine), the shortcut function is named " { $link dot-file } "."
 $nl

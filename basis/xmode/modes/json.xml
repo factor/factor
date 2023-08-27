@@ -1,0 +1,29 @@
+<?xml version="1.0"?>
+<!DOCTYPE MODE SYSTEM "xmode.dtd">
+<MODE>
+	<PROPS>
+		<!-- auto indent -->
+		<PROPERTY NAME="indentOpenBrackets" VALUE="[{"/>
+		<PROPERTY NAME="indentCloseBrackets" VALUE="}]"/>
+		<PROPERTY NAME="contextInsensitive" VALUE="true"/>
+	</PROPS>
+
+	<RULES>
+		<!-- mark numbers as DIGIT -->
+		<SEQ_REGEXP HASH_CHARS="-0123456789." TYPE="DIGIT">[-]?\d+([.]\d*)?([eE][+-]?\d+)?</SEQ_REGEXP>
+
+		<!-- mark strings as LITERAL1 -->
+		<SPAN TYPE="LITERAL1" ESCAPE="\" NO_LINE_BREAK="TRUE">
+			<BEGIN>"</BEGIN>
+			<END>"</END>
+		</SPAN>
+
+		<!-- mark pair separator as OPERATOR -->
+		<SEQ TYPE="OPERATOR">:</SEQ>
+
+		<!-- mark these special values as LITERAL2 -->
+		<SEQ TYPE="LITERAL2">true</SEQ>
+		<SEQ TYPE="LITERAL2">false</SEQ>
+		<SEQ TYPE="LITERAL2">null</SEQ>
+	</RULES>
+</MODE>

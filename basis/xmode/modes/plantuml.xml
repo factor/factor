@@ -1,0 +1,421 @@
+<?xml version="1.0"?>
+<!DOCTYPE MODE SYSTEM "xmode.dtd">
+<MODE>
+	<PROPS>
+		<PROPERTY NAME='commentStart'   VALUE="/'" />
+		<PROPERTY NAME='commentEnd'     VALUE="'/" />
+		<PROPERTY NAME="lineComment" 	VALUE="'" />
+		<PROPERTY NAME='wordBreakChars' VALUE=',+-=&lt;&gt;/?^&amp;*' />
+		<PROPERTY NAME="indentOpenBrackets" VALUE="{" />
+		<PROPERTY NAME="indentCloseBrackets" VALUE="}" />
+		<PROPERTY NAME="lineUpClosingBracket" VALUE="true" />
+		<PROPERTY NAME="indentNextLines"
+			VALUE="\s*(alt\b.*|opt\b.*|loop\b.*|par\b.*|break\b.*|critical\b.*|group\b.*|box\b.*|title$|((note\b|hnote\b|rnote\b)\s*(((left\b|right\b)\s*(of\b\s*[A-Za-z]+)?)|(over\b\s*([A-Za-z]+([,]\s*)?)+))(\s*[#][A-Za-z0-9]+)?$)|(ref\b\s*over\s*([A-Za-z]+([,]\s*)?)+$)|(legend\b\s*(left\b|right\b|center\b)?$))"
+		/>
+		<PROPERTY NAME="unindentThisLine" VALUE="\s*(end\b|else\b)\s*.*" />
+		<PROPERTY NAME="unindentNextLines" VALUE="\s*(end\b)\s*.*" />
+		<PROPERTY NAME="electricKeys" VALUE="&#xA;" />
+	</PROPS>
+
+	<RULES
+		IGNORE_CASE="TRUE"
+		HIGHLIGHT_DIGITS="TRUE"
+		DIGIT_RE="[0-9][0-9a-zA-Z]*">
+
+		<IMPORT DELEGATE='PLANTUML_LEXER' />
+		<IMPORT DELEGATE='KEYWORDS' />
+	</RULES>
+
+	<RULES SET='PLANTUML_LEXER'
+		IGNORE_CASE='TRUE'
+		HIGHLIGHT_DIGITS='TRUE' DIGIT_RE='[0-9][0-9a-zA-Z]*'>
+		
+		<!-- Rules for comments -->
+		<EOL_SPAN TYPE='COMMENT1'>'</EOL_SPAN>
+		<SPAN TYPE="COMMENT1">
+			<BEGIN>/'</BEGIN>
+			<END>'/</END>
+		</SPAN>
+
+		<!-- Rule for Use Case -->
+		<SPAN TYPE="LITERAL3" AT_WORD_START="TRUE" NO_LINE_BREAK="TRUE">
+			<BEGIN>(</BEGIN>
+			<END>)</END>
+		</SPAN>
+		<!-- Rule for User: :some text: -->
+		<SEQ_REGEXP HASH_CHAR=":" AT_WORD_START="TRUE" TYPE="LITERAL3">:[^:]*:</SEQ_REGEXP>
+
+		<!-- Rule for component -->
+		<SPAN TYPE="LITERAL3" AT_WORD_START="TRUE" NO_LINE_BREAK="TRUE">
+			<BEGIN>[</BEGIN>
+			<END>]</END>
+		</SPAN>
+
+		
+		<!-- Rule for Stereotype -->
+		<SEQ TYPE="OPERATOR">&lt;&lt;</SEQ>
+		<SEQ TYPE="OPERATOR">&gt;&gt;</SEQ>
+
+		<!-- Rule for comment on line -->
+		<EOL_SPAN TYPE="MARKUP"  MATCH_TYPE="OPERATOR" DELEGATE="ONELINER_MARKUP">:</EOL_SPAN>
+		
+		<!-- Rule for title -->
+		<SPAN_REGEXP HASH_CHAR="title" AT_WHITESPACE_END="TRUE" TYPE="MARKUP" MATCH_TYPE="KEYWORD1">
+			<BEGIN>title$</BEGIN>
+			<END AT_WHITESPACE_END="TRUE" REGEXP="TRUE">end\s*(title)?</END>
+		</SPAN_REGEXP>
+		<EOL_SPAN_REGEXP HASH_CHAR="title" AT_WHITESPACE_END="TRUE" TYPE="MARKUP" MATCH_TYPE="KEYWORD1" DELEGATE="ONELINER_MARKUP">title\b</EOL_SPAN_REGEXP>
+
+		<!-- Rules for loops and dislikes -->
+		<EOL_SPAN_REGEXP HASH_CHAR="alt" AT_WHITESPACE_END="TRUE" TYPE="MARKUP" MATCH_TYPE="KEYWORD1" DELEGATE="ONELINER_MARKUP">alt\b</EOL_SPAN_REGEXP>
+		<EOL_SPAN_REGEXP HASH_CHAR="else" AT_WHITESPACE_END="TRUE" TYPE="MARKUP" MATCH_TYPE="KEYWORD1" DELEGATE="ONELINER_MARKUP">else\b</EOL_SPAN_REGEXP>
+		<EOL_SPAN_REGEXP HASH_CHAR="opt" AT_WHITESPACE_END="TRUE" TYPE="MARKUP" MATCH_TYPE="KEYWORD1" DELEGATE="ONELINER_MARKUP">opt\b</EOL_SPAN_REGEXP>
+		<EOL_SPAN_REGEXP HASH_CHAR="loop" AT_WHITESPACE_END="TRUE" TYPE="MARKUP" MATCH_TYPE="KEYWORD1" DELEGATE="ONELINER_MARKUP">loop\b</EOL_SPAN_REGEXP>
+		<EOL_SPAN_REGEXP HASH_CHAR="par" AT_WHITESPACE_END="TRUE" TYPE="MARKUP" MATCH_TYPE="KEYWORD1" DELEGATE="ONELINER_MARKUP">par\b</EOL_SPAN_REGEXP>
+		<EOL_SPAN_REGEXP HASH_CHAR="break" AT_WHITESPACE_END="TRUE" TYPE="MARKUP" MATCH_TYPE="KEYWORD1" DELEGATE="ONELINER_MARKUP">break\b</EOL_SPAN_REGEXP>
+		<EOL_SPAN_REGEXP HASH_CHAR="critical" AT_WHITESPACE_END="TRUE" TYPE="MARKUP" MATCH_TYPE="KEYWORD1" DELEGATE="ONELINER_MARKUP">critical\b</EOL_SPAN_REGEXP>
+		<EOL_SPAN_REGEXP HASH_CHAR="group" AT_WHITESPACE_END="TRUE" TYPE="MARKUP" MATCH_TYPE="KEYWORD1" DELEGATE="ONELINER_MARKUP">group\b</EOL_SPAN_REGEXP>
+		
+		<!-- Rules for notes -->
+		<EOL_SPAN_REGEXP HASH_CHARS="nhr" AT_WHITESPACE_END="TRUE" TYPE="MARKUP" MATCH_TYPE="KEYWORD1" DELEGATE="ONELINER_MARKUP">(note\b|hnote\b|rnote\b)\s*(((left\b|right\b)\s*(of\b\s*[A-Za-z]+)?)|(over\b\s*([A-Za-z]+([,]\s*)?)+))(\s*[#][A-Za-z0-9]+)?\s*[:]</EOL_SPAN_REGEXP>
+		<SPAN_REGEXP HASH_CHARS="nhr" AT_WHITESPACE_END="TRUE" TYPE="MARKUP" MATCH_TYPE="KEYWORD1">
+			<BEGIN>(note\b|hnote\b|rnote\b)\s*(((left\b|right\b)\s*(of\b\s*[\D]+)?)|(over\b\s*([A-Za-z]+([,]\s*)?)+))(\s*[#][A-Za-z0-9]+)?$</BEGIN>
+			<END AT_WHITESPACE_END="TRUE" REGEXP="TRUE">end\b\s*(note\b|hnote\b|rnote\b)?</END>
+		</SPAN_REGEXP>
+
+		<!-- Rules for ref's -->
+		<EOL_SPAN_REGEXP HASH_CHAR="ref" AT_WHITESPACE_END="TRUE" TYPE="MARKUP" MATCH_TYPE="KEYWORD1" DELEGATE="ONELINER_MARKUP">ref\b\s*over\s*([A-Za-z]+([,]\s*)?)+\s*[:]</EOL_SPAN_REGEXP>
+		<SPAN_REGEXP HASH_CHAR= "ref" AT_WHITESPACE_END="TRUE" TYPE="MARKUP" MATCH_TYPE="KEYWORD1">
+			<BEGIN>ref\b\s*over\s*([A-Za-z]+([,]\s*)?)+$</BEGIN>
+			<END AT_WHITESPACE_END="TRUE" REGEXP="TRUE">end\b\s*(ref\b)?</END>
+		</SPAN_REGEXP>
+		
+		<!-- Rule for legend -->
+		<SPAN_REGEXP HASH_CHAR="legend" AT_WHITESPACE_END="TRUE" TYPE="MARKUP" MATCH_TYPE="KEYWORD1">
+			<BEGIN>legend\b\s*(left\b|right\b|center\b)?$</BEGIN>
+			<END AT_WHITESPACE_END="TRUE" REGEXP="TRUE">end\b\s*(legend\b)?</END>
+		</SPAN_REGEXP>
+
+		<!-- Rules for sequence arrows -->
+		<SEQ_REGEXP TYPE="OPERATOR">[\[]?[xo*]?(([\\]{1,2})|([/]{1,2})|([&lt;][&lt;\|]?))?[-.]([\[][#][A-Za-z0-9]+[\]])?[-.]?(([&gt;\|]?[&gt;])|([\\]{1,2})|([/]{1,2}))?[xo*]?[\]]?</SEQ_REGEXP>
+		<!-- Rules for colors: #00ffcc or #red -->
+		<SEQ_REGEXP HASH_CHAR="#" TYPE="OPERATOR">[#][A-Za-z0-9]+</SEQ_REGEXP>
+		<!-- Rules for divider: == (some text) == -->
+		<SEQ_REGEXP HASH_CHAR="==" AT_WHITESPACE_END="TRUE" TYPE="OPERATOR">==.*==</SEQ_REGEXP>
+		<!-- Rules for delay: ... (some text) ...-->
+		<SEQ_REGEXP HASH_CHAR="..." AT_WHITESPACE_END="TRUE" TYPE="OPERATOR">[\.]{3}(.*[\.]{3})?</SEQ_REGEXP>
+		<!-- Rules spacer: ||| or ||45||-->
+		<SEQ_REGEXP HASH_CHAR="||" AT_WHITESPACE_END="TRUE" TYPE="OPERATOR">([\|]{3})|([\|]{2}\d+[\|]{2})</SEQ_REGEXP>
+		
+		 <!-- Rules for Literals -->
+ 		<SPAN TYPE="LITERAL1" DELEGATE="LITERAL_USECASE">
+			<BEGIN>"</BEGIN>
+			<END>"</END>
+		</SPAN>
+	</RULES>
+
+	<RULES SET="ONELINER_MARKUP" DEFAULT="MARKUP">
+		<SEQ_REGEXP HASH_CHAR="\" TYPE="OPERATOR">\\[a-z]</SEQ_REGEXP>
+	</RULES>
+
+	<RULES SET="ONELINER_DEFAULT" DEFAULT="NULL">
+		<SEQ_REGEXP HASH_CHAR="\" TYPE="OPERATOR">\\[a-z]</SEQ_REGEXP>
+	</RULES>
+
+	<RULES SET="LITERAL_USECASE" DEFAULT="LITERAL1">
+		<SEQ_REGEXP HASH_CHAR="==" AT_WHITESPACE_END="TRUE" TYPE="OPERATOR">==(.*==)?</SEQ_REGEXP>
+		<SEQ_REGEXP HASH_CHAR="--" AT_WHITESPACE_END="TRUE" TYPE="OPERATOR">--(.*==)?</SEQ_REGEXP>
+		<SEQ_REGEXP HASH_CHAR=".." AT_WHITESPACE_END="TRUE" TYPE="OPERATOR">..(.*..)?</SEQ_REGEXP>
+	</RULES>
+	
+	<RULES SET='KEYWORDS' IGNORE_CASE='TRUE'>
+		<KEYWORDS>
+			<!-- Keywords -->
+			<KEYWORD1>@startuml</KEYWORD1>
+			<KEYWORD1>@enduml</KEYWORD1>
+			<KEYWORD1>as</KEYWORD1>
+			<KEYWORD1>also</KEYWORD1>
+			<KEYWORD1>autonumber</KEYWORD1>
+			<KEYWORD1>title</KEYWORD1>
+			<KEYWORD1>newpage</KEYWORD1>
+			<KEYWORD1>box</KEYWORD1>
+			<KEYWORD1>alt</KEYWORD1>
+			<KEYWORD1>else</KEYWORD1>
+			<KEYWORD1>opt</KEYWORD1>
+			<KEYWORD1>loop</KEYWORD1>
+			<KEYWORD1>par</KEYWORD1>
+			<KEYWORD1>break</KEYWORD1>
+			<KEYWORD1>critical</KEYWORD1>
+			<KEYWORD1>note</KEYWORD1>
+			<KEYWORD1>group</KEYWORD1>
+			<KEYWORD1>left</KEYWORD1>
+			<KEYWORD1>right</KEYWORD1>
+			<KEYWORD1>of</KEYWORD1>
+			<KEYWORD1>on</KEYWORD1>
+			<KEYWORD1>link</KEYWORD1>
+			<KEYWORD1>over</KEYWORD1>
+			<KEYWORD1>end</KEYWORD1>
+			<KEYWORD1>activate</KEYWORD1>
+			<KEYWORD1>deactivate</KEYWORD1>
+			<KEYWORD1>destroy</KEYWORD1>
+			<KEYWORD1>create</KEYWORD1>
+			<KEYWORD1>footbox</KEYWORD1>
+			<KEYWORD1>hide</KEYWORD1>
+			<KEYWORD1>show</KEYWORD1>
+			<KEYWORD1>skinparam</KEYWORD1>
+			<KEYWORD1>skin</KEYWORD1>
+			<KEYWORD1>top</KEYWORD1>
+			<KEYWORD1>bottom</KEYWORD1>
+			<KEYWORD1>top to bottom direction</KEYWORD1>
+			<KEYWORD1>namespace</KEYWORD1>
+			<KEYWORD1>page</KEYWORD1>
+			<KEYWORD1>up</KEYWORD1>
+			<KEYWORD1>down</KEYWORD1>
+			<KEYWORD1>if</KEYWORD1>
+			<KEYWORD1>else</KEYWORD1>
+			<KEYWORD1>elseif</KEYWORD1>
+			<KEYWORD1>endif</KEYWORD1>
+			<KEYWORD1>partition</KEYWORD1>
+			<KEYWORD1>footer</KEYWORD1>
+			<KEYWORD1>header</KEYWORD1>
+			<KEYWORD1>center</KEYWORD1>
+			<KEYWORD1>rotate</KEYWORD1>
+			<KEYWORD1>ref</KEYWORD1>
+			<KEYWORD1>return</KEYWORD1>
+			<KEYWORD1>is</KEYWORD1>
+			<KEYWORD1>repeat</KEYWORD1>
+			<KEYWORD1>start</KEYWORD1>
+			<KEYWORD1>stop</KEYWORD1>
+			<KEYWORD1>while</KEYWORD1>
+			<KEYWORD1>endwhile</KEYWORD1>
+			<KEYWORD1>fork</KEYWORD1>
+			<KEYWORD1>again</KEYWORD1>
+			<KEYWORD1>kill</KEYWORD1>
+
+			<!-- Preprocessor -->
+			<KEYWORD2>!include</KEYWORD2>
+			<KEYWORD2>!define</KEYWORD2>
+			<KEYWORD2>!undef</KEYWORD2>
+			<KEYWORD2>!ifdef</KEYWORD2>
+			<KEYWORD2>!endif</KEYWORD2>
+			<KEYWORD2>!ifndef</KEYWORD2>
+
+			<!-- Types -->
+			<KEYWORD3>actor</KEYWORD3>
+			<KEYWORD3>participant</KEYWORD3>
+			<KEYWORD3>usecase</KEYWORD3>
+			<KEYWORD3>class</KEYWORD3>
+			<KEYWORD3>interface</KEYWORD3>
+			<KEYWORD3>abstract</KEYWORD3>
+			<KEYWORD3>enum</KEYWORD3>
+			<KEYWORD3>component</KEYWORD3>
+			<KEYWORD3>state</KEYWORD3>
+			<KEYWORD3>object</KEYWORD3>
+			<KEYWORD3>artifact</KEYWORD3>
+			<KEYWORD3>folder</KEYWORD3>
+			<KEYWORD3>rect</KEYWORD3>
+			<KEYWORD3>node</KEYWORD3>
+			<KEYWORD3>frame</KEYWORD3>
+			<KEYWORD3>cloud</KEYWORD3>
+			<KEYWORD3>database</KEYWORD3>
+			<KEYWORD3>storage</KEYWORD3>
+			<KEYWORD3>agent</KEYWORD3>
+			<KEYWORD3>boundary</KEYWORD3>
+			<KEYWORD3>control</KEYWORD3>
+			<KEYWORD3>entity</KEYWORD3>
+			<KEYWORD3>card</KEYWORD3>
+			<KEYWORD3>package</KEYWORD3>
+			
+			<!-- Skinparameter -->
+			<KEYWORD4>Monochrome</KEYWORD4>
+			<KEYWORD4>CircledCharacterRadius</KEYWORD4>
+			<KEYWORD4>ClassAttributeIconSize</KEYWORD4>
+			<KEYWORD4>DefaultFontName</KEYWORD4>
+			<KEYWORD4>DefaultFontStyle</KEYWORD4>
+			<KEYWORD4>DefaultFontSize</KEYWORD4>
+			<KEYWORD4>DefaultFontColor</KEYWORD4>
+			<KEYWORD4>FontStyle</KEYWORD4>
+			<KEYWORD4>FontName</KEYWORD4>
+			<KEYWORD4>FontSize</KEYWORD4>
+			<KEYWORD4>FontColor</KEYWORD4>
+			<KEYWORD4>Color</KEYWORD4>
+			<KEYWORD4>Thickness</KEYWORD4>
+
+			<KEYWORD4>scale</KEYWORD4>
+			<KEYWORD4>width</KEYWORD4>
+			<KEYWORD4>classAttributeIconSize</KEYWORD4>
+
+			<KEYWORD4>componentStyle</KEYWORD4>
+			<KEYWORD4>InterfaceBackgroundColor</KEYWORD4>
+			<KEYWORD4>InterfaceBorderColor</KEYWORD4>
+			<KEYWORD4>BackgroundColor</KEYWORD4>
+			<KEYWORD4>BorderColor</KEYWORD4>
+			<KEYWORD4>ArrowFontName</KEYWORD4>
+			<KEYWORD4>ArrowFontColor</KEYWORD4>
+			<KEYWORD4>databaseBackgroundColor</KEYWORD4>
+
+			<KEYWORD4>ArrowColor</KEYWORD4>
+			<KEYWORD4>ActorBorderColor</KEYWORD4>
+			<KEYWORD4>LifeLineBorderColor</KEYWORD4>
+			<KEYWORD4>LifeLineBackgroundColor</KEYWORD4>
+			<KEYWORD4>ParticipantBorderColor</KEYWORD4>
+			<KEYWORD4>ParticipantBackgroundColor</KEYWORD4>
+			<KEYWORD4>ParticipantFontName</KEYWORD4>
+			<KEYWORD4>ParticipantFontSize</KEYWORD4>
+			<KEYWORD4>ParticipantFontColor</KEYWORD4>
+			<KEYWORD4>ActorBackgroundColor</KEYWORD4>
+			<KEYWORD4>ActorFontColor</KEYWORD4>
+			<KEYWORD4>ActorFontSize</KEYWORD4>
+			<KEYWORD4>ActorFontName</KEYWORD4>
+			
+			<LABEL>AliceBlue</LABEL>
+			<LABEL>AntiqueWhite</LABEL>
+			<LABEL>Aqua</LABEL>
+			<LABEL>Aquamarine</LABEL>
+			<LABEL>Azure</LABEL>
+			<LABEL>Beige</LABEL>
+			<LABEL>Bisque</LABEL>
+			<LABEL>Black</LABEL>
+			<LABEL>BlanchedAlmond</LABEL>
+			<LABEL>Blue</LABEL>
+			<LABEL>BlueViolet</LABEL>
+			<LABEL>Brown</LABEL>
+			<LABEL>BurlyWood</LABEL>
+			<LABEL>CadetBlue</LABEL>
+			<LABEL>Chartreuse</LABEL>
+			<LABEL>Chocolate</LABEL>
+			<LABEL>Coral</LABEL>
+			<LABEL>CornflowerBlue</LABEL>
+			<LABEL>Cornsilk</LABEL>
+			<LABEL>Crimson</LABEL>
+			<LABEL>Cyan</LABEL>
+			<LABEL>DarkBlue</LABEL>
+			<LABEL>DarkCyan</LABEL>
+			<LABEL>DarkGoldenRod</LABEL>
+			<LABEL>DarkGray</LABEL>
+			<LABEL>DarkGrey</LABEL>
+			<LABEL>DarkGreen</LABEL>
+			<LABEL>DarkKhaki</LABEL>
+			<LABEL>DarkMagenta</LABEL>
+			<LABEL>DarkOliveGreen</LABEL>
+			<LABEL>Darkorange</LABEL>
+			<LABEL>DarkOrchid</LABEL>
+			<LABEL>DarkRed</LABEL>
+			<LABEL>DarkSalmon</LABEL>
+			<LABEL>DarkSeaGreen</LABEL>
+			<LABEL>DarkSlateBlue</LABEL>
+			<LABEL>DarkSlateGray</LABEL>
+			<LABEL>DarkSlateGrey</LABEL>
+			<LABEL>DarkTurquoise</LABEL>
+			<LABEL>DarkViolet</LABEL>
+			<LABEL>DeepPink</LABEL>
+			<LABEL>DeepSkyBlue</LABEL>
+			<LABEL>DimGray</LABEL>
+			<LABEL>DimGrey</LABEL>
+			<LABEL>DodgerBlue</LABEL>
+			<LABEL>FireBrick</LABEL>
+			<LABEL>FloralWhite</LABEL>
+			<LABEL>ForestGreen</LABEL>
+			<LABEL>Fuchsia</LABEL>
+			<LABEL>Gainsboro</LABEL>
+			<LABEL>GhostWhite</LABEL>
+			<LABEL>Gold</LABEL>
+			<LABEL>GoldenRod</LABEL>
+			<LABEL>Gray</LABEL>
+			<LABEL>Grey</LABEL>
+			<LABEL>Green</LABEL>
+			<LABEL>GreenYellow</LABEL>
+			<LABEL>HoneyDew</LABEL>
+			<LABEL>HotPink</LABEL>
+			<LABEL>IndianRed</LABEL>
+			<LABEL>Indigo</LABEL>
+			<LABEL>Ivory</LABEL>
+			<LABEL>Khaki</LABEL>
+			<LABEL>Lavender</LABEL>
+			<LABEL>LavenderBlush</LABEL>
+			<LABEL>LawnGreen</LABEL>
+			<LABEL>LemonChiffon</LABEL>
+			<LABEL>LightBlue</LABEL>
+			<LABEL>LightCoral</LABEL>
+			<LABEL>LightCyan</LABEL>
+			<LABEL>LightGoldenRodYellow</LABEL>
+			<LABEL>LightGray</LABEL>
+			<LABEL>LightGrey</LABEL>
+			<LABEL>LightGreen</LABEL>
+			<LABEL>LightPink</LABEL>
+			<LABEL>LightSalmon</LABEL>
+			<LABEL>LightSeaGreen</LABEL>
+			<LABEL>LightSkyBlue</LABEL>
+			<LABEL>LightSlateGray</LABEL>
+			<LABEL>LightSlateGrey</LABEL>
+			<LABEL>LightSteelBlue</LABEL>
+			<LABEL>LightYellow</LABEL>
+			<LABEL>Lime</LABEL>
+			<LABEL>LimeGreen</LABEL>
+			<LABEL>Linen</LABEL>
+			<LABEL>Magenta</LABEL>
+			<LABEL>Maroon</LABEL>
+			<LABEL>MediumAquaMarine</LABEL>
+			<LABEL>MediumBlue</LABEL>
+			<LABEL>MediumOrchid</LABEL>
+			<LABEL>MediumPurple</LABEL>
+			<LABEL>MediumSeaGreen</LABEL>
+			<LABEL>MediumSlateBlue</LABEL>
+			<LABEL>MediumSpringGreen</LABEL>
+			<LABEL>MediumTurquoise</LABEL>
+			<LABEL>MediumVioletRed</LABEL>
+			<LABEL>MidnightBlue</LABEL>
+			<LABEL>MintCream</LABEL>
+			<LABEL>MistyRose</LABEL>
+			<LABEL>Moccasin</LABEL>
+			<LABEL>NavajoWhite</LABEL>
+			<LABEL>Navy</LABEL>
+			<LABEL>OldLace</LABEL>
+			<LABEL>Olive</LABEL>
+			<LABEL>OliveDrab</LABEL>
+			<LABEL>Orange</LABEL>
+			<LABEL>OrangeRed</LABEL>
+			<LABEL>Orchid</LABEL>
+			<LABEL>PaleGoldenRod</LABEL>
+			<LABEL>PaleGreen</LABEL>
+			<LABEL>PaleTurquoise</LABEL>
+			<LABEL>PaleVioletRed</LABEL>
+			<LABEL>PapayaWhip</LABEL>
+			<LABEL>PeachPuff</LABEL>
+			<LABEL>Peru</LABEL>
+			<LABEL>Pink</LABEL>
+			<LABEL>Plum</LABEL>
+			<LABEL>PowderBlue</LABEL>
+			<LABEL>Purple</LABEL>
+			<LABEL>Red</LABEL>
+			<LABEL>RosyBrown</LABEL>
+			<LABEL>RoyalBlue</LABEL>
+			<LABEL>SaddleBrown</LABEL>
+			<LABEL>Salmon</LABEL>
+			<LABEL>SandyBrown</LABEL>
+			<LABEL>SeaGreen</LABEL>
+			<LABEL>SeaShell</LABEL>
+			<LABEL>Sienna</LABEL>
+			<LABEL>Silver</LABEL>
+			<LABEL>SkyBlue</LABEL>
+			<LABEL>SlateBlue</LABEL>
+			<LABEL>SlateGray</LABEL>
+			<LABEL>SlateGrey</LABEL>
+			<LABEL>Snow</LABEL>
+			<LABEL>SpringGreen</LABEL>
+			<LABEL>SteelBlue</LABEL>
+			<LABEL>Tan</LABEL>
+			<LABEL>Teal</LABEL>
+			<LABEL>Thistle</LABEL>
+			<LABEL>Tomato</LABEL>
+			<LABEL>Turquoise</LABEL>
+			<LABEL>Violet</LABEL>
+			<LABEL>Wheat</LABEL>
+			<LABEL>White</LABEL>
+			<LABEL>WhiteSmoke</LABEL>
+			<LABEL>Yellow</LABEL>
+			<LABEL>YellowGreen</LABEL>
+		</KEYWORDS>
+	</RULES>
+</MODE>
+ 	  	 

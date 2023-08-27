@@ -1,5 +1,5 @@
 ! Copyright (C) 2006, 2007, 2008 Alex Chapman
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 
 USING: accessors combinators kernel lists math math.functions
 sequences system tetris.board tetris.piece ;
@@ -42,7 +42,7 @@ CONSTANT: default-height 20
     level 1 - 60 * 1,000,000,000 swap - ;
 
 : add-block ( tetris block -- )
-    over [ board>> ] 2dip current-piece tetromino>> colour>> set-block ;
+    over [ board>> ] 2dip current-piece tetromino>> color>> set-block ;
 
 : game-over? ( tetris -- ? )
     [ board>> ] [ next-piece ] bi piece-valid? not ;

@@ -1,12 +1,12 @@
 ! Copyright (C) 2007, 2008 Slava Pestov, 2020 Alexander Ilin.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: assocs fry io io.directories io.encodings.utf8
 io.launcher io.pathnames kernel math.statistics prettyprint
 sequences sorting system ;
 IN: contributors
 
 CONSTANT: aliases {
-    { "Alexander Ilin" "ajsoft@yandex.ru" "alex.ilin@protonmail.com" }
+    { "Alexander Ilin" "Alexander Iljin" }
     { "Björn Lindqvist" "bjourne@gmail.com" }
     { "Cat Stevens" "catb0t" }
     { "Daniel Ehrenberg" "Dan Ehrenberg" }
@@ -22,8 +22,7 @@ CONSTANT: aliases {
 
 : changelog ( -- authors )
     image-path parent-directory [
-        "git log --no-merges --pretty=format:%an"
-        utf8 [ read-lines ] with-process-reader
+        "git log --no-merges --pretty=format:%an" process-lines
     ] with-directory ;
 
 : merge-aliases ( authors -- authors' )
@@ -33,7 +32,7 @@ CONSTANT: aliases {
 
 : contributors ( -- )
     changelog histogram merge-aliases
-    sort-values <reversed>
+    inv-sort-values
     simple-table. ;
 
 MAIN: contributors

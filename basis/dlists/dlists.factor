@@ -1,6 +1,6 @@
 ! Copyright (C) 2007, 2009 Mackenzie Straight, Doug Coleman,
 ! Slava Pestov, John Benediktsson.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors combinators combinators.short-circuit deques
 hashtables kernel kernel.private math math.order parser
 search-deques sequences vocabs.loader ;

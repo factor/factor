@@ -12,12 +12,12 @@ INSTANCE: c m2
 
 : foo ( -- b ) c new g ;
 
-[ 2 ] [ foo ] unit-test
+{ 2 } [ foo ] unit-test
 
-[ ] [ [ c m1 add-mixin-instance ] with-compilation-unit ] unit-test
+{ } [ [ c m1 add-mixin-instance ] with-compilation-unit ] unit-test
 
-[ { m2 m1 } ] [ \ g order ] unit-test
+{ { m2 m1 } } [ \ g dispatch-order ] unit-test
 
-[ 1 ] [ foo ] unit-test
+{ 1 } [ foo ] unit-test
 
-[ ] [ [ c m1 remove-mixin-instance ] with-compilation-unit ] unit-test
+{ } [ [ c m1 remove-mixin-instance ] with-compilation-unit ] unit-test

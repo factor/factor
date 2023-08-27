@@ -1,5 +1,5 @@
 ! Copyright (C) 2005, 2010 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors arrays binary-search combinators
 concurrency.flags deques kernel make math math.order
 math.rectangles math.vectors models namespaces sequences threads
@@ -87,7 +87,7 @@ M: gadget contains-point?
 : pick-up ( point gadget -- child/f )
     2dup [ dup point>rect ] dip children-on
     [ contains-point? ] with find-last nip
-    [ [ loc>> v- ] [ pick-up ] bi ] [ nip ] ?if ;
+    or* [ [ loc>> v- ] [ pick-up ] bi ] [ nip ] if ;
 
 : max-dims ( seq -- dim )
     [ 0 0 ] dip [ first2 swapd [ max ] 2bi@ ] each 2array ;
@@ -189,10 +189,10 @@ M: gadget dim<<
 GENERIC: pref-dim* ( gadget -- dim )
 
 : pref-dim ( gadget -- dim )
-    dup pref-dim>> [ ] [
+    [ pref-dim>> ] [
         [ pref-dim* ] [ ] [ layout-state>> ] tri
         [ drop ] [ dupd pref-dim<< ] if
-    ] ?if ;
+    ] ?unless ;
 
 : pref-dims ( gadgets -- seq ) [ pref-dim ] map ; inline
 
@@ -308,16 +308,15 @@ M: gadget remove-gadget 2drop ;
 : unparent ( gadget -- )
     not-in-layout
     [
-        dup parent>> dup
-        [
-            [ remove-gadget ] [
-                over (unparent)
+        dup parent>> [
+            {
+                [ remove-gadget ]
+                [ drop (unparent) ]
                 [ unfocus-gadget ]
                 [ children>> remove! drop ]
                 [ nip relayout ]
-                2tri
-            ] 2bi
-        ] [ 2drop ] if
+            } 2cleave
+        ] [ drop ] if*
     ] when* ;
 
 : clear-gadget ( gadget -- )
@@ -380,15 +379,12 @@ PRIVATE>
         [ parent>> child? ]
     } cond ;
 
-GENERIC: focusable-child* ( gadget -- child/t )
+GENERIC: focusable-child* ( gadget -- child/f )
 
-M: gadget focusable-child* drop t ;
-
-M: f focusable-child* drop f ;
+M: object focusable-child* drop f ;
 
 : focusable-child ( gadget -- child )
-    dup focusable-child*
-    dup t eq? [ drop ] [ nip focusable-child ] if ;
+    dup focusable-child* [ nip focusable-child ] when* ;
 
 GENERIC: request-focus-on ( child gadget -- )
 

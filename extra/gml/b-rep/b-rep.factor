@@ -43,7 +43,7 @@ GML: faceCCW ( e0 -- e1 ) face-ccw ;
 
 GML: baseface ( e0 -- e1 ) base-face>> ;
 
-GML: nextring ( e0 -- e1 ) dup next-ring>> [ ] [ base-face>> ] ?if ;
+GML: nextring ( e0 -- e1 ) [ next-ring>> ] [ base-face>> ] ?unless ;
 
 GML: facenormal ( e0 -- n ) face-normal ;
 GML: faceplanedist ( e0 -- d ) face-plane-dist ;

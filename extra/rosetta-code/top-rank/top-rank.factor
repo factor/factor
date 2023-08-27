@@ -1,10 +1,10 @@
 ! Copyright (c) 2012 Anonymous
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors assocs io kernel math.parser sequences
 sorting ;
 IN: rosetta-code.top-rank
 
-! http://rosettacode.org/wiki/Top_rank_per_group
+! https://rosettacode.org/wiki/Top_rank_per_group
 
 ! Find the top N salaries in each department, where N is
 ! provided as a parameter.
@@ -48,10 +48,10 @@ CONSTANT: employees {
 
 : prepare-departments ( seq -- departments )
     [ department>> ] collect-by
-    [ [ salary>> ] inv-sort-with ] assoc-map ;
+    [ [ salary>> ] inv-sort-by ] assoc-map ;
 
 : first-n-each ( seq n quot -- )
-    [ short head-slice ] dip each ; inline
+    [ index-or-length head-slice ] dip each ; inline
 
 : top-rank-main ( -- )
     employees prepare-departments [

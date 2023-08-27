@@ -1,5 +1,5 @@
 ! Copyright (C) 2008, 2009 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors compiler.cfg kernel make namespaces sequences
 sets ;
 IN: compiler.cfg.rpo
@@ -17,13 +17,13 @@ IN: compiler.cfg.rpo
     [ >>number drop ] 2each ;
 
 : post-order ( cfg -- blocks )
-    dup post-order>> [ ] [
+    [ post-order>> ] [
         [
             HS{ } clone over entry>>
             post-order-traversal drop
         ] { } make dup number-blocks
         >>post-order post-order>>
-    ] ?if ;
+    ] ?unless ;
 
 : reverse-post-order ( cfg -- blocks )
     post-order <reversed> ; inline

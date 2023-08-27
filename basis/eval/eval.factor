@@ -1,9 +1,8 @@
 ! Copyright (C) 2008, 2009 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: combinators combinators.smart compiler.units
-continuations debugger effects.parser io io.streams.string
-kernel namespaces parser parser.notes prettyprint sequences
-splitting ;
+continuations debugger effects.parser io.streams.string
+kernel namespaces parser parser.notes prettyprint splitting ;
 IN: eval
 
 : parse-string ( str -- quot )
@@ -35,7 +34,7 @@ SYNTAX: eval( \ eval parse-call-paren ;
 : (eval-with-stack>string) ( str -- output )
     [
         parser-quiet? on
-        [ eval-with-stack ] [ nip print-error ] recover
+        [ (eval-with-stack) ] [ nip print-error ] recover
     ] with-string-writer ;
 
 : eval-with-stack>string ( str -- output )

@@ -1,5 +1,5 @@
 ! Copyright (C) 2007 Elie CHAFTARI
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 
 USING: accessors arrays assocs byte-arrays combinators endian io
 io.streams.string kernel make math math.parser namespaces pack
@@ -60,7 +60,7 @@ PRIVATE>
                 }
             }
         }
-     } ;
+    } ;
 
 SYMBOL: elements
 

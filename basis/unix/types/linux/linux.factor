@@ -55,7 +55,7 @@ STRUCT: sigset_t
     { val uchar[128] } ;
 
 STRUCT: posix_spawnattr_t
-  { __flags alien.c-types:short }
+  { __flags short }
   { __pgrp pid_t }
   { __sd sigset_t }
   { __ss sigset_t }

@@ -1,5 +1,5 @@
 ! Copyright (C) 2010 Erik Charlebois
-! See http:// factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors alien alien.c-types alien.data alien.libraries
 alien.syntax classes.struct combinators combinators.short-circuit
 kernel math math.order sequences typed specialized-arrays system ;
@@ -441,7 +441,7 @@ FUNCTION: int cpPolyShapeGetNumVerts ( cpShape* shape )
 FUNCTION: cpVect cpPolyShapeGetVert ( cpShape* shape, int idx )
 
 TYPED: cpPolyShapeValueOnAxis ( poly: cpPolyShape n: cpVect d -- min-dist )
-    swap rot [ numVerts>> ] [ tVerts>> swap cpVect <c-direct-array> ] bi swap
+    spin [ numVerts>> ] [ tVerts>> swap cpVect <c-direct-array> ] bi swap
     [ cpvdot ] curry [ min ] reduce swap - ; inline
 
 TYPED: cpPolyShapeContainsVert ( poly: cpPolyShape v: cpVect -- ? )

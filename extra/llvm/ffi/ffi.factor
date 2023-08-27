@@ -1,12 +1,12 @@
 ! Copyright (C) 2009 Matthew Willis, 2017 Björn Lindqvist
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: alien alien.c-types alien.libraries alien.syntax combinators
 kernel ldcache system ;
 IN: llvm.ffi
 
 << "llvm" {
     { [ os linux? ] [ "LLVM-3.9" find-so ] }
-    { [ os macosx? ] [ "/usr/local/opt/llvm/lib/libLLVM.dylib" ] }
+    { [ os macosx? ] [ "libLLVM.dylib" ] }
     [ f ]
 } cond [ cdecl add-library ] [ drop ] if*
 >>

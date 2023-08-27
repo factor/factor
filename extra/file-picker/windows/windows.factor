@@ -1,6 +1,6 @@
 ! Copyright (C) 2014 John Benediktsson, Doug Coleman.
 ! Copyright (C) 2017 Alexander Ilin.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors alien.c-types alien.data alien.strings
 alien.syntax classes.struct destructors file-picker
 io.encodings.string io.encodings.utf8 kernel libc literals math

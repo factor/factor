@@ -1,5 +1,5 @@
 ! Copyright (C) 2010 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: bootstrap.image bootstrap.image.download io
 io.directories io.files.temp io.files.unique io.launcher
 io.pathnames kernel namespaces sequences mason.common

@@ -1,5 +1,5 @@
 ! Copyright (C) 2009 Phil Dawes.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: alien.c-types alien.strings alien.syntax alien.utilities
 io io.encodings.utf8 io.files kernel sequences system threads ;
 IN: native-thread-test

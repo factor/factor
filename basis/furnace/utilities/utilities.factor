@@ -1,5 +1,5 @@
 ! Copyright (C) 2008, 2010 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs classes combinators continuations
 definitions http http.server http.server.redirection
 http.server.remapping io.pathnames kernel make namespaces
@@ -30,9 +30,10 @@ ERROR: no-such-word name vocab ;
 ERROR: no-such-responder responder ;
 
 : base-path ( string -- seq )
-    dup responder-nesting get
-    [ second class-of superclasses-of [ name>> = ] with any? ] with find nip
-    [ first ] [ no-such-responder ] ?if ;
+    [
+        responder-nesting get
+        [ second class-of superclasses-of [ name>> = ] with any? ] with find nip
+    ] [ first ] [ no-such-responder ] ?if ;
 
 : resolve-base-path ( string -- string' )
     "$" ?head [

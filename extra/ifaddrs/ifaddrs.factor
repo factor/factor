@@ -1,5 +1,5 @@
 ! Copyright (C) 2016 John Benediktsson
-! See http://factorcode.org/license.txt for BSD license
+! See https://factorcode.org/license.txt for BSD license
 USING: accessors alien.c-types alien.data alien.destructors
 alien.syntax classes.struct destructors libc sequences sets
 sorting ;
@@ -30,5 +30,5 @@ DESTRUCTOR: freeifaddrs
         { void* } [ getifaddrs io-error ] with-out-parameters
         &freeifaddrs ifaddrs deref
         [ ifa_next>> ] follow
-        [ ifa_name>> ] map members natural-sort
+        [ ifa_name>> ] map members sort
     ] with-destructors ;

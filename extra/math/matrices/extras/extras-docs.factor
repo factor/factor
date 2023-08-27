@@ -112,7 +112,7 @@ HELP: undefined-inverse
 
 HELP: <random-integer-matrix>
 { $values { "m" integer } { "n" integer } { "max" integer } { "matrix" matrix } }
-{ $description "Creates a " { $snippet "m x n" } " " { $link matrix } " full of random, possibly signed " { $link integer } "s whose absolute values are less than or equal to " { $snippet "max" } ", as given by " { $link random-integers } "." }
+{ $description "Creates a " { $snippet "m x n" } " " { $link matrix } " full of random, possibly signed " { $link integer } "s whose absolute values are less than or equal to " { $snippet "max" } ", as given by " { $link randoms } "." }
 { $notelist
     { "The signedness of the numbers in the resulting matrix will be randomized. Use " { $link mabs } " with this word to generate a matrix of random positive integers." }
     { $equiv-word-note "integral" <random-unit-matrix> }

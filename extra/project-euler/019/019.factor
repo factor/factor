@@ -1,10 +1,10 @@
 ! Copyright (c) 2007 Samuel Tardieu, Aaron Schaefer.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: calendar kernel math.order project-euler.common ranges
 sequences ;
 IN: project-euler.019
 
-! http://projecteuler.net/index.php?section=problems&id=19
+! https://projecteuler.net/index.php?section=problems&id=19
 
 ! DESCRIPTION
 ! -----------

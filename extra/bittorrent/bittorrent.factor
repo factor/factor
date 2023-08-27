@@ -1,5 +1,5 @@
 ! Copyright (C) 2020 John Benediktsson
-! See http://factorcode.org/license.txt for BSD license
+! See https://factorcode.org/license.txt for BSD license
 USING: accessors arrays assocs bencode byte-arrays byte-vectors
 calendar checksums checksums.sha combinators destructors endian
 grouping http.client io io.encodings.binary io.files
@@ -48,7 +48,7 @@ torrent-port [ 6881 ] initialize
 
 : http-get-bencode ( url -- obj )
     <get-request> BV{ } clone [
-        '[ _ push-all ] with-http-request* check-response drop
+        '[ _ push-all ] do-http-request check-response drop
     ] keep B{ } like bencode> ;
 
 
@@ -73,7 +73,7 @@ M: string load-metainfo
     dup "announce-list" of [ nip first random ] [ "announce" of ] if* ;
 
 : scrape-url ( metainfo -- url/f )
-    announce-url "announce" over path>> subseq? [
+    announce-url dup path>>  "announce" subseq-of? [
         [ "announce" "scrape" replace ] change-path
     ] [ drop f ] if ;
 
@@ -100,7 +100,7 @@ M: string load-metainfo
 
 TUPLE: magnet display-name exact-length exact-topic
 web-seed acceptable-source exact-source keyword-topic
-manifest-topic address-tracker ;
+manifest-topic address-tracker select-only peer ;
 
 : magnet-link>magnet ( url -- magnet-url )
     [ magnet new ] dip
@@ -114,6 +114,8 @@ manifest-topic address-tracker ;
         [ "kt" of >>keyword-topic ]
         [ "mt" of >>manifest-topic ]
         [ "tr" of >>address-tracker ]
+        [ "so" of >>select-only ]
+        [ "x.pe" of >>peer ]
     } cleave ;
 
 : parse-peer4 ( peerbin -- inet4 )
@@ -425,7 +427,7 @@ M: peer dispose
 :: next-block ( peer -- peer )
     peer current-index>> [ 1 + ] [ 0 ] if*
     peer #pieces>>
-    peer bitfield>> '[ _ check-bitfield ] (find-integer)
+    peer bitfield>> '[ _ check-bitfield ] find-integer-from
     peer current-index<<
     0 peer current-piece>> set-length
     peer ;

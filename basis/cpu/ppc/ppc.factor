@@ -1,5 +1,5 @@
 ! Copyright (C) 2011 Erik Charlebois
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors alien alien.accessors alien.c-types alien.complex alien.data
 alien.libraries assocs byte-arrays classes.algebra classes.struct combinators
 compiler.cfg compiler.cfg.build-stack-frame compiler.cfg.comparisons
@@ -72,10 +72,10 @@ M: ppc gc-root-offset
 
 : LOAD32 ( r n -- )
     [ -16 shift 0xffff bitand LIS ]
-    [ [ dup ] dip 0xffff bitand ORI ] 2bi ;
+    [ dupd 0xffff bitand ORI ] 2bi ;
 
 : LOAD64 ( r n -- )
-    [ dup ] dip {
+    dupd {
         [ nip -48 shift 0xffff bitand LIS ]
         [ -32 shift 0xffff bitand ORI ]
         [ drop 32 SLDI ]
@@ -701,7 +701,7 @@ M:: ppc.64 %convert-integer ( dst src c-type -- )
     } case ;
 
 M: ppc.32 %load-memory-imm
-    [
+    or* [
         pick %trap-null
         {
             { c:char   [ [ dup ] 2dip LBZ dup EXTSB ] }
@@ -717,10 +717,10 @@ M: ppc.32 %load-memory-imm
             { float-rep  [ LFS ] }
             { double-rep [ LFD ] }
         } case
-    ] ?if ;
+    ] if ;
 
 M: ppc.64 %load-memory-imm
-    [
+    or* [
         pick %trap-null
         {
             { c:char      [ [ dup ] 2dip LBZ dup EXTSB ] }
@@ -738,12 +738,12 @@ M: ppc.64 %load-memory-imm
             { float-rep  [ [ scratch-reg ] dip LI scratch-reg LFSX ] }
             { double-rep [ [ scratch-reg ] dip LI scratch-reg LFDX ] }
         } case
-    ] ?if ;
+    ] if ;
 
 
 M: ppc.32 %load-memory
     [ [ 0 assert= ] bi@ ] 2dip
-    [
+    or* [
         pick %trap-null
         {
             { c:char   [ [ LBZX ] [ drop dup EXTSB ] 2bi ] }
@@ -759,11 +759,11 @@ M: ppc.32 %load-memory
             { float-rep  [ LFSX ] }
             { double-rep [ LFDX ] }
         } case
-    ] ?if ;
+    ] if ;
 
 M: ppc.64 %load-memory
     [ [ 0 assert= ] bi@ ] 2dip
-    [
+    or* [
         pick %trap-null
         {
             { c:char      [ [ LBZX ] [ drop dup EXTSB ] 2bi ] }
@@ -781,11 +781,11 @@ M: ppc.64 %load-memory
             { float-rep  [ LFSX ] }
             { double-rep [ LFDX ] }
         } case
-    ] ?if ;
+    ] if ;
 
 
 M: ppc.32 %store-memory-imm
-    [
+    or* [
         {
             { c:char   [ STB ] }
             { c:uchar  [ STB ] }
@@ -800,10 +800,10 @@ M: ppc.32 %store-memory-imm
             { float-rep  [ STFS ] }
             { double-rep [ STFD ] }
         } case
-    ] ?if ;
+    ] if ;
 
 M: ppc.64 %store-memory-imm
-    [
+    or* [
         {
             { c:char      [ STB ] }
             { c:uchar     [ STB ] }
@@ -820,11 +820,11 @@ M: ppc.64 %store-memory-imm
             { float-rep  [ [ scratch-reg ] dip LI scratch-reg STFSX ] }
             { double-rep [ [ scratch-reg ] dip LI scratch-reg STFDX ] }
         } case
-    ] ?if ;
+    ] if ;
 
 M: ppc.32 %store-memory
     [ [ 0 assert= ] bi@ ] 2dip
-    [
+    or* [
         {
             { c:char   [ STBX ] }
             { c:uchar  [ STBX ] }
@@ -839,11 +839,11 @@ M: ppc.32 %store-memory
             { float-rep  [ STFSX ] }
             { double-rep [ STFDX ] }
         } case
-    ] ?if ;
+    ] if ;
 
 M: ppc.64 %store-memory
     [ [ 0 assert= ] bi@ ] 2dip
-    [
+    or* [
         {
             { c:char      [ STBX ] }
             { c:uchar     [ STBX ] }
@@ -860,7 +860,7 @@ M: ppc.64 %store-memory
             { float-rep  [ STFSX ] }
             { double-rep [ STFDX ] }
         } case
-    ] ?if ;
+    ] if ;
 
 M:: ppc %allot ( dst size class nursery-ptr -- )
     ! dst = vm->nursery.here;

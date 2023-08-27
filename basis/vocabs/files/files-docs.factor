@@ -35,7 +35,7 @@ HELP: vocab-tests
 { $examples
   { $example
     "USING: prettyprint sorting vocabs.files ; "
-    "\"xml\" vocab-tests natural-sort ."
+    "\"xml\" vocab-tests sort ."
     $[
         {
             "{"

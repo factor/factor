@@ -1,10 +1,10 @@
 ! Copyright (c) 2009 Aaron Schaefer.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: kernel math math.primes project-euler.common ranges
 sequences ;
 IN: project-euler.058
 
-! http://projecteuler.net/index.php?section=problems&id=58
+! https://projecteuler.net/index.php?section=problems&id=58
 
 ! DESCRIPTION
 ! -----------

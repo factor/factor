@@ -337,13 +337,13 @@ M: iokit-game-input-backend (close-game-input)
 M: iokit-game-input-backend get-controllers
     +controller-states+ get-global keys [ controller boa ] map ;
 
-: ?join ( pre post sep -- string )
-    2over subseq-start [ swap 2nip ] [ [ 2array ] dip join ] if ;
+: ?glue ( seq subseq sep -- string )
+    2over subseq-index [ drop nip ] [ glue ] if ;
 
 M: iokit-game-input-backend product-string
     handle>>
-    [ kIOHIDManufacturerKey device-property ]
-    [ kIOHIDProductKey      device-property ] bi " " ?join ;
+    [ kIOHIDProductKey      device-property ]
+    [ kIOHIDManufacturerKey device-property ] bi " " ?glue ;
 
 M: iokit-game-input-backend product-id
     handle>>

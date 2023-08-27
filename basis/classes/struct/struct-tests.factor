@@ -1,5 +1,5 @@
 ! Copyright (C) 2009, 2010, 2011 Joe Groff, Slava Pestov, John Benediktsson.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors alien alien.c-types alien.data alien.syntax
 assocs byte-arrays classes classes.private classes.struct
 classes.struct.prettyprint.private classes.tuple

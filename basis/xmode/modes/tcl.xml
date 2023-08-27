@@ -4,7 +4,7 @@
 
 <!-- Tcl mode by Michael Jacobson.
      cplusplus and pascal modes used as reference.
-    2006/10/20 Jean-Francois Larvoire: 
+    2006/10/20 Jean-Francois Larvoire:
      - Fixed comments detection: Only # at the beginning of Tcl commands are comments!
      - Quoted strings can span multiple lines.
      - Added recursive in-string substituted command and variable analysis.
@@ -18,665 +18,668 @@
      - Updated {# comment detection to manage the whole {} block. This catches
        all { and }, and makes it unnecessary to define them as KEYWORDs.
      - Bug fix: Do not delegate content evaluation for ${} scalar variables.
+    2009/02/10: Albert Davidson Chou - added lineComment property for TCL mode (2119958)
+
     Limitations:
      - Unbalanced quotes or brackets within braces, such as in regular expressions,
-	will confuse the analysis. Workaround: If possible, use a \ to escape the
-	unbalanced character. Else add a ;# comment with a closing " or ].
+  will confuse the analysis. Workaround: If possible, use a \ to escape the
+  unbalanced character. Else add a ;# comment with a closing " or ].
     Known bugs:
      - Continuation line detection does not work. Same bug as espace chars below.
      - ; highlighting as an OPERATOR does not work.
     Known bugs (Were there before, and I failed to fix them):
      - \c escape colouring does not work for escapes embedded in words.
            I attemted numerous workarounds using spans and regexps, but they
-	   all seem to fail to detect anything beginning with a \. And using
-	   NO_ESCAPE="TRUE" does not help.
+     all seem to fail to detect anything beginning with a \. And using
+     NO_ESCAPE="TRUE" does not help.
      - {} within quoted strings should not affect indentation. -->
 
 <MODE>
-	<PROPS>
-		<PROPERTY NAME="indentOpenBrackets" VALUE="{" />
-		<PROPERTY NAME="indentCloseBrackets" VALUE="}" />
-		<PROPERTY NAME="lineUpClosingBracket" VALUE="true" />
-	</PROPS>
+  <PROPS>
+    <PROPERTY NAME="indentOpenBrackets" VALUE="{" />
+    <PROPERTY NAME="indentCloseBrackets" VALUE="}" />
+    <PROPERTY NAME="lineUpClosingBracket" VALUE="true" />
+    <PROPERTY NAME="lineComment" VALUE="#" />
+  </PROPS>
 
-	<RULES ESCAPE="\" IGNORE_CASE="FALSE" HIGHLIGHT_DIGITS="TRUE" 
-		DIGIT_RE="0x\p{XDigit}+|\d+">
+  <RULES IGNORE_CASE="FALSE" HIGHLIGHT_DIGITS="TRUE"
+    DIGIT_RE="0x\p{XDigit}+|\d+">
 
-		<!-- Continuation line. Processed before anything else by Tcl. (Does not work)-->
-		<EOL_SPAN_REGEXP TYPE="OPERATOR" HASH_CHAR="\">\\$</EOL_SPAN_REGEXP>
+    <!-- Continuation line. Processed before anything else by Tcl. (Does not work)-->
+    <EOL_SPAN_REGEXP TYPE="OPERATOR" HASH_CHAR="\">\\$</EOL_SPAN_REGEXP>
 
-		<!-- Comments after a ; command separator -->
-		<!-- Note: The ; isn't bolded as other operators. Why?-->
-		<EOL_SPAN_REGEXP TYPE="OPERATOR" HASH_CHAR=";" DELEGATE="TCL_COMMENT">;\s*(?=#)</EOL_SPAN_REGEXP>
-		<!-- Comments at the { opening of a block -->
-		<SPAN_REGEXP TYPE="OPERATOR" HASH_CHAR="{" DELEGATE="TCL_COMMENT">
-			<BEGIN>\{\s*(?=#)</BEGIN>
-			<END>}</END>
-		</SPAN_REGEXP>
-		<!-- Comments on a line of their own. -->
-		<EOL_SPAN TYPE="COMMENT1" AT_WHITESPACE_END="TRUE">#</EOL_SPAN>
+    <!-- Comments after a ; command separator -->
+    <!-- Note: The ; isn't bolded as other operators. Why?-->
+    <EOL_SPAN_REGEXP TYPE="OPERATOR" HASH_CHAR=";" DELEGATE="TCL_COMMENT">;\s*(?=#)</EOL_SPAN_REGEXP>
+    <!-- Comments at the { opening of a block -->
+    <SPAN_REGEXP TYPE="OPERATOR" HASH_CHAR="{" DELEGATE="TCL_COMMENT">
+      <BEGIN>\{\s*(?=#)</BEGIN>
+      <END>}</END>
+    </SPAN_REGEXP>
+    <!-- Comments on a line of their own. -->
+    <EOL_SPAN TYPE="COMMENT1" AT_WHITESPACE_END="TRUE">#</EOL_SPAN>
 
-		<!-- Quoted strings -->
-		<SPAN TYPE="LITERAL1" NO_LINE_BREAK="FALSE" AT_WORD_START="TRUE" DELEGATE="TCL_STRING">
-			<BEGIN>"</BEGIN>
-			<END>"</END>
-		</SPAN>
+    <!-- Quoted strings -->
+    <SPAN TYPE="LITERAL1" NO_LINE_BREAK="FALSE" AT_WORD_START="TRUE" DELEGATE="TCL_STRING">
+      <BEGIN>"</BEGIN>
+      <END>"</END>
+    </SPAN>
 
-		<!-- Avoid colouring substituted variables that are homonyms of a keyword -->
-		<!-- Indexed array variable. Delegate to MAIN, as the index string is evaluated by Tcl.-->
-		<SPAN_REGEXP TYPE="NULL" HASH_CHAR="$" DELEGATE="MAIN">
-			<BEGIN>\$(\w|::)+\(</BEGIN>
-			<END>)</END>
-		</SPAN_REGEXP>
-		<!-- General scalar variable. Do not delegate, as the ${} block content is not evalutated by Tcl. -->
-		<SPAN TYPE="NULL">
-			<BEGIN>${</BEGIN>
-			<END>}</END>
-		</SPAN>
-		<!-- Plain scalar variable. -->
-		<SEQ_REGEXP TYPE="NULL" HASH_CHAR="$">\$(\w|::)+</SEQ_REGEXP>
+    <!-- Avoid colouring substituted variables that are homonyms of a keyword -->
+    <!-- Indexed array variable. Delegate to MAIN, as the index string is evaluated by Tcl.-->
+    <SPAN_REGEXP TYPE="NULL" HASH_CHAR="$" DELEGATE="MAIN">
+      <BEGIN>\$(\w|::)+\(</BEGIN>
+      <END>)</END>
+    </SPAN_REGEXP>
+    <!-- General scalar variable. Do not delegate, as the ${} block content is not evalutated by Tcl. -->
+    <SPAN TYPE="NULL">
+      <BEGIN>${</BEGIN>
+      <END>}</END>
+    </SPAN>
+    <!-- Plain scalar variable. -->
+    <SEQ_REGEXP TYPE="NULL" HASH_CHAR="$">\$(\w|::)+</SEQ_REGEXP>
 
-		<!-- Sub-block -->
-		<SPAN TYPE="OPERATOR" NO_LINE_BREAK="FALSE" AT_WORD_START="TRUE" DELEGATE="MAIN">
-			<BEGIN>{</BEGIN>
-			<END>}</END>
-		</SPAN>
+    <!-- Sub-block -->
+    <SPAN TYPE="OPERATOR" NO_LINE_BREAK="FALSE" AT_WORD_START="TRUE" DELEGATE="MAIN">
+      <BEGIN>{</BEGIN>
+      <END>}</END>
+    </SPAN>
 
-		<!-- Sub-commands to be substituted -->
-		<SPAN TYPE="OPERATOR" NO_LINE_BREAK="FALSE" DELEGATE="MAIN">
-			<BEGIN>[</BEGIN>
-			<END>]</END>
-		</SPAN>
+    <!-- Sub-commands to be substituted -->
+    <SPAN TYPE="OPERATOR" NO_LINE_BREAK="FALSE" DELEGATE="MAIN">
+      <BEGIN>[</BEGIN>
+      <END>]</END>
+    </SPAN>
 
-		<!-- Escaped characters -->
-		<SEQ TYPE="KEYWORD3">\a</SEQ>
-		<SEQ TYPE="KEYWORD3">\b</SEQ>
-		<SEQ TYPE="KEYWORD3">\f</SEQ>
-		<SEQ TYPE="KEYWORD3">\n</SEQ>
-		<SEQ TYPE="KEYWORD3">\r</SEQ>
-		<SEQ TYPE="KEYWORD3">\t</SEQ>
-		<SEQ TYPE="KEYWORD3">\v</SEQ>
+    <!-- Escaped characters -->
+    <SEQ TYPE="KEYWORD3">\a</SEQ>
+    <SEQ TYPE="KEYWORD3">\b</SEQ>
+    <SEQ TYPE="KEYWORD3">\f</SEQ>
+    <SEQ TYPE="KEYWORD3">\n</SEQ>
+    <SEQ TYPE="KEYWORD3">\r</SEQ>
+    <SEQ TYPE="KEYWORD3">\t</SEQ>
+    <SEQ TYPE="KEYWORD3">\v</SEQ>
 
-		<!-- Tcl syntax operators. -->
-		<!-- Note that "{}[]" are already caught above.-->
-		<!-- Delegate to main, as a new command begins after the ; -->
-		<SEQ TYPE="OPERATOR" DELEGATE="MAIN">;</SEQ>
-		<SEQ TYPE="NULL">::</SEQ>
+    <!-- Tcl syntax operators. -->
+    <!-- Note that "{}[]" are already caught above.-->
+    <!-- Delegate to main, as a new command begins after the ; -->
+    <SEQ TYPE="OPERATOR" DELEGATE="MAIN">;</SEQ>
+    <SEQ TYPE="NULL">::</SEQ>
 
-		<!-- Math expression operators -->
-		<SEQ TYPE="OPERATOR">=</SEQ>
-		<SEQ TYPE="OPERATOR">!</SEQ>
-		<SEQ TYPE="OPERATOR">&gt;=</SEQ>
-		<SEQ TYPE="OPERATOR">&lt;=</SEQ>
-		<SEQ TYPE="OPERATOR">+</SEQ>
-		<SEQ TYPE="OPERATOR">-</SEQ>
-		<SEQ TYPE="OPERATOR">/</SEQ>
-		<SEQ TYPE="OPERATOR">*</SEQ>
-		<SEQ TYPE="OPERATOR">&gt;</SEQ>
-		<SEQ TYPE="OPERATOR">&lt;</SEQ>
-		<SEQ TYPE="OPERATOR">%</SEQ>
-		<SEQ TYPE="OPERATOR">&amp;</SEQ>
-		<SEQ TYPE="OPERATOR">|</SEQ>
-		<SEQ TYPE="OPERATOR">^</SEQ>
-		<SEQ TYPE="OPERATOR">~</SEQ>
+    <!-- Math expression operators -->
+    <SEQ TYPE="OPERATOR">=</SEQ>
+    <SEQ TYPE="OPERATOR">!</SEQ>
+    <SEQ TYPE="OPERATOR">&gt;=</SEQ>
+    <SEQ TYPE="OPERATOR">&lt;=</SEQ>
+    <SEQ TYPE="OPERATOR">+</SEQ>
+    <SEQ TYPE="OPERATOR">-</SEQ>
+    <SEQ TYPE="OPERATOR">/</SEQ>
+    <SEQ TYPE="OPERATOR">*</SEQ>
+    <SEQ TYPE="OPERATOR">&gt;</SEQ>
+    <SEQ TYPE="OPERATOR">&lt;</SEQ>
+    <SEQ TYPE="OPERATOR">%</SEQ>
+    <SEQ TYPE="OPERATOR">&amp;</SEQ>
+    <SEQ TYPE="OPERATOR">|</SEQ>
+    <SEQ TYPE="OPERATOR">^</SEQ>
+    <SEQ TYPE="OPERATOR">~</SEQ>
 
-		<KEYWORDS>
-			<!-- Tcl keywords-->
-			<KEYWORD1>append</KEYWORD1>
-			<KEYWORD1>array</KEYWORD1>
-			<KEYWORD1>concat</KEYWORD1>
-			<KEYWORD1>console</KEYWORD1>
-			<KEYWORD1>eval</KEYWORD1>
-			<KEYWORD1>expr</KEYWORD1>
-			<KEYWORD1>format</KEYWORD1>
-			<KEYWORD1>global</KEYWORD1>
-			<KEYWORD1>set</KEYWORD1>
-			<KEYWORD1>trace</KEYWORD1>
-			<KEYWORD1>unset</KEYWORD1>
-			<KEYWORD1>upvar</KEYWORD1>
-			<KEYWORD1>join</KEYWORD1>
-			<KEYWORD1>lappend</KEYWORD1>
-			<KEYWORD1>lindex</KEYWORD1>
-			<KEYWORD1>linsert</KEYWORD1>
-			<KEYWORD1>list</KEYWORD1>
-			<KEYWORD1>llength</KEYWORD1>
-			<KEYWORD1>lrange</KEYWORD1>
-			<KEYWORD1>lreplace</KEYWORD1>
-			<KEYWORD1>lsearch</KEYWORD1>
-			<KEYWORD1>lsort</KEYWORD1>
-			<KEYWORD1>split</KEYWORD1>
-			<KEYWORD1>scan</KEYWORD1>
-			<KEYWORD1>string</KEYWORD1>
-			<KEYWORD1>regexp</KEYWORD1>
-			<KEYWORD1>regsub</KEYWORD1>
-			<KEYWORD1>if</KEYWORD1>
-			<KEYWORD1>else</KEYWORD1>
-			<KEYWORD1>elseif</KEYWORD1>
-			<KEYWORD1>switch</KEYWORD1>
-			<KEYWORD1>for</KEYWORD1>
-			<KEYWORD1>foreach</KEYWORD1>
-			<KEYWORD1>while</KEYWORD1>
-			<KEYWORD1>break</KEYWORD1>
-			<KEYWORD1>continue</KEYWORD1>
-			<KEYWORD1>proc</KEYWORD1>
-			<KEYWORD1>return</KEYWORD1>
-			<KEYWORD1>source</KEYWORD1>
-			<KEYWORD1>unknown</KEYWORD1>
-			<KEYWORD1>uplevel</KEYWORD1>
-			<KEYWORD1>cd</KEYWORD1>
-			<KEYWORD1>close</KEYWORD1>
-			<KEYWORD1>eof</KEYWORD1>
-			<KEYWORD1>file</KEYWORD1>
-			<KEYWORD1>flush</KEYWORD1>
-			<KEYWORD1>gets</KEYWORD1>
-			<KEYWORD1>glob</KEYWORD1>
-			<KEYWORD1>open</KEYWORD1>
-			<KEYWORD1>read</KEYWORD1>
-			<KEYWORD1>puts</KEYWORD1>
-			<KEYWORD1>pwd</KEYWORD1>
-			<KEYWORD1>seek</KEYWORD1>
-			<KEYWORD1>tell</KEYWORD1>
-			<KEYWORD1>catch</KEYWORD1>
-			<KEYWORD1>error</KEYWORD1>
-			<KEYWORD1>exec</KEYWORD1>
-			<KEYWORD1>pid</KEYWORD1>
-			<KEYWORD1>after</KEYWORD1>
-			<KEYWORD1>time</KEYWORD1>
-			<KEYWORD1>exit</KEYWORD1>
-			<KEYWORD1>history</KEYWORD1>
-			<KEYWORD1>rename</KEYWORD1>
-			<KEYWORD1>info</KEYWORD1>
-			<!-- expr keywords-->
-			<KEYWORD1>ceil</KEYWORD1>
-			<KEYWORD1>floor</KEYWORD1>
-			<KEYWORD1>round</KEYWORD1>
-			<KEYWORD1>incr</KEYWORD1>
-			<KEYWORD1>abs</KEYWORD1>
-			<KEYWORD1>acos</KEYWORD1>
-			<KEYWORD1>cos</KEYWORD1>
-			<KEYWORD1>cosh</KEYWORD1>
-			<KEYWORD1>asin</KEYWORD1>
-			<KEYWORD1>sin</KEYWORD1>
-			<KEYWORD1>sinh</KEYWORD1>
-			<KEYWORD1>atan</KEYWORD1>
-			<KEYWORD1>atan2</KEYWORD1>
-			<KEYWORD1>tan</KEYWORD1>
-			<KEYWORD1>tanh</KEYWORD1>
-			<KEYWORD1>log</KEYWORD1>
-			<KEYWORD1>log10</KEYWORD1>
-			<KEYWORD1>fmod</KEYWORD1>
-			<KEYWORD1>pow</KEYWORD1>
-			<KEYWORD1>hypot</KEYWORD1>
-			<KEYWORD1>sqrt</KEYWORD1>
-			<KEYWORD1>double</KEYWORD1>
-			<KEYWORD1>int</KEYWORD1>
-			<!-- New Tcl keywords up to tcl 8.4.14 -->
-			<KEYWORD1>bgerror</KEYWORD1>
-			<KEYWORD1>binary</KEYWORD1>
-			<KEYWORD1>clock</KEYWORD1>
-			<KEYWORD1>dde</KEYWORD1>
-			<KEYWORD1>encoding</KEYWORD1>
-			<KEYWORD1>fblocked</KEYWORD1>
-			<KEYWORD1>fconfigure</KEYWORD1>
-			<KEYWORD1>fcopy</KEYWORD1>
-			<KEYWORD1>fileevent</KEYWORD1>
-			<KEYWORD1>filename</KEYWORD1>
-			<KEYWORD1>http</KEYWORD1>
-			<KEYWORD1>interp</KEYWORD1>
-			<KEYWORD1>load</KEYWORD1>
-			<KEYWORD1>lset</KEYWORD1>
-			<KEYWORD1>memory</KEYWORD1>
-			<KEYWORD1>msgcat</KEYWORD1>
-			<KEYWORD1>namespace</KEYWORD1>
-			<KEYWORD1>package</KEYWORD1>
-			<KEYWORD1>pkg::create</KEYWORD1>
-			<KEYWORD1>pkg_mkIndex</KEYWORD1>
-			<KEYWORD1>registry</KEYWORD1>
-			<KEYWORD1>resource</KEYWORD1>
-			<KEYWORD1>socket</KEYWORD1>
-			<KEYWORD1>subst</KEYWORD1>
-			<KEYWORD1>update</KEYWORD1>
-			<KEYWORD1>variable</KEYWORD1>
-			<KEYWORD1>vwait</KEYWORD1>
-			<!-- Standard library of Tcl interpretor procedures -->
-			<KEYWORD1>auto_execok</KEYWORD1>
-			<KEYWORD1>auto_import</KEYWORD1>
-			<KEYWORD1>auto_load</KEYWORD1>
-			<KEYWORD1>auto_mkindex</KEYWORD1>
-			<KEYWORD1>auto_mkindex_old</KEYWORD1>
-			<KEYWORD1>auto_qualify</KEYWORD1>
-			<KEYWORD1>auto_reset</KEYWORD1>
-			<KEYWORD1>parray</KEYWORD1>
-			<KEYWORD1>tcl_endOfWord</KEYWORD1>
-			<KEYWORD1>tcl_findLibrary</KEYWORD1>
-			<KEYWORD1>tcl_startOfNextWord</KEYWORD1>
-			<KEYWORD1>tcl_startOfPreviousWord</KEYWORD1>
-			<KEYWORD1>tcl_wordBreakAfter</KEYWORD1>
-			<KEYWORD1>tcl_wordBreakBefore</KEYWORD1>
+    <KEYWORDS>
+      <!-- Tcl keywords-->
+      <KEYWORD1>append</KEYWORD1>
+      <KEYWORD1>array</KEYWORD1>
+      <KEYWORD1>concat</KEYWORD1>
+      <KEYWORD1>console</KEYWORD1>
+      <KEYWORD1>eval</KEYWORD1>
+      <KEYWORD1>expr</KEYWORD1>
+      <KEYWORD1>format</KEYWORD1>
+      <KEYWORD1>global</KEYWORD1>
+      <KEYWORD1>set</KEYWORD1>
+      <KEYWORD1>trace</KEYWORD1>
+      <KEYWORD1>unset</KEYWORD1>
+      <KEYWORD1>upvar</KEYWORD1>
+      <KEYWORD1>join</KEYWORD1>
+      <KEYWORD1>lappend</KEYWORD1>
+      <KEYWORD1>lindex</KEYWORD1>
+      <KEYWORD1>linsert</KEYWORD1>
+      <KEYWORD1>list</KEYWORD1>
+      <KEYWORD1>llength</KEYWORD1>
+      <KEYWORD1>lrange</KEYWORD1>
+      <KEYWORD1>lreplace</KEYWORD1>
+      <KEYWORD1>lsearch</KEYWORD1>
+      <KEYWORD1>lsort</KEYWORD1>
+      <KEYWORD1>split</KEYWORD1>
+      <KEYWORD1>scan</KEYWORD1>
+      <KEYWORD1>string</KEYWORD1>
+      <KEYWORD1>regexp</KEYWORD1>
+      <KEYWORD1>regsub</KEYWORD1>
+      <KEYWORD1>if</KEYWORD1>
+      <KEYWORD1>else</KEYWORD1>
+      <KEYWORD1>elseif</KEYWORD1>
+      <KEYWORD1>switch</KEYWORD1>
+      <KEYWORD1>for</KEYWORD1>
+      <KEYWORD1>foreach</KEYWORD1>
+      <KEYWORD1>while</KEYWORD1>
+      <KEYWORD1>break</KEYWORD1>
+      <KEYWORD1>continue</KEYWORD1>
+      <KEYWORD1>proc</KEYWORD1>
+      <KEYWORD1>return</KEYWORD1>
+      <KEYWORD1>source</KEYWORD1>
+      <KEYWORD1>unknown</KEYWORD1>
+      <KEYWORD1>uplevel</KEYWORD1>
+      <KEYWORD1>cd</KEYWORD1>
+      <KEYWORD1>close</KEYWORD1>
+      <KEYWORD1>eof</KEYWORD1>
+      <KEYWORD1>file</KEYWORD1>
+      <KEYWORD1>flush</KEYWORD1>
+      <KEYWORD1>gets</KEYWORD1>
+      <KEYWORD1>glob</KEYWORD1>
+      <KEYWORD1>open</KEYWORD1>
+      <KEYWORD1>read</KEYWORD1>
+      <KEYWORD1>puts</KEYWORD1>
+      <KEYWORD1>pwd</KEYWORD1>
+      <KEYWORD1>seek</KEYWORD1>
+      <KEYWORD1>tell</KEYWORD1>
+      <KEYWORD1>catch</KEYWORD1>
+      <KEYWORD1>error</KEYWORD1>
+      <KEYWORD1>exec</KEYWORD1>
+      <KEYWORD1>pid</KEYWORD1>
+      <KEYWORD1>after</KEYWORD1>
+      <KEYWORD1>time</KEYWORD1>
+      <KEYWORD1>exit</KEYWORD1>
+      <KEYWORD1>history</KEYWORD1>
+      <KEYWORD1>rename</KEYWORD1>
+      <KEYWORD1>info</KEYWORD1>
+      <!-- expr keywords-->
+      <KEYWORD1>ceil</KEYWORD1>
+      <KEYWORD1>floor</KEYWORD1>
+      <KEYWORD1>round</KEYWORD1>
+      <KEYWORD1>incr</KEYWORD1>
+      <KEYWORD1>abs</KEYWORD1>
+      <KEYWORD1>acos</KEYWORD1>
+      <KEYWORD1>cos</KEYWORD1>
+      <KEYWORD1>cosh</KEYWORD1>
+      <KEYWORD1>asin</KEYWORD1>
+      <KEYWORD1>sin</KEYWORD1>
+      <KEYWORD1>sinh</KEYWORD1>
+      <KEYWORD1>atan</KEYWORD1>
+      <KEYWORD1>atan2</KEYWORD1>
+      <KEYWORD1>tan</KEYWORD1>
+      <KEYWORD1>tanh</KEYWORD1>
+      <KEYWORD1>log</KEYWORD1>
+      <KEYWORD1>log10</KEYWORD1>
+      <KEYWORD1>fmod</KEYWORD1>
+      <KEYWORD1>pow</KEYWORD1>
+      <KEYWORD1>hypot</KEYWORD1>
+      <KEYWORD1>sqrt</KEYWORD1>
+      <KEYWORD1>double</KEYWORD1>
+      <KEYWORD1>int</KEYWORD1>
+      <!-- New Tcl keywords up to tcl 8.4.14 -->
+      <KEYWORD1>bgerror</KEYWORD1>
+      <KEYWORD1>binary</KEYWORD1>
+      <KEYWORD1>clock</KEYWORD1>
+      <KEYWORD1>dde</KEYWORD1>
+      <KEYWORD1>encoding</KEYWORD1>
+      <KEYWORD1>fblocked</KEYWORD1>
+      <KEYWORD1>fconfigure</KEYWORD1>
+      <KEYWORD1>fcopy</KEYWORD1>
+      <KEYWORD1>fileevent</KEYWORD1>
+      <KEYWORD1>filename</KEYWORD1>
+      <KEYWORD1>http</KEYWORD1>
+      <KEYWORD1>interp</KEYWORD1>
+      <KEYWORD1>load</KEYWORD1>
+      <KEYWORD1>lset</KEYWORD1>
+      <KEYWORD1>memory</KEYWORD1>
+      <KEYWORD1>msgcat</KEYWORD1>
+      <KEYWORD1>namespace</KEYWORD1>
+      <KEYWORD1>package</KEYWORD1>
+      <KEYWORD1>pkg::create</KEYWORD1>
+      <KEYWORD1>pkg_mkIndex</KEYWORD1>
+      <KEYWORD1>registry</KEYWORD1>
+      <KEYWORD1>resource</KEYWORD1>
+      <KEYWORD1>socket</KEYWORD1>
+      <KEYWORD1>subst</KEYWORD1>
+      <KEYWORD1>update</KEYWORD1>
+      <KEYWORD1>variable</KEYWORD1>
+      <KEYWORD1>vwait</KEYWORD1>
+      <!-- Standard library of Tcl interpretor procedures -->
+      <KEYWORD1>auto_execok</KEYWORD1>
+      <KEYWORD1>auto_import</KEYWORD1>
+      <KEYWORD1>auto_load</KEYWORD1>
+      <KEYWORD1>auto_mkindex</KEYWORD1>
+      <KEYWORD1>auto_mkindex_old</KEYWORD1>
+      <KEYWORD1>auto_qualify</KEYWORD1>
+      <KEYWORD1>auto_reset</KEYWORD1>
+      <KEYWORD1>parray</KEYWORD1>
+      <KEYWORD1>tcl_endOfWord</KEYWORD1>
+      <KEYWORD1>tcl_findLibrary</KEYWORD1>
+      <KEYWORD1>tcl_startOfNextWord</KEYWORD1>
+      <KEYWORD1>tcl_startOfPreviousWord</KEYWORD1>
+      <KEYWORD1>tcl_wordBreakAfter</KEYWORD1>
+      <KEYWORD1>tcl_wordBreakBefore</KEYWORD1>
 
-			<!-- Tk keywords -->
-			<KEYWORD2>bind</KEYWORD2>
-			<KEYWORD2>button</KEYWORD2>
-			<KEYWORD2>canvas</KEYWORD2>
-			<KEYWORD2>checkbutton</KEYWORD2>
-			<KEYWORD2>destroy</KEYWORD2>
-			<KEYWORD2>entry</KEYWORD2>
-			<KEYWORD2>focus</KEYWORD2>
-			<KEYWORD2>frame</KEYWORD2>
-			<KEYWORD2>grab</KEYWORD2>
-			<KEYWORD2>image</KEYWORD2>
-			<KEYWORD2>label</KEYWORD2>
-			<KEYWORD2>listbox</KEYWORD2>
-			<KEYWORD2>lower</KEYWORD2>
-			<KEYWORD2>menu</KEYWORD2>
-			<KEYWORD2>menubutton</KEYWORD2>
-			<KEYWORD2>message</KEYWORD2>
-			<KEYWORD2>option</KEYWORD2>
-			<KEYWORD2>pack</KEYWORD2>
-			<KEYWORD2>placer</KEYWORD2>
-			<KEYWORD2>radiobutton</KEYWORD2>
-			<KEYWORD2>raise</KEYWORD2>
-			<KEYWORD2>scale</KEYWORD2>
-			<KEYWORD2>scrollbar</KEYWORD2>
-			<KEYWORD2>selection</KEYWORD2>
-			<KEYWORD2>send</KEYWORD2>
-			<KEYWORD2>text</KEYWORD2>
-			<KEYWORD2>tk</KEYWORD2>
-			<KEYWORD2>tkerror</KEYWORD2>
-			<KEYWORD2>tkwait</KEYWORD2>
-			<KEYWORD2>toplevel</KEYWORD2>
-			<KEYWORD2>update</KEYWORD2>
-			<KEYWORD2>winfo</KEYWORD2>
-			<KEYWORD2>wm</KEYWORD2>
+      <!-- Tk keywords -->
+      <KEYWORD2>bind</KEYWORD2>
+      <KEYWORD2>button</KEYWORD2>
+      <KEYWORD2>canvas</KEYWORD2>
+      <KEYWORD2>checkbutton</KEYWORD2>
+      <KEYWORD2>destroy</KEYWORD2>
+      <KEYWORD2>entry</KEYWORD2>
+      <KEYWORD2>focus</KEYWORD2>
+      <KEYWORD2>frame</KEYWORD2>
+      <KEYWORD2>grab</KEYWORD2>
+      <KEYWORD2>image</KEYWORD2>
+      <KEYWORD2>label</KEYWORD2>
+      <KEYWORD2>listbox</KEYWORD2>
+      <KEYWORD2>lower</KEYWORD2>
+      <KEYWORD2>menu</KEYWORD2>
+      <KEYWORD2>menubutton</KEYWORD2>
+      <KEYWORD2>message</KEYWORD2>
+      <KEYWORD2>option</KEYWORD2>
+      <KEYWORD2>pack</KEYWORD2>
+      <KEYWORD2>placer</KEYWORD2>
+      <KEYWORD2>radiobutton</KEYWORD2>
+      <KEYWORD2>raise</KEYWORD2>
+      <KEYWORD2>scale</KEYWORD2>
+      <KEYWORD2>scrollbar</KEYWORD2>
+      <KEYWORD2>selection</KEYWORD2>
+      <KEYWORD2>send</KEYWORD2>
+      <KEYWORD2>text</KEYWORD2>
+      <KEYWORD2>tk</KEYWORD2>
+      <KEYWORD2>tkerror</KEYWORD2>
+      <KEYWORD2>tkwait</KEYWORD2>
+      <KEYWORD2>toplevel</KEYWORD2>
+      <KEYWORD2>update</KEYWORD2>
+      <KEYWORD2>winfo</KEYWORD2>
+      <KEYWORD2>wm</KEYWORD2>
 
-			<!-- Expect keywords. Using KEYWORD2 as send is already one -->
-			<!-- KEYWORD2 close -->
-			<KEYWORD2>debug</KEYWORD2>
-			<KEYWORD2>disconnect</KEYWORD2>
-			<!-- KEYWORD2 exit -->
-			<KEYWORD2>exp_continue</KEYWORD2>
-			<KEYWORD2>exp_internal</KEYWORD2>
-			<KEYWORD2>exp_open</KEYWORD2>
-			<KEYWORD2>exp_pid</KEYWORD2>
-			<KEYWORD2>exp_version</KEYWORD2>
-			<KEYWORD2>expect</KEYWORD2>
-			<KEYWORD2>expect_after</KEYWORD2>
-			<KEYWORD2>expect_background</KEYWORD2>
-			<KEYWORD2>expect_before</KEYWORD2>
-			<KEYWORD2>expect_tty</KEYWORD2>
-			<KEYWORD2>expect_user</KEYWORD2>
-			<KEYWORD2>fork</KEYWORD2>
-			<KEYWORD2>inter_return</KEYWORD2>
-			<KEYWORD2>interact</KEYWORD2>
-			<KEYWORD2>interpreter</KEYWORD2>
-			<KEYWORD2>log_file</KEYWORD2>
-			<KEYWORD2>log_user</KEYWORD2>
-			<KEYWORD2>match_max</KEYWORD2>
-			<KEYWORD2>overlay</KEYWORD2>
-			<KEYWORD2>parity</KEYWORD2>
-			<KEYWORD2>promptl</KEYWORD2>
-			<KEYWORD2>prompt2</KEYWORD2>
-			<KEYWORD2>remove_nulls</KEYWORD2>
-			<!-- KEYWORD2 send -->
-			<KEYWORD2>send_error </KEYWORD2>
-			<KEYWORD2>send_log</KEYWORD2>
-			<KEYWORD2>send_tty</KEYWORD2>
-			<KEYWORD2>send_user</KEYWORD2>
-			<KEYWORD2>sleep</KEYWORD2>
-			<KEYWORD2>spawn</KEYWORD2>
-			<KEYWORD2>strace</KEYWORD2>
-			<KEYWORD2>stty</KEYWORD2>
-			<KEYWORD2>system</KEYWORD2>
-			<KEYWORD2>timestamp</KEYWORD2>
-			<KEYWORD2>trap</KEYWORD2>
-			<KEYWORD2>wait</KEYWORD2>
-			<!-- Arguments to expect commands-->
-			<KEYWORD3>full_buffer</KEYWORD3>
-			<KEYWORD3>timeout</KEYWORD3>
-			<!-- KEYWORD3 eof-->
+      <!-- Expect keywords. Using KEYWORD2 as send is already one -->
+      <!-- KEYWORD2 close -->
+      <KEYWORD2>debug</KEYWORD2>
+      <KEYWORD2>disconnect</KEYWORD2>
+      <!-- KEYWORD2 exit -->
+      <KEYWORD2>exp_continue</KEYWORD2>
+      <KEYWORD2>exp_internal</KEYWORD2>
+      <KEYWORD2>exp_open</KEYWORD2>
+      <KEYWORD2>exp_pid</KEYWORD2>
+      <KEYWORD2>exp_version</KEYWORD2>
+      <KEYWORD2>expect</KEYWORD2>
+      <KEYWORD2>expect_after</KEYWORD2>
+      <KEYWORD2>expect_background</KEYWORD2>
+      <KEYWORD2>expect_before</KEYWORD2>
+      <KEYWORD2>expect_tty</KEYWORD2>
+      <KEYWORD2>expect_user</KEYWORD2>
+      <KEYWORD2>fork</KEYWORD2>
+      <KEYWORD2>inter_return</KEYWORD2>
+      <KEYWORD2>interact</KEYWORD2>
+      <KEYWORD2>interpreter</KEYWORD2>
+      <KEYWORD2>log_file</KEYWORD2>
+      <KEYWORD2>log_user</KEYWORD2>
+      <KEYWORD2>match_max</KEYWORD2>
+      <KEYWORD2>overlay</KEYWORD2>
+      <KEYWORD2>parity</KEYWORD2>
+      <KEYWORD2>promptl</KEYWORD2>
+      <KEYWORD2>prompt2</KEYWORD2>
+      <KEYWORD2>remove_nulls</KEYWORD2>
+      <!-- KEYWORD2 send -->
+      <KEYWORD2>send_error </KEYWORD2>
+      <KEYWORD2>send_log</KEYWORD2>
+      <KEYWORD2>send_tty</KEYWORD2>
+      <KEYWORD2>send_user</KEYWORD2>
+      <KEYWORD2>sleep</KEYWORD2>
+      <KEYWORD2>spawn</KEYWORD2>
+      <KEYWORD2>strace</KEYWORD2>
+      <KEYWORD2>stty</KEYWORD2>
+      <KEYWORD2>system</KEYWORD2>
+      <KEYWORD2>timestamp</KEYWORD2>
+      <KEYWORD2>trap</KEYWORD2>
+      <KEYWORD2>wait</KEYWORD2>
+      <!-- Arguments to expect commands-->
+      <KEYWORD3>full_buffer</KEYWORD3>
+      <KEYWORD3>timeout</KEYWORD3>
+      <!-- KEYWORD3 eof-->
 
-			<!-- Global variables-->
-			<KEYWORD3>argv0</KEYWORD3>
-			<KEYWORD3>argv</KEYWORD3>
-			<KEYWORD3>argc</KEYWORD3>
-			<KEYWORD3>tk_version</KEYWORD3>
-			<KEYWORD3>tk_library</KEYWORD3>
-			<KEYWORD3>tk_strictMotif</KEYWORD3>
-			<!-- New global variables up to tcl 8.4.14 -->
-			<KEYWORD3>env</KEYWORD3>
-			<KEYWORD3>errorCode</KEYWORD3>
-			<KEYWORD3>errorInfo</KEYWORD3>
-			<KEYWORD3>geometry</KEYWORD3>
-			<KEYWORD3>tcl_library</KEYWORD3>
-			<KEYWORD3>tcl_patchLevel</KEYWORD3>
-			<KEYWORD3>tcl_pkgPath</KEYWORD3>
-			<KEYWORD3>tcl_platform</KEYWORD3>
-			<KEYWORD3>tcl_precision</KEYWORD3>
-			<KEYWORD3>tcl_rcFileName</KEYWORD3>
-			<KEYWORD3>tcl_rcRsrcName</KEYWORD3>
-			<KEYWORD3>tcl_traceCompile</KEYWORD3>
-			<KEYWORD3>tcl_traceExec</KEYWORD3>
-			<KEYWORD3>tcl_wordchars</KEYWORD3>
-			<KEYWORD3>tcl_nonwordchars</KEYWORD3>
-			<KEYWORD3>tcl_version</KEYWORD3>
-			<KEYWORD3>tcl_interactive</KEYWORD3>
+      <!-- Global variables-->
+      <KEYWORD3>argv0</KEYWORD3>
+      <KEYWORD3>argv</KEYWORD3>
+      <KEYWORD3>argc</KEYWORD3>
+      <KEYWORD3>tk_version</KEYWORD3>
+      <KEYWORD3>tk_library</KEYWORD3>
+      <KEYWORD3>tk_strictMotif</KEYWORD3>
+      <!-- New global variables up to tcl 8.4.14 -->
+      <KEYWORD3>env</KEYWORD3>
+      <KEYWORD3>errorCode</KEYWORD3>
+      <KEYWORD3>errorInfo</KEYWORD3>
+      <KEYWORD3>geometry</KEYWORD3>
+      <KEYWORD3>tcl_library</KEYWORD3>
+      <KEYWORD3>tcl_patchLevel</KEYWORD3>
+      <KEYWORD3>tcl_pkgPath</KEYWORD3>
+      <KEYWORD3>tcl_platform</KEYWORD3>
+      <KEYWORD3>tcl_precision</KEYWORD3>
+      <KEYWORD3>tcl_rcFileName</KEYWORD3>
+      <KEYWORD3>tcl_rcRsrcName</KEYWORD3>
+      <KEYWORD3>tcl_traceCompile</KEYWORD3>
+      <KEYWORD3>tcl_traceExec</KEYWORD3>
+      <KEYWORD3>tcl_wordchars</KEYWORD3>
+      <KEYWORD3>tcl_nonwordchars</KEYWORD3>
+      <KEYWORD3>tcl_version</KEYWORD3>
+      <KEYWORD3>tcl_interactive</KEYWORD3>
 
-			<!-- Common arguments to tcl and Tk keywords -->
-			<KEYWORD3>exact</KEYWORD3>
-			<KEYWORD3>all</KEYWORD3>
-			<KEYWORD3>indices</KEYWORD3>
-			<KEYWORD3>nocase</KEYWORD3>
-			<KEYWORD3>nocomplain</KEYWORD3>
-			<KEYWORD3>nonewline</KEYWORD3>
-			<KEYWORD3>code</KEYWORD3>
-			<KEYWORD3>errorinfo</KEYWORD3>
-			<KEYWORD3>errorcode</KEYWORD3>
-			<KEYWORD3>atime</KEYWORD3>
-			<KEYWORD3>anymore</KEYWORD3>
-			<KEYWORD3>args</KEYWORD3>
-			<KEYWORD3>body</KEYWORD3>
-			<KEYWORD3>compare</KEYWORD3>
-			<KEYWORD3>cmdcount</KEYWORD3>
-			<KEYWORD3>commands</KEYWORD3>
-			<KEYWORD3>ctime</KEYWORD3>
-			<KEYWORD3>current</KEYWORD3>
-			<KEYWORD3>default</KEYWORD3>
-			<KEYWORD3>dev</KEYWORD3>
-			<KEYWORD3>dirname</KEYWORD3>
-			<KEYWORD3>donesearch</KEYWORD3>
-			<KEYWORD3>errorinfo</KEYWORD3>
-			<KEYWORD3>executable</KEYWORD3>
-			<KEYWORD3>extension</KEYWORD3>
-			<KEYWORD3>first</KEYWORD3>
-			<KEYWORD3>globals</KEYWORD3>
-			<KEYWORD3>gid</KEYWORD3>
-			<KEYWORD3>index</KEYWORD3>
-			<KEYWORD3>ino</KEYWORD3>
-			<KEYWORD3>isdirectory</KEYWORD3>
-			<KEYWORD3>isfile</KEYWORD3>
-			<KEYWORD3>keep</KEYWORD3>
-			<KEYWORD3>last</KEYWORD3>
-			<KEYWORD3>level</KEYWORD3>
-			<KEYWORD3>length</KEYWORD3>
-			<KEYWORD3>library</KEYWORD3>
-			<KEYWORD3>locals</KEYWORD3>
-			<KEYWORD3>lstat</KEYWORD3>
-			<KEYWORD3>match</KEYWORD3>
-			<KEYWORD3>mode</KEYWORD3>
-			<KEYWORD3>mtime</KEYWORD3>
-			<KEYWORD3>names</KEYWORD3>
-			<KEYWORD3>nextelement</KEYWORD3>
-			<KEYWORD3>nextid</KEYWORD3>
-			<KEYWORD3>nlink</KEYWORD3>
-			<KEYWORD3>none</KEYWORD3>
-			<KEYWORD3>procs</KEYWORD3>
-			<KEYWORD3>owned</KEYWORD3>
-			<KEYWORD3>range</KEYWORD3>
-			<KEYWORD3>readable</KEYWORD3>
-			<KEYWORD3>readlink</KEYWORD3>
-			<KEYWORD3>redo</KEYWORD3>
-			<KEYWORD3>release</KEYWORD3>
-			<KEYWORD3>rootname</KEYWORD3>
-			<KEYWORD3>script</KEYWORD3>
-			<KEYWORD3>show</KEYWORD3>
-			<KEYWORD3>size</KEYWORD3>
-			<KEYWORD3>startsearch</KEYWORD3>
-			<KEYWORD3>stat</KEYWORD3>
-			<KEYWORD3>status</KEYWORD3>
-			<KEYWORD3>substitute</KEYWORD3>
-			<KEYWORD3>tail</KEYWORD3>
-			<KEYWORD3>tclversion</KEYWORD3>
-			<KEYWORD3>tolower</KEYWORD3>
-			<KEYWORD3>toupper</KEYWORD3>
-			<KEYWORD3>trim</KEYWORD3>
-			<KEYWORD3>trimleft</KEYWORD3>
-			<KEYWORD3>trimright</KEYWORD3>
-			<KEYWORD3>type</KEYWORD3>
-			<KEYWORD3>uid</KEYWORD3>
-			<KEYWORD3>variable</KEYWORD3>
-			<KEYWORD3>vars</KEYWORD3>
-			<KEYWORD3>vdelete</KEYWORD3>
-			<KEYWORD3>vinfo</KEYWORD3>
-			<KEYWORD3>visibility</KEYWORD3>
-			<KEYWORD3>window</KEYWORD3>
-			<KEYWORD3>writable</KEYWORD3>
-			<KEYWORD3>accelerator</KEYWORD3>
-			<KEYWORD3>activeforeground</KEYWORD3>
-			<KEYWORD3>activebackground</KEYWORD3>
-			<KEYWORD3>anchor</KEYWORD3>
-			<KEYWORD3>aspect</KEYWORD3>
-			<KEYWORD3>background</KEYWORD3>
-			<KEYWORD3>before</KEYWORD3>
-			<KEYWORD3>bg</KEYWORD3>
-			<KEYWORD3>borderwidth</KEYWORD3>
-			<KEYWORD3>bd</KEYWORD3>
-			<KEYWORD3>bitmap</KEYWORD3>
-			<KEYWORD3>command</KEYWORD3>
-			<KEYWORD3>cursor</KEYWORD3>
-			<KEYWORD3>default</KEYWORD3>
-			<KEYWORD3>expand</KEYWORD3>
-			<KEYWORD3>family</KEYWORD3>
-			<KEYWORD3>fg</KEYWORD3>
-			<KEYWORD3>fill</KEYWORD3>
-			<KEYWORD3>font</KEYWORD3>
-			<KEYWORD3>force</KEYWORD3>
-			<KEYWORD3>foreground</KEYWORD3>
-			<KEYWORD3>from</KEYWORD3>
-			<KEYWORD3>height</KEYWORD3>
-			<KEYWORD3>icon</KEYWORD3>
-			<KEYWORD3>question</KEYWORD3>
-			<KEYWORD3>warning</KEYWORD3>
-			<KEYWORD3>in</KEYWORD3>
-			<KEYWORD3>ipadx</KEYWORD3>
-			<KEYWORD3>ipady</KEYWORD3>
-			<KEYWORD3>justify</KEYWORD3>
-			<KEYWORD3>left</KEYWORD3>
-			<KEYWORD3>center</KEYWORD3>
-			<KEYWORD3>right</KEYWORD3>
-			<KEYWORD3>length</KEYWORD3>
-			<KEYWORD3>padx</KEYWORD3>
-			<KEYWORD3>pady</KEYWORD3>
-			<KEYWORD3>offvalue</KEYWORD3>
-			<KEYWORD3>onvalue</KEYWORD3>
-			<KEYWORD3>orient</KEYWORD3>
-			<KEYWORD3>horizontal</KEYWORD3>
-			<KEYWORD3>vertical</KEYWORD3>
-			<KEYWORD3>outline</KEYWORD3>
-			<KEYWORD3>oversrike</KEYWORD3>
-			<KEYWORD3>relief</KEYWORD3>
-			<KEYWORD3>raised</KEYWORD3>
-			<KEYWORD3>sunken</KEYWORD3>
-			<KEYWORD3>flat</KEYWORD3>
-			<KEYWORD3>groove</KEYWORD3>
-			<KEYWORD3>ridge</KEYWORD3>
-			<KEYWORD3>solid</KEYWORD3>
-			<KEYWORD3>screen</KEYWORD3>
-			<KEYWORD3>selectbackground</KEYWORD3>
-			<KEYWORD3>selectforeground</KEYWORD3>
-			<KEYWORD3>setgrid</KEYWORD3>
-			<KEYWORD3>side</KEYWORD3>
-			<KEYWORD3>size</KEYWORD3>
-			<KEYWORD3>slant</KEYWORD3>
-			<KEYWORD3>left</KEYWORD3>
-			<KEYWORD3>right</KEYWORD3>
-			<KEYWORD3>top</KEYWORD3>
-			<KEYWORD3>bottom</KEYWORD3>
-			<KEYWORD3>spacing1</KEYWORD3>
-			<KEYWORD3>spacing2</KEYWORD3>
-			<KEYWORD3>spacing3</KEYWORD3>
-			<KEYWORD3>state</KEYWORD3>
-			<KEYWORD3>stipple</KEYWORD3>
-			<KEYWORD3>takefocus</KEYWORD3>
-			<KEYWORD3>tearoff</KEYWORD3>
-			<KEYWORD3>textvariable</KEYWORD3>
-			<KEYWORD3>title</KEYWORD3>
-			<KEYWORD3>to</KEYWORD3>
-			<KEYWORD3>type</KEYWORD3>
-			<KEYWORD3>abortretryignore</KEYWORD3>
-			<KEYWORD3>ok</KEYWORD3>
-			<KEYWORD3>okcancel</KEYWORD3>
-			<KEYWORD3>retrycancel</KEYWORD3>
-			<KEYWORD3>yesno</KEYWORD3>
-			<KEYWORD3>yesnocancel</KEYWORD3>
-			<KEYWORD3>underline</KEYWORD3>
-			<KEYWORD3>value</KEYWORD3>
-			<KEYWORD3>variable</KEYWORD3>
-			<KEYWORD3>weight</KEYWORD3>
-			<KEYWORD3>width</KEYWORD3>
-			<KEYWORD3>xscrollcommand</KEYWORD3>
-			<KEYWORD3>yscrollcommand</KEYWORD3>
-			<KEYWORD3>active</KEYWORD3>
-			<KEYWORD3>add</KEYWORD3>
-			<KEYWORD3>arc</KEYWORD3>
-			<KEYWORD3>aspect</KEYWORD3>
-			<KEYWORD3>bitmap</KEYWORD3>
-			<KEYWORD3>cascade</KEYWORD3>
-			<KEYWORD3>cget</KEYWORD3>
-			<KEYWORD3>children</KEYWORD3>
-			<KEYWORD3>class</KEYWORD3>
-			<KEYWORD3>clear</KEYWORD3>
-			<KEYWORD3>client</KEYWORD3>
-			<KEYWORD3>create</KEYWORD3>
-			<KEYWORD3>colormodel</KEYWORD3>
-			<KEYWORD3>command</KEYWORD3>
-			<KEYWORD3>configure</KEYWORD3>
-			<KEYWORD3>deiconify</KEYWORD3>
-			<KEYWORD3>delete</KEYWORD3>
-			<KEYWORD3>disabled</KEYWORD3>
-			<KEYWORD3>exists</KEYWORD3>
-			<KEYWORD3>focusmodel</KEYWORD3>
-			<KEYWORD3>flash</KEYWORD3>
-			<KEYWORD3>forget</KEYWORD3>
-			<KEYWORD3>geometry</KEYWORD3>
-			<KEYWORD3>get</KEYWORD3>
-			<KEYWORD3>group</KEYWORD3>
-			<KEYWORD3>handle</KEYWORD3>
-			<KEYWORD3>iconbitmap</KEYWORD3>
-			<KEYWORD3>iconify</KEYWORD3>
-			<KEYWORD3>iconmask</KEYWORD3>
-			<KEYWORD3>iconname</KEYWORD3>
-			<KEYWORD3>iconposition</KEYWORD3>
-			<KEYWORD3>iconwindow</KEYWORD3>
-			<KEYWORD3>idletasks</KEYWORD3>
-			<KEYWORD3>insert</KEYWORD3>
-			<KEYWORD3>interps</KEYWORD3>
-			<KEYWORD3>itemconfigure</KEYWORD3>
-			<KEYWORD3>invoke</KEYWORD3>
-			<KEYWORD3>line</KEYWORD3>
-			<KEYWORD3>mark</KEYWORD3>
-			<KEYWORD3>maxsize</KEYWORD3>
-			<KEYWORD3>minsize</KEYWORD3>
-			<KEYWORD3>move</KEYWORD3>
-			<KEYWORD3>name</KEYWORD3>
-			<KEYWORD3>normal</KEYWORD3>
-			<KEYWORD3>overrideredirect</KEYWORD3>
-			<KEYWORD3>oval</KEYWORD3>
-			<KEYWORD3>own</KEYWORD3>
-			<KEYWORD3>photo</KEYWORD3>
-			<KEYWORD3>polygon</KEYWORD3>
-			<KEYWORD3>positionfrom</KEYWORD3>
-			<KEYWORD3>propagate</KEYWORD3>
-			<KEYWORD3>protocol</KEYWORD3>
-			<KEYWORD3>ranges</KEYWORD3>
-			<KEYWORD3>rectangle</KEYWORD3>
-			<KEYWORD3>remove</KEYWORD3>
-			<KEYWORD3>resizable</KEYWORD3>
-			<KEYWORD3>separator</KEYWORD3>
-			<KEYWORD3>slaves</KEYWORD3>
-			<KEYWORD3>sizefrom</KEYWORD3>
-			<KEYWORD3>state</KEYWORD3>
-			<KEYWORD3>tag</KEYWORD3>
-			<KEYWORD3>title</KEYWORD3>
-			<KEYWORD3>transient</KEYWORD3>
-			<KEYWORD3>window</KEYWORD3>
-			<KEYWORD3>withdraw</KEYWORD3>
-			<KEYWORD3>xview</KEYWORD3>
-			<KEYWORD3>yview</KEYWORD3>
-			<KEYWORD3>Activate</KEYWORD3>
-			<KEYWORD3>Alt</KEYWORD3>
-			<KEYWORD3>Any</KEYWORD3>
-			<KEYWORD3>B1</KEYWORD3>
-			<KEYWORD3>B2</KEYWORD3>
-			<KEYWORD3>B3</KEYWORD3>
-			<KEYWORD3>Button1</KEYWORD3>
-			<KEYWORD3>Button2</KEYWORD3>
-			<KEYWORD3>Button3</KEYWORD3>
-			<KEYWORD3>ButtonPress</KEYWORD3>
-			<KEYWORD3>ButtonRelease</KEYWORD3>
-			<KEYWORD3>Double</KEYWORD3>
-			<KEYWORD3>Circulate</KEYWORD3>
-			<KEYWORD3>Colormap</KEYWORD3>
-			<KEYWORD3>Configure</KEYWORD3>
-			<KEYWORD3>Control</KEYWORD3>
-			<KEYWORD3>Deactivate</KEYWORD3>
-			<KEYWORD3>Escape</KEYWORD3>
-			<KEYWORD3>Expose</KEYWORD3>
-			<KEYWORD3>FocusIn</KEYWORD3>
-			<KEYWORD3>FocusOut</KEYWORD3>
-			<KEYWORD3>Gravity</KEYWORD3>
-			<KEYWORD3>Key</KEYWORD3>
-			<KEYWORD3>KeyPress</KEYWORD3>
-			<KEYWORD3>KeyRelease</KEYWORD3>
-			<KEYWORD3>Lock</KEYWORD3>
-			<KEYWORD3>Meta</KEYWORD3>
-			<KEYWORD3>Property</KEYWORD3>
-			<KEYWORD3>Reparent</KEYWORD3>
-			<KEYWORD3>Shift</KEYWORD3>
-			<KEYWORD3>Unmap</KEYWORD3>
-			<KEYWORD3>Visibility</KEYWORD3>
-			<KEYWORD3>Button</KEYWORD3>
-			<KEYWORD3>ButtonPress</KEYWORD3>
-			<KEYWORD3>ButtonRelease</KEYWORD3>
-			<KEYWORD3>Destroy</KEYWORD3>
-			<KEYWORD3>Escape</KEYWORD3>
-			<KEYWORD3>Enter</KEYWORD3>
-			<KEYWORD3>Leave</KEYWORD3>
-			<KEYWORD3>Motion</KEYWORD3>
-			<KEYWORD3>MenuSelect</KEYWORD3>
-			<KEYWORD3>Triple</KEYWORD3>
-			<KEYWORD3>all</KEYWORD3>
-		</KEYWORDS>
-	</RULES>
+      <!-- Common arguments to tcl and Tk keywords -->
+      <KEYWORD3>exact</KEYWORD3>
+      <KEYWORD3>all</KEYWORD3>
+      <KEYWORD3>indices</KEYWORD3>
+      <KEYWORD3>nocase</KEYWORD3>
+      <KEYWORD3>nocomplain</KEYWORD3>
+      <KEYWORD3>nonewline</KEYWORD3>
+      <KEYWORD3>code</KEYWORD3>
+      <KEYWORD3>errorinfo</KEYWORD3>
+      <KEYWORD3>errorcode</KEYWORD3>
+      <KEYWORD3>atime</KEYWORD3>
+      <KEYWORD3>anymore</KEYWORD3>
+      <KEYWORD3>args</KEYWORD3>
+      <KEYWORD3>body</KEYWORD3>
+      <KEYWORD3>compare</KEYWORD3>
+      <KEYWORD3>cmdcount</KEYWORD3>
+      <KEYWORD3>commands</KEYWORD3>
+      <KEYWORD3>ctime</KEYWORD3>
+      <KEYWORD3>current</KEYWORD3>
+      <KEYWORD3>default</KEYWORD3>
+      <KEYWORD3>dev</KEYWORD3>
+      <KEYWORD3>dirname</KEYWORD3>
+      <KEYWORD3>donesearch</KEYWORD3>
+      <KEYWORD3>errorinfo</KEYWORD3>
+      <KEYWORD3>executable</KEYWORD3>
+      <KEYWORD3>extension</KEYWORD3>
+      <KEYWORD3>first</KEYWORD3>
+      <KEYWORD3>globals</KEYWORD3>
+      <KEYWORD3>gid</KEYWORD3>
+      <KEYWORD3>index</KEYWORD3>
+      <KEYWORD3>ino</KEYWORD3>
+      <KEYWORD3>isdirectory</KEYWORD3>
+      <KEYWORD3>isfile</KEYWORD3>
+      <KEYWORD3>keep</KEYWORD3>
+      <KEYWORD3>last</KEYWORD3>
+      <KEYWORD3>level</KEYWORD3>
+      <KEYWORD3>length</KEYWORD3>
+      <KEYWORD3>library</KEYWORD3>
+      <KEYWORD3>locals</KEYWORD3>
+      <KEYWORD3>lstat</KEYWORD3>
+      <KEYWORD3>match</KEYWORD3>
+      <KEYWORD3>mode</KEYWORD3>
+      <KEYWORD3>mtime</KEYWORD3>
+      <KEYWORD3>names</KEYWORD3>
+      <KEYWORD3>nextelement</KEYWORD3>
+      <KEYWORD3>nextid</KEYWORD3>
+      <KEYWORD3>nlink</KEYWORD3>
+      <KEYWORD3>none</KEYWORD3>
+      <KEYWORD3>procs</KEYWORD3>
+      <KEYWORD3>owned</KEYWORD3>
+      <KEYWORD3>range</KEYWORD3>
+      <KEYWORD3>readable</KEYWORD3>
+      <KEYWORD3>readlink</KEYWORD3>
+      <KEYWORD3>redo</KEYWORD3>
+      <KEYWORD3>release</KEYWORD3>
+      <KEYWORD3>rootname</KEYWORD3>
+      <KEYWORD3>script</KEYWORD3>
+      <KEYWORD3>show</KEYWORD3>
+      <KEYWORD3>size</KEYWORD3>
+      <KEYWORD3>startsearch</KEYWORD3>
+      <KEYWORD3>stat</KEYWORD3>
+      <KEYWORD3>status</KEYWORD3>
+      <KEYWORD3>substitute</KEYWORD3>
+      <KEYWORD3>tail</KEYWORD3>
+      <KEYWORD3>tclversion</KEYWORD3>
+      <KEYWORD3>tolower</KEYWORD3>
+      <KEYWORD3>toupper</KEYWORD3>
+      <KEYWORD3>trim</KEYWORD3>
+      <KEYWORD3>trimleft</KEYWORD3>
+      <KEYWORD3>trimright</KEYWORD3>
+      <KEYWORD3>type</KEYWORD3>
+      <KEYWORD3>uid</KEYWORD3>
+      <KEYWORD3>variable</KEYWORD3>
+      <KEYWORD3>vars</KEYWORD3>
+      <KEYWORD3>vdelete</KEYWORD3>
+      <KEYWORD3>vinfo</KEYWORD3>
+      <KEYWORD3>visibility</KEYWORD3>
+      <KEYWORD3>window</KEYWORD3>
+      <KEYWORD3>writable</KEYWORD3>
+      <KEYWORD3>accelerator</KEYWORD3>
+      <KEYWORD3>activeforeground</KEYWORD3>
+      <KEYWORD3>activebackground</KEYWORD3>
+      <KEYWORD3>anchor</KEYWORD3>
+      <KEYWORD3>aspect</KEYWORD3>
+      <KEYWORD3>background</KEYWORD3>
+      <KEYWORD3>before</KEYWORD3>
+      <KEYWORD3>bg</KEYWORD3>
+      <KEYWORD3>borderwidth</KEYWORD3>
+      <KEYWORD3>bd</KEYWORD3>
+      <KEYWORD3>bitmap</KEYWORD3>
+      <KEYWORD3>command</KEYWORD3>
+      <KEYWORD3>cursor</KEYWORD3>
+      <KEYWORD3>default</KEYWORD3>
+      <KEYWORD3>expand</KEYWORD3>
+      <KEYWORD3>family</KEYWORD3>
+      <KEYWORD3>fg</KEYWORD3>
+      <KEYWORD3>fill</KEYWORD3>
+      <KEYWORD3>font</KEYWORD3>
+      <KEYWORD3>force</KEYWORD3>
+      <KEYWORD3>foreground</KEYWORD3>
+      <KEYWORD3>from</KEYWORD3>
+      <KEYWORD3>height</KEYWORD3>
+      <KEYWORD3>icon</KEYWORD3>
+      <KEYWORD3>question</KEYWORD3>
+      <KEYWORD3>warning</KEYWORD3>
+      <KEYWORD3>in</KEYWORD3>
+      <KEYWORD3>ipadx</KEYWORD3>
+      <KEYWORD3>ipady</KEYWORD3>
+      <KEYWORD3>justify</KEYWORD3>
+      <KEYWORD3>left</KEYWORD3>
+      <KEYWORD3>center</KEYWORD3>
+      <KEYWORD3>right</KEYWORD3>
+      <KEYWORD3>length</KEYWORD3>
+      <KEYWORD3>padx</KEYWORD3>
+      <KEYWORD3>pady</KEYWORD3>
+      <KEYWORD3>offvalue</KEYWORD3>
+      <KEYWORD3>onvalue</KEYWORD3>
+      <KEYWORD3>orient</KEYWORD3>
+      <KEYWORD3>horizontal</KEYWORD3>
+      <KEYWORD3>vertical</KEYWORD3>
+      <KEYWORD3>outline</KEYWORD3>
+      <KEYWORD3>oversrike</KEYWORD3>
+      <KEYWORD3>relief</KEYWORD3>
+      <KEYWORD3>raised</KEYWORD3>
+      <KEYWORD3>sunken</KEYWORD3>
+      <KEYWORD3>flat</KEYWORD3>
+      <KEYWORD3>groove</KEYWORD3>
+      <KEYWORD3>ridge</KEYWORD3>
+      <KEYWORD3>solid</KEYWORD3>
+      <KEYWORD3>screen</KEYWORD3>
+      <KEYWORD3>selectbackground</KEYWORD3>
+      <KEYWORD3>selectforeground</KEYWORD3>
+      <KEYWORD3>setgrid</KEYWORD3>
+      <KEYWORD3>side</KEYWORD3>
+      <KEYWORD3>size</KEYWORD3>
+      <KEYWORD3>slant</KEYWORD3>
+      <KEYWORD3>left</KEYWORD3>
+      <KEYWORD3>right</KEYWORD3>
+      <KEYWORD3>top</KEYWORD3>
+      <KEYWORD3>bottom</KEYWORD3>
+      <KEYWORD3>spacing1</KEYWORD3>
+      <KEYWORD3>spacing2</KEYWORD3>
+      <KEYWORD3>spacing3</KEYWORD3>
+      <KEYWORD3>state</KEYWORD3>
+      <KEYWORD3>stipple</KEYWORD3>
+      <KEYWORD3>takefocus</KEYWORD3>
+      <KEYWORD3>tearoff</KEYWORD3>
+      <KEYWORD3>textvariable</KEYWORD3>
+      <KEYWORD3>title</KEYWORD3>
+      <KEYWORD3>to</KEYWORD3>
+      <KEYWORD3>type</KEYWORD3>
+      <KEYWORD3>abortretryignore</KEYWORD3>
+      <KEYWORD3>ok</KEYWORD3>
+      <KEYWORD3>okcancel</KEYWORD3>
+      <KEYWORD3>retrycancel</KEYWORD3>
+      <KEYWORD3>yesno</KEYWORD3>
+      <KEYWORD3>yesnocancel</KEYWORD3>
+      <KEYWORD3>underline</KEYWORD3>
+      <KEYWORD3>value</KEYWORD3>
+      <KEYWORD3>variable</KEYWORD3>
+      <KEYWORD3>weight</KEYWORD3>
+      <KEYWORD3>width</KEYWORD3>
+      <KEYWORD3>xscrollcommand</KEYWORD3>
+      <KEYWORD3>yscrollcommand</KEYWORD3>
+      <KEYWORD3>active</KEYWORD3>
+      <KEYWORD3>add</KEYWORD3>
+      <KEYWORD3>arc</KEYWORD3>
+      <KEYWORD3>aspect</KEYWORD3>
+      <KEYWORD3>bitmap</KEYWORD3>
+      <KEYWORD3>cascade</KEYWORD3>
+      <KEYWORD3>cget</KEYWORD3>
+      <KEYWORD3>children</KEYWORD3>
+      <KEYWORD3>class</KEYWORD3>
+      <KEYWORD3>clear</KEYWORD3>
+      <KEYWORD3>client</KEYWORD3>
+      <KEYWORD3>create</KEYWORD3>
+      <KEYWORD3>colormodel</KEYWORD3>
+      <KEYWORD3>command</KEYWORD3>
+      <KEYWORD3>configure</KEYWORD3>
+      <KEYWORD3>deiconify</KEYWORD3>
+      <KEYWORD3>delete</KEYWORD3>
+      <KEYWORD3>disabled</KEYWORD3>
+      <KEYWORD3>exists</KEYWORD3>
+      <KEYWORD3>focusmodel</KEYWORD3>
+      <KEYWORD3>flash</KEYWORD3>
+      <KEYWORD3>forget</KEYWORD3>
+      <KEYWORD3>geometry</KEYWORD3>
+      <KEYWORD3>get</KEYWORD3>
+      <KEYWORD3>group</KEYWORD3>
+      <KEYWORD3>handle</KEYWORD3>
+      <KEYWORD3>iconbitmap</KEYWORD3>
+      <KEYWORD3>iconify</KEYWORD3>
+      <KEYWORD3>iconmask</KEYWORD3>
+      <KEYWORD3>iconname</KEYWORD3>
+      <KEYWORD3>iconposition</KEYWORD3>
+      <KEYWORD3>iconwindow</KEYWORD3>
+      <KEYWORD3>idletasks</KEYWORD3>
+      <KEYWORD3>insert</KEYWORD3>
+      <KEYWORD3>interps</KEYWORD3>
+      <KEYWORD3>itemconfigure</KEYWORD3>
+      <KEYWORD3>invoke</KEYWORD3>
+      <KEYWORD3>line</KEYWORD3>
+      <KEYWORD3>mark</KEYWORD3>
+      <KEYWORD3>maxsize</KEYWORD3>
+      <KEYWORD3>minsize</KEYWORD3>
+      <KEYWORD3>move</KEYWORD3>
+      <KEYWORD3>name</KEYWORD3>
+      <KEYWORD3>normal</KEYWORD3>
+      <KEYWORD3>overrideredirect</KEYWORD3>
+      <KEYWORD3>oval</KEYWORD3>
+      <KEYWORD3>own</KEYWORD3>
+      <KEYWORD3>photo</KEYWORD3>
+      <KEYWORD3>polygon</KEYWORD3>
+      <KEYWORD3>positionfrom</KEYWORD3>
+      <KEYWORD3>propagate</KEYWORD3>
+      <KEYWORD3>protocol</KEYWORD3>
+      <KEYWORD3>ranges</KEYWORD3>
+      <KEYWORD3>rectangle</KEYWORD3>
+      <KEYWORD3>remove</KEYWORD3>
+      <KEYWORD3>resizable</KEYWORD3>
+      <KEYWORD3>separator</KEYWORD3>
+      <KEYWORD3>slaves</KEYWORD3>
+      <KEYWORD3>sizefrom</KEYWORD3>
+      <KEYWORD3>state</KEYWORD3>
+      <KEYWORD3>tag</KEYWORD3>
+      <KEYWORD3>title</KEYWORD3>
+      <KEYWORD3>transient</KEYWORD3>
+      <KEYWORD3>window</KEYWORD3>
+      <KEYWORD3>withdraw</KEYWORD3>
+      <KEYWORD3>xview</KEYWORD3>
+      <KEYWORD3>yview</KEYWORD3>
+      <KEYWORD3>Activate</KEYWORD3>
+      <KEYWORD3>Alt</KEYWORD3>
+      <KEYWORD3>Any</KEYWORD3>
+      <KEYWORD3>B1</KEYWORD3>
+      <KEYWORD3>B2</KEYWORD3>
+      <KEYWORD3>B3</KEYWORD3>
+      <KEYWORD3>Button1</KEYWORD3>
+      <KEYWORD3>Button2</KEYWORD3>
+      <KEYWORD3>Button3</KEYWORD3>
+      <KEYWORD3>ButtonPress</KEYWORD3>
+      <KEYWORD3>ButtonRelease</KEYWORD3>
+      <KEYWORD3>Double</KEYWORD3>
+      <KEYWORD3>Circulate</KEYWORD3>
+      <KEYWORD3>Colormap</KEYWORD3>
+      <KEYWORD3>Configure</KEYWORD3>
+      <KEYWORD3>Control</KEYWORD3>
+      <KEYWORD3>Deactivate</KEYWORD3>
+      <KEYWORD3>Escape</KEYWORD3>
+      <KEYWORD3>Expose</KEYWORD3>
+      <KEYWORD3>FocusIn</KEYWORD3>
+      <KEYWORD3>FocusOut</KEYWORD3>
+      <KEYWORD3>Gravity</KEYWORD3>
+      <KEYWORD3>Key</KEYWORD3>
+      <KEYWORD3>KeyPress</KEYWORD3>
+      <KEYWORD3>KeyRelease</KEYWORD3>
+      <KEYWORD3>Lock</KEYWORD3>
+      <KEYWORD3>Meta</KEYWORD3>
+      <KEYWORD3>Property</KEYWORD3>
+      <KEYWORD3>Reparent</KEYWORD3>
+      <KEYWORD3>Shift</KEYWORD3>
+      <KEYWORD3>Unmap</KEYWORD3>
+      <KEYWORD3>Visibility</KEYWORD3>
+      <KEYWORD3>Button</KEYWORD3>
+      <KEYWORD3>ButtonPress</KEYWORD3>
+      <KEYWORD3>ButtonRelease</KEYWORD3>
+      <KEYWORD3>Destroy</KEYWORD3>
+      <KEYWORD3>Escape</KEYWORD3>
+      <KEYWORD3>Enter</KEYWORD3>
+      <KEYWORD3>Leave</KEYWORD3>
+      <KEYWORD3>Motion</KEYWORD3>
+      <KEYWORD3>MenuSelect</KEYWORD3>
+      <KEYWORD3>Triple</KEYWORD3>
+      <KEYWORD3>all</KEYWORD3>
+    </KEYWORDS>
+  </RULES>
 
-	<RULES SET="TCL_COMMENT" DEFAULT="OPERATOR">
-		<!-- Allows catching blocks starting with a comment.
-		    or comments following a ; -->
-		<SEQ_REGEXP TYPE="COMMENT1" HASH_CHAR="#" DELEGATE="MAIN">#.*</SEQ_REGEXP>
-	</RULES>
+  <RULES SET="TCL_COMMENT" DEFAULT="OPERATOR">
+    <!-- Allows catching blocks starting with a comment.
+        or comments following a ; -->
+    <SEQ_REGEXP TYPE="COMMENT1" HASH_CHAR="#" DELEGATE="MAIN">#.*</SEQ_REGEXP>
+  </RULES>
 
-	<RULES SET="TCL_STRING" DEFAULT="LITERAL1">
-		<PROPS>
-			<PROPERTY NAME="indentOpenBrackets" VALUE="" />
-			<PROPERTY NAME="indentCloseBrackets" VALUE="" />
-		</PROPS>
+  <RULES SET="TCL_STRING" DEFAULT="LITERAL1" ESCAPE="\">
+    <PROPS>
+      <PROPERTY NAME="indentOpenBrackets" VALUE="" />
+      <PROPERTY NAME="indentCloseBrackets" VALUE="" />
+    </PROPS>
 
-		<!-- Continuation line. Processed before anything else by Tcl.-->
-		<EOL_SPAN_REGEXP TYPE="OPERATOR" HASH_CHAR="\">\\$</EOL_SPAN_REGEXP>
+    <!-- Continuation line. Processed before anything else by Tcl.-->
+    <EOL_SPAN_REGEXP TYPE="OPERATOR" HASH_CHAR="\">\\$</EOL_SPAN_REGEXP>
 
-		<!-- Avoid colouring variables substituted inside strings -->
-		<SPAN_REGEXP TYPE="NULL" HASH_CHAR="$" DELEGATE="MAIN">
-			<BEGIN>\$(\w|::)+\(</BEGIN>
-			<END>)</END>
-		</SPAN_REGEXP>
-		<SPAN_REGEXP TYPE="NULL" HASH_CHAR="$" DELEGATE="MAIN">
-			<BEGIN>\$\{</BEGIN>
-			<END>}</END>
-		</SPAN_REGEXP>
-		<SEQ_REGEXP TYPE="NULL" HASH_CHAR="$">\$(\w|::)+</SEQ_REGEXP>
+    <!-- Avoid colouring variables substituted inside strings -->
+    <SPAN_REGEXP TYPE="NULL" HASH_CHAR="$" DELEGATE="MAIN">
+      <BEGIN>\$(\w|::)+\(</BEGIN>
+      <END>)</END>
+    </SPAN_REGEXP>
+    <SPAN_REGEXP TYPE="NULL" HASH_CHAR="$" DELEGATE="MAIN">
+      <BEGIN>\$\{</BEGIN>
+      <END>}</END>
+    </SPAN_REGEXP>
+    <SEQ_REGEXP TYPE="NULL" HASH_CHAR="$">\$(\w|::)+</SEQ_REGEXP>
 
-		<!-- Sub-commands to be substituted -->
-		<SPAN TYPE="OPERATOR" NO_LINE_BREAK="FALSE" DELEGATE="MAIN">
-			<BEGIN>[</BEGIN>
-			<END>]</END>
-		</SPAN>
+    <!-- Sub-commands to be substituted -->
+    <SPAN TYPE="OPERATOR" NO_LINE_BREAK="FALSE" DELEGATE="MAIN">
+      <BEGIN>[</BEGIN>
+      <END>]</END>
+    </SPAN>
 
-		<!-- Escaped characters -->
-		<SEQ TYPE="KEYWORD3">\a</SEQ>
-		<SEQ TYPE="KEYWORD3">\b</SEQ>
-		<SEQ TYPE="KEYWORD3">\f</SEQ>
-		<SEQ TYPE="KEYWORD3">\n</SEQ>
-		<SEQ TYPE="KEYWORD3">\r</SEQ>
-		<SEQ TYPE="KEYWORD3">\t</SEQ>
-		<SEQ TYPE="KEYWORD3">\v</SEQ>
-	</RULES>
+    <!-- Escaped characters -->
+    <SEQ TYPE="KEYWORD3">\a</SEQ>
+    <SEQ TYPE="KEYWORD3">\b</SEQ>
+    <SEQ TYPE="KEYWORD3">\f</SEQ>
+    <SEQ TYPE="KEYWORD3">\n</SEQ>
+    <SEQ TYPE="KEYWORD3">\r</SEQ>
+    <SEQ TYPE="KEYWORD3">\t</SEQ>
+    <SEQ TYPE="KEYWORD3">\v</SEQ>
+  </RULES>
 </MODE>

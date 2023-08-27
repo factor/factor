@@ -1,5 +1,5 @@
 ! Copyright (C) 2010 Joe Groff.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors assocs combinators euler.b-rep fry
 game.models.half-edge grouping io kernel locals math
 math.parser math.vectors.simd.cords sequences splitting ;

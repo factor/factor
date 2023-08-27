@@ -1,5 +1,5 @@
 ! Copyright (C) 2012 John Benediktsson
-! See http://factorcode.org/license.txt for BSD license
+! See https://factorcode.org/license.txt for BSD license
 
 USING: accessors arrays environment kernel math math.parser
 sequences system vocabs ;
@@ -20,4 +20,4 @@ HOOK: (terminal-size) os ( -- columns lines )
 
 : terminal-width ( -- width ) terminal-size first ;
 
-: terimal-height ( -- height ) terminal-size second ;
+: terminal-height ( -- height ) terminal-size second ;

@@ -1,5 +1,5 @@
 ! Copyright (C) 2020 John Benediktsson
-! See http://factorcode.org/license.txt for BSD license
+! See https://factorcode.org/license.txt for BSD license
 USING: arrays sequences.padded tools.test ;
 
 { { 1 2 3 } } [ { 1 2 3 } 3 f <padded-head> >array ] unit-test

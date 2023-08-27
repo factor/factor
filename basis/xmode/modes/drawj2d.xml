@@ -1,0 +1,469 @@
+<?xml version="1.0"?>
+
+<!DOCTYPE MODE SYSTEM "xmode.dtd">
+
+<!-- Drawj2d/Hcl mode, by A. Vontobel qwert2003@users.sourceforge.net
+    Built upon Tcl mode by Michael Jacobson. -->
+
+<MODE>
+  <PROPS>
+    <PROPERTY NAME="indentOpenBrackets" VALUE="{" />
+    <PROPERTY NAME="indentCloseBrackets" VALUE="}" />
+    <PROPERTY NAME="lineUpClosingBracket" VALUE="true" />
+    <PROPERTY NAME="lineComment" VALUE="#" />
+  </PROPS>
+
+  <RULES IGNORE_CASE="FALSE" HIGHLIGHT_DIGITS="FALSE"
+    DIGIT_RE="0x\p{XDigit}+|\d+">
+
+    <!-- Continuation line. Processed before anything else by Tcl. (Does not work)-->
+    <EOL_SPAN_REGEXP TYPE="OPERATOR" HASH_CHAR="\">\\$</EOL_SPAN_REGEXP>
+
+    <!-- Comments after a ; command separator -->
+    <!-- Note: The ; isn't bolded as other operators. Why?-->
+    <EOL_SPAN_REGEXP TYPE="OPERATOR" HASH_CHAR=";" DELEGATE="TCL_COMMENT">;\s*(?=#)</EOL_SPAN_REGEXP>
+    <!-- Comments at the { opening of a block -->
+    <SPAN_REGEXP TYPE="OPERATOR" HASH_CHAR="{" DELEGATE="TCL_COMMENT">
+      <BEGIN>\{\s*(?=#)</BEGIN>
+      <END>}</END>
+    </SPAN_REGEXP>
+    <!-- Comments on a line of their own. -->
+    <EOL_SPAN TYPE="COMMENT1" AT_WHITESPACE_END="TRUE">#</EOL_SPAN>
+
+    <!-- Quoted strings -->
+    <SPAN TYPE="LITERAL1" NO_LINE_BREAK="FALSE" AT_WORD_START="TRUE" DELEGATE="TCL_STRING">
+      <BEGIN>"</BEGIN>
+      <END>"</END>
+    </SPAN>
+
+    <!-- Avoid colouring substituted variables that are homonyms of a keyword -->
+    <!-- Indexed array variable. Delegate to MAIN, as the index string is evaluated by Tcl.-->
+    <SPAN_REGEXP TYPE="NULL" HASH_CHAR="$" DELEGATE="MAIN">
+      <BEGIN>\$(\w|::)+\(</BEGIN>
+      <END>)</END>
+    </SPAN_REGEXP>
+    <!-- General scalar variable. Do not delegate, as the ${} block content is not evalutated by Tcl. -->
+    <SPAN TYPE="NULL">
+      <BEGIN>${</BEGIN>
+      <END>}</END>
+    </SPAN>
+    <!-- Plain scalar variable. -->
+    <SEQ_REGEXP TYPE="NULL" HASH_CHAR="$">\$(\w|::)+</SEQ_REGEXP>
+
+    <!-- Sub-block -->
+    <SPAN TYPE="OPERATOR" NO_LINE_BREAK="FALSE" AT_WORD_START="TRUE" DELEGATE="MAIN">
+      <BEGIN>{</BEGIN>
+      <END>}</END>
+    </SPAN>
+
+    <!-- Sub-commands to be substituted -->
+    <SPAN TYPE="OPERATOR" NO_LINE_BREAK="FALSE" DELEGATE="MAIN">
+      <BEGIN>[</BEGIN>
+      <END>]</END>
+    </SPAN>
+
+    <!-- Escaped characters -->
+    <SEQ TYPE="KEYWORD3">\a</SEQ>
+    <SEQ TYPE="KEYWORD3">\b</SEQ>
+    <SEQ TYPE="KEYWORD3">\f</SEQ>
+    <SEQ TYPE="KEYWORD3">\n</SEQ>
+    <SEQ TYPE="KEYWORD3">\r</SEQ>
+    <SEQ TYPE="KEYWORD3">\t</SEQ>
+    <SEQ TYPE="KEYWORD3">\v</SEQ>
+
+    <!-- Tcl syntax operators. -->
+    <!-- Note that "{}[]" are already caught above.-->
+    <!-- Delegate to main, as a new command begins after the ; -->
+    <SEQ TYPE="OPERATOR" DELEGATE="MAIN">;</SEQ>
+    <SEQ TYPE="NULL">::</SEQ>
+
+    <!-- Math expression operators -->
+    <SEQ TYPE="OPERATOR">=</SEQ>
+    <SEQ TYPE="OPERATOR">!</SEQ>
+    <SEQ TYPE="OPERATOR">&gt;=</SEQ>
+    <SEQ TYPE="OPERATOR">&lt;=</SEQ>
+    <SEQ TYPE="OPERATOR">+</SEQ>
+    <SEQ TYPE="OPERATOR">-</SEQ>
+    <SEQ TYPE="OPERATOR">/</SEQ>
+    <SEQ TYPE="OPERATOR">*</SEQ>
+    <SEQ TYPE="OPERATOR">&gt;</SEQ>
+    <SEQ TYPE="OPERATOR">&lt;</SEQ>
+    <SEQ TYPE="OPERATOR">%</SEQ>
+    <SEQ TYPE="OPERATOR">&amp;</SEQ>
+    <SEQ TYPE="OPERATOR">|</SEQ>
+    <SEQ TYPE="OPERATOR">^</SEQ>
+    <SEQ TYPE="OPERATOR">~</SEQ>
+
+    <KEYWORDS>
+      <!-- Tcl keywords, common with Hecl -->
+      <KEYWORD1>after</KEYWORD1>
+      <KEYWORD1>append</KEYWORD1>
+      <KEYWORD1>break</KEYWORD1>
+      <KEYWORD1>catch</KEYWORD1>
+      <KEYWORD1>close</KEYWORD1>
+      <KEYWORD1>continue</KEYWORD1>
+      <KEYWORD1>else</KEYWORD1>
+      <KEYWORD1>elseif</KEYWORD1>
+      <KEYWORD1>eval</KEYWORD1>
+      <KEYWORD1>exit</KEYWORD1>
+      <KEYWORD1>for</KEYWORD1>
+      <KEYWORD1>foreach</KEYWORD1>
+      <KEYWORD1>global</KEYWORD1>
+      <KEYWORD1>if</KEYWORD1>
+      <KEYWORD1>incr</KEYWORD1>
+      <KEYWORD1>join</KEYWORD1>
+      <KEYWORD1>lappend</KEYWORD1>
+      <KEYWORD1>lindex</KEYWORD1>
+      <KEYWORD1>list</KEYWORD1>
+      <KEYWORD1>llength</KEYWORD1>
+      <KEYWORD1>lrange</KEYWORD1>
+      <KEYWORD1>lset</KEYWORD1>
+      <KEYWORD1>open</KEYWORD1>
+      <KEYWORD1>proc</KEYWORD1>
+      <KEYWORD1>puts</KEYWORD1>
+      <KEYWORD1>read</KEYWORD1>
+      <KEYWORD1>rename</KEYWORD1>
+      <KEYWORD1>return</KEYWORD1>
+      <KEYWORD1>set</KEYWORD1>
+      <KEYWORD1>source</KEYWORD1>
+      <KEYWORD1>split</KEYWORD1>
+      <KEYWORD1>time</KEYWORD1>
+      <KEYWORD1>unset</KEYWORD1>
+      <KEYWORD1>while</KEYWORD1>
+      <!-- Hecl keywords-->
+      <KEYWORD1>alias</KEYWORD1>
+      <KEYWORD1>and</KEYWORD1>
+      <KEYWORD1>bgerror</KEYWORD1>
+      <KEYWORD1>classof</KEYWORD1>
+      <KEYWORD1>clock</KEYWORD1>
+      <KEYWORD1>copy</KEYWORD1>
+      <KEYWORD1>eq</KEYWORD1>
+      <KEYWORD1>false</KEYWORD1>
+      <KEYWORD1>file.readable</KEYWORD1>
+      <KEYWORD1>filter</KEYWORD1>
+      <KEYWORD1>hasclass</KEYWORD1>
+      <KEYWORD1>hasnext</KEYWORD1>
+      <KEYWORD1>hash</KEYWORD1>
+      <KEYWORD1>hclear</KEYWORD1>
+      <KEYWORD1>hcontains</KEYWORD1>
+      <KEYWORD1>hget</KEYWORD1>
+      <KEYWORD1>hkeys</KEYWORD1>
+      <KEYWORD1>hremove</KEYWORD1>
+      <KEYWORD1>hset</KEYWORD1>
+      <KEYWORD1>intro</KEYWORD1>
+      <KEYWORD1>linsert</KEYWORD1>
+      <KEYWORD1>llen</KEYWORD1>
+      <KEYWORD1>max</KEYWORD1>
+      <KEYWORD1>min</KEYWORD1>
+      <KEYWORD1>ne</KEYWORD1>
+      <KEYWORD1>not</KEYWORD1>
+      <KEYWORD1>or</KEYWORD1>
+      <KEYWORD1>readln</KEYWORD1>
+      <KEYWORD1>runtime.freememory</KEYWORD1>
+      <KEYWORD1>runtime.totalmemory</KEYWORD1>
+      <KEYWORD1>search</KEYWORD1>
+      <KEYWORD1>sort</KEYWORD1>
+      <KEYWORD1>strbytelen</KEYWORD1>
+      <KEYWORD1>strcmp</KEYWORD1>
+      <KEYWORD1>strfind</KEYWORD1>
+      <KEYWORD1>strindex</KEYWORD1>
+      <KEYWORD1>strlast</KEYWORD1>
+      <KEYWORD1>strlen</KEYWORD1>
+      <KEYWORD1>strlower</KEYWORD1>
+      <KEYWORD1>strrange</KEYWORD1>
+      <KEYWORD1>strrep</KEYWORD1>
+      <KEYWORD1>strreplace</KEYWORD1>
+      <KEYWORD1>strtrim</KEYWORD1>
+      <KEYWORD1>strtriml</KEYWORD1>
+      <KEYWORD1>strtrimr</KEYWORD1>
+      <KEYWORD1>strupper</KEYWORD1>
+      <KEYWORD1>system.gc</KEYWORD1>
+      <KEYWORD1>system.getproperty</KEYWORD1>
+      <KEYWORD1>system.hasproperty</KEYWORD1>
+      <KEYWORD1>thisinterp</KEYWORD1>
+      <KEYWORD1>throw</KEYWORD1>
+      <KEYWORD1>tnotify</KEYWORD1>
+      <KEYWORD1>true</KEYWORD1>
+      <KEYWORD1>twait</KEYWORD1>
+      <KEYWORD1>upeval</KEYWORD1>
+      
+      <!-- Hecl math keywords-->
+      <KEYWORD1>abs</KEYWORD1>
+      <KEYWORD1>acos</KEYWORD1>
+      <KEYWORD1>asin</KEYWORD1>
+      <KEYWORD1>atan</KEYWORD1>
+      <KEYWORD1>atan2</KEYWORD1>
+      <KEYWORD1>cbrt</KEYWORD1>
+      <KEYWORD1>ceil</KEYWORD1>
+      <KEYWORD1>cos</KEYWORD1>
+      <KEYWORD1>cosh</KEYWORD1>
+      <KEYWORD1>double</KEYWORD1>
+      <KEYWORD1>exp</KEYWORD1>
+      <KEYWORD1>expm1</KEYWORD1>
+      <KEYWORD1>float</KEYWORD1>
+      <KEYWORD1>floor</KEYWORD1>
+      <KEYWORD1>hypot</KEYWORD1>
+      <KEYWORD1>int</KEYWORD1>
+      <KEYWORD1>log</KEYWORD1>
+      <KEYWORD1>log10</KEYWORD1>
+      <KEYWORD1>log1p</KEYWORD1>
+      <KEYWORD1>long</KEYWORD1>
+      <KEYWORD1>pow</KEYWORD1>
+      <KEYWORD1>random</KEYWORD1>
+      <KEYWORD1>round</KEYWORD1>
+      <KEYWORD1>signum</KEYWORD1>
+      <KEYWORD1>sin</KEYWORD1>
+      <KEYWORD1>sinh</KEYWORD1>
+      <KEYWORD1>sqrt</KEYWORD1>
+      <KEYWORD1>tan</KEYWORD1>
+      <KEYWORD1>tanh</KEYWORD1>
+      <KEYWORD1>toDegrees</KEYWORD1>
+      <KEYWORD1>toRadians</KEYWORD1>
+      
+      <!-- Drawj2d keywords -->
+      <KEYWORD2>unitlength</KEYWORD2>
+      <KEYWORD2>forceunitlength</KEYWORD2>
+      <KEYWORD2>offset</KEYWORD2>
+      <KEYWORD2>here</KEYWORD2>
+      <KEYWORD2>r</KEYWORD2>
+      <KEYWORD2>mm</KEYWORD2>
+      <KEYWORD2>fu</KEYWORD2>
+      <KEYWORD2>kN</KEYWORD2>
+      <KEYWORD2>X</KEYWORD2>
+      <KEYWORD2>Y</KEYWORD2>
+      <KEYWORD2>FX</KEYWORD2>
+      <KEYWORD2>FY</KEYWORD2>
+      <KEYWORD2>XY</KEYWORD2>
+      <KEYWORD2>FXY</KEYWORD2>
+      
+      <KEYWORD2>pen</KEYWORD2>
+      <KEYWORD2>font</KEYWORD2>
+      <KEYWORD2>opacity</KEYWORD2>
+      <KEYWORD2>today</KEYWORD2>
+      <KEYWORD1>nf</KEYWORD1>
+      <KEYWORD1>expr</KEYWORD1>
+      <KEYWORD1>exprinput</KEYWORD1>
+      <KEYWORD1>assert</KEYWORD1>
+      
+      <KEYWORD2>moveto</KEYWORD2>
+      <KEYWORD2>m</KEYWORD2>
+      <KEYWORD2>movetox</KEYWORD2>
+      <KEYWORD2>mx</KEYWORD2>
+      <KEYWORD2>movetoy</KEYWORD2>
+      <KEYWORD2>my</KEYWORD2>
+      <KEYWORD2>moverel</KEYWORD2>
+      <KEYWORD2>mr</KEYWORD2>
+      <KEYWORD2>movepolar</KEYWORD2>
+      <KEYWORD2>mp</KEYWORD2>
+      <KEYWORD2>point</KEYWORD2>
+      <KEYWORD2>pt</KEYWORD2>
+      <KEYWORD2>dot</KEYWORD2>
+      <KEYWORD2>line</KEYWORD2>
+      <KEYWORD2>lineto</KEYWORD2>
+      <KEYWORD2>l</KEYWORD2>
+      <KEYWORD2>linetox</KEYWORD2>
+      <KEYWORD2>lx</KEYWORD2>
+      <KEYWORD2>linetoy</KEYWORD2>
+      <KEYWORD2>ly</KEYWORD2>
+      <KEYWORD2>linerel</KEYWORD2>
+      <KEYWORD2>lr</KEYWORD2>
+      <KEYWORD2>linepolar</KEYWORD2>
+      <KEYWORD2>lp</KEYWORD2>
+      <KEYWORD2>linemid</KEYWORD2>
+      <KEYWORD2>lm</KEYWORD2>
+      <KEYWORD2>arc</KEYWORD2>
+      <KEYWORD2>quadcurve</KEYWORD2>
+      <KEYWORD2>parabola</KEYWORD2>
+      <KEYWORD2>cubiccurve</KEYWORD2>
+      
+      <KEYWORD2>circle</KEYWORD2>
+      <KEYWORD2>fillcircle</KEYWORD2>
+      <KEYWORD2>ellipse</KEYWORD2>
+      <KEYWORD2>fillellipse</KEYWORD2>
+      <KEYWORD2>rectangle</KEYWORD2>
+      <KEYWORD2>rect</KEYWORD2>
+      <KEYWORD2>fillrectangle</KEYWORD2>
+      <KEYWORD2>fillrect</KEYWORD2>
+      <KEYWORD2>box</KEYWORD2>
+      <KEYWORD2>fillbox</KEYWORD2>
+      <KEYWORD2>rod</KEYWORD2>
+      <KEYWORD2>fillrod</KEYWORD2>
+      <KEYWORD2>polygon</KEYWORD2>
+      <KEYWORD2>fillpolygon</KEYWORD2>
+      <KEYWORD2>segment</KEYWORD2>
+      <KEYWORD2>fillsegment</KEYWORD2>
+      <KEYWORD2>sector</KEYWORD2>
+      <KEYWORD2>fillsector</KEYWORD2>
+      <KEYWORD2>image</KEYWORD2>
+      <KEYWORD2>dxf</KEYWORD2>
+      
+      <KEYWORD2>label</KEYWORD2>
+      <KEYWORD2>lb</KEYWORD2>
+      <KEYWORD2>texlabel</KEYWORD2>
+      <KEYWORD2>tlb</KEYWORD2>
+      <KEYWORD2>text</KEYWORD2>
+      <KEYWORD2>arrow</KEYWORD2>
+      <KEYWORD2>arrowto</KEYWORD2>
+      <KEYWORD2>arrows</KEYWORD2>
+      <KEYWORD2>arrowsto</KEYWORD2>
+      <KEYWORD2>arrowrel</KEYWORD2>
+      <KEYWORD2>arrowsrel</KEYWORD2>
+      <KEYWORD2>force</KEYWORD2>
+      <KEYWORD2>texforce</KEYWORD2>
+      <KEYWORD2>force2</KEYWORD2>
+      <KEYWORD2>texforce2</KEYWORD2>
+      <KEYWORD2>dimline</KEYWORD2>
+      <KEYWORD2>dimlineto</KEYWORD2>
+      <KEYWORD2>texdimline</KEYWORD2>
+      <KEYWORD2>texdimlineto</KEYWORD2>
+      <KEYWORD2>dimlinerel</KEYWORD2>
+      <KEYWORD2>texdimlinerel</KEYWORD2>
+      <KEYWORD2>dimangle</KEYWORD2>
+      <KEYWORD2>texdimangle</KEYWORD2>
+      
+      <KEYWORD2>endblock</KEYWORD2>
+      <KEYWORD2>block.rotate</KEYWORD2>
+      <KEYWORD2>block.flip</KEYWORD2>
+      <KEYWORD2>block.scale</KEYWORD2>
+      <KEYWORD2>block</KEYWORD2>
+      
+      <KEYWORD2>geom.vector</KEYWORD2>
+      <KEYWORD2>geom.v</KEYWORD2>
+      <KEYWORD2>geom.azimuth</KEYWORD2>
+      <KEYWORD2>geom.azi</KEYWORD2>
+      <KEYWORD2>geom.add</KEYWORD2>
+      <KEYWORD2>geom.subtract</KEYWORD2>
+      <KEYWORD2>geom.multiply</KEYWORD2>
+      <KEYWORD2>geom.divide</KEYWORD2>
+      <KEYWORD2>geom.half</KEYWORD2>
+      <KEYWORD2>geom.tox</KEYWORD2>
+      <KEYWORD2>tx</KEYWORD2>
+      <KEYWORD2>geom.toy</KEYWORD2>
+      <KEYWORD2>ty</KEYWORD2>
+      <KEYWORD2>geom.intersect</KEYWORD2>
+      <KEYWORD2>geom.area</KEYWORD2>
+      <KEYWORD2>geom.centroid</KEYWORD2>
+      <KEYWORD2>geom.intersectlinepath</KEYWORD2>
+      <KEYWORD2>geom.intersectcircles</KEYWORD2>
+      <KEYWORD2>geom.online</KEYWORD2>
+      <KEYWORD2>geom.angle</KEYWORD2>
+      <KEYWORD2>geom.anglerad</KEYWORD2>
+      <KEYWORD2>geom.crossproduct</KEYWORD2>
+      <KEYWORD2>geom.dotproduct</KEYWORD2>
+      <KEYWORD2>geom.rotate</KEYWORD2>
+      <KEYWORD2>geom.polar</KEYWORD2>
+      <KEYWORD2>geom.length</KEYWORD2>
+      <KEYWORD2>geom.abs</KEYWORD2>
+      <KEYWORD2>geom.norm</KEYWORD2>
+      <KEYWORD2>geom.parallel</KEYWORD2>
+      <KEYWORD2>geom.extend</KEYWORD2>
+      <KEYWORD2>geom.distance</KEYWORD2>
+      <KEYWORD2>geom.dist</KEYWORD2>
+      
+      <KEYWORD2>stat.add</KEYWORD2>
+      <KEYWORD2>stat.subtract</KEYWORD2>
+      <KEYWORD2>stat.multiply</KEYWORD2>
+      <KEYWORD2>stat.move</KEYWORD2>
+      <KEYWORD2>stat.move2</KEYWORD2>
+      <KEYWORD2>stat.actionline</KEYWORD2>
+      <KEYWORD2>stat.tip</KEYWORD2>
+      <KEYWORD2>stat.abs</KEYWORD2>
+      <KEYWORD2>stat.distance</KEYWORD2>
+      <KEYWORD2>stat.dist</KEYWORD2>
+      <KEYWORD2>stat.moment</KEYWORD2>
+      <KEYWORD2>stat.mequi</KEYWORD2>
+      <KEYWORD2>stat.equi</KEYWORD2>
+      <KEYWORD2>stat.fequi</KEYWORD2>
+
+      <!-- Global variables-->
+
+      <!-- Common arguments to Drawj2d -->
+      <KEYWORD3>black</KEYWORD3>
+      <KEYWORD3>blue</KEYWORD3>
+      <KEYWORD3>brown</KEYWORD3>
+      <KEYWORD3>cyan</KEYWORD3>
+      <KEYWORD3>darkgray</KEYWORD3>
+      <KEYWORD3>darkgreen</KEYWORD3>
+      <KEYWORD3>darkorange</KEYWORD3>
+      <KEYWORD3>gray</KEYWORD3>
+      <KEYWORD3>green</KEYWORD3>
+      <KEYWORD3>lightgray</KEYWORD3>
+      <KEYWORD3>magenta</KEYWORD3>
+      <KEYWORD3>orange</KEYWORD3>
+      <KEYWORD3>pink</KEYWORD3>
+      <KEYWORD3>purple</KEYWORD3>
+      <KEYWORD3>red</KEYWORD3>
+      <KEYWORD3>violet</KEYWORD3>
+      <KEYWORD3>white</KEYWORD3>
+      <KEYWORD3>yellow</KEYWORD3>
+      <KEYWORD3>dashed</KEYWORD3>
+      <KEYWORD3>dotted</KEYWORD3>
+      <KEYWORD3>dashdotted</KEYWORD3>
+      <KEYWORD3>solid</KEYWORD3>
+      <KEYWORD3>Serif</KEYWORD3>
+      <KEYWORD3>SansSerif</KEYWORD3>
+      <KEYWORD3>Monospaced</KEYWORD3>
+      <KEYWORD3>Tex</KEYWORD3>
+      <KEYWORD3>plain</KEYWORD3>
+      <KEYWORD3>bold</KEYWORD3>
+      <KEYWORD3>italic</KEYWORD3>
+      <KEYWORD3>left</KEYWORD3>
+      <KEYWORD3>justify</KEYWORD3>
+      <KEYWORD3>NE</KEYWORD3>
+      <KEYWORD3>E</KEYWORD3>
+      <KEYWORD3>SE</KEYWORD3>
+      <KEYWORD3>S</KEYWORD3>
+      <KEYWORD3>SW</KEYWORD3>
+      <KEYWORD3>W</KEYWORD3>
+      <KEYWORD3>NW</KEYWORD3>
+      <KEYWORD3>N</KEYWORD3>
+      <KEYWORD3>C</KEYWORD3>
+      <KEYWORD3>BW</KEYWORD3>
+      <KEYWORD3>BC</KEYWORD3>
+      <KEYWORD3>BL</KEYWORD3>
+      <KEYWORD3>BLC</KEYWORD3>
+    </KEYWORDS>
+  </RULES>
+
+  <RULES SET="TCL_COMMENT" DEFAULT="OPERATOR">
+    <!-- Allows catching blocks starting with a comment.
+        or comments following a ; -->
+    <SEQ_REGEXP TYPE="COMMENT1" HASH_CHAR="#" DELEGATE="MAIN">#.*</SEQ_REGEXP>
+  </RULES>
+
+  <RULES SET="TCL_STRING" DEFAULT="LITERAL1" ESCAPE="\">
+    <PROPS>
+      <PROPERTY NAME="indentOpenBrackets" VALUE="" />
+      <PROPERTY NAME="indentCloseBrackets" VALUE="" />
+    </PROPS>
+
+    <!-- Continuation line. Processed before anything else by Tcl.-->
+    <EOL_SPAN_REGEXP TYPE="OPERATOR" HASH_CHAR="\">\\$</EOL_SPAN_REGEXP>
+
+    <!-- Avoid colouring variables substituted inside strings  -->
+    <SPAN_REGEXP TYPE="NULL" HASH_CHAR="$" DELEGATE="MAIN">
+      <BEGIN>\$(\w|::)+\(</BEGIN>
+      <END>)</END>
+    </SPAN_REGEXP>
+    <SPAN_REGEXP TYPE="NULL" HASH_CHAR="$" DELEGATE="MAIN">
+      <BEGIN>\$\{</BEGIN>
+      <END>}</END>
+    </SPAN_REGEXP>
+    <SEQ_REGEXP TYPE="NULL" HASH_CHAR="$">\$(\w|::)+</SEQ_REGEXP>
+
+    <!-- Sub-commands to be substituted -->
+    <SPAN TYPE="OPERATOR" NO_LINE_BREAK="FALSE" DELEGATE="MAIN">
+      <BEGIN>[</BEGIN>
+      <END>]</END>
+    </SPAN>
+
+    <!-- Escaped characters -->
+    <SEQ TYPE="KEYWORD3">\a</SEQ>
+    <SEQ TYPE="KEYWORD3">\b</SEQ>
+    <SEQ TYPE="KEYWORD3">\f</SEQ>
+    <SEQ TYPE="KEYWORD3">\n</SEQ>
+    <SEQ TYPE="KEYWORD3">\r</SEQ>
+    <SEQ TYPE="KEYWORD3">\t</SEQ>
+    <SEQ TYPE="KEYWORD3">\v</SEQ>
+  </RULES>
+</MODE>

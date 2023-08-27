@@ -1,6 +1,6 @@
 ! Copyright (C) 2008, 2009 Daniel Ehrenberg.
-! See http://factorcode.org/license.txt for BSD license.
-USING: combinators.short-circuit kernel locals namespaces sbufs
+! See https://factorcode.org/license.txt for BSD license.
+USING: combinators.short-circuit kernel namespaces sbufs
 sequences splitting unicode.categories unicode.data ;
 QUALIFIED: ascii
 IN: unicode.case
@@ -70,7 +70,7 @@ CATEGORY-NOT: (uncased) Lu Ll Lt Lm Mn Me ;
 :: map-case ( string string-quot char-quot -- case )
     string length <sbuf> :> out
     string [
-        dup special-case
+        [ special-case ]
         [ string-quot call out push-all ]
         [ char-quot call out push ] ?if
     ] each out "" like ; inline

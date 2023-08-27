@@ -1,5 +1,5 @@
 ! Copyright (C) 2007, 2008 Alex Chapman
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors arrays jamshred.player jamshred.sound
 jamshred.tunnel kernel math math.constants sequences ;
 IN: jamshred.game

@@ -1,5 +1,5 @@
 ! Copyright (C) 2008, 2010 Slava Pestov, 2011 Alex Vondrak.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: assocs kernel namespaces ;
 IN: compiler.cfg.gvn.graph
 

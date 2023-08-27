@@ -161,7 +161,7 @@ COM-INTERFACE: IDirect3DDevice9 IUnknown {D0223B96-BF7A-43fd-92BD-A43B0D82B9EB}
     HRESULT GetVertexShaderConstantF ( UINT StartRegister, float* pConstantData, UINT Vector4fCount )
     HRESULT SetVertexShaderConstantI ( UINT StartRegister, int* pConstantData, UINT Vector4iCount )
     HRESULT GetVertexShaderConstantI ( UINT StartRegister, int* pConstantData, UINT Vector4iCount )
-    HRESULT SetVertexShaderConstantB ( UINT StartRegister, BOOL* pConstantData, UINT  BoolCount )
+    HRESULT SetVertexShaderConstantB ( UINT StartRegister, BOOL* pConstantData, UINT BoolCount )
     HRESULT GetVertexShaderConstantB ( UINT StartRegister, BOOL* pConstantData, UINT BoolCount )
     HRESULT SetStreamSource ( UINT StreamNumber, IDirect3DVertexBuffer9* pStreamData, UINT OffsetInBytes, UINT Stride )
     HRESULT GetStreamSource ( UINT StreamNumber, IDirect3DVertexBuffer9** ppStreamData, UINT* pOffsetInBytes, UINT* pStride )
@@ -176,7 +176,7 @@ COM-INTERFACE: IDirect3DDevice9 IUnknown {D0223B96-BF7A-43fd-92BD-A43B0D82B9EB}
     HRESULT GetPixelShaderConstantF ( UINT StartRegister, float* pConstantData, UINT Vector4fCount )
     HRESULT SetPixelShaderConstantI ( UINT StartRegister, int* pConstantData, UINT Vector4iCount )
     HRESULT GetPixelShaderConstantI ( UINT StartRegister, int* pConstantData, UINT Vector4iCount )
-    HRESULT SetPixelShaderConstantB ( UINT StartRegister, BOOL* pConstantData, UINT  BoolCount )
+    HRESULT SetPixelShaderConstantB ( UINT StartRegister, BOOL* pConstantData, UINT BoolCount )
     HRESULT GetPixelShaderConstantB ( UINT StartRegister, BOOL* pConstantData, UINT BoolCount )
     HRESULT DrawRectPatch ( UINT Handle, float* pNumSegs, D3DRECTPATCH_INFO* pRectPatchInfo )
     HRESULT DrawTriPatch ( UINT Handle, float* pNumSegs, D3DTRIPATCH_INFO* pTriPatchInfo )
@@ -410,7 +410,7 @@ CONSTANT: D3DERR_PRESENT_STATISTICS_DISJOINT      0x88760884
 FUNCTION: HRESULT Direct3DCreate9Ex ( UINT SDKVersion, IDirect3D9Ex** out )
 
 COM-INTERFACE: IDirect3D9Ex IDirect3D9 {02177241-69FC-400C-8FF1-93A44DF6861D}
-    UINT GetAdapterModeCountEx ( UINT Adapter, D3DDISPLAYMODEFILTER* pFilter  )
+    UINT GetAdapterModeCountEx ( UINT Adapter, D3DDISPLAYMODEFILTER* pFilter )
     HRESULT EnumAdapterModesEx ( UINT Adapter, D3DDISPLAYMODEFILTER* pFilter, UINT Mode, D3DDISPLAYMODEEX* pMode )
     HRESULT GetAdapterDisplayModeEx ( UINT Adapter, D3DDISPLAYMODEEX* pMode, D3DDISPLAYROTATION* pRotation )
     HRESULT CreateDeviceEx ( UINT Adapter, D3DDEVTYPE DeviceType, HWND hFocusWindow, DWORD BehaviorFlags, D3DPRESENT_PARAMETERS* pPresentationParameters, D3DDISPLAYMODEEX* pFullscreenDisplayMode, IDirect3DDevice9Ex** ppReturnedDeviceInterface )

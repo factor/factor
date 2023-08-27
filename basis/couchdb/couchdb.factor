@@ -1,14 +1,14 @@
 ! Copyright (C) 2008, 2009 Alex Chapman
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors assocs continuations debugger hashtables http
-http.client io io.encodings.string io.encodings.utf8 json.reader
-json.writer kernel make math math.parser namespaces sequences
-strings urls.encoding vectors ;
+http.client io io.encodings.string io.encodings.utf8 json kernel
+make math math.parser namespaces sequences strings urls.encoding
+vectors ;
 IN: couchdb
 
-! NOTE: This code only works with the latest couchdb (0.9.*), because old
-! versions didn't provide the /_uuids feature which this code relies on when
-! creating new documents.
+! NOTE: This code only works with the latest couchdb (0.9.*),
+! because old versions didn't provide the /_uuids feature which
+! this code relies on when creating new documents.
 
 SYMBOL: couch
 : with-couch ( db quot -- )
@@ -74,7 +74,7 @@ CONSTANT: default-uuids-to-cache 100
     default-couch-host default-couch-port <server> ;
 
 : (server-url) ( server -- )
-    "http://" % [ host>> % ] [ CHAR: : , port>> number>string % ] bi CHAR: / , ; inline
+    "https://" % [ host>> % ] [ CHAR: : , port>> number>string % ] bi CHAR: / , ; inline
 
 : server-url ( server -- url )
     [ (server-url) ] "" make ;
@@ -86,7 +86,7 @@ CONSTANT: default-uuids-to-cache 100
     [ dup server-url % "_uuids?count=" % uuids-to-cache>> number>string % ] "" make ;
 
 : uuids-get ( server -- uuids )
-     uuids-url couch-get "uuids" of >vector ;
+    uuids-url couch-get "uuids" of >vector ;
 
 : get-uuids ( server -- server )
     dup uuids-get [ nip ] curry change-uuids ;

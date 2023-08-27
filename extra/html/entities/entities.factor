@@ -1,5 +1,5 @@
 ! Copyright (C) 2014 John Benediktsson
-! See http://factorcode.org/license.txt for BSD license
+! See https://factorcode.org/license.txt for BSD license
 
 USING: assocs combinators.short-circuit kernel make math
 math.order math.parser ranges regexp sequences splitting
@@ -33,7 +33,7 @@ PRIVATE>
 
 <PRIVATE
 
-! see http://www.w3.org/TR/html5/syntax.html#tokenizing-character-references
+! see https://www.w3.org/TR/html5/syntax.html#tokenizing-character-references
 
 CONSTANT: invalid-charrefs H{
     { 0x00 "\u00fffd" }  ! REPLACEMENT CHARACTER
@@ -95,7 +95,7 @@ CONSTANT: invalid-codepoints {
     0x10fffe 0x10ffff
 }
 
-! see http://www.w3.org/TR/html5/syntax.html#named-character-references
+! see https://www.w3.org/TR/html5/syntax.html#named-character-references
 
 CONSTANT: html5 H{
     { "Aacute" "\xc1" }

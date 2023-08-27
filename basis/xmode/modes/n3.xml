@@ -1,0 +1,86 @@
+<?xml version="1.0"?>
+<!--
+Basic N3 mode by Jakub Roztočil <jakub@roztocil.name>
+
+	N3 (Notation3) is a shorthand non-XML serialization of RDF
+	<http://www.w3.org/DesignIssues/Notation3.html>
+
+Catalog entry:
+
+	<MODE NAME="n3" FILE="n3.xml" FILE_NAME_GLOB="*.n3" />
+
+TODO:
+	* different highlighting for subject, predicate and object
+	* higlight qnames, not only prefixes (prefix:qname)
+
+-->
+<!DOCTYPE MODE SYSTEM "xmode.dtd">
+<MODE>
+	<PROPS>
+		<!-- Indent when writting more statements about the same subject -->
+		<PROPERTY NAME="indentNextLines" VALUE="\S+\s+\S+\s+\S+\s*;$" />
+		<PROPERTY NAME="indentOpenBrackets" VALUE="[{(" />
+		<PROPERTY NAME="indentCloseBrackets" VALUE="}])" />
+		<PROPERTY NAME="ignoreWhitespace" VALUE="false" />
+		<PROPERTY NAME="lineComment" VALUE="#" />
+	</PROPS>
+
+	<RULES HIGHLIGHT_DIGITS="TRUE">
+
+
+		<!-- @foo -->
+		<MARK_FOLLOWING TYPE="KEYWORD1">@</MARK_FOLLOWING>
+
+		<!-- Prefixes -->
+		<MARK_PREVIOUS TYPE="LABEL" MATCH_TYPE="OPERATOR">:</MARK_PREVIOUS>
+
+		<!-- Resource URI -->
+		<SPAN TYPE="LITERAL2" NO_LINE_BREAK="TRUE">
+			<BEGIN>&lt;</BEGIN>
+			<END>&gt;</END>
+		</SPAN>
+
+		<!-- Strings -->
+		<SPAN TYPE="LITERAL1" NO_LINE_BREAK="FALSE" ESCAPE="\">
+			<BEGIN>"""</BEGIN>
+			<END>"""</END>
+		</SPAN>
+		<SPAN TYPE="LITERAL1" NO_LINE_BREAK="FALSE" ESCAPE="\">
+			<BEGIN>"</BEGIN>
+			<END>"</END>
+		</SPAN>
+
+		<!-- Operators -->
+		<SEQ TYPE="OPERATOR">.</SEQ>
+		<SEQ TYPE="OPERATOR">?</SEQ>
+		<SEQ TYPE="OPERATOR">(</SEQ>
+		<SEQ TYPE="OPERATOR">)</SEQ>
+		<SEQ TYPE="OPERATOR">^^</SEQ>
+		<SEQ TYPE="OPERATOR">}</SEQ>
+		<SEQ TYPE="OPERATOR">{</SEQ>
+		<SEQ TYPE="OPERATOR">,</SEQ>
+		<SEQ TYPE="OPERATOR">;</SEQ>
+		<SEQ TYPE="OPERATOR">]</SEQ>
+		<SEQ TYPE="OPERATOR">[</SEQ>
+		<SEQ TYPE="OPERATOR">:</SEQ>
+		<SEQ TYPE="OPERATOR">=></SEQ>
+		<SEQ TYPE="OPERATOR">=</SEQ>
+
+		<!-- COMMENTS -->
+		<EOL_SPAN TYPE="COMMENT1" AT_LINE_START="FALSE">#</EOL_SPAN>
+
+		<!-- KEYWORDS -->
+		<KEYWORDS>
+			<KEYWORD2>a</KEYWORD2>
+			<KEYWORD2>is</KEYWORD2>
+			<KEYWORD2>has</KEYWORD2>
+			<KEYWORD2>of</KEYWORD2>
+			<KEYWORD3>true</KEYWORD3>
+			<KEYWORD3>false</KEYWORD3>
+		</KEYWORDS>
+	</RULES>
+
+
+</MODE>
+
+ 	  	 

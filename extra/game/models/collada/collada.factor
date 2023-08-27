@@ -1,5 +1,5 @@
 ! Copyright (C) 2010 Erik Charlebois
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors alien.c-types alien.data arrays assocs grouping
 hashtables kernel locals math math.parser sequences sequences.deep
 splitting xml xml.data xml.traversal math.order namespaces
@@ -47,7 +47,7 @@ M: x-up >y-up-axis!
         [ 0 swap nth ]
         [ 1 swap nth neg ]
         [ 2 swap nth ] tri
-        swap -rot
+        swapd
     ] [
         [ 2 swap set-nth ]
         [ 1 swap set-nth ]

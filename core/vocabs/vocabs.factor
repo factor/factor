@@ -1,5 +1,5 @@
 ! Copyright (C) 2007, 2009 Eduardo Cavazos, Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors assocs definitions kernel namespaces sequences
 sets sorting splitting strings ;
 IN: vocabs
@@ -23,7 +23,7 @@ ERROR: bad-vocab-name name ;
 
 : check-vocab-name ( name -- name )
     dup string? [ bad-vocab-name ] unless
-    dup [ ":/\\ " member? ] any? [ bad-vocab-name ] when ;
+    dup [ ":/\\ \"" member? ] any? [ bad-vocab-name ] when ;
 
 TUPLE: vocab-link name ;
 
@@ -50,7 +50,7 @@ M: object lookup-vocab vocab-name dictionary get at ;
 ERROR: no-vocab-named name ;
 
 : ?lookup-vocab ( vocab-spec -- vocab )
-    dup lookup-vocab [ nip ] [ no-vocab-named ] if* ;
+    [ lookup-vocab ] [ no-vocab-named ] ?unless ;
 
 GENERIC: vocab-words-assoc ( vocab-spec -- assoc/f )
 
@@ -99,7 +99,7 @@ GENERIC: vocab-changed ( vocab obj -- )
 ERROR: no-vocab name ;
 
 : loaded-vocab-names ( -- seq )
-    dictionary get keys natural-sort ;
+    dictionary get keys sort ;
 
 : vocab-words ( vocab-spec -- seq )
     vocab-words-assoc values ;
@@ -131,7 +131,7 @@ GENERIC: >vocab-link ( name -- vocab )
 
 M: vocab-spec >vocab-link ;
 
-M: object >vocab-link dup lookup-vocab [ ] [ <vocab-link> ] ?if ;
+M: object >vocab-link [ lookup-vocab ] [ <vocab-link> ] ?unless ;
 
 <PRIVATE
 

@@ -1,5 +1,5 @@
 ! Copyright (C) 2009 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors classes combinators.short-circuit kernel ui
 ui.gadgets ui.gadgets.borders ui.gadgets.scrollers
 ui.gadgets.tracks ui.pens.solid ui.theme words ;

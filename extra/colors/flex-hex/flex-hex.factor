@@ -1,5 +1,5 @@
 ! Copyright (C) 2013 John Benediktsson
-! See http://factorcode.org/license.txt for BSD license
+! See https://factorcode.org/license.txt for BSD license
 
 USING: colors.private grouping kernel lexer math regexp.classes
 sequences splitting ;
@@ -19,8 +19,8 @@ IN: colors.flex-hex
 
 : hex-rgb ( array -- array' )
     [
-        8 short tail*
-        2 short head
+        8 index-or-length tail*
+        2 index-or-length head
         2 CHAR: 0 pad-head
     ] map ;
 

@@ -1,5 +1,5 @@
 ! Copyright (C) 2006, 2009 Slava Pestov
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors arrays kernel math math.order ranges
 models sequences splitting ;
 IN: documents
@@ -88,7 +88,7 @@ CONSTANT: doc-start { 0 0 }
     0 swap [ append ] change-nth ;
 
 : append-last ( str seq -- )
-    [ length 1 - ] keep [ prepend ] change-nth ;
+    index-of-last [ prepend ] change-nth ;
 
 : loc-col/str ( loc document -- str col )
     [ first2 swap ] dip nth swap ;

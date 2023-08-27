@@ -1,11 +1,10 @@
 ! Copyright (C) 2020 Fred Alger
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: arrays editors environment io.files.info io.pathnames
 kernel make math.parser namespaces sequences ;
 IN: editors.acme
 
 SINGLETON: acme
-acme editor-class set-global
 
 : plan9-path ( -- path )
   \ plan9-path get [
@@ -23,11 +22,11 @@ acme editor-class set-global
   "plumb" plan9-tool-path ;
 
 : (massage-pathname) ( file line -- str )
- over file-info regular-file?
- [ number>string 2array ":" join ]
- [ drop ] if ;
+  over file-info regular-file?
+  [ number>string 2array ":" join ]
+  [ drop ] if ;
 
 PRIVATE>
 
 M: acme editor-command ( file line -- command )
- [ (plumb-path) , "-d" , "edit" , (massage-pathname) , ] { } make ;
+  [ (plumb-path) , "-d" , "edit" , (massage-pathname) , ] { } make ;

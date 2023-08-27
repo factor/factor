@@ -1,5 +1,5 @@
 ! Copyright (C) 2009 Doug Coleman.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors byte-arrays combinators io io.backend
 io.directories io.encodings.binary io.files io.files.links
 io.pathnames io.streams.byte-array io.streams.string kernel

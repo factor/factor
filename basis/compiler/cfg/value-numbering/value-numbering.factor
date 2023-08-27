@@ -1,5 +1,5 @@
 ! Copyright (C) 2008, 2010 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs compiler.cfg compiler.cfg.def-use
 compiler.cfg.instructions compiler.cfg.rpo
 compiler.cfg.utilities kernel locals namespaces sequences
@@ -30,14 +30,14 @@ GENERIC: process-instruction ( insn -- insn' )
     insn ;
 
 : check-redundancy ( insn -- insn' )
-    dup >expr dup exprs>vns get at
-    [ redundant-instruction ] [ useful-instruction ] ?if ;
+    dup >expr
+    [ exprs>vns get at ] [ redundant-instruction ] [ useful-instruction ] ?if ;
 
 M: insn process-instruction
-    dup rewrite [ process-instruction ] [ ] ?if ;
+    [ rewrite ] [ process-instruction ] ?when ;
 
 M: foldable-insn process-instruction
-    dup rewrite
+    [ rewrite ]
     [ process-instruction ]
     [ dup defs-vregs length 1 = [ check-redundancy ] when ] ?if ;
 

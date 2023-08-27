@@ -1,6 +1,7 @@
 ! Copyright (C) 2019 Jack Lucas
-! See http://factorcode.org/license.txt for BSD license.
-USING: accessors combinators kernel math namespaces raylib ;
+! See https://factorcode.org/license.txt for BSD license.
+USING: accessors arrays combinators kernel math namespaces
+raylib ;
 IN: raylib.demo
 
 : say-hello ( -- )
@@ -25,15 +26,18 @@ SYMBOL: player
     get-screen-height 2 /
     Vector2 boa player set ;
 
-! Make this cleaner
+: check-axis-movement ( key-negative key-positive -- unit/f )
+    [ is-key-down ] bi@ 2array {
+        { { t f } [ -1.0 ] }
+        { { f t } [  1.0 ] }
+        [ drop f ]
+    } case ;
+
 : change-player-position ( -- )
-    player get {
-        { [ KEY_RIGHT is-key-down ] [ [  2.0 + ] change-x ] }
-        { [ KEY_LEFT  is-key-down ] [ [ -2.0 + ] change-x ] }
-        { [ KEY_DOWN  is-key-down ] [ [  2.0 + ] change-y ] }
-        { [ KEY_UP    is-key-down ] [ [ -2.0 + ] change-y ] }
-        [ ]
-    } cond drop ;
+    player get
+    KEY_LEFT KEY_RIGHT check-axis-movement [ '[ _ 2.0 * + ] change-x ] when*
+    KEY_UP KEY_DOWN check-axis-movement [ '[ _ 2.0 * + ] change-y ] when*
+    drop ;
 
 : render-loop ( -- )
     begin-drawing

@@ -1,5 +1,5 @@
 ! Copyright (C) 2009, 2020 Marc Fauconneau, Abtin Molavi, Jacob Fischer.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs bitstreams byte-arrays
 byte-vectors combinators combinators.short-circuit
 combinators.smart compression.huffman endian kernel math
@@ -26,14 +26,14 @@ ERROR: bad-zlib-header ;
 
 
 : read-until-terminated ( data -- data ) 
-   [ dup 8 swap bs:read 0 =  ] [  ]  until ;
+    [ dup 8 swap bs:read 0 =  ] [  ]  until ;
 
-:: interpret-flag ( flg data  -- )
-   27 data bs:seek 
-   flg first 1 = [ 8 data bs:read data bs:seek  ] when
-   flg second 1 = [ data read-until-terminated drop ] when
-   flg fourth 1 = [ data read-until-terminated drop ] when
-   flg second 1 = [ 1 data bs:read drop  ] when ;
+:: interpret-flag ( flg data -- )
+    27 data bs:seek 
+    flg first 1 = [ 8 data bs:read data bs:seek  ] when
+    flg second 1 = [ data read-until-terminated drop ] when
+    flg fourth 1 = [ data read-until-terminated drop ] when
+    flg second 1 = [ 1 data bs:read drop  ] when ;
 
 :: check-gzip-header ( data -- )
     8 data bs:read 31 assert=   ! ID 1
@@ -49,7 +49,7 @@ CONSTANT: clen-shuffle { 16 17 18 0 8 7 9 6 10 5 11 4 12 3 13 2 14 1 15 }
 : get-table ( values size -- table )
     16 f <array> <enumerated>
     [ '[ _ push-at ] 2each ] keep
-    seq>> rest-slice [ natural-sort ] map ; inline
+    seq>> rest-slice [ sort ] map ; inline
 
 :: decode-huffman-tables ( bitstream -- tables )
     5 bitstream bs:read 257 +
@@ -84,12 +84,12 @@ CONSTANT: clen-shuffle { 16 17 18 0 8 7 9 6 10 5 11 4 12 3 13 2 14 1 15 }
 
 MEMO: static-huffman-tables ( -- obj )
     [
-          0 143 [a..b] length [ 8 ] replicate
-        144 255 [a..b] length [ 9 ] replicate append
-        256 279 [a..b] length [ 7 ] replicate append
-        280 287 [a..b] length [ 8 ] replicate append
+          0 143 [a..b] length 8 <array>
+        144 255 [a..b] length 9 <array>
+        256 279 [a..b] length 7 <array>
+        280 287 [a..b] length 8 <array>
     ] append-outputs
-    0 31 [a..b] length [ 5 ] replicate 2array
+    0 31 [a..b] length 5 <array> 2array
     [ [ length>> <iota> ] [ ] bi get-table ] map ;
 
 CONSTANT: length-table

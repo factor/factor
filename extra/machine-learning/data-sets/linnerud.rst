@@ -7,7 +7,7 @@ Data Set Characteristics:
     :Number of Attributes: 3
     :Missing Attribute Values: None
 
-The Linnerud dataset constains two small dataset:
+The Linnerud dataset contains two small datasets:
 
 - *exercise*: A list containing the following components: exercise data with
   20 observations on 3 exercise variables: Weight, Waist and Pulse.

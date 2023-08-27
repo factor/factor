@@ -1,5 +1,5 @@
 ! Copyright (C) Chris Double.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors alien.accessors alien.c-types alien.data
 byte-arrays classes.struct destructors generalizations kernel
 libc math math.order sequences sequences.private typed ;

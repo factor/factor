@@ -1,5 +1,5 @@
 ! Copyright (C) 2007 Doug Coleman.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors combinators.smart effects.parser
 generalizations grouping kernel lexer math math.order
 parser quotations sequences splitting.monotonic strings unicode

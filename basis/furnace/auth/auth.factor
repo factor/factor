@@ -1,5 +1,5 @@
 ! Copyright (c) 2008, 2010 Slava Pestov
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors assocs checksums checksums.sha combinators
 destructors endian furnace.actions furnace.auth.providers
 furnace.auth.providers.db furnace.boilerplate

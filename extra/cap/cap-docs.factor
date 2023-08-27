@@ -13,3 +13,4 @@ HELP: screenshot
     "Creates a bitmap image of a UI window."
   }
   { $notes "If the current " { $link gl-scale-factor } " is " { $snippet "2.0" } ", then the " { $snippet "2x" } " slot in the resulting " { $link image } " will be " { $link t } "." } ;
+

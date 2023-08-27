@@ -1,5 +1,5 @@
 ! Copyright (C) 2009 Daniel Ehrenberg
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: tools.test math math.bits sequences arrays ;
 
 { t } [ 0b111111 3 <bits> second ] unit-test
@@ -8,10 +8,10 @@ USING: tools.test math math.bits sequences arrays ;
 { { f f t } } [ 0b111100 3 <bits> >array ] unit-test
 { 3 } [ 0b111111 3 <bits> length ] unit-test
 { 6 } [ 0b111111 make-bits length ] unit-test
-{ 0 } [ 0 make-bits length ] unit-test
-{ 2 } [ 3 make-bits length ] unit-test
+{ 1 } [ 0 make-bits length ] unit-test
 { 1 } [ 1 make-bits length ] unit-test
-[ -3 make-bits length ] [ non-negative-integer-expected? ] must-fail-with
+{ 2 } [ 3 make-bits length ] unit-test
+[ -3 make-bits length ] [ non-negative-number-expected? ] must-fail-with
 
 ! Odd bug
 { t } [

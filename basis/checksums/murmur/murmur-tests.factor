@@ -25,13 +25,13 @@ sequences tools.test ;
     }
 } [
     "1234567890" [ length 1 + ] keep 156 <murmur3-32>
-    '[ _ swap head _ checksum-bytes ] { } map-integers
+    '[ _ swap head _ checksum-bytes ] map-integers
 ] unit-test
 
 
 { t } [
     "1234567890" dup >byte-array [
         [ length 1 + ] keep 156 <murmur3-32>
-        '[ _ swap head _ checksum-bytes ] { } map-integers
+        '[ _ swap head _ checksum-bytes ] map-integers
     ] bi@ =
 ] unit-test

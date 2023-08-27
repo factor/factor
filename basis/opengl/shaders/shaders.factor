@@ -1,5 +1,5 @@
 ! Copyright (C) 2008 Joe Groff.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: alien.c-types alien.data alien.strings arrays
 continuations destructors io.encodings.ascii kernel libc math
 opengl opengl.gl sequences specialized-arrays ;

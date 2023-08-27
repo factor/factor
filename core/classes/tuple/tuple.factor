@@ -1,5 +1,5 @@
 ! Copyright (C) 2005, 2010 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 IN: classes.tuple
 ! for classes.union mutual dependency
 DEFER: tuple-class?
@@ -84,7 +84,7 @@ M: tuple class-of layout-of 2 slot { word } declare ; inline
     ] if-bootstrapping ; inline
 
 : pad-slots ( seq class -- seq' class )
-    [ all-slots ] keep 2over [ length ] bi@ 2dup > [
+    [ all-slots ] keep 2over 2length 2dup > [
         [ nip swap ] 2dip too-many-slots
     ] [
         drop [
@@ -390,7 +390,7 @@ M: tuple equal? over tuple? [ tuple= ] [ 2drop f ] if ;
 M: tuple hashcode* [ tuple-hashcode ] recursive-hashcode ;
 
 M: tuple-class new
-    dup "prototype" word-prop [ (clone) ] [ tuple-layout <tuple> ] ?if ;
+    [ "prototype" word-prop ] [ (clone) ] [ tuple-layout <tuple> ] ?if ;
 
 M: tuple-class boa
     [ "boa-check" word-prop [ call ] when* ]

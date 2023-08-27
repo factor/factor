@@ -1,5 +1,5 @@
 ! Copyright (C) 2018 Alexander Ilin.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: byte-arrays checksums checksums.md5 checksums.multi
 checksums.sha tools.test ;
 IN: checksums.multi.tests

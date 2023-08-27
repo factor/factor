@@ -1,5 +1,5 @@
 ! Copyright (C) 2007 Chris Double.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 !
 USING:
     alien
@@ -16,13 +16,13 @@ IN: ogg.theora
 <<
 "theoradec" {
     { [ os windows? ]  [ "theoradec.dll" ] }
-    { [ os macosx? ] [ "libtheoradec.0.dylib" ] }
+    { [ os macosx? ] [ "libtheoradec.dylib" ] }
     { [ os unix? ]   [ "libtheoradec.so" ] }
 } cond cdecl add-library
 
 "theoraenc" {
     { [ os windows? ]  [ "theoraenc.dll" ] }
-    { [ os macosx? ] [ "libtheoraenc.0.dylib" ] }
+    { [ os macosx? ] [ "libtheoraenc.dylib" ] }
     { [ os unix? ]   [ "libtheoraenc.so" ] }
 } cond cdecl add-library
 >>

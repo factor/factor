@@ -1,5 +1,5 @@
 ! Copyright (C) 2004, 2010 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs definitions hashtables kernel
 kernel.private math math.order namespaces quotations sequences
 slots.private strings vocabs ;
@@ -51,9 +51,9 @@ M: word definition def>> ;
 
 PRIVATE>
 
-TUPLE: undefined-word word ;
+ERROR: undefined-word word ;
 
-: undefined ( -- * ) get-callstack caller undefined-word boa throw ;
+: undefined ( -- * ) get-callstack caller undefined-word ;
 
 : undefined-def ( -- quot )
     ! 'f' inhibits tail call optimization in non-optimizing
@@ -199,6 +199,8 @@ M: word reset-word
 : <word> ( name vocab -- word )
     over hashcode over hashcode hash-combine >fixnum (word) dup new-word ;
 
+PREDICATE: uninterned-word < word vocabulary>> not ;
+
 : <uninterned-word> ( name -- word )
     f \ <uninterned-word> counter >fixnum (word)
     new-words get [ dup new-word ] when ;
@@ -210,8 +212,8 @@ M: word reset-word
     [ gensym dup ] 2dip define-declared ;
 
 : reveal ( word -- )
-    dup [ name>> ] [ vocabulary>> ] bi dup vocab-words-assoc
-    [ ] [ no-vocab ] ?if set-at ;
+    dup [ name>> ] [ vocabulary>> ] bi
+    [ vocab-words-assoc ] [ no-vocab ] ?unless set-at ;
 
 ERROR: bad-create name vocab ;
 

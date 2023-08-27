@@ -1,5 +1,5 @@
 ! Copyright (C) 2008, 2009 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs classes.mixin classes.parser
 classes.singleton classes.tuple classes.tuple.parser combinators
 effects.parser fry functors.backend generic generic.parser

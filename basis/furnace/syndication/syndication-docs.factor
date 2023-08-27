@@ -8,8 +8,8 @@ HELP: <feed-action>
 
 HELP: >entry
 { $values
-     { "object" object }
-     { "entry" entry }
+    { "object" object }
+    { "entry" entry }
 }
 { $contract "Converts an object into an Atom feed entry. The default implementation constructs an entry by calling "
 { $link feed-entry-title } ", "
@@ -22,29 +22,29 @@ HELP: feed-action
 
 HELP: feed-entry-date
 { $values
-     { "object" object }
-     { "timestamp" timestamp }
+    { "object" object }
+    { "timestamp" timestamp }
 }
 { $contract "Outputs a feed entry timestmap." } ;
 
 HELP: feed-entry-description
 { $values
-     { "object" object }
-     { "description" string }
+    { "object" object }
+    { "description" string }
 }
 { $contract "Outputs a feed entry description." } ;
 
 HELP: feed-entry-title
 { $values
-     { "object" object }
-     { "string" string }
+    { "object" object }
+    { "string" string }
 }
 { $contract "Outputs a feed entry title." } ;
 
 HELP: feed-entry-url
 { $values
-     { "object" object }
-     { "url" url }
+    { "object" object }
+    { "url" url }
 }
 { $contract "Outputs a feed entry URL." } ;
 

@@ -1,10 +1,10 @@
 ! Copyright (c) 2012 Anonymous
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors combinators kernel math math.order
 math.vectors sequences sequences.product combinators.short-circuit ;
 IN: rosetta-code.knapsack-unbounded
 
-! http://rosettacode.org/wiki/Knapsack_problem/Unbounded
+! https://rosettacode.org/wiki/Knapsack_problem/Unbounded
 
 ! A traveller gets diverted and has to make an unscheduled stop
 ! in what turns out to be Shangri La. Opting to leave, he is
@@ -20,12 +20,12 @@ IN: rosetta-code.knapsack-unbounded
 ! He can only take whole units of any item, but there is much
 ! more of any item than he could ever carry
 
-! How many of each item does he take to maximise the value of
+! How many of each item does he take to maximize the value of
 ! items he is carrying away with him?
 
 ! Note:
 
-! There are four solutions that maximise the value taken. Only
+! There are four solutions that maximize the value taken. Only
 ! one need be given.
 
 CONSTANT: values { 3000 1800 2500 }

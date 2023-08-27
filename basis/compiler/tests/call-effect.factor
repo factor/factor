@@ -8,7 +8,7 @@ IN: compiler.tests.call-effect
 
 : call-test ( q -- ) call( -- ) ;
 
-[ ] [ [ ] call-test ] unit-test
-[ ] [ f [ drop ] curry call-test ] unit-test
-[ ] [ [ ] [ ] compose call-test ] unit-test
+{ } [ [ ] call-test ] unit-test
+{ } [ f [ drop ] curry call-test ] unit-test
+{ } [ [ ] [ ] compose call-test ] unit-test
 [ [ 1 2 3 ] call-test ] [ wrong-values? ] must-fail-with

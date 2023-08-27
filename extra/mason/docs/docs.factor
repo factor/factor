@@ -1,12 +1,12 @@
 ! Copyright (C) 2008, 2010 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: hashtables http.client io.files.temp io.pathnames kernel
 mason.common mason.config namespaces sequences ;
 IN: mason.docs
 
 : make-docs-archive ( -- )
     [
-        { "tar" "cfz" }
+        { "tar" "-cz" "--no-xattrs" "-f" }
         "docs.tar.gz" temp-file suffix
         "docs" suffix
         short-running-process

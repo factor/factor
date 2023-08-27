@@ -1,5 +1,5 @@
 ! Copyright (C) 2009 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors furnace.actions furnace.auth
 furnace.redirection html.forms site-watcher site-watcher.db
 validators webapps.site-watcher.common urls ;

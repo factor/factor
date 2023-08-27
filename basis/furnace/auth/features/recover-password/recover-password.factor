@@ -1,5 +1,5 @@
 ! Copyright (c) 2008 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs furnace.actions furnace.auth
 furnace.auth.providers furnace.redirection furnace.utilities
 html.forms http.server.dispatchers http.server.responses

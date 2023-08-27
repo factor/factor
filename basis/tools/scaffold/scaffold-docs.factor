@@ -1,6 +1,6 @@
 ! Copyright (C) 2008 Doug Coleman.
-! See http://factorcode.org/license.txt for BSD license.
-USING: help.markup help.syntax kernel strings words vocabs sequences ;
+! See https://factorcode.org/license.txt for BSD license.
+USING: arrays help.markup help.syntax kernel strings words vocabs sequences ;
 IN: tools.scaffold
 
 HELP: developer-name
@@ -13,8 +13,8 @@ HELP: help.
 { $description "Prints out scaffold help markup for a given word." } ;
 
 HELP: scaffold-docs
-{ $values { "vocab" vocab } }
-{ $description "Takes an existing vocabulary and creates a help file with scaffolded help for each word. This word only works if no help file yet exists." } ;
+{ $values { "obj" object } }
+{ $description "Takes a word or vocabulary name and creates a help file with scaffolded help for each word. For vocabulary names, if a file exists this word will not do anything." } ;
 
 HELP: scaffold-undocumented
 { $values
@@ -93,7 +93,7 @@ HELP: scaffold-tests
 { $values
     { "vocab" "a vocabulary specifier" }
 }
-{ $description "Takes an existing vocabulary and creates an empty tests file help for each word. This word only works if no tests file yet exists." } ;
+{ $description "Takes an existing vocabulary and creates an empty tests file. This word only works if no tests file yet exists." } ;
 
 HELP: scaffold-vocab-in
 { $values
@@ -125,6 +125,50 @@ HELP: scaffold-rc
 HELP: using
 { $description "Stores the vocabularies that are pulled into the documentation file from looking up the stack effect types." } ;
 
+HELP: make-unit-test
+{ $values
+    { "answer" string } { "code" string }
+    { "str" string }
+}
+{ $description "Takes a code snippet and an answer string and returns a unit-test code snippet for use with " { $vocab-link "tools.test" } " vocabulary. The answer string should represent an array of values left on the stack by the code snippet." }
+{ $examples
+    { $example
+        "USING: io tools.scaffold ;"
+        "\"{ 2 2 3 }\" \"3 2 dup rot\" make-unit-test write"
+        "{ 2 2 3 } [\n    3 2 dup rot\n] unit-test"
+    }
+}
+{ $see-also read-unit-test } ;
+
+HELP: run-string
+{ $values
+    { "string" string }
+    { "datastack" array }
+}
+{ $description "Parses and executes the string on an empty datastack, returning the resulting datastack as an array." }
+{ $see-also read-unit-test } ;
+
+HELP: read-unit-test
+{ $values
+    { "str/f" { $maybe string } }
+}
+{ $description "Consumes a code snippet from input stream, runs it, and returns a unit-test code snippet for use with " { $vocab-link "tools.test" } " vocabulary. If no characters were read before the empty line returns " { $link f } " instead. On the interactive listener input is consumed until an empty line." }
+{ $see-also run-string make-unit-test scaffold-unit-tests } ;
+
+HELP: read-unit-tests
+{ $values
+    { "str" string }
+}
+{ $description "Reads code snippets by the means of " { $link read-unit-test } " until two empty lines are input. Returns them separated with two newlines." } ;
+
+HELP: scaffold-unit-tests
+{ $values
+    { "vocab" "a vocabulary specifier" }
+}
+{ $description "Takes an existing vocabulary and creates an empty test file if one isn't present yet. Reads code snippets separated by empty lines from input stream until a double empty line. After each snippet prints a unit test based on the snippet to output stream and appends it to the test file." { $nl }
+"This word enables quick creation of unit tests by recording outputs of code snippets and getting immediate feedback to fix any discrepancies as they occur." }
+{ $see-also read-unit-test } ;
+
 ARTICLE: "tools.scaffold" "Scaffold tool"
 "Scaffold setup:"
 { $subsections developer-name }
@@ -138,7 +182,7 @@ ARTICLE: "tools.scaffold" "Scaffold tool"
     scaffold-n-examples
     help.
 }
-"Types that are unrecognized by the scaffold generator will be of type " { $link null } ". The developer should change these to strings that describe the stack effect names instead." $nl
+"Types that are unrecognized by the scaffold generator will be of type " { $link object } ". The developer should change these to strings that describe the stack effect names instead." $nl
 "Scaffolding a configuration file:"
 { $subsections
     scaffold-rc
@@ -146,6 +190,12 @@ ARTICLE: "tools.scaffold" "Scaffold tool"
     scaffold-factor-rc
     scaffold-factor-roots
     scaffold-emacs
+}
+"Scaffolding a test file:"
+{ $subsections
+    scaffold-tests
+    scaffold-unit-tests
+    read-unit-test
 }
 ;
 

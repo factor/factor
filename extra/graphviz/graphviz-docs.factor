@@ -1,5 +1,5 @@
 ! Copyright (C) 2011 Alex Vondrak.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors arrays graphviz.attributes help.markup
 help.syntax kernel present sequences strings ;
 IN: graphviz
@@ -50,7 +50,7 @@ $nl
 { $snippet "id" } " must be an object supported by the " { $link present } " word. The string " { $snippet "\"cluster_\"" } " is automatically prefixed to the " { $slot "id" } " of the resulting " { $link subgraph } "."
 }
 { $notes
-"Clusters are just a syntactic convention. Not all Graphviz layout engines treat clusters any differently from regular subgraphs. See the Graphviz documentation (" { $url "http://graphviz.org/Documentation.php" } ") for more information."
+"Clusters are just a syntactic convention. Not all Graphviz layout engines treat clusters any differently from regular subgraphs. See the Graphviz documentation (" { $url "https://graphviz.org/Documentation.php" } ") for more information."
 }
 { $examples
   { $example
@@ -511,12 +511,12 @@ $nl
 "In addition, an " { $link edge } " may store local attributes in its " { $slot "attributes" } " slot (" { $instance edge-attributes } " tuple)."
 }
 { $notes
-"By convention, an " { $link edge } " orders its endpoints \"from\" " { $slot "tail" } " \"to\" " { $slot "head" } ", even if it belongs to an undirected " { $link graph } ", where such a distinction is generally meaningless. See the Graphviz documentation (" { $url "http://graphviz.org/Documentation.php" } "), and specifically the notes about ambiguous attributes (in " { $url "http://graphviz.org/content/attrs" } ") for more information."
+"By convention, an " { $link edge } " orders its endpoints \"from\" " { $slot "tail" } " \"to\" " { $slot "head" } ", even if it belongs to an undirected " { $link graph } ", where such a distinction is generally meaningless. See the Graphviz documentation (" { $url "https://graphviz.org/Documentation.php" } "), and specifically the notes about ambiguous attributes (in " { $url "https://graphviz.org/content/attrs" } ") for more information."
 } ;
 
 HELP: graph
 { $class-description
-"Represents the top-level (or " { $emphasis "root" } ") graph used in Graphviz. Its structure is modeled after the DOT language (see " { $url "http://graphviz.org/Documentation.php" } "):"
+"Represents the top-level (or " { $emphasis "root" } ") graph used in Graphviz. Its structure is modeled after the DOT language (see " { $url "https://graphviz.org/Documentation.php" } "):"
 $nl
 { $table
   {
@@ -564,7 +564,7 @@ HELP: node
 
 HELP: subgraph
 { $class-description
-"Represents a logical grouping of nodes and edges within a Graphviz graph. See " { $url "http://graphviz.org/Documentation.php" } " for more information."
+"Represents a logical grouping of nodes and edges within a Graphviz graph. See " { $url "https://graphviz.org/Documentation.php" } " for more information."
 $nl
 "Its structure is largely similar to " { $link graph } ", except " { $link subgraph } " only has two slots: " { $slot "id" } " (" { $instance string } ") and " { $slot "statements" } " (" { $instance sequence } "). The " { $snippet "strict?" } " and " { $snippet "directed?" } " slots of the parent " { $link graph } " are implicitly inherited by a " { $link subgraph } "."
 $nl
@@ -725,7 +725,7 @@ $nl
 ;
 
 ARTICLE: { "graphviz" "gallery" "cluster" } "Cluster example"
-"This example is adapted from " { $url "http://graphviz.org/content/cluster" } "."
+"This example is adapted from " { $url "https://graphviz.org/content/cluster" } "."
 $nl
 { $code
 "USING: graphviz graphviz.notation graphviz.render ;"
@@ -764,7 +764,7 @@ $nl
 ;
 
 ARTICLE: { "graphviz" "gallery" "circles" } "Colored circles example"
-"This example was adapted from the \"star\" example in PyGraphviz (" { $url "http://networkx.lanl.gov/pygraphviz/" } ") and modified slightly."
+"This example was adapted from the \"star\" example in PyGraphviz (" { $url "https://networkx.lanl.gov/pygraphviz/" } ") and modified slightly."
 $nl
 { $code
 "USING: formatting kernel math sequences"
@@ -797,7 +797,7 @@ $nl
 ;
 
 ARTICLE: { "graphviz" "gallery" "fsm" } "Finite state machine example"
-"This example is adapted from " { $url "http://graphviz.org/content/fsm" } "."
+"This example is adapted from " { $url "https://graphviz.org/content/fsm" } "."
 $nl
 { $code
 "USING: graphviz graphviz.notation graphviz.render ;"
@@ -828,9 +828,9 @@ $nl
 ;
 
 ARTICLE: { "graphviz" "gallery" "record" } "Record example"
-"This example is adapted (and slightly altered) from " { $url "http://graphviz.org/content/datastruct" } "."
+"This example is adapted (and slightly altered) from " { $url "https://graphviz.org/content/datastruct" } "."
 $nl
-"As it shows, special label syntax is still parsed, like escape sequences (see " { $url "http://graphviz.org/content/attrs#kescString" } ") or, in this case, record syntax (see " { $url "http://graphviz.org/content/node-shapes#record" } "). However, there is no equivalent to Graphviz's headport/tailport syntax, so we set the " { $link edge } " attributes explicitly."
+"As it shows, special label syntax is still parsed, like escape sequences (see " { $url "https://graphviz.org/content/attrs#kescString" } ") or, in this case, record syntax (see " { $url "https://graphviz.org/content/node-shapes#record" } "). However, there is no equivalent to Graphviz's headport/tailport syntax, so we set the " { $link edge } " attributes explicitly."
 $nl
 { $code
 "USING: graphviz graphviz.notation graphviz.render ;"
@@ -921,7 +921,7 @@ $nl
 ;
 
 ARTICLE: "graphviz" "Graphviz"
-"The " { $vocab-link "graphviz" } " vocabulary provides an interface to your existing Graphviz installation, thus allowing you to create, edit, and render Graphviz graphs using Factor. For more information about Graphviz, see " { $url "http://graphviz.org" } "."
+"The " { $vocab-link "graphviz" } " vocabulary provides an interface to your existing Graphviz installation, thus allowing you to create, edit, and render Graphviz graphs using Factor. For more information about Graphviz, see " { $url "https://graphviz.org" } "."
 $nl
 "This vocabulary provides the basic tools to construct Factor representations of graphs. For more details, see:"
 { $subsections { "graphviz" "data" } }

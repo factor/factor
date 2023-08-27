@@ -1,11 +1,11 @@
 ! Copyright (C) 2005, 2007 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: alien alien.c-types alien.syntax kernel system combinators
 alien.libraries classes.struct ;
 IN: freetype
 
 << "freetype" {
-    { [ os macosx? ] [ "/usr/X11R6/lib/libfreetype.6.dylib" cdecl add-library ] }
+    { [ os macosx? ] [ "libfreetype.6.dylib" cdecl add-library ] }
     { [ os windows? ] [ "freetype6.dll" cdecl add-library ] }
     [ drop ]
 } cond >>

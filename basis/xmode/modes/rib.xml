@@ -8,12 +8,14 @@ Initial keyword list taken from a syntax highlighting definition
 for TextPad text editor by Kharitonov Konstantin (aqua@sm.bmstu.ru)
 -->
 <MODE>
-    <PROPS>
-        <PROPERTY NAME="lineComment" VALUE="#" />
-        <PROPERTY NAME="indentNextLines" VALUE="Begin|WorldBegin|FrameBegin|TransformBegin|AttributeBegin|SolidBegin|ObjectBegin|MotionBegin" />
-        <PROPERTY NAME="doubleBracketIndent" VALUE="false" />
-    </PROPS>
-    <RULES ESCAPE="\" IGNORE_CASE="FALSE" HIGHLIGHT_DIGITS="TRUE" DIGIT_RE="([\p{Digit}]+(e[\p{Digit}]*)?)">
+	<PROPS>
+		<PROPERTY NAME="lineComment" VALUE="#"/>
+		<PROPERTY NAME="indentNextLines"
+			  VALUE="Begin|WorldBegin|FrameBegin|TransformBegin|AttributeBegin|SolidBegin|ObjectBegin|MotionBegin"/>
+		<PROPERTY NAME="doubleBracketIndent" VALUE="false"/>
+		<PROPERTY NAME="contextInsensitive" VALUE="true"/>
+	</PROPS>
+	<RULES IGNORE_CASE="FALSE" HIGHLIGHT_DIGITS="TRUE" DIGIT_RE="([\p{Digit}]+(e[\p{Digit}]*)?)">
 		<EOL_SPAN AT_WHITESPACE_END="TRUE" TYPE="COMMENT1">#</EOL_SPAN>
 		<EOL_SPAN TYPE="COMMENT2">#</EOL_SPAN>
 		<SEQ TYPE="OPERATOR">-</SEQ>
@@ -41,8 +43,8 @@ for TextPad text editor by Kharitonov Konstantin (aqua@sm.bmstu.ru)
 			<KEYWORD2>Begin</KEYWORD2>
 			<KEYWORD2>End</KEYWORD2>
 			<KEYWORD2>Declare</KEYWORD2>
-			<KEYWORD2>RtContextHandle </KEYWORD2>
-			<KEYWORD2>ContextHandle </KEYWORD2>
+			<KEYWORD2>RtContextHandle</KEYWORD2>
+			<KEYWORD2>ContextHandle</KEYWORD2>
 			<KEYWORD2>Context</KEYWORD2>
 			<KEYWORD2>FrameBegin</KEYWORD2>
 			<KEYWORD2>FrameEnd</KEYWORD2>
@@ -155,8 +157,8 @@ for TextPad text editor by Kharitonov Konstantin (aqua@sm.bmstu.ru)
 			<KEYWORD4>Deformation</KEYWORD4>
 			<KEYWORD4>MakeBump</KEYWORD4>
 		</KEYWORDS>
-    </RULES>
-    <RULES SET="LITERALS" ESCAPE="\" IGNORE_CASE="FALSE" DEFAULT="LITERAL1">
+	</RULES>
+	<RULES SET="LITERALS" ESCAPE="\" IGNORE_CASE="FALSE" DEFAULT="LITERAL1">
 		<KEYWORDS>
 			<KEYWORD1>float</KEYWORD1>
 			<KEYWORD1>string</KEYWORD1>
@@ -214,6 +216,6 @@ for TextPad text editor by Kharitonov Konstantin (aqua@sm.bmstu.ru)
 			<LITERAL2>hidden</LITERAL2>
 			<LITERAL2>null</LITERAL2>
 		</KEYWORDS>
-    </RULES>
+	</RULES>
 </MODE>
 

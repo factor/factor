@@ -64,7 +64,7 @@ $nl
 { $code
     "USING: alien.syntax specialized-arrays ;"
     "SPECIALIZED-ARRAY: int"
-    "FUNCTION: void process_data ( int* data, int len ) ;"
+    "FUNCTION: void process_data ( int* data, int len )"
     "int-array{ 10 20 30 } dup length process_data"
 }
 "Literal specialized arrays, as well as specialized arrays created with " { $snippet "<T-array>" } " and " { $snippet "T >c-array" } " are backed by a " { $link byte-array } " in the Factor heap, and can move as a result of garbage collection. If this is unsuitable, the array can be allocated in unmanaged memory instead."
@@ -73,8 +73,8 @@ $nl
 { $code
     "USING: alien.syntax specialized-arrays ;"
     "SPECIALIZED-ARRAY: float"
-    "FUNCTION: void init_with_data ( float* data, int len ) ;"
-    "FUNCTION: float compute_result ( ) ;"
+    "FUNCTION: void init_with_data ( float* data, int len )"
+    "FUNCTION: float compute_result ( )"
     "["
     "    100 malloc-float-array &free"
     "    dup length init_with_data"
@@ -89,7 +89,7 @@ $nl
     "    { id int }"
     "    { name char* } ;"
     ""
-    "FUNCTION: void get_device_info ( int* length ) ;"
+    "FUNCTION: void get_device_info ( int* length )"
     ""
     "0 int <ref> [ get_device_info ] keep <direct-int-array> ."
 }

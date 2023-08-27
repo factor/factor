@@ -34,7 +34,6 @@
 			<END>&lt;/jsp:expression&gt;</END>
 		</SPAN>
 
-
 		<!-- JSP scriptlet code block -->
 		<SPAN TYPE="KEYWORD1" DELEGATE="java::MAIN">
 			<BEGIN>&lt;%!</BEGIN>
@@ -46,7 +45,7 @@
 		</SPAN>
 
 		<!-- JSP scriptlet -->
-		<SPAN TYPE="KEYWORD1" DELEGATE="java::MAIN">
+		<SPAN TYPE="KEYWORD1" DELEGATE="JAVA">
 			<BEGIN>&lt;%</BEGIN>
 			<END>%&gt;</END>
 		</SPAN>
@@ -206,6 +205,8 @@
 		<SEQ TYPE="MARKUP">/</SEQ>
 		<MARK_FOLLOWING TYPE="FUNCTION" MATCH_TYPE="OPERATOR">:</MARK_FOLLOWING>
 		<SEQ TYPE="OPERATOR">:</SEQ>
+		
+		<IMPORT DELEGATE="html::TAGS"/>
 	</RULES>
 
 
@@ -253,5 +254,11 @@
 		<MARK_PREVIOUS TYPE="LABEL" MATCH_TYPE="OPERATOR">:</MARK_PREVIOUS>
 		<IMPORT DELEGATE="java::MAIN"/>
 	</RULES>
+	
+	<RULES SET="JAVA">
+		<SEQ_REGEXP TYPE="COMMENT2">[/][/](.*?)(?=[%][&gt;])</SEQ_REGEXP>
+		<IMPORT DELEGATE="java::MAIN"/>
+	</RULES>
+	
 </MODE>
 <!-- :noTabs=false: -->

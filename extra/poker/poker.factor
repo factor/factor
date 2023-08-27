@@ -1,6 +1,6 @@
 ! Copyright (c) 2009 Aaron Schaefer, Doug Coleman. All rights reserved.
 ! The contents of this file are licensed under the Simplified BSD License
-! A copy of the license is available at http://factorcode.org/license.txt
+! A copy of the license is available at https://factorcode.org/license.txt
 USING: arrays ascii assocs combinators kernel lexer math
 math.bitwise math.combinatorics math.order math.statistics
 poker.arrays random sequences sequences.extras sequences.product
@@ -9,8 +9,8 @@ IN: poker
 
 ! The algorithm used is based on Cactus Kev's Poker Hand Evaluator with
 ! the Senzee Perfect Hash Optimization:
-!     http://www.suffecool.net/poker/evaluator.html
-!     http://www.senzee5.com/2006/06/some-perfect-hash.html
+!     https://www.suffecool.net/poker/evaluator.html
+!     https://www.senzee5.com/2006/06/some-perfect-hash.html
 
 <PRIVATE
 

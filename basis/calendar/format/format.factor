@@ -1,5 +1,5 @@
 ! Copyright (C) 2008, 2010 Slava Pestov, Doug Coleman.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors calendar calendar.english combinators
 formatting grouping io io.streams.string kernel make math
 math.order math.parser math.parser.private ranges present
@@ -11,7 +11,7 @@ MACRO: formatted ( spec -- quot )
         {
             { [ dup word? ] [ 1quotation ] }
             { [ dup quotation? ] [ ] }
-            [ [ nip write ] curry [ ] like ]
+            [ [ nip write ] curry ]
         } cond
     ] map [ cleave ] curry ;
 
@@ -247,7 +247,7 @@ M: duration elapsed-time
     duration>seconds elapsed-time ;
 
 M: timestamp elapsed-time
-    now swap time- elapsed-time ;
+    ago elapsed-time ;
 
 ! XXX: Anything up to 2 hours is "about an hour"
 : relative-time-offset ( seconds -- string )
@@ -277,4 +277,4 @@ M: duration relative-time
     duration>seconds relative-time ;
 
 M: timestamp relative-time
-    now swap time- relative-time ;
+    ago relative-time ;

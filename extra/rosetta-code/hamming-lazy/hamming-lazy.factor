@@ -1,9 +1,9 @@
 ! Copyright (c) 2012 Anonymous
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: combinators kernel lists lists.lazy math ;
 IN: rosetta-code.hamming-lazy
 
-! http://rosettacode.org/wiki/Hamming_numbers#Factor
+! https://rosettacode.org/wiki/Hamming_numbers#Factor
 
 ! Hamming numbers are numbers of the form
 !    H = 2^i * 3^j * 5^k        where i, j, k >= 0

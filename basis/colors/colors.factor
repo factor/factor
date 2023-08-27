@@ -1,6 +1,6 @@
 ! Copyright (C) 2003, 2009 Slava Pestov.
 ! Copyright (C) 2008 Eduardo Cavazos.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors ascii arrays assocs combinators grouping
 io.encodings.utf8 io.files kernel lexer math math.functions
 math.parser sequences splitting vocabs.loader ;
@@ -42,12 +42,12 @@ CONSTANT: transparent T{ rgba f 0.0 0.0 0.0 0.0 }
 
 <PRIVATE
 
-: parse-color ( line -- name color )
+: parse-line ( line -- name color )
     first4 [ [ string>number 255 /f ] tri@ 1.0 <rgba> ] dip swap ;
 
 : parse-colors ( lines -- assoc )
     [ "!" head? ] reject [
-        [ blank? ] split-when harvest 3 cut "-" join suffix parse-color
+        [ blank? ] split-when harvest 3 cut "-" join suffix parse-line
     ] H{ } map>assoc ;
 
 MEMO: colors ( -- assoc )
@@ -71,14 +71,26 @@ ERROR: invalid-hex-color hex ;
         [ drop invalid-hex-color ]
     } case <rgba> ;
 
+: component>hex ( f -- s )
+    255 * round >integer >hex 2 CHAR: 0 pad-head ;
+
+: (color>hex) ( seq -- hex )
+    [ component>hex ] map concat "#" prepend ;
+
 PRIVATE>
 
+: color>hex ( color -- hex )
+    >rgba-components dup 1 number=
+    [ drop 3array ] [ 4array ] if (color>hex) ;
+
 : named-colors ( -- keys ) colors keys ;
+
+: ?named-color ( name -- color/f ) colors at ;
 
 ERROR: no-such-color name ;
 
 : named-color ( name -- color )
-    dup colors at [ ] [ no-such-color ] ?if ;
+    [ ?named-color ] [ no-such-color ] ?unless ;
 
 : parse-color ( str -- color )
     "#" ?head [ hex>rgba ] [ named-color ] if ;

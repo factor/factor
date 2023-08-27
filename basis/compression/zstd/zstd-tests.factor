@@ -1,5 +1,5 @@
 ! Copyright (C) 2021 Doug Coleman.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: tools.test compression.zstd ;
 IN: compression.zstd.tests
 
@@ -15,3 +15,4 @@ IN: compression.zstd.tests
 [
     B{ 1 2 3 4 } zstd-uncompress-size
 ] [ zstd-error? ] must-fail-with
+

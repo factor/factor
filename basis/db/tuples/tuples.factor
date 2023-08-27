@@ -1,6 +1,6 @@
 ! Copyright (C) 2008 Doug Coleman.
 ! Copyright (C) 2018 Alexander Ilin.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors assocs classes classes.tuple
 combinators.short-circuit continuations db db.errors db.types
 destructors kernel math.parser namespaces sequences sets words ;

@@ -1,5 +1,5 @@
 ! Copyright (C) 2007-2009 Samuel Tardieu.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: arrays combinators command-line io kernel math
 math.functions math.parser math.primes.pollard-rho-brent
 ranges math.statistics namespaces sequences
@@ -24,7 +24,7 @@ IN: math.primes.factors
     ] [
         group-factors dup empty? [
             [ first2 [0..b] [ ^ ] with map ] map
-            [ product ] product-map natural-sort
+            [ product ] product-map sort
         ] unless
     ] if ;
 

@@ -1,5 +1,5 @@
 ! Copyright (C) 2008 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: kernel arrays namespaces math accessors alien locals
 destructors system threads io.backend.unix.multiplexers
 io.backend.unix.multiplexers.kqueue core-foundation

@@ -1,5 +1,5 @@
 ! Copyright (C) 2009 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors calendar combinators.short-circuit
 constructors eval kernel math strings tools.test ;
 IN: constructors.tests
@@ -7,7 +7,7 @@ IN: constructors.tests
 TUPLE: stock-spread stock spread timestamp ;
 
 CONSTRUCTOR: <stock-spread> stock-spread ( stock spread -- stock-spread )
-   now >>timestamp ;
+    now >>timestamp ;
 
 SYMBOL: AAPL
 

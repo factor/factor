@@ -118,7 +118,6 @@
   <RULES SET="EXPRESSION"
       DEFAULT="KEYWORD2"
       HIGHLIGHT_DIGITS="TRUE"
-      ESCAPE="\"
       IGNORE_CASE="FALSE"
     >
     <SPAN TYPE="COMMENT1">
@@ -130,7 +129,7 @@
       <END>--&gt;</END>
     </SPAN>
 
-    <SPAN TYPE="LITERAL1">
+    <SPAN TYPE="LITERAL1" ESCAPE="\">
     <BEGIN>"</BEGIN>
     <END>"</END>
     </SPAN>
@@ -172,7 +171,7 @@
     </KEYWORDS>
   </RULES>
 
-  <RULES SET="TAGS" DEFAULT="MARKUP" ESCAPE="\">
+  <RULES SET="TAGS" DEFAULT="MARKUP">
     <SPAN TYPE="LITERAL1" DELEGATE="INQUOTE">
     <BEGIN>"</BEGIN>
     <END>"</END>
@@ -189,7 +188,7 @@
 
   <!-- a ruleset for when we are within a quoted string within an SGML tag
        It can contain FTL interpolations -->
-  <RULES SET="INQUOTE">
+  <RULES SET="INQUOTE" ESCAPE="\">
     <SPAN TYPE="KEYWORD1" DELEGATE="EXPRESSION">
     <BEGIN>${</BEGIN>
     <END>}</END>

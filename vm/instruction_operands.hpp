@@ -50,11 +50,11 @@ enum relocation_class {
   RC_RELATIVE_PPC_2_PC,
   // relative address in a PowerPC B/BL instruction
   RC_RELATIVE_PPC_3_PC,
-  // relative address in an ARM B/BL instruction
+  // relative address in an ARM32 B/BL instruction
   RC_RELATIVE_ARM_3,
-  // pointer to address in an ARM LDR/STR instruction
+  // pointer to address in an ARM32 LDR/STR instruction
   RC_INDIRECT_ARM,
-  // pointer to address in an ARM LDR/STR instruction offset by 8 bytes
+  // pointer to address in an ARM32 LDR/STR instruction offset by 8 bytes
   RC_INDIRECT_ARM_PC,
   // absolute address in a 2 byte location
   RC_ABSOLUTE_2,
@@ -62,6 +62,10 @@ enum relocation_class {
   RC_ABSOLUTE_1,
   // absolute address in a PowerPC LIS/ORI/SLDI/ORIS/ORI sequence
   RC_ABSOLUTE_PPC_2_2_2_2,
+  // relative address in an ARM64 B/BL instruction
+  RC_RELATIVE_ARM64_BRANCH,
+  // relative address in an ARM64 B.cond instruction
+  RC_RELATIVE_ARM64_BCOND,
 };
 
 static const cell rel_absolute_ppc_2_mask = 0x0000ffff;
@@ -69,6 +73,8 @@ static const cell rel_relative_ppc_2_mask = 0x0000fffc;
 static const cell rel_relative_ppc_3_mask = 0x03fffffc;
 static const cell rel_indirect_arm_mask = 0x00000fff;
 static const cell rel_relative_arm_3_mask = 0x00ffffff;
+static const cell rel_relative_arm64_branch_mask = 0x03ffffff;
+static const cell rel_relative_arm64_bcond_mask = 0x00ffffe0;
 
 // code relocation table consists of a table of entries for each fixup
 struct relocation_entry {
@@ -129,13 +135,13 @@ struct instruction_operand {
 
   fixnum load_value_2_2();
   fixnum load_value_2_2_2_2();
-  fixnum load_value_masked(cell mask, cell bits, cell shift);
+  fixnum load_value_masked(cell mask, cell preshift, cell bits, cell postshift);
   fixnum load_value(cell relative_to);
   code_block* load_code_block();
 
   void store_value_2_2(fixnum value);
   void store_value_2_2_2_2(fixnum value);
-  void store_value_masked(fixnum value, cell mask, cell shift);
+  void store_value_masked(fixnum value, cell mask, cell shift1, cell shift2);
   void store_value(fixnum value);
 };
 

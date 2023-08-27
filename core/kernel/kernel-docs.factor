@@ -39,14 +39,13 @@ HELP: over  $shuffle ;
 HELP: 2over $shuffle ;
 HELP: pick  $shuffle ;
 HELP: swap  $shuffle ;
-
-HELP: roll  $complex-shuffle ;
-HELP: -roll $complex-shuffle ;
-HELP: tuck  $complex-shuffle ;
-HELP: rot   $complex-shuffle ;
-HELP: -rot  $complex-shuffle ;
-HELP: dupd  $complex-shuffle ;
-HELP: swapd $complex-shuffle ;
+HELP: roll  $shuffle ;
+HELP: -roll $shuffle ;
+HELP: tuck  $shuffle ;
+HELP: rot   $shuffle ;
+HELP: -rot  $shuffle ;
+HELP: dupd  $shuffle ;
+HELP: swapd $shuffle ;
 
 HELP: callstack>array
 { $values { "callstack" callstack } { "array" array } }
@@ -199,6 +198,34 @@ HELP: or
     { $example "USING: kernel prettyprint ;" "t f or ." "t" }
     { $example "USING: kernel prettyprint ;" "\"hi\" 12.0 or ." "\"hi\"" }
 } ;
+
+HELP: or*
+{ $values
+    { "obj1" "a generalized boolean" }
+    { "obj2" "a generalized boolean" }
+    { "obj2/obj1" "a generalized boolean" }
+    { "second?" "boolean" }
+}
+{ $description "A version of " { $link or } " which prefers to return second argument instead of the first. The output " { $snippet "second?" } " tells you which object was returned." }
+{ $examples
+    "Prefers the second argument:"
+    { $example "USING: arrays kernel prettyprint ;"
+        "f 3 or* 2array ."
+        "{ 3 t }"
+    }
+    "Will also return the first:"
+    { $example "USING: arrays kernel prettyprint ;"
+        "3 f or* 2array ."
+        "{ 3 f }"
+    }
+    "Can return false:"
+    { $example "USING: arrays kernel prettyprint ;"
+        "f f or* 2array ."
+        "{ f f }"
+    }
+} ;
+
+{ or or* } related-words
 
 HELP: xor
 { $values { "obj1" "a generalized boolean" } { "obj2" "a generalized boolean" } { "?" "a generalized boolean" } }
@@ -716,14 +743,81 @@ HELP: unless*
 "The following two lines are equivalent:"
 { $code "X [ Y ] unless*" "X dup [ ] [ drop Y ] if" } } ;
 
+HELP: ?call
+{ $values
+    { "obj/f" { $maybe object } } { "quot" quotation }
+    { "obj'/f" { $maybe object } }
+}
+{ $description "Call the quotation if " { $snippet "obj" } " is not " { $snippet "f" } "." }
+{ $examples
+    "Example:"
+    { $example "USING: kernel math prettyprint ;"
+        "5 [ sq ] ?call ."
+        "25"
+    }
+    "Example:"
+    { $example "USING: kernel math prettyprint ;"
+        "f [ sq ] ?call ."
+        "f"
+    }
+} ;
+
 HELP: ?if
-{ $values { "default" object } { "cond" "a generalized boolean" } { "true" { $quotation ( ..a cond -- ..b ) } } { "false" { $quotation ( ..a default -- ..b ) } } }
-{ $description "If the condition is " { $link f } ", the " { $snippet "false" } " quotation is called with the " { $snippet "default" } " value on the stack. Otherwise, the " { $snippet "true" } " quotation is called with the condition on the stack." }
-{ $notes
-"The following two lines are equivalent:"
-{ $code "[ X ] [ Y ] ?if" "dup [ nip X ] [ drop Y ] if" }
-"The following two lines are equivalent:"
-{ $code "[ ] [ ] ?if" "swap or" } } ;
+{ $values
+    { "default" object } { "cond" object } { "true" object } { "false" object }
+}
+{ $warning "The old " { $snippet "?if" } " word can be refactored:" { $code "[ .. ] [ .. ] ?if\n\nor* [ .. ] [ .. ] if" } }
+{ $description "Calls " { $snippet "cond" } " on the " { $snippet "default" } " object and if " { $snippet "cond" } " outputs a new object then the " { $snippet "true" } " quotation is called with that new object. Otherwise, calls " { $snippet "false" } " with the old object." }
+{ $examples
+    "Look up an existing word or make an error pair:"
+    { $example "USING: arrays definitions kernel math prettyprint sequences vocabs.parser ;"
+        "\"+\" [ search ] [ where first ] [ \"not found\" 2array ] ?if ."
+        "\"resource:core/math/math.factor\""
+    }
+    "Try to look up a word that doesn't exist:"
+    { $example "USING: arrays definitions kernel math prettyprint sequences vocabs.parser ;"
+        "\"+++++\" [ search ] [ where first ] [ \"not found\" 2array ] ?if ."
+        "{ \"+++++\" \"not found\" }"
+    }
+} ;
+
+HELP: ?when
+{ $values
+    { "default" object } { "cond" object } { "true" object }
+}
+{ $description "Calls " { $snippet "cond" } " on the " { $snippet "default" } " object and if " { $snippet "cond" } " outputs a new object then the " { $snippet "true" } " quotation is called with that new object. Otherwise, leaves the old object on the stack." }
+{ $examples
+    "Look up an existing word or make an error pair:"
+    { $example "USING: arrays definitions kernel math prettyprint sequences vocabs.parser ;"
+        "\"+\" [ search ] [ where first ] ?when ."
+        "\"resource:core/math/math.factor\""
+    }
+    "Try to look up a word that doesn't exist:"
+    { $example "USING: arrays definitions kernel math prettyprint sequences vocabs.parser ;"
+        "\"+++++\" [ search ] [ where first ] ?when ."
+        "\"+++++\""
+    }
+} ;
+
+HELP: ?unless
+{ $values
+    { "default" object } { "cond" object } { "false" object }
+}
+{ $description "Calls " { $snippet "cond" } " on the " { $snippet "default" } " object and if " { $snippet "cond" } " outputs a new object. Otherwise, calls " { $snippet "false" } " with the old object." }
+{ $examples
+    "Look up an existing word or make an error pair:"
+    { $example "USING: arrays definitions kernel math prettyprint sequences vocabs.parser ;"
+        "\"+\" [ search ] [ \"not found\" 2array ] ?unless ."
+        "+"
+    }
+    "Try to look up a word that doesn't exist:"
+    { $example "USING: arrays definitions kernel math prettyprint sequences vocabs.parser ;"
+        "\"+++++\" [ search ] [ \"not found\" 2array ] ?unless ."
+        "{ \"+++++\" \"not found\" }"
+    }
+} ;
+
+{ ?if ?when ?unless } related-words
 
 HELP: die
 { $description "Starts the front-end processor (FEP), which is a low-level debugger which can inspect memory addresses and the like. The FEP is also entered when a critical error occurs." }
@@ -812,10 +906,12 @@ HELP: 3curry
 
 HELP: with
 { $values { "param" object } { "obj" object } { "quot" { $quotation ( param elt -- ... ) } } { "curried" curried } }
-{ $description "Partial application on the left. The following two lines are equivalent:"
+{ $description "Similar to how " { $link curry } " binds the element below its quotation as its first argument, "
+{ $link with } " binds the second element below " { $snippet "quot" } " as the second argument of " { $snippet "quot" } "."
+$nl
+"In other words, partial application on the left. The following two lines are equivalent:"
     { $code "swap [ swap A ] curry B" }
     { $code "[ A ] with B" }
-
 }
 { $notes "This operation is efficient and does not copy the quotation." }
 { $examples
@@ -903,8 +999,8 @@ HELP: do
 
 HELP: loop
 { $values
-     { "pred" quotation } }
-     { $description "Calls the quotation repeatedly until it outputs " { $link f } "." }
+    { "pred" quotation } }
+    { $description "Calls the quotation repeatedly until it outputs " { $link f } "." }
 { $examples "Loop until we hit a zero:"
     { $unchecked-example "USING: kernel random math io ; "
     " [ \"hi\" write bl 10 random zero? not ] loop"
@@ -942,20 +1038,6 @@ HELP: assert=
 HELP: become
 { $values { "old" array } { "new" array } }
 { $description "Replaces all references to objects in " { $snippet "old" } " with the corresponding object in " { $snippet "new" } ". This word is used to implement tuple reshaping. See " { $link "tuple-redefinition" } "." } ;
-
-ARTICLE: "shuffle-words-complex" "Complex shuffle words"
-"These shuffle words tend to make code difficult to read and to reason about. Code that uses them should almost always be rewritten using " { $link "locals" } " or " { $link "dataflow-combinators" } "."
-$nl
-"Duplicating stack elements deep in the stack:"
-{ $subsections
-    dupd
-}
-"Permuting stack elements deep in the stack:"
-{ $subsections
-    swapd
-    rot
-    -rot
-} ;
 
 ARTICLE: "callables" "Callables"
 "Aside from " { $link "quotations" } ", there are two other callables that efficiently combine computations."
@@ -995,9 +1077,15 @@ $nl
 { $subsections
     swap
 }
-"There are additional, more complex stack shuffling words whose use is not recommended."
+"Duplicating stack elements deep in the stack:"
 { $subsections
-    "shuffle-words-complex"
+    dupd
+}
+"Permuting stack elements deep in the stack:"
+{ $subsections
+    swapd
+    rot
+    -rot
 } ;
 
 ARTICLE: "equality" "Equality"

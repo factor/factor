@@ -1,7 +1,7 @@
 ! Copyright (C) 2005, 2010, 2018, 2020 Slava Pestov, Joe Groff, and Cat Stevens.
 USING: arrays assocs help.markup help.markup.private help.syntax
 kernel math math.functions math.order math.vectors sequences
-sequences.generalizations ;
+sequences.generalizations urls ;
 IN: math.matrices
 
 <PRIVATE
@@ -633,7 +633,7 @@ HELP: matrix-set-nths
     "Throws an error if the sequence cannot hold elements of the given type."
 } }
 { $examples
-    "Change both entries on row 0."
+    "Change both entries on row 1."
     { $example
         "USING: math.matrices kernel prettyprint ;"
         "{ { 0 1 } { 2 3 } } \"a\" { { 1 0 } { 1 1 } } pick matrix-set-nths ."
@@ -1038,11 +1038,11 @@ HELP: matrix-p-norm-entrywise
 { $description "Find the entry-wise norm of a matrix, in 𝑙ₚ (" { $snippet "L^p" } ") vector space."  }
 { $notes "This word is not an induced or Schatten norm, and it is distinct from all of " { $links matrix-l1-norm matrix-l2-norm matrix-l-infinity-norm } "." }
 { $examples
-   { $example
+    { $example
        "USING: math.matrices prettyprint ;"
        "4 4 1 <matrix> 2 matrix-p-norm-entrywise ."
        "4.0"
-   }
+    }
 } ;
 
 HELP: matrix-p-norm
@@ -1056,17 +1056,17 @@ HELP: matrix-p-norm
 }
 { $examples
    "Calls " { $link l1-norm } ":"
-   { $example
+    { $example
        "USING: math.matrices prettyprint ;"
        "4 4 1 <matrix> 1 matrix-p-norm ."
        "4"
-   }
+    }
    "Falls back to " { $link matrix-p-norm-entrywise } ":"
-   { $example
+    { $example
        "USING: math.functions math.matrices prettyprint ;"
        "2 2 3 <matrix> 1.5 matrix-p-norm 7.559 10e-4 ~ ."
        "t"
-   }
+    }
 } ;
 
 { matrix-p-norm matrix-p-norm-entrywise } related-words
@@ -1076,15 +1076,15 @@ HELP: matrix-normalize
 { $values { "m" "a matrix with at least 1 non-zero number" } { "m'" matrix } }
 { $description "Normalize a matrix containing at least 1 non-zero element. Each element from the input matrix is computed as a fraction of the maximum element. The maximum element becomes " { $snippet "1/1" } "." }
 { $notelist
-   $2d-only-note
-   { $matrix-scalar-note max abs / }
+    $2d-only-note
+    { $matrix-scalar-note max abs / }
 }
 { $examples
-   { $example
+    { $example
        "USING: math.matrices prettyprint ;"
        "{ { 5 9 } { 15 17 } } matrix-normalize ."
        "{ { 5/17 9/17 } { 15/17 1 } }"
-   }
+    }
 } ;
 
 HELP: main-diagonal

@@ -1,10 +1,10 @@
 ! Copyright (C) 2008, 2010 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs byte-arrays byte-vectors classes
 combinators definitions fry generic generic.single
 generic.standard hashtables kernel kernel.private math
-math.parser parser sbufs sequences sequences.private splitting
-strings vectors words ;
+math.parser parser sbufs sequences splitting strings vectors
+words ;
 IN: hints
 
 GENERIC: specializer-predicate ( spec -- quot )
@@ -28,7 +28,7 @@ M: object specializer-declaration class-of ;
     [ drop object eq? ] assoc-reject
     [ [ t ] ] [
         [ swap specializer-predicate append ] { } assoc>map
-        [ ] [ swap [ f ] \ if 3array append [ ] like ] map-reduce
+        [ ] [ swap [ f ] \ if 3array [ ] append-as ] map-reduce
     ] if-empty ;
 
 : specializer-cases ( quot specializer -- alist )

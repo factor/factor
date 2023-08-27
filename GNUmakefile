@@ -1,16 +1,23 @@
 ifdef CONFIG
-	VERSION = 0.99
+	VERSION = 0.100
 	GIT_LABEL = $(shell echo `git describe --all`-`git rev-parse HEAD`)
 	BUNDLE = Factor.app
 	DEBUG ?= 0
 	REPRODUCIBLE ?= 0
 
+	SHELL_CC = $(shell printenv CC)
+	ifeq ($(SHELL_CC),)
+		CC := $(shell which clang cc 2>/dev/null | head -n 1)
+	else
+		CC = $(SHELL_CC)
+	endif
+
 	# gmake's default CXX is g++, we prefer c++
 	SHELL_CXX = $(shell printenv CXX)
 	ifeq ($(SHELL_CXX),)
-		CXX=c++
+		CXX := $(shell which clang++ c++ 2>/dev/null | head -n 1)
 	else
-		CXX=$(SHELL_CXX)
+		CXX = $(SHELL_CXX)
 	endif
 
 	XCODE_PATH ?= /Applications/Xcode.app
@@ -288,5 +295,5 @@ clean:
 	rm -f libfactor-ffi-test.*
 	rm -f Factor.app/Contents/Frameworks/libfactor.dylib
 
-.PHONY: factor factor-lib factor-console factor-ffi-test tags clean macosx.app
+.PHONY: factor factor-lib factor-console factor-ffi-test tags clean help macosx.app
 .PHONY: linux-x86-32 linux-x86-64 linux-ppc-32 linux-ppc-64 linux-arm-64 freebsd-x86-32 freebsd-x86-64 macosx-x86-32 macosx-x86-64 macosx-x86-fat macosx-arm64 windows-x86-32 windows-x86-64

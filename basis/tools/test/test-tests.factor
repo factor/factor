@@ -16,5 +16,5 @@ sequences tools.test tools.test.private ;
 ! Just verifies that the presented output contains a callstack.
 { t } [
     create-test-failure [ error. ] with-string-writer
-    "OBJ-CURRENT-THREAD" swap subseq?
+    "OBJ-CURRENT-THREAD" subseq-of?
 ] unit-test

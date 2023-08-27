@@ -1,5 +1,5 @@
 ! Copyright (C) 2022 John Benediktsson
-! See http://factorcode.org/license.txt for BSD license
+! See https://factorcode.org/license.txt for BSD license
 
 USING: accessors assocs checksums checksums.crc32 combinators
 endian formatting io.encodings.binary io.files io.files.info
@@ -71,7 +71,7 @@ PRIVATE>
     >string " " split [ "=" split1 ] H{ } map>assoc ;
 
 : find-metadata ( lines type -- metadata i )
-   [ '[ _ head? ] find ] keep ?head drop parse-metadata swap ;
+    [ '[ _ head? ] find ] keep ?head drop parse-metadata swap ;
 
 PRIVATE>
 

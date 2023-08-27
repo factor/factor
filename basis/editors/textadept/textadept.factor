@@ -15,7 +15,6 @@ namespaces sequences system vocabs ;
 IN: editors.textadept
 
 SINGLETON: textadept
-textadept editor-class set-global
 
 HOOK: find-textadept-path os ( -- path )
 

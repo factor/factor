@@ -1,6 +1,6 @@
 ! Copyright (C) 2007, 2011 Slava Pestov, Doug Coleman,
 ! Daniel Ehrenberg.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors alien.c-types alien.data alien.strings arrays
 byte-arrays classes classes.struct combinators
 combinators.short-circuit continuations destructors endian fry
@@ -214,7 +214,7 @@ M: inet6 parse-sockaddr
     [ call-next-method ] [ drop port>> ntohs ] 2bi with-port ;
 
 M: inet6 present
-    [ call-next-method ] [ port>> number>string ] bi ":" glue ;
+    [ call-next-method "[" "]" surround ] [ port>> number>string ] bi ":" glue ;
 
 M: inet6 protocol drop 0 ;
 

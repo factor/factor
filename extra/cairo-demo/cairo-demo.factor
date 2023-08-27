@@ -1,9 +1,9 @@
 ! Cairo "Hello World" demo
 !  Copyright (c) 2007 Sampo Vuori
-!    License: http://factorcode.org/license.txt
+!    License: https://factorcode.org/license.txt
 !
 ! This example is an adaptation of the following cairo sample code:
-!  http://cairographics.org/samples/text/
+!  https://cairographics.org/samples/text/
 
 
 USING: accessors byte-arrays cairo.ffi combinators kernel math

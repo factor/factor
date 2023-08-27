@@ -1,5 +1,5 @@
 ! Copyright (C) 2006, 2009 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors assocs kernel math math.vectors opengl
 sequences ui.gadgets ui.gadgets.grids.private ui.pens ;
 IN: ui.gadgets.grid-lines

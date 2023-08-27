@@ -1,5 +1,5 @@
 ! Copyright (C) 2009 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: alien assocs byte-arrays core-foundation
 core-foundation.arrays core-foundation.data
 core-foundation.dictionaries core-foundation.numbers

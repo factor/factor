@@ -23,7 +23,7 @@ webapps.mason.utils webapps.mason.version.data xml.writer xmode.highlight ;
 
 <body>
 <center>
-<img src="logo.png" width="583" height="150" alt="Factor programming language" />
+<img id="logo" src="logo.png" width="583" height="150" alt="Factor programming language" />
 
 <div class="page">
 
@@ -42,7 +42,7 @@ webapps.mason.utils webapps.mason.version.data xml.writer xmode.highlight ;
 <li><a href="https://concatenative.org/wiki/view/Concatenative%20language">Learn more about concatenative programming</a></li>
 <li><a href="https://concatenative.org/wiki/view/Factor/Examples">See some example programs</a></li>
 <li><a href="https://github.com/factor/factor/issues">Report a bug</a></li>
-<li>Screenshots on <a href="https://factorcode.org/factor-macosx.png">Mac OS X</a>, <a href="https://factorcode.org/factor-windows7.png">Windows</a></li>
+<li>Screenshots on <a href="https://factorcode.org/factor-macosx.png">Mac OS</a>, <a href="https://factorcode.org/factor-windows7.png">Windows</a></li>
 </ul>
 
 </div>
@@ -81,7 +81,7 @@ xml>string write-html
 
 <% ] with-mason-db %>
 
-<p><b>Source code</b>: available via <a href="https://github.com/factor/factor/">github</a> or <a href="https://gitweb.factorcode.org/">gitweb</a>.</p>
+<p><b>Source code</b>: available via <a href="https://github.com/factor/factor/">github</a> or <a href="https://gitweb.factorcode.org/">gitweb</a> or <a href="https://cgit.factorcode.org/">cgit</a>.</p>
 
 <p>Stable and development releases are built and uploaded by the <a href="https://concatenative.org/wiki/view/Factor/Build%20farm">build farm</a>. Follow <a href="https://twitter.com/FactorBuilds">@FactorBuilds</a> on Twitter to receive notifications. If you're curious, take a look at the <a href="https://builds.factorcode.org/dashboard">build farm dashboard</a>. You can also <a href="https://concatenative.org/wiki/view/Factor/Building%20Factor">build Factor</a> on your own platform from source.</p>
 

@@ -1,5 +1,5 @@
 ! Copyright (C) 2006, 2010 Slava Pestov
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: kernel make math math.functions math.parser ranges regexp
 sequences sets unicode xmode.catalog ;
 IN: validators
@@ -33,7 +33,7 @@ IN: validators
     ] if ;
 
 : v-number ( str -- n )
-    dup string>number [ ] [ "must be a number" throw ] ?if ;
+    [ string>number ] [ "must be a number" throw ] ?unless ;
 
 : v-integer ( str -- n )
     v-number dup integer? [ "must be an integer" throw ] unless ;
@@ -57,7 +57,7 @@ IN: validators
     [ 2drop ] [ drop "invalid " prepend throw ] if ;
 
 : v-email ( str -- str )
-    ! From http://www.regular-expressions.info/email.html
+    ! From https://www.regular-expressions.info/email.html
     320 v-max-length
     "e-mail"
     R/ [A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}/i

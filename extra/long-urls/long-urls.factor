@@ -1,5 +1,5 @@
 ! Copyright (C) 2015 John Benediktsson
-! See http://factorcode.org/license.txt for BSD license
+! See https://factorcode.org/license.txt for BSD license
 
 USING: accessors http http.client http.client.private kernel
 math namespaces ;

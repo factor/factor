@@ -1,5 +1,5 @@
 ! Copyright (C) 2003, 2011 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors assocs classes combinators combinators.private
 kernel kernel.private make namespaces sequences vectors ;
 IN: continuations
@@ -59,7 +59,7 @@ C: <continuation> continuation
 PRIVATE>
 
 : ifcc ( capture restore -- )
-    [ dummy-1 current-continuation ] 2dip [ dummy-2 ] prepose ?if ; inline
+    [ dummy-1 current-continuation or* ] 2dip [ dummy-2 ] prepose if ; inline
 
 : callcc0 ( quot -- ) [ drop ] ifcc ; inline
 
@@ -149,13 +149,13 @@ callback-error-hook [ [ die rethrow ] ] initialize
         ] curry
     ] dip ifcc ; inline
 
-: ignore-errors ( quot -- )
+: ignore-errors ( ... quot: ( ... -- ... ) -- ... )
     [ drop ] recover ; inline
 
-: ignore-error ( quot check: ( error -- ? ) -- )
+: ignore-error ( ... quot: ( ... -- ... ) check: ( error -- ? ) -- ... )
     '[ dup @ [ drop ] [ rethrow ] if ] recover ; inline
 
-: ignore-error/f ( quot check: ( error -- ? ) -- )
+: ignore-error/f ( ... quot: ( ... -- ... x ) check: ( error -- ? ) -- ... x/f )
     '[ dup @ [ drop f ] [ rethrow ] if ] recover ; inline
 
 : cleanup ( try cleanup-always cleanup-error -- )

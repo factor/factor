@@ -1,5 +1,5 @@
 ! Copyright (C) 2006, 2009 Daniel Ehrenberg.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors alien.accessors byte-arrays io io.encodings
 kernel math math.private sequences sequences.private strings
 strings.private ;

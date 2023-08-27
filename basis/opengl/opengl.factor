@@ -1,9 +1,9 @@
 ! Copyright (C) 2005, 2009 Slava Pestov.
 ! Portions copyright (C) 2007 Eduardo Cavazos.
 ! Portions copyright (C) 2008 Joe Groff.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: alien alien.c-types alien.data assocs colors
-combinators.smart continuations init io kernel math
+combinators.smart continuations io kernel math
 math.functions math.parser namespaces opengl.gl sequences
 sequences.generalizations specialized-arrays system words ;
 FROM: alien.c-types => float ;

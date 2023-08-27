@@ -1,12 +1,13 @@
 ! Copyright (C) 2009 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors assocs checksums checksums.crc32
 combinators.short-circuit io.encodings.utf8 io.files kernel
 namespaces sequences sets source-files vocabs vocabs.loader ;
 IN: vocabs.refresh
 
 : source-modified? ( path -- ? )
-    dup source-files get at [
+    [ source-files get at ]
+    [
         dup path>>
         dup file-exists? [
             utf8 file-lines crc32 checksum-lines

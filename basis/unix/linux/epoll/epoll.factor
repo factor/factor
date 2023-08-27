@@ -1,5 +1,5 @@
 ! Copyright (C) 2008, 2011 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 IN: unix.linux.epoll
 USING: alien.c-types alien.syntax classes.struct math
 unix.types ;

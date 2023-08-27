@@ -1,5 +1,5 @@
 ! Copyright (C) 2011 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: alien.private compiler.utilities kernel namespaces
 stack-checker.alien threads threads.private ;
 IN: compiler.threads

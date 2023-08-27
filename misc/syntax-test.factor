@@ -154,9 +154,13 @@ PRIVATE>
     LIBRARY: name
     TYPEDEF: old new
     ENUM: type words... ;
-    ENUM: type < base-type words...
+    ENUM: type < base-type words... ;
     FUNCTION: return name ( parameters ) ;
     FUNCTION-ALIAS: factor-name return name ( parameters ) ;
+
+{ ALIEN: 1234 } [ ALIEN: 1234 [ { alien } declare void* <ref> ] compile-call void* deref ] unit-test
+{ ALIEN: 1234 } [ ALIEN: 1234 [ { c-ptr } declare void* <ref> ] compile-call void* deref ] unit-test
+{ f } [ f [ { POSTPONE: f } declare void* <ref> ] compile-call void* deref ] unit-test
 
 ! Symbols and literals
 
@@ -195,6 +199,7 @@ PRIVATE>
     5 f <array>
     (clone)
 
+    [| a b | ]
     [let [let { } ] ]
 
 ! Strings
@@ -208,6 +213,7 @@ PRIVATE>
     "\"hello\""
     "\a\b\e\f\n\r\t\s\v\s\0\\\""
     "\x01\xaF\uffffff"
+    "\0123\148"
 
     URL" http://google.com"
     R" asdf"

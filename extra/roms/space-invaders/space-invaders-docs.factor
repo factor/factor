@@ -1,5 +1,5 @@
 ! Copyright (C) 2007 Chris Double.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: help.syntax help.markup cpu.8080.emulator ;
 IN: roms.space-invaders
 
@@ -13,7 +13,7 @@ HELP: run-invaders
 
 ARTICLE: "space-invaders" "Space Invaders Emulator"
 "Provides an emulation of the original 8080 Arcade Game 'Space Invaders'." $nl
-"More information on the arcade game can be obtained from " { $url "http://www.emuparadise.me/M.A.M.E._-_Multiple_Arcade_Machine_Emulator_ROMs/Space_Invaders_--_Space_Invaders_M/13774" } "." $nl
+"More information on the arcade game can be obtained from " { $url "https://www.emuparadise.me/M.A.M.E._-_Multiple_Arcade_Machine_Emulator_ROMs/Space_Invaders_--_Space_Invaders_M/13774" } "." $nl
 "To play the game you need the ROM files for the arcade game. They should "
 "be placed in a directory called 'invaders' in the location specified by "
 "the variable " { $link rom-root } ". The specific files needed are:"

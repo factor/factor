@@ -1,5 +1,5 @@
 ! Copyright (C) 2008, 2010 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors arrays classes.algebra combinators
 compiler.cfg.instructions compiler.cfg.instructions.syntax
 compiler.cfg.value-numbering.graph generic.parser kernel make

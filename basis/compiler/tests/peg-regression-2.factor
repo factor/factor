@@ -12,4 +12,4 @@ Regexp = Times:t => [[ t <times> ]]
 
 ]=]
 
-[ "foo" ] [ "a" parse-regexp ] unit-test
+{ "foo" } [ "a" parse-regexp ] unit-test

@@ -1,0 +1,367 @@
+<?xml version="1.0"?>
+<!DOCTYPE MODE SYSTEM "xmode.dtd"><!-- mode for tag library description (maven) files -->
+<MODE>
+    <PROPS>
+        <PROPERTY NAME="commentStart" VALUE="&lt;!--" />
+        <PROPERTY NAME="commentEnd" VALUE="--&gt;" />
+    </PROPS>
+	<!-- {{{ MAIN -->
+    <RULES>
+		<!-- SGML comment -->
+        <SPAN TYPE="COMMENT1">
+            <BEGIN>&lt;!--</BEGIN>
+            <END>--&gt;</END>
+        </SPAN>
+
+		<!-- variables -->
+        <SPAN TYPE="KEYWORD4">
+            <BEGIN>${</BEGIN>
+            <END>}</END>
+        </SPAN>
+	
+		<!-- DTD Entity declarations -->
+        <SPAN TYPE="KEYWORD2" DELEGATE="ENTITY-TAGS">
+            <BEGIN>&lt;!ENTITY</BEGIN>
+            <END>&gt;</END>
+        </SPAN>
+
+		<!-- CDATA sections -->
+        <SPAN TYPE="KEYWORD2" DELEGATE="CDATA">
+            <BEGIN>&lt;![CDATA[</BEGIN>
+            <END>]]&gt;</END>
+        </SPAN>
+
+		<!-- DTD instructions -->
+        <SPAN TYPE="KEYWORD2" DELEGATE="DTD-TAGS">
+            <BEGIN>&lt;!</BEGIN>
+            <END>&gt;</END>
+        </SPAN>
+
+		<!-- PI directives -->
+        <SPAN TYPE="KEYWORD3">
+            <BEGIN>&lt;?</BEGIN>
+            <END>&gt;</END>
+        </SPAN>
+
+		<!-- markup tags -->
+        <SPAN TYPE="MARKUP" DELEGATE="TAGS">
+            <BEGIN>&lt;</BEGIN>
+            <END>&gt;</END>
+        </SPAN>
+
+		<!-- SGML entities -->
+        <SPAN TYPE="LITERAL2" NO_WORD_BREAK="TRUE">
+            <BEGIN>&amp;</BEGIN>
+            <END>;</END>
+        </SPAN>
+
+        <KEYWORDS>
+            <KEYWORD4>true</KEYWORD4>
+            <KEYWORD4>false</KEYWORD4>
+            <KEYWORD4>default</KEYWORD4>
+        </KEYWORDS>
+
+    </RULES>
+	<!-- }}} -->
+	
+	<!-- {{{ TAGS -->
+    <RULES SET="TAGS" DEFAULT="MARKUP" NO_WORD_SEP="-_">
+		<!-- SGML comment -->
+        <SPAN TYPE="COMMENT1">
+            <BEGIN>&lt;!--</BEGIN>
+            <END>--&gt;</END>
+        </SPAN>
+
+        <SPAN TYPE="LITERAL1" DELEGATE="STRING">
+            <BEGIN>"</BEGIN>
+            <END>"</END>
+        </SPAN>
+     
+        <SPAN TYPE="LITERAL1" DELEGATE="STRING">
+            <BEGIN>'</BEGIN>
+            <END>'</END>
+        </SPAN>
+
+		<!-- variables -->
+        <SPAN TYPE="KEYWORD4">
+            <BEGIN>${</BEGIN>
+            <END>}</END>
+        </SPAN>
+    
+        <SEQ TYPE="MARKUP" DELEGATE="maven::MAIN">/></SEQ>
+        <MARK_PREVIOUS TYPE="LABEL">:</MARK_PREVIOUS>
+        <SEQ TYPE="OPERATOR">:</SEQ>
+        <KEYWORDS>
+            <KEYWORD1>project</KEYWORD1>
+
+            <KEYWORD2>basedir</KEYWORD2>
+            <KEYWORD2>project.baseUri</KEYWORD2>
+            <KEYWORD2>maven.build.timestamp</KEYWORD2>
+            <KEYWORD2>maven.build.timestamp.format</KEYWORD2>
+        
+        
+            <KEYWORD2>activation</KEYWORD2>
+            <KEYWORD2>activeByDefault</KEYWORD2>
+            <KEYWORD2>address</KEYWORD2>
+            <KEYWORD2>arch</KEYWORD2>
+            <KEYWORD2>archive</KEYWORD2>
+            <KEYWORD2>artifactId</KEYWORD2>
+            <KEYWORD2>build</KEYWORD2>
+            <KEYWORD2>checksumPolicy</KEYWORD2>
+            <KEYWORD2>ciManagement</KEYWORD2>
+            <KEYWORD2>classifier</KEYWORD2>
+            <KEYWORD2>comments</KEYWORD2>
+            <KEYWORD2>configuration</KEYWORD2>
+            <KEYWORD2>connection</KEYWORD2>
+            <KEYWORD2>contributors</KEYWORD2>
+            <KEYWORD2>defaultGoal</KEYWORD2>
+            <KEYWORD2>dependencies</KEYWORD2>
+            <KEYWORD2>dependencyManagement</KEYWORD2>
+            <KEYWORD2>description</KEYWORD2>
+            <KEYWORD2>developerConnection</KEYWORD2>
+            <KEYWORD2>developers</KEYWORD2>
+            <KEYWORD2>directory</KEYWORD2>
+            <KEYWORD2>distribution</KEYWORD2>
+            <KEYWORD2>distributionManagement</KEYWORD2>
+            <KEYWORD2>downloadUrl</KEYWORD2>
+            <KEYWORD2>email</KEYWORD2>
+            <KEYWORD2>enabled</KEYWORD2>
+            <KEYWORD2>excludeDefaults</KEYWORD2>
+            <KEYWORD2>excludes</KEYWORD2>
+            <KEYWORD2>exclusions</KEYWORD2>
+            <KEYWORD2>executions</KEYWORD2>
+            <KEYWORD2>exists</KEYWORD2>
+            <KEYWORD2>extensions</KEYWORD2>
+            <KEYWORD2>family</KEYWORD2>
+            <KEYWORD2>file</KEYWORD2>
+            <KEYWORD2>filtering</KEYWORD2>
+            <KEYWORD2>filters</KEYWORD2>
+            <KEYWORD2>finalName</KEYWORD2>
+            <KEYWORD2>goals</KEYWORD2>
+            <KEYWORD2>groupId</KEYWORD2>
+            <KEYWORD2>id</KEYWORD2>
+            <KEYWORD2>inceptionYear</KEYWORD2>
+            <KEYWORD2>includes</KEYWORD2>
+            <KEYWORD2>inherited</KEYWORD2>
+            <KEYWORD2>issueManagement</KEYWORD2>
+            <KEYWORD2>jdk</KEYWORD2>
+            <KEYWORD2>layout</KEYWORD2>
+            <KEYWORD2>licenses</KEYWORD2>
+            <KEYWORD2>mailingLists</KEYWORD2>
+            <KEYWORD2>maven</KEYWORD2>
+            <KEYWORD2>message</KEYWORD2>
+            <KEYWORD2>missing</KEYWORD2>
+            <KEYWORD2>modelVersion</KEYWORD2>
+            <KEYWORD2>modules</KEYWORD2>
+            <KEYWORD2>name</KEYWORD2>
+            <KEYWORD2>notifiers</KEYWORD2>
+            <KEYWORD2>optional</KEYWORD2>
+            <KEYWORD2>organization</KEYWORD2>
+            <KEYWORD2>organizationUrl</KEYWORD2>
+            <KEYWORD2>os</KEYWORD2>
+            <KEYWORD2>otherArchives</KEYWORD2>
+            <KEYWORD2>outputDirectory</KEYWORD2>
+            <KEYWORD2>packaging</KEYWORD2>
+            <KEYWORD2>parent</KEYWORD2>
+            <KEYWORD2>phase</KEYWORD2>
+            <KEYWORD2>pluginManagement</KEYWORD2>
+            <KEYWORD2>pluginRepositories</KEYWORD2>
+            <KEYWORD2>plugins</KEYWORD2>
+            <KEYWORD2>post</KEYWORD2>
+            <KEYWORD2>prerequisites</KEYWORD2>
+            <KEYWORD2>profiles</KEYWORD2>
+            <KEYWORD2>properties</KEYWORD2>
+            <KEYWORD2>property</KEYWORD2>
+            <KEYWORD2>relativePath</KEYWORD2>
+            <KEYWORD2>releases</KEYWORD2>
+            <KEYWORD2>relocation</KEYWORD2>
+            <KEYWORD2>reportSets</KEYWORD2>
+            <KEYWORD2>reporting</KEYWORD2>
+            <KEYWORD2>reports</KEYWORD2>
+            <KEYWORD2>repositories</KEYWORD2>
+            <KEYWORD2>repository</KEYWORD2>
+            <KEYWORD2>resources</KEYWORD2>
+            <KEYWORD2>roles</KEYWORD2>
+            <KEYWORD2>scm</KEYWORD2>
+            <KEYWORD2>scope</KEYWORD2>
+            <KEYWORD2>scriptSourceDirectory</KEYWORD2>
+            <KEYWORD2>sendOnError</KEYWORD2>
+            <KEYWORD2>sendOnFailure</KEYWORD2>
+            <KEYWORD2>sendOnSuccess</KEYWORD2>
+            <KEYWORD2>sendOnWarning</KEYWORD2>
+            <KEYWORD2>site</KEYWORD2>
+            <KEYWORD2>snapshotRepository</KEYWORD2>
+            <KEYWORD2>snapshots</KEYWORD2>
+            <KEYWORD2>sourceDirectory</KEYWORD2>
+            <KEYWORD2>status</KEYWORD2>
+            <KEYWORD2>subscribe</KEYWORD2>
+            <KEYWORD2>system</KEYWORD2>
+            <KEYWORD2>systemPath</KEYWORD2>
+            <KEYWORD2>tag</KEYWORD2>
+            <KEYWORD2>targetPath</KEYWORD2>
+            <KEYWORD2>testOutputDirectory</KEYWORD2>
+            <KEYWORD2>testResources</KEYWORD2>
+            <KEYWORD2>testSourceDirectory</KEYWORD2>
+            <KEYWORD2>timezone</KEYWORD2>
+            <KEYWORD2>type</KEYWORD2>
+            <KEYWORD2>uniqueVersion</KEYWORD2>
+            <KEYWORD2>unsubscribe</KEYWORD2>
+            <KEYWORD2>updatePolicy</KEYWORD2>
+            <KEYWORD2>url</KEYWORD2>
+            <KEYWORD2>value</KEYWORD2>
+            <KEYWORD2>version</KEYWORD2>
+
+            <KEYWORD3>contributor</KEYWORD3>
+            <KEYWORD3>dependency</KEYWORD3>
+            <KEYWORD3>developer</KEYWORD3>
+            <KEYWORD3>exclude</KEYWORD3>
+            <KEYWORD3>exclusion</KEYWORD3>
+            <KEYWORD3>execution</KEYWORD3>
+            <KEYWORD3>extension</KEYWORD3>
+            <KEYWORD3>filter</KEYWORD3>
+            <KEYWORD3>goal</KEYWORD3>
+            <KEYWORD3>include</KEYWORD3>
+            <KEYWORD3>license</KEYWORD3>
+            <KEYWORD3>mailingList</KEYWORD3>
+            <KEYWORD3>module</KEYWORD3>
+            <KEYWORD3>notifier</KEYWORD3>
+            <KEYWORD3>otherArchive</KEYWORD3>
+            <KEYWORD3>plugin</KEYWORD3>
+            <KEYWORD3>pluginRepository</KEYWORD3>
+            <KEYWORD3>profile</KEYWORD3>
+            <KEYWORD3>report</KEYWORD3>
+            <KEYWORD3>reportSet</KEYWORD3>
+            <KEYWORD3>repository</KEYWORD3>
+            <KEYWORD3>resource</KEYWORD3>
+            <KEYWORD3>role</KEYWORD3>
+            <KEYWORD3>testResource</KEYWORD3>
+        </KEYWORDS>
+    </RULES>
+	<!-- }}} -->
+	
+	<!-- {{{ DTD-TAGS -->
+    <RULES SET="DTD-TAGS" DEFAULT="KEYWORD2" IGNORE_CASE="FALSE">
+		<!-- SGML comment -->
+        <SPAN TYPE="COMMENT1">
+            <BEGIN>&lt;!--</BEGIN>
+            <END>--&gt;</END>
+        </SPAN>
+
+		<!-- SGML comment -->
+        <SPAN TYPE="COMMENT1">
+            <BEGIN>--</BEGIN>
+            <END>--</END>
+        </SPAN>
+
+		<!-- Parameter entities -->
+        <SPAN TYPE="LITERAL2" NO_WORD_BREAK="TRUE">
+            <BEGIN>%</BEGIN>
+            <END>;</END>
+        </SPAN>
+
+        <SPAN TYPE="LITERAL1">
+            <BEGIN>"</BEGIN>
+            <END>"</END>
+        </SPAN>
+
+        <SPAN TYPE="LITERAL1">
+            <BEGIN>'</BEGIN>
+            <END>'</END>
+        </SPAN>
+
+		<!-- This appears in some SGML documents -->
+        <SPAN TYPE="KEYWORD2" DELEGATE="MAIN">
+            <BEGIN>[</BEGIN>
+            <END>]</END>
+        </SPAN>
+
+        <SEQ TYPE="OPERATOR">(</SEQ>
+        <SEQ TYPE="OPERATOR">)</SEQ>
+        <SEQ TYPE="OPERATOR">|</SEQ>
+        <SEQ TYPE="OPERATOR">?</SEQ>
+        <SEQ TYPE="OPERATOR">*</SEQ>
+        <SEQ TYPE="OPERATOR">+</SEQ>
+        <SEQ TYPE="OPERATOR">,</SEQ>
+
+        <KEYWORDS>
+            <KEYWORD1>CDATA</KEYWORD1>
+            <KEYWORD1>EMPTY</KEYWORD1>
+            <KEYWORD1>INCLUDE</KEYWORD1>
+            <KEYWORD1>IGNORE</KEYWORD1>
+            <KEYWORD1>NDATA</KEYWORD1>
+            <KEYWORD1>#IMPLIED</KEYWORD1>
+            <KEYWORD1>#PCDATA</KEYWORD1>
+            <KEYWORD1>#REQUIRED</KEYWORD1>
+        </KEYWORDS>
+    </RULES>
+	<!-- }}} -->
+	
+	<!-- {{{ ENTITY-TAGS -->
+    <RULES SET="ENTITY-TAGS" DEFAULT="KEYWORD2">
+		<!-- SGML comment -->
+        <SPAN TYPE="COMMENT1">
+            <BEGIN>&lt;!--</BEGIN>
+            <END>--&gt;</END>
+        </SPAN>
+
+		<!-- SGML comment -->
+        <SPAN TYPE="COMMENT1">
+            <BEGIN>--</BEGIN>
+            <END>--</END>
+        </SPAN>
+
+        <SPAN TYPE="LITERAL1">
+            <BEGIN>"</BEGIN>
+            <END>"</END>
+        </SPAN>
+
+        <SPAN TYPE="LITERAL1">
+            <BEGIN>'</BEGIN>
+            <END>'</END>
+        </SPAN>
+
+        <SEQ TYPE="OPERATOR">=</SEQ>
+
+        <SEQ TYPE="OPERATOR">%</SEQ>
+
+        <KEYWORDS>
+            <KEYWORD1>SYSTEM</KEYWORD1>
+        </KEYWORDS>
+    </RULES>
+	<!-- }}} -->
+	
+	<!-- {{{ CDATA -->
+    <RULES SET="CDATA" DEFAULT="COMMENT2">
+        <KEYWORDS>
+            <LITERAL2>true</LITERAL2>
+            <LITERAL2>yes</LITERAL2>
+            <LITERAL2>false</LITERAL2>
+        </KEYWORDS>
+    </RULES>
+	<!-- }}} -->
+	
+	<!-- {{{ STRING -->
+    <RULES SET="STRING" DEFAULT="LITERAL1">
+		<!-- variables -->
+        <SPAN TYPE="KEYWORD4">
+            <BEGIN>${</BEGIN>
+            <END>}</END>
+        </SPAN>
+        <SEQ TYPE="NULL">\"</SEQ>
+        <SEQ TYPE="MARKUP" DELEGATE="TAGS">"</SEQ>
+
+        <SPAN TYPE="LITERAL2" NO_WORD_BREAK="TRUE">
+            <BEGIN>&amp;</BEGIN>
+            <END>;</END>
+        </SPAN>
+        <KEYWORDS>
+            <LITERAL2>true</LITERAL2>
+            <LITERAL2>yes</LITERAL2>
+            <LITERAL2>false</LITERAL2>
+        </KEYWORDS>
+    </RULES>
+	<!-- }}} -->
+
+</MODE>
+
+ 	  	 

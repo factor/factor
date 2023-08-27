@@ -1,5 +1,5 @@
 ! Copyright (C) 2008 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors alien.c-types alien.data alien.strings assocs
 classes.struct continuations fry io.backend io.backend.unix
 io.directories io.files io.files.info io.files.info.unix
@@ -16,6 +16,9 @@ M: unix touch-file
     dup file-exists? [ touch ] [
         touch-mode file-mode open-file close-file
     ] if ;
+
+M: unix truncate-file
+    [ normalize-path ] dip [ truncate ] unix-system-call drop ;
 
 M: unix move-file-atomically
     [ normalize-path ] bi@ [ rename ] unix-system-call drop ;
@@ -39,7 +42,7 @@ M: unix copy-file
     [ call-next-method ]
     [ [ file-permissions ] dip swap set-file-permissions ] 2bi ;
 
-: with-unix-directory ( ..a path quot: ( ..a DIR* -- ..b ) -- ..b )
+: with-unix-directory ( path quot -- )
     dupd '[ _ _
         [ opendir dup [ throw-errno ] unless ] dip
         dupd curry swap '[ _ closedir io-error ] finally
@@ -60,10 +63,10 @@ M: unix copy-file
 ! An easy way to return +unknown+ is to mount a .iso on OSX and
 ! call directory-entries on the mount point.
 
-: next-dirent ( DIR* -- dirent*/f )
-    readdir dup [
-        errno dup ENOENT = [ drop ] [ (throw-errno) ] if
-    ] unless ; inline
+: next-dirent ( DIR* dirent* -- dirent* ? )
+    f void* <ref> [
+        readdir_r [ (throw-errno) ] unless-zero
+    ] 2keep void* deref ; inline
 
 : >directory-entry ( dirent* -- directory-entry )
     [ d_name>> alien>native-string ]
@@ -73,7 +76,8 @@ M: unix copy-file
 
 M: unix (directory-entries)
     [
-        '[ _ next-dirent dup ] [ >directory-entry ] produce nip
+        dirent new
+        '[ _ _ next-dirent ] [ >directory-entry ] produce nip
     ] with-unix-directory ;
 
 os linux? [ "io.directories.unix.linux" require ] when

@@ -46,10 +46,10 @@ IN: compiler.tests.spilling
         [ dup float+ ]
     } cleave ;
 
-[ 2.0 2.0 2.0 2.0 2.0 2.0 2.0 2.0 2.0 2.0 2.0 2.0 2.0 2.0 2.0 2.0 2.0 2.0 2.0 2.0 2.0 2.0 2.0 2.0 2.0 2.0 2.0 2.0 2.0 2.0 2.0 2.0 2.0 2.0 2.0 2.0 2.0 2.0 ]
+{ 2.0 2.0 2.0 2.0 2.0 2.0 2.0 2.0 2.0 2.0 2.0 2.0 2.0 2.0 2.0 2.0 2.0 2.0 2.0 2.0 2.0 2.0 2.0 2.0 2.0 2.0 2.0 2.0 2.0 2.0 2.0 2.0 2.0 2.0 2.0 2.0 2.0 2.0 }
 [ 1.0 float-spill-bug ] unit-test
 
-[ t ] [ \ float-spill-bug word-optimized? ] unit-test
+{ t } [ \ float-spill-bug word-optimized? ] unit-test
 
 : float-fixnum-spill-bug ( object -- object object object object object object object object object object object object object object object object object object object object object object object object object object object object object object object object object object object object object object object object object object object object object object object object object object object object object object object object object object object object object object object object object object object object object object object object object object object object )
     {
@@ -131,10 +131,10 @@ IN: compiler.tests.spilling
         [ float>fixnum dup fixnum+fast ]
     } cleave ;
 
-[ 2.0 2 2.0 2 2.0 2 2.0 2 2.0 2 2.0 2 2.0 2 2.0 2 2.0 2 2.0 2 2.0 2 2.0 2 2.0 2 2.0 2 2.0 2 2.0 2 2.0 2 2.0 2 2.0 2 2.0 2 2.0 2 2.0 2 2.0 2 2.0 2 2.0 2 2.0 2 2.0 2 2.0 2 2.0 2 2.0 2 2.0 2 2.0 2 2.0 2 2.0 2 2.0 2 2.0 2 2.0 2 2.0 2 ]
+{ 2.0 2 2.0 2 2.0 2 2.0 2 2.0 2 2.0 2 2.0 2 2.0 2 2.0 2 2.0 2 2.0 2 2.0 2 2.0 2 2.0 2 2.0 2 2.0 2 2.0 2 2.0 2 2.0 2 2.0 2 2.0 2 2.0 2 2.0 2 2.0 2 2.0 2 2.0 2 2.0 2 2.0 2 2.0 2 2.0 2 2.0 2 2.0 2 2.0 2 2.0 2 2.0 2 2.0 2 2.0 2 2.0 2 }
 [ 1.0 float-fixnum-spill-bug ] unit-test
 
-[ t ] [ \ float-fixnum-spill-bug word-optimized? ] unit-test
+{ t } [ \ float-fixnum-spill-bug word-optimized? ] unit-test
 
 : resolve-spill-bug ( a b -- c )
     [ 1 fixnum+fast ] bi@ dup 10 fixnum< [
@@ -161,9 +161,9 @@ IN: compiler.tests.spilling
         16 narray
     ] if ;
 
-[ t ] [ \ resolve-spill-bug word-optimized? ] unit-test
+{ t } [ \ resolve-spill-bug word-optimized? ] unit-test
 
-[ 4 ] [ 1 1 resolve-spill-bug ] unit-test
+{ 4 } [ 1 1 resolve-spill-bug ] unit-test
 
 : spill-test-1 ( a -- b )
     dup 1 fixnum+fast
@@ -200,7 +200,7 @@ IN: compiler.tests.spilling
     [ 8 narray [ 8 narray ] dip 2array ] dip 2array
     2array ;
 
-[
+{
     {
         1
         {
@@ -211,7 +211,7 @@ IN: compiler.tests.spilling
             }
         }
     }
-] [ 1 spill-test-1 ] unit-test
+} [ 1 spill-test-1 ] unit-test
 
 : spill-test-2 ( a -- b )
     dup 1.0 float+
@@ -341,4 +341,4 @@ IN: compiler.tests.spilling
     float*
     float* ;
 
-[ t ] [ 1.0 spill-test-2 1.0 \ spill-test-2 def>> call = ] unit-test
+{ t } [ 1.0 spill-test-2 1.0 \ spill-test-2 def>> call = ] unit-test

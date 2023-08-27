@@ -1,5 +1,5 @@
 ! Copyright (C) 2018 Doug Coleman.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: base91 combinators command-line fry io.directories
 io.encodings.binary io.encodings.utf8 io.files io.pathnames
 kernel modern modern.out namespaces sequences splitting strings ;

@@ -1,5 +1,5 @@
 ! Copyright (C) 2006, 2009 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs classes combinators
 combinators.short-circuit compiler.units debugger fonts help
 help.apropos help.crossref help.home help.markup help.stylesheet
@@ -147,27 +147,27 @@ M: browser-gadget definitions-changed
 
 M: browser-gadget focusable-child* search-field>> ;
 
-: (browser-window) ( topic -- )
+: com-browse-new ( topic -- )
     <browser-gadget>
     <world-attributes>
         "Browser" >>title
     open-status-window ;
 
 : browser-window ( -- )
-    "help.home" (browser-window) ;
+    "help.home" com-browse-new ;
 
 : error-help-window ( error -- )
     {
         [ error-help ]
         [ dup tuple? [ class-of ] [ drop "errors" ] if ]
-    } 1|| (browser-window) ;
+    } 1|| com-browse-new ;
 
 \ browser-window H{ { +nullary+ t } } define-command
 
 : com-browse ( link -- )
     [ browser-gadget? ] find-window
     [ [ raise-window ] [ gadget-child show-help ] bi ]
-    [ (browser-window) ] if* ;
+    [ com-browse-new ] if* ;
 
 : show-browser ( -- )
     [ browser-gadget? ] find-window

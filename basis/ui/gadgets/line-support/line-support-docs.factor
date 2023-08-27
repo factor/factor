@@ -66,7 +66,7 @@ $nl
     first-visible-line
     last-visible-line
 }
-"Converting y co-ordinates to line numbers, and vice versa:"
+"Converting y coordinates to line numbers, and vice versa:"
 { $subsections
     line>y
     y>line

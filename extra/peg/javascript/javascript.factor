@@ -1,5 +1,5 @@
 ! Copyright (C) 2008 Chris Double.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors kernel math.parser multiline peg peg.ebnf
 sequences strings ;
 IN: peg.javascript
@@ -48,7 +48,7 @@ TUPLE: ast-default cs ;
 PRIVATE>
 
 ! Grammar for JavaScript. Based on OMeta-JS example from:
-! http://jarrett.cs.ucla.edu/ometa-js/#JavaScript_Compiler
+! https://jarrett.cs.ucla.edu/ometa-js/#JavaScript_Compiler
 
 EBNF: tokenize-javascript [=[
 Letter            = [a-zA-Z]
@@ -152,7 +152,7 @@ Toks              = Tok* Spaces
 ]=]
 
 ! Grammar for JavaScript. Based on OMeta-JS example from:
-! http://jarrett.cs.ucla.edu/ometa-js/#JavaScript_Compiler
+! https://jarrett.cs.ucla.edu/ometa-js/#JavaScript_Compiler
 
 ! The interesting thing about this parser is the mixing of
 ! a default and non-default tokenizer. The JavaScript tokenizer

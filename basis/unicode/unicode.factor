@@ -3,7 +3,7 @@ hints interval-maps kernel math math.order sequences sorting
 strings unicode.breaks.private unicode.case.private
 unicode.categories unicode.collation unicode.collation.private
 unicode.data unicode.data.private unicode.normalize.private
-unicode.script locals ranges ;
+unicode.script ranges ;
 IN: unicode
 
 CATEGORY: blank Zs Zl Zp | "\r\n\t" member? ;
@@ -67,7 +67,7 @@ CATEGORY: math Sm | "Other_Math" property? ;
     ] if ;
 
 : last-grapheme-from ( end str -- i )
-     swap head-slice last-grapheme ;
+    swap head-slice last-grapheme ;
 
 <PRIVATE
 
@@ -212,7 +212,7 @@ PRIVATE>
     0 insensitive= ;
 
 : sort-strings ( strings -- sorted )
-    [ collation-key/nfd 2array ] map natural-sort values ;
+    [ collation-key/nfd 2array ] map sort values ;
 
 : string<=> ( str1 str2 -- <=> )
     [ collation-key/nfd 2array ] compare ;

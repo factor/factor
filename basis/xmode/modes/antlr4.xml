@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE MODE SYSTEM "xmode.dtd"><!--  -->
+
+
+<!--
+    This mode file describes the ANTLR 4 syntax definition language as
+    described in the book "The Definitive ANTLR 4 Reference" by Terrence Parr.
+-->
+<MODE>
+    <PROPS>
+        <PROPERTY NAME="commentStart" VALUE="/*" />
+        <PROPERTY NAME="commentEnd" VALUE="*/" />
+        <PROPERTY NAME="lineComment" VALUE="//" />
+        <PROPERTY NAME="wordBreakChars" VALUE="" />
+    </PROPS>
+    <RULES IGNORE_CASE="FALSE"
+		HIGHLIGHT_DIGITS="TRUE"
+		DIGIT_RE="(0[lL]?|[1-9]\d{0,9}(\d{0,9}[lL])?|0[xX]\p{XDigit}{1,8}(\p{XDigit}{0,8}[lL])?|0[0-7]{1,11}([0-7]{0,11}[lL])?|([0-9]+\.[0-9]*|\.[0-9]+)([eE][+-]?[0-9]+)?[fFdD]?|[0-9]+([eE][+-]?[0-9]+[fFdD]?|([eE][+-]?[0-9]+)?[fFdD]))">
+        
+        <!-- Antlr comments are the same as java comments -->
+        <SPAN TYPE="COMMENT2" DELEGATE="java::JAVADOC">
+            <BEGIN>/**</BEGIN>
+            <END>*/</END>
+        </SPAN>
+        <SPAN TYPE="COMMENT1">
+            <BEGIN>/*</BEGIN>
+            <END>*/</END>
+        </SPAN>
+        <EOL_SPAN TYPE="COMMENT1">//</EOL_SPAN>
+
+        <!-- string literal -->
+        <SPAN TYPE="LITERAL1" ESCAPE="\" NO_LINE_BREAK="TRUE">
+            <BEGIN>'</BEGIN>
+            <END>'</END>
+        </SPAN>
+
+        <!-- rule 'operators' -->
+        <SEQ TYPE="OPERATOR">|</SEQ>
+        <SEQ TYPE="OPERATOR">:</SEQ>
+		<SEQ TYPE="OPERATOR">}</SEQ>
+		<SEQ TYPE="OPERATOR">{</SEQ>
+
+        <!-- rule action -->
+        <MARK_FOLLOWING TYPE="KEYWORD4">@</MARK_FOLLOWING>
+        
+        <!-- lexer rules -->
+        <SEQ_REGEXP HASH_CHARS="ABCDEFGHIJKLMNOPQRSTUVWXYZ" AT_LINE_START="TRUE"
+ 		   TYPE="KEYWORD2">[A-Z][a-zA-Z_]+</SEQ_REGEXP>
+ 
+        <!-- parser rules -->
+        <SEQ_REGEXP HASH_CHARS="abcdefghijklmnopqrstuvwxyz" AT_LINE_START="TRUE"
+ 		   TYPE="KEYWORD2">[a-z][a-zA-Z_]+</SEQ_REGEXP>
+ 
+        
+        <KEYWORDS>
+            <KEYWORD1>catch</KEYWORD1>
+            <KEYWORD1>finally</KEYWORD1>
+            <KEYWORD1>fragment</KEYWORD1>
+            <KEYWORD1>grammar</KEYWORD1>
+            <KEYWORD1>import</KEYWORD1>
+            <KEYWORD1>lexer</KEYWORD1>
+            <KEYWORD1>locals</KEYWORD1>
+            <KEYWORD1>mode</KEYWORD1>
+            <KEYWORD1>options</KEYWORD1>
+            <KEYWORD1>parser</KEYWORD1>
+            <KEYWORD1>private</KEYWORD1>
+            <KEYWORD1>protected</KEYWORD1>
+            <KEYWORD1>public</KEYWORD1>
+            <KEYWORD1>returns</KEYWORD1>
+            <KEYWORD1>throws</KEYWORD1>
+            <KEYWORD4>tokens</KEYWORD4>
+
+            <!-- the following are not Antlr keywords, but since Antlr actions
+            include java keywords, these are useful. These are copied from
+            the java mode file. -->
+			<KEYWORD1>assert</KEYWORD1>
+			<KEYWORD1>break</KEYWORD1>
+			<KEYWORD1>case</KEYWORD1>
+			<KEYWORD1>continue</KEYWORD1>
+			<KEYWORD1>default</KEYWORD1>
+			<KEYWORD1>do</KEYWORD1>
+			<KEYWORD1>else</KEYWORD1>
+			<KEYWORD1>for</KEYWORD1>
+			<KEYWORD1>if</KEYWORD1>
+			<KEYWORD1>instanceof</KEYWORD1>
+			<KEYWORD1>new</KEYWORD1>
+			<KEYWORD1>return</KEYWORD1>
+			<KEYWORD1>strictfp</KEYWORD1>
+			<KEYWORD1>switch</KEYWORD1>
+			<KEYWORD1>throw</KEYWORD1>
+			<KEYWORD1>try</KEYWORD1>
+			<KEYWORD1>while</KEYWORD1>
+
+			<KEYWORD2>abstract</KEYWORD2>
+			<KEYWORD2>enum</KEYWORD2>
+			<KEYWORD2>extends</KEYWORD2>
+			<KEYWORD2>final</KEYWORD2>
+			<KEYWORD2>implements</KEYWORD2>
+			<KEYWORD2>import</KEYWORD2> 
+			<KEYWORD2>native</KEYWORD2>
+			<KEYWORD2>package</KEYWORD2>
+			<KEYWORD2>static</KEYWORD2>
+			<KEYWORD2>synchronized</KEYWORD2>
+			<KEYWORD2>throws</KEYWORD2>
+			<KEYWORD2>transient</KEYWORD2>
+			<KEYWORD2>volatile</KEYWORD2>
+			<KEYWORD3>void</KEYWORD3>
+
+			<KEYWORD3>boolean</KEYWORD3>
+			<KEYWORD3>byte</KEYWORD3>
+			<KEYWORD3>char</KEYWORD3>
+			<KEYWORD3>class</KEYWORD3>
+			<KEYWORD3>double</KEYWORD3>
+			<KEYWORD3>float</KEYWORD3>
+			<KEYWORD3>int</KEYWORD3>
+			<KEYWORD3>interface</KEYWORD3>
+			<KEYWORD3>long</KEYWORD3>
+			<KEYWORD3>short</KEYWORD3>
+
+			<LITERAL2>false</LITERAL2>
+			<LITERAL2>null</LITERAL2>
+			<LITERAL2>super</LITERAL2>
+			<LITERAL2>this</LITERAL2>
+			<LITERAL2>true</LITERAL2>
+
+            <INVALID>goto</INVALID>
+            <INVALID>const</INVALID>
+        </KEYWORDS>
+    </RULES>
+    
+</MODE>

@@ -1,8 +1,9 @@
-USING: accessors arrays assocs classes compiler.units effects
-eval generic grouping io.pathnames io.streams.string kernel
-lexer math multiline namespaces parser sequences sets
-source-files source-files.errors strings tools.crossref
-tools.test vocabs vocabs.parser words words.symbol splitting ;
+USING: accessors arrays assocs classes classes.parser
+classes.tuple compiler.units effects eval generic grouping
+io.pathnames io.streams.string kernel lexer math multiline
+namespaces parser sequences sets source-files
+source-files.errors splitting strings tools.crossref tools.test
+vocabs vocabs.parser words words.symbol ;
 IN: parser.tests
 
 { 1 [ 2 [ 3 ] 4 ] 5 }
@@ -150,15 +151,15 @@ DEFER: foo
 ] unit-test
 
 { t } [
-    array "smudge-me" "parser.tests" lookup-word order member-eq?
+    array "smudge-me" "parser.tests" lookup-word dispatch-order member-eq?
 ] unit-test
 
 { t } [
-    integer "smudge-me" "parser.tests" lookup-word order member-eq?
+    integer "smudge-me" "parser.tests" lookup-word dispatch-order member-eq?
 ] unit-test
 
 { f } [
-    string "smudge-me" "parser.tests" lookup-word order member-eq?
+    string "smudge-me" "parser.tests" lookup-word dispatch-order member-eq?
 ] unit-test
 
 { } [
@@ -655,4 +656,14 @@ EXCLUDE: qualified.tests.bar => x ;
     [
         { "10 20 30 ;" } <lexer> [ parse-array-def ] with-lexer
     ] with-file-vocabs
+] unit-test
+
+! Ensure this works when not from a source file
+{ } [
+    [[
+        [
+            USING: classes.parser classes.tuple compiler.units kernel ;
+            IN: parser.tests "abcde" create-class-in \ tuple { "a" "b" "c" "d" "e" } define-tuple-class
+        ] with-compilation-unit
+    ]] eval( -- )
 ] unit-test

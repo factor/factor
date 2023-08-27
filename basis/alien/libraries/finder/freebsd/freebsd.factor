@@ -6,13 +6,14 @@ IN: alien.libraries.finder.freebsd
 <PRIVATE
 
 : parse-ldconfig-lines ( string -- triple )
-    [ ":-" split1 [ drop ] dip
-    "=>" split1 [ [ unicode:blank? ] trim ] bi@
-      2array
-   ] map ;
+    [
+        ":-" split1 [ drop ] dip
+        "=>" split1 [ [ unicode:blank? ] trim ] bi@
+        2array
+    ] map ;
 
 : load-ldconfig-cache ( -- seq )
-    "/sbin/ldconfig -r" utf8 [ read-lines ] with-process-reader
+    "/sbin/ldconfig -r" process-lines
     rest parse-ldconfig-lines ;
 
 : name-matches? ( lib double -- ? )
@@ -22,5 +23,5 @@ PRIVATE>
 
 M: freebsd find-library*
     "l" prepend load-ldconfig-cache
-    [ name-matches? ] with find nip ?first dup [ ".so" append ] when ;
+    [ name-matches? ] with find nip ?first [ ".so" append ] ?call ;
 

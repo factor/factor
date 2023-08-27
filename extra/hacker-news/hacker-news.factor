@@ -1,10 +1,10 @@
 ! Copyright (C) 2012 Doug Coleman.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 
 USING: accessors assocs calendar calendar.format
 calendar.holidays.us colors combinators concurrency.combinators
-formatting hashtables http.client io io.styles json.reader
-kernel make math sequences ui urls ;
+formatting graphs hashtables http.client io io.styles json
+json.http kernel make math sequences sets ui ui.theme urls ;
 
 IN: hacker-news
 
@@ -13,15 +13,20 @@ CONSTANT: christmas-green COLOR: #376627
 
 <PRIVATE
 : hacker-news-ids ( endpoint -- ids )
-    "https://hacker-news.firebaseio.com/v0/%s.json?print=pretty" sprintf
-    http-get nip json> ;
+    "https://hacker-news.firebaseio.com/v0/%s.json?print=pretty" sprintf http-get-json nip ;
 
 : hacker-news-id>json-url ( n -- url )
     "https://hacker-news.firebaseio.com/v0/item/%d.json?print=pretty" sprintf ;
 
 : hacker-news-items ( n endpoint -- seq )
-    hacker-news-ids swap short head
-    [ hacker-news-id>json-url http-get nip json> ] parallel-map ;
+    hacker-news-ids swap index-or-length head
+    [ hacker-news-id>json-url http-get-json ] parallel-map ;
+
+: hacker-news-items-timeout ( n endpoint timeout -- seq )
+    [
+        hacker-news-ids swap index-or-length head
+        [ hacker-news-id>json-url http-get-json ]
+    ] dip parallel-map-timeout ;
 
 : hacker-news-top-stories ( n -- seq )
     "topstories" hacker-news-items ;
@@ -61,7 +66,7 @@ CONSTANT: christmas-green COLOR: #376627
 : write-title ( title url -- )
     '[
         _ presented ,,
-        ui-running? COLOR: black COLOR: white ? foreground ,,
+        ui-running? text-color COLOR: white ? foreground ,,
     ] H{ } make format ;
 
 : write-link ( title url -- )
@@ -71,13 +76,13 @@ CONSTANT: christmas-green COLOR: #376627
     ] H{ } make format ;
 
 : write-text ( str -- )
-    H{ { foreground COLOR: #888888 } } format ;
+    text-color foreground associate format ;
 
 : post>user-url ( post -- user-url )
-    "by" of "http://news.ycombinator.com/user?id=" prepend >url ;
+    "by" of "https://news.ycombinator.com/user?id=" prepend >url ;
 
 : post>comments-url ( post -- user-url )
-    "id" of "http://news.ycombinator.com/item?id=%d" sprintf >url ;
+    "id" of "https://news.ycombinator.com/item?id=%d" sprintf >url ;
 
 ! Api is funky, gives id=0 and /comment/2342342 for self-post ads
 : post>url ( post -- url )
@@ -105,7 +110,7 @@ PRIVATE>
     } cleave ;
 
 : banner. ( str -- )
-    "http://news.ycombinator.com" >url presented associate
+    "https://news.ycombinator.com" >url presented associate
     H{
         { font-size 20 }
         { font-style bold }
@@ -150,3 +155,17 @@ PRIVATE>
     "Hacker News - Job"
     50 hacker-news-job-stories
     hacker-news. ;
+
+: filter-comments ( seq -- seq' ) "type" of "comment" = ;
+: reject-deleted ( seq -- seq' ) [ "deleted" of ] reject ;
+
+: closure-with ( vertex quot1: ( key -- vertices ) quot2: ( vertex -- keys ) -- set )
+    over '[ @ [ @ _ map ] closure ] call ; inline
+
+: parallel-closure-with ( vertex quot1: ( key -- vertices ) quot2: ( vertex -- edges ) -- set )
+    over '[ @ [ @ _ parallel-map ] closure ] call ; inline
+
+ ! Yes, there is no api that grabs multiple comments in a single call. (4/17/2023)
+: hacker-news-comments ( id -- seq )
+    [ hacker-news-id>json-url http-get-json nip ]
+    [ "kids" of ] parallel-closure-with members ;

@@ -1,5 +1,5 @@
 ! Copyright (C) 2019 HMC Clinic.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: arrays kernel locals math math.functions math.statistics memory
 sequences tools.time ;
 IN: tensors.benchmark

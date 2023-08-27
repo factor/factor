@@ -1,5 +1,5 @@
 ! Copyright (C) 2009 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors compiler.cfg.dataflow-analysis kernel sets ;
 IN: compiler.cfg.stacks.global
 

@@ -1,5 +1,5 @@
 ! Copyright (C) 2008, 2010 Slava Pestov, Doug Coleman.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors arrays combinators compiler.cfg.builder.blocks
 compiler.cfg.comparisons compiler.cfg.hats
 compiler.cfg.instructions compiler.cfg.registers

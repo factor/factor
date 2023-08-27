@@ -1,5 +1,5 @@
 ! Copyright (C) 2010 Erik Charlebois.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: destructors gpu.render gpu.shaders gpu.state gpu.util
 images kernel math.rectangles ;
 IN: gpu.effects.step

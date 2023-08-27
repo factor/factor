@@ -16,13 +16,13 @@ INSTANCE: array mixin
 
 : blah ( a -- b ) { mixin } declare bong ;
 
-[ { } ] [ { } blah ] unit-test
+{ { } } [ { } blah ] unit-test
 
-[ ] [ [ \ array \ mixin remove-mixin-instance ] with-compilation-unit ] unit-test
+{ } [ [ \ array \ mixin remove-mixin-instance ] with-compilation-unit ] unit-test
 
-[ ] [ [ \ string \ mixin add-mixin-instance ] with-compilation-unit ] unit-test
+{ } [ [ \ string \ mixin add-mixin-instance ] with-compilation-unit ] unit-test
 
-[ 0 ] [ "" blah ] unit-test
+{ 0 } [ "" blah ] unit-test
 
 MIXIN: mixin1
 
@@ -40,10 +40,10 @@ INSTANCE: string mixin2
 
 : bully ( a -- b ) { mixin1 } declare billy ;
 
-[ "" ] [ "" bully ] unit-test
+{ "" } [ "" bully ] unit-test
 
-[ ] [ [ \ string \ mixin1 remove-mixin-instance ] with-compilation-unit ] unit-test
+{ } [ [ \ string \ mixin1 remove-mixin-instance ] with-compilation-unit ] unit-test
 
-[ ] [ [ \ array \ mixin1 add-mixin-instance ] with-compilation-unit ] unit-test
+{ } [ [ \ array \ mixin1 add-mixin-instance ] with-compilation-unit ] unit-test
 
-[ "BILLY" ] [ { } bully ] unit-test
+{ "BILLY" } [ { } bully ] unit-test

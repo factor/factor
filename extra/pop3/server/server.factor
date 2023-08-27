@@ -1,5 +1,5 @@
 ! Copyright (C) 2009 Elie Chaftari.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors calendar combinators concurrency.promises
 destructors io io.crlf io.encodings.utf8 io.sockets
 io.sockets.secure.debug io.streams.duplex io.timeouts kernel

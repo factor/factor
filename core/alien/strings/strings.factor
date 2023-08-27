@@ -1,6 +1,6 @@
 ! Copyright (C) 2008, 2011 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
-USING: accessors alien arrays byte-arrays byte-vectors init io
+! See https://factorcode.org/license.txt for BSD license.
+USING: accessors alien arrays byte-arrays byte-vectors io
 io.encodings io.encodings.ascii io.encodings.utf16
 io.encodings.utf8 io.streams.memory kernel kernel.private math
 namespaces sequences sequences.private strings strings.private

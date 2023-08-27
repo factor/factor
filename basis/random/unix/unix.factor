@@ -1,5 +1,5 @@
 ! Copyright (C) 2008 Doug Coleman
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: alien.c-types io io.files kernel namespaces random
 io.encodings.binary init accessors system destructors
 hints math ;

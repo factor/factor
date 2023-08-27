@@ -1,5 +1,5 @@
 ! Copyright (C) 2010 Erik Charlebois.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: literals windows.kernel32 math alien.syntax windows.types
 classes.struct alien alien.c-types windows.errors windows.ole32
 windows.advapi32 alien.libraries ;

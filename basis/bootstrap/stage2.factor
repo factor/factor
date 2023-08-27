@@ -1,5 +1,5 @@
 ! Copyright (C) 2004, 2008 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: command-line compiler.units continuations definitions io
 io.pathnames kernel math math.parser memory namespaces parser
 parser.notes sequences sets splitting system

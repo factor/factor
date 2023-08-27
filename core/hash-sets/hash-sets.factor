@@ -1,6 +1,6 @@
 ! Copyright (C) 2010 Daniel Ehrenberg
 ! Copyright (C) 2005, 2011 John Benediktsson, Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors arrays growable.private hashtables.private
 kernel kernel.private math math.private sequences
 sequences.private sets sets.private slots.private vectors ;
@@ -18,8 +18,6 @@ TUPLE: hash-set
 
 : probe ( array i probe# -- array i probe# )
     1 fixnum+fast [ fixnum+fast over wrap ] keep ; inline
-
-: no-key ( key array -- array n ? ) nip f f ; inline
 
 : (key@) ( key array i probe# -- array n ? )
     [ 3dup swap array-nth ] dip over +empty+ eq?
@@ -99,7 +97,7 @@ PRIVATE>
     [ 0 0 ] dip <hash-array> hash-set boa ; inline
 
 M: hash-set in?
-     key@ 2nip ;
+    key@ 2nip ;
 
 M: hash-set clear-set
     [ init-hash ] [ array>> [ drop +empty+ ] map! drop ] bi ;
@@ -138,6 +136,9 @@ M: hash-set equal?
 
 M: hash-set set-like
     drop dup hash-set? [ ?members >hash-set ] unless ; inline
+
+: intern ( obj hash-set -- obj' )
+    2dup key@ [ swap nth 2nip ] [ 2drop [ adjoin ] keepd ] if ;
 
 INSTANCE: hash-set set
 

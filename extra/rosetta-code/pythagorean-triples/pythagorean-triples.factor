@@ -1,10 +1,10 @@
 ! Copyright (c) 2012 Anonymous
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors arrays formatting kernel literals math
 math.functions math.matrices ranges sequences ;
 IN: rosetta-code.pythagorean-triples
 
-! http://rosettacode.org/wiki/Pythagorean_triples
+! https://rosettacode.org/wiki/Pythagorean_triples
 
 ! A Pythagorean triple is defined as three positive integers
 ! (a,b,c) where a < b < c, and a2 + b2 = c2. They are called

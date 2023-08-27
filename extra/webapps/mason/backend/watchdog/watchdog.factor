@@ -1,5 +1,5 @@
 ! Copyright (C) 2010 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: formatting kernel mason.email math sequences
 webapps.mason.backend xml.syntax xml.writer ;
 IN: webapps.mason.backend.watchdog

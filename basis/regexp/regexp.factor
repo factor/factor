@@ -1,9 +1,10 @@
 ! Copyright (C) 2008, 2009 Doug Coleman, Daniel Ehrenberg.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors arrays classes compiler.units kernel
-kernel.private lexer make math ranges namespaces regexp.ast
-regexp.compiler regexp.negation regexp.parser sequences
-sequences.private splitting strings vocabs.loader words ;
+kernel.private lexer make math ranges namespaces quotations
+regexp.ast regexp.compiler regexp.negation regexp.parser
+sequences sequences.private splitting strings vocabs.loader
+words ;
 IN: regexp
 
 TUPLE: regexp
@@ -18,7 +19,7 @@ TUPLE: reverse-regexp < regexp ;
 
 M: lookahead question>quot
     ! Returns ( index string -- ? )
-    term>> ast>dfa dfa>shortest-word '[ f _ execute ] ;
+    term>> ast>dfa dfa>shortest-word 1quotation [ f ] prepose ;
 
 : <reversed-option> ( ast -- reversed )
     "r" string>options <with-options> ;
@@ -27,7 +28,7 @@ M: lookbehind question>quot
     ! Returns ( index string -- ? )
     term>> <reversed-option>
     ast>dfa dfa>reverse-shortest-word
-    '[ [ 1 - ] dip f _ execute ] ;
+    1quotation [ [ 1 - ] dip f ] prepose ;
 
 : match-index-from ( i string regexp -- index/f )
     ! This word is unsafe. It assumes that i is a fixnum

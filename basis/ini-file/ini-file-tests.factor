@@ -1,11 +1,15 @@
 ! Copyright (C) 2010 John Benediktsson
-! See http://factorcode.org/license.txt for BSD license
+! See https://factorcode.org/license.txt for BSD license
 
 USING: ini-file tools.test ;
 
 { H{ } } [ "" string>ini ] unit-test
 
 { H{ { "section" H{ } } } } [ "[section]" string>ini ] unit-test
+
+{ "[\"test \\\"section with quotes\\\"\"]\n\n" } [
+    "[test \"section with quotes\"]" string>ini ini>string
+] unit-test
 
 { H{ { "section" H{ } } } } [ "[\"section\" ]" string>ini ] unit-test
 
@@ -86,7 +90,7 @@ USING: ini-file tools.test ;
 
 { H{ { "owner" H{ { "name" "John Doe" }
                   { "organization" "Acme Widgets Inc." } } }
-     { "database" H{ { "server" "192.0.2.62" }
+    { "database" H{ { "server" "192.0.2.62" }
                      { "port" "143" }
                      { "file" "payroll.dat" } } } } }
 [
@@ -112,6 +116,15 @@ USING: ini-file tools.test ;
     " string>ini
 ] unit-test
 
+{ H{ { "section with \n escape codes"
+    H{ { "a long key name" "a long value name" } } } } }
+[
+    "
+    [section with \\n escape codes]
+    a long key name=  a long value name
+    " string>ini
+] unit-test
+
 { H{ { "key with \n esc\ape \r codes \""
        "value with \t esc\ape codes" } } }
 [
@@ -121,8 +134,16 @@ USING: ini-file tools.test ;
 ] unit-test
 
 
-{ "key with \\n esc\\ape \\r codes \\\"=value with \\t esc\\ape codes\n" }
+{ "\"key with \\n esc\\ape \\r codes \\\"\"=value with \\t esc\\ape codes\n" }
 [
     H{ { "key with \n esc\ape \r codes \""
          "value with \t esc\ape codes" } } ini>string
+] unit-test
+
+{ H{ { "save_path" "C:\\Temp\\" } } } [
+    "save_path = \"C:\\\\Temp\\\\\"" string>ini
+] unit-test
+
+{ "save_path=\"C\\:\\\\Temp\\\\\"\n" } [
+    H{ { "save_path" "C:\\Temp\\" } } ini>string
 ] unit-test

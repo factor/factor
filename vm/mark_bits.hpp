@@ -51,20 +51,20 @@ struct mark_bits {
     return (bits[position.first] & ((cell)1 << position.second)) != 0;
   }
 
-  void set_bitmap_range(cell* bits, const cell address, const cell size) {
-    std::pair<cell, cell> start = bitmap_deref(address);
-    std::pair<cell, cell> end = bitmap_deref(address + size);
+  void set_bitmap_range(cell* bits, const cell address, const cell data_size) {
+    std::pair<cell, cell> bitmap_start = bitmap_deref(address);
+    std::pair<cell, cell> end = bitmap_deref(address + data_size);
 
-    cell start_mask = ((cell)1 << start.second) - 1;
+    cell start_mask = ((cell)1 << bitmap_start.second) - 1;
     cell end_mask = ((cell)1 << end.second) - 1;
 
-    if (start.first == end.first)
-      bits[start.first] |= start_mask ^ end_mask;
+    if (bitmap_start.first == end.first)
+      bits[bitmap_start.first] |= start_mask ^ end_mask;
     else {
-      FACTOR_ASSERT(start.first < bits_size);
-      bits[start.first] |= ~start_mask;
+      FACTOR_ASSERT(bitmap_start.first < bits_size);
+      bits[bitmap_start.first] |= ~start_mask;
 
-      for (cell index = start.first + 1; index < end.first; index++)
+      for (cell index = bitmap_start.first + 1; index < end.first; index++)
         bits[index] = (cell)-1;
 
       if (end_mask != 0) {
@@ -76,8 +76,8 @@ struct mark_bits {
 
   bool marked_p(const cell address) { return bitmap_elt(marked, address); }
 
-  void set_marked_p(const cell address, const cell size) {
-    set_bitmap_range(marked, address, size);
+  void set_marked_p(const cell address, const cell dsize) {
+    set_bitmap_range(marked, address, dsize);
   }
 
   // The eventual destination of a block after compaction is just the number

@@ -1,5 +1,5 @@
 ! Copyright (C) 2010 Samuel Tardieu.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: assocs help.markup help.syntax math sequences ;
 IN: path-finding
 
@@ -7,7 +7,7 @@ IN: path-finding
 
 HELP: astar
 { $description "This tuple must be subclassed and its method " { $link cost } ", "
-  { $link heuristic } ", and " { $link neighbours } " must be implemented. "
+  { $link heuristic } ", and " { $link neighbors } " must be implemented. "
   "Alternatively, the " { $link <astar> } " word can be used to build a non-specialized version." } ;
 
 HELP: cost
@@ -18,7 +18,7 @@ HELP: cost
   { "n" number }
 }
 { $description "Return the cost to go from " { $snippet "from" } " to " { $snippet "to" } ". "
-  { $snippet "to" } " is necessarily a neighbour of " { $snippet "from" } "."
+  { $snippet "to" } " is necessarily a neighbor of " { $snippet "from" } "."
 } ;
 
 HELP: heuristic
@@ -29,10 +29,10 @@ HELP: heuristic
   { "n" number }
 }
 { $description "Return the estimated (undervalued) cost to go from " { $snippet "from" } " to " { $snippet "to" } ". "
-  { $snippet "from" } " and " { $snippet "to" } " are not necessarily neighbours."
+  { $snippet "from" } " and " { $snippet "to" } " are not necessarily neighbors."
 } ;
 
-HELP: neighbours
+HELP: neighbors
 { $values
   { "node" "a node" }
   { "astar" "an instance of a subclassed " { $link astar } " tuple" }
@@ -42,25 +42,25 @@ HELP: neighbours
 
 HELP: <astar>
 { $values
-  { "neighbours" { $quotation ( node -- seq ) } }
+  { "neighbors" { $quotation ( node -- seq ) } }
   { "cost" { $quotation ( from to -- cost ) } }
   { "heuristic" { $quotation ( pos target -- cost ) } }
   { "astar" astar }
 }
 { $description "Build an astar object from the given quotations. The "
-  { $snippet "neighbours" } " one builds the list of neighbours. The "
+  { $snippet "neighbors" } " one builds the list of neighbors. The "
   { $snippet "cost" } " and " { $snippet "heuristic" } " ones represent "
-  "respectively the cost for transitioning from a node to one of its neighbour, "
+  "respectively the cost for transitioning from a node to one of its neighbor, "
   "and the underestimated cost for going from a node to the target. This solution "
   "may not be as efficient as subclassing the " { $link astar } " tuple."
 } ;
 
 HELP: <bfs>
 { $values
-  { "neighbours" assoc }
+  { "neighbors" assoc }
   { "astar" astar }
 }
-{ $description "Build an astar object from the " { $snippet "neighbours" } " assoc. "
+{ $description "Build an astar object from the " { $snippet "neighbors" } " assoc. "
   "When used with " { $link find-path } ", this astar tuple will use the breadth-first search (BFS) "
   "path finding algorithm which is a particular case of the general A* algorithm."
 } ;
@@ -100,7 +100,7 @@ HELP: considered
 
 ARTICLE: "path-finding" "Path finding using the A* algorithm"
 "The " { $vocab-link "path-finding" } " vocabulary implements a graph search algorithm for finding the least-cost path from one node to another using the A* algorithm." $nl
-"The " { $link astar } " tuple may be derived from and its " { $link cost } ", " { $link heuristic } ", and " { $link neighbours } " methods overwritten, or the " { $link <astar> } " or " { $link <bfs> } " words can be used to build a new tuple." $nl
+"The " { $link astar } " tuple may be derived from and its " { $link cost } ", " { $link heuristic } ", and " { $link neighbors } " methods overwritten, or the " { $link <astar> } " or " { $link <bfs> } " words can be used to build a new tuple." $nl
 "Make an A* object:"
 { $subsections <astar> <bfs> }
 "Find a path between nodes:"

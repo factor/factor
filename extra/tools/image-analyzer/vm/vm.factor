@@ -9,7 +9,7 @@ STRUCT: image-header
     { data-size cell_t }
     { code-relocation-base cell_t }
     { code-size cell_t }
-    { reserved-1 cell_t }
+    { escaped-data-size cell_t }
     { reserved-2 cell_t }
     { reserved-3 cell_t }
     { reserved-4 cell_t }

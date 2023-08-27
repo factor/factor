@@ -6,7 +6,7 @@ IN: multi-methods.tests
 
 multi-methods:GENERIC: first-test ( -- )
 
-[ t ] [ \ first-test generic? ] unit-test
+{ t } [ \ first-test generic? ] unit-test
 
 MIXIN: thing
 
@@ -24,14 +24,14 @@ METHOD: beats? { thing thing } 2drop f ;
 : play ( obj1 obj2 -- ? ) beats? ;
 
 [ { } 3 play ] must-fail
-[ t ] [ error get no-method? ] unit-test
-[ ] [ error get error. ] unit-test
-[ { { } 3 } ] [ error get arguments>> ] unit-test
-[ t ] [ paper scissors play ] unit-test
-[ f ] [ scissors paper play ] unit-test
+{ t } [ error get no-method? ] unit-test
+{ } [ error get error. ] unit-test
+{ { { } 3 } } [ error get arguments>> ] unit-test
+{ t } [ paper scissors play ] unit-test
+{ f } [ scissors paper play ] unit-test
 
-[ t ] [ { beats? paper scissors } method-spec? ] unit-test
-[ ] [ { beats? paper scissors } see ] unit-test
+{ t } [ { beats? paper scissors } method-spec? ] unit-test
+{ } [ { beats? paper scissors } see ] unit-test
 
 SYMBOL: some-var
 
@@ -42,15 +42,15 @@ METHOD: hook-test { { some-var array } } class-of ;
 METHOD: hook-test { hashtable { some-var number } } assoc-size ;
 
 { 1 2 3 } some-var set
-[ { f t t } ] [ { t t f } hook-test ] unit-test
-[ fixnum ] [ 3 hook-test ] unit-test
+{ { f t t } } [ { t t f } hook-test ] unit-test
+{ fixnum } [ 3 hook-test ] unit-test
 5.0 some-var set
-[ 0 ] [ H{ } hook-test ] unit-test
+{ 0 } [ H{ } hook-test ] unit-test
 
 "error" some-var set
 [ H{ } hook-test ] must-fail
-[ t ] [ error get no-method? ] unit-test
-[ { H{ } "error" } ] [ error get arguments>> ] unit-test
+{ t } [ error get no-method? ] unit-test
+{ { H{ } "error" } } [ error get arguments>> ] unit-test
 
 MIXIN: busted
 

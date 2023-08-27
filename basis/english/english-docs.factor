@@ -29,12 +29,10 @@ $nl
 
 "Toy grammatical words:"
 { $subsections a/an ?plural-article a10n comma-list }
-
-"An example application:"
-{ $subsections or-markup-example $or-markup-example } ;
+;
 
 { pluralize ?pluralize plural? count-of-things singularize singular? } related-words
-{ a/an ?plural-article a10n comma-list $or-markup-example or-markup-example } related-words
+{ a/an ?plural-article a10n comma-list } related-words
 
 HELP: singularize
 { $values { "word" string } { "singular" string } }
@@ -144,7 +142,7 @@ HELP: a10n
 } ;
 
 HELP: a/an
-{ $values { "word" string } { "article" { $or-markup-example "\"a\"" "\"an\"" } } }
+{ $values { "word" string } { "article" { $or "\"a\"" "\"an\"" } } }
 { $description "Gives the proper indefinite singular article (" { $emphasis "a" } " or " { $emphasis "an" } ") for the word. For words which begin with a vowel sound, " { $emphasis "an" } " is used, whereas " { $emphasis "a" } " is used for words which begin with a consonant sound." }
 { $notes "The output does not contain the input. The output of this word is always a singular article, regardless of the plurality of the input." }
 { $examples
@@ -156,7 +154,7 @@ HELP: a/an
 } ;
 
 HELP: ?plural-article
-{ $values { "word" string } { "article" { $or-markup-example "\"a\"" "\"an\"" "\"the\"" } } }
+{ $values { "word" string } { "article" { $or "\"a\"" "\"an\"" "\"the\"" } } }
 { $description "Output the proper article given the plurality and first letter of the input. Unlike " { $link a/an } " this word handles plural inputs by outputting the definite " { $emphasis "\"the\"" } ". If the input is singular as determined by " { $link singular? } " this word operates like " { $link a/an } "." }
 { $notes { $list "English lacks a plural indefinite article, so the plural definite is used here instead." $keep-case $0-plurality } }
 { $examples
@@ -185,19 +183,5 @@ HELP: comma-list
         "USING: english io sequences ;"
         "{ \"a cat\" \"a peach\" \"an object\" } \"or\" comma-list concat print"
         "a cat, a peach, or an object"
-    }
-} ;
-
-HELP: or-markup-example
-{ $values { "classes" "a sequence of words" } { "markup" "a sequence of markup elements" } }
-{ $description "Used to implement " { $link $or-markup-example } " and demonstrate " { $link comma-list } "." }
-{ $examples { "See the examples in " { $link $or-markup-example } "." } } ;
-
-HELP: $or-markup-example
-{ $values { "classes" "a sequence of words" } }
-{ $description "An example to demonstrate a use-case for " { $link comma-list } ". Works like the " { $link $or } " and " { $link ($instance) } " words from " { $vocab-link "help.markup" } "." }
-{ $examples
-    { $markup-example
-        { $or-markup-example "cat" "octopus" "animal" object pair number array string sequence assoc "bird" } print-element
     }
 } ;

@@ -1,5 +1,5 @@
 ! Copyright (C) 2013 Jon Harper.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors tools.test furnace.auth.basic http.server
 http.server.responses kernel http namespaces ;
 IN: furnace.auth.basic.tests

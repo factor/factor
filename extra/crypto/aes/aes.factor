@@ -1,6 +1,6 @@
 ! Copyright (C) 2013 Fred Alger
 ! Some parts Copyright (C) 2008 Doug Coleman.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs byte-arrays crypto.aes.utils
 generalizations kernel literals math math.bitwise ranges
 namespaces sequences sequences.private sequences.unrolled ;
@@ -155,7 +155,7 @@ M: aes-256-key key-expand-round ( temp i -- temp' )
 
 : (key-sched-round) ( output temp i -- output' )
     key-expand-round
-    [ dup 4th-from-end ] dip bitxor suffix! ; inline
+    [ dup 4th-from-tail ] dip bitxor suffix! ; inline
 
 : (sched-interval) ( K Nr -- seq )
     [ length ] dip 1 + 4 * [a..b) ;    ! over the interval Nk...Nb(Nr + 1)
@@ -225,7 +225,7 @@ SINGLETON: aes-encrypt
     c0 gb0   c1 gb1   c2 gb2   c3 gb3   >ui32 ; ! c3'
 
 : (add-round-key) ( key state -- state' )
-   4 [ bitxor ] unrolled-2map ;
+    4 [ bitxor ] unrolled-2map ;
 
 : add-round-key ( aes n -- aes' )
     over (key-at-nth-round) swap

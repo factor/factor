@@ -1,5 +1,5 @@
 ! Copyright (C) 2009 Doug Coleman.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors alien.c-types alien.data kernel locals math
 ranges math.bitwise math.vectors math.vectors.simd random
 sequences specialized-arrays sequences.private classes.struct
@@ -39,16 +39,16 @@ TUPLE: sfmt
     [ endian-shuffle ] dip hrshift endian-shuffle ; inline
 
 : wA ( w -- wA )
-   dup 1 hlshift* vbitxor ; inline
+    dup 1 hlshift* vbitxor ; inline
 
 : wB ( w mask -- wB )
-   [ 11 vrshift ] dip vbitand ; inline
+    [ 11 vrshift ] dip vbitand ; inline
 
 : wC ( w -- wC )
-   1 hrshift* ; inline
+    1 hrshift* ; inline
 
 : wD ( w -- wD )
-   18 vlshift ; inline
+    18 vlshift ; inline
 
 : formula ( a b mask c d -- r )
     [ wC ] dip wD vbitxor

@@ -3,6 +3,9 @@
 <!-- RFC mode by Matthieu Casanova -->
 <!DOCTYPE MODE SYSTEM "xmode.dtd">
 <MODE>
+	<PROPS>
+		<PROPERTY NAME="contextInsensitive" VALUE="true" />
+	</PROPS>
 	<RULES HIGHLIGHT_DIGITS="TRUE" IGNORE_CASE="FALSE">
 		<SEQ_REGEXP HASH_CHAR="[" TYPE="KEYWORD3">\[Page \d+\]</SEQ_REGEXP>
 		<SEQ_REGEXP HASH_CHAR="[" TYPE="KEYWORD2">\[RFC\d+\]</SEQ_REGEXP>
@@ -10,6 +13,7 @@
 			<BEGIN>"</BEGIN>
 			<END>"</END>
 		</SPAN>
+		<SEQ_REGEXP TYPE="MARKUP" AT_LINE_START="TRUE">\d.*</SEQ_REGEXP>
 		<KEYWORDS>
 			<!--{{{ Keyword list from RFC2119 -->
 			<KEYWORD1>MUST</KEYWORD1>

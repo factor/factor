@@ -198,7 +198,7 @@ unit-test
 [ 2+1/2 -1 >base ] [ invalid-radix? ] must-fail-with
 [ 123.456 7 >base ] [ invalid-radix? ] must-fail-with
 
-{  "0/0." } [ 0/0. number>string ] unit-test
+{  "0/0." } [  0/0. number>string ] unit-test
 { "-0/0." } [ -0/0. number>string ] unit-test
 
 { t } [  "0/0." string>number fp-nan? ] unit-test

@@ -1,5 +1,5 @@
 ! Copyright (C) 2011 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs bit-arrays classes.tuple
 compiler.codegen.relocation cpu.architecture kernel layouts make
 math namespaces sequences ;
@@ -8,7 +8,7 @@ IN: compiler.codegen.gc-maps
 SYMBOLS: return-addresses gc-maps ;
 
 : gc-map-needed? ( gc-map/f -- ? )
-    dup [ tuple-slots [ empty? ] all? not ] when ;
+    [ tuple-slots [ empty? ] all? not ] ?call ;
 
 : gc-map-here ( gc-map -- )
     dup gc-map-needed? [

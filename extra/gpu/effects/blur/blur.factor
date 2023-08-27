@@ -1,5 +1,5 @@
 ! Copyright (C) 2010 Erik Charlebois.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: destructors gpu.render gpu.shaders gpu.state gpu.textures
 gpu.util images kernel math math.rectangles sequences ;
 IN: gpu.effects.blur

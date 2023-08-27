@@ -1,5 +1,5 @@
 ! Copyright (C) 2010 Anton Gorenko.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: alien alien.destructors alien.libraries alien.syntax
 combinators gobject-introspection literals math system vocabs ;
 IN: gobject.ffi
@@ -12,14 +12,14 @@ USE: glib.ffi
 LIBRARY: gobject
 
 << "gobject" {
-    { [ os windows? ] [ "libgobject-2.0-0.dll" ] }
+    { [ os windows? ] [ "gobject-2.0-0.dll" ] }
     { [ os macosx? ] [ "libgobject-2.0.dylib" ] }
     { [ os unix? ] [ "libgobject-2.0.so" ] }
 } cond cdecl add-library >>
 
 IMPLEMENT-STRUCTS: GValue GParamSpecVariant ;
 
-GIR: vocab:gobject/GObject-2.0.gir
+GIR: vocab:gir/GObject-2.0.gir
 
 FORGET: GIOCondition
 FORGET: G_IO_IN

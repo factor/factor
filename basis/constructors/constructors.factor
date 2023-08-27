@@ -1,5 +1,5 @@
 ! Copyright (C) 2009 Slava Pestov, Doug Coleman.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors assocs classes classes.tuple effects
 effects.parser kernel lexer parser sequences
 sequences.generalizations sets words ;

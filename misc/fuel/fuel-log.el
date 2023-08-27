@@ -1,7 +1,7 @@
 ;;; fuel-log.el -- logging utilities -*- lexical-binding: t -*-
 
 ;; Copyright (C) 2008, 2009 Jose Antonio Ortega Ruiz
-;; See http://factorcode.org/license.txt for BSD license.
+;; See https://factorcode.org/license.txt for BSD license.
 
 ;; Author: Jose Antonio Ortega Ruiz <jao@gnu.org>
 ;; Keywords: languages, fuel, factor
@@ -42,7 +42,7 @@
   (buffer-disable-undo)
   (setq-local comint-redirect-subvert-readonly t)
   (add-hook 'after-change-functions
-            '(lambda (b e len)
+            #'(lambda (b e len)
                (let ((inhibit-read-only t))
                  (when (> b fuel-log--max-buffer-size)
                    (delete-region (point-min) b))))

@@ -1,5 +1,5 @@
 ! Copyright (C) 2005, 2006 Doug Coleman.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: alien alien.c-types alien.syntax kernel windows.types
 math multiline classes.struct alien.data arrays literals ;
 QUALIFIED-WITH: alien.c-types c

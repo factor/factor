@@ -1,5 +1,5 @@
 ! Copyright (C) 2007, 2008 Doug Coleman, Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors alien alien.c-types arrays assocs combinators
 destructors io io.files.windows io.pipes
 io.ports kernel libc literals make math.bitwise math.parser
@@ -8,7 +8,7 @@ windows.kernel32 windows.types ;
 IN: io.pipes.windows
 
 ! This code is based on
-! http://twistedmatrix.com/trac/browser/trunk/twisted/internet/iocpreactor/process.py
+! https://twistedmatrix.com/trac/browser/trunk/twisted/internet/iocpreactor/process.py
 
 : create-named-pipe ( name -- handle )
     flags{ PIPE_ACCESS_INBOUND FILE_FLAG_OVERLAPPED }

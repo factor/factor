@@ -141,7 +141,7 @@ ARTICLE: "compiler.cfg.builder"
 "Final stage of compilation generates machine code from dataflow IR"
 "The compiler first builds an SSA IR tree of the word to be compiled (see " { $vocab-link "compiler.tree.builder" } ") then this vocab converts it to a CFG IR tree. The result is not in SSA form; this is constructed later by calling compiler.cfg.ssa.construction:construct-ssa."
 $nl
-"Each tree node type has its own implementation of the " { $link emit-node } " generic. In that word, cfg instructions (tuples prefixed with ##) are outputted to basic blocks and the cfg constructed."
+"Each tree node type has its own implementation of the " { $link emit-node } " generic. In that word, cfg instructions (tuples prefixed with ##) are output to basic blocks and the cfg constructed."
 $nl
 "Main word:"
 { $subsections

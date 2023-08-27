@@ -1,5 +1,5 @@
 ! Copyright (C) 2018 John Benediktsson.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors alien.c-types alien.data byte-arrays checksums
 combinators endian grouping kernel math math.bitwise sequences
 specialized-arrays ;

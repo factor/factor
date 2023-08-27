@@ -1,7 +1,7 @@
 ! Copyright (C) 2008 Daniel Ehrenberg.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs binary-search classes grouping
-kernel locals make math math.order sequences sequences.private
+kernel make math math.order sequences sequences.private
 sorting ;
 IN: interval-maps
 
@@ -45,7 +45,7 @@ PRIVATE>
     interval-map check-instance array>> [ third-unsafe ] map ;
 
 : <interval-map> ( specification -- map )
-    all-intervals [ first-unsafe second-unsafe ] sort-with
+    all-intervals [ first-unsafe second-unsafe ] sort-by
     >intervals ensure-disjoint interval-map boa ;
 
 : <interval-set> ( specification -- map )

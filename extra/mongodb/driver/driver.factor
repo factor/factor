@@ -109,9 +109,9 @@ SYNTAX: r/
     H{ } clone [ set-at ] keep ;
 
 : <mdb> ( db host port -- mdb )
-   <inet> t [ <mdb-node> ] keep
-   H{ } clone [ set-at ] keep <mdb-db>
-   [ verify-nodes ] keep ;
+    <inet> t [ <mdb-node> ] keep
+    H{ } clone [ set-at ] keep <mdb-db>
+    [ verify-nodes ] keep ;
 
 GENERIC: create-collection ( name/collection -- )
 
@@ -154,10 +154,12 @@ M: mdb-collection create-collection ( collection -- )
     [ nip ] if ;
 
 : (ensure-collection) ( collection mdb-instance -- collection )
-    ensure-collection-map [ dup ] dip key?
-    [ ] [ [ ensure-valid-collection-name ]
-          [ create-collection ]
-          [ ] tri ] if ;
+    ensure-collection-map dupd key?
+    [ ] [
+        [ ensure-valid-collection-name ]
+        [ create-collection ]
+        [ ] tri
+    ] if ;
 
 : reserved-namespace? ( name -- ? )
     [ "$cmd" = ] [ "system" head? ] bi or ;

@@ -1,5 +1,5 @@
 ! Copyright (C) 2008 Eduardo Cavazos.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: math math.constants ;
 IN: math.trig
 

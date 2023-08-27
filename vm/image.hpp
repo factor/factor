@@ -15,17 +15,16 @@ struct image_header {
   cell version;
   // base address of data heap when image was saved
   cell data_relocation_base;
-  // size of data heap
+  // <>0 : size of data heap, ==0 : version4_escape
   union { cell data_size; cell version4_escape; };
   // base address of code heap when image was saved
   cell code_relocation_base;
   // size of code heap
   cell code_size;
-  union { cell reserved_1; cell compressed_code_size; };
-  union { cell reserved_2; cell esc_data_size; };
-  union { cell reserved_3; cell compressed_data_size; };
-  cell reserved_4;
-
+  union { cell reserved_1; cell escaped_data_size; }; // undefined if data_size <>0, stores size of data heap otherwise
+  union { cell reserved_2; cell compressed_data_size; }; // undefined if data_size <>0, compressed data heap size if smaller than data heap size
+  union { cell reserved_3; cell compressed_code_size; }; // undefined if data_size <>0, compressed code heap size if smaller than code heap size
+  cell reserved_4; // undefined if data_size <>0, 0 otherwise
   // Initial user environment
   cell special_objects[special_object_count];
 };

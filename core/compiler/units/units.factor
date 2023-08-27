@@ -1,8 +1,8 @@
 ! Copyright (C) 2008, 2010 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs classes classes.private
 classes.tuple.private continuations definitions generic
-hash-sets init kernel kernel.private math namespaces sequences
+hash-sets kernel kernel.private math namespaces sequences
 sets source-files.errors vocabs words ;
 IN: compiler.units
 

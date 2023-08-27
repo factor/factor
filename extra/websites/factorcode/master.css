@@ -29,10 +29,10 @@ img {
 }
 
 pre {
-    background-color: #f5f5f5;
-    border: 1px dashed #ccc;
-    margin-top: 10px;
+    background-color: #f7f7f7;
+    border: 1px solid #dbdbdb;
     padding: 10px;
+    margin-top: 10px;
     font-size: smaller;
     width: 100%;
     overflow: auto;
@@ -48,8 +48,12 @@ li {
     padding: 5px;
 }
 
+table {
+  border-collapse: collapse;
+}
+
 .downloads {
-    width: 520px;
+    width: min(520px, 100%);
     padding: 0;
     margin: 0;
     white-space: nowrap;
@@ -58,19 +62,26 @@ li {
 .downloads th {
     color: #4f6b72;
     border: 1px solid #C1DAD7;
-    border-left: none;
     letter-spacing: 2px;
     text-transform: uppercase;
     font-size: smaller;
     padding: 6px;
-    background: #CAE8EA url(bg_header.jpg) no-repeat;
+    background-color: #CAE8EA;
+    background-image: linear-gradient(#DBEFEE, #C9E7E9);
     text-align: center;
     vertical-align: center;
 }
 
-.downloads th.nobg {
-    border: 0;
+.downloads td:last-child {
     border-right: 1px solid #C1DAD7;
+}
+
+.downloads tr:last-child {
+    border-bottom: 1px solid #C1DAD7;
+}
+
+.downloads th.nobg {
+    border: none;
     background: none;
 }
 
@@ -119,5 +130,33 @@ li {
     .downloads {
         width: 100%;
         max-width: 520px;
+    }
+}
+
+/* Dark mode */
+@media (prefers-color-scheme: dark) {
+    body {
+        background-color: #202124;
+        color: #bdc1c6;
+    }
+
+    title, h1, h2, h3, h4, h5, h6 {
+        color: white;
+    }
+
+    a {
+        color: #8ab4f8;
+    }
+
+    pre {
+        color: black;
+    }
+
+    .downloads a {
+        color: #2A5DB0;
+    }
+
+    img#logo {
+        content:url(logo-dark.png);
     }
 }

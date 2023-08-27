@@ -1,5 +1,5 @@
 ! Copyright (C) 2008 Doug Coleman.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs classes classes.tuple combinators
 db kernel math math.parser mirrors sequences sequences.deep
 splitting words ;
@@ -35,7 +35,7 @@ SYMBOL: IGNORE
 ERROR: not-persistent class ;
 
 : db-table-name ( class -- object )
-    dup "db-table" word-prop [ ] [ not-persistent ] ?if ;
+    [ "db-table" word-prop ] [ not-persistent ] ?unless ;
 
 : db-columns ( class -- object )
     superclasses-of [ "db-columns" word-prop ] map concat ;
@@ -104,10 +104,10 @@ FACTOR-BLOB NULL URL ;
 : remove-id ( specs -- obj )
     [ primary-key>> ] reject ;
 
-! SQLite Types: http://www.sqlite.org/datatype3.html
+! SQLite Types: https://www.sqlite.org/datatype3.html
 ! NULL INTEGER REAL TEXT BLOB
 ! PostgreSQL Types:
-! http://developer.postgresql.org/pgdocs/postgres/datatype.html
+! https://developer.postgresql.org/pgdocs/postgres/datatype.html
 
 ERROR: unknown-modifier modifier ;
 

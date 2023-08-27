@@ -1,5 +1,5 @@
 ! Copyright (C) 2008 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: assocs calendar calendar.format combinators
 concurrency.messaging continuations debugger destructors init io
 io.directories io.encodings.utf8 io.files io.pathnames kernel
@@ -69,9 +69,6 @@ CONSTANT: keep-logs 10
 
 : delete-oldest ( service -- )
     keep-logs log# ?delete-file ;
-
-: ?move-file ( old new -- )
-    over file-exists? [ move-file ] [ 2drop ] if ;
 
 : advance-log ( path n -- )
     [ 1 - log# ] 2keep log# ?move-file ;

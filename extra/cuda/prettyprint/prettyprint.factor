@@ -21,8 +21,8 @@ PREDICATE: cuda-function-word < word
 M: cuda-function-word definer drop \ CUDA-FUNCTION: \ ; ;
 M: cuda-function-word definition drop f ;
 M: cuda-function-word synopsis*
-   {
-       [ seeing-word ]
-       [ definer. ]
-       [ [ pprint-word ] pprint-cuda-function ]
-   } cleave ;
+    {
+        [ seeing-word ]
+        [ definer. ]
+        [ [ pprint-word ] pprint-cuda-function ]
+    } cleave ;

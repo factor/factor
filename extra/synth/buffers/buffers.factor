@@ -1,8 +1,7 @@
 ! Copyright (C) 2008 Alex Chapman
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors alien alien.c-types combinators kernel math
 openal sequences sequences.merged specialized-arrays ;
-FROM: alien.c-types => short uchar ;
 SPECIALIZED-ARRAY: uchar
 SPECIALIZED-ARRAY: short
 IN: synth.buffers

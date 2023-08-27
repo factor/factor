@@ -97,13 +97,13 @@ IN: compiler.tree.dead-code.tests
 
 { [ [ f ] [ f ] if ] } [ [ [ f ] [ f ] if ] optimize-quot ] unit-test
 
-{ } [ [ dup [ 3 throw ] [ ] if ] optimize-quot drop ] unit-test
+[ [ dup [ 3 throw ] [ ] if ] optimize-quot ] must-not-fail
 
 { [ [ . ] [ drop ] if ] } [ [ [ dup . ] [ ] if drop ] optimize-quot ] unit-test
 
 { [ f ] } [ [ f dup [ ] [ ] if ] optimize-quot ] unit-test
 
-{ } [ [ over [ ] [ dup [ "X" throw ] [ "X" throw ] if ] if ] optimize-quot drop ] unit-test
+[ [ over [ ] [ dup [ "X" throw ] [ "X" throw ] if ] if ] optimize-quot ] must-not-fail
 
 : boo ( a b -- c ) 2drop f ;
 
@@ -161,20 +161,20 @@ IN: compiler.tree.dead-code.tests
     [ call-recursive-dce-4 drop ] optimize-quot squish
 ] unit-test
 
-{ } [ [ f call-recursive-dce-3 swap ] optimize-quot drop ] unit-test
+[ [ f call-recursive-dce-3 swap ] optimize-quot ] must-not-fail
 
 : call-recursive-dce-5 ( -- ) call-recursive-dce-5 ; inline recursive
 
-{ } [ [ call-recursive-dce-5 swap ] optimize-quot drop ] unit-test
+[ [ call-recursive-dce-5 swap ] optimize-quot ] must-not-fail
 
-{ } [ [ [ 0 -rot set-nth-unsafe ] curry (each-integer) ] optimize-quot drop ] unit-test
+[ [ [ 0 -rot set-nth-unsafe ] curry each-integer-from ] optimize-quot ] must-not-fail
 
 : call-recursive-dce-6 ( i quot: ( ..a -- ..b ) -- i )
     dup call [ drop ] [ call-recursive-dce-6 ] if ; inline recursive
 
-{ } [ [ [ ] curry [ ] swap compose call-recursive-dce-6 ] optimize-quot drop ] unit-test
+[ [ [ ] curry [ ] swap compose call-recursive-dce-6 ] optimize-quot ] must-not-fail
 
-{ } [ [ [ ] rot [ . ] curry pick [ roll 2drop call ] [ 2nip call ] if ] optimize-quot drop ] unit-test
+[ [ [ ] rot [ . ] curry pick [ roll 2drop call ] [ 2nip call ] if ] optimize-quot ] must-not-fail
 
 { [ drop ] } [ [ array? drop ] optimize-quot ] unit-test
 
@@ -203,7 +203,7 @@ IN: compiler.tree.dead-code.tests
 : call-recursive-dce-7 ( obj -- elt ? )
     dup 5 = [ t ] [ dup [ call-recursive-dce-7 ] [ drop f f ] if ] if ; inline recursive
 
-{ } [ [ call-recursive-dce-7 ] optimize-quot drop ] unit-test
+[ [ call-recursive-dce-7 ] optimize-quot ] must-not-fail
 
 { [ /i ] } [ [ /mod drop ] optimize-quot ] unit-test
 

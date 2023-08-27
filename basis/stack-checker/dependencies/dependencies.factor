@@ -1,5 +1,5 @@
 ! Copyright (C) 2009, 2010 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 
 USING: accessors alien.c-types arrays assocs classes
 classes.algebra classes.algebra.private classes.maybe
@@ -42,6 +42,9 @@ M: anonymous-union add-depends-on-class
 
 M: anonymous-intersection add-depends-on-class
     participants>> [ add-depends-on-class ] each ;
+
+M: anonymous-complement add-depends-on-class
+    class>> add-depends-on-class ;
 
 GENERIC: add-depends-on-c-type ( c-type -- )
 

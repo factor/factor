@@ -1,5 +1,5 @@
 ! Copyright (C) 2005, 2010 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors arrays ascii assocs boxes calendar classes columns
 combinators combinators.short-circuit deques kernel make math
 math.order math.parser math.vectors namespaces sequences sets system
@@ -57,7 +57,7 @@ M: propagate-gesture-tuple send-queued-gesture
 TUPLE: propagate-key-gesture-tuple gesture world ;
 
 : world-focus ( world -- gadget )
-    dup focus>> [ world-focus ] [ ] ?if ;
+    [ focus>> ] [ world-focus ] ?when ;
 
 M: propagate-key-gesture-tuple send-queued-gesture
     [ gesture>> ] [ world>> world-focus ] bi
@@ -147,7 +147,7 @@ TUPLE: key-up < key-gesture ;
 
 ! Note that these are only really useful inside an event
 ! handler, and that the locations hand-loc and hand-click-loc
-! are in the co-ordinate system of the world which contains
+! are in the coordinate system of the world which contains
 ! the gadget in question.
 SYMBOL: hand-gadget
 SYMBOL: hand-world

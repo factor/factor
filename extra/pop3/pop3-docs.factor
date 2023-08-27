@@ -1,5 +1,5 @@
 ! Copyright (C) 2009 Elie Chaftari.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: arrays assocs help.markup help.syntax math sequences
 strings ;
 IN: pop3

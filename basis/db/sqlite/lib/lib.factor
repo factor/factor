@@ -1,5 +1,5 @@
 ! Copyright (C) 2008 Chris Double, Doug Coleman.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors alien.c-types alien.data arrays calendar.format
 calendar.parser combinators db db.errors db.sqlite.errors
 db.sqlite.ffi db.types io.backend io.encodings.string
@@ -186,7 +186,7 @@ ERROR: sqlite-error < db-error n string ;
     } case ;
 
 : sqlite-row ( handle -- seq )
-    dup sqlite-#columns [ sqlite-column ] with { } map-integers ;
+    dup sqlite-#columns [ sqlite-column ] with map-integers ;
 
 : sqlite-step-has-more-rows? ( prepared -- ? )
     {

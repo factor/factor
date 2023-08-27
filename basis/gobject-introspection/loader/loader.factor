@@ -1,5 +1,5 @@
 ! Copyright (C) 2010 Anton Gorenko.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors ascii combinators gobject-introspection.common
 gobject-introspection.repository kernel literals math.parser
 sequences splitting xml.data xml.traversal ;

@@ -3,7 +3,7 @@
 <!DOCTYPE MODE SYSTEM "xmode.dtd">
 
 <!--	jEdit CLIPS syntax file
-	
+
 	written by	Orhan Alkan
 	version		1.0
 	created on	30 June 2007
@@ -17,27 +17,27 @@
 	<PROPERTY NAME="indentNextLine"
 			VALUE="\s*(((if|while)\s*\(|else\s*|else\s+if\s*\(|for\s*\(.*\))[^{;]*)" />
 	</PROPS>
-	<RULES ESCAPE="\" IGNORE_CASE="FALSE" HIGHLIGHT_DIGITS="TRUE" DIGIT_RE="(0[lL]?|[1-9]\d{0,9}(\d{0,9}[lL])?|0[xX]\p{XDigit}{1,8}(\p{XDigit}{0,8}[lL])?|0[0-7]{1,11}([0-7]{0,11}[lL])?|([0-9]+\.[0-9]*|\.[0-9]+)([eE][+-]?[0-9]+)?[fFdD]?|[0-9]+([eE][+-]?[0-9]+[fFdD]?|([eE][+-]?[0-9]+)?[fFdD]))">
-	
+	<RULES IGNORE_CASE="FALSE" HIGHLIGHT_DIGITS="TRUE" DIGIT_RE="(0[lL]?|[1-9]\d{0,9}(\d{0,9}[lL])?|0[xX]\p{XDigit}{1,8}(\p{XDigit}{0,8}[lL])?|0[0-7]{1,11}([0-7]{0,11}[lL])?|([0-9]+\.[0-9]*|\.[0-9]+)([eE][+-]?[0-9]+)?[fFdD]?|[0-9]+([eE][+-]?[0-9]+[fFdD]?|([eE][+-]?[0-9]+)?[fFdD]))">
+
 		<!-- Comments -->
 		<EOL_SPAN TYPE="COMMENT1">;</EOL_SPAN>
-		
+
 		<!-- String literals -->
-		<SPAN TYPE="LITERAL1" NO_LINE_BREAK="TRUE">
+		<SPAN TYPE="LITERAL1" ESCAPE="\" NO_LINE_BREAK="TRUE">
 			<BEGIN>'</BEGIN>
 			<END>'</END>
 		</SPAN>
-		<SPAN TYPE="LITERAL1" NO_LINE_BREAK="TRUE">
+		<SPAN TYPE="LITERAL1" ESCAPE="\" NO_LINE_BREAK="TRUE">
 			<BEGIN>"</BEGIN>
 			<END>"</END>
 		</SPAN>
-		
+
 		<!-- List literals -->
 		<SPAN TYPE="LITERAL2" NO_LINE_BREAK="TRUE">
 			<BEGIN>[</BEGIN>
 			<END>]</END>
 		</SPAN>
-		
+
 		<!-- Operators -->
 		<SEQ TYPE="OPERATOR">=></SEQ>
 		<SEQ TYPE="OPERATOR">?</SEQ>
@@ -48,7 +48,7 @@
 		<SEQ TYPE="OPERATOR">&lt;=</SEQ>
 		<SEQ TYPE="OPERATOR">&gt;-</SEQ>
 		<SEQ TYPE="OPERATOR">+</SEQ>
-		<SEQ TYPE="OPERATOR">-</SEQ> 
+		<SEQ TYPE="OPERATOR">-</SEQ>
 		<SEQ TYPE="OPERATOR">*</SEQ>
 		<SEQ TYPE="OPERATOR">/</SEQ>
 		<SEQ TYPE="OPERATOR">=</SEQ>
@@ -59,7 +59,7 @@
 		<SEQ TYPE="OPERATOR">&amp;</SEQ>
 		<SEQ TYPE="OPERATOR">:</SEQ>
 		<SEQ TYPE="OPERATOR">$</SEQ>
-		
+
 		<!-- Parentheses -->
 		<SEQ TYPE="MARKUP">(</SEQ>
 		<SEQ TYPE="MARKUP">)</SEQ>
@@ -67,9 +67,9 @@
 		<SEQ TYPE="MARKUP">]</SEQ>
 		<SEQ TYPE="NULL">{</SEQ>
 		<SEQ TYPE="NULL">}</SEQ>
-		
+
 		<KEYWORDS>
-		
+
 			<KEYWORD1>deffacts</KEYWORD1>
 			<KEYWORD1>deftemplate</KEYWORD1>
 			<KEYWORD1>defglobal</KEYWORD1>
@@ -137,7 +137,7 @@
 			<KEYWORD1>allowed-instance-names</KEYWORD1>
 			<KEYWORD1>allowed-values</KEYWORD1>
 			<KEYWORD1>?VARIABLE</KEYWORD1>
-			
+
 			<KEYWORD2>if</KEYWORD2>
 			<KEYWORD2>while</KEYWORD2>
 			<KEYWORD2>then</KEYWORD2>
@@ -159,7 +159,7 @@
 			<KEYWORD2>symbolp</KEYWORD2>
 			<KEYWORD2>switch</KEYWORD2>
 			<KEYWORD2>while</KEYWORD2>
-			
+
 			<KEYWORD3>assert</KEYWORD3>
 			<KEYWORD3>bind</KEYWORD3>
 			<KEYWORD3>class-abstractp</KEYWORD3>
@@ -363,7 +363,7 @@
 			<KEYWORD3>fetch</KEYWORD3>
 			<KEYWORD3>print-region</KEYWORD3>
 			<KEYWORD3>toss</KEYWORD3>
-			
+
 			<KEYWORD4>abs</KEYWORD4>
 			<KEYWORD4>div</KEYWORD4>
 			<KEYWORD4>float</KEYWORD4>
@@ -426,9 +426,9 @@
 			<KEYWORD4>sinh</KEYWORD4>
 			<KEYWORD4>tan</KEYWORD4>
 			<KEYWORD4>tanh</KEYWORD4>
-									
+
 		</KEYWORDS>
-		
+
 	</RULES>
-	
+
 </MODE>

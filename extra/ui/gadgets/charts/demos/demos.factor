@@ -1,5 +1,5 @@
 ! Copyright (C) 2017 Alexander Ilin.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors arrays colors kernel literals locals
 math math.constants math.functions sequences ui ui.gadgets
 ui.gadgets.charts ui.gadgets.charts.axes ui.gadgets.charts.lines

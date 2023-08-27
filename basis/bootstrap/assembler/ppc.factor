@@ -1,5 +1,5 @@
 ! Copyright (C) 2011 Erik Charlebois
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: bootstrap.image.private kernel kernel.private namespaces
 system cpu.ppc.assembler compiler.units compiler.constants math
 math.private ranges layouts words vocabs slots.private

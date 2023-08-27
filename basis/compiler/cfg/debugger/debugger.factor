@@ -1,5 +1,5 @@
 ! Copyright (C) 2008, 2011 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors assocs classes.tuple compiler.cfg
 compiler.cfg.builder compiler.cfg.finalization
 compiler.cfg.gc-checks compiler.cfg.instructions

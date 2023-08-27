@@ -1,5 +1,5 @@
 USING: combinators kernel namespaces quotations regexp sequences
-xml.data xml.traversal ;
+splitting xml.data xml.traversal ;
 IN: xmode.utilities
 
 : implies ( x y -- z ) [ not ] dip or ; inline
@@ -25,11 +25,13 @@ IN: xmode.utilities
     [ object set tag set ] prepose with-scope ; inline
 
 MACRO: (init-from-tag) ( specs -- quot )
-    [ tag-init-form ] map concat [ ] like
+    [ tag-init-form ] map [ ] concat-as
     [ with-tag-initializer ] curry ;
 
 : init-from-tag ( tag tuple specs -- tuple )
     over [ (init-from-tag) ] dip ; inline
 
 : <?insensitive-regexp> ( string ? -- regexp )
+    ! handle Java style case-insensitive flags
+    "(?i)" pick subseq-start [ drop "(?i)" "" replace t ] when
     "i" "" ? <optioned-regexp> ;

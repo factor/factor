@@ -1,5 +1,5 @@
 ! Copyright (C) 2009, 2010 Slava Pestov.
-! See http://factorcode.org/license.txt for BSD license.
+! See https://factorcode.org/license.txt for BSD license.
 USING: arrays compiler.units fry hashtables help.topics io
 kernel math namespaces sequences sets help.vocabs
 help.apropos vocabs help.markup ;

@@ -1,9 +1,10 @@
-! Copyright (c) 2012 Anonymous
-! See http://factorcode.org/license.txt for BSD license.
-USING: combinators kernel math sequences ;
+! Copyright (c) 2023 Alexander Ilin
+! See https://factorcode.org/license.txt for BSD license.
+USING: combinators formatting kernel math random sequences
+strings ;
 IN: rosetta-code.balanced-brackets
 
-! http://rosettacode.org/wiki/Balanced_brackets
+! https://rosettacode.org/wiki/Balanced_brackets
 
 ! Task:
 
@@ -21,15 +22,20 @@ IN: rosetta-code.balanced-brackets
 ! [][]      OK   ][][      NOT OK
 ! [[][]]    OK   []][[]    NOT OK
 
-:: balanced? ( str -- ? )
-    0 :> counter!
-    t :> ok!
-    str [
+: balanced? ( str -- ? )
+    0 swap [
         {
-            { CHAR: [ [ 1 ] }
-            { CHAR: ] [ -1 ] }
-            [ drop 0 ]
-        } case counter + counter!
-        counter 0 < [ f ok! ] when
-    ] each
-    ok [ counter 0 <= ] [ f ] if ;
+            { CHAR: [ [ 1 + t ] }
+            { CHAR: ] [ 1 - dup 0 >= ] }
+            [ drop t ]
+        } case
+    ] all? swap zero? and ;
+
+: bracket-pairs ( n -- str )
+    [ "[]" ] replicate "" concat-as ;
+
+: balanced-brackets-main ( -- )
+    5 bracket-pairs randomize dup balanced? "" "not " ?
+    "String \"%s\" is %sbalanced.\n" printf ;
+
+MAIN: balanced-brackets-main
