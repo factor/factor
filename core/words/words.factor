@@ -51,9 +51,9 @@ M: word definition def>> ;
 
 PRIVATE>
 
-TUPLE: undefined-word word ;
+ERROR: undefined-word word ;
 
-: undefined ( -- * ) get-callstack caller undefined-word boa throw ;
+: undefined ( -- * ) get-callstack caller undefined-word ;
 
 : undefined-def ( -- quot )
     ! 'f' inhibits tail call optimization in non-optimizing
@@ -198,6 +198,8 @@ M: word reset-word
 
 : <word> ( name vocab -- word )
     over hashcode over hashcode hash-combine >fixnum (word) dup new-word ;
+
+PREDICATE: uninterned-word < word vocabulary>> not ;
 
 : <uninterned-word> ( name -- word )
     f \ <uninterned-word> counter >fixnum (word)

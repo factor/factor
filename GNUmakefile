@@ -5,12 +5,19 @@ ifdef CONFIG
 	DEBUG ?= 0
 	REPRODUCIBLE ?= 0
 
+	SHELL_CC = $(shell printenv CC)
+	ifeq ($(SHELL_CC),)
+		CC := $(shell which clang cc 2>/dev/null | head -n 1)
+	else
+		CC = $(SHELL_CC)
+	endif
+
 	# gmake's default CXX is g++, we prefer c++
 	SHELL_CXX = $(shell printenv CXX)
 	ifeq ($(SHELL_CXX),)
-		CXX=c++
+		CXX := $(shell which clang++ c++ 2>/dev/null | head -n 1)
 	else
-		CXX=$(SHELL_CXX)
+		CXX = $(SHELL_CXX)
 	endif
 
 	XCODE_PATH ?= /Applications/Xcode.app
