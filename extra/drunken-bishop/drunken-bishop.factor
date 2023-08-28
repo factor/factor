@@ -36,7 +36,7 @@ board-height [ 9 ] initialize
             } case :> ( dy dx )
             dy y + 0 h 1 - clamp y!
             dx x + 0 w 1 - clamp x!
-            x y board nth [ 1 + 0 15 clamp ] change-nth
+            x y board nth [ dup 14 < [ 1 + ] when ] change-nth
         ] with each
     ] each
 
