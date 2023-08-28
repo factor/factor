@@ -11,7 +11,7 @@ struct embedded_image_footer {
 };
 
 struct image_header {
-  union { cell magic; cell uncompressed_p; };
+  cell magic;
   cell version;
   // base address of data heap when image was saved
   cell data_relocation_base;
