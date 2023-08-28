@@ -27,7 +27,7 @@ TUPLE: image header data code ;
   ] unless
 ;
 
-: sync-header ( image -- image! )
+: sync-header ( image -- image' )
   dup data>> length over header>> compressed-data-size<<
   dup code>> length over header>> compressed-code-size<<
 ;
@@ -49,8 +49,8 @@ TUPLE: image header data code ;
 ;
 
 : compress ( byte-array -- compressed ) 12 zstd-compress-level ; ! level 12 seems the right balance between compression factor and compression speed
-: compress-data ( image -- image! ) dup header>> [ escaped-data-size>> ] [ compressed-data-size>> ] bi = [ dup data>> compress >>data ] when ; ! only compress uncompressed data
-: compress-code ( image -- image! ) dup header>> [ code-size>> ]         [ compressed-code-size>> ] bi = [ dup code>> compress >>code ] when ; ! only compress uncompressed code
+: compress-data ( image -- image' ) dup header>> [ escaped-data-size>> ] [ compressed-data-size>> ] bi = [ dup data>> compress >>data ] when ; ! only compress uncompressed data
+: compress-code ( image -- image' ) dup header>> [ code-size>> ]         [ compressed-code-size>> ] bi = [ dup code>> compress >>code ] when ; ! only compress uncompressed code
 
 ! compress factor image
 : compress-factor-image ( filename -- )
