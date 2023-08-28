@@ -114,7 +114,7 @@ CHLOE: form
 
 : button-tag-markup ( -- xml )
     <XML
-        <t:form class="inline" xmlns:t="https://factorcode.org/chloe/1.0">
+        <t:form class="inline" xmlns:t="http://factorcode.org/chloe/1.0">
             <div style="display: inline;"><button type="submit"></button></div>
         </t:form>
     XML> body>> clone ;

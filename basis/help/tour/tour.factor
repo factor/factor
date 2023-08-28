@@ -1305,7 +1305,7 @@ In order for all this to work, create a file { $snippet "work/hello-furnace/gree
 
 { $code "<?xml version='1.0' ?>
 
-<t:chloe xmlns:t=\"https://factorcode.org/chloe/1.0\">
+<t:chloe xmlns:t=\"http://factorcode.org/chloe/1.0\">
     <p>Hello from Chloe</p>
 </t:chloe>" }
 
