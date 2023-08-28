@@ -1,8 +1,10 @@
 ! Copyright (C) 2007 Chris Double.
 ! See https://factorcode.org/license.txt for BSD license.
-!
-USING: continuations kernel tools.test strings namespaces make arrays
-sequences peg peg.private peg.parsers words math accessors ;
+
+USING: accessors arrays compiler concurrency.futures
+continuations kernel make math namespaces peg peg.parsers
+peg.private sequences strings tools.test words ;
+
 IN: peg.tests
 
 { } [ reset-pegs ] unit-test
@@ -197,8 +199,6 @@ IN: peg.tests
 
 { f } [ \ + T{ parser f f f } equal? ] unit-test
 
-USE: compiler
-
 { } [ disable-optimizer ] unit-test
 
 { } [ "" epsilon parse drop ] unit-test
@@ -215,4 +215,11 @@ USE: compiler
     }
 } [
     [ "fbcd" "a" token "b" token 2array choice parse ] [ ] recover
+] unit-test
+
+PEG: foo ( x -- x ) "abc" token ;
+
+{ t } [
+    10,000 [ [ "abc" foo ] future ] replicate
+    [ ?future "abc" = ] all?
 ] unit-test
