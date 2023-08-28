@@ -130,10 +130,10 @@ vm\zstd.obj: vm\zstd.cpp vm\zstd.hpp vm\zstd.c vm\zstd.h vm\master.hpp
 	cl /EHsc $(CL_FLAGS) /MP /Fovm/ /c vm\zstd.cpp
 
 # batch mode has ::
-.c.obj::
+.cpp.obj::
 	cl /EHsc $(CL_FLAGS) /MP /Fovm/ /c $<
 
-.cpp.obj::
+.c.obj::
 	cl /EHsc $(CL_FLAGS) /MP /Fovm/ /c $<
 
 .asm.obj:
