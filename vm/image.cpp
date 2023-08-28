@@ -282,13 +282,11 @@ void factor_vm::load_image(vm_parameters* p) {
     fatal_error("Bad image: version number check failed", h.version);
 
   if (!h.version4_escape) {
-    h.data_size = h.esc_data_size;
-    h.uncompressed_p = 0;
+    h.data_size = h.escaped_data_size;
   } else {
     h.compressed_data_size = h.data_size;
     h.compressed_code_size = h.code_size;
   }
-
 
   load_data_heap(file, &h, p);
   load_code_heap(file, &h, p);
