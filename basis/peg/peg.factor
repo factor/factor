@@ -2,10 +2,10 @@
 ! See https://factorcode.org/license.txt for BSD license.
 
 USING: accessors arrays assocs classes combinators
-combinators.short-circuit compiler.units effects.parser kernel
-literals make math math.order memoize namespaces quotations
-sequences sets splitting strings unicode vectors vocabs.loader
-words ;
+combinators.short-circuit compiler.units concurrency.locks
+effects.parser kernel literals make math math.order memoize
+namespaces quotations sequences sets splitting strings unicode
+vectors vocabs.loader words ;
 
 IN: peg
 
@@ -595,13 +595,15 @@ PRIVATE>
 
 SYNTAX: PARTIAL-PEG:
     (:) [
-        '[ @ compile-parser ] ( -- word ) memoize-quot
+        <lock> swap
+        '[ _ [ @ compile-parser ] with-lock ] ( -- word ) memoize-quot
         '[ @ perform-parse ast>> ]
     ] dip define-declared ;
 
 SYNTAX: PEG:
     (:) [
-        '[ @ compile-parser ] ( -- word ) memoize-quot
+        <lock> swap
+        '[ _ [ @ compile-parser ] with-lock ] ( -- word ) memoize-quot
         '[ @ perform-parse check-parse-result ast>> ]
     ] dip define-declared ;
 
