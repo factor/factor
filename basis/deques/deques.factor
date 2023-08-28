@@ -18,28 +18,28 @@ GENERIC: deque-empty? ( deque -- ? )
 ERROR: empty-deque ;
 
 : peek-front ( deque -- obj )
-    peek-front* [ drop empty-deque ] unless ;
+    peek-front* [ drop empty-deque ] unless ; inline
 
 : ?peek-front ( deque -- obj/f )
-    peek-front* [ drop f ] unless ;
+    peek-front* [ drop f ] unless ; inline
 
 : peek-back ( deque -- obj )
-    peek-back* [ drop empty-deque ] unless ;
+    peek-back* [ drop empty-deque ] unless ; inline
 
 : ?peek-back ( deque -- obj/f )
-    peek-back* [ drop f ] unless ;
+    peek-back* [ drop f ] unless ; inline
 
 : push-front ( obj deque -- )
     push-front* drop ; inline
 
 : push-all-front ( seq deque -- )
-    '[ _ push-front ] each ;
+    '[ _ push-front ] each ; inline
 
 : push-back ( obj deque -- )
     push-back* drop ; inline
 
 : push-all-back ( seq deque -- )
-    '[ _ push-back ] each ;
+    '[ _ push-back ] each ; inline
 
 : pop-front ( deque -- obj )
     [ peek-front ] [ pop-front* ] bi ; inline
