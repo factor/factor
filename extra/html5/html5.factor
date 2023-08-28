@@ -14,12 +14,12 @@ IN: html5
 ! https://html.spec.whatwg.org/multipage/parsing.html#tokenization
 
 ! https://infra.spec.whatwg.org/#namespaces
-CONSTANT: html-namespace "https://www.w3.org/1999/xhtml"
-CONSTANT: mathml-namespace "https://www.w3.org/1998/Math/MathML"
-CONSTANT: svg-namespace "https://www.w3.org/2000/svg"
-CONSTANT: xlink-namespace "https://www.w3.org/1999/xlink"
-CONSTANT: xml-namespace "https://www.w3.org/XML/1998/namespace"
-CONSTANT: xmlns-namespace "https://www.w3.org/2000/xmlns/"
+CONSTANT: html-namespace "http://www.w3.org/1999/xhtml"
+CONSTANT: mathml-namespace "http://www.w3.org/1998/Math/MathML"
+CONSTANT: svg-namespace "http://www.w3.org/2000/svg"
+CONSTANT: xlink-namespace "http://www.w3.org/1999/xlink"
+CONSTANT: xml-namespace "http://www.w3.org/XML/1998/namespace"
+CONSTANT: xmlns-namespace "http://www.w3.org/2000/xmlns/"
 
 DEFER: data-state
 DEFER: (data-state)
