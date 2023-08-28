@@ -595,14 +595,14 @@ PRIVATE>
 
 SYNTAX: PARTIAL-PEG:
     (:) [
-        call( -- parser ) compile-parser
-        '[ _ perform-parse ast>> ]
+        '[ @ compile-parser ] ( -- word ) memoize-quot
+        '[ @ perform-parse ast>> ]
     ] dip define-declared ;
 
 SYNTAX: PEG:
     (:) [
-        call( -- parser ) compile-parser
-        '[ _ perform-parse check-parse-result ast>> ]
+        '[ @ compile-parser ] ( -- word ) memoize-quot
+        '[ @ perform-parse check-parse-result ast>> ]
     ] dip define-declared ;
 
 { "debugger" "peg" } "peg.debugger" require-when
