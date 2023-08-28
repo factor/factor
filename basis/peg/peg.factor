@@ -2,10 +2,10 @@
 ! See https://factorcode.org/license.txt for BSD license.
 
 USING: accessors arrays assocs classes combinators
-combinators.short-circuit compiler.units concurrency.locks
-effects.parser kernel literals make math math.order memoize
-namespaces quotations sequences sets splitting strings unicode
-vectors vocabs.loader words ;
+combinators.short-circuit compiler.units effects.parser kernel
+literals make math math.order memoize namespaces quotations
+sequences sets splitting strings unicode vectors vocabs.loader
+words ;
 
 IN: peg
 
@@ -594,17 +594,23 @@ PRIVATE>
     box-parser boa f next-id parser boa [ ] action ;
 
 SYNTAX: PARTIAL-PEG:
-    (:) [
-        <lock> swap
-        '[ _ [ @ compile-parser ] with-lock ] ( -- word ) memoize-quot
-        '[ @ perform-parse ast>> ]
-    ] dip define-declared ;
+    (:) '[
+        [
+            _
+            _ call( -- parser ) compile-parser
+            '[ _ perform-parse ast>> ]
+            _ define-declared
+        ] with-compilation-unit
+    ] append! ;
 
 SYNTAX: PEG:
-    (:) [
-        <lock> swap
-        '[ _ [ @ compile-parser ] with-lock ] ( -- word ) memoize-quot
-        '[ @ perform-parse check-parse-result ast>> ]
-    ] dip define-declared ;
+    (:) '[
+        [
+            _
+            _ call( -- parser ) compile-parser
+            '[ _ perform-parse check-parse-result ast>> ]
+            _ define-declared
+        ] with-compilation-unit
+    ] append! ;
 
 { "debugger" "peg" } "peg.debugger" require-when
