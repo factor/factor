@@ -1,0 +1,1 @@
+compress Factor image file for loading by the VM
