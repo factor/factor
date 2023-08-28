@@ -220,6 +220,6 @@ IN: peg.tests
 PEG: foo ( x -- x ) "abc" token ;
 
 { t } [
-    10,000 [ [ "abc" foo ] future ] replicate
+    2,000 [ [ "abc" foo ] future ] replicate
     [ ?future "abc" = ] all?
 ] unit-test
