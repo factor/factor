@@ -1,0 +1,1 @@
+Drunken bishop visual checksum algorithm
