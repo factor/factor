@@ -2,7 +2,7 @@
 ! image-header should be kept in sync with vm/image.hpp
 ! can be run as : factor -run=binary.image.factor.compressor
 
-USING: accessors classes.struct compression.zstd io io.encodings.binary io.files kernel kernel.private locals math sequences system tools.image-analyzer vm ;
+USING: accessors classes.struct byte-arrays compression.zstd io io.encodings.binary io.files kernel kernel.private locals math sequences system tools.image-analyzer vm ;
 IN: binary.image.factor.compressor
 
 STRUCT: image-header
@@ -18,7 +18,10 @@ STRUCT: image-header
     { reserved-4 cell_t initial: 0 }
     { special-objects cell_t[special-object-count] } ;
 
-TUPLE: image header data code ;
+TUPLE: image
+  { header image-header }
+  { data byte-array }
+  { code byte-array } ;
 
 ! converts to compression compatible header if needed
 : >compression-header ( headerv4 -- headerv4+ )
