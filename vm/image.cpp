@@ -98,30 +98,26 @@ void vm_parameters::init_from_args(int argc, vm_char** argv) {
 }
 
 void factor_vm::load_data_heap(FILE* file, image_header* h, vm_parameters* p) {
-  auto uncompress = h->data_size != h->compressed_data_size;
-
   p->tenured_size = std::max((h->data_size * 3) / 2, p->tenured_size);
 
   data_heap *d = new data_heap(&nursery,
                                p->young_size, p->aging_size, p->tenured_size);
   set_data_heap(d);
 
+  auto uncompress = h->data_size != h->compressed_data_size;
   auto buf = uncompress ? malloc (h->compressed_data_size) : (void*)data->tenured->start;
 
   fixnum bytes_read =
-        raw_fread(buf, 1, h->compressed_data_size, file);
+      raw_fread(buf, 1, h->compressed_data_size, file);
 
   if ((cell)bytes_read != h->compressed_data_size) {
     std::cout << "truncated image: " << bytes_read << " bytes read, ";
     std::cout << h->compressed_data_size << " bytes expected\n";
     fatal_error("load_data_heap failed", 0);
   }
+
   if (uncompress) {
-    puts ("decompress data");
     size_t result = lib::zstd::ZSTD_decompress ( (void*)data->tenured->start, h->data_size, buf, h->compressed_data_size);
-    if (lib::zstd::ZSTD_isError (result)) {
-      puts (lib::zstd::ZSTD_getErrorName (result));
-    }
   }
 
   if (uncompress && buf) free (buf);
@@ -130,12 +126,12 @@ void factor_vm::load_data_heap(FILE* file, image_header* h, vm_parameters* p) {
 }
 
 void factor_vm::load_code_heap(FILE* file, image_header* h, vm_parameters* p) {
-  auto uncompress = h->code_size != h->compressed_code_size;
-
   if (h->code_size > p->code_size)
     fatal_error("Code heap too small to fit image", h->code_size);
 
   code = new code_heap(p->code_size);
+
+  auto uncompress = h->code_size != h->compressed_code_size;
   auto buf = uncompress ? malloc (h->compressed_code_size) : (void*)code->allocator->start;
 
   if (h->code_size != 0) {
@@ -146,12 +142,9 @@ void factor_vm::load_code_heap(FILE* file, image_header* h, vm_parameters* p) {
       std::cout << h->compressed_code_size << " bytes expected\n";
       fatal_error("load_code_heap failed", 0);
     }
+
     if (uncompress) {
-      puts ("decompress code");
       size_t result = lib::zstd::ZSTD_decompress ((void*)code->allocator->start, h->code_size, buf, h->compressed_code_size);
-      if (lib::zstd::ZSTD_isError (result)) {
-        puts (lib::zstd::ZSTD_getErrorName (result));
-      }
     }
   }
 
