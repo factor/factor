@@ -9,6 +9,8 @@
 *.exp
 *.gch*
 *.image
+factor.image.*
+boot.*.image.*
 *.lib
 *.o
 *.obj
@@ -32,7 +34,6 @@ Factor.app/Contents/_CodeSignature
 a.out
 checksums.txt
 factor.com
-factor.image.fresh
 xcuserdata
 bin
 git-id
