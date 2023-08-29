@@ -99,7 +99,7 @@ HELP: set-file-ids
 
 HELP: set-file-permissions
 { $values
-    { "path" "a pathname string" } { "n" "an integer, interepreted as a string of bits" } }
+    { "path" "a pathname string" } { "n" "an integer, interpreted as a string of bits" } }
 { $description "Sets the file permissions for a given file with the supplied Unix permissions integer." }
 { $examples "Using the traditional octal value:"
     { $code "USING: io.files.info.unix kernel ;"
