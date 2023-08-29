@@ -36,7 +36,7 @@ board-height [ 9 ] initialize
             } case :> ( dy dx )
             dy y + 0 h 1 - clamp y!
             dx x + 0 w 1 - clamp x!
-            x y board nth [ dup 14 < [ 1 + ] when ] change-nth
+            x y board nth [ 1 + 14 min ] change-nth
         ] with each
     ] each
 
@@ -58,6 +58,6 @@ M: byte-array drunken-bishop.
     board-width get CHAR: - <string> "+" "+" surround [
         print
         drunken-bishop [
-            [ SYMBOLS nth ] "" map-as "|" "|" surround print
+            SYMBOLS nths "|" "|" surround print
         ] each
     ] [ print ] bi ;
