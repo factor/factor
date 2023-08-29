@@ -31719,7 +31719,7 @@ the shader effect
 %CLUTTER_TYPE_SHADER_FLOAT, for a pointer to an array of floating point
 values; and %CLUTTER_TYPE_SHADER_MATRIX, for a pointer to an array of
 floating point values mapping a matrix
-The number of values interepreted is defined by the @n_value
+The number of values interpreted is defined by the @n_value
 argument, and by the @gtype argument. For instance, a uniform named
 "sampler0" and containing a single integer value is set using:
 |[
