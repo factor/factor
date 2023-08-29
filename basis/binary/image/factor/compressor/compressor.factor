@@ -1,12 +1,13 @@
 ! 2022-2023 nomennescio
-! image header should be identical to vm/image.hpp
+! image-header should be kept in sync with vm/image.hpp
 ! can be run as : factor -run=binary.image.factor.compressor
 
 USING: accessors classes.struct compression.zstd io io.encodings.binary io.files kernel kernel.private locals math sequences system tools.image-analyzer vm ;
 IN: binary.image.factor.compressor
 
 STRUCT: image-header
-    { magic cell_t initial: 0 } { version cell_t initial: 0 }
+    { magic cell_t initial: 0 }
+    { version cell_t initial: 0 }
     { data-relocation-base cell_t initial: 0 }
     { data-size cell_t initial: 0 }
     { code-relocation-base cell_t initial: 0 }
