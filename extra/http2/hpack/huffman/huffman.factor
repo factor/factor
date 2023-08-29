@@ -284,7 +284,7 @@ CONSTANT: bit-reverse-table $[
 ]
 
 : reverse-bits ( byte-array -- byte-array' )
-    [ bit-reverse-table nth ] B{ } map-as ;
+    bit-reverse-table nths ;
 
 : byte-array>bit-array ( byte-array -- bit-array )
     [ length 8 * ] [ bit-array boa ] bi ;
@@ -326,7 +326,6 @@ ERROR: hpack-huffman-error message ;
     byte-vector utf8 decode ;
 
 : huffman-encode ( string -- bytes )
-    [ huffman-encode-table nth ] { } map-as concat
+    huffman-encode-table nths concat
     EOS huffman-encode-table nth over length neg 8 rem head
     append bits-to-bytes ;
-

@@ -103,7 +103,7 @@ TUPLE: code-file
         <body>
             <h2><-name-></h2>
             <pre><-html-lines-></pre>
-            <mbp:pagebreak xmlns:mbp="https://www.mobipocket.com/mbp" />
+            <mbp:pagebreak xmlns:mbp="http://www.mobipocket.com/mbp" />
         </body>
     </html> XML> ;
 
@@ -127,7 +127,7 @@ TUPLE: code-file
                 at <-timestamp-></font><br/>
                 <br/>
                 <ul><-toc-></ul>
-                <mbp:pagebreak xmlns:mbp="https://www.mobipocket.com/mbp" />
+                <mbp:pagebreak xmlns:mbp="http://www.mobipocket.com/mbp" />
             </body>
         </html> XML>
     ] with-directory ;
@@ -147,7 +147,7 @@ TUPLE: code-file
     ] map-index :> file-nav-points
 
     <XML <?xml version="1.0" encoding="UTF-8" ?>
-    <ncx version="2005-1" xmlns="https://www.daisy.org/z3986/2005/ncx/">
+    <ncx version="2005-1" xmlns="http://www.daisy.org/z3986/2005/ncx/">
         <navMap>
             <navPoint class="book" id="toc" playOrder="1">
                 <navLabel><text>Table of Contents</text></navLabel>
@@ -171,9 +171,9 @@ TUPLE: code-file
     <XML <?xml version="1.0" encoding="UTF-8" ?>
     <package
         version="2.0"
-        xmlns="https://www.idpf.org/2007/opf"
+        xmlns="http://www.idpf.org/2007/opf"
         unique-identifier=<-name->>
-        <metadata xmlns:dc="https://purl.org/dc/elements/1.1/">
+        <metadata xmlns:dc="http://purl.org/dc/elements/1.1/">
             <dc:title><-name-></dc:title>
             <dc:language>en</dc:language>
             <meta name="cover" content="my-cover-image" />

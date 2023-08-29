@@ -36,8 +36,8 @@ SYMBOL: ns-stack
 
 : init-ns-stack ( -- )
     V{ H{
-        { "xml" "https://www.w3.org/XML/1998/namespace" }
-        { "xmlns" "https://www.w3.org/2000/xmlns" }
+        { "xml" "http://www.w3.org/XML/1998/namespace" }
+        { "xmlns" "http://www.w3.org/2000/xmlns" }
         { "" "" }
     } } clone
     ns-stack set ;

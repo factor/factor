@@ -139,7 +139,7 @@ M: byte-array parse-feed [ bytes>xml xml>feed ] with-html-entities ;
     [ url>> present ]
     [ entries>> [ entry>xml ] map ] tri
     <XML
-        <feed xmlns="https://www.w3.org/2005/Atom">
+        <feed xmlns="http://www.w3.org/2005/Atom">
             <title><-></title>
             <link rel="alternate" href=<-> />
             <->

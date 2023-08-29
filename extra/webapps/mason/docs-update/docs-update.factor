@@ -11,16 +11,16 @@ IN: webapps.mason.docs-update
 
 : update-docs ( -- )
     home [
-        "newdocs" file-exists? [ "newdocs" delete-tree ] when
+        "docs.new" ?delete-tree
 
-        "newdocs" make-directory
-        "newdocs" [ { "tar" "xfz" } docs-path suffix try-process ] with-directory
+        "docs.new" make-directory
+        "docs.new" [ { "tar" "xfz" } docs-path suffix try-process ] with-directory
 
-        "docs" file-exists? [ "docs" "docs.old" move-file ] when
-        "newdocs/docs" "docs" move-file
+        "docs" "docs.old" ?move-file
+        "docs.new/docs" "docs" move-file
 
-        "newdocs" delete-directory
-        "docs.old" file-exists? [ "docs.old" delete-tree ] when
+        "docs.new" delete-directory
+        "docs.old" ?delete-tree
 
         \ load-index reset-memoized
     ] with-directory ;

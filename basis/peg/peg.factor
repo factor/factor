@@ -594,15 +594,23 @@ PRIVATE>
     box-parser boa f next-id parser boa [ ] action ;
 
 SYNTAX: PARTIAL-PEG:
-    (:) [
-        '[ @ compile-parser ] ( -- word ) memoize-quot
-        '[ @ perform-parse ast>> ]
-    ] dip define-declared ;
+    (:) '[
+        [
+            _
+            _ call( -- parser ) compile-parser
+            '[ _ perform-parse ast>> ]
+            _ define-declared
+        ] with-compilation-unit
+    ] append! ;
 
 SYNTAX: PEG:
-    (:) [
-        '[ @ compile-parser ] ( -- word ) memoize-quot
-        '[ @ perform-parse check-parse-result ast>> ]
-    ] dip define-declared ;
+    (:) '[
+        [
+            _
+            _ call( -- parser ) compile-parser
+            '[ _ perform-parse check-parse-result ast>> ]
+            _ define-declared
+        ] with-compilation-unit
+    ] append! ;
 
 { "debugger" "peg" } "peg.debugger" require-when

@@ -14,6 +14,9 @@ PRIVATE>
     >rgba-components drop [ adjust-color ] tri@
     [ 0.2126 * ] [ 0.7152 * ] [ 0.0722 * ] tri* + + ;
 
+: contrast-text-color ( color -- black/white )
+    relative-luminance 0.179 > COLOR: black COLOR: white ? ;
+
 : contrast-ratio ( color1 color2 -- n )
     [ relative-luminance ] bi@
     2dup < [ swap ] when [ 0.05 + ] bi@ / ;
