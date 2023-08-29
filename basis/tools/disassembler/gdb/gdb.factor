@@ -1,8 +1,8 @@
 ! Copyright (C) 2008, 2010 Slava Pestov, Jorge Acereda Macia.
 ! See https://factorcode.org/license.txt for BSD license.
 USING: accessors io io.encodings.ascii io.files io.files.temp
-io.launcher locals make math math.parser namespaces
-tools.disassembler.private ;
+io.launcher make math math.parser namespaces sequences
+tools.disassembler.private tr ;
 IN: tools.disassembler.gdb
 
 SINGLETON: gdb-disassembler
