@@ -5,6 +5,3 @@
 
 " Documentation lines can be any length of characters.
 setlocal textwidth=0
-augroup factorTextWidth
-    au!
-augroup END
