@@ -181,10 +181,10 @@ DEFER: if
 
 ! Default
 
-: ?when ( ..a default cond: ( ..a default -- ..a new/f ) true: ( ..a new -- ..b ) -- ..b )
+: ?when ( ..a default cond: ( ..a default -- ..a new/f ) true: ( ..a new -- ..a x ) -- ..a default/x )
     [ ?transmute ] dip when ; inline
 
-: ?unless ( ..a default cond: ( ..a default -- ..a new/f ) false: ( ..a default -- ..b ) -- ..b )
+: ?unless ( ..a default cond: ( ..a default -- ..a new/f ) false: ( ..a default -- ..a x ) -- ..a default/x )
     [ ?transmute ] dip unless ; inline
 
 : ?if ( ..a default cond: ( default -- new/f ) true: ( ..a new -- ..b ) false: ( ..a default -- ..b ) -- ..b )
