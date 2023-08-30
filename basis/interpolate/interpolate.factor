@@ -2,7 +2,7 @@
 ! See https://factorcode.org/license.txt for BSD license.
 USING: accessors fry generalizations io io.streams.string kernel
 make math math.order math.parser multiline namespaces present
-sequences splitting strings vocabs.parser ;
+sequences splitting strings strings.parser vocabs.parser ;
 IN: interpolate
 
 <PRIVATE
@@ -89,3 +89,5 @@ MACRO: interpolate-locals ( str -- quot )
 SYNTAX: [I
     "I]" parse-multiline-string
     interpolate-locals-quot append! ;
+
+SYNTAX: I" parse-string '[ _ interpolate>string ] append! ;

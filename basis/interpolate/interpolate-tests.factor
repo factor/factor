@@ -42,3 +42,5 @@ USING: interpolate io.streams.string namespaces tools.test locals ;
         "accidentally" [ [I Oops, I ${0} the whole ${noun}...I] ] with-string-writer
     ]
 ] unit-test
+
+{ "hello, world" } [ "world" I"hello, ${0}" ] unit-test
