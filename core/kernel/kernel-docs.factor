@@ -783,7 +783,7 @@ HELP: ?if
 
 HELP: ?when
 { $values
-    { "default" object } { "cond" object } { "true" object }
+    { "default" object } { "cond" { $quotation ( ..a default -- ..a new/f ) } } { "true" { $quotation ( ..a new -- ..a x ) } } { "default/x" { $or { $snippet "default" } { $snippet "x" } } }
 }
 { $description "Calls " { $snippet "cond" } " on the " { $snippet "default" } " object and if " { $snippet "cond" } " outputs a new object then the " { $snippet "true" } " quotation is called with that new object. Otherwise, leaves the old object on the stack." }
 { $examples
@@ -801,7 +801,7 @@ HELP: ?when
 
 HELP: ?unless
 { $values
-    { "default" object } { "cond" object } { "false" object }
+    { "default" object } { "cond" { $quotation ( ..a default -- ..a new/f ) } } { "false" { $quotation ( ..a default -- ..a x ) } } { "default/x" { $or { $snippet "default" } { $snippet "x" } } }
 }
 { $description "Calls " { $snippet "cond" } " on the " { $snippet "default" } " object and if " { $snippet "cond" } " outputs a new object. Otherwise, calls " { $snippet "false" } " with the old object." }
 { $examples
