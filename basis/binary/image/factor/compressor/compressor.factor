@@ -1,22 +1,9 @@
-! 2022-2023 nomennescio
-! image-header should be kept in sync with vm/image.hpp
+! Copyright (C) 2022-2023 nomennescio
+! See https://factorcode.org/license.txt for BSD license.
 ! can be run as : factor -run=binary.image.factor.compressor
 
-USING: accessors classes.struct byte-arrays compression.zstd io io.encodings.binary io.files kernel kernel.private locals math sequences system tools.image-analyzer vm ;
+USING: accessors classes.struct byte-arrays compression.zstd io io.encodings.binary io.files kernel kernel.private locals math sequences system tools.image-analyzer tools.image-analyzer.vm vm ;
 IN: binary.image.factor.compressor
-
-STRUCT: image-header
-    { magic cell_t initial: 0 }
-    { version cell_t initial: 0 }
-    { data-relocation-base cell_t initial: 0 }
-    { data-size cell_t initial: 0 }
-    { code-relocation-base cell_t initial: 0 }
-    { code-size cell_t initial: 0 }
-    { escaped-data-size cell_t initial: 0 }
-    { compressed-data-size cell_t initial: 0 }
-    { compressed-code-size cell_t initial: 0 }
-    { reserved-4 cell_t initial: 0 }
-    { special-objects cell_t[special-object-count] } ;
 
 TUPLE: image
   { header image-header }
