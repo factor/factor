@@ -58,7 +58,7 @@ PRIVATE>
         add-toolbar ;
 
 M: debugger focusable-child*
-    dup restart-hook>> [ restart-list>> ] [ drop t ] if ;
+    dup restart-hook>> [ restart-list>> ] [ drop f ] if ;
 
 : debugger-window ( error continuation -- )
     ! No restarts for the debugger window
