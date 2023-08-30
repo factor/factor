@@ -113,11 +113,15 @@ void factor_vm::load_data_heap(FILE* file, image_header* h, vm_parameters* p) {
   if ((cell)bytes_read != h->compressed_data_size) {
     std::cout << "truncated image: " << bytes_read << " bytes read, ";
     std::cout << h->compressed_data_size << " bytes expected\n";
-    fatal_error("load_data_heap failed", 0);
+    fatal_error ("load_data_heap failed", 0);
   }
 
   if (uncompress) {
-    size_t result = lib::zstd::ZSTD_decompress ( (void*)data->tenured->start, h->data_size, buf, h->compressed_data_size);
+    size_t result = lib::zstd::ZSTD_decompress ((void*)data->tenured->start, h->data_size, buf, h->compressed_data_size);
+    if (lib::zstd::ZSTD_isError (result)) {
+      std::cout << "data heap decompression: " << lib::zstd::ZSTD_getErrorName (result) << '\n';
+      fatal_error ("load_data_heap failed", 0);
+    }
   }
 
   if (uncompress && buf) free (buf);
@@ -145,6 +149,10 @@ void factor_vm::load_code_heap(FILE* file, image_header* h, vm_parameters* p) {
 
     if (uncompress) {
       size_t result = lib::zstd::ZSTD_decompress ((void*)code->allocator->start, h->code_size, buf, h->compressed_code_size);
+      if (lib::zstd::ZSTD_isError (result)) {
+        std::cout << "code heap decompression: " << lib::zstd::ZSTD_getErrorName (result) << '\n';
+        fatal_error ("load_code_heap failed", 0);
+      }
     }
   }
 
