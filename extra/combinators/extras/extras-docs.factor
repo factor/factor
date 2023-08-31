@@ -207,23 +207,23 @@ HELP: dip-2up
 { $description "Like " { $link dip } ", but moves the last two values left on the stack by the quotation to the top of the stack." } ;
 
 HELP: 2dip-1up
-{ $values { "d" object } { "quot" { $quotation ( ..a -- ..b o ) } } { "o" object } }
+{ $values { "d1" object } { "d2" object } { "quot" { $quotation ( ..a -- ..b o ) } } { "o" object } }
 { $description "Like " { $link 2dip } ", but moves the last value left on the stack by the quotation to the top of the stack." } ;
 
 HELP: 2dip-2up
-{ $values { "d" object } { "quot" { $quotation ( ..a -- ..b o1 o2 ) } } { "o1" object } { "o2" object } }
+{ $values { "d1" object } { "d2" object } { "quot" { $quotation ( ..a -- ..b o1 o2 ) } } { "o1" object } { "o2" object } }
 { $description "Like " { $link 2dip } ", but moves the last two values left on the stack by the quotation to the top of the stack." } ;
 
 HELP: 3dip-1up
-{ $values { "d" object } { "quot" { $quotation ( ..a -- ..b o ) } } { "o" object } }
+{ $values { "d1" object } { "d2" object } { "d3" object } { "quot" { $quotation ( ..a -- ..b o ) } } { "o" object } }
 { $description "Like " { $link 3dip } ", but moves the last value left on the stack by the quotation to the top of the stack." } ;
 
 HELP: 3dip-2up
-{ $values { "d" object } { "quot" { $quotation ( ..a -- ..b o1 o2 ) } } { "o1" object } { "o2" object } }
+{ $values { "d1" object } { "d2" object } { "d3" object } { "quot" { $quotation ( ..a -- ..b o1 o2 ) } } { "o1" object } { "o2" object } }
 { $description "Like " { $link 3dip } ", but moves the last two values left on the stack by the quotation to the top of the stack." } ;
 
 HELP: 3dip-3up
-{ $values { "d" object } { "quot" { $quotation ( ..a -- ..b o1 o2 ) } } { "o1" object } { "o2" object } }
+{ $values { "d1" object } { "d2" object } { "d3" object } { "quot" { $quotation ( ..a -- ..b o1 o2 o3 ) } } { "o1" object } { "o2" object } { "o3" object } }
 { $description "Like " { $link 3dip } ", but moves the last three values left on the stack by the quotation to the top of the stack." } ;
 
 HELP: 2craft-1up
@@ -231,27 +231,27 @@ HELP: 2craft-1up
 { $description "Applies " { $snippet "quot1" } "to the values on the stack and saves the last value left by the quotation on the stack. Then applies " { $snippet "quot2" } "to the rest of the values left on the stack by " { $snippet "quot1" } " and saves the last value left by the quotation on the stack. Finally the word puts the saved values on the stack." } ;
 
 HELP: 3craft-1up
-{ $values { "quot1" { $quotation ( ..a -- ..b o1 ) } } { "quot2" { $quotation ( ..b -- ..c o2 ) } } { "quot3" { $quotation ( ..c -- ..d o1 ) } } { "o1" object } { "o2" object } { "o3" object } }
+{ $values { "quot1" { $quotation ( ..a -- ..b o1 ) } } { "quot2" { $quotation ( ..b -- ..c o2 ) } } { "quot3" { $quotation ( ..c -- ..d o3 ) } } { "o1" object } { "o2" object } { "o3" object } }
 { $description "A version of " { $link 2craft-1up } "that crafts 3 values." } ;
 
 HELP: 4craft-1up
-{ $values { "quot1" { $quotation ( ..a -- ..b o1 ) } } { "quot2" { $quotation ( ..b -- ..c o2 ) } } { "quot3" { $quotation ( ..c -- ..d o1 ) } } { "quot4" { $quotation ( ..d -- ..e o1 ) } } { "o1" object } { "o2" object } { "o3" object } { "o4" object } }
+{ $values { "quot1" { $quotation ( ..a -- ..b o1 ) } } { "quot2" { $quotation ( ..b -- ..c o2 ) } } { "quot3" { $quotation ( ..c -- ..d o3 ) } } { "quot4" { $quotation ( ..d -- ..e o4 ) } } { "o1" object } { "o2" object } { "o3" object } { "o4" object } }
 { $description "A version of " { $link 2craft-1up } "that crafts 4 values." } ;
 
 HELP: 3and
-{ $values { "a" "a generalized boolean" } { "b" "a generalized boolean" } { "c" "a generalized boolean" } }
+{ $values { "a" "a generalized boolean" } { "b" "a generalized boolean" } { "c" "a generalized boolean" } { "?" boolean } }
 { $description "Like " { $link and } ", but takes 3 values." } ;
 
 HELP: 4and
-{ $values { "a" "a generalized boolean" } { "b" "a generalized boolean" } { "c" "a generalized boolean" } { "d" "a generalized boolean" } }
+{ $values { "a" "a generalized boolean" } { "b" "a generalized boolean" } { "c" "a generalized boolean" } { "d" "a generalized boolean" } { "?" boolean } }
 { $description "Like " { $link and } ", but takes 4 values." } ;
 
 HELP: 3or
-{ $values { "a" "a generalized boolean" } { "b" "a generalized boolean" } { "c" "a generalized boolean" } }
+{ $values { "a" "a generalized boolean" } { "b" "a generalized boolean" } { "c" "a generalized boolean" } { "?" boolean } }
 { $description "Like " { $link or } ", but takes 3 values." } ;
 
 HELP: 4or
-{ $values { "a" "a generalized boolean" } { "b" "a generalized boolean" } { "c" "a generalized boolean" } { "d" "a generalized boolean" } }
+{ $values { "a" "a generalized boolean" } { "b" "a generalized boolean" } { "c" "a generalized boolean" } { "d" "a generalized boolean" } { "?" boolean } }
 { $description "Like " { $link or } ", but takes 4 values." } ;
 
 HELP: keep-under
