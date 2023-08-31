@@ -67,10 +67,18 @@ The nightly builds are usually a better experience than the point releases.
 
 ### Learning Factor
 
-A tutorial is available that can be accessed from the Factor environment:
+A [tutorial](https://docs.factorcode.org/content/article-first-program.html)
+is available that can be accessed from the Factor environment:
 
 ```factor
 "first-program" help
+```
+
+Take a look at a [guided
+tour](https://docs.factorcode.org/content/article-tour.html) of Factor:
+
+```
+"tour" help
 ```
 
 Some demos that are included in the distribution to show off various features:
