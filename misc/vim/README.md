@@ -21,6 +21,7 @@ The current set of files is as follows:
 * plugin/factor.vim - Teach Vim some commands for navigating Factor source code. See below.
 * syntax/factor.vim - Teach Vim about highlighting Factor source code syntax.
   * syntax/factor/generated.vim - Syntax highlighting lessons generated from a Factor VM.
+* indent/factor.vim - Teach Vim to automatically indent Factor source code.
 
 ## Commands
 
@@ -73,8 +74,8 @@ The default value is `work`.
 ## Note
 
 The `syntax/factor/generated.vim` syntax highlighting file
-is automatically generated
-to include the names of all the vocabularies Factor knows about.
+is automatically generated to include the names of all the
+vocabularies Factor knows about.
 To regenerate it manually, run the following code in the listener:
 
     "editors.vim.generate-syntax" run
