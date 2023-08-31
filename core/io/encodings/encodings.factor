@@ -1,8 +1,11 @@
 ! Copyright (C) 2008, 2010 Daniel Ehrenberg, Slava Pestov.
 ! See https://factorcode.org/license.txt for BSD license.
+
 USING: accessors byte-arrays combinators destructors io
-io.streams.plain kernel kernel.private math namespaces sbufs
-sequences sequences.private strings strings.private ;
+io.private io.streams.plain kernel kernel.private math
+namespaces sbufs sequences sequences.private strings
+strings.private ;
+
 IN: io.encodings
 
 ! The encoding descriptor protocol
@@ -22,17 +25,17 @@ GENERIC: decode-until ( seps stream encoding -- string/f sep/f )
 ! If the stop? branch is taken convert the sbuf to a string
 ! If sep is present, returns ``string sep'' (string can be "")
 ! If sep is f, returns ``string f'' or ``f f''
-: read-until-loop ( buf quot: ( -- char stop? ) -- string/f sep/f )
+: decode-until-loop ( buf quot: ( -- char stop? ) -- string/f sep/f )
     dup call
     [ nip [ "" like ] dip [ f like f ] unless* ]
-    [ pick push read-until-loop ] if ; inline recursive
+    [ pick push decode-until-loop ] if ; inline recursive
 
 PRIVATE>
 
 : (decode-until) ( seps stream encoding -- string/f sep/f )
     [ decode-char dup ] 2curry swap [ dupd member? ] curry
     [ [ drop f t ] if ] curry compose
-    [ 100 <sbuf> ] dip read-until-loop ; inline
+    [ 100 <sbuf> ] dip decode-until-loop ; inline
 
 M: object decode-until (decode-until) ;
 
@@ -74,6 +77,7 @@ M: object encode-string [ encode-char ] 2curry each ; inline
 GENERIC: <decoder> ( stream encoding -- newstream )
 
 TUPLE: decoder { stream read-only } { code read-only } { cr boolean } ;
+
 INSTANCE: decoder input-stream
 
 ERROR: decode-error ;
@@ -81,6 +85,7 @@ ERROR: decode-error ;
 GENERIC: <encoder> ( stream encoding -- newstream )
 
 TUPLE: encoder { stream read-only } { code read-only } ;
+
 INSTANCE: encoder output-stream
 
 ERROR: encode-error ;
@@ -101,44 +106,43 @@ M: object <decoder> f decoder boa ; inline
 M: decoder stream-element-type
     drop +character+ ; inline
 
-: (read1) ( decoder -- ch )
+: decode1 ( decoder -- ch )
     >decoder< decode-char ; inline
 
 : fix-cr ( decoder c -- c' )
     over cr>> [
-        over cr- dup CHAR: \n eq? [ drop (read1) ] [ nip ] if
+        over cr- dup CHAR: \n eq? [ drop decode1 ] [ nip ] if
     ] [ nip ] if ; inline
 
 M: decoder stream-read1
-    dup (read1) fix-cr ; inline
+    dup decode1 fix-cr ; inline
 
-: (read-first) ( n buf decoder -- buf stream encoding n c )
+: decode-first ( n buf decoder -- buf stream encoding n c )
     [ rot [ >decoder< ] dip 2over decode-char ]
     [ swap fix-cr ] bi ; inline
 
-: (store-read) ( buf stream encoding n c i -- buf stream encoding n )
+: store-decode ( buf stream encoding n c i -- buf stream encoding n )
     [ rot [ set-nth-unsafe ] keep ] 2curry 3dip ; inline
 
-: (read-next) ( stream encoding n i -- stream encoding n i c )
+: decode-next ( stream encoding n i -- stream encoding n i c )
     [ 2dup decode-char ] 2dip rot ; inline
 
-: (read-rest) ( buf stream encoding n i -- count )
+: decode-rest ( buf stream encoding n i -- count )
     2dup = [ 4nip ] [
-        (read-next) [
-            swap [ (store-read) ] [ 1 + ] bi (read-rest)
+        decode-next [
+            swap [ store-decode ] [ 1 + ] bi decode-rest
         ] [ 4nip ] if*
     ] if ; inline recursive
 
 M: decoder stream-read-unsafe
     pick 0 = [ 3drop 0 ] [
-        (read-first) [
-            0 (store-read)
-            1 (read-rest)
+        decode-first [
+            0 store-decode
+            1 decode-rest
         ] [ 4drop 0 ] if*
     ] if ; inline
 
-M: decoder stream-contents*
-    (stream-contents-by-element) ; inline
+M: decoder stream-contents* (stream-contents-by-element) ; inline
 
 : line-ends/eof ( stream str -- str ) f like swap cr- ; inline
 
