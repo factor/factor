@@ -13,6 +13,11 @@ FROM: io.encodings.ascii => ascii ;
 FROM: ascii => ascii? ;
 IN: help.html
 
+ERROR: not-printable ch ;
+
+: check-printable ( ch -- ch )
+    dup printable? [ not-printable ] unless ;
+
 : escape-char ( ch -- )
     dup ascii? [
         [
@@ -31,7 +36,7 @@ IN: help.html
                 { CHAR: # "__hash__" }
                 { CHAR: % "__percent__" }
             } at
-        ] [ % ] [ , ] ?if
+        ] [ % ] [ check-printable , ] ?if
     ] [ number>string "__" "__" surround % ] if ;
 
 : escape-filename ( string -- filename )
