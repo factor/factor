@@ -52,7 +52,7 @@ $nl
 "The changer word abstracts a common pattern where a slot value is read then stored again; so the following is not idiomatic code:"
 { $code
     "find-manager"
-    "    salary>> 0.75 * >>salary"
+    "    dup salary>> 0.75 * >>salary"
 }
 "The following version is preferred:"
 { $code
