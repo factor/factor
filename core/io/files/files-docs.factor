@@ -114,3 +114,17 @@ HELP: file-contents
 HELP: file-exists?
 { $values { "path" "a pathname string" } { "?" boolean } }
 { $description "Tests if the file named by " { $snippet "path" } " exists." } ;
+
+HELP: if-file-exists
+{ $values { "path" "a pathname string" } { "true" { $quotation ( ..a path -- ..b ) } } { "false" { $quotation ( ..a path -- ..b ) } } }
+{ $description "If " { $snippet "path" } " is a file that exists, calls the " { $snippet "true" } " quotation, otherwise calls the " { $snippet "false" } " quotation." } ;
+
+HELP: when-file-exists
+{ $values { "path" "a pathname string" } { "quot" { $quotation ( ... path -- ... ) } } }
+{ $description "If " { $snippet "path" } " is a file that exists, calls the " { $snippet "quot" } " quotation." } ;
+
+HELP: unless-file-exists
+{ $values { "path" "a pathname string" } { "quot" { $quotation ( ... path -- ... ) } } }
+{ $description "If " { $snippet "path" } " is a file that does not exist, calls the " { $snippet "quot" } " quotation." } ;
+
+{ if-file-exists when-file-exists unless-file-exists } related-words
