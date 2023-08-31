@@ -284,18 +284,18 @@ HELP: call
 
 HELP: keep
 { $values { "x" object } { "quot" { $quotation ( ..a x -- ..b ) } } }
-{ $description "Call a quotation with a value on the stack, restoring the value when the quotation returns." }
+{ $description "Calls a quotation with a value on the stack, restoring the value when the quotation returns." }
 { $examples
     { $example "USING: arrays kernel prettyprint ;" "2 \"greetings\" [ <array> ] keep 2array ." "{ { \"greetings\" \"greetings\" } \"greetings\" }" }
 } ;
 
 HELP: 2keep
 { $values { "x" object } { "y" object } { "quot" { $quotation ( ..a x y -- ..b ) } } }
-{ $description "Call a quotation with two values on the stack, restoring the values when the quotation returns." } ;
+{ $description "Calls a quotation with two values on the stack, restoring the values when the quotation returns." } ;
 
 HELP: 3keep
 { $values { "x" object } { "y" object } { "z" object } { "quot" { $quotation ( ..a x y z -- ..b ) } } }
-{ $description "Call a quotation with three values on the stack, restoring the values when the quotation returns." } ;
+{ $description "Calls a quotation with three values on the stack, restoring the values when the quotation returns." } ;
 
 HELP: bi
 { $values { "x" object } { "p" { $quotation ( ..a x -- ..b ) } } { "q" { $quotation ( ..c x -- ..d ) } } }
