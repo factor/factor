@@ -18,7 +18,7 @@ jobs:
     - name: test
       run: './factor -run=tools.test resource:core'
     - name: help-lint
-      run: './factor -run=help.lint resource:core resource:basis'
+      run: './factor -run=help.lint resource:core resource:basis resource:extra'
 
   build-macos:
     runs-on: macos-11
@@ -31,7 +31,7 @@ jobs:
     - name: test
       run: './factor -run=tools.test resource:core'
     - name: help-lint
-      run: './factor -run=help.lint resource:core resource:basis'
+      run: './factor -run=help.lint resource:core resource:basis resource:extra'
 
   build-windows:
     runs-on: windows-latest
@@ -47,3 +47,5 @@ jobs:
     - name: test
       shell: cmd
       run: 'factor -run=tools.test resource:core'
+    - name: help-lint
+      run: './factor -run=help.lint resource:core resource:basis resource:extra'
