@@ -1,8 +1,8 @@
 
 USING: kernel namespaces math math.constants math.functions math.order
        arrays sequences
-       opengl opengl.gl opengl.glu ui ui.render ui.gadgets ui.gadgets.theme
-       ui.gadgets.cartesian colors accessors combinators.cleave
+       opengl opengl.gl opengl.glu ui ui.render ui.gadgets
+       ui.gadgets.cartesian colors accessors
        processing.shapes ;
 
 IN: golden-section
@@ -18,24 +18,24 @@ IN: golden-section
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-: omega ( i -- omega ) phi 1- * 2 * pi * ;
+: omega ( i -- omega ) phi 1 - * 2 * pi * ;
 
 : x ( i -- x ) [ omega cos ] [ 0.5 * ] bi * ;
 : y ( i -- y ) [ omega sin ] [ 0.5 * ] bi * ;
 
-: center ( i -- point ) { x y } 1arr ;
+: center ( i -- point ) [ x ] [ y ] bi 2array ;
 
 : radius ( i -- radius ) pi * 720 / sin 10 * ;
 
-: color ( i -- i ) dup 360.0 / dup 0.25 1 rgba boa >fill-color ;
+: color ( i -- i ) dup 360.0 / dup 0.25 1 rgba boa fill-color set ;
 
 : line-width ( i -- i ) dup radius 0.5 * 1 max glLineWidth ;
 
-: draw ( i -- ) [ center ] [ radius 1.5 * 2 * ] bi circle ;
+: draw ( i -- ) [ center ] [ radius 1.5 * 2 * ] bi draw-circle ;
 
 : dot ( i -- ) color line-width draw ;
 
-: golden-section ( -- ) 720 [ dot ] each ;
+: golden-section ( -- ) 720 <iota> [ dot ] each ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
