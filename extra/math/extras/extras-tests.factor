@@ -99,8 +99,8 @@ tools.test ;
 { 3 } [ { 1 2 3 1 2 3 1 2 3 3 } majority ] unit-test
 { CHAR: C } [ "AAACCBBCCCBCC" majority ] unit-test
 
-{ 0.0 } [ 0 2 round-to-decimal ] unit-test
-{ 1.0 } [ 1 2 round-to-decimal ] unit-test
+{ 0.0 } [ 0.0 2 round-to-decimal ] unit-test
+{ 1.0 } [ 1.0 2 round-to-decimal ] unit-test
 { 1.23 } [ 1.2349 2 round-to-decimal ] unit-test
 { 1.24 } [ 1.2350 2 round-to-decimal ] unit-test
 { 1.24 } [ 1.2351 2 round-to-decimal ] unit-test
