@@ -1,8 +1,8 @@
-USING: accessors models monads macros generalizations kernel
-ui ui.gadgets.controls models.combinators ui.gadgets.layout ui.gadgets
-ui.gadgets.labels ui.gadgets.editors ui.gadgets.buttons
-ui.gadgets.packs locals sequences fonts io.styles
-wrap.strings ;
+USING: accessors fonts generalizations io.styles kernel locals
+macros models models.combinators monads sequences
+sequences.generalizations ui ui.gadgets ui.gadgets.buttons
+ui.gadgets.controls ui.gadgets.editors ui.gadgets.labels
+ui.gadgets.layout ui.gadgets.packs wrap.strings ;
 
 IN: ui.gadgets.alerts
 :: alert ( quot string -- ) <pile> { 10 10 } >>gap 1 >>align
