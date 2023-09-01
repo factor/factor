@@ -1,9 +1,8 @@
-USING: accessors arrays colors.constants combinators
-db.sqlite db.tuples db.types kernel locals math
-monads persistency sequences sequences.extras ui ui.gadgets.controls
-ui.gadgets.layout models.combinators ui.gadgets.labels
-ui.gadgets.scrollers ui.pens.solid io.files.temp ;
-FROM: sets => prune ;
+USING: accessors arrays colors combinators db.sqlite db.tuples
+db.types io.files.temp kernel locals math models.combinators
+monads persistency sequences sequences.extras sets ui
+ui.gadgets.controls ui.gadgets.labels ui.gadgets.layout
+ui.gadgets.scrollers ui.pens.solid ;
 IN: recipes
 
 STORED-TUPLE: recipe { title { VARCHAR 100 } } { votes INTEGER } { txt TEXT } { genre { VARCHAR 100 } } ;
@@ -11,7 +10,8 @@ STORED-TUPLE: recipe { title { VARCHAR 100 } } { votes INTEGER } { txt TEXT } { 
 "recipes.db" temp-file <sqlite-db> recipe define-db
 : top-recipes ( offset search -- recipes ) <query> T{ recipe } rot >>title >>tuple
     "votes" >>order 30 >>limit swap >>offset get-tuples ;
-: top-genres ( -- genres ) f f top-recipes [ genre>> ] map prune 4 short head-slice ;
+: top-genres ( -- genres )
+    f f top-recipes [ genre>> ] map members 4 index-or-length head-slice ;
 
 : interface ( -- book ) [ 
      [
