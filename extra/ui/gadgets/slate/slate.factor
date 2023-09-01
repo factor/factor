@@ -76,8 +76,8 @@ USING: combinators arrays sequences math
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-M: slate graft*   ( slate -- ) graft>>   call ;
-M: slate ungraft* ( slate -- ) ungraft>> call ;
+M: slate graft*   ( slate -- ) graft>>   call( -- ) ;
+M: slate ungraft* ( slate -- ) ungraft>> call( -- ) ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
@@ -94,7 +94,7 @@ GENERIC: draw-slate ( slate -- slate )
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-M: slate draw-slate ( slate -- slate ) dup action>> call ;
+M: slate draw-slate ( slate -- slate ) dup action>> call( slate -- slate ) ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
