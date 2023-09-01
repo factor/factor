@@ -151,12 +151,17 @@ HOOK: resolve-symlinks os ( path -- path' )
 
 M: object resolve-symlinks normalize-path ;
 
-: resource-path ( path -- newpath )
+: site-resource-path ( path -- newpath )
     "resource-path" get prepend-path ;
+
+ALIAS: resource-path site-resource-path
 
 HOOK: home io-backend ( -- dir )
 
 M: object home "" resource-path ;
+
+: user-resource-path ( path -- newpath )
+    home ".factor" append-path prepend-path ;
 
 : home-path ( path -- newpath ) home prepend-path ;
 
