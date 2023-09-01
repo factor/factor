@@ -123,14 +123,14 @@ CONSTANT: URL V{ }
     ] when* ;
 
 : gemini-less ( -- )
-    "gemini.txt" temp-file dup file-exists? [
+    "gemini.txt" temp-file [
         utf8 [
             <process>
                 "PAGER" os-env [ "less" ] unless* >>command
                 input-stream get >>stdin
             try-process
         ] with-file-reader
-    ] [ drop ] if ;
+    ] when-file-exists ;
 
 : gemini-ls ( args -- )
     [ PAGE ] [ "-l" = ] bi* print-links ;

@@ -249,7 +249,7 @@ M: object copy-file
     ] [ delete-file ] if ;
 
 : ?delete-tree ( path -- )
-    dup file-exists? [ delete-tree ] [ drop ] if ;
+    [ delete-tree ] when-file-exists ;
 
 DEFER: copy-trees-into
 
