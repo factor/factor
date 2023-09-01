@@ -10,7 +10,7 @@ HELP: filter-model
 { $description "Creates a model that uses the updates of another model only when they satisfy a given predicate" } ;
 
 HELP: fold
-{ $values { "model" model } { "oldval" "starting value" } { "quot" "applied to update and previous values" } { "model" model } }
+{ $values { "model" model } { "oldval" "starting value" } { "quot" "applied to update and previous values" } }
 { $description "Similar to " { $link reduce } " but works on models, applying a quotation to the previous and new values at each update" } ;
 
 HELP: switch-models
@@ -18,7 +18,7 @@ HELP: switch-models
 { $description "Creates a model that starts with the behavior of model2 and switches to the behavior of model1 on its update" } ;
 
 HELP: <mapped>
-{ $values { "model" model } { "quot" "applied to model's value on updates" } { "model" model } }
+{ $values { "model" model } { "quot" "applied to model's value on updates" } }
 { $description "An expanded version of " { $link <arrow> } ". Use " { $link fmap } " instead." } ;
 
 HELP: when-model
