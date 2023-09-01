@@ -85,12 +85,8 @@ ENUM: fcgi-protocol-status
         ] [ 2drop f ] if
     ] loop ;
 
-: delete-if-exists ( file -- )
-    dup file-exists? [ delete-file ] [ drop ] if ;
-
 : make-local-socket ( socket-path -- socket )
-    [ delete-if-exists ] keep
-    <local> ;
+    [ ?delete-file ] keep <local> ;
 
 : get-header ( -- header )
     "CCSSCC" read-packed-be
@@ -213,6 +209,6 @@ M: test-responder call-responder* 2drop test-output <html-content> ;
 
 : do-it ( -- )
     <test-responder> main-responder set
-    socket-path [ delete-if-exists ] keep
+    socket-path [ ?delete-file ] keep
     make-local-socket <fastcgi-server> dup fcgi-server set
     start-server drop ;
