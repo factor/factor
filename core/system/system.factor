@@ -82,7 +82,7 @@ PRIVATE>
         vm-compiler % "] on " % os name>> %
     ] "" make ;
 
-: exit ( n -- )
-    '[ do-shutdown-hooks _ (exit) ] ignore-errors
+: exit ( n -- * )
+    [ do-shutdown-hooks (exit) ] ignore-errors
     [ "Unexpected error during shutdown!" print flush ] ignore-errors
     255 (exit) ;
