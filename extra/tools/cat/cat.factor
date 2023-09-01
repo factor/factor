@@ -12,9 +12,8 @@ IN: tools.cat
     '[ _ [ stream-write ] [ stream-flush ] bi ] each-stream-block ;
 
 : cat-file ( path -- )
-    dup file-exists? [
-        binary [ cat-stream ] with-file-reader
-    ] [ write ": not found" print flush ] if ;
+    [ binary [ cat-stream ] with-file-reader ]
+    [ write ": not found" print flush ] if-file-exists ;
 
 : cat-files ( paths -- )
     [ dup "-" = [ drop cat-stream ] [ cat-file ] if flush ] each ;

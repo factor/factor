@@ -44,8 +44,7 @@ TR: convert-separators "/\\" ".." ;
     ] [ monitor-loop ] bi ;
 
 : (start-vocab-monitor) ( vocab-root -- )
-    dup file-exists?
-    [ [ t <monitor> monitor-loop ] with-monitors ] [ drop ] if ;
+    [ [ t <monitor> monitor-loop ] with-monitors ] when-file-exists ;
 
 : start-vocab-monitor ( vocab-root -- )
     [

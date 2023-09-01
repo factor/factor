@@ -15,4 +15,4 @@ M: unix read-link
 
 M: unix resolve-symlinks
     path-components "/"
-    [ append-path dup file-exists? [ follow-links ] when ] reduce ;
+    [ append-path [ follow-links ] when-file-exists ] reduce ;

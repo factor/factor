@@ -58,7 +58,7 @@ ERROR: vocab-must-not-exist string ;
 
 : scaffold-directory ( vocab-root vocab -- )
     vocab-root/vocab>path
-    dup file-exists? [ directory-exists ] [ make-directories ] if ;
+    [ directory-exists ] [ make-directories ] if-file-exists ;
 
 : not-scaffolding ( path -- path )
     "Not creating scaffolding for " write dup <pathname> . ;
@@ -67,7 +67,7 @@ ERROR: vocab-must-not-exist string ;
     "Creating scaffolding for " write dup <pathname> . ;
 
 : scaffolding? ( path -- path ? )
-    dup file-exists? [ not-scaffolding f ] [ scaffolding t ] if ;
+    [ not-scaffolding f ] [ scaffolding t ] if-file-exists ;
 
 : scaffold-copyright ( -- )
     "! Copyright (C) " write now year>> number>string write

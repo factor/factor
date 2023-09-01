@@ -9,10 +9,10 @@ IN: vocabs.files
 
 : vocab-tests-dir ( vocab -- paths )
     dup vocab-dir "tests" append-path vocab-append-path [
-        dup file-exists? [
+        [
             dup directory-files [ ".factor" tail? ] filter
             [ append-path ] with map
-        ] [ drop f ] if
+        ] when-file-exists
     ] [ f ] if* ;
 
 : vocab-tests ( vocab -- paths )

@@ -123,11 +123,9 @@ DEFER: glob%
 :: glob-literal% ( root globs -- )
     globs unclip :> ( remaining glob )
 
-    root glob append-path dup file-exists? [
+    root glob append-path [
         remaining over file-info ?glob%
-    ] [
-        drop
-    ] if ;
+    ] when-file-exists ;
 
 : glob% ( root globs -- )
     dup ?first {

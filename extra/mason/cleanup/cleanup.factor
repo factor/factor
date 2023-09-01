@@ -5,9 +5,7 @@ mason.config mason.platform namespaces ;
 IN: mason.cleanup
 
 : compress ( filename -- )
-    dup file-exists? [
-        "bzip2" swap 2array short-running-process
-    ] [ drop ] if ;
+    [ "bzip2" swap 2array short-running-process ] when-file-exists ;
 
 : compress-image ( -- )
     target-boot-image-name compress ;
