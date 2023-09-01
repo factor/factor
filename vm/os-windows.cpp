@@ -123,7 +123,6 @@ long getpagesize() {
   return g_pagesize;
 }
 
-
 bool move_file(const vm_char* path1, const vm_char* path2) {
   // MoveFileEx returns FALSE on fail.
   BOOL val = MoveFileEx((path1), (path2), MOVEFILE_REPLACE_EXISTING);
