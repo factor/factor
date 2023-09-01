@@ -4,13 +4,6 @@ math.order ranges sequences sequences.private sets shuffle
 sorting splitting vectors ;
 IN: sequences.extras
 
-! Quot must have static stack effect, unlike "reduce"
-:: reduce* ( seq identity quot: ( prev elt -- next ) -- result )
-    seq [ identity ] [
-        unclip identity swap quot call( prev elt -- next )
-        quot reduce*
-    ] if-empty ; inline recursive
-
 : find-all ( ... seq quot: ( ... elt -- ... ? ) -- ... elts )
     [ <enumerated> ] dip '[ nip @ ] assoc-filter ; inline
 

@@ -30,6 +30,15 @@ M: filter-model (model-changed) [ value>> ] dip 2dup quot>> call( a -- ? )
    [ set-model ] [ 2drop ] if ;
 : filter-model ( model quot -- filter-model ) [ 1array \ filter-model <multi-model> ] dip >>quot ;
 
+<PRIVATE
+! Quot must have static stack effect, unlike "reduce"
+:: reduce* ( seq identity quot: ( prev elt -- next ) -- result )
+    seq [ identity ] [
+        unclip identity swap quot call( prev elt -- next )
+        quot reduce*
+    ] if-empty ; inline recursive
+PRIVATE>
+
 TUPLE: fold-model < multi-model quot base values ;
 M: fold-model (model-changed) 2dup base>> =
     [ [ [ value>> ] [ [ values>> ] [ quot>> ] bi ] bi* swapd reduce* ] keep set-model ]
