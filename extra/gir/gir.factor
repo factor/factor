@@ -1,9 +1,9 @@
 ! Copyright (C) 2023 Doug Coleman.
 ! See https://factorcode.org/license.txt for BSD license.
-USING: accessors arrays assocs combinators
+USING: accessors arrays assocs binary-search combinators
 combinators.short-circuit io.directories io.encodings.utf8
-io.files kernel modern.html multiline sequences strings unicode
-vectors ;
+io.files kernel modern.html multiline sequences sets strings
+unicode vectors ;
 IN: gir
 
 : all-blank? ( string -- ? ) { [ sequence? ] [ [ blank? ] all? ] } 1&& ;
@@ -11,49 +11,46 @@ IN: gir
 ERROR: unknown-gir-tag triple ;
 
 : process-tag ( triple -- array )
-    dup first {
-        { "repository" [ ] }
-
-        { "include" [ ] }
-        { "c:include" [ ] }
-        { "package" [ ] }
-        { "namespace" [ ] }
-
-        { "type" [ ] }
-        { "parameters" [ ] }
-        { "parameter" [ ] }
-        { "attribute" [ ] }
-        { "property" [ ] }
-        { "field" [ ] }
-        { "prerequisite" [ ] }
-        { "return-value" [ ] }
-        { "instance-parameter" [ ] }
-        { "constant" [ ] }
-        { "bitfield" [ ] }
-        { "union" [ ] }
-        { "class" [ ] }
-        { "record" [ ] }
-        { "enumeration" [ ] }
-        { "array" [ ] }
-        { "varargs" [ ] }
-        { "member" [ ] }
-        { "implements" [ ] }
-        { "interface" [ ] }
-        { "alias" [ ] }
-        { "function-macro" [ ] }
-        { "function" [ ] }
-        { "constructor" [ ] }
-        { "virtual-method" [ ] }
-        { "method" [ ] }
-        { "callback" [ ] }
-        { "doc" [ ] }
-        { "doc-deprecated" [ ] }
-        { "doc-version" [ ] }
-        { "docsection" [ ] }
-        { "glib:boxed" [ ] }
-        { "glib:signal" [ ] }
-        [ drop unknown-gir-tag ]
-    } case ;
+    dup first HS{
+        "alias"
+        "array"
+        "attribute"
+        "bitfield"
+        "c:include"
+        "callback"
+        "class"
+        "constant"
+        "constructor"
+        "doc-deprecated"
+        "doc-version"
+        "doc"
+        "docsection"
+        "enumeration"
+        "field"
+        "function-macro"
+        "function"
+        "glib:boxed"
+        "glib:signal"
+        "implements"
+        "include"
+        "instance-parameter"
+        "interface"
+        "member"
+        "method"
+        "namespace"
+        "package"
+        "parameter"
+        "parameters"
+        "prerequisite"
+        "property"
+        "record"
+        "repository"
+        "return-value"
+        "type"
+        "union"
+        "varargs"
+        "virtual-method"
+    } in? [ unknown-gir-tag ] unless ;
 
 ERROR: unknown-html-directive tag ;
 
