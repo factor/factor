@@ -99,7 +99,7 @@ M: unsupported-platform summary
     drop "Current operating system not supported by this vocabulary" ;
 
 : file-exists?, ( path -- )
-    [ dup file-exists? [ , ] [ drop ] if ] when* ;
+    [ [ , ] when-file-exists ] when* ;
 
 : vocab-metadata-files ( vocab -- paths )
     [

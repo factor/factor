@@ -73,13 +73,13 @@ TUPLE: gemini-server < threaded-server
     ] with-directory-entries ;
 
 : send-directory ( server path -- )
-    dup ".geminimap" append-path dup file-exists? [
+    dup ".geminimap" append-path [
         send-file 2drop
     ] [
         drop dup ".geminihead" append-path
-        dup file-exists? [ send-file ] [ drop ] if
+        [ send-file ] when-file-exists
         list-directory
-    ] if ;
+    ] if-file-exists ;
 
 : read-gemini-path ( -- path )
     readln utf8 decode "\r" ?tail drop >url path>> ;

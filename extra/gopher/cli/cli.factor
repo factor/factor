@@ -121,14 +121,14 @@ CONSTANT: URL V{ }
     1 stack-url [ gopher-get ] when* ;
 
 : gopher-less ( -- )
-    "gopher.txt" temp-file dup file-exists? [
+    "gopher.txt" temp-file [
         utf8 [
             <process>
                 "PAGER" os-env [ "less" ] unless* >>command
                 input-stream get >>stdin
             try-process
         ] with-file-reader
-    ] [ drop ] if ;
+    ] when-file-exists ;
 
 : gopher-ls ( args -- )
     [ PAGE ] [ "-l" = ] bi* print-links ;

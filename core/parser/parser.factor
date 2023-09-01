@@ -239,6 +239,6 @@ SYMBOL: bootstrap-syntax
     parse-file call( -- ) ;
 
 : ?run-file ( path -- )
-    dup file-exists? [ run-file ] [ drop ] if ;
+    [ run-file ] when-file-exists ;
 
 ERROR: version-control-merge-conflict ;
