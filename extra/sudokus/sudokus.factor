@@ -1,8 +1,8 @@
-USING: accessors arrays combinators.short-circuit grouping kernel lists
-lists.lazy locals math math.functions math.parser math.ranges
-models.product monads random sequences sets ui ui.gadgets.controls
-ui.gadgets.layout models.combinators ui.gadgets.alerts vectors fry
-ui.gadgets.labels shuffle ;
+USING: accessors arrays combinators.short-circuit fry grouping
+kernel lists lists.lazy locals math math.functions math.parser
+models.combinators models.product monads random ranges sequences
+sets shuffle ui ui.gadgets.alerts ui.gadgets.controls
+ui.gadgets.labels ui.gadgets.layout vectors ;
 IN: sudokus
 
 : row ( index -- row ) 1 + 9 / ceiling ;
@@ -14,7 +14,7 @@ IN: sudokus
 :: solutions ( puzzle random? -- solutions )
     f puzzle random? [ indices [ f ] [ random? swap nth-or-lower ] if-empty ] [ index ] if
     [ :> pos
-      1 9 [a,b] 80 <iota> [ pos near ] filter [ puzzle nth ] map prune diff
+      1 9 [a..b] 80 <iota> [ pos near ] filter [ puzzle nth ] map members diff
       [ 1array puzzle pos cut-slice rest surround ] map >list [ random? solutions ] bind
     ] [ puzzle list-monad return ] if* ;
 
