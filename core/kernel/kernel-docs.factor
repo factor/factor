@@ -284,18 +284,18 @@ HELP: call
 
 HELP: keep
 { $values { "x" object } { "quot" { $quotation ( ..a x -- ..b ) } } }
-{ $description "Call a quotation with a value on the stack, restoring the value when the quotation returns." }
+{ $description "Calls a quotation with a value on the stack, restoring the value when the quotation returns." }
 { $examples
     { $example "USING: arrays kernel prettyprint ;" "2 \"greetings\" [ <array> ] keep 2array ." "{ { \"greetings\" \"greetings\" } \"greetings\" }" }
 } ;
 
 HELP: 2keep
 { $values { "x" object } { "y" object } { "quot" { $quotation ( ..a x y -- ..b ) } } }
-{ $description "Call a quotation with two values on the stack, restoring the values when the quotation returns." } ;
+{ $description "Calls a quotation with two values on the stack, restoring the values when the quotation returns." } ;
 
 HELP: 3keep
 { $values { "x" object } { "y" object } { "z" object } { "quot" { $quotation ( ..a x y z -- ..b ) } } }
-{ $description "Call a quotation with three values on the stack, restoring the values when the quotation returns." } ;
+{ $description "Calls a quotation with three values on the stack, restoring the values when the quotation returns." } ;
 
 HELP: bi
 { $values { "x" object } { "p" { $quotation ( ..a x -- ..b ) } } { "q" { $quotation ( ..c x -- ..d ) } } }
@@ -783,7 +783,7 @@ HELP: ?if
 
 HELP: ?when
 { $values
-    { "default" object } { "cond" object } { "true" object }
+    { "default" object } { "cond" { $quotation ( ..a default -- ..a new/f ) } } { "true" { $quotation ( ..a new -- ..a x ) } } { "default/x" { $or { $snippet "default" } { $snippet "x" } } }
 }
 { $description "Calls " { $snippet "cond" } " on the " { $snippet "default" } " object and if " { $snippet "cond" } " outputs a new object then the " { $snippet "true" } " quotation is called with that new object. Otherwise, leaves the old object on the stack." }
 { $examples
@@ -801,7 +801,7 @@ HELP: ?when
 
 HELP: ?unless
 { $values
-    { "default" object } { "cond" object } { "false" object }
+    { "default" object } { "cond" { $quotation ( ..a default -- ..a new/f ) } } { "false" { $quotation ( ..a default -- ..a x ) } } { "default/x" { $or { $snippet "default" } { $snippet "x" } } }
 }
 { $description "Calls " { $snippet "cond" } " on the " { $snippet "default" } " object and if " { $snippet "cond" } " outputs a new object. Otherwise, calls " { $snippet "false" } " with the old object." }
 { $examples

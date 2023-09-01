@@ -71,7 +71,7 @@ IN: tools.deploy.macosx
     [ % "/Contents/Resources/" % % ".image" % ] "" make ;
 
 : deploy-app-bundle ( vocab -- )
-    bundle-name dup file-exists? [ delete-tree ] [ drop ] if
+    bundle-name ?delete-tree
     [ bundle-name create-app-dir ] keep
     [ bundle-name deploy.app-image-name ] keep
     namespace make-deploy-image

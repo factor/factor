@@ -506,7 +506,8 @@ ARTICLE: "calendar" "Calendar"
 "Getting the current timestamp:"
 { $subsections
     now
-    gmt
+    now-gmt
+    now-utc
 }
 "Time zones:"
 { $subsections

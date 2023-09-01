@@ -114,3 +114,20 @@ HELP: file-contents
 HELP: file-exists?
 { $values { "path" "a pathname string" } { "?" boolean } }
 { $description "Tests if the file named by " { $snippet "path" } " exists." } ;
+
+HELP: if-file-exists
+{ $values { "path" "a pathname string" } { "true" { $quotation ( ..a path -- ..b ) } } { "false" { $quotation ( ..a path -- ..b ) } } }
+{ $description "If " { $snippet "path" } " is a file that exists, calls the " { $snippet "true" } " quotation, otherwise calls the " { $snippet "false" } " quotation." }
+{ $notes "It is possible for the file to be created or deleted after the call to " { $link file-exists? } " but before running " { $snippet "true" } " or " { $snippet "false" } ". If that is a concern, you might want to open the file for reading or writing, as needed." } ;
+
+HELP: when-file-exists
+{ $values { "path" "a pathname string" } { "quot" { $quotation ( ... path -- ... ) } } }
+{ $description "If " { $snippet "path" } " is a file that exists, calls the " { $snippet "quot" } " quotation." }
+{ $notes "It is possible for the file to be created or deleted after the call to " { $link file-exists? } " but before running " { $snippet "quot" } ". If that is a concern, you might want to open the file for reading or writing, as needed." } ;
+
+HELP: unless-file-exists
+{ $values { "path" "a pathname string" } { "quot" { $quotation ( ... path -- ... ) } } }
+{ $description "If " { $snippet "path" } " is a file that does not exist, calls the " { $snippet "quot" } " quotation." }
+{ $notes "It is possible for the file to be created or deleted after the call to " { $link file-exists? } " but before running " { $snippet "quot" } ". If that is a concern, you might want to open the file for reading or writing, as needed." } ;
+
+{ if-file-exists when-file-exists unless-file-exists } related-words

@@ -38,8 +38,8 @@ webapps.mason.utils webapps.mason.version.data xml.writer xmode.highlight ;
 <li><a href="https://concatenative.org/wiki/view/Factor">Learn more about Factor</a></li>
 <li><a href="https://concatenative.org/wiki/view/Factor/Learning">Get started programming with Factor</a></li>
 <li><a href="https://concatenative.org/wiki/view/Factor/FAQ">Get answers to frequently-asked questions</a></li>
-<li><a href="https://docs.factorcode.org/">Read Factor reference documentation online</a></li>
-<li><a href="https://concatenative.org/wiki/view/Concatenative%20language">Learn more about concatenative programming</a></li>
+<li><a href="https://docs.factorcode.org/">Read Factor documentation online</a></li>
+<li><a href="https://concatenative.org/wiki/view/Concatenative%20language">Learn about concatenative programming</a></li>
 <li><a href="https://concatenative.org/wiki/view/Factor/Examples">See some example programs</a></li>
 <li><a href="https://github.com/factor/factor/issues">Report a bug</a></li>
 <li>Screenshots on <a href="https://factorcode.org/factor-macosx.png">Mac OS</a>, <a href="https://factorcode.org/factor-windows7.png">Windows</a></li>

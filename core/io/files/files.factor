@@ -71,6 +71,15 @@ HOOK: (file-appender) io-backend ( path -- stream )
 : file-exists? ( path -- ? )
     normalize-path native-string>alien (file-exists?) ;
 
+: if-file-exists ( ..a path true: ( ..a path -- ..b ) false: ( ..a path -- ..b ) -- ..b )
+    [ dup file-exists? ] 2dip if ; inline
+
+: when-file-exists ( ... path quot: ( ... path -- ... ) -- ... )
+    [ drop ] if-file-exists ; inline
+
+: unless-file-exists ( ... path quot: ( ... path -- ... ) -- ... )
+    [ drop ] swap if-file-exists ; inline
+
 ! Current directory
 <PRIVATE
 

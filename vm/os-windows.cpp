@@ -107,9 +107,7 @@ segment::segment(cell size_, bool executable_p) {
 }
 
 segment::~segment() {
-  SYSTEM_INFO si;
-  GetSystemInfo(&si);
-  if (!VirtualFree((void*)(start - si.dwPageSize), 0, MEM_RELEASE))
+  if (!VirtualFree((void*)(start - getpagesize()), 0, MEM_RELEASE))
     fatal_error("Segment deallocation failed", 0);
 }
 
@@ -122,7 +120,6 @@ long getpagesize() {
   }
   return g_pagesize;
 }
-
 
 bool move_file(const vm_char* path1, const vm_char* path2) {
   // MoveFileEx returns FALSE on fail.

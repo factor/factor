@@ -1,29 +1,32 @@
 ! Copyright (C) 2013 Doug Coleman, John Benediktsson.
 ! See https://factorcode.org/license.txt for BSD license.
 USING: arrays assocs combinators combinators.smart
-generalizations graphs.private kernel math math.order namespaces
-quotations sequences sequences.generalizations sequences.private
-sets shuffle stack-checker.transforms system words ;
+generalizations graphs.private kernel kernel.private math
+math.order namespaces quotations sequences
+sequences.generalizations sequences.private sets shuffle
+stack-checker.transforms system words ;
 IN: combinators.extras
 
+<PRIVATE
 : callk ( ..a quot: ( ..a -- ..b ) -- ..b quot )
     dup [ call ] dip ; inline
+PRIVATE>
 
 : once ( quot -- ) call ; inline
 : twice ( quot -- ) callk call ; inline
 : thrice ( quot -- ) callk callk call ; inline
-: forever ( quot -- ) [ t ] compose loop ; inline
+: forever ( quot -- ) '[ @ t ] loop ; inline
 
 MACRO: cond-case ( assoc -- quot )
     [
         dup callable? not [
-            [ first [ dup ] prepose ]
-            [ second [ drop ] prepose ] bi 2array
+            [ first '[ dup @ ] ]
+            [ second '[ drop @ ] ] bi 2array
         ] when
-    ] map [ cond ] curry ;
+    ] map '[ _ cond ] ;
 
 MACRO: cleave-array ( quots -- quot )
-    [ '[ _ cleave ] ] [ length '[ _ narray ] ] bi compose ;
+    dup length '[ _ cleave _ narray ] ;
 
 : 4bi ( w x y z  p q -- )
     [ 4keep ] dip call ; inline
@@ -49,22 +52,22 @@ MACRO: cleave-array ( quots -- quot )
 : 4bi* ( s t u v  w x y z  p q -- )
     [ 4dip ] dip call ; inline
 
-: 3tri* ( r s t  u v w  x y z  p q r -- )
+: 3tri* ( o s t  u v w  x y z  p q r -- )
     [ 6 ndip ] 2dip [ 4dip ] dip call ; inline
 
-: 4tri* ( o p q r  s t u v  w x y z  p q r -- )
+: 4tri* ( l m n o  s t u v  w x y z  p q r -- )
     [ 8 ndip ] 2dip [ 4dip ] dip call ; inline
 
 : quad* ( w  x  y  z  p q r s -- )
     [ [ [ 3dip ] dip 2dip ] dip dip ] dip call ; inline
 
-: 2quad* ( s t  u v  w x  y z  p q r s -- )
+: 2quad* ( o t  u v  w x  y z  p q r s -- )
     [ [ [ 6 ndip ] dip 4dip ] dip 2dip ] dip call ; inline
 
-: 3quad* ( o p q  r s t  u v w  x y z  p q r s -- )
+: 3quad* ( k l m  n o t  u v w  x y z  p q r s -- )
     [ [ [ 9 ndip ] dip 6 ndip ] dip 3dip ] dip call ; inline
 
-: 4quad* ( k l m n  o p q r  s t u v  w x y z  p q r s -- )
+: 4quad* ( g h i j  k l m n  o t u v  w x y z  p q r s -- )
     [ [ [ 12 ndip ] dip 8 ndip ] dip 4dip ] dip call ; inline
 
 : 3bi@ ( u v w  x y z  quot -- ) dup 3bi* ; inline
@@ -89,7 +92,16 @@ MACRO: cleave-array ( quots -- quot )
 : 4quad@ ( k l m n  o p q r  s t u v  w x y z  quot -- )
     dup dup dup 4quad* ; inline
 
-MACRO: smart-plox ( true -- quot )
+: quad-curry ( x  p q r s -- p' q' r' s' )
+    [ currier ] quad@ quad ; inline
+
+: quad-curry* ( w x y z  p q r s -- p' q' r' s' )
+    [ currier ] quad@ quad* ; inline
+
+: quad-curry@ ( w x y z  q -- p' q' r' s' )
+    currier quad@ ; inline
+
+MACRO: smart-plox ( true: ( ... -- x ) -- quot )
     [ inputs [ 1 - [ and ] n*quot ] keep ] keep swap
     '[ _ _ [ _ ndrop f ] smart-if ] ;
 
@@ -102,12 +114,11 @@ MACRO: smart-plox ( true -- quot )
 : swap-when ( x y quot: ( x -- n ) quot: ( n n -- ? ) -- x' y' )
     '[ _ _ 2dup _ bi@ @ [ swap ] when ] call ; inline
 
+: 2falsify ( obj1 obj2 -- obj1/f obj2/f )
+    2dup and [ 2drop f f ] unless ; inline
 
-! ?1arg-result-falsify
-
-: 1falsify ( obj/f -- obj/f ) ; inline
-: 2falsify ( obj1 obj2 -- obj1/f obj2/f ) 2dup and [ 2drop f f ] unless ; inline
-: 3falsify ( obj1 obj2 obj3 -- obj1/f obj2/f obj3/f ) 3dup and and [ 3drop f f f ] unless ; inline
+: 3falsify ( obj1 obj2 obj3 -- obj1/f obj2/f obj3/f )
+    3dup and and [ 3drop f f f ] unless ; inline
 
 MACRO: n-and ( n -- quot )
     1 [-] [ and ] n*quot ;
@@ -134,8 +145,9 @@ MACRO:: n-falsify ( n -- quot )
     [ rot \ if* 3array [ ] append-as ] assoc-each ;
 
 : cond*>quot ( assoc -- quot )
-    [ dup pair? [ [ drop ] prepend [ t ] swap 2array ] unless ] map
-    reverse! [ no-cond ] swap alist>quot* ;
+    [
+        dup pair? [ [ drop ] prepend [ t ] swap 2array ] unless
+    ] map reverse! [ no-cond ] swap alist>quot* ;
 
 DEFER: cond*
 \ cond* [ cond*>quot ] 1 define-transform
@@ -150,11 +162,10 @@ MACRO: chain ( quots -- quot )
     <reversed> [ ] [ swap '[ [ @ @ ] [ f ] if* ] ] reduce ;
 
 : with-output-variable ( value variable quot -- value )
-    over [ get ] curry compose with-variable ; inline
+    over '[ @ _ get ] with-variable ; inline
 
 : loop1 ( ..a quot: ( ..a -- ..a obj ? ) -- ..a obj )
     [ call ] keep '[ drop _ loop1 ] when ; inline recursive
-
 
 : keep-1up ( quot -- quot ) keep 1 2 0 nrotated ; inline
 : keep-2up ( quot -- quot ) keep 2 3 0 nrotated ; inline
@@ -169,23 +180,26 @@ MACRO: chain ( quots -- quot )
 : 3keep-3up ( quot -- quot ) 3keep 3 6 0 nrotated ; inline
 
 ! d is dummy, o is object to save notation space
-: dip-1up  ( ..a d quot: ( ..a -- ..b o d ) -- ..b d o )
+: dip-1up  ( ..a d quot: ( ..a -- ..b o ) -- ..b d o )
     dip swap ; inline
-: dip-2up  ( ..a d quot: ( ..a -- ..b o1 o2 d ) -- ..b d o1 o2 )
+
+: dip-2up  ( ..a d quot: ( ..a -- ..b o1 o2 ) -- ..b d o1 o2 )
     dip rot rot ; inline
 
-: 2dip-1up ( ..a d1 d2 quot: ( ..a -- ..b o d1 d2 ) -- ..b d1 d2 o )
+: 2dip-1up ( ..a d1 d2 quot: ( ..a -- ..b o ) -- ..b d1 d2 o )
     2dip rot ; inline
-: 2dip-2up ( ..a d1 d2 quot: ( ..a -- ..b o1 o2 d1 d2 ) -- ..b d1 d2 o1 o2 )
+
+: 2dip-2up ( ..a d1 d2 quot: ( ..a -- ..b o1 o2 ) -- ..b d1 d2 o1 o2 )
     2dip roll roll ; inline
 
-: 3dip-1up ( ..a d1 d2 d3 quot: ( ..a -- ..b o d1 d2 d3 ) -- ..b d1 d2 d3 o )
+: 3dip-1up ( ..a d1 d2 d3 quot: ( ..a -- ..b o ) -- ..b d1 d2 d3 o )
     3dip roll ; inline
-: 3dip-2up ( ..a d1 d2 d3 quot: ( ..a -- ..b o1 o2 d1 d2 d3 ) -- ..b d1 d2 d3 o1 o2 )
-    3dip 2 5 0 nrotated ; inline
-: 3dip-3up ( ..a d1 d2 d3 quot: ( ..a -- ..b o1 o2 o3 d1 d2 d3 ) -- ..b d1 d2 d3 o1 o2 o3 )
-    3dip 3 6 0 nrotated ; inline
 
+: 3dip-2up ( ..a d1 d2 d3 quot: ( ..a -- ..b o1 o2 ) -- ..b d1 d2 d3 o1 o2 )
+    3dip 2 5 0 nrotated ; inline
+
+: 3dip-3up ( ..a d1 d2 d3 quot: ( ..a -- ..b o1 o2 o3 ) -- ..b d1 d2 d3 o1 o2 o3 )
+    3dip 3 6 0 nrotated ; inline
 
 : 2craft-1up ( ..a quot1: ( ..a -- ..b o1 ) quot2: ( ..b -- ..c o2 ) -- ..c o1 o2 )
     [ call ] dip [ dip-1up ] call ; inline
@@ -194,7 +208,8 @@ MACRO: chain ( quots -- quot )
     [ call ] 2dip [ dip-1up ] dip [ 2dip-1up ] call ; inline
 
 : 4craft-1up ( ..a quot1: ( ..a -- ..b o1 ) quot2: ( ..b -- ..c o2 ) quot3: ( ..c -- ..d o3 ) quot4: ( ..d -- ..e o4 ) -- ..e o1 o2 o3 o4 )
-    [ call ] 3dip [ dip-1up ] 2dip [ 2dip-1up ] dip [ 3dip-1up ] call ; inline
+    [ call ] 3dip [ dip-1up ] 2dip
+    [ 2dip-1up ] dip [ 3dip-1up ] call ; inline
 
 : 3and ( a b c -- ? ) and and ; inline
 : 4and ( a b c d -- ? ) and and and ; inline
@@ -215,20 +230,25 @@ MACRO: 3keep-under ( quot -- quot' )
 MACRO: 4keep-under ( quot -- quot' )
     dup outputs 4 + '[ _ 4keep 4 _ 0 -nrotated ] ;
 
-! for use with assoc-map etc
-: 1temp1d ( quot: ( a b c -- d e f ) -- quot ) '[ swap @ swap ] ; inline
-: 1temp2d ( quot: ( a b c -- d e f ) -- quot ) '[ rot @ -rot ] ; inline
-: 2temp2d ( quot: ( a b c d -- e f g h ) -- quot ) '[ 2 4 0 nrotated @ 2 4 0 -nrotated ] ; inline
+! for use with assoc-map etc.
+: 1temp1d ( quot: ( a b c -- d e f ) -- quot )
+    '[ swap @ swap ] ; inline
 
+: 1temp2d ( quot: ( a b c -- d e f ) -- quot )
+    '[ rot @ -rot ] ; inline
+
+: 2temp2d ( quot: ( a b c d -- e f g h ) -- quot )
+    '[ 2 4 0 nrotated @ 2 4 0 -nrotated ] ; inline
+
+<PRIVATE
 : (closure-limit) ( vertex set quot: ( vertex -- edges ) i n -- )
     2dup < [
-        [ 1 + ] dip
-        2reach ?adjoin [
-            [ [ dip ] keep ] 2dip [ (closure-limit) ] 2curry 2curry each
+        [ 1 + ] dip 2reach ?adjoin [
+            [ [ dip ] keep ] 2dip
+            '[ _ _ _ _ (closure-limit) ] each
         ] [ 5drop ] if
-    ] [
-        5drop
-    ] if ; inline recursive
+    ] [ 5drop ] if ; inline recursive
+PRIVATE>
 
 : closure-limit-as ( vertex quot: ( vertex -- edges ) n exemplar -- set )
     [ 0 ] 2dip
@@ -237,10 +257,14 @@ MACRO: 4keep-under ( quot -- quot' )
 : closure-limit ( vertex quot: ( vertex -- edges ) n -- set )
     HS{ } closure-limit-as ; inline
 
-: 1check ( obj quot -- obj ? ) over [ call ] dip swap ; inline
-: 2check ( obj1 obj2 quot -- obj ? ) 2over [ call ] 2dip rot ; inline
+: 1check ( obj quot -- obj ? )
+    over [ call ] dip swap ; inline
 
-: 1check-when ( ..a obj cond: ( ..a obj -- obj/f ) true: ( ..a obj cond -- ..b ) -- ..b )
+: 2check ( obj1 obj2 quot -- obj1 obj2 ? )
+    2over [ call ] 2dip rot ; inline
+
+: 1check-when ( ..a obj cond: ( ..a obj -- ? ) true: ( ..a obj -- ..b ) -- ..b )
     [ 1check ] dip when ; inline
-: 2check-when ( ..a obj1 obj2 cond: ( ..a obj1 obj2 -- obj/f ) true: ( ..a obj1 obj2 cond -- ..b ) -- ..b )
+
+: 2check-when ( ..a obj1 obj2 cond: ( ..a obj1 obj2 -- ? ) true: ( ..a obj1 obj2 -- ..b ) -- ..b )
     [ 2check ] dip when ; inline
