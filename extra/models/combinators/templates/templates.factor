@@ -1,7 +1,8 @@
-USING: kernel sequences functors fry macros generalizations ;
+USING: fry functors generalizations kernel macros sequences
+sequences.generalizations ;
 IN: models.combinators.templates
 FROM: models.combinators => <collection> #1 ;
-FUNCTOR: fmaps ( W -- )
+<FUNCTOR: fmaps ( W -- )
 W        IS ${W}
 w-n      DEFINES ${W}-n
 w-2      DEFINES 2${W}
@@ -20,4 +21,4 @@ MACRO: w-n* ( int -- quot ) dup '[ [ _ narray <collection> #1 ] dip [ _ firstn ]
 : w-2* ( a b quot -- mapped ) 2 w-n* ; inline
 : w-3* ( a b c quot -- mapped ) 3 w-n* ; inline
 : w-4* ( a b c d quot -- mapped ) 4 w-n* ; inline
-;FUNCTOR
+;FUNCTOR>
