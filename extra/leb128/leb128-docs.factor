@@ -5,8 +5,11 @@ IN: leb128
 
 ARTICLE: "leb128" "LEB128 Encoding"
 
-Implements support for the LEB128 (Little Endian Base 128) encoding format,
-both unsigned and signed.
+LEB128 (Little Endian Base 128) is a variable-length encoding format designed
+to store arbitrarily large integers in a small number of bytes. There are two
+versions: unsigned and signed. These vary slightly, so a user program that
+wants to decode LEB128 values should use the appropriate unsigned or signed
+decode method.
 
 Unsigned LEB123:
 { $subsections
