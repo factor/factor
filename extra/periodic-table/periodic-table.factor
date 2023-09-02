@@ -2,8 +2,9 @@
 ! See https://factorcode.org/license.txt for BSD license
 
 USING: accessors assocs colors kernel math math.parser sequences
-ui ui.gadgets ui.gadgets.borders ui.gadgets.labels
-ui.gadgets.tracks ui.pens.solid ;
+ui ui.gadgets ui.gadgets.borders ui.gadgets.buttons
+ui.gadgets.labels ui.gadgets.tracks ui.gestures ui.pens.solid
+webbrowser ;
 
 IN: periodic-table
 
@@ -182,13 +183,17 @@ CONSTANT: periodic-table {
         [
             [
                 [
-                    dup 1 - elements nth first3
+                    dup 1 - elements nth [ second swap ] [ first3 ] bi
                     [ <element> ] [ group-colors at ] bi*
                 ] [
-                    "" <label> f
+                    f "" <label> f
                 ] if*
                 [ { 40 35 } >>pref-dim { 5 5 } <border> ]
                 [ [ <solid> >>interior ] when* ] bi*
+                swap [
+                    "https://en.wikipedia.org/wiki/" prepend
+                    '[ drop _ open-url ] <roll-button>
+                ] unless-empty
                 f track-add
             ] each
         ] [
