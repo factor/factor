@@ -1,8 +1,8 @@
 ! Copyright (C) 2023 John Benediktsson
 ! See https://factorcode.org/license.txt for BSD license
 
-USING: byte-vectors combinators.short-circuit io
-io.streams.byte-array kernel math namespaces sequences ;
+USING: byte-vectors combinators.short-circuit hints io
+io.streams.byte-array kernel math namespaces sequences typed ;
 
 IN: leb128
 
@@ -17,18 +17,18 @@ IN: leb128
         quot call
     ] loop drop ; inline
 
+HINTS: (write-uleb128) { fixnum object } ;
+
 PRIVATE>
 
-: stream-write-uleb128 ( n stream -- )
-    '[ _ stream-write1 ] (write-uleb128) ;
+TYPED: stream-write-uleb128 ( n: integer stream -- )
+    '[ _ stream-write1 ] (write-uleb128) ; inline
 
 : write-uleb128 ( n -- )
     output-stream get stream-write-uleb128 ;
 
-: >uleb128 ( n -- byte-array )
-    16 <byte-vector> clone [
-        '[ _ push ] (write-uleb128)
-    ] keep B{ } like ;
+TYPED: >uleb128 ( n: integer -- byte-array )
+    16 <byte-vector> [ '[ _ push ] (write-uleb128) ] keep B{ } like ;
 
 :: stream-read-uleb128 ( stream -- n )
     0 0 [
@@ -57,18 +57,18 @@ PRIVATE>
         quot call
     ] loop drop ; inline
 
+HINTS: (write-leb128) { fixnum object } ;
+
 PRIVATE>
 
-: stream-write-leb128 ( n stream -- )
+TYPED: stream-write-leb128 ( n: integer stream -- )
     '[ _ stream-write1 ] (write-leb128) ;
 
 : write-leb128 ( n -- )
     output-stream get stream-write-leb128 ;
 
-: >leb128 ( n -- byte-array )
-    16 <byte-vector> clone [
-        '[ _ push ] (write-leb128)
-    ] keep B{ } like ;
+TYPED: >leb128 ( n: integer -- byte-array )
+    16 <byte-vector> [ '[ _ push ] (write-leb128) ] keep B{ } like ;
 
 :: stream-read-leb128 ( stream -- n )
     0 0 [
