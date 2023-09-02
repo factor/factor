@@ -108,7 +108,7 @@ M: (when-model) (model-changed) [ quot>> ] 2keep
     [ value>> ] [ cond>> ] bi* call( a -- ? ) [ call( model -- ) ] [ 2drop ] if ;
 
 ! only used in construction
-: with-self ( quot: ( model -- model ) -- model ) [ f <basic> dup ] dip call swap [ add-dependency ] keep ; inline
+: with-self ( quot -- model ) [ f <basic> dup ] dip call swap [ add-dependency ] keep ; inline
 
 USE: models.combinators.templates
 << { "$>" "<$" "fmap" } [ fmaps ] each >>
