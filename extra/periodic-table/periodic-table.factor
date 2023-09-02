@@ -159,6 +159,7 @@ CONSTANT: periodic-table {
     f
     {   f   f   f  58  59  60  61  62  63  64  65  66  67  68  69  70  71   f }
     {   f   f   f  90  91  92  93  94  95  96  97  98  99 100 101 102 103   f }
+    f
 }
 
 :: <element-label> ( atomic-number symbol name -- gadget )
@@ -194,7 +195,7 @@ CONSTANT: periodic-table {
     periodic-table [
         horizontal <track> { 3 3 } >>gap swap
         [ [ <element> f track-add ] each ]
-        [ "" <label> { 20 20 } >>pref-dim f track-add ] if*
+        [ "" <label> { 10 10 } >>pref-dim f track-add ] if*
         f track-add
     ] each <legend> f track-add ;
 
