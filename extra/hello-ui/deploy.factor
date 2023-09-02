@@ -1,6 +1,5 @@
 USING: tools.deploy.config ;
 H{
-    { deploy-name "Hello world" }
     { deploy-ui? t }
     { deploy-c-types? f }
     { deploy-unicode? f }
@@ -11,4 +10,5 @@ H{
     { deploy-math? t }
     { deploy-threads? t }
     { deploy-word-defs? f }
+    { deploy-name "Hello, world!" }
 }
