@@ -11,5 +11,6 @@ H{
     { deploy-math? t }
     { deploy-threads? t }
     { deploy-word-defs? f }
+    { deploy-help? f }
     { deploy-name "Hello, world!" }
 }
