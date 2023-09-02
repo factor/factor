@@ -161,12 +161,25 @@ CONSTANT: periodic-table {
     {   f   f   f  90  91  92  93  94  95  96  97  98  99 100 101 102 103   f }
 }
 
-:: <element> ( atomic-number symbol name -- gadget )
+:: <element-label> ( atomic-number symbol name -- gadget )
     vertical <track>
     atomic-number number>string <label>
         [ 10 >>size ] change-font f track-add
     symbol <label> [ t >>bold? ] change-font f track-add
     name <label> [ 8 >>size ] change-font f track-add ;
+
+: <element> ( atomic-number/f -- element )
+    [
+        dup 1 - elements nth [ second swap ] [ first3 ] bi
+        [ <element-label> ] [ group-colors at ] bi*
+    ] [
+        f "" <label> f
+    ] if*
+    [ { 40 35 } >>pref-dim { 5 5 } <border> ]
+    [ [ <solid> >>interior ] when* ] bi* swap [
+        "https://en.wikipedia.org/wiki/" prepend
+        '[ drop _ open-url ] <roll-button>
+    ] unless-empty ;
 
 : <legend> ( -- gadget )
     horizontal <track> { 3 3 } >>gap
@@ -180,25 +193,8 @@ CONSTANT: periodic-table {
     vertical <track> { 3 3 } >>gap
     periodic-table [
         horizontal <track> { 3 3 } >>gap swap
-        [
-            [
-                [
-                    dup 1 - elements nth [ second swap ] [ first3 ] bi
-                    [ <element> ] [ group-colors at ] bi*
-                ] [
-                    f "" <label> f
-                ] if*
-                [ { 40 35 } >>pref-dim { 5 5 } <border> ]
-                [ [ <solid> >>interior ] when* ] bi*
-                swap [
-                    "https://en.wikipedia.org/wiki/" prepend
-                    '[ drop _ open-url ] <roll-button>
-                ] unless-empty
-                f track-add
-            ] each
-        ] [
-            "" <label> { 20 20 } >>pref-dim f track-add
-        ] if*
+        [ [ <element> f track-add ] each ]
+        [ "" <label> { 20 20 } >>pref-dim f track-add ] if*
         f track-add
     ] each <legend> f track-add ;
 
