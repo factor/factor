@@ -163,9 +163,9 @@ CONSTANT: periodic-table {
 :: <element> ( atomic-number symbol name -- gadget )
     vertical <track>
     atomic-number number>string <label>
-        [ 8 >>size ] change-font f track-add
+        [ 10 >>size ] change-font f track-add
     symbol <label> [ t >>bold? ] change-font f track-add
-    name <label> [ 6 >>size ] change-font f track-add ;
+    name <label> [ 8 >>size ] change-font f track-add ;
 
 : <legend> ( -- gadget )
     horizontal <track> { 3 3 } >>gap
@@ -195,9 +195,8 @@ CONSTANT: periodic-table {
             "" <label> { 20 20 } >>pref-dim f track-add
         ] if*
         f track-add
-    ] each
-    <legend> { 0 10 } <border> f track-add ;
+    ] each <legend> f track-add ;
 
 MAIN-WINDOW: periodic-table-window
     { { title "Periodic Table" } }
-    <periodic-table> >>gadgets ;
+    <periodic-table> { 5 5 } <border> >>gadgets ;
