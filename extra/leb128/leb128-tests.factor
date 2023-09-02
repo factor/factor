@@ -1,6 +1,7 @@
 
-USING: leb128 tools.test ;
+USING: leb128 math tools.test ;
 
+[ -1 >uleb128 ] [ non-negative-number-expected? ] must-fail-with
 { B{ 0xe5 0x8e 0x26 } } [ 624485 >uleb128 ] unit-test
 { 624485 } [ B{ 0xe5 0x8e 0x26 } uleb128> ] unit-test
 { B{ 255 255 127 } } [ 0x1fffff >uleb128 ] unit-test
