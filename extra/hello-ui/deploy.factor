@@ -1,5 +1,6 @@
 USING: tools.deploy.config ;
 H{
+    { deploy-console? t }
     { deploy-ui? t }
     { deploy-c-types? f }
     { deploy-unicode? f }
