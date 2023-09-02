@@ -9,10 +9,10 @@ IN: ui.gadgets.slate
 TUPLE: slate < gadget action pdim graft ungraft ;
 
 : init-slate ( slate -- slate )
-  [ ]         >>action
-  { 200 200 } >>pdim
-  [ ]         >>graft
-  [ ]         >>ungraft ;
+    [ ]         >>action
+    { 200 200 } >>pdim
+    [ ]         >>graft
+    [ ]         >>ungraft ;
 
 : <slate> ( action -- slate )
     slate new
