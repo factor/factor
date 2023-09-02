@@ -112,6 +112,6 @@ PRIVATE>
     ] each-index ;
 
 : domain-stats ( domain -- stats )
-    get-domains all-pages [
+    get-domains all-pages [ "data" of ] map [
         "created" of 1000 * millis>timestamp year>>
     ] collect-by [ [ "score" of ] map-sum ] assoc-map ;
