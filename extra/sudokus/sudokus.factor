@@ -18,23 +18,37 @@ IN: sudokus
       [ 1array puzzle pos cut-slice rest surround ] map >list [ random? solutions ] bind
     ] [ puzzle list-monad return ] if* ;
 
-: solution ( puzzle random? -- solution ) dupd solutions dup +nil+ = [ drop "Unsolvable" alert* ] [ nip car ] if ;
-: hint ( puzzle -- puzzle' ) [ [ f swap indices random dup ] [ f solution ] bi nth ] keep swapd >vector [ set-nth ] keep ;
-: create ( difficulty -- puzzle ) 81 [ f ] replicate
-    40 random solution [ [ f swap [ length random ] keep set-nth ] curry times ] keep ;
+: solution ( puzzle random? -- solution )
+    dupd solutions dup +nil+ = [ drop "Unsolvable" alert* ] [ nip car ] if ;
 
-: do-sudoku ( -- ) [ [
+: hint ( puzzle -- puzzle' )
+    f over indices random [
+        [ >vector dup f solution ]
+        [ [ swap nth ] keep pick set-nth ] bi*
+    ] when* ;
+
+: create ( difficulty -- puzzle )
+    81 f <array>
+    40 random solution [
+        [ f swap [ length random ] keep set-nth ] curry times
+    ] keep ;
+
+: do-sudoku ( -- )
+    [
         [
-            81 [ "" ] replicate <basic> switch-models [ [ <basic> ] map 9 group [ 3 group ] map 3 group
-               [ [ [ <spacer> [ [ <model-field> ->% 2 [ string>number ] fmap ]
-                    map <spacer> ] map concat ] <hbox> , ] map concat <spacer> ] map concat <product>
-               [ "Difficulty:" <label> , "1" <basic> <model-field> -> [ string>number 1 or 1 + 10 * ] fmap
-               "Generate" <model-border-btn> -> updates [ create ] fmap <spacer>
-               "Hint" <model-border-btn> -> "Solve" <model-border-btn> -> ] <hbox> ,
-               roll [ swap updates ] curry bi@
-               [ [ hint ] fmap ] [ [ f solution ] fmap ] bi* 3array merge [ [ [ number>string ] [ "" ] if* ] map ] fmap
-           ] bind
-        ] with-self , ] <vbox> { 280 220 } >>pref-dim
-    "Sudoku Sleuth" open-window ] with-ui ;
+            [
+                81 [ "" ] replicate <basic> switch-models [ [ <basic> ] map 9 group [ 3 group ] map 3 group
+                   [ [ [ <spacer> [ [ <model-field> ->% 2 [ string>number ] fmap ]
+                        map <spacer> ] map concat ] <hbox> , ] map concat <spacer> ] map concat <product>
+                   [ "Difficulty:" <label> , "1" <basic> <model-field> -> [ string>number 1 or 1 + 10 * ] fmap
+                   "Generate" <model-border-btn> -> updates [ create ] fmap <spacer>
+                   "Hint" <model-border-btn> -> "Solve" <model-border-btn> -> ] <hbox> ,
+                   roll [ swap updates ] curry bi@
+                   [ [ hint ] fmap ] [ [ f solution ] fmap ] bi* 3array merge [ [ [ number>string ] [ "" ] if* ] map ] fmap
+               ] bind
+            ] with-self ,
+        ] <vbox> { 280 220 } >>pref-dim
+        "Sudoku Sleuth" open-window
+    ] with-ui ;
 
 MAIN: do-sudoku
