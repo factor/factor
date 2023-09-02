@@ -11,7 +11,7 @@ versions: unsigned and signed. These vary slightly, so a user program that
 wants to decode LEB128 values should use the appropriate unsigned or signed
 decode method.
 
-Unsigned LEB123:
+Unsigned LEB128:
 { $subsections
     >uleb128
     uleb128>
@@ -21,7 +21,7 @@ Unsigned LEB123:
     stream-read-uleb128
 }
 
-Signed LEB123:
+Signed LEB128:
 { $subsections
     >leb128
     leb128>
