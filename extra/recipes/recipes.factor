@@ -14,7 +14,8 @@ STORED-TUPLE: recipe
 : <recipe> ( title genre text -- recipe )
     recipe new swap >>txt swap >>genre swap >>title 0 >>votes ;
 
-"recipes.db" temp-file <sqlite-db> recipe define-db
+: init-recipe-db ( -- )
+    "recipes.db" temp-file <sqlite-db> recipe define-db ;
 
 : top-recipes ( offset search -- recipes )
     <query> T{ recipe } rot >>title >>tuple
@@ -73,4 +74,4 @@ STORED-TUPLE: recipe
 
 MAIN-WINDOW: recipe-browser
     { { title "Recipes" } }
-    <recipe-gadget> >>gadgets ;
+    init-recipe-db <recipe-gadget> >>gadgets ;
