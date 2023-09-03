@@ -3,8 +3,7 @@
 
 USING: accessors assocs colors kernel math math.parser sequences
 ui ui.gadgets ui.gadgets.borders ui.gadgets.buttons
-ui.gadgets.labels ui.gadgets.tracks ui.gestures ui.pens.solid
-webbrowser ;
+ui.gadgets.labels ui.gadgets.tracks ui.pens.solid webbrowser ;
 
 IN: periodic-table
 
@@ -171,16 +170,20 @@ CONSTANT: periodic-table {
 
 : <element> ( atomic-number/f -- element )
     [
-        dup 1 - elements nth [ second swap ] [ first3 ] bi
+        dup 1 - elements nth first3
         [ <element-label> ] [ group-colors at ] bi*
     ] [
-        f "" <label> f
+        "" <label> f
     ] if*
     [ { 40 35 } >>pref-dim { 5 5 } <border> ]
-    [ [ <solid> >>interior ] when* ] bi* swap [
+    [ [ <solid> >>interior ] when* ] bi* ;
+
+: <element-button> ( atomic-number/f -- element )
+    [ <element> ] keep [
+        1 - elements nth second
         "https://en.wikipedia.org/wiki/" prepend
         '[ drop _ open-url ] <roll-button>
-    ] unless-empty ;
+    ] when* ;
 
 : <legend> ( -- gadget )
     horizontal <track> { 3 3 } >>gap
@@ -194,7 +197,7 @@ CONSTANT: periodic-table {
     vertical <track> { 3 3 } >>gap
     periodic-table [
         horizontal <track> { 3 3 } >>gap swap
-        [ [ <element> f track-add ] each ]
+        [ [ <element-button> f track-add ] each ]
         [ "" <label> { 10 10 } >>pref-dim f track-add ] if*
         f track-add
     ] each <legend> f track-add ;
