@@ -50,10 +50,10 @@ TYPED: uleb128> ( byte-array: byte-array -- n )
     n [
         [ -7 shift dup ] [ 0x7f bitand ] bi :> ( i b )
         {
-            { [ i  0 = ] [ b 6 bit? not ] }
-            { [ i -1 = ] [ b 6 bit? ] }
-            [ f ]
-        } cond [ f b ] [ t b 0x80 bitor ] if quot call
+            { [ i  0 = ] [ b 6 bit? ] }
+            { [ i -1 = ] [ b 6 bit? not ] }
+            [ t ]
+        } cond b over [ 0x80 bitor ] when quot call
     ] loop drop ; inline
 
 HINTS: (write-leb128) { fixnum object } ;
