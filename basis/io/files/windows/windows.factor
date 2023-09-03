@@ -227,7 +227,9 @@ M: windows wait-for-fd
 : console-app? ( -- ? ) GetConsoleWindow >boolean ;
 
 M: windows init-stdio
-    init-c-stdio ; ! use inherited handles from parent process
+    console-app?
+    [ init-c-stdio ]
+    [ null-reader null-writer null-writer set-stdio ] if ;
 
 : open-file ( path access-mode create-mode flags -- handle )
     [
