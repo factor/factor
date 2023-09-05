@@ -2,7 +2,7 @@ ifdef CONFIG
 	VERSION = 0.100
 	GIT_LABEL = $(shell echo `git describe --all`-`git rev-parse HEAD`)
 	BUNDLE = Factor.app
-	DEBUG ?= 0
+	DEBUG ?= 1
 	REPRODUCIBLE ?= 0
 
 	SHELL_CC = $(shell printenv CC)
@@ -12,7 +12,7 @@ ifdef CONFIG
 		CC = $(SHELL_CC)
 	endif
 
-	# gmake's default CXX is g++, we prefer c++
+    # gmake's default CXX is g++, we prefer c++
 	SHELL_CXX = $(shell printenv CXX)
 	ifeq ($(SHELL_CXX),)
 		CXX := $(shell which clang++ c++ 2>/dev/null | head -n 1)
@@ -34,15 +34,15 @@ ifdef CONFIG
 
 	CXXFLAGS += -std=c++11
 
-	# SANITIZER=address ./build.sh compile
-	# address,thread,undefined,leak
+    # SANITIZER=address ./build.sh compile
+    # address,thread,undefined,leak
 	ifdef SANITIZER
 		CFLAGS += -fsanitize=$(SANITIZER)
 		CXXFLAGS += -fsanitize=$(SANITIZER)
 	endif
 
 	ifneq ($(DEBUG), 0)
-		CFLAGS += -g -DFACTOR_DEBUG
+		CFLAGS += -g -O0 -DFACTOR_DEBUG
 	else
 		CFLAGS += -O3
 	endif
@@ -186,7 +186,7 @@ help:
 	@echo "SITE_CFLAGS=...  additional optimization flags"
 	@echo "X11=1  force link with X11 libraries instead of Cocoa (only on Mac OS X)"
 
-ALL = factor factor-ffi-test factor-lib
+ALL = factor factor-ffi-test factor-lib factor.dSYM
 
 freebsd-x86-32:
 	$(MAKE) $(ALL) CONFIG=vm/Config.freebsd.x86.32
@@ -235,6 +235,7 @@ windows-x86-64:
 ifdef CONFIG
 
 macosx.app: factor
+	codesign --entitlements factor.entitlements --sign "Apple Development: David Carlton (D8BD4M78SW)" $(EXECUTABLE)
 	mkdir -p $(BUNDLE)/Contents/MacOS
 	mkdir -p $(BUNDLE)/Contents/Frameworks
 	mv $(EXECUTABLE) $(BUNDLE)/Contents/MacOS/factor
@@ -248,6 +249,9 @@ factor-lib: $(ENGINE)
 factor: $(EXE_OBJS) $(DLL_OBJS)
 	$(TOOLCHAIN_PREFIX)$(CXX) -L. $(DLL_OBJS) \
 		$(CFLAGS) $(CXXFLAGS) -o $(EXECUTABLE) $(LIBS) $(EXE_OBJS)
+
+factor.dSYM: factor
+	dsymutil $<
 
 factor-console: $(EXE_OBJS) $(DLL_OBJS)
 	$(TOOLCHAIN_PREFIX)$(CXX) -L. $(DLL_OBJS) \
@@ -289,6 +293,7 @@ clean:
 	rm -f libfactor.*
 	rm -f libfactor-ffi-test.*
 	rm -f Factor.app/Contents/Frameworks/libfactor.dylib
+	rm -fr libfactor.dylib.dSYM
 
 .PHONY: factor factor-lib factor-console factor-ffi-test tags clean help macosx.app
 .PHONY: linux-x86-32 linux-x86-64 linux-ppc-32 linux-ppc-64 linux-arm-64 freebsd-x86-32 freebsd-x86-64 macosx-x86-32 macosx-x86-64 macosx-x86-fat macosx-arm64 windows-x86-32 windows-x86-64
