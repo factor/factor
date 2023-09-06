@@ -166,16 +166,16 @@ HELP: ?
 { $values { "?" boolean } { "true" object } { "false" object } { "true/false" object } }
 { $description "Chooses between two values depending on the boolean value of " { $snippet "?" } "." }
 { $examples
-    { $example  
-        "USING: prettyprint ;"
-        "3 4 < \"3 is smaller than 4\" \"3 is not smaller than 4\" ? print" 
-        "3 is smaller than 4" 
-    } 
-    { $example  
-        "USING: prettyprint ;"
-        "4 3 < \"4 is smaller than 3\" \"4 is not smaller than 3\" ? print" 
-        "4 is not smaller than 3" 
-    } 
+    { $example
+        "USING: io kernel math prettyprint ;"
+        "3 4 < \"3 is smaller than 4\" \"3 is not smaller than 4\" ? print"
+        "3 is smaller than 4"
+    }
+    { $example
+        "USING: io kernel math prettyprint ;"
+        "4 3 < \"4 is smaller than 3\" \"4 is not smaller than 3\" ? print"
+        "4 is not smaller than 3"
+    }
 } ;
 
 HELP: boolean
