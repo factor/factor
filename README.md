@@ -77,7 +77,7 @@ is available that can be accessed from the Factor environment:
 Take a look at a [guided
 tour](https://docs.factorcode.org/content/article-tour.html) of Factor:
 
-```
+```factor
 "tour" help
 ```
 
