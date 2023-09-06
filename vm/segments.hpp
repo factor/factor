@@ -28,11 +28,13 @@ struct segment {
 
   void set_border_locked(bool locked) {
     int pagesize = getpagesize();
+      // lo is 16K below the segment
     cell lo = start - pagesize;
     if (!set_memory_locked(lo, pagesize, locked)) {
       fatal_error("Cannot (un)protect low guard page", lo);
     }
 
+      // hi is end of segement to end of guard page
     cell hi = end;
     if (!set_memory_locked(hi, pagesize, locked)) {
       fatal_error("Cannot (un)protect high guard page", hi);

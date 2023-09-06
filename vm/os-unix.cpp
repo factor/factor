@@ -2,9 +2,70 @@
 
 namespace factor {
 
+void print_prot_bits(int prot) {
+    printf((prot & PROT_READ) == 0 ? "-" : "R");
+    printf((prot & PROT_WRITE) == 0 ? "-" : "W");
+    printf((prot & PROT_EXEC) == 0 ? "-" : "X");
+}
+
+char *try_mmap_jit(size_t size, int map_flags, int prot) {
+    printf("Try mmap %p with MAP_JIT: ", (void *)size);
+    print_prot_bits(prot);
+    char *mem = (char *)mmap(NULL, size, prot, map_flags, -1, 0);
+    if (mem == MAP_FAILED || mem == NULL) {
+        printf(" FAIL: %s", strerror(errno));
+        int map_flags = MAP_ANON | MAP_PRIVATE ;
+        printf(" mmap without MAP_JIT: ");
+        mem = (char *)mmap(NULL, size, prot, map_flags, -1, 0);
+        
+        if (mem == MAP_FAILED || mem == NULL) {
+            printf(" FAIL: %s\n", strerror(errno));
+            return NULL;
+        }
+    }
+    printf(" PASS: %p\n", mem);
+    return mem;
+}
+int try_mprotect(void *mem, size_t size, int prot) {
+    printf("Try mprotect: %p ", mem);
+    print_prot_bits(prot);
+    int status = mprotect(mem, size, prot);
+    if (status)
+        printf(" FAIL: %s\n", strerror(errno));
+    else
+        printf(" PASS\n");
+    return status;
+}
+
+#include <setjmp.h>
+#include <signal.h>
+#include <stdio.h>
+
+jmp_buf env;
+
+void segv_handler(int sig) {
+    longjmp(env, 1);
+}
+
+int is_rwx(void *addr) {
+    // Install the SIGSEGV handler
+    signal(SIGSEGV, segv_handler);
+
+    // Try to read, write, and execute the memory
+    if (setjmp(env) == 0) {
+        volatile char c = *(char*)addr;  // Read
+        *(char*)addr = c;  // Write
+        ((void(*)())addr)();  // Execute
+        return 1;  // If we got here, all operations succeeded
+    } else {
+        return 0;  // If we got here, one of the operations caused SIGSEGV
+    }
+}
+
 bool set_memory_locked(cell base, cell size, bool locked) {
   int prot = locked ? PROT_NONE : PROT_READ | PROT_WRITE;
-  int status = mprotect((char*)base, size, prot);
+//  int status = mprotect((char*)base, size, prot);
+  int status = try_mprotect((void *)base, (size_t)size, prot);
   return status != -1;
 }
 
@@ -77,6 +138,7 @@ bool move_file(const vm_char* path1, const vm_char* path2) {
 segment::segment(cell size_, bool executable_p) {
   size = size_;
 
+    // 16K pages
   int pagesize = getpagesize();
 
   int prot;
@@ -85,10 +147,15 @@ segment::segment(cell size_, bool executable_p) {
   else
     prot = PROT_READ | PROT_WRITE;
 
+    int map_flags = MAP_ANON | MAP_PRIVATE | MAP_JIT;
+
+    // allocate requested size + page size on both ends
   cell alloc_size = 2 * pagesize + size;
 #if defined(__APPLE__) && defined(FACTOR_ARM64)  // FIXME: could be in header file
-  char* array = (char*)mmap(NULL, alloc_size, prot,
-                            MAP_ANON | MAP_PRIVATE | MAP_JIT, -1, 0);
+    // protect the allocation according to prot
+    char* array = try_mmap_jit((size_t)alloc_size, map_flags, prot);
+//  char* array = (char*)mmap(NULL, alloc_size, prot,
+//                            MAP_ANON | MAP_PRIVATE | MAP_JIT, -1, 0);
 #else
   char* array = (char*)mmap(NULL, alloc_size, prot,
                             MAP_ANON | MAP_PRIVATE, -1, 0);
@@ -97,10 +164,15 @@ segment::segment(cell size_, bool executable_p) {
   if (array == (char*)-1)
     fatal_error("Out of memory in mmap", alloc_size);
 
+    // set start of segement to 16K above allocation
   start = (cell)(array + pagesize);
+    // set end of segment "size" above start
   end = start + size;
-
-  set_border_locked(true);
+    
+//    if ((prot & PROT_EXEC) == 0 ) {
+        // lock the guard pages
+//      set_border_locked(true);
+//    }
 }
 
 segment::~segment() {
