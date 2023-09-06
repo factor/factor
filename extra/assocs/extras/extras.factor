@@ -124,6 +124,9 @@ ERROR: key-exists value key assoc ;
 : ?set-once-at ( value key assoc -- value' first-time? )
     [ ?at not ] keep '[ [  _ set-at ] keepd t ] [ nip f ] if ;
 
+: key-of? ( assoc key -- ? )
+    swap key? ; inline
+
 : kv-with ( obj assoc quot -- assoc curried )
     swapd [ -rotd call ] 2curry ; inline
 
