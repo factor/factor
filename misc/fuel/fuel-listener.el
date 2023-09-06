@@ -191,7 +191,9 @@ fuel-start-remote-listener', from the fuel vocabulary."
   (interactive "P")
   (let ((port (if (not arg) 9000 (read-number "Port: "))))
     (fuel-listener--connect-process port)
-    (add-hook 'factor-mode-hook 'fuel-mode)))
+    (add-hook 'factor-mode-hook 'fuel-mode))
+  (other-window 1)
+  (delete-other-windows))
 
 (defun fuel-listener-nuke ()
   "Try this command if the listener becomes unresponsive."
