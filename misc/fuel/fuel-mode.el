@@ -187,6 +187,10 @@ interacting with a factor listener is at your disposal.
   --
   ("Edit word or vocab at point..." ("\M-." "\C-c\C-e\C-d" "\C-c\C-ed")
    fuel-edit-word-at-point)
+  ("Document word at point..." ("\C-c\C-e\C-c" "\C-c\C-ec" "\C-c\C-c\C-c")
+   fuel-edit-word-doc-at-point)
+  ("Add help template..." ("\C-c\C-e\C-t" "\C-c\C-et")
+   fuel-add-help-word-template)
   ("Edit vocab..." ("\C-c\C-e\C-v" "\C-c\C-ev") fuel-edit-vocabulary)
   ("Jump back" "\M-," fuel-edit-pop-edit-word-stack)
   --
