@@ -167,12 +167,12 @@ HELP: ?
 { $description "Chooses between two values depending on the boolean value of " { $snippet "?" } "." }
 { $examples
     { $example
-        "USING: io kernel math prettyprint ;"
+        "USING: io kernel math ;"
         "3 4 < \"3 is smaller than 4\" \"3 is not smaller than 4\" ? print"
         "3 is smaller than 4"
     }
     { $example
-        "USING: io kernel math prettyprint ;"
+        "USING: io kernel math ;"
         "4 3 < \"4 is smaller than 3\" \"4 is not smaller than 3\" ? print"
         "4 is not smaller than 3"
     }
