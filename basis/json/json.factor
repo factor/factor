@@ -159,12 +159,6 @@ GENERIC: json> ( string -- object )
 M: string json>
     [ read-json get-json ] with-string-reader ;
 
-: path>json ( path -- json )
-    utf8 [ read-json get-json ] with-file-reader ;
-
-: path>jsons ( path -- jsons )
-    utf8 [ read-json ] with-file-reader ;
-
 SYMBOL: json-allow-fp-special?
 f json-allow-fp-special? set-global
 
@@ -337,3 +331,27 @@ M: string jsonlines>
 
 : >jsonlines ( objects -- string )
     [ write-jsonlines ] with-string-writer ;
+
+: path>json ( path -- json )
+    utf8 [ read-json get-json ] with-file-reader ;
+
+: path>jsons ( path -- jsons )
+    utf8 [ read-json ] with-file-reader ;
+
+: json>path ( json path -- )
+    utf8 [ write-json ] with-file-writer ;
+
+: jsons>path ( jsons path -- )
+    utf8 [ write-jsonlines ] with-file-writer ;
+
+: rewrite-json-string ( string quot: ( json -- json' ) -- string )
+    [ json> ] dip call >json ; inline
+
+: rewrite-jsons-string ( string quot: ( jsons -- jsons' ) -- string )
+    [ jsonlines> ] dip call >jsonlines ; inline
+
+: rewrite-json-path ( path quot: ( json -- json' ) -- )
+    [ [ path>json ] dip call ] keepd json>path ; inline
+
+: rewrite-jsons-path ( path quot: ( jsons -- jsons' ) -- )
+    [ [ path>jsons ] dip call ] keepd jsons>path ; inline

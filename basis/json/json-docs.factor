@@ -3,13 +3,14 @@ IN: json
 
 HELP: json>
 { $values { "string" "a string in JSON format" } { "object" "a deserialized object" } }
-{ $description "Deserializes the JSON formatted string into a Factor object. JSON objects are converted to Factor hashtables. All other JSON objects convert to their obvious Factor equivalents." } ;
+{ $description "Deserializes the JSON formatted string into a Factor object. JSON objects are converted to Factor hashtables. All other JSON objects convert to their obvious Factor equivalents." }
+{ $notes "The full name of this word could be " { $snippet "json-string>object" } "." } ;
 
 HELP: read-json
 { $values { "objects" { $sequence "deserialized objects" } } }
 { $description "Reads JSON formatted strings into a vector of Factor object until the end of the stream is reached. JSON objects are converted to Factor hashtables. All other JSON objects convert to their obvious Factor equivalents." } ;
 
-{ json> read-json } related-words
+{ >json json> read-json write-json } related-words
 
 HELP: path>json
 { $values
@@ -18,7 +19,7 @@ HELP: path>json
 }
 { $description "Reads a file into a single JSON object. Throws an error if the file contains more than one json." } ;
 
-{ path>json path>jsons } related-words
+{ path>json path>jsons json>path jsons>path } related-words
 
 HELP: path>jsons
 { $values
@@ -29,7 +30,8 @@ HELP: path>jsons
 
 HELP: >json
 { $values { "obj" object } { "string" "the object converted to JSON format" } }
-{ $description "Serializes the object into a JSON formatted string." } ;
+{ $description "Serializes the object into a JSON formatted string." }
+{ $notes "The full name of this word could be " { $snippet "object>json-string" } "." } ;
 
 HELP: write-json
 { $values { "obj" object } }
@@ -45,8 +47,6 @@ $nl
 }
 }
 { $see-also >json } ;
-
-{ >json write-json } related-words
 
 { json-fp-special-error json-allow-fp-special? } related-words
 
