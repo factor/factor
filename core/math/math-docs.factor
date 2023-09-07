@@ -248,6 +248,15 @@ HELP: gcd
 { $description "Computes the positive greatest common divisor " { $snippet "d" } " of " { $snippet "x" } " and " { $snippet "y" } ", and another value " { $snippet "a" } " satisfying:" { $code "a*y = d mod x" } }
 { $notes "If " { $snippet "d" } " is 1, then " { $snippet "a" } " is the inverse of " { $snippet "y" } " modulo " { $snippet "x" } "." } ;
 
+HELP: lcm
+{ $values { "a" integer } { "b" integer } { "c" integer } }
+{ $description "Computes the least common multiple of " { $snippet "a" } " and " { $snippet "b" } ". If either of the arguments is zero, then the returned value is zero." }
+{ $examples
+    { $example "USING: math prettyprint ;" "10 5 lcm ." "10" }
+    { $example "USING: math prettyprint ;" "10 3 lcm ." "30" }
+    { $example "USING: math prettyprint ;" "10 8 lcm ." "40" }
+} ;
+
 HELP: 2/
 { $values { "x" integer } { "y" integer } }
 { $description "Shifts " { $snippet "x" } " to the right by one bit." }
