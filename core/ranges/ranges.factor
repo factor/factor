@@ -91,29 +91,18 @@ M: range duplicates drop f ;
 
 CONSTANT: empty-range T{ range f 1 0 1 }
 
-: explode-ranges ( range1 range2 -- start1 start2 stop1 stop2 step1 step2 )
-    [ >forward-range< ] bi@ [ -rot ] [ swap ] [ ] tri* ;
-
-: compute-z-y-x ( start1 start2 step1 step2 -- z y x )
-    gcd [ - ] 2dip swap [ /mod ] dip ;
-
-: compute-b-a ( start1 x z step1 step2 -- b a )
-    dupd lcm [ * * - ] dip ;
-
-: intersected-range ( start1 start2 stop1 stop2 b a -- range )
-    [
-        [ '[ [ _ over - _ rem + ] bi@ max ] 2dip ]
-        [ '[ dup _ - _ rem - ] bi@ min ] 2bi
-    ] keep <range> ;
-
-: intersect-range ( range1 range2 -- range3 )
-    2dup [ empty? ] either? [ 2drop empty-range ] [
-        explode-ranges [
-            [ reach reach ] 2dip compute-z-y-x swap
-        ] 2keep rot zero? not [
-            4drop 4drop empty-range
-        ] [
-            [ reach ] 4dip compute-b-a intersected-range
+:: intersect-range ( range1 range2 -- range3 )
+    range1 empty? range2 empty? or [ empty-range ] [
+        range1 >forward-range< :> ( start1 stop1 step1 )
+        range2 >forward-range< :> ( start2 stop2 step2 )
+        step1 step2 gcd :> ( x g )
+        start1 start2 - g /mod :> ( z y )
+        y zero? not [ empty-range ] [
+            start1 x z step1 * * - :> b
+            step1 step2 lcm :> a
+            start1 start2 [ b over - a rem + ] bi@ max :> m
+            stop1  stop2  [  dup b - a rem - ] bi@ min :> n
+            m n a <range>
         ] if
     ] if ;
 
