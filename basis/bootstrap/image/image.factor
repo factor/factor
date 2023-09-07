@@ -6,10 +6,11 @@ classes.tuple.private combinators combinators.short-circuit
 combinators.smart command-line compiler.codegen.relocation
 compiler.units endian generic generic.single.private grouping
 hashtables hashtables.private io io.encodings.binary io.files
-io.pathnames kernel kernel.private layouts locals.types make math
-math.bitwise math.order namespaces namespaces.private parser
-parser.notes prettyprint quotations sequences sequences.private
-source-files splitting strings system vectors vocabs words ;
+io.pathnames kernel kernel.private layouts locals.types make
+math math.bitwise math.order namespaces namespaces.private
+parser parser.notes prettyprint quotations sequences
+sequences.private source-files splitting strings system vectors
+vocabs words ;
 IN: bootstrap.image
 
 : arch-name ( os cpu -- arch )
@@ -495,6 +496,8 @@ M: quotation prepare-object
     build-generics
     "Serializing words..." print flush
     emit-words
+    "Serializing locals..." print flush
+    emit-locals
     "Serializing JIT data..." print flush
     emit-jit-data
 ! special-objects get ...
@@ -511,7 +514,7 @@ M: quotation prepare-object
     "Serializing special object table..." print flush
     emit-special-objects
     "Performing word fixups..." print flush
-    emit-locals fixup-words
+    fixup-words
     "Performing header fixups..." print flush
     fixup-header
     "Image length: " write bootstrapping-image get length .
