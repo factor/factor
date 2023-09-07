@@ -41,8 +41,7 @@ PRIVATE>
 ! -------------------
 
 : fib-upto* ( n -- seq )
-    0 1 [ pick over >= ] [ [ nip ] 2keep + dup ] produce 3nip
-    but-last-slice { 0 1 } prepend ;
+    [ 1 0 ] dip '[ [ + ] 2keep dup _ < ] [ ] produce 3nip ;
 
 : euler002a ( -- answer )
     4,000,000 fib-upto* [ even? ] filter sum ;
