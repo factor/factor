@@ -80,56 +80,59 @@ M: range duplicates drop f ;
 
 <PRIVATE
 
-: start-stop-step>> ( range -- start stop step )
-    [ from>> ] [ step>> ]
-    [ length>> 1 - 2over swapd * + ] tri swap ;
+: >range< ( range -- start stop step )
+    [ from>> ] [ length>> ] [ step>> ] tri [ swap 1 - * over + ] keep ;
 
-: rev-range ( range -- range' )
-    start-stop-step>> neg swapd <range> ;
+: >forward-range< ( range -- start stop step )
+    >range< dup neg? [ abs swapd ] when ;
 
-: abs-step ( range -- range' )
-    dup step>> neg? [ rev-range ] when ; inline
+: forward-range ( range -- range' )
+    >forward-range< <range> ; inline
 
-: empty-range ( -- range ) 1 0 1 <range> ;
+CONSTANT: empty-range T{ range f 1 0 1 }
 
-! https://github.com/JuliaLang/julia/blob/8e14322b5aa344639dd86bf9eabb84afe831fcba/base/range.jl#L1185
-:: (intersect) ( range1 range2 -- range' )
-    range1 empty? range2 empty? or [ empty-range ] [
-        
-        range1 abs-step start-stop-step>> :> ( start1 stop1 step1 )
-        range2 abs-step start-stop-step>> :> ( start2 stop2 step2 )
+: explode-ranges ( range1 range2 -- start1 start2 stop1 stop2 step1 step2 )
+    [ >forward-range< ] bi@ [ -rot ] [ swap ] [ ] tri* ;
 
-        step1 step2 [ * ] 2keep simple-gcd /i :> a
-        step1 step2 gcd :> ( x g )
+: compute-z-y-x ( start1 start2 step1 step2 -- z y x )
+    gcd [ - ] 2dip swap [ /mod ] dip ;
 
-        start1 start2 - g /mod :> ( z y )
+: compute-b-a ( start1 x z step1 step2 -- b a )
+    dupd lcm [ * * - ] dip ;
 
-        y zero? not [ empty-range ] [
-        
-        start1 x z step1 * * - :> b
+: intersected-range ( start1 start2 stop1 stop2 b a -- range )
+    [
+        [ '[ [ _ over - _ rem + ] bi@ max ] 2dip ]
+        [ '[ dup _ - _ rem - ] bi@ min ] 2bi
+    ] keep <range> ;
 
-        start1 start2 [ b over - a rem + ] bi@ max :> m
-        stop1  stop2  [  dup b - a rem - ] bi@ min :> n
+: intersect-range ( range1 range2 -- range3 )
+    2dup [ empty? ] either? [ 2drop empty-range ] [
+        explode-ranges [
+            [ reach reach ] 2dip compute-z-y-x swap
+        ] 2keep rot zero? not [
+            4drop 4drop empty-range
+        ] [
+            [ reach ] 4dip compute-b-a intersected-range
+        ] if
+    ] if ;
 
-        m n a <range>
-    ] if ] if ;
-    
 PRIVATE>
 
 M: range intersect
-    over range? [ (intersect) ] [ call-next-method ] if ;
+    over range? [ intersect-range ] [ call-next-method ] if ;
 
 M: range intersects?
     over range?
-    [ intersect length>> zero? not ]
+    [ intersect-range length>> zero? not ]
     [ call-next-method ] if ;
 
 M: range set=
     over range?
-    [ [ [ empty-range ] [ abs-step ] if-empty ] bi@ = ]
+    [ [ [ empty-range ] [ forward-range ] if-empty ] bi@ = ]
     [ call-next-method ] if ;
 
 M: range subset?
-    swap [ drop t ] [ swap over range?
-        [ dupd (intersect) = ] [ call-next-method ] if
-    ] if-empty ;
+    over range?
+    [ over empty? [ 2drop t ] [ dupd intersect-range = ] if ]
+    [ call-next-method ] if ;
