@@ -63,20 +63,7 @@ PRIVATE>
 
 : [1..b) ( b -- range ) 1 swap [a..b) ; inline
 
-
 ! Some methods can be much faster for ranges
-M: range in?
-    over number?
-    [ [ from>> ] [ step>> ] [ length>> 1 - ] tri
-        [ * over + sort-pair between? ] 4keep
-        drop 3dup [ - ] dip /i * + = and
-    ] [ 2drop f ] if ;
-
-M: range cardinality length>> ;
-
-M: range all-unique? drop t ;
-
-M: range duplicates drop f ;
 
 <PRIVATE
 
@@ -107,6 +94,18 @@ CONSTANT: empty-range T{ range f 1 0 1 }
     ] if ;
 
 PRIVATE>
+
+M: range in?
+    over number? [
+        >forward-range< [ 3dup between? ] dip swap
+        [ nip 3dup [ - ] dip /i * + = ] [ 4drop f ] if
+    ] [ 2drop f ] if ;
+
+M: range cardinality length>> ;
+
+M: range all-unique? drop t ;
+
+M: range duplicates drop f ;
 
 M: range intersect
     over range? [ intersect-range ] [ call-next-method ] if ;
