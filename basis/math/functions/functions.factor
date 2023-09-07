@@ -105,9 +105,6 @@ PRIVATE>
 
 : nth-root ( n x -- y ) swap recip ^ ; inline
 
-: lcm ( a b -- c )
-    [ * ] 2keep simple-gcd /i ; foldable
-
 : divisor? ( m n -- ? )
     mod 0 = ; inline
 

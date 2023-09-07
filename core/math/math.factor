@@ -230,6 +230,9 @@ M: fixnum simple-gcd fixnum-gcd ; inline
 
 M: bignum simple-gcd bignum-gcd ; inline
 
+: lcm ( a b -- c )
+    [ * ] 2keep simple-gcd /i ; foldable
+
 : fp-bitwise= ( x y -- ? ) [ double>bits ] same? ; inline
 
 GENERIC: fp-special? ( x -- ? )
