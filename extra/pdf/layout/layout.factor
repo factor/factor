@@ -252,7 +252,7 @@ M: table-row pdf-render
     rows [
         cells>> canvas swap col-widths
         [ widths [ 0 or max ] change-at ] each-index
-    ] each widths >alist sort-keys values
+    ] each widths sort-keys values
 
     dup sum dup 450 > [
 
