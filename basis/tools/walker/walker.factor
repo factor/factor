@@ -161,8 +161,16 @@ SYMBOL: +stopped+
 : breakpoint ( word -- )
     [ add-breakpoint ] annotate ;
 
-: breakpoint-if ( word quot -- )
+: breakpoint-if ( word quot: ( ... -- ... ? ) -- )
     '[ [ _ [ [ break ] when ] ] dip 3append ] annotate ;
+
+: breakpoint-after ( word n -- )
+    0 1array swap '[
+        [
+            0 _ [ 1 + dup ] change-nth-unsafe
+            _ >= [ break ] when
+        ] prepend
+    ] annotate ;
 
 ! For convenience
 IN: syntax

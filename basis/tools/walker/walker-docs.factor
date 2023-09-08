@@ -11,13 +11,22 @@ HELP: breakpoint
 } ;
 
 HELP: breakpoint-if
-{ $values { "word" word } { "quot" { $quotation ( -- ? ) } } }
+{ $values { "word" word } { "quot" { $quotation ( ... -- ... ? ) } } }
 { $description "Annotates a word definition to enter the single stepper if the quotation yields true. The quotation has access to the datastack as it exists just before " { $snippet "word" } " is called. Use " { $link reset } " to clear." }
 { $examples
     "Break if the input to sq is 3:"
-    { $unchecked-example
+    { $code
         "USE: tools.walker \\ sq [ dup 3 = ] breakpoint-if"
-        ""
+    }
+} ;
+
+HELP: breakpoint-after
+{ $values { "word" word } { "n" number } }
+{ $description "Annotates a word definition to enter the single stepper after the word has been called " { $snippet "n" } " times. Use " { $link reset } " to clear." }
+{ $examples
+    "Break after calling sq 3 times:"
+    { $code
+        "USE: tools.walker \\ sq 3 breakpoint-after"
     }
 } ;
 
@@ -37,6 +46,7 @@ $nl
 { $subsections
     breakpoint
     breakpoint-if
+    breakpoint-after
 }
 "Breakpoints can be inserted directly into code:"
 { $subsections
