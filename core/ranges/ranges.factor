@@ -1,6 +1,6 @@
 ! Copyright (C) 2008, 2010 Slava Pestov.
 ! See https://factorcode.org/license.txt for BSD license.
-USING: accessors classes.algebra classes.tuple kernel locals
+USING: accessors arrays classes.algebra classes.tuple kernel
 math math.order sequences sequences.private sets sorting ;
 IN: ranges
 
@@ -106,6 +106,8 @@ M: range cardinality length>> ;
 M: range all-unique? drop t ;
 
 M: range duplicates drop f ;
+
+M: range members >array ; ! XXX: just return a T{ range } ? ;
 
 M: range intersect
     over range? [ intersect-range ] [ call-next-method ] if ;
