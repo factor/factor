@@ -158,10 +158,15 @@ SYMBOL: +stopped+
     "Walker on " self name>> append spawn
     [ associate-thread ] keep ;
 
+: breaklist+ ( word -- ) 
+    "breaklist" get-global swap suffix "breaklist" set-global ;
+
 : breakpoint ( word -- )
+    dup breaklist+
     [ add-breakpoint ] annotate ;
 
 : breakpoint-if ( word quot: ( ... -- ... ? ) -- )
+    over breaklist+
     '[ [ _ [ [ break ] when ] ] dip 3append ] annotate ;
 
 : breakpoint-after ( word n -- )
