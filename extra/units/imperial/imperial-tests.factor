@@ -31,4 +31,4 @@ USING: kernel math tools.test units.imperial inverse ;
 { 1 } [ 4 inches [ hands ] undo ] unit-test
 { 1 } [ 3 inches [ palms ] undo ] unit-test
 { 1 } [ 16 nails [ yards ] undo ] unit-test
-{ 1 } [ 8 fingers [ yards ] undo ] unit-test
+{ 7 } [ 8 fingers [ inches ] undo ] unit-test

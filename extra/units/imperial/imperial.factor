@@ -1,10 +1,10 @@
-USING: kernel math prettyprint units units.si inverse ;
+USING: math units units.si ;
 IN: units.imperial
 
 ! TEMPERATURE
 
 : deg-F ( n -- Fahrenheit ) 32 - 5/9 * deg-C ;
-ALIAS: °F deg-F
+ALIAS: Â°F deg-F
 
 ! LENGTH
 
@@ -27,6 +27,8 @@ ALIAS: °F deg-F
 : links ( n -- dimensioned ) 1/100 * chains ;
 
 : rods ( n -- dimensioned ) 5+1/2 * yards ;
+ALIAS: poles rods
+ALIAS: perches rods
 
 : barleycorns ( n -- dimensioned ) 1/3 * inches ;
 
@@ -46,15 +48,11 @@ ALIAS: °F deg-F
 
 : spans ( n -- dimensioned ) 3 * palms ;
 
-: fingers ( n -- dimensioned ) 1/8 * yards ; ! FIXME: or 7/8 * inches?
+: fingers ( n -- dimensioned ) 7/8 * inches ;
 
 : cubits ( n -- dimensioned ) 18 * inches ;
 
 : ells ( n -- dimensioned ) 1+1/4 * yards ;
-
-ALIAS: poles rods
-
-ALIAS: perches rods
 
 : ramsdens-chains ( n -- dimensioned ) 100 * feet ;
 
@@ -65,6 +63,18 @@ ALIAS: perches rods
 : shackles ( n -- dimensioned ) 15 * fathoms ;
 
 : cables ( n -- dimensioned ) 608 * feet ;
+
+! AREA
+
+: square-rods ( n -- dimensioned ) 25+1830329/6250000 * m^2 ;
+ALIAS: square-poles square-rods
+ALIAS: square-perches square-rods
+
+: roods ( n -- dimensioned ) 40 * perches ;
+
+: acres ( n -- dimensioned ) 4 * roods ;
+
+: square-miles ( n -- dimensioned ) 640 * acres ;
 
 ! VOLUME
 
@@ -162,7 +172,6 @@ DEFER: imperial-fluid-ounces
 : beer-hogsheads ( n -- dimensioned ) 1+1/2 * beer-barrels ;
 
 : beer-butts ( n -- dimensioned ) 2 * beer-hogsheads ;
-
 ALIAS: beer-pipes beer-butts
 
 : beer-tuns ( n -- dimensioned ) 2 * beer-pipes ;
@@ -178,11 +187,9 @@ ALIAS: beer-pipes beer-butts
 : wine-hogsheads ( n -- dimensioned ) 2 * wine-barrels ;
 
 : wine-punchians ( n -- dimensioned ) 2 * tierces ;
-
 ALIAS: wine-tertians wine-punchians
 
 : wine-butts ( n -- dimensioned ) 2 * wine-hogsheads ;
-
 ALIAS: wine-pipes wine-butts
 
 : wine-tun ( n -- dimensioned ) 2 * wine-butts ;
