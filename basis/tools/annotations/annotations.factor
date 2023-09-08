@@ -21,8 +21,12 @@ M: word (reset)
     ] [ drop ] if* ;
 
 PRIVATE>
+: breaklist- ( word -- )
+    "breaklist" get-global  remove
+    "breaklist" set-global ;
 
 : reset ( word -- )
+    dup breaklist-
     [ (reset) ] with-compilation-unit ;
 
 ERROR: cannot-annotate-twice word ;

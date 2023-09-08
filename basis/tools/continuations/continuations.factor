@@ -4,7 +4,7 @@ USING: accessors arrays assocs combinators continuations
 continuations.private generic generic.single kernel
 kernel.private make math namespaces namespaces.private
 quotations sequences sequences.private threads threads.private
-tools.crossref words ;
+tools.crossref words variables see io ;
 IN: tools.continuations
 
 <PRIVATE
@@ -26,12 +26,18 @@ SYMBOL: break-hook
 
 \ break t "break?" set-word-prop
 
+GLOBAL: breaklist
+"breaklist" [ { } ] initialize
+
+: breaklist. ( -- )
+    "breaklist" get-global [ synopsis write nl ] each ;
+
 GENERIC: add-breakpoint ( quot -- quot' )
 
 <PRIVATE
 
 M: callable add-breakpoint
-    dup [ break ] head? [ \ break prefix ] unless ;
+    dup [ break ] head?  [ \ break prefix ] unless ;
 
 M: array add-breakpoint
     [ add-breakpoint ] map ;
