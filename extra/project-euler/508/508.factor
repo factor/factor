@@ -4,16 +4,18 @@ USING: kernel locals math math.functions ranges sequences
 project-euler.common ;
 IN: project-euler.508
 
-! https://projecteuler.net/index.php?section=problems&id=508
+! https://projecteuler.net/problem=508
 
 ! DESCRIPTION
 ! -----------
 
-! Consider the Gaussian integer i-1. A base i-1 representation of a Gaussian integer a+bi is a finite sequence of digits
+! Consider the Gaussian integer i-1. A base i-1 representation
+! of a Gaussian integer a+bi is a finite sequence of digits
 ! d(n-1) d(n-2) ... d(1) d(0) such that:
 ! a+bi = d(n-1) (i-1)^(n-1) + ... + d(1) (i-1) + d(0)
 ! Each d(k) is in {0,1}
-! There are no leading zeros, i.e. d(n-1) != 0, unless a+bi is itself 0
+! There are no leading zeros, i.e. d(n-1) != 0, unless a+bi is
+! itself 0.
 
 ! Here are base i-1 representations of a few Gaussian integers:
 ! 11+24i -> 111010110001101
@@ -22,13 +24,15 @@ IN: project-euler.508
 ! -5+ 0i -> 11001101
 !  0+ 0i -> 0
 
-! Remarkably, every Gaussian integer has a unique base i-1 representation!
+! Remarkably, every Gaussian integer has a unique base i-1
+! representation!
 
-! Define f(a+bi) as the number of 1s in the unique base i-1 representation of a+bi.
-! For example, f(11+24i) = 9 and f(24-11i) = 7.
+! Define f(a+bi) as the number of 1s in the unique base i-1
+! representation of a+bi. For example, f(11+24i) = 9 and
+! f(24-11i) = 7.
 
-! Define B(L) as the sum of f(a+bi) for all integers a, b such that |a| <= L and |b| <= L.
-! For example, B(500) = 10,795,060.
+! Define B(L) as the sum of f(a+bi) for all integers a, b such
+! that |a| <= L and |b| <= L. For example, B(500) = 10,795,060.
 
 ! Find B(10^15) mod 1,000,000,007.
 
@@ -44,8 +48,9 @@ MEMO:: fab ( a b -- n )
     a b [ zero? ] both? [ 0 ] [ a b + 2 rem dup a - dup [ b + 2 / ] [ b - 2 / ] bi* fab + ] if ;
 
 ! B(P,Q,R,S) := Sum(a=P..Q, b=R..S, f(a+bi))
-! Recursion for B(P,Q,R,S) exists, basically four slightly different versions of B(-S/2,-R/2,P/2,Q/2)
-! If summation is over fewer than 5000 terms, we just calculate values of f
+! Recursion for B(P,Q,R,S) exists, basically four slightly
+! different versions of B(-S/2,-R/2,P/2,Q/2). If summation is
+! over fewer than 5000 terms, we just calculate values of f.
 
 MEMO:: B ( P Q R S -- n )
     Q P - S R - * 5000 <

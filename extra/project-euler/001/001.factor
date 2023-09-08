@@ -1,16 +1,17 @@
 ! Copyright (c) 2007-2009 Aaron Schaefer, Slava Pestov.
 ! See https://factorcode.org/license.txt for BSD license.
-USING: kernel math math.functions ranges project-euler.common sequences
-    sets ;
+USING: kernel math math.functions ranges project-euler.common
+sequences sets ;
 IN: project-euler.001
 
-! https://projecteuler.net/index.php?section=problems&id=1
+! https://projecteuler.net/problem=1
 
 ! DESCRIPTION
 ! -----------
 
-! If we list all the natural numbers below 10 that are multiples of 3 or 5, we
-! get 3, 5, 6 and 9. The sum of these multiples is 23.
+! If we list all the natural numbers below 10 that are multiples
+! of 3 or 5, we get 3, 5, 6 and 9. The sum of these multiples is
+! 23.
 
 ! Find the sum of all the multiples of 3 or 5 below 1000.
 

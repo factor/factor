@@ -1,14 +1,16 @@
 ! Copyright (c) 2023 Cecilia Knaebchen.
 ! See https://factorcode.org/license.txt for BSD license.
-USING: combinators kernel locals math math.functions project-euler.common ;
+USING: combinators kernel locals math math.functions
+project-euler.common ;
 IN: project-euler.463
 
-! https://projecteuler.net/index.php?section=problems&id=463
+! https://projecteuler.net/problem=463
 
 ! DESCRIPTION
 ! -----------
 
-! The function f is defined for all positive integers as follows:
+! The function f is defined for all positive integers as
+! follows:
 
 ! f(1) = 1
 ! f(3) = 3
@@ -27,7 +29,8 @@ IN: project-euler.463
 ! --------
 
 ! Recursion for S(n):
-! S(n) = S([n/2]) + 2S([(n+1)/2]) + 3S([(n-1)/2]) - 2S([(n+1)/4]) - 4S([(n-1)/4]) - 2S([(n-3)/4]) - 1
+! S(n) = S([n/2]) + 2S([(n+1)/2]) + 3S([(n-1)/2]) -
+!        2S([(n+1)/4]) - 4S([(n-1)/4]) - 2S([(n-3)/4]) - 1
 
 MEMO:: S ( n -- Sn )
     n {

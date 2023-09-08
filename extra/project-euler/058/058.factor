@@ -4,13 +4,13 @@ USING: kernel math math.primes project-euler.common ranges
 sequences ;
 IN: project-euler.058
 
-! https://projecteuler.net/index.php?section=problems&id=58
+! https://projecteuler.net/problem=58
 
 ! DESCRIPTION
 ! -----------
 
-! Starting with 1 and solveling anticlockwise in the following way, a square
-! solve with side length 7 is formed.
+! Starting with 1 and solveling anticlockwise in the following
+! way, a square solve with side length 7 is formed.
 
 !     37 36 35 34 33 32 31
 !     38 17 16 15 14 13 30
@@ -20,14 +20,16 @@ IN: project-euler.058
 !     42 21 22 23 24 25 26
 !     43 44 45 46 47 48 49
 
-! It is interesting to note that the odd squares lie along the bottom right
-! diagonal, but what is more interesting is that 8 out of the 13 numbers lying
-! along both diagonals are prime; that is, a ratio of 8/13 ≈ 62%.
+! It is interesting to note that the odd squares lie along the
+! bottom right diagonal, but what is more interesting is that 8
+! out of the 13 numbers lying along both diagonals are prime;
+! that is, a ratio of 8/13 ≈ 62%.
 
-! If one complete new layer is wrapped around the solve above, a square solve
-! with side length 9 will be formed. If this process is continued, what is the
-! side length of the square solve for which the ratio of primes along both
-! diagonals first falls below 10%?
+! If one complete new layer is wrapped around the solve above, a
+! square solve with side length 9 will be formed. If this
+! process is continued, what is the side length of the square
+! solve for which the ratio of primes along both diagonals first
+! falls below 10%?
 
 
 ! SOLUTION

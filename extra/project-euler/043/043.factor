@@ -1,20 +1,22 @@
 ! Copyright (c) 2008 Aaron Schaefer.
 ! See https://factorcode.org/license.txt for BSD license.
-USING: combinators.short-circuit kernel math math.functions math.combinatorics
-    ranges project-euler.common sequences sets sorting ;
+USING: combinators.short-circuit kernel math math.functions
+math.combinatorics ranges project-euler.common sequences sets
+sorting ;
 IN: project-euler.043
 
-! https://projecteuler.net/index.php?section=problems&id=43
+! https://projecteuler.net/problem=43
 
 ! DESCRIPTION
 ! -----------
 
-! The number, 1406357289, is a 0 to 9 pandigital number because it is made up
-! of each of the digits 0 to 9 in some order, but it also has a rather
-! interesting sub-string divisibility property.
+! The number, 1406357289, is a 0 to 9 pandigital number because
+! it is made up of each of the digits 0 to 9 in some order, but
+! it also has a rather interesting sub-string divisibility
+! property.
 
-! Let d1 be the 1st digit, d2 be the 2nd digit, and so on. In this way, we note
-! the following:
+! Let d1 be the 1st digit, d2 be the 2nd digit, and so on. In
+! this way, we note the following:
 
 !     * d2d3d4  = 406 is divisible by 2
 !     * d3d4d5  = 063 is divisible by 3
@@ -24,14 +26,15 @@ IN: project-euler.043
 !     * d7d8d9  = 728 is divisible by 13
 !     * d8d9d10 = 289 is divisible by 17
 
-! Find the sum of all 0 to 9 pandigital numbers with this property.
+! Find the sum of all 0 to 9 pandigital numbers with this
+! property.
 
 
 ! SOLUTION
 ! --------
 
-! Brute force generating all the pandigitals then checking 3-digit divisiblity
-! properties...this is very slow!
+! Brute force generating all the pandigitals then checking
+! 3-digit divisiblity properties...this is very slow!
 
 <PRIVATE
 

@@ -3,18 +3,19 @@
 USING: kernel make math sequences sorting project-euler.common ;
 IN: project-euler.009
 
-! https://projecteuler.net/index.php?section=problems&id=9
+! https://projecteuler.net/problem=9
 
 ! DESCRIPTION
 ! -----------
 
-! A Pythagorean triplet is a set of three natural numbers, a < b < c, for which,
+! A Pythagorean triplet is a set of three natural numbers, a < b
+! < c, for which,
 !     a² + b² = c²
 
 ! For example, 3² + 4² = 9 + 16 = 25 = 5².
 
-! There exists exactly one Pythagorean triplet for which a + b + c = 1000.
-! Find the product abc.
+! There exists exactly one Pythagorean triplet for which a + b +
+! c = 1000. Find the product abc.
 
 
 ! SOLUTION

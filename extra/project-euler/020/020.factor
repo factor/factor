@@ -3,7 +3,7 @@
 USING: math.combinatorics project-euler.common sequences ;
 IN: project-euler.020
 
-! https://projecteuler.net/index.php?section=problems&id=20
+! https://projecteuler.net/problem=20
 
 ! DESCRIPTION
 ! -----------

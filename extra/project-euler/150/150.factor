@@ -4,22 +4,22 @@ USING: kernel math math.order ranges math.statistics
 project-euler.common sequences sequences.private ;
 IN: project-euler.150
 
-! https://projecteuler.net/index.php?section=problems&id=150
+! https://projecteuler.net/problem=150
 
 ! DESCRIPTION
 ! -----------
 
-! In a triangular array of positive and negative integers, we wish to find a
-! sub-triangle such that the sum of the numbers it contains is the smallest
-! possible.
+! In a triangular array of positive and negative integers, we
+! wish to find a sub-triangle such that the sum of the numbers
+! it contains is the smallest possible.
 
-! In the example below, it can be easily verified that the marked triangle
-! satisfies this condition having a sum of -42.
+! In the example below, it can be easily verified that the
+! marked triangle satisfies this condition having a sum of -42.
 
-! We wish to make such a triangular array with one thousand rows, so we
-! generate 500500 pseudo-random numbers sk in the range +/-2^19, using a type of
-! random number generator (known as a Linear Congruential Generator) as
-! follows:
+! We wish to make such a triangular array with one thousand
+! rows, so we generate 500500 pseudo-random numbers sk in the
+! range +/-2^19, using a type of random number generator (known
+! as a Linear Congruential Generator) as follows:
 
 ! ...
 

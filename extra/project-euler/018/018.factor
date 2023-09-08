@@ -3,7 +3,7 @@
 USING: kernel project-euler.common ranges sequences ;
 IN: project-euler.018
 
-! https://projecteuler.net/index.php?section=problems&id=18
+! https://projecteuler.net/problem=18
 
 ! DESCRIPTION
 ! -----------

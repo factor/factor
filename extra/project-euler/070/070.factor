@@ -1,41 +1,42 @@
-! Copyright (c) 2010 Aaron Schaefer. All rights reserved.
-! The contents of this file are licensed under the Simplified BSD License
-! A copy of the license is available at https://factorcode.org/license.txt
-USING: arrays combinators.short-circuit kernel math math.combinatorics
-math.functions math.primes project-euler.common sequences
-sequences.extras ;
+! Copyright (c) 2010 Aaron Schaefer.
+! See https://factorcode.org/license.txt for BSD license.
+USING: arrays combinators.short-circuit kernel math
+math.combinatorics math.functions math.primes
+project-euler.common sequences sequences.extras ;
 FROM: project-euler.common => permutations? ;
 IN: project-euler.070
 
-! https://projecteuler.net/index.php?section=problems&id=70
+! https://projecteuler.net/problem=70
 
 ! DESCRIPTION
 ! -----------
 
-! Euler's Totient function, φ(n) [sometimes called the phi function], is used
-! to determine the number of positive numbers less than or equal to n which are
-! relatively prime to n. For example, as 1, 2, 4, 5, 7, and 8, are all less
-! than nine and relatively prime to nine, φ(9)=6. The number 1 is considered to
-! be relatively prime to every positive number, so φ(1)=1.
+! Euler's Totient function, φ(n) [sometimes called the phi
+! function], is used to determine the number of positive numbers
+! less than or equal to n which are relatively prime to n. For
+! example, as 1, 2, 4, 5, 7, and 8, are all less than nine and
+! relatively prime to nine, φ(9)=6. The number 1 is considered
+! to be relatively prime to every positive number, so φ(1)=1.
 
-! Interestingly, φ(87109)=79180, and it can be seen that 87109 is a permutation
-! of 79180.
+! Interestingly, φ(87109)=79180, and it can be seen that 87109
+! is a permutation of 79180.
 
-! Find the value of n, 1 < n < 10^(7), for which φ(n) is a permutation of n and
-! the ratio n/φ(n) produces a minimum.
+! Find the value of n, 1 < n < 10^(7), for which φ(n) is a
+! permutation of n and the ratio n/φ(n) produces a minimum.
 
 
 ! SOLUTION
 ! --------
 
-! For n/φ(n) to be minimised, φ(n) must be as close to n as possible; that is,
-! we want to maximize φ(n). The minimal solution for n/φ(n) would be if n was
-! prime giving n/(n-1) but since n-1 never is a permutation of n it cannot be
-! prime.
+! For n/φ(n) to be minimised, φ(n) must be as close to n as
+! possible; that is, we want to maximize φ(n). The minimal
+! solution for n/φ(n) would be if n was prime giving n/(n-1) but
+! since n-1 never is a permutation of n it cannot be prime.
 
-! The next best thing would be if n only consisted of 2 prime factors close to
-! (in this case) sqrt(10000000). Hence n = p1*p2 and we only need to search
-! through a list of known prime pairs. In addition:
+! The next best thing would be if n only consisted of 2 prime
+! factors close to (in this case) sqrt(10000000). Hence n =
+! p1*p2 and we only need to search through a list of known prime
+! pairs. In addition:
 
 !     φ(p1*p2) = p1*p2*(1-1/p1)(1-1/p2) = (p1-1)(p2-1)
 

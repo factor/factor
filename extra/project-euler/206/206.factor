@@ -1,11 +1,10 @@
-! Copyright (c) 2010 Aaron Schaefer. All rights reserved.
-! The contents of this file are licensed under the Simplified BSD License
-! A copy of the license is available at https://factorcode.org/license.txt
+! Copyright (c) 2010 Aaron Schaefer.
+! See https://factorcode.org/license.txt for BSD license.
 USING: grouping kernel math project-euler.common ranges
 sequences sequences.cords ;
 IN: project-euler.206
 
-! https://projecteuler.net/index.php?section=problems&id=206
+! https://projecteuler.net/problem=206
 
 ! DESCRIPTION
 ! -----------
@@ -17,9 +16,9 @@ IN: project-euler.206
 ! SOLUTION
 ! --------
 
-! Through mathematical analysis, we know that the number must end in 00, and
-! the only way to get the last digits to be 900, is for our answer to end in
-! 30 or 70.
+! Through mathematical analysis, we know that the number must
+! end in 00, and the only way to get the last digits to be 900,
+! is for our answer to end in 30 or 70.
 
 <PRIVATE
 

@@ -1,16 +1,17 @@
 ! Copyright (c) 2008 Aaron Schaefer.
 ! See https://factorcode.org/license.txt for BSD license.
-USING: kernel math.combinatorics math.primes sequences project-euler.common ;
+USING: kernel math.combinatorics math.primes sequences
+project-euler.common ;
 IN: project-euler.041
 
-! https://projecteuler.net/index.php?section=problems&id=41
+! https://projecteuler.net/problem=41
 
 ! DESCRIPTION
 ! -----------
 
-! We shall say that an n-digit number is pandigital if it makes use of all the
-! digits 1 to n exactly once. For example, 2143 is a 4-digit pandigital and is
-! also prime.
+! We shall say that an n-digit number is pandigital if it makes
+! use of all the digits 1 to n exactly once. For example, 2143
+! is a 4-digit pandigital and is also prime.
 
 ! What is the largest n-digit pandigital prime that exists?
 
@@ -18,10 +19,11 @@ IN: project-euler.041
 ! SOLUTION
 ! --------
 
-! Check 7-digit pandigitals because if the sum of the digits in any number add
-! up to a multiple of three, then it is a multiple of three and can't be prime.
-! I assumed there would be a 7-digit answer, but technically a higher 4-digit
-! pandigital than the one given in the description was also possible.
+! Check 7-digit pandigitals because if the sum of the digits in
+! any number add up to a multiple of three, then it is a
+! multiple of three and can't be prime. I assumed there would be
+! a 7-digit answer, but technically a higher 4-digit pandigital
+! than the one given in the description was also possible.
 
 !     1 + 2 + 3 + 4 + 5 + 6 + 7 + 8 + 9 = 45
 !     1 + 2 + 3 + 4 + 5 + 6 + 7 + 8     = 36

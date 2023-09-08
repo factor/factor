@@ -1,9 +1,7 @@
-! Copyright (C) 2023 Giftpflanze
+! Copyright (C) 2023 Giftpflanze.
 ! See https://factorcode.org/license.txt for BSD license
-
 USING: arrays assocs assocs.extras grouping kernel math
 project-euler.common ranges sequences sequences.extras ;
-
 IN: project-euler.061
 
 ! https://projecteuler.net/problem=61

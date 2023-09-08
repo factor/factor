@@ -1,17 +1,18 @@
 ! Copyright (c) 2008 Aaron Schaefer.
 ! See https://factorcode.org/license.txt for BSD license.
-USING: kernel math math.functions ranges
-project-euler.common sequences ;
+USING: kernel math math.functions ranges project-euler.common
+sequences ;
 IN: project-euler.048
 
-! https://projecteuler.net/index.php?section=problems&id=48
+! https://projecteuler.net/problem=48
 
 ! DESCRIPTION
 ! -----------
 
 ! The series, 1^1 + 2^2 + 3^3 + ... + 10^10 = 10405071317.
 
-! Find the last ten digits of the series, 1^1 + 2^2 + 3^3 + ... + 1000^1000.
+! Find the last ten digits of the series,
+! 1^1 + 2^2 + 3^3 + ... + 1000^1000.
 
 
 ! SOLUTION
