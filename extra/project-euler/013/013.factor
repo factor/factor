@@ -3,13 +3,13 @@
 USING: math.parser sequences project-euler.common ;
 IN: project-euler.013
 
-! https://projecteuler.net/index.php?section=problems&id=13
+! https://projecteuler.net/problem=13
 
 ! DESCRIPTION
 ! -----------
 
-! Work out the first ten digits of the sum of the following one-hundred
-! 50-digit numbers.
+! Work out the first ten digits of the sum of the following
+! one-hundred 50-digit numbers.
 
 !     37107287533902102798797998220837590246510135740250
 !     46376937677490009712648124896970078050417018260538

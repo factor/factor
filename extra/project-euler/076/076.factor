@@ -1,9 +1,10 @@
 ! Copyright (c) 2008 Eric Mertens.
 ! See https://factorcode.org/license.txt for BSD license.
-USING: arrays assocs kernel math math.order ranges sequences project-euler.common ;
+USING: arrays assocs kernel math math.order ranges sequences
+project-euler.common ;
 IN: project-euler.076
 
-! https://projecteuler.net/index.php?section=problems&id=76
+! https://projecteuler.net/problem=76
 
 ! DESCRIPTION
 ! -----------

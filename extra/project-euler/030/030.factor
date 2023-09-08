@@ -1,15 +1,16 @@
 ! Copyright (c) 2008 Aaron Schaefer.
 ! See https://factorcode.org/license.txt for BSD license.
-USING: kernel math math.functions project-euler.common sequences ;
+USING: kernel math math.functions project-euler.common sequences
+;
 IN: project-euler.030
 
-! https://projecteuler.net/index.php?section=problems&id=30
+! https://projecteuler.net/problem=30
 
 ! DESCRIPTION
 ! -----------
 
-! Surprisingly there are only three numbers that can be written as the sum of
-! fourth powers of their digits:
+! Surprisingly there are only three numbers that can be written
+! as the sum of fourth powers of their digits:
 
 !     1634 = 1^4 + 6^4 + 3^4 + 4^4
 !     8208 = 8^4 + 2^4 + 0^4 + 8^4
@@ -19,8 +20,8 @@ IN: project-euler.030
 
 ! The sum of these numbers is 1634 + 8208 + 9474 = 19316.
 
-! Find the sum of all the numbers that can be written as the sum of fifth
-! powers of their digits.
+! Find the sum of all the numbers that can be written as the sum
+! of fifth powers of their digits.
 
 
 ! SOLUTION

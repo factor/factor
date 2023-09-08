@@ -1,18 +1,20 @@
 ! Copyright (c) 2007 Samuel Tardieu.
 ! See https://factorcode.org/license.txt for BSD license.
+USING: combinators kernel math math.functions
+project-euler.common ;
 IN: project-euler.169
-USING: combinators kernel math math.functions project-euler.common ;
 
-! https://projecteuler.net/index.php?section=problems&id=169
+! https://projecteuler.net/problem=169
 
 ! DESCRIPTION
 ! -----------
 
-! Define f(0) = 1 and f(n) to be the number of different ways n can be
-! expressed as a sum of integer powers of 2 using each power no more than
-! twice.
+! Define f(0) = 1 and f(n) to be the number of different ways n
+! can be expressed as a sum of integer powers of 2 using each
+! power no more than twice.
 
-! For example, f(10) = 5 since there are five different ways to express 10:
+! For example, f(10) = 5 since there are five different ways to
+! express 10:
 
 ! 1 + 1 + 8
 ! 1 + 1 + 4 + 4

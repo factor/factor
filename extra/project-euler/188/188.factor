@@ -3,13 +3,14 @@
 USING: kernel math math.functions project-euler.common ;
 IN: project-euler.188
 
-! https://projecteuler.net/index.php?section=problems&id=188
+! https://projecteuler.net/problem=188
 
 ! DESCRIPTION
 ! -----------
 
-! The hyperexponentiation or tetration of a number a by a positive integer b,
-! denoted by a↑↑b or ^(b)a, is recursively defined by:
+! The hyperexponentiation or tetration of a number a by a
+! positive integer b, denoted by a↑↑b or ^(b)a, is recursively
+! defined by:
 
 ! a↑↑1 = a,
 ! a↑↑(k+1) = a^(a↑↑k).

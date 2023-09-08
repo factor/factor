@@ -3,32 +3,33 @@
 USING: kernel math ranges sequences project-euler.common ;
 IN: project-euler.116
 
-! https://projecteuler.net/index.php?section=problems&id=116
+! https://projecteuler.net/problem=116
 
 ! DESCRIPTION
 ! -----------
 
-! A row of five black square tiles is to have a number of its tiles replaced
-! with colored oblong tiles chosen from red (length two), green (length
-! three), or blue (length four).
+! A row of five black square tiles is to have a number of its
+! tiles replaced with colored oblong tiles chosen from red
+! (length two), green (length three), or blue (length four).
 
-! If red tiles are chosen there are exactly seven ways this can be done.
-! If green tiles are chosen there are three ways.
-! And if blue tiles are chosen there are two ways.
+! If red tiles are chosen there are exactly seven ways this can
+! be done. If green tiles are chosen there are three ways. And
+! if blue tiles are chosen there are two ways.
 
-! Assuming that colors cannot be mixed there are 7 + 3 + 2 = 12 ways of
-! replacing the black tiles in a row measuring five units in length.
+! Assuming that colors cannot be mixed there are 7 + 3 + 2 = 12
+! ways of replacing the black tiles in a row measuring five
+! units in length.
 
-! How many different ways can the black tiles in a row measuring fifty units in
-! length be replaced if colors cannot be mixed and at least one colored tile
-! must be used?
+! How many different ways can the black tiles in a row measuring
+! fifty units in length be replaced if colors cannot be mixed
+! and at least one colored tile must be used?
 
 
 ! SOLUTION
 ! --------
 
-! This solution uses a simple dynamic programming approach using the
-! following recurence relation
+! This solution uses a simple dynamic programming approach using
+! the following recurence relation
 
 ! ways(n,_) = 0   | n < 0
 ! ways(0,_) = 1

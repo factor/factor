@@ -1,15 +1,17 @@
 ! Copyright (c) 2008 Eric Mertens.
 ! See https://factorcode.org/license.txt for BSD license.
-USING: arrays assocs kernel math ranges sequences project-euler.common ;
+USING: arrays assocs kernel math ranges sequences
+project-euler.common ;
 IN: project-euler.164
 
-! https://projecteuler.net/index.php?section=problems&id=164
+! https://projecteuler.net/problem=164
 
 ! DESCRIPTION
 ! -----------
 
-! How many 20 digit numbers n (without any leading zero) exist such
-! that no three consecutive digits of n have a sum greater than 9?
+! How many 20 digit numbers n (without any leading zero) exist
+! such that no three consecutive digits of n have a sum greater
+! than 9?
 
 
 ! SOLUTION

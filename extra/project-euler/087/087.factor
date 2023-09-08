@@ -1,9 +1,10 @@
-USING: math math.functions math.primes
-project-euler.common sequences sets ;
-
+! Copyright (C) 2009 Kye W. Shi.
+! See https://factorcode.org/license.txt for BSD license.
+USING: math math.functions math.primes project-euler.common
+sequences sets ;
 IN: project-euler.087
 
-! https://projecteuler.net/index.php?section=problems&id=87
+! https://projecteuler.net/problem=87
 
 ! DESCRIPTION
 ! -----------

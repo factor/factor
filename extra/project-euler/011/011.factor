@@ -1,15 +1,16 @@
 ! Copyright (c) 2007, 2008 Aaron Schaefer.
 ! See https://factorcode.org/license.txt for BSD license.
-USING: grouping kernel make math.order sequences project-euler.common ;
+USING: grouping kernel make math.order sequences
+project-euler.common ;
 IN: project-euler.011
 
-! https://projecteuler.net/index.php?section=problems&id=11
+! https://projecteuler.net/problem=11
 
 ! DESCRIPTION
 ! -----------
 
-! In the 20x20 grid below, four numbers along a diagonal line have been marked
-! in red.
+! In the 20x20 grid below, four numbers along a diagonal line
+! have been marked in red.
 
 !     08 02 22 97 38 15 00 40 00 75 04 05 07 78 52 12 50 77 91 08
 !     49 49 99 40 17 81 18 57 60 87 17 40 98 43 69 48 04 56 62 00

@@ -3,13 +3,13 @@
 USING: kernel math ranges sequences project-euler.common ;
 IN: project-euler.028
 
-! https://projecteuler.net/index.php?section=problems&id=28
+! https://projecteuler.net/problem=28
 
 ! DESCRIPTION
 ! -----------
 
-! Starting with the number 1 and moving to the right in a clockwise direction a
-! 5 by 5 spiral is formed as follows:
+! Starting with the number 1 and moving to the right in a
+! clockwise direction a 5 by 5 spiral is formed as follows:
 
 !     21 22 23 24 25
 !     20  7  8  9 10
@@ -19,7 +19,8 @@ IN: project-euler.028
 
 ! It can be verified that the sum of both diagonals is 101.
 
-! What is the sum of both diagonals in a 1001 by 1001 spiral formed in the same way?
+! What is the sum of both diagonals in a 1001 by 1001 spiral
+! formed in the same way?
 
 
 ! SOLUTION

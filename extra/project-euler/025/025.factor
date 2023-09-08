@@ -4,7 +4,7 @@ USING: kernel math math.constants math.functions math.parser
 project-euler.common sequences ;
 IN: project-euler.025
 
-! https://projecteuler.net/index.php?section=problems&id=25
+! https://projecteuler.net/problem=25
 
 ! DESCRIPTION
 ! -----------
@@ -30,7 +30,8 @@ IN: project-euler.025
 
 ! The 12th term, F12, is the first term to contain three digits.
 
-! What is the first term in the Fibonacci sequence to contain 1000 digits?
+! What is the first term in the Fibonacci sequence to contain
+! 1000 digits?
 
 
 ! SOLUTION

@@ -1,19 +1,20 @@
 ! Copyright (c) 2008 Eric Mertens.
 ! See https://factorcode.org/license.txt for BSD license.
-USING: kernel sequences math math.functions ranges project-euler.common ;
+USING: kernel sequences math math.functions ranges
+project-euler.common ;
 IN: project-euler.190
 
-! https://projecteuler.net/index.php?section=problems&id=190
+! https://projecteuler.net/problem=190
 
 ! DESCRIPTION
 ! -----------
 
-! Let Sm = (x1, x2, ... , xm) be the m-tuple of positive real numbers
-! with x1 + x2 + ... + xm = m for which Pm = x1 * x22 * ... * xmm is
-! maximized.
+! Let Sm = (x1, x2, ... , xm) be the m-tuple of positive real
+! numbers with x1 + x2 + ... + xm = m for which Pm = x1 * x22 *
+! ... * xmm is maximized.
 
-! For example, it can be verified that [P10] = 4112 ([ ] is the integer
-! part function).
+! For example, it can be verified that [P10] = 4112 ([ ] is the
+! integer part function).
 
 ! Find Σ[Pm] for 2 ≤ m ≤ 15.
 

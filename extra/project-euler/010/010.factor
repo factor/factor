@@ -3,7 +3,7 @@
 USING: math.primes sequences project-euler.common ;
 IN: project-euler.010
 
-! https://projecteuler.net/index.php?section=problems&id=10
+! https://projecteuler.net/problem=10
 
 ! DESCRIPTION
 ! -----------

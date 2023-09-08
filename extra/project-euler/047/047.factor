@@ -1,33 +1,36 @@
 ! Copyright (c) 2008 Aaron Schaefer.
 ! See https://factorcode.org/license.txt for BSD license.
-USING: arrays kernel math math.primes math.primes.factors
-    ranges namespaces sequences project-euler.common ;
+USING: arrays kernel math math.primes math.primes.factors ranges
+namespaces sequences project-euler.common ;
 IN: project-euler.047
 
-! https://projecteuler.net/index.php?section=problems&id=47
+! https://projecteuler.net/problem=47
 
 ! DESCRIPTION
 ! -----------
 
-! The first two consecutive numbers to have two distinct prime factors are:
+! The first two consecutive numbers to have two distinct prime
+! factors are:
 
 !     14 = 2 * 7
 !     15 = 3 * 5
 
-! The first three consecutive numbers to have three distinct prime factors are:
+! The first three consecutive numbers to have three distinct
+! prime factors are:
 
 !     644 = 2² * 7 * 23
 !     645 = 3 * 5 * 43
 !     646 = 2 * 17 * 19.
 
-! Find the first four consecutive integers to have four distinct primes
-! factors. What is the first of these numbers?
+! Find the first four consecutive integers to have four distinct
+! primes factors. What is the first of these numbers?
 
 
 ! SOLUTION
 ! --------
 
-! Brute force, not sure why it's incredibly slow compared to other languages
+! Brute force, not sure why it's incredibly slow compared to
+! other languages
 
 <PRIVATE
 
