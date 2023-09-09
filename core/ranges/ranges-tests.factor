@@ -78,6 +78,10 @@ USING: arrays kernel math ranges sequences sets tools.test ;
     1 100 3 <range> 11 50 2 <range> intersect >array ] unit-test
 { { 6 } } [
     6 7 1 <range> 6 -20 -4 <range> intersect >array ] unit-test
+{ { 3 3+1/3 3+2/3 4 4+1/3 4+2/3 5 } } [
+    2 5 1/3 <range> 3 10 1/3 <range> intersect >array ] unit-test
+{ { 1.0 1.5 2.0 } } [
+    1.0 2.0 0.25 <range> 1.0 2.0 0.5 <range> intersect >array ] unit-test
 
 { f } [ 1 8 2 <range> 2 9 2 <range> intersects? ] unit-test
 { f } [ 1 8 2 <range> 8 1 -2 <range> intersects? ] unit-test
