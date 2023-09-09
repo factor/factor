@@ -1,1 +1,1 @@
-Bindings for Raylib 4.0
+Bindings for Raylib 4.5
