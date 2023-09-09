@@ -1,7 +1,9 @@
 ! Copyright (C) 2023 CapitalEx.
 ! See https://factorcode.org/license.txt for BSD license.
-USING: alien alien.c-types alien.libraries alien.syntax
-classes.struct combinators kernel multiline raylib system ;
+USING: accessors alien alien.c-types alien.libraries
+alien.syntax classes.struct combinators kernel math multiline
+raylib raylib.util system ;
+FROM: alien.c-types => float ;
 IN: rlgl
 
 <<
@@ -108,10 +110,10 @@ STRUCT: rlVertexBuffer
     { vboId        uint[4] }  ! OpenGL Vertex Buffer Objects id ( 4 types of vertex data )
 ;
 
-ARRAY-SLOTS: rlVertexBuffer float _vertices  [ elementCount>> 3 * ] vertices 
-ARRAY-SLOTS: rlVertexBuffer float _texcoords [ elementCount>> 2 * ] texcoords
-ARRAY-SLOTS: rlVertexBuffer uchar _colors    [ elementCount>> 4 * ] colors
-ARRAY-SLOTS: rlVertexBuffer uint  _indices   [ elementCount>> 6 * ] indices
+ARRAY-SLOT: rlVertexBuffer float _vertices  [ elementCount>> 3 * ] vertices 
+ARRAY-SLOT: rlVertexBuffer float _texcoords [ elementCount>> 2 * ] texcoords
+ARRAY-SLOT: rlVertexBuffer uchar _colors    [ elementCount>> 4 * ] colors
+ARRAY-SLOT: rlVertexBuffer uint  _indices   [ elementCount>> 6 * ] indices
 
 ! Draw call type
 ! NOTE: Only texture changes register a new draw, other state-change-related elements are not
@@ -134,8 +136,8 @@ STRUCT: rlRenderBatch
     { currentDepth   float            } ! Current depth value for next draw
 ;
 
-ARRAY-SLOTS: rlRenderBatch rlVertexBuffer _vertexBuffer [ bufferCount>> ] vertexBuffer
-ARRAY-SLOTS: rlRenderBatch rlDrawCall _draws [ drawCounter>> ] draws
+ARRAY-SLOT: rlRenderBatch rlVertexBuffer _vertexBuffer [ bufferCount>> ] vertexBuffer
+ARRAY-SLOT: rlRenderBatch rlDrawCall _draws [ drawCounter>> ] draws
 
 ! OpenGL version
 ENUM: rlGlVersion
