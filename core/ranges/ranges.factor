@@ -37,6 +37,12 @@ M: range sum
     [ drop 0 ]
     [ swap [ first-unsafe ] [ last-unsafe ] bi + * 2 / ] if-zero ;
 
+M: range infimum
+    dup step>> 0 > [ first ] [ last ] if ;
+
+M: range supremum
+    dup step>> 0 > [ last ] [ first ] if ;
+
 <PRIVATE
 
 : twiddle ( a b -- a b step ) 2dup > -1 1 ? ; inline
