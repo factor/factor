@@ -233,7 +233,7 @@ M: bignum simple-gcd bignum-gcd ; inline
 M: real simple-gcd gcd nip ; inline
 
 : lcm ( a b -- c )
-    [ * dup zero? ] 2keep '[ _ _ simple-gcd /i ] unless ; foldable
+    [ * dup zero? ] 2keep '[ _ _ simple-gcd / ] unless ; foldable
 
 : fp-bitwise= ( x y -- ? ) [ double>bits ] same? ; inline
 

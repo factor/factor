@@ -257,6 +257,7 @@ HELP: lcm
     { $example "USING: math prettyprint ;" "10 8 lcm ." "40" }
     { $example "USING: math prettyprint ;" "10 0 lcm ." "0" }
     { $example "USING: math prettyprint ;" "0 0 lcm ." "0" }
+    { $example "USING: math prettyprint ;" "1/3 1/6 lcm ." "1/3" }
 } ;
 
 HELP: 2/
