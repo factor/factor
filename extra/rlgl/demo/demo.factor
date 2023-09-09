@@ -11,7 +11,7 @@ IN: rlgl.demo
     call end-drawing ; inline
 
 : with-matrix ( quot -- )
-    rlPushMatrix call rlPopMatrix ; inline
+    rl-push-matrix call rl-pop-matrix ; inline
 
 : while-window-open ( quot -- )
     [ window-should-close not ] swap while ; inline
@@ -30,62 +30,62 @@ CONSTANT:    rotationSpeed 0.2
 
 :: draw-sphere-basic ( color -- )
     16 16 :> ( rings slices )
-    rings 2 + slices 6 * * rlCheckRenderBatchLimit drop
+    rings 2 + slices 6 * * rl-check-render-batch-limit drop
 
-    RL_TRIANGLES rlBegin
-        color [ r>> ] [ g>> ] [ b>> ] [ a>> ] quad rlColor4ub
+    RL_TRIANGLES rl-begin
+        color [ r>> ] [ g>> ] [ b>> ] [ a>> ] quad rl-color4ub
         rings 2 + [0..b) slices [0..b) [| i j |
             270 180 rings 1 + / i * + deg>rad cos j 360 * slices / deg>rad sin *
             270 180 rings 1 + / i * + deg>rad sin
             270 180 rings 1 + / i * + deg>rad cos j 360 * slices / deg>rad cos *
-                        rlVertex3f
+                        rl-vertex3f
 
             270 180 rings 1 + / i 1 + * + deg>rad cos j 1 + 360 * slices / deg>rad sin *
             270 180 rings 1 + / i 1 + * + deg>rad sin
             270 180 rings 1 + / i 1 + * + deg>rad cos j 1 + 360 * slices / deg>rad cos *
-                        rlVertex3f
+                        rl-vertex3f
 
             270 180 rings 1 + / i 1 + * + deg>rad cos j 360 * slices / deg>rad sin *
             270 180 rings 1 + / i 1 + * + deg>rad sin
             270 180 rings 1 + / i 1 + * + deg>rad cos j 360 * slices / deg>rad cos *
-                        rlVertex3f
+                        rl-vertex3f
 
             270 180 rings 1 + / i * + deg>rad cos j 360 * slices / deg>rad sin *
             270 180 rings 1 + / i * + deg>rad sin
             270 180 rings 1 + / i * + deg>rad cos j 360 * slices / deg>rad cos *
-                        rlVertex3f
+                        rl-vertex3f
 
             270 180 rings 1 + / i * + deg>rad cos j 1 + 360 * slices / deg>rad sin *
             270 180 rings 1 + / i * + deg>rad sin
             270 180 rings 1 + / i * + deg>rad cos j 1 + 360 * slices / deg>rad cos *
-                        rlVertex3f
+                        rl-vertex3f
 
             270 180 rings 1 + / i 1 + * + deg>rad cos j 1 + 360 * slices / deg>rad sin *
             270 180 rings 1 + / i 1 + * + deg>rad sin
             270 180 rings 1 + / i 1 + * + deg>rad cos j 1 + 360 * slices / deg>rad cos *
-                        rlVertex3f
+                        rl-vertex3f
         ] cartesian-each
-    rlEnd ;
+    rl-end ;
 
 : draw-sun ( scale -- )
-    dup dup rlScalef GOLD draw-sphere-basic ;
+    dup dup rl-scalef GOLD draw-sphere-basic ;
 
 : draw-moon ( radius rotation orbit-radius orbit-rotation -- )
-    0.0 1.0 0.0 rlRotatef
-        0.0 0.0 rlTranslatef
-    0.0 1.0 0.0 rlRotatef
-    dup dup rlScalef
+    0.0 1.0 0.0 rl-rotatef
+        0.0 0.0 rl-translatef
+    0.0 1.0 0.0 rl-rotatef
+    dup dup rl-scalef
     LIGHTGRAY draw-sphere-basic ;
 
 : draw-earth ( radius rotation -- )
-    0.25 1.0 0.0 rlRotatef dup dup rlScalef
+    0.25 1.0 0.0 rl-rotatef dup dup rl-scalef
     BLUE draw-sphere-basic ;
 
 : draw-earth-and-moon ( moonRadius       moonRotation
                         moonOrbitRadius  moonOrbitRotation
                         earthRadius      earthRotation
                         earthOrbitRadius earthOrbitRotation -- )
-    0.0 1.0 0.0 rlRotatef 0.0 0.0 rlTranslatef
+    0.0 1.0 0.0 rl-rotatef 0.0 0.0 rl-translatef
     [ draw-earth ] with-matrix draw-moon ;
 
 : draw-solar-system ( moonRadius       moonRotation
@@ -137,3 +137,5 @@ CONSTANT:    rotationSpeed 0.2
     ] while-window-open
 
     close-window ;
+
+MAIN: main
