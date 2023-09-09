@@ -1,0 +1,1 @@
+Hook combination used for namespace variables
