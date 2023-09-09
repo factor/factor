@@ -99,35 +99,43 @@ CONSTANT: RL_BLEND_COLOR                          0x8005      ! GL_BLEND_COLOR
 
 
 STRUCT: rlVertexBuffer
-    { elementCount int  }  ! Number of elements in the buffer ( QUADS )
-    { vertices  float*  }  ! Vertex position ( XYZ - 3 components per vertex ) ( shader-location = 0 )
-    { texcoords float*  }  ! Vertex texture coordinates ( UV - 2 components per vertex ) ( shader-location = 1 )
-    { colors    uchar*  }  ! Vertex colors ( RGBA - 4 components per vertex ) ( shader-location = 3 )
-    { indices   uint*   }  ! Vertex indices ( in case vertex data comes indexed ) ( 6 indices per quad )
-    { vaoId     uint    }  ! OpenGL Vertex Array Object id
-    { vboId     uint[4] }  ! OpenGL Vertex Buffer Objects id ( 4 types of vertex data )
+    { elementCount int     }  ! Number of elements in the buffer ( QUADS )
+    { _vertices    float*  }  ! Vertex position ( XYZ - 3 components per vertex ) ( shader-location = 0 )
+    { _texcoords   float*  }  ! Vertex texture coordinates ( UV - 2 components per vertex ) ( shader-location = 1 )
+    { _colors      uchar*  }  ! Vertex colors ( RGBA - 4 components per vertex ) ( shader-location = 3 )
+    { _indices     uint*   }  ! Vertex indices ( in case vertex data comes indexed ) ( 6 indices per quad )
+    { vaoId        uint    }  ! OpenGL Vertex Array Object id
+    { vboId        uint[4] }  ! OpenGL Vertex Buffer Objects id ( 4 types of vertex data )
 ;
+
+ARRAY-SLOTS: rlVertexBuffer float _vertices  [ elementCount>> 3 * ] vertices 
+ARRAY-SLOTS: rlVertexBuffer float _texcoords [ elementCount>> 2 * ] texcoords
+ARRAY-SLOTS: rlVertexBuffer uchar _colors    [ elementCount>> 4 * ] colors
+ARRAY-SLOTS: rlVertexBuffer uint  _indices   [ elementCount>> 6 * ] indices
 
 ! Draw call type
 ! NOTE: Only texture changes register a new draw, other state-change-related elements are not
 ! used at this moment ( vaoId, shaderId, matrices ), raylib just forces a batch draw call if any
 ! of those state-change happens ( this is done in core module )
 STRUCT: rlDrawCall
-    { mode             int  }                 ! Drawing mode: LINES, TRIANGLES, QUADS
-    { vertexCount      int  }             ! Number of vertex of the draw
-    { vertexAlignment  int  }        ! Number of vertex required for index alignment ( LINES, TRIANGLES )
-    { textureId        uint }    ! Texture id to be used on the draw -> Use to create new draw call if changes
+    { mode             int  } ! Drawing mode: LINES, TRIANGLES, QUADS
+    { vertexCount      int  } ! Number of vertex of the draw
+    { vertexAlignment  int  } ! Number of vertex required for index alignment ( LINES, TRIANGLES )
+    { textureId        uint } ! Texture id to be used on the draw -> Use to create new draw call if changes
 ; 
 
 ! rlRenderBatch type
 STRUCT: rlRenderBatch
-    { bufferCount    int             } ! Number of vertex buffers ( multi-buffering support )
-    { currentBuffer  int             } ! Current buffer tracking in case of multi-buffering
-    { vertexBuffer   rlVertexBuffer* } ! Dynamic buffer ( s ) for vertex data
-    { draws          rlDrawCall*     } ! Draw calls array, depends on textureId
-    { drawCounter    int             } ! Draw calls counter
-    { currentDepth   float           } ! Current depth value for next draw
+    { bufferCount    int              } ! Number of vertex buffers ( multi-buffering support )
+    { currentBuffer  int              } ! Current buffer tracking in case of multi-buffering
+    { _vertexBuffer   rlVertexBuffer* } ! Dynamic buffer ( s ) for vertex data
+    { _draws          rlDrawCall*     } ! Draw calls array, depends on textureId
+    { drawCounter    int              } ! Draw calls counter
+    { currentDepth   float            } ! Current depth value for next draw
 ;
+
+ARRAY-SLOTS: rlRenderBatch rlVertexBuffer _vertexBuffer [ bufferCount>> ] vertexBuffer
+ARRAY-SLOTS: rlRenderBatch rlDrawCall _draws [ drawCounter>> ] draws
 
 ! OpenGL version
 ENUM: rlGlVersion
@@ -272,7 +280,7 @@ ENUM: rlFramebufferAttachType
 
 ! Framebuffer texture attachment type
 ENUM: rlFramebufferAttachTextureType
-    RL_ATTACHMENT_CUBEMAP_POSITIVE_X  ! Framebuffer texture attachment type: cubemap, +X side
+    RL_ATTACHMENT_CUBEMAP_POSITIVE_X   ! Framebuffer texture attachment type: cubemap, +X side
     RL_ATTACHMENT_CUBEMAP_NEGATIVE_X   ! Framebuffer texture attachment type: cubemap, -X side
     RL_ATTACHMENT_CUBEMAP_POSITIVE_Y   ! Framebuffer texture attachment type: cubemap, +Y side
     RL_ATTACHMENT_CUBEMAP_NEGATIVE_Y   ! Framebuffer texture attachment type: cubemap, -Y side
@@ -288,31 +296,31 @@ ENUM: rlCullMode
     RL_CULL_FACE_BACK
 ; 
 
-FUNCTION: void rlMatrixMode ( int mode )                     ! Choose the current matrix to be transformed
-FUNCTION: void rlPushMatrix ( )                         ! Push the current matrix to stack
-FUNCTION: void rlPopMatrix ( )                          ! Pop latest inserted matrix from stack
-FUNCTION: void rlLoadIdentity ( )                       ! Reset current matrix to identity matrix
-FUNCTION: void rlTranslatef ( float x, float y, float z )    ! Multiply the current matrix by a translation matrix
-FUNCTION: void rlRotatef ( float angle, float x, float y, float z )   ! Multiply the current matrix by a rotation matrix
-FUNCTION: void rlScalef ( float x, float y, float z )        ! Multiply the current matrix by a scaling matrix
-FUNCTION: void rlMultMatrixf ( float* matf )                 ! Multiply the current matrix by another matrix
-FUNCTION: void rlFrustum ( double left, double right, double bottom, double top, double znear, double zfar ) 
-FUNCTION: void rlOrtho ( double left, double right, double bottom, double top, double znear, double zfar ) 
-FUNCTION: void rlViewport ( int x, int y, int width, int height )  ! Set the viewport area
+FUNCTION-ALIAS: rl-matrix-mode   void rlMatrixMode ( int mode )                              ! Choose the current matrix to be transformed
+FUNCTION-ALIAS: rl-push-matrix   void rlPushMatrix ( )                                       ! Push the current matrix to stack
+FUNCTION-ALIAS: rl-pop-matrix    void rlPopMatrix ( )                                        ! Pop latest inserted matrix from stack
+FUNCTION-ALIAS: rl-load-identity void rlLoadIdentity ( )                                     ! Reset current matrix to identity matrix
+FUNCTION-ALIAS: rl-translatef    void rlTranslatef ( float x, float y, float z )             ! Multiply the current matrix by a translation matrix
+FUNCTION-ALIAS: rl-rotatef       void rlRotatef ( float angle, float x, float y, float z )   ! Multiply the current matrix by a rotation matrix
+FUNCTION-ALIAS: rl-scalef        void rlScalef ( float x, float y, float z )                 ! Multiply the current matrix by a scaling matrix
+FUNCTION-ALIAS: rl-mult-matrixf  void rlMultMatrixf ( float* matf )                          ! Multiply the current matrix by another matrix
+FUNCTION-ALIAS: rl-frustum       void rlFrustum ( double left, double right, double bottom, double top, double znear, double zfar ) 
+FUNCTION-ALIAS: rl-ortho         void rlOrtho ( double left, double right, double bottom, double top, double znear, double zfar ) 
+FUNCTION-ALIAS: rl-viewport      void rlViewport ( int x, int y, int width, int height )     ! Set the viewport area
 
 ! ------------------------------------------------------------------------------------
 ! Functions Declaration - Vertex level operations
 ! ------------------------------------------------------------------------------------
-FUNCTION: void rlBegin ( int mode )                          ! Initialize drawing mode ( how to organize vertex )
-FUNCTION: void rlEnd ( )                                ! Finish vertex providing
-FUNCTION: void rlVertex2i ( int x, int y )                   ! Define one vertex ( position ) - 2 int
-FUNCTION: void rlVertex2f ( float x, float y )               ! Define one vertex ( position ) - 2 float
-FUNCTION: void rlVertex3f ( float x, float y, float z )      ! Define one vertex ( position ) - 3 float
-FUNCTION: void rlTexCoord2f ( float x, float y )             ! Define one vertex ( texture coordinate ) - 2 float
-FUNCTION: void rlNormal3f ( float x, float y, float z )      ! Define one vertex ( normal ) - 3 float
-FUNCTION: void rlColor4ub ( uchar r, uchar g, uchar b, uchar a )   ! Define one vertex ( color ) - 4 byte
-FUNCTION: void rlColor3f ( float x, float y, float z )           ! Define one vertex ( color ) - 3 float
-FUNCTION: void rlColor4f ( float x, float y, float z, float w )  ! Define one vertex ( color ) - 4 float
+FUNCTION-ALIAS: rl-begin        void rlBegin ( int mode )                                ! Initialize drawing mode ( how to organize vertex )
+FUNCTION-ALIAS: rl-end          void rlEnd ( )                                           ! Finish vertex providing
+FUNCTION-ALIAS: rl-vertex2i     void rlVertex2i ( int x, int y )                         ! Define one vertex ( position ) - 2 int
+FUNCTION-ALIAS: rl-vertex2f     void rlVertex2f ( float x, float y )                     ! Define one vertex ( position ) - 2 float
+FUNCTION-ALIAS: rl-vertex3f     void rlVertex3f ( float x, float y, float z )            ! Define one vertex ( position ) - 3 float
+FUNCTION-ALIAS: rl-text-coord2f void rlTexCoord2f ( float x, float y )                   ! Define one vertex ( texture coordinate ) - 2 float
+FUNCTION-ALIAS: rl-normal3f     void rlNormal3f ( float x, float y, float z )            ! Define one vertex ( normal ) - 3 float
+FUNCTION-ALIAS: rl-color4ub     void rlColor4ub ( uchar r, uchar g, uchar b, uchar a )   ! Define one vertex ( color ) - 4 byte
+FUNCTION-ALIAS: rl-color3f      void rlColor3f ( float x, float y, float z )             ! Define one vertex ( color ) - 3 float
+FUNCTION-ALIAS: rl-color4f      void rlColor4f ( float x, float y, float z, float w )    ! Define one vertex ( color ) - 4 float
 
 ! ------------------------------------------------------------------------------------
 ! Functions Declaration - OpenGL style functions ( common to 1.1, 3.3+, ES2 )
@@ -321,171 +329,171 @@ FUNCTION: void rlColor4f ( float x, float y, float z, float w )  ! Define one ve
 ! ------------------------------------------------------------------------------------
 
 ! Vertex buffers state
-FUNCTION: bool rlEnableVertexArray ( uint vaoId )      ! Enable vertex array ( VAO, if supported )
-FUNCTION: void rlDisableVertexArray ( )                   ! Disable vertex array ( VAO, if supported )
-FUNCTION: void rlEnableVertexBuffer ( uint id )        ! Enable vertex buffer ( VBO )
-FUNCTION: void rlDisableVertexBuffer ( )                  ! Disable vertex buffer ( VBO )
-FUNCTION: void rlEnableVertexBufferElement ( uint id ) ! Enable vertex buffer element ( VBO element )
-FUNCTION: void rlDisableVertexBufferElement ( )           ! Disable vertex buffer element ( VBO element )
-FUNCTION: void rlEnableVertexAttribute ( uint index )  ! Enable vertex attribute index
-FUNCTION: void rlDisableVertexAttribute ( uint index ) ! Disable vertex attribute index
+FUNCTION-ALIAS: rl-enable-vertex-array           bool rlEnableVertexArray ( uint vaoId )         ! Enable vertex array ( VAO, if supported )
+FUNCTION-ALIAS: rl-disable-vertex-array          void rlDisableVertexArray ( )                   ! Disable vertex array ( VAO, if supported )
+FUNCTION-ALIAS: rl-enable-vertex-buffer          void rlEnableVertexBuffer ( uint id )           ! Enable vertex buffer ( VBO )
+FUNCTION-ALIAS: rl-disable-vertex-buffer         void rlDisableVertexBuffer ( )                  ! Disable vertex buffer ( VBO )
+FUNCTION-ALIAS: rl-enable-vertex-buffer-element  void rlEnableVertexBufferElement ( uint id )    ! Enable vertex buffer element ( VBO element )
+FUNCTION-ALIAS: rl-disable-vertex-buffer-element void rlDisableVertexBufferElement ( )           ! Disable vertex buffer element ( VBO element )
+FUNCTION-ALIAS: rl-enable-vertex-attribute       void rlEnableVertexAttribute ( uint index )     ! Enable vertex attribute index
+FUNCTION-ALIAS: rl-disable-vertex-attribute      void rlDisableVertexAttribute ( uint index )    ! Disable vertex attribute index
 ! #if defined ( GRAPHICS_API_OPENGL_11 )
-! FUNCTION: void rlEnableStatePointer ( int vertexAttribType, void* buffer )     ! Enable attribute state pointer
-! FUNCTION: void rlDisableStatePointer ( int vertexAttribType )                  ! Disable attribute state pointer
+! FUNCTION-ALIAS: void rlEnableStatePointer ( int vertexAttribType, void* buffer )     ! Enable attribute state pointer
+! FUNCTION-ALIAS: void rlDisableStatePointer ( int vertexAttribType )                  ! Disable attribute state pointer
 ! #endif
 
 ! Textures state
-FUNCTION: void rlActiveTextureSlot ( int slot )                ! Select and active a texture slot
-FUNCTION: void rlEnableTexture ( uint id )             ! Enable texture
-FUNCTION: void rlDisableTexture ( )                       ! Disable texture
-FUNCTION: void rlEnableTextureCubemap ( uint id )      ! Enable texture cubemap
-FUNCTION: void rlDisableTextureCubemap ( )                ! Disable texture cubemap
-FUNCTION: void rlTextureParameters ( uint id, int param, int value )  ! Set texture parameters ( filter, wrap )
-FUNCTION: void rlCubemapParameters ( uint id, int param, int value )  ! Set cubemap parameters ( filter, wrap )
+FUNCTION-ALIAS: rl-active-texture-slot     void rlActiveTextureSlot ( int slot )                       ! Select and active a texture slot
+FUNCTION-ALIAS: rl-enable-texture          void rlEnableTexture ( uint id )                            ! Enable texture
+FUNCTION-ALIAS: rl-disable-texture         void rlDisableTexture ( )                                   ! Disable texture
+FUNCTION-ALIAS: rl-enable-texture-cubemap  void rlEnableTextureCubemap ( uint id )                     ! Enable texture cubemap
+FUNCTION-ALIAS: rl-disable-texture-cubemap void rlDisableTextureCubemap ( )                            ! Disable texture cubemap
+FUNCTION-ALIAS: rl-texture-parameters      void rlTextureParameters ( uint id, int param, int value )  ! Set texture parameters ( filter, wrap )
+FUNCTION-ALIAS: rl-cubemap-parameters      void rlCubemapParameters ( uint id, int param, int value )  ! Set cubemap parameters ( filter, wrap )
 
 ! Shader state
-FUNCTION: void rlEnableShader ( uint id )              ! Enable shader program
-FUNCTION: void rlDisableShader ( )                        ! Disable shader program
+FUNCTION-ALIAS: rl-enable-shader  void rlEnableShader ( uint id )  ! Enable shader program
+FUNCTION-ALIAS: rl-disable-shader void rlDisableShader ( )         ! Disable shader program
 
 ! Framebuffer state
-FUNCTION: void rlEnableFramebuffer ( uint id )         ! Enable render texture ( fbo )
-FUNCTION: void rlDisableFramebuffer ( )                   ! Disable render texture ( fbo ), return to default framebuffer
-FUNCTION: void rlActiveDrawBuffers ( int count )               ! Activate multiple draw color buffers
+FUNCTION-ALIAS: rl-enable-framebuffer    void rlEnableFramebuffer ( uint id )    ! Enable render texture ( fbo )
+FUNCTION-ALIAS: rl-disable-framebuffer   void rlDisableFramebuffer ( )           ! Disable render texture ( fbo ), return to default framebuffer
+FUNCTION-ALIAS: rl-activate-draw-buffers void rlActiveDrawBuffers ( int count )  ! Activate multiple draw color buffers
 
 ! General render state
-FUNCTION: void rlEnableColorBlend ( )                      ! Enable color blending
-FUNCTION: void rlDisableColorBlend ( )                    ! Disable color blending
-FUNCTION: void rlEnableDepthTest ( )                      ! Enable depth test
-FUNCTION: void rlDisableDepthTest ( )                     ! Disable depth test
-FUNCTION: void rlEnableDepthMask ( )                      ! Enable depth write
-FUNCTION: void rlDisableDepthMask ( )                     ! Disable depth write
-FUNCTION: void rlEnableBackfaceCulling ( )                ! Enable backface culling
-FUNCTION: void rlDisableBackfaceCulling ( )               ! Disable backface culling
-FUNCTION: void rlSetCullFace ( int mode )                      ! Set face culling mode
-FUNCTION: void rlEnableScissorTest ( )                    ! Enable scissor test
-FUNCTION: void rlDisableScissorTest ( )                   ! Disable scissor test
-FUNCTION: void rlScissor ( int x, int y, int width, int height )  ! Scissor test
-FUNCTION: void rlEnableWireMode ( )                       ! Enable wire mode
-FUNCTION: void rlDisableWireMode ( )                      ! Disable wire mode
-FUNCTION: void rlSetLineWidth ( float width )                  ! Set the line drawing width
-FUNCTION: float rlGetLineWidth ( )                        ! Get the line drawing width
-FUNCTION: void rlEnableSmoothLines ( )                    ! Enable line aliasing
-FUNCTION: void rlDisableSmoothLines ( )                   ! Disable line aliasing
-FUNCTION: void rlEnableStereoRender ( )                   ! Enable stereo rendering
-FUNCTION: void rlDisableStereoRender ( )                  ! Disable stereo rendering
-FUNCTION: bool rlIsStereoRenderEnabled ( )                ! Check if stereo render is enabled
+FUNCTION-ALIAS: rl-enable-color-blend          void  rlEnableColorBlend ( )                             ! Enable color blending
+FUNCTION-ALIAS: rl-disable-color-blend         void  rlDisableColorBlend ( )                            ! Disable color blending
+FUNCTION-ALIAS: rl-enble-depth-test            void  rlEnableDepthTest ( )                              ! Enable depth test
+FUNCTION-ALIAS: rl-disable-depth-test          void  rlDisableDepthTest ( )                             ! Disable depth test
+FUNCTION-ALIAS: rl-enable-depth-mask           void  rlEnableDepthMask ( )                              ! Enable depth write
+FUNCTION-ALIAS: rl-disable-depth-mask          void  rlDisableDepthMask ( )                             ! Disable depth write
+FUNCTION-ALIAS: rl-enable-backface-culling     void  rlEnableBackfaceCulling ( )                        ! Enable backface culling
+FUNCTION-ALIAS: rl-disable-backface-culling    void  rlDisableBackfaceCulling ( )                       ! Disable backface culling
+FUNCTION-ALIAS: rl-set-cull-face               void  rlSetCullFace ( int mode )                         ! Set face culling mode
+FUNCTION-ALIAS: rl-enable-scissor-test         void  rlEnableScissorTest ( )                            ! Enable scissor test
+FUNCTION-ALIAS: rl-disable-scissor-test        void  rlDisableScissorTest ( )                           ! Disable scissor test
+FUNCTION-ALIAS: rl-scissor                     void  rlScissor ( int x, int y, int width, int height )  ! Scissor test
+FUNCTION-ALIAS: rl-enable-wire-mode            void  rlEnableWireMode ( )                               ! Enable wire mode
+FUNCTION-ALIAS: rl-disable-wire-mode           void  rlDisableWireMode ( )                              ! Disable wire mode
+FUNCTION-ALIAS: rl-set-line-width              void  rlSetLineWidth ( float width )                     ! Set the line drawing width
+FUNCTION-ALIAS: rl-get-line-width              float rlGetLineWidth ( )                                 ! Get the line drawing width
+FUNCTION-ALIAS: rl-enable-smooth-lines         void  rlEnableSmoothLines ( )                            ! Enable line aliasing
+FUNCTION-ALIAS: rl-disable-smooth-lines        void  rlDisableSmoothLines ( )                           ! Disable line aliasing
+FUNCTION-ALIAS: rl-enable-stereo-render        void  rlEnableStereoRender ( )                           ! Enable stereo rendering
+FUNCTION-ALIAS: rl-disable-stereo-render       void  rlDisableStereoRender ( )                          ! Disable stereo rendering
+FUNCTION-ALIAS: rl-is-stereo-rendering-enabled bool  rlIsStereoRenderEnabled ( )                        ! Check if stereo render is enabled
 
-FUNCTION: void rlClearColor ( uchar r, uchar g, uchar b, uchar a )  ! Clear color buffer with color
-FUNCTION: void rlClearScreenBuffers ( )                   ! Clear used screen buffers ( color and depth )
-FUNCTION: void rlCheckErrors ( )                          ! Check and log OpenGL error codes
-FUNCTION: void rlSetBlendMode ( int mode )                     ! Set blending mode
-FUNCTION: void rlSetBlendFactors ( int glSrcFactor, int glDstFactor, int glEquation )  ! Set blending mode factor and equation ( using OpenGL factors )
-FUNCTION: void rlSetBlendFactorsSeparate ( int glSrcRGB, int glDstRGB, int glSrcAlpha, int glDstAlpha, int glEqRGB, int glEqAlpha )  ! Set blending mode factors and equations separately ( using OpenGL factors )
+FUNCTION-ALIAS: rl-clear-color void rlClearColor ( uchar r, uchar g, uchar b, uchar a )                                                                                  ! Clear color buffer with color
+FUNCTION-ALIAS: rl-clear-screen-buffers void rlClearScreenBuffers ( )                                                                                                    ! Clear used screen buffers ( color and depth )
+FUNCTION-ALIAS: rl-check-errors void rlCheckErrors ( )                                                                                                                   ! Check and log OpenGL error codes
+FUNCTION-ALIAS: rl-set-blend-mode void rlSetBlendMode ( int mode )                                                                                                       ! Set blending mode
+FUNCTION-ALIAS: rl-set-blend-factors void rlSetBlendFactors ( int glSrcFactor, int glDstFactor, int glEquation )                                                         ! Set blending mode factor and equation ( using OpenGL factors )
+FUNCTION-ALIAS: rl-set-blend-factors-seperate void rlSetBlendFactorsSeparate ( int glSrcRGB, int glDstRGB, int glSrcAlpha, int glDstAlpha, int glEqRGB, int glEqAlpha )  ! Set blending mode factors and equations separately ( using OpenGL factors )
 
 ! ------------------------------------------------------------------------------------
 ! Functions Declaration - rlgl functionality
 ! ------------------------------------------------------------------------------------
 ! rlgl initialization functions
-FUNCTION: void rlglInit ( int width, int height )              ! Initialize rlgl ( buffers, shaders, textures, states )
-FUNCTION: void rlglClose ( )                              ! De-initialize rlgl ( buffers, shaders, textures )
-FUNCTION: void rlLoadExtensions ( void* loader )               ! Load OpenGL extensions ( loader function required )
-FUNCTION: int rlGetVersion ( )                            ! Get current OpenGL version
-FUNCTION: void rlSetFramebufferWidth ( int width )             ! Set current framebuffer width
-FUNCTION: int rlGetFramebufferWidth ( )                   ! Get default framebuffer width
-FUNCTION: void rlSetFramebufferHeight ( int height )           ! Set current framebuffer height
-FUNCTION: int rlGetFramebufferHeight ( )                  ! Get default framebuffer height
+FUNCTION-ALIAS: rl-gl-init                void rlglInit ( int width, int height )     ! Initialize rlgl ( buffers, shaders, textures, states )
+FUNCTION-ALIAS: rl-gl-close               void rlglClose ( )                          ! De-initialize rlgl ( buffers, shaders, textures )
+FUNCTION-ALIAS: rl-load-extensions        void rlLoadExtensions ( void* loader )      ! Load OpenGL extensions ( loader function required )
+FUNCTION-ALIAS: rl-get-version            int  rlGetVersion ( )                       ! Get current OpenGL version
+FUNCTION-ALIAS: rl-set-framebuffer-width  void rlSetFramebufferWidth ( int width )    ! Set current framebuffer width
+FUNCTION-ALIAS: rl-get-framebuffer-width  int  rlGetFramebufferWidth ( )              ! Get default framebuffer width
+FUNCTION-ALIAS: rl-set-framebuffer-height void rlSetFramebufferHeight ( int height )  ! Set current framebuffer height
+FUNCTION-ALIAS: rl-get-framebuffer-height int  rlGetFramebufferHeight ( )             ! Get default framebuffer height
 
-FUNCTION: uint rlGetTextureIdDefault ( )          ! Get default texture id
-FUNCTION: uint rlGetShaderIdDefault ( )           ! Get default shader id
-FUNCTION: int* rlGetShaderLocsDefault ( )                 ! Get default shader locations
+FUNCTION-ALIAS: rl-get-texture-id-default  uint rlGetTextureIdDefault ( )   ! Get default texture id
+FUNCTION-ALIAS: rl-get-shader-id-default   uint rlGetShaderIdDefault ( )    ! Get default shader id
+FUNCTION-ALIAS: rl-get-shader-locs-default int* rlGetShaderLocsDefault ( )  ! Get default shader locations
 
 ! Render batch management
 ! NOTE: rlgl provides a default render batch to behave like OpenGL 1.1 immediate mode
 ! but this render batch API is exposed in case of custom batches are required
-FUNCTION: rlRenderBatch rlLoadRenderBatch ( int numBuffers, int bufferElements )   ! Load a render batch system
-FUNCTION: void rlUnloadRenderBatch ( rlRenderBatch batch )                         ! Unload render batch system
-FUNCTION: void rlDrawRenderBatch ( rlRenderBatch* batch )                          ! Draw render batch data ( Update->Draw->Reset )
-FUNCTION: void rlSetRenderBatchActive ( rlRenderBatch* batch )                     ! Set the active render batch for rlgl ( NULL for default internal )
-FUNCTION: void rlDrawRenderBatchActive ( )                                    ! Update and draw internal render batch
-FUNCTION: bool rlCheckRenderBatchLimit ( int vCount )                              ! Check internal buffer overflow for a given number of vertex
+FUNCTION-ALIAS: rl-load-render-batch        rlRenderBatch rlLoadRenderBatch ( int numBuffers, int bufferElements )   ! Load a render batch system
+FUNCTION-ALIAS: rl-unload-render-batch      void          rlUnloadRenderBatch ( rlRenderBatch batch )                ! Unload render batch system
+FUNCTION-ALIAS: rl-draw-render-batch        void          rlDrawRenderBatch ( rlRenderBatch* batch )                 ! Draw render batch data ( Update->Draw->Reset )
+FUNCTION-ALIAS: rl-set-render-batch-active  void          rlSetRenderBatchActive ( rlRenderBatch* batch )            ! Set the active render batch for rlgl ( NULL for default internal )
+FUNCTION-ALIAS: rl-draw-render-batch-active void          rlDrawRenderBatchActive ( )                                ! Update and draw internal render batch
+FUNCTION-ALIAS: rl-check-render-batch-limit bool          rlCheckRenderBatchLimit ( int vCount )                     ! Check internal buffer overflow for a given number of vertex
 
-FUNCTION: void rlSetTexture ( uint id )                ! Set current texture for render batch and check buffers limits
+FUNCTION-ALIAS: rl-set-texture void rlSetTexture ( uint id )                ! Set current texture for render batch and check buffers limits
 
 ! ------------------------------------------------------------------------------------------------------------------------
 
 ! Vertex buffers management
-FUNCTION: uint rlLoadVertexArray ( )                                ! Load vertex array ( vao ) if supported
-FUNCTION: uint rlLoadVertexBuffer ( void* buffer, int size, bool dynamic )             ! Load a vertex buffer attribute
-FUNCTION: uint rlLoadVertexBufferElement ( void* buffer, int size, bool dynamic )      ! Load a new attributes element buffer
-FUNCTION: void rlUpdateVertexBuffer ( uint bufferId, void* data, int dataSize, int offset )      ! Update GPU buffer with new data
-FUNCTION: void rlUpdateVertexBufferElements ( uint id, void* data, int dataSize, int offset )    ! Update vertex buffer elements with new data
-FUNCTION: void rlUnloadVertexArray ( uint vaoId ) 
-FUNCTION: void rlUnloadVertexBuffer ( uint vboId ) 
-FUNCTION: void rlSetVertexAttribute ( uint index, int compSize, int type, bool normalized, int stride, void* pointer ) 
-FUNCTION: void rlSetVertexAttributeDivisor ( uint index, int divisor ) 
-FUNCTION: void rlSetVertexAttributeDefault ( int locIndex, void* value, int attribType, int count )  ! Set vertex attribute default value
-FUNCTION: void rlDrawVertexArray ( int offset, int count ) 
-FUNCTION: void rlDrawVertexArrayElements ( int offset, int count, void* buffer ) 
-FUNCTION: void rlDrawVertexArrayInstanced ( int offset, int count, int instances ) 
-FUNCTION: void rlDrawVertexArrayElementsInstanced ( int offset, int count, void* buffer, int instances ) 
+FUNCTION-ALIAS: rl-load-vertex-array                    uint rlLoadVertexArray ( )                                                                 ! Load vertex array ( vao ) if supported
+FUNCTION-ALIAS: rl-load-vertex-buffer                   uint rlLoadVertexBuffer ( void* buffer, int size, bool dynamic )                           ! Load a vertex buffer attribute
+FUNCTION-ALIAS: rl-load-vertex-buffer-element           uint rlLoadVertexBufferElement ( void* buffer, int size, bool dynamic )                    ! Load a new attributes element buffer
+FUNCTION-ALIAS: rl-update-vetex-buffer                  void rlUpdateVertexBuffer ( uint bufferId, void* data, int dataSize, int offset )          ! Update GPU buffer with new data
+FUNCTION-ALIAS: rl-update-vetex-buffer-elements         void rlUpdateVertexBufferElements ( uint id, void* data, int dataSize, int offset )        ! Update vertex buffer elements with new data
+FUNCTION-ALIAS: rl-unload-vertex-array                  void rlUnloadVertexArray ( uint vaoId ) 
+FUNCTION-ALIAS: rl-unload-vertex-buffer                 void rlUnloadVertexBuffer ( uint vboId ) 
+FUNCTION-ALIAS: rl-set-vertex-attribute                 void rlSetVertexAttribute ( uint index, int compSize, int type, bool normalized, int stride, void* pointer ) 
+FUNCTION-ALIAS: rl-set-vertex-attribute-divisor         void rlSetVertexAttributeDivisor ( uint index, int divisor ) 
+FUNCTION-ALIAS: rl-set-vertex-attribute-default         void rlSetVertexAttributeDefault ( int locIndex, void* value, int attribType, int count )  ! Set vertex attribute default value
+FUNCTION-ALIAS: rl-draw-vertex-array                    void rlDrawVertexArray ( int offset, int count ) 
+FUNCTION-ALIAS: rl-draw-vertex-array-elements           void rlDrawVertexArrayElements ( int offset, int count, void* buffer ) 
+FUNCTION-ALIAS: rl-draw-vertex-array-instanced          void rlDrawVertexArrayInstanced ( int offset, int count, int instances ) 
+FUNCTION-ALIAS: rl-draw-vertex-array-elements-instanced void rlDrawVertexArrayElementsInstanced ( int offset, int count, void* buffer, int instances ) 
 
 ! Textures management
-FUNCTION: uint rlLoadTexture ( void* data, int width, int height, int format, int mipmapCount )  ! Load texture in GPU
-FUNCTION: uint rlLoadTextureDepth ( int width, int height, bool useRenderBuffer )                ! Load depth texture/renderbuffer ( to be attached to fbo )
-FUNCTION: uint rlLoadTextureCubemap ( void* data, int size, int format )                         ! Load texture cubemap
-FUNCTION: void rlUpdateTexture ( uint id, int offsetX, int offsetY, int width, int height, int format, void* data )   ! Update GPU texture with new data
-FUNCTION: void rlGetGlTextureFormats ( int format, uint* glInternalFormat, uint* glFormat, uint* glType )   ! Get OpenGL internal formats
-FUNCTION: char* rlGetPixelFormatName ( uint format )               ! Get name string for pixel format
-FUNCTION: void rlUnloadTexture ( uint id )                               ! Unload texture from GPU memory
-FUNCTION: void rlGenTextureMipmaps ( uint id, int width, int height, int format, int* mipmaps )  ! Generate mipmap data for selected texture
-FUNCTION: void* rlReadTexturePixels ( uint id, int width, int height, int format )               ! Read texture pixel data
-FUNCTION: uchar* rlReadScreenPixels ( int width, int height )            ! Read screen pixel data ( color buffer )
+FUNCTION-ALIAS: rl-load-texture           uint rlLoadTexture ( void* data, int width, int height, int format, int mipmapCount )                       ! Load texture in GPU
+FUNCTION-ALIAS: rl-load-texture-depth     uint rlLoadTextureDepth ( int width, int height, bool useRenderBuffer )                                     ! Load depth texture/renderbuffer ( to be attached to fbo )
+FUNCTION-ALIAS: rl-load-texture-cubemap   uint rlLoadTextureCubemap ( void* data, int size, int format )                                              ! Load texture cubemap
+FUNCTION-ALIAS: rl-update-texture         void rlUpdateTexture ( uint id, int offsetX, int offsetY, int width, int height, int format, void* data )   ! Update GPU texture with new data
+FUNCTION-ALIAS: rl-get-gl-texture-formats void rlGetGlTextureFormats ( int format, uint* glInternalFormat, uint* glFormat, uint* glType )             ! Get OpenGL internal formats
+FUNCTION-ALIAS: rl-get-pixel-format-name  char* rlGetPixelFormatName ( uint format )                                                                  ! Get name string for pixel format
+FUNCTION-ALIAS: rl-unload-texture         void rlUnloadTexture ( uint id )                                                                            ! Unload texture from GPU memory
+FUNCTION-ALIAS: rl-gen-texture-mipmaps    void rlGenTextureMipmaps ( uint id, int width, int height, int format, int* mipmaps )                       ! Generate mipmap data for selected texture
+FUNCTION-ALIAS: rl-read-texture-pixels    void* rlReadTexturePixels ( uint id, int width, int height, int format )                                    ! Read texture pixel data
+FUNCTION-ALIAS: rl-read-screen-pixels     uchar* rlReadScreenPixels ( int width, int height )                                                         ! Read screen pixel data ( color buffer )
 
 ! Framebuffer management ( fbo )
-FUNCTION: uint rlLoadFramebuffer ( int width, int height )               ! Load an empty framebuffer
-FUNCTION: void rlFramebufferAttach ( uint fboId, uint texId, int attachType, int texType, int mipLevel )   ! Attach texture/renderbuffer to a framebuffer
-FUNCTION: bool rlFramebufferComplete ( uint id )                         ! Verify framebuffer is complete
-FUNCTION: void rlUnloadFramebuffer ( uint id )                           ! Delete framebuffer from GPU
+FUNCTION-ALIAS: rl-load-framebuffer     uint rlLoadFramebuffer ( int width, int height )                                                 ! Load an empty framebuffer
+FUNCTION-ALIAS: rl-framebuffer-attach   void rlFramebufferAttach ( uint fboId, uint texId, int attachType, int texType, int mipLevel )   ! Attach texture/renderbuffer to a framebuffer
+FUNCTION-ALIAS: rl-framebuffer-complete bool rlFramebufferComplete ( uint id )                                                           ! Verify framebuffer is complete
+FUNCTION-ALIAS: rl-unload-framebuffer   void rlUnloadFramebuffer ( uint id )                                                             ! Delete framebuffer from GPU
 
 ! Shaders management
-FUNCTION: uint rlLoadShaderCode ( char* vsCode, char* fsCode )     ! Load shader from code strings
-FUNCTION: uint rlCompileShader ( char* shaderCode, int type )            ! Compile custom shader and return shader id ( type: RL_VERTEX_SHADER, RL_FRAGMENT_SHADER, RL_COMPUTE_SHADER )
-FUNCTION: uint rlLoadShaderProgram ( uint vShaderId, uint fShaderId )  ! Load custom shader program
-FUNCTION: void rlUnloadShaderProgram ( uint id )                               ! Unload shader program
-FUNCTION: int rlGetLocationUniform ( uint shaderId, char* uniformName )  ! Get shader location uniform
-FUNCTION: int rlGetLocationAttrib ( uint shaderId, char* attribName )    ! Get shader location attribute
-FUNCTION: void rlSetUniform ( int locIndex, void* value, int uniformType, int count )    ! Set shader value uniform
-FUNCTION: void rlSetUniformMatrix ( int locIndex, Matrix mat )                         ! Set shader value matrix
-FUNCTION: void rlSetUniformSampler ( int locIndex, uint textureId )            ! Set shader value sampler
-FUNCTION: void rlSetShader ( uint id, int* locs )                              ! Set shader currently active ( id and locations )
+FUNCTION-ALIAS: rl-load-shader-code      uint rlLoadShaderCode ( char* vsCode, char* fsCode )                           ! Load shader from code strings
+FUNCTION-ALIAS: rl-compile-shader        uint rlCompileShader ( char* shaderCode, int type )                            ! Compile custom shader and return shader id ( type: RL_VERTEX_SHADER, RL_FRAGMENT_SHADER, RL_COMPUTE_SHADER )
+FUNCTION-ALIAS: rl-load-shader-program   uint rlLoadShaderProgram ( uint vShaderId, uint fShaderId )                    ! Load custom shader program
+FUNCTION-ALIAS: rl-unload-shader-program void rlUnloadShaderProgram ( uint id )                                         ! Unload shader program
+FUNCTION-ALIAS: rl-get-location-uniform  int  rlGetLocationUniform ( uint shaderId, char* uniformName )                 ! Get shader location uniform
+FUNCTION-ALIAS: rl-get-location-attrib   int  rlGetLocationAttrib ( uint shaderId, char* attribName )                   ! Get shader location attribute
+FUNCTION-ALIAS: rl-set-uniform           void rlSetUniform ( int locIndex, void* value, int uniformType, int count )    ! Set shader value uniform
+FUNCTION-ALIAS: rl-set-uniform-matrix    void rlSetUniformMatrix ( int locIndex, Matrix mat )                           ! Set shader value matrix
+FUNCTION-ALIAS: rl-set-uniform-sampler   void rlSetUniformSampler ( int locIndex, uint textureId )                      ! Set shader value sampler
+FUNCTION-ALIAS: rl-set-shader            void rlSetShader ( uint id, int* locs )                                        ! Set shader currently active ( id and locations )
 
 ! Compute shader management
-FUNCTION: uint rlLoadComputeShaderProgram ( uint shaderId )            ! Load compute shader program
-FUNCTION: void rlComputeShaderDispatch ( uint groupX, uint groupY, uint groupZ )   ! Dispatch compute shader ( equivalent to* draw* for graphics pipeline )
+FUNCTION-ALIAS: rl-load-compute-shader-program uint rlLoadComputeShaderProgram ( uint shaderId )                        ! Load compute shader program
+FUNCTION-ALIAS: rl-compute-shader-dispatch     void rlComputeShaderDispatch ( uint groupX, uint groupY, uint groupZ )   ! Dispatch compute shader ( equivalent to* draw* for graphics pipeline )
 
 ! Shader buffer storage object management ( ssbo )
-FUNCTION: uint rlLoadShaderBuffer ( uint size, void* data, int usageHint )  ! Load shader storage buffer object ( SSBO )
-FUNCTION: void rlUnloadShaderBuffer ( uint ssboId )                            ! Unload shader storage buffer object ( SSBO )
-FUNCTION: void rlUpdateShaderBuffer ( uint id, void* data, uint dataSize, uint offset )  ! Update SSBO buffer data
-FUNCTION: void rlBindShaderBuffer ( uint id, uint index )              ! Bind SSBO buffer
-FUNCTION: void rlReadShaderBuffer ( uint id, void* dest, uint count, uint offset )  ! Read SSBO buffer data ( GPU->CPU )
-FUNCTION: void rlCopyShaderBuffer ( uint destId, uint srcId, uint destOffset, uint srcOffset, uint count )  ! Copy SSBO data between buffers
-FUNCTION: uint rlGetShaderBufferSize ( uint id )                       ! Get SSBO buffer size
+FUNCTION-ALIAS: rl-load-shader-buffer     uint rlLoadShaderBuffer ( uint size, void* data, int usageHint )                                  ! Load shader storage buffer object ( SSBO )
+FUNCTION-ALIAS: rl-unload-shader-buffer   void rlUnloadShaderBuffer ( uint ssboId )                                                         ! Unload shader storage buffer object ( SSBO )
+FUNCTION-ALIAS: rl-update-shader-buffer   void rlUpdateShaderBuffer ( uint id, void* data, uint dataSize, uint offset )                     ! Update SSBO buffer data
+FUNCTION-ALIAS: rl-bind-shader-buffer     void rlBindShaderBuffer ( uint id, uint index )                                                   ! Bind SSBO buffer
+FUNCTION-ALIAS: rl-read-shader-buffer     void rlReadShaderBuffer ( uint id, void* dest, uint count, uint offset )                          ! Read SSBO buffer data ( GPU->CPU )
+FUNCTION-ALIAS: rl-copy-shader-buffer     void rlCopyShaderBuffer ( uint destId, uint srcId, uint destOffset, uint srcOffset, uint count )  ! Copy SSBO data between buffers
+FUNCTION-ALIAS: rl-get-shader-buffer-size uint rlGetShaderBufferSize ( uint id )                                                            ! Get SSBO buffer size
 
 ! Buffer management
-FUNCTION: void rlBindImageTexture ( uint id, uint index, int format, bool readonly )   ! Bind image texture
+FUNCTION-ALIAS: rl-bind-image-texture void rlBindImageTexture ( uint id, uint index, int format, bool readonly )   ! Bind image texture
 
 ! Matrix state management
-FUNCTION: Matrix rlGetMatrixModelview ( )                                   ! Get internal modelview matrix
-FUNCTION: Matrix rlGetMatrixProjection ( )                                  ! Get internal projection matrix
-FUNCTION: Matrix rlGetMatrixTransform ( )                                   ! Get internal accumulated transform matrix
-FUNCTION: Matrix rlGetMatrixProjectionStereo ( int eye )                         ! Get internal projection matrix for stereo render ( selected eye )
-FUNCTION: Matrix rlGetMatrixViewOffsetStereo ( int eye )                         ! Get internal view offset matrix for stereo render ( selected eye )
-FUNCTION: void rlSetMatrixProjection ( Matrix proj )                             ! Set a custom projection matrix ( replaces internal projection matrix )
-FUNCTION: void rlSetMatrixModelview ( Matrix view )                              ! Set a custom modelview matrix ( replaces internal modelview matrix )
-FUNCTION: void rlSetMatrixProjectionStereo ( Matrix right, Matrix left )         ! Set eyes projection matrices for stereo rendering
-FUNCTION: void rlSetMatrixViewOffsetStereo ( Matrix right, Matrix left )         ! Set eyes view offsets matrices for stereo rendering
+FUNCTION-ALIAS: rl-get-matrix-modelview          Matrix rlGetMatrixModelview ( )                                   ! Get internal modelview matrix
+FUNCTION-ALIAS: rl-get-matrix-projection         Matrix rlGetMatrixProjection ( )                                  ! Get internal projection matrix
+FUNCTION-ALIAS: rl-get-matrix-transform          Matrix rlGetMatrixTransform ( )                                   ! Get internal accumulated transform matrix
+FUNCTION-ALIAS: rl-get-matrix-projection-stereo  Matrix rlGetMatrixProjectionStereo ( int eye )                    ! Get internal projection matrix for stereo render ( selected eye )
+FUNCTION-ALIAS: rl-get-matrix-view-offset-stereo Matrix rlGetMatrixViewOffsetStereo ( int eye )                    ! Get internal view offset matrix for stereo render ( selected eye )
+FUNCTION-ALIAS: rl-set-matrix-projection         void   rlSetMatrixProjection ( Matrix proj )                      ! Set a custom projection matrix ( replaces internal projection matrix )
+FUNCTION-ALIAS: rl-set-matrix-modelview          void   rlSetMatrixModelview ( Matrix view )                       ! Set a custom modelview matrix ( replaces internal modelview matrix )
+FUNCTION-ALIAS: rl-set-matrix-projection-stereo  void   rlSetMatrixProjectionStereo ( Matrix right, Matrix left )  ! Set eyes projection matrices for stereo rendering
+FUNCTION-ALIAS: rl-set-matrix-view-offset-stereo void   rlSetMatrixViewOffsetStereo ( Matrix right, Matrix left )  ! Set eyes view offsets matrices for stereo rendering
 
 ! Quick and dirty cube/quad buffers load->draw->unload
-FUNCTION: void rlLoadDrawCube ( )      ! Load and draw a cube
-FUNCTION: void rlLoadDrawQuad ( )      ! Load and draw a quad
+FUNCTION-ALIAS: rl-load-draw-cube void rlLoadDrawCube ( )      ! Load and draw a cube
+FUNCTION-ALIAS: rl-load-draw-quad void rlLoadDrawQuad ( )      ! Load and draw a quad
