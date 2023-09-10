@@ -382,6 +382,9 @@ strings tools.test ;
 { 1 t } [ 1 { 1 1 3 4 } [ dupd = ] 2 count= ] unit-test
 { 1 f } [ 1 { 1 1 3 4 } [ dupd = ] 3 count= ] unit-test
 { 4 t } [ 0 { 1 1 3 4 } [ [ 1 + dup ] dip = ] 3 count= ] unit-test
+{ 5 8 f } [ 0 1 { 1 1 2 3 5 8 } [ [ swap dupd + ] dip pick = ] 4 count= ] unit-test
+{ 8 13 t } [ 0 1 { 1 1 0 3 0 8 } [ [ swap dupd + ] dip pick = ] 4 count= ] unit-test
+{ 8 13 f } [ 0 1 { 1 1 2 3 5 8 } [ [ swap dupd + ] dip pick = ] 8 count= ] unit-test
 
 { SBUF" aco" SBUF" ftr"  } [ SBUF" factor" dup [ even? ] extract! ] unit-test
 
