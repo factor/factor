@@ -498,7 +498,7 @@ PRIVATE>
 : sift-as ( seq exemplar -- newseq )
     [ ] swap filter-as ;
 
-: sift! ( seq -- newseq )
+: sift! ( seq -- seq' )
     [ ] filter! ;
 
 : harvest-as ( seq exemplar -- newseq )
