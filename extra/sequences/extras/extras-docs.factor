@@ -681,6 +681,14 @@ HELP: count-tail
 }
 { $description "Count the number of values from the end of " { $snippet "seq" } " that return a truthy value when passed into " { $snippet "quot" } "." } ;
 
+HELP: count=
+{ $values
+    { "seq" sequence } { "quot" quotation } { "n" integer }
+    { "?" boolean }
+}
+{ $description "Returns " { $link t } " if the sequence has exactly " { $snippet "n" } " elements where " { $snippet "quot" } " returns true, otherwise returns " { $link f } "." } ;
+
+
 HELP: cut-when
 { $values
     { "seq" sequence } { "quot" quotation }
