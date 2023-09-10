@@ -1,6 +1,7 @@
 ! Copyright (C) 2010 Slava Pestov.
 USING: arrays gml.runtime kernel math.matrices
-math.matrices.extras math.trig math.vectors.simd.cords   ;
+math.matrices.extras math.vectors.simd.cords 
+math.functions  ;
 IN: gml.geometry
 
 GML: rot_vec ( v n alpha -- v )

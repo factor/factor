@@ -3,7 +3,7 @@
 ! See https://factorcode.org/license.txt for BSD license.
 
 USING: accessors arrays boids.simulation calendar classes colors
-kernel literals math math.functions math.trig models
+kernel literals math math.functions models
 models.range opengl opengl.demo-support opengl.gl sequences
 threads ui ui.commands ui.gadgets ui.gadgets.borders
 ui.gadgets.buttons ui.gadgets.frames ui.gadgets.grids

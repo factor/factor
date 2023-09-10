@@ -1,6 +1,6 @@
 ! Copyright (C) 2010 Slava Pestov.
 USING: gml.types gml.printer gml.runtime math math.constants
-math.functions math.matrices math.order ranges math.trig
+math.functions math.matrices math.order ranges
 math.vectors continuations combinators arrays kernel vectors
 accessors prettyprint fry sequences assocs locals hashtables
 grouping sorting classes.struct math.vectors.simd
