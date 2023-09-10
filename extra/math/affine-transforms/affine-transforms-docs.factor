@@ -8,12 +8,12 @@ ARTICLE: "math.affine-transforms" "Affine Transformations of 2d Vectors"
 { $examples
   "Creates a 45 degree counter clock-wise rotation matrix and applies it to a vector:"
   { $example
-    "USING: math.affine-transforms math.trig prettyprint ;\n45 deg>rad <rotation> { 0 4 } a.v ."
+    "USING: math.affine-transforms math.functions prettyprint ;\n45 deg>rad <rotation> { 0 4 } a.v ."
     "{ -2.82842712474619 2.82842712474619 }"
   }
   "Applies a combined scaling and translation transform to a vector:"
   { $example
-    "USING: math.affine-transforms math.trig prettyprint ;\n{ 0 -5 } <translation> 1 2  <scale>  a. { 4 3 } a.v ."
+    "USING: math.affine-transforms math.functions prettyprint ;\n{ 0 -5 } <translation> 1 2  <scale>  a. { 4 3 } a.v ."
     "{ 4.0 1.0 }"
   }
 } ;
