@@ -1,7 +1,8 @@
 ! Copyright (C) 2013 Doug Coleman.
 ! See https://factorcode.org/license.txt for BSD license.
 USING: alien.c-types arrays assocs combinators.extras io.files
-kernel math modern.slices sequences splitting tools.test ;
+kernel math modern.slices parser ranges sequences splitting
+tools.test ;
 IN: combinators.extras.tests
 
 
@@ -23,6 +24,29 @@ IN: combinators.extras.tests
         } cond-case
     ] map
 ] unit-test
+
+<<
+SYNTAX: ..= dup pop scan-object [a..b] suffix! ;
+SYNTAX: ..< dup pop scan-object [a..b) suffix! ;
+>>
+
+<<
+: describe-number ( n -- str )
+    {
+        { 0 [ "no" ] }
+        { 1 ..= 3 [ "a few" ] }
+        { 4 ..= 9 [ "several" ] }
+        { 12 [ "twelve" ] }
+        { 10 ..= 99 [ "tens of" ] }
+        { 100 ..= 999 [ "hundreds of" ] }
+        { 1000 ..= 999,999 [ "thousands of" ] }
+        [ drop "millions and millions of" ]
+    } sequence-case ;
+>>
+
+{ "twelve" } [ 12 describe-number ] unit-test
+{ "several" } [ 5 describe-number ] unit-test
+{ "millions and millions of" } [ 1,000,000 describe-number ] unit-test
 
 { { 1 2 3 } } [ 1 { [ ] [ 1 + ] [ 2 + ] } cleave-array ] unit-test
 
