@@ -366,6 +366,10 @@ M: real atan >float atan ; inline
 
 : acot ( x -- y ) recip atan ; inline
 
+: deg>rad ( x -- y ) pi * 180 / ; inline
+
+: rad>deg ( x -- y ) 180 * pi / ; inline
+
 GENERIC: truncate ( x -- y )
 
 M: real truncate dup 1 mod - ;
