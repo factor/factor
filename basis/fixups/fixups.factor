@@ -10,6 +10,7 @@ CONSTANT: vocab-renames {
     { "sorting.slots" { "sorting.specification" "0.99" } }
     { "json.reader" { "json" "0.99" } }
     { "json.writer" { "json" "0.99" } }
+    { "math.trig" { "math.functions" "0.100" } }
 }
 
 CONSTANT: word-renames {
