@@ -1,10 +1,12 @@
 ! Copyright (C) 2009 Joe Groff.
 ! See https://factorcode.org/license.txt for BSD license.
-USING: accessors arrays assocs kernel locals math sequences
-sequences.private ;
+USING: accessors arrays assocs kernel math sequences
+sequences.private typed ;
 IN: sequences.product
 
-TUPLE: product-sequence { sequences array read-only } { lengths array read-only } ;
+TUPLE: product-sequence
+    { sequences array read-only }
+    { lengths array read-only } ;
 
 : <product-sequence> ( sequences -- product-sequence )
     >array dup [ length ] map product-sequence boa ;
@@ -15,26 +17,27 @@ M: product-sequence length lengths>> product ;
 
 <PRIVATE
 
-: ns ( n lengths -- ns )
+TYPED: product-ns ( n lengths: array -- ns )
     [ /mod ] map nip ;
 
-: nths ( ns seqs -- nths )
-    [ nth ] { } 2map-as ;
+TYPED: product-nths ( ns: array seqs -- nths )
+    [ nth-unsafe ] { } 2map-as ;
 
 : product@ ( n product-sequence -- ns seqs )
-    [ lengths>> ns ] [ nip sequences>> ] 2bi ;
+    [ lengths>> product-ns ] [ nip sequences>> ] 2bi ;
 
-:: (carry-n) ( ns lengths i -- )
-    ns length i 1 + = [
+:: (carry-n) ( ns lengths i j -- )
+    i 1 + j = [
         i ns nth-unsafe i lengths nth-unsafe = [
             0 i ns set-nth-unsafe
-            i 1 + ns [ 1 + ] change-nth-unsafe
-            ns lengths i 1 + (carry-n)
+            ns lengths i 1 +
+            dup ns [ 1 + ] change-nth-unsafe
+            j (carry-n)
         ] when
     ] unless ; inline recursive
 
 : carry-ns ( ns lengths -- )
-    0 (carry-n) ; inline
+    0 pick length integer>fixnum-strict (carry-n) ; inline
 
 : product-iter ( ns lengths -- )
     [ 0 over [ 1 + ] change-nth-unsafe ] dip carry-ns ; inline
@@ -51,13 +54,13 @@ M: product-sequence length lengths>> product ;
 PRIVATE>
 
 M: product-sequence nth
-    product@ nths ;
+    product@ product-nths ;
 
 :: product-each ( ... sequences quot: ( ... seq -- ... ) -- ... )
     sequences start-product-iter :> ( ns lengths )
     lengths [ 0 = ] any? [
         [ ns lengths end-product-iter? ]
-        [ ns sequences nths quot call ns lengths product-iter ] until
+        [ ns sequences product-nths quot call ns lengths product-iter ] until
     ] unless ; inline
 
 :: product-map-as ( ... sequences quot: ( ... seq -- ... value ) exemplar -- ... sequence )
@@ -83,5 +86,5 @@ M: product-sequence nth
     sequences start-product-iter :> ( ns lengths )
     lengths [ 0 = ] any? [ f ] [
         f [ ns lengths end-product-iter? over or ]
-        [ drop ns sequences nths quot keep and ns lengths product-iter ] until
+        [ drop ns sequences product-nths quot keep and ns lengths product-iter ] until
     ] if ; inline
