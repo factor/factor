@@ -46,6 +46,7 @@ SYNTAX: ..< dup pop scan-object [a..b) suffix! ;
 
 { "twelve" } [ 12 describe-number ] unit-test
 { "several" } [ 5 describe-number ] unit-test
+{ "tens of" } [ 10 describe-number ] unit-test
 { "millions and millions of" } [ 1,000,000 describe-number ] unit-test
 
 { { 1 2 3 } } [ 1 { [ ] [ 1 + ] [ 2 + ] } cleave-array ] unit-test
