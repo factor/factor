@@ -1263,6 +1263,7 @@ HELP: sift!
     { "seq'" { "a resizable mutable " { $link sequence } } }
 }
 { $description "Removes all instances of " { $link f } " from a sequence." }
+{ $notes "The sequence " { $snippet "seq" } " MUST be growable. See " { $link "growable" } "." }
 { $side-effects "seq" }
 { $examples
     { $example
