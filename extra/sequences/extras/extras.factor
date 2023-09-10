@@ -990,6 +990,11 @@ PRIVATE>
     [ not ] compose [ find-last drop ] keepd
     length swap [ - 1 - ] when* ; inline
 
+: count= ( ... seq quot: ( ... elt -- ... ? ) n -- ... ? )
+    [ 0 ] 3dip [
+        '[ swap _ dip swap [ 1 + ] when dup _ >= ] find 2drop
+    ] keep = ; inline
+
 :: shorten* ( vector n -- seq )
     vector n tail
     n vector shorten ;

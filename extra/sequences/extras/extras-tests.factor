@@ -377,6 +377,12 @@ strings tools.test ;
 { 2 } [ { 1 2 3 4 } [ 2 > ] count-tail ] unit-test
 { 4 } [ { 1 2 3 4 } [ 5 < ] count-tail ] unit-test
 
+{ t } [ { 1 2 3 4 } [ 5 > ] 0 count= ] unit-test
+{ f } [ { 1 2 3 4 } [ 5 > ] 1 count= ] unit-test
+{ 1 t } [ 1 { 1 1 3 4 } [ dupd = ] 2 count= ] unit-test
+{ 1 f } [ 1 { 1 1 3 4 } [ dupd = ] 3 count= ] unit-test
+{ 4 t } [ 0 { 1 1 3 4 } [ [ 1 + dup ] dip = ] 3 count= ] unit-test
+
 { SBUF" aco" SBUF" ftr"  } [ SBUF" factor" dup [ even? ] extract! ] unit-test
 
 { 25 5 1 } [ { 4 5 6 } [ sq ] [ 20 > ] find-pred ] unit-test
