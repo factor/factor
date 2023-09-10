@@ -2,7 +2,7 @@
 ! See https:!factorcode.org/license.txt for BSD license.
 ! A port of https://github.com/raysan5/raylib/blob/master/examples/models/models_rlgl_solar_system.c
 USING: accessors classes.struct kernel math math.functions
-math.trig ranges raylib rlgl sequences combinators.extras ;
+ranges raylib rlgl sequences combinators.extras ;
 IN: rlgl.demo
 
 ! Some raylib combinators

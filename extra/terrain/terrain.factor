@@ -3,7 +3,7 @@
 USING: accessors arrays combinators combinators.short-circuit
 destructors game.input game.input.scancodes game.loop
 game.worlds grid-meshes grouping kernel literals math
-math.functions math.matrices.simd math.order math.trig
+math.functions math.matrices.simd math.order
 math.vectors math.vectors.simd noise opengl
 opengl.capabilities opengl.gl opengl.shaders opengl.textures
 sequences specialized-arrays terrain.generation terrain.shaders
