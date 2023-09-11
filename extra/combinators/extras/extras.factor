@@ -28,13 +28,8 @@ MACRO: cond-case ( assoc -- quot )
 MACRO: sequence-case ( assoc -- quot )
     [
         dup callable? [
-            [
-                first {
-                    { [ dup set? ] [ [ in? ] ] }
-                    { [ dup sequence? ] [ [ member? ] ] }
-                    [ [ = ] ]
-                } cond '[ dup _ @ ]
-            ] [ second '[ drop @ ] ] bi 2array
+            [ first dup set? [ in? ] [ = ] ? '[ dup _ @ ] ]
+            [ second '[ drop @ ] ] bi 2array
         ] unless
     ] map [ cond ] curry ;
 
