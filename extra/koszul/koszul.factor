@@ -18,8 +18,7 @@ IN: koszul
         [ 1array >alt ]
     } cond ;
 
-: canonicalize ( assoc -- assoc' )
-    [ nip zero? ] assoc-reject ;
+: canonicalize ( assoc -- assoc' ) [ zero? ] reject-values ;
 
 SYMBOL: terms
 

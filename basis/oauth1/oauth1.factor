@@ -60,21 +60,22 @@ nonce ;
         ] bi
     ] H{ } make ; inline
 
-! Checksum all the params but only return the oauth_ params for use in the auth header.
+! Checksum all the params but only return the oauth_ params for
+! use in the auth header.
 ! See https://github.com/factor/factor/issues/2487
 :: sign-params ( url request-method consumer-token request-token params -- oauth-params )
     params sort-keys :> params
     url request-method params signature-base-string :> sbs
-    consumer-token secret>> request-token dup [ secret>> ] when hmac-key :> key
+    consumer-token secret>> request-token dup [ secret>> ] when
+    hmac-key :> key
     sbs key sha1 hmac-bytes >base64 >string :> signature
     params { "oauth_signature" signature } prefix
-    [ drop "oauth_" head? ] assoc-filter ;
+    [ "oauth_" head? ] filter-keys ;
 
 : extract-user-data ( assoc -- assoc' )
     [
-        drop
         { "oauth_token" "oauth_token_secret" } member? not
-    ] assoc-filter ;
+    ] filter-keys ;
 
 : parse-token ( response data -- token )
     nip

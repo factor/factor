@@ -10,7 +10,7 @@ IN: cgi
 <PRIVATE
 
 : query-string ( string -- assoc )
-    query>assoc [ nip ] assoc-filter [
+    query>assoc sift-values [
         [ [ CHAR: \s = ] trim ]
         [ dup string? [ 1array ] when ] bi*
     ] assoc-map ;

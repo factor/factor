@@ -45,7 +45,7 @@ M: all holidays drop (holidays) ;
     [
         [ clone ] dip
         [ drop ] [ holiday-assoc ] 2bi swap
-        '[ drop _ same-day? ] assoc-filter values
+        '[ _ same-day? ] filter-keys values
     ] keep '[ _ swap "holiday" word-prop at ] map ;
 
 HOLIDAY: armistice-day november 11 >>day ;

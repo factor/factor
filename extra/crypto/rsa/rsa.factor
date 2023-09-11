@@ -27,11 +27,7 @@ CONSTANT: public-key 65537
     ! Loop until phi is not divisible by the public key.
     dup rsa-primes [ * ] 2keep
     [ 1 - ] bi@ *
-    dup public-key coprime? [
-        rot drop
-    ] [
-        2drop modulus-phi
-    ] if ;
+    dup public-key coprime? [ nipd ] [ 2drop modulus-phi ] if ;
 
 PRIVATE>
 

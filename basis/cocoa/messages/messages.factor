@@ -254,7 +254,7 @@ ERROR: no-objc-type name ;
     objc-methods get >alist
     [ first CHAR: . swap member? ] filter
     [ first "." split1 nip ] collect-by
-    [ nip values members length 1 > ] assoc-filter ;
+    [ values members length 1 > ] filter-values ;
 
 : method-count ( class -- c-direct-array )
     0 uint <ref> [ class_copyMethodList (free) ] keep uint deref ;

@@ -123,7 +123,7 @@ IN: tools.deploy.shaker
     "Stripping word properties" show
     swap '[
         [
-            [ drop _ member? ] assoc-reject sift-values
+            [ _ member? ] reject-keys sift-values
             >alist f like
         ] change-props drop
     ] each ;
@@ -257,7 +257,7 @@ IN: tools.deploy.shaker
                 dup array? [
                     [
                         2 group
-                        [ drop _ in? ] assoc-reject
+                        [ _ in? ] reject-keys
                         concat
                     ] map
                 ] when

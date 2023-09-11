@@ -14,7 +14,7 @@ CONSTANT: ignored-resources {
 }
 
 : filter-flaky-resources ( seq -- seq' )
-    [ drop unparse ignored-resources member? ] assoc-reject ;
+    [ unparse ignored-resources member? ] reject-keys ;
 
 ! Allow testing without calling exit
 : zealot-help-lint ( exit? -- )

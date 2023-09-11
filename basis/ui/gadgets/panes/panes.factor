@@ -303,10 +303,10 @@ MEMO:: specified-font ( name style size foreground background -- font )
 
 : remove-paragraph-styles ( style -- style' )
     [
-        drop HS{
+        HS{
             wrap-margin border-color page-color inset presented
         } in?
-    ] assoc-reject ;
+    ] reject-keys ;
 
 TUPLE: styled-pane < pane style ;
 
