@@ -22,7 +22,6 @@ M: unix hosts-path "/etc/hosts" ;
 MEMO: system-hosts ( -- hosts ) hosts-path parse-hosts ;
 
 : host>ips ( host -- ips )
-    system-hosts [ member? nip ] with assoc-filter keys ;
+    system-hosts [ member? ] with filter-values keys ;
 
-: ip>hosts ( ip -- hosts )
-    system-hosts at ;
+: ip>hosts ( ip -- hosts ) system-hosts at ;

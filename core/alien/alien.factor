@@ -124,7 +124,7 @@ TUPLE: expiry-check object alien ;
     [ alien>> expired? ] [ t ] if* ;
 
 : delete-values ( value assoc -- )
-    [ rot drop = ] with assoc-reject! drop ;
+    [ nipd = ] with assoc-reject! drop ;
 
 PRIVATE>
 

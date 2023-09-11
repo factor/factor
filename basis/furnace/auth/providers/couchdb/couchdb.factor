@@ -112,12 +112,10 @@ TUPLE: couchdb-auth-provider
     url>user ;
 
 : strip-hash ( hash1 -- hash2 )
-    [ drop first CHAR: _ = ] assoc-reject ;
+    [ first CHAR: _ = ] reject-keys ;
 
-: at-or-k ( key hash -- newkey )
-    ?at drop ;
-: value-at-or-k ( key hash -- newkey )
-    ?value-at drop ;
+: at-or-k ( key hash -- newkey ) ?at drop ;
+: value-at-or-k ( key hash -- newkey ) ?value-at drop ;
 
 : map-fields-forward ( assoc field-map -- assoc )
     [ swapd at-or-k swap ] curry assoc-map ;

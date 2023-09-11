@@ -5,7 +5,7 @@ sorting splitting vectors ;
 IN: sequences.extras
 
 : find-all ( ... seq quot: ( ... elt -- ... ? ) -- ... elts )
-    [ <enumerated> ] dip '[ nip @ ] assoc-filter ; inline
+    [ <enumerated> ] dip '[ @ ] filter-values ; inline
 
 :: subseq* ( from to seq -- subseq )
     seq length :> len

@@ -335,3 +335,46 @@ M: enumerated length seq>> length ; inline
 M: enumerated nth-unsafe dupd seq>> nth-unsafe 2array ; inline
 
 INSTANCE: enumerated immutable-sequence
+
+: any-key? ( ... assoc quot: ( ... key -- ... ? ) -- ... ? )
+    [ drop ] prepose assoc-find 2nip ; inline
+
+: any-value? ( ... assoc quot: ( ... value -- ... ? ) -- ... ? )
+    [ nip ] prepose assoc-find 2nip ; inline
+
+: all-keys? ( ... assoc quot: ( ... key -- ... ? ) -- ... ? )
+    [ not ] compose any-key? not ; inline
+
+: all-values? ( ... assoc quot: ( ... value -- ... ? ) -- ... ? )
+    [ not ] compose any-value? not ; inline
+
+: assoc-reduce ( ... assoc identity quot: ( ... prev key value -- next ) -- ... result )
+    [ >alist ] 2dip [ first2 ] prepose reduce ; inline
+
+: reduce-keys ( ... assoc identity quot: ( ... prev elt -- ... next ) -- ... result )
+    [ drop ] prepose assoc-reduce ; inline
+
+: reduce-values ( ... assoc identity quot: ( ... prev elt -- ... next ) -- ... result )
+    [ nip ] prepose assoc-reduce ; inline
+
+: sum-keys ( assoc -- n ) 0 [ + ] reduce-keys ; inline
+
+: sum-values ( assoc -- n ) 0 [ + ] reduce-values ; inline
+
+: map-keys ( assoc quot: ( key -- key' ) -- assoc )
+    '[ _ dip ] assoc-map ; inline
+
+: map-values ( assoc quot: ( value -- value' ) -- assoc )
+    '[ swap _ dip swap ] assoc-map ; inline
+
+: filter-keys ( assoc quot: ( key -- ? ) -- assoc' )
+    '[ drop @ ] assoc-filter ; inline
+
+: filter-values ( assoc quot: ( value -- ? ) -- assoc' )
+    '[ nip @ ] assoc-filter ; inline
+
+: reject-keys ( assoc quot: ( key -- ? ) -- assoc' )
+    '[ drop @ ] assoc-reject ; inline
+
+: reject-values ( assoc quot: ( value -- ? ) -- assoc' )
+    '[ nip @ ] assoc-reject ; inline

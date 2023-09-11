@@ -16,7 +16,7 @@ generic-call-site-crossref [ H{ } clone ] initialize
     compiled-crossref get at ;
 
 : dependencies-of ( word dep-type -- assoc )
-    [ all-dependencies-of ] dip '[ nip _ dependency>= ] assoc-filter ;
+    [ all-dependencies-of ] dip '[ _ dependency>= ] filter-values ;
 
 : outdated-definition-usages ( set -- assocs )
     filter-word-defs [ +definition+ dependencies-of ] map ;
@@ -31,7 +31,7 @@ generic-call-site-crossref [ H{ } clone ] initialize
 : outdated-conditional-usages ( set -- assocs )
     members H{ } clone '[
         +conditional+ dependencies-of
-        [ drop _ dependencies-satisfied? ] assoc-reject
+        [ _ dependencies-satisfied? ] reject-keys
     ] map ;
 
 : generic-call-sites-of ( word -- assoc )
@@ -44,7 +44,7 @@ generic-call-site-crossref [ H{ } clone ] initialize
     concat f like "generic-call-sites" set-word-prop ;
 
 : store-dependencies-of-type ( word assoc symbol prop-name -- )
-    [ rot '[ nip _ = ] assoc-filter keys ] dip set-word-prop ;
+    [ rot '[ _ = ] filter-values keys ] dip set-word-prop ;
 
 : store-dependencies ( word assoc -- )
     keys "dependencies" set-word-prop ;

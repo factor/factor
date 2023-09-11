@@ -26,7 +26,7 @@ TUPLE: hashtable
     [ 3dup swap array-nth ] dip over +empty+ eq?
     [ 4drop no-key ] [
         [ = ] dip swap
-        [ drop rot drop t ]
+        [ roll 2drop t ]
         [ probe (key@) ]
         if
     ] if ; inline recursive
