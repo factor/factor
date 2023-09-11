@@ -19,24 +19,22 @@ PRIVATE>
 
 MACRO: cond-case ( assoc -- quot )
     [
-        dup callable? not [
+        dup callable? [
             [ first '[ dup @ ] ]
             [ second '[ drop @ ] ] bi 2array
-        ] when
+        ] unless
     ] map '[ _ cond ] ;
-
-<PRIVATE
-GENERIC: sequence-case-contains? ( elt obj -- ? )
-M: object sequence-case-contains? = ;
-M: sequence sequence-case-contains? member? ;
-M: sets:set sequence-case-contains? in? ;
-PRIVATE>
 
 MACRO: sequence-case ( assoc -- quot )
     [
         dup callable? [
-            [ first '[ dup _ sequence-case-contains? ] ]
-            [ second '[ drop @ ] ] bi 2array
+            [
+                first {
+                    { [ dup set? ] [ [ in? ] ] }
+                    { [ dup sequence? ] [ [ member? ] ] }
+                    [ [ = ] ]
+                } cond '[ dup _ @ ]
+            ] [ second '[ drop @ ] ] bi 2array
         ] unless
     ] map [ cond ] curry ;
 
