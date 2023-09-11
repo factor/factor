@@ -86,7 +86,7 @@ M: string coverage
 
 M: word coverage
     "coverage" word-prop
-    [ drop executed?>> ] assoc-reject values ;
+    [ executed?>> ] reject-keys values ;
 
 GENERIC: coverage. ( object -- )
 

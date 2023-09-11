@@ -50,7 +50,7 @@ QUALIFIED: opencl
 : base-pointer-groups-decoded ( word -- seq )
     word>gc-maps [
         second second [ swap 2array ] map-index
-        [ nip -1 = ] assoc-reject
+        [ -1 = ] reject-values
     ] map ;
 
 ! byte-array>bit-array

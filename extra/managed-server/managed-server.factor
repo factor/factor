@@ -28,7 +28,7 @@ M: managed-server handle-client-disconnect ;
 : client-streams ( -- assoc ) clients values ;
 : username ( -- string ) client username>> ;
 : everyone-else ( -- assoc )
-    clients [ drop username = ] assoc-reject ;
+    clients [ username = ] reject-keys ;
 : everyone-else-streams ( -- assoc ) everyone-else values ;
 
 ERROR: no-such-client username ;

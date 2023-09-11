@@ -20,7 +20,7 @@ M: singleton-class component-tag
     bi* ;
 
 : compile-component-attrs ( tag class -- )
-    [ attrs>> [ drop main>> "name" = ] assoc-reject ] dip
+    [ attrs>> [ main>> "name" = ] reject-keys ] dip
     [ all-slots swap '[ name>> _ at compile-attr ] each ]
     [ [ boa ] [code-with] ]
     bi ;

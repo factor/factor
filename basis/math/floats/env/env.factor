@@ -53,8 +53,8 @@ HOOK: (fp-env-registers) cpu ( -- registers )
 
 : fp-env-register ( -- register ) (fp-env-registers) first ;
 
-:: mask> ( bits assoc -- symbols )
-    assoc [| k v | bits v mask zero? ] assoc-reject keys ;
+: mask> ( bits assoc -- symbols )
+    [ mask zero? ] with reject-values keys ;
 : >mask ( symbols assoc -- bits )
     over empty?
     [ 2drop 0 ]

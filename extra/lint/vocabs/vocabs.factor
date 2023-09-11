@@ -198,11 +198,8 @@ DEFER: next-token
 : no-vocab-found ( name -- empty )
     { } 2array ;
 
-: [is-used?] ( hash-set  -- quot )
-    '[ nip [ _ in? ] any? ] ; inline
-
 : reject-unused-vocabs ( assoc hash-set -- seq )
-    [is-used?] assoc-reject keys ;
+    '[ [ _ in? ] any? ] reject-values keys ;
 
 :: print-new-header ( seq -- )
     "Use the following header to remove unused imports: " print

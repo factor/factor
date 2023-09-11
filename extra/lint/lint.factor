@@ -32,6 +32,7 @@ CONSTANT: manual-substitutions
         { spin [ swap rot ] }
         { >boolean [ f = not ] }
         { keep [ over [ call ] dip ] }
+        { nipd [ rot drop ] }
     }
 
 CONSTANT: trivial-defs
@@ -248,7 +249,7 @@ SYMBOL: lint-definitions-keys
     [ keys lint-definitions-keys set-global ] bi ;
 
 : find-duplicates ( -- seq )
-    lint-definitions get-global [ nip length 1 > ] assoc-filter ;
+    lint-definitions get-global [ length 1 > ] filter-values ;
 
 GENERIC: lint ( obj -- seq )
 
@@ -284,9 +285,9 @@ GENERIC: run-lint ( obj -- obj )
 
 : filter-symbols ( alist -- alist )
     [
-        nip first dup lint-definitions get-global at
+        first dup lint-definitions get-global at
         [ first ] bi@ literalize = not
-    ] assoc-filter ;
+    ] filter-values ;
 
 M: sequence run-lint ( seq -- seq )
     [ lint ] zip-with trim-self

@@ -427,7 +427,7 @@ ERROR: repeated-parent-hash hash ;
     ] with-variable ;
 
 : filter-git-remotes ( seq -- seq' )
-    [ drop "remote" head? ] assoc-filter ;
+    [ "remote" head? ] filter-keys ;
 
 : github-git-remote? ( hash -- ? )
     "url" of [ CHAR: / = ] trim-tail "git@github.com:" head? ;
@@ -454,10 +454,10 @@ ERROR: repeated-parent-hash hash ;
     git-config-path utf8 file-contents string>ini >alist ;
 
 : has-any-git-at-urls? ( git-ini -- ? )
-    [ nip github-git-remote? ] assoc-any? ;
+    [ github-git-remote? ] any-value? ;
 
 : has-remote-repo? ( git-ini owner repo -- ? )
-    '[ nip _ _ git-remote-matches? ] assoc-filter f like ;
+    '[ _ _ git-remote-matches? ] filter-values f like ;
 
 : write-git-config ( seq -- )
     ini>string git-config-path utf8 set-file-contents ;

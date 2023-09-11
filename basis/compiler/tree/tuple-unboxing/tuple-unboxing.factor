@@ -162,5 +162,5 @@ M: #alien-callback unbox-tuples* ;
 
 : unbox-tuples ( nodes -- nodes )
     allocations get escaping-allocations get
-    [ nip key? ] curry assoc-all?
+    [ key? ] curry all-values?
     [ [ unbox-tuples* ] map-nodes ] unless ;

@@ -40,7 +40,7 @@ PRIVATE>
 : purge-cache ( cache -- )
     dup [ assoc>> ] [ max-age>> ] bi V{ } clone [
         '[
-            nip dup age>> 1 + [ >>age ] keep
+            dup age>> 1 + [ >>age ] keep
             _ < [ drop t ] [ _ dispose-to f ] if
-        ] assoc-filter >>assoc drop 
+        ] filter-values >>assoc drop 
     ] keep [ last rethrow ] unless-empty ;

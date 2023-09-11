@@ -32,7 +32,7 @@ IN: project-euler.164
 PRIVATE>
 
 : euler164 ( -- answer )
-    init-table 19 [ next-table ] times values sum ;
+    init-table 19 [ next-table ] times sum-values ;
 
 ! [ euler164 ] 100 ave-time
 ! 7 ms ave run time - 1.23 SD (100 trials)
