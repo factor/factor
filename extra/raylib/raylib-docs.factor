@@ -3,6 +3,25 @@
 USING: help.markup help.syntax kernel quotations urls ;
 IN: raylib
 
+<PRIVATE
+: $related-subsections ( element -- )
+    [ related-words ] [ $subsections ] bi ;
+
+: $enum-members ( element -- )
+    "Enum members" $heading $related-subsections ;
+
+: $raylib-color ( element -- )
+    "Word description" $heading
+    { { "value" Color } } $values
+    "Represents the color (" print-element print-element ")" print-element
+    "\n\n" print-element
+    "For a visual guide, see the following:\n" print-element
+    { "https://raw.githubusercontent.com/raysan5/raylib/master/examples/shapes/shapes_colors_palette.png" }
+        $url ;
+
+
+PRIVATE>
+
 HELP: &unload-audio-stream
 { $values
     { "alien" object }
@@ -522,8 +541,8 @@ HELP: BlendMode
 { $var-description 
     A C-enum holding the OpenGL texture blend modes.
 
-    See the following words for more information:
-    { $links 
+    
+    { $enum-members 
         BLEND_ALPHA
         BLEND_ADDITIVE
         BLEND_MULTIPLIED
@@ -677,7 +696,7 @@ HELP: CameraMode
 { $var-description 
     The various modes a camera can behave in Raylib.
 
-    { $see-also 
+    { $enum-members
         CAMERA_CUSTOM
         CAMERA_FREE
         CAMERA_ORBITAL
@@ -693,7 +712,8 @@ HELP: Color
     Represents a RGBA color with 8-bit unsigned components.
     Raylibe comes with 25 default colors.
     
-    { $see-also 
+    { $heading Builtin colors }
+    { $related-subsections 
         LIGHTGRAY 
         GRAY 
         DARKGRAY 
@@ -725,7 +745,7 @@ HELP: ConfigFlags
 { $var-description 
     An enum representing the configuration flags raylib has
      
-    { $see-also 
+    { $enum-members
         FLAG_VSYNC_HINT
         FLAG_FULLSCREEN_MODE
         FLAG_WINDOW_RESIZABLE
@@ -747,7 +767,7 @@ HELP: CubemapLayout
 { $var-description
     Represents the layout a cube map is using.
 
-    { $see-also 
+    { $enum-members
         CUBEMAP_LAYOUT_AUTO_DETECT
         CUBEMAP_LAYOUT_LINE_VERTICAL
         CUBEMAP_LAYOUT_LINE_HORIZONTAL
@@ -757,70 +777,11 @@ HELP: CubemapLayout
     }    
 } ;
 
-HELP: DARKBLUE
-{ $values
-    { "value" Color }
-}
-{ $description
-    Represents the RGBA color (0, 82, 172, 255).
-
-    
-    See, the following reference for a visual guide:
-    
-    { $url "https://raw.githubusercontent.com/raysan5/raylib/master/examples/shapes/shapes_colors_palette.png" }
-} ;
-
-HELP: DARKBROWN
-{ $values
-    { "value" Color }
-}
-{ $description
-    Represents the RGBA color (76, 63, 47, 255).
-
-    
-    See, the following reference for a visual guide:
-    
-    { $url "https://raw.githubusercontent.com/raysan5/raylib/master/examples/shapes/shapes_colors_palette.png" }
-} ;
-
-HELP: DARKGRAY
-{ $values
-    { "value" Color }
-}
-{ $description
-    Represents the RGBA color (80, 80, 80, 255).
-
-    
-    See, the following reference for a visual guide:
-    
-    { $url "https://raw.githubusercontent.com/raysan5/raylib/master/examples/shapes/shapes_colors_palette.png" }
-} ;
-
-HELP: DARKGREEN
-{ $values
-    { "value" Color }
-}
-{ $description
-    Represents the RGBA color (0, 117, 44, 255).
-
-    
-    See, the following reference for a visual guide:
-    
-    { $url "https://raw.githubusercontent.com/raysan5/raylib/master/examples/shapes/shapes_colors_palette.png" }
-} ;
-
-HELP: DARKPURPLE
-{ $values
-    { "value" Color }
-}
-{ $description
-    Represents the RGBA color (112, 31, 126, 255).
-
-    
-    See, the following reference for a visual guide:
-    
-    { $url "https://raw.githubusercontent.com/raysan5/raylib/master/examples/shapes/shapes_colors_palette.png" }
-} ;
+HELP: DARKBLUE   { $raylib-color "0, 82, 172, 255" } ;
+HELP: DARKBROWN  { $raylib-color "76, 63, 47, 255" } ;
+HELP: DARKGRAY   { $raylib-color "80, 80, 80, 255" } ;
+HELP: DARKGREEN  { $raylib-color "0, 117, 44, 255" } ;
+HELP: DARKPURPLE { $raylib-color "112, 31, 126, 255" } ;
 
 HELP: FLAG_FULLSCREEN_MODE
 { $class-description 
@@ -892,42 +853,100 @@ HELP: FLAG_WINDOW_UNFOCUSED
 { $class-description
     Setting this flag will set the window to be unfocused.
 } ;
-! TODO: more docs
+
 HELP: FONT_BITMAP
-{ $class-description "" } ;
+{ $class-description 
+    Bitmap font generation without anti-aliasing.
+} ;
 
 HELP: FONT_DEFAULT
-{ $class-description "" } ;
+{ $class-description
+    Default font generation with anti-aliasing.
+} ;
 
 HELP: FONT_SDF
-{ $class-description "" } ;
+{ $class-description 
+    SDF font generation. Requires an external shader.
+} ;
 
 HELP: FilePathList
-{ $class-description "" } ;
+{ $class-description
+    A list of file paths returned from \ load-directory-files ,
+    \ load-directory-files-ex . Must be freed with 
+    \ unload-directory-files .
+
+    The fields are defined as followed:
+    { $list 
+        { { $snippet capacity } " the max number of entries." }
+        { { $snippet count } " the number of entries found." }
+        { { $snippet paths } " array of string where each member is a file path." }
+    }
+
+    { $see-also 
+        load-directory-files
+        load-directory-files-ex
+        unload-directory-files
+    }
+} ;
 
 HELP: Font
-{ $class-description "" } ;
+{ $class-description 
+    Represents a collections of glyphs that can be drawn to the screen. 
+    The fields are defined as followed:
+
+    { $list
+        { { $snippet baseSize     } { " the base size of the characters. This is how tall a glyph is." } }
+        { { $snippet glyphCount   } { " the number of glyph characters." } }
+        { { $snippet glyphPadding } { " the padding around each glyph." } }
+        { { $snippet texture      } { " the texture atlas continaing the glyphs." } }
+        { { $snippet recs         } { " an array of rectangles used to find each glyph in " { $snippet texture } "." } }
+        { { $snippet glyphs       } { " metadata about each glyph." } }
+    }
+
+} ;
 
 HELP: FontType
-{ $var-description "" } ;
+{ $var-description 
+    A C-enum defining the various font generation methods in Raylib.
+
+    { $enum-members
+        FONT_DEFAULT
+        FONT_BITMAP
+        FONT_SDF
+    }
+} ;
 
 HELP: GAMEPAD_AXIS_LEFT_TRIGGER
-{ $class-description "" } ;
+{ $class-description 
+    Represents the left gamepad trigger. Trigger has the value 
+    range [1..-1]. 
+} ;
 
 HELP: GAMEPAD_AXIS_LEFT_X
-{ $class-description "" } ;
+{ $class-description 
+    Represents the left gamepad stick and its tilt on the X axis (left/right).
+} ;
 
 HELP: GAMEPAD_AXIS_LEFT_Y
-{ $class-description "" } ;
+{ $class-description 
+    Represents the left gamepad stick and its tilt on the Y axis (up/down).
+} ;
 
 HELP: GAMEPAD_AXIS_RIGHT_TRIGGER
-{ $class-description "" } ;
+{ $class-description 
+    Represents the left gamepad trigger. Trigger has the value
+    range [1..-1].
+} ;
 
 HELP: GAMEPAD_AXIS_RIGHT_X
-{ $class-description "" } ;
+{ $class-description 
+    Represents the right gamepad stick and its tilt on the X axis (left/right).
+} ;
 
 HELP: GAMEPAD_AXIS_RIGHT_Y
-{ $class-description "" } ;
+{ $class-description
+    Represents the right gamepad stick and its tilt on the Y axis (up/down).
+} ;
 
 HELP: GAMEPAD_BUTTON_LEFT_FACE_DOWN
 { $class-description "" } ;
@@ -1016,26 +1035,24 @@ HELP: GESTURE_SWIPE_UP
 HELP: GESTURE_TAP
 { $class-description "" } ;
 
-HELP: GOLD
-{ $values
-    { "value" object }
-}
-{ $description "" } ;
-
-HELP: GRAY
-{ $values
-    { "value" object }
-}
-{ $description "" } ;
-
-HELP: GREEN
-{ $values
-    { "value" object }
-}
-{ $description "" } ;
+HELP: GOLD { $raylib-color "255, 203, 0, 255" } ;
+HELP: GRAY { $raylib-color "130, 130, 130, 255" } ;
+HELP: GREEN { $raylib-color "0, 228, 48, 255" } ;
 
 HELP: GamepadAxis
-{ $var-description "" } ;
+{ $var-description 
+    Contains a set of flags for each axis a gamepad may have. Raylib 
+    supports controllers with two triggers and two joysticks.
+
+    { $enum-members 
+        GAMEPAD_AXIS_LEFT_X              
+        GAMEPAD_AXIS_LEFT_Y                
+        GAMEPAD_AXIS_RIGHT_X               
+        GAMEPAD_AXIS_RIGHT_Y               
+        GAMEPAD_AXIS_LEFT_TRIGGER 
+        GAMEPAD_AXIS_RIGHT_TRIGGER
+    }
+} ;
 
 HELP: GamepadButton
 { $var-description "" } ;
@@ -1669,27 +1686,27 @@ HELP: Quaternion
 
 HELP: RAYLIB_VERSION
 { $values
-    { "value" object }
+    { "value" string }
 }
-{ $description "" } ;
+{ $description "A string representing the current version of raylib." } ;
 
 HELP: RAYLIB_VERSION_MAJOR
 { $values
-    { "value" object }
+    { "value" fixnum }
 }
-{ $description "" } ;
+{ $description "The current major version of raylib." } ;
 
 HELP: RAYLIB_VERSION_MINOR
 { $values
-    { "value" object }
+    { "value" fixnum }
 }
-{ $description "" } ;
+{ $description "The current minor version of raylib." } ;
 
 HELP: RAYLIB_VERSION_PATCH
 { $values
-    { "value" object }
+    { "value" fixnum }
 }
-{ $description "" } ;
+{ $description "The current patch version of raylib." } ;
 
 HELP: RAYWHITE
 { $values
