@@ -58,7 +58,7 @@ TUPLE: parts in out ;
                 _ swap '[ _ get-transitions ] assoc-map
                 harvest-values
             ] [
-                [ drop tagged-epsilon? ] assoc-filter
+                [ tagged-epsilon? ] filter-keys
             ] bi H{ } assoc-union-as
         ] assoc-map
     ] change-transitions ;

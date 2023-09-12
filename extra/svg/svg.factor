@@ -1,7 +1,7 @@
 ! (c)2009 Joe Groff, see BSD license
 
 USING: accessors arrays assocs kernel math
-math.affine-transforms math.functions math.parser math.trig
+math.affine-transforms math.functions math.parser
 peg.ebnf sequences sequences.squish splitting strings xml.data
 xml.syntax multiline ;
 

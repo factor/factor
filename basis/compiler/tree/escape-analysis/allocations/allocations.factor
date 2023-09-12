@@ -110,7 +110,7 @@ SYMBOL: escaping-allocations
 
 : compute-escaping-allocations ( -- )
     allocations get escaping-values get
-    '[ drop _ (escaping-value?) ] assoc-filter
+    '[ _ (escaping-value?) ] filter-keys
     escaping-allocations set ;
 
 : escaping-allocation? ( value -- ? )

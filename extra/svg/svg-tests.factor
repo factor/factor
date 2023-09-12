@@ -1,6 +1,6 @@
 ! (c)2009 Joe Groff, see BSD license
 USING: accessors literals math math.affine-transforms
-math.functions math.trig multiline sequences svg tools.test xml
+math.functions multiline sequences svg tools.test xml
 xml.traversal ;
 IN: svg.tests
 

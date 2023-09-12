@@ -27,7 +27,7 @@ M: arm.64 %load-immediate ( reg val -- )
     [ XZR MOVr ] [
         { 0 1 2 3 } [
             tuck -16 * shift 0xffff bitand
-        ] with map>alist [ nip 0 = ] assoc-reject
+        ] with map>alist [ 0 = ] reject-values
         unclip
         overd first2 rot MOVZ
         [ first2 rot MOVK ] with each

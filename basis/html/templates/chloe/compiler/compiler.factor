@@ -7,10 +7,10 @@ xml.data xml.entities xml.writer ;
 IN: html.templates.chloe.compiler
 
 : chloe-attrs-only ( assoc -- assoc' )
-    [ drop chloe-name? ] assoc-filter ;
+    [ chloe-name? ] filter-keys ;
 
 : non-chloe-attrs-only ( assoc -- assoc' )
-    [ drop chloe-name? ] assoc-reject ;
+    [ chloe-name? ] reject-keys ;
 
 : chloe-tag? ( tag -- ? )
     dup xml? [ body>> ] when

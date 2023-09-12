@@ -158,7 +158,7 @@ PRIVATE>
     [ total-time>> ] same? ;
 
 : trim-flat ( root-node -- root-node' )
-    dup '[ [ nip _ redundant-flat-node? ] assoc-reject ] change-children ;
+    dup '[ [ _ redundant-flat-node? ] reject-values ] change-children ;
 
 PRIVATE>
 

@@ -1,6 +1,6 @@
 ! Copyright (c) 2012 Anonymous
 ! See https://factorcode.org/license.txt for BSD license.
-USING: arrays kernel math math.functions math.trig
+USING: arrays kernel math math.functions
 math.vectors sequences ;
 IN: rosetta-code.haversine-formula
 

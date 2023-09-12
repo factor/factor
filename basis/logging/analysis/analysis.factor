@@ -52,7 +52,7 @@ SYMBOL: message-histogram
 
 : analysis. ( errors word-histogram message-histogram -- )
     nl "==== FREQUENT MESSAGES:" print nl
-    "Total: " write dup values sum . nl
+    "Total: " write dup sum-values . nl
     [
         [ first name>> write bl ]
         [ second write ": " write ]

@@ -1139,9 +1139,15 @@ M: repetition sum [ elt>> ] [ length>> ] bi * ; inline
 
 : product ( seq -- n ) 1 [ * ] binary-reduce ;
 
-: infimum ( seq -- elt ) [ ] [ min ] map-reduce ;
+GENERIC: infimum ( seq -- elt )
+M: object infimum [ ] [ min ] map-reduce ;
+M: iota infimum first ;
+M: reversed infimum seq>> infimum ;
 
-: supremum ( seq -- elt ) [ ] [ max ] map-reduce ;
+GENERIC: supremum ( seq -- elt )
+M: object supremum [ ] [ max ] map-reduce ;
+M: iota supremum last ;
+M: reversed supremum seq>> supremum ;
 
 : map-sum ( ... seq quot: ( ... elt -- ... n ) -- ... n )
     [ 0 ] 2dip [ dip + ] curry [ swap ] prepose each ; inline

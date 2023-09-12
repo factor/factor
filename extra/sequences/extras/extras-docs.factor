@@ -681,6 +681,14 @@ HELP: count-tail
 }
 { $description "Count the number of values from the end of " { $snippet "seq" } " that return a truthy value when passed into " { $snippet "quot" } "." } ;
 
+HELP: count=
+{ $values
+    { "seq" sequence } { "quot" quotation } { "n" integer }
+    { "?" boolean }
+}
+{ $description "Returns " { $link t } " if the sequence has exactly " { $snippet "n" } " elements where " { $snippet "quot" } " returns true, otherwise returns " { $link f } "." } ;
+
+
 HELP: cut-when
 { $values
     { "seq" sequence } { "quot" quotation }
@@ -1251,9 +1259,20 @@ HELP: shorten*
 
 HELP: sift!
 { $values
-    { "seq" sequence }
-    { "newseq" sequence }
-} ;
+    { "seq" { "a resizable mutable " { $link sequence } } }
+    { "seq'" { "a resizable mutable " { $link sequence } } }
+}
+{ $description "Removes all instances of " { $link f } " from a sequence." }
+{ $notes "The sequence " { $snippet "seq" } " MUST be growable. See " { $link "growable" } "." }
+{ $side-effects "seq" }
+{ $examples
+    { $example
+        "USING: prettyprint sequences.extras ;"
+        "V{ 2 f \"a\" f { } f } sift! ."
+        "V{ 2 \"a\" { } }"
+    }
+}
+{ $see-also sift filter! filter harvest! harvest } ;
 
 HELP: sift-as
 { $values

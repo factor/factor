@@ -32,8 +32,7 @@ IN: rosettacode.anagrams-deranged
         ] each
     ] keep ;
 
-: anagrams ( hash -- seq )
-    [ nip length 1 > ] assoc-filter values ;
+: anagrams ( hash -- seq ) [ length 1 > ] filter-values values ;
 
 : deranged-anagrams ( path -- seq )
     parse-dict-file anagrams [ derangements ] map concat ;

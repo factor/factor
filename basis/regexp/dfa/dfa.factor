@@ -13,7 +13,7 @@ IN: regexp.dfa
     new-question old-value = [
         new-question state table set-at
         state nfa transitions>> at
-        [ drop tagged-epsilon? ] assoc-filter
+        [ tagged-epsilon? ] filter-keys
         [| trans to |
             to [
                 table nfa

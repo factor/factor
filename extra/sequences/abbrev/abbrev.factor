@@ -16,4 +16,4 @@ PRIVATE>
     ] keep ;
 
 : unique-abbrev ( seqs -- assoc )
-    abbrev [ nip length 1 = ] assoc-filter ;
+    abbrev [ length 1 = ] filter-values ;

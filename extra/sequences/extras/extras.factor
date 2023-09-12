@@ -5,7 +5,7 @@ sorting splitting vectors ;
 IN: sequences.extras
 
 : find-all ( ... seq quot: ( ... elt -- ... ? ) -- ... elts )
-    [ <enumerated> ] dip '[ nip @ ] assoc-filter ; inline
+    [ <enumerated> ] dip '[ @ ] filter-values ; inline
 
 :: subseq* ( from to seq -- subseq )
     seq length :> len
@@ -498,7 +498,7 @@ PRIVATE>
 : sift-as ( seq exemplar -- newseq )
     [ ] swap filter-as ;
 
-: sift! ( seq -- newseq )
+: sift! ( seq -- seq' )
     [ ] filter! ;
 
 : harvest-as ( seq exemplar -- newseq )
@@ -989,6 +989,11 @@ PRIVATE>
 : count-tail ( seq quot -- n )
     [ not ] compose [ find-last drop ] keepd
     length swap [ - 1 - ] when* ; inline
+
+: count= ( ... seq quot: ( ... elt -- ... ? ) n -- ... ? )
+    [ 0 ] 3dip [
+        '[ swap _ dip swap [ 1 + ] when dup _ > ] find 2drop
+    ] keep = ; inline
 
 :: shorten* ( vector n -- seq )
     vector n tail

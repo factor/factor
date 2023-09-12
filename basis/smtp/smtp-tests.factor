@@ -79,8 +79,8 @@ IN: smtp.tests
         {
             [
                 email>headers sort-keys [
-                    drop { "Date" "Message-Id" } member? not
-                ] assoc-filter
+                    { "Date" "Message-Id" } member? not
+                ] filter-keys
             ]
             [ to>> [ extract-email ] map ]
             [ from>> extract-email ]

@@ -8,7 +8,7 @@ IN: anagrams
 : make-anagram-hash ( strings -- assoc )
     [ sort ] collect-by
     [ members ] assoc-map
-    [ nip length 1 > ] assoc-filter ;
+    [ length 1 > ] filter-values ;
 
 MEMO: dict-words ( -- seq )
     "/usr/share/dict/words" ascii file-lines [ >lower ] map ;

@@ -115,7 +115,7 @@ M: word integer-op-input-classes
     [ [ dup 3array ] [ swap ?lookup-method ] 2bi ] with { } map>assoc
     sift-values
     [ def>> ] assoc-map
-    [ nip length 1 = ] assoc-filter
+    [ length 1 = ] filter-values
     [ first ] assoc-map % ;
 
 SYMBOL: math-ops
@@ -135,7 +135,7 @@ SYMBOL: fast-math-ops
     [ drop math-class-max swap method-for-class >boolean ] if ;
 
 : (derived-ops) ( word assoc -- words )
-    swap '[ swap first _ eq? nip ] assoc-filter ;
+    swap '[ first _ eq? ] filter-keys ;
 
 : derived-ops ( word -- words )
     [ 1array ] [ math-ops get (derived-ops) values ] bi append ;
@@ -150,11 +150,10 @@ SYMBOL: fast-math-ops
     [ math-ops get (derived-ops) ] [ fast-math-ops get (derived-ops) ] bi
     [
         [
-            drop
             [ second integer class<= ]
             [ third integer class<= ]
             bi and
-        ] assoc-filter values
+        ] filter-keys values
     ] bi@ append ;
 
 : each-derived-op ( word quot -- )

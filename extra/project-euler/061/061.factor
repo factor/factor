@@ -77,6 +77,6 @@ IN: project-euler.061
 : euler061 ( -- n )
     4-digit-polygons dup [ 8 = ] filter-keys [
         1array 6 find-cycle
-    ] with map-find drop values sum ;
+    ] with map-find drop sum-values ;
 
 SOLUTION: euler061

@@ -19,11 +19,19 @@ PRIVATE>
 
 MACRO: cond-case ( assoc -- quot )
     [
-        dup callable? not [
+        dup callable? [
             [ first '[ dup @ ] ]
             [ second '[ drop @ ] ] bi 2array
-        ] when
+        ] unless
     ] map '[ _ cond ] ;
+
+MACRO: sequence-case ( assoc -- quot )
+    [
+        dup callable? [
+            [ first dup set? [ in? ] [ = ] ? '[ dup _ @ ] ]
+            [ second '[ drop @ ] ] bi 2array
+        ] unless
+    ] map [ cond ] curry ;
 
 MACRO: cleave-array ( quots -- quot )
     dup length '[ _ cleave _ narray ] ;
