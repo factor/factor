@@ -123,7 +123,7 @@ DESTRUCTOR: cs_close
         { x86.64 [ CS_ARCH_X86 CS_MODE_64 ] }
         { arm.32 [ CS_ARCH_ARM CS_MODE_ARM ] }
         { arm.64 [ CS_ARCH_ARM64 CS_MODE_ARM ] }
-    } case B 0 csh <ref> [ cs_open CS_ERR_OK assert= ] keep ;
+    } case 0 csh <ref> [ cs_open CS_ERR_OK assert= ] keep ;
 
 : with-csh ( ..a quot: ( ..a csh -- ..b ) -- ..b )
     '[ <csh> &cs_close @ ] with-destructors ; inline
