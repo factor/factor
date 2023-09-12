@@ -1,7 +1,7 @@
 ! Copyright (C) 2008, 2010 Slava Pestov.
 ! See https://factorcode.org/license.txt for BSD license.
 USING: accessors arrays classes.algebra classes.tuple kernel
-math math.order sequences sequences.private sets sorting ;
+math math.order parser sequences sequences.private sets sorting ;
 IN: ranges
 
 TUPLE: range
@@ -132,3 +132,7 @@ M: range subset?
     over range?
     [ over empty? [ 2drop t ] [ dupd intersect-range = ] if ]
     [ call-next-method ] if ;
+
+SYNTAX: ..= dup pop scan-object [a..b] suffix! ;
+
+SYNTAX: ..< dup pop scan-object [a..b) suffix! ;
