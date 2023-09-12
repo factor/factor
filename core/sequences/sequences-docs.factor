@@ -1,5 +1,6 @@
 USING: arrays generic.single help.markup help.syntax kernel
-layouts math math.order quotations sequences.private vectors ;
+layouts math math.order multiline quotations sequences.private
+vectors ;
 IN: sequences
 
 HELP: sequence
@@ -9,13 +10,37 @@ HELP: sequence
 
 HELP: length
 { $values { "seq" sequence } { "n" "a non-negative integer" } }
-{ $contract "Outputs the length of the sequence. All sequences support this operation." } ;
+{ $contract "Outputs the length of the sequence. All sequences support this operation." }
+{ $examples
+    [=[
+        USING: prettyprint sequences ;
+        { 1 "a" { 2 3 } f } length .
+        4
+    ]=]
+    [=[
+        USING: prettyprint sequences ;
+        "Hello, world!" length .
+        13
+    ]=]
+} ;
 
 HELP: set-length
 { $values { "n" "a non-negative integer" } { "seq" "a resizable sequence" } }
 { $contract "Resizes a sequence. The initial contents of the new area is undefined." }
 { $errors "Throws a " { $link no-method } " error if the sequence is not resizable, and a " { $link bounds-error } " if the new length is negative." }
-{ $side-effects "seq" } ;
+{ $side-effects "seq" }
+{ $examples
+    [=[
+        USING: kernel prettyprint sequences ;
+        6 V{ 1 2 3 } [ set-length ] keep .
+        V{ 1 2 3 0 0 0 }
+    ]=]
+    [=[
+        USING: kernel prettyprint sequences ;
+        3 V{ 1 2 3 4 5 6 } [ set-length ] keep .
+        V{ 1 2 3 }
+    ]=]
+} ;
 
 HELP: lengthen
 { $values { "n" "a non-negative integer" } { "seq" "a resizable sequence" } }
@@ -24,12 +49,38 @@ HELP: lengthen
         { "This word does not shrink the sequence if " { $snippet "n" } " is less than its length." }
         { "The word doubles the underlying storage of " { $snippet "seq" } ", whereas " { $link set-length } " is permitted to set it to equal " { $snippet "n" } ". This ensures that repeated calls to this word with constant increments of " { $snippet "n" } " do not result in a quadratic amount of copying, so that for example " { $link push-all } " can run efficiently when used in a loop." }
     }
+}
+{ $examples
+    { $example
+        "USING: kernel prettyprint sequences ;"
+        "6 V{ 1 1 1 1 } [ lengthen ] keep ."
+        "V{ 1 1 1 1 0 0 }"
+    }
+    "Showing how the underlying storage grows:"
+    { $example
+        "USING: accessors kernel prettyprint sequences ;"
+        "6 V{ 1 1 1 1 } [ lengthen ] keep underlying>> ."
+        "{ 1 1 1 1 0 0 0 0 0 0 0 0 0 0 }"
+    }
+    "When " { $snippet "n" } " is less than the length of " { $snippet "seq" } ":"
+    { $example
+        "USING: kernel prettyprint sequences ;"
+        "2 V{ 1 2 3 4 5 6 7 8 } [ lengthen ] keep ."
+        "V{ 1 2 3 4 5 6 7 8 }"
+    }
 } ;
 
 HELP: nth
 { $values { "n" "a non-negative integer" } { "seq" sequence } { "elt" "the element at the " { $snippet "n" } "th index" } }
 { $contract "Outputs the " { $snippet "n" } "th element of the sequence. Elements are numbered from zero, so the last element has an index one less than the length of the sequence. All sequences support this operation." }
-{ $errors "Throws a " { $link bounds-error } " if the index is negative, or greater than or equal to the length of the sequence." } ;
+{ $errors "Throws a " { $link bounds-error } " if the index is negative, or greater than or equal to the length of the sequence." }
+{ $examples
+    [=[
+        USING: prettyprint sequences ;
+        1 { "a" "b" "c" } nth .
+        "b"
+    ]=]
+} ;
 
 HELP: set-nth
 { $values { "elt" object } { "n" "a non-negative integer" } { "seq" "a mutable sequence" } }
@@ -37,7 +88,19 @@ HELP: set-nth
 { $errors "Throws an error if the index is negative, or if the sequence is not resizable and the index is greater than or equal to the length of the sequence."
 $nl
 "Throws an error if the sequence cannot hold elements of the given type." }
-{ $side-effects "seq" } ;
+{ $side-effects "seq" }
+{ $examples
+    [=[
+        USING: kernel prettyprint sequences ;
+        99 0 { 1 1 1 } [ set-nth ] keep .
+        { 99 1 1 }
+    ]=]
+    [=[
+        USING: kernel prettyprint sequences ;
+        99 8 V{ 1 1 1 } [ set-nth ] keep .
+        V{ 1 1 1 0 0 0 0 0 99 }
+    ]=]
+} ;
 
 HELP: nths
 { $values
@@ -58,7 +121,14 @@ HELP: immutable
 
 HELP: new-sequence
 { $values { "len" "a non-negative integer" } { "seq" sequence } { "newseq" "a mutable sequence" } }
-{ $contract "Outputs a mutable sequence of length " { $snippet "len" } " which can hold the elements of " { $snippet "seq" } ". The initial contents of the sequence are undefined." } ;
+{ $contract "Outputs a mutable sequence of length " { $snippet "len" } " which can hold the elements of " { $snippet "seq" } ". The initial contents of the sequence are undefined." }
+{ $examples
+    [=[
+        USING: prettyprint sequences ;
+        6 { 1 2 3 } new-sequence .
+        { 0 0 0 0 0 0 }
+    ]=]
+} ;
 
 HELP: new-resizable
 { $values { "len" "a non-negative integer" } { "seq" sequence } { "newseq" "a resizable mutable sequence" } }
@@ -73,7 +143,20 @@ HELP: like
 { $contract "Outputs a sequence with the same elements as " { $snippet "seq" } ", but " { $emphasis "like" } " the template sequence, in the sense that it either has the same class as the template sequence, or if the template sequence is a virtual sequence, the same class as the template sequence's underlying sequence."
 $nl
 "The default implementation does nothing." }
-{ $notes "Unlike " { $link clone-like } ", the output sequence might share storage with the input sequence." } ;
+{ $notes "Unlike " { $link clone-like } ", the output sequence might share storage with the input sequence." }
+{ $examples
+    { $example
+        "USING: prettyprint sequences ;"
+        "{ 1 2 3 } V{ } like ."
+        "V{ 1 2 3 }"
+    }
+    "Demonstrating the shared storage:"
+    { $example
+        "USING: kernel prettyprint sequences ;"
+        "{ 1 2 3 } dup V{ } like reverse! [ . ] bi@"
+        "{ 3 2 1 }\nV{ 3 2 1 }"
+    }
+} ;
 
 HELP: empty?
 { $values { "seq" sequence } { "?" boolean } }
@@ -165,7 +248,14 @@ HELP: push
 
 HELP: bounds-check?
 { $values { "n" integer } { "seq" sequence } { "?" boolean } }
-{ $description "Tests if the index is within the bounds of the sequence." } ;
+{ $description "Tests if the index is within the bounds of the sequence." }
+{ $examples
+    [=[
+        USING: prettyprint sequences ;
+        5 { 1 2 3 } bounds-check? .
+        f
+    ]=]
+} ;
 
 HELP: bounds-error
 { $values { "n" integer } { "seq" sequence } }
@@ -762,7 +852,19 @@ HELP: prefix
 
 HELP: sum-lengths
 { $values { "seq" { $sequence sequence } } { "n" integer } }
-{ $description "Outputs the sum of the lengths of all sequences in " { $snippet "seq" } "." } ;
+{ $description "Outputs the sum of the lengths of all sequences in " { $snippet "seq" } "." }
+{ $examples
+    [=[
+        USING: prettyprint sequences ;
+        { { 11 43 3.2 } { 1 } { 15 16 } } sum-lengths .
+        6
+    ]=]
+    [=[
+        USING: prettyprint sequences ;
+        { "hello" f { 1 2 3 } { } } sum-lengths .
+        8
+    ]=]
+} ;
 
 HELP: concat
 { $values { "seq" sequence } { "newseq" sequence } }
@@ -1081,7 +1183,20 @@ HELP: subseq-as
 HELP: clone-like
 { $values { "seq" sequence } { "exemplar" sequence } { "newseq" "a new sequence" } }
 { $description "Outputs a newly-allocated sequence with the same elements as " { $snippet "seq" } " but of the same type as " { $snippet "exemplar" } "." }
-{ $notes "Unlike " { $link like } ", this word always creates a new sequence which never shares storage with the original." } ;
+{ $notes "Unlike " { $link like } ", this word always creates a new sequence which never shares storage with the original." }
+{ $examples
+    { $example
+        "USING: prettyprint sequences ;"
+        "{ 1 2 3 } V{ } clone-like ."
+        "V{ 1 2 3 }"
+    }
+    "Demonstrating the lack of shared storage:"
+    { $example
+        "USING: kernel prettyprint sequences ;"
+        "{ 1 2 3 } dup V{ } clone-like reverse! [ . ] bi@"
+        "{ 1 2 3 }\nV{ 3 2 1 }"
+    }
+} ;
 
 HELP: head-slice
 { $values { "seq" sequence } { "n" "a non-negative integer" } { "slice" "a slice" } }
@@ -1312,7 +1427,19 @@ HELP: unclip-last-slice
 
 HELP: sum
 { $values { "seq" { $sequence number } } { "n" number } }
-{ $description "Outputs the sum of all elements of " { $snippet "seq" } ". Outputs zero given an empty sequence." } ;
+{ $description "Outputs the sum of all elements of " { $snippet "seq" } ". Outputs zero given an empty sequence." }
+{ $examples
+    [=[
+        USING: prettyprint sequences ;
+        { 3 1 5 } sum .
+        9
+    ]=]
+    [=[
+        USING: prettyprint sequences ;
+        { } sum .
+        0
+    ]=]
+} ;
 
 HELP: product
 { $values { "seq" { $sequence number } } { "n" number } }
@@ -1632,13 +1759,27 @@ HELP: virtual-exemplar
 { $values
     { "seq" sequence }
     { "seq'" sequence } }
-{ $description "Part of the virtual sequence protocol, this word is used to return an exemplar of the underlying storage. This is used in words like " { $link new-sequence } "." } ;
+{ $description "Part of the virtual sequence protocol, this word is used to return an exemplar of the underlying storage. This is used in words like " { $link new-sequence } "." }
+{ $examples
+    [=[
+        USING: prettyprint sequences ;
+        1 3 { 14 15 16 17 } <slice> virtual-exemplar .
+        { 14 15 16 17 }
+    ]=]
+} ;
 
 HELP: virtual@
 { $values
     { "n" integer } { "seq" sequence }
     { "n'" integer } { "seq'" sequence } }
-{ $description "Part of the sequence protocol, this word translates the input index " { $snippet "n" } " into an index and the underlying storage this index points into." } ;
+{ $description "Part of the sequence protocol, this word translates the input index " { $snippet "n" } " into an index and the underlying storage this index points into." }
+{ $examples
+    { $example
+        "USING: kernel prettyprint sequences ;"
+        "0 { 1 2 3 4 5 6 } <reversed> virtual@ [ . ] bi@"
+        "5\n{ 1 2 3 4 5 6 }"
+    }
+} ;
 
 HELP: 2map-reduce
 { $values
