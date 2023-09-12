@@ -121,6 +121,7 @@ DESTRUCTOR: cs_close
     cpu {
         { x86.32 [ CS_ARCH_X86 CS_MODE_32 ] }
         { x86.64 [ CS_ARCH_X86 CS_MODE_64 ] }
+        { arm.32 [ CS_ARCH_ARM CS_MODE_ARM ] }
         { arm.64 [ CS_ARCH_ARM64 CS_MODE_ARM ] }
     } case 0 csh <ref> [ cs_open CS_ERR_OK assert= ] keep ;
 
