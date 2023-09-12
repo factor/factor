@@ -25,4 +25,28 @@ $nl
 { $code "100 1 [a..b] product" }
 "A range can be converted into a concrete sequence using a word such as " { $link >array } ". In most cases this is unnecessary since ranges implement the sequence protocol already. It is necessary if a mutable sequence is needed, for use with words such as " { $link set-nth } " or " { $link map! } "." ;
 
+HELP: ..=
+{ $syntax "start ..= end" }
+{ $description "Defines a literal " { $link range } " from " { $snippet "start" } " to " { $snippet "end" } " (inclusive) with a step of 1." }
+{ $examples
+    { $example
+        "USING: arrays prettyprint ranges ;"
+        "1 ..= 10 >array ."
+        "{ 1 2 3 4 5 6 7 8 9 10 }"
+    }
+}
+{ $see-also [a..b] } ;
+
+HELP: ..<
+{ $syntax "start ..< end" }
+{ $description "Defines a literal " { $link range } " from " { $snippet "start" } " to " { $snippet "end" } " (exclusive) with a step of 1." }
+{ $examples
+    { $example
+        "USING: arrays prettyprint ranges ;"
+        "1 ..< 10 >array ."
+        "{ 1 2 3 4 5 6 7 8 9 }"
+    }
+}
+{ $see-also [a..b) } ;
+
 ABOUT: "ranges"
