@@ -1686,7 +1686,7 @@ HELP: AudioCallback
 HELP: AudioStream
 { $class-description
     Represents a stream of audio data in Raylib.
-    { $list
+    { $table
         { { $snippet buffer }     " a pointer to the internal data used by the audio system." }
         { { $snippet processor }  " a pointer to the interanl data processor, useful for audio effects." }
         { { $snippet sampleRate } " the frequence of the samples." }
@@ -1735,7 +1735,7 @@ HELP: Color
 HELP: Camera3D
 { $class-description
     Represents a camera in 3D space. The fields are defined as followed:
-    { $list
+    { $table
         { { $snippet position   } " is the camera position in 3D space." }
         { { $snippet target     } " is the target the camera is looking at." }
         { { $snippet up         } " is the direction that faces up relative to the camera." }
@@ -1748,7 +1748,7 @@ HELP: Camera2D
 { $class-description
     Represents a camera in 2D space. The fields are defined
     as followed:
-    { $list
+    { $table
         { { $snippet offset   } " is the camera offset (dispacement from target)" }
         { { $snippet target   } " is the camera target (rotation and zoom origin)." }
         { { $snippet rotation } " is the camera rotation in degrees." }
@@ -1767,7 +1767,7 @@ HELP: Camera
 HELP: BoneInfo
 { $class-description
     A skeletal animation bone.
-    { $list
+    { $table
         { { $snippet name }     " is the name of the bone. Max 32 characters." }
         { { $snippet processor }  " the parent index." }
     }
@@ -1776,8 +1776,8 @@ HELP: BoneInfo
 HELP: BoundingBox
 { $class-description
     Represents a 3D bounding box defined by two points:
-    { $list
-        { { $snippet min }     " The minimum vertex box-corner." }
+    { $table
+        { { $snippet min }  " The minimum vertex box-corner." }
         { { $snippet max }  " The maxium vertex box-corner." }
     } } ;
 
@@ -1792,7 +1792,7 @@ HELP: FilePathList
     \ unload-directory-files .
 
     The fields are defined as followed:
-    { $list
+    { $table
         { { $snippet capacity } " the max number of entries." }
         { { $snippet count } " the number of entries found." }
         { { $snippet paths } " array of string where each member is a file path." }
@@ -1810,7 +1810,7 @@ HELP: Font
     Represents a collections of glyphs that can be drawn to the screen.
     The fields are defined as followed:
 
-    { $list
+    { $table
         { { $snippet baseSize     } { " the base size of the characters. This is how tall a glyph is." } }
         { { $snippet glyphCount   } { " the number of glyph characters." } }
         { { $snippet glyphPadding } { " the padding around each glyph." } }
