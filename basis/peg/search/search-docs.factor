@@ -12,7 +12,7 @@ HELP: tree-write
     "writing each object to the stream." }
 { $example "USE: peg.search" "{ 65 \"bc\" { 68 \"ef\" } } tree-write" "AbcDef" } ;
 
-HELP: search
+HELP: peg-search
 { $values
   { "string" string }
   { "parser" "a peg based parser" }
@@ -24,11 +24,18 @@ HELP: search
     "parser."
 }
 
-{ $example "USING: peg.parsers peg.search prettyprint ;" "\"one 123 two 456\" integer-parser search ." "V{ 123 456 }" }
-{ $example "USING: peg peg.parsers peg.search prettyprint ;" "\"one 123 \\\"hello\\\" two 456\" integer-parser string-parser 2choice search ." "V{ 123 \"hello\" 456 }" }
-{ $see-also replace } ;
+{ $example
+    "USING: peg.parsers peg.search prettyprint ;"
+    "\"one 123 two 456\" integer-parser peg-search ."
+    "V{ 123 456 }"
+}
+{ $example
+    "USING: peg peg.parsers peg.search prettyprint ;"
+    "\"one 123 \\\"hello\\\" two 456\" integer-parser string-parser 2choice peg-search ."
+    "V{ 123 \"hello\" 456 }"
+} ;
 
-HELP: replace
+HELP: peg-replace
 { $values
   { "string" string }
   { "parser" "a peg based parser" }
@@ -39,5 +46,10 @@ HELP: replace
     "successfully parse with the given parser replaced with "
     "the result of that parser."
 }
-{ $example "USING: math math.parser peg peg.parsers peg.search prettyprint ;" "\"one 123 two 456\" integer-parser [ 2 * number>string ] action replace ." "\"one 246 two 912\"" }
-{ $see-also search } ;
+{ $example
+    "USING: math math.parser peg peg.parsers peg.search prettyprint ;"
+    "\"one 123 two 456\" integer-parser [ 2 * number>string ] action peg-replace ."
+    "\"one 246 two 912\""
+} ;
+
+{ peg-search peg-replace } related-words

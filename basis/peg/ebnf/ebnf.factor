@@ -3,12 +3,9 @@
 
 USING: accessors assocs combinators combinators.short-circuit
 effects kernel make math.parser multiline namespaces parser peg
-peg.private peg.parsers quotations sequences sequences.deep
-splitting stack-checker strings strings.parser summary unicode
-vocabs.parser words ;
-
-FROM: vocabs.parser => search ;
-FROM: peg.search => replace ;
+peg.private peg.parsers peg.search quotations sequences
+sequences.deep splitting stack-checker strings strings.parser
+summary unicode vocabs.parser words ;
 
 IN: peg.ebnf
 
@@ -107,7 +104,7 @@ C: <ebnf> ebnf
         "\t" token [ drop "\\t" ] action ,
         "\n" token [ drop "\\n" ] action ,
         "\r" token [ drop "\\r" ] action ,
-    ] choice* replace ;
+    ] choice* peg-replace ;
 
 : identifier-parser ( -- parser )
     ! Return a parser that parses an identifier delimited by
