@@ -1,9 +1,8 @@
 ! Copyright (C) 2007, 2008 Chris Double, Doug Coleman.
 ! See https://factorcode.org/license.txt for BSD license.
 USING: accessors fry kernel literals make math math.parser
-ranges peg peg.private sequences splitting strings unicode
-vectors ;
-FROM: peg.search => replace ;
+ranges peg peg.private peg.search sequences splitting strings
+unicode vectors ;
 IN: peg.parsers
 
 <PRIVATE
@@ -92,7 +91,7 @@ PRIVATE>
         any-char ,
     ] seq* [
         first2 [a..b] >string
-    ] action replace ;
+    ] action peg-replace ;
 
 : range-pattern ( pattern -- parser )
     ! 'pattern' is a set of characters describing the
