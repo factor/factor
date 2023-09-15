@@ -1,8 +1,10 @@
 ! Copyright (C) 2023 CapitalEx.
 ! See https://factorcode.org/license.txt for BSD license.
 USING: accessors alien.c-types arrays help.markup help.syntax
-kernel make math math.parser quotations sequences strings urls ;
+kernel make math math.parser quotations sequences strings urls 
+alien.c-types ;
 IN: raylib
+FROM: alien.c-types => float ;
 
 <PRIVATE
 : $enum-members ( element -- )
@@ -1675,31 +1677,57 @@ HELP: NPATCH_THREE_PATCH_HORIZONTAL
 } ;
 
 
-
-HELP: AudioCallback
-{ $values
-    { "quot" quotation }
-    { "alien" object }
-}
-{ $description "" } ;
-
-HELP: AudioStream
+HELP: Vector2
 { $class-description
-    Represents a stream of audio data in Raylib.
-    { $table
-        { { $snippet buffer }     " a pointer to the internal data used by the audio system." }
-        { { $snippet processor }  " a pointer to the interanl data processor, useful for audio effects." }
-        { { $snippet sampleRate } " the frequence of the samples." }
-        { { $snippet sampleSize } " the bit depth of the samples: spport values are 8, 16, and 32." }
-        { { $snippet channels }   " the number of channels: 1 for mono, 2 for stereo." }
-    }
+    Represents a 2D vector in Raylib. Implements the 
+    { $link "sequence-protocol" } . 
+    
+    { $warning 
+        Values are all single-precision where 
+        as Factor is double precision (see \ alien.c-types:float ) } 
+} ;
+
+HELP: Vector3
+{ $class-description 
+    Represents a 3D vector in Raylib. Implements the 
+    { $link "sequence-protocol" } . 
+
+    { $warning 
+        Values are all single-precision where 
+        as Factor is double precision (see \ alien.c-types:float ) } 
+} ;
+
+HELP: Vector4
+{ $class-description
+    Represents a 4D vector in Raylib. Implements the 
+    { $link "sequence-protocol" } . 
+    
+    { $warning 
+        Values are all single-precision where 
+        as Factor is double precision (see \ alien.c-types:float ) } 
+} ;
+
+HELP: Quaternion
+{ $class-description 
+    A c-typedef for a \ Vector4 . 
+    
+} ;
+
+HELP: Matrix
+{ $class-description 
+    Represents a 4x4 OpenGL style matrix. It's right handed 
+    and column major. 
+    
+    { $warning 
+        Values are all single-precision where 
+        as Factor is double precision (see \ alien.c-types:float ) } 
 } ;
 
 
 HELP: Color
 { $class-description
     Represents a RGBA color with 8-bit unsigned components.
-    Raylibe comes with 25 default colors.
+    Raylib comes with 25 default colors.
 
     { $heading Builtin colors }
     { $subsections
@@ -1729,6 +1757,28 @@ HELP: Color
         MAGENTA
         RAYWHITE }
 } ;
+
+HELP: Rectangle
+{ $class-description 
+    Represents a 2D rectangle defined by a x position, y position, width, and height. 
+    { $warning 
+        Values are all single-precision where 
+        as Factor is double precision (see \ alien.c-types:float ) } 
+} ;
+
+HELP: AudioStream
+{ $class-description
+    Represents a stream of audio data in Raylib.
+    { $table
+        { { $snippet buffer }     " a pointer to the internal data used by the audio system." }
+        { { $snippet processor }  " a pointer to the interanl data processor, useful for audio effects." }
+        { { $snippet sampleRate } " the frequence of the samples." }
+        { { $snippet sampleSize } " the bit depth of the samples: spport values are 8, 16, and 32." }
+        { { $snippet channels }   " the number of channels: 1 for mono, 2 for stereo." }
+    }
+} ;
+
+
 
 
 
@@ -1851,6 +1901,5172 @@ HELP: BLACK      { $raylib-color "0, 0, 0, 255" } ;
 HELP: BLANK      { $raylib-color "0, 0, 0, 0" } ;
 HELP: MAGENTA    { $raylib-color "255, 0, 255, 255" } ;
 HELP: RAYWHITE   { $raylib-color "245, 245, 245, 255" } ;
+
+! Window-related functions
+HELP: init-window
+{ $values 
+    width: int
+    height: int
+    title: c-string
+  
+}
+
+{ $description
+    "Initialize window and OpenGL context" 
+} ;
+
+HELP: window-should-close
+{ $description
+    "Check if KEY_ESCAPE pressed or Close icon pressed"
+} ;
+
+HELP: close-window
+{ $description
+    "Close window and unload OpenGL context" 
+} ;
+
+HELP: is-window-ready
+{ $description
+    "Check if window has been initialized successfully" 
+} ;
+
+HELP: is-window-fullscreen
+{ $description
+    "Check if window is currently fullscreen" 
+} ;
+
+HELP: is-window-hidden
+{ $description
+    "Check if window is currently hidden (only PLATFORM_DESKTOP)" 
+} ;
+
+HELP: is-window-minimized
+{ $description
+    "Check if window is currently minimized (only PLATFORM_DESKTOP)" 
+} ;
+
+HELP: is-window-maximized
+{ $description
+    "Check if window is currently maximized (only PLATFORM_DESKTOP)" 
+} ;
+
+HELP: is-window-focused
+{ $description
+    "Check if window is currently focused (only PLATFORM_DESKTOP)" 
+} ;
+
+HELP: is-window-resized
+{ $description
+    "Check if window has been resized last frame" 
+} ;
+
+HELP: is-window-state
+{ $values 
+    flag: uint
+  
+}
+
+{ $description
+    "Check if one specific window flag is enabled" 
+} ;
+
+HELP: set-window-state
+{ $values 
+    flags: uint
+  
+}
+
+{ $description
+    "Set window configuration state using flags" 
+} ;
+
+HELP: clear-window-state
+{ $values 
+    flags: uint
+  
+}
+
+{ $description
+    "Clear window configuration state flags" 
+} ;
+
+HELP: toggle-fullscreen
+{ $description
+    "Toggle window state: fullscreen/windowed (only PLATFORM_DESKTOP)" 
+} ;
+
+HELP: maximize-window
+{ $description
+    "Set window state: maximized, if resizable (only PLATFORM_DESKTOP)" 
+} ;
+
+HELP: minimize-window
+{ $description
+    "Set window state: minimized, if resizable (only PLATFORM_DESKTOP)" 
+} ;
+
+HELP: restore-window
+{ $description
+    "Set window state: not minimized/maximized (only PLATFORM_DESKTOP)" 
+} ;
+
+HELP: set-window-icon
+{ $values 
+    image: Image
+  
+}
+
+{ $description
+    "Set icon for window (only PLATFORM_DESKTOP)" 
+} ;
+
+HELP: set-window-icons 
+{ $values 
+    image: { "a " { $link pointer } " to a " { $link Image } }
+    count: int } ;
+    
+HELP: set-window-title
+{ $values 
+    title: c-string
+  
+}
+
+{ $description
+    "Set title for window (only PLATFORM_DESKTOP)" 
+} ;
+
+HELP: set-window-position
+{ $values 
+    x: int
+    y: int
+  
+}
+
+{ $description
+    "Set window position on screen (only PLATFORM_DESKTOP)" 
+} ;
+
+HELP: set-window-monitor
+{ $values 
+    monitor: int
+  
+}
+
+{ $description
+    "Set monitor for the current window (fullscreen mode)" 
+} ;
+
+HELP: set-window-min-size
+{ $values 
+    width: int
+    height: int
+  
+}
+
+{ $description
+    "Set window minimum dimensions (for FLAG_WINDOW_RESIZABLE)" 
+} ;
+
+HELP: set-window-size
+{ $values 
+    width: int
+    height: int
+  
+}
+
+{ $description
+    "Set window dimensions" 
+} ;
+
+HELP: set-window-opacity
+{ $values 
+    opacity: float
+  
+}
+
+{ $description
+    "Set window opacity [0.0f..1.0f] (only PLATFORM_DESKTOP)" 
+} ;
+
+HELP: get-window-handle
+{ $description
+    "Get native window handle" 
+} ;
+
+HELP: get-screen-width
+{ $description
+    "Get current screen width" 
+} ;
+
+HELP: get-screen-height
+{ $description
+    "Get current screen height" 
+} ;
+
+HELP: get-render-width
+{ $description
+    "Get current render width (it considers HiDPI)" 
+} ;
+
+HELP: get-render-height
+{ $description
+    "Get current render height (it considers HiDPI)" 
+} ;
+
+HELP: get-monitor-count
+{ $description
+    "Get number of connected monitors" 
+} ;
+
+HELP: get-current-monitor
+{ $description
+    "Get current connected monitor" 
+} ;
+
+HELP: get-monitor-position
+{ $values 
+    monitor: int
+  
+}
+
+{ $description
+    "Get specified monitor position" 
+} ;
+
+HELP: get-monitor-width
+{ $values 
+    monitor: int
+  
+}
+
+{ $description
+    "Get specified monitor width (max available by monitor)" 
+} ;
+
+HELP: get-monitor-height
+{ $values 
+    monitor: int
+  
+}
+
+{ $description
+    "Get specified monitor height (max available by monitor)" 
+} ;
+
+HELP: get-monitor-physical-width
+{ $values 
+    monitor: int
+  
+}
+
+{ $description
+    "Get specified monitor physical width in millimetres" 
+} ;
+
+HELP: get-monitor-physical-height
+{ $values 
+    monitor: int
+  
+}
+
+{ $description
+    "Get specified monitor physical height in millimetres" 
+} ;
+
+HELP: get-monitor-refresh-rate
+{ $values 
+    monitor: int
+  
+}
+
+{ $description
+    "Get specified monitor refresh rate" 
+} ;
+
+HELP: get-window-position
+{ $description
+    "Get window position XY on monitor" 
+} ;
+
+HELP: get-window-scale-dpi
+{ $description
+    "Get window scale DPI factor" 
+} ;
+
+HELP: get-monitor-name
+{ $values 
+    monitor: int
+  
+}
+
+{ $description
+    "Get the human-readable, UTF-8 encoded name of the primary monitor" 
+} ;
+
+HELP: set-clipboard-text
+{ $values 
+    text: c-string
+  
+}
+
+{ $description
+    "Set clipboard text content" 
+} ;
+
+HELP: get-clipboard-text
+{ $description
+    "Get clipboard text content" 
+} ;
+
+HELP: enable-event-waiting
+{ $description
+    "Enable waiting for events on EndDrawing(), no automatic event polling" 
+} ;
+
+HELP: disable-event-waiting
+{ $description
+    "Disable waiting for events on EndDrawing(), automatic events polling" 
+} ;
+
+
+! Custom frame control functions
+! NOTE: Those functions are intended for advance users that want full control over the frame processing
+! By default EndDrawing() does this job: draws everything + SwapScreenBuffer() + manage frame timming + PollInputEvents()
+! To avoid that behavior and control frame processes manually, enable in config.h: SUPPORT_CUSTOM_FRAME_CONTROL
+HELP: swap-screen-buffer
+{ $description
+    "Swap back buffer with front buffer (screen drawing)" 
+
+    { $warning 
+        "Those functions are intended for advance users that want"
+        " full control over the frame processing. By default"
+        " EndDrawing() does this job: \n\t- draws everything"
+        "\n\t- " { $link swap-screen-buffer } 
+        "\n\t- manage frame timming"
+        "\n\t- " { $link poll-input-events } ".\n"
+        "To avoid that behavior and control frame processes manually,"
+        " enable in config.h: SUPPORT_CUSTOM_FRAME_CONTROL" }
+} ;
+
+HELP: poll-input-events
+{ $description
+    "Register all input events" 
+
+    { $warning 
+        "Those functions are intended for advance users that want"
+        " full control over the frame processing. By default"
+        " EndDrawing() does this job: \n\t- draws everything"
+        "\n\t- " { $link swap-screen-buffer } 
+        "\n\t- manage frame timming"
+        "\n\t- " { $link poll-input-events } ".\n"
+        "To avoid that behavior and control frame processes manually,"
+        " enable in config.h: SUPPORT_CUSTOM_FRAME_CONTROL" }
+} ;
+
+HELP: wait-time
+{ $values 
+    seconds: double
+  
+}
+
+{ $description
+    "Wait for some milliseconds (halt program execution)" 
+
+    { $warning 
+        "Those functions are intended for advance users that want"
+        " full control over the frame processing. By default"
+        " EndDrawing() does this job: \n\t- draws everything"
+        "\n\t- " { $link swap-screen-buffer } 
+        "\n\t- manage frame timming"
+        "\n\t- " { $link poll-input-events } ".\n"
+        "To avoid that behavior and control frame processes manually,"
+        " enable in config.h: SUPPORT_CUSTOM_FRAME_CONTROL" }
+} ;
+
+
+! Cursor-related functions
+HELP: show-cursor
+{ $description
+    "Shows cursor" 
+} ;
+
+HELP: hide-cursor
+{ $description
+    "Hides cursor" 
+} ;
+
+HELP: is-cursor-hidden
+{ $description
+    "Check if cursor is not visible" 
+} ;
+
+HELP: enable-cursor
+{ $description
+    "Enables cursor (unlock cursor)" 
+} ;
+
+HELP: disable-cursor
+{ $description
+    "Disables cursor (lock cursor)" 
+} ;
+
+HELP: is-cursor-on-screen
+{ $description
+    "Check if cursor is on the screen" 
+} ;
+
+
+! Drawing-related functions
+HELP: clear-background
+{ $values 
+    color: Color
+  
+}
+
+{ $description
+    "Set background color (framebuffer clear color)" 
+} ;
+
+HELP: begin-drawing
+{ $description
+    "Setup canvas (framebuffer) to start drawing" 
+} ;
+
+HELP: end-drawing
+{ $description
+    "End canvas drawing and swap buffers (double buffering)" 
+} ;
+
+HELP: begin-mode-2d
+{ $values 
+    camera: Camera2D
+  
+}
+
+{ $description
+    "Begin 2D mode with custom camera (2D)" 
+} ;
+
+HELP: end-mode-2d
+{ $description
+    "Ends 2D mode with custom camera" 
+} ;
+
+HELP: begin-mode-3d
+{ $values 
+    camera: Camera3D
+  
+}
+
+{ $description
+    "Begin 3D mode with custom camera (3D)" 
+} ;
+
+HELP: end-mode-3d
+{ $description
+    "Ends 3D mode and returns to default 2D orthographic mode" 
+} ;
+
+HELP: begin-texture-mode
+{ $values 
+    target: RenderTexture2D
+  
+}
+
+{ $description
+    "Begin drawing to render texture" 
+} ;
+
+HELP: end-texture-mode
+{ $description
+    "Ends drawing to render texture" 
+} ;
+
+HELP: begin-shader-mode
+{ $values 
+    shader: Shader
+  
+}
+
+{ $description
+    "Begin custom shader drawing" 
+} ;
+
+HELP: end-shader-mode
+{ $description
+    "End custom shader drawing (use default shader)" 
+} ;
+
+HELP: begin-blend-mode
+{ $values 
+    mode: BlendMode
+  
+}
+
+{ $description
+    "Begin blending mode (alpha, additive, multiplied, subtract, custom)" 
+} ;
+
+HELP: end-blend-mode
+{ $description
+    "End blending mode (reset to default: alpha blending)" 
+} ;
+
+HELP: begin-scissor-mode
+{ $values 
+    x: int
+    y: int
+    width: int
+    height: int
+  
+}
+
+{ $description
+    "Begin scissor mode (define screen area for following drawing)" 
+} ;
+
+HELP: end-scissor-mode
+{ $description
+    "End scissor mode" 
+} ;
+
+HELP: begin-vr-stereo-mode
+{ $values 
+    config: VrStereoConfig
+  
+}
+
+{ $description
+    "Begin stereo rendering (requires VR simulator)" 
+} ;
+
+HELP: end-vr-stereo-mode
+{ $description
+    "End stereo rendering (requires VR simulator)" 
+} ;
+
+
+! VR stereo config functions for VR simulator
+HELP: load-vr-stereo-config
+{ $values 
+    device: VrDeviceInfo
+  
+}
+
+{ $description
+    "Load VR stereo config for VR simulator device parameters" 
+} ;
+
+HELP: unload-vr-stereo-config
+{ $values 
+    config: VrStereoConfig
+  
+}
+
+{ $description
+    "Unload VR stereo config" 
+} ;
+
+
+! Shader management functions
+! NOTE: Shader functionality is not available on OpenGL 1.1
+HELP: load-shader
+{ $values 
+    vsFileName: c-string
+    fsFileName: c-string
+  
+}
+
+{ $description
+    "Load shader from files and bind default locations"
+
+    { $warning 
+        "Shader functionality is not available on OpenGL 1.1" }
+} ;
+
+HELP: load-shader-from-memory
+{ $values 
+    vsCode: c-string
+    fsCode: c-string
+  
+}
+
+{ $description
+    "Load shader from code strings and bind default locations" 
+    { $warning 
+        "Shader functionality is not available on OpenGL 1.1" }
+} ;
+
+HELP: is-shader-ready
+{ $values 
+    shader: Shader
+  
+}
+
+{ $description
+    "Check if a shader is ready" 
+    { $warning 
+        "Shader functionality is not available on OpenGL 1.1" }
+} ;
+
+HELP: get-shader-location
+{ $values 
+    shader: Shader
+    uniformName: c-string
+  
+}
+
+{ $description
+    "Get shader uniform location" 
+    { $warning 
+        "Shader functionality is not available on OpenGL 1.1" }
+} ;
+
+HELP: get-shader-location-attrib
+{ $values 
+    shader: Shader
+    attribName: c-string
+  
+}
+
+{ $description
+    "Get shader attribute location" 
+    { $warning 
+        "Shader functionality is not available on OpenGL 1.1" }
+} ;
+
+HELP: set-shader-value
+{ $values 
+    shader: Shader
+    locIndex: int
+    value: void*
+    uniformType: ShaderUniformDataType
+  
+}
+
+{ $description
+    "Set shader uniform value" 
+    { $warning 
+        "Shader functionality is not available on OpenGL 1.1" }
+} ;
+
+HELP: set-shader-value-v
+{ $values 
+    shader: Shader
+    locIndex: int
+    value: void*
+    uniformType: ShaderUniformDataType
+    count: int
+  
+}
+
+{ $description
+    "Set shader uniform value vector" 
+    { $warning 
+        "Shader functionality is not available on OpenGL 1.1" }
+} ;
+
+HELP: set-shader-value-matrix
+{ $values 
+    shader: Shader
+    locIndex: int
+    mat: Matrix
+  
+}
+
+{ $description
+    "Set shader uniform value (matrix 4x4)" 
+    { $warning 
+        "Shader functionality is not available on OpenGL 1.1" }
+} ;
+
+HELP: set-shader-value-texture
+{ $values 
+    shader: Shader
+    locIndex: int
+    texture: Texture2D
+  
+}
+
+{ $description
+    "Set shader uniform value for texture (sampler2d)" 
+    { $warning 
+        "Shader functionality is not available on OpenGL 1.1" }
+} ;
+
+HELP: unload-shader
+{ $values 
+    shader: Shader
+  
+}
+
+{ $description
+    "Unload shader from GPU memory (VRAM)" 
+    { $warning 
+        "Shader functionality is not available on OpenGL 1.1" }
+} ;
+
+
+! Screen-space-related functions
+HELP: get-mouse-ray
+{ $values 
+    mousePosition: Vector2
+    camera: Camera
+  
+}
+
+{ $description
+    "Get a ray trace from mouse position" 
+} ;
+
+HELP: get-camera-matrix
+{ $values 
+    camera: Camera
+  
+}
+
+{ $description
+    "Get camera transform matrix (view matrix)" 
+} ;
+
+HELP: get-camera-matrix-2d
+{ $values 
+    camera: Camera2D
+  
+}
+
+{ $description
+    "Get camera 2d transform matrix" 
+} ;
+
+HELP: get-world-to-screen
+{ $values 
+    position: Vector3
+    camera: Camera
+  
+}
+
+{ $description
+    "Get the screen space position for a 3d world space position" 
+} ;
+
+HELP: get-world-to-screen-2d
+{ $values 
+    position: Vector2
+    camera: Camera2D
+  
+}
+
+{ $description
+    "Get the screen space position for a 2d camera world space position" 
+} ;
+
+HELP: get-world-to-screen-ex
+{ $values 
+    position: Vector3
+    camera: Camera
+    width: int
+    height: int
+  
+}
+
+{ $description
+    "Get size position for a 3d world space position" 
+} ;
+
+HELP: get-screen-to-world-2d
+{ $values 
+    position: Vector2
+    camera: Camera2D
+  
+}
+
+{ $description
+    "Get the world space position for a 2d camera screen space position" 
+} ;
+
+
+! Timing-related functions
+HELP: set-target-fps
+{ $values 
+    fps: int
+  
+}
+
+{ $description
+    "Set target FPS (maximum)" 
+} ;
+
+HELP: get-fps
+{ $description
+    "Get current FPS" 
+} ;
+
+HELP: get-frame-time
+{ $description
+    "Get time in seconds for last frame drawn (delta time)" 
+} ;
+
+HELP: get-time
+{ $description
+    "Get elapsed time in seconds since InitWindow()" 
+} ;
+
+
+! Misc. functions
+HELP: get-random-value
+{ $values 
+    min: int
+    max: int
+  
+}
+
+{ $description
+    "Get a random value between min and max (both included)" 
+} ;
+
+HELP: set-random-seed
+{ $values 
+    seed: uint
+  
+}
+
+{ $description
+    "Set the seed for the random number generator" 
+} ;
+
+HELP: take-screenshot
+{ $values 
+    fileName: c-string
+  
+}
+
+{ $description
+    "Takes a screenshot of current screen (filename extension defines format)" 
+} ;
+
+HELP: set-config-flags
+{ $values 
+    flags: uint
+  
+}
+
+{ $description
+    "Setup init configuration flags (view FLAGS)" 
+} ;
+
+HELP: set-trace-log-level
+{ $values 
+    logLevel: int
+  
+}
+
+{ $description
+    "Set the current threshold (minimum) log level" 
+} ;
+
+HELP: mem-alloc
+{ $values 
+    size: uint
+  
+}
+
+{ $description
+    "Internal memory allocator" 
+} ;
+
+HELP: mem-realloc
+{ $values 
+    ptr: void*
+    size: uint
+  
+}
+
+{ $description
+    "Internal memory reallocator" 
+} ;
+
+HELP: mem-free
+{ $values 
+    ptr: void*
+  
+}
+
+{ $description
+    "Internal memory free" 
+} ;
+
+
+HELP: open-url
+{ $values 
+    url: c-string
+  
+}
+
+{ $description
+    "Open URL with default system browser (if available)" 
+} ;
+
+
+! Files management functions
+HELP: load-file-data
+{ $values 
+    fileName: c-string
+    bytesRead: { "a " { $link pointer } " to a " { $link uint } }
+  
+}
+
+{ $description
+    "Load file data as byte array (read)" 
+} ;
+
+HELP: unload-file-data
+{ $values 
+    data: c-string
+  
+}
+
+{ $description
+    "Unload file data allocated by LoadFileData()" 
+} ;
+
+HELP: save-file-data
+{ $values 
+    fileName: c-string
+    data: void*
+    bytesToWrite: uint
+  
+}
+
+{ $description
+    "Save data to file from byte array (write), returns true on success" 
+} ;
+
+HELP: export-data-as-code
+{ $values 
+    data: { "a " { $link pointer } " to a " { $link uchar } }
+    size: uint
+    fileName: c-string
+  
+}
+
+{ $description
+    "Export data to code (.h), returns true on success" 
+} ;
+
+HELP: load-file-text
+{ $values 
+    fileName: c-string
+  
+}
+
+{ $description
+    "Load text data from file (read), returns a '\0' terminated string" 
+} ;
+
+HELP: unload-file-text
+{ $values 
+    text: c-string
+  
+}
+
+{ $description
+    "Unload file text data allocated by LoadFileText()" 
+} ;
+
+HELP: save-file-text
+{ $values 
+    fileName: c-string
+    text: c-string
+  
+}
+
+{ $description
+    "Save text data to file (write), string must be '\0' terminated, returns true on success" 
+} ;
+
+HELP: file-exists
+{ $values 
+    fileName: c-string
+  
+}
+
+{ $description
+    "Check if file exists" 
+} ;
+
+HELP: directory-exists
+{ $values 
+    dirPath: c-string
+  
+}
+
+{ $description
+    "Check if a directory path exists" 
+} ;
+
+HELP: is-file-extension
+{ $values 
+    fileName: c-string
+    ext: c-string
+  
+}
+
+{ $description
+    "Check file extension (including point: .png, .wav)" 
+} ;
+
+HELP: get-file-length
+{ $values 
+    fileName: c-string
+  
+}
+
+{ $description
+    "Get file length in bytes (NOTE: GetFileSize() conflicts with windows.h)" 
+} ;
+
+HELP: get-file-extension
+{ $values 
+    fileName: c-string
+  
+}
+
+{ $description
+    "Get pointer to extension for a filename string (includes dot: '.png')" 
+} ;
+
+HELP: get-file-name
+{ $values 
+    filePath: c-string
+  
+}
+
+{ $description
+    "Get pointer to filename for a path string" 
+} ;
+
+HELP: get-file-name-without-ext
+{ $values 
+    filePath: c-string
+  
+}
+
+{ $description
+    "Get filename string without extension (uses static string)" 
+} ;
+
+HELP: get-directory-path
+{ $values 
+    filePath: c-string
+  
+}
+
+{ $description
+    "Get full path for a given fileName with path (uses static string)" 
+} ;
+
+HELP: get-prev-directory-path
+{ $values 
+    dirPath: c-string
+  
+}
+
+{ $description
+    "Get previous directory path for a given path (uses static string)" 
+} ;
+
+HELP: get-working-directory
+{ $description
+    "Get current working directory (uses static string)" 
+} ;
+
+HELP: get-application-directory
+{ $description
+    "Get the directory if the running application (uses static string)" 
+} ;
+
+HELP: change-directory
+{ $values 
+    dir: c-string
+  
+}
+
+{ $description
+    "Change working directory, return true on success" 
+} ;
+
+HELP: is-path-file
+{ $values 
+    path: c-string
+  
+}
+
+{ $description
+    "Check if a given path is a file or a directory" 
+} ;
+
+HELP: load-directory-files
+{ $values 
+    dirPath: c-string
+  
+}
+
+{ $description
+    "Get filenames in a directory path (memory should be freed)" 
+} ;
+
+HELP: load-directory-files-ex
+{ $values 
+    dirPath: c-string
+    filter: c-string
+    scanSubDirs: bool
+  
+}
+
+{ $description
+    "Get filenames in a directory path (memory should be freed)" 
+} ;
+
+HELP: unload-directory-files
+{ $values 
+    files: FilePathList
+  
+}
+
+{ $description
+    "Clear directory files paths buffers (free memory)" 
+} ;
+
+HELP: is-file-dropped
+{ $description
+    "Check if a file has been dropped into window" 
+} ;
+
+HELP: load-dropped-files
+{ $description
+    "Get dropped files names (memory should be freed)" 
+} ;
+
+HELP: unload-dropped-files
+{ $values 
+    files: FilePathList
+  
+}
+
+{ $description
+    "Clear dropped files paths buffer (free memory)" 
+} ;
+
+HELP: get-file-mod-time
+{ $values 
+    fileName: c-string
+  
+}
+
+{ $description
+    "Get file modification time (last write time)" 
+} ;
+
+
+! Compression/Encoding functionality
+HELP: compress-data
+{ $values 
+    data: { "a " { $link pointer } " to a " { $link uchar } }
+    dataLength: int
+    compDataLength: { "a " { $link pointer } " to a " { $link int } }
+  
+}
+
+{ $description
+    "Compress data (DEFLATE algorithm)" 
+} ;
+
+HELP: decompress-data
+{ $values 
+    compData: { "a " { $link pointer } " to a " { $link uchar } }
+    compDataLength: int
+    dataLength: { "a " { $link pointer } " to a " { $link int } }
+  
+}
+
+{ $description
+    "Decompress data (DEFLATE algorithm)" 
+} ;
+
+HELP: encode-data-base64
+{ $values 
+    data: { "a " { $link pointer } " to a " { $link uchar } }
+    dataLength: int
+    outputLength: { "a " { $link pointer } " to a " { $link int } }
+  
+}
+
+{ $description
+    "Encode data to Base64 string" 
+} ;
+
+HELP: decode-data-base64
+{ $values 
+    data: { "a " { $link pointer } " to a " { $link uchar } }
+    outputLength: { "a " { $link pointer } " to a " { $link int } }
+  
+}
+
+{ $description
+    "Decode Base64 string data" 
+} ;
+
+
+! ------------------------------------------------------------------------------------
+! Input Handling Functions (Module: core)
+! ------------------------------------------------------------------------------------
+
+! Input-related functions: keyboard
+HELP: is-key-pressed
+{ $values 
+    key: KeyboardKey
+  
+}
+
+{ $description
+    "Check if a key has been pressed once" 
+} ;
+
+HELP: is-key-down
+{ $values 
+    key: KeyboardKey
+  
+}
+
+{ $description
+    "Check if a key is being pressed" 
+} ;
+
+HELP: is-key-released
+{ $values 
+    key: KeyboardKey
+  
+}
+
+{ $description
+    "Check if a key has been released once" 
+} ;
+
+HELP: is-key-up
+{ $values 
+    key: KeyboardKey
+  
+}
+
+{ $description
+    "Check if a key is NOT being pressed" 
+} ;
+
+HELP: set-exit-key
+{ $values 
+    key: KeyboardKey
+  
+}
+
+{ $description
+    "Set a custom key to exit program (default is ESC)" 
+} ;
+
+HELP: get-key-pressed
+{ $description
+    "Get key pressed (keycode), call it multiple times for keys queued, returns 0 when the queue is empty" 
+} ;
+
+HELP: get-char-pressed
+{ $description
+    "Get char pressed (unicode), call it multiple times for chars queued, returns 0 when the queue is empty" 
+} ;
+
+
+! Input-related functions: gamepads
+HELP: is-gamepad-available
+{ $values 
+    gamepad: int
+  
+}
+
+{ $description
+    "Check if a gamepad is available" 
+} ;
+
+HELP: get-gamepad-name
+{ $values 
+    gamepad: int
+  
+}
+
+{ $description
+    "Get gamepad internal name id" 
+} ;
+
+HELP: is-gamepad-button-pressed
+{ $values 
+    gamepad: int
+    button: GamepadButton
+  
+}
+
+{ $description
+    "Check if a gamepad button has been pressed once" 
+} ;
+
+HELP: is-gamepad-button-down
+{ $values 
+    gamepad: int
+    button: GamepadButton
+  
+}
+
+{ $description
+    "Check if a gamepad button is being pressed" 
+} ;
+
+HELP: is-gamepad-button-released
+{ $values 
+    gamepad: int
+    button: GamepadButton
+  
+}
+
+{ $description
+    "Check if a gamepad button has been released once" 
+} ;
+
+HELP: is-gamepad-button-up
+{ $values 
+    gamepad: int
+    button: GamepadButton
+  
+}
+
+{ $description
+    "Check if a gamepad button is NOT being pressed" 
+} ;
+
+HELP: get-gamepad-button-pressed
+{ $description
+    "Get the last gamepad button pressed" 
+} ;
+
+HELP: get-gamepad-axis-count
+{ $values 
+    gamepad: int
+  
+}
+
+{ $description
+    "Get gamepad axis count for a gamepad" 
+} ;
+
+HELP: get-gamepad-axis-movement
+{ $values 
+    gamepad: int
+    axis: GamepadAxis
+  
+}
+
+{ $description
+    "Get axis movement value for a gamepad axis" 
+} ;
+
+HELP: set-gamepad-mappings
+{ $values 
+    mappings: c-string
+  
+}
+
+{ $description
+    "Set internal gamepad mappings (SDL_GameControllerDB)" 
+} ;
+
+
+! Input-related functions: mouse
+HELP: is-mouse-button-pressed
+{ $values 
+    button: MouseButton
+  
+}
+
+{ $description
+    "Check if a mouse button has been pressed once" 
+} ;
+
+HELP: is-mouse-button-down
+{ $values 
+    button: MouseButton
+  
+}
+
+{ $description
+    "Check if a mouse button is being pressed" 
+} ;
+
+HELP: is-mouse-button-released
+{ $values 
+    button: MouseButton
+  
+}
+
+{ $description
+    "Check if a mouse button has been released once" 
+} ;
+
+HELP: is-mouse-button-up
+{ $values 
+    button: MouseButton
+  
+}
+
+{ $description
+    "Check if a mouse button is NOT being pressed" 
+} ;
+
+HELP: get-mouse-x
+{ $description
+    "Get mouse position X" 
+} ;
+
+HELP: get-mouse-y
+{ $description
+    "Get mouse position Y" 
+} ;
+
+HELP: get-mouse-position
+{ $description
+    "Get mouse position XY" 
+} ;
+
+HELP: get-mouse-delta
+{ $description
+    "Get mouse delta between frames" 
+} ;
+
+HELP: set-mouse-position
+{ $values 
+    x: int
+    y: int
+  
+}
+
+{ $description
+    "Set mouse position XY" 
+} ;
+
+HELP: set-mouse-offset
+{ $values 
+    offsetX: int
+    offsetY: int
+  
+}
+
+{ $description
+    "Set mouse offset" 
+} ;
+
+HELP: set-mouse-scale
+{ $values 
+    scaleX: float
+    scaleY: float
+  
+}
+
+{ $description
+    "Set mouse scaling" 
+} ;
+
+HELP: get-mouse-wheel-move
+{ $description
+    "Get mouse wheel movement Y" 
+} ;
+
+HELP: get-mouse-wheel-move-v
+{ $description
+    "Get mouse wheel movement for both X and Y" 
+} ;
+
+HELP: set-mouse-cursor
+{ $values 
+    cursor: MouseCursor
+  
+}
+
+{ $description
+    "Set mouse cursor" 
+} ;
+
+
+! Input-related functions: touch
+HELP: get-touch-x
+{ $description
+    "Get touch position X for touch point 0 (relative to screen size)" 
+} ;
+
+HELP: get-touch-y
+{ $description
+    "Get touch position Y for touch point 0 (relative to screen size)" 
+} ;
+
+HELP: get-touch-position
+{ $values 
+    index: int
+  
+}
+
+{ $description
+    "Get touch position XY for a touch point index (relative to screen size)" 
+} ;
+
+HELP: get-touch-point-id
+{ $values 
+    index: int
+  
+}
+
+{ $description
+    "Get touch point identifier for given index" 
+} ;
+
+HELP: get-touch-point-count
+{ $description
+    "Get number of touch points" 
+} ;
+
+
+! ------------------------------------------------------------------------------------
+! Gestures and Touch Handling Functions (Module: rgestures)
+! ------------------------------------------------------------------------------------
+HELP: set-gestures-enabled
+{ $values 
+    flags: uint
+  
+}
+
+{ $description
+    "Enable a set of gestures using flags" 
+} ;
+
+HELP: is-gesture-detected
+{ $values 
+    gesture: Gestures
+  
+}
+
+{ $description
+    "Check if a gesture have been detected" 
+} ;
+
+HELP: get-gesture-detected
+{ $description
+    "Get latest detected gesture" 
+} ;
+
+HELP: get-gesture-hold-duration
+{ $description
+    "Get gesture hold time in milliseconds" 
+} ;
+
+HELP: get-gesture-drag-vector
+{ $description
+    "Get gesture drag vector" 
+} ;
+
+HELP: get-gesture-drag-angle
+{ $description
+    "Get gesture drag angle" 
+} ;
+
+HELP: get-gesture-pinch-vector
+{ $description
+    "Get gesture pinch delta" 
+} ;
+
+HELP: get-gesture-pinch-angle
+{ $description
+    "Get gesture pinch angle" 
+} ;
+
+
+! ------------------------------------------------------------------------------------
+! Camera System Functions (Module: rcamera)
+! ------------------------------------------------------------------------------------
+
+HELP: update-camera
+{ $values 
+    camera: { "a " { $link pointer } " to a " { $link Camera } }
+    mode: CameraMode
+  
+}
+
+{ $description
+    "Update camera position for selected mode" 
+} ;
+
+HELP: update-camera-pro
+{ $values 
+    camera: { "a " { $link pointer } " to a " { $link Camera } }
+    movement: Vector3
+    rotation: Vector3
+    zoom: float
+  
+}
+
+{ $description
+    "Update camera movement/rotation" 
+} ;
+
+
+! ------------------------------------------------------------------------------------
+! Basic Shapes Drawing Functions (Module: shapes)
+! ------------------------------------------------------------------------------------
+! Set texture and rectangle to be used on shapes drawing
+! NOTE: It can be useful when using basic shapes and one single font,
+! defining a font char white rectangle would allow drawing everything in a single draw call
+HELP: set-shapes-texture
+{ $values 
+    texture: Texture2D
+    source: Rectangle
+}
+
+{ $description
+    "Set texture and rectangle to be used on shapes drawing" 
+} ;
+
+
+! Basic shapes drawing functions
+HELP: draw-pixel
+{ $values 
+    posX: int
+    posY: int
+    color: Color
+  
+}
+
+{ $description
+    "Draw a pixel" 
+} ;
+
+HELP: draw-pixel-v
+{ $values 
+    position: Vector2
+    color: Color
+  
+}
+
+{ $description
+    "Draw a pixel (Vector version)" 
+} ;
+
+HELP: draw-line
+{ $values 
+    startPosX: int
+    startPosY: int
+    endPosX: int
+    endPosY: int
+    color: Color
+  
+}
+
+{ $description
+    "Draw a line" 
+} ;
+
+HELP: draw-line-v
+{ $values 
+    startPos: Vector2
+    endPos: Vector2
+    color: Color
+  
+}
+
+{ $description
+    "Draw a line (Vector version)" 
+} ;
+
+HELP: draw-line-ex
+{ $values 
+    startPos: Vector2
+    endPos: Vector2
+    thick: float
+    color: Color
+  
+}
+
+{ $description
+    "Draw a line defining thickness" 
+} ;
+
+HELP: draw-line-bezier
+{ $values 
+    startPos: Vector2
+    endPos: Vector2
+    thick: float
+    color: Color
+  
+}
+
+{ $description
+    "Draw a line using cubic-bezier curves in-out" 
+} ;
+
+HELP: draw-line-bezier-quad
+{ $values 
+    startPos: Vector2
+    endPos: Vector2
+    controlPos: Vector2
+    thick: float
+    color: Color
+  
+}
+
+{ $description
+    "Draw line using quadratic bezier curves with a control point" 
+} ;
+
+HELP: draw-line-bezier-cubic
+{ $values 
+    startPos: Vector2
+    endPos: Vector2
+    startControlPos: Vector2
+    endControlPos: Vector2
+    thick: float
+    color: Color
+  
+}
+
+{ $description
+    "Draw line using cubic bezier curves with 2 control points" 
+} ;
+
+HELP: draw-line-strip
+{ $values 
+    points: { "a " { $link pointer } " to a " { $link Vector2 } }
+    pointCount: int
+    color: Color
+  
+}
+
+{ $description
+    "Draw lines sequence" 
+} ;
+
+HELP: draw-circle
+{ $values 
+    centerX: int
+    centerY: int
+    radius: float
+    color: Color
+  
+}
+
+{ $description
+    "Draw a color-filled circle" 
+} ;
+
+HELP: draw-circle-sector
+{ $values 
+    center: Vector2
+    radius: float
+    startAngle: float
+    endAngle: float
+    segments: int
+    color: Color
+  
+}
+
+{ $description
+    "Draw a piece of a circle" 
+} ;
+
+HELP: draw-circle-sector-lines
+{ $values 
+    center: Vector2
+    radius: float
+    startAngle: float
+    endAngle: float
+    segments: int
+    color: Color
+  
+}
+
+{ $description
+    "Draw circle sector outline" 
+} ;
+
+HELP: draw-circle-gradient
+{ $values 
+    centerX: int
+    centerY: int
+    radius: float
+    color1: Color
+    color2: Color
+  
+}
+
+{ $description
+    "Draw a gradient-filled circle" 
+} ;
+
+HELP: draw-circle-v
+{ $values 
+    center: Vector2
+    radius: float
+    color: Color
+  
+}
+
+{ $description
+    "Draw a color-filled circle (Vector version)" 
+} ;
+
+HELP: draw-circle-lines
+{ $values 
+    centerX: int
+    centerY: int
+    radius: float
+    color: Color
+  
+}
+
+{ $description
+    "Draw circle outline" 
+} ;
+
+HELP: draw-ellipse
+{ $values 
+    centerX: int
+    centerY: int
+    radiusH: float
+    radiusV: float
+    color: Color
+  
+}
+
+{ $description
+    "Draw ellipse" 
+} ;
+
+HELP: draw-ellipse-lines
+{ $values 
+    centerX: int
+    centerY: int
+    radiusH: float
+    radiusV: float
+    color: Color
+  
+}
+
+{ $description
+    "Draw ellipse outline" 
+} ;
+
+HELP: draw-ring
+{ $values 
+    center: Vector2
+    innerRadius: float
+    outerRadius: float
+    startAngle: float
+    endAngle: float
+    segments: int
+    color: Color
+  
+}
+
+{ $description
+    "Draw ring" 
+} ;
+
+HELP: draw-ring-lines
+{ $values 
+    center: Vector2
+    innerRadius: float
+    outerRadius: float
+    startAngle: float
+    endAngle: float
+    segments: int
+    color: Color
+  
+}
+
+{ $description
+    "Draw ring outline" 
+} ;
+
+HELP: draw-rectangle
+{ $values 
+    posX: int
+    posY: int
+    width: int
+    height: int
+    color: Color
+  
+}
+
+{ $description
+    "Draw a color-filled rectangle" 
+} ;
+
+HELP: draw-rectangle-v
+{ $values 
+    position: Vector2
+    size: Vector2
+    color: Color
+  
+}
+
+{ $description
+    "Draw a color-filled rectangle (Vector version)" 
+} ;
+
+HELP: draw-rectangle-rec
+{ $values 
+    rec: Rectangle
+    color: Color
+  
+}
+
+{ $description
+    "Draw a color-filled rectangle" 
+} ;
+
+HELP: draw-rectangle-pro
+{ $values 
+    rec: Rectangle
+    origin: Vector2
+    rotation: float
+    color: Color
+  
+}
+
+{ $description
+    "Draw a color-filled rectangle with pro parameters" 
+} ;
+
+HELP: draw-rectangle-gradient-v
+{ $values 
+    posX: int
+    posY: int
+    width: int
+    height: int
+    color1: Color
+    color2: Color
+  
+}
+
+{ $description
+    "Draw a vertical-gradient-filled rectangle" 
+} ;
+
+HELP: draw-rectangle-gradient-h
+{ $values 
+    posX: int
+    posY: int
+    width: int
+    height: int
+    color1: Color
+    color2: Color
+  
+}
+
+{ $description
+    "Draw a horizontal-gradient-filled rectangle" 
+} ;
+
+HELP: draw-rectangle-gradient-ex
+{ $values 
+    rec: Rectangle
+    col1: Color
+    col2: Color
+    col3: Color
+    col4: Color
+  
+}
+
+{ $description
+    "Draw a gradient-filled rectangle with custom vertex colors" 
+} ;
+
+HELP: draw-rectangle-lines
+{ $values 
+    posX: int
+    posY: int
+    width: int
+    height: int
+    color: Color
+  
+}
+
+{ $description
+    "Draw rectangle outline" 
+} ;
+
+HELP: draw-rectangle-lines-ex
+{ $values 
+    rec: Rectangle
+    lineThick: float
+    color: Color
+  
+}
+
+{ $description
+    "Draw rectangle outline with extended parameters" 
+} ;
+
+HELP: draw-rectangle-rounded
+{ $values 
+    rec: Rectangle
+    roundness: float
+    segments: int
+    color: Color
+  
+}
+
+{ $description
+    "Draw rectangle with rounded edges" 
+} ;
+
+HELP: draw-rectangle-rounded-lines
+{ $values 
+    rec: Rectangle
+    roundness: float
+    segments: int
+    lineThick: float
+    color: Color
+  
+}
+
+{ $description
+    "Draw rectangle with rounded edges outline" 
+} ;
+
+HELP: draw-triangle
+{ $values 
+    v1: Vector2
+    v2: Vector2
+    v3: Vector2
+    color: Color
+  
+}
+
+{ $description
+    "Draw a color-filled triangle (vertex in counter-clockwise order!)" 
+} ;
+
+HELP: draw-triangle-lines
+{ $values 
+    v1: Vector2
+    v2: Vector2
+    v3: Vector2
+    color: Color
+  
+}
+
+{ $description
+    "Draw triangle outline (vertex in counter-clockwise order!)" 
+} ;
+
+HELP: draw-triangle-fan
+{ $values 
+    points: { "a " { $link pointer } " to a " { $link Vector2 } }
+    pointCount: int
+    color: Color
+  
+}
+
+{ $description
+    "Draw a triangle fan defined by points (first vertex is the center)" 
+} ;
+
+HELP: draw-triangle-strip
+{ $values 
+    points: { "a " { $link pointer } " to a " { $link Vector2 } }
+    pointCount: int
+    color: Color
+  
+}
+
+{ $description
+    "Draw a triangle strip defined by points" 
+} ;
+
+HELP: draw-poly
+{ $values 
+    center: Vector2
+    sides: int
+    radius: float
+    rotation: float
+    color: Color
+  
+}
+
+{ $description
+    "Draw a regular polygon (Vector version)" 
+} ;
+
+HELP: draw-poly-lines
+{ $values 
+    center: Vector2
+    sides: int
+    radius: float
+    rotation: float
+    color: Color
+  
+}
+
+{ $description
+    "Draw a polygon outline of n sides" 
+} ;
+
+HELP: draw-poly-lines-ex
+{ $values 
+    center: Vector2
+    sides: int
+    radius: float
+    rotation: float
+    lineThick: float
+    color: Color
+  
+}
+
+{ $description
+    "Draw a polygon outline of n sides with extended parameters" 
+} ;
+
+
+! Basic shapes collision detection functions
+HELP: check-collision-recs
+{ $values 
+    rec1: Rectangle
+    rec2: Rectangle
+  
+}
+
+{ $description
+    "Check collision between two rectangles" 
+} ;
+
+HELP: check-collision-circles
+{ $values 
+    center1: Vector2
+    radius1: float
+    center2: Vector2
+    radius2: float
+  
+}
+
+{ $description
+    "Check collision between two circles" 
+} ;
+
+HELP: check-collision-circle-rec
+{ $values 
+    center: Vector2
+    radius: float
+    rec: Rectangle
+  
+}
+
+{ $description
+    "Check collision between circle and rectangle" 
+} ;
+
+HELP: check-collision-point-rec
+{ $values 
+    point: Vector2
+    rec: Rectangle
+  
+}
+
+{ $description
+    "Check if point is inside rectangle" 
+} ;
+
+HELP: check-collision-point-circle
+{ $values 
+    point: Vector2
+    center: Vector2
+    radius: float
+  
+}
+
+{ $description
+    "Check if point is inside circle" 
+} ;
+
+HELP: check-collision-point-triangle
+{ $values 
+    point: Vector2
+    p1: Vector2
+    p2: Vector2
+    p3: Vector2
+  
+}
+
+{ $description
+    "Check if point is inside a triangle" 
+} ;
+
+HELP: check-collision-point-poly
+{ $values 
+    point: Vector2
+    points: { "a " { $link pointer } " to a " { $link Vector2 } }
+    pointCount: int
+  
+}
+
+{ $description
+    "Check if point is within a polygon described by array of vertices" 
+} ;
+
+HELP: check-collision-lines
+{ $values 
+    startPos1: Vector2
+    endPos1: Vector2
+    startPos2: Vector2
+    endPos2: Vector2
+    collisionPoint: { "a " { $link pointer } " to a " { $link Vector2 } }
+  
+}
+
+{ $description
+    "Check the collision between two lines defined by two points each, returns collision point by reference" 
+} ;
+
+HELP: check-collision-point-line
+{ $values 
+    point: Vector2
+    p1: Vector2
+    p2: Vector2
+    threshold: int
+  
+}
+
+{ $description
+    "Check if point belongs to line created between two points [p1] and [p2] with defined margin in pixels [threshold]" 
+} ;
+
+HELP: get-collision-rec
+{ $values 
+    rec1: Rectangle
+    rec2: Rectangle
+  
+}
+
+{ $description
+    "Get collision rectangle for two rectangles collision" 
+} ;
+
+
+! ------------------------------------------------------------------------------------
+! Texture Loading and Drawing Functions (Module: textures)
+! ------------------------------------------------------------------------------------
+
+! Image loading functions
+! NOTE: This functions do not require GPU access
+HELP: load-image
+{ $values 
+    fileName: c-string
+  
+}
+
+{ $description
+    "Load image from file into CPU memory (RAM). " 
+} ;
+
+HELP: load-image-raw
+{ $values 
+    fileName: c-string
+    width: int
+    height: int
+    format: int
+    headerSize: int
+  
+}
+
+{ $description
+    "Load image from RAW file data." 
+} ;
+
+HELP: load-image-anim
+{ $values 
+    fileName: c-string
+    frames: { "a " { $link pointer } " to a " { $link int } }
+  
+}
+
+{ $description
+    "Load image sequence from file (frames appended to image.data)" 
+} ;
+
+HELP: load-image-from-memory
+{ $values 
+    fileType: c-string
+    fileData: c-string
+    dataSize: int
+  
+}
+
+{ $description
+    "Load image from memory buffer, fileType refers to extension: i.e. '.png'" 
+} ;
+
+HELP: load-image-from-texture
+{ $values 
+    texture: Texture2D
+  
+}
+
+{ $description
+    "Load image from GPU texture data" 
+} ;
+
+HELP: load-image-from-screen
+{ $description
+    "Load image from screen buffer and (screenshot)" 
+} ;
+
+HELP: is-image-ready
+{ $values 
+    image: Image
+  
+}
+
+{ $description
+    "Check if an image is ready" 
+} ;
+
+HELP: unload-image
+{ $values 
+    image: Image
+  
+}
+
+{ $description
+    "Unload image from CPU memory (RAM)" 
+} ;
+
+HELP: export-image
+{ $values 
+    image: Image
+    fileName: c-string
+  
+}
+
+{ $description
+    "Export image data to file, returns true on success" 
+} ;
+
+HELP: export-image-as-code
+{ $values 
+    image: Image
+    fileName: c-string
+  
+}
+
+{ $description
+    "Export image as code file defining an array of bytes, returns true on success" 
+} ;
+
+
+! Image generation functions
+HELP: gen-image-color
+{ $values 
+    width: int
+    height: int
+    color: Color
+  
+}
+
+{ $description
+    "Generate image: plain color" 
+} ;
+
+HELP: gen-image-gradient-v
+{ $values 
+    width: int
+    height: int
+    top: Color
+    bottom: Color
+  
+}
+
+{ $description
+    "Generate image: vertical gradient" 
+} ;
+
+HELP: gen-image-gradient-h
+{ $values 
+    width: int
+    height: int
+    left: Color
+    right: Color
+  
+}
+
+{ $description
+    "Generate image: horizontal gradient" 
+} ;
+
+HELP: gen-image-gradient-radial
+{ $values 
+    width: int
+    height: int
+    density: float
+    inner: Color
+    outer: Color
+  
+}
+
+{ $description
+    "Generate image: radial gradient" 
+} ;
+
+HELP: gen-image-checked
+{ $values 
+    width: int
+    height: int
+    checksX: int
+    checksY: int
+    col1: Color
+    col2: Color
+  
+}
+
+{ $description
+    "Generate image: checked" 
+} ;
+
+HELP: gen-image-white-noise
+{ $values 
+    width: int
+    height: int
+    factor: float
+  
+}
+
+{ $description
+    "Generate image: white noise" 
+} ;
+
+HELP: gen-image-perlin-noise
+{ $values 
+    width: int
+    height: int
+    offsetX: int
+    offsetY: int
+    scale: float
+  
+}
+
+{ $description
+    "Generate image: perlin noise" 
+} ;
+
+HELP: gen-image-cellular
+{ $values 
+    width: int
+    height: int
+    tileSize: int
+  
+}
+
+{ $description
+    "Generate image: cellular algorithm, bigger tileSize means bigger cells" 
+} ;
+
+HELP: gen-image-text
+{ $values 
+    width: int
+    height: int
+    text: c-string
+  
+}
+
+{ $description
+    "Generate image: text" 
+} ;
+
+
+! Image manipulation functions
+HELP: image-copy
+{ $values 
+    image: Image
+  
+}
+
+{ $description
+    "Create an image duplicate (useful for transformations)" 
+} ;
+
+HELP: image-from-image
+{ $values 
+    image: Image
+    rec: Rectangle
+  
+}
+
+{ $description
+    "Create an image from another image piece" 
+} ;
+
+HELP: image-text
+{ $values 
+    text: c-string
+    fontSize: int
+    color: Color
+  
+}
+
+{ $description
+    "Create an image from text (default font)" 
+} ;
+
+HELP: image-text-ex
+{ $values 
+    font: Font
+    text: c-string
+    fontSize: float
+    spacing: float
+    tint: Color
+  
+}
+
+{ $description
+    "Create an image from text (custom sprite font)" 
+} ;
+
+HELP: image-format
+{ $values 
+    image: { "a " { $link pointer } " to a " { $link Image } }
+    newformat: int
+  
+}
+
+{ $description
+    "Convert image data to desired format" 
+} ;
+
+HELP: image-to-pot
+{ $values 
+    image: { "a " { $link pointer } " to a " { $link Image } }
+    fill: Color
+  
+}
+
+{ $description
+    "Convert image to POT (power-of-two)" 
+} ;
+
+HELP: image-crop
+{ $values 
+    image: { "a " { $link pointer } " to a " { $link Image } }
+    crop: Rectangle
+  
+}
+
+{ $description
+    "Crop an image to a defined rectangle" 
+} ;
+
+HELP: image-alpha-crop
+{ $values 
+    image: { "a " { $link pointer } " to a " { $link Image } }
+    threshold: float
+  
+}
+
+{ $description
+    "Crop image depending on alpha value" 
+} ;
+
+HELP: image-alpha-clear
+{ $values 
+    image: { "a " { $link pointer } " to a " { $link Image } }
+    color: Color
+    threshold: float
+  
+}
+
+{ $description
+    "Clear alpha channel to desired color" 
+} ;
+
+HELP: image-alpha-mask
+{ $values 
+    image: { "a " { $link pointer } " to a " { $link Image } }
+    alphaMask: Image
+  
+}
+
+{ $description
+    "Apply alpha mask to image" 
+} ;
+
+HELP: image-alpha-premultiply
+{ $values 
+    image: { "a " { $link pointer } " to a " { $link Image } }
+  
+}
+
+{ $description
+    "Premultiply alpha channel" 
+} ;
+
+HELP: image-blur-gaussian
+{ $values 
+    image: { "a " { $link pointer } " to a " { $link Image } }
+    blurSize: int
+  
+}
+
+{ $description
+    "Blur image with gaussian" 
+} ;
+
+HELP: image-resize
+{ $values 
+    image: { "a " { $link pointer } " to a " { $link Image } }
+    newWidth: int
+    newHeight: int
+  
+}
+
+{ $description
+    "Resize image (Bicubic scaling algorithm)" 
+} ;
+
+HELP: image-resize-nn
+{ $values 
+    image: { "a " { $link pointer } " to a " { $link Image } }
+    newWidth: int
+    newHeight: int
+  
+}
+
+{ $description
+    "Resize image (Nearest-Neighbor scaling algorithm)" 
+} ;
+
+HELP: image-resize-canvas
+{ $values 
+    image: { "a " { $link pointer } " to a " { $link Image } }
+    newWidth: int
+    newHeight: int
+    offsetX: int
+    offsetY: int
+    fill: Color
+  
+}
+
+{ $description
+    "Resize canvas and fill with color" 
+} ;
+
+HELP: image-mipmaps
+{ $values 
+    image: { "a " { $link pointer } " to a " { $link Image } }
+  
+}
+
+{ $description
+    "Compute all mipmap levels for a provided image" 
+} ;
+
+HELP: image-dither
+{ $values 
+    image: { "a " { $link pointer } " to a " { $link Image } }
+    rBpp: int
+    gBpp: int
+    bBpp: int
+    aBpp: int
+  
+}
+
+{ $description
+    "Dither image data to 16bpp or lower (Floyd-Steinberg dithering)" 
+} ;
+
+HELP: image-flip-vertical
+{ $values 
+    image: { "a " { $link pointer } " to a " { $link Image } }
+  
+}
+
+{ $description
+    "Flip image vertically" 
+} ;
+
+HELP: image-flip-horizontal
+{ $values 
+    image: { "a " { $link pointer } " to a " { $link Image } }
+  
+}
+
+{ $description
+    "Flip image horizontally" 
+} ;
+
+HELP: image-rotate-cw
+{ $values 
+    image: { "a " { $link pointer } " to a " { $link Image } }
+  
+}
+
+{ $description
+    "Rotate image clockwise 90deg" 
+} ;
+
+HELP: image-rotate-ccw
+{ $values 
+    image: { "a " { $link pointer } " to a " { $link Image } }
+  
+}
+
+{ $description
+    "Rotate image counter-clockwise 90deg" 
+} ;
+
+HELP: image-color-tint
+{ $values 
+    image: { "a " { $link pointer } " to a " { $link Image } }
+    color: Color
+  
+}
+
+{ $description
+    "Modify image color: tint" 
+} ;
+
+HELP: image-color-invert
+{ $values 
+    image: { "a " { $link pointer } " to a " { $link Image } }
+  
+}
+
+{ $description
+    "Modify image color: invert" 
+} ;
+
+HELP: image-color-grayscale
+{ $values 
+    image: { "a " { $link pointer } " to a " { $link Image } }
+  
+}
+
+{ $description
+    "Modify image color: grayscale" 
+} ;
+
+HELP: image-color-contrast
+{ $values 
+    image: { "a " { $link pointer } " to a " { $link Image } }
+    contrast: float
+  
+}
+
+{ $description
+    "Modify image color: contrast (-100 to 100)" 
+} ;
+
+HELP: image-color-brightness
+{ $values 
+    image: { "a " { $link pointer } " to a " { $link Image } }
+    brightness: int
+  
+}
+
+{ $description
+    "Modify image color: brightness (-255 to 255)" 
+} ;
+
+HELP: image-color-replace
+{ $values 
+    image: { "a " { $link pointer } " to a " { $link Image } }
+    color: Color
+    replace: Color
+  
+}
+
+{ $description
+    "Modify image color: replace color" 
+} ;
+
+HELP: load-image-colors
+{ $values 
+    image: Image
+  
+}
+
+{ $description
+    "Load color data from image as a Color array (RGBA - 32bit)" 
+} ;
+
+HELP: load-image-palette
+{ $values 
+    image: Image
+    maxPaletteSize: int
+    colorCount: { "a " { $link pointer } " to a " { $link int } }
+  
+}
+
+{ $description
+    "Load colors palette from image as a Color array (RGBA - 32bit)" 
+} ;
+
+HELP: unload-image-colors
+{ $values 
+    colors: { "a " { $link pointer } " to a " { $link Color } }
+  
+}
+
+{ $description
+    "Unload color data loaded with LoadImageColors()" 
+} ;
+
+HELP: unload-image-palette
+{ $values 
+    colors: { "a " { $link pointer } " to a " { $link Color } }
+  
+}
+
+{ $description
+    "Unload colors palette loaded with LoadImagePalette()" 
+} ;
+
+HELP: get-image-alpha-border
+{ $values 
+    image: Image
+    threshold: float
+  
+}
+
+{ $description
+    "Get image alpha border rectangle" 
+} ;
+
+HELP: get-image-color
+{ $values 
+    image: Image
+    x: int
+    y: int
+  
+}
+
+{ $description
+    "Get image pixel color at (x, y) position" 
+} ;
+
+
+! Image drawing functions
+! NOTE: Image software-rendering functions (CPU)
+HELP: image-clear-background
+{ $values 
+    dst: { "a " { $link pointer } " to a " { $link Image } }
+    color: Color
+  
+}
+
+{ $description
+    "Clear image background with given color" 
+} ;
+
+HELP: image-draw-pixel
+{ $values 
+    dst: { "a " { $link pointer } " to a " { $link Image } }
+    posX: int
+    posY: int
+    color: Color
+  
+}
+
+{ $description
+    "Draw pixel within an image" 
+} ;
+
+HELP: image-draw-pixel-v
+{ $values 
+    dst: { "a " { $link pointer } " to a " { $link Image } }
+    position: Vector2
+    color: Color
+  
+}
+
+{ $description
+    "Draw pixel within an image (Vector version)" 
+} ;
+
+HELP: image-draw-line
+{ $values 
+    dst: { "a " { $link pointer } " to a " { $link Image } }
+    startPosX: int
+    startPosY: int
+    endPosX: int
+    endPosY: int
+    color: Color
+  
+}
+
+{ $description
+    "Draw line within an image" 
+} ;
+
+HELP: image-draw-line-v
+{ $values 
+    dst: { "a " { $link pointer } " to a " { $link Image } }
+    start: Vector2
+    end: Vector2
+    color: Color
+  
+}
+
+{ $description
+    "Draw line within an image (Vector version)" 
+} ;
+
+HELP: image-draw-circle
+{ $values 
+    dst: { "a " { $link pointer } " to a " { $link Image } }
+    centerX: int
+    centerY: int
+    radius: int
+    color: Color
+  
+}
+
+{ $description
+    "Draw circle within an image" 
+} ;
+
+HELP: image-draw-circle-v
+{ $values 
+    dst: { "a " { $link pointer } " to a " { $link Image } }
+    center: Vector2
+    radius: int
+    color: Color
+  
+}
+
+{ $description
+    "Draw circle within an image (Vector version)" 
+} ;
+
+HELP: image-draw-circle-lines
+{ $values 
+    dst: { "a " { $link pointer } " to a " { $link Image } }
+    centerX: int
+    centerY: int
+    radius: int
+    color: Color
+  
+}
+
+{ $description
+    "Draw circle within an image" 
+} ;
+
+HELP: image-draw-circle-lines-v
+{ $values 
+    dst: { "a " { $link pointer } " to a " { $link Image } }
+    center: Vector2
+    radius: int
+    color: Color
+  
+}
+
+{ $description
+    "Draw circle within an image (Vector version)" 
+} ;
+
+HELP: image-draw-rectangle
+{ $values 
+    dst: { "a " { $link pointer } " to a " { $link Image } }
+    posX: int
+    posY: int
+    width: int
+    height: int
+    color: Color
+  
+}
+
+{ $description
+    "Draw rectangle within an image" 
+} ;
+
+HELP: image-draw-rectangle-v
+{ $values 
+    dst: { "a " { $link pointer } " to a " { $link Image } }
+    position: Vector2
+    size: Vector2
+    color: Color
+  
+}
+
+{ $description
+    "Draw rectangle within an image (Vector version)" 
+} ;
+
+HELP: image-draw-rectangle-rec
+{ $values 
+    dst: { "a " { $link pointer } " to a " { $link Image } }
+    rec: Rectangle
+    color: Color
+  
+}
+
+{ $description
+    "Draw rectangle within an image" 
+} ;
+
+HELP: image-draw-rectangle-lines
+{ $values 
+    dst: { "a " { $link pointer } " to a " { $link Image } }
+    rec: Rectangle
+    thick: int
+    color: Color
+  
+}
+
+{ $description
+    "Draw rectangle lines within an image" 
+} ;
+
+HELP: image-draw
+{ $values 
+    dst: { "a " { $link pointer } " to a " { $link Image } }
+    src: Image
+    srcRec: Rectangle
+    dstRec: Rectangle
+    tint: Color
+  
+}
+
+{ $description
+    "Draw a source image within a destination image (tint applied to source)" 
+} ;
+
+HELP: image-draw-text
+{ $values 
+    dst: { "a " { $link pointer } " to a " { $link Image } }
+    text: c-string
+    posX: int
+    posY: int
+    fontSize: int
+    color: Color
+  
+}
+
+{ $description
+    "Draw text (using default font) within an image (destination)" 
+} ;
+
+HELP: image-draw-text-ex
+{ $values 
+    dst: { "a " { $link pointer } " to a " { $link Image } }
+    font: Font
+    text: c-string
+    position: Vector2
+    fontSize: float
+    spacing: float
+    tint: Color
+  
+}
+
+{ $description
+    "Draw text (custom sprite font) within an image (destination)" 
+} ;
+
+
+! Texture loading functions
+! NOTE: These functions require GPU access
+HELP: load-texture
+{ $values 
+    fileName: c-string
+  
+}
+
+{ $description
+    "Load texture from file into GPU memory (VRAM)" 
+} ;
+
+HELP: load-texture-from-image
+{ $values 
+    image: Image
+  
+}
+
+{ $description
+    "Load texture from image data" 
+} ;
+
+HELP: load-texture-cubemap
+{ $values 
+    image: Image
+    layout: CubemapLayout
+  
+}
+
+{ $description
+    "Load cubemap from image, multiple image cubemap layouts supported" 
+} ;
+
+HELP: load-render-texture
+{ $values 
+    width: int
+    height: int
+  
+}
+
+{ $description
+    "Load texture for rendering (framebuffer)" 
+} ;
+
+HELP: is-texture-ready
+{ $values 
+    texture: Texture2D
+  
+}
+
+{ $description
+    "Check if a texture is ready" 
+} ;
+
+HELP: unload-texture
+{ $values 
+    texture: Texture2D
+  
+}
+
+{ $description
+    "Unload texture from GPU memory (VRAM)" 
+} ;
+
+HELP: is-render-texture-ready
+{ $values 
+    target: RenderTexture2D
+  
+}
+
+{ $description
+    "Check if a render texture is ready" 
+} ;
+
+HELP: unload-render-texture
+{ $values 
+    target: RenderTexture2D
+  
+}
+
+{ $description
+    "Unload render texture from GPU memory (VRAM)" 
+} ;
+
+HELP: update-texture
+{ $values 
+    texture: Texture2D
+    pixels: void*
+  
+}
+
+{ $description
+    "Update GPU texture with new data" 
+} ;
+
+HELP: update-texture-rec
+{ $values 
+    texture: Texture2D
+    rec: Rectangle
+    pixels: void*
+  
+}
+
+{ $description
+    "Update GPU texture rectangle with new data" 
+} ;
+
+
+! Texture configuration functions
+HELP: gen-texture-mipmaps
+{ $values 
+    texture: { "a " { $link pointer } " to a " { $link Texture2D } }
+  
+}
+
+{ $description
+    "Generate GPU mipmaps for a texture" 
+} ;
+
+HELP: set-texture-filter
+{ $values 
+    texture: Texture2D
+    filter: TextureFilterMode
+  
+}
+
+{ $description
+    "Set texture scaling filter mode" 
+} ;
+
+HELP: set-texture-wrap
+{ $values 
+    texture: Texture2D
+    wrap: TextureWrapMode
+  
+}
+
+{ $description
+    "Set texture wrapping mode" 
+} ;
+
+
+! Texture drawing functions
+HELP: draw-texture
+{ $values 
+    texture: Texture2D
+    posX: int
+    posY: int
+    tint: Color
+  
+}
+
+{ $description
+    "Draw a Texture2D" 
+} ;
+
+HELP: draw-texture-v
+{ $values 
+    texture: Texture2D
+    position: Vector2
+    tint: Color
+  
+}
+
+{ $description
+    "Draw a Texture2D with position defined as Vector2" 
+} ;
+
+HELP: draw-texture-ex
+{ $values 
+    texture: Texture2D
+    position: Vector2
+    rotation: float
+    scale: float
+    tint: Color
+  
+}
+
+{ $description
+    "Draw a Texture2D with extended parameters" 
+} ;
+
+HELP: draw-texture-rec
+{ $values 
+    texture: Texture2D
+    source: Rectangle
+    position: Vector2
+    tint: Color
+  
+}
+
+{ $description
+    "Draw a part of a texture defined by a rectangle" 
+} ;
+
+HELP: draw-texture-pro
+{ $values 
+    texture: Texture2D
+    source: Rectangle
+    dest: Rectangle
+    origin: Vector2
+    rotation: float
+    tint: Color
+  
+}
+
+{ $description
+    "Draw a part of a texture defined by a rectangle with 'pro' parameters" 
+} ;
+
+HELP: draw-texture-npatch
+{ $values 
+    texture: Texture2D
+    nPatchInfo: NPatchInfo
+    dest: Rectangle
+    origin: Vector2
+    rotation: float
+    tint: Color
+  
+}
+
+{ $description
+    "Draws a texture (or part of it) that stretches or shrinks nicely" 
+} ;
+
+
+! Color/pixel related functions
+HELP: fade
+{ $values 
+    color: Color
+    alpha: float
+  
+}
+
+{ $description
+    "Get color with alpha applied, alpha goes from 0.0f to 1.0f" 
+} ;
+
+HELP: color-to-int
+{ $values 
+    color: Color
+  
+}
+
+{ $description
+    "Get hexadecimal value for a Color" 
+} ;
+
+HELP: color-normalize
+{ $values 
+    color: Color
+  
+}
+
+{ $description
+    "Get Color normalized as float [0..1]" 
+} ;
+
+HELP: color-from-normalized
+{ $values 
+    normalized: Vector4
+  
+}
+
+{ $description
+    "Get Color from normalized values [0..1]" 
+} ;
+
+HELP: color-to-hsv
+{ $values 
+    color: Color
+  
+}
+
+{ $description
+    "Get HSV values for a Color, hue [0..360], saturation/value [0..1]" 
+} ;
+
+HELP: color-from-hsv
+{ $values 
+    hue: float
+    saturation: float
+    value: float
+  
+}
+
+{ $description
+    "Get a Color from HSV values, hue [0..360], saturation/value [0..1]" 
+} ;
+
+HELP: color-tint
+{ $values 
+    color: Color
+    tint: Color
+  
+}
+
+{ $description
+    "Get color with tint" 
+} ;
+
+HELP: color-brightness
+{ $values 
+    color: Color
+    factor: float
+  
+}
+
+{ $description
+    "Get color with brightness" 
+} ;
+
+HELP: color-contrast
+{ $values 
+    color: Color
+    contrast: float
+  
+}
+
+{ $description
+    "Get color with contrast" 
+} ;
+
+HELP: color-alpha
+{ $values 
+    color: Color
+    alpha: float
+  
+}
+
+{ $description
+    "Get color with alpha applied, alpha goes from 0.0f to 1.0f" 
+} ;
+
+HELP: color-alpha-blend
+{ $values 
+    dst: Color
+    src: Color
+    tint: Color
+  
+}
+
+{ $description
+    "Get src alpha-blended into dst color with tint" 
+} ;
+
+HELP: get-color
+{ $values 
+    hexValue: uint
+  
+}
+
+{ $description
+    "Get Color structure from hexadecimal value" 
+} ;
+
+HELP: get-pixel-color
+{ $values 
+    srcPtr: void*
+    format: PixelFormat
+  
+}
+
+{ $description
+    "Get Color from a source pixel pointer of certain format" 
+} ;
+
+HELP: set-pixel-color
+{ $values 
+    dstPtr: void*
+    color: Color
+    format: PixelFormat
+  
+}
+
+{ $description
+    "Set color formatted into destination pixel pointer" 
+} ;
+
+HELP: get-pixel-data-size
+{ $values 
+    width: int
+    height: int
+    format: PixelFormat
+  
+}
+
+{ $description
+    "Get pixel data size in bytes for certain format" 
+} ;
+
+
+! ------------------------------------------------------------------------------------
+! Font Loading and Text Drawing Functions (Module: text)
+! ------------------------------------------------------------------------------------
+
+! Font loading/unloading functions
+HELP: get-font-default
+{ $description
+    "Get the default Font" 
+} ;
+
+HELP: load-font
+{ $values 
+    fileName: c-string
+  
+}
+
+{ $description
+    "Load font from file into GPU memory (VRAM)" 
+} ;
+
+HELP: load-font-ex
+{ $values 
+    fileName: c-string
+    fontSize: int
+    fontChars: { "a " { $link pointer } " to a " { $link int } }
+    glyphCount: int
+  
+}
+
+{ $description
+    "Load font from file with extended parameters, use NULL for fontChars and 0 for glyphCount to load the default character set" 
+} ;
+
+HELP: load-font-from-image
+{ $values 
+    image: Image
+    key: Color
+    firstChar: int
+  
+}
+
+{ $description
+    "Load font from Image (XNA style)" 
+} ;
+
+HELP: load-font-from-memory
+{ $values 
+    fileType: c-string
+    fileData: c-string
+    dataSize: int
+    fontSize: int
+    fontChars: { "a " { $link pointer } " to a " { $link int } }
+    glyphCount: int
+  
+}
+
+{ $description
+    "Load font from memory buffer, fileType refers to extension: i.e. '.ttf'" 
+} ;
+
+HELP: is-font-ready
+{ $values 
+    font: Font
+  
+}
+
+{ $description
+    "Check if a font is ready" 
+} ;
+
+HELP: load-font-data
+{ $values 
+    fileData: c-string
+    dataSize: int
+    fontSize: int
+    fontChars: { "a " { $link pointer } " to a " { $link int } }
+    glyphCount: int
+    type: FontType
+  
+}
+
+{ $description
+    "Load font data for further use" 
+} ;
+
+HELP: gen-image-font-atlas
+{ $values 
+    chars: { "a " { $link pointer } " to a " { $link GlyphInfo } }
+    recs: { "a double " { $link pointer } " to a " { $link Rectangle } }
+    glyphCount: int
+    fontSize: int
+    padding: int
+    packMethod: int
+  
+}
+
+{ $description
+    "Generate image font atlas using chars info" 
+} ;
+
+HELP: unload-font-data
+{ $values 
+    chars: { "a " { $link pointer } " to a " { $link GlyphInfo } }
+    glyphCount: int
+  
+}
+
+{ $description
+    "Unload font chars info data (RAM)" 
+} ;
+
+HELP: unload-font
+{ $values 
+    font: Font
+  
+}
+
+{ $description
+    "Unload Font from GPU memory (VRAM)" 
+} ;
+
+HELP: export-font-as-code
+{ $values 
+    font: Font
+    fileName: c-string
+  
+}
+
+{ $description
+    "Export font as code file, returns true on success" 
+} ;
+
+
+! Text drawing functions
+HELP: draw-fps
+{ $values 
+    posX: int
+    posY: int
+  
+}
+
+{ $description
+    "Draw current FPS" 
+} ;
+
+HELP: draw-text
+{ $values 
+    text: c-string
+    posX: int
+    posY: int
+    fontSize: int
+    color: Color
+  
+}
+
+{ $description
+    "Draw text (using default font)" 
+} ;
+
+HELP: draw-text-ex
+{ $values 
+    font: Font
+    text: c-string
+    position: Vector2
+    fontSize: float
+    spacing: float
+    tint: Color
+  
+}
+
+{ $description
+    "Draw text using font and additional parameters" 
+} ;
+
+HELP: draw-text-pro
+{ $values 
+    font: Font
+    text: c-string
+    position: Vector2
+    origin: Vector2
+    rotation: float
+    fontSize: float
+    spacing: float
+    tint: Color
+  
+}
+
+{ $description
+    "Draw text using Font and pro parameters (rotation)" 
+} ;
+
+HELP: draw-text-codepoint
+{ $values 
+    font: Font
+    codepoint: int
+    position: Vector2
+    fontSize: float
+    tint: Color
+  
+}
+
+{ $description
+    "Draw one character (codepoint)" 
+} ;
+
+HELP: draw-text-codepoints
+{ $values 
+    font: Font
+    codepoint: { "a " { $link pointer } " to a " { $link int } }
+    count: int
+    position: Vector2
+    fontSize: float
+    spacing: float
+    tint: Color
+  
+}
+
+{ $description
+    "Draw multiple character (codepoint)" 
+} ;
+
+
+! Text font info functions
+HELP: measure-text
+{ $values 
+    text: c-string
+    fontSize: int
+  
+}
+
+{ $description
+    "Measure string width for default font" 
+} ;
+
+HELP: measure-text-ex
+{ $values 
+    font: Font
+    text: c-string
+    fontSize: float
+    spacing: float
+  
+}
+
+{ $description
+    "Measure string size for Font" 
+} ;
+
+HELP: get-glyph-index
+{ $values 
+    font: Font
+    codepoint: int
+  
+}
+
+{ $description
+    "Get glyph index position in font for a codepoint (unicode character), fallback to '?' if not found" 
+} ;
+
+HELP: get-glyph-info
+{ $values 
+    font: Font
+    codepoint: int
+  
+}
+
+{ $description
+    "Get glyph font info data for a codepoint (unicode character), fallback to '?' if not found" 
+} ;
+
+HELP: get-glyph-atlas-rec
+{ $values 
+    font: Font
+    codepoint: int
+  
+}
+
+{ $description
+    "Get glyph rectangle in font atlas for a codepoint (unicode character), fallback to '?' if not found" 
+} ;
+
+
+! Text codepoints management functions (unicode characters)
+HELP: load-utf8
+{ $values 
+    codepoints: { "a " { $link pointer } " to a " { $link int } }
+    length: int
+  
+}
+
+{ $description
+    "Load UTF-8 text encoded from codepoints array" 
+} ;
+
+HELP: unload-utf8
+{ $values 
+    text: c-string
+  
+}
+
+{ $description
+    "Unload UTF-8 text encoded from codepoints array" 
+} ;
+
+HELP: load-codepoints
+{ $values 
+    text: c-string
+    count: { "a " { $link pointer } " to a " { $link int } }
+  
+}
+
+{ $description
+    "Load all codepoints from a UTF-8 text string, codepoints count returned by parameter" 
+} ;
+
+HELP: unload-codepoints
+{ $values 
+    codepoints: { "a " { $link pointer } " to a " { $link int } }
+  
+}
+
+{ $description
+    "Unload codepoints data from memory" 
+} ;
+
+HELP: get-codepoint-count
+{ $values 
+    text: c-string
+  
+}
+
+{ $description
+    "Get total number of codepoints in a UTF-8 encoded string" 
+} ;
+
+HELP: get-codepoint
+{ $values 
+    text: c-string
+    bytesProcessed: { "a " { $link pointer } " to a " { $link int } }
+  
+}
+
+{ $description
+    "Get next codepoint in a UTF-8 encoded string, 0x3f('?') is returned on failure" 
+} ;
+
+HELP: get-codepoint-next
+{ $values 
+    text: c-string
+    codepointSize: { "a " { $link pointer } " to a " { $link int } }
+  
+}
+
+{ $description
+    "Get next codepoint in a UTF-8 encoded string, 0x3f('?') is returned on failure" 
+} ;
+
+HELP: get-codepoint-previous
+{ $values 
+    text: c-string
+    codepointSize: { "a " { $link pointer } " to a " { $link int } }
+  
+}
+
+{ $description
+    "Get previous codepoint in a UTF-8 encoded string, 0x3f('?') is returned on failure" 
+} ;
+
+HELP: codepoint-to-utf8
+{ $values 
+    codepoint: int
+    byteSize: { "a " { $link pointer } " to a " { $link int } }
+  
+}
+
+{ $description
+    "Encode one codepoint into UTF-8 byte array (array length returned as parameter)" 
+} ;
+
+
+! Text strings management functions (no UTF-8 strings, only byte chars)
+! NOTE: Some strings allocate memory internally for returned strings, just be careful!
+HELP: text-copy
+{ $values 
+    dst: c-string
+    src: c-string
+  
+}
+
+{ $description
+    "Copy one string to another, returns bytes copied"
+} ;
+
+HELP: text-is-equal
+{ $values 
+    text1: c-string
+    text2: c-string
+  
+}
+
+{ $description
+    "Check if two text string are equal" 
+} ;
+
+HELP: text-length
+{ $values 
+    text: c-string
+  
+}
+
+{ $description
+    "Get text length, checks for '\0' ending" 
+} ;
+
+HELP: text-subtext
+{ $values 
+    text: c-string
+    position: int
+    length: int
+  
+}
+
+{ $description
+    "Get a piece of a text string" 
+} ;
+
+HELP: text-replace
+{ $values 
+    text: c-string
+    replace: c-string
+    by: c-string
+  
+}
+
+{ $description
+    "Replace text string" 
+    { $warning
+        "Memory must be freed!" }
+} ;
+
+HELP: text-insert
+{ $values 
+    text: c-string
+    insert: c-string
+    position: int
+  
+}
+
+{ $description
+    "Insert text in a position" 
+    { $warning
+        "Memory must be freed!" }
+} ;
+
+HELP: text-join
+{ $values 
+    textList: { "a " { $link pointer } " to a " { $link c-string } }
+    count: int
+    delimiter: c-string
+  
+}
+
+{ $description
+    "Join text strings with delimiter" 
+} ;
+
+HELP: text-split
+{ $values 
+    text: c-string
+    delimiter: char
+    count: { "a " { $link pointer } " to a " { $link int } }
+  
+}
+
+{ $description
+    "Split text into multiple strings" 
+} ;
+
+HELP: text-append
+{ $values 
+    text: c-string
+    append: c-string
+    position: { "a " { $link pointer } " to a " { $link int } }
+  
+}
+
+{ $description
+    "Append text at specific position and move cursor!" 
+} ;
+
+HELP: text-find-index
+{ $values 
+    text: c-string
+    find: c-string
+  
+}
+
+{ $description
+    "Find first text occurrence within a string" 
+} ;
+
+HELP: text-to-upper
+{ $values 
+    text: c-string
+  
+}
+
+{ $description
+    "Get upper case version of provided string" 
+} ;
+
+HELP: text-to-lower
+{ $values 
+    text: c-string
+  
+}
+
+{ $description
+    "Get lower case version of provided string" 
+} ;
+
+HELP: text-to-pascal
+{ $values 
+    text: c-string
+  
+}
+
+{ $description
+    "Get Pascal case notation version of provided string" 
+} ;
+
+HELP: text-to-integer
+{ $values 
+    text: c-string
+  
+}
+
+{ $description
+    "Get integer value from text." 
+    { $warning
+        "Negative values not supported" }
+} ;
+
+
+! ------------------------------------------------------------------------------------
+! Basic 3d Shapes Drawing Functions (Module: models)
+! ------------------------------------------------------------------------------------
+
+! Basic geometric 3D shapes drawing functions
+HELP: draw-line-3d
+{ $values 
+    startPos: Vector3
+    endPos: Vector3
+    color: Color
+  
+}
+
+{ $description
+    "Draw a line in 3D world space" 
+} ;
+
+HELP: draw-point-3d
+{ $values 
+    position: Vector3
+    color: Color
+  
+}
+
+{ $description
+    "Draw a point in 3D space, actually a small line" 
+} ;
+
+HELP: draw-circle-3d
+{ $values 
+    center: Vector3
+    radius: float
+    rotationAxis: Vector3
+    rotationAngle: float
+    color: Color
+  
+}
+
+{ $description
+    "Draw a circle in 3D world space" 
+} ;
+
+HELP: draw-triangle-3d
+{ $values 
+    v1: Vector3
+    v2: Vector3
+    v3: Vector3
+    color: Color
+  
+}
+
+{ $description
+    "Draw a color-filled triangle (vertex in counter-clockwise order!)" 
+} ;
+
+HELP: draw-triangle-strip-3d
+{ $values 
+    points: { "a " { $link pointer } " to a " { $link Vector3 } }
+    pointCount: int
+    color: Color
+  
+}
+
+{ $description
+    "Draw a triangle strip defined by points" 
+} ;
+
+HELP: draw-cube
+{ $values 
+    position: Vector3
+    width: float
+    height: float
+    length: float
+    color: Color
+  
+}
+
+{ $description
+    "Draw cube" 
+} ;
+
+HELP: draw-cube-v
+{ $values 
+    position: Vector3
+    size: Vector3
+    color: Color
+  
+}
+
+{ $description
+    "Draw cube (Vector version)" 
+} ;
+
+HELP: draw-cube-wires
+{ $values 
+    position: Vector3
+    width: float
+    height: float
+    length: float
+    color: Color
+  
+}
+
+{ $description
+    "Draw cube wires" 
+} ;
+
+HELP: draw-cube-wires-v
+{ $values 
+    position: Vector3
+    size: Vector3
+    color: Color
+  
+}
+
+{ $description
+    "Draw cube wires (Vector version)" 
+} ;
+
+HELP: draw-sphere
+{ $values 
+    centerPos: Vector3
+    radius: float
+    color: Color
+  
+}
+
+{ $description
+    "Draw sphere" 
+} ;
+
+HELP: draw-sphere-ex
+{ $values 
+    centerPos: Vector3
+    radius: float
+    rings: int
+    slices: int
+    color: Color
+  
+}
+
+{ $description
+    "Draw sphere with extended parameters" 
+} ;
+
+HELP: draw-sphere-wires
+{ $values 
+    centerPos: Vector3
+    radius: float
+    rings: int
+    slices: int
+    color: Color
+  
+}
+
+{ $description
+    "Draw sphere wires" 
+} ;
+
+HELP: draw-cylinder
+{ $values 
+    position: Vector3
+    radiusTop: float
+    radiusBottom: float
+    height: float
+    slices: int
+    color: Color
+  
+}
+
+{ $description
+    "Draw a cylinder/cone" 
+} ;
+
+HELP: draw-cylinder-ex
+{ $values 
+    startPos: Vector3
+    endPos: Vector3
+    startRadius: float
+    endRadius: float
+    sides: int
+    color: Color
+  
+}
+
+{ $description
+    "Draw a cylinder with base at startPos and top at endPos" 
+} ;
+
+HELP: draw-cylinder-wires
+{ $values 
+    position: Vector3
+    radiusTop: float
+    radiusBottom: float
+    height: float
+    slices: int
+    color: Color
+  
+}
+
+{ $description
+    "Draw a cylinder/cone wires" 
+} ;
+
+HELP: draw-cylinder-wires-ex
+{ $values 
+    startPos: Vector3
+    endPos: Vector3
+    startRadius: float
+    endRadius: float
+    sides: int
+    color: Color
+  
+}
+
+{ $description
+    "Draw a cylinder wires with base at startPos and top at endPos" 
+} ;
+
+HELP: draw-capsule
+{ $values 
+    startPos: Vector3
+    endPos: Vector3
+    radius: float
+    slices: int
+    rings: int
+    color: Color
+  
+}
+
+{ $description
+    "Draw a capsule with the center of its sphere caps at startPos and endPos" 
+} ;
+
+HELP: draw-capsule-wires
+{ $values 
+    startPos: Vector3
+    endPos: Vector3
+    radius: float
+    slices: int
+    rings: int
+    color: Color
+  
+}
+
+{ $description
+    "Draw capsule wireframe with the center of its sphere caps at startPos and endPos" 
+} ;
+
+HELP: draw-plane
+{ $values 
+    centerPos: Vector3
+    size: Vector2
+    color: Color
+  
+}
+
+{ $description
+    "Draw a plane XZ" 
+} ;
+
+HELP: draw-ray
+{ $values 
+    ray: Ray
+    color: Color
+  
+}
+
+{ $description
+    "Draw a ray line" 
+} ;
+
+HELP: draw-grid
+{ $values 
+    slices: int
+    spacing: float
+  
+}
+
+{ $description
+    "Draw a grid (centered at (0, 0, 0))" 
+} ;
+
+
+! ------------------------------------------------------------------------------------
+! Model 3d Loading and Drawing Functions (Module: models)
+! ------------------------------------------------------------------------------------
+
+! Model management functions
+HELP: load-model
+{ $values 
+    fileName: c-string
+  
+}
+
+{ $description
+    "Load model from files (meshes and materials)" 
+} ;
+
+HELP: load-model-from-mesh
+{ $values 
+    mesh: Mesh
+  
+}
+
+{ $description
+    "Load model from generated mesh (default material)" 
+} ;
+
+HELP: is-model-ready
+{ $values 
+    model: Model
+  
+}
+
+{ $description
+    "Check if a model is ready" 
+} ;
+
+HELP: unload-model
+{ $values 
+    model: Model
+  
+}
+
+{ $description
+    "Unload model (including meshes) from memory (RAM and/or VRAM)" 
+} ;
+
+HELP: get-model-bounding-box
+{ $values 
+    model: Model
+  
+}
+
+{ $description
+    "Compute model bounding box limits (considers all meshes)" 
+} ;
+
+
+! Model drawing functions
+HELP: draw-model
+{ $values 
+    model: Model
+    position: Vector3
+    scale: float
+    tint: Color
+  
+}
+
+{ $description
+    "Draw a model (with texture if set)" 
+} ;
+
+HELP: draw-model-ex
+{ $values 
+    model: Model
+    position: Vector3
+    rotationAxis: Vector3
+    rotationAngle: float
+    scale: Vector3
+    tint: Color
+  
+}
+
+{ $description
+    "Draw a model with extended parameters" 
+} ;
+
+HELP: draw-model-wires
+{ $values 
+    model: Model
+    position: Vector3
+    scale: float
+    tint: Color
+  
+}
+
+{ $description
+    "Draw a model wires (with texture if set)" 
+} ;
+
+HELP: draw-model-wires-ex
+{ $values 
+    model: Model
+    position: Vector3
+    rotationAxis: Vector3
+    rotationAngle: float
+    scale: Vector3
+    tint: Color
+  
+}
+
+{ $description
+    "Draw a model wires (with texture if set) with extended parameters" 
+} ;
+
+HELP: draw-bounding-box
+{ $values 
+    box: BoundingBox
+    color: Color
+  
+}
+
+{ $description
+    "Draw bounding box (wires)" 
+} ;
+
+HELP: draw-billboard
+{ $values 
+    camera: Camera
+    texture: Texture2D
+    position: Vector3
+    size: float
+    tint: Color
+  
+}
+
+{ $description
+    "Draw a billboard texture" 
+} ;
+
+HELP: draw-billboard-rec
+{ $values 
+    camera: Camera
+    texture: Texture2D
+    source: Rectangle
+    position: Vector3
+    size: Vector2
+    tint: Color
+  
+}
+
+{ $description
+    "Draw a billboard texture defined by source" 
+} ;
+
+HELP: draw-billboard-pro
+{ $values 
+    camera: Camera
+    texture: Texture2D
+    source: Rectangle
+    position: Vector3
+    up: Vector3
+    size: Vector2
+    origin: Vector2
+    rotation: float
+    tint: Color
+  
+}
+
+{ $description
+    "Draw a billboard texture defined by source and rotation" 
+} ;
+
+
+! Mesh management functions
+HELP: upload-mesh
+{ $values 
+    mesh: { "a " { $link pointer } " to a " { $link Mesh } }
+    dynamic: bool
+  
+}
+
+{ $description
+    "Upload mesh vertex data in GPU and provide VAO/VBO ids" 
+} ;
+
+HELP: update-mesh-buffer
+{ $values 
+    mesh: Mesh
+    index: int
+    data: void*
+    dataSize: int
+    offset: int
+  
+}
+
+{ $description
+    "Update mesh vertex data in GPU for a specific buffer index" 
+} ;
+
+HELP: unload-mesh
+{ $values 
+    mesh: Mesh
+  
+}
+
+{ $description
+    "Unload mesh data from CPU and GPU" 
+} ;
+
+HELP: draw-mesh
+{ $values 
+    mesh: Mesh
+    material: Material
+    transform: Matrix
+  
+}
+
+{ $description
+    "Draw a 3d mesh with material and transform" 
+} ;
+
+HELP: draw-mesh-instanced
+{ $values 
+    mesh: Mesh
+    material: Material
+    transforms: { "a " { $link pointer } " to a " { $link Matrix } }
+    instances: int
+  
+}
+
+{ $description
+    "Draw multiple mesh instances with material and different transforms" 
+} ;
+
+HELP: export-mesh
+{ $values 
+    mesh: Mesh
+    fileName: c-string
+  
+}
+
+{ $description
+    "Export mesh data to file, returns true on success" 
+} ;
+
+HELP: get-mesh-bounding-box
+{ $values 
+    mesh: Mesh
+  
+}
+
+{ $description
+    "Compute mesh bounding box limits" 
+} ;
+
+HELP: gen-mesh-tangents
+{ $values 
+    mesh: { "a " { $link pointer } " to a " { $link Mesh } }
+  
+}
+
+{ $description
+    "Compute mesh tangents" 
+} ;
+
+
+! Mesh generation functions
+HELP: gen-mesh-poly
+{ $values 
+    sides: int
+    radius: float
+  
+}
+
+{ $description
+    "Generate polygonal mesh" 
+} ;
+
+HELP: gen-mesh-plane
+{ $values 
+    width: float
+    length: float
+    resX: int
+    resZ: int
+  
+}
+
+{ $description
+    "Generate plane mesh (with subdivisions)" 
+} ;
+
+HELP: gen-mesh-cube
+{ $values 
+    width: float
+    height: float
+    length: float
+  
+}
+
+{ $description
+    "Generate cuboid mesh" 
+} ;
+
+HELP: gen-mesh-sphere
+{ $values 
+    radius: float
+    rings: int
+    slices: int
+  
+}
+
+{ $description
+    "Generate sphere mesh (standard sphere)" 
+} ;
+
+HELP: gen-mesh-hemi-sphere
+{ $values 
+    radius: float
+    rings: int
+    slices: int
+  
+}
+
+{ $description
+    "Generate half-sphere mesh (no bottom cap)" 
+} ;
+
+HELP: gen-mesh-cylinder
+{ $values 
+    radius: float
+    height: float
+    slices: int
+  
+}
+
+{ $description
+    "Generate cylinder mesh" 
+} ;
+
+HELP: gen-mesh-cone
+{ $values 
+    radius: float
+    height: float
+    slices: int
+  
+}
+
+{ $description
+    "Generate cone/pyramid mesh" 
+} ;
+
+HELP: gen-mesh-torus
+{ $values 
+    radius: float
+    size: float
+    radSeg: int
+    sides: int
+  
+}
+
+{ $description
+    "Generate torus mesh" 
+} ;
+
+HELP: gen-mesh-knot
+{ $values 
+    radius: float
+    size: float
+    radSeg: int
+    sides: int
+  
+}
+
+{ $description
+    "Generate trefoil knot mesh" 
+} ;
+
+HELP: gen-mesh-heightmap
+{ $values 
+    heightmap: Image
+    size: Vector3
+  
+}
+
+{ $description
+    "Generate heightmap mesh from image data" 
+} ;
+
+HELP: gen-mesh-cubicmap
+{ $values 
+    cubicmap: Image
+    cubeSize: Vector3
+  
+}
+
+{ $description
+    "Generate cubes-based map mesh from image data" 
+} ;
+
+
+! Material loading/unloading functions
+HELP: load-materials
+{ $values 
+    fileName: c-string
+    materialCount: { "a " { $link pointer } " to a " { $link int } }
+  
+}
+
+{ $description
+    "Load materials from model file" 
+} ;
+
+HELP: load-material-default
+{ $description
+    "Load default material (Supports: DIFFUSE, SPECULAR, NORMAL maps)" 
+} ;
+
+HELP: is-material-ready
+{ $values 
+    material: Material
+  
+}
+
+{ $description
+    "check if a material is ready" 
+} ;
+
+HELP: unload-material
+{ $values 
+    material: Material
+  
+}
+
+{ $description
+    "Unload material from GPU memory (VRAM)" 
+} ;
+
+HELP: set-material-texture
+{ $values 
+    material: { "a " { $link pointer } " to a " { $link Material } }
+    mapType: int
+    texture: Texture2D
+  
+}
+
+{ $description
+    "Set texture for a material map type  ( Material_MAP_DIFFUSE, MATERIAL_MAP_SPECULAR...)" 
+} ;
+
+HELP: set-model-mesh-material
+{ $values 
+    model: { "a " { $link pointer } " to a " { $link Model } }
+    meshId: int
+    materialId: int
+  
+}
+
+{ $description
+    "Set material for a mesh" 
+} ;
+
+
+! Model animations loading/unloading functions
+HELP: load-model-animations
+{ $values 
+    fileName: c-string
+    animCount: { "a " { $link pointer } " to a " { $link uint } }
+  
+}
+
+{ $description
+    "Load model animations from file" 
+} ;
+
+HELP: update-model-animation
+{ $values 
+    model: Model
+    anim: ModelAnimation
+    frame: int
+  
+}
+
+{ $description
+    "Update model animation pose" 
+} ;
+
+HELP: unload-model-animation
+{ $values 
+    anim: ModelAnimation
+  
+}
+
+{ $description
+    "Unload animation data" 
+} ;
+
+HELP: unload-model-animations
+{ $values 
+    animations: { "a " { $link pointer } " to a "  { $link ModelAnimation } }
+    count: uint
+  
+}
+
+{ $description
+    "Unload animation array data" 
+} ;
+
+HELP: is-model-animation-valid
+{ $values 
+    model: Model
+    anim: ModelAnimation
+  
+}
+
+{ $description
+    "Check model animation skeleton match" 
+} ;
+
+
+! Collision detection functions
+HELP: check-collision-spheres
+{ $values 
+    center1: Vector3
+    radius1: float
+    center2: Vector3
+    radius2: float
+  
+}
+
+{ $description
+    "Check collision between two spheres" 
+} ;
+
+HELP: check-collision-boxes
+{ $values 
+    box1: BoundingBox
+    box2: BoundingBox
+  
+}
+
+{ $description
+    "Check collision between two bounding boxes" 
+} ;
+
+HELP: check-collision-box-sphere
+{ $values 
+    box: BoundingBox
+    center: Vector3
+    radius: float
+  
+}
+
+{ $description
+    "Check collision between box and sphere" 
+} ;
+
+HELP: get-ray-collision-sphere
+{ $values 
+    ray: Ray
+    center: Vector3
+    radius: float
+  
+}
+
+{ $description
+    "Get collision info between ray and sphere" 
+} ;
+
+HELP: get-ray-collision-box
+{ $values 
+    ray: Ray
+    box: BoundingBox
+  
+}
+
+{ $description
+    "Get collision info between ray and box" 
+} ;
+
+HELP: get-ray-collision-mesh
+{ $values 
+    ray: Ray
+    mesh: Mesh
+    transform: Matrix
+  
+}
+
+{ $description
+    "Get collision info between ray and mesh" 
+} ;
+
+HELP: get-ray-collision-triangle
+{ $values 
+    ray: Ray
+    p1: Vector3
+    p2: Vector3
+    p3: Vector3
+  
+}
+
+{ $description
+    "Get collision info between ray and triangle" 
+} ;
+
+HELP: get-ray-collision-quad
+{ $values 
+    ray: Ray
+    p1: Vector3
+    p2: Vector3
+    p3: Vector3
+    p4: Vector3
+  
+}
+
+{ $description
+    "Get collision info between ray and quad" 
+} ;
+
+HELP: get-ray-collision-model ;
+HELP: get-ray-collision-ground ;
+
+! HELP: void AudioCallback ( void* bufferData, int frames )
+
+! Audio device management functions
+HELP: init-audio-device
+{ $description 
+    "Initialize audio device and context " } ;
+
+HELP: close-audio-device
+{ $description 
+    "Close the audio device and context " } ;
+
+HELP: is-audio-device-ready
+{ $description 
+    "Check if audio device has been initialized successfully " } ;
+
+! HELP: set-master-volume ( float volume )                         ! Set master volume (listener)
+
+! Wave/Sound loading/unloading functions
+! HELP: load-wave ( c-string fileName )                                   ! Load wave data from file
+! HELP: load-wave-from-memory ( c-string fileType, c-string fileData, int dataSize )  ! Load wave from memory buffer, fileType refers to extension: i.e. '.wav'
+HELP: is-wave-ready 
+{ $values
+    wave: Wave }
+{ $description 
+    "Checks if wave data is ready " } ;
+
+! HELP: load-sound ( c-string fileName )                                ! Load sound from file
+HELP: load-sound-from-wave 
+{ $values
+    wave: Wave }
+{ $description 
+    "Load sound from wave data " } ;
+
+HELP: is-sound-ready 
+{ $values 
+    sound: Sound }
+{ $description 
+    "Checks if a sound is ready" } ;
+
+! HELP: update-sound ( Sound sound, void* data, int sampleCount )      ! Update sound buffer with new data
+HELP: unload-wave 
+{ $values
+    wave: Wave }
+{ $description 
+    "Unload wave data" } ;
+
+HELP: unload-sound 
+{ $values 
+    sound: Sound }
+{ $description 
+    Unload sound } ;
+
+HELP: export-wave 
+{ $values 
+    wave: Wave
+    fileName: c-string }
+{ $description 
+    "Export wave data to file, returns true on success " } ;
+
+HELP: export-wave-as-code 
+{ $values 
+    wave: Wave
+    fileName: c-string }
+{ $description 
+    "Export wave sample data to code (.h), returns true on success " } ;
+
+
+! Wave/Sound management functions
+HELP: play-sound 
+{ $values 
+    sound: Sound }
+{ $description 
+    Play a sound } ;
+
+HELP: stop-sound 
+{ $values 
+    sound: Sound }
+{ $description 
+    Stop playing a sound } ;
+
+HELP: pause-sound 
+{ $values 
+    sound: Sound }
+{ $description 
+    Pause a sound } ;
+
+HELP: resume-sound 
+{ $values 
+    sound: Sound }
+{ $description 
+    Resume a paused sound } ;
+
+HELP: is-sound-playing 
+{ $values 
+    sound: Sound }
+{ $description 
+    Check if a sound is currently playing } ;
+
+! HELP: set-sound-volume ( Sound sound, float volume )              ! Set volume for a sound (1.0 is max level)
+! HELP: set-sound-pitch ( Sound sound, float pitch )                 ! Set pitch for a sound (1.0 is base level)
+! HELP: set-sound-pan ( Sound sound, float pan )                       ! Set pan for a sound (0.5 is center)
+HELP: wave-copy 
+{ $values
+    wave: Wave }
+{ $description 
+    "Copy a wave to a new wave " } ;
+
+! HELP: wave-crop ( Wave* wave, int initSample, int finalSample )         ! Crop a wave to defined samples range
+! HELP: wave-format ( Wave* wave, int sampleRate, int sampleSize, int channels ) ! Convert wave data to desired format
+HELP: load-wave-samples 
+{ $values
+    wave: Wave }
+{ $description 
+    "Load samples data from wave as a floats array " } ;
+
+! HELP: unload-wave-samples ( float* samples )                   ! Unload samples data loaded with LoadWaveSamples()
+
+! Music management functions
+! HELP: load-music-stream ( c-string fileName )                   ! Load music stream from file
+! HELP: load-music-stream-from-memory ( c-string fileType, c-string data, int dataSize ) ! Load music stream from data
+HELP: is-music-ready 
+{ $values
+        music: Music }
+{ $description 
+    "Checks if a music stream is ready " } ;
+
+HELP: unload-music-stream 
+{ $values
+        music: Music } 
+{ $description 
+    "Unload music stream " } ;
+
+HELP: play-music-stream 
+{ $values
+        music: Music } 
+{ $description 
+    "Start music playing " } ;
+
+HELP: is-music-stream-playing 
+{ $values
+        music: Music } 
+{ $description 
+    "Check if music is playing " } ;
+
+HELP: update-music-stream 
+{ $values
+        music: Music } 
+{ $description 
+    "Updates buffers for music streaming " } ;
+
+HELP: stop-music-stream 
+{ $values
+        music: Music } 
+{ $description 
+    "Stop music playing " } ;
+
+HELP: pause-music-stream 
+{ $values
+        music: Music } 
+{ $description 
+    "Pause music playing " } ;
+
+HELP: resume-music-stream 
+{ $values
+        music: Music } 
+{ $description 
+    "Resume playing paused music " } ;
+
+! HELP: seek-music-stream ( Music music, float position )          ! Seek music to a position (in seconds)
+! HELP: set-music-volume ( Music music, float volume )              ! Set volume for music (1.0 is max level)
+! HELP: set-music-pitch ( Music music, float pitch )                 ! Set pitch for a music (1.0 is base level)
+! HELP: set-music-pan ( Music sound, float pan )                       ! Set pan for a music (0.5 is center)
+HELP: get-music-time-length 
+{ $values
+        music: Music } 
+{ $description 
+    "Get music time length (in seconds) " } ;
+
+HELP: get-music-time-played 
+{ $values
+        music: Music } 
+{ $description 
+    "Get current music time played (in seconds) " } ;
+
+! AudioStream management functions
+! HELP: load-audio-stream ( uint sampleRate, uint sampleSize, uint channels ) ! Load audio stream (to stream raw audio pcm data)
+HELP: is-audio-stream-ready
+{ $values
+    stream: AudioStream }
+{ $description 
+    "Checks if an audio stream is ready " } ;
+
+HELP: unload-audio-stream
+{ $values
+    stream: AudioStream }
+{ $description 
+    "Unload audio stream and free memory " } ;
+
+! HELP: update-audio-stream ( AudioStream stream, void* data, int frameCount )     ! Update audio stream buffers with data
+HELP: is-audio-stream-processed
+{ $values
+    stream: AudioStream }
+{ $description 
+    "Check if any audio stream buffers requires refill " } ;
+
+HELP: play-audio-stream
+{ $values
+    stream: AudioStream }
+{ $description 
+    "Play audio stream " } ;
+
+HELP: pause-audio-stream
+{ $values
+    stream: AudioStream }
+{ $description 
+    "Pause audio stream " } ;
+
+HELP: resume-audio-stream
+{ $values
+    stream: AudioStream }
+{ $description 
+    "Resume audio stream " } ;
+
+HELP: is-audio-stream-playing
+{ $values
+    stream: AudioStream }
+{ $description 
+    "Check if audio stream is playing " } ;
+
+HELP: stop-audio-stream
+{ $values
+    stream: AudioStream }
+{ $description 
+    "Stop audio stream " } ;
+
+! HELP: set-audio-stream-volume ( AudioStream stream, float volume )            ! Set volume for audio stream (1.0 is max level)
+! HELP: set-audio-stream-pitch ( AudioStream stream, float pitch )               ! Set pitch for audio stream (1.0 is base level)
+! HELP: set-audio-stream-pan ( AudioStream stream, float pan )                     ! Set pan for audio stream (0.5 is center)
+! HELP: set-audio-stream-buffer-size-default ( int size )            ! Default size for new audio streams
+! HELP: set-audio-stream-callback ( AudioStream stream, AudioCallback callback ) ! Audio thread callback to request new data
+
+! HELP: attach-audio-stream-processor ( AudioStream stream, AudioCallback processor ) ! Attach audio stream processor to stream
+! HELP: detach-audio-stream-processor ( AudioStream stream, AudioCallback processor ) ! Detach audio stream processor from stream
+
+! HELP: attach-audio-mixed-processor ( AudioCallback processor ) ! Attach audio stream processor to the entire audio pipeline
+! HELP: detach-audio-mixed-processor ( AudioCallback processor ) ! Detach audio stream processor from the entire audio pipeline
+
 
 ARTICLE: "raylib" "Raylib"
     { $heading About Raylib  }
