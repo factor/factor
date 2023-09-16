@@ -5538,7 +5538,8 @@ HELP: get-ray-collision-ground
 
 HELP: AudioCallback
 { $values
-    quot: { $quotation ( void* int -- ) } }
+    quot: { $quotation ( void* int -- ) }
+    alien: c-ptr }
 { $description
     Constructs a \ alien-callback that can be passed to
     raylib's audio processing functions. }
