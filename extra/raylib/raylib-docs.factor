@@ -5536,7 +5536,7 @@ HELP: get-ray-collision-ground
     ground-height: float 
     ray-collision: RayCollision } ;
 
-HELP: void AudioCallback
+HELP: AudioCallback
 { $values
     quot: { $quotation ( void* int -- ) } }
 { $description
