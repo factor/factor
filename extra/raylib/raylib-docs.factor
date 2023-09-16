@@ -1729,7 +1729,7 @@ HELP: Shader
 
 
 HELP: MaterialMap
-{ $class-description }
+
 { $heading Fields }
 { $table 
     { "texture" { $link Texture2D } "Material map Texture" }     
@@ -1737,7 +1737,7 @@ HELP: MaterialMap
     { "value"   { $link float }     "Material map value"   } } ;        
 
 HELP: Material
-{ $class-description }
+
 { $heading Fields } 
 { $table 
     { "shader" { $link Shader                             }  "Material shader"                           }
@@ -1840,7 +1840,7 @@ HELP: AudioStream
 } ;
 
 HELP: Sound
-{ $class-description }
+
 { $heading Fields } 
 { $table 
     { "stream"     { $link AudioStream } "Audio stream"                                  }  
