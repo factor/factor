@@ -1,10 +1,10 @@
 ! Copyright (C) 2023 CapitalEx.
 ! See https://factorcode.org/license.txt for BSD license.
-USING: accessors alien.c-types arrays help.markup help.syntax
-kernel make math math.parser quotations sequences strings urls
-alien.c-types ;
-IN: raylib
+USING: accessors alien alien.c-types arrays help.markup
+help.syntax kernel make math math.parser quotations sequences
+strings urls ;
 FROM: alien.c-types => float ;
+IN: raylib
 
 <PRIVATE
 : $enum-members ( element -- )
@@ -1473,7 +1473,6 @@ HELP: NPATCH_THREE_PATCH_HORIZONTAL
 
     { $see-also NPatchLayout } } ;
 
-
 HELP: Vector2
 { $class-description
     Represents a 2D vector in Raylib. Implements the
@@ -1502,8 +1501,42 @@ HELP: Vector4
         as Factor is double precision (see \ alien.c-types:float ) } } ;
 
 HELP: Quaternion
-{ $class-description
+{ $description
     A c-typedef for a \ Vector4 . } ;
+
+HELP: invalid-vector-length 
+{ $error-description 
+    Raised when calling functions such as \ like
+    and \ new-sequence . Indicates that the 
+    converted sequence doesn't fit into the bounds
+    of the given \ Vector2 , \ Vector3 , \ Vector4 . } ;
+
+HELP: <Vector2> 
+{ $values 
+    x: float 
+    y: float 
+    obj: Vector2 }
+{ $description
+    Constructs a new \ Vector2 . } ;
+
+HELP: <Vector3> 
+{ $values 
+    x: float 
+    y: float 
+    z: float 
+    obj: Vector3 }
+{ $description
+    Constructs a new \ Vector3 . } ;
+
+HELP: <Vector4> 
+{ $values 
+    x: float 
+    y: float 
+    z: float 
+    w: float 
+    obj: Vector4 }
+{ $description
+    Constructs a new \ Vector4 . } ;
 
 HELP: Matrix
 { $class-description
@@ -1513,8 +1546,6 @@ HELP: Matrix
     { $warning
         Values are all single-precision where
         as Factor is double precision (see \ alien.c-types:float ) } } ;
-
-
 HELP: Color
 { $class-description
     Represents a RGBA color with 8-bit unsigned components.
@@ -1555,105 +1586,326 @@ HELP: Rectangle
         Values are all single-precision where
         as Factor is double precision (see \ alien.c-types:float ) } } ;
 
-HELP: AudioStream
+HELP: Image
+{ $class-description 
+    Represents a RGBA (32bit) image in Raylib. 
+    Data is always stored in main memory. }
+{ $heading Fields }
+{ $table 
+    { "data"    { $link void* }       "Image raw data"                 }
+    { "width"   { $link int }         "Image base width"               }
+    { "height"  { $link int }         "Image base height"              }
+    { "mipmaps" { $link int }         "Mipmap levels, 1 by default"    }
+    { "format"  { $link PixelFormat } "Data format (PixelFormat type)" } 
+} ;
+
+HELP: Texture2D
+{ $class-description 
+    Represents an texture stored on the GPU. }
+{ $heading Fields }
+{ $table 
+    { "id"      { $link uint        }  "OpenGL Texture ID"              }   
+    { "width"   { $link int         }  "Texture Base Width"             }  
+    { "height"  { $link int         }  "Texture Base Height"            }                 
+    { "mipmaps" { $link int         }  "Mipmap Levels, 1 by default"    }               
+    { "format"  { $link PixelFormat }  "Data Format (PixelFormat type)" }     
+}  ;
+
+HELP: RenderTexture2D
 { $class-description
-    Represents a stream of audio data in Raylib.
-    { $table
-        { { $snippet buffer }     " a pointer to the internal data used by the audio system." }
-        { { $snippet processor }  " a pointer to the interanl data processor, useful for audio effects." }
-        { { $snippet sampleRate } " the frequence of the samples." }
-        { { $snippet sampleSize } " the bit depth of the samples: spport values are 8, 16, and 32." }
-        { { $snippet channels }   " the number of channels: 1 for mono, 2 for stereo." }
-    } } ;
+    FBO for texture rendering. }
+{ $heading Fields }
+{ $table 
+    { "id"       { $link uint      } "OpenGL Framebuffer Object (FBO) id" }                         
+    { "texture"  { $link Texture2D } "Color buffer attachment texture"    }               
+    { "depth"    { $link Texture2D } "Depth buffer attachment texture"    } 
+} ;               
 
 
+HELP: NPatchInfo
+{ $class-description
+    Information about a n-patch tile. }
+{ $heading Fields }
+{ $table 
+    { "source"  { $link Rectangle } "Texture source rectangle"               }
+    { "left"    { $link int       } "Left border offset"                     }
+    { "top"     { $link int       } "Top border offset"                      }
+    { "right"   { $link int       } "Right border offset"                    }
+    { "bottom"  { $link int       } "Bottom border offset"                   }
+    { "layout"  { $link int       } "Layout of the n-patch: 3x3, 1x3 or 3x1" }
+} ;
 
+HELP: GlyphInfo
+{ $class-description 
+    Contains information about the gyphs in a font. }
+{ $heading Fields }
+{ $table 
+    { "value"    { $link int    } "Texture source rectangle"  }
+    { "offsetX"  { $link int    } "Texture source rectangle"  }
+    { "offsetY"  { $link int    } "Left border offset"        }
+    { "advanceX" { $link int    } "Top border offset"         }
+    { "image"    { $link Image  } "Right border offset"       }
+} ;
 
+HELP: Font
+{ $class-description
+    Represents a collections of glyphs that can be drawn to the screen.
+    The fields are defined as followed: }
+{ $heading Fields }
+{ $table
+    { { $snippet baseSize     } { " the base size of the characters. This is how tall a glyph is." } }
+    { { $snippet glyphCount   } { " the number of glyph characters." } }
+    { { $snippet glyphPadding } { " the padding around each glyph." } }
+    { { $snippet texture      } { " the texture atlas continaing the glyphs." } }
+    { { $snippet recs         } { " an array of rectangles used to find each glyph in " { $snippet texture } "." } }
+    { { $snippet glyphs       } { " metadata about each glyph." } }
+} ;
 
 HELP: Camera3D
 { $class-description
-    Represents a camera in 3D space. The fields are defined as followed:
-    { $table
-        { { $snippet position   } " is the camera position in 3D space." }
-        { { $snippet target     } " is the target the camera is looking at." }
-        { { $snippet up         } " is the direction that faces up relative to the camera." }
-        { { $snippet fovy       } " is the camera's field of view aperature in degrees. Used as the near-plane for orthogrphic projections." }
-        { { $snippet projection } " is the camera's projection:" { $link CAMERA_PERSPECTIVE } " or " { $link CAMERA_ORTHOGRAPHIC } }
-    } } ;
+    Represents a camera in 3D space. The fields are defined as followed: }
+{ $heading Fields }
+{ $table
+    { { $snippet position   } " is the camera position in 3D space." }
+    { { $snippet target     } " is the target the camera is looking at." }
+    { { $snippet up         } " is the direction that faces up relative to the camera." }
+    { { $snippet fovy       } " is the camera's field of view aperature in degrees. Used as the near-plane for orthogrphic projections." }
+    { { $snippet projection } " is the camera's projection:" { $link CAMERA_PERSPECTIVE } " or " { $link CAMERA_ORTHOGRAPHIC } }
+} ;
 
 HELP: Camera2D
 { $class-description
     Represents a camera in 2D space. The fields are defined
-    as followed:
-    { $table
-        { { $snippet offset   } " is the camera offset (dispacement from target)" }
-        { { $snippet target   } " is the camera target (rotation and zoom origin)." }
-        { { $snippet rotation } " is the camera rotation in degrees." }
-        { { $snippet zoom     } " is the camera zoom/scalling, should be 1.0f by default." }
-    } } ;
+    as followed: }
+{ $heading Fields }
+{ $table
+    { { $snippet offset   } " is the camera offset (dispacement from target)" }
+    { { $snippet target   } " is the camera target (rotation and zoom origin)." }
+    { { $snippet rotation } " is the camera rotation in degrees." }
+    { { $snippet zoom     } " is the camera zoom/scalling, should be 1.0f by default." } } ;
 
 HELP: Camera
 { $var-description
     A c-typedef alias for \ Camera3D .
 } ;
 
+HELP: Mesh 
+{ $class-description
+    Holds the vertex data and VAO/VBO for a 3D mesh. } 
+ 
+{ $heading Fields }
+{ $table
+    { "vertexCount"   { $link int } "Number of vertices stored in arrays" }    
+    { "triangleCount" { $link int } "Number of triangles stored (indexed or not)" }  
+    { "_vertices"     { { $link float  } { $snippet "*" } } "Vertex position (XYZ - 3 components per vertex)"                                }   
+    { "_texcoords"    { { $link float  } { $snippet "*" } } "Vertex texture coordinates (UV - 2 components per vertex)"                     }  
+    { "_texcoords2"   { { $link float  } { $snippet "*" } } "Vertex second texture coordinates (useful for lightmaps)"                       } 
+    { "_normals"      { { $link float  } { $snippet "*" } } "Vertex normals (XYZ - 3 components per vertex)"                                 }   
+    { "tangents"      { { $link float  } { $snippet "*" } } "Vertex tangents (XYZW - 4 components per vertex)"                              }    
+    { "colors"        { { $link uchar  } { $snippet "*" } } "Vertex colors (RGBA - 4 components per vertex)"                                 }      
+    { "indices"       { { $link ushort } { $snippet "*" } } "Vertex indices (in case vertex data comes indexed)"                             }    
+    
+    { "animVertices"  { { $link float  } { $snippet "*" } } "Animated vertex positions (after bones transformations)"                        }
+    { "animNormals"   { { $link float  } { $snippet "*" } } "Animated normals (after bones transformation)"                                  }
+    { "boneIds"       { { $link uchar  } { $snippet "*" } } "Vertex bone ids, max 255 bone ids, up to 4 bones influence by vertex (skining)" }
+    { "boneWeights"   { { $link float  } { $snippet "*" } } "Vertex bone weight, up to 4 bones influence by vertex (skinning)"               }
+    
+    { "vaoId"         { $link uint                      } "OpenGL Vertex Array Object id"                                                    } 
+    { "vboId"         { { $link uint } { $snippet "*" } } "OpenGL Vertex Buffer Objects id (7 types of vertex data)"                         } } ;   
 
+
+HELP: Shader
+{ $class-description 
+    Represents a graphics shader in Raylib. The size of 
+    { $snippet locs } depends on { $snippet MAX_SHADER_LOCATIONS } . 
+    
+    { $warning 
+        { $snippet MAX_SHADER_LOCATIONS } is set when raylib is compiled
+        to a shared library. This cannot be changed from Factor. } }
+{ $heading Fields }
+{ $table
+    { "id"   { $link uint                     } "Shader program id"      } 
+    { "locs" { { $link int } { $snippet "*" } } "Shader locations array" } } ;
+
+
+HELP: MaterialMap
+{ $class-description }
+{ $heading Fields }
+{ $table 
+    { "texture" { $link Texture2D } "Material map Texture" }     
+    { "color"   { $link Color }     "Material map color"   }          
+    { "value"   { $link float }     "Material map value"   } } ;        
+
+HELP: Material
+{ $class-description }
+{ $heading Fields } 
+{ $table 
+    { "shader" { $link Shader                             }  "Material shader"                           }
+    { "_maps"  { { $link MaterialMap } { $snippet "*"   } } "Material maps.  Uses MAX_MATERIAL_MAPS."    }   
+    { "params" { { $link float       } { $snippet "[4]" } }  "Material generic parameters (if required)" } } ;    
+
+HELP: Transform
+{ $class-description 
+    Represents a 3D vertex transformation. }
+{ $heading Fields }
+{ $table
+    { "translation" { $link Vector3    } }
+    { "rotation"    { $link Quaternion } }
+    { "scale"       { $link Vector3    } } } ;
 
 
 HELP: BoneInfo
 { $class-description
-    A skeletal animation bone.
-    { $table
-        { { $snippet name }     " is the name of the bone. Max 32 characters." }
-        { { $snippet processor }  " the parent index." }
-    } } ;
+    A skeletal animation bone. }
+{ $heading Fields }
+{ $table
+    { { $snippet name }     " is the name of the bone. Max 32 characters." }
+    { { $snippet processor }  " the parent index." } } ;
+
+HELP: Model
+{ $class-description
+    Meshes, materials and animation data }
+{ $heading Fields }
+{ $table
+    { "transform"     { $link Matrix                     } "Local transform matrix."           }
+    { "meshCount"     { $link int                        } "Number of meshes."                 }
+    { "materialCount" { $link int                        } "Number of materials."              }
+    { "_meshes"       { { $link void } { $snippet "*" }  } "Meshes array."                     }
+    { "_materials"    { { $link void } { $snippet "*" }  } "Materials array."                  }
+    { "meshMaterial"  { { $link int  } { $snippet "*" }  } "Mesh material number."             }
+    { "boneCount"     { $link int                        } "Number of bones."                  }
+    { "_bones"        { { $link void } { $snippet "*"  } } "Bones information (skeleton)."     }
+    { "bindPose"      { { $link void } { $snippet "*"  } } "Bones base transformation (pose)." } } ;
+
+
+HELP: ModelAnimation
+{ $class-description 
+    Represents information about a animation for a 3D model. }
+{ $heading Fields }
+{ $table
+    { "boneCount"  { $link int                             }  "Number of bones."              }
+    { "frameCount" { $link int                             }  "Numbero f animation frames."   }
+    { "_bones"     { { $link BoneInfo  } { $snippet "**" } }  "Bones information (skeleton)." }
+    { "framePoses" { { $link Transform } { $snippet "**" } }  "Poses array by frame"          } } ;
+
+
+HELP: Ray
+{ $class-description
+    Represents a ray casted across 3D space. }
+{ $heading Fields } 
+{ $table 
+    { "position"  { $link Vector3 } "Ray position (origin)" }   
+    { "direction" { $link Vector3 } "Ray direction"         } } ;
+
+HELP: RayCollision
+{ $class-description
+    Represents collision information from a Ray. }
+{ $heading Fields } 
+{ $table
+    { "hit"      { $link bool    } "Did the ray hit something?" }  
+    { "distance" { $link float   } "Distance to nearest hit"    }  
+    { "point"    { $link Vector3 } "Point of nearest hit"       }  
+    { "normal"   { $link Vector3 } "Surface normal of hit"      } } ;
 
 HELP: BoundingBox
 { $class-description
-    Represents a 3D bounding box defined by two points:
-    { $table
-        { { $snippet min }  " The minimum vertex box-corner." }
-        { { $snippet max }  " The maxium vertex box-corner." }
-    } } ;
+    Represents a 3D bounding box defined by two points: }
+{ $heading Fields }
+{ $table
+    { { $snippet min }  " The minimum vertex box-corner." }
+    { { $snippet max }  " The maxium vertex box-corner." }
+} ;
 
+HELP: Wave
+{ $class-description 
+    Audio wave data }
+{ $heading Fields } 
+{ $table 
+    { "frameCount" { $link uint  } "Total number of frames (considering channels)" }   
+    { "sampleRate" { $link uint  } "Frequency (samples per second)"                }   
+    { "sampleSize" { $link uint  } "Bit depth (bits per sample): 8,16,32"          }   
+    { "channels"   { $link uint  } "Number of channels (1-mono, 2-stereo)"         }     
+    { "data"       { $link void* } "Buffer data pointer"                           } } ;      
 
+HELP: AudioStream
+{ $class-description
+    Represents a stream of audio data in Raylib. }
+{ $heading Fields }
+{ $table
+    { { $snippet buffer }     " a pointer to the internal data used by the audio system."            }
+    { { $snippet processor }  " a pointer to the interanl data processor, useful for audio effects." }
+    { { $snippet sampleRate } " the frequence of the samples."                                       }
+    { { $snippet sampleSize } " the bit depth of the samples: spport values are 8, 16, and 32."      }
+    { { $snippet channels }   " the number of channels: 1 for mono, 2 for stereo."                   }
+} ;
 
+HELP: Sound
+{ $class-description }
+{ $heading Fields } 
+{ $table 
+    { "stream"     { $link AudioStream } "Audio stream"                                  }  
+    { "frameCount" { $link uint        } "Total number of frames (considering channels)" } } ; 
 
+HELP: Music
+{ $class-description 
+    Audio stream, anything longer than ~10 seconds should be streamed. }
+{ $heading Fields } 
+{ $table
+    { "stream"     { $link AudioStream } "Audio stream"                                  }
+    { "frameCount" { $link uint        } "Total number of frames (considering channels)" }
+    { "looping"    { $link bool        } "Music looping enable"                          }
+    { "ctxType"    { $link int         } "Type of music context (audio filetype)"        }
+    { "ctxData"    { $link void*       } "Audio context data, depends on type"           } } ;
+
+HELP: VrDeviceInfo
+{ $class-description 
+    Hold the configuation for a VR device. }
+{ $heading Fields }
+{ $table
+    { "hResolution"            { $link int                          } "HMD horizontal resolution in pixels"            }               
+    { "vResolution"            { $link int                          } "HMD verticle resolution in pixels"              }               
+    { "hScreenSize"            { $link float                        } "HMD horizontal size in meters"                  }             
+    { "vScreenSize"            { $link float                        } "HMD verticle size in meters"                    }             
+    { "vScreenCenter"          { $link float                        } "HMD screen center in meters"                    }           
+    { "eyeToScreenDistance"    { $link float                        } "HMD distance between eye and display in meters" }     
+    { "lensSeparationDistance" { $link float                        } "HMD lens separation distance in meters"         }  
+    { "interpupillaryDistance" { $link float                        } "HMD IPD in meters"                              }  
+    { "lensDistortionValues"   { { $link float } { $snippet "[4]" } } "HMD lens distortion constant parameters"        } 
+    { "chromaAbCorrection"     { { $link float } { $snippet "[4]" } } "HMD chromatic abberation correction parameters" } } ; 
+
+HELP: VrStereoConfig
+{ $class-description 
+    VR stereo rendering configuration for simulator. }
+{ $heading Fields }
+{ $table 
+    { "projection"        { { $link Matrix } { $snippet [2] } "VR projection matrices (per eye)"  } }
+    { "viewOffset"        { { $link Matrix } { $snippet [2] } "VR view offset matrices (per eye)" } }  
+    { "leftLensCenter"    { { $link float }  { $snippet [2] } "VR left lens center"               } }     
+    { "rightLensCenter"   { { $link float }  { $snippet [2] } "VR right lens center"              } }    
+    { "leftScreenCenter"  { { $link float }  { $snippet [2] } "VR left screen center"             } }   
+    { "rightScreenCenter" { { $link float }  { $snippet [2] } "VR right screen center"            } }  
+    { "scale"             { { $link float }  { $snippet [2] } "VR distortion scale"               } }              
+    { "scaleIn"           { { $link float }  { $snippet [2] } "VR distortion scale in"            } }
+} ;           
 
 HELP: FilePathList
 { $class-description
     A list of file paths returned from \ load-directory-files ,
     \ load-directory-files-ex . Must be freed with
-    \ unload-directory-files .
+    \ unload-directory-files . }
 
-    The fields are defined as followed:
-    { $table
-        { { $snippet capacity } " the max number of entries." }
-        { { $snippet count } " the number of entries found." }
-        { { $snippet paths } " array of string where each member is a file path." }
-    }
+{ $heading Fields }
+{ $table
+    { { $snippet capacity } " the max number of entries." }
+    { { $snippet count } " the number of entries found." }
+    { { $snippet paths } " array of string where each member is a file path." }
+}
 
-    { $see-also
-        load-directory-files
-        load-directory-files-ex
-        unload-directory-files
-    } } ;
-
-HELP: Font
-{ $class-description
-    Represents a collections of glyphs that can be drawn to the screen.
-    The fields are defined as followed:
-
-    { $table
-        { { $snippet baseSize     } { " the base size of the characters. This is how tall a glyph is." } }
-        { { $snippet glyphCount   } { " the number of glyph characters." } }
-        { { $snippet glyphPadding } { " the padding around each glyph." } }
-        { { $snippet texture      } { " the texture atlas continaing the glyphs." } }
-        { { $snippet recs         } { " an array of rectangles used to find each glyph in " { $snippet texture } "." } }
-        { { $snippet glyphs       } { " metadata about each glyph." } }
-    } } ;
-
-
+{ $see-also
+    load-directory-files
+    load-directory-files-ex
+    unload-directory-files
+} ;
 
 
 HELP: LIGHTGRAY  { $raylib-color "200, 200, 200, 255" } ;
@@ -1695,13 +1947,11 @@ HELP: init-window
 
 HELP: window-should-close
 { $values
-    bool: boolean }
+    bool: bool }
 { $description
     "Check if KEY_ESCAPE pressed or Close icon pressed" } ;
 
 HELP: close-window
-{ $values
-    bool: boolean }
 { $description
     "Close window and unload OpenGL context" } ;
 
@@ -1791,7 +2041,7 @@ HELP: set-window-icon
 
 HELP: set-window-icons
 { $values
-    image: { "a " { $link pointer } " to a " { $link Image } }
+    images: { "a " { $link pointer } " to an array of " { $link Image } }
     count: int } ;
 
 HELP: set-window-title
@@ -1958,9 +2208,6 @@ HELP: disable-event-waiting
 
 
 ! Custom frame control functions
-! NOTE: Those functions are intended for advance users that want full control over the frame processing
-! By default EndDrawing() does this job: draws everything + SwapScreenBuffer() + manage frame timming + PollInputEvents()
-! To avoid that behavior and control frame processes manually, enable in config.h: SUPPORT_CUSTOM_FRAME_CONTROL
 HELP: swap-screen-buffer
 { $description
     "Swap back buffer with front buffer (screen drawing)"
@@ -2030,6 +2277,8 @@ HELP: disable-cursor
     "Disables cursor (lock cursor)" } ;
 
 HELP: is-cursor-on-screen
+{ $values 
+    bool: bool }
 { $description
     "Check if cursor is on the screen" } ;
 
@@ -2139,7 +2388,6 @@ HELP: unload-vr-stereo-config
 
 
 ! Shader management functions
-! NOTE: Shader functionality is not available on OpenGL 1.1
 HELP: load-shader
 { $values
     vsFileName: c-string
@@ -2417,20 +2665,20 @@ HELP: export-data-as-code
     data: { "a " { $link pointer } " to a " { $link uchar } }
     size: uint
     fileName: c-string
-    c-string: c-string }
+    bool: bool }
 { $description
     "Export data to code (.h), returns true on success" } ;
 
 HELP: load-file-text
 { $values
-    fileName: c-string }
+    fileName: c-string
+    c-string: c-string }
 { $description
     "Load text data from file (read), returns a '\0' terminated string" } ;
 
 HELP: unload-file-text
 { $values
-    text: c-string
-    bool: bool }
+    text: c-string }
 { $description
     "Unload file text data allocated by LoadFileText()" } ;
 
@@ -2616,10 +2864,6 @@ HELP: decode-data-base64
 { $description
     "Decode Base64 string data" } ;
 
-
-! ------------------------------------------------------------------------------------
-! Input Handling Functions (Module: core)
-! ------------------------------------------------------------------------------------
 
 ! Input-related functions: keyboard
 HELP: is-key-pressed
@@ -2945,13 +3189,6 @@ HELP: update-camera-pro
 { $description
     "Update camera movement/rotation" } ;
 
-
-! ------------------------------------------------------------------------------------
-! Basic Shapes Drawing Functions (Module: shapes)
-! ------------------------------------------------------------------------------------
-! Set texture and rectangle to be used on shapes drawing
-! NOTE: It can be useful when using basic shapes and one single font,
-! defining a font char white rectangle would allow drawing everything in a single draw call
 HELP: set-shapes-texture
 { $values
     texture: Texture2D
@@ -3406,13 +3643,7 @@ HELP: get-collision-rec
 { $description
     "Get collision rectangle for two rectangles collision" } ;
 
-
-! ------------------------------------------------------------------------------------
-! Texture Loading and Drawing Functions (Module: textures)
-! ------------------------------------------------------------------------------------
-
 ! Image loading functions
-! NOTE: This functions do not require GPU access
 HELP: load-image
 { $values
     fileName: c-string
@@ -3785,7 +4016,8 @@ HELP: image-color-replace
 
 HELP: load-image-colors
 { $values
-    image: Image }
+    image: Image 
+    Color*: { "a " { $link pointer } " to an array of " { $link Color } "s" } }
 { $description
     "Load color data from image as a Color array (RGBA - 32bit)" } ;
 
@@ -3793,7 +4025,8 @@ HELP: load-image-palette
 { $values
     image: Image
     maxPaletteSize: int
-    colorCount: { "a " { $link pointer } " to a " { $link int } } }
+    colorCount: { "a " { $link pointer } " to a " { $link int } } 
+    Color*: { "a " { $link pointer } " to an array of " { $link Color } "s" } }
 { $description
     "Load colors palette from image as a Color array (RGBA - 32bit)" } ;
 
@@ -3828,7 +4061,6 @@ HELP: get-image-color
 
 
 ! Image drawing functions
-! NOTE: Image software-rendering functions (CPU)
 HELP: image-clear-background
 { $values
     dst: { "a " { $link pointer } " to a " { $link Image } }
@@ -4257,10 +4489,6 @@ HELP: get-pixel-data-size
     "Get pixel data size in bytes for certain format" } ;
 
 
-! ------------------------------------------------------------------------------------
-! Font Loading and Text Drawing Functions (Module: text)
-! ------------------------------------------------------------------------------------
-
 ! Font loading/unloading functions
 HELP: get-font-default
 { $values
@@ -4321,7 +4549,7 @@ HELP: load-font-data
     fontChars: { "a " { $link pointer } " to a " { $link int } }
     glyphCount: int
     type: FontType
-    GlyphInfo: { "a " { $link pointer } " to " { $link GlyphInfo } } }
+    GlyphInfo*: { "a " { $link pointer } " to " { $link GlyphInfo } } }
 { $description
     "Load font data for further use" } ;
 
@@ -4543,7 +4771,7 @@ HELP: text-copy
 { $values
     dst: c-string
     src: c-string
-    c-string: c-string }
+    int: int }
 { $description
     "Copy one string to another, returns bytes copied" } ;
 
@@ -4606,7 +4834,8 @@ HELP: text-split
 { $values
     text: c-string
     delimiter: char
-    count: { "a " { $link pointer } " to a " { $link int } } }
+    count: { "a " { $link pointer } " to a " { $link int } }
+    c-string*: { "a " { $link pointer } " to an array of " { $link c-string } } }
 { $description
     "Split text into multiple strings" } ;
 
@@ -4614,8 +4843,7 @@ HELP: text-append
 { $values
     text: c-string
     append: c-string
-    position: { "a " { $link pointer } " to a " { $link int } }
-    c-string*: { "a " { $link pointer } " to a " { $link c-string } } }
+    position: { "a " { $link pointer } " to a " { $link int } } }
 { $description
     "Append text at specific position and move cursor!" } ;
 
@@ -4656,11 +4884,6 @@ HELP: text-to-integer
     "Get integer value from text."
     { $warning
         "Negative values not supported" } } ;
-
-
-! ------------------------------------------------------------------------------------
-! Basic 3d Shapes Drawing Functions (Module: models)
-! ------------------------------------------------------------------------------------
 
 ! Basic geometric 3D shapes drawing functions
 HELP: draw-line-3d
@@ -4857,10 +5080,6 @@ HELP: draw-grid
 { $description
     "Draw a grid (centered at (0, 0, 0))" } ;
 
-
-! ------------------------------------------------------------------------------------
-! Model 3d Loading and Drawing Functions (Module: models)
-! ------------------------------------------------------------------------------------
 
 ! Model management functions
 HELP: load-model
@@ -5305,8 +5524,17 @@ HELP: get-ray-collision-quad
 { $description
     "Get collision info between ray and quad" } ;
 
-HELP: get-ray-collision-model ;
-HELP: get-ray-collision-ground ;
+HELP: get-ray-collision-model
+{ $values 
+    ray: Ray
+    model: Model 
+    ray-collision: RayCollision } ;
+
+HELP: get-ray-collision-ground 
+{ $values 
+    ray: Ray
+    ground-height: float 
+    ray-collision: RayCollision } ;
 
 HELP: void AudioCallback
 { $values
@@ -5331,6 +5559,8 @@ HELP: close-audio-device
     "Close the audio device and context " } ;
 
 HELP: is-audio-device-ready
+{ $values 
+    bool: bool }
 { $description
     "Check if audio device has been initialized successfully " } ;
 
@@ -5693,7 +5923,7 @@ HELP: stop-audio-stream
 HELP: set-audio-stream-volume
 { $values
     stream: AudioStream
-    volum: float }
+    volume: float }
 { $description
     "Set volume for audio stream (1.0 is max level)" } ;
 
