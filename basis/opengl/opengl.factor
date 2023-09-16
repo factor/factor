@@ -169,6 +169,9 @@ MACRO: all-enabled-client-state ( seq quot -- quot )
 : gen-gl-buffer ( -- id )
     [ glGenBuffers ] (gen-gl-object) ;
 
+: create-gl-buffer ( -- id )
+    [ glCreateBuffers ] (gen-gl-object) ;
+
 : delete-gl-buffer ( id -- )
     [ glDeleteBuffers ] (delete-gl-object) ;
 
@@ -183,6 +186,9 @@ MACRO: all-enabled-client-state ( seq quot -- quot )
 
 : gen-vertex-array ( -- id )
     [ glGenVertexArrays ] (gen-gl-object) ;
+
+: create-vertex-array ( -- id )
+    [ glCreateVertexArrays ] (gen-gl-object) ;
 
 : delete-vertex-array ( id -- )
     [ glDeleteVertexArrays ] (delete-gl-object) ;

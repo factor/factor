@@ -22,6 +22,9 @@ SYMBOL: non-power-of-2-textures?
 
 : gen-texture ( -- id ) [ glGenTextures ] (gen-gl-object) ;
 
+: create-texture ( target -- id ) 
+    [ glCreateTextures ] (gen-gl-object) ;
+
 : delete-texture ( id -- ) [ glDeleteTextures ] (delete-gl-object) ;
 
 ERROR: unsupported-component-order component-order component-type ;
