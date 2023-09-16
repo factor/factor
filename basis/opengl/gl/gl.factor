@@ -2568,3 +2568,240 @@ CONSTANT: GL_COMPRESSED_LUMINANCE_LATC1_EXT              0x8C70
 CONSTANT: GL_COMPRESSED_SIGNED_LUMINANCE_LATC1_EXT       0x8C71
 CONSTANT: GL_COMPRESSED_LUMINANCE_ALPHA_LATC2_EXT        0x8C72
 CONSTANT: GL_COMPRESSED_SIGNED_LUMINANCE_ALPHA_LATC2_EXT 0x8C73
+
+! OpenGL 4.1
+
+! GL_ARB_separate_shader_objects
+
+GL-FUNCTION: void glProgramUniform1f { } ( GLuint program, GLint location, GLfloat v0 )
+GL-FUNCTION: void glProgramUniform2f { } ( GLuint program, GLint location, GLfloat v0, GLfloat v1 )
+GL-FUNCTION: void glProgramUniform3f { } ( GLuint program, GLint location, GLfloat v0, GLfloat v1, GLfloat v2 )
+GL-FUNCTION: void glProgramUniform4f { } ( GLuint program, GLint location, GLfloat v0, GLfloat v1, GLfloat v2, GLfloat v3 )
+GL-FUNCTION: void glProgramUniform1i { } ( GLuint program, GLint location, GLint v0 )
+GL-FUNCTION: void glProgramUniform2i { } ( GLuint program, GLint location, GLint v0, GLint v1 )
+GL-FUNCTION: void glProgramUniform3i { } ( GLuint program, GLint location, GLint v0, GLint v1, GLint v2 )
+GL-FUNCTION: void glProgramUniform4i { } ( GLuint program, GLint location, GLint v0, GLint v1, GLint v2, GLint v3 )
+GL-FUNCTION: void glProgramUniform1ui { } ( GLuint program, GLint location, GLuint v0 )
+GL-FUNCTION: void glProgramUniform2ui { } ( GLuint program, GLint location, GLuint v0, GLuint v1 )
+GL-FUNCTION: void glProgramUniform3ui { } ( GLuint program, GLint location, GLuint v0, GLuint v1, GLuint v2 )
+GL-FUNCTION: void glProgramUniform4ui { } ( GLuint program, GLint location, GLuint v0, GLuint v1, GLuint v2, GLuint v3 )
+GL-FUNCTION: void glProgramUniform1fv { } ( GLuint program, GLint location, GLsizei count, GLfloat *value )
+GL-FUNCTION: void glProgramUniform2fv { } ( GLuint program, GLint location, GLsizei count, GLfloat *value )
+GL-FUNCTION: void glProgramUniform3fv { } ( GLuint program, GLint location, GLsizei count, GLfloat *value )
+GL-FUNCTION: void glProgramUniform4fv { } ( GLuint program, GLint location, GLsizei count, GLfloat *value )
+GL-FUNCTION: void glProgramUniform1iv { } ( GLuint program, GLint location, GLsizei count, GLint *value )
+GL-FUNCTION: void glProgramUniform2iv { } ( GLuint program, GLint location, GLsizei count, GLint *value )
+GL-FUNCTION: void glProgramUniform3iv { } ( GLuint program, GLint location, GLsizei count, GLint *value )
+GL-FUNCTION: void glProgramUniform4iv { } ( GLuint program, GLint location, GLsizei count, GLint *value )
+GL-FUNCTION: void glProgramUniform1uiv { } ( GLuint program, GLint location, GLsizei count, GLuint *value )
+GL-FUNCTION: void glProgramUniform2uiv { } ( GLuint program, GLint location, GLsizei count, GLuint *value )
+GL-FUNCTION: void glProgramUniform3uiv { } ( GLuint program, GLint location, GLsizei count, GLuint *value )
+GL-FUNCTION: void glProgramUniform4uiv { } ( GLuint program, GLint location, GLsizei count, GLuint *value )
+GL-FUNCTION: void glProgramUniformMatrix2fv { } ( GLuint program, GLint location, GLsizei count, GLboolean transpose, GLfloat *value )
+GL-FUNCTION: void glProgramUniformMatrix3fv { } ( GLuint program, GLint location, GLsizei count, GLboolean transpose, GLfloat *value )
+GL-FUNCTION: void glProgramUniformMatrix4fv { } ( GLuint program, GLint location, GLsizei count, GLboolean transpose, GLfloat *value )
+GL-FUNCTION: void glProgramUniformMatrix2x3fv { } ( GLuint program, GLint location, GLsizei count, GLboolean transpose, GLfloat *value )
+GL-FUNCTION: void glProgramUniformMatrix3x2fv { } ( GLuint program, GLint location, GLsizei count, GLboolean transpose, GLfloat *value )
+GL-FUNCTION: void glProgramUniformMatrix2x4fv { } ( GLuint program, GLint location, GLsizei count, GLboolean transpose, GLfloat *value )
+GL-FUNCTION: void glProgramUniformMatrix4x2fv { } ( GLuint program, GLint location, GLsizei count, GLboolean transpose, GLfloat *value )
+GL-FUNCTION: void glProgramUniformMatrix3x4fv { } ( GLuint program, GLint location, GLsizei count, GLboolean transpose, GLfloat *value )
+GL-FUNCTION: void glProgramUniformMatrix4x3fv { } ( GLuint program, GLint location, GLsizei count, GLboolean transpose, GLfloat *value )
+
+! OpenGL 4.2
+
+! GL_ARB_shader_image_load_store
+
+CONSTANT: GL_MAX_IMAGE_UNITS                                 0x8F38
+CONSTANT: GL_MAX_COMBINED_IMAGE_UNITS_AND_FRAGMENT_OUTPUTS   0x8F39
+CONSTANT: GL_MAX_IMAGE_SAMPLES                               0x906D
+CONSTANT: GL_MAX_VERTEX_IMAGE_UNIFORMS                       0x90CA
+CONSTANT: GL_MAX_TESS_CONTROL_IMAGE_UNIFORMS                 0x90CB
+CONSTANT: GL_MAX_TESS_EVALUATION_IMAGE_UNIFORMS              0x90CC
+CONSTANT: GL_MAX_GEOMETRY_IMAGE_UNIFORMS                     0x90CD
+CONSTANT: GL_MAX_FRAGMENT_IMAGE_UNIFORMS                     0x90CE
+CONSTANT: GL_MAX_COMBINED_IMAGE_UNIFORMS                     0x90CF
+CONSTANT: GL_IMAGE_BINDING_NAME                              0x8F3A
+CONSTANT: GL_IMAGE_BINDING_LEVEL                             0x8F3B
+CONSTANT: GL_IMAGE_BINDING_LAYERED                           0x8F3C
+CONSTANT: GL_IMAGE_BINDING_LAYER                             0x8F3D
+CONSTANT: GL_IMAGE_BINDING_ACCESS                            0x8F3E
+CONSTANT: GL_IMAGE_BINDING_FORMAT                            0x906E
+CONSTANT: GL_VERTEX_ATTRIB_ARRAY_BARRIER_BIT                 0x00000001
+CONSTANT: GL_ELEMENT_ARRAY_BARRIER_BIT                       0x00000002
+CONSTANT: GL_UNIFORM_BARRIER_BIT                             0x00000004
+CONSTANT: GL_TEXTURE_FETCH_BARRIER_BIT                       0x00000008
+CONSTANT: GL_SHADER_IMAGE_ACCESS_BARRIER_BIT                 0x00000020
+CONSTANT: GL_COMMAND_BARRIER_BIT                             0x00000040
+CONSTANT: GL_PIXEL_BUFFER_BARRIER_BIT                        0x00000080
+CONSTANT: GL_TEXTURE_UPDATE_BARRIER_BIT                      0x00000100
+CONSTANT: GL_BUFFER_UPDATE_BARRIER_BIT                       0x00000200
+CONSTANT: GL_FRAMEBUFFER_BARRIER_BIT                         0x00000400
+CONSTANT: GL_TRANSFORM_FEEDBACK_BARRIER_BIT                  0x00000800
+CONSTANT: GL_ATOMIC_COUNTER_BARRIER_BIT                      0x00001000
+CONSTANT: GL_ALL_BARRIER_BITS                                0xFFFFFFFF
+CONSTANT: GL_IMAGE_1D                                        0x904C
+CONSTANT: GL_IMAGE_2D                                        0x904D
+CONSTANT: GL_IMAGE_3D                                        0x904E
+CONSTANT: GL_IMAGE_2D_RECT                                   0x904F
+CONSTANT: GL_IMAGE_CUBE                                      0x9050
+CONSTANT: GL_IMAGE_BUFFER                                    0x9051
+CONSTANT: GL_IMAGE_1D_ARRAY                                  0x9052
+CONSTANT: GL_IMAGE_2D_ARRAY                                  0x9053
+CONSTANT: GL_IMAGE_CUBE_MAP_ARRAY                            0x9054
+CONSTANT: GL_IMAGE_2D_MULTISAMPLE                            0x9055
+CONSTANT: GL_IMAGE_2D_MULTISAMPLE_ARRAY                      0x9056
+CONSTANT: GL_INT_IMAGE_1D                                    0x9057
+CONSTANT: GL_INT_IMAGE_2D                                    0x9058
+CONSTANT: GL_INT_IMAGE_3D                                    0x9059
+CONSTANT: GL_INT_IMAGE_2D_RECT                               0x905A
+CONSTANT: GL_INT_IMAGE_CUBE                                  0x905B
+CONSTANT: GL_INT_IMAGE_BUFFER                                0x905C
+CONSTANT: GL_INT_IMAGE_1D_ARRAY                              0x905D
+CONSTANT: GL_INT_IMAGE_2D_ARRAY                              0x905E
+CONSTANT: GL_INT_IMAGE_CUBE_MAP_ARRAY                        0x905F
+CONSTANT: GL_INT_IMAGE_2D_MULTISAMPLE                        0x9060
+CONSTANT: GL_INT_IMAGE_2D_MULTISAMPLE_ARRAY                  0x9061
+CONSTANT: GL_UNSIGNED_INT_IMAGE_1D                           0x9062
+CONSTANT: GL_UNSIGNED_INT_IMAGE_2D                           0x9063
+CONSTANT: GL_UNSIGNED_INT_IMAGE_3D                           0x9064
+CONSTANT: GL_UNSIGNED_INT_IMAGE_2D_RECT                      0x9065
+CONSTANT: GL_UNSIGNED_INT_IMAGE_CUBE                         0x9066
+CONSTANT: GL_UNSIGNED_INT_IMAGE_BUFFER                       0x9067
+CONSTANT: GL_UNSIGNED_INT_IMAGE_1D_ARRAY                     0x9068
+CONSTANT: GL_UNSIGNED_INT_IMAGE_2D_ARRAY                     0x9069
+CONSTANT: GL_UNSIGNED_INT_IMAGE_CUBE_MAP_ARRAY               0x906A
+CONSTANT: GL_UNSIGNED_INT_IMAGE_2D_MULTISAMPLE               0x906B
+CONSTANT: GL_UNSIGNED_INT_IMAGE_2D_MULTISAMPLE_ARRAY         0x906C
+CONSTANT: GL_IMAGE_FORMAT_COMPATIBILITY_TYPE                 0x90C7
+CONSTANT: GL_IMAGE_FORMAT_COMPATIBILITY_BY_SIZE              0x90C8
+CONSTANT: GL_IMAGE_FORMAT_COMPATIBILITY_BY_CLASS             0x90C9
+GL-FUNCTION: void glMemoryBarrier { } ( GLbitfield barriers )
+
+
+! GL_OES_EGL_image_external_essl3
+
+GL-FUNCTION: void glBindImageTexture { } ( GLuint unit, GLuint texture, GLint level, GLboolean layered, GLint layer, GLenum access, GLenum format )
+
+! OpenGL 4.3
+
+! GL_ARB_compute_shader
+
+CONSTANT: GL_MAX_COMPUTE_UNIFORM_BLOCKS                         0x91BB
+CONSTANT: GL_MAX_COMPUTE_TEXTURE_IMAGE_UNITS                    0x91BC
+CONSTANT: GL_MAX_COMPUTE_IMAGE_UNIFORMS                         0x91BD
+CONSTANT: GL_MAX_COMPUTE_SHARED_MEMORY_SIZE                     0x8262
+CONSTANT: GL_MAX_COMPUTE_UNIFORM_COMPONENTS                     0x8263
+CONSTANT: GL_MAX_COMPUTE_ATOMIC_COUNTER_BUFFERS                 0x8264
+CONSTANT: GL_MAX_COMPUTE_ATOMIC_COUNTERS                        0x8265
+CONSTANT: GL_MAX_COMBINED_COMPUTE_UNIFORM_COMPONENTS            0x8266
+CONSTANT: GL_MAX_COMPUTE_WORK_GROUP_INVOCATIONS                 0x90EB
+CONSTANT: GL_MAX_COMPUTE_WORK_GROUP_COUNT                       0x91BE
+CONSTANT: GL_MAX_COMPUTE_WORK_GROUP_SIZE                        0x91BF
+CONSTANT: GL_COMPUTE_WORK_GROUP_SIZE                            0x8267
+CONSTANT: GL_UNIFORM_BLOCK_REFERENCED_BY_COMPUTE_SHADER         0x90EC
+CONSTANT: GL_ATOMIC_COUNTER_BUFFER_REFERENCED_BY_COMPUTE_SHADER 0x90ED
+CONSTANT: GL_DISPATCH_INDIRECT_BUFFER                           0x90EE
+CONSTANT: GL_DISPATCH_INDIRECT_BUFFER_BINDING                   0x90EF
+CONSTANT: GL_COMPUTE_SHADER                                     0x91B9
+CONSTANT: GL_COMPUTE_SHADER_BIT                                 0x00000020
+
+GL-FUNCTION: void glDispatchCompute { } ( GLuint num_groups_x, GLuint num_groups_y, GLuint num_groups_z )
+GL-FUNCTION: void glDispatchComputeIndirect { } ( GLintptr indirect )
+
+! OpenGL 4.5
+
+!  GL_ARB_direct_state_access
+
+GL-FUNCTION: void glCreateTransformFeedbacks { } ( GLsizei n, GLuint *ids )
+GL-FUNCTION: void glTransformFeedbackBufferBase { } ( GLuint xfb, GLuint index, GLuint buffer )
+GL-FUNCTION: void glTransformFeedbackBufferRange { } ( GLuint xfb, GLuint index, GLuint buffer, GLintptr offset, GLsizeiptr size )
+GL-FUNCTION: void glGetTransformFeedbackiv { } ( GLuint xfb, GLenum pname, GLint *param )
+GL-FUNCTION: void glGetTransformFeedbacki_v { } ( GLuint xfb, GLenum pname, GLuint index, GLint *param )
+GL-FUNCTION: void glGetTransformFeedbacki64_v { } ( GLuint xfb, GLenum pname, GLuint index, GLint64 *param )
+GL-FUNCTION: void glCreateBuffers { } ( GLsizei n, GLuint *buffers )
+GL-FUNCTION: void glNamedBufferStorage { } ( GLuint buffer, GLsizeiptr size, void *data, GLbitfield flags )
+GL-FUNCTION: void glNamedBufferData { } ( GLuint buffer, GLsizeiptr size, void *data, GLenum usage )
+GL-FUNCTION: GLenum glCheckNamedFramebufferStatus { } ( GLuint framebuffer, GLenum target )
+GL-FUNCTION: GLboolean glUnmapNamedBuffer { } ( GLuint buffer )
+GL-FUNCTION: void glNamedBufferSubData { } ( GLuint buffer, GLintptr offset, GLsizeiptr size, void *data )
+GL-FUNCTION: void glCopyNamedBufferSubData { } ( GLuint readBuffer, GLuint writeBuffer, GLintptr readOffset, GLintptr writeOffset, GLsizeiptr size )
+GL-FUNCTION: void glClearNamedBufferData { } ( GLuint buffer, GLenum internalformat, GLenum format, GLenum type, void *data )
+GL-FUNCTION: void glClearNamedBufferSubData { } ( GLuint buffer, GLenum internalformat, GLintptr offset, GLsizeiptr size, GLenum format, GLenum type, void *data )
+GL-FUNCTION: void* glMapNamedBuffer { } ( GLuint buffer, GLenum access )
+GL-FUNCTION: void* glMapNamedBufferRange { } ( GLuint buffer, GLintptr offset, GLsizeiptr length, GLbitfield access )
+GL-FUNCTION: void glFlushMappedNamedBufferRange { } ( GLuint buffer, GLintptr offset, GLsizeiptr length )
+GL-FUNCTION: void glGetNamedBufferParameteriv { } ( GLuint buffer, GLenum pname, GLint *params )
+GL-FUNCTION: void glGetNamedBufferParameteri64v { } ( GLuint buffer, GLenum pname, GLint64 *params )
+GL-FUNCTION: void glGetNamedBufferPointerv { } ( GLuint buffer, GLenum pname, void **params )
+GL-FUNCTION: void glGetNamedBufferSubData { } ( GLuint buffer, GLintptr offset, GLsizeiptr size, void *data )
+GL-FUNCTION: void glCreateFramebuffers { } ( GLsizei n, GLuint *framebuffers )
+GL-FUNCTION: void glNamedFramebufferRenderbuffer { } ( GLuint framebuffer, GLenum attachment, GLenum renderbuffertarget, GLuint renderbuffer )
+GL-FUNCTION: void glNamedFramebufferParameteri { } ( GLuint framebuffer, GLenum pname, GLint param )
+GL-FUNCTION: void glNamedFramebufferTexture { } ( GLuint framebuffer, GLenum attachment, GLuint texture, GLint level )
+GL-FUNCTION: void glNamedFramebufferTextureLayer { } ( GLuint framebuffer, GLenum attachment, GLuint texture, GLint level, GLint layer )
+GL-FUNCTION: void glNamedFramebufferDrawBuffer { } ( GLuint framebuffer, GLenum mode )
+GL-FUNCTION: void glNamedFramebufferDrawBuffers { } ( GLuint framebuffer, GLsizei n, GLenum *bufs )
+GL-FUNCTION: void glNamedFramebufferReadBuffer { } ( GLuint framebuffer, GLenum mode )
+GL-FUNCTION: void glInvalidateNamedFramebufferData { } ( GLuint framebuffer, GLsizei numAttachments, GLenum *attachments )
+GL-FUNCTION: void glInvalidateNamedFramebufferSubData { } ( GLuint framebuffer, GLsizei numAttachments, GLenum *attachments, GLint x, GLint y, GLsizei width, GLsizei height )
+GL-FUNCTION: void glClearNamedFramebufferiv { } ( GLuint framebuffer, GLenum buffer, GLint drawbuffer,  GLint *value )
+GL-FUNCTION: void glClearNamedFramebufferuiv { } ( GLuint framebuffer, GLenum buffer, GLint drawbuffer,  GLuint *value )
+GL-FUNCTION: void glClearNamedFramebufferfv { } ( GLuint framebuffer, GLenum buffer, GLint drawbuffer,  float *value )
+GL-FUNCTION: void glClearNamedFramebufferfi { } ( GLuint framebuffer, GLenum buffer, GLint drawbuffer, float depth, GLint stencil )
+GL-FUNCTION: void glBlitNamedFramebuffer { } ( GLuint readFramebuffer, GLuint drawFramebuffer, GLint srcX0, GLint srcY0, GLint srcX1, GLint srcY1, GLint dstX0, GLint dstY0, GLint dstX1, GLint dstY1, GLbitfield mask, GLenum filter )
+GL-FUNCTION: void glGetNamedFramebufferParameteriv { } ( GLuint framebuffer, GLenum pname, GLint *param )
+GL-FUNCTION: void glGetNamedFramebufferAttachmentParameteriv { } ( GLuint framebuffer, GLenum attachment, GLenum pname, GLint *params )
+GL-FUNCTION: void glCreateRenderbuffers { } ( GLsizei n, GLuint *renderbuffers )
+GL-FUNCTION: void glNamedRenderbufferStorage { } ( GLuint renderbuffer, GLenum internalformat, GLsizei width, GLsizei height )
+GL-FUNCTION: void glNamedRenderbufferStorageMultisample { } ( GLuint renderbuffer, GLsizei samples, GLenum internalformat, GLsizei width, GLsizei height )
+GL-FUNCTION: void glGetNamedRenderbufferParameteriv { } ( GLuint renderbuffer, GLenum pname, GLint *params )
+GL-FUNCTION: void glCreateTextures { } ( GLenum target, GLsizei n, GLuint *textures )
+GL-FUNCTION: void glTextureBuffer { } ( GLuint texture, GLenum internalformat, GLuint buffer )
+GL-FUNCTION: void glTextureBufferRange { } ( GLuint texture, GLenum internalformat, GLuint buffer, GLintptr offset, GLsizeiptr size )
+GL-FUNCTION: void glTextureStorage1D { } ( GLuint texture, GLsizei levels, GLenum internalformat, GLsizei width )
+GL-FUNCTION: void glTextureStorage2D { } ( GLenum target, GLsizei levels, GLenum internalformat, GLsizei width, GLsizei height )
+GL-FUNCTION: void glTextureStorage3D { } ( GLuint texture, GLsizei levels, GLenum internalformat, GLsizei width, GLsizei height, GLsizei depth )
+GL-FUNCTION: void glTextureStorage2DMultisample { } ( GLuint texture, GLsizei samples, GLenum internalformat, GLsizei width, GLsizei height,  GLboolean fixedsamplelocations )
+GL-FUNCTION: void glTextureStorage3DMultisample { } ( GLuint texture, GLsizei samples, GLenum internalformat, GLsizei width, GLsizei height, GLsizei depth, GLboolean fixedsamplelocations )
+GL-FUNCTION: void glTextureSubImage1D { } ( GLuint texture, GLint level, GLint xoffset, GLsizei width, GLenum format, GLenum type, void *pixels )
+GL-FUNCTION: void glTextureSubImage2D { } ( GLuint texture, GLint level, GLint xoffset, GLint yoffset, GLsizei width, GLsizei height, GLenum format, GLenum type, void *pixels )
+GL-FUNCTION: void glTextureSubImage3D { } ( GLuint texture, GLint level, GLint xoffset, GLint yoffset, GLint zoffset, GLsizei width, GLsizei height, GLsizei depth, GLenum format, GLenum type, void *pixels )
+GL-FUNCTION: void glCompressedTextureSubImage1D { } ( GLuint texture, GLint level, GLint xoffset, GLsizei width, GLenum format, GLsizei imageSize,  void *data )
+GL-FUNCTION: void glCompressedTextureSubImage2D { } ( GLuint texture, GLint level, GLint xoffset, GLint yoffset, GLsizei width, GLsizei height, GLenum format, GLsizei imageSize, void *data )
+GL-FUNCTION: void glCompressedTextureSubImage3D { } ( GLuint texture, GLint level, GLint xoffset, GLint yoffset, GLint zoffset, GLsizei width, GLsizei height, GLsizei depth, GLenum format, GLsizei imageSize,  void *data )
+GL-FUNCTION: void glCopyTextureSubImage1D { } ( GLuint texture, GLint level, GLint xoffset, GLint x, GLint y, GLsizei width )
+GL-FUNCTION: void glCopyTextureSubImage2D { } ( GLuint texture, GLint level, GLint xoffset, GLint yoffset, GLint x, GLint y, GLsizei width, GLsizei height )
+GL-FUNCTION: void glCopyTextureSubImage3D { } ( GLuint texture, GLint level, GLint xoffset, GLint yoffset, GLint zoffset, GLint x, GLint y, GLsizei width, GLsizei height )
+GL-FUNCTION: void glTextureParameterf { } ( GLuint texture, GLenum pname, float param )
+GL-FUNCTION: void glTextureParameterfv { } ( GLuint texture, GLenum pname,  float *param )
+GL-FUNCTION: void glTextureParameteri { } ( GLenum target, GLenum pname, GLint param )
+GL-FUNCTION: void glTextureParameterIiv { } ( GLuint texture, GLenum pname,  GLint *params )
+GL-FUNCTION: void glTextureParameterIuiv { } ( GLuint texture, GLenum pname,  GLuint *params )
+GL-FUNCTION: void glTextureParameteriv { } ( GLuint texture, GLenum pname,  GLint *param )
+GL-FUNCTION: void glGenerateTextureMipmap { } ( GLuint texture )
+GL-FUNCTION: void glBindTextureUnit { } ( GLuint unit, GLuint texture )
+GL-FUNCTION: void glGetTextureImage { } ( GLuint texture, GLint level, GLenum format, GLenum type, GLsizei bufSize, void *pixels )
+GL-FUNCTION: void glGetCompressedTextureImage { } ( GLuint texture, GLint level, GLsizei bufSize, void *pixels )
+GL-FUNCTION: void glGetTextureLevelParameterfv { } ( GLuint texture, GLint level, GLenum pname, float *params )
+GL-FUNCTION: void glGetTextureLevelParameteriv { } ( GLuint texture, GLint level, GLenum pname, GLint *params )
+GL-FUNCTION: void glGetTextureParameterfv { } ( GLuint texture,  GLenum pname, float *params )
+GL-FUNCTION: void glGetTextureParameterIiv { } ( GLuint texture, GLenum pname, GLint *params )
+GL-FUNCTION: void glGetTextureParameterIuiv { } ( GLuint texture, GLenum pname, GLuint *params )
+GL-FUNCTION: void glGetTextureParameteriv { } ( GLuint texture, GLenum pname, GLint *params )
+GL-FUNCTION: void glCreateVertexArrays { } ( GLsizei n, GLuint *arrays )
+GL-FUNCTION: void glDisableVertexArrayAttrib { } ( GLuint vaobj, GLuint index )
+GL-FUNCTION: void glEnableVertexArrayAttrib { } ( GLuint vaobj, GLuint index )
+GL-FUNCTION: void glVertexArrayElementBuffer { } ( GLuint vaobj, GLuint buffer )
+GL-FUNCTION: void glVertexArrayVertexBuffer { } ( GLuint vaobj, GLuint bindingindex, GLuint buffer, GLintptr offset, GLsizei stride )
+GL-FUNCTION: void glVertexArrayVertexBuffers { } ( GLuint vaobj, GLuint first, GLsizei count,  GLuint *buffers, GLintptr *offsets, GLsizei *strides )
+GL-FUNCTION: void glVertexArrayAttribFormat { } ( GLuint vaobj, GLuint attribindex, GLint size, GLenum type, GLboolean normalized, GLuint relativeoffset )
+GL-FUNCTION: void glVertexArrayAttribIFormat { } ( GLuint vaobj, GLuint attribindex, GLint size, GLenum type, GLuint relativeoffset )
+GL-FUNCTION: void glVertexArrayAttribLFormat { } ( GLuint vaobj, GLuint attribindex, GLint size, GLenum type, GLuint relativeoffset )
+GL-FUNCTION: void glVertexArrayAttribBinding { } ( GLuint vaobj, GLuint attribindex, GLuint bindingindex )
+GL-FUNCTION: void glVertexArrayBindingDivisor { } ( GLuint vaobj, GLuint bindingindex, GLuint divisor )
+GL-FUNCTION: void glGetVertexArrayiv { } ( GLuint vaobj, GLenum pname, GLint *param )
+GL-FUNCTION: void glGetVertexArrayIndexediv { } ( GLuint vaobj, GLuint index, GLenum pname, GLint *param )
+GL-FUNCTION: void glGetVertexArrayIndexed64iv { } ( GLuint vaobj, GLuint index, GLenum pname, GLint64 *param )
+GL-FUNCTION: void glCreateSamplers { } ( GLsizei n, GLuint *samplers )
+GL-FUNCTION: void glCreateProgramPipelines { } ( GLsizei n, GLuint *pipelines )
+GL-FUNCTION: void glCreateQueries { } ( GLenum target, GLsizei n, GLuint *ids )

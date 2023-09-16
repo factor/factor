@@ -24,6 +24,10 @@ HELP: <fragment-shader>
 { $values { "source" "The GLSL source code to compile" } { "fragment-shader" "a new " { $link fragment-shader } } }
 { $description "Tries to compile the given GLSL source into a fragment shader object. Equivalent to " { $snippet "GL_FRAGMENT_SHADER <gl-shader>" } "." } ;
 
+HELP: <compute-shader>
+{ $values { "source" "The GLSL source code to compile" } { "compute-shader" "a new " { $link compute-shader } } }
+{ $description "Tries to compile the given GLSL source into a compute shader object. Equivalent to " { $snippet "GL_COMPUTE_SHADER <gl-shader>" } "." } ;
+
 HELP: gl-shader
 { $class-description { $snippet "gl-shader" } " is a predicate class comprising values returned by OpenGL to represent shader objects. The following words are provided for creating and manipulating these objects:"
     { $list
@@ -46,6 +50,13 @@ HELP: fragment-shader
 { $class-description { $snippet "fragment-shader" } " is the predicate class of " { $link gl-shader } " objects that refer to shaders of type " { $snippet "GL_FRAGMENT_SHADER" } ". In addition to the " { $snippet "gl-shader" } " words, the following fragment shader-specific functions are defined:"
     { $list
         { { $link <fragment-shader> } " - Compile GLSL code into a fragment shader object " }
+    }
+} ;
+
+HELP: compute-shader
+{ $class-description { $snippet "compute-shader" } " is the predicate class of " { $link gl-shader } " objects that refer to shaders of type " { $snippet "GL_COMPUTE_SHADER" } ". In addition to the " { $snippet "gl-shader" } " words, the following compute shader-specific functions are defined:"
+    { $list
+        { { $link <compute-shader> } " - Compile GLSL code into a compute shader object " }
     }
 } ;
 
@@ -83,6 +94,12 @@ HELP: <simple-gl-program>
 { $description "Wrapper for " { $link <gl-program> } " for the simple case of compiling a single vertex shader and fragment shader and linking them into a GLSL program. Throws an exception if compiling or linking fails." } ;
 
 { <gl-program> <simple-gl-program> } related-words
+
+HELP: <compute-program>
+{ $values { "compute-shader-source" "A string containing GLSL compute shader source" } { "program" "a new " { $link gl-program } } }
+{ $description "Wrapper for " { $link <gl-program> } " for the simple case of compiling a compute shader and linking them into a GLSL program. Throws an exception if compiling or linking fails." } ;
+
+{ <gl-program> } related-words
 
 HELP: gl-program-ok?
 { $values { "program" "A " { $link gl-program } " object" } { "?" boolean } }
