@@ -1,12 +1,12 @@
 IN: opengl.textures
-USING: help.markup help.syntax opengl.gl opengl.textures.private math alien images ;
+USING: help.markup help.syntax kernel opengl.gl opengl.textures.private math alien images ;
 
 HELP: gen-texture
 { $values { "id" integer } }
 { $description "Wrapper for " { $link glGenTextures } " to handle the common case of generating a single texture ID." } ;
 
 HELP: create-texture
-{ $values { "id" integer } }
+{ $values { "target" object } { "id" integer } }
 { $description "Wrapper for " { $link glCreateTextures } " to handle the common case of generating a single DSA texture ID." } ;
 
 HELP: delete-texture
