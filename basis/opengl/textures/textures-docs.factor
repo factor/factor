@@ -5,6 +5,10 @@ HELP: gen-texture
 { $values { "id" integer } }
 { $description "Wrapper for " { $link glGenTextures } " to handle the common case of generating a single texture ID." } ;
 
+HELP: create-texture
+{ $values { "id" integer } }
+{ $description "Wrapper for " { $link glCreateTextures } " to handle the common case of generating a single DSA texture ID." } ;
+
 HELP: delete-texture
 { $values { "id" integer } }
 { $description "Wrapper for " { $link glDeleteTextures } " to handle the common case of deleting a single texture ID." } ;

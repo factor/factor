@@ -40,6 +40,14 @@ IN: opengl.shaders
     [ GL_SHADER_TYPE gl-shader-get-int GL_FRAGMENT_SHADER = ]
     [ drop f ] if ;
 
+: <compute-shader> ( source -- compute-shader )
+    GL_COMPUTE_SHADER <gl-shader> ; inline
+
+: (compute-shader?) ( object -- ? )
+    dup (gl-shader?)
+    [ GL_SHADER_TYPE gl-shader-get-int GL_COMPUTE_SHADER = ]
+    [ drop f ] if ;
+
 : gl-shader-info-log-length ( shader -- log-length )
     GL_INFO_LOG_LENGTH gl-shader-get-int ; inline
 
@@ -56,6 +64,7 @@ IN: opengl.shaders
 PREDICATE: gl-shader < integer (gl-shader?) ;
 PREDICATE: vertex-shader < gl-shader (vertex-shader?) ;
 PREDICATE: fragment-shader < gl-shader (fragment-shader?) ;
+PREDICATE: compute-shader < gl-shader (compute-shader?) ;
 
 ! Programs
 
@@ -122,3 +131,6 @@ PREDICATE: gl-program < integer (gl-program?) ;
     [ <vertex-shader> check-gl-shader ]
     [ <fragment-shader> check-gl-shader ] bi*
     2array <gl-program> check-gl-program ;
+
+: <compute-program> ( compute-shader-source -- program ) 
+    <compute-shader> check-gl-shader 1array <gl-program> ;

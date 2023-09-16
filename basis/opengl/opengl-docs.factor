@@ -34,11 +34,30 @@ HELP: gen-gl-buffer
 { $values { "id" integer } }
 { $description "Wrapper for " { $link glGenBuffers } " to handle the common case of generating a single buffer ID." } ;
 
+HELP: create-gl-buffer
+{ $values { "id" integer } }
+{ $description "Wrapper for " { $link glCreateBuffers } " to handle the common case of generating a single DSA buffer ID." } ;
+
 HELP: delete-gl-buffer
 { $values { "id" integer } }
 { $description "Wrapper for " { $link glDeleteBuffers } " to handle the common case of deleting a single buffer ID." } ;
 
-{ gen-gl-buffer delete-gl-buffer } related-words
+{ gen-gl-buffer create-gl-buffer delete-gl-buffer } related-words
+
+HELP: gen-vertex-array
+{ $values { "id" integer } }
+{ $description "Wrapper for " { $link glGenVertexArrays } " to handle the common case of generating a single vertex array ID." } ;
+
+HELP: create-vertex-array
+{ $values { "id" integer } }
+{ $description "Wrapper for " { $link glCreateVertexArrays } " to handle the common case of generating a single DSA vertex array ID." } ;
+
+HELP: delete-vertex-array
+{ $values { "id" integer } }
+{ $description "Wrapper for " { $link glDeleteVertexArrays } " to handle the common case of deleting a single vertex array ID." } ;
+
+{ gen-gl-buffer create-gl-buffer delete-gl-buffer } related-words
+
 
 HELP: bind-texture-unit
 { $values { "id" "The id of a texture object." } { "target" "The texture target (e.g., " { $snippet "GL_TEXTURE_2D" } ")" } { "unit" "The texture unit to bind (e.g., " { $snippet "GL_TEXTURE0" } ")" } }
