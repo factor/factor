@@ -1397,7 +1397,7 @@ FUNCTION-ALIAS: get-music-time-played float GetMusicTimePlayed ( Music music )  
 
 ! AudioStream management functions
 FUNCTION-ALIAS: load-audio-stream AudioStream LoadAudioStream ( uint sampleRate, uint sampleSize, uint channels ) ! Load audio stream (to stream raw audio pcm data)
-FUNCTION-ALIAS: is-audio-stream-ready AudioStream IsAudioStreamReady ( AudioStream stream )                       ! Checks if an audio stream is ready
+FUNCTION-ALIAS: is-audio-stream-ready bool IsAudioStreamReady ( AudioStream stream )                       ! Checks if an audio stream is ready
 FUNCTION-ALIAS: unload-audio-stream void UnloadAudioStream ( AudioStream stream )                                 ! Unload audio stream and free memory
 FUNCTION-ALIAS: update-audio-stream void UpdateAudioStream ( AudioStream stream, void* data, int frameCount )     ! Update audio stream buffers with data
 FUNCTION-ALIAS: is-audio-stream-processed bool IsAudioStreamProcessed ( AudioStream stream )                      ! Check if any audio stream buffers requires refill
