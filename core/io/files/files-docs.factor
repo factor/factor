@@ -115,6 +115,11 @@ HELP: file-exists?
 { $values { "path" "a pathname string" } { "?" boolean } }
 { $description "Tests if the file named by " { $snippet "path" } " exists." } ;
 
+HELP: check-file-exists
+{ $values { "path" "a pathname string" } }
+{ $description "Check if a file exists, otherwise throw a " { $link no-such-file } " error." }
+{ $errors "Throws an error if the file does not exist." } ;
+
 HELP: if-file-exists
 { $values { "path" "a pathname string" } { "true" { $quotation ( ..a path -- ..b ) } } { "false" { $quotation ( ..a path -- ..b ) } } }
 { $description "If " { $snippet "path" } " is a file that exists, calls the " { $snippet "true" } " quotation, otherwise calls the " { $snippet "false" } " quotation." }

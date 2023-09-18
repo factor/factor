@@ -162,7 +162,11 @@ CONSTANT: pt-array-1
 
     { t } [ "test2.txt" file-exists? ] unit-test
 
+    { "test2.txt" } [ "test2.txt" check-file-exists ] unit-test
+
     { } [ "test2.txt" delete-file ] unit-test
+
+    [ "test2.txt" check-file-exists ] [ no-such-file? ] must-fail-with
 ] with-test-directory
 
 ! File seeking tests
