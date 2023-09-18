@@ -71,6 +71,11 @@ HOOK: (file-appender) io-backend ( path -- stream )
 : file-exists? ( path -- ? )
     normalize-path native-string>alien (file-exists?) ;
 
+ERROR: no-such-file path ;
+
+: check-file-exists ( path -- path )
+    dup file-exists? [ no-such-file ] unless ;
+
 : if-file-exists ( ..a path true: ( ..a path -- ..b ) false: ( ..a path -- ..b ) -- ..b )
     [ dup file-exists? ] 2dip if ; inline
 
