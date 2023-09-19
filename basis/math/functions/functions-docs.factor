@@ -17,6 +17,12 @@ ARTICLE: "integer-functions" "Integer functions"
     even?
     odd?
     divisor?
+}
+"Function variants:"
+{ $subsections
+    integer-log2
+    integer-log10
+    integer-sqrt
 } ;
 
 ARTICLE: "arithmetic-functions" "Arithmetic functions"
@@ -367,3 +373,44 @@ HELP: signum
 HELP: copysign
 { $values { "x" number } { "y" number } { "x'" number } }
 { $description "Returns " { $snippet "x" } " with the sign of " { $snippet "y" } ", as a " { $link float } "." } ;
+
+HELP: integer-sqrt
+{ $values
+    { "x" "a non-negative rational number" }
+    { "n" integer }
+}
+{ $description "Outputs the largest integer that is less than or equal to the " { $link sqrt } " of " { $snippet "m" } "." }
+{ $errors "Throws an error if " { $snippet "m" } " is negative." }
+{ $examples
+    { $example
+        "USING: prettyprint math.functions ;"
+        "15 integer-sqrt ."
+        "3"
+    }
+} ;
+
+HELP: integer-log10
+{ $values
+    { "x" "a positive rational number" }
+    { "n" integer }
+}
+{ $description "Outputs the largest integer " { $snippet "n" } " such that " { $snippet "10^n" } " is less than or equal to " { $snippet "x" } "." }
+{ $errors "Throws an error if " { $snippet "x" } " is zero or negative." }
+{ $examples
+    { $example
+        "USING: prettyprint math.functions sequences ;"
+        "{"
+        "     5 99 100 101 100000000000000000000"
+        "     100+1/2 1/100"
+        "} [ integer-log10 ] map ."
+        "{ 0 1 2 2 20 2 -2 }"
+    }
+} ;
+
+HELP: integer-log2
+{ $values
+    { "x" "a positive rational number" }
+    { "n" integer }
+}
+{ $description "Outputs the largest integer " { $snippet "n" } " such that " { $snippet "2^n" } " is less than or equal to " { $snippet "x" } "." }
+{ $errors "Throws an error if " { $snippet "x" } " is zero or negative." } ;

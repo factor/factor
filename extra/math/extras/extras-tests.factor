@@ -146,12 +146,6 @@ tools.test ;
 { 0 } [ 1/2 1 kelly ] unit-test
 { -1/5 } [ 2/5 1 kelly ] unit-test
 
-[ -1 integer-sqrt ] must-fail
-{ 0 } [ 0 integer-sqrt ] unit-test
-{ 3 } [ 12 integer-sqrt ] unit-test
-{ 4 } [ 16 integer-sqrt ] unit-test
-{ 44 } [ 2019 integer-sqrt ] unit-test
-
 { 1 } [ 11 13 stein ] unit-test
 { 2 } [ 14 52 stein ] unit-test
 { 7 } [ 14 7 stein ] unit-test
