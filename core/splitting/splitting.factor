@@ -1,7 +1,7 @@
 ! Copyright (C) 2005, 2009 Slava Pestov.
 ! See https://factorcode.org/license.txt for BSD license.
-USING: arrays kernel math sbufs sequences sequences.private
-strings ;
+USING: accessors arrays kernel kernel.private math math.order
+sbufs sequences sequences.private strings strings.private ;
 IN: splitting
 
 <PRIVATE
@@ -94,22 +94,35 @@ PRIVATE>
         [ pick subseq ] keep swap
     ] map 2nip ;
 
-! split-lines uses string-nth-fast which is 50% faster over
-! nth-unsafe. be careful when changing the definition so that
-! you don't unoptimize it.
+<PRIVATE
+
+: linebreak? ( ch -- ? )
+    { fixnum } declare
+    dup CHAR: \n CHAR: \r between? [ drop t ] [         ! LINE FEED, CARRIAGE RETURN, LINE TABULATION, FORM FEED
+        dup CHAR: \x1c CHAR: \x1e between? [ drop t ] [ ! FILE, GROUP, RECORD SEPARATOR
+            dup CHAR: \x85 = [ drop t ] [               ! NEXT LINE (C1 CONTROL CODE)
+                CHAR: \u002028 CHAR: \u002029 between?  ! LINE, PARAGRAPH SEPARATOR
+            ] if
+        ] if
+    ] if ; inline
+
+PRIVATE>
+
 GENERIC: split-lines ( seq -- seq' )
 
 ALIAS: string-lines split-lines
 
-M: string split-lines
-    [ V{ } clone 0 ] dip [ 2dup bounds-check? ] [
-        2dup [ "\r\n" member? ] find-from swapd [
-            over [ [ nip length ] keep ] unless
-            [ "" subseq-as suffix! ] 2keep [ 1 + ] dip
-        ] dip CHAR: \r eq? [
-            2dup ?nth CHAR: \n eq? [ [ 1 + ] dip ] when
-        ] when
-    ] while 2drop { } like ;
+M:: string split-lines ( seq -- seq' )
+    seq length :> len
+    V{ } clone 0 [ dup len < ] [
+        dup seq [ linebreak? ] find-from [
+            len or [ seq subseq suffix! ] [ 1 + ] bi
+        ] [
+            CHAR: \r eq? [
+               dup seq ?nth CHAR: \n eq? [ 1 + ] when
+            ] when
+        ] bi*
+    ] while drop { } like ; inline
 
 M: sbuf split-lines "" like split-lines ;
 
