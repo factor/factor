@@ -1,11 +1,8 @@
 ! Copyright (C) 2015 Doug Coleman.
 ! See https://factorcode.org/license.txt for BSD license.
-USING: accessors fry git io io.directories io.encodings.utf8
-io.launcher io.streams.string kernel sequences tools.test ;
+USING: accessors git io io.directories io.launcher
+io.streams.string kernel sequences tools.test ;
 IN: git.tests
-
-: run-process-stdout ( process -- string )
-    >process utf8 [ read-contents ] with-process-reader ;
 
 : with-empty-test-git-repo ( quot -- )
     '[
@@ -36,7 +33,7 @@ IN: git.tests
 
 { } [
     [
-        { "git" "log" } run-process-stdout print
+        { "git" "log" } process-contents print
     ] with-zero-byte-file-repo
 ] unit-test
 

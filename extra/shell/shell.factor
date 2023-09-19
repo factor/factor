@@ -29,8 +29,7 @@ M: factor-expr expand expr>> eval>string ;
 DEFER: expansion
 
 M: back-quoted-expr expand
-  expr>> expr command>> expansion
-  utf8 [ read-contents ] with-process-reader
+  expr>> expr command>> expansion process-contents
   " \n" split harvest ;
 
 : expansion ( command -- command ) [ expand ] map flatten ;
