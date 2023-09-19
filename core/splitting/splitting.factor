@@ -98,8 +98,12 @@ PRIVATE>
 
 : linebreak? ( ch -- ? )
     { fixnum } declare
-    dup CHAR: \n CHAR: \r between? [ drop t ] [         ! LINE FEED, CARRIAGE RETURN, LINE TABULATION, FORM FEED
-        dup CHAR: \x1c CHAR: \x1e between? [ drop t ] [ ! FILE, GROUP, RECORD SEPARATOR
+    dup CHAR: \x1f < [
+        dup CHAR: \n CHAR: \r between? [ drop t ] [     ! LINE FEED, CARRIAGE RETURN, LINE TABULATION, FORM FEED
+            CHAR: \x1c CHAR: \x1e between?              ! FILE, GROUP, RECORD SEPARATOR
+        ] if
+    ] [
+        dup CHAR: \x85 < [ drop f ] [
             dup CHAR: \x85 = [ drop t ] [               ! NEXT LINE (C1 CONTROL CODE)
                 CHAR: \u002028 CHAR: \u002029 between?  ! LINE, PARAGRAPH SEPARATOR
             ] if
