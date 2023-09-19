@@ -70,11 +70,21 @@ ENUM: cs_mode
     { CS_MODE_M680X_HCS08 0x400 }
 ;
 
-STRUCT: cs_insn
+STRUCT: cs_insn_4
     { id uint }
     { address uint64_t }
     { size uint16_t }
     { bytes uint8_t[16] }
+    { mnemonic char[32] }
+    { op_str char[160] }
+    { detail void* }
+;
+
+STRUCT: cs_insn_5
+    { id uint }
+    { address uint64_t }
+    { size uint16_t }
+    { bytes uint8_t[24] }
     { mnemonic char[32] }
     { op_str char[160] }
     { detail void* }
@@ -104,10 +114,10 @@ FUNCTION: cs_err cs_open ( cs_arch arch, cs_mode mode, csh* handle )
 FUNCTION: cs_err cs_close ( csh* handle )
 FUNCTION: cs_err cs_errno ( csh handle )
 FUNCTION: c-string cs_strerror ( cs_err code )
-FUNCTION: size_t cs_disasm ( csh handle, uint8_t* code, size_t code_size, uint64_t address, size_t count, cs_insn** insn )
-FUNCTION: size_t cs_disasm_iter ( csh handle, uint8_t** code, size_t* size, uint64_t* address, size_t count, cs_insn* insn )
-FUNCTION: cs_insn* cs_malloc ( csh handle )
-FUNCTION: void cs_free ( cs_insn* insn, size_t count )
+FUNCTION: size_t cs_disasm ( csh handle, uint8_t* code, size_t code_size, uint64_t address, size_t count, void** insn )
+FUNCTION: size_t cs_disasm_iter ( csh handle, uint8_t** code, size_t* size, uint64_t* address, size_t count, void* insn )
+FUNCTION: void* cs_malloc ( csh handle )
+FUNCTION: void cs_free ( void* insn, size_t count )
 FUNCTION: c-string cs_reg_name ( csh handle, uint reg_id )
 FUNCTION: c-string cs_insn_name ( csh handle, uint insn_id )
 FUNCTION: c-string cs_group_name ( csh handle, uint group_id )
@@ -128,9 +138,16 @@ DESTRUCTOR: cs_close
 : with-csh ( ..a quot: ( ..a csh -- ..b ) -- ..b )
     '[ <csh> &cs_close @ ] with-destructors ; inline
 
-SPECIALIZED-ARRAY: cs_insn
-
 <PRIVATE
+
+SPECIALIZED-ARRAY: cs_insn_4
+SPECIALIZED-ARRAY: cs_insn_5
+
+: <direct-cs_insn-array> ( alien len -- specialized-array )
+    cs-version drop {
+        { 4 [ <direct-cs_insn_4-array> ] }
+        { 5 [ <direct-cs_insn_5-array> ] }
+    } case ;
 
 : buf/len/start ( from to -- buf len from )
     [ drop <alien> ] [ swap - ] [ drop ] 2tri ;
