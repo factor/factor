@@ -101,6 +101,8 @@ ENUM: cs_mode
     { CS_MODE_TRICORE_162 128 }
 ;
 
+TYPEDEF: void cs_detail
+
 STRUCT: cs_insn_4
     { id uint }
     { address uint64_t }
@@ -108,7 +110,7 @@ STRUCT: cs_insn_4
     { bytes uint8_t[16] }
     { mnemonic char[32] }
     { op_str char[160] }
-    { detail void* }
+    { detail cs_detail* }
 ;
 
 STRUCT: cs_insn_5
@@ -118,8 +120,10 @@ STRUCT: cs_insn_5
     { bytes uint8_t[24] }
     { mnemonic char[32] }
     { op_str char[160] }
-    { detail void* }
+    { detail cs_detail* }
 ;
+
+TYPEDEF: void cs_insn
 
 ENUM: cs_err
     CS_ERR_OK
@@ -145,10 +149,10 @@ FUNCTION: cs_err cs_open ( cs_arch arch, cs_mode mode, csh* handle )
 FUNCTION: cs_err cs_close ( csh* handle )
 FUNCTION: cs_err cs_errno ( csh handle )
 FUNCTION: c-string cs_strerror ( cs_err code )
-FUNCTION: size_t cs_disasm ( csh handle, uint8_t* code, size_t code_size, uint64_t address, size_t count, void** insn )
-FUNCTION: size_t cs_disasm_iter ( csh handle, uint8_t** code, size_t* size, uint64_t* address, size_t count, void* insn )
+FUNCTION: size_t cs_disasm ( csh handle, uint8_t* code, size_t code_size, uint64_t address, size_t count, cs_insn** insn )
+FUNCTION: size_t cs_disasm_iter ( csh handle, uint8_t** code, size_t* size, uint64_t* address, size_t count, cs_insn* insn )
 FUNCTION: void* cs_malloc ( csh handle )
-FUNCTION: void cs_free ( void* insn, size_t count )
+FUNCTION: void cs_free ( cs_insn* insn, size_t count )
 FUNCTION: c-string cs_reg_name ( csh handle, uint reg_id )
 FUNCTION: c-string cs_insn_name ( csh handle, uint insn_id )
 FUNCTION: c-string cs_group_name ( csh handle, uint group_id )
