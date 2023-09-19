@@ -161,6 +161,9 @@ ERROR: negative-number-expected n ;
 : even? ( n -- ? ) 1 bitand zero? ; inline
 : odd? ( n -- ? ) 1 bitand 1 number= ; inline
 
+: bit-length ( x -- n )
+    assert-non-negative dup 1 > [ log2 1 + ] when ;
+
 GENERIC: neg? ( x -- ? )
 
 : if-zero ( ..a n quot1: ( ..a -- ..b ) quot2: ( ..a n -- ..b ) -- ..b )

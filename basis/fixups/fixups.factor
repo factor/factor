@@ -11,6 +11,7 @@ CONSTANT: vocab-renames {
     { "json.reader" { "json" "0.99" } }
     { "json.writer" { "json" "0.99" } }
     { "math.trig" { "math.functions" "0.100" } }
+    { "math.functions.integer-logs" { "math.functions" "0.100" } }
 }
 
 CONSTANT: word-renames {
@@ -72,7 +73,7 @@ CONSTANT: word-renames {
     { "assoc-all-key?" { "all-keys?" "0.100" } }
     { "assoc-all-value?" { "all-values?" "0.100" } }
     { "assoc-any-key?" { "any-key?" "0.100" } }
-    { "assoc-any-value?" { "any-value?" "0.100" } } 
+    { "assoc-any-value?" { "any-value?" "0.100" } }
 }
 
 : compute-assoc-fixups ( continuation name assoc -- seq )

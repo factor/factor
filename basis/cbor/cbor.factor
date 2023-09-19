@@ -4,7 +4,7 @@
 USING: accessors arrays assocs base64 byte-arrays calendar
 calendar.format calendar.parser combinators endian io
 io.encodings.binary io.encodings.string io.encodings.utf8
-io.streams.byte-array io.streams.string kernel math math.bitwise
+io.streams.byte-array io.streams.string kernel math
 math.floats.half present sequences strings urls ;
 
 IN: cbor

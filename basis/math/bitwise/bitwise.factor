@@ -142,11 +142,6 @@ M: byte-array bit-count
 M: object bit-count
     binary-object uchar <c-direct-array> byte-array-bit-count ;
 
-: bit-length ( x -- n )
-    dup 0 < [ non-negative-number-expected ] [
-        dup 1 > [ log2 1 + ] when
-    ] if ;
-
 : even-parity? ( obj -- ? ) bit-count even? ;
 
 : odd-parity? ( obj -- ? ) bit-count odd? ;
