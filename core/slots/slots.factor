@@ -67,6 +67,9 @@ M: object reader-quot
 
 ERROR: bad-slot-value value class ;
 
+: check-slot-value ( value slot -- )
+    class>> 2dup instance? [ 2drop ] [ bad-slot-value ] if ; inline
+
 GENERIC: instance-check-quot ( obj -- quot )
 
 M: class instance-check-quot
