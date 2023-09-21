@@ -82,8 +82,8 @@ PRIVATE>
                 "%sx%s" sprintf "chs" set-query-param
             ] [ 2drop ] if
         ]
-        [ title>> "chtt" set-query-param ]
-        [ data>> "t:" prepend "chd" set-query-param ]
+        [ title>> [ "chtt" set-query-param ] when* ]
+        [ data>> [ "t:" prepend "chd" set-query-param ] when* ]
         [ data-scale>> [ "chds" set-query-param ] when* ]
         [ labels>> "chl" set-query-param ]
         [
