@@ -63,6 +63,13 @@ TUPLE: slotty a b c ;
 { T{ slotty f 1 2 f } } [ H{ { "a" 1 } { "b" 2 } } slotty from-slots ] unit-test
 [ H{ { "d" 0 } } slotty new set-slots ] must-fail
 
+TUPLE: slotty2 { a integer } { b number } c ;
+
+{ T{ slotty2 } } [ H{ } slotty2 from-slots ] unit-test
+{ T{ slotty2 f 1 2 f } } [ H{ { "a" 1 } { "b" 2 } } slotty2 from-slots ] unit-test
+[ H{ { "a" 1 } { "b" "two" } } slotty2 from-slots ] must-fail
+[ H{ { "d" 0 } } slotty2 new set-slots ] must-fail
+
 TUPLE: predicate-test ;
 
 C: <predicate-test> predicate-test
