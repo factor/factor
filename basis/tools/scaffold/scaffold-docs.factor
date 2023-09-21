@@ -5,7 +5,7 @@ IN: tools.scaffold
 
 HELP: developer-name
 { $description "Set this symbol to hold your name so that the scaffold tools can generate the correct file header for copyright. Setting this variable in your .factor-boot-rc file is recommended." }
-{ $code "USING: namespaces tools.scaffold ;\n\"Stacky Guy\" developer-name set-global" } ;
+{ $code "USING: namespaces tools.scaffold ;\n\"Stacky\" developer-name set-global" } ;
 
 HELP: help.
 { $values
