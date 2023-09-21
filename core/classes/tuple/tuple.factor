@@ -40,7 +40,10 @@ ERROR: no-slot name tuple ;
     [ nip ] [ offset-of-slot ] 2bi slot ;
 
 : set-slot-named ( value name tuple -- )
-    [ nip ] [ offset-of-slot ] 2bi set-slot ;
+    [ nip ] [
+        2dup class-of all-slots slot-named
+        [ 2nip pick over check-slot-value offset>> ] [ no-slot ] if*
+    ] 2bi set-slot ;
 
 : set-slots ( assoc tuple -- )
     [ swapd set-slot-named ] curry assoc-each ; inline
@@ -76,12 +79,7 @@ M: tuple class-of layout-of 2 slot { word } declare ; inline
     [ array-nth ] curry map ;
 
 : check-slots ( seq class -- seq class )
-    [ ] [
-        2dup all-slots [
-            class>> 2dup instance?
-            [ 2drop ] [ bad-slot-value ] if
-        ] 2each
-    ] if-bootstrapping ; inline
+    [ ] [ 2dup all-slots [ check-slot-value ] 2each ] if-bootstrapping ; inline
 
 : pad-slots ( seq class -- seq' class )
     [ all-slots ] keep 2over 2length 2dup > [
