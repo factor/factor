@@ -128,7 +128,7 @@
 
 /* Begin PBXFileReference section */
 		7595E1ED28A1DBDA0031EB24 /* factor */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = factor; sourceTree = BUILT_PRODUCTS_DIR; };
-		7595E1F728A1DC150031EB24 /* factor.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; name = factor.entitlements; path = Xcode/factorOSX/factor.entitlements; sourceTree = "<group>"; };
+		7595E1F728A1DC150031EB24 /* factor.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = factor.entitlements; sourceTree = "<group>"; };
 		7595E2DA28A1DC7A0031EB24 /* Config.macosx.arm64 */ = {isa = PBXFileReference; lastKnownFileType = text; name = Config.macosx.arm64; path = vm/Config.macosx.arm64; sourceTree = "<group>"; };
 		7595E2DB28A1DC7A0031EB24 /* Config.arm.64 */ = {isa = PBXFileReference; lastKnownFileType = text; name = Config.arm.64; path = vm/Config.arm.64; sourceTree = "<group>"; };
 		7595E2DC28A1DC7A0031EB24 /* Config.unix */ = {isa = PBXFileReference; lastKnownFileType = text; name = Config.unix; path = vm/Config.unix; sourceTree = "<group>"; };
