@@ -75,6 +75,7 @@ void *try_mmap_jit(size_t size, int prot) {
     printf(" PASS: %p", mem);
     return mem;
 }
+
 void try_mprotect(void *mem, size_t size, int prot) {
     printf("Try mprotect: %p ", mem);
     print_prot_bits(prot);

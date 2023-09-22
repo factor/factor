@@ -8,6 +8,7 @@ void print_prot_bits(int prot) {
     printf((prot & PROT_EXEC) == 0 ? "-" : "X");
 }
 
+#ifdef DEBUG_ARM
 char *try_mmap_jit(size_t size, int map_flags, int prot) {
     printf("Try mmap %p with MAP_JIT: ", (void *)size);
     print_prot_bits(prot);
@@ -26,6 +27,24 @@ char *try_mmap_jit(size_t size, int map_flags, int prot) {
     printf(" PASS: %p\n", mem);
     return mem;
 }
+
+#else
+char *try_mmap_jit(size_t size, int map_flags, int prot) {
+    print_prot_bits(prot);
+    char *mem = (char *)mmap(NULL, size, prot, map_flags, -1, 0);
+    if (mem == MAP_FAILED || mem == NULL) {
+        int map_flags = MAP_ANON | MAP_PRIVATE ;
+        mem = (char *)mmap(NULL, size, prot, map_flags, -1, 0);
+        
+        if (mem == MAP_FAILED || mem == NULL) {
+            return NULL;
+        }
+    }
+    return mem;
+}
+
+#endif
+#ifdef DEBUG_ARM
 int try_mprotect(void *mem, size_t size, int prot) {
     printf("Try mprotect: %p ", mem);
     print_prot_bits(prot);
@@ -36,6 +55,13 @@ int try_mprotect(void *mem, size_t size, int prot) {
         printf(" PASS\n");
     return status;
 }
+
+#else
+int try_mprotect(void *mem, size_t size, int prot) {
+    int status = mprotect(mem, size, prot);
+    return status;
+}
+#endif
 
 #include <setjmp.h>
 #include <signal.h>
