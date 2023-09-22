@@ -289,10 +289,9 @@ clean:
 	rm -f factor.dll
 	rm -f factor.lib
 	rm -f factor.dll.lib
-	rm -f libfactor.*
+	rm -fr libfactor.*
 	rm -f libfactor-ffi-test.*
 	rm -f Factor.app/Contents/Frameworks/libfactor.dylib
-	rm -fr libfactor.dylib.dSYM
 
 .PHONY: factor factor-lib factor-console factor-ffi-test tags clean help macosx.app
 .PHONY: linux-x86-32 linux-x86-64 linux-ppc-32 linux-ppc-64 linux-arm-64 freebsd-x86-32 freebsd-x86-64 macosx-x86-32 macosx-x86-64 macosx-x86-fat macosx-arm64 windows-x86-32 windows-x86-64
