@@ -235,7 +235,6 @@ windows-x86-64:
 ifdef CONFIG
 
 macosx.app: factor
-	codesign --entitlements factor.entitlements --sign "Apple Development: David Carlton (D8BD4M78SW)" $(EXECUTABLE)
 	mkdir -p $(BUNDLE)/Contents/MacOS
 	mkdir -p $(BUNDLE)/Contents/Frameworks
 	mv $(EXECUTABLE) $(BUNDLE)/Contents/MacOS/factor
