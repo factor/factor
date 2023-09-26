@@ -248,15 +248,15 @@ find_architecture() {
        ppc64) ARCH=ppc ;;
        *86) ARCH=x86 ;;
        *86_64) ARCH=x86 ;;
-       aarch64) ARCH=arm64 ;;
-       arm64) ARCH=arm64 ;;
-       iPhone5*[3-9]) ARCH=arm64 ;;
-       iPhone[6-9]*) ARCH=arm64 ;;
-       iPhone[1-9][0-9]*) ARCH=arm64 ;;
-       iPad[4-9]*) ARCH=arm64 ;;
-       iPad[1-9][0-9]*) ARCH=arm64 ;;
-       AppleTV[5-9]*) ARCH=arm64 ;;
-       AppleTV[1-9][0-9]*) ARCH=arm64 ;;
+       aarch64) ARCH=arm ;;
+       arm64) ARCH=arm ;;
+       iPhone5*[3-9]) ARCH=arm ;;
+       iPhone[6-9]*) ARCH=arm ;;
+       iPhone[1-9][0-9]*) ARCH=arm ;;
+       iPad[4-9]*) ARCH=arm ;;
+       iPad[1-9][0-9]*) ARCH=arm ;;
+       AppleTV[5-9]*) ARCH=arm ;;
+       AppleTV[1-9][0-9]*) ARCH=arm ;;
        "Power Macintosh") ARCH=ppc ;;
     esac
 }
@@ -363,29 +363,11 @@ check_os_arch_word() {
 
 set_build_info() {
     check_os_arch_word
-    if [[ $OS == linux && $ARCH == ppc ]] ; then
-        MAKE_IMAGE_TARGET=linux-ppc.32
-        MAKE_TARGET=linux-ppc-32
-    elif [[ $OS == linux && $ARCH == arm64 ]] ; then
-        MAKE_IMAGE_TARGET=unix-arm.64
-        MAKE_TARGET=linux-arm-64
-    elif [[ $OS == macosx && $ARCH == arm64 ]] ; then
-        MAKE_IMAGE_TARGET=unix-arm.64
-        MAKE_TARGET=macosx-arm64
-    elif [[ $OS == windows && $ARCH == x86 && $WORD == 64 ]] ; then
-        MAKE_IMAGE_TARGET=windows-x86.64
-        MAKE_TARGET=windows-x86-64
-    elif [[ $OS == windows && $ARCH == x86 && $WORD == 32 ]] ; then
-        MAKE_IMAGE_TARGET=windows-x86.32
-        MAKE_TARGET=windows-x86-32
-    elif [[ $ARCH == x86 && $WORD == 64 ]] ; then
-        MAKE_IMAGE_TARGET=unix-x86.64
-        MAKE_TARGET=$OS-x86-64
-    elif [[ $ARCH == x86 && $WORD == 32 ]] ; then
-        MAKE_IMAGE_TARGET=unix-x86.32
-        MAKE_TARGET=$OS-x86-32
+    if [[ $OS == "windows" ]] ; then
+        MAKE_IMAGE_TARGET=windows-$ARCH.$WORD
+        MAKE_TARGET=$OS-$ARCH-$WORD
     else
-        MAKE_IMAGE_TARGET=$ARCH.$WORD
+        MAKE_IMAGE_TARGET=unix-$ARCH.$WORD
         MAKE_TARGET=$OS-$ARCH-$WORD
     fi
     BOOT_IMAGE=boot.$MAKE_IMAGE_TARGET.image
