@@ -439,16 +439,16 @@ update_script_name() {
 }
 
 update_script() {
+    set_current_branch
     local -r update_script=$(update_script_name)
     local -r bash_path=$(which bash)
-    $ECHO "updating from ${CURRENT_BRANCH}"
     $ECHO "#!$bash_path" >"$update_script"
-    $ECHO "git pull ${GIT_URL} ${CURRENT_BRANCH} >>$update_script"
-    $ECHO "if [[ \$? -eq 0 ]]; then exec \"$0\" $SCRIPT_ARGS; else echo \"git pull failed\"; exit 2; fi" \
-        >>"$update_script"
+    $ECHO "set -ex" >>"$update_script"
+    $ECHO "git pull ${GIT_URL} ${CURRENT_BRANCH}" >>"$update_script"
     $ECHO "exit 0" >>"$update_script"
 
     chmod 755 "$update_script"
+    $ECHO "running the build.sh updater script: $update_script"
     exec "$update_script"
 }
 
@@ -779,6 +779,7 @@ case "$1" in
     report|info) find_build_info ;;
     full-report) find_build_info; check_installed_programs; check_libraries ;;
     update-boot-image) find_build_info; check_installed_programs; update_boot_image ;;
+    update-script) update_script ;;
     *) usage ;;
 esac
 
