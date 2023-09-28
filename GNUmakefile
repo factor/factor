@@ -169,6 +169,7 @@ help:
 	@echo "linux-x86-64"
 	@echo "linux-ppc-32"
 	@echo "linux-ppc-64"
+	@echo "linux-arm-32"
 	@echo "linux-arm-64"
 	@echo "freebsd-x86-32"
 	@echo "freebsd-x86-64"
