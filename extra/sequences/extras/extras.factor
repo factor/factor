@@ -357,7 +357,7 @@ PRIVATE>
     [ f f ] [ unclip ] if-empty ;
 
 : 1reduce ( seq quot: ( prev elt -- next ) -- result )
-    [ ?unclip ] dip reduce ; inline
+    [ f ] swap '[ [ ] _ map-reduce ] if-empty ; inline
 
 <PRIVATE
 
