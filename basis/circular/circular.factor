@@ -3,7 +3,7 @@
 USING: accessors arrays kernel math sequences strings ;
 IN: circular
 
-TUPLE: circular { seq read-only } { start integer } ;
+TUPLE: circular < sequence-view { start integer } ;
 
 : <circular> ( seq -- circular )
     0 circular boa ; inline
@@ -16,11 +16,9 @@ TUPLE: circular { seq read-only } { start integer } ;
 
 PRIVATE>
 
-M: circular length seq>> length ; inline
 
 M: circular virtual@ circular-wrap seq>> ; inline
 
-M: circular virtual-exemplar seq>> ; inline
 
 : change-circular-start ( n circular -- )
     ! change start to (start + n) mod length
@@ -35,7 +33,6 @@ M: circular virtual-exemplar seq>> ; inline
 : <circular-string> ( n -- circular )
     0 <string> <circular> ; inline
 
-INSTANCE: circular virtual-sequence
 
 TUPLE: growing-circular < circular { length integer } ;
 
