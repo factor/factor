@@ -37,7 +37,7 @@ $nl
 HELP: singularize
 { $values { "word" string } { "singular" string } }
 { $description "Determine the singular form of the input English word. If the input is already singular, it is returned unchanged." }
-{ $notes $keep-case  }
+{ $notes { $keep-case } }
 { $examples
     { $example
         "USING: english io ;"
@@ -177,7 +177,7 @@ HELP: comma-list
     { "clause-seq" sequence }
 }
 { $description "Generate a comma-separated list of things, emplacing " { $snippet "conjunction" } " before the last " { $snippet "part" } " if there are two or more elements in " { $snippet "parts" } "." }
-{ $notes $keep-case }
+{ $notes { $keep-case } }
 { $examples
     { $example
         "USING: english io sequences ;"
