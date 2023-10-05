@@ -217,7 +217,7 @@ DEFER: value-parser
 : array-parser ( -- parser )
     [
         "[" token hide ,
-        array-value-parser separator list-of ,
+        array-value-parser separator list-of optional ,
         separator optional hide ,
         ws-comment-newline hide ,
         "]" token hide ,
