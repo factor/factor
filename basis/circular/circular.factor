@@ -16,9 +16,7 @@ TUPLE: circular < sequence-view { start integer } ;
 
 PRIVATE>
 
-
 M: circular virtual@ circular-wrap seq>> ; inline
-
 
 : change-circular-start ( n circular -- )
     ! change start to (start + n) mod length
@@ -32,7 +30,6 @@ M: circular virtual@ circular-wrap seq>> ; inline
 
 : <circular-string> ( n -- circular )
     0 <string> <circular> ; inline
-
 
 TUPLE: growing-circular < circular { length integer } ;
 
