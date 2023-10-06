@@ -3,13 +3,10 @@
 USING: accessors kernel math sequences ;
 IN: sequences.rotated
 
-TUPLE: rotated
-{ seq read-only }
+TUPLE: rotated < sequence-view
 { n integer read-only } ;
 
 C: <rotated> rotated
-
-M: rotated length seq>> length ;
 
 M: rotated virtual@
     [ n>> + ] [ seq>> ] bi [
@@ -17,10 +14,6 @@ M: rotated virtual@
             2dup >= [ - ] [ drop ] if
         ] if
     ] keep ;
-
-M: rotated virtual-exemplar seq>> ;
-
-INSTANCE: rotated virtual-sequence
 
 : all-rotations ( seq -- seq' )
     dup length <iota> [ <rotated> ] with map ;
