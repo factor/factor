@@ -209,7 +209,6 @@ M: virtual-sequence new-sequence virtual-exemplar new-sequence ; inline
 
 INSTANCE: virtual-sequence sequence
 
-! TUPLE: sequence-view { seq sequence read-only } ;
 TUPLE: sequence-view { seq read-only } ;
 INSTANCE: sequence-view virtual-sequence
 
@@ -218,15 +217,11 @@ M: sequence-view virtual@ seq>> ; inline
 M: sequence-view length seq>> length ; inline
 
 ! A reversal of an underlying sequence.
-TUPLE: reversed { seq read-only } ;
+TUPLE: reversed < sequence-view ;
 
 C: <reversed> reversed
 
-M: reversed virtual-exemplar seq>> ; inline
 M: reversed virtual@ seq>> [ length swap - 1 - ] keep ; inline
-M: reversed length seq>> length ; inline
-
-INSTANCE: reversed virtual-sequence
 
 ! A slice of another sequence.
 TUPLE: slice
