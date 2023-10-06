@@ -3,16 +3,8 @@
 USING: accessors sequences ;
 IN: sequences.frozen
 
-TUPLE: frozen { seq read-only } ;
+TUPLE: frozen < sequence-view ;
 
 C: <frozen> frozen
-
-M: frozen virtual@ seq>> ;
-
-M: frozen virtual-exemplar seq>> ;
-
-M: frozen length seq>> length ;
-
-INSTANCE: frozen virtual-sequence
 
 INSTANCE: frozen immutable-sequence

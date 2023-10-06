@@ -579,7 +579,7 @@ PRIVATE>
 : 2map-index ( ... seq1 seq2 quot: ( ... elt1 elt2 index -- ... newelt ) -- ... newseq )
     pick [ 2sequence-index-iterator ] dip map-integers-as ; inline
 
-TUPLE: evens { seq read-only } ;
+TUPLE: evens < sequence-view ;
 
 C: <evens> evens
 
@@ -587,21 +587,13 @@ M: evens length seq>> length 1 + 2/ ; inline
 
 M: evens virtual@ [ 2 * ] [ seq>> ] bi* ; inline
 
-M: evens virtual-exemplar seq>> ; inline
-
-INSTANCE: evens virtual-sequence
-
-TUPLE: odds { seq read-only } ;
+TUPLE: odds < sequence-view ;
 
 C: <odds> odds
 
 M: odds length seq>> length 2/ ; inline
 
 M: odds virtual@ [ 2 * 1 + ] [ seq>> ] bi* ; inline
-
-M: odds virtual-exemplar seq>> ; inline
-
-INSTANCE: odds virtual-sequence
 
 : until-empty ( seq quot -- )
     [ dup empty? ] swap until drop ; inline
