@@ -209,7 +209,7 @@ M: virtual-sequence new-sequence virtual-exemplar new-sequence ; inline
 
 INSTANCE: virtual-sequence sequence
 
-TUPLE: sequence-view { seq read-only } ;
+TUPLE: sequence-view { seq sequence read-only } ;
 
 M: sequence-view virtual-exemplar seq>> ; inline
 M: sequence-view virtual@ seq>> ; inline
