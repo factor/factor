@@ -2708,6 +2708,9 @@ CONSTANT: GL_COMPUTE_SHADER_BIT                                 0x00000020
 GL-FUNCTION: void glDispatchCompute { } ( GLuint num_groups_x, GLuint num_groups_y, GLuint num_groups_z )
 GL-FUNCTION: void glDispatchComputeIndirect { } ( GLintptr indirect )
 
+! GL_ARB_shader_storage_buffer_object
+CONSTANT: GL_SHADER_STORAGE_BUFFER 0x90D2
+
 ! OpenGL 4.5
 
 !  GL_ARB_direct_state_access
