@@ -27,8 +27,7 @@ M: cycles virtual-exemplar circular>> ;
 
 INSTANCE: cycles virtual-sequence
 
-TUPLE: element-repeats
-{ seq sequence read-only }
+TUPLE: element-repeats < sequence-view
 { times integer read-only } ;
 
 C: <element-repeats> element-repeats
@@ -37,11 +36,7 @@ M: element-repeats length [ seq>> length ] [ times>> ] bi * ;
 
 M: element-repeats virtual@ [ times>> /i ] [ seq>> ] bi ;
 
-M: element-repeats virtual-exemplar seq>> ;
-
 INSTANCE: element-repeats immutable-sequence
-
-INSTANCE: element-repeats virtual-sequence
 
 : repeat-elements ( seq times -- new-seq )
     dupd <element-repeats> swap like ;

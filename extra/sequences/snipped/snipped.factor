@@ -3,8 +3,7 @@
 USING: accessors kernel math math.order sequences ;
 IN: sequences.snipped
 
-TUPLE: snipped
-{ seq sequence read-only }
+TUPLE: snipped < sequence-view
 { from integer read-only }
 { length integer read-only } ;
 
@@ -19,7 +18,3 @@ M: snipped length [ seq>> length ] [ length>> ] bi [-] ;
 M: snipped virtual@
     [ [ from>> dupd >= ] keep [ length>> + ] curry when ]
     [ seq>> ] bi ;
-
-M: snipped virtual-exemplar seq>> ;
-
-INSTANCE: snipped virtual-sequence
