@@ -195,7 +195,8 @@ M: string silly "t" ;
 
 M: vector silly "z" ;
 
-{ "zz" } [ 123 <reversed> silly nip ] unit-test
+[ 123 <reversed> ] must-fail
+{ "zz" } [ { 123 } <reversed> silly nip ] unit-test
 
 ! Typo
 SYMBOL: not-a-tuple-class
@@ -624,9 +625,9 @@ must-fail-with
 ] unit-test
 
 
-{ } [
-    "IN: sequences TUPLE: reversed { seq read-only } ;" eval( -- )
-] unit-test
+! { } [
+!     "IN: sequences TUPLE: reversed { seq read-only } ;" eval( -- )
+! ] unit-test
 
 
 TUPLE: bogus-hashcode-1 x ;
