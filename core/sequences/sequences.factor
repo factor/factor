@@ -209,6 +209,12 @@ M: virtual-sequence new-sequence virtual-exemplar new-sequence ; inline
 
 INSTANCE: virtual-sequence sequence
 
+! all wrapped-sequence instances need to define a slot `seq` that is a sequence
+MIXIN: wrapped-sequence
+M: wrapped-sequence virtual-exemplar seq>> ; inline
+M: wrapped-sequence virtual@ seq>> ; inline
+M: wrapped-sequence length seq>> length ; inline
+INSTANCE: wrapped-sequence virtual-sequence
 TUPLE: sequence-view { seq sequence read-only } ;
 
 M: sequence-view virtual-exemplar seq>> ; inline
