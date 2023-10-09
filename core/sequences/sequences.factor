@@ -255,8 +255,6 @@ PRIVATE>
 : <slice> ( from to seq -- slice )
     check-slice <slice-unsafe> ; inline
 
-M: slice virtual-exemplar seq>> ; inline
-
 M: slice virtual@ [ from>> + ] [ seq>> ] bi ; inline
 
 M: slice length [ to>> ] [ from>> ] bi - ; inline
@@ -273,7 +271,7 @@ M: slice length [ to>> ] [ from>> ] bi - ; inline
 
 : but-last-slice ( seq -- slice ) 1 head-slice* ; inline
 
-INSTANCE: slice virtual-sequence
+INSTANCE: slice wrapped-sequence
 
 ! One element repeated many times
 TUPLE: repetition
