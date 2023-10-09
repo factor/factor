@@ -217,11 +217,7 @@ M: wrapped-sequence length seq>> length ; inline
 INSTANCE: wrapped-sequence virtual-sequence
 TUPLE: sequence-view { seq sequence read-only } ;
 
-M: sequence-view virtual-exemplar seq>> ; inline
-M: sequence-view virtual@ seq>> ; inline
-M: sequence-view length seq>> length ; inline
-
-INSTANCE: sequence-view virtual-sequence
+INSTANCE: sequence-view wrapped-sequence
 
 ! A reversal of an underlying sequence.
 TUPLE: reversed < sequence-view ;
