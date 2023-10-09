@@ -625,9 +625,9 @@ must-fail-with
 ] unit-test
 
 
-! { } [
-!     "IN: sequences TUPLE: reversed { seq read-only } ;" eval( -- )
-! ] unit-test
+{ } [
+     "IN: sequences TUPLE: reversed < sequence-view ;" eval( -- )
+] unit-test
 
 
 TUPLE: bogus-hashcode-1 x ;
