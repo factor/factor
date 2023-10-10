@@ -90,15 +90,13 @@ TUPLE: circular-slice
     { to integer read-only }
     { seq read-only } ;
 
-INSTANCE: circular-slice virtual-sequence
+INSTANCE: circular-slice wrapped-sequence
 
 M: circular-slice equal? over circular-slice? [ sequence= ] [ 2drop f ] if ;
 
 M: circular-slice hashcode* [ sequence-hashcode ] recursive-hashcode ;
 
 M: circular-slice length [ to>> ] [ from>> ] bi - ; inline
-
-M: circular-slice virtual-exemplar seq>> ; inline
 
 M: circular-slice virtual@
     [ from>> + ] [ seq>> ] bi [ length rem ] keep ; inline
