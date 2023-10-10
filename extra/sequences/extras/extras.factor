@@ -1046,8 +1046,6 @@ TUPLE: step-slice
     seq dup slice? [ collapse-slice ] when
     step step-slice boa ;
 
-M: step-slice virtual-exemplar seq>> ; inline
-
 M: step-slice virtual@
     [ step>> * ] [ from>> + ] [ seq>> ] tri ; inline
 
@@ -1056,7 +1054,7 @@ M: step-slice length
     dup 0 < [ [ neg 0 max ] dip neg ] when /mod
     zero? [ 1 + ] unless ; inline
 
-INSTANCE: step-slice virtual-sequence
+INSTANCE: step-slice wrapped-sequence
 
 : 2nested-each* ( seq1 seq-quot: ( n -- seq ) quot: ( a b -- ) -- )
     '[
