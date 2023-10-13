@@ -138,6 +138,8 @@ M: anonymous-union implementor-classes members>> ;
 
 M: anonymous-intersection implementor-classes participants>> ;
 
+M: anonymous-predicate implementor-classes class>> 1array ;
+
 : with-implementors ( class generic quot -- )
     [ swap implementor-classes [ implementors-map get at ] map ] dip call ; inline
 
