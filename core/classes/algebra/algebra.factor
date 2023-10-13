@@ -50,15 +50,15 @@ M: anonymous-complement class-name
     class>> class-name ;
 
 
-TUPLE: anonymous-predicate 
-    { class classoid read-only initial: object }
-    { predicate callable read-only initial: [ drop f ] } ;
+TUPLE: anonymous-predicate
+    { class read-only }
+    { predicate read-only } ;
 
 INSTANCE: anonymous-predicate classoid
 
-: <anonymous-predicate> ( object -- classoid )
-    first2 [ classoid check-instance ] [ quotation check-instance ] bi*
-        anonymous-predicate boa ;
+: <anonymous-predicate> ( class predicate -- classoid )
+    [ classoid check-instance ] [ quotation check-instance ] bi*
+    anonymous-predicate boa ;
 
 ! Used for ordering classes
 M: anonymous-predicate rank-class drop 1.5 ;

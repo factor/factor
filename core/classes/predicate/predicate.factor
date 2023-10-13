@@ -54,7 +54,3 @@ M: anonymous-predicate instance?
 
 M: anonymous-predicate class-name
     class>> class-name ;
-
-M: anonymous-predicate normalize-class
-    class>> normalize-class ;
-
