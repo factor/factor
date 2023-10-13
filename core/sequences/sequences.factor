@@ -1141,16 +1141,24 @@ M: iota sum length dup 1 - * 2/ ; inline
 M: repetition sum [ elt>> ] [ length>> ] bi * ; inline
 
 : product ( seq -- n ) 1 [ * ] binary-reduce ;
+: (minimum) ( seq -- n ) [ ] [ min ] map-reduce ;
+: (maximum) ( seq -- n ) [ ] [ max ] map-reduce ;
+
+GENERIC: minimum ( seq -- elt )
+M: sequence minimum (minimum) ; inline
+M: iota minimum first ; inline
+M: reversed minimum seq>> minimum ; inline
+
+GENERIC: maximum ( seq -- elt )
+M: sequence maximum (maximum) ; inline
+M: iota maximum last ; inline
+M: reversed maximum seq>> maximum ; inline
 
 GENERIC: infimum ( seq -- elt )
-M: object infimum [ ] [ min ] map-reduce ;
-M: iota infimum first ;
-M: reversed infimum seq>> infimum ;
+M: sequence infimum minimum ; inline
 
 GENERIC: supremum ( seq -- elt )
-M: object supremum [ ] [ max ] map-reduce ;
-M: iota supremum last ;
-M: reversed supremum seq>> supremum ;
+M: sequence supremum maximum ; inline
 
 : map-sum ( ... seq quot: ( ... elt -- ... n ) -- ... n )
     [ 0 ] 2dip [ dip + ] curry [ swap ] prepose each ; inline
