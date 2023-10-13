@@ -44,13 +44,13 @@ M: predicate-class (flatten-class)
 M: predicate-class (classes-intersect?)
     superclass-of classes-intersect? ;
 
-M: anonymous-predicate predicate-def 
-    '[ _ 2dup instance? 
-        [ predicate>> call( obj -- ? ) ] [ 2drop f ] if ] ;
+M: anonymous-predicate predicate-def
+    [ class>> ] [ predicate>> ] bi
+    '[ dup _ instance? _ [ drop f ] if ] ;
 
 M: anonymous-predicate instance?
-    2dup class>> instance? 
-        [ predicate>> call( object -- ? ) ] [ 2drop f ] if ;
+    2dup class>> instance?
+    [ predicate>> call( object -- ? ) ] [ 2drop f ] if ;
 
 M: anonymous-predicate class-name
     class>> class-name ;
