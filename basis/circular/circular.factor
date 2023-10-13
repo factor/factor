@@ -18,6 +18,9 @@ PRIVATE>
 
 M: circular virtual@ circular-wrap seq>> ; inline
 
+M: circular minimum seq>> minimum ; inline
+M: circular maximum seq>> maximum ; inline
+
 : change-circular-start ( n circular -- )
     ! change start to (start + n) mod length
     circular-wrap start<< ; inline
