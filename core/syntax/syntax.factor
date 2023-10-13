@@ -272,6 +272,10 @@ IN: bootstrap.syntax
         \ } [ <anonymous-union> <anonymous-complement> ] parse-literal
     ] define-core-syntax
 
+    "predicate{" [
+        \ } [ <anonymous-predicate> ] parse-literal
+    ] define-core-syntax
+
     "intersection{" [
          \ } [ <anonymous-intersection> ] parse-literal
     ] define-core-syntax
