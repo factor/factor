@@ -273,7 +273,7 @@ IN: bootstrap.syntax
     ] define-core-syntax
 
     "predicate{" [
-        \ } [ <anonymous-predicate> ] parse-literal
+        \ } [ first2 <anonymous-predicate> ] parse-literal
     ] define-core-syntax
 
     "intersection{" [
