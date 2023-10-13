@@ -150,7 +150,7 @@ HELP: no-word
 
 HELP: parse-word
 { $values { "string" string } { "word" word } }
-{ $description "The current vocabulary search path is searched for all words named by the " { $snippet "string" } ". If no words matches, an error is thrown, if one word matches, and it is already loaded, that word is returned. Otherwise throws a restartable error to let the user choose which word to use." }
+{ $description "The vocabulary search path is searched for all words named by the " { $snippet "string" } ". If no words matches, an error is thrown, if one word matches, and it is already loaded, that word is returned. Otherwise throws a restartable error to let the user choose which word to use." }
 { $errors "Throws a " { $link no-word-error } " if the string doesn't name a word." }
 { $notes "This word is used to implement " { $link scan-word } "." } ;
 
@@ -162,7 +162,7 @@ HELP: parse-datum
 
 HELP: scan-word
 { $values { "word" word } }
-{ $description "Reads the next token from parser input. If the token is a valid number literal, it is converted to a number, otherwise the vocabulary search path is searched for a word named by the token." }
+{ $description "Reads the next token from parser input. The vocabulary search path is searched for a word named by the token." }
 { $errors "Throws an error if the token does not name a word or end of file is reached." }
 $parsing-note ;
 
