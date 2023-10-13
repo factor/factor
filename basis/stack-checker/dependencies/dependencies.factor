@@ -46,6 +46,9 @@ M: anonymous-intersection add-depends-on-class
 M: anonymous-complement add-depends-on-class
     class>> add-depends-on-class ;
 
+M: anonymous-predicate add-depends-on-class
+    class>> add-depends-on-class ;
+
 GENERIC: add-depends-on-c-type ( c-type -- )
 
 M: void add-depends-on-c-type drop ;
