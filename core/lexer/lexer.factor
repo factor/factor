@@ -2,7 +2,7 @@
 ! See https://factorcode.org/license.txt for BSD license.
 USING: accessors arrays classes combinators continuations io
 kernel math math.parser namespaces sequences source-files.errors
-strings vectors ;
+splitting strings vectors ;
 IN: lexer
 
 TUPLE: lexer
@@ -33,7 +33,7 @@ TUPLE: lexer-parsing-word word line line-text column ;
     lexer get lexer check-instance parsing-words>> pop* ;
 
 : new-lexer ( text class -- lexer )
-    new
+    [ dup string? [ split-lines ] when ] dip new
         0 >>line
         swap >>text
         V{ } clone >>parsing-words
