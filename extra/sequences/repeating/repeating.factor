@@ -1,5 +1,6 @@
 ! Copyright (C) 2008 Alex Chapman
 ! Copyright (C) 2012 John Benediktsson
+! Copyright (C) 2023 nomennescio
 ! See https://factorcode.org/license.txt for BSD license
 USING: accessors circular kernel math sequences ;
 IN: sequences.repeating
@@ -26,6 +27,15 @@ M: cycles virtual@ circular>> ;
 M: cycles virtual-exemplar circular>> ;
 
 INSTANCE: cycles virtual-sequence
+
+<PRIVATE
+
+: full-cycle? ( cycle -- ? ) [ length>> ] [ circular>> length ] bi >= ; inline
+
+PRIVATE>
+
+M: cycles minimum dup full-cycle? [ circular>> minimum ] [ (minimum) ] if ; inline
+M: cycles maximum dup full-cycle? [ circular>> maximum ] [ (maximum) ] if ; inline
 
 TUPLE: element-repeats < sequence-view
 { times integer read-only } ;
