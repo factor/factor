@@ -48,5 +48,8 @@ M: element-repeats virtual@ [ times>> /i ] [ seq>> ] bi ;
 
 INSTANCE: element-repeats immutable-sequence
 
+M: element-repeats minimum seq>> minimum ; inline
+M: element-repeats maximum seq>> maximum ; inline
+
 : repeat-elements ( seq times -- new-seq )
     dupd <element-repeats> swap like ;
