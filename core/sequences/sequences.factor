@@ -1146,13 +1146,13 @@ M: repetition sum [ elt>> ] [ length>> ] bi * ; inline
 
 GENERIC: minimum ( seq -- elt )
 M: sequence minimum (minimum) ; inline
-M: iota minimum first ; inline
+M: iota minimum drop 0 ; inline
 M: reversed minimum seq>> minimum ; inline
 M: repetition minimum elt>> ; inline
 
 GENERIC: maximum ( seq -- elt )
 M: sequence maximum (maximum) ; inline
-M: iota maximum last ; inline
+M: iota maximum n>> 1 - ; inline
 M: reversed maximum seq>> maximum ; inline
 M: repetition maximum elt>> ; inline
 
