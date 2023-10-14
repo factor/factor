@@ -206,7 +206,7 @@ M: windows factor-path "./factor.com" ;
 : check-new-factor ( path branch/checksum cmd -- out )
     nip [ factor-path "-i=factor.image" ] dip "-e=%s" sprintf 3array
     "./test-bisect-log" zealot-test-command
-    '[ _ utf8 [ read-contents ] with-process-reader ] with-directory ;
+    '[ _ process-contents ] with-directory ;
 
 : build-new-factor ( branch/checksum -- )
     checkout-new-factor bootstrap-new-factor test-new-factor ;

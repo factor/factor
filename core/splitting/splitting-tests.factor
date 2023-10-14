@@ -60,6 +60,10 @@ unit-test
 { { "hello" "hi" } } [ "hello\r\nhi" split-lines ] unit-test
 { { "hello" "" "" } } [ "hello\n\n\n" split-lines ] unit-test
 
+{ { "a" "b" "c" "d" "e" "f" "g" "h" "i" "j" "k" "l" } } [
+    "a\nb\vc\fd\re\r\nf\x1cg\x1dh\x1ei\x85j\u002028k\u002029l" split-lines
+] unit-test
+
 { { } } [ SBUF" " split-lines ] unit-test
 { { "" } } [ SBUF" \n" split-lines ] unit-test
 { { "" } } [ SBUF" \r" split-lines ] unit-test
@@ -72,6 +76,10 @@ unit-test
 { { "hello" "hi" } } [ SBUF" hello\rhi" split-lines ] unit-test
 { { "hello" "hi" } } [ SBUF" hello\r\nhi" split-lines ] unit-test
 { { "hello" "" "" } } [ SBUF" hello\n\n\n" split-lines ] unit-test
+
+{ { "a" "b" "c" "d" "e" "f" "g" "h" "i" "j" "k" "l" } } [
+    SBUF" a\nb\vc\fd\re\r\nf\x1cg\x1dh\x1ei\x85j\u002028k\u002029l" split-lines
+] unit-test
 
 { { "hey" "world" "what's" "happening" } }
 [ "heyAworldBwhat'sChappening" [ LETTER? ] split-when ] unit-test

@@ -5,7 +5,7 @@ sorting splitting vectors ;
 IN: sequences.extras
 
 : find-all ( ... seq quot: ( ... elt -- ... ? ) -- ... elts )
-    [ <enumerated> ] dip '[ nip @ ] assoc-filter ; inline
+    [ <enumerated> ] dip '[ @ ] filter-values ; inline
 
 :: subseq* ( from to seq -- subseq )
     seq length :> len
@@ -357,7 +357,7 @@ PRIVATE>
     [ f f ] [ unclip ] if-empty ;
 
 : 1reduce ( seq quot: ( prev elt -- next ) -- result )
-    [ ?unclip ] dip reduce ; inline
+    [ f ] swap '[ [ ] _ map-reduce ] if-empty ; inline
 
 <PRIVATE
 
@@ -498,7 +498,7 @@ PRIVATE>
 : sift-as ( seq exemplar -- newseq )
     [ ] swap filter-as ;
 
-: sift! ( seq -- newseq )
+: sift! ( seq -- seq' )
     [ ] filter! ;
 
 : harvest-as ( seq exemplar -- newseq )
@@ -579,7 +579,7 @@ PRIVATE>
 : 2map-index ( ... seq1 seq2 quot: ( ... elt1 elt2 index -- ... newelt ) -- ... newseq )
     pick [ 2sequence-index-iterator ] dip map-integers-as ; inline
 
-TUPLE: evens { seq read-only } ;
+TUPLE: evens < sequence-view ;
 
 C: <evens> evens
 
@@ -587,21 +587,13 @@ M: evens length seq>> length 1 + 2/ ; inline
 
 M: evens virtual@ [ 2 * ] [ seq>> ] bi* ; inline
 
-M: evens virtual-exemplar seq>> ; inline
-
-INSTANCE: evens virtual-sequence
-
-TUPLE: odds { seq read-only } ;
+TUPLE: odds < sequence-view ;
 
 C: <odds> odds
 
 M: odds length seq>> length 2/ ; inline
 
 M: odds virtual@ [ 2 * 1 + ] [ seq>> ] bi* ; inline
-
-M: odds virtual-exemplar seq>> ; inline
-
-INSTANCE: odds virtual-sequence
 
 : until-empty ( seq quot -- )
     [ dup empty? ] swap until drop ; inline
@@ -990,6 +982,11 @@ PRIVATE>
     [ not ] compose [ find-last drop ] keepd
     length swap [ - 1 - ] when* ; inline
 
+: count= ( ... seq quot: ( ... elt -- ... ? ) n -- ... ? )
+    [ 0 ] 3dip [
+        '[ swap _ dip swap [ 1 + ] when dup _ > ] find 2drop
+    ] keep = ; inline
+
 :: shorten* ( vector n -- seq )
     vector n tail
     n vector shorten ;
@@ -1049,8 +1046,6 @@ TUPLE: step-slice
     seq dup slice? [ collapse-slice ] when
     step step-slice boa ;
 
-M: step-slice virtual-exemplar seq>> ; inline
-
 M: step-slice virtual@
     [ step>> * ] [ from>> + ] [ seq>> ] tri ; inline
 
@@ -1059,7 +1054,7 @@ M: step-slice length
     dup 0 < [ [ neg 0 max ] dip neg ] when /mod
     zero? [ 1 + ] unless ; inline
 
-INSTANCE: step-slice virtual-sequence
+INSTANCE: step-slice wrapped-sequence
 
 : 2nested-each* ( seq1 seq-quot: ( n -- seq ) quot: ( a b -- ) -- )
     '[

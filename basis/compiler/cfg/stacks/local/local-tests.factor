@@ -154,7 +154,7 @@ IN: compiler.cfg.stacks.local.tests
         ! a i j el
         77 eq?
         [
-            rot drop and
+            nipd and
         ]
         [
             ! a i j

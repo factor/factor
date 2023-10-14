@@ -81,9 +81,13 @@ HELP: root-directory?
 
 { absolute-path? windows-absolute-path? root-directory? } related-words
 
-HELP: resource-path
+HELP: site-resource-path
 { $values { "path" "a pathname string" } { "newpath" "a pathname string" } }
-{ $description "Resolve a path relative to the Factor source code location." } ;
+{ $description "Resolve a path relative to the Factor installation directory." } ;
+
+HELP: user-resource-path
+{ $values { "path" "a pathname string" } { "newpath" "a pathname string" } }
+{ $description "Resolve a path relative to the user's " { $snippet "HOME/.factor" } " directory." } ;
 
 HELP: pathname
 { $class-description "Class of path name objects. Path name objects can be created by calling " { $link <pathname> } "." } ;

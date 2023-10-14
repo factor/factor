@@ -7,6 +7,7 @@ io.encodings.utf8 io.sockets io.sockets.private
 io.streams.byte-array io.timeouts kernel make math math.bitwise
 math.parser namespaces random sequences slots.syntax splitting
 system vectors vocabs ;
+FROM: io.encodings.ascii => ascii ;
 IN: dns
 
 : with-input-seek ( n seek-type quot -- )
@@ -227,12 +228,22 @@ CONSTANT: ipv6-arpa-suffix ".ip6.arpa"
     2 read be> >>port
     parse-name >>target ;
 
+ERROR: invalid-hinfo-record length ;
+
+: (parse-hinfo-piece) ( -- s )
+    read1 dup 40 <
+    [ read ascii decode ] [ invalid-hinfo-record throw ] if ;
+
+: parse-hinfo ( -- hinfo )
+    (parse-hinfo-piece) (parse-hinfo-piece) hinfo boa ;
+
 GENERIC: parse-rdata ( n type -- obj )
 
 M: object parse-rdata drop read ;
 M: A parse-rdata 2drop 4 read byte-array>ipv4 <a> ;
 M: AAAA parse-rdata 2drop 16 read byte-array>ipv6 <aaaa> ;
 M: CNAME parse-rdata 2drop parse-name <cname> ;
+M: HINFO parse-rdata 2drop parse-hinfo ;
 M: MX parse-rdata 2drop parse-mx ;
 M: NS parse-rdata 2drop parse-name <ns> ;
 M: PTR parse-rdata 2drop parse-name <ptr> ;
@@ -372,6 +383,7 @@ M: TXT rdata>byte-array
 : dns-AAAA-query ( name -- message ) AAAA IN dns-query ;
 : dns-CNAME-query ( name -- message ) CNAME IN dns-query ;
 : dns-LOC-query ( name -- message ) LOC IN dns-query ;
+: dns-HINFO-query ( name -- message ) HINFO IN dns-query ;
 : dns-MX-query ( name -- message ) MX IN dns-query ;
 : dns-NS-query ( name -- message ) NS IN dns-query ;
 : dns-TXT-query ( name -- message ) TXT IN dns-query ;

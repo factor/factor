@@ -161,6 +161,9 @@ ERROR: negative-number-expected n ;
 : even? ( n -- ? ) 1 bitand zero? ; inline
 : odd? ( n -- ? ) 1 bitand 1 number= ; inline
 
+: bit-length ( x -- n )
+    assert-non-negative dup 1 > [ log2 1 + ] when ;
+
 GENERIC: neg? ( x -- ? )
 
 : if-zero ( ..a n quot1: ( ..a -- ..b ) quot2: ( ..a n -- ..b ) -- ..b )
@@ -229,6 +232,11 @@ PRIVATE>
 M: fixnum simple-gcd fixnum-gcd ; inline
 
 M: bignum simple-gcd bignum-gcd ; inline
+
+M: real simple-gcd gcd nip ; inline
+
+: lcm ( a b -- c )
+    [ * dup zero? ] 2keep '[ _ _ simple-gcd / ] unless ; foldable
 
 : fp-bitwise= ( x y -- ? ) [ double>bits ] same? ; inline
 

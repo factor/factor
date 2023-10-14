@@ -2,3 +2,4 @@ Slava Pestov
 Eduardo Cavazos
 Joe Groff
 Alex Chapman
+Sebastian Strobl

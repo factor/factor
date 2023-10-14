@@ -2,7 +2,7 @@
 ! See https://factorcode.org/license.txt for BSD license
 
 USING: accessors colors colors.lab colors.lch kernel math
-math.functions math.libm math.order math.trig ;
+math.functions math.libm math.order ;
 
 IN: colors.distances
 

@@ -234,6 +234,7 @@ M: hash-set pprint-delims drop \ HS{ \ } ;
 M: anonymous-union pprint-delims drop \ union{ \ } ;
 M: anonymous-intersection pprint-delims drop \ intersection{ \ } ;
 M: anonymous-complement pprint-delims drop \ not{ \ } ;
+M: anonymous-predicate pprint-delims drop \ predicate{ \ } ;
 M: maybe pprint-delims drop \ maybe{ \ } ;
 
 M: object >pprint-sequence ;
@@ -247,6 +248,7 @@ M: hash-set >pprint-sequence sets:members ;
 M: anonymous-union >pprint-sequence members>> ;
 M: anonymous-intersection >pprint-sequence participants>> ;
 M: anonymous-complement >pprint-sequence class>> 1array ;
+M: anonymous-predicate >pprint-sequence [ class>> ] [ predicate>> ] bi 2array ;
 M: maybe >pprint-sequence class>> 1array ;
 
 : class-slot-sequence ( class slots -- sequence )
@@ -314,6 +316,7 @@ M: hash-set pprint* pprint-object ;
 M: anonymous-union pprint* pprint-object ;
 M: anonymous-intersection pprint* pprint-object ;
 M: anonymous-complement pprint* pprint-object ;
+M: anonymous-predicate pprint* pprint-object ;
 M: maybe pprint* pprint-object ;
 
 M: wrapper pprint*

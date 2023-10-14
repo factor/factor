@@ -90,7 +90,7 @@ C: <predicate-engine> predicate-engine
 ! 2. Convert methods
 : split-methods ( assoc class -- first second )
     [ [ nip class<= ] curry assoc-reject ]
-    [ [ nip class<=     ] curry assoc-filter ] 2bi ;
+    [ [ nip class<= ] curry assoc-filter ] 2bi ;
 
 : convert-methods ( assoc class word -- assoc' )
     over [ split-methods ] 2dip pick assoc-empty?

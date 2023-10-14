@@ -21,6 +21,15 @@ M: positive abs ;
 { 10 } [ 10 abs ] unit-test
 { 0 } [ 0 abs ] unit-test
 
+GENERIC: anonymous-abs ( n -- n )
+M: integer anonymous-abs ;
+M: predicate{ integer [ 0 < ] } anonymous-abs -1 * ;
+M: predicate{ integer [ 0 > ] } anonymous-abs ;
+
+{ 10 } [ -10 anonymous-abs ] unit-test
+{ 10 } [ 10 anonymous-abs ] unit-test
+{ 0 } [ 0 anonymous-abs ] unit-test
+
 ! Bug report from Bruno Deferrari
 TUPLE: tuple-a slot ;
 TUPLE: tuple-b < tuple-a ;

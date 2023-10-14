@@ -4,7 +4,7 @@ USING: arrays assocs hashtables kernel math math.functions
 project-euler.common sequences sorting ;
 IN: project-euler.062
 
-! https://projecteuler.net/index.php?section=problems&id=062
+! https://projecteuler.net/problem=62
 
 ! DESCRIPTION
 ! -----------

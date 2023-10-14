@@ -46,6 +46,6 @@ M: f dev-deps drop { } ;
     ?github-package-json [
         [ "dependencies" of ] [ "devDependencies" of ] bi 2array [
             [ over npm-latest-version "version" of 2array ] parallel-assoc-map
-            [ nip first2 = not ] assoc-filter
+            [ first2 = not ] filter-values
         ] map
     ] transmute ;

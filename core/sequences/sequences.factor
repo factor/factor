@@ -209,16 +209,22 @@ M: virtual-sequence new-sequence virtual-exemplar new-sequence ; inline
 
 INSTANCE: virtual-sequence sequence
 
+! all wrapped-sequence instances need to define a slot `seq` that is a sequence
+MIXIN: wrapped-sequence
+M: wrapped-sequence virtual-exemplar seq>> ; inline
+M: wrapped-sequence virtual@ seq>> ; inline
+M: wrapped-sequence length seq>> length ; inline
+INSTANCE: wrapped-sequence virtual-sequence
+
+TUPLE: sequence-view { seq sequence read-only } ;
+INSTANCE: sequence-view wrapped-sequence
+
 ! A reversal of an underlying sequence.
-TUPLE: reversed { seq read-only } ;
+TUPLE: reversed < sequence-view ;
 
 C: <reversed> reversed
 
-M: reversed virtual-exemplar seq>> ; inline
 M: reversed virtual@ seq>> [ length swap - 1 - ] keep ; inline
-M: reversed length seq>> length ; inline
-
-INSTANCE: reversed virtual-sequence
 
 ! A slice of another sequence.
 TUPLE: slice
@@ -249,8 +255,6 @@ PRIVATE>
 : <slice> ( from to seq -- slice )
     check-slice <slice-unsafe> ; inline
 
-M: slice virtual-exemplar seq>> ; inline
-
 M: slice virtual@ [ from>> + ] [ seq>> ] bi ; inline
 
 M: slice length [ to>> ] [ from>> ] bi - ; inline
@@ -267,7 +271,7 @@ M: slice length [ to>> ] [ from>> ] bi - ; inline
 
 : but-last-slice ( seq -- slice ) 1 head-slice* ; inline
 
-INSTANCE: slice virtual-sequence
+INSTANCE: slice wrapped-sequence
 
 ! One element repeated many times
 TUPLE: repetition
@@ -275,8 +279,7 @@ TUPLE: repetition
     { elt read-only } ;
 
 : <repetition> ( len elt -- repetition )
-    over 0 < [ non-negative-number-expected ] when
-    repetition boa ; inline
+    [ assert-non-negative ] dip repetition boa ; inline
 
 M: repetition length length>> ; inline
 M: repetition nth-unsafe nip elt>> ; inline
@@ -1139,9 +1142,15 @@ M: repetition sum [ elt>> ] [ length>> ] bi * ; inline
 
 : product ( seq -- n ) 1 [ * ] binary-reduce ;
 
-: infimum ( seq -- elt ) [ ] [ min ] map-reduce ;
+GENERIC: infimum ( seq -- elt )
+M: object infimum [ ] [ min ] map-reduce ;
+M: iota infimum first ;
+M: reversed infimum seq>> infimum ;
 
-: supremum ( seq -- elt ) [ ] [ max ] map-reduce ;
+GENERIC: supremum ( seq -- elt )
+M: object supremum [ ] [ max ] map-reduce ;
+M: iota supremum last ;
+M: reversed supremum seq>> supremum ;
 
 : map-sum ( ... seq quot: ( ... elt -- ... n ) -- ... n )
     [ 0 ] 2dip [ dip + ] curry [ swap ] prepose each ; inline

@@ -163,8 +163,20 @@ HELP: clone
 { $contract "Outputs a new object equal to the given object. This is not guaranteed to actually copy the object; it does nothing with immutable objects, and does not copy words either. However, sequences and tuples can be cloned to obtain a shallow copy of the original." } ;
 
 HELP: ?
-{ $values { "?" "a generalized boolean" } { "true" object } { "false" object } { "true/false" { { $snippet "true" } " or " { $snippet "false" } } } }
-{ $description "Chooses between two values depending on the boolean value of " { $snippet "cond" } "." } ;
+{ $values { "?" boolean } { "true" object } { "false" object } { "true/false" object } }
+{ $description "Chooses between two values depending on the boolean value of " { $snippet "?" } "." }
+{ $examples
+    { $example
+        "USING: io kernel math ;"
+        "3 4 < \"3 is smaller than 4\" \"3 is not smaller than 4\" ? print"
+        "3 is smaller than 4"
+    }
+    { $example
+        "USING: io kernel math ;"
+        "4 3 < \"4 is smaller than 3\" \"4 is not smaller than 3\" ? print"
+        "4 is not smaller than 3"
+    }
+} ;
 
 HELP: boolean
 { $class-description "A union of the " { $link POSTPONE: t } " and " { $link POSTPONE: f } " classes." } ;

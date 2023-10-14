@@ -21,11 +21,11 @@ CONSTANT: any-char-parser $[ [ drop t ] satisfy ]
 
 PRIVATE>
 
-: search ( string parser -- seq )
+: peg-search ( string parser -- seq )
     any-char-parser [ drop f ] action 2choice repeat0
     [ parse sift ] [ 3drop { } ] recover ;
 
-: replace ( string parser -- result )
+: peg-replace ( string parser -- result )
     [
         any-char-parser 2choice repeat0
         parse sift tree-write

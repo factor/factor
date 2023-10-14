@@ -99,8 +99,8 @@ tools.test ;
 { 3 } [ { 1 2 3 1 2 3 1 2 3 3 } majority ] unit-test
 { CHAR: C } [ "AAACCBBCCCBCC" majority ] unit-test
 
-{ 0.0 } [ 0 2 round-to-decimal ] unit-test
-{ 1.0 } [ 1 2 round-to-decimal ] unit-test
+{ 0.0 } [ 0.0 2 round-to-decimal ] unit-test
+{ 1.0 } [ 1.0 2 round-to-decimal ] unit-test
 { 1.23 } [ 1.2349 2 round-to-decimal ] unit-test
 { 1.24 } [ 1.2350 2 round-to-decimal ] unit-test
 { 1.24 } [ 1.2351 2 round-to-decimal ] unit-test
@@ -145,12 +145,6 @@ tools.test ;
 { 1/5 } [ 3/5 1 kelly ] unit-test
 { 0 } [ 1/2 1 kelly ] unit-test
 { -1/5 } [ 2/5 1 kelly ] unit-test
-
-[ -1 integer-sqrt ] must-fail
-{ 0 } [ 0 integer-sqrt ] unit-test
-{ 3 } [ 12 integer-sqrt ] unit-test
-{ 4 } [ 16 integer-sqrt ] unit-test
-{ 44 } [ 2019 integer-sqrt ] unit-test
 
 { 1 } [ 11 13 stein ] unit-test
 { 2 } [ 14 52 stein ] unit-test

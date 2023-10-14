@@ -4,28 +4,30 @@ USING: arrays grouping io.encodings.ascii io.files kernel math
 math.parser sequences splitting project-euler.common ;
 IN: project-euler.102
 
-! https://projecteuler.net/index.php?section=problems&id=102
+! https://projecteuler.net/problem=102
 
 ! DESCRIPTION
 ! -----------
 
-! Three distinct points are plotted at random on a Cartesian plane, for which
-! -1000 ≤ x, y ≤ 1000, such that a triangle is formed.
+! Three distinct points are plotted at random on a Cartesian
+! plane, for which -1000 ≤ x, y ≤ 1000, such that a triangle is
+! formed.
 
 ! Consider the following two triangles:
 
 ! A(-340,495), B(-153,-910), C(835,-947)
 ! X(-175,41), Y(-421,-714), Z(574,-645)
 
-! It can be verified that triangle ABC contains the origin, whereas triangle
-! XYZ does not.
+! It can be verified that triangle ABC contains the origin,
+! whereas triangle XYZ does not.
 
-! Using triangles.txt (right click and 'Save Link/Target As...'), a 27K text
-! file containing the coordinates of one thousand "random" triangles, find the
-! number of triangles for which the interior contains the origin.
+! Using triangles.txt (right click and 'Save Link/Target
+! As...'), a 27K text file containing the coordinates of one
+! thousand "random" triangles, find the number of triangles for
+! which the interior contains the origin.
 
-! NOTE: The first two examples in the file represent the triangles in the
-! example given above.
+! NOTE: The first two examples in the file represent the
+! triangles in the example given above.
 
 
 ! SOLUTION

@@ -88,6 +88,7 @@ IN: bootstrap.syntax
         "maybe{"
         "union{"
         "intersection{"
+        "predicate{"
         "initial:"
         "read-only"
         "call("

@@ -4,15 +4,11 @@ USING: sequences kernel accessors ;
 IN: columns
 
 ! A column of a matrix
-TUPLE: column seq col ;
+TUPLE: column < sequence-view col ;
 
 C: <column> column
 
-M: column virtual-exemplar seq>> ;
 M: column virtual@ [ col>> swap ] [ seq>> ] bi nth bounds-check ;
-M: column length seq>> length ;
-
-INSTANCE: column virtual-sequence
 
 : <flipped> ( seq -- seq' )
     dup empty? [ dup first length [ <column> ] with map-integers ] unless ;

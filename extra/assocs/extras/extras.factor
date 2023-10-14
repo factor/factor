@@ -11,7 +11,8 @@ IN: assocs.extras
 
 : of+ ( assoc key n -- assoc ) '[ 0 or _ + ] change-of ; inline
 
-: of+* ( assoc key n -- assoc old new ) '[ [ 0 or _ + ] keep swap dup ] change-of ; inline
+: of+* ( assoc key n -- assoc old new )
+    '[ [ 0 or _ + ] keep swap dup ] change-of ; inline
 
 : delete-of ( assoc key -- assoc ) over delete-at ; inline
 
@@ -58,37 +59,6 @@ IN: assocs.extras
 
 : substitute! ( seq assoc -- seq )
     substituter map! ;
-
-: assoc-reduce ( ... assoc identity quot: ( ... prev key value -- next ) -- ... result )
-    [ >alist ] 2dip [ first2 ] prepose reduce ; inline
-
-: reduce-keys ( ... assoc identity quot: ( ... prev elt -- ... next ) -- ... result )
-    [ drop ] prepose assoc-reduce ; inline
-
-: reduce-values ( ... assoc identity quot: ( ... prev elt -- ... next ) -- ... result )
-    [ nip ] prepose assoc-reduce ; inline
-
-: sum-keys ( assoc -- n ) 0 [ + ] reduce-keys ; inline
-
-: sum-values ( assoc -- n ) 0 [ + ] reduce-values ; inline
-
-: map-keys ( assoc quot: ( key -- key' ) -- assoc )
-    '[ _ dip ] assoc-map ; inline
-
-: map-values ( assoc quot: ( value -- value' ) -- assoc )
-    '[ swap _ dip swap ] assoc-map ; inline
-
-: filter-keys ( assoc quot: ( key -- ? ) -- assoc' )
-    '[ drop @ ] assoc-filter ; inline
-
-: filter-values ( assoc quot: ( value -- ? ) -- assoc' )
-    '[ nip @ ] assoc-filter ; inline
-
-: reject-keys ( assoc quot: ( key -- ? ) -- assoc' )
-    '[ drop @ ] assoc-reject ; inline
-
-: reject-values ( assoc quot: ( value -- ? ) -- assoc' )
-    '[ nip @ ] assoc-reject ; inline
 
 : rekey-new-assoc ( assoc keys -- newassoc )
     [ tuck of ] with H{ } map>assoc ; inline
@@ -153,6 +123,9 @@ ERROR: key-exists value key assoc ;
 
 : ?set-once-at ( value key assoc -- value' first-time? )
     [ ?at not ] keep '[ [  _ set-at ] keepd t ] [ nip f ] if ;
+
+: key-of? ( assoc key -- ? )
+    swap key? ; inline
 
 : kv-with ( obj assoc quot -- assoc curried )
     swapd [ -rotd call ] 2curry ; inline
@@ -244,23 +217,9 @@ PRIVATE>
 : expand-values-push ( assoc -- sequence )
     V{ } expand-values-push-as ; inline
 
-: assoc-any-key? ( ... assoc quot: ( ... key -- ... ? ) -- ... ? )
-    [ drop ] prepose assoc-find 2nip ; inline
+: any-multi-key? ( assoc -- ? ) [ sequence? ] any-key? ;
 
-: assoc-any-value? ( ... assoc quot: ( ... value -- ... ? ) -- ... ? )
-    [ nip ] prepose assoc-find 2nip ; inline
-
-: assoc-all-key? ( ... assoc quot: ( ... key -- ... ? ) -- ... ? )
-    [ not ] compose assoc-any-key? not ; inline
-
-: assoc-all-value? ( ... assoc quot: ( ... value -- ... ? ) -- ... ? )
-    [ not ] compose assoc-any-value? not ; inline
-
-: any-multi-key? ( assoc -- ? )
-    [ sequence? ] assoc-any-key? ;
-
-: any-multi-value? ( assoc -- ? )
-    [ sequence? ] assoc-any-value? ;
+: any-multi-value? ( assoc -- ? ) [ sequence? ] any-value? ;
 
 : flatten-keys ( assoc -- assoc' )
     dup any-multi-key? [ expand-keys-set-at flatten-keys ] when ;

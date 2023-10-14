@@ -1,28 +1,31 @@
 ! Copyright (c) 2008 Aaron Schaefer.
 ! See https://factorcode.org/license.txt for BSD license.
-USING: kernel math math.combinatorics math.functions math.parser ranges
-    project-euler.common sequences sets ;
+USING: kernel math math.combinatorics math.functions math.parser
+ranges project-euler.common sequences sets ;
 IN: project-euler.032
 
-! https://projecteuler.net/index.php?section=problems&id=32
+! https://projecteuler.net/problem=32
 
 ! DESCRIPTION
 ! -----------
 
-! The product 7254 is unusual, as the identity, 39 × 186 = 7254, containing
-! multiplicand, multiplier, and product is 1 through 9 pandigital.
+! The product 7254 is unusual, as the identity, 39 × 186 = 7254,
+! containing multiplicand, multiplier, and product is 1 through
+! 9 pandigital.
 
-! Find the sum of all products whose multiplicand/multiplier/product identity
-! can be written as a 1 through 9 pandigital.
+! Find the sum of all products whose
+! multiplicand/multiplier/product identity can be written as a 1
+! through 9 pandigital.
 
-! HINT: Some products can be obtained in more than one way so be sure to only
-! include it once in your sum.
+! HINT: Some products can be obtained in more than one way so be
+! sure to only include it once in your sum.
 
 
 ! SOLUTION
 ! --------
 
-! Generate all pandigital numbers and then check if they fit the identity
+! Generate all pandigital numbers and then check if they fit the
+! identity
 
 <PRIVATE
 

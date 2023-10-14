@@ -1,7 +1,7 @@
 ! Copyright (C) 2008, 2010 Slava Pestov.
 ! See https://factorcode.org/license.txt for BSD license.
-USING: accessors classes.tuple kernel math math.order sequences
-sequences.private ;
+USING: accessors arrays classes.algebra classes.tuple kernel
+math math.order parser sequences sequences.private sets sorting ;
 IN: ranges
 
 TUPLE: range
@@ -37,6 +37,12 @@ M: range sum
     [ drop 0 ]
     [ swap [ first-unsafe ] [ last-unsafe ] bi + * 2 / ] if-zero ;
 
+M: range infimum
+    dup step>> 0 > [ first ] [ last ] if ;
+
+M: range supremum
+    dup step>> 0 > [ last ] [ first ] if ;
+
 <PRIVATE
 
 : twiddle ( a b -- a b step ) 2dup > -1 1 ? ; inline
@@ -62,3 +68,71 @@ PRIVATE>
 : [0..b) ( b -- range ) 0 swap [a..b) ; inline
 
 : [1..b) ( b -- range ) 1 swap [a..b) ; inline
+
+! Some methods can be much faster for ranges
+
+<PRIVATE
+
+: >range< ( range -- start stop step )
+    [ from>> ] [ length>> ] [ step>> ] tri [ swap 1 - * over + ] keep ;
+
+: >forward-range< ( range -- start stop step )
+    >range< dup neg? [ abs swapd ] when ;
+
+: forward-range ( range -- range' )
+    >forward-range< <range> ; inline
+
+CONSTANT: empty-range T{ range f 1 0 1 }
+
+:: intersect-range ( range1 range2 -- range3 )
+    range1 empty? range2 empty? or [ empty-range ] [
+        range1 >forward-range< :> ( start1 stop1 step1 )
+        range2 >forward-range< :> ( start2 stop2 step2 )
+        step1 step2 gcd :> ( x g )
+        start1 start2 - g /mod :> ( z y )
+        y zero? not [ empty-range ] [
+            start1 x z step1 * * - :> b
+            step1 step2 lcm :> a
+            start1 start2 [ b over - a rem + ] bi@ max :> m
+            stop1  stop2  [  dup b - a rem - ] bi@ min :> n
+            m n a <range>
+        ] if
+    ] if ;
+
+PRIVATE>
+
+M: range in?
+    over number? [
+        >forward-range< [ 3dup between? ] dip swap
+        [ nip 3dup [ - ] dip /i * + = ] [ 4drop f ] if
+    ] [ 2drop f ] if ;
+
+M: range cardinality length>> ;
+
+M: range all-unique? drop t ;
+
+M: range duplicates drop f ;
+
+M: range members >array ; ! XXX: just return a T{ range } ? ;
+
+M: range intersect
+    over range? [ intersect-range ] [ call-next-method ] if ;
+
+M: range intersects?
+    over range?
+    [ intersect-range length>> zero? not ]
+    [ call-next-method ] if ;
+
+M: range set=
+    over range?
+    [ [ [ empty-range ] [ forward-range ] if-empty ] bi@ = ]
+    [ call-next-method ] if ;
+
+M: range subset?
+    over range?
+    [ over empty? [ 2drop t ] [ dupd intersect-range = ] if ]
+    [ call-next-method ] if ;
+
+SYNTAX: ..= dup pop scan-object [a..b] suffix! ;
+
+SYNTAX: ..< dup pop scan-object [a..b) suffix! ;

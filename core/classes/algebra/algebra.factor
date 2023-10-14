@@ -1,8 +1,8 @@
 ! Copyright (C) 2004, 2010 Slava Pestov.
 ! See https://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs classes classes.private
-combinators kernel make math math.order namespaces sequences
-sets sorting vectors ;
+combinators kernel make math math.order namespaces quotations 
+sequences sets sorting vectors ;
 IN: classes.algebra
 
 DEFER: sort-classes
@@ -48,6 +48,20 @@ M: anonymous-complement instance?
 
 M: anonymous-complement class-name
     class>> class-name ;
+
+
+TUPLE: anonymous-predicate
+    { class read-only }
+    { predicate read-only } ;
+
+INSTANCE: anonymous-predicate classoid
+
+: <anonymous-predicate> ( class predicate -- classoid )
+    [ classoid check-instance ] [ quotation check-instance ] bi*
+    anonymous-predicate boa ;
+
+! Used for ordering classes
+M: anonymous-predicate rank-class drop 1.5 ;
 
 DEFER: (class<=)
 
@@ -199,6 +213,9 @@ M: anonymous-intersection (classes-intersect?)
 M: anonymous-complement (classes-intersect?)
     class>> class<= not ;
 
+M: anonymous-predicate (classes-intersect?)
+    class>> classes-intersect? ;
+
 : anonymous-union-and ( first second -- class )
     members>> [ class-and ] with map <anonymous-union> ;
 
@@ -260,6 +277,9 @@ M: anonymous-complement (classes-intersect?)
 
 M: anonymous-union (flatten-class)
     members>> [ (flatten-class) ] each ;
+
+M: anonymous-predicate (flatten-class)
+    class>> (flatten-class) ;
 
 PRIVATE>
 

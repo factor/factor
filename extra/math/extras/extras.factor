@@ -257,7 +257,7 @@ PRIVATE>
     compression-lengths + / ;
 
 : round-to-decimal ( x n -- y )
-    10^ [ * 0.5 over 0 > [ + ] [ - ] if truncate ] [ / ] bi ;
+    10^ [ * round ] [ / ] bi ;
 
 : round-to-step ( x step -- y )
     [ [ / round ] [ * ] bi ] unless-zero ;
@@ -352,21 +352,6 @@ PRIVATE>
 
 : kelly ( winning-probability odds -- fraction )
     [ 1 + * 1 - ] [ / ] bi ;
-
-:: integer-sqrt ( m -- n )
-    m [ 0 ] [
-        assert-non-negative
-        bit-length 1 - 2 /i :> c
-        1 :> a!
-        0 :> d!
-        c bit-length <iota> <reversed> [| s |
-            d :> e
-            c s neg shift d!
-            a d e - 1 - shift
-            m 2 c * e - d - 1 + neg shift a /i + a!
-        ] each
-        a a sq m > [ 1 - ] when
-    ] if-zero ;
 
 <PRIVATE
 

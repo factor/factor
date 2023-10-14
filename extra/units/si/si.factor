@@ -52,6 +52,7 @@ IN: units.si
 : V ( n -- volt ) { m m kg } { s s s A } <dimensioned> ;
 : F ( n -- farad ) { s s s s A A } { m m kg } <dimensioned> ;
 : ohm ( n -- ohm ) { m m kg } { s s s A A } <dimensioned> ;
+ALIAS: Ω ohm
 : S ( n -- siemens ) { s s s A A } { m m kg } <dimensioned> ;
 : Wb ( n -- weber ) { m m kg } { s s A } <dimensioned> ;
 : T ( n -- tesla ) { kg } { s s A } <dimensioned> ;
@@ -59,7 +60,7 @@ IN: units.si
 : deg-C ( n -- Celsius ) 27315/100 + { K } { } <dimensioned> ;
 ALIAS: °C deg-C
 : lm ( n -- lumen ) { m m cd } { m m } <dimensioned> ;
-: lx ( n -- lux ) { m m cd } { m m m m  } <dimensioned> ;
+: lx ( n -- lux ) { m m cd } { m m m m } <dimensioned> ;
 : Bq ( n -- becquerel ) { } { s } <dimensioned> ;
 : Gy ( n -- gray ) { m m } { s s } <dimensioned> ;
 : Sv ( n -- sievert ) { m m } { s s } <dimensioned> ;
@@ -70,6 +71,7 @@ ALIAS: °C deg-C
 : arc-min ( n -- x ) pi 10800 / * radians ;
 : arc-sec ( n -- x ) pi 648000 / * radians ;
 : L ( n -- liter ) 1/1000 * m^3 ;
+ALIAS: l L
 : tons ( n -- metric-ton ) 1000 * kg ;
 : Np ( n -- neper ) { } { } <dimensioned> ;
 : B ( n -- bel ) 1.151292546497023 * Np ;
@@ -81,6 +83,7 @@ ALIAS: °C deg-C
 
 : a ( n -- are ) 100 * m^2 ;
 : ha ( n -- hectare ) 10000 * m^2 ;
+: km^2 ( n -- dimensioned ) 1000000 * m^2 ;
 : bar ( n -- bar ) 100000 * Pa ;
 : b ( n -- barn ) 1/10000000000000000000000000000 * m^2 ;
 : Ci ( n -- curie ) 37000000000 * Bq ;
@@ -147,3 +150,4 @@ ALIAS: Ki kibi
 : g ( n -- dimensioned ) milli kg ;
 : ms ( n -- dimensioned ) milli s ;
 : angstrom ( n -- dimensioned ) 10 / nm ;
+ALIAS: Å angstrom

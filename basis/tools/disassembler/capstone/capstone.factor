@@ -30,6 +30,11 @@ ENUM: cs_arch
     CS_ARCH_TMS320C64X
     CS_ARCH_M680X
     CS_ARCH_EVM
+    CS_ARCH_WASM
+    CS_ARCH_BPF
+    CS_ARCH_RISCV
+    CS_ARCH_SH
+    CS_ARCH_TRICORE
     CS_ARCH_MAX
     { CS_ARCH_ALL 0xFFFF }
 ;
@@ -68,17 +73,57 @@ ENUM: cs_mode
     { CS_MODE_M680X_6811 0x100 }
     { CS_MODE_M680X_CPU12 0x200 }
     { CS_MODE_M680X_HCS08 0x400 }
+    { CS_MODE_BPF_CLASSIC 0 }
+    { CS_MODE_BPF_EXTENDED 1 }
+    { CS_MODE_RISCV32 1 }
+    { CS_MODE_RISCV64 2 }
+    { CS_MODE_RISCVC 4 }
+    { CS_MODE_MOS65XX_6502 2 }
+    { CS_MODE_MOS65XX_65C02 4 }
+    { CS_MODE_MOS65XX_W65C02 8 }
+    { CS_MODE_MOS65XX_65816 16 }
+    { CS_MODE_MOS65XX_65816_LONG_M 32 }
+    { CS_MODE_MOS65XX_65816_LONG_X 64 }
+    { CS_MODE_MOS65XX_65816_LONG_MX 96 }
+    { CS_MODE_SH2 2 }
+    { CS_MODE_SH2A 4 }
+    { CS_MODE_SH3 8 }
+    { CS_MODE_SH4 16 }
+    { CS_MODE_SH4A 32 }
+    { CS_MODE_SHFPU 64 }
+    { CS_MODE_SHDSP 128 }
+    { CS_MODE_TRICORE_110 2 }
+    { CS_MODE_TRICORE_120 4 }
+    { CS_MODE_TRICORE_130 8 }
+    { CS_MODE_TRICORE_131 16 }
+    { CS_MODE_TRICORE_160 32 }
+    { CS_MODE_TRICORE_161 64 }
+    { CS_MODE_TRICORE_162 128 }
 ;
 
-STRUCT: cs_insn
+TYPEDEF: void cs_detail
+
+STRUCT: cs_insn_4
     { id uint }
     { address uint64_t }
     { size uint16_t }
     { bytes uint8_t[16] }
     { mnemonic char[32] }
     { op_str char[160] }
-    { detail void* }
+    { detail cs_detail* }
 ;
+
+STRUCT: cs_insn_5
+    { id uint }
+    { address uint64_t }
+    { size uint16_t }
+    { bytes uint8_t[24] }
+    { mnemonic char[32] }
+    { op_str char[160] }
+    { detail cs_detail* }
+;
+
+TYPEDEF: void cs_insn
 
 ENUM: cs_err
     CS_ERR_OK
@@ -106,7 +151,7 @@ FUNCTION: cs_err cs_errno ( csh handle )
 FUNCTION: c-string cs_strerror ( cs_err code )
 FUNCTION: size_t cs_disasm ( csh handle, uint8_t* code, size_t code_size, uint64_t address, size_t count, cs_insn** insn )
 FUNCTION: size_t cs_disasm_iter ( csh handle, uint8_t** code, size_t* size, uint64_t* address, size_t count, cs_insn* insn )
-FUNCTION: cs_insn* cs_malloc ( csh handle )
+FUNCTION: void* cs_malloc ( csh handle )
 FUNCTION: void cs_free ( cs_insn* insn, size_t count )
 FUNCTION: c-string cs_reg_name ( csh handle, uint reg_id )
 FUNCTION: c-string cs_insn_name ( csh handle, uint insn_id )
@@ -118,15 +163,26 @@ DESTRUCTOR: cs_close
     { int int } [ cs_version drop ] with-out-parameters ;
 
 : <csh> ( -- csh )
-    CS_ARCH_X86 64-bit? CS_MODE_64 CS_MODE_32 ? 0 csh <ref>
-    [ cs_open CS_ERR_OK assert= ] keep ;
+    \ cpu get {
+        { x86.32 [ CS_ARCH_X86 CS_MODE_32 ] }
+        { x86.64 [ CS_ARCH_X86 CS_MODE_64 ] }
+        { arm.32 [ CS_ARCH_ARM CS_MODE_ARM ] }
+        { arm.64 [ CS_ARCH_ARM64 CS_MODE_ARM ] }
+    } case 0 csh <ref> [ cs_open CS_ERR_OK assert= ] keep ;
 
 : with-csh ( ..a quot: ( ..a csh -- ..b ) -- ..b )
     '[ <csh> &cs_close @ ] with-destructors ; inline
 
-SPECIALIZED-ARRAY: cs_insn
-
 <PRIVATE
+
+SPECIALIZED-ARRAY: cs_insn_4
+SPECIALIZED-ARRAY: cs_insn_5
+
+: <direct-cs_insn-array> ( alien len -- specialized-array )
+    cs-version drop {
+        { 4 [ <direct-cs_insn_4-array> ] }
+        { 5 [ <direct-cs_insn_5-array> ] }
+    } case ;
 
 : buf/len/start ( from to -- buf len from )
     [ drop <alien> ] [ swap - ] [ drop ] 2tri ;

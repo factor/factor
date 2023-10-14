@@ -97,6 +97,21 @@ HELP: ?tail-slice
 HELP: split-lines
 { $values { "seq" sequence } { "seq'" { $sequence string } } }
 { $description "Splits a string along line breaks." }
+{ $notes "These are considered line breaks:"
+    { $table
+        { { $snippet "\\n" } "Line Feed" }
+        { { $snippet "\\r" } "Carriage Return" }
+        { { $snippet "\\r\\n" } "Carriage Return + Line Feed" }
+        { { $snippet "\\v" } "Line Tabulation" }
+        { { $snippet "\\f" } "Form Feed" }
+        { { $snippet "\\x1c" } "File Separator" }
+        { { $snippet "\\x1d" } "Group Separator" }
+        { { $snippet "\\x1e" } "Record Separator" }
+        { { $snippet "\\x85" } "Next Line (C1 Control Code)" }
+        { { $snippet "\\u002028" } "Line Separator" }
+        { { $snippet "\\u002029" } "Paragraph Separator" }
+    }
+}
 { $examples
     { $example "USING: prettyprint splitting ;" "\"Hello\\r\\nworld\\n\" split-lines ." "{ \"Hello\" \"world\" }" }
 } ;

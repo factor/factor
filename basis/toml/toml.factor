@@ -1,8 +1,9 @@
 ! Copyright (C) 2019 John Benediktsson
 ! See https://factorcode.org/license.txt for BSD license
 
-USING: accessors ascii assocs hashtables kernel make math.parser
-peg peg.parsers regexp sequences splitting strings.parser ;
+USING: accessors ascii assocs hashtables io.encodings.utf8
+io.files kernel make math.parser peg peg.parsers regexp
+sequences splitting strings.parser ;
 
 ! https://github.com/toml-lang/toml/blob/main/toml.abnf
 
@@ -216,7 +217,7 @@ DEFER: value-parser
 : array-parser ( -- parser )
     [
         "[" token hide ,
-        array-value-parser separator list-of ,
+        array-value-parser separator list-of optional ,
         separator optional hide ,
         ws-comment-newline hide ,
         "]" token hide ,
@@ -243,6 +244,7 @@ DEFER: key-value-parser
 : value-parser ( -- parser )
     [
         [
+            array-parser ,
             boolean-parser ,
             datetime-parser ,
             date-parser ,
@@ -250,7 +252,6 @@ DEFER: key-value-parser
             float-parser ,
             integer-parser ,
             string-parser ,
-            array-parser ,
             inline-table-parser ,
         ] choice*
     ] delay ;
@@ -322,3 +323,6 @@ PRIVATE>
 
 : toml> ( string -- assoc )
     [ H{ } clone dup ] dip parse-toml [ update-toml ] each drop ;
+
+: path>toml ( path -- assoc )
+    utf8 file-contents toml> ;

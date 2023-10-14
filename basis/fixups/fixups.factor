@@ -10,6 +10,8 @@ CONSTANT: vocab-renames {
     { "sorting.slots" { "sorting.specification" "0.99" } }
     { "json.reader" { "json" "0.99" } }
     { "json.writer" { "json" "0.99" } }
+    { "math.trig" { "math.functions" "0.100" } }
+    { "math.functions.integer-logs" { "math.functions" "0.100" } }
 }
 
 CONSTANT: word-renames {
@@ -65,14 +67,17 @@ CONSTANT: word-renames {
     { "count*" { "percent-of" "0.99" } }
     { "more?" { "deref?" "0.99" } }
     { "plox" { "?transmute" "0.99" } }
-    ! { "?if" { "?if" "0.99" } }
     { "ensure-non-negative" { "assert-non-negative" "0.99" } }
     { "order" { "dispatch-order" "0.99" } }
     { "TEST:" { "DEFINE-TEST-WORD:" "0.99" } }
+    { "assoc-all-key?" { "all-keys?" "0.100" } }
+    { "assoc-all-value?" { "all-values?" "0.100" } }
+    { "assoc-any-key?" { "any-key?" "0.100" } }
+    { "assoc-any-value?" { "any-value?" "0.100" } }
 }
 
 : compute-assoc-fixups ( continuation name assoc -- seq )
-    swap '[ drop _ = ] assoc-filter [
+    swap '[ _ = ] filter-keys [
         drop { }
     ] [
         swap '[

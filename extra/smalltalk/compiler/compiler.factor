@@ -71,7 +71,7 @@ M: ast-return compile-ast
         dup dup _ in? [ <local-reader> ] [ <local> ] if
     ] H{ } map>assoc
     dup
-    [ nip local-reader? ] assoc-filter
+    [ local-reader? ] filter-values
     [ <local-writer> ] assoc-map
     <lexenv> swap >>local-writers swap >>local-readers ;
 

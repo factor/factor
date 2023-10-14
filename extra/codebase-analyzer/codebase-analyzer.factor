@@ -4,8 +4,8 @@ USING: accessors assocs assocs.extras combinators
 combinators.short-circuit formatting io io.backend
 io.directories io.encodings.binary io.files io.files.info
 io.files.types io.pathnames kernel math math.statistics prettyprint
-sequences sets sorting splitting tools.memory.private tools.wc
-unicode ;
+sequences sets sorting splitting toml tools.memory.private
+tools.wc unicode ;
 IN: codebase-analyzer
 
 : file-sizes ( paths -- assoc )
@@ -179,6 +179,53 @@ IN: codebase-analyzer
 : julia-project-files ( paths -- paths' ) [ julia-project-file? ] filter ;
 : has-julia-project-files? ( paths -- ? ) [ julia-project-file? ] any? ;
 
+: rust-project-dir? ( path -- ? ) file-name "Cargo.toml" = ;
+
+: rust-source-file? ( path -- ? )
+    {
+        [ ".rs" tail? ]
+    } 1|| ;
+
+: rust-source-files ( path -- paths ) [ rust-source-file? ] filter ;
+
+: rust-build-system-files ( path -- ? )
+    {
+        [ "Carg.toml" tail? ]
+        [ "Carg.lock" tail? ]
+    } 1|| ;
+
+: rust-intermediate-build-files ( path -- ? )
+    {
+        [ ".rlib" tail? ]
+        [ ".rmeta" tail? ]
+        [ ".o" tail? ]
+    } 1|| ;
+
+: rust-output-files ( path -- ? )
+    {
+        [ ".dll" tail? ]
+        [ ".dylib" tail? ]
+        [ ".a" tail? ]
+        [ ".so" tail? ]
+    } 1|| ;
+
+: analyze-rust-cargo-toml ( assoc -- )
+    {
+        [ "workspace" of "members" of length [ "  %d member projects" sprintf print ] unless-zero ]
+        [ "package" of "name" of [ "  name: %s" sprintf print ] when* ]
+        [ "package" of "version" of [ "  version: %s" sprintf print ] when* ]
+        [ "package" of "license" of [ "  license: %s" sprintf print ] when* ]
+        [ "package" of "edition" of [ "  rust edition: %s" sprintf print ] when* ]
+    } cleave ;
+
+: analyze-rust-project ( path -- )
+    [ "Analyzing rust project at %s" sprintf print ]
+    [ path>toml analyze-rust-cargo-toml ]
+    [ containing-directory recursive-directory-files ] tri
+    {
+        [ rust-source-files length "  %d rust source files" sprintf print ]
+    } cleave ;
+
 : web-file? ( path -- ? )
     >lower file-extension
     {
@@ -242,6 +289,7 @@ IN: codebase-analyzer
         [ julia-project-files [ "uses julia Project.toml" print ... ] unless-empty ]
         [ in-files [ "uses 'in' files" print ... ] unless-empty ]
         [ ignore-files [ [ length "has %d ignore files" sprintf print ] [ ... ] bi ] unless-empty nl ]
+        [ [ rust-project-dir? ] filter [ [ "rust projects at " print . ] [ [ analyze-rust-project ] each ] bi ] unless-empty nl ]
         [
             [ upper-files ] keep
             {

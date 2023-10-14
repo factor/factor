@@ -1,27 +1,29 @@
 ! Copyright (c) 2008 Aaron Schaefer.
 ! See https://factorcode.org/license.txt for BSD license.
 USING: combinators.short-circuit kernel math.parser ranges
-    project-euler.common sequences ;
+project-euler.common sequences ;
 IN: project-euler.036
 
-! https://projecteuler.net/index.php?section=problems&id=36
+! https://projecteuler.net/problem=36
 
 ! DESCRIPTION
 ! -----------
 
-! The decimal number, 585 = 1001001001 (binary), is palindromic in both bases.
+! The decimal number, 585 = 1001001001 (binary), is palindromic
+! in both bases.
 
-! Find the sum of all numbers, less than one million, which are palindromic in
-! base 10 and base 2.
+! Find the sum of all numbers, less than one million, which are
+! palindromic in base 10 and base 2.
 
-! (Please note that the palindromic number, in either base, may not include
-! leading zeros.)
+! (Please note that the palindromic number, in either base, may
+! not include leading zeros.)
 
 
 ! SOLUTION
 ! --------
 
-! Only check odd numbers since the binary number must begin and end with 1
+! Only check odd numbers since the binary number must begin and
+! end with 1
 
 <PRIVATE
 

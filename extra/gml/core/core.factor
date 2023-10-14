@@ -1,8 +1,7 @@
 ! Copyright (C) 2010 Slava Pestov.
-USING: gml.types gml.printer gml.runtime math ranges
-continuations combinators arrays kernel vectors accessors
-prettyprint fry sequences assocs locals hashtables grouping
-sorting models ;
+USING: accessors arrays assocs classes combinators continuations
+gml.printer gml.runtime gml.types grouping hashtables kernel
+math ranges sequences sorting ;
 IN: gml.core
 
 ! Tokens
@@ -77,8 +76,7 @@ GML: sort-number-permutation ( array -- permutation )
     zip-index sort-keys <reversed> values ;
 
 ! Dictionaries
-ERROR: not-a-dict object ;
-: check-dict ( obj -- obj' ) dup hashtable? [ not-a-dict ] unless ; inline
+: check-dict ( obj -- obj' ) hashtable check-instance ; inline
 
 GML: begin ( dict -- ) check-dict over dictionary-stack>> push ;
 GML: end ( -- ) dup dictionary-stack>> pop* ;
@@ -105,9 +103,7 @@ GML: where ( key -- ? )
 GML: currentdict ( -- dict ) dup current-dict ;
 GML: load ( name -- value ) over lookup-name ;
 
-ERROR: not-a-name object ;
-
-: check-name ( obj -- obj' ) dup gml-name? [ not-a-name ] unless ; inline
+: check-name ( obj -- obj' ) gml-name check-instance ; inline
 
 GML: def ( name value -- ) swap check-name pick current-dict set-at ;
 GML: edef ( value name -- ) check-name pick current-dict set-at ;

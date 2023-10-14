@@ -63,7 +63,7 @@ IN: regexp.minimize
     '[ dup _ at =  ] swap '[ _ at has-conditions? ] bi or ;
 
 : delete-duplicates ( transitions state-classes -- new-transitions )
-    dupd '[ drop _ _ canonical-state? ] assoc-filter ;
+    dupd '[ _ _ canonical-state? ] filter-keys ;
 
 : combine-states ( table -- smaller-table )
     dup state-classes

@@ -25,7 +25,7 @@ LIBRARY: raylib
 CONSTANT: RAYLIB_VERSION_MAJOR 4
 CONSTANT: RAYLIB_VERSION_MINOR 5
 CONSTANT: RAYLIB_VERSION_PATCH 0
-CONSTANT: RAYLIB_VERSION  "4.5-dev"
+CONSTANT: RAYLIB_VERSION  "4.5"
 
 ! Enumerations ---------------------------------------------------------
 
@@ -688,7 +688,9 @@ STRUCT: VrStereoConfig
 STRUCT: FilePathList
     { capacity uint }                 ! Filepaths max entries
     { count uint }                    ! Filepaths entries count
-    { paths char** } ;                ! Filepaths entries
+    { _paths c-string* } ;             ! Filepaths entries
+
+ARRAY-SLOT: FilePathList c-string _paths [ count>> ] paths
 
 ! Constants ----------------------------------------------------------------
 
@@ -741,6 +743,7 @@ FUNCTION-ALIAS: maximize-window void MaximizeWindow ( )                         
 FUNCTION-ALIAS: minimize-window void MinimizeWindow ( )                                  ! Set window state: minimized, if resizable (only PLATFORM_DESKTOP)
 FUNCTION-ALIAS: restore-window void RestoreWindow ( )                                    ! Set window state: not minimized/maximized (only PLATFORM_DESKTOP)
 FUNCTION-ALIAS: set-window-icon void SetWindowIcon ( Image image )                       ! Set icon for window (only PLATFORM_DESKTOP)
+FUNCTION-ALIAS: set-window-icons void SetWindowIcons ( Image* images, int count )
 FUNCTION-ALIAS: set-window-title void SetWindowTitle ( c-string title )                  ! Set title for window (only PLATFORM_DESKTOP)
 FUNCTION-ALIAS: set-window-position void SetWindowPosition ( int x, int y )              ! Set window position on screen (only PLATFORM_DESKTOP)
 FUNCTION-ALIAS: set-window-monitor void SetWindowMonitor ( int monitor )                 ! Set monitor for the current window (fullscreen mode)
@@ -811,6 +814,7 @@ FUNCTION-ALIAS: unload-vr-stereo-config void UnloadVrStereoConfig ( VrStereoConf
 ! NOTE: Shader functionality is not available on OpenGL 1.1
 FUNCTION-ALIAS: load-shader Shader LoadShader ( c-string vsFileName, c-string fsFileName )                                       ! Load shader from files and bind default locations
 FUNCTION-ALIAS: load-shader-from-memory Shader LoadShaderFromMemory ( c-string vsCode, c-string fsCode )                         ! Load shader from code strings and bind default locations
+FUNCTION-ALIAS: is-shader-ready bool IsShaderReady ( Shader shader )                                                             ! Check if a shader is ready
 FUNCTION-ALIAS: get-shader-location int GetShaderLocation ( Shader shader, c-string uniformName )                                ! Get shader uniform location
 FUNCTION-ALIAS: get-shader-location-attrib int GetShaderLocationAttrib ( Shader shader, c-string attribName )                    ! Get shader attribute location
 FUNCTION-ALIAS: set-shader-value void SetShaderValue ( Shader shader, int locIndex, void* value, ShaderUniformDataType uniformType ) ! Set shader uniform value
@@ -824,8 +828,8 @@ FUNCTION-ALIAS: get-mouse-ray Ray GetMouseRay ( Vector2 mousePosition, Camera ca
 FUNCTION-ALIAS: get-camera-matrix Matrix GetCameraMatrix ( Camera camera )                                                    ! Get camera transform matrix (view matrix)
 FUNCTION-ALIAS: get-camera-matrix-2d Matrix GetCameraMatrix2D ( Camera2D camera )                                             ! Get camera 2d transform matrix
 FUNCTION-ALIAS: get-world-to-screen Vector2 GetWorldToScreen ( Vector3 position, Camera camera )                              ! Get the screen space position for a 3d world space position
-FUNCTION-ALIAS: get-world-to-screen-ex Vector2 GetWorldToScreenEx ( Vector3 position, Camera camera, int width, int height )  ! Get size position for a 3d world space position
 FUNCTION-ALIAS: get-world-to-screen-2d Vector2 GetWorldToScreen2D ( Vector2 position, Camera2D camera )                       ! Get the screen space position for a 2d camera world space position
+FUNCTION-ALIAS: get-world-to-screen-ex Vector2 GetWorldToScreenEx ( Vector3 position, Camera camera, int width, int height )  ! Get size position for a 3d world space position
 FUNCTION-ALIAS: get-screen-to-world-2d Vector2 GetScreenToWorld2D ( Vector2 position, Camera2D camera )                       ! Get the world space position for a 2d camera screen space position
 
 ! Timing-related functions
@@ -877,19 +881,19 @@ FUNCTION-ALIAS: get-working-directory c-string GetWorkingDirectory ( )          
 FUNCTION-ALIAS: get-application-directory c-string GetApplicationDirectory ( )                        ! Get the directory if the running application (uses static string)
 FUNCTION-ALIAS: change-directory bool ChangeDirectory ( c-string dir )                                ! Change working directory, return true on success
 FUNCTION-ALIAS: is-path-file bool IsPathFile ( c-string path )                                        ! Check if a given path is a file or a directory
-FUNCTION-ALIAS: load-directory-files char** LoadDirectoryFiles ( c-string dirPath, int* count )       ! Get filenames in a directory path (memory should be freed)
-FUNCTION-ALIAS: load-directory-files-ex char** LoadDirectoryFilesEx ( c-string dirPath, c-string filter, bool scanSubDirs )       ! Get filenames in a directory path (memory should be freed)
-FUNCTION-ALIAS: unload-directory-files void UnloadDirectoryFiles ( )                                  ! Clear directory files paths buffers (free memory)
+FUNCTION-ALIAS: load-directory-files FilePathList LoadDirectoryFiles ( c-string dirPath )       ! Get filenames in a directory path (memory should be freed)
+FUNCTION-ALIAS: load-directory-files-ex FilePathList LoadDirectoryFilesEx ( c-string dirPath, c-string filter, bool scanSubDirs )       ! Get filenames in a directory path (memory should be freed)
+FUNCTION-ALIAS: unload-directory-files void UnloadDirectoryFiles ( FilePathList files )               ! Clear directory files paths buffers (free memory)
 FUNCTION-ALIAS: is-file-dropped bool IsFileDropped ( )                                                ! Check if a file has been dropped into window
-FUNCTION-ALIAS: load-dropped-files c-string* LoadDroppedFiles ( int* count )                          ! Get dropped files names (memory should be freed)
-FUNCTION-ALIAS: unload-dropped-files void UnloadDroppedFiles ( )                                      ! Clear dropped files paths buffer (free memory)
+FUNCTION-ALIAS: load-dropped-files FilePathList LoadDroppedFiles ( )                          ! Get dropped files names (memory should be freed)
+FUNCTION-ALIAS: unload-dropped-files void UnloadDroppedFiles ( FilePathList files )                                      ! Clear dropped files paths buffer (free memory)
 FUNCTION-ALIAS: get-file-mod-time long GetFileModTime ( c-string fileName )                           ! Get file modification time (last write time)
 
 ! Compression/Encoding functionality
-FUNCTION-ALIAS: compress-data uchar* CompressData ( uchar* data, int dataLength, int* compDataLength )         ! Compress data (DEFLATE algorithm)
-FUNCTION-ALIAS: decompress-data uchar* DecompressData ( uchar* compData, int compDataLength, int* dataLength ) ! Decompress data (DEFLATE algorithm)
-FUNCTION-ALIAS: encode-data-base64 uchar* EncodeDataBase64 ( uchar* data, int dataLength, int* outputLength )  ! Encode data to Base64 string
-FUNCTION-ALIAS: decode-data-base64 uchar* DecodeDataBase64 ( uchar* data, int* outputLength )                  ! Decode Base64 string data
+FUNCTION-ALIAS: compress-data uchar* CompressData ( uchar* data, int dataLength, int* compDataLength )          ! Compress data (DEFLATE algorithm)
+FUNCTION-ALIAS: decompress-data uchar* DecompressData ( uchar* compData, int compDataLength, int* dataLength )  ! Decompress data (DEFLATE algorithm)
+FUNCTION-ALIAS: encode-data-base64 c-string EncodeDataBase64 ( uchar* data, int dataLength, int* outputLength ) ! Encode data to Base64 string
+FUNCTION-ALIAS: decode-data-base64 uchar* DecodeDataBase64 ( uchar* data, int* outputLength )                   ! Decode Base64 string data
 
 ! ------------------------------------------------------------------------------------
 ! Input Handling Functions (Module: core)
@@ -1029,6 +1033,7 @@ FUNCTION-ALIAS: load-image-anim Image LoadImageAnim ( c-string fileName, int* fr
 FUNCTION-ALIAS: load-image-from-memory Image LoadImageFromMemory ( c-string fileType, c-string fileData, int dataSize )          ! Load image from memory buffer, fileType refers to extension: i.e. '.png'
 FUNCTION-ALIAS: load-image-from-texture Image LoadImageFromTexture ( Texture2D texture )                                         ! Load image from GPU texture data
 FUNCTION-ALIAS: load-image-from-screen Image LoadImageFromScreen ( )                                                             ! Load image from screen buffer and (screenshot)
+FUNCTION-ALIAS: is-image-ready bool IsImageReady ( Image image )                                                                 ! Check if an image is ready
 FUNCTION-ALIAS: unload-image void UnloadImage ( Image image )                                                                    ! Unload image from CPU memory (RAM)
 FUNCTION-ALIAS: export-image bool ExportImage ( Image image, c-string fileName )                                                 ! Export image data to file, returns true on success
 FUNCTION-ALIAS: export-image-as-code bool ExportImageAsCode ( Image image, c-string fileName )                                   ! Export image as code file defining an array of bytes, returns true on success
@@ -1104,7 +1109,9 @@ FUNCTION-ALIAS: load-texture Texture2D LoadTexture ( c-string fileName )        
 FUNCTION-ALIAS: load-texture-from-image Texture2D LoadTextureFromImage ( Image image )                                           ! Load texture from image data
 FUNCTION-ALIAS: load-texture-cubemap TextureCubemap LoadTextureCubemap ( Image image, CubemapLayout layout )                     ! Load cubemap from image, multiple image cubemap layouts supported
 FUNCTION-ALIAS: load-render-texture RenderTexture2D LoadRenderTexture ( int width, int height )                                  ! Load texture for rendering (framebuffer)
+FUNCTION-ALIAS: is-texture-ready bool IsTextureReady ( Texture2D texture )                                                            ! Check if a texture is ready
 FUNCTION-ALIAS: unload-texture void UnloadTexture ( Texture2D texture )                                                          ! Unload texture from GPU memory (VRAM)
+FUNCTION-ALIAS: is-render-texture-ready void IsRenderTextureReady ( RenderTexture2D target )                                     ! Check if a render texture is ready
 FUNCTION-ALIAS: unload-render-texture void UnloadRenderTexture ( RenderTexture2D target )                                        ! Unload render texture from GPU memory (VRAM)
 FUNCTION-ALIAS: update-texture void UpdateTexture ( Texture2D texture, void* pixels )                                            ! Update GPU texture with new data
 FUNCTION-ALIAS: update-texture-rec void UpdateTextureRec ( Texture2D texture, Rectangle rec, void* pixels )                      ! Update GPU texture rectangle with new data
@@ -1119,11 +1126,8 @@ FUNCTION-ALIAS: draw-texture void DrawTexture ( Texture2D texture, int posX, int
 FUNCTION-ALIAS: draw-texture-v void DrawTextureV ( Texture2D texture, Vector2 position, Color tint )                             ! Draw a Texture2D with position defined as Vector2
 FUNCTION-ALIAS: draw-texture-ex void DrawTextureEx ( Texture2D texture, Vector2 position, float rotation, float scale, Color tint ) ! Draw a Texture2D with extended parameters
 FUNCTION-ALIAS: draw-texture-rec void DrawTextureRec ( Texture2D texture, Rectangle source, Vector2 position, Color tint )       ! Draw a part of a texture defined by a rectangle
-! FUNCTION-ALIAS: draw-texture-quad void DrawTextureQuad ( Texture2D texture, Vector2 tiling, Vector2 offset, Rectangle quad, Color tint ) ! Draw texture quad with tiling and offset parameters
-! FUNCTION-ALIAS: draw-texture-tiled void DrawTextureTiled ( Texture2D texture, Rectangle source, Rectangle dest, Vector2 origin, float rotation, float scale, Color tint ) ! Draw part of a texture (defined by a rectangle) with rotation and scale tiled into dest.
 FUNCTION-ALIAS: draw-texture-pro void DrawTexturePro ( Texture2D texture, Rectangle source, Rectangle dest, Vector2 origin, float rotation, Color tint ) ! Draw a part of a texture defined by a rectangle with 'pro' parameters
 FUNCTION-ALIAS: draw-texture-npatch void DrawTextureNPatch ( Texture2D texture, NPatchInfo nPatchInfo, Rectangle dest, Vector2 origin, float rotation, Color tint ) ! Draws a texture (or part of it) that stretches or shrinks nicely
-! FUNCTION-ALIAS: draw-texture-poly void DrawTexturePoly ( Texture2D texture, Vector2 center, Vector2* points, Vector2* texcoords, int pointCount, Color tint ) ! Draw a textured polygon
 
 ! Color/pixel related functions
 FUNCTION-ALIAS: fade Color Fade ( Color color, float alpha )                                   ! Get color with alpha applied, alpha goes from 0.0f to 1.0f
@@ -1152,6 +1156,7 @@ FUNCTION-ALIAS: load-font Font LoadFont ( c-string fileName )                   
 FUNCTION-ALIAS: load-font-ex Font LoadFontEx ( c-string fileName, int fontSize, int* fontChars, int glyphCount )     ! Load font from file with extended parameters, use NULL for fontChars and 0 for glyphCount to load the default character set
 FUNCTION-ALIAS: load-font-from-image Font LoadFontFromImage ( Image image, Color key, int firstChar )                ! Load font from Image (XNA style)
 FUNCTION-ALIAS: load-font-from-memory Font LoadFontFromMemory ( c-string fileType, c-string fileData, int dataSize, int fontSize, int* fontChars, int glyphCount )  ! Load font from memory buffer, fileType refers to extension: i.e. '.ttf'
+FUNCTION-ALIAS: is-font-ready bool IsFontReady ( Font font )                                                         ! Check if a font is ready
 FUNCTION-ALIAS: load-font-data GlyphInfo* LoadFontData ( c-string  fileData, int dataSize, int fontSize, int* fontChars, int glyphCount, FontType type )  ! Load font data for further use
 FUNCTION-ALIAS: gen-image-font-atlas Image GenImageFontAtlas ( GlyphInfo* chars, Rectangle** recs, int glyphCount, int fontSize, int padding, int packMethod )  ! Generate image font atlas using chars info
 FUNCTION-ALIAS: unload-font-data void UnloadFontData ( GlyphInfo* chars, int glyphCount )                            ! Unload font chars info data (RAM)
@@ -1188,7 +1193,7 @@ FUNCTION-ALIAS: codepoint-to-utf8 c-string CodepointToUTF8 ( int codepoint, int*
 ! NOTE: Some strings allocate memory internally for returned strings, just be careful!
 FUNCTION-ALIAS: text-copy int TextCopy ( c-string  dst, c-string src )                                ! Copy one string to another, returns bytes copied
 FUNCTION-ALIAS: text-is-equal bool TextIsEqual ( c-string text1, c-string text2 )                     ! Check if two text string are equal
-FUNCTION-ALIAS: text-length uint TextLength ( c-string text )                                         ! Get text length, checks for ' ' ending
+FUNCTION-ALIAS: text-length uint TextLength ( c-string text )                                         ! Get text length, checks for '\0' ending
 ! FUNCTION: c-string TextFormat ( c-string text, ... )                                                  ! Text formatting with variables (sprintf() style)
 FUNCTION-ALIAS: text-subtext c-string TextSubtext ( c-string text, int position, int length )         ! Get a piece of a text string
 FUNCTION-ALIAS: text-replace c-string TextReplace ( c-string  text, c-string replace, c-string by )   ! Replace text string (WARNING: memory must be freed!)
@@ -1216,8 +1221,6 @@ FUNCTION-ALIAS: draw-cube void DrawCube ( Vector3 position, float width, float h
 FUNCTION-ALIAS: draw-cube-v void DrawCubeV ( Vector3 position, Vector3 size, Color color )            ! Draw cube (Vector version)
 FUNCTION-ALIAS: draw-cube-wires void DrawCubeWires ( Vector3 position, float width, float height, float length, Color color ) ! Draw cube wires
 FUNCTION-ALIAS: draw-cube-wires-v void DrawCubeWiresV ( Vector3 position, Vector3 size, Color color ) ! Draw cube wires (Vector version)
-! FUNCTION-ALIAS: draw-cube-texture void DrawCubeTexture ( Texture2D texture, Vector3 position, float width, float height, float length, Color color )  ! Draw cube textured
-! FUNCTION-ALIAS: draw-cube-texture-rec void DrawCubeTextureRec ( Texture2D texture, Rectangle source, Vector3 position, float width, float height, float length, Color color )  ! Draw cube with a region of a texture
 FUNCTION-ALIAS: draw-sphere void DrawSphere ( Vector3 centerPos, float radius, Color color )          ! Draw sphere
 FUNCTION-ALIAS: draw-sphere-ex void DrawSphereEx ( Vector3 centerPos, float radius, int rings, int slices, Color color ) ! Draw sphere with extended parameters
 FUNCTION-ALIAS: draw-sphere-wires void DrawSphereWires ( Vector3 centerPos, float radius, int rings, int slices, Color color ) ! Draw sphere wires
@@ -1238,8 +1241,8 @@ FUNCTION-ALIAS: draw-grid void DrawGrid ( int slices, float spacing )           
 ! Model management functions
 FUNCTION-ALIAS: load-model Model LoadModel ( c-string fileName )                                      ! Load model from files (meshes and materials)
 FUNCTION-ALIAS: load-model-from-mesh Model LoadModelFromMesh ( Mesh mesh )                            ! Load model from generated mesh (default material)
+FUNCTION-ALIAS: is-model-ready bool IsModelReady ( Model model )                                      ! Check if a model is ready
 FUNCTION-ALIAS: unload-model void UnloadModel ( Model model )                                         ! Unload model (including meshes) from memory (RAM and/or VRAM)
-FUNCTION-ALIAS: unload-model-keep-meshes void UnloadModelKeepMeshes ( Model model )                   ! Unload model (but not meshes) from memory (RAM and/or VRAM)
 FUNCTION-ALIAS: get-model-bounding-box BoundingBox GetModelBoundingBox ( Model model )                ! Compute model bounding box limits (considers all meshes)
 
 ! Model drawing functions
@@ -1278,6 +1281,7 @@ FUNCTION-ALIAS: gen-mesh-cubicmap Mesh GenMeshCubicmap ( Image cubicmap, Vector3
 ! Material loading/unloading functions
 FUNCTION-ALIAS: load-materials Material* LoadMaterials ( c-string fileName, int* materialCount )      ! Load materials from model file
 FUNCTION-ALIAS: load-material-default Material LoadMaterialDefault ( )                                ! Load default material (Supports: DIFFUSE, SPECULAR, NORMAL maps)
+FUNCTION-ALIAS: is-material-ready bool IsMaterialReady ( Material material )                          ! check if a material is ready
 FUNCTION-ALIAS: unload-material void UnloadMaterial ( Material material )                             ! Unload material from GPU memory (VRAM)
 FUNCTION-ALIAS: set-material-texture void SetMaterialTexture ( Material* material, int mapType, Texture2D texture ) ! Set texture for a material map type  ( Material_MAP_DIFFUSE, MATERIAL_MAP_SPECULAR...)
 FUNCTION-ALIAS: set-model-mesh-material void SetModelMeshMaterial ( Model* model, int meshId, int materialId ) ! Set material for a mesh
@@ -1348,8 +1352,10 @@ FUNCTION-ALIAS: set-master-volume void SetMasterVolume ( float volume )         
 ! Wave/Sound loading/unloading functions
 FUNCTION-ALIAS: load-wave Wave LoadWave ( c-string fileName )                                   ! Load wave data from file
 FUNCTION-ALIAS: load-wave-from-memory Wave LoadWaveFromMemory ( c-string fileType, c-string fileData, int dataSize )  ! Load wave from memory buffer, fileType refers to extension: i.e. '.wav'
+FUNCTION-ALIAS: is-wave-ready bool IsWaveReady ( Wave wave )                                    ! Checks if wave data is ready
 FUNCTION-ALIAS: load-sound Sound LoadSound ( c-string fileName )                                ! Load sound from file
 FUNCTION-ALIAS: load-sound-from-wave Sound LoadSoundFromWave ( Wave wave )                      ! Load sound from wave data
+FUNCTION-ALIAS: is-sound-ready bool IsSoundReady ( Sound sound )                                ! Checks if a sound is ready
 FUNCTION-ALIAS: update-sound void UpdateSound ( Sound sound, void* data, int sampleCount )      ! Update sound buffer with new data
 FUNCTION-ALIAS: unload-wave void UnloadWave ( Wave wave )                                       ! Unload wave data
 FUNCTION-ALIAS: unload-sound void UnloadSound ( Sound sound )                                   ! Unload sound
@@ -1361,22 +1367,20 @@ FUNCTION-ALIAS: play-sound void PlaySound ( Sound sound )                       
 FUNCTION-ALIAS: stop-sound void StopSound ( Sound sound )                                       ! Stop playing a sound
 FUNCTION-ALIAS: pause-sound void PauseSound ( Sound sound )                                     ! Pause a sound
 FUNCTION-ALIAS: resume-sound void ResumeSound ( Sound sound )                                   ! Resume a paused sound
-FUNCTION-ALIAS: play-sound-multi void PlaySoundMulti ( Sound sound )                            ! Play a sound (using multichannel buffer pool)
-FUNCTION-ALIAS: stop-sound-multi void StopSoundMulti ( )                                        ! Stop any sound playing (using multichannel buffer pool)
-FUNCTION-ALIAS: get-sounds-playing int GetSoundsPlaying ( )                                     ! Get number of sounds playing in the multichannel
 FUNCTION-ALIAS: is-sound-playing bool IsSoundPlaying ( Sound sound )                            ! Check if a sound is currently playing
 FUNCTION-ALIAS: set-sound-volume void SetSoundVolume ( Sound sound, float volume )              ! Set volume for a sound (1.0 is max level)
 FUNCTION-ALIAS: set-sound-pitch void SetSoundPitch ( Sound sound, float pitch )                 ! Set pitch for a sound (1.0 is base level)
 FUNCTION-ALIAS: set-sound-pan void SetSoundPan ( Sound sound, float pan )                       ! Set pan for a sound (0.5 is center)
-FUNCTION-ALIAS: wave-format void WaveFormat ( Wave* wave, int sampleRate, int sampleSize, int channels ) ! Convert wave data to desired format
 FUNCTION-ALIAS: wave-copy Wave WaveCopy ( Wave wave )                                           ! Copy a wave to a new wave
 FUNCTION-ALIAS: wave-crop void WaveCrop ( Wave* wave, int initSample, int finalSample )         ! Crop a wave to defined samples range
+FUNCTION-ALIAS: wave-format void WaveFormat ( Wave* wave, int sampleRate, int sampleSize, int channels ) ! Convert wave data to desired format
 FUNCTION-ALIAS: load-wave-samples float* LoadWaveSamples ( Wave wave )                          ! Load samples data from wave as a floats array
 FUNCTION-ALIAS: unload-wave-samples void UnloadWaveSamples ( float* samples )                   ! Unload samples data loaded with LoadWaveSamples()
 
 ! Music management functions
 FUNCTION-ALIAS: load-music-stream Music LoadMusicStream ( c-string fileName )                   ! Load music stream from file
 FUNCTION-ALIAS: load-music-stream-from-memory Music LoadMusicStreamFromMemory ( c-string fileType, c-string data, int dataSize ) ! Load music stream from data
+FUNCTION-ALIAS: is-music-ready bool IsMusicReady ( Music music )                                ! Checks if a music stream is ready
 FUNCTION-ALIAS: unload-music-stream void UnloadMusicStream ( Music music )                      ! Unload music stream
 FUNCTION-ALIAS: play-music-stream void PlayMusicStream ( Music music )                          ! Start music playing
 FUNCTION-ALIAS: is-music-stream-playing bool IsMusicStreamPlaying ( Music music )               ! Check if music is playing
@@ -1393,6 +1397,7 @@ FUNCTION-ALIAS: get-music-time-played float GetMusicTimePlayed ( Music music )  
 
 ! AudioStream management functions
 FUNCTION-ALIAS: load-audio-stream AudioStream LoadAudioStream ( uint sampleRate, uint sampleSize, uint channels ) ! Load audio stream (to stream raw audio pcm data)
+FUNCTION-ALIAS: is-audio-stream-ready bool IsAudioStreamReady ( AudioStream stream )                       ! Checks if an audio stream is ready
 FUNCTION-ALIAS: unload-audio-stream void UnloadAudioStream ( AudioStream stream )                                 ! Unload audio stream and free memory
 FUNCTION-ALIAS: update-audio-stream void UpdateAudioStream ( AudioStream stream, void* data, int frameCount )     ! Update audio stream buffers with data
 FUNCTION-ALIAS: is-audio-stream-processed bool IsAudioStreamProcessed ( AudioStream stream )                      ! Check if any audio stream buffers requires refill
@@ -1406,8 +1411,12 @@ FUNCTION-ALIAS: set-audio-stream-pitch void SetAudioStreamPitch ( AudioStream st
 FUNCTION-ALIAS: set-audio-stream-pan void SetAudioStreamPan ( AudioStream stream, float pan )                     ! Set pan for audio stream (0.5 is center)
 FUNCTION-ALIAS: set-audio-stream-buffer-size-default void SetAudioStreamBufferSizeDefault ( int size )            ! Default size for new audio streams
 FUNCTION-ALIAS: set-audio-stream-callback void SetAudioStreamCallback ( AudioStream stream, AudioCallback callback ) ! Audio thread callback to request new data
+
 FUNCTION-ALIAS: attach-audio-stream-processor void AttachAudioStreamProcessor ( AudioStream stream, AudioCallback processor ) ! Attach audio stream processor to stream
 FUNCTION-ALIAS: detach-audio-stream-processor void DetachAudioStreamProcessor ( AudioStream stream, AudioCallback processor ) ! Detach audio stream processor from stream
+
+FUNCTION-ALIAS: attach-audio-mixed-processor void AttachAudioMixedProcessor ( AudioCallback processor ) ! Attach audio stream processor to the entire audio pipeline
+FUNCTION-ALIAS: detach-audio-mixed-processor void DetachAudioMixedProcessor ( AudioCallback processor ) ! Detach audio stream processor from the entire audio pipeline
 
 ! Destructors
 DESTRUCTOR: unload-audio-stream

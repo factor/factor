@@ -1,5 +1,6 @@
-USING: hashtables io.streams.string json json.private kernel
-linked-assocs literals math namespaces strings tools.test ;
+USING: hashtables io.encodings.utf8 io.files io.files.unique
+io.streams.string json json.private kernel linked-assocs
+literals math namespaces sequences strings tools.test ;
 IN: json.tests
 
 ! !!!!!!!!!!!!
@@ -182,4 +183,25 @@ TUPLE: person first-name age ;
         LH{ { "foo" 1 } { "bar" 2 } }
         LH{ { "baz" 3 } { "qux" 4 } }
     } dup >jsonlines jsonlines> =
+] unit-test
+
+{ "6" } [ "[1,2,3]" [ sum ] rewrite-json-string ] unit-test
+{ "9\n81" } [ "3\n9" [ [ sq ] map ] rewrite-jsons-string ] unit-test
+
+{ "[1,2]" } [
+    [
+        "[1]" "test-json"
+        [ utf8 set-file-contents ]
+        [ [ { 2 } append ] rewrite-json-path ]
+        [ utf8 file-contents ] tri
+    ] cleanup-unique-directory
+] unit-test
+
+{ "121\n144" } [
+    [
+        "11\n12" "test-jsons"
+        [ utf8 set-file-contents ]
+        [ [ [ sq ] map ] rewrite-jsons-path ]
+        [ utf8 file-contents ] tri
+    ] cleanup-unique-directory
 ] unit-test

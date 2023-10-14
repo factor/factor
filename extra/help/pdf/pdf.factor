@@ -55,7 +55,7 @@ PRIVATE>
     "handbook-system-reference" "system.pdf" article-pdf ;
 
 : tools-pdf ( -- )
-    "handbook-tools-reference" "tools" article-pdf ;
+    "handbook-tools-reference" "tools.pdf" article-pdf ;
 
 : index-pdf ( -- )
     {

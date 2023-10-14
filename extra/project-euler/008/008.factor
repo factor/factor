@@ -1,14 +1,16 @@
 ! Copyright (c) 2007, 2008 Aaron Schaefer.
 ! See https://factorcode.org/license.txt for BSD license.
-USING: grouping math.order math.parser sequences project-euler.common ;
+USING: grouping math.order math.parser sequences
+project-euler.common ;
 IN: project-euler.008
 
-! https://projecteuler.net/index.php?section=problems&id=8
+! https://projecteuler.net/problem=8
 
 ! DESCRIPTION
 ! -----------
 
-! Find the greatest product of five consecutive digits in the 1000-digit number.
+! Find the greatest product of five consecutive digits in the
+! 1000-digit number.
 
 !     73167176531330624919225119674426574742355349194934
 !     96983520312774506326239578318016984801869478851843

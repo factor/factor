@@ -3,7 +3,7 @@
 USING: math.primes.factors sequences project-euler.common ;
 IN: project-euler.003
 
-! https://projecteuler.net/index.php?section=problems&id=3
+! https://projecteuler.net/problem=3
 
 ! DESCRIPTION
 ! -----------

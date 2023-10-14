@@ -83,13 +83,13 @@ TUPLE: gopher-server < threaded-server
     ] with-directory-entries ;
 
 : send-directory ( server path -- )
-    dup ".gophermap" append-path dup file-exists? [
+    dup ".gophermap" append-path [
         send-file 2drop
     ] [
         drop dup ".gopherhead" append-path
-        dup file-exists? [ send-file ] [ drop ] if
+        [ send-file ] when-file-exists
         list-directory
-    ] if ;
+    ] if-file-exists ;
 
 : read-gopher-path ( -- path )
     readln dup [ "\t\r\n" member? ] find drop [ head ] when*

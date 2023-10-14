@@ -509,6 +509,10 @@ animal = { type.name = "pug" }]=] toml>
            { x = 2, y = 4, z = 8 } ] ]=] toml>
 ] unit-test
 
+{ H{ { "a" { } } } } [ "a=[]" toml> ] unit-test
+{ H{ { "a" { 1 } } } } [ "a=[1]" toml> ] unit-test
+{ H{ { "a" { 1 2 3 } } } } [ "a=[1,2,3]" toml> ] unit-test
+
 ! unreleased
 
 ! Clarify Unicode and UTF-8 references.

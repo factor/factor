@@ -1,8 +1,10 @@
+! Copyright (C) 2009 Kye W. Shi.
+! See https://factorcode.org/license.txt for BSD license.
 USING: accessors classes.tuple kernel math math.functions
 project-euler.common ranges sequences ;
 IN: project-euler.064
 
-! http://projecteuler.net/index.php?section=problems&id=64
+! http://projecteuler.net/problem=64
 
 ! DESCRIPTION
 ! -----------

@@ -2,8 +2,8 @@
 ! See https://factorcode.org/license.txt for BSD license
 
 USING: accessors assocs colors kernel math math.parser sequences
-ui ui.gadgets ui.gadgets.borders ui.gadgets.labels
-ui.gadgets.tracks ui.pens.solid ;
+ui ui.gadgets ui.gadgets.borders ui.gadgets.buttons
+ui.gadgets.labels ui.gadgets.tracks ui.pens.solid webbrowser ;
 
 IN: periodic-table
 
@@ -158,14 +158,32 @@ CONSTANT: periodic-table {
     f
     {   f   f   f  58  59  60  61  62  63  64  65  66  67  68  69  70  71   f }
     {   f   f   f  90  91  92  93  94  95  96  97  98  99 100 101 102 103   f }
+    f
 }
 
-:: <element> ( atomic-number symbol name -- gadget )
+:: <element-label> ( atomic-number symbol name -- gadget )
     vertical <track>
     atomic-number number>string <label>
-        [ 8 >>size ] change-font f track-add
+        [ 10 >>size ] change-font f track-add
     symbol <label> [ t >>bold? ] change-font f track-add
-    name <label> [ 6 >>size ] change-font f track-add ;
+    name <label> [ 8 >>size ] change-font f track-add ;
+
+: <element> ( atomic-number/f -- element )
+    [
+        dup 1 - elements nth first3
+        [ <element-label> ] [ group-colors at ] bi*
+    ] [
+        "" <label> f
+    ] if*
+    [ { 40 35 } >>pref-dim { 5 5 } <border> ]
+    [ [ <solid> >>interior ] when* ] bi* ;
+
+: <element-button> ( atomic-number/f -- element )
+    [ <element> ] keep [
+        1 - elements nth second
+        "https://en.wikipedia.org/wiki/" prepend
+        '[ drop _ open-url ] <roll-button>
+    ] when* ;
 
 : <legend> ( -- gadget )
     horizontal <track> { 3 3 } >>gap
@@ -179,25 +197,11 @@ CONSTANT: periodic-table {
     vertical <track> { 3 3 } >>gap
     periodic-table [
         horizontal <track> { 3 3 } >>gap swap
-        [
-            [
-                [
-                    dup 1 - elements nth first3
-                    [ <element> ] [ group-colors at ] bi*
-                ] [
-                    "" <label> f
-                ] if*
-                [ { 40 35 } >>pref-dim { 5 5 } <border> ]
-                [ [ <solid> >>interior ] when* ] bi*
-                f track-add
-            ] each
-        ] [
-            "" <label> { 20 20 } >>pref-dim f track-add
-        ] if*
+        [ [ <element-button> f track-add ] each ]
+        [ "" <label> { 10 10 } >>pref-dim f track-add ] if*
         f track-add
-    ] each
-    <legend> { 0 10 } <border> f track-add ;
+    ] each <legend> f track-add ;
 
 MAIN-WINDOW: periodic-table-window
     { { title "Periodic Table" } }
-    <periodic-table> >>gadgets ;
+    <periodic-table> { 5 5 } <border> >>gadgets ;
