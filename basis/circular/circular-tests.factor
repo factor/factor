@@ -1,6 +1,6 @@
 ! Copyright (C) 2005, 2006 Alex Chapman, Daniel Ehrenberg
 ! See https://factorcode.org/license.txt for BSD license
-USING: arrays circular kernel math sequences sequences.private
+USING: arrays circular kernel literals math sequences sequences.private
 strings tools.test ;
 IN: circular.tests
 
@@ -18,6 +18,9 @@ IN: circular.tests
 { [ 2 3 1 ] } [ { 1 2 3 } <circular> 1 over change-circular-start [ ] like ] unit-test
 { [ 3 1 2 ] } [ { 1 2 3 } <circular> 1 over change-circular-start 1 over change-circular-start [ ] like ] unit-test
 { [ 3 1 2 ] } [ { 1 2 3 } <circular> -100 over change-circular-start [ ] like ] unit-test
+
+{ $[ { 1 2 3 } minimum ] } [ { 1 2 3 } <circular> minimum ] unit-test
+{ $[ { 1 2 3 } maximum ] } [ { 1 2 3 } <circular> maximum ] unit-test
 
 { "fob" } [ "foo" <circular> CHAR: b 2 pick set-nth >string ] unit-test
 { "boo" } [ "foo" <circular> CHAR: b 3 pick set-nth-unsafe >string ] unit-test
