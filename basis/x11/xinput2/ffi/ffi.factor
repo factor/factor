@@ -147,7 +147,7 @@ STRUCT: XIHierarchyInfo
     { enabled    Bool }
     { flags      int } ;
 
-! Notifies the client that the device hierarcy has been changed
+! Notifies the client that the device hierarchy has been changed
 ! The client is expected to re-query the server for the device
 ! hierarchy.
 STRUCT: XIHierarchyEvent
