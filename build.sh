@@ -390,7 +390,7 @@ parse_build_info() {
     $ECHO "WORD=$WORD"
 }
 
-find_build_info() {
+prepare_build_info() {
     find_os
     find_architecture
     find_num_cores
@@ -404,6 +404,10 @@ find_build_info() {
     set_downloader
     set_boot_image_vars
     set_make
+}
+
+find_build_info() {
+    prepare_build_info
     echo_build_info
 }
 
@@ -622,6 +626,43 @@ copy_fresh_image() {
     $COPY $FACTOR_IMAGE $FACTOR_IMAGE_FRESH
 }
 
+check_launch_factor() {
+    ./$FACTOR_BINARY "-e=USE: system 0 exit"
+    check_ret "Could not launch ./$FACTOR_BINARY"
+}
+
+is_boot_image_outdated() {
+    ./$FACTOR_BINARY "-e=USE: system \"\" to-refresh 2drop length 0 > 1 0 ? exit"
+    return $?
+}
+
+info_boot_image() {
+    prepare_build_info
+    if [[ -f $BOOT_IMAGE ]] ; then
+        get_url "$CHECKSUM_URL"
+        local factorcode_md5
+        factorcode_md5=$(grep "$BOOT_IMAGE" checksums.txt | cut -f2 -d' ')
+        set_md5sum
+        local disk_md5
+        disk_md5=$($MD5SUM "$BOOT_IMAGE" | cut -f1 -d' ')
+        $ECHO "Factorcode md5: $factorcode_md5";
+        $ECHO "Disk md5: $disk_md5";
+        if [[ "$factorcode_md5" == "$disk_md5" ]] ; then
+            $ECHO "Your disk boot image matches the one on downloads.factorcode.org."
+        else
+            $ECHO "Your disk boot image and the one on downloads.factorcode.org mismatch"
+        fi
+    fi
+
+    check_launch_factor
+    is_boot_image_outdated
+    if [[ $? -eq 0 ]]; then
+        $ECHO "Your disk boot image is up-to-date"
+    else
+        $ECHO "Your disk boot image needs to be updated"
+    fi
+}
+
 bootstrap() {
     ./$FACTOR_BINARY -i="$BOOT_IMAGE"
     check_ret "./$FACTOR_BINARY bootstrap failed"
@@ -707,6 +748,7 @@ usage() {
     $ECHO "  deps-dnf - install required packages for Factor on Linux using dnf"
     $ECHO "  deps-pkg - install required packages for Factor on FreeBSD using pkg"
     $ECHO "  deps-macosx - install git on MacOSX using port"
+    $ECHO "  info-boot-image - print remote and disk boot image MD5, status disk boot image"
     $ECHO "  self-bootstrap - make local boot image, bootstrap"
     $ECHO "  self-update - git pull, recompile, make local boot image, bootstrap"
     $ECHO "  quick-update - git pull, refresh-all, save"
@@ -751,6 +793,7 @@ case "$1" in
     deps-macosx) install_deps_macosx ;;
     deps-dnf) install_deps_dnf ;;
     deps-pkg) install_deps_pkg ;;
+    info-boot-image) info_boot_image ;;
     self-bootstrap) get_config_info; make_boot_image; bootstrap  ;;
     self-update) update; make_boot_image; bootstrap  ;;
     quick-update) update; refresh_image ;;
