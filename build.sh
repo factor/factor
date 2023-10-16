@@ -331,6 +331,7 @@ echo_build_info() {
     $ECHO "DEBUG=$DEBUG"
     $ECHO "REPRODUCIBLE=$REPRODUCIBLE"
     $ECHO "CURRENT_BRANCH=$CURRENT_BRANCH"
+    $ECHO "CURRENT_BRANCH_FULL=$CURRENT_BRANCH_FULL"
     $ECHO "FACTOR_BINARY=$FACTOR_BINARY"
     $ECHO "FACTOR_LIBRARY=$FACTOR_LIBRARY"
     $ECHO "FACTOR_IMAGE=$FACTOR_IMAGE"
@@ -521,7 +522,7 @@ make_clean_factor() {
 current_git_branch() {
     # git rev-parse --abbrev-ref HEAD # outputs HEAD for detached head
     # outputs nothing for detached HEAD, which is fine for ``git fetch``
-    git describe --all --exact-match 2>/dev/null | sed 's=.*/=='
+    git describe --all --exact-match 2>/dev/null
 }
 
 check_url() {
@@ -564,7 +565,8 @@ set_current_branch() {
     if [ -n "${CI_BRANCH}" ]; then
         CURRENT_BRANCH="${CI_BRANCH}"
     else
-        CURRENT_BRANCH=$(current_git_branch)
+        CURRENT_BRANCH_FULL=$(current_git_branch)
+        CURRENT_BRANCH=$($ECHO $CURRENT_BRANCH_FULL | sed -E 's=(heads|remotes)/==')
     fi
 }
 
