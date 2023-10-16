@@ -390,8 +390,6 @@ M: bogus-hashcode hashcode* 2drop 0 >bignum ;
 { 24 } [ { 1 2 } { 3 4 } [ + ] [ * ] 2map-reduce ] unit-test
 { 2 96 } [ 2 { 3 3 3 3 } { 4 4 4 4 } [ [ dup ] 2dip * * ] [ + ] 2map-reduce ] unit-test
 
-{ 4 } [ 5 <iota> (maximum) ] unit-test
-{ 0 } [ 5 <iota> (minimum) ] unit-test
 { 4 } [ 5 <iota> supremum ] unit-test
 { 0 } [ 5 <iota> infimum ] unit-test
 { 4 } [ 5 <iota> maximum ] unit-test

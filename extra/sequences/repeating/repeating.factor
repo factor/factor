@@ -34,8 +34,8 @@ INSTANCE: cycles virtual-sequence
 
 PRIVATE>
 
-M: cycles minimum dup full-cycle? [ circular>> minimum ] [ (minimum) ] if ; inline
-M: cycles maximum dup full-cycle? [ circular>> maximum ] [ (maximum) ] if ; inline
+M: cycles minimum dup full-cycle? [ circular>> minimum ] [ call-next-method ] if ; inline
+M: cycles maximum dup full-cycle? [ circular>> maximum ] [ call-next-method ] if ; inline
 
 TUPLE: element-repeats < sequence-view
 { times integer read-only } ;
