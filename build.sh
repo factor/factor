@@ -566,7 +566,7 @@ set_current_branch() {
         CURRENT_BRANCH="${CI_BRANCH}"
     else
         CURRENT_BRANCH_FULL=$(current_git_branch)
-        CURRENT_BRANCH=$($ECHO $CURRENT_BRANCH_FULL | sed -E 's=(heads|remotes)/==')
+        CURRENT_BRANCH=$($ECHO $CURRENT_BRANCH_FULL | sed 's=heads/==;s=remotes/==')
     fi
 }
 
