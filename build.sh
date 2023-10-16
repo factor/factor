@@ -627,7 +627,7 @@ copy_fresh_image() {
 }
 
 check_launch_factor() {
-    ./$FACTOR_BINARY "-e=USE: system 0 exit"
+    ./$FACTOR_BINARY -e=
     check_ret "Could not launch ./$FACTOR_BINARY"
 }
 
