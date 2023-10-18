@@ -461,7 +461,7 @@ big-endian off
 
 ! The *-signal-handler subprimitives are special-cased in vm/quotations.cpp
 ! not to trigger generation of a stack frame, so they can
-! peform their own prolog/epilog preserving registers.
+! perform their own prolog/epilog preserving registers.
 !
 ! It is important that the total is 192/64 and that it matches the
 ! constants in vm/cpu-x86.*.hpp
