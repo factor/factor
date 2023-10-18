@@ -12,9 +12,17 @@ INSTANCE: visual-studio-codium visual-studio-code-base
 M: visual-studio-codium find-visual-studio-code-path
     os {
         { linux [ "codium" which ] }
-        { macosx [
-            "com.visualstudio.code.oss" find-native-bundle
-            [ "Contents/MacOS/Electron" append-path ] [ f ] if* ] }
+        { macosx [ 
+            "com.vscodium" find-native-bundle 
+            [ "Contents/MacOS/Electron" append-path ] 
+            [  "com.visualstudio.code.oss" find-native-bundle 
+                [ "Contents/MacOS/Electron" append-path ] 
+                [ f ] 
+                if*
+            ]
+            if*
+        ]
+        }
         { windows [
             { "Microsoft VS Codium" } "codium.cmd" find-in-applications ] }
     } case ;
