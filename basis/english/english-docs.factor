@@ -65,7 +65,7 @@ HELP: singular?
 HELP: pluralize
 { $values { "word" string } { "plural" string } }
 { $description "Determine the plural form of the input English word. If the input is already plural, it " { $emphasis "might" } " be returned unchanged." }
-{ $notes { $list { "If the input is already in plural form, an invaid construct such as " { $emphasis "friendses" } " may be generated. This is difficult to avoid due to the unpredictable structure of the English language." } $keep-case } }
+{ $notes { $list { "If the input is already in plural form, an invalid construct such as " { $emphasis "friendses" } " may be generated. This is difficult to avoid due to the unpredictable structure of the English language." } $keep-case } }
 { $examples
     { $example
         "USING: english io ;"
