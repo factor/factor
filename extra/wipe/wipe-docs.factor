@@ -5,7 +5,7 @@ IN: wipe
 
 HELP: overwrite-with-random-bytes
 { $values { "file-name" "a filename string" } }
-{ $description "Overwite the " { $snippet "file-name" } " contents with random data. The slack space at the end is not overwritten." } ;
+{ $description "Overwrite the " { $snippet "file-name" } " contents with random data. The slack space at the end is not overwritten." } ;
 
 ABOUT: "Wipe"
 
