@@ -8,13 +8,13 @@ features](https://concatenative.org/wiki/view/Factor/Features/The%20language)
 including dynamic types, extensible syntax, macros, and garbage collection.
 On a practical side, Factor has a [full-featured
 library](https://docs.factorcode.org/content/article-vocab-index.html),
-supports many different platforms and has been extensively documented.
+supports many different platforms, and has been extensively documented.
 
 The implementation is [fully
 compiled](https://concatenative.org/wiki/view/Factor/Optimizing%20compiler)
 for performance while still supporting [interactive
 development](https://concatenative.org/wiki/view/Factor/Interactive%20development).
-Factor applications are portable between all common platforms. Factor can
+Factor applications are portable across all common platforms. Factor can
 [deploy stand-alone
 applications](https://concatenative.org/wiki/view/Factor/Deployment) on all
 platforms. Full source code for the Factor project is available under a BSD
@@ -53,7 +53,7 @@ Factor does not yet work on arm64 cpus. There is an arm64 assembler
 in `cpu.arm.64.assembler`, and we are working on a port and also looking for
 contributors.
 
-More information on [building factor](https://concatenative.org/wiki/view/Factor/Building%20Factor)
+More information on [building factors](https://concatenative.org/wiki/view/Factor/Building%20Factor)
 and [system requirements](https://concatenative.org/wiki/view/Factor/Requirements).
 
 ### To run a Factor binary:
@@ -170,7 +170,7 @@ Then, subsequent fetches will automatically update any replaced objects.
 
 ## Community
 
-Factor developers are pretty active in [the Factor Discord server](https://discord.gg/QxJYZx3QDf).
+Factor developers are pretty active on [the Factor Discord server](https://discord.gg/QxJYZx3QDf).
 Drop by if you want to discuss anything related to Factor or language design in general.
 
 * [Factor homepage](https://factorcode.org)
