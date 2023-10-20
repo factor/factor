@@ -3,7 +3,7 @@
 The Factor monorepo contains almost all libraries developed in Factor alongside the Factor distribution.
 Contributions of any form are welcome.
 
-Contributing to Factor requires a bleeding-edge build. You can clone the repository and run `./build.sh update` to get one.
+Contributing to Factor requires a bleeding-edge build. You can clone the repository and follow the [build steps](README.md#building-factor-from-source) to start working on Factor.
 
 If you have any questions beyond the scope of this document, feel free to ask the [community.](https://www.concatenative.org/wiki/view/Factor/Community)
 
@@ -18,7 +18,7 @@ If you have found a bug in the Factor distribution,
 
 # Submitting a patch
 - Commits must always have vocabulary names prefixed to them. The commit history has many good examples of this.
-- All contributions to Factor are mandatorily under the BSD license. In new vocabularies, you must add a comment stating the same. You can use your real name or your GitHub nickname. See [this](https://github.com/factor/factor/blob/master/core/alien/alien.factor) for an example.
+- All contributions to Factor are mandatorily under the [BSD license](LICENSE.txt). In new vocabularies, you must add a comment stating the same. You can use your real name or your GitHub nickname. See [this](https://github.com/factor/factor/blob/master/core/alien/alien.factor) for an example.
 - Do not submit features without creating a feature request first.
 - The repository is structured as follows:
   - `basis`: Vocabularies which are well-tested, well-documented, and have a wide variety of uses.
@@ -31,5 +31,9 @@ If you have found a bug in the Factor distribution,
   - Factor code is written in small definitions that reference smaller definitions. Keep words as small as possible by factoring out core parts.
   - Use 4 spaces of indentation if your definitions take multiple lines.
   - Apart from these guidelines, follow the style of the file you are editing.
+- If you are making changes to `basis` or `core`, performing the required changes to documentation is mandatory. You can use the words in
+  [tools.scaffold](https://docs.factorcode.org/content/article-tools.scaffold.html) to generate the basic structure.
+  - Some words are referenced in other standalone articles. It is highly recommended to mention those in a comment above your word's documentation,
+    so that the documentation stays consistent on all referenced pages.
 - `<PRIVATE` blocks are highly recommended for helper words. They are a leaky abstraction, but they make the documentation tidier.
 - Always run `lint` and `help.lint` on your changes before submitting them.
