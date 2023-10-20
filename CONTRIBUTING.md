@@ -14,7 +14,7 @@ If you have found a bug in the Factor distribution,
 - For bugs, always add a code sample, and a reproducible test case.
   - Always paste the text of the snippet and the text from the error that Factor produces. Screenshots are useful, but text is important.
   - If the text cannot feasibly fit in a github issue, use the [Factor pastebin](https://paste.factorcode.org/) or a GitHub gist to host your code.
-- If you are adding a feature request, detail on how the feature should be implemented, and add links to existing libraries or papers that will aid with implementing the feature.
+- If you are adding a feature request, provide details on how the feature should be implemented and add links to existing libraries or papers that will aid with implementing the feature.
 
 # Submitting a patch
 - Commits must always have vocabulary names prefixed to them. The commit history has many good examples of this.
