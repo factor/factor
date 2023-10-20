@@ -44,7 +44,7 @@ TUPLE: wordlet-game secret-word chances guesses ;
         { COLOR: green [ 3 ] }
     } case ;
 
-: reamining-chars ( game -- chars )
+: remaining-chars ( game -- chars )
     [ secret-word>> ] [ guesses>> ] bi [
         guess>chars
     ] with map concat members
@@ -54,7 +54,7 @@ TUPLE: wordlet-game secret-word chances guesses ;
     CHAR: a CHAR: z [a..b] [ 1string COLOR: white ] { } map>assoc [ or ] assoc-merge ;
 
 : print-remaining-chars ( game -- )
-    reamining-chars [ background associate format ] assoc-each nl ;
+    remaining-chars [ background associate format ] assoc-each nl ;
 
 : print-guesses ( game -- )
     [ secret-word>> ] [ guesses>> ] bi [
