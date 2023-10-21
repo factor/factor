@@ -505,7 +505,7 @@ HELP: SYMBOLS:
 { $examples { $example "USING: prettyprint ;" "IN: scratchpad" "SYMBOLS: foo bar baz ;\nfoo . bar . baz ." "foo\nbar\nbaz" } } ;
 
 HELP: INITIALIZED-SYMBOL:
-{ $syntax "INITIALIZE-SYMBOL: word [ ... ]"  }
+{ $syntax "INITIALIZED-SYMBOL: word [ ... ]"  }
 { $description "Defines a new symbol " { $snippet "word" } " and sets the value in the global namespace." }
 { $examples
     { $unchecked-example
