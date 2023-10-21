@@ -7,7 +7,7 @@ IN: ui.gadgets.comboboxes
 TUPLE: combo-table < table spawner ;
 
 M: combo-table handle-gesture
-    [ call-next-method drop ] 2keep swap T{ button-up } = [
+    [ call-next-method drop ] 2keep swap T{ button-down } = [
         [ spawner>> ]
         [ tbl:selected-row [ swap set-control-value ] [ 2drop ] if ]
         [ hide-glass ] tri
@@ -16,7 +16,7 @@ M: combo-table handle-gesture
 TUPLE: combobox < label-control table ;
 
 combobox H{
-   { T{ button-down } [ dup table>> over >>spawner <zero-rect> show-glass ] }
+   { T{ button-up } [ dup table>> over >>spawner <zero-rect> show-glass ] }
 } set-gestures
 
 : <combobox> ( options -- combobox )
