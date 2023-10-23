@@ -7,7 +7,7 @@ HELP: pad-center
 { $description "Outputs a new sequence consisting of " { $snippet "seq" } " padded on the left and right with enough repetitions of " { $snippet "elt" } " to have the result be of length " { $snippet "n" } "." }
 { $examples { $example "USING: io sequences sequences.extras ;" "{ \"ab\" \"quux\" } [ 5 CHAR: - pad-center print ] each" "-ab--\nquux-" } } ;
 
-HELP: ?supremum
+HELP: ?maximum
 { $values
     { "seq/f" { $maybe sequence } }
     { "elt/f" { $maybe object } }
@@ -15,11 +15,11 @@ HELP: ?supremum
 { $description "Outputs the greatest element of " { $snippet "seq" } ", ignoring any " { $link POSTPONE: f } " elements in it. If " { $snippet "seq" } " is empty or " { $link POSTPONE: f } ", returns " { $link POSTPONE: f } "." }
 { $examples
     { $example "USING: prettyprint sequences.extras ;"
-    "{ 1 f 3 2 } ?supremum ."
+    "{ 1 f 3 2 } ?maximum ."
     "3" }
 } ;
 
-HELP: ?infimum
+HELP: ?minimum
 { $values
     { "seq/f" { $maybe sequence } }
     { "elt/f" { $maybe object } }
@@ -27,11 +27,11 @@ HELP: ?infimum
 { $description "Outputs the least element of " { $snippet "seq" } ", ignoring any " { $link POSTPONE: f } " elements in it. If " { $snippet "seq" } " is empty or " { $link POSTPONE: f } ", returns " { $link POSTPONE: f } "." }
 { $examples
     { $example "USING: prettyprint sequences.extras ;"
-    "{ 1 f 3 2 } ?infimum ."
+    "{ 1 f 3 2 } ?minimum ."
     "1" }
 } ;
 
-{ ?supremum ?infimum } related-words
+{ ?maximum ?minimum } related-words
 
 HELP: 2count
 { $values

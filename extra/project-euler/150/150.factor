@@ -36,10 +36,10 @@ IN: project-euler.150
 : partial-sums ( seq -- sums )
     cum-sum 0 prefix ; inline
 
-: partial-sum-infimum ( seq quot -- seq )
+: partial-sum-minimum ( seq quot -- seq )
     [ 0 0 ] 2dip [ + [ min ] keep ] compose each drop ; inline
 
-: map-infimum ( seq quot -- min )
+: map-minimum ( seq quot -- min )
     [ min ] compose 0 swap reduce ; inline
 
 ! triangle generator functions
@@ -58,9 +58,9 @@ IN: project-euler.150
                 x z + table nth-unsafe
                 [ y z + 1 + swap nth-unsafe ]
                 [ y         swap nth-unsafe ] bi -
-            ] partial-sum-infimum
-        ] map-infimum
-    ] map-infimum ; inline
+            ] partial-sum-minimum
+        ] map-minimum
+    ] map-minimum ; inline
 
 PRIVATE>
 
