@@ -1154,11 +1154,8 @@ M: iota maximum n>> 1 - ; inline
 M: reversed maximum seq>> maximum ; inline
 M: repetition maximum elt>> ; inline
 
-GENERIC: infimum ( seq -- elt )
-M: sequence infimum minimum ; inline
-
-GENERIC: supremum ( seq -- elt )
-M: sequence supremum maximum ; inline
+ALIAS: infimum minimum deprecated
+ALIAS: supremum maximum deprecated
 
 : map-sum ( ... seq quot: ( ... elt -- ... n ) -- ... n )
     [ 0 ] 2dip [ dip + ] curry [ swap ] prepose each ; inline
