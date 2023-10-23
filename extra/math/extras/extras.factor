@@ -106,11 +106,14 @@ PRIVATE>
 : moving-median ( u n -- v )
     <clumps> [ median ] map ;
 
-: moving-supremum ( u n -- v )
-    <clumps> [ supremum ] map ;
+: moving-maximum ( u n -- v )
+    <clumps> [ maximum ] map ;
 
-: moving-infimum ( u n -- v )
-    <clumps> [ infimum ] map ;
+: moving-minimum ( u n -- v )
+    <clumps> [ minimum ] map ;
+
+ALIAS: moving-supremum moving-maximum deprecated
+ALIAS: moving-infimum moving-minimum deprecated
 
 : moving-sum ( u n -- v )
     <clumps> [ sum ] map ;
@@ -152,10 +155,10 @@ PRIVATE>
     0 [ dup fp-nan? [ drop ] [ + ] if ] binary-reduce ;
 
 : nan-min ( seq -- n )
-    [ fp-nan? ] reject infimum ;
+    [ fp-nan? ] reject minimum ;
 
 : nan-max ( seq -- n )
-    [ fp-nan? ] reject supremum ;
+    [ fp-nan? ] reject maximum ;
 
 : fill-nans ( seq -- newseq )
     [ first ] keep [

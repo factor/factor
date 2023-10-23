@@ -1445,18 +1445,18 @@ HELP: product
 { $values { "seq" { $sequence number } } { "n" number } }
 { $description "Outputs the product of all elements of " { $snippet "seq" } ". Outputs one given an empty sequence." } ;
 
-HELP: infimum
+HELP: minimum
 { $values { "seq" sequence } { "elt" object } }
 { $description "Outputs the least element of " { $snippet "seq" } "." }
 { $examples
     "Example:"
     { $example "USING: sequences prettyprint ;"
-        "{ 1 2 3 4 5 } infimum ."
+        "{ 1 2 3 4 5 } minimum ."
         "1"
     }
     "Example:"
     { $example "USING: sequences prettyprint ;"
-        "{ \"c\" \"b\" \"a\" } infimum ."
+        "{ \"c\" \"b\" \"a\" } minimum ."
         "\"a\""
     }
 }
@@ -1477,18 +1477,18 @@ HELP: infimum-by
 }
 { $errors "Throws an error if the sequence is empty." } ;
 
-HELP: supremum
+HELP: maximum
 { $values { "seq" sequence } { "elt" object } }
 { $description "Outputs the greatest element of " { $snippet "seq" } "." }
 { $examples
     "Example:"
     { $example "USING: sequences prettyprint ;"
-        "{ 1 2 3 4 5 } supremum ."
+        "{ 1 2 3 4 5 } maximum ."
         "5"
     }
     "Example:"
     { $example "USING: sequences prettyprint ;"
-        "{ \"c\" \"b\" \"a\" } supremum ."
+        "{ \"c\" \"b\" \"a\" } maximum ."
         "\"c\""
     }
 }
@@ -1509,7 +1509,7 @@ HELP: supremum-by
 }
 { $errors "Throws an error if the sequence is empty." } ;
 
-{ min max infimum infimum-by supremum supremum-by } related-words
+{ min max minimum infimum-by maximum supremum-by } related-words
 
 HELP: shortest
 { $values { "seqs" sequence } { "elt" object } }
@@ -2167,9 +2167,9 @@ ARTICLE: "sequences-combinators" "Sequence combinators"
 }
 "Superlatives with " { $link min } " and " { $link max } ":"
 { $subsections
-    infimum
+    minimum
     infimum-by
-    supremum
+    maximum
     supremum-by
     shorter
     longer

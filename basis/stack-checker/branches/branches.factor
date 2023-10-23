@@ -54,7 +54,7 @@ SYMBOLS: combinator quotations ;
 
 : unify-branches ( ins stacks -- in phi-in phi-out )
     zip [ 0 { } { } ] [
-        [ keys supremum ] [ ] [ balanced? ] tri
+        [ keys maximum ] [ ] [ balanced? ] tri
         [ dupd phi-inputs dup phi-outputs ] [
             [ combinator get quotations get ] dip
             simple-unbalanced-branches-error
@@ -70,7 +70,7 @@ SYMBOLS: combinator quotations ;
 
 : datastack-phi ( seq -- phi-in phi-out )
     [ input-count branch-variable ]
-    [ inner-d-index branch-variable infimum inner-d-index set ]
+    [ inner-d-index branch-variable minimum inner-d-index set ]
     [ (meta-d) active-variable ] tri
     unify-branches
     [ input-count set ] [ ] [ dup >vector (meta-d) set ] tri* ;

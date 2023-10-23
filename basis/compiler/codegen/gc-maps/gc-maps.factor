@@ -20,7 +20,7 @@ SYMBOLS: return-addresses gc-maps ;
     <bit-array> [ '[ [ t ] dip _ set-nth ] each ] keep ;
 
 : largest-spill-slot ( seqs -- n )
-    concat [ 0 ] [ supremum 1 + ] if-empty ;
+    concat [ 0 ] [ maximum 1 + ] if-empty ;
 
 : emit-gc-roots ( seqs -- n )
     ! seqs is a sequence of sequences of integers 0..n-1

@@ -48,11 +48,11 @@ HELP: nan-sum
 
 HELP: nan-min
 { $values { "seq" sequence } { "n" number } }
-{ $description "Return the " { $link infimum } " of " { $snippet "seq" } " ignoring any NaNs." } ;
+{ $description "Return the " { $link minimum } " of " { $snippet "seq" } " ignoring any NaNs." } ;
 
 HELP: nan-max
 { $values { "seq" sequence } { "n" number } }
-{ $description "Return the " { $link supremum } " of " { $snippet "seq" } " ignoring any NaNs." } ;
+{ $description "Return the " { $link maximum } " of " { $snippet "seq" } " ignoring any NaNs." } ;
 
 HELP: sinc
 { $values { "x" number } { "y" number } }

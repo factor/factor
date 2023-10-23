@@ -56,7 +56,7 @@ CONSTANT: aliases H{
         [
             [ days>> 1 ] [ months>> ] bi [
                 { 0 31 29 31 30 31 30 31 31 30 31 30 31 } nth
-            ] map supremum [ between? ] 2curry all?
+            ] map maximum [ between? ] 2curry all?
         ]
         [ minutes>> [ 0 59 between? ] all? ]
         [ hours>> [ 0 23 between? ] all? ]

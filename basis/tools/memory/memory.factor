@@ -157,8 +157,8 @@ TUPLE: gc-stats collections times ;
                     [ sum nanos>string ]
                     [ mean >integer nanos>string ]
                     [ median >integer nanos>string ]
-                    [ infimum nanos>string ]
-                    [ supremum nanos>string ]
+                    [ minimum nanos>string ]
+                    [ maximum nanos>string ]
                 } cleave
             ] bi
         ] bi

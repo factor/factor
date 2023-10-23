@@ -164,13 +164,13 @@ ERROR: no-case object ;
 : contiguous-range? ( keys -- ? )
     dup [ fixnum? ] all? [
         dup all-unique? [
-            [ length ] [ supremum ] [ infimum ] tri - - 1 =
+            [ length ] [ maximum ] [ minimum ] tri - - 1 =
         ] [ drop f ] if
     ] [ drop f ] if ;
 
 : dispatch-case-quot ( default assoc -- quot )
     swap [
-        [ keys [ infimum ] [ supremum ] bi over ]
+        [ keys [ minimum ] [ maximum ] bi over ]
         [ sort-keys values [ >quotation ] map ] bi
     ] dip dup '[
         dup integer? [
