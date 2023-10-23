@@ -18,7 +18,7 @@ IN: math.statistics
     0 mean-ddof ; inline
 
 : meanest ( seq -- x )
-    [ mean ] keep [ - abs ] with infimum-by ;
+    [ mean ] keep [ - abs ] with minimum-by ;
 
 GENERIC: sum-of-squares ( seq -- x )
 M: object sum-of-squares [ sq ] map-sum ;
@@ -273,7 +273,7 @@ PRIVATE>
     dup recip <array> ; inline
 
 : mode ( seq -- x )
-    histogram >alist [ second ] supremum-by first ;
+    histogram >alist [ second ] maximum-by first ;
 
 : minmax ( seq -- min max )
     [ first dup ] keep [ [ min ] [ max ] bi-curry bi* ] 1 each-from ;

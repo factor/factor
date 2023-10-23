@@ -13,7 +13,7 @@ TUPLE: bin items total ;
     V{ } clone 0 bin boa ; inline
 
 : smallest-bin ( bins -- bin )
-    [ total>> ] infimum-by ; inline
+    [ total>> ] minimum-by ; inline
 
 : add-to-bin ( item weight bin -- )
     [ + ] change-total items>> push ;

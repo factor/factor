@@ -1190,15 +1190,18 @@ ALIAS: supremum maximum deprecated
 
 PRIVATE>
 
-: supremum-by ( ... seq quot: ( ... elt -- ... x ) -- ... elt )
+: maximum-by ( ... seq quot: ( ... elt -- ... x ) -- ... elt )
     [ after? ] select-by ; inline
 
-: infimum-by ( ... seq quot: ( ... elt -- ... x ) -- ... elt )
+: minimum-by ( ... seq quot: ( ... elt -- ... x ) -- ... elt )
     [ before? ] select-by ; inline
 
-: shortest ( seqs -- elt ) [ length ] infimum-by ;
+ALIAS: supremum-by maximum-by deprecated
+ALIAS: infimum-by minimum-by deprecated
 
-: longest ( seqs -- elt ) [ length ] supremum-by ;
+: shortest ( seqs -- elt ) [ length ] minimum-by ;
+
+: longest ( seqs -- elt ) [ length ] maximum-by ;
 
 ! We hand-optimize flip to such a degree because type hints
 ! cannot express that an array is an array of arrays yet, and

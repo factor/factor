@@ -1462,7 +1462,7 @@ HELP: minimum
 }
 { $errors "Throws an error if the sequence is empty." } ;
 
-HELP: infimum-by
+HELP: minimum-by
 { $values
     { "seq" sequence } { "quot" quotation }
     { "elt" object }
@@ -1471,7 +1471,7 @@ HELP: infimum-by
 { $examples
     "Example:"
     { $example "USING: sequences prettyprint ;"
-        "{ { 1 2 } { 1 2 3 } { 1 2 3 4 } } [ length ] infimum-by ."
+        "{ { 1 2 } { 1 2 3 } { 1 2 3 4 } } [ length ] minimum-by ."
         "{ 1 2 }"
     }
 }
@@ -1494,7 +1494,7 @@ HELP: maximum
 }
 { $errors "Throws an error if the sequence is empty." } ;
 
-HELP: supremum-by
+HELP: maximum-by
 { $values
     { "seq" sequence } { "quot" quotation }
     { "elt" object }
@@ -1503,13 +1503,13 @@ HELP: supremum-by
 { $examples
     "Example:"
     { $example "USING: sequences prettyprint ;"
-        "{ { 1 2 } { 1 2 3 } { 1 2 3 4 } } [ length ] supremum-by ."
+        "{ { 1 2 } { 1 2 3 } { 1 2 3 4 } } [ length ] maximum-by ."
         "{ 1 2 3 4 }"
     }
 }
 { $errors "Throws an error if the sequence is empty." } ;
 
-{ min max minimum infimum-by maximum supremum-by } related-words
+{ min max minimum minimum-by maximum maximum-by } related-words
 
 HELP: shortest
 { $values { "seqs" sequence } { "elt" object } }
@@ -2168,9 +2168,9 @@ ARTICLE: "sequences-combinators" "Sequence combinators"
 "Superlatives with " { $link min } " and " { $link max } ":"
 { $subsections
     minimum
-    infimum-by
+    minimum-by
     maximum
-    supremum-by
+    maximum-by
     shorter
     longer
     shorter?
