@@ -47,7 +47,7 @@ IN: project-euler.042
 PRIVATE>
 
 : euler042 ( -- answer )
-    source-042 [ alpha-value ] map dup supremum
+    source-042 [ alpha-value ] map dup maximum
     triangle-upto [ member? ] curry count ;
 
 ! [ euler042 ] 100 ave-time

@@ -259,7 +259,7 @@ DEFER: matrix-set-nths
 
 : matrix-l-infinity-norm ( m -- n )
     dup zero-matrix? [ drop 0 ] [
-        [ [ abs ] map-sum ] map supremum
+        [ [ abs ] map-sum ] map maximum
     ] if ; inline foldable
 
 : matrix-l1-norm ( m -- n )

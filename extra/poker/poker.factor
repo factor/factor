@@ -150,7 +150,7 @@ PRIVATE>
 
 : best-holdem-hand ( hand -- n cards )
     5 [ [ hand-value ] [ ] bi ] { } map>assoc-combinations
-    infimum first2 ;
+    minimum first2 ;
 
 : value>string ( n -- string )
     value>rank VALUES nth ;
@@ -185,7 +185,7 @@ ERROR: no-card card deck ;
     n [
         holes deck 5 sample '[
             [ _ append best-holdem-hand drop ] keep
-        ] { } map>assoc infimum second
+        ] { } map>assoc minimum second
     ] replicate histogram ;
 
 : (best-omaha-hand) ( seq -- pair )
@@ -193,13 +193,13 @@ ERROR: no-card card deck ;
     [ 2 all-combinations ] [ 3 all-combinations ] bi*
     2array [ concat [ best-holdem-hand drop ] keep ] { } product-map>assoc ;
 
-: best-omaha-hand ( seq -- n cards ) (best-omaha-hand) infimum first2 ;
+: best-omaha-hand ( seq -- n cards ) (best-omaha-hand) minimum first2 ;
 
 :: compare-omaha-hands ( holes deck n -- seq )
     n [
         holes deck 5 sample '[
             [ _ append best-omaha-hand drop ] keep
-        ] { } map>assoc infimum second
+        ] { } map>assoc minimum second
     ] replicate histogram ;
 
 ERROR: bad-suit-symbol ch ;

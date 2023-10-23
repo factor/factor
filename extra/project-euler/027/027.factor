@@ -60,7 +60,7 @@ IN: project-euler.027
     swap 0 (consecutive-primes) ;
 
 : max-consecutive ( seq -- elt n )
-    dup [ first2 consecutive-primes ] map dup supremum
+    dup [ first2 consecutive-primes ] map dup maximum
     over index [ swap nth ] curry bi@ ;
 
 PRIVATE>

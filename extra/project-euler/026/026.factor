@@ -57,7 +57,7 @@ PRIVATE>
 <PRIVATE
 
 : max-period ( seq -- elt n )
-    dup [ period-length ] map dup supremum
+    dup [ period-length ] map dup maximum
     over index [ swap nth ] curry bi@ ;
 
 PRIVATE>

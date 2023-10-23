@@ -19,7 +19,7 @@ IN: math.distances
     1 minkowski-distance ;
 
 : chebyshev-distance ( a b -- n ) ! also chessboard-distance
-    v- vabs supremum ;
+    v- vabs maximum ;
 
 : cosine-distance ( a b -- n )
     cosine-similarity 1 swap - ;

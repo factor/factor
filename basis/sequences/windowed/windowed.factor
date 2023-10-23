@@ -38,11 +38,14 @@ M: windowed-sequence length
 : rolling-median ( seq n -- newseq )
     [ median ] rolling-map ;
 
-: rolling-supremum ( seq n -- newseq )
-    [ supremum ] rolling-map ;
+: rolling-maximum ( seq n -- newseq )
+    [ maximum ] rolling-map ;
 
-: rolling-infimum ( seq n -- newseq )
-    [ infimum ] rolling-map ;
+: rolling-minimum ( seq n -- newseq )
+    [ minimum ] rolling-map ;
+
+ALIAS: rolling-supremum rolling-maximum deprecated
+ALIAS: rolling-infimum rolling-minimum deprecated
 
 : rolling-count ( ... u n quot: ( ... elt -- ... ? ) -- ... v )
     '[ _ count ] rolling-map ; inline
