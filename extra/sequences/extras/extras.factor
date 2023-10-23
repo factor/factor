@@ -890,17 +890,20 @@ ERROR: slice-error-of from to seq ;
 
 PRIVATE>
 
-: supremum-by* ( ... seq quot: ( ... elt -- ... x ) -- ... i elt )
+: maximum-by* ( ... seq quot: ( ... elt -- ... x ) -- ... i elt )
     [ after? ] select-by* ; inline
 
-: infimum-by* ( ... seq quot: ( ... elt -- ... x ) -- ... i elt )
+: minimum-by* ( ... seq quot: ( ... elt -- ... x ) -- ... i elt )
     [ before? ] select-by* ; inline
 
+ALIAS: supremum-by* maximum-by* deprecated
+ALIAS: infimum-by* minimum-by* deprecated
+
 : arg-max ( seq -- n )
-    [ ] supremum-by* drop ;
+    [ ] maximum-by* drop ;
 
 : arg-min ( seq -- n )
-    [ ] infimum-by* drop ;
+    [ ] minimum-by* drop ;
 
 : ?supremum ( seq/f -- elt/f )
     [ f ] [

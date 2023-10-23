@@ -857,12 +857,12 @@ HELP: index-selector-as
     { "selector" object } { "accum" object }
 } ;
 
-HELP: infimum-by*
+HELP: minimum-by*
 { $values
     { "seq" sequence } { "quot" quotation }
     { "i" integer } { "elt" object }
 }
-{ $description "A variant of " { $link infimum-by } " that pushes the index of the least element along with the least element." } ;
+{ $description "A variant of " { $link minimum-by } " that pushes the index of the least element along with the least element." } ;
 
 HELP: insert-nth!
 { $values
@@ -1324,11 +1324,12 @@ HELP: span-slices
 }
 { $description "Create a virtual sequence spanning the length covered by " { $snippet "slice1" } " and " { $snippet "slice2" } ". Slices must refer to the same sequence." } ;
 
-HELP: supremum-by*
+HELP: maximum-by*
 { $values
     { "seq" sequence } { "quot" quotation }
     { "i" integer } { "elt" object }
-} ;
+}
+{ $description "A variant of " { $link maximum-by } " that pushes the index of the greated element along with the greatest element." } ;
 
 HELP: tail*-as
 { $values
