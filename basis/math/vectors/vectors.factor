@@ -234,7 +234,7 @@ M: object norm-sq [ absq ] [ + ] map-reduce ; inline
 
 ALIAS: norm l2-norm
 
-: l-infinity-norm ( k -- x ) supremum ; inline
+: l-infinity-norm ( k -- x ) maximum ; inline
 
 : p-norm-default ( k p -- x )
     [ [ [ abs ] dip ^ ] curry map-sum ] keep recip ^ ; inline
@@ -243,7 +243,7 @@ ALIAS: norm l2-norm
     {
         { [ dup 1 = ] [ drop l1-norm ] }
         { [ dup 2 = ] [ drop l2-norm ] }
-        { [ dup fp-infinity? ] [ drop supremum ] }
+        { [ dup fp-infinity? ] [ drop maximum ] }
         [ p-norm-default ]
     } cond ;
 
