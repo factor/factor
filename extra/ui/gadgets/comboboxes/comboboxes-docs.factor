@@ -18,7 +18,7 @@ HELP: combobox
 { $class-description "The class of comboboxes. The combobox dropdown is a "
 { $link table } " with clickable elements." } ;
 
-ARTICLE: "ui.gadgets.comboboxes" "ui.gadgets.comboboxes"
+ARTICLE: "ui.gadgets.comboboxes" "Combobox gadgets"
 "Comboboxes are UI elements that provide a dropdown menu for selecting from a "
 "list of set options."
 $nl
