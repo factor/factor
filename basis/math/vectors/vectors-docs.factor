@@ -88,8 +88,8 @@ $nl
     vmax
     vmin
     vclamp
-    vsupremum
-    vinfimum
+    vmaximum
+    vminimum
 }
 "Bitwise operations:"
 { $subsections
@@ -512,7 +512,7 @@ HELP: norm
 
 HELP: l-infinity-norm
 { $values { "k" sequence } { "x" "a non-negative real number" } }
-{ $contract "Computes the norm (size) of " { $snippet "k" } " in 𝑙∞ (" { $snippet "L^∞" } ") vector space, usually written ∥･∥∞. For a mathematical vector, this is simply its " { $link supremum } "." }
+{ $contract "Computes the norm (size) of " { $snippet "k" } " in 𝑙∞ (" { $snippet "L^∞" } ") vector space, usually written ∥･∥∞. For a mathematical vector, this is simply its " { $link maximum } "." }
 { $examples
     { $example
         "USING: math.vectors prettyprint ;"

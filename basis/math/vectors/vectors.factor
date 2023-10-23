@@ -213,8 +213,11 @@ M: object v?
 : vceiling ( v -- w ) [ ceiling ] map ;
 : vtruncate ( v -- w ) [ truncate ] map ;
 
-: vsupremum ( seq -- vmax ) [ ] [ vmax ] map-reduce ; inline
-: vinfimum ( seq -- vmin ) [ ] [ vmin ] map-reduce ; inline
+: vmaximum ( seq -- vmax ) [ ] [ vmax ] map-reduce ; inline
+: vminimum ( seq -- vmin ) [ ] [ vmin ] map-reduce ; inline
+
+ALIAS: vsupremum vmaximum deprecated
+ALIAS: vinfimum vminimum deprecated
 
 GENERIC: vdot ( u v -- x )
 M: object vdot [ * ] [ + ] 2map-reduce ; inline
