@@ -905,21 +905,27 @@ ALIAS: infimum-by* minimum-by* deprecated
 : arg-min ( seq -- n )
     [ ] minimum-by* drop ;
 
-: ?supremum ( seq/f -- elt/f )
+: ?maximum ( seq/f -- elt/f )
     [ f ] [
         [ ] [ 2dup and [ max ] [ dupd ? ] if ] map-reduce
     ] if-empty ;
 
-: ?infimum ( seq/f -- elt/f )
+: ?minimum ( seq/f -- elt/f )
     [ f ] [
         [ ] [ 2dup and [ min ] [ dupd ? ] if ] map-reduce
     ] if-empty ;
 
-: map-infimum ( seq quot: ( ... elt -- ... elt' ) -- elt' )
+ALIAS: ?supremum ?maximum deprecated
+ALIAS: ?infimum ?minimum deprecated
+
+: map-minimum ( seq quot: ( ... elt -- ... elt' ) -- elt' )
     [ min ] map-reduce ; inline
 
-: map-supremum ( seq quot: ( ... elt -- ... elt' ) -- elt' )
+: map-maximum ( seq quot: ( ... elt -- ... elt' ) -- elt' )
     [ max ] map-reduce ; inline
+
+ALIAS: map-supremum map-maximum deprecated
+ALIAS: map-infimum map-minimum deprecated
 
 : change-last ( seq quot -- )
     [ index-of-last ] [ change-nth ] bi* ; inline
