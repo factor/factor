@@ -37,10 +37,10 @@ M: range sum
     [ drop 0 ]
     [ swap [ first-unsafe ] [ last-unsafe ] bi + * 2 / ] if-zero ;
 
-M: range infimum
+M: range minimum
     dup step>> 0 > [ first ] [ last ] if ;
 
-M: range supremum
+M: range maximum
     dup step>> 0 > [ last ] [ first ] if ;
 
 <PRIVATE
