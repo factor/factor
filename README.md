@@ -81,7 +81,7 @@ tour](https://docs.factorcode.org/content/article-tour.html) of Factor:
 "tour" help
 ```
 
-Some demos that are included in the distribution to show off various features:
+Some demo's that are included in the distribution to show off various features:
 
 ```factor
 "demos" run
