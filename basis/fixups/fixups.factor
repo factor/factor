@@ -66,7 +66,7 @@ CONSTANT: word-renames {
     { "random-integers" { "randoms" "0.99" } }
     { "count*" { "percent-of" "0.99" } }
     { "more?" { "deref?" "0.99" } }
-    { "plox" { "?transmute" "0.99" } }
+    { "plox" { "?call" "0.99" } }
     { "ensure-non-negative" { "assert-non-negative" "0.99" } }
     { "order" { "dispatch-order" "0.99" } }
     { "TEST:" { "DEFINE-TEST-WORD:" "0.99" } }
