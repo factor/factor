@@ -8,23 +8,23 @@ features](https://concatenative.org/wiki/view/Factor/Features/The%20language)
 including dynamic types, extensible syntax, macros, and garbage collection.
 On a practical side, Factor has a [full-featured
 library](https://docs.factorcode.org/content/article-vocab-index.html),
-supports many different platforms and has been extensively documented.
+supports many different platforms, and has been extensively documented.
 
 The implementation is [fully
 compiled](https://concatenative.org/wiki/view/Factor/Optimizing%20compiler)
-for performance while still supporting [interactive
+for performance, while still supporting [interactive
 development](https://concatenative.org/wiki/view/Factor/Interactive%20development).
-Factor applications are portable between all common platforms. Factor can
+Factor applications are portable between all common platforms.  Factor can
 [deploy stand-alone
 applications](https://concatenative.org/wiki/view/Factor/Deployment) on all
-platforms. Full source code for the Factor project is available under a BSD
+platforms.  Full source code for the Factor project is available under a BSD
 license.
 
 ## Getting Started
 
 ### Building Factor from source
 
-If you have a build environment, you can build Factor from git.
+If you have a build environment set up, then you can build Factor from git.
 These scripts will attempt to compile the Factor binary and bootstrap from
 a boot image stored on factorcode.org.
 
@@ -47,10 +47,10 @@ directory and run:
 * Unix: `make` and then `./factor -i=boot.unix-x86.64.image`
 * Windows: `nmake /f Nmakefile x86-64` and then `factor.com -i=boot.windows-x86.64.image`
 
-Now, you should have a complete Factor system ready to run.
+Now you should have a complete Factor system ready to run.
 
 Factor does not yet work on arm64 cpus. There is an arm64 assembler
-in `cpu.arm.64.assembler`, and we are working on a port and also looking for
+in `cpu.arm.64.assembler` and we are working on a port and also looking for
 contributors.
 
 More information on [building factor](https://concatenative.org/wiki/view/Factor/Building%20Factor)
@@ -114,7 +114,7 @@ online](https://docs.factorcode.org).
 
 ## Command Line Usage
 
-Factor supports several command line switches:
+Factor supports a number of command line switches:
 
 ```
 Usage: factor [Factor arguments] [script] [script arguments]
@@ -136,7 +136,7 @@ from within Factor for more information.
 ```
 
 You can also write scripts that can be run from the terminal, by putting
-``#!/path/to/factor`` at the top of your scripts and make them executable.
+``#!/path/to/factor`` at the top of your scripts and making them executable.
 
 ## Source Organization
 
@@ -151,7 +151,7 @@ The Factor source tree is organized as follows:
 
 ## Source History
 
-During Factor's lifetime, source code has lived in many repositories. Unfortunately, the first import in Git did not keep history. History has been partially recreated from what could be salvaged. Due to the nature of Git, it's only possible to add history without disturbing upstream work using replace objects. These need to be manually fetched or need to be explicitly added to your git remote configuration.
+During Factor's lifetime, source code has lived in many repositories. Unfortunately, the first import in Git did not keep history. History has been partially recreated from what could be salvaged. Due to the nature of Git, it's only possible to add history without disturbing upstream work, by using replace objects. These need to be manually fetched, or need to be explicitly added to your git remote configuration.
 
 Use:
 `git fetch origin 'refs/replace/*:refs/replace/*'`
@@ -166,11 +166,11 @@ or add the following line to your configuration file
     fetch = +refs/replace/*:refs/replace/*
 ```
 
-Then, subsequent fetches will automatically update any replaced objects.
+Then subsequent fetches will automatically update any replace objects.
 
 ## Community
 
-Factor developers are pretty active in [the Factor Discord server](https://discord.gg/QxJYZx3QDf).
+Factor developers are quite active in [the Factor Discord server](https://discord.gg/QxJYZx3QDf).
 Drop by if you want to discuss anything related to Factor or language design in general.
 
 * [Factor homepage](https://factorcode.org)
