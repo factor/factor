@@ -40,3 +40,9 @@ SYMBOL: selection
 : com-copy ( gadget -- ) clipboard get gadget-copy ;
 
 : com-copy-selection ( gadget -- ) selection get gadget-copy ;
+
+: >clipboard ( string -- )
+    clipboard get set-clipboard-contents ;
+
+: clipboard> ( -- string )
+    clipboard get clipboard-contents ;
