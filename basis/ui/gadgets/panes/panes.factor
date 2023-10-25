@@ -2,14 +2,15 @@
 ! See https://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs classes combinators destructors
 documents.private fonts io io.styles kernel math math.rectangles
-math.vectors models namespaces sequences sets sorting splitting
-strings ui.baseline-alignment ui.clipboards ui.gadgets
-ui.gadgets.borders ui.gadgets.grid-lines ui.gadgets.grids
-ui.gadgets.icons ui.gadgets.incremental ui.gadgets.labels
-ui.gadgets.menus ui.gadgets.packs ui.gadgets.paragraphs
-ui.gadgets.presentations ui.gadgets.private ui.gadgets.scrollers
-ui.gadgets.tracks ui.gestures ui.images ui.pens.solid ui.render
-ui.theme ui.traverse unicode ;
+math.vectors models models.range namespaces sequences sets
+sorting splitting strings ui.baseline-alignment ui.clipboards
+ui.gadgets ui.gadgets.borders ui.gadgets.grid-lines
+ui.gadgets.grids ui.gadgets.icons ui.gadgets.incremental
+ui.gadgets.labels ui.gadgets.menus ui.gadgets.packs
+ui.gadgets.paragraphs ui.gadgets.presentations
+ui.gadgets.private ui.gadgets.scrollers ui.gadgets.tracks
+ui.gestures ui.images ui.pens.solid ui.render ui.theme
+ui.traverse unicode ;
 FROM: io.styles => foreground background ;
 FROM: ui.gadgets.wrappers => <wrapper> ;
 IN: ui.gadgets.panes
@@ -123,17 +124,16 @@ GENERIC: pane-line ( str style gadget -- )
     pane-stream pane>> :> pane
     pane find-scroller :> scroller
     scroller [
-        model>> {
-            [ range-value second ]
-            [ range-page-value second + ]
-            [ range-max-value second >= ]
+        model>> dependencies>> second {
+            [ range-value ]
+            [ range-page-value + ]
+            [ range-max-value >= ]
         } cleave
     ] [ f ] if* :> bottom?
     pane quot call
     pane scrolls?>> bottom? and scroller and [
         scroller {
-            [ model>> range-value first ]
-            [ model>> range-max-value second 2array ]
+            [ model>> dependencies>> first2 [ range-value ] [ range-max-value ] bi* 2array ]
             [ set-scroll-position ]
         } cleave
     ] when ; inline

@@ -99,46 +99,6 @@ HELP: pop-model
 { $values { "model" model } { "value" object } }
 { $description { $link pop } "s the topmost " { $snippet "value" } " off of the " { $link growable } " sequence stored as the value of " { $snippet "model" } " and calls " { $link model-changed } " on all observers registered for the model with " { $link add-connection } "." } ;
 
-HELP: range-value
-{ $values { "model" model } { "value" object } }
-{ $contract "Outputs the current value of a range model." } ;
-
-HELP: range-page-value
-{ $values { "model" model } { "value" object } }
-{ $contract "Outputs the page size of a range model." } ;
-
-HELP: range-min-value
-{ $values { "model" model } { "value" object } }
-{ $contract "Outputs the minimum value of a range model." } ;
-
-HELP: range-max-value
-{ $values { "model" model } { "value" object } }
-{ $contract "Outputs the maximum value of a range model." } ;
-
-HELP: range-max-value*
-{ $values { "model" model } { "value" object } }
-{ $contract "Outputs the slider position for a range model. Since the bottom of the slider cannot exceed the maximum value, this is equal to the maximum value minus the page size." } ;
-
-HELP: set-range-value
-{ $values { "value" object } { "model" model } }
-{ $description "Sets the current value of a range model." }
-{ $side-effects "model" } ;
-
-HELP: set-range-page-value
-{ $values { "value" object } { "model" model } }
-{ $description "Sets the page size of a range model." }
-{ $side-effects "model" } ;
-
-HELP: set-range-min-value
-{ $values { "value" object } { "model" model } }
-{ $description "Sets the minimum value of a range model." }
-{ $side-effects "model" } ;
-
-HELP: set-range-max-value
-{ $values { "value" object } { "model" model } }
-{ $description "Sets the maximum value of a range model." }
-{ $side-effects "model" } ;
-
 ARTICLE: "models" "Models"
 "The " { $vocab-link "models" } " vocabulary provides basic support for dataflow programming. A model is an observable value. Changing a model's value notifies other objects which depend on the model automatically, and models may depend on each other's values."
 $nl
