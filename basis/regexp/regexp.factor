@@ -105,27 +105,23 @@ PRIVATE>
     [ <slice-unsafe> ] map-matches ;
 
 : all-matching-subseqs ( string regexp -- seq )
-    [ subseq ] map-matches ;
+    [ subseq-unsafe ] map-matches ;
 
 : count-matches ( string regexp -- n )
     [ 0 ] 2dip [ 3drop 1 + ] each-match ;
 
 <PRIVATE
 
-:: (re-split) ( string regexp quot: ( from to seq -- slice ) -- new-slices )
-    0 string regexp [| end start end' string |
-        end' ! leave it on the stack for the next iteration
-        end start string quot call
-    ] map-matches
-    ! Final chunk
-    swap string length string quot call suffix ; inline
+: (re-split) ( string regexp quot -- pieces )
+    [ 0 ] 3dip [
+        '[ swap _ dip swap ] collector [ each-match ] dip swap
+    ] 3keep nip [ [ length ] keep ] dip call suffix! >array ; inline
 
 PRIVATE>
 
-:: first-match ( string regexp -- slice/f )
-    string regexp prepare-match-iterator do-next-match [
-        regexp reverse-regexp? [ [ 1 + ] bi@ ] when
-        string <slice-unsafe>
+: first-match ( string regexp -- slice/f )
+    [ prepare-match-iterator do-next-match ] 2keep swap '[
+        _ reverse-regexp? [ [ 1 + ] bi@ ] when _ <slice-unsafe>
     ] [ 2drop f ] if ;
 
 : re-contains? ( string regexp -- ? )
@@ -135,7 +131,7 @@ PRIVATE>
     [ <slice-unsafe> ] (re-split) ;
 
 : re-replace ( string regexp replacement -- result )
-    [ [ subseq ] (re-split) ] dip join ;
+    [ [ subseq-unsafe ] (re-split) ] dip join ;
 
 :: re-replace-with ( string regexp quot: ( slice -- replacement ) -- result )
     [
