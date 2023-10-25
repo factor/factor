@@ -49,8 +49,44 @@ ARTICLE: "models.range" "Range models"
 "Range models conform to a protocol for getting and setting the current value, as well as the endpoints of the range."
 { $subsections "range-model-protocol" } ;
 
+HELP: range-value
+{ $values { "range" range } { "value" object } }
+{ $contract "Outputs the current value of a range model." } ;
+
+HELP: range-page-value
+{ $values { "range" range } { "value" object } }
+{ $contract "Outputs the page size of a range model." } ;
+
+HELP: range-min-value
+{ $values { "range" range } { "value" object } }
+{ $contract "Outputs the minimum value of a range model." } ;
+
+HELP: range-max-value
+{ $values { "range" range } { "value" object } }
+{ $contract "Outputs the maximum value of a range model." } ;
+
+HELP: range-max-value*
+{ $values { "range" range } { "value" object } }
+{ $contract "Outputs the slider position for a range model. Since the bottom of the slider cannot exceed the maximum value, this is equal to the maximum value minus the page size." } ;
+
+HELP: set-range-value
+{ $values { "value" object } { "range" range } }
+{ $description "Sets the current value of a range model." } ;
+
+HELP: set-range-page-value
+{ $values { "value" object } { "range" range } }
+{ $description "Sets the page size of a range model." } ;
+
+HELP: set-range-min-value
+{ $values { "value" object } { "range" range } }
+{ $description "Sets the minimum value of a range model." } ;
+
+HELP: set-range-max-value
+{ $values { "value" object } { "range" range } }
+{ $description "Sets the maximum value of a range model." } ;
+
 ARTICLE: "range-model-protocol" "Range model protocol"
-"The range model protocol is implemented by the " { $link range } " and " { $link product } " classes. User-defined models may implement it too."
+"The " { $link range } " class supports a range model protocol."
 { $subsections
     range-value
     range-page-value

@@ -20,26 +20,31 @@ TUPLE: range < product ;
 : step-value ( value range -- value' )
     range-step value>> floor-to ;
 
-M: range range-value
+DEFER: clamp-value
+
+: range-value ( range -- value )
     [ range-model value>> ] [ clamp-value ] [ step-value ] tri ;
 
-M: range range-page-value range-page value>> ;
+: range-page-value ( range -- value ) range-page value>> ;
 
-M: range range-min-value range-min value>> ;
+: range-min-value ( range -- value ) range-min value>> ;
 
-M: range range-max-value range-max value>> ;
+: range-max-value ( range -- value ) range-max value>> ;
 
-M: range range-max-value*
+: range-max-value* ( range -- value )
     [ range-max-value ] [ range-page-value ] bi [-] ;
 
-M: range set-range-value
+: clamp-value ( value range -- newvalue )
+    [ range-min-value ] [ range-max-value* ] bi clamp ;
+
+: set-range-value ( value range -- )
     [ clamp-value ] [ range-model ] bi set-model ;
 
-M: range set-range-page-value range-page set-model ;
+: set-range-page-value ( value range -- ) range-page set-model ;
 
-M: range set-range-min-value range-min set-model ;
+: set-range-min-value ( value range -- ) range-min set-model ;
 
-M: range set-range-max-value range-max set-model ;
+: set-range-max-value ( value range -- ) range-max set-model ;
 
 : move-by ( amount range -- )
     [ range-value + ] keep set-range-value ;
