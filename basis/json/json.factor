@@ -4,7 +4,7 @@ USING: accessors ascii assocs combinators formatting hashtables
 io io.encodings.utf16.private io.encodings.utf8 io.files
 io.streams.string kernel kernel.private linked-assocs make math
 math.order math.parser mirrors namespaces sbufs sequences
-sequences.private strings summary tr words ;
+sequences.private strings summary tr words vocabs.loader ;
 
 IN: json
 
@@ -355,3 +355,5 @@ M: string jsonlines>
 
 : rewrite-jsons-path ( path quot: ( jsons -- jsons' ) -- )
     [ [ path>jsons ] dip call ] keepd jsons>path ; inline
+
+{ "json" "ui.tools" } "json.ui" require-when
