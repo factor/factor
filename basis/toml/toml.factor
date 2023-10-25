@@ -211,15 +211,13 @@ DEFER: value-parser
 
 : array-value-parser ( -- parser )
     ws-comment-newline hide
-    value-parser
+    value-parser optional
     ws-comment-newline hide 3seq [ first ] action ;
 
 : array-parser ( -- parser )
     [
         "[" token hide ,
-        array-value-parser separator list-of optional ,
-        separator optional hide ,
-        ws-comment-newline hide ,
+        array-value-parser separator list-of [ sift ] action ,
         "]" token hide ,
     ] seq* [ first { } like ] action ;
 

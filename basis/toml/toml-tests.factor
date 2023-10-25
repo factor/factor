@@ -512,6 +512,8 @@ animal = { type.name = "pug" }]=] toml>
 { H{ { "a" { } } } } [ "a=[]" toml> ] unit-test
 { H{ { "a" { 1 } } } } [ "a=[1]" toml> ] unit-test
 { H{ { "a" { 1 2 3 } } } } [ "a=[1,2,3]" toml> ] unit-test
+{ H{ { "a" { 1 2 3 } } } } [ "a=[,1,,,,2,,3,,]" toml> ] unit-test
+{ H{ { "a" { 1 2 3 } } } } [ "a=[ # this\n,1,, # is\n,,2, #a\n,3,, # comment \n]" toml> ] unit-test
 
 ! unreleased
 
