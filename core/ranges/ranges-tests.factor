@@ -96,4 +96,7 @@ USING: arrays kernel math ranges sequences sets tools.test ;
 
 { t } [ 3 10 4 <range> 1 10 2 <range> subset? ] unit-test
 { t } [ 1 0 1 <range> 10 2 1 <range> subset? ] unit-test
-{ f } [ 1 10 2 <range> 3 10 4 <range> subset? ] unit-test 
+{ f } [ 1 10 2 <range> 3 10 4 <range> subset? ] unit-test
+
+{ { 1.5 2.5 3.5 } } [ 1.5 3.7 [a..b) >array ] unit-test
+{ { 1+1/2 2+1/2 3+1/2 } } [ 3/2 37/10 [a..b) >array ] unit-test

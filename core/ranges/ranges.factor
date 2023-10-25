@@ -49,7 +49,8 @@ M: range maximum
 
 : (a.. ( a b step -- a' b' step ) dup [ + ] curry 2dip ; inline
 
-: ..b) ( a b step -- a' b' step ) dup [ - ] curry dip ; inline
+: ..b) ( a b step -- a' b' step )
+    2over - over mod zero? [ dup [ - ] curry dip ] when ; inline
 
 PRIVATE>
 
