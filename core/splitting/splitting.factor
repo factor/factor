@@ -120,7 +120,7 @@ M:: string split-lines ( seq -- seq' )
     seq length :> len
     V{ } clone 0 [ dup len < ] [
         dup seq [ linebreak? ] find-from [
-            len or [ seq subseq suffix! ] [ 1 + ] bi
+            len or [ seq subseq-unsafe suffix! ] [ 1 + ] bi
         ] [
             CHAR: \r eq? [
                dup seq ?nth CHAR: \n eq? [ 1 + ] when
