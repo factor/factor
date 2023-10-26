@@ -55,6 +55,12 @@ IN: memoize
 : make-memoizer ( table quot effect -- quot )
     dup in>> length zero? [ make/0 ] [ make/n ] if ;
 
+: memo-cache ( effect -- cache )
+    in>> length zero? [ f f 2array ] [ H{ } clone ] if ;
+
+: identity-memo-cache ( effect -- cache )
+    in>> length zero? [ f f 2array ] [ IH{ } clone ] if ;
+
 PRIVATE>
 
 : (define-memoized) ( word quot effect hashtable -- )
@@ -64,12 +70,10 @@ PRIVATE>
     3tri ;
 
 : define-memoized ( word quot effect -- )
-    dup in>> length zero? [ f f 2array ] [ H{ } clone ] if
-    (define-memoized) ;
+    dup memo-cache (define-memoized) ;
 
 : define-identity-memoized ( word quot effect -- )
-    dup in>> length zero? [ f f 2array ] [ IH{ } clone ] if
-    (define-memoized) ;
+    dup identity-memo-cache (define-memoized) ;
 
 PREDICATE: memoized < word "memoize" word-prop >boolean ;
 
@@ -85,8 +89,10 @@ M: memoized reset-word
     bi ;
 
 : memoize-quot ( quot effect -- memo-quot )
-    dup in>> length zero? [ f f 2array ] [ H{ } clone ] if
-    -rot make-memoizer ;
+    dup memo-cache -rot make-memoizer ;
+
+: identity-memoize-quot ( quot effect -- memo-quot )
+    dup identity-memo-cache -rot make-memoizer ;
 
 : reset-memoized ( word -- )
     "memoize" word-prop dup sequence?
