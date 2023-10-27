@@ -8,7 +8,7 @@ features](https://concatenative.org/wiki/view/Factor/Features/The%20language)
 including dynamic types, extensible syntax, macros, and garbage collection.
 On a practical side, Factor has a [full-featured
 library](https://docs.factorcode.org/content/article-vocab-index.html),
-supports many different platforms, and has been extensively documented.
+which supports many different platforms, and has been extensively documented.
 
 The implementation is [fully
 compiled](https://concatenative.org/wiki/view/Factor/Optimizing%20compiler)
