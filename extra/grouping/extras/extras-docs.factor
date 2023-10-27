@@ -18,16 +18,14 @@ HELP: <n-groups>
     { "seq" sequence } { "n" integer }
     { "groups" object }
 }
-{ $description "Divides a sequence into " { $snippet "n" } " groups of equal size." 
-" Groups are represented by virtual sequences." } ;
+{ $description "Separates a sequence into " { $snippet "n" } " groups of roughly equal size, any remainder is distributed to the first groups. Groups are represented by slices." } ;
 
 HELP: <prefixes>
 { $values
     { "seq" sequence }
     { "prefixes" object }
 }
-{ $description "All slices of a sequence that start at index 0, ordered by length in ascending order."
-    "The empty sequence is not included." } ;
+{ $description "All slices of a sequence that start at index 0, ordered by length in ascending order. The empty sequence is not included." } ;
 
 
 HELP: <suffixes>
@@ -35,65 +33,68 @@ HELP: <suffixes>
     { "seq" sequence }
     { "suffixes" object }
 }
-{ $description "All slices of a sequence that end at its last element, ordered by length in "
-    "descending order. The empty sequence is not included." } ;
+{ $description "All slices of a sequence that end at its last element, ordered by length in descending order. The empty sequence is not included." } ;
 
 HELP: clump-as
 { $values
     { "seq" sequence } { "n" integer } { "exemplar" object }
     { "array" array }
 }
-{ $description "A version of " { $link clump } " that returns a sequence of the same class as "
-    { $snippet "exemplar" } "." } ;
+{ $description "A version of " { $link clump } " that returns a sequence of the same class as " { $snippet "exemplar" } "." } ;
 
 HELP: clump-map
 { $values
     { "seq" sequence } { "quot" quotation } { "n" integer }
     { "result" object }
 }
-{ $description "Map each clump of " { $snippet "seq" } " of size " { $snippet "n" }
-    " using " { $snippet "quot" } "." } ;
+{ $description "Map each clump of " { $snippet "seq" } " of size " { $snippet "n" } " using " { $snippet "quot" } "." } ;
 
 HELP: clump-map-as
 { $values
     { "seq" sequence } { "quot" quotation } { "exemplar" object } { "n" integer }
     { "result" object }
 }
-{ $description "A version of " { $link clump-map } " that returns a sequence of the same "
-    "class as " { $snippet "exemplar" } "." } ;
+{ $description "A version of " { $link clump-map } " that returns a sequence of the same class as " { $snippet "exemplar" } "." } ;
 
 HELP: group-as
 { $values
     { "seq" sequence } { "n" integer } { "exemplar" object }
     { "array" array }
 }
-{ $description "A version of " { $link group } " that returns a sequence of the same class as "
-    { $snippet "exemplar" } "." } ;
-    
+{ $description "A version of " { $link group } " that returns a sequence of the same class as " { $snippet "exemplar" } "." } ;
 
 HELP: group-map
 { $values
     { "seq" sequence } { "quot" quotation } { "n" integer }
     { "result" object }
 }
-{ $description "Map each group of " { $snippet "seq" } " of size " { $snippet "n" }
-    " using " { $snippet "quot" } "." } ;
+{ $description "Map each group of " { $snippet "seq" } " of size " { $snippet "n" } " using " { $snippet "quot" } "." } ;
 
 HELP: group-map-as
 { $values
     { "seq" sequence } { "quot" quotation } { "exemplar" object } { "n" integer }
     { "result" object }
 }
-{ $description "A version of " { $link group-map } " that returns a sequence of the same "
-    "class as " { $snippet "exemplar" } "." } ;
+{ $description "A version of " { $link group-map } " that returns a sequence of the same class as " { $snippet "exemplar" } "." } ;
 
 HELP: n-group
 { $values
     { "seq" sequence } { "n" integer }
     { "groups" object }
 }
-{ $description "A strict version of " { $link <n-groups> } " that returns a list of sequences "
-    "instead of slices." } ;
+{ $description "A strict version of " { $link <n-groups> } " that returns a list of sequences instead of slices." }
+{ $examples
+  { $example
+    "USING: grouping.extras prettyprint ;"
+    "\"abcdefgh\" 4 n-group ."
+    "{ \"ab\" \"cd\" \"ef\" \"gh\" }"
+  }
+  { $example
+    "USING: grouping.extras prettyprint ;"
+    "\"abcdefgh\" 3 n-group ."
+    "{ \"abc\" \"def\" \"gh\" }"
+  }
+} ;
 
 HELP: pad-groups
 { $values
@@ -112,7 +113,7 @@ HELP: short-groups
     ", return the sequence as is. Otherwise, trim it at the end to fit that requirement."
     $nl
     "Returns a virtual sequence." } ;
-    
+
 HELP: all-prefixes
 { $values
     { "seq" sequence }
@@ -129,8 +130,7 @@ HELP: all-suffixes
     { "seq" sequence }
     { "array" array }
 }
-{ $description "A strict version of " { $link <suffixes> } " that returns a list of sequences"
-    " instead of slices." } ;
+{ $description "A strict version of " { $link <suffixes> } " that returns a list of sequences instead of slices." } ;
 
 HELP: suffixes
 { $class-description "Class that represents the suffixes of a sequence." } ;
