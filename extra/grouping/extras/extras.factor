@@ -61,14 +61,13 @@ PRIVATE>
     '[ dup _ call( x -- y ) (group-by) ] V{ } clone swap reduce ;
 
 :: <n-groups> ( seq n -- groups )
-    seq length :> len
-    len n /mod :> ( step rem! )
-    0 n [
+    seq length dup n assert-positive /mod :> ( len step j )
+    0 n [| i |
         dup len < [
-            dup step + rem zero? [ 1 + rem 1 - rem! ] unless
+            dup step + i j < [ 1 + ] when
             [ seq <slice> ] keep swap
         ] [ f ] if
-    ] replicate nip ;
+    ] map-integers nip ;
 
 : n-group ( seq n -- groups )
     [ <n-groups> ] map-like ;
