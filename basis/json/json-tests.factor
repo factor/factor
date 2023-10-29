@@ -11,7 +11,7 @@ IN: json.tests
 { t } [ "true" json> ] unit-test
 { json-null } [ "null" json> ] unit-test
 { 0 } [ "0" json> ] unit-test
-{ 0 } [ "-0" json> ] unit-test
+{ -0.0 } [ "-0" json> ] unit-test
 { 102 } [ "102" json> ] unit-test
 { -102 } [ "-102" json> ] unit-test
 { 102 } [ "+102" json> ] unit-test
@@ -33,7 +33,6 @@ IN: json.tests
 ! not widely supported by javascript, but allowed in the grammar, and a nice
 ! feature to get
 { -0.0 } [ "-0.0" json> ] unit-test
-{ -0.0 } [ "-0" json> ] unit-test
 
 { " fuzzy  pickles " } [ "  \" fuzzy  pickles \" "  json> ] unit-test
 { "while 1:\n\tpass" } [ "  \"while 1:\n\tpass\" "  json> ] unit-test
