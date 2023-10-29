@@ -172,10 +172,10 @@ check_library_exists() {
     else
         $ECHO "found."
     fi
-    $DELETE -f $GCC_TEST
-    check_ret $DELETE
-    $DELETE -f $GCC_OUT
-    check_ret $DELETE
+    rm -f $GCC_TEST
+    check_ret rm
+    rm -f $GCC_OUT
+    check_ret rm
 }
 
 check_X11_libraries() {
@@ -299,7 +299,7 @@ find_word_size_c() {
             echo "Word size should be 32/64, got '$WORD_OUT'"
             exit_script 15 ;;
     esac
-    $DELETE -f $C_WORD
+    rm -f $C_WORD
     echo "$WORD_OUT"
 }
 
@@ -346,8 +346,6 @@ echo_build_info() {
     $ECHO "CC=$CC"
     $ECHO "CXX=$CXX"
     $ECHO "MAKE=$MAKE"
-    $ECHO "COPY=$COPY"
-    $ECHO "DELETE=$DELETE"
 }
 
 check_os_arch_word() {
@@ -426,21 +424,22 @@ update_script_name() {
 }
 
 update_script() {
-    set_current_branch
-    local -r update_script=$(update_script_name)
-    local -r bash_path=$(which bash)
-    $ECHO "#!$bash_path" >"$update_script"
-    $ECHO "set -ex" >>"$update_script"
-    $ECHO "git pull ${GIT_URL} ${CURRENT_BRANCH}" >>"$update_script"
-    $ECHO "exit 0" >>"$update_script"
-
-    chmod 755 "$update_script"
-    $ECHO "running the build.sh updater script: $update_script"
-    exec "$update_script"
+  set_current_branch
+  local -r update_script=$(update_script_name)
+  local -r shell_path=$(echo "$SHELL")
+  {
+    echo "#!$shell_path"
+    echo "set -ex"
+    echo "git pull ${GIT_URL} ${CURRENT_BRANCH}"
+    echo "exit 0"
+  } > "$update_script"
+  chmod 755 "$update_script"
+  $ECHO "Running the build.sh updater script: $update_script"
+  exec "$update_script"
 }
 
 update_script_changed() {
-    invoke_git diff --stat "$(invoke_git merge-base HEAD FETCH_HEAD)" FETCH_HEAD | grep 'build\.sh' >/dev/null
+    invoke_git diff --stat "$(invoke_git merge-base HEAD FETCH_HEAD)" FETCH_HEAD | grep "build.sh" >/dev/null
 }
 
 git_fetch() {
@@ -465,26 +464,12 @@ cd_factor() {
     check_ret cd
 }
 
-set_copy() {
-    case $OS in
-        windows) COPY="cp" ;;
-        *) COPY="cp" ;;
-    esac
-}
-
-set_delete() {
-    case $OS in
-        windows) DELETE="rm" ;;
-        *) DELETE="rm" ;;
-    esac
-}
-
 backup_factor() {
     $ECHO "Backing up factor..."
-    $COPY $FACTOR_BINARY $FACTOR_BINARY.bak
-    $COPY $FACTOR_LIBRARY $FACTOR_LIBRARY.bak
-    $COPY "$BOOT_IMAGE" "$BOOT_IMAGE.bak"
-    $COPY $FACTOR_IMAGE $FACTOR_IMAGE.bak
+    cp "$FACTOR_BINARY" "$FACTOR_BINARY.bak"
+    cp "$FACTOR_LIBRARY" "$FACTOR_LIBRARY.bak"
+    cp "$BOOT_IMAGE" "$BOOT_IMAGE.bak"
+    cp "$FACTOR_IMAGE" "$FACTOR_IMAGE.bak"
     $ECHO "Done with backup."
 }
 
@@ -570,17 +555,16 @@ set_current_branch() {
         CURRENT_BRANCH="${CI_BRANCH}"
     else
         CURRENT_BRANCH_FULL=$(current_git_branch)
-        CURRENT_BRANCH=$($ECHO $CURRENT_BRANCH_FULL | sed 's=heads/==;s=remotes/==')
+        CURRENT_BRANCH=$($ECHO "$CURRENT_BRANCH_FULL" | sed 's=heads/==;s=remotes/==')
     fi
 }
 
 update_boot_image() {
     set_boot_image_vars
     $ECHO "Deleting old images..."
-    $DELETE checksums.txt* > /dev/null 2>&1
-    # delete boot images with one or two characters after the dot
-    $DELETE "$BOOT_IMAGE".{?,??} > /dev/null 2>&1
-    $DELETE temp/staging.*.image > /dev/null 2>&1
+    rm -f "checksums.txt*" > /dev/null 2>&1
+    rm -f "$BOOT_IMAGE.{?,??}" > /dev/null 2>&1
+    rm -f "temp/staging.*.image" > /dev/null 2>&1
     if [[ -f $BOOT_IMAGE ]] ; then
         get_url "$CHECKSUM_URL"
         local factorcode_md5
@@ -593,7 +577,7 @@ update_boot_image() {
         if [[ "$factorcode_md5" == "$disk_md5" ]] ; then
             $ECHO "Your disk boot image matches the one on downloads.factorcode.org."
         else
-            $DELETE "$BOOT_IMAGE" > /dev/null 2>&1
+            rm -f "$BOOT_IMAGE" > /dev/null 2>&1
             get_boot_image
         fi
     else
@@ -623,7 +607,7 @@ get_config_info() {
 
 copy_fresh_image() {
     $ECHO "Copying $FACTOR_IMAGE to $FACTOR_IMAGE_FRESH..."
-    $COPY $FACTOR_IMAGE $FACTOR_IMAGE_FRESH
+    cp "$FACTOR_IMAGE" "$FACTOR_IMAGE_FRESH"
 }
 
 check_launch_factor() {
@@ -781,10 +765,6 @@ if [ "$#" -gt 3 ]; then
     $ECHO "error: too many arguments"
     exit 1
 fi
-
-
-set_copy
-set_delete
 
 case "$1" in
     install) install ;;
