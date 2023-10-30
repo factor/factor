@@ -1,5 +1,5 @@
 USING: assocs byte-arrays destructors help.markup help.syntax http
-http.client.post-data.private http.client.private
+http.client.post-data http.client.private
 io.encodings.binary io.encodings.latin1 io.pathnames kernel
 sequences strings urls urls.encoding ;
 IN: http.client
