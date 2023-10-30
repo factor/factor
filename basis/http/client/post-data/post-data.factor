@@ -45,25 +45,6 @@ M: object (write-post-data)
     [ [ write-chunk ] each-block ] with-input-stream
     "0;\r\n" ascii encode write ;
 
-GENERIC: >post-data ( object -- post-data )
-
-M: f >post-data ;
-
-M: post-data >post-data ;
-
-M: string >post-data
-    utf8 encode
-    "application/octet-stream" <post-data>
-        swap >>data ;
-
-M: assoc >post-data
-    "application/x-www-form-urlencoded" <post-data>
-        swap >>params ;
-
-M: object >post-data
-    "application/octet-stream" <post-data>
-        swap >>data ;
-
 : pathname>measured-stream ( pathname -- stream )
     string>>
     [ binary <file-reader> &dispose ]
@@ -82,6 +63,26 @@ M: object >post-data
     ] when* ;
 
 PRIVATE>
+
+
+GENERIC: >post-data ( object -- post-data )
+
+M: f >post-data ;
+
+M: post-data >post-data ;
+
+M: string >post-data
+    utf8 encode
+    "application/octet-stream" <post-data>
+        swap >>data ;
+
+M: assoc >post-data
+    "application/x-www-form-urlencoded" <post-data>
+        swap >>params ;
+
+M: object >post-data
+    "application/octet-stream" <post-data>
+        swap >>data ;
 
 : unparse-post-data ( request -- request )
     [ >post-data ] change-post-data
