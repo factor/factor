@@ -96,6 +96,16 @@ SYMBOL: b2-authorized-account
     "/b2api/v2/b2_create_bucket" b2-post-request-with-account-id ;
 : b2-create-bucket ( assoc -- json' ) [ b2-create-bucket* ] with-b2 ;
 
+: vaka ( value assoc key -- assoc ) swapd swap set-of ; inline
+: kava ( key assoc value -- assoc ) swapd set-of ; inline
+
+: b2-create-bucket-by-name-type ( bucket-name bucket-type -- json' )
+    "bucketType" associate
+    "bucketName" vaka b2-create-bucket ;
+
+: b2-create-private-bucket-by-name ( bucket-name -- json' )
+    "allPrivate" b2-create-bucket-by-name-type ;
+
 : b2-list-buckets* ( -- json )
     "/b2api/v2/b2_list_buckets" b2-get-request-with-account-id ;
 : b2-list-buckets ( -- json ) [ b2-list-buckets* ] with-b2 ;
