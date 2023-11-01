@@ -29,11 +29,6 @@ M: bit-set delete
 ! of the same length.
 <PRIVATE
 
-ERROR: check-bit-set-failed ;
-
-: check-bit-set ( bit-set -- bit-set )
-    dup bit-set? [ check-bit-set-failed ] unless ; inline
-
 : bit-set-map ( seq1 seq2 quot -- seq )
     [ drop 2length [ assert= ] keep ]
     [ [ [ underlying>> ] bi@ ] dip 2map ] 3bi
@@ -62,21 +57,14 @@ M: bit-set subset?
 M: bit-set members
     table>> [ length <iota> ] keep '[ _ nth-unsafe ] filter ;
 
-<PRIVATE
-
-: bit-set-like ( set bit-set -- bit-set' )
+M: bit-set set-like
     ! Throws an error if there are keys that can't be put
     ! in the bit set
     over bit-set? [ 2dup [ table>> length ] same? ] [ f ] if
     [ drop ] [
         [ members ] dip table>> length <bit-set>
         [ adjoin-all ] keep
-    ] if ;
-
-PRIVATE>
-
-M: bit-set set-like
-    bit-set-like check-bit-set ; inline
+    ] if ; inline
 
 M: bit-set clone
     table>> clone bit-set boa ;
