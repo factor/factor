@@ -201,7 +201,7 @@ M: light-theme highlighted-word-color COLOR: DarkSlateGray ;
 M: light-theme string-color COLOR: LightSalmon4 ;
 M: light-theme stack-effect-color COLOR: FactorDarkSlateBlue ;
 
-M: light-theme field-border-color COLOR: gray ;
+M: light-theme field-border-color COLOR: grey75 ;
 
 M: light-theme editor-caret-color COLOR: red ;
 M: light-theme selection-color T{ rgba f 0.8 0.8 1.0 1.0 } ;
