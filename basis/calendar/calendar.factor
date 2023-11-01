@@ -738,7 +738,7 @@ ALIAS: last-day-of-week saturday
 : december? ( timestamp -- ? ) month>> 12 = ;
 
 : weekend? ( timestamp -- ? ) day-of-week { 0 6 } member? ;
-: weekday? ( timestamp -- ? ) day-of-week weekend? not ;
+: weekday? ( timestamp -- ? ) weekend? not ;
 
 : same-or-next-business-day ( timestamp -- timestamp' )
     dup day-of-week {
