@@ -287,6 +287,12 @@ IN: calendar
 { 151 } [ 2014 1 10 <date>  2014 8 9 <date>  weekdays-between ] unit-test
 { 151 } [ 2014 1 10 <date>  2014 8 10 <date>  weekdays-between ] unit-test
 
+{ t } [ 2014 1 10 <date> weekday? ] unit-test
+{ f } [ 2014 1 10 <date> weekend? ] unit-test
+
+{ t } [ 2014 1 11 <date> weekend? ] unit-test
+{ f } [ 2014 1 11 <date> weekday? ] unit-test
+
 
 { t } [
     2014 1 1 <date-gmt>
