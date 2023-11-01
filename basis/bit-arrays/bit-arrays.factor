@@ -78,7 +78,14 @@ M: bit-array like drop dup bit-array? [ >bit-array ] unless ; inline
 M: bit-array new-sequence drop <bit-array> ; inline
 
 M: bit-array equal?
-    over bit-array? [ [ underlying>> ] bi@ sequence= ] [ 2drop f ] if ;
+    over bit-array? [
+        2dup 2length dupd = [
+            [ [ underlying>> ] bi@ ] dip 8 mod [ sequence= ] [
+                [ [ unclip-slice ] bi@ swapd ] dip
+                '[ _ bits ] bi@ = [ sequence= ] [ 2drop f ] if
+            ] if-zero
+        ] [ 3drop f ] if
+    ] [ 2drop f ] if ;
 
 M: bit-array resize
     dupd [ bits>bytes ] [ underlying>> ] bi*
