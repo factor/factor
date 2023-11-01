@@ -27,7 +27,7 @@ IN: sets.tests
 { { 1 2 3 } } [ HS{ 1 2 3 } { } set-like sort ] unit-test
 { { 1 2 3 } } [ { 1 2 2 3 3 } { } set-like ] unit-test
 { { 3 2 1 } } [ { 3 3 2 2 1 } { } set-like ] unit-test
-{ t } [ 4 <bit-set> 1 <bit-set> set-like 4 <bit-set> = ] unit-test
+{ t } [ 4 <bit-set> 1 <bit-set> set-like 1 <bit-set> = ] unit-test
 { t } [ { 1 2 3 } HS{ } set-like HS{ 1 2 3 } = ] unit-test
 
 { HS{ 1 2 3 } } [ { 1 2 3 } fast-set ] unit-test
