@@ -62,10 +62,12 @@ enum relocation_class {
   RC_ABSOLUTE_1,
   // absolute address in a PowerPC LIS/ORI/SLDI/ORIS/ORI sequence
   RC_ABSOLUTE_PPC_2_2_2_2,
-  // relative address in an ARM64 B/BL instruction
+  // Relative address stored, divided by four, in bits 25:0 of an ARM64 instruction
   RC_RELATIVE_ARM64_BRANCH,
-  // relative address in an ARM64 B.cond instruction
+  // Relative address stored, divided by four, in bits 23:5 of an ARM64 instruction
   RC_RELATIVE_ARM64_BCOND,
+  // Absolute address stored in bits 20:5 of an ARM64 instruction
+  RC_ABSOLUTE_ARM64_MOVZ,
 };
 
 static const cell rel_absolute_ppc_2_mask = 0x0000ffff;
@@ -75,6 +77,7 @@ static const cell rel_indirect_arm_mask = 0x00000fff;
 static const cell rel_relative_arm_3_mask = 0x00ffffff;
 static const cell rel_relative_arm64_branch_mask = 0x03ffffff;
 static const cell rel_relative_arm64_bcond_mask = 0x00ffffe0;
+static const cell rel_absolute_arm64_movz_mask = 0x001fffe0;
 
 // code relocation table consists of a table of entries for each fixup
 struct relocation_entry {
