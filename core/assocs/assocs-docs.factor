@@ -598,11 +598,15 @@ HELP: zip-as
     { "keys" sequence } { "values" sequence } { "exemplar" sequence }
     { "assoc" "a sequence of key/value pairs of type " { $snippet "exemplar" } } }
 { $description "Combines two sequences pairwise into a single sequence of key/value pairs of type " { $snippet "exemplar" } "." }
-{ $notes "Exemplar must be a sequence type; hashtables will not work yet." }
 { $examples
     { $example "USING: prettyprint assocs ;"
                "{ 1 2 3 } { 4 5 6 } V{ } zip-as ."
                "V{ { 1 4 } { 2 5 } { 3 6 } }"
+    }
+    $nl
+    { $example "USING: prettyprint assocs ;"
+               "{ 1 2 3 } { 4 5 6 } H{ } zip-as ."
+               "H{ { 1 4 } { 2 5 } { 3 6 } }"
     }
 } ;
 
