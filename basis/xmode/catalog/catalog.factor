@@ -26,7 +26,7 @@ TAG: MODE parse-mode-tag
     ] keep ;
 
 MEMO: modes ( -- modes )
-    "vocab:xmode/modes/catalog"
+    "vocab:xmode/catalog/modes/catalog"
     file>xml parse-modes-tag ;
 
 MEMO: mode-names ( -- modes )
@@ -38,7 +38,7 @@ MEMO: mode-names ( -- modes )
 MEMO: (load-mode) ( name -- rule-sets )
     modes at [
         file>>
-        "vocab:xmode/modes/" prepend parse-mode
+        "vocab:xmode/catalog/modes/" prepend parse-mode
     ] [
         "text" (load-mode)
     ] if* ;
