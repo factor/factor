@@ -4,7 +4,7 @@ USING: io.directories kernel sequences xml ;
 IN: benchmark.xml
 
 : xml-benchmark ( -- )
-    "vocab:xmode/modes/" [
+    "vocab:xmode/catalog/modes/" [
         [ file>xml drop ] each
     ] with-directory-files ;
 
