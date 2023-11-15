@@ -79,26 +79,33 @@ segment::segment(cell size_, bool executable_p) {
 
   int pagesize = getpagesize();
 
+#if defined(__APPLE__) && defined(FACTOR_ARM64)
+  int prot = PROT_READ | PROT_WRITE;
+  int flags = MAP_ANON | MAP_PRIVATE | MAP_JIT;
+#else
   int prot;
   if (executable_p)
     prot = PROT_READ | PROT_WRITE | PROT_EXEC;
   else
     prot = PROT_READ | PROT_WRITE;
+  int flags = MAP_ANON | MAP_PRIVATE;
+#endif
 
   cell alloc_size = 2 * pagesize + size;
-#if defined(__APPLE__) && defined(FACTOR_ARM64)  // FIXME: could be in header file
-  char* array = (char*)mmap(NULL, alloc_size, prot,
-                            MAP_ANON | MAP_PRIVATE | MAP_JIT, -1, 0);
-#else
-  char* array = (char*)mmap(NULL, alloc_size, prot,
-                            MAP_ANON | MAP_PRIVATE, -1, 0);
-#endif
+  char* array = (char*)mmap(NULL, alloc_size, prot, flags, -1, 0);
 
   if (array == (char*)-1)
     fatal_error("Out of memory in mmap", alloc_size);
 
   start = (cell)(array + pagesize);
   end = start + size;
+
+#if defined(__APPLE__) && defined(FACTOR_ARM64)
+  if (executable_p) {
+    if (mprotect((char*)start, size, prot | PROT_EXEC) == -1)
+      fatal_error("mprotect executable page failed", 0);
+  }
+#endif
 
   set_border_locked(true);
 }
