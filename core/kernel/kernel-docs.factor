@@ -999,7 +999,9 @@ HELP: while
 
 HELP: while*
 { $values { "pred" { $quotation ( ..a -- ..b ? ) } } { "body" { $quotation ( ..b ? -- ..a ) } } }
-{ $description "Calls " { $snippet "body" } " until " { $snippet "pred" } " returns " { $link f } "." } ;
+{ $description "Calls " { $snippet "body" } " until " { $snippet "pred" }
+  " returns " { $link f } ". The return value of " { $snippet "pred" } " is "
+  "kept on the stack." } ;
 
 HELP: until
 { $values { "pred" { $quotation ( ..a -- ..b ? ) } } { "body" { $quotation ( ..b -- ..a ) } } }
