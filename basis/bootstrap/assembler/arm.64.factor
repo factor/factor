@@ -336,7 +336,7 @@ big-endian off
 
 ! C to Factor entry point
 [
-    0xabcd BRK
+    ! 0xabcd BRK
     ! ! Optimizing compiler's side of callback accesses
     ! ! arguments that are on the stack via the frame pointer.
     ! ! On x86-32 fastcall, and x86-64, some arguments are passed
@@ -599,11 +599,12 @@ big-endian off
 ! Load a value from a stack position
 [
     ! temp1 ds-reg 0x7f [+] MOV f rc-absolute-1 rel-untagged
-    4 words temp2 ADR
-    3 temp2 temp2 LDRBuoff
+    ! get the absolute relocation into temp2
+    0 0 temp2 MOVZ f rc-absolute-arm64-movz rel-untagged
+    ! clear the upper bytes of temp2, keep the least significant byte
+    temp2 temp2 UXTB
+    ! load the stuff at the address (ds-reg + temp2) into temp1
     temp2 ds-reg temp1 LDRr
-    2 words Br
-    NOP f rc-absolute-1 rel-untagged
 ] PIC-LOAD jit-define
 
 [
@@ -627,18 +628,21 @@ big-endian off
 
 [
     ! temp1/32 0x7f CMP f rc-absolute-1 rel-untagged
-    4 words temp2 ADR
-    3 temp2 temp2 LDRBuoff
+    0 0 temp2 MOVZ f rc-absolute-arm64-movz rel-untagged
+    temp2 temp2 UXTB
     temp2 temp1 CMPr
-    2 words Br
-    NOP f rc-absolute-1 rel-untagged
 ] PIC-CHECK-TAG jit-define
 
 [
-    ! ! 0 JE f rc-relative rel-word
-    ! 0 EQ B.cond f rc-relative-arm64-bcond rel-word
-    5 words NE B.cond
-    absolute-jump rel-word
+    ! temp2 0 MOV f rc-absolute-cell rel-literal
+    ! temp1 temp2 CMP
+    0 0 temp2 MOVZ f rc-absolute-arm64-movz rel-untagged
+    temp2 temp1 CMPr
+] PIC-CHECK-TUPLE jit-define
+
+[
+    ! 0 JE f rc-relative rel-word
+    0 EQ B.cond f rc-relative-arm64-bcond rel-word
 ] PIC-HIT jit-define
 
 ! ! ! Megamorphic caches
