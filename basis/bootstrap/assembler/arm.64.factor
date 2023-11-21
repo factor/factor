@@ -530,7 +530,7 @@ big-endian off
 [
     >r
     push-link-reg
-    0 BL rc-relative-arm64-branch rel-word
+    0 BL f rc-relative-arm64-branch rel-word
     pop-link-reg
     r>
 ] JIT-DIP jit-define
@@ -538,7 +538,7 @@ big-endian off
 [
     >r >r
     push-link-reg
-    0 BL rc-relative-arm64-branch rel-word
+    0 BL f rc-relative-arm64-branch rel-word
     pop-link-reg
     r> r>
 ] JIT-2DIP jit-define
@@ -546,7 +546,7 @@ big-endian off
 [
     >r >r >r
     push-link-reg
-    0 BL rc-relative-arm64-branch rel-word
+    0 BL f rc-relative-arm64-branch rel-word
     pop-link-reg
     r> r> r>
 ] JIT-3DIP jit-define
