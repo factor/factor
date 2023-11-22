@@ -1,9 +1,9 @@
 ! Copyright (c) 2023 John Benediktsson.
 ! See https://factorcode.org/license.txt for BSD license.
 
-USING: anagrams ascii assocs http.client io.encodings.ascii
+USING: anagrams assocs combinators.short-circuit http.client
 io.encodings.utf8 io.files io.files.temp kernel math
-math.combinatorics math.functions math.parser
+math.combinatorics math.functions math.order math.parser
 project-euler.common ranges sequences splitting ;
 
 IN: project-euler.098
