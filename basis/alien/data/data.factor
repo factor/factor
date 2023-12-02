@@ -3,8 +3,8 @@
 USING: accessors alien alien.arrays alien.c-types alien.strings
 arrays byte-arrays combinators combinators.short-circuit
 cpu.architecture generalizations io io.streams.memory kernel
-libc math parser sequences stack-checker.dependencies summary
-words ;
+libc math namespaces parser sequences stack-checker.dependencies
+summary words ;
 IN: alien.data
 
 : <ref> ( value c-type -- c-ptr )
@@ -13,6 +13,12 @@ IN: alien.data
 
 : deref ( c-ptr c-type -- value )
     [ 0 ] dip alien-value ; inline
+
+: stream-read-c-ptr ( c-ptr stream -- value )
+    over [ heap-size ] [ stream-read ] [ deref ] tri* ; inline
+
+: read-c-ptr ( c-ptr -- value )
+    input-stream get stream-read-c-ptr ; inline
 
 : little-endian? ( -- ? ) 1 int <ref> char deref 1 = ; foldable
 
