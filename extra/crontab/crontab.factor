@@ -5,17 +5,22 @@ USING: accessors arrays ascii assocs assocs.extras calendar
 calendar.english calendar.format calendar.parser
 calendar.private circular combinators combinators.short-circuit
 io kernel literals math math.order math.parser prettyprint
-ranges sequences sets sorting splitting ;
+random ranges sequences sets sorting splitting ;
 
 IN: crontab
 
 ERROR: invalid-cronentry value ;
+
+TUPLE: cronentry minutes hours days months days-of-week command ;
+
+<PRIVATE
 
 :: parse-value ( value quot: ( value -- value' ) seq -- value )
     value {
         { [ CHAR: , over member? ] [
             "," split [ quot seq parse-value ] map concat ] }
         { [ dup "*" = ] [ drop seq ] }
+        { [ dup "~" = ] [ drop seq random 1array ] }
         { [ CHAR: / over member? ] [
             "/" split1 [
                 quot seq parse-value
@@ -24,6 +29,8 @@ ERROR: invalid-cronentry value ;
             ] dip string>number <range> swap nths ] }
         { [ CHAR: - over member? ] [
             "-" split1 quot bi@ [a..b] ] }
+        { [ CHAR: ~ over member? ] [
+            "~" split1 quot bi@ [a..b] random 1array ] }
         [ quot call 1array ]
     } cond members sort ; inline recursive
 
@@ -36,8 +43,6 @@ ERROR: invalid-cronentry value ;
     [ string>number ] [
         >lower $[ month-abbreviations [ >lower ] map ] index
     ] ?unless ;
-
-TUPLE: cronentry minutes hours days months days-of-week command ;
 
 CONSTANT: aliases H{
     { "@yearly"   "0 0 1 1 *" }
@@ -61,6 +66,8 @@ CONSTANT: aliases H{
         [ minutes>> [ 0 59 between? ] all? ]
         [ hours>> [ 0 23 between? ] all? ]
     } 1&& [ invalid-cronentry ] unless ;
+
+PRIVATE>
 
 : parse-cronentry ( entry -- cronentry )
     " " split1 [ aliases ?at drop ] dip " " glue
