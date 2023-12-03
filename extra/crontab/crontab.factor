@@ -15,12 +15,16 @@ TUPLE: cronentry minutes hours days months days-of-week command ;
 
 <PRIVATE
 
+:: parse-range ( from/f to/f quot: ( value -- value' ) seq -- from to )
+    from/f to/f
+    [ [ seq first ] quot if-empty ]
+    [ [ seq last ] quot if-empty ] bi* ; inline
+
 :: parse-value ( value quot: ( value -- value' ) seq -- value )
     value {
         { [ CHAR: , over member? ] [
             "," split [ quot seq parse-value ] map concat ] }
         { [ dup "*" = ] [ drop seq ] }
-        { [ dup "~" = ] [ drop seq random 1array ] }
         { [ CHAR: / over member? ] [
             "/" split1 [
                 quot seq parse-value
@@ -28,9 +32,9 @@ TUPLE: cronentry minutes hours days months days-of-week command ;
                 over length dup 7 = [ [ <circular> ] 2dip ] [ 1 - ] if
             ] dip string>number <range> swap nths ] }
         { [ CHAR: - over member? ] [
-            "-" split1 quot bi@ [a..b] ] }
+            "-" split1 quot seq parse-range [a..b] ] }
         { [ CHAR: ~ over member? ] [
-            "~" split1 quot bi@ [a..b] random 1array ] }
+            "~" split1 quot seq parse-range [a..b] random 1array ] }
         [ quot call 1array ]
     } cond members sort ; inline recursive
 
