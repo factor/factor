@@ -1,5 +1,5 @@
 USING: calendar calendar.format crontab kernel math.order
-sequences tools.test ;
+namespaces random random.mersenne-twister sequences tools.test ;
 
 IN: crontab.tests
 
@@ -220,3 +220,18 @@ CONSTANT: start-timestamp T{ timestamp
         "Sun, 24 Mar 2019 04:54:00 -0700"
     }
 } [ "50- 4 * * *" next-few-times ] unit-test
+
+! A random minute of every 04:00 hour
+{
+    {
+        "Sun, 24 Mar 2019 04:32:00 -0700"
+        "Mon, 25 Mar 2019 04:32:00 -0700"
+        "Tue, 26 Mar 2019 04:32:00 -0700"
+        "Wed, 27 Mar 2019 04:32:00 -0700"
+        "Thu, 28 Mar 2019 04:32:00 -0700"
+    }
+} [
+    100 <mersenne-twister> [
+        "~ 4 * * *" next-few-times
+    ] with-random
+] unit-test
