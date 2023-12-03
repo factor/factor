@@ -170,28 +170,28 @@ PRIVATE>
     tuck time+ group-crons ;
 
 : group-crons-for-duration ( cronstrings duration -- entries )
-    now utc group-crons-for-duration-from ;
+    now group-crons-for-duration-from ;
 
 : crons-for-minute ( cronstrings timestamp -- entries )
-    utc start-of-minute dup end-of-minute group-crons ;
+    start-of-minute dup end-of-minute group-crons ;
 
 : crons-for-hour ( cronstrings timestamp -- entries )
-    utc start-of-hour dup end-of-hour group-crons ;
+    start-of-hour dup end-of-hour group-crons ;
 
 : crons-for-day ( cronstrings timestamp -- entries )
-    utc start-of-day dup end-of-day group-crons ;
+    start-of-day dup end-of-day group-crons ;
 
 : crons-for-week ( cronstrings timestamp -- entries )
-    utc start-of-week dup end-of-week group-crons ;
+    start-of-week dup end-of-week group-crons ;
 
 : crons-for-month ( cronstrings timestamp -- entries )
-    utc start-of-month dup end-of-month group-crons ;
+    start-of-month dup end-of-month group-crons ;
 
 : crons-for-year ( cronstrings timestamp -- entries )
-    utc start-of-year dup end-of-year group-crons ;
+    start-of-year dup end-of-year group-crons ;
 
 : crons-for-decade ( cronstrings timestamp -- entries )
-    utc start-of-decade dup end-of-decade group-crons ;
+    start-of-decade dup end-of-decade group-crons ;
 
 : crons-this-minute ( cronstrings -- entries ) now crons-for-minute ;
 : crons-this-hour ( cronstrings -- entries ) now crons-for-hour ;
