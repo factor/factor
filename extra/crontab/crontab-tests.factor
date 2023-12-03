@@ -198,3 +198,25 @@ CONSTANT: start-timestamp T{ timestamp
         "Fri, 3 May 2019 04:05:00 -0700"
     }
 } [ "5 4 1-5/2 * *" next-few-times ] unit-test
+
+! The first 10 minutes of every 04:00 hour
+{
+    {
+        "Sun, 24 Mar 2019 04:00:00 -0700"
+        "Sun, 24 Mar 2019 04:01:00 -0700"
+        "Sun, 24 Mar 2019 04:02:00 -0700"
+        "Sun, 24 Mar 2019 04:03:00 -0700"
+        "Sun, 24 Mar 2019 04:04:00 -0700"
+    }
+} [ "-10 4 * * *" next-few-times ] unit-test
+
+! The last 10 minutes of every 04:00 hour
+{
+    {
+        "Sun, 24 Mar 2019 04:50:00 -0700"
+        "Sun, 24 Mar 2019 04:51:00 -0700"
+        "Sun, 24 Mar 2019 04:52:00 -0700"
+        "Sun, 24 Mar 2019 04:53:00 -0700"
+        "Sun, 24 Mar 2019 04:54:00 -0700"
+    }
+} [ "50- 4 * * *" next-few-times ] unit-test
