@@ -453,7 +453,14 @@ IN: build-from-source.windows
 
 : zstd-versions ( -- seq )
     "facebook" "zstd" "v" list-repository-tags-matching
-    tag-refs human-sort ;
+    tag-refs human-sort
+    [
+        {
+            [ length 2 >= ]
+            [ "v" head? ]
+            [ second digit? ]
+        } 1&&
+    ] filter ;
 
 : build-zstd-dll ( -- )
     "facebook" "zstd" zstd-versions last [
