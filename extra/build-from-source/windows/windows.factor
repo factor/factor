@@ -153,11 +153,9 @@ IN: build-from-source.windows
                 qw{ cmake -DCMAKE_BUILD_TYPE=Release -DBUILD_SHARED_LIBS=ON .. } try-process
                 qw{ msbuild LibreSSL.sln /m /property:Configuration=Release } try-process
             ] if
-            {
-                "crypto/Release/crypto-51.dll"
-                "ssl/Release/ssl-54.dll"
-                "tls/Release/tls-27.dll"
-            } copy-output-files
+            "crypto/Release/crypto.dll" "libressl-crypto.dll" copy-output-file-as
+            "ssl/Release/ssl.dll" "libressl-ssl.dll" copy-output-file-as
+            "tls/Release/tls.dll" "libressl-tls.dll" copy-output-file-as
         ] with-build-directory
     ] with-tar-gz ;
 
