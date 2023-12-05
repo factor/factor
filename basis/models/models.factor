@@ -53,8 +53,12 @@ DEFER: remove-connection
         drop
     ] if ;
 
+GENERIC: model-value ( model -- value )
+
+M: model model-value value>> ;
+
 : compute-model ( model -- value )
-    [ activate-model ] [ deactivate-model ] [ value>> ] tri ;
+    [ activate-model ] [ deactivate-model ] [ model-value ] tri ;
 
 GENERIC: model-changed ( model observer -- )
 M: object model-changed 2drop ;
