@@ -20,12 +20,12 @@ IN: unicode.breaks.tests
 { { t f t t f t } } [ 6 <iota> [ "as df" word-break-at? ] map ] unit-test
 
 : grapheme-break-test ( -- filename )
-    "https://downloads.factorcode.org/misc/UCD/auxiliary/GraphemeBreakTest.txt"
-    "GraphemeBreakTest.txt" cache-file [ ?download-to ] keep ;
+    "https://downloads.factorcode.org/misc/UCD/15.0.0/auxiliary/GraphemeBreakTest.txt"
+    "GraphemeBreakTest-15.0.0.txt" cache-file [ ?download-to ] keep ;
 
 : word-break-test ( -- filename )
-    "https://downloads.factorcode.org/misc/UCD/auxiliary/WordBreakTest.txt"
-    "WordBreakTest.txt" cache-file [ ?download-to ] keep ;
+    "https://downloads.factorcode.org/misc/UCD/15.0.0/auxiliary/WordBreakTest.txt"
+    "WordBreakTest-15.0.0.txt" cache-file [ ?download-to ] keep ;
 
 : parse-test-file ( file-name -- tests )
     utf8 file-lines

@@ -18,8 +18,8 @@ IN: unicode.collation.tests
 [ { "HELLO" "goodbye" "good bye" "hello" } sort-strings ] unit-test
 
 : collation-test-lines ( -- lines )
-    "https://downloads.factorcode.org/misc/UCA/CollationTest_SHIFTED.txt"
-    "CollationTest_SHIFTED.txt" cache-file [ ?download-to ] keep
+    "https://downloads.factorcode.org/misc/UCA/15.0.0/CollationTest_SHIFTED.txt"
+    "CollationTest_SHIFTED_15.0.0.txt" cache-file [ ?download-to ] keep
     utf8 file-lines [ "#" head? ] reject harvest ;
 
 : parse-collation-test-shifted ( -- lines )
