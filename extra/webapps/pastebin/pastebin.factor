@@ -1,11 +1,11 @@
-! Copyright (C) 2007, 2010 Slava Pestov
+! Copyright (C) 2007, 2010, 2023 Slava Pestov, Raghu Ranganathan.
 ! See https://factorcode.org/license.txt for BSD license.
 USING: accessors calendar db db.tuples db.types furnace.actions
 furnace.auth furnace.boilerplate furnace.recaptcha
 furnace.redirection furnace.syndication furnace.utilities
 html.forms http.server.dispatchers http.server.responses kernel
 math.parser namespaces present sequences smtp sorting splitting
-urls validators xmode.catalog ;
+urls validators xmode.catalog literals ;
 IN: webapps.pastebin
 
 TUPLE: pastebin < dispatcher ;
@@ -14,6 +14,8 @@ SYMBOL: can-delete-pastes?
 
 SYMBOL: pastebin-email-from
 SYMBOL: pastebin-email-to
+
+CONSTANT: paste-mode-names $[ "text" mode-names remove "text" prefix ] 
 
 can-delete-pastes? define-capability
 
@@ -113,6 +115,7 @@ M: annotation entity-url
 ! PASTES
 ! ! !
 
+
 : <paste-action> ( -- action )
     <page-action>
         [
@@ -122,7 +125,7 @@ M: annotation entity-url
             "id" value
             "new-annotation" [
                 "parent" set-value
-                mode-names "modes" set-value
+                paste-mode-names "modes" set-value
                 "factor" "mode" set-value
             ] nest-form
         ] >>init
@@ -170,13 +173,13 @@ M: annotation entity-url
     <page-action>
         [
             "factor" "mode" set-value
-            mode-names "modes" set-value
+            paste-mode-names "modes" set-value
         ] >>init
 
         { pastebin "new-paste" } >>template
 
         [
-            mode-names "modes" set-value
+            paste-mode-names "modes" set-value
             validate-entity
         ] >>validate
 
@@ -212,7 +215,7 @@ M: annotation entity-url
 : <new-annotation-action> ( -- action )
     <action>
         [
-            mode-names "modes" set-value
+            paste-mode-names "modes" set-value
             { { "parent" [ v-integer ] } } validate-params
             validate-entity
         ] >>validate
