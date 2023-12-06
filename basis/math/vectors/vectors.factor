@@ -1,7 +1,7 @@
 ! Copyright (C) 2005, 2010 Slava Pestov, Joe Groff.
 ! See https://factorcode.org/license.txt for BSD license.
 USING: arrays assocs combinators grouping kernel math
-math.functions math.libm math.order sequences ;
+math.functions math.libm math.order sequences vocabs.loader ;
 QUALIFIED-WITH: alien.c-types c
 IN: math.vectors
 
@@ -301,3 +301,5 @@ PRIVATE>
 
 : angle-between ( v u -- a )
     [ normalize ] bi@ hdot acos ;
+
+{ "math.vectors" "ranges" } "math.vectors.ranges" require-when
