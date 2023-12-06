@@ -1,9 +1,9 @@
 ! Copyright (C) 2019 John Benediktsson
 ! See https://factorcode.org/license.txt for BSD license
 
-USING: accessors ascii assocs hashtables io.encodings.utf8
-io.files kernel make math.parser peg peg.parsers regexp
-sequences splitting strings.parser ;
+USING: accessors ascii assocs calendar.parser hashtables
+io.encodings.utf8 io.files kernel make math.parser peg
+peg.parsers regexp sequences splitting strings.parser ;
 
 ! https://github.com/toml-lang/toml/blob/main/toml.abnf
 
@@ -186,12 +186,12 @@ M: table update-toml
         decdigit 2 exactly-n ,
         ":" token ,
         decdigit 2 exactly-n ,
-        "." token decdigit repeat1 2seq optional ,
+        "." token decdigit repeat1 2seq optional [ concat ] action ,
     ] seq* [ "" concat-as ] action ;
 
 : timezone-parser ( -- parser )
     "Z" token
-    "-" token
+    "+" token "-" token 2choice
     decdigit 2 exactly-n ":" token
     decdigit 2 exactly-n 4seq [ "" concat-as ] action
     2choice ;
@@ -199,10 +199,10 @@ M: table update-toml
 : datetime-parser ( -- parser )
     [
         date-parser ,
-        "T" token " " token 2choice ,
+        "T" token "t" token " " token 3choice ,
         time-parser ,
         timezone-parser optional ,
-    ] seq* [ "" concat-as ] action ;
+    ] seq* [ "" concat-as rfc3339>timestamp ] action ;
 
 : separator ( -- parser )
     "," token comment optional 2seq ;
