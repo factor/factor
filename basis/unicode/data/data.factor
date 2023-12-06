@@ -200,7 +200,7 @@ load-unicode-data {
     [ 12 swap process-data simple-upper swap assoc-union! drop ]
     [ 14 swap process-data simple-upper assoc-union simple-title swap assoc-union! drop ]
     [ process-combining class-map swap assoc-union! drop ]
-    [ process-canonical canonical-map swap assoc-union! drop combine-map swap assoc-union! drop ]
+    [ process-canonical B canonical-map swap assoc-union! drop combine-map swap assoc-union! drop ]
     [ process-compatibility compatibility-map swap assoc-union! drop ]
     [ process-category category-map push-all ]
 } cleave
