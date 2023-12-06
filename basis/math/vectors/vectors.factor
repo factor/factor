@@ -1,42 +1,56 @@
 ! Copyright (C) 2005, 2010 Slava Pestov, Joe Groff.
 ! See https://factorcode.org/license.txt for BSD license.
-USING: arrays assocs combinators grouping kernel math
-math.functions math.libm math.order sequences ;
+USING: accessors arrays assocs combinators grouping kernel math
+math.functions math.libm math.order ranges sequences ;
 QUALIFIED-WITH: alien.c-types c
 IN: math.vectors
 
 GENERIC: vneg ( v -- w )
 M: object vneg [ neg ] map ; inline
+M: range vneg >range< [ neg ] tri@ <range> ;
 
 GENERIC#: v+n 1 ( v n -- w )
 M: object v+n [ + ] curry map ; inline
+M: range v+n [ >range< ] dip '[ [ _ + ] bi@ ] dip <range> ;
 
 GENERIC: n+v ( n v -- w )
 M: object n+v [ + ] with map ; inline
+M: range n+v swap v+n ;
 
 GENERIC#: v-n 1 ( v n -- w )
 M: object v-n [ - ] curry map ; inline
+M: range v-n neg v+n ;
 
 GENERIC: n-v ( n v -- w )
 M: object n-v [ - ] with map ; inline
+M: range n-v >range< roll '[ [ _ swap - ] bi@ ] dip neg <range> ;
 
 GENERIC#: v*n 1 ( v n -- w )
 M: object v*n [ * ] curry map ; inline
+M: range v*n [ >range< ] dip '[ _ * ] tri@ <range> ;
 
 GENERIC: n*v ( n v -- w )
 M: object n*v [ * ] with map ; inline
+M: range n*v swap v*n ;
 
 GENERIC#: v/n 1 ( v n -- w )
 M: object v/n [ / ] curry map ; inline
+M: range v/n recip v*n ;
 
 GENERIC: n/v ( n v -- w )
 M: object n/v [ / ] with map ; inline
 
 GENERIC: v+ ( u v -- w )
 M: object v+ [ + ] 2map ; inline
+M: range v+ over range? [
+        [ [ from>> ] bi@ + ]
+        [ [ length>> ] bi@ min ]
+        [ [ step>> ] bi@ + ] 2tri \ range boa
+    ] [ call-next-method ] if ;
 
 GENERIC: v- ( u v -- w )
 M: object v- [ - ] 2map ; inline
+M: range v- >range< [ neg ] tri@ <range> v+ ;
 
 GENERIC: [v-] ( u v -- w )
 M: object [v-] [ [-] ] 2map ; inline
@@ -67,6 +81,9 @@ M: object n^v [ ^ ] with map ; inline
 
 GENERIC: vavg ( u v -- w )
 M: object vavg [ + 2 / ] 2map ; inline
+M: range vavg over range?
+    [ v+ 2 v/n ]
+    [ call-next-method ] if ;
 
 GENERIC: vmax ( u v -- w )
 M: object vmax [ max ] 2map ; inline
