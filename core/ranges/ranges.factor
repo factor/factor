@@ -21,6 +21,9 @@ PRIVATE>
     [ sign/mod 0 < [ 1 + ] unless 0 max ] keep
     range boa ; inline
 
+: >range< ( range -- start stop step )
+    [ from>> ] [ length>> ] [ step>> ] tri [ swap 1 - * over + ] keep ;
+
 M: range length length>> ; inline
 
 M: range nth-unsafe
@@ -73,9 +76,6 @@ PRIVATE>
 ! Some methods can be much faster for ranges
 
 <PRIVATE
-
-: >range< ( range -- start stop step )
-    [ from>> ] [ length>> ] [ step>> ] tri [ swap 1 - * over + ] keep ;
 
 : >forward-range< ( range -- start stop step )
     >range< dup neg? [ abs swapd ] when ;
