@@ -2,7 +2,7 @@
 ! See https://factorcode.org/license.txt for BSD license.
 USING: accessors kernel math math.order math.vectors ranges
 ranges.private ;
-IN: math.vectors
+IN: math.vectors.ranges
 
 M: range vneg >range< [ neg ] tri@ <range> ;
 
