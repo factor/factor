@@ -14,9 +14,8 @@ LIBRARY: clang
 
 CONSTANT: UINT_MAX 4294967295
 
-TYPEDEF: void* CXTranslationUnitImpl
 TYPEDEF: void* CXIndex
-TYPEDEF: CXTranslationUnitImpl* CXTranslationUnit
+TYPEDEF: void* CXTranslationUnit
 TYPEDEF: void* CXClientData
 TYPEDEF: void* CXFile
 
@@ -202,16 +201,24 @@ STRUCT: CXStringSet
     { Strings CXString* }
     { Count uint } ;
 
-TYPEDEF: void* CXSourceLocation
-! STRUCT: CXSourceLocation
-!     { ptr_data void*[2]  }
-!     { data uint } ;
+STRUCT: CXSourceLocation
+    { ptr_data void*[2]  }
+    { data uint } ;
 
-TYPEDEF: void* CXSourceRange
-! STRUCT: CXSourceRange
-!     { ptr_data void*[2]  }
-!     { begin_int_data uint }
-!     { end_int_data uint } ;
+STRUCT: CXSourceRange
+    { ptr_data void*[2]  }
+    { begin_int_data uint }
+    { end_int_data uint } ;
+
+STRUCT: CXSourceRangeList
+    { count uint }
+    { ranges CXSourceRange* } ;
+
+STRUCT: CXDiagnosticSet
+    { data void* } ;
+
+STRUCT: CXDiagnostic
+    { data void*[3] } ;
 
 FUNCTION: CXIndex clang_createIndex ( int excludeDeclarationsFromPCH, int displayDiagnostics )
 
@@ -237,7 +244,7 @@ FUNCTION: CXString clang_getCursorKindSpelling ( CXCursorKind Kind )
 FUNCTION: void clang_getDefinitionSpellingAndExtent (
     CXCursor cursor, char **startBuf, char **endBuf, uint *startLine,
     uint *startColumn, uint *endLine, uint *endColumn
-    )
+)
 FUNCTION: void clang_enableStackTraces ( )
 FUNCTION: void clang_executeOnThread ( void* fn, void *user_data, uint stack_size )
 
@@ -269,8 +276,49 @@ FUNCTION: int clang_Cursor_getNumArguments ( CXCursor C )
 FUNCTION: CXType clang_getArgType ( CXType C, uint i )
 FUNCTION: CXCursor clang_Cursor_getArgument ( CXCursor C, uint i )
 
-FUNCTION: CXFile clang_getFile ( CXTranslationUnit tu, char* file_name )
+FUNCTION: CXFile clang_getFile ( CXTranslationUnit tu, c-string file_name )
+FUNCTION: CXString clang_getFileName ( CXFile SFile )
+FUNCTION: uint clang_getFileTime ( CXFile SFile )
+FUNCTION: CXSourceLocation clang_getLocation ( CXTranslationUnit tu, CXFile file, uint line, uint column )
+FUNCTION: CXSourceLocation clang_getNullLocation ( )
+FUNCTION: uint clang_equalLocations ( CXSourceLocation loc1, CXSourceLocation loc2 )
 FUNCTION: CXSourceLocation clang_getLocationForOffset ( CXTranslationUnit tu, CXFile file, uint offset )
+FUNCTION: int clang_Location_isInSystemHeader ( CXSourceLocation location )
+FUNCTION: int clang_Location_isFromMainFile ( CXSourceLocation location )
+FUNCTION: CXSourceRange clang_getNullRange ( )
+FUNCTION: int clang_equalRanges ( CXSourceRange range1, CXSourceRange range2 )
+FUNCTION: int clang_Range_isNull ( CXSourceRange range )
+FUNCTION: void clang_getExpansionLocation (
+    CXSourceLocation location, CXFile *file, uint *line,
+    uint *column, uint *offset
+)
+FUNCTION: void clang_getPresumedLocation (
+    CXSourceLocation location, CXString *filename, uint *line,
+    uint *column
+)
+FUNCTION: void clang_getInstantiationLocation (
+    CXSourceLocation location, CXFile *file, uint *line,
+    uint *column, uint *offset
+    )
+FUNCTION: void clang_getSpellingLocation (
+    CXSourceLocation location, CXFile *file, uint *line,
+    uint *column, uint *offset
+)
+FUNCTION: void clang_getFileLocation (
+    CXSourceLocation location, CXFile *file, uint *line,
+    uint *column, uint *offset
+)
+
+FUNCTION: CXFile clang_getIncludedFile ( CXCursor cursor )
+FUNCTION: CXSourceLocation clang_getCursorLocation ( CXCursor cursor )
+FUNCTION: CXSourceRange clang_getCursorExtent ( CXCursor cursor )
+FUNCTION: CXSourceLocation clang_getRangeStart ( CXSourceRange range )
+FUNCTION: CXSourceLocation clang_getRangeEnd ( CXSourceRange range )
+FUNCTION: CXSourceRangeList* clang_getSkippedRanges ( CXTranslationUnit tu, CXFile file )
+FUNCTION: CXSourceRangeList* clang_getAllSkippedRanges ( CXTranslationUnit tu )
+FUNCTION: void clang_disposeSourceRangeList ( CXSourceRangeList *ranges )
+FUNCTION: CXDiagnosticSet clang_getDiagnosticSetFromTU ( CXTranslationUnit Unit )
+
 FUNCTION: void clang_tokenize ( CXTranslationUnit tu, CXSourceRange range, CXToken **tokens, uint *numTokens )
 FUNCTION: void clang_disposeTokens ( CXTranslationUnit tu, CXToken *tokens, uint numTokens )
 FUNCTION: CXTokenKind clang_getTokenKind ( CXToken token )
@@ -284,15 +332,36 @@ FUNCTION: CXString clang_constructUSR_ObjCIvar ( char *name, CXString classUSR )
 FUNCTION: CXString clang_constructUSR_ObjCMethod ( char *name, uint isInstanceMethod, CXString classUSR )
 FUNCTION: CXString clang_constructUSR_ObjCProperty ( char *property, CXString classUSR )
 
+FUNCTION: CXCursor clang_getTypeDeclaration ( CXType T )
+FUNCTION: uint clang_getNumFields ( CXType T )
+FUNCTION: CXCursor clang_getFieldDecl ( CXType T, uint i )
+FUNCTION: uint clang_Cursor_getNumTemplateArguments ( CXCursor C )
+FUNCTION: CXType clang_Cursor_getTemplateArgumentType ( CXCursor C, uint i )
+FUNCTION: int clang_Cursor_getTemplateArgumentValue ( CXCursor C, uint i )
+FUNCTION: CXCursor clang_Cursor_getTemplateArgumentCursor ( CXCursor C, uint i )
+FUNCTION: uint clang_Cursor_getNumSpecializations ( CXCursor C )
+FUNCTION: CXCursor clang_Cursor_getSpecialization ( CXCursor C, uint i )
+FUNCTION: CXSourceRange clang_Cursor_getCommentRange ( CXCursor C )
+FUNCTION: CXString clang_Cursor_getRawCommentText ( CXCursor C )
+FUNCTION: CXString clang_Cursor_getBriefCommentText ( CXCursor C )
+FUNCTION: CXString clang_Cursor_getMangling ( CXCursor C )
+FUNCTION: CXString clang_Cursor_getCXXManglings ( CXCursor C )
+FUNCTION: CXStringSet* clang_Cursor_getObjCManglings ( CXCursor C )
+FUNCTION: CXString clang_Cursor_getObjCSelectorIndexName ( CXCursor C )
+FUNCTION: CXString clang_Cursor_getObjCPropertyGetterName ( CXCursor C )
+FUNCTION: CXString clang_Cursor_getObjCPropertySetterName ( CXCursor C )
+FUNCTION: CXString clang_Cursor_getObjCDeclQualifiers ( CXCursor C )
+FUNCTION: uint clang_Cursor_isObjCOptional ( CXCursor C )
+FUNCTION: uint clang_Cursor_isVariadic ( CXCursor C )
+
+FUNCTION: CXString clang_getClangVersion ( )
 FUNCTION: CXSourceRange clang_getRange ( CXSourceLocation begin, CXSourceLocation end )
 FUNCTION: c-string clang_getCString ( CXString string )
 FUNCTION: void clang_disposeString ( CXString string )
 FUNCTION: void clang_disposeStringSet ( CXStringSet *set )
 
-
-
 FUNCTION: uint clang_visitChildren (
     CXCursor parent,
     CXCursorVisitor visitor,
     CXClientData client_data
-    )
+)
