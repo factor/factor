@@ -1,8 +1,9 @@
 ! Copyright (C) 2022 Doug Coleman.
 ! See https://factorcode.org/license.txt for BSD license.
-USING: accessors alien.c-types alien.data alien.enums ascii
-classes.struct combinators combinators.smart discord io
-io.backend kernel libclang.ffi sequences splitting ;
+USING: accessors alien alien.c-types alien.data alien.enums
+alien.strings ascii classes.struct combinators combinators.smart
+discord io io.backend io.encodings.utf8 io.files.info kernel
+layouts libclang.ffi math sequences splitting strings ;
 IN: libclang
 
 : function-arg-cursor-visitor ( -- callback )
@@ -18,20 +19,23 @@ IN: libclang
         [ 2drop f ]
     } case ;
 
+: clang-get-cstring ( CXString -- string )
+    clang_getCString [ utf8 alien>string ] [ clang_disposeString ] bi ;
+
 : remove-const ( strinng -- string' )
     "const" split1 [ [ blank? ] trim ] bi@ " " glue [ blank? ] trim ;
 
 : cursor-type ( cursor -- string )
     ! [ "cursor display name" g... clang_getCursorDisplayName g... ] keep
     clang_getCursorType
-    clang_getTypeSpelling clang_getCString ! "type spelling c string" g... dup g...
+    clang_getTypeSpelling clang-get-cstring ! "type spelling c string" g... dup g...
     remove-const ;
 
 : cursor-name ( cursor -- string )
-    clang_getCursorSpelling data>> ;
+    clang_getCursorSpelling clang-get-cstring ;
 
 : arg-info ( cursor -- string )
-    [ cursor-type ] [ cursor-name ] bi " " glue ;
+    [ cursor-type ] [ cursor-name [ "dummy" ] when-empty ] bi " " glue ;
 
 : cursor>args ( cursor -- args/f )
     dup clang_Cursor_getNumArguments dup -1 = [
@@ -42,34 +46,40 @@ IN: libclang
         ] with { } map-as
     ] if ;
 
-: cxreturn-type>factor ( type -- string )
-    dup kind>> dup CXType_Pointer = [
-        drop
-        clang_getPointeeType
-        cxreturn-type>factor "*" append
-    ] [
-        nip
-        {
-            { CXType_Bool [ "bool" ] }
-            { CXType_Char_S [ "char" ] }
-            { CXType_Char_U [ "uchar" ] }
-            { CXType_SChar [ "char" ] }
-            { CXType_UChar [ "uchar" ] }
-            { CXType_Short [ "short" ] }
-            { CXType_UShort [ "ushort" ] }
-            { CXType_Int [ "int" ] }
-            { CXType_UInt [ "uint" ] }
-            { CXType_Long [ "long" ] }
-            { CXType_ULong [ "ulong" ] }
-            { CXType_LongLong [ "longlong" ] }
-            { CXType_ULongLong [ "ulonglong" ] }
-            { CXType_Float [ "float" ] }
-            { CXType_Double [ "double" ] }
-            { CXType_Void [ "void" ] }
-            ! { CXType_Pointer [ "*" ] }
-            [ drop "" ]
-        } case
-    ] if ;
+: cxprimitive-type>factor ( type -- string )
+    {
+        { CXType_Bool [ "bool" ] }
+        { CXType_Char_S [ "char" ] }
+        { CXType_Char_U [ "uchar" ] }
+        { CXType_SChar [ "char" ] }
+        { CXType_UChar [ "uchar" ] }
+        { CXType_Short [ "short" ] }
+        { CXType_UShort [ "ushort" ] }
+        { CXType_Int [ "int" ] }
+        { CXType_UInt [ "uint" ] }
+        { CXType_Long [ "long" ] }
+        { CXType_ULong [ "ulong" ] }
+        { CXType_LongLong [ "longlong" ] }
+        { CXType_ULongLong [ "ulonglong" ] }
+        { CXType_Float [ "float" ] }
+        { CXType_Double [ "double" ] }
+        { CXType_Void [ "void" ] }
+        [ drop "" ]
+    } case ;
+
+: cxreturn-type>factor ( CXType -- string )
+    {
+        { [ dup kind>> CXType_Pointer = ] [
+            clang_getPointeeType cxreturn-type>factor "*" append
+        ] }
+        { [ dup kind>> CXType_Elaborated = ] [
+            clang_getCanonicalType cxreturn-type>factor
+        ] }
+        { [ dup kind>> CXType_Record = ] [
+            clang_getTypeDeclaration clang_getCursorSpelling clang-get-cstring
+        ] }
+        [ kind>> cxprimitive-type>factor ]
+    } cond ;
 
 : cursor>args-info ( cursor -- args-info )
     cursor>args [ arg-info ] map ", " join ;
@@ -78,27 +88,21 @@ IN: libclang
     [
         {
             [ drop "FUNCTION: " ]
-            [ clang_getCursorType clang_getResultType cxreturn-type>factor ]
+            [ clang_getCursorResultType cxreturn-type>factor ]
             [ drop " " ]
-            [ clang_getCursorSpelling data>> ]
+            [ clang_getCursorSpelling clang-get-cstring ]
             [ drop " ( " ]
             [ cursor>args-info dup empty? ")" " )" ? ]
-            ! [ drop " )" ]
         } cleave
     ] "" append-outputs-as ;
 
 : cursor-visitor ( -- callback )
     [
-        2drop
-        dup clang_getCursorKind
-        ! dup g...
+        2drop dup clang_getCursorKind
         {
             { CXCursor_FunctionDecl [ function-cursor>string gprint ] }
-            ! { CXType_Pointer [ function-cursor>string  ] }
-            ! { CXType_Invalid [ drop ] }
             [ 2drop ]
         } case
-        ! nl nl nl
         gflush
         CXChildVisit_Recurse
     ] CXCursorVisitor ;
@@ -106,72 +110,61 @@ IN: libclang
 ! "resource:vm/factor.hpp" parse-include
 ! "C:\\Program Files\\LLVM\\include\\clang-c\\index.h"
 
+: with-clang-index ( quot: ( index -- ) -- )
+    [ 0 0 clang_createIndex ] dip keep clang_disposeIndex ; inline
+
+: with-clang-translation-unit ( idx source-file command-line-args nargs unsaved-files nunsaved-files options quot: ( tu -- ) -- )
+    [ enum>number clang_parseTranslationUnit ] dip
+    keep clang_disposeTranslationUnit ; inline
+
+: with-clang-default-translation-unit ( path quot: ( path tu -- ) -- )
+    dupd '[
+        _ f 0 f 0 CXTranslationUnit_None [
+            [ _ ] dip @
+        ] with-clang-translation-unit
+    ] with-clang-index ; inline
+
+: with-clang-cursor ( path quot: ( path tu cursor -- ) -- )
+    dupd '[
+        _ f 0 f 0 CXTranslationUnit_None [
+            [ _ ] dip dup clang_getTranslationUnitCursor @
+        ] with-clang-translation-unit
+    ] with-clang-index ; inline
+
 : clang-get-file-max-range ( CXTranslationUnit path -- CXSourceRange )
-    dupd clang_getFile
-    [ 0 clang_getLocationForOffset ]
-    [ 1000 clang_getLocationForOffset ] 2bi
+    [ dupd clang_getFile 0 clang_getLocationForOffset ]
+    [ dupd [ clang_getFile ] [ nip file-info size>> ] 2bi clang_getLocationForOffset ] 2bi
     clang_getRange ;
 
 : parse-c-defines ( path -- )
-    dup '[
-        _
-        f 0
-        f 0
-        CXTranslationUnit_None enum>number
-        clang_parseTranslationUnit
-        [ ]
-        [ _ clang-get-file-max-range ] bi
-        ! CXToken 
+    [
+        swap
+        ! tu path
+        dupd clang-get-file-max-range ! tu CXRange
         f void* <ref>
         0 uint <ref>
         [ clang_tokenize ] 2keep
-        [ g... ] bi@
-    ] with-clang-index ;
+        [ void* deref ]
+        [ uint deref <iota> ] bi*
+        [
+            ! tu void* int
+            cell-bits 8 /i * swap <displaced-alien>
+            clang_getTokenKind
+        ] with { } map-as
+        g... gflush
+    ] with-clang-default-translation-unit ;
 
 : parse-c-exports ( path -- )
-    '[
-        _
-        f 0 f 0 CXTranslationUnit_None enum>number
-        clang_parseTranslationUnit
-        clang_getTranslationUnitCursor
-        cursor-visitor f
-        clang_visitChildren drop
-    ] with-clang-index ;
+    [
+        2nip cursor-visitor f clang_visitChildren drop
+    ] with-clang-cursor ;
 
 ! "resource:vm/factor.hpp" parse-include
 : parse-include ( path -- )
     normalize-path
     {
         ! [ parse-c-defines ]
-
         [ parse-c-exports ]
     } cleave ;
 
-
-
-
-    ! CXToken *tokens;
-    ! unsigned numTokens;
-    ! clang_tokenize(unit, range, &tokens, &numTokens);
-
-    ! for (unsigned i = 0; i < numTokens; i++) {
-    !     CXTokenKind kind = clang_getTokenKind(tokens[i]);
-    !     if (kind == CXToken_Comment) {
-    !         continue;
-    !     }
-
-    !     CXString spelling = clang_getTokenSpelling(unit, tokens[i]);
-    !     const char *text = clang_getCString(spelling);
-    !     if (kind == CXToken_Punctuation && strcmp(text, "#") == 0 && i + 1 < numTokens) {
-    !         CXString nextSpelling = clang_getTokenSpelling(unit, tokens[i + 1]);
-    !         const char *nextText = clang_getCString(nextSpelling);
-    !         if (strcmp(nextText, "define") == 0) {
-    !             printf("#define directive found: %s %s\n", text, nextText);
-    !             i++; // Skip the 'define' token
-    !         }
-    !         clang_disposeString(nextSpelling);
-    !     }
-    !     clang_disposeString(spelling);
-    ! }
-
-    ! clang_disposeTokens(unit, tokens, numTokens);
+! "/Library/Developer/CommandLineTools/SDKs/MacOSX10.15.sdk/usr/include/php/ext/sqlite3/libsqlite/sqlite3.h" parse-include
