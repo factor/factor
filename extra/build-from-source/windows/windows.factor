@@ -26,17 +26,6 @@ IN: build-from-source.windows
 : check-cmake ( -- ) { "cmake" "-h" } try-process ;
 : check-msbuild ( -- ) { "msbuild" "-h" } try-process ;
 
-: latest-fftw ( -- path )
-    "https://ftp.fftw.org/pub/fftw/" [
-        http-get nip
-        parse-html find-links concat
-        [ name>> text = ] filter
-        [ text>> ] map
-        [ "fftw-" head? ] filter
-        [ ".tar.gz" tail? ] filter
-        human-sort last
-    ] keep prepend-path ;
-
 : build-fftw-dll ( -- )
     latest-fftw [
         [
@@ -51,10 +40,6 @@ IN: build-from-source.windows
         ] with-build-directory
     ] with-tar-gz ;
 
-: winflexbison-versions ( -- seq )
-    "lexxmark" "winflexbison" "v" list-repository-tags-matching
-    tag-refs [ "v." head? ] reject human-sort ;
-
 : build-winflexbison ( -- )
     "lexxmark" "winflexbison" winflexbison-versions last [
         [
@@ -64,10 +49,6 @@ IN: build-from-source.windows
         "bin/Release/win_bison.exe" "bison.exe" copy-vm-file-as
         "bin/Release/win_flex.exe" "flex.exe" copy-vm-file-as
     ] with-github-worktree-tag ;
-
-: blas-versions ( -- seq )
-    "xianyi" "OpenBLAS" "v" list-repository-tags-matching
-    tag-refs human-sort ;
 
 : build-blas ( -- )
     "xianyi" "OpenBLAS" blas-versions last [
@@ -82,10 +63,6 @@ IN: build-from-source.windows
             "lib/RELEASE/openblas.dll" "blas.dll" copy-output-file-as
         ] with-build-directory
     ] with-github-worktree-tag ;
-
-: openssl-versions ( -- seq )
-    "openssl" "openssl" "openssl-" list-repository-tags-matching
-    tag-refs human-sort ;
 
 : build-openssl-32-dlls ( -- )
     "openssl" "openssl" openssl-versions last [
@@ -113,10 +90,6 @@ IN: build-from-source.windows
 : build-openssl-dlls ( -- )
     32-bit? [ build-openssl-32-dlls ] [ build-openssl-64-dlls ] if ;
 
-: cairo-versions ( -- version )
-    "https://gitlab.freedesktop.org/api/v4/projects/956/repository/tags"
-    http-get nip utf8 decode json> [ "name" of ] map ;
-
 : build-cairo-dll ( -- )
     "gitlab.freedesktop.org" "cairo" "cairo" cairo-versions first [
         qw{ meson setup --force-fallback-for=freetype2,fontconfig,zlib,expat,expat_dep build } try-process
@@ -134,15 +107,6 @@ IN: build-from-source.windows
         } delete-output-files
     ] with-gitlab-worktree-tag ;
 
-: latest-libressl ( -- path )
-    "https://ftp.openbsd.org/pub/OpenBSD/LibreSSL/" [
-        http-get nip parse-html find-links concat
-        [ name>> text = ] filter
-        [ text>> ] map
-        [ "libressl-" head? ] filter
-        [ ".tar.gz" tail? ] filter last
-    ] keep prepend ;
-
 : build-libressl-dlls ( -- )
     latest-libressl [
         [
@@ -158,12 +122,6 @@ IN: build-from-source.windows
             "tls/Release/tls.dll" "libressl-tls.dll" copy-output-file-as
         ] with-build-directory
     ] with-tar-gz ;
-
-: openal-versions ( -- seq )
-    "kcat" "openal-soft" "" list-repository-tags-matching
-    tag-refs
-    [ [ digit-or-dot? ] all? ] filter
-    human-sort ;
 
 : build-openal-dll ( -- )
     "kcat" "openal-soft" openal-versions last [
@@ -189,10 +147,6 @@ IN: build-from-source.windows
             "Release/OpenAL32.dll" copy-output-file
         ] with-build-directory
     ] with-github-worktree-tag ;
-
-: grpc-versions ( -- seq )
-    "grpc" "grpc" "v" list-repository-tags-matching
-    tag-refs human-sort ;
 
 : build-grpc-dll ( -- )
     "grpc" "grpc" grpc-versions last [
@@ -227,14 +181,6 @@ IN: build-from-source.windows
         ] with-build-directory-as
     ] with-github-worktree-tag ;
 
-: latest-pcre-tar-gz ( -- path )
-    "https://ftp.exim.org/pub/pcre/" [
-        http-get nip parse-html find-links concat
-        [ name>> text = ] filter [ text>> ] map
-        [ "pcre-" head? ] filter
-        [ ".tar.gz" tail? ] filter last
-    ] keep prepend ;
-
 : build-pcre-dll ( -- )
     latest-pcre-tar-gz [
         [
@@ -248,10 +194,6 @@ IN: build-from-source.windows
             "Release/pcre.dll" copy-output-file
         ] with-build-directory
     ] with-tar-gz ;
-
-: pcre2-versions ( -- seq )
-    "PCRE2Project" "pcre2" "" list-repository-tags-matching
-    tag-refs human-sort ;
 
 : build-pcre2-dll ( -- )
     "PCRE2Project" "pcre2" pcre2-versions last [
@@ -267,12 +209,6 @@ IN: build-from-source.windows
         ] with-build-directory
     ] with-github-worktree-tag ;
 
-: postgres-versions ( -- seq )
-    "postgres" "postgres" "REL_" list-repository-tags-matching
-    tag-refs
-    ! [ "_" split1-last nip [ digit? ] all? ] filter ! no RC1 or BETA1
-    human-sort ;
-
 ! choco install -y meson winflexbison3
 : build-postgres-dll ( -- )
     "postgres" "postgres" postgres-versions last [
@@ -282,10 +218,6 @@ IN: build-from-source.windows
         [ { "ninja" } try-process ] with-directory
         "build/src/interfaces/libpq/libpq.dll" copy-output-file
     ] with-github-worktree-tag ;
-
-: raylib-versions ( -- seq )
-    "raysan5" "raylib" "" list-repository-tags-matching
-    tag-refs human-sort ;
 
 ! choco install -y glfw3
 : build-raylib-dll ( -- )
@@ -302,10 +234,6 @@ IN: build-from-source.windows
         ] with-build-directory
     ] with-github-worktree-tag ;
 
-: raygui-versions ( -- seq )
-    "raysan5" "raygui" "" list-repository-tags-matching
-    tag-refs human-sort ;
-
 :: build-raygui-dll ( -- )
     "raysan5" "raygui" raygui-versions last [
         "raysan5" "raylib" raylib-versions last github-tag-disk-checkout-path :> $raylib-dir
@@ -321,21 +249,11 @@ IN: build-from-source.windows
         "raygui.dll" copy-output-file
     ] with-github-worktree-tag ;
 
-: ripgrep-versions ( -- seq )
-    "BurntSushi" "ripgrep" "" list-repository-tags-matching
-    tag-refs
-    [ [ digit-or-dot? ] all? ] filter
-    human-sort ;
-
 : build-ripgrep ( -- )
     "BurntSushi" "ripgrep" ripgrep-versions last [
         qw{ cargo build --release } try-process
         "target/release/rg.exe" copy-output-file
     ] with-github-worktree-tag ;
-
-: snappy-versions ( -- seq )
-    "google" "snappy" "" list-repository-tags-matching
-    tag-refs human-sort ;
 
 : build-snappy-dll ( -- )
     "google" "snappy" snappy-versions last [
@@ -351,20 +269,12 @@ IN: build-from-source.windows
         ] with-build-directory
     ] with-github-worktree-tag ;
 
-: sqlite-versions ( -- seq )
-    "sqlite" "sqlite" "version-" list-repository-tags-matching
-    tag-refs human-sort ;
-
 : build-sqlite-dll ( -- )
     "sqlite" "sqlite" sqlite-versions last [
         qw{ nmake /f Makefile.msc clean } try-process
         qw{ nmake /f Makefile.msc } try-process
         "sqlite3.dll" copy-output-file
     ] with-github-worktree-tag ;
-
-: duckdb-versions ( -- seq )
-    "duckdb" "duckdb" "v" list-repository-tags-matching
-    tag-refs human-sort ;
 
 : build-duckdb-dll ( -- )
     "duckdb" "duckdb" duckdb-versions last [
@@ -381,10 +291,6 @@ IN: build-from-source.windows
         ] with-build-directory
     ] with-github-worktree-tag ;
 
-: yaml-versions ( -- seq )
-    "yaml" "libyaml" "" list-repository-tags-matching
-    tag-refs [ [ digit-or-dot? ] all? ] filter human-sort ;
-
 : build-yaml-dll ( -- )
     "yaml" "libyaml" yaml-versions last [
         [
@@ -400,10 +306,6 @@ IN: build-from-source.windows
         ] with-build-directory
     ] with-github-worktree-tag ;
 
-: zeromq-versions ( -- seq )
-    "zeromq" "libzmq" "" list-repository-tags-matching
-    tag-refs human-sort ;
-
 : build-zeromq-dll ( -- )
     "zeromq" "libzmq" zeromq-versions last [
         [
@@ -418,20 +320,12 @@ IN: build-from-source.windows
         ] with-build-directory
     ] with-github-worktree-tag ;
 
-: zlib-versions ( -- seq )
-    "madler" "zlib" "v" list-repository-tags-matching
-    tag-refs human-sort ;
-
 : build-zlib-dll ( -- )
     "madler" "zlib" zlib-versions last [
         qw{ nmake /f win32/Makefile.msc clean } try-process
         qw{ nmake /f win32/Makefile.msc } try-process
         "zlib1.dll" copy-output-file
     ] with-github-worktree-tag ;
-
-: lz4-versions ( -- seq )
-    "lz4" "lz4" "v" list-repository-tags-matching
-    tag-refs human-sort ;
 
 : build-lz4 ( -- )
     "lz4" "lz4" lz4-versions last [
@@ -448,17 +342,6 @@ IN: build-from-source.windows
             ] with-build-directory
         ] with-directory
     ] with-github-worktree-tag ;
-
-: zstd-versions ( -- seq )
-    "facebook" "zstd" "v" list-repository-tags-matching
-    tag-refs human-sort
-    [
-        {
-            [ length 2 >= ]
-            [ "v" head? ]
-            [ second digit? ]
-        } 1&&
-    ] filter ;
 
 : build-zstd-dll ( -- )
     "facebook" "zstd" zstd-versions last [

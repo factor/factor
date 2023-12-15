@@ -1,12 +1,12 @@
 ! Copyright (C) 2023 Doug Coleman.
 ! See https://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs calendar calendar.format cli.git
-combinators combinators.extras combinators.short-circuit
-continuations formatting github http.client io io.directories
-io.encodings.utf8 io.files io.files.info io.launcher
-io.pathnames json kernel layouts math namespaces
-namespaces.extras semver sequences sequences.extras sorting
-sorting.human sorting.specification splitting system unicode ;
+combinators combinators.short-circuit continuations formatting
+github html.parser html.parser.analyzer http.client io
+io.directories io.encodings.string io.encodings.utf8 io.files
+io.launcher io.pathnames json kernel layouts math namespaces
+semver sequences sequences.extras sorting sorting.human
+sorting.specification splitting system unicode ;
 IN: build-from-source
 
 INITIALIZED-SYMBOL: use-gitlab-git-uris [ f ]
@@ -244,3 +244,120 @@ ERROR: no-output-file path ;
     [ "." split1-last nip [ digit? ] all? ] filter
     latest-python ;
 : latest-python3 ( -- tag ) python-tags tags>latest-python3 ;
+
+: latest-fftw ( -- path )
+    "https://ftp.fftw.org/pub/fftw/" [
+        http-get nip
+        parse-html find-links concat
+        [ name>> text = ] filter
+        [ text>> ] map
+        [ "fftw-" head? ] filter
+        [ ".tar.gz" tail? ] filter
+        human-sort last
+    ] keep prepend-path ;
+
+: latest-libressl ( -- path )
+    "https://ftp.openbsd.org/pub/OpenBSD/LibreSSL/" [
+        http-get nip parse-html find-links concat
+        [ name>> text = ] filter
+        [ text>> ] map
+        [ "libressl-" head? ] filter
+        [ ".tar.gz" tail? ] filter last
+    ] keep prepend ;
+
+: latest-pcre-tar-gz ( -- path )
+    "https://ftp.exim.org/pub/pcre/" [
+        http-get nip parse-html find-links concat
+        [ name>> text = ] filter [ text>> ] map
+        [ "pcre-" head? ] filter
+        [ ".tar.gz" tail? ] filter last
+    ] keep prepend ;
+
+: cairo-versions ( -- version )
+    "https://gitlab.freedesktop.org/api/v4/projects/956/repository/tags"
+    http-get nip utf8 decode json> [ "name" of ] map ;
+
+: blas-versions ( -- seq )
+    "xianyi" "OpenBLAS" "v" list-repository-tags-matching
+    tag-refs human-sort ;
+
+: duckdb-versions ( -- seq )
+    "duckdb" "duckdb" "v" list-repository-tags-matching
+    tag-refs human-sort ;
+
+: grpc-versions ( -- seq )
+    "grpc" "grpc" "v" list-repository-tags-matching
+    tag-refs human-sort ;
+
+: pcre2-versions ( -- seq )
+    "PCRE2Project" "pcre2" "" list-repository-tags-matching
+    tag-refs human-sort ;
+
+: lz4-versions ( -- seq )
+    "lz4" "lz4" "v" list-repository-tags-matching
+    tag-refs human-sort ;
+
+: openal-versions ( -- seq )
+    "kcat" "openal-soft" "" list-repository-tags-matching
+    tag-refs
+    [ [ digit-or-dot? ] all? ] filter
+    human-sort ;
+
+: openssl-versions ( -- seq )
+    "openssl" "openssl" "openssl-" list-repository-tags-matching
+    tag-refs human-sort ;
+
+: postgres-versions ( -- seq )
+    "postgres" "postgres" "REL_" list-repository-tags-matching
+    tag-refs
+    ! [ "_" split1-last nip [ digit? ] all? ] filter ! no RC1 or BETA1
+    human-sort ;
+
+: raylib-versions ( -- seq )
+    "raysan5" "raylib" "" list-repository-tags-matching
+    tag-refs human-sort ;
+
+: raygui-versions ( -- seq )
+    "raysan5" "raygui" "" list-repository-tags-matching
+    tag-refs human-sort ;
+
+: ripgrep-versions ( -- seq )
+    "BurntSushi" "ripgrep" "" list-repository-tags-matching
+    tag-refs
+    [ [ digit-or-dot? ] all? ] filter
+    human-sort ;
+
+: snappy-versions ( -- seq )
+    "google" "snappy" "" list-repository-tags-matching
+    tag-refs human-sort ;
+
+: sqlite-versions ( -- seq )
+    "sqlite" "sqlite" "version-" list-repository-tags-matching
+    tag-refs human-sort ;
+
+: winflexbison-versions ( -- seq )
+    "lexxmark" "winflexbison" "v" list-repository-tags-matching
+    tag-refs [ "v." head? ] reject human-sort ;
+
+: yaml-versions ( -- seq )
+    "yaml" "libyaml" "" list-repository-tags-matching
+    tag-refs [ [ digit-or-dot? ] all? ] filter human-sort ;
+
+: zeromq-versions ( -- seq )
+    "zeromq" "libzmq" "" list-repository-tags-matching
+    tag-refs human-sort ;
+
+: zlib-versions ( -- seq )
+    "madler" "zlib" "v" list-repository-tags-matching
+    tag-refs human-sort ;
+
+: zstd-versions ( -- seq )
+    "facebook" "zstd" "v" list-repository-tags-matching
+    tag-refs human-sort
+    [
+        {
+            [ length 2 >= ]
+            [ "v" head? ]
+            [ second digit? ]
+        } 1&&
+    ] filter ;
