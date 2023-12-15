@@ -245,6 +245,10 @@ ERROR: no-output-file path ;
     latest-python ;
 : latest-python3 ( -- tag ) python-tags tags>latest-python3 ;
 
+: rustup-update ( -- )
+    qw{ rustup update stable } try-process
+    qw{ rustup update nightly } try-process ;
+
 : latest-fftw ( -- path )
     "https://ftp.fftw.org/pub/fftw/" [
         http-get nip
