@@ -269,26 +269,26 @@ IN: codebase-analyzer
             [ length "%d binary files" sprintf print ]
             [ length "%d text files" sprintf print ] bi*
         ]
-        [ github-files [ "has .github files" print ... ] unless-empty ]
-        [ license-files [ [ length "has %d license files" sprintf print ] [ ... ] bi ] unless-empty ]
-        [ readme-files [ "has readme files" print ... ] unless-empty ]
-        [ owners-files [ "has owners files" print ... ] unless-empty ]
-        [ version-files [ "has version files" print ... ] unless-empty ]
+        [ github-files [ sort "has .github files" print ... ] unless-empty ]
+        [ license-files [ sort [ length "has %d license files" sprintf print ] [ ... ] bi ] unless-empty ]
+        [ readme-files [ sort "has readme files" print ... ] unless-empty ]
+        [ owners-files [ sort "has owners files" print ... ] unless-empty ]
+        [ version-files [ sort "has version files" print ... ] unless-empty ]
         [
             { [ dot-files ] [ rc-files diff ] [ ignore-files diff ] } cleave
-            [ "has dot files" print ... ] unless-empty
+            [ sort "has dot files" print ... ] unless-empty
         ]
-        [ rc-files [ [ length "has %d rc files" sprintf print ] [ ... ] bi ] unless-empty ]
-        [ configure-files [ "uses configure files" print ... ] unless-empty ]
-        [ automake-files [ "uses automake" print ... ] unless-empty ]
-        [ make-files [ "uses make" print ... ] unless-empty ]
-        [ nmake-files [ "uses nmake" print ... ] unless-empty ]
-        [ cmake-files [ "uses cmake" print ... ] unless-empty ]
-        [ gradle-files [ "uses gradle" print ... ] unless-empty ]
-        [ cargo-files [ "uses rust/cargo" print ... ] unless-empty ]
-        [ julia-project-files [ "uses julia Project.toml" print ... ] unless-empty ]
-        [ in-files [ "uses 'in' files" print ... ] unless-empty ]
-        [ ignore-files [ [ length "has %d ignore files" sprintf print ] [ ... ] bi ] unless-empty nl ]
+        [ rc-files [ sort [ length "has %d rc files" sprintf print ] [ ... ] bi ] unless-empty ]
+        [ configure-files [ sort "uses configure files" print ... ] unless-empty ]
+        [ automake-files [ sort "uses automake" print ... ] unless-empty ]
+        [ make-files [ sort "uses make" print ... ] unless-empty ]
+        [ nmake-files [ sort "uses nmake" print ... ] unless-empty ]
+        [ cmake-files [ sort "uses cmake" print ... ] unless-empty ]
+        [ gradle-files [ sort "uses gradle" print ... ] unless-empty ]
+        [ cargo-files [ sort "uses rust/cargo" print ... ] unless-empty ]
+        [ julia-project-files [ sort "uses julia Project.toml" print ... ] unless-empty ]
+        [ in-files [ sort "uses 'in' files" print ... ] unless-empty ]
+        [ ignore-files [ sort [ length "has %d ignore files" sprintf print ] [ ... ] bi ] unless-empty nl ]
         [ [ rust-project-dir? ] filter [ [ "rust projects at " print . ] [ [ analyze-rust-project ] each ] bi ] unless-empty nl ]
         [
             [ upper-files ] keep
@@ -298,7 +298,7 @@ IN: codebase-analyzer
                 [ owners-files diff ]
                 [ version-files diff ]
             } cleave
-            [ [ length "has %d UPPER files (minus license,readme,owner,version)" sprintf print ] [ ... ] bi ] unless-empty nl
+            [ sort [ length "has %d UPPER files (minus license,readme,owner,version)" sprintf print ] [ ... ] bi ] unless-empty nl
         ]
         [ "Top 20 largest files" print file-sizes sort-values 20 index-or-length tail* [ normalize-path ] map-keys reverse assoc. nl ]
         [ "Top 10 file extension sizes" print sum-sizes-by-extension 10 index-or-length tail* reverse assoc. nl ]
