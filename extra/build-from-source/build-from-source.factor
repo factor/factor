@@ -4,7 +4,7 @@ USING: accessors arrays assocs calendar calendar.format cli.git
 combinators combinators.short-circuit continuations formatting
 github html.parser html.parser.analyzer http.client io
 io.directories io.encodings.string io.encodings.utf8 io.files
-io.launcher io.pathnames json kernel layouts math namespaces
+io.launcher io.pathnames json kernel layouts math namespaces qw
 semver sequences sequences.extras sorting sorting.human
 sorting.specification splitting system unicode ;
 IN: build-from-source
