@@ -1,11 +1,8 @@
 ! Copyright (C) 2023 Doug Coleman.
 ! See https://factorcode.org/license.txt for BSD license.
-USING: accessors ascii assocs build-from-source cli.git
-combinators.short-circuit combinators.smart continuations
-environment github html.parser html.parser.analyzer http.client
-io.directories io.encodings.string io.encodings.utf8
-io.files.temp io.launcher io.pathnames json kernel layouts math
-namespaces qw sequences sorting.human splitting windows.shell32 ;
+USING: build-from-source combinators.smart continuations
+environment http.client io.directories io.files.temp io.launcher
+io.pathnames kernel layouts qw sequences windows.shell32 ;
 IN: build-from-source.windows
 
 ! choco install -y meson StrawberryPerl nasm winflexbison3 glfw3 jom
@@ -251,7 +248,7 @@ IN: build-from-source.windows
 
 : build-ripgrep ( -- )
     "BurntSushi" "ripgrep" ripgrep-versions last [
-        qw{ cargo build --release } try-process
+        qw{ cargo +nightly build --release --features pcre2,simd-accel } try-process
         "target/release/rg.exe" copy-output-file
     ] with-github-worktree-tag ;
 
@@ -410,4 +407,9 @@ IN: build-from-source.windows
     build-fftw-dll
     build-pcre-dll ;
 
-! build-ripgrep build-duckdb
+: build-unused-windows-dlls ( -- )
+    dll-out-directory make-directories
+    build-grpc-dll
+    rustup-update
+    build-ripgrep
+    build-duckdb-dll ;
