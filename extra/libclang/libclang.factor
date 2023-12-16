@@ -1,15 +1,45 @@
 ! Copyright (C) 2022 Doug Coleman.
 ! See https://factorcode.org/license.txt for BSD license.
 USING: accessors alien alien.c-types alien.data alien.enums
-alien.strings ascii classes.struct combinators combinators.smart
-discord io io.backend io.encodings.utf8 io.files.info kernel
-layouts libclang.ffi math sequences splitting strings ;
+alien.strings ascii byte-arrays classes.struct combinators
+combinators.smart discord io io.backend io.encodings.utf8
+io.files.info kernel layouts libc libclang.ffi make math
+sequences splitting strings ;
 IN: libclang
 
-: function-arg-cursor-visitor ( -- callback )
-    [
-        2drop
-    ] CXCursorVisitor ;
+STRUCT: malloced
+    { byte-array void* }
+    { len uint }
+    { offset uint } ;
+
+: <malloced> ( len -- malloced )
+    malloced malloc-struct
+        over 1 + <byte-array> malloc-byte-array >>byte-array
+        swap >>len
+        0 >>offset ;
+
+: append-oom? ( malloced string -- ? )
+    [ [ len>> ] [ offset>> ] bi - ]
+    [ length ] bi* < ;
+
+: realloc-malloced ( malloced -- malloced' )
+    dup len>> 2 *
+    '[ [ _ 1 + realloc ] change-byte-array ] keep >>len ;
+
+: append-malloced ( malloced string -- )
+    2dup append-oom?
+    [ [ realloc-malloced ] dip append-malloced ] [
+        [
+            [
+                [ offset>> ] [ byte-array>> ] bi <displaced-alien>
+            ] dip [ utf8 string>alien ] [ length ] bi memcpy
+        ] [
+            '[ _ length + ] change-offset drop
+        ] 2bi
+    ] if ;
+
+: malloced>string ( malloced -- string )
+    [ byte-array>> utf8 alien>string ] [ free ] bi ;
 
 : CXCursor>factor ( cursor -- string )
     dup clang_getCursorKind {
@@ -37,7 +67,7 @@ IN: libclang
 : arg-info ( cursor -- string )
     [ cursor-type ] [ cursor-name [ "dummy" ] when-empty ] bi " " glue ;
 
-: cursor>args ( cursor -- args/f )
+: cursor>args ( CXCursor -- args/f )
     dup clang_Cursor_getNumArguments dup -1 = [
         2drop f
     ] [
@@ -46,7 +76,7 @@ IN: libclang
         ] with { } map-as
     ] if ;
 
-: cxprimitive-type>factor ( type -- string )
+: cxprimitive-type>factor ( CXType -- string )
     {
         { CXType_Bool [ "bool" ] }
         { CXType_Char_S [ "char" ] }
@@ -81,10 +111,10 @@ IN: libclang
         [ kind>> cxprimitive-type>factor ]
     } cond ;
 
-: cursor>args-info ( cursor -- args-info )
+: cursor>args-info ( CXCursor -- args-info )
     cursor>args [ arg-info ] map ", " join ;
 
-: function-cursor>string ( cursor -- string )
+: function>string ( CXCursor -- string )
     [
         {
             [ drop "FUNCTION: " ]
@@ -92,39 +122,50 @@ IN: libclang
             [ drop " " ]
             [ clang_getCursorSpelling clang-get-cstring ]
             [ drop " ( " ]
-            [ cursor>args-info dup empty? ")" " )" ? ]
+            [ cursor>args-info dup empty? ")\n" " )\n" ? ]
         } cleave
     ] "" append-outputs-as ;
 
+: typedef>string ( CXCursor -- string )
+    [ clang_getTypedefDeclUnderlyingType cxreturn-type>factor ]
+    [ clang_getCursorSpelling clang-get-cstring ] bi
+    2dup = [
+        2drop ""
+    ] [
+        " " glue "TYPEDEF: " "\n" surround
+    ] if ;
+
+: struct>string ( CXCursor -- string )
+    clang_getCursorSpelling clang-get-cstring "STRUCT: " "\n" surround   ;
+
 : cursor-visitor ( -- callback )
     [
-        2drop dup clang_getCursorKind
+        nip
+        malloced memory>struct
+        swap dup clang_getCursorKind
         {
-            { CXCursor_FunctionDecl [ function-cursor>string gprint ] }
-            [ 2drop ]
+            { CXCursor_FunctionDecl [ function>string append-malloced CXChildVisit_Continue ] }
+            { CXCursor_TypedefDecl [ typedef>string append-malloced CXChildVisit_Continue ] }
+            { CXCursor_StructDecl [ struct>string append-malloced CXChildVisit_Continue ] }
+            [ dup g... gflush 3drop CXChildVisit_Recurse ]
         } case
-        gflush
-        CXChildVisit_Recurse
     ] CXCursorVisitor ;
 
-! "resource:vm/factor.hpp" parse-include
-! "C:\\Program Files\\LLVM\\include\\clang-c\\index.h"
-
-: with-clang-index ( quot: ( index -- ) -- )
+: with-clang-index ( quot: ( index -- string ) -- )
     [ 0 0 clang_createIndex ] dip keep clang_disposeIndex ; inline
 
-: with-clang-translation-unit ( idx source-file command-line-args nargs unsaved-files nunsaved-files options quot: ( tu -- ) -- )
+: with-clang-translation-unit ( idx source-file command-line-args nargs unsaved-files nunsaved-files options quot: ( tu -- string ) -- )
     [ enum>number clang_parseTranslationUnit ] dip
     keep clang_disposeTranslationUnit ; inline
 
-: with-clang-default-translation-unit ( path quot: ( path tu -- ) -- )
+: with-clang-default-translation-unit ( path quot: ( path tu -- string ) -- )
     dupd '[
         _ f 0 f 0 CXTranslationUnit_None [
             [ _ ] dip @
         ] with-clang-translation-unit
     ] with-clang-index ; inline
 
-: with-clang-cursor ( path quot: ( path tu cursor -- ) -- )
+: with-clang-cursor ( path quot: ( path tu cursor -- string ) -- )
     dupd '[
         _ f 0 f 0 CXTranslationUnit_None [
             [ _ ] dip dup clang_getTranslationUnitCursor @
@@ -136,7 +177,7 @@ IN: libclang
     [ dupd [ clang_getFile ] [ nip file-info size>> ] 2bi clang_getLocationForOffset ] 2bi
     clang_getRange ;
 
-: parse-c-defines ( path -- )
+: parse-c-defines ( path -- string )
     [
         swap
         ! tu path
@@ -151,16 +192,15 @@ IN: libclang
             cell-bits 8 /i * swap <displaced-alien>
             clang_getTokenKind
         ] with { } map-as
-        g... gflush
     ] with-clang-default-translation-unit ;
 
-: parse-c-exports ( path -- )
+: parse-c-exports ( path -- string )
     [
-        2nip cursor-visitor f clang_visitChildren drop
+        nip cursor-visitor rot file-info size>> 2 * <malloced>
+        [ clang_visitChildren drop ] keep malloced>string
     ] with-clang-cursor ;
 
-! "resource:vm/factor.hpp" parse-include
-: parse-include ( path -- )
+: parse-include ( path -- string )
     normalize-path
     {
         ! [ parse-c-defines ]
