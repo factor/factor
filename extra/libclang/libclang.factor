@@ -4,27 +4,32 @@ USING: accessors alien alien.c-types alien.data alien.enums
 alien.strings ascii byte-arrays classes.struct combinators
 combinators.smart discord io io.backend io.encodings.utf8
 io.files.info kernel layouts libc libclang.ffi make math
-sequences splitting strings ;
+sequences sequences.private splitting strings ;
 IN: libclang
 
 STRUCT: malloced
     { byte-array void* }
     { len uint }
     { offset uint }
-    { latest-offset uint } ;
+    { marked-offset uint } ;
 
 : <malloced> ( len -- malloced )
     malloced malloc-struct
         over 1 + <byte-array> malloc-byte-array >>byte-array
         swap >>len
         0 >>offset
-        0 >>latest-offset ;
+        0 >>marked-offset ;
 
 : mark-malloced ( malloced -- malloced )
-    dup offset>> >>latest-offset ;
+    dup offset>> >>marked-offset ;
 
-: reset-malloced ( malloced -- malloced )
-    dup latest-offset>> >>offset ;
+: since-reset ( malloced -- string )
+    [ marked-offset>> ] [ byte-array>> ] bi
+    <displaced-alien> utf8 alien>string ;
+
+: reset-malloced ( malloced -- malloced string )
+    [ since-reset ]
+    [ dup marked-offset>> >>offset ] bi swap ;
 
 : malloced-string ( malloced -- string )
     byte-array>> utf8 alien>string ;
@@ -52,36 +57,30 @@ STRUCT: malloced
 : malloced>string ( malloced -- string )
     [ byte-array>> utf8 alien>string ] [ free ] bi ;
 
-: CXCursor>factor ( cursor -- string )
-    dup clang_getCursorKind {
-        { CXCursor_FunctionDecl [ drop f ] }
-        { CXType_Pointer [ drop f ] }
-        { CXType_Invalid [ drop f ] }
-        [ 2drop f ]
-    } case ;
-
 : clang-get-cstring ( CXString -- string )
     clang_getCString [ utf8 alien>string ] [ clang_disposeString ] bi ;
 
 : trim-blanks ( string -- string' )
     [ blank? ] trim ; inline
 
-: remove-const ( strinng -- string' )
-    "const" split1 [ trim-blanks ] bi@ " " glue trim-blanks ;
+: cut-tail ( string quot -- before after ) (trim-tail) cut ; inline
 
 : cursor-type ( cursor -- string )
     clang_getCursorType
     clang_getTypeSpelling clang-get-cstring
-    ! remove-const
-    "const" ?head drop
-    "*" ?tail [ trim-blanks "*" append ] when
-    "struct " ?head drop ! [ trim-blanks ] when
 
+    "const" ?head drop
+
+    [ CHAR: * = ] cut-tail
+    [ [ trim-blanks ] dip append ] when*
+
+    "struct " ?head drop
     {
+        { [ dup "_Bool" = ] [ drop "bool" ] }
         { [ dup "unsigned char" = ] [ drop "uchar" ] }
         { [ "unsigned char" ?head ] [ trim-blanks "uchar" prepend ] }
         { [ "unsigned int" ?head ] [ trim-blanks "uint" prepend ] }
-        ! { [ "*" ?tail ] [ trim-blanks "*" append ] }
+        { [ "unsigned short" ?head ] [ trim-blanks "ushort" prepend ] }
         { [ dup "(*)" swap subseq? ] [ drop "void*" ] }
         [ ]
     } cond ;
@@ -184,28 +183,62 @@ STRUCT: malloced
         gflush
     ] CXCursorVisitor ;
 
+: enum-visitor ( -- callback )
+    [
+        nip
+        malloced memory>struct
+        swap dup clang_getCursorKind
+        {
+            { CXCursor_EnumConstantDecl [
+                "enum" gprint
+                cursor-name g... gflush
+                drop
+                CXChildVisit_Continue
+            ] }
+            { CXCursor_IntegerLiteral [
+                "integer" gprint
+                cursor-name g... gflush
+                drop
+                CXChildVisit_Continue
+            ] }
+            [ 3drop CXChildVisit_Recurse ]
+        } case
+        gflush
+    ] CXCursorVisitor ;
+
 : struct>string ( malloced CXCursor -- )
     [ mark-malloced ] dip
-    tuck cursor-name "STRUCT: " prepend append-malloced
+    tuck cursor-name append-malloced
     [ field-visitor ] dip
     [ clang_visitChildren drop ] keep
     ! hack to removev typedefs like `typedef struct foo foo;`
     dup malloced-string "}" tail? [
-        " ;\n" append-malloced drop
+        reset-malloced "STRUCT: " " ;\n" surround
+        append-malloced drop
     ] [
-        reset-malloced drop
+        reset-malloced "C-TYPE: " "\n" surround
+        append-malloced drop
     ] if ;
+
+: enum>string ( malloced CXCursor -- )
+    [ mark-malloced ] dip
+    tuck cursor-name "ENUM: " prepend append-malloced
+    [ enum-visitor ] dip
+    [ clang_visitChildren drop ] keep
+     drop ;
 
 : cursor-visitor ( -- callback )
     [
         nip
         malloced memory>struct
         swap dup clang_getCursorKind
+        dup g... gflush
         {
             { CXCursor_Namespace [ 2drop CXChildVisit_Recurse ] }
             { CXCursor_FunctionDecl [ function>string append-malloced drop CXChildVisit_Continue ] }
             { CXCursor_TypedefDecl [ typedef>string append-malloced drop CXChildVisit_Continue ] }
             { CXCursor_StructDecl [ struct>string CXChildVisit_Continue ] }
+            { CXCursor_EnumDecl [ enum>string CXChildVisit_Continue ] }
             [ dup g... 3drop CXChildVisit_Recurse ]
         } case
     ] CXCursorVisitor
@@ -218,17 +251,17 @@ STRUCT: malloced
     [ enum>number clang_parseTranslationUnit ] dip
     keep clang_disposeTranslationUnit ; inline
 
-: with-clang-default-translation-unit ( path quot: ( path tu -- string ) -- )
+: with-clang-default-translation-unit ( path quot: ( tu path -- string ) -- )
     dupd '[
         _ f 0 f 0 CXTranslationUnit_None [
-            [ _ ] dip @
+            _ @
         ] with-clang-translation-unit
     ] with-clang-index ; inline
 
-: with-clang-cursor ( path quot: ( path tu cursor -- string ) -- )
+: with-clang-cursor ( path quot: ( tu path cursor -- string ) -- )
     dupd '[
         _ f 0 f 0 CXTranslationUnit_None [
-            [ _ ] dip dup clang_getTranslationUnitCursor @
+            _ over clang_getTranslationUnitCursor @
         ] with-clang-translation-unit
     ] with-clang-index ; inline
 
@@ -237,16 +270,31 @@ STRUCT: malloced
     [ dupd [ clang_getFile ] [ nip file-info size>> ] 2bi clang_getLocationForOffset ] 2bi
     clang_getRange ;
 
+: clang-tokenize ( CXTranslationUnit CXSourceRange -- tokens ntokens )
+    f void* <ref>
+    0 uint <ref>
+    [ clang_tokenize ] 2keep
+    [ void* deref ]
+    [ uint deref ] bi* ;
+
+: tokenize-path ( tu path -- tokens ntokens )
+    [ drop ] [ clang-get-file-max-range ] 2bi
+    clang-tokenize ;
+
+: tokenize-translation-unit ( CXTranslationUnit -- tokens ntokens )
+    [ ] [ clang_getTranslationUnitCursor clang_getCursorExtent ] bi
+    clang-tokenize ;
+
+: tokenize-cursor ( cursor -- tokens ntokens )
+    [ clang_Cursor_getTranslationUnit ] [ clang_getCursorExtent ] bi
+    clang-tokenize ;
+
+: clang-get-token-spelling ( CXTranslationUnit CXToken -- string )
+    clang_getTokenSpelling clang-get-cstring ;
+
 : parse-c-defines ( path -- string )
     [
-        swap
-        ! tu path
-        dupd clang-get-file-max-range ! tu CXRange
-        f void* <ref>
-        0 uint <ref>
-        [ clang_tokenize ] 2keep
-        [ void* deref ]
-        [ uint deref <iota> ] bi*
+        tokenize-path
         [
             ! tu void* int
             cell-bits 8 /i * swap <displaced-alien>
@@ -256,7 +304,7 @@ STRUCT: malloced
 
 : parse-c-exports ( path -- string )
     [
-        nip cursor-visitor rot file-info size>> 2 * <malloced>
+        nipd cursor-visitor rot file-info size>> 2 * <malloced>
         [ clang_visitChildren drop ] keep malloced>string
     ] with-clang-cursor ;
 
