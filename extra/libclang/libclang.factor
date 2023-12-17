@@ -10,13 +10,24 @@ IN: libclang
 STRUCT: malloced
     { byte-array void* }
     { len uint }
-    { offset uint } ;
+    { offset uint }
+    { latest-offset uint } ;
 
 : <malloced> ( len -- malloced )
     malloced malloc-struct
         over 1 + <byte-array> malloc-byte-array >>byte-array
         swap >>len
-        0 >>offset ;
+        0 >>offset
+        0 >>latest-offset ;
+
+: mark-malloced ( malloced -- malloced )
+    dup offset>> >>latest-offset ;
+
+: reset-malloced ( malloced -- malloced )
+    dup latest-offset>> >>offset ;
+
+: malloced-string ( malloced -- string )
+    byte-array>> utf8 alien>string ;
 
 : append-oom? ( malloced string -- ? )
     [ [ len>> ] [ offset>> ] bi - ]
@@ -26,7 +37,7 @@ STRUCT: malloced
     dup len>> 2 *
     '[ [ _ 1 + realloc ] change-byte-array ] keep >>len ;
 
-: append-malloced ( malloced string -- )
+: append-malloced ( malloced string -- malloced )
     2dup append-oom?
     [ [ realloc-malloced ] dip append-malloced ] [
         [
@@ -34,7 +45,7 @@ STRUCT: malloced
                 [ offset>> ] [ byte-array>> ] bi <displaced-alien>
             ] dip [ utf8 string>alien ] [ length ] bi memcpy
         ] [
-            '[ _ length + ] change-offset drop
+            '[ _ length + ] change-offset
         ] 2bi
     ] if ;
 
@@ -52,14 +63,28 @@ STRUCT: malloced
 : clang-get-cstring ( CXString -- string )
     clang_getCString [ utf8 alien>string ] [ clang_disposeString ] bi ;
 
+: trim-blanks ( string -- string' )
+    [ blank? ] trim ; inline
+
 : remove-const ( strinng -- string' )
-    "const" split1 [ [ blank? ] trim ] bi@ " " glue [ blank? ] trim ;
+    "const" split1 [ trim-blanks ] bi@ " " glue trim-blanks ;
 
 : cursor-type ( cursor -- string )
-    ! [ "cursor display name" g... clang_getCursorDisplayName g... ] keep
     clang_getCursorType
-    clang_getTypeSpelling clang-get-cstring ! "type spelling c string" g... dup g...
-    remove-const ;
+    clang_getTypeSpelling clang-get-cstring
+    ! remove-const
+    "const" ?head drop
+    "*" ?tail [ trim-blanks "*" append ] when
+    "struct " ?head drop ! [ trim-blanks ] when
+
+    {
+        { [ dup "unsigned char" = ] [ drop "uchar" ] }
+        { [ "unsigned char" ?head ] [ trim-blanks "uchar" prepend ] }
+        { [ "unsigned int" ?head ] [ trim-blanks "uint" prepend ] }
+        ! { [ "*" ?tail ] [ trim-blanks "*" append ] }
+        { [ dup "(*)" swap subseq? ] [ drop "void*" ] }
+        [ ]
+    } cond ;
 
 : cursor-name ( cursor -- string )
     clang_getCursorSpelling clang-get-cstring ;
@@ -100,13 +125,17 @@ STRUCT: malloced
 : cxreturn-type>factor ( CXType -- string )
     {
         { [ dup kind>> CXType_Pointer = ] [
-            clang_getPointeeType cxreturn-type>factor "*" append
+            clang_getPointeeType dup g... gflush cxreturn-type>factor "*" append
         ] }
         { [ dup kind>> CXType_Elaborated = ] [
             clang_getCanonicalType cxreturn-type>factor
         ] }
         { [ dup kind>> CXType_Record = ] [
-            clang_getTypeDeclaration clang_getCursorSpelling clang-get-cstring
+            clang_getTypeDeclaration cursor-name
+        ] }
+        { [ dup kind>> CXType_FunctionProto = ] [
+            ! inside a CXType_Pointer, so we get `void*` from that case
+            drop "void"
         ] }
         [ kind>> cxprimitive-type>factor ]
     } cond ;
@@ -120,7 +149,7 @@ STRUCT: malloced
             [ drop "FUNCTION: " ]
             [ clang_getCursorResultType cxreturn-type>factor ]
             [ drop " " ]
-            [ clang_getCursorSpelling clang-get-cstring ]
+            [ cursor-name ]
             [ drop " ( " ]
             [ cursor>args-info dup empty? ")\n" " )\n" ? ]
         } cleave
@@ -128,15 +157,44 @@ STRUCT: malloced
 
 : typedef>string ( CXCursor -- string )
     [ clang_getTypedefDeclUnderlyingType cxreturn-type>factor ]
-    [ clang_getCursorSpelling clang-get-cstring ] bi
+    [ cursor-name ] bi
     2dup = [
         2drop ""
     ] [
         " " glue "TYPEDEF: " "\n" surround
     ] if ;
 
-: struct>string ( CXCursor -- string )
-    clang_getCursorSpelling clang-get-cstring "STRUCT: " "\n" surround   ;
+
+: field-visitor ( -- callback )
+    [
+        nip
+        malloced memory>struct
+        swap dup clang_getCursorKind
+        {
+            { CXCursor_FieldDecl [
+                [ cursor-name ] [ cursor-type ] bi " " glue
+                "\n  { " " }" surround
+                append-malloced drop
+                CXChildVisit_Continue
+            ] }
+            ! { CXCursor_TypedefDecl [ 2drop CXChildVisit_Continue ] }
+            ! { CXCursor_StructDecl [ 2drop CXChildVisit_Continue ] }
+            [ dup g...  3drop CXChildVisit_Recurse ]
+        } case
+        gflush
+    ] CXCursorVisitor ;
+
+: struct>string ( malloced CXCursor -- )
+    [ mark-malloced ] dip
+    tuck cursor-name "STRUCT: " prepend append-malloced
+    [ field-visitor ] dip
+    [ clang_visitChildren drop ] keep
+    ! hack to removev typedefs like `typedef struct foo foo;`
+    dup malloced-string "}" tail? [
+        " ;\n" append-malloced drop
+    ] [
+        reset-malloced drop
+    ] if ;
 
 : cursor-visitor ( -- callback )
     [
@@ -144,12 +202,14 @@ STRUCT: malloced
         malloced memory>struct
         swap dup clang_getCursorKind
         {
-            { CXCursor_FunctionDecl [ function>string append-malloced CXChildVisit_Continue ] }
-            { CXCursor_TypedefDecl [ typedef>string append-malloced CXChildVisit_Continue ] }
-            { CXCursor_StructDecl [ struct>string append-malloced CXChildVisit_Continue ] }
-            [ dup g... gflush 3drop CXChildVisit_Recurse ]
+            { CXCursor_Namespace [ 2drop CXChildVisit_Recurse ] }
+            { CXCursor_FunctionDecl [ function>string append-malloced drop CXChildVisit_Continue ] }
+            { CXCursor_TypedefDecl [ typedef>string append-malloced drop CXChildVisit_Continue ] }
+            { CXCursor_StructDecl [ struct>string CXChildVisit_Continue ] }
+            [ dup g... 3drop CXChildVisit_Recurse ]
         } case
-    ] CXCursorVisitor ;
+    ] CXCursorVisitor
+    gflush ;
 
 : with-clang-index ( quot: ( index -- string ) -- )
     [ 0 0 clang_createIndex ] dip keep clang_disposeIndex ; inline
@@ -208,3 +268,6 @@ STRUCT: malloced
     } cleave ;
 
 ! "/Library/Developer/CommandLineTools/SDKs/MacOSX10.15.sdk/usr/include/php/ext/sqlite3/libsqlite/sqlite3.h" parse-include
+
+! "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/clang/15.0.0/include"
+
