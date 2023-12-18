@@ -128,10 +128,22 @@ STRUCT: malloced
     "struct " ?head drop
     {
         { [ dup "_Bool" = ] [ drop "bool" ] }
-        { [ dup "unsigned char" = ] [ drop "uchar" ] }
+        { [ "int8_t" ?head ] [ trim-blanks "char" prepend ] }
+        { [ "int16_t" ?head ] [ trim-blanks "short" prepend ] }
+        { [ "int32_t" ?head ] [ trim-blanks "int" prepend ] }
+        { [ "int64_t" ?head ] [ trim-blanks "longlong" prepend ] }
+        { [ "uint8_t" ?head ] [ trim-blanks "uchar" prepend ] }
+        { [ "uint16_t" ?head ] [ trim-blanks "ushort" prepend ] }
+        { [ "uint32_t" ?head ] [ trim-blanks "uint" prepend ] }
+        { [ "uint64_t" ?head ] [ trim-blanks "ulonglong" prepend ] }
+        { [ "signed char" ?head ] [ trim-blanks "char" prepend ] }
+        { [ "signed short" ?head ] [ trim-blanks "short" prepend ] }
+        { [ "signed int" ?head ] [ trim-blanks "int" prepend ] }
+        { [ "signed long" ?head ] [ trim-blanks "long" prepend ] }
         { [ "unsigned char" ?head ] [ trim-blanks "uchar" prepend ] }
-        { [ "unsigned int" ?head ] [ trim-blanks "uint" prepend ] }
         { [ "unsigned short" ?head ] [ trim-blanks "ushort" prepend ] }
+        { [ "unsigned int" ?head ] [ trim-blanks "uint" prepend ] }
+        { [ "unsigned long" ?head ] [ trim-blanks "ulong" prepend ] }
         { [ dup "(*)" swap subseq? ] [ drop "void*" ] }
         [ ]
     } cond ;
