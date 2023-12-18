@@ -2,9 +2,10 @@
 ! See https://factorcode.org/license.txt for BSD license.
 USING: accessors alien alien.c-types alien.data alien.enums
 alien.strings ascii byte-arrays classes.struct combinators
-combinators.smart discord io io.backend io.encodings.utf8
-io.files.info kernel layouts libc libclang.ffi make math
-sequences sequences.private splitting strings ;
+combinators.short-circuit combinators.smart discord io
+io.backend io.encodings.utf8 io.files.info kernel layouts libc
+libclang.ffi make math math.parser sequences sequences.private
+splitting strings ;
 IN: libclang
 
 STRUCT: malloced
@@ -64,6 +65,56 @@ STRUCT: malloced
     [ blank? ] trim ; inline
 
 : cut-tail ( string quot -- before after ) (trim-tail) cut ; inline
+
+: cell-bytes ( -- n )
+    cell-bits 8 /i ; inline
+
+: get-tokens ( tokens ntokens -- tokens )
+    <iota> cell-bytes '[
+        _ * swap <displaced-alien>
+        clang_getTokenKind
+    ] with { } map-as ;
+
+: clang-get-file-max-range ( CXTranslationUnit path -- CXSourceRange )
+    [ dupd clang_getFile 0 clang_getLocationForOffset ]
+    [ dupd [ clang_getFile ] [ nip file-info size>> ] 2bi clang_getLocationForOffset ] 2bi
+    clang_getRange ;
+
+: clang-tokenize ( CXTranslationUnit CXSourceRange -- tokens ntokens )
+    f void* <ref>
+    0 uint <ref>
+    [ clang_tokenize ] 2keep
+    [ void* deref ]
+    [ uint deref ] bi* ;
+
+: tokenize-path ( tu path -- tokens ntokens )
+    [ drop ] [ clang-get-file-max-range ] 2bi
+    clang-tokenize ;
+
+: tokenize-translation-unit ( CXTranslationUnit -- tokens ntokens )
+    [ ] [ clang_getTranslationUnitCursor clang_getCursorExtent ] bi
+    clang-tokenize ;
+
+: tokenize-cursor ( cursor -- tokens ntokens )
+    [ clang_Cursor_getTranslationUnit ] [ clang_getCursorExtent ] bi
+    clang-tokenize ;
+
+: dispose-tokens ( cursor tokens ntokens -- )
+    [ clang_Cursor_getTranslationUnit ] 2dip clang_disposeTokens ;
+
+:: with-cursor-tokens ( cursor quot: ( tu token -- obj ) -- )
+    cursor clang_Cursor_getTranslationUnit :> tu
+    cursor tokenize-cursor :> ( tokens ntokens )
+    tokens ntokens <iota>
+    cell-bytes :> bytesize
+    quot
+    '[
+        [ tu ] 2dip bytesize * swap <displaced-alien> @
+    ] with { } map-as
+    tu tokens ntokens dispose-tokens ; inline
+
+: clang-get-token-spelling ( CXTranslationUnit CXToken -- string )
+    clang_getTokenSpelling clang-get-cstring ;
 
 : cursor-type ( cursor -- string )
     clang_getCursorType
@@ -157,12 +208,8 @@ STRUCT: malloced
 : typedef>string ( CXCursor -- string )
     [ clang_getTypedefDeclUnderlyingType cxreturn-type>factor ]
     [ cursor-name ] bi
-    2dup = [
-        2drop ""
-    ] [
-        " " glue "TYPEDEF: " "\n" surround
-    ] if ;
-
+    2dup { [ and ] [ = ] } 2||
+    [ nip "C-TYPE: " "\n" surround ] [ " " glue "TYPEDEF: " "\n" surround ] if ;
 
 : field-visitor ( -- callback )
     [
@@ -176,32 +223,7 @@ STRUCT: malloced
                 append-malloced drop
                 CXChildVisit_Continue
             ] }
-            ! { CXCursor_TypedefDecl [ 2drop CXChildVisit_Continue ] }
-            ! { CXCursor_StructDecl [ 2drop CXChildVisit_Continue ] }
             [ dup g...  3drop CXChildVisit_Recurse ]
-        } case
-        gflush
-    ] CXCursorVisitor ;
-
-: enum-visitor ( -- callback )
-    [
-        nip
-        malloced memory>struct
-        swap dup clang_getCursorKind
-        {
-            { CXCursor_EnumConstantDecl [
-                "enum" gprint
-                cursor-name g... gflush
-                drop
-                CXChildVisit_Continue
-            ] }
-            { CXCursor_IntegerLiteral [
-                "integer" gprint
-                cursor-name g... gflush
-                drop
-                CXChildVisit_Continue
-            ] }
-            [ 3drop CXChildVisit_Recurse ]
         } case
         gflush
     ] CXCursorVisitor ;
@@ -220,12 +242,42 @@ STRUCT: malloced
         append-malloced drop
     ] if ;
 
+: enum-visitor ( -- callback )
+    [
+        nip
+        malloced memory>struct
+        swap dup clang_getCursorKind
+        {
+            { CXCursor_EnumConstantDecl [
+                "enum" gprint
+                [
+                    [ clang-get-token-spelling ] with-cursor-tokens
+                    first
+                ] [
+                    clang_getEnumConstantDeclUnsignedValue number>string
+                ] bi
+                " " glue
+                "\n  { " " }" surround
+                append-malloced drop
+                CXChildVisit_Continue
+            ] }
+            ! { CXCursor_IntegerLiteral [
+            !     "integer" gprint
+            !     [ clang-get-token-spelling ] with-cursor-tokens
+            !     first " " " }" surround append-malloced drop
+            !     CXChildVisit_Continue
+            ! ] }
+            [ "omg" g... 3dup [ g... ] tri@ 3drop CXChildVisit_Recurse ]
+        } case
+        gflush
+    ] CXCursorVisitor ;
+
 : enum>string ( malloced CXCursor -- )
     [ mark-malloced ] dip
     tuck cursor-name "ENUM: " prepend append-malloced
     [ enum-visitor ] dip
     [ clang_visitChildren drop ] keep
-     drop ;
+    " ;\n" append-malloced drop ;
 
 : cursor-visitor ( -- callback )
     [
@@ -239,6 +291,7 @@ STRUCT: malloced
             { CXCursor_TypedefDecl [ typedef>string append-malloced drop CXChildVisit_Continue ] }
             { CXCursor_StructDecl [ struct>string CXChildVisit_Continue ] }
             { CXCursor_EnumDecl [ enum>string CXChildVisit_Continue ] }
+            ! { CXType_FunctionProto [ cursor-name "C-TYPE: " "\n" surround append-malloced drop CXChildVisit_Continue ] }
             [ dup g... 3drop CXChildVisit_Recurse ]
         } case
     ] CXCursorVisitor
@@ -264,33 +317,6 @@ STRUCT: malloced
             _ over clang_getTranslationUnitCursor @
         ] with-clang-translation-unit
     ] with-clang-index ; inline
-
-: clang-get-file-max-range ( CXTranslationUnit path -- CXSourceRange )
-    [ dupd clang_getFile 0 clang_getLocationForOffset ]
-    [ dupd [ clang_getFile ] [ nip file-info size>> ] 2bi clang_getLocationForOffset ] 2bi
-    clang_getRange ;
-
-: clang-tokenize ( CXTranslationUnit CXSourceRange -- tokens ntokens )
-    f void* <ref>
-    0 uint <ref>
-    [ clang_tokenize ] 2keep
-    [ void* deref ]
-    [ uint deref ] bi* ;
-
-: tokenize-path ( tu path -- tokens ntokens )
-    [ drop ] [ clang-get-file-max-range ] 2bi
-    clang-tokenize ;
-
-: tokenize-translation-unit ( CXTranslationUnit -- tokens ntokens )
-    [ ] [ clang_getTranslationUnitCursor clang_getCursorExtent ] bi
-    clang-tokenize ;
-
-: tokenize-cursor ( cursor -- tokens ntokens )
-    [ clang_Cursor_getTranslationUnit ] [ clang_getCursorExtent ] bi
-    clang-tokenize ;
-
-: clang-get-token-spelling ( CXTranslationUnit CXToken -- string )
-    clang_getTokenSpelling clang-get-cstring ;
 
 : parse-c-defines ( path -- string )
     [
