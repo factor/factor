@@ -293,8 +293,12 @@ ERROR: no-output-file path ;
     "grpc" "grpc" "v" list-repository-tags-matching
     tag-refs human-sort ;
 
+: capnproto-versions ( -- seq )
+    "capnproto" "capnproto" "v" list-repository-tags-matching
+    tag-refs human-sort ;
+
 : pcre2-versions ( -- seq )
-    "PCRE2Project" "pcre2" "" list-repository-tags-matching
+    "PCRE2Project" "pcre2" "pcre2-" list-repository-tags-matching
     tag-refs human-sort ;
 
 : lz4-versions ( -- seq )
@@ -307,7 +311,13 @@ ERROR: no-output-file path ;
     [ [ digit-or-dot? ] all? ] filter
     human-sort ;
 
-: openssl-versions ( -- seq )
+: openssl-release-versions ( -- seq )
+    "openssl" "openssl" "openssl-" list-repository-tags-matching
+    tag-refs
+    [ [ CHAR: - = ] count 1 = ] filter
+    human-sort ;
+
+: openssl-dev-versions ( -- seq )
     "openssl" "openssl" "openssl-" list-repository-tags-matching
     tag-refs human-sort ;
 

@@ -61,8 +61,23 @@ IN: build-from-source.windows
         ] with-build-directory
     ] with-github-worktree-tag ;
 
+: build-capnproto-dll ( -- )
+    "capnproto" "capnproto" capnproto-versions last [
+        [
+            32-bit? [
+                qw{ cmake -A Win32 -DCMAKE_BUILD_TYPE=Release -DBUILD_SHARED_LIBS=ON .. } try-process
+                { "msbuild" "Cap'n Proto Root.sln" "/m" "/property:Configuration=Release" "/p:Platform=Win32" } try-process
+            ] [
+                qw{ cmake -DCMAKE_BUILD_TYPE=Release -DBUILD_SHARED_LIBS=ON .. } try-process
+                { "msbuild" "Cap'n Proto Root.sln" "/m" "/property:Configuration=Release" } try-process
+            ] if
+            ! "raylib/Release/raylib.dll" copy-output-file
+        ] with-build-directory
+    ] with-github-worktree-tag ;
+
+
 : build-openssl-32-dlls ( -- )
-    "openssl" "openssl" openssl-versions last [
+    "openssl" "openssl" openssl-release-versions last [
         check-perl
         "ProgramW6432" os-env program-files or
             "NASM/nasm.exe" append-path "nasm.exe" prepend-current-path copy-file
@@ -74,7 +89,7 @@ IN: build-from-source.windows
     ] with-github-worktree-tag ;
 
 : build-openssl-64-dlls ( -- )
-    "openssl" "openssl" openssl-versions last [
+    "openssl" "openssl" openssl-release-versions last [
         check-perl
         program-files "NASM/nasm.exe" append-path "nasm.exe" prepend-current-path copy-file
         check-nasm
