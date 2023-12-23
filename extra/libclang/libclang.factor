@@ -221,7 +221,7 @@ STRUCT: malloced
     [ clang_getTypedefDeclUnderlyingType cxreturn-type>factor ]
     [ cursor-name ] bi
     2dup { [ and ] [ = ] } 2||
-    [ nip "C-TYPE: " "\n" surround ] [ " " glue "TYPEDEF: " "\n" surround ] if ;
+    [ nip "TYPEDEF: void* " "\n" surround ] [ " " glue "TYPEDEF: " "\n" surround ] if ;
 
 : field-visitor ( -- callback )
     [
@@ -235,7 +235,7 @@ STRUCT: malloced
                 append-malloced drop
                 CXChildVisit_Continue
             ] }
-            [ dup g...  3drop CXChildVisit_Recurse ]
+            [ dup g... 3drop CXChildVisit_Recurse ]
         } case
         gflush
     ] CXCursorVisitor ;
@@ -250,7 +250,7 @@ STRUCT: malloced
         reset-malloced "STRUCT: " " ;\n" surround
         append-malloced drop
     ] [
-        reset-malloced "C-TYPE: " "\n" surround
+        reset-malloced "TYPEDEF: void* " "\n" surround
         append-malloced drop
     ] if ;
 
