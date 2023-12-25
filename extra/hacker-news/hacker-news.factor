@@ -47,7 +47,7 @@ CONSTANT: christmas-green COLOR: #376627
     "jobstories" hacker-news-items ;
 
 : christmas-day? ( -- ? )
-    now dup christmas-day same-day? ;
+    now-utc dup christmas-day same-day? ;
 
 : number-color ( n -- color )
     christmas-day? [
