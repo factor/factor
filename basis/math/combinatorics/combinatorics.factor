@@ -78,7 +78,7 @@ TUPLE: k-permutations length skip k seq ;
     seq length :> n
     n k nPk :> len
     {
-        { [ len k [ zero? ] either? ] [ { } ] }
+        { [ len zero? ] [ { } ] }
         { [ n k = ] [ seq <permutations> ] }
         [ len n factorial over /i k seq k-permutations boa ]
     } cond ;
