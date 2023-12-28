@@ -18,7 +18,7 @@ INITIALIZED-SYMBOL: c-forms [ V{ } clone ]
 INITIALIZED-SYMBOL: child-forms [ H{ } clone ]
 
 : peek-current-form ( -- n )
-    c-forms get-global last ; inline
+    c-forms get-global ?last ; inline
 
 SLOT: parent-order
 
@@ -30,11 +30,11 @@ SLOT: parent-order
     call
     c-forms get-global pop ; inline
 
-: ?unnamed ( string -- string' ? )
-    "(unnamed" over subseq? [
-        drop "unnamed" \ unnamed-counter counter number>string append t
+: ?unnamed ( string type -- string' ? )
+    "(unnamed" pick subseq? [
+        nip [ "Unnamed" \ unnamed-counter counter number>string ] dip glue t
     ] [
-        f
+        drop f
     ] if ;
 
 
@@ -186,7 +186,11 @@ M: c-union libclang>string
     [
         {
             [ drop "UNION-STRUCT: " ]
-            [ name>> ]
+            [ name>> "\n" ]
+            [
+                order>> child-forms get-global ?at [ unknown-child-forms ] unless
+                [ libclang>string ] map "\n" join " ;\n" append
+            ]
         } cleave
     ] "" append-outputs-as ;
 
@@ -275,15 +279,12 @@ DEFER: cursor>c-union
 
     [ CHAR: * = ] cut-tail
     [ [ trim-blanks ] dip append ] when*
-
-    ! "struct " ?head [ ?unnamed [ cursor cursor>c-union ] when ] [ ] if
-    ! "union " ?head [ ?unnamed [ cursor cursor>c-union ] when ] [ ] if
     {
         { [ "struct " ?head ] [
-            ?unnamed [ cursor cursor>c-struct ] when
+            "Struct" ?unnamed [ cursor cursor>c-struct ] when
         ] }
         { [ "union " ?head ] [
-            ?unnamed [ cursor cursor>c-union ] when
+            "Union" ?unnamed [ cursor cursor>c-union ] when
         ] }
         { [ dup "_Bool" = ] [ drop "bool" ] }
         { [ "int8_t" ?head ] [ trim-blanks "char" prepend ] }
@@ -307,7 +308,10 @@ DEFER: cursor>c-union
     } cond ;
 
 : cursor-name ( cursor -- string )
-    clang_getCursorSpelling clang-get-cstring ?unnamed drop ;
+    clang_getCursorSpelling clang-get-cstring "" ?unnamed drop ;
+
+: ?cursor-name ( cursor unnamed-type -- string )
+    [ clang_getCursorSpelling clang-get-cstring ] dip ?unnamed drop ;
 
 : arg-info ( cursor -- string )
     [ cursor-type ] [ cursor-name [ "dummy" ] when-empty ] bi " " glue ;
@@ -373,16 +377,19 @@ DEFER: cursor>c-union
     [ cursor-name ] bi <c-typedef> set-definition ;
 
 : cursor>c-field ( CXCursor -- )
-    [ cursor-name ] [ cursor-type ] bi <c-field> push-child-form ;
+    [ cursor-name ] [ cursor-type ] bi <c-field> dup g... gflush push-child-form ;
 
-: struct-field-visitor ( -- callback )
+: struct-visitor ( -- callback )
     [
         2drop dup clang_getCursorKind
+        "struct-visitor got: " gwrite dup g... gflush
+        peek-current-form g... gflush
         {
             { CXCursor_FieldDecl [
                 cursor>c-field CXChildVisit_Continue
             ] }
             { CXCursor_UnionDecl [
+                ! cursor>c-union CXChildVisit_Continue
                 cursor>c-field CXChildVisit_Continue
             ] }
             [ dup g... gflush 2drop CXChildVisit_Recurse ]
@@ -391,11 +398,17 @@ DEFER: cursor>c-union
 
 : cursor>struct ( CXCursor -- )
     [
+        "cursor>struct start" g...
+        peek-current-form g... gflush
         {
             [ cursor-name ]
-            [ struct-field-visitor f clang_visitChildren drop ]
+            [ struct-visitor f clang_visitChildren drop ]
         } cleave
-    ] with-new-form <c-struct> set-definition ;
+        "cursor>struct finish" g... gflush
+        peek-current-form g... gflush
+    ] with-new-form
+
+     <c-struct> set-definition ;
 
 : enum-visitor ( -- callback )
     [
@@ -432,7 +445,8 @@ DEFER: cursor>c-union
     [
         2drop
         dup clang_getCursorKind
-        dup g... gflush
+        dup "union-visitor got: " gwrite g... gflush
+        
         {
             ! { CXCursor_EnumConstantDecl [
             !     [
@@ -449,22 +463,36 @@ DEFER: cursor>c-union
             !     [ clang-get-token-spelling ] with-cursor-tokens
             !     CXChildVisit_Continue
             ! ] }
-            [ "unhandled union case" g... 2dup [ g... ] bi@ 2drop CXChildVisit_Recurse ]
+            { CXCursor_FieldDecl [
+                cursor>c-field CXChildVisit_Continue
+            ] }
+
+            [ "unhandled union case" g...
+            dup g... gflush
+            ! 2dup [ g... ] bi@ 
+            2drop CXChildVisit_Recurse ]
         } case
         gflush
     ] CXCursorVisitor ;
 
 : cursor>c-union ( CXCursor -- )
     [
-        [ cursor-name ] keep
+        "cursor>c-union start" g...
+        peek-current-form g... gflush
+
+        [ "Union" ?cursor-name ] keep    dup g... gflush
         union-visitor f clang_visitChildren drop
-    ] with-new-form <c-union> set-definition ;
+
+        "cursor>c-union finish" g... gflush
+        peek-current-form g... gflush
+    ] with-new-form
+    <c-union> dup g... gflush set-definition ;
 
 : cursor-visitor ( -- callback )
     [
         2drop
         dup clang_getCursorKind
-        dup g... gflush
+        dup "cursor-visitor got: " gwrite g... gflush
         {
             { CXCursor_Namespace [ drop CXChildVisit_Recurse ] }
             { CXCursor_FunctionDecl [ cursor>c-function CXChildVisit_Continue ] }
@@ -472,7 +500,11 @@ DEFER: cursor>c-union
             { CXCursor_UnionDecl [ cursor>c-union CXChildVisit_Continue ] }
             { CXCursor_StructDecl [ cursor>struct CXChildVisit_Continue ] }
             { CXCursor_EnumDecl [ cursor>enum CXChildVisit_Continue ] }
-            [ dup g... 2drop CXChildVisit_Recurse ]
+            { CXCursor_VarDecl [ drop CXChildVisit_Continue ] }
+            [
+                "cursor-visitor unhandled: " gwrite dup g... gflush
+                2drop CXChildVisit_Recurse
+            ]
         } case
     ] CXCursorVisitor
     gflush ;
