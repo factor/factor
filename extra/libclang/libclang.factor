@@ -5,7 +5,7 @@ alien.strings ascii assocs byte-arrays classes classes.struct
 combinators combinators.short-circuit combinators.smart discord
 io io.backend io.encodings.utf8 io.files.info kernel layouts
 libc libclang.ffi make math math.parser multiline namespaces
-prettyprint sequences sequences.private sorting splitting
+prettyprint sequences sequences.private sets sorting splitting
 strings ;
 IN: libclang
 
@@ -16,6 +16,8 @@ INITIALIZED-SYMBOL: c-defs [ H{ } clone ]
 INITIALIZED-SYMBOL: c-defs-order [ H{ } clone ]
 INITIALIZED-SYMBOL: c-forms [ V{ } clone ]
 INITIALIZED-SYMBOL: child-forms [ H{ } clone ]
+INITIALIZED-SYMBOL: unnamed-table [ H{ } clone ]
+INITIALIZED-SYMBOL: unnamed-set [ HS{ } clone ]
 
 : peek-current-form ( -- n )
     c-forms get-global ?last ; inline
@@ -37,6 +39,11 @@ SLOT: parent-order
         drop f
     ] if ;
 
+: unnamed? ( string -- ? ) "(unnamed" swap subseq? ; inline
+: set-unnamed ( obj string -- ) unnamed-table get-global set-at ; inline
+: lookup-unnamed ( string -- type ) unnamed-table get-global at ; inline
+
+: record-unnamed ( string -- ) unnamed-set get-global adjoin ;
 
 TUPLE: c-function
     { return-type string }
@@ -164,7 +171,7 @@ M: c-struct libclang>string
             [ drop "STRUCT: " ]
             [ name>> "\n" ]
             [
-                order>> child-forms get-global ?at [ unknown-child-forms ] unless
+                order>> child-forms get-global ?at [ drop { } ] unless
                 [ libclang>string ] map "\n" join " ;\n" append
             ]
         } cleave
@@ -203,7 +210,9 @@ M: object libclang>string
     H{ } clone c-defs set-global
     H{ } clone c-defs-order set-global
     V{ } clone c-forms set-global
-    H{ } clone child-forms set-global ;
+    H{ } clone child-forms set-global
+    H{ } clone unnamed-table set-global
+    HS{ } clone unnamed-set set-global ;
 
 : set-definition ( named -- )
     [ dup name>> c-defs get-global set-at ]
@@ -275,13 +284,20 @@ DEFER: cursor>c-union
     clang_getCursorType
     clang_getTypeSpelling clang-get-cstring 
 
+    dup unnamed? [ dup record-unnamed ] when
+
     "const" ?head drop
 
     [ CHAR: * = ] cut-tail
     [ [ trim-blanks ] dip append ] when*
+
+    dup :> type
     {
         { [ "struct " ?head ] [
-            "Struct" ?unnamed [ cursor cursor>c-struct ] when
+            "Struct" ?unnamed [
+                ! type set-unnamed
+                cursor cursor>c-struct
+            ] when
         ] }
         { [ "union " ?head ] [
             "Union" ?unnamed [ cursor cursor>c-union ] when
@@ -446,27 +462,14 @@ DEFER: cursor>c-union
         2drop
         dup clang_getCursorKind
         dup "union-visitor got: " gwrite g... gflush
-        
         {
-            ! { CXCursor_EnumConstantDecl [
-            !     [
-            !         [ clang-get-token-spelling ] with-cursor-tokens
-            !         first
-            !     ] [
-            !         clang_getEnumConstantDeclUnsignedValue number>string
-            !     ] bi
-            !     <c-field> set-definition
-            !     CXChildVisit_Continue
-            ! ] }
-            ! { CXCursor_IntegerLiteral [
-            !     "integer" gprint
-            !     [ clang-get-token-spelling ] with-cursor-tokens
-            !     CXChildVisit_Continue
-            ! ] }
             { CXCursor_FieldDecl [
                 cursor>c-field CXChildVisit_Continue
             ] }
-
+            { CXCursor_UnionDecl [
+                "union-visitor union...!" gprint
+                drop CXChildVisit_Continue
+            ] }
             [ "unhandled union case" g...
             dup g... gflush
             ! 2dup [ g... ] bi@ 
@@ -480,13 +483,26 @@ DEFER: cursor>c-union
         "cursor>c-union start" g...
         peek-current-form g... gflush
 
-        [ "Union" ?cursor-name ] keep    dup g... gflush
+        [ "Union" ?cursor-name ] keep
         union-visitor f clang_visitChildren drop
 
         "cursor>c-union finish" g... gflush
         peek-current-form g... gflush
     ] with-new-form
     <c-union> dup g... gflush set-definition ;
+
+: cursor>c-struct ( CXCursor -- )
+    [
+        "cursor>c-struct start" g...
+        peek-current-form g... gflush
+
+        [ "Struct" ?cursor-name ] keep
+        struct-visitor f clang_visitChildren drop
+
+        "cursor>c-struct finish" g... gflush
+        peek-current-form g... gflush
+    ] with-new-form
+    <c-struct> dup g... gflush set-definition ;
 
 : cursor-visitor ( -- callback )
     [
