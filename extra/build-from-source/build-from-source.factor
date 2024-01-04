@@ -299,9 +299,11 @@ ERROR: no-output-file path ;
 
 : pcre2-versions ( -- seq )
     "PCRE2Project" "pcre2" "pcre2-" list-repository-tags-matching
-    tag-refs
-    [ "-" split length 2 = ] filter
-    human-sort ;
+    tag-refs human-sort ;
+
+: pcre2-release-versions ( -- seq )
+    pcre2-versions
+    [ "-" split length 2 = ] filter ;
 
 : lz4-versions ( -- seq )
     "lz4" "lz4" "v" list-repository-tags-matching
@@ -325,17 +327,26 @@ ERROR: no-output-file path ;
 
 : postgres-versions ( -- seq )
     "postgres" "postgres" "REL_" list-repository-tags-matching
-    tag-refs
-    ! [ "_" split1-last nip [ digit? ] all? ] filter ! no RC1 or BETA1
-    human-sort ;
+    tag-refs human-sort ;
+
+: postgres-release-versions ( -- seq )
+    postgres-versions
+    ! no RC1 or BETA1
+    [ "_" split1-last nip [ digit? ] all? ] filter ;
 
 : raylib-versions ( -- seq )
     "raysan5" "raylib" "" list-repository-tags-matching
     tag-refs human-sort ;
 
+: raylib-release-versions ( -- seq )
+    raylib-versions [ "-" swap subseq? ] reject ;
+
 : raygui-versions ( -- seq )
     "raysan5" "raygui" "" list-repository-tags-matching
     tag-refs human-sort ;
+
+: raygui-release-versions ( -- seq )
+    raygui-versions [ "-" swap subseq? ] reject ;
 
 : ripgrep-versions ( -- seq )
     "BurntSushi" "ripgrep" "" list-repository-tags-matching

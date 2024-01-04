@@ -208,7 +208,7 @@ IN: build-from-source.windows
     ] with-tar-gz ;
 
 : build-pcre2-dll ( -- )
-    "PCRE2Project" "pcre2" pcre2-versions last [
+    "PCRE2Project" "pcre2" pcre2-release-versions last [
         [
             32-bit? [
                 qw{ cmake -A Win32 -DCMAKE_BUILD_TYPE=Release -DBUILD_SHARED_LIBS=ON -DPCRE2_SUPPORT_UNICODE=ON -DPCRE2_SUPPORT_LIBZ=OFF -DPCRE2_SUPPORT_LIBBZ2=OFF -DPCRE2_SUPPORT_LIBEDIT=OFF -DPCRE2_SUPPORT_LIBREADLINE=OFF .. } try-process
@@ -223,7 +223,7 @@ IN: build-from-source.windows
 
 ! choco install -y meson winflexbison3
 : build-postgres-dll ( -- )
-    "postgres" "postgres" postgres-versions last [
+    "postgres" "postgres" postgres-release-versions last [
         "src/tools/msvc/clean.bat" prepend-current-path try-process
         qw{ meson setup build } try-process
         "build" prepend-current-path
@@ -233,7 +233,7 @@ IN: build-from-source.windows
 
 ! choco install -y glfw3
 : build-raylib-dll ( -- )
-    "raysan5" "raylib" raylib-versions last [
+    "raysan5" "raylib" raylib-release-versions last [
         [
             32-bit? [
                 qw{ cmake -A Win32 -DCMAKE_BUILD_TYPE=Release -DBUILD_SHARED_LIBS=ON -DBUILD_EXAMPLES=OFF -DUSE_EXTERNAL_GLFW=OFF .. } try-process
@@ -247,7 +247,7 @@ IN: build-from-source.windows
     ] with-github-worktree-tag ;
 
 :: build-raygui-dll ( -- )
-    "raysan5" "raygui" raygui-versions last [
+    "raysan5" "raygui" raygui-release-versions last [
         "raysan5" "raylib" raylib-versions last github-tag-disk-checkout-path :> $raylib-dir
         $raylib-dir "src" append-path :> $raylib-src
         $raylib-dir "build/raylib/Release/raylib.lib" append-path :> $raylib-lib
