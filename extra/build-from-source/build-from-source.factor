@@ -299,7 +299,9 @@ ERROR: no-output-file path ;
 
 : pcre2-versions ( -- seq )
     "PCRE2Project" "pcre2" "pcre2-" list-repository-tags-matching
-    tag-refs human-sort ;
+    tag-refs
+    [ "-" split length 2 = ] filter
+    human-sort ;
 
 : lz4-versions ( -- seq )
     "lz4" "lz4" "v" list-repository-tags-matching
