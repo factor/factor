@@ -32,7 +32,6 @@ SYMBOL: current-cache-directory
 
 {
     { [ os windows? ] [ "io.files.temp.windows" ] }
-    { [ os macosx? ] [ "io.files.temp.macosx" ] }
     { [ os unix? ] [ "io.files.temp.unix" ] }
 } cond require
 
