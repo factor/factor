@@ -1,7 +1,7 @@
 ! Copyright (C) 2012 Joe Groff.
 ! See https://factorcode.org/license.txt for BSD license.
-USING: environment io.files.temp io.pathnames sequences system
-xdg ;
+USING: environment io.files.temp io.pathnames kernel sequences
+system vocabs xdg ;
 IN: io.files.temp.unix
 
 M: unix default-temp-directory
@@ -9,3 +9,5 @@ M: unix default-temp-directory
 
 M: unix default-cache-directory
     xdg-cache-home "factor" append-path absolute-path ;
+
+os macosx? [ "io.files.temp.macosx" require ] when

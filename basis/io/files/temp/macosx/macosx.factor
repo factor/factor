@@ -26,9 +26,8 @@ CONSTANT: factor-bundle-name "org.factorcode.Factor"
 : factor-bundle-subdir ( path -- path )
     factor-bundle-name append-path ;
 
-: first-existing ( paths -- path )
-    [ file-exists? ] find nip
-    [ "no user cache directory found" throw ] unless* ; inline
+: first-existing ( paths -- path/f )
+    [ file-exists? ] find nip ; inline
 
 PRIVATE>
 
@@ -37,4 +36,4 @@ M: macosx default-temp-directory
 
 M: macosx default-cache-directory
     NSCachesDirectory NSUserDomainMask 1 NSSearchPathForDirectoriesInDomains
-    plist> first-existing factor-bundle-subdir ;
+    plist> first-existing [ call-next-method ] unless* factor-bundle-subdir ;
