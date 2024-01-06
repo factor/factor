@@ -554,7 +554,7 @@ PREDICATE: ebnf-word < word "ebnf-quot" word-prop >boolean ;
 M: ebnf-word reset-word
     [ call-next-method ]
     [ "ebnf-quot" word-prop first first forget ]
-    [ "ebnf-quot" remove-word-prop ] tri ;
+    [ { "ebnf-quot" "ebnf-parser" } remove-word-props ] tri ;
 
 M: ebnf-word forget*
     [ call-next-method ] [ "ebnf-quot" word-prop first first forget ] bi ;
