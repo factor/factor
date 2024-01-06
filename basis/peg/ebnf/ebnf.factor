@@ -1,11 +1,12 @@
 ! Copyright (C) 2007 Chris Double.
 ! See https://factorcode.org/license.txt for BSD license.
 
-USING: accessors assocs combinators combinators.short-circuit
-effects kernel make math.parser multiline namespaces parser peg
-peg.private peg.parsers peg.search quotations sequences
-sequences.deep splitting stack-checker strings strings.parser
-summary unicode vocabs.parser words ;
+USING: accessors arrays assocs combinators
+combinators.short-circuit definitions effects kernel make
+math.parser multiline namespaces parser peg peg.parsers
+peg.private peg.search quotations sequences sequences.deep
+splitting stack-checker strings strings.parser summary unicode
+vocabs.parser words ;
 
 IN: peg.ebnf
 
@@ -547,6 +548,16 @@ SYNTAX: PARTIAL-EBNF:
     scan-word "ebnf-quot" word-prop
     [ ast>> ] compose
     ( input -- ast ) define-declared ;
+
+PREDICATE: ebnf-word < word "ebnf-quot" word-prop >boolean ;
+
+M: ebnf-word reset-word
+    [ call-next-method ]
+    [ "ebnf-quot" word-prop first first forget ]
+    [ "ebnf-quot" remove-word-prop ] tri ;
+
+M: ebnf-word forget*
+    [ call-next-method ] [ "ebnf-quot" word-prop first first forget ] bi ;
 
 : define-inline-ebnf ( ast string -- quot )
     reset-tokenizer
