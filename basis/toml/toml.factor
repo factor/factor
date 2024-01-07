@@ -22,11 +22,15 @@ TUPLE: entry key value ;
 : check-no-key ( key assoc -- key assoc )
     2dup at* nip [ over duplicate-key ] when ;
 
+: check-no-value ( key assoc -- table )
+    over '[
+        [ dup hashtable? [ _ duplicate-key ] unless ]
+        [ H{ } clone ] if* dup
+    ] change-at ;
+
 : entries-at ( table keys -- key entries )
     unclip-last -rot [
-        over ?at [ nip ] [
-            H{ } clone [ spin check-no-key set-at ] keep
-        ] if
+        over ?at [ nip ] [ swap check-no-value ] if
     ] each ;
 
 GENERIC: update-toml ( root table entry -- root table' )
@@ -37,9 +41,7 @@ M: entry update-toml
 
 M: table update-toml
     nip dupd [ name>> entries-at ] [ array?>> ] bi
-    H{ } clone [
-        swap [ -rot push-at ] [ -rot check-no-key set-at ] if
-    ] keep ;
+    [ H{ } clone [ -rot push-at ] keep ] [ check-no-value ] if ;
 
 : ws ( -- parser )
     [ " \t" member? ] satisfy repeat0 ;

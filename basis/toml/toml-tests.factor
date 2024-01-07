@@ -141,6 +141,17 @@ hosts = [
     temp_targets = { case = 72.0 }" toml>
 ] unit-test
 
+{
+    H{ { "foo" H{ { "qux" 456 } { "bar" H{ { "baz" 123 } } } } } }
+} [
+[=[
+[foo.bar]
+baz = 123
+[foo]
+qux = 456
+]=] toml>
+] unit-test
+
 ! TESTS FROM 1.0.0 SPEC
 
 ! Comments
