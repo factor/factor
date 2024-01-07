@@ -1,11 +1,11 @@
 ! Copyright (C) 2022 Doug Coleman.
 ! See https://factorcode.org/license.txt for BSD license.
 USING: accessors assocs assocs.extras combinators
-combinators.short-circuit formatting io io.backend
+combinators.short-circuit formatting hashtables io io.backend
 io.directories io.encodings.binary io.files io.files.info
-io.files.types io.pathnames kernel math math.statistics prettyprint
-sequences sets sorting splitting toml tools.memory.private
-tools.wc unicode ;
+io.files.types io.pathnames kernel math math.statistics
+prettyprint sequences sets sorting splitting toml
+tools.memory.private tools.wc unicode ;
 IN: codebase-analyzer
 
 : file-sizes ( paths -- assoc )
@@ -209,14 +209,23 @@ IN: codebase-analyzer
         [ ".so" tail? ]
     } 1|| ;
 
-: analyze-rust-cargo-toml ( assoc -- )
+: print-rust-package ( assoc -- )
     {
-        [ "workspace" of "members" of length [ "  %d member projects" sprintf print ] unless-zero ]
-        [ "package" of "name" of [ "  name: %s" sprintf print ] when* ]
-        [ "package" of "version" of [ "  version: %s" sprintf print ] when* ]
-        [ "package" of "license" of [ "  license: %s" sprintf print ] when* ]
-        [ "package" of "edition" of [ "  rust edition: %s" sprintf print ] when* ]
+        [ "name" of [ "  name: %s" sprintf print ] when* ]
+        [ "version" of [ "  version: %s" sprintf print ] when* ]
+        [ "license" of [ "  license: %s" sprintf print ] when* ]
+        [ "edition" of [ "  rust edition: %s" sprintf print ] when* ]
     } cleave ;
+
+: analyze-rust-cargo-toml ( assoc -- )
+    [ print-rust-package ] keep
+    [ "workspace" of "members" of length [ "  %d member projects" sprintf print ] unless-zero ]
+    [
+        [ [ "package" of ] [ "workspace" of "package" of ] bi assoc-union ] keep
+        "workspace" of "members" of [
+            "package: " write print print-rust-package
+        ] with each
+    ] bi ;
 
 : analyze-rust-project ( path -- )
     [ "Analyzing rust project at %s" sprintf print ]
