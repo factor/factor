@@ -350,13 +350,13 @@ PRIVATE>
 : progressive-index ( seq1 seq2 -- hash seq' )
     [ ] progressive-index-by ; inline
 
-: 0reduce ( seq quot: ( prev elt -- next ) -- result )
+: 0reduce ( seq quot: ( ..a prev elt -- ..a next ) -- result )
     [ 0 ] dip reduce ; inline
 
 : ?unclip ( seq -- rest/f first/f )
     [ f f ] [ unclip ] if-empty ;
 
-: 1reduce ( seq quot: ( prev elt -- next ) -- result )
+: 1reduce ( seq quot: ( ..a prev elt -- ..a next ) -- result )
     [ f ] swap '[ [ ] _ map-reduce ] if-empty ; inline
 
 <PRIVATE
@@ -1031,8 +1031,8 @@ ALIAS: map-infimum map-minimum deprecated
 ! https://en.wikipedia.org/wiki/Maximum_subarray_problem
 ! Kadane's algorithm O(n) largest sum in subarray
 : max-subarray-sum ( seq -- sum )
-    [ -1/0. 0 ] dip
-    [ [ + ] keep max [ max ] keep ] each drop ;
+    [ -1/0. ] dip
+    [ [ + ] keep max [ max ] keep ] 0reduce drop ;
 
 TUPLE: step-slice
     { from integer read-only initial: 0 }
