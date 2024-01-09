@@ -19,11 +19,17 @@ SYMBOLS: +parsing+ +done+ ;
         swap >>name
         H{ } clone >>words ;
 
+<PRIVATE
+
+: valid-vocab-name? ( name -- ? )
+    dup string? [ [ ":/\\ \"" member? ] none? ] [ f ] if ;
+
+PRIVATE>
+
 ERROR: bad-vocab-name name ;
 
 : check-vocab-name ( name -- name )
-    dup string? [ bad-vocab-name ] unless
-    dup [ ":/\\ \"" member? ] any? [ bad-vocab-name ] when ;
+    dup valid-vocab-name? [ bad-vocab-name ] unless ;
 
 TUPLE: vocab-link name ;
 
