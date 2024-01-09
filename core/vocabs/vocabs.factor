@@ -22,7 +22,7 @@ SYMBOLS: +parsing+ +done+ ;
 <PRIVATE
 
 : valid-vocab-name? ( name -- ? )
-    dup string? [ [ ":/\\ \"" member? ] none? ] [ f ] if ;
+    dup string? [ [ ":/\\ \"" member? ] none? ] [ drop f ] if ;
 
 PRIVATE>
 
