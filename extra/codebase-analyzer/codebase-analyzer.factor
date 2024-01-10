@@ -127,6 +127,26 @@ IN: codebase-analyzer
     >lower file-stem "owners" = ;
 : owners-files ( paths -- paths' ) [ owners-file? ] filter ;
 
+: codenotify-file? ( path -- ? )
+    >lower file-stem "codenotify" = ;
+: codenotify-files ( paths -- paths' ) [ codenotify-file? ] filter ;
+
+: contributing-file? ( path -- ? )
+    >lower file-stem "contributing" = ;
+: contributing-files ( paths -- paths' ) [ contributing-file? ] filter ;
+
+: changelog-file? ( path -- ? )
+    >lower file-stem "changelog" = ;
+: changelog-files ( paths -- paths' ) [ changelog-file? ] filter ;
+
+: security-file? ( path -- ? )
+    >lower file-stem "security" = ;
+: security-files ( paths -- paths' ) [ security-file? ] filter ;
+
+: notice-file? ( path -- ? )
+    >lower file-stem "notice" = ;
+: notice-files ( paths -- paths' ) [ notice-file? ] filter ;
+
 : version-file? ( path -- ? )
     >lower file-stem "version" = ;
 : version-files ( paths -- paths' ) [ version-file? ] filter ;
@@ -282,6 +302,11 @@ IN: codebase-analyzer
         [ license-files [ sort [ length "has %d license files" sprintf print ] [ ... ] bi ] unless-empty ]
         [ readme-files [ sort "has readme files" print ... ] unless-empty ]
         [ owners-files [ sort "has owners files" print ... ] unless-empty ]
+        [ codenotify-files [ sort "has codenotify files" print ... ] unless-empty ]
+        [ contributing-files [ sort "has contributing files" print ... ] unless-empty ]
+        [ changelog-files [ sort "has changelog files" print ... ] unless-empty ]
+        [ security-files [ sort "has security files" print ... ] unless-empty ]
+        [ notice-files [ sort "has notice files" print ... ] unless-empty ]
         [ version-files [ sort "has version files" print ... ] unless-empty ]
         [
             { [ dot-files ] [ rc-files diff ] [ ignore-files diff ] } cleave
@@ -302,12 +327,18 @@ IN: codebase-analyzer
         [
             [ upper-files ] keep
             {
+                [ github-files diff ]
                 [ license-files diff ]
                 [ readme-files diff ]
                 [ owners-files diff ]
+                [ codenotify-files diff ]
+                [ contributing-files diff ]
+                [ changelog-files diff ]
+                [ security-files diff ]
+                [ notice-files diff ]
                 [ version-files diff ]
             } cleave
-            [ sort [ length "has %d UPPER files (minus license,readme,owner,version)" sprintf print ] [ ... ] bi ] unless-empty nl
+            [ sort [ length "has %d UPPER files (minus github,license,readme,owner,codenotify,contributing,changelog,security,notice,version)" sprintf print ] [ ... ] bi ] unless-empty nl
         ]
         [ "Top 20 largest files" print file-sizes sort-values 20 index-or-length tail* [ normalize-path ] map-keys reverse assoc. nl ]
         [ "Top 10 file extension sizes" print sum-sizes-by-extension 10 index-or-length tail* reverse assoc. nl ]
