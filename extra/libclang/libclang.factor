@@ -12,19 +12,44 @@ IN: libclang
 INITIALIZED-SYMBOL: unnamed-counter [ 0 ]
 INITIALIZED-SYMBOL: defs-counter [ 0 ]
 
-INITIALIZED-SYMBOL: c-defs [ H{ } clone ]
-INITIALIZED-SYMBOL: c-defs-order [ H{ } clone ]
-INITIALIZED-SYMBOL: c-forms [ V{ } clone ]
+INITIALIZED-SYMBOL: c-defs-by-name [ H{ } clone ]
+INITIALIZED-SYMBOL: c-defs-by-order [ H{ } clone ]
+INITIALIZED-SYMBOL: c-forms [ H{ } clone ]
 INITIALIZED-SYMBOL: child-forms [ H{ } clone ]
 INITIALIZED-SYMBOL: unnamed-table [ H{ } clone ]
-INITIALIZED-SYMBOL: unnamed-set [ HS{ } clone ]
+INITIALIZED-SYMBOL: deferred-set [ HS{ } clone ]
+INITIALIZED-SYMBOL: out-forms [ H{ } clone ]
+INITIALIZED-SYMBOL: out-forms-written [ HS{ } clone ]
+INITIALIZED-SYMBOL: out-form-counter [ 0 ]
+
+
+GENERIC: def>out-form ( obj -- string )
+
+: save-out-form ( string -- )
+    [
+        dup out-forms-written get-global in? [
+            drop
+        ] [
+            [
+                out-form-counter counter
+                out-forms get-global set-at
+            ]
+            [ out-forms-written get-global adjoin ] bi
+        ] if
+    ] unless-empty ;
+
+! some forms must be defined out of order, e.g. anonymous unions/structs
+: def>out-forms ( obj -- )
+    def>out-form save-out-form ;
 
 : peek-current-form ( -- n )
     c-forms get-global ?last ; inline
 
 SLOT: parent-order
+SLOT: order
 
 : push-child-form ( form -- )
+    ! dup order>> c-defs-by-order get-global set-at ; inline
     dup parent-order>> child-forms get-global push-at ; inline
 
 : with-new-form ( quot -- n )
@@ -32,18 +57,39 @@ SLOT: parent-order
     call
     c-forms get-global pop ; inline
 
-: ?unnamed ( string type -- string' ? )
-    "(unnamed" pick subseq? [
-        nip [ "Unnamed" \ unnamed-counter counter number>string ] dip glue t
+ERROR: unknown-form name ;
+GENERIC: print-deferred ( obj -- )
+M: object print-deferred
+    type>> c-defs-by-name get-global ?at [ def>out-forms ] [ unknown-form ] if ;
+
+: maybe-defer ( n -- )
+    dup deferred-set get-global key? [
+        drop
     ] [
-        drop f
+        [ deferred-set get-global adjoin ]
+        [ print-deferred ] bi
     ] if ;
 
 : unnamed? ( string -- ? ) "(unnamed" swap subseq? ; inline
-: set-unnamed ( obj string -- ) unnamed-table get-global set-at ; inline
-: lookup-unnamed ( string -- type ) unnamed-table get-global at ; inline
+: append-counter ( string counter -- string' ) counter number>string append ; inline
+! : record-unnamed ( form-name string -- ) unnamed-table get-global set-at ;
+: unnamed-exists? ( string -- value/key ? ) unnamed-table get-global ?at ; inline
+: lookup-unnamed ( type string -- type-name )
+    unnamed-exists? [
+        nip
+    ] [
+        [ \ unnamed-counter append-counter ] dip
+        " " split1-last nip
+        "RECORDING: " gwrite dup g... gflush
+        [ unnamed-table get-global set-at ] keepd
+    ] if ; inline
 
-: record-unnamed ( string -- ) unnamed-set get-global adjoin ;
+: ?unnamed ( string type -- string' ? )
+    over unnamed? [
+        swap lookup-unnamed t
+    ] [
+        drop f
+    ] if ;
 
 TUPLE: c-function
     { return-type string }
@@ -129,10 +175,7 @@ TUPLE: c-typedef
         swap >>type
         defs-counter counter >>order ;
 
-
-GENERIC: libclang>string ( obj -- string )
-
-M: c-function libclang>string
+M: c-function def>out-form
     [
         {
             [ drop "FUNCTION: " ]
@@ -142,7 +185,7 @@ M: c-function libclang>string
         } cleave
     ] "" append-outputs-as ;
 
-M: c-typedef libclang>string
+M: c-typedef def>out-form
     dup [ type>> ] [ name>> ] bi = [
         drop ""
     ] [
@@ -156,7 +199,7 @@ M: c-typedef libclang>string
     ] if ;
 
 ERROR: unknown-child-forms order ;
-M: c-field libclang>string
+M: c-field def>out-form
     [
         {
             [ drop "  { " ]
@@ -165,58 +208,76 @@ M: c-field libclang>string
         } cleave
     ] "" append-outputs-as ;
 
-M: c-struct libclang>string
+: lookup-order ( obj -- order )
+    type>> c-defs-by-name get-global at [ order>> ] ?call -1 or ;
+
+: print-defers ( current-order slots -- )
+    [
+        tuck lookup-order < [
+            print-deferred
+        ] [
+            drop
+        ] if
+    ] with each ;
+
+M: c-struct def>out-form
     [
         {
             [ drop "STRUCT: " ]
             [ name>> "\n" ]
             [
-                order>> child-forms get-global ?at [ drop { } ] unless
-                [ libclang>string ] map "\n" join " ;\n" append
+                order>> dup child-forms get-global ?at [ drop { } ] unless
+                [ print-defers ]
+                [ nip [ def>out-form ] map "\n" join " ;\n" append ] 2bi
             ]
         } cleave
     ] "" append-outputs-as ;
 
-M: c-enum libclang>string
+M: c-enum def>out-form
     [
         {
             [ drop "ENUM: " ]
             [ name>> "\n" ]
             [
-                order>> child-forms get-global ?at [ unknown-child-forms ] unless
-                [ libclang>string ] map "\n" join " ;\n" append
+                order>> dup child-forms get-global ?at [ drop { } ] unless
+                [ print-defers ]
+                [ nip [ def>out-form ] map "\n" join " ;\n" append ] 2bi
             ]
         } cleave
     ] "" append-outputs-as ;
 
-M: c-union libclang>string
+M: c-union def>out-form
     [
         {
             [ drop "UNION-STRUCT: " ]
             [ name>> "\n" ]
             [
-                order>> child-forms get-global ?at [ unknown-child-forms ] unless
-                [ libclang>string ] map "\n" join " ;\n" append
+                order>> dup child-forms get-global ?at [ drop { } ] unless
+                [ print-defers ]
+                [ nip [ def>out-form ] map "\n" join " ;\n" append ] 2bi
             ]
         } cleave
     ] "" append-outputs-as ;
 
-M: object libclang>string
+M: object def>out-form
     class-of name>> "unknown object: " prepend ;
 
 : reset-c-defs ( -- )
     0 unnamed-counter set-global
     0 defs-counter set-global
-    H{ } clone c-defs set-global
-    H{ } clone c-defs-order set-global
+    H{ } clone c-defs-by-name set-global
+    H{ } clone c-defs-by-order set-global
     V{ } clone c-forms set-global
     H{ } clone child-forms set-global
     H{ } clone unnamed-table set-global
-    HS{ } clone unnamed-set set-global ;
+    HS{ } clone deferred-set set-global
+    H{ } clone out-forms set-global
+    HS{ } clone out-forms-written set-global
+    0 out-form-counter set-global ;
 
 : set-definition ( named -- )
-    [ dup name>> c-defs get-global set-at ]
-    [ dup order>> c-defs-order get-global set-at ] bi ;
+    [ dup name>> c-defs-by-name get-global set-at ]
+    [ dup order>> c-defs-by-order get-global set-at ] bi ;
 
 : clang-get-cstring ( CXString -- string )
     clang_getCString [ utf8 alien>string ] [ clang_disposeString ] bi ;
@@ -280,11 +341,7 @@ DEFER: cursor>c-struct
 DEFER: cursor>c-union
 
 :: cursor-type ( cursor -- string )
-    cursor
-    clang_getCursorType
-    clang_getTypeSpelling clang-get-cstring 
-
-    dup unnamed? [ dup record-unnamed ] when
+    cursor clang_getCursorType clang_getTypeSpelling clang-get-cstring
 
     "const" ?head drop
 
@@ -293,14 +350,17 @@ DEFER: cursor>c-union
 
     dup :> type
     {
-        { [ "struct " ?head ] [
-            "Struct" ?unnamed [
-                ! type set-unnamed
-                cursor cursor>c-struct
-            ] when
+        { [ dup "struct " head? ] [
+            " " split1-last nip
+            unnamed-table get-global ?at or
         ] }
-        { [ "union " ?head ] [
-            "Union" ?unnamed [ cursor cursor>c-union ] when
+
+        ! libclang uses two forms for unnamed union (why!?)
+        ! union (unnamed at /Users/erg/factor/elf2.h:39:3)
+        ! union (unnamed union at /Users/erg/factor/elf2.h:39:3)
+        { [ dup "union " head? ] [
+            " " split1-last nip
+            unnamed-table get-global ?at or
         ] }
         { [ dup "_Bool" = ] [ drop "bool" ] }
         { [ "int8_t" ?head ] [ trim-blanks "char" prepend ] }
@@ -395,98 +455,23 @@ DEFER: cursor>c-union
 : cursor>c-field ( CXCursor -- )
     [ cursor-name ] [ cursor-type ] bi <c-field> dup g... gflush push-child-form ;
 
-: struct-visitor ( -- callback )
-    [
-        2drop dup clang_getCursorKind
-        "struct-visitor got: " gwrite dup g... gflush
-        peek-current-form g... gflush
-        {
-            { CXCursor_FieldDecl [
-                cursor>c-field CXChildVisit_Continue
-            ] }
-            { CXCursor_UnionDecl [
-                ! cursor>c-union CXChildVisit_Continue
-                cursor>c-field CXChildVisit_Continue
-            ] }
-            [ dup g... gflush 2drop CXChildVisit_Recurse ]
-        } case
-    ] CXCursorVisitor ;
-
-: cursor>struct ( CXCursor -- )
-    [
-        "cursor>struct start" g...
-        peek-current-form g... gflush
-        {
-            [ cursor-name ]
-            [ struct-visitor f clang_visitChildren drop ]
-        } cleave
-        "cursor>struct finish" g... gflush
-        peek-current-form g... gflush
-    ] with-new-form
-
-     <c-struct> set-definition ;
-
-: enum-visitor ( -- callback )
-    [
-        2drop
-        dup clang_getCursorKind
-        {
-            { CXCursor_EnumConstantDecl [
-                [
-                    [ clang-get-token-spelling ] with-cursor-tokens
-                    first
-                ] [
-                    clang_getEnumConstantDeclUnsignedValue number>string
-                ] bi
-                <c-field> push-child-form
-                CXChildVisit_Continue
-            ] }
-            ! { CXCursor_IntegerLiteral [
-            !     "integer" gprint
-            !     [ clang-get-token-spelling ] with-cursor-tokens
-            !     CXChildVisit_Continue
-            ! ] }
-            [ "omg unhandled enum case" g... 2dup [ g... ] bi@ 2drop CXChildVisit_Recurse ]
-        } case
-        gflush
-    ] CXCursorVisitor ;
+DEFER: cursor-visitor
 
 : cursor>enum ( CXCursor -- )
     [
-        [ cursor-name ] [ enum-visitor ] bi
+        [ cursor-name ] [ cursor-visitor ] bi
         f clang_visitChildren drop
     ] with-new-form <c-enum> set-definition ;
 
-: union-visitor ( -- callback )
-    [
-        2drop
-        dup clang_getCursorKind
-        dup "union-visitor got: " gwrite g... gflush
-        {
-            { CXCursor_FieldDecl [
-                cursor>c-field CXChildVisit_Continue
-            ] }
-            { CXCursor_UnionDecl [
-                "union-visitor union...!" gprint
-                drop CXChildVisit_Continue
-            ] }
-            [ "unhandled union case" g...
-            dup g... gflush
-            ! 2dup [ g... ] bi@ 
-            2drop CXChildVisit_Recurse ]
-        } case
-        gflush
-    ] CXCursorVisitor ;
-
 : cursor>c-union ( CXCursor -- )
     [
-        "cursor>c-union start" g...
+        "cursor>union start" g...
         peek-current-form g... gflush
 
-        [ "Union" ?cursor-name ] keep
-        union-visitor f clang_visitChildren drop
+        [ "Union" ?cursor-name "name: " gwrite dup g... gflush ] keep
+        cursor-visitor f clang_visitChildren drop
 
-        "cursor>c-union finish" g... gflush
+        "cursor>union finish" g... gflush
         peek-current-form g... gflush
     ] with-new-form
     <c-union> dup g... gflush set-definition ;
@@ -497,7 +482,7 @@ DEFER: cursor>c-union
         peek-current-form g... gflush
 
         [ "Struct" ?cursor-name ] keep
-        struct-visitor f clang_visitChildren drop
+        cursor-visitor f clang_visitChildren drop
 
         "cursor>c-struct finish" g... gflush
         peek-current-form g... gflush
@@ -514,9 +499,23 @@ DEFER: cursor>c-union
             { CXCursor_FunctionDecl [ cursor>c-function CXChildVisit_Continue ] }
             { CXCursor_TypedefDecl [ cursor>c-typedef CXChildVisit_Continue ] }
             { CXCursor_UnionDecl [ cursor>c-union CXChildVisit_Continue ] }
-            { CXCursor_StructDecl [ cursor>struct CXChildVisit_Continue ] }
+            { CXCursor_StructDecl [ cursor>c-struct CXChildVisit_Continue ] }
             { CXCursor_EnumDecl [ cursor>enum CXChildVisit_Continue ] }
             { CXCursor_VarDecl [ drop CXChildVisit_Continue ] }
+
+            { CXCursor_FieldDecl [
+                cursor>c-field CXChildVisit_Continue
+            ] }
+            { CXCursor_EnumConstantDecl [
+                [
+                    [ clang-get-token-spelling ] with-cursor-tokens
+                    first
+                ] [
+                    clang_getEnumConstantDeclUnsignedValue number>string
+                ] bi
+                <c-field> push-child-form
+                CXChildVisit_Continue
+            ] }
             [
                 "cursor-visitor unhandled: " gwrite dup g... gflush
                 2drop CXChildVisit_Recurse
@@ -562,9 +561,11 @@ DEFER: cursor>c-union
     ] with-clang-cursor ;
 
 : write-c-defs ( -- )
-    c-defs-order get-global
+    c-defs-by-order get-global
     sort-keys values
-    [ libclang>string [ print ] unless-empty ] each ;
+    [ def>out-forms ] each
+    out-forms get-global
+    sort-keys values [ print ] each ;
 
 : parse-include ( path -- )
     normalize-path
@@ -585,6 +586,8 @@ DEFER: cursor>c-union
 
 ![[
 "resource:elf.h" parse-include
-c-defs-order get-global write-c-defs
+c-defs-by-order get-global write-c-defs
+
+"resource:elf2.h" parse-include
 
 ]]
