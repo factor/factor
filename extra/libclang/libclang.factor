@@ -3,9 +3,9 @@
 USING: accessors alien alien.c-types alien.data alien.enums
 alien.strings ascii assocs byte-arrays classes classes.struct
 combinators combinators.extras combinators.short-circuit
-combinators.smart discord io io.backend io.encodings.utf8
-io.files.info kernel layouts libc libclang.ffi make math
-math.parser multiline namespaces prettyprint sequences
+combinators.smart discord io io.backend io.directories
+io.encodings.utf8 io.files.info kernel layouts libc libclang.ffi
+make math math.parser multiline namespaces prettyprint sequences
 sequences.private sets sorting splitting strings ;
 IN: libclang
 
@@ -113,7 +113,7 @@ M: object print-deferred
     ] [
         [ clang-state> next-unnamed-counter number>string append ] dip
         " " split1-last nip
-        "RECORDING: " gwrite dup g... gflush
+        ! "RECORDING: " gwrite dup g... gflush
         [ clang-state> unnamed-table>> set-at ] keepd
     ] if ; inline
 
@@ -137,7 +137,6 @@ TUPLE: c-function
         swap >>return-type
         clang-state> next-defs-counter >>order ;
 
-
 TUPLE: c-struct
     { name string }
     { order integer } ;
@@ -146,7 +145,6 @@ TUPLE: c-struct
     c-struct new
         swap >>order
         swap >>name ;
-
 
 TUPLE: c-union
     { name string }
@@ -168,11 +166,10 @@ TUPLE: c-enum
         swap >>order
         swap >>name ;
 
-
 TUPLE: c-arg
     { name string }
     { type string }
-    { parent-order integer }
+    parent-order
     { order integer } ;
 
 : <c-arg> ( name type -- c-arg )
@@ -182,11 +179,10 @@ TUPLE: c-arg
         peek-current-form >>parent-order
         clang-state> next-defs-counter >>order ;
 
-
 TUPLE: c-field
     { name string }
     { type string }
-    { parent-order integer }
+    parent-order
     { order integer } ;
 
 : <c-field> ( name type -- c-field )
@@ -195,7 +191,6 @@ TUPLE: c-field
         swap >>name
         peek-current-form >>parent-order
         clang-state> next-defs-counter >>order ;
-
 
 TUPLE: c-typedef
     { type string }
@@ -347,30 +342,16 @@ M: object def>out-form
     [ drop ] [ clang-get-file-max-range ] 2bi
     clang-tokenize ;
 
-: tokenize-translation-unit ( CXTranslationUnit -- tokens ntokens )
-    [ ] [ clang_getTranslationUnitCursor clang_getCursorExtent ] bi
-    clang-tokenize ;
-
-: tokenize-cursor ( cursor -- tokens ntokens )
-    [ clang_Cursor_getTranslationUnit ] [ clang_getCursorExtent ] bi
-    clang-tokenize ;
-
-: dispose-tokens ( cursor tokens ntokens -- )
-    [ clang_Cursor_getTranslationUnit ] 2dip clang_disposeTokens ;
-
 :: with-cursor-tokens ( cursor quot: ( tu token -- obj ) -- )
     cursor clang_Cursor_getTranslationUnit :> tu
-    cursor tokenize-cursor :> ( tokens ntokens )
-    tokens ntokens <iota>
-    cell-bytes :> bytesize
+    tu cursor clang_getCursorExtent clang-tokenize :> ( tokens ntokens )
+    tu tokens ntokens <iota>
+    CXToken heap-size :> bytesize
     quot
     '[
-        [ tu ] 2dip bytesize * swap <displaced-alien> @
-    ] with { } map-as
-    tu tokens ntokens dispose-tokens ; inline
-
-: clang-get-token-spelling ( CXTranslationUnit CXToken -- string )
-    clang_getTokenSpelling clang-get-cstring ;
+        bytesize * swap <displaced-alien> @
+    ] with with { } map-as
+    tu tokens ntokens clang_disposeTokens ; inline
 
 DEFER: cursor>c-struct
 DEFER: cursor>c-union
@@ -419,7 +400,7 @@ DEFER: cursor>c-union
     } cond ;
 
 : cursor-name ( cursor -- string )
-    clang_getCursorSpelling clang-get-cstring "" ?unnamed drop ;
+    clang_getCursorSpelling clang-get-cstring "Enum" ?unnamed drop ;
 
 : ?cursor-name ( cursor unnamed-type -- string )
     [ clang_getCursorSpelling clang-get-cstring ] dip ?unnamed drop ;
@@ -460,7 +441,7 @@ DEFER: cursor>c-union
 : cxreturn-type>factor ( CXType -- string )
     {
         { [ dup kind>> CXType_Pointer = ] [
-            clang_getPointeeType dup g... gflush cxreturn-type>factor "*" append
+            clang_getPointeeType cxreturn-type>factor "*" append
         ] }
         { [ dup kind>> CXType_Elaborated = ] [
             clang_getCanonicalType cxreturn-type>factor
@@ -488,7 +469,7 @@ DEFER: cursor>c-union
     [ cursor-name ] bi <c-typedef> [ set-definition ] [ set-typedef ] bi ;
 
 : cursor>c-field ( CXCursor -- )
-    [ cursor-name ] [ cursor-type ] bi <c-field> dup g... gflush push-child-form ;
+    [ cursor-name ] [ cursor-type ] bi <c-field> push-child-form ;
 
 DEFER: cursor-visitor
 
@@ -500,35 +481,23 @@ DEFER: cursor-visitor
 
 : cursor>c-union ( CXCursor -- )
     [
-        "cursor>union start" g...
-        peek-current-form g... gflush
-
-        [ "Union" ?cursor-name "name: " gwrite dup g... gflush ] keep
+        [ "Union" ?cursor-name ] keep
         cursor-visitor f clang_visitChildren drop
-
-        "cursor>union finish" g... gflush
-        peek-current-form g... gflush
     ] with-new-form
-    <c-union> dup g... gflush set-definition ;
+    <c-union> set-definition ;
 
 : cursor>c-struct ( CXCursor -- )
     [
-        "cursor>c-struct start" g...
-        peek-current-form g... gflush
-
         [ "Struct" ?cursor-name ] keep
         cursor-visitor f clang_visitChildren drop
-
-        "cursor>c-struct finish" g... gflush
-        peek-current-form g... gflush
     ] with-new-form
-    <c-struct> dup g... gflush set-definition ;
+    <c-struct> set-definition ;
 
 : cursor-visitor ( -- callback )
     [
         2drop
         dup clang_getCursorKind
-        dup "cursor-visitor got: " gwrite g... gflush
+        ! dup "cursor-visitor got: " gwrite g... gflush
         {
             { CXCursor_Namespace [ drop CXChildVisit_Recurse ] }
             { CXCursor_FunctionDecl [ cursor>c-function CXChildVisit_Continue ] }
@@ -543,7 +512,9 @@ DEFER: cursor-visitor
             ] }
             { CXCursor_EnumConstantDecl [
                 [
-                    [ clang-get-token-spelling ] with-cursor-tokens
+                    [
+                        clang_getTokenSpelling clang-get-cstring
+                    ] with-cursor-tokens
                     first
                 ] [
                     clang_getEnumConstantDeclUnsignedValue number>string
@@ -551,6 +522,7 @@ DEFER: cursor-visitor
                 <c-field> push-child-form
                 CXChildVisit_Continue
             ] }
+            { CXCursor_UnexposedDecl [ drop CXChildVisit_Continue ] }
             [
                 "cursor-visitor unhandled: " gwrite dup g... gflush
                 2drop CXChildVisit_Recurse
@@ -602,4 +574,21 @@ DEFER: cursor-visitor
     <libclang-state> clang-state [
         normalize-path
         parse-c-exports
-    ] with-output-global-variable dup write-c-defs ; inline
+    ] with-output-global-variable
+    ! dup write-c-defs
+    ;
+
+: parse-hpp-files ( path -- assoc )
+    ?qualified-directory-files
+    [ ".hpp" tail? ] filter
+    [ parse-include ] zip-with ;
+
+: parse-h-files ( path -- assoc )
+    ?qualified-directory-files
+    [ ".h" tail? ] filter
+    [ parse-include ] zip-with ;
+
+: parse-cpp-files ( path -- assoc )
+    ?qualified-directory-files
+    [ ".cpp" tail? ] filter
+    [ parse-include ] zip-with ;
