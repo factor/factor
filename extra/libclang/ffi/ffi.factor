@@ -1,15 +1,23 @@
 ! Copyright (C) 2023 Doug Coleman.
 ! See https://factorcode.org/license.txt for BSD license.
 USING: alien alien.c-types alien.libraries alien.syntax
-classes.struct combinators kernel system ;
+classes.struct combinators io.directories io.pathnames kernel
+sequences sorting.human system ;
 IN: libclang.ffi
 
 LIBRARY: clang
 
+<<
+: latest-libclang ( -- path/f )
+    "/usr/lib/" qualified-directory-files
+    [ file-name "llvm-" head? ] filter
+    human-sort <reversed> ?first ;
+>>
+
 << "clang" {
     { [ os windows? ] [ "libclang.dll" ] }
     { [ os macosx? ] [ "/Library/Developer/CommandLineTools/usr/lib/libclang.dylib" ] }
-    { [ os unix? ] [ "/usr/lib/llvm-10/lib/libclang.so" ] }
+    { [ os unix? ] [ latest-libclang "lib/libclang.so" append-path ] }
 } cond cdecl add-library >>
 
 CONSTANT: UINT_MAX 4294967295
