@@ -585,24 +585,21 @@ DEFER: cursor-visitor
         2nip cursor-visitor f clang_visitChildren drop
     ] with-clang-cursor ;
 
-: write-c-defs ( -- )
-    clang-state> c-defs-by-order>>
-    sort-keys values
-    [ def>out-forms ] each
-    clang-state>
+: write-c-defs ( clang-state -- )
     [
-        [ members [ length ] inv-sort-by ] assoc-map
-    ] change-out-forms-by-name
-    out-forms>>
-    sort-keys values [ print ] each ;
+        c-defs-by-order>>
+        sort-keys values
+        [ def>out-forms ] each
+    ] [
+        [
+            [ members [ length ] inv-sort-by ] assoc-map
+        ] change-out-forms-by-name
+        out-forms>>
+        sort-keys values [ print ] each
+    ] bi ;
 
 : parse-include ( path -- libclang-state )
     <libclang-state> clang-state [
         normalize-path
-        ! reset-c-defs
-        {
-            ! [ parse-c-defines ]
-            [ parse-c-exports ]
-        } cleave
-        write-c-defs
-    ] with-output-global-variable ; inline
+        parse-c-exports
+    ] with-output-global-variable dup write-c-defs ; inline
