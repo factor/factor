@@ -2,39 +2,49 @@
 ! See https://factorcode.org/license.txt for BSD license.
 USING: accessors alien alien.c-types alien.data alien.enums
 alien.strings ascii assocs byte-arrays classes classes.struct
-combinators combinators.short-circuit combinators.smart discord
-io io.backend io.encodings.utf8 io.files.info kernel layouts
-libc libclang.ffi make math math.parser multiline namespaces
-prettyprint sequences sequences.private sets sorting splitting
-strings ;
+combinators combinators.extras combinators.short-circuit
+combinators.smart discord io io.backend io.encodings.utf8
+io.files.info kernel layouts libc libclang.ffi make math
+math.parser multiline namespaces prettyprint sequences
+sequences.private sets sorting splitting strings ;
 IN: libclang
 
-INITIALIZED-SYMBOL: unnamed-counter [ 0 ]
-INITIALIZED-SYMBOL: defs-counter [ 0 ]
+SYMBOL: clang-state
+: clang-state> ( -- clang-state ) clang-state get-global ;
 
-INITIALIZED-SYMBOL: c-defs-by-name [ H{ } clone ]
-INITIALIZED-SYMBOL: c-defs-by-order [ H{ } clone ]
-INITIALIZED-SYMBOL: c-forms [ H{ } clone ]
-INITIALIZED-SYMBOL: child-forms [ H{ } clone ]
-INITIALIZED-SYMBOL: unnamed-table [ H{ } clone ]
-INITIALIZED-SYMBOL: deferred-set [ HS{ } clone ]
-INITIALIZED-SYMBOL: out-forms [ H{ } clone ]
-INITIALIZED-SYMBOL: out-forms-written [ HS{ } clone ]
-INITIALIZED-SYMBOL: out-form-counter [ 0 ]
+! todo: typedefs
+TUPLE: libclang-state
+    defs-counter c-defs-by-name c-defs-by-order
+    c-forms child-forms
+    unnamed-table unnamed-counter
+    out-forms-counter out-forms out-forms-written ;
 
+: <libclang-state> ( -- state )
+    libclang-state new
+        0 >>defs-counter
+        H{ } clone >>c-defs-by-name
+        H{ } clone >>c-defs-by-order
+        V{ } clone >>c-forms
+        H{ } clone >>child-forms
+        0 >>unnamed-counter
+        H{ } clone >>unnamed-table
+        0 >>out-forms-counter
+        H{ } clone >>out-forms
+        HS{ } clone >>out-forms-written ;
 
 GENERIC: def>out-form ( obj -- string )
 
 : save-out-form ( string -- )
     [
-        dup out-forms-written get-global in? [
+        dup clang-state> out-forms-written>> in? [
             drop
         ] [
+            clang-state>
             [
-                out-form-counter counter
-                out-forms get-global set-at
+                [ out-forms-counter>> counter ]
+                [ out-forms>> set-at ] bi
             ]
-            [ out-forms-written get-global adjoin ] bi
+            [ out-forms-written>> adjoin ] 2bi
         ] if
     ] unless-empty ;
 
@@ -43,45 +53,36 @@ GENERIC: def>out-form ( obj -- string )
     def>out-form save-out-form ;
 
 : peek-current-form ( -- n )
-    c-forms get-global ?last ; inline
+    clang-state> c-forms>> ?last ; inline
 
 SLOT: parent-order
 SLOT: order
 
 : push-child-form ( form -- )
     ! dup order>> c-defs-by-order get-global set-at ; inline
-    dup parent-order>> child-forms get-global push-at ; inline
+    dup parent-order>> clang-state> child-forms>> push-at ; inline
 
 : with-new-form ( quot -- n )
-    defs-counter counter c-forms get-global push 
+    clang-state> [ defs-counter>> counter ] [ c-forms>> ] bi push
     call
-    c-forms get-global pop ; inline
+    clang-state> c-forms>> pop ; inline
 
 ERROR: unknown-form name ;
 GENERIC: print-deferred ( obj -- )
 M: object print-deferred
-    type>> c-defs-by-name get-global ?at [ def>out-forms ] [ unknown-form ] if ;
-
-: maybe-defer ( n -- )
-    dup deferred-set get-global key? [
-        drop
-    ] [
-        [ deferred-set get-global adjoin ]
-        [ print-deferred ] bi
-    ] if ;
+    type>> clang-state> c-defs-by-name>> ?at [ def>out-forms ] [ unknown-form ] if ;
 
 : unnamed? ( string -- ? ) "(unnamed" swap subseq? ; inline
 : append-counter ( string counter -- string' ) counter number>string append ; inline
-! : record-unnamed ( form-name string -- ) unnamed-table get-global set-at ;
-: unnamed-exists? ( string -- value/key ? ) unnamed-table get-global ?at ; inline
+: unnamed-exists? ( string -- value/key ? ) clang-state> unnamed-table>> ?at ; inline
 : lookup-unnamed ( type string -- type-name )
     unnamed-exists? [
         nip
     ] [
-        [ \ unnamed-counter append-counter ] dip
+        [ clang-state> unnamed-counter>> append-counter ] dip
         " " split1-last nip
         "RECORDING: " gwrite dup g... gflush
-        [ unnamed-table get-global set-at ] keepd
+        [ clang-state> unnamed-table>> set-at ] keepd
     ] if ; inline
 
 : ?unnamed ( string type -- string' ? )
@@ -102,7 +103,7 @@ TUPLE: c-function
         swap >>args
         swap >>name
         swap >>return-type
-        defs-counter counter >>order ;
+        clang-state> defs-counter>> counter >>order ;
 
 
 TUPLE: c-struct
@@ -147,7 +148,7 @@ TUPLE: c-arg
         swap >>type
         swap >>name
         peek-current-form >>parent-order
-        defs-counter counter >>order ;
+        clang-state> defs-counter>> counter >>order ;
 
 
 TUPLE: c-field
@@ -161,7 +162,7 @@ TUPLE: c-field
         swap >>type
         swap >>name
         peek-current-form >>parent-order
-        defs-counter counter >>order ;
+        clang-state> defs-counter>> counter >>order ;
 
 
 TUPLE: c-typedef
@@ -173,7 +174,7 @@ TUPLE: c-typedef
     c-typedef new
         swap >>name
         swap >>type
-        defs-counter counter >>order ;
+        clang-state> defs-counter>> counter >>order ;
 
 M: c-function def>out-form
     [
@@ -185,8 +186,12 @@ M: c-function def>out-form
         } cleave
     ] "" append-outputs-as ;
 
+: ignore-typedef? ( typedef -- ? )
+    [ type>> ] [ name>> ] bi
+    { [ = ] [ [ empty? ] either? ] } 2|| ;
+
 M: c-typedef def>out-form
-    dup [ type>> ] [ name>> ] bi = [
+    dup ignore-typedef? [
         drop ""
     ] [
         [
@@ -209,7 +214,7 @@ M: c-field def>out-form
     ] "" append-outputs-as ;
 
 : lookup-order ( obj -- order )
-    type>> c-defs-by-name get-global at [ order>> ] ?call -1 or ;
+    type>> clang-state> c-defs-by-name>> at [ order>> ] ?call -1 or ;
 
 : print-defers ( current-order slots -- )
     [
@@ -220,18 +225,25 @@ M: c-field def>out-form
         ] if
     ] with each ;
 
+: empty-struct? ( c-struct -- ? )
+    order>> clang-state> child-forms>> key? not ;
+
 M: c-struct def>out-form
-    [
-        {
-            [ drop "STRUCT: " ]
-            [ name>> "\n" ]
-            [
-                order>> dup child-forms get-global ?at [ drop { } ] unless
-                [ print-defers ]
-                [ nip [ def>out-form ] map "\n" join " ;\n" append ] 2bi
-            ]
-        } cleave
-    ] "" append-outputs-as ;
+    dup empty-struct? [
+        name>> "C-TYPE: " prepend
+    ] [
+        [
+            {
+                [ drop "STRUCT: " ]
+                [ name>> "\n" ]
+                [
+                    order>> dup clang-state> child-forms>> ?at [ drop { } ] unless
+                    [ print-defers ]
+                    [ nip [ def>out-form ] map "\n" join " ;\n" append ] 2bi
+                ]
+            } cleave
+        ] "" append-outputs-as
+    ] if ;
 
 M: c-enum def>out-form
     [
@@ -239,7 +251,7 @@ M: c-enum def>out-form
             [ drop "ENUM: " ]
             [ name>> "\n" ]
             [
-                order>> dup child-forms get-global ?at [ drop { } ] unless
+                order>> dup clang-state> child-forms>> ?at [ drop { } ] unless
                 [ print-defers ]
                 [ nip [ def>out-form ] map "\n" join " ;\n" append ] 2bi
             ]
@@ -252,7 +264,7 @@ M: c-union def>out-form
             [ drop "UNION-STRUCT: " ]
             [ name>> "\n" ]
             [
-                order>> dup child-forms get-global ?at [ drop { } ] unless
+                order>> dup clang-state> child-forms>> ?at [ drop { } ] unless
                 [ print-defers ]
                 [ nip [ def>out-form ] map "\n" join " ;\n" append ] 2bi
             ]
@@ -262,22 +274,9 @@ M: c-union def>out-form
 M: object def>out-form
     class-of name>> "unknown object: " prepend ;
 
-: reset-c-defs ( -- )
-    0 unnamed-counter set-global
-    0 defs-counter set-global
-    H{ } clone c-defs-by-name set-global
-    H{ } clone c-defs-by-order set-global
-    V{ } clone c-forms set-global
-    H{ } clone child-forms set-global
-    H{ } clone unnamed-table set-global
-    HS{ } clone deferred-set set-global
-    H{ } clone out-forms set-global
-    HS{ } clone out-forms-written set-global
-    0 out-form-counter set-global ;
-
 : set-definition ( named -- )
-    [ dup name>> c-defs-by-name get-global set-at ]
-    [ dup order>> c-defs-by-order get-global set-at ] bi ;
+    [ dup name>> clang-state> c-defs-by-name>> set-at ]
+    [ dup order>> clang-state> c-defs-by-order>> set-at ] bi ;
 
 : clang-get-cstring ( CXString -- string )
     clang_getCString [ utf8 alien>string ] [ clang_disposeString ] bi ;
@@ -352,7 +351,7 @@ DEFER: cursor>c-union
     {
         { [ dup "struct " head? ] [
             " " split1-last nip
-            unnamed-table get-global ?at or
+            clang-state> unnamed-table>> ?at or
         ] }
 
         ! libclang uses two forms for unnamed union (why!?)
@@ -360,7 +359,7 @@ DEFER: cursor>c-union
         ! union (unnamed union at /Users/erg/factor/elf2.h:39:3)
         { [ dup "union " head? ] [
             " " split1-last nip
-            unnamed-table get-global ?at or
+            clang-state> unnamed-table>> ?at or
         ] }
         { [ dup "_Bool" = ] [ drop "bool" ] }
         { [ "int8_t" ?head ] [ trim-blanks "char" prepend ] }
@@ -561,20 +560,22 @@ DEFER: cursor-visitor
     ] with-clang-cursor ;
 
 : write-c-defs ( -- )
-    c-defs-by-order get-global
+    clang-state> c-defs-by-order>>
     sort-keys values
     [ def>out-forms ] each
-    out-forms get-global
+    clang-state> out-forms>>
     sort-keys values [ print ] each ;
 
-: parse-include ( path -- )
-    normalize-path
-    reset-c-defs
-    {
-        ! [ parse-c-defines ]
-        [ parse-c-exports ]
-    } cleave
-    write-c-defs ;
+: parse-include ( path -- libclang-state )
+    <libclang-state> clang-state [
+        normalize-path
+        ! reset-c-defs
+        {
+            ! [ parse-c-defines ]
+            [ parse-c-exports ]
+        } cleave
+        write-c-defs
+    ] with-output-global-variable ; inline
 
 
 
