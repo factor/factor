@@ -143,29 +143,7 @@ ENUM: CXTypeKind { CXType_Invalid 0 } { CXType_Unexposed 1 } { CXType_Void 2 } {
 { CXType_OCLIntelSubgroupAVCSicResult 171 } { CXType_OCLIntelSubgroupAVCImeResultSingleRefStreamout 172 }
 { CXType_OCLIntelSubgroupAVCImeResultDualRefStreamout 173 } { CXType_OCLIntelSubgroupAVCImeSingleRefStreamin 174 }
 { CXType_OCLIntelSubgroupAVCImeDualRefStreamin 175 } { CXType_ExtVector 176 } { CXType_Atomic 177 }
-{ CXType_OCLIntelSubgroupAVCImePayloadSingleRefStreamout 178 } { CXType_OCLIntelSubgroupAVCImePayloadDualRefStreamout 179 } { CXType_OCLIntelSubgroupAVCImeInputPayload 180 }
-{ CXType_OCLIntelSubgroupAVCImeInputPayloads 181 }
-{ CXType_OCLIntelSubgroupAVCRefPayloads 182 }
-{ CXType_OCLIntelSubgroupAVCSicPayloads 183 }
-{ CXType_OCLIntelSubgroupAVCMceInputPayload 184 }
-{ CXType_OCLIntelSubgroupAVCMceInputPayloads 185 }
-{ CXType_OCLIntelSubgroupAVCMotionEstimationForwardIntegerINTEL 186 }
-{ CXType_OCLIntelSubgroupAVCMotionEstimationBackwardIntegerINTEL 187 }
-{ CXType_OCLIntelSubgroupAVCMotionEstimationBidirectionalIntegerINTEL 188 }
-{ CXType_OCLIntelSubgroupAVCMotionEstimationForwardDualReferenceINTEL 189 }
-{ CXType_OCLIntelSubgroupAVCMotionEstimationBackwardDualReferenceINTEL 190 }
-{ CXType_OCLIntelSubgroupAVCMotionEstimationBidirectionalDualReferenceINTEL 191 }
-{ CXType_OCLIntelSubgroupAVCMotionEstimationInterlacedINTEL 192 }
-{ CXType_OCLIntelSubgroupAVCMotionEstimationInterlacedDualReferenceINTEL 193 }
-{ CXType_OCLIntelSubgroupAVCEvaluateWithSingleReferenceINTEL 194 }
-{ CXType_OCLIntelSubgroupAVCEvaluateWithDualReferenceINTEL 195 }
-{ CXType_OCLIntelSubgroupAVCDualReferenceInterlacedINTEL 196 }
-{ CXType_OCLIntelSubgroupAVCDualReferenceInterlacedWithSingleReferenceINTEL 197 }
-{ CXType_OCLIntelSubgroupAVCDualReferenceInterlacedWithDualReferenceINTEL 198 }
-{ CXType_OCLIntelSubgroupAVCEvaluateWithSingleReferenceStreaminINTEL 199 }
-{ CXType_OCLIntelSubgroupAVCEvaluateWithDualReferenceStreaminINTEL 200 }
-{ CXType_OCLIntelSubgroupAVCEvaluateWithSingleReferenceStreamoutINTEL 201 }
-{ CXType_OCLIntelSubgroupAVCEvaluateWithDualReferenceStreamoutINTEL 202 } ;
+{ CXType_BTFTagAttributed 178 } ;
 
 ENUM: CXTranslationUnit_Flags
 { CXTranslationUnit_None 0 }
