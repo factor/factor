@@ -172,6 +172,12 @@ MACRO: chain ( quots -- quot )
 : with-output-variable ( value variable quot -- value )
     over '[ @ _ get ] with-variable ; inline
 
+: with-global-variable ( value key quot -- )
+    [ set-global ] dip call ; inline
+
+: with-output-global-variable ( value variable quot -- value )
+    over '[ @ _ get-global ] with-global-variable ; inline
+
 : loop1 ( ..a quot: ( ..a -- ..a obj ? ) -- ..a obj )
     [ call ] keep '[ drop _ loop1 ] when ; inline recursive
 
