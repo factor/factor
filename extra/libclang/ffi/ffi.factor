@@ -22,26 +22,138 @@ LIBRARY: clang
 
 CONSTANT: UINT_MAX 4294967295
 
-TYPEDEF: void* CXIndex
-TYPEDEF: void* CXTranslationUnit
 TYPEDEF: void* CXClientData
+TYPEDEF: void* CXCompilationDatabase
+TYPEDEF: void* CXCompileCommand
+TYPEDEF: void* CXCompileCommands
+TYPEDEF: void* CXCompletionString
+TYPEDEF: void* CXCursorSet
+TYPEDEF: void* CXDiagnostic
+TYPEDEF: void* CXDiagnosticSet
+TYPEDEF: void* CXEvalResult
 TYPEDEF: void* CXFile
+TYPEDEF: void* CXIdxClientASTFile
+TYPEDEF: void* CXIdxClientContainer
+TYPEDEF: void* CXIdxClientEntity
+TYPEDEF: void* CXIdxClientFile
+TYPEDEF: void* CXIndex
+TYPEDEF: void* CXIndexAction
+TYPEDEF: void* CXModule
+TYPEDEF: void* CXPrintingPolicy
+TYPEDEF: void* CXRemapping
+TYPEDEF: void* CXTargetInfo
+TYPEDEF: void* CXTranslationUnit
 
 STRUCT: CXToken
 { int_data uint[4] }
 { ptr_data void* } ;
 
-ENUM: CXTokenKind
-{ CXToken_Punctuation 0 }
-{ CXToken_Keyword 1 }
-{ CXToken_Identifier 2 }
-{ CXToken_Literal 3 }
-{ CXToken_Comment 4 } ;
+ENUM: CXAvailabilityKind
+{ CXAvailability_Available 0 }
+{ CXAvailability_Deprecated 1 }
+{ CXAvailability_NotAvailable 2 }
+{ CXAvailability_NotAccessible 3 } ;
 
-STRUCT: CXUnsavedFile
-{ Filename char* }
-{ Contents char* }
-{ Length ulong } ;
+ENUM: CXBinaryOperatorKind
+{ CXBinaryOperator_Invalid 0 } { CXBinaryOperator_PtrMemD 1 } { CXBinaryOperator_PtrMemI 2 }
+{ CXBinaryOperator_Mul 3 } { CXBinaryOperator_Div 4 } { CXBinaryOperator_Rem 5 }
+{ CXBinaryOperator_Add 6 } { CXBinaryOperator_Sub 7 } { CXBinaryOperator_Shl 8 }
+{ CXBinaryOperator_Shr 9 } { CXBinaryOperator_Cmp 10 } { CXBinaryOperator_LT 11 }
+{ CXBinaryOperator_GT 12 } { CXBinaryOperator_LE 13 } { CXBinaryOperator_GE 14 }
+{ CXBinaryOperator_EQ 15 } { CXBinaryOperator_NE 16 } { CXBinaryOperator_And 17 }
+{ CXBinaryOperator_Xor 18 } { CXBinaryOperator_Or 19 } { CXBinaryOperator_LAnd 20 }
+{ CXBinaryOperator_LOr 21 } { CXBinaryOperator_Assign 22 } { CXBinaryOperator_MulAssign 23 }
+{ CXBinaryOperator_DivAssign 24 } { CXBinaryOperator_RemAssign 25 } { CXBinaryOperator_AddAssign 26 }
+{ CXBinaryOperator_SubAssign 27 } { CXBinaryOperator_ShlAssign 28 } { CXBinaryOperator_ShrAssign 29 }
+{ CXBinaryOperator_AndAssign 30 } { CXBinaryOperator_XorAssign 31 } { CXBinaryOperator_OrAssign 32 }
+{ CXBinaryOperator_Comma 33 } ;
+
+ENUM: CXCallingConv
+{ CXCallingConv_Default 0 }
+{ CXCallingConv_C 1 }
+{ CXCallingConv_X86StdCall 2 }
+{ CXCallingConv_X86FastCall 3 }
+{ CXCallingConv_X86ThisCall 4 }
+{ CXCallingConv_X86Pascal 5 }
+{ CXCallingConv_AAPCS 6 }
+{ CXCallingConv_AAPCS_VFP 7 }
+{ CXCallingConv_X86RegCall 8 }
+{ CXCallingConv_IntelOclBicc 9 }
+{ CXCallingConv_Win64 10 }
+{ CXCallingConv_X86_64Win64 10 }
+{ CXCallingConv_X86_64SysV 11 }
+{ CXCallingConv_X86VectorCall 12 }
+{ CXCallingConv_Swift 13 }
+{ CXCallingConv_PreserveMost 14 }
+{ CXCallingConv_PreserveAll 15 }
+{ CXCallingConv_AArch64VectorCall 16 }
+{ CXCallingConv_Invalid 100 }
+{ CXCallingConv_Unexposed 200 }
+{ CXCallingConv_SwiftAsync 17 }
+{ CXCallingConv_AArch64SVEPCS 18 } ;
+
+ENUM: CXChildVisitResult
+{ CXChildVisit_Break 0 }
+{ CXChildVisit_Continue 1 }
+{ CXChildVisit_Recurse 2 } ;
+
+ENUM: CXChoice
+{ CXChoice_Default 0 }
+{ CXChoice_Enabled 1 }
+{ CXChoice_Disabled 2 } ;
+
+ENUM: CXCommentInlineCommandRenderKind
+{ CXCommentInlineCommandRenderKind_Normal 0 }
+{ CXCommentInlineCommandRenderKind_Bold 1 }
+{ CXCommentInlineCommandRenderKind_Monospaced 2 }
+{ CXCommentInlineCommandRenderKind_Emphasized 3 } ;
+
+ENUM: CXCommentKind
+{ CXComment_Null 0 }
+{ CXComment_Text 1 }
+{ CXComment_InlineCommand 2 }
+{ CXComment_HTMLStartTag 3 }
+{ CXComment_HTMLEndTag 4 }
+{ CXComment_Paragraph 5 }
+{ CXComment_BlockCommand 6 }
+{ CXComment_ParamCommand 7 }
+{ CXComment_TParamCommand 8 }
+{ CXComment_VerbatimBlockCommand 9 }
+{ CXComment_VerbatimBlockLine 10 }
+{ CXComment_VerbatimLine 11 }
+{ CXComment_FullComment 12 } ;
+
+ENUM: CXCommentParamPassDirection
+{ CXCommentParamPassDirection_In 0 }
+{ CXCommentParamPassDirection_Out 1 }
+{ CXCommentParamPassDirection_InOut 2 } ;
+
+ENUM: CXCompilationDatabase_Error
+{ CXCompilationDatabase_NoError 0 }
+{ CXCompilationDatabase_CanNotLoadDatabase 1 } ;
+
+ENUM: CXCompletionChunkKind
+{ CXCompletionChunk_Optional 0 }
+{ CXCompletionChunk_TypedText 1 }
+{ CXCompletionChunk_Text 2 }
+{ CXCompletionChunk_Placeholder 3 }
+{ CXCompletionChunk_Informative 4 }
+{ CXCompletionChunk_CurrentParameter 5 }
+{ CXCompletionChunk_LeftParen 6 }
+{ CXCompletionChunk_RightParen 7 }
+{ CXCompletionChunk_LeftBracket 8 }
+{ CXCompletionChunk_RightBracket 9 }
+{ CXCompletionChunk_LeftBrace 10 }
+{ CXCompletionChunk_RightBrace 11 }
+{ CXCompletionChunk_LeftAngle 12 }
+{ CXCompletionChunk_RightAngle 13 }
+{ CXCompletionChunk_Comma 14 }
+{ CXCompletionChunk_ResultType 15 }
+{ CXCompletionChunk_Colon 16 }
+{ CXCompletionChunk_SemiColon 17 }
+{ CXCompletionChunk_Equal 18 }
+{ CXCompletionChunk_HorizontalSpace 19 }
+{ CXCompletionChunk_VerticalSpace 20 } ;
 
 ENUM: CXCursorKind
 { CXCursor_UnexposedDecl 1 } { CXCursor_StructDecl 2 } { CXCursor_UnionDecl 3 } { CXCursor_ClassDecl 4 }
@@ -114,10 +226,183 @@ ENUM: CXCursorKind
 { CXCursor_StaticAssert 602 } { CXCursor_FriendDecl 603 } { CXCursor_FirstExtraDecl CXCursor_ModuleImportDecl } { CXCursor_LastExtraDecl CXCursor_FriendDecl }
 { CXCursor_OverloadCandidate 700 } ;
 
-ENUM: CXChildVisitResult
-{ CXChildVisit_Break 0 }
-{ CXChildVisit_Continue 1 }
-{ CXChildVisit_Recurse 2 } ;
+ENUM: CXCursor_ExceptionSpecificationKind
+{ CXCursor_ExceptionSpecificationKind_None 0 }
+{ CXCursor_ExceptionSpecificationKind_DynamicNone 1 }
+{ CXCursor_ExceptionSpecificationKind_Dynamic 2 }
+{ CXCursor_ExceptionSpecificationKind_MSAny 3 }
+{ CXCursor_ExceptionSpecificationKind_BasicNoexcept 4 }
+{ CXCursor_ExceptionSpecificationKind_ComputedNoexcept 5 }
+{ CXCursor_ExceptionSpecificationKind_Unevaluated 6 }
+{ CXCursor_ExceptionSpecificationKind_Uninstantiated 7 }
+{ CXCursor_ExceptionSpecificationKind_Unparsed 8 }
+{ CXCursor_ExceptionSpecificationKind_NoThrow 9 } ;
+
+ENUM: CXDiagnosticSeverity
+{ CXDiagnostic_Ignored 0 }
+{ CXDiagnostic_Note 1 }
+{ CXDiagnostic_Warning 2 }
+{ CXDiagnostic_Error 3 }
+{ CXDiagnostic_Fatal 4 } ;
+
+ENUM: CXErrorCode
+{ CXError_Success 0 }
+{ CXError_Failure 1 }
+{ CXError_Crashed 2 }
+{ CXError_InvalidArguments 3 }
+{ CXError_ASTReadError 4 } ;
+
+ENUM: CXEvalResultKind
+{ CXEval_UnExposed 0 }
+{ CXEval_Int 1 }
+{ CXEval_Float 2 }
+{ CXEval_ObjCStrLiteral 3 }
+{ CXEval_StrLiteral 4 }
+{ CXEval_CFStr 5 }
+{ CXEval_Other 6 } ;
+
+ENUM: CXIdxAttrKind
+{ CXIdxAttr_Unexposed 0 }
+{ CXIdxAttr_IBAction 1 }
+{ CXIdxAttr_IBOutlet 2 }
+{ CXIdxAttr_IBOutletCollection 3 } ;
+
+ENUM: CXIdxEntityCXXTemplateKind
+{ CXIdxEntity_NonTemplate 0 }
+{ CXIdxEntity_Template 1 }
+{ CXIdxEntity_TemplatePartialSpecialization 2 }
+{ CXIdxEntity_TemplateSpecialization 3 } ;
+
+ENUM: CXIdxEntityKind
+{ CXIdxEntity_Unexposed 0 } { CXIdxEntity_Typedef 1 } { CXIdxEntity_Function 2 }
+{ CXIdxEntity_Variable 3 } { CXIdxEntity_Field 4 } { CXIdxEntity_EnumConstant 5 }
+{ CXIdxEntity_ObjCClass 6 } { CXIdxEntity_ObjCProtocol 7 } { CXIdxEntity_ObjCCategory 8 }
+{ CXIdxEntity_ObjCInstanceMethod 9 } { CXIdxEntity_ObjCClassMethod 10 } { CXIdxEntity_ObjCProperty 11 }
+{ CXIdxEntity_ObjCIvar 12 } { CXIdxEntity_Enum 13 } { CXIdxEntity_Struct 14 }
+{ CXIdxEntity_Union 15 } { CXIdxEntity_CXXClass 16 } { CXIdxEntity_CXXNamespace 17 }
+{ CXIdxEntity_CXXNamespaceAlias 18 } { CXIdxEntity_CXXStaticVariable 19 } { CXIdxEntity_CXXStaticMethod 20 }
+{ CXIdxEntity_CXXInstanceMethod 21 } { CXIdxEntity_CXXConstructor 22 } { CXIdxEntity_CXXDestructor 23 }
+{ CXIdxEntity_CXXConversionFunction 24 } { CXIdxEntity_CXXTypeAlias 25 } { CXIdxEntity_CXXInterface 26 }
+{ CXIdxEntity_CXXConcept 27 } ;
+
+ENUM: CXIdxEntityLanguage
+{ CXIdxEntityLang_None 0 }
+{ CXIdxEntityLang_C 1 }
+{ CXIdxEntityLang_ObjC 2 }
+{ CXIdxEntityLang_CXX 3 }
+{ CXIdxEntityLang_Swift 4 } ;
+
+ENUM: CXIdxEntityRefKind
+{ CXIdxEntityRef_Direct 1 }
+{ CXIdxEntityRef_Implicit 2 } ;
+
+ENUM: CXIdxObjCContainerKind
+{ CXIdxObjCContainer_ForwardRef 0 }
+{ CXIdxObjCContainer_Interface 1 }
+{ CXIdxObjCContainer_Implementation 2 } ;
+
+ENUM: CXLanguageKind
+{ CXLanguage_Invalid 0 }
+{ CXLanguage_C 1 }
+{ CXLanguage_ObjC 2 }
+{ CXLanguage_CPlusPlus 3 } ;
+
+ENUM: CXLinkageKind
+{ CXLinkage_Invalid 0 }
+{ CXLinkage_NoLinkage 1 }
+{ CXLinkage_Internal 2 }
+{ CXLinkage_UniqueExternal 3 }
+{ CXLinkage_External 4 } ;
+
+ENUM: CXLoadDiag_Error
+{ CXLoadDiag_None 0 }
+{ CXLoadDiag_Unknown 1 }
+{ CXLoadDiag_CannotLoad 2 }
+{ CXLoadDiag_InvalidFile 3 } ;
+
+ENUM: CXPrintingPolicyProperty
+{ CXPrintingPolicy_Indentation 0 }
+{ CXPrintingPolicy_SuppressSpecifiers 1 }
+{ CXPrintingPolicy_SuppressTagKeyword 2 }
+{ CXPrintingPolicy_IncludeTagDefinition 3 }
+{ CXPrintingPolicy_SuppressScope 4 }
+{ CXPrintingPolicy_SuppressUnwrittenScope 5 }
+{ CXPrintingPolicy_SuppressInitializers 6 }
+{ CXPrintingPolicy_ConstantArraySizeAsWritten 7 }
+{ CXPrintingPolicy_AnonymousTagLocations 8 }
+{ CXPrintingPolicy_SuppressStrongLifetime 9 }
+{ CXPrintingPolicy_SuppressLifetimeQualifiers 10 }
+{ CXPrintingPolicy_SuppressTemplateArgsInCXXConstructors 11 }
+{ CXPrintingPolicy_Bool 12 }
+{ CXPrintingPolicy_Restrict 13 }
+{ CXPrintingPolicy_Alignof 14 }
+{ CXPrintingPolicy_UnderscoreAlignof 15 }
+{ CXPrintingPolicy_UseVoidForZeroParams 16 }
+{ CXPrintingPolicy_TerseOutput 17 }
+{ CXPrintingPolicy_PolishForDeclaration 18 }
+{ CXPrintingPolicy_Half 19 }
+{ CXPrintingPolicy_MSWChar 20 }
+{ CXPrintingPolicy_IncludeNewlines 21 }
+{ CXPrintingPolicy_MSVCFormatting 22 }
+{ CXPrintingPolicy_ConstantsAsWritten 23 }
+{ CXPrintingPolicy_SuppressImplicitBase 24 }
+{ CXPrintingPolicy_FullyQualifiedName 25 } ;
+
+ENUM: CXRefQualifierKind
+{ CXRefQualifier_None 0 }
+{ CXRefQualifier_LValue 1 }
+{ CXRefQualifier_RValue 2 } ;
+
+ENUM: CXResult
+{ CXResult_Success 0 }
+{ CXResult_Invalid 1 }
+{ CXResult_VisitBreak 2 } ;
+
+ENUM: CXSaveError
+{ CXSaveError_None 0 }
+{ CXSaveError_Unknown 1 }
+{ CXSaveError_TranslationErrors 2 }
+{ CXSaveError_InvalidTU 3 } ;
+
+ENUM: CXTLSKind
+{ CXTLS_None 0 }
+{ CXTLS_Dynamic 1 }
+{ CXTLS_Static 2 } ;
+
+ENUM: CXTUResourceUsageKind
+{ CXTUResourceUsage_AST 1 }
+{ CXTUResourceUsage_Identifiers 2 }
+{ CXTUResourceUsage_Selectors 3 }
+{ CXTUResourceUsage_GlobalCompletionResults 4 }
+{ CXTUResourceUsage_SourceManagerContentCache 5 }
+{ CXTUResourceUsage_AST_SideTables 6 }
+{ CXTUResourceUsage_SourceManager_Membuffer_Malloc 7 }
+{ CXTUResourceUsage_SourceManager_Membuffer_MMap 8 }
+{ CXTUResourceUsage_ExternalASTSource_Membuffer_Malloc 9 }
+{ CXTUResourceUsage_ExternalASTSource_Membuffer_MMap 10 }
+{ CXTUResourceUsage_Preprocessor 11 }
+{ CXTUResourceUsage_PreprocessingRecord 12 }
+{ CXTUResourceUsage_SourceManager_DataStructures 13 }
+{ CXTUResourceUsage_Preprocessor_HeaderSearch 14 } ;
+
+ENUM: CXTemplateArgumentKind
+{ CXTemplateArgumentKind_Null 0 }
+{ CXTemplateArgumentKind_Type 1 }
+{ CXTemplateArgumentKind_Declaration 2 }
+{ CXTemplateArgumentKind_NullPtr 3 }
+{ CXTemplateArgumentKind_Integral 4 }
+{ CXTemplateArgumentKind_Template 5 }
+{ CXTemplateArgumentKind_TemplateExpansion 6 }
+{ CXTemplateArgumentKind_Expression 7 }
+{ CXTemplateArgumentKind_Pack 8 }
+{ CXTemplateArgumentKind_Invalid 9 } ;
+
+ENUM: CXTokenKind
+{ CXToken_Punctuation 0 }
+{ CXToken_Keyword 1 }
+{ CXToken_Identifier 2 }
+{ CXToken_Literal 3 }
+{ CXToken_Comment 4 } ;
 
 ENUM: CXTypeKind { CXType_Invalid 0 } { CXType_Unexposed 1 } { CXType_Void 2 } { CXType_Bool 3 }
 { CXType_Char_U 4 } { CXType_UChar 5 } { CXType_Char16 6 } { CXType_Char32 7 }
@@ -153,6 +438,171 @@ ENUM: CXTypeKind { CXType_Invalid 0 } { CXType_Unexposed 1 } { CXType_Void 2 } {
 { CXType_OCLIntelSubgroupAVCImeDualRefStreamin 175 } { CXType_ExtVector 176 } { CXType_Atomic 177 }
 { CXType_BTFTagAttributed 178 } ;
 
+ENUM: CXTypeLayoutError
+{ CXTypeLayoutError_Invalid -1 }
+{ CXTypeLayoutError_Incomplete -2 }
+{ CXTypeLayoutError_Dependent -3 }
+{ CXTypeLayoutError_NotConstantSize -4 }
+{ CXTypeLayoutError_InvalidFieldName -5 }
+{ CXTypeLayoutError_Undeduced -6 } ;
+
+ENUM: CXVisibilityKind
+{ CXVisibility_Invalid 0 }
+{ CXVisibility_Hidden 1 }
+{ CXVisibility_Protected 2 }
+{ CXVisibility_Default 3 } ;
+
+ENUM: CXTypeNullabilityKind
+{ CXTypeNullability_NonNull 0 }
+{ CXTypeNullability_Nullable 1 }
+{ CXTypeNullability_Unspecified 2 }
+{ CXTypeNullability_Invalid 3 }
+{ CXTypeNullability_NullableResult 4 } ;
+
+ENUM: CXUnaryOperatorKind
+{ CXUnaryOperator_Invalid 0 }
+{ CXUnaryOperator_PostInc 1 }
+{ CXUnaryOperator_PostDec 2 }
+{ CXUnaryOperator_PreInc 3 }
+{ CXUnaryOperator_PreDec 4 }
+{ CXUnaryOperator_AddrOf 5 }
+{ CXUnaryOperator_Deref 6 }
+{ CXUnaryOperator_Plus 7 }
+{ CXUnaryOperator_Minus 8 }
+{ CXUnaryOperator_Not 9 }
+{ CXUnaryOperator_LNot 10 }
+{ CXUnaryOperator_Real 11 }
+{ CXUnaryOperator_Imag 12 }
+{ CXUnaryOperator_Extension 13 }
+{ CXUnaryOperator_Coawait 14 } ;
+
+ENUM: CXVisitorResult
+{ CXVisit_Break 0 }
+{ CXVisit_Continue 1 } ;
+
+ENUM: CX_CXXAccessSpecifier
+{ CX_CXXInvalidAccessSpecifier 0 }
+{ CX_CXXPublic 1 }
+{ CX_CXXProtected 2 }
+{ CX_CXXPrivate 3 } ;
+
+ENUM: CX_StorageClass
+{ CX_SC_Invalid 0 }
+{ CX_SC_None 1 }
+{ CX_SC_Extern 2 }
+{ CX_SC_Static 3 }
+{ CX_SC_PrivateExtern 4 }
+{ CX_SC_OpenCLWorkGroupLocal 5 }
+{ CX_SC_Auto 6 }
+{ CX_SC_Register 7 } ;
+
+ENUM: CXCodeComplete_Flags
+{ CXCodeComplete_IncludeMacros 1 }
+{ CXCodeComplete_IncludeCodePatterns 2 }
+{ CXCodeComplete_IncludeBriefComments 4 }
+{ CXCodeComplete_SkipPreamble 8 }
+{ CXCodeComplete_IncludeCompletionsWithFixIts 16 } ;
+
+ENUM: CXCompletionContext
+{ CXCompletionContext_Unexposed 0 }
+{ CXCompletionContext_AnyType 1 }
+{ CXCompletionContext_AnyValue 2 }
+{ CXCompletionContext_ObjCObjectValue 4 }
+{ CXCompletionContext_ObjCSelectorValue 8 }
+{ CXCompletionContext_CXXClassTypeValue 16 }
+{ CXCompletionContext_DotMemberAccess 32 }
+{ CXCompletionContext_ArrowMemberAccess 64 }
+{ CXCompletionContext_ObjCPropertyAccess 128 }
+{ CXCompletionContext_EnumTag 256 }
+{ CXCompletionContext_UnionTag 512 }
+{ CXCompletionContext_StructTag 1024 }
+{ CXCompletionContext_ClassTag 2048 }
+{ CXCompletionContext_Namespace 4096 }
+{ CXCompletionContext_NestedNameSpecifier 8192 }
+{ CXCompletionContext_ObjCInterface 16384 }
+{ CXCompletionContext_ObjCProtocol 32768 }
+{ CXCompletionContext_ObjCCategory 65536 }
+{ CXCompletionContext_ObjCInstanceMessage 131072 }
+{ CXCompletionContext_ObjCClassMessage 262144 }
+{ CXCompletionContext_ObjCSelectorName 524288 }
+{ CXCompletionContext_MacroName 1048576 }
+{ CXCompletionContext_NaturalLanguage 2097152 }
+{ CXCompletionContext_IncludedFile 4194304 }
+{ CXCompletionContext_Unknown 8388607 } ;
+
+ENUM: CXDiagnosticDisplayOptions
+{ CXDiagnostic_DisplaySourceLocation 1 }
+{ CXDiagnostic_DisplayColumn 2 }
+{ CXDiagnostic_DisplaySourceRanges 4 }
+{ CXDiagnostic_DisplayOption 8 }
+{ CXDiagnostic_DisplayCategoryId 16 }
+{ CXDiagnostic_DisplayCategoryName 32 } ;
+
+ENUM: CXGlobalOptFlags
+{ CXGlobalOpt_None 0 }
+{ CXGlobalOpt_ThreadBackgroundPriorityForIndexing 1 }
+{ CXGlobalOpt_ThreadBackgroundPriorityForEditing 2 }
+{ CXGlobalOpt_ThreadBackgroundPriorityForAll 3 } ;
+
+ENUM: CXIdxDeclInfoFlags
+{ CXIdxDeclFlag_Skipped 1 } ;
+
+ENUM: CXIndexOptFlags
+{ CXIndexOptNone 0 }
+{ CXIndexOptSuppressRedundantRefs 1 }
+{ CXIndexOptIndexFunctionLocalSymbols 2 }
+{ CXIndexOptIndexImplicitTemplateInstantiations 4 }
+{ CXIndexOptSuppressWarnings 8 }
+{ CXIndexOptSkipParsedBodiesInSession 16 } ;
+
+ENUM: CXNameRefFlags
+{ CXNameRange_WantQualifier 1 }
+{ CXNameRange_WantTemplateArgs 2 }
+{ CXNameRange_WantSinglePiece 4 } ;
+
+ENUM: CXObjCDeclQualifierKind
+{ CXObjCDeclQualifier_None 0 }
+{ CXObjCDeclQualifier_In 1 }
+{ CXObjCDeclQualifier_Inout 2 }
+{ CXObjCDeclQualifier_Out 4 }
+{ CXObjCDeclQualifier_Bycopy 8 }
+{ CXObjCDeclQualifier_Byref 16 }
+{ CXObjCDeclQualifier_Oneway 32 } ;
+
+ENUM: CXObjCPropertyAttrKind
+{ CXObjCPropertyAttr_noattr 0 }
+{ CXObjCPropertyAttr_readonly 1 }
+{ CXObjCPropertyAttr_getter 2 }
+{ CXObjCPropertyAttr_assign 4 }
+{ CXObjCPropertyAttr_readwrite 8 }
+{ CXObjCPropertyAttr_retain 16 }
+{ CXObjCPropertyAttr_copy 32 }
+{ CXObjCPropertyAttr_nonatomic 64 }
+{ CXObjCPropertyAttr_setter 128 }
+{ CXObjCPropertyAttr_atomic 256 }
+{ CXObjCPropertyAttr_weak 512 }
+{ CXObjCPropertyAttr_strong 1024 }
+{ CXObjCPropertyAttr_unsafe_unretained 2048 }
+{ CXObjCPropertyAttr_class 4096 } ;
+
+ENUM: CXReparse_Flags
+{ CXReparse_None 0 } ;
+
+ENUM: CXSaveTranslationUnit_Flags
+{ CXSaveTranslationUnit_None 0 } ;
+
+ENUM: CXSymbolRole
+{ CXSymbolRole_None 0 }
+{ CXSymbolRole_Declaration 1 }
+{ CXSymbolRole_Definition 2 }
+{ CXSymbolRole_Reference 4 }
+{ CXSymbolRole_Read 8 }
+{ CXSymbolRole_Write 16 }
+{ CXSymbolRole_Call 32 }
+{ CXSymbolRole_Dynamic 64 }
+{ CXSymbolRole_AddressOf 128 }
+{ CXSymbolRole_Implicit 256 } ;
+
 ENUM: CXTranslationUnit_Flags
 { CXTranslationUnit_None 0 }
 { CXTranslationUnit_DetailedPreprocessingRecord 1 }
@@ -168,12 +618,42 @@ ENUM: CXTranslationUnit_Flags
 { CXTranslationUnit_SingleFileParse 1024 }
 { CXTranslationUnit_LimitSkipFunctionBodiesToPreamble 2048 }
 { CXTranslationUnit_IncludeAttributedTypes 4096 }
-{ CXTranslationUnit_VisitImplicitAttributes 8192 } ;
+{ CXTranslationUnit_VisitImplicitAttributes 8192 }
+{ CXTranslationUnit_IgnoreNonErrorsFromIncludedFiles 16384 }
+{ CXTranslationUnit_RetainExcludedConditionalBlocks 32768 } ;
+
+STRUCT: CXCompletionResult
+{ CursorKind CXCursorKind }
+{ CompletionString CXCompletionString } ;
+
+STRUCT: CXCodeCompleteResults
+{ Results CXCompletionResult* }
+{ NumResults uint } ;
+
+STRUCT: CXComment
+{ ASTNode void* }
+{ TranslationUnit CXTranslationUnit } ;
 
 STRUCT: CXCursor
 { kind CXCursorKind }
 { xdata int }
 { data void*[3] } ;
+
+STRUCT: CXCursorAndRangeVisitor
+{ context void* }
+{ visit void* } ;
+
+STRUCT: CXFileUniqueID
+{ data ulonglong[3] } ;
+
+STRUCT: CXIdxLoc
+{ ptr_data void*[2] }
+{ int_data uint } ;
+
+STRUCT: CXIdxAttrInfo
+{ kind CXIdxAttrKind }
+{ cursor CXCursor }
+{ loc CXIdxLoc } ;
 
 STRUCT: CXType
     { kind CXTypeKind }
@@ -200,11 +680,14 @@ STRUCT: CXSourceRangeList
     { count uint }
     { ranges CXSourceRange* } ;
 
-STRUCT: CXDiagnosticSet
-    { data void* } ;
+! STRUCT: CXDiagnostic
+!     { data void*[3] } ;
 
-STRUCT: CXDiagnostic
-    { data void*[3] } ;
+STRUCT: CXUnsavedFile
+{ Filename char* }
+{ Contents char* }
+{ Length ulong } ;
+
 
 FUNCTION: CXIndex clang_createIndex ( int excludeDeclarationsFromPCH, int displayDiagnostics )
 
