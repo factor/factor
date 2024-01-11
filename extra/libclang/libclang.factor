@@ -16,8 +16,10 @@ SYMBOL: clang-state
 TUPLE: libclang-state
     defs-counter c-defs-by-name c-defs-by-order
     c-forms child-forms
-    unnamed-table unnamed-counter
-    out-forms-counter out-forms out-forms-written ;
+    unnamed-counter unnamed-table
+    typedefs
+    out-forms-counter out-forms out-forms-by-name
+    out-forms-written out-form-names-written ;
 
 : <libclang-state> ( -- state )
     libclang-state new
@@ -28,29 +30,50 @@ TUPLE: libclang-state
         H{ } clone >>child-forms
         0 >>unnamed-counter
         H{ } clone >>unnamed-table
+        H{ } clone >>typedefs
         0 >>out-forms-counter
         H{ } clone >>out-forms
-        HS{ } clone >>out-forms-written ;
+        H{ } clone >>out-forms-by-name
+        HS{ } clone >>out-forms-written
+        HS{ } clone >>out-form-names-written ;
+
+: next-defs-counter ( libclang-state -- n ) [ dup 1 + ] change-defs-counter drop ;
+: next-unnamed-counter ( libclang-state -- n ) [ dup 1 + ] change-unnamed-counter drop ;
+: next-out-forms-counter ( libclang-state -- n ) [ dup 1 + ] change-out-forms-counter drop ;
 
 GENERIC: def>out-form ( obj -- string )
 
-: save-out-form ( string -- )
-    [
-        dup clang-state> out-forms-written>> in? [
-            drop
+: out-form-written? ( string -- ? )
+    clang-state> out-forms-written>> in? ; inline
+
+: out-form-name-written? ( string -- ? )
+    clang-state> out-form-names-written>> in? ; inline
+
+: save-out-form ( string def -- )
+    over empty? [
+        2drop
+    ] [
+        over out-form-written? [
+        ! dup name>> out-form-name-written? [
+            2drop
         ] [
             clang-state>
-            [
-                [ out-forms-counter>> counter ]
-                [ out-forms>> set-at ] bi
-            ]
-            [ out-forms-written>> adjoin ] 2bi
+            {
+                [
+                    nip
+                    [ next-out-forms-counter ]
+                    [ out-forms>> set-at ] bi
+                ]
+                [ nipd [ name>> ] dip out-form-names-written>> adjoin ]
+                [ nip out-forms-written>> adjoin ]
+                [ [ name>> ] dip out-forms-by-name>> push-at ]
+            } 3cleave
         ] if
-    ] unless-empty ;
+    ] if ;
 
 ! some forms must be defined out of order, e.g. anonymous unions/structs
 : def>out-forms ( obj -- )
-    def>out-form save-out-form ;
+    [ def>out-form ] keep save-out-form ;
 
 : peek-current-form ( -- n )
     clang-state> c-forms>> ?last ; inline
@@ -63,23 +86,32 @@ SLOT: order
     dup parent-order>> clang-state> child-forms>> push-at ; inline
 
 : with-new-form ( quot -- n )
-    clang-state> [ defs-counter>> counter ] [ c-forms>> ] bi push
+    clang-state> [ next-defs-counter ] [ c-forms>> ] bi push
     call
     clang-state> c-forms>> pop ; inline
 
 ERROR: unknown-form name ;
 GENERIC: print-deferred ( obj -- )
+
+! foo*** -> foo, todo: other cases?
+: factor-type-name ( type -- type' ) [ CHAR: * = ] trim-tail ;
+
+: ?lookup-type ( type -- obj/f )
+    factor-type-name
+    clang-state> c-defs-by-name>> ?at [ drop f ] unless ;
+
+: lookup-order ( obj -- order/f ) type>> ?lookup-type [ order>> ] ?call -1 or ;
+
 M: object print-deferred
-    type>> clang-state> c-defs-by-name>> ?at [ def>out-forms ] [ unknown-form ] if ;
+    type>> ?lookup-type [ def>out-forms ] when* ;
 
 : unnamed? ( string -- ? ) "(unnamed" swap subseq? ; inline
-: append-counter ( string counter -- string' ) counter number>string append ; inline
 : unnamed-exists? ( string -- value/key ? ) clang-state> unnamed-table>> ?at ; inline
 : lookup-unnamed ( type string -- type-name )
     unnamed-exists? [
         nip
     ] [
-        [ clang-state> unnamed-counter>> append-counter ] dip
+        [ clang-state> next-unnamed-counter number>string append ] dip
         " " split1-last nip
         "RECORDING: " gwrite dup g... gflush
         [ clang-state> unnamed-table>> set-at ] keepd
@@ -103,7 +135,7 @@ TUPLE: c-function
         swap >>args
         swap >>name
         swap >>return-type
-        clang-state> defs-counter>> counter >>order ;
+        clang-state> next-defs-counter >>order ;
 
 
 TUPLE: c-struct
@@ -148,7 +180,7 @@ TUPLE: c-arg
         swap >>type
         swap >>name
         peek-current-form >>parent-order
-        clang-state> defs-counter>> counter >>order ;
+        clang-state> next-defs-counter >>order ;
 
 
 TUPLE: c-field
@@ -162,7 +194,7 @@ TUPLE: c-field
         swap >>type
         swap >>name
         peek-current-form >>parent-order
-        clang-state> defs-counter>> counter >>order ;
+        clang-state> next-defs-counter >>order ;
 
 
 TUPLE: c-typedef
@@ -174,7 +206,7 @@ TUPLE: c-typedef
     c-typedef new
         swap >>name
         swap >>type
-        clang-state> defs-counter>> counter >>order ;
+        clang-state> next-defs-counter >>order ;
 
 M: c-function def>out-form
     [
@@ -212,9 +244,6 @@ M: c-field def>out-form
             [ type>> " }" ]
         } cleave
     ] "" append-outputs-as ;
-
-: lookup-order ( obj -- order )
-    type>> clang-state> c-defs-by-name>> at [ order>> ] ?call -1 or ;
 
 : print-defers ( current-order slots -- )
     [
@@ -277,6 +306,13 @@ M: object def>out-form
 : set-definition ( named -- )
     [ dup name>> clang-state> c-defs-by-name>> set-at ]
     [ dup order>> clang-state> c-defs-by-order>> set-at ] bi ;
+
+: set-typedef ( typedef -- )
+    dup ignore-typedef? [
+        drop
+    ] [
+        [ type>> ] [ name>> ] bi clang-state> typedefs>> set-at
+    ] if ;
 
 : clang-get-cstring ( CXString -- string )
     clang_getCString [ utf8 alien>string ] [ clang_disposeString ] bi ;
@@ -449,7 +485,7 @@ DEFER: cursor>c-union
 
 : cursor>c-typedef ( CXCursor -- )
     [ clang_getTypedefDeclUnderlyingType cxreturn-type>factor ]
-    [ cursor-name ] bi <c-typedef> set-definition ;
+    [ cursor-name ] bi <c-typedef> [ set-definition ] [ set-typedef ] bi ;
 
 : cursor>c-field ( CXCursor -- )
     [ cursor-name ] [ cursor-type ] bi <c-field> dup g... gflush push-child-form ;
@@ -544,16 +580,6 @@ DEFER: cursor-visitor
         ] with-clang-translation-unit
     ] with-clang-index ; inline
 
-! : parse-c-defines ( path -- )
-!     [
-!         tokenize-path
-!         [
-!             ! tu void* int
-!             cell-bits 8 /i * swap <displaced-alien>
-!             clang_getTokenKind
-!         ] with { } map-as
-!     ] with-clang-default-translation-unit ;
-
 : parse-c-exports ( path -- )
     [
         2nip cursor-visitor f clang_visitChildren drop
@@ -563,7 +589,11 @@ DEFER: cursor-visitor
     clang-state> c-defs-by-order>>
     sort-keys values
     [ def>out-forms ] each
-    clang-state> out-forms>>
+    clang-state>
+    [
+        [ members [ length ] inv-sort-by ] assoc-map
+    ] change-out-forms-by-name
+    out-forms>>
     sort-keys values [ print ] each ;
 
 : parse-include ( path -- libclang-state )
@@ -576,19 +606,3 @@ DEFER: cursor-visitor
         } cleave
         write-c-defs
     ] with-output-global-variable ; inline
-
-
-
-! "/Library/Developer/CommandLineTools/SDKs/MacOSX10.15.sdk/usr/include/php/ext/sqlite3/libsqlite/sqlite3.h" parse-include
-
-! "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/clang/15.0.0/include"
-
-! "resource:elf.h" parse-include
-
-![[
-"resource:elf.h" parse-include
-c-defs-by-order get-global write-c-defs
-
-"resource:elf2.h" parse-include
-
-]]
