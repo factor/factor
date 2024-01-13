@@ -31,8 +31,11 @@ TUPLE: sequence-parser sequence n ;
 : advance ( sequence-parser -- sequence-parser )
     [ 1 + ] change-n ; inline
 
-: next ( sequence-parser -- char/f )
+: consume ( sequence-parser -- char/f )
     [ current ] [ advance drop ] bi ; inline
+
+: next ( sequence-parser -- char/f )
+    [ advance drop ] [ current ] bi ; inline
 
 :: skip-until ( ... sequence-parser quot: ( ... obj -- ... ? ) -- ... )
     sequence-parser current [
