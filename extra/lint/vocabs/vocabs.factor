@@ -167,14 +167,14 @@ DEFER: next-token
 ! Words for finding the words used in a program
 ! and stripping out import statements
 : skip-imports ( sequence-parser -- sequence-parser string/? )
-    dup next { 
+    dup consume { 
         { "USING:"  [ ";" skip-after* f ] }
         { "USE:"    [        advance  f ] }
         [ ]
     } case ;
 
 : take-imports ( sequence-parser -- vector )
-    dup next {
+    dup consume {
         { "USING:" [ ";" take-until-object ] }
         { "USE:"   [  1  take-n ] }
         [ 2drop f ]
