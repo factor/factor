@@ -102,3 +102,43 @@ USING: tools.test sequences.parser unicode kernel accessors ;
 
 { "\n" } [ "\n" <sequence-parser> [ ] take-while ] unit-test
 { f } [ "\n" <sequence-parser> [ not ] take-while ] unit-test
+
+
+{ f } [
+    { } <sequence-parser> next
+] unit-test
+
+
+{ f } [
+    { } <sequence-parser> current
+] unit-test
+
+
+{ f } [
+    { } <sequence-parser> consume
+] unit-test
+
+
+{ 2 2 } [
+    { 2 1 3 7 } <sequence-parser> [ current ] [ current ] bi
+] unit-test
+
+
+{ 1 1 } [
+    { 2 1 3 7 } <sequence-parser> [ next ] [ current ] bi
+] unit-test
+
+
+{ 2 1 } [
+    { 2 1 3 7 } <sequence-parser> [ consume ] [ current ] bi
+] unit-test
+
+
+{ f } [
+    { 2 } <sequence-parser> next
+] unit-test
+
+
+{ 2 f } [
+    { 2 } <sequence-parser> [ consume ] [ current ] bi
+] unit-test
