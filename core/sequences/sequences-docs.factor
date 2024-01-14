@@ -1373,7 +1373,7 @@ HELP: subseq-starts-at?
 
 HELP: subseq-index
 { $values { "seq" sequence } { "subseq" sequence } { "i/f" "a start index or " { $snippet "f" } } }
-{ $description "Outputs the start index of the first contiguous subsequence equal to " { $snippet "subseq" } ", starting the search from the " { $snippet "n" } "th element. If no matching subsequence is found, outputs " { $link f } "." } ;
+{ $description "Outputs the start index of the first contiguous subsequence equal to " { $snippet "subseq" } ". If no matching subsequence is found, outputs " { $link f } "." } ;
 
 HELP: subseq-index-from
 { $values { "n" "a start index" } { "seq" sequence } { "subseq" sequence } { "i/f" "a start index or " { $snippet "f" } } }
@@ -1384,11 +1384,11 @@ HELP: subseq-start-from
     { "subseq" object } { "seq" sequence } { "n" integer }
     { "i/f" { $maybe integer } }
 }
-{ $description "Outputs the start index of the first contiguous subsequence equal to " { $snippet "subseq" } ", or " { $link f } " if no matching subsequence is found starting from " { $snippet "n" } "." } ;
+{ $description "Outputs the start index of the first contiguous subsequence equal to " { $snippet "subseq" } ", starting the search from the " { $snippet "n" } "th element. If no matching subsequence is found, outputs " { $link f } "." } ;
 
 HELP: subseq-start
 { $values { "subseq" sequence } { "seq" sequence } { "i/f" "a start index or " { $snippet "f" } } }
-{ $description "Outputs the start index of the first contiguous subsequence equal to " { $snippet "subseq" } ", or " { $link f } " if no matching subsequence is found." } ;
+{ $description "Outputs the start index of the first contiguous subsequence equal to " { $snippet "subseq" } ". If no matching subsequence is found, outputs " { $link f } "." } ;
 
 HELP: subseq?
 { $values { "subseq" sequence } { "seq" sequence } { "?" boolean } }
