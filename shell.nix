@@ -37,8 +37,8 @@ in
     # Defined in gdk-pixbuf setup hook
     findGdkPixbufLoaders "${pkgs.librsvg}"
 
-    wrapFactor () {
-    [ -n "$1" ] || { printf "Usage: wrapFactor <factor-root>" ; return; }
+    wrapLocalFactor () {
+    [ -n "$1" ] || { printf "Usage: wrapLocalFactor <factor-root>" ; return; }
     local root="$(realpath $1)"
     local binary="''${root}/factor"
     local wrapped="''${root}/.factor-wrapped"
