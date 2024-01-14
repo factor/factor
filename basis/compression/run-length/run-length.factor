@@ -28,7 +28,8 @@ IN: compression.run-length
                 nip {
                     { 0 [ i 1 + i!  0 j! ] }
                     { 1 [ t done?! ] }
-                    { 2 [ sp consume j + j!  sp consume i + i! ] }
+                    { 2 [ sp consume j + j!
+                          sp consume i + i! ] }
                 } case
             ] if
         ] [
@@ -60,7 +61,8 @@ IN: compression.run-length
                 nip {
                     { 0 [ i 1 + i!  0 j! ] }
                     { 1 [ t done?! ] }
-                    { 2 [ sp consume j + j!  sp consume i + i! ] }
+                    { 2 [ sp consume j + j!
+                          sp consume i + i! ] }
                 } case
             ] if
         ] [
