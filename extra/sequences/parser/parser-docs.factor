@@ -8,8 +8,7 @@ HELP: <safe-slice>
 { $values
     { "from" integer } { "to" integer } { "seq" sequence }
     { "slice/f" { $maybe slice } }
-}
-{ $description "" } ;
+} ;
 
 HELP: <sequence-parser>
 { $values
@@ -88,120 +87,105 @@ HELP: sequence-parse-end?
 { $description "Retruns " { $link POSTPONE: t } " if the parser has exhausted the sequence, otherwise " { $link POSTPONE: f } "." } ;
 
 HELP: sequence-parser
-{ $class-description "" } ;
+{ $class-description "A class for keeping the state of a parser on a sequence." }
+{ $see-also <sequence-parser> }
+;
 
 HELP: skip-until
 { $values
     { "sequence-parser" sequence-parser } { "quot" quotation }
-}
-{ $description "" } ;
+} ;
 
 HELP: skip-whitespace
 { $values
     { "sequence-parser" sequence-parser }
-}
-{ $description "" } ;
+} ;
 
 HELP: skip-whitespace-eol
 { $values
     { "sequence-parser" sequence-parser }
-}
-{ $description "" } ;
+} ;
 
 HELP: sort-tokens
 { $values
     { "seq" sequence }
     { "seq'" sequence }
-}
-{ $description "" } ;
+} ;
 
 HELP: take-first-matching
 { $values
     { "sequence-parser" sequence-parser } { "seq" sequence }
-}
-{ $description "" } ;
+} ;
 
 HELP: take-integer
 { $values
     { "sequence-parser" sequence-parser }
     { "n/f" { $maybe integer } }
-}
-{ $description "" } ;
+} ;
 
 HELP: take-longest
 { $values
     { "sequence-parser" sequence-parser } { "seq" sequence }
-}
-{ $description "" } ;
+} ;
 
 HELP: take-n
 { $values
     { "sequence-parser" sequence-parser } { "n" integer }
     { "seq/f" { $maybe sequence } }
-}
-{ $description "" } ;
+} ;
 
 HELP: take-rest
 { $values
     { "sequence-parser" sequence-parser }
     { "sequence" sequence }
-}
-{ $description "" } ;
+} ;
 
 HELP: take-rest-slice
 { $values
     { "sequence-parser" sequence-parser }
     { "sequence/f" { $maybe sequence } }
-}
-{ $description "" } ;
+} ;
 
 HELP: take-sequence
 { $values
     { "sequence-parser" sequence-parser } { "sequence" sequence }
     { "obj/f" { $maybe object } }
-}
-{ $description "" } ;
+} ;
 
 HELP: take-sequence*
 { $values
     { "sequence-parser" sequence-parser } { "sequence" sequence }
-}
-{ $description "" } ;
+} ;
 
 HELP: take-until
 { $values
     { "sequence-parser" sequence-parser } { "quot" quotation }
     { "sequence/f" { $maybe sequence } }
-}
-{ $description "" } ;
+} ;
 
 HELP: take-until-object
 { $values
     { "sequence-parser" sequence-parser } { "obj" object }
     { "sequence" sequence }
-}
-{ $description "" } ;
+} ;
 
 HELP: take-until-sequence
 { $values
     { "sequence-parser" sequence-parser } { "sequence" sequence }
     { "sequence'/f" { $maybe sequence } }
-}
-{ $description "" } ;
+} ;
 
 HELP: take-until-sequence*
 { $values
     { "sequence-parser" sequence-parser } { "sequence" sequence }
     { "sequence'/f" { $maybe sequence } }
-}
-{ $description "" } ;
+} ;
 
 HELP: take-while
 { $values
     { "sequence-parser" sequence-parser } { "quot" quotation }
     { "sequence/f" { $maybe sequence } }
-}
-{ $description "" } ;
+} ;
 
 HELP: with-sequence-parser
 { $values
@@ -213,16 +197,14 @@ HELP: with-sequence-parser
 HELP: write-full
 { $values
     { "sequence-parser" sequence-parser }
-}
-{ $description "" } ;
+} ;
 
 HELP: write-rest
 { $values
     { "sequence-parser" sequence-parser }
-}
-{ $description "" } ;
+} ;
 
-ARTICLE: "sequences.parser" "sequences.parser"
+ARTICLE: "sequences.parser" "Sequence parser"
 { $vocab-link "sequences.parser" }
 ;
 
