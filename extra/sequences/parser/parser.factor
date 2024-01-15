@@ -12,29 +12,31 @@ TUPLE: sequence-parser sequence n ;
         swap >>sequence
         0 >>n ;
 
-:: with-sequence-parser ( sequence-parser quot -- seq/f )
+:: with-sequence-parser
+    ( ..a sequence-parser quot: ( ..a parser -- ..b obj/f )
+      -- ..b obj/f )
     sequence-parser n>> :> n
     sequence-parser quot call [
         n sequence-parser n<< f
     ] unless* ; inline
 
-: offset  ( sequence-parser offset -- char/f )
+: offset  ( sequence-parser offset -- obj/f )
     swap
     [ n>> + ] [ sequence>> ?nth ] bi ; inline
 
-: current ( sequence-parser -- char/f ) 0 offset ; inline
+: current ( sequence-parser -- obj/f ) 0 offset ; inline
 
-: previous ( sequence-parser -- char/f ) -1 offset ; inline
+: previous ( sequence-parser -- obj/f ) -1 offset ; inline
 
-: peek-next ( sequence-parser -- char/f ) 1 offset ; inline
+: peek-next ( sequence-parser -- obj/f ) 1 offset ; inline
 
 : advance ( sequence-parser -- sequence-parser )
     [ 1 + ] change-n ; inline
 
-: consume ( sequence-parser -- char/f )
+: consume ( sequence-parser -- obj/f )
     [ current ] [ advance drop ] bi ; inline
 
-: next ( sequence-parser -- char/f )
+: next ( sequence-parser -- obj/f )
     [ advance drop ] [ current ] bi ; inline
 
 :: skip-until ( ... sequence-parser quot: ( ... obj -- ... ? ) -- ... )
@@ -116,7 +118,8 @@ TUPLE: sequence-parser sequence n ;
 : take-until-object ( sequence-parser obj -- sequence )
     '[ current _ = ] take-until ;
 
-: parse-sequence ( sequence quot -- )
+: parse-sequence
+    ( ..a sequence quot: ( ..a parser -- ..b ) -- ..b )
     [ <sequence-parser> ] dip call ; inline
 
 : take-integer ( sequence-parser -- n/f )
