@@ -25,3 +25,9 @@ PRIVATE>
             r n < [ line r accum set-nth-unsafe ] when
         ] if
     ] each-numbered-line accum ;
+
+: random-file-line ( path encoding -- line/f )
+    [ random-line ] with-file-reader ; inline
+
+: random-file-lines ( path encoding n -- lines )
+    '[ _ random-file-lines ] with-file-reader ; inline
