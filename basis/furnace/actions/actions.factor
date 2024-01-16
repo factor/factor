@@ -75,7 +75,7 @@ CONSTANT: revalidate-url-key "__u"
 
 : handle-put ( action -- response )
     '[
-        _ dup submit>> [
+        _ dup replace>> [
             [ validate>> call( -- ) ]
             [ authorize>> call( -- ) ]
             [ replace>> call( -- response ) ]
@@ -85,7 +85,7 @@ CONSTANT: revalidate-url-key "__u"
 
 : handle-patch ( action -- response )
     '[
-        _ dup submit>> [
+        _ dup update>> [
             [ validate>> call( -- ) ]
             [ authorize>> call( -- ) ]
             [ update>> call( -- response ) ]
