@@ -11,6 +11,8 @@ IN: furnace.redirection
         { "GET" [ <temporary-redirect> ] }
         { "HEAD" [ <temporary-redirect> ] }
         { "POST" [ <permanent-redirect> ] }
+        { "DELETE" [ <303> <custom-redirect> ] }
+        [ 2drop <405> ]
     } case ;
 
 : >secure-url ( url -- url' )

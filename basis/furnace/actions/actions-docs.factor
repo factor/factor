@@ -93,13 +93,14 @@ ARTICLE: "furnace.actions.config" "Furnace action configuration"
 "Actions have the following slots:"
 { $slots
     { "rest" { "A parameter name to map the rest of the URL, after the action name, to. If this is not set, then navigating to a URL where the action is not the last path component will return to the client with an error. A more general facility can be found in the " { $vocab-link "http.server.rewrite" } " vocabulary." } }
-    { "init" { "A quotation called at the beginning of a GET or HEAD request. Typically this quotation configures " { $link "html.forms" } " and parses query parameters." } }
-    { "authorize" { "A quotation called at the beginning of a GET, HEAD or POST request. In GET requests, it is called after the " { $slot "init" } " quotation; in POST requests, it is called after the " { $slot "validate" } " quotation. By convention, this quotation performs custom authorization checks which depend on query parameters or POST parameters." } }
+    { "init" { "A quotation called at the beginning of a GET, HEAD or DELETE request. Typically this quotation configures " { $link "html.forms" } " and parses query parameters." } }
+    { "authorize" { "A quotation called at the beginning of all implemented requests. In GET, HEAD and DELETE requests, it is called after the " { $slot "init" } " quotation; in PATCH, POST and PUT requests, it is called after the " { $slot "validate" } " quotation. By convention, this quotation performs custom authorization checks which depend on query parameters or POST parameters." } }
     { "display" { "A quotation called after the " { $slot "init" } " quotation in a GET request. This quotation must return an HTTP " { $link response } "." } }
     { "validate" { "A quotation called at the beginning of a POST request to validate POST parameters." } }
     { "submit" { "A quotation called after the " { $slot "validate" } " quotation in a POST request. This quotation must return an HTTP " { $link response } "." } }
     { "replace" { "A quotation called after the " { $slot "validate" } " quotation in a PUT request. This quotation must return an HTTP " { $link response } "." } }
     { "update" { "A quotation called after the " { $slot "validate" } " quotation in a PATCH request. This quotation must return an HTTP " { $link response } "." } }
+    { "delete" { "A quotation called after the " { $slot "init" } " quotation in a DELETE request. This quotation must return an HTTP " { $link response } "." } }
 }
 "At least one of the " { $slot "display" } " and " { $slot "submit" } " slots must be set, otherwise the action will be useless." ;
 
@@ -125,6 +126,22 @@ ARTICLE: "furnace.actions.lifecycle" "Furnace action lifecycle"
 "Any one of the above steps can perform validation; if " { $link validation-failed } " is called during a GET request, the client receives a " { $link <400> } " error."
 { $heading "HEAD request lifecycle" }
 "A HEAD request proceeds exactly like a GET request. The only difference is that the " { $slot "body" } " slot of the " { $link response } " object is never rendered."
+
+{ $heading "DELETE request lifecycle" }
+"A DELETE request is supposed to act on a whole resources, i.e. a URL sans query parameters. "
+"Nevertheless, " { $vocab-link "http.server" } " accepts query parameters that may be used for authorization. "
+"A DELETE request results in the following sequence of events:"
+{ $list
+    { "The " { $snippet "init" } " quotation is called." }
+    { "The " { $snippet "authorize" } " quotation is called." }
+    { "The " { $snippet "delete" } " quotation is called; it is expected to output an HTTP " { $link response } " on the stack. "
+      "By convention, this response should be either a " { $link <redirect> } " (which generates a " { $link <303> } " response) or, "
+      "when successful, one of " { $link <200> } ", " { $link <202> } " or " { $link <204> } " responses."
+    }
+}
+"Any one of the above steps can perform validation; if " { $link validation-failed } " is called during a DELETE request, "
+"the client is sent back to the originating page with validation errors passed in a " { $link "furnace.conversations" } "."
+
 { $heading "POST request lifecycle" }
 "A POST request results in the following sequence of events:"
 { $list

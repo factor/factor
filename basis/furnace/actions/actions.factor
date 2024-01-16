@@ -1,15 +1,14 @@
 ! Copyright (C) 2008, 2009 Slava Pestov.
 ! See https://factorcode.org/license.txt for BSD license.
-USING: accessors assocs combinators furnace.conversations
-furnace.utilities html.forms html.templates.chloe http
-http.server http.server.responses kernel namespaces sequences
+USING: accessors assocs combinators furnace.conversations furnace.utilities
+html.forms http http.server http.server.responses kernel namespaces sequences
 splitting urls validators ;
 FROM: html.templates.chloe => <chloe> ;
 IN: furnace.actions
 
 SYMBOL: rest
 
-TUPLE: action rest init authorize display validate submit update replace ;
+TUPLE: action rest init authorize display validate submit update replace delete ;
 
 : new-action ( class -- action )
     new [ ] >>init [ ] >>validate [ ] >>authorize ; inline
@@ -55,7 +54,8 @@ CONSTANT: revalidate-url-key "__u"
     dup [ >url ensure-port [ same-host? ] keep and ] when ;
 
 : validation-failed ( -- * )
-    post-request? revalidate-url and [
+    post-request? "DELETE" method= or
+    revalidate-url and [
         begin-conversation
         nested-forms-key param split-words harvest nested-forms cset
         form get form cset
@@ -93,6 +93,16 @@ CONSTANT: revalidate-url-key "__u"
         ] [ drop <400> ] if
     ] with-exit-continuation ;
 
+: handle-delete ( action -- response )
+    '[
+        _ dup delete>> [
+            [ init>> call( -- ) ]
+            [ authorize>> call( -- ) ]
+            [ delete>> call( -- response ) ]
+            tri
+        ] [ drop <400> ] if
+    ] with-exit-continuation ;
+
 : handle-rest ( path action -- )
     rest>> [ [ "/" join ] dip set-param ] [ drop ] if* ;
 
@@ -108,6 +118,7 @@ M: action call-responder*
         { "POST"  [ handle-post ] }
         { "PUT"   [ handle-put ] }
         { "PATCH" [ handle-patch ] }
+        { "DELETE" [ handle-delete ] }
         [ 2drop <405> ]
     } case ;
 
