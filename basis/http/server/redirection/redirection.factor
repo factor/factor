@@ -14,15 +14,14 @@ M: url relative-to-request
         f >>query
     swap derive-url ensure-port ;
 
-: <custom-redirect> ( url code message -- response )
-    <trivial-response>
-        swap dup url? [ relative-to-request ] when
-        "location" set-header ;
+: <custom-redirect> ( url response -- response' )
+    swap dup url? [ relative-to-request ] when
+    "location" set-header ;
 
 \ <custom-redirect> DEBUG add-input-logging
 
 : <permanent-redirect> ( url -- response )
-    301 "Moved Permanently" <custom-redirect> ;
+    <301> <custom-redirect> ;
 
 : <temporary-redirect> ( url -- response )
-    307 "Temporary Redirect" <custom-redirect> ;
+    <307> <custom-redirect> ;
