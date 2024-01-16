@@ -34,7 +34,11 @@ HELP: main-responder
 
 HELP: post-request?
 { $values { "?" boolean } }
-{ $description "Outputs if the current request is a POST request.s" } ;
+{ $description "Outputs if the current request is a POST request." } ;
+
+HELP: method=
+{ $values { "str" "a string" } { "?" boolean } }
+{ $description "Outputs if the current request matches the expected method." } ;
 
 HELP: responder-nesting
 { $description "A sequence of " { $snippet "{ path responder }" } " pairs." } ;
