@@ -40,6 +40,8 @@ ARTICLE: "http.server.responses" "Canned HTTP responses"
     <400>
     <404>
 }
+
+"The " { $vocab-link "http.server.responses" } " already provides many more canned responses. "
 "New error responses like the above can be created for other error codes too:"
 { $subsections <trivial-response> } ;
 
