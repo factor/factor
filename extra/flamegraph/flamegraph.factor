@@ -26,7 +26,7 @@ PRIVATE>
 
 : flamegraph ( -- )
     "output.txt" temp-file
-    [ utf8 [ flamegraph. ] with-file-writer ]
+    [ utf8 [ write-flamegraph ] with-file-writer ]
     [ "vocab:flamegraph/flamegraph.pl" absolute-path swap 2array process-contents ] bi
     "output.svg" temp-file
     [ utf8 set-file-contents ]
