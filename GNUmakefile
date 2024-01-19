@@ -260,7 +260,7 @@ $(FFI_TEST_LIBRARY): vm/ffi_test.o
 	$(TOOLCHAIN_PREFIX)$(CC) $(CFLAGS) $(FFI_TEST_CFLAGS) $(SHARED_FLAG) -o $(FFI_TEST_LIBRARY) $(TEST_OBJS)
 
 vm/resources.o:
-	$(TOOLCHAIN_PREFIX)$(WINDRES) vm/factor.rs vm/resources.o
+	$(TOOLCHAIN_PREFIX)$(WINDRES) --preprocessor=cat vm/factor.rs vm/resources.o
 
 vm/ffi_test.o: vm/ffi_test.c
 	$(TOOLCHAIN_PREFIX)$(CC) -c $(CFLAGS) $(FFI_TEST_CFLAGS) -std=c99 -o $@ $<
