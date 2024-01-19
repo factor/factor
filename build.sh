@@ -629,8 +629,8 @@ info_boot_image() {
         set_md5sum
         local disk_md5
         disk_md5=$($MD5SUM "$BOOT_IMAGE" | cut -f1 -d' ')
-        $ECHO "Factorcode md5: $factorcode_md5";
-        $ECHO "Disk md5: $disk_md5";
+        $ECHO "Boot image @factorcode.org md5: $factorcode_md5";
+        $ECHO "Boot image @local disk     md5: $disk_md5";
         if [[ "$factorcode_md5" == "$disk_md5" ]] ; then
             $ECHO "Your disk boot image matches the one on downloads.factorcode.org."
         else
