@@ -31,4 +31,4 @@ PRIVATE>
     [ random-line ] with-file-reader ; inline
 
 : random-file-lines ( path encoding n -- lines )
-    '[ _ random-file-lines ] with-file-reader ; inline
+    '[ _ random-lines ] with-file-reader ; inline
