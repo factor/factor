@@ -31,7 +31,8 @@ factor_vm::factor_vm(THREADHANDLE thread)
 #if defined(WINDOWS)
       ,
       thread_id(GetCurrentThreadId()),
-      ctrl_break_thread(NULL)
+      ctrl_break_thread(NULL),
+      sampler_thread(NULL)
 #endif
 {
   primitive_reset_dispatch_stats();
