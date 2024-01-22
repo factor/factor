@@ -8,14 +8,14 @@ APPICON ICON "misc/icons/Factor.ico"
   {
     BLOCK "StringFileInfo" {
       BLOCK "040904E4" {
-		VALUE "FileDescription", "Factor GUI Listener"
-		VALUE "ProductName", "The Factor Programming Language"
-		VALUE "ProductVersion", "0.100"
-		VALUE "LegalCopyright", "Copyright ©2003-2024 Slava Pestov, et al."
-		VALUE "OriginalFilename", "factor.exe"
-	  }
+        VALUE "FileDescription", "Factor GUI Listener"
+        VALUE "ProductName", "The Factor Programming Language"
+        VALUE "ProductVersion", "0.100"
+        VALUE "LegalCopyright", "Copyright ©2003-2024 Slava Pestov, et al."
+        VALUE "OriginalFilename", "factor.exe"
+      }
     }
     BLOCK "VarFileInfo" {
-	  VALUE "Translation", 0x0409, 0x04E4
+      VALUE "Translation", 0x0409, 0x04E4
     }
   }
