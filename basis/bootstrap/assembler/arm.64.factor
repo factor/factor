@@ -632,7 +632,7 @@ jit-jump-quot ;
 ! temp0 ds-reg [] MOVZ !these inputs might be in the wrong order
 ! ! pop boolean
 ! ds-reg bootstrap-cell SUBi
-! ! compare boolean with f
+! ! ! compare boolean with f
 ! \ f type-number temp0 CMPr
 ! ! jump to true branch if not equal
 ! 0 NE B.cond f rc-relative-arm64-bcond rel-word
