@@ -20,6 +20,10 @@ HELP: rc-relative-arm64-bcond
 HELP: rc-absolute-arm64-movz
 { $description "Absolute address stored in bits 20:5 of an ARM64 instruction." } ;
 
+HELP: rc-relative-cell
+{ $description "Indicates that the relocation is a cell-sized relative address to an object in the VM." } ;
+
+
 HELP: rt-cards-offset
 { $description "Relocation offset type for the cards table." }
 { $see-also rel-cards-offset } ;
@@ -98,6 +102,7 @@ $nl
     rc-relative-arm64-branch
     rc-relative-arm64-bcond
     rc-absolute-arm64-movz
+    rc-relative-cell
 }
 "Relocation types:"
 { $subsections
