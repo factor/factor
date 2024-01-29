@@ -163,9 +163,9 @@ big-endian off
     name jit-call ;
 
 ! Factor 2024 Clinic Code
-arg1s arg1 MOVr
-arg2s arg2 MOVr
-name jit-call ;
+! arg1s arg1 MOVr
+! arg2s arg2 MOVr
+! name jit-call ;
 
 
 : jit-load-vm ( -- ) ;
