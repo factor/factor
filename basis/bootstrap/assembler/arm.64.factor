@@ -544,6 +544,16 @@ jit-jump-quot ;
     push0
 ] JIT-PUSH-LITERAL jit-define
 
+! Factor 2024 Clinic Code:
+! [
+!    0 f rc-absolute-cell rel-literal
+!    [ temp0 MOVwi ]
+!    [ -16 shift 1 swap temp0 MOVK ]
+!    bi
+!    push0
+! ] JIT-PUSH-LITERAL jit-define
+
+
 ! The *-signal-handler subprimitives are special-cased in vm/quotations.cpp
 ! not to trigger generation of a stack frame, so they can
 ! perform their own prolog/epilog preserving registers.
