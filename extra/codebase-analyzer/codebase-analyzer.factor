@@ -1,11 +1,11 @@
 ! Copyright (C) 2022 Doug Coleman.
 ! See https://factorcode.org/license.txt for BSD license.
 USING: accessors assocs assocs.extras combinators
-combinators.short-circuit formatting io io.backend
+combinators.short-circuit formatting hashtables io io.backend
 io.directories io.encodings.binary io.files io.files.info
-io.files.types io.pathnames kernel math math.statistics prettyprint
-sequences sets sorting splitting toml tools.memory.private
-tools.wc unicode ;
+io.files.types io.pathnames kernel math math.statistics
+prettyprint sequences sets sorting splitting toml
+tools.memory.private tools.wc unicode ;
 IN: codebase-analyzer
 
 : file-sizes ( paths -- assoc )
@@ -127,6 +127,26 @@ IN: codebase-analyzer
     >lower file-stem "owners" = ;
 : owners-files ( paths -- paths' ) [ owners-file? ] filter ;
 
+: codenotify-file? ( path -- ? )
+    >lower file-stem "codenotify" = ;
+: codenotify-files ( paths -- paths' ) [ codenotify-file? ] filter ;
+
+: contributing-file? ( path -- ? )
+    >lower file-stem "contributing" = ;
+: contributing-files ( paths -- paths' ) [ contributing-file? ] filter ;
+
+: changelog-file? ( path -- ? )
+    >lower file-stem "changelog" = ;
+: changelog-files ( paths -- paths' ) [ changelog-file? ] filter ;
+
+: security-file? ( path -- ? )
+    >lower file-stem "security" = ;
+: security-files ( paths -- paths' ) [ security-file? ] filter ;
+
+: notice-file? ( path -- ? )
+    >lower file-stem "notice" = ;
+: notice-files ( paths -- paths' ) [ notice-file? ] filter ;
+
 : version-file? ( path -- ? )
     >lower file-stem "version" = ;
 : version-files ( paths -- paths' ) [ version-file? ] filter ;
@@ -209,14 +229,23 @@ IN: codebase-analyzer
         [ ".so" tail? ]
     } 1|| ;
 
-: analyze-rust-cargo-toml ( assoc -- )
+: print-rust-package ( assoc -- )
     {
-        [ "workspace" of "members" of length [ "  %d member projects" sprintf print ] unless-zero ]
-        [ "package" of "name" of [ "  name: %s" sprintf print ] when* ]
-        [ "package" of "version" of [ "  version: %s" sprintf print ] when* ]
-        [ "package" of "license" of [ "  license: %s" sprintf print ] when* ]
-        [ "package" of "edition" of [ "  rust edition: %s" sprintf print ] when* ]
+        [ "name" of [ "  name: %s" sprintf print ] when* ]
+        [ "version" of [ "  version: %s" sprintf print ] when* ]
+        [ "license" of [ "  license: %s" sprintf print ] when* ]
+        [ "edition" of [ "  rust edition: %s" sprintf print ] when* ]
     } cleave ;
+
+: analyze-rust-cargo-toml ( assoc -- )
+    [ print-rust-package ] keep
+    [ "workspace" of "members" of length [ "  %d member projects" sprintf print ] unless-zero ]
+    [
+        [ [ "package" of ] [ "workspace" of "package" of ] bi assoc-union ] keep
+        "workspace" of "members" of [
+            "package: " write print print-rust-package
+        ] with each
+    ] bi ;
 
 : analyze-rust-project ( path -- )
     [ "Analyzing rust project at %s" sprintf print ]
@@ -269,36 +298,47 @@ IN: codebase-analyzer
             [ length "%d binary files" sprintf print ]
             [ length "%d text files" sprintf print ] bi*
         ]
-        [ github-files [ "has .github files" print ... ] unless-empty ]
-        [ license-files [ [ length "has %d license files" sprintf print ] [ ... ] bi ] unless-empty ]
-        [ readme-files [ "has readme files" print ... ] unless-empty ]
-        [ owners-files [ "has owners files" print ... ] unless-empty ]
-        [ version-files [ "has version files" print ... ] unless-empty ]
+        [ github-files [ sort "has .github files" print ... ] unless-empty ]
+        [ license-files [ sort [ length "has %d license files" sprintf print ] [ ... ] bi ] unless-empty ]
+        [ readme-files [ sort "has readme files" print ... ] unless-empty ]
+        [ owners-files [ sort "has owners files" print ... ] unless-empty ]
+        [ codenotify-files [ sort "has codenotify files" print ... ] unless-empty ]
+        [ contributing-files [ sort "has contributing files" print ... ] unless-empty ]
+        [ changelog-files [ sort "has changelog files" print ... ] unless-empty ]
+        [ security-files [ sort "has security files" print ... ] unless-empty ]
+        [ notice-files [ sort "has notice files" print ... ] unless-empty ]
+        [ version-files [ sort "has version files" print ... ] unless-empty ]
         [
             { [ dot-files ] [ rc-files diff ] [ ignore-files diff ] } cleave
-            [ "has dot files" print ... ] unless-empty
+            [ sort "has dot files" print ... ] unless-empty
         ]
-        [ rc-files [ [ length "has %d rc files" sprintf print ] [ ... ] bi ] unless-empty ]
-        [ configure-files [ "uses configure files" print ... ] unless-empty ]
-        [ automake-files [ "uses automake" print ... ] unless-empty ]
-        [ make-files [ "uses make" print ... ] unless-empty ]
-        [ nmake-files [ "uses nmake" print ... ] unless-empty ]
-        [ cmake-files [ "uses cmake" print ... ] unless-empty ]
-        [ gradle-files [ "uses gradle" print ... ] unless-empty ]
-        [ cargo-files [ "uses rust/cargo" print ... ] unless-empty ]
-        [ julia-project-files [ "uses julia Project.toml" print ... ] unless-empty ]
-        [ in-files [ "uses 'in' files" print ... ] unless-empty ]
-        [ ignore-files [ [ length "has %d ignore files" sprintf print ] [ ... ] bi ] unless-empty nl ]
+        [ rc-files [ sort [ length "has %d rc files" sprintf print ] [ ... ] bi ] unless-empty ]
+        [ configure-files [ sort "uses configure files" print ... ] unless-empty ]
+        [ automake-files [ sort "uses automake" print ... ] unless-empty ]
+        [ make-files [ sort "uses make" print ... ] unless-empty ]
+        [ nmake-files [ sort "uses nmake" print ... ] unless-empty ]
+        [ cmake-files [ sort "uses cmake" print ... ] unless-empty ]
+        [ gradle-files [ sort "uses gradle" print ... ] unless-empty ]
+        [ cargo-files [ sort "uses rust/cargo" print ... ] unless-empty ]
+        [ julia-project-files [ sort "uses julia Project.toml" print ... ] unless-empty ]
+        [ in-files [ sort "uses 'in' files" print ... ] unless-empty ]
+        [ ignore-files [ sort [ length "has %d ignore files" sprintf print ] [ ... ] bi ] unless-empty nl ]
         [ [ rust-project-dir? ] filter [ [ "rust projects at " print . ] [ [ analyze-rust-project ] each ] bi ] unless-empty nl ]
         [
             [ upper-files ] keep
             {
+                [ github-files diff ]
                 [ license-files diff ]
                 [ readme-files diff ]
                 [ owners-files diff ]
+                [ codenotify-files diff ]
+                [ contributing-files diff ]
+                [ changelog-files diff ]
+                [ security-files diff ]
+                [ notice-files diff ]
                 [ version-files diff ]
             } cleave
-            [ [ length "has %d UPPER files (minus license,readme,owner,version)" sprintf print ] [ ... ] bi ] unless-empty nl
+            [ sort [ length "has %d UPPER files (minus github,license,readme,owner,codenotify,contributing,changelog,security,notice,version)" sprintf print ] [ ... ] bi ] unless-empty nl
         ]
         [ "Top 20 largest files" print file-sizes sort-values 20 index-or-length tail* [ normalize-path ] map-keys reverse assoc. nl ]
         [ "Top 10 file extension sizes" print sum-sizes-by-extension 10 index-or-length tail* reverse assoc. nl ]

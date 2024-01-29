@@ -91,22 +91,22 @@ $nl
 $nl
 "Singleton components:"
 { $subsections
-    hidden
-    link
-    inspector
     comparison
+    hidden
     html
+    inspector
     xml
 }
 "Tuple components:"
 { $subsections
-    field
-    password
-    textarea
-    choice
     checkbox
+    choice
     code
     farkup
+    field
+    link
+    password
+    textarea
 }
 "Creating custom components:"
 { $subsections render* }

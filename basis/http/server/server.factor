@@ -70,7 +70,9 @@ M: raw-response write-response
 M: raw-response write-full-response
     nip write-response ;
 
-: post-request? ( -- ? ) request get method>> "POST" = ;
+: method= ( str -- ? ) request get method>> = ;
+
+: post-request? ( -- ? ) "POST" method= ;
 
 SYMBOL: responder-nesting
 
@@ -142,8 +144,11 @@ LOG: httpd-header NOTICE
         { "GET" [ url>> query>> ] }
         { "HEAD" [ url>> query>> ] }
         { "OPTIONS" [ url>> query>> ] }
+        { "DELETE" [ url>> query>> ] }
         { "POST" [ post-data>> params>> ] }
+        { "PATCH" [ post-data>> params>> ] }
         { "PUT" [ post-data>> params>> ] }
+        [ 2drop H{ } clone ]
     } case ;
 
 SYMBOL: params

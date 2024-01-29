@@ -106,8 +106,7 @@ PRIVATE>
 
 : nth-root ( n x -- y ) swap recip ^ ; inline
 
-: divisor? ( m n -- ? )
-    mod 0 = ; inline
+: divisor? ( m n -- ? ) mod zero? ; inline
 
 ERROR: non-trivial-divisor n ;
 

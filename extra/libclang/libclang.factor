@@ -1,229 +1,594 @@
 ! Copyright (C) 2022 Doug Coleman.
 ! See https://factorcode.org/license.txt for BSD license.
-USING: accessors alien alien.c-types alien.libraries
-alien.syntax classes.struct combinators io io.backend kernel
-prettyprint sequences system ;
+USING: accessors alien alien.c-types alien.data alien.enums
+alien.strings ascii assocs byte-arrays classes classes.struct
+combinators combinators.extras combinators.short-circuit
+combinators.smart discord io io.backend io.directories
+io.encodings.utf8 io.files.info kernel layouts libc libclang.ffi
+make math math.parser multiline namespaces prettyprint sequences
+sequences.private sets sorting splitting strings ;
 IN: libclang
 
-LIBRARY: clang
+SYMBOL: clang-state
+: clang-state> ( -- clang-state ) clang-state get-global ;
 
-<< "clang" {
-    { [ os windows? ] [ "libclang.dll" ] }
-    { [ os macosx? ] [ "libclang.dylib" ] }
-    { [ os unix? ] [ "/usr/lib/llvm-10/lib/libclang.so" ] }
-} cond cdecl add-library >>
+! todo: typedefs
+TUPLE: libclang-state
+    defs-counter c-defs-by-name c-defs-by-order
+    c-forms child-forms
+    unnamed-counter unnamed-table
+    typedefs
+    out-forms-counter out-forms out-forms-by-name
+    out-forms-written out-form-names-written ;
 
-TYPEDEF: void* CXTranslationUnitImpl
-TYPEDEF: void* CXIndex
-TYPEDEF: CXTranslationUnitImpl* CXTranslationUnit
-TYPEDEF: void* CXClientData
+: <libclang-state> ( -- state )
+    libclang-state new
+        0 >>defs-counter
+        H{ } clone >>c-defs-by-name
+        H{ } clone >>c-defs-by-order
+        V{ } clone >>c-forms
+        H{ } clone >>child-forms
+        0 >>unnamed-counter
+        H{ } clone >>unnamed-table
+        H{ } clone >>typedefs
+        0 >>out-forms-counter
+        H{ } clone >>out-forms
+        H{ } clone >>out-forms-by-name
+        HS{ } clone >>out-forms-written
+        HS{ } clone >>out-form-names-written ;
 
-STRUCT: CXUnsavedFile
-{ Filename char* }
-{ Contents char* }
-{ Length ulong } ;
+: next-defs-counter ( libclang-state -- n ) [ dup 1 + ] change-defs-counter drop ;
+: next-unnamed-counter ( libclang-state -- n ) [ dup 1 + ] change-unnamed-counter drop ;
+: next-out-forms-counter ( libclang-state -- n ) [ dup 1 + ] change-out-forms-counter drop ;
 
-ENUM: CXCursorKind
-{ CXCursor_UnexposedDecl 1 } { CXCursor_StructDecl 2 } { CXCursor_UnionDecl 3 } { CXCursor_ClassDecl 4 }
-{ CXCursor_EnumDecl 5 } { CXCursor_FieldDecl 6 } { CXCursor_EnumConstantDecl 7 } { CXCursor_FunctionDecl 8 }
-{ CXCursor_VarDecl 9 } { CXCursor_ParmDecl 10 } { CXCursor_ObjCInterfaceDecl 11 } { CXCursor_ObjCCategoryDecl 12 }
-{ CXCursor_ObjCProtocolDecl 13 } { CXCursor_ObjCPropertyDecl 14 } { CXCursor_ObjCIvarDecl 15 } { CXCursor_ObjCInstanceMethodDecl 16 }
-{ CXCursor_ObjCClassMethodDecl 17 } { CXCursor_ObjCImplementationDecl 18 } { CXCursor_ObjCCategoryImplDecl 19 } { CXCursor_TypedefDecl 20 }
-{ CXCursor_CXXMethod 21 } { CXCursor_Namespace 22 } { CXCursor_LinkageSpec 23 } { CXCursor_Constructor 24 }
-{ CXCursor_Destructor 25 } { CXCursor_ConversionFunction 26 } { CXCursor_TemplateTypeParameter 27 } { CXCursor_NonTypeTemplateParameter 28 }
-{ CXCursor_TemplateTemplateParameter 29 } { CXCursor_FunctionTemplate 30 } { CXCursor_ClassTemplate 31 } { CXCursor_ClassTemplatePartialSpecialization 32 }
-{ CXCursor_NamespaceAlias 33 } { CXCursor_UsingDirective 34 } { CXCursor_UsingDeclaration 35 } { CXCursor_TypeAliasDecl 36 }
-{ CXCursor_ObjCSynthesizeDecl 37 } { CXCursor_ObjCDynamicDecl 38 } { CXCursor_CXXAccessSpecifier 39 } { CXCursor_FirstDecl CXCursor_UnexposedDecl }
-{ CXCursor_LastDecl CXCursor_CXXAccessSpecifier } { CXCursor_FirstRef 40 } { CXCursor_ObjCSuperClassRef 40 } { CXCursor_ObjCProtocolRef 41 }
-{ CXCursor_ObjCClassRef 42 } { CXCursor_TypeRef 43 } { CXCursor_CXXBaseSpecifier 44 } { CXCursor_TemplateRef 45 }
-{ CXCursor_NamespaceRef 46 } { CXCursor_MemberRef 47 } { CXCursor_LabelRef 48 } { CXCursor_OverloadedDeclRef 49 }
-{ CXCursor_VariableRef 50 } { CXCursor_LastRef CXCursor_VariableRef } { CXCursor_FirstInvalid 70 } { CXCursor_InvalidFile 70 }
-{ CXCursor_NoDeclFound 71 } { CXCursor_NotImplemented 72 } { CXCursor_InvalidCode 73 } { CXCursor_LastInvalid CXCursor_InvalidCode }
-{ CXCursor_FirstExpr 100 } { CXCursor_UnexposedExpr 100 } { CXCursor_DeclRefExpr 101 } { CXCursor_MemberRefExpr 102 }
-{ CXCursor_CallExpr 103 } { CXCursor_ObjCMessageExpr 104 } { CXCursor_BlockExpr 105 } { CXCursor_IntegerLiteral 106 }
-{ CXCursor_FloatingLiteral 107 } { CXCursor_ImaginaryLiteral 108 } { CXCursor_StringLiteral 109 } { CXCursor_CharacterLiteral 110 }
-{ CXCursor_ParenExpr 111 } { CXCursor_UnaryOperator 112 } { CXCursor_ArraySubscriptExpr 113 } { CXCursor_BinaryOperator 114 }
-{ CXCursor_CompoundAssignOperator 115 } { CXCursor_ConditionalOperator 116 } { CXCursor_CStyleCastExpr 117 } { CXCursor_CompoundLiteralExpr 118 }
-{ CXCursor_InitListExpr 119 } { CXCursor_AddrLabelExpr 120 } { CXCursor_StmtExpr 121 } { CXCursor_GenericSelectionExpr 122 }
-{ CXCursor_GNUNullExpr 123 } { CXCursor_CXXStaticCastExpr 124 } { CXCursor_CXXDynamicCastExpr 125 } { CXCursor_CXXReinterpretCastExpr 126 }
-{ CXCursor_CXXConstCastExpr 127 } { CXCursor_CXXFunctionalCastExpr 128 } { CXCursor_CXXTypeidExpr 129 } { CXCursor_CXXBoolLiteralExpr 130 }
-{ CXCursor_CXXNullPtrLiteralExpr 131 } { CXCursor_CXXThisExpr 132 } { CXCursor_CXXThrowExpr 133 } { CXCursor_CXXNewExpr 134 }
-{ CXCursor_CXXDeleteExpr 135 } { CXCursor_UnaryExpr 136 } { CXCursor_ObjCStringLiteral 137 } { CXCursor_ObjCEncodeExpr 138 }
-{ CXCursor_ObjCSelectorExpr 139 } { CXCursor_ObjCProtocolExpr 140 } { CXCursor_ObjCBridgedCastExpr 141 } { CXCursor_PackExpansionExpr 142 }
-{ CXCursor_SizeOfPackExpr 143 } { CXCursor_LambdaExpr 144 } { CXCursor_ObjCBoolLiteralExpr 145 } { CXCursor_ObjCSelfExpr 146 }
-{ CXCursor_OMPArraySectionExpr 147 } { CXCursor_ObjCAvailabilityCheckExpr 148 } { CXCursor_FixedPointLiteral 149 } { CXCursor_OMPArrayShapingExpr 150 }
-{ CXCursor_OMPIteratorExpr 151 } { CXCursor_CXXAddrspaceCastExpr 152 } { CXCursor_LastExpr CXCursor_CXXAddrspaceCastExpr } { CXCursor_FirstStmt 200 }
-{ CXCursor_UnexposedStmt 200 } { CXCursor_LabelStmt 201 } { CXCursor_CompoundStmt 202 } { CXCursor_CaseStmt 203 }
-{ CXCursor_DefaultStmt 204 } { CXCursor_IfStmt 205 } { CXCursor_SwitchStmt 206 } { CXCursor_WhileStmt 207 }
-{ CXCursor_DoStmt 208 } { CXCursor_ForStmt 209 } { CXCursor_GotoStmt 210 } { CXCursor_IndirectGotoStmt 211 }
-{ CXCursor_ContinueStmt 212 } { CXCursor_BreakStmt 213 } { CXCursor_ReturnStmt 214 } { CXCursor_GCCAsmStmt 215 }
-{ CXCursor_AsmStmt CXCursor_GCCAsmStmt } { CXCursor_ObjCAtTryStmt 216 } { CXCursor_ObjCAtCatchStmt 217 } { CXCursor_ObjCAtFinallyStmt 218 }
-{ CXCursor_ObjCAtThrowStmt 219 } { CXCursor_ObjCAtSynchronizedStmt 220 } { CXCursor_ObjCAutoreleasePoolStmt 221 } { CXCursor_ObjCForCollectionStmt 222 }
-{ CXCursor_CXXCatchStmt 223 } { CXCursor_CXXTryStmt 224 } { CXCursor_CXXForRangeStmt 225 } { CXCursor_SEHTryStmt 226 }
-{ CXCursor_SEHExceptStmt 227 } { CXCursor_SEHFinallyStmt 228 } { CXCursor_MSAsmStmt 229 } { CXCursor_NullStmt 230 }
-{ CXCursor_DeclStmt 231 } { CXCursor_OMPParallelDirective 232 } { CXCursor_OMPSimdDirective 233 } { CXCursor_OMPForDirective 234 }
-{ CXCursor_OMPSectionsDirective 235 } { CXCursor_OMPSectionDirective 236 } { CXCursor_OMPSingleDirective 237 } { CXCursor_OMPParallelForDirective 238 }
-{ CXCursor_OMPParallelSectionsDirective 239 } { CXCursor_OMPTaskDirective 240 } { CXCursor_OMPMasterDirective 241 } { CXCursor_OMPCriticalDirective 242 }
-{ CXCursor_OMPTaskyieldDirective 243 } { CXCursor_OMPBarrierDirective 244 } { CXCursor_OMPTaskwaitDirective 245 } { CXCursor_OMPFlushDirective 246 }
-{ CXCursor_SEHLeaveStmt 247 } { CXCursor_OMPOrderedDirective 248 } { CXCursor_OMPAtomicDirective 249 } { CXCursor_OMPForSimdDirective 250 }
-{ CXCursor_OMPParallelForSimdDirective 251 } { CXCursor_OMPTargetDirective 252 } { CXCursor_OMPTeamsDirective 253 } { CXCursor_OMPTaskgroupDirective 254 }
-{ CXCursor_OMPCancellationPointDirective 255 } { CXCursor_OMPCancelDirective 256 } { CXCursor_OMPTargetDataDirective 257 } { CXCursor_OMPTaskLoopDirective 258 }
-{ CXCursor_OMPTaskLoopSimdDirective 259 } { CXCursor_OMPDistributeDirective 260 } { CXCursor_OMPTargetEnterDataDirective 261 } { CXCursor_OMPTargetExitDataDirective 262 }
-{ CXCursor_OMPTargetParallelDirective 263 } { CXCursor_OMPTargetParallelForDirective 264 } { CXCursor_OMPTargetUpdateDirective 265 } { CXCursor_OMPDistributeParallelForDirective 266 }
-{ CXCursor_OMPDistributeParallelForSimdDirective 267 } { CXCursor_OMPDistributeSimdDirective 268 } { CXCursor_OMPTargetParallelForSimdDirective 269 } { CXCursor_OMPTargetSimdDirective 270 }
-{ CXCursor_OMPTeamsDistributeDirective 271 } { CXCursor_OMPTeamsDistributeSimdDirective 272 } { CXCursor_OMPTeamsDistributeParallelForSimdDirective 273 } { CXCursor_OMPTeamsDistributeParallelForDirective 274 }
-{ CXCursor_OMPTargetTeamsDirective 275 } { CXCursor_OMPTargetTeamsDistributeDirective 276 } { CXCursor_OMPTargetTeamsDistributeParallelForDirective 277 } { CXCursor_OMPTargetTeamsDistributeParallelForSimdDirective 278 }
-{ CXCursor_OMPTargetTeamsDistributeSimdDirective 279 } { CXCursor_BuiltinBitCastExpr 280 } { CXCursor_OMPMasterTaskLoopDirective 281 } { CXCursor_OMPParallelMasterTaskLoopDirective 282 }
-{ CXCursor_OMPMasterTaskLoopSimdDirective 283 } { CXCursor_OMPParallelMasterTaskLoopSimdDirective 284 } { CXCursor_OMPParallelMasterDirective 285 } { CXCursor_OMPDepobjDirective 286 }
-{ CXCursor_OMPScanDirective 287 } { CXCursor_OMPTileDirective 288 } { CXCursor_OMPCanonicalLoop 289 } { CXCursor_OMPInteropDirective 290 }
-{ CXCursor_OMPDispatchDirective 291 } { CXCursor_OMPMaskedDirective 292 } { CXCursor_OMPUnrollDirective 293 } { CXCursor_OMPMetaDirective 294 }
-{ CXCursor_OMPGenericLoopDirective 295 } { CXCursor_LastStmt CXCursor_OMPGenericLoopDirective } { CXCursor_TranslationUnit 300 } { CXCursor_FirstAttr 400 }
-{ CXCursor_UnexposedAttr 400 } { CXCursor_IBActionAttr 401 } { CXCursor_IBOutletAttr 402 } { CXCursor_IBOutletCollectionAttr 403 }
-{ CXCursor_CXXFinalAttr 404 } { CXCursor_CXXOverrideAttr 405 } { CXCursor_AnnotateAttr 406 } { CXCursor_AsmLabelAttr 407 }
-{ CXCursor_PackedAttr 408 } { CXCursor_PureAttr 409 } { CXCursor_ConstAttr 410 } { CXCursor_NoDuplicateAttr 411 }
-{ CXCursor_CUDAConstantAttr 412 } { CXCursor_CUDADeviceAttr 413 } { CXCursor_CUDAGlobalAttr 414 } { CXCursor_CUDAHostAttr 415 }
-{ CXCursor_CUDASharedAttr 416 } { CXCursor_VisibilityAttr 417 } { CXCursor_DLLExport 418 } { CXCursor_DLLImport 419 }
-{ CXCursor_NSReturnsRetained 420 } { CXCursor_NSReturnsNotRetained 421 } { CXCursor_NSReturnsAutoreleased 422 } { CXCursor_NSConsumesSelf 423 }
-{ CXCursor_NSConsumed 424 } { CXCursor_ObjCException 425 } { CXCursor_ObjCNSObject 426 } { CXCursor_ObjCIndependentClass 427 }
-{ CXCursor_ObjCPreciseLifetime 428 } { CXCursor_ObjCReturnsInnerPointer 429 } { CXCursor_ObjCRequiresSuper 430 } { CXCursor_ObjCRootClass 431 }
-{ CXCursor_ObjCSubclassingRestricted 432 } { CXCursor_ObjCExplicitProtocolImpl 433 } { CXCursor_ObjCDesignatedInitializer 434 } { CXCursor_ObjCRuntimeVisible 435 }
-{ CXCursor_ObjCBoxable 436 } { CXCursor_FlagEnum 437 } { CXCursor_ConvergentAttr 438 } { CXCursor_WarnUnusedAttr 439 }
-{ CXCursor_WarnUnusedResultAttr 440 } { CXCursor_AlignedAttr 441 } { CXCursor_LastAttr CXCursor_AlignedAttr } { CXCursor_PreprocessingDirective 500 }
-{ CXCursor_MacroDefinition 501 } { CXCursor_MacroExpansion 502 } { CXCursor_MacroInstantiation CXCursor_MacroExpansion } { CXCursor_InclusionDirective 503 }
-{ CXCursor_FirstPreprocessing CXCursor_PreprocessingDirective } { CXCursor_LastPreprocessing CXCursor_InclusionDirective } { CXCursor_ModuleImportDecl 600 } { CXCursor_TypeAliasTemplateDecl 601 }
-{ CXCursor_StaticAssert 602 } { CXCursor_FriendDecl 603 } { CXCursor_FirstExtraDecl CXCursor_ModuleImportDecl } { CXCursor_LastExtraDecl CXCursor_FriendDecl }
-{ CXCursor_OverloadCandidate 700 } ;
+GENERIC: def>out-form ( obj -- string )
 
-ENUM: CXChildVisitResult
-{ CXChildVisit_Break 0 }
-{ CXChildVisit_Continue 1 }
-{ CXChildVisit_Recurse 2 } ;
+: out-form-written? ( string -- ? )
+    clang-state> out-forms-written>> in? ; inline
 
-ENUM: CXTypeKind { CXType_Invalid 0 } { CXType_Unexposed 1 } { CXType_Void 2 } { CXType_Bool 3 }
-{ CXType_Char_U 4 } { CXType_UChar 5 } { CXType_Char16 6 } { CXType_Char32 7 }
-{ CXType_UShort 8 } { CXType_UInt 9 } { CXType_ULong 10 } { CXType_ULongLong 11 }
-{ CXType_UInt128 12 } { CXType_Char_S 13 } { CXType_SChar 14 } { CXType_WChar 15 }
-{ CXType_Short 16 } { CXType_Int 17 } { CXType_Long 18 } { CXType_LongLong 19 }
-{ CXType_Int128 20 } { CXType_Float 21 } { CXType_Double 22 } { CXType_LongDouble 23 }
-{ CXType_NullPtr 24 } { CXType_Overload 25 } { CXType_Dependent 26 } { CXType_ObjCId 27 }
-{ CXType_ObjCClass 28 } { CXType_ObjCSel 29 } { CXType_Float128 30 } { CXType_Half 31 }
-{ CXType_Float16 32 } { CXType_ShortAccum 33 } { CXType_Accum 34 } { CXType_LongAccum 35 }
-{ CXType_UShortAccum 36 } { CXType_UAccum 37 } { CXType_ULongAccum 38 } { CXType_BFloat16 39 }
-{ CXType_Ibm128 40 } { CXType_FirstBuiltin CXType_Void } { CXType_LastBuiltin CXType_Ibm128 } { CXType_Complex 100 }
-{ CXType_Pointer 101 } { CXType_BlockPointer 102 } { CXType_LValueReference 103 } { CXType_RValueReference 104 }
-{ CXType_Record 105 } { CXType_Enum 106 } { CXType_Typedef 107 } { CXType_ObjCInterface 108 }
-{ CXType_ObjCObjectPointer 109 } { CXType_FunctionNoProto 110 } { CXType_FunctionProto 111 } { CXType_ConstantArray 112 }
-{ CXType_Vector 113 } { CXType_IncompleteArray 114 } { CXType_VariableArray 115 } { CXType_DependentSizedArray 116 }
-{ CXType_MemberPointer 117 } { CXType_Auto 118 } { CXType_Elaborated 119 } { CXType_Pipe 120 }
-{ CXType_OCLImage1dRO 121 } { CXType_OCLImage1dArrayRO 122 } { CXType_OCLImage1dBufferRO 123 } { CXType_OCLImage2dRO 124 }
-{ CXType_OCLImage2dArrayRO 125 } { CXType_OCLImage2dDepthRO 126 } { CXType_OCLImage2dArrayDepthRO 127 } { CXType_OCLImage2dMSAARO 128 }
-{ CXType_OCLImage2dArrayMSAARO 129 } { CXType_OCLImage2dMSAADepthRO 130 } { CXType_OCLImage2dArrayMSAADepthRO 131 } { CXType_OCLImage3dRO 132 }
-{ CXType_OCLImage1dWO 133 } { CXType_OCLImage1dArrayWO 134 } { CXType_OCLImage1dBufferWO 135 } { CXType_OCLImage2dWO 136 }
-{ CXType_OCLImage2dArrayWO 137 } { CXType_OCLImage2dDepthWO 138 } { CXType_OCLImage2dArrayDepthWO 139 } { CXType_OCLImage2dMSAAWO 140 }
-{ CXType_OCLImage2dArrayMSAAWO 141 } { CXType_OCLImage2dMSAADepthWO 142 } { CXType_OCLImage2dArrayMSAADepthWO 143 } { CXType_OCLImage3dWO 144 }
-{ CXType_OCLImage1dRW 145 } { CXType_OCLImage1dArrayRW 146 } { CXType_OCLImage1dBufferRW 147 } { CXType_OCLImage2dRW 148 }
-{ CXType_OCLImage2dArrayRW 149 } { CXType_OCLImage2dDepthRW 150 } { CXType_OCLImage2dArrayDepthRW 151 } { CXType_OCLImage2dMSAARW 152 }
-{ CXType_OCLImage2dArrayMSAARW 153 } { CXType_OCLImage2dMSAADepthRW 154 } { CXType_OCLImage2dArrayMSAADepthRW 155 } { CXType_OCLImage3dRW 156 }
-{ CXType_OCLSampler 157 } { CXType_OCLEvent 158 } { CXType_OCLQueue 159 } { CXType_OCLReserveID 160 }
-{ CXType_ObjCObject 161 } { CXType_ObjCTypeParam 162 } { CXType_Attributed 163 } { CXType_OCLIntelSubgroupAVCMcePayload 164 }
-{ CXType_OCLIntelSubgroupAVCImePayload 165 } { CXType_OCLIntelSubgroupAVCRefPayload 166 } { CXType_OCLIntelSubgroupAVCSicPayload 167 }
-{ CXType_OCLIntelSubgroupAVCMceResult 168 } { CXType_OCLIntelSubgroupAVCImeResult 169 } { CXType_OCLIntelSubgroupAVCRefResult 170 }
-{ CXType_OCLIntelSubgroupAVCSicResult 171 } { CXType_OCLIntelSubgroupAVCImeResultSingleRefStreamout 172 }
-{ CXType_OCLIntelSubgroupAVCImeResultDualRefStreamout 173 } { CXType_OCLIntelSubgroupAVCImeSingleRefStreamin 174 }
-{ CXType_OCLIntelSubgroupAVCImeDualRefStreamin 175 } { CXType_ExtVector 176 } { CXType_Atomic 177 } ;
+: out-form-name-written? ( string -- ? )
+    clang-state> out-form-names-written>> in? ; inline
 
-STRUCT: CXCursor
-{ kind CXCursorKind }
-{ xdata int }
-{ data void*[3] } ;
+: save-out-form ( string def -- )
+    over empty? [
+        2drop
+    ] [
+        over out-form-written? [
+        ! dup name>> out-form-name-written? [
+            2drop
+        ] [
+            clang-state>
+            {
+                [
+                    nip
+                    [ next-out-forms-counter ]
+                    [ out-forms>> set-at ] bi
+                ]
+                [ nipd [ name>> ] dip out-form-names-written>> adjoin ]
+                [ nip out-forms-written>> adjoin ]
+                [ [ name>> ] dip out-forms-by-name>> push-at ]
+            } 3cleave
+        ] if
+    ] if ;
 
-STRUCT: CXType
-    { kind CXTypeKind }
-    { data void*[2] } ;
+! some forms must be defined out of order, e.g. anonymous unions/structs
+: def>out-forms ( obj -- )
+    [ def>out-form ] keep save-out-form ;
 
-STRUCT: CXString
-    { data c-string }
-    { private_flags uint } ;
+: peek-current-form ( -- n )
+    clang-state> c-forms>> ?last ; inline
 
-STRUCT: CXStringSet
-    { Strings CXString* }
-    { Count uint } ;
+SLOT: parent-order
+SLOT: order
 
-FUNCTION: CXIndex clang_createIndex ( int excludeDeclarationsFromPCH, int displayDiagnostics )
+: push-child-form ( form -- )
+    ! dup order>> c-defs-by-order get-global set-at ; inline
+    dup parent-order>> clang-state> child-forms>> push-at ; inline
 
-FUNCTION: CXTranslationUnit clang_parseTranslationUnit (
-    CXIndex CIdx, c-string source_filename,
-    char** command_line_args, int num_command_line_args,
-    CXUnsavedFile *unsaved_files, uint num_unsaved_files,
-    uint options )
+: with-new-form ( quot -- n )
+    clang-state> [ next-defs-counter ] [ c-forms>> ] bi push
+    call
+    clang-state> c-forms>> pop ; inline
 
-FUNCTION: void clang_disposeIndex ( CXIndex index )
-FUNCTION: void clang_disposeTranslationUnit ( CXTranslationUnit c )
+ERROR: unknown-form name ;
+GENERIC: print-deferred ( obj -- )
 
-: with-clang-index ( quot: ( index -- ) -- )
-    [ 0 0 clang_createIndex ] dip keep clang_disposeIndex ; inline
+! foo*** -> foo, todo: other cases?
+: factor-type-name ( type -- type' ) [ CHAR: * = ] trim-tail ;
 
-FUNCTION: CXCursor clang_getTranslationUnitCursor ( CXTranslationUnit c )
+: ?lookup-type ( type -- obj/f )
+    factor-type-name
+    clang-state> c-defs-by-name>> ?at [ drop f ] unless ;
 
-FUNCTION: CXCursorKind clang_getCursorKind ( CXCursor c )
+: lookup-order ( obj -- order/f ) type>> ?lookup-type [ order>> ] ?call -1 or ;
 
-CALLBACK: CXChildVisitResult CXCursorVisitor ( CXCursor cursor, CXCursor parent, CXClientData client_data )
+M: object print-deferred
+    type>> ?lookup-type [ def>out-forms ] when* ;
 
-FUNCTION: CXString clang_getCursorKindSpelling ( CXCursorKind Kind )
-FUNCTION: void clang_getDefinitionSpellingAndExtent (
-    CXCursor cursor, char **startBuf, char **endBuf, uint *startLine,
-    uint *startColumn, uint *endLine, uint *endColumn
-    )
-FUNCTION: void clang_enableStackTraces ( )
-FUNCTION: void clang_executeOnThread ( void* fn, void *user_data, uint stack_size )
+: unnamed? ( string -- ? ) "(unnamed" swap subseq? ; inline
+: unnamed-exists? ( string -- value/key ? ) clang-state> unnamed-table>> ?at ; inline
+: lookup-unnamed ( type string -- type-name )
+    unnamed-exists? [
+        nip
+    ] [
+        [ clang-state> next-unnamed-counter number>string append ] dip
+        " " split1-last nip
+        ! "RECORDING: " gwrite dup g... gflush
+        [ clang-state> unnamed-table>> set-at ] keepd
+    ] if ; inline
+
+: ?unnamed ( string type -- string' ? )
+    over unnamed? [
+        swap lookup-unnamed t
+    ] [
+        drop f
+    ] if ;
+
+TUPLE: c-function
+    { return-type string }
+    { name string }
+    { args string }
+    { order integer } ;
+
+: <c-function> ( return-type name args -- c-function )
+    c-function new
+        swap >>args
+        swap >>name
+        swap >>return-type
+        clang-state> next-defs-counter >>order ;
+
+TUPLE: c-struct
+    { name string }
+    { order integer } ;
+
+: <c-struct> ( name order -- c-struct )
+    c-struct new
+        swap >>order
+        swap >>name ;
+
+TUPLE: c-union
+    { name string }
+    { order integer } ;
+
+: <c-union> ( name order -- c-union )
+    c-union new
+        swap >>order
+        swap >>name ;
 
 
-FUNCTION: CXString clang_getCursorSpelling ( CXCursor C )
+TUPLE: c-enum
+    { name string }
+    slots
+    { order integer } ;
 
-FUNCTION: CXType clang_getCursorType ( CXCursor C )
-FUNCTION: CXString clang_getTypeSpelling ( CXType CT )
-FUNCTION: CXString clang_getTypeKindSpelling ( CXTypeKind K )
+: <c-enum> ( name order -- c-enum )
+    c-enum new
+        swap >>order
+        swap >>name ;
 
-FUNCTION: CXType clang_getResultType ( CXType T )
-FUNCTION: int clang_Cursor_getNumArguments ( CXCursor C )
-FUNCTION: CXType clang_getArgType ( CXType C, uint i )
-FUNCTION: CXCursor clang_Cursor_getArgument ( CXCursor C, uint i )
+TUPLE: c-arg
+    { name string }
+    { type string }
+    parent-order
+    { order integer } ;
 
-FUNCTION: uint clang_visitChildren (
-    CXCursor parent,
-    CXCursorVisitor visitor,
-    CXClientData client_data
-    )
+: <c-arg> ( name type -- c-arg )
+    c-arg new
+        swap >>type
+        swap >>name
+        peek-current-form >>parent-order
+        clang-state> next-defs-counter >>order ;
+
+TUPLE: c-field
+    { name string }
+    { type string }
+    parent-order
+    { order integer } ;
+
+: <c-field> ( name type -- c-field )
+    c-field new
+        swap >>type
+        swap >>name
+        peek-current-form >>parent-order
+        clang-state> next-defs-counter >>order ;
+
+TUPLE: c-typedef
+    { type string }
+    { name string }
+    { order integer } ;
+
+: <c-typedef> ( type name -- c-typedef )
+    c-typedef new
+        swap >>name
+        swap >>type
+        clang-state> next-defs-counter >>order ;
+
+M: c-function def>out-form
+    [
+        {
+            [ drop "FUNCTION: " ]
+            [ return-type>> " " ]
+            [ name>> " ( " ]
+            [ args>> dup empty? ")\n" " )\n" ? ]
+        } cleave
+    ] "" append-outputs-as ;
+
+: ignore-typedef? ( typedef -- ? )
+    [ type>> ] [ name>> ] bi
+    { [ = ] [ [ empty? ] either? ] } 2|| ;
+
+M: c-typedef def>out-form
+    dup ignore-typedef? [
+        drop ""
+    ] [
+        [
+            {
+                [ drop "TYPEDEF: " ]
+                [ type>> " " ]
+                [ name>> ]
+            } cleave
+        ] "" append-outputs-as
+    ] if ;
+
+ERROR: unknown-child-forms order ;
+M: c-field def>out-form
+    [
+        {
+            [ drop "  { " ]
+            [ name>> " " ]
+            [ type>> " }" ]
+        } cleave
+    ] "" append-outputs-as ;
+
+: print-defers ( current-order slots -- )
+    [
+        tuck lookup-order < [
+            print-deferred
+        ] [
+            drop
+        ] if
+    ] with each ;
+
+: empty-struct? ( c-struct -- ? )
+    order>> clang-state> child-forms>> key? not ;
+
+M: c-struct def>out-form
+    dup empty-struct? [
+        name>> "C-TYPE: " prepend
+    ] [
+        [
+            {
+                [ drop "STRUCT: " ]
+                [ name>> "\n" ]
+                [
+                    order>> dup clang-state> child-forms>> ?at [ drop { } ] unless
+                    [ print-defers ]
+                    [ nip [ def>out-form ] map "\n" join " ;\n" append ] 2bi
+                ]
+            } cleave
+        ] "" append-outputs-as
+    ] if ;
+
+M: c-enum def>out-form
+    [
+        {
+            [ drop "ENUM: " ]
+            [ name>> "\n" ]
+            [
+                order>> dup clang-state> child-forms>> ?at [ drop { } ] unless
+                [ print-defers ]
+                [ nip [ def>out-form ] map "\n" join " ;\n" append ] 2bi
+            ]
+        } cleave
+    ] "" append-outputs-as ;
+
+M: c-union def>out-form
+    [
+        {
+            [ drop "UNION-STRUCT: " ]
+            [ name>> "\n" ]
+            [
+                order>> dup clang-state> child-forms>> ?at [ drop { } ] unless
+                [ print-defers ]
+                [ nip [ def>out-form ] map "\n" join " ;\n" append ] 2bi
+            ]
+        } cleave
+    ] "" append-outputs-as ;
+
+M: object def>out-form
+    class-of name>> "unknown object: " prepend ;
+
+: set-definition ( named -- )
+    [ dup name>> clang-state> c-defs-by-name>> set-at ]
+    [ dup order>> clang-state> c-defs-by-order>> set-at ] bi ;
+
+: set-typedef ( typedef -- )
+    dup ignore-typedef? [
+        drop
+    ] [
+        [ type>> ] [ name>> ] bi clang-state> typedefs>> set-at
+    ] if ;
+
+: clang-get-cstring ( CXString -- string )
+    clang_getCString [ utf8 alien>string ] [ clang_disposeString ] bi ;
+
+: trim-blanks ( string -- string' )
+    [ blank? ] trim ; inline
+
+: cut-tail ( string quot -- before after ) (trim-tail) cut ; inline
+
+: cell-bytes ( -- n )
+    cell-bits 8 /i ; inline
+
+: get-tokens ( tokens ntokens -- tokens )
+    <iota> cell-bytes '[
+        _ * swap <displaced-alien>
+        clang_getTokenKind
+    ] with { } map-as ;
+
+: clang-get-file-max-range ( CXTranslationUnit path -- CXSourceRange )
+    [ dupd clang_getFile 0 clang_getLocationForOffset ]
+    [ dupd [ clang_getFile ] [ nip file-info size>> ] 2bi clang_getLocationForOffset ] 2bi
+    clang_getRange ;
+
+: clang-tokenize ( CXTranslationUnit CXSourceRange -- tokens ntokens )
+    f void* <ref>
+    0 uint <ref>
+    [ clang_tokenize ] 2keep
+    [ void* deref ]
+    [ uint deref ] bi* ;
+
+: tokenize-path ( tu path -- tokens ntokens )
+    [ drop ] [ clang-get-file-max-range ] 2bi
+    clang-tokenize ;
+
+:: with-cursor-tokens ( cursor quot: ( tu token -- obj ) -- )
+    cursor clang_Cursor_getTranslationUnit :> tu
+    tu cursor clang_getCursorExtent clang-tokenize :> ( tokens ntokens )
+    tu tokens ntokens <iota>
+    CXToken heap-size :> bytesize
+    quot
+    '[
+        bytesize * swap <displaced-alien> @
+    ] with with { } map-as
+    tu tokens ntokens clang_disposeTokens ; inline
+
+DEFER: cursor>c-struct
+DEFER: cursor>c-union
+
+:: cursor-type ( cursor -- string )
+    cursor clang_getCursorType clang_getTypeSpelling clang-get-cstring
+
+    "const" ?head drop
+
+    [ CHAR: * = ] cut-tail
+    [ [ trim-blanks ] dip append ] when*
+
+    dup :> type
+    {
+        { [ dup "struct " head? ] [
+            " " split1-last nip
+            clang-state> unnamed-table>> ?at or
+        ] }
+
+        ! libclang uses two forms for unnamed union (why!?)
+        ! union (unnamed at /Users/erg/factor/elf2.h:39:3)
+        ! union (unnamed union at /Users/erg/factor/elf2.h:39:3)
+        { [ dup "union " head? ] [
+            " " split1-last nip
+            clang-state> unnamed-table>> ?at or
+        ] }
+        { [ dup "_Bool" = ] [ drop "bool" ] }
+        { [ "int8_t" ?head ] [ trim-blanks "char" prepend ] }
+        { [ "int16_t" ?head ] [ trim-blanks "short" prepend ] }
+        { [ "int32_t" ?head ] [ trim-blanks "int" prepend ] }
+        { [ "int64_t" ?head ] [ trim-blanks "longlong" prepend ] }
+        { [ "uint8_t" ?head ] [ trim-blanks "uchar" prepend ] }
+        { [ "uint16_t" ?head ] [ trim-blanks "ushort" prepend ] }
+        { [ "uint32_t" ?head ] [ trim-blanks "uint" prepend ] }
+        { [ "uint64_t" ?head ] [ trim-blanks "ulonglong" prepend ] }
+        { [ "signed char" ?head ] [ trim-blanks "char" prepend ] }
+        { [ "signed short" ?head ] [ trim-blanks "short" prepend ] }
+        { [ "signed int" ?head ] [ trim-blanks "int" prepend ] }
+        { [ "signed long" ?head ] [ trim-blanks "long" prepend ] }
+        { [ "unsigned char" ?head ] [ trim-blanks "uchar" prepend ] }
+        { [ "unsigned short" ?head ] [ trim-blanks "ushort" prepend ] }
+        { [ "unsigned int" ?head ] [ trim-blanks "uint" prepend ] }
+        { [ "unsigned long" ?head ] [ trim-blanks "ulong" prepend ] }
+        { [ dup "(*)" swap subseq? ] [ drop "void*" ] }
+        [ ]
+    } cond ;
+
+: cursor-name ( cursor -- string )
+    clang_getCursorSpelling clang-get-cstring "Enum" ?unnamed drop ;
+
+: ?cursor-name ( cursor unnamed-type -- string )
+    [ clang_getCursorSpelling clang-get-cstring ] dip ?unnamed drop ;
+
+: arg-info ( cursor -- string )
+    [ cursor-type ] [ cursor-name [ "dummy" ] when-empty ] bi " " glue ;
+
+: cursor>args ( CXCursor -- args/f )
+    dup clang_Cursor_getNumArguments dup -1 = [
+        2drop f
+    ] [
+        <iota> [
+            clang_Cursor_getArgument
+        ] with { } map-as
+    ] if ;
+
+: cxprimitive-type>factor ( CXType -- string )
+    {
+        { CXType_Bool [ "bool" ] }
+        { CXType_Char_S [ "char" ] }
+        { CXType_Char_U [ "uchar" ] }
+        { CXType_SChar [ "char" ] }
+        { CXType_UChar [ "uchar" ] }
+        { CXType_Short [ "short" ] }
+        { CXType_UShort [ "ushort" ] }
+        { CXType_Int [ "int" ] }
+        { CXType_UInt [ "uint" ] }
+        { CXType_Long [ "long" ] }
+        { CXType_ULong [ "ulong" ] }
+        { CXType_LongLong [ "longlong" ] }
+        { CXType_ULongLong [ "ulonglong" ] }
+        { CXType_Float [ "float" ] }
+        { CXType_Double [ "double" ] }
+        { CXType_Void [ "void" ] }
+        [ drop "" ]
+    } case ;
+
+: cxreturn-type>factor ( CXType -- string )
+    {
+        { [ dup kind>> CXType_Pointer = ] [
+            clang_getPointeeType cxreturn-type>factor "*" append
+        ] }
+        { [ dup kind>> CXType_Elaborated = ] [
+            clang_getCanonicalType cxreturn-type>factor
+        ] }
+        { [ dup kind>> CXType_Record = ] [
+            clang_getTypeDeclaration cursor-name
+        ] }
+        { [ dup kind>> CXType_FunctionProto = ] [
+            ! inside a CXType_Pointer, so we get `void*` from that case
+            drop "void"
+        ] }
+        [ kind>> cxprimitive-type>factor ]
+    } cond ;
+
+: cursor>args-info ( CXCursor -- args-info )
+    cursor>args [ arg-info ] map ", " join ;
+
+: cursor>c-function ( CXCursor -- )
+    [ clang_getCursorResultType cxreturn-type>factor ]
+    [ cursor-name ]
+    [ cursor>args-info ] tri <c-function> set-definition ;
+
+: cursor>c-typedef ( CXCursor -- )
+    [ clang_getTypedefDeclUnderlyingType cxreturn-type>factor ]
+    [ cursor-name ] bi <c-typedef> [ set-definition ] [ set-typedef ] bi ;
+
+: cursor>c-field ( CXCursor -- )
+    [ cursor-name ] [ cursor-type ] bi <c-field> push-child-form ;
+
+DEFER: cursor-visitor
+
+: cursor>enum ( CXCursor -- )
+    [
+        [ cursor-name ] [ cursor-visitor ] bi
+        f clang_visitChildren drop
+    ] with-new-form <c-enum> set-definition ;
+
+: cursor>c-union ( CXCursor -- )
+    [
+        [ "Union" ?cursor-name ] keep
+        cursor-visitor f clang_visitChildren drop
+    ] with-new-form
+    <c-union> set-definition ;
+
+: cursor>c-struct ( CXCursor -- )
+    [
+        [ "Struct" ?cursor-name ] keep
+        cursor-visitor f clang_visitChildren drop
+    ] with-new-form
+    <c-struct> set-definition ;
 
 : cursor-visitor ( -- callback )
     [
         2drop
+        dup clang_getCursorKind
+        ! dup "cursor-visitor got: " gwrite g... gflush
         {
-            [ clang_getCursorType clang_getTypeSpelling data>> . ]
-            [ clang_getCursorSpelling data>> . ]
-            [ clang_getCursorKind clang_getCursorKindSpelling data>> . ]
-            [ clang_getCursorType clang_getResultType . ]
-            [
-                dup clang_Cursor_getNumArguments dup -1 = [
-                    2drop
-                ] [
-                    <iota> [
-                        clang_Cursor_getArgument
-                    ] with { } map-as ...
-                ] if
-            ]
-        } cleave
-        nl
-        CXChildVisit_Recurse
-    ] CXCursorVisitor ;
+            { CXCursor_Namespace [ drop CXChildVisit_Recurse ] }
+            { CXCursor_FunctionDecl [ cursor>c-function CXChildVisit_Continue ] }
+            { CXCursor_TypedefDecl [ cursor>c-typedef CXChildVisit_Continue ] }
+            { CXCursor_UnionDecl [ cursor>c-union CXChildVisit_Continue ] }
+            { CXCursor_StructDecl [ cursor>c-struct CXChildVisit_Continue ] }
+            { CXCursor_EnumDecl [ cursor>enum CXChildVisit_Continue ] }
+            { CXCursor_VarDecl [ drop CXChildVisit_Continue ] }
 
-! "resource:vm/factor.hpp"
-! "C:\\Program Files\\LLVM\\include\\clang-c\\index.h"
-: parse-include ( path -- )
-    normalize-path
-    '[
-        _
-        f 0 f 0 0 clang_parseTranslationUnit clang_getTranslationUnitCursor
-        cursor-visitor f
-        clang_visitChildren drop
-    ] with-clang-index ;
+            { CXCursor_FieldDecl [
+                cursor>c-field CXChildVisit_Continue
+            ] }
+            { CXCursor_EnumConstantDecl [
+                [
+                    [
+                        clang_getTokenSpelling clang-get-cstring
+                    ] with-cursor-tokens
+                    first
+                ] [
+                    clang_getEnumConstantDeclUnsignedValue number>string
+                ] bi
+                <c-field> push-child-form
+                CXChildVisit_Continue
+            ] }
+            { CXCursor_UnexposedDecl [ drop CXChildVisit_Continue ] }
+            [
+                "cursor-visitor unhandled: " gwrite dup g... gflush
+                2drop CXChildVisit_Recurse
+            ]
+        } case
+    ] CXCursorVisitor
+    gflush ;
+
+: with-clang-index ( quot: ( index -- ) -- )
+    [ 0 0 clang_createIndex ] dip keep clang_disposeIndex ; inline
+
+: with-clang-translation-unit ( idx source-file command-line-args nargs unsaved-files nunsaved-files options quot: ( tu -- ) -- )
+    [ enum>number clang_parseTranslationUnit ] dip
+    keep clang_disposeTranslationUnit ; inline
+
+: with-clang-default-translation-unit ( path quot: ( tu path -- ) -- )
+    dupd '[
+        _ f 0 f 0 CXTranslationUnit_None [
+            _ @
+        ] with-clang-translation-unit
+    ] with-clang-index ; inline
+
+: with-clang-cursor ( path quot: ( tu path cursor -- ) -- )
+    dupd '[
+        _ f 0 f 0 CXTranslationUnit_None [
+            _ over clang_getTranslationUnitCursor @
+        ] with-clang-translation-unit
+    ] with-clang-index ; inline
+
+: parse-c-exports ( path -- )
+    [
+        2nip cursor-visitor f clang_visitChildren drop
+    ] with-clang-cursor ;
+
+: write-c-defs ( clang-state -- )
+    [
+        c-defs-by-order>>
+        sort-keys values
+        [ def>out-forms ] each
+    ] [
+        [
+            [ members [ length ] inv-sort-by ] assoc-map
+        ] change-out-forms-by-name
+        out-forms>>
+        sort-keys values [ print ] each
+    ] bi ;
+
+: parse-include ( path -- libclang-state )
+    <libclang-state> clang-state [
+        normalize-path
+        parse-c-exports
+    ] with-output-global-variable
+    ! dup write-c-defs
+    ;
+
+: parse-hpp-files ( path -- assoc )
+    ?qualified-directory-files
+    [ ".hpp" tail? ] filter
+    [ parse-include ] zip-with ;
+
+: parse-h-files ( path -- assoc )
+    ?qualified-directory-files
+    [ ".h" tail? ] filter
+    [ parse-include ] zip-with ;
+
+: parse-cpp-files ( path -- assoc )
+    ?qualified-directory-files
+    [ ".cpp" tail? ] filter
+    [ parse-include ] zip-with ;

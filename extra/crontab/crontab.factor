@@ -5,11 +5,20 @@ USING: accessors arrays ascii assocs assocs.extras calendar
 calendar.english calendar.format calendar.parser
 calendar.private circular combinators combinators.short-circuit
 io kernel literals math math.order math.parser prettyprint
-ranges sequences sets sorting splitting ;
+random ranges sequences sets sorting splitting ;
 
 IN: crontab
 
 ERROR: invalid-cronentry value ;
+
+TUPLE: cronentry minutes hours days months days-of-week command ;
+
+<PRIVATE
+
+:: parse-range ( from/f to/f quot: ( value -- value' ) seq -- from to )
+    from/f to/f
+    [ [ seq first ] quot if-empty ]
+    [ [ seq last ] quot if-empty ] bi* ; inline
 
 :: parse-value ( value quot: ( value -- value' ) seq -- value )
     value {
@@ -23,7 +32,9 @@ ERROR: invalid-cronentry value ;
                 over length dup 7 = [ [ <circular> ] 2dip ] [ 1 - ] if
             ] dip string>number <range> swap nths ] }
         { [ CHAR: - over member? ] [
-            "-" split1 quot bi@ [a..b] ] }
+            "-" split1 quot seq parse-range [a..b] ] }
+        { [ CHAR: ~ over member? ] [
+            "~" split1 quot seq parse-range [a..b] random 1array ] }
         [ quot call 1array ]
     } cond members sort ; inline recursive
 
@@ -36,8 +47,6 @@ ERROR: invalid-cronentry value ;
     [ string>number ] [
         >lower $[ month-abbreviations [ >lower ] map ] index
     ] ?unless ;
-
-TUPLE: cronentry minutes hours days months days-of-week command ;
 
 CONSTANT: aliases H{
     { "@yearly"   "0 0 1 1 *" }
@@ -61,6 +70,8 @@ CONSTANT: aliases H{
         [ minutes>> [ 0 59 between? ] all? ]
         [ hours>> [ 0 23 between? ] all? ]
     } 1&& [ invalid-cronentry ] unless ;
+
+PRIVATE>
 
 : parse-cronentry ( entry -- cronentry )
     " " split1 [ aliases ?at drop ] dip " " glue
@@ -159,28 +170,28 @@ PRIVATE>
     tuck time+ group-crons ;
 
 : group-crons-for-duration ( cronstrings duration -- entries )
-    now utc group-crons-for-duration-from ;
+    now group-crons-for-duration-from ;
 
 : crons-for-minute ( cronstrings timestamp -- entries )
-    utc start-of-minute dup end-of-minute group-crons ;
+    start-of-minute dup end-of-minute group-crons ;
 
 : crons-for-hour ( cronstrings timestamp -- entries )
-    utc start-of-hour dup end-of-hour group-crons ;
+    start-of-hour dup end-of-hour group-crons ;
 
 : crons-for-day ( cronstrings timestamp -- entries )
-    utc start-of-day dup end-of-day group-crons ;
+    start-of-day dup end-of-day group-crons ;
 
 : crons-for-week ( cronstrings timestamp -- entries )
-    utc start-of-week dup end-of-week group-crons ;
+    start-of-week dup end-of-week group-crons ;
 
 : crons-for-month ( cronstrings timestamp -- entries )
-    utc start-of-month dup end-of-month group-crons ;
+    start-of-month dup end-of-month group-crons ;
 
 : crons-for-year ( cronstrings timestamp -- entries )
-    utc start-of-year dup end-of-year group-crons ;
+    start-of-year dup end-of-year group-crons ;
 
 : crons-for-decade ( cronstrings timestamp -- entries )
-    utc start-of-decade dup end-of-decade group-crons ;
+    start-of-decade dup end-of-decade group-crons ;
 
 : crons-this-minute ( cronstrings -- entries ) now crons-for-minute ;
 : crons-this-hour ( cronstrings -- entries ) now crons-for-hour ;

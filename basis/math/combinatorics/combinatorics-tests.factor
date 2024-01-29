@@ -112,3 +112,15 @@ math.combinatorics.private tools.test sequences sets ;
 
 { { "as" "ad" "af" "sa" "sd" "sf" "da" "ds" "df" "fa" "fs" "fd" } }
 [ "asdf" 2 <k-permutations> >array ] unit-test
+
+{ { "" } } [
+    "asdf" 0 <k-permutations> >array
+] unit-test
+
+{ { } } [
+    "" 10 <k-permutations>
+] unit-test
+
+{ { "" } } [
+    "" 0 <k-permutations> >array
+] unit-test

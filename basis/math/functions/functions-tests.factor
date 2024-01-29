@@ -159,6 +159,7 @@ CONSTANT: log10-factorial-1000 0x1.40f3593ed6f8ep11
 { t } [ 42 -7 divisor? ] unit-test
 { t } [ 42 42 divisor? ] unit-test
 { f } [ 42 16 divisor? ] unit-test
+{ t } [ 42.0 1 divisor? ] unit-test
 
 { 3 } [ 5 7 mod-inv ] unit-test
 { 78572682077 } [ 234829342 342389423843 mod-inv ] unit-test

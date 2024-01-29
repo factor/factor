@@ -3,11 +3,10 @@
 
 USING: accessors assocs calendar calendar.format
 calendar.holidays.us colors combinators concurrency.combinators
-formatting graphs hashtables http.client io io.styles json
-json.http kernel make math sequences sets ui ui.theme urls ;
+formatting graphs hashtables io io.styles json.http kernel make
+math sequences sets ui ui.theme urls ;
 
 IN: hacker-news
-
 CONSTANT: christmas-red COLOR: #bc2c21
 CONSTANT: christmas-green COLOR: #376627
 
@@ -47,7 +46,7 @@ CONSTANT: christmas-green COLOR: #376627
     "jobstories" hacker-news-items ;
 
 : christmas-day? ( -- ? )
-    now dup christmas-day same-day? ;
+    now-utc dup christmas-day same-day? ;
 
 : number-color ( n -- color )
     christmas-day? [

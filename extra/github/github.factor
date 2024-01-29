@@ -1,7 +1,7 @@
 ! Copyright (C) 2017 Doug Coleman.
 ! See https://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs assocs.extras calendar.parser
-cli.git combinators.extras combinators.short-circuit
+cli.git combinators combinators.extras combinators.short-circuit
 continuations formatting hashtables http.client io.pathnames
 json json.http kernel math math.order namespaces.extras
 sequences sorting urls ;
@@ -25,23 +25,56 @@ SYMBOL: github-token
     github-username required >>username
     github-token required >>password ;
 
-: github-get ( url -- json ) >github-url http-get-json nip ;
+: github-get ( url -- json ) >github-url http-get nip ;
+: github-get* ( url -- response data ) >github-url http-get* ;
+: github-get-success? ( url -- ? ) github-get* drop code>> 204 = ;
+: github-get-json ( url -- json ) >github-url http-get-json nip ;
 : github-post ( post-data url -- json ) [ ?>json ] [ >github-url ] bi* http-post-json nip ;
 : github-put ( post-data url -- json ) [ ?>json ] [ >github-url ] bi* http-put-json nip ;
+: github-put-success? ( url -- json ) f swap >github-url http-put* drop code>> 204 = ;
+: github-put-payload-success? ( post-data url -- json ) [ ?>json ] [ >github-url ] bi* http-put* drop code>> 204 = ;
 : github-patch ( post-data url -- json ) [ ?>json ] [ >github-url ] bi* http-patch-json nip ;
 : github-delete ( url -- json ) >github-url http-delete-json nip ;
+: github-delete* ( url -- ) >github-url http-delete* 2drop ;
 
 ! type is one of { "orgs" "users" }
 : map-github-pages ( base-url params param-string -- seq )
     [ 0 [ dup ] ] 3dip '[
         1 + _ _ pick suffix _ vsprintf append github-get
+        dup { [ empty? ] [ "[]" = ] } 1|| [ 2drop f f ] when
+    ] produce nip concat ; inline
+
+! type is one of { "orgs" "users" }
+: map-github-pages-json ( base-url params param-string -- seq )
+    [ 0 [ dup ] ] 3dip '[
+        1 + _ _ pick suffix _ vsprintf append github-get-json
         dup empty? [ 2drop f f ] when
     ] produce nip concat ; inline
 
 : map-github-pages-100 ( base-url -- seq )
     { 100 } "?per_page=%d&page=%d" map-github-pages ;
 
-: get-repositories ( type org/user -- seq )
+: map-github-pages-100-json ( base-url -- seq )
+    { 100 } "?per_page=%d&page=%d" map-github-pages-json ;
+
+: get-user ( user -- json ) "/users/%s" sprintf github-get-json ;
+: get-users ( users -- seq ) [ get-user ] map ;
+
+: get-repositories-for-type ( type org/user -- seq )
+    "/%s/%s/repos" sprintf map-github-pages-100 ;
+
+: get-org-repositories ( org -- seq ) [ "orgs" ] dip get-repositories-for-type ;
+: get-user-repositories ( user -- seq ) [ "users" ] dip get-repositories-for-type ;
+
+: github-org-or-user ( org/user -- orgs/users )
+    get-user "type" of {
+        { "User" [ "users" ] }
+        { "Organization" [ "orgs" ] }
+        [  type>> "Unknown github username type: " prepend throw ]
+    } case ;
+
+: get-repositories ( org/user -- seq )
+    [ github-org-or-user ] [ ] bi
     "/%s/%s/repos" sprintf map-github-pages-100 ;
 
 : list-repository-languages ( owner repo -- seq )
@@ -51,19 +84,22 @@ SYMBOL: github-token
     "/repos/%s/%s/tags" sprintf map-github-pages-100 ;
 
 : list-repository-tags-all ( owner repo -- seq )
-    "/repos/%s/%s/git/refs/tags" sprintf github-get ;
+    "/repos/%s/%s/git/refs/tags" sprintf github-get-json ;
 
 : list-repository-branches-matching ( owner repo ref -- seq )
-    "/repos/%s/%s/git/matching-refs/heads/%s" sprintf github-get ;
+    "/repos/%s/%s/git/matching-refs/heads/%s" sprintf github-get-json ;
 
 : list-repository-tags-matching ( owner repo ref -- seq )
-    "/repos/%s/%s/git/matching-refs/tags/%s" sprintf github-get ;
+    "/repos/%s/%s/git/matching-refs/tags/%s" sprintf github-get-json ;
 
 : list-repository-teams ( owner repo -- seq )
-    "/repos/%s/%s/teams" sprintf github-get ;
+    "/repos/%s/%s/teams" sprintf github-get-json ;
+
+: list-teams-for-organization ( org -- seq )
+    "/orgs/%s/teams" sprintf map-github-pages-100-json ;
 
 : list-repository-topics ( owner repo -- seq )
-    "/repos/%s/%s/topics" sprintf github-get ;
+    "/repos/%s/%s/topics" sprintf github-get-json ;
 
 : github-file-meta-and-contents ( owner repo path -- meta contents )
     "/repos/%s/%s/contents/%s" sprintf github-get
@@ -86,22 +122,22 @@ SYMBOL: github-token
     github-sha-file-meta-and-contents nip ;
 
 : github-sha-files-recursive-for-path ( owner repo sha path/f -- files )
-    "/repos/%s/%s/git/trees/%s?recursive=1&%s" sprintf github-get ;
+    "/repos/%s/%s/git/trees/%s?recursive=1&%s" sprintf github-get-json ;
 
 : github-sha-files-recursive ( owner repo sha -- files )
     f github-sha-files-recursive-for-path ;
 
 : github-sha-files-for-path ( owner repo sha path -- files )
-    swap "/repos/%s/%s/contents/%s?ref=%s" sprintf github-get ;
+    swap "/repos/%s/%s/contents/%s?ref=%s" sprintf github-get-json ;
 
 : github-code-search ( query -- seq )
-    "/search/code?q=%s" sprintf github-get ;
+    "/search/code?q=%s" sprintf github-get-json ;
 
 : github-factor-code-search ( query -- seq )
-    "/search/code?q=%s+language:factor" sprintf github-get ;
+    "/search/code?q=%s+language:factor" sprintf github-get-json ;
 
 : check-enabled-vulnerability-alerts ( owner repo -- json )
-    "/repos/%s/%s/vulnerability-alerts" sprintf github-get ;
+    "/repos/%s/%s/vulnerability-alerts" sprintf github-get-json ;
 
 : enable-vulnerability-alerts ( owner repo -- json )
     [ f ] 2dip
@@ -110,9 +146,9 @@ SYMBOL: github-token
 : disable-vulnerability-alerts ( owner repo -- json )
     "/repos/%s/%s/vulnerability-alerts" sprintf github-delete ;
 
-: get-codes-of-conduct ( -- seq ) "/codes_of_conduct" github-get ;
+: get-codes-of-conduct ( -- seq ) "/codes_of_conduct" github-get-json ;
 ! key: contributor_covenant|citizen_code_of_conduct
-: get-code-of-conduct ( key -- seq ) "/codes_of_conduct/%s" sprintf github-get ;
+: get-code-of-conduct ( key -- seq ) "/codes_of_conduct/%s" sprintf github-get-json ;
 
 ! H{ { "names" { "programming-language" "factor" "stack" "concatenative" "language" } }
 : set-repository-topics ( assoc owner repo -- json )
@@ -125,7 +161,7 @@ SYMBOL: github-token
 : create-fork ( json owner repo -- res )
     [ >json ] 2dip "/repos/%s/%s/forks" sprintf github-post ;
 
-: get-issues ( owner repo -- seq )
+: list-issues-for-repository ( owner repo -- seq )
     "/repos/%s/%s/issues" sprintf map-github-pages-100 ;
 
 ! Pull Requests
@@ -133,13 +169,13 @@ SYMBOL: github-token
     "/repos/%s/%s/pulls" sprintf map-github-pages-100 ;
 
 : get-pull-request ( owner repo n -- seq )
-    "/repos/%s/%s/pulls/%d" sprintf github-get ;
+    "/repos/%s/%s/pulls/%d" sprintf github-get-json ;
 
 : get-open-pull-requests ( owner repo -- seq )
-    "/repos/%s/%s/pulls?state=open" sprintf github-get ;
+    "/repos/%s/%s/pulls?state=open" sprintf github-get-json ;
 
 : get-pull-request-files ( owner repo pr-number -- seq )
-    "/repos/%s/%s/pulls/%d/files" sprintf github-get ;
+    "/repos/%s/%s/pulls/%d/files" sprintf github-get-json ;
 
 : get-files-from-sha ( owner repo sha files -- seq )
     [ "filename" of github-sha-file-meta-and-contents 2array ] with with with zip-with ;
@@ -164,7 +200,7 @@ SYMBOL: github-token
     "/repos/%s/%s/pulls/%d/files" sprintf map-github-pages-100 ;
 
 : pull-request-merged? ( owner repo n -- res )
-    "/repos/%s/%s/pulls/%d/merge" sprintf github-get ;
+    "/repos/%s/%s/pulls/%d/merge" sprintf github-get-json ;
 
 ! H{ { "commit_title" "oh wow" } { "commit_message" "messaged123" } { "merge_method" "merge|squash|rebase" } { "sha" "0c001" } }
 : merge-pull-request ( assoc owner repo n -- res )
@@ -176,7 +212,7 @@ SYMBOL: github-token
 
 : get-users-page ( page -- seq )
     [ "/users" ] dip
-    '{ 100 _ } "?per_page=%d&page=%d" vsprintf append github-get ;
+    '{ 100 _ } "?per_page=%d&page=%d" vsprintf append github-get-json ;
 
 : get-labels ( owner repo -- seq )
     "/repos/%s/%s/labels" sprintf map-github-pages-100 ;
@@ -185,7 +221,7 @@ SYMBOL: github-token
     get-labels [ "name" of ] map ;
 
 : get-issues-by-label ( owner repo -- seq )
-    get-issues
+    list-issues-for-repository
     [ "labels" of [ "name" of ] map ] collect-by-multi ;
 
 : get-issues-for-label ( owner repo label -- seq )
@@ -193,47 +229,41 @@ SYMBOL: github-token
 
 : get-issues-by-all-labels ( owner repo -- seq )
     [ get-label-names [ V{ } clone ] H{ } map>assoc ]
-    [ get-issues ] 2bi
+    [ list-issues-for-repository ] 2bi
     [ "labels" of [ "name" of ] map ] collect-by-multi! ;
 
 : get-empty-labels ( owner repo -- seq ) get-issues-by-all-labels sift-values ;
-: get-issues-with-no-labels ( owner repo -- seq ) get-issues [ "labels" of empty? ] filter ;
+: get-issues-with-no-labels ( owner repo -- seq ) list-issues-for-repository [ "labels" of empty? ] filter ;
 
-: get-user ( user -- json ) "/users/%s" sprintf github-get ;
-: get-users ( users -- seq ) [ get-user ] map ;
-
-: get-org-repositories ( org -- seq ) [ "orgs" ] dip get-repositories ;
-: get-user-repositories ( user -- seq ) [ "users" ] dip get-repositories ;
-
-: get-branches ( owner repo -- json ) "/repos/%s/%s/branches" sprintf github-get ;
-: get-branch ( owner repo branch -- json ) "/repos/%s/%s/branches/%s" sprintf github-get ;
+: get-branches ( owner repo -- json ) "/repos/%s/%s/branches" sprintf github-get-json ;
+: get-branch ( owner repo branch -- json ) "/repos/%s/%s/branches/%s" sprintf github-get-json ;
 : post-rename-branch ( owner repo branch new-name -- json )
     "new-name" associate -roll
     "/repos/%s/%s/branches/%s/rename" sprintf github-post ;
 
-: get-my-issues ( -- json ) "/issues" github-get ;
-: get-my-org-issues ( org -- json ) "/orgs/%s/issues" sprintf github-get ;
+: get-my-issues ( -- json ) "/issues" github-get-json ;
+: get-my-org-issues ( org -- json ) "/orgs/%s/issues" sprintf github-get-json ;
 ! H{ { "title" "issue 1" } { "body" "dear, i found a bug" } { "assignees" { "erg" "mrjbq7" } } } >json
 : create-issue ( json owner repo -- json )
     "/repos/%s/%s/issues" sprintf github-post ;
 : get-issue ( owner repo n -- json )
-    "/repos/%s/%s/issues/%d" sprintf github-get ;
+    "/repos/%s/%s/issues/%d" sprintf github-get-json ;
 ! H{ { "title" "issue 1" } { "body" "dear, i found a bug" } { "state" "open|closed" } { "state_reason" "completed|not_planned|reopened|null" } { "assignees" { "erg" "mrjbq7" } } } ! milestone, labels
 : update-issue ( json owner repo n -- json )
     "/repos/%s/%s/issues/%d" sprintf github-patch ;
 
 ! issue comments
 : list-issue-comments ( owner repo -- json )
-    "/repos/%s/%s/issues/comments" sprintf github-get ;
+    "/repos/%s/%s/issues/comments" sprintf github-get-json ;
 : list-issue-comment-by-id ( owner repo comment-id -- json )
-    "/repos/%s/%s/issues/comments/%s" sprintf github-get ;
+    "/repos/%s/%s/issues/comments/%s" sprintf github-get-json ;
 ! H{ { "body" "update my stuff" } }
 : update-issue-comment-by-id ( json owner repo comment-id -- json )
     "/repos/%s/%s/issues/comments/%s" sprintf github-patch ;
 : delete-issue-comment-by-id ( owner repo comment-id -- json )
     "/repos/%s/%s/issues/comments/%s" sprintf github-delete ;
 : list-issue-comments-by-id ( owner repo comment-id -- json )
-    "/repos/%s/%s/issues/%d/comments" sprintf github-get ;
+    "/repos/%s/%s/issues/%d/comments" sprintf github-get-json ;
 ! H{ { "body" "update my stuff" } }
 : create-issue-comment-by-id ( json owner repo issue-number -- json )
     "/repos/%s/%s/issues/%d/comments" sprintf github-post ;
@@ -243,7 +273,42 @@ SYMBOL: github-token
     "/repos/%s/%s/issues/%d/lock" sprintf github-put ;
 : unlock-issue ( owner repo n -- json )
     "/repos/%s/%s/issues/%d/lock" sprintf github-delete ;
-: user-issues ( -- json ) "/user/issues" github-get ;
+: user-issues ( -- json ) "/user/issues" github-get-json ;
+
+! stargazers
+: list-all-stargazers ( owner repo -- json )
+    "/repos/%s/%s/stargazers" sprintf map-github-pages-100 ;
+
+: list-my-starred-projects ( -- json ) "/user/starred" map-github-pages-100 ;
+
+: single-repository-starred? ( owner repo -- ? )
+    "/user/starred/%s/%s" sprintf github-get-success? ;
+
+: star-repository ( owner repo -- )
+    "/user/starred/%s/%s" sprintf github-put-success? drop ;
+
+: unstar-repository ( owner repo -- )
+    "/user/starred/%s/%s" sprintf github-delete* ;
+
+: list-repositories-starred-by-user ( user -- json )
+    "/users/%s/starred" sprintf map-github-pages-100-json ;
+
+
+: list-organization-members ( org -- json )
+    "/orgs/%s/members" sprintf map-github-pages-100-json ;
+
+: list-pull-requests-for-repository ( owner repo -- json )
+    "/repos/%s/%s/pulls" sprintf map-github-pages-100-json ;
+
+: list-repository-collaborators ( owner repo -- json )
+    "/repos/%s/%s/collaborators" sprintf map-github-pages-100-json ;
+
+: list-gists-for-user ( user -- json )
+    "/users/%s/gists" sprintf map-github-pages-100-json ;
+
+
+
+: list-repositories-for-authenticated-user ( -- json ) "/user/repos" map-github-pages-100-json ;
 
 : find-repos-by-name ( seq quot: ( name -- ? ) -- seq' ) '[ "name" of @ ] filter ; inline
 : find-repos-by-visibility ( seq quot: ( name -- ? ) -- seq' ) '[ "visibility" of @ ] filter ; inline
@@ -258,11 +323,8 @@ SYMBOL: github-token
 : sort-repos-by-updated-at<=> ( seq -- seq' ) "updated_at" [ <=> ] sort-repos-by-time ;
 : sort-repos-by-updated-at>=< ( seq -- seq' ) "updated_at" [ >=< ] sort-repos-by-time ;
 
-: sync-github-org-or-user ( directory type name -- )
+: sync-github-org-or-user ( directory name -- )
     get-repositories [ "ssh_url" of ] map sync-repositories ;
-
-: sync-github-org ( directory org -- ) [ "orgs" ] dip sync-github-org-or-user ;
-: sync-github-user ( directory user -- ) [ "users" ] dip sync-github-org-or-user ;
 
 : github-git-uri ( org/user project -- uri ) [ "git@github.com" ] 2dip "/" glue ":" glue ;
 : github-ssh-uri ( org/user project -- uri ) [ "https://github.com" ] 2dip 3append-path ;
@@ -273,3 +335,7 @@ SYMBOL: github-token
 
 : github-http-uri ( org/user project -- uri ) "http://github.com/%s/%s" sprintf ;
 : github-https-uri ( org/user project -- uri ) "https://github.com/%s/%s" sprintf ;
+
+: github-mirror-path ( org/user -- path ) "github-factor-pristine" home-path prepend-path ;
+: mirror-github-org ( org/user -- )
+    [ github-mirror-path ] [ ] bi sync-github-org-or-user ;

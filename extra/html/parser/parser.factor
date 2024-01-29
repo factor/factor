@@ -46,7 +46,7 @@ SYMBOL: tagstack
     CHAR: \" (read-quote) ;
 
 : read-quote ( sequence-parser -- string )
-    dup get+increment CHAR: ' =
+    dup consume CHAR: ' =
     [ read-single-quote ] [ read-double-quote ] if ;
 
 : read-key ( sequence-parser -- string )
