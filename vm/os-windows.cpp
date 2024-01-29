@@ -250,7 +250,7 @@ static void wake_up_thread(HANDLE thread) {
     // CancelSynchronousIo() didn't find anything to cancel, let's try
     // with QueueUserAPC() instead.
     if (err == ERROR_NOT_FOUND) {
-      if (!QueueUserAPC(&dummy_cb, thread, NULL)) {
+      if (!QueueUserAPC(&dummy_cb, thread, 0)) {
         fatal_error("QueueUserAPC() failed", GetLastError());
       }
     } else {
@@ -351,6 +351,9 @@ cell get_thread_pc(THREADHANDLE th) {
 
   suscount = ResumeThread(th);
   FACTOR_ASSERT(suscount == 1);
+
+  (void)suscount, (void)context_ok; // use all variables
+
   return context.EIP;
 }
 
@@ -382,6 +385,9 @@ void factor_vm::sampler_thread_loop() {
     cell pc = get_thread_pc(thread);
     enqueue_samples(samples, pc, false);
   }
+
+  (void)ok; // use all variables
+
 }
 
 static DWORD WINAPI sampler_thread_entry(LPVOID parent_vm) {

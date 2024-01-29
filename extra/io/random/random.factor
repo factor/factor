@@ -1,7 +1,8 @@
 ! Copyright (C) 2012 John Benediktsson
 ! See https://factorcode.org/license.txt for BSD license
 
-USING: io kernel math random sequences sequences.private ;
+USING: io io.files kernel math random sequences
+sequences.private ;
 
 IN: io.random
 
@@ -30,4 +31,4 @@ PRIVATE>
     [ random-line ] with-file-reader ; inline
 
 : random-file-lines ( path encoding n -- lines )
-    '[ _ random-file-lines ] with-file-reader ; inline
+    '[ _ random-lines ] with-file-reader ; inline

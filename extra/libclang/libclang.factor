@@ -342,15 +342,18 @@ M: object def>out-form
     [ drop ] [ clang-get-file-max-range ] 2bi
     clang-tokenize ;
 
-:: with-cursor-tokens ( cursor quot: ( tu token -- obj ) -- )
+: ptr-array>array ( ptr c-type n -- array )
+    [ heap-size ] [ <iota> ] bi*
+    [
+        * swap <displaced-alien>
+    ] with with { } map-as ;
+
+:: with-cursor-tokens ( cursor quot: ( tu token -- obj ) -- seq )
     cursor clang_Cursor_getTranslationUnit :> tu
     tu cursor clang_getCursorExtent clang-tokenize :> ( tokens ntokens )
-    tu tokens ntokens <iota>
-    CXToken heap-size :> bytesize
-    quot
-    '[
-        bytesize * swap <displaced-alien> @
-    ] with with { } map-as
+    tu
+    tokens CXToken ntokens ptr-array>array
+    [ clang_getTokenSpelling clang-get-cstring ] with map
     tu tokens ntokens clang_disposeTokens ; inline
 
 DEFER: cursor>c-struct
