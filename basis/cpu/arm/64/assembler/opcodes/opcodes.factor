@@ -208,21 +208,22 @@ M: integer-literal value value>> ;
 M: object value ;
 
 : arm-bitfield ( seq -- assoc )
-    [ current-vocab name>> ?lookup-word ] map
-    [ dup width ] map>alist
-    dup values [ f = ] any? [ throw ] when ;
+    [ current-vocab name>> ?lookup-word ] map ! looks up the fields associated with the effect labels
+    [ dup width ] map>alist ! creates a list of { field bitwidth } pairs 
+    dup values [ f = ] any? [ throw ] when ; ! if any have no assigned bitwidth, throw.
 
 ERROR: bad-instruction values ;
 
 SYNTAX: ARM-INSTRUCTION:
-    scan-new-word
-    scan-effect
+    scan-new-word ! scans in the name given
+    scan-effect ! scans in the effect given (effect objects hold input and output sequences)
     [
-      in>> arm-bitfield
-      [ keys [ value ] map ]
-      [ values 32 [ - ] accumulate* ] bi zip
-      dup last second 0 = [ bad-instruction ] unless
-      '[ _ bitfield* 4 >le % ]
+      in>> arm-bitfield ! generates a list of { field bitwidth } pairs from the input
+      [ keys [ value ] map ] ! gets the fields back
+      ! for each field, how many bits are left in the instr after it?
+      [ values 32 [ - ] accumulate* ] bi zip ! then combines into another assoc
+      dup last second 0 = [ bad-instruction ] unless ! and there better be 0 bits left after the last field
+      '[ _ bitfield* 4 >le % ] ! this quot is the actual word effect
     ] [ in>> [ string>number ] reject { } <effect> ] bi define-declared ;
 >>
 

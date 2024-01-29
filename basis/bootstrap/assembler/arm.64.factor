@@ -336,7 +336,7 @@ big-endian off
 
 ! C to Factor entry point
 [
-    0xabcd BRK
+    ! 0xabcd BRK
     ! ! Optimizing compiler's side of callback accesses
     ! ! arguments that are on the stack via the frame pointer.
     ! ! On x86-32 fastcall, and x86-64, some arguments are passed
@@ -447,15 +447,9 @@ big-endian off
 ] CALLBACK-STUB jit-define
 
 [
-    ! ! load literal
-    ! temp0 0 MOV f rc-absolute-cell rel-literal
-    2 words temp0 LDRl
-    3 words Br
-    NOP NOP f rc-absolute-cell rel-literal
-    ! ! increment datastack pointer
-    ! ds-reg bootstrap-cell ADD
-    ! ! store literal on datastack
-    ! ds-reg [] temp0 MOV
+    ! load literal
+    0 0 temp0 MOVZ f rc-absolute-arm64-movz rel-literal
+    ! push literal on data stack
     push0
 ] JIT-PUSH-LITERAL jit-define
 
@@ -523,52 +517,37 @@ big-endian off
     16 SP X1 X0 LDPpost ;
 
 [
-    ! ! load boolean
-    ! temp0 ds-reg [] MOV
-    ! ! pop boolean
-    ! ds-reg bootstrap-cell SUB
+    ! load and pop value
     pop0
-    ! ! compare boolean with f
-    ! temp0 \ f type-number CMP
+    ! compare value with f
     \ f type-number temp0 CMPi
-    ! ! jump to true branch if not equal
-    ! ! 0 JNE f rc-relative rel-word
-    ! 0 NE B.cond f rc-relative-arm64-bcond rel-word
-    5 words EQ B.cond
-    absolute-jump rel-word
-    ! ! jump to false branch if equal
-    ! ! 0 JMP f rc-relative rel-word
-    ! 0 Br f rc-relative-arm64-branch rel-word
-    absolute-jump rel-word
+    ! jump to true branch if not equal
+    0 NE B.cond f rc-relative-arm64-bcond rel-word
+    ! jump to false branch if equal
+    0 Br f rc-relative-arm64-branch rel-word
 ] JIT-IF jit-define
 
 [
     >r
-    ! ! 0 CALL f rc-relative rel-word
-    ! push-link-reg
-    ! 0 Br f rc-relative-arm64-branch rel-word
-    ! pop-link-reg
-    absolute-call rel-word
+    push-link-reg
+    0 BL f rc-relative-arm64-branch rel-word
+    pop-link-reg
     r>
 ] JIT-DIP jit-define
 
 [
     >r >r
-    ! ! 0 CALL f rc-relative rel-word
-    ! push-link-reg
-    ! 0 Br f rc-relative-arm64-branch rel-word
-    ! pop-link-reg
-    absolute-call rel-word
+    push-link-reg
+    0 BL f rc-relative-arm64-branch rel-word
+    pop-link-reg
     r> r>
 ] JIT-2DIP jit-define
 
 [
     >r >r >r
-    ! ! 0 CALL f rc-relative rel-word
-    ! push-link-reg
-    ! 0 Br f rc-relative-arm64-branch rel-word
-    ! pop-link-reg
-    absolute-call rel-word
+    push-link-reg
+    0 BL f rc-relative-arm64-branch rel-word
+    pop-link-reg
     r> r> r>
 ] JIT-3DIP jit-define
 
@@ -620,11 +599,12 @@ big-endian off
 ! Load a value from a stack position
 [
     ! temp1 ds-reg 0x7f [+] MOV f rc-absolute-1 rel-untagged
-    4 words temp2 ADR
-    3 temp2 temp2 LDRBuoff
+    ! get the absolute relocation into temp2
+    0 0 temp2 MOVZ f rc-absolute-arm64-movz rel-untagged
+    ! clear the upper bytes of temp2, keep the least significant byte
+    temp2 temp2 UXTB
+    ! load the stuff at the address (ds-reg + temp2) into temp1
     temp2 ds-reg temp1 LDRr
-    2 words Br
-    NOP f rc-absolute-1 rel-untagged
 ] PIC-LOAD jit-define
 
 [
@@ -648,18 +628,21 @@ big-endian off
 
 [
     ! temp1/32 0x7f CMP f rc-absolute-1 rel-untagged
-    4 words temp2 ADR
-    3 temp2 temp2 LDRBuoff
+    0 0 temp2 MOVZ f rc-absolute-arm64-movz rel-untagged
+    temp2 temp2 UXTB
     temp2 temp1 CMPr
-    2 words Br
-    NOP f rc-absolute-1 rel-untagged
 ] PIC-CHECK-TAG jit-define
 
 [
-    ! ! 0 JE f rc-relative rel-word
-    ! 0 EQ B.cond f rc-relative-arm64-bcond rel-word
-    5 words NE B.cond
-    absolute-jump rel-word
+    ! temp2 0 MOV f rc-absolute-cell rel-literal
+    ! temp1 temp2 CMP
+    0 0 temp2 MOVZ f rc-absolute-arm64-movz rel-untagged
+    temp2 temp1 CMPr
+] PIC-CHECK-TUPLE jit-define
+
+[
+    ! 0 JE f rc-relative rel-word
+    0 EQ B.cond f rc-relative-arm64-bcond rel-word
 ] PIC-HIT jit-define
 
 ! ! ! Megamorphic caches

@@ -342,3 +342,5 @@ PRIVATE>
 : SVC ( uimm16 -- ) 16 ?ubits SVC-encode ;
 
 : TSTi ( imm64 Rn -- ) 1bw [ swap encode-bitmask ] dip TSTi-encode ;
+
+: UXTB ( Rn Rd -- ) UXTB-encode ;
