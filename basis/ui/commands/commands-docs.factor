@@ -59,6 +59,11 @@ HELP: define-command-map
 }
 { $notes "Only one of " { $link define-command-map } " and " { $link set-gestures } " can be used on a given gadget class, since each word will overwrite the other word's definitions." } ;
 
+HELP: update-command-map
+{ $values { "class" "a class word" } { "group" string } { "pairs" "a sequence of gesture/word pairs" } }
+{ $description
+    "Updates a command map on the specified gadget class. The gestures specified in " { $snippet "pairs" } " are added. If any of the gestures are already defined in that " { $snippet "group" } ", they are replaced." } ;
+
 HELP: $command-map
 { $values { "element" "a pair " { $snippet "{ class map }" } } }
 { $description "Prints a command map, where the first element of the pair is a class word and the second is a command map name." } ;
