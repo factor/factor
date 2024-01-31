@@ -157,11 +157,11 @@ PRIVATE>
 :: call-continue ( params quot1: ( params -- obj assoc )
 quot2: ( ... -- ... ) -- seq )
     f f [
-        "continue" of dup
+        "continue" of
     ] [
         params assoc-union quot1 call
         [ quot2 call >alist append ] dip
-    ] do while drop ; inline
+    ] do while* ; inline
 
 : query ( params -- seq )
     [ (query) ] [ ] call-continue ;
