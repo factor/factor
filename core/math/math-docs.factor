@@ -246,7 +246,11 @@ HELP: >rect
 HELP: gcd
 { $values { "x" integer } { "y" integer } { "a" integer } { "d" integer } }
 { $description "Computes the positive greatest common divisor " { $snippet "d" } " of " { $snippet "x" } " and " { $snippet "y" } ", and another value " { $snippet "a" } " satisfying:" { $code "(a*x - d) mod y == 0" } }
-{ $notes "If " { $snippet "d" } " is 1, then " { $snippet "a" } " is the inverse of " { $snippet "y" } " modulo " { $snippet "x" } "." } ;
+{ $notes "If " { $snippet "d" } " is 1, then " { $snippet "a" } " is the inverse of " { $snippet "x" } " modulo " { $snippet "y" } "." }
+{ $examples
+    { $example "USING: kernel math prettyprint ;" "54 26 gcd [ . ] bi@" "1\n2" }
+    { $example "USING: math prettyprint ;" "54 1 * 2 - 26 mod ." "0" }
+} ;
 
 HELP: lcm
 { $values { "a" integer } { "b" integer } { "c" integer } }
