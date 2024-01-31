@@ -61,7 +61,7 @@ HELP: max-dims
 { pref-dims max-dims sum-dims } related-words
 
 HELP: each-child
-{ $values { "gadget" gadget } { "quot" { $quotation ( child -- ) } } }
+{ $values { "gadget" gadget } { "quot" { $quotation ( ... child -- ... ) } } }
 { $description "Applies the quotation to each child of the gadget." } ;
 
 HELP: gadget-selection?
@@ -163,11 +163,11 @@ HELP: child?
 { $description "Tests if " { $snippet "child" } " is contained inside " { $snippet "parent" } "." } ;
 
 HELP: each-parent
-{ $values { "gadget" gadget } { "quot" { $quotation ( gadget -- ? ) } } { "?" boolean } }
+{ $values { "gadget" gadget } { "quot" { $quotation ( ... gadget -- ... ? ) } } { "?" boolean } }
 { $description "Applies the quotation to every parent of the gadget, starting from the gadget itself, stopping if the quotation yields " { $link f } ". Outputs " { $link t } " if the iteration completed, and outputs " { $link f } " if it was stopped prematurely." } ;
 
 HELP: find-parent
-{ $values { "gadget" gadget } { "quot" { $quotation ( gadget -- ? ) } } { "parent" gadget } }
+{ $values { "gadget" gadget } { "quot" { $quotation ( ... gadget -- ... ? ) } } { "parent" gadget } }
 { $description "Outputs the first parent of the gadget, starting from the gadget itself, for which the quotation outputs a true value, or " { $link f } " if the quotation outputs " { $link f } " for every parent." } ;
 
 HELP: focusable-child*

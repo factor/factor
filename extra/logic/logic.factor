@@ -131,7 +131,7 @@ C: <cut> cut-info inline
 : set-info-if-f ( ? cut-info -- )
     dup cut?>> [ 2drop ] [ cut?<< ] if ; inline
 
-: 2each-until ( seq1 seq2 quot -- all-failed? ) 2 nfind 2drop f = ; inline
+: 2each-until ( ... seq1 seq2 quot: ( ... elt1 elt2 -- ... ? ) -- ... all-failed? ) 2 nfind 2drop f = ; inline
 
 DEFER: unify*
 
@@ -585,7 +585,7 @@ PRIVATE>
 
 <PRIVATE
 
-: each-until ( seq quot -- ) find 2drop ; inline
+: each-until ( ... seq quot: ( ... elt -- ... ? ) -- ... ) find 2drop ; inline
 
 :: resolve-body ( body env cut quot: ( -- ) -- )
     body empty? [
