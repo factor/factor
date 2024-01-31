@@ -22,14 +22,14 @@ TUPLE: cronentry minutes hours days months days-of-week command ;
 
 :: parse-value ( value quot: ( value -- value' ) seq -- value )
     value {
+        { [ dup "*" = ] [ drop seq ] }
         { [ CHAR: , over member? ] [
             "," split [ quot seq parse-value ] map concat ] }
-        { [ dup "*" = ] [ drop seq ] }
         { [ CHAR: / over member? ] [
             "/" split1 [
-                quot seq parse-value
-                dup length 1 = [ seq swap first seq first - ] [ 0 ] if
-                over length dup 7 = [ [ <circular> ] 2dip ] [ 1 - ] if
+                quot seq parse-value dup length 1 =
+                [ seq swap first seq index seq length ]
+                [ 0 over length ] if 1 -
             ] dip string>number <range> swap nths ] }
         { [ CHAR: - over member? ] [
             "-" split1 quot seq parse-range [a..b] ] }
@@ -80,7 +80,7 @@ PRIVATE>
         [ [ string>number ] T{ range f 0 24 1 } parse-value ]
         [ [ string>number ] T{ range f 1 31 1 } parse-value ]
         [ [ parse-month ] T{ range f 1 12 1 } parse-value ]
-        [ [ parse-day ] T{ range f 0 7 1 } parse-value ]
+        [ [ parse-day ] T{ circular f T{ range f 0 7 1 } 1 } parse-value ]
         [ ]
     } spread cronentry boa check-cronentry ;
 
