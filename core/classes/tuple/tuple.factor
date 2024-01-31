@@ -263,7 +263,7 @@ M: tuple-class update-class
 : subclasses ( class -- classes )
     class-usages [ tuple-class? ] filter ;
 
-: each-subclass ( class quot -- )
+: each-subclass ( ... class quot: ( ... subclass -- ... ) -- ... )
     [ subclasses ] dip each ; inline
 
 : redefine-tuple-class ( class superclass slots -- )

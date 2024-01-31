@@ -31,7 +31,7 @@ M: trails-gadget ungraft*
 
 M: trails-gadget pref-dim* drop { 500 500 } ;
 
-: each-percent ( seq quot -- )
+: each-percent ( ... seq quot: ( ... elt percent -- ... ) -- ... )
     [ dup length ] dip '[ 1 + _ / @ ] each-index ; inline
 
 M:: trails-gadget draw-gadget* ( GADGET -- )

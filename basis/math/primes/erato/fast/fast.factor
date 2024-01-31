@@ -15,7 +15,7 @@ CONSTANT: wheel-2-3-5-7 $[
     ] B{ } filter-as differences
 ]
 
-:: each-prime ( upto sieve quot -- )
+:: each-prime ( ... upto sieve quot: ( ... n -- ... ) -- ... )
     11 upto integer>fixnum-strict '[ dup _ <= ] [
         wheel-2-3-5-7 [
             over dup 2/ sieve nth-unsafe [ drop ] quot if
