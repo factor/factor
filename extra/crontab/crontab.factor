@@ -15,13 +15,12 @@ TUPLE: cronentry minutes hours days months days-of-week command ;
 
 <PRIVATE
 
-:: parse-range ( from/f to/f quot: ( value -- value' ) seq -- from to )
-    from/f to/f
-    [ [ seq first ] quot if-empty ]
-    [ [ seq last ] quot if-empty ] bi* ; inline
+:: parse-range ( from/f to/f quot: ( input -- value ) seq -- from to )
+    from/f [ seq first ] quot if-empty
+    to/f [ seq last ] quot if-empty ; inline
 
-:: parse-value ( value quot: ( value -- value' ) seq -- value )
-    value {
+:: parse-value ( input quot: ( input -- value ) seq -- value )
+    input {
         { [ dup "*" = ] [ drop seq ] }
         { [ CHAR: , over member? ] [
             "," split [ quot seq parse-value ] map concat ] }
