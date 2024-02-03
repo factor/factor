@@ -76,7 +76,7 @@ PRIVATE>
     ] with-directory ;
 
 : gzip-decompress-file ( path -- )
-    { "gzip" "-d" } swap suffix run-process drop ;
+    { "gzip" "-d" } swap suffix try-process ;
 
 : mnist-data>array ( bytes -- seq )
     16 tail-slice 28 28 * <groups> [
