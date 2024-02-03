@@ -6,15 +6,15 @@ IN: git.tests
 
 : with-empty-test-git-repo ( quot -- )
     '[
-        { "git" "init" } run-process drop
+        { "git" "init" } try-process
         @
     ] with-test-directory ; inline
 
 : with-zero-byte-file-repo ( quot -- )
     '[
         "empty-file" touch-file
-        { "git" "add" "empty-file" } run-process drop
-        { "git" "commit" "-m" "initial commit of empty file" } run-process drop
+        { "git" "add" "empty-file" } try-process
+        { "git" "commit" "-m" "initial commit of empty file" } try-process
         @
     ] with-empty-test-git-repo ; inline
 

@@ -66,7 +66,7 @@ SYMBOL: docker-password
         docker-path "login"
         "-p" docker-password get-global
         "-u" docker-username get-global
-    } run-process drop ;
+    } try-process ;
 
 GENERIC: docker-pull ( obj -- )
 
