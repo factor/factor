@@ -28,7 +28,7 @@ TUPLE: city
 first-zip name state latitude longitude gmt-offset dst-offset ;
 
 MEMO: cities ( -- seq )
-    "resource:extra/usa-cities/zipcode.csv" ascii file>csv
+    "vocab:usa-cities/zipcode.csv" ascii file>csv
     rest-slice [
         [
             {
