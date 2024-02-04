@@ -3,4 +3,4 @@ include vm/Config.x86.64
 
 PLAF_MASTER_HEADERS += vm/os-macosx-x86.64.hpp
 
-SITE_CFLAGS += -mmacosx-version-min=10.9 -target x86_64-apple-darwin
+SITE_CFLAGS += -mmacosx-version-min=11.0 -target x86_64-apple-darwin
