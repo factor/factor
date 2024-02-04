@@ -45,7 +45,7 @@ cpu ppc? [
     }
 }
 [
-    "resource:extra/elf/a.elf" [
+    "vocab:elf/a.elf" [
         sections [ name>> ] map
     ] with-mapped-elf
 ]
@@ -74,7 +74,7 @@ unit-test
     }
 }
 [
-    "resource:extra/elf/a.elf" [
+    "vocab:elf/a.elf" [
         segments [ program-header>> p_type>> PT_LOAD = ] find nip
         sections [ name>> ] map
     ] with-mapped-elf
@@ -158,7 +158,7 @@ unit-test
     }
 }
 [
-    "resource:extra/elf/a.elf" [
+    "vocab:elf/a.elf" [
         sections ".symtab" find-section symbols
         [ name>> ] map
     ] with-mapped-elf
@@ -172,7 +172,7 @@ unit-test
     }
 }
 [
-    "resource:extra/elf/a.elf" [
+    "vocab:elf/a.elf" [
         sections ".symtab" "main" find-section-symbol
         symbol-data >byte-array
     ] with-mapped-elf
