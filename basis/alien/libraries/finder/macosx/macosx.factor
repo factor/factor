@@ -115,7 +115,7 @@ SYMBOL: dyld-executable-path
 FUNCTION: bool _dyld_shared_cache_contains_path ( c-string name )
 
 : use-dyld-shared-cache? ( -- ? )
-    os-version { 10 16 0 } after=? ;
+    os-version { 11 0 0 } after=? ;
 
 PRIVATE>
 
